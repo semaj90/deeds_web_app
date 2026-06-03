@@ -2,12 +2,14 @@
 ~24gb,
 find the remaining 40gb missing.
 156k sveltekit-frontend 156,217 Files, 19,755 Folders 15.7 GB
+~143k node_modules 143,133 Files, 14,792 Folders 1.79 GB
 repo root:
 ~50k deeds_labs 51,201 Files, 11,688 Folders 884 MB
-~100k .venv-py313-backup 97,636 Files, 16,490 Folders 5.47 GB
-~143k node_modules 143,133 Files, 14,792 Folders 1.79 GB
 ~44k claude-mem 44,250 Files, 4,175 Folders 1.20 GB
 .python311 5,385 Files, 229 Folders 101 MB
+
+
+~100k .venv-py313-backup 97,636 Files, 16,490 Folders 5.47 GB
 
 
 Here's the honest production hardening picture for this stack:

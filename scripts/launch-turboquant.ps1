@@ -125,20 +125,56 @@ $llama = if ($env:LLAMA_SERVER_PATH) {
     else { "llama-server.exe" }
 }
 
-# ROTORQUANT_MODEL_PATH overrides TURBO_MODEL_PATH when set.
+# Embedding note: --embeddings is intentionally NOT passed to llama-server.
+# Embeddings are handled by the ONNX DirectML pipeline (embeddinggemma_300m_onnx)
+# via compute-glyph-rewards.mjs and gpu-full-pipeline.mjs. Adding --embeddings
+# here would OOM the 8GB GPU (5.3GB model + KV cache already fills ~7.5GB).
+
+# Model resolution: ROTORQUANT_MODEL_PATH > TURBO_MODEL_PATH > local GGUF search
+# > Ollama blob auto-discovery (scans manifests for gemma4/rotorquant GGUFs).
+# Ollama blobs are raw GGUF files — llama-server reads them directly without Ollama.
 $model = if ($env:ROTORQUANT_MODEL_PATH) {
     $env:ROTORQUANT_MODEL_PATH
 } elseif ($env:TURBO_MODEL_PATH) {
     $env:TURBO_MODEL_PATH
 } else {
-    $vendorModel = Join-Path $PSScriptRoot "..\vendor\models\gemma4-legal.gguf"
-    $vendorDirect = Join-Path $PSScriptRoot "..\vendor\models\gemma4-rotorquant:latest.gguf"
-    $localModel = Join-Path $PSScriptRoot "..\models\gemma4-legal-iq4xs-direct.gguf"
-    $localLegacy = Join-Path $PSScriptRoot "..\models\gemma4-turboquant-rotorquant.gguf"
+    $vendorModel  = Join-Path $PSScriptRoot "..\vendor\models\gemma4-legal.gguf"
+    $vendorDirect = Join-Path $PSScriptRoot "..\vendor\models\gemma4-rotorquant.gguf"
+    $localModel   = Join-Path $PSScriptRoot "..\models\gemma4-legal-iq4xs-direct.gguf"
+    $localLegacy  = Join-Path $PSScriptRoot "..\models\gemma4-turboquant-rotorquant.gguf"
+
+    # Auto-discover RotorQuant/Gemma4 GGUF from Ollama blob store.
+    # Scans manifests for model layers matching known legal/gemma4 tags,
+    # then resolves the sha256 blob path. Works without Ollama running.
+    $ollamaBlob = $null
+    $manifestRoot = Join-Path $env:USERPROFILE '.ollama\models\manifests\registry.ollama.ai\library'
+    $blobRoot     = Join-Path $env:USERPROFILE '.ollama\models\blobs'
+    $preferredTags = @('gemma3-legal', 'gemma4-legal', 'gemma4-rotorquant', 'gemma3-legal-optimized')
+    foreach ($tag in $preferredTags) {
+        $mf = Join-Path $manifestRoot "$tag\latest"
+        if (-not (Test-Path $mf)) { continue }
+        try {
+            $mfData = Get-Content $mf -Raw | ConvertFrom-Json
+            $modelLayer = $mfData.layers | Where-Object { $_.mediaType -eq 'application/vnd.ollama.image.model' } | Select-Object -First 1
+            if ($modelLayer -and $modelLayer.digest) {
+                $blobName = $modelLayer.digest -replace ':', '-'
+                $blobPath = Join-Path $blobRoot $blobName
+                if (Test-Path $blobPath) {
+                    Write-Host ("Auto-discovered model: $tag → $blobPath") -ForegroundColor DarkCyan
+                    $ollamaBlob = $blobPath
+                    break
+                }
+            }
+        } catch {
+            # malformed manifest — skip
+        }
+    }
+
     if (Test-Path $vendorModel) { $vendorModel }
     elseif (Test-Path $vendorDirect) { $vendorDirect }
     elseif (Test-Path $localModel) { $localModel }
     elseif (Test-Path $localLegacy) { $localLegacy }
+    elseif ($ollamaBlob) { $ollamaBlob }
     else { $null }
 }
 $mmproj = if ($env:TURBO_MMPROJ_PATH) {
@@ -163,7 +199,7 @@ $batchSize = if ($env:TURBO_BATCH_SIZE) { $env:TURBO_BATCH_SIZE } else { $null }
 $ubatchSize = if ($env:TURBO_UBATCH_SIZE) { $env:TURBO_UBATCH_SIZE } else { $null }
 
 # -- GPU Offload (NGL) ----------------------------------------------------
-$ngl = if ($env:TURBO_NGL) { $env:TURBO_NGL } else { "35" }
+$ngl = if ($env:TURBO_NGL) { $env:TURBO_NGL } else { "99" }
 
 # Handle negative values - warn and normalize
 if ($ngl -match "^-") {
@@ -215,7 +251,10 @@ if ($supportedKv -notcontains $kvV) {
 }
 
 if (-not (Test-Path $llama)) { throw "llama-server.exe not found at $llama" }
-if (-not (Test-Path $model)) { throw "TurboQuant model blob not found at $model" }
+if (-not $model) {
+  throw "No model GGUF found. Set ROTORQUANT_MODEL_PATH=<path to GGUF>, or place gemma4-legal.gguf in vendor/models/, or ensure gemma3-legal/gemma4-rotorquant is pulled in Ollama (~/.ollama/models/)."
+}
+if (-not (Test-Path $model)) { throw "TurboQuant model GGUF not found at: $model" }
 
 
 # -- Pre-flight: evict Ollama-resident model so VRAM is free --------------
@@ -359,14 +398,15 @@ if ($StatusOnly) {
 
 # -- Build argument list --------------------------------------------------
 $baseArgs = @(
-  '-m',    $model,
-  '--port', $port,
-  '-ngl',   $ngl,
-  '-fa',    'on',
-  '-ctk',   $kvK,
-  '-ctv',   $kvV,
-  '-c',     $ctxLen,
-  '-t',     $threads
+  '-m',      $model,
+  '--host',  '127.0.0.1',
+  '--port',  $port,
+  '-ngl',    $ngl,
+  '-fa',     'on',
+  '-ctk',    $kvK,
+  '-ctv',    $kvV,
+  '-c',      $ctxLen,
+  '-t',      $threads
 )
 
 # -- Parallel slots check (Multi-core / Concurrent processing) -------------

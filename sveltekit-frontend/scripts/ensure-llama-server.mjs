@@ -3,14 +3,25 @@ import 'dotenv/config';
 /**
  * ensure-llama-server.mjs
  *
- * Ensures llama-server.exe is running on :8090 using the active local GGUF.
- * Prefers explicit env paths so the launcher follows the current Path B
- * runtime: stock llama.cpp CUDA + merged Gemma4 legal GGUF model.
+ * Two exports:
+ *
+ *   ensureLlamaServer()   — chat/VLM server on :8090 (Gemma4, --jinja, KV cache)
+ *   ensureEmbedServer()   — embedding server on :8081 (embeddinggemma, --embedding
+ *                           --pooling mean --embd-normalize 2)
+ *
+ * The embedding server exposes OpenAI-compatible POST /v1/embeddings.
+ * Set OLLAMA_EMBED_BASE_URL=http://127.0.0.1:8081 in .env to route the
+ * SvelteKit embedding pipeline through it instead of Ollama.
+ *
+ * CLI flags:
+ *   --spawn          start chat server (default)
+ *   --spawn-embed    start embedding server
+ *   --spawn-both     start both servers
  */
 
 import os from 'node:os';
 import { spawn } from 'node:child_process';
-import { existsSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -171,15 +182,131 @@ export async function ensureLlamaServer() {
   return false;
 }
 
+// ── Embedding server (llama-server :8081 with --embedding) ───────────────────
+
+const EMBED_HOST = process.env.EMBED_SERVER_HOST ?? '127.0.0.1';
+const EMBED_PORT = parseInt(process.env.EMBED_SERVER_PORT ?? '8081', 10);
+const EMBED_BASE = `http://${EMBED_HOST}:${EMBED_PORT}`;
+
+// Auto-discover embedding model blob via Ollama manifest (reads sha256 digest → blob path).
+// Tries embeddinggemma first, then nomic-embed-text, then all-minilm.
+function resolveOllamaEmbedBlob() {
+  const home = process.env.USERPROFILE ?? process.env.HOME ?? 'C:\\Users\\james';
+  const manifestRoot = path.join(home, '.ollama', 'models', 'manifests', 'registry.ollama.ai', 'library');
+  const blobRoot     = path.join(home, '.ollama', 'models', 'blobs');
+  for (const tag of ['embeddinggemma', 'nomic-embed-text', 'all-minilm']) {
+    const mf = path.join(manifestRoot, tag, 'latest');
+    if (!existsSync(mf)) continue;
+    try {
+      const data  = JSON.parse(readFileSync(mf, 'utf8'));
+      const layer = (data.layers ?? []).find((l) => l.mediaType === 'application/vnd.ollama.image.model');
+      if (!layer?.digest) continue;
+      const blobPath = path.join(blobRoot, layer.digest.replace(':', '-'));
+      if (existsSync(blobPath)) {
+        console.log(`[ensure-embed-server] auto-discovered ${tag} blob: ${blobPath}`);
+        return blobPath;
+      }
+    } catch { /* malformed manifest */ }
+  }
+  return null;
+}
+
+const EMBED_MODEL_CANDIDATES = [
+  process.env.EMBED_MODEL_PATH,
+  path.join(workspaceRoot, 'vendor', 'models', 'embeddinggemma.gguf'),
+  path.join(workspaceRoot, 'models', 'embeddinggemma.gguf'),
+  path.join(workspaceRoot, 'models', 'embeddinggemma-300m.gguf'),
+  resolveOllamaEmbedBlob(),
+  path.join(workspaceRoot, 'models', 'nomic-embed-text-v1.5.Q4_K_M.gguf'),
+].filter(Boolean);
+
+const EMBED_MODEL = firstExisting(EMBED_MODEL_CANDIDATES);
+const EMBED_THREADS = Math.max(1, parseInt(process.env.EMBED_SERVER_THREADS ?? String(DEFAULT_THREADS), 10));
+const EMBED_CTX = parseInt(process.env.EMBED_SERVER_CTX ?? '2048', 10);
+// GPU layers for embed model — default 99 (full GPU), set 0 for CPU-only
+const EMBED_NGL = parseInt(process.env.EMBED_SERVER_NGL ?? '99', 10);
+
+export async function isEmbedServerHealthy() {
+  try {
+    const res = await fetch(`${EMBED_BASE}/health`, { signal: AbortSignal.timeout(TIMEOUT) });
+    return res.ok;
+  } catch {
+    return false;
+  }
+}
+
+export async function ensureEmbedServer() {
+  if (await isEmbedServerHealthy()) return true;
+
+  if (!LLAMA_EXE) {
+    console.warn('[ensure-llama-server] llama-server.exe not found — skipping embed server');
+    return false;
+  }
+
+  if (!EMBED_MODEL) {
+    console.warn('[ensure-llama-server] embeddinggemma GGUF not found in configured locations');
+    console.warn('[ensure-llama-server] Set EMBED_MODEL_PATH= or place embeddinggemma.gguf in models/');
+    console.warn('[ensure-llama-server] Falling back to Ollama for embeddings');
+    return false;
+  }
+
+  console.log(`[ensure-embed-server] Using binary: ${LLAMA_EXE}`);
+  console.log(`[ensure-embed-server] Using model:  ${EMBED_MODEL}`);
+  console.log(`[ensure-embed-server] Port: ${EMBED_PORT}  NGL: ${EMBED_NGL}  CTX: ${EMBED_CTX}`);
+
+  const args = [
+    '-m', EMBED_MODEL,
+    '--host', EMBED_HOST,
+    '--port', String(EMBED_PORT),
+    '-c', String(EMBED_CTX),
+    '-ngl', String(EMBED_NGL),
+    '-t', String(EMBED_THREADS),
+    '--embedding',
+    '--pooling', 'mean',
+    '--embd-normalize', '2',
+  ];
+
+  const child = spawn(LLAMA_EXE, args, {
+    detached: true,
+    stdio: 'ignore',
+    windowsHide: true,
+    cwd: projectRoot,
+  });
+  child.unref();
+
+  for (let i = 0; i < RETRIES; i++) {
+    await new Promise((r) => setTimeout(r, 500));
+    if (await isEmbedServerHealthy()) {
+      console.log(`[ensure-embed-server] healthy at ${EMBED_BASE}`);
+      return true;
+    }
+  }
+
+  console.error('[ensure-embed-server] embedding server did not become healthy in time');
+  return false;
+}
+
+// ── CLI entry ─────────────────────────────────────────────────────────────────
 const args = process.argv.slice(2);
-if (args.includes('--spawn')) {
+if (args.includes('--spawn-both')) {
+  const [chat, embed] = await Promise.all([ensureLlamaServer(), ensureEmbedServer()]);
+  process.exit(chat && embed ? 0 : 1);
+} else if (args.includes('--spawn-embed')) {
+  const ok = await ensureEmbedServer();
+  process.exit(ok ? 0 : 1);
+} else if (args.includes('--spawn')) {
   const ok = await ensureLlamaServer();
   process.exit(ok ? 0 : 1);
 } else {
-  const healthy = await isLlamaServerHealthy();
-  console.log(healthy ? `llama-server: healthy (${BASE})` : `llama-server: not running (${BASE})`);
+  const [chatHealthy, embedHealthy] = await Promise.all([
+    isLlamaServerHealthy(),
+    isEmbedServerHealthy(),
+  ]);
+  console.log(chatHealthy ? `chat server:  healthy (${BASE})` : `chat server:  not running (${BASE})`);
+  console.log(embedHealthy ? `embed server: healthy (${EMBED_BASE})` : `embed server: not running (${EMBED_BASE})`);
   console.log(`[ensure-llama-server] binary=${LLAMA_EXE ?? 'n/a'}`);
-  console.log(`[ensure-llama-server] model=${MODEL ?? 'n/a'}`);
+  console.log(`[ensure-llama-server] chat model=${MODEL ?? 'n/a'}`);
+  console.log(`[ensure-llama-server] embed model=${EMBED_MODEL ?? 'n/a'}`);
   console.log(`[ensure-llama-server] mmproj=${MMPROJ ?? 'n/a'}`);
 }
 

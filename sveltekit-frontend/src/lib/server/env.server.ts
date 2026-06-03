@@ -55,10 +55,18 @@ function qdrantUrlFromParts(): string | undefined {
 export const ENV = {
   DATABASE_URL: privateEnv.DATABASE_URL ?? privateEnv.POSTGRES_URL ?? DEV.DATABASE_URL,
   REDIS_URL: privateEnv.REDIS_URL ?? DEV.REDIS_URL,
+  REDIS_PASSWORD: privateEnv.REDIS_PASSWORD ?? privateEnv.REDIS_PASS ?? '',
   QDRANT_URL: privateEnv.QDRANT_URL ?? qdrantUrlFromParts() ?? DEV.QDRANT_URL,
   QDRANT_API_KEY: privateEnv.QDRANT_API_KEY ?? '',
   RABBITMQ_URL: privateEnv.RABBITMQ_URL ?? DEV.RABBITMQ_URL,
   OLLAMA_BASE_URL: privateEnv.OLLAMA_BASE_URL ?? privateEnv.OLLAMA_URL ?? DEV.OLLAMA_URL,
+  /**
+   * Dedicated embedding server URL. Set to http://127.0.0.1:8081 to route
+   * embeddinggemma through llama-server.exe --embedding instead of Ollama.
+   * llama-server exposes /v1/embeddings (OpenAI) + /embedding (llama.cpp native).
+   * Falls back to OLLAMA_BASE_URL when not set.
+   */
+  OLLAMA_EMBED_BASE_URL: privateEnv.OLLAMA_EMBED_BASE_URL ?? privateEnv.EMBED_SERVER_URL ?? null,
   /** Legal reasoning / chat / tool-calling model (unified GRPO legal + VLM, 5.3GB) */
   OLLAMA_CHAT_MODEL:
     privateEnv.OLLAMA_CHAT_MODEL ?? privateEnv.OLLAMA_MODEL ?? 'gemma4-rotorquant:latest',

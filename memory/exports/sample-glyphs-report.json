@@ -1,26 +1,23 @@
 {
-  "timestamp": "2026-05-30T17:47:20.057Z",
+  "timestamp": "2026-06-03T02:47:51.362Z",
   "params": {
-    "minReward": 0.5,
-    "target": 50,
+    "minReward": 0.42,
+    "target": 500,
     "maxPerCluster": 20
   },
-  "totalEligible": 78,
+  "totalEligible": 75,
   "selected": 20,
   "bySection": {
-    "CLAIMS": 1,
-    "FACTS": 3,
-    "LEGAL_AUTHORITY": 4,
-    "UNKNOWN": 12
+    "UNKNOWN": 20
   },
   "byCluster": {
     "null": 20
   },
   "rewardDistribution": {
-    "min": 0.5,
-    "max": 0.55,
-    "avg": 0.5199999999999999
+    "min": 0.44481695,
+    "max": 0.4537333,
+    "avg": 0.44833416350000005
   },
-  "outPath": "C:\\Users\\james\\Videos\\deeds-web-app\\scripts\\training-datasets\\active-sample-2026-05-30T17-47-20-058Z.jsonl",
+  "outPath": "C:\\Users\\james\\Videos\\deeds-web-app\\scripts\\training-datasets\\active-sample-2026-06-03T02-47-51-363Z.jsonl",
   "latestPath": "C:\\Users\\james\\Videos\\deeds-web-app\\scripts\\training-datasets\\active-sample-latest.jsonl"
 }

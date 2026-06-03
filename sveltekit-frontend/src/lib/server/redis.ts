@@ -7,6 +7,7 @@ import Redis from 'ioredis';
 import { ENV } from '$lib/server/env.server.js';
 
 const REDIS_URL = ENV.REDIS_URL;
+const REDIS_PASSWORD = ENV.REDIS_PASSWORD;
 
 /**
  * Redis Connection Pool
@@ -35,6 +36,7 @@ class RedisConnectionPool {
 		// Create new connection if pool not at capacity
 		if (this.pool.length < this.maxConnections) {
 			const client = new Redis(REDIS_URL, {
+				password: REDIS_PASSWORD || undefined,
 				maxRetriesPerRequest: 1,
 				enableReadyCheck: false,
 				connectTimeout: 3000,
@@ -132,6 +134,7 @@ export default function createRedisInstance(options: Record<string, unknown>): R
  */
 export function createRedisConnection() {
 	return new Redis(REDIS_URL, {
+		password: REDIS_PASSWORD || undefined,
 		maxRetriesPerRequest: 1,
 		enableReadyCheck: false,
 		connectTimeout: 3000,

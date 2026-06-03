@@ -1,0 +1,532 @@
+{
+  "generated_at": "2026-06-02T13:58:00.801Z",
+  "total_packets": 41,
+  "feature_groups": [
+    {
+      "featureId": "feat:roadmap-nextsteps",
+      "sources": [
+        {
+          "packet_id": "238cef8714d3",
+          "sourceRef": "42_26ptnextsteps.txt",
+          "title_id": "42_26ptnextsteps",
+          "hit_count": 1,
+          "category": "session_note",
+          "dump_source": "rg_turbovec"
+        },
+        {
+          "packet_id": "e481dea49563",
+          "sourceRef": "45_26_nextsteps.txt",
+          "title_id": "45_26_nextsteps",
+          "hit_count": 6,
+          "category": "session_note",
+          "dump_source": "rg_turbovec"
+        },
+        {
+          "packet_id": "fcdf410694b0",
+          "sourceRef": "deeds_labs\\snapshots\\2026-03-15-v1\\root-session-logs\\3_3_26_nextsteps.txt",
+          "title_id": "3_3_26_nextsteps",
+          "hit_count": 4,
+          "category": "session_note",
+          "dump_source": "rg_turbovec"
+        },
+        {
+          "packet_id": "4394aac9f5a7",
+          "sourceRef": "deeds_labs\\snapshots\\2026-03-15-v1\\root-session-logs\\3_1_26__nextsteps.txt",
+          "title_id": "3_1_26__nextsteps",
+          "hit_count": 20,
+          "category": "session_note",
+          "dump_source": "rg_turbovec"
+        }
+      ],
+      "total_hits": 31
+    },
+    {
+      "featureId": "feat:rag-kag-dag-retrieval",
+      "sources": [
+        {
+          "packet_id": "29337d5e8908",
+          "sourceRef": "330_26.txt",
+          "title_id": "330_26",
+          "hit_count": 11,
+          "category": "session_note",
+          "dump_source": "rg_turbovec"
+        },
+        {
+          "packet_id": "30ee07ebf256",
+          "sourceRef": "328_26.txt",
+          "title_id": "328_26",
+          "hit_count": 2,
+          "category": "session_note",
+          "dump_source": "rg_turbovec"
+        },
+        {
+          "packet_id": "ad2e75f50c56",
+          "sourceRef": "331_26.txt",
+          "title_id": "331_26",
+          "hit_count": 16,
+          "category": "session_note",
+          "dump_source": "rg_turbovec"
+        }
+      ],
+      "total_hits": 29
+    },
+    {
+      "featureId": "feat:session-3_5_26_vscodenotes",
+      "sources": [
+        {
+          "packet_id": "16649faeaec7",
+          "sourceRef": "deeds_labs\\snapshots\\2026-03-15-v1\\root-session-logs\\3_5_26_vscodenotes.txt",
+          "title_id": "3_5_26_vscodenotes",
+          "hit_count": 16,
+          "category": "session_note",
+          "dump_source": "rg_turbovec"
+        }
+      ],
+      "total_hits": 16
+    },
+    {
+      "featureId": "feat:session-59_26cudagraphdeepresearch",
+      "sources": [
+        {
+          "packet_id": "f586750c1354",
+          "sourceRef": "59_26cudagraphdeepresearch.txt",
+          "title_id": "59_26cudagraphdeepresearch",
+          "hit_count": 15,
+          "category": "session_note",
+          "dump_source": "rg_turbovec"
+        }
+      ],
+      "total_hits": 15
+    },
+    {
+      "featureId": "feat:session-3_9_26",
+      "sources": [
+        {
+          "packet_id": "4b8438764449",
+          "sourceRef": "deeds_labs\\snapshots\\2026-03-15-v1\\root-session-logs\\3_9_26.txt",
+          "title_id": "3_9_26",
+          "hit_count": 12,
+          "category": "session_note",
+          "dump_source": "rg_turbovec"
+        }
+      ],
+      "total_hits": 12
+    },
+    {
+      "featureId": "feat:auth-drizzle-evidence-pipeline",
+      "sources": [
+        {
+          "packet_id": "b0ff18d428c1",
+          "sourceRef": "318_26.txt",
+          "title_id": "318_26",
+          "hit_count": 4,
+          "category": "session_note",
+          "dump_source": "rg_turbovec"
+        },
+        {
+          "packet_id": "72bbf75babd3",
+          "sourceRef": "319_26_nextsteps.txt",
+          "title_id": "319_26_nextsteps",
+          "hit_count": 2,
+          "category": "session_note",
+          "dump_source": "rg_turbovec"
+        },
+        {
+          "packet_id": "dce99c03ec49",
+          "sourceRef": "323_26.txt",
+          "title_id": "323_26",
+          "hit_count": 3,
+          "category": "session_note",
+          "dump_source": "rg_turbovec"
+        },
+        {
+          "packet_id": "ffe1b8c2b04d",
+          "sourceRef": "deeds_labs\\snapshots\\2026-03-15-v1\\root-session-logs\\315_26.txt",
+          "title_id": "315_26",
+          "hit_count": 1,
+          "category": "session_note",
+          "dump_source": "rg_napi"
+        }
+      ],
+      "total_hits": 10
+    },
+    {
+      "featureId": "feat:session-46_26__adiff",
+      "sources": [
+        {
+          "packet_id": "73b587214334",
+          "sourceRef": "46_26__adiff.txt",
+          "title_id": "46_26__adiff",
+          "hit_count": 9,
+          "category": "session_note",
+          "dump_source": "rg_turbovec"
+        }
+      ],
+      "total_hits": 9
+    },
+    {
+      "featureId": "feat:session-313_26",
+      "sources": [
+        {
+          "packet_id": "96da2b7349db",
+          "sourceRef": "deeds_labs\\snapshots\\2026-03-15-v1\\root-session-logs\\313_26.txt",
+          "title_id": "313_26",
+          "hit_count": 9,
+          "category": "session_note",
+          "dump_source": "rg_turbovec"
+        }
+      ],
+      "total_hits": 9
+    },
+    {
+      "featureId": "feat:session-419_26next_steps",
+      "sources": [
+        {
+          "packet_id": "4155757ab881",
+          "sourceRef": "419_26next_steps.txt",
+          "title_id": "419_26next_steps",
+          "hit_count": 8,
+          "category": "session_note",
+          "dump_source": "rg_turbovec"
+        }
+      ],
+      "total_hits": 8
+    },
+    {
+      "featureId": "feat:session-513_26",
+      "sources": [
+        {
+          "packet_id": "bcb82a1237f5",
+          "sourceRef": "513_26.txt",
+          "title_id": "513_26",
+          "hit_count": 8,
+          "category": "session_note",
+          "dump_source": "rg_turbovec"
+        }
+      ],
+      "total_hits": 8
+    },
+    {
+      "featureId": "feat:session-59_26",
+      "sources": [
+        {
+          "packet_id": "27cff445e430",
+          "sourceRef": "59_26.txt",
+          "title_id": "59_26",
+          "hit_count": 8,
+          "category": "session_note",
+          "dump_source": "rg_turbovec"
+        }
+      ],
+      "total_hits": 8
+    },
+    {
+      "featureId": "feat:session-44_26",
+      "sources": [
+        {
+          "packet_id": "0dd759120aec",
+          "sourceRef": "44_26.txt",
+          "title_id": "44_26",
+          "hit_count": 7,
+          "category": "session_note",
+          "dump_source": "rg_turbovec"
+        }
+      ],
+      "total_hits": 7
+    },
+    {
+      "featureId": "feat:session-43_26-todo",
+      "sources": [
+        {
+          "packet_id": "25621536e5cd",
+          "sourceRef": "43_26-todo.txt",
+          "title_id": "43_26-todo",
+          "hit_count": 7,
+          "category": "session_note",
+          "dump_source": "rg_turbovec"
+        }
+      ],
+      "total_hits": 7
+    },
+    {
+      "featureId": "feat:session-58_26_next_steps_graphanalysis_ingestion_analysis",
+      "sources": [
+        {
+          "packet_id": "ac9fecc1cd82",
+          "sourceRef": "58_26_next_steps_graphanalysis_ingestion_analysis.txt",
+          "title_id": "58_26_next_steps_graphanalysis_ingestion_analysis",
+          "hit_count": 7,
+          "category": "session_note",
+          "dump_source": "rg_turbovec"
+        }
+      ],
+      "total_hits": 7
+    },
+    {
+      "featureId": "feat:session-220_26",
+      "sources": [
+        {
+          "packet_id": "0e21b4eb8cd1",
+          "sourceRef": "deeds_labs\\snapshots\\2026-03-15-v1\\root-session-logs\\220_26.txt",
+          "title_id": "220_26",
+          "hit_count": 6,
+          "category": "session_note",
+          "dump_source": "rg_turbovec"
+        }
+      ],
+      "total_hits": 6
+    },
+    {
+      "featureId": "feat:session-42_26",
+      "sources": [
+        {
+          "packet_id": "1343692b9e46",
+          "sourceRef": "42_26.txt",
+          "title_id": "42_26",
+          "hit_count": 5,
+          "category": "session_note",
+          "dump_source": "rg_turbovec"
+        }
+      ],
+      "total_hits": 5
+    },
+    {
+      "featureId": "feat:session-420_26",
+      "sources": [
+        {
+          "packet_id": "df37b54f407c",
+          "sourceRef": "420_26.txt",
+          "title_id": "420_26",
+          "hit_count": 5,
+          "category": "session_note",
+          "dump_source": "rg_turbovec"
+        }
+      ],
+      "total_hits": 5
+    },
+    {
+      "featureId": "feat:session-510_26",
+      "sources": [
+        {
+          "packet_id": "e32e66501766",
+          "sourceRef": "510_26.txt",
+          "title_id": "510_26",
+          "hit_count": 5,
+          "category": "session_note",
+          "dump_source": "rg_turbovec"
+        }
+      ],
+      "total_hits": 5
+    },
+    {
+      "featureId": "feat:session-3_10_26",
+      "sources": [
+        {
+          "packet_id": "4ad2ab1da6ea",
+          "sourceRef": "deeds_labs\\snapshots\\2026-03-15-v1\\root-session-logs\\3_10_26.txt",
+          "title_id": "3_10_26",
+          "hit_count": 5,
+          "category": "session_note",
+          "dump_source": "rg_turbovec"
+        }
+      ],
+      "total_hits": 5
+    },
+    {
+      "featureId": "feat:session-3_7_26_todo",
+      "sources": [
+        {
+          "packet_id": "3f9519db9479",
+          "sourceRef": "deeds_labs\\snapshots\\2026-03-15-v1\\root-session-logs\\3_7_26_todo.txt",
+          "title_id": "3_7_26_todo",
+          "hit_count": 4,
+          "category": "session_note",
+          "dump_source": "rg_turbovec"
+        }
+      ],
+      "total_hits": 4
+    },
+    {
+      "featureId": "feat:session-3_29_26",
+      "sources": [
+        {
+          "packet_id": "71d8e04592eb",
+          "sourceRef": "3_29_26.txt",
+          "title_id": "3_29_26",
+          "hit_count": 3,
+          "category": "session_note",
+          "dump_source": "rg_turbovec"
+        }
+      ],
+      "total_hits": 3
+    },
+    {
+      "featureId": "feat:session-3_24_26",
+      "sources": [
+        {
+          "packet_id": "f69b6c11481d",
+          "sourceRef": "3_24_26.txt",
+          "title_id": "3_24_26",
+          "hit_count": 3,
+          "category": "session_note",
+          "dump_source": "rg_turbovec"
+        }
+      ],
+      "total_hits": 3
+    },
+    {
+      "featureId": "feat:session-43_26-pt3",
+      "sources": [
+        {
+          "packet_id": "dae42415faea",
+          "sourceRef": "43_26-pt3.txt",
+          "title_id": "43_26-pt3",
+          "hit_count": 3,
+          "category": "session_note",
+          "dump_source": "rg_turbovec"
+        }
+      ],
+      "total_hits": 3
+    },
+    {
+      "featureId": "feat:session-54_26",
+      "sources": [
+        {
+          "packet_id": "3419b2d6e12a",
+          "sourceRef": "54_26.txt",
+          "title_id": "54_26",
+          "hit_count": 3,
+          "category": "session_note",
+          "dump_source": "rg_turbovec"
+        }
+      ],
+      "total_hits": 3
+    },
+    {
+      "featureId": "feat:codebase-extractor",
+      "sources": [
+        {
+          "packet_id": "eb71fa7f0852",
+          "sourceRef": "3_15_26extractorofrealcode.txt",
+          "title_id": "3_15_26extractorofrealcode",
+          "hit_count": 2,
+          "category": "session_note",
+          "dump_source": "rg_turbovec"
+        }
+      ],
+      "total_hits": 2
+    },
+    {
+      "featureId": "feat:session-3_16_26",
+      "sources": [
+        {
+          "packet_id": "be26d2f2e8d1",
+          "sourceRef": "3_16_26.txt",
+          "title_id": "3_16_26",
+          "hit_count": 2,
+          "category": "session_note",
+          "dump_source": "rg_turbovec"
+        }
+      ],
+      "total_hits": 2
+    },
+    {
+      "featureId": "feat:session-3_26_26",
+      "sources": [
+        {
+          "packet_id": "657df11d8279",
+          "sourceRef": "3_26_26.txt",
+          "title_id": "3_26_26",
+          "hit_count": 2,
+          "category": "session_note",
+          "dump_source": "rg_turbovec"
+        }
+      ],
+      "total_hits": 2
+    },
+    {
+      "featureId": "feat:session-417_26_var",
+      "sources": [
+        {
+          "packet_id": "3f78d4bdb396",
+          "sourceRef": "417_26_var.txt",
+          "title_id": "417_26_var",
+          "hit_count": 2,
+          "category": "session_note",
+          "dump_source": "rg_turbovec"
+        }
+      ],
+      "total_hits": 2
+    },
+    {
+      "featureId": "feat:session-512_26",
+      "sources": [
+        {
+          "packet_id": "a7424b878b4b",
+          "sourceRef": "512_26.txt",
+          "title_id": "512_26",
+          "hit_count": 2,
+          "category": "session_note",
+          "dump_source": "rg_turbovec"
+        }
+      ],
+      "total_hits": 2
+    },
+    {
+      "featureId": "feat:session-514_26__",
+      "sources": [
+        {
+          "packet_id": "7e0810b5d958",
+          "sourceRef": "514_26__.txt",
+          "title_id": "514_26__",
+          "hit_count": 2,
+          "category": "session_note",
+          "dump_source": "rg_turbovec"
+        }
+      ],
+      "total_hits": 2
+    },
+    {
+      "featureId": "feat:session-416_26_trt",
+      "sources": [
+        {
+          "packet_id": "b2dbe9a3c806",
+          "sourceRef": "416_26_trt.txt",
+          "title_id": "416_26_trt",
+          "hit_count": 1,
+          "category": "session_note",
+          "dump_source": "rg_turbovec"
+        }
+      ],
+      "total_hits": 1
+    },
+    {
+      "featureId": "feat:session-39_26__app_directories",
+      "sources": [
+        {
+          "packet_id": "984a4946f212",
+          "sourceRef": "deeds_labs\\snapshots\\2026-03-15-v1\\root-session-logs\\39_26__app_directories.txt",
+          "title_id": "39_26__app_directories",
+          "hit_count": 1,
+          "category": "session_note",
+          "dump_source": "rg_turbovec"
+        }
+      ],
+      "total_hits": 1
+    },
+    {
+      "featureId": "feat:session-56_26_loop",
+      "sources": [
+        {
+          "packet_id": "1f3d96163d89",
+          "sourceRef": "56_26_loop.txt",
+          "title_id": "56_26_loop",
+          "hit_count": 1,
+          "category": "session_note",
+          "dump_source": "rg_napi"
+        }
+      ],
+      "total_hits": 1
+    }
+  ]
+}

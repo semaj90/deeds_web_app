@@ -235,7 +235,7 @@ The WSL2 GPU override is optional. Do not assume the research UI container itsel
 
 - **Gemma4**: synthesis, summarization, tool-calling assistant
 - **local-deep-research**: research backend, search, crawl, summarize, report
-- **Hermes**: test-only unless a specific lane proves useful
+- **Hermes**: archived to the deeds_labs legacy surface; test-only unless a specific lane proves useful
 
 ## BM25 + LangExtract + graph fusion
 

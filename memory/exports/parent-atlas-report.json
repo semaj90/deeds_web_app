@@ -1,11 +1,11 @@
 {
-  "timestamp": "2026-06-02T04:27:38.315Z",
+  "timestamp": "2026-06-03T04:05:48.690Z",
   "mode": "apply",
   "phase": "Atlas Parent Indexing",
   "data": {
-    "cards_loaded": 9374,
+    "cards_loaded": 9399,
     "outcomes_loaded": 6,
-    "parent_atlas_entries": 9374,
+    "parent_atlas_entries": 9399,
     "cluster_summaries": 396
   },
   "status": "Parent atlas indexing complete, canonical tables ready for Bitfrost cache",

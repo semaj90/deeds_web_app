@@ -8,11 +8,15 @@ import neo4j from 'neo4j-driver';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = path.resolve(__dirname, '../..');
 const FRONTEND_ROOT = path.join(REPO_ROOT, 'sveltekit-frontend');
-const ENV_PATH = path.join(FRONTEND_ROOT, '.env');
+const ENV_PATHS = [
+  path.join(FRONTEND_ROOT, '.env.local'),
+  path.join(FRONTEND_ROOT, '.env'),
+  path.join(REPO_ROOT, '.env'),
+];
 
-function loadEnv() {
-  if (!fs.existsSync(ENV_PATH)) return {};
-  const content = fs.readFileSync(ENV_PATH, 'utf8');
+function loadEnvFile(filePath) {
+  if (!fs.existsSync(filePath)) return {};
+  const content = fs.readFileSync(filePath, 'utf8');
   const env = {};
   for (const line of content.split(/\r?\n/)) {
     const trimmed = line.trim();
@@ -29,9 +33,10 @@ function loadEnv() {
   return env;
 }
 
-const env = loadEnv();
+const env = Object.assign({}, ...ENV_PATHS.map(loadEnvFile));
 const DATABASE_URL = env.DATABASE_URL || 'postgresql://legal_admin:123456@localhost:5434/legal_ai_db';
 const REDIS_URL = env.REDIS_URL || 'redis://127.0.0.1:6379';
+const REDIS_PASSWORD = env.REDIS_PASSWORD || env.REDIS_PASS || '';
 const QDRANT_URL = env.QDRANT_URL || 'http://127.0.0.1:6333';
 const NEO4J_URI = env.NEO4J_URI || 'bolt://localhost:7687';
 const NEO4J_USER = env.NEO4J_USER || 'neo4j';
@@ -58,7 +63,16 @@ async function main() {
   console.log('🔍 Running Retrieval Smoke Tests & Consistency Audits...');
 
   const pool = new pg.Pool({ connectionString: DATABASE_URL });
-  const redis = new Redis(REDIS_URL);
+  const redis = new Redis(REDIS_URL, {
+    ...(REDIS_PASSWORD ? { password: REDIS_PASSWORD } : {}),
+    lazyConnect: true,
+    maxRetriesPerRequest: 1,
+    enableOfflineQueue: false,
+    retryStrategy: () => null,
+  });
+  redis.on('error', () => {});
+  let redisReady = false;
+  try { await redis.connect(); await redis.ping(); redisReady = true; } catch { /* offline */ }
   const neoDriver = neo4j.driver(NEO4J_URI, neo4j.auth.basic(NEO4J_USER, NEO4J_PASSWORD));
 
   const results = {
@@ -122,6 +136,7 @@ async function main() {
 
   // 4. Redis ACE packet lookup
   try {
+    if (!redisReady) throw new Error('Redis offline');
     const keys = await redis.keys('code:llm_output:path:*');
     if (keys.length > 0) {
       const redisType = await redis.type(keys[0]);
@@ -244,7 +259,8 @@ async function main() {
 
   // Finalize
   await pool.end();
-  await redis.quit();
+  if (redisReady) await redis.quit().catch(() => {});
+  else redis.disconnect();
   await neoDriver.close();
 
   console.log('\n==================================================');

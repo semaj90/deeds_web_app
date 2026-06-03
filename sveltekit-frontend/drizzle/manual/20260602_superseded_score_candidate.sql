@@ -1,0 +1,24 @@
+-- 20260602_superseded_score_candidate.sql
+-- Candidate-only additive schema sketch for superseded-score storage.
+-- DO NOT APPLY AUTOMATICALLY. This file is a proposal for later review.
+
+-- Proposed additions for parent_atlas_documents:
+-- ALTER TABLE public.parent_atlas_documents
+--   ADD COLUMN IF NOT EXISTS superseded_score integer;
+--
+-- ALTER TABLE public.parent_atlas_documents
+--   ADD COLUMN IF NOT EXISTS archive_eligible boolean DEFAULT false;
+--
+-- ALTER TABLE public.parent_atlas_documents
+--   ADD COLUMN IF NOT EXISTS archive_decision jsonb;
+--
+-- Proposed indexes:
+-- CREATE INDEX IF NOT EXISTS idx_parent_atlas_documents_superseded_score
+--   ON public.parent_atlas_documents (superseded_score DESC);
+--
+-- CREATE INDEX IF NOT EXISTS idx_parent_atlas_documents_archive_eligible
+--   ON public.parent_atlas_documents (archive_eligible);
+--
+-- Candidate-only rule:
+-- archive_eligible is advisory, not an authorization to delete or move files.
+-- delete_allowed and move_allowed must remain false in the scorer/report layer.

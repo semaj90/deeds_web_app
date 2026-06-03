@@ -11,6 +11,15 @@ Design Principles (Caveman)
 - Offline joins third (JSONL → DuckDB hash joins)
 - Training rows last (JSONL supervised rows for LoRA adapters)
 
+Two-lane storage split
+- Cold originals are immutable files and archives.
+- Warm packets/cards are compact indexes that point back to the cold originals.
+- Hot cache is only active task memory and recent retrieval state.
+- Queue is work waiting to be processed, not source truth.
+- Postgres is the truth table and packet registry.
+- Qdrant is the semantic lookup layer with payload filters and ANN search.
+- See also: [Dual-Lane Hot Brain, Cold Queue](</C:/Users/james/Videos/deeds-web-app/docs/architecture/dual-lane-hot-brain-cold-queue.md>)
+
 Caveman architecture (compiler pipeline)
 -------------------------------------------------
 TypeScript/Drizzle schema
@@ -129,6 +138,7 @@ Postgres / Qdrant / Neo4j responsibilities
 - Postgres: durable truth, partitioned tables (`outcome_ledger`, `chunk_hit_log`, `summary_cards`). Write via controlled migration or `--write` path.
 - Qdrant: 768d retrieval store (collection: `codebase_chunks_768`). Seeded from `vectors64.jsonl`/`qdrant-export.jsonl` via separate command — do not write from these scripts.
 - Neo4j: graph path proofs; export `edges.jsonl` for manual/controlled import.
+- Adapter boundary note: TurboVec, LlamaIndex, LangChain, and LangGraph remain adapters only; durable writes must go through promotion queues and bounded apply gates.
 
 Acceptance criteria
 - `sourceRefId` stability: same normalized sourceRef → same sha256 across runs.

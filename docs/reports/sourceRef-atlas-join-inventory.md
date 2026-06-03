@@ -115,4 +115,4 @@
 
 ## Next Safe Action
 
-Fuse `retrieval-pass` output into `build-recommendations.mjs` so Qdrant hits + Neo4j neighbor scores flow into recommendation ranking (the last remaining `[ ]` item in Phase 11E).
+Review the sourceRef-parent-join dry-run report, then use the packet manifests to keep cold originals archived and warm indexes compact without mutating Qdrant, Neo4j, Redis, or Postgres.

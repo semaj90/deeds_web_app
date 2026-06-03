@@ -1,23 +1,23 @@
 # ACE Packet Summary
 
-Generated: 2026-06-02T05:26:03.084Z
+Generated: 2026-06-03T01:55:34.490Z
 Query: "ACE context retrieval"
 Cards: 76 / budget: 6000 tokens (~5997 used)
 
 ## Areas
-- **misc** — 76 cards (top score: 0.7990)
+- **misc** — 76 cards (top score: 0.7962)
 
 ## Top 10 Cards
-1. `undefined` — score 0.7990
-2. `undefined` — score 0.7906
-3. `undefined` — score 0.6918
-4. `undefined` — score 0.6904
-5. `undefined` — score 0.6852
-6. `undefined` — score 0.6821
-7. `undefined` — score 0.6816
-8. `undefined` — score 0.6815
-9. `undefined` — score 0.6807
-10. `undefined` — score 0.6805
+1. `undefined` — score 0.7962
+2. `undefined` — score 0.7878
+3. `undefined` — score 0.6890
+4. `undefined` — score 0.6875
+5. `undefined` — score 0.6823
+6. `undefined` — score 0.6793
+7. `undefined` — score 0.6787
+8. `undefined` — score 0.6786
+9. `undefined` — score 0.6779
+10. `undefined` — score 0.6777
 
 ## Next Gate
 Wire real embeddings: replace `pseudoEmbed()` in embed-cards.mjs + rank-cards.mjs

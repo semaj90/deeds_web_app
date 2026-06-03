@@ -517,6 +517,9 @@ node scripts/promotion/run-promotion-queue.mjs --dry-run --only alias-id-schema-
 - **Recommendation layer**: canonical builder exists at `scripts/opencode/build-recommendations.mjs`; remaining open hooks are `scripts/ingest/retrieval-pass.mjs`, Neo4j edge expansion, Redis packet cache, and Langfuse tracing.
   - retrieval pass currently lives in `scripts/ingest/retrieval-pass.mjs`
   - Qdrant search hook: `sveltekit-frontend/src/lib/server/search/qdrant-search.ts`
+    - stable `searchCodebaseAnn()` seam now exposes an optional `turbovec` backend behind the same result contract; Qdrant remains the default
+    - the optional native TurboVec loader is env-driven (`TURBO_VEC_NATIVE_MODULE` / `TURBO_VEC_NATIVE_PATH`) and falls back to the existing Qdrant + rerank path when absent
+    - backend-toggle smoke: `scripts/smoke/turbovec-ann-backend-smoke.mjs` confirms the default Qdrant selection and the `CODEBASE_ANN_BACKEND=turbovec` override without loading the full search stack
   - Neo4j edge expansion hook: `sveltekit-frontend/src/lib/server/search/neo4j-rerank.ts`
   - Redis packet cache hook: `sveltekit-frontend/src/lib/server/cache/redis-semantic-cache.ts`
   - Langfuse trace hook: `sveltekit-frontend/src/lib/server/observability/langfuse.ts`
@@ -564,6 +567,21 @@ node scripts/promotion/run-promotion-queue.mjs --dry-run --only alias-id-schema-
     - turns the dirty-tree split plus the organization audit into a concrete summarize-then-archive / keep-as-index-surface plan
   - doc crosswalk: `docs/reports/doc-feature-crosswalk-2026-06-01.{json,md}`
     - groups docs by sourceRef/pathmap, parent-atlas, Neo4j, Qdrant, Redis, TurboVec, and offline-processing feature families
+    - sourceRef parent join dry-run: `scripts/atlas/sourceRef-parent-join-dry-run.mjs`
+      - emits `docs/reports/sourceRef-parent-join-dry-run.{json,md}` and `.tmp/sourceRef-parent-join-packets.jsonl`
+      - uses `rg -uu` plus the existing sourceRef / pathmap / parent-atlas artifacts to build compact packet manifests without mutating Qdrant, Neo4j, Redis, or Postgres
+      - keeps cold originals pointed-to by packet manifests so repo minification stays aligned with the packet lifecycle
+      - dry-run verified in the repo shell and through the root npm alias, with 136 packet manifests, 16 sourceRef clusters, 120 path packets, and no unmatched sourceRef or parent-atlas rows in the current snapshot
+    - sourceRef parent archive plan: `scripts/atlas/sourceRef-parent-join-archive-plan.mjs`
+      - emits `docs/reports/sourceRef-parent-join-archive-plan.{json,md}`
+      - reads the dry-run join report plus the dirty-tree classification and separates keep-active surfaces from summarize-then-archive evidence
+      - stays read-only and does not move files; it just classifies what should remain live versus what should be archived after promotion
+      - dry-run verified in the repo shell and through the npm alias, yielding 552 archive candidates, 5 keep-active items, and 4 keep-as-index-surface items
+    - sourceRef parent archive move list: `scripts/atlas/sourceRef-parent-join-archive-move-list.mjs`
+      - emits `docs/reports/sourceRef-parent-join-archive-move-list.{json,md}`
+      - takes the archive plan and buckets candidates into explicit archive destinations for raw dumps, generated reports, mirror surfaces, model blobs, and scratch/cache outputs
+      - stays read-only and does not move files; it is a destination map for later archive execution
+      - dry-run verified in the repo shell with 552 archive candidates across 8 destinations, with the largest bucket intentionally marked `archive/review-needed/` for manual inspection before any future move
   - parent atlas build refresh: `node scripts/atlas/atlas-parent-indexing.mjs --apply`
     - current run processed 9 lanes with 10,743 nodes and 9,398 edges
   - the crosswalk/archive-plan/atlas-refresh sequence has now been regenerated in the current repo state, so the pruning lane can proceed from the latest reports
@@ -646,6 +664,10 @@ node scripts/promotion/run-promotion-queue.mjs --dry-run --only alias-id-schema-
       - emits `docs/reports/sourceRef-first-parent-atlas-packets.{json,md}` and writes packet JSON files under `.tmp/parent_atlas_packets/sourceRef-first`
       - the dedicated packet directory is queued through `scripts/atlas/enqueue_parent_atlas_jobs.mjs` with `PACKETS_DIR=.tmp/parent_atlas_packets/sourceRef-first`
       - the sourceRef-first packets are now enqueued into `parent_atlas_jobs`, so the refreshed mirror rows have a downstream processing lane
+    - repo minification / packet lifecycle:
+      - cold originals should live in SeaweedFS or archive storage, not as long-lived large repo files
+      - warm packet indexes belong in Postgres/Qdrant/Neo4j/Redis/Bitfrost, keyed by `sourceRef + feature_id + queryHash`
+      - the repo should keep completion notes and packet manifests active, while stale generated evidence moves out after LangExtract summarization
     - raw rg transcript organizer: `scripts/atlas/organize-rg-search-transcripts.mjs`
       - emits `docs/reports/parent-atlas-rg-dump-organizer.{json,md}` and streams `docs/reports/rg_turbovec.txt` and `docs/reports/rg_napi.txt` into `.tmp/parent_atlas_packets/rg-dumps/rg-dump-packets.ndjson`
       - chunks the line-oriented transcripts into compact Parent Atlas packets with `title_id`, `feature_id`, `sourceRef`, and summary fields before the parent-atlas projection step
@@ -665,7 +687,8 @@ node scripts/promotion/run-promotion-queue.mjs --dry-run --only alias-id-schema-
       - `som_topology_stats`
       - `language_distribution`
       - `playbook_lookup_by_language`
-    - these lanes are already live in the Hermes planner/tool registry; the remaining work is OpenCode/Gemma4 exposure and productization, not a new runtime implementation
+    - these lanes are already live in the OpenCode agents/skills surface; Hermes is now a deeds_labs legacy/archive surface, and the remaining work is OpenCode/Gemma4 exposure and productization, not a new runtime implementation
+    - the knowledge-graph tool lanes are now routed into the correct skill families (`gpu-acceleration`, `vector-cluster`, `codebase`, `research`) without introducing a parallel graph source of truth
     - RabbitMQ `media.download` / `media.transcribe` queue registration is already present
     - both lanes have foundations already in-tree; the remaining work is productization and wiring
   - Phase 101C: local-deep-research / OpenCode / LangGraph alignment
@@ -675,7 +698,7 @@ node scripts/promotion/run-promotion-queue.mjs --dry-run --only alias-id-schema-
     - compare the local-deep-research Docker app to the repo's Gemma4/OpenCode function-calling path
     - recreate the container for GPU use only through the WSL2 GPU override path when the image and deployment target warrant it
     - prefer a host-side OpenAI-compatible `llama-server` endpoint for the model boundary when available
-    - keep Hermes test-only unless it proves useful as a separate lane
+    - keep Hermes archived in deeds_labs/test-only unless it proves useful as a separate lane
     - add the export/import bridge that promotes local research state into canonical backend rows before ACE packet generation
     - emit a canonical ACE packet from the LDR bridge with preserved `sourceRef` provenance and warm the shared Redis ACE packet cache
     - store the same packet as an immutable semantic provenance tuple in Redis so OpenCode/Gemma4 can replay the exact compact packet without re-summarizing
@@ -696,11 +719,32 @@ node scripts/promotion/run-promotion-queue.mjs --dry-run --only alias-id-schema-
       - apply path remains gated on `LOCAL_OPENAI_BASE_URL`, `LOCAL_OPENAI_API_KEY`, and `LOCAL_GEMMA_MODEL` hydration
     - add the additive `research_summaries.source_ref` / `source_refs` migration and the Drizzle schema bridge so provenance lands in durable rows with indexes
     - apply the `research_summaries` provenance/index migration to the live 17.6 database and backfill the URL-backed rows
-    - keep Qdrant as the default ANN service and treat cuVS/CAGRA as the future WSL2 experiment lane behind the same retrieval contract
+    - keep Qdrant as the default ANN service and treat cuVS/CAGRA or a small Rust gRPC ANN worker as the future experiment lane behind the same retrieval contract and result shape
     - keep the ANN adapter boundary stable in `src/lib/server/search/qdrant-search.ts` and `src/lib/server/retrieval/orchestrator.ts` (implemented as the `searchCodebaseAnn` seam; Qdrant remains default)
-    - keep LangGraph optional orchestration only; no direct DB/Qdrant writes from graph nodes
+    - the seam now has an optional TurboVec backend toggle for native N-API, TurboVec sidecar rerank, GPU-safe load shedding, and SOM/AE-aware rerank without caller changes
+    - keep LangGraph optional orchestration only; use it for validation/testing subagents via Gemma4 function tool calling, with no direct DB/Qdrant writes from graph nodes
     - use the OpenCode-facing bridge only when provenance (`sourceRef`) is preserved end to end
+    - the OpenCode-facing bridge is now defined through the TRACE MCP / function-caller path and the Phase 101 parent-atlas packetizer tools, so research queries can flow without bypassing `sourceRef` provenance
     - store raw docs and large artifacts in SeaweedFS, not in the local SQLite research boundary
+    - the repo now treats SeaweedFS as the cold-artifact store for large docs and generated evidence, with the research SQLite boundary kept out of the hot path
+    - treat TurboVec, LlamaIndex, LangChain, and LangGraph as adapters only; the boundary is documented in `docs/architecture/dual-lane-hot-brain-cold-queue.md`
+    - keep the two-lane model explicit: cold originals stay in archive stores, warm packets/cards stay small and point back to them, hot cache is only active task memory, and Qdrant is semantic lookup with payload filters rather than the canonical truth store
+    - use RabbitMQ as the work queue only, with separate urgent / normal / bulk / dead-letter lanes rather than one catch-all deque
+    - archive originals only after SeaweedFS copy, checksum verification, Postgres ledger write, and archive-eligible scoring / sourceRef resolution
+    - assign a 0-100 superseded score to originals so archive prioritization is backed by duplicate detection, validation coverage, and `sourceRef` / `feature_id` resolution instead of intuition
+      - implemented as `scripts/packets/score-superseded-originals.mjs`
+      - writes `.tmp/superseded-score-candidates.{json,md,ndjson}` and `.tmp/superseded-score-implementation-report.{json,md}`
+      - splits the candidate surface into source-file and generated-artifact sections so provenance-heavy code files can be reviewed separately from derived evidence
+      - every row stays candidate-only with `delete_allowed=false` and `move_allowed=false`
+    - generate a read-only, candidate-only superseded-score report that ranks dirty-tree and archive-plan candidates without moving or deleting anything
+    - G17 browser Ollama routing is fixed via `/api/ollama/generate`; the browser no longer calls `localhost:11434` directly
+    - G18 startup truth now checks GPU bridge live count, Postgres 18.x, `parent_atlas_documents`, `alias_id`, and Redis auth/protected-mode
+    - Redis flavor audit confirms the active container is `valkey/valkey-bundle:8.1.1`; the hot-cache lane now runs on Valkey with localhost bind + auth
+    - VS Code startup now runs the GPU bridge probe task and writes its summary to `logs/task-output/startup-gpu-bridge-probe.log`
+    - `parent_atlas_documents` is created but its population remains gated by dry-run/apply promotion checks
+    - Redis auth/protected-mode is now confirmed through the startup truth gate using the app’s default Redis credentials / protected-mode check
+    - `startup-truth.mjs` is now green end to end; the earlier ACE/Vite timeout was fixed by widening the startup probe window to match the real `/api/health` latency
+    - bounded offline synthesis apply has advanced through `--limit 25 --offset 25`, `--limit 50 --offset 50`, and `--limit 50 --offset 75`; the qdrant-postgres reconciliation dry-run is clean
     - summarize with Gemma4 and persist compact outputs into Postgres 18 deep_research tables with JSONB / pgvector where appropriate
     - keep BM25 + LangExtract as the lexical/provenance enrichment pass before final recommendation fusion
     - treat the WSL2 GPU override as an optional deployment flavor, not the default research path
@@ -713,3 +757,49 @@ node scripts/promotion/run-promotion-queue.mjs --dry-run --only alias-id-schema-
 **Status**: Ready for Phase 101 execution
 **Approval**: N/A (self-contained planning + initial implementation)
 **Next Review**: 2026-06-06 (end of Week 1)
+
+---
+
+## Current Green Gates (2026-06-02)
+
+### GPU Smoke: GREEN
+- 15/16 live GPU bridge functions, 0 stub functions
+- CUDA available
+- GPU lanes smoke: 8 ok, 0 skip, 0 fail
+- CUDA graph replay: 100 replays ~0.09ms/replay
+- FP16 attention lane: OK
+- VLM lane: OK
+
+### Promotion Status: GREEN for bounded apply only
+- MCP sidecar guard: GREEN
+- Card validation: GREEN
+- `alias_id` schema: UNBLOCKED
+- Synthesis dry-run: GREEN
+- Bounded apply cadence verified through `--limit 50 --offset 75`
+
+### PostgreSQL 18 / pgvector Lane: GREEN
+- PostgreSQL 18 live container active
+- `parent_atlas_documents` table exists with indexes
+- `task_semantic_packets.alias_id` exists
+- pgvector installed
+- task_semantic_packets: 185/185 summaries written (Phase 102 T3 complete)
+
+---
+
+## Non-blocking Backlog (2026-06-02)
+
+`getCudaMemory` currently reports `{ free_mb: 0, total_mb: 0 }` while `checkCudaAvailable=1` and GPU kernels run successfully. Treat as a telemetry/N-API integer mapping issue, not a GPU availability failure. Backlog: fix VRAM telemetry before building a VRAM dashboard.
+
+---
+
+## Next Safe Promotion Step
+
+Use bounded slices only:
+
+```bash
+node scripts/atlas/run-offline-synthesis.mjs --apply --limit 25 --offset 100
+node scripts/promotion/report-promotion-status.mjs
+node scripts/promotion/run-promotion-queue.mjs --dry-run --only qdrant-postgres-reconciliation
+```
+
+Do not run unbounded apply.

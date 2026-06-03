@@ -7,6 +7,7 @@
  */
 import { json } from '@sveltejs/kit';
 import { z } from 'zod';
+import { execFileSync } from 'node:child_process';
 import {
   ollamaBreaker,
   qdrantBreaker,
@@ -383,10 +384,27 @@ async function probeTcp(host: string, port: number, _name: string): Promise<Chec
 async function probeRedis(): Promise<CheckResult> {
   const start = performance.now();
   try {
-    const { getRedis } = await import('$lib/server/redis.js');
-    const client = getRedis();
-    await client.ping();
-    return { ok: true, latencyMs: Math.round(performance.now() - start) };
+    const redisUrl = ENV.REDIS_URL || 'redis://127.0.0.1:6379';
+    const parsed = new URL(redisUrl);
+    const host = parsed.hostname || '127.0.0.1';
+    const port = parsed.port || '6379';
+    const password = ENV.REDIS_PASSWORD || parsed.password || 'redis';
+    const args = ['-h', host, '-p', port];
+    if (password) args.push('-a', password);
+
+    const ping = execFileSync('cmd.exe', ['/c', 'redis-cli', ...args, 'ping'], {
+      encoding: 'utf8',
+      timeout: 3000,
+      stdio: ['ignore', 'pipe', 'pipe'],
+    }).trim();
+    if (ping.toUpperCase() === 'PONG') {
+      return { ok: true, latencyMs: Math.round(performance.now() - start) };
+    }
+    return {
+      ok: false,
+      latencyMs: Math.round(performance.now() - start),
+      error: 'Service unreachable',
+    };
   } catch {
     return {
       ok: false,

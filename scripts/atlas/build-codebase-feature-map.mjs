@@ -48,8 +48,9 @@ const VERBOSE  = argv.includes('--verbose');
 const LIMIT_I  = argv.indexOf('--limit');
 const LIMIT    = LIMIT_I >= 0 ? Number(argv[LIMIT_I + 1]) : null;
 
-const config     = loadConfig();
-const ignoreDirs = new Set(config.ignoreDirs ?? []);
+const config      = loadConfig();
+const ignoreDirs  = new Set(config.ignoreDirs ?? []);
+const ignoreExts  = new Set((config.ignoreExtensions ?? []).map(e => e.toLowerCase()));
 
 // ── Feature area taxonomy ──────────────────────────────────────────────────
 // Maps directory segments to canonical semantic feature keys
@@ -255,7 +256,7 @@ for (const root of scanRoots) {
   collectFiles(root, ignoreDirs, (fp, name) => {
     const ext = path.extname(name).toLowerCase();
     return SRC_EXT.has(ext);
-  }, allFiles);
+  }, allFiles, ignoreExts);
 }
 
 const files = LIMIT ? allFiles.slice(0, LIMIT) : allFiles;

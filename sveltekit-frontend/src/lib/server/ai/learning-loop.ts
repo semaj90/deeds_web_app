@@ -1,7 +1,7 @@
-import Redis from 'ioredis';
+import { getValkeyClient } from '../cache/valkey-client.js';
 import { ENV } from '../env.server.js';
 
-const redis = new Redis(ENV.REDIS_URL);
+const redis = getValkeyClient();
 
 export async function recordExecutionOutcome(query: string, success: boolean, ctx: any) {
   const hash = Buffer.from(query).toString('base64').substring(0, 10);

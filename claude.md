@@ -1,6 +1,6 @@
 # Legal AI Platform — Claude Project Instructions
 
-## Last Updated: May 3, 2026 (GraphRAG community layer + deep compiler stack audit)
+## Last Updated: June 2, 2026 (Phase 101 completion plan + Valkey + Omni-Worker + git-diff cold archive)
 ## Status: svelte-check 0 errors, 0 warnings | vite build PASSES | Playwright 20/20
 
 ---
@@ -24,7 +24,7 @@ See `memory/ide-linter-workarounds.md` for full details.
 - **Frontend**: SvelteKit 2 + Svelte 5 (runes) + bits-ui v2.16.2 + UnoCSS v66.5 (svelte-scoped)
 - **Forms**: sveltekit-superforms v2 + Zod validation
 - **Local Cache**: IndexedDB + Loki.js
-- **Server Cache**: Redis (SSR pages + sessions)
+- **Server Cache**: Valkey (`valkey/valkey-bundle:8` — AGPL-free Redis Stack drop-in with valkey-json + valkey-search; bind `127.0.0.1:6379`; zero ioredis code changes)
 - **Database**: PostgreSQL 18.4 + Drizzle ORM 0.44 + pgvector
 - **Vector DB**: Qdrant (GPU-accelerated)
 - **AI Models**: 
@@ -1577,6 +1577,87 @@ safelist: [
 
 ---
 
+## Gemma4 LLM Call Rules (Hard Rules — June 2026)
+
+Gemma4 (`gemma4-rotorquant:latest`, `gemma4-legal-iq4xs`) is a thinking/reasoning model. These rules are mandatory for any script or route that calls it:
+
+### llama-server `:8090` — always `stream: true`
+
+```javascript
+const res = await fetch(`${LLAMA_URL}/v1/chat/completions`, {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({
+    model: MODEL,
+    messages: [{ role: 'user', content: prompt }],
+    max_tokens: 1024,
+    temperature: 0.3,
+    stream: true,  // REQUIRED — see below
+  }),
+  signal: AbortSignal.timeout(90_000),
+});
+// Assemble content deltas from SSE stream:
+let assembled = '';
+const decoder = new TextDecoder();
+let buf = '';
+for await (const chunk of res.body) {
+  buf += decoder.decode(chunk, { stream: true });
+  const lines = buf.split('\n');
+  buf = lines.pop() ?? '';
+  for (const line of lines) {
+    const trimmed = line.trim();
+    if (!trimmed.startsWith('data:')) continue;
+    const payload = trimmed.slice(5).trim();
+    if (payload === '[DONE]') break;
+    try {
+      const parsed = JSON.parse(payload);
+      assembled += parsed.choices?.[0]?.delta?.content ?? '';
+    } catch { /* skip malformed SSE line */ }
+  }
+}
+const text = assembled.trim();
+```
+
+**Why:** With `stream: false`, the Gemma4 thinking block fills `reasoning_content` first — ~350–400 tokens of chain-of-thought before any `content` tokens appear. A fixed `max_tokens` budget (even 1024) can be exhausted by thinking, leaving `content` empty and `finish_reason: "length"`. Streaming accumulates content deltas as they arrive; `[DONE]` signals stop correctly regardless of thinking length. Streaming also enables `cache_prompt: true` KV reuse across calls with identical prompt prefixes.
+
+**Timeout:** 90s — model may take up to ~30s to finish thinking before first content token arrives.
+
+### Ollama `:11434` — always `think: false`
+
+```javascript
+const res = await fetch(`${OLLAMA_URL}/api/chat`, {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({
+    model: MODEL,
+    messages: [{ role: 'user', content: prompt }],
+    stream: false,
+    think: false,   // REQUIRED — suppresses reasoning block entirely
+    options: { temperature: 0.3, num_predict: 200 },
+  }),
+  signal: AbortSignal.timeout(60_000),
+});
+const data = await res.json();
+const text = data.message?.content?.trim();  // NOT data.response
+```
+
+**Why:** Ollama exposes `think: false` to suppress the reasoning block entirely; `num_predict: 200` is then sufficient for a 2–3 sentence answer.
+
+### Batch rule
+
+`batch=1` (sequential) — Gemma4 cannot serve parallel completions. Concurrent requests queue; the first-in AbortSignal.timeout fires before queued ones start.
+
+### OLLAMA_HOST normalization
+
+Ollama sets `OLLAMA_HOST=0.0.0.0` when binding to all interfaces. `0.0.0.0` is not a connectable address. Always normalize before use:
+
+```javascript
+const _ollamaRaw = (process.env.OLLAMA_HOST ?? 'http://127.0.0.1:11434').replace(/^0\.0\.0\.0/, '127.0.0.1');
+const OLLAMA_URL = _ollamaRaw.startsWith('http') ? _ollamaRaw : `http://${_ollamaRaw}:11434`;
+```
+
+---
+
 ## Post-Audit Alignment (May 3, 2026 — Deep Compiler Stack Audit)
 
 ### Inference Cascade (8 tiers — verified live)
@@ -1917,6 +1998,9 @@ NPM scripts: `agent:fix:batch:{quiet,summary}`, `audit:dirs:{quiet,summary}`, `a
 
 ## Key Lessons (Proven Patterns)
 
+- **Git-diff cold archive (no-delete workaround)**: To retire archive-eligible files without destroying content — `git add` → structured commit → `git tag archive/YYYY-MM-DD/<slug>` → `git rm` + prune commit. Content lives in git DAG forever; recoverable via `git show <tag>:<path>`. Score gate: only files with `superseded-score >= threshold` qualify. Canonical scorer: `scripts/atlas/score-superseded-originals.mjs`. Archive pipeline (not yet built): `scripts/atlas/archive-cold-originals.mjs`. See `docs/architecture/phase-101-completion-plan.md` Block 1.
+- **Valkey bundle replaces Redis Stack**: `valkey/valkey-bundle:8` is the AGPL-free drop-in. Includes `valkey-json` (RapidJSON C++) and `valkey-search`. Swap image in docker-compose, bind `127.0.0.1:6379`. Zero ioredis code changes. `ROTORQUANT_KV_ENABLED=true` in `.env` is a dead variable — `launch-turboquant.ps1` never reads it; use `TURBO_PROFILE` instead.
+- **Hybrid Omni-Worker**: Anaconda container unifies Node.js + PyTorch + TRT-LLM in one process sharing a CUDA context. Bridge is `n-api.rs` using `tch-rs` (Rust LibTorch bindings) or `cudarc` — zero-copy tensor hand-off between SvelteKit and GPU inference. LangGraph = orchestration-only planner, never writes to DB. Not yet implemented; scaffold in `docker/omni-worker/`. See `docs/architecture/phase-101-completion-plan.md` Block 6.
 - **ioredis cold-start in startup scripts**: `legal-ai-redis` Docker container may start *after* folderOpen pipelines fire. Default ioredis behavior reconnects forever and spams unhandled `error` events. Required client options for ANY standalone Node script under `scripts/startup/`, `scripts/index-*`, `scripts/seed-*`: `lazyConnect:true`, `maxRetriesPerRequest:1`, `enableOfflineQueue:false`, `retryStrategy:()=>null`, attach `redis.on('error',()=>{})`, then `await redis.connect()` BEFORE `await redis.ping()` (offlineQueue:false makes ping fail with "Stream isn't writeable" otherwise), and `redis.disconnect()` on failure. Verified in `scripts/index-codebase-fast.mjs` and `scripts/startup/ace-incremental-startup.mjs` (2026-05-08). Do NOT use this pattern in long-running server code — there `getRedis()` from `src/lib/server/redis.ts` is canonical.
 - **$derived vs $derived.by**: `$derived(() => {...})` returns a function. Use `$derived.by(() => {...})` for complex computations
 - **TS imports in SvelteKit**: Use `.js` extensions not `.ts` (bundler resolves `.js` → `.ts`)
@@ -2085,6 +2169,9 @@ See `memory/reconstruction-3-tracks.md` for full SceneIntent schema, RabbitMQ qu
 
 ## Reference Docs
 
+- `docs/architecture/phase-101-completion-plan.md` — **Phase 101 completion plan** (2026-06-02): 7-block, 8-10h plan — git-diff cold archive, promotion boundary, schema migrations, Gemma4 task summaries, Valkey swap, Omni-Worker scaffold, OpenCode Kanban. Run order and verification gates included.
+- `docs/ai-os/opencode-context-window.md` — OpenCode context window config (2026-06-02): two-cap problem (server `-c` + client `contextLength`), `/slots` endpoint explained, `ROTORQUANT_KV_ENABLED` is a dead var, model path fix in `.env`.
+- `docs/architecture/retrieval-layer-separation.md` — **Three-layer retrieval separation** (2026-06-02): Orchestrator → Search Contract → Backend Implementation. Hard rule: callers never call QdrantManager directly; all ANN retrieval enters through `retrieval/orchestrator.ts` or `search/qdrant-search.ts:searchCodebaseAnn()`. TurboVec is additive (rerank + prefilter), not a Qdrant replacement. cuVS/IVF seam is ready in Layer 3.
 - `sveltekit-frontend/docs/architecture/trace-runtime-split.md` — TRACE/Karpathy runtime boundary rule (Gemma4 → MCP only, never raw infra)
 - `sveltekit-frontend/docs/architecture/trace-kag-web-development-guide.md` — 23-section practical guide (route contract, retrieval lane decision tree, Admin Copilot safety, browser context lane, RabbitMQ/sidecar rules, production safety gates)
 - `sveltekit-frontend/docs/architecture/hermes-agent-windows-gemma4-guide.md` — Hermes Agent + WSL2 + local Gemma4 integration (allowlist/blocklist of TRACE tools, port reconciliation, TurboQuant Gemma4 binary caveat)

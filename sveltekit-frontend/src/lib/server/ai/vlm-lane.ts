@@ -77,7 +77,7 @@ export async function runVlmLane(req: LaneRequest): Promise<VlmLaneResult> {
 			const result = await generateText({
 				model: llamaServer(LOCAL_VLM_MODEL),
 				messages: [{ role: 'user', content: userContent }],
-				maxTokens: 1024,
+				maxOutputTokens: 1024,
 				temperature: 0.2,
 				abortSignal: AbortSignal.timeout(60_000),
 			});

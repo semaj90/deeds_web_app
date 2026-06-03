@@ -30,7 +30,7 @@ import { fileURLToPath } from 'url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, '../..');
-const REPORTS_DIR = path.join(ROOT, 'docs', 'reports');
+const REPORTS_DIR = path.join(ROOT, 'archive', 'raw-search-dumps');
 const PACKETS_DIR = path.join(ROOT, 'docs', 'packets');
 const DOCS_DIR = path.join(ROOT, 'docs');
 
@@ -63,19 +63,7 @@ const FEATURE_KEYWORDS = [
 ];
 
 // Noise file patterns to skip (svelte-check logs, build artifacts)
-const NOISE_SOURCE_RE = /(?:
-  svelte-check|
-  node_modules|
-  \.svelte-kit|
-  dist\/|
-  build\/|
-  \.cache\/|
-  \.venv|
-  __pycache__|
-  \.pyc$|
-  lock\.json|
-  package-lock
-)/xi;
+const NOISE_SOURCE_RE = /svelte-check|node_modules|\.svelte-kit|[/\\]dist[/\\]|[/\\]build[/\\]|\.cache[/\\]|\.venv|__pycache__|\.pyc$|lock\.json|package-lock/i;
 
 // Feature ID derivation from file path / content
 function deriveFeatureId(sourcePath) {
@@ -137,37 +125,46 @@ function buildPathMapping(sourcePath) {
   };
 }
 
-// --- Streaming UTF-16 LE reader for rg dumps ---
+// --- Streaming reader for rg dumps (auto-detects UTF-8 vs UTF-16 LE) ---
 async function* streamRgDumpLines(filePath) {
-  const fileStream = fs.createReadStream(filePath);
-  const rl = readline.createInterface({
-    input: fileStream,
-    // Node readline handles BOM stripping when encoding is known
-    // but the file is UTF-16 LE — we need to handle this ourselves
-    crlfDelay: Infinity,
-  });
+  // Probe first 3 bytes to detect encoding
+  const probeFd = fs.openSync(filePath, 'r');
+  const probeBuf = Buffer.alloc(3);
+  fs.readSync(probeFd, probeBuf, 0, 3, 0);
+  fs.closeSync(probeFd);
 
-  // For UTF-16 LE files, we need a different approach
-  // Read using a custom Transform that decodes UTF-16 LE
-  fileStream.destroy();
-  rl.close();
+  const isUtf16Le = probeBuf[0] === 0xFF && probeBuf[1] === 0xFE;
+  const isUtf8Bom = probeBuf[0] === 0xEF && probeBuf[1] === 0xBB && probeBuf[2] === 0xBF;
 
-  // Use PowerShell for UTF-16 LE reading in chunks
-  // We'll use a Node.js approach: read raw buffer and decode
+  // UTF-8 path (mirrors produced by convert-utf16le-dumps-to-utf8.mjs)
+  if (!isUtf16Le) {
+    const rl = readline.createInterface({
+      input: fs.createReadStream(filePath, { encoding: 'utf8' }),
+      crlfDelay: Infinity,
+    });
+    let firstLine = true;
+    for await (const line of rl) {
+      if (firstLine) {
+        firstLine = false;
+        // Strip UTF-8 BOM if present
+        if (isUtf8Bom && line.charCodeAt(0) === 0xfeff) {
+          yield line.slice(1);
+          continue;
+        }
+      }
+      yield line;
+    }
+    return;
+  }
+
+  // UTF-16 LE path (originals)
   const CHUNK = 64 * 1024 * 1024; // 64MB chunks
   const fd = fs.openSync(filePath, 'r');
   const stat = fs.statSync(filePath);
   const fileSize = stat.size;
 
-  let offset = 0;
+  let offset = 2; // skip BOM
   let remainder = Buffer.alloc(0);
-
-  // Skip UTF-16 LE BOM (FF FE) if present
-  const bom = Buffer.alloc(2);
-  fs.readSync(fd, bom, 0, 2, 0);
-  if (bom[0] === 0xFF && bom[1] === 0xFE) {
-    offset = 2;
-  }
 
   while (offset < fileSize) {
     const readSize = Math.min(CHUNK, fileSize - offset);
@@ -279,13 +276,14 @@ async function scanSessionNotes(outStream) {
   console.log('[extract] Scanning session notes in docs/ directly...');
 
   const docsFiles = fs.readdirSync(DOCS_DIR).filter(f => /\.(txt|md)$/.test(f));
-  const reportsFiles = fs.existsSync(REPORTS_DIR)
-    ? fs.readdirSync(REPORTS_DIR).filter(f => /\.txt$/.test(f) && !f.startsWith('rg_'))
+  const docsReports = path.join(ROOT, 'docs', 'reports');
+  const reportsFiles = fs.existsSync(docsReports)
+    ? fs.readdirSync(docsReports).filter(f => /\.txt$/.test(f) && !f.startsWith('rg_'))
     : [];
 
   const allFiles = [
     ...docsFiles.map(f => path.join(DOCS_DIR, f)),
-    ...reportsFiles.map(f => path.join(REPORTS_DIR, f)),
+    ...reportsFiles.map(f => path.join(docsReports, f)),
   ];
 
   let featureCount = 0;
@@ -362,9 +360,19 @@ async function main() {
 
   const packets = new Map(); // sourcePath → packet
 
-  // Process both dumps
-  const turboVecPath = path.join(REPORTS_DIR, 'rg_turbovec.txt');
-  const napiPath = path.join(REPORTS_DIR, 'rg_napi.txt');
+  // Process both dumps — prefer UTF-8 mirror (.utf8.txt) if present
+  function resolveDumpPath(base) {
+    const utf8Mirror = path.join(REPORTS_DIR, `${base}.utf8.txt`);
+    const original = path.join(REPORTS_DIR, `${base}.txt`);
+    if (fs.existsSync(utf8Mirror)) {
+      console.log(`[extract] using UTF-8 mirror: ${path.basename(utf8Mirror)}`);
+      return utf8Mirror;
+    }
+    return original;
+  }
+
+  const turboVecPath = resolveDumpPath('rg_turbovec');
+  const napiPath = resolveDumpPath('rg_napi');
 
   if (fs.existsSync(turboVecPath)) {
     await processRgDump(turboVecPath, 'rg_turbovec', packets);

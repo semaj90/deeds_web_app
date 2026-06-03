@@ -101,6 +101,22 @@ For this codebase, the stable search contract is:
 - hot recall should land in Redis before Qdrant ANN
 - final rerank should happen after the query API reduces the candidate set
 
+## Caller Rule (added 2026-06-02)
+
+Qdrant is Layer 3 — a backend implementation, not a public API.
+
+Do not import `QdrantManager` and call `.search()` from routes, services,
+or LangGraph nodes. All ANN retrieval enters through:
+
+- `retrieval/orchestrator.ts` — full pipeline (embed → ANN → graph → rerank → pack)
+- `search/qdrant-search.ts:searchCodebaseAnn()` — bare ANN call with stable contract
+
+The backend behind `searchCodebaseAnn()` is swappable via `CODEBASE_ANN_BACKEND`.
+Current options: `qdrant` (default), `turbovec`. Future: cuVS, Rust gRPC ANN.
+
+See [retrieval-layer-separation.md](retrieval-layer-separation.md) for the full
+three-layer architecture and where new code belongs.
+
 ## References
 
 - Qdrant Search: https://qdrant.tech/documentation/search/search/
@@ -108,4 +124,5 @@ For this codebase, the stable search contract is:
 - Qdrant Query API schema: https://api.qdrant.tech/api-reference/search/query-points
 - Storage tier design: [storage-tier-schema.md](storage-tier-schema.md)
 - Retrieval architecture: [retrieval-architecture.md](retrieval-architecture.md)
+- Three-layer separation: [retrieval-layer-separation.md](retrieval-layer-separation.md)
 - Active roadmap note: [2026-05-19_qdrant-cluster-autoencoder-roadmap.md](../../next_steps/active/2026-05-19_qdrant-cluster-autoencoder-roadmap.md)

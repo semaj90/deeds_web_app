@@ -1,0 +1,56 @@
+version: "3.9"
+
+# Omni-Worker standalone compose.
+# NOT merged into the main docker-compose.yml yet — operator decision pending.
+# Run: docker compose -f docker/omni-worker/docker-compose.omni.yml up --build
+
+services:
+  omni-worker:
+    build:
+      context: ../..
+      dockerfile: docker/omni-worker/Dockerfile
+    image: legal-ai-omni-worker:dev
+    container_name: legal-ai-omni-worker
+    restart: unless-stopped
+
+    environment:
+      NODE_ENV: production
+      CUDA_VISIBLE_DEVICES: "0"
+      # Inherit DB + Redis + RabbitMQ from .env
+      DATABASE_URL: ${DATABASE_URL}
+      REDIS_URL: ${REDIS_URL:-redis://legal-ai-redis:6379}
+      RABBITMQ_URL: ${RABBITMQ_URL:-amqp://guest:guest@legal-ai-rabbitmq:5672}
+      OLLAMA_HOST: ${OLLAMA_HOST:-http://host.docker.internal:11434}
+      LLAMA_URL: ${LLAMA_URL:-http://host.docker.internal:8090}
+
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+
+    networks:
+      - legal-ai-network
+
+    volumes:
+      # Mount model weights read-only so the worker can call llama-server on host
+      - ${ROTORQUANT_MODEL_PATH:-/dev/null}:/models/gemma4.gguf:ro
+
+    healthcheck:
+      test: ["CMD", "node", "-e",
+        "const a=require(process.env.OMNI_BRIDGE_ADDON||'/app/addons/omni_bridge.node'); console.log(a.helloGpu());"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+
+    labels:
+      com.legal-ai.service: "omni-worker"
+      com.legal-ai.phase: "101-block6"
+
+networks:
+  legal-ai-network:
+    external: true
+    name: legal-ai-network

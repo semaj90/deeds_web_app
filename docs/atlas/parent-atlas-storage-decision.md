@@ -13,6 +13,18 @@ This document records storage roles, recommended services, tooling, and quick ru
 - Langfuse for LLM & tool observability.
 - LangGraph for durable agent orchestration.
 
+Two-lane model
+--------------
+- Cold store: original files, archives, and large raw artifacts stay here.
+- Warm index: packets/cards/summaries stay small and point back to cold originals.
+- Hot cache: only active task memory and recent retrieval state live here.
+- Queue: work waiting to be processed, not source truth.
+- Qdrant: semantic lookup plus payload filters for traversal and ANN recall.
+- Postgres: truth table, packet registry, and durable joins.
+- RabbitMQ: promotion and ingest work queue with separate lanes for urgent, normal, bulk, and dead-letter traffic.
+- SeaweedFS: cold original object store for large artifacts that have already been packetized and verified.
+- See also: [Dual-Lane Hot Brain, Cold Queue](</C:/Users/james/Videos/deeds-web-app/docs/architecture/dual-lane-hot-brain-cold-queue.md>)
+
 Caveman rule
 -----------
 Postgres stores truth.
@@ -78,12 +90,15 @@ Use `pgvector` for:
 - `summary_cards`
 - recommendations
 - metadata-bound vectors where transactional guarantees matter
+- warm packet mirrors that need durable joins back to `sourceRef` / `feature_id`
 
 Qdrant (retained for large-scale ANN)
 -------------------------------------
 Rationale:
 - Qdrant is optimized for large-scale vector stores and production ANN retrieval with payload filters.
-- Keep Qdrant for heavy, large-dataset retrieval use-cases (e.g., `codebase_chunks_768`).
+- Keep Qdrant for heavy, large-dataset retrieval use-cases (e.g., `codebase_chunks_768`) and traversal surfaces where payload filtering matters.
+- Treat quantization, multi-stage retrieval, and hybrid search as storage-efficiency and recall tools, not as a replacement for the durable ledger.
+- Keep quaternion / SOM / XGBoost / topology math outside Qdrant; compute those transforms in the CUDA, PyTorch, or LibTorch lane, then persist the resulting metadata or vectors back into the index.
 
 Suggested Qdrant responsibilities:
 - `codebase_chunks_768` (large code chunk vectors)
@@ -134,6 +149,7 @@ Analytics / Audit:
 - DuckDB + Arrow/Parquet for exports and fast joins
 - Langfuse for LLM observability
 - CouchDB for archival JSON replication (optional archive store)
+- Adapter boundary note: TurboVec, LlamaIndex, LangChain, and LangGraph are adapters only; do not let them become canonical storage or write paths.
 
 Experimentation / Training:
 - LanceDB for offline vector lake and training-data staging

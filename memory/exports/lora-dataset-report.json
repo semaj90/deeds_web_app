@@ -1,9 +1,9 @@
 {
-  "timestamp": "2026-05-30T05:20:27.514Z",
-  "mode": "apply",
+  "timestamp": "2026-06-03T02:48:08.924Z",
+  "mode": "preview",
   "phase": "Phase 6: LoRA Dataset Generation",
   "inputs": {
-    "totalCards": 9373,
+    "totalCards": 9399,
     "rewardEnriched": 1,
     "somEnriched": 9372
   },
@@ -35,12 +35,12 @@
     }
   },
   "stats": {
-    "timestamp": "2026-05-30T05:20:27.511Z",
+    "timestamp": "2026-06-03T02:48:08.917Z",
     "phase": "Phase 6: LoRA Dataset Generation",
     "dataset": {
       "totalExamples": 9372,
-      "totalCards": 9373,
-      "cardsUtilized": "99.99"
+      "totalCards": 9399,
+      "cardsUtilized": "99.71"
     },
     "enrichment": {
       "cardsWithRewards": 1,

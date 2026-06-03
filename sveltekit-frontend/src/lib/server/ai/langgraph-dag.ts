@@ -5,10 +5,10 @@ import { buildACEPacket, injectACETableCache } from './ace-builder.js';
 import { recordExecutionOutcome, mutatePromptWithLearnings } from './learning-loop.js';
 import { logSynthesisRun } from '../observability/synthesis-logger.js';
 import { ENV } from '../env.server.js';
-import Redis from 'ioredis';
+import { getValkeyClient } from '../cache/valkey-client.js';
 import crypto from 'crypto';
 
-const redis = new Redis(ENV.REDIS_URL);
+const redis = getValkeyClient();
 
 function canonicalJson(obj: any): string {
   if (typeof obj !== 'object' || obj === null) return JSON.stringify(obj);

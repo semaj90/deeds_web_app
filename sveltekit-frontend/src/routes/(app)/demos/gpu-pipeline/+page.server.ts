@@ -51,8 +51,8 @@ export const load: PageServerLoad = async ({ locals }) => {
 				if (Array.isArray(topScores)) {
 					for (let i = 0; i < topScores.length; i += 2) {
 						try {
-							const parsed = JSON.parse(topScores[i + 1]);
-							scores.push({ file: topScores[i], ...parsed });
+							const parsed = JSON.parse(String(topScores[i + 1]));
+							scores.push({ file: String(topScores[i]), ...parsed });
 						} catch {
 							// skip malformed
 						}

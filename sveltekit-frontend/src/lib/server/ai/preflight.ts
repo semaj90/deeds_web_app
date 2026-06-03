@@ -1,7 +1,7 @@
 import { ENV } from '../env.server.js';
-import Redis from 'ioredis';
+import { getValkeyClient } from '../cache/valkey-client.js';
 
-const redis = new Redis(ENV.REDIS_URL);
+const redis = getValkeyClient();
 
 export async function preflight(query: string) {
   // Read top 10 most recent failures from the hot cache

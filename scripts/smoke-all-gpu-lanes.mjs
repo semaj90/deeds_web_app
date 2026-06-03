@@ -12,6 +12,8 @@
  *  3. Autoencoder weights → reconstruction loss check (Redis ace:autoencoder:*)
  *  4. NES CHR-ROM cards → batch attention (.opencode/cards/*.json)
  *  5. Qdrant chunks → pageRank + topK (codebase_chunks_768)
+ *  6. CUDA Graphs capture + replay (Phase H1, skips gracefully if not built)
+ *  7. mmproj vision — llama-server /v1/chat/completions with a 1×1 PNG (skips if no multimodal)
  *
  * Exit codes:
  *  0  all lanes exercised successfully (or skipped gracefully when data missing)
@@ -19,8 +21,9 @@
  *  2  GPU addon unloadable (run startup-gpu-bridge-probe.mjs to diagnose)
  *
  * Usage:
- *  node scripts/smoke-all-gpu-lanes.mjs               # all lanes
- *  node scripts/smoke-all-gpu-lanes.mjs --lane=engram # single lane
+ *  node scripts/smoke-all-gpu-lanes.mjs                    # all lanes
+ *  node scripts/smoke-all-gpu-lanes.mjs --lane=engram     # single lane
+ *  node scripts/smoke-all-gpu-lanes.mjs --lane=vlm-vision # mmproj vision probe only
  */
 
 import { existsSync, writeFileSync, mkdirSync, readFileSync, readdirSync } from 'fs';
@@ -297,21 +300,6 @@ if (!LANE_FILTER || LANE_FILTER === 'qdrant') {
 // ─────────────────────────────────────────────────────────────────
 // LANE 6: CUDA Graphs capture + replay (Phase H1)
 // ─────────────────────────────────────────────────────────────────
-// ─────────────────────────────────────────────────────────────────
-// LANE 6: CUDA Graphs capture + replay (Phase H1)
-// ─────────────────────────────────────────────────────────────────
-// ─────────────────────────────────────────────────────────────────
-// LANE 6: CUDA Graphs capture + replay (Phase H1)
-// ─────────────────────────────────────────────────────────────────
-// ─────────────────────────────────────────────────────────────────
-// LANE 6: CUDA Graphs capture + replay (Phase H1)
-// ─────────────────────────────────────────────────────────────────
-// ─────────────────────────────────────────────────────────────────
-// LANE 6: CUDA Graphs capture + replay (Phase H1)
-// ─────────────────────────────────────────────────────────────────
-// ─────────────────────────────────────────────────────────────────
-// LANE 6: CUDA Graphs capture + replay (Phase H1)
-// ─────────────────────────────────────────────────────────────────
 if (!LANE_FILTER || LANE_FILTER === 'cuda-graph') {
   const lane = { name: 'cuda-graph', status: 'pending', detail: null };
   try {
@@ -515,6 +503,116 @@ if (!LANE_FILTER || LANE_FILTER === 'vlm') {
     lane.detail = { reason: `llama-server not reachable at ${BASE}: ${e.message}` };
     lanes.push(lane);
   }
+}
+
+// ─────────────────────────────────────────────────────────────────
+// LANE 7: mmproj vision probe — llama-server /v1/chat/completions
+// with a base64-encoded 1×1 white PNG image.
+// Verifies that --mmproj is active and the vision pathway returns
+// a non-empty text response without error.
+// ─────────────────────────────────────────────────────────────────
+if (!LANE_FILTER || LANE_FILTER === 'vlm-vision') {
+  const lane = { name: 'vlm-vision', status: 'pending', detail: null };
+  const LLAMA_HOST = process.env.LLAMA_SERVER_HOST ?? '127.0.0.1';
+  const LLAMA_PORT = process.env.TURBO_PORT ?? process.env.LLAMA_SERVER_PORT ?? '8090';
+  const BASE = `http://${LLAMA_HOST}:${LLAMA_PORT}`;
+
+  // 1×1 white PNG — minimal valid image, base64-encoded
+  const WHITE_PNG_B64 = 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwADhQGAWjR9awAAAABJRU5ErkJggg==';
+
+  try {
+    // Stage 1: health check
+    const healthRes = await fetch(`${BASE}/health`, { signal: AbortSignal.timeout(3_000) }).catch(() => null);
+    if (!healthRes?.ok) {
+      lane.status = 'skip';
+      lane.detail = { reason: `llama-server not reachable at ${BASE}` };
+    } else {
+      // Stage 2: check multimodal capability via /v1/models
+      let modelId = null;
+      let hasMultimodal = false;
+      try {
+        const modelsRes = await fetch(`${BASE}/v1/models`, { signal: AbortSignal.timeout(3_000) });
+        if (modelsRes.ok) {
+          const modelsData = await modelsRes.json();
+          const oaiModels = modelsData.data ?? [];
+          const llamaModels = modelsData.models ?? [];
+          modelId = oaiModels[0]?.id ?? llamaModels[0]?.name ?? null;
+          hasMultimodal = llamaModels.some(
+            m => Array.isArray(m.capabilities) && m.capabilities.includes('multimodal')
+          );
+        }
+      } catch { /* informational */ }
+
+      if (!hasMultimodal) {
+        lane.status = 'skip';
+        lane.detail = {
+          reason: 'llama-server does not report multimodal capability — start with --mmproj mmproj-F16.gguf',
+          model_id: modelId,
+          base_url: BASE,
+        };
+      } else {
+        // Stage 3: actual vision inference with a 1×1 white PNG
+        const t0 = Date.now();
+        const body = JSON.stringify({
+          model: modelId ?? 'default',
+          messages: [
+            {
+              role: 'user',
+              content: [
+                { type: 'image_url', image_url: { url: `data:image/png;base64,${WHITE_PNG_B64}` } },
+                { type: 'text', text: 'What colour is this image? Reply with one word.' },
+              ],
+            },
+          ],
+          max_tokens: 16,
+          stream: false,
+          temperature: 0,
+        });
+
+        let visionText = null;
+        let visionError = null;
+        try {
+          const visionRes = await fetch(`${BASE}/v1/chat/completions`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body,
+            signal: AbortSignal.timeout(30_000),
+          });
+          if (visionRes.ok) {
+            const visionData = await visionRes.json();
+            visionText = visionData.choices?.[0]?.message?.content ?? null;
+          } else {
+            visionError = `HTTP ${visionRes.status}: ${await visionRes.text().catch(() => '')}`;
+          }
+        } catch (e) {
+          visionError = e.message;
+        }
+
+        const latency = Date.now() - t0;
+        if (visionText) {
+          lane.status = 'ok';
+          lane.detail = {
+            model_id: modelId,
+            multimodal_capability: hasMultimodal,
+            vision_response: visionText.trim().slice(0, 80),
+            latency_ms: latency,
+          };
+        } else {
+          lane.status = 'fail';
+          lane.detail = {
+            model_id: modelId,
+            multimodal_capability: hasMultimodal,
+            error: visionError,
+            latency_ms: latency,
+          };
+        }
+      }
+    }
+  } catch (e) {
+    lane.status = 'skip';
+    lane.detail = { reason: `llama-server not reachable: ${e.message}` };
+  }
+  lanes.push(lane);
 }
 
 // ─────────────────────────────────────────────────────────────────

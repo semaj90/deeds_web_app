@@ -36,7 +36,27 @@
     "llms": "sveltekit-frontend/docs/graph/LLMS.md"
   },
   "workspaces": ["sveltekit-frontend", "simd-bridge", "vscode-extension"],
-  "ignoreDirs": ["node_modules", ".git", ".svelte-kit", "dist", "build", "coverage", ".cache", "tmp", "target"],
+  "ignoreDirs": [
+    "node_modules", ".git", ".svelte-kit", "dist", "build", "coverage", ".cache", "tmp", "target",
+    ".tmp",
+    ".venv", ".venv-py313-backup",
+    "deeds_labs",
+    "granite-docling-258M",
+    "logs",
+    "__pycache__", ".pytest_cache",
+    "static"
+  ],
+  "ignoreExtensions": [
+    ".safetensors", ".onnx", ".bin",
+    ".o", ".so", ".dll", ".node",
+    ".pyc", ".pyd",
+    ".wasm",
+    ".parquet", ".arrow",
+    ".png", ".jpg", ".jpeg", ".gif", ".webp", ".ico", ".svg",
+    ".mp4", ".mp3", ".wav", ".ogg",
+    ".pdf", ".zip", ".tar", ".gz", ".7z",
+    ".woff", ".woff2", ".ttf", ".eot"
+  ],
   "scanRoots": ["scripts", "sveltekit-frontend/src", "sveltekit-frontend/scripts", "sveltekit-frontend/tests", "simd-bridge", "vscode-extension"],
   "qdrantCollections": ["codebase_chunks_768", "codebase_chunks_64d", "glyph_atlas", "task_distillates", "docs_chunks", "error_notes"],
   "redisKeys": ["wiki:note:dir:*", "couchdb:pagerank_scores", "agents:dir:*", "code:llm_output:path:*", "summary:cluster:*"] ,

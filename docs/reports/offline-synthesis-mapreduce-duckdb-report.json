@@ -1,13 +1,13 @@
 {
-  "generatedAt": "2026-06-02T04:27:25.313Z",
+  "generatedAt": "2026-06-03T04:05:42.227Z",
   "inputs": {
     "input": ".tmp/offline-synthesis/consolidated-index.ndjson",
     "manifest": ".tmp/offline-synthesis/consolidated-index.ndjson.manifest.json",
     "duckdb": "docs/reports/offline-synthesis-mapreduce.duckdb"
   },
   "summary": {
-    "rows": 25,
-    "files": 25,
+    "rows": 50,
+    "files": 50,
     "features": 5,
     "extensions": 3,
     "staticImports": 10,
@@ -16,19 +16,19 @@
   },
   "topFeatures": [
     {
+      "key": "unclassified",
+      "value": 34
+    },
+    {
       "key": "cache",
       "value": 12
     },
     {
-      "key": "unclassified",
-      "value": 10
+      "key": "ui",
+      "value": 2
     },
     {
       "key": "admin",
-      "value": 1
-    },
-    {
-      "key": "ui",
       "value": 1
     },
     {
@@ -38,12 +38,12 @@
   ],
   "topExtensions": [
     {
-      "key": ".md",
-      "value": 13
+      "key": ".json",
+      "value": 30
     },
     {
-      "key": ".json",
-      "value": 11
+      "key": ".md",
+      "value": 19
     },
     {
       "key": ".ts",

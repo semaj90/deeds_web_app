@@ -102,10 +102,10 @@ services:
       retries: 3
       start_period: 30s
 
-  # Redis — caching, sessions, semantic cache, pub/sub
-  # Using redis-stack-server (no RedisInsight UI = less memory)
+  # Valkey Bundle — caching, sessions, semantic cache, pub/sub
+  # Open-source Redis-compatible bundle with JSON/Search/Bloom support.
   redis:
-    image: redis/redis-stack-server:latest
+    image: valkey/valkey-bundle:8.1.1
     container_name: legal-ai-redis
     restart: unless-stopped
     deploy:
@@ -121,17 +121,16 @@ services:
         max-size: "20m"
         max-file: "3"
     ports:
-      - "6379:6379"
+      - "127.0.0.1:6379:6379"
     command: >
-      redis-server
+      valkey-server
       --appendonly yes
       --port 6379
-      --protected-mode no
+      --protected-mode yes
       --bind 0.0.0.0
-      --loadmodule /opt/redis-stack/lib/redisearch.so
-      --loadmodule /opt/redis-stack/lib/redistimeseries.so
-      --loadmodule /opt/redis-stack/lib/rejson.so
-      --loadmodule /opt/redis-stack/lib/redisbloom.so
+      --requirepass ${REDIS_PASSWORD:-redis}
+      --io-threads 4
+      --io-threads-do-reads yes
       --maxmemory 2gb
       --maxmemory-policy allkeys-lru
       --save 900 1
@@ -146,7 +145,7 @@ services:
     networks:
       - legal-ai-network
     healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
+      test: ["CMD-SHELL", "valkey-cli -a ${REDIS_PASSWORD:-redis} ping"]
       interval: 30s
       timeout: 10s
       retries: 3

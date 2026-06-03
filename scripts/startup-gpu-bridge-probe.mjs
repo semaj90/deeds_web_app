@@ -28,6 +28,7 @@ import path from 'path';
 const require = createRequire(import.meta.url);
 const ADDON_PATH = path.resolve('simd-bridge/cpp/build/Release/tensorrt_bridge.node');
 const OUT_FILE = '.tmp/gpu-bridge-probe.json';
+const LOG_FILE = path.resolve('logs/task-output/startup-gpu-bridge-probe.log');
 
 if (!existsSync('.tmp')) mkdirSync('.tmp', { recursive: true });
 
@@ -254,6 +255,22 @@ console.log('══════════════════════�
 
 writeFileSync(OUT_FILE, JSON.stringify(probe, null, 2));
 console.log(`Probe written: ${OUT_FILE}`);
+
+mkdirSync(path.dirname(LOG_FILE), { recursive: true });
+writeFileSync(
+  LOG_FILE,
+  [
+    `timestamp: ${probe.timestamp}`,
+    `addon_path: ${probe.addon_path}`,
+    `addon_loaded: ${probe.addon_loaded}`,
+    `cuda_available: ${probe.cuda_available}`,
+    `live_count: ${probe.live_count}`,
+    `stub_count: ${probe.stub_count}`,
+    `summary: ${probe.summary}`,
+    probe.load_error ? `load_error: ${probe.load_error}` : null,
+  ].filter(Boolean).join('\n') + '\n'
+);
+console.log(`Task log written: ${LOG_FILE}`);
 
 // Exit code
 if (probe.live_count === 0 && probe.stub_count === total) {

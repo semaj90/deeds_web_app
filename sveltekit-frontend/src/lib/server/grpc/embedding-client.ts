@@ -41,7 +41,7 @@ export interface EmbeddingOptions {
   skipCacheWrite?: boolean;
 }
 
-type EmbeddingSource = 'grpc' | 'quic' | 'http-ollama' | 'http-ollama-sequential';
+type EmbeddingSource = 'grpc' | 'quic' | 'http-ollama' | 'http-ollama-sequential' | 'onnx-local';
 
 export type EmbeddingAttemptStatus = 'success' | 'failed' | 'skipped' | 'cache-hit';
 
@@ -367,6 +367,37 @@ async function generateViaQuic(texts: string[], timeoutMs = 5000): Promise<Embed
     console.warn('[embedding-client] QUIC/NATS embedding failed:', message);
     markQuicFailure(message);
     return { vectors: null, detail: message };
+  }
+}
+
+// ── llama-server embed tier (:8081) ──────────────────────────────────────────
+// When the dedicated embedding server is running (npm run embed:start), route
+// batch embedding through it before Ollama. Uses OpenAI /v1/embeddings shape.
+// Batch size 512 at --ubatch-size 128 gives ~3ms per 512-text batch on GPU.
+
+const LLAMA_EMBED_URL = ENV.OLLAMA_EMBED_BASE_URL?.startsWith('http')
+  ? ENV.OLLAMA_EMBED_BASE_URL          // e.g. http://127.0.0.1:8081
+  : null;
+
+async function generateViaLlamaEmbed(
+  texts: string[],
+): Promise<number[][] | null> {
+  if (!LLAMA_EMBED_URL) return null;
+  try {
+    const res = await fetch(`${LLAMA_EMBED_URL}/v1/embeddings`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ input: texts, model: 'embeddinggemma' }),
+      signal: AbortSignal.timeout(8000),
+    });
+    if (!res.ok) return null;
+    const data = (await res.json()) as { data?: Array<{ embedding?: number[] }> };
+    if (!Array.isArray(data.data) || data.data.length !== texts.length) return null;
+    const vectors = data.data.map((d) => d.embedding ?? []);
+    if (vectors.some((v) => v.length !== 768)) return null;
+    return vectors;
+  } catch {
+    return null;
   }
 }
 
@@ -830,6 +861,29 @@ export async function generateEmbeddings(
     attempts.push({ transport: 'quic', status: 'skipped', detail: 'disabled by config' });
   }
 
+  // Tier 2.5: llama-server embed (:8081) — GPU GGUF embed, faster than Ollama
+  if (!newVectors && LLAMA_EMBED_URL) {
+    const llamaStart = performance.now();
+    const llamaVecs = await generateViaLlamaEmbed(uncachedTexts);
+    if (llamaVecs) {
+      newVectors = llamaVecs;
+      source = 'http-ollama'; // closest existing source tag; observability shows LLAMA_EMBED_URL
+      attempts.push({
+        transport: 'http-ollama',
+        status: 'success',
+        detail: `llama-embed ${LLAMA_EMBED_URL}`,
+        durationMs: Math.round(performance.now() - llamaStart),
+      });
+    } else {
+      attempts.push({
+        transport: 'http-ollama',
+        status: 'failed',
+        detail: `llama-embed ${LLAMA_EMBED_URL} unavailable`,
+        durationMs: Math.round(performance.now() - llamaStart),
+      });
+    }
+  }
+
   // Tier 3+4: HTTP/Ollama (batch → sequential fallback)
   if (!newVectors) {
     try {
@@ -850,8 +904,52 @@ export async function generateEmbeddings(
               },
             ];
       attempts.push(...httpAttempts);
-      throw new EmbeddingGenerationError(message, attempts);
+      // Don't throw yet — ONNX local is Tier 5
     }
+  }
+
+  // Tier 5: ONNX local (embeddinggemma_300m_onnx — no network, no Ollama)
+  if (!newVectors) {
+    const onnxStart = performance.now();
+    try {
+      const { tryEmbedOnnx, isOnnxEmbedAvailable } = await import('../embedding/onnx-embed.js');
+      if (isOnnxEmbedAvailable()) {
+        const onnxVectors: (number[] | null)[] = [];
+        for (const t of uncachedTexts) {
+          onnxVectors.push(await tryEmbedOnnx(t));
+        }
+        if (onnxVectors.every((v) => v !== null)) {
+          newVectors = onnxVectors as number[][];
+          source = 'onnx-local';
+          model = 'embeddinggemma-onnx';
+          attempts.push({
+            transport: 'onnx-local',
+            status: 'success',
+            durationMs: Math.round(performance.now() - onnxStart),
+          });
+        } else {
+          attempts.push({
+            transport: 'onnx-local',
+            status: 'failed',
+            detail: 'partial null results from ONNX inference',
+            durationMs: Math.round(performance.now() - onnxStart),
+          });
+        }
+      } else {
+        attempts.push({ transport: 'onnx-local', status: 'skipped', detail: 'model not present' });
+      }
+    } catch (onnxErr) {
+      attempts.push({
+        transport: 'onnx-local',
+        status: 'failed',
+        detail: onnxErr instanceof Error ? onnxErr.message : String(onnxErr),
+        durationMs: Math.round(performance.now() - onnxStart),
+      });
+    }
+  }
+
+  if (!newVectors) {
+    throw new EmbeddingGenerationError('All embedding tiers failed', attempts);
   }
 
   // Merge cached + new, and cache new results

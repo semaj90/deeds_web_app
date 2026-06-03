@@ -1,10 +1,10 @@
 {
-  "generatedAt": "2026-06-02T05:26:03.251Z",
+  "generatedAt": "2026-06-03T01:55:34.862Z",
   "totalCount": 12,
   "clusters": {
     "UI Components": [
       {
-        "id": "import_error_2cde1d5d",
+        "id": "import_error_027f9390",
         "type": "developer_recommendation",
         "cluster": "UI Components",
         "title": "src/lib/components/ui/index.ts — 42 unresolved imports",
@@ -18,7 +18,7 @@
         "featureStatus": "degraded"
       },
       {
-        "id": "import_error_c793661c",
+        "id": "import_error_1a343356",
         "type": "developer_recommendation",
         "cluster": "UI Components",
         "title": "src/lib/components/ui/gaming/n64/index.ts — 29 unresolved imports",
@@ -32,7 +32,7 @@
         "featureStatus": "degraded"
       },
       {
-        "id": "import_error_9e5572ac",
+        "id": "import_error_19b54bbb",
         "type": "developer_recommendation",
         "cluster": "UI Components",
         "title": "src/lib/components/ui/gaming/index.ts — 18 unresolved imports",
@@ -46,7 +46,7 @@
         "featureStatus": "degraded"
       },
       {
-        "id": "import_error_15134c65",
+        "id": "import_error_a5ea42f6",
         "type": "developer_recommendation",
         "cluster": "UI Components",
         "title": "src/lib/components/ui/alert-dialog/index.js — 12 unresolved imports",
@@ -60,7 +60,7 @@
         "featureStatus": "degraded"
       },
       {
-        "id": "import_error_6a0805bf",
+        "id": "import_error_6c7d8081",
         "type": "developer_recommendation",
         "cluster": "UI Components",
         "title": "src/lib/components/ui/dialog/index.ts — 11 unresolved imports",
@@ -76,7 +76,7 @@
     ],
     "General": [
       {
-        "id": "import_error_b5fad5c8",
+        "id": "import_error_21f291a6",
         "type": "developer_recommendation",
         "cluster": "General",
         "title": "src/lib/icons/yorha/index.ts — 12 unresolved imports",
@@ -90,7 +90,7 @@
         "featureStatus": "degraded"
       },
       {
-        "id": "stale_feature_c846557c",
+        "id": "stale_feature_c9a01af0",
         "type": "missing_feature",
         "cluster": "General",
         "title": "Feature not implemented: Priority 2: VLM POI Integration (90 min)",
@@ -104,7 +104,7 @@
         "featureStatus": "missing"
       },
       {
-        "id": "stale_feature_e4a37dda",
+        "id": "stale_feature_b2737e54",
         "type": "missing_feature",
         "cluster": "General",
         "title": "Feature not implemented: Priority 3: Audit Dashboard Web UI (3-4 hours)",
@@ -118,7 +118,7 @@
         "featureStatus": "missing"
       },
       {
-        "id": "stale_feature_f59259ce",
+        "id": "stale_feature_0389903d",
         "type": "missing_feature",
         "cluster": "General",
         "title": "Feature not implemented: Priority 4: Auto-Fix Orchestrator (6-8 hours)",
@@ -132,7 +132,7 @@
         "featureStatus": "missing"
       },
       {
-        "id": "stale_feature_56ff4d41",
+        "id": "stale_feature_8030a43a",
         "type": "missing_feature",
         "cluster": "General",
         "title": "Feature not implemented: Phase 3: Post-Synthesis Quality Review (RunID: `stage-2c-500`)",
@@ -148,7 +148,7 @@
     ],
     "Agent Workflow": [
       {
-        "id": "unclassified_5ed0194a",
+        "id": "unclassified_68b46b6b",
         "type": "missing_dependency",
         "cluster": "Agent Workflow",
         "title": "4 files unclassified with >10 imports",
@@ -167,7 +167,7 @@
     ],
     "Legal Workspace": [
       {
-        "id": "stale_feature_cc8dfa76",
+        "id": "stale_feature_958eded3",
         "type": "missing_feature",
         "cluster": "Legal Workspace",
         "title": "Feature not implemented: Priority 1: Evidence Upload UI (1 hour)",
@@ -184,7 +184,7 @@
   },
   "top10": [
     {
-      "id": "import_error_2cde1d5d",
+      "id": "import_error_027f9390",
       "type": "developer_recommendation",
       "cluster": "UI Components",
       "title": "src/lib/components/ui/index.ts — 42 unresolved imports",
@@ -198,7 +198,7 @@
       "featureStatus": "degraded"
     },
     {
-      "id": "import_error_c793661c",
+      "id": "import_error_1a343356",
       "type": "developer_recommendation",
       "cluster": "UI Components",
       "title": "src/lib/components/ui/gaming/n64/index.ts — 29 unresolved imports",
@@ -212,7 +212,7 @@
       "featureStatus": "degraded"
     },
     {
-      "id": "import_error_9e5572ac",
+      "id": "import_error_19b54bbb",
       "type": "developer_recommendation",
       "cluster": "UI Components",
       "title": "src/lib/components/ui/gaming/index.ts — 18 unresolved imports",
@@ -226,7 +226,7 @@
       "featureStatus": "degraded"
     },
     {
-      "id": "import_error_15134c65",
+      "id": "import_error_a5ea42f6",
       "type": "developer_recommendation",
       "cluster": "UI Components",
       "title": "src/lib/components/ui/alert-dialog/index.js — 12 unresolved imports",
@@ -240,7 +240,7 @@
       "featureStatus": "degraded"
     },
     {
-      "id": "import_error_b5fad5c8",
+      "id": "import_error_21f291a6",
       "type": "developer_recommendation",
       "cluster": "General",
       "title": "src/lib/icons/yorha/index.ts — 12 unresolved imports",
@@ -254,7 +254,7 @@
       "featureStatus": "degraded"
     },
     {
-      "id": "import_error_6a0805bf",
+      "id": "import_error_6c7d8081",
       "type": "developer_recommendation",
       "cluster": "UI Components",
       "title": "src/lib/components/ui/dialog/index.ts — 11 unresolved imports",
@@ -268,7 +268,7 @@
       "featureStatus": "degraded"
     },
     {
-      "id": "unclassified_5ed0194a",
+      "id": "unclassified_68b46b6b",
       "type": "missing_dependency",
       "cluster": "Agent Workflow",
       "title": "4 files unclassified with >10 imports",
@@ -285,7 +285,7 @@
       "featureStatus": "degraded"
     },
     {
-      "id": "stale_feature_cc8dfa76",
+      "id": "stale_feature_958eded3",
       "type": "missing_feature",
       "cluster": "Legal Workspace",
       "title": "Feature not implemented: Priority 1: Evidence Upload UI (1 hour)",
@@ -299,7 +299,7 @@
       "featureStatus": "missing"
     },
     {
-      "id": "stale_feature_c846557c",
+      "id": "stale_feature_c9a01af0",
       "type": "missing_feature",
       "cluster": "General",
       "title": "Feature not implemented: Priority 2: VLM POI Integration (90 min)",
@@ -313,7 +313,7 @@
       "featureStatus": "missing"
     },
     {
-      "id": "stale_feature_e4a37dda",
+      "id": "stale_feature_b2737e54",
       "type": "missing_feature",
       "cluster": "General",
       "title": "Feature not implemented: Priority 3: Audit Dashboard Web UI (3-4 hours)",

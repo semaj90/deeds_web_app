@@ -593,12 +593,12 @@ Please provide a comprehensive legal analysis including:
 
 Response:`;
 
-    const response = await fetch('http://localhost:11434/api/generate', {
+    const response = await fetch('/api/ai/chat', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         model: 'gemma4-legal',
-        prompt: enhancedPrompt,
+        messages: [{ role: 'user', content: enhancedPrompt }],
         stream: false,
         options: {
           temperature: 0.4,

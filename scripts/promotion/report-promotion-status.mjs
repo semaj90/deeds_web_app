@@ -60,6 +60,7 @@ const knownReports = {
   'offline_synthesis_report':        '.tmp/offline-synthesis-report.json',
   'qdrant_postgres_reconciliation':  '.tmp/qdrant-postgres-mirror-reconciliation.json',
   'parent_atlas_validation':         '.tmp/parent-atlas-validation.json',
+  'superseded_score_candidates':      '.tmp/superseded-score-candidates.json',
   'promotion_queue_run':             '.tmp/promotion-queue-run.json',
 };
 
@@ -199,6 +200,27 @@ if (driftReport) {
   }
 }
 
+// ── NEW GATES: superseded score candidates ─────────────────────────────────
+
+let supersededScoreStatus = 'UNKNOWN';
+let supersededScoreDetail = 'No candidate report — run node scripts/packets/score-superseded-originals.mjs';
+const supersededScoreReport = readJson(findReport('.tmp/superseded-score-candidates.json'));
+if (supersededScoreReport) {
+  const rows = Array.isArray(supersededScoreReport.candidates) ? supersededScoreReport.candidates : [];
+  const mutatingRows = rows.filter(row => row?.delete_allowed === true || row?.move_allowed === true);
+  const allReadOnly = rows.length > 0 && mutatingRows.length === 0 && supersededScoreReport.candidateOnly === true;
+  if (allReadOnly) {
+    supersededScoreStatus = 'GREEN';
+    supersededScoreDetail = `${rows.length} candidate rows, all delete/move flags false`;
+  } else if (mutatingRows.length > 0) {
+    supersededScoreStatus = 'RED';
+    supersededScoreDetail = `${mutatingRows.length} row(s) expose mutating flags — the lane must stay read-only`;
+  } else {
+    supersededScoreStatus = 'YELLOW';
+    supersededScoreDetail = 'Report exists but candidate rows are missing or unreadable';
+  }
+}
+
 // ── NEW GATES: duplicate rels classification ─────────────────────────────────
 
 let dupRelsStatus = 'UNKNOWN';
@@ -272,6 +294,9 @@ if (parentAtlasDocStatus === 'BLOCKED') {
 if (drizzleDriftStatus === 'BLOCKED') {
   blockedLanes.push(`Drizzle drift — ${drizzleDriftDetail}`);
 }
+if (supersededScoreStatus === 'RED') {
+  blockedLanes.push(`superseded-score candidates are not read-only — ${supersededScoreDetail}`);
+}
 
 const missingReports = Object.entries(reportStatus)
   .filter(([, exists]) => !exists)
@@ -306,6 +331,8 @@ if (mcpGuardStatus !== 'GREEN') {
   nextSafeCommand = 'docker exec legal-ai-postgres psql -U legal_admin -d legal_ai_db -f /tmp/20260601_add_alias_and_parent_atlas_indexes.sql  # creates parent_atlas_documents + indexes';
 } else if (aliasIdVerifiedStatus === 'BLOCKED') {
   nextSafeCommand = 'docker exec legal-ai-postgres psql -U legal_admin -d legal_ai_db -f /tmp/20260601_add_alias_and_parent_atlas_indexes.sql  # adds alias_id column (idempotent)';
+} else if (!reportStatus['superseded_score_candidates']) {
+  nextSafeCommand = 'node scripts/packets/score-superseded-originals.mjs';
 } else if (!reportStatus['knowledge_card_validation']) {
   nextSafeCommand = 'node scripts/promotion/run-promotion-queue.mjs --dry-run --only knowledge-card-validation';
 } else if (!reportStatus['alias_id_preflight']) {
@@ -333,6 +360,7 @@ const result = {
   drizzle_drift_audit: { status: drizzleDriftStatus, detail: drizzleDriftDetail },
   alias_id_verified: { status: aliasIdVerifiedStatus, detail: aliasIdVerifiedDetail },
   parent_atlas_documents_ready: { status: parentAtlasDocStatus, detail: parentAtlasDocDetail },
+  superseded_score_candidates: { status: supersededScoreStatus, detail: supersededScoreDetail },
   duplicate_rels_classified: { status: dupRelsStatus, detail: dupRelsDetail },
   redis_auth_configured: { status: redisAuthStatus, detail: redisAuthDetail },
   can_run_bounded_apply: canRunBoundedApply,
@@ -370,6 +398,7 @@ const mdLines = [
   `| Card validation | ${cardValidationStatus === 'GREEN' ? '✅' : cardValidationStatus === 'YELLOW' ? '🟡' : '⚠️'} ${cardValidationStatus} | ${cardValidationDetail} |`,
   `| alias_id schema | ${aliasIdStatus === 'UNBLOCKED' ? '✅' : aliasIdStatus === 'BLOCKED' ? '❌' : '⚠️'} ${aliasIdStatus} | ${aliasIdDetail} |`,
   `| Synthesis dry-run | ${synthDryRunStatus === 'GREEN' ? '✅' : synthDryRunStatus === 'YELLOW' ? '🟡' : '⚠️'} ${synthDryRunStatus} | ${synthDryRunDetail} |`,
+  `| Superseded score candidates | ${supersededScoreStatus === 'GREEN' ? '✅' : supersededScoreStatus === 'RED' ? '❌' : supersededScoreStatus === 'YELLOW' ? '🟡' : '⚠️'} ${supersededScoreStatus} | ${supersededScoreDetail} |`,
   `| **Can run bounded apply** | ${canRunBoundedApply ? '✅ YES' : '❌ NO'} | ${canRunBoundedApply ? 'All gates green' : boundedApplyBlockers.join('; ')} |`,
   '',
   '## Closed Lanes',
@@ -431,6 +460,7 @@ console.log(`MCP sidecar guard:    ${mcpGuardStatus === 'GREEN' ? '✅' : '⚠�
 console.log(`Card validation:      ${cardValidationStatus === 'GREEN' ? '✅' : '⚠️ '} ${cardValidationStatus}`);
 console.log(`alias_id schema:      ${aliasIdStatus === 'UNBLOCKED' ? '✅' : '⚠️ '} ${aliasIdStatus}`);
 console.log(`Synthesis dry-run:    ${synthDryRunStatus === 'GREEN' ? '✅' : '⚠️ '} ${synthDryRunStatus}`);
+console.log(`Superseded score:     ${supersededScoreStatus === 'GREEN' ? '✅' : '⚠️ '} ${supersededScoreStatus}`);
 console.log(`Can bounded apply:    ${canRunBoundedApply ? '✅ YES' : '❌ NO'}`);
 if (boundedApplyBlockers.length > 0) {
   for (const b of boundedApplyBlockers) console.log(`  ❌  ${b}`);

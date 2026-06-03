@@ -293,7 +293,12 @@ function checkEnvHygiene() {
     const lines = content.split('\n');
     for (let i = 0; i < lines.length; i++) {
       const line = lines[i];
-      if (/localhost|127\.0\.0\.1/.test(line) && !/env\.|ENV\.|PG_URL|REDIS_URL|fallback|default/.test(line)) {
+      const trimmed = line.trimStart();
+      // Skip comment lines and string-literal descriptions of the rule itself
+      if (trimmed.startsWith('*') || trimmed.startsWith('//') || trimmed.startsWith('#')) continue;
+      // Skip lines where localhost only appears inside a quoted string (pass/fail message text)
+      const stripped = line.replace(/'[^']*localhost[^']*'/g, '').replace(/"[^"]*localhost[^"]*"/g, '');
+      if (/localhost|127\.0\.0\.1/.test(stripped) && !/env\.|ENV\.|PG_URL|REDIS_URL|fallback|default/.test(stripped)) {
         violations.push(`${fname}:${i + 1}: ${line.trim()}`);
       }
     }

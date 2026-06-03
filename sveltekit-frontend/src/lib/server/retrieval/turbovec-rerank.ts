@@ -30,6 +30,8 @@ export interface RerankOptions {
 	graphHints?: GraphRAGHints;
 	sourceRefs?: string[];
 	aeScores?: Record<string | number, number>; // pointId -> latent similarity
+	/** GRPO reward scores from glyph_records — keyed by source_id or file_path (Redis gpu:glyph:rewards) */
+	glyphRewardScores?: Record<string, number>;
 }
 
 export interface RerankResult {
@@ -51,7 +53,7 @@ export interface RerankResult {
  */
 export async function turbovecRerank(options: RerankOptions): Promise<RerankResult> {
 	const t0 = performance.now();
-	const { query, hits, graphHints, aeScores } = options;
+	const { query, hits, graphHints, aeScores, glyphRewardScores } = options;
 
 	try {
 		if (!hits || hits.length === 0) {
@@ -66,14 +68,17 @@ export async function turbovecRerank(options: RerankOptions): Promise<RerankResu
 		const beforeIds = hits.map(h => String(h.id));
 		const scoreDeltas: Record<string, number> = {};
 
-		// Scoring weights
-		const semanticWeight = 0.5;
-		const topologyWeight = 0.35;
-		const latentWeight = 0.15;
+		// Scoring weights — glyph GRPO reward is 4th signal (0.10)
+		const semanticWeight  = 0.45;
+		const topologyWeight  = 0.30;
+		const latentWeight    = 0.15;
+		const glyphRewardWeight = 0.10;
+		const hasGlyphRewards = glyphRewardScores && Object.keys(glyphRewardScores).length > 0;
 
 		const rerankedHits = hits.map(hit => {
 			const ptId = String(hit.id);
 			const filePath = hit.payload?.file_path || '';
+			const sourceId = hit.payload?.source_id || hit.payload?.chunk_id || '';
 
 			// 1. Semantic score (normalized roughly to 0..1 range)
 			const sScore = hit.score || 0;
@@ -81,15 +86,25 @@ export async function turbovecRerank(options: RerankOptions): Promise<RerankResu
 			// 2. Topology score from Neo4j pagerank/authority
 			let tScore = 0;
 			if (graphHints?.authorityScores) {
-				// Match by exact file path
 				tScore = graphHints.authorityScores[filePath] || 0;
 			}
 
 			// 3. Latent similarity score
 			const lScore = aeScores?.[ptId] || aeScores?.[Number(ptId)] || 0;
 
-			// Combined blend score
-			const blended = (sScore * semanticWeight) + (tScore * topologyWeight) + (lScore * latentWeight);
+			// 4. GRPO glyph reward score — lookup by source_id, file_path, or chunk_id
+			let gScore = 0;
+			if (hasGlyphRewards) {
+				gScore = glyphRewardScores![sourceId]
+					?? glyphRewardScores![filePath]
+					?? glyphRewardScores![ptId]
+					?? 0;
+			}
+
+			// Combined blend score — fall back to 3-component weights if no glyph rewards
+			const blended = hasGlyphRewards
+				? (sScore * semanticWeight) + (tScore * topologyWeight) + (lScore * latentWeight) + (gScore * glyphRewardWeight)
+				: (sScore * 0.5) + (tScore * 0.35) + (lScore * 0.15);
 			scoreDeltas[ptId] = blended - sScore;
 
 			return {

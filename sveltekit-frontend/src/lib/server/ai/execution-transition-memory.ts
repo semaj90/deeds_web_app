@@ -1,6 +1,6 @@
-import Redis from 'ioredis';
+import { getValkeyClient } from '../cache/valkey-client.js';
 import { ENV } from '../env.server.js';
-const redis = new Redis(ENV.REDIS_URL);
+const redis = getValkeyClient();
 
 export type ExecutionTransition = {
   from: string;

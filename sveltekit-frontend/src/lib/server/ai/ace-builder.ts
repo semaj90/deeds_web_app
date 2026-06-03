@@ -1,8 +1,8 @@
-import Redis from 'ioredis';
+import { getValkeyClient } from '../cache/valkey-client.js';
 import { ENV } from '../env.server.js';
 import { tool_graph_expand_neighborhood, tool_search_hybrid } from './mcp-tool-dispatch.js';
 
-const redis = new Redis(ENV.REDIS_URL);
+const redis = getValkeyClient();
 
 export async function buildACEPacket(query: string, ctx: any) {
   // 1. Fetch Graph Traversal Data (Topology)

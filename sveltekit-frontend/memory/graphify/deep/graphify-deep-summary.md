@@ -1,22 +1,22 @@
 # Deep Import Graph - Phase A
-Generated: 2026-06-01T22:14:01.699Z
+Generated: 2026-06-02T13:29:16.845Z
 
 ## Stats
 | Metric | Value |
 |--------|-------|
-| Nodes | 56931 |
-| Total edges | 83508 |
-| Resolved edges | 9351 |
-| Unresolved (local) | 8523 |
-| External refs | 63931 |
+| Nodes | 57024 |
+| Total edges | 83735 |
+| Resolved edges | 9352 |
+| Unresolved (local) | 8525 |
+| External refs | 64155 |
 | Neighborhoods computed | 100 |
 | Test-covered files | 993 |
 
 ## Zone Breakdown
 | Zone | Count |
 |------|-------|
-| shared | 49508 |
-| script | 4734 |
+| shared | 49561 |
+| script | 4774 |
 | test | 1469 |
 | types | 1041 |
 | config | 140 |
@@ -27,24 +27,24 @@ Generated: 2026-06-01T22:14:01.699Z
 ## Edge Type Breakdown
 | Type | Count |
 |------|-------|
-| imports_static | 66446 |
+| imports_static | 66651 |
 | test_covers_file | 4941 |
-| redis_dependency | 3303 |
-| imports_dynamic | 2375 |
+| redis_dependency | 3316 |
+| imports_dynamic | 2369 |
 | exports_from | 1982 |
 | env_dependency | 1746 |
 | qdrant_dependency | 1350 |
-| neo4j_dependency | 520 |
+| neo4j_dependency | 534 |
 | mcp_tool_calls | 490 |
-| db_dependency | 352 |
+| db_dependency | 353 |
 | svelte_route_uses_loader | 3 |
 
 ## Top 20 Coupling Hotspots (directFanIn)
 | Rank | File | Zone | FanIn | FanOut |
 |------|------|------|-------|--------|
 | 1 | `claude-mem/src/utils/logger.ts` | shared | 178 | 1 |
-| 2 | `scripts/atlas/_atlas-utils.mjs` | script | 80 | 0 |
-| 3 | `scripts/atlas/_atlas-utils.mjs` | script | 80 | 0 |
+| 2 | `scripts/atlas/_atlas-utils.mjs` | script | 82 | 0 |
+| 3 | `scripts/atlas/_atlas-utils.mjs` | script | 82 | 0 |
 | 4 | `sveltekit-frontend/tests/helpers/env-ports.ts` | shared | 78 | 0 |
 | 5 | `sveltekit-frontend/src/lib/server/db/client.ts` | shared | 75 | 5 |
 | 6 | `deeds_labs/frontend/sveltekit-frontend-archive/dirs/_archived/services-corrupted/nodejs-orchestrator.ts` | shared | 63 | 0 |

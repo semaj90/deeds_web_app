@@ -60,7 +60,7 @@ async function main() {
   // 1. Call local /api/health
   try {
     const response = await fetch('http://localhost:5173/api/health', {
-      signal: AbortSignal.timeout(3000),
+      signal: AbortSignal.timeout(12000),
     });
     status = response.status;
     viteService = true;

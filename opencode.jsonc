@@ -11,7 +11,8 @@
       },
       "models": {
         "gemma4-legal.gguf": {
-          "name": "Gemma4 Legal"
+          "name": "Gemma4 Legal",
+          "contextLength": 65536
         }
       }
     }

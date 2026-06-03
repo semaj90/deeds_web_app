@@ -67,6 +67,7 @@ export interface InferenceLogEntry {
     | 'neo4j'
     | 'couchdb'
     | 'ace-policy'
+    | 'gpu'
     | 'js';
   latencyMs: number;
   tokenCount?: number;

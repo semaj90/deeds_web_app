@@ -1,0 +1,3355 @@
+{
+  "generatedAt": "2026-06-02T13:50:59.812Z",
+  "mode": "dry-run",
+  "inputs": {
+    "archivePlan": "docs/reports/sourceRef-parent-join-archive-plan.json"
+  },
+  "summary": {
+    "archiveCandidates": 552,
+    "moveEntries": 552,
+    "destinations": 8
+  },
+  "destinations": {
+    "archive/opencode-generated/": [
+      {
+        "source": "opencode/ace-packet-summary.md",
+        "bucket": "opencode-generated",
+        "destination": "archive/opencode-generated/",
+        "reason": "generated OpenCode surface after completion notes are promoted"
+      },
+      {
+        "source": ".opencode/ace-packet.json",
+        "bucket": "opencode-generated",
+        "destination": "archive/opencode-generated/",
+        "reason": "generated OpenCode surface after completion notes are promoted"
+      },
+      {
+        "source": ".opencode/recommendations/recommendations.json",
+        "bucket": "opencode-generated",
+        "destination": "archive/opencode-generated/",
+        "reason": "generated OpenCode surface after completion notes are promoted"
+      },
+      {
+        "source": ".opencode/recommendations/recommendations.md",
+        "bucket": "opencode-generated",
+        "destination": "archive/opencode-generated/",
+        "reason": "generated OpenCode surface after completion notes are promoted"
+      },
+      {
+        "source": ".opencode/recommendations/tasks.md",
+        "bucket": "opencode-generated",
+        "destination": "archive/opencode-generated/",
+        "reason": "generated OpenCode surface after completion notes are promoted"
+      },
+      {
+        "source": ".opencode/recommendations/tasks.ndjson",
+        "bucket": "opencode-generated",
+        "destination": "archive/opencode-generated/",
+        "reason": "generated OpenCode surface after completion notes are promoted"
+      }
+    ],
+    "archive/legacy-doc-bundles/": [
+      {
+        "source": "docs/6_1_26",
+        "bucket": "legacy-doc-bundle",
+        "destination": "archive/legacy-doc-bundles/",
+        "reason": "legacy bundled doc surface"
+      }
+    ],
+    "archive/generated-reports/": [
+      {
+        "source": "docs/reports/contract-error-map-report.json",
+        "bucket": "generated-reports",
+        "destination": "archive/generated-reports/",
+        "reason": "generated report surface that can be archived after the summary is promoted"
+      },
+      {
+        "source": "docs/reports/contract-error-map-report.md",
+        "bucket": "generated-reports",
+        "destination": "archive/generated-reports/",
+        "reason": "generated report surface that can be archived after the summary is promoted"
+      },
+      {
+        "source": "docs/reports/drizzle-postgres-contract-report.json",
+        "bucket": "generated-reports",
+        "destination": "archive/generated-reports/",
+        "reason": "generated report surface that can be archived after the summary is promoted"
+      },
+      {
+        "source": "docs/reports/drizzle-postgres-contract-report.md",
+        "bucket": "generated-reports",
+        "destination": "archive/generated-reports/",
+        "reason": "generated report surface that can be archived after the summary is promoted"
+      },
+      {
+        "source": "docs/reports/error-fix-dag-report.json",
+        "bucket": "generated-reports",
+        "destination": "archive/generated-reports/",
+        "reason": "generated report surface that can be archived after the summary is promoted"
+      },
+      {
+        "source": "docs/reports/error-fix-dag-report.md",
+        "bucket": "generated-reports",
+        "destination": "archive/generated-reports/",
+        "reason": "generated report surface that can be archived after the summary is promoted"
+      },
+      {
+        "source": "sveltekit-frontend/docs/reports/feature-card-duckdb-inspect.json",
+        "bucket": "generated-reports",
+        "destination": "archive/generated-reports/",
+        "reason": "generated report surface that can be archived after the summary is promoted"
+      },
+      {
+        "source": "sveltekit-frontend/docs/reports/feature-card-duckdb-inspect.md",
+        "bucket": "generated-reports",
+        "destination": "archive/generated-reports/",
+        "reason": "generated report surface that can be archived after the summary is promoted"
+      },
+      {
+        "source": "sveltekit-frontend/docs/reports/feature-card-duckdb-ready.json",
+        "bucket": "generated-reports",
+        "destination": "archive/generated-reports/",
+        "reason": "generated report surface that can be archived after the summary is promoted"
+      },
+      {
+        "source": "sveltekit-frontend/docs/reports/feature-card-duckdb-validation.json",
+        "bucket": "generated-reports",
+        "destination": "archive/generated-reports/",
+        "reason": "generated report surface that can be archived after the summary is promoted"
+      },
+      {
+        "source": "sveltekit-frontend/docs/reports/feature-card-duckdb-validation.md",
+        "bucket": "generated-reports",
+        "destination": "archive/generated-reports/",
+        "reason": "generated report surface that can be archived after the summary is promoted"
+      },
+      {
+        "source": "sveltekit-frontend/docs/reports/feature-card-offline-mirror-report.json",
+        "bucket": "generated-reports",
+        "destination": "archive/generated-reports/",
+        "reason": "generated report surface that can be archived after the summary is promoted"
+      },
+      {
+        "source": "sveltekit-frontend/docs/reports/feature-card-offline-mirror-report.md",
+        "bucket": "generated-reports",
+        "destination": "archive/generated-reports/",
+        "reason": "generated report surface that can be archived after the summary is promoted"
+      },
+      {
+        "source": "sveltekit-frontend/docs/reports/feature-card.duckdb",
+        "bucket": "generated-reports",
+        "destination": "archive/generated-reports/",
+        "reason": "generated report surface that can be archived after the summary is promoted"
+      },
+      {
+        "source": "sveltekit-frontend/docs/reports/qdrant-source-refs-backfill-latest.json",
+        "bucket": "generated-reports",
+        "destination": "archive/generated-reports/",
+        "reason": "generated report surface that can be archived after the summary is promoted"
+      },
+      {
+        "source": "sveltekit-frontend/docs/reports/qdrant-source-refs-backfill-latest.md",
+        "bucket": "generated-reports",
+        "destination": "archive/generated-reports/",
+        "reason": "generated report surface that can be archived after the summary is promoted"
+      },
+      {
+        "source": "sveltekit-frontend/docs/reports/stage-2c-500-phase-review.json",
+        "bucket": "generated-reports",
+        "destination": "archive/generated-reports/",
+        "reason": "generated report surface that can be archived after the summary is promoted"
+      },
+      {
+        "source": "sveltekit-frontend/docs/reports/stage-2c-500-phase-review.md",
+        "bucket": "generated-reports",
+        "destination": "archive/generated-reports/",
+        "reason": "generated report surface that can be archived after the summary is promoted"
+      },
+      {
+        "source": "docs/reports/doc-feature-crosswalk-2026-06-01.json",
+        "bucket": "generated-reports",
+        "destination": "archive/generated-reports/",
+        "reason": "generated report surface that can be archived after the summary is promoted"
+      },
+      {
+        "source": "docs/reports/doc-feature-crosswalk-2026-06-01.md",
+        "bucket": "generated-reports",
+        "destination": "archive/generated-reports/",
+        "reason": "generated report surface that can be archived after the summary is promoted"
+      },
+      {
+        "source": "docs/reports/gitignored-folder-summary-2026-06-01.json",
+        "bucket": "generated-reports",
+        "destination": "archive/generated-reports/",
+        "reason": "generated report surface that can be archived after the summary is promoted"
+      },
+      {
+        "source": "docs/reports/gitignored-folder-summary-2026-06-01.md",
+        "bucket": "generated-reports",
+        "destination": "archive/generated-reports/",
+        "reason": "generated report surface that can be archived after the summary is promoted"
+      },
+      {
+        "source": "docs/reports/gitignored-model-directories-audit-2026-06-01.md",
+        "bucket": "generated-reports",
+        "destination": "archive/generated-reports/",
+        "reason": "generated report surface that can be archived after the summary is promoted"
+      },
+      {
+        "source": "docs/reports/kanban-turbovec-consolidation-latest.json",
+        "bucket": "generated-reports",
+        "destination": "archive/generated-reports/",
+        "reason": "generated report surface that can be archived after the summary is promoted"
+      },
+      {
+        "source": "docs/reports/kanban-turbovec-consolidation-latest.md",
+        "bucket": "generated-reports",
+        "destination": "archive/generated-reports/",
+        "reason": "generated report surface that can be archived after the summary is promoted"
+      },
+      {
+        "source": "docs/reports/nes-chrom-backfill-report.json",
+        "bucket": "generated-reports",
+        "destination": "archive/generated-reports/",
+        "reason": "generated report surface that can be archived after the summary is promoted"
+      },
+      {
+        "source": "docs/reports/nes-chrom-backfill-report.md",
+        "bucket": "generated-reports",
+        "destination": "archive/generated-reports/",
+        "reason": "generated report surface that can be archived after the summary is promoted"
+      },
+      {
+        "source": "docs/reports/nes-chrom-packet-kag-dag-map.md",
+        "bucket": "generated-reports",
+        "destination": "archive/generated-reports/",
+        "reason": "generated report surface that can be archived after the summary is promoted"
+      },
+      {
+        "source": "docs/reports/nes-chrom-packet-recent-hits.json",
+        "bucket": "generated-reports",
+        "destination": "archive/generated-reports/",
+        "reason": "generated report surface that can be archived after the summary is promoted"
+      },
+      {
+        "source": "docs/reports/nes-chrom-packet-recent-hits.md",
+        "bucket": "generated-reports",
+        "destination": "archive/generated-reports/",
+        "reason": "generated report surface that can be archived after the summary is promoted"
+      },
+      {
+        "source": "docs/reports/offline-synthesis-mapreduce-duckdb-report.json",
+        "bucket": "generated-reports",
+        "destination": "archive/generated-reports/",
+        "reason": "generated report surface that can be archived after the summary is promoted"
+      },
+      {
+        "source": "docs/reports/offline-synthesis-mapreduce-duckdb-report.md",
+        "bucket": "generated-reports",
+        "destination": "archive/generated-reports/",
+        "reason": "generated report surface that can be archived after the summary is promoted"
+      },
+      {
+        "source": "docs/reports/offline-synthesis-mapreduce.duckdb",
+        "bucket": "generated-reports",
+        "destination": "archive/generated-reports/",
+        "reason": "generated report surface that can be archived after the summary is promoted"
+      },
+      {
+        "source": "docs/reports/parent-atlas-compression-plan.json",
+        "bucket": "generated-reports",
+        "destination": "archive/generated-reports/",
+        "reason": "generated report surface that can be archived after the summary is promoted"
+      },
+      {
+        "source": "docs/reports/parent-atlas-compression-plan.md",
+        "bucket": "generated-reports",
+        "destination": "archive/generated-reports/",
+        "reason": "generated report surface that can be archived after the summary is promoted"
+      },
+      {
+        "source": "docs/reports/parent-atlas-compression-plan.svg",
+        "bucket": "generated-reports",
+        "destination": "archive/generated-reports/",
+        "reason": "generated report surface that can be archived after the summary is promoted"
+      },
+      {
+        "source": "docs/reports/parent-atlas-cypher-apply-report.json",
+        "bucket": "generated-reports",
+        "destination": "archive/generated-reports/",
+        "reason": "generated report surface that can be archived after the summary is promoted"
+      },
+      {
+        "source": "docs/reports/parent-atlas-cypher-apply-report.md",
+        "bucket": "generated-reports",
+        "destination": "archive/generated-reports/",
+        "reason": "generated report surface that can be archived after the summary is promoted"
+      },
+      {
+        "source": "docs/reports/parent-atlas-feature-command-atlas-postgres.json",
+        "bucket": "generated-reports",
+        "destination": "archive/generated-reports/",
+        "reason": "generated report surface that can be archived after the summary is promoted"
+      },
+      {
+        "source": "docs/reports/parent-atlas-feature-command-atlas-postgres.md",
+        "bucket": "generated-reports",
+        "destination": "archive/generated-reports/",
+        "reason": "generated report surface that can be archived after the summary is promoted"
+      },
+      {
+        "source": "docs/reports/parent-atlas-feature-command-atlas-projection.json",
+        "bucket": "generated-reports",
+        "destination": "archive/generated-reports/",
+        "reason": "generated report surface that can be archived after the summary is promoted"
+      },
+      {
+        "source": "docs/reports/parent-atlas-feature-command-atlas-projection.md",
+        "bucket": "generated-reports",
+        "destination": "archive/generated-reports/",
+        "reason": "generated report surface that can be archived after the summary is promoted"
+      },
+      {
+        "source": "docs/reports/parent-atlas-feature-command-atlas-qdrant.json",
+        "bucket": "generated-reports",
+        "destination": "archive/generated-reports/",
+        "reason": "generated report surface that can be archived after the summary is promoted"
+      },
+      {
+        "source": "docs/reports/parent-atlas-feature-command-atlas-qdrant.md",
+        "bucket": "generated-reports",
+        "destination": "archive/generated-reports/",
+        "reason": "generated report surface that can be archived after the summary is promoted"
+      },
+      {
+        "source": "docs/reports/parent-atlas-feature-command-atlas.json",
+        "bucket": "generated-reports",
+        "destination": "archive/generated-reports/",
+        "reason": "generated report surface that can be archived after the summary is promoted"
+      },
+      {
+        "source": "docs/reports/parent-atlas-feature-command-atlas.md",
+        "bucket": "generated-reports",
+        "destination": "archive/generated-reports/",
+        "reason": "generated report surface that can be archived after the summary is promoted"
+      },
+      {
+        "source": "docs/reports/parent-atlas-rg-dump-organizer.json",
+        "bucket": "generated-reports",
+        "destination": "archive/generated-reports/",
+        "reason": "generated report surface that can be archived after the summary is promoted"
+      },
+      {
+        "source": "docs/reports/parent-atlas-rg-dump-organizer.md",
+        "bucket": "generated-reports",
+        "destination": "archive/generated-reports/",
+        "reason": "generated report surface that can be archived after the summary is promoted"
+      },
+      {
+        "source": "docs/reports/parent-atlas-rg-dump-projection.json",
+        "bucket": "generated-reports",
+        "destination": "archive/generated-reports/",
+        "reason": "generated report surface that can be archived after the summary is promoted"
+      },
+      {
+        "source": "docs/reports/parent-atlas-rg-dump-projection.md",
+        "bucket": "generated-reports",
+        "destination": "archive/generated-reports/",
+        "reason": "generated report surface that can be archived after the summary is promoted"
+      },
+      {
+        "source": "docs/reports/pytorch-qdrant-redis-som-index-2026-06-01.json",
+        "bucket": "generated-reports",
+        "destination": "archive/generated-reports/",
+        "reason": "generated report surface that can be archived after the summary is promoted"
+      },
+      {
+        "source": "docs/reports/pytorch-qdrant-redis-som-index-2026-06-01.md",
+        "bucket": "generated-reports",
+        "destination": "archive/generated-reports/",
+        "reason": "generated report surface that can be archived after the summary is promoted"
+      },
+      {
+        "source": "docs/reports/repo-archive-move-plan-2026-06-01.json",
+        "bucket": "generated-reports",
+        "destination": "archive/generated-reports/",
+        "reason": "generated report surface that can be archived after the summary is promoted"
+      },
+      {
+        "source": "docs/reports/repo-archive-move-plan-2026-06-01.md",
+        "bucket": "generated-reports",
+        "destination": "archive/generated-reports/",
+        "reason": "generated report surface that can be archived after the summary is promoted"
+      },
+      {
+        "source": "docs/reports/repo-organization-audit-2026-06-01.json",
+        "bucket": "generated-reports",
+        "destination": "archive/generated-reports/",
+        "reason": "generated report surface that can be archived after the summary is promoted"
+      },
+      {
+        "source": "docs/reports/repo-organization-audit-2026-06-01.md",
+        "bucket": "generated-reports",
+        "destination": "archive/generated-reports/",
+        "reason": "generated report surface that can be archived after the summary is promoted"
+      },
+      {
+        "source": "docs/reports/rg-search-dump-index-report.json",
+        "bucket": "generated-reports",
+        "destination": "archive/generated-reports/",
+        "reason": "generated report surface that can be archived after the summary is promoted"
+      },
+      {
+        "source": "docs/reports/rg-search-dump-index-report.md",
+        "bucket": "generated-reports",
+        "destination": "archive/generated-reports/",
+        "reason": "generated report surface that can be archived after the summary is promoted"
+      },
+      {
+        "source": "docs/reports/sourceRef-context-neo4j-report.json",
+        "bucket": "generated-reports",
+        "destination": "archive/generated-reports/",
+        "reason": "generated report surface that can be archived after the summary is promoted"
+      },
+      {
+        "source": "docs/reports/sourceRef-context-neo4j-report.md",
+        "bucket": "generated-reports",
+        "destination": "archive/generated-reports/",
+        "reason": "generated report surface that can be archived after the summary is promoted"
+      },
+      {
+        "source": "docs/reports/sourceRef-first-hot-join-warmup.json",
+        "bucket": "generated-reports",
+        "destination": "archive/generated-reports/",
+        "reason": "generated report surface that can be archived after the summary is promoted"
+      },
+      {
+        "source": "docs/reports/sourceRef-first-hot-join-warmup.md",
+        "bucket": "generated-reports",
+        "destination": "archive/generated-reports/",
+        "reason": "generated report surface that can be archived after the summary is promoted"
+      },
+      {
+        "source": "docs/reports/sourceRef-first-join-warmup.json",
+        "bucket": "generated-reports",
+        "destination": "archive/generated-reports/",
+        "reason": "generated report surface that can be archived after the summary is promoted"
+      },
+      {
+        "source": "docs/reports/sourceRef-first-join-warmup.md",
+        "bucket": "generated-reports",
+        "destination": "archive/generated-reports/",
+        "reason": "generated report surface that can be archived after the summary is promoted"
+      },
+      {
+        "source": "docs/reports/sourceRef-first-nes-glyph-compress.json",
+        "bucket": "generated-reports",
+        "destination": "archive/generated-reports/",
+        "reason": "generated report surface that can be archived after the summary is promoted"
+      },
+      {
+        "source": "docs/reports/sourceRef-first-nes-glyph-compress.md",
+        "bucket": "generated-reports",
+        "destination": "archive/generated-reports/",
+        "reason": "generated report surface that can be archived after the summary is promoted"
+      },
+      {
+        "source": "docs/reports/sourceRef-first-parent-atlas-packets.json",
+        "bucket": "generated-reports",
+        "destination": "archive/generated-reports/",
+        "reason": "generated report surface that can be archived after the summary is promoted"
+      },
+      {
+        "source": "docs/reports/sourceRef-first-parent-atlas-packets.md",
+        "bucket": "generated-reports",
+        "destination": "archive/generated-reports/",
+        "reason": "generated report surface that can be archived after the summary is promoted"
+      },
+      {
+        "source": "docs/reports/sourceRef-first-parent-atlas-refresh.json",
+        "bucket": "generated-reports",
+        "destination": "archive/generated-reports/",
+        "reason": "generated report surface that can be archived after the summary is promoted"
+      },
+      {
+        "source": "docs/reports/sourceRef-first-parent-atlas-refresh.md",
+        "bucket": "generated-reports",
+        "destination": "archive/generated-reports/",
+        "reason": "generated report surface that can be archived after the summary is promoted"
+      },
+      {
+        "source": "sveltekit-frontend/docs/reports/feature-labelling-parent-atlas-report.json",
+        "bucket": "generated-reports",
+        "destination": "archive/generated-reports/",
+        "reason": "generated report surface that can be archived after the summary is promoted"
+      },
+      {
+        "source": "sveltekit-frontend/docs/reports/feature-labelling-parent-atlas-report.md",
+        "bucket": "generated-reports",
+        "destination": "archive/generated-reports/",
+        "reason": "generated report surface that can be archived after the summary is promoted"
+      },
+      {
+        "source": "sveltekit-frontend/docs/reports/task-semantic-packet-latest.json",
+        "bucket": "generated-reports",
+        "destination": "archive/generated-reports/",
+        "reason": "generated report surface that can be archived after the summary is promoted"
+      },
+      {
+        "source": "sveltekit-frontend/docs/reports/task-semantic-packet-latest.md",
+        "bucket": "generated-reports",
+        "destination": "archive/generated-reports/",
+        "reason": "generated report surface that can be archived after the summary is promoted"
+      },
+      {
+        "source": "sveltekit-frontend/docs/reports/task-semantic-packet-workflow-latest.json",
+        "bucket": "generated-reports",
+        "destination": "archive/generated-reports/",
+        "reason": "generated report surface that can be archived after the summary is promoted"
+      },
+      {
+        "source": "sveltekit-frontend/docs/reports/task-semantic-packet-workflow-latest.md",
+        "bucket": "generated-reports",
+        "destination": "archive/generated-reports/",
+        "reason": "generated report surface that can be archived after the summary is promoted"
+      },
+      {
+        "source": "docs/reports/sourceRef-parent-join-dry-run.json",
+        "bucket": "generated-reports",
+        "destination": "archive/generated-reports/",
+        "reason": "generated report surface that can be archived after the summary is promoted"
+      },
+      {
+        "source": "docs/reports/sourceRef-parent-join-dry-run.md",
+        "bucket": "generated-reports",
+        "destination": "archive/generated-reports/",
+        "reason": "generated report surface that can be archived after the summary is promoted"
+      },
+      {
+        "source": "docs/reports/sourceRef-parent-join-archive-plan.json",
+        "bucket": "generated-reports",
+        "destination": "archive/generated-reports/",
+        "reason": "generated report surface that can be archived after the summary is promoted"
+      },
+      {
+        "source": "docs/reports/sourceRef-parent-join-archive-plan.md",
+        "bucket": "generated-reports",
+        "destination": "archive/generated-reports/",
+        "reason": "generated report surface that can be archived after the summary is promoted"
+      }
+    ],
+    "archive/model-blobs/": [
+      {
+        "source": "granite-docling-258M",
+        "bucket": "model-blob",
+        "destination": "archive/model-blobs/",
+        "reason": "large model artifact to externalize or relocate"
+      },
+      {
+        "source": "models/embeddinggemma_300m",
+        "bucket": "model-blob",
+        "destination": "archive/model-blobs/",
+        "reason": "large model artifact to externalize or relocate"
+      }
+    ],
+    "archive/memory-exports/": [
+      {
+        "source": "memory/exports/all-lanes-parent-atlas-report.json",
+        "bucket": "memory-exports",
+        "destination": "archive/memory-exports/",
+        "reason": "derived export surface that should move after packet promotion"
+      },
+      {
+        "source": "memory/exports/kanban-ranking-report.json",
+        "bucket": "memory-exports",
+        "destination": "archive/memory-exports/",
+        "reason": "derived export surface that should move after packet promotion"
+      },
+      {
+        "source": "memory/exports/master-todo-consolidation-report.json",
+        "bucket": "memory-exports",
+        "destination": "archive/memory-exports/",
+        "reason": "derived export surface that should move after packet promotion"
+      },
+      {
+        "source": "memory/exports/npm-doc-fetch-plan.md",
+        "bucket": "memory-exports",
+        "destination": "archive/memory-exports/",
+        "reason": "derived export surface that should move after packet promotion"
+      },
+      {
+        "source": "memory/exports/npm-library-inventory.json",
+        "bucket": "memory-exports",
+        "destination": "archive/memory-exports/",
+        "reason": "derived export surface that should move after packet promotion"
+      },
+      {
+        "source": "memory/exports/parent-atlas-report.json",
+        "bucket": "memory-exports",
+        "destination": "archive/memory-exports/",
+        "reason": "derived export surface that should move after packet promotion"
+      },
+      {
+        "source": "sveltekit-frontend/memory/atlas/codebase-atlas.dirs.json",
+        "bucket": "memory-exports",
+        "destination": "archive/memory-exports/",
+        "reason": "derived export surface that should move after packet promotion"
+      },
+      {
+        "source": "sveltekit-frontend/memory/atlas/codebase-atlas.latest.md",
+        "bucket": "memory-exports",
+        "destination": "archive/memory-exports/",
+        "reason": "derived export surface that should move after packet promotion"
+      },
+      {
+        "source": "sveltekit-frontend/memory/atlas/codebase-atlas.min.json",
+        "bucket": "memory-exports",
+        "destination": "archive/memory-exports/",
+        "reason": "derived export surface that should move after packet promotion"
+      },
+      {
+        "source": "sveltekit-frontend/memory/atlas/codebase-atlas.top.json",
+        "bucket": "memory-exports",
+        "destination": "archive/memory-exports/",
+        "reason": "derived export surface that should move after packet promotion"
+      },
+      {
+        "source": "sveltekit-frontend/memory/docstore/manifest.json",
+        "bucket": "memory-exports",
+        "destination": "archive/memory-exports/",
+        "reason": "derived export surface that should move after packet promotion"
+      },
+      {
+        "source": "sveltekit-frontend/memory/exports/karpathy-publish-split.json",
+        "bucket": "memory-exports",
+        "destination": "archive/memory-exports/",
+        "reason": "derived export surface that should move after packet promotion"
+      },
+      {
+        "source": "sveltekit-frontend/memory/exports/karpathy-qdrant-cluster-backfill.json",
+        "bucket": "memory-exports",
+        "destination": "archive/memory-exports/",
+        "reason": "derived export surface that should move after packet promotion"
+      },
+      {
+        "source": "sveltekit-frontend/memory/exports/xgboost-hotness/features.json",
+        "bucket": "memory-exports",
+        "destination": "archive/memory-exports/",
+        "reason": "derived export surface that should move after packet promotion"
+      },
+      {
+        "source": "sveltekit-frontend/memory/graphify/deep/graph-stats.json",
+        "bucket": "memory-exports",
+        "destination": "archive/memory-exports/",
+        "reason": "derived export surface that should move after packet promotion"
+      },
+      {
+        "source": "sveltekit-frontend/memory/graphify/deep/graphify-deep-summary.md",
+        "bucket": "memory-exports",
+        "destination": "archive/memory-exports/",
+        "reason": "derived export surface that should move after packet promotion"
+      },
+      {
+        "source": "sveltekit-frontend/memory/graphify/deep/route-dependency-map.json",
+        "bucket": "memory-exports",
+        "destination": "archive/memory-exports/",
+        "reason": "derived export surface that should move after packet promotion"
+      },
+      {
+        "source": "sveltekit-frontend/memory/graphify/deep/test-coverage-links.json",
+        "bucket": "memory-exports",
+        "destination": "archive/memory-exports/",
+        "reason": "derived export surface that should move after packet promotion"
+      },
+      {
+        "source": "sveltekit-frontend/memory/graphify/deep/unresolved-imports.json",
+        "bucket": "memory-exports",
+        "destination": "archive/memory-exports/",
+        "reason": "derived export surface that should move after packet promotion"
+      },
+      {
+        "source": "sveltekit-frontend/memory/graphify/gds/gds-enrichment-report.json",
+        "bucket": "memory-exports",
+        "destination": "archive/memory-exports/",
+        "reason": "derived export surface that should move after packet promotion"
+      },
+      {
+        "source": "sveltekit-frontend/memory/graphify/gds/latest.json",
+        "bucket": "memory-exports",
+        "destination": "archive/memory-exports/",
+        "reason": "derived export surface that should move after packet promotion"
+      },
+      {
+        "source": "sveltekit-frontend/memory/kag-notes/manifest.json",
+        "bucket": "memory-exports",
+        "destination": "archive/memory-exports/",
+        "reason": "derived export surface that should move after packet promotion"
+      }
+    ],
+    "archive/build-artifacts/": [
+      {
+        "source": "simd-bridge/cpp/build-x64-cuda/CMakeFiles/CMakeConfigureLog.yaml",
+        "bucket": "build-artifact",
+        "destination": "archive/build-artifacts/",
+        "reason": "native build artifact or configure log"
+      }
+    ],
+    "archive/obsidian-vault-mirror/": [
+      {
+        "source": "sveltekit-frontend/docs/obsidian-vault/Indexes/Cluster-Entry-Points.md",
+        "bucket": "mirror-surface",
+        "destination": "archive/obsidian-vault-mirror/",
+        "reason": "downstream mirror/index surface only"
+      },
+      {
+        "source": "sveltekit-frontend/docs/obsidian-vault/Indexes/High-Risk-Files.md",
+        "bucket": "mirror-surface",
+        "destination": "archive/obsidian-vault-mirror/",
+        "reason": "downstream mirror/index surface only"
+      },
+      {
+        "source": "sveltekit-frontend/docs/obsidian-vault/Indexes/Low-Confidence-Summaries.md",
+        "bucket": "mirror-surface",
+        "destination": "archive/obsidian-vault-mirror/",
+        "reason": "downstream mirror/index surface only"
+      },
+      {
+        "source": "sveltekit-frontend/docs/obsidian-vault/Indexes/Top-PageRank-Files.md",
+        "bucket": "mirror-surface",
+        "destination": "archive/obsidian-vault-mirror/",
+        "reason": "downstream mirror/index surface only"
+      },
+      {
+        "source": "sveltekit-frontend/docs/obsidian-vault/codebase.canvas",
+        "bucket": "mirror-surface",
+        "destination": "archive/obsidian-vault-mirror/",
+        "reason": "downstream mirror/index surface only"
+      }
+    ],
+    "archive/review-needed/": [
+      {
+        "source": "sveltekit-frontend/src/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/lib/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/lib/ai/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/lib/ai/e2b/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/lib/ai/onnx/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/lib/cache/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/lib/client/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/lib/client/ui/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/lib/components/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/lib/components/admin/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/lib/components/agentic/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/lib/components/ai/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/lib/components/analysis/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/lib/components/analytics/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/lib/components/cache/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/lib/components/canvas/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/lib/components/case/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/lib/components/cases/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/lib/components/chat/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/lib/components/citations/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/lib/components/codebase/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/lib/components/courtroom/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/lib/components/dashboard/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/lib/components/detective/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/lib/components/editor/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/lib/components/evidence/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/lib/components/forms/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/lib/components/graph/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/lib/components/legal-ai/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/lib/components/legal-corpus/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/lib/components/legal/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/lib/components/modals/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/lib/components/monitoring/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/lib/components/phase78/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/lib/components/poi/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/lib/components/rag/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/lib/components/recommendations/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/lib/components/shells/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/lib/components/source-validation/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/lib/components/ui/Card/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/lib/components/ui/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/lib/components/ui/alert-dialog/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/lib/components/ui/avatar/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/lib/components/ui/badge/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/lib/components/ui/bits/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/lib/components/ui/button/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/lib/components/ui/dialog/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/lib/components/ui/enhanced-bits/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/lib/components/ui/gaming/8bit/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/lib/components/ui/gaming/constants/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/lib/components/ui/gaming/effects/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/lib/components/ui/gaming/n64/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/lib/components/ui/gaming/types/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/lib/components/ui/input/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/lib/components/ui/label/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/lib/components/ui/modal/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/lib/components/ui/modular/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/lib/components/ui/progress/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/lib/components/ui/scrollarea/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/lib/components/ui/select/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/lib/components/ui/table/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/lib/components/ui/tabs/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/lib/components/ui/textarea/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/lib/components/webgpu/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/lib/components/yorha/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/lib/components/yorha/_simulations/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/lib/components/yorha/cases/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/lib/components/yorha/dashboard/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/lib/components/yorha/evidence/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/lib/config/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/lib/courtroom/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/lib/data/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/lib/db/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/lib/db/queries/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/lib/db/schema/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/lib/env/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/lib/features/evidence-command-center/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/lib/gpu/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/lib/icons/yorha/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/lib/machines/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/lib/schemas/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/lib/schemas/tools/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/lib/server/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/lib/server/ace/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/lib/server/admin/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/lib/server/agent/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/lib/server/agent/tools/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/lib/server/agents-md/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/lib/server/agents/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/lib/server/agents/regen/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/lib/server/agents/regen/loaders/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/lib/server/agents/regen/writers/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/lib/server/ai/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/lib/server/ai/hermes/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/lib/server/ai/hermes/skills/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/lib/server/ai/hermes/tools/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/lib/server/analysis/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/lib/server/analytics/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/lib/server/atlas/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/lib/server/audit/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/lib/server/cache/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/lib/server/cartridge/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/lib/server/chrrom/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/lib/server/concurrency/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/lib/server/config/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/lib/server/couchdb/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/lib/server/data/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/lib/server/db/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/lib/server/db/meta/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/lib/server/db/schema/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/lib/server/embedding/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/lib/server/error-brain/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/lib/server/error-brain/transport/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/lib/server/evidence/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/lib/server/evidence/services/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/lib/server/evidence/video/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/lib/server/features/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/lib/server/ff1/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/lib/server/ff1/agent/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/lib/server/ff1/cli/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/lib/server/glyph/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/lib/server/gpu/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/lib/server/graph/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/lib/server/grpc/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/lib/server/helpers/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/lib/server/hypergraph/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/lib/server/indexer/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/lib/server/indexer/pipeline/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/lib/server/inference/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/lib/server/kb/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/lib/server/langextract/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/lib/server/legal/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/lib/server/llm/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/lib/server/mcp/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/lib/server/middleware/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/lib/server/minio/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/lib/server/ml/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/lib/server/models/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/lib/server/observability/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/lib/server/obsidian/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/lib/server/ocr/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/lib/server/pdf/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/lib/server/pgai/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/lib/server/phase72/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/lib/server/queue/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/lib/server/rag/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/lib/server/rate-limit/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/lib/server/reconstruction/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/lib/server/research/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/lib/server/retrieval/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/lib/server/rg-atlas/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/lib/server/search/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/lib/server/services/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/lib/server/services/error-analysis/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/lib/server/services/knowledge-search/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/lib/server/simulation/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/lib/server/storage/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/lib/server/streaming/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/lib/server/tensor/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/lib/server/tools/handlers/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/lib/server/types/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/lib/server/utils/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/lib/server/validation/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/lib/server/vector/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/lib/server/wiki/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/lib/server/workers/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/lib/server/workflows/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/lib/services/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/lib/services/error-analysis/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/lib/services/knowledge-search/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/lib/shared/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/lib/shims/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/lib/stores/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/lib/stores/dashboard/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/lib/stores/unified/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/lib/types/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/lib/utils/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/lib/webgpu/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/lib/workers/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/mcp/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/mcp/tools/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/mcp/zod-to-json-schema-bridge/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/routes/(admin)/error-brain/components/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/routes/(analysis)/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/routes/(analysis)/audio-analysis/[evidenceId]/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/routes/(analysis)/document-analysis/[evidenceId]/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/routes/(analysis)/video-analysis/[evidenceId]/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/routes/(analysis)@/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/routes/(analysis)@/audio-analysis/[evidenceId]/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/routes/(analysis)@/document-analysis/[evidenceId]/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/routes/(analysis)@/video-analysis/[evidenceId]/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/routes/(app)/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/routes/(app)/active-cases/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/routes/(app)/admin/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/routes/(app)/admin/ai-dashboard/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/routes/(app)/admin/ai-dashboard/lab/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/routes/(app)/admin/ai-dashboard/operator/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/routes/(app)/admin/all-routes/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/routes/(app)/admin/ast-topology/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/routes/(app)/admin/cache/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/routes/(app)/admin/chat-memory/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/routes/(app)/admin/codebase-index/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/routes/(app)/admin/codebase-index/[fileId]/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/routes/(app)/admin/codebase-viewer/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/routes/(app)/admin/component-analysis/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/routes/(app)/admin/dev-tools/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/routes/(app)/admin/dev-tools/component-showcase/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/routes/(app)/admin/document-search/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/routes/(app)/admin/error-analysis/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/routes/(app)/admin/error-brain/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/routes/(app)/admin/gpu-demo/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/routes/(app)/admin/gpu-evidence-graph/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/routes/(app)/admin/kag-notebook/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/routes/(app)/admin/knowledge-base/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/routes/(app)/admin/knowledge-search/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/routes/(app)/admin/library/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/routes/(app)/admin/memory-inspector/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/routes/(app)/admin/phase78/monitor/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/routes/(app)/admin/phase78/routes/[routePath]/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/routes/(app)/admin/phase89/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/routes/(app)/admin/qlora-training/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/routes/(app)/admin/search-intelligence/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/routes/(app)/admin/unified-indexing-studio/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/routes/(app)/admin/workflows/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/routes/(app)/analysis-center/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/routes/(app)/analytics/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/routes/(app)/cases/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/routes/(app)/cases/[id]/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/routes/(app)/cases/[id]/ai/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/routes/(app)/cases/[id]/board/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/routes/(app)/cases/[id]/canvas/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/routes/(app)/cases/[id]/chat/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/routes/(app)/cases/[id]/evidence/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/routes/(app)/cases/[id]/evidence/upload/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/routes/(app)/cases/[id]/notes/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/routes/(app)/cases/[id]/overview/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/routes/(app)/cases/[id]/persons/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/routes/(app)/cases/[id]/reports/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/routes/(app)/cases/new/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/routes/(app)/chat/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/routes/(app)/chat/[id]/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/routes/(app)/citations/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/routes/(app)/citations/[...label]/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/routes/(app)/citations/law/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/routes/(app)/citations/law/[citation]/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/routes/(app)/code-intel/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/routes/(app)/code-intel/audit/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/routes/(app)/code-intel/clusters/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/routes/(app)/code-intel/memory/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/routes/(app)/code-intel/retrieval/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/routes/(app)/code-intel/topology/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/routes/(app)/code-intel/wiki/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/routes/(app)/codebase-graph/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/routes/(app)/codebase-graph/fast-ast/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/routes/(app)/command-center/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/routes/(app)/command-center/codebase/clusters/[id]/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/routes/(app)/command-center/codebase/components/[id]/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/routes/(app)/command-center/codebase/errors/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/routes/(app)/couchdb-analytics/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/routes/(app)/dashboard/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/routes/(app)/demos/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/routes/(app)/demos/ace-pipeline/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/routes/(app)/demos/agent-chat/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/routes/(app)/demos/agentic-errors/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/routes/(app)/demos/agentic-errors/analysis/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/routes/(app)/demos/ai-assistant/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/routes/(app)/demos/ai-chat-test/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/routes/(app)/demos/ai-file-upload/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/routes/(app)/demos/ask-ai/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/routes/(app)/demos/bits-ui/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/routes/(app)/demos/cache/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/routes/(app)/demos/case-form/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/routes/(app)/demos/celestial-icons/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/routes/(app)/demos/chat-messages/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/routes/(app)/demos/citation-tools/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/routes/(app)/demos/client-ai-chat/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/routes/(app)/demos/client-inference/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/routes/(app)/demos/collab-canvas/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/routes/(app)/demos/context-menu/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/routes/(app)/demos/contextual-chat/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/routes/(app)/demos/courtroom-sim/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/routes/(app)/demos/crime-reconstruction/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/routes/(app)/demos/detective-command/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/routes/(app)/demos/dialog-wrapper/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/routes/(app)/demos/embedding-stream/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/routes/(app)/demos/enhanced-upload/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/routes/(app)/demos/evidence-canvas/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/routes/(app)/demos/evidence-dashboard/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/routes/(app)/demos/evidence-form/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/routes/(app)/demos/gpu-cache/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/routes/(app)/demos/hover-card/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/routes/(app)/demos/keyboard-shortcuts/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/routes/(app)/demos/legal-layout/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/routes/(app)/demos/legal-spellbook/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/routes/(app)/demos/memory-palace/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/routes/(app)/demos/modals/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/routes/(app)/demos/modular-upload/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/routes/(app)/demos/nes-graph/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/routes/(app)/demos/nes-routes/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/routes/(app)/demos/nes-toast/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/routes/(app)/demos/nier-showcase/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/routes/(app)/demos/notifications/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/routes/(app)/demos/phantom-code-lab/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/routes/(app)/demos/prosecutor-dashboard/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/routes/(app)/demos/rich-text-editor/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/routes/(app)/demos/scene-intent-2d/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/routes/(app)/demos/search-tools/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/routes/(app)/demos/source-drawer/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/routes/(app)/demos/stats-panel/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/routes/(app)/demos/streaming/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/routes/(app)/demos/svelte5-components/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/routes/(app)/demos/svelte5-primitives/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/routes/(app)/demos/synthesis-chat/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/routes/(app)/demos/theory-board/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/routes/(app)/demos/toc-reader/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/routes/(app)/demos/ui-components/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/routes/(app)/demos/webgpu-memory-palace/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/routes/(app)/demos/webgpu-showcase/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/routes/(app)/demos/yorha-assistant/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/routes/(app)/demos/yorha-icons/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/routes/(app)/demos/yorha-terminal/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/routes/(app)/demos/yorha/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/routes/(app)/demos/yorha/components/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/routes/(app)/demos/yorha/components/_simulations/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/routes/(app)/demos/yorha/components/cases/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/routes/(app)/demos/yorha/components/dashboard/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/routes/(app)/demos/yorha/components/evidence/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/routes/(app)/evidence-board/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/routes/(app)/evidence-library/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/routes/(app)/evidence/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/routes/(app)/evidence/[id]/view/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/routes/(app)/evidence/analyze/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/routes/(app)/evidence/hash/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/routes/(app)/evidence/manage/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/routes/(app)/evidence/realtime/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/routes/(app)/evidence/upload/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/routes/(app)/fictional-cases/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/routes/(app)/fictional-cases/[id]/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/routes/(app)/global-search/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/routes/(app)/legal-corpus/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/routes/(app)/legal-corpus/[id]/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/routes/(app)/library/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/routes/(app)/library/[documentId]/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/routes/(app)/library/[documentId]/node/[nodeId]/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/routes/(app)/library/[documentId]/reader/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/routes/(app)/library/corpus/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/routes/(app)/library/glossary/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/routes/(app)/persons-of-interest/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/routes/(app)/persons-of-interest/[id]/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/routes/(app)/persons-of-interest/create/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/routes/(app)/rag-search/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/routes/(app)/recommendations/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/routes/(app)/reports/[id]/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/routes/(app)/reports/[id]/edit/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/routes/(app)/simulation/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/routes/(app)/terminal/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/routes/(app)/yorha/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/routes/(dev)/demo/bits-ui/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/routes/(dev)/odin/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/routes/(dev)/tts-demo/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/routes/(dev)/voice-chat-demo/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/routes/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/routes/api/codebase-index/deep-research/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/routes/api/rag/hyperrag/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/routes/api/rag/search/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/routes/api/search/hyperrag/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/routes/login/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/routes/register/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/types/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/wasm/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/src/workers/LLMS.md",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/scripts/atlas/kanban-turbovec-consolidation.mts",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "sveltekit-frontend/scripts/tasks/task-semantic-packet-workflow.mts",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "docs/documents-atlas-index.md#chunk-1258",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "docs/documents-atlas-index.md#chunk-608",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "docs/documents-atlas-index.md#chunk-623",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "docs/CODEBASE_DIRECTORY_MAP.md#chunk-26",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "docs/CODEBASE_DIRECTORY_MAP.md#chunk-4",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "docs/CODEBASE_DIRECTORY_MAP.md#chunk-18",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "docs/CODEBASE_INDEXING_PIPELINE.md#chunk-2",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "docs/CODEBASE_INDEXING_PIPELINE.md#chunk-3",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "docs/CODEBASE_INDEXING_PIPELINE.md#chunk-1",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "docs/error-analysis-architecture.md#chunk-2",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "docs/error-analysis-architecture.md#chunk-4",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "docs/error-analysis-architecture.md#chunk-1",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "docs/visualization-stack.md#chunk-3",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "docs/visualization-stack.md#chunk-1",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "docs/visualization-stack.md#chunk-2",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "docs/ARCHITECTURE_GUIDE_V1.md#chunk-1",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "docs/ARCHITECTURE_GUIDE_V1.md#chunk-2",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "docs/compiler-landscape.md#chunk-1",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "docs/compiler-landscape.md#chunk-2",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "docs/KARPATHY_PIPELINE_ARCHITECTURE.md#chunk-1",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "docs/KARPATHY_PIPELINE_ARCHITECTURE.md#chunk-2",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "docs/UNIVERSAL_APP_READINESS_CHECKLIST.md#chunk-1",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "docs/UNIVERSAL_APP_READINESS_CHECKLIST.md#chunk-2",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "docs/ARCHITECTURE_GUIDE_V2_ENHANCED_BITS_INTEGRATION.md#chunk-1",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "docs/atlas-vendor-wheels.md#chunk-1",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "docs/CI_VENDOR_WHEELS.md#chunk-1",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "drizzle/manual/0010_distilled_table_store.sql",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "drizzle/manual/0016_cluster_centroids.sql",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "drizzle/manual/0018_ace_observability_canonicalize.sql",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "src/lib/server/ai/mcp-tool-dispatch.ts",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "src/lib/server/ai/openai-facade.ts",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "src/lib/server/ai/gemma4.ts",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "src/lib/server/db/schema/index.ts",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "src/lib/server/db/schema/legal-relations.ts",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "src/lib/server/db/schema/case-library-links.ts",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "src/lib/server/retrieval/hyperrag-fusion-service.ts",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "src/lib/server/retrieval/orchestrator.ts",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "src/lib/server/retrieval/cross-encoder-reranker.ts",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "src/lib/server/ace/self-prompt.ts",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "src/lib/server/ace/codeintel-datastore.ts",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "src/lib/server/ace/auto-tagger.ts",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "drizzle/schema-contextual-chat.ts",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "drizzle/relations.ts",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "drizzle/schema.ts",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "src/lib/types/server.d.ts",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "src/lib/types/index.ts",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "src/lib/types/enhanced-svelte5-types.ts",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "drizzle/archived/0001_abandoned_satana.sql",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "drizzle/archived/0001_add_evidence_schema.sql",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "drizzle/archived/0001_case_reporter_schema.sql",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "src/lib/utils/dynamic-imports.ts",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "src/lib/utils/index.ts",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "src/lib/utils/security.ts",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "src/lib/server/lucia.ts",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "src/lib/server/batch-embedder.ts",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "src/lib/server/mcp-bridge.ts",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "src/lib/server/db/mirror-query.ts",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "src/lib/server/db/unified-client.ts",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "src/lib/server/db/client.ts",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "src/lib/server/graph/codebase-neo4j-sync.ts",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "src/lib/server/graph/gpu-graph-analysis.ts",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      },
+      {
+        "source": "src/lib/server/graph/ingestion-buffer-builder.ts",
+        "bucket": "review-needed",
+        "destination": "archive/review-needed/",
+        "reason": "no explicit archive bucket matched"
+      }
+    ]
+  },
+  "notes": [
+    "This is a read-only move list only.",
+    "Do not move source files, live completion notes, or active atlas navigation docs.",
+    "Packet manifests and index surfaces can stay live if they are needed for traversal.",
+    "Use the move list to externalize cold originals and redundant generated evidence after promotion."
+  ],
+  "keepActive": [
+    "docs/atlas/parent-atlas-table-of-contents.md",
+    "MASTER-FEATURE-TODO-2026-05-20.md",
+    "IMPLEMENTATION_STATUS.md",
+    "docs/reports/sourceRef-atlas-join-inventory.json",
+    "docs/reports/sourceRef-atlas-join-inventory.md"
+  ]
+}

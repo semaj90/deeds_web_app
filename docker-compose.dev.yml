@@ -26,19 +26,19 @@ services:
       retries: 5
 
   redis:
-    image: redis/redis-stack:latest
+    image: valkey/valkey-bundle:8.1.1
     container_name: legal-ai-redis
     ports:
-      - "6379:6379"   # Redis port
-      - "8001:8001"   # RedisInsight port
+      - "127.0.0.1:6379:6379"   # Redis-compatible port (loopback only)
     command: >
-      redis-server
+      valkey-server
       --appendonly yes
       --port 6379
-      --loadmodule /opt/redis-stack/lib/redisearch.so
-      --loadmodule /opt/redis-stack/lib/redistimeseries.so 
-      --loadmodule /opt/redis-stack/lib/rejson.so
-      --loadmodule /opt/redis-stack/lib/redisbloom.so
+      --protected-mode yes
+      --bind 0.0.0.0
+      --requirepass ${REDIS_PASSWORD:-redis}
+      --io-threads 4
+      --io-threads-do-reads yes
       --maxmemory 2gb
       --maxmemory-policy allkeys-lru
     volumes:

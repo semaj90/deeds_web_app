@@ -1,0 +1,28 @@
+[package]
+name = "omni-bridge"
+version = "0.1.0"
+edition = "2021"
+description = "N-API bridge: zero-copy tensor hand-off between Node.js and GPU (tch-rs / cudarc)"
+
+[lib]
+crate-type = ["cdylib"]
+name = "omni_bridge"
+
+[dependencies]
+# N-API bindings — generates the .node addon
+napi = { version = "2", features = ["napi4", "tokio_rt"] }
+napi-derive = "2"
+
+# GPU paths (feature-gated so the crate compiles on CPU-only CI)
+[target.'cfg(feature = "cuda")'.dependencies]
+# tch-rs: LibTorch Rust bindings — zero-copy Tensor ↔ Node.js Buffer
+tch = { version = "0.16", optional = true }
+# cudarc: low-level CUDA context management (device query, stream sync)
+cudarc = { version = "0.11", features = ["cuda-12010"], optional = true }
+
+[features]
+default = []
+cuda = ["dep:tch", "dep:cudarc"]
+
+[build-dependencies]
+napi-build = "2"

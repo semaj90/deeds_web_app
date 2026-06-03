@@ -88,5 +88,5 @@
     "alias_id is present in schema and read-only preflight, but should only be written through bounded promotion paths that preserve provenance.",
     "PG18 remains a target shape; the repo currently has Postgres 18-friendly SQL sidecars and schema definitions, not a forced live upgrade."
   ],
-  "next_safe_action": "Generate a dry-run join report that reads these existing artifacts and emits compact sourceRef-prefix clusters plus unmatched rows, without mutating Qdrant, Neo4j, Redis, or Postgres."
+  "next_safe_action": "Review the sourceRef-parent-join dry-run report, then use the packet manifests to keep cold originals archived and warm indexes compact without mutating Qdrant, Neo4j, Redis, or Postgres."
 }

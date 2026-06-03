@@ -4,9 +4,12 @@ This page is the navigation entry for the Parent Atlas workstream. It links the 
 
 ## Core References
 
+- [**Retrieval Layer Separation**](</C:/Users/james/Videos/deeds-web-app/docs/architecture/retrieval-layer-separation.md>) — Three-layer architecture: Orchestrator → Search Contract → Backend Implementation. Caller rule: never call Qdrant directly.
 - [Parent Atlas - Storage & Runtime Decision](</C:/Users/james/Videos/deeds-web-app/docs/atlas/parent-atlas-storage-decision.md>)
 - [Parent Atlas - Data Spine](</C:/Users/james/Videos/deeds-web-app/docs/atlas/parent-atlas-data-spine.md>)
 - [Parent Atlas Karpathy Pipeline](</C:/Users/james/Videos/deeds-web-app/docs/architecture/parent-atlas-karpathy-pipeline.md>)
+- [Cold / Warm / Hot Packet Lifecycle](</C:/Users/james/Videos/deeds-web-app/docs/architecture/cold-warm-hot-packet-lifecycle.md>)
+- [Dual-Lane Hot Brain, Cold Queue](</C:/Users/james/Videos/deeds-web-app/docs/architecture/dual-lane-hot-brain-cold-queue.md>)
 - [Kanban and Parent Atlas Alignment](</C:/Users/james/Videos/deeds-web-app/docs/architecture/kanban-parent-atlas-alignment.md>)
 - [Local Deep Research Boundary](</C:/Users/james/Videos/deeds-web-app/docs/architecture/local-deep-research-boundary.md>)
 - [Legal-AI Parent Atlas Product Integration](</C:/Users/james/Videos/deeds-web-app/docs/architecture/legal-ai-parent-atlas-product-integration.md>)
@@ -29,15 +32,28 @@ This page is the navigation entry for the Parent Atlas workstream. It links the 
 - [PyTorch / Qdrant / Redis / SOM index](</C:/Users/james/Videos/deeds-web-app/docs/reports/pytorch-qdrant-redis-som-index-2026-06-01.md>)
 - [Repo dirty tree classification](</C:/Users/james/Videos/deeds-web-app/docs/reports/repo-dirty-tree-classification-2026-06-01.md>)
 - [Repo archive move plan](</C:/Users/james/Videos/deeds-web-app/docs/reports/repo-archive-move-plan-2026-06-01.md>)
+- [Original superseded score](</C:/Users/james/Videos/deeds-web-app/docs/reports/original-superseded-score-2026-06-02.md>)
 - [Parent Atlas feature command atlas](</C:/Users/james/Videos/deeds-web-app/docs/reports/parent-atlas-feature-command-atlas.md>)
 - [Parent Atlas feature command atlas projection](</C:/Users/james/Videos/deeds-web-app/docs/reports/parent-atlas-feature-command-atlas-projection.md>)
 - [Parent Atlas feature command atlas Qdrant projection](</C:/Users/james/Videos/deeds-web-app/docs/reports/parent-atlas-feature-command-atlas-qdrant.md>)
 - [Parent Atlas feature command atlas Postgres mirror](</C:/Users/james/Videos/deeds-web-app/docs/reports/parent-atlas-feature-command-atlas-postgres.md>)
 - [Parent Atlas Cypher apply report](</C:/Users/james/Videos/deeds-web-app/docs/reports/parent-atlas-cypher-apply-report.md>)
 - [SourceRef context Neo4j projection](</C:/Users/james/Videos/deeds-web-app/docs/reports/sourceRef-context-neo4j-report.md>)
+- [SourceRef parent join dry-run](</C:/Users/james/Videos/deeds-web-app/docs/reports/sourceRef-parent-join-dry-run.md>)
+- [SourceRef parent join archive plan](</C:/Users/james/Videos/deeds-web-app/docs/reports/sourceRef-parent-join-archive-plan.md>)
+- [SourceRef parent join move list](</C:/Users/james/Videos/deeds-web-app/docs/reports/sourceRef-parent-join-archive-move-list.md>)
 - [All-lanes parent atlas report](</C:/Users/james/Videos/deeds-web-app/memory/exports/all-lanes-parent-atlas-report.json>)
 
 ## Lane Index
+
+### Two-lane storage model
+- Cold originals stay in the repo, SeaweedFS, or other archive stores
+- Warm index packets stay small and point back to cold originals
+- Hot cache holds only active task memory and recent retrieval state
+- Queue holds work waiting to be processed, not source truth
+- Postgres is the durable ledger and packet registry
+- Qdrant is semantic lookup plus payload filters, not the canonical store
+- See also: [Dual-Lane Hot Brain, Cold Queue](</C:/Users/james/Videos/deeds-web-app/docs/architecture/dual-lane-hot-brain-cold-queue.md>)
 
 ### Storage and retrieval
 - Postgres 18 + pgvector
@@ -68,6 +84,9 @@ This page is the navigation entry for the Parent Atlas workstream. It links the 
 - Parent Atlas Cypher apply
 - SourceRef context Neo4j projection
 - parent atlas indexing
+- sourceRef parent join dry-run
+- sourceRef parent join archive plan
+- sourceRef parent join move list
 - validation and consistency audits
 - offline synthesis
 
@@ -76,6 +95,32 @@ This page is the navigation entry for the Parent Atlas workstream. It links the 
 - finish P4 provenance UI and trust-tier editing
 - finish P5 feature registry reconciliation and command mapping
 - keep offline mirrors downstream-only
+
+## Retrieval abstraction and future cuVS swap
+
+The current retrieval boundary is:
+- `sveltekit-frontend/src/lib/server/search/qdrant-search.ts`
+- `sveltekit-frontend/src/lib/server/retrieval/orchestrator.ts`
+
+Current default: Qdrant handles semantic vector search, payload filters, quantized vector traversal, and structural pruning.
+
+Future optional acceleration: cuVS/CAGRA may be introduced behind the same retrieval abstraction. Callers must not depend on Qdrant-specific client details. cuVS is an acceleration lane, not the canonical store.
+
+Canonical truth remains: Postgres packet/ledger tables, sourceRef/cold-original provenance, and Parent Atlas joins.
+
+## LangGraph boundary
+
+LangGraph is optional orchestration/testing only.
+
+**Allowed:**
+- validation workflows, planning graphs, subagent sequencing
+- Gemma4/function-tool calling, dry-run reasoning
+
+**Not allowed:**
+- direct writes to Postgres, Qdrant, Redis, Neo4j, DuckDB, or SeaweedFS
+- archive/move/delete operations
+
+Durable mutations must go through: promotion queue, schema gates, validation reports, and bounded apply scripts.
 
 ## Notes
 

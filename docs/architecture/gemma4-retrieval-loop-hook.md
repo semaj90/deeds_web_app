@@ -60,9 +60,9 @@ app.post('/internal/gemma4/hook', (req, res) => {
 app.listen(9111);
 ```
 
-## Hermes/OpenAI-compatible gateway pseudocode
+## OpenCode/OpenAI-compatible gateway pseudocode
 
-When using an OpenAI-compatible gateway (Hermes), call the hook after tool completion. Pseudocode:
+When using an OpenAI-compatible gateway (OpenCode-facing), call the hook after tool completion. Pseudocode:
 
 ```
 // inside tool execution handler

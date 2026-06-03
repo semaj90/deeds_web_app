@@ -1,5 +1,9 @@
 # Retrieval Architecture
 
+> **Layer map**: this doc covers the staged pipeline (Layer 1 — Orchestration).
+> For the caller contract and backend switching, see
+> [retrieval-layer-separation.md](retrieval-layer-separation.md).
+
 This system treats retrieval as a staged pipeline, not a single search call. Each
 stage has a specific job: prune, score, expand, synthesize, then cache.
 

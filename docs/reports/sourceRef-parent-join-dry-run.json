@@ -1,0 +1,2118 @@
+{
+  "generatedAt": "2026-06-02T13:45:43.136Z",
+  "mode": "dry-run",
+  "inputs": {
+    "pathMap": ".tmp/path-map.json",
+    "sourceRefCardMap": "memory/exports/sourceRef-cardId-map.json",
+    "parentAtlas": "memory/exports/parent-atlas/parent_atlas_index.json",
+    "inventory": "docs/reports/sourceRef-atlas-join-inventory.json",
+    "crosswalk": "docs/reports/doc-feature-crosswalk-2026-06-01.json"
+  },
+  "scanner": {
+    "command": "rg -uu -l across docs/memory/scripts/obsidian-vault for sourceRef/pathmap traversal families",
+    "groups": [
+      {
+        "id": "sourceRef_pathmap",
+        "label": "SourceRef / pathmap spine",
+        "pattern": "sourceRef|path-map|stableKey|feature_id|title_id|mapreduce-path-join",
+        "roots": [
+          "docs",
+          "memory",
+          "scripts",
+          "sveltekit-frontend/docs/obsidian-vault/Files"
+        ],
+        "fileCount": 380,
+        "sampleFiles": [
+          "docs/atlas-graph-plan-update.md",
+          "docs/atlas-runtime-intent-graph-architecture.md",
+          "docs/ai-os/opencode-mcp-atlas.md",
+          "docs/ATLAS-PHASES-ROADMAP-INDEX.md",
+          "memory/atlas-token-map.preview.json",
+          "memory/agent-runs/current-corpus-promotion-preflight.json",
+          "memory/graph/deep-node-relations.jsonl",
+          "memory/atlas/documents-atlas.latest.md",
+          "docs/architecture/agentic-error-proposal-flow.md",
+          "memory/datasets/llm_synthesis/2026-05-17.jsonl"
+        ],
+        "error": ""
+      },
+      {
+        "id": "parent_atlas",
+        "label": "Parent atlas / packet flow",
+        "pattern": "parent atlas|parent_atlas|NES chrom|NES/Glyph|packet|feature-command-atlas",
+        "roots": [
+          "docs",
+          "memory",
+          "scripts",
+          "sveltekit-frontend/docs/obsidian-vault/Files"
+        ],
+        "fileCount": 1756,
+        "sampleFiles": [
+          "docs/atlas-graph-plan-update.md",
+          "docs/ARCHITECTURE_GUIDE_V1.md",
+          "docs/atlas/feature-registry.json",
+          "docs/atlas/cluster-cards.json",
+          "docs/6_1_26",
+          "docs/atlas/parent-atlas-storage-decision.md",
+          "docs/architecture/agentic-error-proposal-flow.md",
+          "docs/atlas/parent-atlas-data-spine.md",
+          "docs/architecture/cold-warm-hot-packet-lifecycle.md",
+          "docs/architecture/consolidation-and-schema-migration-checklist.md"
+        ],
+        "error": ""
+      },
+      {
+        "id": "neo4j",
+        "label": "Neo4j contextual trees / multi-hop traversal",
+        "pattern": "Neo4j|multi-hop|context tree|graph",
+        "roots": [
+          "docs",
+          "memory",
+          "scripts",
+          "sveltekit-frontend/docs/obsidian-vault/Files"
+        ],
+        "fileCount": 2626,
+        "sampleFiles": [
+          "docs/6_1_26",
+          "docs/ARCHITECTURE_GUIDE_V1.md",
+          "docs/archive/sessions/SESSION_SUMMARY_APRIL_9_2026.md",
+          "docs/atlas/cluster-cards.json",
+          "docs/atlas/atlas-nes-retokenization.md",
+          "docs/CODEBASE_DIRECTORY_MAP.md",
+          "docs/atlas/feature-registry.json",
+          "docs/atlas/export-cluster-worker.md",
+          "docs/NEXT-STEPS-IMPLEMENTATION-2026-05-29.md",
+          "docs/feature-pillar-barrel-migration.md"
+        ],
+        "error": ""
+      },
+      {
+        "id": "qdrant",
+        "label": "Qdrant semantic analysis / clustering",
+        "pattern": "Qdrant|semantic|clustering|HNSW|vector",
+        "roots": [
+          "docs",
+          "memory",
+          "scripts",
+          "sveltekit-frontend/docs/obsidian-vault/Files"
+        ],
+        "fileCount": 2169,
+        "sampleFiles": [
+          "docs/6_1_26",
+          "docs/ai-os/opencode-mcp-atlas.md",
+          "docs/atlas-calls-extractor-implementation.md",
+          "docs/ATLAS-PHASES-ROADMAP-INDEX.md",
+          "docs/architecture/agentic-error-proposal-flow.md",
+          "docs/atlas-uses-db-extractor-implementation.md",
+          "docs/atlas-graph-plan-update.md",
+          "docs/archive/CRUD_OPERATIONS_AUDIT.md",
+          "docs/atlas-runtime-intent-graph-architecture.md",
+          "docs/archive/sessions/SESSION_SUMMARY_APRIL_9_2026.md"
+        ],
+        "error": ""
+      },
+      {
+        "id": "redis",
+        "label": "Redis / Bitfrost cache lane",
+        "pattern": "Redis|Bitfrost|cache",
+        "roots": [
+          "docs",
+          "memory",
+          "scripts",
+          "sveltekit-frontend/docs/obsidian-vault/Files"
+        ],
+        "fileCount": 3992,
+        "sampleFiles": [
+          "docs/6_1_26",
+          "docs/atlas-graph-plan-update.md",
+          "docs/atlas-runtime-intent-graph-architecture.md",
+          "docs/atlas-calls-extractor-implementation.md",
+          "docs/atlas-uses-db-extractor-implementation.md",
+          "docs/ATLAS-PHASES-ROADMAP-INDEX.md",
+          "docs/ai-os/opencode-mcp-atlas.md",
+          "docs/CODEBASE-FEATURE-MAPPING-2026-05-29.md",
+          "docs/ATLAS_NEXT_PHASE_SUMMARY.md",
+          "docs/CODEBASE_DIRECTORY_MAP.md"
+        ],
+        "error": ""
+      },
+      {
+        "id": "offline",
+        "label": "Offline processing / mapreduce / DuckDB",
+        "pattern": "DuckDB|mapreduce|offline|SeaweedFS",
+        "roots": [
+          "docs",
+          "memory",
+          "scripts",
+          "sveltekit-frontend/docs/obsidian-vault/Files"
+        ],
+        "fileCount": 316,
+        "sampleFiles": [
+          "docs/atlas-graph-plan-update.md",
+          "docs/atlas-runtime-intent-graph-architecture.md",
+          "docs/atlas/cluster-cards.json",
+          "docs/ATLAS-PHASES-ROADMAP-INDEX.md",
+          "docs/atlas/atlas-nes-retokenization.md",
+          "docs/CI_VENDOR_WHEELS.md",
+          "docs/ATLAS_NEXT_PHASE_SUMMARY.md",
+          "docs/atlas-vendor-wheels.md",
+          "docs/atlas/feature-registry.json",
+          "memory/runs/claude-code/2026-06-02.jsonl"
+        ],
+        "error": ""
+      }
+    ]
+  },
+  "summary": {
+    "pathRows": 3270,
+    "sourceRefMapRows": 1380,
+    "parentAtlasRowsWithSourceRef": 1380,
+    "matchedSourceRefMapRows": 1380,
+    "unmatchedSourceRefMapRows": 0,
+    "unmatchedParentAtlasRows": 0,
+    "packetManifests": 136,
+    "packetValidationErrors": 0
+  },
+  "top": {
+    "sourceRefClusters": [
+      {
+        "schemaVersion": "sourceRef.prefix.packet.v1",
+        "packetId": "srprefix_17031610ebc109d1",
+        "title_id": "17031610ebc109d1",
+        "title": "docs/documents-atlas-index.md",
+        "feature_id": "sourceRef.pathmap",
+        "sourceRef": "docs/documents-atlas-index.md",
+        "sourceRefs": [
+          "docs\\documents-atlas-index.md#chunk-1258",
+          "docs\\documents-atlas-index.md#chunk-608",
+          "docs\\documents-atlas-index.md#chunk-623",
+          "docs\\documents-atlas-index.md#chunk-309",
+          "docs\\documents-atlas-index.md#chunk-252",
+          "docs\\documents-atlas-index.md#chunk-1317",
+          "docs\\documents-atlas-index.md#chunk-1184",
+          "docs\\documents-atlas-index.md#chunk-354",
+          "docs\\documents-atlas-index.md#chunk-212",
+          "docs\\documents-atlas-index.md#chunk-837"
+        ],
+        "parentAtlasCardIds": [
+          "0024f386d46d7f23",
+          "002eef270abc533c",
+          "00376eb299856fbe",
+          "005d877f65beacff",
+          "0099365f2954a7c8",
+          "01195c4fd7875b60",
+          "0167f3ca94dc2620",
+          "01aebc03901a5aaf",
+          "01f0af8d35f3583f",
+          "01f58df7c9edcea9"
+        ],
+        "coldOriginals": [
+          "docs\\documents-atlas-index.md#chunk-1258",
+          "docs\\documents-atlas-index.md#chunk-608",
+          "docs\\documents-atlas-index.md#chunk-623",
+          "docs\\documents-atlas-index.md#chunk-309",
+          "docs\\documents-atlas-index.md#chunk-252",
+          "docs\\documents-atlas-index.md#chunk-1317",
+          "docs\\documents-atlas-index.md#chunk-1184",
+          "docs\\documents-atlas-index.md#chunk-354",
+          "docs\\documents-atlas-index.md#chunk-212",
+          "docs\\documents-atlas-index.md#chunk-837"
+        ],
+        "summary": "sourceRefs=1318; atlas=1318; sourceRefMap=1318",
+        "metrics": {
+          "sourceRefCount": 1318,
+          "atlasCount": 1318,
+          "mapCount": 1318,
+          "cardIdCount": 2636
+        },
+        "joinSpine": {
+          "sourceRef": "docs/documents-atlas-index.md",
+          "feature_id": "sourceRef.pathmap",
+          "parent_atlas_card_id": "0024f386d46d7f23"
+        }
+      },
+      {
+        "schemaVersion": "sourceRef.prefix.packet.v1",
+        "packetId": "srprefix_cd51b6bba959697b",
+        "title_id": "cd51b6bba959697b",
+        "title": "docs/codebase_directory_map.md",
+        "feature_id": "sourceRef.pathmap",
+        "sourceRef": "docs/codebase_directory_map.md",
+        "sourceRefs": [
+          "docs\\CODEBASE_DIRECTORY_MAP.md#chunk-26",
+          "docs\\CODEBASE_DIRECTORY_MAP.md#chunk-4",
+          "docs\\CODEBASE_DIRECTORY_MAP.md#chunk-18",
+          "docs\\CODEBASE_DIRECTORY_MAP.md#chunk-17",
+          "docs\\CODEBASE_DIRECTORY_MAP.md#chunk-24",
+          "docs\\CODEBASE_DIRECTORY_MAP.md#chunk-5",
+          "docs\\CODEBASE_DIRECTORY_MAP.md#chunk-15",
+          "docs\\CODEBASE_DIRECTORY_MAP.md#chunk-25",
+          "docs\\CODEBASE_DIRECTORY_MAP.md#chunk-34",
+          "docs\\CODEBASE_DIRECTORY_MAP.md#chunk-29"
+        ],
+        "parentAtlasCardIds": [
+          "0335e87d2bafa7ce",
+          "0d7226e77536cb78",
+          "0da2dacaf111ec03",
+          "0ef0fb2f7ae1bf50",
+          "11f18da6ddb4b04b",
+          "134da0189ba05253",
+          "192f8114cafce7e0",
+          "1cc801f7dc5bdff2",
+          "26a3d6a7b7b6fb74",
+          "337c3b05abf4b502"
+        ],
+        "coldOriginals": [
+          "docs\\CODEBASE_DIRECTORY_MAP.md#chunk-26",
+          "docs\\CODEBASE_DIRECTORY_MAP.md#chunk-4",
+          "docs\\CODEBASE_DIRECTORY_MAP.md#chunk-18",
+          "docs\\CODEBASE_DIRECTORY_MAP.md#chunk-17",
+          "docs\\CODEBASE_DIRECTORY_MAP.md#chunk-24",
+          "docs\\CODEBASE_DIRECTORY_MAP.md#chunk-5",
+          "docs\\CODEBASE_DIRECTORY_MAP.md#chunk-15",
+          "docs\\CODEBASE_DIRECTORY_MAP.md#chunk-25",
+          "docs\\CODEBASE_DIRECTORY_MAP.md#chunk-34",
+          "docs\\CODEBASE_DIRECTORY_MAP.md#chunk-29"
+        ],
+        "summary": "sourceRefs=35; atlas=35; sourceRefMap=35",
+        "metrics": {
+          "sourceRefCount": 35,
+          "atlasCount": 35,
+          "mapCount": 35,
+          "cardIdCount": 70
+        },
+        "joinSpine": {
+          "sourceRef": "docs/codebase_directory_map.md",
+          "feature_id": "sourceRef.pathmap",
+          "parent_atlas_card_id": "0335e87d2bafa7ce"
+        }
+      },
+      {
+        "schemaVersion": "sourceRef.prefix.packet.v1",
+        "packetId": "srprefix_938e7922c3a60c56",
+        "title_id": "938e7922c3a60c56",
+        "title": "docs/codebase_indexing_pipeline.md",
+        "feature_id": "sourceRef.pathmap",
+        "sourceRef": "docs/codebase_indexing_pipeline.md",
+        "sourceRefs": [
+          "docs\\CODEBASE_INDEXING_PIPELINE.md#chunk-2",
+          "docs\\CODEBASE_INDEXING_PIPELINE.md#chunk-3",
+          "docs\\CODEBASE_INDEXING_PIPELINE.md#chunk-1",
+          "docs\\CODEBASE_INDEXING_PIPELINE.md#chunk-5",
+          "docs\\CODEBASE_INDEXING_PIPELINE.md#chunk-4"
+        ],
+        "parentAtlasCardIds": [
+          "084583552fa0535b",
+          "48c43346e8110de5",
+          "4f23961e0770a380",
+          "ac8231e0ace5ae1b",
+          "dba3d3cd07b0ed23",
+          "5af5b6129535ca22",
+          "9ed03e8ee58a493f",
+          "6441e0ca547ccfcc",
+          "beebff6f260f1e77",
+          "2596064b106f7bea"
+        ],
+        "coldOriginals": [
+          "docs\\CODEBASE_INDEXING_PIPELINE.md#chunk-2",
+          "docs\\CODEBASE_INDEXING_PIPELINE.md#chunk-3",
+          "docs\\CODEBASE_INDEXING_PIPELINE.md#chunk-1",
+          "docs\\CODEBASE_INDEXING_PIPELINE.md#chunk-5",
+          "docs\\CODEBASE_INDEXING_PIPELINE.md#chunk-4"
+        ],
+        "summary": "sourceRefs=5; atlas=5; sourceRefMap=5",
+        "metrics": {
+          "sourceRefCount": 5,
+          "atlasCount": 5,
+          "mapCount": 5,
+          "cardIdCount": 10
+        },
+        "joinSpine": {
+          "sourceRef": "docs/codebase_indexing_pipeline.md",
+          "feature_id": "sourceRef.pathmap",
+          "parent_atlas_card_id": "084583552fa0535b"
+        }
+      },
+      {
+        "schemaVersion": "sourceRef.prefix.packet.v1",
+        "packetId": "srprefix_61038e02ca3b74ae",
+        "title_id": "61038e02ca3b74ae",
+        "title": "docs/error-analysis-architecture.md",
+        "feature_id": "sourceRef.pathmap",
+        "sourceRef": "docs/error-analysis-architecture.md",
+        "sourceRefs": [
+          "docs\\error-analysis-architecture.md#chunk-2",
+          "docs\\error-analysis-architecture.md#chunk-4",
+          "docs\\error-analysis-architecture.md#chunk-1",
+          "docs\\error-analysis-architecture.md#chunk-3"
+        ],
+        "parentAtlasCardIds": [
+          "0c12489a6026299a",
+          "4fecd8a1ea37173d",
+          "7a480656652a0adc",
+          "e400b08daec497d1",
+          "350e76500f6c01ad",
+          "0e40aa7920026c43",
+          "38ee0ac2c3bdcc41",
+          "5e48cb5706f50059"
+        ],
+        "coldOriginals": [
+          "docs\\error-analysis-architecture.md#chunk-2",
+          "docs\\error-analysis-architecture.md#chunk-4",
+          "docs\\error-analysis-architecture.md#chunk-1",
+          "docs\\error-analysis-architecture.md#chunk-3"
+        ],
+        "summary": "sourceRefs=4; atlas=4; sourceRefMap=4",
+        "metrics": {
+          "sourceRefCount": 4,
+          "atlasCount": 4,
+          "mapCount": 4,
+          "cardIdCount": 8
+        },
+        "joinSpine": {
+          "sourceRef": "docs/error-analysis-architecture.md",
+          "feature_id": "sourceRef.pathmap",
+          "parent_atlas_card_id": "0c12489a6026299a"
+        }
+      },
+      {
+        "schemaVersion": "sourceRef.prefix.packet.v1",
+        "packetId": "srprefix_c8156167a66950bd",
+        "title_id": "c8156167a66950bd",
+        "title": "docs/visualization-stack.md",
+        "feature_id": "sourceRef.pathmap",
+        "sourceRef": "docs/visualization-stack.md",
+        "sourceRefs": [
+          "docs\\visualization-stack.md#chunk-3",
+          "docs\\visualization-stack.md#chunk-1",
+          "docs\\visualization-stack.md#chunk-2"
+        ],
+        "parentAtlasCardIds": [
+          "27dc226f39ece25c",
+          "3372f74292f3968e",
+          "594a9d620e160c17",
+          "3ac19e7629abba6a",
+          "3d4cb4d9e837f917",
+          "dff73b67646ecc50"
+        ],
+        "coldOriginals": [
+          "docs\\visualization-stack.md#chunk-3",
+          "docs\\visualization-stack.md#chunk-1",
+          "docs\\visualization-stack.md#chunk-2"
+        ],
+        "summary": "sourceRefs=3; atlas=3; sourceRefMap=3",
+        "metrics": {
+          "sourceRefCount": 3,
+          "atlasCount": 3,
+          "mapCount": 3,
+          "cardIdCount": 6
+        },
+        "joinSpine": {
+          "sourceRef": "docs/visualization-stack.md",
+          "feature_id": "sourceRef.pathmap",
+          "parent_atlas_card_id": "27dc226f39ece25c"
+        }
+      },
+      {
+        "schemaVersion": "sourceRef.prefix.packet.v1",
+        "packetId": "srprefix_7dd280d4a4c3a1d1",
+        "title_id": "7dd280d4a4c3a1d1",
+        "title": "docs/architecture_guide_v1.md",
+        "feature_id": "sourceRef.pathmap",
+        "sourceRef": "docs/architecture_guide_v1.md",
+        "sourceRefs": [
+          "docs\\ARCHITECTURE_GUIDE_V1.md#chunk-1",
+          "docs\\ARCHITECTURE_GUIDE_V1.md#chunk-2"
+        ],
+        "parentAtlasCardIds": [
+          "31460746db2719dd",
+          "3f4ca05853f7ed2f",
+          "ac3526af900a28d2",
+          "5cb7eca7e72d20fb"
+        ],
+        "coldOriginals": [
+          "docs\\ARCHITECTURE_GUIDE_V1.md#chunk-1",
+          "docs\\ARCHITECTURE_GUIDE_V1.md#chunk-2"
+        ],
+        "summary": "sourceRefs=2; atlas=2; sourceRefMap=2",
+        "metrics": {
+          "sourceRefCount": 2,
+          "atlasCount": 2,
+          "mapCount": 2,
+          "cardIdCount": 4
+        },
+        "joinSpine": {
+          "sourceRef": "docs/architecture_guide_v1.md",
+          "feature_id": "sourceRef.pathmap",
+          "parent_atlas_card_id": "31460746db2719dd"
+        }
+      },
+      {
+        "schemaVersion": "sourceRef.prefix.packet.v1",
+        "packetId": "srprefix_08b0bc4ef16fd849",
+        "title_id": "08b0bc4ef16fd849",
+        "title": "docs/compiler-landscape.md",
+        "feature_id": "sourceRef.pathmap",
+        "sourceRef": "docs/compiler-landscape.md",
+        "sourceRefs": [
+          "docs\\compiler-landscape.md#chunk-1",
+          "docs\\compiler-landscape.md#chunk-2"
+        ],
+        "parentAtlasCardIds": [
+          "119989cb1eb3f118",
+          "88fe4b99ee8aa6cc",
+          "6b842ce9f00c5f58",
+          "7d66043701201944"
+        ],
+        "coldOriginals": [
+          "docs\\compiler-landscape.md#chunk-1",
+          "docs\\compiler-landscape.md#chunk-2"
+        ],
+        "summary": "sourceRefs=2; atlas=2; sourceRefMap=2",
+        "metrics": {
+          "sourceRefCount": 2,
+          "atlasCount": 2,
+          "mapCount": 2,
+          "cardIdCount": 4
+        },
+        "joinSpine": {
+          "sourceRef": "docs/compiler-landscape.md",
+          "feature_id": "sourceRef.pathmap",
+          "parent_atlas_card_id": "119989cb1eb3f118"
+        }
+      },
+      {
+        "schemaVersion": "sourceRef.prefix.packet.v1",
+        "packetId": "srprefix_55d30c8510f483d8",
+        "title_id": "55d30c8510f483d8",
+        "title": "docs/karpathy_pipeline_architecture.md",
+        "feature_id": "sourceRef.pathmap",
+        "sourceRef": "docs/karpathy_pipeline_architecture.md",
+        "sourceRefs": [
+          "docs\\KARPATHY_PIPELINE_ARCHITECTURE.md#chunk-1",
+          "docs\\KARPATHY_PIPELINE_ARCHITECTURE.md#chunk-2"
+        ],
+        "parentAtlasCardIds": [
+          "2a9c6da5fe477520",
+          "443f906df3580b71",
+          "727511e9c68dd1f4",
+          "4266fb7511a12b61"
+        ],
+        "coldOriginals": [
+          "docs\\KARPATHY_PIPELINE_ARCHITECTURE.md#chunk-1",
+          "docs\\KARPATHY_PIPELINE_ARCHITECTURE.md#chunk-2"
+        ],
+        "summary": "sourceRefs=2; atlas=2; sourceRefMap=2",
+        "metrics": {
+          "sourceRefCount": 2,
+          "atlasCount": 2,
+          "mapCount": 2,
+          "cardIdCount": 4
+        },
+        "joinSpine": {
+          "sourceRef": "docs/karpathy_pipeline_architecture.md",
+          "feature_id": "sourceRef.pathmap",
+          "parent_atlas_card_id": "2a9c6da5fe477520"
+        }
+      },
+      {
+        "schemaVersion": "sourceRef.prefix.packet.v1",
+        "packetId": "srprefix_69c3499eb79e6058",
+        "title_id": "69c3499eb79e6058",
+        "title": "docs/universal_app_readiness_checklist.md",
+        "feature_id": "sourceRef.pathmap",
+        "sourceRef": "docs/universal_app_readiness_checklist.md",
+        "sourceRefs": [
+          "docs\\UNIVERSAL_APP_READINESS_CHECKLIST.md#chunk-1",
+          "docs\\UNIVERSAL_APP_READINESS_CHECKLIST.md#chunk-2"
+        ],
+        "parentAtlasCardIds": [
+          "587ca3120696b73d",
+          "71f009eb0b811ce7",
+          "5b50fe4e19c6cfc3",
+          "0b071e32657b358b"
+        ],
+        "coldOriginals": [
+          "docs\\UNIVERSAL_APP_READINESS_CHECKLIST.md#chunk-1",
+          "docs\\UNIVERSAL_APP_READINESS_CHECKLIST.md#chunk-2"
+        ],
+        "summary": "sourceRefs=2; atlas=2; sourceRefMap=2",
+        "metrics": {
+          "sourceRefCount": 2,
+          "atlasCount": 2,
+          "mapCount": 2,
+          "cardIdCount": 4
+        },
+        "joinSpine": {
+          "sourceRef": "docs/universal_app_readiness_checklist.md",
+          "feature_id": "sourceRef.pathmap",
+          "parent_atlas_card_id": "587ca3120696b73d"
+        }
+      },
+      {
+        "schemaVersion": "sourceRef.prefix.packet.v1",
+        "packetId": "srprefix_f2d64fb51727ac63",
+        "title_id": "f2d64fb51727ac63",
+        "title": "docs/architecture_guide_v2_enhanced_bits_integration.md",
+        "feature_id": "sourceRef.pathmap",
+        "sourceRef": "docs/architecture_guide_v2_enhanced_bits_integration.md",
+        "sourceRefs": [
+          "docs\\ARCHITECTURE_GUIDE_V2_ENHANCED_BITS_INTEGRATION.md#chunk-1"
+        ],
+        "parentAtlasCardIds": [
+          "4651c885d8ad9f38",
+          "19365a1d20ddbf9c"
+        ],
+        "coldOriginals": [
+          "docs\\ARCHITECTURE_GUIDE_V2_ENHANCED_BITS_INTEGRATION.md#chunk-1"
+        ],
+        "summary": "sourceRefs=1; atlas=1; sourceRefMap=1",
+        "metrics": {
+          "sourceRefCount": 1,
+          "atlasCount": 1,
+          "mapCount": 1,
+          "cardIdCount": 2
+        },
+        "joinSpine": {
+          "sourceRef": "docs/architecture_guide_v2_enhanced_bits_integration.md",
+          "feature_id": "sourceRef.pathmap",
+          "parent_atlas_card_id": "4651c885d8ad9f38"
+        }
+      },
+      {
+        "schemaVersion": "sourceRef.prefix.packet.v1",
+        "packetId": "srprefix_8801c8f44c2c3b11",
+        "title_id": "8801c8f44c2c3b11",
+        "title": "docs/atlas-vendor-wheels.md",
+        "feature_id": "sourceRef.pathmap",
+        "sourceRef": "docs/atlas-vendor-wheels.md",
+        "sourceRefs": [
+          "docs\\atlas-vendor-wheels.md#chunk-1"
+        ],
+        "parentAtlasCardIds": [
+          "75c0602197055947",
+          "4161a21feb56f2c2"
+        ],
+        "coldOriginals": [
+          "docs\\atlas-vendor-wheels.md#chunk-1"
+        ],
+        "summary": "sourceRefs=1; atlas=1; sourceRefMap=1",
+        "metrics": {
+          "sourceRefCount": 1,
+          "atlasCount": 1,
+          "mapCount": 1,
+          "cardIdCount": 2
+        },
+        "joinSpine": {
+          "sourceRef": "docs/atlas-vendor-wheels.md",
+          "feature_id": "sourceRef.pathmap",
+          "parent_atlas_card_id": "75c0602197055947"
+        }
+      },
+      {
+        "schemaVersion": "sourceRef.prefix.packet.v1",
+        "packetId": "srprefix_6a53c3b3a9a36012",
+        "title_id": "6a53c3b3a9a36012",
+        "title": "docs/ci_vendor_wheels.md",
+        "feature_id": "sourceRef.pathmap",
+        "sourceRef": "docs/ci_vendor_wheels.md",
+        "sourceRefs": [
+          "docs\\CI_VENDOR_WHEELS.md#chunk-1"
+        ],
+        "parentAtlasCardIds": [
+          "b71cdaa5d570be7a",
+          "399de276dca04216"
+        ],
+        "coldOriginals": [
+          "docs\\CI_VENDOR_WHEELS.md#chunk-1"
+        ],
+        "summary": "sourceRefs=1; atlas=1; sourceRefMap=1",
+        "metrics": {
+          "sourceRefCount": 1,
+          "atlasCount": 1,
+          "mapCount": 1,
+          "cardIdCount": 2
+        },
+        "joinSpine": {
+          "sourceRef": "docs/ci_vendor_wheels.md",
+          "feature_id": "sourceRef.pathmap",
+          "parent_atlas_card_id": "b71cdaa5d570be7a"
+        }
+      }
+    ],
+    "pathPackets": [
+      {
+        "schemaVersion": "sourceRef.parent.join.packet.v1",
+        "packetId": "srpkt_8be3c96e2a19e525",
+        "title_id": "8be3c96e2a19e525",
+        "title": "database @ drizzle/manual",
+        "feature_id": "database",
+        "sourceRef": "drizzle/manual",
+        "sourceRefs": [
+          "drizzle/manual/0010_distilled_table_store.sql",
+          "drizzle/manual/0016_cluster_centroids.sql",
+          "drizzle/manual/0018_ace_observability_canonicalize.sql",
+          "drizzle/manual/0029_align_userid_sidecar.sql",
+          "drizzle/manual/0029_align_userid_validation.sql",
+          "drizzle/manual/0099_ff1_engine.sql",
+          "drizzle/manual/10000_create_parent_atlas_jobs.sql",
+          "drizzle/manual/20251207_phase78_fk_fixes.sql"
+        ],
+        "coldOriginals": [
+          "drizzle/manual/0010_distilled_table_store.sql",
+          "drizzle/manual/0016_cluster_centroids.sql",
+          "drizzle/manual/0018_ace_observability_canonicalize.sql",
+          "drizzle/manual/0029_align_userid_sidecar.sql",
+          "drizzle/manual/0029_align_userid_validation.sql",
+          "drizzle/manual/0099_ff1_engine.sql",
+          "drizzle/manual/10000_create_parent_atlas_jobs.sql",
+          "drizzle/manual/20251207_phase78_fk_fixes.sql"
+        ],
+        "summary": "files=86; importErrors=0; resolved=0",
+        "metrics": {
+          "fileCount": 86,
+          "importErrorCount": 0,
+          "resolvedCount": 0,
+          "totalLines": 6119,
+          "staticImportCount": 0
+        },
+        "joinSpine": {
+          "file_path": "drizzle/manual",
+          "stableKeys": [
+            "a558e8386253",
+            "044da0fc904f",
+            "50e4307a6068",
+            "01ba64411872",
+            "02ae1b6fcf53",
+            "c7a6998771f8",
+            "f45dbebd6058",
+            "974b2b1e4f8c"
+          ],
+          "sourceRef": "drizzle/manual",
+          "feature_id": "database"
+        }
+      },
+      {
+        "schemaVersion": "sourceRef.parent.join.packet.v1",
+        "packetId": "srpkt_b0fa32e59247fc60",
+        "title_id": "b0fa32e59247fc60",
+        "title": "unclassified @ src/lib/server/ai",
+        "feature_id": "unclassified",
+        "sourceRef": "src/lib/server/ai",
+        "sourceRefs": [
+          "src/lib/server/ai/mcp-tool-dispatch.ts",
+          "src/lib/server/ai/openai-facade.ts",
+          "src/lib/server/ai/gemma4.ts",
+          "src/lib/server/ai/engram-registry.ts",
+          "src/lib/server/ai/ace-prompt-preflight.ts",
+          "src/lib/server/ai/agent-worker.ts",
+          "src/lib/server/ai/code-intel-service.ts",
+          "src/lib/server/ai/gemma4-tool-controller.ts"
+        ],
+        "coldOriginals": [
+          "src/lib/server/ai/mcp-tool-dispatch.ts",
+          "src/lib/server/ai/openai-facade.ts",
+          "src/lib/server/ai/gemma4.ts",
+          "src/lib/server/ai/engram-registry.ts",
+          "src/lib/server/ai/ace-prompt-preflight.ts",
+          "src/lib/server/ai/agent-worker.ts",
+          "src/lib/server/ai/code-intel-service.ts",
+          "src/lib/server/ai/gemma4-tool-controller.ts"
+        ],
+        "summary": "files=78; importErrors=1; resolved=196",
+        "metrics": {
+          "fileCount": 78,
+          "importErrorCount": 1,
+          "resolvedCount": 196,
+          "totalLines": 15202,
+          "staticImportCount": 197
+        },
+        "joinSpine": {
+          "file_path": "src/lib/server/ai",
+          "stableKeys": [
+            "f201bc410b4e",
+            "84125b59d99c",
+            "06bedb477f20",
+            "0fa319808ffc",
+            "a722fc17bf2a",
+            "f2e5f9ff3fa9",
+            "fe011589683d",
+            "2a60ccdd2a62"
+          ],
+          "sourceRef": "src/lib/server/ai",
+          "feature_id": "unclassified"
+        }
+      },
+      {
+        "schemaVersion": "sourceRef.parent.join.packet.v1",
+        "packetId": "srpkt_1fd3b29c9a03a1c8",
+        "title_id": "1fd3b29c9a03a1c8",
+        "title": "database @ src/lib/server/db/schema",
+        "feature_id": "database",
+        "sourceRef": "src/lib/server/db/schema",
+        "sourceRefs": [
+          "src/lib/server/db/schema/index.ts",
+          "src/lib/server/db/schema/legal-relations.ts",
+          "src/lib/server/db/schema/case-library-links.ts",
+          "src/lib/server/db/schema/legal-nodes.ts",
+          "src/lib/server/db/schema/search-analytics.ts",
+          "src/lib/server/db/schema/codebase-embeddings.ts",
+          "src/lib/server/db/schema/context-timeline.ts",
+          "src/lib/server/db/schema/evidence-multi-modal.ts"
+        ],
+        "coldOriginals": [
+          "src/lib/server/db/schema/index.ts",
+          "src/lib/server/db/schema/legal-relations.ts",
+          "src/lib/server/db/schema/case-library-links.ts",
+          "src/lib/server/db/schema/legal-nodes.ts",
+          "src/lib/server/db/schema/search-analytics.ts",
+          "src/lib/server/db/schema/codebase-embeddings.ts",
+          "src/lib/server/db/schema/context-timeline.ts",
+          "src/lib/server/db/schema/evidence-multi-modal.ts"
+        ],
+        "summary": "files=71; importErrors=0; resolved=180",
+        "metrics": {
+          "fileCount": 71,
+          "importErrorCount": 0,
+          "resolvedCount": 180,
+          "totalLines": 3962,
+          "staticImportCount": 180
+        },
+        "joinSpine": {
+          "file_path": "src/lib/server/db/schema",
+          "stableKeys": [
+            "21331a1601fb",
+            "aabdd337edf4",
+            "c75691ec9669",
+            "27dda3cb6e90",
+            "c4e5e54df894",
+            "c859261a3edc",
+            "d4d01e702204",
+            "374a7e1c2aac"
+          ],
+          "sourceRef": "src/lib/server/db/schema",
+          "feature_id": "database"
+        }
+      },
+      {
+        "schemaVersion": "sourceRef.parent.join.packet.v1",
+        "packetId": "srpkt_2b9e8f3c7c796b82",
+        "title_id": "2b9e8f3c7c796b82",
+        "title": "rag @ src/lib/server/retrieval",
+        "feature_id": "rag",
+        "sourceRef": "src/lib/server/retrieval",
+        "sourceRefs": [
+          "src/lib/server/retrieval/hyperrag-fusion-service.ts",
+          "src/lib/server/retrieval/orchestrator.ts",
+          "src/lib/server/retrieval/cross-encoder-reranker.ts",
+          "src/lib/server/retrieval/encoded-cluster-prefilter.ts",
+          "src/lib/server/retrieval/summary-card-retrieval.ts",
+          "src/lib/server/retrieval/centroid-cache.ts",
+          "src/lib/server/retrieval/graph-context.ts",
+          "src/lib/server/retrieval/graph-informed-retrieval.ts"
+        ],
+        "coldOriginals": [
+          "src/lib/server/retrieval/hyperrag-fusion-service.ts",
+          "src/lib/server/retrieval/orchestrator.ts",
+          "src/lib/server/retrieval/cross-encoder-reranker.ts",
+          "src/lib/server/retrieval/encoded-cluster-prefilter.ts",
+          "src/lib/server/retrieval/summary-card-retrieval.ts",
+          "src/lib/server/retrieval/centroid-cache.ts",
+          "src/lib/server/retrieval/graph-context.ts",
+          "src/lib/server/retrieval/graph-informed-retrieval.ts"
+        ],
+        "summary": "files=65; importErrors=0; resolved=164",
+        "metrics": {
+          "fileCount": 65,
+          "importErrorCount": 0,
+          "resolvedCount": 164,
+          "totalLines": 11819,
+          "staticImportCount": 164
+        },
+        "joinSpine": {
+          "file_path": "src/lib/server/retrieval",
+          "stableKeys": [
+            "8bacc7703ade",
+            "2d04bab37871",
+            "9e0eef135935",
+            "2a09a6a95be7",
+            "954c68c32b69",
+            "ada772f91ae2",
+            "0af32f3c0ff7",
+            "0eb4dee3e52d"
+          ],
+          "sourceRef": "src/lib/server/retrieval",
+          "feature_id": "rag"
+        }
+      },
+      {
+        "schemaVersion": "sourceRef.parent.join.packet.v1",
+        "packetId": "srpkt_b79360bbb132362f",
+        "title_id": "b79360bbb132362f",
+        "title": "unclassified @ src/lib/server/ace",
+        "feature_id": "unclassified",
+        "sourceRef": "src/lib/server/ace",
+        "sourceRefs": [
+          "src/lib/server/ace/self-prompt.ts",
+          "src/lib/server/ace/codeintel-datastore.ts",
+          "src/lib/server/ace/auto-tagger.ts",
+          "src/lib/server/ace/gemma4-codeintel.ts",
+          "src/lib/server/ace/ace-agent.ts",
+          "src/lib/server/ace/ace-error-kag.ts",
+          "src/lib/server/ace/ace-wiki.ts",
+          "src/lib/server/ace/hmm-wiki-logger.ts"
+        ],
+        "coldOriginals": [
+          "src/lib/server/ace/self-prompt.ts",
+          "src/lib/server/ace/codeintel-datastore.ts",
+          "src/lib/server/ace/auto-tagger.ts",
+          "src/lib/server/ace/gemma4-codeintel.ts",
+          "src/lib/server/ace/ace-agent.ts",
+          "src/lib/server/ace/ace-error-kag.ts",
+          "src/lib/server/ace/ace-wiki.ts",
+          "src/lib/server/ace/hmm-wiki-logger.ts"
+        ],
+        "summary": "files=52; importErrors=0; resolved=106",
+        "metrics": {
+          "fileCount": 52,
+          "importErrorCount": 0,
+          "resolvedCount": 106,
+          "totalLines": 10435,
+          "staticImportCount": 106
+        },
+        "joinSpine": {
+          "file_path": "src/lib/server/ace",
+          "stableKeys": [
+            "21ca92a711bc",
+            "498c88ece8c4",
+            "bde9395ed47c",
+            "151adaeea622",
+            "5b474e513167",
+            "0bfec728e929",
+            "9d84254b6601",
+            "8724e94eab8c"
+          ],
+          "sourceRef": "src/lib/server/ace",
+          "feature_id": "unclassified"
+        }
+      },
+      {
+        "schemaVersion": "sourceRef.parent.join.packet.v1",
+        "packetId": "srpkt_ab7e18c489283be3",
+        "title_id": "ab7e18c489283be3",
+        "title": "database @ drizzle",
+        "feature_id": "database",
+        "sourceRef": "drizzle",
+        "sourceRefs": [
+          "drizzle/schema-contextual-chat.ts",
+          "drizzle/relations.ts",
+          "drizzle/schema.ts",
+          "drizzle/schema-user-intent.ts",
+          "drizzle/0000_puzzling_mongu.sql",
+          "drizzle/0002_calm_human_cannonball.sql",
+          "drizzle/0003_powerful_nebula.sql",
+          "drizzle/0004_strong_mindworm.sql"
+        ],
+        "coldOriginals": [
+          "drizzle/schema-contextual-chat.ts",
+          "drizzle/relations.ts",
+          "drizzle/schema.ts",
+          "drizzle/schema-user-intent.ts",
+          "drizzle/0000_puzzling_mongu.sql",
+          "drizzle/0002_calm_human_cannonball.sql",
+          "drizzle/0003_powerful_nebula.sql",
+          "drizzle/0004_strong_mindworm.sql"
+        ],
+        "summary": "files=48; importErrors=0; resolved=8",
+        "metrics": {
+          "fileCount": 48,
+          "importErrorCount": 0,
+          "resolvedCount": 8,
+          "totalLines": 5196,
+          "staticImportCount": 8
+        },
+        "joinSpine": {
+          "file_path": "drizzle",
+          "stableKeys": [
+            "0defdd4a2083",
+            "fae1915fc2ee",
+            "ddec1954e6ff",
+            "34a170d1929c",
+            "5389c4e6cbb7",
+            "50964ce7fcce",
+            "e7baf6b98bd9",
+            "99c1b95aae5c"
+          ],
+          "sourceRef": "drizzle",
+          "feature_id": "database"
+        }
+      },
+      {
+        "schemaVersion": "sourceRef.parent.join.packet.v1",
+        "packetId": "srpkt_31012a52fcd462cd",
+        "title_id": "31012a52fcd462cd",
+        "title": "unclassified @ src/lib/types",
+        "feature_id": "unclassified",
+        "sourceRef": "src/lib/types",
+        "sourceRefs": [
+          "src/lib/types/server.d.ts",
+          "src/lib/types/index.ts",
+          "src/lib/types/enhanced-svelte5-types.ts",
+          "src/lib/types/browser-context.ts",
+          "src/lib/types/evidence.ts",
+          "src/lib/types/global.ts",
+          "src/lib/types/missing-modules.d.ts",
+          "src/lib/types/protocol.ts"
+        ],
+        "coldOriginals": [
+          "src/lib/types/server.d.ts",
+          "src/lib/types/index.ts",
+          "src/lib/types/enhanced-svelte5-types.ts",
+          "src/lib/types/browser-context.ts",
+          "src/lib/types/evidence.ts",
+          "src/lib/types/global.ts",
+          "src/lib/types/missing-modules.d.ts",
+          "src/lib/types/protocol.ts"
+        ],
+        "summary": "files=45; importErrors=1; resolved=17",
+        "metrics": {
+          "fileCount": 45,
+          "importErrorCount": 1,
+          "resolvedCount": 17,
+          "totalLines": 5729,
+          "staticImportCount": 18
+        },
+        "joinSpine": {
+          "file_path": "src/lib/types",
+          "stableKeys": [
+            "ea651229eb6d",
+            "bc0c3c3c93cc",
+            "f4d9c27e11f7",
+            "763ce9b3c93b",
+            "7465d10cebeb",
+            "5a29b1c98336",
+            "77e019561b1d",
+            "a4185eca8823"
+          ],
+          "sourceRef": "src/lib/types",
+          "feature_id": "unclassified"
+        }
+      },
+      {
+        "schemaVersion": "sourceRef.parent.join.packet.v1",
+        "packetId": "srpkt_43627e7ba88e8bcc",
+        "title_id": "43627e7ba88e8bcc",
+        "title": "database @ drizzle/archived",
+        "feature_id": "database",
+        "sourceRef": "drizzle/archived",
+        "sourceRefs": [
+          "drizzle/archived/0001_abandoned_satana.sql",
+          "drizzle/archived/0001_add_evidence_schema.sql",
+          "drizzle/archived/0001_case_reporter_schema.sql",
+          "drizzle/archived/0001_create_documents.sql",
+          "drizzle/archived/0001_nice_omega_sentinel.sql",
+          "drizzle/archived/0004_case_notes.sql",
+          "drizzle/archived/0005_case_note_refs.sql",
+          "drizzle/archived/0006_case_notes_fts.sql"
+        ],
+        "coldOriginals": [
+          "drizzle/archived/0001_abandoned_satana.sql",
+          "drizzle/archived/0001_add_evidence_schema.sql",
+          "drizzle/archived/0001_case_reporter_schema.sql",
+          "drizzle/archived/0001_create_documents.sql",
+          "drizzle/archived/0001_nice_omega_sentinel.sql",
+          "drizzle/archived/0004_case_notes.sql",
+          "drizzle/archived/0005_case_note_refs.sql",
+          "drizzle/archived/0006_case_notes_fts.sql"
+        ],
+        "summary": "files=43; importErrors=0; resolved=0",
+        "metrics": {
+          "fileCount": 43,
+          "importErrorCount": 0,
+          "resolvedCount": 0,
+          "totalLines": 7634,
+          "staticImportCount": 0
+        },
+        "joinSpine": {
+          "file_path": "drizzle/archived",
+          "stableKeys": [
+            "ceb6c3d659b0",
+            "12cddac306ea",
+            "fb8a736b1a68",
+            "4ef76b1a9280",
+            "6ffda120569f",
+            "3ff0270288a1",
+            "26ab8c945c52",
+            "8d656464b091"
+          ],
+          "sourceRef": "drizzle/archived",
+          "feature_id": "database"
+        }
+      },
+      {
+        "schemaVersion": "sourceRef.parent.join.packet.v1",
+        "packetId": "srpkt_0bff1904835e6aa2",
+        "title_id": "0bff1904835e6aa2",
+        "title": "unclassified @ src/lib/utils",
+        "feature_id": "unclassified",
+        "sourceRef": "src/lib/utils",
+        "sourceRefs": [
+          "src/lib/utils/dynamic-imports.ts",
+          "src/lib/utils/index.ts",
+          "src/lib/utils/security.ts",
+          "src/lib/utils/telemetry.ts",
+          "src/lib/utils/xstate-svelte5.svelte.ts",
+          "src/lib/utils/accessibility.ts",
+          "src/lib/utils/accessibleClick.ts",
+          "src/lib/utils/cn.ts"
+        ],
+        "coldOriginals": [
+          "src/lib/utils/dynamic-imports.ts",
+          "src/lib/utils/index.ts",
+          "src/lib/utils/security.ts",
+          "src/lib/utils/telemetry.ts",
+          "src/lib/utils/xstate-svelte5.svelte.ts",
+          "src/lib/utils/accessibility.ts",
+          "src/lib/utils/accessibleClick.ts",
+          "src/lib/utils/cn.ts"
+        ],
+        "summary": "files=38; importErrors=7; resolved=19",
+        "metrics": {
+          "fileCount": 38,
+          "importErrorCount": 7,
+          "resolvedCount": 19,
+          "totalLines": 7070,
+          "staticImportCount": 19
+        },
+        "joinSpine": {
+          "file_path": "src/lib/utils",
+          "stableKeys": [
+            "8f674ec86197",
+            "b0ad0e784303",
+            "dd012c087eee",
+            "316bfaeb5cc9",
+            "ded3b35b89d5",
+            "09a7ba56b391",
+            "6efa438af4d8",
+            "5fbab42960d2"
+          ],
+          "sourceRef": "src/lib/utils",
+          "feature_id": "unclassified"
+        }
+      },
+      {
+        "schemaVersion": "sourceRef.parent.join.packet.v1",
+        "packetId": "srpkt_358aa476d659030a",
+        "title_id": "358aa476d659030a",
+        "title": "unclassified @ src/lib/server",
+        "feature_id": "unclassified",
+        "sourceRef": "src/lib/server",
+        "sourceRefs": [
+          "src/lib/server/lucia.ts",
+          "src/lib/server/batch-embedder.ts",
+          "src/lib/server/mcp-bridge.ts",
+          "src/lib/server/yolo.ts",
+          "src/lib/server/mcp-client.ts",
+          "src/lib/server/minio-client.ts",
+          "src/lib/server/database-simple.js",
+          "src/lib/server/db-shim.ts"
+        ],
+        "coldOriginals": [
+          "src/lib/server/lucia.ts",
+          "src/lib/server/batch-embedder.ts",
+          "src/lib/server/mcp-bridge.ts",
+          "src/lib/server/yolo.ts",
+          "src/lib/server/mcp-client.ts",
+          "src/lib/server/minio-client.ts",
+          "src/lib/server/database-simple.js",
+          "src/lib/server/db-shim.ts"
+        ],
+        "summary": "files=36; importErrors=0; resolved=50",
+        "metrics": {
+          "fileCount": 36,
+          "importErrorCount": 0,
+          "resolvedCount": 50,
+          "totalLines": 6836,
+          "staticImportCount": 50
+        },
+        "joinSpine": {
+          "file_path": "src/lib/server",
+          "stableKeys": [
+            "4f6988b3149c",
+            "b70056c503f4",
+            "fc295cb94aeb",
+            "4f45d6a7d072",
+            "0203c2811233",
+            "ba049ca7e515",
+            "b9d118a5da28",
+            "a0baa9710a3a"
+          ],
+          "sourceRef": "src/lib/server",
+          "feature_id": "unclassified"
+        }
+      },
+      {
+        "schemaVersion": "sourceRef.parent.join.packet.v1",
+        "packetId": "srpkt_5b01520cdebabbfc",
+        "title_id": "5b01520cdebabbfc",
+        "title": "unclassified @ src/lib/server/db",
+        "feature_id": "unclassified",
+        "sourceRef": "src/lib/server/db",
+        "sourceRefs": [
+          "src/lib/server/db/mirror-query.ts",
+          "src/lib/server/db/unified-client.ts",
+          "src/lib/server/db/client.ts",
+          "src/lib/server/db/migrate.ts",
+          "src/lib/server/db/index.ts",
+          "src/lib/server/db/index-clean.ts",
+          "src/lib/server/db/pg.ts",
+          "src/lib/server/db/index-new.ts"
+        ],
+        "coldOriginals": [
+          "src/lib/server/db/mirror-query.ts",
+          "src/lib/server/db/unified-client.ts",
+          "src/lib/server/db/client.ts",
+          "src/lib/server/db/migrate.ts",
+          "src/lib/server/db/index.ts",
+          "src/lib/server/db/index-clean.ts",
+          "src/lib/server/db/pg.ts",
+          "src/lib/server/db/index-new.ts"
+        ],
+        "summary": "files=30; importErrors=1; resolved=87",
+        "metrics": {
+          "fileCount": 30,
+          "importErrorCount": 1,
+          "resolvedCount": 87,
+          "totalLines": 3728,
+          "staticImportCount": 88
+        },
+        "joinSpine": {
+          "file_path": "src/lib/server/db",
+          "stableKeys": [
+            "5ba588dc22ec",
+            "eb17f44c77ad",
+            "dea2c56dc7a0",
+            "302a4a5f7027",
+            "48954376c982",
+            "ab2bdad808bb",
+            "c943e67470e4",
+            "f3d5f06a17c9"
+          ],
+          "sourceRef": "src/lib/server/db",
+          "feature_id": "unclassified"
+        }
+      },
+      {
+        "schemaVersion": "sourceRef.parent.join.packet.v1",
+        "packetId": "srpkt_8b427d1b95698f91",
+        "title_id": "8b427d1b95698f91",
+        "title": "graph @ src/lib/server/graph",
+        "feature_id": "graph",
+        "sourceRef": "src/lib/server/graph",
+        "sourceRefs": [
+          "src/lib/server/graph/codebase-neo4j-sync.ts",
+          "src/lib/server/graph/gpu-graph-analysis.ts",
+          "src/lib/server/graph/ingestion-buffer-builder.ts",
+          "src/lib/server/graph/som-topology-pipeline.ts",
+          "src/lib/server/graph/codebase-cluster-detection.ts",
+          "src/lib/server/graph/community-graph.ts",
+          "src/lib/server/graph/missing-import-recommendations.ts",
+          "src/lib/server/graph/neo4j-jsonl-exporter.ts"
+        ],
+        "coldOriginals": [
+          "src/lib/server/graph/codebase-neo4j-sync.ts",
+          "src/lib/server/graph/gpu-graph-analysis.ts",
+          "src/lib/server/graph/ingestion-buffer-builder.ts",
+          "src/lib/server/graph/som-topology-pipeline.ts",
+          "src/lib/server/graph/codebase-cluster-detection.ts",
+          "src/lib/server/graph/community-graph.ts",
+          "src/lib/server/graph/missing-import-recommendations.ts",
+          "src/lib/server/graph/neo4j-jsonl-exporter.ts"
+        ],
+        "summary": "files=27; importErrors=0; resolved=73",
+        "metrics": {
+          "fileCount": 27,
+          "importErrorCount": 0,
+          "resolvedCount": 73,
+          "totalLines": 9700,
+          "staticImportCount": 73
+        },
+        "joinSpine": {
+          "file_path": "src/lib/server/graph",
+          "stableKeys": [
+            "ef0908b6ce39",
+            "7619b3f49de2",
+            "75eed74405f9",
+            "2107b95af1e7",
+            "d8336a8d1b6b",
+            "9977d22aef9a",
+            "5384ddd6a7b5",
+            "6124f9f7c4cb"
+          ],
+          "sourceRef": "src/lib/server/graph",
+          "feature_id": "graph"
+        }
+      }
+    ],
+    "features": [
+      {
+        "value": "unclassified",
+        "count": 1129
+      },
+      {
+        "value": "routes",
+        "count": 892
+      },
+      {
+        "value": "database",
+        "count": 394
+      },
+      {
+        "value": "ui",
+        "count": 168
+      },
+      {
+        "value": "rag",
+        "count": 151
+      },
+      {
+        "value": "admin",
+        "count": 140
+      },
+      {
+        "value": "cache",
+        "count": 126
+      },
+      {
+        "value": "graph",
+        "count": 115
+      },
+      {
+        "value": "vector",
+        "count": 77
+      },
+      {
+        "value": "llm",
+        "count": 51
+      },
+      {
+        "value": "auth",
+        "count": 27
+      }
+    ],
+    "directories": [
+      {
+        "value": "drizzle/manual",
+        "count": 105
+      },
+      {
+        "value": "src/lib/server/ai",
+        "count": 98
+      },
+      {
+        "value": "src/lib/server/db/schema",
+        "count": 82
+      },
+      {
+        "value": "src/lib/server",
+        "count": 72
+      },
+      {
+        "value": "src/lib/server/db",
+        "count": 70
+      },
+      {
+        "value": "src/lib/server/ace",
+        "count": 68
+      },
+      {
+        "value": "src/lib/server/retrieval",
+        "count": 66
+      },
+      {
+        "value": "src/lib/types",
+        "count": 55
+      },
+      {
+        "value": "drizzle",
+        "count": 54
+      },
+      {
+        "value": "drizzle/archived",
+        "count": 47
+      },
+      {
+        "value": "src/lib/utils",
+        "count": 45
+      },
+      {
+        "value": "src/lib/server/cache",
+        "count": 29
+      }
+    ]
+  },
+  "unmatched": {
+    "sourceRefMap": [],
+    "parentAtlas": [],
+    "pathRows": [
+      {
+        "stableKey": "69a256e07545",
+        "filePath": "src/lib/components/ui/index.ts",
+        "feature": "ui",
+        "importErrorCount": 42,
+        "lines": 83,
+        "extension": ".ts",
+        "directory": "src/lib/components/ui",
+        "staticImportCount": 43,
+        "resolvedCount": 1
+      },
+      {
+        "stableKey": "2008c51548ef",
+        "filePath": "src/lib/components/ui/gaming/n64/index.ts",
+        "feature": "ui",
+        "importErrorCount": 29,
+        "lines": 38,
+        "extension": ".ts",
+        "directory": "src/lib/components/ui/gaming/n64",
+        "staticImportCount": 30,
+        "resolvedCount": 1
+      },
+      {
+        "stableKey": "e5bfa1d615a1",
+        "filePath": "src/lib/components/ui/gaming/index.ts",
+        "feature": "ui",
+        "importErrorCount": 18,
+        "lines": 60,
+        "extension": ".ts",
+        "directory": "src/lib/components/ui/gaming",
+        "staticImportCount": 22,
+        "resolvedCount": 4
+      },
+      {
+        "stableKey": "d46f789cc148",
+        "filePath": "src/lib/components/ui/alert-dialog/index.js",
+        "feature": "ui",
+        "importErrorCount": 12,
+        "lines": 29,
+        "extension": ".js",
+        "directory": "src/lib/components/ui/alert-dialog",
+        "staticImportCount": 12,
+        "resolvedCount": 0
+      },
+      {
+        "stableKey": "a8939096ca48",
+        "filePath": "src/lib/icons/yorha/index.ts",
+        "feature": "unclassified",
+        "importErrorCount": 12,
+        "lines": 23,
+        "extension": ".ts",
+        "directory": "src/lib/icons/yorha",
+        "staticImportCount": 13,
+        "resolvedCount": 1
+      },
+      {
+        "stableKey": "43fa8b523273",
+        "filePath": "src/lib/components/ui/dialog/index.ts",
+        "feature": "ui",
+        "importErrorCount": 11,
+        "lines": 36,
+        "extension": ".ts",
+        "directory": "src/lib/components/ui/dialog",
+        "staticImportCount": 13,
+        "resolvedCount": 2
+      },
+      {
+        "stableKey": "76455727aa6b",
+        "filePath": "src/lib/index.ts",
+        "feature": "unclassified",
+        "importErrorCount": 8,
+        "lines": 111,
+        "extension": ".ts",
+        "directory": "src/lib",
+        "staticImportCount": 17,
+        "resolvedCount": 9
+      },
+      {
+        "stableKey": "fc7e65d4c227",
+        "filePath": "src/lib/components/ui/svelte5-index.ts",
+        "feature": "ui",
+        "importErrorCount": 8,
+        "lines": 62,
+        "extension": ".ts",
+        "directory": "src/lib/components/ui",
+        "staticImportCount": 11,
+        "resolvedCount": 3
+      },
+      {
+        "stableKey": "622703abaa52",
+        "filePath": "src/lib/components/codebase/index.ts",
+        "feature": "ui",
+        "importErrorCount": 8,
+        "lines": 15,
+        "extension": ".ts",
+        "directory": "src/lib/components/codebase",
+        "staticImportCount": 8,
+        "resolvedCount": 0
+      },
+      {
+        "stableKey": "8f674ec86197",
+        "filePath": "src/lib/utils/dynamic-imports.ts",
+        "feature": "unclassified",
+        "importErrorCount": 7,
+        "lines": 265,
+        "extension": ".ts",
+        "directory": "src/lib/utils",
+        "staticImportCount": 0,
+        "resolvedCount": 0
+      },
+      {
+        "stableKey": "694f66e087f2",
+        "filePath": "src/lib/server/services/knowledge-search/index.ts",
+        "feature": "unclassified",
+        "importErrorCount": 7,
+        "lines": 43,
+        "extension": ".ts",
+        "directory": "src/lib/server/services/knowledge-search",
+        "staticImportCount": 18,
+        "resolvedCount": 11
+      },
+      {
+        "stableKey": "b9c3a023e8eb",
+        "filePath": "src/lib/components/ui/table/index.ts",
+        "feature": "ui",
+        "importErrorCount": 7,
+        "lines": 21,
+        "extension": ".ts",
+        "directory": "src/lib/components/ui/table",
+        "staticImportCount": 7,
+        "resolvedCount": 0
+      },
+      {
+        "stableKey": "3b382c4718b6",
+        "filePath": "src/lib/components/API-CONTRACTS.md",
+        "feature": "ui",
+        "importErrorCount": 6,
+        "lines": 691,
+        "extension": ".md",
+        "directory": "src/lib/components",
+        "staticImportCount": 10,
+        "resolvedCount": 4
+      },
+      {
+        "stableKey": "0d28c36abba9",
+        "filePath": "src/lib/components/ui/card/index.ts",
+        "feature": "ui",
+        "importErrorCount": 6,
+        "lines": 28,
+        "extension": ".ts",
+        "directory": "src/lib/components/ui/card",
+        "staticImportCount": 6,
+        "resolvedCount": 0
+      },
+      {
+        "stableKey": "bf105bc7746f",
+        "filePath": "src/lib/components/ui/Card.js",
+        "feature": "ui",
+        "importErrorCount": 6,
+        "lines": 15,
+        "extension": ".js",
+        "directory": "src/lib/components/ui",
+        "staticImportCount": 7,
+        "resolvedCount": 1
+      },
+      {
+        "stableKey": "9d5eab8cd93e",
+        "filePath": "src/lib/components/ui/tabs/index.ts",
+        "feature": "ui",
+        "importErrorCount": 5,
+        "lines": 26,
+        "extension": ".ts",
+        "directory": "src/lib/components/ui/tabs",
+        "staticImportCount": 7,
+        "resolvedCount": 2
+      },
+      {
+        "stableKey": "4240c6b6b300",
+        "filePath": "src/lib/stores/unified/index.svelte.ts",
+        "feature": "unclassified",
+        "importErrorCount": 4,
+        "lines": 160,
+        "extension": ".ts",
+        "directory": "src/lib/stores/unified",
+        "staticImportCount": 5,
+        "resolvedCount": 1
+      },
+      {
+        "stableKey": "bfc8d5267ed2",
+        "filePath": "src/lib/components/ui/tooltip.ts",
+        "feature": "ui",
+        "importErrorCount": 4,
+        "lines": 15,
+        "extension": ".ts",
+        "directory": "src/lib/components/ui",
+        "staticImportCount": 4,
+        "resolvedCount": 0
+      },
+      {
+        "stableKey": "fc1261c5a690",
+        "filePath": "src/lib/cache/__tests__/cache.test.ts",
+        "feature": "cache",
+        "importErrorCount": 3,
+        "lines": 389,
+        "extension": ".ts",
+        "directory": "src/lib/cache/__tests__",
+        "staticImportCount": 2,
+        "resolvedCount": 2
+      },
+      {
+        "stableKey": "63d719092803",
+        "filePath": "src/lib/components/chat/README.md",
+        "feature": "ui",
+        "importErrorCount": 3,
+        "lines": 265,
+        "extension": ".md",
+        "directory": "src/lib/components/chat",
+        "staticImportCount": 4,
+        "resolvedCount": 1
+      },
+      {
+        "stableKey": "0f57fc3871cf",
+        "filePath": "src/lib/components/ui/progress/index.ts",
+        "feature": "ui",
+        "importErrorCount": 3,
+        "lines": 14,
+        "extension": ".ts",
+        "directory": "src/lib/components/ui/progress",
+        "staticImportCount": 3,
+        "resolvedCount": 0
+      },
+      {
+        "stableKey": "e7c1777f7ac6",
+        "filePath": "src/lib/components/ui/avatar/index.ts",
+        "feature": "ui",
+        "importErrorCount": 3,
+        "lines": 7,
+        "extension": ".ts",
+        "directory": "src/lib/components/ui/avatar",
+        "staticImportCount": 3,
+        "resolvedCount": 0
+      },
+      {
+        "stableKey": "b94f8a402143",
+        "filePath": "src/lib/components/dashboard/index.ts",
+        "feature": "ui",
+        "importErrorCount": 3,
+        "lines": 4,
+        "extension": ".ts",
+        "directory": "src/lib/components/dashboard",
+        "staticImportCount": 3,
+        "resolvedCount": 0
+      },
+      {
+        "stableKey": "504c954e5851",
+        "filePath": "src/lib/components/shells/index.ts",
+        "feature": "ui",
+        "importErrorCount": 3,
+        "lines": 4,
+        "extension": ".ts",
+        "directory": "src/lib/components/shells",
+        "staticImportCount": 3,
+        "resolvedCount": 0
+      },
+      {
+        "stableKey": "4e59778e30e7",
+        "filePath": "src/lib/cache/cache-service.svelte.ts",
+        "feature": "cache",
+        "importErrorCount": 2,
+        "lines": 351,
+        "extension": ".ts",
+        "directory": "src/lib/cache",
+        "staticImportCount": 3,
+        "resolvedCount": 1
+      },
+      {
+        "stableKey": "a7d9fc883472",
+        "filePath": "src/lib/server/cache/README.md",
+        "feature": "cache",
+        "importErrorCount": 2,
+        "lines": 351,
+        "extension": ".md",
+        "directory": "src/lib/server/cache",
+        "staticImportCount": 3,
+        "resolvedCount": 1
+      },
+      {
+        "stableKey": "7238991f5146",
+        "filePath": "src/routes/api/codebase-index/graph/+server.ts",
+        "feature": "graph",
+        "importErrorCount": 2,
+        "lines": 319,
+        "extension": ".ts",
+        "directory": "src/routes/api/codebase-index/graph",
+        "staticImportCount": 5,
+        "resolvedCount": 4
+      },
+      {
+        "stableKey": "d28285639a87",
+        "filePath": "src/lib/webgpu/wire-telemetry.ts",
+        "feature": "unclassified",
+        "importErrorCount": 2,
+        "lines": 51,
+        "extension": ".ts",
+        "directory": "src/lib/webgpu",
+        "staticImportCount": 1,
+        "resolvedCount": 0
+      },
+      {
+        "stableKey": "24e2ea99f6dc",
+        "filePath": "src/routes/api/debug/retrieval-comparison/+server.ts",
+        "feature": "rag",
+        "importErrorCount": 2,
+        "lines": 42,
+        "extension": ".ts",
+        "directory": "src/routes/api/debug/retrieval-comparison",
+        "staticImportCount": 4,
+        "resolvedCount": 2
+      },
+      {
+        "stableKey": "ff6fb2595768",
+        "filePath": "src/lib/components/ui/bits/index.ts",
+        "feature": "ui",
+        "importErrorCount": 2,
+        "lines": 22,
+        "extension": ".ts",
+        "directory": "src/lib/components/ui/bits",
+        "staticImportCount": 3,
+        "resolvedCount": 1
+      },
+      {
+        "stableKey": "048d90be6b83",
+        "filePath": "src/lib/components/cases/index.ts",
+        "feature": "ui",
+        "importErrorCount": 2,
+        "lines": 17,
+        "extension": ".ts",
+        "directory": "src/lib/components/cases",
+        "staticImportCount": 3,
+        "resolvedCount": 1
+      },
+      {
+        "stableKey": "d70fb9f2b96b",
+        "filePath": "src/lib/server/features/ai/ace/context-assembler.ts",
+        "feature": "unclassified",
+        "importErrorCount": 1,
+        "lines": 6470,
+        "extension": ".ts",
+        "directory": "src/lib/server/features/ai/ace",
+        "staticImportCount": 71,
+        "resolvedCount": 70
+      },
+      {
+        "stableKey": "f201bc410b4e",
+        "filePath": "src/lib/server/ai/mcp-tool-dispatch.ts",
+        "feature": "unclassified",
+        "importErrorCount": 1,
+        "lines": 1028,
+        "extension": ".ts",
+        "directory": "src/lib/server/ai",
+        "staticImportCount": 13,
+        "resolvedCount": 12
+      },
+      {
+        "stableKey": "bdc5e83f161c",
+        "filePath": "src/routes/api/admin/atlas/query/+server.ts",
+        "feature": "admin",
+        "importErrorCount": 1,
+        "lines": 542,
+        "extension": ".ts",
+        "directory": "src/routes/api/admin/atlas/query",
+        "staticImportCount": 4,
+        "resolvedCount": 3
+      },
+      {
+        "stableKey": "08ad554910f5",
+        "filePath": "src/lib/machines/evidence-analysis-machine.ts",
+        "feature": "unclassified",
+        "importErrorCount": 1,
+        "lines": 392,
+        "extension": ".ts",
+        "directory": "src/lib/machines",
+        "staticImportCount": 2,
+        "resolvedCount": 1
+      },
+      {
+        "stableKey": "7ca8960de2b9",
+        "filePath": "src/lib/stores/admin-chat-assistant.svelte.ts",
+        "feature": "admin",
+        "importErrorCount": 1,
+        "lines": 260,
+        "extension": ".ts",
+        "directory": "src/lib/stores",
+        "staticImportCount": 1,
+        "resolvedCount": 0
+      },
+      {
+        "stableKey": "e91bebba77c1",
+        "filePath": "src/lib/stores/knowledge-search.svelte.ts",
+        "feature": "unclassified",
+        "importErrorCount": 1,
+        "lines": 251,
+        "extension": ".ts",
+        "directory": "src/lib/stores",
+        "staticImportCount": 1,
+        "resolvedCount": 0
+      },
+      {
+        "stableKey": "f209dcd039dc",
+        "filePath": "src/lib/server/rg-atlas/run.ts",
+        "feature": "unclassified",
+        "importErrorCount": 1,
+        "lines": 197,
+        "extension": ".ts",
+        "directory": "src/lib/server/rg-atlas",
+        "staticImportCount": 12,
+        "resolvedCount": 11
+      },
+      {
+        "stableKey": "0eba0b550f78",
+        "filePath": "src/lib/server/db/archived-schemas/additional-tables.ts",
+        "feature": "database",
+        "importErrorCount": 1,
+        "lines": 182,
+        "extension": ".ts",
+        "directory": "src/lib/server/db/archived-schemas",
+        "staticImportCount": 2,
+        "resolvedCount": 1
+      },
+      {
+        "stableKey": "0f89a4c76a13",
+        "filePath": "src/lib/ClientEmbeddingGemma.README.md",
+        "feature": "unclassified",
+        "importErrorCount": 1,
+        "lines": 143,
+        "extension": ".md",
+        "directory": "src/lib",
+        "staticImportCount": 1,
+        "resolvedCount": 0
+      },
+      {
+        "stableKey": "d34fd2b9cd0d",
+        "filePath": "src/routes/api/test/webgpu-modules/+server.ts",
+        "feature": "routes",
+        "importErrorCount": 1,
+        "lines": 137,
+        "extension": ".ts",
+        "directory": "src/routes/api/test/webgpu-modules",
+        "staticImportCount": 3,
+        "resolvedCount": 3
+      },
+      {
+        "stableKey": "0f0d97befba4",
+        "filePath": "src/lib/stores/analytics.svelte.ts",
+        "feature": "unclassified",
+        "importErrorCount": 1,
+        "lines": 122,
+        "extension": ".ts",
+        "directory": "src/lib/stores",
+        "staticImportCount": 1,
+        "resolvedCount": 0
+      },
+      {
+        "stableKey": "0058cf595fd8",
+        "filePath": "src/lib/stores/user.migration-report.md",
+        "feature": "unclassified",
+        "importErrorCount": 1,
+        "lines": 93,
+        "extension": ".md",
+        "directory": "src/lib/stores",
+        "staticImportCount": 3,
+        "resolvedCount": 2
+      },
+      {
+        "stableKey": "5ba588dc22ec",
+        "filePath": "src/lib/server/db/mirror-query.ts",
+        "feature": "unclassified",
+        "importErrorCount": 1,
+        "lines": 86,
+        "extension": ".ts",
+        "directory": "src/lib/server/db",
+        "staticImportCount": 4,
+        "resolvedCount": 3
+      },
+      {
+        "stableKey": "8cbd85eb2ff3",
+        "filePath": "src/routes/(app)/cases/[id]/+layout.ts",
+        "feature": "routes",
+        "importErrorCount": 1,
+        "lines": 84,
+        "extension": ".ts",
+        "directory": "src/routes/(app)/cases/[id]",
+        "staticImportCount": 2,
+        "resolvedCount": 2
+      },
+      {
+        "stableKey": "549ff87cc0a3",
+        "filePath": "src/lib/server/atlas/master-feature-map.test.ts",
+        "feature": "unclassified",
+        "importErrorCount": 1,
+        "lines": 54,
+        "extension": ".ts",
+        "directory": "src/lib/server/atlas",
+        "staticImportCount": 4,
+        "resolvedCount": 3
+      },
+      {
+        "stableKey": "9c333276fdd4",
+        "filePath": "src/types/webgpu-shims.d.ts",
+        "feature": "unclassified",
+        "importErrorCount": 1,
+        "lines": 46,
+        "extension": ".ts",
+        "directory": "src/types",
+        "staticImportCount": 1,
+        "resolvedCount": 0
+      },
+      {
+        "stableKey": "48524c0073c4",
+        "filePath": "src/lib/server/atlas/drizzle-sidecar-policy.spec.ts",
+        "feature": "database",
+        "importErrorCount": 1,
+        "lines": 41,
+        "extension": ".ts",
+        "directory": "src/lib/server/atlas",
+        "staticImportCount": 1,
+        "resolvedCount": 1
+      },
+      {
+        "stableKey": "7206d23a9250",
+        "filePath": "src/types/ui-components.d.ts",
+        "feature": "ui",
+        "importErrorCount": 1,
+        "lines": 36,
+        "extension": ".ts",
+        "directory": "src/types",
+        "staticImportCount": 2,
+        "resolvedCount": 1
+      },
+      {
+        "stableKey": "d154185b17eb",
+        "filePath": "src/routes/(app)/cases/+page.ts",
+        "feature": "routes",
+        "importErrorCount": 1,
+        "lines": 30,
+        "extension": ".ts",
+        "directory": "src/routes/(app)/cases",
+        "staticImportCount": 3,
+        "resolvedCount": 2
+      }
+    ]
+  },
+  "docMatches": [
+    {
+      "id": "sourceRef_pathmap",
+      "label": "SourceRef / pathmap spine",
+      "fileCount": 380,
+      "sampleFiles": [
+        "docs/atlas-graph-plan-update.md",
+        "docs/atlas-runtime-intent-graph-architecture.md",
+        "docs/ai-os/opencode-mcp-atlas.md",
+        "docs/ATLAS-PHASES-ROADMAP-INDEX.md",
+        "memory/atlas-token-map.preview.json",
+        "memory/agent-runs/current-corpus-promotion-preflight.json",
+        "memory/graph/deep-node-relations.jsonl",
+        "memory/atlas/documents-atlas.latest.md",
+        "docs/architecture/agentic-error-proposal-flow.md",
+        "memory/datasets/llm_synthesis/2026-05-17.jsonl"
+      ],
+      "error": null
+    },
+    {
+      "id": "parent_atlas",
+      "label": "Parent atlas / packet flow",
+      "fileCount": 1756,
+      "sampleFiles": [
+        "docs/atlas-graph-plan-update.md",
+        "docs/ARCHITECTURE_GUIDE_V1.md",
+        "docs/atlas/feature-registry.json",
+        "docs/atlas/cluster-cards.json",
+        "docs/6_1_26",
+        "docs/atlas/parent-atlas-storage-decision.md",
+        "docs/architecture/agentic-error-proposal-flow.md",
+        "docs/atlas/parent-atlas-data-spine.md",
+        "docs/architecture/cold-warm-hot-packet-lifecycle.md",
+        "docs/architecture/consolidation-and-schema-migration-checklist.md"
+      ],
+      "error": null
+    },
+    {
+      "id": "neo4j",
+      "label": "Neo4j contextual trees / multi-hop traversal",
+      "fileCount": 2626,
+      "sampleFiles": [
+        "docs/6_1_26",
+        "docs/ARCHITECTURE_GUIDE_V1.md",
+        "docs/archive/sessions/SESSION_SUMMARY_APRIL_9_2026.md",
+        "docs/atlas/cluster-cards.json",
+        "docs/atlas/atlas-nes-retokenization.md",
+        "docs/CODEBASE_DIRECTORY_MAP.md",
+        "docs/atlas/feature-registry.json",
+        "docs/atlas/export-cluster-worker.md",
+        "docs/NEXT-STEPS-IMPLEMENTATION-2026-05-29.md",
+        "docs/feature-pillar-barrel-migration.md"
+      ],
+      "error": null
+    },
+    {
+      "id": "qdrant",
+      "label": "Qdrant semantic analysis / clustering",
+      "fileCount": 2169,
+      "sampleFiles": [
+        "docs/6_1_26",
+        "docs/ai-os/opencode-mcp-atlas.md",
+        "docs/atlas-calls-extractor-implementation.md",
+        "docs/ATLAS-PHASES-ROADMAP-INDEX.md",
+        "docs/architecture/agentic-error-proposal-flow.md",
+        "docs/atlas-uses-db-extractor-implementation.md",
+        "docs/atlas-graph-plan-update.md",
+        "docs/archive/CRUD_OPERATIONS_AUDIT.md",
+        "docs/atlas-runtime-intent-graph-architecture.md",
+        "docs/archive/sessions/SESSION_SUMMARY_APRIL_9_2026.md"
+      ],
+      "error": null
+    },
+    {
+      "id": "redis",
+      "label": "Redis / Bitfrost cache lane",
+      "fileCount": 3992,
+      "sampleFiles": [
+        "docs/6_1_26",
+        "docs/atlas-graph-plan-update.md",
+        "docs/atlas-runtime-intent-graph-architecture.md",
+        "docs/atlas-calls-extractor-implementation.md",
+        "docs/atlas-uses-db-extractor-implementation.md",
+        "docs/ATLAS-PHASES-ROADMAP-INDEX.md",
+        "docs/ai-os/opencode-mcp-atlas.md",
+        "docs/CODEBASE-FEATURE-MAPPING-2026-05-29.md",
+        "docs/ATLAS_NEXT_PHASE_SUMMARY.md",
+        "docs/CODEBASE_DIRECTORY_MAP.md"
+      ],
+      "error": null
+    },
+    {
+      "id": "offline",
+      "label": "Offline processing / mapreduce / DuckDB",
+      "fileCount": 316,
+      "sampleFiles": [
+        "docs/atlas-graph-plan-update.md",
+        "docs/atlas-runtime-intent-graph-architecture.md",
+        "docs/atlas/cluster-cards.json",
+        "docs/ATLAS-PHASES-ROADMAP-INDEX.md",
+        "docs/atlas/atlas-nes-retokenization.md",
+        "docs/CI_VENDOR_WHEELS.md",
+        "docs/ATLAS_NEXT_PHASE_SUMMARY.md",
+        "docs/atlas-vendor-wheels.md",
+        "docs/atlas/feature-registry.json",
+        "memory/runs/claude-code/2026-06-02.jsonl"
+      ],
+      "error": null
+    }
+  ],
+  "inventory": {
+    "generated_at": "2026-06-01T08:25:00.000Z",
+    "goal": "SourceRef-first atlas join inventory",
+    "join_spine": [
+      "file_path",
+      "mapreduce stableKey",
+      "sourceRef",
+      "parent_atlas_card_id",
+      "alias_id",
+      "feature_id"
+    ],
+    "existing_artifacts": {
+      "mapreduce_and_path_map": [
+        ".tmp/mapreduce-full-v4.ndjson",
+        ".tmp/mapreduce-full-v4.ndjson.manifest.json",
+        ".tmp/path-map.json",
+        ".tmp/path-map.ndjson",
+        "scripts/atlas/mapreduce-consolidated-index.mjs",
+        "scripts/atlas/missing-features-review.mjs",
+        "docs/graph/missing-features-path-map.json",
+        "docs/graph/missing-features-path-map.md"
+      ],
+      "duckdb_and_parent_atlas": [
+        ".tmp/ingest/atlas.duckdb",
+        ".tmp/ingest/parent_atlas.parquet",
+        ".tmp/ingest/parent_atlas_full.parquet",
+        ".tmp/ingest/parent_atlas_gpu.ndjson",
+        ".tmp/ingest/parent_atlas_gpu.parquet",
+        ".tmp/parent-atlas-index.json",
+        ".tmp/parent-atlas-validation.json",
+        "memory/exports/parent-atlas/parent_atlas_index.json",
+        "docs/atlas/parent-atlas-data-spine.md",
+        "docs/architecture/offline-synthesis-parent-atlas.md"
+      ],
+      "qdrant_and_cache": [
+        "scripts/atlas/qdrant-path-bridge.mjs",
+        "docs/reports/qdrant-path-bridge-latest.json",
+        "docs/reports/qdrant-path-bridge-latest.md",
+        ".tmp/qdrant-postgres-mirror-reconciliation.json",
+        ".tmp/qdrant-postgres-mirror-reconciliation.md",
+        "sveltekit-frontend/src/lib/server/search/qdrant-search.ts",
+        "sveltekit-frontend/src/lib/server/cache/redis-semantic-cache.ts",
+        "sveltekit-frontend/src/lib/server/features/rag/codebase-context.ts"
+      ],
+      "neo4j_and_topology": [
+        "sveltekit-frontend/src/lib/server/graph/neo4j-gds.ts",
+        "sveltekit-frontend/src/lib/server/graph/som-topology-pipeline.ts",
+        "sveltekit-frontend/src/lib/server/graph/community-graph.ts",
+        "sveltekit-frontend/src/lib/server/features/rag/codebase-context.ts",
+        "docs/atlas/phase-20-training-readiness.md"
+      ],
+      "retrieval_and_recommendation": [
+        "scripts/ingest/retrieval-pass.mjs",
+        "scripts/ingest/rank-cards.mjs",
+        "scripts/ingest/compress-cards.mjs",
+        "scripts/ingest/rerank-cards.mjs",
+        "scripts/opencode/build-recommendations.mjs",
+        "docs/reports/retrieval-pass-dry-run.md",
+        ".tmp/retrieval-pass-dry-run.json",
+        ".tmp/retrieval-pass-dry-run.ndjson"
+      ],
+      "schema_and_alias": [
+        "sveltekit-frontend/src/lib/server/db/schema/tasks.ts",
+        "sveltekit-frontend/src/lib/server/db/schema/atlas-profile-store.ts",
+        "sveltekit-frontend/src/lib/server/db/schema/index.ts",
+        "sveltekit-frontend/drizzle/manual/20260601_task_semantic_packets_alias_id_and_atlas_profile_gin.sql",
+        ".tmp/alias-id-migration-preflight-report.json",
+        ".tmp/alias-id-migration-preflight-report.md",
+        "docs/reports/alias-id-readiness.json",
+        "docs/reports/alias-id-readiness.md"
+      ],
+      "provenance_and_join_aids": [
+        "docs/graph/missing-features-review-latest.json",
+        "docs/graph/missing-features-review-latest.md",
+        "docs/graph/missing-features-review-latest.svg",
+        ".tmp/atlas-token-map.jsonl",
+        ".tmp/atlas-token-map.md",
+        ".tmp/atlas-retrieval-loop.jsonl",
+        ".tmp/atlas-parent-join-readiness.json",
+        ".tmp/atlas-parent-join-readiness.md",
+        "docs/graph/kanban-board.json",
+        "docs/graph/kanban-parent-atlas-alignment.md"
+      ]
+    },
+    "notes": [
+      "Qdrant point ids are not the join key for atlas cards.",
+      "Use file_path / mapreduce stableKey / sourceRef to bridge into parent-atlas card identity.",
+      "alias_id is present in schema and read-only preflight, but should only be written through bounded promotion paths that preserve provenance.",
+      "PG18 remains a target shape; the repo currently has Postgres 18-friendly SQL sidecars and schema definitions, not a forced live upgrade."
+    ],
+    "next_safe_action": "Review the sourceRef-parent-join dry-run report, then use the packet manifests to keep cold originals archived and warm indexes compact without mutating Qdrant, Neo4j, Redis, or Postgres."
+  },
+  "notes": [
+    "Cold originals stay in archive stores; the packet report points back to them.",
+    "The join spine remains file_path -> stableKey -> sourceRef -> feature_id -> packetId.",
+    "Qdrant point ids are not the join key.",
+    "Redis/Bitfrost is for exact-hit reuse; Postgres/Qdrant/Neo4j are warm indexes, not source-of-truth."
+  ]
+}

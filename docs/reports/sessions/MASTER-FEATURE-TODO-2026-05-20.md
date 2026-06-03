@@ -23,17 +23,17 @@ Use this file as the primary checklist. Reference-only notes may remain in suppo
   - [ ] `som_topology_stats` — delegate to `gpu:som_topology` for Redis SOM grid / centroid stats
   - [ ] `language_distribution` — delegate to `gpu:language_distribution` for Qdrant cluster tag stats
   - [ ] `playbook_lookup_by_language` — use CouchDB `karpathy_wiki` plus top Karpathy file intersection
-  - [x] Hermes planner/tool registry already exposes these lanes; remaining work is OpenCode/Gemma4 exposure and lane productization, not new runtime implementation
+  - [x] OpenCode agents/skills already expose these lanes; Hermes is archived to the deeds_labs legacy surface, and the remaining work is OpenCode/Gemma4 exposure and lane productization, not new runtime implementation
   - [x] Register RabbitMQ `media.download` and `media.transcribe` queues in `src/lib/server/queue/rabbitmq-manager-fixed.ts`
-  - [ ] Route these tools into the correct skill families (`gpu-acceleration`, `vector-cluster`, `codebase`, `research`) without creating a parallel graph source of truth
+- [x] Route these tools into the correct skill families (`gpu-acceleration`, `vector-cluster`, `codebase`, `research`) without creating a parallel graph source of truth
 
-- [x] **Phase KG-6 (Hermes Tool Wiring)**
+- [x] **Phase KG-6 (legacy Hermes Tool Wiring / deeds_labs archive)**
   - [x] `attention_rank_files` — embed query → attentionScoreGPU via libtorch → top-N from Karpathy scores
   - [x] `som_topology_stats` — delegates to `gpu:som_topology` (Redis SOM grid/centroid stats)
   - [x] `language_distribution` — delegates to `gpu:language_distribution` (Qdrant cluster tags)
   - [x] `playbook_lookup_by_language` — CouchDB karpathy_wiki + top Karpathy file intersection
   - [x] Registered all 4 tools into appropriate skill families (gpu-acceleration, vector-cluster, codebase, research)
-  - [x] Updated Hermes planner system prompt with tool signatures
+  - [x] Updated the legacy Hermes planner system prompt with tool signatures; active usage now routes through OpenCode agents/skills
   - [x] TypeScript type check (task-655 succeeded)
 
 - [x] **Verification**
@@ -315,6 +315,7 @@ dependency graph, sourceRefs, startup context, package scripts.
 - [ ] Chunk the huge ripgrep search dumps (`docs/reports/rg_turbovec.txt`, `docs/reports/rg_napi.txt`) into parent-atlas-ready packets keyed by `title_id`, `feature_id`, and `sourceRef`; treat the raw `.txt` dumps as generated evidence, not source.
 - [ ] Use the Obsidian-vault mirror as a downstream indexing surface only: ingest source files first, then pull the minimum mirror summaries needed to advance `next_steps/active/` and the parent atlas.
 - [ ] Use LangExtract to summarize source files, parent-atlas packets, and selected Obsidian mirror summaries into completion notes before archiving any stale generated tree.
+- [ ] Keep the repo minification split explicit: SeaweedFS (cold originals), Postgres/Qdrant/Neo4j/Redis (warm packets and indexes), and only completion notes plus active packet manifests in the repo.
 - [ ] Keep only production-readiness completion notes active (`docs/reports/phase-101-closeout.md`, `docs/reports/phase-102-handoff.md`); archive superseded generated reports, mirror trees, and raw search dumps after their content has been promoted.
 - [x] Rebuild the parent atlas from the production-ready feature list after archive decisions land.
   - `docs/reports/repo-dirty-tree-classification-2026-06-01.{json,md}`
@@ -329,6 +330,20 @@ dependency graph, sourceRefs, startup context, package scripts.
 - [ ] Re-run `scripts/atlas/classify-dirty-tree.mjs` before any archive move so the dirty tree is separated into generated artifacts, source changes, large blobs, and submodule dirtiness.
 - [ ] Review `scripts/atlas/plan-archive-moves.mjs` and its report output before any archive operation; summarize promoted content with LangExtract first, then archive stale generated material.
 - [ ] Use `scripts/atlas/doc-feature-crosswalk.mjs` to keep docs aligned to the sourceRef/pathmap spine for Neo4j, Qdrant, Redis, TurboVec, and offline-processing traversals.
+- [x] Generate the dry-run sourceRef-parent join report and use its packet manifests to keep cold originals archived while warm indexes stay compact.
+  - `scripts/atlas/sourceRef-parent-join-dry-run.mjs`
+  - report: `docs/reports/sourceRef-parent-join-dry-run.{json,md}`
+  - packet manifests: `.tmp/sourceRef-parent-join-packets.jsonl`
+  - dry-run run uses `rg -uu` plus the sourceRef/pathmap/parent-atlas artifacts to produce compact sourceRef-prefix clusters and path packets without mutating Qdrant, Neo4j, Redis, or Postgres
+- [x] Generate the sourceRef-parent archive plan from the dry-run join report and use it to separate keep-active index surfaces from summarize-then-archive evidence.
+  - `scripts/atlas/sourceRef-parent-join-archive-plan.mjs`
+  - report: `docs/reports/sourceRef-parent-join-archive-plan.{json,md}`
+  - the archive plan is read-only and only classifies move candidates; it does not move files
+- [x] Generate the sourceRef-parent archive move list from the archive plan so the summarize-then-archive bucket has explicit destinations.
+  - `scripts/atlas/sourceRef-parent-join-archive-move-list.mjs`
+  - report: `docs/reports/sourceRef-parent-join-archive-move-list.{json,md}`
+  - the move list is still read-only; it only categorizes files into archive destinations
+  - verified bucket split: `archive/review-needed/` (435), `archive/generated-reports/` (80), `archive/memory-exports/` (22), `archive/opencode-generated/` (6), `archive/obsidian-vault-mirror/` (5), `archive/model-blobs/` (2), `archive/legacy-doc-bundles/` (1), `archive/build-artifacts/` (1)
 - [ ] Refresh the all-lanes parent atlas build after the crosswalk and archive-plan reports land, then use the active TOC as the traversal entrypoint for codebase indexing.
 
 ## NES/Glyph Architecture Notes (SourceRef-First Atlas Join & Cards)
@@ -459,7 +474,7 @@ dependency graph, sourceRefs, startup context, package scripts.
 - [ ] Inventory the current `local-deep-research` compose and note the current boundary: local SQLite state on the research side, canonical backend stores in the repo.
 - [ ] Compare the local-deep-research container against the repo's current OpenCode/Gemma4 function-calling path and document the exact role split.
 - [ ] Recreate the `local-deep-research` container for GPU use when needed by bringing it up from the WSL2 GPU override path, then verify the host/container model boundary before promoting it to the checklist.
-- [ ] Align `local-deep-research` to an OpenAI-compatible `llama-server` endpoint when using `llama.cpp`; keep Hermes test-only unless it proves useful as a separate lane.
+- [ ] Align `local-deep-research` to an OpenAI-compatible `llama-server` endpoint when using `llama.cpp`; keep Hermes archived in deeds_labs/test-only unless it proves useful as a separate lane.
 - [ ] Add the export/import bridge that turns local SQLite research state into canonical backend rows before ACE packet generation.
 - [ ] Emit a canonical ACE packet from the LDR bridge with preserved `sourceRefs`, then warm the shared Redis ACE packet cache for OpenCode reuse.
 - [ ] Expose tuple metadata on the exact-match cache read path so front-door hits return the same envelope they store.
@@ -477,15 +492,44 @@ dependency graph, sourceRefs, startup context, package scripts.
   - current runtime note: the script runs successfully in report-only mode and records that one or both NES chrom relations are absent in the current local database
 - [x] Add the additive `research_summaries.source_ref` / `source_refs` migration and Drizzle schema bridge so local-deep-research provenance can land in durable rows and indexes.
 - [x] Apply the `research_summaries` provenance/index migration to the live 17.6 database and backfill the URL-backed rows.
-- [ ] Keep Qdrant as the default ANN service and treat cuVS/CAGRA as the future WSL2 experiment lane behind the same retrieval contract.
-- [x] Keep the ANN adapter boundary stable in `sveltekit-frontend/src/lib/server/search/qdrant-search.ts` and `src/lib/server/retrieval/orchestrator.ts` so cuVS can swap in later without changing callers.
-- [ ] Keep LangGraph optional as orchestration only; no direct DB/Qdrant writes from graph nodes.
-- [ ] Define the OpenCode-facing bridge so research queries can flow through TRACE MCP / function-caller without bypassing `sourceRef` provenance.
-- [ ] Store docs and large artifacts in SeaweedFS, not in the research container's local SQLite boundary.
+- [ ] Keep Qdrant as the default ANN service and treat cuVS/CAGRA or a small Rust gRPC ANN worker as the future experiment lane behind the same retrieval contract and result shape.
+  - Keep `sveltekit-frontend/src/lib/server/search/qdrant-search.ts` and `sveltekit-frontend/src/lib/server/retrieval/orchestrator.ts` as the stable retrieval abstraction boundary so cuVS/CAGRA can swap in later without changing callers.
+  - Current default: Qdrant for semantic lookup, payload filters, HNSW traversal, and quantized vector search.
+  - Future optional lane: cuVS/CAGRA or IVF variants as GPU ANN acceleration behind the same search interface.
+  - Rule: callers must request retrieval intent/results and must not depend on Qdrant-specific client details.
+- [ ] Keep the two-lane storage split explicit: cold originals and archives are immutable, warm packets/cards stay small and point back to them, hot cache stays transient, and Qdrant remains semantic lookup plus payload filters rather than the canonical store.
+- [ ] Use RabbitMQ as a work queue only with separate urgent / normal / bulk / dead-letter lanes; do not model it as one catch-all deque.
+- [ ] Archive originals only after SeaweedFS copy, checksum verification, Postgres ledger write, and archive-eligible marking.
+- [x] Add a 0-100 superseded score for originals so archive prioritization is based on duplicate detection, validation coverage, and `sourceRef` / `feature_id` resolution.
+  - candidate-only scorer: `scripts/packets/score-superseded-originals.mjs`
+  - outputs `.tmp/superseded-score-candidates.{json,md,ndjson}` and `.tmp/superseded-score-implementation-report.{json,md}`
+  - source-file candidates and generated-artifact candidates are scored in separate sections
+  - `delete_allowed` and `move_allowed` remain false for every row
+- [x] Generate a read-only, candidate-only superseded-score report that ranks dirty-tree and archive-plan candidates without moving or deleting anything.
+- [x] Fix G17 hardcoded localhost in `EnhancedLegalAIChatWithSynthesis.svelte` by routing browser requests through `/api/ollama/generate`.
+- [x] Add G18 startup truth gate checks for GPU bridge live count, Postgres 18.x, `parent_atlas_documents`, `alias_id`, and Redis auth/protected-mode.
+- [x] Wire the GPU bridge probe into VS Code startup and log results to `logs/task-output/startup-gpu-bridge-probe.log`.
+- [ ] Keep `parent_atlas_documents` population gated by promote-to-postgres dry-run/apply until the first bounded batch reconciles.
+- [x] Advance bounded offline synthesis promotion through `--limit 25 --offset 25`, `--limit 50 --offset 50`, and `--limit 50 --offset 75`; confirm the `qdrant-postgres-reconciliation` dry-run stays clean.
+- [x] Confirm Redis auth or protected-mode so the new startup truth gate clears its final blocker.
+- [x] Clear ACE/Vite health so `startup-truth.mjs` can pass end to end instead of failing closed on `api.health.unavailable`.
+  - startup truth is now green with the Valkey bundle and the widened `/api/health` timeout
+  - [x] Keep the ANN adapter boundary stable in `sveltekit-frontend/src/lib/server/search/qdrant-search.ts` and `src/lib/server/retrieval/orchestrator.ts` so cuVS can swap in later without changing callers.
+  - [x] Add the optional TurboVec seam behind `searchCodebaseAnn()` so a Rust/N-API backend or TurboVec sidecar rerank can be enabled without changing SvelteKit callers; Qdrant remains the default backend.
+    - the seam now includes GPU-safe load shedding and SOM/AE-aware rerank for oversubscribed batches
+  - [x] Add a backend-toggle smoke (`scripts/smoke/turbovec-ann-backend-smoke.mjs`) so the default Qdrant vs `CODEBASE_ANN_BACKEND=turbovec` selection stays testable without loading the full ANN stack.
+- [ ] Keep LangGraph optional as orchestration only.
+  - LangGraph nodes may validate, route, inspect, and call Gemma4/function tools.
+  - LangGraph nodes must not directly write to Postgres, Qdrant, Redis, Neo4j, DuckDB, or SeaweedFS.
+  - Durable writes must go through existing promotion queues, validation gates, and bounded apply scripts.
+  - LangGraph is for agentic testing/planning/subagent coordination, not a replacement for SvelteKit routes, MCP tools, or the promotion ledger.
+- [x] Define the OpenCode-facing bridge so research queries can flow through TRACE MCP / function-caller without bypassing `sourceRef` provenance.
+- [x] Store docs and large artifacts in SeaweedFS, not in the research container's local SQLite boundary.
 - [ ] Summarize docs with Gemma4 and persist the compact outputs into Postgres 18 deep_research tables with JSONB / pgvector where appropriate.
 - [ ] Keep BM25 and LangExtract as the lexical/provenance enrichment pass before the final recommendation fusion.
+- [x] Treat TurboVec, LlamaIndex, LangChain, and LangGraph as adapters only; the boundary is documented in `docs/architecture/dual-lane-hot-brain-cold-queue.md`.
 - [ ] Document the WSL2 GPU override as optional deployment flavor only; default to host-side CUDA inference when it is already available.
-- [ ] Emit a short comparison note for Gemma4 vs Hermes vs local-deep-research so the assistant path stays explicit.
+- [ ] Emit a short comparison note for Gemma4 vs Hermes-archive (deeds_labs) vs local-deep-research so the assistant path stays explicit.
 - [ ] Re-run the assistant-path comparison after each boundary change and record the result in `IMPLEMENTATION_STATUS.md`.
 
 **Rules**:
@@ -805,9 +849,19 @@ User intent
 This section is the current gap list for the parent-atlas and codebase-indexing lane. It is intentionally separate from the completed phase summaries above so the remaining work stays visible.
 
 ### Open promotion work
-- [ ] Run the full current-corpus offline ingest in bounded chunks until the full scan is promoted, not just summarized
-  - current scan scope is about 133k indexable files
-  - keep the write path bounded and resumable
+- [ ] Continue current-corpus offline ingest in bounded chunks until the full scan is promoted, not merely summarized.
+  - Current scan scope is about 133k indexable files.
+  - Promotion gates are green for bounded apply only.
+  - Required cadence:
+    1. run small bounded apply slice
+    2. run Qdrant/Postgres/Neo4j/Redis reconciliation
+    3. update promotion status
+    4. widen only if reports remain green
+  - Do not jump directly to broad/unbounded apply.
+- [ ] Keep `parent_atlas_documents` population separate from schema readiness.
+  - Table and indexes exist.
+  - Population must proceed through bounded promotion slices.
+  - Duplicate rel/sourceRef cases must use explicit upsert/dedupe strategy, not blind inserts.
 - [ ] Promote validated offline outputs into the durable stores only after validation passes
   - Postgres
   - Qdrant
@@ -835,11 +889,27 @@ This section is the current gap list for the parent-atlas and codebase-indexing 
   - re-run kanban-to-parent-atlas sync after archive decisions are made
 
 ### Archive / retire after promotion
-- [ ] Archive redundant Svelte 5 runes carry-logic layers once the feature folders are stable
-- [ ] Archive redundant async SvelteKit RPC wrappers once the JSON-RPC 2.0 path is the single canonical route
+- [ ] Archive only after superseded-score and sourceRef validation gates pass.
+  - No file move/delete is allowed from score alone.
+  - Required before any move:
+    1. validated warm packets/cards
+    2. sourceRef coverage
+    3. feature_id/workspace_task_id coverage where applicable
+    4. cold copy candidate in SeaweedFS
+    5. checksum verification
+    6. Postgres ledger entry
+    7. restore manifest
+    8. manual/operator review
+  - `archive/review-needed/` remains blocked.
+  - Generated-report and memory-export buckets may receive reviewed dry-run move plans, but not automatic movement.
+- [ ] Archive redundant Svelte 5 runes carry-logic layers only after feature folders are stable and sourceRef-backed packets exist.
+- [ ] Archive dev MCP redundant async/SvelteKit RPC wrappers only after JSON-RPC 2.0 path is confirmed as the canonical agent-testing route.
+  - SvelteKit 2 keeps its own app routing pipeline.
+  - MCP/JSON-RPC is for agentic testing/tooling, not a replacement for user-facing SvelteKit routes.
 - [ ] Archive duplicate JSON-RPC 2.0 shim logic after the canonical handler is confirmed
 - [ ] Archive deep Drizzle audit artifacts after the schema/migration plan is signed off
 - [ ] Archive stale or duplicate feature implementations after the parent atlas tags them as production-ready or redundant
+- [ ] Archive originals only after SeaweedFS copy, checksum verification, Postgres ledger write, and sourceRef / feature_id resolution are complete
 
 ### Phase 1-20 rollup gaps still open
 - [ ] Phase 20 A6000 training lane

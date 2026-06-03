@@ -96,7 +96,11 @@ const CODE_EXTENSIONS = new Set([
 const DEFAULT_IGNORE_PATTERNS = [
   'node_modules', '.svelte-kit', 'build', 'dist', '.git',
   'deeds_labs', 'phase104-backups', 'scripts/tests/screenshots',
-  '.cache', '.tmp', 'logs', 'coverage', '.qdrant'
+  '.cache', '.tmp', 'logs', 'coverage', '.qdrant',
+  '.venv', '.venv-py313-backup',
+  'granite-docling-258M',
+  '__pycache__', '.pytest_cache',
+  'static', // WASM/ONNX/model binaries — not source code
 ];
 const IGNORE_PATTERNS = customExcludes.length > 0 ? customExcludes : DEFAULT_IGNORE_PATTERNS;
 

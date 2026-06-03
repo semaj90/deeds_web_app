@@ -1,25 +1,25 @@
 # Offline Synthesis MapReduce DuckDB
 
-Generated: 2026-06-02T04:27:25.313Z
+Generated: 2026-06-03T04:05:42.227Z
 Mode: WRITE
 
 ## Summary
-- rows: 25
-- files: 25
+- rows: 50
+- files: 50
 - features: 5
 - static imports: 10
 - dynamic imports: 0
 
 ## Top Features
+- unclassified: 34
 - cache: 12
-- unclassified: 10
+- ui: 2
 - admin: 1
-- ui: 1
 - rag: 1
 
 ## Top Extensions
-- .md: 13
-- .json: 11
+- .json: 30
+- .md: 19
 - .ts: 1
 
 ## Notes

@@ -64,16 +64,65 @@ extern "C" int graphSimilarityHalf(const float* embeddings, int n, int dim, floa
   return graphSimilarity(embeddings, n, dim, output, output_len);
 }
 
+// batchCosineSimilarity — LibTorch cuBLAS GEMM path with pinned host memory.
+//
+// Uses torch::mm() which dispatches to cuBLAS SGEMM on GPU (RTX 3060 Ti SM 8.6).
+// Pinned (page-locked) host memory is allocated once per call via
+// torch::from_blob on a pinned tensor — enabling async DMA (H2D/D2H overlap).
+// Normalisation is done on-device before GEMM to avoid a second pass.
+// Falls back to scalar CPU loop when CUDA unavailable.
 extern "C" int batchCosineSimilarity(const float* query, int dim, const float* corpus, int n, float* scores, int scores_len) {
   if (!query || !corpus || !scores) return -1;
   if (scores_len < n) return -2;
-  for (int i = 0; i < n; ++i) {
-    const float* c = corpus + (size_t)i * dim;
-    float dot = 0.0f, na = 0.0f, nb = 0.0f;
-    for (int d = 0; d < dim; ++d) { dot += query[d] * c[d]; na += query[d]*query[d]; nb += c[d]*c[d]; }
-    scores[i] = dot / (sqrtf(na) * sqrtf(nb) + 1e-12f);
+  if (n <= 0 || dim <= 0) return -3;
+
+  if (!torch::cuda::is_available()) {
+    // CPU scalar fallback (kept for correctness; matches original behaviour)
+    for (int i = 0; i < n; ++i) {
+      const float* c = corpus + (size_t)i * dim;
+      float dot = 0.0f, na = 0.0f, nb = 0.0f;
+      for (int d = 0; d < dim; ++d) { dot += query[d] * c[d]; na += query[d]*query[d]; nb += c[d]*c[d]; }
+      scores[i] = dot / (sqrtf(na) * sqrtf(nb) + 1e-12f);
+    }
+    return 0;
   }
-  return 0;
+
+  try {
+    torch::NoGradGuard ng;
+    auto opts_cpu  = torch::TensorOptions().dtype(torch::kFloat32).device(torch::kCPU).pinned_memory(true);
+    auto opts_cuda = torch::TensorOptions().dtype(torch::kFloat32).device(torch::kCUDA);
+
+    // Wrap host buffers into pinned tensors (zero-copy if already pinned; one
+    // allocation otherwise).  from_blob does NOT copy data — the async H2D
+    // transfer below does.
+    auto q_pinned = torch::from_blob(const_cast<float*>(query), {1, dim}, opts_cpu);
+    auto c_pinned = torch::from_blob(const_cast<float*>(corpus), {n, dim}, opts_cpu);
+
+    // Async H2D on the default CUDA stream.
+    auto q_gpu = q_pinned.to(opts_cuda, /*non_blocking=*/true);   // [1, dim]
+    auto c_gpu = c_pinned.to(opts_cuda, /*non_blocking=*/true);   // [n, dim]
+
+    // L2-normalise each row on-device (avoids separate norm pass after GEMM).
+    auto q_norm = torch::nn::functional::normalize(q_gpu, torch::nn::functional::NormalizeFuncOptions().p(2).dim(1)); // [1, dim]
+    auto c_norm = torch::nn::functional::normalize(c_gpu, torch::nn::functional::NormalizeFuncOptions().p(2).dim(1)); // [n, dim]
+
+    // cuBLAS SGEMM: [1, dim] × [dim, n] → [1, n]  (cosine similarity scores)
+    auto result = torch::mm(q_norm, c_norm.t()).squeeze(0);  // [n]
+
+    // Async D2H back into the caller's buffer (pinned scores buffer for max throughput).
+    auto scores_tensor = torch::from_blob(scores, {n}, torch::TensorOptions().dtype(torch::kFloat32).device(torch::kCPU));
+    scores_tensor.copy_(result.to(torch::kCPU));
+    return 0;
+  } catch (const c10::Error& e) {
+    // CUDA OOM or device error — fall back to CPU
+    for (int i = 0; i < n; ++i) {
+      const float* c = corpus + (size_t)i * dim;
+      float dot = 0.0f, na = 0.0f, nb = 0.0f;
+      for (int d = 0; d < dim; ++d) { dot += query[d] * c[d]; na += query[d]*query[d]; nb += c[d]*c[d]; }
+      scores[i] = dot / (sqrtf(na) * sqrtf(nb) + 1e-12f);
+    }
+    return 0;
+  }
 }
 
 // clusterEmbeddings and computeCaseEmbedding should be implemented using

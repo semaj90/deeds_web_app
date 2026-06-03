@@ -1,9 +1,9 @@
-import Redis from 'ioredis';
+import { getValkeyClient } from './valkey-client.js';
 import { ENV } from '../env.server.js';
 import crypto from 'crypto';
 import type { VarianceRecovery } from '../ace/variance-recovery-schema.js';
 
-const redis = new Redis(ENV.REDIS_URL);
+const redis = getValkeyClient();
 
 export type AcePacket = {
   query: string;

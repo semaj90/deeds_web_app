@@ -25,6 +25,27 @@
       "problemMatcher": []
     },
     {
+      "label": "GPU Bridge Probe (startup)",
+      "type": "shell",
+      "command": "node scripts/startup-gpu-bridge-probe.mjs",
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "runOptions": {
+        "runOn": "folderOpen"
+      },
+      "problemMatcher": [],
+      "presentation": {
+        "echo": true,
+        "reveal": "never",
+        "focus": false,
+        "panel": "dedicated",
+        "showReuseMessage": false,
+        "clear": false
+      },
+      "detail": "Runs the GPU bridge probe on folder open and writes the summary log to logs/task-output/startup-gpu-bridge-probe.log."
+    },
+    {
       "label": "Dev Server",
       "type": "shell",
       "command": "npm run dev",
@@ -1387,6 +1408,30 @@
           "endsPattern": "graphify:daily complete"
         }
       },
+      "presentation": {
+        "echo": false,
+        "reveal": "silent",
+        "focus": false,
+        "panel": "shared",
+        "showReuseMessage": false,
+        "clear": false
+      }
+    },
+    {
+      "label": "🗂️ Startup: Parent Atlas Refresh (promote + wire-qdrant)",
+      "type": "shell",
+      "command": "$stamp = 'logs/task-output/.parent-atlas-refresh-last-run'; $cooldownSec = 3600; if ((Test-Path $stamp) -and ((Get-Date) - (Get-Item $stamp).LastWriteTime).TotalSeconds -lt $cooldownSec) { Write-Host ('🗂️ parent-atlas refresh skipped — last run ' + [int]((Get-Date) - (Get-Item $stamp).LastWriteTime).TotalMinutes + ' min ago') } else { New-Item -Path logs/task-output -ItemType Directory -Force | Out-Null; npm run atlas:parent-atlas:refresh 2>&1 | Tee-Object logs/task-output/parent-atlas-refresh-latest.log | Select-Object -Last 10; if ($LASTEXITCODE -eq 0) { Set-Content $stamp (Get-Date -Format o); Write-Host '🗂️ parent-atlas refresh complete' } else { Write-Host '🗂️ parent-atlas refresh FAILED — check logs/task-output/parent-atlas-refresh-latest.log' } }",
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "runOptions": {
+        "runOn": "folderOpen",
+        "instanceLimit": 1
+      },
+      "isBackground": false,
+      "dependsOn": "🗺️ Startup: Auto-Map Codebase (graphify:daily)",
+      "group": "build",
+      "problemMatcher": [],
       "presentation": {
         "echo": false,
         "reveal": "silent",

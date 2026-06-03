@@ -118,7 +118,14 @@ function scanCodebase() {
     '.vscode',
     'coverage',
     'vendor',
-    'archived'
+    'archived',
+    '.venv',
+    '.venv-py313-backup',
+    'deeds_labs',
+    'granite-docling-258M',
+    'logs',
+    '__pycache__',
+    '.pytest_cache',
   ]);
 
   function walk(dir) {

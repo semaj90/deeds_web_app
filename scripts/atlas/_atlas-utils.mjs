@@ -87,15 +87,16 @@ export function workspaceForPath(relPath, workspaces = []) {
   return top;
 }
 
-export function collectFiles(startDir, ignoreDirs = new Set(), predicate = () => true, out = []) {
+export function collectFiles(startDir, ignoreDirs = new Set(), predicate = () => true, out = [], ignoreExts = new Set()) {
   if (!existsSync(startDir)) return out;
   for (const entry of readdirSync(startDir, { withFileTypes: true })) {
     if (ignoreDirs.has(entry.name)) continue;
     const fullPath = join(startDir, entry.name);
     if (entry.isDirectory()) {
-      collectFiles(fullPath, ignoreDirs, predicate, out);
+      collectFiles(fullPath, ignoreDirs, predicate, out, ignoreExts);
       continue;
     }
+    if (ignoreExts.size > 0 && ignoreExts.has(extname(entry.name).toLowerCase())) continue;
     if (!predicate(fullPath, entry.name)) continue;
     out.push(fullPath);
   }

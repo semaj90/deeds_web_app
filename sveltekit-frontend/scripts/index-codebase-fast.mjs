@@ -181,6 +181,8 @@ await loadTsDiagnostics();
 const EXTENSIONS   = new Set(['.ts', '.svelte', '.js', '.mjs', '.cjs', '.json']);
 const EXCLUDE_DIRS = new Set([
   'node_modules', '.svelte-kit', 'build', 'dist', '.git', '__mocks__', '__tests__',
+  'static', // WASM/ONNX/model binaries — not source
+  '.cache', 'coverage', 'logs',
 ]);
 
 function* walk(dir) {
