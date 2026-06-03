@@ -1,7 +1,8 @@
 ---
+name: graphrag-context-recovery
 description: GraphRAG context recovery using rg, glob, Qdrant, ACE packets, and sourceRefs
-mode: subagent
-temperature: 0.1
+license: MIT
+compatibility: opencode
 ---
 
 # GraphRAG Context Recovery Skill

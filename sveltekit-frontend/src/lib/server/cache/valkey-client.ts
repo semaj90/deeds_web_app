@@ -12,7 +12,7 @@
  * Bind: 127.0.0.1:6379, auth password = "redis"
  */
 
-import Redis from 'ioredis';
+import Redis, { type RedisOptions } from 'ioredis';
 
 // ── env resolution (safe for both Vite and standalone Node) ──────────────────
 
@@ -58,7 +58,7 @@ function buildUrlFromParts(): string {
 let _client: Redis | null = null;
 let _closed = false;
 
-function buildOptions(url: string, password: string): ConstructorParameters<typeof Redis>[1] {
+function buildOptions(url: string, password: string): RedisOptions {
   const parsed = (() => { try { return new URL(url); } catch { return null; } })();
   const effectivePassword = password || parsed?.password || '';
 

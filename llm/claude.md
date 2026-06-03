@@ -57,4 +57,20 @@ Sub-commands for independent pipeline steps:
 - Caveat: if the local `claude-mem` plugin cache is reinstalled or upgraded, recheck the bundle for the `zod/v3` compatibility fix before trusting hooks.
 
 ---
+## 5. Redis/Valkey Connection Policy
+
+- **Valkey/Redis Config Object Pattern (The "Redis Trick"):** When initializing Redis (`ioredis` or SvelteKit client) inside standalone Node scripts/smoke tests, do not parse/interpolate `REDIS_URL` strings with inline passwords (which fail if the password contains special characters like `@` or `:`). Use constructor objects configured with parsed `.env` credentials to prevent URL parsing failures:
+  ```javascript
+  const redis = new Redis({
+    host: env.REDIS_HOST || '127.0.0.1',
+    port: parseInt(env.REDIS_PORT || '6379', 10),
+    password: env.REDIS_PASSWORD || undefined,
+    lazyConnect: true,
+    maxRetriesPerRequest: 1,
+    enableOfflineQueue: false,
+    retryStrategy: () => null,
+  });
+  ```
+
+---
 *Maintained under Deeds Legal-AI Platform Guidelines.*

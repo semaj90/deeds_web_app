@@ -295,6 +295,110 @@ async function backfillQdrant(canonical) {
   return { fixed, skipped, missingQdrantId, staleClusterIds };
 }
 
+// ── Phase 3C: Parent Atlas join — patch atlas_node_id + feature_id + top_feature ──
+// Reads .tmp/ingest/lanes/codebase_features.ndjson (Parent Atlas truth map).
+// For each Qdrant point whose sourceRef matches a Parent Atlas record, patches:
+//   atlas_node_id, feature_ids, top_feature, workspace_task_id
+// This makes Qdrant the semantic lookup layer with Atlas IDs baked into every point.
+async function patchAtlasIds(atlasLanePath) {
+  console.log('\n[Phase 3C] ATLAS JOIN — patching atlas_node_id + feature_id into Qdrant...');
+  if (DRY_RUN) console.log('  [DRY RUN — no writes]\n');
+
+  // Load Parent Atlas codebase_features lane
+  let atlasNodes = [];
+  try {
+    const { createReadStream } = await import('node:fs');
+    const { createInterface } = await import('node:readline');
+    const rl = createInterface({ input: createReadStream(atlasLanePath) });
+    for await (const line of rl) {
+      if (!line.trim()) continue;
+      try {
+        const n = JSON.parse(line);
+        const p = typeof n.payload_json === 'string' ? JSON.parse(n.payload_json) : (n.payload_json ?? {});
+        atlasNodes.push({
+          source_ref: n.sourceRef ?? n.alias_id ?? '',
+          atlas_node_id: n.node_id,
+          feature_ids: p.features ?? [],
+          top_feature: p.top_feature ?? null,
+          // workspace_task_id derived from top_feature + lane
+          workspace_task_id: `task:${p.top_feature ?? 'unknown'}:${n.lane ?? 'codebase'}`,
+        });
+      } catch { /* skip malformed lines */ }
+    }
+  } catch (e) {
+    console.warn(`  Atlas lane not found — skipping Phase 3C: ${e.message}`);
+    return { patched: 0, skipped: 0 };
+  }
+
+  if (atlasNodes.length === 0) {
+    console.log('  No atlas nodes loaded — skipping Phase 3C.');
+    return { patched: 0, skipped: 0 };
+  }
+
+  // Build sourceRef → atlas record index
+  const atlasIndex = new Map();
+  for (const n of atlasNodes) {
+    if (n.source_ref) atlasIndex.set(n.source_ref.replace(/^\.\//, '').replace(/\\/g, '/'), n);
+  }
+  console.log(`  Loaded ${atlasNodes.length} atlas nodes → ${atlasIndex.size} sourceRef keys`);
+
+  let patched = 0;
+  let skipped = 0;
+
+  // Scroll Qdrant and match by sourceRef
+  let scrollOffset = null;
+  while (true) {
+    const body = { limit: 200, with_payload: ['sourceRef', 'relativePath', 'atlas_node_id'], with_vector: false };
+    if (scrollOffset) body.offset = scrollOffset;
+
+    let res;
+    try {
+      res = await qdrantPost(`/collections/${COLLECTION}/points/scroll`, body);
+    } catch (e) {
+      console.warn(`  Qdrant scroll failed: ${e.message}`);
+      break;
+    }
+
+    const pts = res.result?.points ?? [];
+    if (pts.length === 0) break;
+
+    for (const pt of pts) {
+      const sr = pt.payload?.sourceRef ?? pt.payload?.relativePath ?? '';
+      const normSr = sr.replace(/^\.\//, '').replace(/\\/g, '/');
+      const atlas = atlasIndex.get(normSr);
+
+      if (!atlas) { skipped++; continue; }
+      // Skip if already patched with same node id
+      if (pt.payload?.atlas_node_id === atlas.atlas_node_id) { skipped++; continue; }
+
+      try {
+        if (!DRY_RUN) {
+          await qdrantPost(`/collections/${COLLECTION}/points/payload?wait=true`, {
+            payload: {
+              atlas_node_id: atlas.atlas_node_id,
+              feature_ids: atlas.feature_ids,
+              top_feature: atlas.top_feature,
+              workspace_task_id: atlas.workspace_task_id,
+            },
+            points: [pt.id],
+          });
+        }
+        patched++;
+        if (VERBOSE) console.log(`  ATLAS: ${normSr} → feature=${atlas.top_feature}`);
+      } catch (err) {
+        console.error(`  ERR atlas patch ${pt.id}: ${err.message}`);
+        skipped++;
+      }
+    }
+
+    scrollOffset = res.result?.next_page_offset ?? null;
+    if (!scrollOffset) break;
+  }
+
+  console.log(`  Atlas-patched: ${patched}  |  Skipped (no match / already set): ${skipped}`);
+  return { patched, skipped };
+}
+
 // ── Phase 3B: Direct-patch Qdrant points that have file_path but no sourceRef ──
 // These are points from older indexing runs that set file_path but never set sourceRef.
 // directory-cluster points (kind=directory-cluster) are skipped — they legitimately
@@ -404,6 +508,7 @@ async function main() {
   let duplicatePaths = [];
   let backfillResult = { fixed: 0, skipped: 0, missingQdrantId: [], staleClusterIds: [] };
   let phase3bResult  = { patched: 0, skipped: 0 };
+  let phase3cResult  = { patched: 0, skipped: 0 };
   let auditMissing = [];
 
   if (!SCAN_ONLY) {
@@ -427,6 +532,10 @@ async function main() {
 
     // Phase 3B: fix points that already have file_path but no sourceRef
     phase3bResult = await patchFilepathPoints();
+
+    // Phase 3C: Parent Atlas join — patch atlas_node_id + feature_id
+    const atlasLanePath = resolve(ROOT, '.tmp/ingest/lanes/codebase_features.ndjson');
+    phase3cResult = await patchAtlasIds(atlasLanePath);
   }
 
   auditMissing = await auditQdrantMissing();
@@ -450,6 +559,7 @@ async function main() {
       staleClusterCount: backfillResult.staleClusterIds.length,
       staleClusterSample: backfillResult.staleClusterIds.slice(0, 20),
       phase3b: phase3bResult,
+      phase3c_atlas_join: phase3cResult,
     },
     audit: {
       pointsMissingSourceRef: auditMissing.length,

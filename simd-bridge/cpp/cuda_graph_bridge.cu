@@ -212,6 +212,11 @@ extern "C" int cudaGraphCount() {
   return static_cast<int>(g_graphs.size());
 }
 
+/** Returns the compile-time stream pool size so TS can discover it at runtime. */
+extern "C" int cudaStreamCount() {
+  return STREAM_POOL_SIZE;
+}
+
 #else  // CUDA not enabled — provide empty stubs so binding.cc links
 
 extern "C" int captureGraph(const char* /*key*/, int /*n*/, int /*dim*/) { return -99; }
@@ -220,5 +225,6 @@ extern "C" int replayGraph(const char* /*key*/, const float* /*input*/, int /*in
 extern "C" int replayGraphOnStream(const char* /*key*/, const float* /*input*/, int /*input_len*/,
                                    float* /*output*/, int /*output_len*/, int /*stream_id*/) { return -99; }
 extern "C" int cudaGraphCount() { return 0; }
+extern "C" int cudaStreamCount() { return 4; }  // fallback: match STREAM_POOL_SIZE
 
 #endif  // CUDA_GRAPH_HAVE_CUDA

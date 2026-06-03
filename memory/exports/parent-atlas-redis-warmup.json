@@ -1,7 +1,7 @@
 {
-  "timestamp": "2026-05-30T23:31:58.856Z",
+  "timestamp": "2026-06-03T16:19:41.912Z",
   "redis": "localhost:6379",
-  "ttl_seconds": 86400,
+  "ttl_seconds": 604800,
   "written": {
     "nodes": 10751,
     "lanes": 9,

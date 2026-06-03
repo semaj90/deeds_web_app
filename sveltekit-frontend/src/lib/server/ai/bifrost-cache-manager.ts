@@ -85,6 +85,64 @@ export class BifrostCacheManager {
   }
 
   /**
+   * Log a retrieval call so Bifrost can reuse the same source_refs + cluster path.
+   *
+   * Stored at:  bitfrost:retrieval:{queryHash}  (TTL 2h)
+   * Shape: { query_hash, prompt_hash, source_refs, qdrant_point_ids,
+   *          atlas_cluster_ids, feature_ids, cache_hit, tokens_in, tokens_out, latency_ms }
+   *
+   * A future query with the same queryHash skips Qdrant and reads this packet directly
+   * (same as Bifrost L2 semantic cache but at the sourceRef/cluster level).
+   */
+  static async logRetrieval(opts: {
+    queryHash: string;
+    promptHash?: string;
+    sourceRefs: string[];
+    qdrantPointIds?: (string | number)[];
+    atlasClusterIds?: string[];
+    featureIds?: string[];
+    cacheHit: 'redis' | 'bifrost' | 'qdrant' | 'none';
+    tokensIn?: number;
+    tokensOut?: number;
+    latencyMs?: number;
+  }): Promise<void> {
+    const redis = getRedis();
+    const key = `bitfrost:retrieval:${opts.queryHash}`;
+    const packet = {
+      query_hash: opts.queryHash,
+      prompt_hash: opts.promptHash ?? null,
+      source_refs: opts.sourceRefs,
+      qdrant_point_ids: opts.qdrantPointIds ?? [],
+      atlas_cluster_ids: opts.atlasClusterIds ?? [],
+      feature_ids: opts.featureIds ?? [],
+      cache_hit: opts.cacheHit,
+      tokens_in: opts.tokensIn ?? 0,
+      tokens_out: opts.tokensOut ?? 0,
+      latency_ms: opts.latencyMs ?? 0,
+      logged_at: new Date().toISOString(),
+    };
+    await redis.set(key, JSON.stringify(packet), 'EX', 7200).catch(() => {});
+  }
+
+  /**
+   * Look up a prior retrieval packet by query hash.
+   * Returns null on miss — caller falls through to Qdrant.
+   */
+  static async getRetrieval(queryHash: string): Promise<{
+    source_refs: string[];
+    qdrant_point_ids: (string | number)[];
+    atlas_cluster_ids: string[];
+    feature_ids: string[];
+    cache_hit: string;
+    logged_at: string;
+  } | null> {
+    const redis = getRedis();
+    const raw = await redis.get(`bitfrost:retrieval:${queryHash}`).catch(() => null);
+    if (!raw) return null;
+    try { return JSON.parse(raw); } catch { return null; }
+  }
+
+  /**
    * Optimize a message list by identifying shareable prefixes.
    */
   static async optimizeMessages(messages: any[]): Promise<{ optimized: any[], cacheToken?: string }> {

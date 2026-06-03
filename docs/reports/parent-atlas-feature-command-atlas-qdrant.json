@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-06-01T20:55:48.595Z",
+  "generatedAt": "2026-06-03T19:19:50.485Z",
   "inputs": {
     "manifestPath": "C:\\Users\\james\\Videos\\deeds-web-app\\docs\\reports\\parent-atlas-feature-command-atlas.json",
     "collection": "parent_atlas_feature_commands_768",
@@ -8,7 +8,7 @@
   "summary": {
     "lanesProjected": 6,
     "pointsPrepared": 6,
-    "applied": false,
+    "applied": true,
     "collection": "parent_atlas_feature_commands_768",
     "vectorSource": "ollama-or-fallback",
     "model": "embeddinggemma:latest"
@@ -17,7 +17,7 @@
     {
       "laneId": "sourceRef_spine",
       "pointId": "4c9bf9be-c60f-4bf7-de09-b8df02270e16",
-      "pointStatus": "prepared",
+      "pointStatus": "written",
       "sourceRefsCount": 31,
       "featureId": "phase_4_admin_copilot_ui_integration",
       "clusterId": "sourceRef_spine"
@@ -25,7 +25,7 @@
     {
       "laneId": "durable_truth",
       "pointId": "086a3f8d-6442-67ce-9942-be888d2e7ed5",
-      "pointStatus": "prepared",
+      "pointStatus": "written",
       "sourceRefsCount": 33,
       "featureId": "2_gpu_audit_storage_postgresql_jsonb_chosen",
       "clusterId": "durable_truth"
@@ -33,7 +33,7 @@
     {
       "laneId": "retrieval_memory",
       "pointId": "cd1e5767-82fe-9bb3-e30a-7fbac18feb08",
-      "pointStatus": "prepared",
+      "pointStatus": "written",
       "sourceRefsCount": 25,
       "featureId": "the_4_layer_retrieval_stack",
       "clusterId": "retrieval_memory"
@@ -41,7 +41,7 @@
     {
       "laneId": "graph_topology",
       "pointId": "a535e2e9-a07c-4a41-05fb-1a4f6cb54765",
-      "pointStatus": "prepared",
+      "pointStatus": "written",
       "sourceRefsCount": 28,
       "featureId": "from_sveltekit_frontend",
       "clusterId": "graph_topology"
@@ -49,7 +49,7 @@
     {
       "laneId": "compute_ranking",
       "pointId": "6a0508b3-e17a-6117-2963-b090605a43f7",
-      "pointStatus": "prepared",
+      "pointStatus": "written",
       "sourceRefsCount": 25,
       "featureId": "integration_features_to_look_for",
       "clusterId": "compute_ranking"
@@ -57,7 +57,7 @@
     {
       "laneId": "orchestration_future",
       "pointId": "5c3f037e-b769-88d2-f9c1-e27c8bc48a97",
-      "pointStatus": "prepared",
+      "pointStatus": "written",
       "sourceRefsCount": 25,
       "featureId": "expanded_architecture_opencode_ace_graphrag",
       "clusterId": "orchestration_future"

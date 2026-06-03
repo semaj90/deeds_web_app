@@ -173,6 +173,13 @@ export interface NativeAddon {
     data: Float32Array, n: number, dim: number,
     mean: Float32Array, components: Float32Array, k: number
   ) => Float32Array;
+  // Phase H2: CUDA Graph capture/replay (cuda_graph_bridge.cu)
+  captureGraph?: (key: string, n: number, dim: number) => number;
+  replayGraph?: (key: string, input: Float32Array) => Float32Array;
+  replayGraphOnStream?: (key: string, input: Float32Array, streamId: number) => Float32Array;
+  cudaGraphCount?: () => number;
+  // Phase H2: stream pool size introspection
+  cudaStreamCount?: () => number;
 }
 
 let addon: NativeAddon | null = null;
@@ -1620,4 +1627,89 @@ export async function pageRankGPUAsync(
   iters    = 30,
 ): Promise<Float32Array> {
   return runGpuWorker<Float32Array>('pageRankGPU', [adj, n, damping, iters]);
+}
+
+// ── Phase H2: CUDA Graph capture / stream-aware replay ─────────────────────
+// The STREAM_POOL_SIZE in cuda_graph_bridge.cu is 4; stream IDs are 0–3.
+// These wrappers mirror the C++ API and add TypeScript-level guards.
+
+export interface CudaGraphReplayResult {
+  scores: Float32Array;
+  streamId: number;
+  source: 'gpu' | 'stub';
+  elapsedMs: number;
+}
+
+/** Pre-captures a CUDA graph for the given key + shape. Idempotent. */
+export function captureGraphSync(key: string, n: number, dim: number): number {
+  const native = getAddonInternal();
+  if (!native?.captureGraph) return -99;
+  return native.captureGraph(key, n, dim);
+}
+
+/**
+ * Replays a captured CUDA graph on the legacy synchronous path (stream 0).
+ * Returns raw float scores (n values). Throws on native error.
+ */
+export function replayGraphSync(key: string, input: Float32Array): Float32Array {
+  const native = getAddonInternal();
+  if (!native?.replayGraph) return new Float32Array(0);
+  return native.replayGraph(key, input);
+}
+
+/**
+ * Stream-aware graph replay — Phase H2 core API.
+ *
+ * Dispatches H2D copy + graph launch + D2H copy on stream `streamId` (0–3).
+ * Concurrent calls on different stream IDs run in parallel on the GPU.
+ * Falls back to a CPU stub (returns zero-filled array) when no CUDA addon.
+ *
+ * @param key       Graph registry key (must have been captureGraph'd first)
+ * @param input     Flat Float32Array of shape [n × dim]
+ * @param streamId  CUDA stream pool index 0–3 (wraps mod STREAM_POOL_SIZE=4)
+ */
+export async function replayGraphOnStream(
+  key: string,
+  input: Float32Array,
+  streamId: number,
+): Promise<CudaGraphReplayResult> {
+  const t0 = performance.now();
+  const native = getAddonInternal();
+
+  if (native?.replayGraphOnStream) {
+    try {
+      const scores = native.replayGraphOnStream(key, input, streamId % 4);
+      return { scores, streamId, source: 'gpu', elapsedMs: performance.now() - t0 };
+    } catch (err) {
+      console.warn(
+        `[libtorch-bridge:H2] replayGraphOnStream("${key}", stream=${streamId}) failed:`,
+        (err as Error).message,
+        '— returning zero stub',
+      );
+    }
+  }
+
+  // CPU stub: return zeros so callers don't crash.
+  return {
+    scores: new Float32Array(input.length),
+    streamId,
+    source: 'stub',
+    elapsedMs: performance.now() - t0,
+  };
+}
+
+/** Number of CUDA graphs currently captured in the native registry. */
+export function cudaGraphCount(): number {
+  const native = getAddonInternal();
+  return native?.cudaGraphCount?.() ?? 0;
+}
+
+/**
+ * Logical stream pool size exposed to TS layer.
+ * Returns the native value when available, otherwise the hard-coded pool
+ * size from cuda_graph_bridge.cu (STREAM_POOL_SIZE = 4).
+ */
+export function cudaStreamCount(): number {
+  const native = getAddonInternal();
+  return native?.cudaStreamCount?.() ?? 4;
 }

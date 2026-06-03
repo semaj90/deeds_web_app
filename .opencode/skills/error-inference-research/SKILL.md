@@ -1,3 +1,10 @@
+---
+name: error-inference-research
+description: Diagnose validation/runtime errors and produce a safe repair plan via multi-step research
+license: MIT
+compatibility: opencode
+---
+
 # Skill: error-inference-research
 
 **Goal:** Diagnose validation/runtime errors and produce a safe repair plan via multi-step research.

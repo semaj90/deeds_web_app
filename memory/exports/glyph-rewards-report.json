@@ -1,10 +1,10 @@
 {
-  "timestamp": "2026-06-03T03:24:30.473Z",
+  "timestamp": "2026-06-03T18:26:49.882Z",
   "mode": "apply",
   "totalGlyphs": 78,
   "withEmbedding": 78,
   "rewardsComputed": 78,
-  "computeMs": 83,
+  "computeMs": 109,
   "gpuAvailable": true,
   "rewardStats": {
     "avg": 0.48198720002573026,

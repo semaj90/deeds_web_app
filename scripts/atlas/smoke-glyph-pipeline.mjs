@@ -118,17 +118,17 @@ async function checkPostgres() {
       fail('grpo_reward_score check', e.message);
     }
 
-    // Check 3: glyph_kind distribution (health signal)
+    // Check 3: kind distribution (health signal — column is `kind` in live schema)
     try {
-      const r = await client.query('SELECT glyph_kind, count(*) AS n FROM glyph_records GROUP BY glyph_kind ORDER BY n DESC LIMIT 5');
+      const r = await client.query('SELECT kind, count(*) AS n FROM glyph_records GROUP BY kind ORDER BY n DESC LIMIT 5');
       if (r.rows.length > 0) {
-        const dist = r.rows.map(row => `${row.glyph_kind}=${row.n}`).join(', ');
-        pass('glyph_kind distribution non-empty', dist);
+        const dist = r.rows.map(row => `${row.kind}=${row.n}`).join(', ');
+        pass('kind distribution non-empty', dist);
       } else {
-        warn('glyph_kind distribution', 'no rows to group');
+        warn('kind distribution', 'no rows to group');
       }
     } catch (e) {
-      warn('glyph_kind distribution check', e.message);
+      warn('kind distribution check', e.message);
     }
 
     // Check 4: lora_training_runs table exists

@@ -19,9 +19,12 @@
  */
 
 import { Redis } from 'ioredis';
+import dotenv from 'dotenv';
+dotenv.config();
 
 const QDRANT_URL  = process.env.QDRANT_URL  ?? 'http://localhost:6333';
 const REDIS_URL   = process.env.REDIS_URL   ?? 'redis://localhost:6379';
+const REDIS_PASS  = process.env.REDIS_PASSWORD ?? 'redis';
 const COLLECTION  = 'codebase_chunks_768';
 const CONTENT_DIM = 768;
 const HIDDEN_DIM  = 256;
@@ -154,6 +157,7 @@ async function main() {
   log(`dryRun=${FLAGS.dryRun} force=${FLAGS.force} limit=${FLAGS.limit}`);
 
   const redis = new Redis(REDIS_URL, {
+    password: REDIS_PASS || undefined,
     lazyConnect: true,
     maxRetriesPerRequest: 1,
     enableOfflineQueue: false,

@@ -20,6 +20,7 @@ import 'dotenv/config';
  */
 
 import os from 'node:os';
+import net from 'node:net';
 import { spawn } from 'node:child_process';
 import { existsSync, readFileSync } from 'node:fs';
 import path from 'node:path';
@@ -35,7 +36,8 @@ const HOST = process.env.LLAMA_SERVER_HOST ?? '127.0.0.1';
 const PORT = parseInt(process.env.LLAMA_SERVER_PORT ?? '8090', 10);
 const BASE = `http://${HOST}:${PORT}`;
 const TIMEOUT = 1_000;
-const RETRIES = 60;
+// 5.3 GB GGUF at -ngl 99 on RTX 3060 Ti takes 45–90s to load; poll for up to 3 min
+const RETRIES = 180;
 
 const LLAMA_EXE_CANDIDATES = [
   process.env.LLAMA_SERVER_PATH,
@@ -104,6 +106,16 @@ const THREADS_BATCH = Math.max(
 );
 const CACHE_REUSE = process.env.LLAMA_CACHE_REUSE ?? '256';
 
+/** Returns true if something is already listening on HOST:PORT (even if not HTTP-healthy). */
+function isPortBound(host, port) {
+  return new Promise((resolve) => {
+    const sock = net.createConnection({ host, port });
+    sock.once('connect', () => { sock.destroy(); resolve(true); });
+    sock.once('error', () => { sock.destroy(); resolve(false); });
+    sock.setTimeout(500, () => { sock.destroy(); resolve(false); });
+  });
+}
+
 export async function isLlamaServerHealthy() {
   try {
     const res = await fetch(`${BASE}/health`, { signal: AbortSignal.timeout(TIMEOUT) });
@@ -153,14 +165,28 @@ export async function ensureLlamaServer() {
     String(THREADS_BATCH),
     '-np',
     String(PARALLEL),
-    '--cache-prompt',
-    '--cache-reuse',
-    String(CACHE_REUSE),
-    '--jinja',
+    '-fa',
+    'on',
     '-ctk',
     CACHE_TYPE_K,
     '-ctv',
     CACHE_TYPE_V,
+    '--jinja',
+    '--chat-template',
+    'gemma',
+    '--reasoning',
+    'auto',
+    '--reasoning-format',
+    'none',
+    '--reasoning-budget',
+    '0',
+    '--cont-batching',
+    '--cache-prompt',
+    '--cache-reuse',
+    String(CACHE_REUSE),
+    '--metrics',
+    '--log-verbosity',
+    '3',
   ];
 
   if (MMPROJ) args.push('--mmproj', MMPROJ);
@@ -173,9 +199,21 @@ export async function ensureLlamaServer() {
   });
   child.unref();
 
+  // Zombie-process detection: after 5 failed health polls, check if the port
+  // is already bound by a stale process that isn't responding to HTTP.
+  const ZOMBIE_CHECK_AFTER = 5;
   for (let i = 0; i < RETRIES; i++) {
     await new Promise((r) => setTimeout(r, 500));
     if (await isLlamaServerHealthy()) return true;
+    if (i === ZOMBIE_CHECK_AFTER && (await isPortBound(HOST, PORT))) {
+      console.warn(
+        `[ensure-llama-server] Port ${PORT} is already bound by another process but is not` +
+          ` responding to HTTP health checks. Kill the stale process first or verify with:` +
+          ` curl http://${HOST}:${PORT}/health`
+      );
+      // Exit 0 so the VS Code task doesn't show as a hard failure.
+      process.exit(0);
+    }
   }
 
   console.error('[ensure-llama-server] llama-server did not become healthy in time');
@@ -213,15 +251,20 @@ function resolveOllamaEmbedBlob() {
 
 const EMBED_MODEL_CANDIDATES = [
   process.env.EMBED_MODEL_PATH,
-  path.join(workspaceRoot, 'vendor', 'models', 'embeddinggemma.gguf'),
+  // Primary: converted GGUF from sentence-transformers model (--sentence-transformers-dense-modules)
+  path.join(workspaceRoot, 'models', 'embeddinggemma-300m-q8_0.gguf'),
+  path.join(workspaceRoot, 'models', 'embeddinggemma-300m-f16.gguf'),
+  // Legacy names
   path.join(workspaceRoot, 'models', 'embeddinggemma.gguf'),
+  path.join(workspaceRoot, 'vendor', 'models', 'embeddinggemma.gguf'),
   path.join(workspaceRoot, 'models', 'embeddinggemma-300m.gguf'),
+  // Fallback: Ollama blob (no Dense projection layers — lower quality embeddings)
   resolveOllamaEmbedBlob(),
   path.join(workspaceRoot, 'models', 'nomic-embed-text-v1.5.Q4_K_M.gguf'),
 ].filter(Boolean);
 
 const EMBED_MODEL = firstExisting(EMBED_MODEL_CANDIDATES);
-const EMBED_THREADS = Math.max(1, parseInt(process.env.EMBED_SERVER_THREADS ?? String(DEFAULT_THREADS), 10));
+// EMBED_THREADS intentionally unused — llama-server manages threading internally for embedding workloads
 const EMBED_CTX = parseInt(process.env.EMBED_SERVER_CTX ?? '2048', 10);
 // GPU layers for embed model — default 99 (full GPU), set 0 for CPU-only
 const EMBED_NGL = parseInt(process.env.EMBED_SERVER_NGL ?? '99', 10);
@@ -244,9 +287,15 @@ export async function ensureEmbedServer() {
   }
 
   if (!EMBED_MODEL) {
-    console.warn('[ensure-llama-server] embeddinggemma GGUF not found in configured locations');
-    console.warn('[ensure-llama-server] Set EMBED_MODEL_PATH= or place embeddinggemma.gguf in models/');
-    console.warn('[ensure-llama-server] Falling back to Ollama for embeddings');
+    console.warn('[ensure-embed-server] embeddinggemma GGUF not found. Convert it first:');
+    console.warn('');
+    console.warn('  pwsh -NoProfile -ExecutionPolicy Bypass -File ../scripts/convert-embeddinggemma-to-gguf.ps1');
+    console.warn('');
+    console.warn('  This produces: models/embeddinggemma-300m-f16.gguf');
+    console.warn('  Requires: llama-cpp-turboquant-gemma4 converter (--sentence-transformers-dense-modules)');
+    console.warn('  Converter path: C:\\Users\\james\\Downloads\\llama-cpp-turboquant-gemma4-feature-turboquant-kv-cache\\...');
+    console.warn('');
+    console.warn('[ensure-embed-server] Falling back to Ollama for embeddings (no Dense projection — lower quality)');
     return false;
   }
 
@@ -254,16 +303,21 @@ export async function ensureEmbedServer() {
   console.log(`[ensure-embed-server] Using model:  ${EMBED_MODEL}`);
   console.log(`[ensure-embed-server] Port: ${EMBED_PORT}  NGL: ${EMBED_NGL}  CTX: ${EMBED_CTX}`);
 
+  const EMBED_BATCH  = parseInt(process.env.EMBED_BATCH_SIZE  ?? '512', 10);
+  const EMBED_UBATCH = parseInt(process.env.EMBED_UBATCH_SIZE ?? '512', 10);
+
   const args = [
     '-m', EMBED_MODEL,
     '--host', EMBED_HOST,
     '--port', String(EMBED_PORT),
     '-c', String(EMBED_CTX),
     '-ngl', String(EMBED_NGL),
-    '-t', String(EMBED_THREADS),
+    '-b', String(EMBED_BATCH),
+    '-ub', String(EMBED_UBATCH),
     '--embedding',
     '--pooling', 'mean',
-    '--embd-normalize', '2',
+    '--metrics',
+    '--log-verbosity', '3',
   ];
 
   const child = spawn(LLAMA_EXE, args, {
@@ -274,7 +328,9 @@ export async function ensureEmbedServer() {
   });
   child.unref();
 
-  for (let i = 0; i < RETRIES; i++) {
+  // embeddinggemma (593 MB) loads in ~5–10s; poll for up to 60s
+  const EMBED_RETRIES = 120;
+  for (let i = 0; i < EMBED_RETRIES; i++) {
     await new Promise((r) => setTimeout(r, 500));
     if (await isEmbedServerHealthy()) {
       console.log(`[ensure-embed-server] healthy at ${EMBED_BASE}`);

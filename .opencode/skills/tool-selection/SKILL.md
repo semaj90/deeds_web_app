@@ -1,3 +1,10 @@
+---
+name: tool-selection
+description: Select the right tool chain (rg, glob, MCP, Gemma4, embed) for the current task
+license: MIT
+compatibility: opencode
+---
+
 # Skill: tool-selection
 
 ## The discipline split

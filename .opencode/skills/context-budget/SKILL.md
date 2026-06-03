@@ -1,3 +1,9 @@
+---
+name: context-budget
+description: Compact rg/glob-first search discipline — never paste full files, always build sourceRef cards first
+license: MIT
+compatibility: opencode
+---
 # Context Budget Skill
 
 Use this skill whenever analyzing repository files, migrations, schemas, docs, or logs.

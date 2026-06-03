@@ -1,3 +1,10 @@
+---
+name: sourceRef-ranking
+description: Rank and deduplicate sourceRefs by relevance score across ACE card candidates
+license: MIT
+compatibility: opencode
+---
+
 # Skill: sourceRef-ranking
 
 ## When to use

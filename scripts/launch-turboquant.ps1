@@ -358,8 +358,8 @@ Write-Host "  Flash attention:  $TurboFlashAttn"
 Write-Host "  KV cache K:       $kvK"
 Write-Host "  KV cache V:       $kvV"
 Write-Host "  CPU threads:      $threads"
-Write-Host "  Batch size:       $($batchSize ?? 'default')"
-Write-Host "  UBatch size:      $($ubatchSize ?? 'default')"
+Write-Host "  Batch size:       $(if ($batchSize) { $batchSize } else { 'default' })"
+Write-Host "  UBatch size:      $(if ($ubatchSize) { $ubatchSize } else { 'default' })"
 Write-Host "  Tokens/sec:       $MeasuredTokensPerSecDisplay"
 Write-Host "  VRAM:             $MeasuredVramDisplay"
 
@@ -372,17 +372,37 @@ if ($ngl -match "^-") {
     Write-Warning "TURBO_NGL is negative ($ngl). llama.cpp-style --n-gpu-layers usually expects a positive layer count."
 }
 if (-not $TurboSpeculative) {
-    Write-Warning "No draft model configured. Speculative decoding is disabled."
+    Write-Host "  Speculative decoding: disabled (set ENABLE_MTP_DRAFTER=true + MTP_DRAFT_MODEL to enable)" -ForegroundColor DarkGray
 }
 Write-Host ""
 
 # -- Already healthy? -----------------------------------------------------
 if (-not $StatusOnly) {
     try {
-        Invoke-RestMethod ('http://127.0.0.1:' + $port + '/health') -TimeoutSec 1 | Out-Null
-        Write-Host ('TurboQuant already healthy on http://127.0.0.1:' + $port) -ForegroundColor Yellow
-        exit 0
-    } catch { }
+        $slotsInfo = Invoke-RestMethod ("http://127.0.0.1:$port/slots") -TimeoutSec 2 -ErrorAction Stop
+        if ($slotsInfo -and $slotsInfo.Count -gt 0) {
+            $runningCtx = $slotsInfo[0].n_ctx
+            if ($runningCtx -eq [int]$ctxLen) {
+                Write-Host "TurboQuant already healthy on http://127.0.0.1:$port with target context size ($ctxLen)" -ForegroundColor Yellow
+                exit 0
+            } else {
+                Write-Host "TurboQuant running on http://127.0.0.1:$port but with different context size: $runningCtx (target: $ctxLen). Proceeding with restart." -ForegroundColor Cyan
+                $runningPids = Get-NetTCPConnection -LocalPort $port -ErrorAction SilentlyContinue | Select-Object -ExpandProperty OwningProcess -Unique
+                if ($runningPids) {
+                    Write-Host "Stopping process(es) using port ${port}: $runningPids" -ForegroundColor Cyan
+                    $runningPids | ForEach-Object { Stop-Process -Id $_ -Force -ErrorAction SilentlyContinue }
+                    Start-Sleep -Seconds 1
+                }
+            }
+        } else {
+            # Fall back to health endpoint if /slots is empty or doesn't return list structure
+            Invoke-RestMethod ("http://127.0.0.1:$port/health") -TimeoutSec 1 | Out-Null
+            Write-Host "TurboQuant already healthy on http://127.0.0.1:$port" -ForegroundColor Yellow
+            exit 0
+        }
+    } catch {
+        # Server down or endpoint not supporting /slots, proceed with start
+    }
 }
 
 if ($StatusOnly) {
@@ -410,7 +430,7 @@ $baseArgs = @(
 )
 
 # -- Parallel slots check (Multi-core / Concurrent processing) -------------
-$slots = if ($env:TURBO_PARALLEL) { $env:TURBO_PARALLEL } else { '4' }
+$slots = if ($env:TURBO_PARALLEL) { $env:TURBO_PARALLEL } else { '1' }
 if (Test-LlamaFlag $llama '--parallel') {
     $baseArgs = $baseArgs + @('--parallel', $slots)
     Write-Host "Parallel slots: --parallel $slots enabled" -ForegroundColor Cyan

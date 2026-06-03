@@ -653,7 +653,7 @@ async function main() {
   const encodedMap = new Map(); // stableKey → Float32Array(64)
   if (!DRY) {
     try {
-      const weightRedis = new Redis(REDIS_URL);
+      const weightRedis = new Redis(REDIS_URL, { password: REDIS_PASS || undefined });
       const [wData, mData] = await Promise.all([
         weightRedis.hgetall('ace:autoencoder:weights'),
         weightRedis.hgetall('ace:autoencoder:meta'),
@@ -712,7 +712,7 @@ async function main() {
   }
 
   if (!DRY) {
-    const redis = _earlyRedis ?? new Redis(REDIS_URL);
+    const redis = _earlyRedis ?? new Redis(REDIS_URL, { password: REDIS_PASS || undefined });
     // Write scores as a pipeline for atomicity + set 7-day TTL to match summary
     const pipe = redis.pipeline();
     pipe.del('gpu:karpathy:scores');

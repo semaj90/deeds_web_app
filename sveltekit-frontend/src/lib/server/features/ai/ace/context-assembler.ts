@@ -55,6 +55,7 @@ import {
 import { appendOutcomeLedger } from '$lib/server/observability/outcome-ledger.js';
 import { mkdirSync } from 'node:fs';
 import { promises as fsPromises } from 'node:fs';
+import crypto from 'node:crypto';
 
 const TURBO_CTX_SIZE = Number(process.env.TURBO_CTX_SIZE ?? process.env.LLAMA_CTX_SIZE ?? 65536);
 const OPENAI_HARD_INPUT_CAP = Number(process.env.OPENAI_HARD_INPUT_CAP ?? '24000');
@@ -188,6 +189,7 @@ import {
   type ClusterTagsEntry,
 } from '../../../ace/cluster-tags-cache.js';
 import { clusterPivot } from '../../../ace/rg-cluster-pivot.js';
+import { BifrostCacheManager } from '$lib/server/ai/bifrost-cache-manager.js';
 
 // ── QueryRouter4x4 cache — persisted to Redis (24h) ─
 const _userRouters = new Map<string, QueryRouter4x4>();
@@ -1285,6 +1287,7 @@ export async function assembleACEContext(opts: {
    * relative to the repo root (e.g. `src/lib/server/ace/agent.ts`).
    */
   filePath?: string;
+  mode?: string;
   tokenAwarePacking?: boolean;
   statsOut?: Record<string, any>;
   traceId?: string;
@@ -1293,6 +1296,112 @@ export async function assembleACEContext(opts: {
     opts.statsOut.topo_hit = false;
     opts.statsOut.packet_hit = false;
     opts.statsOut.top_k = getAdaptiveTopK();
+  }
+
+  // === Parent Atlas mode preflight ===
+  if (opts.mode === 'parent_atlas' || (opts.enableCodebaseContext && /\b(redis|valkey|qdrant|som|ace|bifrost|query router|codebase|indexing|nes|chrom|parent atlas|mapping|card)\b/i.test(opts.query))) {
+    try {
+      const { routeQuery } = await import('../../../ace/query-router.js');
+      const { BifrostCacheManager } = await import('$lib/server/ai/bifrost-cache-manager.js');
+      const routeResult = await routeQuery({ query: opts.query });
+      const packet = routeResult.packet;
+
+      // Log Bifrost retrieval telemetry
+      await BifrostCacheManager.logRetrieval({
+        queryHash: packet.query_hash,
+        sourceRefs: packet.source_refs,
+        qdrantPointIds: packet.qdrant_point_ids,
+        atlasClusterIds: packet.cluster_id ? [packet.cluster_id] : [],
+        featureIds: packet.feature_ids,
+        cacheHit: packet.cache_hit,
+        latencyMs: packet.latency_ms,
+      }).catch(() => {});
+
+      // Map to codebase context items to populate prompt renderer
+      const codebaseContext = packet.ranked_cards.map((c: any) => ({
+        filePath: c.source_ref,
+        summary: c.snippet,
+        score: c.score,
+        gpuCluster: packet.cluster_id ? parseInt(packet.cluster_id.split(':')[0]) : null,
+      }));
+
+      const parentAtlasContext: ACEContext = {
+        selectedRelationCards: '',
+        selectedClusterSummaries: '',
+        cacheTrace: '',
+        topRuntimeDependencies: '',
+        userProfile: opts.userId
+          ? await fetchUserProfile(opts.userId).catch(() => null)
+          : null,
+        caseContext: opts.caseId
+          ? await fetchCaseContext(opts.caseId).catch(() => null)
+          : null,
+        glossaryMatches: null,
+        ragChunks: [],
+        kbChunks: [],
+        caseChunks: [],
+        docChunks: [],
+        kagNeighbors: [],
+        chatHistory: [],
+        chatMemory: [],
+        entities: {
+          statutes: [],
+          cases: [],
+          persons: [],
+          organizations: [],
+          dates: [],
+        },
+        practiceTemplate: null,
+        queryTags: [],
+        webSearchContext: `[PARENT ATLAS PATH — Cache hit: ${packet.cache_hit}]\n\n${packet.prompt_context}`,
+        persona: opts.persona ?? 'neutral',
+        evidenceMetadata: null,
+        evidenceConnections: null,
+        userAnalyticsContext: null,
+        codebaseContext,
+        activeClusterSummary: packet.cluster_id ? {
+          clusterId: packet.cluster_id,
+          summary: `SOM Cluster at ${packet.cluster_id}`,
+          purpose: 'Topological context for parent atlas routing',
+          patterns: packet.feature_ids,
+          keyFiles: packet.source_refs,
+          warnings: [],
+        } : null,
+        dbSchemaContext: '',
+        policyDecision: null,
+        cachePlanner: {
+          hit: packet.cache_hit !== 'none',
+          source: packet.cache_hit === 'redis' ? 'redis' : 'qdrant',
+          cacheKey: `bitfrost:retrieval:${packet.query_hash}`,
+          contextHash: packet.query_hash,
+          deltaFields: [],
+          retrievalModeHash: 'parent-atlas',
+          sectionTypesHash: 'parent-atlas',
+          tokenAwarePacking: false,
+        },
+        retrievalTrace: {
+          topoPrefilter: undefined,
+        },
+        aceContextPacket: {
+          query: packet.query,
+          query_hash: packet.query_hash,
+          source_refs: packet.source_refs,
+          feature_ids: packet.feature_ids,
+          lane_ids: packet.lane_ids,
+          cluster_id: packet.cluster_id,
+          workspace_task_id: packet.workspace_task_id,
+          qdrant_point_ids: packet.qdrant_point_ids,
+          neo4j_neighbor_ids: packet.neo4j_neighbor_ids,
+          redis_hot_keys: packet.redis_hot_keys,
+          contextMarkdown: packet.prompt_context,
+          selectedSources: packet.source_refs,
+        },
+      };
+
+      return parentAtlasContext;
+    } catch (err) {
+      console.warn('[Parent Atlas Preflight] failed, falling back:', err);
+    }
   }
 
   return traceGraph(
@@ -1809,6 +1918,25 @@ export async function assembleACEContext(opts: {
       // P5-B: Apply QLoRA quality boost to RAG chunks (proven high-quality chunks get +0.05)
       const allRag = ragChunks.map(toUnified);
       await applyQloraBoost(allRag).catch(() => {});
+
+      // Bifrost telemetry — log source_refs + cluster_ids so future queries hit Redis first
+      const _ragSourceRefs = ragChunks.map((c) => c.filePath || c.url || '').filter(Boolean);
+      if (_ragSourceRefs.length > 0) {
+        const _queryHash = crypto.createHash('sha256').update(query).digest('hex').slice(0, 16);
+        BifrostCacheManager.logRetrieval({
+          queryHash: _queryHash,
+          sourceRefs: _ragSourceRefs,
+          atlasClusterIds: ragChunks
+            .map((c) => (c as any).som_cluster ?? (c as any).gpu_cluster ?? null)
+            .filter(Boolean),
+          featureIds: ragChunks
+            .map((c) => (c as any).top_feature ?? (c as any).feature_id ?? null)
+            .filter(Boolean),
+          cacheHit: 'qdrant',
+          tokensIn: 0,
+          tokensOut: 0,
+        }).catch(() => {});
+      }
 
       // Fetch graph relation summaries (selectedRelationCards, selectedClusterSummaries, cacheTrace, topRuntimeDependencies)
       const graphRelationSummaries = await fetchGraphRelationSummaries(

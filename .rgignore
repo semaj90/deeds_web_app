@@ -1,0 +1,23 @@
+# .rgignore — ripgrep override for gitignored NES/CHROM packet files
+#
+# These paths are in .gitignore (ephemeral local artifacts) but MUST be
+# searchable by rg for offline MapReduce joins, awk pipelines, and graph
+# traversal queries. Add them here so plain `rg` finds them without --no-ignore.
+#
+# Usage:
+#   rg "cluster_key"           .opencode/ndjson/   # works — .rgignore unblocks
+#   rg --no-ignore "cluster_key" .opencode/ndjson/ # also works (explicit)
+#
+# Note: ripgrep 14.x uses --no-ignore (not --uu which was rg 13.x)
+
+!.opencode/ndjson/
+!.opencode/ndjson/*.ndjson
+!.opencode/ndjson/**/*.ndjson
+!.opencode/ace-packets/
+!.opencode/ace-packets/*.ndjson
+!.opencode/ace-packets/*.json
+!.opencode/gemma4_candidates.ndjson
+!.opencode/outcome-ledger.ndjson
+!.opencode/outcome-ledger-with-cardIds.ndjson
+!.opencode/cards/
+!.opencode/cards/*.json

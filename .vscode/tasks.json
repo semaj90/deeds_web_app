@@ -142,9 +142,12 @@
     {
       "label": "TurboQuant llama-server (VLM)",
       "type": "shell",
-      "command": "npm run turbo:start:detached",
+      "command": "pwsh -NoProfile -ExecutionPolicy Bypass -File scripts/launch-turboquant.ps1 -Detached",
       "options": {
-        "cwd": "${workspaceFolder}/sveltekit-frontend"
+        "cwd": "${workspaceFolder}"
+      },
+      "runOptions": {
+        "runOn": "folderOpen"
       },
       "group": "build",
       "problemMatcher": [],
@@ -156,7 +159,7 @@
         "showReuseMessage": false,
         "clear": true
       },
-      "detail": "Spawn TurboQuant llama-server.exe as a detached PowerShell child, wait for /health on :8090, and return immediately. Uses stable q8_0 KV cache, 64K ctx, and adds mmproj automatically if present."
+      "detail": "Spawn gemma4-legal-iq4xs-direct.gguf + mmproj VLM on :8090. Pre-evicts Ollama VRAM, probes binary for --jinja/--cache-prompt/--cache-reuse/Flash-Attn, 64K ctx, q8_0/q8_0 KV, -np 1. Waits up to 120s for /health."
     },
     {
       "label": "MCP TRACE Server (detached)",
@@ -2960,7 +2963,8 @@
     {
       "label": "⚡ TurboQuant: Start (text-only, :8090)",
       "type": "shell",
-      "command": "npm run turbo:start:text:detached",
+      "command": "pwsh -NoProfile -ExecutionPolicy Bypass -File scripts/launch-turboquant.ps1 -Detached -TextOnly",
+      "options": { "cwd": "${workspaceFolder}" },
       "group": "build",
       "presentation": {
         "reveal": "always",
@@ -2969,12 +2973,13 @@
         "showReuseMessage": false
       },
       "problemMatcher": [],
-      "detail": "Spawn text-only TurboQuant as a detached PowerShell child, wait for /health on :8090, and return immediately. Uses stable q8_0 KV cache."
+      "detail": "Text-only (no --mmproj): gemma4-legal-iq4xs-direct.gguf on :8090, 64K ctx, q8_0/q8_0, -fa on, --jinja. Saves ~1GB VRAM vs VLM mode."
     },
     {
       "label": "⚡ TurboQuant: Start (vision + text, :8090)",
       "type": "shell",
-      "command": "npm run turbo:start:detached",
+      "command": "pwsh -NoProfile -ExecutionPolicy Bypass -File scripts/launch-turboquant.ps1 -Detached",
+      "options": { "cwd": "${workspaceFolder}" },
       "group": "build",
       "presentation": {
         "reveal": "always",
@@ -2983,7 +2988,22 @@
         "showReuseMessage": false
       },
       "problemMatcher": [],
-      "detail": "Spawn vision + text TurboQuant as a detached PowerShell child, wait for /health on :8090, and return immediately. Uses stable q8_0 KV cache."
+      "detail": "VLM mode: gemma4-legal-iq4xs-direct.gguf + mmproj-F16.gguf on :8090. 64K ctx, q8_0/q8_0, -fa on, --jinja. Pre-evicts Ollama. GRPO legal LoRA is merged into the GGUF — no --lora needed."
+    },
+    {
+      "label": "⚡ Embed Server: Start (:8081)",
+      "type": "shell",
+      "command": "node scripts/ensure-llama-server.mjs --spawn-embed",
+      "options": { "cwd": "${workspaceFolder}/sveltekit-frontend" },
+      "group": "build",
+      "presentation": {
+        "reveal": "silent",
+        "panel": "shared",
+        "clear": false,
+        "showReuseMessage": false
+      },
+      "problemMatcher": [],
+      "detail": "Spawn embeddinggemma GGUF on :8081 (--embedding --pooling mean --embd-normalize 2 -b 512 -ub 128). Activate tier 2.5 by setting OLLAMA_EMBED_BASE_URL=http://127.0.0.1:8081 in .env. Idempotent — no-op if already healthy."
     },
     {
       "label": "⚡ TurboQuant: Health Check",
@@ -3787,6 +3807,7 @@
       "dependsOrder": "parallel",
       "dependsOn": [
         "⚡ TurboQuant: Start (vision + text, :8090)",
+        "⚡ Embed Server: Start (:8081)",
         "🤖 Startup: TRACE MCP Server (:8788)",
         "🌉 Startup: Bifrost Semantic Cache (:3040)",
         "🗺️ Startup: Auto-Map Codebase (graphify:daily)"

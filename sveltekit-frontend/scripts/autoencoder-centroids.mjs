@@ -51,8 +51,10 @@ function parseArg(argv, flag, fallback) {
 const log = (...a) => { if (!FLAGS.quiet) console.log(...a); };
 
 // ── Redis (cold-start safe) ───────────────────────────────────────────────────
+const REDIS_PASS = process.env.REDIS_PASSWORD ?? '';
 function makeRedis() {
     const r = new Redis(REDIS_URL, {
+        password:             REDIS_PASS || undefined,
         lazyConnect:          true,
         maxRetriesPerRequest: 1,
         enableOfflineQueue:   false,

@@ -1,0 +1,105 @@
+{
+  "generated_at": "2026-06-03T19:13:44.895Z",
+  "description": "End-to-end: NES packet multi-hop → Qdrant backfill → Bifrost warmup → SeaweedFS cold archive → RabbitMQ dequeue",
+  "stage1_multihop": {
+    "name": "engram-nes-multihop",
+    "inputs": [
+      ".opencode/cards/*.json",
+      ".opencode/ndjson/graph-edges.ndjson",
+      ".opencode/ndjson/cluster-summary.ndjson"
+    ],
+    "algorithm": {
+      "step1": "Start from query embedding → find nearest SOM cluster (bmu_row:bmu_col)",
+      "step2": "Load cluster node from cluster-summary.ndjson → get card_sample + top_keywords",
+      "step3": "Expand to adjacent clusters via graph-edges.ndjson (SIMILAR_TOPOLOGY edges)",
+      "step4": "Collect all card_ids from hop-0 + hop-1 clusters",
+      "step5": "Cross-join with gemma4_candidates.ndjson for flagged candidate overlay",
+      "step6": "Score by: shared_kw * 0.4 + candidate_count/card_count * 0.3 + avg_som_dist_inverse * 0.3"
+    },
+    "gradient_checkpoint": {
+      "redis_key": "ace:multihop:checkpoint:{query_hash}",
+      "ttl_s": 300,
+      "fields": [
+        "hop0_cluster",
+        "hop1_clusters",
+        "scored_cards"
+      ]
+    },
+    "output": "scored card list with source_id + feature_ids"
+  },
+  "stage2_qdrant_backfill": {
+    "name": "qdrant-backfill-after-index",
+    "script": "scripts/atlas/backfill-qdrant-source-refs.mjs --commit",
+    "trigger": "After every graphify:semantic or phase-19c-qdrant-index run",
+    "collections": [
+      "codebase_chunks_768",
+      "feature_maps"
+    ],
+    "payload_fields_added": [
+      "sourceRef",
+      "gpu_cluster",
+      "som_cluster",
+      "content_hash",
+      "tags",
+      "feature_ids"
+    ],
+    "gradient_checkpoint": {
+      "redis_key": "hg:checkpoint:qdrant_backfill:{batch_cursor}",
+      "ttl_s": 3600
+    }
+  },
+  "stage3_bifrost_warmup": {
+    "name": "bifrost-cache-warmup",
+    "endpoint": "POST http://localhost:3040/cache/warm",
+    "trigger": "After stage2_qdrant_backfill completes",
+    "strategy": "POST top-200 Karpathy scored queries to Bifrost so next ACE lookup hits L2",
+    "queries_source": "docker exec legal-ai-redis redis-cli HKEYS gpu:karpathy:scores | head -200",
+    "expected_hit_rate": "70-90% on semantic variants",
+    "ttl_s": 7200
+  },
+  "stage4_cold_archive": {
+    "name": "cold-storage-dequeue",
+    "description": "Minified/superseded files → SeaweedFS cold tier → RabbitMQ dequeue notification",
+    "queue": "vector.index",
+    "message_schema": {
+      "type": "cold_archive",
+      "source_ref": "string (relative path)",
+      "source_id": "string (sha256 node_id)",
+      "seaweedfs_key": "string (bucket/date/source_id.json)",
+      "git_tag": "string (archive/YYYY-MM-DD/slug)",
+      "superseded_score": "number",
+      "feature_ids": "string[]"
+    },
+    "seaweedfs": {
+      "bucket": "legal-evidence",
+      "s3_port": 8333,
+      "path_pattern": "cold-archive/{YYYY-MM-DD}/{source_id}.json"
+    },
+    "archive_script": "scripts/atlas/archive-cold-originals.mjs --commit",
+    "cold_candidates_source": "docs/phase100/source-feature-connections.json (cold_archive_candidates)",
+    "dequeue_consumer": "src/lib/server/queue/rabbitmq-manager-fixed.ts"
+  },
+  "stage5_outcome_ledger": {
+    "ledger_files": [
+      ".opencode/outcome-ledger.ndjson",
+      ".opencode/outcome-ledger-with-cardIds.ndjson"
+    ],
+    "current_state": {
+      "total_entries": 14,
+      "matched_card_ids": 6,
+      "dominant_intent": "smoke_test_intent",
+      "avg_reward": 0.99,
+      "confirmed_source_ref": "sveltekit-frontend/src/lib/server/cache/cache-config.ts"
+    },
+    "join_gap": "gemma4_candidates use file: namespace; cards use hex IDs. Run graphify:semantic to populate codebase cards with file: IDs.",
+    "action": "npm run graphify:semantic to close the join gap → re-run ndjson:mapreduce to get matched enriched candidates"
+  },
+  "execution_order": [
+    "1. npm run graphify:semantic  // populate file:src/... codebase cards",
+    "2. npm run ndjson:mapreduce   // join closes: candidates → cards",
+    "3. node scripts/atlas/backfill-qdrant-source-refs.mjs --commit  // sync payloads",
+    "4. curl -X POST http://localhost:3040/cache/warm -d @top200-queries.json  // Bifrost warmup",
+    "5. node scripts/atlas/archive-cold-originals.mjs --commit  // git-tag cold files",
+    "6. rabbitmq publish vector.index cold_archive messages  // notify consumers"
+  ]
+}

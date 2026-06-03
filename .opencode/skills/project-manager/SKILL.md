@@ -1,3 +1,10 @@
+---
+name: project-manager
+description: Manage OpenCode kanban tasks, track progress, and coordinate multi-step agent plans
+license: MIT
+compatibility: opencode
+---
+
 # Skill: project-manager
 
 Goal:

@@ -1,3 +1,10 @@
+---
+name: docs-search-ace
+description: Search docs and ACE packets with rg first-pass then semantic fallback
+license: MIT
+compatibility: opencode
+---
+
 # Skill: docs-search-ace
 
 Goal:

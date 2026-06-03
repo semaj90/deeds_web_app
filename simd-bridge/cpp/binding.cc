@@ -138,6 +138,7 @@ extern "C" int captureGraph(const char* key, int n, int dim);
 extern "C" int replayGraph(const char* key, const float* input, int input_len, float* output, int output_len);
 extern "C" int replayGraphOnStream(const char* key, const float* input, int input_len, float* output, int output_len, int stream_id);
 extern "C" int cudaGraphCount();
+extern "C" int cudaStreamCount();
 
 // cuVS ANN compression stub (cuvs_bridge.cc)
 extern "C" napi_value RegisterCuvsCompress(napi_env env, napi_callback_info info);
@@ -1088,7 +1089,6 @@ static napi_value AutoencoderDecodeWrapper(napi_env env, napi_callback_info info
   return result;
 }
 
-// ── PcaProject(Float32Array data, n, dim, Float32Array mean, Float32Array components, k)
 //    → Float32Array[n * k]
 static napi_value PcaProjectWrapper(napi_env env, napi_callback_info info) {
   size_t argc = 6; napi_value argv[6];

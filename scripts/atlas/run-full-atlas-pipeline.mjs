@@ -113,6 +113,14 @@ if (!NO_CARDS) {
     ['--no-embed'] // skip embeddings by default to keep pipeline fast; use standalone for full embed
   );
   if (!results[0]) console.warn('[pipeline] Stage 0 failed — continuing (non-blocking)');
+
+  // Stage 0.5: Pre-assemble ACE Packets
+  const aceResult = runStage(
+    '0.5', 'Pre-assemble & Inject ACE Packets',
+    path.join(__dir, 'preassemble-ace-packets.mjs'),
+    ['--apply']
+  );
+  if (!aceResult) console.warn('[pipeline] Stage 0.5 failed — continuing (non-blocking)');
 } else {
   console.log('\n[pipeline] ⏩ Stage 0 skipped (--no-cards)');
   results[0] = true;

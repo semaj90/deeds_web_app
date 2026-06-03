@@ -41,7 +41,7 @@ function loadEnv() {
   const envPath = path.join(ROOT, '.env');
   if (fs.existsSync(envPath)) {
     for (const line of fs.readFileSync(envPath, 'utf8').split('\n')) {
-      const m = line.match(/^([A-Z_][A-Z0-9_]*)=(.*)$/);
+      const m = line.trimEnd().match(/^([A-Z_][A-Z0-9_]*)=(.*)$/);
       if (m && !env[m[1]]) env[m[1]] = m[2].replace(/^["']|["']$/g, '');
     }
   }
@@ -82,26 +82,115 @@ async function main() {
     return;
   }
 
-  // ioredis cold-start safe config (per ioredis-coldstart-pattern memory)
-  const redis = new Redis({
-    host: REDIS_HOST,
-    port: REDIS_PORT,
-    password: REDIS_PASS || undefined,
-    lazyConnect: true,
-    maxRetriesPerRequest: 1,
-    enableOfflineQueue: false,
-    retryStrategy: () => null,
-  });
-  redis.on('error', () => {}); // silence reconnect spam
+  const DOCKER_CONTAINER = env.REDIS_CONTAINER ?? 'legal-ai-redis';
+  const FORCE_DOCKER = argv.includes('--docker');
+  let useDocker = FORCE_DOCKER;
 
-  try {
-    await redis.connect();
-    await redis.ping();
-    console.log('  ✅ Redis connected\n');
-  } catch (e) {
-    console.error('  ❌ Redis unreachable:', e.message);
-    redis.disconnect();
-    process.exit(1);
+  async function probeDirectRedis() {
+    const r = new Redis({
+      host: REDIS_HOST,
+      port: REDIS_PORT,
+      password: REDIS_PASS || undefined,
+      family: 4,
+      lazyConnect: true,
+      maxRetriesPerRequest: 1,
+      enableOfflineQueue: false,
+      retryStrategy: () => null,
+      connectTimeout: 2000,
+    });
+    r.on('error', () => {});
+    await r.connect();
+    await r.ping();
+    return r;
+  }
+
+  let redis = null;
+  if (!useDocker) {
+    try {
+      redis = await probeDirectRedis();
+      console.log(`  ✅ Redis connected directly (${REDIS_HOST}:${REDIS_PORT})\n`);
+    } catch {
+      console.log(`  ⚠️  Direct Redis unreachable — using docker exec proxy (container: ${DOCKER_CONTAINER})\n`);
+      useDocker = true;
+    }
+  } else {
+    console.log(`  🐳 Force Docker mode — using docker exec proxy (container: ${DOCKER_CONTAINER})\n`);
+  }
+
+  // Thin wrapper: route commands through docker exec redis-cli
+  const { execFile, spawn } = await import('node:child_process');
+  function dockerExecRedis(...args) {
+    return new Promise((resolve, reject) => {
+      execFile('docker', [
+        'exec', DOCKER_CONTAINER,
+        'redis-cli', '-a', REDIS_PASS, '--no-auth-warning',
+        ...args,
+      ], { timeout: 5000 }, (err, stdout, stderr) => {
+        if (err) reject(new Error(stderr.trim() || err.message));
+        else resolve(stdout.trim());
+      });
+    });
+  }
+
+  function runDockerPipe(respData) {
+    return new Promise((resolve, reject) => {
+      const child = spawn('docker', [
+        'exec', '-i', DOCKER_CONTAINER,
+        'redis-cli', '-a', REDIS_PASS, '--no-auth-warning', '--pipe'
+      ]);
+      let stdout = '';
+      let stderr = '';
+      child.stdout.on('data', (d) => { stdout += d; });
+      child.stderr.on('data', (d) => { stderr += d; });
+      child.on('close', (code) => {
+        if (code !== 0 && !stdout.includes('errors: 0')) {
+          reject(new Error(`redis-cli --pipe failed (code ${code}): ${stderr || stdout}`));
+        } else {
+          resolve(stdout);
+        }
+      });
+      child.stdin.write(respData);
+      child.stdin.end();
+    });
+  }
+
+  function toResp(args) {
+    let res = `*${args.length}\r\n`;
+    for (const arg of args) {
+      const s = String(arg);
+      res += `$${Buffer.byteLength(s)}\r\n${s}\r\n`;
+    }
+    return res;
+  }
+
+  async function executePipeline(commands) {
+    if (!useDocker && redis) {
+      const pipe = redis.pipeline();
+      for (const [cmd, ...args] of commands) {
+        pipe[cmd.toLowerCase()](...args);
+      }
+      return pipe.exec();
+    } else {
+      console.log(`    Piping ${commands.length} commands to docker container ${DOCKER_CONTAINER}...`);
+      const BATCH_SIZE = 5000;
+      for (let i = 0; i < commands.length; i += BATCH_SIZE) {
+        const batch = commands.slice(i, i + BATCH_SIZE);
+        const chunk = batch.map(toResp).join('');
+        await runDockerPipe(chunk);
+      }
+    }
+  }
+
+  // Verify the fallback works
+  if (useDocker) {
+    try {
+      const pong = await dockerExecRedis('PING');
+      if (pong !== 'PONG') throw new Error(`unexpected: ${pong}`);
+      console.log(`  ✅ Redis via docker exec: PING → PONG\n`);
+    } catch (e) {
+      console.error('  ❌ Redis unreachable via docker exec:', e.message);
+      process.exit(1);
+    }
   }
 
   // Load parquet artifacts
@@ -111,68 +200,59 @@ async function main() {
   const clusters = parquetToJSON(path.join(ROOT, '.tmp', 'ingest', 'cluster_summary.parquet'));
   console.log(`  ✅ Loaded ${nodes.length} nodes, ${lanes.length} lanes, ${clusters.length} clusters\n`);
 
-  // Step 2: Pipeline node writes
-  console.log('  Step 2: Pipeline node writes...');
-  const BATCH = 1000;
-  let written = 0;
-  for (let i = 0; i < nodes.length; i += BATCH) {
-    const slice = nodes.slice(i, i + BATCH);
-    const pipe = redis.pipeline();
-    for (const n of slice) {
-      const key = `atlas:parent:node:${n.lane}:${n.node_id}`;
-      pipe.set(key, JSON.stringify(n), 'EX', TTL);
-      // Degree ZSET for top-K queries
-      if (n.degree && n.degree > 0) {
-        pipe.zadd('atlas:parent:degree:rank', n.degree, `${n.lane}:${n.node_id}`);
-      }
+  const pipelineCommands = [];
+
+  // Step 2: Queue node writes
+  console.log('  Step 2: Queue node writes...');
+  for (const n of nodes) {
+    const key = `atlas:parent:node:${n.lane}:${n.node_id}`;
+    pipelineCommands.push(['SET', key, JSON.stringify(n), 'EX', String(TTL)]);
+    if (n.degree && n.degree > 0) {
+      pipelineCommands.push(['ZADD', 'atlas:parent:degree:rank', String(n.degree), `${n.lane}:${n.node_id}`]);
     }
-    await pipe.exec();
-    written += slice.length;
-    if (VERBOSE) console.log(`    ...batch ${i / BATCH + 1}: ${written}/${nodes.length}`);
   }
-  await redis.expire('atlas:parent:degree:rank', TTL);
-  console.log(`  ✅ Wrote ${written} nodes + degree ZSET\n`);
+  pipelineCommands.push(['EXPIRE', 'atlas:parent:degree:rank', String(TTL)]);
 
   // Step 3: Lane summaries
-  console.log('  Step 3: Write lane summaries...');
-  const lanePipe = redis.pipeline();
+  console.log('  Step 3: Queue lane summaries...');
   for (const l of lanes) {
-    lanePipe.set(`atlas:parent:lane:${l.lane}`, JSON.stringify(l), 'EX', TTL);
+    pipelineCommands.push(['SET', `atlas:parent:lane:${l.lane}`, JSON.stringify(l), 'EX', String(TTL)]);
   }
-  await lanePipe.exec();
-  console.log(`  ✅ Wrote ${lanes.length} lane summaries\n`);
 
   // Step 4: Cluster summaries + heat ZSET
-  console.log('  Step 4: Write cluster summaries + heat ZSET...');
-  const clusterPipe = redis.pipeline();
+  console.log('  Step 4: Queue cluster summaries + heat ZSET...');
   for (const c of clusters) {
     const key = `atlas:parent:cluster:${c.som_row}:${c.som_col}`;
-    clusterPipe.set(key, JSON.stringify(c), 'EX', TTL);
-    clusterPipe.zadd('atlas:parent:cluster:rank', Number(c.card_count) || 0, `${c.som_row}:${c.som_col}`);
+    pipelineCommands.push(['SET', key, JSON.stringify(c), 'EX', String(TTL)]);
+    pipelineCommands.push(['ZADD', 'atlas:parent:cluster:rank', String(Number(c.card_count) || 0), `${c.som_row}:${c.som_col}`]);
   }
-  await clusterPipe.exec();
-  await redis.expire('atlas:parent:cluster:rank', TTL);
-  console.log(`  ✅ Wrote ${clusters.length} clusters + heat ZSET\n`);
+  pipelineCommands.push(['EXPIRE', 'atlas:parent:cluster:rank', String(TTL)]);
 
   // Step 5: Meta
-  console.log('  Step 5: Write build metadata...');
-  await redis.hset('atlas:parent:meta', {
-    built_at: new Date().toISOString(),
-    total_nodes: nodes.length,
-    total_lanes: lanes.length,
-    total_clusters: clusters.length,
-    ttl_seconds: TTL,
-    source: 'parent_atlas_full.parquet',
-  });
-  await redis.expire('atlas:parent:meta', TTL);
-  console.log('  ✅ Metadata written\n');
+  console.log('  Step 5: Queue build metadata...');
+  pipelineCommands.push(['HSET', 'atlas:parent:meta',
+    'built_at', new Date().toISOString(),
+    'total_nodes', String(nodes.length),
+    'total_lanes', String(lanes.length),
+    'total_clusters', String(clusters.length),
+    'ttl_seconds', String(TTL),
+    'source', 'parent_atlas_full.parquet',
+  ]);
+  pipelineCommands.push(['EXPIRE', 'atlas:parent:meta', String(TTL)]);
 
-  // Step 6: Quick sanity check
-  console.log('  Step 6: Sanity check...');
-  const topClusters = await redis.zrevrange('atlas:parent:cluster:rank', 0, 4, 'WITHSCORES');
+  console.log('  Step 6: Executing integration pipeline...');
+  await executePipeline(pipelineCommands);
+  console.log('  ✅ Pipeline executed successfully\n');
+
+  // Step 7: Quick sanity check
+  console.log('  Step 7: Sanity check...');
+  const topClustersRaw = useDocker
+    ? (await dockerExecRedis('ZREVRANGE', 'atlas:parent:cluster:rank', '0', '4', 'WITHSCORES')).split(/\r?\n/)
+    : await redis.zrevrange('atlas:parent:cluster:rank', 0, 4, 'WITHSCORES');
+
   console.log('  Top 5 hottest SOM clusters (by card_count):');
-  for (let i = 0; i < topClusters.length; i += 2) {
-    console.log(`    ${topClusters[i].padEnd(8)} → ${topClusters[i + 1]} cards`);
+  for (let i = 0; i < topClustersRaw.length; i += 2) {
+    console.log(`    ${topClustersRaw[i].padEnd(8)} → ${topClustersRaw[i + 1]} cards`);
   }
 
   // Write report
@@ -181,7 +261,7 @@ async function main() {
     redis: `${REDIS_HOST}:${REDIS_PORT}`,
     ttl_seconds: TTL,
     written: {
-      nodes: written,
+      nodes: nodes.length,
       lanes: lanes.length,
       clusters: clusters.length,
     },
@@ -193,7 +273,9 @@ async function main() {
   fs.writeFileSync(reportPath, JSON.stringify(report, null, 2), 'utf8');
   console.log(`\n  ✅ Report → ${reportPath}`);
 
-  await redis.quit();
+  if (redis) {
+    await redis.quit();
+  }
 }
 
 main().catch((e) => {

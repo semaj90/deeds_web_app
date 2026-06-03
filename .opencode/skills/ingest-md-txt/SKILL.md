@@ -1,3 +1,10 @@
+---
+name: ingest-md-txt
+description: Ingest markdown and text files into structured JSON cards and Qdrant
+license: MIT
+compatibility: opencode
+---
+
 # ingest-md-txt skill
 
 Goal:

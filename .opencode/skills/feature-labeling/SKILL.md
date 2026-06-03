@@ -1,3 +1,10 @@
+---
+name: feature-labeling
+description: Auto-label ACE cards with domain and feature tags using Gemma4 offload
+license: MIT
+compatibility: opencode
+---
+
 # Skill: feature-labeling
 
 ## When to use

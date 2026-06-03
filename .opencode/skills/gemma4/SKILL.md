@@ -1,3 +1,10 @@
+---
+name: gemma4
+description: Pre-warm ACE context packet for Gemma4 — staleness check then ingest pipeline rebuild
+license: MIT
+compatibility: opencode
+---
+
 # Skill: gemma4
 
 **Goal:** When Gemma4 needs fresh context for a task, automatically run the ACE ingest pipeline to rebuild ranking, rerank, label, compress, and cache the packet — then hand the result to the requesting skill or agent.

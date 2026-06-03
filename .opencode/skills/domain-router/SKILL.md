@@ -1,3 +1,10 @@
+---
+name: domain-router
+description: Route tasks to the correct domain lane based on file type and ACE feature labels
+license: MIT
+compatibility: opencode
+---
+
 # Skill: domain-router
 
 ## When to use

@@ -34,4 +34,21 @@ Active query benchmark profiles comparing canonical `768d` against compressed `6
 - **Unified Pipeline Built:** Consolidates all document processes, semantic chunking, master index rebuilding, and benchmarking under a single command `node scripts/docs-atlas/run-all-docs-pipeline.mjs`.
 
 ---
+
+## 4. Redis/Valkey Password Configuration Pattern (The "Redis Trick")
+
+- **Constructor Config Over URL Strings:** Standalone scripts (smoke tests, offline indexers) must avoid manually constructing `REDIS_URL` connection strings with password interpolation (which frequently breaks on special characters like `:` or `@`). Instead, read variables from `.env` and pass them as a configuration object to the `ioredis` constructor:
+  ```javascript
+  const redis = new Redis({
+    host: env.REDIS_HOST || '127.0.0.1',
+    port: parseInt(env.REDIS_PORT || '6379', 10),
+    password: env.REDIS_PASSWORD || undefined,
+    lazyConnect: true,
+    maxRetriesPerRequest: 1,
+    enableOfflineQueue: false,
+    retryStrategy: () => null,
+  });
+  ```
+
+---
 *Verified under Deeds Legal-AI Platform Guidelines.*

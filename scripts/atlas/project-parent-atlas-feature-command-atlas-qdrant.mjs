@@ -105,7 +105,8 @@ function ensureCollection(client) {
       on_disk: false,
     },
   }).catch(async (error) => {
-    if (!String(error?.message ?? error).includes('already exists')) {
+    const msg = String(error?.message ?? error);
+    if (!msg.includes('already exists') && !msg.includes('Conflict')) {
       throw error;
     }
   });

@@ -1,3 +1,10 @@
+---
+name: caveman-pipeline
+description: End-to-end ingest pipeline: discover, chunk, embed, and index docs into Qdrant atlas_cards
+license: MIT
+compatibility: opencode
+---
+
 # Skill: caveman-pipeline
 
 Goal:

@@ -29,6 +29,15 @@ from pathlib import Path
 if hasattr(sys.stdout, 'reconfigure'):
     sys.stdout.reconfigure(encoding='utf-8', errors='replace')
 
+# Manual parse of sveltekit-frontend/.env
+env_path = Path(__file__).parent.parent / ".env"
+if env_path.exists():
+    for line in env_path.read_text(encoding="utf-8").splitlines():
+        line = line.strip()
+        if line and not line.startswith("#") and "=" in line:
+            k, v = line.split("=", 1)
+            os.environ[k.strip()] = v.strip().strip("'").strip('"')
+
 import requests
 import redis
 import torch
@@ -129,7 +138,8 @@ if args.dry_run:
     sys.exit(0)
 
 # ── Resume from Redis weights ─────────────────────────────────────────────────
-r = redis.from_url(REDIS_URL, decode_responses=True)
+REDIS_PASS = os.environ.get("REDIS_PASSWORD", "redis")
+r = redis.from_url(REDIS_URL, password=REDIS_PASS or None, decode_responses=True)
 
 if args.resume:
     try:

@@ -1,0 +1,1891 @@
+{
+  "generated_at": "2026-06-03T19:12:48.707Z",
+  "connection_count": 50,
+  "feature_count": 10,
+  "connections": [
+    {
+      "source_id": "ad2ba02099ccf749a50985c8b251ec9116cc832d72735bf336e3e32a44b4c44a",
+      "source_ref": ".claude/commands/shallow-wiring-analysis.md",
+      "feature_ids": [
+        "ui"
+      ],
+      "top_feature": "ui",
+      "risk": "low",
+      "next_action": "Review API and schema alignment.",
+      "language": "markdown",
+      "environment": "workspace"
+    },
+    {
+      "source_id": "d312e2306627348a4b553600b651a1a1fad86a259536bcffb09f70a9f391a739",
+      "source_ref": ".claude/commands/wire-modules.md",
+      "feature_ids": [
+        "ui",
+        "database"
+      ],
+      "top_feature": "ui",
+      "risk": "low",
+      "next_action": "Review API and schema alignment.",
+      "language": "markdown",
+      "environment": "workspace"
+    },
+    {
+      "source_id": "192ea945cbfb1df4bcd191e1fa4b8cbac987431612c6407909610e1c747409d9",
+      "source_ref": ".claude/hooks/LLMS.md",
+      "feature_ids": [
+        "llm",
+        "graph",
+        "database",
+        "ui",
+        "ingest",
+        "cache",
+        "gpu",
+        "auth"
+      ],
+      "top_feature": "llm",
+      "risk": "low",
+      "next_action": "Review API and schema alignment.",
+      "language": "markdown",
+      "environment": "workspace"
+    },
+    {
+      "source_id": "350f0afc30ceb3ea668ca993269fcfee57db5308dab3e8ccde5a7d53c4a2eed7",
+      "source_ref": ".claude/hooks/posttooluse-audit.mjs",
+      "feature_ids": [
+        "auth",
+        "evidence",
+        "ui"
+      ],
+      "top_feature": "auth",
+      "risk": "low",
+      "next_action": "Review API and schema alignment.",
+      "language": "javascript",
+      "environment": "workspace"
+    },
+    {
+      "source_id": "d44aaf4aaa471a89bf7e2c1b70e267b9ae15df39e7df46bb24ffae1735822db8",
+      "source_ref": ".claude/hooks/pretooluse-deny.mjs",
+      "feature_ids": [
+        "database",
+        "ui"
+      ],
+      "top_feature": "database",
+      "risk": "low",
+      "next_action": "Review API and schema alignment.",
+      "language": "javascript",
+      "environment": "workspace"
+    },
+    {
+      "source_id": "387c72a56c8a5eb8192f44e97cbe7194d329090b5e92160c1c23c71d1e945c15",
+      "source_ref": ".claude/LLMS.md",
+      "feature_ids": [
+        "llm",
+        "graph",
+        "database",
+        "ui",
+        "ingest",
+        "cache",
+        "gpu",
+        "auth"
+      ],
+      "top_feature": "llm",
+      "risk": "low",
+      "next_action": "Review API and schema alignment.",
+      "language": "markdown",
+      "environment": "workspace"
+    },
+    {
+      "source_id": "8cd301bfc48ffeb3cf1498b8fa4604d6cf1fedf018e518b1a128664faf1cd935",
+      "source_ref": ".claude/mcp.json",
+      "feature_ids": [
+        "graph",
+        "database",
+        "vector-search",
+        "auth",
+        "evidence",
+        "llm",
+        "ui"
+      ],
+      "top_feature": "graph",
+      "risk": "low",
+      "next_action": "Review API and schema alignment.",
+      "language": "json",
+      "environment": "workspace"
+    },
+    {
+      "source_id": "f27ac6f39d89fe021c56900069198aa7d9968f2cd6645c00b11ffd1b78fcf546",
+      "source_ref": ".claude/settings.json",
+      "feature_ids": [
+        "ui",
+        "auth",
+        "llm",
+        "gpu"
+      ],
+      "top_feature": "ui",
+      "risk": "low",
+      "next_action": "Review API and schema alignment.",
+      "language": "json",
+      "environment": "workspace"
+    },
+    {
+      "source_id": "fca16cae5b0e32edfa6b55eaa32a98ffbf4a0c7d885fb585785fc83b6ea2d9c3",
+      "source_ref": ".claude/settings.local.json",
+      "feature_ids": [
+        "gpu",
+        "database",
+        "ui",
+        "evidence",
+        "llm"
+      ],
+      "top_feature": "gpu",
+      "risk": "low",
+      "next_action": "Review API and schema alignment.",
+      "language": "json",
+      "environment": "workspace"
+    },
+    {
+      "source_id": "da3216bebaece34b891bd41f6f898915e36d93016085e61441ac18304c7d3a55",
+      "source_ref": ".claude/skills/bits-ui-svelte5/SKILL.md",
+      "feature_ids": [
+        "ui"
+      ],
+      "top_feature": "ui",
+      "risk": "low",
+      "next_action": "Review API and schema alignment.",
+      "language": "markdown",
+      "environment": "workspace"
+    },
+    {
+      "source_id": "5da61b40a6abaf2a2f75a2d216a6e6704bc8bc9d7f2fa20e2727263f50eee332",
+      "source_ref": ".claude/skills/codebase-indexing-agentic-error-fixing.md",
+      "feature_ids": [
+        "graph",
+        "database",
+        "auth",
+        "ui",
+        "gpu",
+        "llm",
+        "vector-search"
+      ],
+      "top_feature": "graph",
+      "risk": "low",
+      "next_action": "Review API and schema alignment.",
+      "language": "markdown",
+      "environment": "workspace"
+    },
+    {
+      "source_id": "34090a1c513cf6d2723df2021e6af484d309662b1ab32b099a898d837c6fdd16",
+      "source_ref": ".claude/skills/codebase-mapping-json-ingestion.md",
+      "feature_ids": [
+        "graph",
+        "database",
+        "evidence",
+        "vector-search",
+        "ui",
+        "ingest",
+        "llm",
+        "auth",
+        "cache"
+      ],
+      "top_feature": "graph",
+      "risk": "low",
+      "next_action": "Review API and schema alignment.",
+      "language": "markdown",
+      "environment": "workspace"
+    },
+    {
+      "source_id": "378a33358f832d123c2d247ef75184cc22de0d965cd4578d7190629a14fd7eee",
+      "source_ref": ".claude/skills/codebase-todo-recommendations.md",
+      "feature_ids": [
+        "gpu",
+        "auth",
+        "llm",
+        "graph",
+        "database",
+        "evidence",
+        "vector-search",
+        "ui"
+      ],
+      "top_feature": "gpu",
+      "risk": "low",
+      "next_action": "Review API and schema alignment.",
+      "language": "markdown",
+      "environment": "workspace"
+    },
+    {
+      "source_id": "83ff3e9c7f4e57ed3db1f11d9bde189a3582eb1d54fb157498258474f85dde9c",
+      "source_ref": ".claude/skills/drizzle-schema-review/SKILL.md",
+      "feature_ids": [
+        "database",
+        "vector-search",
+        "ui"
+      ],
+      "top_feature": "database",
+      "risk": "low",
+      "next_action": "Review API and schema alignment.",
+      "language": "markdown",
+      "environment": "workspace"
+    },
+    {
+      "source_id": "d64f6b3be698e4f2435fe7bfd852bc28d0ede4c42c19e7dae6e4cfb16510bbee",
+      "source_ref": ".claude/skills/metadata-context-analysis/SKILL.md",
+      "feature_ids": [
+        "llm",
+        "database",
+        "graph",
+        "ui",
+        "auth"
+      ],
+      "top_feature": "llm",
+      "risk": "low",
+      "next_action": "Review API and schema alignment.",
+      "language": "markdown",
+      "environment": "workspace"
+    },
+    {
+      "source_id": "6913429c677a322ca695bce499d85a65b5207cad5b6d48e71db910a9b4c3449b",
+      "source_ref": ".claude/skills/trace-mcp-tooling/SKILL.md",
+      "feature_ids": [
+        "llm",
+        "graph",
+        "database",
+        "ui",
+        "vector-search"
+      ],
+      "top_feature": "llm",
+      "risk": "low",
+      "next_action": "Review API and schema alignment.",
+      "language": "markdown",
+      "environment": "workspace"
+    },
+    {
+      "source_id": "bbe25914d48bc994f40bcf218a1097a6a090dca7fa29daa6382e044ec9333743",
+      "source_ref": ".claude/skills/uno-css-design-system/SKILL.md",
+      "feature_ids": [
+        "ui"
+      ],
+      "top_feature": "ui",
+      "risk": "low",
+      "next_action": "Review API and schema alignment.",
+      "language": "markdown",
+      "environment": "workspace"
+    },
+    {
+      "source_id": "c2c38f66a7465add334f95d98183ae296e28cbe0c7eb877c4a13fee5f8f033e6",
+      "source_ref": ".couchdb-state-report-2026-05-29.md",
+      "feature_ids": [
+        "graph",
+        "llm",
+        "database",
+        "evidence",
+        "auth",
+        "cache",
+        "gpu",
+        "ui"
+      ],
+      "top_feature": "graph",
+      "risk": "low",
+      "next_action": "Review API and schema alignment.",
+      "language": "markdown",
+      "environment": "workspace"
+    },
+    {
+      "source_id": "dd80875ceeedd0041d381b3a0f2ac49400e3799bd6600f3cff93ebe9b08f8625",
+      "source_ref": ".github/agents/admin-dashboard-engineer.agent.md",
+      "feature_ids": [
+        "ui",
+        "auth"
+      ],
+      "top_feature": "ui",
+      "risk": "low",
+      "next_action": "Review API and schema alignment.",
+      "language": "markdown",
+      "environment": "workspace"
+    },
+    {
+      "source_id": "2629305481627c9c5aea901d84daaca76e5a81e78062d5e10c8de71d2adb81e9",
+      "source_ref": ".github/agents/chat-attachment-engineer.agent.md",
+      "feature_ids": [
+        "ingest",
+        "ui",
+        "auth",
+        "evidence",
+        "llm"
+      ],
+      "top_feature": "ingest",
+      "risk": "low",
+      "next_action": "Review API and schema alignment.",
+      "language": "markdown",
+      "environment": "workspace"
+    },
+    {
+      "source_id": "793888d9c2baaa6a360fedc07d848a6b77f41a95c196cce4e202af71eacb7701",
+      "source_ref": ".github/agents/design-system-steward.agent.md",
+      "feature_ids": [
+        "ui",
+        "graph",
+        "auth"
+      ],
+      "top_feature": "ui",
+      "risk": "low",
+      "next_action": "Review API and schema alignment.",
+      "language": "markdown",
+      "environment": "workspace"
+    },
+    {
+      "source_id": "22d79bb84d94a2bc976162165335422c382bda17afa7f4190e219dd2d944300f",
+      "source_ref": ".github/agents/evidence-pipeline-engineer.agent.md",
+      "feature_ids": [
+        "evidence",
+        "ingest",
+        "ui",
+        "auth",
+        "llm",
+        "vector-search"
+      ],
+      "top_feature": "evidence",
+      "risk": "low",
+      "next_action": "Review API and schema alignment.",
+      "language": "markdown",
+      "environment": "workspace"
+    },
+    {
+      "source_id": "8a7d8f1627ea7193c9944e2c88b4bb3fd921371248b9a7c6f6a5aae349183d76",
+      "source_ref": ".github/agents/import-audit-engineer.agent.md",
+      "feature_ids": [
+        "ui",
+        "evidence",
+        "auth"
+      ],
+      "top_feature": "ui",
+      "risk": "low",
+      "next_action": "Review API and schema alignment.",
+      "language": "markdown",
+      "environment": "workspace"
+    },
+    {
+      "source_id": "02f0a1ba4b19d5486088388fe3439e330cebdc62a97c9fbfc869a8805cca5daf",
+      "source_ref": ".github/agents/legal-library-engineer.agent.md",
+      "feature_ids": [
+        "evidence",
+        "ingest",
+        "llm",
+        "vector-search",
+        "ui",
+        "database",
+        "graph",
+        "auth"
+      ],
+      "top_feature": "evidence",
+      "risk": "low",
+      "next_action": "Review API and schema alignment.",
+      "language": "markdown",
+      "environment": "workspace"
+    },
+    {
+      "source_id": "c0d58ae124f17bbdc61f964d009fc1cc2fe26aa465bfdba2c5c7d90e85b9d0c0",
+      "source_ref": ".github/agents/performance-caching-engineer.agent.md",
+      "feature_ids": [
+        "auth",
+        "cache",
+        "ui"
+      ],
+      "top_feature": "auth",
+      "risk": "low",
+      "next_action": "Review API and schema alignment.",
+      "language": "markdown",
+      "environment": "workspace"
+    },
+    {
+      "source_id": "08f465d19f65df481c534d6274954c82d6bd4ad463a10bf4414ea6e9c6b9751f",
+      "source_ref": ".github/agents/playwright-feature-engineer.agent.md",
+      "feature_ids": [
+        "auth",
+        "ui"
+      ],
+      "top_feature": "auth",
+      "risk": "low",
+      "next_action": "Review API and schema alignment.",
+      "language": "markdown",
+      "environment": "dev"
+    },
+    {
+      "source_id": "700838911ab2a8b15c37fd3aedd939af3a28d2977ba9f167119016bd8b39205b",
+      "source_ref": ".github/agents/playwright-ui-ux.agent.md",
+      "feature_ids": [
+        "ui",
+        "auth"
+      ],
+      "top_feature": "ui",
+      "risk": "low",
+      "next_action": "Review API and schema alignment.",
+      "language": "markdown",
+      "environment": "dev"
+    },
+    {
+      "source_id": "82bf6cd44bc85f3c17b05ac1e900e62b46df03dc4d84ccb5429f695b15794e0d",
+      "source_ref": ".github/agents/rag-retrieval-engineer.agent.md",
+      "feature_ids": [
+        "auth",
+        "evidence",
+        "vector-search",
+        "llm",
+        "ui"
+      ],
+      "top_feature": "auth",
+      "risk": "low",
+      "next_action": "Review API and schema alignment.",
+      "language": "markdown",
+      "environment": "workspace"
+    },
+    {
+      "source_id": "a5e2e801939021b59b20231500cf4500511fabaaf09f5fdf1e5bcc1db4459865",
+      "source_ref": ".github/agents/route-triage-engineer.agent.md",
+      "feature_ids": [
+        "ui",
+        "evidence",
+        "auth"
+      ],
+      "top_feature": "ui",
+      "risk": "low",
+      "next_action": "Review API and schema alignment.",
+      "language": "markdown",
+      "environment": "workspace"
+    },
+    {
+      "source_id": "0e69d15020bd7a8f62ccd0f2b850dc0ad8910462c3b4ccc7c70afefb7b23e3ff",
+      "source_ref": ".github/agents/search-platform-engineer.agent.md",
+      "feature_ids": [
+        "evidence",
+        "vector-search",
+        "ui",
+        "auth"
+      ],
+      "top_feature": "evidence",
+      "risk": "low",
+      "next_action": "Review API and schema alignment.",
+      "language": "markdown",
+      "environment": "workspace"
+    },
+    {
+      "source_id": "8bb9a3de9829728bfd9936c128853d6832a88dd90f4ac8cd1f3b5ca8e421b4a3",
+      "source_ref": ".github/agents/svelte5-migration-engineer.agent.md",
+      "feature_ids": [
+        "ui",
+        "auth"
+      ],
+      "top_feature": "ui",
+      "risk": "low",
+      "next_action": "Review API and schema alignment.",
+      "language": "markdown",
+      "environment": "workspace"
+    },
+    {
+      "source_id": "feef1839b5c140db791ea437cf90ae7c8d7794d0be2f3168a9068078044f85d9",
+      "source_ref": ".github/agents/trace-audit.agent.md",
+      "feature_ids": [
+        "evidence",
+        "ui"
+      ],
+      "top_feature": "evidence",
+      "risk": "low",
+      "next_action": "Review API and schema alignment.",
+      "language": "markdown",
+      "environment": "workspace"
+    },
+    {
+      "source_id": "a66b9c33770a2e25fe9925c7aa389d09063c24a84052d6b68f757e9871406981",
+      "source_ref": ".github/agents/ui-polish-engineer.agent.md",
+      "feature_ids": [
+        "ui",
+        "auth",
+        "graph"
+      ],
+      "top_feature": "ui",
+      "risk": "low",
+      "next_action": "Review API and schema alignment.",
+      "language": "markdown",
+      "environment": "workspace"
+    },
+    {
+      "source_id": "227c2c26cb2ee0ce0f46a320fc48fbcbdf21801a57f59161b1d0861e8aad55f5",
+      "source_ref": ".github/copilot-instructions.md",
+      "feature_ids": [
+        "ui",
+        "auth"
+      ],
+      "top_feature": "ui",
+      "risk": "low",
+      "next_action": "Review API and schema alignment.",
+      "language": "markdown",
+      "environment": "workspace"
+    },
+    {
+      "source_id": "9efe77aad5dfc42e5cc2463170a0674bfb8d50925b7c009b65a61e1c3a40427f",
+      "source_ref": ".github/hooks/rg.json",
+      "feature_ids": [],
+      "top_feature": "other",
+      "risk": "low",
+      "next_action": "Review API and schema alignment.",
+      "language": "json",
+      "environment": "workspace"
+    },
+    {
+      "source_id": "564d17d924e5960e863da5303d4bf2769731f97d854f1711450101c3c4685d25",
+      "source_ref": ".github/instructions/opencode-context-prefetch.instructions.md",
+      "feature_ids": [
+        "database",
+        "graph",
+        "evidence",
+        "auth",
+        "llm",
+        "vector-search",
+        "ui"
+      ],
+      "top_feature": "database",
+      "risk": "low",
+      "next_action": "Review API and schema alignment.",
+      "language": "markdown",
+      "environment": "workspace"
+    },
+    {
+      "source_id": "d5d3368a61f8d02e085f7a4cb666ee471cf5383690a04b64c839c6ae2080ceb9",
+      "source_ref": ".mcp.json",
+      "feature_ids": [
+        "graph",
+        "ui",
+        "auth",
+        "vector-search"
+      ],
+      "top_feature": "graph",
+      "risk": "low",
+      "next_action": "Review API and schema alignment.",
+      "language": "json",
+      "environment": "workspace"
+    },
+    {
+      "source_id": "06546ba9d294f1cc00db185f2f878add0211f764ed1c71c3abdb08f9a6a04c81",
+      "source_ref": ".opencode/ace-context.json",
+      "feature_ids": [
+        "llm",
+        "vector-search",
+        "evidence",
+        "ui",
+        "graph",
+        "cache",
+        "database",
+        "ingest"
+      ],
+      "top_feature": "llm",
+      "risk": "low",
+      "next_action": "Review API and schema alignment.",
+      "language": "json",
+      "environment": "workspace"
+    },
+    {
+      "source_id": "9b54dd41e7f28817cd6e5660423a40b9ea8367a530459bc2cff05cfd1388adf8",
+      "source_ref": ".opencode/ace-packet-summary.md",
+      "feature_ids": [
+        "llm",
+        "cache",
+        "database",
+        "vector-search",
+        "graph"
+      ],
+      "top_feature": "llm",
+      "risk": "low",
+      "next_action": "Review API and schema alignment.",
+      "language": "markdown",
+      "environment": "workspace"
+    },
+    {
+      "source_id": "b9247d29291048eea9c6677582aba53ddfbe67057d80fbc659bc793c33f3f97c",
+      "source_ref": ".opencode/ace-packet.json",
+      "feature_ids": [
+        "gpu",
+        "graph",
+        "auth",
+        "database",
+        "evidence",
+        "llm",
+        "ui",
+        "ingest"
+      ],
+      "top_feature": "gpu",
+      "risk": "low",
+      "next_action": "Review API and schema alignment.",
+      "language": "json",
+      "environment": "workspace"
+    },
+    {
+      "source_id": "2e70e291efbbeb2ebd81befca5821dc37901d19eba1b4286b39c804337400789",
+      "source_ref": ".opencode/ace-packets/packet-89e34ac6-a15a-4d8f-84ec-1a118dab4c00.json",
+      "feature_ids": [
+        "llm",
+        "evidence",
+        "database"
+      ],
+      "top_feature": "llm",
+      "risk": "low",
+      "next_action": "Review API and schema alignment.",
+      "language": "json",
+      "environment": "workspace"
+    },
+    {
+      "source_id": "ae3845852a78fef046202dd61dc0771f714dd9588ace2ecc39d21c225539ec58",
+      "source_ref": ".opencode/ace-packets_stale/packet-0b57dd4c-f695-4910-b3ba-c84b6b822e32.json",
+      "feature_ids": [
+        "ingest",
+        "database"
+      ],
+      "top_feature": "ingest",
+      "risk": "low",
+      "next_action": "Review API and schema alignment.",
+      "language": "json",
+      "environment": "workspace"
+    },
+    {
+      "source_id": "51a8005fb3ed0451e96296dcad105a30bd1697e1004db81154d5f7c69a35e4f4",
+      "source_ref": ".opencode/ace-packets_stale/packet-122d0988-998e-4835-bed2-5632d05b8165.json",
+      "feature_ids": [
+        "ui",
+        "graph",
+        "database",
+        "vector-search",
+        "gpu"
+      ],
+      "top_feature": "ui",
+      "risk": "low",
+      "next_action": "Review API and schema alignment.",
+      "language": "json",
+      "environment": "workspace"
+    },
+    {
+      "source_id": "79a758152c1cfbd1f1b19d66b9762f453baa4bb4f199568674f18f1cdb6b0d2b",
+      "source_ref": ".opencode/ace-packets_stale/packet-149456da-ae1c-4d4e-b120-220cce7b7d74.json",
+      "feature_ids": [
+        "graph",
+        "database",
+        "ui",
+        "auth"
+      ],
+      "top_feature": "graph",
+      "risk": "low",
+      "next_action": "Review API and schema alignment.",
+      "language": "json",
+      "environment": "workspace"
+    },
+    {
+      "source_id": "8c88619d206ec166fb3ca856b5bc3fa69bcd464892e2ab9c4ab974e813dbbaef",
+      "source_ref": ".opencode/ace-packets_stale/packet-3bcafaf8-da68-43b0-b33b-30fe9830e61e.json",
+      "feature_ids": [
+        "database",
+        "graph",
+        "llm"
+      ],
+      "top_feature": "database",
+      "risk": "low",
+      "next_action": "Review API and schema alignment.",
+      "language": "json",
+      "environment": "workspace"
+    },
+    {
+      "source_id": "753bed35571723fac08bf419b83d6b1aae9f861cc2343af5a6d15a150a5ef791",
+      "source_ref": ".opencode/ace-packets_stale/packet-3c7d7ca2-e42d-45f3-82c2-590060813b4d.json",
+      "feature_ids": [
+        "graph",
+        "gpu",
+        "database"
+      ],
+      "top_feature": "graph",
+      "risk": "low",
+      "next_action": "Review API and schema alignment.",
+      "language": "json",
+      "environment": "workspace"
+    },
+    {
+      "source_id": "06ec73dc9919d9c42bb775bc61d82b57b3785bb351657278ee0849318b2b2151",
+      "source_ref": ".opencode/ace-packets_stale/packet-4e47e747-d909-4141-a86a-3d1e2268cb20.json",
+      "feature_ids": [
+        "ui",
+        "graph",
+        "database",
+        "ingest"
+      ],
+      "top_feature": "ui",
+      "risk": "low",
+      "next_action": "Review API and schema alignment.",
+      "language": "json",
+      "environment": "workspace"
+    },
+    {
+      "source_id": "7f7eae42070b51bb4656b7388e3d9f6df445206f101bd7b4c7ed7f17d01bf8a0",
+      "source_ref": ".opencode/ace-packets_stale/packet-6ca0e48c-5a47-42e9-be6a-8769d06d0bad.json",
+      "feature_ids": [
+        "ui",
+        "graph",
+        "database",
+        "ingest"
+      ],
+      "top_feature": "ui",
+      "risk": "low",
+      "next_action": "Review API and schema alignment.",
+      "language": "json",
+      "environment": "workspace"
+    },
+    {
+      "source_id": "d6a9dd99e8087422c41d35c362eb0dcb44d1d191786948dc78a57bdd098ef8d5",
+      "source_ref": ".opencode/ace-packets_stale/packet-7e78d6d5-9ab3-4e36-94bf-e5c18b521b36.json",
+      "feature_ids": [
+        "graph",
+        "database",
+        "ui",
+        "auth"
+      ],
+      "top_feature": "graph",
+      "risk": "low",
+      "next_action": "Review API and schema alignment.",
+      "language": "json",
+      "environment": "workspace"
+    },
+    {
+      "source_id": "de8d7f81e23763acb79d1936e6699260cd259e8e6d693a6a46d12f80c7bc3551",
+      "source_ref": ".opencode/ace-packets_stale/packet-a614d225-687d-43ef-b4b4-62f67ec7ce33.json",
+      "feature_ids": [
+        "graph",
+        "gpu",
+        "database"
+      ],
+      "top_feature": "graph",
+      "risk": "low",
+      "next_action": "Review API and schema alignment.",
+      "language": "json",
+      "environment": "workspace"
+    }
+  ],
+  "feature_index": {
+    "ui": {
+      "feature_id": "ui",
+      "sources": [
+        {
+          "source_id": "ad2ba02099ccf749a50985c8b251ec9116cc832d72735bf336e3e32a44b4c44a",
+          "source_ref": ".claude/commands/shallow-wiring-analysis.md",
+          "risk": "low"
+        },
+        {
+          "source_id": "d312e2306627348a4b553600b651a1a1fad86a259536bcffb09f70a9f391a739",
+          "source_ref": ".claude/commands/wire-modules.md",
+          "risk": "low"
+        },
+        {
+          "source_id": "192ea945cbfb1df4bcd191e1fa4b8cbac987431612c6407909610e1c747409d9",
+          "source_ref": ".claude/hooks/LLMS.md",
+          "risk": "low"
+        },
+        {
+          "source_id": "350f0afc30ceb3ea668ca993269fcfee57db5308dab3e8ccde5a7d53c4a2eed7",
+          "source_ref": ".claude/hooks/posttooluse-audit.mjs",
+          "risk": "low"
+        },
+        {
+          "source_id": "d44aaf4aaa471a89bf7e2c1b70e267b9ae15df39e7df46bb24ffae1735822db8",
+          "source_ref": ".claude/hooks/pretooluse-deny.mjs",
+          "risk": "low"
+        },
+        {
+          "source_id": "387c72a56c8a5eb8192f44e97cbe7194d329090b5e92160c1c23c71d1e945c15",
+          "source_ref": ".claude/LLMS.md",
+          "risk": "low"
+        },
+        {
+          "source_id": "8cd301bfc48ffeb3cf1498b8fa4604d6cf1fedf018e518b1a128664faf1cd935",
+          "source_ref": ".claude/mcp.json",
+          "risk": "low"
+        },
+        {
+          "source_id": "f27ac6f39d89fe021c56900069198aa7d9968f2cd6645c00b11ffd1b78fcf546",
+          "source_ref": ".claude/settings.json",
+          "risk": "low"
+        },
+        {
+          "source_id": "fca16cae5b0e32edfa6b55eaa32a98ffbf4a0c7d885fb585785fc83b6ea2d9c3",
+          "source_ref": ".claude/settings.local.json",
+          "risk": "low"
+        },
+        {
+          "source_id": "da3216bebaece34b891bd41f6f898915e36d93016085e61441ac18304c7d3a55",
+          "source_ref": ".claude/skills/bits-ui-svelte5/SKILL.md",
+          "risk": "low"
+        },
+        {
+          "source_id": "5da61b40a6abaf2a2f75a2d216a6e6704bc8bc9d7f2fa20e2727263f50eee332",
+          "source_ref": ".claude/skills/codebase-indexing-agentic-error-fixing.md",
+          "risk": "low"
+        },
+        {
+          "source_id": "34090a1c513cf6d2723df2021e6af484d309662b1ab32b099a898d837c6fdd16",
+          "source_ref": ".claude/skills/codebase-mapping-json-ingestion.md",
+          "risk": "low"
+        },
+        {
+          "source_id": "378a33358f832d123c2d247ef75184cc22de0d965cd4578d7190629a14fd7eee",
+          "source_ref": ".claude/skills/codebase-todo-recommendations.md",
+          "risk": "low"
+        },
+        {
+          "source_id": "83ff3e9c7f4e57ed3db1f11d9bde189a3582eb1d54fb157498258474f85dde9c",
+          "source_ref": ".claude/skills/drizzle-schema-review/SKILL.md",
+          "risk": "low"
+        },
+        {
+          "source_id": "d64f6b3be698e4f2435fe7bfd852bc28d0ede4c42c19e7dae6e4cfb16510bbee",
+          "source_ref": ".claude/skills/metadata-context-analysis/SKILL.md",
+          "risk": "low"
+        },
+        {
+          "source_id": "6913429c677a322ca695bce499d85a65b5207cad5b6d48e71db910a9b4c3449b",
+          "source_ref": ".claude/skills/trace-mcp-tooling/SKILL.md",
+          "risk": "low"
+        },
+        {
+          "source_id": "bbe25914d48bc994f40bcf218a1097a6a090dca7fa29daa6382e044ec9333743",
+          "source_ref": ".claude/skills/uno-css-design-system/SKILL.md",
+          "risk": "low"
+        },
+        {
+          "source_id": "c2c38f66a7465add334f95d98183ae296e28cbe0c7eb877c4a13fee5f8f033e6",
+          "source_ref": ".couchdb-state-report-2026-05-29.md",
+          "risk": "low"
+        },
+        {
+          "source_id": "dd80875ceeedd0041d381b3a0f2ac49400e3799bd6600f3cff93ebe9b08f8625",
+          "source_ref": ".github/agents/admin-dashboard-engineer.agent.md",
+          "risk": "low"
+        },
+        {
+          "source_id": "2629305481627c9c5aea901d84daaca76e5a81e78062d5e10c8de71d2adb81e9",
+          "source_ref": ".github/agents/chat-attachment-engineer.agent.md",
+          "risk": "low"
+        },
+        {
+          "source_id": "793888d9c2baaa6a360fedc07d848a6b77f41a95c196cce4e202af71eacb7701",
+          "source_ref": ".github/agents/design-system-steward.agent.md",
+          "risk": "low"
+        },
+        {
+          "source_id": "22d79bb84d94a2bc976162165335422c382bda17afa7f4190e219dd2d944300f",
+          "source_ref": ".github/agents/evidence-pipeline-engineer.agent.md",
+          "risk": "low"
+        },
+        {
+          "source_id": "8a7d8f1627ea7193c9944e2c88b4bb3fd921371248b9a7c6f6a5aae349183d76",
+          "source_ref": ".github/agents/import-audit-engineer.agent.md",
+          "risk": "low"
+        },
+        {
+          "source_id": "02f0a1ba4b19d5486088388fe3439e330cebdc62a97c9fbfc869a8805cca5daf",
+          "source_ref": ".github/agents/legal-library-engineer.agent.md",
+          "risk": "low"
+        },
+        {
+          "source_id": "c0d58ae124f17bbdc61f964d009fc1cc2fe26aa465bfdba2c5c7d90e85b9d0c0",
+          "source_ref": ".github/agents/performance-caching-engineer.agent.md",
+          "risk": "low"
+        },
+        {
+          "source_id": "08f465d19f65df481c534d6274954c82d6bd4ad463a10bf4414ea6e9c6b9751f",
+          "source_ref": ".github/agents/playwright-feature-engineer.agent.md",
+          "risk": "low"
+        },
+        {
+          "source_id": "700838911ab2a8b15c37fd3aedd939af3a28d2977ba9f167119016bd8b39205b",
+          "source_ref": ".github/agents/playwright-ui-ux.agent.md",
+          "risk": "low"
+        },
+        {
+          "source_id": "82bf6cd44bc85f3c17b05ac1e900e62b46df03dc4d84ccb5429f695b15794e0d",
+          "source_ref": ".github/agents/rag-retrieval-engineer.agent.md",
+          "risk": "low"
+        },
+        {
+          "source_id": "a5e2e801939021b59b20231500cf4500511fabaaf09f5fdf1e5bcc1db4459865",
+          "source_ref": ".github/agents/route-triage-engineer.agent.md",
+          "risk": "low"
+        },
+        {
+          "source_id": "0e69d15020bd7a8f62ccd0f2b850dc0ad8910462c3b4ccc7c70afefb7b23e3ff",
+          "source_ref": ".github/agents/search-platform-engineer.agent.md",
+          "risk": "low"
+        },
+        {
+          "source_id": "8bb9a3de9829728bfd9936c128853d6832a88dd90f4ac8cd1f3b5ca8e421b4a3",
+          "source_ref": ".github/agents/svelte5-migration-engineer.agent.md",
+          "risk": "low"
+        },
+        {
+          "source_id": "feef1839b5c140db791ea437cf90ae7c8d7794d0be2f3168a9068078044f85d9",
+          "source_ref": ".github/agents/trace-audit.agent.md",
+          "risk": "low"
+        },
+        {
+          "source_id": "a66b9c33770a2e25fe9925c7aa389d09063c24a84052d6b68f757e9871406981",
+          "source_ref": ".github/agents/ui-polish-engineer.agent.md",
+          "risk": "low"
+        },
+        {
+          "source_id": "227c2c26cb2ee0ce0f46a320fc48fbcbdf21801a57f59161b1d0861e8aad55f5",
+          "source_ref": ".github/copilot-instructions.md",
+          "risk": "low"
+        },
+        {
+          "source_id": "564d17d924e5960e863da5303d4bf2769731f97d854f1711450101c3c4685d25",
+          "source_ref": ".github/instructions/opencode-context-prefetch.instructions.md",
+          "risk": "low"
+        },
+        {
+          "source_id": "d5d3368a61f8d02e085f7a4cb666ee471cf5383690a04b64c839c6ae2080ceb9",
+          "source_ref": ".mcp.json",
+          "risk": "low"
+        },
+        {
+          "source_id": "06546ba9d294f1cc00db185f2f878add0211f764ed1c71c3abdb08f9a6a04c81",
+          "source_ref": ".opencode/ace-context.json",
+          "risk": "low"
+        },
+        {
+          "source_id": "b9247d29291048eea9c6677582aba53ddfbe67057d80fbc659bc793c33f3f97c",
+          "source_ref": ".opencode/ace-packet.json",
+          "risk": "low"
+        },
+        {
+          "source_id": "51a8005fb3ed0451e96296dcad105a30bd1697e1004db81154d5f7c69a35e4f4",
+          "source_ref": ".opencode/ace-packets_stale/packet-122d0988-998e-4835-bed2-5632d05b8165.json",
+          "risk": "low"
+        },
+        {
+          "source_id": "79a758152c1cfbd1f1b19d66b9762f453baa4bb4f199568674f18f1cdb6b0d2b",
+          "source_ref": ".opencode/ace-packets_stale/packet-149456da-ae1c-4d4e-b120-220cce7b7d74.json",
+          "risk": "low"
+        },
+        {
+          "source_id": "06ec73dc9919d9c42bb775bc61d82b57b3785bb351657278ee0849318b2b2151",
+          "source_ref": ".opencode/ace-packets_stale/packet-4e47e747-d909-4141-a86a-3d1e2268cb20.json",
+          "risk": "low"
+        },
+        {
+          "source_id": "7f7eae42070b51bb4656b7388e3d9f6df445206f101bd7b4c7ed7f17d01bf8a0",
+          "source_ref": ".opencode/ace-packets_stale/packet-6ca0e48c-5a47-42e9-be6a-8769d06d0bad.json",
+          "risk": "low"
+        },
+        {
+          "source_id": "d6a9dd99e8087422c41d35c362eb0dcb44d1d191786948dc78a57bdd098ef8d5",
+          "source_ref": ".opencode/ace-packets_stale/packet-7e78d6d5-9ab3-4e36-94bf-e5c18b521b36.json",
+          "risk": "low"
+        }
+      ]
+    },
+    "database": {
+      "feature_id": "database",
+      "sources": [
+        {
+          "source_id": "d312e2306627348a4b553600b651a1a1fad86a259536bcffb09f70a9f391a739",
+          "source_ref": ".claude/commands/wire-modules.md",
+          "risk": "low"
+        },
+        {
+          "source_id": "192ea945cbfb1df4bcd191e1fa4b8cbac987431612c6407909610e1c747409d9",
+          "source_ref": ".claude/hooks/LLMS.md",
+          "risk": "low"
+        },
+        {
+          "source_id": "d44aaf4aaa471a89bf7e2c1b70e267b9ae15df39e7df46bb24ffae1735822db8",
+          "source_ref": ".claude/hooks/pretooluse-deny.mjs",
+          "risk": "low"
+        },
+        {
+          "source_id": "387c72a56c8a5eb8192f44e97cbe7194d329090b5e92160c1c23c71d1e945c15",
+          "source_ref": ".claude/LLMS.md",
+          "risk": "low"
+        },
+        {
+          "source_id": "8cd301bfc48ffeb3cf1498b8fa4604d6cf1fedf018e518b1a128664faf1cd935",
+          "source_ref": ".claude/mcp.json",
+          "risk": "low"
+        },
+        {
+          "source_id": "fca16cae5b0e32edfa6b55eaa32a98ffbf4a0c7d885fb585785fc83b6ea2d9c3",
+          "source_ref": ".claude/settings.local.json",
+          "risk": "low"
+        },
+        {
+          "source_id": "5da61b40a6abaf2a2f75a2d216a6e6704bc8bc9d7f2fa20e2727263f50eee332",
+          "source_ref": ".claude/skills/codebase-indexing-agentic-error-fixing.md",
+          "risk": "low"
+        },
+        {
+          "source_id": "34090a1c513cf6d2723df2021e6af484d309662b1ab32b099a898d837c6fdd16",
+          "source_ref": ".claude/skills/codebase-mapping-json-ingestion.md",
+          "risk": "low"
+        },
+        {
+          "source_id": "378a33358f832d123c2d247ef75184cc22de0d965cd4578d7190629a14fd7eee",
+          "source_ref": ".claude/skills/codebase-todo-recommendations.md",
+          "risk": "low"
+        },
+        {
+          "source_id": "83ff3e9c7f4e57ed3db1f11d9bde189a3582eb1d54fb157498258474f85dde9c",
+          "source_ref": ".claude/skills/drizzle-schema-review/SKILL.md",
+          "risk": "low"
+        },
+        {
+          "source_id": "d64f6b3be698e4f2435fe7bfd852bc28d0ede4c42c19e7dae6e4cfb16510bbee",
+          "source_ref": ".claude/skills/metadata-context-analysis/SKILL.md",
+          "risk": "low"
+        },
+        {
+          "source_id": "6913429c677a322ca695bce499d85a65b5207cad5b6d48e71db910a9b4c3449b",
+          "source_ref": ".claude/skills/trace-mcp-tooling/SKILL.md",
+          "risk": "low"
+        },
+        {
+          "source_id": "c2c38f66a7465add334f95d98183ae296e28cbe0c7eb877c4a13fee5f8f033e6",
+          "source_ref": ".couchdb-state-report-2026-05-29.md",
+          "risk": "low"
+        },
+        {
+          "source_id": "02f0a1ba4b19d5486088388fe3439e330cebdc62a97c9fbfc869a8805cca5daf",
+          "source_ref": ".github/agents/legal-library-engineer.agent.md",
+          "risk": "low"
+        },
+        {
+          "source_id": "564d17d924e5960e863da5303d4bf2769731f97d854f1711450101c3c4685d25",
+          "source_ref": ".github/instructions/opencode-context-prefetch.instructions.md",
+          "risk": "low"
+        },
+        {
+          "source_id": "06546ba9d294f1cc00db185f2f878add0211f764ed1c71c3abdb08f9a6a04c81",
+          "source_ref": ".opencode/ace-context.json",
+          "risk": "low"
+        },
+        {
+          "source_id": "9b54dd41e7f28817cd6e5660423a40b9ea8367a530459bc2cff05cfd1388adf8",
+          "source_ref": ".opencode/ace-packet-summary.md",
+          "risk": "low"
+        },
+        {
+          "source_id": "b9247d29291048eea9c6677582aba53ddfbe67057d80fbc659bc793c33f3f97c",
+          "source_ref": ".opencode/ace-packet.json",
+          "risk": "low"
+        },
+        {
+          "source_id": "2e70e291efbbeb2ebd81befca5821dc37901d19eba1b4286b39c804337400789",
+          "source_ref": ".opencode/ace-packets/packet-89e34ac6-a15a-4d8f-84ec-1a118dab4c00.json",
+          "risk": "low"
+        },
+        {
+          "source_id": "ae3845852a78fef046202dd61dc0771f714dd9588ace2ecc39d21c225539ec58",
+          "source_ref": ".opencode/ace-packets_stale/packet-0b57dd4c-f695-4910-b3ba-c84b6b822e32.json",
+          "risk": "low"
+        },
+        {
+          "source_id": "51a8005fb3ed0451e96296dcad105a30bd1697e1004db81154d5f7c69a35e4f4",
+          "source_ref": ".opencode/ace-packets_stale/packet-122d0988-998e-4835-bed2-5632d05b8165.json",
+          "risk": "low"
+        },
+        {
+          "source_id": "79a758152c1cfbd1f1b19d66b9762f453baa4bb4f199568674f18f1cdb6b0d2b",
+          "source_ref": ".opencode/ace-packets_stale/packet-149456da-ae1c-4d4e-b120-220cce7b7d74.json",
+          "risk": "low"
+        },
+        {
+          "source_id": "8c88619d206ec166fb3ca856b5bc3fa69bcd464892e2ab9c4ab974e813dbbaef",
+          "source_ref": ".opencode/ace-packets_stale/packet-3bcafaf8-da68-43b0-b33b-30fe9830e61e.json",
+          "risk": "low"
+        },
+        {
+          "source_id": "753bed35571723fac08bf419b83d6b1aae9f861cc2343af5a6d15a150a5ef791",
+          "source_ref": ".opencode/ace-packets_stale/packet-3c7d7ca2-e42d-45f3-82c2-590060813b4d.json",
+          "risk": "low"
+        },
+        {
+          "source_id": "06ec73dc9919d9c42bb775bc61d82b57b3785bb351657278ee0849318b2b2151",
+          "source_ref": ".opencode/ace-packets_stale/packet-4e47e747-d909-4141-a86a-3d1e2268cb20.json",
+          "risk": "low"
+        },
+        {
+          "source_id": "7f7eae42070b51bb4656b7388e3d9f6df445206f101bd7b4c7ed7f17d01bf8a0",
+          "source_ref": ".opencode/ace-packets_stale/packet-6ca0e48c-5a47-42e9-be6a-8769d06d0bad.json",
+          "risk": "low"
+        },
+        {
+          "source_id": "d6a9dd99e8087422c41d35c362eb0dcb44d1d191786948dc78a57bdd098ef8d5",
+          "source_ref": ".opencode/ace-packets_stale/packet-7e78d6d5-9ab3-4e36-94bf-e5c18b521b36.json",
+          "risk": "low"
+        },
+        {
+          "source_id": "de8d7f81e23763acb79d1936e6699260cd259e8e6d693a6a46d12f80c7bc3551",
+          "source_ref": ".opencode/ace-packets_stale/packet-a614d225-687d-43ef-b4b4-62f67ec7ce33.json",
+          "risk": "low"
+        }
+      ]
+    },
+    "llm": {
+      "feature_id": "llm",
+      "sources": [
+        {
+          "source_id": "192ea945cbfb1df4bcd191e1fa4b8cbac987431612c6407909610e1c747409d9",
+          "source_ref": ".claude/hooks/LLMS.md",
+          "risk": "low"
+        },
+        {
+          "source_id": "387c72a56c8a5eb8192f44e97cbe7194d329090b5e92160c1c23c71d1e945c15",
+          "source_ref": ".claude/LLMS.md",
+          "risk": "low"
+        },
+        {
+          "source_id": "8cd301bfc48ffeb3cf1498b8fa4604d6cf1fedf018e518b1a128664faf1cd935",
+          "source_ref": ".claude/mcp.json",
+          "risk": "low"
+        },
+        {
+          "source_id": "f27ac6f39d89fe021c56900069198aa7d9968f2cd6645c00b11ffd1b78fcf546",
+          "source_ref": ".claude/settings.json",
+          "risk": "low"
+        },
+        {
+          "source_id": "fca16cae5b0e32edfa6b55eaa32a98ffbf4a0c7d885fb585785fc83b6ea2d9c3",
+          "source_ref": ".claude/settings.local.json",
+          "risk": "low"
+        },
+        {
+          "source_id": "5da61b40a6abaf2a2f75a2d216a6e6704bc8bc9d7f2fa20e2727263f50eee332",
+          "source_ref": ".claude/skills/codebase-indexing-agentic-error-fixing.md",
+          "risk": "low"
+        },
+        {
+          "source_id": "34090a1c513cf6d2723df2021e6af484d309662b1ab32b099a898d837c6fdd16",
+          "source_ref": ".claude/skills/codebase-mapping-json-ingestion.md",
+          "risk": "low"
+        },
+        {
+          "source_id": "378a33358f832d123c2d247ef75184cc22de0d965cd4578d7190629a14fd7eee",
+          "source_ref": ".claude/skills/codebase-todo-recommendations.md",
+          "risk": "low"
+        },
+        {
+          "source_id": "d64f6b3be698e4f2435fe7bfd852bc28d0ede4c42c19e7dae6e4cfb16510bbee",
+          "source_ref": ".claude/skills/metadata-context-analysis/SKILL.md",
+          "risk": "low"
+        },
+        {
+          "source_id": "6913429c677a322ca695bce499d85a65b5207cad5b6d48e71db910a9b4c3449b",
+          "source_ref": ".claude/skills/trace-mcp-tooling/SKILL.md",
+          "risk": "low"
+        },
+        {
+          "source_id": "c2c38f66a7465add334f95d98183ae296e28cbe0c7eb877c4a13fee5f8f033e6",
+          "source_ref": ".couchdb-state-report-2026-05-29.md",
+          "risk": "low"
+        },
+        {
+          "source_id": "2629305481627c9c5aea901d84daaca76e5a81e78062d5e10c8de71d2adb81e9",
+          "source_ref": ".github/agents/chat-attachment-engineer.agent.md",
+          "risk": "low"
+        },
+        {
+          "source_id": "22d79bb84d94a2bc976162165335422c382bda17afa7f4190e219dd2d944300f",
+          "source_ref": ".github/agents/evidence-pipeline-engineer.agent.md",
+          "risk": "low"
+        },
+        {
+          "source_id": "02f0a1ba4b19d5486088388fe3439e330cebdc62a97c9fbfc869a8805cca5daf",
+          "source_ref": ".github/agents/legal-library-engineer.agent.md",
+          "risk": "low"
+        },
+        {
+          "source_id": "82bf6cd44bc85f3c17b05ac1e900e62b46df03dc4d84ccb5429f695b15794e0d",
+          "source_ref": ".github/agents/rag-retrieval-engineer.agent.md",
+          "risk": "low"
+        },
+        {
+          "source_id": "564d17d924e5960e863da5303d4bf2769731f97d854f1711450101c3c4685d25",
+          "source_ref": ".github/instructions/opencode-context-prefetch.instructions.md",
+          "risk": "low"
+        },
+        {
+          "source_id": "06546ba9d294f1cc00db185f2f878add0211f764ed1c71c3abdb08f9a6a04c81",
+          "source_ref": ".opencode/ace-context.json",
+          "risk": "low"
+        },
+        {
+          "source_id": "9b54dd41e7f28817cd6e5660423a40b9ea8367a530459bc2cff05cfd1388adf8",
+          "source_ref": ".opencode/ace-packet-summary.md",
+          "risk": "low"
+        },
+        {
+          "source_id": "b9247d29291048eea9c6677582aba53ddfbe67057d80fbc659bc793c33f3f97c",
+          "source_ref": ".opencode/ace-packet.json",
+          "risk": "low"
+        },
+        {
+          "source_id": "2e70e291efbbeb2ebd81befca5821dc37901d19eba1b4286b39c804337400789",
+          "source_ref": ".opencode/ace-packets/packet-89e34ac6-a15a-4d8f-84ec-1a118dab4c00.json",
+          "risk": "low"
+        },
+        {
+          "source_id": "8c88619d206ec166fb3ca856b5bc3fa69bcd464892e2ab9c4ab974e813dbbaef",
+          "source_ref": ".opencode/ace-packets_stale/packet-3bcafaf8-da68-43b0-b33b-30fe9830e61e.json",
+          "risk": "low"
+        }
+      ]
+    },
+    "graph": {
+      "feature_id": "graph",
+      "sources": [
+        {
+          "source_id": "192ea945cbfb1df4bcd191e1fa4b8cbac987431612c6407909610e1c747409d9",
+          "source_ref": ".claude/hooks/LLMS.md",
+          "risk": "low"
+        },
+        {
+          "source_id": "387c72a56c8a5eb8192f44e97cbe7194d329090b5e92160c1c23c71d1e945c15",
+          "source_ref": ".claude/LLMS.md",
+          "risk": "low"
+        },
+        {
+          "source_id": "8cd301bfc48ffeb3cf1498b8fa4604d6cf1fedf018e518b1a128664faf1cd935",
+          "source_ref": ".claude/mcp.json",
+          "risk": "low"
+        },
+        {
+          "source_id": "5da61b40a6abaf2a2f75a2d216a6e6704bc8bc9d7f2fa20e2727263f50eee332",
+          "source_ref": ".claude/skills/codebase-indexing-agentic-error-fixing.md",
+          "risk": "low"
+        },
+        {
+          "source_id": "34090a1c513cf6d2723df2021e6af484d309662b1ab32b099a898d837c6fdd16",
+          "source_ref": ".claude/skills/codebase-mapping-json-ingestion.md",
+          "risk": "low"
+        },
+        {
+          "source_id": "378a33358f832d123c2d247ef75184cc22de0d965cd4578d7190629a14fd7eee",
+          "source_ref": ".claude/skills/codebase-todo-recommendations.md",
+          "risk": "low"
+        },
+        {
+          "source_id": "d64f6b3be698e4f2435fe7bfd852bc28d0ede4c42c19e7dae6e4cfb16510bbee",
+          "source_ref": ".claude/skills/metadata-context-analysis/SKILL.md",
+          "risk": "low"
+        },
+        {
+          "source_id": "6913429c677a322ca695bce499d85a65b5207cad5b6d48e71db910a9b4c3449b",
+          "source_ref": ".claude/skills/trace-mcp-tooling/SKILL.md",
+          "risk": "low"
+        },
+        {
+          "source_id": "c2c38f66a7465add334f95d98183ae296e28cbe0c7eb877c4a13fee5f8f033e6",
+          "source_ref": ".couchdb-state-report-2026-05-29.md",
+          "risk": "low"
+        },
+        {
+          "source_id": "793888d9c2baaa6a360fedc07d848a6b77f41a95c196cce4e202af71eacb7701",
+          "source_ref": ".github/agents/design-system-steward.agent.md",
+          "risk": "low"
+        },
+        {
+          "source_id": "02f0a1ba4b19d5486088388fe3439e330cebdc62a97c9fbfc869a8805cca5daf",
+          "source_ref": ".github/agents/legal-library-engineer.agent.md",
+          "risk": "low"
+        },
+        {
+          "source_id": "a66b9c33770a2e25fe9925c7aa389d09063c24a84052d6b68f757e9871406981",
+          "source_ref": ".github/agents/ui-polish-engineer.agent.md",
+          "risk": "low"
+        },
+        {
+          "source_id": "564d17d924e5960e863da5303d4bf2769731f97d854f1711450101c3c4685d25",
+          "source_ref": ".github/instructions/opencode-context-prefetch.instructions.md",
+          "risk": "low"
+        },
+        {
+          "source_id": "d5d3368a61f8d02e085f7a4cb666ee471cf5383690a04b64c839c6ae2080ceb9",
+          "source_ref": ".mcp.json",
+          "risk": "low"
+        },
+        {
+          "source_id": "06546ba9d294f1cc00db185f2f878add0211f764ed1c71c3abdb08f9a6a04c81",
+          "source_ref": ".opencode/ace-context.json",
+          "risk": "low"
+        },
+        {
+          "source_id": "9b54dd41e7f28817cd6e5660423a40b9ea8367a530459bc2cff05cfd1388adf8",
+          "source_ref": ".opencode/ace-packet-summary.md",
+          "risk": "low"
+        },
+        {
+          "source_id": "b9247d29291048eea9c6677582aba53ddfbe67057d80fbc659bc793c33f3f97c",
+          "source_ref": ".opencode/ace-packet.json",
+          "risk": "low"
+        },
+        {
+          "source_id": "51a8005fb3ed0451e96296dcad105a30bd1697e1004db81154d5f7c69a35e4f4",
+          "source_ref": ".opencode/ace-packets_stale/packet-122d0988-998e-4835-bed2-5632d05b8165.json",
+          "risk": "low"
+        },
+        {
+          "source_id": "79a758152c1cfbd1f1b19d66b9762f453baa4bb4f199568674f18f1cdb6b0d2b",
+          "source_ref": ".opencode/ace-packets_stale/packet-149456da-ae1c-4d4e-b120-220cce7b7d74.json",
+          "risk": "low"
+        },
+        {
+          "source_id": "8c88619d206ec166fb3ca856b5bc3fa69bcd464892e2ab9c4ab974e813dbbaef",
+          "source_ref": ".opencode/ace-packets_stale/packet-3bcafaf8-da68-43b0-b33b-30fe9830e61e.json",
+          "risk": "low"
+        },
+        {
+          "source_id": "753bed35571723fac08bf419b83d6b1aae9f861cc2343af5a6d15a150a5ef791",
+          "source_ref": ".opencode/ace-packets_stale/packet-3c7d7ca2-e42d-45f3-82c2-590060813b4d.json",
+          "risk": "low"
+        },
+        {
+          "source_id": "06ec73dc9919d9c42bb775bc61d82b57b3785bb351657278ee0849318b2b2151",
+          "source_ref": ".opencode/ace-packets_stale/packet-4e47e747-d909-4141-a86a-3d1e2268cb20.json",
+          "risk": "low"
+        },
+        {
+          "source_id": "7f7eae42070b51bb4656b7388e3d9f6df445206f101bd7b4c7ed7f17d01bf8a0",
+          "source_ref": ".opencode/ace-packets_stale/packet-6ca0e48c-5a47-42e9-be6a-8769d06d0bad.json",
+          "risk": "low"
+        },
+        {
+          "source_id": "d6a9dd99e8087422c41d35c362eb0dcb44d1d191786948dc78a57bdd098ef8d5",
+          "source_ref": ".opencode/ace-packets_stale/packet-7e78d6d5-9ab3-4e36-94bf-e5c18b521b36.json",
+          "risk": "low"
+        },
+        {
+          "source_id": "de8d7f81e23763acb79d1936e6699260cd259e8e6d693a6a46d12f80c7bc3551",
+          "source_ref": ".opencode/ace-packets_stale/packet-a614d225-687d-43ef-b4b4-62f67ec7ce33.json",
+          "risk": "low"
+        }
+      ]
+    },
+    "ingest": {
+      "feature_id": "ingest",
+      "sources": [
+        {
+          "source_id": "192ea945cbfb1df4bcd191e1fa4b8cbac987431612c6407909610e1c747409d9",
+          "source_ref": ".claude/hooks/LLMS.md",
+          "risk": "low"
+        },
+        {
+          "source_id": "387c72a56c8a5eb8192f44e97cbe7194d329090b5e92160c1c23c71d1e945c15",
+          "source_ref": ".claude/LLMS.md",
+          "risk": "low"
+        },
+        {
+          "source_id": "34090a1c513cf6d2723df2021e6af484d309662b1ab32b099a898d837c6fdd16",
+          "source_ref": ".claude/skills/codebase-mapping-json-ingestion.md",
+          "risk": "low"
+        },
+        {
+          "source_id": "2629305481627c9c5aea901d84daaca76e5a81e78062d5e10c8de71d2adb81e9",
+          "source_ref": ".github/agents/chat-attachment-engineer.agent.md",
+          "risk": "low"
+        },
+        {
+          "source_id": "22d79bb84d94a2bc976162165335422c382bda17afa7f4190e219dd2d944300f",
+          "source_ref": ".github/agents/evidence-pipeline-engineer.agent.md",
+          "risk": "low"
+        },
+        {
+          "source_id": "02f0a1ba4b19d5486088388fe3439e330cebdc62a97c9fbfc869a8805cca5daf",
+          "source_ref": ".github/agents/legal-library-engineer.agent.md",
+          "risk": "low"
+        },
+        {
+          "source_id": "06546ba9d294f1cc00db185f2f878add0211f764ed1c71c3abdb08f9a6a04c81",
+          "source_ref": ".opencode/ace-context.json",
+          "risk": "low"
+        },
+        {
+          "source_id": "b9247d29291048eea9c6677582aba53ddfbe67057d80fbc659bc793c33f3f97c",
+          "source_ref": ".opencode/ace-packet.json",
+          "risk": "low"
+        },
+        {
+          "source_id": "ae3845852a78fef046202dd61dc0771f714dd9588ace2ecc39d21c225539ec58",
+          "source_ref": ".opencode/ace-packets_stale/packet-0b57dd4c-f695-4910-b3ba-c84b6b822e32.json",
+          "risk": "low"
+        },
+        {
+          "source_id": "06ec73dc9919d9c42bb775bc61d82b57b3785bb351657278ee0849318b2b2151",
+          "source_ref": ".opencode/ace-packets_stale/packet-4e47e747-d909-4141-a86a-3d1e2268cb20.json",
+          "risk": "low"
+        },
+        {
+          "source_id": "7f7eae42070b51bb4656b7388e3d9f6df445206f101bd7b4c7ed7f17d01bf8a0",
+          "source_ref": ".opencode/ace-packets_stale/packet-6ca0e48c-5a47-42e9-be6a-8769d06d0bad.json",
+          "risk": "low"
+        }
+      ]
+    },
+    "cache": {
+      "feature_id": "cache",
+      "sources": [
+        {
+          "source_id": "192ea945cbfb1df4bcd191e1fa4b8cbac987431612c6407909610e1c747409d9",
+          "source_ref": ".claude/hooks/LLMS.md",
+          "risk": "low"
+        },
+        {
+          "source_id": "387c72a56c8a5eb8192f44e97cbe7194d329090b5e92160c1c23c71d1e945c15",
+          "source_ref": ".claude/LLMS.md",
+          "risk": "low"
+        },
+        {
+          "source_id": "34090a1c513cf6d2723df2021e6af484d309662b1ab32b099a898d837c6fdd16",
+          "source_ref": ".claude/skills/codebase-mapping-json-ingestion.md",
+          "risk": "low"
+        },
+        {
+          "source_id": "c2c38f66a7465add334f95d98183ae296e28cbe0c7eb877c4a13fee5f8f033e6",
+          "source_ref": ".couchdb-state-report-2026-05-29.md",
+          "risk": "low"
+        },
+        {
+          "source_id": "c0d58ae124f17bbdc61f964d009fc1cc2fe26aa465bfdba2c5c7d90e85b9d0c0",
+          "source_ref": ".github/agents/performance-caching-engineer.agent.md",
+          "risk": "low"
+        },
+        {
+          "source_id": "06546ba9d294f1cc00db185f2f878add0211f764ed1c71c3abdb08f9a6a04c81",
+          "source_ref": ".opencode/ace-context.json",
+          "risk": "low"
+        },
+        {
+          "source_id": "9b54dd41e7f28817cd6e5660423a40b9ea8367a530459bc2cff05cfd1388adf8",
+          "source_ref": ".opencode/ace-packet-summary.md",
+          "risk": "low"
+        }
+      ]
+    },
+    "gpu": {
+      "feature_id": "gpu",
+      "sources": [
+        {
+          "source_id": "192ea945cbfb1df4bcd191e1fa4b8cbac987431612c6407909610e1c747409d9",
+          "source_ref": ".claude/hooks/LLMS.md",
+          "risk": "low"
+        },
+        {
+          "source_id": "387c72a56c8a5eb8192f44e97cbe7194d329090b5e92160c1c23c71d1e945c15",
+          "source_ref": ".claude/LLMS.md",
+          "risk": "low"
+        },
+        {
+          "source_id": "f27ac6f39d89fe021c56900069198aa7d9968f2cd6645c00b11ffd1b78fcf546",
+          "source_ref": ".claude/settings.json",
+          "risk": "low"
+        },
+        {
+          "source_id": "fca16cae5b0e32edfa6b55eaa32a98ffbf4a0c7d885fb585785fc83b6ea2d9c3",
+          "source_ref": ".claude/settings.local.json",
+          "risk": "low"
+        },
+        {
+          "source_id": "5da61b40a6abaf2a2f75a2d216a6e6704bc8bc9d7f2fa20e2727263f50eee332",
+          "source_ref": ".claude/skills/codebase-indexing-agentic-error-fixing.md",
+          "risk": "low"
+        },
+        {
+          "source_id": "378a33358f832d123c2d247ef75184cc22de0d965cd4578d7190629a14fd7eee",
+          "source_ref": ".claude/skills/codebase-todo-recommendations.md",
+          "risk": "low"
+        },
+        {
+          "source_id": "c2c38f66a7465add334f95d98183ae296e28cbe0c7eb877c4a13fee5f8f033e6",
+          "source_ref": ".couchdb-state-report-2026-05-29.md",
+          "risk": "low"
+        },
+        {
+          "source_id": "b9247d29291048eea9c6677582aba53ddfbe67057d80fbc659bc793c33f3f97c",
+          "source_ref": ".opencode/ace-packet.json",
+          "risk": "low"
+        },
+        {
+          "source_id": "51a8005fb3ed0451e96296dcad105a30bd1697e1004db81154d5f7c69a35e4f4",
+          "source_ref": ".opencode/ace-packets_stale/packet-122d0988-998e-4835-bed2-5632d05b8165.json",
+          "risk": "low"
+        },
+        {
+          "source_id": "753bed35571723fac08bf419b83d6b1aae9f861cc2343af5a6d15a150a5ef791",
+          "source_ref": ".opencode/ace-packets_stale/packet-3c7d7ca2-e42d-45f3-82c2-590060813b4d.json",
+          "risk": "low"
+        },
+        {
+          "source_id": "de8d7f81e23763acb79d1936e6699260cd259e8e6d693a6a46d12f80c7bc3551",
+          "source_ref": ".opencode/ace-packets_stale/packet-a614d225-687d-43ef-b4b4-62f67ec7ce33.json",
+          "risk": "low"
+        }
+      ]
+    },
+    "auth": {
+      "feature_id": "auth",
+      "sources": [
+        {
+          "source_id": "192ea945cbfb1df4bcd191e1fa4b8cbac987431612c6407909610e1c747409d9",
+          "source_ref": ".claude/hooks/LLMS.md",
+          "risk": "low"
+        },
+        {
+          "source_id": "350f0afc30ceb3ea668ca993269fcfee57db5308dab3e8ccde5a7d53c4a2eed7",
+          "source_ref": ".claude/hooks/posttooluse-audit.mjs",
+          "risk": "low"
+        },
+        {
+          "source_id": "387c72a56c8a5eb8192f44e97cbe7194d329090b5e92160c1c23c71d1e945c15",
+          "source_ref": ".claude/LLMS.md",
+          "risk": "low"
+        },
+        {
+          "source_id": "8cd301bfc48ffeb3cf1498b8fa4604d6cf1fedf018e518b1a128664faf1cd935",
+          "source_ref": ".claude/mcp.json",
+          "risk": "low"
+        },
+        {
+          "source_id": "f27ac6f39d89fe021c56900069198aa7d9968f2cd6645c00b11ffd1b78fcf546",
+          "source_ref": ".claude/settings.json",
+          "risk": "low"
+        },
+        {
+          "source_id": "5da61b40a6abaf2a2f75a2d216a6e6704bc8bc9d7f2fa20e2727263f50eee332",
+          "source_ref": ".claude/skills/codebase-indexing-agentic-error-fixing.md",
+          "risk": "low"
+        },
+        {
+          "source_id": "34090a1c513cf6d2723df2021e6af484d309662b1ab32b099a898d837c6fdd16",
+          "source_ref": ".claude/skills/codebase-mapping-json-ingestion.md",
+          "risk": "low"
+        },
+        {
+          "source_id": "378a33358f832d123c2d247ef75184cc22de0d965cd4578d7190629a14fd7eee",
+          "source_ref": ".claude/skills/codebase-todo-recommendations.md",
+          "risk": "low"
+        },
+        {
+          "source_id": "d64f6b3be698e4f2435fe7bfd852bc28d0ede4c42c19e7dae6e4cfb16510bbee",
+          "source_ref": ".claude/skills/metadata-context-analysis/SKILL.md",
+          "risk": "low"
+        },
+        {
+          "source_id": "c2c38f66a7465add334f95d98183ae296e28cbe0c7eb877c4a13fee5f8f033e6",
+          "source_ref": ".couchdb-state-report-2026-05-29.md",
+          "risk": "low"
+        },
+        {
+          "source_id": "dd80875ceeedd0041d381b3a0f2ac49400e3799bd6600f3cff93ebe9b08f8625",
+          "source_ref": ".github/agents/admin-dashboard-engineer.agent.md",
+          "risk": "low"
+        },
+        {
+          "source_id": "2629305481627c9c5aea901d84daaca76e5a81e78062d5e10c8de71d2adb81e9",
+          "source_ref": ".github/agents/chat-attachment-engineer.agent.md",
+          "risk": "low"
+        },
+        {
+          "source_id": "793888d9c2baaa6a360fedc07d848a6b77f41a95c196cce4e202af71eacb7701",
+          "source_ref": ".github/agents/design-system-steward.agent.md",
+          "risk": "low"
+        },
+        {
+          "source_id": "22d79bb84d94a2bc976162165335422c382bda17afa7f4190e219dd2d944300f",
+          "source_ref": ".github/agents/evidence-pipeline-engineer.agent.md",
+          "risk": "low"
+        },
+        {
+          "source_id": "8a7d8f1627ea7193c9944e2c88b4bb3fd921371248b9a7c6f6a5aae349183d76",
+          "source_ref": ".github/agents/import-audit-engineer.agent.md",
+          "risk": "low"
+        },
+        {
+          "source_id": "02f0a1ba4b19d5486088388fe3439e330cebdc62a97c9fbfc869a8805cca5daf",
+          "source_ref": ".github/agents/legal-library-engineer.agent.md",
+          "risk": "low"
+        },
+        {
+          "source_id": "c0d58ae124f17bbdc61f964d009fc1cc2fe26aa465bfdba2c5c7d90e85b9d0c0",
+          "source_ref": ".github/agents/performance-caching-engineer.agent.md",
+          "risk": "low"
+        },
+        {
+          "source_id": "08f465d19f65df481c534d6274954c82d6bd4ad463a10bf4414ea6e9c6b9751f",
+          "source_ref": ".github/agents/playwright-feature-engineer.agent.md",
+          "risk": "low"
+        },
+        {
+          "source_id": "700838911ab2a8b15c37fd3aedd939af3a28d2977ba9f167119016bd8b39205b",
+          "source_ref": ".github/agents/playwright-ui-ux.agent.md",
+          "risk": "low"
+        },
+        {
+          "source_id": "82bf6cd44bc85f3c17b05ac1e900e62b46df03dc4d84ccb5429f695b15794e0d",
+          "source_ref": ".github/agents/rag-retrieval-engineer.agent.md",
+          "risk": "low"
+        },
+        {
+          "source_id": "a5e2e801939021b59b20231500cf4500511fabaaf09f5fdf1e5bcc1db4459865",
+          "source_ref": ".github/agents/route-triage-engineer.agent.md",
+          "risk": "low"
+        },
+        {
+          "source_id": "0e69d15020bd7a8f62ccd0f2b850dc0ad8910462c3b4ccc7c70afefb7b23e3ff",
+          "source_ref": ".github/agents/search-platform-engineer.agent.md",
+          "risk": "low"
+        },
+        {
+          "source_id": "8bb9a3de9829728bfd9936c128853d6832a88dd90f4ac8cd1f3b5ca8e421b4a3",
+          "source_ref": ".github/agents/svelte5-migration-engineer.agent.md",
+          "risk": "low"
+        },
+        {
+          "source_id": "a66b9c33770a2e25fe9925c7aa389d09063c24a84052d6b68f757e9871406981",
+          "source_ref": ".github/agents/ui-polish-engineer.agent.md",
+          "risk": "low"
+        },
+        {
+          "source_id": "227c2c26cb2ee0ce0f46a320fc48fbcbdf21801a57f59161b1d0861e8aad55f5",
+          "source_ref": ".github/copilot-instructions.md",
+          "risk": "low"
+        },
+        {
+          "source_id": "564d17d924e5960e863da5303d4bf2769731f97d854f1711450101c3c4685d25",
+          "source_ref": ".github/instructions/opencode-context-prefetch.instructions.md",
+          "risk": "low"
+        },
+        {
+          "source_id": "d5d3368a61f8d02e085f7a4cb666ee471cf5383690a04b64c839c6ae2080ceb9",
+          "source_ref": ".mcp.json",
+          "risk": "low"
+        },
+        {
+          "source_id": "b9247d29291048eea9c6677582aba53ddfbe67057d80fbc659bc793c33f3f97c",
+          "source_ref": ".opencode/ace-packet.json",
+          "risk": "low"
+        },
+        {
+          "source_id": "79a758152c1cfbd1f1b19d66b9762f453baa4bb4f199568674f18f1cdb6b0d2b",
+          "source_ref": ".opencode/ace-packets_stale/packet-149456da-ae1c-4d4e-b120-220cce7b7d74.json",
+          "risk": "low"
+        },
+        {
+          "source_id": "d6a9dd99e8087422c41d35c362eb0dcb44d1d191786948dc78a57bdd098ef8d5",
+          "source_ref": ".opencode/ace-packets_stale/packet-7e78d6d5-9ab3-4e36-94bf-e5c18b521b36.json",
+          "risk": "low"
+        }
+      ]
+    },
+    "evidence": {
+      "feature_id": "evidence",
+      "sources": [
+        {
+          "source_id": "350f0afc30ceb3ea668ca993269fcfee57db5308dab3e8ccde5a7d53c4a2eed7",
+          "source_ref": ".claude/hooks/posttooluse-audit.mjs",
+          "risk": "low"
+        },
+        {
+          "source_id": "8cd301bfc48ffeb3cf1498b8fa4604d6cf1fedf018e518b1a128664faf1cd935",
+          "source_ref": ".claude/mcp.json",
+          "risk": "low"
+        },
+        {
+          "source_id": "fca16cae5b0e32edfa6b55eaa32a98ffbf4a0c7d885fb585785fc83b6ea2d9c3",
+          "source_ref": ".claude/settings.local.json",
+          "risk": "low"
+        },
+        {
+          "source_id": "34090a1c513cf6d2723df2021e6af484d309662b1ab32b099a898d837c6fdd16",
+          "source_ref": ".claude/skills/codebase-mapping-json-ingestion.md",
+          "risk": "low"
+        },
+        {
+          "source_id": "378a33358f832d123c2d247ef75184cc22de0d965cd4578d7190629a14fd7eee",
+          "source_ref": ".claude/skills/codebase-todo-recommendations.md",
+          "risk": "low"
+        },
+        {
+          "source_id": "c2c38f66a7465add334f95d98183ae296e28cbe0c7eb877c4a13fee5f8f033e6",
+          "source_ref": ".couchdb-state-report-2026-05-29.md",
+          "risk": "low"
+        },
+        {
+          "source_id": "2629305481627c9c5aea901d84daaca76e5a81e78062d5e10c8de71d2adb81e9",
+          "source_ref": ".github/agents/chat-attachment-engineer.agent.md",
+          "risk": "low"
+        },
+        {
+          "source_id": "22d79bb84d94a2bc976162165335422c382bda17afa7f4190e219dd2d944300f",
+          "source_ref": ".github/agents/evidence-pipeline-engineer.agent.md",
+          "risk": "low"
+        },
+        {
+          "source_id": "8a7d8f1627ea7193c9944e2c88b4bb3fd921371248b9a7c6f6a5aae349183d76",
+          "source_ref": ".github/agents/import-audit-engineer.agent.md",
+          "risk": "low"
+        },
+        {
+          "source_id": "02f0a1ba4b19d5486088388fe3439e330cebdc62a97c9fbfc869a8805cca5daf",
+          "source_ref": ".github/agents/legal-library-engineer.agent.md",
+          "risk": "low"
+        },
+        {
+          "source_id": "82bf6cd44bc85f3c17b05ac1e900e62b46df03dc4d84ccb5429f695b15794e0d",
+          "source_ref": ".github/agents/rag-retrieval-engineer.agent.md",
+          "risk": "low"
+        },
+        {
+          "source_id": "a5e2e801939021b59b20231500cf4500511fabaaf09f5fdf1e5bcc1db4459865",
+          "source_ref": ".github/agents/route-triage-engineer.agent.md",
+          "risk": "low"
+        },
+        {
+          "source_id": "0e69d15020bd7a8f62ccd0f2b850dc0ad8910462c3b4ccc7c70afefb7b23e3ff",
+          "source_ref": ".github/agents/search-platform-engineer.agent.md",
+          "risk": "low"
+        },
+        {
+          "source_id": "feef1839b5c140db791ea437cf90ae7c8d7794d0be2f3168a9068078044f85d9",
+          "source_ref": ".github/agents/trace-audit.agent.md",
+          "risk": "low"
+        },
+        {
+          "source_id": "564d17d924e5960e863da5303d4bf2769731f97d854f1711450101c3c4685d25",
+          "source_ref": ".github/instructions/opencode-context-prefetch.instructions.md",
+          "risk": "low"
+        },
+        {
+          "source_id": "06546ba9d294f1cc00db185f2f878add0211f764ed1c71c3abdb08f9a6a04c81",
+          "source_ref": ".opencode/ace-context.json",
+          "risk": "low"
+        },
+        {
+          "source_id": "b9247d29291048eea9c6677582aba53ddfbe67057d80fbc659bc793c33f3f97c",
+          "source_ref": ".opencode/ace-packet.json",
+          "risk": "low"
+        },
+        {
+          "source_id": "2e70e291efbbeb2ebd81befca5821dc37901d19eba1b4286b39c804337400789",
+          "source_ref": ".opencode/ace-packets/packet-89e34ac6-a15a-4d8f-84ec-1a118dab4c00.json",
+          "risk": "low"
+        }
+      ]
+    },
+    "vector-search": {
+      "feature_id": "vector-search",
+      "sources": [
+        {
+          "source_id": "8cd301bfc48ffeb3cf1498b8fa4604d6cf1fedf018e518b1a128664faf1cd935",
+          "source_ref": ".claude/mcp.json",
+          "risk": "low"
+        },
+        {
+          "source_id": "5da61b40a6abaf2a2f75a2d216a6e6704bc8bc9d7f2fa20e2727263f50eee332",
+          "source_ref": ".claude/skills/codebase-indexing-agentic-error-fixing.md",
+          "risk": "low"
+        },
+        {
+          "source_id": "34090a1c513cf6d2723df2021e6af484d309662b1ab32b099a898d837c6fdd16",
+          "source_ref": ".claude/skills/codebase-mapping-json-ingestion.md",
+          "risk": "low"
+        },
+        {
+          "source_id": "378a33358f832d123c2d247ef75184cc22de0d965cd4578d7190629a14fd7eee",
+          "source_ref": ".claude/skills/codebase-todo-recommendations.md",
+          "risk": "low"
+        },
+        {
+          "source_id": "83ff3e9c7f4e57ed3db1f11d9bde189a3582eb1d54fb157498258474f85dde9c",
+          "source_ref": ".claude/skills/drizzle-schema-review/SKILL.md",
+          "risk": "low"
+        },
+        {
+          "source_id": "6913429c677a322ca695bce499d85a65b5207cad5b6d48e71db910a9b4c3449b",
+          "source_ref": ".claude/skills/trace-mcp-tooling/SKILL.md",
+          "risk": "low"
+        },
+        {
+          "source_id": "22d79bb84d94a2bc976162165335422c382bda17afa7f4190e219dd2d944300f",
+          "source_ref": ".github/agents/evidence-pipeline-engineer.agent.md",
+          "risk": "low"
+        },
+        {
+          "source_id": "02f0a1ba4b19d5486088388fe3439e330cebdc62a97c9fbfc869a8805cca5daf",
+          "source_ref": ".github/agents/legal-library-engineer.agent.md",
+          "risk": "low"
+        },
+        {
+          "source_id": "82bf6cd44bc85f3c17b05ac1e900e62b46df03dc4d84ccb5429f695b15794e0d",
+          "source_ref": ".github/agents/rag-retrieval-engineer.agent.md",
+          "risk": "low"
+        },
+        {
+          "source_id": "0e69d15020bd7a8f62ccd0f2b850dc0ad8910462c3b4ccc7c70afefb7b23e3ff",
+          "source_ref": ".github/agents/search-platform-engineer.agent.md",
+          "risk": "low"
+        },
+        {
+          "source_id": "564d17d924e5960e863da5303d4bf2769731f97d854f1711450101c3c4685d25",
+          "source_ref": ".github/instructions/opencode-context-prefetch.instructions.md",
+          "risk": "low"
+        },
+        {
+          "source_id": "d5d3368a61f8d02e085f7a4cb666ee471cf5383690a04b64c839c6ae2080ceb9",
+          "source_ref": ".mcp.json",
+          "risk": "low"
+        },
+        {
+          "source_id": "06546ba9d294f1cc00db185f2f878add0211f764ed1c71c3abdb08f9a6a04c81",
+          "source_ref": ".opencode/ace-context.json",
+          "risk": "low"
+        },
+        {
+          "source_id": "9b54dd41e7f28817cd6e5660423a40b9ea8367a530459bc2cff05cfd1388adf8",
+          "source_ref": ".opencode/ace-packet-summary.md",
+          "risk": "low"
+        },
+        {
+          "source_id": "51a8005fb3ed0451e96296dcad105a30bd1697e1004db81154d5f7c69a35e4f4",
+          "source_ref": ".opencode/ace-packets_stale/packet-122d0988-998e-4835-bed2-5632d05b8165.json",
+          "risk": "low"
+        }
+      ]
+    }
+  },
+  "cold_archive_candidates": [
+    {
+      "source_id": "ad2ba02099ccf749a50985c8b251ec9116cc832d72735bf336e3e32a44b4c44a",
+      "source_ref": ".claude/commands/shallow-wiring-analysis.md",
+      "feature": "ui"
+    },
+    {
+      "source_id": "da3216bebaece34b891bd41f6f898915e36d93016085e61441ac18304c7d3a55",
+      "source_ref": ".claude/skills/bits-ui-svelte5/SKILL.md",
+      "feature": "ui"
+    },
+    {
+      "source_id": "bbe25914d48bc994f40bcf218a1097a6a090dca7fa29daa6382e044ec9333743",
+      "source_ref": ".claude/skills/uno-css-design-system/SKILL.md",
+      "feature": "ui"
+    },
+    {
+      "source_id": "9efe77aad5dfc42e5cc2463170a0674bfb8d50925b7c009b65a61e1c3a40427f",
+      "source_ref": ".github/hooks/rg.json",
+      "feature": "other"
+    }
+  ],
+  "pipeline": {
+    "qdrant_collection": "feature_maps",
+    "redis_key_prefix": "ace:ctx:",
+    "rabbitmq_queue": "vector.index",
+    "seaweedfs_bucket": "legal-evidence",
+    "bifrost_port": 3040
+  }
+}

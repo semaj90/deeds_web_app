@@ -67,7 +67,6 @@
   },
   "instructions": [
     "AGENTS.md",
-    ".opencode/command/*.md",
     "docs/ai-os/*.md"
   ],
   "watcher": {

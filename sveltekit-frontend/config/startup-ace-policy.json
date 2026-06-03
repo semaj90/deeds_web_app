@@ -62,7 +62,12 @@
     "hypergraph:tag",
     "wiki:loop:smoke",
     "llms:enrich",
-    "codebase:index"
+    "codebase:index",
+    "atlas:ingest-glyphs",
+    "atlas:compute-rewards",
+    "atlas:sample-training",
+    "atlas:build-pairs",
+    "atlas:smoke-glyphs"
   ],
   "thresholds": {
     "smallChangeMaxFiles": 20,
@@ -125,7 +130,9 @@
       "hypergraph:tag",
       "audit:full-pipeline",
       "llms:enrich",
-      "codebase:index"
+      "codebase:index",
+      "atlas:ingest-glyphs",
+      "atlas:compute-rewards"
     ],
     "logKey": "ace:startup:heavy_log"
   }
