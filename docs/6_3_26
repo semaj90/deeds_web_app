@@ -1,0 +1,276 @@
+(((seperate dev utility into npm build package for import into sveltekit 2 app (desktop app integration later)
+once have package, and review node_modules vs package.json dependencies, can start refactoring codebase to use the package instead of direct imports from node_modules, which will help with tree shaking and reducing bundle size in the SvelteKit app, where we'll import the the atlas indexing. contexual trees need more information for dag hits from neo4j into per emebedding layers rotorquantized for ingestion for token mapping of distilled loras ready for memory swaps later baked into cuda kernels, graphed, streamed, cached, then let run once the package is built for registry mapping if installed, with permissions (windows for exmaple, on startup thus the ai assistant has access to drive and can make better recommndations down the line.) eval testing gemma4 for reap is needed.))))
+
+search engine is inverse relation, paginated pagerank, 1992, cpu = apps windows task manager, webview ("genie effect) object orientated programming in json packets = pokemon source code, for assembly registry mapping which sveltekit 2 can handles as an updated dependency graph (signals, javascript, ecmascript = json creation, look more into it.) making it hardware specific thus can be easily importable, keeping in mind. sveltekit 2 app needs package json mapping, from atlas for multi-hop cached traversals to not fill context window, and "grpo thinking with deep research" needs testing, docker containers need solidifying, and once built can share libraries to build into typescript safe javascript, sql injection would work but needs zod validation where typescript zod validations can be schema matched yaml matched programicaly to determine features missed by project atlas find files. a computer doesn't think or know, you show it what success it, and train it. thus memory swapping with ability to research and create memory store will improve weights of user.intent based on past conversations that the user might have missed thus keeping an open user recommendations with background processing = "self-prompting" goal bonsai ai or a quantized stable diffusion can be trained to create a strategy guide of the codebase, for visually learning, a manual table of contents, how to guide.
+gaussian splatting = detective mode, mcp server or typescript sub agentic tool calling can help integrate what we need, ingest it, create qlora adapter and stick into unsloth training package nvidia released 2026. to make memory cards cache it and give relevant data with web_search fallback, already there or fish mcp ((searxng and fire* whatever is already created, needing wiring.))
+
+detective mode, user creates account, "who, what, why, how"
+take messy notes, langextract organzing, atlas extracts indexes compresses helps the user stay organized and learns grows with the user." thus can take adapters merge itself and be modularly importable to other systems to continue where the user left off, cloud self-hosted, what-not. this is a legal-ai app, will have pdfs' parsable, took california consitution > 400pages and made good ocr chunking embedding, and building out the rest for hyperrag dense search for 4d topology manifold transforms using manhanttan expansion tool calling service_worker to help recreate deepseek "taxonomy" "6 degrees of seperation"
+to model multiple domains, a framework exists, "meshnet can represent data in 3d space visually to perform the 4d transformations not just a kv 1-to many, nosql, mapreduce = tricubic, 4d would take a node note yet ingested and adjust "temperature" k value due to not being able to find the answer, and explain it 1-2 sentences to the user, "this might be far off, give the distance from manhattan expansion" and explain where it is in postgresql 18 related to seaweedfs and qdrant vector stores using tags.
+search is somewhat built out, docker container...
+
+
+ Production Wiring Audit
+We still need proof of these:
+[ ] GlobalCommandPalette mounted
+[ ] Parent Atlas packet assembler used by production code
+[ ] query-router used by production chat path
+[ ] context-assembler injects ACE packets
+Searches:
+rg "GlobalCommandPalette"
+rg "assemblePacketForSourceRef|parent-atlas-packet-assembler"
+rg "routeQuery|query-router"
+Priority 2 AI Chat Context Injection
+Goal: user Query (need user analytics engram kag dag hits later) that's what libtorch pytorch xgradient reinforcment learning is about. then cold storage from already ingested embedded feature extracted labeled, then temporally updating the codebase with kanban tasks for minified que deque using turbovec n-api tensorrtbridge and rtx stuff we wrote recently. hyperrag intergrations for postgresql 18 indexing table migrations and seaweedfs storage of documents already ingested thus we just have the json gin indexed jsonb served trhough grpc
+  ↓
+query-router
+  ↓
+Parent Atlas packet
+  ↓
+ACE packet
+  ↓
+context-assembler
+  ↓
+Gemma4
+Required packet fields:
+source_refs
+feature_ids
+lane_ids
+cluster_id
+som_cluster
+qdrant_hits
+redis_hot_keys
+Statu
+🟡 Verify implementation
+Priority 3 — Golden Retrieval Test
+Create one permanent validation:
+Query:
+where is Redis Valkey cache config wired?
+Expected:
+source_refs > 0
+feature_ids > 0
+lane_ids > 0
+qdrant_hits > 0
+ACE packet written
+Bifrost telemetry written
+Status:
+🟡 Not verified yet
+Priority 4 — Parent Atlas Coverage Report
+Generate:
+atlas nodes
+atlas edges
+atlas sourceRefs
+Qdrant vectors
+Redis atlas keys
+Neo4j relationships
+Goal:
+Find orphan sourceRefs
+Find orphan vectors
+Find missing packet mappings
+Status:
+🟡 Pending
+Priority 5 — Recommendation Engine
+Now that routing works:
+
+Parent Atlas
+  ↓
+ACE packet
+  ↓
+Bifrost telemetry
+  ↓
+Recommendation materializer
+  ↓
+Kanban tasks
+  ↓
+Opencode suggestions
+Need:
+[ ] Recommendation scoring
+[ ] Task materialization
+[ ] Packet → Kanban linkage
+[ ] User recommendation ranking
+
+deep research integration, subagent, langfuse, sentry like "glitchtip costs money...something else we were working on...)
+mtp gemma training,
+eval testing later for trt-llm, kernel encoding the nes engrams, with more topology domain distilled ingested packets.
+
+looking at your logs, you've already answered one of the biggest questions
+Your model is NOT actually limited to 16K anymore
+The live model shows:
+n_ctx_train = 131072
+n_ctx       = 65536
+n_ctx_seq   = 65536
+
+and
+
+[{
+  "id":0,
+  "n_ctx":65536,
+  "speculative":false,
+  "is_processing":false
+}]
+
+So TurboQuant on :8090 is running at 64K context right now, not 16K. The /slots output confirms that.
+
+The earlier 16384 result likely came from:
+
+an older llama-server instance
+stale VS Code task
+old Ollama llama-server
+another process bound before restart
+
+Your later log shows the correct 65536 allocation.
+
+About the "0.4 improvement"
+
+I think there's confusion around what improved.
+
+The reports you pasted show:
+
+"turbovecScore": 0.99826454
+
+and reranking changes, but I don't see a measured:
+
++0.40 recall
++0.40 NDCG
++0.40 MRR
+
+anywhere.
+
+The likely candidates are:
+
+Lane A
+
+EmbeddingGemma via Ollama
+
+embeddinggemma:latest
+↓
+768 dimensions
+↓
+Qdrant
+Lane B
+
+EmbeddingGemma GGUF
+
+embeddinggemma-300m-f16.gguf
+↓
+llama-server :8081
+↓
+/v1/embeddings
+↓
+Qdrant
+
+The test you want is:
+
+same queries
+same documents
+same Qdrant collection
+
+compare:
+
+Recall@10
+MRR
+NDCG
+Top-10 overlap
+
+That will tell you whether the llama-server embeddings actually improved retrieval.
+
+What I would do next
+
+You already have:
+
+Qdrant
+Redis
+Neo4j
+TurboQuant
+TensorRT bridge
+BitFrost cache
+Parent Atlas
+
+The next useful benchmark is:
+
+EmbeddingGemma Ollama
+vs
+EmbeddingGemma GGUF llama-server
+
+against the same Atlas cards.
+
+Create:
+
+scripts/evals/embed-head-to-head.mjs
+
+Output:
+
+{
+  "queries": 100,
+  "ollama": {
+    "mrr": 0.61,
+    "ndcg": 0.74
+  },
+  "llama_server": {
+    "mrr": 0.64,
+    "ndcg": 0.77
+  },
+  "delta": {
+    "mrr": 0.03,
+    "ndcg": 0.03
+  }
+}
+
+Then you'll know whether the 8081 lane is worth keeping.
+
+Parent Atlas integration
+
+Based on your reconciliation output:
+
+parent_atlas_feature_commands_768
+parent_atlas_rg_packets_768
+
+are already loaded and healthy in Qdrant.
+
+I'd structure retrieval as:
+
+User Query
+     │
+     ▼
+EmbeddingGemma
+     │
+     ▼
+Qdrant
+     │
+     ├── parent_atlas_feature_commands_768
+     ├── parent_atlas_rg_packets_768
+     ├── codebase_chunks_768
+     ├── chat_messages
+     └── legal_cases
+     │
+     ▼
+TurboVec rerank
+     │
+     ▼
+BitFrost cache
+     │
+     ▼
+Gemma4 generation
+
+That keeps Parent Atlas as the authoritative retrieval layer instead of creating another indexing lane.
+
+Biggest remaining issue
+
+Your audit is almost perfect:
+
+33/33 PASS
+
+except:
+
+WARN: Embed server :8081 not healthy
+
+Everything else is green.
+
+So before building more retrieval features, I would focus on:
+
+Stabilize embeddinggemma-300m-f16.gguf
+Make :8081/health consistently pass
+Run head-to-head retrieval evaluation
+Decide whether Ollama embeddings can be retired
+
+Only after that would I look at TRT-LLM/Triton migration, because you need a stable retrieval baseline first.
