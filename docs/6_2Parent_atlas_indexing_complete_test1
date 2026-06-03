@@ -1,0 +1,84 @@
+Parent atlas indexing complete!
+
+Exports ready in: C:\Users\james\Videos\deeds-web-app\memory\exports\parent-atlas/
+  - parent_atlas_index.csv (for Bitfrost cache warmup)
+  - parent_atlas_index.json (for Redis cache)
+  - cluster_summary.csv (for SOM topology analysis)
+
+══ validate-parent-atlas.mjs ══════════════════════════════════════════════
+◇ injected env (181) from .env // tip: ⌘ override existing { override: true }
+Parent atlas validation passed for deeds-web-app.
+{
+  "repo": "deeds-web-app",
+  "generatedAt": "2026-06-03T04:05:49.110Z",
+  "missing": [],
+  "ok": true,
+  "routeMapBytes": 28815877,
+  "rootAtlasRoutes": 909,
+  "batchPayloads": 0
+}
+
+══ audit-parent-atlas-consistency.mjs ══════════════════════════════════════════════
+🔍 Running Retrieval Smoke Tests & Consistency Audits...
+✓ Sample Qdrant point from feature_maps: {
+  id: 22229,
+  payload: {
+    source_ref: '.opencode/embeddings/90a901760543ebf1.json',
+    featureId: 'llm',
+    kind: 'codebase_chunk',
+    status: 'processed',
+    index_version: 1,
+    language: 'json',
+    environment: 'workspace',
+    features: [ 'llm', 'vector-search' ],
+    top_feature: 'llm',
+    created_at: '2026-05-30T23:06:44.258Z',
+    summary_llm: 'Component implementation for llm vertical.',
+    risk: 'low',
+    next_action: 'Review API and schema alignment.',
+    structure: { functionsCount: 0 }
+  }
+}
+  ⚠️ Redis smoke query failed: Redis offline
+✓ Verified task_semantic_packets indexes: [
+  'task_semantic_packets_pkey',
+  'idx_task_semantic_packets_workspace_task_id',
+  'idx_task_semantic_packets_feature_id',
+  'idx_task_semantic_packets_status',
+  'idx_task_semantic_packets_agent_pickup_ready',
+  'idx_task_semantic_packets_created_at',
+  'idx_task_semantic_packets_updated_at',
+  'task_semantic_packets_alias_id_idx',
+  'idx_task_semantic_packets_workspace_id',
+  'idx_task_semantic_packets_point_kind',
+  'idx_task_semantic_packets_source_ref',
+  'idx_task_semantic_packets_cluster_id',
+  'idx_task_semantic_packets_centroid_id',
+  'idx_task_semantic_packets_semantic_path_gin',
+  'idx_task_semantic_packets_related_feature_ids_gin',
+  'idx_task_semantic_packets_related_task_ids_gin',
+  'idx_task_semantic_packets_related_file_paths_gin',
+  'idx_task_semantic_packets_qdrant_point_id'
+]
+
+==================================================
+✅ AUDIT AND CONSISTENCY CHECKS COMPLETE
+==================================================
+Smoke Tests: {
+  qdrant_query_feature: true,
+  postgres_query_task: true,
+  neo4j_multihop: true,
+  redis_ace_lookup: false
+}
+Consistency Audits: {
+  qdrant_points_matched_pg: 7,
+  pgvector_record_fk_integrity: true,
+  neo4j_source_ref_in_atlas: 815,
+  kanban_tasks_have_feature_id: true
+}
+==================================================
+
+✓ Wrote C:\Users\james\Videos\deeds-web-app\.tmp\offline-synthesis-report.json
+✓ Wrote C:\Users\james\Videos\deeds-web-app\.tmp\offline-synthesis-report.md
+
+Offline synthesis complete.
