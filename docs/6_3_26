@@ -9,7 +9,6 @@ take messy notes, langextract organzing, atlas extracts indexes compresses helps
 to model multiple domains, a framework exists, "meshnet can represent data in 3d space visually to perform the 4d transformations not just a kv 1-to many, nosql, mapreduce = tricubic, 4d would take a node note yet ingested and adjust "temperature" k value due to not being able to find the answer, and explain it 1-2 sentences to the user, "this might be far off, give the distance from manhattan expansion" and explain where it is in postgresql 18 related to seaweedfs and qdrant vector stores using tags.
 search is somewhat built out, docker container...
 
-
  Production Wiring Audit
 We still need proof of these:
 [ ] GlobalCommandPalette mounted
@@ -71,7 +70,6 @@ Status:
 🟡 Pending
 Priority 5 — Recommendation Engine
 Now that routing works:
-
 Parent Atlas
   ↓
 ACE packet
@@ -88,69 +86,49 @@ Need:
 [ ] Task materialization
 [ ] Packet → Kanban linkage
 [ ] User recommendation ranking
-
 deep research integration, subagent, langfuse, sentry like "glitchtip costs money...something else we were working on...)
 mtp gemma training,
 eval testing later for trt-llm, kernel encoding the nes engrams, with more topology domain distilled ingested packets.
-
 looking at your logs, you've already answered one of the biggest questions
 Your model is NOT actually limited to 16K anymore
 The live model shows:
 n_ctx_train = 131072
 n_ctx       = 65536
 n_ctx_seq   = 65536
-
 and
-
 [{
   "id":0,
   "n_ctx":65536,
   "speculative":false,
   "is_processing":false
 }]
-
 So TurboQuant on :8090 is running at 64K context right now, not 16K. The /slots output confirms that.
-
 The earlier 16384 result likely came from:
-
 an older llama-server instance
 stale VS Code task
 old Ollama llama-server
 another process bound before restart
-
 Your later log shows the correct 65536 allocation.
-
 About the "0.4 improvement"
-
 I think there's confusion around what improved.
-
 The reports you pasted show:
-
 "turbovecScore": 0.99826454
-
 and reranking changes, but I don't see a measured:
-
 +0.40 recall
 +0.40 NDCG
 +0.40 MRR
 
 anywhere.
-
 The likely candidates are:
-
 Lane A
-
 EmbeddingGemma via Ollama
-
 embeddinggemma:latest
 ↓
 768 dimensions
 ↓
 Qdrant
 Lane B
-
 EmbeddingGemma GGUF
-
 embeddinggemma-300m-f16.gguf
 ↓
 llama-server :8081
@@ -158,26 +136,19 @@ llama-server :8081
 /v1/embeddings
 ↓
 Qdrant
-
 The test you want is:
-
 same queries
 same documents
 same Qdrant collection
-
 compare:
-
 Recall@10
 MRR
 NDCG
 Top-10 overlap
 
 That will tell you whether the llama-server embeddings actually improved retrieval.
-
 What I would do next
-
 You already have:
-
 Qdrant
 Redis
 Neo4j
@@ -185,21 +156,14 @@ TurboQuant
 TensorRT bridge
 BitFrost cache
 Parent Atlas
-
 The next useful benchmark is:
-
 EmbeddingGemma Ollama
 vs
 EmbeddingGemma GGUF llama-server
-
 against the same Atlas cards.
-
 Create:
-
 scripts/evals/embed-head-to-head.mjs
-
 Output:
-
 {
   "queries": 100,
   "ollama": {
@@ -215,60 +179,39 @@ Output:
     "ndcg": 0.03
   }
 }
-
 Then you'll know whether the 8081 lane is worth keeping.
-
 Parent Atlas integration
-
 Based on your reconciliation output:
-
 parent_atlas_feature_commands_768
 parent_atlas_rg_packets_768
-
 are already loaded and healthy in Qdrant.
-
 I'd structure retrieval as:
-
 User Query
-     │
      ▼
 EmbeddingGemma
-     │
      ▼
 Qdrant
-     │
      ├── parent_atlas_feature_commands_768
      ├── parent_atlas_rg_packets_768
      ├── codebase_chunks_768
      ├── chat_messages
      └── legal_cases
-     │
      ▼
 TurboVec rerank
-     │
      ▼
 BitFrost cache
-     │
      ▼
 Gemma4 generation
-
 That keeps Parent Atlas as the authoritative retrieval layer instead of creating another indexing lane.
-
 Biggest remaining issue
-
 Your audit is almost perfect:
-
 33/33 PASS
-
 except:
-
 WARN: Embed server :8081 not healthy
-
 Everything else is green.
+So before building more retrieval features, I would focus on: this passed (6 3 26 but left note**)
 
-So before building more retrieval features, I would focus on:
-
-Stabilize embeddinggemma-300m-f16.gguf
+Stabilize embeddinggemma-300m-f16.gguf -> needs recreation using gemma4 just released "multi-modal?" using 512 embeds? in our llama-server, needs eval testing which was sort of stubbed out.
 Make :8081/health consistently pass
 Run head-to-head retrieval evaluation
 Decide whether Ollama embeddings can be retired
