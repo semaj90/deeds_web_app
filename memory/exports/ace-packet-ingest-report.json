@@ -1,0 +1,14 @@
+{
+  "timestamp": "2026-06-04T04:44:00.929Z",
+  "packet_count": 396,
+  "engram_count": 0,
+  "som_cluster_count": 396,
+  "source_ref_count": 1720,
+  "feature_count": 114,
+  "dag_hit_count": 0,
+  "kag_hit_count": 745,
+  "nes_chrom_key_count": 1400,
+  "ace_packet_latest": "9f188342171c9e1c",
+  "ttl_seconds": 86400,
+  "top_n": 396
+}
