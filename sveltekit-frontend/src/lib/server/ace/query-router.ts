@@ -182,6 +182,7 @@ export async function routeQuery(opts: QueryRouterOpts): Promise<QueryRouterResu
   const neo4jNeighborIds: string[] = [];
   const redisHotKeys: string[] = [];
   const engramIds: string[] = [];
+  const nesChromPacketKeys: string[] = [];
   const snippets: AceFullPacket['ranked_cards'] = [];
   let clusterId: string | null = clusterHint ?? null;
   let somClusterFound: string | null = null;
@@ -199,14 +200,40 @@ export async function routeQuery(opts: QueryRouterOpts): Promise<QueryRouterResu
           sourceRefs.push(...prior.source_refs);
           redisHotKeys.push(hotKey);
           cacheHit = 'redis';
-          // Track engram query key for provenance
-          const engramQueryKey = `ace:engram:query:${queryHash}`;
-          engramIds.push(engramQueryKey);
           trace.push({ lane: 'redis-hot', hit: true, latency_ms: Date.now() - t0 });
         }
       } catch { /* ignore */ }
     } else {
       trace.push({ lane: 'redis-hot', hit: false, latency_ms: Date.now() - t0 });
+    }
+  }
+
+  // ── Lane 1.5: Engram bigram lookup (co-occurrence suggestions) ────────────
+  // Reads ace:engram:bigram:{queryHash} ZSET — top next-query suggestions from
+  // prior sessions. Gives the router provenance of "what queries tend to follow
+  // this one" without requiring a prior query to have happened THIS session.
+  {
+    const t0 = Date.now();
+    const bigramKey = `ace:engram:bigram:${queryHash}`;
+    try {
+      // ZREVRANGE returns [member, score, member, score, ...] with WITHSCORES
+      const bigramEntries = await redis.zrevrange(bigramKey, 0, 4, 'WITHSCORES').catch(() => [] as string[]);
+      if (bigramEntries.length >= 2) {
+        // Build ace:engram:query:* keys for each suggestion hash
+        for (let i = 0; i < bigramEntries.length - 1; i += 2) {
+          const nextHash = bigramEntries[i];
+          engramIds.push(`ace:engram:query:${nextHash}`);
+        }
+        trace.push({ lane: 'engram-bigram', hit: true, latency_ms: Date.now() - t0 });
+        if (!laneIds.includes('engram')) laneIds.push('engram');
+      } else {
+        // Still record the current query's own engram key for provenance
+        engramIds.push(`ace:engram:query:${queryHash}`);
+        trace.push({ lane: 'engram-bigram', hit: false, latency_ms: Date.now() - t0 });
+      }
+    } catch {
+      engramIds.push(`ace:engram:query:${queryHash}`);
+      trace.push({ lane: 'engram-bigram', hit: false, latency_ms: Date.now() - t0 });
     }
   }
 
@@ -362,6 +389,46 @@ export async function routeQuery(opts: QueryRouterOpts): Promise<QueryRouterResu
     }
   }
 
+  // ── Lane 6: NES/CHROM card lookup (parallel, top 5 source_refs) ─────────
+  // Enriches feature_ids and populates nes_chrom_packet_keys from the
+  // 7,992 NES cards already warm in Redis. Runs after Qdrant so we have
+  // source_refs to look up.
+  if (sourceRefs.length > 0) {
+    const t0 = Date.now();
+    const topRefs = [...new Set(sourceRefs)].slice(0, 5);
+    const cardResults = await Promise.allSettled(
+      topRefs.map(ref => readCardBySourceRef(ref).catch(() => null))
+    );
+    let nesHits = 0;
+    for (const result of cardResults) {
+      if (result.status === 'fulfilled' && result.value) {
+        const card = result.value;
+        // Add canonical nes:card:{id} key to provenance
+        nesChromPacketKeys.push(`nes:card:${card.id}`);
+        // Merge feature_ids from the NES card
+        for (const fid of card.feature_ids) {
+          if (fid && !featureIds.includes(fid)) featureIds.push(fid);
+        }
+        // Prefer the card's top_feature over empty tags
+        if (card.top_feature && !featureIds.includes(card.top_feature)) {
+          featureIds.unshift(card.top_feature);
+        }
+        // Merge cluster from card if we don't have one
+        if (!clusterId && card.cluster_id) {
+          clusterId = card.cluster_id;
+          somClusterFound = somClusterFound ?? card.cluster_id;
+        }
+        nesHits++;
+      }
+    }
+    if (nesHits > 0) {
+      trace.push({ lane: 'nes-chrom', hit: true, latency_ms: Date.now() - t0 });
+      if (!laneIds.includes('nes-chrom')) laneIds.push('nes-chrom');
+    } else {
+      trace.push({ lane: 'nes-chrom', hit: false, latency_ms: Date.now() - t0 });
+    }
+  }
+
   // ── Assemble prompt context (top 5 snippets) ──────────────────────────
   const topSnippets = snippets
     .sort((a, b) => b.score - a.score)
@@ -387,8 +454,8 @@ export async function routeQuery(opts: QueryRouterOpts): Promise<QueryRouterResu
     som_cluster: somClusterFound,
     engram_ids: engramIds,
     kag_hits: neo4jNeighborIds.length,
-    dag_hits: 0,
-    nes_chrom_packet_keys: [],
+    dag_hits: neo4jNeighborIds.length,  // DAG = graph expansion edge count (Neo4j lane)
+    nes_chrom_packet_keys: nesChromPacketKeys,
     prompt_context: promptContext,
     ranked_cards: topSnippets,
     cache_hit: cacheHit,
