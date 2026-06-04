@@ -59,13 +59,34 @@ const CHECKPOINT_KEY   = 'code:index:checkpoint:hashes';  // Redis set of done c
 const CHECKPOINT_TTL   = 2 * 3600;                        // 2h — auto-expires after full run
 const CHECKPOINT_EVERY = 200;                             // flush batch every N files
 
+// ── .env loader (so REDIS_PASSWORD is available when run outside npm scripts) ─
+
+for (const envCandidate of [
+  path.resolve(SVELTEKIT_ROOT, '.env'),
+  path.resolve(ROOT, '.env'),
+]) {
+  if (fs.existsSync(envCandidate)) {
+    for (const line of fs.readFileSync(envCandidate, 'utf8').split('\n')) {
+      const m = line.trimEnd().match(/^([A-Z_][A-Z0-9_]*)=(.*)$/);
+      if (m && !process.env[m[1]]) process.env[m[1]] = m[2].replace(/^["']|["']$/g, '');
+    }
+    break;
+  }
+}
+
 // ── Redis (optional) ──────────────────────────────────────────────────────────
 
 let redis = null;
 if (!SKIP_REDIS) {
   try {
     const { default: Redis } = await import('ioredis');
-    redis = new Redis(process.env.REDIS_URL ?? 'redis://127.0.0.1:6379', {
+    const _redisUrl = process.env.REDIS_URL ?? 'redis://127.0.0.1:6379';
+    const _redisPw  = process.env.REDIS_PASSWORD || process.env.REDIS_PASS || undefined;
+    const _u        = new URL(_redisUrl);
+    redis = new Redis({
+      host:                 _u.hostname || '127.0.0.1',
+      port:                 Number(_u.port) || 6379,
+      password:             _redisPw,
       lazyConnect:          true,
       connectTimeout:       3000,
       maxRetriesPerRequest: 1,
@@ -82,7 +103,7 @@ if (!SKIP_REDIS) {
   }
 }
 
-const REDIS_TTL     = 6  * 3600; // 6h  — file/tag/manifest keys
+const REDIS_TTL     = Number(process.env.CODE_INDEX_REDIS_TTL ?? 24 * 3600); // 24h default — file/tag/manifest keys
 const WIKI_NOTE_TTL = 24 * 3600; // 24h — wiki:note:dir keys
 
 async function rset(key, value, ttl = REDIS_TTL) {

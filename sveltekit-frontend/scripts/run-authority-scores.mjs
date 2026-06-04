@@ -29,6 +29,11 @@ const TTL       = 21600; // 6h
 const TOP_N     = 200;
 
 const REDIS_URL  = process.env.REDIS_URL       ?? 'redis://127.0.0.1:6379';
+const REDIS_PASSWORD = process.env.REDIS_PASSWORD || process.env.REDIS_PASS || undefined;
+function redisOpts(extra = {}) {
+  const u = new URL(REDIS_URL);
+  return { host: u.hostname || '127.0.0.1', port: Number(u.port) || 6379, password: REDIS_PASSWORD, ...extra };
+}
 const PG_URL     = process.env.DATABASE_URL    ?? null;
 
 // ── helpers ────────────────────────────────────────────────────────────────────
@@ -128,12 +133,12 @@ async function loadFromPostgres() {
 
 async function writeToRedis(entries) {
   const { Redis } = await import('ioredis');
-  const redis = new Redis(REDIS_URL, {
+  const redis = new Redis(redisOpts({
     lazyConnect:          true,
     maxRetriesPerRequest: 1,
     enableOfflineQueue:   false,
     retryStrategy:        () => null,
-  });
+  }));
   redis.on('error', () => {});
 
   try {

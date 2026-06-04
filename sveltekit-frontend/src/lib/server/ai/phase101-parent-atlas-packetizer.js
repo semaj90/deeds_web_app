@@ -225,7 +225,11 @@ async function getCacheAdapter() {
   let redis = null;
   try {
     const redisUrl = String(process.env.REDIS_URL ?? '').trim() || 'redis://127.0.0.1:6379';
-    redis = new IORedis(redisUrl, {
+    const redisPassword = process.env.REDIS_PASSWORD || process.env.REDIS_PASS || undefined;
+    redis = new IORedis({
+      host: new URL(redisUrl).hostname || '127.0.0.1',
+      port: Number(new URL(redisUrl).port) || 6379,
+      password: redisPassword,
       lazyConnect: false,
       enableReadyCheck: false,
       maxRetriesPerRequest: 1,

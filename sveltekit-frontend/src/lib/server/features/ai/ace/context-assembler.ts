@@ -1318,11 +1318,12 @@ export async function assembleACEContext(opts: {
       }).catch(() => {});
 
       // Map to codebase context items to populate prompt renderer
-      const codebaseContext = packet.ranked_cards.map((c: any) => ({
-        filePath: c.source_ref,
-        summary: c.snippet,
-        score: c.score,
-        gpuCluster: packet.cluster_id ? parseInt(packet.cluster_id.split(':')[0]) : null,
+      const codebaseContext: NonNullable<ACEContext['codebaseContext']> = packet.ranked_cards.map((c: any) => ({
+        filePath: String(c.source_ref ?? ''),
+        content: String(c.snippet ?? ''),
+        score: Number(c.score ?? 0),
+        gpuCluster: packet.cluster_id ? parseInt(packet.cluster_id.split(':')[0], 10) : null,
+        tags: [] as string[],
       }));
 
       const parentAtlasContext: ACEContext = {
@@ -1360,21 +1361,21 @@ export async function assembleACEContext(opts: {
         userAnalyticsContext: null,
         codebaseContext,
         activeClusterSummary: packet.cluster_id ? {
-          clusterId: packet.cluster_id,
+          clusterId: parseInt((packet.cluster_id as string).split(':')[0], 10) || 0,
           summary: `SOM Cluster at ${packet.cluster_id}`,
           purpose: 'Topological context for parent atlas routing',
-          patterns: packet.feature_ids,
-          keyFiles: packet.source_refs,
-          warnings: [],
+          patterns: (packet.feature_ids as string[]) ?? [],
+          keyFiles: (packet.source_refs as string[]) ?? [],
+          warnings: [] as string[],
         } : null,
         dbSchemaContext: '',
         policyDecision: null,
         cachePlanner: {
           hit: packet.cache_hit !== 'none',
-          source: packet.cache_hit === 'redis' ? 'redis' : 'qdrant',
+          source: (packet.cache_hit === 'redis' ? 'redis' : 'miss') as 'redis' | 'postgres' | 'local-json' | 'miss',
           cacheKey: `bitfrost:retrieval:${packet.query_hash}`,
-          contextHash: packet.query_hash,
-          deltaFields: [],
+          contextHash: packet.query_hash as string,
+          deltaFields: [] as string[],
           retrievalModeHash: 'parent-atlas',
           sectionTypesHash: 'parent-atlas',
           tokenAwarePacking: false,

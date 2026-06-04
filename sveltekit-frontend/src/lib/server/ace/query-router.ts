@@ -27,6 +27,7 @@ import {
 } from './ace-packet-store.js';
 import { readSomPacketById } from './som-packet-store.js';
 import { readCardBySourceRef, normalizeCardId, cardIdVariants } from './nes-chrom-card-store.js';
+import { nearestCluster } from '$lib/server/retrieval/centroid-cache.js';
 import crypto from 'crypto';
 
 // ── Embed query via embeddinggemma :8081 or Ollama fallback ──────────────
@@ -121,7 +122,7 @@ async function neo4jNeighbors(sourceRef: string, limit = 5): Promise<string[]> {
       headers: { 'Content-Type': 'application/json', 'Authorization': 'Basic ' + Buffer.from('neo4j:neo4j').toString('base64') },
       body: JSON.stringify({
         statements: [{
-          statement: `MATCH (f:CodebaseFile {sourceRef: $ref})-[:IMPORTS|BELONGS_TO_CLUSTER]-(n) RETURN n.sourceRef LIMIT $limit`,
+          statement: `MATCH (f:CodebaseFile {id: $ref})-[:IMPORTS|DYNAMIC_IMPORTS|USES_COMPONENT|USES_STORE|SIMILAR_TOPOLOGY]-(n) RETURN n.id LIMIT $limit`,
           parameters: { ref: sourceRef, limit },
         }],
       }),
@@ -180,8 +181,10 @@ export async function routeQuery(opts: QueryRouterOpts): Promise<QueryRouterResu
   const qdrantPointIds: (string | number)[] = [];
   const neo4jNeighborIds: string[] = [];
   const redisHotKeys: string[] = [];
+  const engramIds: string[] = [];
   const snippets: AceFullPacket['ranked_cards'] = [];
   let clusterId: string | null = clusterHint ?? null;
+  let somClusterFound: string | null = null;
   let cacheHit: AceFullPacket['cache_hit'] = 'none';
 
   // ── Lane 1: Redis hot packet (exact query hash) ────────────────────────
@@ -196,6 +199,9 @@ export async function routeQuery(opts: QueryRouterOpts): Promise<QueryRouterResu
           sourceRefs.push(...prior.source_refs);
           redisHotKeys.push(hotKey);
           cacheHit = 'redis';
+          // Track engram query key for provenance
+          const engramQueryKey = `ace:engram:query:${queryHash}`;
+          engramIds.push(engramQueryKey);
           trace.push({ lane: 'redis-hot', hit: true, latency_ms: Date.now() - t0 });
         }
       } catch { /* ignore */ }
@@ -255,10 +261,34 @@ export async function routeQuery(opts: QueryRouterOpts): Promise<QueryRouterResu
     }
   }
 
+  // ── Lane 3.5: Centroid nearest-cluster lookup ─────────────────────────────
+  // Embed query once and find the nearest precomputed cluster centroid.
+  // Resolves a clusterId hint before Qdrant ANN, improving cluster-scoped recall.
+  let sharedEmbedding: number[] | null = null;
+  if (!clusterId) {
+    const t0 = Date.now();
+    const vec = await embedQuery(query);
+    if (vec) {
+      sharedEmbedding = vec;
+      try {
+        const nearest = await nearestCluster(vec, 50);
+        if (nearest && nearest.similarity > 0.3) {
+          clusterId = `cluster:${nearest.clusterId}`;
+          somClusterFound = somClusterFound ?? clusterId;
+          trace.push({ lane: 'centroid-nn', hit: true, latency_ms: Date.now() - t0 });
+        } else {
+          trace.push({ lane: 'centroid-nn', hit: false, latency_ms: Date.now() - t0 });
+        }
+      } catch {
+        trace.push({ lane: 'centroid-nn', hit: false, latency_ms: Date.now() - t0 });
+      }
+    }
+  }
+
   // ── Lane 4: Qdrant dense search ────────────────────────────────────────
   {
     const t0 = Date.now();
-    const embedding = await embedQuery(query);
+    const embedding = sharedEmbedding ?? await embedQuery(query);
     if (embedding) {
       const hits = await qdrantSearch(embedding, limit, collection);
       if (hits.length > 0) {
@@ -268,16 +298,40 @@ export async function routeQuery(opts: QueryRouterOpts): Promise<QueryRouterResu
           const normRef = normalizeCardId(ref);
           if (normRef && !sourceRefs.includes(normRef)) sourceRefs.push(normRef);
 
-          // Extract Atlas fields baked into Qdrant payload by Phase 3C backfill
-          const hitFeatures = hit.payload.feature_ids as string[] | undefined;
-          if (hitFeatures) featureIds.push(...hitFeatures.filter(f => !featureIds.includes(f)));
-          const hitCluster = hit.payload.som_cluster as string | undefined;
-          if (hitCluster && !clusterId) clusterId = hitCluster;
+          // Extract Atlas fields from Qdrant payload — support both old and new field names
+          // feature_ids: new name | phase_lane: old single string | tags: supplemental
+          const rawFeatureIds = hit.payload.feature_ids as string[] | undefined;
+          const phaseLane = hit.payload.phase_lane as string | undefined;
+          const payloadTags = hit.payload.tags as string[] | undefined;
+          const hitFeatures: string[] = rawFeatureIds?.length
+            ? rawFeatureIds
+            : phaseLane
+              ? [phaseLane]
+              : payloadTags?.slice(0, 2) ?? [];
+          for (const f of hitFeatures) {
+            if (f && !featureIds.includes(f)) featureIds.push(f);
+          }
+
+          // som_cluster (new) or derive from somRow/somCol or gpuCluster (existing payload formats)
+          const hitCluster = (hit.payload.som_cluster as string | undefined)
+            ?? (hit.payload.somRow != null && hit.payload.somCol != null
+              ? `${hit.payload.somRow}:${hit.payload.somCol}`
+              : undefined)
+            ?? (hit.payload.gpuCluster != null
+              ? `cluster:${hit.payload.gpuCluster}`
+              : undefined);
+          if (hitCluster) {
+            if (!clusterId) clusterId = hitCluster;
+            if (!somClusterFound) somClusterFound = hitCluster;
+          }
+
+          // feature_id label: top_feature (new) or feature_label or area (existing payload formats)
+          const hitFeatureLabel = (hit.payload.top_feature ?? hit.payload.feature_label ?? hit.payload.area ?? null) as string | null;
 
           snippets.push({
             source_ref: normRef,
             score: hit.score,
-            feature_id: (hit.payload.top_feature as string) ?? null,
+            feature_id: hitFeatureLabel,
             snippet: ((hit.payload.text ?? hit.payload.content ?? '') as string).slice(0, 200),
           });
         }
@@ -329,6 +383,12 @@ export async function routeQuery(opts: QueryRouterOpts): Promise<QueryRouterResu
     qdrant_point_ids: qdrantPointIds,
     neo4j_neighbor_ids: neo4jNeighborIds,
     redis_hot_keys: redisHotKeys,
+    // Provenance fields — propagated from Qdrant payload + Neo4j expansion
+    som_cluster: somClusterFound,
+    engram_ids: engramIds,
+    kag_hits: neo4jNeighborIds.length,
+    dag_hits: 0,
+    nes_chrom_packet_keys: [],
     prompt_context: promptContext,
     ranked_cards: topSnippets,
     cache_hit: cacheHit,
@@ -354,6 +414,8 @@ export async function routeQuery(opts: QueryRouterOpts): Promise<QueryRouterResu
       qdrant_point_ids: packet.qdrant_point_ids,
       atlas_cluster_ids: packet.cluster_id ? [packet.cluster_id] : [],
       feature_ids: packet.feature_ids,
+      som_cluster: packet.som_cluster,
+      kag_hits: packet.kag_hits,
       cache_hit: packet.cache_hit,
       latency_ms: packet.latency_ms,
       logged_at: new Date().toISOString(),

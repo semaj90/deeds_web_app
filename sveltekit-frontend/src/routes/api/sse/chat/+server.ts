@@ -28,6 +28,8 @@ import { setCache, getFromMemoryCache } from '$lib/server/cache.js';
 import { traceEmbedding, traceLLM } from '$lib/server/observability/langfuse.js';
 import { evaluateResponse, generateCorrectionPrompt } from '$lib/server/ace/self-prompt.js';
 import { fetchGlossaryMatches, fetchCachedACEChunks, persistACEChunks } from '$lib/server/ace/context-assembler.js';
+import { routeQuery } from '$lib/server/ace/query-router.js';
+import { recordEngramTransition } from '$lib/server/search/engram-bigram.js';
 import { classifyQuerySection, getInterimInference } from '$lib/server/analysis/hmm-ace-analyzer.js';
 import { orderByDependency, extractCitationRefs } from '$lib/server/retrieval/document-dag.js';
 import type { DAGDocument } from '$lib/server/retrieval/document-dag.js';
@@ -1296,8 +1298,18 @@ export const POST: RequestHandler = async ({ request, locals }) => {
         }
       }
 
+      // ── Parent Atlas packet: fire-and-forget alongside other retrieval ──
+      // routeQuery resolves from Redis hot cache (<5ms on hit) or builds from
+      // NES/CHROM cards + SOM cluster. Non-fatal — null on any failure.
+      const PARENT_ATLAS_HINT =
+        /(redis|valkey|qdrant|som|ace|bifrost|query router|codebase|indexing|nes|chrom|parent atlas|mapping|card|svelte|drizzle|schema|route|endpoint|component|database|migration)/i;
+      const wantsAtlas = PARENT_ATLAS_HINT.test(message);
+      let atlasPacketPromise = wantsAtlas
+        ? routeQuery({ query: message, limit: 5 }).catch(() => null)
+        : Promise.resolve(null);
+
       const retrievalStart = performance.now();
-      const [rawContextDocs, freshCodebaseResult, aceChunks] = await Promise.all([
+      const [rawContextDocs, freshCodebaseResult, aceChunks, atlasResult] = await Promise.all([
         cachedRagDocs
           ? Promise.resolve(cachedRagDocs)
           : attachmentScopedDocs.length > 0
@@ -1319,6 +1331,8 @@ export const POST: RequestHandler = async ({ request, locals }) => {
               () => [] as Array<{ content: string; score: number; source: string }>
             )
           : Promise.resolve([] as Array<{ content: string; score: number; source: string }>),
+        // Parent Atlas packet: NES/CHROM → SOM → AceFullPacket (Redis hot cache <5ms on hit)
+        atlasPacketPromise,
       ]);
       const retrievalDuration = performance.now() - retrievalStart;
 
@@ -1791,6 +1805,33 @@ export const POST: RequestHandler = async ({ request, locals }) => {
       // Inject codebase context (recall→rerank pipeline)
       if (codebaseResult) {
         systemPrompt += `\n\n${codebaseResult.context}`;
+      }
+
+      // Inject Parent Atlas packet (NES/CHROM source_refs + feature_ids + lane_ids + qdrant_hits + redis_hot_keys)
+      const atlasPacket = atlasResult?.packet ?? null;
+      if (atlasPacket) {
+        const refs  = atlasPacket.source_refs?.slice(0, 6).join(', ')       || '';
+        const feats = atlasPacket.feature_ids?.slice(0, 4).join(', ')       || '';
+        const lanes = atlasPacket.lane_ids?.slice(0, 4).join(', ')          || '';
+        const clust = atlasPacket.cluster_id ?? '';
+        const qdrantHits = atlasPacket.qdrant_point_ids?.slice(0, 4).join(', ') || '';
+        const hotKeys = atlasPacket.redis_hot_keys?.slice(0, 4).join(', ')  || '';
+        const parts: string[] = [];
+        if (refs)       parts.push(`Source refs: ${refs}`);
+        if (feats)      parts.push(`Features: ${feats}`);
+        if (lanes)      parts.push(`Lanes: ${lanes}`);
+        if (clust)      parts.push(`SOM cluster: ${clust}`);
+        if (qdrantHits) parts.push(`Qdrant hits: ${qdrantHits}`);
+        if (hotKeys)    parts.push(`Redis hot keys: ${hotKeys}`);
+        // Inject ranked snippet text so the model can actually answer from codebase context
+        const snippetText = atlasPacket.prompt_context ?? '';
+        if (snippetText && snippetText.length > 50) {
+          systemPrompt += `\n\n## Codebase Context (Atlas)\n${snippetText.slice(0, 3000)}`;
+        } else if (parts.length) {
+          systemPrompt += `\n\n## Atlas Context\n${parts.join('\n')}`;
+        }
+        // Fire engram transition for bigram memory (non-blocking): cluster_id → query
+        recordEngramTransition(clust || 'parent-atlas', message).catch(() => {});
       }
 
 

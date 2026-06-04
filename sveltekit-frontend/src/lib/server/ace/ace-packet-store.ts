@@ -35,6 +35,12 @@ export interface AceFullPacket {
   qdrant_point_ids: (string | number)[];
   neo4j_neighbor_ids: string[];
   redis_hot_keys: string[];
+  // Provenance fields (NES/CHROM + Engram + KAG/DAG)
+  som_cluster: string | null;         // "row:col" from Qdrant payload som_cluster field
+  engram_ids: string[];               // ace:engram:query:{hash} keys touched this request
+  kag_hits: number;                   // KAG graph neighbor hit count
+  dag_hits: number;                   // DAG (directed graph) hit count
+  nes_chrom_packet_keys: string[];    // nes:* packet keys written to Postgres this request
   // Assembled context
   prompt_context: string;          // compact context string for Gemma4
   ranked_cards: Array<{

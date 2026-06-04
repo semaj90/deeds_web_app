@@ -27,6 +27,20 @@ import { spawnSync } from 'node:child_process';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, '../..');
 
+// ── .env loader (so REDIS_PASSWORD is available when run outside npm scripts) ─
+for (const envCandidate of [
+  path.resolve(ROOT, '.env'),
+  path.resolve(ROOT, '..', '.env'),
+]) {
+  if (existsSync(envCandidate)) {
+    for (const line of readFileSync(envCandidate, 'utf8').split('\n')) {
+      const m = line.trimEnd().match(/^([A-Z_][A-Z0-9_]*)=(.*)$/);
+      if (m && !process.env[m[1]]) process.env[m[1]] = m[2].replace(/^["']|["']$/g, '');
+    }
+    break;
+  }
+}
+
 const NO_REDIS  = process.argv.includes('--no-redis');
 const RUN_INDEX = process.argv.includes('--run-index');
 
@@ -54,46 +68,102 @@ function skip(label, reason = '') {
   skipped++;
 }
 
-// ── raw TCP Redis helper ────────────────────────────────────────────────────
+// ── Redis helper — docker-exec preferred, raw TCP fallback ─────────────────
+// Parses a complete RESP response starting at lines[offset], returns [value, nextOffset]
+function parseResp(lines, offset) {
+  const first = lines[offset] ?? '';
+  if (first.startsWith('+')) return [first.slice(1), offset + 1];
+  if (first.startsWith('-')) return [null, offset + 1];
+  if (first.startsWith(':')) return [parseInt(first.slice(1), 10), offset + 1];
+  if (first.startsWith('$')) {
+    const len = parseInt(first.slice(1), 10);
+    return [len === -1 ? null : (lines[offset + 1] ?? null), offset + 2];
+  }
+  if (first.startsWith('*')) {
+    const count = parseInt(first.slice(1), 10);
+    const items = [];
+    let cur = offset + 1;
+    for (let i = 0; i < count; i++) {
+      const [v, next] = parseResp(lines, cur);
+      items.push(v);
+      cur = next;
+    }
+    return [items, cur];
+  }
+  return [null, offset + 1];
+}
+
+// Docker-exec helper — most reliable on Windows where TCP auth can race
+function redisDockerExec(args) {
+  return new Promise((resolve) => {
+    const REDIS_PASSWORD = process.env.REDIS_PASSWORD || process.env.REDIS_PASS || '';
+    const passArgs = REDIS_PASSWORD ? ['-a', REDIS_PASSWORD, '--no-auth-warning'] : [];
+    const result = spawnSync('docker', ['exec', 'legal-ai-redis', 'redis-cli', ...passArgs, ...args.map(String)], {
+      encoding: 'utf8',
+      timeout: 5000,
+    });
+    if (result.status !== 0 || result.error) { resolve(null); return; }
+    const out = (result.stdout || '').trimEnd();
+    // Handle KEYS output (one key per line)
+    if (args[0] === 'KEYS') {
+      const keys = out.split('\n').filter(Boolean);
+      resolve(keys.length ? keys : null);
+      return;
+    }
+    // GET: return string or null
+    resolve(out === '' || out === '(nil)' ? null : out);
+  });
+}
 
 function redisCmd(args) {
+  // Try docker-exec first (bulletproof on Windows/WSL); fall back to TCP
+  return redisDockerExec(args).catch(() => redisCmdTcp(args));
+}
+
+function redisCmdTcp(args) {
   return new Promise((resolve) => {
     const REDIS_HOST = process.env.REDIS_HOST || '127.0.0.1';
     const REDIS_PORT = parseInt(process.env.REDIS_PORT || '6379', 10);
+    const REDIS_PASSWORD = process.env.REDIS_PASSWORD || process.env.REDIS_PASS || '';
     const sock = createConnection({ host: REDIS_HOST, port: REDIS_PORT });
     let buf = '';
-    sock.setTimeout(3000);
-    sock.on('timeout', () => { sock.destroy(); resolve(null); });
-    sock.on('error', () => resolve(null));
-    sock.on('data', d => { buf += d.toString(); });
-    sock.on('end', () => {
+    let responsesExpected = REDIS_PASSWORD ? 2 : 1;
+    let resolved = false;
+
+    function tryParse() {
       const lines = buf.split('\r\n');
-      // Simple RESP parse: first line type marker, then value
-      const first = lines[0] ?? '';
-      if (first.startsWith('+')) { resolve(first.slice(1)); return; }
-      if (first.startsWith(':')) { resolve(parseInt(first.slice(1), 10)); return; }
-      if (first.startsWith('$')) {
-        const len = parseInt(first.slice(1), 10);
-        resolve(len === -1 ? null : lines[1] ?? null);
-        return;
-      }
-      if (first.startsWith('*')) {
-        const count = parseInt(first.slice(1), 10);
-        const items = [];
-        for (let i = 0; i < count; i++) {
-          const lenLine = lines[1 + i * 2] ?? '';
-          const len = parseInt(lenLine.slice(1), 10);
-          items.push(len === -1 ? null : lines[2 + i * 2] ?? null);
+      let offset = 0;
+      let count = 0;
+      let lastVal = null;
+      try {
+        while (count < responsesExpected && offset < lines.length && lines[offset] !== '') {
+          const [val, next] = parseResp(lines, offset);
+          lastVal = val;
+          offset = next;
+          count++;
         }
-        resolve(items);
-        return;
+      } catch { return; }
+      if (count === responsesExpected && !resolved) {
+        resolved = true;
+        sock.destroy();
+        resolve(lastVal);
       }
-      resolve(buf.trim() || null);
-    });
-    // Build RESP command
-    const cmd = `*${args.length}\r\n` + args.map(a => `$${String(a).length}\r\n${a}\r\n`).join('');
+    }
+
+    sock.setTimeout(4000);
+    sock.on('timeout', () => { sock.destroy(); if (!resolved) { resolved = true; resolve(null); } });
+    sock.on('error', () => { if (!resolved) { resolved = true; resolve(null); } });
+    sock.on('data', (d) => { buf += d.toString(); tryParse(); });
+    // Also try on close in case data arrived but parsing missed count check
+    sock.on('close', () => { tryParse(); if (!resolved) { resolved = true; resolve(null); } });
+
+    let cmd = '';
+    if (REDIS_PASSWORD) {
+      cmd += `*2\r\n$4\r\nAUTH\r\n$${REDIS_PASSWORD.length}\r\n${REDIS_PASSWORD}\r\n`;
+    }
+    cmd += `*${args.length}\r\n` + args.map(a => `$${String(a).length}\r\n${a}\r\n`).join('');
     sock.write(cmd);
-    sock.end();
+    // Signal EOF so server sends response; do NOT call sock.end() before data arrives
   });
 }
 
@@ -129,15 +199,36 @@ if (!existsSync(GRAPH_JSON)) {
   }
 }
 
+// ── Topology probe: detect which "cave" (runtime) we're in ─────────────────
+const IS_WSL = (() => {
+  try { return readFileSync('/proc/version', 'utf8').toLowerCase().includes('microsoft'); } catch { return false; }
+})();
+const REDIS_HOST_ACTUAL = process.env.REDIS_HOST || '127.0.0.1';
+const topoHint = IS_WSL
+  ? `WSL→Docker: use host.docker.internal or $(cat /etc/resolv.conf | grep nameserver | awk '{print $2}') instead of 127.0.0.1`
+  : `Windows: 127.0.0.1 → Docker Valkey (correct)`;
+
 // 2 & 3. Redis checks
 if (NO_REDIS) {
   skip('Redis code:index:manifest exists', '--no-redis');
   skip('code:index:tag:* keys exist', '--no-redis');
   skip('Manifest mode === fast-ast', '--no-redis');
 } else {
+  // First probe: is Redis reachable at all?
+  const pingResult = await redisCmd(['PING']);
+  if (pingResult !== 'PONG') {
+    const runtime = IS_WSL ? 'WSL' : 'Windows/native';
+    fail('Redis code:index:manifest exists',
+      `Redis unreachable at ${REDIS_HOST_ACTUAL}:${process.env.REDIS_PORT ?? 6379} (runtime: ${runtime}). ` +
+      `Topology hint: ${topoHint}. ` +
+      `Fix: run npm run index:codebase:fast with REDIS_PASSWORD set`);
+    skip('code:index:tag:* keys exist', 'Redis offline');
+    skip('Manifest mode === fast-ast', 'Redis offline');
+  } else {
   const manifest = await redisCmd(['GET', 'code:index:manifest']);
   if (manifest == null) {
-    fail('Redis code:index:manifest exists', 'key missing or Redis unreachable — run npm run index:codebase:fast');
+    fail('Redis code:index:manifest exists',
+      'key missing (expired or never written) — run: npm run index:codebase:fast');
     skip('code:index:tag:* keys exist', 'manifest missing');
     skip('Manifest mode === fast-ast', 'manifest missing');
   } else {
@@ -146,7 +237,7 @@ if (NO_REDIS) {
     // 3. tag keys
     const tagKeys = await redisCmd(['KEYS', 'code:index:tag:*']);
     if (!Array.isArray(tagKeys) || tagKeys.length === 0) {
-      fail('code:index:tag:* keys exist', 'no tag keys found in Redis');
+      fail('code:index:tag:* keys exist', 'no tag keys (expired or indexer ran without REDIS_PASSWORD) — rerun: npm run index:codebase:fast');
     } else {
       pass('code:index:tag:* keys exist', `${tagKeys.length} tag key(s)`);
     }
@@ -155,14 +246,15 @@ if (NO_REDIS) {
     let parsed;
     try { parsed = JSON.parse(manifest); } catch { parsed = null; }
     if (!parsed) {
-      fail('Manifest mode === fast-ast', 'manifest JSON parse failed');
+      fail('Manifest mode === fast-ast', `manifest is not valid JSON (type=${typeof manifest}, len=${String(manifest).length}) — DEL code:index:manifest and reindex`);
     } else if (parsed.mode !== 'fast-ast') {
       fail('Manifest mode === fast-ast', `mode was '${parsed.mode}'`);
     } else {
       pass('Manifest mode === fast-ast', `fileCount=${parsed.fileCount ?? '?'}`);
     }
   }
-}
+  } // end ping-ok else
+} // end NO_REDIS else
 
 // 4. Static: ACE score cap ≤ 0.07
 const ASSEMBLER =

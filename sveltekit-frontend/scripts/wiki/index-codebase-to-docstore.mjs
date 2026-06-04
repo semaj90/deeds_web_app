@@ -29,6 +29,11 @@ const MANIFEST_DIR = join(ROOT, 'memory', 'docstore');
 
 const DRY_RUN = process.argv.includes('--dry-run');
 const REDIS_URL = process.env.REDIS_URL ?? 'redis://127.0.0.1:6379';
+const REDIS_PASSWORD = process.env.REDIS_PASSWORD || process.env.REDIS_PASS || undefined;
+function redisOpts(extra = {}) {
+  const u = new URL(REDIS_URL);
+  return { host: u.hostname || '127.0.0.1', port: Number(u.port) || 6379, password: REDIS_PASSWORD, ...extra };
+}
 const COUCHDB_URL = process.env.COUCHDB_URL ?? 'http://admin:deeds123@localhost:5984';
 const TTL = 6 * 3600; // 6 hours
 
@@ -247,7 +252,7 @@ async function main() {
   let redisWritten = 0;
   let redis;
   try {
-    redis = new Redis(REDIS_URL, { lazyConnect: true, enableOfflineQueue: false });
+    redis = new Redis(redisOpts({ lazyConnect: true, enableOfflineQueue: false }));
     await redis.connect();
 
     const pipe = redis.pipeline();

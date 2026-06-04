@@ -57,6 +57,11 @@ const HOURS     = parseInt(args.find(a => a.startsWith('--hours='))?.split('=')[
 
 const DB_URL    = process.env.DATABASE_URL ?? 'postgresql://legal_admin:123456@127.0.0.1:5434/legal_ai_db';
 const REDIS_URL = process.env.REDIS_URL    ?? 'redis://127.0.0.1:6379';
+const REDIS_PASSWORD = process.env.REDIS_PASSWORD || process.env.REDIS_PASS || undefined;
+function redisOpts(extra = {}) {
+  const u = new URL(REDIS_URL);
+  return { host: u.hostname || '127.0.0.1', port: Number(u.port) || 6379, password: REDIS_PASSWORD, ...extra };
+}
 const pool      = new pg.Pool({
   connectionString: DB_URL,
   max: 4,
@@ -329,7 +334,7 @@ console.log(`  ✓ wrote ${minPath}  (${minKB} KB, ${ratio}% of full)`);
 if (!NO_REDIS) {
   try {
     const { default: Redis } = await import('ioredis');
-    const r = new Redis(REDIS_URL, { lazyConnect: true });
+    const r = new Redis(redisOpts({ lazyConnect: true }));
     await r.connect();
     await r.setex('ace:atlas:latest',         24 * 3600, minJson);
     await r.setex('ace:atlas:latest:summary', 24 * 3600, JSON.stringify({
@@ -395,7 +400,7 @@ for (const r of relRows) {
 let karpathyMap = new Map();
 try {
   const { default: Redis } = await import('ioredis');
-  const r = new Redis(REDIS_URL, { lazyConnect: true });
+  const r = new Redis(redisOpts({ lazyConnect: true }));
   await r.connect();
   const kHash = await r.hgetall('gpu:karpathy:scores').catch(() => ({}));
   for (const [k, v] of Object.entries(kHash)) {
@@ -562,7 +567,7 @@ if (!DRY_RUN) {
   if (!NO_REDIS) {
     try {
       const { default: Redis } = await import('ioredis');
-      const r = new Redis(REDIS_URL, { lazyConnect: true });
+      const r = new Redis(redisOpts({ lazyConnect: true }));
       await r.connect();
       await r.setex('ace:atlas:dirs', 24 * 3600, dirsJson);
       // Per-directory cache for O(1) skill lookups

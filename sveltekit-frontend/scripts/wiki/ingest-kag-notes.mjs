@@ -28,6 +28,11 @@ const RUN_ARG_IDX = args.indexOf('--run');
 const RUN_FILTER = RUN_ARG_IDX !== -1 ? args[RUN_ARG_IDX + 1] : null;
 
 const REDIS_URL = process.env.REDIS_URL ?? 'redis://127.0.0.1:6379';
+const REDIS_PASSWORD = process.env.REDIS_PASSWORD || process.env.REDIS_PASS || undefined;
+function redisOpts(extra = {}) {
+  const u = new URL(REDIS_URL);
+  return { host: u.hostname || '127.0.0.1', port: Number(u.port) || 6379, password: REDIS_PASSWORD, ...extra };
+}
 const TTL = 6 * 60 * 60; // 6h — matches wiki:note:* TTL convention
 
 const RUNS_DIR = resolve(ROOT, 'memory/runs');
@@ -127,7 +132,7 @@ if (DRY_RUN) {
 } else {
   let redis;
   try {
-    redis = new Redis(REDIS_URL, { lazyConnect: true, enableOfflineQueue: false });
+    redis = new Redis(redisOpts({ lazyConnect: true, enableOfflineQueue: false }));
     await redis.connect();
   } catch (e) {
     console.error(`[kag-ingest] Redis unavailable: ${e.message}`);
