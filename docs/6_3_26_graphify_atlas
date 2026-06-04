@@ -1,0 +1,375 @@
+  Executing task in folder deeds-web-app: pwsh -NoProfile -ExecutionPolicy Bypass -File scripts/ace-startup-with-cooldown.ps1
+
+
+> yorha-legal-ai-frontend@1.0.0 ace:startup
+> npm run embeds:stub && npm run recommendations:full
+
+
+> yorha-legal-ai-frontend@1.0.0 embeds:stub
+> node scripts/ingest/stub-missing-embeddings.mjs
+
+
+ΓöÇΓöÇ Stub Missing Embeddings ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+  cards      : 9399
+  embedded   : 9373
+  to stub    : 0
+
+  Γ£à stubbed 0 embeddings (pseudo-embed, source:'pseudo')
+  total coverage: 9373 / 9399
+ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+
+
+> yorha-legal-ai-frontend@1.0.0 recommendations:full
+> npm run recommendations:build && npm run ace:label-and-cache && npm run recommendations:tasks
+
+
+> yorha-legal-ai-frontend@1.0.0 recommendations:build
+> node scripts/ingest/rank-cards.mjs && node scripts/ingest/rerank-cards.mjs && node scripts/ingest/compress-cards.mjs && node scripts/opencode/build-recommendations.mjs
+
+
+ΓöÇΓöÇ Rank Cards ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+  query : "ACE context retrieval"
+  top   : 500
+  embeddings loaded: 9373
+  query embed  : ollama (real)
+  cards found: 9399
+
+  Top 5 results:
+    0.7934  ≡ƒôà Session Logs & Timelines  [docs\documents-atlas-index.md]
+    0.7901  ≡ƒôÉ Architectural Plans & Design Documents  [docs\documents-atlas-index.md]
+    0.7886  ≡ƒôû General Reference Guides  [docs\documents-atlas-index.md]
+    0.7850  password_reset_tokens.user_id: uuid ΓåÆ integer (0 rows in tab  [claude.md]
+    0.7837  ≡ƒôï Checklists & Todo Lists  [docs\documents-atlas-index.md]
+
+  Γ£à wrote C:\Users\james\Videos\deeds-web-app\.tmp\retrieval-ranking-report.json
+ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+
+
+ΓöÇΓöÇ Rerank Cards (Phase 10B) ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+  query    : "ACE context retrieval"
+  entries  : 500
+  TurboVec : Γ£à :8791 healthy  embeddings: 9373
+  sidecar  : reranked 500 cards in 4.2ms
+  reranked : 500 entries | top-10 positions changed: 9
+
+  Top 5 after rerank:
+    0.7869  password_reset_tokens.user_id: uuid ΓåÆ integer (0 rows i  [claude.md]
+    0.7773  ≡ƒôï Checklists & Todo Lists  [docs\documents-atlas-index.md]
+    0.7386  ≡ƒôà Session Logs & Timelines  [docs\documents-atlas-index.md]
+    0.6897  ≡ƒôû General Reference Guides  [docs\documents-atlas-index.md]
+    0.6877  ≡ƒôÉ Architectural Plans & Design Documents  [docs\documents-atlas-index.md]
+
+  Γ£à wrote C:\Users\james\Videos\deeds-web-app\.tmp\retrieval-ranking-report.json  (reranked)
+  Γ£à wrote C:\Users\james\Videos\deeds-web-app\.tmp\rerank-diff.json
+ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+
+
+ΓöÇΓöÇ Compress Cards ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+  budget : 6000 tokens (~24000 chars)
+  ranked entries: 500
+  quarantine: 2033 entries
+  after dedup   : 191
+  packed: 76 cards | 23986 chars (~5997 tokens) | dropped: 115
+  areas : misc
+
+  Γ£à wrote C:\Users\james\Videos\deeds-web-app\.opencode\ace-packet.json
+  Γ£à wrote C:\Users\james\Videos\deeds-web-app\.opencode\ace-packet-summary.md
+ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+
+
+ΓöÇΓöÇ Build Recommendations (Phase 11E) ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+  ace packets   : 1
+  atlas seeds   : 4173
+  merged cards  : 3
+  rank report   : 500 entries
+  todo queue    : 131 items (path_map: 3270 entries)
+
+  Total recommendations: 12
+    UI Components           : 5
+    General                 : 5
+    Agent Workflow          : 1
+    Legal Workspace         : 1
+
+  Γ£à wrote C:\Users\james\Videos\deeds-web-app\.opencode\recommendations\recommendations.json
+  Γ£à wrote C:\Users\james\Videos\deeds-web-app\.opencode\recommendations\recommendations.md
+ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+
+
+> yorha-legal-ai-frontend@1.0.0 ace:label-and-cache
+> npm run graphify:feature-labels && npm run graphify:domain-topology && npm run ace:intent-cache && npm run ace:cache
+
+
+> yorha-legal-ai-frontend@1.0.0 graphify:feature-labels
+> node scripts/graphify/feature-labeling.mjs
+
+
+ΓöÇΓöÇ Feature Labeling (Phase 11G) ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+  sourceRefs: 79
+  domain counts:
+    General       : 69
+    Agent         : 4
+    Retrieval     : 3
+    Graph         : 1
+    Infra         : 1
+    Performance   : 1
+
+  Γ£à wrote C:\Users\james\Videos\deeds-web-app\.tmp\feature-labels.ndjson (79 labels)
+ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+
+
+> yorha-legal-ai-frontend@1.0.0 graphify:domain-topology
+> node scripts/graphify/domain-topology.mjs
+
+
+ΓöÇΓöÇ Domain Topology (Phase 11G) ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+  labels: 79
+  nodes: 79  edges: 45
+    Agent         : 4 nodes
+    General       : 69 nodes
+    Graph         : 1 nodes
+    Infra         : 1 nodes
+    Performance   : 1 nodes
+    Retrieval     : 3 nodes
+
+  Γ£à wrote C:\Users\james\Videos\deeds-web-app\.tmp\domain-topology.json
+  Γ£à wrote C:\Users\james\Videos\deeds-web-app\.tmp\domain-topology-manifest.md
+ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+
+
+> yorha-legal-ai-frontend@1.0.0 ace:intent-cache
+> node scripts/ingest/intent-cache.mjs
+
+
+ΓöÇΓöÇ Intent Cache (Phase 11G) ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+  query       : "ACE context retrieval"
+  intent_hash : 8b5329dc4ae5ad26
+  sourceRefs  : 76
+  features    : general, auth-session, rabbitmq-queue
+  ΓÜá∩╕Å  Redis offline ΓÇö manifest written to disk only
+ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+
+
+> yorha-legal-ai-frontend@1.0.0 ace:cache
+> node scripts/ingest/cache-ace-packet.mjs
+
+
+ΓöÇΓöÇ Cache ACE Packet ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+  ttl    : 86400s (~24.0h)
+  redis  : ΓÜá∩╕Å  unavailable ΓÇö will write .tmp/ace-packet-cache-manifest.json only
+  query  : "ACE context retrieval"
+  cards  : 76 | ~5997 tokens
+  intent : 850f53b72fd6cc30
+  srefs  : 76
+  Γ£à wrote C:\Users\james\Videos\deeds-web-app\.tmp\ace-packet-cache-manifest.json
+ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+
+
+> yorha-legal-ai-frontend@1.0.0 recommendations:tasks
+> node scripts/opencode/materialize-recommendation-tasks.mjs
+
+
+ΓöÇΓöÇ Materialize Recommendation Tasks ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+  recommendations: 12
+
+  Γ£à wrote C:\Users\james\Videos\deeds-web-app\.opencode\recommendations\tasks.ndjson
+  Γ£à wrote C:\Users\james\Videos\deeds-web-app\.opencode\recommendations\tasks.md
+  forwarded 12 tasks to gemma4 retrieval hook (legacy)
+
+  risk breakdown: high=6 medium=1 low=5
+ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+
+ACE startup pipeline green
+
+🧠 ACE context pack smoke degraded — redis, tscDiagnostics
+
+🧠 ACE top-retrieval smoke degraded — redis
+
+🧩 Feature-map smoke green
+
+🧩 Feature-map smoke green
+
+🤖 TRACE MCP Server :8788 ready
+
+── Startup Health Check ──
+✅ Redis
+✅ Qdrant
+✅ Ollama
+✅ Postgres container
+✅ Go Retrieval
+✅ Topology Search
+✅ Bifrost
+✅ TurboQuant
+✅ MCP Server
+❌ RabbitMQ API
+── summary: PASS=9 FAIL=1 ──
+⚠️ degraded startup state recorded in .tmp/ace-startup-status.json
+
+> yorha-legal-ai-frontend@1.0.0 graphify:daily
+> npm run graphify:daily:tsc
+
+
+> yorha-legal-ai-frontend@1.0.0 graphify:daily:tsc
+> npm run atlas:build && node scripts/atlas/run-seed-nonfatal.mjs && npm run index:codebase:fast:plan:tsc && npm run graphify:deep:ingest && npm run graphify:deep:smoke && npm run smoke:fast-ast && npm run smoke:kag && npm run graphify:kag-notes && npm run graphify:docstore && npm run graphify:authority && npm run atlas:cartridge-seed
+
+
+> yorha-legal-ai-frontend@1.0.0 atlas:build
+> node scripts/build-atlas-index.mjs
+
+
+[atlas-index] BUILD  hits-window=168h
+  files indexed:           8674
+  cluster_key lookups:     3012
+  authority scores:        7309
+  hits in last 168h:        0
+
+  stats:
+    files            8674
+    clusters         156
+    topo_classes     8
+    agents_dirs      352
+    with_authority   3500
+    with_hits        0
+    build_ms         29551
+
+  ✓ wrote C:\Users\james\Videos\deeds-web-app\sveltekit-frontend\docs\atlas-index\codebase-atlas.json  (1817.4 KB)
+  ✓ wrote C:\Users\james\Videos\deeds-web-app\sveltekit-frontend\docs\atlas-index\codebase-atlas.min.json  (825.7 KB, 45% of full)
+  ✓ Redis ace:atlas:latest set (825.7 KB, 24h TTL)
+
+  Top-10 by blend (0.4·PR + 0.3·GA + 0.2·hits/10 + 0.1·rerank):
+     0.180  pr=     0  ga=   0.6  h=  0  src/routes/api/test/redis-direct/+server.ts
+     0.166  pr=     0  ga=0.5549  h=  0  src/lib/server/db/client.ts
+     0.166  pr=     0  ga=0.5549  h=  0  src/lib/server/db/client.ts
+     0.150  pr=     0  ga=   0.5  h=  0  src/lib/server/db/connections.ts
+     0.150  pr=     0  ga=   0.5  h=  0  src/lib/server/db/enhanced-vector-operations.ts
+     0.150  pr=     0  ga=   0.5  h=  0  src/lib/server/db/jsonb-legal-schema.ts
+     0.150  pr=     0  ga=   0.5  h=  0  src/lib/server/db/jsonb-legal-schema.ts
+     0.150  pr=     0  ga=   0.5  h=  0  src/lib/server/db/pgvector-utils.temp.ts
+     0.150  pr=     0  ga=   0.5  h=  0  src/lib/server/db/pgvector-utils.temp.ts
+     0.150  pr=     0  ga=   0.5  h=  0  src/lib/server/db/pgvector-utils.ts
+
+  Directory cards: 1167
+  Top-10 directories by rank:
+     0.539  files=111  pr=     0  hits=  0  src/lib/server/db
+     0.525  files= 58  pr=     0  hits=  0  src/lib/server/db/schema
+     0.525  files= 18  pr=     0  hits=  0  src/lib/server/vector
+     0.513  files= 92  pr=     0  hits=  0  src/lib/server
+     0.513  files= 63  pr=     0  hits=  0  src/lib/server/ai
+     0.513  files= 29  pr=     0  hits=  0  src/lib/server/analytics
+     0.513  files= 23  pr=     0  hits=  0  src/lib/server/research
+     0.500  files= 20  pr=     0  hits=  0  src/lib/server/grpc
+     0.500  files= 73  pr=     0  hits=  0  src/lib/types
+     0.488  files= 15  pr=     0  hits=  0  src/lib/config
+
+  ✓ wrote memory/atlas/codebase-atlas.dirs.json   (618.8 KB)
+  ✓ wrote memory/atlas/codebase-atlas.top.json    (36.8 KB)
+  ✓ wrote memory/atlas/codebase-atlas.latest.md   (14.1 KB)
+  ✓ Redis ace:atlas:dirs + ace:atlas:dir:* set (1167 keys, 24h TTL)
+
+[atlas:cartridge-seed] Reading 1 lines from C:\Users\james\Videos\deeds-web-app\sveltekit-frontend\.tmp\parent-atlas-profile-cards.jsonl
+[atlas:cartridge-seed] Reading 1 lines from C:\Users\james\Videos\deeds-web-app\memory\knowledge\schema-indexer-contract-cards.jsonl
+[atlas:cartridge-seed] Scanning atlas-retrieval-loop.jsonl (2 lines)
+[atlas:cartridge-seed] Scanning parent-atlas-hypergraph.jsonl (25 lines)
+[atlas:cartridge-seed] Selected 3 seeds from 29 total cards (500 cap)
+[atlas:cartridge-seed] ✓ Wrote 3 seeds → C:\Users\james\Videos\deeds-web-app\sveltekit-frontend\.tmp\atlas-cartridge-seeds.jsonl
+[atlas:cartridge-seed] ✓ Wrote seed meta → C:\Users\james\Videos\deeds-web-app\sveltekit-frontend\.tmp\atlas-cartridge-seed-meta.json
+[atlas:cartridge-seed] Redis publish skipped (pass --publish to enable)
+
+> yorha-legal-ai-frontend@1.0.0 index:codebase:fast:plan:tsc
+> node scripts/index-codebase-fast.mjs --write-plan --tsc
+
+🔍 Running tsc --noEmit (caching results for 2h)…
+✅ tsc: 250 errors cached across 28 dirs
+🔍 Fast AST codebase index — scanning C:\Users\james\Videos\deeds-web-app
+   Indexed 54700 files...   + 2954 test files indexed from scripts, tests, test, e2e, integration, playwright, simd-bridge, services, go-microservice, docker, drizzle, proto, python, tools, turbovec, next_steps
+
+🔍 Pass 3: Analyzing cyclic import risks…
+📦 Directory wiki notes → 1601 dirs written to Redis wiki:note:dir:*
+📄 Graph JSON → sveltekit-frontend\docs\graph\codebase-graph.json
+🗺️  Codebase map → sveltekit-frontend\docs\graph\codebase-map.md
+📝 Graph plan → sveltekit-frontend\docs\graph\codebase-graph.md
+
+✅ Fast index complete in 316.3s
+   Files: 54759  Dirs: 1601  Routes: 1095  Components: 5347  API handlers: 5543  TODOs: 7695
+   G4 auth: 825✅ 18❌  G5 zod: 583✅ 0❌  G15 ssr-unsafe: 0  G20 cyclic: 2
+   KV cache: 0 hit / 54759 miss (0.0% hit rate)  (redis offline — no caching)
+   Redis wiki:note:dir: skipped (no Redis)
+   Outputs: docs/graph/codebase-graph.json  docs/graph/codebase-map.md
+
+> yorha-legal-ai-frontend@1.0.0 graphify:deep:ingest
+> node scripts/graphify-deep-ingest.mjs
+
+[0.0s] Step 1/2: Running graphify-deep-imports.mjs …
+Loaded 54759 files from codebase-graph.json
+Built 84113 typed edges
+Computed 100 neighborhoods
+Wrote deep-import-graph.json
+Wrote deep-import-edges.jsonl (84113 edges)
+Wrote ACE ingest: 3779 records → C:\Users\james\Videos\deeds-web-app\sveltekit-frontend\memory\ingest\pending\graphify_deep_imports_2026-06-04T00-08-15-873Z.jsonl
+
+=== Deep Import Graph Complete ===
+Nodes: 54759  Edges: 84113  Resolved: 9897
+Top edge types: imports_static:66933, test_covers_file:4941, redis_dependency:3363, imports_dynamic:2369, exports_from:1982
+Top hotspot: claude-mem/src/utils/logger.ts (fanIn=178)
+Output: C:\Users\james\Videos\deeds-web-app\sveltekit-frontend\memory\graphify\deep
+[1.9s] Step 1/2: Build complete.
+[1.9s] Step 2/2: 1 JSONL file(s) in pending/ — calling kag.ingest_memory_directory …
+
+══════════════════════════════════════════
+  graphify-deep-ingest — Pipeline Report
+══════════════════════════════════════════
+
+  Build:    complete
+  Ingest:   OK (dryRun=false)
+  Scanned:  1 file(s) of 1 pending
+  Ingested: 3779 record(s) → Redis
+  Skipped:  0 (already ingested — idempotent)
+  Failed:   0
+  Moved to processed/: graphify_deep_imports_2026-06-04T00-08-15-873Z.jsonl
+
+  Graph:    54759 nodes, 84113 edges (9897 resolved)
+            100 BFS neighborhoods, 1087 test-covered files
+
+  Total time: 2.9s
+══════════════════════════════════════════
+
+
+> yorha-legal-ai-frontend@1.0.0 graphify:deep:smoke
+> node scripts/smoke-graphify-deep-imports.mjs
+
+
+=== Smoke: graphify-deep-imports ===
+
+  PASS  G1 - deep-import-graph.json exists with required keys
+  PASS  G2 - nodes array has >= 1000 entries with required fields
+  PASS  G3 - deep-import-edges.jsonl has >= 1000 lines
+  PASS  G4 - resolved edges >= 5% of total
+  PASS  G5 - required edge types present (imports_static, db_dependency, env_dependency, server_route_depends_on, test_covers_file)
+  PASS  G6 - unresolved-imports.json exists and non-empty
+        (3779 records in processed/graphify_deep_imports_2026-06-04T00-08-15-873Z.jsonl)
+  PASS  G7 - ACE ingest JSONL present (pending/ OR processed/)
+  PASS  G8 - top hotspot node has directFanIn >= 50
+
+8/8 gates passed
+All gates PASS
+
+> yorha-legal-ai-frontend@1.0.0 smoke:fast-ast
+> node scripts/tests/smoke-fast-ast-ace.mjs
+
+
+=== Fast AST / ACE Copilot Smoke Test ===
+
+  ✓ codebase-graph.json exists  54759 files, mode=fast-ast
+  ✓ Redis code:index:manifest exists
+  ✗ code:index:tag:* keys exist  no tag keys found in Redis
+  ✗ Manifest mode === fast-ast  manifest JSON parse failed
+  ✓ ACE FAST_AST_SCORE_CAP ≤ 0.07  cap = 0.07
+  ✓ .vscode/tasks.json JSONC valid  2 file(s) checked
+
+Results: 4 passed, 2 failed  (6 total)
+
+Hint: run  npm run index:codebase:fast  then retry
+
+⚠️  Redis unavailable — skipping cache writes
+[exit code] 1
+
+ *  The terminal process "C:\Program Files\PowerShell\7\pwsh.exe -Command node scripts/startup/run-graphify-daily-startup.mjs" terminated with exit code: 1.
