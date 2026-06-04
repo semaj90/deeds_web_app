@@ -1,7 +1,7 @@
 {
   "repo": "deeds-web-app",
-  "runId": "soak_ladder_checkpoint",
-  "generatedAt": "2026-05-17T06:06:00.228Z",
+  "runId": "engram_sync_6426",
+  "generatedAt": "2026-06-04T04:50:29.635Z",
   "dryRun": false,
   "health": {
     "ok": true,
@@ -9,12 +9,37 @@
     "warning": null
   },
   "routeCount": 909,
-  "workspaceCount": 21,
+  "workspaceCount": 27,
   "clusterCount": 0,
   "featureCount": 2,
   "memoryCount": 5,
   "writes": 5,
   "sample": [
+    {
+      "id": "engram:repo-root",
+      "repo": "deeds-web-app",
+      "workspace": "repo-root",
+      "memory_type": "workflow_lesson",
+      "summary": "Workspace repo-root hot context lesson",
+      "content": "Top files and routes for repo-root",
+      "accepted": true,
+      "tests_passed": true,
+      "reward": 1,
+      "trust": "low_hint",
+      "stores": [
+        "redis",
+        "couchdb",
+        "neo4j"
+      ],
+      "tags": [
+        "engram",
+        "workspace",
+        "repo-root"
+      ],
+      "runId": "engram_sync_6426",
+      "createdAt": "2026-06-04T04:50:29.435Z",
+      "updatedAt": "2026-06-04T04:50:29.521Z"
+    },
     {
       "id": "engram:deeds_labs",
       "repo": "deeds-web-app",
@@ -36,9 +61,9 @@
         "workspace",
         "deeds_labs"
       ],
-      "runId": "soak_ladder_checkpoint",
-      "createdAt": "2026-05-17T06:06:00.199Z",
-      "updatedAt": "2026-05-17T06:06:00.199Z"
+      "runId": "engram_sync_6426",
+      "createdAt": "2026-06-04T04:50:29.521Z",
+      "updatedAt": "2026-06-04T04:50:29.521Z"
     },
     {
       "id": "engram:sveltekit-frontend",
@@ -61,34 +86,9 @@
         "workspace",
         "sveltekit-frontend"
       ],
-      "runId": "soak_ladder_checkpoint",
-      "createdAt": "2026-05-17T06:06:00.199Z",
-      "updatedAt": "2026-05-17T06:06:00.199Z"
-    },
-    {
-      "id": "engram:scripts",
-      "repo": "deeds-web-app",
-      "workspace": "scripts",
-      "memory_type": "workflow_lesson",
-      "summary": "Workspace scripts hot context lesson",
-      "content": "Top files and routes for scripts",
-      "accepted": true,
-      "tests_passed": true,
-      "reward": 1,
-      "trust": "low_hint",
-      "stores": [
-        "redis",
-        "couchdb",
-        "neo4j"
-      ],
-      "tags": [
-        "engram",
-        "workspace",
-        "scripts"
-      ],
-      "runId": "soak_ladder_checkpoint",
-      "createdAt": "2026-05-17T06:06:00.199Z",
-      "updatedAt": "2026-05-17T06:06:00.199Z"
+      "runId": "engram_sync_6426",
+      "createdAt": "2026-06-04T04:50:29.521Z",
+      "updatedAt": "2026-06-04T04:50:29.521Z"
     },
     {
       "id": "engram:feature:code.surface",
@@ -111,9 +111,9 @@
         "feature",
         "code.surface"
       ],
-      "runId": "soak_ladder_checkpoint",
-      "createdAt": "2026-05-17T06:06:00.199Z",
-      "updatedAt": "2026-05-17T06:06:00.199Z"
+      "runId": "engram_sync_6426",
+      "createdAt": "2026-06-04T04:50:29.521Z",
+      "updatedAt": "2026-06-04T04:50:29.521Z"
     },
     {
       "id": "engram:feature:route.surface",
@@ -136,9 +136,9 @@
         "feature",
         "route.surface"
       ],
-      "runId": "soak_ladder_checkpoint",
-      "createdAt": "2026-05-17T06:06:00.199Z",
-      "updatedAt": "2026-05-17T06:06:00.199Z"
+      "runId": "engram_sync_6426",
+      "createdAt": "2026-06-04T04:50:29.521Z",
+      "updatedAt": "2026-06-04T04:50:29.521Z"
     }
   ]
 }

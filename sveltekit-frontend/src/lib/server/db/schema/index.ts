@@ -77,6 +77,7 @@ export * from './rag-cards.js';
 export * from './summary-cards.js';
 export * from './normalize-labels.js';
 export * from './nes-chrom-packets.js';
+export * from './atlas-feature-map.js';
 
 // 2026-05-30 drift remediation — DO NOT add the Round-1 sidecars
 // (case-notes, case-statute-links, case-note-versions, case-note-evidence-refs,

@@ -83,10 +83,10 @@ export async function nearestCluster(
   const t0 = Date.now();
   try {
     const redis = getRedis();
-    let keys = (await redis.keys('centroid:cluster:*')).slice(0, maxClusters);
+    let keys = (await redis.keys('taxonomy:clusters:gpu:*')).slice(0, maxClusters);
     if (!keys.length) {
       await loadCentroidsFromDB();
-      keys = (await redis.keys('centroid:cluster:*')).slice(0, maxClusters);
+      keys = (await redis.keys('taxonomy:clusters:gpu:*')).slice(0, maxClusters);
     }
     if (!keys.length) return null;
 

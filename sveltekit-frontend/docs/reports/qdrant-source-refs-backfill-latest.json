@@ -1,20 +1,20 @@
 {
-  "generatedAt": "2026-06-01T16:45:34.222Z",
-  "startedAt": "2026-06-01T16:45:27.618Z",
+  "generatedAt": "2026-06-04T04:48:07.977Z",
+  "startedAt": "2026-06-04T04:48:04.720Z",
   "dryRun": false,
   "sampleQdrant": false,
   "sampleLimit": 25,
-  "qdrantUrl": "http://localhost:6333",
+  "qdrantUrl": "http://127.0.0.1:6333",
   "collection": "codebase_chunks_768",
   "attempted": 3253,
-  "updated": 1449,
-  "skipped": 1804,
+  "updated": 1514,
+  "skipped": 1739,
   "qdrantBefore": {
     "ok": true,
     "status": 200,
     "total": 25,
-    "withSourceRefs": 11,
-    "coverage": 0.44,
+    "withSourceRefs": 16,
+    "coverage": 0.64,
     "sample": [
       {
         "id": 119404,
@@ -27,11 +27,18 @@
           "total_chunks": 31,
           "content": "\n       subroutine {fprefix}_character_bc_old(x, y, z)\n         character, intent(in) :: x\n         character, intent(out) :: y\n         !f2py character, depend(x) :: y = x[0]\n         !f2py character, dimension((*x=='a'?1:2)), depend(x), intent(out) :: z\n         character, dimension(*) :: z\n         !f2py character, optional, check(*x == 'a' || x[0] == 'b') :: x = 'a'\n         !f2py callstatement (*f2py_func)(x, y, z)\n         !f2py callprotoargument char*, char*, char*\n          if (y.eq.x) then\n           y = x\n         else\n           y = 'e'\n         endif\n         z(1) = 'c'\n       end subroutine {fprefix}_character_bc_old\n    \"\"\")\n\n    @pytest.mark.slow\n    def test_gh18684(self):\n        # Test character(len=5) and character*5 usages",
           "content_hash": "1785da7d5ef6dfeb",
-          "tags": [],
+          "tags": [
+            "python",
+            "test",
+            "utility",
+            "py"
+          ],
           "purpose": "",
           "domain": "utility",
           "complexity": "medium",
-          "indexed_at": "2026-05-27T15:38:55.280Z"
+          "indexed_at": "2026-05-27T15:38:55.280Z",
+          "sourceRef": ".venv/Lib/python3.9/site-packages/numpy/f2py/tests/test_character.py",
+          "relativePath": ".venv/Lib/python3.9/site-packages/numpy/f2py/tests/test_character.py"
         }
       },
       {
@@ -45,20 +52,17 @@
           "total_chunks": 11,
           "content": "            dispatcher, module, verify=verify,\n            docs_from_dispatcher=docs_from_dispatcher)(implementation)\n    return decorator\n",
           "content_hash": "4f0c572113e704dd",
-          "tags": [],
+          "tags": [
+            "python",
+            "utility",
+            "py"
+          ],
           "purpose": "",
           "domain": "utility",
           "complexity": "medium",
-          "indexed_at": "2026-05-27T15:50:54.689Z"
-        }
-      },
-      {
-        "id": 164541,
-        "payload": {
-          "kind": "directory-cluster",
-          "dir": "deeds_labs/routes-parked-full/api/admin",
-          "summary": "module directory with 8 files, 8 API handlers",
-          "generatedAt": "2026-05-31T04:39:58.300Z"
+          "indexed_at": "2026-05-27T15:50:54.689Z",
+          "sourceRef": ".venv/Lib/python3.9/site-packages/numpy/_core/overrides.py",
+          "relativePath": ".venv/Lib/python3.9/site-packages/numpy/_core/overrides.py"
         }
       },
       {
@@ -100,19 +104,24 @@
           ],
           "graphAuthorityScore": 0,
           "glyph_cluster": "unclassified:1",
-          "som_cluster": 1,
+          "som_cluster": "1:0",
           "gpu_cluster": 1,
           "som_bmu_row": 0,
           "som_bmu_col": 1,
-          "gpuCluster": 14,
-          "somRow": 2,
+          "gpuCluster": 3,
+          "somRow": 3,
           "somCol": 4,
           "sourceRefs": [
             "src/lib/server/ai/contextual-tools.ts"
           ],
           "source_refs": [
             "src/lib/server/ai/contextual-tools.ts"
-          ]
+          ],
+          "feature_ids": [],
+          "lane_ids": [],
+          "feature_id": "ai",
+          "related_feature_ids": [],
+          "cluster_id": "1"
         }
       },
       {
@@ -159,7 +168,16 @@
           ],
           "source_refs": [
             "src/lib/server/research/reddit-harvester.ts"
-          ]
+          ],
+          "gpuCluster": 3,
+          "somRow": 3,
+          "somCol": 4,
+          "som_cluster": "3:0",
+          "feature_ids": [],
+          "lane_ids": [],
+          "feature_id": "research",
+          "related_feature_ids": [],
+          "cluster_id": "3"
         }
       },
       {
@@ -196,8 +214,8 @@
           "domain": "utility",
           "complexity": "medium",
           "indexed_at": "2026-05-29T15:52:22.017Z",
-          "gpuCluster": 4,
-          "somRow": 0,
+          "gpuCluster": 3,
+          "somRow": 3,
           "somCol": 4,
           "graphAuthorityScore": 0.45,
           "communityId": "community:13916",
@@ -209,7 +227,13 @@
           ],
           "source_refs": [
             "src/lib/server/gpu/libtorch-bridge.ts"
-          ]
+          ],
+          "som_cluster": "3:0",
+          "feature_ids": [],
+          "lane_ids": [],
+          "feature_id": "gpu",
+          "related_feature_ids": [],
+          "cluster_id": "3"
         }
       },
       {
@@ -241,15 +265,21 @@
           "domain": "utility",
           "complexity": "medium",
           "indexed_at": "2026-05-27T20:57:27.770Z",
-          "gpuCluster": 5,
-          "somRow": 1,
-          "somCol": 0,
+          "gpuCluster": 3,
+          "somRow": 3,
+          "somCol": 4,
           "sourceRefs": [
             "src/lib/server/couchdb/mango-indexes.ts"
           ],
           "source_refs": [
             "src/lib/server/couchdb/mango-indexes.ts"
-          ]
+          ],
+          "som_cluster": "3:0",
+          "feature_ids": [],
+          "lane_ids": [],
+          "feature_id": "couchdb",
+          "related_feature_ids": [],
+          "cluster_id": "3"
         }
       },
       {
@@ -272,6 +302,11 @@
           "centroid_id": "ae_0",
           "content_hash": "5166baf5051650d9",
           "schema_version": 1,
+          "feature_label": "lib",
+          "phase_lane": "workspace_gap",
+          "dependency_cluster": "src",
+          "hot_keyword_cluster": "svelte",
+          "parent_atlas_card_id": "general-card",
           "file_name": "CacheMonitoringWidget.svelte",
           "extension": ".svelte",
           "chunk_index": 16,
@@ -280,16 +315,67 @@
           "purpose": "",
           "domain": "utility",
           "complexity": "medium",
-          "indexed_at": "2026-05-27T20:55:09.986Z",
-          "gpuCluster": 6,
-          "somRow": 1,
-          "somCol": 1,
+          "indexed_at": "2026-06-04T02:40:12.942Z",
           "sourceRefs": [
             "src/lib/components/monitoring/CacheMonitoringWidget.svelte"
           ],
           "source_refs": [
             "src/lib/components/monitoring/CacheMonitoringWidget.svelte"
-          ]
+          ],
+          "feature_id": "monitoring",
+          "related_feature_ids": [],
+          "cluster_id": "8",
+          "som_cluster": "8:0"
+        }
+      },
+      {
+        "id": 404803,
+        "payload": {
+          "chunk_id": "card:src/lib/server/data/legal-seed-data.ts:1c48e8c13f66e353",
+          "sourceRef": "src/lib/server/data/legal-seed-data.ts#chunk-381",
+          "file_path": "src/lib/server/data/legal-seed-data.ts",
+          "root": "src",
+          "area": "lib",
+          "kind": "ts",
+          "tags": [
+            "data",
+            "legal-seed-data",
+            "legal",
+            "seed"
+          ],
+          "agent_area": "atlas-context",
+          "feature_status": "candidate_complete",
+          "centroid_id": "ae_0",
+          "content_hash": "1c48e8c13f66e353",
+          "schema_version": 1,
+          "feature_label": "lib",
+          "phase_lane": "workspace_gap",
+          "dependency_cluster": "src",
+          "hot_keyword_cluster": "data",
+          "parent_atlas_card_id": "general-card",
+          "file_name": "legal-seed-data.ts",
+          "extension": ".ts",
+          "chunk_index": 381,
+          "total_chunks": 393,
+          "content": "\t{ title: 'People v. Castillo', summary: 'Affirmed that an aider and abettor may be convicted of a greater offense than the direct perpetrator if the aider and abettor has the required mental state. Applied natural and probable consequences doctrine to determine liability for unintended crimes committed during course of target offense.', citation: '2007 Cal. App. LEXIS', court: 'California Court of Appeal', decisionDate: '2007-03-15' },\r\n\t{ title: 'People v. Villegas', summary: 'Addressed the applicability of probation conditions and sentencing enhancements under California\\'s sentencing framework. Discussed the court\\'s discretion in imposing consecutive versus concurrent sentences and the requirements for probation eligibility.', citation: 'Cal. App. 4th', court: 'California Court of Appeal', decisionDate: '1952-01-01' },\r\n\t{ title: 'People v. Vital', summary: 'Analyzed the sufficiency of evidence required to sustain a conviction under California criminal law. Addressed standards for circumstantial evidence and the requirement that the prosecution prove every element of the charged offense beyond a reasonable doubt.', citation: '45 Cal. App. 4th 441', court: 'California Court of Appeal', decisionDate: '1996-05-20' },\r",
+          "purpose": "",
+          "domain": "utility",
+          "complexity": "medium",
+          "indexed_at": "2026-06-01T22:58:21.940Z",
+          "gpuCluster": 9,
+          "somRow": 3,
+          "somCol": 4,
+          "sourceRefs": [
+            "src/lib/server/data/legal-seed-data.ts"
+          ],
+          "source_refs": [
+            "src/lib/server/data/legal-seed-data.ts"
+          ],
+          "som_cluster": "3:4",
+          "feature_ids": [],
+          "lane_ids": [],
+          "feature_id": "data",
+          "related_feature_ids": []
         }
       },
       {
@@ -312,6 +398,11 @@
           "centroid_id": "ae_0",
           "content_hash": "9876dbe952c51405",
           "schema_version": 1,
+          "feature_label": "lib",
+          "phase_lane": "workspace_gap",
+          "dependency_cluster": "src",
+          "hot_keyword_cluster": "svelte",
+          "parent_atlas_card_id": "general-card",
           "file_name": "CitationSaveForm.svelte",
           "extension": ".svelte",
           "chunk_index": 7,
@@ -320,16 +411,17 @@
           "purpose": "",
           "domain": "utility",
           "complexity": "medium",
-          "indexed_at": "2026-05-27T20:54:21.022Z",
-          "gpuCluster": 17,
-          "somRow": 3,
-          "somCol": 2,
+          "indexed_at": "2026-06-04T02:35:41.359Z",
           "sourceRefs": [
             "src/lib/components/citations/CitationSaveForm.svelte"
           ],
           "source_refs": [
             "src/lib/components/citations/CitationSaveForm.svelte"
-          ]
+          ],
+          "feature_id": "citations",
+          "related_feature_ids": [],
+          "cluster_id": "0",
+          "som_cluster": "0:0"
         }
       },
       {
@@ -343,11 +435,68 @@
           "total_chunks": 26,
           "content": "    \"light_yellow3\": 187,\n    \"grey84\": 188,\n    \"gray84\": 188,\n    \"light_steel_blue1\": 189,\n    \"yellow2\": 190,\n    \"dark_olive_green1\": 192,\n    \"honeydew2\": 194,\n    \"light_cyan1\": 195,\n    \"red1\": 196,\n    \"deep_pink2\": 197,\n    \"deep_pink1\": 199,\n    \"magenta1\": 201,\n    \"orange_red1\": 202,\n    \"indian_red1\": 204,\n    \"hot_pink\": 206,\n    \"dark_orange\": 208,\n    \"salmon1\": 209,\n    \"light_coral\": 210,\n    \"pale_violet_red1\": 211,\n    \"orchid2\": 212,\n    \"orchid1\": 213,\n    \"orange1\": 214,\n    \"sandy_brown\": 215,\n    \"light_salmon1\": 216,\n    \"light_pink1\": 217,\n    \"pink1\": 218,\n    \"plum1\": 219,\n    \"gold1\": 220,\n    \"navajo_white1\": 223,\n    \"misty_rose1\": 224,\n    \"thistle1\": 225,\n    \"yellow1\": 226,\n    \"light_goldenrod1\": 227,\n    \"khaki1\": 228,\n    \"wheat1\": 229,",
           "content_hash": "277f925c4be33f95",
-          "tags": [],
+          "tags": [
+            "python",
+            "utility",
+            "py"
+          ],
           "purpose": "",
           "domain": "utility",
           "complexity": "medium",
-          "indexed_at": "2026-05-27T16:05:44.035Z"
+          "indexed_at": "2026-05-27T16:05:44.035Z",
+          "sourceRef": ".venv/Lib/python3.9/site-packages/pip/_vendor/rich/color.py",
+          "relativePath": ".venv/Lib/python3.9/site-packages/pip/_vendor/rich/color.py"
+        }
+      },
+      {
+        "id": 727645,
+        "payload": {
+          "chunk_id": "card:src/lib/server/ai/mcp-tool-dispatch.ts:d8df208fbf8ae76c",
+          "sourceRef": "src/lib/server/ai/mcp-tool-dispatch.ts#chunk-43",
+          "file_path": "src/lib/server/ai/mcp-tool-dispatch.ts",
+          "root": "src",
+          "area": "lib",
+          "kind": "ts",
+          "tags": [
+            "mcp-tool-dispatch",
+            "mcp",
+            "tool",
+            "dispatch"
+          ],
+          "agent_area": "ai-agents",
+          "feature_status": "candidate_complete",
+          "centroid_id": "ae_0",
+          "content_hash": "d8df208fbf8ae76c",
+          "schema_version": 1,
+          "feature_label": "lib",
+          "phase_lane": "workspace_gap",
+          "dependency_cluster": "src",
+          "hot_keyword_cluster": "mcp-tool-dispatch",
+          "parent_atlas_card_id": "general-card",
+          "file_name": "mcp-tool-dispatch.ts",
+          "extension": ".ts",
+          "chunk_index": 43,
+          "total_chunks": 52,
+          "content": "  try {\n    const result = await runTaskSemanticPacketLifecycle(Number(args.taskId));\n    return ok('task.run_semantic_packet_workflow', result, Date.now() - t0, false);\n  } catch (e) {\n    return err('task.run_semantic_packet_workflow', String(e), Date.now() - t0);\n  }\n}\n\r\n// ── Dispatch table ────────────────────────────────────────────────────────────\r\n\r\nexport const TOOL_DISPATCH: Record<\r\n  string,\r\n  (args: Record<string, unknown>) => Promise<MCPToolResult>\r\n> = {\r\n  'trace.kag_search': (a) =>\r\n    tool_trace_kag_search(a as Parameters<typeof tool_trace_kag_search>[0]),\r\n  'trace.explain_retrieval': (a) =>\r\n    tool_trace_explain_retrieval(a as Parameters<typeof tool_trace_explain_retrieval>[0]),\r\n  'topology.route_query': (a) =>\r",
+          "purpose": "",
+          "domain": "utility",
+          "complexity": "medium",
+          "indexed_at": "2026-06-01T22:56:30.160Z",
+          "gpuCluster": 3,
+          "somRow": 3,
+          "somCol": 4,
+          "sourceRefs": [
+            "src/lib/server/ai/mcp-tool-dispatch.ts"
+          ],
+          "source_refs": [
+            "src/lib/server/ai/mcp-tool-dispatch.ts"
+          ],
+          "som_cluster": "3:0",
+          "feature_ids": [],
+          "lane_ids": [],
+          "feature_id": "ai",
+          "related_feature_ids": [],
+          "cluster_id": "3"
         }
       },
       {
@@ -361,11 +510,63 @@
           "total_chunks": 70,
           "content": "        for op1, op2 in cases:\n            vdata_ab = self.load([op1, op2]*hf_nlanes)\n            data = test_nan(op1, op2)\n            simd = reduce_intrin(vdata_ab)\n            assert simd == pytest.approx(data, nan_ok=True)\n            vdata_a = self.setall(op1)\n            vdata_b = self.setall(op2)\n            data = [data] * self.nlanes\n            simd = intrin(vdata_a, vdata_b)\n            assert simd == pytest.approx(data, nan_ok=True)\n\n    def test_reciprocal(self):\n        pinf, ninf, nan = self._pinfinity(), self._ninfinity(), self._nan()\n        data = self._data()\n        vdata = self.load(self._data())\n\n        recip_cases = ((nan, nan), (pinf, 0.0), (ninf, -0.0), (0.0, pinf), (-0.0, ninf))\n        for case, desired in recip_cases:",
           "content_hash": "c04e341c2adfbdb0",
-          "tags": [],
+          "tags": [
+            "python",
+            "test",
+            "utility",
+            "py"
+          ],
           "purpose": "",
           "domain": "utility",
           "complexity": "medium",
-          "indexed_at": "2026-05-27T15:54:23.153Z"
+          "indexed_at": "2026-05-27T15:54:23.153Z",
+          "sourceRef": ".venv/Lib/python3.9/site-packages/numpy/_core/tests/test_simd.py",
+          "relativePath": ".venv/Lib/python3.9/site-packages/numpy/_core/tests/test_simd.py"
+        }
+      },
+      {
+        "id": 761314,
+        "payload": {
+          "chunk_id": "card:src/lib/components/ai/CachePerformanceDashboard.svelte:cf42b7fd06fadbcd",
+          "sourceRef": "src/lib/components/ai/CachePerformanceDashboard.svelte#chunk-16",
+          "file_path": "src/lib/components/ai/CachePerformanceDashboard.svelte",
+          "root": "src",
+          "area": "lib",
+          "kind": "svelte",
+          "tags": [
+            "svelte",
+            "components",
+            "cacheperformancedashboard"
+          ],
+          "agent_area": "atlas-context",
+          "feature_status": "candidate_complete",
+          "centroid_id": "ae_0",
+          "content_hash": "cf42b7fd06fadbcd",
+          "schema_version": 1,
+          "feature_label": "lib",
+          "phase_lane": "workspace_gap",
+          "dependency_cluster": "src",
+          "hot_keyword_cluster": "svelte",
+          "parent_atlas_card_id": "general-card",
+          "file_name": "CachePerformanceDashboard.svelte",
+          "extension": ".svelte",
+          "chunk_index": 16,
+          "total_chunks": 38,
+          "content": "            <div class=\"stat-bar\">\r\n              <div class=\"bar\">\r\n                <div class=\"fill\" style=\"width: {cacheMetrics.retrieval.hitRate}%\"></div>\r\n              </div>\r\n              <span>{cacheMetrics.retrieval.hitRate.toFixed(1)}%</span>\r\n            </div>\r\n          </div>\r\n          <div class=\"stat-grid\">\r\n            <div class=\"stat-item\">\r\n              <span class=\"label\">Total Queries:</span>\r\n              <span class=\"value\">{cacheMetrics.retrieval.totalQueries.toLocaleString()}</span>\r\n            </div>\r\n            <div class=\"stat-item\">\r\n              <span class=\"label\">Cache Hits:</span>\r\n              <span class=\"value\">{cacheMetrics.retrieval.hits.toLocaleString()}</span>\r\n            </div>\r\n            <div class=\"stat-item\">\r",
+          "purpose": "",
+          "domain": "utility",
+          "complexity": "medium",
+          "indexed_at": "2026-06-04T02:08:37.839Z",
+          "sourceRefs": [
+            "src/lib/components/ai/CachePerformanceDashboard.svelte"
+          ],
+          "source_refs": [
+            "src/lib/components/ai/CachePerformanceDashboard.svelte"
+          ],
+          "feature_id": "ai",
+          "related_feature_ids": [],
+          "cluster_id": "0",
+          "som_cluster": "0:0"
         }
       },
       {
@@ -407,22 +608,16 @@
           ],
           "source_refs": [
             "src/lib/server/retrieval/centroid-cache.ts"
-          ]
-        }
-      },
-      {
-        "id": 990761,
-        "payload": {
-          "kind": "directory-cluster",
-          "dir": "sveltekit-frontend/src/routes/(analysis)@",
-          "summary": "route handler directory with 3 files, 0 API handlers",
-          "generatedAt": "2026-05-31T04:38:41.429Z"
-        }
-      },
-      {
-        "id": 999999,
-        "payload": {
-          "test": true
+          ],
+          "gpuCluster": 3,
+          "somRow": 3,
+          "somCol": 4,
+          "som_cluster": "3:0",
+          "feature_ids": [],
+          "lane_ids": [],
+          "feature_id": "retrieval",
+          "related_feature_ids": [],
+          "cluster_id": "3"
         }
       },
       {
@@ -445,6 +640,11 @@
           "centroid_id": "ae_0",
           "content_hash": "b6cbebca14c0fbd1",
           "schema_version": 1,
+          "feature_label": "lib",
+          "phase_lane": "workspace_gap",
+          "dependency_cluster": "src",
+          "hot_keyword_cluster": "svelte",
+          "parent_atlas_card_id": "general-card",
           "file_name": "AdminMonitoringDashboard.svelte",
           "extension": ".svelte",
           "chunk_index": 22,
@@ -453,7 +653,9 @@
           "purpose": "",
           "domain": "utility",
           "complexity": "medium",
-          "indexed_at": "2026-05-27T20:54:03.120Z"
+          "indexed_at": "2026-06-04T02:07:59.688Z",
+          "feature_id": "admin",
+          "related_feature_ids": []
         }
       },
       {
@@ -476,6 +678,11 @@
           "centroid_id": "ae_0",
           "content_hash": "e5ca07ccec87ca3b",
           "schema_version": 1,
+          "feature_label": "lib",
+          "phase_lane": "workspace_gap",
+          "dependency_cluster": "src",
+          "hot_keyword_cluster": "svelte",
+          "parent_atlas_card_id": "general-card",
           "file_name": "GraphifyViewer.svelte",
           "extension": ".svelte",
           "chunk_index": 64,
@@ -484,13 +691,15 @@
           "purpose": "",
           "domain": "utility",
           "complexity": "medium",
-          "indexed_at": "2026-05-27T20:54:35.947Z",
+          "indexed_at": "2026-06-04T02:38:39.426Z",
           "sourceRefs": [
             "src/lib/components/graph/GraphifyViewer.svelte"
           ],
           "source_refs": [
             "src/lib/components/graph/GraphifyViewer.svelte"
-          ]
+          ],
+          "feature_id": "graph",
+          "related_feature_ids": []
         }
       },
       {
@@ -535,7 +744,16 @@
           ],
           "source_refs": [
             "src/lib/server/retrieval/cluster-aware-reranker.ts"
-          ]
+          ],
+          "gpuCluster": 3,
+          "somRow": 3,
+          "somCol": 4,
+          "som_cluster": "3:0",
+          "feature_ids": [],
+          "lane_ids": [],
+          "feature_id": "retrieval",
+          "related_feature_ids": [],
+          "cluster_id": "3"
         }
       },
       {
@@ -549,38 +767,56 @@
           "total_chunks": 29,
           "content": "        constraint=template.constraint,\n        hash_options=template.hash_options,\n        config_settings=template.config_settings,\n    )\n    ireq.satisfied_by = dist\n    return ireq\n\n\nclass _InstallRequirementBackedCandidate(Candidate):\n    \"\"\"A candidate backed by an ``InstallRequirement``.\n\n    This represents a package request with the target not being already\n    in the environment, and needs to be fetched and installed. The backing\n    ``InstallRequirement`` is responsible for most of the leg work; this\n    class exposes appropriate information to the resolver.\n\n    :param link: The link passed to the ``InstallRequirement``. The backing\n        ``InstallRequirement`` will use this link to fetch the distribution.",
           "content_hash": "2da0f7259e03acea",
-          "tags": [],
+          "tags": [
+            "python",
+            "utility",
+            "py"
+          ],
           "purpose": "",
           "domain": "utility",
           "complexity": "medium",
-          "indexed_at": "2026-05-27T15:59:43.437Z"
+          "indexed_at": "2026-05-27T15:59:43.437Z",
+          "sourceRef": ".venv/Lib/python3.9/site-packages/pip/_internal/resolution/resolvelib/candidates.py",
+          "relativePath": ".venv/Lib/python3.9/site-packages/pip/_internal/resolution/resolvelib/candidates.py"
         }
       },
       {
-        "id": 1167479,
+        "id": 1146202,
         "payload": {
-          "kind": "directory-cluster",
-          "dir": "scripts/tests/screenshots/2026-04-12T23-47-33",
-          "summary": "module directory with 2 files, 0 API handlers",
-          "generatedAt": "2026-05-31T04:37:52.616Z"
-        }
-      },
-      {
-        "id": 1234338,
-        "payload": {
-          "kind": "directory-cluster",
-          "dir": "deeds_labs/routes-parked-full/register",
-          "summary": "module directory with 2 files, 0 API handlers",
-          "generatedAt": "2026-05-31T04:40:01.580Z"
-        }
-      },
-      {
-        "id": 1323671,
-        "payload": {
-          "kind": "directory-cluster",
-          "dir": "sveltekit-frontend/src/lib",
-          "summary": "module directory with 6 files, 5 API handlers, 245 Drizzle refs, 13 TODOs",
-          "generatedAt": "2026-05-31T04:39:45.217Z"
+          "chunk_id": "card:src/lib/server/admin/retrieval-analytics-service.ts:bde26e38e979172d",
+          "sourceRef": "src/lib/server/admin/retrieval-analytics-service.ts#chunk-0",
+          "file_path": "src/lib/server/admin/retrieval-analytics-service.ts",
+          "root": "src",
+          "area": "lib",
+          "kind": "ts",
+          "tags": [
+            "admin",
+            "retrieval-analytics-service",
+            "retrieval",
+            "analytics",
+            "service"
+          ],
+          "agent_area": "atlas-context",
+          "feature_status": "candidate_complete",
+          "centroid_id": "ae_0",
+          "content_hash": "bde26e38e979172d",
+          "schema_version": 1,
+          "feature_label": "lib",
+          "phase_lane": "workspace_gap",
+          "dependency_cluster": "src",
+          "hot_keyword_cluster": "admin",
+          "parent_atlas_card_id": "general-card",
+          "file_name": "retrieval-analytics-service.ts",
+          "extension": ".ts",
+          "chunk_index": 0,
+          "total_chunks": 1,
+          "content": "export * from '$lib/server/features/rag/retrieval-analytics-service.js';\n",
+          "purpose": "",
+          "domain": "utility",
+          "complexity": "medium",
+          "indexed_at": "2026-06-01T22:56:05.478Z",
+          "feature_id": "admin",
+          "related_feature_ids": []
         }
       },
       {
@@ -603,6 +839,11 @@
           "centroid_id": "ae_0",
           "content_hash": "3b3cdad63482a124",
           "schema_version": 1,
+          "feature_label": "lib",
+          "phase_lane": "workspace_gap",
+          "dependency_cluster": "src",
+          "hot_keyword_cluster": "svelte",
+          "parent_atlas_card_id": "general-card",
           "file_name": "EvidenceReportSummary.svelte",
           "extension": ".svelte",
           "chunk_index": 5,
@@ -611,25 +852,17 @@
           "purpose": "",
           "domain": "utility",
           "complexity": "medium",
-          "indexed_at": "2026-05-27T20:54:45.350Z",
-          "gpuCluster": 17,
-          "somRow": 3,
-          "somCol": 2,
+          "indexed_at": "2026-06-04T02:39:17.021Z",
           "sourceRefs": [
             "src/lib/components/legal/EvidenceReportSummary.svelte"
           ],
           "source_refs": [
             "src/lib/components/legal/EvidenceReportSummary.svelte"
-          ]
-        }
-      },
-      {
-        "id": 1373377,
-        "payload": {
-          "kind": "directory-cluster",
-          "dir": "deeds_labs/frontend/features-archive/memory",
-          "summary": "module directory with 3 files, 0 API handlers",
-          "generatedAt": "2026-05-31T04:38:27.903Z"
+          ],
+          "feature_id": "legal",
+          "related_feature_ids": [],
+          "cluster_id": "0",
+          "som_cluster": "0:0"
         }
       },
       {
@@ -660,7 +893,7 @@
           "domain": "utility",
           "complexity": "medium",
           "indexed_at": "2026-05-27T20:56:36.174Z",
-          "gpuCluster": 19,
+          "gpuCluster": 9,
           "somRow": 3,
           "somCol": 4,
           "graphAuthorityScore": 0.4,
@@ -673,7 +906,13 @@
           ],
           "source_refs": [
             "src/lib/db/schema/evidence.ts"
-          ]
+          ],
+          "som_cluster": "9:0",
+          "feature_ids": [],
+          "lane_ids": [],
+          "feature_id": "schema",
+          "related_feature_ids": [],
+          "cluster_id": "9"
         }
       },
       {
@@ -687,11 +926,132 @@
           "total_chunks": 64,
           "content": "# field with '' name\ndt4 = np.dtype({'names': ['a', '', 'b'], 'formats': ['i4']*3})\n# titles\ndt5 = np.dtype({'names': ['a', 'b'], 'formats': ['i4', 'i4'],\n                'offsets': [1, 6], 'titles': ['aa', 'bb']})\n# empty\ndt6 = np.dtype({'names': [], 'formats': [], 'itemsize': 8})\n\n@pytest.mark.parametrize(\"dt\", [dt1, dt2, dt3, dt4, dt5, dt6])\ndef test_load_padded_dtype(tmpdir, dt):\n    arr = np.zeros(3, dt)\n    for i in range(3):\n        arr[i] = i + 5\n    npz_file = os.path.join(tmpdir, 'aligned.npz')\n    np.savez(npz_file, arr=arr)\n    with np.load(npz_file) as npz:\n        arr1 = npz['arr']\n    assert_array_equal(arr, arr1)\n\n\n@pytest.mark.skipif(sys.version_info >= (3, 12), reason=\"see gh-23988\")\n@pytest.mark.xfail(IS_WASM, reason=\"Emscripten NODEFS has a buggy dup\")",
           "content_hash": "0e84115ff99a0d8b",
-          "tags": [],
+          "tags": [
+            "python",
+            "test",
+            "utility",
+            "py"
+          ],
           "purpose": "",
           "domain": "utility",
           "complexity": "medium",
-          "indexed_at": "2026-05-27T15:40:29.304Z"
+          "indexed_at": "2026-05-27T15:40:29.304Z",
+          "sourceRef": ".venv/Lib/python3.9/site-packages/numpy/lib/tests/test_format.py",
+          "relativePath": ".venv/Lib/python3.9/site-packages/numpy/lib/tests/test_format.py"
+        }
+      },
+      {
+        "id": 1589319,
+        "payload": {
+          "chunk_id": "card:.venv/Lib/python3.9/site-packages/numpy/polynomial/hermite_e.py:92291ed1b1fa075e",
+          "file_path": ".venv/Lib/python3.9/site-packages/numpy/polynomial/hermite_e.py",
+          "file_name": "hermite_e.py",
+          "extension": ".py",
+          "chunk_index": 8,
+          "total_chunks": 75,
+          "content": "    else:\n        return np.array([off])\n\n\ndef hermefromroots(roots):\n    \"\"\"\n    Generate a HermiteE series with given roots.\n\n    The function returns the coefficients of the polynomial\n\n    .. math:: p(x) = (x - r_0) * (x - r_1) * ... * (x - r_n),\n\n    in HermiteE form, where the :math:`r_n` are the roots specified in `roots`.\n    If a zero has multiplicity n, then it must appear in `roots` n times.\n    For instance, if 2 is a root of multiplicity three and 3 is a root of\n    multiplicity 2, then `roots` looks something like [2, 2, 2, 3, 3]. The\n    roots can appear in any order.\n\n    If the returned coefficients are `c`, then\n\n    .. math:: p(x) = c_0 + c_1 * He_1(x) + ... +  c_n * He_n(x)\n\n    The coefficient of the last term is not generally 1 for monic",
+          "content_hash": "92291ed1b1fa075e",
+          "tags": [
+            "python",
+            "utility",
+            "py"
+          ],
+          "purpose": "",
+          "domain": "utility",
+          "complexity": "medium",
+          "indexed_at": "2026-05-27T15:46:16.062Z",
+          "sourceRef": ".venv/Lib/python3.9/site-packages/numpy/polynomial/hermite_e.py",
+          "relativePath": ".venv/Lib/python3.9/site-packages/numpy/polynomial/hermite_e.py"
+        }
+      },
+      {
+        "id": 1604171,
+        "payload": {
+          "chunk_id": "card:src/lib/components/admin/ContextualAssistantModal.svelte:e7f05cffedf9f6b6",
+          "sourceRef": "src/lib/components/admin/ContextualAssistantModal.svelte#chunk-19",
+          "file_path": "src/lib/components/admin/ContextualAssistantModal.svelte",
+          "root": "src",
+          "area": "lib",
+          "kind": "svelte",
+          "tags": [
+            "svelte",
+            "components",
+            "admin",
+            "contextualassistantmodal"
+          ],
+          "agent_area": "atlas-context",
+          "feature_status": "candidate_complete",
+          "centroid_id": "ae_0",
+          "content_hash": "e7f05cffedf9f6b6",
+          "schema_version": 1,
+          "feature_label": "lib",
+          "phase_lane": "workspace_gap",
+          "dependency_cluster": "src",
+          "hot_keyword_cluster": "svelte",
+          "parent_atlas_card_id": "general-card",
+          "file_name": "ContextualAssistantModal.svelte",
+          "extension": ".svelte",
+          "chunk_index": 19,
+          "total_chunks": 23,
+          "content": "\r\n            <input\r\n              type=\"file\"\r\n              bind:this={fileInput}\r\n              class=\"hidden\"\r\n              onchange={handleFileUpload}\r\n              accept=\"image/*,.pdf,.doc,.docx,.txt\"\r\n            />\r\n\r\n            <button\r\n              type=\"button\"\r\n              class=\"absolute left-4 bottom-4 w-10 h-10 rounded-xl hover:bg-white/10 text-white/40 flex items-center justify-center transition-all\"\r\n              onclick={() => fileInput.click()}\r\n              disabled={isUploading || snapshot.matches('thinking')}\r\n            >\r\n              {#if isUploading}\r\n                <span class=\"i-carbon-loader animate-spin\"></span>\r\n              {:else}\r\n                <span class=\"i-carbon-add text-xl\"></span>\r\n              {/if}\r\n            </button>\r\n\r",
+          "purpose": "",
+          "domain": "utility",
+          "complexity": "medium",
+          "indexed_at": "2026-06-04T02:08:05.943Z",
+          "sourceRefs": [
+            "src/lib/components/admin/ContextualAssistantModal.svelte"
+          ],
+          "source_refs": [
+            "src/lib/components/admin/ContextualAssistantModal.svelte"
+          ],
+          "feature_id": "admin",
+          "related_feature_ids": []
+        }
+      },
+      {
+        "id": 1612494,
+        "payload": {
+          "chunk_id": "card:src/lib/components/legal-ai/CaseDocumentWriter.svelte:077ff71f79fc0c51",
+          "sourceRef": "src/lib/components/legal-ai/CaseDocumentWriter.svelte#chunk-5",
+          "file_path": "src/lib/components/legal-ai/CaseDocumentWriter.svelte",
+          "root": "src",
+          "area": "lib",
+          "kind": "svelte",
+          "tags": [
+            "svelte",
+            "components",
+            "legal-ai",
+            "casedocumentwriter"
+          ],
+          "agent_area": "atlas-context",
+          "feature_status": "candidate_complete",
+          "centroid_id": "ae_0",
+          "content_hash": "077ff71f79fc0c51",
+          "schema_version": 1,
+          "feature_label": "lib",
+          "phase_lane": "workspace_gap",
+          "dependency_cluster": "src",
+          "hot_keyword_cluster": "svelte",
+          "parent_atlas_card_id": "general-card",
+          "file_name": "CaseDocumentWriter.svelte",
+          "extension": ".svelte",
+          "chunk_index": 5,
+          "total_chunks": 11,
+          "content": "\t\t\t\t\tbind:value={noteTitle}\r\n\t\t\t\t\tplaceholder=\"Document title (optional)\"\r\n\t\t\t\t/>\r\n\t\t\t</div>\r\n\t\t</div>\r\n\r\n\t\t<div class=\"cdw-editor-wrap\">\r\n\t\t\t<TipTapEditor\r\n\t\t\t\tbind:this={editorRef}\r\n\t\t\t\ttheme=\"legal\"\r\n\t\t\t\tplaceholder=\"Write your case document here...\"\r\n\t\t\t\tonUpdate={handleEditorUpdate}\r\n\t\t\t/>\r\n\t\t</div>\r\n\r\n\t\t{#if saveStatus !== 'idle'}\r\n\t\t\t<div class=\"cdw-status\" class:saved={saveStatus === 'saved'} class:error={saveStatus === 'error'}>\r\n\t\t\t\t{#if saveStatus === 'saving'}\r\n\t\t\t\t\tSaving...\r\n\t\t\t\t{:else if saveStatus === 'saved'}\r\n\t\t\t\t\t{saveMessage}\r\n\t\t\t\t{:else if saveStatus === 'error'}\r\n\t\t\t\t\t{saveMessage}\r\n\t\t\t\t{/if}\r\n\t\t\t</div>\r\n\t\t{/if}\r\n\r\n\t\t<div class=\"cdw-footer\">\r\n\t\t\t<span class=\"cdw-shortcut-hint\">Ctrl+Shift+D to toggle</span>\r\n\t\t\t{#if selectedCase}\r",
+          "purpose": "",
+          "domain": "utility",
+          "complexity": "medium",
+          "indexed_at": "2026-06-04T02:39:39.370Z",
+          "sourceRefs": [
+            "src/lib/components/legal-ai/CaseDocumentWriter.svelte"
+          ],
+          "source_refs": [
+            "src/lib/components/legal-ai/CaseDocumentWriter.svelte"
+          ],
+          "feature_id": "legal-ai",
+          "related_feature_ids": [],
+          "cluster_id": "0",
+          "som_cluster": "0:0"
         }
       }
     ]
@@ -700,8 +1060,8 @@
     "ok": true,
     "status": 200,
     "total": 25,
-    "withSourceRefs": 11,
-    "coverage": 0.44,
+    "withSourceRefs": 16,
+    "coverage": 0.64,
     "sample": [
       {
         "id": 119404,
@@ -714,11 +1074,18 @@
           "total_chunks": 31,
           "content": "\n       subroutine {fprefix}_character_bc_old(x, y, z)\n         character, intent(in) :: x\n         character, intent(out) :: y\n         !f2py character, depend(x) :: y = x[0]\n         !f2py character, dimension((*x=='a'?1:2)), depend(x), intent(out) :: z\n         character, dimension(*) :: z\n         !f2py character, optional, check(*x == 'a' || x[0] == 'b') :: x = 'a'\n         !f2py callstatement (*f2py_func)(x, y, z)\n         !f2py callprotoargument char*, char*, char*\n          if (y.eq.x) then\n           y = x\n         else\n           y = 'e'\n         endif\n         z(1) = 'c'\n       end subroutine {fprefix}_character_bc_old\n    \"\"\")\n\n    @pytest.mark.slow\n    def test_gh18684(self):\n        # Test character(len=5) and character*5 usages",
           "content_hash": "1785da7d5ef6dfeb",
-          "tags": [],
+          "tags": [
+            "python",
+            "test",
+            "utility",
+            "py"
+          ],
           "purpose": "",
           "domain": "utility",
           "complexity": "medium",
-          "indexed_at": "2026-05-27T15:38:55.280Z"
+          "indexed_at": "2026-05-27T15:38:55.280Z",
+          "sourceRef": ".venv/Lib/python3.9/site-packages/numpy/f2py/tests/test_character.py",
+          "relativePath": ".venv/Lib/python3.9/site-packages/numpy/f2py/tests/test_character.py"
         }
       },
       {
@@ -732,20 +1099,17 @@
           "total_chunks": 11,
           "content": "            dispatcher, module, verify=verify,\n            docs_from_dispatcher=docs_from_dispatcher)(implementation)\n    return decorator\n",
           "content_hash": "4f0c572113e704dd",
-          "tags": [],
+          "tags": [
+            "python",
+            "utility",
+            "py"
+          ],
           "purpose": "",
           "domain": "utility",
           "complexity": "medium",
-          "indexed_at": "2026-05-27T15:50:54.689Z"
-        }
-      },
-      {
-        "id": 164541,
-        "payload": {
-          "kind": "directory-cluster",
-          "dir": "deeds_labs/routes-parked-full/api/admin",
-          "summary": "module directory with 8 files, 8 API handlers",
-          "generatedAt": "2026-05-31T04:39:58.300Z"
+          "indexed_at": "2026-05-27T15:50:54.689Z",
+          "sourceRef": ".venv/Lib/python3.9/site-packages/numpy/_core/overrides.py",
+          "relativePath": ".venv/Lib/python3.9/site-packages/numpy/_core/overrides.py"
         }
       },
       {
@@ -787,19 +1151,24 @@
           ],
           "graphAuthorityScore": 0,
           "glyph_cluster": "unclassified:1",
-          "som_cluster": 1,
+          "som_cluster": "1:0",
           "gpu_cluster": 1,
           "som_bmu_row": 0,
           "som_bmu_col": 1,
-          "gpuCluster": 14,
-          "somRow": 2,
+          "gpuCluster": 3,
+          "somRow": 3,
           "somCol": 4,
           "sourceRefs": [
             "src/lib/server/ai/contextual-tools.ts"
           ],
           "source_refs": [
             "src/lib/server/ai/contextual-tools.ts"
-          ]
+          ],
+          "feature_ids": [],
+          "lane_ids": [],
+          "feature_id": "ai",
+          "related_feature_ids": [],
+          "cluster_id": "1"
         }
       },
       {
@@ -846,7 +1215,16 @@
           ],
           "source_refs": [
             "src/lib/server/research/reddit-harvester.ts"
-          ]
+          ],
+          "gpuCluster": 3,
+          "somRow": 3,
+          "somCol": 4,
+          "som_cluster": "3:0",
+          "feature_ids": [],
+          "lane_ids": [],
+          "feature_id": "research",
+          "related_feature_ids": [],
+          "cluster_id": "3"
         }
       },
       {
@@ -883,8 +1261,8 @@
           "domain": "utility",
           "complexity": "medium",
           "indexed_at": "2026-05-29T15:52:22.017Z",
-          "gpuCluster": 4,
-          "somRow": 0,
+          "gpuCluster": 3,
+          "somRow": 3,
           "somCol": 4,
           "graphAuthorityScore": 0.45,
           "communityId": "community:13916",
@@ -896,7 +1274,13 @@
           ],
           "source_refs": [
             "src/lib/server/gpu/libtorch-bridge.ts"
-          ]
+          ],
+          "som_cluster": "3:0",
+          "feature_ids": [],
+          "lane_ids": [],
+          "feature_id": "gpu",
+          "related_feature_ids": [],
+          "cluster_id": "3"
         }
       },
       {
@@ -928,15 +1312,21 @@
           "domain": "utility",
           "complexity": "medium",
           "indexed_at": "2026-05-27T20:57:27.770Z",
-          "gpuCluster": 5,
-          "somRow": 1,
-          "somCol": 0,
+          "gpuCluster": 3,
+          "somRow": 3,
+          "somCol": 4,
           "sourceRefs": [
             "src/lib/server/couchdb/mango-indexes.ts"
           ],
           "source_refs": [
             "src/lib/server/couchdb/mango-indexes.ts"
-          ]
+          ],
+          "som_cluster": "3:0",
+          "feature_ids": [],
+          "lane_ids": [],
+          "feature_id": "couchdb",
+          "related_feature_ids": [],
+          "cluster_id": "3"
         }
       },
       {
@@ -959,6 +1349,11 @@
           "centroid_id": "ae_0",
           "content_hash": "5166baf5051650d9",
           "schema_version": 1,
+          "feature_label": "lib",
+          "phase_lane": "workspace_gap",
+          "dependency_cluster": "src",
+          "hot_keyword_cluster": "svelte",
+          "parent_atlas_card_id": "general-card",
           "file_name": "CacheMonitoringWidget.svelte",
           "extension": ".svelte",
           "chunk_index": 16,
@@ -967,16 +1362,67 @@
           "purpose": "",
           "domain": "utility",
           "complexity": "medium",
-          "indexed_at": "2026-05-27T20:55:09.986Z",
-          "gpuCluster": 6,
-          "somRow": 1,
-          "somCol": 1,
+          "indexed_at": "2026-06-04T02:40:12.942Z",
           "sourceRefs": [
             "src/lib/components/monitoring/CacheMonitoringWidget.svelte"
           ],
           "source_refs": [
             "src/lib/components/monitoring/CacheMonitoringWidget.svelte"
-          ]
+          ],
+          "feature_id": "monitoring",
+          "related_feature_ids": [],
+          "cluster_id": "8",
+          "som_cluster": "8:0"
+        }
+      },
+      {
+        "id": 404803,
+        "payload": {
+          "chunk_id": "card:src/lib/server/data/legal-seed-data.ts:1c48e8c13f66e353",
+          "sourceRef": "src/lib/server/data/legal-seed-data.ts#chunk-381",
+          "file_path": "src/lib/server/data/legal-seed-data.ts",
+          "root": "src",
+          "area": "lib",
+          "kind": "ts",
+          "tags": [
+            "data",
+            "legal-seed-data",
+            "legal",
+            "seed"
+          ],
+          "agent_area": "atlas-context",
+          "feature_status": "candidate_complete",
+          "centroid_id": "ae_0",
+          "content_hash": "1c48e8c13f66e353",
+          "schema_version": 1,
+          "feature_label": "lib",
+          "phase_lane": "workspace_gap",
+          "dependency_cluster": "src",
+          "hot_keyword_cluster": "data",
+          "parent_atlas_card_id": "general-card",
+          "file_name": "legal-seed-data.ts",
+          "extension": ".ts",
+          "chunk_index": 381,
+          "total_chunks": 393,
+          "content": "\t{ title: 'People v. Castillo', summary: 'Affirmed that an aider and abettor may be convicted of a greater offense than the direct perpetrator if the aider and abettor has the required mental state. Applied natural and probable consequences doctrine to determine liability for unintended crimes committed during course of target offense.', citation: '2007 Cal. App. LEXIS', court: 'California Court of Appeal', decisionDate: '2007-03-15' },\r\n\t{ title: 'People v. Villegas', summary: 'Addressed the applicability of probation conditions and sentencing enhancements under California\\'s sentencing framework. Discussed the court\\'s discretion in imposing consecutive versus concurrent sentences and the requirements for probation eligibility.', citation: 'Cal. App. 4th', court: 'California Court of Appeal', decisionDate: '1952-01-01' },\r\n\t{ title: 'People v. Vital', summary: 'Analyzed the sufficiency of evidence required to sustain a conviction under California criminal law. Addressed standards for circumstantial evidence and the requirement that the prosecution prove every element of the charged offense beyond a reasonable doubt.', citation: '45 Cal. App. 4th 441', court: 'California Court of Appeal', decisionDate: '1996-05-20' },\r",
+          "purpose": "",
+          "domain": "utility",
+          "complexity": "medium",
+          "indexed_at": "2026-06-01T22:58:21.940Z",
+          "gpuCluster": 9,
+          "somRow": 3,
+          "somCol": 4,
+          "sourceRefs": [
+            "src/lib/server/data/legal-seed-data.ts"
+          ],
+          "source_refs": [
+            "src/lib/server/data/legal-seed-data.ts"
+          ],
+          "som_cluster": "3:4",
+          "feature_ids": [],
+          "lane_ids": [],
+          "feature_id": "data",
+          "related_feature_ids": []
         }
       },
       {
@@ -999,6 +1445,11 @@
           "centroid_id": "ae_0",
           "content_hash": "9876dbe952c51405",
           "schema_version": 1,
+          "feature_label": "lib",
+          "phase_lane": "workspace_gap",
+          "dependency_cluster": "src",
+          "hot_keyword_cluster": "svelte",
+          "parent_atlas_card_id": "general-card",
           "file_name": "CitationSaveForm.svelte",
           "extension": ".svelte",
           "chunk_index": 7,
@@ -1007,16 +1458,17 @@
           "purpose": "",
           "domain": "utility",
           "complexity": "medium",
-          "indexed_at": "2026-05-27T20:54:21.022Z",
-          "gpuCluster": 17,
-          "somRow": 3,
-          "somCol": 2,
+          "indexed_at": "2026-06-04T02:35:41.359Z",
           "sourceRefs": [
             "src/lib/components/citations/CitationSaveForm.svelte"
           ],
           "source_refs": [
             "src/lib/components/citations/CitationSaveForm.svelte"
-          ]
+          ],
+          "feature_id": "citations",
+          "related_feature_ids": [],
+          "cluster_id": "0",
+          "som_cluster": "0:0"
         }
       },
       {
@@ -1030,11 +1482,68 @@
           "total_chunks": 26,
           "content": "    \"light_yellow3\": 187,\n    \"grey84\": 188,\n    \"gray84\": 188,\n    \"light_steel_blue1\": 189,\n    \"yellow2\": 190,\n    \"dark_olive_green1\": 192,\n    \"honeydew2\": 194,\n    \"light_cyan1\": 195,\n    \"red1\": 196,\n    \"deep_pink2\": 197,\n    \"deep_pink1\": 199,\n    \"magenta1\": 201,\n    \"orange_red1\": 202,\n    \"indian_red1\": 204,\n    \"hot_pink\": 206,\n    \"dark_orange\": 208,\n    \"salmon1\": 209,\n    \"light_coral\": 210,\n    \"pale_violet_red1\": 211,\n    \"orchid2\": 212,\n    \"orchid1\": 213,\n    \"orange1\": 214,\n    \"sandy_brown\": 215,\n    \"light_salmon1\": 216,\n    \"light_pink1\": 217,\n    \"pink1\": 218,\n    \"plum1\": 219,\n    \"gold1\": 220,\n    \"navajo_white1\": 223,\n    \"misty_rose1\": 224,\n    \"thistle1\": 225,\n    \"yellow1\": 226,\n    \"light_goldenrod1\": 227,\n    \"khaki1\": 228,\n    \"wheat1\": 229,",
           "content_hash": "277f925c4be33f95",
-          "tags": [],
+          "tags": [
+            "python",
+            "utility",
+            "py"
+          ],
           "purpose": "",
           "domain": "utility",
           "complexity": "medium",
-          "indexed_at": "2026-05-27T16:05:44.035Z"
+          "indexed_at": "2026-05-27T16:05:44.035Z",
+          "sourceRef": ".venv/Lib/python3.9/site-packages/pip/_vendor/rich/color.py",
+          "relativePath": ".venv/Lib/python3.9/site-packages/pip/_vendor/rich/color.py"
+        }
+      },
+      {
+        "id": 727645,
+        "payload": {
+          "chunk_id": "card:src/lib/server/ai/mcp-tool-dispatch.ts:d8df208fbf8ae76c",
+          "sourceRef": "src/lib/server/ai/mcp-tool-dispatch.ts#chunk-43",
+          "file_path": "src/lib/server/ai/mcp-tool-dispatch.ts",
+          "root": "src",
+          "area": "lib",
+          "kind": "ts",
+          "tags": [
+            "mcp-tool-dispatch",
+            "mcp",
+            "tool",
+            "dispatch"
+          ],
+          "agent_area": "ai-agents",
+          "feature_status": "candidate_complete",
+          "centroid_id": "ae_0",
+          "content_hash": "d8df208fbf8ae76c",
+          "schema_version": 1,
+          "feature_label": "lib",
+          "phase_lane": "workspace_gap",
+          "dependency_cluster": "src",
+          "hot_keyword_cluster": "mcp-tool-dispatch",
+          "parent_atlas_card_id": "general-card",
+          "file_name": "mcp-tool-dispatch.ts",
+          "extension": ".ts",
+          "chunk_index": 43,
+          "total_chunks": 52,
+          "content": "  try {\n    const result = await runTaskSemanticPacketLifecycle(Number(args.taskId));\n    return ok('task.run_semantic_packet_workflow', result, Date.now() - t0, false);\n  } catch (e) {\n    return err('task.run_semantic_packet_workflow', String(e), Date.now() - t0);\n  }\n}\n\r\n// ── Dispatch table ────────────────────────────────────────────────────────────\r\n\r\nexport const TOOL_DISPATCH: Record<\r\n  string,\r\n  (args: Record<string, unknown>) => Promise<MCPToolResult>\r\n> = {\r\n  'trace.kag_search': (a) =>\r\n    tool_trace_kag_search(a as Parameters<typeof tool_trace_kag_search>[0]),\r\n  'trace.explain_retrieval': (a) =>\r\n    tool_trace_explain_retrieval(a as Parameters<typeof tool_trace_explain_retrieval>[0]),\r\n  'topology.route_query': (a) =>\r",
+          "purpose": "",
+          "domain": "utility",
+          "complexity": "medium",
+          "indexed_at": "2026-06-01T22:56:30.160Z",
+          "gpuCluster": 3,
+          "somRow": 3,
+          "somCol": 4,
+          "sourceRefs": [
+            "src/lib/server/ai/mcp-tool-dispatch.ts"
+          ],
+          "source_refs": [
+            "src/lib/server/ai/mcp-tool-dispatch.ts"
+          ],
+          "som_cluster": "3:0",
+          "feature_ids": [],
+          "lane_ids": [],
+          "feature_id": "ai",
+          "related_feature_ids": [],
+          "cluster_id": "3"
         }
       },
       {
@@ -1048,11 +1557,63 @@
           "total_chunks": 70,
           "content": "        for op1, op2 in cases:\n            vdata_ab = self.load([op1, op2]*hf_nlanes)\n            data = test_nan(op1, op2)\n            simd = reduce_intrin(vdata_ab)\n            assert simd == pytest.approx(data, nan_ok=True)\n            vdata_a = self.setall(op1)\n            vdata_b = self.setall(op2)\n            data = [data] * self.nlanes\n            simd = intrin(vdata_a, vdata_b)\n            assert simd == pytest.approx(data, nan_ok=True)\n\n    def test_reciprocal(self):\n        pinf, ninf, nan = self._pinfinity(), self._ninfinity(), self._nan()\n        data = self._data()\n        vdata = self.load(self._data())\n\n        recip_cases = ((nan, nan), (pinf, 0.0), (ninf, -0.0), (0.0, pinf), (-0.0, ninf))\n        for case, desired in recip_cases:",
           "content_hash": "c04e341c2adfbdb0",
-          "tags": [],
+          "tags": [
+            "python",
+            "test",
+            "utility",
+            "py"
+          ],
           "purpose": "",
           "domain": "utility",
           "complexity": "medium",
-          "indexed_at": "2026-05-27T15:54:23.153Z"
+          "indexed_at": "2026-05-27T15:54:23.153Z",
+          "sourceRef": ".venv/Lib/python3.9/site-packages/numpy/_core/tests/test_simd.py",
+          "relativePath": ".venv/Lib/python3.9/site-packages/numpy/_core/tests/test_simd.py"
+        }
+      },
+      {
+        "id": 761314,
+        "payload": {
+          "chunk_id": "card:src/lib/components/ai/CachePerformanceDashboard.svelte:cf42b7fd06fadbcd",
+          "sourceRef": "src/lib/components/ai/CachePerformanceDashboard.svelte#chunk-16",
+          "file_path": "src/lib/components/ai/CachePerformanceDashboard.svelte",
+          "root": "src",
+          "area": "lib",
+          "kind": "svelte",
+          "tags": [
+            "svelte",
+            "components",
+            "cacheperformancedashboard"
+          ],
+          "agent_area": "atlas-context",
+          "feature_status": "candidate_complete",
+          "centroid_id": "ae_0",
+          "content_hash": "cf42b7fd06fadbcd",
+          "schema_version": 1,
+          "feature_label": "lib",
+          "phase_lane": "workspace_gap",
+          "dependency_cluster": "src",
+          "hot_keyword_cluster": "svelte",
+          "parent_atlas_card_id": "general-card",
+          "file_name": "CachePerformanceDashboard.svelte",
+          "extension": ".svelte",
+          "chunk_index": 16,
+          "total_chunks": 38,
+          "content": "            <div class=\"stat-bar\">\r\n              <div class=\"bar\">\r\n                <div class=\"fill\" style=\"width: {cacheMetrics.retrieval.hitRate}%\"></div>\r\n              </div>\r\n              <span>{cacheMetrics.retrieval.hitRate.toFixed(1)}%</span>\r\n            </div>\r\n          </div>\r\n          <div class=\"stat-grid\">\r\n            <div class=\"stat-item\">\r\n              <span class=\"label\">Total Queries:</span>\r\n              <span class=\"value\">{cacheMetrics.retrieval.totalQueries.toLocaleString()}</span>\r\n            </div>\r\n            <div class=\"stat-item\">\r\n              <span class=\"label\">Cache Hits:</span>\r\n              <span class=\"value\">{cacheMetrics.retrieval.hits.toLocaleString()}</span>\r\n            </div>\r\n            <div class=\"stat-item\">\r",
+          "purpose": "",
+          "domain": "utility",
+          "complexity": "medium",
+          "indexed_at": "2026-06-04T02:08:37.839Z",
+          "sourceRefs": [
+            "src/lib/components/ai/CachePerformanceDashboard.svelte"
+          ],
+          "source_refs": [
+            "src/lib/components/ai/CachePerformanceDashboard.svelte"
+          ],
+          "feature_id": "ai",
+          "related_feature_ids": [],
+          "cluster_id": "0",
+          "som_cluster": "0:0"
         }
       },
       {
@@ -1094,22 +1655,16 @@
           ],
           "source_refs": [
             "src/lib/server/retrieval/centroid-cache.ts"
-          ]
-        }
-      },
-      {
-        "id": 990761,
-        "payload": {
-          "kind": "directory-cluster",
-          "dir": "sveltekit-frontend/src/routes/(analysis)@",
-          "summary": "route handler directory with 3 files, 0 API handlers",
-          "generatedAt": "2026-05-31T04:38:41.429Z"
-        }
-      },
-      {
-        "id": 999999,
-        "payload": {
-          "test": true
+          ],
+          "gpuCluster": 3,
+          "somRow": 3,
+          "somCol": 4,
+          "som_cluster": "3:0",
+          "feature_ids": [],
+          "lane_ids": [],
+          "feature_id": "retrieval",
+          "related_feature_ids": [],
+          "cluster_id": "3"
         }
       },
       {
@@ -1132,6 +1687,11 @@
           "centroid_id": "ae_0",
           "content_hash": "b6cbebca14c0fbd1",
           "schema_version": 1,
+          "feature_label": "lib",
+          "phase_lane": "workspace_gap",
+          "dependency_cluster": "src",
+          "hot_keyword_cluster": "svelte",
+          "parent_atlas_card_id": "general-card",
           "file_name": "AdminMonitoringDashboard.svelte",
           "extension": ".svelte",
           "chunk_index": 22,
@@ -1140,7 +1700,9 @@
           "purpose": "",
           "domain": "utility",
           "complexity": "medium",
-          "indexed_at": "2026-05-27T20:54:03.120Z"
+          "indexed_at": "2026-06-04T02:07:59.688Z",
+          "feature_id": "admin",
+          "related_feature_ids": []
         }
       },
       {
@@ -1163,6 +1725,11 @@
           "centroid_id": "ae_0",
           "content_hash": "e5ca07ccec87ca3b",
           "schema_version": 1,
+          "feature_label": "lib",
+          "phase_lane": "workspace_gap",
+          "dependency_cluster": "src",
+          "hot_keyword_cluster": "svelte",
+          "parent_atlas_card_id": "general-card",
           "file_name": "GraphifyViewer.svelte",
           "extension": ".svelte",
           "chunk_index": 64,
@@ -1171,13 +1738,15 @@
           "purpose": "",
           "domain": "utility",
           "complexity": "medium",
-          "indexed_at": "2026-05-27T20:54:35.947Z",
+          "indexed_at": "2026-06-04T02:38:39.426Z",
           "sourceRefs": [
             "src/lib/components/graph/GraphifyViewer.svelte"
           ],
           "source_refs": [
             "src/lib/components/graph/GraphifyViewer.svelte"
-          ]
+          ],
+          "feature_id": "graph",
+          "related_feature_ids": []
         }
       },
       {
@@ -1222,7 +1791,16 @@
           ],
           "source_refs": [
             "src/lib/server/retrieval/cluster-aware-reranker.ts"
-          ]
+          ],
+          "gpuCluster": 3,
+          "somRow": 3,
+          "somCol": 4,
+          "som_cluster": "3:0",
+          "feature_ids": [],
+          "lane_ids": [],
+          "feature_id": "retrieval",
+          "related_feature_ids": [],
+          "cluster_id": "3"
         }
       },
       {
@@ -1236,38 +1814,56 @@
           "total_chunks": 29,
           "content": "        constraint=template.constraint,\n        hash_options=template.hash_options,\n        config_settings=template.config_settings,\n    )\n    ireq.satisfied_by = dist\n    return ireq\n\n\nclass _InstallRequirementBackedCandidate(Candidate):\n    \"\"\"A candidate backed by an ``InstallRequirement``.\n\n    This represents a package request with the target not being already\n    in the environment, and needs to be fetched and installed. The backing\n    ``InstallRequirement`` is responsible for most of the leg work; this\n    class exposes appropriate information to the resolver.\n\n    :param link: The link passed to the ``InstallRequirement``. The backing\n        ``InstallRequirement`` will use this link to fetch the distribution.",
           "content_hash": "2da0f7259e03acea",
-          "tags": [],
+          "tags": [
+            "python",
+            "utility",
+            "py"
+          ],
           "purpose": "",
           "domain": "utility",
           "complexity": "medium",
-          "indexed_at": "2026-05-27T15:59:43.437Z"
+          "indexed_at": "2026-05-27T15:59:43.437Z",
+          "sourceRef": ".venv/Lib/python3.9/site-packages/pip/_internal/resolution/resolvelib/candidates.py",
+          "relativePath": ".venv/Lib/python3.9/site-packages/pip/_internal/resolution/resolvelib/candidates.py"
         }
       },
       {
-        "id": 1167479,
+        "id": 1146202,
         "payload": {
-          "kind": "directory-cluster",
-          "dir": "scripts/tests/screenshots/2026-04-12T23-47-33",
-          "summary": "module directory with 2 files, 0 API handlers",
-          "generatedAt": "2026-05-31T04:37:52.616Z"
-        }
-      },
-      {
-        "id": 1234338,
-        "payload": {
-          "kind": "directory-cluster",
-          "dir": "deeds_labs/routes-parked-full/register",
-          "summary": "module directory with 2 files, 0 API handlers",
-          "generatedAt": "2026-05-31T04:40:01.580Z"
-        }
-      },
-      {
-        "id": 1323671,
-        "payload": {
-          "kind": "directory-cluster",
-          "dir": "sveltekit-frontend/src/lib",
-          "summary": "module directory with 6 files, 5 API handlers, 245 Drizzle refs, 13 TODOs",
-          "generatedAt": "2026-05-31T04:39:45.217Z"
+          "chunk_id": "card:src/lib/server/admin/retrieval-analytics-service.ts:bde26e38e979172d",
+          "sourceRef": "src/lib/server/admin/retrieval-analytics-service.ts#chunk-0",
+          "file_path": "src/lib/server/admin/retrieval-analytics-service.ts",
+          "root": "src",
+          "area": "lib",
+          "kind": "ts",
+          "tags": [
+            "admin",
+            "retrieval-analytics-service",
+            "retrieval",
+            "analytics",
+            "service"
+          ],
+          "agent_area": "atlas-context",
+          "feature_status": "candidate_complete",
+          "centroid_id": "ae_0",
+          "content_hash": "bde26e38e979172d",
+          "schema_version": 1,
+          "feature_label": "lib",
+          "phase_lane": "workspace_gap",
+          "dependency_cluster": "src",
+          "hot_keyword_cluster": "admin",
+          "parent_atlas_card_id": "general-card",
+          "file_name": "retrieval-analytics-service.ts",
+          "extension": ".ts",
+          "chunk_index": 0,
+          "total_chunks": 1,
+          "content": "export * from '$lib/server/features/rag/retrieval-analytics-service.js';\n",
+          "purpose": "",
+          "domain": "utility",
+          "complexity": "medium",
+          "indexed_at": "2026-06-01T22:56:05.478Z",
+          "feature_id": "admin",
+          "related_feature_ids": []
         }
       },
       {
@@ -1290,6 +1886,11 @@
           "centroid_id": "ae_0",
           "content_hash": "3b3cdad63482a124",
           "schema_version": 1,
+          "feature_label": "lib",
+          "phase_lane": "workspace_gap",
+          "dependency_cluster": "src",
+          "hot_keyword_cluster": "svelte",
+          "parent_atlas_card_id": "general-card",
           "file_name": "EvidenceReportSummary.svelte",
           "extension": ".svelte",
           "chunk_index": 5,
@@ -1298,25 +1899,17 @@
           "purpose": "",
           "domain": "utility",
           "complexity": "medium",
-          "indexed_at": "2026-05-27T20:54:45.350Z",
-          "gpuCluster": 17,
-          "somRow": 3,
-          "somCol": 2,
+          "indexed_at": "2026-06-04T02:39:17.021Z",
           "sourceRefs": [
             "src/lib/components/legal/EvidenceReportSummary.svelte"
           ],
           "source_refs": [
             "src/lib/components/legal/EvidenceReportSummary.svelte"
-          ]
-        }
-      },
-      {
-        "id": 1373377,
-        "payload": {
-          "kind": "directory-cluster",
-          "dir": "deeds_labs/frontend/features-archive/memory",
-          "summary": "module directory with 3 files, 0 API handlers",
-          "generatedAt": "2026-05-31T04:38:27.903Z"
+          ],
+          "feature_id": "legal",
+          "related_feature_ids": [],
+          "cluster_id": "0",
+          "som_cluster": "0:0"
         }
       },
       {
@@ -1347,7 +1940,7 @@
           "domain": "utility",
           "complexity": "medium",
           "indexed_at": "2026-05-27T20:56:36.174Z",
-          "gpuCluster": 19,
+          "gpuCluster": 9,
           "somRow": 3,
           "somCol": 4,
           "graphAuthorityScore": 0.4,
@@ -1360,7 +1953,13 @@
           ],
           "source_refs": [
             "src/lib/db/schema/evidence.ts"
-          ]
+          ],
+          "som_cluster": "9:0",
+          "feature_ids": [],
+          "lane_ids": [],
+          "feature_id": "schema",
+          "related_feature_ids": [],
+          "cluster_id": "9"
         }
       },
       {
@@ -1374,11 +1973,132 @@
           "total_chunks": 64,
           "content": "# field with '' name\ndt4 = np.dtype({'names': ['a', '', 'b'], 'formats': ['i4']*3})\n# titles\ndt5 = np.dtype({'names': ['a', 'b'], 'formats': ['i4', 'i4'],\n                'offsets': [1, 6], 'titles': ['aa', 'bb']})\n# empty\ndt6 = np.dtype({'names': [], 'formats': [], 'itemsize': 8})\n\n@pytest.mark.parametrize(\"dt\", [dt1, dt2, dt3, dt4, dt5, dt6])\ndef test_load_padded_dtype(tmpdir, dt):\n    arr = np.zeros(3, dt)\n    for i in range(3):\n        arr[i] = i + 5\n    npz_file = os.path.join(tmpdir, 'aligned.npz')\n    np.savez(npz_file, arr=arr)\n    with np.load(npz_file) as npz:\n        arr1 = npz['arr']\n    assert_array_equal(arr, arr1)\n\n\n@pytest.mark.skipif(sys.version_info >= (3, 12), reason=\"see gh-23988\")\n@pytest.mark.xfail(IS_WASM, reason=\"Emscripten NODEFS has a buggy dup\")",
           "content_hash": "0e84115ff99a0d8b",
-          "tags": [],
+          "tags": [
+            "python",
+            "test",
+            "utility",
+            "py"
+          ],
           "purpose": "",
           "domain": "utility",
           "complexity": "medium",
-          "indexed_at": "2026-05-27T15:40:29.304Z"
+          "indexed_at": "2026-05-27T15:40:29.304Z",
+          "sourceRef": ".venv/Lib/python3.9/site-packages/numpy/lib/tests/test_format.py",
+          "relativePath": ".venv/Lib/python3.9/site-packages/numpy/lib/tests/test_format.py"
+        }
+      },
+      {
+        "id": 1589319,
+        "payload": {
+          "chunk_id": "card:.venv/Lib/python3.9/site-packages/numpy/polynomial/hermite_e.py:92291ed1b1fa075e",
+          "file_path": ".venv/Lib/python3.9/site-packages/numpy/polynomial/hermite_e.py",
+          "file_name": "hermite_e.py",
+          "extension": ".py",
+          "chunk_index": 8,
+          "total_chunks": 75,
+          "content": "    else:\n        return np.array([off])\n\n\ndef hermefromroots(roots):\n    \"\"\"\n    Generate a HermiteE series with given roots.\n\n    The function returns the coefficients of the polynomial\n\n    .. math:: p(x) = (x - r_0) * (x - r_1) * ... * (x - r_n),\n\n    in HermiteE form, where the :math:`r_n` are the roots specified in `roots`.\n    If a zero has multiplicity n, then it must appear in `roots` n times.\n    For instance, if 2 is a root of multiplicity three and 3 is a root of\n    multiplicity 2, then `roots` looks something like [2, 2, 2, 3, 3]. The\n    roots can appear in any order.\n\n    If the returned coefficients are `c`, then\n\n    .. math:: p(x) = c_0 + c_1 * He_1(x) + ... +  c_n * He_n(x)\n\n    The coefficient of the last term is not generally 1 for monic",
+          "content_hash": "92291ed1b1fa075e",
+          "tags": [
+            "python",
+            "utility",
+            "py"
+          ],
+          "purpose": "",
+          "domain": "utility",
+          "complexity": "medium",
+          "indexed_at": "2026-05-27T15:46:16.062Z",
+          "sourceRef": ".venv/Lib/python3.9/site-packages/numpy/polynomial/hermite_e.py",
+          "relativePath": ".venv/Lib/python3.9/site-packages/numpy/polynomial/hermite_e.py"
+        }
+      },
+      {
+        "id": 1604171,
+        "payload": {
+          "chunk_id": "card:src/lib/components/admin/ContextualAssistantModal.svelte:e7f05cffedf9f6b6",
+          "sourceRef": "src/lib/components/admin/ContextualAssistantModal.svelte#chunk-19",
+          "file_path": "src/lib/components/admin/ContextualAssistantModal.svelte",
+          "root": "src",
+          "area": "lib",
+          "kind": "svelte",
+          "tags": [
+            "svelte",
+            "components",
+            "admin",
+            "contextualassistantmodal"
+          ],
+          "agent_area": "atlas-context",
+          "feature_status": "candidate_complete",
+          "centroid_id": "ae_0",
+          "content_hash": "e7f05cffedf9f6b6",
+          "schema_version": 1,
+          "feature_label": "lib",
+          "phase_lane": "workspace_gap",
+          "dependency_cluster": "src",
+          "hot_keyword_cluster": "svelte",
+          "parent_atlas_card_id": "general-card",
+          "file_name": "ContextualAssistantModal.svelte",
+          "extension": ".svelte",
+          "chunk_index": 19,
+          "total_chunks": 23,
+          "content": "\r\n            <input\r\n              type=\"file\"\r\n              bind:this={fileInput}\r\n              class=\"hidden\"\r\n              onchange={handleFileUpload}\r\n              accept=\"image/*,.pdf,.doc,.docx,.txt\"\r\n            />\r\n\r\n            <button\r\n              type=\"button\"\r\n              class=\"absolute left-4 bottom-4 w-10 h-10 rounded-xl hover:bg-white/10 text-white/40 flex items-center justify-center transition-all\"\r\n              onclick={() => fileInput.click()}\r\n              disabled={isUploading || snapshot.matches('thinking')}\r\n            >\r\n              {#if isUploading}\r\n                <span class=\"i-carbon-loader animate-spin\"></span>\r\n              {:else}\r\n                <span class=\"i-carbon-add text-xl\"></span>\r\n              {/if}\r\n            </button>\r\n\r",
+          "purpose": "",
+          "domain": "utility",
+          "complexity": "medium",
+          "indexed_at": "2026-06-04T02:08:05.943Z",
+          "sourceRefs": [
+            "src/lib/components/admin/ContextualAssistantModal.svelte"
+          ],
+          "source_refs": [
+            "src/lib/components/admin/ContextualAssistantModal.svelte"
+          ],
+          "feature_id": "admin",
+          "related_feature_ids": []
+        }
+      },
+      {
+        "id": 1612494,
+        "payload": {
+          "chunk_id": "card:src/lib/components/legal-ai/CaseDocumentWriter.svelte:077ff71f79fc0c51",
+          "sourceRef": "src/lib/components/legal-ai/CaseDocumentWriter.svelte#chunk-5",
+          "file_path": "src/lib/components/legal-ai/CaseDocumentWriter.svelte",
+          "root": "src",
+          "area": "lib",
+          "kind": "svelte",
+          "tags": [
+            "svelte",
+            "components",
+            "legal-ai",
+            "casedocumentwriter"
+          ],
+          "agent_area": "atlas-context",
+          "feature_status": "candidate_complete",
+          "centroid_id": "ae_0",
+          "content_hash": "077ff71f79fc0c51",
+          "schema_version": 1,
+          "feature_label": "lib",
+          "phase_lane": "workspace_gap",
+          "dependency_cluster": "src",
+          "hot_keyword_cluster": "svelte",
+          "parent_atlas_card_id": "general-card",
+          "file_name": "CaseDocumentWriter.svelte",
+          "extension": ".svelte",
+          "chunk_index": 5,
+          "total_chunks": 11,
+          "content": "\t\t\t\t\tbind:value={noteTitle}\r\n\t\t\t\t\tplaceholder=\"Document title (optional)\"\r\n\t\t\t\t/>\r\n\t\t\t</div>\r\n\t\t</div>\r\n\r\n\t\t<div class=\"cdw-editor-wrap\">\r\n\t\t\t<TipTapEditor\r\n\t\t\t\tbind:this={editorRef}\r\n\t\t\t\ttheme=\"legal\"\r\n\t\t\t\tplaceholder=\"Write your case document here...\"\r\n\t\t\t\tonUpdate={handleEditorUpdate}\r\n\t\t\t/>\r\n\t\t</div>\r\n\r\n\t\t{#if saveStatus !== 'idle'}\r\n\t\t\t<div class=\"cdw-status\" class:saved={saveStatus === 'saved'} class:error={saveStatus === 'error'}>\r\n\t\t\t\t{#if saveStatus === 'saving'}\r\n\t\t\t\t\tSaving...\r\n\t\t\t\t{:else if saveStatus === 'saved'}\r\n\t\t\t\t\t{saveMessage}\r\n\t\t\t\t{:else if saveStatus === 'error'}\r\n\t\t\t\t\t{saveMessage}\r\n\t\t\t\t{/if}\r\n\t\t\t</div>\r\n\t\t{/if}\r\n\r\n\t\t<div class=\"cdw-footer\">\r\n\t\t\t<span class=\"cdw-shortcut-hint\">Ctrl+Shift+D to toggle</span>\r\n\t\t\t{#if selectedCase}\r",
+          "purpose": "",
+          "domain": "utility",
+          "complexity": "medium",
+          "indexed_at": "2026-06-04T02:39:39.370Z",
+          "sourceRefs": [
+            "src/lib/components/legal-ai/CaseDocumentWriter.svelte"
+          ],
+          "source_refs": [
+            "src/lib/components/legal-ai/CaseDocumentWriter.svelte"
+          ],
+          "feature_id": "legal-ai",
+          "related_feature_ids": [],
+          "cluster_id": "0",
+          "som_cluster": "0:0"
         }
       }
     ]

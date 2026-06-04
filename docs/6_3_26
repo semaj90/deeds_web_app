@@ -1,5 +1,205 @@
+Given your latest state, I would reorder the Parent Atlas roadmap. The recommendation engine is no longer Priority 5—it becomes Priority 2 after wiring verification because all the hard infrastructure appears to be working.
+
+Updated Parent Atlas Roadmap
+Phase 1 — Production Wiring Verification (NOW)
+You need proof, not assumptions.
+Verify GlobalCommandPalette
+rg "GlobalCommandPalette" sveltekit-frontend/src
+Need to answer:
+Exists?
+Imported?
+Mounted?
+Ctrl+K registered?
+Target:
+src/routes/+layout.svelte
+or
+src/lib/components/app-shell/*
+Verify Parent Atlas packet assembler
+rg "assemblePacketForSourceRef|parent-atlas-packet-assembler" sveltekit-frontend/src
+
+Need:
+Used by query-router?
+Used by context-assembler?
+Used only by tests?
+Verify query-router is authoritative
+rg "routeQuery|query-router" sveltekit-frontend/src
+
+Need:
+AI Chat
+    ↓
+query-router
+Not:
+AI Chat
+    ↓
+direct Qdrant
+Verify ACE packet injection
+Open:
+context-assembler.ts
+Need proof that packet fields flow into prompt assembly:
+source_refs
+feature_ids
+lane_ids
+cluster_id
+som_cluster
+qdrant_hits
+redis_hot_keys
+Status:
+🔴 Highest priority
+Phase 2 — Recommendation Engine (Moved Up)
+Because your routing smoke tests already pass:
+ACE CRUD       PASS
+SOM CRUD       PASS
+Query Router   PASS
+Bifrost        PASS
+the recommendation engine is now the biggest value unlock.
+Packet → Recommendation
+Current flow:
+Parent Atlas
+   ↓
+ACE Packet
+New flow:
+Parent Atlas
+   ↓
+ACE Packet
+   ↓
+Recommendation Materializer
+Recommendation packet:
+{
+  "workspace_task_id": "...",
+  "feature_id": "...",
+  "cluster_id": "...",
+  "source_refs": [],
+  "priority": 0.94,
+  "reason": "Atlas coverage gap",
+  "recommended_action": "Build packet assembler integration"
+}
+Kanban Materialization
+Create:
+recommendation-task-materializer.ts
+Output:
+Task
+Priority
+Evidence
+SourceRefs
+Feature
+Cluster
+Suggested Owner
+User Analytics / Engram Layer
+
+This is where your earlier idea fits.
+Hot Memory
+Redis:
+recent_queries
+recent_source_refs
+recent_clusters
+recent_packets
+Warm Memory
+Postgres:
+engram_packets
+nes_chrom_packets
+kag_dag_hits
+Cold Memory
+SeaweedFS:
+documents
+snapshots
+exports
+historical embeddings
+Phase 3 — Golden Retrieval Validation
+Permanent test:
+Query:
+where is Redis Valkey cache config wired?
+Expected:
+source_refs > 0
+feature_ids > 0
+lane_ids > 0
+qdrant_hits > 0
+ACE packet written
+Bifrost telemetry written
+recommendation packet written
+
+Make this a CI gate.
+Phase 4 Coverage Report
+Generate:
+Atlas Nodes
+Atlas Edges
+Atlas SourceRefs
+Qdrant Vectors
+Redis Atlas Keys
+Neo4j Relationships
+Then compute:
+orphan sourceRefs
+orphan vectors
+orphan packets
+orphan recommendations
+This becomes your Atlas health score.
+Phase 5 — HyperRAG Integration
+This is where the PostgreSQL 18 + JSONB + gRPC architecture comes in.
+Desired flow:
+SeaweedFS
+    ↓
+Document Metadata
+    ↓
+Postgres JSONB
+    ↓
+GIN Index
+    ↓
+gRPC Retrieval
+    ↓
+HyperRAG
+    ↓
+Parent Atlas
+    ↓
+ACE Packet
+Not:
+SeaweedFS
+    ↓
+Qdrant directly
+Qdrant should remain semantic retrieval, not authoritative storage.
+Phase 6 — Learning / Reinforcement Layer
+Your PyTorch/libtorch/xgradient ideas belong here.
+Use telemetry from:
+Bifrost
+ACE Packets
+Recommendations
+Kanban completion
+User interactions
+Train:
+Recommendation ranker
+Packet ranker
+Cluster scorer
+Task priority scorer
+
+Do not let RL directly mutate Atlas.
+Instead:
+RL
+   ↓
+score
+   ↓
+recommend
+   ↓
+human accepts
+   ↓
+Atlas updates
+Immediate Next 5 Commands
+rg "GlobalCommandPalette" sveltekit-frontend/src
+
+rg "assemblePacketForSourceRef|parent-atlas-packet-assembler" sveltekit-frontend/src
+
+rg "routeQuery|query-router" sveltekit-frontend/src
+
+rg "source_refs|feature_ids|lane_ids|cluster_id" context-assembler.ts
+
+node scripts/smoke/smoke-query-router.mjs
+Those five searches will tell you whether Parent Atlas is merely working in isolation or actually driving the AI assistant. That is the most important unresolved question right now.
+
 (((seperate dev utility into npm build package for import into sveltekit 2 app (desktop app integration later)
 once have package, and review node_modules vs package.json dependencies, can start refactoring codebase to use the package instead of direct imports from node_modules, which will help with tree shaking and reducing bundle size in the SvelteKit app, where we'll import the the atlas indexing. contexual trees need more information for dag hits from neo4j into per emebedding layers rotorquantized for ingestion for token mapping of distilled loras ready for memory swaps later baked into cuda kernels, graphed, streamed, cached, then let run once the package is built for registry mapping if installed, with permissions (windows for exmaple, on startup thus the ai assistant has access to drive and can make better recommndations down the line.) eval testing gemma4 for reap is needed.))))
+
+open code ai contextual chat testing with engrams packets working, function calling, retrieval working, now need to focus on the recommendation engine and reinforcement learning layer to make the assistant proactive and continuously improving based on user interactions and feedback.
+
+deep research integration, subagent, langfuse, sentry like "glitchtip costs money...something else we were working on...)
+mtp gemma training,
+eval testing later for trt-llm, kernel encoding the nes engrams, with more topology domain distilled ingested packets...sveltekit ui testing demo reviewing for production integrations.
 
 search engine is inverse relation, paginated pagerank, 1992, cpu = apps windows task manager, webview ("genie effect) object orientated programming in json packets = pokemon source code, for assembly registry mapping which sveltekit 2 can handles as an updated dependency graph (signals, javascript, ecmascript = json creation, look more into it.) making it hardware specific thus can be easily importable, keeping in mind. sveltekit 2 app needs package json mapping, from atlas for multi-hop cached traversals to not fill context window, and "grpo thinking with deep research" needs testing, docker containers need solidifying, and once built can share libraries to build into typescript safe javascript, sql injection would work but needs zod validation where typescript zod validations can be schema matched yaml matched programicaly to determine features missed by project atlas find files. a computer doesn't think or know, you show it what success it, and train it. thus memory swapping with ability to research and create memory store will improve weights of user.intent based on past conversations that the user might have missed thus keeping an open user recommendations with background processing = "self-prompting" goal bonsai ai or a quantized stable diffusion can be trained to create a strategy guide of the codebase, for visually learning, a manual table of contents, how to guide.
 gaussian splatting = detective mode, mcp server or typescript sub agentic tool calling can help integrate what we need, ingest it, create qlora adapter and stick into unsloth training package nvidia released 2026. to make memory cards cache it and give relevant data with web_search fallback, already there or fish mcp ((searxng and fire* whatever is already created, needing wiring.))
@@ -117,7 +317,6 @@ and reranking changes, but I don't see a measured:
 +0.40 recall
 +0.40 NDCG
 +0.40 MRR
-
 anywhere.
 The likely candidates are:
 Lane A
@@ -210,10 +409,8 @@ except:
 WARN: Embed server :8081 not healthy
 Everything else is green.
 So before building more retrieval features, I would focus on: this passed (6 3 26 but left note**)
-
 Stabilize embeddinggemma-300m-f16.gguf -> needs recreation using gemma4 just released "multi-modal?" using 512 embeds? in our llama-server, needs eval testing which was sort of stubbed out.
 Make :8081/health consistently pass
 Run head-to-head retrieval evaluation
 Decide whether Ollama embeddings can be retired
-
 Only after that would I look at TRT-LLM/Triton migration, because you need a stable retrieval baseline first.

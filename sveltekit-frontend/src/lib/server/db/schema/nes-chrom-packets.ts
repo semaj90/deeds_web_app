@@ -1,4 +1,4 @@
-import { index, integer, jsonb, pgTable, real, text, timestamp, unique, uuid, vector } from 'drizzle-orm/pg-core';
+import { index, integer, jsonb, pgTable, real, text, timestamp, uuid, vector } from 'drizzle-orm/pg-core';
 import { sql } from 'drizzle-orm';
 import { kagDagRuns } from './kag-dag.js';
 
@@ -31,6 +31,9 @@ export const nesChromPackets = pgTable('nes_chrom_packets', {
   kagDagRunId: uuid('kag_dag_run_id').references(() => kagDagRuns.id, { onDelete: 'set null' }),
   kagNodeKey: text('kag_node_key'),
   tokenBudget: integer('token_budget'),
+  featureIds: text('feature_ids').array(),
+  somCluster: text('som_cluster'),
+  laneIds: text('lane_ids').array(),
   createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),
   updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow(),
 }, (table) => ({
@@ -43,6 +46,9 @@ export const nesChromPackets = pgTable('nes_chrom_packets', {
   sourceRefsGin: index('nes_chrom_packets_source_refs_gin').using('gin', table.sourceRefs),
   payloadGin: index('nes_chrom_packets_payload_gin').using('gin', table.payload),
   embeddingHnsw: index('nes_chrom_packets_embedding_hnsw').using('hnsw', table.embedding.op('vector_cosine_ops')),
+  featureIdsGin: index('idx_nes_chrom_packets_feature_ids_gin').using('gin', table.featureIds),
+  somClusterIdx: index('idx_nes_chrom_packets_som_cluster').on(table.somCluster),
+  laneIdsGin: index('idx_nes_chrom_packets_lane_ids_gin').using('gin', table.laneIds),
 }));
 
 /**

@@ -2105,6 +2105,12 @@
     "serverDeps": 0,
     "dbDeps": 0
   },
+  "sveltekit-frontend/src/routes/api/ace/route/+server.ts": {
+    "zone": "shared",
+    "directDeps": 0,
+    "serverDeps": 0,
+    "dbDeps": 0
+  },
   "sveltekit-frontend/src/routes/api/ace/status/+server.ts": {
     "zone": "shared",
     "directDeps": 0,

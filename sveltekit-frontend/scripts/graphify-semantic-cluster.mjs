@@ -23,6 +23,7 @@
  * Deps: ioredis (npm), tensorrt_bridge.node (simd-bridge/cpp/build/Release/)
  */
 
+import 'dotenv/config';
 import { createHash }  from 'node:crypto';
 import { createRequire } from 'node:module';
 import { resolve, dirname, join } from 'node:path';
@@ -78,7 +79,12 @@ function topoClass(dir) {
 // ── Redis ─────────────────────────────────────────────────────────────────────
 
 const { default: Redis } = await import('ioredis');
-const redis = new Redis(REDIS_URL, { lazyConnect: true, connectTimeout: 4000, maxRetriesPerRequest: 1 });
+const redis = new Redis(REDIS_URL, {
+  password: process.env.REDIS_PASSWORD || undefined,
+  lazyConnect: true,
+  connectTimeout: 4000,
+  maxRetriesPerRequest: 1
+});
 try {
   await redis.ping();
   log(`${c.g('✓')} Redis connected`);

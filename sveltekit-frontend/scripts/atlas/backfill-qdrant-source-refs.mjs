@@ -1,7 +1,16 @@
 #!/usr/bin/env node
-import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { mkdirSync, readFileSync, writeFileSync, existsSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 import { Pool } from 'pg';
+import { config as loadEnv } from 'dotenv';
+
+// Load env
+for (const dir of [process.cwd(), resolve(process.cwd(), '..')]) {
+  for (const envFile of ['.env', '.env.local', '.env.development', '.env.development.local']) {
+    const envPath = resolve(dir, envFile);
+    if (existsSync(envPath)) loadEnv({ path: envPath, override: false });
+  }
+}
 
 const ROOT = resolve(process.cwd());
 const REPORTS_DIR = join(ROOT, 'docs', 'reports');

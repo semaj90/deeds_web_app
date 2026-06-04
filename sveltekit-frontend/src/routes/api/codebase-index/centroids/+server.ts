@@ -53,9 +53,10 @@ export const GET: RequestHandler = async ({ locals }) => {
   const { getRedis } = await import('$lib/server/redis.js');
   try {
     const redis = getRedis();
-    const keys  = await redis.keys('centroid:cluster:*');
+    const keys  = await redis.keys('taxonomy:clusters:gpu:*');
     return json({ cached: keys.length, hint: 'POST to rebuild from Qdrant' });
   } catch {
     return json({ cached: 0, hint: 'Redis unavailable' });
   }
 };
+

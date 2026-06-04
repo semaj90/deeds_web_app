@@ -25,10 +25,13 @@ import { config as loadEnv } from 'dotenv';
 import { resolve } from 'path';
 
 // Load env
-for (const envFile of ['.env', '.env.local', '.env.development', '.env.development.local']) {
-  const envPath = resolve(process.cwd(), envFile);
-  if (existsSync(envPath)) loadEnv({ path: envPath, override: false });
+for (const dir of [process.cwd(), resolve(process.cwd(), '..')]) {
+  for (const envFile of ['.env', '.env.local', '.env.development', '.env.development.local']) {
+    const envPath = resolve(dir, envFile);
+    if (existsSync(envPath)) loadEnv({ path: envPath, override: false });
+  }
 }
+
 
 // ─── Config ──────────────────────────────────────────────────────────────────
 const OLLAMA_URL = process.env.OLLAMA_BASE_URL ?? 'http://127.0.0.1:11434';
@@ -79,6 +82,9 @@ const concIdx = args.indexOf('--concurrency');
 const concurrency = concIdx >= 0 ? parseInt(args[concIdx + 1]) : 4;
 const queryIdx = args.indexOf('--query');
 const searchQuery = queryIdx >= 0 ? args[queryIdx + 1] : null;
+const limitIdx = args.indexOf('--limit');
+const limit = limitIdx >= 0 ? parseInt(args[limitIdx + 1], 10) : null;
+
 
 // Progress mode
 const progressIdx   = args.indexOf('--progress-every');
@@ -239,8 +245,24 @@ let redis: any = null;
 async function initRedis(): Promise<void> {
   try {
     const { default: Redis } = await import('ioredis');
-    redis = new Redis(REDIS_URL, { maxRetriesPerRequest: 2, lazyConnect: true });
+    const redisUrl = process.env.REDIS_URL ?? 'redis://127.0.0.1:6379';
+    const redisPw = process.env.REDIS_PASSWORD || process.env.REDIS_PASS || undefined;
+    const u = new URL(redisUrl);
+
+    redis = new Redis({
+      host: u.hostname || '127.0.0.1',
+      port: Number(u.port) || 6379,
+      password: redisPw,
+      lazyConnect: true,
+      connectTimeout: 3000,
+      maxRetriesPerRequest: 1,
+      enableOfflineQueue: false,
+      retryStrategy: () => null,
+    });
+
+    redis.on('error', () => {});
     await redis.connect();
+    await redis.ping();
     console.log('  ✓ Redis bifrost cache connected');
   } catch {
     console.log('  ⚠ Redis unavailable — indexing without dedup cache');
@@ -754,7 +776,11 @@ async function main() {
 
   // Discover files
   console.log(`  📁 Scanning roots: ${roots.join(', ')}`);
-  const files = discoverFiles(roots);
+  let files = discoverFiles(roots);
+  if (limit !== null && !isNaN(limit)) {
+    console.log(`  ⚠️ Limiting indexing to first ${limit} files`);
+    files = files.slice(0, limit);
+  }
   console.log(`  📄 Found ${files.length} indexable files`);
 
   // Chunk all files

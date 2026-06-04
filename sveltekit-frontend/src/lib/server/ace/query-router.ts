@@ -257,6 +257,8 @@ export async function routeQuery(opts: QueryRouterOpts): Promise<QueryRouterResu
         sourceRefs.push(card.source_ref);
         featureIds.push(...card.feature_ids);
         clusterId = card.cluster_id ?? clusterId;
+        // Record NES/CHROM Redis key for provenance
+        nesChromPacketKeys.push(`nes:card:${normalizeCardId(maybeRef)}`);
         trace.push({ lane: 'nes-card', hit: true, latency_ms: Date.now() - t0 });
       } else {
         trace.push({ lane: 'source-ref', hit: false, latency_ms: Date.now() - t0 });
@@ -454,7 +456,7 @@ export async function routeQuery(opts: QueryRouterOpts): Promise<QueryRouterResu
     som_cluster: somClusterFound,
     engram_ids: engramIds,
     kag_hits: neo4jNeighborIds.length,
-    dag_hits: neo4jNeighborIds.length,  // DAG = graph expansion edge count (Neo4j lane)
+    dag_hits: 0,  // DAG lane not yet implemented
     nes_chrom_packet_keys: nesChromPacketKeys,
     prompt_context: promptContext,
     ranked_cards: topSnippets,

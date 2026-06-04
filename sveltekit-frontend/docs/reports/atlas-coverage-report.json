@@ -1,0 +1,24 @@
+{
+  "generatedAt": "2026-06-04T03:00:05.074Z",
+  "postgres": {
+    "parent_atlas_documents_count": 5253,
+    "task_semantic_packets_count": 210,
+    "nes_chrom_packets_count": 27,
+    "atlas_feature_map_count": 5253
+  },
+  "redis": {
+    "total_keys": 173221,
+    "code_index_tag_keys": 2177,
+    "bitfrost_retrieval_keys": 1,
+    "gpu_autoencoder_keys": 2
+  },
+  "qdrant": {
+    "points_count": 36841,
+    "status": "green",
+    "scrolled": 36841,
+    "with_feature_id": 20007,
+    "with_source_refs": 36841,
+    "orphan_points": 0,
+    "missing_feature_ids": 16834
+  }
+}

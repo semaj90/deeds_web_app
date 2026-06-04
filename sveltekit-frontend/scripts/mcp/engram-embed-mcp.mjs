@@ -14,11 +14,21 @@
  * Health: node scripts/mcp/engram-embed-mcp.mjs --health
  */
 
+import 'dotenv/config';
 import { createServer } from 'node:http';
 import { createHash } from 'node:crypto';
+import { fileURLToPath } from 'node:url';
+import { dirname, resolve } from 'node:path';
+import { existsSync } from 'node:fs';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+const MODEL_DIR = resolve(__dirname, '..', '..', 'static', 'embeddinggemma_300m_onnx');
+const MODEL_PATH = resolve(MODEL_DIR, 'model.onnx');
 
 const PORT = parseInt(process.env.ENGRAM_MCP_PORT ?? '8792', 10);
 const OLLAMA_URL = process.env.OLLAMA_URL ?? process.env.OLLAMA_BASE_URL ?? 'http://127.0.0.1:11434';
+const OLLAMA_EMBED_BASE_URL = process.env.OLLAMA_EMBED_BASE_URL || process.env.EMBED_BASE_URL || 'http://127.0.0.1:8081';
 const QDRANT_URL = process.env.QDRANT_URL ?? 'http://127.0.0.1:6333';
 const REDIS_URL = process.env.REDIS_URL ?? 'redis://127.0.0.1:6379';
 const EMBED_MODEL = process.env.OLLAMA_EMBED_MODEL ?? 'embeddinggemma:latest';
@@ -26,13 +36,31 @@ const EMBED_DIM = 768;
 let redisClient = null;
 let redisClientPromise = null;
 
+let llamaEmbedUrl = OLLAMA_EMBED_BASE_URL;
+if (llamaEmbedUrl) {
+  if (!llamaEmbedUrl.endsWith('/v1/embeddings') && !llamaEmbedUrl.endsWith('/v1/embeddings/')) {
+    if (llamaEmbedUrl.endsWith('/v1') || llamaEmbedUrl.endsWith('/v1/')) {
+      llamaEmbedUrl = llamaEmbedUrl.replace(/\/$/, '') + '/embeddings';
+    } else {
+      llamaEmbedUrl = llamaEmbedUrl.replace(/\/$/, '') + '/v1/embeddings';
+    }
+  }
+}
+
 async function getRedis() {
   if (redisClient) return redisClient;
   if (redisClientPromise) return redisClientPromise;
 
   redisClientPromise = (async () => {
     const { default: Redis } = await import('ioredis');
-    const client = new Redis(REDIS_URL, {
+    const redisUrl = process.env.REDIS_URL ?? 'redis://127.0.0.1:6379';
+    const redisPw = process.env.REDIS_PASSWORD || process.env.REDIS_PASS || undefined;
+    const u = new URL(redisUrl);
+
+    const client = new Redis({
+      host: u.hostname || '127.0.0.1',
+      port: Number(u.port) || 6379,
+      password: redisPw,
       lazyConnect: true,
       maxRetriesPerRequest: 1,
       enableOfflineQueue: false,
@@ -71,10 +99,134 @@ if (process.argv.includes('--health')) {
   process.exit(0);
 }
 
-// ── Embedding helper ──────────────────────────────────────────────────────────
+// ── Embedding helpers ──────────────────────────────────────────────────────────
+
+let onnxSession = null;
+let transformersTokenizer = null;
+
+async function embedTextsOnnx(texts) {
+  if (!existsSync(MODEL_PATH)) {
+    throw new Error(`ONNX model file not found at ${MODEL_PATH}`);
+  }
+
+  // Load onnxruntime and transformers
+  if (!onnxSession) {
+    const ort = await import('onnxruntime-node');
+    onnxSession = await ort.InferenceSession.create(MODEL_PATH, {
+      executionProviders: ['cuda', 'cpu'],
+      graphOptimizationLevel: 'all',
+    });
+  }
+
+  if (!transformersTokenizer) {
+    const { AutoTokenizer, env } = await import('@huggingface/transformers');
+    env.allowLocalModels = true;
+    env.allowRemoteModels = false;
+    transformersTokenizer = await AutoTokenizer.from_pretrained(MODEL_DIR, {
+      local_files_only: true,
+    });
+  }
+
+  const { Tensor } = await import('onnxruntime-node');
+  const results = [];
+
+  for (const text of texts) {
+    const encoded = transformersTokenizer(text, {
+      return_tensors: 'np',
+      padding: true,
+      truncation: true,
+      max_length: 512,
+    });
+
+    const seqLen = encoded.input_ids.data.length;
+    const inputIds = new Tensor(
+      'int64',
+      new BigInt64Array(Array.from(encoded.input_ids.data, v => BigInt(v))),
+      [1, seqLen]
+    );
+    const attentionMask = new Tensor(
+      'int64',
+      new BigInt64Array(Array.from(encoded.attention_mask.data, v => BigInt(v))),
+      [1, seqLen]
+    );
+
+    const feeds = { input_ids: inputIds, attention_mask: attentionMask };
+    if (encoded.token_type_ids) {
+      feeds.token_type_ids = new Tensor(
+        'int64',
+        new BigInt64Array(Array.from(encoded.token_type_ids.data, v => BigInt(v))),
+        [1, seqLen]
+      );
+    }
+
+    const sessionOutputs = await onnxSession.run(feeds);
+    const outputKey = sessionOutputs.last_hidden_state
+      ? 'last_hidden_state'
+      : sessionOutputs.token_embeddings
+        ? 'token_embeddings'
+        : Object.keys(sessionOutputs)[0];
+
+    const outputData = sessionOutputs[outputKey].data;
+    const maskData = encoded.attention_mask.data;
+
+    // Mean pool over non-padding tokens
+    const pooled = new Float32Array(EMBED_DIM);
+    let maskSum = 0;
+    for (let t = 0; t < seqLen; t++) {
+      if (maskData[t] === 0) continue;
+      maskSum += 1;
+      for (let d = 0; d < EMBED_DIM; d++) {
+        pooled[d] += outputData[t * EMBED_DIM + d];
+      }
+    }
+    if (maskSum > 0) {
+      for (let d = 0; d < EMBED_DIM; d++) {
+        pooled[d] /= maskSum;
+      }
+    }
+
+    // L2 normalize
+    let norm = 0;
+    for (let d = 0; d < EMBED_DIM; d++) {
+      norm += pooled[d] * pooled[d];
+    }
+    norm = Math.sqrt(norm);
+    if (norm > 0) {
+      for (let d = 0; d < EMBED_DIM; d++) {
+        pooled[d] /= norm;
+      }
+    }
+
+    results.push(Array.from(pooled));
+  }
+
+  return results;
+}
 
 async function embedTexts(texts) {
-  // Tier 3: HTTP batch /api/embed (Ollama >=0.1.33 — preferred)
+  // Tier 1: Dedicated llama-server (OpenAI compatible batch /v1/embeddings)
+  if (llamaEmbedUrl) {
+    try {
+      const res = await fetch(llamaEmbedUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ model: EMBED_MODEL, input: texts }),
+        signal: AbortSignal.timeout(30_000),
+      });
+      if (res.ok) {
+        const data = await res.json();
+        if (Array.isArray(data.data) && data.data[0]?.embedding?.length === EMBED_DIM) {
+          const sortedData = [...data.data].sort((a, b) => (a.index ?? 0) - (b.index ?? 0));
+          const vectors = sortedData.map(item => item.embedding);
+          return { vectors, source: 'llama-server-v1-embeddings', model: EMBED_MODEL };
+        }
+      }
+    } catch (err) {
+      /* fall through */
+    }
+  }
+
+  // Tier 2: HTTP batch /api/embed (Ollama >=0.1.33)
   try {
     const res = await fetch(`${OLLAMA_URL}/api/embed`, {
       method: 'POST',
@@ -90,7 +242,17 @@ async function embedTexts(texts) {
     }
   } catch { /* fall through */ }
 
-  // Tier 4: HTTP sequential /api/embeddings (legacy)
+  // Tier 3: Local ONNX embeddinggemma model (fallback)
+  try {
+    const vectors = await embedTextsOnnx(texts);
+    if (Array.isArray(vectors) && vectors[0]?.length === EMBED_DIM) {
+      return { vectors, source: 'local-onnx-embeddings', model: 'embeddinggemma-300m-onnx' };
+    }
+  } catch (err) {
+    /* fall through */
+  }
+
+  // Tier 4: HTTP sequential /api/embeddings (legacy Ollama)
   const vectors = [];
   for (const text of texts) {
     try {
