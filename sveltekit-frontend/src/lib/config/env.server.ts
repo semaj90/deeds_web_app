@@ -67,12 +67,32 @@ function normalizeMinioUrl(rawValue?: string): string {
   return `${scheme}://${normalizeMinioEndpoint(env?.MINIO_ENDPOINT)}`;
 }
 
+function normalizeRedisUrl(rawValue?: string): string {
+  const fallbackHost = isDocker ? 'redis' : LOOPBACK_IP;
+  const fallbackPort = '6379';
+  const raw = rawValue?.trim();
+
+  if (!raw) {
+    return `redis://${fallbackHost}:${fallbackPort}/0`;
+  }
+  if (/^rediss?:\/\//i.test(raw)) return raw;
+  if (/^[^:/?#]+:\d+(?:\/\d+)?$/.test(raw)) {
+    const [hostPort, dbPart] = raw.split('/', 2);
+    const [host, port] = hostPort.split(':', 2);
+    return `redis://${host || fallbackHost}:${port || fallbackPort}${dbPart ? `/${dbPart}` : ''}`;
+  }
+  if (/^[^:/?#]+$/.test(raw)) {
+    return `redis://${raw}:${fallbackPort}/0`;
+  }
+  return `redis://${fallbackHost}:${fallbackPort}/0`;
+}
+
 export function getDatabaseUrl(): string {
  return env?.DATABASE_URL ?? `postgresql://legal_admin:123456@${LOCALHOST}:5434/legal_ai_db`;
 }
 
 export function getRedisUrl(): string {
- return env?.REDIS_URL ?? `redis://redis@${LOCALHOST}:6379/0`;
+ return normalizeRedisUrl(env?.REDIS_URL);
 }
 
 export function getRedisHost(): string {

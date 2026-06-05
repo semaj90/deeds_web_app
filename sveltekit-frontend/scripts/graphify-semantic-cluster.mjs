@@ -59,6 +59,30 @@ const log   = (...a) => !QUIET && console.log(...a);
 const warn  = (...a) => console.warn(...a);
 const c     = { g: s=>`\x1b[32m${s}\x1b[0m`, y: s=>`\x1b[33m${s}\x1b[0m`, r: s=>`\x1b[31m${s}\x1b[0m`, b: s=>`\x1b[1m${s}\x1b[0m`, d: s=>`\x1b[2m${s}\x1b[0m` };
 
+function normalizeSourceRef(value) {
+  return String(value ?? '')
+    .replace(/\\/g, '/')
+    .replace(/^\/+/, '')
+    .replace(/^(\.\.\/)+/, '')
+    .replace(/^\.\/+/, '')
+    .replace(/^sveltekit-frontend\//, '');
+}
+
+function dirOfSourceRef(value) {
+  const clean = normalizeSourceRef(value);
+  if (!clean) return '';
+  return clean.includes('/') ? clean.split('/').slice(0, -1).join('/') : '.';
+}
+
+function dirKeyVariants(value) {
+  const clean = normalizeSourceRef(value);
+  const variants = new Set([clean]);
+  if (clean && clean !== '.') variants.add(`../${clean}`);
+  if (clean.startsWith('scripts/')) variants.add(clean.replace(/^scripts\//, '../scripts/'));
+  if (clean.startsWith('../scripts/')) variants.add(clean.replace(/^\.\.\//, ''));
+  return [...variants].filter(Boolean);
+}
+
 // ── Topo label table (mirrors topology-byte-mapper.ts) ────────────────────────
 
 const TOPO_LABELS = ['unclassified','legal-evidence','api-route','ui-component',
@@ -423,6 +447,8 @@ if (!SKIP_QDRANT) {
     const tClass = topoClass(repDir);
     const payload = {
       gpuCluster:   centroidIdx,
+      som_cluster:  centroidIdx,
+      centroid_id:  centroidIdx,
       somRow:       row,
       somCol:       col,
       clusterLabel: TOPO_LABELS[tClass],
@@ -461,7 +487,10 @@ if (!SKIP_BACKFILL) {
   const dirToCentroid = new Map();
   for (let i = 0; i < n; i++) {
     const meta = pointMeta[i];
-    if (meta?.dir) dirToCentroid.set(meta.dir, { centroid: assignments[i], somRow: bmuCoords(somBmu[assignments[i]]).row, somCol: bmuCoords(somBmu[assignments[i]]).col });
+    if (meta?.dir) {
+      const entry = { centroid: assignments[i], somRow: bmuCoords(somBmu[assignments[i]]).row, somCol: bmuCoords(somBmu[assignments[i]]).col };
+      for (const key of dirKeyVariants(meta.dir)) dirToCentroid.set(key, entry);
+    }
   }
 
   // Scroll codebase_chunks_768 to find chunks by dir, batch set gpuCluster
@@ -469,7 +498,7 @@ if (!SKIP_BACKFILL) {
   let bfOffset = null;
 
   while (true) {
-    const body = { limit: SCROLL_BATCH, with_payload: ['filePath', 'relativePath', 'file_path', 'gpuCluster'], with_vector: false };
+    const body = { limit: SCROLL_BATCH, with_payload: ['filePath', 'relativePath', 'file_path', 'sourceRef', 'gpuCluster'], with_vector: false };
     if (bfOffset) body.offset = bfOffset;
     let res, d;
     try {
@@ -488,10 +517,10 @@ if (!SKIP_BACKFILL) {
     const byPayload = new Map();
     for (const pt of pts) {
       if (!pt.payload) continue;
-      const fp = pt.payload.relativePath ?? pt.payload.filePath ?? pt.payload.file_path ?? '';
+      const fp = pt.payload.relativePath ?? pt.payload.filePath ?? pt.payload.file_path ?? pt.payload.sourceRef?.replace(/#chunk-\d+$/, '') ?? '';
       if (!fp) continue;
-      const dir = fp.includes('/') ? fp.split('/').slice(0, -1).join('/') : '.';
-      const entry = dirToCentroid.get(dir);
+      const dir = dirOfSourceRef(fp);
+      const entry = dirKeyVariants(dir).map((key) => dirToCentroid.get(key)).find(Boolean);
       if (!entry) continue;
       const key = JSON.stringify(entry);
       if (!byPayload.has(key)) byPayload.set(key, { entry, ids: [] });
@@ -499,7 +528,13 @@ if (!SKIP_BACKFILL) {
     }
 
     for (const { entry, ids } of byPayload.values()) {
-      const payload = { gpuCluster: entry.centroid, somRow: entry.somRow, somCol: entry.somCol };
+      const payload = {
+        gpuCluster:  entry.centroid,
+        som_cluster: entry.centroid,
+        centroid_id: entry.centroid,
+        somRow:      entry.somRow,
+        somCol:      entry.somCol,
+      };
       for (let b = 0; b < ids.length; b += 200) {
         const batch = ids.slice(b, b + 200);
         try {

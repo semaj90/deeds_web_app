@@ -1,0 +1,35 @@
+{
+  "source_ref": "scripts/memory/graphify/gds/98714cf0f2af.json",
+  "file_path": "scripts/memory/graphify/gds/98714cf0f2af.json",
+  "feature_id": "gds",
+  "som_cluster": "unassigned",
+  "centroid_id": "unassigned",
+  "qdrant_point_id": null,
+  "component_type": "TypeScript Module",
+  "line_count": 47850,
+  "parent_modules": [],
+  "nested_routes": [],
+  "related_features": [],
+  "hypergraph_neighbors": [],
+  "similar_files": [],
+  "health_status": "warning",
+  "warnings": [
+    "high complexity (line count > 400)"
+  ],
+  "agentic_fixes": [
+    {
+      "type": "refactor",
+      "description": "Extract functions/sub-components to simplify module footprint."
+    }
+  ],
+  "metadata": {
+    "has_zod": false,
+    "is_route": false,
+    "is_svelte_comp": false,
+    "packet_count": 0,
+    "semantic_confidence": 0,
+    "drizzle_refs": [],
+    "imports": [],
+    "exports": []
+  }
+}

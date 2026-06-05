@@ -190,6 +190,7 @@ import {
 } from '../../../ace/cluster-tags-cache.js';
 import { clusterPivot } from '../../../ace/rg-cluster-pivot.js';
 import { BifrostCacheManager } from '$lib/server/ai/bifrost-cache-manager.js';
+import { retrieveMultihopContext } from '$lib/server/ace/multihop-contextual-tree.js';
 
 // ── QueryRouter4x4 cache — persisted to Redis (24h) ─
 const _userRouters = new Map<string, QueryRouter4x4>();
@@ -1303,7 +1304,20 @@ export async function assembleACEContext(opts: {
     try {
       const { routeQuery } = await import('../../../ace/query-router.js');
       const { BifrostCacheManager } = await import('$lib/server/ai/bifrost-cache-manager.js');
-      const routeResult = await routeQuery({ query: opts.query });
+
+      // Identity path: caller knows the specific file — try NES card lookup first (O(1) Redis).
+      // Falls through to freetext routeQuery on miss.
+      let routeResult: Awaited<ReturnType<typeof routeQuery>> | null = null;
+      if (opts.filePath) {
+        const { assemblePacketForSourceRef } = await import('../../../ace/parent-atlas-packet-assembler.js');
+        const assembled = await assemblePacketForSourceRef({ sourceRef: opts.filePath, query: opts.query }).catch(() => null);
+        if (assembled) {
+          routeResult = { packet: assembled.packet, source: assembled.fromCache ? 'redis' : 'assembled' } as unknown as Awaited<ReturnType<typeof routeQuery>>;
+        }
+      }
+      if (!routeResult) {
+        routeResult = await routeQuery({ query: opts.query });
+      }
       const packet = routeResult.packet;
 
       // Log Bifrost retrieval telemetry
@@ -1398,6 +1412,64 @@ export async function assembleACEContext(opts: {
           selectedSources: packet.source_refs,
         },
       };
+
+      // Fire-and-forget ACE telemetry → route_runtime_packets (non-blocking)
+      Promise.all([
+        import('$lib/server/db/client'),
+        import('./telemetry-compressor.js')
+      ]).then(([{ pool: pgPool }, { compressAndStoreTelemetry }]) => {
+        const _p = packet as unknown as Record<string, unknown>;
+        const queryHash = String(_p.query_hash ?? '');
+        const sourceRefs = Array.isArray(_p.source_refs) ? _p.source_refs : [];
+        const featureIds = Array.isArray(_p.feature_ids) ? _p.feature_ids : [];
+        const laneIds = Array.isArray(_p.lane_ids) ? _p.lane_ids : [];
+        const redisHotKeys = Array.isArray(_p.redis_hot_keys) ? _p.redis_hot_keys : [];
+        const qdrantHits = Array.isArray(_p.qdrant_point_ids) ? (_p.qdrant_point_ids as unknown[]).length : 0;
+
+        pgPool.query(
+          `INSERT INTO route_runtime_packets
+             (route, query_hash, query_preview,
+              source_refs, feature_ids, lane_ids, cluster_id, som_cluster,
+              qdrant_hits, redis_hot_keys, cache_hit, cache_tier,
+              user_id, session_id)
+           VALUES ($1,$2,$3,$4::jsonb,$5::jsonb,$6::jsonb,$7,$8,$9,$10::jsonb,$11,$12,$13,$14)
+           RETURNING id`,
+          [
+            opts.filePath ? `file:${opts.filePath}` : '/api/sse/chat',
+            queryHash,
+            opts.query.slice(0, 120),
+            JSON.stringify(sourceRefs),
+            JSON.stringify(featureIds),
+            JSON.stringify(laneIds),
+            String(_p.cluster_id ?? ''),
+            String(_p.som_cluster ?? ''),
+            qdrantHits,
+            JSON.stringify(redisHotKeys),
+            _p.cache_hit !== 'none',
+            String(_p.cache_hit ?? ''),
+            opts.userId ? parseInt(opts.userId, 10) || null : null,
+            opts.conversationId ?? null,
+          ]
+        ).then((res) => {
+          const insertedId = res.rows[0]?.id;
+          if (insertedId) {
+            compressAndStoreTelemetry(insertedId, {
+              route: opts.filePath ? `file:${opts.filePath}` : '/api/sse/chat',
+              query_hash: queryHash,
+              query_preview: opts.query.slice(0, 120),
+              source_refs: sourceRefs,
+              feature_ids: featureIds,
+              lane_ids: laneIds,
+              cluster_id: String(_p.cluster_id ?? ''),
+              som_cluster: String(_p.som_cluster ?? ''),
+              qdrant_hits: qdrantHits,
+              redis_hot_keys: redisHotKeys,
+              userId: opts.userId ? parseInt(opts.userId, 10) || null : null,
+              sessionId: opts.conversationId ?? null,
+            }).catch(() => {});
+          }
+        }).catch(() => { /* telemetry — never throw */ });
+      }).catch(() => { /* non-blocking */ });
 
       return parentAtlasContext;
     } catch (err) {
@@ -1632,6 +1704,78 @@ export async function assembleACEContext(opts: {
                 })
               )
               .catch(() => {});
+
+            // Fire-and-forget ACE telemetry → route_runtime_packets (non-blocking)
+            Promise.all([
+              import('$lib/server/db/client'),
+              import('node:path'),
+              import('./telemetry-compressor.js')
+            ]).then(async ([{ pool: pgPool }, path, { compressAndStoreTelemetry }]) => {
+              try {
+                const rootDir = path.resolve(process.cwd(), '..');
+                const relativeRefs = (codebaseContext || [])
+                  .map((c: any) => path.relative(rootDir, c.filePath).replace(/\\/g, '/'))
+                  .filter(Boolean);
+                
+                const featuresRes = await pgPool.query(
+                  'SELECT DISTINCT source_ref, feature_id FROM parent_atlas_documents WHERE source_ref = ANY($1)',
+                  [relativeRefs]
+                ).catch(() => ({ rows: [] as any[] }));
+                
+                const featureIdMap = new Map((featuresRes.rows || []).map((r: any) => [r.source_ref, r.feature_id]));
+                const featureIds = relativeRefs.map(ref => featureIdMap.get(ref) || 'shims').filter(Boolean);
+                const redisHotKeys = [cartridgeKey];
+                const qHits = cartridgeResults.results?.length ?? 0;
+                
+                pgPool.query(
+                  `INSERT INTO route_runtime_packets
+                     (route, query_hash, query_preview,
+                      source_refs, feature_ids, lane_ids, cluster_id, som_cluster,
+                      qdrant_hits, redis_hot_keys, cache_hit, cache_tier,
+                      user_id, session_id, latency_ms)
+                   VALUES ($1,$2,$3,$4::jsonb,$5::jsonb,$6::jsonb,$7,$8,$9,$10::jsonb,$11,$12,$13,$14,$15)
+                   RETURNING id`,
+                  [
+                    opts.filePath ? `file:${opts.filePath}` : '/api/sse/chat',
+                    qHash,
+                    query.slice(0, 120),
+                    JSON.stringify(relativeRefs),
+                    JSON.stringify(featureIds),
+                    JSON.stringify([]), // lane_ids
+                    activeClusterSummary ? String(activeClusterSummary.clusterId) : '',
+                    activeClusterSummary ? String(activeClusterSummary.clusterId) : '',
+                    qHits,
+                    JSON.stringify(redisHotKeys),
+                    true,
+                    'redis',
+                    opts.userId ? parseInt(opts.userId, 10) || null : null,
+                    opts.conversationId ?? null,
+                    Date.now() - policyStartedAt,
+                  ]
+                ).then((res) => {
+                  const insertedId = res.rows[0]?.id;
+                  if (insertedId) {
+                    compressAndStoreTelemetry(insertedId, {
+                      route: opts.filePath ? `file:${opts.filePath}` : '/api/sse/chat',
+                      query_hash: qHash,
+                      query_preview: query.slice(0, 120),
+                      source_refs: relativeRefs,
+                      feature_ids: featureIds,
+                      lane_ids: [],
+                      cluster_id: activeClusterSummary ? String(activeClusterSummary.clusterId) : '',
+                      som_cluster: activeClusterSummary ? String(activeClusterSummary.clusterId) : '',
+                      qdrant_hits: qHits,
+                      redis_hot_keys: redisHotKeys,
+                      userId: opts.userId ? parseInt(opts.userId, 10) || null : null,
+                      sessionId: opts.conversationId ?? null,
+                      latencyMs: Date.now() - policyStartedAt,
+                    }).catch(() => {});
+                  }
+                }).catch((err) => { console.error('[Fast-Path Telemetry Query Error]', err); });
+              } catch (err) {
+                console.error('[Fast-Path Telemetry Outer Error]', err);
+              }
+            }).catch(() => {});
 
             return fastContext;
           }
@@ -1960,6 +2104,12 @@ export async function assembleACEContext(opts: {
         filePath: opts.filePath,
       }).catch(() => null);
 
+      const multihopPacket = await retrieveMultihopContext({
+        query,
+        topK: 5,
+        maxHops: 2,
+      }).catch(() => null);
+
       const cachePlannerTrace = {
         hit: Boolean(acePlannerHit),
         source: acePlannerHit?.meta.source ?? 'miss',
@@ -2226,7 +2376,7 @@ export async function assembleACEContext(opts: {
             durationMs: multiLaneResult.durationMs,
           };
         })(),
-        aceContextPacket: featureWikiPacket ?? null,
+        aceContextPacket: featureWikiPacket ?? multihopPacket ?? null,
       };
 
       // ── HMM Wiki Logger — 4D topology note (fire-and-forget) ──────────
@@ -3354,6 +3504,68 @@ export async function assembleACEContext(opts: {
         } catch {
           // non-fatal: authority enrichment is best-effort
         }
+      }
+
+      // Fire-and-forget ACE telemetry → route_runtime_packets (non-blocking)
+      try {
+        const _p = multihopPacket || {};
+        const qHash = queryHash(query);
+        const latencyMs = Date.now() - policyStartedAt;
+        const sourceRefs = Array.isArray(_p.source_refs) ? _p.source_refs : [];
+        const featureIds = Array.isArray(_p.feature_ids) ? _p.feature_ids : [];
+        const laneIds = Array.isArray(_p.lane_ids) ? _p.lane_ids : [];
+        const redisHotKeys = Array.isArray(_p.redis_hot_keys) ? _p.redis_hot_keys : [];
+        const qHits = Array.isArray(_p.qdrant_hits) ? _p.qdrant_hits.length : 0;
+
+        pgPool.query(
+          `INSERT INTO route_runtime_packets
+             (route, query_hash, query_preview,
+              source_refs, feature_ids, lane_ids, cluster_id, som_cluster,
+              qdrant_hits, redis_hot_keys, cache_hit, cache_tier,
+              user_id, session_id, latency_ms)
+           VALUES ($1,$2,$3,$4::jsonb,$5::jsonb,$6::jsonb,$7,$8,$9,$10::jsonb,$11,$12,$13,$14,$15)
+           RETURNING id`,
+          [
+            opts.filePath ? `file:${opts.filePath}` : '/api/sse/chat',
+            qHash,
+            query.slice(0, 120),
+            JSON.stringify(sourceRefs),
+            JSON.stringify(featureIds),
+            JSON.stringify(laneIds),
+            String(_p.cluster_id ?? ''),
+            String(_p.som_cluster ?? ''),
+            qHits,
+            JSON.stringify(redisHotKeys),
+            finalContext.cachePlanner?.hit ?? false,
+            String(finalContext.cachePlanner?.source ?? ''),
+            opts.userId ? parseInt(opts.userId, 10) || null : null,
+            opts.conversationId ?? null,
+            latencyMs,
+          ],
+        ).then((res) => {
+          const insertedId = res.rows[0]?.id;
+          if (insertedId) {
+            import('./telemetry-compressor.js').then(({ compressAndStoreTelemetry }) => {
+              compressAndStoreTelemetry(insertedId, {
+                route: opts.filePath ? `file:${opts.filePath}` : '/api/sse/chat',
+                query_hash: qHash,
+                query_preview: query.slice(0, 120),
+                source_refs: sourceRefs,
+                feature_ids: featureIds,
+                lane_ids: laneIds,
+                cluster_id: String(_p.cluster_id ?? ''),
+                som_cluster: String(_p.som_cluster ?? ''),
+                qdrant_hits: qHits,
+                redis_hot_keys: redisHotKeys,
+                userId: opts.userId ? parseInt(opts.userId, 10) || null : null,
+                sessionId: opts.conversationId ?? null,
+                latencyMs,
+              }).catch(() => {});
+            }).catch(() => {});
+          }
+        }).catch((err) => { console.error('[Telemetry Error]', err); });
+      } catch (err) {
+        console.error('[Telemetry Outer Error]', err);
       }
 
       return finalContext;
@@ -6107,7 +6319,7 @@ export async function fetchCodebaseContext(
     // Fallback: cosine-score filtering only + Karpathy boost
     const fallbackChunks = await applyKarpathyBoost(
       results
-        .filter((r) => r.score >= 0.5)
+        .filter((r) => r.score >= 0.35)
         .slice(0, 10)
         .map((r) => toCtx(r)),
       query,
@@ -6474,7 +6686,7 @@ async function applyKarpathyBoost(
   const top = boosted
     .sort((a, b) => b.score - a.score)
     .slice(0, 5)
-    .filter((r) => r.score >= 0.45);
+    .filter((r) => r.score >= 0.35);
 
   // Step 7: attach cached LLM outputs from code-llm-index (single MGET, <5ms)
   // Path-keyed cache lets two queries that touch the same file share a synthesis

@@ -15,7 +15,10 @@ for (const dir of [process.cwd(), resolve(process.cwd(), '..')]) {
 const ROOT = resolve(process.cwd());
 const REPORTS_DIR = join(ROOT, 'docs', 'reports');
 const QDRANT_URL = process.env.QDRANT_URL ?? 'http://localhost:6333';
-const QDRANT_COLLECTION = process.env.QDRANT_COLLECTION ?? 'codebase_chunks_768';
+let QDRANT_COLLECTION = process.env.QDRANT_COLLECTION ?? 'codebase_chunks_768';
+if (QDRANT_COLLECTION === 'legal_documents') {
+  QDRANT_COLLECTION = 'codebase_chunks_768';
+}
 const DATABASE_URL =
   process.env.DATABASE_URL ??
   process.env.POSTGRES_URL ??

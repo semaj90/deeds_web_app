@@ -1,0 +1,37 @@
+{
+  "source_ref": "sveltekit-frontend/src/routes/(app)/cases/[id]/board/+page.svelte",
+  "file_path": "sveltekit-frontend/src/routes/(app)/cases/[id]/board/+page.svelte",
+  "feature_id": "board",
+  "line_count": 3570,
+  "is_route": true,
+  "is_svelte_comp": true,
+  "has_zod": false,
+  "drizzle_refs": [],
+  "imports": [
+    "$lib/components/canvas/HybridBoard.svelte",
+    "$lib/components/ui/Icon.svelte",
+    "$lib/models/ChatSession.svelte.js",
+    "$lib/components/ai/TypewriterResponse.svelte",
+    "$lib/components/legal/AISummaryMiniModal.svelte",
+    "$lib/components/evidence/board-history.svelte.js",
+    "$lib/components/evidence/board-persistence.svelte.js",
+    "$lib/components/evidence/WebGPUParticleOverlay.svelte",
+    "fuse.js",
+    "./$types",
+    "svelte",
+    "$lib/stores/notifications.svelte"
+  ],
+  "exports": [],
+  "som_cluster": "unassigned",
+  "centroid_id": "unassigned",
+  "qdrant_point_id": "",
+  "packet_count": 0,
+  "runtime_packet_count": 0,
+  "related_features": [],
+  "hypergraph_neighbors": [],
+  "similar_files": [],
+  "health_warnings": [
+    "high complexity (line count > 400)",
+    "missing strict validation payload adapter (Zod)"
+  ]
+}

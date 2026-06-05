@@ -30,6 +30,8 @@ This page is the navigation entry for the Parent Atlas workstream. It links the 
 - [Offline synthesis mapreduce DuckDB](</C:/Users/james/Videos/deeds-web-app/docs/reports/offline-synthesis-mapreduce-duckdb-report.md>)
 - [Doc-feature crosswalk](</C:/Users/james/Videos/deeds-web-app/docs/reports/doc-feature-crosswalk-2026-06-01.md>)
 - [PyTorch / Qdrant / Redis / SOM index](</C:/Users/james/Videos/deeds-web-app/docs/reports/pytorch-qdrant-redis-som-index-2026-06-01.md>)
+- [Production Qdrant without SOM report](</C:/Users/james/Videos/deeds-web-app/docs/reports/production-qdrant-no-som-report.md>)
+- [Multi-hop traversal class matrix](</C:/Users/james/Videos/deeds-web-app/docs/reports/multihop-traversal-class-matrix.md>)
 - [Repo dirty tree classification](</C:/Users/james/Videos/deeds-web-app/docs/reports/repo-dirty-tree-classification-2026-06-01.md>)
 - [Repo archive move plan](</C:/Users/james/Videos/deeds-web-app/docs/reports/repo-archive-move-plan-2026-06-01.md>)
 - [Original superseded score](</C:/Users/james/Videos/deeds-web-app/docs/reports/original-superseded-score-2026-06-02.md>)

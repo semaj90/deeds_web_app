@@ -1,4 +1,18 @@
-import { loadConfig, loadCodebaseGraph, loadRouteMap, loadClusterAliases, resolveRepoPath, writeJson, writeMarkdown, parentAtlasMarkdown, topEntries, workspaceForPath, routeSummary, createProgressLogger } from './_atlas-utils.mjs';
+import pg from 'pg';
+import {
+  loadConfig,
+  loadRouteMap,
+  loadClusterAliases,
+  createProgressLogger,
+  resolveRepoPath,
+  writeJson,
+  writeMarkdown,
+  parentAtlasMarkdown,
+  routeSummary,
+  workspaceForPath,
+  loadCodebaseGraph,
+  fileLanguage
+} from './_atlas-utils.mjs';
 
 const args = new Set(process.argv.slice(2));
 const WRITE = args.has('--write');
@@ -24,11 +38,8 @@ if (WRITE && !RUN_ID) {
 const EFFECTIVE_RUN_ID = RUN_ID || `run_${Date.now()}`;
 
 const config = loadConfig();
-const graph = loadCodebaseGraph(config);
 const routeMap = loadRouteMap(config);
 const aliases = loadClusterAliases(config);
-
-if (!graph) throw new Error(`Missing source graph: ${config.sources.codebaseGraph}`);
 
 console.log(`Starting CouchDB MapReduce Ingestion [WRITE=${WRITE}] [runId=${EFFECTIVE_RUN_ID}]`);
 
@@ -49,8 +60,78 @@ if (WRITE) {
   }
 }
 
+// Query Postgres for authoritative lineage
+const DATABASE_URL = process.env.DATABASE_URL || 'postgresql://legal_admin:123456@127.0.0.1:5434/legal_ai_db';
+let files = [];
+try {
+  const pool = new pg.Pool({ connectionString: DATABASE_URL });
+  const { rows } = await pool.query(`
+    SELECT 
+      pad.source_ref, 
+      pad.rel_path, 
+      pad.feature_id, 
+      pad.line_count,
+      pad.is_route, 
+      pad.is_svelte_comp, 
+      pad.has_zod, 
+      pad.drizzle_refs, 
+      pad.imports, 
+      pad.exports, 
+      pad.qdrant_point_id, 
+      pad.related_feature_ids,
+      afm.cluster_id, 
+      afm.centroid_id, 
+      afm.som_cluster,
+      afm.nes_card_id,
+      afm.lane_ids,
+      afm.atlas_version
+    FROM parent_atlas_documents pad
+    LEFT JOIN atlas_feature_map afm ON afm.source_ref = pad.source_ref;
+  `);
+  await pool.end();
+  files = rows.map(r => ({
+    rel: r.rel_path || r.source_ref,
+    source_ref: r.source_ref,
+    source_id: r.source_ref,
+    feature_id: r.feature_id || 'feature.unknown',
+    featureKey: r.feature_id || 'feature.unknown',
+    line_count: r.line_count,
+    is_route: r.is_route,
+    is_svelte_comp: r.is_svelte_comp,
+    has_zod: r.has_zod,
+    drizzle_refs: r.drizzle_refs,
+    imports: r.imports,
+    exports: r.exports,
+    qdrant_point_id: r.qdrant_point_id,
+    related_feature_ids: r.related_feature_ids,
+    cluster_id: r.cluster_id,
+    centroid_id: r.centroid_id,
+    som_cluster: r.som_cluster,
+    gpu_cluster: r.cluster_id,
+    nes_card_id: r.nes_card_id,
+    lane_ids: r.lane_ids,
+    atlas_version: r.atlas_version || 1
+  }));
+  console.log(`Loaded ${files.length} documents from Postgres.`);
+} catch (err) {
+  console.warn(`Postgres query failed, falling back to codebase-graph.json: ${err.message}`);
+  const graph = loadCodebaseGraph(config);
+  files = (graph?.files ?? []).map(f => ({
+    rel: f.rel,
+    source_ref: f.rel,
+    source_id: f.rel,
+    feature_id: f.featureKey || 'feature.unknown',
+    featureKey: f.featureKey || 'feature.unknown',
+    cluster_id: f.gpuCluster || f.clusterId,
+    gpu_cluster: f.gpuCluster || f.clusterId,
+    som_cluster: f.som_cluster || (f.somRow != null ? `${f.somRow}:${f.somCol}` : null),
+    centroid_id: f.centroidId,
+    atlas_version: 1
+  }));
+}
 
-let files = graph.files ?? [];
+// Remove feature:* source_refs from physical file mapping lists
+files = files.filter(f => f.source_ref && !f.source_ref.startsWith('feature:'));
 
 // Apply workspace filter
 if (WORKSPACE) {
@@ -67,6 +148,7 @@ if (LIMIT > 0) {
 const directoryDocs = new Map();
 const clusterDocs = new Map();
 const featureDocs = new Map();
+const sourceDocs = new Map();
 
 for (const file of files) {
   const rel = file.rel ?? '';
@@ -78,6 +160,15 @@ for (const file of files) {
     directoryDocs.set(dir, sanitizePayload({
       _id: `wiki:dir:${dir}`,
       type: 'directory_wiki',
+      source_id: `dir:${dir}`,
+      source_ref: `dir:${dir}`,
+      source_kind: 'directory',
+      file_path: null,
+      rel_path: dir,
+      feature_id: null,
+      related_feature_ids: [],
+      atlas_version: config.atlasVersion || '1',
+      cold_storage_ready: true,
       workspace: workspaceForPath(rel, config.workspaces),
       path: dir,
       summary: '',
@@ -100,6 +191,15 @@ for (const file of files) {
       clusterDocs.set(String(clusterId), sanitizePayload({
         _id: `cluster:${clusterId}`,
         type: 'cluster_summary',
+        source_id: `cluster:${clusterId}`,
+        source_ref: `cluster:${clusterId}`,
+        source_kind: 'cluster',
+        file_path: null,
+        rel_path: null,
+        feature_id: null,
+        related_feature_ids: [],
+        atlas_version: config.atlasVersion || '1',
+        cold_storage_ready: true,
         clusterId: String(clusterId),
         alias: aliases[String(clusterId)]?.alias ?? null,
         summary: '',
@@ -117,6 +217,15 @@ for (const file of files) {
     featureDocs.set(featureKey, sanitizePayload({
       _id: `feature:${featureKey}`,
       type: 'feature_card',
+      source_id: `feature:${featureKey}`,
+      source_ref: `feature:${featureKey}`,
+      source_kind: 'feature',
+      file_path: null,          // feature cards never have a file_path
+      rel_path: null,
+      feature_id: featureKey,
+      related_feature_ids: [],
+      atlas_version: config.atlasVersion || '1',
+      cold_storage_ready: true,
       featureKey,
       summary: '',
       routes: new Set(),
@@ -128,6 +237,34 @@ for (const file of files) {
   const featureDoc = featureDocs.get(featureKey);
   featureDoc.files.add(rel);
   if (clusterId != null) featureDoc.clusters.add(String(clusterId));
+
+  const sourceKind = file.is_route ? 'route' : (file.is_svelte_comp ? 'component' : fileLanguage(rel));
+  const sourceCard = sanitizePayload({
+    _id: `source:${file.source_ref}`,
+    type: 'source_card',
+    source_id: file.source_id,
+    source_ref: file.source_ref,
+    feature_id: file.feature_id,
+    related_feature_ids: file.related_feature_ids || [],
+    rel_path: rel,
+    file_path: rel,
+    source_kind: sourceKind,
+    atlas_version: file.atlas_version,
+    cold_storage_ready: true,
+    line_count: file.line_count || 0,
+    has_zod: !!file.has_zod,
+    drizzle_refs: file.drizzle_refs || [],
+    imports: file.imports || [],
+    exports: file.exports || [],
+    qdrant_point_id: file.qdrant_point_id,
+    cluster_id: clusterId ? String(clusterId) : null,
+    centroid_id: file.centroid_id,
+    som_cluster: file.som_cluster,
+    lane_ids: file.lane_ids || [],
+    runId: EFFECTIVE_RUN_ID,
+    updatedAt: new Date().toISOString()
+  });
+  sourceDocs.set(file.source_ref, sourceCard);
 }
 
 const docs = [
@@ -148,7 +285,8 @@ const docs = [
     routes: [...doc.routes],
     files: [...doc.files].slice(0, 8),
     clusters: [...doc.clusters]
-  }))
+  })),
+  ...[...sourceDocs.values()]
 ];
 
 if (WRITE) {
@@ -161,7 +299,8 @@ if (WRITE) {
   const allDocs = [
     ...directoryDocs.values(),
     ...clusterDocs.values(),
-    ...featureDocs.values()
+    ...featureDocs.values(),
+    ...sourceDocs.values()
   ].map(d => {
     // Handle Set conversion to Array for JSON
     const cloned = { ...d };
@@ -207,6 +346,7 @@ const report = {
     directory_wiki: directoryDocs.size,
     cluster_summary: clusterDocs.size,
     feature_card: featureDocs.size,
+    source_card: sourceDocs.size,
     engram_memory: 0
   },
   views: [
@@ -218,6 +358,8 @@ const report = {
 };
 
 writeJson(resolveRepoPath(config.outputs.couchdbReportJson), report);
+writeJson(resolveRepoPath('.tmp/couchdb-mapreduce-reingest-report.json'), report);
+writeJson(resolveRepoPath('.tmp/parent-atlas-reingest-report.json'), report);
 writeMarkdown(resolveRepoPath(config.outputs.couchdbReportMd), parentAtlasMarkdown('CouchDB MapReduce Ingestion — Parent Atlas Rollups', {
   documents: report.docs,
   views: report.views.length,
@@ -226,6 +368,7 @@ writeMarkdown(resolveRepoPath(config.outputs.couchdbReportMd), parentAtlasMarkdo
 }, report.views.map((view) => view)));
 
 console.log(`CouchDB MapReduce report written to ${config.outputs.couchdbReportJson} [runId: ${EFFECTIVE_RUN_ID}]`);
+console.log(`Saved reports to .tmp/couchdb-mapreduce-reingest-report.json and .tmp/parent-atlas-reingest-report.json`);
 if (!WRITE) console.log('Dry-run complete. Add --write once CouchDB client is configured.');
 
 process.exit(0);

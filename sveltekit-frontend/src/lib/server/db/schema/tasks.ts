@@ -1,4 +1,4 @@
-import { pgTable, serial, text, integer, boolean, timestamp, jsonb, bigserial, uuid, numeric, index } from 'drizzle-orm/pg-core';
+import { pgTable, serial, text, integer, boolean, timestamp, jsonb, numeric, index, uuid } from 'drizzle-orm/pg-core';
 import { sql } from 'drizzle-orm';
 
 export const workspaceTasks = pgTable('workspace_tasks', {
@@ -11,7 +11,7 @@ export const workspaceTasks = pgTable('workspace_tasks', {
 });
 
 export const taskSemanticPackets = pgTable('task_semantic_packets', {
-  id: bigserial('id', { mode: 'number' }).primaryKey().notNull(),
+  id: serial('id').primaryKey().notNull(),
   point_kind: text('point_kind').notNull().default('task_summary'),
   qdrant_point_id: text('qdrant_point_id'),
   workspace_id: text('workspace_id'),
@@ -43,7 +43,7 @@ export const taskSemanticPackets = pgTable('task_semantic_packets', {
 });
 
 export const agentPickupQueue = pgTable('agent_pickup_queue', {
-  id: uuid('id').primaryKey().defaultRandom(),
+  id: serial('id').primaryKey(),
   task_id: text('task_id'),
   packet_id: text('packet_id'),
   status: text('status'),

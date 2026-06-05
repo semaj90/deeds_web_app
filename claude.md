@@ -2005,7 +2005,7 @@ NPM scripts: `agent:fix:batch:{quiet,summary}`, `audit:dirs:{quiet,summary}`, `a
 - **Git-diff cold archive (no-delete workaround)**: To retire archive-eligible files without destroying content — `git add` → structured commit → `git tag archive/YYYY-MM-DD/<slug>` → `git rm` + prune commit. Content lives in git DAG forever; recoverable via `git show <tag>:<path>`. Score gate: only files with `superseded-score >= threshold` qualify. Canonical scorer: `scripts/atlas/score-superseded-originals.mjs`. Archive pipeline (not yet built): `scripts/atlas/archive-cold-originals.mjs`. See `docs/architecture/phase-101-completion-plan.md` Block 1.
 - **Valkey bundle replaces Redis Stack**: `valkey/valkey-bundle:8` is the AGPL-free drop-in. Includes `valkey-json` (RapidJSON C++) and `valkey-search`. Swap image in docker-compose, bind `127.0.0.1:6379`. Zero ioredis code changes. `ROTORQUANT_KV_ENABLED=true` in `.env` is a dead variable — `launch-turboquant.ps1` never reads it; use `TURBO_PROFILE` instead.
 - **Hybrid Omni-Worker**: Anaconda container unifies Node.js + PyTorch + TRT-LLM in one process sharing a CUDA context. Bridge is `n-api.rs` using `tch-rs` (Rust LibTorch bindings) or `cudarc` — zero-copy tensor hand-off between SvelteKit and GPU inference. LangGraph = orchestration-only planner, never writes to DB. Not yet implemented; scaffold in `docker/omni-worker/`. See `docs/architecture/phase-101-completion-plan.md` Block 6.
-- **ioredis cold-start in startup scripts**: `legal-ai-redis` Docker container may start *after* folderOpen pipelines fire. Default ioredis behavior reconnects forever and spams unhandled `error` events. Required client options for ANY standalone Node script under `scripts/startup/`, `scripts/index-*`, `scripts/seed-*`: `lazyConnect:true`, `maxRetriesPerRequest:1`, `enableOfflineQueue:false`, `retryStrategy:()=>null`, attach `redis.on('error',()=>{})`, then `await redis.connect()` BEFORE `await redis.ping()` (offlineQueue:false makes ping fail with "Stream isn't writeable" otherwise), and `redis.disconnect()` on failure. Verified in `scripts/index-codebase-fast.mjs` and `scripts/startup/ace-incremental-startup.mjs` (2026-05-08). Do NOT use this pattern in long-running server code — there `getRedis()` from `src/lib/server/redis.ts` is canonical.
+- **ioredis cold-start and lifecycle checks**: `legal-ai-redis` Docker container may start *after* folderOpen pipelines fire. Default ioredis behavior reconnects forever and spams unhandled `error` events. Required client options for ANY standalone Node script under `scripts/startup/`, `scripts/index-*`, `scripts/seed-*`: `lazyConnect:true`, `maxRetriesPerRequest:1`, `enableOfflineQueue:false`, `retryStrategy:()=>null`, attach `redis.on('error',()=>{})`, then `await redis.connect()` BEFORE `await redis.ping()` (offlineQueue:false makes ping fail with "Stream isn't writeable" otherwise). **Rule**: Never reuse a closed or disconnected client across distinct script segments or different query runs. Always create a fresh client instance or use block/scope isolation (e.g., with a clean `try...finally` with `redis.quit()`) to prevent `Connection is closed` errors. Do NOT use this pattern in long-running server code — there `getRedis()` from `src/lib/server/redis.ts` is canonical.
 - **Valkey/Redis Config Object Pattern (The "Redis Trick")**: In standalone Node/smoke scripts, do not parse/interpolate `REDIS_URL` strings with passwords (fails on special characters like `:` or `@`). Always configure the `ioredis` constructor with an options object: `{ host: env.REDIS_HOST, port: env.REDIS_PORT, password: env.REDIS_PASSWORD }`.
 - **$derived vs $derived.by**: `$derived(() => {...})` returns a function. Use `$derived.by(() => {...})` for complex computations
 - **TS imports in SvelteKit**: Use `.js` extensions not `.ts` (bundler resolves `.js` → `.ts`)
@@ -2212,6 +2212,15 @@ See `memory/reconstruction-3-tracks.md` for full SceneIntent schema, RabbitMQ qu
   - `scripts/opencode/monitor-claude-mem-poll.mjs`
   - `scripts/memory/import-claude-mem-observations.mjs`
 - Important caveat: the local `claude-mem` plugin cache patch is cache-only. If the plugin is reinstalled or upgraded, recheck the local bundle for the `zod/v3` compatibility fix before trusting the hooks.
+
+## Parent Atlas Lineage & Synthesis Rules
+- **Task Joins**: `task_semantic_packets` currently joins safely by `feature_id`.
+- **Mixed Source Refs**: `source_ref` values are mixed and can represent:
+  - Real file references (e.g., `src/lib/...`)
+  - Task references (e.g., `task:123`)
+  - Feature aggregation references (e.g., `feature:auth`, `feature:ui`)
+- **Synthesis Separation**: `atlas_feature_synthesis` is a feature-level aggregation table.
+- **Lineage Integrity**: `atlas_source_ref_synthesis` must not trust `feature:*` as file paths.
 
 Sources:
 - [Bits UI Docs](https://bits-ui.com/) | [Migration Guide](https://bits-ui.com/docs/migration-guide)

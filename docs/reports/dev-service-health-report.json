@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-05-31T04:54:13.407Z",
+  "generatedAt": "2026-06-05T00:04:48.487Z",
   "strict": false,
   "services": [
     {
@@ -68,7 +68,7 @@
       "port": 8090,
       "required": false,
       "status": "up",
-      "latencyMs": 1,
+      "latencyMs": 0,
       "error": null,
       "envVar": "LLAMA_SERVER_URL"
     },
@@ -78,7 +78,7 @@
       "port": 11434,
       "required": false,
       "status": "up",
-      "latencyMs": 1,
+      "latencyMs": 0,
       "error": null,
       "envVar": "OLLAMA_HOST"
     },
@@ -88,7 +88,7 @@
       "port": 5672,
       "required": false,
       "status": "up",
-      "latencyMs": 1,
+      "latencyMs": 0,
       "error": null,
       "envVar": null
     },
@@ -98,7 +98,7 @@
       "port": 8333,
       "required": false,
       "status": "up",
-      "latencyMs": 1,
+      "latencyMs": 0,
       "error": null,
       "envVar": "SEAWEED_S3_PORT"
     },

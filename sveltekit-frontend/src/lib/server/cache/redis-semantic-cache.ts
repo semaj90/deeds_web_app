@@ -76,7 +76,6 @@ export async function ensureSemanticIndex(redis: Redis): Promise<void> {
 			'PREFIX', '1', KEY_PREFIX,
 			'SCHEMA',
 			'model',    'TAG',
-			'response', 'TEXT',      // stored but not FT-searched directly
 			'vec',      'VECTOR', 'FLAT', '6',
 			            'TYPE', 'FLOAT32',
 			            'DIM',  String(DIM),

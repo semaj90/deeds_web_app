@@ -1,0 +1,23 @@
+{
+  "source_ref": "scripts/tests/screenshots/2026-04-06T06-27-46/report.json",
+  "file_path": "scripts/tests/screenshots/2026-04-06T06-27-46/report.json",
+  "feature_id": "2026-04-06T06-27-46",
+  "line_count": 3864,
+  "is_route": false,
+  "is_svelte_comp": false,
+  "has_zod": false,
+  "drizzle_refs": [],
+  "imports": [],
+  "exports": [],
+  "som_cluster": "unassigned",
+  "centroid_id": "unassigned",
+  "qdrant_point_id": "",
+  "packet_count": 0,
+  "runtime_packet_count": 0,
+  "related_features": [],
+  "hypergraph_neighbors": [],
+  "similar_files": [],
+  "health_warnings": [
+    "high complexity (line count > 400)"
+  ]
+}

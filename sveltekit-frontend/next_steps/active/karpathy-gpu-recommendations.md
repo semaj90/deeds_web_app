@@ -1,6 +1,6 @@
 # Karpathy GPU Authority Blend
 
-Generated: 2026-06-03T20:10:02.398Z
+Generated: 2026-06-05T00:38:55.267Z
 
 - FP16 mode: auto (default)
 - FP32 compare: false
@@ -9,28 +9,28 @@ Generated: 2026-06-03T20:10:02.398Z
 
 | File | PR | Auth | Attn | CPU | GPU | Δ | Peak | Mean | Blend |
 |---|---|---|---|---|---|---|---|---|---|
-| src/lib/server/db/schema.ts | 7.624 | 12749.400 | 0.020 | 0.660 | 0.020 | -0.640 | 0.020 | 0.020 | 3827.876 |
-| src/lib/server/db/client.ts | 21.134 | 10702.526 | 0.020 | 0.505 | 0.020 | -0.485 | 0.020 | 0.020 | 3219.218 |
-| src/lib/server/ollama.ts | 7.452 | 5299.567 | 0.020 | 0.566 | 0.020 | -0.546 | 0.020 | 0.020 | 1592.857 |
-| src/lib/server/ai/hypergraph-store.ts | 1.279 | 4234.383 | 0.020 | 0.502 | 0.020 | -0.482 | 0.020 | 0.020 | 1270.833 |
-| src/lib/server/grpc/embedding-client.ts | 1.474 | 1087.117 | 0.020 | 0.618 | 0.020 | -0.598 | 0.020 | 0.020 | 326.731 |
-| src/lib/server/db/schema-canvas-autosaves.ts | 3.743 | 630.017 | 0.000 | 0.000 | 0.020 | 0.020 | 0.020 | 0.020 | 190.502 |
-| src/lib/server/research/web-research-ingester.ts | 0.988 | 555.500 | 0.020 | 0.591 | 0.020 | -0.571 | 0.020 | 0.020 | 167.051 |
-| src/lib/server/db/drizzle-cache.ts | 3.743 | 386.393 | 0.020 | 0.514 | 0.020 | -0.494 | 0.020 | 0.020 | 117.421 |
-| src/lib/server/db/schema-postgres.ts | 54.810 | 249.917 | 0.020 | 0.632 | 0.020 | -0.612 | 0.020 | 0.020 | 96.905 |
-| src/lib/server/vector/qdrant-manager.ts | 1.343 | 313.317 | 0.020 | 0.575 | 0.020 | -0.555 | 0.020 | 0.020 | 94.538 |
-| src/lib/server/analytics/search-analytics.ts | 0.760 | 147.393 | 0.020 | 0.486 | 0.020 | -0.467 | 0.020 | 0.020 | 44.528 |
-| src/lib/types/enhanced-svelte5-types.ts | 3.397 | 133.967 | 0.000 | 0.000 | 0.020 | 0.020 | 0.020 | 0.020 | 41.549 |
-| src/lib/server/redis.ts | 13.009 | 73.950 | 0.020 | 0.599 | 0.020 | -0.579 | 0.020 | 0.020 | 27.394 |
-| src/lib/server/cache.ts | 0.757 | 69.533 | 0.020 | 0.506 | 0.020 | -0.486 | 0.020 | 0.020 | 21.169 |
-| src/lib/config/env.server.ts | 4.362 | 61.000 | 0.020 | 0.505 | 0.020 | -0.485 | 0.020 | 0.020 | 20.051 |
-| src/lib/server/db/schema-chat.ts | 47.054 | 0.000 | 0.020 | 0.622 | 0.020 | -0.602 | 0.020 | 0.020 | 18.828 |
-| src/lib/server/env.server.ts | 41.220 | 0.000 | 0.020 | 0.641 | 0.020 | -0.621 | 0.020 | 0.020 | 16.494 |
-| src/lib/server/queue/rabbitmq-manager-fixed.ts | 0.818 | 21.333 | 0.020 | 0.600 | 0.020 | -0.580 | 0.020 | 0.020 | 6.733 |
-| src/lib/server/observability/langfuse.ts | 8.347 | 11.200 | 0.020 | 0.592 | 0.020 | -0.572 | 0.020 | 0.020 | 6.705 |
-| src/lib/server/cache/redis-exact-match.ts | 0.796 | 18.000 | 0.020 | 0.495 | 0.020 | -0.476 | 0.020 | 0.020 | 5.724 |
-| src/lib/server/db/schema/library-documents.ts | 3.753 | 9.000 | 0.020 | 0.642 | 0.020 | -0.622 | 0.020 | 0.020 | 4.207 |
-| src/lib/server/db/schema/legal-nodes.ts | 1.868 | 10.000 | 0.020 | 0.628 | 0.020 | -0.607 | 0.020 | 0.020 | 3.753 |
-| src/lib/server/minio-client.ts | 0.777 | 7.583 | 0.020 | 0.586 | 0.020 | -0.566 | 0.020 | 0.020 | 2.592 |
-| src/lib/server/cache-keys.ts | 0.876 | 6.667 | 0.020 | 0.471 | 0.020 | -0.451 | 0.020 | 0.020 | 2.356 |
-| src/lib/server/middleware/cache-headers.ts | 4.225 | 0.000 | 0.020 | 0.622 | 0.020 | -0.602 | 0.020 | 0.020 | 1.696 |
+| src/lib/server/db/client.ts | 7.062 | 10702.526 | 0.022 | 0.633 | 0.022 | -0.611 | 0.022 | 0.022 | 3213.589 |
+| src/lib/server/ollama.ts | 3.413 | 5299.567 | 0.022 | 0.572 | 0.022 | -0.549 | 0.022 | 0.022 | 1591.242 |
+| src/lib/server/grpc/embedding-client.ts | 1.851 | 1087.117 | 0.022 | 0.618 | 0.022 | -0.596 | 0.022 | 0.022 | 326.882 |
+| src/lib/server/vector/qdrant-manager.ts | 1.809 | 313.317 | 0.022 | 0.572 | 0.022 | -0.549 | 0.022 | 0.022 | 94.725 |
+| src/lib/server/db/schema-postgres.ts | 4.050 | 249.917 | 0.022 | 0.632 | 0.022 | -0.610 | 0.022 | 0.022 | 76.602 |
+| src/lib/server/redis.ts | 3.904 | 73.950 | 0.022 | 0.595 | 0.022 | -0.573 | 0.022 | 0.022 | 23.753 |
+| src/lib/server/lucia.ts | 1.778 | 75.833 | 0.000 | 0.000 | 0.022 | 0.022 | 0.022 | 0.022 | 23.461 |
+| src/lib/server/cache.ts | 1.899 | 69.533 | 0.022 | 0.637 | 0.022 | -0.615 | 0.022 | 0.022 | 21.626 |
+| src/lib/config/env.server.ts | 2.715 | 61.000 | 0.022 | 0.634 | 0.022 | -0.612 | 0.022 | 0.022 | 19.392 |
+| src/lib/server/observability/langfuse.ts | 2.453 | 11.200 | 0.022 | 0.590 | 0.022 | -0.568 | 0.022 | 0.022 | 4.348 |
+| src/lib/server/embeddings/ollama.ts | 1.675 | 11.167 | 0.022 | 0.582 | 0.022 | -0.560 | 0.022 | 0.022 | 4.027 |
+| src/lib/server/db/schema/legal-nodes.ts | 1.676 | 10.000 | 0.022 | 0.628 | 0.022 | -0.605 | 0.022 | 0.022 | 3.677 |
+| src/lib/server/db/schema/library-documents.ts | 1.796 | 9.000 | 0.022 | 0.642 | 0.022 | -0.620 | 0.022 | 0.022 | 3.425 |
+| src/lib/server/minio-client.ts | 1.834 | 7.583 | 0.022 | 0.584 | 0.022 | -0.562 | 0.022 | 0.022 | 3.015 |
+| src/lib/server/analysis/worker.ts | 1.903 | 5.000 | 0.022 | 0.623 | 0.022 | -0.601 | 0.022 | 0.022 | 2.268 |
+| src/lib/server/env.server.ts | 5.278 | 0.000 | 0.022 | 0.642 | 0.022 | -0.619 | 0.022 | 0.022 | 2.118 |
+| src/lib/server/db/schema-evidence-crud.ts | 1.760 | 2.000 | 0.022 | 0.614 | 0.022 | -0.592 | 0.022 | 0.022 | 1.311 |
+| src/lib/server/middleware/cache-headers.ts | 3.173 | 0.000 | 0.022 | 0.624 | 0.022 | -0.601 | 0.022 | 0.022 | 1.276 |
+| src/lib/cache/cache-service.svelte.ts | 1.641 | 2.000 | 0.022 | 0.621 | 0.022 | -0.598 | 0.022 | 0.022 | 1.263 |
+| src/lib/server/observability/inference-log.ts | 2.130 | 1.033 | 0.022 | 0.606 | 0.022 | -0.584 | 0.022 | 0.022 | 1.169 |
+| src/lib/server/minio.ts | 1.640 | 1.000 | 0.022 | 0.592 | 0.022 | -0.570 | 0.022 | 0.022 | 0.962 |
+| src/lib/server/gpu/simdjson-bridge.ts | 1.852 | 0.000 | 0.022 | 0.617 | 0.022 | -0.595 | 0.022 | 0.022 | 0.747 |
+| src/lib/server/neo4j-driver.ts | 1.837 | 0.000 | 0.022 | 0.636 | 0.022 | -0.614 | 0.022 | 0.022 | 0.741 |
+| src/lib/server/db/relations.ts | 1.835 | 0.000 | 0.022 | 0.647 | 0.022 | -0.624 | 0.022 | 0.022 | 0.741 |
+| src/lib/server/gpu/libtorch-bridge.ts | 1.787 | 0.000 | 0.022 | 0.591 | 0.022 | -0.569 | 0.022 | 0.022 | 0.722 |

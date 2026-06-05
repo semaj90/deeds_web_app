@@ -26,9 +26,23 @@
 import { createConnection } from 'node:net';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { existsSync } from 'node:fs';
+import dotenv from 'dotenv';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, '../..');
+
+// Load environment variables
+const envLocal = path.resolve(ROOT, '.env.local');
+const envRoot = path.resolve(ROOT, '.env');
+const parentEnvLocal = path.resolve(ROOT, '../.env.local');
+const parentEnv = path.resolve(ROOT, '../.env');
+
+if (existsSync(envLocal)) dotenv.config({ path: envLocal, override: true });
+else if (existsSync(parentEnvLocal)) dotenv.config({ path: parentEnvLocal, override: true });
+
+if (existsSync(envRoot)) dotenv.config({ path: envRoot });
+else if (existsSync(parentEnv)) dotenv.config({ path: parentEnv });
 
 const USE_GEMMA4 = process.argv.includes('--gemma4');
 const KEEP       = process.argv.includes('--keep') || process.argv.includes('--no-cleanup');
@@ -50,10 +64,12 @@ const pass = (label, detail = '') => { console.log(`  ${c.green('✓')} ${label}
 
 function redisCmd(args) {
   return new Promise((resolve) => {
-    const sock = createConnection({
-      host: process.env.REDIS_HOST || '127.0.0.1',
-      port: parseInt(process.env.REDIS_PORT || '6379', 10),
-    });
+    let host = process.env.REDIS_HOST || '127.0.0.1';
+    if (host === 'localhost') host = '127.0.0.1';
+    const port = parseInt(process.env.REDIS_PORT || '6379', 10);
+    const password = process.env.REDIS_PASSWORD || null;
+
+    const sock = createConnection({ host, port });
     let buf = Buffer.alloc(0);
     sock.setTimeout(5000);
     sock.on('timeout', () => { sock.destroy(); resolve(null); });
@@ -62,21 +78,45 @@ function redisCmd(args) {
     sock.on('end', () => {
       const s = buf.toString('utf8');
       const lines = s.split('\r\n');
-      const first = lines[0] ?? '';
+      
+      let actualResponseLines = lines;
+      if (password) {
+        // The first line should be +OK from the AUTH command.
+        if (lines[0]?.startsWith('-')) {
+          return resolve({ error: 'Auth failed: ' + lines[0].slice(1) });
+        }
+        actualResponseLines = lines.slice(1);
+      }
+
+      const first = actualResponseLines[0] ?? '';
       if (first.startsWith('+')) return resolve(first.slice(1));
       if (first.startsWith(':')) return resolve(parseInt(first.slice(1), 10));
       if (first.startsWith('-')) return resolve({ error: first.slice(1) });
+      if (first.startsWith('*')) {
+        return resolve(parseInt(first.slice(1), 10));
+      }
       if (first.startsWith('$')) {
         const len = parseInt(first.slice(1), 10);
-        return resolve(len === -1 ? null : lines[1] ?? null);
+        return resolve(len === -1 ? null : actualResponseLines[1] ?? null);
       }
-      resolve(s.trim() || null);
+      resolve(actualResponseLines.join('\r\n').trim() || null);
     });
-    const cmd = `*${args.length}\r\n` + args.map(a => {
+
+    let fullCmd = '';
+    if (password) {
+      const authArgs = ['AUTH', password];
+      fullCmd += `*${authArgs.length}\r\n` + authArgs.map(a => {
+        const v = String(a);
+        return `$${Buffer.byteLength(v)}\r\n${v}\r\n`;
+      }).join('');
+    }
+
+    fullCmd += `*${args.length}\r\n` + args.map(a => {
       const v = String(a);
       return `$${Buffer.byteLength(v)}\r\n${v}\r\n`;
     }).join('');
-    sock.write(cmd);
+
+    sock.write(fullCmd);
     sock.end();
   });
 }

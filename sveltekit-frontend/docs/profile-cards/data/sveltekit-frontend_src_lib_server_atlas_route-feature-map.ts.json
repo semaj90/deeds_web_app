@@ -1,0 +1,53 @@
+{
+  "source_ref": "sveltekit-frontend/src/lib/server/atlas/route-feature-map.ts",
+  "file_path": "sveltekit-frontend/src/lib/server/atlas/route-feature-map.ts",
+  "feature_id": "atlas",
+  "component_type": "TypeScript module",
+  "line_count": 7185,
+  "is_route": false,
+  "is_svelte_comp": false,
+  "has_auth": false,
+  "has_zod": false,
+  "drizzle_refs": [],
+  "imports": [],
+  "exports": [
+    "RouteFeatureMapEntry",
+    "ROUTE_FEATURE_MAP",
+    "getRouteFeatureMap",
+    "getRouteClusterPriors"
+  ],
+  "route_handlers": [],
+  "tags": [
+    "runtime:server"
+  ],
+  "som_cluster": "unassigned",
+  "centroid_id": "ae_0",
+  "qdrant_point_id": "29525070",
+  "semantic_confidence": null,
+  "behavior_score": null,
+  "routing_score": null,
+  "runtime_state": {},
+  "feature_avg_confidence": null,
+  "feature_dominant_status": null,
+  "feature_primary_cluster": null,
+  "packet_count": 0,
+  "runtime_packet_count": 0,
+  "parent_modules": [
+    "sveltekit-frontend/src/lib/server/retrieval/subgraph-seed-neighborhood.ts"
+  ],
+  "nested_routes": [],
+  "related_features": [],
+  "hypergraph_neighbors": [
+    "SIMILAR_TOPOLOGY → sveltekit-frontend/src/lib/server/atlas/types.ts",
+    "SIMILAR_TOPOLOGY → sveltekit-frontend/src/lib/server/audit/api-audit-buffer.ts",
+    "SIMILAR_TOPOLOGY → sveltekit-frontend/src/lib/server/atlas/prompt-mapper.ts",
+    "SIMILAR_TOPOLOGY → sveltekit-frontend/src/lib/server/atlas/rg-search-matrix.ts",
+    "IMPORTS → sveltekit-frontend/src/lib/server/retrieval/subgraph-seed-neighborhood.ts",
+    "BELONGS_TO_FEATURE → null"
+  ],
+  "similar_files": [],
+  "health_status": "warning",
+  "warnings": [
+    "high complexity (line count > 400)"
+  ]
+}

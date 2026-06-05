@@ -5,6 +5,26 @@
 import fs from 'fs';
 import readline from 'readline';
 import { createRequire } from 'module';
+import path from 'path';
+import { fileURLToPath } from 'url';
+import dotenv from 'dotenv';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const ROOT = path.resolve(__dirname, '../..');
+
+// Load environment variables
+const envLocal = path.resolve(ROOT, '.env.local');
+const envRoot = path.resolve(ROOT, '.env');
+const parentEnvLocal = path.resolve(ROOT, '../.env.local');
+const parentEnv = path.resolve(ROOT, '../.env');
+
+if (fs.existsSync(envLocal)) dotenv.config({ path: envLocal, override: true });
+else if (fs.existsSync(parentEnvLocal)) dotenv.config({ path: parentEnvLocal, override: true });
+
+if (fs.existsSync(envRoot)) dotenv.config({ path: envRoot });
+else if (fs.existsSync(parentEnv)) dotenv.config({ path: parentEnv });
+
 const require = createRequire(import.meta.url);
 let Redis;
 try { Redis = require('ioredis'); } catch (e) { Redis = null; }
@@ -41,7 +61,15 @@ async function main() {
   let redisClient = null;
   if (redisUrl) {
     if (!Redis) console.warn('ioredis not available; skipping Redis checkpointing.');
-    else { redisClient = new Redis(redisUrl); redisClient.on('error', e => console.warn('Redis error', e.message)); }
+    else {
+      const options = {};
+      const pw = process.env.REDIS_PASSWORD || process.env.REDIS_PASS;
+      if (pw) {
+        options.password = pw;
+      }
+      redisClient = new Redis(redisUrl, options);
+      redisClient.on('error', e => console.warn('Redis error', e.message));
+    }
   }
 
   const rl = readline.createInterface({ input: fs.createReadStream(cfg.input), crlfDelay: Infinity });

@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-05-30T21:55:27.898Z",
+  "generatedAt": "2026-06-04T14:03:42.452Z",
   "embeddingDim": 768,
   "allowedDims": [
     768,
@@ -62,8 +62,8 @@
         "agent_memory_observations.agent_memory_observations_embedding_hnsw",
         "cluster_summaries.cluster_summaries_embedding_hnsw",
         "code_retrieval_chunks.crc_embedding_hnsw",
-        "codebase_chunk_index.codebase_chunk_index_content_hnsw",
         "codebase_chunk_index.codebase_chunk_index_summary_hnsw",
+        "codebase_chunk_index.codebase_chunk_index_content_hnsw",
         "codebase_embeddings.idx_codebase_embeddings_hnsw",
         "document_embeddings.document_embeddings_hnsw_idx",
         "embedded_summaries.idx_embedded_summaries_vector_hnsw",
@@ -72,6 +72,8 @@
         "feature_registry_vectors.feature_registry_vectors_embedding_hnsw",
         "fixer_patterns.fp_embedding_hnsw_idx",
         "legal_documents.legal_documents_hnsw_idx",
+        "parent_atlas_rg_vectors.idx_parent_atlas_rg_vectors_embedding_768",
+        "parent_atlas_vectors.idx_parent_atlas_vectors_embedding_768",
         "rag_query_log.rag_query_log_embedding_hnsw",
         "research_summaries.rs_embedding_hnsw",
         "screenshot_artifacts.screenshot_artifacts_caption_embedding_hnsw_idx",
@@ -81,7 +83,7 @@
         "warden_chunks.warden_chunks_hnsw_idx"
       ],
       "missingHnswOnExistingTables": [],
-      "message": "pgvector 0.8.2 installed. 20 HNSW index(es) found.",
+      "message": "pgvector 0.8.2 installed. 22 HNSW index(es) found.",
       "suggestedFix": null
     }
   ],

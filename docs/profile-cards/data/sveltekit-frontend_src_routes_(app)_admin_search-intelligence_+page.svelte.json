@@ -1,0 +1,30 @@
+{
+  "source_ref": "sveltekit-frontend/src/routes/(app)/admin/search-intelligence/+page.svelte",
+  "file_path": "sveltekit-frontend/src/routes/(app)/admin/search-intelligence/+page.svelte",
+  "feature_id": "search-intelligence",
+  "line_count": 4561,
+  "is_route": true,
+  "is_svelte_comp": true,
+  "has_zod": true,
+  "drizzle_refs": [],
+  "imports": [
+    "$lib/components/ui/Icon.svelte",
+    "$lib/components/ui/FeedbackButtons.svelte",
+    "$lib/components/analytics/ResearchSummariesBrowser.svelte",
+    "$lib/components/analytics/LiveResearchPanel.svelte",
+    "$lib/components/graph/GlyphAtlasViewer.svelte",
+    "$lib/stores/contextual-chat.svelte.js"
+  ],
+  "exports": [],
+  "som_cluster": "unassigned",
+  "centroid_id": "unassigned",
+  "qdrant_point_id": "",
+  "packet_count": 0,
+  "runtime_packet_count": 0,
+  "related_features": [],
+  "hypergraph_neighbors": [],
+  "similar_files": [],
+  "health_warnings": [
+    "high complexity (line count > 400)"
+  ]
+}

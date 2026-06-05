@@ -414,3 +414,10 @@ Make :8081/health consistently pass
 Run head-to-head retrieval evaluation
 Decide whether Ollama embeddings can be retired
 Only after that would I look at TRT-LLM/Triton migration, because you need a stable retrieval baseline first.
+
+---
+### Temporal Event Note [2026-06-04T08:02:00Z]
+Fixed `atlas-live-reconciliation-audit.mjs` ioredis client scope contamination: 
+- Banned reusing a closed or disconnected ioredis client. 
+- Refactored `auditAcePackets` to instantiate a fresh client via `createRedisClient()` and cleanly teardown in `try...finally` with `safeRedisDisconnect()`.
+- Re-ran the Production Wiring/Reconciliation Audit resulting in 38 PASS / 1 WARN.

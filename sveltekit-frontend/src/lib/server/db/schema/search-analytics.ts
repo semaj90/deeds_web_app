@@ -235,7 +235,7 @@ export const codebaseChunkIndex = pgTable(
     neoMeta: jsonb('neo4j_meta')
       .notNull()
       .default(sql`'{}'::jsonb`),
-    compressedEmbedding: vector('compressed_embedding', { dimensions: 128 }),
+    // compressedEmbedding: vector('compressed_embedding', { dimensions: 128 }),
     reconstructionError: real('reconstruction_error'),
     centroidId: integer('centroid_id'),
     embeddingModel: varchar('embedding_model', { length: 100 }),

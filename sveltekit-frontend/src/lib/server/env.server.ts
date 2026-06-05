@@ -11,6 +11,23 @@ const publicEnv: Record<string, string | undefined> = process.env;
 // Development fallback defaults (loopback)
 const LOCALHOST = ['local', 'host'].join('');
 const LOOPBACK_IP = ['127', '0', '0', '1'].join('.');
+
+function normalizeRedisUrl(rawValue?: string): string {
+  const fallbackHost = LOOPBACK_IP;
+  const fallbackPort = '6379';
+  const raw = rawValue?.trim();
+  if (!raw) return `redis://${fallbackHost}:${fallbackPort}`;
+  if (/^rediss?:\/\//i.test(raw)) return raw;
+  if (/^[^:/?#]+:\d+(?:\/\d+)?$/.test(raw)) {
+    const [hostPort, dbPart] = raw.split('/', 2);
+    const [host, port] = hostPort.split(':', 2);
+    return `redis://${host || fallbackHost}:${port || fallbackPort}${dbPart ? `/${dbPart}` : ''}`;
+  }
+  if (/^[^:/?#]+$/.test(raw)) {
+    return `redis://${raw}:${fallbackPort}`;
+  }
+  return `redis://${fallbackHost}:${fallbackPort}`;
+}
 const DEV = {
   // Port 5434 = deeds-postgres-prod-proxy (alpine/socat) → legal-ai-postgres container.
   // Port 5432 on the host is squatted by a native Windows Postgres install on this machine,
@@ -54,7 +71,7 @@ function qdrantUrlFromParts(): string | undefined {
 
 export const ENV = {
   DATABASE_URL: privateEnv.DATABASE_URL ?? privateEnv.POSTGRES_URL ?? DEV.DATABASE_URL,
-  REDIS_URL: privateEnv.REDIS_URL ?? DEV.REDIS_URL,
+  REDIS_URL: normalizeRedisUrl(privateEnv.REDIS_URL ?? DEV.REDIS_URL),
   REDIS_PASSWORD: privateEnv.REDIS_PASSWORD ?? privateEnv.REDIS_PASS ?? '',
   QDRANT_URL: privateEnv.QDRANT_URL ?? qdrantUrlFromParts() ?? DEV.QDRANT_URL,
   QDRANT_API_KEY: privateEnv.QDRANT_API_KEY ?? '',

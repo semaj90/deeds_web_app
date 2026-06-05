@@ -211,6 +211,13 @@
       "when": 1780179458854,
       "tag": "0029_align_userid",
       "breakpoints": true
+    },
+    {
+      "idx": 30,
+      "version": "7",
+      "when": 1780581824838,
+      "tag": "0030_atlas_synthesis_tables",
+      "breakpoints": true
     }
   ]
 }

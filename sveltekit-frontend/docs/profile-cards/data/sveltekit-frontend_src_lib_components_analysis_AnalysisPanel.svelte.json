@@ -1,0 +1,54 @@
+{
+  "source_ref": "sveltekit-frontend/src/lib/components/analysis/AnalysisPanel.svelte",
+  "file_path": "sveltekit-frontend/src/lib/components/analysis/AnalysisPanel.svelte",
+  "feature_id": "analysis",
+  "component_type": "Svelte component",
+  "line_count": 2405,
+  "is_route": false,
+  "is_svelte_comp": true,
+  "has_auth": false,
+  "has_zod": true,
+  "drizzle_refs": [],
+  "imports": [
+    "svelte",
+    "svelte/transition",
+    "$app/navigation",
+    "$lib/components/ui/Icon.svelte",
+    "$lib/stores/analysis-panel.svelte.js",
+    "$lib/stores/analysis-panel.svelte.js"
+  ],
+  "exports": [],
+  "route_handlers": [],
+  "tags": [
+    "component:svelte",
+    "has_zod",
+    "runtime:client"
+  ],
+  "som_cluster": "unassigned",
+  "centroid_id": "ae_0",
+  "qdrant_point_id": "16426368",
+  "semantic_confidence": null,
+  "behavior_score": null,
+  "routing_score": null,
+  "runtime_state": {},
+  "feature_avg_confidence": null,
+  "feature_dominant_status": null,
+  "feature_primary_cluster": null,
+  "packet_count": 0,
+  "runtime_packet_count": 0,
+  "parent_modules": [],
+  "nested_routes": [],
+  "related_features": [],
+  "hypergraph_neighbors": [
+    "SIMILAR_TOPOLOGY → sveltekit-frontend/src/lib/components/ai/index.ts",
+    "SIMILAR_TOPOLOGY → sveltekit-frontend/src/lib/components/analysis/AnalysisToast.svelte",
+    "SIMILAR_TOPOLOGY → sveltekit-frontend/src/lib/components/ai/YorhaAIAssistant.svelte",
+    "SIMILAR_TOPOLOGY → sveltekit-frontend/src/lib/components/analysis/KeyboardShortcutsHelp.svelte",
+    "BELONGS_TO_FEATURE → null"
+  ],
+  "similar_files": [],
+  "health_status": "warning",
+  "warnings": [
+    "high complexity (line count > 400)"
+  ]
+}

@@ -51,4 +51,13 @@ Active query benchmark profiles comparing canonical `768d` against compressed `6
   ```
 
 ---
+
+## 5. Parent Atlas Lineage & Synthesis Rules
+
+- **Task Joining Mechanics:** `task_semantic_packets` currently joins safely by `feature_id`.
+- **Mixed Source References:** `source_ref` values are mixed and can represent actual file references (e.g. `src/lib/...`), task references (e.g. `task:123`), and feature aggregation references (e.g. `feature:auth`, `feature:ui`).
+- **Feature Aggregation:** `atlas_feature_synthesis` is a feature-level aggregation table.
+- **Lineage Boundaries:** `atlas_source_ref_synthesis` must not trust `feature:*` source references as physical file system paths.
+
+---
 *Verified under Deeds Legal-AI Platform Guidelines.*

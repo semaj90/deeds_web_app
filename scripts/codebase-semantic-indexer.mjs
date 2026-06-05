@@ -443,7 +443,25 @@ async function main() {
   }
   
   if (WRITE) {
-    const redis = new Redis(REDIS_URL);
+    const redisPw = process.env.REDIS_PASSWORD || process.env.REDIS_PASS || undefined;
+    const u = new URL(REDIS_URL);
+    const redis = new Redis({
+      host: u.hostname || '127.0.0.1',
+      port: Number(u.port) || 6379,
+      password: redisPw,
+      lazyConnect: true,
+      connectTimeout: 3000,
+      maxRetriesPerRequest: 1,
+      enableOfflineQueue: false,
+      retryStrategy: () => null,
+    });
+    redis.on('error', () => {});
+    try {
+      await redis.connect();
+      await redis.ping();
+    } catch (err) {
+      console.warn(`  [warning] Redis connection failed: ${err.message}`);
+    }
     console.log(`\nConnecting to Redis for cache hot-warmup: ${REDIS_URL}`);
     
     try {

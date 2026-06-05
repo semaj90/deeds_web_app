@@ -1,0 +1,101 @@
+{
+  "source_ref": "sveltekit-frontend/src/routes/api/evidence/upload/+server.ts",
+  "file_path": "sveltekit-frontend/src/routes/api/evidence/upload/+server.ts",
+  "feature_id": "upload",
+  "component_type": "SvelteKit route",
+  "line_count": 2482,
+  "is_route": true,
+  "is_svelte_comp": false,
+  "has_auth": true,
+  "has_zod": true,
+  "drizzle_refs": [
+    "drizzle"
+  ],
+  "imports": [
+    "@sveltejs/kit",
+    "./$types",
+    "crypto",
+    "$lib/server/seaweed-client.js",
+    "$lib/server/db/client",
+    "drizzle-orm",
+    "$lib/server/db/schema-postgres.js",
+    "$lib/server/evidence-progress",
+    "$lib/server/vector/qdrant-manager.js",
+    "$lib/server/ocr/hybrid.js",
+    "$lib/server/grpc/embedding-client.js",
+    "$lib/server/batch-embedder.js",
+    "$lib/server/indexer/legal-chunker.js",
+    "$lib/server/vector-cache.js",
+    "$lib/server/analysis/entity-extraction.js",
+    "$lib/server/analysis/forensics.js",
+    "$lib/server/analysis/summarizer.js",
+    "$lib/server/analysis/analysis-jobs.js",
+    "$lib/server/analysis/concurrency-gate.js",
+    "$lib/server/middleware/rate-limiter.js",
+    "$lib/server/evidence/type-detector.js",
+    "$lib/server/cache/invalidation.js",
+    "$lib/server/observability/langfuse.js",
+    "$lib/server/gpu/background-analyzer.js",
+    "$lib/server/services/langextract-service.js",
+    "$lib/server/evidence/proto-serializer.js",
+    "$lib/server/evidence/batch-entity-storer.js",
+    "$lib/server/evidence/batch-entity-embedder.js",
+    "$lib/server/evidence/docling-structure.js",
+    "$lib/server/workflows/pdf-ocr-workflow.js"
+  ],
+  "exports": [
+    "POST"
+  ],
+  "route_handlers": [
+    "POST"
+  ],
+  "tags": [
+    "api:write",
+    "auth:required",
+    "crud:evidence",
+    "has_auth",
+    "has_drizzle",
+    "has_qdrant",
+    "has_server_action",
+    "has_upload",
+    "has_zod",
+    "route:api",
+    "runtime:server"
+  ],
+  "som_cluster": "gpu:10",
+  "centroid_id": "unassigned",
+  "qdrant_point_id": "",
+  "semantic_confidence": null,
+  "behavior_score": null,
+  "routing_score": null,
+  "runtime_state": {},
+  "feature_avg_confidence": null,
+  "feature_dominant_status": null,
+  "feature_primary_cluster": null,
+  "packet_count": 0,
+  "runtime_packet_count": 0,
+  "parent_modules": [],
+  "nested_routes": [
+    "sveltekit-frontend/src/routes/api/v1/evidence/advanced-analysis/+server.ts",
+    "sveltekit-frontend/src/routes/api/investigate/suggest/+server.ts",
+    "sveltekit-frontend/src/routes/api/evidence/video/ingest/+server.ts",
+    "sveltekit-frontend/src/routes/api/evidence/upload-test/+server.ts",
+    "sveltekit-frontend/src/routes/api/feedback/+server.ts",
+    "sveltekit-frontend/src/routes/api/evidence/tags/[id]/+server.ts"
+  ],
+  "related_features": [],
+  "hypergraph_neighbors": [
+    "SIMILAR_TOPOLOGY → sveltekit-frontend/src/routes/api/v1/evidence/advanced-analysis/+server.ts",
+    "SIMILAR_TOPOLOGY → sveltekit-frontend/src/routes/api/investigate/suggest/+server.ts",
+    "SIMILAR_TOPOLOGY → sveltekit-frontend/src/routes/api/evidence/video/ingest/+server.ts",
+    "SIMILAR_TOPOLOGY → sveltekit-frontend/src/routes/api/evidence/upload-test/+server.ts",
+    "SIMILAR_TOPOLOGY → sveltekit-frontend/src/routes/api/feedback/+server.ts",
+    "SIMILAR_TOPOLOGY → sveltekit-frontend/src/routes/api/evidence/tags/[id]/+server.ts",
+    "BELONGS_TO_FEATURE → null"
+  ],
+  "similar_files": [],
+  "health_status": "warning",
+  "warnings": [
+    "high complexity (line count > 400)"
+  ]
+}

@@ -32,7 +32,9 @@ const BATCH     = 250;
 function loadEnv() {
   const env = { ...process.env };
   for (const p of [
+    path.join(ROOT, 'sveltekit-frontend', '.env.local'),
     path.join(ROOT, 'sveltekit-frontend', '.env'),
+    path.join(ROOT, '.env.local'),
     path.join(ROOT, '.env'),
   ]) {
     if (!fs.existsSync(p)) continue;
@@ -43,6 +45,15 @@ function loadEnv() {
     break;
   }
   return env;
+}
+
+function normalizeSourceRef(value) {
+  return String(value ?? '')
+    .replace(/\\/g, '/')
+    .replace(/^\/+/, '')
+    .replace(/^(\.\.\/)+/, '')
+    .replace(/^\.\/+/, '')
+    .replace(/^sveltekit-frontend\//, '');
 }
 
 const env = loadEnv();
@@ -91,7 +102,7 @@ while (guard < 600) {
         filePath.startsWith('granite-docling') || filePath.startsWith('turbovec') ||
         filePath.startsWith('models/')) continue;
 
-    const normalized = filePath.replace(/\\/g, '/').replace(/^\/+/, '');
+    const normalized = normalizeSourceRef(filePath);
 
     if (!fileMap.has(normalized)) {
       fileMap.set(normalized, {
@@ -111,10 +122,15 @@ while (guard < 600) {
     // Take first point's qdrant_point_id
     if (!entry.qdrantPointId) entry.qdrantPointId = String(point.id);
 
-    // SOM / cluster fields — prefer already-set over null
-    if (!entry.somCluster && p.som_cluster)  entry.somCluster  = String(p.som_cluster);
-    if (!entry.centroidId && p.centroid_id)  entry.centroidId  = String(p.centroid_id);
-    if (!entry.gpuCluster && p.gpuCluster != null) entry.gpuCluster = String(p.gpuCluster);
+    // SOM / cluster fields — prefer canonical fields, but accept legacy gpuCluster
+    // payloads from older graphify-semantic-cluster runs.
+    const gpuCluster = p.gpuCluster ?? p.gpu_cluster ?? null;
+    const somCluster = p.som_cluster ?? gpuCluster;
+    const centroidId = p.centroid_id ?? gpuCluster;
+
+    if (!entry.somCluster && somCluster != null)  entry.somCluster  = String(somCluster);
+    if (!entry.centroidId && centroidId != null)  entry.centroidId  = String(centroidId);
+    if (!entry.gpuCluster && gpuCluster != null) entry.gpuCluster = String(gpuCluster);
 
     // Collect feature_ids (from backfill or singular feature_id)
     if (Array.isArray(p.feature_ids) && p.feature_ids.length) {

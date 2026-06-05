@@ -1,0 +1,75 @@
+{
+  "source_ref": "sveltekit-frontend/src/mcp/server.ts",
+  "file_path": "sveltekit-frontend/src/mcp/server.ts",
+  "feature_id": "mcp",
+  "component_type": "TypeScript module",
+  "line_count": 4915,
+  "is_route": false,
+  "is_svelte_comp": false,
+  "has_auth": true,
+  "has_zod": true,
+  "drizzle_refs": [
+    "drizzle",
+    "pgTable"
+  ],
+  "imports": [
+    "@modelcontextprotocol/sdk/server/index.js",
+    "@modelcontextprotocol/sdk/server/stdio.js",
+    "@modelcontextprotocol/sdk/types.js",
+    "node:crypto",
+    "node:path",
+    "../mcp/index.js",
+    "$lib/server/env.server.js",
+    "$lib/server/kb/search-logic.js",
+    "$lib/server/rg-atlas/run.js",
+    "$lib/server/rg-atlas/types.js",
+    "./tools/repair_tools.js",
+    "$lib/server/kb/wiki-logic.js",
+    "$lib/server/inference/vlm-lifecycle.js",
+    "$lib/server/graph/community-graph.js"
+  ],
+  "exports": [
+    "server",
+    "setupToolHandlers"
+  ],
+  "route_handlers": [],
+  "tags": [
+    "has_auth",
+    "has_drizzle",
+    "has_zod",
+    "api:search"
+  ],
+  "som_cluster": "gpu:10",
+  "centroid_id": "unassigned",
+  "qdrant_point_id": "",
+  "semantic_confidence": null,
+  "behavior_score": null,
+  "routing_score": null,
+  "runtime_state": {},
+  "feature_avg_confidence": null,
+  "feature_dominant_status": null,
+  "feature_primary_cluster": null,
+  "packet_count": 0,
+  "runtime_packet_count": 0,
+  "parent_modules": [],
+  "nested_routes": [
+    "sveltekit-frontend/src/routes/(analysis)/+layout.svelte"
+  ],
+  "related_features": [],
+  "hypergraph_neighbors": [
+    "SIMILAR_TOPOLOGY → sveltekit-frontend/src/mcp/rg_atlas_tools.ts",
+    "SIMILAR_TOPOLOGY → sveltekit-frontend/src/mcp/server-fastmcp.ts",
+    "SIMILAR_TOPOLOGY → sveltekit-frontend/src/mcp/skill_tools.ts",
+    "SIMILAR_TOPOLOGY → sveltekit-frontend/src/mcp/topology_mgmt_tools.ts",
+    "SIMILAR_TOPOLOGY → sveltekit-frontend/src/lib/server/ai/gemma4-agent.ts",
+    "SIMILAR_TOPOLOGY → sveltekit-frontend/src/lib/server/retrieval/hyperrag-fusion-service.ts",
+    "SIMILAR_TOPOLOGY → sveltekit-frontend/src/mcp/trace-mcp-server.ts",
+    "SIMILAR_TOPOLOGY → sveltekit-frontend/src/routes/(analysis)/+layout.svelte",
+    "BELONGS_TO_FEATURE → null"
+  ],
+  "similar_files": [],
+  "health_status": "warning",
+  "warnings": [
+    "high complexity (line count > 400)"
+  ]
+}

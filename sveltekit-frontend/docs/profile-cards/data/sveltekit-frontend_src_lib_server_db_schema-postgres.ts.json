@@ -1,0 +1,74 @@
+{
+  "source_ref": "sveltekit-frontend/src/lib/server/db/schema-postgres.ts",
+  "file_path": "sveltekit-frontend/src/lib/server/db/schema-postgres.ts",
+  "feature_id": "db",
+  "component_type": "TypeScript module",
+  "line_count": 4654,
+  "is_route": false,
+  "is_svelte_comp": false,
+  "has_auth": false,
+  "has_zod": false,
+  "drizzle_refs": [
+    "drizzle",
+    "pgTable"
+  ],
+  "imports": [
+    "drizzle-orm",
+    "drizzle-orm/pg-core",
+    "drizzle-orm/relations"
+  ],
+  "exports": [
+    "userRoleEnum",
+    "caseStatusEnum",
+    "casePriorityEnum",
+    "evidenceTypeEnum",
+    "relationTypeEnum",
+    "threatLevelEnum",
+    "patchStatusEnum",
+    "documentStatusEnum",
+    "documentTypeEnum",
+    "summaryTypeEnum",
+    "activityStatusEnum",
+    "verificationStatusEnum",
+    "reportStatusEnum",
+    "caseRiskLevelEnum",
+    "users",
+    "sessions",
+    "emailVerificationCodes",
+    "passwordResetTokens",
+    "cases",
+    "criminals"
+  ],
+  "route_handlers": [],
+  "tags": [
+    "has_drizzle",
+    "runtime:server"
+  ],
+  "som_cluster": "unassigned",
+  "centroid_id": "ae_0",
+  "qdrant_point_id": "14443849",
+  "semantic_confidence": null,
+  "behavior_score": null,
+  "routing_score": null,
+  "runtime_state": {},
+  "feature_avg_confidence": null,
+  "feature_dominant_status": null,
+  "feature_primary_cluster": null,
+  "packet_count": 0,
+  "runtime_packet_count": 0,
+  "parent_modules": [],
+  "nested_routes": [],
+  "related_features": [],
+  "hypergraph_neighbors": [
+    "SIMILAR_TOPOLOGY → sveltekit-frontend/src/lib/server/db/schema-ingestion.ts",
+    "SIMILAR_TOPOLOGY → sveltekit-frontend/src/lib/server/db/schema-scenarios.ts",
+    "SIMILAR_TOPOLOGY → sveltekit-frontend/src/lib/server/db/schema-phase89-preserved.ts",
+    "SIMILAR_TOPOLOGY → sveltekit-frontend/src/lib/server/db/schema-search.ts",
+    "BELONGS_TO_FEATURE → null"
+  ],
+  "similar_files": [],
+  "health_status": "warning",
+  "warnings": [
+    "high complexity (line count > 400)"
+  ]
+}

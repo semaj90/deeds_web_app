@@ -62,7 +62,7 @@ const SCAN_ROOTS = [
   join(REPO_ROOT, '.opencode'),
 ].filter(existsSync);
 
-const SKIP_DIRS = new Set(['node_modules', '.git', '.svelte-kit', 'build', 'dist', '.tmp', 'deeds_labs', 'tmp']);
+const SKIP_DIRS = new Set(['node_modules', '.git', '.svelte-kit', 'build', 'dist', '.tmp', 'deeds_labs', 'tmp', '.venv', '.venv-py313-backup', '.python311', '.cache', '.vs']);
 
 console.log(`\n🔎 sourceRef Candidate Generator`);
 console.log(`════════════════════════════════════════`);

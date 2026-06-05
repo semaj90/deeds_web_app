@@ -1,16 +1,16 @@
 {
-  "generatedAt": "2026-06-02T02:26:42.890Z",
+  "generatedAt": "2026-06-04T20:47:48.315Z",
   "mode": "apply",
-  "limit": 5,
+  "limit": 10,
   "source": {
     "packets": "nes_chrom_packets",
     "hits": "nes_chrom_kag_dag_hits"
   },
   "summary": {
-    "packets": 5,
-    "hits": 10,
-    "sourceRefs": 5,
-    "featureIds": 4,
+    "packets": 10,
+    "hits": 15,
+    "sourceRefs": 10,
+    "featureIds": 8,
     "queryHashes": 2,
     "applied": true,
     "errors": 0

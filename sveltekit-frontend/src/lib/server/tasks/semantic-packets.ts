@@ -920,7 +920,7 @@ export async function hydrateAgentPickupTask(queueId: string): Promise<TaskSeman
   const queue = await db
     .select()
     .from(agentPickupQueue)
-    .where(eq(agentPickupQueue.id, queueId))
+    .where(eq(agentPickupQueue.id, Number(queueId)))
     .limit(1)
     .then((rows) => rows[0] ?? null);
   if (!queue?.packet_id) return null;
@@ -945,7 +945,7 @@ export async function hydrateAgentPickupTask(queueId: string): Promise<TaskSeman
     : [];
 
   return {
-    queueId: queue.id,
+    queueId: String(queue.id),
     taskId: Number(queue.task_id),
     packetId: String(packet.id),
     qdrantPointId: normalizeText(packet.qdrant_point_id),
@@ -969,7 +969,7 @@ export async function markAgentPickupTaskComplete(queueId: string, packetId: str
   await db
     .update(agentPickupQueue)
     .set({ status: 'completed', completed_at: new Date(), updated_at: new Date() })
-    .where(eq(agentPickupQueue.id, queueId))
+    .where(eq(agentPickupQueue.id, Number(queueId)))
     .execute();
 
   await updatePacketRow(packetId, { status: 'done', agent_pickup_ready: false });
@@ -985,7 +985,7 @@ export async function markAgentPickupTaskFailed(queueId: string, packetId: strin
       available_at: sql`now() + interval '30 seconds'`,
       updated_at: new Date(),
     })
-    .where(eq(agentPickupQueue.id, queueId))
+    .where(eq(agentPickupQueue.id, Number(queueId)))
     .returning({ status: agentPickupQueue.status })
     .then((rows) => rows[0] ?? null);
 

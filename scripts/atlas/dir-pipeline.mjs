@@ -154,6 +154,7 @@ const SRC_ROOTS = [
 const SKIP_DIRS = new Set([
   'node_modules', '.git', '.svelte-kit', 'build', 'dist',
   '__pycache__', '.opencode', '.tmp', 'logs', 'out',
+  '.venv', '.venv-py313-backup', '.python311', '.cache', '.vs', 'deeds_labs', 'static'
 ]);
 const CODE_EXTS = new Set(['.ts', '.tsx', '.svelte', '.mjs', '.mts', '.js', '.py']);
 

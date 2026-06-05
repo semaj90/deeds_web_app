@@ -1,0 +1,31 @@
+{
+  "timestamp": "2026-06-05T00:06:50.837Z",
+  "limit": 50,
+  "raw_inventory": {
+    "total": 14465,
+    "has_som": 10487,
+    "has_qdrant": 10997,
+    "qdrant_no_som": 1492
+  },
+  "active_production": {
+    "total": 4808,
+    "has_som": 4808,
+    "has_qdrant": 4808,
+    "qdrant_no_som": 0,
+    "som_pct": "100.0"
+  },
+  "coverage": {
+    "raw_total": 14465,
+    "raw_has_som": 10487,
+    "raw_has_qdrant": 10997,
+    "raw_qdrant_no_som": 1492,
+    "production_total": 4808,
+    "production_has_som": 4808,
+    "production_has_qdrant": 4808,
+    "production_qdrant_no_som": 0,
+    "production_som_pct": "100.0"
+  },
+  "sample_buckets": [],
+  "sample_rows": [],
+  "next_decision": "no_active_qdrant_without_som_gap"
+}

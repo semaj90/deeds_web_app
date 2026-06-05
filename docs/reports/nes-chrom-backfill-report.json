@@ -1,16 +1,16 @@
 {
   "schema": "nes_glyph_backfill_report.v1",
-  "generatedAt": "2026-06-01T20:19:14.507Z",
-  "mode": "apply",
+  "generatedAt": "2026-06-04T15:27:18.146Z",
+  "mode": "dry-run",
   "inputs": {
     "sourceReportPath": "docs/reports/missing-features-review-latest.json",
     "candidateCount": 25,
     "limit": 25
   },
   "outputs": {
-    "kagDagRunsWritten": 1,
-    "packetsWritten": 25,
-    "hitsWritten": 25,
+    "kagDagRunsWritten": 0,
+    "packetsWritten": 0,
+    "hitsWritten": 0,
     "topPackets": [
       {
         "packet_key": "nes:ui:71db4b96c7f2c392:69a256e07545",

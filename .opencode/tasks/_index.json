@@ -1,0 +1,107 @@
+{
+  "workspace_id": "deeds-web-app",
+  "version": 1,
+  "updated_at": "2026-06-04T23:18:39.719Z",
+  "total_tasks": 12,
+  "tasks_by_status": {
+    "todo": [
+      {
+        "id": "task_967675a8",
+        "title": "src/lib/components/ui/index.ts — 42 unresolved imports",
+        "feature_id": "ai-retrieval",
+        "priority": "high"
+      },
+      {
+        "id": "task_0a5c4394",
+        "title": "src/lib/components/ui/gaming/n64/index.ts — 29 unresolved imports",
+        "feature_id": "ai-retrieval",
+        "priority": "high"
+      },
+      {
+        "id": "task_7a017007",
+        "title": "src/lib/components/ui/gaming/index.ts — 18 unresolved imports",
+        "feature_id": "ai-retrieval",
+        "priority": "high"
+      },
+      {
+        "id": "task_2931bfb6",
+        "title": "src/lib/components/ui/alert-dialog/index.js — 12 unresolved imports",
+        "feature_id": "ai-retrieval",
+        "priority": "high"
+      },
+      {
+        "id": "task_0cfb6631",
+        "title": "src/lib/components/ui/dialog/index.ts — 11 unresolved imports",
+        "feature_id": "ai-retrieval",
+        "priority": "high"
+      },
+      {
+        "id": "task_c8397099",
+        "title": "src/lib/icons/yorha/index.ts — 12 unresolved imports",
+        "feature_id": "ai-retrieval",
+        "priority": "high"
+      },
+      {
+        "id": "task_0aab643f",
+        "title": "4 files unclassified with >10 imports",
+        "feature_id": "ai-retrieval",
+        "priority": "medium"
+      },
+      {
+        "id": "task_8cc82e8b",
+        "title": "Feature not implemented: Priority 2: VLM POI Integration (90 min)",
+        "feature_id": "platform",
+        "priority": "low"
+      },
+      {
+        "id": "task_4881e9f6",
+        "title": "Feature not implemented: Priority 3: Audit Dashboard Web UI (3-4 hours)",
+        "feature_id": "ai-inference",
+        "priority": "low"
+      },
+      {
+        "id": "task_3d3f24cd",
+        "title": "Feature not implemented: Priority 4: Auto-Fix Orchestrator (6-8 hours)",
+        "feature_id": "ai-inference",
+        "priority": "low"
+      },
+      {
+        "id": "task_453bfa42",
+        "title": "Feature not implemented: Phase 3: Post-Synthesis Quality Review (RunID: `stage-2c-500`)",
+        "feature_id": "vector-graph",
+        "priority": "low"
+      },
+      {
+        "id": "task_c4986856",
+        "title": "Feature not implemented: Priority 1: Evidence Upload UI (1 hour)",
+        "feature_id": "ai-retrieval",
+        "priority": "low"
+      }
+    ],
+    "doing": [],
+    "blocked": [],
+    "done": []
+  },
+  "next_ready_task_id": "task_967675a8",
+  "feature_label_count": 13,
+  "statistics": {
+    "by_status": {
+      "todo": 12,
+      "doing": 0,
+      "blocked": 0,
+      "done": 0
+    },
+    "by_feature": {
+      "ai-retrieval": 8,
+      "platform": 1,
+      "ai-inference": 2,
+      "vector-graph": 1
+    },
+    "by_priority": {
+      "high": 6,
+      "medium": 1,
+      "low": 5,
+      "critical": 0
+    }
+  }
+}

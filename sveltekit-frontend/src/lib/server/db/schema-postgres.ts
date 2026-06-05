@@ -4306,7 +4306,7 @@ export const codebaseChunkIndex = pgTable('codebase_chunk_index', {
 	// Set by the autoencoder pipeline after 768d embedding is complete.
 	// centroid_id → FK to centroid_registry; used to filter Qdrant ANN.
 	centroidId:           uuid('centroid_id'),
-	compressedEmbedding:  vector('compressed_embedding', { dimensions: 64 }),
+	// compressedEmbedding:  vector('compressed_embedding', { dimensions: 64 }),
 	reconstructionError:  real('reconstruction_error'), // MSE of 768d→64d→768d round-trip
 	routingTier:          varchar('routing_tier', { length: 10 }).default('cold'),
 	// routingTier: 'cold' (no centroid), 'warm' (centroid assigned), 'hot' (in Redis cluster card)

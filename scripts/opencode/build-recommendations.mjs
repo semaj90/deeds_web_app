@@ -15,6 +15,7 @@
  *   .tmp/bifrost-trace-smoke.json
  *   .tmp/atlas-lane-health-loop.json
  *   reports/startup-truth-audit-report.md
+ *   .tmp/multi-hop-traversal-report.json
  *
  * Outputs:
  *   .opencode/recommendations/recommendations.json
@@ -43,6 +44,7 @@ const PATHS = {
   bifrostSmoke:    path.join(ROOT, '.tmp', 'bifrost-trace-smoke.json'),
   laneHealth:      path.join(ROOT, '.tmp', 'atlas-lane-health-loop.json'),
   startupReport:   path.join(ROOT, 'reports', 'startup-truth-audit-report.md'),
+  traversalReport: path.join(ROOT, '.tmp', 'multi-hop-traversal-report.json'),
   featureTodoQueue: path.join(ROOT, '.tmp', 'feature-todo-queue.ndjson'),
   pathMap:         path.join(ROOT, '.tmp', 'path-map.json'),
   outDir:          path.join(ROOT, '.opencode', 'recommendations'),
@@ -247,6 +249,30 @@ function detectMissingSourceRefs(mergedCards) {
   return recs;
 }
 
+/** Missing summaries: merged cards with blank summary text. */
+function detectMissingSummaries(mergedCards) {
+  const recs = [];
+  const missing = mergedCards.filter((c) => {
+    const summary = c.summary ?? c.summary_llm ?? c.summary_text ?? c.content?.summary ?? '';
+    return !String(summary).trim();
+  }).slice(0, 5);
+  if (missing.length > 0) {
+    recs.push({
+      id: recId('missing_summary'),
+      type: 'summary:missing',
+      cluster: 'Context Engineering',
+      title: `${missing.length} merged cards missing summaries`,
+      why: 'Cards without summary text cannot participate in prompt-cache reuse or packet replay.',
+      sourceRefs: missing.map((c) => c.sourceRef || c.source_ref || c.card_id || c.id).filter(Boolean),
+      action: 'Regenerate summaries and backfill summary packets before widening graph-truth sync.',
+      next_command: 'npm run atlas:tasks:summarize',
+      priority: 'medium',
+      featureStatus: 'degraded',
+    });
+  }
+  return recs;
+}
+
 /** Import errors: high-priority items from feature_todo_queue / path-map. */
 function detectImportErrors(todoQueue, pathMap) {
   const recs = [];
@@ -273,7 +299,7 @@ function detectImportErrors(todoQueue, pathMap) {
   if (unclassified.length > 0) {
     recs.push({
       id: recId('unclassified'),
-      type: 'missing_dependency',
+      type: 'feature:unclassified',
       cluster: 'Agent Workflow',
       title: `${unclassified.length} files unclassified with >10 imports`,
       why: 'Files with many imports but no feature label degrade ACE context quality',
@@ -284,6 +310,171 @@ function detectImportErrors(todoQueue, pathMap) {
       featureStatus: 'degraded',
     });
   }
+  const testCoverage = todoQueue.filter(t => (t.type || t.todo_type) === 'missing_test_coverage').slice(0, 6);
+  if (testCoverage.length > 0) {
+    recs.push({
+      id: recId('missing_test_coverage'),
+      type: 'test:missing-coverage',
+      cluster: 'Agent Workflow',
+      title: `${testCoverage.length} files missing test coverage`,
+      why: 'Files without test coverage weaken the graph-truth feedback loop.',
+      sourceRefs: testCoverage.map(t => t.filePath).filter(Boolean),
+      action: 'Add test coverage and rerun the graph-truth smoke.',
+      next_command: 'npm run smoke:multi-hop-traversal',
+      priority: 'medium',
+      featureStatus: 'degraded',
+    });
+  }
+  return recs;
+}
+
+/** Multi-hop traversal report: promote graph gaps into concrete tasks. */
+function detectTraversalSignals(traversalReport) {
+  const recs = [];
+  if (!traversalReport) return recs;
+
+  const sourceRef = traversalReport.sourceRef || traversalReport.targetSourceRef;
+  const featureId = traversalReport.featureId || '';
+  const featureMap = traversalReport.featureMap || {};
+  const neo4j = traversalReport.neo4j || {};
+  const issues = Array.isArray(traversalReport.issues) ? traversalReport.issues : [];
+
+  const hasQdrantMapping = Boolean(
+    featureMap.matched &&
+      featureMap.qdrantPointId &&
+      featureMap.somCluster !== null &&
+      featureMap.somCluster !== undefined
+  );
+  if (!hasQdrantMapping) {
+    recs.push({
+      id: recId('traversal_backfill'),
+      type: 'retrieval:qdrant-missing',
+      cluster: 'Retrieval',
+      title: `Backfill atlas_feature_map for ${sourceRef || featureId || 'multi-hop target'}`,
+      why: `Traversal report recorded no Qdrant/SOM mapping for ${sourceRef || featureId || 'the selected sourceRef'}`,
+      sourceRefs: [sourceRef].filter(Boolean),
+      featureIds: [featureId].filter(Boolean),
+      action: 'Backfill atlas_feature_map, then rerun the graph-truth sync and smoke.',
+      next_command: 'node scripts/atlas/sync-graph-truth-neo4j.mjs --apply --limit=250 && npm run smoke:multi-hop-traversal',
+      priority: 'medium',
+      featureStatus: 'degraded',
+      traversalReport: {
+        sourceRef,
+        featureId,
+        status: traversalReport.status,
+        neighborCount: neo4j.neighborCount || 0,
+      },
+    });
+  }
+  if (featureMap.qdrantPointId && (featureMap.somCluster === null || featureMap.somCluster === undefined)) {
+    recs.push({
+      id: recId('traversal_backfill'),
+      type: 'retrieval:som-missing',
+      cluster: 'Retrieval',
+      title: `Backfill SOM metadata for ${sourceRef || featureId || 'multi-hop target'}`,
+      why: 'The traversal found a Qdrant point, but SOM metadata is missing.',
+      sourceRefs: [sourceRef].filter(Boolean),
+      featureIds: [featureId].filter(Boolean),
+      action: 'Backfill som_cluster / centroid metadata, then rerun the graph-truth sync and smoke.',
+      next_command: 'node scripts/atlas/sync-graph-truth-neo4j.mjs --apply --limit=250 && npm run smoke:multi-hop-traversal',
+      priority: 'medium',
+      featureStatus: 'degraded',
+      traversalReport: {
+        sourceRef,
+        featureId,
+        status: traversalReport.status,
+        neighborCount: neo4j.neighborCount || 0,
+      },
+    });
+  }
+
+  if (!neo4j.featureNodeFound) {
+    recs.push({
+      id: recId('traversal_backfill'),
+      type: 'failing_lane',
+      cluster: 'Retrieval',
+      title: `Neo4j graph node missing for ${featureId || sourceRef || 'multi-hop target'}`,
+      why: 'The multi-hop traversal reached the graph layer, but the ParentAtlasFeature node was absent.',
+      sourceRefs: [sourceRef].filter(Boolean),
+      featureIds: [featureId].filter(Boolean),
+      action: 'Rerun the Neo4j graph-truth sync with --apply and verify the feature node.',
+      next_command: 'node scripts/atlas/sync-graph-truth-neo4j.mjs --apply --limit=250',
+      priority: 'high',
+      featureStatus: 'degraded',
+      traversalReport: {
+        sourceRef,
+        featureId,
+        status: traversalReport.status,
+        neighborCount: neo4j.neighborCount || 0,
+      },
+    });
+  }
+
+  if (neo4j.neighborCount === 0) {
+    recs.push({
+      id: recId('traversal_backfill'),
+      type: 'graph:neo4j-neighbor-low',
+      cluster: 'Context Engineering',
+      title: `No graph neighbors found for ${sourceRef || featureId || 'multi-hop target'}`,
+      why: 'The traversal completed, but no 2-hop neighbors were returned.',
+      sourceRefs: [sourceRef].filter(Boolean),
+      featureIds: [featureId].filter(Boolean),
+      action: 'Inspect the graph sync coverage for this sourceRef and widen the sync slice if needed.',
+      next_command: 'npm run smoke:multi-hop-traversal -- --source-ref="<sourceRef>"',
+      priority: 'medium',
+      featureStatus: 'degraded',
+      traversalReport: {
+        sourceRef,
+        featureId,
+        status: traversalReport.status,
+        neighborCount: neo4j.neighborCount || 0,
+      },
+    });
+  }
+  if (neo4j.neighborCount > 0 && neo4j.neighborCount < 10) {
+    recs.push({
+      id: recId('traversal_backfill'),
+      type: 'graph:neo4j-neighbor-low',
+      cluster: 'Context Engineering',
+      title: `Low graph neighbor count for ${sourceRef || featureId || 'multi-hop target'}`,
+      why: `The traversal found only ${neo4j.neighborCount} 2-hop neighbors.`,
+      sourceRefs: [sourceRef].filter(Boolean),
+      featureIds: [featureId].filter(Boolean),
+      action: 'Backfill graph-truth edges or widen the sync slice for the feature bucket.',
+      next_command: 'node scripts/atlas/sync-graph-truth-neo4j.mjs --apply --limit=1000',
+      priority: 'low',
+      featureStatus: 'degraded',
+      traversalReport: {
+        sourceRef,
+        featureId,
+        status: traversalReport.status,
+        neighborCount: neo4j.neighborCount || 0,
+      },
+    });
+  }
+
+  if (issues.some((issue) => issue.level === 'error')) {
+    recs.push({
+      id: recId('traversal_backfill'),
+      type: 'failing_lane',
+      cluster: 'Agent Workflow',
+      title: `Traversal smoke reported an error for ${sourceRef || featureId || 'multi-hop target'}`,
+      why: issues.find((issue) => issue.level === 'error')?.message || 'Traversal smoke failed',
+      sourceRefs: [sourceRef].filter(Boolean),
+      featureIds: [featureId].filter(Boolean),
+      action: 'Fix the failing layer before widening graph-truth sync.',
+      next_command: 'npm run smoke:multi-hop-traversal',
+      priority: 'high',
+      featureStatus: 'degraded',
+      traversalReport: {
+        sourceRef,
+        featureId,
+        status: traversalReport.status,
+        neighborCount: neo4j.neighborCount || 0,
+      },
+    });
+  }
+
   return recs;
 }
 
@@ -327,12 +518,14 @@ async function main() {
 
   // Load merged cards
   const mergedCards = await readNdjson(PATHS.mergedCards);
+  const traversalReport = await readJson(PATHS.traversalReport);
 
   console.log(`  ace packets   : ${acePackets.length}`);
   console.log(`  atlas seeds   : ${atlasSeeds.length}`);
   console.log(`  merged cards  : ${mergedCards.length}`);
   console.log(`  rank report   : ${rankReport?.ranked?.length ?? 0} entries`);
   console.log(`  todo queue    : ${featureTodoQueue.length} items (path_map: ${pathMap ? Object.keys(pathMap).length : 0} entries)`);
+  console.log(`  traversal rpt : ${traversalReport ? 'present' : 'absent'}`);
 
   // Generate all recommendations
   const all = [
@@ -341,7 +534,9 @@ async function main() {
     ...detectTopDevRecs(rankReport),
     ...detectDuplicates(acePackets),
     ...detectMissingSourceRefs(mergedCards),
+    ...detectMissingSummaries(mergedCards),
     ...detectImportErrors(featureTodoQueue, pathMap),
+    ...detectTraversalSignals(traversalReport),
   ];
 
   // Sort: high → medium → low
@@ -370,6 +565,7 @@ async function main() {
       rankEntries: rankReport?.ranked?.length ?? 0,
       todoQueueItems: featureTodoQueue.length,
       pathMapEntries: pathMap ? Object.keys(pathMap).length : 0,
+      traversalReport: traversalReport ? 1 : 0,
     },
   };
 

@@ -384,6 +384,7 @@ function buildDeterministicDraft(input) {
 		workspace_task_id: 'phase101:parent-atlas-packetize',
 		title_id: 'phase101.parent-atlas.packetize',
 		feature_id: 'phase101.parent_atlas.packetize',
+		featureIds: ['phase101.parent_atlas.packetize'],
 		source_ref: 'IMPLEMENTATION_STATUS.md:194-213',
 		source_refs: [
 			'IMPLEMENTATION_STATUS.md:194-213',
@@ -432,6 +433,7 @@ export async function emitNesPacket(input) {
 		workspace_task_id: 'phase101:parent-atlas-packetize',
 		title_id: 'phase101.parent-atlas.packetize',
 		feature_id: 'phase101.parent_atlas.packetize',
+		featureIds: ['phase101.parent_atlas.packetize'],
 		source_ref: 'IMPLEMENTATION_STATUS.md:194-213',
 		source_refs: [
 			'IMPLEMENTATION_STATUS.md:194-213',

@@ -1,0 +1,108 @@
+{
+  "source_ref": "sveltekit-frontend/src/routes/api/sse/chat/+server.ts",
+  "file_path": "sveltekit-frontend/src/routes/api/sse/chat/+server.ts",
+  "feature_id": "chat",
+  "component_type": "SvelteKit route",
+  "line_count": 2756,
+  "is_route": true,
+  "is_svelte_comp": false,
+  "has_auth": true,
+  "has_zod": true,
+  "drizzle_refs": [
+    "drizzle"
+  ],
+  "imports": [
+    "@sveltejs/kit",
+    "./$types",
+    "$lib/server/db/client",
+    "$lib/server/db/schema",
+    "drizzle-orm",
+    "$lib/server/env.server.js",
+    "$lib/server/ollama.js",
+    "$lib/server/retrieval/codebase-context.js",
+    "$lib/server/retrieval/summary-card-retrieval.js",
+    "$lib/server/retrieval/graph-context.js",
+    "$lib/server/retrieval/graph-informed-retrieval.js",
+    "$lib/server/config/vector-config.js",
+    "$lib/server/ai/llm-cache.js",
+    "$lib/server/glyph-prompt-cache.js",
+    "crypto",
+    "$lib/server/cache-keys.js",
+    "$lib/server/cache.js",
+    "$lib/server/observability/langfuse.js",
+    "$lib/server/ace/self-prompt.js",
+    "$lib/server/ace/context-assembler.js",
+    "$lib/server/analysis/hmm-ace-analyzer.js",
+    "$lib/server/retrieval/document-dag.js",
+    "$lib/server/retrieval/document-dag.js",
+    "$lib/server/rag/tag-extractor.js",
+    "$lib/server/knowledge-cache.js",
+    "$lib/server/cache/dag-cache.js",
+    "$lib/server/observability/inference-log.js",
+    "$lib/server/observability/tool-trace.js",
+    "$lib/server/analytics/search-analytics.js",
+    "$lib/server/retrieval/authority-chain.js"
+  ],
+  "exports": [
+    "POST"
+  ],
+  "route_handlers": [
+    "POST"
+  ],
+  "tags": [
+    "api:write",
+    "auth:required",
+    "has_auth",
+    "has_drizzle",
+    "has_llm",
+    "has_server_action",
+    "has_zod",
+    "route:api",
+    "runtime:server",
+    "has_qdrant",
+    "api:search",
+    "has_streaming",
+    "crud:document"
+  ],
+  "som_cluster": "gpu:10",
+  "centroid_id": "unassigned",
+  "qdrant_point_id": "",
+  "semantic_confidence": null,
+  "behavior_score": null,
+  "routing_score": null,
+  "runtime_state": {},
+  "feature_avg_confidence": null,
+  "feature_dominant_status": null,
+  "feature_primary_cluster": null,
+  "packet_count": 0,
+  "runtime_packet_count": 0,
+  "parent_modules": [
+    "sveltekit-frontend/src/lib/server/utils/safe-json-post.ts",
+    "sveltekit-frontend/src/lib/server/ace/context-assembler.ts"
+  ],
+  "nested_routes": [
+    "sveltekit-frontend/src/routes/api/stream/+server.ts",
+    "sveltekit-frontend/src/routes/api/stream/[chatId]/+server.ts",
+    "sveltekit-frontend/src/routes/api/simulation/[sessionId]/strategy/+server.ts",
+    "sveltekit-frontend/src/routes/api/statutes/+server.ts",
+    "sveltekit-frontend/src/routes/api/sse/[id]/+server.ts",
+    "sveltekit-frontend/src/routes/api/statutes/[id]/+server.ts"
+  ],
+  "related_features": [],
+  "hypergraph_neighbors": [
+    "SIMILAR_TOPOLOGY → sveltekit-frontend/src/routes/api/stream/+server.ts",
+    "SIMILAR_TOPOLOGY → sveltekit-frontend/src/routes/api/stream/[chatId]/+server.ts",
+    "SIMILAR_TOPOLOGY → sveltekit-frontend/src/routes/api/simulation/[sessionId]/strategy/+server.ts",
+    "SIMILAR_TOPOLOGY → sveltekit-frontend/src/routes/api/statutes/+server.ts",
+    "SIMILAR_TOPOLOGY → sveltekit-frontend/src/routes/api/sse/[id]/+server.ts",
+    "SIMILAR_TOPOLOGY → sveltekit-frontend/src/routes/api/statutes/[id]/+server.ts",
+    "IMPORTS → sveltekit-frontend/src/lib/server/utils/safe-json-post.ts",
+    "IMPORTS → sveltekit-frontend/src/lib/server/ace/context-assembler.ts",
+    "BELONGS_TO_FEATURE → null"
+  ],
+  "similar_files": [],
+  "health_status": "warning",
+  "warnings": [
+    "high complexity (line count > 400)"
+  ]
+}

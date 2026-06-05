@@ -135,6 +135,7 @@ async function main() {
     const task_id = `task_${crypto.randomBytes(4).toString('hex')}`;
     return {
       task_id,
+      workspace_task_id: task_id,
       recommendation_id: rec.id,
       cluster: rec.cluster || 'General',
       type: rec.type || 'unknown',
@@ -144,7 +145,10 @@ async function main() {
         (rec.title || '') + '\n\nWhy: ' + (rec.why || '') + '\n\nAction: ' + (rec.action || ''),
       why: rec.why || '',
       action: rec.action || '',
+      next_action: rec.next_command || rec.action || '',
       sourceRefs: rec.sourceRefs || [],
+      source_ref: rec.sourceRefs?.[0] || '',
+      featureIds: Array.isArray(rec.featureIds) ? rec.featureIds : [],
       next_command: rec.next_command || '',
       status: 'todo',
       priority: rec.priority || 'low',
@@ -153,6 +157,7 @@ async function main() {
       ttl_days: deriveTtlDays(rec),
       featureStatus: rec.featureStatus || 'active',
       createdAt,
+      traversalReport: rec.traversalReport || null,
     };
   });
 
@@ -224,7 +229,9 @@ async function main() {
     n.featureStatus = t.featureStatus;
     n.createdAt = t.createdAt;
     n.sourceRefs = t.sourceRefs || n.context.sourceRefs || [];
+    n.featureIds = Array.isArray(t.featureIds) ? t.featureIds.map(String) : n.context.featureIds || [];
     n.next_command = t.next_command || n.expected_output.safe_next_command || '';
+    n.traversalReport = t.traversalReport || null;
     return n;
   });
 

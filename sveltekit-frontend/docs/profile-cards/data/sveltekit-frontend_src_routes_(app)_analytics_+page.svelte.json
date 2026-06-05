@@ -1,0 +1,70 @@
+{
+  "source_ref": "sveltekit-frontend/src/routes/(app)/analytics/+page.svelte",
+  "file_path": "sveltekit-frontend/src/routes/(app)/analytics/+page.svelte",
+  "feature_id": "analytics",
+  "component_type": "Svelte component",
+  "line_count": 2417,
+  "is_route": true,
+  "is_svelte_comp": true,
+  "has_auth": true,
+  "has_zod": false,
+  "drizzle_refs": [],
+  "imports": [
+    "$lib/components/ui/Icon.svelte",
+    "svelte",
+    "$app/environment",
+    "$lib/stores/research-tasks.svelte.js"
+  ],
+  "exports": [],
+  "route_handlers": [],
+  "tags": [
+    "auth:required",
+    "component:svelte",
+    "has_auth",
+    "route:page",
+    "runtime:server",
+    "runtime:ssr",
+    "route:api",
+    "runtime:client",
+    "api:search"
+  ],
+  "som_cluster": "gpu:10",
+  "centroid_id": "unassigned",
+  "qdrant_point_id": "",
+  "semantic_confidence": null,
+  "behavior_score": null,
+  "routing_score": null,
+  "runtime_state": {},
+  "feature_avg_confidence": null,
+  "feature_dominant_status": null,
+  "feature_primary_cluster": null,
+  "packet_count": 0,
+  "runtime_packet_count": 0,
+  "parent_modules": [],
+  "nested_routes": [
+    "sveltekit-frontend/src/routes/(app)/analytics/+page.server.ts",
+    "sveltekit-frontend/src/routes/(app)/couchdb-analytics/+page.svelte",
+    "sveltekit-frontend/src/routes/(app)/admin/topology/+page.svelte",
+    "sveltekit-frontend/src/routes/(app)/analysis-center/+page.svelte",
+    "sveltekit-frontend/src/routes/(app)/cache-monitor/+page.svelte",
+    "sveltekit-frontend/src/routes/(app)/cases/+page.svelte",
+    "sveltekit-frontend/src/routes/(app)/analysis-center/+layout.svelte"
+  ],
+  "related_features": [],
+  "hypergraph_neighbors": [
+    "SIMILAR_TOPOLOGY → sveltekit-frontend/src/routes/(app)/analytics/+page.server.ts",
+    "SIMILAR_TOPOLOGY → sveltekit-frontend/src/routes/(app)/couchdb-analytics/+page.svelte",
+    "SIMILAR_TOPOLOGY → sveltekit-frontend/src/routes/(app)/admin/topology/+page.svelte",
+    "SIMILAR_TOPOLOGY → sveltekit-frontend/src/routes/(app)/analysis-center/+page.svelte",
+    "SIMILAR_TOPOLOGY → sveltekit-frontend/src/routes/(app)/cache-monitor/+page.svelte",
+    "SIMILAR_TOPOLOGY → sveltekit-frontend/src/routes/(app)/cases/+page.svelte",
+    "SIMILAR_TOPOLOGY → sveltekit-frontend/src/routes/(app)/analysis-center/+layout.svelte",
+    "BELONGS_TO_FEATURE → null"
+  ],
+  "similar_files": [],
+  "health_status": "critical",
+  "warnings": [
+    "high complexity (line count > 400)",
+    "missing strict validation payload adapter (Zod)"
+  ]
+}

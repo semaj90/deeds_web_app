@@ -8,6 +8,7 @@ import { ENV } from '$lib/server/env.server.js';
 import { encodedClusterPrefilter } from '$lib/server/retrieval/encoded-cluster-prefilter.js';
 import { getCodebaseAnnBackend } from './codebase-ann-backend.js';
 import { searchTurboVecCode } from './turbovec-search.js';
+import type { SearchBackend, SearchBackendRequest } from './search-backend.js';
 
 export interface QdrantCodeResult {
   stable_key: string;
@@ -29,6 +30,82 @@ function getManager(): QdrantManager {
   return _mgr;
 }
 
+class QdrantSearchBackend implements SearchBackend<QdrantCodeResult> {
+  readonly name = 'qdrant' as const;
+
+  async search(request: SearchBackendRequest): Promise<QdrantCodeResult[]> {
+    const { embedding, limit = 30, topoClass, collection = 'codebase_chunks_768' } = request;
+
+    try {
+      const mgr = getManager();
+      const mustConditions: any[] = [];
+
+      if (topoClass) {
+        mustConditions.push({ key: 'topo_class', match: { value: topoClass } });
+      }
+
+      // Apply encoded-cluster prefilter (Stage A0) if enabled
+      if (ENV.ACE_ENCODED_PREFILTER_ENABLED === 'true') {
+        try {
+          const pre = await encodedClusterPrefilter(new Float32Array(embedding));
+          if (pre && pre.filter && pre.filter.should) {
+            mustConditions.push({ should: pre.filter.should });
+          }
+        } catch (err) {
+          console.warn('[searchQdrantCode] Encoded prefilter failed:', err);
+        }
+      }
+
+      const filter = mustConditions.length > 0 ? { must: mustConditions } : undefined;
+
+      const res = await mgr.hybridSearch({
+        collection,
+        query: '',
+        queryEmbedding: embedding,
+        limit,
+        filters: filter,
+      });
+
+      return (res.results ?? []).map((r) => {
+        const p = r.payload ?? {};
+        return {
+          stable_key: String(p.stable_key ?? p.chunk_id ?? r.id),
+          file_path: String(p.file_path ?? ''),
+          symbol_name: p.symbol_name ? String(p.symbol_name) : undefined,
+          symbol_kind: p.symbol_kind ? String(p.symbol_kind) : undefined,
+          language: p.language ? String(p.language) : undefined,
+          content: String(p.content ?? p.chunk_text ?? ''),
+          tags: p.tags ? String(p.tags) : undefined,
+          topo_class: p.topo_class ? String(p.topo_class) : undefined,
+          graph_authority_score:
+            typeof p.graph_authority_score === 'number' ? p.graph_authority_score : undefined,
+          semantic_score: r.score,
+          qdrant_id: String(r.id),
+        };
+      });
+    } catch {
+      return [];
+    }
+  }
+}
+
+class TurboVecSearchBackend implements SearchBackend<QdrantCodeResult> {
+  readonly name = 'turbovec' as const;
+
+  async search(request: SearchBackendRequest): Promise<QdrantCodeResult[]> {
+    const { embedding, limit = 30, topoClass, collection = 'codebase_chunks_768' } = request;
+    return searchTurboVecCode(embedding, limit, topoClass, collection);
+  }
+}
+
+function createCodebaseSearchBackend(backend: string): SearchBackend<QdrantCodeResult> {
+  if (backend === 'turbovec') return new TurboVecSearchBackend();
+  if (backend === 'cuvs') {
+    console.warn('[searchCodebaseAnn] backend=cuvs not implemented yet; falling back to qdrant');
+  }
+  return new QdrantSearchBackend();
+}
+
 /**
  * Stable ANN retrieval contract for codebase chunks.
  *
@@ -42,68 +119,8 @@ export async function searchCodebaseAnn(
   topoClass?: string,
   collection = 'codebase_chunks_768'
 ): Promise<QdrantCodeResult[]> {
-  const backend = getCodebaseAnnBackend();
-  if (backend === 'turbovec') {
-    return searchTurboVecCode(embedding, limit, topoClass, collection);
-  }
-
-  if (backend !== 'qdrant') {
-    // Future seam: route to cuVS-backed ANN worker or Rust gRPC ANN service behind the
-    // same contract and result shape.
-    // For now, keep the existing Qdrant behavior as the canonical implementation.
-    console.warn(`[searchCodebaseAnn] backend=${backend} not implemented yet; falling back to qdrant`);
-  }
-
-  try {
-    const mgr = getManager();
-    const mustConditions: any[] = [];
-
-    if (topoClass) {
-      mustConditions.push({ key: 'topo_class', match: { value: topoClass } });
-    }
-
-    // Apply encoded-cluster prefilter (Stage A0) if enabled
-    if (ENV.ACE_ENCODED_PREFILTER_ENABLED === 'true') {
-      try {
-        const pre = await encodedClusterPrefilter(new Float32Array(embedding));
-        if (pre && pre.filter && pre.filter.should) {
-          mustConditions.push({ should: pre.filter.should });
-        }
-      } catch (err) {
-        console.warn('[searchQdrantCode] Encoded prefilter failed:', err);
-      }
-    }
-
-    const filter = mustConditions.length > 0 ? { must: mustConditions } : undefined;
-
-    const res = await mgr.hybridSearch({
-      collection,
-      query: '',
-      queryEmbedding: embedding,
-      limit,
-      filters: filter,
-    });
-
-    return (res.results ?? []).map((r) => {
-      const p = r.payload ?? {};
-      return {
-        stable_key: String(p.stable_key ?? p.chunk_id ?? r.id),
-        file_path: String(p.file_path ?? ''),
-        symbol_name: p.symbol_name ? String(p.symbol_name) : undefined,
-        symbol_kind: p.symbol_kind ? String(p.symbol_kind) : undefined,
-        language: p.language ? String(p.language) : undefined,
-        content: String(p.content ?? p.chunk_text ?? ''),
-        tags: p.tags ? String(p.tags) : undefined,
-        topo_class: p.topo_class ? String(p.topo_class) : undefined,
-        graph_authority_score:
-          typeof p.graph_authority_score === 'number' ? p.graph_authority_score : undefined,
-        semantic_score: r.score,
-        qdrant_id: String(r.id),
-      };
-    });
-  } catch {
-    return [];
-  }
+  const backend = createCodebaseSearchBackend(getCodebaseAnnBackend());
+  return backend.search({ embedding, limit, topoClass, collection });
 }
 
 export async function searchQdrantCode(

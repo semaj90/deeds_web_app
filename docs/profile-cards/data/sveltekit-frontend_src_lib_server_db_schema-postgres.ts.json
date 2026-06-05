@@ -1,0 +1,51 @@
+{
+  "source_ref": "sveltekit-frontend/src/lib/server/db/schema-postgres.ts",
+  "file_path": "sveltekit-frontend/src/lib/server/db/schema-postgres.ts",
+  "feature_id": "db",
+  "line_count": 4654,
+  "is_route": false,
+  "is_svelte_comp": false,
+  "has_zod": false,
+  "drizzle_refs": [
+    "drizzle",
+    "pgTable"
+  ],
+  "imports": [
+    "drizzle-orm",
+    "drizzle-orm/pg-core",
+    "drizzle-orm/relations"
+  ],
+  "exports": [
+    "userRoleEnum",
+    "caseStatusEnum",
+    "casePriorityEnum",
+    "evidenceTypeEnum",
+    "relationTypeEnum",
+    "threatLevelEnum",
+    "patchStatusEnum",
+    "documentStatusEnum",
+    "documentTypeEnum",
+    "summaryTypeEnum",
+    "activityStatusEnum",
+    "verificationStatusEnum",
+    "reportStatusEnum",
+    "caseRiskLevelEnum",
+    "users",
+    "sessions",
+    "emailVerificationCodes",
+    "passwordResetTokens",
+    "cases",
+    "criminals"
+  ],
+  "som_cluster": "unassigned",
+  "centroid_id": "unassigned",
+  "qdrant_point_id": "14443849",
+  "packet_count": 0,
+  "runtime_packet_count": 0,
+  "related_features": [],
+  "hypergraph_neighbors": [],
+  "similar_files": [],
+  "health_warnings": [
+    "high complexity (line count > 400)"
+  ]
+}

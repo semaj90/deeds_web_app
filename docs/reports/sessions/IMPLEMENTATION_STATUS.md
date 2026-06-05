@@ -5,6 +5,64 @@
 
 ---
 
+## Current Parent Atlas Status — 2026-06-04
+
+The Parent Atlas lane is in cleanup / coverage mode, not architecture mode.
+
+Current practical completion:
+- Parent Atlas core: about 90%
+- Production topology coverage: active production SOM 100.0%, active production Qdrant 100.0%
+- Raw inventory topology: 10,487 / 14,465 SOM, 10,997 / 14,465 Qdrant
+- Active production Qdrant-without-SOM: 0
+- Active production without Qdrant: 0
+- Summary lane: active-production summary check shows 3,528 / 3,528 with summaries, 0 missing
+- Graph truth / traversal: verified complete enough for recommendations
+- Recommendation -> pickup queue: working
+- Recommendation workspace refresh: 12 tasks materialized, next ready `task_967675a8`
+
+Validated command corrections:
+- Parent Atlas synthesized-map rebuild: `npm --prefix sveltekit-frontend run atlas:feature-map:synthesize:apply`
+- Direct rebuild command: `node scripts/atlas/build-synthesized-map.mjs`
+- Do not use `npm --prefix sveltekit-frontend run atlas:synthesize` for Parent Atlas synthesized-map rebuild; that script points at `synthesize-context-chunks.mjs` and requires `--input`.
+
+Validated traversal proof:
+- `npm --prefix sveltekit-frontend run smoke:multihop-contextual-tree`
+- `npm --prefix sveltekit-frontend run smoke:multi-hop-traversal`
+- Class matrix report: `docs/reports/multihop-traversal-class-matrix.{json,md}`
+- Full traversal was verified for API route, ACE/server, DB schema, and Svelte component classes.
+- The `scripts/atlas` sample now proves Postgres feature truth, Qdrant, SOM, and Neo4j traversal.
+
+Current topology metrics:
+- raw `atlas_feature_map`: 14,465 rows
+- raw SOM rows: 10,487
+- raw Qdrant rows: 10,997
+- raw Qdrant without SOM: 1,492
+- deduped active production rows: 4,808
+- deduped active production SOM rows: 4,808
+- deduped active production Qdrant rows: 4,808
+- deduped active production Qdrant without SOM: 0
+- deduped active production without Qdrant: 0
+- remaining nuance: active-production topology coverage is now closed; raw-inventory no-SOM rows are excluded from profile cards and belong to storage/indexing audit.
+
+Next cleanup commands:
+```bash
+cd C:\Users\james\Videos\deeds-web-app\sveltekit-frontend
+npm run atlas:coverage:qdrant-no-som -- --limit=50
+npm run atlas:coverage:no-qdrant -- --limit=50
+npm run atlas:feature-map:synthesize:apply
+npm run recommendations:workspace   # run from repo root, not sveltekit-frontend
+```
+
+The focused Qdrant-without-SOM report writes:
+- `docs/reports/production-qdrant-no-som-report.json`
+- `docs/reports/production-qdrant-no-som-report.md`
+
+The focused no-Qdrant report writes:
+- `docs/reports/production-no-qdrant-report.json`
+- `docs/reports/production-no-qdrant-report.md`
+
+---
+
 ## ✅ COMPLETED: Phase 99 — Gemma4 Function-Calling Integration
 
 **Commit**: 737be68df3

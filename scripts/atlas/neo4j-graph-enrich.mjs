@@ -57,7 +57,7 @@ if (!process.env.NEO4J_PASSWORD && !process.env.NEO4J_PASS) {
   console.warn('   ⚠ NEO4J_PASSWORD not set in environment — using hardcoded default. Add to .env: NEO4J_PASSWORD=<password>');
 }
 const QDRANT_URL  = process.env.QDRANT_URL       ?? 'http://127.0.0.1:6333';
-const QDRANT_COLL = process.env.QDRANT_COLLECTION ?? 'codebase_chunks_768';
+const QDRANT_COLL = 'codebase_chunks_768';
 const DB_URL      = process.env.DATABASE_URL     ?? 'postgresql://legal_admin:123456@127.0.0.1:5434/legal_ai_db';
 if (!process.env.DATABASE_URL) {
   console.warn('   ⚠ DATABASE_URL not set in environment — using hardcoded dev default. Add to .env: DATABASE_URL=postgresql://...');

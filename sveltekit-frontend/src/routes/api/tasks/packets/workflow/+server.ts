@@ -25,7 +25,7 @@ const getSchema = z.object({
 });
 
 type QueueRow = {
-	id: string;
+	id: number | string;
 	task_id: string;
 	packet_id: string | null;
 	status: string | null;
@@ -127,7 +127,7 @@ async function buildWorkflowStatus(taskId?: number, queueId?: string, lane = 'se
 		queue = await db
 			.select()
 			.from(agentPickupQueue)
-			.where(eq(agentPickupQueue.id, queueId))
+			.where(eq(agentPickupQueue.id, Number(queueId)))
 			.limit(1)
 			.then((rows) => rows[0] ?? null);
 		if (queue?.packet_id) {
@@ -250,9 +250,9 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 					picked_up_at: new Date(),
 					updated_at: new Date(),
 				})
-				.where(eq(agentPickupQueue.id, next.id));
+				.where(eq(agentPickupQueue.id, Number(next.id)));
 			const status = await buildWorkflowStatus(Number(next.task_id), undefined, lane);
-			return json({ ok: true, claimed: { queueId: next.id, taskId: Number(next.task_id) }, status });
+			return json({ ok: true, claimed: { queueId: String(next.id), taskId: Number(next.task_id) }, status });
 		}
 
 		if (!parsed.data.taskId) {

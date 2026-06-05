@@ -182,3 +182,7 @@ export * from './schema/documents-atlas.js';
 export * from './schema/feature-registry.js';
 export * from './schema/atlas-cards.js';
 export * from './schema/synthesis-logs.js';
+
+export * from './schema/atlas-dict.js';
+export * from './schema/route_runtime_packets.js';
+

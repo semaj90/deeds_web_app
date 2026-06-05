@@ -78,6 +78,7 @@ export * from './summary-cards.js';
 export * from './normalize-labels.js';
 export * from './nes-chrom-packets.js';
 export * from './atlas-feature-map.js';
+export * from './atlas-dict.js';
 
 // 2026-05-30 drift remediation — DO NOT add the Round-1 sidecars
 // (case-notes, case-statute-links, case-note-versions, case-note-evidence-refs,
@@ -101,10 +102,6 @@ export * from './vector-smoke.js';
 // `migrations` is custom journal (managed by db/migrate.ts) — added to tablesFilter.
 export * from './embeddings.js';
 export * from './model-weights.js';
+export * from './route_runtime_packets.js';
 
-// Round 3 (Tier-D promotions, 2026-05-30):
-// `embeddings` (384-dim, FK target of case_chunks) — 4 active consumers
-// `model_weights` (SeaweedFS-backed) — 4 active consumers in admin paths
-export * from './embeddings.js';
-export * from './model-weights.js';
 

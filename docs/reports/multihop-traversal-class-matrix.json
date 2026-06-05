@@ -1,0 +1,61 @@
+{
+  "generatedAt": "2026-06-04",
+  "results": [
+    {
+      "class": "api_route",
+      "source_ref": "sveltekit-frontend/src/routes/api/evidence/upload/+server.ts",
+      "status": "pass",
+      "feature_id": "upload",
+      "som_cluster": "19",
+      "qdrant_point_id": "28787088",
+      "cluster_id": "gpu:19",
+      "neo4j_feature_node": true,
+      "neighbor_count": 10
+    },
+    {
+      "class": "ace_server",
+      "source_ref": "sveltekit-frontend/src/lib/server/ace/context-assembler.ts",
+      "status": "pass",
+      "feature_id": "ace",
+      "som_cluster": "3",
+      "qdrant_point_id": "180171793",
+      "cluster_id": "gpu:3",
+      "neo4j_feature_node": true,
+      "neighbor_count": 10
+    },
+    {
+      "class": "db_schema",
+      "source_ref": "sveltekit-frontend/src/lib/server/db/schema-postgres.ts",
+      "status": "pass",
+      "feature_id": "db",
+      "som_cluster": "9",
+      "qdrant_point_id": "14443849",
+      "cluster_id": "gpu:9",
+      "neo4j_feature_node": true,
+      "neighbor_count": 10
+    },
+    {
+      "class": "svelte_component",
+      "source_ref": "sveltekit-frontend/src/routes/(app)/admin/+page.svelte",
+      "status": "pass",
+      "feature_id": "admin",
+      "som_cluster": "18",
+      "qdrant_point_id": "141476391",
+      "cluster_id": "gpu:18",
+      "neo4j_feature_node": true,
+      "neighbor_count": 10
+    },
+    {
+      "class": "scripts_atlas",
+      "source_ref": "scripts/atlas/build-rg-search-matrix.mjs",
+      "status": "partial",
+      "feature_id": "atlas",
+      "som_cluster": null,
+      "qdrant_point_id": null,
+      "cluster_id": null,
+      "neo4j_feature_node": true,
+      "neighbor_count": 10,
+      "gap": "Postgres feature truth and Neo4j traversal pass; Qdrant/SOM mapping is not populated yet."
+    }
+  ]
+}

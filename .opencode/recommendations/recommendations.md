@@ -1,4 +1,4 @@
-# Recommendations — 2026-06-03T22:01:39.740Z
+# Recommendations — 2026-06-04T23:18:37.294Z
 
 **Total**: 12 recommendations across 4 clusters
 
@@ -27,7 +27,7 @@
    - Feature "ui" barrel/index has 11 dangling import refs (mapreduce v4 scan)
    - Action: Audit barrel re-exports; remove or fix dangling import paths
    - `node scripts/atlas/debug-import-resolve.mjs <import> 'src/lib/components/ui/dialog/index.ts'`
-7. **[MEDIUM]** `missing_dependency` — 4 files unclassified with >10 imports
+7. **[MEDIUM]** `feature:unclassified` — 4 files unclassified with >10 imports
    - Files with many imports but no feature label degrade ACE context quality
    - Action: Add feature labels to mapreduce classification rules
    - `node scripts/atlas/mapreduce-consolidated-index.mjs "--output=.tmp/mapreduce-full-v4.ndjson"`

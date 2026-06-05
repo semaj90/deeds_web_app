@@ -30,7 +30,7 @@ const outputFile = outputIndex >= 0
 const verbose = args.includes('--verbose');
 
 const REPO_ROOT = resolve('.');
-const SKIP_DIRS = new Set(['.git', 'node_modules', 'target', 'dist', 'coverage']);
+const SKIP_DIRS = new Set(['.git', 'node_modules', 'target', 'dist', 'coverage', '.venv', '.venv-py313-backup', '.python311', '.cache', '.vs', 'deeds_labs']);
 const ALLOW_HIDDEN_DIRS = new Set(['.opencode', '.tmp', '.cache', '.github', '.vscode', '.svelte-kit', '.docker-build']);
 const ALLOWED_EXTENSIONS = new Set(['.ts', '.tsx', '.js', '.mjs', '.json', '.sql', '.md', '.svelte']);
 

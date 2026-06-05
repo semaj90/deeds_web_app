@@ -1,6 +1,6 @@
 # Hypergraph Cluster Digest
 
-> Generated 2026-05-15T01:23:44.900Z from `codebase_chunks_768` (K=100, 32,753 chunks clustered, 1,256 payloads sampled, 0.6s)
+> Generated 2026-06-05T00:14:14.505Z from `codebase_chunks_768` (K=100, 76,261 chunks clustered, 1,521 payloads sampled, 1.1s)
 
 Pure aggregation over hypergraph k-means assignments + Qdrant payloads — no LLM. Drives ACE community summaries and the audit-hotspots tool.
 
@@ -8,1570 +8,1205 @@ Pure aggregation over hypergraph k-means assignments + Qdrant payloads — no LL
 
 | # | Size | Topic | Top dir |
 |---|------|-------|---------|
-| 50 | 3,814 | component chunks in `src/lib/components/ui/gaming/n64` (tag: page) | `src/lib/components/ui/gaming/n64` |
-| 21 | 2,980 | component chunks in `src/lib/components/legal` (tag: auth) | `src/lib/components/legal` |
-| 70 | 1,546 | route-handler chunks in `src/lib/server/analytics` (tag: embedding) | `src/lib/server/analytics` |
-| 35 | 1,392 | component chunks in `src/lib/components/legal-ai` (tag: component) | `src/lib/components/legal-ai` |
-| 5 | 1,280 | component chunks in `src/lib/components/ai` (tag: ai) | `src/lib/components/ai` |
-| 72 | 1,186 | function chunks in `src/lib/server/ace` (tag: vector) | `src/lib/server/ace` |
-| 74 | 1,122 | type chunks in `src/lib/types` (tag: vector) | `src/lib/types` |
-| 57 | 1,099 | const chunks in `src/lib/shims` (tag: embedding) | `src/lib/shims` |
-| 44 | 1,062 | route-handler chunks in `src/lib/server/llm` (tag: api) | `src/lib/server/llm` |
-| 25 | 974 | route-handler chunks in `src/lib/server` (tag: redis) | `src/lib/server` |
-| 92 | 940 | component chunks in `src/lib/components/evidence` (tag: embedding) | `src/lib/components/evidence` |
-| 94 | 921 | function chunks in `src/lib/server/cache` (tag: redis) | `src/lib/server/cache` |
-| 82 | 903 | function chunks in `src/lib/server/grpc` (tag: embedding) | `src/lib/server/grpc` |
-| 20 | 883 | function chunks in `src/lib/webgpu` (tag: embedding) | `src/lib/webgpu` |
-| 6 | 700 | function chunks in `src/lib/server/db` (tag: embedding) | `src/lib/server/db` |
-| 86 | 680 | function chunks in `src/lib/components/evidence` (tag: embedding) | `src/lib/components/evidence` |
-| 23 | 622 | class chunks in `src/lib/webgpu` (tag: embedding) | `src/lib/webgpu` |
-| 85 | 587 | route-handler chunks in `src/routes/api/citations/collections/[collectionId]/citations` (tag: api) | `src/routes/api/citations/collections/[collectionId]/citations` |
-| 55 | 577 | table-def chunks in `src/lib/server/db` (tag: database) | `src/lib/server/db` |
-| 32 | 540 | function chunks in `src/lib/server/services` (tag: api-route) | `src/lib/server/services` |
-| 48 | 526 | unknown chunks in `src/lib/server/db/migrations` (tag: database) | `src/lib/server/db/migrations` |
-| 64 | 525 | route-handler chunks in `src/routes/api/error-brain/history/[filePath]` (tag: api) | `src/routes/api/error-brain/history/[filePath]` |
-| 73 | 476 | function chunks in `src/lib/server/retrieval` (tag: vector) | `src/lib/server/retrieval` |
-| 29 | 455 | const chunks in `src/lib/schemas` (tag: auth) | `src/lib/schemas` |
-| 1 | 450 | type chunks in `src/lib/utils` (tag: page-component) | `src/lib/utils` |
-| 75 | 416 | function chunks in `src/lib/config` (tag: embedding) | `src/lib/config` |
-| 60 | 406 | function chunks in `src/lib/server/analytics` (tag: embedding) | `src/lib/server/analytics` |
-| 2 | 400 | component chunks in `src/lib/components/cases` | `src/lib/components/cases` |
-| 28 | 387 | component chunks in `src/routes/(app)/demos/cache` (tag: page) | `src/routes/(app)/demos/cache` |
-| 47 | 339 | route-handler chunks in `src/lib/server/legal` (tag: api) | `src/lib/server/legal` |
-| 24 | 297 | class chunks in `src/lib/server/workers` (tag: redis) | `src/lib/server/workers` |
-| 80 | 285 | function chunks in `src/lib/server/gpu` (tag: vector) | `src/lib/server/gpu` |
-| 27 | 277 | route-handler chunks in `src/routes/api/conversations/[id]` (tag: api) | `src/routes/api/conversations/[id]` |
-| 69 | 256 | route-handler chunks in `src/routes/(app)/admin/api-testing/agentic-loop` (tag: api) | `src/routes/(app)/admin/api-testing/agentic-loop` |
-| 18 | 190 | type chunks in `src/lib/types` (tag: embedding) | `src/lib/types` |
-| 95 | 183 | type chunks in `src/lib/server/db/schema` (tag: database) | `src/lib/server/db/schema` |
-| 96 | 177 | type chunks in `src/lib/server` (tag: embedding) | `src/lib/server` |
-| 81 | 176 | class chunks in `src/lib/services/knowledge-search` (tag: vector) | `src/lib/services/knowledge-search` |
-| 91 | 162 | type chunks in `src/lib/server/db` (tag: database) | `src/lib/server/db` |
-| 90 | 158 | function chunks in `src/lib/server` (tag: auth) | `src/lib/server` |
-| 83 | 154 | const chunks in `src/routes/(app)/admin/dev-tools` (tag: page-server) | `src/routes/(app)/admin/dev-tools` |
-| 9 | 150 | type chunks in `src/lib/types` (tag: auth) | `src/lib/types` |
-| 8 | 136 | route-handler chunks in `src/routes/api/library/documents/[documentId]/toc` (tag: api) | `src/routes/api/library/documents/[documentId]/toc` |
-| 19 | 136 | type chunks in `src/lib/types` (tag: embedding) | `src/lib/types` |
-| 52 | 134 | const chunks in `src/lib/stores/unified` (tag: server-module) | `src/lib/stores/unified` |
-| 77 | 134 | type chunks in `src/lib/types` (tag: embedding) | `src/lib/types` |
-| 43 | 124 | type chunks in `src/lib/services/knowledge-search` (tag: embedding) | `src/lib/services/knowledge-search` |
-| 88 | 123 | const chunks in `src/lib/server/db` (tag: database) | `src/lib/server/db` |
-| 3 | 119 | const chunks in `src/routes/(app)/demos/detective-command` | `src/routes/(app)/demos/detective-command` |
-| 51 | 100 | table-def chunks in `src/lib/db/schema` (tag: database) | `src/lib/db/schema` |
-| 34 | 88 | component chunks in `src/routes/(app)/demos/celestial-icons` (tag: page) | `src/routes/(app)/demos/celestial-icons` |
-| 22 | 86 | function chunks in `src/lib/server/cache` (tag: redis) | `src/lib/server/cache` |
-| 53 | 84 | const chunks in `src/lib/server/db` (tag: database) | `src/lib/server/db` |
-| 78 | 71 | type chunks in `src/lib/types` (tag: vector) | `src/lib/types` |
-| 84 | 69 | function chunks in `src/lib/server/audit` (tag: vector) | `src/lib/server/audit` |
-| 97 | 61 | component chunks in `src/lib/components/yorha` (tag: embedding) | `src/lib/components/yorha` |
-| 4 | 52 | type chunks in `src/lib/components/ui/dialog` (tag: vector) | `src/lib/components/ui/dialog` |
-| 87 | 46 | const chunks in `src/lib/server/ai` (tag: ai) | `src/lib/server/ai` |
-| 13 | 41 | table-def chunks in `src/lib/server/db` (tag: database) | `src/lib/server/db` |
-| 38 | 41 | type chunks in `src/lib/stores/unified` (tag: types) | `src/lib/stores/unified` |
-| 89 | 41 | function chunks in `src/lib/server/legal` | `src/lib/server/legal` |
-| 41 | 40 | component chunks in `src/lib/components/ui` | `src/lib/components/ui` |
-| 17 | 38 | function chunks in `src/lib/services/error-analysis` (tag: embedding) | `src/lib/services/error-analysis` |
-| 59 | 36 | function chunks in `src/lib/server/observability` (tag: vector) | `src/lib/server/observability` |
-| 15 | 31 | function chunks in `src/lib/server/db` (tag: database) | `src/lib/server/db` |
-| 31 | 31 | route-handler chunks in `src/routes/api/investigate/suggest` (tag: api) | `src/routes/api/investigate/suggest` |
-| 54 | 26 | function chunks in `src/lib/server/analysis` | `src/lib/server/analysis` |
-| 99 | 26 | function chunks in `src/lib/server/image` (tag: embedding) | `src/lib/server/image` |
-| 39 | 23 | function chunks in `src/lib/server/analysis` (tag: embedding) | `src/lib/server/analysis` |
-| 40 | 22 | component chunks in `src/routes/(app)/demos/streaming` (tag: page) | `src/routes/(app)/demos/streaming` |
-| 11 | 20 | type chunks in `src/lib/utils` (tag: config) | `src/lib/utils` |
-| 36 | 17 | function chunks in `src/lib/webgpu` | `src/lib/webgpu` |
-| 12 | 13 | function chunks in `src/lib/server/cartridge` (tag: embedding) | `src/lib/server/cartridge` |
-| 66 | 12 | type chunks in `src/lib/server/services` (tag: types) | `src/lib/server/services` |
-| 56 | 10 | type chunks in `src/lib/server` (tag: embedding) | `src/lib/server` |
-| 58 | 10 | type chunks in `src/lib/server/indexer` (tag: vector) | `src/lib/server/indexer` |
-| 26 | 8 | route-handler chunks in `src/routes/api/ai/context` (tag: api) | `src/routes/api/ai/context` |
-| 37 | 7 | function chunks in `src/lib/utils` (tag: api-route) | `src/lib/utils` |
-| 7 | 6 | component chunks in `src/lib/components/admin` | `src/lib/components/admin` |
-| 63 | 5 | const chunks in `src/lib/server/db` (tag: database) | `src/lib/server/db` |
-| 98 | 5 | type chunks in `src/lib/server/db` (tag: database) | `src/lib/server/db` |
-| 45 | 3 | function chunks in `src/lib/server/ai` (tag: ai) | `src/lib/server/ai` |
-| 67 | 3 | const chunks in `src/lib/components/ui/tabs` | `src/lib/components/ui/tabs` |
-| 30 | 2 | type chunks in `src/lib/components/ui/gaming/types` | `src/lib/components/ui/gaming/types` |
-| 42 | 2 | type chunks in `src/lib/services/error-analysis` (tag: vector) | `src/lib/services/error-analysis` |
-| 46 | 2 | type chunks in `src/lib/server/types` (tag: ai) | `src/lib/server/types` |
-| 49 | 2 | type chunks in `src/lib/server/cache` (tag: vector) | `src/lib/server/cache` |
-| 68 | 2 | function chunks in `src/lib/stores/dashboard` (tag: server-module) | `src/lib/stores/dashboard` |
-| 0 | 1 | type chunks in `src/lib/types` (tag: vector) | `src/lib/types` |
-| 10 | 1 | type chunks in `src/lib/server/db` (tag: database) | `src/lib/server/db` |
-| 14 | 1 | function chunks in `src/lib/ai` (tag: ai) | `src/lib/ai` |
-| 16 | 1 | type chunks in `src/lib/services/error-analysis` (tag: vector) | `src/lib/services/error-analysis` |
-| 33 | 1 | type chunks in `src/lib/types` (tag: auth) | `src/lib/types` |
-| 61 | 1 | const chunks in `src/lib/server/concurrency` (tag: auth) | `src/lib/server/concurrency` |
-| 62 | 1 | type chunks in `src/lib/types` (tag: vector) | `src/lib/types` |
-| 65 | 1 | const chunks in `src/lib/server/db` (tag: database) | `src/lib/server/db` |
-| 71 | 1 | type chunks in `src/lib/server/vector` (tag: vector) | `src/lib/server/vector` |
-| 76 | 1 | type chunks in `src/lib/server/db` (tag: database) | `src/lib/server/db` |
-| 79 | 1 | type chunks in `src/lib/server/types` | `src/lib/server/types` |
-| 93 | 1 | type chunks in `src/lib/types` (tag: embedding) | `src/lib/types` |
+| 30 | 4,218 | ts chunks (tag: scripts) | `—` |
+| 88 | 3,982 | ts chunks (tag: scripts) | `—` |
+| 90 | 3,446 | svelte chunks (tag: svelte) | `—` |
+| 66 | 3,187 | mixed chunks in `.venv/Lib/python3.9/site-packages/numpy/_core/tests` (tag: python) | `.venv/Lib/python3.9/site-packages/numpy/_core/tests` |
+| 3 | 2,964 | ts chunks (tag: +server) | `—` |
+| 19 | 2,679 | md chunks (tag: llms) | `—` |
+| 78 | 2,455 | mixed chunks in `.venv/Lib/python3.9/site-packages/numpy/lib` (tag: python) | `.venv/Lib/python3.9/site-packages/numpy/lib` |
+| 94 | 2,416 | ts chunks (tag: +server) | `—` |
+| 91 | 2,084 | mixed chunks in `.venv/Lib/python3.9/site-packages/pip/_vendor/packaging` (tag: python) | `.venv/Lib/python3.9/site-packages/pip/_vendor/packaging` |
+| 27 | 2,014 | mjs chunks (tag: mjs) | `—` |
+| 44 | 1,966 | svelte chunks (tag: svelte) | `—` |
+| 56 | 1,828 | ts chunks (tag: qdrant) | `—` |
+| 96 | 1,761 | ts chunks (tag: +server) | `—` |
+| 7 | 1,733 | ts chunks (tag: gpu) | `—` |
+| 43 | 1,632 | ts chunks (tag: schema) | `—` |
+| 28 | 1,606 | ts chunks (tag: scripts) | `—` |
+| 99 | 1,602 | svelte chunks (tag: svelte) | `—` |
+| 49 | 1,502 | svelte chunks (tag: svelte) | `—` |
+| 9 | 1,486 | svelte chunks (tag: svelte) | `—` |
+| 84 | 1,371 | md chunks (tag: scripts) | `—` |
+| 72 | 1,350 | ts chunks (tag: svelte) | `—` |
+| 61 | 1,313 | ts chunks (tag: ace) | `—` |
+| 36 | 1,268 | ts chunks (tag: index) | `—` |
+| 58 | 1,178 | ts chunks (tag: +server) | `—` |
+| 37 | 1,164 | ts chunks (tag: scripts) | `—` |
+| 11 | 1,113 | ts chunks (tag: legal) | `—` |
+| 67 | 1,113 | ts chunks (tag: mcp) | `—` |
+| 24 | 1,107 | md chunks (tag: scripts) | `—` |
+| 34 | 1,040 | mixed chunks in `.venv/Lib/python3.9/site-packages/pip/_internal/resolution/resolvelib` (tag: python) | `.venv/Lib/python3.9/site-packages/pip/_internal/resolution/resolvelib` |
+| 57 | 1,017 | mixed chunks in `.venv/Lib/python3.9/site-packages/pip/_internal/commands` (tag: python) | `.venv/Lib/python3.9/site-packages/pip/_internal/commands` |
+| 79 | 967 | ts chunks (tag: rerank) | `—` |
+| 51 | 887 | svelte chunks (tag: svelte) | `—` |
+| 65 | 879 | ts chunks (tag: scripts) | `—` |
+| 47 | 862 | mixed chunks in `.venv/Lib/python3.9/site-packages/numpy/polynomial` (tag: python) | `.venv/Lib/python3.9/site-packages/numpy/polynomial` |
+| 81 | 850 | md chunks (tag: scripts) | `—` |
+| 39 | 809 | ts chunks (tag: webgpu) | `—` |
+| 87 | 749 | mjs chunks (tag: mjs) | `—` |
+| 35 | 636 | md chunks (tag: scripts) | `—` |
+| 62 | 589 | ts chunks (tag: +server) | `—` |
+| 69 | 571 | ts chunks (tag: server) | `—` |
+| 13 | 568 | svelte chunks (tag: svelte) | `—` |
+| 70 | 565 | mjs chunks in `.tmp/audits/archive` (tag: audit) | `.tmp/audits/archive` |
+| 48 | 562 | svelte chunks (tag: svelte) | `—` |
+| 40 | 552 | ts chunks (tag: scripts) | `—` |
+| 60 | 549 | py chunks (tag: scripts) | `—` |
+| 12 | 545 | md chunks (tag: scripts) | `—` |
+| 16 | 539 | ts chunks in `.venv/Lib/python3.9/site-packages/pip/_vendor/rich` (tag: python) | `.venv/Lib/python3.9/site-packages/pip/_vendor/rich` |
+| 54 | 454 | mjs chunks (tag: mjs) | `—` |
+| 42 | 389 | svelte chunks (tag: svelte) | `—` |
+| 74 | 381 | ts chunks (tag: routes) | `—` |
+| 41 | 374 | mjs chunks (tag: mjs) | `—` |
+| 55 | 374 | mixed chunks in `.venv/Lib/python3.9/site-packages/numpy/ma` (tag: utility) | `.venv/Lib/python3.9/site-packages/numpy/ma` |
+| 23 | 338 | mjs chunks (tag: atlas) | `—` |
+| 83 | 307 | ts chunks (tag: ace) | `—` |
+| 31 | 301 | svelte chunks (tag: svelte) | `—` |
+| 5 | 280 | ts chunks (tag: +server) | `—` |
+| 26 | 262 | ts chunks (tag: citations) | `—` |
+| 50 | 253 | ts chunks (tag: indexer) | `—` |
+| 76 | 229 | ts chunks (tag: karpathy) | `—` |
+| 82 | 220 | mixed chunks in `.venv/Lib/python3.9/site-packages/numpy/lib/tests` (tag: python) | `.venv/Lib/python3.9/site-packages/numpy/lib/tests` |
+| 22 | 215 | svelte chunks (tag: svelte) | `—` |
+| 73 | 175 | svelte chunks (tag: routes) | `—` |
+| 46 | 173 | ts chunks (tag: transcript) | `—` |
+| 63 | 168 | ts chunks (tag: agent) | `—` |
+| 97 | 159 | ts chunks (tag: vault) | `—` |
+| 71 | 157 | svelte chunks (tag: svelte) | `—` |
+| 29 | 151 | json chunks (tag: json) | `—` |
+| 53 | 138 | ts chunks (tag: grpc) | `—` |
+| 6 | 137 | ts chunks (tag: research) | `—` |
+| 32 | 137 | svelte chunks (tag: svelte) | `—` |
+| 80 | 115 | ts chunks (tag: xstate) | `—` |
+| 1 | 114 | mixed chunks in `.venv/Lib/python3.9/site-packages/numpy/f2py/tests` (tag: python) | `.venv/Lib/python3.9/site-packages/numpy/f2py/tests` |
+| 20 | 107 | ts chunks (tag: tasks) | `—` |
+| 4 | 91 | ts chunks (tag: utils) | `—` |
+| 38 | 91 | ts chunks (tag: gpu) | `—` |
+| 21 | 72 | mixed chunks in `.venv/Lib/python3.9/site-packages/numpy/_core/tests` (tag: python) | `.venv/Lib/python3.9/site-packages/numpy/_core/tests` |
+| 92 | 59 | ts chunks (tag: agents) | `—` |
+| 93 | 52 | ts chunks (tag: routes) | `—` |
+| 85 | 50 | mixed chunks in `.venv/Lib/python3.9/site-packages/numpy/tests` (tag: python) | `.venv/Lib/python3.9/site-packages/numpy/tests` |
+| 33 | 47 | ts chunks (tag: graph) | `—` |
+| 18 | 45 | svelte chunks (tag: svelte) | `—` |
+| 64 | 42 | ts chunks (tag: retrieval) | `—` |
+| 89 | 41 | mixed chunks in `.venv/Lib/python3.9/site-packages/numpy/_core` (tag: python) | `.venv/Lib/python3.9/site-packages/numpy/_core` |
+| 75 | 39 | ts chunks (tag: scripts) | `—` |
+| 2 | 38 | mixed chunks in `.venv/Lib/python3.9/site-packages/numpy/_core/tests` (tag: python) | `.venv/Lib/python3.9/site-packages/numpy/_core/tests` |
+| 45 | 36 | mixed chunks in `.venv/Lib/python3.9/site-packages/numpy/_core/tests` (tag: python) | `.venv/Lib/python3.9/site-packages/numpy/_core/tests` |
+| 98 | 32 | svelte chunks (tag: svelte) | `—` |
+| 86 | 25 | js chunks (tag: utils) | `—` |
+| 25 | 19 | ts chunks (tag: retrieval) | `—` |
+| 77 | 19 | ts chunks (tag: ff1) | `—` |
+| 0 | 16 | ts chunks (tag: routes) | `—` |
+| 10 | 12 | ts chunks (tag: indexer) | `—` |
+| 15 | 12 | md chunks (tag: scripts) | `—` |
+| 17 | 12 | ts chunks (tag: routes) | `—` |
+| 14 | 7 | mjs chunks (tag: mjs) | `—` |
+| 52 | 7 | mixed chunks in `.venv/Lib/python3.9/site-packages/pip/_internal/network` (tag: python) | `.venv/Lib/python3.9/site-packages/pip/_internal/network` |
+| 8 | 6 | ts chunks (tag: couchdb) | `—` |
+| 59 | 4 | ts chunks (tag: routes) | `—` |
+| 68 | 3 | svelte chunks (tag: svelte) | `—` |
+| 95 | 2 | js chunks (tag: ollama) | `—` |
 
 ## Per-cluster details
 
-### Cluster 50 — component chunks in `src/lib/components/ui/gaming/n64` (tag: page)
+### Cluster 30 — ts chunks (tag: scripts)
 
-- **Size:** 3,814 chunks (sampled 16)
-- **Top kinds:** component×14, unknown×2
-- **Top tags:** page×1, component×1
-- **Top symbols:** `Svelte5Input.svelte`×1, `SelectRoot.svelte`×1, `ExpandGrid.svelte`×1, `AlertDialogTrigger.svelte`×1, `User.svelte`×1
-- **Top directories:** `src/lib/components/ui/gaming/n64`×3, `src/lib/components/yorha`×3, `src/lib/components/ui/select`×2
-
-**Top member files:**
-- `src/lib/components/ui/input/Svelte5Input.svelte` (1×)
-- `src/lib/components/ui/select/SelectRoot.svelte` (1×)
-- `src/lib/components/ui/ExpandGrid.svelte` (1×)
-- `src/lib/components/ui/alert-dialog/AlertDialogTrigger.svelte` (1×)
-- `src/lib/components/ui/user/User.svelte` (1×)
-- `src/lib/components/ui/gaming/n64/Dialog.svelte` (1×)
-- `src/lib/components/components-shims.d.ts` (1×)
-- `src/lib/components/ui/gaming/n64/N64Screen.svelte` (1×)
-
-### Cluster 21 — component chunks in `src/lib/components/legal` (tag: auth)
-
-- **Size:** 2,980 chunks (sampled 16)
-- **Top kinds:** component×6, function×5, route-handler×2, class×1, unknown×1
-- **Top tags:** auth×5, embedding×4, redis×3, ai×2, api×2
-- **Top symbols:** `GET`×2, `LegalPrecedentCard.svelte`×1, `CitationManager.svelte`×1, `+page.svelte`×1, `generateLegalPacketPDF`×1
-- **Top directories:** `src/lib/components/legal`×2, `src/lib/server`×2, `src/routes/(app)/simulation`×1
+- **Size:** 4,218 chunks (sampled 16)
+- **Top kinds:** ts×11, mjs×4, json×1
+- **Top tags:** scripts×8, mjs×4, server×4, api-cleanup×3, reports×3
+- **Top symbols:** —
+- **Top directories:** —
 
 **Top member files:**
-- `src/lib/components/legal/LegalPrecedentCard.svelte` (1×)
-- `src/lib/components/legal/CitationManager.svelte` (1×)
-- `src/routes/(app)/simulation/+page.svelte` (1×)
-- `src/lib/server/pdf/legalPacketGenerator.ts` (1×)
-- `src/lib/ai/e2b/session.ts` (1×)
-- `src/lib/components/dashboard/GamificationWidget.svelte` (1×)
-- `src/lib/components/evidence/BoardSearchOverlay.svelte` (1×)
-- `src/routes/api/rag/todo-suggestions/+server.ts` (1×)
 
-### Cluster 70 — route-handler chunks in `src/lib/server/analytics` (tag: embedding)
+### Cluster 88 — ts chunks (tag: scripts)
 
-- **Size:** 1,546 chunks (sampled 16)
-- **Top kinds:** route-handler×8, function×7, const×1
-- **Top tags:** embedding×11, api×8, server×8, vector×7, redis×6
-- **Top symbols:** `POST`×7, `agenticScout`×1, `syncAllCasesToGraph`×1, `crawlDocsHandler`×1, `kbSearchHandler`×1
-- **Top directories:** `src/lib/server/analytics`×2, `src/lib/server/tools/handlers`×2, `src/routes/api/library/crawl`×1
+- **Size:** 3,982 chunks (sampled 16)
+- **Top kinds:** ts×13, mjs×1, sql×1, py×1
+- **Top tags:** scripts×7, +server×6, server×6, api-cleanup×5, reports×5
+- **Top symbols:** —
+- **Top directories:** —
 
 **Top member files:**
-- `src/routes/api/library/crawl/+server.ts` (1×)
-- `src/routes/api/admin/seed-knowledge/+server.ts` (1×)
-- `src/lib/server/analytics/agentic-web-indexer.ts` (1×)
-- `src/lib/server/graph/pg-neo4j-sync.ts` (1×)
-- `src/lib/server/tools/handlers/crawlDocs.ts` (1×)
-- `src/routes/api/analytics/research-summaries/+server.ts` (1×)
-- `src/routes/api/codebase-index/gpu-pipeline/+server.ts` (1×)
-- `src/lib/server/tools/handlers/kbSearch.ts` (1×)
 
-### Cluster 35 — component chunks in `src/lib/components/legal-ai` (tag: component)
+### Cluster 90 — svelte chunks (tag: svelte)
 
-- **Size:** 1,392 chunks (sampled 16)
-- **Top kinds:** component×16
-- **Top tags:** component×6, page×5, vector×1, layout×1
-- **Top symbols:** `+page.svelte`×5, `CorpusSidebar.svelte`×1, `StatuteSearchBar.svelte`×1, `LegalResearchSpellbook.svelte`×1, `GlossaryTermCard.svelte`×1
-- **Top directories:** `src/lib/components/legal-ai`×4, `src/lib/components/legal`×3, `src/lib/components/legal-corpus`×1
+- **Size:** 3,446 chunks (sampled 16)
+- **Top kinds:** svelte×16
+- **Top tags:** svelte×16, components×10, routes×6, +page×6, page×6
+- **Top symbols:** —
+- **Top directories:** —
 
 **Top member files:**
-- `src/lib/components/legal-corpus/CorpusSidebar.svelte` (1×)
-- `src/routes/(app)/library/[documentId]/node/[nodeId]/+page.svelte` (1×)
-- `src/lib/components/legal-ai/StatuteSearchBar.svelte` (1×)
-- `src/routes/(app)/demos/source-drawer/+page.svelte` (1×)
-- `src/lib/components/legal/LegalResearchSpellbook.svelte` (1×)
-- `src/lib/components/legal/GlossaryTermCard.svelte` (1×)
-- `src/routes/(app)/library/glossary/+page.svelte` (1×)
-- `src/routes/(app)/cases/[id]/+layout.svelte` (1×)
 
-### Cluster 5 — component chunks in `src/lib/components/ai` (tag: ai)
+### Cluster 66 — mixed chunks in `.venv/Lib/python3.9/site-packages/numpy/_core/tests` (tag: python)
 
-- **Size:** 1,280 chunks (sampled 16)
-- **Top kinds:** component×16
-- **Top tags:** ai×8, auth×8, page×5, component×5, embedding×1
-- **Top symbols:** `+page.svelte`×5, `SimpleWorkingChat.svelte`×1, `AIChatAssistant.svelte`×1, `EnhancedAIChatTest.svelte`×1, `FloatingChatModal.svelte`×1
-- **Top directories:** `src/lib/components/ai`×8, `src/routes/(app)/terminal`×1, `src/routes/(app)/demos/chat-messages`×1
+- **Size:** 3,187 chunks (sampled 16)
+- **Top kinds:** —
+- **Top tags:** python×16, utility×16, py×16, test×15
+- **Top symbols:** —
+- **Top directories:** `.venv/Lib/python3.9/site-packages/numpy/_core/tests`×7, `.venv/Lib/python3.9/site-packages/numpy/random/tests`×3, `.venv/Lib/python3.9/site-packages/numpy/ma/tests`×1
 
 **Top member files:**
-- `src/lib/components/ai/SimpleWorkingChat.svelte` (1×)
-- `src/routes/(app)/terminal/+page.svelte` (1×)
-- `src/routes/(app)/demos/chat-messages/+page.svelte` (1×)
-- `src/lib/components/AIChatAssistant.svelte` (1×)
-- `src/lib/components/ai/EnhancedAIChatTest.svelte` (1×)
-- `src/lib/components/ai/FloatingChatModal.svelte` (1×)
-- `src/lib/components/ai/AIRecommendation.svelte` (1×)
-- `src/lib/features/evidence-command-center/EvidenceChatPane.svelte` (1×)
+- `.venv/Lib/python3.9/site-packages/numpy/random/tests/test_random.py` (2×)
+- `.venv/Lib/python3.9/site-packages/numpy/ma/tests/test_extras.py` (1×)
+- `.venv/Lib/python3.9/site-packages/numpy/polynomial/tests/test_polyutils.py` (1×)
+- `.venv/Lib/python3.9/site-packages/numpy/_core/tests/test_arrayprint.py` (1×)
+- `.venv/Lib/python3.9/site-packages/numpy/lib/tests/test_recfunctions.py` (1×)
+- `.venv/Lib/python3.9/site-packages/numpy/_core/tests/test_deprecations.py` (1×)
+- `.venv/Lib/python3.9/site-packages/numpy/fft/tests/test_pocketfft.py` (1×)
+- `.venv/Lib/python3.9/site-packages/numpy/_core/tests/test_argparse.py` (1×)
 
-### Cluster 72 — function chunks in `src/lib/server/ace` (tag: vector)
+### Cluster 3 — ts chunks (tag: +server)
 
-- **Size:** 1,186 chunks (sampled 16)
-- **Top kinds:** function×14, route-handler×1, const×1
-- **Top tags:** vector×11, embedding×11, redis×7, auth×4, ai×3
-- **Top symbols:** `POST`×1, `determineACEPolicy`×1, `assembleACEContext`×1, `generateAceWiki`×1, `recallChunks`×1
-- **Top directories:** `src/lib/server/ace`×5, `src/lib/server/retrieval`×3, `src/lib/server/ai`×3
-
-**Top member files:**
-- `src/lib/server/ace/policy.ts` (2×)
-- `src/lib/server/ace/context-assembler.ts` (2×)
-- `src/lib/server/retrieval/codebase-context.ts` (2×)
-- `src/lib/server/ai/langgraph-research.ts` (2×)
-- `src/routes/api/graph/recommendations/+server.ts` (1×)
-- `src/lib/server/ace/ace-wiki.ts` (1×)
-- `src/lib/types/rag-source-validation.ts` (1×)
-- `src/lib/server/llm/ollama-client.ts` (1×)
-
-### Cluster 74 — type chunks in `src/lib/types` (tag: vector)
-
-- **Size:** 1,122 chunks (sampled 16)
-- **Top kinds:** type×16
-- **Top tags:** vector×4, auth×4, redis×3, types×3, embedding×3
-- **Top symbols:** `RankedChunk`×1, `KBSearchResult`×1, `RetrievalNote`×1, `HealthStatus`×1, `VisualEffect`×1
-- **Top directories:** `src/lib/types`×6, `src/lib/machines`×1, `src/lib/server/indexer`×1
+- **Size:** 2,964 chunks (sampled 16)
+- **Top kinds:** ts×16
+- **Top tags:** +server×16, server×16, scripts×14, api-cleanup×14, reports×14
+- **Top symbols:** —
+- **Top directories:** —
 
 **Top member files:**
-- `src/lib/machines/retrieval-machine.ts` (1×)
-- `src/lib/types/source-validation.ts` (1×)
-- `src/lib/server/indexer/karpathy-wiki.ts` (1×)
-- `src/lib/types/api.ts` (1×)
-- `src/lib/types/yorha-interface.ts` (1×)
-- `src/lib/types/database.ts` (1×)
-- `src/lib/webgpu/dimensional-tensor-store.ts` (1×)
-- `src/lib/server/agent/subagents.ts` (1×)
 
-### Cluster 57 — const chunks in `src/lib/shims` (tag: embedding)
+### Cluster 19 — md chunks (tag: llms)
 
-- **Size:** 1,099 chunks (sampled 16)
-- **Top kinds:** const×10, function×3, type×2, class×1
-- **Top tags:** embedding×5, vector×3, auth×3, server-module×3, config×3
-- **Top symbols:** `multiStore`×1, `stores`×1, `routeLogger`×1, `parentPort`×1, `drainFloat32Pool`×1
-- **Top directories:** `src/lib/shims`×3, `src/lib/server/vector`×2, `src/lib`×1
+- **Size:** 2,679 chunks (sampled 16)
+- **Top kinds:** md×9, json×5, mjs×2
+- **Top tags:** llms×9, scripts×7, audit×6, gates×6, tier×6
+- **Top symbols:** —
+- **Top directories:** —
 
 **Top member files:**
-- `src/lib/server/vector/multi-store.ts` (1×)
-- `src/lib/stores.svelte.ts` (1×)
-- `src/lib/utils/route-operation-logger.ts` (1×)
-- `src/lib/shims/worker-threads-browser-shim.js` (1×)
-- `src/lib/server/gpu/libtorch-bridge.ts` (1×)
-- `src/lib/stores/unified/index.svelte.ts` (1×)
-- `src/lib/db/pool.ts` (1×)
-- `src/lib/server/retrieval/context-buffer.ts` (1×)
 
-### Cluster 44 — route-handler chunks in `src/lib/server/llm` (tag: api)
+### Cluster 78 — mixed chunks in `.venv/Lib/python3.9/site-packages/numpy/lib` (tag: python)
 
-- **Size:** 1,062 chunks (sampled 16)
-- **Top kinds:** route-handler×11, function×5
-- **Top tags:** api×11, server×11, embedding×4, auth×3, vector×2
-- **Top symbols:** `POST`×10, `generateLegalMemo`×1, `callGemma4WithTools`×1, `GET`×1, `generatePDFSummaryFromNotes`×1
-- **Top directories:** `src/lib/server/llm`×2, `src/routes/api/ai/memo-skeleton`×1, `src/routes/api/ai/cross-exam`×1
+- **Size:** 2,455 chunks (sampled 16)
+- **Top kinds:** —
+- **Top tags:** python×16, utility×16, py×16, test×2
+- **Top symbols:** —
+- **Top directories:** `.venv/Lib/python3.9/site-packages/numpy/lib`×6, `.venv/Lib/python3.9/site-packages/numpy/_core`×6, `.venv/Lib/python3.9/site-packages/numpy/_core/tests`×2
 
 **Top member files:**
-- `src/lib/server/llm/ollamaClient.ts` (2×)
-- `src/routes/api/ai/memo-skeleton/+server.ts` (1×)
-- `src/routes/api/ai/cross-exam/+server.ts` (1×)
-- `src/routes/api/ai/legal-research/+server.ts` (1×)
-- `src/routes/api/ai/ask/+server.ts` (1×)
-- `src/lib/server/ace/gemma4-codeintel.ts` (1×)
-- `src/routes/api/cases/[id]/analyze/stream/+server.ts` (1×)
-- `src/routes/api/phase72/suggest-fix/+server.ts` (1×)
+- `.venv/Lib/python3.9/site-packages/numpy/_core/einsumfunc.py` (2×)
+- `.venv/Lib/python3.9/site-packages/numpy/lib/_index_tricks_impl.py` (2×)
+- `.venv/Lib/python3.9/site-packages/numpy/_core/tests/test_indexerrors.py` (1×)
+- `.venv/Lib/python3.9/site-packages/numpy/lib/_shape_base_impl.py` (1×)
+- `.venv/Lib/python3.9/site-packages/numpy/_core/multiarray.py` (1×)
+- `.venv/Lib/python3.9/site-packages/numpy/_core/numeric.py` (1×)
+- `.venv/Lib/python3.9/site-packages/numpy/_core/tests/test_indexing.py` (1×)
+- `.venv/Lib/python3.9/site-packages/numpy/_core/function_base.py` (1×)
 
-### Cluster 25 — route-handler chunks in `src/lib/server` (tag: redis)
+### Cluster 94 — ts chunks (tag: +server)
 
-- **Size:** 974 chunks (sampled 16)
-- **Top kinds:** route-handler×11, function×5
-- **Top tags:** redis×11, api×11, server×11, embedding×9, vector×5
-- **Top symbols:** `GET`×10, `getAllCacheStats`×1, `getCartridgeCacheStats`×1, `checkChr97GrpcHealth`×1, `getDocStatus`×1
-- **Top directories:** `src/lib/server`×1, `src/routes/api/cache/metrics`×1, `src/routes/api/health/status`×1
-
-**Top member files:**
-- `src/lib/server/knowledge-cache.ts` (1×)
-- `src/routes/api/cache/metrics/+server.ts` (1×)
-- `src/routes/api/health/status/+server.ts` (1×)
-- `src/routes/api/ml/cluster-status/+server.ts` (1×)
-- `src/routes/api/glyph/tile-atlas/+server.ts` (1×)
-- `src/routes/api/cache/stats/+server.ts` (1×)
-- `src/lib/server/cache/cartridge-tensor-bridge.ts` (1×)
-- `src/routes/api/chrrom/push/+server.ts` (1×)
-
-### Cluster 92 — component chunks in `src/lib/components/evidence` (tag: embedding)
-
-- **Size:** 940 chunks (sampled 16)
-- **Top kinds:** component×14, const×1, function×1
-- **Top tags:** embedding×4, page×3, component×3, xstate×1
-- **Top symbols:** `+page.svelte`×3, `UploadZone.svelte`×2, `POIPhotoUploader.svelte`×1, `UploadProgressCard.svelte`×1, `AIFileUpload.svelte`×1
-- **Top directories:** `src/lib/components/evidence`×3, `src/lib/components`×2, `src/lib/components/yorha/evidence`×1
+- **Size:** 2,416 chunks (sampled 16)
+- **Top kinds:** ts×14, svelte×1, mjs×1
+- **Top tags:** +server×12, server×12, scripts×9, api-cleanup×8, reports×8
+- **Top symbols:** —
+- **Top directories:** —
 
 **Top member files:**
-- `src/lib/components/yorha/evidence/UploadZone.svelte` (1×)
-- `src/routes/(app)/demos/yorha/components/evidence/UploadZone.svelte` (1×)
-- `src/routes/(app)/cases/[id]/evidence/upload/+page.svelte` (1×)
-- `src/lib/client/ui/POIPhotoUploader.svelte` (1×)
-- `src/routes/(app)/evidence/upload/+page.svelte` (1×)
-- `src/lib/components/evidence/UploadProgressCard.svelte` (1×)
-- `src/lib/components/ui/AIFileUpload.svelte` (1×)
-- `src/lib/components/evidence/EvidenceBulkUploadDialog.svelte` (1×)
 
-### Cluster 94 — function chunks in `src/lib/server/cache` (tag: redis)
+### Cluster 91 — mixed chunks in `.venv/Lib/python3.9/site-packages/pip/_vendor/packaging` (tag: python)
 
-- **Size:** 921 chunks (sampled 16)
-- **Top kinds:** function×14, route-handler×1, const×1
-- **Top tags:** redis×12, cache×9, api×1, server×1, embedding×1
-- **Top symbols:** `POST`×1, `getCachedExport`×1, `getFromMemoryCache`×1, `getFromRedisCache`×1, `setCache`×1
-- **Top directories:** `src/lib/server/cache`×5, `src/lib/server`×4, `src/lib/cache`×2
+- **Size:** 2,084 chunks (sampled 16)
+- **Top kinds:** —
+- **Top tags:** python×16, utility×16, py×16, redis×1
+- **Top symbols:** —
+- **Top directories:** `.venv/Lib/python3.9/site-packages/pip/_vendor/packaging`×2, `.venv/Lib/python3.9/site-packages/numpy/f2py`×2, `.venv/Lib/python3.9/site-packages/pip/_vendor/rich`×2
 
 **Top member files:**
-- `src/lib/server/cache.ts` (3×)
-- `src/lib/server/cache/pdf-export-cache.ts` (2×)
-- `src/lib/server/cache/report-template-cache.ts` (2×)
-- `src/routes/api/v1/redis/cache/+server.ts` (1×)
-- `src/lib/cache/indexdb-cache.svelte.ts` (1×)
-- `src/lib/cache/cache-service.svelte.ts` (1×)
-- `src/lib/server/research/lane4-feedback.ts` (1×)
-- `src/lib/server/vector-cache.ts` (1×)
+- `.venv/Lib/python3.9/site-packages/pip/_internal/metadata/base.py` (1×)
+- `.venv/Lib/python3.9/site-packages/pip/_vendor/pygments/lexers/python.py` (1×)
+- `.venv/Lib/python3.9/site-packages/pip/_vendor/packaging/utils.py` (1×)
+- `.venv/Lib/python3.9/site-packages/numpy/f2py/cb_rules.py` (1×)
+- `.venv/Lib/python3.9/site-packages/pip/_vendor/idna/idnadata.py` (1×)
+- `.venv/Lib/python3.9/site-packages/pip/_vendor/cachecontrol/controller.py` (1×)
+- `.venv/Lib/python3.9/site-packages/pip/_vendor/pygments/sphinxext.py` (1×)
+- `.venv/Lib/python3.9/site-packages/pip/_vendor/rich/style.py` (1×)
 
-### Cluster 82 — function chunks in `src/lib/server/grpc` (tag: embedding)
+### Cluster 27 — mjs chunks (tag: mjs)
 
-- **Size:** 903 chunks (sampled 16)
-- **Top kinds:** function×14, class×1, const×1
-- **Top tags:** embedding×9, vector×7, api-route×3, auth×2, analytics×2
-- **Top symbols:** `ToolCallingClient`×1, `toMcpResponse`×1, `logToolCall`×1, `expandAstNeighborsViaGrpc`×1, `listMcpTools`×1
-- **Top directories:** `src/lib/server/grpc`×10, `src/lib/server/training`×2, `src/lib/server/mcp`×1
-
-**Top member files:**
-- `src/lib/server/grpc/retrieval-client.ts` (5×)
-- `src/lib/server/grpc/codeintel-client.ts` (3×)
-- `src/lib/server/training/query-logger.ts` (2×)
-- `src/lib/server/grpc/tool-calling-client.ts` (1×)
-- `src/lib/server/grpc/tool-router-client.ts` (1×)
-- `src/lib/server/mcp/mcp-internal.ts` (1×)
-- `src/lib/server/gpu/mapreduce-cuda-analyzer.ts` (1×)
-- `src/lib/server/retrieval/codebase-context.ts` (1×)
-
-### Cluster 20 — function chunks in `src/lib/webgpu` (tag: embedding)
-
-- **Size:** 883 chunks (sampled 16)
-- **Top kinds:** function×9, class×5, const×1, route-handler×1
-- **Top tags:** embedding×15, redis×6, vector×4, auth×2, schema×1
-- **Top symbols:** `WebGPUSimilarityService`×1, `WebGPUSOMCache`×1, `COSINE_SIMILARITY_WGSL`×1, `computeSimilarity`×1, `dotProduct`×1
-- **Top directories:** `src/lib/webgpu`×3, `src/lib/server/gpu`×3, `src/lib/gpu`×2
+- **Size:** 2,014 chunks (sampled 16)
+- **Top kinds:** mjs×16
+- **Top tags:** mjs×16, scripts×16, atlas×13, smoke×2, gpu×2
+- **Top symbols:** —
+- **Top directories:** —
 
 **Top member files:**
-- `src/lib/server/gpu/libtorch-bridge.ts` (2×)
-- `src/lib/server/grpc/graph-ml-client.ts` (2×)
-- `src/lib/webgpu/webgpu-similarity-service.ts` (1×)
-- `src/lib/webgpu/som-webgpu-cache.ts` (1×)
-- `src/lib/gpu/shader-registry.ts` (1×)
-- `src/lib/webgpu/compute-shader-engine.ts` (1×)
-- `src/lib/server/indexer/gpu-karpathy-tagger.ts` (1×)
-- `src/routes/api/codebase-index/karpathy-tag/gpu/+server.ts` (1×)
 
-### Cluster 6 — function chunks in `src/lib/server/db` (tag: embedding)
+### Cluster 44 — svelte chunks (tag: svelte)
 
-- **Size:** 700 chunks (sampled 16)
-- **Top kinds:** function×15, class×1
-- **Top tags:** embedding×15, database×11, vector×7, auth×6, vector-search×1
-- **Top symbols:** `searchAcrossAllVectors`×2, `searchSimilarMessages`×2, `hybridSearch`×1, `searchTagsBySemantic`×1, `searchByEmbedding`×1
-- **Top directories:** `src/lib/server/db`×11, `src/lib/server/ace`×1, `src/lib/server`×1
+- **Size:** 1,966 chunks (sampled 16)
+- **Top kinds:** svelte×16
+- **Top tags:** svelte×16, routes×14, (app)×14, +page×14, page×14
+- **Top symbols:** —
+- **Top directories:** —
 
 **Top member files:**
-- `src/lib/server/db/vector-operations.ts` (3×)
-- `src/lib/server/db/pgvector-utils.ts` (3×)
-- `src/lib/server/db/pgvector-utils.temp.ts` (2×)
-- `src/lib/server/db/qdrant-sync.ts` (2×)
-- `src/lib/server/ace/tag-sync.ts` (1×)
-- `src/lib/server/db/postgres-knowledge.ts` (1×)
-- `src/lib/server/qdrant-integration.ts` (1×)
-- `src/lib/server/graph/user-interaction-sync.ts` (1×)
 
-### Cluster 86 — function chunks in `src/lib/components/evidence` (tag: embedding)
+### Cluster 56 — ts chunks (tag: qdrant)
 
-- **Size:** 680 chunks (sampled 16)
-- **Top kinds:** function×14, const×2
-- **Top tags:** embedding×7, server-module×3, vector×3, page-component×2, redis×2
-- **Top symbols:** `toReaderModel`×1, `runeBatchToGlyphRecords`×1, `createBulkMoveCommand`×1, `legalCorpusViews`×1, `extractLegalMetadata`×1
-- **Top directories:** `src/lib/components/evidence`×3, `src/lib/types`×2, `src/lib/server/cartridge`×1
+- **Size:** 1,828 chunks (sampled 16)
+- **Top kinds:** ts×11, mjs×5
+- **Top tags:** qdrant×7, mjs×5, scripts×5, atlas×5, services×3
+- **Top symbols:** —
+- **Top directories:** —
 
 **Top member files:**
-- `src/lib/components/evidence/board-history.svelte.ts` (3×)
-- `src/lib/types/legal-corpus-views.ts` (2×)
-- `src/lib/server/cartridge/glyph-mappers.ts` (1×)
-- `src/lib/server/png-embed-extractor.ts` (1×)
-- `src/lib/server/embeddings/ollama.ts` (1×)
-- `src/lib/shims/worker-threads-browser-shim.js` (1×)
-- `src/lib/server/ml/recommendation-glyph.ts` (1×)
-- `src/lib/data/types.ts` (1×)
 
-### Cluster 23 — class chunks in `src/lib/webgpu` (tag: embedding)
+### Cluster 96 — ts chunks (tag: +server)
 
-- **Size:** 622 chunks (sampled 16)
-- **Top kinds:** class×6, function×6, type×2, unknown×1, const×1
-- **Top tags:** embedding×6, api-route×4, sse×4, types×2, server-module×1
-- **Top symbols:** `webgpu-navigator.d.ts`×1, `webGPU`×1, `WebGPUInit`×1, `initWebGPU`×1, `wireWebGPUToTelemetry`×1
-- **Top directories:** `src/lib/webgpu`×7, `src/lib/types`×4, `src/lib/gpu`×2
+- **Size:** 1,761 chunks (sampled 16)
+- **Top kinds:** ts×16
+- **Top tags:** +server×6, server×6, utils×4, error×4, scripts×4
+- **Top symbols:** —
+- **Top directories:** —
 
 **Top member files:**
-- `src/lib/webgpu/init.ts` (2×)
-- `src/lib/types/webgpu.d.ts` (2×)
-- `src/lib/types/webgpu-navigator.d.ts` (1×)
-- `src/lib/polyfills.ts` (1×)
-- `src/lib/webgpu/webgpu-init.ts` (1×)
-- `src/lib/webgpu/wire-telemetry.ts` (1×)
-- `src/lib/gpu/gpu-compute-pipeline.ts` (1×)
-- `src/lib/webgpu/webgpu-rag-service.ts` (1×)
 
-### Cluster 85 — route-handler chunks in `src/routes/api/citations/collections/[collectionId]/citations` (tag: api)
+### Cluster 7 — ts chunks (tag: gpu)
 
-- **Size:** 587 chunks (sampled 16)
-- **Top kinds:** route-handler×15, function×1
-- **Top tags:** api×15, server×15, embedding×3, redis×2, vector×1
-- **Top symbols:** `DELETE`×8, `GET`×4, `POST`×3, `deleteEmbeddings`×1
-- **Top directories:** `src/routes/api/citations/collections/[collectionId]/citations`×3, `src/routes/api/cases/[id]/notes/[noteId]/evidence`×2, `src/routes/api/fictional-cases/[id]`×1
+- **Size:** 1,733 chunks (sampled 16)
+- **Top kinds:** ts×12, mjs×3, mts×1
+- **Top tags:** gpu×8, libtorch-bridge×5, libtorch×5, bridge×5, scripts×4
+- **Top symbols:** —
+- **Top directories:** —
 
 **Top member files:**
-- `src/routes/api/citations/collections/[collectionId]/citations/+server.ts` (3×)
-- `src/routes/api/cases/[id]/notes/[noteId]/evidence/+server.ts` (2×)
-- `src/routes/api/fictional-cases/[id]/+server.ts` (1×)
-- `src/routes/api/citations/[citationId]/tags/+server.ts` (1×)
-- `src/routes/api/error-brain/diagnosis-history/+server.ts` (1×)
-- `src/routes/api/reports/+server.ts` (1×)
-- `src/routes/api/citations/collections/[collectionId]/+server.ts` (1×)
-- `src/routes/api/citations/export/json/+server.ts` (1×)
 
-### Cluster 55 — table-def chunks in `src/lib/server/db` (tag: database)
+### Cluster 43 — ts chunks (tag: schema)
 
-- **Size:** 577 chunks (sampled 16)
-- **Top kinds:** table-def×16
-- **Top tags:** database×16, schema×16, drizzle×16, embedding×14, vector×9
-- **Top symbols:** `legal_nodes`×1, `error_events`×1, `web_pages`×1, `qlora_examples`×1, `library_document_versions`×1
-- **Top directories:** `src/lib/server/db`×11, `src/lib/server/db/schema`×2, `src/lib/db/schema`×2
+- **Size:** 1,632 chunks (sampled 16)
+- **Top kinds:** ts×14, sql×1, json×1
+- **Top tags:** schema×15, schema-postgres×3, postgres×3, cards×2, legal×2
+- **Top symbols:** —
+- **Top directories:** —
 
 **Top member files:**
-- `src/lib/server/db/schema-postgres.ts` (7×)
-- `src/lib/server/db/schema-phase78.ts` (2×)
-- `src/lib/server/db/schema-web.ts` (1×)
-- `src/lib/server/db/schema/search-analytics.ts` (1×)
-- `src/lib/db/schema/gpuInferenceDemo.ts` (1×)
-- `src/lib/db/schema/ace-web.ts` (1×)
-- `src/lib/db/vite-error-schema.ts` (1×)
-- `src/lib/server/db/schema/ingestion-jobs.ts` (1×)
 
-### Cluster 32 — function chunks in `src/lib/server/services` (tag: api-route)
+### Cluster 28 — ts chunks (tag: scripts)
 
-- **Size:** 540 chunks (sampled 16)
-- **Top kinds:** function×15, unknown×1
-- **Top tags:** api-route×5, server-module×3, redis×2, vector×2, schema×1
-- **Top symbols:** `extractEntities`×2, `extractFromFile`×1, `extractEvidenceEntities`×1, `extractDocument`×1, `extractSectionsBatch`×1
-- **Top directories:** `src/lib/server/services`×6, `src/lib/server`×4, `src/lib/server/analysis`×1
+- **Size:** 1,606 chunks (sampled 16)
+- **Top kinds:** ts×15, mjs×1
+- **Top tags:** scripts×8, api-cleanup×8, reports×8, +server×8, server×8
+- **Top symbols:** —
+- **Top directories:** —
 
 **Top member files:**
-- `src/lib/server/services/langextract-service.ts` (6×)
-- `src/lib/server/langextract-client.ts` (3×)
-- `src/lib/server/analysis/entity-extraction.ts` (1×)
-- `src/lib/server/tools/handlers/langextractBatch.ts` (1×)
-- `src/lib/server/keyword-extractor.ts` (1×)
-- `src/lib/server/retrieval/wikipedia-search.ts` (1×)
-- `src/lib/schemas/tools/langextract-batch.schema.json` (1×)
-- `src/lib/server/evidence/services/entity-extractor.ts` (1×)
 
-### Cluster 48 — unknown chunks in `src/lib/server/db/migrations` (tag: database)
+### Cluster 99 — svelte chunks (tag: svelte)
 
-- **Size:** 526 chunks (sampled 16)
-- **Top kinds:** unknown×16
-- **Top tags:** database×16, embedding×12, auth×5, vector×3
-- **Top symbols:** `20241211000002_create_enhanced_evidence_table.sql`×1, `005_pgvector_384_optimization.sql`×1, `012_gin_jsonb_indexes.sql`×1, `enhanced-grpo-migration.sql`×1, `005_fix_app_requirements.sql`×1
-- **Top directories:** `src/lib/server/db/migrations`×9, `src/lib/db/migrations`×3, `src/lib/server/db`×3
+- **Size:** 1,602 chunks (sampled 16)
+- **Top kinds:** svelte×16
+- **Top tags:** svelte×16, routes×16, (app)×16, +page×16, page×16
+- **Top symbols:** —
+- **Top directories:** —
 
 **Top member files:**
-- `src/lib/db/migrations/20241211000002_create_enhanced_evidence_table.sql` (1×)
-- `src/lib/server/db/migrations/005_pgvector_384_optimization.sql` (1×)
-- `src/lib/server/db/migrations/012_gin_jsonb_indexes.sql` (1×)
-- `src/lib/db/migrations/enhanced-grpo-migration.sql` (1×)
-- `src/lib/server/db/migrations/005_fix_app_requirements.sql` (1×)
-- `src/lib/server/db/schema-pgvector-512.ts` (1×)
-- `src/lib/server/db/migrations/010_add_uploads_table.sql` (1×)
-- `src/lib/server/db/migrations/meta/_journal.json` (1×)
 
-### Cluster 64 — route-handler chunks in `src/routes/api/error-brain/history/[filePath]` (tag: api)
+### Cluster 49 — svelte chunks (tag: svelte)
 
-- **Size:** 525 chunks (sampled 16)
-- **Top kinds:** route-handler×2
-- **Top tags:** api×2, server×2
-- **Top symbols:** `GET`×2
-- **Top directories:** `src/routes/api/error-brain/history/[filePath]`×1, `src/routes/api/internal/error-brain/runs`×1
+- **Size:** 1,502 chunks (sampled 16)
+- **Top kinds:** svelte×15, ts×1
+- **Top tags:** svelte×15, routes×9, (app)×8, +page×8, page×8
+- **Top symbols:** —
+- **Top directories:** —
 
 **Top member files:**
-- `src/routes/api/error-brain/history/[filePath]/+server.ts` (1×)
-- `src/routes/api/internal/error-brain/runs/+server.ts` (1×)
 
-### Cluster 73 — function chunks in `src/lib/server/retrieval` (tag: vector)
+### Cluster 9 — svelte chunks (tag: svelte)
 
-- **Size:** 476 chunks (sampled 16)
-- **Top kinds:** function×14, class×1, type×1
-- **Top tags:** vector×10, redis×9, embedding×8, rag-pipeline×5, graph-db×1
-- **Top symbols:** `legalPageRank`×1, `CitationGraph`×1, `computePageRank`×1, `orderByDependency`×1, `rerankLegalAware`×1
-- **Top directories:** `src/lib/server/retrieval`×8, `src/lib/server/types`×4, `src/lib/server/graph`×2
+- **Size:** 1,486 chunks (sampled 16)
+- **Top kinds:** svelte×8, ts×8
+- **Top tags:** svelte×10, cache×9, components×6, monitoring×3, cachemonitoringwidget×3
+- **Top symbols:** —
+- **Top directories:** —
 
 **Top member files:**
-- `src/lib/server/types/retrieval.ts` (4×)
-- `src/lib/server/graph/couchdb-pagerank.ts` (2×)
-- `src/lib/server/retrieval/document-dag.ts` (2×)
-- `src/lib/server/retrieval/legal-pagerank.ts` (1×)
-- `src/lib/server/retrieval/citation-graph.ts` (1×)
-- `src/lib/server/rag/ranker.ts` (1×)
-- `src/lib/server/retrieval/topological-search.ts` (1×)
-- `src/lib/server/retrieval/graph-context.ts` (1×)
 
-### Cluster 29 — const chunks in `src/lib/schemas` (tag: auth)
+### Cluster 84 — md chunks (tag: scripts)
 
-- **Size:** 455 chunks (sampled 16)
-- **Top kinds:** const×7, type×5, function×3, unknown×1
-- **Top tags:** auth×3, types×2, embedding×2, vector×1, redis×1
-- **Top symbols:** `Evidence`×2, `EvidenceFile`×1, `evidenceSchema`×1, `DBEvidence`×1, `evidenceUploadSchema`×1
-- **Top directories:** `src/lib/schemas`×3, `src/lib/types`×2, `src/routes/(app)/evidence`×2
+- **Size:** 1,371 chunks (sampled 16)
+- **Top kinds:** md×16
+- **Top tags:** scripts×16, api-cleanup×16, reports×16, llms×16, agents×16
+- **Top symbols:** —
+- **Top directories:** —
 
 **Top member files:**
-- `src/routes/(app)/evidence/schema.ts` (2×)
-- `src/lib/schemas/evidence-upload.ts` (2×)
-- `src/lib/stores/unified/evidence-store.svelte.ts` (1×)
-- `src/lib/types/global.ts` (1×)
-- `src/lib/schemas/evidence.ts` (1×)
-- `src/lib/types/database.ts` (1×)
-- `src/lib/data/types.ts` (1×)
-- `src/lib/components/evidence/evidence-utils.ts` (1×)
 
-### Cluster 1 — type chunks in `src/lib/utils` (tag: page-component)
+### Cluster 72 — ts chunks (tag: svelte)
 
-- **Size:** 450 chunks (sampled 16)
-- **Top kinds:** type×4, function×1, component×1
-- **Top tags:** page-component×3, auth×2, ui-component×2, server-module×2, types×2
-- **Top symbols:** `FormState`×2, `FormComponentProps`×1, `createProgressiveForm`×1, `ProgressiveFormUtils`×1, `ProgressiveForm.svelte`×1
-- **Top directories:** `src/lib/utils`×3, `src/lib/types`×2, `src/lib/components/forms`×1
+- **Size:** 1,350 chunks (sampled 16)
+- **Top kinds:** ts×12, svelte×4
+- **Top tags:** svelte×7, routes×6, api×6, chat×6, +server×6
+- **Top symbols:** —
+- **Top directories:** —
 
 **Top member files:**
-- `src/lib/utils/progressive-enhancement-audit.ts` (3×)
-- `src/lib/types/svelte5-api-types.d.ts` (2×)
-- `src/lib/components/forms/ProgressiveForm.svelte` (1×)
 
-### Cluster 75 — function chunks in `src/lib/config` (tag: embedding)
+### Cluster 61 — ts chunks (tag: ace)
 
-- **Size:** 416 chunks (sampled 16)
-- **Top kinds:** function×12, const×3, type×1
-- **Top tags:** embedding×9, vector×9, redis×7, rabbitmq×5, ai×2
-- **Top symbols:** `getOllamaEndpoint`×2, `getMinioConfig`×1, `CONFIG`×1, `getModelConfig`×1, `DATABASE_CONFIG`×1
-- **Top directories:** `src/lib/config`×6, `src/lib/server`×2, `src/lib/server/config`×1
+- **Size:** 1,313 chunks (sampled 16)
+- **Top kinds:** ts×9, mjs×7
+- **Top tags:** ace×11, mjs×7, scripts×7, packet×5, ingest×4
+- **Top symbols:** —
+- **Top directories:** —
 
 **Top member files:**
-- `src/lib/config/env.server.ts` (4×)
-- `src/lib/server/config/ollama.ts` (1×)
-- `src/lib/server/ai/ollama-config.ts` (1×)
-- `src/lib/server/config.ts` (1×)
-- `src/lib/config/database.ts` (1×)
-- `src/lib/config/redis-config.ts` (1×)
-- `src/lib/server/minio.ts` (1×)
-- `src/lib/services/knowledge-search/QdrantKnowledgeStore.ts` (1×)
 
-### Cluster 60 — function chunks in `src/lib/server/analytics` (tag: embedding)
+### Cluster 36 — ts chunks (tag: index)
 
-- **Size:** 406 chunks (sampled 16)
-- **Top kinds:** function×5, table-def×3, type×1
-- **Top tags:** embedding×8, redis×6, vector×5, database×4, schema×3
-- **Top symbols:** `recordChunkHits`×1, `chunk_hit_log`×1, `recordQueryLog`×1, `ace_chunks`×1, `getChunkQualitySignals`×1
-- **Top directories:** `src/lib/server/analytics`×4, `src/lib/server/db/schema`×2, `src/lib/db/schema`×1
+- **Size:** 1,268 chunks (sampled 16)
+- **Top kinds:** ts×16
+- **Top tags:** index×8, features×6, analytics×3, evidence×3, retrieval×2
+- **Top symbols:** —
+- **Top directories:** —
 
 **Top member files:**
-- `src/lib/server/analytics/search-analytics.ts` (4×)
-- `src/lib/server/db/schema/search-analytics.ts` (2×)
-- `src/lib/db/schema/ace-web.ts` (1×)
-- `src/lib/server/indexer/karpathy-wiki.ts` (1×)
-- `src/lib/types/pipeline-v2.ts` (1×)
 
-### Cluster 2 — component chunks in `src/lib/components/cases`
+### Cluster 58 — ts chunks (tag: +server)
 
-- **Size:** 400 chunks (sampled 16)
-- **Top kinds:** component×1
-- **Top tags:** —
-- **Top symbols:** `ContextualChatModal.svelte`×1
-- **Top directories:** `src/lib/components/cases`×1
+- **Size:** 1,178 chunks (sampled 16)
+- **Top kinds:** ts×16
+- **Top tags:** +server×12, server×12, scripts×6, api-cleanup×6, reports×6
+- **Top symbols:** —
+- **Top directories:** —
 
 **Top member files:**
-- `src/lib/components/cases/ContextualChatModal.svelte` (1×)
 
-### Cluster 28 — component chunks in `src/routes/(app)/demos/cache` (tag: page)
+### Cluster 37 — ts chunks (tag: scripts)
 
-- **Size:** 387 chunks (sampled 16)
-- **Top kinds:** component×5
-- **Top tags:** page×5, component×5
-- **Top symbols:** `+page.svelte`×5
-- **Top directories:** `src/routes/(app)/demos/cache`×1, `src/routes/(app)/demos/gpu-cache`×1, `src/routes/(app)/demos/bits-ui`×1
-
-**Top member files:**
-- `src/routes/(app)/demos/cache/+page.svelte` (1×)
-- `src/routes/(app)/demos/gpu-cache/+page.svelte` (1×)
-- `src/routes/(app)/demos/bits-ui/+page.svelte` (1×)
-- `src/routes/(app)/demos/icons/+page.svelte` (1×)
-- `src/routes/(app)/webgpu-similarity/+page.svelte` (1×)
-
-### Cluster 47 — route-handler chunks in `src/lib/server/legal` (tag: api)
-
-- **Size:** 339 chunks (sampled 16)
-- **Top kinds:** route-handler×6, const×5, function×4, unknown×1
-- **Top tags:** api×6, server×6, page-server×4, ssr×4, api-route×1
-- **Top symbols:** `load`×4, `GET`×3, `POST`×3, `fetchConstitution`×1, `normalizeConstitutionHtml`×1
-- **Top directories:** `src/lib/server/legal`×5, `src/routes/api/library/corpus/constitutions`×2, `src/routes/(app)/library/corpus`×1
+- **Size:** 1,164 chunks (sampled 16)
+- **Top kinds:** ts×12, mjs×3, json×1
+- **Top tags:** scripts×9, redis×9, server×7, api-cleanup×5, reports×5
+- **Top symbols:** —
+- **Top directories:** —
 
 **Top member files:**
-- `src/routes/api/library/corpus/constitutions/+server.ts` (2×)
-- `src/routes/(app)/library/corpus/+page.server.ts` (1×)
-- `src/routes/(app)/legal-corpus/+page.server.ts` (1×)
-- `src/lib/server/legal/constitution-fetcher.ts` (1×)
-- `src/routes/(app)/citations/law/[citation]/+page.server.ts` (1×)
-- `src/lib/server/legal/html-normalizer.ts` (1×)
-- `src/routes/(app)/legal-corpus/[id]/+page.server.ts` (1×)
-- `src/lib/server/legal/law-citations.ts` (1×)
 
-### Cluster 24 — class chunks in `src/lib/server/workers` (tag: redis)
+### Cluster 11 — ts chunks (tag: legal)
 
-- **Size:** 297 chunks (sampled 16)
-- **Top kinds:** class×2, function×1
-- **Top tags:** redis×3, vector×1, embedding×1, rabbitmq×1, worker×1
-- **Top symbols:** `AudioProcessor`×1, `VideoVLMProcessor`×1, `startAudioQueueConsumer`×1
-- **Top directories:** `src/lib/server/workers`×3
+- **Size:** 1,113 chunks (sampled 16)
+- **Top kinds:** ts×11, mjs×2, json×2, md×1
+- **Top tags:** legal×14, seed×13, data×11, legal-seed-data×11, scripts×5
+- **Top symbols:** —
+- **Top directories:** —
 
 **Top member files:**
-- `src/lib/server/workers/audio-processor.ts` (1×)
-- `src/lib/server/workers/video-vlm-processor.ts` (1×)
-- `src/lib/server/workers/audio-queue-consumer.ts` (1×)
 
-### Cluster 80 — function chunks in `src/lib/server/gpu` (tag: vector)
+### Cluster 67 — ts chunks (tag: mcp)
 
-- **Size:** 285 chunks (sampled 16)
-- **Top kinds:** function×2, route-handler×1
-- **Top tags:** vector×2, embedding×2, api×1, server×1
-- **Top symbols:** `triggerPoiGpuAnalysis`×1, `POST`×1, `analyzePoiPhotoGpu`×1
-- **Top directories:** `src/lib/server/gpu`×2, `src/routes/api/persons-of-interest/[id]/gpu-analyze`×1
+- **Size:** 1,113 chunks (sampled 16)
+- **Top kinds:** ts×16
+- **Top tags:** mcp×16, server×8, index×4, tools×3, trace×3
+- **Top symbols:** —
+- **Top directories:** —
 
 **Top member files:**
-- `src/lib/server/gpu/background-analyzer.ts` (2×)
-- `src/routes/api/persons-of-interest/[id]/gpu-analyze/+server.ts` (1×)
 
-### Cluster 27 — route-handler chunks in `src/routes/api/conversations/[id]` (tag: api)
+### Cluster 24 — md chunks (tag: scripts)
 
-- **Size:** 277 chunks (sampled 16)
-- **Top kinds:** route-handler×15, function×1
-- **Top tags:** api×15, server×15, redis×3, database×1, vector×1
-- **Top symbols:** `PATCH`×9, `POST`×5, `PUT`×1, `updateUser`×1
-- **Top directories:** `src/routes/api/conversations/[id]`×1, `src/routes/api/auth/profile`×1, `src/routes/api/error-brain/diagnosis-history`×1
+- **Size:** 1,107 chunks (sampled 16)
+- **Top kinds:** md×16
+- **Top tags:** scripts×16, api-cleanup×16, reports×16, llms×16, retrieval×16
+- **Top symbols:** —
+- **Top directories:** —
 
 **Top member files:**
-- `src/routes/api/conversations/[id]/+server.ts` (1×)
-- `src/routes/api/auth/profile/+server.ts` (1×)
-- `src/routes/api/error-brain/diagnosis-history/+server.ts` (1×)
-- `src/routes/api/evidence/[id]/approve/+server.ts` (1×)
-- `src/routes/api/routes/[routeId]/error-brain-patch/+server.ts` (1×)
-- `src/routes/api/evidence/summary/[id]/approve/+server.ts` (1×)
-- `src/routes/api/cases/[id]/notes/[noteId]/+server.ts` (1×)
-- `src/routes/api/persons-of-interest/[id]/+server.ts` (1×)
 
-### Cluster 69 — route-handler chunks in `src/routes/(app)/admin/api-testing/agentic-loop` (tag: api)
+### Cluster 34 — mixed chunks in `.venv/Lib/python3.9/site-packages/pip/_internal/resolution/resolvelib` (tag: python)
 
-- **Size:** 256 chunks (sampled 16)
-- **Top kinds:** route-handler×5, function×1
-- **Top tags:** api×5, server×5, vector×5, embedding×5, xstate×1
-- **Top symbols:** `POST`×4, `startClusteringJob`×1, `GET`×1
-- **Top directories:** `src/routes/(app)/admin/api-testing/agentic-loop`×2, `src/routes/api/codebase-index/recommendations`×1, `src/routes/api/codebase-index/cluster-detect`×1
+- **Size:** 1,040 chunks (sampled 16)
+- **Top kinds:** —
+- **Top tags:** python×16, utility×16, py×16
+- **Top symbols:** —
+- **Top directories:** `.venv/Lib/python3.9/site-packages/pip/_internal/resolution/resolvelib`×8, `.venv/Lib/python3.9/site-packages/pip/_internal/resolution/legacy`×3, `.venv/Lib/python3.9/site-packages/pip/_vendor/resolvelib/resolvers`×1
 
 **Top member files:**
-- `src/routes/(app)/admin/api-testing/agentic-loop/+server.ts` (2×)
-- `src/routes/api/codebase-index/recommendations/+server.ts` (1×)
-- `src/routes/api/codebase-index/cluster-detect/+server.ts` (1×)
-- `src/routes/api/ml/cluster-status/+server.ts` (1×)
-- `src/lib/server/ml/topic-clustering-worker.ts` (1×)
+- `.venv/Lib/python3.9/site-packages/pip/_internal/resolution/resolvelib/candidates.py` (4×)
+- `.venv/Lib/python3.9/site-packages/pip/_internal/resolution/legacy/resolver.py` (3×)
+- `.venv/Lib/python3.9/site-packages/pip/_internal/resolution/resolvelib/requirements.py` (2×)
+- `.venv/Lib/python3.9/site-packages/pip/_internal/resolution/resolvelib/factory.py` (2×)
+- `.venv/Lib/python3.9/site-packages/pip/_vendor/resolvelib/resolvers/resolution.py` (1×)
+- `.venv/Lib/python3.9/site-packages/pip/_internal/operations/prepare.py` (1×)
+- `.venv/Lib/python3.9/site-packages/pip/_internal/utils/pylock.py` (1×)
+- `.venv/Lib/python3.9/site-packages/pip/_vendor/resolvelib/providers.py` (1×)
 
-### Cluster 18 — type chunks in `src/lib/types` (tag: embedding)
+### Cluster 57 — mixed chunks in `.venv/Lib/python3.9/site-packages/pip/_internal/commands` (tag: python)
 
-- **Size:** 190 chunks (sampled 16)
-- **Top kinds:** type×16
-- **Top tags:** embedding×6, types×5, auth×3, api-route×1, analytics×1
-- **Top symbols:** `LegalMetadata`×2, `CaseMetadata`×1, `CaseTheoryPlan`×1, `LegalCaseInfo`×1, `CasePersonSummary`×1
-- **Top directories:** `src/lib/types`×8, `src/lib/server/vector`×2, `src/lib/components/cases`×2
-
-**Top member files:**
-- `src/lib/types/case-summary.ts` (3×)
-- `src/lib/server/vector/pgvector.ts` (2×)
-- `src/lib/components/cases/index.ts` (2×)
-- `src/lib/types/database.ts` (1×)
-- `src/lib/types/case-theory.ts` (1×)
-- `src/lib/types/legal-corpus.ts` (1×)
-- `src/lib/types/poi.ts` (1×)
-- `src/lib/types/sharedTypes.ts` (1×)
-
-### Cluster 95 — type chunks in `src/lib/server/db/schema` (tag: database)
-
-- **Size:** 183 chunks (sampled 16)
-- **Top kinds:** type×16
-- **Top tags:** database×15, schema×15, drizzle×15, auth×9, embedding×9
-- **Top symbols:** `StateConstitutionSource`×1, `WebCrawlJob`×1, `LegalChunk`×1, `ModelRegistryEntry`×1, `QueryVariancePair`×1
-- **Top directories:** `src/lib/server/db/schema`×7, `src/lib/server/db`×5, `src/lib/db/schema`×2
+- **Size:** 1,017 chunks (sampled 16)
+- **Top kinds:** —
+- **Top tags:** python×16, utility×16, py×16, test×1
+- **Top symbols:** —
+- **Top directories:** `.venv/Lib/python3.9/site-packages/pip/_internal/commands`×6, `.venv/Lib/python3.9/site-packages/pip/_internal/cli`×4, `.venv/Lib/python3.9/site-packages/pip/_internal/operations/install`×3
 
 **Top member files:**
-- `src/lib/server/db/schema-postgres.ts` (3×)
-- `src/lib/server/db/schema/search-analytics.ts` (2×)
-- `src/lib/server/db/schema/state-constitution-sources.ts` (1×)
-- `src/lib/server/db/schema/ace-web-crawl.ts` (1×)
-- `src/lib/server/db/schema/legal-chunks.ts` (1×)
-- `src/lib/server/db/schema/route_health.ts` (1×)
-- `src/lib/server/embedding/embed-schema.ts` (1×)
-- `src/lib/db/schema/evidence.ts` (1×)
+- `.venv/Lib/python3.9/site-packages/pip/_internal/commands/install.py` (5×)
+- `.venv/Lib/python3.9/site-packages/pip/_internal/cli/cmdoptions.py` (3×)
+- `.venv/Lib/python3.9/site-packages/pip/_internal/operations/install/wheel.py` (3×)
+- `.venv/Lib/python3.9/site-packages/pip/_internal/commands/lock.py` (1×)
+- `.venv/Lib/python3.9/site-packages/pip/_internal/cli/index_command.py` (1×)
+- `.venv/Lib/python3.9/site-packages/pip/_internal/req/req_uninstall.py` (1×)
+- `.venv/Lib/python3.9/site-packages/numpy/_pyinstaller/test_pyinstaller.py` (1×)
+- `.venv/Lib/python3.9/site-packages/pip/_internal/exceptions.py` (1×)
 
-### Cluster 96 — type chunks in `src/lib/server` (tag: embedding)
+### Cluster 79 — ts chunks (tag: rerank)
 
-- **Size:** 177 chunks (sampled 16)
-- **Top kinds:** type×12, const×2, function×2
-- **Top tags:** embedding×6, redis×5, vector×4, types×3, rabbitmq×2
-- **Top symbols:** `WorkflowEventType`×2, `evidenceKey`×1, `EvidenceWebSocketMessage`×1, `QUEUES`×1, `EvidenceLifecycleEvent`×1
-- **Top directories:** `src/lib/server`×3, `src/lib/types`×2, `src/lib/machines`×2
-
-**Top member files:**
-- `src/lib/server/cache-keys.ts` (1×)
-- `src/lib/types/evidence.ts` (1×)
-- `src/lib/server/rabbitmq.ts` (1×)
-- `src/lib/server/queue/workflow-publish.ts` (1×)
-- `src/lib/machines/evidence-lifecycle-machine.ts` (1×)
-- `src/lib/machines/evidence-analysis-machine.ts` (1×)
-- `src/lib/server/evidence-progress.ts` (1×)
-- `src/lib/server/evidence/type-detector.ts` (1×)
-
-### Cluster 81 — class chunks in `src/lib/services/knowledge-search` (tag: vector)
-
-- **Size:** 176 chunks (sampled 16)
-- **Top kinds:** class×1
-- **Top tags:** vector×1, redis×1, vector-search×1, rag-pipeline×1
-- **Top symbols:** `KnowledgeSearcher`×1
-- **Top directories:** `src/lib/services/knowledge-search`×1
+- **Size:** 967 chunks (sampled 16)
+- **Top kinds:** ts×14, wgsl×1, mjs×1
+- **Top tags:** rerank×6, retrieval×5, rerank-weight-loader×3, weight×3, loader×3
+- **Top symbols:** —
+- **Top directories:** —
 
 **Top member files:**
-- `src/lib/services/knowledge-search/KnowledgeSearcher.ts` (1×)
 
-### Cluster 91 — type chunks in `src/lib/server/db` (tag: database)
+### Cluster 51 — svelte chunks (tag: svelte)
 
-- **Size:** 162 chunks (sampled 16)
-- **Top kinds:** type×16
-- **Top tags:** database×16, schema×16, drizzle×16, embedding×14, auth×11
-- **Top symbols:** `ErrorEventInsert`×1, `NewEvidenceAuditLog`×1, `NewRouteMetadata`×1, `RouteHealthInsert`×1, `NewViteError`×1
-- **Top directories:** `src/lib/server/db`×10, `src/lib/server/db/schema`×3, `src/lib/db`×2
-
-**Top member files:**
-- `src/lib/server/db/schema-postgres.ts` (9×)
-- `src/lib/server/db/schema/error_events.ts` (1×)
-- `src/lib/db/schema/route-health-tables.ts` (1×)
-- `src/lib/server/db/schema/route_health.ts` (1×)
-- `src/lib/db/vite-error-schema.ts` (1×)
-- `src/lib/server/db/schema/search-analytics.ts` (1×)
-- `src/lib/db/schema.ts` (1×)
-- `src/lib/server/db/jsonb-legal-schema.ts` (1×)
-
-### Cluster 90 — function chunks in `src/lib/server` (tag: auth)
-
-- **Size:** 158 chunks (sampled 16)
-- **Top kinds:** function×9, route-handler×4, const×1, unknown×1
-- **Top tags:** auth×15, api×4, server×4
-- **Top symbols:** `POST`×2, `GET`×2, `deleteSessionCookie`×1, `invalidateUserSessions`×1, `getUser`×1
-- **Top directories:** `src/lib/server`×10, `src/routes/api/auth/logout`×2, `src/lib/types`×1
+- **Size:** 887 chunks (sampled 16)
+- **Top kinds:** svelte×15, ts×1
+- **Top tags:** svelte×15, components×10, routes×5, analysis×3, +page×3
+- **Top symbols:** —
+- **Top directories:** —
 
 **Top member files:**
-- `src/lib/server/lucia.ts` (6×)
-- `src/lib/server/auth.ts` (3×)
-- `src/routes/api/auth/logout/+server.ts` (2×)
-- `src/lib/server/auth-guard.js` (1×)
-- `src/lib/types/auth.d.ts` (1×)
-- `src/routes/api/auth/session/+server.ts` (1×)
-- `src/routes/api/dev/login-demo/+server.ts` (1×)
 
-### Cluster 83 — const chunks in `src/routes/(app)/admin/dev-tools` (tag: page-server)
+### Cluster 65 — ts chunks (tag: scripts)
 
-- **Size:** 154 chunks (sampled 16)
-- **Top kinds:** const×14, component×1, type×1
-- **Top tags:** page-server×13, ssr×13, embedding×4, vector×3, redis×2
-- **Top symbols:** `load`×14, `+page.svelte`×1, `PageServerLoad`×1
-- **Top directories:** `src/routes/(app)/admin/dev-tools`×1, `src/routes/(app)/cases/[id]/ai`×1, `src/routes/(app)/admin/knowledge-search`×1
+- **Size:** 879 chunks (sampled 16)
+- **Top kinds:** ts×8, mjs×7, py×1
+- **Top tags:** scripts×15, fixer×8, test×7, mjs×7, fix×6
+- **Top symbols:** —
+- **Top directories:** —
 
 **Top member files:**
-- `src/routes/(app)/admin/dev-tools/+page.svelte` (1×)
-- `src/routes/(app)/cases/[id]/ai/+page.server.ts` (1×)
-- `src/routes/(app)/admin/knowledge-search/+page.server.ts` (1×)
-- `src/routes/(analysis)@/+layout.server.ts` (1×)
-- `src/routes/(app)/cases/[id]/canvas/+page.server.ts` (1×)
-- `src/routes/login/+page.server.ts` (1×)
-- `src/routes/(app)/demos/agentic-errors/analysis/+page.server.ts` (1×)
-- `src/routes/(app)/admin/search-intelligence/+page.server.ts` (1×)
 
-### Cluster 9 — type chunks in `src/lib/types` (tag: auth)
+### Cluster 47 — mixed chunks in `.venv/Lib/python3.9/site-packages/numpy/polynomial` (tag: python)
 
-- **Size:** 150 chunks (sampled 16)
-- **Top kinds:** type×6
-- **Top tags:** auth×4, embedding×1, types×1, api-route×1
-- **Top symbols:** `APIResponse`×2, `APIComponentProps`×1, `APIHook`×1, `EndpointHandler`×1, `ApiResponse`×1
-- **Top directories:** `src/lib/types`×5, `src/lib/utils`×1
+- **Size:** 862 chunks (sampled 16)
+- **Top kinds:** —
+- **Top tags:** python×16, utility×16, py×16, test×2
+- **Top symbols:** —
+- **Top directories:** `.venv/Lib/python3.9/site-packages/numpy/polynomial`×12, `.venv/Lib/python3.9/site-packages/numpy/polynomial/tests`×2, `.venv/Lib/python3.9/site-packages/numpy/lib`×2
 
 **Top member files:**
-- `src/lib/types/svelte5-api-types.d.ts` (4×)
-- `src/lib/utils/type-guards.ts` (1×)
-- `src/lib/types/api.ts` (1×)
+- `.venv/Lib/python3.9/site-packages/numpy/polynomial/hermite_e.py` (3×)
+- `.venv/Lib/python3.9/site-packages/numpy/polynomial/hermite.py` (3×)
+- `.venv/Lib/python3.9/site-packages/numpy/polynomial/_polybase.py` (2×)
+- `.venv/Lib/python3.9/site-packages/numpy/polynomial/legendre.py` (2×)
+- `.venv/Lib/python3.9/site-packages/numpy/lib/_polynomial_impl.py` (2×)
+- `.venv/Lib/python3.9/site-packages/numpy/polynomial/tests/test_hermite_e.py` (1×)
+- `.venv/Lib/python3.9/site-packages/numpy/polynomial/tests/test_laguerre.py` (1×)
+- `.venv/Lib/python3.9/site-packages/numpy/polynomial/chebyshev.py` (1×)
 
-### Cluster 8 — route-handler chunks in `src/routes/api/library/documents/[documentId]/toc` (tag: api)
+### Cluster 81 — md chunks (tag: scripts)
 
-- **Size:** 136 chunks (sampled 16)
-- **Top kinds:** route-handler×13, const×3
-- **Top tags:** api×13, server×13, page-server×3, ssr×3, vector×2
-- **Top symbols:** `GET`×13, `load`×3
-- **Top directories:** `src/routes/api/library/documents/[documentId]/toc`×1, `src/routes/api/library/document/[id]`×1, `src/routes/api/library/document/[id]/node/[nodeId]`×1
-
-**Top member files:**
-- `src/routes/api/library/documents/[documentId]/toc/+server.ts` (1×)
-- `src/routes/api/library/document/[id]/+server.ts` (1×)
-- `src/routes/api/library/document/[id]/node/[nodeId]/+server.ts` (1×)
-- `src/routes/api/knowledge/document/[id]/+server.ts` (1×)
-- `src/routes/api/library/document/[id]/toc/+server.ts` (1×)
-- `src/routes/(app)/library/[documentId]/reader/+page.server.ts` (1×)
-- `src/routes/api/library/documents/[documentId]/pdf/+server.ts` (1×)
-- `src/routes/(app)/library/[documentId]/node/[nodeId]/+page.server.ts` (1×)
-
-### Cluster 19 — type chunks in `src/lib/types` (tag: embedding)
-
-- **Size:** 136 chunks (sampled 16)
-- **Top kinds:** type×16
-- **Top tags:** embedding×11, vector×5, redis×5, rabbitmq×4, ai×3
-- **Top symbols:** `QdrantConfig`×2, `OllamaConfig`×2, `OllamaEmbeddingParams`×1, `Neo4jConfig`×1, `QuantizationConfig`×1
-- **Top directories:** `src/lib/types`×6, `src/lib/server/ai`×3, `src/lib/utils`×2
+- **Size:** 850 chunks (sampled 16)
+- **Top kinds:** md×16
+- **Top tags:** scripts×16, api-cleanup×16, reports×16, llms×16, this×16
+- **Top symbols:** —
+- **Top directories:** —
 
 **Top member files:**
-- `src/lib/types/external-services.ts` (4×)
-- `src/lib/server/ai/ollama-client.ts` (2×)
-- `src/lib/utils/webgpu-array-utils.ts` (1×)
-- `src/lib/server/utils/avatar-upload.ts` (1×)
-- `src/lib/services/error-analysis/LearningPipeline.ts` (1×)
-- `src/lib/components/ui/gaming/types/gaming-types.ts` (1×)
-- `src/lib/services/error-analysis/ExperienceRecorder.ts` (1×)
-- `src/lib/types/yorha-interface.ts` (1×)
 
-### Cluster 52 — const chunks in `src/lib/stores/unified` (tag: server-module)
+### Cluster 39 — ts chunks (tag: webgpu)
 
-- **Size:** 134 chunks (sampled 16)
-- **Top kinds:** const×16
-- **Top tags:** server-module×6, cache×5, config×5, embedding×3, auth×3
-- **Top symbols:** `toastStore`×2, `enhancedUploadStore`×1, `base64FP32Quantizer`×1, `userStore`×1, `vectorOps`×1
-- **Top directories:** `src/lib/stores/unified`×4, `src/lib/server/db`×2, `src/lib/stores`×2
+- **Size:** 809 chunks (sampled 16)
+- **Top kinds:** ts×14, wgsl×1, svelte×1
+- **Top tags:** webgpu×11, gpu×5, glyph×5, gaussian×3, nes-glyph-webgpu×3
+- **Top symbols:** —
+- **Top directories:** —
 
 **Top member files:**
-- `src/lib/stores/unified/index.svelte.ts` (2×)
-- `src/lib/utils/security.ts` (2×)
-- `src/lib/ai/base64-fp32-quantizer.ts` (1×)
-- `src/lib/stores/unified/toast-store.svelte.ts` (1×)
-- `src/lib/components/ui/gaming/n64/N64ToastStore.svelte.ts` (1×)
-- `src/lib/server/db/enhanced-vector-operations.ts` (1×)
-- `src/lib/stores/evidenceCommandCenter.store.svelte.ts` (1×)
-- `src/lib/stores/unified/report-store.svelte.ts` (1×)
 
-### Cluster 77 — type chunks in `src/lib/types` (tag: embedding)
+### Cluster 87 — mjs chunks (tag: mjs)
 
-- **Size:** 134 chunks (sampled 16)
-- **Top kinds:** type×16
-- **Top tags:** embedding×12, vector×11, redis×9, auth×5, rabbitmq×4
-- **Top symbols:** `QdrantPayload`×2, `QdrantPoint`×2, `QdrantSearchResult`×2, `QdrantVectorPayload`×1, `QdrantHit`×1
-- **Top directories:** `src/lib/types`×10, `src/lib/server`×2, `src/lib/server/types`×2
+- **Size:** 749 chunks (sampled 16)
+- **Top kinds:** mjs×14, ts×2
+- **Top tags:** mjs×14, scripts×13, atlas×11, gemma4×6, parent×5
+- **Top symbols:** —
+- **Top directories:** —
 
 **Top member files:**
-- `src/lib/types/external-services.ts` (4×)
-- `src/lib/types/database.ts` (3×)
-- `src/lib/server/qdrant-http.ts` (2×)
-- `src/lib/server/types/qdrant.ts` (2×)
-- `src/lib/types/vector-jobs.ts` (2×)
-- `src/lib/types/pipeline-v2.ts` (1×)
-- `src/lib/server/vector/qdrant-manager.ts` (1×)
-- `src/lib/server/embedding/embed-schema.ts` (1×)
 
-### Cluster 43 — type chunks in `src/lib/services/knowledge-search` (tag: embedding)
+### Cluster 35 — md chunks (tag: scripts)
 
-- **Size:** 124 chunks (sampled 16)
-- **Top kinds:** type×13, const×3
-- **Top tags:** embedding×8, vector×6, api-route×3, types×2, server-module×2
-- **Top symbols:** `VectorSearchOptions`×2, `RerankOptions`×2, `SearchRequest`×1, `RedditSearchOptions`×1, `SearchFilters`×1
-- **Top directories:** `src/lib/services/knowledge-search`×2, `src/lib/server/research`×2, `src/lib/server/rag`×2
+- **Size:** 636 chunks (sampled 16)
+- **Top kinds:** md×8, ts×7, json×1
+- **Top tags:** scripts×9, unsloth-training×6, inference×3, with×3, status×2
+- **Top symbols:** —
+- **Top directories:** —
 
 **Top member files:**
-- `src/lib/services/knowledge-search/types.ts` (2×)
-- `src/lib/server/rag/rag-types.ts` (2×)
-- `src/lib/types/rag.ts` (2×)
-- `src/lib/server/research/reddit-harvester.ts` (1×)
-- `src/lib/server/utils/vector-schemas.ts` (1×)
-- `src/lib/server/validation/query-params.ts` (1×)
-- `src/lib/server/research/github-harvester.ts` (1×)
-- `src/lib/services/api-client.ts` (1×)
 
-### Cluster 88 — const chunks in `src/lib/server/db` (tag: database)
+### Cluster 62 — ts chunks (tag: +server)
 
-- **Size:** 123 chunks (sampled 16)
-- **Top kinds:** const×16
-- **Top tags:** database×16, schema×12, drizzle×12, auth×11, embedding×10
-- **Top symbols:** `usersRelations`×1, `yorhaChatSessionsRelations`×1, `statuteChunksRelations`×1, `legalChunksRelations`×1, `routeMetadataRelations`×1
-- **Top directories:** `src/lib/server/db`×11, `src/lib/server/db/schema`×2, `src/lib/db/schema`×2
+- **Size:** 589 chunks (sampled 16)
+- **Top kinds:** ts×16
+- **Top tags:** +server×15, server×15, routes×10, api×10, summarize×6
+- **Top symbols:** —
+- **Top directories:** —
 
 **Top member files:**
-- `src/lib/server/db/schema-postgres.ts` (7×)
-- `src/lib/server/db/relations.ts` (2×)
-- `src/lib/server/db/schema/legal-relations.ts` (2×)
-- `src/lib/db/schema/route-health-tables.ts` (1×)
-- `src/lib/server/db/vector-schema.ts` (1×)
-- `src/lib/db/schema.ts` (1×)
-- `src/lib/server/db/warden-schema.ts` (1×)
-- `src/lib/db/schema/evidence.ts` (1×)
 
-### Cluster 3 — const chunks in `src/routes/(app)/demos/detective-command`
+### Cluster 69 — ts chunks (tag: server)
 
-- **Size:** 119 chunks (sampled 16)
-- **Top kinds:** const×16
-- **Top tags:** —
-- **Top symbols:** `ssr`×16
-- **Top directories:** `src/routes/(app)/demos/detective-command`×1, `src/routes/(app)/demos/gpu-cache`×1, `src/routes/(app)/demos/webgpu-memory-palace`×1
+- **Size:** 571 chunks (sampled 16)
+- **Top kinds:** ts×16
+- **Top tags:** server×16, +server×15, health×14, scripts×13, api-cleanup×13
+- **Top symbols:** —
+- **Top directories:** —
 
 **Top member files:**
-- `src/routes/(app)/demos/detective-command/+page.ts` (1×)
-- `src/routes/(app)/demos/gpu-cache/+page.ts` (1×)
-- `src/routes/(app)/demos/webgpu-memory-palace/+page.ts` (1×)
-- `src/routes/(app)/admin/ai-dashboard/operator/+page.ts` (1×)
-- `src/routes/(app)/command-center/+page.ts` (1×)
-- `src/routes/(app)/demos/nier-showcase/+page.ts` (1×)
-- `src/routes/(app)/demos/prosecutor-dashboard/+page.ts` (1×)
-- `src/routes/(app)/demos/yorha/+page.ts` (1×)
 
-### Cluster 51 — table-def chunks in `src/lib/db/schema` (tag: database)
+### Cluster 13 — svelte chunks (tag: svelte)
 
-- **Size:** 100 chunks (sampled 16)
-- **Top kinds:** table-def×3
-- **Top tags:** database×3, schema×3, drizzle×3, vector×1, redis×1
-- **Top symbols:** `evidence_relationships`×2, `graph_edges`×1
-- **Top directories:** `src/lib/db/schema`×2, `src/lib/server/db`×1
+- **Size:** 568 chunks (sampled 16)
+- **Top kinds:** svelte×15, ts×1
+- **Top tags:** svelte×15, components×11, citations×10, legal-ai×4, routes×4
+- **Top symbols:** —
+- **Top directories:** —
 
 **Top member files:**
-- `src/lib/db/schema/evidence.ts` (2×)
-- `src/lib/server/db/schema-postgres.ts` (1×)
 
-### Cluster 34 — component chunks in `src/routes/(app)/demos/celestial-icons` (tag: page)
+### Cluster 70 — mjs chunks in `.tmp/audits/archive` (tag: audit)
 
-- **Size:** 88 chunks (sampled 16)
-- **Top kinds:** component×3
-- **Top tags:** page×2, component×2
-- **Top symbols:** `+page.svelte`×2, `Icon.svelte`×1
-- **Top directories:** `src/routes/(app)/demos/celestial-icons`×1, `src/routes/(app)/demos/yorha-icons`×1, `src/lib/components/ui`×1
+- **Size:** 565 chunks (sampled 16)
+- **Top kinds:** mjs×10, ts×3
+- **Top tags:** audit×12, mjs×10, scripts×10, atlas×7, postgres×6
+- **Top symbols:** —
+- **Top directories:** `.tmp/audits/archive`×3
 
 **Top member files:**
-- `src/routes/(app)/demos/celestial-icons/+page.svelte` (1×)
-- `src/routes/(app)/demos/yorha-icons/+page.svelte` (1×)
-- `src/lib/components/ui/Icon.svelte` (1×)
+- `.tmp/audits/archive/latest-audit-summary-20260516-214237.json` (2×)
+- `.tmp/audits/archive/latest-audit-summary-20260516-214014.json` (1×)
 
-### Cluster 22 — function chunks in `src/lib/server/cache` (tag: redis)
+### Cluster 48 — svelte chunks (tag: svelte)
 
-- **Size:** 86 chunks (sampled 16)
-- **Top kinds:** function×13
-- **Top tags:** redis×11, vector×10, embedding×9, cache×7, rabbitmq×2
-- **Top symbols:** `invalidateCartridge`×1, `getCachedCartridge`×1, `cacheCartridge`×1, `invalidateGlyphAtlas`×1, `invalidateGpuAnalysis`×1
-- **Top directories:** `src/lib/server/cache`×7, `src/lib/server/cartridge`×2, `src/lib/server`×2
-
-**Top member files:**
-- `src/lib/server/cache/cartridge-tensor-bridge.ts` (6×)
-- `src/lib/server/cartridge/glyph-tile-engine.ts` (2×)
-- `src/lib/components/evidence/board-persistence.svelte.ts` (2×)
-- `src/lib/server/glyph-prompt-cache.ts` (1×)
-- `src/lib/server/cache-keys.ts` (1×)
-- `src/lib/server/cache/report-template-cache.ts` (1×)
-
-### Cluster 53 — const chunks in `src/lib/server/db` (tag: database)
-
-- **Size:** 84 chunks (sampled 16)
-- **Top kinds:** const×11, type×5
-- **Top tags:** database×9, schema×9, drizzle×9, embedding×9, vector×8
-- **Top symbols:** `citationTypeEnum`×1, `auditTableEnum`×1, `jurisdictionEnum`×1, `processingStatusEnum`×1, `chatMessageRoleEnum`×1
-- **Top directories:** `src/lib/server/db`×8, `src/lib/types`×3, `src/lib/server/db/schema`×1
+- **Size:** 562 chunks (sampled 16)
+- **Top kinds:** svelte×16
+- **Top tags:** svelte×16, components×15, admin×5, contextualassistantmodal×5, contextualevidencechatmodal×2
+- **Top symbols:** —
+- **Top directories:** —
 
 **Top member files:**
-- `src/lib/server/db/schema-postgres.ts` (4×)
-- `src/lib/server/db/schema-ingestion.ts` (2×)
-- `src/lib/types/poi.ts` (2×)
-- `src/lib/server/db/schema/legal-citations.ts` (1×)
-- `src/lib/server/db/schema-evidence-crud.ts` (1×)
-- `src/lib/server/db/schema-chat.ts` (1×)
-- `src/lib/server/evidence/type-detector.ts` (1×)
-- `src/lib/types/protocol.ts` (1×)
 
-### Cluster 78 — type chunks in `src/lib/types` (tag: vector)
+### Cluster 40 — ts chunks (tag: scripts)
 
-- **Size:** 71 chunks (sampled 16)
-- **Top kinds:** type×12, const×4
-- **Top tags:** vector×10, embedding×10, redis×7, types×5, server-module×4
-- **Top symbols:** `BoardSnapshotSchema`×1, `ProtocolBoundary`×1, `LegalCitation`×1, `SessionEdgePayload`×1, `OllamaMessage`×1
-- **Top directories:** `src/lib/types`×5, `src/lib/schemas`×3, `src/lib/server/tools`×3
+- **Size:** 552 chunks (sampled 16)
+- **Top kinds:** ts×11, mjs×4, py×1
+- **Top tags:** scripts×7, analyze×5, ast×4, +server×4, server×4
+- **Top symbols:** —
+- **Top directories:** —
 
 **Top member files:**
-- `src/lib/types/protocol.ts` (5×)
-- `src/lib/server/tools/registry.ts` (3×)
-- `src/lib/schemas/board.ts` (2×)
-- `src/lib/db/schema.ts` (2×)
-- `src/lib/server/ai/lang-extract.ts` (1×)
-- `src/lib/env.server.ts` (1×)
-- `src/lib/server/db/jsonb-legal-schema.ts` (1×)
-- `src/lib/schemas/evidence-upload.ts` (1×)
 
-### Cluster 84 — function chunks in `src/lib/server/audit` (tag: vector)
+### Cluster 60 — py chunks (tag: scripts)
 
-- **Size:** 69 chunks (sampled 16)
-- **Top kinds:** function×4, type×1, table-def×1, const×1, route-handler×1
-- **Top tags:** vector×8, embedding×7, database×1, schema×1, drizzle×1
-- **Top symbols:** `executeAuditTool`×1, `getLatestAuditReport`×1, `AuditReport`×1, `codebase_audit_reports`×1, `runGpuAudit`×1
-- **Top directories:** `src/lib/server/audit`×6, `src/lib/server/db`×1, `src/routes/api/audit/gpu`×1
+- **Size:** 549 chunks (sampled 16)
+- **Top kinds:** py×14, ts×2
+- **Top tags:** scripts×15, content_ops×5, case×5, fictional_case_generator×4, fictional×4
+- **Top symbols:** —
+- **Top directories:** —
 
 **Top member files:**
-- `src/lib/server/audit/gpu-audit-orchestrator.ts` (4×)
-- `src/lib/server/audit/gemma-tool-router.ts` (2×)
-- `src/lib/server/db/schema-postgres.ts` (1×)
-- `src/routes/api/audit/gpu/+server.ts` (1×)
 
-### Cluster 97 — component chunks in `src/lib/components/yorha` (tag: embedding)
+### Cluster 12 — md chunks (tag: scripts)
 
-- **Size:** 61 chunks (sampled 16)
-- **Top kinds:** component×2
-- **Top tags:** embedding×2
-- **Top symbols:** `PhoenixEventMonitor.svelte`×2
-- **Top directories:** `src/lib/components/yorha`×1, `src/routes/(app)/demos/yorha/components`×1
+- **Size:** 545 chunks (sampled 16)
+- **Top kinds:** md×16
+- **Top tags:** scripts×16, api-cleanup×16, reports×16, llms×16, this×16
+- **Top symbols:** —
+- **Top directories:** —
 
 **Top member files:**
-- `src/lib/components/yorha/PhoenixEventMonitor.svelte` (1×)
-- `src/routes/(app)/demos/yorha/components/PhoenixEventMonitor.svelte` (1×)
 
-### Cluster 4 — type chunks in `src/lib/components/ui/dialog` (tag: vector)
+### Cluster 16 — ts chunks in `.venv/Lib/python3.9/site-packages/pip/_vendor/rich` (tag: python)
+
+- **Size:** 539 chunks (sampled 16)
+- **Top kinds:** ts×1
+- **Top tags:** python×15, utility×15, py×15, config×1, retro-console-palettes×1
+- **Top symbols:** —
+- **Top directories:** `.venv/Lib/python3.9/site-packages/pip/_vendor/rich`×14, `.venv/Lib/python3.9/site-packages/pip/_vendor/pygments/filters`×1
+
+**Top member files:**
+- `.venv/Lib/python3.9/site-packages/pip/_vendor/rich/color.py` (5×)
+- `.venv/Lib/python3.9/site-packages/pip/_vendor/rich/default_styles.py` (3×)
+- `.venv/Lib/python3.9/site-packages/pip/_vendor/rich/terminal_theme.py` (2×)
+- `.venv/Lib/python3.9/site-packages/pip/_vendor/rich/style.py` (2×)
+- `.venv/Lib/python3.9/site-packages/pip/_vendor/rich/ansi.py` (2×)
+- `.venv/Lib/python3.9/site-packages/pip/_vendor/pygments/filters/__init__.py` (1×)
+
+### Cluster 54 — mjs chunks (tag: mjs)
+
+- **Size:** 454 chunks (sampled 16)
+- **Top kinds:** mjs×15, ts×1
+- **Top tags:** mjs×15, scripts×15, atlas×14, smoke×7, audit×6
+- **Top symbols:** —
+- **Top directories:** —
+
+**Top member files:**
+
+### Cluster 42 — svelte chunks (tag: svelte)
+
+- **Size:** 389 chunks (sampled 16)
+- **Top kinds:** svelte×16
+- **Top tags:** svelte×16, components×16, legal×12, evidencereportsummary×4, evidence×3
+- **Top symbols:** —
+- **Top directories:** —
+
+**Top member files:**
+
+### Cluster 74 — ts chunks (tag: routes)
+
+- **Size:** 381 chunks (sampled 16)
+- **Top kinds:** ts×14, svelte×2
+- **Top tags:** routes×9, +server×8, server×8, api×7, legal-reasoning-chain×6
+- **Top symbols:** —
+- **Top directories:** —
+
+**Top member files:**
+
+### Cluster 41 — mjs chunks (tag: mjs)
+
+- **Size:** 374 chunks (sampled 16)
+- **Top kinds:** mjs×13, ts×3
+- **Top tags:** mjs×13, scripts×13, analyze-current-errors×7, analyze×7, current×7
+- **Top symbols:** —
+- **Top directories:** —
+
+**Top member files:**
+
+### Cluster 55 — mixed chunks in `.venv/Lib/python3.9/site-packages/numpy/ma` (tag: utility)
+
+- **Size:** 374 chunks (sampled 16)
+- **Top kinds:** —
+- **Top tags:** utility×16, python×15, py×15, test×4, txt×1
+- **Top symbols:** —
+- **Top directories:** `.venv/Lib/python3.9/site-packages/numpy/ma`×10, `.venv/Lib/python3.9/site-packages/numpy/ma/tests`×4, `.venv/Lib/python3.9/site-packages/numpy`×1
+
+**Top member files:**
+- `.venv/Lib/python3.9/site-packages/numpy/ma/extras.py` (5×)
+- `.venv/Lib/python3.9/site-packages/numpy/ma/mrecords.py` (4×)
+- `.venv/Lib/python3.9/site-packages/numpy/ma/tests/test_mrecords.py` (2×)
+- `.venv/Lib/python3.9/site-packages/numpy/ma/tests/test_old_ma.py` (2×)
+- `.venv/Lib/python3.9/site-packages/numpy/matlib.py` (1×)
+- `.venv/Lib/python3.9/site-packages/numpy/_core/multiarray.py` (1×)
+- `.venv/Lib/python3.9/site-packages/numpy/ma/API_CHANGES.txt` (1×)
+
+### Cluster 23 — mjs chunks (tag: atlas)
+
+- **Size:** 338 chunks (sampled 16)
+- **Top kinds:** mjs×12, ts×4
+- **Top tags:** atlas×15, mjs×12, scripts×12, context×10, chunks×8
+- **Top symbols:** —
+- **Top directories:** —
+
+**Top member files:**
+
+### Cluster 83 — ts chunks (tag: ace)
+
+- **Size:** 307 chunks (sampled 16)
+- **Top kinds:** ts×16
+- **Top tags:** ace×14, features×13, context-assembler×13, context×13, assembler×13
+- **Top symbols:** —
+- **Top directories:** —
+
+**Top member files:**
+
+### Cluster 31 — svelte chunks (tag: svelte)
+
+- **Size:** 301 chunks (sampled 16)
+- **Top kinds:** svelte×16
+- **Top tags:** svelte×16, components×13, admin×13, adminmonitoringdashboard×10, routes×3
+- **Top symbols:** —
+- **Top directories:** —
+
+**Top member files:**
+
+### Cluster 5 — ts chunks (tag: +server)
+
+- **Size:** 280 chunks (sampled 16)
+- **Top kinds:** ts×15, svelte×1
+- **Top tags:** +server×14, server×14, routes×13, api×13, [id]×11
+- **Top symbols:** —
+- **Top directories:** —
+
+**Top member files:**
+
+### Cluster 26 — ts chunks (tag: citations)
+
+- **Size:** 262 chunks (sampled 16)
+- **Top kinds:** ts×15, svelte×1
+- **Top tags:** citations×16, +server×14, server×14, collections×12, routes×10
+- **Top symbols:** —
+- **Top directories:** —
+
+**Top member files:**
+
+### Cluster 50 — ts chunks (tag: indexer)
+
+- **Size:** 253 chunks (sampled 16)
+- **Top kinds:** ts×16
+- **Top tags:** indexer×10, directory-summarizer×8, directory×8, summarizer×8, features×6
+- **Top symbols:** —
+- **Top directories:** —
+
+**Top member files:**
+
+### Cluster 76 — ts chunks (tag: karpathy)
+
+- **Size:** 229 chunks (sampled 16)
+- **Top kinds:** ts×14, mjs×2
+- **Top tags:** karpathy×7, atlas×5, server×5, routes×3, rg-atlas×3
+- **Top symbols:** —
+- **Top directories:** —
+
+**Top member files:**
+
+### Cluster 82 — mixed chunks in `.venv/Lib/python3.9/site-packages/numpy/lib/tests` (tag: python)
+
+- **Size:** 220 chunks (sampled 16)
+- **Top kinds:** —
+- **Top tags:** python×16, utility×16, py×16, test×14
+- **Top symbols:** —
+- **Top directories:** `.venv/Lib/python3.9/site-packages/numpy/lib/tests`×12, `.venv/Lib/python3.9/site-packages/numpy/lib`×2, `.venv/Lib/python3.9/site-packages/numpy/ma/tests`×1
+
+**Top member files:**
+- `.venv/Lib/python3.9/site-packages/numpy/lib/tests/test_nanfunctions.py` (12×)
+- `.venv/Lib/python3.9/site-packages/numpy/lib/_nanfunctions_impl.py` (2×)
+- `.venv/Lib/python3.9/site-packages/numpy/ma/tests/test_extras.py` (1×)
+- `.venv/Lib/python3.9/site-packages/numpy/linalg/tests/test_linalg.py` (1×)
+
+### Cluster 22 — svelte chunks (tag: svelte)
+
+- **Size:** 215 chunks (sampled 16)
+- **Top kinds:** svelte×16
+- **Top tags:** svelte×16, components×12, cacheperformancedashboard×7, routes×4, +page×4
+- **Top symbols:** —
+- **Top directories:** —
+
+**Top member files:**
+
+### Cluster 73 — svelte chunks (tag: routes)
+
+- **Size:** 175 chunks (sampled 16)
+- **Top kinds:** svelte×15, ts×1
+- **Top tags:** routes×16, page×16, svelte×15, (app)×15, admin×15
+- **Top symbols:** —
+- **Top directories:** —
+
+**Top member files:**
+
+### Cluster 46 — ts chunks (tag: transcript)
+
+- **Size:** 173 chunks (sampled 16)
+- **Top kinds:** ts×16
+- **Top tags:** transcript×8, evidence×6, video×6, service×5, mcp×4
+- **Top symbols:** —
+- **Top directories:** —
+
+**Top member files:**
+
+### Cluster 63 — ts chunks (tag: agent)
+
+- **Size:** 168 chunks (sampled 16)
+- **Top kinds:** ts×16
+- **Top tags:** agent×16, gemma4-agent×15, gemma4×15, features×7, autonomous-agent×1
+- **Top symbols:** —
+- **Top directories:** —
+
+**Top member files:**
+
+### Cluster 97 — ts chunks (tag: vault)
+
+- **Size:** 159 chunks (sampled 16)
+- **Top kinds:** ts×16
+- **Top tags:** vault×15, mcp×11, tools×11, vault-walker.tool×11, walker×11
+- **Top symbols:** —
+- **Top directories:** —
+
+**Top member files:**
+
+### Cluster 71 — svelte chunks (tag: svelte)
+
+- **Size:** 157 chunks (sampled 16)
+- **Top kinds:** svelte×15, mjs×1
+- **Top tags:** svelte×15, components×15, graph×9, glyphatlasviewer×6, glyph×5
+- **Top symbols:** —
+- **Top directories:** —
+
+**Top member files:**
+
+### Cluster 29 — json chunks (tag: json)
+
+- **Size:** 151 chunks (sampled 16)
+- **Top kinds:** json×16
+- **Top tags:** json×16, scripts×16, case_data×16, _cache×16, obstruction×5
+- **Top symbols:** —
+- **Top directories:** —
+
+**Top member files:**
+
+### Cluster 53 — ts chunks (tag: grpc)
+
+- **Size:** 138 chunks (sampled 16)
+- **Top kinds:** ts×10, proto×5, md×1
+- **Top tags:** grpc×12, graph×9, client×9, proto×5, graph_ml×5
+- **Top symbols:** —
+- **Top directories:** —
+
+**Top member files:**
+
+### Cluster 6 — ts chunks (tag: research)
+
+- **Size:** 137 chunks (sampled 16)
+- **Top kinds:** ts×16
+- **Top tags:** research×11, harvester×6, reddit×4, server×4, reddit-harvester×3
+- **Top symbols:** —
+- **Top directories:** —
+
+**Top member files:**
+
+### Cluster 32 — svelte chunks (tag: svelte)
+
+- **Size:** 137 chunks (sampled 16)
+- **Top kinds:** svelte×16
+- **Top tags:** svelte×16, components×16, graph×16, graphifyviewer×16
+- **Top symbols:** —
+- **Top directories:** —
+
+**Top member files:**
+
+### Cluster 80 — ts chunks (tag: xstate)
+
+- **Size:** 115 chunks (sampled 16)
+- **Top kinds:** ts×16
+- **Top tags:** xstate×13, machines×6, machine×5, scripts×3, api-cleanup×3
+- **Top symbols:** —
+- **Top directories:** —
+
+**Top member files:**
+
+### Cluster 1 — mixed chunks in `.venv/Lib/python3.9/site-packages/numpy/f2py/tests` (tag: python)
+
+- **Size:** 114 chunks (sampled 16)
+- **Top kinds:** —
+- **Top tags:** python×16, utility×16, py×16, test×15
+- **Top symbols:** —
+- **Top directories:** `.venv/Lib/python3.9/site-packages/numpy/f2py/tests`×15, `.venv/Lib/python3.9/site-packages/numpy/f2py`×1
+
+**Top member files:**
+- `.venv/Lib/python3.9/site-packages/numpy/f2py/tests/test_character.py` (14×)
+- `.venv/Lib/python3.9/site-packages/numpy/f2py/tests/test_return_character.py` (1×)
+- `.venv/Lib/python3.9/site-packages/numpy/f2py/cfuncs.py` (1×)
+
+### Cluster 20 — ts chunks (tag: tasks)
+
+- **Size:** 107 chunks (sampled 16)
+- **Top kinds:** ts×15, svelte×1
+- **Top tags:** tasks×13, packets×12, semantic×10, semantic-packets×9, routes×4
+- **Top symbols:** —
+- **Top directories:** —
+
+**Top member files:**
+
+### Cluster 4 — ts chunks (tag: utils)
+
+- **Size:** 91 chunks (sampled 16)
+- **Top kinds:** ts×16
+- **Top tags:** utils×9, buffer-conversion×5, buffer×5, conversion×5, scripts×4
+- **Top symbols:** —
+- **Top directories:** —
+
+**Top member files:**
+
+### Cluster 38 — ts chunks (tag: gpu)
+
+- **Size:** 91 chunks (sampled 16)
+- **Top kinds:** ts×14, svelte×2
+- **Top tags:** gpu×8, nes×5, memory×5, +server×4, server×4
+- **Top symbols:** —
+- **Top directories:** —
+
+**Top member files:**
+
+### Cluster 21 — mixed chunks in `.venv/Lib/python3.9/site-packages/numpy/_core/tests` (tag: python)
+
+- **Size:** 72 chunks (sampled 16)
+- **Top kinds:** —
+- **Top tags:** python×16, test×16, utility×16, py×16
+- **Top symbols:** —
+- **Top directories:** `.venv/Lib/python3.9/site-packages/numpy/_core/tests`×16
+
+**Top member files:**
+- `.venv/Lib/python3.9/site-packages/numpy/_core/tests/test_simd.py` (16×)
+
+### Cluster 92 — ts chunks (tag: agents)
+
+- **Size:** 59 chunks (sampled 16)
+- **Top kinds:** ts×16
+- **Top tags:** agents×16, regen×16, run×12, writers×3, couchdb×3
+- **Top symbols:** —
+- **Top directories:** —
+
+**Top member files:**
+
+### Cluster 93 — ts chunks (tag: routes)
 
 - **Size:** 52 chunks (sampled 16)
-- **Top kinds:** type×16
-- **Top tags:** vector×1, redis×1, embedding×1, page-component×1, ui-component×1
-- **Top symbols:** `AlertDialogCancelProps`×1, `DialogHeaderProps`×1, `AlertDialogTitleProps`×1, `AlertDialogDescriptionProps`×1, `DialogOverlayProps`×1
-- **Top directories:** `src/lib/components/ui/dialog`×5, `src/lib/components/ui/alert-dialog`×3, `src/lib/components/ui/modular`×3
+- **Top kinds:** ts×13, svelte×2, mjs×1
+- **Top tags:** routes×13, api×11, +server×11, server×11, rag×7
+- **Top symbols:** —
+- **Top directories:** —
 
 **Top member files:**
-- `src/lib/components/ui/dialog/types.ts` (5×)
-- `src/lib/components/ui/alert-dialog/types.ts` (3×)
-- `src/lib/components/ui/modular/types.ts` (3×)
-- `src/lib/icons/yorha/index.ts` (1×)
-- `src/lib/components/ui/gaming/types/gaming-types.ts` (1×)
-- `src/lib/components/ui/tabs/types.ts` (1×)
-- `src/lib/types/global.ts` (1×)
-- `src/lib/types/common-props.d.ts` (1×)
 
-### Cluster 87 — const chunks in `src/lib/server/ai` (tag: ai)
+### Cluster 85 — mixed chunks in `.venv/Lib/python3.9/site-packages/numpy/tests` (tag: python)
 
-- **Size:** 46 chunks (sampled 16)
-- **Top kinds:** const×1, function×1
-- **Top tags:** ai×2, embedding×2
-- **Top symbols:** `FALLBACK_CHAIN`×1, `getOptimalModel`×1
-- **Top directories:** `src/lib/server/ai`×2
+- **Size:** 50 chunks (sampled 16)
+- **Top kinds:** —
+- **Top tags:** python×16, utility×16, py×16, test×14, script×1
+- **Top symbols:** —
+- **Top directories:** `.venv/Lib/python3.9/site-packages/numpy/tests`×6, `.venv/Lib/python3.9/site-packages/numpy`×4, `.venv/Lib/python3.9/site-packages/numpy/f2py/tests`×2
 
 **Top member files:**
-- `src/lib/server/ai/ollama-config.ts` (2×)
+- `.venv/Lib/python3.9/site-packages/numpy/tests/test_configtool.py` (3×)
+- `.venv/Lib/python3.9/site-packages/numpy/tests/test_numpy_config.py` (2×)
+- `.venv/Lib/python3.9/site-packages/numpy/__config__.py` (2×)
+- `.venv/Lib/python3.9/site-packages/numpy/_pytesttester.py` (2×)
+- `.venv/Lib/python3.9/site-packages/numpy/f2py/tests/test_f2py2e.py` (2×)
+- `.venv/Lib/python3.9/site-packages/numpy/testing/_private/utils.py` (2×)
+- `.venv/Lib/python3.9/site-packages/numpy/_core/tests/test_limited_api.py` (1×)
+- `.venv/Lib/python3.9/site-packages/numpy/tests/test_scripts.py` (1×)
 
-### Cluster 13 — table-def chunks in `src/lib/server/db` (tag: database)
+### Cluster 33 — ts chunks (tag: graph)
+
+- **Size:** 47 chunks (sampled 16)
+- **Top kinds:** ts×15, svelte×1
+- **Top tags:** graph×8, remote×5, graph-remote-functions×4, functions×4, redis.js×3
+- **Top symbols:** —
+- **Top directories:** —
+
+**Top member files:**
+
+### Cluster 18 — svelte chunks (tag: svelte)
+
+- **Size:** 45 chunks (sampled 16)
+- **Top kinds:** svelte×16
+- **Top tags:** svelte×16, routes×16, admin×16, parents-atlas×16, +page×16
+- **Top symbols:** —
+- **Top directories:** —
+
+**Top member files:**
+
+### Cluster 64 — ts chunks (tag: retrieval)
+
+- **Size:** 42 chunks (sampled 16)
+- **Top kinds:** ts×16
+- **Top tags:** retrieval×10, routes×6, api×6, +server×6, server×6
+- **Top symbols:** —
+- **Top directories:** —
+
+**Top member files:**
+
+### Cluster 89 — mixed chunks in `.venv/Lib/python3.9/site-packages/numpy/_core` (tag: python)
 
 - **Size:** 41 chunks (sampled 16)
-- **Top kinds:** table-def×8, route-handler×2
-- **Top tags:** database×8, schema×8, drizzle×8, embedding×5, auth×4
-- **Top symbols:** `timeline_events`×2, `POST`×2, `user_timeline`×1, `phase89_timeline`×1, `case_timeline`×1
-- **Top directories:** `src/lib/server/db`×7, `src/lib/db/schema`×1, `src/routes/api/persons-of-interest/[id]/timeline`×1
+- **Top kinds:** —
+- **Top tags:** python×16, utility×16, py×16
+- **Top symbols:** —
+- **Top directories:** `.venv/Lib/python3.9/site-packages/numpy/_core`×16
 
 **Top member files:**
-- `src/lib/server/db/schema-postgres.ts` (3×)
-- `src/lib/server/db/schema-phase89-preserved.ts` (2×)
-- `src/lib/server/db/schema-timeline.ts` (1×)
-- `src/lib/server/db/schema-charges.ts` (1×)
-- `src/lib/db/schema/evidence.ts` (1×)
-- `src/routes/api/persons-of-interest/[id]/timeline/+server.ts` (1×)
-- `src/routes/api/analytics/context-timeline/+server.ts` (1×)
+- `.venv/Lib/python3.9/site-packages/numpy/_core/_machar.py` (9×)
+- `.venv/Lib/python3.9/site-packages/numpy/_core/getlimits.py` (6×)
+- `.venv/Lib/python3.9/site-packages/numpy/_core/arrayprint.py` (1×)
 
-### Cluster 38 — type chunks in `src/lib/stores/unified` (tag: types)
+### Cluster 75 — ts chunks (tag: scripts)
 
-- **Size:** 41 chunks (sampled 16)
-- **Top kinds:** type×4
-- **Top tags:** types×4, ui-component×4, config×4, page-component×4
-- **Top symbols:** `EvidenceType`×1, `CommandCenterView`×1, `ReportType`×1, `NotificationType`×1
-- **Top directories:** `src/lib/stores/unified`×3, `src/lib/stores`×1
+- **Size:** 39 chunks (sampled 16)
+- **Top kinds:** ts×16
+- **Top tags:** scripts×16, error-resolution×16, validation×16, service×16, tests×14
+- **Top symbols:** —
+- **Top directories:** —
 
 **Top member files:**
-- `src/lib/stores/unified/evidence-store.svelte.ts` (1×)
-- `src/lib/stores/evidenceCommandCenter.store.svelte.ts` (1×)
-- `src/lib/stores/unified/report-store.svelte.ts` (1×)
-- `src/lib/stores/unified/notification-store.svelte.ts` (1×)
 
-### Cluster 89 — function chunks in `src/lib/server/legal`
-
-- **Size:** 41 chunks (sampled 16)
-- **Top kinds:** function×2, type×1
-- **Top tags:** —
-- **Top symbols:** `getOfficialSources`×1, `getSource`×1, `StateConstitutionSource`×1
-- **Top directories:** `src/lib/server/legal`×3
-
-**Top member files:**
-- `src/lib/server/legal/constitution-registry.ts` (3×)
-
-### Cluster 41 — component chunks in `src/lib/components/ui`
-
-- **Size:** 40 chunks (sampled 16)
-- **Top kinds:** component×1
-- **Top tags:** —
-- **Top symbols:** `DiffViewer.svelte`×1
-- **Top directories:** `src/lib/components/ui`×1
-
-**Top member files:**
-- `src/lib/components/ui/DiffViewer.svelte` (1×)
-
-### Cluster 17 — function chunks in `src/lib/services/error-analysis` (tag: embedding)
+### Cluster 2 — mixed chunks in `.venv/Lib/python3.9/site-packages/numpy/_core/tests` (tag: python)
 
 - **Size:** 38 chunks (sampled 16)
-- **Top kinds:** function×15
-- **Top tags:** embedding×7, server-module×4, cache×3, vector×3, redis×3
-- **Top symbols:** `getComputePool`×1, `getCachedGPUCompute`×1, `getCacheService`×1, `getDecisionEngine`×1, `getPostgresKnowledgeStore`×1
-- **Top directories:** `src/lib/services/error-analysis`×6, `src/lib/services/knowledge-search`×4, `src/lib/gpu`×2
+- **Top kinds:** —
+- **Top tags:** python×16, utility×16, py×16, test×11
+- **Top symbols:** —
+- **Top directories:** `.venv/Lib/python3.9/site-packages/numpy/_core/tests`×9, `.venv/Lib/python3.9/site-packages/numpy/_core`×4, `.venv/Lib/python3.9/site-packages/numpy/testing/_private`×1
 
 **Top member files:**
-- `src/lib/gpu/gpu-compute-pipeline.ts` (2×)
-- `src/lib/server/workers/compute-pool.ts` (1×)
-- `src/lib/services/error-analysis/CacheService.ts` (1×)
-- `src/lib/services/error-analysis/DecisionEngine.ts` (1×)
-- `src/lib/services/knowledge-search/PostgresKnowledgeStore.ts` (1×)
-- `src/lib/services/error-analysis/FixSynthesizer.ts` (1×)
-- `src/lib/services/knowledge-search/MinioKnowledgeStore.ts` (1×)
-- `src/lib/services/error-analysis/LearningPipeline.ts` (1×)
+- `.venv/Lib/python3.9/site-packages/numpy/_core/tests/test_overrides.py` (9×)
+- `.venv/Lib/python3.9/site-packages/numpy/_core/overrides.py` (4×)
+- `.venv/Lib/python3.9/site-packages/numpy/testing/_private/utils.py` (1×)
+- `.venv/Lib/python3.9/site-packages/numpy/core/overrides.py` (1×)
+- `.venv/Lib/python3.9/site-packages/numpy/tests/test_public_api.py` (1×)
 
-### Cluster 59 — function chunks in `src/lib/server/observability` (tag: vector)
+### Cluster 45 — mixed chunks in `.venv/Lib/python3.9/site-packages/numpy/_core/tests` (tag: python)
 
 - **Size:** 36 chunks (sampled 16)
-- **Top kinds:** function×5
-- **Top tags:** vector×4, embedding×4, auth×1
-- **Top symbols:** `logInference`×1, `flushInferenceLog`×1, `startInferenceLogCleanup`×1, `flushServerSave`×1, `getInferenceLogStats`×1
-- **Top directories:** `src/lib/server/observability`×4, `src/lib/components/evidence`×1
+- **Top kinds:** —
+- **Top tags:** python×16, utility×16, py×16, test×14
+- **Top symbols:** —
+- **Top directories:** `.venv/Lib/python3.9/site-packages/numpy/_core/tests`×11, `.venv/Lib/python3.9/site-packages/numpy/lib/tests`×3, `.venv/Lib/python3.9/site-packages/numpy/_core`×2
 
 **Top member files:**
-- `src/lib/server/observability/inference-log.ts` (4×)
-- `src/lib/components/evidence/board-persistence.svelte.ts` (1×)
+- `.venv/Lib/python3.9/site-packages/numpy/_core/tests/test_dtype.py` (9×)
+- `.venv/Lib/python3.9/site-packages/numpy/lib/tests/test_format.py` (2×)
+- `.venv/Lib/python3.9/site-packages/numpy/_core/_dtype_ctypes.py` (1×)
+- `.venv/Lib/python3.9/site-packages/numpy/_core/tests/test_records.py` (1×)
+- `.venv/Lib/python3.9/site-packages/numpy/lib/tests/test_recfunctions.py` (1×)
+- `.venv/Lib/python3.9/site-packages/numpy/_core/_internal.py` (1×)
+- `.venv/Lib/python3.9/site-packages/numpy/_core/tests/test_regression.py` (1×)
 
-### Cluster 15 — function chunks in `src/lib/server/db` (tag: database)
+### Cluster 98 — svelte chunks (tag: svelte)
 
-- **Size:** 31 chunks (sampled 16)
-- **Top kinds:** function×2
-- **Top tags:** database×2, auth×1, embedding×1
-- **Top symbols:** `ensureExtensions`×1, `initializePgVector`×1
-- **Top directories:** `src/lib/server/db`×2
-
-**Top member files:**
-- `src/lib/server/db/connections.ts` (1×)
-- `src/lib/server/db/pgvector-utils.ts` (1×)
-
-### Cluster 31 — route-handler chunks in `src/routes/api/investigate/suggest` (tag: api)
-
-- **Size:** 31 chunks (sampled 16)
-- **Top kinds:** route-handler×1
-- **Top tags:** api×1, server×1, vector×1, embedding×1
-- **Top symbols:** `POST`×1
-- **Top directories:** `src/routes/api/investigate/suggest`×1
+- **Size:** 32 chunks (sampled 16)
+- **Top kinds:** svelte×15, ts×1
+- **Top tags:** svelte×15, components×10, citations×7, routes×5, (app)×5
+- **Top symbols:** —
+- **Top directories:** —
 
 **Top member files:**
-- `src/routes/api/investigate/suggest/+server.ts` (1×)
 
-### Cluster 54 — function chunks in `src/lib/server/analysis`
+### Cluster 86 — js chunks (tag: utils)
 
-- **Size:** 26 chunks (sampled 16)
-- **Top kinds:** function×7
-- **Top tags:** —
-- **Top symbols:** `claimNextJob`×1, `createAnalysisJob`×1, `getJobsForEvidence`×1, `enqueueJob`×1, `getJobCounts`×1
-- **Top directories:** `src/lib/server/analysis`×7
-
-**Top member files:**
-- `src/lib/server/analysis/analysis-jobs.ts` (7×)
-
-### Cluster 99 — function chunks in `src/lib/server/image` (tag: embedding)
-
-- **Size:** 26 chunks (sampled 16)
-- **Top kinds:** function×2
-- **Top tags:** embedding×1
-- **Top symbols:** `resizeForVLM`×1, `resizeForThumbnail`×1
-- **Top directories:** `src/lib/server/image`×2
+- **Size:** 25 chunks (sampled 16)
+- **Top kinds:** js×16
+- **Top tags:** utils×16, parallaxdynamic×16
+- **Top symbols:** —
+- **Top directories:** —
 
 **Top member files:**
-- `src/lib/server/image/resize-for-vlm.ts` (2×)
 
-### Cluster 39 — function chunks in `src/lib/server/analysis` (tag: embedding)
+### Cluster 25 — ts chunks (tag: retrieval)
 
-- **Size:** 23 chunks (sampled 16)
-- **Top kinds:** function×5
-- **Top tags:** embedding×2
-- **Top symbols:** `completeAnalysisJob`×1, `failAnalysisJob`×1, `updateAnalysisJob`×1, `updateJob`×1, `updateAceIngestJob`×1
-- **Top directories:** `src/lib/server/analysis`×3, `src/lib/server`×2
-
-**Top member files:**
-- `src/lib/server/analysis/analysis-jobs.ts` (3×)
-- `src/lib/server/evidence-progress.ts` (1×)
-- `src/lib/server/ace-ingest-progress.ts` (1×)
-
-### Cluster 40 — component chunks in `src/routes/(app)/demos/streaming` (tag: page)
-
-- **Size:** 22 chunks (sampled 16)
-- **Top kinds:** component×1
-- **Top tags:** page×1, component×1
-- **Top symbols:** `+page.svelte`×1
-- **Top directories:** `src/routes/(app)/demos/streaming`×1
+- **Size:** 19 chunks (sampled 16)
+- **Top kinds:** ts×16
+- **Top tags:** retrieval×8, cache×7, centroid-cache×6, centroid×6, cluster×4
+- **Top symbols:** —
+- **Top directories:** —
 
 **Top member files:**
-- `src/routes/(app)/demos/streaming/+page.svelte` (1×)
 
-### Cluster 11 — type chunks in `src/lib/utils` (tag: config)
+### Cluster 77 — ts chunks (tag: ff1)
 
-- **Size:** 20 chunks (sampled 16)
-- **Top kinds:** type×1, const×1
-- **Top tags:** config×2, sse×1, types×1, ui-component×1
-- **Top symbols:** `ProgressiveEnhancementConfig`×1, `DEFAULT_PE_CONFIG`×1
-- **Top directories:** `src/lib/utils`×2
-
-**Top member files:**
-- `src/lib/utils/progressive-enhancement-audit.ts` (2×)
-
-### Cluster 36 — function chunks in `src/lib/webgpu`
-
-- **Size:** 17 chunks (sampled 16)
-- **Top kinds:** function×1
-- **Top tags:** —
-- **Top symbols:** `configureCanvas`×1
-- **Top directories:** `src/lib/webgpu`×1
+- **Size:** 19 chunks (sampled 16)
+- **Top kinds:** ts×16
+- **Top tags:** ff1×16, storage×9, redis-cache×9, redis×9, cache×9
+- **Top symbols:** —
+- **Top directories:** —
 
 **Top member files:**
-- `src/lib/webgpu/init.ts` (1×)
 
-### Cluster 12 — function chunks in `src/lib/server/cartridge` (tag: embedding)
+### Cluster 0 — ts chunks (tag: routes)
 
-- **Size:** 13 chunks (sampled 13)
-- **Top kinds:** function×5
-- **Top tags:** embedding×5, vector×3
-- **Top symbols:** `parseCartridgeHeader`×2, `parseCartridge`×2, `buildCartridge`×1
-- **Top directories:** `src/lib/server/cartridge`×3, `src/lib/shared`×2
+- **Size:** 16 chunks (sampled 16)
+- **Top kinds:** ts×15, svelte×1
+- **Top tags:** routes×15, api×15, server×15, +server×14, research×11
+- **Top symbols:** —
+- **Top directories:** —
 
 **Top member files:**
-- `src/lib/server/cartridge/chr97-builder.ts` (3×)
-- `src/lib/shared/chr97-reader.ts` (2×)
 
-### Cluster 66 — type chunks in `src/lib/server/services` (tag: types)
+### Cluster 10 — ts chunks (tag: indexer)
 
 - **Size:** 12 chunks (sampled 12)
-- **Top kinds:** type×12
-- **Top tags:** types×5, redis×1, embedding×1, server-module×1, ui-component×1
-- **Top symbols:** `Entity`×3, `LangExtractSection`×2, `LangExtractEntity`×1, `GoogleLangExtractEntity`×1, `LangExtractOutput`×1
-- **Top directories:** `src/lib/server/services`×4, `src/lib/server`×3, `src/lib/server/evidence`×2
+- **Top kinds:** ts×12
+- **Top tags:** indexer×12, directory-summarizer×12, directory×12, summarizer×12, features×6
+- **Top symbols:** —
+- **Top directories:** —
 
 **Top member files:**
-- `src/lib/server/services/langextract-service.ts` (4×)
-- `src/lib/server/langextract-client.ts` (3×)
-- `src/lib/server/evidence/proto-serializer.ts` (2×)
-- `src/lib/server/analysis/entity-extraction.ts` (1×)
-- `src/lib/server/evidence/services/entity-extractor.ts` (1×)
-- `src/lib/types/ai.ts` (1×)
 
-### Cluster 56 — type chunks in `src/lib/server` (tag: embedding)
+### Cluster 15 — md chunks (tag: scripts)
 
-- **Size:** 10 chunks (sampled 10)
-- **Top kinds:** type×7
-- **Top tags:** embedding×2, vector×1, redis×1, types×1
-- **Top symbols:** `DoclingResult`×1, `VLMOCRResult`×1, `YoloVLMResult`×1, `OllamaEmbedResult`×1, `EvidenceAnalysisResult`×1
-- **Top directories:** `src/lib/server`×4, `src/lib/server/embeddings`×1, `src/lib/types`×1
+- **Size:** 12 chunks (sampled 12)
+- **Top kinds:** md×12
+- **Top tags:** scripts×12, api-cleanup×12, reports×12, llms×12, this×12
+- **Top symbols:** —
+- **Top directories:** —
 
 **Top member files:**
-- `src/lib/server/docling.ts` (3×)
-- `src/lib/server/embeddings/ollama.ts` (1×)
-- `src/lib/types/evidence.ts` (1×)
-- `src/lib/shared/types/parser.ts` (1×)
-- `src/lib/server/db-shim.ts` (1×)
 
-### Cluster 58 — type chunks in `src/lib/server/indexer` (tag: vector)
+### Cluster 17 — ts chunks (tag: routes)
 
-- **Size:** 10 chunks (sampled 10)
-- **Top kinds:** type×9
-- **Top tags:** vector×7, embedding×7, xstate×3, auth×3, schema×2
-- **Top symbols:** `ChunkMetadata`×2, `CandidateChunk`×1, `CodeChunk`×1, `TextChunk`×1, `RetrievedCodebaseChunk`×1
-- **Top directories:** `src/lib/server/indexer`×2, `src/lib/machines`×1, `src/lib/server/retrieval`×1
+- **Size:** 12 chunks (sampled 12)
+- **Top kinds:** ts×8, svelte×4
+- **Top tags:** routes×12, server×8, api×7, tasks×7, packets×7
+- **Top symbols:** —
+- **Top directories:** —
 
 **Top member files:**
-- `src/lib/server/indexer/ast-chunker.ts` (2×)
-- `src/lib/machines/retrieval-machine.ts` (1×)
-- `src/lib/server/retrieval/codebase-context.ts` (1×)
-- `src/lib/types/rag.ts` (1×)
-- `src/lib/server/grpc/retrieval-client.ts` (1×)
-- `src/lib/server/phase78/contextBuilder.ts` (1×)
-- `src/lib/server/inference/inference-router.ts` (1×)
-- `src/lib/server/research/web-research-ingester.ts` (1×)
 
-### Cluster 26 — route-handler chunks in `src/routes/api/ai/context` (tag: api)
-
-- **Size:** 8 chunks (sampled 8)
-- **Top kinds:** route-handler×1
-- **Top tags:** api×1, server×1, vector×1, embedding×1
-- **Top symbols:** `POST`×1
-- **Top directories:** `src/routes/api/ai/context`×1
-
-**Top member files:**
-- `src/routes/api/ai/context/+server.ts` (1×)
-
-### Cluster 37 — function chunks in `src/lib/utils` (tag: api-route)
+### Cluster 14 — mjs chunks (tag: mjs)
 
 - **Size:** 7 chunks (sampled 7)
-- **Top kinds:** function×2
-- **Top tags:** api-route×2, server-module×1, page-component×1
-- **Top symbols:** `getHealthEndpoint`×1, `getGpuMetricsEndpoint`×1
-- **Top directories:** `src/lib/utils`×2
+- **Top kinds:** mjs×7
+- **Top tags:** mjs×7, scripts×7, opencode×7, get-ace-context×7, get×7
+- **Top symbols:** —
+- **Top directories:** —
 
 **Top member files:**
-- `src/lib/utils/api-endpoints.ts` (2×)
 
-### Cluster 7 — component chunks in `src/lib/components/admin`
+### Cluster 52 — mixed chunks in `.venv/Lib/python3.9/site-packages/pip/_internal/network` (tag: python)
+
+- **Size:** 7 chunks (sampled 7)
+- **Top kinds:** —
+- **Top tags:** python×7, utility×7, py×7, auth×1, redis×1
+- **Top symbols:** —
+- **Top directories:** `.venv/Lib/python3.9/site-packages/pip/_internal/network`×6, `.venv/Lib/python3.9/site-packages/pip/_vendor/cachecontrol`×1
+
+**Top member files:**
+- `.venv/Lib/python3.9/site-packages/pip/_internal/network/download.py` (2×)
+- `.venv/Lib/python3.9/site-packages/pip/_internal/network/xmlrpc.py` (1×)
+- `.venv/Lib/python3.9/site-packages/pip/_internal/network/utils.py` (1×)
+- `.venv/Lib/python3.9/site-packages/pip/_internal/network/session.py` (1×)
+- `.venv/Lib/python3.9/site-packages/pip/_vendor/cachecontrol/controller.py` (1×)
+- `.venv/Lib/python3.9/site-packages/pip/_internal/network/auth.py` (1×)
+
+### Cluster 8 — ts chunks (tag: couchdb)
 
 - **Size:** 6 chunks (sampled 6)
-- **Top kinds:** component×1
-- **Top tags:** —
-- **Top symbols:** `TagSelector.svelte`×1
-- **Top directories:** `src/lib/components/admin`×1
+- **Top kinds:** ts×6
+- **Top tags:** couchdb×6, mango-indexes×6, mango×6, indexes×6
+- **Top symbols:** —
+- **Top directories:** —
 
 **Top member files:**
-- `src/lib/components/admin/TagSelector.svelte` (1×)
 
-### Cluster 63 — const chunks in `src/lib/server/db` (tag: database)
+### Cluster 59 — ts chunks (tag: routes)
 
-- **Size:** 5 chunks (sampled 5)
-- **Top kinds:** const×2
-- **Top tags:** database×2, schema×2, drizzle×2, vector×2, auth×2
-- **Top symbols:** `testRagEmbeddingsRelations`×1, `testRagDocumentsRelations`×1
-- **Top directories:** `src/lib/server/db`×2
-
-**Top member files:**
-- `src/lib/server/db/schema-test-rag.ts` (2×)
-
-### Cluster 98 — type chunks in `src/lib/server/db` (tag: database)
-
-- **Size:** 5 chunks (sampled 5)
-- **Top kinds:** type×5
-- **Top tags:** database×5, schema×5, drizzle×5, auth×5, embedding×5
-- **Top symbols:** `InsertShaderCacheEntry`×1, `InsertShaderUserPattern`×1, `InsertShaderRecommendation`×1, `InsertShaderDependency`×1, `InsertShaderPreloadRule`×1
-- **Top directories:** `src/lib/server/db`×5
+- **Size:** 4 chunks (sampled 4)
+- **Top kinds:** ts×4
+- **Top tags:** routes×4, api×4, chat×4, migrate×4, +server×4
+- **Top symbols:** —
+- **Top directories:** —
 
 **Top member files:**
-- `src/lib/server/db/schema-gpu-cache.ts` (5×)
 
-### Cluster 45 — function chunks in `src/lib/server/ai` (tag: ai)
+### Cluster 68 — svelte chunks (tag: svelte)
 
 - **Size:** 3 chunks (sampled 3)
-- **Top kinds:** function×1
-- **Top tags:** ai×1, embedding×1
-- **Top symbols:** `isLegalTask`×1
-- **Top directories:** `src/lib/server/ai`×1
+- **Top kinds:** svelte×3
+- **Top tags:** svelte×3, components×3, commandpalette×3, navigation×1, fuse.js×1
+- **Top symbols:** —
+- **Top directories:** —
 
 **Top member files:**
-- `src/lib/server/ai/ollama-config.ts` (1×)
 
-### Cluster 67 — const chunks in `src/lib/components/ui/tabs`
-
-- **Size:** 3 chunks (sampled 3)
-- **Top kinds:** const×3
-- **Top tags:** —
-- **Top symbols:** `Root`×1, `Content`×1, `List`×1
-- **Top directories:** `src/lib/components/ui/tabs`×3
-
-**Top member files:**
-- `src/lib/components/ui/tabs/index.ts` (3×)
-
-### Cluster 30 — type chunks in `src/lib/components/ui/gaming/types`
+### Cluster 95 — js chunks (tag: ollama)
 
 - **Size:** 2 chunks (sampled 2)
-- **Top kinds:** type×2
-- **Top tags:** —
-- **Top symbols:** `GamepadState`×2
-- **Top directories:** `src/lib/components/ui/gaming/types`×2
+- **Top kinds:** js×2
+- **Top tags:** ollama×2, ollama.ts×1
+- **Top symbols:** —
+- **Top directories:** —
 
 **Top member files:**
-- `src/lib/components/ui/gaming/types/gaming-types-minimal.ts` (1×)
-- `src/lib/components/ui/gaming/types/gaming-types.ts` (1×)
-
-### Cluster 42 — type chunks in `src/lib/services/error-analysis` (tag: vector)
-
-- **Size:** 2 chunks (sampled 2)
-- **Top kinds:** type×1
-- **Top tags:** vector×1, redis×1, embedding×1
-- **Top symbols:** `EscalationTicket`×1
-- **Top directories:** `src/lib/services/error-analysis`×1
-
-**Top member files:**
-- `src/lib/services/error-analysis/types.ts` (1×)
-
-### Cluster 46 — type chunks in `src/lib/server/types` (tag: ai)
-
-- **Size:** 2 chunks (sampled 2)
-- **Top kinds:** type×2
-- **Top tags:** ai×1, vector×1, redis×1, embedding×1
-- **Top symbols:** `SynthesisResponse`×1, `LangGraphSynthesizeResponse`×1
-- **Top directories:** `src/lib/server/types`×1, `src/lib/server/ai`×1
-
-**Top member files:**
-- `src/lib/server/types/synthesis.ts` (1×)
-- `src/lib/server/ai/langgraph-client.ts` (1×)
-
-### Cluster 49 — type chunks in `src/lib/server/cache` (tag: vector)
-
-- **Size:** 2 chunks (sampled 2)
-- **Top kinds:** type×2
-- **Top tags:** vector×2, embedding×2, cache×1, redis×1
-- **Top symbols:** `CachedGpuAnalysis`×1, `GpuAnalysisResult`×1
-- **Top directories:** `src/lib/server/cache`×1, `src/lib/server/gpu`×1
-
-**Top member files:**
-- `src/lib/server/cache/cartridge-tensor-bridge.ts` (1×)
-- `src/lib/server/gpu/background-analyzer.ts` (1×)
-
-### Cluster 68 — function chunks in `src/lib/stores/dashboard` (tag: server-module)
-
-- **Size:** 2 chunks (sampled 2)
-- **Top kinds:** function×2
-- **Top tags:** server-module×1, sse×1
-- **Top symbols:** `getStageLabelLabel`×1, `getStatusMessage`×1
-- **Top directories:** `src/lib/stores/dashboard`×2
-
-**Top member files:**
-- `src/lib/stores/dashboard/GrpcStatusAdapter.ts` (2×)
-
-### Cluster 0 — type chunks in `src/lib/types` (tag: vector)
-
-- **Size:** 1 chunks (sampled 1)
-- **Top kinds:** type×1
-- **Top tags:** vector×1, redis×1, embedding×1
-- **Top symbols:** `UploadResponse`×1
-- **Top directories:** `src/lib/types`×1
-
-**Top member files:**
-- `src/lib/types/evidence.ts` (1×)
-
-### Cluster 10 — type chunks in `src/lib/server/db` (tag: database)
-
-- **Size:** 1 chunks (sampled 1)
-- **Top kinds:** type×1
-- **Top tags:** database×1, schema×1, drizzle×1, auth×1, embedding×1
-- **Top symbols:** `InsertShaderCompilationQueue`×1
-- **Top directories:** `src/lib/server/db`×1
-
-**Top member files:**
-- `src/lib/server/db/schema-gpu-cache.ts` (1×)
-
-### Cluster 14 — function chunks in `src/lib/ai` (tag: ai)
-
-- **Size:** 1 chunks (sampled 1)
-- **Top kinds:** function×1
-- **Top tags:** ai×1, auth×1, embedding×1
-- **Top symbols:** `stableSoftmax`×1
-- **Top directories:** `src/lib/ai`×1
-
-**Top member files:**
-- `src/lib/ai/client-embed.ts` (1×)
-
-### Cluster 16 — type chunks in `src/lib/services/error-analysis` (tag: vector)
-
-- **Size:** 1 chunks (sampled 1)
-- **Top kinds:** type×1
-- **Top tags:** vector×1, redis×1, embedding×1
-- **Top symbols:** `LanguageErrorDetector`×1
-- **Top directories:** `src/lib/services/error-analysis`×1
-
-**Top member files:**
-- `src/lib/services/error-analysis/types.ts` (1×)
-
-### Cluster 33 — type chunks in `src/lib/types` (tag: auth)
-
-- **Size:** 1 chunks (sampled 1)
-- **Top kinds:** type×1
-- **Top tags:** auth×1
-- **Top symbols:** `QUICStreamOptions`×1
-- **Top directories:** `src/lib/types`×1
-
-**Top member files:**
-- `src/lib/types/svelte5-api-types.d.ts` (1×)
-
-### Cluster 61 — const chunks in `src/lib/server/concurrency` (tag: auth)
-
-- **Size:** 1 chunks (sampled 1)
-- **Top kinds:** const×1
-- **Top tags:** auth×1
-- **Top symbols:** `advisoryLocks`×1
-- **Top directories:** `src/lib/server/concurrency`×1
-
-**Top member files:**
-- `src/lib/server/concurrency/advisory-locks.ts` (1×)
-
-### Cluster 62 — type chunks in `src/lib/types` (tag: vector)
-
-- **Size:** 1 chunks (sampled 1)
-- **Top kinds:** type×1
-- **Top tags:** vector×1, redis×1, embedding×1
-- **Top symbols:** `Permission`×1
-- **Top directories:** `src/lib/types`×1
-
-**Top member files:**
-- `src/lib/types/global.ts` (1×)
-
-### Cluster 65 — const chunks in `src/lib/server/db` (tag: database)
-
-- **Size:** 1 chunks (sampled 1)
-- **Top kinds:** const×1
-- **Top tags:** database×1, schema×1, drizzle×1, vector×1, redis×1
-- **Top symbols:** `criminalsRelations`×1
-- **Top directories:** `src/lib/server/db`×1
-
-**Top member files:**
-- `src/lib/server/db/schema-postgres.ts` (1×)
-
-### Cluster 71 — type chunks in `src/lib/server/vector` (tag: vector)
-
-- **Size:** 1 chunks (sampled 1)
-- **Top kinds:** type×1
-- **Top tags:** vector×1, embedding×1
-- **Top symbols:** `ReadFastestResult`×1
-- **Top directories:** `src/lib/server/vector`×1
-
-**Top member files:**
-- `src/lib/server/vector/multi-store.ts` (1×)
-
-### Cluster 76 — type chunks in `src/lib/server/db` (tag: database)
-
-- **Size:** 1 chunks (sampled 1)
-- **Top kinds:** type×1
-- **Top tags:** database×1, schema×1, drizzle×1, vector×1, redis×1
-- **Top symbols:** `CodebaseAuditReport`×1
-- **Top directories:** `src/lib/server/db`×1
-
-**Top member files:**
-- `src/lib/server/db/schema-postgres.ts` (1×)
-
-### Cluster 79 — type chunks in `src/lib/server/types`
-
-- **Size:** 1 chunks (sampled 1)
-- **Top kinds:** type×1
-- **Top tags:** —
-- **Top symbols:** `KAGExpansion`×1
-- **Top directories:** `src/lib/server/types`×1
-
-**Top member files:**
-- `src/lib/server/types/kag.ts` (1×)
-
-### Cluster 93 — type chunks in `src/lib/types` (tag: embedding)
-
-- **Size:** 1 chunks (sampled 1)
-- **Top kinds:** type×1
-- **Top tags:** embedding×1
-- **Top symbols:** `POIAlias`×1
-- **Top directories:** `src/lib/types`×1
-
-**Top member files:**
-- `src/lib/types/poi.ts` (1×)

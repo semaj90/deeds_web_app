@@ -305,7 +305,7 @@ async function cacheInRedis(r, filePath, summary) {
 
 // ── File collection ───────────────────────────────────────────────────────────
 
-const SKIP_DIRS = new Set(['.svelte-kit', 'node_modules', 'dist', 'build', '.git', 'static', 'public']);
+const SKIP_DIRS = new Set(['.svelte-kit', 'node_modules', 'dist', 'build', '.git', 'static', 'public', '.venv', '.venv-py313-backup', '.python311', '.cache', '.vs', 'deeds_labs']);
 const INCLUDE_EXT = new Set(['.ts', '.svelte', '.js', '.mjs', '.mts']);
 
 async function collectFiles(dir) {

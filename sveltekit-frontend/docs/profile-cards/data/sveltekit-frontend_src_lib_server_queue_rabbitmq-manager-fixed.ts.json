@@ -1,0 +1,75 @@
+{
+  "source_ref": "sveltekit-frontend/src/lib/server/queue/rabbitmq-manager-fixed.ts",
+  "file_path": "sveltekit-frontend/src/lib/server/queue/rabbitmq-manager-fixed.ts",
+  "feature_id": "queue",
+  "component_type": "TypeScript module",
+  "line_count": 2741,
+  "is_route": false,
+  "is_svelte_comp": false,
+  "has_auth": false,
+  "has_zod": true,
+  "drizzle_refs": [
+    "drizzle"
+  ],
+  "imports": [
+    "events",
+    "$lib/server/observability/langfuse.js",
+    "$lib/server/env.server.js",
+    "$lib/server/gpu/simdjson-bridge.js"
+  ],
+  "exports": [
+    "RabbitMQManager",
+    "rabbitmq"
+  ],
+  "route_handlers": [],
+  "tags": [
+    "has_drizzle",
+    "has_zod",
+    "runtime:server"
+  ],
+  "som_cluster": "unassigned",
+  "centroid_id": "ae_0",
+  "qdrant_point_id": "4277316",
+  "semantic_confidence": null,
+  "behavior_score": null,
+  "routing_score": null,
+  "runtime_state": {},
+  "feature_avg_confidence": null,
+  "feature_dominant_status": null,
+  "feature_primary_cluster": null,
+  "packet_count": 0,
+  "runtime_packet_count": 0,
+  "parent_modules": [
+    "sveltekit-frontend/src/lib/server/analysis/media-processing.ts",
+    "sveltekit-frontend/src/lib/server/analysis/entity-extraction.ts",
+    "sveltekit-frontend/src/lib/server/queue/queue-worker.ts",
+    "sveltekit-frontend/src/lib/server/analysis/evidence-analysis-pipeline.ts",
+    "sveltekit-frontend/src/lib/server/queue/rabbitmq-client.ts",
+    "sveltekit-frontend/src/lib/server/analysis/forensics.ts",
+    "sveltekit-frontend/src/lib/server/queue/dispatch-inline.ts",
+    "sveltekit-frontend/src/lib/server/grpc/embedding-client.ts"
+  ],
+  "nested_routes": [],
+  "related_features": [],
+  "hypergraph_neighbors": [
+    "SIMILAR_TOPOLOGY → sveltekit-frontend/src/lib/server/queue/rabbitmq-manager-fixed.test.ts",
+    "SIMILAR_TOPOLOGY → sveltekit-frontend/src/lib/server/queue/workflow-publish.ts",
+    "SIMILAR_TOPOLOGY → sveltekit-frontend/src/lib/server/queue/rabbitmq-xstate-integration.ts",
+    "SIMILAR_TOPOLOGY → sveltekit-frontend/src/lib/server/queue/rabbitmq-manager-blended_yolo_vlm_neschrom_embeds.ts",
+    "TEST_COVERS_FILE → sveltekit-frontend/src/lib/server/queue/rabbitmq-manager-fixed.test.ts",
+    "IMPORTS → sveltekit-frontend/src/lib/server/analysis/media-processing.ts",
+    "IMPORTS → sveltekit-frontend/src/lib/server/analysis/entity-extraction.ts",
+    "IMPORTS → sveltekit-frontend/src/lib/server/queue/queue-worker.ts",
+    "IMPORTS → sveltekit-frontend/src/lib/server/analysis/evidence-analysis-pipeline.ts",
+    "IMPORTS → sveltekit-frontend/src/lib/server/queue/rabbitmq-client.ts",
+    "IMPORTS → sveltekit-frontend/src/lib/server/analysis/forensics.ts",
+    "IMPORTS → sveltekit-frontend/src/lib/server/queue/dispatch-inline.ts",
+    "IMPORTS → sveltekit-frontend/src/lib/server/grpc/embedding-client.ts",
+    "BELONGS_TO_FEATURE → null"
+  ],
+  "similar_files": [],
+  "health_status": "warning",
+  "warnings": [
+    "high complexity (line count > 400)"
+  ]
+}

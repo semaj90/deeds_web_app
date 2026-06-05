@@ -417,6 +417,30 @@ async function auditPackageScripts() {
 // =============================================================================
 // E. ACE packet + SOM cluster reconciliation
 // =============================================================================
+function createRedisClient(Redis, redisUrl) {
+    return new Redis(redisUrl, {
+        host: DB_CONFIG.REDIS_HOST,
+        port: DB_CONFIG.REDIS_PORT,
+        password: REDIS_PASSWORD || undefined,
+        lazyConnect: true,
+        maxRetriesPerRequest: 1,
+        enableOfflineQueue: false,
+        retryStrategy: () => null,
+    });
+}
+
+async function safeRedisDisconnect(redis) {
+    if (!redis) return;
+    if (redis.status === 'end' || redis.status === 'close') return;
+    try {
+        await redis.quit();
+    } catch {
+        try {
+            redis.disconnect();
+        } catch {}
+    }
+}
+
 async function auditAcePackets() {
     if (!flags.json) console.log('\n--- ACE Packet + SOM Cluster reconciliation ---');
 
@@ -432,10 +456,7 @@ async function auditAcePackets() {
         return;
     }
 
-    const redis = new Redis(REDIS_URL, {
-        lazyConnect: true, maxRetriesPerRequest: 1,
-        enableOfflineQueue: false, retryStrategy: () => null,
-    });
+    const redis = createRedisClient(Redis, REDIS_URL);
     redis.on('error', () => {});
 
     try {
@@ -443,77 +464,79 @@ async function auditAcePackets() {
         await redis.ping();
     } catch (e) {
         logFinding('ACE', 'redis_connect', { status: 'WARN', details: `Redis not reachable: ${e.message}` });
-        await redis.disconnect().catch(() => {});
+        await safeRedisDisconnect(redis);
         return;
     }
 
-    // Check ace:packet:latest
-    const latestId = await redis.get('ace:packet:latest').catch(() => null);
-    logFinding('ACE', 'packet_latest', {
-        status: latestId ? 'PASS' : 'WARN',
-        details: latestId ? `ace:packet:latest → ${latestId}` : 'no packets written yet — trigger a query to populate',
-    });
-
-    if (latestId) {
-        const raw = await redis.get(`ace:packet:${latestId}`).catch(() => null);
-        if (raw) {
-            const p = JSON.parse(raw);
-            logFinding('ACE', 'packet_schema', {
-                status: p.source_refs?.length > 0 && !p.degraded ? 'PASS' : 'WARN',
-                details: `source_refs=${p.source_refs?.length ?? 0}, degraded=${p.degraded}, cache_hit=${p.cache_hit}`,
-            });
-        }
-    }
-
-    // Check SOM cluster index
-    const clusterCount = await redis.scard('ace:cluster:index').catch(() => 0);
-    logFinding('ACE', 'som_cluster_index', {
-        status: clusterCount > 0 ? 'PASS' : 'WARN',
-        details: clusterCount > 0
-            ? `${clusterCount} SOM clusters in ace:cluster:index`
-            : 'empty — run graphify:semantic or bulkUpsertSomPackets()',
-    });
-
-    // Check Bifrost telemetry keys
-    const [, bifrostKeys] = await redis.scan('0', 'MATCH', 'bitfrost:retrieval:*', 'COUNT', 50).catch(() => ['0', []]);
-    logFinding('ACE', 'bifrost_telemetry', {
-        status: bifrostKeys.length > 0 ? 'PASS' : 'WARN',
-        details: bifrostKeys.length > 0
-            ? `${bifrostKeys.length} bitfrost:retrieval:* keys (context assembler firing)`
-            : 'no Bifrost telemetry keys — context assembler not yet called or TTLs expired',
-    });
-
-    // Check graph-edges have feature_ids
-    const edgesPath = path.join(workspaceRoot, '.opencode/ndjson/graph-edges.ndjson');
-    if (existsSync(edgesPath)) {
-        const lines = readFileSync(edgesPath, 'utf8').split('\n').filter(Boolean);
-        let withFeatures = 0;
-        for (const line of lines.slice(0, 100)) {
-            try {
-                const e = JSON.parse(line);
-                if (e.feature_ids?.length > 0) withFeatures++;
-            } catch { /* skip */ }
-        }
-        logFinding('ACE', 'graph_edges_feature_ids', {
-            status: withFeatures > 0 ? 'PASS' : 'WARN',
-            details: withFeatures > 0
-                ? `${withFeatures}/${Math.min(lines.length, 100)} sampled edges have feature_ids`
-                : 'no edges have feature_ids — run ndjson:mapreduce with updated join',
+    try {
+        // Check ace:packet:latest
+        const latestId = await redis.get('ace:packet:latest').catch(() => null);
+        logFinding('ACE', 'packet_latest', {
+            status: latestId ? 'PASS' : 'WARN',
+            details: latestId ? `ace:packet:latest → ${latestId}` : 'no packets written yet — trigger a query to populate',
         });
-    } else {
-        logFinding('ACE', 'graph_edges_file', { status: 'WARN', details: 'graph-edges.ndjson missing — run ndjson:mapreduce' });
+
+        if (latestId) {
+            const raw = await redis.get(`ace:packet:${latestId}`).catch(() => null);
+            if (raw) {
+                const p = JSON.parse(raw);
+                logFinding('ACE', 'packet_schema', {
+                    status: p.source_refs?.length > 0 && !p.degraded ? 'PASS' : 'WARN',
+                    details: `source_refs=${p.source_refs?.length ?? 0}, degraded=${p.degraded}, cache_hit=${p.cache_hit}`,
+                });
+            }
+        }
+
+        // Check SOM cluster index
+        const clusterCount = await redis.scard('ace:cluster:index').catch(() => 0);
+        logFinding('ACE', 'som_cluster_index', {
+            status: clusterCount > 0 ? 'PASS' : 'WARN',
+            details: clusterCount > 0
+                ? `${clusterCount} SOM clusters in ace:cluster:index`
+                : 'empty — run graphify:semantic or bulkUpsertSomPackets()',
+        });
+
+        // Check Bifrost telemetry keys
+        const [, bifrostKeys] = await redis.scan('0', 'MATCH', 'bitfrost:retrieval:*', 'COUNT', 50).catch(() => ['0', []]);
+        logFinding('ACE', 'bifrost_telemetry', {
+            status: bifrostKeys.length > 0 ? 'PASS' : 'WARN',
+            details: bifrostKeys.length > 0
+                ? `${bifrostKeys.length} bitfrost:retrieval:* keys (context assembler firing)`
+                : 'no Bifrost telemetry keys — context assembler not yet called or TTLs expired',
+        });
+
+        // Check graph-edges have feature_ids
+        const edgesPath = path.join(workspaceRoot, '.opencode/ndjson/graph-edges.ndjson');
+        if (existsSync(edgesPath)) {
+            const lines = readFileSync(edgesPath, 'utf8').split('\n').filter(Boolean);
+            let withFeatures = 0;
+            for (const line of lines.slice(0, 100)) {
+                try {
+                    const e = JSON.parse(line);
+                    if (e.feature_ids?.length > 0) withFeatures++;
+                } catch { /* skip */ }
+            }
+            logFinding('ACE', 'graph_edges_feature_ids', {
+                status: withFeatures > 0 ? 'PASS' : 'WARN',
+                details: withFeatures > 0
+                    ? `${withFeatures}/${Math.min(lines.length, 100)} sampled edges have feature_ids`
+                    : 'no edges have feature_ids — run ndjson:mapreduce with updated join',
+            });
+        } else {
+            logFinding('ACE', 'graph_edges_file', { status: 'WARN', details: 'graph-edges.ndjson missing — run ndjson:mapreduce' });
+        }
+
+        // Check NES card index (nes:card:* keys)
+        const [, nesKeys] = await redis.scan('0', 'MATCH', 'nes:card:*', 'COUNT', 20).catch(() => ['0', []]);
+        logFinding('ACE', 'nes_card_index', {
+            status: nesKeys.length > 0 ? 'PASS' : 'WARN',
+            details: nesKeys.length > 0
+                ? `${nesKeys.length}+ NES card keys in Redis`
+                : 'no NES cards in Redis — call bulkLoadCards() after mapreduce',
+        });
+    } finally {
+        await safeRedisDisconnect(redis);
     }
-
-    // Check NES card index (nes:card:* keys)
-    const [, nesKeys] = await redis.scan('0', 'MATCH', 'nes:card:*', 'COUNT', 20).catch(() => ['0', []]);
-    logFinding('ACE', 'nes_card_index', {
-        status: nesKeys.length > 0 ? 'PASS' : 'WARN',
-        details: nesKeys.length > 0
-            ? `${nesKeys.length}+ NES card keys in Redis`
-            : 'no NES cards in Redis — call bulkLoadCards() after mapreduce',
-    });
-
-    await redis.disconnect().catch(() => {});
 }
 
 // =============================================================================

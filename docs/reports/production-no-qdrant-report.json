@@ -1,0 +1,12 @@
+{
+  "timestamp": "2026-06-04T23:01:41.034Z",
+  "limit": 25,
+  "active_production": {
+    "total": 4808,
+    "has_qdrant": 4808,
+    "no_qdrant": 0
+  },
+  "sample_buckets": [],
+  "sample_rows": [],
+  "next_decision": "no_active_qdrant_gap"
+}

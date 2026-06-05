@@ -451,6 +451,34 @@ dependency graph, sourceRefs, startup context, package scripts.
 - [x] Parent Atlas table of contents exists.
   - `docs/atlas/parent-atlas-table-of-contents.md`
   - navigation index for storage, data spine, agent flow, and active todo spine
+- [x] Parent Atlas graph-truth / traversal lane is verified through production ACE injection.
+  - `sveltekit-frontend/src/lib/server/features/ai/ace/context-assembler.ts` imports and calls `retrieveMultihopContext`
+  - `npm run smoke:multihop-contextual-tree` passes through Qdrant, Postgres expansion, Redis packet keying, and packet field validation
+  - `npm run smoke:multi-hop-traversal` proves the `shims` sourceRef path through Postgres, Qdrant, SOM, Neo4j `ParentAtlasFeature`, and 9 two-hop neighbors
+  - class matrix report: `docs/reports/multihop-traversal-class-matrix.{json,md}`
+  - verified full traversal for API route, ACE/server, DB schema, and Svelte component classes
+  - `scripts/atlas` class is intentionally marked partial: Postgres feature truth and Neo4j traversal pass, but Qdrant/SOM mapping is not populated yet
+- [x] Parent Atlas synthesized-map rebuild has a clear command surface.
+  - `npm --prefix sveltekit-frontend run atlas:feature-map:synthesize:apply`
+  - direct command: `node scripts/atlas/build-synthesized-map.mjs`
+  - note: `npm --prefix sveltekit-frontend run atlas:synthesize` is not the Parent Atlas synthesized-map rebuild; it points to `synthesize-context-chunks.mjs` and requires `--input`
+- [x] Drive the remaining production Qdrant-without-SOM cleanup from a focused report before more clustering.
+  - `npm --prefix sveltekit-frontend run atlas:coverage:qdrant-no-som`
+  - report: `docs/reports/production-qdrant-no-som-report.{json,md}`
+  - current practical status: raw topology `10487/14465` SOM, deduped active-production topology `4808/4808` SOM, active-production Qdrant `4808/4808`, active-production Qdrant-without-SOM `0`
+  - active vectorized files now all have SOM
+- [x] Drive the remaining active-production no-Qdrant cleanup from the focused report.
+  - `npm --prefix sveltekit-frontend run atlas:coverage:no-qdrant`
+  - report: `docs/reports/production-no-qdrant-report.{json,md}`
+  - current practical status: active-production no-Qdrant `0`
+  - bounded sourceRef-backed ingest wrote the remaining active points; broad generated-folder indexing was not used
+- [x] Continue cached Gemma4 summary batches after topology/report cleanup.
+  - active-production summary check shows `3528 / 3528` with summaries and `0` missing
+  - profile cards regenerated with `npm --prefix sveltekit-frontend run docs:file-cards:apply`
+- [x] Refresh recommendation workspace after topology and summary cleanup.
+  - `npm run recommendations:workspace`
+  - materialized `12` active workspace tasks
+  - next ready task: `task_967675a8`
 
 ---
 

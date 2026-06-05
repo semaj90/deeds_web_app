@@ -1,6 +1,90 @@
 # Drizzle ↔ Postgres Contract Report
 
-Generated: 2026-06-01T18:30:34.760Z  |  Findings: 871
+Generated: 2026-06-04T23:58:06.915Z  |  Findings: 881
+
+### unsafe_drizzle_update_delete  (medium)
+**Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
+**Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
+**File:** `C`
+**Validate:** `npm run lint:drizzle`
+
+### unsafe_drizzle_update_delete  (medium)
+**Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
+**Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
+**File:** `C`
+**Validate:** `npm run lint:drizzle`
+
+### unsafe_drizzle_update_delete  (medium)
+**Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
+**Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
+**File:** `C`
+**Validate:** `npm run lint:drizzle`
+
+### unsafe_drizzle_update_delete  (medium)
+**Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
+**Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
+**File:** `C`
+**Validate:** `npm run lint:drizzle`
+
+### unsafe_drizzle_update_delete  (medium)
+**Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
+**Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
+**File:** `C`
+**Validate:** `npm run lint:drizzle`
+
+### unsafe_drizzle_update_delete  (medium)
+**Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
+**Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
+**File:** `C`
+**Validate:** `npm run lint:drizzle`
+
+### unsafe_drizzle_update_delete  (medium)
+**Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
+**Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
+**File:** `C`
+**Validate:** `npm run lint:drizzle`
+
+### unsafe_drizzle_update_delete  (medium)
+**Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
+**Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
+**File:** `C`
+**Validate:** `npm run lint:drizzle`
+
+### unsafe_drizzle_update_delete  (medium)
+**Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
+**Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
+**File:** `C`
+**Validate:** `npm run lint:drizzle`
+
+### unsafe_drizzle_update_delete  (medium)
+**Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
+**Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
+**File:** `C`
+**Validate:** `npm run lint:drizzle`
+
+### unsafe_drizzle_update_delete  (medium)
+**Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
+**Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
+**File:** `C`
+**Validate:** `npm run lint:drizzle`
+
+### unsafe_drizzle_update_delete  (medium)
+**Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
+**Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
+**File:** `C`
+**Validate:** `npm run lint:drizzle`
+
+### unsafe_drizzle_update_delete  (medium)
+**Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
+**Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
+**File:** `C`
+**Validate:** `npm run lint:drizzle`
+
+### unsafe_drizzle_update_delete  (medium)
+**Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
+**Fix:** Add a .where(eq(...)) condition or confirm this is intentional.
+**File:** `C`
+**Validate:** `npm run lint:drizzle`
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
@@ -3962,17 +4046,11 @@ Generated: 2026-06-01T18:30:34.760Z  |  Findings: 871
 **File:** `sveltekit-frontend\src\lib\server\db\schema\models.ts`
 **Validate:** `npm run db:check`, `npm run db:generate`
 
-### missing_table  (medium)
-**Problem:** Table "nes_chrom_packets" declared in Drizzle schema but absent from live DB — migration pending.
-**Fix:** Run: npm run db:generate then npm run db:migrate (or manual SQL).
+### missing_column  (medium)
+**Problem:** Column nes_chrom_kag_dag_hits.metadata in Drizzle schema but absent from live DB.
+**Fix:** ALTER TABLE nes_chrom_kag_dag_hits ADD COLUMN IF NOT EXISTS metadata ...
 **File:** `sveltekit-frontend\src\lib\server\db\schema\nes-chrom-packets.ts`
-**Validate:** `npm run db:check`, `npm run db:generate`
-
-### missing_table  (medium)
-**Problem:** Table "nes_chrom_kag_dag_hits" declared in Drizzle schema but absent from live DB — migration pending.
-**Fix:** Run: npm run db:generate then npm run db:migrate (or manual SQL).
-**File:** `sveltekit-frontend\src\lib\server\db\schema\nes-chrom-packets.ts`
-**Validate:** `npm run db:check`, `npm run db:generate`
+**Validate:** `npm run db:check`
 
 ### missing_table  (medium)
 **Problem:** Table "rag_cards" declared in Drizzle schema but absent from live DB — migration pending.
@@ -4074,24 +4152,6 @@ Generated: 2026-06-01T18:30:34.760Z  |  Findings: 871
 **Problem:** Table "predictive_todos" declared in Drizzle schema but absent from live DB — migration pending.
 **Fix:** Run: npm run db:generate then npm run db:migrate (or manual SQL).
 **File:** `sveltekit-frontend\src\lib\server\db\schema\search-analytics.ts`
-**Validate:** `npm run db:check`, `npm run db:generate`
-
-### live_db_schema_drift  (high)
-**Problem:** task_semantic_packets.id: Drizzle says bigserial, live DB says integer.
-**Fix:** Align Drizzle schema to match DB type OR migrate DB column.
-**File:** `sveltekit-frontend\src\lib\server\db\schema\tasks.ts`
-**Validate:** `npm run db:check`, `npm run audit:contracts`
-
-### live_db_schema_drift  (high)
-**Problem:** agent_pickup_queue.id: Drizzle says uuid, live DB says integer.
-**Fix:** Align Drizzle schema to match DB type OR migrate DB column.
-**File:** `sveltekit-frontend\src\lib\server\db\schema\tasks.ts`
-**Validate:** `npm run db:check`, `npm run audit:contracts`
-
-### missing_table  (medium)
-**Problem:** Table "task_file_links" declared in Drizzle schema but absent from live DB — migration pending.
-**Fix:** Run: npm run db:generate then npm run db:migrate (or manual SQL).
-**File:** `sveltekit-frontend\src\lib\server\db\schema\tasks.ts`
 **Validate:** `npm run db:check`, `npm run db:generate`
 
 ### missing_column  (medium)
@@ -4457,18 +4517,6 @@ Generated: 2026-06-01T18:30:34.760Z  |  Findings: 871
 ### missing_column  (medium)
 **Problem:** Column glyph_records.batch_id in Drizzle schema but absent from live DB.
 **Fix:** ALTER TABLE glyph_records ADD COLUMN IF NOT EXISTS batch_id ...
-**File:** `sveltekit-frontend\src\lib\server\db\schema-postgres.ts`
-**Validate:** `npm run db:check`
-
-### missing_column  (medium)
-**Problem:** Column research_summaries.source_ref in Drizzle schema but absent from live DB.
-**Fix:** ALTER TABLE research_summaries ADD COLUMN IF NOT EXISTS source_ref ...
-**File:** `sveltekit-frontend\src\lib\server\db\schema-postgres.ts`
-**Validate:** `npm run db:check`
-
-### missing_column  (medium)
-**Problem:** Column research_summaries.source_refs in Drizzle schema but absent from live DB.
-**Fix:** ALTER TABLE research_summaries ADD COLUMN IF NOT EXISTS source_refs ...
 **File:** `sveltekit-frontend\src\lib\server\db\schema-postgres.ts`
 **Validate:** `npm run db:check`
 
@@ -5146,6 +5194,18 @@ Generated: 2026-06-01T18:30:34.760Z  |  Findings: 871
 
 ### migration_schema_drift  (low)
 **Problem:** Table "card_source_refs" in SQL migrations but not declared in Drizzle schema (may be a filtered/legacy table).
+**Fix:** Add to schema-postgres.ts OR add to tablesFilter in drizzle.config.ts.
+**File:** `sveltekit-frontend/drizzle/`
+**Validate:** `npm run db:check`
+
+### migration_schema_drift  (low)
+**Problem:** Table "atlas_feature_map_synthesized" in SQL migrations but not declared in Drizzle schema (may be a filtered/legacy table).
+**Fix:** Add to schema-postgres.ts OR add to tablesFilter in drizzle.config.ts.
+**File:** `sveltekit-frontend/drizzle/`
+**Validate:** `npm run db:check`
+
+### migration_schema_drift  (low)
+**Problem:** Table "atlas_feature_map_history" in SQL migrations but not declared in Drizzle schema (may be a filtered/legacy table).
 **Fix:** Add to schema-postgres.ts OR add to tablesFilter in drizzle.config.ts.
 **File:** `sveltekit-frontend/drizzle/`
 **Validate:** `npm run db:check`
