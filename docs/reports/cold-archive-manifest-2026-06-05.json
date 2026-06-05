@@ -1,0 +1,267 @@
+{
+  "generatedAt": "2026-06-05T04:36:08.215Z",
+  "dryRun": false,
+  "mode": "proof_only",
+  "threshold": 70,
+  "bucketFilter": null,
+  "repoRoot": "C:\\Users\\james\\Videos\\deeds-web-app",
+  "entries": [
+    {
+      "path": "drizzle/schema.ts",
+      "git_tag": "archive/2026-06-05/drizzle-schema.ts",
+      "sha": "e5a896370861d406c647db2103580a755f2e68ba",
+      "score": 39,
+      "bucket": "packetization_incomplete",
+      "reasons": [
+        "bucket:review-needed",
+        "no explicit archive bucket matched",
+        "packet_coverage:1",
+        "pathmap_match",
+        "preflight:postgres_parent_atlas|qdrant_codebase_chunks"
+      ],
+      "candidate_class": "mirror_surface",
+      "mode": "proof_only",
+      "archived_at": "2026-06-05T04:36:08.470Z",
+      "cold_copy_verified": true,
+      "delete_allowed_after_review": false
+    },
+    {
+      "path": "docs/graph/parent-atlas-rg-dump-packets.cypher",
+      "git_tag": "archive/2026-06-05/docs-graph-parent-atlas-rg-dump-packets.cypher",
+      "sha": "e5a896370861d406c647db2103580a755f2e68ba",
+      "score": 0,
+      "bucket": "keep_hot_in_repo",
+      "reasons": [
+        "bucket:sourceChanges",
+        "source or active-note surface",
+        "preflight:neo4j_edges|redis_hot_sourcerefs|qdrant_codebase_chunks"
+      ],
+      "candidate_class": "generated_artifact",
+      "mode": "proof_only",
+      "archived_at": "2026-06-05T04:36:09.843Z",
+      "cold_copy_verified": true,
+      "delete_allowed_after_review": false
+    },
+    {
+      "path": "docs/reports/contract-error-map-report.json",
+      "git_tag": "archive/2026-06-05/docs-reports-contract-error-map-report.json",
+      "sha": "e5a896370861d406c647db2103580a755f2e68ba",
+      "score": 0,
+      "bucket": "keep_hot_in_repo",
+      "reasons": [
+        "bucket:generated-reports",
+        "generated report surface that can be archived after the summary is promoted",
+        "preflight:qdrant_codebase_chunks"
+      ],
+      "candidate_class": "generated_artifact",
+      "mode": "proof_only",
+      "archived_at": "2026-06-05T04:36:10.074Z",
+      "cold_copy_verified": true,
+      "delete_allowed_after_review": false
+    },
+    {
+      "path": "docs/reports/contract-error-map-report.md",
+      "git_tag": "archive/2026-06-05/docs-reports-contract-error-map-report.md",
+      "sha": "e5a896370861d406c647db2103580a755f2e68ba",
+      "score": 0,
+      "bucket": "keep_hot_in_repo",
+      "reasons": [
+        "bucket:generated-reports",
+        "generated report surface that can be archived after the summary is promoted",
+        "preflight:qdrant_codebase_chunks"
+      ],
+      "candidate_class": "generated_artifact",
+      "mode": "proof_only",
+      "archived_at": "2026-06-05T04:36:10.328Z",
+      "cold_copy_verified": true,
+      "delete_allowed_after_review": false
+    },
+    {
+      "path": "docs/reports/doc-feature-crosswalk-2026-06-01.json",
+      "git_tag": "archive/2026-06-05/docs-reports-doc-feature-crosswalk-2026-06-01.json",
+      "sha": "e5a896370861d406c647db2103580a755f2e68ba",
+      "score": 0,
+      "bucket": "keep_hot_in_repo",
+      "reasons": [
+        "bucket:generated-reports",
+        "generated report surface that can be archived after the summary is promoted",
+        "preflight:qdrant_codebase_chunks"
+      ],
+      "candidate_class": "generated_artifact",
+      "mode": "proof_only",
+      "archived_at": "2026-06-05T04:36:10.579Z",
+      "cold_copy_verified": true,
+      "delete_allowed_after_review": false
+    },
+    {
+      "path": "docs/reports/doc-feature-crosswalk-2026-06-01.md",
+      "git_tag": "archive/2026-06-05/docs-reports-doc-feature-crosswalk-2026-06-01.md",
+      "sha": "e5a896370861d406c647db2103580a755f2e68ba",
+      "score": 0,
+      "bucket": "keep_hot_in_repo",
+      "reasons": [
+        "bucket:generated-reports",
+        "generated report surface that can be archived after the summary is promoted",
+        "preflight:qdrant_codebase_chunks"
+      ],
+      "candidate_class": "generated_artifact",
+      "mode": "proof_only",
+      "archived_at": "2026-06-05T04:36:10.850Z",
+      "cold_copy_verified": true,
+      "delete_allowed_after_review": false
+    },
+    {
+      "path": "docs/reports/drizzle-postgres-contract-report.json",
+      "git_tag": "archive/2026-06-05/docs-reports-drizzle-postgres-contract-report.json",
+      "sha": "e5a896370861d406c647db2103580a755f2e68ba",
+      "score": 0,
+      "bucket": "keep_hot_in_repo",
+      "reasons": [
+        "bucket:generated-reports",
+        "generated report surface that can be archived after the summary is promoted",
+        "preflight:qdrant_codebase_chunks"
+      ],
+      "candidate_class": "generated_artifact",
+      "mode": "proof_only",
+      "archived_at": "2026-06-05T04:36:11.104Z",
+      "cold_copy_verified": true,
+      "delete_allowed_after_review": false
+    },
+    {
+      "path": "docs/reports/drizzle-postgres-contract-report.md",
+      "git_tag": "archive/2026-06-05/docs-reports-drizzle-postgres-contract-report.md",
+      "sha": "e5a896370861d406c647db2103580a755f2e68ba",
+      "score": 0,
+      "bucket": "keep_hot_in_repo",
+      "reasons": [
+        "bucket:generated-reports",
+        "generated report surface that can be archived after the summary is promoted",
+        "preflight:qdrant_codebase_chunks"
+      ],
+      "candidate_class": "generated_artifact",
+      "mode": "proof_only",
+      "archived_at": "2026-06-05T04:36:11.360Z",
+      "cold_copy_verified": true,
+      "delete_allowed_after_review": false
+    },
+    {
+      "path": "docs/reports/error-fix-dag-report.json",
+      "git_tag": "archive/2026-06-05/docs-reports-error-fix-dag-report.json",
+      "sha": "e5a896370861d406c647db2103580a755f2e68ba",
+      "score": 0,
+      "bucket": "keep_hot_in_repo",
+      "reasons": [
+        "bucket:generated-reports",
+        "generated report surface that can be archived after the summary is promoted",
+        "preflight:neo4j_edges|qdrant_codebase_chunks"
+      ],
+      "candidate_class": "generated_artifact",
+      "mode": "proof_only",
+      "archived_at": "2026-06-05T04:36:11.613Z",
+      "cold_copy_verified": true,
+      "delete_allowed_after_review": false
+    },
+    {
+      "path": "docs/reports/error-fix-dag-report.md",
+      "git_tag": "archive/2026-06-05/docs-reports-error-fix-dag-report.md",
+      "sha": "e5a896370861d406c647db2103580a755f2e68ba",
+      "score": 0,
+      "bucket": "keep_hot_in_repo",
+      "reasons": [
+        "bucket:generated-reports",
+        "generated report surface that can be archived after the summary is promoted",
+        "preflight:neo4j_edges|qdrant_codebase_chunks"
+      ],
+      "candidate_class": "generated_artifact",
+      "mode": "proof_only",
+      "archived_at": "2026-06-05T04:36:11.910Z",
+      "cold_copy_verified": true,
+      "delete_allowed_after_review": false
+    },
+    {
+      "path": "docs/reports/gitignored-folder-summary-2026-06-01.json",
+      "git_tag": "archive/2026-06-05/docs-reports-gitignored-folder-summary-2026-06-01.json",
+      "sha": "e5a896370861d406c647db2103580a755f2e68ba",
+      "score": 0,
+      "bucket": "keep_hot_in_repo",
+      "reasons": [
+        "bucket:generated-reports",
+        "generated report surface that can be archived after the summary is promoted",
+        "preflight:qdrant_codebase_chunks"
+      ],
+      "candidate_class": "generated_artifact",
+      "mode": "proof_only",
+      "archived_at": "2026-06-05T04:36:12.202Z",
+      "cold_copy_verified": true,
+      "delete_allowed_after_review": false
+    },
+    {
+      "path": "docs/reports/gitignored-folder-summary-2026-06-01.md",
+      "git_tag": "archive/2026-06-05/docs-reports-gitignored-folder-summary-2026-06-01.md",
+      "sha": "e5a896370861d406c647db2103580a755f2e68ba",
+      "score": 0,
+      "bucket": "keep_hot_in_repo",
+      "reasons": [
+        "bucket:generated-reports",
+        "generated report surface that can be archived after the summary is promoted",
+        "preflight:qdrant_codebase_chunks"
+      ],
+      "candidate_class": "generated_artifact",
+      "mode": "proof_only",
+      "archived_at": "2026-06-05T04:36:12.538Z",
+      "cold_copy_verified": true,
+      "delete_allowed_after_review": false
+    },
+    {
+      "path": "docs/reports/gitignored-model-directories-audit-2026-06-01.md",
+      "git_tag": "archive/2026-06-05/docs-reports-gitignored-model-directories-audit-2026-06-01.md",
+      "sha": "e5a896370861d406c647db2103580a755f2e68ba",
+      "score": 0,
+      "bucket": "keep_hot_in_repo",
+      "reasons": [
+        "bucket:generated-reports",
+        "generated report surface that can be archived after the summary is promoted",
+        "preflight:qdrant_codebase_chunks"
+      ],
+      "candidate_class": "generated_artifact",
+      "mode": "proof_only",
+      "archived_at": "2026-06-05T04:36:12.841Z",
+      "cold_copy_verified": true,
+      "delete_allowed_after_review": false
+    },
+    {
+      "path": "docs/reports/kanban-turbovec-consolidation-latest.json",
+      "git_tag": "archive/2026-06-05/docs-reports-kanban-turbovec-consolidation-latest.json",
+      "sha": "e5a896370861d406c647db2103580a755f2e68ba",
+      "score": 0,
+      "bucket": "keep_hot_in_repo",
+      "reasons": [
+        "bucket:generated-reports",
+        "generated report surface that can be archived after the summary is promoted",
+        "preflight:qdrant_codebase_chunks"
+      ],
+      "candidate_class": "generated_artifact",
+      "mode": "proof_only",
+      "archived_at": "2026-06-05T04:36:13.141Z",
+      "cold_copy_verified": true,
+      "delete_allowed_after_review": false
+    },
+    {
+      "path": "docs/reports/kanban-turbovec-consolidation-latest.md",
+      "git_tag": "archive/2026-06-05/docs-reports-kanban-turbovec-consolidation-latest.md",
+      "sha": "e5a896370861d406c647db2103580a755f2e68ba",
+      "score": 0,
+      "bucket": "keep_hot_in_repo",
+      "reasons": [
+        "bucket:generated-reports",
+        "generated report surface that can be archived after the summary is promoted",
+        "preflight:qdrant_codebase_chunks"
+      ],
+      "candidate_class": "generated_artifact",
+      "mode": "proof_only",
+      "archived_at": "2026-06-05T04:36:13.444Z",
+      "cold_copy_verified": true,
+      "delete_allowed_after_review": false
+    }
+  ]
+}

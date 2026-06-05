@@ -23,6 +23,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import pg from 'pg';
+import { loadRepoEnv, resolveDatabaseUrl } from './connection-config.mjs';
 
 const __dir = path.dirname(fileURLToPath(import.meta.url));
 const ROOT  = path.resolve(__dir, '../..');
@@ -33,24 +34,11 @@ const FEAT_FILTER = FEAT_ARG ? FEAT_ARG.split('=')[1] : null;
 
 // ── Env loader ────────────────────────────────────────────────────────────────
 function loadEnv() {
-  const env = { ...process.env };
-  for (const p of [
-    path.join(ROOT, 'sveltekit-frontend', '.env'),
-    path.join(ROOT, '.env'),
-  ]) {
-    if (!fs.existsSync(p)) continue;
-    for (const line of fs.readFileSync(p, 'utf8').split('\n')) {
-      const m = line.trimEnd().match(/^([A-Z_][A-Z0-9_]*)=(.*)$/);
-      if (m && !env[m[1]]) env[m[1]] = m[2].replace(/^["']|["']$/g, '');
-    }
-    break;
-  }
-  return env;
+  return loadRepoEnv(process.env);
 }
 
 const env = loadEnv();
-const DATABASE_URL = env.DATABASE_URL
-  ?? `postgresql://${env.DB_USER ?? 'legal_admin'}:${env.DB_PASSWORD ?? 'legal_password'}@${env.DB_HOST ?? '127.0.0.1'}:${env.DB_PORT ?? '5432'}/${env.DB_NAME ?? 'legal_ai_db'}`;
+const DATABASE_URL = resolveDatabaseUrl(env);
 
 // ── Step 1: load atlas_feature_map rows ───────────────────────────────────────
 const pool = new pg.Pool({ connectionString: DATABASE_URL });

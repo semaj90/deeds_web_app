@@ -20,6 +20,7 @@ The stronger correction is:
 - keep Qdrant as the hot semantic lookup and filtered traversal layer
 - keep topology / quaternion / SOM / XGBoost math in the CUDA, PyTorch, or LibTorch lane
 - promote the resulting vectors and payload fields back into Qdrant only after they are computed elsewhere
+- treat Qdrant/TurboVec/Redis LOD as compressed approximate semantic geometry with optional exact rescore, not durable truth
 - use the superseded-score report to rank originals before any archive eligibility decision
 
 ## 1. Storage Tiers
@@ -167,11 +168,21 @@ The traversal stack should stay small and deterministic:
 Practical mapping:
 
 - sparse gate: `rg`, path maps, feature ids, source refs, hashes
-- dense recall: Qdrant ANN
+- dense recall: Qdrant ANN over compressed/indexed semantic geometry
 - graph expansion: Neo4j / KAG / DAG
 - synthesis: Gemma4
 
 Redis / Bitfrost sits between sparse and dense as a hot reuse layer.
+
+Candidate flow:
+
+```txt
+filters first
+  -> approximate ANN candidate search
+  -> dynamic oversampling when needed
+  -> optional exact rescore
+  -> packet assembly
+```
 
 ## 5. Packet Contract
 

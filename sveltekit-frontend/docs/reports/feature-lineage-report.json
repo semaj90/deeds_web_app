@@ -1,0 +1,4571 @@
+{
+  "generatedAt": "2026-06-05T16:58:22.850Z",
+  "inputs": {
+    "featureLabels": ".tmp/feature_labels.jsonl",
+    "kanbanTasks": ".tmp/kanban_tasks.jsonl",
+    "missingFeatureTodos": ".tmp/missing_feature_todos.jsonl"
+  },
+  "summary": {
+    "totalRows": 6765,
+    "sourceRefRows": 6765,
+    "sourceRefCoveragePct": 100,
+    "featureIdRows": 6765,
+    "featureIdCoveragePct": 100,
+    "featureLabelRows": 6765,
+    "featureLabelCoveragePct": 100,
+    "pathRows": 3312,
+    "taskIdRows": 3453,
+    "runIdRows": 0,
+    "higherHopCoverage": {
+      "somClusterRows": 0,
+      "glyphRecordRows": 0,
+      "qdrantHitRows": 0,
+      "redisHotKeyRows": 0,
+      "neo4jNodeRows": 0
+    },
+    "hopCoverage": {
+      "sourceRef": 6765,
+      "featureId": 6765,
+      "featureLabel": 6765,
+      "path": 3312,
+      "taskId": 3453,
+      "runId": 0,
+      "somCluster": 0,
+      "glyphRecord": 0,
+      "qdrantHit": 0,
+      "redisHotKey": 0,
+      "neo4jNode": 0
+    },
+    "hopCoveragePct": {
+      "sourceRef": 100,
+      "featureId": 100,
+      "featureLabel": 100,
+      "path": 48.96,
+      "taskId": 51.04,
+      "runId": 0,
+      "somCluster": 0,
+      "glyphRecord": 0,
+      "qdrantHit": 0,
+      "redisHotKey": 0,
+      "neo4jNode": 0
+    },
+    "higherHopJoinMap": [
+      {
+        "name": "route_runtime_packets",
+        "kind": "table",
+        "source": "src/lib/server/db/schema/route_runtime_packets.ts",
+        "exists": true,
+        "candidateKeys": [
+          "sourceRefs",
+          "featureIds",
+          "somCluster",
+          "qdrantHits",
+          "redisHotKeys"
+        ],
+        "canonicalJoinKey": "sourceRefs[] + featureIds[] projected through the packet spine",
+        "sampleKeysFound": [
+          "sourceRefs",
+          "featureIds",
+          "somCluster",
+          "qdrantHits",
+          "redisHotKeys"
+        ],
+        "whyZero": "Present as a runtime telemetry table, but the lineage auditor reads JSONL feature surfaces, not runtime packets."
+      },
+      {
+        "name": "parent_atlas_documents",
+        "kind": "table",
+        "source": "src/routes/dev/file-card/[...sourceRef]/+page.server.ts",
+        "exists": true,
+        "candidateKeys": [
+          "source_ref",
+          "feature_id",
+          "rel_path",
+          "qdrant_point_id"
+        ],
+        "canonicalJoinKey": "source_ref",
+        "sampleKeysFound": [
+          "source_ref",
+          "feature_id",
+          "rel_path",
+          "qdrant_point_id"
+        ],
+        "whyZero": "Join keys exist in the dev file-card fallback query, but the lineage auditor does not read parent_atlas_documents rows."
+      },
+      {
+        "name": "atlas_feature_map_synthesized",
+        "kind": "table",
+        "source": "src/routes/dev/file-card/[...sourceRef]/+page.server.ts",
+        "exists": true,
+        "candidateKeys": [
+          "source_ref",
+          "som_cluster",
+          "packet_count",
+          "semantic_confidence",
+          "behavior_score",
+          "routing_score"
+        ],
+        "canonicalJoinKey": "source_ref",
+        "sampleKeysFound": [
+          "source_ref",
+          "som_cluster",
+          "packet_count",
+          "semantic_confidence",
+          "behavior_score",
+          "routing_score"
+        ],
+        "whyZero": "SOM cluster metadata exists in route-side joins, but the lineage auditor does not project this table."
+      },
+      {
+        "name": "atlas_feature_synthesis",
+        "kind": "table",
+        "source": "src/routes/dev/file-card/[...sourceRef]/+page.server.ts",
+        "exists": true,
+        "candidateKeys": [
+          "feature_id",
+          "avg_confidence",
+          "dominant_status",
+          "primary_cluster_id"
+        ],
+        "canonicalJoinKey": "feature_id",
+        "sampleKeysFound": [
+          "feature_id",
+          "avg_confidence",
+          "dominant_status",
+          "primary_cluster_id"
+        ],
+        "whyZero": "Feature-level synthesis exists behind the file-card fallback, but the lineage auditor only normalizes feature labels."
+      },
+      {
+        "name": "qdrant_codebase_chunks_768",
+        "kind": "payload",
+        "source": "src/mcp/tools/trace-kag.tool.ts",
+        "exists": true,
+        "candidateKeys": [
+          "payload.source_ref",
+          "payload.file_path",
+          "payload.som_cluster",
+          "payload.summary"
+        ],
+        "canonicalJoinKey": "payload.source_ref (fallback: payload.file_path)",
+        "sampleKeysFound": [
+          "payload.som_cluster"
+        ],
+        "whyZero": "Qdrant payload fields are reachable in graph/search tooling, but the lineage auditor is not sampling live Qdrant payloads."
+      },
+      {
+        "name": "neo4j_codebasefile",
+        "kind": "graph",
+        "source": "scripts/check-neo4j.cjs",
+        "exists": true,
+        "candidateKeys": [
+          "labels(CodebaseFile)",
+          "filePath",
+          "sourceRef",
+          "nodeLabel",
+          "usedTables"
+        ],
+        "canonicalJoinKey": "CodebaseFile.filePath / CodebaseFile.sourceRef",
+        "sampleKeysFound": [
+          "filePath",
+          "nodeLabel",
+          "usedTables"
+        ],
+        "whyZero": "Neo4j node labels/properties exist in graph tooling, but the lineage auditor does not query Neo4j yet."
+      },
+      {
+        "name": "local_jsonl_surface",
+        "kind": "artifact",
+        "source": "scripts/atlas/audit-jsonl.mjs",
+        "exists": true,
+        "candidateKeys": [
+          "source_ref",
+          "feature_id",
+          "feature_label",
+          "som_cluster",
+          "qdrant_point_id",
+          "redis_hot_key",
+          "neo4j_node"
+        ],
+        "canonicalJoinKey": "source_ref + feature_id",
+        "sampleKeysFound": [
+          "source_ref",
+          "feature_id",
+          "feature_label"
+        ],
+        "whyZero": "The lineage auditor already normalizes sourceRef/featureId/labels from JSONL, but the higher-hop keys are not present in the loaded feature surfaces."
+      }
+    ],
+    "higherHopJoinSamples": {
+      "routeRuntimePackets": [
+        {
+          "sourceRefs": [
+            "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:21"
+          ],
+          "featureIds": [
+            "feature:todo:1e95eb7b2c97aa52a6ec0308"
+          ]
+        },
+        {
+          "sourceRefs": [
+            "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:22"
+          ],
+          "featureIds": [
+            "feature:todo:f831f8496459630481b6f126"
+          ]
+        },
+        {
+          "sourceRefs": [
+            "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:23"
+          ],
+          "featureIds": [
+            "feature:todo:2aed3e03cc66e3e478a5479d"
+          ]
+        },
+        {
+          "sourceRefs": [
+            "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:24"
+          ],
+          "featureIds": [
+            "feature:todo:a33b97f7501a9583a2e63c2b"
+          ]
+        },
+        {
+          "sourceRefs": [
+            "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:25"
+          ],
+          "featureIds": [
+            "feature:todo:322cf977b5fa41f902b9321b"
+          ]
+        }
+      ],
+      "parentAtlasDocuments": [
+        {
+          "source_ref": "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:21",
+          "feature_id": "feature:todo:1e95eb7b2c97aa52a6ec0308"
+        },
+        {
+          "source_ref": "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:22",
+          "feature_id": "feature:todo:f831f8496459630481b6f126"
+        },
+        {
+          "source_ref": "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:23",
+          "feature_id": "feature:todo:2aed3e03cc66e3e478a5479d"
+        },
+        {
+          "source_ref": "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:24",
+          "feature_id": "feature:todo:a33b97f7501a9583a2e63c2b"
+        },
+        {
+          "source_ref": "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:25",
+          "feature_id": "feature:todo:322cf977b5fa41f902b9321b"
+        }
+      ],
+      "qdrantPayload": [
+        {
+          "source_ref": "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:21",
+          "feature_id": "feature:todo:1e95eb7b2c97aa52a6ec0308"
+        },
+        {
+          "source_ref": "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:22",
+          "feature_id": "feature:todo:f831f8496459630481b6f126"
+        },
+        {
+          "source_ref": "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:23",
+          "feature_id": "feature:todo:2aed3e03cc66e3e478a5479d"
+        },
+        {
+          "source_ref": "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:24",
+          "feature_id": "feature:todo:a33b97f7501a9583a2e63c2b"
+        },
+        {
+          "source_ref": "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:25",
+          "feature_id": "feature:todo:322cf977b5fa41f902b9321b"
+        }
+      ],
+      "redisKeys": [],
+      "neo4jNodes": [],
+      "localJsonl": [
+        {
+          "source_ref": "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:21",
+          "feature_id": "feature:todo:1e95eb7b2c97aa52a6ec0308"
+        },
+        {
+          "source_ref": "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:22",
+          "feature_id": "feature:todo:f831f8496459630481b6f126"
+        },
+        {
+          "source_ref": "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:23",
+          "feature_id": "feature:todo:2aed3e03cc66e3e478a5479d"
+        },
+        {
+          "source_ref": "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:24",
+          "feature_id": "feature:todo:a33b97f7501a9583a2e63c2b"
+        },
+        {
+          "source_ref": "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:25",
+          "feature_id": "feature:todo:322cf977b5fa41f902b9321b"
+        }
+      ]
+    },
+    "higherHopCandidateDiscovery": {
+      "scannedRoots": [
+        ".tmp",
+        "docs/reports",
+        "memory",
+        "../memory"
+      ],
+      "scannedFiles": 500,
+      "hops": [
+        {
+          "hop": "somCluster",
+          "candidateEvidenceAnywhere": true,
+          "candidateFilesFound": [
+            "../memory/atlas/documents-atlas.latest.md",
+            "../memory/exports/cluster-cards.jsonl"
+          ],
+          "candidateFieldNamesFound": [
+            "som_cluster",
+            "somCluster",
+            "cluster_id",
+            "clusterId"
+          ],
+          "sampleValues": [
+            "\"Tier A — Code Connectivity (G1–G9) | Gate | Check | Command | |------|-------|---------| | G1 | Static ESM imports | `…",
+            "\"G31: Qdrant tag enrichment — som_cluster payload field written after SOM\",",
+            "7, // optional: narrow to one SOM cluster }); // Returns Manifold4Hit[] ordered by manifoldScore = 1/(1 + distance) ```…",
+            "\"Postgres must have columns/JSONB for section, tags, summary, somCluster,\",",
+            "feature:opencode-tools",
+            "feature:sveltekit-api",
+            "feature:deeds_labs/snapshots",
+            "feature:redis-cache",
+            "feature:deeds_labs/services",
+            "feature:sveltekit-frontend/src"
+          ],
+          "probableJoinKey": "som_cluster",
+          "whyZero": "The lineage rows never project SOM cluster metadata, so this hop stays empty even though the artifacts may carry the field names."
+        },
+        {
+          "hop": "glyphRecord",
+          "candidateEvidenceAnywhere": true,
+          "candidateFilesFound": [
+            "../memory/atlas/documents-atlas.latest.md",
+            "../memory/knowledge/document-knowledge-report.md",
+            "memory/runs/2026-05-22T21-40-55/plan.md",
+            "memory/runs/2026-05-25T06-16-29/plan.md",
+            "memory/runs/2026-05-25T06-55-58/plan.md",
+            "memory/runs/2026-05-25T06-57-32/plan.md",
+            "memory/runs/2026-05-27T15-20-32/plan.md",
+            "memory/runs/2026-06-01T21-49-00/plan.md",
+            "memory/runs/2026-06-02T14-53-38/plan.md",
+            "memory/runs/2026-06-02T14-55-15/plan.md",
+            "memory/runs/2026-06-03T19-42-51/plan.md"
+          ],
+          "candidateFieldNamesFound": [
+            "glyph_record",
+            "glyphId",
+            "glyph"
+          ],
+          "sampleValues": [
+            "\"Accept either dedicated glyph_records table OR documented JSONB persistence fields\",",
+            "\"Tier A — Code Connectivity (G1–G9) | Gate | Check | Command | |------|-------|---------| | G1 | Static ESM imports | `…",
+            "\"Cache keys must tie to glyphId, pageIndex, or cartridge page identity\",",
+            "\"G37: Shared glyph enums/types exist\",",
+            "\"MUST return ≥1 hit — glyphs can be grouped by document/legal structure\",",
+            "\"MUST return ≥1 hit — cache keys can be tied to glyph/page boundaries\",",
+            "\"G46: RabbitMQ glyph rebuild trigger exists\",",
+            "\"G47: Drizzle/Postgres durable glyph schema exists\",",
+            "\"MUST return ≥1 hit — glyph metadata persists beyond runtime/cache\",",
+            "\"MUST return ≥1 hit — public glyph API exported from a controlled index.ts\","
+          ],
+          "probableJoinKey": "glyph_record",
+          "whyZero": "Glyph metadata is not part of the current lineage surface, so any glyph-shaped evidence remains disconnected from the normalized rows."
+        },
+        {
+          "hop": "qdrantHit",
+          "candidateEvidenceAnywhere": false,
+          "candidateFilesFound": [],
+          "candidateFieldNamesFound": [],
+          "sampleValues": [],
+          "probableJoinKey": "qdrant_point_id",
+          "whyZero": "The lineage auditor tracks sourceRef and featureId, but it does not yet hydrate raw Qdrant hit identifiers into the row set."
+        },
+        {
+          "hop": "redisHotKey",
+          "candidateEvidenceAnywhere": false,
+          "candidateFilesFound": [],
+          "candidateFieldNamesFound": [],
+          "sampleValues": [],
+          "probableJoinKey": "redis_hot_key",
+          "whyZero": "Redis key evidence may exist in reports or packet payloads, but the lineage rows do not carry a hot-key field today."
+        },
+        {
+          "hop": "neo4jNode",
+          "candidateEvidenceAnywhere": true,
+          "candidateFilesFound": [
+            "../memory/datasets/llm_synthesis/2026-05-17.jsonl"
+          ],
+          "candidateFieldNamesFound": [
+            "nodeId"
+          ],
+          "sampleValues": [
+            "42"
+          ],
+          "probableJoinKey": "neo4j_node",
+          "whyZero": "Neo4j node evidence is visible in graph-oriented artifacts, but the lineage auditor does not yet project those node identifiers into the normalized feature rows."
+        }
+      ]
+    },
+    "fieldNameMismatchDiscovery": {
+      "qdrantHit": {
+        "actualFieldNamesFound": [
+          "id",
+          "payload",
+          "payload.agent_area",
+          "payload.area",
+          "payload.centroid_id",
+          "payload.chunk_id",
+          "payload.chunk_index",
+          "payload.complexity",
+          "payload.content",
+          "payload.content_hash",
+          "payload.dependency_cluster",
+          "payload.domain",
+          "payload.extension",
+          "payload.feature_label",
+          "payload.feature_status",
+          "payload.file_name",
+          "payload.file_path",
+          "payload.gpuCluster",
+          "payload.gpu_cluster",
+          "payload.hot_keyword_cluster",
+          "payload.indexed_at",
+          "payload.kind",
+          "payload.parent_atlas_card_id",
+          "payload.phase_lane",
+          "payload.purpose",
+          "payload.relativePath",
+          "payload.root",
+          "payload.schema_version",
+          "payload.somCol",
+          "payload.somRow",
+          "payload.som_cluster",
+          "payload.sourceRef",
+          "payload.sourceRefs",
+          "payload.source_refs",
+          "payload.tags",
+          "payload.total_chunks"
+        ],
+        "samplePayloadKeys": [
+          "agent_area",
+          "area",
+          "centroid_id",
+          "chunk_id",
+          "chunk_index",
+          "complexity",
+          "content",
+          "content_hash",
+          "dependency_cluster",
+          "domain",
+          "extension",
+          "feature_label",
+          "feature_status",
+          "file_name",
+          "file_path",
+          "gpuCluster",
+          "gpu_cluster",
+          "hot_keyword_cluster",
+          "indexed_at",
+          "kind",
+          "parent_atlas_card_id",
+          "phase_lane",
+          "purpose",
+          "relativePath",
+          "root",
+          "schema_version",
+          "somCol",
+          "somRow",
+          "som_cluster",
+          "sourceRef",
+          "sourceRefs",
+          "source_refs",
+          "tags",
+          "total_chunks"
+        ],
+        "expectedAliases": [
+          "id",
+          "payload.file_path",
+          "payload.source_ref",
+          "point_id",
+          "qdrantHit",
+          "qdrant_hit",
+          "qdrant_hits",
+          "qdrant_point_id"
+        ],
+        "expectedAliasesPresent": [
+          "id",
+          "payload.file_path"
+        ],
+        "expectedAliasesMissing": [
+          "payload.source_ref",
+          "point_id",
+          "qdrantHit",
+          "qdrant_hit",
+          "qdrant_hits",
+          "qdrant_point_id"
+        ],
+        "recommendedAliasPatchOnly": "Qdrant alias discovery: map qdrantHit to actual fields (id, payload, payload.agent_area, payload.area, payload.centroid_id, payload.chunk_id, payload.chunk_index, payload.complexity, payload.content, payload.content_hash, payload.dependency_cluster, payload.domain); missing expected aliases: payload.source_ref, point_id, qdrantHit, qdrant_hit, qdrant_hits, qdrant_point_id; no writes."
+      },
+      "neo4jNode": {
+        "actualFieldNamesFound": [
+          "callees",
+          "classCount",
+          "cluster",
+          "communityId",
+          "communityId.high",
+          "communityId.low",
+          "complexity",
+          "consumedQueues",
+          "dynamicImportTargets",
+          "elementId",
+          "exportCount",
+          "exports",
+          "fetchedRoutes",
+          "filePath",
+          "fileSize",
+          "functions",
+          "gds_betweenness",
+          "gds_community",
+          "gds_community.high",
+          "gds_community.low",
+          "gds_pagerank",
+          "gpuCluster",
+          "graphAuthorityScore",
+          "graphPageRank",
+          "hasAuthGuard",
+          "hasCachePattern",
+          "hasDynamicImports",
+          "hasErrorHandling",
+          "hasRunesInPlainTs",
+          "hasSvelte4Events",
+          "hasSvelte4Props",
+          "hasSvelte4Reactive",
+          "hasZodValidation",
+          "id",
+          "importCount",
+          "isRouteFile",
+          "isSseEndpoint",
+          "isSvelteComponent",
+          "isWorkerBoundary",
+          "keys",
+          "label",
+          "labels",
+          "lineCount",
+          "maxCallDepth",
+          "nodeLabel",
+          "pagerank",
+          "properties",
+          "publishedQueues",
+          "routeType",
+          "sourceRef",
+          "symbolCount",
+          "type",
+          "updatedAt",
+          "updatedAt.day",
+          "updatedAt.day.high",
+          "updatedAt.day.low",
+          "updatedAt.hour",
+          "updatedAt.hour.high",
+          "updatedAt.hour.low",
+          "updatedAt.minute",
+          "updatedAt.minute.high",
+          "updatedAt.minute.low",
+          "updatedAt.month",
+          "updatedAt.month.high",
+          "updatedAt.month.low",
+          "updatedAt.nanosecond",
+          "updatedAt.nanosecond.high",
+          "updatedAt.nanosecond.low",
+          "updatedAt.second",
+          "updatedAt.second.high",
+          "updatedAt.second.low",
+          "updatedAt.timeZoneId",
+          "updatedAt.timeZoneOffsetSeconds",
+          "updatedAt.timeZoneOffsetSeconds.high",
+          "updatedAt.timeZoneOffsetSeconds.low",
+          "updatedAt.year",
+          "updatedAt.year.high",
+          "updatedAt.year.low",
+          "usedTables",
+          "usesNative"
+        ],
+        "samplePropertyKeys": [
+          "callees",
+          "classCount",
+          "cluster",
+          "communityId",
+          "complexity",
+          "consumedQueues",
+          "dynamicImportTargets",
+          "exportCount",
+          "exports",
+          "fetchedRoutes",
+          "filePath",
+          "fileSize",
+          "functions",
+          "gds_betweenness",
+          "gds_community",
+          "gds_pagerank",
+          "gpuCluster",
+          "graphAuthorityScore",
+          "graphPageRank",
+          "hasAuthGuard",
+          "hasCachePattern",
+          "hasDynamicImports",
+          "hasErrorHandling",
+          "hasRunesInPlainTs",
+          "hasSvelte4Events",
+          "hasSvelte4Props",
+          "hasSvelte4Reactive",
+          "hasZodValidation",
+          "id",
+          "importCount",
+          "isRouteFile",
+          "isSseEndpoint",
+          "isSvelteComponent",
+          "isWorkerBoundary",
+          "label",
+          "lineCount",
+          "maxCallDepth",
+          "nodeLabel",
+          "pagerank",
+          "publishedQueues",
+          "routeType",
+          "symbolCount",
+          "type",
+          "updatedAt",
+          "usedTables",
+          "usesNative"
+        ],
+        "expectedAliases": [
+          "filePath",
+          "graph_node",
+          "neo4jNode",
+          "neo4j_node",
+          "nodeId",
+          "node_id",
+          "sourceRef",
+          "source_ref"
+        ],
+        "expectedAliasesPresent": [
+          "filePath",
+          "sourceRef"
+        ],
+        "expectedAliasesMissing": [
+          "graph_node",
+          "neo4jNode",
+          "neo4j_node",
+          "nodeId",
+          "node_id",
+          "source_ref"
+        ],
+        "recommendedAliasPatchOnly": "Neo4j alias discovery: map neo4jNode to actual fields (callees, classCount, cluster, communityId, communityId.high, communityId.low, complexity, consumedQueues, dynamicImportTargets, elementId, exportCount, exports); missing expected aliases: graph_node, neo4jNode, neo4j_node, nodeId, node_id, source_ref; no writes."
+      }
+    },
+    "liveHopProbes": {
+      "routeRuntimePackets": {
+        "hop": "route_runtime_packets",
+        "source": "postgres",
+        "envName": "DATABASE_URL",
+        "status": "sampled",
+        "sampledCount": 3,
+        "detectedJoinKeys": [],
+        "sampleValues": [],
+        "note": "field-name mismatch in sampled live source"
+      },
+      "parentAtlasDocuments": {
+        "hop": "parent_atlas_documents",
+        "source": "postgres",
+        "envName": "DATABASE_URL",
+        "status": "sampled",
+        "sampledCount": 3,
+        "detectedJoinKeys": [
+          "source_ref",
+          "feature_id",
+          "rel_path",
+          "qdrant_point_id"
+        ],
+        "sampleValues": [
+          "scripts/10-layer-audit-cli.mjs",
+          "scripts",
+          "sveltekit-frontend/src/lib/shims/missing-types-shim.d.ts",
+          "shims",
+          "sveltekit-frontend/src/routes/api/system/env/+server.ts",
+          "env"
+        ],
+        "note": "postgres rows sampled successfully"
+      },
+      "atlasFeatureMapSynthesized": {
+        "hop": "atlas_feature_map_synthesized",
+        "source": "postgres",
+        "envName": "DATABASE_URL",
+        "status": "sampled",
+        "sampledCount": 3,
+        "detectedJoinKeys": [
+          "source_ref",
+          "som_cluster",
+          "packet_count",
+          "semantic_confidence",
+          "behavior_score",
+          "routing_score"
+        ],
+        "sampleValues": [
+          "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/ai/yorha/context-chat/+server.ts",
+          "59",
+          "0",
+          "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/cases/[id]/summary/+server.ts",
+          "57",
+          "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/documents/process/yolo/+server.ts",
+          "77"
+        ],
+        "note": "postgres rows sampled successfully"
+      },
+      "atlasFeatureSynthesis": {
+        "hop": "atlas_feature_synthesis",
+        "source": "postgres",
+        "envName": "DATABASE_URL",
+        "status": "sampled",
+        "sampledCount": 3,
+        "detectedJoinKeys": [
+          "feature_id",
+          "avg_confidence",
+          "primary_cluster_id",
+          "dominant_status"
+        ],
+        "sampleValues": [
+          "auth",
+          "3.5454545",
+          "processed",
+          "cache",
+          "1",
+          "codebase-structure",
+          "0.95",
+          "idle"
+        ],
+        "note": "postgres rows sampled successfully"
+      },
+      "qdrantCodebaseChunks768": {
+        "hop": "qdrantHit",
+        "source": "qdrant",
+        "envName": "QDRANT_URL",
+        "status": "sampled",
+        "sampledCount": 3,
+        "detectedJoinKeys": [
+          "file_path",
+          "som_cluster"
+        ],
+        "sampleValues": [
+          "86694",
+          "src/routes/api/research/concurrent-deep/stream/+server.ts",
+          "0",
+          "119404",
+          ".venv/Lib/python3.9/site-packages/numpy/f2py/tests/test_character.py",
+          "1",
+          "119984",
+          ".venv/Lib/python3.9/site-packages/numpy/_core/overrides.py",
+          "2"
+        ],
+        "note": "Qdrant scroll sampled successfully",
+        "actualFieldNamesFound": [
+          "id",
+          "payload",
+          "payload.agent_area",
+          "payload.area",
+          "payload.centroid_id",
+          "payload.chunk_id",
+          "payload.chunk_index",
+          "payload.complexity",
+          "payload.content",
+          "payload.content_hash",
+          "payload.dependency_cluster",
+          "payload.domain",
+          "payload.extension",
+          "payload.feature_label",
+          "payload.feature_status",
+          "payload.file_name",
+          "payload.file_path",
+          "payload.gpuCluster",
+          "payload.gpu_cluster",
+          "payload.hot_keyword_cluster",
+          "payload.indexed_at",
+          "payload.kind",
+          "payload.parent_atlas_card_id",
+          "payload.phase_lane",
+          "payload.purpose",
+          "payload.relativePath",
+          "payload.root",
+          "payload.schema_version",
+          "payload.somCol",
+          "payload.somRow",
+          "payload.som_cluster",
+          "payload.sourceRef",
+          "payload.sourceRefs",
+          "payload.source_refs",
+          "payload.tags",
+          "payload.total_chunks"
+        ],
+        "samplePayloadKeys": [
+          "agent_area",
+          "area",
+          "centroid_id",
+          "chunk_id",
+          "chunk_index",
+          "complexity",
+          "content",
+          "content_hash",
+          "dependency_cluster",
+          "domain",
+          "extension",
+          "feature_label",
+          "feature_status",
+          "file_name",
+          "file_path",
+          "gpuCluster",
+          "gpu_cluster",
+          "hot_keyword_cluster",
+          "indexed_at",
+          "kind",
+          "parent_atlas_card_id",
+          "phase_lane",
+          "purpose",
+          "relativePath",
+          "root",
+          "schema_version",
+          "somCol",
+          "somRow",
+          "som_cluster",
+          "sourceRef",
+          "sourceRefs",
+          "source_refs",
+          "tags",
+          "total_chunks"
+        ],
+        "expectedAliases": [
+          "id",
+          "payload.file_path",
+          "payload.source_ref",
+          "point_id",
+          "qdrantHit",
+          "qdrant_hit",
+          "qdrant_hits",
+          "qdrant_point_id"
+        ],
+        "expectedAliasesPresent": [
+          "id",
+          "payload.file_path"
+        ],
+        "expectedAliasesMissing": [
+          "payload.source_ref",
+          "point_id",
+          "qdrantHit",
+          "qdrant_hit",
+          "qdrant_hits",
+          "qdrant_point_id"
+        ],
+        "actualFieldNamesNotInExpectedAliases": [
+          "payload",
+          "payload.agent_area",
+          "payload.area",
+          "payload.centroid_id",
+          "payload.chunk_id",
+          "payload.chunk_index",
+          "payload.complexity",
+          "payload.content",
+          "payload.content_hash",
+          "payload.dependency_cluster",
+          "payload.domain",
+          "payload.extension",
+          "payload.feature_label",
+          "payload.feature_status",
+          "payload.file_name",
+          "payload.gpuCluster",
+          "payload.gpu_cluster",
+          "payload.hot_keyword_cluster",
+          "payload.indexed_at",
+          "payload.kind",
+          "payload.parent_atlas_card_id",
+          "payload.phase_lane",
+          "payload.purpose",
+          "payload.relativePath",
+          "payload.root",
+          "payload.schema_version",
+          "payload.somCol",
+          "payload.somRow",
+          "payload.som_cluster",
+          "payload.sourceRef",
+          "payload.sourceRefs",
+          "payload.source_refs",
+          "payload.tags",
+          "payload.total_chunks"
+        ],
+        "recommendedAliasPatchOnly": "Qdrant alias discovery: map qdrantHit to actual fields (id, payload, payload.agent_area, payload.area, payload.centroid_id, payload.chunk_id, payload.chunk_index, payload.complexity, payload.content, payload.content_hash, payload.dependency_cluster, payload.domain); missing expected aliases: payload.source_ref, point_id, qdrantHit, qdrant_hit, qdrant_hits, qdrant_point_id; no writes."
+      },
+      "redisHotKeys": {
+        "hop": "redisHotKey",
+        "source": "redis",
+        "envName": "REDIS_URL",
+        "status": "sampled",
+        "sampledCount": 25,
+        "detectedJoinKeys": [
+          "code:index:tag:sourceRef-parent-join-archive-move-list.mjs",
+          "code:index:tag:project-sourceRef-context-neo4j.mjs",
+          "code:index:tag:sourceRef-first-parent-atlas-refresh.mjs",
+          "code:index:route:sveltekit-frontend//dev/file-card/[...sourceRef]",
+          "code:index:tag:sourceRef-first-join-warmup.mjs",
+          "code:index:tag:sourceRef-first-hot-join-warmup.mjs",
+          "code:index:route:sveltekit-frontend//dev/file-card/[...sourceRef]/+page.server.ts",
+          "code:index:tag:sourceRef-first-nes-glyph-compress.mjs",
+          "code:index:tag:sourceRef-parent-join-dry-run.mjs",
+          "code:index:tag:sourceRef-parent-join-archive-plan.mjs",
+          "wiki:note:dir:dir:_tmp_parent_atlas_packets_sourceRef_first",
+          "code:index:path:0ce103de9b4d"
+        ],
+        "sampleValues": [
+          "code:index:tag:sourceRef-parent-join-archive-move-list.mjs",
+          "code:index:tag:project-sourceRef-context-neo4j.mjs",
+          "code:index:tag:sourceRef-first-parent-atlas-refresh.mjs",
+          "code:index:route:sveltekit-frontend//dev/file-card/[...sourceRef]",
+          "code:index:tag:sourceRef-first-join-warmup.mjs",
+          "code:index:tag:sourceRef-first-hot-join-warmup.mjs",
+          "code:index:route:sveltekit-frontend//dev/file-card/[...sourceRef]/+page.server.ts",
+          "code:index:tag:sourceRef-first-nes-glyph-compress.mjs",
+          "code:index:tag:sourceRef-parent-join-dry-run.mjs",
+          "code:index:tag:sourceRef-parent-join-archive-plan.mjs"
+        ],
+        "note": "bounded SCAN completed"
+      },
+      "neo4jCodebaseFile": {
+        "hop": "neo4jNode",
+        "source": "neo4j",
+        "envName": "NEO4J_URI",
+        "status": "sampled",
+        "sampledCount": 3,
+        "detectedJoinKeys": [
+          "filePath"
+        ],
+        "sampleValues": [
+          "CodebaseFile",
+          "Store",
+          "src/auth-store.svelte.ts",
+          "4:35613eb1-5ea2-405c-9c39-5a673aef978d:486",
+          "src/hooks.client.ts",
+          "4:35613eb1-5ea2-405c-9c39-5a673aef978d:487",
+          "src/hooks.server.ts",
+          "4:35613eb1-5ea2-405c-9c39-5a673aef978d:488"
+        ],
+        "note": "CodebaseFile sample query completed",
+        "actualFieldNamesFound": [
+          "callees",
+          "classCount",
+          "cluster",
+          "communityId",
+          "communityId.high",
+          "communityId.low",
+          "complexity",
+          "consumedQueues",
+          "dynamicImportTargets",
+          "elementId",
+          "exportCount",
+          "exports",
+          "fetchedRoutes",
+          "filePath",
+          "fileSize",
+          "functions",
+          "gds_betweenness",
+          "gds_community",
+          "gds_community.high",
+          "gds_community.low",
+          "gds_pagerank",
+          "gpuCluster",
+          "graphAuthorityScore",
+          "graphPageRank",
+          "hasAuthGuard",
+          "hasCachePattern",
+          "hasDynamicImports",
+          "hasErrorHandling",
+          "hasRunesInPlainTs",
+          "hasSvelte4Events",
+          "hasSvelte4Props",
+          "hasSvelte4Reactive",
+          "hasZodValidation",
+          "id",
+          "importCount",
+          "isRouteFile",
+          "isSseEndpoint",
+          "isSvelteComponent",
+          "isWorkerBoundary",
+          "keys",
+          "label",
+          "labels",
+          "lineCount",
+          "maxCallDepth",
+          "nodeLabel",
+          "pagerank",
+          "properties",
+          "publishedQueues",
+          "routeType",
+          "sourceRef",
+          "symbolCount",
+          "type",
+          "updatedAt",
+          "updatedAt.day",
+          "updatedAt.day.high",
+          "updatedAt.day.low",
+          "updatedAt.hour",
+          "updatedAt.hour.high",
+          "updatedAt.hour.low",
+          "updatedAt.minute",
+          "updatedAt.minute.high",
+          "updatedAt.minute.low",
+          "updatedAt.month",
+          "updatedAt.month.high",
+          "updatedAt.month.low",
+          "updatedAt.nanosecond",
+          "updatedAt.nanosecond.high",
+          "updatedAt.nanosecond.low",
+          "updatedAt.second",
+          "updatedAt.second.high",
+          "updatedAt.second.low",
+          "updatedAt.timeZoneId",
+          "updatedAt.timeZoneOffsetSeconds",
+          "updatedAt.timeZoneOffsetSeconds.high",
+          "updatedAt.timeZoneOffsetSeconds.low",
+          "updatedAt.year",
+          "updatedAt.year.high",
+          "updatedAt.year.low",
+          "usedTables",
+          "usesNative"
+        ],
+        "samplePropertyKeys": [
+          "callees",
+          "classCount",
+          "cluster",
+          "communityId",
+          "complexity",
+          "consumedQueues",
+          "dynamicImportTargets",
+          "exportCount",
+          "exports",
+          "fetchedRoutes",
+          "filePath",
+          "fileSize",
+          "functions",
+          "gds_betweenness",
+          "gds_community",
+          "gds_pagerank",
+          "gpuCluster",
+          "graphAuthorityScore",
+          "graphPageRank",
+          "hasAuthGuard",
+          "hasCachePattern",
+          "hasDynamicImports",
+          "hasErrorHandling",
+          "hasRunesInPlainTs",
+          "hasSvelte4Events",
+          "hasSvelte4Props",
+          "hasSvelte4Reactive",
+          "hasZodValidation",
+          "id",
+          "importCount",
+          "isRouteFile",
+          "isSseEndpoint",
+          "isSvelteComponent",
+          "isWorkerBoundary",
+          "label",
+          "lineCount",
+          "maxCallDepth",
+          "nodeLabel",
+          "pagerank",
+          "publishedQueues",
+          "routeType",
+          "symbolCount",
+          "type",
+          "updatedAt",
+          "usedTables",
+          "usesNative"
+        ],
+        "expectedAliases": [
+          "filePath",
+          "graph_node",
+          "neo4jNode",
+          "neo4j_node",
+          "nodeId",
+          "node_id",
+          "sourceRef",
+          "source_ref"
+        ],
+        "expectedAliasesPresent": [
+          "filePath",
+          "sourceRef"
+        ],
+        "expectedAliasesMissing": [
+          "graph_node",
+          "neo4jNode",
+          "neo4j_node",
+          "nodeId",
+          "node_id",
+          "source_ref"
+        ],
+        "actualFieldNamesNotInExpectedAliases": [
+          "callees",
+          "classCount",
+          "cluster",
+          "communityId",
+          "communityId.high",
+          "communityId.low",
+          "complexity",
+          "consumedQueues",
+          "dynamicImportTargets",
+          "elementId",
+          "exportCount",
+          "exports",
+          "fetchedRoutes",
+          "fileSize",
+          "functions",
+          "gds_betweenness",
+          "gds_community",
+          "gds_community.high",
+          "gds_community.low",
+          "gds_pagerank",
+          "gpuCluster",
+          "graphAuthorityScore",
+          "graphPageRank",
+          "hasAuthGuard",
+          "hasCachePattern",
+          "hasDynamicImports",
+          "hasErrorHandling",
+          "hasRunesInPlainTs",
+          "hasSvelte4Events",
+          "hasSvelte4Props",
+          "hasSvelte4Reactive",
+          "hasZodValidation",
+          "id",
+          "importCount",
+          "isRouteFile",
+          "isSseEndpoint",
+          "isSvelteComponent",
+          "isWorkerBoundary",
+          "keys",
+          "label",
+          "labels",
+          "lineCount",
+          "maxCallDepth",
+          "nodeLabel",
+          "pagerank",
+          "properties",
+          "publishedQueues",
+          "routeType",
+          "symbolCount",
+          "type",
+          "updatedAt",
+          "updatedAt.day",
+          "updatedAt.day.high",
+          "updatedAt.day.low",
+          "updatedAt.hour",
+          "updatedAt.hour.high",
+          "updatedAt.hour.low",
+          "updatedAt.minute",
+          "updatedAt.minute.high",
+          "updatedAt.minute.low",
+          "updatedAt.month",
+          "updatedAt.month.high",
+          "updatedAt.month.low",
+          "updatedAt.nanosecond",
+          "updatedAt.nanosecond.high",
+          "updatedAt.nanosecond.low",
+          "updatedAt.second",
+          "updatedAt.second.high",
+          "updatedAt.second.low",
+          "updatedAt.timeZoneId",
+          "updatedAt.timeZoneOffsetSeconds",
+          "updatedAt.timeZoneOffsetSeconds.high",
+          "updatedAt.timeZoneOffsetSeconds.low",
+          "updatedAt.year",
+          "updatedAt.year.high",
+          "updatedAt.year.low",
+          "usedTables",
+          "usesNative"
+        ],
+        "recommendedAliasPatchOnly": "Neo4j alias discovery: map neo4jNode to actual fields (callees, classCount, cluster, communityId, communityId.high, communityId.low, complexity, consumedQueues, dynamicImportTargets, elementId, exportCount, exports); missing expected aliases: graph_node, neo4jNode, neo4j_node, nodeId, node_id, source_ref; no writes."
+      }
+    },
+    "averageLineageScorePct": 36.36,
+    "maxLineageScorePct": 36.36,
+    "sampleCount": 40,
+    "missingHigherHopRows": 6765,
+    "featureGroups": [
+      {
+        "featureId": "feature:todo:fadfc0e985f4f0e151eaf542",
+        "rowCount": 6,
+        "labels": [
+          "opencode-recommendations-json",
+          "Optional mirror only: export aliases to `.opencode/recommendations.json` + `.opencode/recommendations-summary.md` if a flat compatibility surface is still requi"
+        ],
+        "sourceRefs": [
+          ".opencode/recommendations.json"
+        ],
+        "avgLineageScorePct": 36.36
+      },
+      {
+        "featureId": "feature:todo:1e95eb7b2c97aa52a6ec0308",
+        "rowCount": 3,
+        "labels": [
+          "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+          "**Knowledge Graph Tool Lanes**"
+        ],
+        "sourceRefs": [
+          "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:21"
+        ],
+        "avgLineageScorePct": 36.36
+      },
+      {
+        "featureId": "feature:todo:f831f8496459630481b6f126",
+        "rowCount": 3,
+        "labels": [
+          "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+          "`attention_rank_files` — embed query → `attentionScoreGPU` via LibTorch → top-N from Karpathy scores"
+        ],
+        "sourceRefs": [
+          "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:22"
+        ],
+        "avgLineageScorePct": 36.36
+      },
+      {
+        "featureId": "feature:todo:2aed3e03cc66e3e478a5479d",
+        "rowCount": 3,
+        "labels": [
+          "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+          "`som_topology_stats` — delegate to `gpu:som_topology` for Redis SOM grid / centroid stats"
+        ],
+        "sourceRefs": [
+          "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:23"
+        ],
+        "avgLineageScorePct": 36.36
+      },
+      {
+        "featureId": "feature:todo:a33b97f7501a9583a2e63c2b",
+        "rowCount": 3,
+        "labels": [
+          "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+          "`language_distribution` — delegate to `gpu:language_distribution` for Qdrant cluster tag stats"
+        ],
+        "sourceRefs": [
+          "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:24"
+        ],
+        "avgLineageScorePct": 36.36
+      },
+      {
+        "featureId": "feature:todo:322cf977b5fa41f902b9321b",
+        "rowCount": 3,
+        "labels": [
+          "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+          "`playbook_lookup_by_language` — use CouchDB `karpathy_wiki` plus top Karpathy file intersection"
+        ],
+        "sourceRefs": [
+          "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:25"
+        ],
+        "avgLineageScorePct": 36.36
+      },
+      {
+        "featureId": "feature:todo:4ced48dea132da38f2ab7305",
+        "rowCount": 3,
+        "labels": [
+          "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+          "Route these tools into the correct skill families (`gpu-acceleration`, `vector-cluster`, `codebase`, `research`) without creating a parallel graph source of tru"
+        ],
+        "sourceRefs": [
+          "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:28"
+        ],
+        "avgLineageScorePct": 36.36
+      },
+      {
+        "featureId": "feature:todo:a11f763c236417569484b3e7",
+        "rowCount": 3,
+        "labels": [
+          "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+          "Clustering quality cleanup (deferred)"
+        ],
+        "sourceRefs": [
+          "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:49"
+        ],
+        "avgLineageScorePct": 36.36
+      },
+      {
+        "featureId": "feature:todo:787ff44880ddd6be2d9388ce",
+        "rowCount": 3,
+        "labels": [
+          "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+          "Wire into API routes (`/api/cases`, `/api/evidence/upload`) — deferred"
+        ],
+        "sourceRefs": [
+          "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:55"
+        ],
+        "avgLineageScorePct": 36.36
+      },
+      {
+        "featureId": "feature:todo:7c0dbd56784529c16e1cb60e",
+        "rowCount": 3,
+        "labels": [
+          "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+          "**Track C — Production Gap Remediation** (after DB audit)"
+        ],
+        "sourceRefs": [
+          "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:71"
+        ],
+        "avgLineageScorePct": 36.36
+      },
+      {
+        "featureId": "feature:todo:4afa9ddc2a7b74e522364100",
+        "rowCount": 3,
+        "labels": [
+          "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+          "Seed legal canon chunks (legal PDF ingest pipeline)"
+        ],
+        "sourceRefs": [
+          "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:74"
+        ],
+        "avgLineageScorePct": 36.36
+      },
+      {
+        "featureId": "feature:todo:c3913a6ae582b02ec6366094",
+        "rowCount": 3,
+        "labels": [
+          "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+          "Add Playwright test fixtures for auth + DB seeding"
+        ],
+        "sourceRefs": [
+          "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:75"
+        ],
+        "avgLineageScorePct": 36.36
+      },
+      {
+        "featureId": "feature:todo:211e484d8c9f1b5087925e91",
+        "rowCount": 3,
+        "labels": [
+          "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+          "Option 2: ClusterCard schema + Redis/Qdrant wiring + API route"
+        ],
+        "sourceRefs": [
+          "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:80"
+        ],
+        "avgLineageScorePct": 36.36
+      },
+      {
+        "featureId": "feature:todo:f85f7b428819c0244985ab85",
+        "rowCount": 3,
+        "labels": [
+          "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+          "Warm workspace-start plans"
+        ],
+        "sourceRefs": [
+          "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:86"
+        ],
+        "avgLineageScorePct": 36.36
+      },
+      {
+        "featureId": "feature:todo:5855fc827e386a10b01a26db",
+        "rowCount": 3,
+        "labels": [
+          "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+          "Warm legal/codebase summaries"
+        ],
+        "sourceRefs": [
+          "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:87"
+        ],
+        "avgLineageScorePct": 36.36
+      },
+      {
+        "featureId": "feature:todo:132472e27f5f5116545a7ccf",
+        "rowCount": 3,
+        "labels": [
+          "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+          "**Remaining Lower-Priority**"
+        ],
+        "sourceRefs": [
+          "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:89"
+        ],
+        "avgLineageScorePct": 36.36
+      },
+      {
+        "featureId": "feature:todo:dc13d165afeb65f00c87fe15",
+        "rowCount": 3,
+        "labels": [
+          "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+          "Track 1: .env audit + dead-config archival"
+        ],
+        "sourceRefs": [
+          "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:90"
+        ],
+        "avgLineageScorePct": 36.36
+      },
+      {
+        "featureId": "feature:todo:9289019adf7d2721550af764",
+        "rowCount": 3,
+        "labels": [
+          "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+          "Track 2: Docker CPU limits + Caddy memory bump"
+        ],
+        "sourceRefs": [
+          "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:91"
+        ],
+        "avgLineageScorePct": 36.36
+      },
+      {
+        "featureId": "feature:todo:d8d7affddeaa909af27f7d69",
+        "rowCount": 3,
+        "labels": [
+          "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+          "Track 5C–5E: Model/GGUF cleanup"
+        ],
+        "sourceRefs": [
+          "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:93"
+        ],
+        "avgLineageScorePct": 36.36
+      },
+      {
+        "featureId": "feature:todo:24b4111ad0e1777784a9bd1a",
+        "rowCount": 3,
+        "labels": [
+          "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+          "Feature cluster grouping by `sourceRef` prefix"
+        ],
+        "sourceRefs": [
+          "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:234"
+        ],
+        "avgLineageScorePct": 36.36
+      },
+      {
+        "featureId": "feature:todo:af15f2f3c8d9e6c470e05b29",
+        "rowCount": 3,
+        "labels": [
+          "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+          "Stale feature detection (atlas entry exists, no recent git touch)"
+        ],
+        "sourceRefs": [
+          "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:235"
+        ],
+        "avgLineageScorePct": 36.36
+      },
+      {
+        "featureId": "feature:todo:c3dab502e86cc90f236e9a48",
+        "rowCount": 3,
+        "labels": [
+          "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+          "Duplicate system detection (two scripts/routes with overlapping sourceRefs)"
+        ],
+        "sourceRefs": [
+          "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:236"
+        ],
+        "avgLineageScorePct": 36.36
+      },
+      {
+        "featureId": "feature:todo:6ad7088a53bb671d7863d642",
+        "rowCount": 3,
+        "labels": [
+          "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+          "Retrieval hook inventory for Phase 11E:"
+        ],
+        "sourceRefs": [
+          "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:243"
+        ],
+        "avgLineageScorePct": 36.36
+      },
+      {
+        "featureId": "feature:todo:0d3ab6734e763f3f7697cfc0",
+        "rowCount": 3,
+        "labels": [
+          "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+          "Wire `QueryRouter4x4` into `fetchACPKnowledgeResults` so retrieval can explore dynamically instead of using fixed lane defaults."
+        ],
+        "sourceRefs": [
+          "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:259"
+        ],
+        "avgLineageScorePct": 36.36
+      },
+      {
+        "featureId": "feature:todo:4f67c0fab5bbbbbd33051d65",
+        "rowCount": 3,
+        "labels": [
+          "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+          "Add adaptive Hebbian adjustments to `ace:router:matrix` based on observed chunk hits and retrieval outcomes."
+        ],
+        "sourceRefs": [
+          "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:260"
+        ],
+        "avgLineageScorePct": 36.36
+      },
+      {
+        "featureId": "feature:todo:f93d30a30e773e2e83395aca",
+        "rowCount": 3,
+        "labels": [
+          "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+          "Configure `gemma3-270m.gguf` draft-model support in TurboQuant for CPU-assisted speculative token validation."
+        ],
+        "sourceRefs": [
+          "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:261"
+        ],
+        "avgLineageScorePct": 36.36
+      },
+      {
+        "featureId": "feature:todo:783118149f85dbce6bf6dd2a",
+        "rowCount": 3,
+        "labels": [
+          "src-lib-server-features-ai-ace-context-assembler-ts",
+          "Preserve the existing router/cache path in `src/lib/server/features/ai/ace/context-assembler.ts`; this is an extension lane, not a rewrite."
+        ],
+        "sourceRefs": [
+          "src/lib/server/features/ai/ace/context-assembler.ts"
+        ],
+        "avgLineageScorePct": 36.36
+      },
+      {
+        "featureId": "feature:todo:9ffab6bc4b9cd644239758c2",
+        "rowCount": 3,
+        "labels": [
+          "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+          "Document the live 4x4 router matrix location and usage:"
+        ],
+        "sourceRefs": [
+          "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:263"
+        ],
+        "avgLineageScorePct": 36.36
+      },
+      {
+        "featureId": "feature:todo:2ace876ba56f2c0753161f4b",
+        "rowCount": 3,
+        "labels": [
+          "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+          "Create `schema-encoder.wgsl` for client-side reranking of documents."
+        ],
+        "sourceRefs": [
+          "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:278"
+        ],
+        "avgLineageScorePct": 36.36
+      },
+      {
+        "featureId": "feature:todo:580c60d78636e391070bd061",
+        "rowCount": 3,
+        "labels": [
+          "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+          "Establish SharedArrayBuffer zero-copy structures for Web Worker communication."
+        ],
+        "sourceRefs": [
+          "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:279"
+        ],
+        "avgLineageScorePct": 36.36
+      },
+      {
+        "featureId": "feature:todo:039e09ca423789739c8c42c5",
+        "rowCount": 3,
+        "labels": [
+          "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+          "Implement IndexedDB caching of ONNX models and WebGPU weights inside the Service Worker."
+        ],
+        "sourceRefs": [
+          "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:280"
+        ],
+        "avgLineageScorePct": 36.36
+      },
+      {
+        "featureId": "feature:todo:c32b8055c5900f49a4919f9c",
+        "rowCount": 3,
+        "labels": [
+          "src-service-worker-ts",
+          "Preserve the existing WebGPU/SW foundation in `src/service-worker.ts`, `src/lib/workers/compute-worker.mjs`, and related browser guards; this is a productizatio"
+        ],
+        "sourceRefs": [
+          "src/service-worker.ts"
+        ],
+        "avgLineageScorePct": 36.36
+      },
+      {
+        "featureId": "feature:todo:002df24db7233c4b96982982",
+        "rowCount": 3,
+        "labels": [
+          "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+          "Option 2: ClusterCard schema + Redis/Qdrant wiring + API route"
+        ],
+        "sourceRefs": [
+          "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:290"
+        ],
+        "avgLineageScorePct": 36.36
+      },
+      {
+        "featureId": "feature:todo:86ddf5ba1247b00bd1f4e72b",
+        "rowCount": 3,
+        "labels": [
+          "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+          "Thread `alias_id` through the prompt listener log entries as a stable cross-store alias field"
+        ],
+        "sourceRefs": [
+          "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:291"
+        ],
+        "avgLineageScorePct": 36.36
+      },
+      {
+        "featureId": "feature:todo:63f45279017c8d6d13ef35c9",
+        "rowCount": 3,
+        "labels": [
+          "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+          "Add retrieval-loop sourceRef/feature_id/alias_id reconciliation into the prompt listener and recommendation score fusion path"
+        ],
+        "sourceRefs": [
+          "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:292"
+        ],
+        "avgLineageScorePct": 36.36
+      },
+      {
+        "featureId": "feature:todo:f5ffd5e75b0e0ea6ae82d22f",
+        "rowCount": 3,
+        "labels": [
+          "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+          "Upgrade Phase 17 PyTorch Feature Extractor script and Python implementation with robust fallbacks and correct schema"
+        ],
+        "sourceRefs": [
+          "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:299"
+        ],
+        "avgLineageScorePct": 36.36
+      },
+      {
+        "featureId": "feature:todo:1c1c05a2ad42be0af8be0757",
+        "rowCount": 3,
+        "labels": [
+          "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+          "Upgrade Phase 18 XGBoost Reranker script and Python implementation with robust fallbacks and correct schema"
+        ],
+        "sourceRefs": [
+          "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:300"
+        ],
+        "avgLineageScorePct": 36.36
+      },
+      {
+        "featureId": "feature:todo:9776801fc047158c169943dd",
+        "rowCount": 3,
+        "labels": [
+          "scripts-atlas-phase-lane-completion-mjs",
+          "Implement Phase 19 lane completion hook (`scripts/atlas/phase-lane-completion.mjs`)"
+        ],
+        "sourceRefs": [
+          "scripts/atlas/phase-lane-completion.mjs"
+        ],
+        "avgLineageScorePct": 36.36
+      },
+      {
+        "featureId": "feature:todo:0255cb3ad2d2cf33a3f9450c",
+        "rowCount": 3,
+        "labels": [
+          "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+          "Wire `ast-grep` into the directory analysis pipeline for codebase pruning."
+        ],
+        "sourceRefs": [
+          "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:312"
+        ],
+        "avgLineageScorePct": 36.36
+      },
+      {
+        "featureId": "feature:todo:a0a4835aaffa64c8919de261",
+        "rowCount": 3,
+        "labels": [
+          "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+          "Use directory-role analysis plus AST maps to separate missing features from redundant features."
+        ],
+        "sourceRefs": [
+          "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:313"
+        ],
+        "avgLineageScorePct": 36.36
+      },
+      {
+        "featureId": "feature:todo:d5113512a1121e2900be4215",
+        "rowCount": 3,
+        "labels": [
+          "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+          "Keep pruning outputs compact and JSON-backed so the lane can be re-run deterministically."
+        ],
+        "sourceRefs": [
+          "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:314"
+        ],
+        "avgLineageScorePct": 36.36
+      },
+      {
+        "featureId": "feature:todo:f9a4d5e77f03ab3edee38b79",
+        "rowCount": 3,
+        "labels": [
+          "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+          "Rebuild the parent atlas from the production-ready feature list after archive decisions land."
+        ],
+        "sourceRefs": [
+          "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:315"
+        ],
+        "avgLineageScorePct": 36.36
+      },
+      {
+        "featureId": "feature:todo:19b6bdabfc35748b3abe43b9",
+        "rowCount": 3,
+        "labels": [
+          "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+          "Keep the pruning lane offline-only; it should not become a startup dependency."
+        ],
+        "sourceRefs": [
+          "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:316"
+        ],
+        "avgLineageScorePct": 36.36
+      },
+      {
+        "featureId": "feature:todo:851702bfd009e88acf89b080",
+        "rowCount": 3,
+        "labels": [
+          "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+          "Audit PostgreSQL 17.6 vs 18 table/index drift and use the result to label canonical production tables vs experimental / archive-only tables."
+        ],
+        "sourceRefs": [
+          "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:317"
+        ],
+        "avgLineageScorePct": 36.36
+      },
+      {
+        "featureId": "feature:todo:8a2d69cd56d9bffc15ecf138",
+        "rowCount": 3,
+        "labels": [
+          "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+          "Keep `research_summaries` as the live canonical research table and finish the additive provenance/index migration before any dump/restore promotion to Postgres"
+        ],
+        "sourceRefs": [
+          "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:318"
+        ],
+        "avgLineageScorePct": 36.36
+      },
+      {
+        "featureId": "feature:todo:c65d7d66dd23a8f1e78b18f0",
+        "rowCount": 3,
+        "labels": [
+          "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+          "Use the repo consolidation feature map to label ship-path, planned production, experimental, and archive-only files before trimming the repo to source, schemas,"
+        ],
+        "sourceRefs": [
+          "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:319"
+        ],
+        "avgLineageScorePct": 36.36
+      },
+      {
+        "featureId": "feature:todo:f9185997e91637153ceff9e9",
+        "rowCount": 3,
+        "labels": [
+          "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+          "Warm Redis / Bitfrost caches from sourceRef-backed ClusterCards and hot atlas joins."
+        ],
+        "sourceRefs": [
+          "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:354"
+        ],
+        "avgLineageScorePct": 36.36
+      },
+      {
+        "featureId": "feature:todo:1967eedf615aa4f61bb9001b",
+        "rowCount": 3,
+        "labels": [
+          "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+          "Expand Neo4j context trees from KAG / DAG hits so multi-hop traversals can reuse the same sourceRef spine."
+        ],
+        "sourceRefs": [
+          "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:355"
+        ],
+        "avgLineageScorePct": 36.36
+      },
+      {
+        "featureId": "feature:todo:3b4cd1270af9b361cc0445b3",
+        "rowCount": 3,
+        "labels": [
+          "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+          "Formalize the later compute lanes for PyTorch XGBoost reranking, SOM clustering collection, and Neo4j hypergraph merges against the same `sourceRef + feature_id"
+        ],
+        "sourceRefs": [
+          "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:381"
+        ],
+        "avgLineageScorePct": 36.36
+      },
+      {
+        "featureId": "feature:todo:f5cbbf3a1926a2e5e4776f9e",
+        "rowCount": 3,
+        "labels": [
+          "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+          "Keep the Postgres 18 indexing tables, Qdrant multi-query tags, and JSONB card packets aligned so semantic hash lookups stay stable across mirrors."
+        ],
+        "sourceRefs": [
+          "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:382"
+        ],
+        "avgLineageScorePct": 36.36
+      },
+      {
+        "featureId": "feature:todo:c7555bf2fd60736e3f31a778",
+        "rowCount": 3,
+        "labels": [
+          "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+          "Add deep_research test coverage for the future LLM orchestration lane before promoting any offline synthesis output into the live stack."
+        ],
+        "sourceRefs": [
+          "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:383"
+        ],
+        "avgLineageScorePct": 36.36
+      },
+      {
+        "featureId": "feature:todo:58e227fee8b87fb979c1d86c",
+        "rowCount": 3,
+        "labels": [
+          "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+          "Keep Ollama `embeddinggemma` on the fast path with timeout + fallback, then map the outputs into token transforms before compression."
+        ],
+        "sourceRefs": [
+          "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:384"
+        ],
+        "avgLineageScorePct": 36.36
+      },
+      {
+        "featureId": "feature:todo:e943964cdc2b8a8e54c32c20",
+        "rowCount": 3,
+        "labels": [
+          "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+          "Keep the lane offline-first and report-only until the join outputs are validated against DuckDB and the parent atlas."
+        ],
+        "sourceRefs": [
+          "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:385"
+        ],
+        "avgLineageScorePct": 36.36
+      },
+      {
+        "featureId": "feature:todo:ac2e7658372461b27dc6004c",
+        "rowCount": 3,
+        "labels": [
+          "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+          "Use the Parent Atlas feature command atlas as the container manifest for later PyTorch / XGBoost / SOM / Neo4j lanes so the same sourceRef spine stays retrievab"
+        ],
+        "sourceRefs": [
+          "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:386"
+        ],
+        "avgLineageScorePct": 36.36
+      },
+      {
+        "featureId": "feature:todo:864b06c9ae590874c8a97736",
+        "rowCount": 3,
+        "labels": [
+          "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+          "Project the Parent Atlas feature command atlas into `parent_atlas_jobs` and a Neo4j Cypher export so the containers become durable indexing packets instead of r"
+        ],
+        "sourceRefs": [
+          "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:387"
+        ],
+        "avgLineageScorePct": 36.36
+      },
+      {
+        "featureId": "feature:todo:f8f730e399822268e0fc11d5",
+        "rowCount": 3,
+        "labels": [
+          "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+          "Preserve the existing `tools:ast-grep`, `index:ast`, `audit:directories`, and `graphify:dependency:audit` entrypoints as the core analysis surface."
+        ],
+        "sourceRefs": [
+          "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:393"
+        ],
+        "avgLineageScorePct": 36.36
+      },
+      {
+        "featureId": "feature:todo:588615702ca05ecc061ca130",
+        "rowCount": 3,
+        "labels": [
+          "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+          "Use TurboVec-assisted directory summarization to fill gaps in directories that do not yet have `llms.md` / `agents.md` cards."
+        ],
+        "sourceRefs": [
+          "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:394"
+        ],
+        "avgLineageScorePct": 36.36
+      },
+      {
+        "featureId": "feature:todo:7764fce80614a26ad6f64361",
+        "rowCount": 3,
+        "labels": [
+          "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+          "Inventory and reconcile directory cards (`llms.md`, `agents.md`, generated summaries) so pruning can operate on the whole repository consistently."
+        ],
+        "sourceRefs": [
+          "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:395"
+        ],
+        "avgLineageScorePct": 36.36
+      },
+      {
+        "featureId": "feature:todo:8ab2ccea68d3be232891bee5",
+        "rowCount": 3,
+        "labels": [
+          "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+          "AGENTS -> Qdrant Backfill: enrich vector payloads with AGENTS card metadata using a dry-run-safe path first."
+        ],
+        "sourceRefs": [
+          "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:417"
+        ],
+        "avgLineageScorePct": 36.36
+      },
+      {
+        "featureId": "feature:todo:dd2f1f789d08e442f1733ead",
+        "rowCount": 3,
+        "labels": [
+          "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+          "RG-Atlas Persistence: stabilize directory-level metadata integration and keep it aligned with the atlas graph exports."
+        ],
+        "sourceRefs": [
+          "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:418"
+        ],
+        "avgLineageScorePct": 36.36
+      },
+      {
+        "featureId": "feature:todo:bb7188da8e37c9d39482c279",
+        "rowCount": 3,
+        "labels": [
+          "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+          "Knowledge Base Manager: expose TRACE MCP tools for OpenCode integration."
+        ],
+        "sourceRefs": [
+          "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:419"
+        ],
+        "avgLineageScorePct": 36.36
+      },
+      {
+        "featureId": "feature:todo:1e4c336ba1e2a42f2be25839",
+        "rowCount": 3,
+        "labels": [
+          "docs-graph",
+          "Keep this lane tied to the existing graph artifacts in `docs/graph/` rather than inventing a parallel source of truth."
+        ],
+        "sourceRefs": [
+          "docs/graph/"
+        ],
+        "avgLineageScorePct": 36.36
+      },
+      {
+        "featureId": "feature:todo:647bb722ed21ed7cbc94072d",
+        "rowCount": 3,
+        "labels": [
+          "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+          "Inventory the current `local-deep-research` compose and note the current boundary: local SQLite state on the research side, canonical backend stores in the repo"
+        ],
+        "sourceRefs": [
+          "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:429"
+        ],
+        "avgLineageScorePct": 36.36
+      },
+      {
+        "featureId": "feature:todo:5859a864610db3d6a2493463",
+        "rowCount": 3,
+        "labels": [
+          "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+          "Compare the local-deep-research container against the repo's current OpenCode/Gemma4 function-calling path and document the exact role split."
+        ],
+        "sourceRefs": [
+          "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:430"
+        ],
+        "avgLineageScorePct": 36.36
+      },
+      {
+        "featureId": "feature:todo:242aeb4c8a2fd571a88fb8f6",
+        "rowCount": 3,
+        "labels": [
+          "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+          "Recreate the `local-deep-research` container for GPU use when needed by bringing it up from the WSL2 GPU override path, then verify the host/container model bou"
+        ],
+        "sourceRefs": [
+          "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:431"
+        ],
+        "avgLineageScorePct": 36.36
+      },
+      {
+        "featureId": "feature:todo:325923e1f45a27e423516f44",
+        "rowCount": 3,
+        "labels": [
+          "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+          "Align `local-deep-research` to an OpenAI-compatible `llama-server` endpoint when using `llama.cpp`; keep Hermes test-only unless it proves useful as a separate"
+        ],
+        "sourceRefs": [
+          "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:432"
+        ],
+        "avgLineageScorePct": 36.36
+      },
+      {
+        "featureId": "feature:todo:a877e91eada4ba20c44f8b37",
+        "rowCount": 3,
+        "labels": [
+          "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+          "Add the export/import bridge that turns local SQLite research state into canonical backend rows before ACE packet generation."
+        ],
+        "sourceRefs": [
+          "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:433"
+        ],
+        "avgLineageScorePct": 36.36
+      },
+      {
+        "featureId": "feature:todo:18afe17870a6d2d0f1856193",
+        "rowCount": 3,
+        "labels": [
+          "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+          "Emit a canonical ACE packet from the LDR bridge with preserved `sourceRefs`, then warm the shared Redis ACE packet cache for OpenCode reuse."
+        ],
+        "sourceRefs": [
+          "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:434"
+        ],
+        "avgLineageScorePct": 36.36
+      },
+      {
+        "featureId": "feature:todo:341f9d2bc50bbbc3a8ca69a3",
+        "rowCount": 3,
+        "labels": [
+          "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+          "Expose tuple metadata on the exact-match cache read path so front-door hits return the same envelope they store."
+        ],
+        "sourceRefs": [
+          "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:435"
+        ],
+        "avgLineageScorePct": 36.36
+      },
+      {
+        "featureId": "feature:todo:1bd33c5ca64b01df42e9fcac",
+        "rowCount": 3,
+        "labels": [
+          "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+          "Route agentic errors through a read-only proposal flow that launches parallel repair subagents before any patching is considered."
+        ],
+        "sourceRefs": [
+          "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:436"
+        ],
+        "avgLineageScorePct": 36.36
+      },
+      {
+        "featureId": "feature:todo:0aa8e73629125ac4b069abd9",
+        "rowCount": 3,
+        "labels": [
+          "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+          "Promote each proposal run into the engram registry (`memory_registry` + `engram_cards`) so the repair timeline is indexed as reusable memory, not just audit his"
+        ],
+        "sourceRefs": [
+          "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:439"
+        ],
+        "avgLineageScorePct": 36.36
+      },
+      {
+        "featureId": "feature:todo:d60e7fd1e58a9ac27398d940",
+        "rowCount": 3,
+        "labels": [
+          "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+          "Expose the proposal timeline in the agentic controller UI via the read-only `/api/v1/agentic?action=timeline` path."
+        ],
+        "sourceRefs": [
+          "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:440"
+        ],
+        "avgLineageScorePct": 36.36
+      },
+      {
+        "featureId": "feature:todo:bf6c95f604835aeec202985b",
+        "rowCount": 3,
+        "labels": [
+          "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+          "Emit a parent-atlas feature-labeling report that includes missing todos, `feature_id`, `featureKey`, `source_ref`, and `sourceRefs` so the kanban/atlas sync can"
+        ],
+        "sourceRefs": [
+          "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:441"
+        ],
+        "avgLineageScorePct": 36.36
+      },
+      {
+        "featureId": "feature:todo:8e5eaf945282c9ba26406b26",
+        "rowCount": 3,
+        "labels": [
+          "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+          "Keep Qdrant as the default ANN service and treat cuVS/CAGRA as the future WSL2 experiment lane behind the same retrieval contract."
+        ],
+        "sourceRefs": [
+          "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:447"
+        ],
+        "avgLineageScorePct": 36.36
+      },
+      {
+        "featureId": "feature:todo:36a520b68d772f80f148300f",
+        "rowCount": 3,
+        "labels": [
+          "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+          "Keep LangGraph optional as orchestration only; no direct DB/Qdrant writes from graph nodes."
+        ],
+        "sourceRefs": [
+          "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:449"
+        ],
+        "avgLineageScorePct": 36.36
+      },
+      {
+        "featureId": "feature:todo:16f554676a7b623ce9880206",
+        "rowCount": 3,
+        "labels": [
+          "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+          "Define the OpenCode-facing bridge so research queries can flow through TRACE MCP / function-caller without bypassing `sourceRef` provenance."
+        ],
+        "sourceRefs": [
+          "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:450"
+        ],
+        "avgLineageScorePct": 36.36
+      },
+      {
+        "featureId": "feature:todo:26b2bebdc5c285740e7bce4d",
+        "rowCount": 3,
+        "labels": [
+          "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+          "Store docs and large artifacts in SeaweedFS, not in the research container's local SQLite boundary."
+        ],
+        "sourceRefs": [
+          "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:451"
+        ],
+        "avgLineageScorePct": 36.36
+      },
+      {
+        "featureId": "feature:todo:f110c0ebab6f7b882bf8997c",
+        "rowCount": 3,
+        "labels": [
+          "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+          "Summarize docs with Gemma4 and persist the compact outputs into Postgres 18 deep_research tables with JSONB / pgvector where appropriate."
+        ],
+        "sourceRefs": [
+          "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:452"
+        ],
+        "avgLineageScorePct": 36.36
+      },
+      {
+        "featureId": "feature:todo:3c3c2a5c203e7248dda320e2",
+        "rowCount": 3,
+        "labels": [
+          "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+          "Keep BM25 and LangExtract as the lexical/provenance enrichment pass before the final recommendation fusion."
+        ],
+        "sourceRefs": [
+          "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:453"
+        ],
+        "avgLineageScorePct": 36.36
+      },
+      {
+        "featureId": "feature:todo:b04cb35f007d8bae79ba97ca",
+        "rowCount": 3,
+        "labels": [
+          "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+          "Document the WSL2 GPU override as optional deployment flavor only; default to host-side CUDA inference when it is already available."
+        ],
+        "sourceRefs": [
+          "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:454"
+        ],
+        "avgLineageScorePct": 36.36
+      },
+      {
+        "featureId": "feature:todo:5d22b2b996d856b77506427c",
+        "rowCount": 3,
+        "labels": [
+          "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+          "Emit a short comparison note for Gemma4 vs Hermes vs local-deep-research so the assistant path stays explicit."
+        ],
+        "sourceRefs": [
+          "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:455"
+        ],
+        "avgLineageScorePct": 36.36
+      },
+      {
+        "featureId": "feature:todo:998aaa3711147350851b1220",
+        "rowCount": 3,
+        "labels": [
+          "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+          "Re-run the assistant-path comparison after each boundary change and record the result in `IMPLEMENTATION_STATUS.md`."
+        ],
+        "sourceRefs": [
+          "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:456"
+        ],
+        "avgLineageScorePct": 36.36
+      },
+      {
+        "featureId": "feature:todo:d95c5dcf45458befd109b456",
+        "rowCount": 3,
+        "labels": [
+          "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+          "Clustering quality cleanup (deferred)"
+        ],
+        "sourceRefs": [
+          "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:504"
+        ],
+        "avgLineageScorePct": 36.36
+      },
+      {
+        "featureId": "feature:todo:d8ab6855119337da53bd1cb0",
+        "rowCount": 3,
+        "labels": [
+          "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+          "Wire into API routes (`/api/cases`, `/api/evidence/upload`) — deferred"
+        ],
+        "sourceRefs": [
+          "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:510"
+        ],
+        "avgLineageScorePct": 36.36
+      },
+      {
+        "featureId": "feature:todo:ff90358d6e6879b2ad50bdc9",
+        "rowCount": 3,
+        "labels": [
+          "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+          "**Track C — Production Gap Remediation** (after DB audit)"
+        ],
+        "sourceRefs": [
+          "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:526"
+        ],
+        "avgLineageScorePct": 36.36
+      },
+      {
+        "featureId": "feature:todo:28992ba01871f873f4c05915",
+        "rowCount": 3,
+        "labels": [
+          "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+          "Seed legal canon chunks (legal PDF ingest pipeline)"
+        ],
+        "sourceRefs": [
+          "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:529"
+        ],
+        "avgLineageScorePct": 36.36
+      },
+      {
+        "featureId": "feature:todo:82a8f6f34cd584027481e379",
+        "rowCount": 3,
+        "labels": [
+          "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+          "Add Playwright test fixtures for auth + DB seeding"
+        ],
+        "sourceRefs": [
+          "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:530"
+        ],
+        "avgLineageScorePct": 36.36
+      },
+      {
+        "featureId": "feature:todo:4c05231411f757965000cedb",
+        "rowCount": 3,
+        "labels": [
+          "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+          "Option 2: ClusterCard schema + Redis/Qdrant wiring + API route"
+        ],
+        "sourceRefs": [
+          "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:535"
+        ],
+        "avgLineageScorePct": 36.36
+      },
+      {
+        "featureId": "feature:todo:f0f27b8fcc26eb849fe76242",
+        "rowCount": 3,
+        "labels": [
+          "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+          "Warm workspace-start plans"
+        ],
+        "sourceRefs": [
+          "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:541"
+        ],
+        "avgLineageScorePct": 36.36
+      },
+      {
+        "featureId": "feature:todo:ca7e2a61d982eff86e61b461",
+        "rowCount": 3,
+        "labels": [
+          "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+          "Warm legal/codebase summaries"
+        ],
+        "sourceRefs": [
+          "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:542"
+        ],
+        "avgLineageScorePct": 36.36
+      },
+      {
+        "featureId": "feature:todo:d155181e742183f8dd1ebfb5",
+        "rowCount": 3,
+        "labels": [
+          "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+          "**Remaining Lower-Priority**"
+        ],
+        "sourceRefs": [
+          "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:544"
+        ],
+        "avgLineageScorePct": 36.36
+      },
+      {
+        "featureId": "feature:todo:eb4e3bee910b08b95e30ef0f",
+        "rowCount": 3,
+        "labels": [
+          "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+          "Track 1: .env audit + dead-config archival"
+        ],
+        "sourceRefs": [
+          "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:545"
+        ],
+        "avgLineageScorePct": 36.36
+      },
+      {
+        "featureId": "feature:todo:9f52e7400198785380b71be0",
+        "rowCount": 3,
+        "labels": [
+          "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+          "Track 2: Docker CPU limits + Caddy memory bump"
+        ],
+        "sourceRefs": [
+          "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:546"
+        ],
+        "avgLineageScorePct": 36.36
+      },
+      {
+        "featureId": "feature:todo:5ad7e6c3a6858eb25a409bb5",
+        "rowCount": 3,
+        "labels": [
+          "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+          "Track 5C–5E: Model/GGUF cleanup"
+        ],
+        "sourceRefs": [
+          "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:548"
+        ],
+        "avgLineageScorePct": 36.36
+      },
+      {
+        "featureId": "feature:todo:345f071ce68fa8162ef4bf2d",
+        "rowCount": 3,
+        "labels": [
+          "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+          "Add `alias_id` to parent atlas profile payloads, task mirror payloads, and retrieval events once the live `task_semantic_packets` migration is applied"
+        ],
+        "sourceRefs": [
+          "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:570"
+        ],
+        "avgLineageScorePct": 36.36
+      },
+      {
+        "featureId": "feature:todo:ca478d3be8a7950ab5b26dd7",
+        "rowCount": 3,
+        "labels": [
+          "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+          "Extend the distilled DDL/migration SQL to persist `alias_id` in the live task/profile path once the migration is scheduled"
+        ],
+        "sourceRefs": [
+          "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:573"
+        ],
+        "avgLineageScorePct": 36.36
+      },
+      {
+        "featureId": "feature:todo:df78a3d9985514cc3eb24398",
+        "rowCount": 3,
+        "labels": [
+          "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+          "Thread `alias_id` through the prompt listener log entries as a stable cross-store alias field"
+        ],
+        "sourceRefs": [
+          "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:575"
+        ],
+        "avgLineageScorePct": 36.36
+      },
+      {
+        "featureId": "feature:todo:50a08906ac2944f99ff97955",
+        "rowCount": 3,
+        "labels": [
+          "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+          "**Phase 20 — Colab/A6000 training lane**"
+        ],
+        "sourceRefs": [
+          "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:581"
+        ],
+        "avgLineageScorePct": 36.36
+      },
+      {
+        "featureId": "feature:todo:ec200c0104dbc7cef41b6374",
+        "rowCount": 3,
+        "labels": [
+          "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+          "Support high-RAM LLM tagging"
+        ],
+        "sourceRefs": [
+          "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:582"
+        ],
+        "avgLineageScorePct": 36.36
+      },
+      {
+        "featureId": "feature:todo:57f67bd8348b2f120581c642",
+        "rowCount": 3,
+        "labels": [
+          "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+          "Install Unsloth + PyTorch (`uv pip install unsloth --torch-backend=auto`)"
+        ],
+        "sourceRefs": [
+          "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:583"
+        ],
+        "avgLineageScorePct": 36.36
+      },
+      {
+        "featureId": "feature:todo:a8329db04d9e038d5dbf0ad5",
+        "rowCount": 3,
+        "labels": [
+          "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+          "Configure optional LoRA/QLoRA adapter training"
+        ],
+        "sourceRefs": [
+          "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:584"
+        ],
+        "avgLineageScorePct": 36.36
+      },
+      {
+        "featureId": "feature:todo:f6cac7bf75adc262479ce1db",
+        "rowCount": 3,
+        "labels": [
+          "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+          "Export trained tagger/reranker artifacts"
+        ],
+        "sourceRefs": [
+          "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:585"
+        ],
+        "avgLineageScorePct": 36.36
+      },
+      {
+        "featureId": "feature:todo:d99af10b5a87018316f6a9a8",
+        "rowCount": 3,
+        "labels": [
+          "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+          "Exclude from startup (run only offline)"
+        ],
+        "sourceRefs": [
+          "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:586"
+        ],
+        "avgLineageScorePct": 36.36
+      },
+      {
+        "featureId": "feature:todo:766413ce20ee852d0750e788",
+        "rowCount": 3,
+        "labels": [
+          "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+          "WebGPU optional only (do not require WebGPU)"
+        ],
+        "sourceRefs": [
+          "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:587"
+        ],
+        "avgLineageScorePct": 36.36
+      },
+      {
+        "featureId": "feature:todo:31595ba6c0ff5254d39848b5",
+        "rowCount": 3,
+        "labels": [
+          "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+          "Run the full current-corpus offline ingest in bounded chunks until the full scan is promoted, not just summarized"
+        ],
+        "sourceRefs": [
+          "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:775"
+        ],
+        "avgLineageScorePct": 36.36
+      },
+      {
+        "featureId": "feature:todo:6ebdce207d27de5f2c70d010",
+        "rowCount": 3,
+        "labels": [
+          "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+          "Promote validated offline outputs into the durable stores only after validation passes"
+        ],
+        "sourceRefs": [
+          "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:778"
+        ],
+        "avgLineageScorePct": 36.36
+      },
+      {
+        "featureId": "feature:todo:951f1337ba4de5a57686d986",
+        "rowCount": 3,
+        "labels": [
+          "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+          "Confirm the live task mirror schema for `task_semantic_packets`"
+        ],
+        "sourceRefs": [
+          "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:784"
+        ],
+        "avgLineageScorePct": 36.36
+      },
+      {
+        "featureId": "feature:todo:cba41628d9e42971e1bfd189",
+        "rowCount": 3,
+        "labels": [
+          "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+          "Recover or containerize the missing worker lanes required for the full offline path"
+        ],
+        "sourceRefs": [
+          "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:788"
+        ],
+        "avgLineageScorePct": 36.36
+      },
+      {
+        "featureId": "feature:todo:d03cf5787e951fe5e6dad698",
+        "rowCount": 3,
+        "labels": [
+          "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+          "Add a read/query path for NES chrom packets and recent hits by `sourceRef` / `featureId` / `queryHash`"
+        ],
+        "sourceRefs": [
+          "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:794"
+        ],
+        "avgLineageScorePct": 36.36
+      },
+      {
+        "featureId": "feature:todo:aaa4c01aaa9f761db1e77363",
+        "rowCount": 3,
+        "labels": [
+          "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+          "Keep the repo trimmed to source, schemas, scripts, and docs"
+        ],
+        "sourceRefs": [
+          "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:797"
+        ],
+        "avgLineageScorePct": 36.36
+      },
+      {
+        "featureId": "feature:todo:312cb59ccc81c603bff431c2",
+        "rowCount": 3,
+        "labels": [
+          "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+          "Refresh the parent atlas using only the production-ready feature list after archive decisions are made"
+        ],
+        "sourceRefs": [
+          "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:800"
+        ],
+        "avgLineageScorePct": 36.36
+      },
+      {
+        "featureId": "feature:todo:9d706730404ce1b74ebc1ba0",
+        "rowCount": 3,
+        "labels": [
+          "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+          "Archive redundant Svelte 5 runes carry-logic layers once the feature folders are stable"
+        ],
+        "sourceRefs": [
+          "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:805"
+        ],
+        "avgLineageScorePct": 36.36
+      },
+      {
+        "featureId": "feature:todo:2850678b92201182850900fb",
+        "rowCount": 3,
+        "labels": [
+          "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+          "Archive redundant async SvelteKit RPC wrappers once the JSON-RPC 2.0 path is the single canonical route"
+        ],
+        "sourceRefs": [
+          "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:806"
+        ],
+        "avgLineageScorePct": 36.36
+      },
+      {
+        "featureId": "feature:todo:60b1a6d9622cfd4be3d92ea4",
+        "rowCount": 3,
+        "labels": [
+          "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+          "Archive duplicate JSON-RPC 2.0 shim logic after the canonical handler is confirmed"
+        ],
+        "sourceRefs": [
+          "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:807"
+        ],
+        "avgLineageScorePct": 36.36
+      },
+      {
+        "featureId": "feature:todo:60cac941e18861bbd047b035",
+        "rowCount": 3,
+        "labels": [
+          "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+          "Archive deep Drizzle audit artifacts after the schema/migration plan is signed off"
+        ],
+        "sourceRefs": [
+          "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:808"
+        ],
+        "avgLineageScorePct": 36.36
+      },
+      {
+        "featureId": "feature:todo:db7ebe32c0763b6c28da28bc",
+        "rowCount": 3,
+        "labels": [
+          "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+          "Archive stale or duplicate feature implementations after the parent atlas tags them as production-ready or redundant"
+        ],
+        "sourceRefs": [
+          "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:809"
+        ],
+        "avgLineageScorePct": 36.36
+      },
+      {
+        "featureId": "feature:todo:81e57bc0d2fe676cd78238f2",
+        "rowCount": 3,
+        "labels": [
+          "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+          "Phase 20 A6000 training lane"
+        ],
+        "sourceRefs": [
+          "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:812"
+        ],
+        "avgLineageScorePct": 36.36
+      },
+      {
+        "featureId": "feature:todo:be04de8dd8896a006f5c9e6e",
+        "rowCount": 3,
+        "labels": [
+          "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+          "high-RAM LLM tagging"
+        ],
+        "sourceRefs": [
+          "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:813"
+        ],
+        "avgLineageScorePct": 36.36
+      },
+      {
+        "featureId": "feature:todo:bcaa5532bc0ebd95d4c83621",
+        "rowCount": 3,
+        "labels": [
+          "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+          "Unsloth + PyTorch install and validation"
+        ],
+        "sourceRefs": [
+          "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:814"
+        ],
+        "avgLineageScorePct": 36.36
+      },
+      {
+        "featureId": "feature:todo:345a2ebee67a1aabc71e2f6f",
+        "rowCount": 3,
+        "labels": [
+          "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+          "optional LoRA / QLoRA adapter training"
+        ],
+        "sourceRefs": [
+          "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:815"
+        ],
+        "avgLineageScorePct": 36.36
+      },
+      {
+        "featureId": "feature:todo:895074946e4a263ef394fd48",
+        "rowCount": 3,
+        "labels": [
+          "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+          "export trained tagger / reranker artifacts"
+        ],
+        "sourceRefs": [
+          "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:816"
+        ],
+        "avgLineageScorePct": 36.36
+      },
+      {
+        "featureId": "feature:todo:37b37ade97d6ef135f3be736",
+        "rowCount": 3,
+        "labels": [
+          "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+          "keep the lane offline-only, not a startup dependency"
+        ],
+        "sourceRefs": [
+          "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:817"
+        ],
+        "avgLineageScorePct": 36.36
+      },
+      {
+        "featureId": "feature:todo:38b232326e47610bd9b82f08",
+        "rowCount": 3,
+        "labels": [
+          "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+          "H4 write-enabled benchmark and FP16 accuracy comparison"
+        ],
+        "sourceRefs": [
+          "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:818"
+        ],
+        "avgLineageScorePct": 36.36
+      },
+      {
+        "featureId": "feature:todo:2b57685b8f00551d3fd3bc5e",
+        "rowCount": 3,
+        "labels": [
+          "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+          "keep CPU fallback as default until benchmark passes"
+        ],
+        "sourceRefs": [
+          "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:819"
+        ],
+        "avgLineageScorePct": 36.36
+      },
+      {
+        "featureId": "feature:todo:86664b89691c50d8e4f02a68",
+        "rowCount": 3,
+        "labels": [
+          "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+          "do not enable FP16 globally before the comparison is recorded"
+        ],
+        "sourceRefs": [
+          "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:820"
+        ],
+        "avgLineageScorePct": 36.36
+      },
+      {
+        "featureId": "feature:todo:a903be5040b8ad037fa92752",
+        "rowCount": 3,
+        "labels": [
+          "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+          "Deep Drizzle audit after consolidation and archiving"
+        ],
+        "sourceRefs": [
+          "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:821"
+        ],
+        "avgLineageScorePct": 36.36
+      },
+      {
+        "featureId": "feature:todo:7bff888f19bae6332e81eb0a",
+        "rowCount": 3,
+        "labels": [
+          "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+          "verify schema drift against the moved feature folders"
+        ],
+        "sourceRefs": [
+          "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:822"
+        ],
+        "avgLineageScorePct": 36.36
+      },
+      {
+        "featureId": "feature:todo:e9ee98a5e46461a30b8c0a05",
+        "rowCount": 3,
+        "labels": [
+          "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+          "apply migration only after the repo is trimmed and the live schema is consistent"
+        ],
+        "sourceRefs": [
+          "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:823"
+        ],
+        "avgLineageScorePct": 36.36
+      },
+      {
+        "featureId": "feature:todo:1f3fec88b4887714bff46565",
+        "rowCount": 3,
+        "labels": [
+          "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+          "Parent atlas refresh using only the production-ready feature list"
+        ],
+        "sourceRefs": [
+          "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:824"
+        ],
+        "avgLineageScorePct": 36.36
+      },
+      {
+        "featureId": "feature:todo:62719d535d4e40d142460cfc",
+        "rowCount": 3,
+        "labels": [
+          "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+          "keep missing features and redundant features separated"
+        ],
+        "sourceRefs": [
+          "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:825"
+        ],
+        "avgLineageScorePct": 36.36
+      },
+      {
+        "featureId": "feature:todo:518b7cb0495a940422645806",
+        "rowCount": 3,
+        "labels": [
+          "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+          "re-run kanban-to-parent-atlas sync after archive decisions are made"
+        ],
+        "sourceRefs": [
+          "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:826"
+        ],
+        "avgLineageScorePct": 36.36
+      },
+      {
+        "featureId": "feature:todo:7a16fad76ef24a827a57f242",
+        "rowCount": 3,
+        "labels": [
+          "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+          "Decide whether `simd-bridge-rs/` becomes the next canonical native add-on workspace or remains a staged canary"
+        ],
+        "sourceRefs": [
+          "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:866"
+        ],
+        "avgLineageScorePct": 36.36
+      },
+      {
+        "featureId": "feature:todo:fbc090d17b770f5c659e5d28",
+        "rowCount": 3,
+        "labels": [
+          "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+          "Scaffold or promote the `napi-rs` prototype API surface (`parse_batch`, `compute_centroids`, Tokio worker handoff)"
+        ],
+        "sourceRefs": [
+          "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:867"
+        ],
+        "avgLineageScorePct": 36.36
+      },
+      {
+        "featureId": "feature:todo:a3b86bb63f937fceeb3bb021",
+        "rowCount": 3,
+        "labels": [
+          "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+          "Add a dedicated benchmark harness for JSON.parse vs simdjson vs Rust roundtrip"
+        ],
+        "sourceRefs": [
+          "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:868"
+        ],
+        "avgLineageScorePct": 36.36
+      },
+      {
+        "featureId": "feature:todo:3851354f3117385472fc7eb5",
+        "rowCount": 3,
+        "labels": [
+          "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+          "Wire the production native base image into CI so the runtime image and addon ABI stay pinned"
+        ],
+        "sourceRefs": [
+          "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:869"
+        ],
+        "avgLineageScorePct": 36.36
+      },
+      {
+        "featureId": "feature:todo:33e49c6bf3ce8231ba4f6402",
+        "rowCount": 3,
+        "labels": [
+          "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+          "Add telemetry for parse latency, worker queue time, and GPU allocation metrics"
+        ],
+        "sourceRefs": [
+          "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:870"
+        ],
+        "avgLineageScorePct": 36.36
+      },
+      {
+        "featureId": "feature:todo:08a60b305944064051beac3a",
+        "rowCount": 3,
+        "labels": [
+          "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+          "Keep CPU fallback paths available for dev and rollback"
+        ],
+        "sourceRefs": [
+          "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:871"
+        ],
+        "avgLineageScorePct": 36.36
+      },
+      {
+        "featureId": "feature:todo:c2ab8074caeb070184d46c20",
+        "rowCount": 3,
+        "labels": [
+          "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+          "Do not remove the JS fallback path until the Rust native path is benchmarked and canary-validated"
+        ],
+        "sourceRefs": [
+          "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:874"
+        ],
+        "avgLineageScorePct": 36.36
+      },
+      {
+        "featureId": "feature:todo:c05219160d4f5b6d7cba09a1",
+        "rowCount": 3,
+        "labels": [
+          "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+          "Do not treat the CUDA path as mandatory for the browser or startup lanes"
+        ],
+        "sourceRefs": [
+          "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:875"
+        ],
+        "avgLineageScorePct": 36.36
+      },
+      {
+        "featureId": "feature:todo:c06a94c291be9d63d3e12179",
+        "rowCount": 3,
+        "labels": [
+          "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+          "Keep offline training and zero-copy handoff separate from the live retrieval path until benchmarks pass"
+        ],
+        "sourceRefs": [
+          "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:876"
+        ],
+        "avgLineageScorePct": 36.36
+      },
+      {
+        "featureId": "feature:file:4537c26965f6d4abfdcf05ab",
+        "rowCount": 2,
+        "labels": [
+          "cache-ace-context-packs-ace-context-local-json-hit-v1-json",
+          "Label cache-ace-context-packs-ace-context-local-json-hit-v1-json"
+        ],
+        "sourceRefs": [
+          "local:.cache/ace/context-packs/ace_context_local-json-hit_v1.json"
+        ],
+        "avgLineageScorePct": 36.36
+      },
+      {
+        "featureId": "feature:file:8679708a6349443ae8066b3b",
+        "rowCount": 2,
+        "labels": [
+          "cache-ace-context-packs-ace-context-smoke-context-pack-v1-json",
+          "Label cache-ace-context-packs-ace-context-smoke-context-pack-v1-json"
+        ],
+        "sourceRefs": [
+          "local:.cache/ace/context-packs/ace_context_smoke-context-pack_v1.json"
+        ],
+        "avgLineageScorePct": 36.36
+      },
+      {
+        "featureId": "feature:file:c01c9263f03bf00e10875001",
+        "rowCount": 2,
+        "labels": [
+          "cache-ace-top-retrieval-ace-retrieval-topn-77245b8d5bd3442aa981670b-2-json",
+          "Label cache-ace-top-retrieval-ace-retrieval-topn-77245b8d5bd3442aa981670b-2-json"
+        ],
+        "sourceRefs": [
+          "local:.cache/ace/top-retrieval/ace_retrieval_topn_77245b8d5bd3442aa981670b_2.json"
+        ],
+        "avgLineageScorePct": 36.36
+      },
+      {
+        "featureId": "feature:file:2c0015cb6265c9ee6c987434",
+        "rowCount": 2,
+        "labels": [
+          "cache-cards-7fa8a288f900d5f042365e405126cba1b373fc0f-meta-json",
+          "Label cache-cards-7fa8a288f900d5f042365e405126cba1b373fc0f-meta-json"
+        ],
+        "sourceRefs": [
+          "local:.cache/cards/7fa8a288f900d5f042365e405126cba1b373fc0f.meta.json"
+        ],
+        "avgLineageScorePct": 36.36
+      },
+      {
+        "featureId": "feature:file:2a83e073f935d0e05f13a2a7",
+        "rowCount": 2,
+        "labels": [
+          "cache-cards-87a3e2aa5036028f81632b720cdf195a73ce8a0e-meta-json",
+          "Label cache-cards-87a3e2aa5036028f81632b720cdf195a73ce8a0e-meta-json"
+        ],
+        "sourceRefs": [
+          "local:.cache/cards/87a3e2aa5036028f81632b720cdf195a73ce8a0e.meta.json"
+        ],
+        "avgLineageScorePct": 36.36
+      },
+      {
+        "featureId": "feature:file:0fa5e4b1bd7b3ccac492b228",
+        "rowCount": 2,
+        "labels": [
+          "cache-d9-verifier-0aefb06409d30bcc-json",
+          "Label cache-d9-verifier-0aefb06409d30bcc-json"
+        ],
+        "sourceRefs": [
+          "local:.cache/d9-verifier/0aefb06409d30bcc.json"
+        ],
+        "avgLineageScorePct": 36.36
+      },
+      {
+        "featureId": "feature:file:8de80d749291e6c3e2aa2528",
+        "rowCount": 2,
+        "labels": [
+          "cache-d9-verifier-18e924c96cf72a44-json",
+          "Label cache-d9-verifier-18e924c96cf72a44-json"
+        ],
+        "sourceRefs": [
+          "local:.cache/d9-verifier/18e924c96cf72a44.json"
+        ],
+        "avgLineageScorePct": 36.36
+      },
+      {
+        "featureId": "feature:file:2a28624f3ea31eca1ba4fa8c",
+        "rowCount": 2,
+        "labels": [
+          "cache-d9-verifier-1b1d36c14e179b86-json",
+          "Label cache-d9-verifier-1b1d36c14e179b86-json"
+        ],
+        "sourceRefs": [
+          "local:.cache/d9-verifier/1b1d36c14e179b86.json"
+        ],
+        "avgLineageScorePct": 36.36
+      },
+      {
+        "featureId": "feature:file:7da56c5068c5094bf41dd26f",
+        "rowCount": 2,
+        "labels": [
+          "cache-d9-verifier-29367b26ad1e578a-json",
+          "Label cache-d9-verifier-29367b26ad1e578a-json"
+        ],
+        "sourceRefs": [
+          "local:.cache/d9-verifier/29367b26ad1e578a.json"
+        ],
+        "avgLineageScorePct": 36.36
+      },
+      {
+        "featureId": "feature:file:82af50b4fd72f29850bc36f3",
+        "rowCount": 2,
+        "labels": [
+          "cache-d9-verifier-294f7266e00b9379-json",
+          "Label cache-d9-verifier-294f7266e00b9379-json"
+        ],
+        "sourceRefs": [
+          "local:.cache/d9-verifier/294f7266e00b9379.json"
+        ],
+        "avgLineageScorePct": 36.36
+      },
+      {
+        "featureId": "feature:file:6a2e9ec981582e7483ab3ade",
+        "rowCount": 2,
+        "labels": [
+          "cache-d9-verifier-307279f5f1494c7e-json",
+          "Label cache-d9-verifier-307279f5f1494c7e-json"
+        ],
+        "sourceRefs": [
+          "local:.cache/d9-verifier/307279f5f1494c7e.json"
+        ],
+        "avgLineageScorePct": 36.36
+      },
+      {
+        "featureId": "feature:file:34a54184e7994745a3c84d10",
+        "rowCount": 2,
+        "labels": [
+          "cache-d9-verifier-39a2eb1d8f1afd09-json",
+          "Label cache-d9-verifier-39a2eb1d8f1afd09-json"
+        ],
+        "sourceRefs": [
+          "local:.cache/d9-verifier/39a2eb1d8f1afd09.json"
+        ],
+        "avgLineageScorePct": 36.36
+      },
+      {
+        "featureId": "feature:file:c06c65f0962cca53168993c7",
+        "rowCount": 2,
+        "labels": [
+          "cache-d9-verifier-43b9fc4b89d78538-json",
+          "Label cache-d9-verifier-43b9fc4b89d78538-json"
+        ],
+        "sourceRefs": [
+          "local:.cache/d9-verifier/43b9fc4b89d78538.json"
+        ],
+        "avgLineageScorePct": 36.36
+      },
+      {
+        "featureId": "feature:file:23390b9679b54ecd0d75b9e2",
+        "rowCount": 2,
+        "labels": [
+          "cache-d9-verifier-441c62a1acf01e5d-json",
+          "Label cache-d9-verifier-441c62a1acf01e5d-json"
+        ],
+        "sourceRefs": [
+          "local:.cache/d9-verifier/441c62a1acf01e5d.json"
+        ],
+        "avgLineageScorePct": 36.36
+      },
+      {
+        "featureId": "feature:file:8693c86d43c2b0d14c8d9dce",
+        "rowCount": 2,
+        "labels": [
+          "cache-d9-verifier-53a4d51ab2e58a11-json",
+          "Label cache-d9-verifier-53a4d51ab2e58a11-json"
+        ],
+        "sourceRefs": [
+          "local:.cache/d9-verifier/53a4d51ab2e58a11.json"
+        ],
+        "avgLineageScorePct": 36.36
+      },
+      {
+        "featureId": "feature:file:290a6da34f60b17a3804d70e",
+        "rowCount": 2,
+        "labels": [
+          "cache-d9-verifier-5628c7618811c4fd-json",
+          "Label cache-d9-verifier-5628c7618811c4fd-json"
+        ],
+        "sourceRefs": [
+          "local:.cache/d9-verifier/5628c7618811c4fd.json"
+        ],
+        "avgLineageScorePct": 36.36
+      },
+      {
+        "featureId": "feature:file:3521b74db7e778923fd00d16",
+        "rowCount": 2,
+        "labels": [
+          "cache-d9-verifier-5e4a96bb345bd10e-json",
+          "Label cache-d9-verifier-5e4a96bb345bd10e-json"
+        ],
+        "sourceRefs": [
+          "local:.cache/d9-verifier/5e4a96bb345bd10e.json"
+        ],
+        "avgLineageScorePct": 36.36
+      },
+      {
+        "featureId": "feature:file:62e7d8c2f65aceb845d51713",
+        "rowCount": 2,
+        "labels": [
+          "cache-d9-verifier-7530781fb24e4c3a-json",
+          "Label cache-d9-verifier-7530781fb24e4c3a-json"
+        ],
+        "sourceRefs": [
+          "local:.cache/d9-verifier/7530781fb24e4c3a.json"
+        ],
+        "avgLineageScorePct": 36.36
+      },
+      {
+        "featureId": "feature:file:a80b89d9a2df6e7c0b41afab",
+        "rowCount": 2,
+        "labels": [
+          "cache-d9-verifier-78b20ee42936e840-json",
+          "Label cache-d9-verifier-78b20ee42936e840-json"
+        ],
+        "sourceRefs": [
+          "local:.cache/d9-verifier/78b20ee42936e840.json"
+        ],
+        "avgLineageScorePct": 36.36
+      },
+      {
+        "featureId": "feature:file:19473fa5c8be3362f6bbefa0",
+        "rowCount": 2,
+        "labels": [
+          "cache-d9-verifier-79e2ba0f90ee5ebe-json",
+          "Label cache-d9-verifier-79e2ba0f90ee5ebe-json"
+        ],
+        "sourceRefs": [
+          "local:.cache/d9-verifier/79e2ba0f90ee5ebe.json"
+        ],
+        "avgLineageScorePct": 36.36
+      },
+      {
+        "featureId": "feature:file:055439abb00e133b9b96a16b",
+        "rowCount": 2,
+        "labels": [
+          "cache-d9-verifier-87fe7ea09a599e3f-json",
+          "Label cache-d9-verifier-87fe7ea09a599e3f-json"
+        ],
+        "sourceRefs": [
+          "local:.cache/d9-verifier/87fe7ea09a599e3f.json"
+        ],
+        "avgLineageScorePct": 36.36
+      },
+      {
+        "featureId": "feature:file:9a6b4693def4d4a4a1f4f79b",
+        "rowCount": 2,
+        "labels": [
+          "cache-d9-verifier-905270df680aabf7-json",
+          "Label cache-d9-verifier-905270df680aabf7-json"
+        ],
+        "sourceRefs": [
+          "local:.cache/d9-verifier/905270df680aabf7.json"
+        ],
+        "avgLineageScorePct": 36.36
+      },
+      {
+        "featureId": "feature:file:8be9e583141b09f816d6d391",
+        "rowCount": 2,
+        "labels": [
+          "cache-d9-verifier-92f9dd3a09baf1d3-json",
+          "Label cache-d9-verifier-92f9dd3a09baf1d3-json"
+        ],
+        "sourceRefs": [
+          "local:.cache/d9-verifier/92f9dd3a09baf1d3.json"
+        ],
+        "avgLineageScorePct": 36.36
+      },
+      {
+        "featureId": "feature:file:e6647dfab96642db88b2045a",
+        "rowCount": 2,
+        "labels": [
+          "cache-d9-verifier-9e81804cbb551132-json",
+          "Label cache-d9-verifier-9e81804cbb551132-json"
+        ],
+        "sourceRefs": [
+          "local:.cache/d9-verifier/9e81804cbb551132.json"
+        ],
+        "avgLineageScorePct": 36.36
+      },
+      {
+        "featureId": "feature:file:26902d9de0525a08833e78b4",
+        "rowCount": 2,
+        "labels": [
+          "cache-d9-verifier-ae5f8718a6ccb862-json",
+          "Label cache-d9-verifier-ae5f8718a6ccb862-json"
+        ],
+        "sourceRefs": [
+          "local:.cache/d9-verifier/ae5f8718a6ccb862.json"
+        ],
+        "avgLineageScorePct": 36.36
+      },
+      {
+        "featureId": "feature:file:8681a70c0ea7b0c615409b20",
+        "rowCount": 2,
+        "labels": [
+          "cache-d9-verifier-aeba5bcc519138f2-json",
+          "Label cache-d9-verifier-aeba5bcc519138f2-json"
+        ],
+        "sourceRefs": [
+          "local:.cache/d9-verifier/aeba5bcc519138f2.json"
+        ],
+        "avgLineageScorePct": 36.36
+      },
+      {
+        "featureId": "feature:file:764070b243f5d82aae1891a9",
+        "rowCount": 2,
+        "labels": [
+          "cache-d9-verifier-b222315b079d41a4-json",
+          "Label cache-d9-verifier-b222315b079d41a4-json"
+        ],
+        "sourceRefs": [
+          "local:.cache/d9-verifier/b222315b079d41a4.json"
+        ],
+        "avgLineageScorePct": 36.36
+      },
+      {
+        "featureId": "feature:file:9be8d9a8d6402c46d5ba05d5",
+        "rowCount": 2,
+        "labels": [
+          "cache-d9-verifier-bb86bc9e01c04c6f-json",
+          "Label cache-d9-verifier-bb86bc9e01c04c6f-json"
+        ],
+        "sourceRefs": [
+          "local:.cache/d9-verifier/bb86bc9e01c04c6f.json"
+        ],
+        "avgLineageScorePct": 36.36
+      },
+      {
+        "featureId": "feature:file:40df721da7ecaeca03201bd6",
+        "rowCount": 2,
+        "labels": [
+          "cache-d9-verifier-cccf31c98362c308-json",
+          "Label cache-d9-verifier-cccf31c98362c308-json"
+        ],
+        "sourceRefs": [
+          "local:.cache/d9-verifier/cccf31c98362c308.json"
+        ],
+        "avgLineageScorePct": 36.36
+      },
+      {
+        "featureId": "feature:file:109a826640e7e0d54bef3703",
+        "rowCount": 2,
+        "labels": [
+          "cache-d9-verifier-ccf4fdbf1f8add86-json",
+          "Label cache-d9-verifier-ccf4fdbf1f8add86-json"
+        ],
+        "sourceRefs": [
+          "local:.cache/d9-verifier/ccf4fdbf1f8add86.json"
+        ],
+        "avgLineageScorePct": 36.36
+      },
+      {
+        "featureId": "feature:file:b3deb4628b54d70890b9b2ca",
+        "rowCount": 2,
+        "labels": [
+          "cache-d9-verifier-d3bbf96419461ade-json",
+          "Label cache-d9-verifier-d3bbf96419461ade-json"
+        ],
+        "sourceRefs": [
+          "local:.cache/d9-verifier/d3bbf96419461ade.json"
+        ],
+        "avgLineageScorePct": 36.36
+      },
+      {
+        "featureId": "feature:file:81b395405c4a748f68c5c25e",
+        "rowCount": 2,
+        "labels": [
+          "cache-d9-verifier-f0c1a7704b4304ab-json",
+          "Label cache-d9-verifier-f0c1a7704b4304ab-json"
+        ],
+        "sourceRefs": [
+          "local:.cache/d9-verifier/f0c1a7704b4304ab.json"
+        ],
+        "avgLineageScorePct": 36.36
+      },
+      {
+        "featureId": "feature:file:a103b6ecf69fe019e018389e",
+        "rowCount": 2,
+        "labels": [
+          "cache-d9-verifier-f27f74bd0b344af2-json",
+          "Label cache-d9-verifier-f27f74bd0b344af2-json"
+        ],
+        "sourceRefs": [
+          "local:.cache/d9-verifier/f27f74bd0b344af2.json"
+        ],
+        "avgLineageScorePct": 36.36
+      },
+      {
+        "featureId": "feature:file:2d292829df3e4a009b6c8fc6",
+        "rowCount": 2,
+        "labels": [
+          "cache-llm-synthesis-object-promise-json",
+          "Label cache-llm-synthesis-object-promise-json"
+        ],
+        "sourceRefs": [
+          "local:.cache/llm-synthesis/[object Promise].json"
+        ],
+        "avgLineageScorePct": 36.36
+      },
+      {
+        "featureId": "feature:file:e36671891bf6e4ceb77774db",
+        "rowCount": 2,
+        "labels": [
+          "claude-settings-local-json",
+          "Label claude-settings-local-json"
+        ],
+        "sourceRefs": [
+          "local:.claude/settings.local.json"
+        ],
+        "avgLineageScorePct": 36.36
+      },
+      {
+        "featureId": "feature:file:9036c2132d8f0f31202dd556",
+        "rowCount": 2,
+        "labels": [
+          "docker-build-package-lock-json",
+          "Label docker-build-package-lock-json"
+        ],
+        "sourceRefs": [
+          "local:.docker-build/package-lock.json"
+        ],
+        "avgLineageScorePct": 36.36
+      },
+      {
+        "featureId": "feature:file:feebaefb3d25c227463c88c5",
+        "rowCount": 2,
+        "labels": [
+          "docker-build-package-json",
+          "Label docker-build-package-json"
+        ],
+        "sourceRefs": [
+          "local:.docker-build/package.json"
+        ],
+        "avgLineageScorePct": 36.36
+      },
+      {
+        "featureId": "feature:file:d144f9a57e03df7dab715bfc",
+        "rowCount": 2,
+        "labels": [
+          "eslint-cache-json",
+          "Label eslint-cache-json"
+        ],
+        "sourceRefs": [
+          "local:.eslint-cache.json"
+        ],
+        "avgLineageScorePct": 36.36
+      },
+      {
+        "featureId": "feature:file:ad71adb69e81a236ff57fe53",
+        "rowCount": 2,
+        "labels": [
+          "opencode-config-patches-json",
+          "Label opencode-config-patches-json"
+        ],
+        "sourceRefs": [
+          "local:.opencode/config-patches.json"
+        ],
+        "avgLineageScorePct": 36.36
+      },
+      {
+        "featureId": "feature:file:da0961806327c6e8cf0b2acc",
+        "rowCount": 2,
+        "labels": [
+          "opencode-outcome-ledger-ndjson",
+          "Label opencode-outcome-ledger-ndjson"
+        ],
+        "sourceRefs": [
+          "local:.opencode/outcome-ledger.ndjson"
+        ],
+        "avgLineageScorePct": 36.36
+      },
+      {
+        "featureId": "feature:file:9f97d710cc64165591692177",
+        "rowCount": 2,
+        "labels": [
+          "opencode-package-lock-json",
+          "Label opencode-package-lock-json"
+        ],
+        "sourceRefs": [
+          "local:.opencode/package-lock.json"
+        ],
+        "avgLineageScorePct": 36.36
+      },
+      {
+        "featureId": "feature:file:a8d8b7db2cd59d7ae6fcb8c9",
+        "rowCount": 2,
+        "labels": [
+          "opencode-package-json",
+          "Label opencode-package-json"
+        ],
+        "sourceRefs": [
+          "local:.opencode/package.json"
+        ],
+        "avgLineageScorePct": 36.36
+      },
+      {
+        "featureId": "feature:file:a2c7a723a67e9d7cc510e511",
+        "rowCount": 2,
+        "labels": [
+          "port-allocation-json",
+          "Label port-allocation-json"
+        ],
+        "sourceRefs": [
+          "local:.port-allocation.json"
+        ],
+        "avgLineageScorePct": 36.36
+      },
+      {
+        "featureId": "feature:file:d760d083f2893052d3296241",
+        "rowCount": 2,
+        "labels": [
+          "tmp-tmp-db-upsert-report-dryrun-json",
+          "Label tmp-tmp-db-upsert-report-dryrun-json"
+        ],
+        "sourceRefs": [
+          "local:.tmp/.tmp/db_upsert_report.dryrun.json"
+        ],
+        "avgLineageScorePct": 36.36
+      },
+      {
+        "featureId": "feature:file:e60ff2080454da54e2b89c50",
+        "rowCount": 2,
+        "labels": [
+          "tmp-ace-packet-0530826d24087e7fc57b682e2c3e4f7f3e763b29f99c770e0645428774e6855e-",
+          "Label tmp-ace-packet-0530826d24087e7fc57b682e2c3e4f7f3e763b29f99c770e0645428774e6855e-"
+        ],
+        "sourceRefs": [
+          "local:.tmp/ace/packet-0530826d24087e7fc57b682e2c3e4f7f3e763b29f99c770e0645428774e6855e.json"
+        ],
+        "avgLineageScorePct": 36.36
+      },
+      {
+        "featureId": "feature:file:882dab01a702b7e18f609609",
+        "rowCount": 2,
+        "labels": [
+          "tmp-ace-packet-28a8adf4a4b229aa61df5e63532477b04b77442b94160ed5b31b13ae26fd5ca9-",
+          "Label tmp-ace-packet-28a8adf4a4b229aa61df5e63532477b04b77442b94160ed5b31b13ae26fd5ca9-"
+        ],
+        "sourceRefs": [
+          "local:.tmp/ace/packet-28a8adf4a4b229aa61df5e63532477b04b77442b94160ed5b31b13ae26fd5ca9.json"
+        ],
+        "avgLineageScorePct": 36.36
+      },
+      {
+        "featureId": "feature:file:56e2ac0a82902911a6759b15",
+        "rowCount": 2,
+        "labels": [
+          "tmp-ace-packet-3ca4e86dc7e1fc15410b6c11f819cc6eca79b05ec34dd423d416ba7a9c1a76e9-",
+          "Label tmp-ace-packet-3ca4e86dc7e1fc15410b6c11f819cc6eca79b05ec34dd423d416ba7a9c1a76e9-"
+        ],
+        "sourceRefs": [
+          "local:.tmp/ace/packet-3ca4e86dc7e1fc15410b6c11f819cc6eca79b05ec34dd423d416ba7a9c1a76e9.json"
+        ],
+        "avgLineageScorePct": 36.36
+      },
+      {
+        "featureId": "feature:file:0096877c8ea0f483b4469715",
+        "rowCount": 2,
+        "labels": [
+          "tmp-ace-packet-52ce38b07b52885e20f83afaee495920a3979f2339d2822236bb4ec86de8186e-",
+          "Label tmp-ace-packet-52ce38b07b52885e20f83afaee495920a3979f2339d2822236bb4ec86de8186e-"
+        ],
+        "sourceRefs": [
+          "local:.tmp/ace/packet-52ce38b07b52885e20f83afaee495920a3979f2339d2822236bb4ec86de8186e.json"
+        ],
+        "avgLineageScorePct": 36.36
+      },
+      {
+        "featureId": "feature:file:a5c4acea7c85e11d1c4d2aae",
+        "rowCount": 2,
+        "labels": [
+          "tmp-ace-packet-748183a3d3d0c3d2bbef320ae4a3ba16a7729360f283ed3d935494e0696ddca7-",
+          "Label tmp-ace-packet-748183a3d3d0c3d2bbef320ae4a3ba16a7729360f283ed3d935494e0696ddca7-"
+        ],
+        "sourceRefs": [
+          "local:.tmp/ace/packet-748183a3d3d0c3d2bbef320ae4a3ba16a7729360f283ed3d935494e0696ddca7.json"
+        ],
+        "avgLineageScorePct": 36.36
+      },
+      {
+        "featureId": "feature:file:cd8886797030c9396ca36cac",
+        "rowCount": 2,
+        "labels": [
+          "tmp-ace-packet-756c9e51a9ee9c74d7ff780a53e7a66bccf40c0cb0432a0d749e9f874a70f858-",
+          "Label tmp-ace-packet-756c9e51a9ee9c74d7ff780a53e7a66bccf40c0cb0432a0d749e9f874a70f858-"
+        ],
+        "sourceRefs": [
+          "local:.tmp/ace/packet-756c9e51a9ee9c74d7ff780a53e7a66bccf40c0cb0432a0d749e9f874a70f858.json"
+        ],
+        "avgLineageScorePct": 36.36
+      },
+      {
+        "featureId": "feature:file:1e5d3c4442903a92fd07c9b7",
+        "rowCount": 2,
+        "labels": [
+          "tmp-ace-packet-9d6d8dacd6715e45ac2417361a3b64ae3403ac142752d61020337fb08f06cc63-",
+          "Label tmp-ace-packet-9d6d8dacd6715e45ac2417361a3b64ae3403ac142752d61020337fb08f06cc63-"
+        ],
+        "sourceRefs": [
+          "local:.tmp/ace/packet-9d6d8dacd6715e45ac2417361a3b64ae3403ac142752d61020337fb08f06cc63.json"
+        ],
+        "avgLineageScorePct": 36.36
+      },
+      {
+        "featureId": "feature:file:eef09efabfb3e5bc6fd2cd57",
+        "rowCount": 2,
+        "labels": [
+          "tmp-ace-packet-ace4ab403730eee1a69e514c840581e1389f6eaa27c4622718619c74e3fa1c7e-",
+          "Label tmp-ace-packet-ace4ab403730eee1a69e514c840581e1389f6eaa27c4622718619c74e3fa1c7e-"
+        ],
+        "sourceRefs": [
+          "local:.tmp/ace/packet-ace4ab403730eee1a69e514c840581e1389f6eaa27c4622718619c74e3fa1c7e.json"
+        ],
+        "avgLineageScorePct": 36.36
+      },
+      {
+        "featureId": "feature:file:b5b52568da8337c13a3eaa2a",
+        "rowCount": 2,
+        "labels": [
+          "tmp-ace-startup-status-json",
+          "Label tmp-ace-startup-status-json"
+        ],
+        "sourceRefs": [
+          "local:.tmp/ace-startup-status.json"
+        ],
+        "avgLineageScorePct": 36.36
+      },
+      {
+        "featureId": "feature:file:8f158397122a5519722ee277",
+        "rowCount": 2,
+        "labels": [
+          "tmp-ace-top-retrieval-status-json",
+          "Label tmp-ace-top-retrieval-status-json"
+        ],
+        "sourceRefs": [
+          "local:.tmp/ace-top-retrieval-status.json"
+        ],
+        "avgLineageScorePct": 36.36
+      },
+      {
+        "featureId": "feature:file:ae52049279f61a1bf2d3d3d1",
+        "rowCount": 2,
+        "labels": [
+          "tmp-atlas-cartridge-seed-meta-json",
+          "Label tmp-atlas-cartridge-seed-meta-json"
+        ],
+        "sourceRefs": [
+          "local:.tmp/atlas-cartridge-seed-meta.json"
+        ],
+        "avgLineageScorePct": 36.36
+      },
+      {
+        "featureId": "feature:file:bbd9cf54e64442aa1eeb6485",
+        "rowCount": 2,
+        "labels": [
+          "tmp-atlas-cartridge-seeds-jsonl",
+          "Label tmp-atlas-cartridge-seeds-jsonl"
+        ],
+        "sourceRefs": [
+          "local:.tmp/atlas-cartridge-seeds.jsonl"
+        ],
+        "avgLineageScorePct": 36.36
+      },
+      {
+        "featureId": "feature:file:20800f1e76e0fae61c9649bb",
+        "rowCount": 2,
+        "labels": [
+          "tmp-atlas-retrieval-loop-jsonl",
+          "Label tmp-atlas-retrieval-loop-jsonl"
+        ],
+        "sourceRefs": [
+          "local:.tmp/atlas-retrieval-loop.jsonl"
+        ],
+        "avgLineageScorePct": 36.36
+      },
+      {
+        "featureId": "feature:file:67355e4959fa9126eecbd26f",
+        "rowCount": 2,
+        "labels": [
+          "tmp-audits-archive-latest-audit-summary-20260516-214014-json",
+          "Label tmp-audits-archive-latest-audit-summary-20260516-214014-json"
+        ],
+        "sourceRefs": [
+          "local:.tmp/audits/archive/latest-audit-summary-20260516-214014.json"
+        ],
+        "avgLineageScorePct": 36.36
+      },
+      {
+        "featureId": "feature:file:222493e62a0c4974e8f583a0",
+        "rowCount": 2,
+        "labels": [
+          "tmp-audits-archive-latest-audit-summary-20260516-214237-json",
+          "Label tmp-audits-archive-latest-audit-summary-20260516-214237-json"
+        ],
+        "sourceRefs": [
+          "local:.tmp/audits/archive/latest-audit-summary-20260516-214237.json"
+        ],
+        "avgLineageScorePct": 36.36
+      },
+      {
+        "featureId": "feature:file:eefe1df43dc01605ebccc2ae",
+        "rowCount": 2,
+        "labels": [
+          "tmp-audits-latest-audit-summary-json",
+          "Label tmp-audits-latest-audit-summary-json"
+        ],
+        "sourceRefs": [
+          "local:.tmp/audits/latest-audit-summary.json"
+        ],
+        "avgLineageScorePct": 36.36
+      }
+    ],
+    "sampleLineages": [
+      {
+        "sourceRef": "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:21",
+        "featureId": "feature:todo:1e95eb7b2c97aa52a6ec0308",
+        "featureLabels": [
+          "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+          "**Knowledge Graph Tool Lanes**"
+        ],
+        "path": "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:21",
+        "taskId": null,
+        "runId": null,
+        "somCluster": null,
+        "glyphRecord": null,
+        "qdrantHit": null,
+        "redisHotKey": null,
+        "neo4jNode": null,
+        "lineageScorePct": 36.36,
+        "missingHigherHopStages": [
+          "somCluster",
+          "glyphRecord",
+          "qdrantHit",
+          "redisHotKey",
+          "neo4jNode"
+        ]
+      },
+      {
+        "sourceRef": "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:22",
+        "featureId": "feature:todo:f831f8496459630481b6f126",
+        "featureLabels": [
+          "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+          "`attention_rank_files` — embed query → `attentionScoreGPU` via LibTorch → top-N from Karpathy scores"
+        ],
+        "path": "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:22",
+        "taskId": null,
+        "runId": null,
+        "somCluster": null,
+        "glyphRecord": null,
+        "qdrantHit": null,
+        "redisHotKey": null,
+        "neo4jNode": null,
+        "lineageScorePct": 36.36,
+        "missingHigherHopStages": [
+          "somCluster",
+          "glyphRecord",
+          "qdrantHit",
+          "redisHotKey",
+          "neo4jNode"
+        ]
+      },
+      {
+        "sourceRef": "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:23",
+        "featureId": "feature:todo:2aed3e03cc66e3e478a5479d",
+        "featureLabels": [
+          "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+          "`som_topology_stats` — delegate to `gpu:som_topology` for Redis SOM grid / centroid stats"
+        ],
+        "path": "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:23",
+        "taskId": null,
+        "runId": null,
+        "somCluster": null,
+        "glyphRecord": null,
+        "qdrantHit": null,
+        "redisHotKey": null,
+        "neo4jNode": null,
+        "lineageScorePct": 36.36,
+        "missingHigherHopStages": [
+          "somCluster",
+          "glyphRecord",
+          "qdrantHit",
+          "redisHotKey",
+          "neo4jNode"
+        ]
+      },
+      {
+        "sourceRef": "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:24",
+        "featureId": "feature:todo:a33b97f7501a9583a2e63c2b",
+        "featureLabels": [
+          "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+          "`language_distribution` — delegate to `gpu:language_distribution` for Qdrant cluster tag stats"
+        ],
+        "path": "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:24",
+        "taskId": null,
+        "runId": null,
+        "somCluster": null,
+        "glyphRecord": null,
+        "qdrantHit": null,
+        "redisHotKey": null,
+        "neo4jNode": null,
+        "lineageScorePct": 36.36,
+        "missingHigherHopStages": [
+          "somCluster",
+          "glyphRecord",
+          "qdrantHit",
+          "redisHotKey",
+          "neo4jNode"
+        ]
+      },
+      {
+        "sourceRef": "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:25",
+        "featureId": "feature:todo:322cf977b5fa41f902b9321b",
+        "featureLabels": [
+          "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+          "`playbook_lookup_by_language` — use CouchDB `karpathy_wiki` plus top Karpathy file intersection"
+        ],
+        "path": "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:25",
+        "taskId": null,
+        "runId": null,
+        "somCluster": null,
+        "glyphRecord": null,
+        "qdrantHit": null,
+        "redisHotKey": null,
+        "neo4jNode": null,
+        "lineageScorePct": 36.36,
+        "missingHigherHopStages": [
+          "somCluster",
+          "glyphRecord",
+          "qdrantHit",
+          "redisHotKey",
+          "neo4jNode"
+        ]
+      },
+      {
+        "sourceRef": "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:28",
+        "featureId": "feature:todo:4ced48dea132da38f2ab7305",
+        "featureLabels": [
+          "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+          "Route these tools into the correct skill families (`gpu-acceleration`, `vector-cluster`, `codebase`, `research`) without creating a parallel graph source of tru"
+        ],
+        "path": "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:28",
+        "taskId": null,
+        "runId": null,
+        "somCluster": null,
+        "glyphRecord": null,
+        "qdrantHit": null,
+        "redisHotKey": null,
+        "neo4jNode": null,
+        "lineageScorePct": 36.36,
+        "missingHigherHopStages": [
+          "somCluster",
+          "glyphRecord",
+          "qdrantHit",
+          "redisHotKey",
+          "neo4jNode"
+        ]
+      },
+      {
+        "sourceRef": "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:49",
+        "featureId": "feature:todo:a11f763c236417569484b3e7",
+        "featureLabels": [
+          "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+          "Clustering quality cleanup (deferred)"
+        ],
+        "path": "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:49",
+        "taskId": null,
+        "runId": null,
+        "somCluster": null,
+        "glyphRecord": null,
+        "qdrantHit": null,
+        "redisHotKey": null,
+        "neo4jNode": null,
+        "lineageScorePct": 36.36,
+        "missingHigherHopStages": [
+          "somCluster",
+          "glyphRecord",
+          "qdrantHit",
+          "redisHotKey",
+          "neo4jNode"
+        ]
+      },
+      {
+        "sourceRef": "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:55",
+        "featureId": "feature:todo:787ff44880ddd6be2d9388ce",
+        "featureLabels": [
+          "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+          "Wire into API routes (`/api/cases`, `/api/evidence/upload`) — deferred"
+        ],
+        "path": "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:55",
+        "taskId": null,
+        "runId": null,
+        "somCluster": null,
+        "glyphRecord": null,
+        "qdrantHit": null,
+        "redisHotKey": null,
+        "neo4jNode": null,
+        "lineageScorePct": 36.36,
+        "missingHigherHopStages": [
+          "somCluster",
+          "glyphRecord",
+          "qdrantHit",
+          "redisHotKey",
+          "neo4jNode"
+        ]
+      },
+      {
+        "sourceRef": "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:71",
+        "featureId": "feature:todo:7c0dbd56784529c16e1cb60e",
+        "featureLabels": [
+          "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+          "**Track C — Production Gap Remediation** (after DB audit)"
+        ],
+        "path": "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:71",
+        "taskId": null,
+        "runId": null,
+        "somCluster": null,
+        "glyphRecord": null,
+        "qdrantHit": null,
+        "redisHotKey": null,
+        "neo4jNode": null,
+        "lineageScorePct": 36.36,
+        "missingHigherHopStages": [
+          "somCluster",
+          "glyphRecord",
+          "qdrantHit",
+          "redisHotKey",
+          "neo4jNode"
+        ]
+      },
+      {
+        "sourceRef": "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:74",
+        "featureId": "feature:todo:4afa9ddc2a7b74e522364100",
+        "featureLabels": [
+          "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+          "Seed legal canon chunks (legal PDF ingest pipeline)"
+        ],
+        "path": "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:74",
+        "taskId": null,
+        "runId": null,
+        "somCluster": null,
+        "glyphRecord": null,
+        "qdrantHit": null,
+        "redisHotKey": null,
+        "neo4jNode": null,
+        "lineageScorePct": 36.36,
+        "missingHigherHopStages": [
+          "somCluster",
+          "glyphRecord",
+          "qdrantHit",
+          "redisHotKey",
+          "neo4jNode"
+        ]
+      },
+      {
+        "sourceRef": "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:75",
+        "featureId": "feature:todo:c3913a6ae582b02ec6366094",
+        "featureLabels": [
+          "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+          "Add Playwright test fixtures for auth + DB seeding"
+        ],
+        "path": "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:75",
+        "taskId": null,
+        "runId": null,
+        "somCluster": null,
+        "glyphRecord": null,
+        "qdrantHit": null,
+        "redisHotKey": null,
+        "neo4jNode": null,
+        "lineageScorePct": 36.36,
+        "missingHigherHopStages": [
+          "somCluster",
+          "glyphRecord",
+          "qdrantHit",
+          "redisHotKey",
+          "neo4jNode"
+        ]
+      },
+      {
+        "sourceRef": "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:80",
+        "featureId": "feature:todo:211e484d8c9f1b5087925e91",
+        "featureLabels": [
+          "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+          "Option 2: ClusterCard schema + Redis/Qdrant wiring + API route"
+        ],
+        "path": "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:80",
+        "taskId": null,
+        "runId": null,
+        "somCluster": null,
+        "glyphRecord": null,
+        "qdrantHit": null,
+        "redisHotKey": null,
+        "neo4jNode": null,
+        "lineageScorePct": 36.36,
+        "missingHigherHopStages": [
+          "somCluster",
+          "glyphRecord",
+          "qdrantHit",
+          "redisHotKey",
+          "neo4jNode"
+        ]
+      },
+      {
+        "sourceRef": "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:86",
+        "featureId": "feature:todo:f85f7b428819c0244985ab85",
+        "featureLabels": [
+          "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+          "Warm workspace-start plans"
+        ],
+        "path": "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:86",
+        "taskId": null,
+        "runId": null,
+        "somCluster": null,
+        "glyphRecord": null,
+        "qdrantHit": null,
+        "redisHotKey": null,
+        "neo4jNode": null,
+        "lineageScorePct": 36.36,
+        "missingHigherHopStages": [
+          "somCluster",
+          "glyphRecord",
+          "qdrantHit",
+          "redisHotKey",
+          "neo4jNode"
+        ]
+      },
+      {
+        "sourceRef": "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:87",
+        "featureId": "feature:todo:5855fc827e386a10b01a26db",
+        "featureLabels": [
+          "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+          "Warm legal/codebase summaries"
+        ],
+        "path": "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:87",
+        "taskId": null,
+        "runId": null,
+        "somCluster": null,
+        "glyphRecord": null,
+        "qdrantHit": null,
+        "redisHotKey": null,
+        "neo4jNode": null,
+        "lineageScorePct": 36.36,
+        "missingHigherHopStages": [
+          "somCluster",
+          "glyphRecord",
+          "qdrantHit",
+          "redisHotKey",
+          "neo4jNode"
+        ]
+      },
+      {
+        "sourceRef": "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:89",
+        "featureId": "feature:todo:132472e27f5f5116545a7ccf",
+        "featureLabels": [
+          "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+          "**Remaining Lower-Priority**"
+        ],
+        "path": "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:89",
+        "taskId": null,
+        "runId": null,
+        "somCluster": null,
+        "glyphRecord": null,
+        "qdrantHit": null,
+        "redisHotKey": null,
+        "neo4jNode": null,
+        "lineageScorePct": 36.36,
+        "missingHigherHopStages": [
+          "somCluster",
+          "glyphRecord",
+          "qdrantHit",
+          "redisHotKey",
+          "neo4jNode"
+        ]
+      },
+      {
+        "sourceRef": "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:90",
+        "featureId": "feature:todo:dc13d165afeb65f00c87fe15",
+        "featureLabels": [
+          "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+          "Track 1: .env audit + dead-config archival"
+        ],
+        "path": "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:90",
+        "taskId": null,
+        "runId": null,
+        "somCluster": null,
+        "glyphRecord": null,
+        "qdrantHit": null,
+        "redisHotKey": null,
+        "neo4jNode": null,
+        "lineageScorePct": 36.36,
+        "missingHigherHopStages": [
+          "somCluster",
+          "glyphRecord",
+          "qdrantHit",
+          "redisHotKey",
+          "neo4jNode"
+        ]
+      },
+      {
+        "sourceRef": "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:91",
+        "featureId": "feature:todo:9289019adf7d2721550af764",
+        "featureLabels": [
+          "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+          "Track 2: Docker CPU limits + Caddy memory bump"
+        ],
+        "path": "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:91",
+        "taskId": null,
+        "runId": null,
+        "somCluster": null,
+        "glyphRecord": null,
+        "qdrantHit": null,
+        "redisHotKey": null,
+        "neo4jNode": null,
+        "lineageScorePct": 36.36,
+        "missingHigherHopStages": [
+          "somCluster",
+          "glyphRecord",
+          "qdrantHit",
+          "redisHotKey",
+          "neo4jNode"
+        ]
+      },
+      {
+        "sourceRef": "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:93",
+        "featureId": "feature:todo:d8d7affddeaa909af27f7d69",
+        "featureLabels": [
+          "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+          "Track 5C–5E: Model/GGUF cleanup"
+        ],
+        "path": "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:93",
+        "taskId": null,
+        "runId": null,
+        "somCluster": null,
+        "glyphRecord": null,
+        "qdrantHit": null,
+        "redisHotKey": null,
+        "neo4jNode": null,
+        "lineageScorePct": 36.36,
+        "missingHigherHopStages": [
+          "somCluster",
+          "glyphRecord",
+          "qdrantHit",
+          "redisHotKey",
+          "neo4jNode"
+        ]
+      },
+      {
+        "sourceRef": "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:234",
+        "featureId": "feature:todo:24b4111ad0e1777784a9bd1a",
+        "featureLabels": [
+          "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+          "Feature cluster grouping by `sourceRef` prefix"
+        ],
+        "path": "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:234",
+        "taskId": null,
+        "runId": null,
+        "somCluster": null,
+        "glyphRecord": null,
+        "qdrantHit": null,
+        "redisHotKey": null,
+        "neo4jNode": null,
+        "lineageScorePct": 36.36,
+        "missingHigherHopStages": [
+          "somCluster",
+          "glyphRecord",
+          "qdrantHit",
+          "redisHotKey",
+          "neo4jNode"
+        ]
+      },
+      {
+        "sourceRef": "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:235",
+        "featureId": "feature:todo:af15f2f3c8d9e6c470e05b29",
+        "featureLabels": [
+          "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+          "Stale feature detection (atlas entry exists, no recent git touch)"
+        ],
+        "path": "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:235",
+        "taskId": null,
+        "runId": null,
+        "somCluster": null,
+        "glyphRecord": null,
+        "qdrantHit": null,
+        "redisHotKey": null,
+        "neo4jNode": null,
+        "lineageScorePct": 36.36,
+        "missingHigherHopStages": [
+          "somCluster",
+          "glyphRecord",
+          "qdrantHit",
+          "redisHotKey",
+          "neo4jNode"
+        ]
+      },
+      {
+        "sourceRef": "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:236",
+        "featureId": "feature:todo:c3dab502e86cc90f236e9a48",
+        "featureLabels": [
+          "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+          "Duplicate system detection (two scripts/routes with overlapping sourceRefs)"
+        ],
+        "path": "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:236",
+        "taskId": null,
+        "runId": null,
+        "somCluster": null,
+        "glyphRecord": null,
+        "qdrantHit": null,
+        "redisHotKey": null,
+        "neo4jNode": null,
+        "lineageScorePct": 36.36,
+        "missingHigherHopStages": [
+          "somCluster",
+          "glyphRecord",
+          "qdrantHit",
+          "redisHotKey",
+          "neo4jNode"
+        ]
+      },
+      {
+        "sourceRef": ".opencode/recommendations.json",
+        "featureId": "feature:todo:fadfc0e985f4f0e151eaf542",
+        "featureLabels": [
+          "opencode-recommendations-json",
+          "Optional mirror only: export aliases to `.opencode/recommendations.json` + `.opencode/recommendations-summary.md` if a flat compatibility surface is still requi"
+        ],
+        "path": ".opencode/recommendations.json",
+        "taskId": null,
+        "runId": null,
+        "somCluster": null,
+        "glyphRecord": null,
+        "qdrantHit": null,
+        "redisHotKey": null,
+        "neo4jNode": null,
+        "lineageScorePct": 36.36,
+        "missingHigherHopStages": [
+          "somCluster",
+          "glyphRecord",
+          "qdrantHit",
+          "redisHotKey",
+          "neo4jNode"
+        ]
+      },
+      {
+        "sourceRef": "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:243",
+        "featureId": "feature:todo:6ad7088a53bb671d7863d642",
+        "featureLabels": [
+          "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+          "Retrieval hook inventory for Phase 11E:"
+        ],
+        "path": "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:243",
+        "taskId": null,
+        "runId": null,
+        "somCluster": null,
+        "glyphRecord": null,
+        "qdrantHit": null,
+        "redisHotKey": null,
+        "neo4jNode": null,
+        "lineageScorePct": 36.36,
+        "missingHigherHopStages": [
+          "somCluster",
+          "glyphRecord",
+          "qdrantHit",
+          "redisHotKey",
+          "neo4jNode"
+        ]
+      },
+      {
+        "sourceRef": "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:259",
+        "featureId": "feature:todo:0d3ab6734e763f3f7697cfc0",
+        "featureLabels": [
+          "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+          "Wire `QueryRouter4x4` into `fetchACPKnowledgeResults` so retrieval can explore dynamically instead of using fixed lane defaults."
+        ],
+        "path": "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:259",
+        "taskId": null,
+        "runId": null,
+        "somCluster": null,
+        "glyphRecord": null,
+        "qdrantHit": null,
+        "redisHotKey": null,
+        "neo4jNode": null,
+        "lineageScorePct": 36.36,
+        "missingHigherHopStages": [
+          "somCluster",
+          "glyphRecord",
+          "qdrantHit",
+          "redisHotKey",
+          "neo4jNode"
+        ]
+      },
+      {
+        "sourceRef": "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:260",
+        "featureId": "feature:todo:4f67c0fab5bbbbbd33051d65",
+        "featureLabels": [
+          "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+          "Add adaptive Hebbian adjustments to `ace:router:matrix` based on observed chunk hits and retrieval outcomes."
+        ],
+        "path": "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:260",
+        "taskId": null,
+        "runId": null,
+        "somCluster": null,
+        "glyphRecord": null,
+        "qdrantHit": null,
+        "redisHotKey": null,
+        "neo4jNode": null,
+        "lineageScorePct": 36.36,
+        "missingHigherHopStages": [
+          "somCluster",
+          "glyphRecord",
+          "qdrantHit",
+          "redisHotKey",
+          "neo4jNode"
+        ]
+      },
+      {
+        "sourceRef": "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:261",
+        "featureId": "feature:todo:f93d30a30e773e2e83395aca",
+        "featureLabels": [
+          "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+          "Configure `gemma3-270m.gguf` draft-model support in TurboQuant for CPU-assisted speculative token validation."
+        ],
+        "path": "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:261",
+        "taskId": null,
+        "runId": null,
+        "somCluster": null,
+        "glyphRecord": null,
+        "qdrantHit": null,
+        "redisHotKey": null,
+        "neo4jNode": null,
+        "lineageScorePct": 36.36,
+        "missingHigherHopStages": [
+          "somCluster",
+          "glyphRecord",
+          "qdrantHit",
+          "redisHotKey",
+          "neo4jNode"
+        ]
+      },
+      {
+        "sourceRef": "src/lib/server/features/ai/ace/context-assembler.ts",
+        "featureId": "feature:todo:783118149f85dbce6bf6dd2a",
+        "featureLabels": [
+          "src-lib-server-features-ai-ace-context-assembler-ts",
+          "Preserve the existing router/cache path in `src/lib/server/features/ai/ace/context-assembler.ts`; this is an extension lane, not a rewrite."
+        ],
+        "path": "src/lib/server/features/ai/ace/context-assembler.ts",
+        "taskId": null,
+        "runId": null,
+        "somCluster": null,
+        "glyphRecord": null,
+        "qdrantHit": null,
+        "redisHotKey": null,
+        "neo4jNode": null,
+        "lineageScorePct": 36.36,
+        "missingHigherHopStages": [
+          "somCluster",
+          "glyphRecord",
+          "qdrantHit",
+          "redisHotKey",
+          "neo4jNode"
+        ]
+      },
+      {
+        "sourceRef": "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:263",
+        "featureId": "feature:todo:9ffab6bc4b9cd644239758c2",
+        "featureLabels": [
+          "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+          "Document the live 4x4 router matrix location and usage:"
+        ],
+        "path": "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:263",
+        "taskId": null,
+        "runId": null,
+        "somCluster": null,
+        "glyphRecord": null,
+        "qdrantHit": null,
+        "redisHotKey": null,
+        "neo4jNode": null,
+        "lineageScorePct": 36.36,
+        "missingHigherHopStages": [
+          "somCluster",
+          "glyphRecord",
+          "qdrantHit",
+          "redisHotKey",
+          "neo4jNode"
+        ]
+      },
+      {
+        "sourceRef": "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:278",
+        "featureId": "feature:todo:2ace876ba56f2c0753161f4b",
+        "featureLabels": [
+          "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+          "Create `schema-encoder.wgsl` for client-side reranking of documents."
+        ],
+        "path": "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:278",
+        "taskId": null,
+        "runId": null,
+        "somCluster": null,
+        "glyphRecord": null,
+        "qdrantHit": null,
+        "redisHotKey": null,
+        "neo4jNode": null,
+        "lineageScorePct": 36.36,
+        "missingHigherHopStages": [
+          "somCluster",
+          "glyphRecord",
+          "qdrantHit",
+          "redisHotKey",
+          "neo4jNode"
+        ]
+      },
+      {
+        "sourceRef": "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:279",
+        "featureId": "feature:todo:580c60d78636e391070bd061",
+        "featureLabels": [
+          "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+          "Establish SharedArrayBuffer zero-copy structures for Web Worker communication."
+        ],
+        "path": "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:279",
+        "taskId": null,
+        "runId": null,
+        "somCluster": null,
+        "glyphRecord": null,
+        "qdrantHit": null,
+        "redisHotKey": null,
+        "neo4jNode": null,
+        "lineageScorePct": 36.36,
+        "missingHigherHopStages": [
+          "somCluster",
+          "glyphRecord",
+          "qdrantHit",
+          "redisHotKey",
+          "neo4jNode"
+        ]
+      },
+      {
+        "sourceRef": "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:280",
+        "featureId": "feature:todo:039e09ca423789739c8c42c5",
+        "featureLabels": [
+          "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+          "Implement IndexedDB caching of ONNX models and WebGPU weights inside the Service Worker."
+        ],
+        "path": "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:280",
+        "taskId": null,
+        "runId": null,
+        "somCluster": null,
+        "glyphRecord": null,
+        "qdrantHit": null,
+        "redisHotKey": null,
+        "neo4jNode": null,
+        "lineageScorePct": 36.36,
+        "missingHigherHopStages": [
+          "somCluster",
+          "glyphRecord",
+          "qdrantHit",
+          "redisHotKey",
+          "neo4jNode"
+        ]
+      },
+      {
+        "sourceRef": "src/service-worker.ts",
+        "featureId": "feature:todo:c32b8055c5900f49a4919f9c",
+        "featureLabels": [
+          "src-service-worker-ts",
+          "Preserve the existing WebGPU/SW foundation in `src/service-worker.ts`, `src/lib/workers/compute-worker.mjs`, and related browser guards; this is a productizatio"
+        ],
+        "path": "src/service-worker.ts",
+        "taskId": null,
+        "runId": null,
+        "somCluster": null,
+        "glyphRecord": null,
+        "qdrantHit": null,
+        "redisHotKey": null,
+        "neo4jNode": null,
+        "lineageScorePct": 36.36,
+        "missingHigherHopStages": [
+          "somCluster",
+          "glyphRecord",
+          "qdrantHit",
+          "redisHotKey",
+          "neo4jNode"
+        ]
+      },
+      {
+        "sourceRef": "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:290",
+        "featureId": "feature:todo:002df24db7233c4b96982982",
+        "featureLabels": [
+          "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+          "Option 2: ClusterCard schema + Redis/Qdrant wiring + API route"
+        ],
+        "path": "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:290",
+        "taskId": null,
+        "runId": null,
+        "somCluster": null,
+        "glyphRecord": null,
+        "qdrantHit": null,
+        "redisHotKey": null,
+        "neo4jNode": null,
+        "lineageScorePct": 36.36,
+        "missingHigherHopStages": [
+          "somCluster",
+          "glyphRecord",
+          "qdrantHit",
+          "redisHotKey",
+          "neo4jNode"
+        ]
+      },
+      {
+        "sourceRef": "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:291",
+        "featureId": "feature:todo:86ddf5ba1247b00bd1f4e72b",
+        "featureLabels": [
+          "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+          "Thread `alias_id` through the prompt listener log entries as a stable cross-store alias field"
+        ],
+        "path": "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:291",
+        "taskId": null,
+        "runId": null,
+        "somCluster": null,
+        "glyphRecord": null,
+        "qdrantHit": null,
+        "redisHotKey": null,
+        "neo4jNode": null,
+        "lineageScorePct": 36.36,
+        "missingHigherHopStages": [
+          "somCluster",
+          "glyphRecord",
+          "qdrantHit",
+          "redisHotKey",
+          "neo4jNode"
+        ]
+      },
+      {
+        "sourceRef": "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:292",
+        "featureId": "feature:todo:63f45279017c8d6d13ef35c9",
+        "featureLabels": [
+          "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+          "Add retrieval-loop sourceRef/feature_id/alias_id reconciliation into the prompt listener and recommendation score fusion path"
+        ],
+        "path": "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:292",
+        "taskId": null,
+        "runId": null,
+        "somCluster": null,
+        "glyphRecord": null,
+        "qdrantHit": null,
+        "redisHotKey": null,
+        "neo4jNode": null,
+        "lineageScorePct": 36.36,
+        "missingHigherHopStages": [
+          "somCluster",
+          "glyphRecord",
+          "qdrantHit",
+          "redisHotKey",
+          "neo4jNode"
+        ]
+      },
+      {
+        "sourceRef": ".opencode/recommendations.json",
+        "featureId": "feature:todo:fadfc0e985f4f0e151eaf542",
+        "featureLabels": [
+          "opencode-recommendations-json",
+          "Optional mirror only: export aliases to `.opencode/recommendations.json` + `.opencode/recommendations-summary.md` if a flat compatibility surface is still requi"
+        ],
+        "path": ".opencode/recommendations.json",
+        "taskId": null,
+        "runId": null,
+        "somCluster": null,
+        "glyphRecord": null,
+        "qdrantHit": null,
+        "redisHotKey": null,
+        "neo4jNode": null,
+        "lineageScorePct": 36.36,
+        "missingHigherHopStages": [
+          "somCluster",
+          "glyphRecord",
+          "qdrantHit",
+          "redisHotKey",
+          "neo4jNode"
+        ]
+      },
+      {
+        "sourceRef": "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:299",
+        "featureId": "feature:todo:f5ffd5e75b0e0ea6ae82d22f",
+        "featureLabels": [
+          "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+          "Upgrade Phase 17 PyTorch Feature Extractor script and Python implementation with robust fallbacks and correct schema"
+        ],
+        "path": "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:299",
+        "taskId": null,
+        "runId": null,
+        "somCluster": null,
+        "glyphRecord": null,
+        "qdrantHit": null,
+        "redisHotKey": null,
+        "neo4jNode": null,
+        "lineageScorePct": 36.36,
+        "missingHigherHopStages": [
+          "somCluster",
+          "glyphRecord",
+          "qdrantHit",
+          "redisHotKey",
+          "neo4jNode"
+        ]
+      },
+      {
+        "sourceRef": "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:300",
+        "featureId": "feature:todo:1c1c05a2ad42be0af8be0757",
+        "featureLabels": [
+          "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+          "Upgrade Phase 18 XGBoost Reranker script and Python implementation with robust fallbacks and correct schema"
+        ],
+        "path": "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:300",
+        "taskId": null,
+        "runId": null,
+        "somCluster": null,
+        "glyphRecord": null,
+        "qdrantHit": null,
+        "redisHotKey": null,
+        "neo4jNode": null,
+        "lineageScorePct": 36.36,
+        "missingHigherHopStages": [
+          "somCluster",
+          "glyphRecord",
+          "qdrantHit",
+          "redisHotKey",
+          "neo4jNode"
+        ]
+      },
+      {
+        "sourceRef": "scripts/atlas/phase-lane-completion.mjs",
+        "featureId": "feature:todo:9776801fc047158c169943dd",
+        "featureLabels": [
+          "scripts-atlas-phase-lane-completion-mjs",
+          "Implement Phase 19 lane completion hook (`scripts/atlas/phase-lane-completion.mjs`)"
+        ],
+        "path": "scripts/atlas/phase-lane-completion.mjs",
+        "taskId": null,
+        "runId": null,
+        "somCluster": null,
+        "glyphRecord": null,
+        "qdrantHit": null,
+        "redisHotKey": null,
+        "neo4jNode": null,
+        "lineageScorePct": 36.36,
+        "missingHigherHopStages": [
+          "somCluster",
+          "glyphRecord",
+          "qdrantHit",
+          "redisHotKey",
+          "neo4jNode"
+        ]
+      },
+      {
+        "sourceRef": "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:312",
+        "featureId": "feature:todo:0255cb3ad2d2cf33a3f9450c",
+        "featureLabels": [
+          "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+          "Wire `ast-grep` into the directory analysis pipeline for codebase pruning."
+        ],
+        "path": "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:312",
+        "taskId": null,
+        "runId": null,
+        "somCluster": null,
+        "glyphRecord": null,
+        "qdrantHit": null,
+        "redisHotKey": null,
+        "neo4jNode": null,
+        "lineageScorePct": 36.36,
+        "missingHigherHopStages": [
+          "somCluster",
+          "glyphRecord",
+          "qdrantHit",
+          "redisHotKey",
+          "neo4jNode"
+        ]
+      }
+    ]
+  }
+}

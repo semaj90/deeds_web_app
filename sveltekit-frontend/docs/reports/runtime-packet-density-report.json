@@ -1,0 +1,945 @@
+{
+  "generatedAt": "2026-06-05T16:18:46.443Z",
+  "mode": "dry-run",
+  "summary": {
+    "totalAnalyzed": 33,
+    "lowDensityCount": 0,
+    "optimalCount": 32,
+    "emptyPointersCount": 1,
+    "avgHydrationRatio": "88.38%",
+    "missingFieldsTally": {
+      "somCluster": 32,
+      "glyphRecord": 33,
+      "neo4jNode": 33,
+      "rankedCards": 33,
+      "parentAtlasDocuments": 23,
+      "sourceRefs": 3,
+      "featureIds": 3,
+      "qdrantHits": 1,
+      "redisKeys": 1
+    }
+  },
+  "details": [
+    {
+      "packetId": "33",
+      "counts": {
+        "sourceRefs": 2,
+        "featureIds": 2,
+        "qdrantHits": 8,
+        "redisKeys": 1,
+        "parentAtlasDocuments": 1,
+        "somCluster": 0,
+        "glyphRecord": 0,
+        "neo4jNode": 0,
+        "rankedCards": 0
+      },
+      "byteMetrics": {
+        "packetBytes": 559,
+        "semanticBytes": 492
+      },
+      "densityScore": "88.01%",
+      "classification": "optimal",
+      "missingFields": [
+        "somCluster",
+        "glyphRecord",
+        "neo4jNode",
+        "rankedCards"
+      ],
+      "suggestedRepair": "None"
+    },
+    {
+      "packetId": "32",
+      "counts": {
+        "sourceRefs": 2,
+        "featureIds": 2,
+        "qdrantHits": 8,
+        "redisKeys": 1,
+        "parentAtlasDocuments": 1,
+        "somCluster": 0,
+        "glyphRecord": 0,
+        "neo4jNode": 0,
+        "rankedCards": 0
+      },
+      "byteMetrics": {
+        "packetBytes": 575,
+        "semanticBytes": 508
+      },
+      "densityScore": "88.35%",
+      "classification": "optimal",
+      "missingFields": [
+        "somCluster",
+        "glyphRecord",
+        "neo4jNode",
+        "rankedCards"
+      ],
+      "suggestedRepair": "None"
+    },
+    {
+      "packetId": "31",
+      "counts": {
+        "sourceRefs": 5,
+        "featureIds": 5,
+        "qdrantHits": 8,
+        "redisKeys": 1,
+        "parentAtlasDocuments": 0,
+        "somCluster": 0,
+        "glyphRecord": 0,
+        "neo4jNode": 0,
+        "rankedCards": 0
+      },
+      "byteMetrics": {
+        "packetBytes": 740,
+        "semanticBytes": 673
+      },
+      "densityScore": "90.95%",
+      "classification": "optimal",
+      "missingFields": [
+        "parentAtlasDocuments",
+        "somCluster",
+        "glyphRecord",
+        "neo4jNode",
+        "rankedCards"
+      ],
+      "suggestedRepair": "None"
+    },
+    {
+      "packetId": "30",
+      "counts": {
+        "sourceRefs": 3,
+        "featureIds": 3,
+        "qdrantHits": 8,
+        "redisKeys": 1,
+        "parentAtlasDocuments": 1,
+        "somCluster": 0,
+        "glyphRecord": 0,
+        "neo4jNode": 0,
+        "rankedCards": 0
+      },
+      "byteMetrics": {
+        "packetBytes": 631,
+        "semanticBytes": 564
+      },
+      "densityScore": "89.38%",
+      "classification": "optimal",
+      "missingFields": [
+        "somCluster",
+        "glyphRecord",
+        "neo4jNode",
+        "rankedCards"
+      ],
+      "suggestedRepair": "None"
+    },
+    {
+      "packetId": "29",
+      "counts": {
+        "sourceRefs": 1,
+        "featureIds": 1,
+        "qdrantHits": 8,
+        "redisKeys": 1,
+        "parentAtlasDocuments": 1,
+        "somCluster": 0,
+        "glyphRecord": 0,
+        "neo4jNode": 0,
+        "rankedCards": 0
+      },
+      "byteMetrics": {
+        "packetBytes": 502,
+        "semanticBytes": 435
+      },
+      "densityScore": "86.65%",
+      "classification": "optimal",
+      "missingFields": [
+        "somCluster",
+        "glyphRecord",
+        "neo4jNode",
+        "rankedCards"
+      ],
+      "suggestedRepair": "None"
+    },
+    {
+      "packetId": "28",
+      "counts": {
+        "sourceRefs": 4,
+        "featureIds": 4,
+        "qdrantHits": 8,
+        "redisKeys": 1,
+        "parentAtlasDocuments": 0,
+        "somCluster": 0,
+        "glyphRecord": 0,
+        "neo4jNode": 0,
+        "rankedCards": 0
+      },
+      "byteMetrics": {
+        "packetBytes": 707,
+        "semanticBytes": 640
+      },
+      "densityScore": "90.52%",
+      "classification": "optimal",
+      "missingFields": [
+        "parentAtlasDocuments",
+        "somCluster",
+        "glyphRecord",
+        "neo4jNode",
+        "rankedCards"
+      ],
+      "suggestedRepair": "None"
+    },
+    {
+      "packetId": "27",
+      "counts": {
+        "sourceRefs": 3,
+        "featureIds": 3,
+        "qdrantHits": 8,
+        "redisKeys": 1,
+        "parentAtlasDocuments": 0,
+        "somCluster": 0,
+        "glyphRecord": 0,
+        "neo4jNode": 0,
+        "rankedCards": 0
+      },
+      "byteMetrics": {
+        "packetBytes": 634,
+        "semanticBytes": 567
+      },
+      "densityScore": "89.43%",
+      "classification": "optimal",
+      "missingFields": [
+        "parentAtlasDocuments",
+        "somCluster",
+        "glyphRecord",
+        "neo4jNode",
+        "rankedCards"
+      ],
+      "suggestedRepair": "None"
+    },
+    {
+      "packetId": "26",
+      "counts": {
+        "sourceRefs": 2,
+        "featureIds": 2,
+        "qdrantHits": 8,
+        "redisKeys": 1,
+        "parentAtlasDocuments": 1,
+        "somCluster": 0,
+        "glyphRecord": 0,
+        "neo4jNode": 0,
+        "rankedCards": 0
+      },
+      "byteMetrics": {
+        "packetBytes": 557,
+        "semanticBytes": 490
+      },
+      "densityScore": "87.97%",
+      "classification": "optimal",
+      "missingFields": [
+        "somCluster",
+        "glyphRecord",
+        "neo4jNode",
+        "rankedCards"
+      ],
+      "suggestedRepair": "None"
+    },
+    {
+      "packetId": "25",
+      "counts": {
+        "sourceRefs": 1,
+        "featureIds": 1,
+        "qdrantHits": 8,
+        "redisKeys": 1,
+        "parentAtlasDocuments": 1,
+        "somCluster": 0,
+        "glyphRecord": 0,
+        "neo4jNode": 0,
+        "rankedCards": 0
+      },
+      "byteMetrics": {
+        "packetBytes": 509,
+        "semanticBytes": 442
+      },
+      "densityScore": "86.84%",
+      "classification": "optimal",
+      "missingFields": [
+        "somCluster",
+        "glyphRecord",
+        "neo4jNode",
+        "rankedCards"
+      ],
+      "suggestedRepair": "None"
+    },
+    {
+      "packetId": "24",
+      "counts": {
+        "sourceRefs": 4,
+        "featureIds": 4,
+        "qdrantHits": 8,
+        "redisKeys": 1,
+        "parentAtlasDocuments": 0,
+        "somCluster": 0,
+        "glyphRecord": 0,
+        "neo4jNode": 0,
+        "rankedCards": 0
+      },
+      "byteMetrics": {
+        "packetBytes": 707,
+        "semanticBytes": 640
+      },
+      "densityScore": "90.52%",
+      "classification": "optimal",
+      "missingFields": [
+        "parentAtlasDocuments",
+        "somCluster",
+        "glyphRecord",
+        "neo4jNode",
+        "rankedCards"
+      ],
+      "suggestedRepair": "None"
+    },
+    {
+      "packetId": "23",
+      "counts": {
+        "sourceRefs": 4,
+        "featureIds": 4,
+        "qdrantHits": 8,
+        "redisKeys": 1,
+        "parentAtlasDocuments": 0,
+        "somCluster": 0,
+        "glyphRecord": 0,
+        "neo4jNode": 0,
+        "rankedCards": 0
+      },
+      "byteMetrics": {
+        "packetBytes": 707,
+        "semanticBytes": 640
+      },
+      "densityScore": "90.52%",
+      "classification": "optimal",
+      "missingFields": [
+        "parentAtlasDocuments",
+        "somCluster",
+        "glyphRecord",
+        "neo4jNode",
+        "rankedCards"
+      ],
+      "suggestedRepair": "None"
+    },
+    {
+      "packetId": "22",
+      "counts": {
+        "sourceRefs": 1,
+        "featureIds": 1,
+        "qdrantHits": 8,
+        "redisKeys": 1,
+        "parentAtlasDocuments": 1,
+        "somCluster": 0,
+        "glyphRecord": 0,
+        "neo4jNode": 0,
+        "rankedCards": 0
+      },
+      "byteMetrics": {
+        "packetBytes": 509,
+        "semanticBytes": 442
+      },
+      "densityScore": "86.84%",
+      "classification": "optimal",
+      "missingFields": [
+        "somCluster",
+        "glyphRecord",
+        "neo4jNode",
+        "rankedCards"
+      ],
+      "suggestedRepair": "None"
+    },
+    {
+      "packetId": "21",
+      "counts": {
+        "sourceRefs": 2,
+        "featureIds": 2,
+        "qdrantHits": 8,
+        "redisKeys": 1,
+        "parentAtlasDocuments": 1,
+        "somCluster": 0,
+        "glyphRecord": 0,
+        "neo4jNode": 0,
+        "rankedCards": 0
+      },
+      "byteMetrics": {
+        "packetBytes": 557,
+        "semanticBytes": 490
+      },
+      "densityScore": "87.97%",
+      "classification": "optimal",
+      "missingFields": [
+        "somCluster",
+        "glyphRecord",
+        "neo4jNode",
+        "rankedCards"
+      ],
+      "suggestedRepair": "None"
+    },
+    {
+      "packetId": "20",
+      "counts": {
+        "sourceRefs": 3,
+        "featureIds": 3,
+        "qdrantHits": 8,
+        "redisKeys": 1,
+        "parentAtlasDocuments": 0,
+        "somCluster": 0,
+        "glyphRecord": 0,
+        "neo4jNode": 0,
+        "rankedCards": 0
+      },
+      "byteMetrics": {
+        "packetBytes": 633,
+        "semanticBytes": 566
+      },
+      "densityScore": "89.42%",
+      "classification": "optimal",
+      "missingFields": [
+        "parentAtlasDocuments",
+        "somCluster",
+        "glyphRecord",
+        "neo4jNode",
+        "rankedCards"
+      ],
+      "suggestedRepair": "None"
+    },
+    {
+      "packetId": "19",
+      "counts": {
+        "sourceRefs": 2,
+        "featureIds": 2,
+        "qdrantHits": 8,
+        "redisKeys": 1,
+        "parentAtlasDocuments": 1,
+        "somCluster": 0,
+        "glyphRecord": 0,
+        "neo4jNode": 0,
+        "rankedCards": 0
+      },
+      "byteMetrics": {
+        "packetBytes": 557,
+        "semanticBytes": 490
+      },
+      "densityScore": "87.97%",
+      "classification": "optimal",
+      "missingFields": [
+        "somCluster",
+        "glyphRecord",
+        "neo4jNode",
+        "rankedCards"
+      ],
+      "suggestedRepair": "None"
+    },
+    {
+      "packetId": "18",
+      "counts": {
+        "sourceRefs": 3,
+        "featureIds": 3,
+        "qdrantHits": 8,
+        "redisKeys": 1,
+        "parentAtlasDocuments": 2,
+        "somCluster": 0,
+        "glyphRecord": 0,
+        "neo4jNode": 0,
+        "rankedCards": 0
+      },
+      "byteMetrics": {
+        "packetBytes": 622,
+        "semanticBytes": 555
+      },
+      "densityScore": "89.23%",
+      "classification": "optimal",
+      "missingFields": [
+        "somCluster",
+        "glyphRecord",
+        "neo4jNode",
+        "rankedCards"
+      ],
+      "suggestedRepair": "None"
+    },
+    {
+      "packetId": "17",
+      "counts": {
+        "sourceRefs": 4,
+        "featureIds": 4,
+        "qdrantHits": 8,
+        "redisKeys": 1,
+        "parentAtlasDocuments": 0,
+        "somCluster": 0,
+        "glyphRecord": 0,
+        "neo4jNode": 0,
+        "rankedCards": 0
+      },
+      "byteMetrics": {
+        "packetBytes": 707,
+        "semanticBytes": 640
+      },
+      "densityScore": "90.52%",
+      "classification": "optimal",
+      "missingFields": [
+        "parentAtlasDocuments",
+        "somCluster",
+        "glyphRecord",
+        "neo4jNode",
+        "rankedCards"
+      ],
+      "suggestedRepair": "None"
+    },
+    {
+      "packetId": "16",
+      "counts": {
+        "sourceRefs": 0,
+        "featureIds": 0,
+        "qdrantHits": 8,
+        "redisKeys": 1,
+        "parentAtlasDocuments": 0,
+        "somCluster": 0,
+        "glyphRecord": 0,
+        "neo4jNode": 0,
+        "rankedCards": 0
+      },
+      "byteMetrics": {
+        "packetBytes": 466,
+        "semanticBytes": 399
+      },
+      "densityScore": "85.62%",
+      "classification": "optimal",
+      "missingFields": [
+        "sourceRefs",
+        "featureIds",
+        "parentAtlasDocuments",
+        "somCluster",
+        "glyphRecord",
+        "neo4jNode",
+        "rankedCards"
+      ],
+      "suggestedRepair": "None"
+    },
+    {
+      "packetId": "15",
+      "counts": {
+        "sourceRefs": 1,
+        "featureIds": 1,
+        "qdrantHits": 8,
+        "redisKeys": 1,
+        "parentAtlasDocuments": 0,
+        "somCluster": 0,
+        "glyphRecord": 0,
+        "neo4jNode": 0,
+        "rankedCards": 0
+      },
+      "byteMetrics": {
+        "packetBytes": 476,
+        "semanticBytes": 409
+      },
+      "densityScore": "85.92%",
+      "classification": "optimal",
+      "missingFields": [
+        "parentAtlasDocuments",
+        "somCluster",
+        "glyphRecord",
+        "neo4jNode",
+        "rankedCards"
+      ],
+      "suggestedRepair": "None"
+    },
+    {
+      "packetId": "14",
+      "counts": {
+        "sourceRefs": 5,
+        "featureIds": 5,
+        "qdrantHits": 8,
+        "redisKeys": 1,
+        "parentAtlasDocuments": 0,
+        "somCluster": 0,
+        "glyphRecord": 0,
+        "neo4jNode": 0,
+        "rankedCards": 0
+      },
+      "byteMetrics": {
+        "packetBytes": 649,
+        "semanticBytes": 582
+      },
+      "densityScore": "89.68%",
+      "classification": "optimal",
+      "missingFields": [
+        "parentAtlasDocuments",
+        "somCluster",
+        "glyphRecord",
+        "neo4jNode",
+        "rankedCards"
+      ],
+      "suggestedRepair": "None"
+    },
+    {
+      "packetId": "13",
+      "counts": {
+        "sourceRefs": 1,
+        "featureIds": 1,
+        "qdrantHits": 8,
+        "redisKeys": 1,
+        "parentAtlasDocuments": 0,
+        "somCluster": 0,
+        "glyphRecord": 0,
+        "neo4jNode": 0,
+        "rankedCards": 0
+      },
+      "byteMetrics": {
+        "packetBytes": 476,
+        "semanticBytes": 409
+      },
+      "densityScore": "85.92%",
+      "classification": "optimal",
+      "missingFields": [
+        "parentAtlasDocuments",
+        "somCluster",
+        "glyphRecord",
+        "neo4jNode",
+        "rankedCards"
+      ],
+      "suggestedRepair": "None"
+    },
+    {
+      "packetId": "12",
+      "counts": {
+        "sourceRefs": 5,
+        "featureIds": 5,
+        "qdrantHits": 8,
+        "redisKeys": 1,
+        "parentAtlasDocuments": 0,
+        "somCluster": 0,
+        "glyphRecord": 0,
+        "neo4jNode": 0,
+        "rankedCards": 0
+      },
+      "byteMetrics": {
+        "packetBytes": 649,
+        "semanticBytes": 582
+      },
+      "densityScore": "89.68%",
+      "classification": "optimal",
+      "missingFields": [
+        "parentAtlasDocuments",
+        "somCluster",
+        "glyphRecord",
+        "neo4jNode",
+        "rankedCards"
+      ],
+      "suggestedRepair": "None"
+    },
+    {
+      "packetId": "11",
+      "counts": {
+        "sourceRefs": 5,
+        "featureIds": 5,
+        "qdrantHits": 8,
+        "redisKeys": 1,
+        "parentAtlasDocuments": 0,
+        "somCluster": 0,
+        "glyphRecord": 0,
+        "neo4jNode": 0,
+        "rankedCards": 0
+      },
+      "byteMetrics": {
+        "packetBytes": 624,
+        "semanticBytes": 557
+      },
+      "densityScore": "89.26%",
+      "classification": "optimal",
+      "missingFields": [
+        "parentAtlasDocuments",
+        "somCluster",
+        "glyphRecord",
+        "neo4jNode",
+        "rankedCards"
+      ],
+      "suggestedRepair": "None"
+    },
+    {
+      "packetId": "10",
+      "counts": {
+        "sourceRefs": 5,
+        "featureIds": 5,
+        "qdrantHits": 8,
+        "redisKeys": 1,
+        "parentAtlasDocuments": 0,
+        "somCluster": 0,
+        "glyphRecord": 0,
+        "neo4jNode": 0,
+        "rankedCards": 0
+      },
+      "byteMetrics": {
+        "packetBytes": 649,
+        "semanticBytes": 582
+      },
+      "densityScore": "89.68%",
+      "classification": "optimal",
+      "missingFields": [
+        "parentAtlasDocuments",
+        "somCluster",
+        "glyphRecord",
+        "neo4jNode",
+        "rankedCards"
+      ],
+      "suggestedRepair": "None"
+    },
+    {
+      "packetId": "9",
+      "counts": {
+        "sourceRefs": 5,
+        "featureIds": 5,
+        "qdrantHits": 8,
+        "redisKeys": 1,
+        "parentAtlasDocuments": 0,
+        "somCluster": 0,
+        "glyphRecord": 0,
+        "neo4jNode": 0,
+        "rankedCards": 0
+      },
+      "byteMetrics": {
+        "packetBytes": 623,
+        "semanticBytes": 557
+      },
+      "densityScore": "89.41%",
+      "classification": "optimal",
+      "missingFields": [
+        "parentAtlasDocuments",
+        "somCluster",
+        "glyphRecord",
+        "neo4jNode",
+        "rankedCards"
+      ],
+      "suggestedRepair": "None"
+    },
+    {
+      "packetId": "8",
+      "counts": {
+        "sourceRefs": 1,
+        "featureIds": 1,
+        "qdrantHits": 8,
+        "redisKeys": 1,
+        "parentAtlasDocuments": 0,
+        "somCluster": 0,
+        "glyphRecord": 0,
+        "neo4jNode": 0,
+        "rankedCards": 0
+      },
+      "byteMetrics": {
+        "packetBytes": 475,
+        "semanticBytes": 409
+      },
+      "densityScore": "86.11%",
+      "classification": "optimal",
+      "missingFields": [
+        "parentAtlasDocuments",
+        "somCluster",
+        "glyphRecord",
+        "neo4jNode",
+        "rankedCards"
+      ],
+      "suggestedRepair": "None"
+    },
+    {
+      "packetId": "7",
+      "counts": {
+        "sourceRefs": 5,
+        "featureIds": 5,
+        "qdrantHits": 8,
+        "redisKeys": 1,
+        "parentAtlasDocuments": 0,
+        "somCluster": 0,
+        "glyphRecord": 0,
+        "neo4jNode": 0,
+        "rankedCards": 0
+      },
+      "byteMetrics": {
+        "packetBytes": 698,
+        "semanticBytes": 632
+      },
+      "densityScore": "90.54%",
+      "classification": "optimal",
+      "missingFields": [
+        "parentAtlasDocuments",
+        "somCluster",
+        "glyphRecord",
+        "neo4jNode",
+        "rankedCards"
+      ],
+      "suggestedRepair": "None"
+    },
+    {
+      "packetId": "6",
+      "counts": {
+        "sourceRefs": 5,
+        "featureIds": 5,
+        "qdrantHits": 8,
+        "redisKeys": 1,
+        "parentAtlasDocuments": 0,
+        "somCluster": 0,
+        "glyphRecord": 0,
+        "neo4jNode": 0,
+        "rankedCards": 0
+      },
+      "byteMetrics": {
+        "packetBytes": 649,
+        "semanticBytes": 583
+      },
+      "densityScore": "89.83%",
+      "classification": "optimal",
+      "missingFields": [
+        "parentAtlasDocuments",
+        "somCluster",
+        "glyphRecord",
+        "neo4jNode",
+        "rankedCards"
+      ],
+      "suggestedRepair": "None"
+    },
+    {
+      "packetId": "5",
+      "counts": {
+        "sourceRefs": 5,
+        "featureIds": 5,
+        "qdrantHits": 8,
+        "redisKeys": 1,
+        "parentAtlasDocuments": 0,
+        "somCluster": 0,
+        "glyphRecord": 0,
+        "neo4jNode": 0,
+        "rankedCards": 0
+      },
+      "byteMetrics": {
+        "packetBytes": 648,
+        "semanticBytes": 582
+      },
+      "densityScore": "89.81%",
+      "classification": "optimal",
+      "missingFields": [
+        "parentAtlasDocuments",
+        "somCluster",
+        "glyphRecord",
+        "neo4jNode",
+        "rankedCards"
+      ],
+      "suggestedRepair": "None"
+    },
+    {
+      "packetId": "4",
+      "counts": {
+        "sourceRefs": 0,
+        "featureIds": 0,
+        "qdrantHits": 8,
+        "redisKeys": 1,
+        "parentAtlasDocuments": 0,
+        "somCluster": 0,
+        "glyphRecord": 0,
+        "neo4jNode": 0,
+        "rankedCards": 0
+      },
+      "byteMetrics": {
+        "packetBytes": 465,
+        "semanticBytes": 399
+      },
+      "densityScore": "85.81%",
+      "classification": "optimal",
+      "missingFields": [
+        "sourceRefs",
+        "featureIds",
+        "parentAtlasDocuments",
+        "somCluster",
+        "glyphRecord",
+        "neo4jNode",
+        "rankedCards"
+      ],
+      "suggestedRepair": "None"
+    },
+    {
+      "packetId": "3",
+      "counts": {
+        "sourceRefs": 1,
+        "featureIds": 1,
+        "qdrantHits": 8,
+        "redisKeys": 1,
+        "parentAtlasDocuments": 0,
+        "somCluster": 0,
+        "glyphRecord": 0,
+        "neo4jNode": 0,
+        "rankedCards": 0
+      },
+      "byteMetrics": {
+        "packetBytes": 499,
+        "semanticBytes": 433
+      },
+      "densityScore": "86.77%",
+      "classification": "optimal",
+      "missingFields": [
+        "parentAtlasDocuments",
+        "somCluster",
+        "glyphRecord",
+        "neo4jNode",
+        "rankedCards"
+      ],
+      "suggestedRepair": "None"
+    },
+    {
+      "packetId": "2",
+      "counts": {
+        "sourceRefs": 2,
+        "featureIds": 2,
+        "qdrantHits": 8,
+        "redisKeys": 1,
+        "parentAtlasDocuments": 0,
+        "somCluster": 0,
+        "glyphRecord": 0,
+        "neo4jNode": 0,
+        "rankedCards": 0
+      },
+      "byteMetrics": {
+        "packetBytes": 586,
+        "semanticBytes": 520
+      },
+      "densityScore": "88.74%",
+      "classification": "optimal",
+      "missingFields": [
+        "parentAtlasDocuments",
+        "somCluster",
+        "glyphRecord",
+        "neo4jNode",
+        "rankedCards"
+      ],
+      "suggestedRepair": "None"
+    },
+    {
+      "packetId": "1",
+      "counts": {
+        "sourceRefs": 0,
+        "featureIds": 0,
+        "qdrantHits": 0,
+        "redisKeys": 0,
+        "parentAtlasDocuments": 0,
+        "somCluster": 1,
+        "glyphRecord": 0,
+        "neo4jNode": 0,
+        "rankedCards": 0
+      },
+      "byteMetrics": {
+        "packetBytes": 381,
+        "semanticBytes": 315
+      },
+      "densityScore": "82.68%",
+      "classification": "empty-pointers",
+      "missingFields": [
+        "sourceRefs",
+        "featureIds",
+        "qdrantHits",
+        "redisKeys",
+        "parentAtlasDocuments",
+        "glyphRecord",
+        "neo4jNode",
+        "rankedCards"
+      ],
+      "suggestedRepair": "Vector gap: ensure TurboVec/Qdrant threshold is yielding hits."
+    }
+  ]
+}

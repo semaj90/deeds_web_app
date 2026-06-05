@@ -43,6 +43,7 @@ const FAMILIES = [
       'docs/reports/sourceRef-atlas-join-inventory.md',
       'docs/reports/qdrant-path-bridge-latest.md',
       'docs/reports/sourceRef-first-join-warmup.md',
+      'docs/reports/hidden-packet-pathmap-duckdb-report.md',
     ],
   },
   {
@@ -276,12 +277,14 @@ const report = {
       'docs/reports/sourceRef-first-parent-atlas-refresh.md',
       'docs/reports/nes-chrom-packet-kag-dag-map.md',
       'docs/reports/parent-atlas-rg-dump-organizer.md',
+      'docs/reports/hidden-packet-pathmap-duckdb-report.md',
     ],
     useCase: 'Quick multi-hop traversal across sourceRef, parent atlas, Neo4j, Qdrant, Redis, and offline-processing docs.',
   },
   discoveredFileCount: discoveredFiles.length,
   notes: [
     'The sourceRef/pathmap spine is the canonical bridge for fast cross-store traversal.',
+    'The hidden packet DuckDB report is the canonical joined replay surface for sourceRef + feature_id + stable_id.',
     'Parent atlas packets stay the durable evidence layer for multi-hop joins.',
     'Neo4j contextual trees are for traversal, not canonical storage.',
     'Qdrant handles semantic analysis and clustering; Redis/Bitfrost keep hot packets live.',

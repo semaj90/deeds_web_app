@@ -1,10 +1,10 @@
 {
-  "generatedAt": "2026-06-05T02:49:32.705Z",
-  "totalCount": 17,
+  "generatedAt": "2026-06-05T14:13:35.970Z",
+  "totalCount": 18,
   "clusters": {
     "UI Components": [
       {
-        "id": "import_error_873421e8",
+        "id": "import_error_deccde7d",
         "type": "developer_recommendation",
         "cluster": "UI Components",
         "title": "src/lib/components/ui/index.ts — 42 unresolved imports",
@@ -18,7 +18,7 @@
         "featureStatus": "degraded"
       },
       {
-        "id": "import_error_ae6067b9",
+        "id": "import_error_15bcec7c",
         "type": "developer_recommendation",
         "cluster": "UI Components",
         "title": "src/lib/components/ui/gaming/n64/index.ts — 29 unresolved imports",
@@ -32,7 +32,7 @@
         "featureStatus": "degraded"
       },
       {
-        "id": "import_error_e90b057b",
+        "id": "import_error_842eb5b9",
         "type": "developer_recommendation",
         "cluster": "UI Components",
         "title": "src/lib/components/ui/gaming/index.ts — 18 unresolved imports",
@@ -46,7 +46,7 @@
         "featureStatus": "degraded"
       },
       {
-        "id": "import_error_c4ebaf50",
+        "id": "import_error_a0fb5148",
         "type": "developer_recommendation",
         "cluster": "UI Components",
         "title": "src/lib/components/ui/alert-dialog/index.js — 12 unresolved imports",
@@ -60,7 +60,7 @@
         "featureStatus": "degraded"
       },
       {
-        "id": "import_error_ce60b29d",
+        "id": "import_error_6e12b1ca",
         "type": "developer_recommendation",
         "cluster": "UI Components",
         "title": "src/lib/components/ui/dialog/index.ts — 11 unresolved imports",
@@ -76,7 +76,7 @@
     ],
     "General": [
       {
-        "id": "import_error_cdb765e5",
+        "id": "import_error_b068f027",
         "type": "developer_recommendation",
         "cluster": "General",
         "title": "src/lib/icons/yorha/index.ts — 12 unresolved imports",
@@ -90,7 +90,7 @@
         "featureStatus": "degraded"
       },
       {
-        "id": "stale_feature_2fa69fe8",
+        "id": "stale_feature_224560fe",
         "type": "missing_feature",
         "cluster": "General",
         "title": "Feature not implemented: Priority 2: VLM POI Integration (90 min)",
@@ -104,7 +104,7 @@
         "featureStatus": "missing"
       },
       {
-        "id": "stale_feature_7a88b756",
+        "id": "stale_feature_9af2c0d9",
         "type": "missing_feature",
         "cluster": "General",
         "title": "Feature not implemented: Priority 3: Audit Dashboard Web UI (3-4 hours)",
@@ -118,7 +118,7 @@
         "featureStatus": "missing"
       },
       {
-        "id": "stale_feature_f7393512",
+        "id": "stale_feature_25f66dd6",
         "type": "missing_feature",
         "cluster": "General",
         "title": "Feature not implemented: Priority 4: Auto-Fix Orchestrator (6-8 hours)",
@@ -132,7 +132,7 @@
         "featureStatus": "missing"
       },
       {
-        "id": "stale_feature_ba44d129",
+        "id": "stale_feature_3ff41859",
         "type": "missing_feature",
         "cluster": "General",
         "title": "Feature not implemented: Phase 3: Post-Synthesis Quality Review (RunID: `stage-2c-500`)",
@@ -148,7 +148,7 @@
     ],
     "Agent Workflow": [
       {
-        "id": "unclassified_8d358356",
+        "id": "unclassified_8f4ebf76",
         "type": "feature:unclassified",
         "cluster": "Agent Workflow",
         "title": "4 files unclassified with >10 imports",
@@ -167,7 +167,7 @@
     ],
     "Legal Workspace": [
       {
-        "id": "stale_feature_6512cdd2",
+        "id": "stale_feature_b49f8f6d",
         "type": "missing_feature",
         "cluster": "Legal Workspace",
         "title": "Feature not implemented: Priority 1: Evidence Upload UI (1 hour)",
@@ -181,103 +181,122 @@
         "featureStatus": "missing"
       }
     ],
-    "Self-Healing Retrieval": [
+    "Parent Atlas Coverage": [
       {
-        "id": "runtime_packet_607b329d",
-        "type": "retrieval:low-context-density",
-        "cluster": "Self-Healing Retrieval",
-        "title": "25 runtime packets returned fewer than 8 sourceRefs",
-        "why": "Route runtime telemetry shows 25/26 packets with Qdrant hits but low sourceRef density. This weakens replay, traversal, and recommendation lineage.",
+        "id": "atlas_coverage_79e5f292",
+        "type": "atlas_coverage_gap",
+        "cluster": "Parent Atlas Coverage",
+        "title": "Qdrant coverage: 33% (3539 files unembedded)",
+        "why": "3539 parent_atlas_documents rows have no qdrant_point_id. ACE packet source_refs will be empty for these files until embedded.",
         "sourceRefs": [
-          "scripts/atlas/report-route-runtime-packets.mjs",
-          "sveltekit-frontend/src/lib/server/features/ai/ace/context-assembler.ts"
+          "scripts/graphify/semantic-index.mjs"
         ],
-        "action": "Review CHR97 cartridge hit expansion and sourceRef density thresholds; replay a representative packet before changing scoring.",
-        "next_command": "npm run atlas:runtime-packets:report && cd sveltekit-frontend && npx tsx ../scripts/tests/smoke-runtime-packet-replay.mjs",
+        "action": "Run graphify:semantic to embed 3539 missing files",
+        "next_command": "npm run graphify:semantic",
         "priority": "high",
         "featureStatus": "degraded",
         "metrics": {
-          "total": 26,
-          "lowDensity": 25
+          "total": 5253,
+          "covered": 1714,
+          "pct": 33
         }
       },
       {
-        "id": "runtime_packet_49252f06",
-        "type": "retrieval:source-ref-provenance-gap",
-        "cluster": "Self-Healing Retrieval",
-        "title": "3 empty-sourceRef packets and 44 historical unknown sourceRef hits",
-        "why": "Runtime packets must be replayable from sourceRef lineage. Empty or placeholder sourceRefs break Parent Atlas joins and Redis packet decoding.",
+        "id": "atlas_coverage_155319fd",
+        "type": "atlas_coverage_gap",
+        "cluster": "Parent Atlas Coverage",
+        "title": "SOM cluster coverage: 29% (3744 files unclassified)",
+        "why": "3744 parent_atlas_documents rows have no cluster_id. ACE packet cluster_id, som_cluster, and topology boosting are unavailable for these files.",
         "sourceRefs": [
-          "sveltekit-frontend/src/lib/server/features/ai/ace/telemetry-source-ref-fallback.ts"
+          "scripts/graphify/semantic-cluster.mjs"
         ],
-        "action": "Keep the sourceRef normalizer in the hot path and monitor new route_runtime_packets rows for empty/unknown refs.",
-        "next_command": "npm run atlas:runtime-packets:report",
+        "action": "Run graphify:semantic-cluster to assign cluster_id to 3744 files",
+        "next_command": "npm run graphify:semantic-cluster",
         "priority": "high",
         "featureStatus": "degraded",
         "metrics": {
-          "emptySourceRefs": 3,
-          "unknownHits": 44
+          "total": 5253,
+          "covered": 1509,
+          "pct": 29
         }
       },
       {
-        "id": "runtime_packet_b139233b",
-        "type": "retrieval:feature-id-provenance-gap",
-        "cluster": "Self-Healing Retrieval",
-        "title": "3 runtime packets have no featureIds",
-        "why": "Feature IDs are the join spine for recommendations, Neo4j ParentAtlasFeature nodes, and packet replay ranking.",
+        "id": "atlas_coverage_021ee808",
+        "type": "atlas_coverage_gap",
+        "cluster": "Parent Atlas Coverage",
+        "title": "atlas_feature_synthesis has only 12 rows — feature rollups incomplete",
+        "why": "Feature-level ACE context (feature_ids, lane_ids) is sparse. Only 12 features have synthesized rollups; full codebase has hundreds of features.",
         "sourceRefs": [
-          "sveltekit-frontend/src/lib/server/features/ai/ace/context-assembler.ts"
+          "scripts/atlas/gemma4-parent-atlas-summaries.mjs"
         ],
-        "action": "Backfill feature IDs from parent_atlas_documents for telemetry sourceRefs before writing the runtime packet.",
-        "next_command": "cd sveltekit-frontend && npx tsx ../scripts/tests/smoke-route-runtime-packets.mjs",
+        "action": "Run Gemma4 parent atlas summary pipeline to build feature synthesis rows",
+        "next_command": "npm run atlas:summaries:apply",
         "priority": "medium",
         "featureStatus": "degraded",
         "metrics": {
-          "emptyFeatureIds": 3
+          "synthTotal": 12
         }
       },
       {
-        "id": "runtime_packet_a99c93d7",
-        "type": "retrieval:missing-runtime-som-cluster",
-        "cluster": "Self-Healing Retrieval",
-        "title": "25 runtime packets are missing SOM/cluster telemetry",
-        "why": "Active production files have Qdrant and SOM coverage, but the runtime telemetry row is not always carrying the selected SOM cluster.",
+        "id": "atlas_coverage_f489f8eb",
+        "type": "atlas_coverage_gap",
+        "cluster": "Parent Atlas Coverage",
+        "title": "2201 atlas_feature_map rows not joined to parent_atlas_documents",
+        "why": "These files have feature map entries but no canonical parent_atlas_documents record. They are invisible to ACE packet assembly and cannot contribute to feature_ids.",
         "sourceRefs": [
-          "sveltekit-frontend/src/lib/server/features/ai/ace/context-assembler.ts",
-          "scripts/atlas/sync-graph-truth-neo4j.mjs"
+          "scripts/atlas/sync-parent-atlas.mjs"
         ],
-        "action": "Resolve SOM cluster from sourceRefs or qdrant IDs before writing route_runtime_packets.",
-        "next_command": "npm run atlas:coverage:qdrant-no-som -- --limit=25",
+        "action": "Re-run atlas sync to backfill missing parent_atlas_documents rows",
+        "next_command": "npm run atlas:sync",
         "priority": "high",
         "featureStatus": "degraded",
         "metrics": {
-          "missingSom": 25,
-          "total": 26
+          "afmTotal": 5740,
+          "notInPad": 2201,
+          "matched": 3539
         }
       },
       {
-        "id": "runtime_packet_396928f5",
-        "type": "cache:missing-runtime-lod0-packets",
-        "cluster": "Self-Healing Retrieval",
-        "title": "4/25 recent runtime packets missing Redis LOD0 replay keys",
-        "why": "A route_runtime_packets row without ace:telemetry:{id}:lod0 cannot be replayed from packet_id alone.",
+        "id": "atlas_coverage_049f4bdb",
+        "type": "atlas_coverage_gap",
+        "cluster": "Parent Atlas Coverage",
+        "title": "SOM cluster on atlas_feature_map: 31% (3941 missing)",
+        "why": "3941 atlas_feature_map rows have no som_cluster. SOM topology boosting in ACE scoring is limited to 31% of the feature map.",
         "sourceRefs": [
-          "sveltekit-frontend/src/lib/server/features/ai/ace/telemetry-compressor.ts"
+          "scripts/graphify/som-topology-pipeline.mjs"
         ],
-        "action": "Replay smoke should continue checking Redis LOD0 coverage; investigate fire-and-forget compression misses if this remains nonzero.",
-        "next_command": "cd sveltekit-frontend && npx tsx ../scripts/tests/smoke-runtime-packet-replay.mjs",
+        "action": "Run graphify:semantic-cluster to populate som_cluster on atlas_feature_map",
+        "next_command": "npm run graphify:semantic-cluster",
         "priority": "medium",
         "featureStatus": "degraded",
         "metrics": {
-          "redisMissing": 4,
-          "redisChecked": 25
+          "afmTotal": 5740,
+          "afmWithSom": 1799,
+          "afmSomPct": 31
+        }
+      },
+      {
+        "id": "atlas_coverage_576ea1b4",
+        "type": "atlas_coverage_gap",
+        "cluster": "Parent Atlas Coverage",
+        "title": "route_runtime_packets is empty — hot-path scoring unavailable",
+        "why": "ACE hot-path scoring (route_runtime_packets) has 0 rows. Routes cannot be boosted by actual request frequency. redis_hot_keys will be empty.",
+        "sourceRefs": [
+          "src/routes/api/sse/chat/+server.ts"
+        ],
+        "action": "Instrument routes to emit runtime telemetry packets",
+        "next_command": "",
+        "priority": "low",
+        "featureStatus": "missing",
+        "metrics": {
+          "rrpTotal": 0
         }
       }
     ]
   },
   "top10": [
     {
-      "id": "import_error_873421e8",
+      "id": "import_error_deccde7d",
       "type": "developer_recommendation",
       "cluster": "UI Components",
       "title": "src/lib/components/ui/index.ts — 42 unresolved imports",
@@ -291,7 +310,7 @@
       "featureStatus": "degraded"
     },
     {
-      "id": "import_error_ae6067b9",
+      "id": "import_error_15bcec7c",
       "type": "developer_recommendation",
       "cluster": "UI Components",
       "title": "src/lib/components/ui/gaming/n64/index.ts — 29 unresolved imports",
@@ -305,7 +324,7 @@
       "featureStatus": "degraded"
     },
     {
-      "id": "import_error_e90b057b",
+      "id": "import_error_842eb5b9",
       "type": "developer_recommendation",
       "cluster": "UI Components",
       "title": "src/lib/components/ui/gaming/index.ts — 18 unresolved imports",
@@ -319,7 +338,7 @@
       "featureStatus": "degraded"
     },
     {
-      "id": "import_error_c4ebaf50",
+      "id": "import_error_a0fb5148",
       "type": "developer_recommendation",
       "cluster": "UI Components",
       "title": "src/lib/components/ui/alert-dialog/index.js — 12 unresolved imports",
@@ -333,7 +352,7 @@
       "featureStatus": "degraded"
     },
     {
-      "id": "import_error_ce60b29d",
+      "id": "import_error_6e12b1ca",
       "type": "developer_recommendation",
       "cluster": "UI Components",
       "title": "src/lib/components/ui/dialog/index.ts — 11 unresolved imports",
@@ -347,7 +366,7 @@
       "featureStatus": "degraded"
     },
     {
-      "id": "import_error_cdb765e5",
+      "id": "import_error_b068f027",
       "type": "developer_recommendation",
       "cluster": "General",
       "title": "src/lib/icons/yorha/index.ts — 12 unresolved imports",
@@ -361,63 +380,64 @@
       "featureStatus": "degraded"
     },
     {
-      "id": "runtime_packet_607b329d",
-      "type": "retrieval:low-context-density",
-      "cluster": "Self-Healing Retrieval",
-      "title": "25 runtime packets returned fewer than 8 sourceRefs",
-      "why": "Route runtime telemetry shows 25/26 packets with Qdrant hits but low sourceRef density. This weakens replay, traversal, and recommendation lineage.",
+      "id": "atlas_coverage_79e5f292",
+      "type": "atlas_coverage_gap",
+      "cluster": "Parent Atlas Coverage",
+      "title": "Qdrant coverage: 33% (3539 files unembedded)",
+      "why": "3539 parent_atlas_documents rows have no qdrant_point_id. ACE packet source_refs will be empty for these files until embedded.",
       "sourceRefs": [
-        "scripts/atlas/report-route-runtime-packets.mjs",
-        "sveltekit-frontend/src/lib/server/features/ai/ace/context-assembler.ts"
+        "scripts/graphify/semantic-index.mjs"
       ],
-      "action": "Review CHR97 cartridge hit expansion and sourceRef density thresholds; replay a representative packet before changing scoring.",
-      "next_command": "npm run atlas:runtime-packets:report && cd sveltekit-frontend && npx tsx ../scripts/tests/smoke-runtime-packet-replay.mjs",
+      "action": "Run graphify:semantic to embed 3539 missing files",
+      "next_command": "npm run graphify:semantic",
       "priority": "high",
       "featureStatus": "degraded",
       "metrics": {
-        "total": 26,
-        "lowDensity": 25
+        "total": 5253,
+        "covered": 1714,
+        "pct": 33
       }
     },
     {
-      "id": "runtime_packet_49252f06",
-      "type": "retrieval:source-ref-provenance-gap",
-      "cluster": "Self-Healing Retrieval",
-      "title": "3 empty-sourceRef packets and 44 historical unknown sourceRef hits",
-      "why": "Runtime packets must be replayable from sourceRef lineage. Empty or placeholder sourceRefs break Parent Atlas joins and Redis packet decoding.",
+      "id": "atlas_coverage_155319fd",
+      "type": "atlas_coverage_gap",
+      "cluster": "Parent Atlas Coverage",
+      "title": "SOM cluster coverage: 29% (3744 files unclassified)",
+      "why": "3744 parent_atlas_documents rows have no cluster_id. ACE packet cluster_id, som_cluster, and topology boosting are unavailable for these files.",
       "sourceRefs": [
-        "sveltekit-frontend/src/lib/server/features/ai/ace/telemetry-source-ref-fallback.ts"
+        "scripts/graphify/semantic-cluster.mjs"
       ],
-      "action": "Keep the sourceRef normalizer in the hot path and monitor new route_runtime_packets rows for empty/unknown refs.",
-      "next_command": "npm run atlas:runtime-packets:report",
+      "action": "Run graphify:semantic-cluster to assign cluster_id to 3744 files",
+      "next_command": "npm run graphify:semantic-cluster",
       "priority": "high",
       "featureStatus": "degraded",
       "metrics": {
-        "emptySourceRefs": 3,
-        "unknownHits": 44
+        "total": 5253,
+        "covered": 1509,
+        "pct": 29
       }
     },
     {
-      "id": "runtime_packet_a99c93d7",
-      "type": "retrieval:missing-runtime-som-cluster",
-      "cluster": "Self-Healing Retrieval",
-      "title": "25 runtime packets are missing SOM/cluster telemetry",
-      "why": "Active production files have Qdrant and SOM coverage, but the runtime telemetry row is not always carrying the selected SOM cluster.",
+      "id": "atlas_coverage_f489f8eb",
+      "type": "atlas_coverage_gap",
+      "cluster": "Parent Atlas Coverage",
+      "title": "2201 atlas_feature_map rows not joined to parent_atlas_documents",
+      "why": "These files have feature map entries but no canonical parent_atlas_documents record. They are invisible to ACE packet assembly and cannot contribute to feature_ids.",
       "sourceRefs": [
-        "sveltekit-frontend/src/lib/server/features/ai/ace/context-assembler.ts",
-        "scripts/atlas/sync-graph-truth-neo4j.mjs"
+        "scripts/atlas/sync-parent-atlas.mjs"
       ],
-      "action": "Resolve SOM cluster from sourceRefs or qdrant IDs before writing route_runtime_packets.",
-      "next_command": "npm run atlas:coverage:qdrant-no-som -- --limit=25",
+      "action": "Re-run atlas sync to backfill missing parent_atlas_documents rows",
+      "next_command": "npm run atlas:sync",
       "priority": "high",
       "featureStatus": "degraded",
       "metrics": {
-        "missingSom": 25,
-        "total": 26
+        "afmTotal": 5740,
+        "notInPad": 2201,
+        "matched": 3539
       }
     },
     {
-      "id": "unclassified_8d358356",
+      "id": "unclassified_8f4ebf76",
       "type": "feature:unclassified",
       "cluster": "Agent Workflow",
       "title": "4 files unclassified with >10 imports",
@@ -441,7 +461,6 @@
     "rankEntries": 500,
     "todoQueueItems": 131,
     "pathMapEntries": 3270,
-    "traversalReport": 1,
-    "routeRuntimePacketsReport": "docs/reports/route-runtime-packets-report.json"
+    "traversalReport": 1
   }
 }

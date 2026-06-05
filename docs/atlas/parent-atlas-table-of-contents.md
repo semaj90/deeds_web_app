@@ -5,6 +5,7 @@ This page is the navigation entry for the Parent Atlas workstream. It links the 
 ## Core References
 
 - [**Retrieval Layer Separation**](</C:/Users/james/Videos/deeds-web-app/docs/architecture/retrieval-layer-separation.md>) — Three-layer architecture: Orchestrator → Search Contract → Backend Implementation. Caller rule: never call Qdrant directly.
+- [Compressed Semantic Geometry](</C:/Users/james/Videos/deeds-web-app/docs/architecture/compressed-semantic-geometry.md>) — Qdrant/TurboVec/Redis LOD as approximate search geometry with optional exact rescore.
 - [Parent Atlas - Storage & Runtime Decision](</C:/Users/james/Videos/deeds-web-app/docs/atlas/parent-atlas-storage-decision.md>)
 - [Parent Atlas - Data Spine](</C:/Users/james/Videos/deeds-web-app/docs/atlas/parent-atlas-data-spine.md>)
 - [Parent Atlas Karpathy Pipeline](</C:/Users/james/Videos/deeds-web-app/docs/architecture/parent-atlas-karpathy-pipeline.md>)
@@ -28,6 +29,9 @@ This page is the navigation entry for the Parent Atlas workstream. It links the 
 - [Raw rg transcript organizer](</C:/Users/james/Videos/deeds-web-app/docs/reports/parent-atlas-rg-dump-organizer.md>)
 - [Raw rg transcript projection](</C:/Users/james/Videos/deeds-web-app/docs/reports/parent-atlas-rg-dump-projection.md>)
 - [Offline synthesis mapreduce DuckDB](</C:/Users/james/Videos/deeds-web-app/docs/reports/offline-synthesis-mapreduce-duckdb-report.md>)
+- [Compressed semantic geometry report](</C:/Users/james/Videos/deeds-web-app/docs/reports/compressed-semantic-geometry-report.md>)
+- [Hidden packet pathmap report](</C:/Users/james/Videos/deeds-web-app/docs/reports/hidden-packet-pathmap-report.md>)
+- [Hidden packet pathmap DuckDB report](</C:/Users/james/Videos/deeds-web-app/docs/reports/hidden-packet-pathmap-duckdb-report.md>)
 - [Doc-feature crosswalk](</C:/Users/james/Videos/deeds-web-app/docs/reports/doc-feature-crosswalk-2026-06-01.md>)
 - [PyTorch / Qdrant / Redis / SOM index](</C:/Users/james/Videos/deeds-web-app/docs/reports/pytorch-qdrant-redis-som-index-2026-06-01.md>)
 - [Production Qdrant without SOM report](</C:/Users/james/Videos/deeds-web-app/docs/reports/production-qdrant-no-som-report.md>)
@@ -105,6 +109,8 @@ The current retrieval boundary is:
 - `sveltekit-frontend/src/lib/server/retrieval/orchestrator.ts`
 
 Current default: Qdrant handles semantic vector search, payload filters, quantized vector traversal, and structural pruning.
+
+Retrieval policy: filter first, search compressed approximate semantic geometry second, then exact-rescore only the bounded candidate set when quality or telemetry requires it.
 
 Future optional acceleration: cuVS/CAGRA may be introduced behind the same retrieval abstraction. Callers must not depend on Qdrant-specific client details. cuVS is an acceleration lane, not the canonical store.
 

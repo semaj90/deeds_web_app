@@ -149,10 +149,25 @@ if (postgresUp) {
 
 const driftNotes = [];
 
-// Key payload fields expected in a well-indexed Qdrant chunk
-const expectedFields = ['file_path', 'chunk_index', 'content', 'cluster_id', 'som_bmu_row', 'som_bmu_col'];
-const missingExpectedFields = expectedFields.filter(f => !qdrantPayloadFields.has(f));
-const extraFields = [...qdrantPayloadFields].filter(f => !expectedFields.includes(f));
+const fieldAliases = {
+  file_path: ['file_path'],
+  chunk_index: ['chunk_index'],
+  content: ['content'],
+  cluster_id: ['cluster_id'],
+  sourceRef: ['sourceRef', 'source_ref', 'source_refs'],
+  feature_id: ['feature_id', 'feature_ids'],
+  som_bmu_row: ['som_bmu_row', 'somRow', 'som_row'],
+  som_bmu_col: ['som_bmu_col', 'somCol', 'som_col'],
+};
+
+const expectedFields = Object.keys(fieldAliases);
+const missingExpectedFields = expectedFields.filter((field) => {
+  const aliases = fieldAliases[field];
+  return !aliases.some((alias) => qdrantPayloadFields.has(alias));
+});
+const extraFields = [...qdrantPayloadFields].filter((field) => {
+  return !Object.values(fieldAliases).some((aliases) => aliases.includes(field));
+});
 
 if (missingExpectedFields.length > 0) {
   driftNotes.push(`Qdrant payload missing expected fields: ${missingExpectedFields.join(', ')}`);
@@ -161,19 +176,15 @@ if (!atlasTableExists && postgresUp) {
   driftNotes.push('parent_atlas_documents table does not exist — Postgres mirror not yet promoted');
 }
 if (atlasTableExists && qdrantPointCount !== null && atlasRowCount !== null) {
-  const diff = Math.abs(qdrantPointCount - atlasRowCount);
-  const pct = qdrantPointCount > 0 ? ((diff / qdrantPointCount) * 100).toFixed(1) : '?';
-  if (diff > 0) {
-    driftNotes.push(`Row count mismatch: Qdrant=${qdrantPointCount}, Postgres=${atlasRowCount} (diff=${diff}, ${pct}%)`);
-  } else {
-    driftNotes.push('Row counts match between Qdrant and Postgres');
-  }
+  driftNotes.push(
+    `Grain note: Qdrant is chunk-level (${qdrantPointCount.toLocaleString()} points) while parent_atlas_documents is file-level (${atlasRowCount.toLocaleString()} rows); raw row counts are not directly comparable.`,
+  );
 }
 
 const overallStatus = !qdrantUp ? 'QDRANT_DOWN'
   : !postgresUp ? 'POSTGRES_DOWN'
   : !atlasTableExists ? 'POSTGRES_NOT_PROMOTED'
-  : driftNotes.some(n => n.includes('mismatch') || n.includes('missing')) ? 'DRIFT_DETECTED'
+  : missingExpectedFields.length > 0 ? 'DRIFT_DETECTED'
   : 'IN_SYNC';
 
 console.log(`\n── Overall: ${overallStatus}`);
@@ -206,6 +217,7 @@ const jsonReport = {
   notes: [
     'DuckDB is validation/mirror only — never authoritative',
     'CouchDB is disabled — no CouchDB reads attempted',
+    'Qdrant chunk counts and Postgres file counts use different grains; compare payload shape and join coverage, not raw row totals',
     `Scroll was bounded to ${SCROLL_LIMIT} points — payload field list may be incomplete for large collections`,
   ],
 };

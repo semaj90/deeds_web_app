@@ -40,6 +40,25 @@ The reason: the backend is already swappable via `CODEBASE_ANN_BACKEND`.
 A caller that bypasses the contract breaks the swap and couples the call
 site to Qdrant specifically.
 
+## Compressed semantic geometry rule
+
+The retrieval lane uses **compressed approximate semantic geometry with optional
+exact rescore**.
+
+That means:
+
+```txt
+payload / sourceRef / feature_id filters
+  -> approximate ANN over compressed or indexed vector geometry
+  -> dynamic oversampling when the query is ambiguous
+  -> optional exact rescore on the smaller candidate set
+  -> graph expansion and packet assembly
+```
+
+Qdrant owns the default HNSW / payload-filtered candidate search. TurboVec and
+LibTorch may rerank or rescore bounded candidate sets, but they do not replace
+the `SearchBackend.search()` contract or the Postgres/sourceRef ledger.
+
 ## What each layer is responsible for
 
 ### Layer 1 — Orchestration (`retrieval/orchestrator.ts`)
@@ -187,6 +206,7 @@ RetrievalResult → Gemma4 context
 ## Cross-references
 
 - [qdrant-search-contract.md](qdrant-search-contract.md) — Qdrant Query API patterns (multi-stage, fusion, grouping)
+- [compressed-semantic-geometry.md](compressed-semantic-geometry.md) — Filter first, approximate compressed search second, exact rescore only on bounded candidates
 - [retrieval-architecture.md](retrieval-architecture.md) — Staged pipeline: sparse → dense → graph → synthesis
 - [cold-warm-hot-packet-lifecycle.md](cold-warm-hot-packet-lifecycle.md) — Storage tier rules; superseded-score is advisory
 - [trace-runtime-split.md](trace-runtime-split.md) — MCP boundary rule: Gemma4 calls MCP tools, not raw Qdrant/Postgres

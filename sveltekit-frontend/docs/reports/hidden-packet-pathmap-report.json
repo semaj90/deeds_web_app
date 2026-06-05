@@ -1,0 +1,1133 @@
+{
+  "generatedAt": "2026-06-05T15:34:29.458Z",
+  "inputs": {
+    "featureLabels": ".tmp/feature_labels.jsonl",
+    "kanbanTasks": ".tmp/kanban_tasks.jsonl",
+    "missingFeatureTodos": ".tmp/missing_feature_todos.jsonl",
+    "parentAtlasToc": "docs/atlas/parent-atlas-table-of-contents.md",
+    "docFeatureCrosswalk": "docs/reports/doc-feature-crosswalk-2026-06-01.md"
+  },
+  "summary": {
+    "packetSurfaceCounts": [
+      {
+        "filePath": ".tmp/feature_labels.jsonl",
+        "exists": true,
+        "lineCount": 3312,
+        "validRows": 3312,
+        "invalidRows": 0,
+        "keySamples": [
+          "id",
+          "feature_id",
+          "featureKey",
+          "feature",
+          "path",
+          "source_ref",
+          "sourceRefs",
+          "label",
+          "tags",
+          "source"
+        ],
+        "sourceRefRows": 3312,
+        "featureIdRows": 3312,
+        "featureLabelRows": 3312,
+        "pathOnlyRows": 0,
+        "taskIdRows": 0,
+        "runIdRows": 0,
+        "sourceRefCoveragePct": 100,
+        "featureIdCoveragePct": 100,
+        "featureLabelCoveragePct": 100,
+        "pathOnlyExamples": [],
+        "invalidExamples": []
+      },
+      {
+        "filePath": ".tmp/kanban_tasks.jsonl",
+        "exists": true,
+        "lineCount": 3312,
+        "validRows": 3312,
+        "invalidRows": 0,
+        "keySamples": [
+          "task_id",
+          "feature_id",
+          "featureKey",
+          "feature",
+          "source_ref",
+          "sourceRefs",
+          "title",
+          "description",
+          "section",
+          "status",
+          "source",
+          "line_number"
+        ],
+        "sourceRefRows": 3312,
+        "featureIdRows": 3312,
+        "featureLabelRows": 3312,
+        "pathOnlyRows": 0,
+        "taskIdRows": 3312,
+        "runIdRows": 0,
+        "sourceRefCoveragePct": 100,
+        "featureIdCoveragePct": 100,
+        "featureLabelCoveragePct": 100,
+        "pathOnlyExamples": [],
+        "invalidExamples": []
+      },
+      {
+        "filePath": ".tmp/missing_feature_todos.jsonl",
+        "exists": true,
+        "lineCount": 141,
+        "validRows": 141,
+        "invalidRows": 0,
+        "keySamples": [
+          "task_id",
+          "feature_id",
+          "featureKey",
+          "feature",
+          "source_ref",
+          "sourceRefs",
+          "title",
+          "description",
+          "section",
+          "status",
+          "source",
+          "line_number"
+        ],
+        "sourceRefRows": 141,
+        "featureIdRows": 141,
+        "featureLabelRows": 141,
+        "pathOnlyRows": 0,
+        "taskIdRows": 141,
+        "runIdRows": 0,
+        "sourceRefCoveragePct": 100,
+        "featureIdCoveragePct": 100,
+        "featureLabelCoveragePct": 100,
+        "pathOnlyExamples": [],
+        "invalidExamples": []
+      }
+    ],
+    "totalRows": 6765,
+    "invalidRowCount": 0,
+    "rowsWithSourceRef": 6765,
+    "rowsWithFeatureId": 6765,
+    "rowsWithFeatureLabel": 6765,
+    "rowsWithTaskId": 3453,
+    "rowsWithRunId": 0,
+    "pathOnlyRows": 0,
+    "featureLabelCoverage": {
+      "rowsWithFeatureLabel": 6765,
+      "pct": 100
+    },
+    "sourceRefCoverage": {
+      "rowsWithSourceRef": 6765,
+      "pct": 100
+    },
+    "featureIdCoverage": {
+      "rowsWithFeatureId": 6765,
+      "pct": 100
+    },
+    "invalidRows": [],
+    "pathOnlyExamples": [],
+    "featureLabelCoverageById": [
+      {
+        "featureId": "feature:todo:1e95eb7b2c97aa52a6ec0308",
+        "labels": [
+          "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+          "**Knowledge Graph Tool Lanes**"
+        ],
+        "rowCount": 3
+      },
+      {
+        "featureId": "feature:todo:f831f8496459630481b6f126",
+        "labels": [
+          "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+          "`attention_rank_files` — embed query → `attentionScoreGPU` via LibTorch → top-N from Karpathy scores"
+        ],
+        "rowCount": 3
+      },
+      {
+        "featureId": "feature:todo:2aed3e03cc66e3e478a5479d",
+        "labels": [
+          "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+          "`som_topology_stats` — delegate to `gpu:som_topology` for Redis SOM grid / centroid stats"
+        ],
+        "rowCount": 3
+      },
+      {
+        "featureId": "feature:todo:a33b97f7501a9583a2e63c2b",
+        "labels": [
+          "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+          "`language_distribution` — delegate to `gpu:language_distribution` for Qdrant cluster tag stats"
+        ],
+        "rowCount": 3
+      },
+      {
+        "featureId": "feature:todo:322cf977b5fa41f902b9321b",
+        "labels": [
+          "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+          "`playbook_lookup_by_language` — use CouchDB `karpathy_wiki` plus top Karpathy file intersection"
+        ],
+        "rowCount": 3
+      },
+      {
+        "featureId": "feature:todo:4ced48dea132da38f2ab7305",
+        "labels": [
+          "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+          "Route these tools into the correct skill families (`gpu-acceleration`, `vector-cluster`, `codebase`, `research`) without creating a parallel graph source of tru"
+        ],
+        "rowCount": 3
+      },
+      {
+        "featureId": "feature:todo:a11f763c236417569484b3e7",
+        "labels": [
+          "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+          "Clustering quality cleanup (deferred)"
+        ],
+        "rowCount": 3
+      },
+      {
+        "featureId": "feature:todo:787ff44880ddd6be2d9388ce",
+        "labels": [
+          "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+          "Wire into API routes (`/api/cases`, `/api/evidence/upload`) — deferred"
+        ],
+        "rowCount": 3
+      },
+      {
+        "featureId": "feature:todo:7c0dbd56784529c16e1cb60e",
+        "labels": [
+          "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+          "**Track C — Production Gap Remediation** (after DB audit)"
+        ],
+        "rowCount": 3
+      },
+      {
+        "featureId": "feature:todo:4afa9ddc2a7b74e522364100",
+        "labels": [
+          "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+          "Seed legal canon chunks (legal PDF ingest pipeline)"
+        ],
+        "rowCount": 3
+      },
+      {
+        "featureId": "feature:todo:c3913a6ae582b02ec6366094",
+        "labels": [
+          "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+          "Add Playwright test fixtures for auth + DB seeding"
+        ],
+        "rowCount": 3
+      },
+      {
+        "featureId": "feature:todo:211e484d8c9f1b5087925e91",
+        "labels": [
+          "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+          "Option 2: ClusterCard schema + Redis/Qdrant wiring + API route"
+        ],
+        "rowCount": 3
+      },
+      {
+        "featureId": "feature:todo:f85f7b428819c0244985ab85",
+        "labels": [
+          "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+          "Warm workspace-start plans"
+        ],
+        "rowCount": 3
+      },
+      {
+        "featureId": "feature:todo:5855fc827e386a10b01a26db",
+        "labels": [
+          "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+          "Warm legal/codebase summaries"
+        ],
+        "rowCount": 3
+      },
+      {
+        "featureId": "feature:todo:132472e27f5f5116545a7ccf",
+        "labels": [
+          "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+          "**Remaining Lower-Priority**"
+        ],
+        "rowCount": 3
+      },
+      {
+        "featureId": "feature:todo:dc13d165afeb65f00c87fe15",
+        "labels": [
+          "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+          "Track 1: .env audit + dead-config archival"
+        ],
+        "rowCount": 3
+      },
+      {
+        "featureId": "feature:todo:9289019adf7d2721550af764",
+        "labels": [
+          "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+          "Track 2: Docker CPU limits + Caddy memory bump"
+        ],
+        "rowCount": 3
+      },
+      {
+        "featureId": "feature:todo:d8d7affddeaa909af27f7d69",
+        "labels": [
+          "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+          "Track 5C–5E: Model/GGUF cleanup"
+        ],
+        "rowCount": 3
+      },
+      {
+        "featureId": "feature:todo:24b4111ad0e1777784a9bd1a",
+        "labels": [
+          "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+          "Feature cluster grouping by `sourceRef` prefix"
+        ],
+        "rowCount": 3
+      },
+      {
+        "featureId": "feature:todo:af15f2f3c8d9e6c470e05b29",
+        "labels": [
+          "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+          "Stale feature detection (atlas entry exists, no recent git touch)"
+        ],
+        "rowCount": 3
+      },
+      {
+        "featureId": "feature:todo:c3dab502e86cc90f236e9a48",
+        "labels": [
+          "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+          "Duplicate system detection (two scripts/routes with overlapping sourceRefs)"
+        ],
+        "rowCount": 3
+      },
+      {
+        "featureId": "feature:todo:fadfc0e985f4f0e151eaf542",
+        "labels": [
+          "opencode-recommendations-json",
+          "Optional mirror only: export aliases to `.opencode/recommendations.json` + `.opencode/recommendations-summary.md` if a flat compatibility surface is still requi"
+        ],
+        "rowCount": 6
+      },
+      {
+        "featureId": "feature:todo:6ad7088a53bb671d7863d642",
+        "labels": [
+          "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+          "Retrieval hook inventory for Phase 11E:"
+        ],
+        "rowCount": 3
+      },
+      {
+        "featureId": "feature:todo:0d3ab6734e763f3f7697cfc0",
+        "labels": [
+          "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+          "Wire `QueryRouter4x4` into `fetchACPKnowledgeResults` so retrieval can explore dynamically instead of using fixed lane defaults."
+        ],
+        "rowCount": 3
+      },
+      {
+        "featureId": "feature:todo:4f67c0fab5bbbbbd33051d65",
+        "labels": [
+          "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+          "Add adaptive Hebbian adjustments to `ace:router:matrix` based on observed chunk hits and retrieval outcomes."
+        ],
+        "rowCount": 3
+      },
+      {
+        "featureId": "feature:todo:f93d30a30e773e2e83395aca",
+        "labels": [
+          "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+          "Configure `gemma3-270m.gguf` draft-model support in TurboQuant for CPU-assisted speculative token validation."
+        ],
+        "rowCount": 3
+      },
+      {
+        "featureId": "feature:todo:783118149f85dbce6bf6dd2a",
+        "labels": [
+          "src-lib-server-features-ai-ace-context-assembler-ts",
+          "Preserve the existing router/cache path in `src/lib/server/features/ai/ace/context-assembler.ts`; this is an extension lane, not a rewrite."
+        ],
+        "rowCount": 3
+      },
+      {
+        "featureId": "feature:todo:9ffab6bc4b9cd644239758c2",
+        "labels": [
+          "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+          "Document the live 4x4 router matrix location and usage:"
+        ],
+        "rowCount": 3
+      },
+      {
+        "featureId": "feature:todo:2ace876ba56f2c0753161f4b",
+        "labels": [
+          "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+          "Create `schema-encoder.wgsl` for client-side reranking of documents."
+        ],
+        "rowCount": 3
+      },
+      {
+        "featureId": "feature:todo:580c60d78636e391070bd061",
+        "labels": [
+          "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+          "Establish SharedArrayBuffer zero-copy structures for Web Worker communication."
+        ],
+        "rowCount": 3
+      },
+      {
+        "featureId": "feature:todo:039e09ca423789739c8c42c5",
+        "labels": [
+          "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+          "Implement IndexedDB caching of ONNX models and WebGPU weights inside the Service Worker."
+        ],
+        "rowCount": 3
+      },
+      {
+        "featureId": "feature:todo:c32b8055c5900f49a4919f9c",
+        "labels": [
+          "src-service-worker-ts",
+          "Preserve the existing WebGPU/SW foundation in `src/service-worker.ts`, `src/lib/workers/compute-worker.mjs`, and related browser guards; this is a productizatio"
+        ],
+        "rowCount": 3
+      },
+      {
+        "featureId": "feature:todo:002df24db7233c4b96982982",
+        "labels": [
+          "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+          "Option 2: ClusterCard schema + Redis/Qdrant wiring + API route"
+        ],
+        "rowCount": 3
+      },
+      {
+        "featureId": "feature:todo:86ddf5ba1247b00bd1f4e72b",
+        "labels": [
+          "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+          "Thread `alias_id` through the prompt listener log entries as a stable cross-store alias field"
+        ],
+        "rowCount": 3
+      },
+      {
+        "featureId": "feature:todo:63f45279017c8d6d13ef35c9",
+        "labels": [
+          "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+          "Add retrieval-loop sourceRef/feature_id/alias_id reconciliation into the prompt listener and recommendation score fusion path"
+        ],
+        "rowCount": 3
+      },
+      {
+        "featureId": "feature:todo:f5ffd5e75b0e0ea6ae82d22f",
+        "labels": [
+          "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+          "Upgrade Phase 17 PyTorch Feature Extractor script and Python implementation with robust fallbacks and correct schema"
+        ],
+        "rowCount": 3
+      },
+      {
+        "featureId": "feature:todo:1c1c05a2ad42be0af8be0757",
+        "labels": [
+          "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+          "Upgrade Phase 18 XGBoost Reranker script and Python implementation with robust fallbacks and correct schema"
+        ],
+        "rowCount": 3
+      },
+      {
+        "featureId": "feature:todo:9776801fc047158c169943dd",
+        "labels": [
+          "scripts-atlas-phase-lane-completion-mjs",
+          "Implement Phase 19 lane completion hook (`scripts/atlas/phase-lane-completion.mjs`)"
+        ],
+        "rowCount": 3
+      },
+      {
+        "featureId": "feature:todo:0255cb3ad2d2cf33a3f9450c",
+        "labels": [
+          "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+          "Wire `ast-grep` into the directory analysis pipeline for codebase pruning."
+        ],
+        "rowCount": 3
+      },
+      {
+        "featureId": "feature:todo:a0a4835aaffa64c8919de261",
+        "labels": [
+          "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+          "Use directory-role analysis plus AST maps to separate missing features from redundant features."
+        ],
+        "rowCount": 3
+      }
+    ],
+    "sourceRefJoins": [
+      {
+        "sourceRef": "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:21",
+        "rowCount": 3,
+        "featureIds": [
+          "feature:todo:1e95eb7b2c97aa52a6ec0308"
+        ],
+        "featureLabels": [
+          "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+          "**Knowledge Graph Tool Lanes**"
+        ]
+      },
+      {
+        "sourceRef": "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:22",
+        "rowCount": 3,
+        "featureIds": [
+          "feature:todo:f831f8496459630481b6f126"
+        ],
+        "featureLabels": [
+          "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+          "`attention_rank_files` — embed query → `attentionScoreGPU` via LibTorch → top-N from Karpathy scores"
+        ]
+      },
+      {
+        "sourceRef": "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:23",
+        "rowCount": 3,
+        "featureIds": [
+          "feature:todo:2aed3e03cc66e3e478a5479d"
+        ],
+        "featureLabels": [
+          "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+          "`som_topology_stats` — delegate to `gpu:som_topology` for Redis SOM grid / centroid stats"
+        ]
+      },
+      {
+        "sourceRef": "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:24",
+        "rowCount": 3,
+        "featureIds": [
+          "feature:todo:a33b97f7501a9583a2e63c2b"
+        ],
+        "featureLabels": [
+          "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+          "`language_distribution` — delegate to `gpu:language_distribution` for Qdrant cluster tag stats"
+        ]
+      },
+      {
+        "sourceRef": "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:25",
+        "rowCount": 3,
+        "featureIds": [
+          "feature:todo:322cf977b5fa41f902b9321b"
+        ],
+        "featureLabels": [
+          "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+          "`playbook_lookup_by_language` — use CouchDB `karpathy_wiki` plus top Karpathy file intersection"
+        ]
+      },
+      {
+        "sourceRef": "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:28",
+        "rowCount": 3,
+        "featureIds": [
+          "feature:todo:4ced48dea132da38f2ab7305"
+        ],
+        "featureLabels": [
+          "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+          "Route these tools into the correct skill families (`gpu-acceleration`, `vector-cluster`, `codebase`, `research`) without creating a parallel graph source of tru"
+        ]
+      },
+      {
+        "sourceRef": "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:49",
+        "rowCount": 3,
+        "featureIds": [
+          "feature:todo:a11f763c236417569484b3e7"
+        ],
+        "featureLabels": [
+          "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+          "Clustering quality cleanup (deferred)"
+        ]
+      },
+      {
+        "sourceRef": "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:55",
+        "rowCount": 3,
+        "featureIds": [
+          "feature:todo:787ff44880ddd6be2d9388ce"
+        ],
+        "featureLabels": [
+          "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+          "Wire into API routes (`/api/cases`, `/api/evidence/upload`) — deferred"
+        ]
+      },
+      {
+        "sourceRef": "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:71",
+        "rowCount": 3,
+        "featureIds": [
+          "feature:todo:7c0dbd56784529c16e1cb60e"
+        ],
+        "featureLabels": [
+          "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+          "**Track C — Production Gap Remediation** (after DB audit)"
+        ]
+      },
+      {
+        "sourceRef": "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:74",
+        "rowCount": 3,
+        "featureIds": [
+          "feature:todo:4afa9ddc2a7b74e522364100"
+        ],
+        "featureLabels": [
+          "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+          "Seed legal canon chunks (legal PDF ingest pipeline)"
+        ]
+      },
+      {
+        "sourceRef": "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:75",
+        "rowCount": 3,
+        "featureIds": [
+          "feature:todo:c3913a6ae582b02ec6366094"
+        ],
+        "featureLabels": [
+          "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+          "Add Playwright test fixtures for auth + DB seeding"
+        ]
+      },
+      {
+        "sourceRef": "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:80",
+        "rowCount": 3,
+        "featureIds": [
+          "feature:todo:211e484d8c9f1b5087925e91"
+        ],
+        "featureLabels": [
+          "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+          "Option 2: ClusterCard schema + Redis/Qdrant wiring + API route"
+        ]
+      },
+      {
+        "sourceRef": "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:86",
+        "rowCount": 3,
+        "featureIds": [
+          "feature:todo:f85f7b428819c0244985ab85"
+        ],
+        "featureLabels": [
+          "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+          "Warm workspace-start plans"
+        ]
+      },
+      {
+        "sourceRef": "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:87",
+        "rowCount": 3,
+        "featureIds": [
+          "feature:todo:5855fc827e386a10b01a26db"
+        ],
+        "featureLabels": [
+          "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+          "Warm legal/codebase summaries"
+        ]
+      },
+      {
+        "sourceRef": "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:89",
+        "rowCount": 3,
+        "featureIds": [
+          "feature:todo:132472e27f5f5116545a7ccf"
+        ],
+        "featureLabels": [
+          "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+          "**Remaining Lower-Priority**"
+        ]
+      },
+      {
+        "sourceRef": "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:90",
+        "rowCount": 3,
+        "featureIds": [
+          "feature:todo:dc13d165afeb65f00c87fe15"
+        ],
+        "featureLabels": [
+          "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+          "Track 1: .env audit + dead-config archival"
+        ]
+      },
+      {
+        "sourceRef": "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:91",
+        "rowCount": 3,
+        "featureIds": [
+          "feature:todo:9289019adf7d2721550af764"
+        ],
+        "featureLabels": [
+          "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+          "Track 2: Docker CPU limits + Caddy memory bump"
+        ]
+      },
+      {
+        "sourceRef": "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:93",
+        "rowCount": 3,
+        "featureIds": [
+          "feature:todo:d8d7affddeaa909af27f7d69"
+        ],
+        "featureLabels": [
+          "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+          "Track 5C–5E: Model/GGUF cleanup"
+        ]
+      },
+      {
+        "sourceRef": "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:234",
+        "rowCount": 3,
+        "featureIds": [
+          "feature:todo:24b4111ad0e1777784a9bd1a"
+        ],
+        "featureLabels": [
+          "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+          "Feature cluster grouping by `sourceRef` prefix"
+        ]
+      },
+      {
+        "sourceRef": "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:235",
+        "rowCount": 3,
+        "featureIds": [
+          "feature:todo:af15f2f3c8d9e6c470e05b29"
+        ],
+        "featureLabels": [
+          "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+          "Stale feature detection (atlas entry exists, no recent git touch)"
+        ]
+      }
+    ],
+    "missingFeatureTodos": [
+      {
+        "lineNumber": 1,
+        "sourceRef": "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:21",
+        "path": null,
+        "featureId": "feature:todo:1e95eb7b2c97aa52a6ec0308",
+        "title": "**Knowledge Graph Tool Lanes**"
+      },
+      {
+        "lineNumber": 2,
+        "sourceRef": "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:22",
+        "path": null,
+        "featureId": "feature:todo:f831f8496459630481b6f126",
+        "title": "`attention_rank_files` — embed query → `attentionScoreGPU` via LibTorch → top-N from Karpathy scores"
+      },
+      {
+        "lineNumber": 3,
+        "sourceRef": "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:23",
+        "path": null,
+        "featureId": "feature:todo:2aed3e03cc66e3e478a5479d",
+        "title": "`som_topology_stats` — delegate to `gpu:som_topology` for Redis SOM grid / centroid stats"
+      },
+      {
+        "lineNumber": 4,
+        "sourceRef": "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:24",
+        "path": null,
+        "featureId": "feature:todo:a33b97f7501a9583a2e63c2b",
+        "title": "`language_distribution` — delegate to `gpu:language_distribution` for Qdrant cluster tag stats"
+      },
+      {
+        "lineNumber": 5,
+        "sourceRef": "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:25",
+        "path": null,
+        "featureId": "feature:todo:322cf977b5fa41f902b9321b",
+        "title": "`playbook_lookup_by_language` — use CouchDB `karpathy_wiki` plus top Karpathy file intersection"
+      },
+      {
+        "lineNumber": 6,
+        "sourceRef": "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:28",
+        "path": null,
+        "featureId": "feature:todo:4ced48dea132da38f2ab7305",
+        "title": "Route these tools into the correct skill families (`gpu-acceleration`, `vector-cluster`, `codebase`, `research`) without creating a parallel graph source of tru"
+      },
+      {
+        "lineNumber": 7,
+        "sourceRef": "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:49",
+        "path": null,
+        "featureId": "feature:todo:a11f763c236417569484b3e7",
+        "title": "Clustering quality cleanup (deferred)"
+      },
+      {
+        "lineNumber": 8,
+        "sourceRef": "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:55",
+        "path": null,
+        "featureId": "feature:todo:787ff44880ddd6be2d9388ce",
+        "title": "Wire into API routes (`/api/cases`, `/api/evidence/upload`) — deferred"
+      },
+      {
+        "lineNumber": 9,
+        "sourceRef": "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:71",
+        "path": null,
+        "featureId": "feature:todo:7c0dbd56784529c16e1cb60e",
+        "title": "**Track C — Production Gap Remediation** (after DB audit)"
+      },
+      {
+        "lineNumber": 10,
+        "sourceRef": "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:74",
+        "path": null,
+        "featureId": "feature:todo:4afa9ddc2a7b74e522364100",
+        "title": "Seed legal canon chunks (legal PDF ingest pipeline)"
+      },
+      {
+        "lineNumber": 11,
+        "sourceRef": "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:75",
+        "path": null,
+        "featureId": "feature:todo:c3913a6ae582b02ec6366094",
+        "title": "Add Playwright test fixtures for auth + DB seeding"
+      },
+      {
+        "lineNumber": 12,
+        "sourceRef": "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:80",
+        "path": null,
+        "featureId": "feature:todo:211e484d8c9f1b5087925e91",
+        "title": "Option 2: ClusterCard schema + Redis/Qdrant wiring + API route"
+      },
+      {
+        "lineNumber": 13,
+        "sourceRef": "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:86",
+        "path": null,
+        "featureId": "feature:todo:f85f7b428819c0244985ab85",
+        "title": "Warm workspace-start plans"
+      },
+      {
+        "lineNumber": 14,
+        "sourceRef": "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:87",
+        "path": null,
+        "featureId": "feature:todo:5855fc827e386a10b01a26db",
+        "title": "Warm legal/codebase summaries"
+      },
+      {
+        "lineNumber": 15,
+        "sourceRef": "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:89",
+        "path": null,
+        "featureId": "feature:todo:132472e27f5f5116545a7ccf",
+        "title": "**Remaining Lower-Priority**"
+      },
+      {
+        "lineNumber": 16,
+        "sourceRef": "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:90",
+        "path": null,
+        "featureId": "feature:todo:dc13d165afeb65f00c87fe15",
+        "title": "Track 1: .env audit + dead-config archival"
+      },
+      {
+        "lineNumber": 17,
+        "sourceRef": "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:91",
+        "path": null,
+        "featureId": "feature:todo:9289019adf7d2721550af764",
+        "title": "Track 2: Docker CPU limits + Caddy memory bump"
+      },
+      {
+        "lineNumber": 18,
+        "sourceRef": "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:93",
+        "path": null,
+        "featureId": "feature:todo:d8d7affddeaa909af27f7d69",
+        "title": "Track 5C–5E: Model/GGUF cleanup"
+      },
+      {
+        "lineNumber": 19,
+        "sourceRef": "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:234",
+        "path": null,
+        "featureId": "feature:todo:24b4111ad0e1777784a9bd1a",
+        "title": "Feature cluster grouping by `sourceRef` prefix"
+      },
+      {
+        "lineNumber": 20,
+        "sourceRef": "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:235",
+        "path": null,
+        "featureId": "feature:todo:af15f2f3c8d9e6c470e05b29",
+        "title": "Stale feature detection (atlas entry exists, no recent git touch)"
+      }
+    ],
+    "kanbanTaskJoins": [
+      {
+        "lineNumber": 1,
+        "taskId": "kanban-5b882548bfd3",
+        "featureId": "feature:todo:1e95eb7b2c97aa52a6ec0308",
+        "sourceRef": "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:21",
+        "featureLabels": [
+          "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+          "**Knowledge Graph Tool Lanes**"
+        ],
+        "sourceRefJoinCount": 3
+      },
+      {
+        "lineNumber": 2,
+        "taskId": "kanban-e85ec67be636",
+        "featureId": "feature:todo:f831f8496459630481b6f126",
+        "sourceRef": "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:22",
+        "featureLabels": [
+          "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+          "`attention_rank_files` — embed query → `attentionScoreGPU` via LibTorch → top-N from Karpathy scores"
+        ],
+        "sourceRefJoinCount": 3
+      },
+      {
+        "lineNumber": 3,
+        "taskId": "kanban-367ef736edbd",
+        "featureId": "feature:todo:2aed3e03cc66e3e478a5479d",
+        "sourceRef": "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:23",
+        "featureLabels": [
+          "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+          "`som_topology_stats` — delegate to `gpu:som_topology` for Redis SOM grid / centroid stats"
+        ],
+        "sourceRefJoinCount": 3
+      },
+      {
+        "lineNumber": 4,
+        "taskId": "kanban-c94be4b7f14d",
+        "featureId": "feature:todo:a33b97f7501a9583a2e63c2b",
+        "sourceRef": "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:24",
+        "featureLabels": [
+          "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+          "`language_distribution` — delegate to `gpu:language_distribution` for Qdrant cluster tag stats"
+        ],
+        "sourceRefJoinCount": 3
+      },
+      {
+        "lineNumber": 5,
+        "taskId": "kanban-bd3f0f6d443b",
+        "featureId": "feature:todo:322cf977b5fa41f902b9321b",
+        "sourceRef": "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:25",
+        "featureLabels": [
+          "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+          "`playbook_lookup_by_language` — use CouchDB `karpathy_wiki` plus top Karpathy file intersection"
+        ],
+        "sourceRefJoinCount": 3
+      },
+      {
+        "lineNumber": 6,
+        "taskId": "kanban-c029e338268b",
+        "featureId": "feature:todo:4ced48dea132da38f2ab7305",
+        "sourceRef": "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:28",
+        "featureLabels": [
+          "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+          "Route these tools into the correct skill families (`gpu-acceleration`, `vector-cluster`, `codebase`, `research`) without creating a parallel graph source of tru"
+        ],
+        "sourceRefJoinCount": 3
+      },
+      {
+        "lineNumber": 7,
+        "taskId": "kanban-4d2c22a25d3f",
+        "featureId": "feature:todo:a11f763c236417569484b3e7",
+        "sourceRef": "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:49",
+        "featureLabels": [
+          "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+          "Clustering quality cleanup (deferred)"
+        ],
+        "sourceRefJoinCount": 3
+      },
+      {
+        "lineNumber": 8,
+        "taskId": "kanban-4666ceed33f2",
+        "featureId": "feature:todo:787ff44880ddd6be2d9388ce",
+        "sourceRef": "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:55",
+        "featureLabels": [
+          "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+          "Wire into API routes (`/api/cases`, `/api/evidence/upload`) — deferred"
+        ],
+        "sourceRefJoinCount": 3
+      },
+      {
+        "lineNumber": 9,
+        "taskId": "kanban-95132d29e580",
+        "featureId": "feature:todo:7c0dbd56784529c16e1cb60e",
+        "sourceRef": "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:71",
+        "featureLabels": [
+          "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+          "**Track C — Production Gap Remediation** (after DB audit)"
+        ],
+        "sourceRefJoinCount": 3
+      },
+      {
+        "lineNumber": 10,
+        "taskId": "kanban-c47cc56e809a",
+        "featureId": "feature:todo:4afa9ddc2a7b74e522364100",
+        "sourceRef": "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:74",
+        "featureLabels": [
+          "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+          "Seed legal canon chunks (legal PDF ingest pipeline)"
+        ],
+        "sourceRefJoinCount": 3
+      },
+      {
+        "lineNumber": 11,
+        "taskId": "kanban-b4528d883940",
+        "featureId": "feature:todo:c3913a6ae582b02ec6366094",
+        "sourceRef": "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:75",
+        "featureLabels": [
+          "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+          "Add Playwright test fixtures for auth + DB seeding"
+        ],
+        "sourceRefJoinCount": 3
+      },
+      {
+        "lineNumber": 12,
+        "taskId": "kanban-190dc27e5764",
+        "featureId": "feature:todo:211e484d8c9f1b5087925e91",
+        "sourceRef": "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:80",
+        "featureLabels": [
+          "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+          "Option 2: ClusterCard schema + Redis/Qdrant wiring + API route"
+        ],
+        "sourceRefJoinCount": 3
+      },
+      {
+        "lineNumber": 13,
+        "taskId": "kanban-a826ba266ce3",
+        "featureId": "feature:todo:f85f7b428819c0244985ab85",
+        "sourceRef": "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:86",
+        "featureLabels": [
+          "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+          "Warm workspace-start plans"
+        ],
+        "sourceRefJoinCount": 3
+      },
+      {
+        "lineNumber": 14,
+        "taskId": "kanban-ace78cb1afbd",
+        "featureId": "feature:todo:5855fc827e386a10b01a26db",
+        "sourceRef": "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:87",
+        "featureLabels": [
+          "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+          "Warm legal/codebase summaries"
+        ],
+        "sourceRefJoinCount": 3
+      },
+      {
+        "lineNumber": 15,
+        "taskId": "kanban-a43cf4f65693",
+        "featureId": "feature:todo:132472e27f5f5116545a7ccf",
+        "sourceRef": "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:89",
+        "featureLabels": [
+          "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+          "**Remaining Lower-Priority**"
+        ],
+        "sourceRefJoinCount": 3
+      },
+      {
+        "lineNumber": 16,
+        "taskId": "kanban-1c3d788fc073",
+        "featureId": "feature:todo:dc13d165afeb65f00c87fe15",
+        "sourceRef": "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:90",
+        "featureLabels": [
+          "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+          "Track 1: .env audit + dead-config archival"
+        ],
+        "sourceRefJoinCount": 3
+      },
+      {
+        "lineNumber": 17,
+        "taskId": "kanban-d209d6dd0493",
+        "featureId": "feature:todo:9289019adf7d2721550af764",
+        "sourceRef": "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:91",
+        "featureLabels": [
+          "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+          "Track 2: Docker CPU limits + Caddy memory bump"
+        ],
+        "sourceRefJoinCount": 3
+      },
+      {
+        "lineNumber": 18,
+        "taskId": "kanban-022e81f9aab7",
+        "featureId": "feature:todo:d8d7affddeaa909af27f7d69",
+        "sourceRef": "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:93",
+        "featureLabels": [
+          "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+          "Track 5C–5E: Model/GGUF cleanup"
+        ],
+        "sourceRefJoinCount": 3
+      },
+      {
+        "lineNumber": 19,
+        "taskId": "kanban-1876c5b2b9c3",
+        "featureId": "feature:todo:24b4111ad0e1777784a9bd1a",
+        "sourceRef": "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:234",
+        "featureLabels": [
+          "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+          "Feature cluster grouping by `sourceRef` prefix"
+        ],
+        "sourceRefJoinCount": 3
+      },
+      {
+        "lineNumber": 20,
+        "taskId": "kanban-567948832697",
+        "featureId": "feature:todo:af15f2f3c8d9e6c470e05b29",
+        "sourceRef": "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:235",
+        "featureLabels": [
+          "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+          "Stale feature detection (atlas entry exists, no recent git touch)"
+        ],
+        "sourceRefJoinCount": 3
+      }
+    ],
+    "crosswalkStatus": {
+      "parentAtlasTocExists": false,
+      "docFeatureCrosswalkExists": false,
+      "parentAtlasToc": "docs/atlas/parent-atlas-table-of-contents.md",
+      "docFeatureCrosswalk": "docs/reports/doc-feature-crosswalk-2026-06-01.md",
+      "note": "WARN: optional doc crosswalk inputs missing: docs/atlas/parent-atlas-table-of-contents.md, docs/reports/doc-feature-crosswalk-2026-06-01.md"
+    },
+    "pathCandidates": [
+      {
+        "candidate": "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:21",
+        "rowCount": 3
+      },
+      {
+        "candidate": "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:22",
+        "rowCount": 3
+      },
+      {
+        "candidate": "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:23",
+        "rowCount": 3
+      },
+      {
+        "candidate": "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:24",
+        "rowCount": 3
+      },
+      {
+        "candidate": "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:25",
+        "rowCount": 3
+      },
+      {
+        "candidate": "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:28",
+        "rowCount": 3
+      },
+      {
+        "candidate": "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:49",
+        "rowCount": 3
+      },
+      {
+        "candidate": "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:55",
+        "rowCount": 3
+      },
+      {
+        "candidate": "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:71",
+        "rowCount": 3
+      },
+      {
+        "candidate": "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:74",
+        "rowCount": 3
+      },
+      {
+        "candidate": "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:75",
+        "rowCount": 3
+      },
+      {
+        "candidate": "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:80",
+        "rowCount": 3
+      },
+      {
+        "candidate": "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:86",
+        "rowCount": 3
+      },
+      {
+        "candidate": "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:87",
+        "rowCount": 3
+      },
+      {
+        "candidate": "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:89",
+        "rowCount": 3
+      },
+      {
+        "candidate": "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:90",
+        "rowCount": 3
+      },
+      {
+        "candidate": "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:91",
+        "rowCount": 3
+      },
+      {
+        "candidate": "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:93",
+        "rowCount": 3
+      },
+      {
+        "candidate": "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:234",
+        "rowCount": 3
+      },
+      {
+        "candidate": "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#line:235",
+        "rowCount": 3
+      }
+    ],
+    "nextRepairActions": [
+      "Backfill feature_id for any path-only rows.",
+      "Normalize source_ref to the packet join key before replay.",
+      "Join kanban tasks and missing feature todos to feature labels by feature_id.",
+      "Treat missing doc crosswalk inputs as warnings in this checkout."
+    ]
+  }
+}

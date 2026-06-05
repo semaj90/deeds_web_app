@@ -73,13 +73,14 @@ The orchestrator at `scripts/atlas/run-offline-synthesis.mjs` sequences:
 2. `scripts/opencode/summarize_cards_gemma4.mjs`
 3. `scripts/atlas/mapreduce-consolidated-index.mjs`
 4. `scripts/atlas/materialize-mapreduce-duckdb.mjs`
-5. `npm run duckdb:feature-cards:refresh`
-6. `scripts/atlas/phase-19c-knowledge-consolidation.mjs`
-7. `scripts/atlas/phase-19c-qdrant-index.mjs`
-8. `scripts/atlas/phase-19c-neo4j-sync.mjs`
-9. `scripts/atlas-parent-indexing.mjs`
-10. `scripts/atlas/validate-parent-atlas.mjs`
-11. `scripts/atlas/audit-parent-atlas-consistency.mjs`
+5. `scripts/atlas/materialize-hidden-packet-pathmap-duckdb.mjs`
+6. `npm run duckdb:feature-cards:refresh`
+7. `scripts/atlas/phase-19c-knowledge-consolidation.mjs`
+8. `scripts/atlas/phase-19c-qdrant-index.mjs`
+9. `scripts/atlas/phase-19c-neo4j-sync.mjs`
+10. `scripts/atlas-parent-indexing.mjs`
+11. `scripts/atlas/validate-parent-atlas.mjs`
+12. `scripts/atlas/audit-parent-atlas-consistency.mjs`
 
 ## Storage targets
 
@@ -129,6 +130,9 @@ The runner writes the following artifacts:
 
 - `.tmp/offline-synthesis/consolidated-index.ndjson`
 - `.tmp/offline-synthesis/consolidated-index.ndjson.manifest.json`
+- `docs/reports/hidden-packet-pathmap.duckdb`
+- `docs/reports/hidden-packet-pathmap-duckdb-report.json`
+- `docs/reports/hidden-packet-pathmap-duckdb-report.md`
 - `docs/reports/offline-synthesis-mapreduce-duckdb-report.json`
 - `docs/reports/offline-synthesis-mapreduce-duckdb-report.md`
 - `.tmp/ingest/lanes/codebase_features.ndjson`
@@ -140,6 +144,8 @@ The runner writes the following artifacts:
 - `docs/phase100/feature-recommendations.json`
 - `.tmp/offline-synthesis-report.json`
 - `.tmp/offline-synthesis-report.md`
+
+The hidden packet pathmap DuckDB report is the canonical joined replay surface for the `sourceRef + feature_id + stable_id` spine. Keep it in the bounded offline lane so the pathmap stays aligned with the packet, kanban, and todo surfaces instead of drifting into a separate ad hoc report.
 
 ## Open lanes
 

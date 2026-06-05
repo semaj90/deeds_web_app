@@ -51,6 +51,7 @@
         "github.copilot.chat.localIndex.enabled": true,
         "github.copilot.chat.responsesApi.toolSearchTool.enabled": true,
         "github.copilot.chat.anthropic.cacheBreakpoints.lastTwoMessages": true,
-        "github.copilot.chat.skillTool.enabled": true
+        "github.copilot.chat.skillTool.enabled": true,
+        "editor.codeActions.triggerOnFocusChange": true
     }
 }

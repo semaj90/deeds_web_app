@@ -59,3 +59,20 @@ Keep the stable caller seam in:
 - `sveltekit-frontend/src/lib/server/retrieval/orchestrator.ts`
 
 Adapters must return the same search hit / retrieval result shape, regardless of backend.
+
+## Compressed semantic geometry
+
+Qdrant, TurboVec, Redis LOD packets, SOM centroids, and NES/CHROM dictionaries
+are compressed approximate semantic geometry. They are acceleration and replay
+surfaces.
+
+The durable identity remains `sourceRef + feature_id + packetId` in Postgres
+and the Parent Atlas ledger.
+
+Use this order:
+
+1. apply sourceRef / feature_id / tag / route filters
+2. run approximate ANN or compressed candidate search
+3. oversample only when the query needs more recall
+4. exact-rescore a bounded candidate set when quality requires it
+5. assemble replayable packets with provenance intact

@@ -1,0 +1,518 @@
+{
+  "schema": "hidden_packet_pathmap_audit.v1",
+  "generatedAt": "2026-06-05T14:53:21.352Z",
+  "readOnly": true,
+  "inputs": [
+    {
+      "key": "feature_labels",
+      "requestedPath": ".tmp/feature_labels.jsonl",
+      "selectedPath": ".tmp/feature_labels.jsonl",
+      "exists": true,
+      "usedFallback": false,
+      "bytes": 820091,
+      "rows": 3106,
+      "invalidJson": 0,
+      "withStableId": 3106,
+      "withSourceRef": 3106,
+      "withFeatureId": 3106,
+      "withSourceRefAndFeatureId": 3106,
+      "uniqueStableIds": 3096,
+      "uniqueSourceRefs": 2640,
+      "uniqueFeatureIds": 10,
+      "duplicateStableIds": 10,
+      "sourceRefBuckets": {
+        "src/": 2347,
+        "src/lib/server/db/schema/": 713,
+        "lib": 18,
+        "routes": 4,
+        "drizzle/manual/": 24
+      },
+      "topFeatures": [
+        {
+          "feature_id": "ui",
+          "count": 1765
+        },
+        {
+          "feature_id": "database",
+          "count": 1149
+        },
+        {
+          "feature_id": "llm",
+          "count": 367
+        },
+        {
+          "feature_id": "evidence",
+          "count": 316
+        },
+        {
+          "feature_id": "cache",
+          "count": 268
+        },
+        {
+          "feature_id": "graph",
+          "count": 220
+        },
+        {
+          "feature_id": "vector-search",
+          "count": 148
+        },
+        {
+          "feature_id": "gpu",
+          "count": 144
+        },
+        {
+          "feature_id": "ingest",
+          "count": 109
+        },
+        {
+          "feature_id": "auth",
+          "count": 87
+        }
+      ],
+      "samples": [
+        {
+          "line": 1,
+          "stableIds": [
+            "b5aa13ce0a61c3f166000471d0729aa6a8e57292fdbd8d88452443502e4b9a4a"
+          ],
+          "sourceRefs": [
+            "src/hooks.server.ts"
+          ],
+          "featureIds": [
+            "llm",
+            "auth",
+            "cache"
+          ],
+          "title": null
+        },
+        {
+          "line": 2,
+          "stableIds": [
+            "f777da347bf5c85e9d386c9f4a21ac8795bcd8ab10da0eec19bfd4d6f4d77fb6"
+          ],
+          "sourceRefs": [
+            "src/lib/ai/client-embed.ts"
+          ],
+          "featureIds": [
+            "llm",
+            "auth"
+          ],
+          "title": null
+        },
+        {
+          "line": 3,
+          "stableIds": [
+            "f447c6677f27ebe5066946722253f06a4bce58b36a2978b088853c3d9faabf63"
+          ],
+          "sourceRefs": [
+            "src/lib/ai/client-llm-synthesis.ts"
+          ],
+          "featureIds": [
+            "llm"
+          ],
+          "title": null
+        },
+        {
+          "line": 4,
+          "stableIds": [
+            "dc041bf776c31ef676af0eef1eae830a52178f04dd06570ac8f1063bcf7ce1fc"
+          ],
+          "sourceRefs": [
+            "src/lib/ai/e2b/inference.ts"
+          ],
+          "featureIds": [
+            "auth"
+          ],
+          "title": null
+        },
+        {
+          "line": 5,
+          "stableIds": [
+            "89544bd259731886161a246954fd88fba19799602559e7d68f1153f1fde7310b"
+          ],
+          "sourceRefs": [
+            "src/lib/ai/onnx/inference.ts"
+          ],
+          "featureIds": [
+            "auth"
+          ],
+          "title": null
+        }
+      ],
+      "errors": []
+    },
+    {
+      "key": "kanban_tasks",
+      "requestedPath": ".tmp/kanban_tasks.jsonl",
+      "selectedPath": ".tmp/kanban_tasks.jsonl",
+      "exists": true,
+      "usedFallback": false,
+      "bytes": 1088245,
+      "rows": 3106,
+      "invalidJson": 0,
+      "withStableId": 3106,
+      "withSourceRef": 3106,
+      "withFeatureId": 3106,
+      "withSourceRefAndFeatureId": 3106,
+      "uniqueStableIds": 3096,
+      "uniqueSourceRefs": 2640,
+      "uniqueFeatureIds": 10,
+      "duplicateStableIds": 10,
+      "sourceRefBuckets": {
+        "src/": 2347,
+        "src/lib/server/db/schema/": 713,
+        "lib": 18,
+        "routes": 4,
+        "drizzle/manual/": 24
+      },
+      "topFeatures": [
+        {
+          "feature_id": "ui",
+          "count": 1442
+        },
+        {
+          "feature_id": "database",
+          "count": 939
+        },
+        {
+          "feature_id": "evidence",
+          "count": 181
+        },
+        {
+          "feature_id": "llm",
+          "count": 162
+        },
+        {
+          "feature_id": "cache",
+          "count": 106
+        },
+        {
+          "feature_id": "graph",
+          "count": 90
+        },
+        {
+          "feature_id": "gpu",
+          "count": 78
+        },
+        {
+          "feature_id": "vector-search",
+          "count": 52
+        },
+        {
+          "feature_id": "ingest",
+          "count": 34
+        },
+        {
+          "feature_id": "auth",
+          "count": 22
+        }
+      ],
+      "samples": [
+        {
+          "line": 1,
+          "stableIds": [
+            "b5aa13ce0a61c3f166000471d0729aa6a8e57292fdbd8d88452443502e4b9a4a"
+          ],
+          "sourceRefs": [
+            "src/hooks.server.ts"
+          ],
+          "featureIds": [
+            "llm"
+          ],
+          "title": "Label: llm — Review hooks.server.ts"
+        },
+        {
+          "line": 2,
+          "stableIds": [
+            "f777da347bf5c85e9d386c9f4a21ac8795bcd8ab10da0eec19bfd4d6f4d77fb6"
+          ],
+          "sourceRefs": [
+            "src/lib/ai/client-embed.ts"
+          ],
+          "featureIds": [
+            "llm"
+          ],
+          "title": "Label: llm — Review client-embed.ts"
+        },
+        {
+          "line": 3,
+          "stableIds": [
+            "f447c6677f27ebe5066946722253f06a4bce58b36a2978b088853c3d9faabf63"
+          ],
+          "sourceRefs": [
+            "src/lib/ai/client-llm-synthesis.ts"
+          ],
+          "featureIds": [
+            "llm"
+          ],
+          "title": "Label: llm — Review client-llm-synthesis.ts"
+        },
+        {
+          "line": 4,
+          "stableIds": [
+            "dc041bf776c31ef676af0eef1eae830a52178f04dd06570ac8f1063bcf7ce1fc"
+          ],
+          "sourceRefs": [
+            "src/lib/ai/e2b/inference.ts"
+          ],
+          "featureIds": [
+            "auth"
+          ],
+          "title": "Label: auth — Review inference.ts"
+        },
+        {
+          "line": 5,
+          "stableIds": [
+            "89544bd259731886161a246954fd88fba19799602559e7d68f1153f1fde7310b"
+          ],
+          "sourceRefs": [
+            "src/lib/ai/onnx/inference.ts"
+          ],
+          "featureIds": [
+            "auth"
+          ],
+          "title": "Label: auth — Review inference.ts"
+        }
+      ],
+      "errors": []
+    },
+    {
+      "key": "missing_feature_todos",
+      "requestedPath": ".tmp/missing_feature_todos.jsonl",
+      "selectedPath": "sveltekit-frontend/.tmp/missing_feature_todos.jsonl",
+      "exists": true,
+      "usedFallback": true,
+      "bytes": 114390,
+      "rows": 141,
+      "invalidJson": 0,
+      "withStableId": 141,
+      "withSourceRef": 141,
+      "withFeatureId": 141,
+      "withSourceRefAndFeatureId": 141,
+      "uniqueStableIds": 141,
+      "uniqueSourceRefs": 143,
+      "uniqueFeatureIds": 146,
+      "duplicateStableIds": 0,
+      "sourceRefBuckets": {
+        "todo": 135,
+        "MASTER-FEATURE-TODO-2026-05-20.md": 141,
+        ".opencode/": 4,
+        "src/": 3,
+        "scripts/atlas/": 1,
+        "docs/graph/": 1
+      },
+      "topFeatures": [
+        {
+          "feature_id": "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
+          "count": 135
+        },
+        {
+          "feature_id": "feature:todo:fadfc0e985f4f0e151eaf542",
+          "count": 2
+        },
+        {
+          "feature_id": "opencode-recommendations-json",
+          "count": 2
+        },
+        {
+          "feature_id": "docs-graph",
+          "count": 1
+        },
+        {
+          "feature_id": "feature:todo:002df24db7233c4b96982982",
+          "count": 1
+        },
+        {
+          "feature_id": "feature:todo:0255cb3ad2d2cf33a3f9450c",
+          "count": 1
+        },
+        {
+          "feature_id": "feature:todo:039e09ca423789739c8c42c5",
+          "count": 1
+        },
+        {
+          "feature_id": "feature:todo:08a60b305944064051beac3a",
+          "count": 1
+        },
+        {
+          "feature_id": "feature:todo:0aa8e73629125ac4b069abd9",
+          "count": 1
+        },
+        {
+          "feature_id": "feature:todo:0d3ab6734e763f3f7697cfc0",
+          "count": 1
+        },
+        {
+          "feature_id": "feature:todo:132472e27f5f5116545a7ccf",
+          "count": 1
+        },
+        {
+          "feature_id": "feature:todo:16f554676a7b623ce9880206",
+          "count": 1
+        },
+        {
+          "feature_id": "feature:todo:18afe17870a6d2d0f1856193",
+          "count": 1
+        },
+        {
+          "feature_id": "feature:todo:1967eedf615aa4f61bb9001b",
+          "count": 1
+        },
+        {
+          "feature_id": "feature:todo:19b6bdabfc35748b3abe43b9",
+          "count": 1
+        },
+        {
+          "feature_id": "feature:todo:1bd33c5ca64b01df42e9fcac",
+          "count": 1
+        },
+        {
+          "feature_id": "feature:todo:1c1c05a2ad42be0af8be0757",
+          "count": 1
+        },
+        {
+          "feature_id": "feature:todo:1e4c336ba1e2a42f2be25839",
+          "count": 1
+        },
+        {
+          "feature_id": "feature:todo:1e95eb7b2c97aa52a6ec0308",
+          "count": 1
+        },
+        {
+          "feature_id": "feature:todo:1f3fec88b4887714bff46565",
+          "count": 1
+        }
+      ],
+      "samples": [
+        {
+          "line": 1,
+          "stableIds": [
+            "kanban-5b882548bfd3"
+          ],
+          "sourceRefs": [
+            "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#L21",
+            "MASTER-FEATURE-TODO-2026-05-20.md"
+          ],
+          "featureIds": [
+            "feature:todo:1e95eb7b2c97aa52a6ec0308",
+            "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md"
+          ],
+          "title": "**Knowledge Graph Tool Lanes**"
+        },
+        {
+          "line": 2,
+          "stableIds": [
+            "kanban-e85ec67be636"
+          ],
+          "sourceRefs": [
+            "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#L22",
+            "MASTER-FEATURE-TODO-2026-05-20.md"
+          ],
+          "featureIds": [
+            "feature:todo:f831f8496459630481b6f126",
+            "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md"
+          ],
+          "title": "`attention_rank_files` — embed query → `attentionScoreGPU` via LibTorch → top-N from Karpathy scores"
+        },
+        {
+          "line": 3,
+          "stableIds": [
+            "kanban-367ef736edbd"
+          ],
+          "sourceRefs": [
+            "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#L23",
+            "MASTER-FEATURE-TODO-2026-05-20.md"
+          ],
+          "featureIds": [
+            "feature:todo:2aed3e03cc66e3e478a5479d",
+            "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md"
+          ],
+          "title": "`som_topology_stats` — delegate to `gpu:som_topology` for Redis SOM grid / centroid stats"
+        },
+        {
+          "line": 4,
+          "stableIds": [
+            "kanban-c94be4b7f14d"
+          ],
+          "sourceRefs": [
+            "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#L24",
+            "MASTER-FEATURE-TODO-2026-05-20.md"
+          ],
+          "featureIds": [
+            "feature:todo:a33b97f7501a9583a2e63c2b",
+            "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md"
+          ],
+          "title": "`language_distribution` — delegate to `gpu:language_distribution` for Qdrant cluster tag stats"
+        },
+        {
+          "line": 5,
+          "stableIds": [
+            "kanban-bd3f0f6d443b"
+          ],
+          "sourceRefs": [
+            "todo:C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md#L25",
+            "MASTER-FEATURE-TODO-2026-05-20.md"
+          ],
+          "featureIds": [
+            "feature:todo:322cf977b5fa41f902b9321b",
+            "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md"
+          ],
+          "title": "`playbook_lookup_by_language` — use CouchDB `karpathy_wiki` plus top Karpathy file intersection"
+        }
+      ],
+      "errors": []
+    }
+  ],
+  "summary": {
+    "inputsResolved": 3,
+    "totalRows": 6353,
+    "invalidJson": 0,
+    "withSourceRef": 6353,
+    "withFeatureId": 6353,
+    "withSourceRefAndFeatureId": 6353
+  },
+  "joins": {
+    "feature_labels_to_kanban_tasks": {
+      "kanbanRows": 3106,
+      "stableIdMatches": 3106,
+      "sourceFeatureMatches": 3106
+    },
+    "missing_feature_todos": {
+      "rows": 141,
+      "withTodoSourceRef": 135
+    }
+  },
+  "pathmap": {
+    "path": "docs/graph/missing-features-path-map.json",
+    "exists": true,
+    "roots": [
+      "sveltekit-frontend/src/lib/server/db/schema/",
+      "sveltekit-frontend/drizzle/manual/",
+      "scripts/atlas/",
+      "scripts/ingest/",
+      "docs/graph/",
+      "docs/reports/",
+      "docs/atlas/",
+      "memory/exports/",
+      ".tmp/",
+      ".opencode/",
+      ".cache/",
+      ".svelte-kit/",
+      ".github/",
+      ".vscode/"
+    ],
+    "fieldAlignment": {
+      "sourceRef": "canonical source identity",
+      "feature_id": "stable feature lane identity",
+      "alias_id": "cross-store alias for task and packet reconciliation",
+      "parent_atlas_card_id": "offline synthesis card identity"
+    },
+    "targets": [
+      "Postgres",
+      "Qdrant",
+      "Redis",
+      "Neo4j / SOM topology",
+      "SeaweedFS archive"
+    ]
+  }
+}

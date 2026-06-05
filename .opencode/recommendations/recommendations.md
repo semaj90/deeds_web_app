@@ -1,45 +1,45 @@
-# Recommendations - 2026-06-05T02:49:32.705Z
+# Recommendations — 2026-06-05T14:13:35.970Z
 
-**Total**: 17 recommendations across 5 clusters
+**Total**: 18 recommendations across 5 clusters
 
 ## Top 10
-1. **[HIGH]** `developer_recommendation` - src/lib/components/ui/index.ts — 42 unresolved imports
+1. **[HIGH]** `developer_recommendation` — src/lib/components/ui/index.ts — 42 unresolved imports
    - Feature "ui" barrel/index has 42 dangling import refs (mapreduce v4 scan)
    - Action: Audit barrel re-exports; remove or fix dangling import paths
    - `node scripts/atlas/debug-import-resolve.mjs <import> 'src/lib/components/ui/index.ts'`
-2. **[HIGH]** `developer_recommendation` - src/lib/components/ui/gaming/n64/index.ts — 29 unresolved imports
+2. **[HIGH]** `developer_recommendation` — src/lib/components/ui/gaming/n64/index.ts — 29 unresolved imports
    - Feature "ui" barrel/index has 29 dangling import refs (mapreduce v4 scan)
    - Action: Audit barrel re-exports; remove or fix dangling import paths
    - `node scripts/atlas/debug-import-resolve.mjs <import> 'src/lib/components/ui/gaming/n64/index.ts'`
-3. **[HIGH]** `developer_recommendation` - src/lib/components/ui/gaming/index.ts — 18 unresolved imports
+3. **[HIGH]** `developer_recommendation` — src/lib/components/ui/gaming/index.ts — 18 unresolved imports
    - Feature "ui" barrel/index has 18 dangling import refs (mapreduce v4 scan)
    - Action: Audit barrel re-exports; remove or fix dangling import paths
    - `node scripts/atlas/debug-import-resolve.mjs <import> 'src/lib/components/ui/gaming/index.ts'`
-4. **[HIGH]** `developer_recommendation` - src/lib/components/ui/alert-dialog/index.js — 12 unresolved imports
+4. **[HIGH]** `developer_recommendation` — src/lib/components/ui/alert-dialog/index.js — 12 unresolved imports
    - Feature "ui" barrel/index has 12 dangling import refs (mapreduce v4 scan)
    - Action: Audit barrel re-exports; remove or fix dangling import paths
    - `node scripts/atlas/debug-import-resolve.mjs <import> 'src/lib/components/ui/alert-dialog/index.js'`
-5. **[HIGH]** `developer_recommendation` - src/lib/components/ui/dialog/index.ts — 11 unresolved imports
+5. **[HIGH]** `developer_recommendation` — src/lib/components/ui/dialog/index.ts — 11 unresolved imports
    - Feature "ui" barrel/index has 11 dangling import refs (mapreduce v4 scan)
    - Action: Audit barrel re-exports; remove or fix dangling import paths
    - `node scripts/atlas/debug-import-resolve.mjs <import> 'src/lib/components/ui/dialog/index.ts'`
-6. **[HIGH]** `developer_recommendation` - src/lib/icons/yorha/index.ts — 12 unresolved imports
+6. **[HIGH]** `developer_recommendation` — src/lib/icons/yorha/index.ts — 12 unresolved imports
    - Feature "unclassified" barrel/index has 12 dangling import refs (mapreduce v4 scan)
    - Action: Audit barrel re-exports; remove or fix dangling import paths
    - `node scripts/atlas/debug-import-resolve.mjs <import> 'src/lib/icons/yorha/index.ts'`
-7. **[HIGH]** `retrieval:low-context-density` - 25 runtime packets returned fewer than 8 sourceRefs
-   - Route runtime telemetry shows 25/26 packets with Qdrant hits but low sourceRef density. This weakens replay, traversal, and recommendation lineage.
-   - Action: Review CHR97 cartridge hit expansion and sourceRef density thresholds; replay a representative packet before changing scoring.
-   - `npm run atlas:runtime-packets:report && cd sveltekit-frontend && npx tsx ../scripts/tests/smoke-runtime-packet-replay.mjs`
-8. **[HIGH]** `retrieval:source-ref-provenance-gap` - 3 empty-sourceRef packets and 44 historical unknown sourceRef hits
-   - Runtime packets must be replayable from sourceRef lineage. Empty or placeholder sourceRefs break Parent Atlas joins and Redis packet decoding.
-   - Action: Keep the sourceRef normalizer in the hot path and monitor new route_runtime_packets rows for empty/unknown refs.
-   - `npm run atlas:runtime-packets:report`
-9. **[HIGH]** `retrieval:missing-runtime-som-cluster` - 25 runtime packets are missing SOM/cluster telemetry
-   - Active production files have Qdrant and SOM coverage, but the runtime telemetry row is not always carrying the selected SOM cluster.
-   - Action: Resolve SOM cluster from sourceRefs or qdrant IDs before writing route_runtime_packets.
-   - `npm run atlas:coverage:qdrant-no-som -- --limit=25`
-10. **[MEDIUM]** `feature:unclassified` - 4 files unclassified with >10 imports
+7. **[HIGH]** `atlas_coverage_gap` — Qdrant coverage: 33% (3539 files unembedded)
+   - 3539 parent_atlas_documents rows have no qdrant_point_id. ACE packet source_refs will be empty for these files until embedded.
+   - Action: Run graphify:semantic to embed 3539 missing files
+   - `npm run graphify:semantic`
+8. **[HIGH]** `atlas_coverage_gap` — SOM cluster coverage: 29% (3744 files unclassified)
+   - 3744 parent_atlas_documents rows have no cluster_id. ACE packet cluster_id, som_cluster, and topology boosting are unavailable for these files.
+   - Action: Run graphify:semantic-cluster to assign cluster_id to 3744 files
+   - `npm run graphify:semantic-cluster`
+9. **[HIGH]** `atlas_coverage_gap` — 2201 atlas_feature_map rows not joined to parent_atlas_documents
+   - These files have feature map entries but no canonical parent_atlas_documents record. They are invisible to ACE packet assembly and cannot contribute to feature_ids.
+   - Action: Re-run atlas sync to backfill missing parent_atlas_documents rows
+   - `npm run atlas:sync`
+10. **[MEDIUM]** `feature:unclassified` — 4 files unclassified with >10 imports
    - Files with many imports but no feature label degrade ACE context quality
    - Action: Add feature labels to mapreduce classification rules
    - `node scripts/atlas/mapreduce-consolidated-index.mjs "--output=.tmp/mapreduce-full-v4.ndjson"`
@@ -65,9 +65,10 @@
 ### Legal Workspace
 - [low] Feature not implemented: Priority 1: Evidence Upload UI (1 hour)
 
-### Self-Healing Retrieval
-- [high] 25 runtime packets returned fewer than 8 sourceRefs
-- [high] 3 empty-sourceRef packets and 44 historical unknown sourceRef hits
-- [medium] 3 runtime packets have no featureIds
-- [high] 25 runtime packets are missing SOM/cluster telemetry
-- [medium] 4/25 recent runtime packets missing Redis LOD0 replay keys
+### Parent Atlas Coverage
+- [high] Qdrant coverage: 33% (3539 files unembedded)
+- [high] SOM cluster coverage: 29% (3744 files unclassified)
+- [medium] atlas_feature_synthesis has only 12 rows — feature rollups incomplete
+- [high] 2201 atlas_feature_map rows not joined to parent_atlas_documents
+- [medium] SOM cluster on atlas_feature_map: 31% (3941 missing)
+- [low] route_runtime_packets is empty — hot-path scoring unavailable

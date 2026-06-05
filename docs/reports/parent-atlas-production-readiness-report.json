@@ -1,8 +1,295 @@
 {
   "schema": "parent_atlas_production_readiness.v1",
-  "generatedAt": "2026-06-05T03:09:00.642Z",
+  "generatedAt": "2026-06-05T17:23:24.227Z",
   "readOnly": true,
   "sections": {
+    "summary-batch": [
+      {
+        "id": "report:exists",
+        "status": "pass",
+        "message": "Loaded gemma4-parent-atlas-summary-cache-report.json (35 queued)",
+        "details": {
+          "rowsQueued": 35,
+          "succeeded": 35,
+          "failed": 0,
+          "exactHits": 0,
+          "semanticHits": 0,
+          "llamaCalls": 35
+        }
+      },
+      {
+        "id": "report:passed",
+        "status": "pass",
+        "message": "Failed rows: 0",
+        "details": {
+          "failed": 0
+        }
+      },
+      {
+        "id": "report:sourceRefReads",
+        "status": "pass",
+        "message": "sourceRef packet reads: 35",
+        "details": {
+          "sourceRefPacketReads": 35
+        }
+      },
+      {
+        "id": "report:summariesWritten",
+        "status": "pass",
+        "message": "summaries written: 35",
+        "details": {
+          "summariesWritten": 35
+        }
+      },
+      {
+        "id": "report:cache-counters",
+        "status": "pass",
+        "message": "Exact hits=0, semantic hits=0, llama calls=35",
+        "details": {
+          "exactHits": 0,
+          "semanticHits": 0,
+          "llamaCalls": 35,
+          "succeeded": 35
+        }
+      }
+    ],
+    "gpu": [
+      {
+        "id": "libtorchBridge",
+        "status": "pass",
+        "message": "sveltekit-frontend/src/lib/server/gpu/libtorch-bridge.ts exists",
+        "details": {
+          "exists": true,
+          "bytes": 62082,
+          "relPath": "sveltekit-frontend/src/lib/server/gpu/libtorch-bridge.ts"
+        }
+      },
+      {
+        "id": "pytorchGraph",
+        "status": "pass",
+        "message": "sveltekit-frontend/src/lib/server/gpu/pytorch-graph.ts exists",
+        "details": {
+          "exists": true,
+          "bytes": 20120,
+          "relPath": "sveltekit-frontend/src/lib/server/gpu/pytorch-graph.ts"
+        }
+      },
+      {
+        "id": "autoencoderBridge",
+        "status": "pass",
+        "message": "sveltekit-frontend/src/lib/server/gpu/autoencoder-bridge.ts exists",
+        "details": {
+          "exists": true,
+          "bytes": 4611,
+          "relPath": "sveltekit-frontend/src/lib/server/gpu/autoencoder-bridge.ts"
+        }
+      },
+      {
+        "id": "topologyProjection",
+        "status": "pass",
+        "message": "sveltekit-frontend/src/lib/server/gpu/topology-projection.ts exists",
+        "details": {
+          "exists": true,
+          "bytes": 13345,
+          "relPath": "sveltekit-frontend/src/lib/server/gpu/topology-projection.ts"
+        }
+      },
+      {
+        "id": "trainAutoencoderPy",
+        "status": "pass",
+        "message": "sveltekit-frontend/scripts/train-autoencoder.py exists",
+        "details": {
+          "exists": true,
+          "bytes": 11488,
+          "relPath": "sveltekit-frontend/scripts/train-autoencoder.py"
+        }
+      },
+      {
+        "id": "trainAutoencoderMjs",
+        "status": "pass",
+        "message": "sveltekit-frontend/scripts/train-autoencoder.mjs exists",
+        "details": {
+          "exists": true,
+          "bytes": 21827,
+          "relPath": "sveltekit-frontend/scripts/train-autoencoder.mjs"
+        }
+      },
+      {
+        "id": "somPipeline",
+        "status": "pass",
+        "message": "scripts/atlas/pytorch-qdrant-redis-som-index.mjs exists",
+        "details": {
+          "exists": true,
+          "bytes": 35532,
+          "relPath": "scripts/atlas/pytorch-qdrant-redis-som-index.mjs"
+        }
+      },
+      {
+        "id": "libtorchGraphImpl",
+        "status": "pass",
+        "message": "simd-bridge/cpp/libtorch_graph_impl.cpp exists",
+        "details": {
+          "exists": true,
+          "bytes": 6851,
+          "relPath": "simd-bridge/cpp/libtorch_graph_impl.cpp"
+        }
+      },
+      {
+        "id": "pytorchGraphCpp",
+        "status": "pass",
+        "message": "simd-bridge/cpp/pytorch_graph.cc exists",
+        "details": {
+          "exists": true,
+          "bytes": 22437,
+          "relPath": "simd-bridge/cpp/pytorch_graph.cc"
+        }
+      },
+      {
+        "id": "pytorchGraphFp16Cpp",
+        "status": "pass",
+        "message": "simd-bridge/cpp/pytorch_graph_fp16.cc exists",
+        "details": {
+          "exists": true,
+          "bytes": 6903,
+          "relPath": "simd-bridge/cpp/pytorch_graph_fp16.cc"
+        }
+      },
+      {
+        "id": "cuvsBridge",
+        "status": "pass",
+        "message": "simd-bridge/cpp/cuvs_bridge.cc exists",
+        "details": {
+          "exists": true,
+          "bytes": 1009,
+          "relPath": "simd-bridge/cpp/cuvs_bridge.cc"
+        }
+      },
+      {
+        "id": "dimensions:768-256-64",
+        "status": "pass",
+        "message": "Autoencoder dims: 768→256→64",
+        "details": {
+          "inputDim": 768,
+          "hiddenDim": 256,
+          "latentDim": 64,
+          "somGrid": 8
+        }
+      },
+      {
+        "id": "som:grid",
+        "status": "pass",
+        "message": "SOM grid: 8×8",
+        "details": {
+          "somGrid": 8
+        }
+      },
+      {
+        "id": "bridge:torch-mm-backend",
+        "status": "pass",
+        "message": "Internal GEMM is present: simd-bridge/cpp/libtorch_graph_impl.cpp and simd-bridge/cpp/pytorch_graph_fp16.cc use torch::mm(); LibTorch GPU tensors dispatch torch::mm() through CUDA/cuBLAS where available.",
+        "details": {
+          "libtorchGraphImpl": {
+            "exists": true,
+            "bytes": 6851,
+            "relPath": "simd-bridge/cpp/libtorch_graph_impl.cpp"
+          },
+          "pytorchGraphCpp": {
+            "exists": true,
+            "bytes": 22437,
+            "relPath": "simd-bridge/cpp/pytorch_graph.cc"
+          },
+          "pytorchGraphFp16Cpp": {
+            "exists": true,
+            "bytes": 6903,
+            "relPath": "simd-bridge/cpp/pytorch_graph_fp16.cc"
+          },
+          "cuvsBridge": {
+            "exists": true,
+            "bytes": 1009,
+            "relPath": "simd-bridge/cpp/cuvs_bridge.cc"
+          },
+          "hasMatmulExport": false,
+          "hasDotProduct": true,
+          "hasBatchCosine": true,
+          "hasKMeans": true,
+          "hasSOM": true,
+          "hasPCA": true,
+          "hasAutoencoderEncode": true,
+          "hasTorchMmBackend": true,
+          "hasCuvsStub": true
+        }
+      },
+      {
+        "id": "bridge:matmul-export",
+        "status": "warn",
+        "message": "No generic public matmul_f32 native bridge export is exposed yet; this is a public API gap, not evidence that GEMM is absent. Keep the canonical 768→256→64 autoencoder lane valid.",
+        "details": {
+          "hasMatmulExport": false,
+          "hasDotProduct": true,
+          "hasBatchCosine": true,
+          "hasKMeans": true,
+          "hasSOM": true,
+          "hasPCA": true,
+          "hasAutoencoderEncode": true,
+          "hasTorchMmBackend": true,
+          "hasCuvsStub": true
+        }
+      }
+    ],
+    "native-json-parser": [
+      {
+        "id": "simdjsonBridge",
+        "status": "pass",
+        "message": "sveltekit-frontend/src/lib/server/gpu/simdjson-bridge.ts exists",
+        "details": {
+          "exists": true,
+          "bytes": 14441,
+          "relPath": "sveltekit-frontend/src/lib/server/gpu/simdjson-bridge.ts"
+        }
+      },
+      {
+        "id": "jsonBench",
+        "status": "pass",
+        "message": "scripts/bench/json-parse-bench.mjs exists",
+        "details": {
+          "exists": true,
+          "bytes": 5398,
+          "relPath": "scripts/bench/json-parse-bench.mjs"
+        }
+      },
+      {
+        "id": "parserSmoke",
+        "status": "pass",
+        "message": "sveltekit-frontend/scripts/smoke/qdrant-simdjson-parser-smoke.mjs exists",
+        "details": {
+          "exists": true,
+          "bytes": 6364,
+          "relPath": "sveltekit-frontend/scripts/smoke/qdrant-simdjson-parser-smoke.mjs"
+        }
+      },
+      {
+        "id": "rustAddonPackager",
+        "status": "pass",
+        "message": "simd-bridge/scripts/package-win.ps1 exists",
+        "details": {
+          "exists": true,
+          "bytes": 1007,
+          "relPath": "simd-bridge/scripts/package-win.ps1"
+        }
+      },
+      {
+        "id": "overall",
+        "status": "pass",
+        "message": "Native simdjson parser path is present and the JSON.parse fallback remains in place.",
+        "details": {
+          "nativeAddonPathRefs": true,
+          "nativeParseExport": true,
+          "fallbackPath": true,
+          "simdjsonMentions": true,
+          "rustPackagingRefs": true
+        }
+      }
+    ],
     "drizzle": [
       {
         "id": "nesChromSchema",
@@ -127,36 +414,146 @@
         }
       },
       {
+        "id": "docs/reports/compressed-semantic-geometry-report.json",
+        "status": "pass",
+        "message": "docs/reports/compressed-semantic-geometry-report.json exists",
+        "details": {
+          "exists": true,
+          "bytes": 6088,
+          "relPath": "docs/reports/compressed-semantic-geometry-report.json"
+        }
+      },
+      {
+        "id": "docs/reports/hidden-packet-pathmap-report.json",
+        "status": "pass",
+        "message": "docs/reports/hidden-packet-pathmap-report.json exists",
+        "details": {
+          "exists": true,
+          "bytes": 13827,
+          "relPath": "docs/reports/hidden-packet-pathmap-report.json"
+        }
+      },
+      {
+        "id": "docs/reports/hidden-packet-pathmap-duckdb-report.json",
+        "status": "pass",
+        "message": "docs/reports/hidden-packet-pathmap-duckdb-report.json exists",
+        "details": {
+          "exists": true,
+          "bytes": 17097,
+          "relPath": "docs/reports/hidden-packet-pathmap-duckdb-report.json"
+        }
+      },
+      {
+        "id": "docs/reports/hidden-packet-pathmap.duckdb",
+        "status": "pass",
+        "message": "docs/reports/hidden-packet-pathmap.duckdb exists",
+        "details": {
+          "exists": true,
+          "bytes": 1585152,
+          "relPath": "docs/reports/hidden-packet-pathmap.duckdb"
+        }
+      },
+      {
+        "id": "scripts/atlas/ndjson-mapreduce-join.mjs",
+        "status": "pass",
+        "message": "scripts/atlas/ndjson-mapreduce-join.mjs exists",
+        "details": {
+          "exists": true,
+          "bytes": 19979,
+          "relPath": "scripts/atlas/ndjson-mapreduce-join.mjs"
+        }
+      },
+      {
+        "id": "scripts/atlas/materialize-mapreduce-duckdb.mjs",
+        "status": "pass",
+        "message": "scripts/atlas/materialize-mapreduce-duckdb.mjs exists",
+        "details": {
+          "exists": true,
+          "bytes": 7002,
+          "relPath": "scripts/atlas/materialize-mapreduce-duckdb.mjs"
+        }
+      },
+      {
+        "id": "scripts/atlas/offline-parent-atlas-mapreduce.sql",
+        "status": "pass",
+        "message": "scripts/atlas/offline-parent-atlas-mapreduce.sql exists",
+        "details": {
+          "exists": true,
+          "bytes": 9070,
+          "relPath": "scripts/atlas/offline-parent-atlas-mapreduce.sql"
+        }
+      },
+      {
+        "id": "scripts/atlas/gemma4-parent-atlas-summaries.mjs",
+        "status": "pass",
+        "message": "scripts/atlas/gemma4-parent-atlas-summaries.mjs exists",
+        "details": {
+          "exists": true,
+          "bytes": 40340,
+          "relPath": "scripts/atlas/gemma4-parent-atlas-summaries.mjs"
+        }
+      },
+      {
+        "id": "scripts/atlas/report-compressed-semantic-geometry.mjs",
+        "status": "pass",
+        "message": "scripts/atlas/report-compressed-semantic-geometry.mjs exists",
+        "details": {
+          "exists": true,
+          "bytes": 10237,
+          "relPath": "scripts/atlas/report-compressed-semantic-geometry.mjs"
+        }
+      },
+      {
+        "id": "scripts/atlas/audit-hidden-packet-pathmap.mjs",
+        "status": "pass",
+        "message": "scripts/atlas/audit-hidden-packet-pathmap.mjs exists",
+        "details": {
+          "exists": true,
+          "bytes": 13510,
+          "relPath": "scripts/atlas/audit-hidden-packet-pathmap.mjs"
+        }
+      },
+      {
+        "id": "scripts/atlas/materialize-hidden-packet-pathmap-duckdb.mjs",
+        "status": "pass",
+        "message": "scripts/atlas/materialize-hidden-packet-pathmap-duckdb.mjs exists",
+        "details": {
+          "exists": true,
+          "bytes": 14107,
+          "relPath": "scripts/atlas/materialize-hidden-packet-pathmap-duckdb.mjs"
+        }
+      },
+      {
         "id": "rg-uu:ndjson-inventory",
         "status": "pass",
-        "message": "rg -uuu found 127 NDJSON files",
+        "message": "rg -uuu found 128 NDJSON files",
         "details": {
           "sample": [
+            ".opencode\\ingest\\nodes.ndjson",
+            ".opencode\\ingest\\edges.ndjson",
+            ".opencode\\gemma4_candidates.ndjson",
+            ".opencode\\fixes\\fixes.ndjson",
             ".opencode\\recommendations\\tasks.ndjson",
             ".opencode\\recommendations\\tasks-with-improved-titles.ndjson",
             ".opencode\\quarantine\\invalid-cards.ndjson",
             ".opencode\\outcome-ledger.ndjson",
             ".opencode\\outcome-ledger-with-cardIds.ndjson",
-            ".tmp\\mapreduce-full-v4.ndjson",
-            ".tmp\\mapreduce-full-v3.ndjson",
-            ".tmp\\mapreduce-full-v2.ndjson",
-            ".tmp\\ingest\\test-tasks.ndjson",
-            ".tmp\\ingest\\tasks.ndjson",
-            ".tmp\\ingest\\task-proposals.ndjson",
-            ".tmp\\ingest\\parent_atlas_gpu.ndjson",
-            ".tmp\\ingest\\nodes.ndjson",
-            ".tmp\\feature-todo-queue.ndjson",
-            ".tmp\\feature-labels.ndjson",
+            ".opencode\\ace-packets\\index.ndjson",
+            ".opencode\\ace-packets_stale\\index.ndjson",
+            ".opencode\\ndjson\\parents-atlas-test\\ledger.ndjson",
+            ".opencode\\ndjson\\parents-atlas-test\\2026-05-30-test-1780159729769.ndjson",
+            ".opencode\\ndjson\\minified-ace-index.ndjson",
+            ".opencode\\ndjson\\graph-edges.ndjson",
+            ".opencode\\ndjson\\enriched-ledger.ndjson",
+            ".opencode\\ndjson\\enriched-candidates.ndjson",
+            ".opencode\\ndjson\\cluster-summary.ndjson",
+            ".tmp\\superseded-score-candidates.ndjson",
+            ".tmp\\source-ref-repair-candidates.ndjson",
             ".tmp\\retrieval-pass-dry-run.ndjson",
-            ".tmp\\ingest\\lanes\\workspace.ndjson",
-            ".tmp\\ingest\\lanes\\som_edge.ndjson",
-            ".tmp\\ingest\\lanes\\route.ndjson",
-            ".tmp\\ingest\\lanes\\outcome.ndjson",
-            ".tmp\\ingest\\lanes\\language.ndjson",
-            ".tmp\\ingest\\lanes\\import.ndjson",
-            ".tmp\\ingest\\lanes\\gemma_recommendation.ndjson",
-            ".tmp\\ingest\\lanes\\env.ndjson",
-            ".tmp\\ingest\\lanes\\codebase_features.ndjson"
+            "tmp\\llm-wiki-chunks\\_combined.ndjson",
+            "tmp\\llm-wiki-chunks\\tokenization.ndjson",
+            "tmp\\llm-wiki-chunks\\tokenization-rg.ndjson",
+            "tmp\\llm-wiki-chunks\\som-clustering.ndjson"
           ]
         }
       }
@@ -205,9 +602,9 @@
       {
         "id": "table:route_runtime_packets",
         "status": "pass",
-        "message": "route_runtime_packets exists with 30 rows",
+        "message": "route_runtime_packets exists with 33 rows",
         "details": {
-          "count": 30
+          "count": 33
         }
       },
       {
@@ -269,7 +666,7 @@
       {
         "id": "route-runtime:sourceRefs",
         "status": "pass",
-        "message": "Runtime packets with sourceRefs: 27/30",
+        "message": "Runtime packets with sourceRefs: 30/33",
         "details": {}
       }
     ],
@@ -277,7 +674,7 @@
       {
         "id": "lod0:route-runtime",
         "status": "pass",
-        "message": "Redis LOD0 runtime packets: 25/30",
+        "message": "Redis LOD0 runtime packets: 28/33",
         "details": {}
       }
     ],
@@ -299,6 +696,312 @@
     ]
   },
   "checks": [
+    {
+      "section": "summary-batch",
+      "id": "report:exists",
+      "status": "pass",
+      "message": "Loaded gemma4-parent-atlas-summary-cache-report.json (35 queued)",
+      "details": {
+        "rowsQueued": 35,
+        "succeeded": 35,
+        "failed": 0,
+        "exactHits": 0,
+        "semanticHits": 0,
+        "llamaCalls": 35
+      }
+    },
+    {
+      "section": "summary-batch",
+      "id": "report:passed",
+      "status": "pass",
+      "message": "Failed rows: 0",
+      "details": {
+        "failed": 0
+      }
+    },
+    {
+      "section": "summary-batch",
+      "id": "report:sourceRefReads",
+      "status": "pass",
+      "message": "sourceRef packet reads: 35",
+      "details": {
+        "sourceRefPacketReads": 35
+      }
+    },
+    {
+      "section": "summary-batch",
+      "id": "report:summariesWritten",
+      "status": "pass",
+      "message": "summaries written: 35",
+      "details": {
+        "summariesWritten": 35
+      }
+    },
+    {
+      "section": "summary-batch",
+      "id": "report:cache-counters",
+      "status": "pass",
+      "message": "Exact hits=0, semantic hits=0, llama calls=35",
+      "details": {
+        "exactHits": 0,
+        "semanticHits": 0,
+        "llamaCalls": 35,
+        "succeeded": 35
+      }
+    },
+    {
+      "section": "gpu",
+      "id": "libtorchBridge",
+      "status": "pass",
+      "message": "sveltekit-frontend/src/lib/server/gpu/libtorch-bridge.ts exists",
+      "details": {
+        "exists": true,
+        "bytes": 62082,
+        "relPath": "sveltekit-frontend/src/lib/server/gpu/libtorch-bridge.ts"
+      }
+    },
+    {
+      "section": "gpu",
+      "id": "pytorchGraph",
+      "status": "pass",
+      "message": "sveltekit-frontend/src/lib/server/gpu/pytorch-graph.ts exists",
+      "details": {
+        "exists": true,
+        "bytes": 20120,
+        "relPath": "sveltekit-frontend/src/lib/server/gpu/pytorch-graph.ts"
+      }
+    },
+    {
+      "section": "gpu",
+      "id": "autoencoderBridge",
+      "status": "pass",
+      "message": "sveltekit-frontend/src/lib/server/gpu/autoencoder-bridge.ts exists",
+      "details": {
+        "exists": true,
+        "bytes": 4611,
+        "relPath": "sveltekit-frontend/src/lib/server/gpu/autoencoder-bridge.ts"
+      }
+    },
+    {
+      "section": "gpu",
+      "id": "topologyProjection",
+      "status": "pass",
+      "message": "sveltekit-frontend/src/lib/server/gpu/topology-projection.ts exists",
+      "details": {
+        "exists": true,
+        "bytes": 13345,
+        "relPath": "sveltekit-frontend/src/lib/server/gpu/topology-projection.ts"
+      }
+    },
+    {
+      "section": "gpu",
+      "id": "trainAutoencoderPy",
+      "status": "pass",
+      "message": "sveltekit-frontend/scripts/train-autoencoder.py exists",
+      "details": {
+        "exists": true,
+        "bytes": 11488,
+        "relPath": "sveltekit-frontend/scripts/train-autoencoder.py"
+      }
+    },
+    {
+      "section": "gpu",
+      "id": "trainAutoencoderMjs",
+      "status": "pass",
+      "message": "sveltekit-frontend/scripts/train-autoencoder.mjs exists",
+      "details": {
+        "exists": true,
+        "bytes": 21827,
+        "relPath": "sveltekit-frontend/scripts/train-autoencoder.mjs"
+      }
+    },
+    {
+      "section": "gpu",
+      "id": "somPipeline",
+      "status": "pass",
+      "message": "scripts/atlas/pytorch-qdrant-redis-som-index.mjs exists",
+      "details": {
+        "exists": true,
+        "bytes": 35532,
+        "relPath": "scripts/atlas/pytorch-qdrant-redis-som-index.mjs"
+      }
+    },
+    {
+      "section": "gpu",
+      "id": "libtorchGraphImpl",
+      "status": "pass",
+      "message": "simd-bridge/cpp/libtorch_graph_impl.cpp exists",
+      "details": {
+        "exists": true,
+        "bytes": 6851,
+        "relPath": "simd-bridge/cpp/libtorch_graph_impl.cpp"
+      }
+    },
+    {
+      "section": "gpu",
+      "id": "pytorchGraphCpp",
+      "status": "pass",
+      "message": "simd-bridge/cpp/pytorch_graph.cc exists",
+      "details": {
+        "exists": true,
+        "bytes": 22437,
+        "relPath": "simd-bridge/cpp/pytorch_graph.cc"
+      }
+    },
+    {
+      "section": "gpu",
+      "id": "pytorchGraphFp16Cpp",
+      "status": "pass",
+      "message": "simd-bridge/cpp/pytorch_graph_fp16.cc exists",
+      "details": {
+        "exists": true,
+        "bytes": 6903,
+        "relPath": "simd-bridge/cpp/pytorch_graph_fp16.cc"
+      }
+    },
+    {
+      "section": "gpu",
+      "id": "cuvsBridge",
+      "status": "pass",
+      "message": "simd-bridge/cpp/cuvs_bridge.cc exists",
+      "details": {
+        "exists": true,
+        "bytes": 1009,
+        "relPath": "simd-bridge/cpp/cuvs_bridge.cc"
+      }
+    },
+    {
+      "section": "gpu",
+      "id": "dimensions:768-256-64",
+      "status": "pass",
+      "message": "Autoencoder dims: 768→256→64",
+      "details": {
+        "inputDim": 768,
+        "hiddenDim": 256,
+        "latentDim": 64,
+        "somGrid": 8
+      }
+    },
+    {
+      "section": "gpu",
+      "id": "som:grid",
+      "status": "pass",
+      "message": "SOM grid: 8×8",
+      "details": {
+        "somGrid": 8
+      }
+    },
+    {
+      "section": "gpu",
+      "id": "bridge:torch-mm-backend",
+      "status": "pass",
+      "message": "Internal GEMM is present: simd-bridge/cpp/libtorch_graph_impl.cpp and simd-bridge/cpp/pytorch_graph_fp16.cc use torch::mm(); LibTorch GPU tensors dispatch torch::mm() through CUDA/cuBLAS where available.",
+      "details": {
+        "libtorchGraphImpl": {
+          "exists": true,
+          "bytes": 6851,
+          "relPath": "simd-bridge/cpp/libtorch_graph_impl.cpp"
+        },
+        "pytorchGraphCpp": {
+          "exists": true,
+          "bytes": 22437,
+          "relPath": "simd-bridge/cpp/pytorch_graph.cc"
+        },
+        "pytorchGraphFp16Cpp": {
+          "exists": true,
+          "bytes": 6903,
+          "relPath": "simd-bridge/cpp/pytorch_graph_fp16.cc"
+        },
+        "cuvsBridge": {
+          "exists": true,
+          "bytes": 1009,
+          "relPath": "simd-bridge/cpp/cuvs_bridge.cc"
+        },
+        "hasMatmulExport": false,
+        "hasDotProduct": true,
+        "hasBatchCosine": true,
+        "hasKMeans": true,
+        "hasSOM": true,
+        "hasPCA": true,
+        "hasAutoencoderEncode": true,
+        "hasTorchMmBackend": true,
+        "hasCuvsStub": true
+      }
+    },
+    {
+      "section": "gpu",
+      "id": "bridge:matmul-export",
+      "status": "warn",
+      "message": "No generic public matmul_f32 native bridge export is exposed yet; this is a public API gap, not evidence that GEMM is absent. Keep the canonical 768→256→64 autoencoder lane valid.",
+      "details": {
+        "hasMatmulExport": false,
+        "hasDotProduct": true,
+        "hasBatchCosine": true,
+        "hasKMeans": true,
+        "hasSOM": true,
+        "hasPCA": true,
+        "hasAutoencoderEncode": true,
+        "hasTorchMmBackend": true,
+        "hasCuvsStub": true
+      }
+    },
+    {
+      "section": "native-json-parser",
+      "id": "simdjsonBridge",
+      "status": "pass",
+      "message": "sveltekit-frontend/src/lib/server/gpu/simdjson-bridge.ts exists",
+      "details": {
+        "exists": true,
+        "bytes": 14441,
+        "relPath": "sveltekit-frontend/src/lib/server/gpu/simdjson-bridge.ts"
+      }
+    },
+    {
+      "section": "native-json-parser",
+      "id": "jsonBench",
+      "status": "pass",
+      "message": "scripts/bench/json-parse-bench.mjs exists",
+      "details": {
+        "exists": true,
+        "bytes": 5398,
+        "relPath": "scripts/bench/json-parse-bench.mjs"
+      }
+    },
+    {
+      "section": "native-json-parser",
+      "id": "parserSmoke",
+      "status": "pass",
+      "message": "sveltekit-frontend/scripts/smoke/qdrant-simdjson-parser-smoke.mjs exists",
+      "details": {
+        "exists": true,
+        "bytes": 6364,
+        "relPath": "sveltekit-frontend/scripts/smoke/qdrant-simdjson-parser-smoke.mjs"
+      }
+    },
+    {
+      "section": "native-json-parser",
+      "id": "rustAddonPackager",
+      "status": "pass",
+      "message": "simd-bridge/scripts/package-win.ps1 exists",
+      "details": {
+        "exists": true,
+        "bytes": 1007,
+        "relPath": "simd-bridge/scripts/package-win.ps1"
+      }
+    },
+    {
+      "section": "native-json-parser",
+      "id": "overall",
+      "status": "pass",
+      "message": "Native simdjson parser path is present and the JSON.parse fallback remains in place.",
+      "details": {
+        "nativeAddonPathRefs": true,
+        "nativeParseExport": true,
+        "fallbackPath": true,
+        "simdjsonMentions": true,
+        "rustPackagingRefs": true
+      }
+    },
     {
       "section": "drizzle",
       "id": "nesChromSchema",
@@ -433,36 +1136,157 @@
     },
     {
       "section": "offline",
+      "id": "docs/reports/compressed-semantic-geometry-report.json",
+      "status": "pass",
+      "message": "docs/reports/compressed-semantic-geometry-report.json exists",
+      "details": {
+        "exists": true,
+        "bytes": 6088,
+        "relPath": "docs/reports/compressed-semantic-geometry-report.json"
+      }
+    },
+    {
+      "section": "offline",
+      "id": "docs/reports/hidden-packet-pathmap-report.json",
+      "status": "pass",
+      "message": "docs/reports/hidden-packet-pathmap-report.json exists",
+      "details": {
+        "exists": true,
+        "bytes": 13827,
+        "relPath": "docs/reports/hidden-packet-pathmap-report.json"
+      }
+    },
+    {
+      "section": "offline",
+      "id": "docs/reports/hidden-packet-pathmap-duckdb-report.json",
+      "status": "pass",
+      "message": "docs/reports/hidden-packet-pathmap-duckdb-report.json exists",
+      "details": {
+        "exists": true,
+        "bytes": 17097,
+        "relPath": "docs/reports/hidden-packet-pathmap-duckdb-report.json"
+      }
+    },
+    {
+      "section": "offline",
+      "id": "docs/reports/hidden-packet-pathmap.duckdb",
+      "status": "pass",
+      "message": "docs/reports/hidden-packet-pathmap.duckdb exists",
+      "details": {
+        "exists": true,
+        "bytes": 1585152,
+        "relPath": "docs/reports/hidden-packet-pathmap.duckdb"
+      }
+    },
+    {
+      "section": "offline",
+      "id": "scripts/atlas/ndjson-mapreduce-join.mjs",
+      "status": "pass",
+      "message": "scripts/atlas/ndjson-mapreduce-join.mjs exists",
+      "details": {
+        "exists": true,
+        "bytes": 19979,
+        "relPath": "scripts/atlas/ndjson-mapreduce-join.mjs"
+      }
+    },
+    {
+      "section": "offline",
+      "id": "scripts/atlas/materialize-mapreduce-duckdb.mjs",
+      "status": "pass",
+      "message": "scripts/atlas/materialize-mapreduce-duckdb.mjs exists",
+      "details": {
+        "exists": true,
+        "bytes": 7002,
+        "relPath": "scripts/atlas/materialize-mapreduce-duckdb.mjs"
+      }
+    },
+    {
+      "section": "offline",
+      "id": "scripts/atlas/offline-parent-atlas-mapreduce.sql",
+      "status": "pass",
+      "message": "scripts/atlas/offline-parent-atlas-mapreduce.sql exists",
+      "details": {
+        "exists": true,
+        "bytes": 9070,
+        "relPath": "scripts/atlas/offline-parent-atlas-mapreduce.sql"
+      }
+    },
+    {
+      "section": "offline",
+      "id": "scripts/atlas/gemma4-parent-atlas-summaries.mjs",
+      "status": "pass",
+      "message": "scripts/atlas/gemma4-parent-atlas-summaries.mjs exists",
+      "details": {
+        "exists": true,
+        "bytes": 40340,
+        "relPath": "scripts/atlas/gemma4-parent-atlas-summaries.mjs"
+      }
+    },
+    {
+      "section": "offline",
+      "id": "scripts/atlas/report-compressed-semantic-geometry.mjs",
+      "status": "pass",
+      "message": "scripts/atlas/report-compressed-semantic-geometry.mjs exists",
+      "details": {
+        "exists": true,
+        "bytes": 10237,
+        "relPath": "scripts/atlas/report-compressed-semantic-geometry.mjs"
+      }
+    },
+    {
+      "section": "offline",
+      "id": "scripts/atlas/audit-hidden-packet-pathmap.mjs",
+      "status": "pass",
+      "message": "scripts/atlas/audit-hidden-packet-pathmap.mjs exists",
+      "details": {
+        "exists": true,
+        "bytes": 13510,
+        "relPath": "scripts/atlas/audit-hidden-packet-pathmap.mjs"
+      }
+    },
+    {
+      "section": "offline",
+      "id": "scripts/atlas/materialize-hidden-packet-pathmap-duckdb.mjs",
+      "status": "pass",
+      "message": "scripts/atlas/materialize-hidden-packet-pathmap-duckdb.mjs exists",
+      "details": {
+        "exists": true,
+        "bytes": 14107,
+        "relPath": "scripts/atlas/materialize-hidden-packet-pathmap-duckdb.mjs"
+      }
+    },
+    {
+      "section": "offline",
       "id": "rg-uu:ndjson-inventory",
       "status": "pass",
-      "message": "rg -uuu found 127 NDJSON files",
+      "message": "rg -uuu found 128 NDJSON files",
       "details": {
         "sample": [
+          ".opencode\\ingest\\nodes.ndjson",
+          ".opencode\\ingest\\edges.ndjson",
+          ".opencode\\gemma4_candidates.ndjson",
+          ".opencode\\fixes\\fixes.ndjson",
           ".opencode\\recommendations\\tasks.ndjson",
           ".opencode\\recommendations\\tasks-with-improved-titles.ndjson",
           ".opencode\\quarantine\\invalid-cards.ndjson",
           ".opencode\\outcome-ledger.ndjson",
           ".opencode\\outcome-ledger-with-cardIds.ndjson",
-          ".tmp\\mapreduce-full-v4.ndjson",
-          ".tmp\\mapreduce-full-v3.ndjson",
-          ".tmp\\mapreduce-full-v2.ndjson",
-          ".tmp\\ingest\\test-tasks.ndjson",
-          ".tmp\\ingest\\tasks.ndjson",
-          ".tmp\\ingest\\task-proposals.ndjson",
-          ".tmp\\ingest\\parent_atlas_gpu.ndjson",
-          ".tmp\\ingest\\nodes.ndjson",
-          ".tmp\\feature-todo-queue.ndjson",
-          ".tmp\\feature-labels.ndjson",
+          ".opencode\\ace-packets\\index.ndjson",
+          ".opencode\\ace-packets_stale\\index.ndjson",
+          ".opencode\\ndjson\\parents-atlas-test\\ledger.ndjson",
+          ".opencode\\ndjson\\parents-atlas-test\\2026-05-30-test-1780159729769.ndjson",
+          ".opencode\\ndjson\\minified-ace-index.ndjson",
+          ".opencode\\ndjson\\graph-edges.ndjson",
+          ".opencode\\ndjson\\enriched-ledger.ndjson",
+          ".opencode\\ndjson\\enriched-candidates.ndjson",
+          ".opencode\\ndjson\\cluster-summary.ndjson",
+          ".tmp\\superseded-score-candidates.ndjson",
+          ".tmp\\source-ref-repair-candidates.ndjson",
           ".tmp\\retrieval-pass-dry-run.ndjson",
-          ".tmp\\ingest\\lanes\\workspace.ndjson",
-          ".tmp\\ingest\\lanes\\som_edge.ndjson",
-          ".tmp\\ingest\\lanes\\route.ndjson",
-          ".tmp\\ingest\\lanes\\outcome.ndjson",
-          ".tmp\\ingest\\lanes\\language.ndjson",
-          ".tmp\\ingest\\lanes\\import.ndjson",
-          ".tmp\\ingest\\lanes\\gemma_recommendation.ndjson",
-          ".tmp\\ingest\\lanes\\env.ndjson",
-          ".tmp\\ingest\\lanes\\codebase_features.ndjson"
+          "tmp\\llm-wiki-chunks\\_combined.ndjson",
+          "tmp\\llm-wiki-chunks\\tokenization.ndjson",
+          "tmp\\llm-wiki-chunks\\tokenization-rg.ndjson",
+          "tmp\\llm-wiki-chunks\\som-clustering.ndjson"
         ]
       }
     },
@@ -515,9 +1339,9 @@
       "section": "postgres",
       "id": "table:route_runtime_packets",
       "status": "pass",
-      "message": "route_runtime_packets exists with 30 rows",
+      "message": "route_runtime_packets exists with 33 rows",
       "details": {
-        "count": 30
+        "count": 33
       }
     },
     {
@@ -587,14 +1411,14 @@
       "section": "postgres",
       "id": "route-runtime:sourceRefs",
       "status": "pass",
-      "message": "Runtime packets with sourceRefs: 27/30",
+      "message": "Runtime packets with sourceRefs: 30/33",
       "details": {}
     },
     {
       "section": "redis",
       "id": "lod0:route-runtime",
       "status": "pass",
-      "message": "Redis LOD0 runtime packets: 25/30",
+      "message": "Redis LOD0 runtime packets: 28/33",
       "details": {}
     },
     {
@@ -619,7 +1443,7 @@
       "atlas_feature_map_synthesized": 14465,
       "nes_chrom_packets": 27,
       "nes_chrom_kag_dag_hits": 32,
-      "route_runtime_packets": 30,
+      "route_runtime_packets": 33,
       "task_semantic_packets": 302,
       "codebase_chunk_index": 40754,
       "agent_pickup_queue": 123
@@ -648,17 +1472,17 @@
       "with_som_cluster": 16
     },
     "routeRuntimePackets": {
-      "total": 30,
-      "with_source_refs": 27,
-      "with_feature_ids": 27,
-      "with_qdrant_hits": 29,
+      "total": 33,
+      "with_source_refs": 30,
+      "with_feature_ids": 30,
+      "with_qdrant_hits": 32,
       "with_cluster": 1
     }
   },
   "redis": {
     "available": true,
-    "latestRuntimePacketsChecked": 30,
-    "lod0Found": 25,
+    "latestRuntimePacketsChecked": 33,
+    "lod0Found": 28,
     "lod0Missing": 5
   },
   "qdrant": {
@@ -741,44 +1565,470 @@
       "exists": true,
       "bytes": 8955,
       "relPath": "docs/reports/route-runtime-packets-report.json"
+    },
+    {
+      "exists": true,
+      "bytes": 6088,
+      "relPath": "docs/reports/compressed-semantic-geometry-report.json"
+    },
+    {
+      "exists": true,
+      "bytes": 13827,
+      "relPath": "docs/reports/hidden-packet-pathmap-report.json"
+    },
+    {
+      "exists": true,
+      "bytes": 17097,
+      "relPath": "docs/reports/hidden-packet-pathmap-duckdb-report.json"
+    },
+    {
+      "exists": true,
+      "bytes": 1585152,
+      "relPath": "docs/reports/hidden-packet-pathmap.duckdb"
+    },
+    {
+      "exists": true,
+      "bytes": 19979,
+      "relPath": "scripts/atlas/ndjson-mapreduce-join.mjs"
+    },
+    {
+      "exists": true,
+      "bytes": 7002,
+      "relPath": "scripts/atlas/materialize-mapreduce-duckdb.mjs"
+    },
+    {
+      "exists": true,
+      "bytes": 9070,
+      "relPath": "scripts/atlas/offline-parent-atlas-mapreduce.sql"
+    },
+    {
+      "exists": true,
+      "bytes": 40340,
+      "relPath": "scripts/atlas/gemma4-parent-atlas-summaries.mjs"
+    },
+    {
+      "exists": true,
+      "bytes": 10237,
+      "relPath": "scripts/atlas/report-compressed-semantic-geometry.mjs"
+    },
+    {
+      "exists": true,
+      "bytes": 13510,
+      "relPath": "scripts/atlas/audit-hidden-packet-pathmap.mjs"
+    },
+    {
+      "exists": true,
+      "bytes": 14107,
+      "relPath": "scripts/atlas/materialize-hidden-packet-pathmap-duckdb.mjs"
     }
   ],
   "ndjsonInventory": {
     "status": "pass",
-    "total": 127,
+    "total": 128,
     "sample": [
+      ".opencode\\ingest\\nodes.ndjson",
+      ".opencode\\ingest\\edges.ndjson",
+      ".opencode\\gemma4_candidates.ndjson",
+      ".opencode\\fixes\\fixes.ndjson",
       ".opencode\\recommendations\\tasks.ndjson",
       ".opencode\\recommendations\\tasks-with-improved-titles.ndjson",
       ".opencode\\quarantine\\invalid-cards.ndjson",
       ".opencode\\outcome-ledger.ndjson",
       ".opencode\\outcome-ledger-with-cardIds.ndjson",
-      ".tmp\\mapreduce-full-v4.ndjson",
-      ".tmp\\mapreduce-full-v3.ndjson",
-      ".tmp\\mapreduce-full-v2.ndjson",
-      ".tmp\\ingest\\test-tasks.ndjson",
-      ".tmp\\ingest\\tasks.ndjson",
-      ".tmp\\ingest\\task-proposals.ndjson",
-      ".tmp\\ingest\\parent_atlas_gpu.ndjson",
-      ".tmp\\ingest\\nodes.ndjson",
-      ".tmp\\feature-todo-queue.ndjson",
-      ".tmp\\feature-labels.ndjson",
+      ".opencode\\ace-packets\\index.ndjson",
+      ".opencode\\ace-packets_stale\\index.ndjson",
+      ".opencode\\ndjson\\parents-atlas-test\\ledger.ndjson",
+      ".opencode\\ndjson\\parents-atlas-test\\2026-05-30-test-1780159729769.ndjson",
+      ".opencode\\ndjson\\minified-ace-index.ndjson",
+      ".opencode\\ndjson\\graph-edges.ndjson",
+      ".opencode\\ndjson\\enriched-ledger.ndjson",
+      ".opencode\\ndjson\\enriched-candidates.ndjson",
+      ".opencode\\ndjson\\cluster-summary.ndjson",
+      ".tmp\\superseded-score-candidates.ndjson",
+      ".tmp\\source-ref-repair-candidates.ndjson",
       ".tmp\\retrieval-pass-dry-run.ndjson",
-      ".tmp\\ingest\\lanes\\workspace.ndjson",
-      ".tmp\\ingest\\lanes\\som_edge.ndjson",
-      ".tmp\\ingest\\lanes\\route.ndjson",
-      ".tmp\\ingest\\lanes\\outcome.ndjson",
-      ".tmp\\ingest\\lanes\\language.ndjson",
-      ".tmp\\ingest\\lanes\\import.ndjson",
-      ".tmp\\ingest\\lanes\\gemma_recommendation.ndjson",
-      ".tmp\\ingest\\lanes\\env.ndjson",
-      ".tmp\\ingest\\lanes\\codebase_features.ndjson"
+      "tmp\\llm-wiki-chunks\\_combined.ndjson",
+      "tmp\\llm-wiki-chunks\\tokenization.ndjson",
+      "tmp\\llm-wiki-chunks\\tokenization-rg.ndjson",
+      "tmp\\llm-wiki-chunks\\som-clustering.ndjson"
     ]
   },
   "summary": {
     "counts": {
-      "pass": 30,
-      "warn": 0,
+      "pass": 65,
+      "warn": 1,
       "fail": 0
+    }
+  },
+  "summaryBatch": {
+    "path": ".tmp/gemma4-parent-atlas-summary-cache-report.json",
+    "report": {
+      "timestamp": "2026-06-04T23:16:49.819Z",
+      "mode": "apply",
+      "cache_mode": "phase101-summary-cache",
+      "llm_backend": "unknown",
+      "targetSourceRef": null,
+      "limit": 100,
+      "concurrency": 2,
+      "rows_queued": 35,
+      "succeeded": 35,
+      "skippedUnsupported": 0,
+      "skippedDryRun": 0,
+      "failed": 0,
+      "exactCacheHits": 0,
+      "semanticCacheHits": 0,
+      "sourceRefPacketReuse": 0,
+      "dbSummaryReuse": 0,
+      "cacheRepairs": 22,
+      "cacheRepairWrites": 22,
+      "cacheMisses": 13,
+      "llamaCalls": 35,
+      "wouldCallLlama": 0,
+      "llamaCallsAvoided": 0,
+      "callsAvoided": 0,
+      "summariesWritten": 35,
+      "skippedVendor": 545,
+      "skippedFeatureBuckets": 0,
+      "avgLatencyMs": 10941.9,
+      "packetsRead": 35,
+      "sourceRefPacketReads": 35,
+      "still_missing": 0,
+      "sample": [
+        {
+          "source_ref": "sveltekit-frontend/src/lib/components/ui/badge/index.ts",
+          "cache_mode": "miss",
+          "exact_cache_key": "atlas:summary:exact:v1:300d62b5151af0626fa880c173a2952f8acc2c404e0e8cbaec7061bad9ef790a",
+          "semantic_cache_key": "atlas:summary:semantic:v1:sum:300d62b5151af062",
+          "packet_id": "sum:300d62b5151af062",
+          "summary_length": 496,
+          "exact_cache_hit": false,
+          "semantic_cache_hit": false,
+          "sourceRefPacketRead": true,
+          "llama_called": true,
+          "would_call_llama": false,
+          "skippedDryRun": false,
+          "skipped_dry_run": false,
+          "cache_lookup_error": null,
+          "calls_avoided": false,
+          "callsAvoided": false,
+          "latency_ms": 6248,
+          "success": true
+        },
+        {
+          "source_ref": "sveltekit-frontend/src/lib/components/shells/index.ts",
+          "cache_mode": "miss",
+          "exact_cache_key": "atlas:summary:exact:v1:259b03ce4df813eabc166e09dd592bc31724233fc26958e3f58f7969a62a314c",
+          "semantic_cache_key": "atlas:summary:semantic:v1:sum:259b03ce4df813ea",
+          "packet_id": "sum:259b03ce4df813ea",
+          "summary_length": 121,
+          "exact_cache_hit": false,
+          "semantic_cache_hit": false,
+          "sourceRefPacketRead": true,
+          "llama_called": true,
+          "would_call_llama": false,
+          "skippedDryRun": false,
+          "skipped_dry_run": false,
+          "cache_lookup_error": null,
+          "calls_avoided": false,
+          "callsAvoided": false,
+          "latency_ms": 11826,
+          "success": true
+        },
+        {
+          "source_ref": "sveltekit-frontend/src/routes/(app)/cases/[id]/+page.ts",
+          "cache_mode": "miss_repaired",
+          "exact_cache_key": "atlas:summary:exact:v1:049cb117986222480745fcc518458a1b1e02b46b735e7f29a5bd9361aa2d45b3",
+          "semantic_cache_key": "atlas:summary:semantic:v1:sum:049cb11798622248",
+          "packet_id": "sum:049cb11798622248",
+          "summary_length": 360,
+          "exact_cache_hit": false,
+          "semantic_cache_hit": false,
+          "sourceRefPacketRead": true,
+          "llama_called": true,
+          "would_call_llama": false,
+          "skippedDryRun": false,
+          "skipped_dry_run": false,
+          "cache_lookup_error": null,
+          "calls_avoided": false,
+          "callsAvoided": false,
+          "latency_ms": 11178,
+          "success": true
+        },
+        {
+          "source_ref": "sveltekit-frontend/src/routes/(app)/rag-search/+page.ts",
+          "cache_mode": "miss_repaired",
+          "exact_cache_key": "atlas:summary:exact:v1:7c8b5d0969cdd5ad003b3c3e08d124b5aa2d2a4c87979f63537ec38476434c7e",
+          "semantic_cache_key": "atlas:summary:semantic:v1:sum:7c8b5d0969cdd5ad",
+          "packet_id": "sum:7c8b5d0969cdd5ad",
+          "summary_length": 277,
+          "exact_cache_hit": false,
+          "semantic_cache_hit": false,
+          "sourceRefPacketRead": true,
+          "llama_called": true,
+          "would_call_llama": false,
+          "skippedDryRun": false,
+          "skipped_dry_run": false,
+          "cache_lookup_error": null,
+          "calls_avoided": false,
+          "callsAvoided": false,
+          "latency_ms": 11055,
+          "success": true
+        },
+        {
+          "source_ref": "scripts/graphify/graphify-batch-gpu-analysis.mjs",
+          "cache_mode": "miss",
+          "exact_cache_key": "atlas:summary:exact:v1:bf2764e78903bf8fb3f10f1bf98e87faca6c84e5312435c46682bd5ec6b1ea03",
+          "semantic_cache_key": "atlas:summary:semantic:v1:sum:bf2764e78903bf8f",
+          "packet_id": "sum:bf2764e78903bf8f",
+          "summary_length": 500,
+          "exact_cache_hit": false,
+          "semantic_cache_hit": false,
+          "sourceRefPacketRead": true,
+          "llama_called": true,
+          "would_call_llama": false,
+          "skippedDryRun": false,
+          "skipped_dry_run": false,
+          "cache_lookup_error": null,
+          "calls_avoided": false,
+          "callsAvoided": false,
+          "latency_ms": 10964,
+          "success": true
+        },
+        {
+          "source_ref": "sveltekit-frontend/src/routes/(app)/admin/error-brain/+page.ts",
+          "cache_mode": "miss_repaired",
+          "exact_cache_key": "atlas:summary:exact:v1:23996bca098a14b195c7d2c9b4834e873513abd55067a9aeeca0625c677f080a",
+          "semantic_cache_key": "atlas:summary:semantic:v1:sum:23996bca098a14b1",
+          "packet_id": "sum:23996bca098a14b1",
+          "summary_length": 278,
+          "exact_cache_hit": false,
+          "semantic_cache_hit": false,
+          "sourceRefPacketRead": true,
+          "llama_called": true,
+          "would_call_llama": false,
+          "skippedDryRun": false,
+          "skipped_dry_run": false,
+          "cache_lookup_error": null,
+          "calls_avoided": false,
+          "callsAvoided": false,
+          "latency_ms": 10871,
+          "success": true
+        },
+        {
+          "source_ref": "sveltekit-frontend/src/routes/(dev)/voice-chat-demo/+page.ts",
+          "cache_mode": "miss_repaired",
+          "exact_cache_key": "atlas:summary:exact:v1:2871b899ebabce60f6433a50f1ac07418130a1f92eb4b753bed90e0ae39a48da",
+          "semantic_cache_key": "atlas:summary:semantic:v1:sum:2871b899ebabce60",
+          "packet_id": "sum:2871b899ebabce60",
+          "summary_length": 275,
+          "exact_cache_hit": false,
+          "semantic_cache_hit": false,
+          "sourceRefPacketRead": true,
+          "llama_called": true,
+          "would_call_llama": false,
+          "skippedDryRun": false,
+          "skipped_dry_run": false,
+          "cache_lookup_error": null,
+          "calls_avoided": false,
+          "callsAvoided": false,
+          "latency_ms": 10800,
+          "success": true
+        },
+        {
+          "source_ref": "sveltekit-frontend/src/routes/(app)/cases/[id]/reports/+page.ts",
+          "cache_mode": "miss_repaired",
+          "exact_cache_key": "atlas:summary:exact:v1:ba3307d9e2562e97b0e8ebe1711176bc6da73779c8adda87f0e89529cdb4920a",
+          "semantic_cache_key": "atlas:summary:semantic:v1:sum:ba3307d9e2562e97",
+          "packet_id": "sum:ba3307d9e2562e97",
+          "summary_length": 257,
+          "exact_cache_hit": false,
+          "semantic_cache_hit": false,
+          "sourceRefPacketRead": true,
+          "llama_called": true,
+          "would_call_llama": false,
+          "skippedDryRun": false,
+          "skipped_dry_run": false,
+          "cache_lookup_error": null,
+          "calls_avoided": false,
+          "callsAvoided": false,
+          "latency_ms": 10772,
+          "success": true
+        },
+        {
+          "source_ref": "sveltekit-frontend/src/routes/(app)/citations/+page.ts",
+          "cache_mode": "miss_repaired",
+          "exact_cache_key": "atlas:summary:exact:v1:d9bf8931dddd6c7de3aacaed1eb7ceaca8b21f8b1ef3aebd3c68040283da6f1b",
+          "semantic_cache_key": "atlas:summary:semantic:v1:sum:d9bf8931dddd6c7d",
+          "packet_id": "sum:d9bf8931dddd6c7d",
+          "summary_length": 292,
+          "exact_cache_hit": false,
+          "semantic_cache_hit": false,
+          "sourceRefPacketRead": true,
+          "llama_called": true,
+          "would_call_llama": false,
+          "skippedDryRun": false,
+          "skipped_dry_run": false,
+          "cache_lookup_error": null,
+          "calls_avoided": false,
+          "callsAvoided": false,
+          "latency_ms": 10802,
+          "success": true
+        },
+        {
+          "source_ref": "sveltekit-frontend/src/routes/(app)/reports/[id]/+page.ts",
+          "cache_mode": "miss",
+          "exact_cache_key": "atlas:summary:exact:v1:71227eccb6b6f4769c3011750cf30d6bda287cff4ae4c466e809205d2b98d4df",
+          "semantic_cache_key": "atlas:summary:semantic:v1:sum:71227eccb6b6f476",
+          "packet_id": "sum:71227eccb6b6f476",
+          "summary_length": 264,
+          "exact_cache_hit": false,
+          "semantic_cache_hit": false,
+          "sourceRefPacketRead": true,
+          "llama_called": true,
+          "would_call_llama": false,
+          "skippedDryRun": false,
+          "skipped_dry_run": false,
+          "cache_lookup_error": null,
+          "calls_avoided": false,
+          "callsAvoided": false,
+          "latency_ms": 10772,
+          "success": true
+        }
+      ]
+    },
+    "metrics": {
+      "rowsQueued": 35,
+      "succeeded": 35,
+      "failed": 0,
+      "exactHits": 0,
+      "semanticHits": 0,
+      "sourceRefPacketReads": 35,
+      "sourceRefPacketReuse": 0,
+      "dbSummaryReuse": 0,
+      "cacheRepairs": 22,
+      "cacheRepairWrites": 22,
+      "cacheMisses": 13,
+      "llamaCalls": 35,
+      "wouldCallLlama": 0,
+      "llamaCallsAvoided": 0,
+      "callsAvoided": 0,
+      "summariesWritten": 35,
+      "skippedVendor": 545,
+      "skippedFeatureBuckets": 0,
+      "avgLatencyMs": 10941.9,
+      "stillMissing": 0
+    }
+  },
+  "gpu": {
+    "files": {
+      "libtorchBridge": {
+        "exists": true,
+        "bytes": 62082,
+        "relPath": "sveltekit-frontend/src/lib/server/gpu/libtorch-bridge.ts"
+      },
+      "pytorchGraph": {
+        "exists": true,
+        "bytes": 20120,
+        "relPath": "sveltekit-frontend/src/lib/server/gpu/pytorch-graph.ts"
+      },
+      "autoencoderBridge": {
+        "exists": true,
+        "bytes": 4611,
+        "relPath": "sveltekit-frontend/src/lib/server/gpu/autoencoder-bridge.ts"
+      },
+      "topologyProjection": {
+        "exists": true,
+        "bytes": 13345,
+        "relPath": "sveltekit-frontend/src/lib/server/gpu/topology-projection.ts"
+      },
+      "trainAutoencoderPy": {
+        "exists": true,
+        "bytes": 11488,
+        "relPath": "sveltekit-frontend/scripts/train-autoencoder.py"
+      },
+      "trainAutoencoderMjs": {
+        "exists": true,
+        "bytes": 21827,
+        "relPath": "sveltekit-frontend/scripts/train-autoencoder.mjs"
+      },
+      "somPipeline": {
+        "exists": true,
+        "bytes": 35532,
+        "relPath": "scripts/atlas/pytorch-qdrant-redis-som-index.mjs"
+      },
+      "libtorchGraphImpl": {
+        "exists": true,
+        "bytes": 6851,
+        "relPath": "simd-bridge/cpp/libtorch_graph_impl.cpp"
+      },
+      "pytorchGraphCpp": {
+        "exists": true,
+        "bytes": 22437,
+        "relPath": "simd-bridge/cpp/pytorch_graph.cc"
+      },
+      "pytorchGraphFp16Cpp": {
+        "exists": true,
+        "bytes": 6903,
+        "relPath": "simd-bridge/cpp/pytorch_graph_fp16.cc"
+      },
+      "cuvsBridge": {
+        "exists": true,
+        "bytes": 1009,
+        "relPath": "simd-bridge/cpp/cuvs_bridge.cc"
+      }
+    },
+    "dimensions": {
+      "autoencoder": {
+        "inputDim": 768,
+        "hiddenDim": 256,
+        "latentDim": 64,
+        "somGrid": 8
+      },
+      "topologyHint": "768→256(ReLU)→64(L2)",
+      "trainScriptArchitecture": "768-256-64-256-768",
+      "mjsArchitecture": "Encoder: Linear(768→256) → ReLU → Linear(256→64)"
+    },
+    "capabilities": {
+      "hasMatmulExport": false,
+      "hasDotProduct": true,
+      "hasBatchCosine": true,
+      "hasKMeans": true,
+      "hasSOM": true,
+      "hasPCA": true,
+      "hasAutoencoderEncode": true,
+      "hasTorchMmBackend": true,
+      "hasCuvsStub": true
+    }
+  },
+  "nativeJsonParser": {
+    "files": {
+      "simdjsonBridge": {
+        "exists": true,
+        "bytes": 14441,
+        "relPath": "sveltekit-frontend/src/lib/server/gpu/simdjson-bridge.ts"
+      },
+      "jsonBench": {
+        "exists": true,
+        "bytes": 5398,
+        "relPath": "scripts/bench/json-parse-bench.mjs"
+      },
+      "parserSmoke": {
+        "exists": true,
+        "bytes": 6364,
+        "relPath": "sveltekit-frontend/scripts/smoke/qdrant-simdjson-parser-smoke.mjs"
+      },
+      "rustAddonPackager": {
+        "exists": true,
+        "bytes": 1007,
+        "relPath": "simd-bridge/scripts/package-win.ps1"
+      }
+    },
+    "capabilities": {
+      "nativeAddonPathRefs": true,
+      "nativeParseExport": true,
+      "fallbackPath": true,
+      "simdjsonMentions": true,
+      "rustPackagingRefs": true
     }
   }
 }

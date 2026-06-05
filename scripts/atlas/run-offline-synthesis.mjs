@@ -9,12 +9,13 @@
  *   2. summarize_cards_gemma4 (compact summary artifacts)
  *   3. mapreduce-consolidated-index (current corpus metadata join)
  *   4. offline-synthesis-mapreduce-duckdb (materialize DuckDB mirror)
- *   5. duckdb:feature-cards:refresh (validate offline mirror)
- *   6. phase-19c-knowledge-consolidation (prepare consolidation payloads)
- *   7. phase-19c-qdrant-index (prepare vector payloads)
- *   8. phase-19c-neo4j-sync (prepare graph payloads)
- *   9. atlas-parent-indexing (apply parent atlas exports)
- *   10. validate-parent-atlas + audit-parent-atlas-consistency
+ *   5. hidden-packet-pathmap-duckdb (materialize hidden packet join surface)
+ *   6. duckdb:feature-cards:refresh (validate offline mirror)
+ *   7. phase-19c-knowledge-consolidation (prepare consolidation payloads)
+ *   8. phase-19c-qdrant-index (prepare vector payloads)
+ *   9. phase-19c-neo4j-sync (prepare graph payloads)
+ *   10. atlas-parent-indexing (apply parent atlas exports)
+ *   11. validate-parent-atlas + audit-parent-atlas-consistency
  *
  * Usage:
  *   node scripts/atlas/run-offline-synthesis.mjs
@@ -147,7 +148,16 @@ try {
     mark('offline-synthesis-mapreduce-duckdb', 'skipped', { reason: 'dry-run' });
   }
 
-  // 5. Validate the offline mirror in DuckDB.
+  // 5. Materialize the hidden packet pathmap join surface in DuckDB.
+  if (APPLY && !DRY_RUN) {
+    runNodeScript('scripts/atlas/materialize-hidden-packet-pathmap-duckdb.mjs', ['--write']);
+    mark('hidden-packet-pathmap-duckdb', 'ok');
+  } else {
+    runNodeScript('scripts/atlas/materialize-hidden-packet-pathmap-duckdb.mjs', ['--dry-run']);
+    mark('hidden-packet-pathmap-duckdb', 'skipped', { reason: 'dry-run' });
+  }
+
+  // 6. Validate the offline mirror in DuckDB.
   if (APPLY && !DRY_RUN) {
     runNpmScript('duckdb:feature-cards:refresh', [], path.join(ROOT, 'sveltekit-frontend'));
     mark('duckdb-feature-cards-refresh', 'ok');
@@ -155,7 +165,7 @@ try {
     mark('duckdb-feature-cards-refresh', 'skipped', { reason: 'dry-run' });
   }
 
-  // 6. Prepare the phase-19c payloads.
+  // 7. Prepare the phase-19c payloads.
   runNodeScript('scripts/atlas/phase-19c-knowledge-consolidation.mjs', DRY_RUN || !APPLY ? ['--dry-run'] : []);
   mark('phase-19c-knowledge-consolidation', 'ok');
 
@@ -165,7 +175,7 @@ try {
   runNodeScript('scripts/atlas/phase-19c-neo4j-sync.mjs', DRY_RUN || !APPLY ? ['--dry-run'] : []);
   mark('phase-19c-neo4j-sync', 'ok');
 
-  // 5. Promote the parent atlas export and validate it.
+  // 8. Promote the parent atlas export and validate it.
   runNodeScript('scripts/atlas-parent-indexing.mjs', [DRY_RUN || !APPLY ? '--dry-run' : '--apply']);
   mark('atlas-parent-indexing', 'ok', { apply: APPLY && !DRY_RUN });
 
@@ -195,21 +205,24 @@ try {
     '3. Postgres durable tables',
     '4. Neo4j / SOM topology lanes',
     '',
-    '## Primary outputs',
-    '- `.tmp/ingest/lanes/codebase_features.ndjson`',
-    '- `.tmp/ingest/edges/codebase_features_edges.ndjson`',
-    '- `memory/exports/parent-atlas/parent_atlas_index.csv`',
-    '- `memory/exports/parent-atlas/parent_atlas_index.json`',
-    '- `memory/exports/parent-atlas-report.json`',
-    '- `docs/phase100/feature-recommendations.json`',
-    '- `docs/phase100/feature-recommendations.md`',
+  '## Primary outputs',
+  '- `.tmp/ingest/lanes/codebase_features.ndjson`',
+  '- `.tmp/ingest/edges/codebase_features_edges.ndjson`',
+  '- `docs/reports/hidden-packet-pathmap-duckdb-report.md`',
+  '- `docs/reports/hidden-packet-pathmap-duckdb-report.json`',
+  '- `memory/exports/parent-atlas/parent_atlas_index.csv`',
+  '- `memory/exports/parent-atlas/parent_atlas_index.json`',
+  '- `memory/exports/parent-atlas-report.json`',
+  '- `docs/phase100/feature-recommendations.json`',
+  '- `docs/phase100/feature-recommendations.md`',
     '',
-    '## Downstream stores',
-    '- Postgres: `task_semantic_packets`, `parent_atlas_records`, `parent_atlas_vectors`, `glyph_records`',
-    '- Qdrant: `feature_maps`, `codebase_chunks_768`',
-    '- Redis: `ace:ctx:*`, `ace:packet:latest`, centroid and SOM caches',
-    '',
-  ].join('\n');
+  '## Downstream stores',
+  '- Postgres: `task_semantic_packets`, `parent_atlas_records`, `parent_atlas_vectors`, `glyph_records`',
+  '- Qdrant: `feature_maps`, `codebase_chunks_768`',
+  '- Redis: `ace:ctx:*`, `ace:packet:latest`, centroid and SOM caches',
+  '- Canonical hidden-packet join surface: `docs/reports/hidden-packet-pathmap-duckdb-report.md` for `sourceRef + feature_id + stable_id` replay',
+  '',
+].join('\n');
 
   fs.writeFileSync(REPORT_MD, md, 'utf8');
 

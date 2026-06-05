@@ -4,52 +4,19 @@ import { fileURLToPath } from 'node:url';
 import crypto from 'node:crypto';
 import pg from 'pg';
 import Redis from 'ioredis';
+import { loadRepoEnv, resolveDatabaseUrl, resolveRedisConfig } from './connection-config.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = path.resolve(__dirname, '../..');
 const FRONTEND_ROOT = path.join(REPO_ROOT, 'sveltekit-frontend');
-const ENV_PATHS = [
-  path.join(REPO_ROOT, '.env.local'),
-  path.join(REPO_ROOT, '.env'),
-  path.join(FRONTEND_ROOT, '.env.local'),
-  path.join(FRONTEND_ROOT, '.env'),
-];
 
-function loadEnvFiles(filePaths) {
-  const env = {};
-  for (const filePath of filePaths) {
-    if (!fs.existsSync(filePath)) continue;
-    const content = fs.readFileSync(filePath, 'utf8');
-    for (const line of content.split(/\r?\n/)) {
-      const trimmed = line.trim();
-      if (!trimmed || trimmed.startsWith('#')) continue;
-      const idx = trimmed.indexOf('=');
-      if (idx === -1) continue;
-      const key = trimmed.slice(0, idx).trim();
-      let val = trimmed.slice(idx + 1).trim();
-      if ((val.startsWith('"') && val.endsWith('"')) || (val.startsWith("'") && val.endsWith("'"))) {
-        val = val.slice(1, -1);
-      }
-      env[key] = val;
-    }
-  }
-  return env;
-}
-
-function normalizeRedisUrl(rawUrl, rawHost, rawPort) {
-  const host = rawHost || '127.0.0.1';
-  const port = Number(rawPort || 6379);
-  if (rawUrl && rawUrl.includes('://')) return rawUrl;
-  if (rawUrl && /^[^:/]+:\d+$/.test(rawUrl)) return `redis://${rawUrl}`;
-  return `redis://${host}:${port}`;
-}
-
-const env = loadEnvFiles(ENV_PATHS);
-const DATABASE_URL = env.DATABASE_URL || env.ADMIN_DATABASE_URL || 'postgresql://legal_admin:123456@localhost:5434/legal_ai_db';
-const REDIS_URL = normalizeRedisUrl(env.REDIS_URL, env.REDIS_HOST, env.REDIS_PORT);
-const REDIS_PASSWORD = env.REDIS_PASSWORD || 'redis';
-const REDIS_HOST = env.REDIS_HOST || '127.0.0.1';
-const REDIS_PORT = Number(env.REDIS_PORT || 6379);
+const env = loadRepoEnv(process.env);
+const DATABASE_URL = resolveDatabaseUrl(env);
+const REDIS_CONFIG = resolveRedisConfig(env);
+const REDIS_URL = REDIS_CONFIG.url;
+const REDIS_PASSWORD = REDIS_CONFIG.password;
+const REDIS_HOST = REDIS_CONFIG.host;
+const REDIS_PORT = REDIS_CONFIG.port;
 
 const args = process.argv.slice(2);
 let fromFile = path.join(FRONTEND_ROOT, '.tmp', 'gemma-recommendations.jsonl');

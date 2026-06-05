@@ -1,0 +1,274 @@
+{
+  "schema": "compressed_semantic_geometry_report.v1",
+  "generated_at": "2026-06-05T14:49:23.302Z",
+  "limit": 25,
+  "qdrant": {
+    "available": true,
+    "url": "http://127.0.0.1:6333",
+    "collection": "codebase_chunks_768",
+    "status": "green",
+    "pointsCount": 76261,
+    "indexedVectorsCount": 143664,
+    "vectorsConfig": {
+      "content": {
+        "size": 768,
+        "distance": "Cosine"
+      },
+      "encoded_64": {
+        "size": 64,
+        "distance": "Cosine"
+      },
+      "error": {
+        "size": 768,
+        "distance": "Cosine"
+      },
+      "signature": {
+        "size": 768,
+        "distance": "Cosine"
+      }
+    },
+    "optimizerConfig": {
+      "deleted_threshold": 0.2,
+      "vacuum_min_vector_number": 1000,
+      "default_segment_number": 0,
+      "max_segment_size": null,
+      "memmap_threshold": null,
+      "indexing_threshold": 20000,
+      "flush_interval_sec": 5,
+      "max_optimization_threads": null
+    },
+    "hnswConfig": {
+      "m": 16,
+      "ef_construct": 100,
+      "full_scan_threshold": 10000,
+      "max_indexing_threads": 0,
+      "on_disk": false
+    },
+    "quantizationConfig": {
+      "scalar": {
+        "type": "int8",
+        "always_ram": true
+      }
+    },
+    "quantizationDetected": true
+  },
+  "runtime": {
+    "total": 32,
+    "with_source_refs": 29,
+    "with_feature_ids": 29,
+    "with_qdrant_hits": 31,
+    "with_redis_hot_keys": 31,
+    "low_context_density": 31
+  },
+  "telemetry": {
+    "exact_rescore_fields_present": false,
+    "fields": []
+  },
+  "oversampling": {
+    "low": 0,
+    "medium": 10,
+    "high": 15
+  },
+  "recent_policy_sample": [
+    {
+      "id": "32",
+      "source_ref_count": 2,
+      "feature_id_count": 2,
+      "qdrant_hits": 8,
+      "cache_hit": true,
+      "suggested_oversampling": "high"
+    },
+    {
+      "id": "31",
+      "source_ref_count": 5,
+      "feature_id_count": 5,
+      "qdrant_hits": 8,
+      "cache_hit": true,
+      "suggested_oversampling": "medium"
+    },
+    {
+      "id": "30",
+      "source_ref_count": 3,
+      "feature_id_count": 3,
+      "qdrant_hits": 8,
+      "cache_hit": true,
+      "suggested_oversampling": "high"
+    },
+    {
+      "id": "29",
+      "source_ref_count": 1,
+      "feature_id_count": 1,
+      "qdrant_hits": 8,
+      "cache_hit": true,
+      "suggested_oversampling": "high"
+    },
+    {
+      "id": "28",
+      "source_ref_count": 4,
+      "feature_id_count": 4,
+      "qdrant_hits": 8,
+      "cache_hit": true,
+      "suggested_oversampling": "medium"
+    },
+    {
+      "id": "27",
+      "source_ref_count": 3,
+      "feature_id_count": 3,
+      "qdrant_hits": 8,
+      "cache_hit": true,
+      "suggested_oversampling": "high"
+    },
+    {
+      "id": "26",
+      "source_ref_count": 2,
+      "feature_id_count": 2,
+      "qdrant_hits": 8,
+      "cache_hit": true,
+      "suggested_oversampling": "high"
+    },
+    {
+      "id": "25",
+      "source_ref_count": 1,
+      "feature_id_count": 1,
+      "qdrant_hits": 8,
+      "cache_hit": true,
+      "suggested_oversampling": "high"
+    },
+    {
+      "id": "24",
+      "source_ref_count": 4,
+      "feature_id_count": 4,
+      "qdrant_hits": 8,
+      "cache_hit": true,
+      "suggested_oversampling": "medium"
+    },
+    {
+      "id": "23",
+      "source_ref_count": 4,
+      "feature_id_count": 4,
+      "qdrant_hits": 8,
+      "cache_hit": true,
+      "suggested_oversampling": "medium"
+    },
+    {
+      "id": "22",
+      "source_ref_count": 1,
+      "feature_id_count": 1,
+      "qdrant_hits": 8,
+      "cache_hit": true,
+      "suggested_oversampling": "high"
+    },
+    {
+      "id": "21",
+      "source_ref_count": 2,
+      "feature_id_count": 2,
+      "qdrant_hits": 8,
+      "cache_hit": true,
+      "suggested_oversampling": "high"
+    },
+    {
+      "id": "20",
+      "source_ref_count": 3,
+      "feature_id_count": 3,
+      "qdrant_hits": 8,
+      "cache_hit": true,
+      "suggested_oversampling": "high"
+    },
+    {
+      "id": "19",
+      "source_ref_count": 2,
+      "feature_id_count": 2,
+      "qdrant_hits": 8,
+      "cache_hit": true,
+      "suggested_oversampling": "high"
+    },
+    {
+      "id": "18",
+      "source_ref_count": 3,
+      "feature_id_count": 3,
+      "qdrant_hits": 8,
+      "cache_hit": true,
+      "suggested_oversampling": "high"
+    },
+    {
+      "id": "17",
+      "source_ref_count": 4,
+      "feature_id_count": 4,
+      "qdrant_hits": 8,
+      "cache_hit": true,
+      "suggested_oversampling": "medium"
+    },
+    {
+      "id": "16",
+      "source_ref_count": 0,
+      "feature_id_count": 0,
+      "qdrant_hits": 8,
+      "cache_hit": true,
+      "suggested_oversampling": "high"
+    },
+    {
+      "id": "15",
+      "source_ref_count": 1,
+      "feature_id_count": 1,
+      "qdrant_hits": 8,
+      "cache_hit": true,
+      "suggested_oversampling": "high"
+    },
+    {
+      "id": "14",
+      "source_ref_count": 5,
+      "feature_id_count": 5,
+      "qdrant_hits": 8,
+      "cache_hit": true,
+      "suggested_oversampling": "medium"
+    },
+    {
+      "id": "13",
+      "source_ref_count": 1,
+      "feature_id_count": 1,
+      "qdrant_hits": 8,
+      "cache_hit": true,
+      "suggested_oversampling": "high"
+    },
+    {
+      "id": "12",
+      "source_ref_count": 5,
+      "feature_id_count": 5,
+      "qdrant_hits": 8,
+      "cache_hit": true,
+      "suggested_oversampling": "medium"
+    },
+    {
+      "id": "11",
+      "source_ref_count": 5,
+      "feature_id_count": 5,
+      "qdrant_hits": 8,
+      "cache_hit": true,
+      "suggested_oversampling": "medium"
+    },
+    {
+      "id": "10",
+      "source_ref_count": 5,
+      "feature_id_count": 5,
+      "qdrant_hits": 8,
+      "cache_hit": true,
+      "suggested_oversampling": "medium"
+    },
+    {
+      "id": "9",
+      "source_ref_count": 5,
+      "feature_id_count": 5,
+      "qdrant_hits": 8,
+      "cache_hit": true,
+      "suggested_oversampling": "medium"
+    },
+    {
+      "id": "8",
+      "source_ref_count": 1,
+      "feature_id_count": 1,
+      "qdrant_hits": 8,
+      "cache_hit": true,
+      "suggested_oversampling": "high"
+    }
+  ]
+}

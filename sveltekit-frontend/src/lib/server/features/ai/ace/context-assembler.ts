@@ -57,6 +57,17 @@ import { mkdirSync } from 'node:fs';
 import { promises as fsPromises } from 'node:fs';
 import crypto from 'node:crypto';
 
+function normalizeToParentAtlasSourceRef(p: string): string {
+  if (!p) return '';
+  let normalized = p.replace(/\\/g, '/');
+  if (normalized.startsWith('./')) normalized = normalized.slice(2);
+  const frontendPrefixes = ['src/', 'tests/', 'drizzle/', 'static/', 'scripts/', 'config/'];
+  if (frontendPrefixes.some(pref => normalized.startsWith(pref))) {
+    return 'sveltekit-frontend/' + normalized;
+  }
+  return normalized;
+}
+
 const TURBO_CTX_SIZE = Number(process.env.TURBO_CTX_SIZE ?? process.env.LLAMA_CTX_SIZE ?? 65536);
 const OPENAI_HARD_INPUT_CAP = Number(process.env.OPENAI_HARD_INPUT_CAP ?? '24000');
 const ACE_PACKET_TOKEN_CAP = Number(process.env.ACE_PACKET_TOKEN_CAP ?? '3500');

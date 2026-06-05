@@ -529,6 +529,9 @@ async function scoreBatchWithBackendFallback(
                 scores.set(candidates[i].documentId, batchScores[i]);
             }
             return scores;
+        } else {
+            tritonHealth.ok = false;
+            tritonHealth.checkedAt = Date.now();
         }
     } catch {
         tritonHealth.ok = false;

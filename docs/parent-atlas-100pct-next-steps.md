@@ -14,7 +14,8 @@ Current practical completion:
 - Recommendation -> pickup queue: working
 - Route runtime packets / ACE replay: working; JSONB audit rows and Redis LOD0 packets preserve `source_ref` provenance
 - Route runtime observability: working; report and self-healing recommendation feedback are wired
-- Production-readiness audit: working; 30 PASS / 0 WARN / 0 FAIL across Drizzle, Postgres, Redis, Qdrant, Neo4j, NDJSON, and DuckDB artifacts
+- Production-readiness audit: working; 53 PASS / 1 WARN / 0 FAIL across Drizzle, Postgres, Redis, Qdrant, Neo4j, NDJSON, DuckDB, and GPU bridge artifacts
+- GPU bridge detail: the native export surface still does not expose a generic `matmul` symbol, but the real LibTorch GEMM path exists in `simd-bridge/cpp/libtorch_graph_impl.cpp`, `simd-bridge/cpp/pytorch_graph.cc`, and `simd-bridge/cpp/pytorch_graph_fp16.cc` via `torch::mm()`; `simd-bridge/cpp/CMakeLists.txt` explicitly notes cuBLASLt dispatch
 - EmbeddingGemma `:8081`: healthy and faster than Ollama on bounded head-to-head eval
 
 Important command correction:
@@ -100,7 +101,8 @@ The bounded sourceRef-backed ingest closed this gap. Current active-production n
 ```bash
 npx tsx ../scripts/atlas/gemma4-parent-atlas-summaries.mjs --cache --apply --limit=100
 ```
-Current summary backlog is tracked against the non-vendor active-production set. The latest active-production summary check returned 3,528 / 3,528 with summaries and 0 missing.
+Current summary backlog is tracked against the non-vendor active-production set. The latest active-production summary check returned 3,799 / 3,799 with summaries and 0 missing.
+The latest cached batch report on disk now shows 35 queued / 35 succeeded with 0 failed, and the audit script treats that batch report as a live validation checkpoint for the summary lane.
 Fills `parent_atlas_documents.summary` — unlocks:
 - Richer profile card descriptions
 - Summary-aware ACE prompt injection
@@ -159,7 +161,7 @@ The audit writes:
 - `docs/reports/parent-atlas-production-readiness-report.md`
 
 Latest result:
-- checks: 30 PASS / 0 WARN / 0 FAIL
+- checks: 48 PASS / 1 WARN / 0 FAIL
 - `parent_atlas_documents`: 5,253 rows
 - active non-vendor Parent Atlas summaries: 3,799 / 3,799
 - `atlas_feature_map`: 14,465 rows
@@ -177,6 +179,54 @@ Latest result:
 - `rg -uuu` NDJSON inventory: 127 files, excluding generated dependency folders
 
 This audit is intentionally report-only. It does not run migrations, `drizzle-kit push`, Qdrant writes, graph writes, file archive moves, or database pruning.
+
+### Step 8c — Hidden packet pathmap audit (DONE, read-only)
+```bash
+node scripts/atlas/audit-hidden-packet-pathmap.mjs
+```
+
+The audit writes:
+- `docs/reports/hidden-packet-pathmap-report.json`
+- `docs/reports/hidden-packet-pathmap-report.md`
+
+Current result:
+- hidden packet inputs resolved: 3/3
+- total packet rows: 6,353
+- rows with both `sourceRef` and `feature_id`: 6,353
+- kanban rows matched to feature labels by stable id: 3,106/3,106
+- kanban rows matched by `sourceRef + feature`: 3,106/3,106
+- missing-feature todo rows with todo `sourceRef`: 135/141
+
+This is now a replay/join surface, not just a visible artifact list. The next follow-on is to feed the same spine into the offline DuckDB join lane so the pathmap, feature labels, kanban tasks, and missing-feature todo packets stay aligned in one bounded report.
+
+### Step 8d — Hidden packet DuckDB materialization (DONE)
+```bash
+node scripts/atlas/materialize-hidden-packet-pathmap-duckdb.mjs --write
+```
+
+This step turns the normalized hidden packet rows into a DuckDB-backed join surface and writes:
+- `docs/reports/hidden-packet-pathmap.duckdb`
+- `docs/reports/hidden-packet-pathmap-duckdb-report.json`
+- `docs/reports/hidden-packet-pathmap-duckdb-report.md`
+
+Treat `docs/reports/hidden-packet-pathmap-duckdb-report.md` as the canonical replay/join report for the `sourceRef + feature_id + stable_id` spine.
+
+Use the DuckDB report to inspect the combined `sourceRef + feature_id + stable_id` spine before any broader offline promotion.
+Current result:
+- normalized rows: 6,353
+- joined rows: 6,353
+- stable-id joins: 6,353
+- sourceRef joins: 6,353
+
+The next follow-on is to keep this same join surface in sync with the offline synthesis lane so the packet pathmap remains a bounded replay artifact instead of drifting into a separate ad hoc report.
+
+### Directory-by-directory checkpoints
+- `scripts/atlas/`: batch summaries are validated by the cached Phase 101 report, and the production-readiness audit now surfaces the summary lane explicitly.
+- `scripts/atlas/ndjson-mapreduce-join.mjs` / `scripts/atlas/materialize-mapreduce-duckdb.mjs`: the offline NDJSON MapReduce and DuckDB materialization lane is present and audited as read-only.
+- `scripts/atlas/audit-hidden-packet-pathmap.mjs`: the hidden `.tmp` packet surfaces are now audited as a replay/join surface with `sourceRef` and `feature_id` coverage.
+- `scripts/atlas/create-agent-pickup-packets.mjs`: now uses the shared connection config for Postgres and Redis so the pickup queue does not drift back to local-auth defaults.
+- `sveltekit-frontend/src/lib/server/gpu/`: the canonical autoencoder lane remains `768→256→64`; generic `matmul` is still absent from the native bridge and is tracked as a warning, not a blocker.
+- `sveltekit-frontend/src/lib/server/db/`: Drizzle barrels continue to mirror the NES/CHROM and route runtime packet schemas.
 
 ### Step 9 — Embed head-to-head eval (DONE, bounded)
 ```bash
