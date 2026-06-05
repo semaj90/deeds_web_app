@@ -1,3 +1,69 @@
+now we have feature_id table added we'll go directory by directory
+1. needs validation check for batch summaries
+2. ndjson offline processing indexing (possibly scripts tests not aligning) it needs cognitive organzing multi hop traversal bit envoding autoencoding jsonb for grpc serialization vs code workspae utility then grpc mcp? for our sveltekit 2 app
+3 find relevant pytorch libtorch files, matmul i missing, 4d topological transformation,  som 768-386-64 embedding ae:train to find dimensions and ask for help algorithmic finding best distance clustering embeddinggemma
+4. looking into token remapping, gpu functions lanes for decisions trees neo4j,
+5. organize the codebase/repo and find next steps features to complete and find more information on.
+6. look at skills spec driven gsd kanban board tasks to help finish and align features to auto-map codebase finished in 112ms.
+7. deep research sub agent search engines production hardening
+
+route_runtime_packets -> compressed NES packet -> Redis LOD cache -> decoded sourceRef/featureId -> Qdrant -> Neo4j -> recommendation/workspace task if this works, we need neo4j ingestions chrom nes packets using rg -uu the repo ndjson since might be git ignored  parsing to offline mapreduce joins duckdb analyze to match proveance to our postgresql18 tables with out git diff we have packet reader writer ingester with migrations nes chrom cards for json packets contextual trees neo4j for table indexeable packets? qdrant backfilled? for semantic cache bitfrost sidecar centroid clusters of ae som 20x20? louvian works here? k-means clustering langextract reranker to nes chrom jsonb json toon encodable packets attached to qdrannt tags with original file path mapped to possibly cold storage once all feature_labeled extracted while we prune the database. to seperate archives to production level readiness. audit this, alter table add table to existing don't delete migrate mirror with drizzle-orm for typescript bridge sveltekit 2 opencode app integration later on$ Set-Location 'C:\Users\james\Videos\deeds-web-app'; npm run audit:contracts
+
+Yes. Treat this as the next directory-by-directory production hardening lane.
+
+Use this order:
+
+1. Validate active summaries
+2. Audit feature_id/sourceRef/path coverage per directory
+3. Offline NDJSON/DuckDB MapReduce join
+4. PyTorch/LibTorch/GPU function inventory
+5. NES/Chrom packet indexing into Postgres/Qdrant/Neo4j
+6. Generate GSD/Kanban tasks
+7. Archive/prune only after summaries + packets are promoted
+
+Start with this safe command set:
+Set-Location C:\Users\james\Videos\deeds-web-app
+npm run audit:contracts
+node scripts/atlas/report-atlas-duplicates-and-cache-hits.mjs
+node scripts/atlas/report-production-qdrant-no-som.mjs --limit=50
+node scripts/atlas/report-production-no-qdrant.mjs --limit=50
+npx tsx scripts/tests/smoke-runtime-packet-replay.mjs
+npm run recommendations:workspace
+For the directory-by-directory lane, create one report per directory:
+source_ref coverage
+feature_id coverage
+summary coverage
+qdrant_point_id coverage
+som_cluster coverage
+neo4j neighbor count
+nes_chrom packet count
+redis LOD packet count
+archive/production classification
+
+Use this as the next OpenCode prompt:
+Continue Parent Atlas directory-by-directory production hardening.
+Rules:
+- Additive only.
+- Do not delete or prune.
+- Do not rewrite migrations destructively.
+- Use ALTER TABLE ADD COLUMN IF NOT EXISTS only when live DB is missing a declared field.
+- Keep feature:* as feature buckets, not file paths.
+- Use source_ref / relative_path as the provenance spine.
+- Keep raw inventory separate from active production.
+Steps:
+1. Run npm run audit:contracts and capture output.
+2. Validate active summaries are 100%.
+3. Generate per-directory coverage report for source_ref, feature_id, qdrant_point_id, som_cluster, summary, NES packets, Redis LOD, Neo4j neighbors.
+4. Use rg -uu to include gitignored NDJSON/cache/report roots, but classify them as generated/cold unless promoted.
+5. Use DuckDB for offline NDJSON joins.
+6. Inventory PyTorch/LibTorch/GPU bridge files and identify matmul/cosine/kmeans/SOM/autoencoder lanes.
+7. Generate GSD/Kanban tasks from gaps.
+8. Write reports only; no archive moves yet.
+
+Louvain fits the Neo4j graph lane. K-means/SOM/autoencoder/PCA fit the embedding topology lane. JSONB/NDJSON/Redis are serialization/cache lanes, not matmul.
+
+
+
 ~2pm
   ace packets   : 1
   atlas seeds   : 4173
