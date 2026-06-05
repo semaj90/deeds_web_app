@@ -1,23 +1,23 @@
 # Deep Import Graph - Phase A
-Generated: 2026-06-04T13:42:54.450Z
+Generated: 2026-06-05T02:04:02.638Z
 
 ## Stats
 | Metric | Value |
 |--------|-------|
-| Nodes | 54784 |
-| Total edges | 84186 |
-| Resolved edges | 9371 |
+| Nodes | 55000 |
+| Total edges | 84487 |
+| Resolved edges | 9384 |
 | Unresolved (local) | 8528 |
-| External refs | 64584 |
+| External refs | 64872 |
 | Neighborhoods computed | 100 |
 | Test-covered files | 993 |
 
 ## Zone Breakdown
 | Zone | Count |
 |------|-------|
-| shared | 47254 |
-| script | 4844 |
-| test | 1469 |
+| shared | 47416 |
+| script | 4896 |
+| test | 1471 |
 | types | 1038 |
 | config | 140 |
 | server | 29 |
@@ -27,16 +27,16 @@ Generated: 2026-06-04T13:42:54.450Z
 ## Edge Type Breakdown
 | Type | Count |
 |------|-------|
-| imports_static | 66982 |
+| imports_static | 67184 |
 | test_covers_file | 4941 |
-| redis_dependency | 3369 |
-| imports_dynamic | 2373 |
+| redis_dependency | 3393 |
+| imports_dynamic | 2379 |
 | exports_from | 1983 |
 | env_dependency | 1746 |
-| qdrant_dependency | 1406 |
-| neo4j_dependency | 534 |
+| qdrant_dependency | 1453 |
+| neo4j_dependency | 554 |
 | mcp_tool_calls | 496 |
-| db_dependency | 353 |
+| db_dependency | 355 |
 | svelte_route_uses_loader | 3 |
 
 ## Top 20 Coupling Hotspots (directFanIn)
@@ -46,7 +46,7 @@ Generated: 2026-06-04T13:42:54.450Z
 | 2 | `scripts/atlas/_atlas-utils.mjs` | script | 82 | 0 |
 | 3 | `scripts/atlas/_atlas-utils.mjs` | script | 82 | 0 |
 | 4 | `sveltekit-frontend/tests/helpers/env-ports.ts` | shared | 78 | 0 |
-| 5 | `sveltekit-frontend/src/lib/server/db/client.ts` | shared | 75 | 5 |
+| 5 | `sveltekit-frontend/src/lib/server/db/client.ts` | shared | 77 | 5 |
 | 6 | `deeds_labs/frontend/sveltekit-frontend-archive/dirs/_archived/services-corrupted/nodejs-orchestrator.ts` | shared | 63 | 0 |
 | 7 | `deeds_labs/frontend/sveltekit-frontend-archive/dirs/_archived/services-corrupted/nodejs-orchestrator.ts` | shared | 63 | 0 |
 | 8 | `claude-mem/src/shared/paths.ts` | shared | 57 | 2 |

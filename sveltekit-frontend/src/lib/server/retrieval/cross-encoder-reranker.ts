@@ -256,9 +256,113 @@ const SCORE_PROMPT_SUFFIX =
   `\n\nRate the relevance of this document to the query.\n` +
   `Respond ONLY with JSON: {"score": <number 0.0 to 1.0>}`;
 
+function parseScoreFromText(text: string | undefined | null): number | null {
+  if (!text) return null;
+  try {
+    const json = fastJsonParse<{ score?: number }>(text);
+    if (typeof json?.score === 'number' && isFinite(json.score)) {
+      return Math.max(0, Math.min(1, json.score));
+    }
+  } catch {
+    // llama.cpp may wrap JSON in markdown fences; fall through to numeric extraction.
+  }
+  const match = text.match(/\d+(?:\.\d+)?/);
+  if (match) return Math.max(0, Math.min(1, parseFloat(match[0])));
+  return null;
+}
+
+async function _scoreLlamaServer(prompt: string): Promise<number | null> {
+  const baseUrl =
+    process.env.LOCAL_OPENAI_BASE_URL ??
+    process.env.RERANK_BASE_URL ??
+    process.env.TURBOQUANT_BASE_URL ??
+    ENV.RERANK_BASE_URL;
+  if (!baseUrl) return null;
+
+  const model =
+    process.env.LOCAL_GEMMA_MODEL ??
+    process.env.RERANK_MODEL ??
+    RERANK_MODEL ??
+    'gemma4-legal-iq4xs-direct.gguf';
+
+  try {
+    const base = baseUrl.replace(/\/$/, '');
+    const nativeRes = await fetch(`${base}/completion`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        ...(process.env.LOCAL_OPENAI_API_KEY
+          ? { Authorization: `Bearer ${process.env.LOCAL_OPENAI_API_KEY}` }
+          : {}),
+      },
+      body: JSON.stringify({
+        prompt,
+        temperature: 0,
+        n_predict: 64,
+      }),
+      signal: AbortSignal.timeout(20_000),
+    });
+    if (nativeRes.ok) {
+      const body = await nativeRes.json() as { content?: string };
+      const score = parseScoreFromText(body.content);
+      if (score !== null) return score;
+    }
+
+    const completionRes = await fetch(`${base}/v1/completions`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        ...(process.env.LOCAL_OPENAI_API_KEY
+          ? { Authorization: `Bearer ${process.env.LOCAL_OPENAI_API_KEY}` }
+          : {}),
+      },
+      body: JSON.stringify({
+        model,
+        prompt,
+        temperature: 0,
+        max_tokens: 24,
+      }),
+      signal: AbortSignal.timeout(20_000),
+    });
+    if (!completionRes.ok) return null;
+    const body = await completionRes.json() as {
+      choices?: Array<{ text?: string; message?: { content?: string } }>;
+    };
+    const completionScore = parseScoreFromText(body.choices?.[0]?.text ?? body.choices?.[0]?.message?.content);
+    if (completionScore !== null) return completionScore;
+
+    const chatRes = await fetch(`${base}/v1/chat/completions`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        ...(process.env.LOCAL_OPENAI_API_KEY
+          ? { Authorization: `Bearer ${process.env.LOCAL_OPENAI_API_KEY}` }
+          : {}),
+      },
+      body: JSON.stringify({
+        model,
+        messages: [{ role: 'user', content: prompt }],
+        temperature: 0,
+        max_tokens: 64,
+      }),
+      signal: AbortSignal.timeout(20_000),
+    });
+    if (!chatRes.ok) return null;
+    const chatBody = await chatRes.json() as {
+      choices?: Array<{ message?: { content?: string } }>;
+    };
+    return parseScoreFromText(chatBody.choices?.[0]?.message?.content);
+  } catch {
+    return null;
+  }
+}
+
 async function _scoreOne(query: string, doc: RerankCandidate): Promise<number> {
   const docText = doc.content.slice(0, SCORE_MAX_CHARS);
   const prompt = SCORE_PROMPT_PREFIX(query) + docText + SCORE_PROMPT_SUFFIX;
+
+  const llamaScore = await _scoreLlamaServer(prompt);
+  if (llamaScore !== null) return llamaScore;
 
   try {
     const res = await ollamaFetch(
@@ -285,15 +389,8 @@ async function _scoreOne(query: string, doc: RerankCandidate): Promise<number> {
 
     const raw = await res.text();
     const body = fastJsonParse<{ response?: string }>(raw);
-    const json = fastJsonParse<{ score?: number }>(body?.response ?? '{}');
-
-    if (typeof json?.score === 'number' && isFinite(json.score)) {
-      return Math.max(0, Math.min(1, json.score));
-    }
-
-    // Fallback: extract first float from response text
-    const match = (body?.response ?? '').match(/\d+(?:\.\d+)?/);
-    if (match) return Math.max(0, Math.min(1, parseFloat(match[0])));
+    const parsedScore = parseScoreFromText(body?.response);
+    if (parsedScore !== null) return parsedScore;
 
     return 0.5; // neutral on parse failure
   } catch {

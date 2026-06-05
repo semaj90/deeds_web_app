@@ -4,6 +4,7 @@ import crypto from 'crypto';
 import { createRequire } from 'module';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { existsSync } from 'fs';
 
 const require = createRequire(import.meta.url);
 let __dirname = '';
@@ -14,8 +15,16 @@ try {
 let native: any = null;
 try {
   if (__dirname) {
-    const nativePath = path.resolve(__dirname, '../../../../simd-bridge/rust-simdjson/target/release/simd_bridge_rs.node');
-    native = require(nativePath);
+    const candidatePaths = [
+      path.resolve(process.cwd(), '..', 'simd-bridge/rust-simdjson/target/release/simd_bridge_rs.node'),
+      path.resolve(process.cwd(), 'simd-bridge/rust-simdjson/target/release/simd_bridge_rs.node'),
+      path.resolve(__dirname, '../../../../../../simd-bridge/rust-simdjson/target/release/simd_bridge_rs.node'),
+      path.resolve(__dirname, '../../../../../../../simd-bridge/rust-simdjson/target/release/simd_bridge_rs.node'),
+    ];
+    const nativePath = candidatePaths.find((candidate) => existsSync(candidate));
+    if (nativePath) {
+      native = require(nativePath);
+    }
   }
 } catch (e: any) {
   console.warn('[bifrost-cache] Native Rust bridge load failed, using JS fallback:', e.message);

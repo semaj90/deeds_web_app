@@ -21,6 +21,7 @@ import { fileURLToPath } from 'url';
 const __dirname = fileURLToPath(new URL('.', import.meta.url));
 const ROOT = resolve(__dirname, '..');
 const REDIS_URL = process.env.REDIS_URL ?? 'redis://127.0.0.1:6379';
+const REDIS_PASSWORD = process.env.REDIS_PASSWORD || undefined;
 const HYPERGRAPH_PATH = resolve(ROOT, 'docs/graph/hypergraph-clusters.json');
 
 function uniqueByFilePath(rows) {
@@ -43,7 +44,12 @@ async function createRedis() {
   } catch {
     throw new Error('ioredis not found');
   }
-  const client = new Redis(REDIS_URL, { lazyConnect: true });
+  const client = new Redis(REDIS_URL, {
+    password: REDIS_PASSWORD,
+    lazyConnect: true,
+    enableOfflineQueue: false,
+    maxRetriesPerRequest: 1,
+  });
   await client.connect();
   Object.defineProperty(client, Symbol.asyncDispose, {
     value: async () => { try { await client.quit(); } catch { } },
@@ -60,7 +66,14 @@ async function main() {
     process.exit(1);
   }
 
-  const clusters = JSON.parse(readFileSync(HYPERGRAPH_PATH, 'utf-8'));
+  const rawClusters = JSON.parse(readFileSync(HYPERGRAPH_PATH, 'utf-8'));
+  const clusters = Array.isArray(rawClusters)
+    ? rawClusters
+    : Array.isArray(rawClusters.clusters)
+      ? rawClusters.clusters
+      : Array.isArray(rawClusters.items)
+        ? rawClusters.items
+        : [];
   console.log(`Loaded ${clusters.length} clusters.`);
 
   const redis = await createRedis();

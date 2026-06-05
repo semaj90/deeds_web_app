@@ -479,6 +479,29 @@ dependency graph, sourceRefs, startup context, package scripts.
   - `npm run recommendations:workspace`
   - materialized `12` active workspace tasks
   - next ready task: `task_967675a8`
+- [x] Close the route runtime packet / ACE replay gate.
+  - `route_runtime_packets` is confirmed as the live Postgres JSONB audit table; no second schema lane was added
+  - `codebase_chunk_index` live drift was resolved with additive nullable columns for replay compatibility: `compressed_embedding`, `reconstruction_error`, and `centroid_id`
+  - sourceRef normalization now rejects placeholder `unknown` refs, preserves repo-root paths, and draws from CHR97 cartridge hits when rendered context rows do not carry paths
+  - Redis `ace:telemetry:{id}:lod0` replay uses compact source IDs and repairs stale source dictionaries from `parent_atlas_documents`
+  - validation: `npx tsx ../scripts/tests/smoke-route-runtime-packets.mjs`, `npx tsx ../scripts/tests/smoke-runtime-packet-replay.mjs`, `npx tsx scripts/tests/telemetry-source-ref-fallback.test.mjs`, and `npx tsc -p tsconfig.json --noEmit --pretty false`
+- [x] Add route runtime packet observability and recommendation feedback.
+  - `scripts/atlas/report-route-runtime-packets.mjs`
+  - `scripts/atlas/route-runtime-packet-recommendations.mjs`
+  - package aliases: `atlas:runtime-packets:report`, `atlas:runtime-packets:recommend`, `atlas:runtime-packets:recommend:apply`
+  - latest report: 24 packets, 95.8% cache hit rate, Redis LOD0 19/24, low-density rows 23
+  - generated 5 self-healing runtime-packet recommendations and bootstrapped 17 active workspace tasks; next ready `task_d2dad154`
+- [x] Refresh Karpathy / authority signals after topology closure.
+  - `npm --prefix sveltekit-frontend run karpathy:gpu` completed on CUDA/fp16: 45 candidates, 42 Qdrant hits, 42 encoded files
+  - `npm --prefix sveltekit-frontend run graphify:cluster:pagerank` completed after Redis auth handling: 100 clusters updated, `gpu:karpathy:clusters` pushed
+  - `npm --prefix sveltekit-frontend run graphify:authority` wrote 200 entries to Redis `ace:authority:top`
+- [x] Run bounded EmbeddingGemma head-to-head eval.
+  - fixed `scripts/evals/embed-head-to-head.mjs` for named Qdrant vectors with `--vector-name content`
+  - `:8081/health` and `:8090/health` are green
+  - bounded result: llama-server `:8081` is equivalent quality and faster than Ollama (`p50 76ms` vs `196ms`), so `:8081` remains canonical when healthy
+- [ ] Add a bounded/observable `graphify:topology` runner.
+  - full `npm --prefix sveltekit-frontend run graphify:topology` exceeded the 4-minute command timeout without useful progress output
+  - keep the existing Neo4j graph-truth sync as the proven dense topology path until this alias is split into measurable substeps
 
 ---
 

@@ -105,6 +105,11 @@ import { getLlmOutputHitsBulk, recordLlmOutputHit } from '$lib/server/cache/code
 import { getRedis } from '$lib/server/redis.js';
 import { aceTopkKey } from '../../../ace/cache-keys.js';
 import {
+  normalizeTelemetrySourceRefs,
+  resolveTelemetryPacketFallbacks,
+  telemetrySourceRefFromContext,
+} from './telemetry-source-ref-fallback.js';
+import {
   buildAceContextPlannerState,
   loadAceContextPlannerHit,
   storeAceContextPlannerHit,
@@ -1417,14 +1422,85 @@ export async function assembleACEContext(opts: {
       Promise.all([
         import('$lib/server/db/client'),
         import('./telemetry-compressor.js')
-      ]).then(([{ pool: pgPool }, { compressAndStoreTelemetry }]) => {
+      ]).then(async ([{ pool: pgPool }, { compressAndStoreTelemetry }]) => {
         const _p = packet as unknown as Record<string, unknown>;
         const queryHash = String(_p.query_hash ?? '');
-        const sourceRefs = Array.isArray(_p.source_refs) ? _p.source_refs : [];
+        const rankedCardSourceRefs = Array.isArray(_p.ranked_cards)
+          ? normalizeTelemetrySourceRefs(
+              (_p.ranked_cards as Array<Record<string, unknown>>).map(
+                (card) =>
+                  card.source_ref ??
+                  card.sourceRef ??
+                  card.relative_path ??
+                  card.path ??
+                  card.file_path ??
+                  null
+              )
+            )
+          : [];
+        const sourceRefs = Array.isArray(_p.source_refs) ? normalizeTelemetrySourceRefs(_p.source_refs) : [];
+        const telemetrySourceRefSeeds = sourceRefs.length > 0 ? sourceRefs : rankedCardSourceRefs;
         const featureIds = Array.isArray(_p.feature_ids) ? _p.feature_ids : [];
         const laneIds = Array.isArray(_p.lane_ids) ? _p.lane_ids : [];
         const redisHotKeys = Array.isArray(_p.redis_hot_keys) ? _p.redis_hot_keys : [];
         const qdrantHits = Array.isArray(_p.qdrant_point_ids) ? (_p.qdrant_point_ids as unknown[]).length : 0;
+        const qdrantPointIds = Array.isArray(_p.qdrant_point_ids)
+          ? (_p.qdrant_point_ids as Array<string | number>).map((value) => String(value)).filter(Boolean)
+          : [];
+        const packetSomCluster = typeof _p.som_cluster === 'string' ? String(_p.som_cluster) : '';
+
+        const resolveTelemetryFallbacks = async () => {
+          const needsSourceRefs = telemetrySourceRefSeeds.length === 0 && qdrantPointIds.length > 0;
+          const needsSomCluster = !packetSomCluster && qdrantPointIds.length > 0;
+          if (!needsSourceRefs && !needsSomCluster) return { sourceRefs: telemetrySourceRefSeeds, somCluster: packetSomCluster };
+
+          const rows = await pgPool.query<{
+            qdrant_id: string | null;
+            relative_path: string | null;
+            source_ref: string | null;
+            som_cluster: number | null;
+            }>(
+            `SELECT qdrant_id, relative_path, NULL::text AS source_ref, som_cluster
+               FROM codebase_chunk_index
+              WHERE qdrant_id = ANY($1::text[])`,
+            [qdrantPointIds]
+          ).catch(() => ({ rows: [] as Array<{ qdrant_id: string | null; relative_path: string | null; source_ref: string | null; som_cluster: number | null }> }));
+          return resolveTelemetryPacketFallbacks({
+            sourceRefs: telemetrySourceRefSeeds,
+            qdrantPointIds,
+            packetSomCluster,
+            rows: rows.rows,
+          });
+        };
+        const resolveSomClusterFromSourceRefs = async (refs: string[]) => {
+          if (!refs.length) return '';
+          const somRows = await pgPool.query<{ som_cluster: number | null }>(
+            `SELECT som_cluster
+               FROM parent_atlas_documents
+              WHERE source_ref = ANY($1::text[])
+                AND som_cluster IS NOT NULL
+              ORDER BY source_ref
+              LIMIT 1`,
+            [refs]
+          ).catch(() => ({ rows: [] as Array<{ som_cluster: number | null }> }));
+          const som = somRows.rows[0]?.som_cluster;
+          if (som != null) return String(som);
+          const atlasRows = await pgPool.query<{ som_cluster: string | number | null }>(
+            `SELECT som_cluster
+               FROM atlas_feature_map
+              WHERE source_ref = ANY($1::text[])
+                AND som_cluster IS NOT NULL
+              ORDER BY source_ref
+              LIMIT 1`,
+            [refs]
+          ).catch(() => ({ rows: [] as Array<{ som_cluster: string | number | null }> }));
+          const atlasSom = atlasRows.rows[0]?.som_cluster;
+          return atlasSom != null ? String(atlasSom) : '';
+        };
+        const { sourceRefs: telemetrySourceRefs, somCluster: telemetrySomClusterBase } =
+          await resolveTelemetryFallbacks();
+        const telemetrySomCluster =
+          telemetrySomClusterBase || (await resolveSomClusterFromSourceRefs(telemetrySourceRefs));
 
         pgPool.query(
           `INSERT INTO route_runtime_packets
@@ -1438,11 +1514,11 @@ export async function assembleACEContext(opts: {
             opts.filePath ? `file:${opts.filePath}` : '/api/sse/chat',
             queryHash,
             opts.query.slice(0, 120),
-            JSON.stringify(sourceRefs),
+            JSON.stringify(telemetrySourceRefs),
             JSON.stringify(featureIds),
             JSON.stringify(laneIds),
             String(_p.cluster_id ?? ''),
-            String(_p.som_cluster ?? ''),
+            telemetrySomCluster,
             qdrantHits,
             JSON.stringify(redisHotKeys),
             _p.cache_hit !== 'none',
@@ -1453,20 +1529,24 @@ export async function assembleACEContext(opts: {
         ).then((res) => {
           const insertedId = res.rows[0]?.id;
           if (insertedId) {
-            compressAndStoreTelemetry(insertedId, {
-              route: opts.filePath ? `file:${opts.filePath}` : '/api/sse/chat',
-              query_hash: queryHash,
-              query_preview: opts.query.slice(0, 120),
-              source_refs: sourceRefs,
-              feature_ids: featureIds,
-              lane_ids: laneIds,
-              cluster_id: String(_p.cluster_id ?? ''),
-              som_cluster: String(_p.som_cluster ?? ''),
-              qdrant_hits: qdrantHits,
-              redis_hot_keys: redisHotKeys,
-              userId: opts.userId ? parseInt(opts.userId, 10) || null : null,
-              sessionId: opts.conversationId ?? null,
-            }).catch(() => {});
+            resolveTelemetryFallbacks()
+              .then(({ sourceRefs: resolvedSourceRefs, somCluster: resolvedSomCluster }) =>
+                compressAndStoreTelemetry(insertedId, {
+                  route: opts.filePath ? `file:${opts.filePath}` : '/api/sse/chat',
+                  query_hash: queryHash,
+                  query_preview: opts.query.slice(0, 120),
+                  source_refs: telemetrySourceRefs.length > 0 ? telemetrySourceRefs : resolvedSourceRefs,
+                  feature_ids: featureIds,
+                  lane_ids: laneIds,
+                  cluster_id: String(_p.cluster_id ?? ''),
+                  som_cluster: telemetrySomCluster || resolvedSomCluster,
+                  qdrant_hits: qdrantHits,
+                  redis_hot_keys: redisHotKeys,
+                  userId: opts.userId ? parseInt(opts.userId, 10) || null : null,
+                  sessionId: opts.conversationId ?? null,
+                })
+              )
+              .catch(() => {});
           }
         }).catch(() => { /* telemetry — never throw */ });
       }).catch(() => { /* non-blocking */ });
@@ -1708,22 +1788,27 @@ export async function assembleACEContext(opts: {
             // Fire-and-forget ACE telemetry → route_runtime_packets (non-blocking)
             Promise.all([
               import('$lib/server/db/client'),
-              import('node:path'),
               import('./telemetry-compressor.js')
-            ]).then(async ([{ pool: pgPool }, path, { compressAndStoreTelemetry }]) => {
+            ]).then(async ([{ pool: pgPool }, { compressAndStoreTelemetry }]) => {
               try {
-                const rootDir = path.resolve(process.cwd(), '..');
                 const relativeRefs = (codebaseContext || [])
-                  .map((c: any) => path.relative(rootDir, c.filePath).replace(/\\/g, '/'))
-                  .filter(Boolean);
+                  .map((c: any) => telemetrySourceRefFromContext(c as Record<string, unknown>))
+                  .filter((ref: string | null): ref is string => Boolean(ref));
+                const cartridgeRefs = [
+                  ...(Array.isArray(cartridgeResults.topChunks) ? cartridgeResults.topChunks : []),
+                  ...(Array.isArray(cartridgeResults.results) ? cartridgeResults.results : []),
+                ]
+                  .map((c: any) => telemetrySourceRefFromContext(c as Record<string, unknown>))
+                  .filter((ref: string | null): ref is string => Boolean(ref));
+                const telemetryRefs = [...new Set([...relativeRefs, ...cartridgeRefs])];
                 
                 const featuresRes = await pgPool.query(
                   'SELECT DISTINCT source_ref, feature_id FROM parent_atlas_documents WHERE source_ref = ANY($1)',
-                  [relativeRefs]
+                  [telemetryRefs]
                 ).catch(() => ({ rows: [] as any[] }));
                 
                 const featureIdMap = new Map((featuresRes.rows || []).map((r: any) => [r.source_ref, r.feature_id]));
-                const featureIds = relativeRefs.map(ref => featureIdMap.get(ref) || 'shims').filter(Boolean);
+                const featureIds = telemetryRefs.map(ref => featureIdMap.get(ref) || 'shims').filter(Boolean);
                 const redisHotKeys = [cartridgeKey];
                 const qHits = cartridgeResults.results?.length ?? 0;
                 
@@ -1739,7 +1824,7 @@ export async function assembleACEContext(opts: {
                     opts.filePath ? `file:${opts.filePath}` : '/api/sse/chat',
                     qHash,
                     query.slice(0, 120),
-                    JSON.stringify(relativeRefs),
+                    JSON.stringify(telemetryRefs),
                     JSON.stringify(featureIds),
                     JSON.stringify([]), // lane_ids
                     activeClusterSummary ? String(activeClusterSummary.clusterId) : '',
@@ -1759,7 +1844,7 @@ export async function assembleACEContext(opts: {
                       route: opts.filePath ? `file:${opts.filePath}` : '/api/sse/chat',
                       query_hash: qHash,
                       query_preview: query.slice(0, 120),
-                      source_refs: relativeRefs,
+                      source_refs: telemetryRefs,
                       feature_ids: featureIds,
                       lane_ids: [],
                       cluster_id: activeClusterSummary ? String(activeClusterSummary.clusterId) : '',
@@ -3511,11 +3596,46 @@ export async function assembleACEContext(opts: {
         const _p = multihopPacket || {};
         const qHash = queryHash(query);
         const latencyMs = Date.now() - policyStartedAt;
-        const sourceRefs = Array.isArray(_p.source_refs) ? _p.source_refs : [];
+        const sourceRefs = Array.isArray(_p.source_refs) ? normalizeTelemetrySourceRefs(_p.source_refs) : [];
+        const qdrantHitSourceRefs = Array.isArray(_p.qdrant_hits)
+          ? normalizeTelemetrySourceRefs(
+              (_p.qdrant_hits as Array<Record<string, unknown>>).map(
+                (hit) => hit.source_ref ?? hit.sourceRef ?? hit.relative_path ?? hit.path ?? null
+              )
+            )
+          : [];
+        const telemetrySourceRefs = sourceRefs.length > 0 ? sourceRefs : qdrantHitSourceRefs;
         const featureIds = Array.isArray(_p.feature_ids) ? _p.feature_ids : [];
         const laneIds = Array.isArray(_p.lane_ids) ? _p.lane_ids : [];
         const redisHotKeys = Array.isArray(_p.redis_hot_keys) ? _p.redis_hot_keys : [];
         const qHits = Array.isArray(_p.qdrant_hits) ? _p.qdrant_hits.length : 0;
+        let telemetrySomCluster = String(_p.som_cluster ?? '');
+        if (!telemetrySomCluster && telemetrySourceRefs.length > 0) {
+          telemetrySomCluster = await (async () => {
+            const somRows = await pgPool.query<{ som_cluster: number | null }>(
+              `SELECT som_cluster
+                 FROM parent_atlas_documents
+                WHERE source_ref = ANY($1::text[])
+                  AND som_cluster IS NOT NULL
+                ORDER BY source_ref
+                LIMIT 1`,
+              [telemetrySourceRefs]
+            ).catch(() => ({ rows: [] as Array<{ som_cluster: number | null }> }));
+            const som = somRows.rows[0]?.som_cluster;
+            if (som != null) return String(som);
+            const atlasRows = await pgPool.query<{ som_cluster: string | number | null }>(
+              `SELECT som_cluster
+                 FROM atlas_feature_map
+                WHERE source_ref = ANY($1::text[])
+                  AND som_cluster IS NOT NULL
+                ORDER BY source_ref
+                LIMIT 1`,
+              [telemetrySourceRefs]
+            ).catch(() => ({ rows: [] as Array<{ som_cluster: string | number | null }> }));
+            const atlasSom = atlasRows.rows[0]?.som_cluster;
+            return atlasSom != null ? String(atlasSom) : '';
+          })();
+        }
 
         pgPool.query(
           `INSERT INTO route_runtime_packets
@@ -3529,11 +3649,11 @@ export async function assembleACEContext(opts: {
             opts.filePath ? `file:${opts.filePath}` : '/api/sse/chat',
             qHash,
             query.slice(0, 120),
-            JSON.stringify(sourceRefs),
+            JSON.stringify(telemetrySourceRefs),
             JSON.stringify(featureIds),
             JSON.stringify(laneIds),
             String(_p.cluster_id ?? ''),
-            String(_p.som_cluster ?? ''),
+            telemetrySomCluster,
             qHits,
             JSON.stringify(redisHotKeys),
             finalContext.cachePlanner?.hit ?? false,
@@ -3550,11 +3670,11 @@ export async function assembleACEContext(opts: {
                 route: opts.filePath ? `file:${opts.filePath}` : '/api/sse/chat',
                 query_hash: qHash,
                 query_preview: query.slice(0, 120),
-                source_refs: sourceRefs,
+                source_refs: telemetrySourceRefs,
                 feature_ids: featureIds,
                 lane_ids: laneIds,
                 cluster_id: String(_p.cluster_id ?? ''),
-                som_cluster: String(_p.som_cluster ?? ''),
+                som_cluster: telemetrySomCluster,
                 qdrant_hits: qHits,
                 redis_hot_keys: redisHotKeys,
                 userId: opts.userId ? parseInt(opts.userId, 10) || null : null,

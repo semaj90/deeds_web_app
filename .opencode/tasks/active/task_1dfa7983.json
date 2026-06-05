@@ -1,0 +1,35 @@
+{
+  "id": "task_1dfa7983",
+  "workspace_id": "deeds-web-app",
+  "title": "src/lib/components/ui/gaming/index.ts — 18 unresolved imports",
+  "description": "src/lib/components/ui/gaming/index.ts — 18 unresolved imports\n\nWhy: Feature \"ui\" barrel/index has 18 dangling import refs (mapreduce v4 scan)\n\nAction: Audit barrel re-exports; remove or fix dangling import paths",
+  "status": "todo",
+  "priority": "high",
+  "risk": "high",
+  "feature_id": "ai-retrieval",
+  "feature_confidence": 0.2,
+  "semantic_path": [
+    "rag",
+    "kag",
+    "ace"
+  ],
+  "source": "opencode",
+  "source_ref": "import_error_e90b057b",
+  "related_file_paths": [
+    "src/lib/components/ui/gaming/index.ts"
+  ],
+  "qdrant_point_id": null,
+  "summary_llm": null,
+  "summary_model": null,
+  "cluster_id": "UI Components",
+  "centroid_id": null,
+  "agent_pickup_ready": false,
+  "created_at": "2026-06-05T02:34:46.736Z",
+  "updated_at": "2026-06-05T02:35:01.170Z",
+  "mirror": {
+    "postgres_id": null,
+    "qdrant_point_id": null,
+    "redis_queue_key": null,
+    "langfuse_trace_id": null
+  }
+}

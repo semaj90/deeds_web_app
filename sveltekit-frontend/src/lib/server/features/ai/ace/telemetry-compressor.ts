@@ -1,5 +1,6 @@
 import { pool } from '$lib/server/db/client.js';
 import { getRedis } from '$lib/server/redis.js';
+import { normalizeTelemetrySourceRefs } from './telemetry-source-ref-fallback.js';
 
 interface RawTelemetryData {
 	route: string;
@@ -55,13 +56,42 @@ export async function compressAndStoreTelemetry(
 		};
 
 		// 2. Query Postgres for source_ref_id for all source_refs
+		const sourceRefs = normalizeTelemetrySourceRefs(data.source_refs || []);
 		let sourceRefIds: number[] = [];
-		if (data.source_refs && data.source_refs.length > 0) {
+		let unresolvedSourceRefs: string[] = [];
+		if (sourceRefs.length > 0) {
 			const res = await pool.query(
 				'SELECT DISTINCT source_ref, source_ref_id FROM parent_atlas_documents WHERE source_ref = ANY($1)',
-				[data.source_refs]
+				[sourceRefs]
 			);
-			sourceRefIds = res.rows.map((r: any) => r.source_ref_id).filter(Boolean);
+			const sourceRefIdByRef = new Map<string, number>();
+			for (const row of res.rows as Array<{ source_ref: string | null; source_ref_id: number | string | null }>) {
+				const ref = row.source_ref ? String(row.source_ref) : '';
+				const id = Number(row.source_ref_id);
+				if (ref && Number.isFinite(id)) sourceRefIdByRef.set(ref, id);
+			}
+			sourceRefIds = sourceRefs
+				.map((ref) => sourceRefIdByRef.get(ref))
+				.filter((id): id is number => id != null);
+			unresolvedSourceRefs = sourceRefs.filter((ref) => !sourceRefIdByRef.has(ref));
+		}
+
+		if (sourceRefIds.length === 0 && data.feature_ids?.length) {
+			const featureRes = await pool.query(
+				`SELECT DISTINCT source_ref, source_ref_id
+				   FROM parent_atlas_documents
+				  WHERE feature_id = ANY($1)
+				    AND source_ref IS NOT NULL
+				    AND source_ref NOT LIKE 'feature:%'
+				    AND source_ref NOT LIKE 'scripts/api-cleanup/%'
+				    AND source_ref NOT LIKE 'sveltekit-frontend/.venv/%'
+				  ORDER BY source_ref
+				  LIMIT 8`,
+				[[...new Set(data.feature_ids)]]
+			).catch(() => ({ rows: [] as Array<{ source_ref: string | null; source_ref_id: number | string | null }> }));
+			sourceRefIds = (featureRes.rows as Array<{ source_ref: string | null; source_ref_id: number | string | null }>)
+				.map((row) => Number(row.source_ref_id))
+				.filter((id): id is number => Number.isFinite(id));
 		}
 
 		// 3. Map feature_ids to codes
@@ -87,6 +117,7 @@ export async function compressAndStoreTelemetry(
 		// 6. Build the compact telemetry packet
 		const packet = {
 			s: sourceRefIds, // source integer IDs
+			x: unresolvedSourceRefs, // raw fallback refs for non-parent-atlas hot-path hits
 			f: featureCodes, // feature codes
 			l: laneCodes, // lane codes
 			q: data.qdrant_hits || 0, // qdrant hits count
@@ -128,10 +159,29 @@ export async function decompressTelemetry(
 		const decodeFeatures = decodeFeaturesRaw ? JSON.parse(decodeFeaturesRaw) : {};
 		const decodeLanes = decodeLanesRaw ? JSON.parse(decodeLanesRaw) : {};
 
+		const sourceIds = Array.isArray(packet.s) ? packet.s.map((id: unknown) => Number(id)).filter(Number.isFinite) : [];
+		const missingSourceIds = sourceIds.filter((id: number) => !decodeSources[String(id)]);
+		if (missingSourceIds.length > 0) {
+			const res = await pool.query(
+				`SELECT source_ref_id, source_ref
+				   FROM parent_atlas_documents
+				  WHERE source_ref_id = ANY($1::int[])`,
+				[[...new Set(missingSourceIds)]]
+			).catch(() => ({ rows: [] as Array<{ source_ref_id: number; source_ref: string }> }));
+			for (const row of res.rows as Array<{ source_ref_id: number; source_ref: string }>) {
+				if (row.source_ref_id != null && row.source_ref) {
+					decodeSources[String(row.source_ref_id)] = row.source_ref;
+				}
+			}
+		}
+
 		// Map integer codes back to strings
-		const sourceRefs = (packet.s || [])
+		const sourceRefs = sourceIds
 			.map((id: number) => decodeSources[String(id)])
 			.filter((s: string): s is string => !!s);
+		const fallbackSourceRefs = Array.isArray(packet.x)
+			? normalizeTelemetrySourceRefs(packet.x)
+			: [];
 
 		const featureIds = (packet.f || [])
 			.map((code: number) => decodeFeatures[String(code)])
@@ -142,7 +192,7 @@ export async function decompressTelemetry(
 			.filter((l: string): l is string => !!l);
 
 		return {
-			sourceRefs,
+			sourceRefs: [...new Set([...sourceRefs, ...fallbackSourceRefs])],
 			featureIds,
 			laneIds,
 			qdrantHits: packet.q ?? 0,

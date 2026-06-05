@@ -1,0 +1,71 @@
+{
+  "generatedAt": "2026-06-05T03:14:25.974Z",
+  "totalCount": 2,
+  "clusters": {
+    "Self-Healing Retrieval": [
+      {
+        "id": "self_heal_1780629265969_1",
+        "type": "retrieval:low-context-density",
+        "cluster": "Self-Healing Retrieval",
+        "title": "Low context density retrieved for query: \"context-assembler 1780629210005\"",
+        "why": "The runtime query assembled only 2 codebase references (lower than the required threshold of 8). This indicates a gap in either our semantic embedding coverage or search terms association.",
+        "sourceRefs": [
+          "sveltekit-frontend/src/hooks.server.ts",
+          "sveltekit-frontend/scripts/activity/log-developer-activity.mjs"
+        ],
+        "action": "Analyze the query vocabulary and run semantic index backfills if codebase files are missing.",
+        "next_command": "npm run graphify:semantic",
+        "priority": "medium",
+        "featureStatus": "degraded"
+      },
+      {
+        "id": "self_heal_1780629265969_2",
+        "type": "graph:missing-neighborhood",
+        "cluster": "Self-Healing Retrieval",
+        "title": "Disconnected graph neighborhood for query seeds: [src/hooks.server.ts, scripts/activity/log-developer-activity.mjs]",
+        "why": "Traversing Neo4j imports relationships starting from decompressed seeds returned 0 neighbors. This indicates key files are orphaned in the Neo4j dependency map, reducing hyperedge retrieval relevance.",
+        "sourceRefs": [
+          "sveltekit-frontend/src/hooks.server.ts",
+          "sveltekit-frontend/scripts/activity/log-developer-activity.mjs"
+        ],
+        "action": "Run dependency extraction to merge relationships for orphaned codebase nodes.",
+        "next_command": "npm run graph:refresh",
+        "priority": "high",
+        "featureStatus": "degraded"
+      }
+    ]
+  },
+  "top10": [
+    {
+      "id": "self_heal_1780629265969_2",
+      "type": "graph:missing-neighborhood",
+      "cluster": "Self-Healing Retrieval",
+      "title": "Disconnected graph neighborhood for query seeds: [src/hooks.server.ts, scripts/activity/log-developer-activity.mjs]",
+      "why": "Traversing Neo4j imports relationships starting from decompressed seeds returned 0 neighbors. This indicates key files are orphaned in the Neo4j dependency map, reducing hyperedge retrieval relevance.",
+      "sourceRefs": [
+        "sveltekit-frontend/src/hooks.server.ts",
+        "sveltekit-frontend/scripts/activity/log-developer-activity.mjs"
+      ],
+      "action": "Run dependency extraction to merge relationships for orphaned codebase nodes.",
+      "next_command": "npm run graph:refresh",
+      "priority": "high",
+      "featureStatus": "degraded"
+    },
+    {
+      "id": "self_heal_1780629265969_1",
+      "type": "retrieval:low-context-density",
+      "cluster": "Self-Healing Retrieval",
+      "title": "Low context density retrieved for query: \"context-assembler 1780629210005\"",
+      "why": "The runtime query assembled only 2 codebase references (lower than the required threshold of 8). This indicates a gap in either our semantic embedding coverage or search terms association.",
+      "sourceRefs": [
+        "sveltekit-frontend/src/hooks.server.ts",
+        "sveltekit-frontend/scripts/activity/log-developer-activity.mjs"
+      ],
+      "action": "Analyze the query vocabulary and run semantic index backfills if codebase files are missing.",
+      "next_command": "npm run graphify:semantic",
+      "priority": "medium",
+      "featureStatus": "degraded"
+    }
+  ],
+  "inputs": {}
+}

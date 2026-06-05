@@ -1,0 +1,386 @@
+{
+  "generated_at": "2026-06-05T02:49:14.695Z",
+  "limit": 25,
+  "summary": {
+    "total": 26,
+    "last24h": 26,
+    "cache_hits": 25,
+    "avg_qdrant_hits": 7.69,
+    "avg_latency_ms": 4553.58,
+    "empty_source_refs": 3,
+    "empty_feature_ids": 3,
+    "empty_som_cluster": 25,
+    "low_context_density": 25,
+    "cache_hit_pct": 96.2
+  },
+  "redis_lod0": {
+    "checked": 25,
+    "found": 21,
+    "missing": 4,
+    "available": true,
+    "error": null
+  },
+  "top_source_refs": [
+    {
+      "source_ref": "sveltekit-frontend/unknown",
+      "hits": 44
+    },
+    {
+      "source_ref": "sveltekit-frontend/scripts/ace/ask-gemma4.mjs",
+      "hits": 5
+    },
+    {
+      "source_ref": "sveltekit-frontend/scripts/ace/export-transition-memory.mjs",
+      "hits": 4
+    },
+    {
+      "source_ref": "sveltekit-frontend/scripts/ace/persist-authority-test.mjs",
+      "hits": 4
+    },
+    {
+      "source_ref": "sveltekit-frontend/scripts/activity/log-developer-activity.mjs",
+      "hits": 3
+    },
+    {
+      "source_ref": "sveltekit-frontend/src/hooks.server.ts",
+      "hits": 3
+    },
+    {
+      "source_ref": "sveltekit-frontend/scripts/agent-diagnose.mjs",
+      "hits": 2
+    },
+    {
+      "source_ref": "sveltekit-frontend/src/mcp-gpu-orchestrator.ts",
+      "hits": 2
+    },
+    {
+      "source_ref": "sveltekit-frontend/src/app.d.ts",
+      "hits": 1
+    },
+    {
+      "source_ref": "sveltekit-frontend/src/app.postcss",
+      "hits": 1
+    },
+    {
+      "source_ref": "sveltekit-frontend/src/global.d.ts",
+      "hits": 1
+    },
+    {
+      "source_ref": "sveltekit-frontend/.venv/Lib/python3.9/site-packages/pip/_internal/cache.py",
+      "hits": 1
+    },
+    {
+      "source_ref": "sveltekit-frontend/.venv/Lib/python3.9/site-packages/pip/_internal/network/cache.py",
+      "hits": 1
+    }
+  ],
+  "top_features": [
+    {
+      "feature_id": "shims",
+      "hits": 65
+    },
+    {
+      "feature_id": "sveltekit-frontend",
+      "hits": 7
+    }
+  ],
+  "top_redis_hot_keys": [
+    {
+      "redis_hot_key": "ace:cartridge:1:0624747c04372106",
+      "hits": 1
+    },
+    {
+      "redis_hot_key": "ace:cartridge:1:06a30620527e665c",
+      "hits": 1
+    },
+    {
+      "redis_hot_key": "ace:cartridge:1:08ba6178c85b4d4e",
+      "hits": 1
+    },
+    {
+      "redis_hot_key": "ace:cartridge:1:10d5bad8c16deef2",
+      "hits": 1
+    },
+    {
+      "redis_hot_key": "ace:cartridge:1:1de90d1187831008",
+      "hits": 1
+    },
+    {
+      "redis_hot_key": "ace:cartridge:1:212c57e6f8ee6ded",
+      "hits": 1
+    },
+    {
+      "redis_hot_key": "ace:cartridge:1:3317047aa8d6fc14",
+      "hits": 1
+    },
+    {
+      "redis_hot_key": "ace:cartridge:1:473463c5ae07ef36",
+      "hits": 1
+    },
+    {
+      "redis_hot_key": "ace:cartridge:1:4c540e79290dd050",
+      "hits": 1
+    },
+    {
+      "redis_hot_key": "ace:cartridge:1:4fbcd1c84abb1fd1",
+      "hits": 1
+    },
+    {
+      "redis_hot_key": "ace:cartridge:1:546d8a871b1d0d33",
+      "hits": 1
+    },
+    {
+      "redis_hot_key": "ace:cartridge:1:58d593fe9bc6afac",
+      "hits": 1
+    },
+    {
+      "redis_hot_key": "ace:cartridge:1:6071579337a8a887",
+      "hits": 1
+    },
+    {
+      "redis_hot_key": "ace:cartridge:1:6a058b76b6d7100c",
+      "hits": 1
+    },
+    {
+      "redis_hot_key": "ace:cartridge:1:7e176c63a90af338",
+      "hits": 1
+    },
+    {
+      "redis_hot_key": "ace:cartridge:1:822427c785c77753",
+      "hits": 1
+    },
+    {
+      "redis_hot_key": "ace:cartridge:1:951e299640687e1d",
+      "hits": 1
+    },
+    {
+      "redis_hot_key": "ace:cartridge:1:97ab22166562ffbb",
+      "hits": 1
+    },
+    {
+      "redis_hot_key": "ace:cartridge:1:9ee5e54952770744",
+      "hits": 1
+    },
+    {
+      "redis_hot_key": "ace:cartridge:1:a3383a3ada83d202",
+      "hits": 1
+    },
+    {
+      "redis_hot_key": "ace:cartridge:1:a83063dc47fe049c",
+      "hits": 1
+    },
+    {
+      "redis_hot_key": "ace:cartridge:1:ba92e263a5793bed",
+      "hits": 1
+    },
+    {
+      "redis_hot_key": "ace:cartridge:1:d81bd490cc466dcb",
+      "hits": 1
+    },
+    {
+      "redis_hot_key": "ace:cartridge:1:ebc8cdd4145caacf",
+      "hits": 1
+    },
+    {
+      "redis_hot_key": "ace:cartridge:1:ff7501a879fa62d5",
+      "hits": 1
+    }
+  ],
+  "top_som_clusters": [
+    {
+      "som_cluster": "missing",
+      "hits": 25
+    },
+    {
+      "som_cluster": "som:1",
+      "hits": 1
+    }
+  ],
+  "cache_tiers": [
+    {
+      "cache_tier": "redis",
+      "hits": 25
+    },
+    {
+      "cache_tier": "miss",
+      "hits": 1
+    }
+  ],
+  "recent_low_density": [
+    {
+      "id": "26",
+      "query_preview": "context-assembler 1780627691691",
+      "source_ref_count": 2,
+      "qdrant_hits": 8,
+      "cache_tier": "redis"
+    },
+    {
+      "id": "25",
+      "query_preview": "context-assembler 1780627522904",
+      "source_ref_count": 1,
+      "qdrant_hits": 8,
+      "cache_tier": "redis"
+    },
+    {
+      "id": "24",
+      "query_preview": "context-assembler 1780627208808",
+      "source_ref_count": 4,
+      "qdrant_hits": 8,
+      "cache_tier": "redis"
+    },
+    {
+      "id": "23",
+      "query_preview": "context-assembler 1780626713928",
+      "source_ref_count": 4,
+      "qdrant_hits": 8,
+      "cache_tier": "redis"
+    },
+    {
+      "id": "22",
+      "query_preview": "context-assembler 1780626587903",
+      "source_ref_count": 1,
+      "qdrant_hits": 8,
+      "cache_tier": "redis"
+    },
+    {
+      "id": "21",
+      "query_preview": "context-assembler 1780626549728",
+      "source_ref_count": 2,
+      "qdrant_hits": 8,
+      "cache_tier": "redis"
+    },
+    {
+      "id": "20",
+      "query_preview": "context-assembler 1780626444076",
+      "source_ref_count": 3,
+      "qdrant_hits": 8,
+      "cache_tier": "redis"
+    },
+    {
+      "id": "19",
+      "query_preview": "context-assembler 1780626324763",
+      "source_ref_count": 2,
+      "qdrant_hits": 8,
+      "cache_tier": "redis"
+    },
+    {
+      "id": "18",
+      "query_preview": "auth middleware client-side caching 1780626308994",
+      "source_ref_count": 3,
+      "qdrant_hits": 8,
+      "cache_tier": "redis"
+    },
+    {
+      "id": "17",
+      "query_preview": "context-assembler 1780626253642",
+      "source_ref_count": 4,
+      "qdrant_hits": 8,
+      "cache_tier": "redis"
+    },
+    {
+      "id": "16",
+      "query_preview": "auth middleware client-side caching 1780626161024",
+      "source_ref_count": 0,
+      "qdrant_hits": 8,
+      "cache_tier": "redis"
+    },
+    {
+      "id": "15",
+      "query_preview": "context-assembler 1780625767352",
+      "source_ref_count": 1,
+      "qdrant_hits": 8,
+      "cache_tier": "redis"
+    },
+    {
+      "id": "14",
+      "query_preview": "auth middleware client-side caching 1780625767349",
+      "source_ref_count": 5,
+      "qdrant_hits": 8,
+      "cache_tier": "redis"
+    },
+    {
+      "id": "13",
+      "query_preview": "context-assembler 1780625721200",
+      "source_ref_count": 1,
+      "qdrant_hits": 8,
+      "cache_tier": "redis"
+    },
+    {
+      "id": "12",
+      "query_preview": "auth middleware client-side caching 1780625720467",
+      "source_ref_count": 5,
+      "qdrant_hits": 8,
+      "cache_tier": "redis"
+    },
+    {
+      "id": "11",
+      "query_preview": "context-assembler 1780625680593",
+      "source_ref_count": 5,
+      "qdrant_hits": 8,
+      "cache_tier": "redis"
+    },
+    {
+      "id": "10",
+      "query_preview": "auth middleware client-side caching 1780625680598",
+      "source_ref_count": 5,
+      "qdrant_hits": 8,
+      "cache_tier": "redis"
+    },
+    {
+      "id": "9",
+      "query_preview": "context-assembler 1780620702065",
+      "source_ref_count": 5,
+      "qdrant_hits": 8,
+      "cache_tier": "redis"
+    },
+    {
+      "id": "8",
+      "query_preview": "context-assembler 1780620634544",
+      "source_ref_count": 1,
+      "qdrant_hits": 8,
+      "cache_tier": "redis"
+    },
+    {
+      "id": "7",
+      "query_preview": "auth middleware client-side caching 1780620581894",
+      "source_ref_count": 5,
+      "qdrant_hits": 8,
+      "cache_tier": "redis"
+    },
+    {
+      "id": "6",
+      "query_preview": "auth middleware client-side caching 1780620540680",
+      "source_ref_count": 5,
+      "qdrant_hits": 8,
+      "cache_tier": "redis"
+    },
+    {
+      "id": "5",
+      "query_preview": "auth middleware client-side caching 1780619549033",
+      "source_ref_count": 5,
+      "qdrant_hits": 8,
+      "cache_tier": "redis"
+    },
+    {
+      "id": "4",
+      "query_preview": "auth middleware client-side caching 1780619455405",
+      "source_ref_count": 0,
+      "qdrant_hits": 8,
+      "cache_tier": "redis"
+    },
+    {
+      "id": "3",
+      "query_preview": "auth middleware client-side caching 1780619361378",
+      "source_ref_count": 1,
+      "qdrant_hits": 8,
+      "cache_tier": "redis"
+    },
+    {
+      "id": "2",
+      "query_preview": "auth middleware client-side caching 1780619337444",
+      "source_ref_count": 2,
+      "qdrant_hits": 8,
+      "cache_tier": "redis"
+    }
+  ]
+}

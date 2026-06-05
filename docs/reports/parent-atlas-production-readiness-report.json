@@ -1,0 +1,784 @@
+{
+  "schema": "parent_atlas_production_readiness.v1",
+  "generatedAt": "2026-06-05T03:09:00.642Z",
+  "readOnly": true,
+  "sections": {
+    "drizzle": [
+      {
+        "id": "nesChromSchema",
+        "status": "pass",
+        "message": "sveltekit-frontend/src/lib/server/db/schema/nes-chrom-packets.ts exists",
+        "details": {
+          "exists": true,
+          "bytes": 4357,
+          "relPath": "sveltekit-frontend/src/lib/server/db/schema/nes-chrom-packets.ts"
+        }
+      },
+      {
+        "id": "routeRuntimeSchema",
+        "status": "pass",
+        "message": "sveltekit-frontend/src/lib/server/db/schema/route_runtime_packets.ts exists",
+        "details": {
+          "exists": true,
+          "bytes": 1799,
+          "relPath": "sveltekit-frontend/src/lib/server/db/schema/route_runtime_packets.ts"
+        }
+      },
+      {
+        "id": "schemaIndex",
+        "status": "pass",
+        "message": "sveltekit-frontend/src/lib/server/db/schema/index.ts exists",
+        "details": {
+          "exists": true,
+          "bytes": 3953,
+          "relPath": "sveltekit-frontend/src/lib/server/db/schema/index.ts"
+        }
+      },
+      {
+        "id": "schemaPostgres",
+        "status": "pass",
+        "message": "sveltekit-frontend/src/lib/server/db/schema-postgres.ts exists",
+        "details": {
+          "exists": true,
+          "bytes": 217109,
+          "relPath": "sveltekit-frontend/src/lib/server/db/schema-postgres.ts"
+        }
+      },
+      {
+        "id": "mirrors:nes-chrom-route-runtime",
+        "status": "pass",
+        "message": "Drizzle barrels mirror NES/CHROM and route runtime packet schemas",
+        "details": {
+          "indexExportsNesChrom": true,
+          "indexExportsRouteRuntime": true,
+          "postgresExportsNesChrom": true
+        }
+      }
+    ],
+    "offline": [
+      {
+        "id": ".tmp/offline-synthesis/consolidated-index.ndjson",
+        "status": "pass",
+        "message": ".tmp/offline-synthesis/consolidated-index.ndjson exists",
+        "details": {
+          "exists": true,
+          "bytes": 108288,
+          "relPath": ".tmp/offline-synthesis/consolidated-index.ndjson"
+        }
+      },
+      {
+        "id": ".tmp/offline-synthesis/consolidated-index.ndjson.manifest.json",
+        "status": "pass",
+        "message": ".tmp/offline-synthesis/consolidated-index.ndjson.manifest.json exists",
+        "details": {
+          "exists": true,
+          "bytes": 928,
+          "relPath": ".tmp/offline-synthesis/consolidated-index.ndjson.manifest.json"
+        }
+      },
+      {
+        "id": "docs/reports/offline-synthesis-mapreduce.duckdb",
+        "status": "pass",
+        "message": "docs/reports/offline-synthesis-mapreduce.duckdb exists",
+        "details": {
+          "exists": true,
+          "bytes": 2371584,
+          "relPath": "docs/reports/offline-synthesis-mapreduce.duckdb"
+        }
+      },
+      {
+        "id": "docs/reports/offline-synthesis-mapreduce-duckdb-report.json",
+        "status": "pass",
+        "message": "docs/reports/offline-synthesis-mapreduce-duckdb-report.json exists",
+        "details": {
+          "exists": true,
+          "bytes": 906,
+          "relPath": "docs/reports/offline-synthesis-mapreduce-duckdb-report.json"
+        }
+      },
+      {
+        "id": "docs/reports/offline-synthesis-mapreduce-duckdb-report.md",
+        "status": "pass",
+        "message": "docs/reports/offline-synthesis-mapreduce-duckdb-report.md exists",
+        "details": {
+          "exists": true,
+          "bytes": 543,
+          "relPath": "docs/reports/offline-synthesis-mapreduce-duckdb-report.md"
+        }
+      },
+      {
+        "id": "docs/reports/production-qdrant-no-som-report.json",
+        "status": "pass",
+        "message": "docs/reports/production-qdrant-no-som-report.json exists",
+        "details": {
+          "exists": true,
+          "bytes": 717,
+          "relPath": "docs/reports/production-qdrant-no-som-report.json"
+        }
+      },
+      {
+        "id": "docs/reports/route-runtime-packets-report.json",
+        "status": "pass",
+        "message": "docs/reports/route-runtime-packets-report.json exists",
+        "details": {
+          "exists": true,
+          "bytes": 8955,
+          "relPath": "docs/reports/route-runtime-packets-report.json"
+        }
+      },
+      {
+        "id": "rg-uu:ndjson-inventory",
+        "status": "pass",
+        "message": "rg -uuu found 127 NDJSON files",
+        "details": {
+          "sample": [
+            ".opencode\\recommendations\\tasks.ndjson",
+            ".opencode\\recommendations\\tasks-with-improved-titles.ndjson",
+            ".opencode\\quarantine\\invalid-cards.ndjson",
+            ".opencode\\outcome-ledger.ndjson",
+            ".opencode\\outcome-ledger-with-cardIds.ndjson",
+            ".tmp\\mapreduce-full-v4.ndjson",
+            ".tmp\\mapreduce-full-v3.ndjson",
+            ".tmp\\mapreduce-full-v2.ndjson",
+            ".tmp\\ingest\\test-tasks.ndjson",
+            ".tmp\\ingest\\tasks.ndjson",
+            ".tmp\\ingest\\task-proposals.ndjson",
+            ".tmp\\ingest\\parent_atlas_gpu.ndjson",
+            ".tmp\\ingest\\nodes.ndjson",
+            ".tmp\\feature-todo-queue.ndjson",
+            ".tmp\\feature-labels.ndjson",
+            ".tmp\\retrieval-pass-dry-run.ndjson",
+            ".tmp\\ingest\\lanes\\workspace.ndjson",
+            ".tmp\\ingest\\lanes\\som_edge.ndjson",
+            ".tmp\\ingest\\lanes\\route.ndjson",
+            ".tmp\\ingest\\lanes\\outcome.ndjson",
+            ".tmp\\ingest\\lanes\\language.ndjson",
+            ".tmp\\ingest\\lanes\\import.ndjson",
+            ".tmp\\ingest\\lanes\\gemma_recommendation.ndjson",
+            ".tmp\\ingest\\lanes\\env.ndjson",
+            ".tmp\\ingest\\lanes\\codebase_features.ndjson"
+          ]
+        }
+      }
+    ],
+    "postgres": [
+      {
+        "id": "table:parent_atlas_documents",
+        "status": "pass",
+        "message": "parent_atlas_documents exists with 5253 rows",
+        "details": {
+          "count": 5253
+        }
+      },
+      {
+        "id": "table:atlas_feature_map",
+        "status": "pass",
+        "message": "atlas_feature_map exists with 14465 rows",
+        "details": {
+          "count": 14465
+        }
+      },
+      {
+        "id": "table:atlas_feature_map_synthesized",
+        "status": "pass",
+        "message": "atlas_feature_map_synthesized exists with 14465 rows",
+        "details": {
+          "count": 14465
+        }
+      },
+      {
+        "id": "table:nes_chrom_packets",
+        "status": "pass",
+        "message": "nes_chrom_packets exists with 27 rows",
+        "details": {
+          "count": 27
+        }
+      },
+      {
+        "id": "table:nes_chrom_kag_dag_hits",
+        "status": "pass",
+        "message": "nes_chrom_kag_dag_hits exists with 32 rows",
+        "details": {
+          "count": 32
+        }
+      },
+      {
+        "id": "table:route_runtime_packets",
+        "status": "pass",
+        "message": "route_runtime_packets exists with 30 rows",
+        "details": {
+          "count": 30
+        }
+      },
+      {
+        "id": "table:task_semantic_packets",
+        "status": "pass",
+        "message": "task_semantic_packets exists with 302 rows",
+        "details": {
+          "count": 302
+        }
+      },
+      {
+        "id": "table:codebase_chunk_index",
+        "status": "pass",
+        "message": "codebase_chunk_index exists with 40754 rows",
+        "details": {
+          "count": 40754
+        }
+      },
+      {
+        "id": "table:agent_pickup_queue",
+        "status": "pass",
+        "message": "agent_pickup_queue exists with 123 rows",
+        "details": {
+          "count": 123
+        }
+      },
+      {
+        "id": "parent_atlas_documents:sourceRef",
+        "status": "pass",
+        "message": "Parent Atlas sourceRefs: 3799/3799",
+        "details": {}
+      },
+      {
+        "id": "parent_atlas_documents:summaries",
+        "status": "pass",
+        "message": "Parent Atlas summaries: 3799/3799",
+        "details": {}
+      },
+      {
+        "id": "active-production:topology",
+        "status": "pass",
+        "message": "Active production qdrant-without-SOM rows: 0",
+        "details": {
+          "raw_total": 14465,
+          "raw_with_som": 10487,
+          "raw_with_qdrant": 10997,
+          "active_total": 4808,
+          "active_with_som": 4808,
+          "active_with_qdrant": 4808,
+          "active_qdrant_no_som": 0
+        }
+      },
+      {
+        "id": "nes-chrom:sourceRef-parent-join",
+        "status": "pass",
+        "message": "NES/CHROM packets matching Parent Atlas: 22/27",
+        "details": {}
+      },
+      {
+        "id": "route-runtime:sourceRefs",
+        "status": "pass",
+        "message": "Runtime packets with sourceRefs: 27/30",
+        "details": {}
+      }
+    ],
+    "redis": [
+      {
+        "id": "lod0:route-runtime",
+        "status": "pass",
+        "message": "Redis LOD0 runtime packets: 25/30",
+        "details": {}
+      }
+    ],
+    "qdrant": [
+      {
+        "id": "collection:codebase_chunks_768",
+        "status": "pass",
+        "message": "Qdrant codebase_chunks_768 points: 76261",
+        "details": {}
+      }
+    ],
+    "neo4j": [
+      {
+        "id": "contextual-tree",
+        "status": "pass",
+        "message": "Neo4j CodebaseFile=25269, ParentAtlasFeature=1701",
+        "details": {}
+      }
+    ]
+  },
+  "checks": [
+    {
+      "section": "drizzle",
+      "id": "nesChromSchema",
+      "status": "pass",
+      "message": "sveltekit-frontend/src/lib/server/db/schema/nes-chrom-packets.ts exists",
+      "details": {
+        "exists": true,
+        "bytes": 4357,
+        "relPath": "sveltekit-frontend/src/lib/server/db/schema/nes-chrom-packets.ts"
+      }
+    },
+    {
+      "section": "drizzle",
+      "id": "routeRuntimeSchema",
+      "status": "pass",
+      "message": "sveltekit-frontend/src/lib/server/db/schema/route_runtime_packets.ts exists",
+      "details": {
+        "exists": true,
+        "bytes": 1799,
+        "relPath": "sveltekit-frontend/src/lib/server/db/schema/route_runtime_packets.ts"
+      }
+    },
+    {
+      "section": "drizzle",
+      "id": "schemaIndex",
+      "status": "pass",
+      "message": "sveltekit-frontend/src/lib/server/db/schema/index.ts exists",
+      "details": {
+        "exists": true,
+        "bytes": 3953,
+        "relPath": "sveltekit-frontend/src/lib/server/db/schema/index.ts"
+      }
+    },
+    {
+      "section": "drizzle",
+      "id": "schemaPostgres",
+      "status": "pass",
+      "message": "sveltekit-frontend/src/lib/server/db/schema-postgres.ts exists",
+      "details": {
+        "exists": true,
+        "bytes": 217109,
+        "relPath": "sveltekit-frontend/src/lib/server/db/schema-postgres.ts"
+      }
+    },
+    {
+      "section": "drizzle",
+      "id": "mirrors:nes-chrom-route-runtime",
+      "status": "pass",
+      "message": "Drizzle barrels mirror NES/CHROM and route runtime packet schemas",
+      "details": {
+        "indexExportsNesChrom": true,
+        "indexExportsRouteRuntime": true,
+        "postgresExportsNesChrom": true
+      }
+    },
+    {
+      "section": "offline",
+      "id": ".tmp/offline-synthesis/consolidated-index.ndjson",
+      "status": "pass",
+      "message": ".tmp/offline-synthesis/consolidated-index.ndjson exists",
+      "details": {
+        "exists": true,
+        "bytes": 108288,
+        "relPath": ".tmp/offline-synthesis/consolidated-index.ndjson"
+      }
+    },
+    {
+      "section": "offline",
+      "id": ".tmp/offline-synthesis/consolidated-index.ndjson.manifest.json",
+      "status": "pass",
+      "message": ".tmp/offline-synthesis/consolidated-index.ndjson.manifest.json exists",
+      "details": {
+        "exists": true,
+        "bytes": 928,
+        "relPath": ".tmp/offline-synthesis/consolidated-index.ndjson.manifest.json"
+      }
+    },
+    {
+      "section": "offline",
+      "id": "docs/reports/offline-synthesis-mapreduce.duckdb",
+      "status": "pass",
+      "message": "docs/reports/offline-synthesis-mapreduce.duckdb exists",
+      "details": {
+        "exists": true,
+        "bytes": 2371584,
+        "relPath": "docs/reports/offline-synthesis-mapreduce.duckdb"
+      }
+    },
+    {
+      "section": "offline",
+      "id": "docs/reports/offline-synthesis-mapreduce-duckdb-report.json",
+      "status": "pass",
+      "message": "docs/reports/offline-synthesis-mapreduce-duckdb-report.json exists",
+      "details": {
+        "exists": true,
+        "bytes": 906,
+        "relPath": "docs/reports/offline-synthesis-mapreduce-duckdb-report.json"
+      }
+    },
+    {
+      "section": "offline",
+      "id": "docs/reports/offline-synthesis-mapreduce-duckdb-report.md",
+      "status": "pass",
+      "message": "docs/reports/offline-synthesis-mapreduce-duckdb-report.md exists",
+      "details": {
+        "exists": true,
+        "bytes": 543,
+        "relPath": "docs/reports/offline-synthesis-mapreduce-duckdb-report.md"
+      }
+    },
+    {
+      "section": "offline",
+      "id": "docs/reports/production-qdrant-no-som-report.json",
+      "status": "pass",
+      "message": "docs/reports/production-qdrant-no-som-report.json exists",
+      "details": {
+        "exists": true,
+        "bytes": 717,
+        "relPath": "docs/reports/production-qdrant-no-som-report.json"
+      }
+    },
+    {
+      "section": "offline",
+      "id": "docs/reports/route-runtime-packets-report.json",
+      "status": "pass",
+      "message": "docs/reports/route-runtime-packets-report.json exists",
+      "details": {
+        "exists": true,
+        "bytes": 8955,
+        "relPath": "docs/reports/route-runtime-packets-report.json"
+      }
+    },
+    {
+      "section": "offline",
+      "id": "rg-uu:ndjson-inventory",
+      "status": "pass",
+      "message": "rg -uuu found 127 NDJSON files",
+      "details": {
+        "sample": [
+          ".opencode\\recommendations\\tasks.ndjson",
+          ".opencode\\recommendations\\tasks-with-improved-titles.ndjson",
+          ".opencode\\quarantine\\invalid-cards.ndjson",
+          ".opencode\\outcome-ledger.ndjson",
+          ".opencode\\outcome-ledger-with-cardIds.ndjson",
+          ".tmp\\mapreduce-full-v4.ndjson",
+          ".tmp\\mapreduce-full-v3.ndjson",
+          ".tmp\\mapreduce-full-v2.ndjson",
+          ".tmp\\ingest\\test-tasks.ndjson",
+          ".tmp\\ingest\\tasks.ndjson",
+          ".tmp\\ingest\\task-proposals.ndjson",
+          ".tmp\\ingest\\parent_atlas_gpu.ndjson",
+          ".tmp\\ingest\\nodes.ndjson",
+          ".tmp\\feature-todo-queue.ndjson",
+          ".tmp\\feature-labels.ndjson",
+          ".tmp\\retrieval-pass-dry-run.ndjson",
+          ".tmp\\ingest\\lanes\\workspace.ndjson",
+          ".tmp\\ingest\\lanes\\som_edge.ndjson",
+          ".tmp\\ingest\\lanes\\route.ndjson",
+          ".tmp\\ingest\\lanes\\outcome.ndjson",
+          ".tmp\\ingest\\lanes\\language.ndjson",
+          ".tmp\\ingest\\lanes\\import.ndjson",
+          ".tmp\\ingest\\lanes\\gemma_recommendation.ndjson",
+          ".tmp\\ingest\\lanes\\env.ndjson",
+          ".tmp\\ingest\\lanes\\codebase_features.ndjson"
+        ]
+      }
+    },
+    {
+      "section": "postgres",
+      "id": "table:parent_atlas_documents",
+      "status": "pass",
+      "message": "parent_atlas_documents exists with 5253 rows",
+      "details": {
+        "count": 5253
+      }
+    },
+    {
+      "section": "postgres",
+      "id": "table:atlas_feature_map",
+      "status": "pass",
+      "message": "atlas_feature_map exists with 14465 rows",
+      "details": {
+        "count": 14465
+      }
+    },
+    {
+      "section": "postgres",
+      "id": "table:atlas_feature_map_synthesized",
+      "status": "pass",
+      "message": "atlas_feature_map_synthesized exists with 14465 rows",
+      "details": {
+        "count": 14465
+      }
+    },
+    {
+      "section": "postgres",
+      "id": "table:nes_chrom_packets",
+      "status": "pass",
+      "message": "nes_chrom_packets exists with 27 rows",
+      "details": {
+        "count": 27
+      }
+    },
+    {
+      "section": "postgres",
+      "id": "table:nes_chrom_kag_dag_hits",
+      "status": "pass",
+      "message": "nes_chrom_kag_dag_hits exists with 32 rows",
+      "details": {
+        "count": 32
+      }
+    },
+    {
+      "section": "postgres",
+      "id": "table:route_runtime_packets",
+      "status": "pass",
+      "message": "route_runtime_packets exists with 30 rows",
+      "details": {
+        "count": 30
+      }
+    },
+    {
+      "section": "postgres",
+      "id": "table:task_semantic_packets",
+      "status": "pass",
+      "message": "task_semantic_packets exists with 302 rows",
+      "details": {
+        "count": 302
+      }
+    },
+    {
+      "section": "postgres",
+      "id": "table:codebase_chunk_index",
+      "status": "pass",
+      "message": "codebase_chunk_index exists with 40754 rows",
+      "details": {
+        "count": 40754
+      }
+    },
+    {
+      "section": "postgres",
+      "id": "table:agent_pickup_queue",
+      "status": "pass",
+      "message": "agent_pickup_queue exists with 123 rows",
+      "details": {
+        "count": 123
+      }
+    },
+    {
+      "section": "postgres",
+      "id": "parent_atlas_documents:sourceRef",
+      "status": "pass",
+      "message": "Parent Atlas sourceRefs: 3799/3799",
+      "details": {}
+    },
+    {
+      "section": "postgres",
+      "id": "parent_atlas_documents:summaries",
+      "status": "pass",
+      "message": "Parent Atlas summaries: 3799/3799",
+      "details": {}
+    },
+    {
+      "section": "postgres",
+      "id": "active-production:topology",
+      "status": "pass",
+      "message": "Active production qdrant-without-SOM rows: 0",
+      "details": {
+        "raw_total": 14465,
+        "raw_with_som": 10487,
+        "raw_with_qdrant": 10997,
+        "active_total": 4808,
+        "active_with_som": 4808,
+        "active_with_qdrant": 4808,
+        "active_qdrant_no_som": 0
+      }
+    },
+    {
+      "section": "postgres",
+      "id": "nes-chrom:sourceRef-parent-join",
+      "status": "pass",
+      "message": "NES/CHROM packets matching Parent Atlas: 22/27",
+      "details": {}
+    },
+    {
+      "section": "postgres",
+      "id": "route-runtime:sourceRefs",
+      "status": "pass",
+      "message": "Runtime packets with sourceRefs: 27/30",
+      "details": {}
+    },
+    {
+      "section": "redis",
+      "id": "lod0:route-runtime",
+      "status": "pass",
+      "message": "Redis LOD0 runtime packets: 25/30",
+      "details": {}
+    },
+    {
+      "section": "qdrant",
+      "id": "collection:codebase_chunks_768",
+      "status": "pass",
+      "message": "Qdrant codebase_chunks_768 points: 76261",
+      "details": {}
+    },
+    {
+      "section": "neo4j",
+      "id": "contextual-tree",
+      "status": "pass",
+      "message": "Neo4j CodebaseFile=25269, ParentAtlasFeature=1701",
+      "details": {}
+    }
+  ],
+  "postgres": {
+    "tableCounts": {
+      "parent_atlas_documents": 5253,
+      "atlas_feature_map": 14465,
+      "atlas_feature_map_synthesized": 14465,
+      "nes_chrom_packets": 27,
+      "nes_chrom_kag_dag_hits": 32,
+      "route_runtime_packets": 30,
+      "task_semantic_packets": 302,
+      "codebase_chunk_index": 40754,
+      "agent_pickup_queue": 123
+    },
+    "parentAtlasDocuments": {
+      "total": 3799,
+      "with_source_ref": 3799,
+      "with_feature_id": 3799,
+      "with_summary": 3799
+    },
+    "topologyCoverage": {
+      "raw_total": 14465,
+      "raw_with_som": 10487,
+      "raw_with_qdrant": 10997,
+      "active_total": 4808,
+      "active_with_som": 4808,
+      "active_with_qdrant": 4808,
+      "active_qdrant_no_som": 0
+    },
+    "nesChromPackets": {
+      "total": 27,
+      "parent_atlas_matches": 22,
+      "with_source_ref": 27,
+      "with_feature_id": 27,
+      "with_qdrant_point": 20,
+      "with_som_cluster": 16
+    },
+    "routeRuntimePackets": {
+      "total": 30,
+      "with_source_refs": 27,
+      "with_feature_ids": 27,
+      "with_qdrant_hits": 29,
+      "with_cluster": 1
+    }
+  },
+  "redis": {
+    "available": true,
+    "latestRuntimePacketsChecked": 30,
+    "lod0Found": 25,
+    "lod0Missing": 5
+  },
+  "qdrant": {
+    "available": true,
+    "url": "http://127.0.0.1:6333",
+    "collection": "codebase_chunks_768",
+    "pointsCount": 76261,
+    "indexedVectorsCount": 143664,
+    "status": "green"
+  },
+  "neo4j": {
+    "available": true,
+    "uri": "bolt://localhost:7687",
+    "totalNodes": 58224,
+    "codebaseFiles": 25269,
+    "parentAtlasFeatures": 1701,
+    "totalRelationships": 394257,
+    "belongsToFeature": 10506,
+    "similarTopology": 165005
+  },
+  "drizzle": {
+    "nesChromSchema": {
+      "exists": true,
+      "bytes": 4357,
+      "relPath": "sveltekit-frontend/src/lib/server/db/schema/nes-chrom-packets.ts"
+    },
+    "routeRuntimeSchema": {
+      "exists": true,
+      "bytes": 1799,
+      "relPath": "sveltekit-frontend/src/lib/server/db/schema/route_runtime_packets.ts"
+    },
+    "schemaIndex": {
+      "exists": true,
+      "bytes": 3953,
+      "relPath": "sveltekit-frontend/src/lib/server/db/schema/index.ts"
+    },
+    "schemaPostgres": {
+      "exists": true,
+      "bytes": 217109,
+      "relPath": "sveltekit-frontend/src/lib/server/db/schema-postgres.ts"
+    },
+    "mirrors": {
+      "indexExportsNesChrom": true,
+      "indexExportsRouteRuntime": true,
+      "postgresExportsNesChrom": true
+    }
+  },
+  "offlineArtifacts": [
+    {
+      "exists": true,
+      "bytes": 108288,
+      "relPath": ".tmp/offline-synthesis/consolidated-index.ndjson"
+    },
+    {
+      "exists": true,
+      "bytes": 928,
+      "relPath": ".tmp/offline-synthesis/consolidated-index.ndjson.manifest.json"
+    },
+    {
+      "exists": true,
+      "bytes": 2371584,
+      "relPath": "docs/reports/offline-synthesis-mapreduce.duckdb"
+    },
+    {
+      "exists": true,
+      "bytes": 906,
+      "relPath": "docs/reports/offline-synthesis-mapreduce-duckdb-report.json"
+    },
+    {
+      "exists": true,
+      "bytes": 543,
+      "relPath": "docs/reports/offline-synthesis-mapreduce-duckdb-report.md"
+    },
+    {
+      "exists": true,
+      "bytes": 717,
+      "relPath": "docs/reports/production-qdrant-no-som-report.json"
+    },
+    {
+      "exists": true,
+      "bytes": 8955,
+      "relPath": "docs/reports/route-runtime-packets-report.json"
+    }
+  ],
+  "ndjsonInventory": {
+    "status": "pass",
+    "total": 127,
+    "sample": [
+      ".opencode\\recommendations\\tasks.ndjson",
+      ".opencode\\recommendations\\tasks-with-improved-titles.ndjson",
+      ".opencode\\quarantine\\invalid-cards.ndjson",
+      ".opencode\\outcome-ledger.ndjson",
+      ".opencode\\outcome-ledger-with-cardIds.ndjson",
+      ".tmp\\mapreduce-full-v4.ndjson",
+      ".tmp\\mapreduce-full-v3.ndjson",
+      ".tmp\\mapreduce-full-v2.ndjson",
+      ".tmp\\ingest\\test-tasks.ndjson",
+      ".tmp\\ingest\\tasks.ndjson",
+      ".tmp\\ingest\\task-proposals.ndjson",
+      ".tmp\\ingest\\parent_atlas_gpu.ndjson",
+      ".tmp\\ingest\\nodes.ndjson",
+      ".tmp\\feature-todo-queue.ndjson",
+      ".tmp\\feature-labels.ndjson",
+      ".tmp\\retrieval-pass-dry-run.ndjson",
+      ".tmp\\ingest\\lanes\\workspace.ndjson",
+      ".tmp\\ingest\\lanes\\som_edge.ndjson",
+      ".tmp\\ingest\\lanes\\route.ndjson",
+      ".tmp\\ingest\\lanes\\outcome.ndjson",
+      ".tmp\\ingest\\lanes\\language.ndjson",
+      ".tmp\\ingest\\lanes\\import.ndjson",
+      ".tmp\\ingest\\lanes\\gemma_recommendation.ndjson",
+      ".tmp\\ingest\\lanes\\env.ndjson",
+      ".tmp\\ingest\\lanes\\codebase_features.ndjson"
+    ]
+  },
+  "summary": {
+    "counts": {
+      "pass": 30,
+      "warn": 0,
+      "fail": 0
+    }
+  }
+}

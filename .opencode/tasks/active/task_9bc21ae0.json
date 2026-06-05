@@ -1,0 +1,35 @@
+{
+  "id": "task_9bc21ae0",
+  "workspace_id": "deeds-web-app",
+  "title": "3 runtime packets have no featureIds",
+  "description": "3 runtime packets have no featureIds\n\nWhy: Feature IDs are the join spine for recommendations, Neo4j ParentAtlasFeature nodes, and packet replay ranking.\n\nAction: Backfill feature IDs from parent_atlas_documents for telemetry sourceRefs before writing the runtime packet.",
+  "status": "todo",
+  "priority": "medium",
+  "risk": "medium",
+  "feature_id": "vector-graph",
+  "feature_confidence": 0.3,
+  "semantic_path": [
+    "qdrant",
+    "neo4j",
+    "hypergraph"
+  ],
+  "source": "opencode",
+  "source_ref": "runtime_packet_aa937d83",
+  "related_file_paths": [
+    "sveltekit-frontend/src/lib/server/features/ai/ace/context-assembler.ts"
+  ],
+  "qdrant_point_id": null,
+  "summary_llm": null,
+  "summary_model": null,
+  "cluster_id": "Self-Healing Retrieval",
+  "centroid_id": null,
+  "agent_pickup_ready": false,
+  "created_at": "2026-06-05T02:34:46.736Z",
+  "updated_at": "2026-06-05T02:35:01.173Z",
+  "mirror": {
+    "postgres_id": null,
+    "qdrant_point_id": null,
+    "redis_queue_key": null,
+    "langfuse_trace_id": null
+  }
+}

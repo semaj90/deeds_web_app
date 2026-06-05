@@ -1,0 +1,33 @@
+{
+  "timestamp": "2026-06-05T02:37:33.344Z",
+  "collection": "codebase_chunks_768",
+  "vector_name": "content",
+  "queries": 10,
+  "k": 10,
+  "ollama": {
+    "endpoint": "http://localhost:11434",
+    "model": "embeddinggemma:latest",
+    "mrr": 0.6835,
+    "ndcg": 1,
+    "latency_p50_ms": 196,
+    "latency_p95_ms": 309,
+    "errors": 0,
+    "error_samples": []
+  },
+  "llama_server": {
+    "endpoint": "http://localhost:8081",
+    "model": "embeddinggemma-300m-f16.gguf",
+    "mrr": 0.6844,
+    "ndcg": 1,
+    "latency_p50_ms": 76,
+    "latency_p95_ms": 88,
+    "errors": 0,
+    "error_samples": []
+  },
+  "delta": {
+    "mrr": 0.0009,
+    "ndcg": 0,
+    "top_k_overlap": 0.93
+  },
+  "verdict": "LLAMA-SERVER EQUIVALENT QUALITY + FASTER — keep :8081 as canonical embedding lane when healthy"
+}

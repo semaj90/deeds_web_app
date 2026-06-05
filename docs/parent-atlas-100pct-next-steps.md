@@ -12,6 +12,10 @@ Current practical completion:
 - Summary lane: 0 missing in the active-production summary check
 - Graph truth / traversal: complete enough for recommendations
 - Recommendation -> pickup queue: working
+- Route runtime packets / ACE replay: working; JSONB audit rows and Redis LOD0 packets preserve `source_ref` provenance
+- Route runtime observability: working; report and self-healing recommendation feedback are wired
+- Production-readiness audit: working; 30 PASS / 0 WARN / 0 FAIL across Drizzle, Postgres, Redis, Qdrant, Neo4j, NDJSON, and DuckDB artifacts
+- EmbeddingGemma `:8081`: healthy and faster than Ollama on bounded head-to-head eval
 
 Important command correction:
 - `npm run atlas:synthesize` is **not** the Parent Atlas synthesized-map rebuild. It points at `synthesize-context-chunks.mjs` and requires `--input`.
@@ -107,6 +111,84 @@ Fills `parent_atlas_documents.summary` — unlocks:
 npm run docs:file-cards:apply
 ```
 
+### Step 7 — Route runtime packets / ACE replay gate (DONE)
+```bash
+npx tsx ../scripts/tests/smoke-route-runtime-packets.mjs
+npx tsx ../scripts/tests/smoke-runtime-packet-replay.mjs
+```
+
+The replay gate now keeps the responsibilities split cleanly:
+- `route_runtime_packets` is Postgres JSONB audit telemetry, not a matmul/GPU lane.
+- Redis `ace:telemetry:{id}:lod0` is the compact NES-style replay packet.
+- SourceRef normalization drops placeholder paths like `unknown`, preserves repo-root sourceRefs, and repairs stale Redis source dictionaries from Postgres.
+
+Latest validation:
+- route telemetry row inserted exactly once
+- `source_refs` > 0
+- `feature_ids` > 0
+- `qdrant_hits` > 0
+- Redis hot key present
+- decompressed sourceRefs resolve to `parent_atlas_documents.source_ref_id`
+- replay smoke restores the Redis Qdrant pointer and runs Neo4j traversal
+
+### Step 8 — Runtime packet observability and feedback (DONE)
+```bash
+npm run atlas:runtime-packets:report
+npm run atlas:runtime-packets:recommend
+npm run atlas:runtime-packets:recommend:apply
+npm run recommendations:tasks
+node scripts/atlas/create-agent-pickup-packets.mjs --from .opencode/recommendations/tasks.ndjson
+node scripts/opencode/bootstrap-workspace-tasks.mjs --apply
+```
+
+Current report:
+- route runtime packets: 30
+- runtime packets with sourceRefs: 27 / 30
+- runtime packets with Qdrant hits: 29 / 30
+- Redis LOD0 coverage: 25 / 30 recent packets
+
+The feedback lane produced 5 runtime-packet recommendations and the workspace task bootstrap now has 17 active tasks. Next ready task: `task_d2dad154`.
+
+### Step 8b — Production-readiness packet/index audit (DONE, read-only)
+```bash
+npm run atlas:production-readiness
+```
+
+The audit writes:
+- `docs/reports/parent-atlas-production-readiness-report.json`
+- `docs/reports/parent-atlas-production-readiness-report.md`
+
+Latest result:
+- checks: 30 PASS / 0 WARN / 0 FAIL
+- `parent_atlas_documents`: 5,253 rows
+- active non-vendor Parent Atlas summaries: 3,799 / 3,799
+- `atlas_feature_map`: 14,465 rows
+- `atlas_feature_map_synthesized`: 14,465 rows
+- active production SOM: 4,808 / 4,808
+- active production Qdrant: 4,808 / 4,808
+- `nes_chrom_packets`: 27 rows
+- `nes_chrom_kag_dag_hits`: 32 rows
+- NES/CHROM packets with sourceRef: 27 / 27
+- NES/CHROM packets matching Parent Atlas sourceRefs: 22 / 27
+- `route_runtime_packets`: 30 rows
+- Redis LOD0 runtime packet coverage: 25 / 30
+- Qdrant `codebase_chunks_768`: 76,261 points
+- Neo4j: 25,269 `CodebaseFile` nodes, 1,701 `ParentAtlasFeature` nodes, 165,005 `SIMILAR_TOPOLOGY` edges
+- `rg -uuu` NDJSON inventory: 127 files, excluding generated dependency folders
+
+This audit is intentionally report-only. It does not run migrations, `drizzle-kit push`, Qdrant writes, graph writes, file archive moves, or database pruning.
+
+### Step 9 — Embed head-to-head eval (DONE, bounded)
+```bash
+node scripts/evals/embed-head-to-head.mjs --queries 10 --k 10 --vector-name content --out docs/reports/embed-head-to-head-runtime-2026-06-04.json
+```
+
+Current bounded result:
+- Ollama `embeddinggemma:latest`: MRR@10 0.6835, p50 196ms, p95 309ms
+- llama-server `:8081`: MRR@10 0.6844, p50 76ms, p95 88ms
+- overlap: 93.0%
+- verdict: llama-server is equivalent quality and faster; keep `:8081` as canonical embedding lane when healthy
+
 ---
 
 ## What Unlocks at 100%
@@ -169,10 +251,11 @@ Refreshes `couchdb:pagerank_scores` Redis hash (6h TTL) with the full link graph
 
 | Priority | Action | Why |
 |----------|--------|-----|
-| P1 | route runtime packets / ACE write path | Starts the next architecture lane after topology, summaries, profile cards, and recommendations |
-| P2 | Fix :8081 embed server | Removes fallback dependence; the focused ingest used Ollama because :8081 was down |
-| P3 | `karpathy:gpu` re-run | Refreshes authority blend with current Qdrant coverage |
-| P4 | `graphify:topology` / `graphify:pagerank` | Refreshes Neo4j topology and authority signals |
+| P1 | route runtime packets / ACE write path | Done: JSONB audit row + Redis LOD0 replay packet + sourceRef restore smoke pass |
+| P2 | Fix :8081 embed server | Done: `:8081/health` is green and bounded eval shows equivalent quality with lower latency |
+| P3 | `karpathy:gpu` re-run | Done: CUDA/fp16 lane refreshed 45 candidates, 42 Qdrant hits, 42 encoded files |
+| P4 | `graphify:cluster:pagerank` / `graphify:authority` | Done after Redis auth fix/env injection; cluster scores and `ace:authority:top` refreshed |
+| P5 | `graphify:topology` bounded run | Still needs a bounded/observable runner; full alias exceeded the 4-minute command timeout |
 
 ---
 

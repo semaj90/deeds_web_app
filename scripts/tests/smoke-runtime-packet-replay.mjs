@@ -114,6 +114,7 @@ async function run() {
 
   // 5. Verify Qdrant indexing status for the resolved refs
   console.log('\n⏳ Checking Qdrant index status for resolved files in Redis...');
+  let resolvedLookupCount = 0;
   for (const ref of decompressed.sourceRefs) {
     // Retrieve source ref integer ID
     const refRes = await pool.query('SELECT source_ref_id FROM parent_atlas_documents WHERE source_ref = $1', [ref]);
@@ -122,9 +123,16 @@ async function run() {
       console.warn(`  ⚠ No source_ref_id found for ${ref}`);
       continue;
     }
+    resolvedLookupCount++;
     const qdrantPoint = await redis.get(`ace:source:${refId}:qdrant`);
     console.log(`  - ${ref} → source_id: ${refId} → Qdrant ID in Redis: ${qdrantPoint ?? 'missing'}`);
   }
+
+  if (resolvedLookupCount === 0) {
+    console.error('❌ FAILURE: No recovered sourceRefs resolved through parent_atlas_documents or Redis Qdrant lookup.');
+    process.exit(1);
+  }
+  console.log(`✓ Resolved replay lookups: ${resolvedLookupCount}`);
 
   // 6. Traverse Neo4j 2-hop neighborhood using the reconstructed seeds
   console.log('\n⏳ Traversing Neo4j using decompressed seeds...');

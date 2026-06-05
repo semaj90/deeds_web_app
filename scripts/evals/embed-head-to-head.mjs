@@ -13,6 +13,7 @@
  *   node scripts/evals/embed-head-to-head.mjs --ollama-only
  *   node scripts/evals/embed-head-to-head.mjs --llama-only
  *   node scripts/evals/embed-head-to-head.mjs --collection codebase_chunks_768
+ *   node scripts/evals/embed-head-to-head.mjs --vector-name content
  *   node scripts/evals/embed-head-to-head.mjs --out reports/embed-eval.json
  *
  * Requirements:
@@ -41,6 +42,7 @@ const flag = (f) => argv.includes(f);
 const N_QUERIES   = parseInt(arg('--queries', '100'), 10);
 const K           = parseInt(arg('--k', '10'), 10);
 const COLLECTION  = arg('--collection', 'codebase_chunks_768');
+const VECTOR_NAME = arg('--vector-name', process.env.QDRANT_VECTOR_NAME ?? 'content');
 const OUT_PATH    = arg('--out', null);
 const OLLAMA_ONLY = flag('--ollama-only');
 const LLAMA_ONLY  = flag('--llama-only');
@@ -84,8 +86,9 @@ async function embedLlama(text) {
     if (!res2.ok) throw new Error(`llama-server embed HTTP ${res2.status}`);
     const data2 = await res2.json();
     const emb = data2.embedding ?? data2.data?.[0]?.embedding;
-    if (!emb?.length) throw new Error('llama-server embed: empty embedding');
-    return emb;
+    const flat = Array.isArray(emb?.[0]) ? emb[0] : emb;
+    if (!flat?.length) throw new Error('llama-server embed: empty embedding');
+    return flat;
   }
   const data = await res.json();
   const emb = data.data?.[0]?.embedding;
@@ -99,7 +102,12 @@ async function qdrantSearch(embedding, limit = K) {
   const res = await fetch(`${QDRANT_URL}/collections/${COLLECTION}/points/search`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ vector: embedding, limit, with_payload: true, with_vector: false }),
+    body: JSON.stringify({
+      vector: VECTOR_NAME ? { name: VECTOR_NAME, vector: embedding } : embedding,
+      limit,
+      with_payload: true,
+      with_vector: false,
+    }),
     signal: AbortSignal.timeout(TIMEOUT),
   });
   if (!res.ok) throw new Error(`Qdrant search HTTP ${res.status}`);
@@ -207,6 +215,7 @@ async function checkHealth() {
 async function run() {
   console.log('\n── Embed Head-to-Head Eval ─────────────────────────────────');
   console.log(`   Collection : ${COLLECTION}`);
+  console.log(`   Vector name: ${VECTOR_NAME || '(unnamed)'}`);
   console.log(`   Queries    : ${N_QUERIES}`);
   console.log(`   K          : ${K}`);
   console.log(`   Ollama     : ${OLLAMA_URL}`);
@@ -238,8 +247,8 @@ async function run() {
   console.log(`   Got ${queries.length} queries`);
 
   // Run eval
-  const ollamaMetrics = { mrr: [], ndcg: [], latency: [], errors: 0 };
-  const llamaMetrics  = { mrr: [], ndcg: [], latency: [], errors: 0 };
+  const ollamaMetrics = { mrr: [], ndcg: [], latency: [], errors: 0, errorSamples: [] };
+  const llamaMetrics  = { mrr: [], ndcg: [], latency: [], errors: 0, errorSamples: [] };
   const overlapScores = [];
 
   const runOllama = !LLAMA_ONLY && health.ollama;
@@ -260,8 +269,9 @@ async function run() {
         ollamaMetrics.latency.push(Date.now() - t0);
         ollamaMetrics.mrr.push(mrr(ollamaHits));
         ollamaMetrics.ndcg.push(ndcg(ollamaHits));
-      } catch {
+      } catch (err) {
         ollamaMetrics.errors++;
+        if (ollamaMetrics.errorSamples.length < 3) ollamaMetrics.errorSamples.push(err instanceof Error ? err.message : String(err));
       }
     }
 
@@ -273,8 +283,9 @@ async function run() {
         llamaMetrics.latency.push(Date.now() - t0);
         llamaMetrics.mrr.push(mrr(llamaHits));
         llamaMetrics.ndcg.push(ndcg(llamaHits));
-      } catch {
+      } catch (err) {
         llamaMetrics.errors++;
+        if (llamaMetrics.errorSamples.length < 3) llamaMetrics.errorSamples.push(err instanceof Error ? err.message : String(err));
       }
     }
 
@@ -295,6 +306,7 @@ async function run() {
   const report = {
     timestamp: new Date().toISOString(),
     collection: COLLECTION,
+    vector_name: VECTOR_NAME || null,
     queries: queries.length,
     k: K,
     ollama: runOllama ? {
@@ -305,6 +317,7 @@ async function run() {
       latency_p50_ms: Math.round(p50(ollamaMetrics.latency) ?? 0),
       latency_p95_ms: Math.round(p95(ollamaMetrics.latency) ?? 0),
       errors: ollamaMetrics.errors,
+      error_samples: ollamaMetrics.errorSamples,
     } : null,
     llama_server: runLlama ? {
       endpoint: LLAMA_EMBED_URL,
@@ -314,6 +327,7 @@ async function run() {
       latency_p50_ms: Math.round(p50(llamaMetrics.latency) ?? 0),
       latency_p95_ms: Math.round(p95(llamaMetrics.latency) ?? 0),
       errors: llamaMetrics.errors,
+      error_samples: llamaMetrics.errorSamples,
     } : null,
     delta: (runOllama && runLlama) ? {
       mrr:  parseFloat(((avg(llamaMetrics.mrr) ?? 0) - (avg(ollamaMetrics.mrr) ?? 0)).toFixed(4)),
@@ -324,11 +338,20 @@ async function run() {
   };
 
   // Verdict
-  if (report.delta) {
+  const hasErrors = (report.ollama?.errors ?? 0) > 0 || (report.llama_server?.errors ?? 0) > 0;
+  if (hasErrors) {
+    report.verdict = 'INVALID — one or more lanes had errors; inspect error_samples before choosing a canonical embedding path';
+  } else if (report.delta) {
     const mrrDelta = report.delta.mrr;
     const ndcgDelta = report.delta.ndcg;
     if (Math.abs(mrrDelta) < 0.01 && Math.abs(ndcgDelta) < 0.01) {
-      report.verdict = 'EQUIVALENT — both lanes produce same results; prefer Ollama (simpler ops)';
+      const ollamaP50 = report.ollama?.latency_p50_ms ?? 0;
+      const llamaP50 = report.llama_server?.latency_p50_ms ?? 0;
+      if (llamaP50 > 0 && ollamaP50 > 0 && llamaP50 <= ollamaP50 * 0.8) {
+        report.verdict = 'LLAMA-SERVER EQUIVALENT QUALITY + FASTER — keep :8081 as canonical embedding lane when healthy';
+      } else {
+        report.verdict = 'EQUIVALENT QUALITY — prefer Ollama only if simpler ops matters more than latency';
+      }
     } else if (mrrDelta > 0.01 || ndcgDelta > 0.01) {
       report.verdict = 'LLAMA-SERVER WINS — :8081 lane improves retrieval quality; keep it active';
     } else {

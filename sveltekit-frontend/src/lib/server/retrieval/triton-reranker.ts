@@ -54,7 +54,7 @@ export async function scoreBatchTriton(
         if (!response.ok) {
             const errText = await response.text().catch(() => '');
             console.warn(`[triton-reranker] Error ${response.status}: ${errText.slice(0, 200)}`);
-            return candidates.map(() => 0.5); // neutral fallback
+            return [];
         }
 
         const data = await response.json();
@@ -64,10 +64,16 @@ export async function scoreBatchTriton(
             return scoresOutput.data.map((s: number) => Math.max(0, Math.min(1, s)));
         }
 
-        return candidates.map(() => 0.5);
+        return [];
     } catch (err) {
-        console.error('[triton-reranker] Batch inference failed:', err);
-        return candidates.map(() => 0.5);
+        const code = (err as { cause?: { code?: string }; code?: string })?.cause?.code ?? (err as { code?: string }).code;
+        if (code === 'ECONNREFUSED') {
+            console.warn('[triton-reranker] Triton unavailable (ECONNREFUSED), falling back to Gemma4 scorer.');
+        } else {
+            const message = err instanceof Error ? err.message : String(err);
+            console.warn(`[triton-reranker] Batch inference failed, falling back to Gemma4 scorer: ${message}`);
+        }
+        return [];
     }
 }
 

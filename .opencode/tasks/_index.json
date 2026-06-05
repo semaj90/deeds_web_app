@@ -1,78 +1,108 @@
 {
   "workspace_id": "deeds-web-app",
   "version": 1,
-  "updated_at": "2026-06-04T23:18:39.719Z",
-  "total_tasks": 12,
+  "updated_at": "2026-06-05T02:35:01.174Z",
+  "total_tasks": 17,
   "tasks_by_status": {
     "todo": [
       {
-        "id": "task_967675a8",
+        "id": "task_d2dad154",
         "title": "src/lib/components/ui/index.ts — 42 unresolved imports",
         "feature_id": "ai-retrieval",
         "priority": "high"
       },
       {
-        "id": "task_0a5c4394",
+        "id": "task_5528f4b5",
         "title": "src/lib/components/ui/gaming/n64/index.ts — 29 unresolved imports",
         "feature_id": "ai-retrieval",
         "priority": "high"
       },
       {
-        "id": "task_7a017007",
+        "id": "task_1dfa7983",
         "title": "src/lib/components/ui/gaming/index.ts — 18 unresolved imports",
         "feature_id": "ai-retrieval",
         "priority": "high"
       },
       {
-        "id": "task_2931bfb6",
+        "id": "task_f42f03c1",
         "title": "src/lib/components/ui/alert-dialog/index.js — 12 unresolved imports",
         "feature_id": "ai-retrieval",
         "priority": "high"
       },
       {
-        "id": "task_0cfb6631",
+        "id": "task_732adba9",
         "title": "src/lib/components/ui/dialog/index.ts — 11 unresolved imports",
         "feature_id": "ai-retrieval",
         "priority": "high"
       },
       {
-        "id": "task_c8397099",
+        "id": "task_2deedfa4",
         "title": "src/lib/icons/yorha/index.ts — 12 unresolved imports",
         "feature_id": "ai-retrieval",
         "priority": "high"
       },
       {
-        "id": "task_0aab643f",
+        "id": "task_e560ff90",
+        "title": "22 runtime packets returned fewer than 8 sourceRefs",
+        "feature_id": "vector-graph",
+        "priority": "high"
+      },
+      {
+        "id": "task_c107cd35",
+        "title": "3 empty-sourceRef packets and 44 historical unknown sourceRef hits",
+        "feature_id": "ai-retrieval",
+        "priority": "high"
+      },
+      {
+        "id": "task_7dc4e1e0",
+        "title": "22 runtime packets are missing SOM/cluster telemetry",
+        "feature_id": "ai-retrieval",
+        "priority": "high"
+      },
+      {
+        "id": "task_d1f69fb0",
         "title": "4 files unclassified with >10 imports",
         "feature_id": "ai-retrieval",
         "priority": "medium"
       },
       {
-        "id": "task_8cc82e8b",
+        "id": "task_9bc21ae0",
+        "title": "3 runtime packets have no featureIds",
+        "feature_id": "vector-graph",
+        "priority": "medium"
+      },
+      {
+        "id": "task_f76db493",
+        "title": "5/23 recent runtime packets missing Redis LOD0 replay keys",
+        "feature_id": "ai-retrieval",
+        "priority": "medium"
+      },
+      {
+        "id": "task_97685f9d",
         "title": "Feature not implemented: Priority 2: VLM POI Integration (90 min)",
         "feature_id": "platform",
         "priority": "low"
       },
       {
-        "id": "task_4881e9f6",
+        "id": "task_3137e7d1",
         "title": "Feature not implemented: Priority 3: Audit Dashboard Web UI (3-4 hours)",
         "feature_id": "ai-inference",
         "priority": "low"
       },
       {
-        "id": "task_3d3f24cd",
+        "id": "task_815f4e70",
         "title": "Feature not implemented: Priority 4: Auto-Fix Orchestrator (6-8 hours)",
         "feature_id": "ai-inference",
         "priority": "low"
       },
       {
-        "id": "task_453bfa42",
+        "id": "task_b93f1af8",
         "title": "Feature not implemented: Phase 3: Post-Synthesis Quality Review (RunID: `stage-2c-500`)",
         "feature_id": "vector-graph",
         "priority": "low"
       },
       {
-        "id": "task_c4986856",
+        "id": "task_1e6bd546",
         "title": "Feature not implemented: Priority 1: Evidence Upload UI (1 hour)",
         "feature_id": "ai-retrieval",
         "priority": "low"
@@ -82,24 +112,24 @@
     "blocked": [],
     "done": []
   },
-  "next_ready_task_id": "task_967675a8",
+  "next_ready_task_id": "task_d2dad154",
   "feature_label_count": 13,
   "statistics": {
     "by_status": {
-      "todo": 12,
+      "todo": 17,
       "doing": 0,
       "blocked": 0,
       "done": 0
     },
     "by_feature": {
-      "ai-retrieval": 8,
+      "ai-retrieval": 11,
+      "vector-graph": 3,
       "platform": 1,
-      "ai-inference": 2,
-      "vector-graph": 1
+      "ai-inference": 2
     },
     "by_priority": {
-      "high": 6,
-      "medium": 1,
+      "high": 9,
+      "medium": 3,
       "low": 5,
       "critical": 0
     }

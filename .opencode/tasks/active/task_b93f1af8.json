@@ -1,0 +1,35 @@
+{
+  "id": "task_b93f1af8",
+  "workspace_id": "deeds-web-app",
+  "title": "Feature not implemented: Phase 3: Post-Synthesis Quality Review (RunID: `stage-2c-500`)",
+  "description": "Feature not implemented: Phase 3: Post-Synthesis Quality Review (RunID: `stage-2c-500`)\n\nWhy: feature not yet implemented\n\nAction: rg \"**Authority Audit**: Verify PageRank scores in Neo4j align with perceived file importance.\" src docs tests",
+  "status": "todo",
+  "priority": "low",
+  "risk": "low",
+  "feature_id": "vector-graph",
+  "feature_confidence": 0.1,
+  "semantic_path": [
+    "qdrant",
+    "neo4j",
+    "hypergraph"
+  ],
+  "source": "opencode",
+  "source_ref": "stale_feature_ba44d129",
+  "related_file_paths": [
+    "local:docs/operator/atlas-production-roadmap.md#L5"
+  ],
+  "qdrant_point_id": null,
+  "summary_llm": null,
+  "summary_model": null,
+  "cluster_id": "General",
+  "centroid_id": null,
+  "agent_pickup_ready": false,
+  "created_at": "2026-06-05T02:34:46.736Z",
+  "updated_at": "2026-06-05T02:35:01.173Z",
+  "mirror": {
+    "postgres_id": null,
+    "qdrant_point_id": null,
+    "redis_queue_key": null,
+    "langfuse_trace_id": null
+  }
+}

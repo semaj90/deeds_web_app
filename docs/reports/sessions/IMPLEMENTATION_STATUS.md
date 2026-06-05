@@ -19,6 +19,10 @@ Current practical completion:
 - Graph truth / traversal: verified complete enough for recommendations
 - Recommendation -> pickup queue: working
 - Recommendation workspace refresh: 12 tasks materialized, next ready `task_967675a8`
+- Route runtime packets / ACE replay: verified; `route_runtime_packets` JSONB audit rows and Redis `ace:telemetry:{id}:lod0` packets now preserve `source_ref` provenance
+- Route runtime observability: verified; `docs/reports/route-runtime-packets-report.{json,md}` now reports cache hit rate, sourceRef/feature/SOM/Redis-key hot spots, LOD0 coverage, and low-density rows
+- Runtime packet recommendation feedback: verified; 5 self-healing runtime recommendations were merged and workspace bootstrap now has 17 active tasks, next ready `task_d2dad154`
+- EmbeddingGemma `:8081`: healthy and validated against Ollama with bounded head-to-head eval
 
 Validated command corrections:
 - Parent Atlas synthesized-map rebuild: `npm --prefix sveltekit-frontend run atlas:feature-map:synthesize:apply`
@@ -31,6 +35,31 @@ Validated traversal proof:
 - Class matrix report: `docs/reports/multihop-traversal-class-matrix.{json,md}`
 - Full traversal was verified for API route, ACE/server, DB schema, and Svelte component classes.
 - The `scripts/atlas` sample now proves Postgres feature truth, Qdrant, SOM, and Neo4j traversal.
+
+Validated route runtime packet proof:
+- `cd sveltekit-frontend && npx tsx ../scripts/tests/smoke-route-runtime-packets.mjs`
+- `cd sveltekit-frontend && npx tsx ../scripts/tests/smoke-runtime-packet-replay.mjs`
+- `cd sveltekit-frontend && npx tsx scripts/tests/telemetry-source-ref-fallback.test.mjs`
+- `cd sveltekit-frontend && npx tsc -p tsconfig.json --noEmit --pretty false`
+- `route_runtime_packets` remains the live CPU/Postgres/JSONB telemetry table; no duplicate schema was introduced.
+- The compressed Redis replay packet uses integer source IDs and falls back to Postgres when Redis source dictionaries are stale.
+
+Validated runtime observability / feedback proof:
+- `node scripts/atlas/report-route-runtime-packets.mjs --limit=25`
+- `npm run atlas:runtime-packets:recommend`
+- `npm run atlas:runtime-packets:recommend:apply`
+- `npm run recommendations:tasks`
+- `node scripts/atlas/create-agent-pickup-packets.mjs --from .opencode/recommendations/tasks.ndjson`
+- `node scripts/opencode/bootstrap-workspace-tasks.mjs --apply`
+- latest report: 24 packets, 95.8% cache-hit rate, Redis LOD0 19/24, low-density rows 23.
+
+Validated signal refresh / eval proof:
+- `cd sveltekit-frontend && npm run karpathy:gpu`
+- `cd sveltekit-frontend && npm run graphify:cluster:pagerank`
+- `cd sveltekit-frontend && npm run graphify:authority`
+- `node scripts/evals/embed-head-to-head.mjs --queries 10 --k 10 --vector-name content --out docs/reports/embed-head-to-head-runtime-2026-06-04.json`
+- bounded embed eval: Ollama MRR@10 0.6835 p50 196ms; llama-server `:8081` MRR@10 0.6844 p50 76ms; verdict keeps `:8081` canonical when healthy.
+- `graphify:topology` full alias exceeded the 4-minute command timeout and still needs a bounded/observable runner.
 
 Current topology metrics:
 - raw `atlas_feature_map`: 14,465 rows
