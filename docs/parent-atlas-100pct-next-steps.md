@@ -177,6 +177,7 @@ Latest result:
 - Qdrant `codebase_chunks_768`: 76,261 points
 - Neo4j: 25,269 `CodebaseFile` nodes, 1,701 `ParentAtlasFeature` nodes, 165,005 `SIMILAR_TOPOLOGY` edges
 - `rg -uuu` NDJSON inventory: 127 files, excluding generated dependency folders
+- Live-service env gate: `npm run atlas:live-service-env` is the read-only preflight that separates `SERVICE_STOPPED` from `ENV_MISMATCH` before Qdrant backfill work.
 
 This audit is intentionally report-only. It does not run migrations, `drizzle-kit push`, Qdrant writes, graph writes, file archive moves, or database pruning.
 
@@ -225,6 +226,7 @@ The next follow-on is to keep this same join surface in sync with the offline sy
 - `scripts/atlas/ndjson-mapreduce-join.mjs` / `scripts/atlas/materialize-mapreduce-duckdb.mjs`: the offline NDJSON MapReduce and DuckDB materialization lane is present and audited as read-only.
 - `scripts/atlas/audit-hidden-packet-pathmap.mjs`: the hidden `.tmp` packet surfaces are now audited as a replay/join surface with `sourceRef` and `feature_id` coverage.
 - `scripts/atlas/create-agent-pickup-packets.mjs`: now uses the shared connection config for Postgres and Redis so the pickup queue does not drift back to local-auth defaults.
+- `sveltekit-frontend/scripts/atlas/audit-feature-lineage.mjs`: use `atlas:feature-lineage:fast` for smoke/CI, `atlas:feature-lineage:medium` for bounded review, and `atlas:feature-lineage` for the exhaustive manual scan.
 - `sveltekit-frontend/src/lib/server/gpu/`: the canonical autoencoder lane remains `768→256→64`; generic `matmul` is still absent from the native bridge and is tracked as a warning, not a blocker.
 - `sveltekit-frontend/src/lib/server/db/`: Drizzle barrels continue to mirror the NES/CHROM and route runtime packet schemas.
 
@@ -238,6 +240,12 @@ Current bounded result:
 - llama-server `:8081`: MRR@10 0.6844, p50 76ms, p95 88ms
 - overlap: 93.0%
 - verdict: llama-server is equivalent quality and faster; keep `:8081` as canonical embedding lane when healthy
+
+### Open Lanes TODO
+The remaining open lanes are tracked in [reports/parent-atlas-open-lanes-todo.md](../reports/parent-atlas-open-lanes-todo.md).
+
+Use that file for the finish order when working in the regular OpenCode terminal. It keeps the runtime path separate from the optional bootstrap priming pass.
+The Engram lane is now tracked explicitly in `sveltekit-frontend/docs/reports/engram-adapter-decision-report.md` and `npm run atlas:engram-adapter:decision`.
 
 ---
 

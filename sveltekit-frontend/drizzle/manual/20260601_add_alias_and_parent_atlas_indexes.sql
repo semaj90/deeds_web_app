@@ -46,6 +46,14 @@ CREATE TABLE IF NOT EXISTS public.parent_atlas_documents (
   centroid_id      text,
   qdrant_point_id  text,
   alias_id         text,
+  related_feature_ids jsonb      NOT NULL DEFAULT '[]'::jsonb,
+  source_kind      text         DEFAULT 'source',
+  profile_card_visible boolean   DEFAULT true,
+  index_lane       text         DEFAULT 'source',
+  summary_lod0     text,
+  summary_lod1     text,
+  summary_lod2     text,
+  source_ref_id    integer,
   ingest_source    text        NOT NULL DEFAULT 'codebase-graph',
   created_at       timestamptz NOT NULL DEFAULT now(),
   updated_at       timestamptz NOT NULL DEFAULT now(),
@@ -54,6 +62,12 @@ CREATE TABLE IF NOT EXISTS public.parent_atlas_documents (
 
 CREATE INDEX IF NOT EXISTS idx_pad_source_ref
   ON public.parent_atlas_documents (source_ref);
+
+CREATE INDEX IF NOT EXISTS idx_pad_index_lane
+  ON public.parent_atlas_documents (index_lane);
+
+CREATE INDEX IF NOT EXISTS idx_pad_lod1
+  ON public.parent_atlas_documents (summary_lod1);
 
 CREATE INDEX IF NOT EXISTS idx_pad_feature_id
   ON public.parent_atlas_documents (feature_id);
@@ -66,6 +80,15 @@ CREATE INDEX IF NOT EXISTS idx_pad_cluster_id
 
 CREATE INDEX IF NOT EXISTS idx_pad_alias_id
   ON public.parent_atlas_documents (alias_id);
+
+CREATE INDEX IF NOT EXISTS idx_pad_source_kind
+  ON public.parent_atlas_documents (source_kind);
+
+CREATE INDEX IF NOT EXISTS idx_pad_source_ref_id
+  ON public.parent_atlas_documents (source_ref_id);
+
+CREATE INDEX IF NOT EXISTS idx_parent_atlas_documents_related_feature_ids_gin
+  ON public.parent_atlas_documents USING gin (related_feature_ids);
 
 CREATE INDEX IF NOT EXISTS idx_pad_qdrant_point_id
   ON public.parent_atlas_documents (qdrant_point_id);

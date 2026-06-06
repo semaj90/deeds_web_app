@@ -1,0 +1,24 @@
+{
+  "generatedAt": "2026-06-06T06:21:32.816Z",
+  "repo": "sveltekit-frontend",
+  "evidenceFirst": true,
+  "recommendations": {
+    "snapshotJson": ".opencode\\recommendations\\recommendations.json",
+    "snapshotMd": ".opencode\\recommendations\\recommendations.md",
+    "eventsJsonl": ".opencode\\recommendations\\recommendation-events.jsonl",
+    "currentCount": 26
+  },
+  "tasks": {
+    "stateJson": ".opencode\\tasks\\task-state.json",
+    "stateMd": ".opencode\\tasks\\task-state.md",
+    "eventsJsonl": ".opencode\\tasks\\task-events.jsonl",
+    "currentCount": 10,
+    "openCount": 10
+  },
+  "openLanesTodo": "reports\\parent-atlas-open-lanes-todo.md",
+  "reports": {
+    "temporalTaskRegistry": "docs\\reports\\temporal-task-registry-report.md",
+    "engramAdapterDecision": "docs/reports/engram-adapter-decision-report.md",
+    "parentAtlasOverlay": "docs/reports/parent-atlas-overlay-sync-report.md"
+  }
+}

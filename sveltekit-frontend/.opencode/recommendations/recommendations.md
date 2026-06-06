@@ -1,18 +1,40 @@
-# Recommendations — 2026-06-05T15:37:44.742Z
+# Codebase Recommendations
+Generated: 2026-06-06T06:21:32.559Z
+Graph source: `deep-import-graph.json`
+next_steps/active/ files cross-referenced: 2026-05-03-auth-gaps.md, 2026-05-03-directory-consolidation.md, 2026-05-03-production-blockers.md, 2026-05-03-production-readiness-master.md, 2026-05-05_inverted-features-build-order.md, 2026-05-05_unwired-features-wiring-plan.md, 2026-05-07-dir-audit-lib-server.md, 2026-05-07_graph-glyph-ace-synthesis.md, 2026-05-08-production-core-routes-recommendation.md, 2026-05-08_23-30-42_topology-admin-thoughts.md, 2026-05-08_agentic-error-fixing-workflow.md, 2026-05-08_agentic-ingestion-program.md, 2026-05-08_agentic-retrieval-checklist.md, 2026-05-08_agentic-retrieval-ladder.md, 2026-05-08_atlas-signal-quality-todo.md, 2026-05-08_knowledge-graph-retrieval-feature-tracker.md, 2026-05-08_master-pipeline-todo.md, 2026-05-08_mcp-trace-hardening-session.md, 2026-05-08_path-mapping-retrieval-stack.md, 2026-05-08_pipeline-driven-next-actions.md, 2026-05-08_reconstruction-track-production-ready.md, 2026-05-08_schema-consolidation-production-ready.md, 2026-05-09-dir-audit-lib-server.md, 2026-05-09_agents-md-incremental-pipeline.md, 2026-05-09_karpathy-chr97-wiring.md, 2026-05-09_session-end-handoff.md, 2026-05-10_full-stack-claude-checklist.md, 2026-05-10_langgraph-background-research-worker.md, 2026-05-10_production-mental-model.md, 2026-05-10_rotorquant-bitnet-cache-hierarchy.md, 2026-05-10_service-worker-regex-tool-router.md, 2026-05-14_todo-pt2-workspace-startup-and-gpu-indexing.md, 2026-05-14_todo-pt3-ace-cache-indexing-postgres-qdrant.md, codebase-semantic-index-tasks.md, codebase-todo-recommendations.md, karpathy-gpu-recommendations.md
 
-**Total**: 2 recommendations across 1 clusters
+## Summary
+| | Count |
+|---|---|
+| Total recommendations | 8 |
+| Net-new (not in next_steps) | **0** |
+| Already tracked | 8 |
 
-## Top 10
-1. **[HIGH]** `graph:missing-neighborhood` — Disconnected graph neighborhood for query seeds: [src/mcp-gpu-orchestrator.ts, src/workers/LLMS.md]
-   - Traversing Neo4j imports relationships starting from decompressed seeds returned 0 neighbors. This indicates key files are orphaned in the Neo4j dependency map, reducing hyperedge retrieval relevance.
-   - Action: Run dependency extraction to merge relationships for orphaned codebase nodes.
-   - `npm run graph:refresh`
-2. **[MEDIUM]** `retrieval:low-context-density` — Low context density retrieved for query: "context-assembler 1780673843641"
-   - The runtime query assembled only 2 codebase references (lower than the required threshold of 8). This indicates a gap in either our semantic embedding coverage or search terms association.
-   - Action: Analyze the query vocabulary and run semantic index backfills if codebase files are missing.
-   - `npm run graphify:semantic`
+---
 
-## By Cluster
-### Self-Healing Retrieval
-- [medium] Low context density retrieved for query: "context-assembler 1780673843641"
-- [high] Disconnected graph neighborhood for query seeds: [src/mcp-gpu-orchestrator.ts, src/workers/LLMS.md]
+## Net-New Recommendations
+
+_All recommendations are already tracked in next_steps/active/_
+
+---
+
+## Already Tracked in next_steps/active/
+
+- **R2-cycles-large**: 4 circular dependency chains of 3+ files _(high)_
+- **R4-missing-auth**: 27 API route handlers lack auth guards _(high)_
+- **R1-orphans**: 25 files have 0 importers and are not entrypoints _(medium)_
+- **R3-hotspots**: 30 files each depended on by >50 files transitively _(medium)_
+- **R5-missing-zod**: 157 API routes lack Zod input validation _(medium)_
+- **R6-untested-cycles**: 35 files in circular dependency chains have no paired test _(medium)_
+- **R7-unwired-impl**: 243 substantial files import libraries but have 0 consumers _(medium)_
+- **R2-cycles-small**: 11 2-file circular dependency pairs _(low)_
+
+---
+
+## Recommendations → next_steps/ Action Plan
+
+
+
+
+
+

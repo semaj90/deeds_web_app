@@ -5,6 +5,10 @@ import { execSync } from 'node:child_process';
 const ROOT_DIR = process.cwd();
 const STATUS_PATH = path.resolve(ROOT_DIR, '.tmp/ace-startup-status.json');
 const ALT_STATUS_PATH = path.resolve(ROOT_DIR, 'sveltekit-frontend/.tmp/ace-startup-status.json');
+const RECOMMENDATIONS_PATH = path.resolve(ROOT_DIR, '.opencode/recommendations/recommendations.md');
+const ALT_RECOMMENDATIONS_PATH = path.resolve(ROOT_DIR, 'sveltekit-frontend/.opencode/recommendations/recommendations.md');
+const GRAPH_RECOMMENDATIONS_PATH = path.resolve(ROOT_DIR, 'docs/graph/recommendations.md');
+const ALT_GRAPH_RECOMMENDATIONS_PATH = path.resolve(ROOT_DIR, 'sveltekit-frontend/docs/graph/recommendations.md');
 
 // Ensure directories exist
 fs.mkdirSync(path.dirname(STATUS_PATH), { recursive: true });
@@ -47,6 +51,13 @@ function getDuplicateScripts(packageJsonPath) {
     }
   }
   return duplicates;
+}
+
+function resolveFirstExisting(paths) {
+  for (const p of paths) {
+    if (fs.existsSync(p)) return p;
+  }
+  return null;
 }
 
 async function main() {
@@ -92,7 +103,19 @@ async function main() {
     warnings.push(`package.json.frontend.duplicate_scripts: ${frontendDuplicates.join(', ')}`);
   }
 
-  // 3. Sidecar stdout guard check
+  // 3. Require repo evidence before startup is considered healthy
+  const recommendationsPath = resolveFirstExisting([
+    RECOMMENDATIONS_PATH,
+    ALT_RECOMMENDATIONS_PATH,
+    GRAPH_RECOMMENDATIONS_PATH,
+    ALT_GRAPH_RECOMMENDATIONS_PATH,
+  ]);
+  if (!recommendationsPath) {
+    blockers.push('repo_evidence.recommendations_missing');
+    ok = false;
+  }
+
+  // 4. Sidecar stdout guard check
   let sidecarHealthy = true;
   try {
     const sidecarCheckScript = path.join(ROOT_DIR, 'scripts/health-check-sidecars.mjs');
@@ -124,6 +147,9 @@ async function main() {
     },
     blockers,
     warnings,
+    evidence: {
+      recommendationsPath,
+    },
   };
 
   const payloadString = JSON.stringify(resultPayload, null, 2);

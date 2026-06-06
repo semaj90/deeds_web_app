@@ -66,6 +66,8 @@ export * from './codebase-intelligence.js';
 
 // Codebase document atlas, features index, and cache traces
 export * from './documents-atlas.js';
+export * from './parent-atlas-jobs.js';
+export * from './parent-atlas-documents.js';
 export * from './feature-registry.js';
 export * from './atlas-cards.js';
 export * from './atlas-profile-store.js';
@@ -95,6 +97,7 @@ export * from './intent-synthesis-rewards.js';
 export * from './feature-cards.js';
 export * from './codebase-relationship-reports.js';
 export * from './vector-smoke.js';
+export * from './atlas-feature-map-synthesized.js';
 
 // Round 3 (Tier-D promotions from real-gap-classification.md):
 // `embeddings` is FK-referenced by case_chunks.chunk_embedding_id.

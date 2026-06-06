@@ -40,7 +40,25 @@ export const taskSemanticPackets = pgTable('task_semantic_packets', {
   created_at: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
   updated_at: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
   deleted: boolean('deleted').notNull().default(false),
-});
+}, (table) => ({
+  agentPickupReadyIdx: index('idx_task_semantic_packets_agent_pickup_ready').on(table.agent_pickup_ready),
+  aliasIdIdx: index('task_semantic_packets_alias_id_idx').on(table.alias_id),
+  centroidIdIdx: index('idx_task_semantic_packets_centroid_id').on(table.centroid_id),
+  clusterIdIdx: index('idx_task_semantic_packets_cluster_id').on(table.cluster_id),
+  createdAtIdx: index('idx_task_semantic_packets_created_at').on(table.created_at),
+  featureIdIdx: index('idx_task_semantic_packets_feature_id').on(table.feature_id),
+  pointKindIdx: index('idx_task_semantic_packets_point_kind').on(table.point_kind),
+  qdrantPointIdIdx: index('idx_task_semantic_packets_qdrant_point_id').on(table.qdrant_point_id),
+  relatedFeatureIdsGin: index('idx_task_semantic_packets_related_feature_ids_gin').using('gin', table.related_feature_ids),
+  relatedFilePathsGin: index('idx_task_semantic_packets_related_file_paths_gin').using('gin', table.related_file_paths),
+  relatedTaskIdsGin: index('idx_task_semantic_packets_related_task_ids_gin').using('gin', table.related_task_ids),
+  semanticPathGin: index('idx_task_semantic_packets_semantic_path_gin').using('gin', table.semantic_path),
+  sourceRefIdx: index('idx_task_semantic_packets_source_ref').on(table.source_ref),
+  statusIdx: index('idx_task_semantic_packets_status').on(table.status),
+  updatedAtIdx: index('idx_task_semantic_packets_updated_at').on(table.updated_at),
+  workspaceIdIdx: index('idx_task_semantic_packets_workspace_id').on(table.workspace_id),
+  workspaceTaskIdIdx: index('idx_task_semantic_packets_workspace_task_id').on(table.workspace_task_id),
+}));
 
 export const agentPickupQueue = pgTable('agent_pickup_queue', {
   id: serial('id').primaryKey(),

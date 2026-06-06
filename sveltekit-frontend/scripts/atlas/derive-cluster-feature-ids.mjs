@@ -22,9 +22,12 @@
  */
 
 const DRY_RUN = process.argv.includes('--dry-run');
+const APPLY   = process.argv.includes('--apply');
 const FORCE   = process.argv.includes('--force');
 const TOP_ARG = process.argv.find(a => a.startsWith('--top='));
 const TOP_N   = TOP_ARG ? Math.max(1, parseInt(TOP_ARG.split('=')[1])) : 8;
+const LIMIT_ARG = process.argv.find(a => a.startsWith('--limit=')) ?? (process.env.npm_config_limit ? `--limit=${process.env.npm_config_limit}` : null);
+const LIMIT = LIMIT_ARG ? Math.max(1, parseInt(LIMIT_ARG.split('=')[1])) : null;
 const BATCH   = 200;
 
 const QDRANT_URL        = process.env.QDRANT_URL        ?? 'http://127.0.0.1:6333';
@@ -150,7 +153,11 @@ console.log();
 let totalPatched = 0;
 let totalSkipped = 0;
 
-process.stdout.write(`Pass 2: writing feature_ids to Qdrant${DRY_RUN ? ' (DRY RUN)' : ''}...\n`);
+const effectiveDryRun = DRY_RUN && !APPLY;
+if (APPLY && LIMIT === null) {
+  console.warn('[feature-ids:derive] WARN: --apply was provided without --limit; proceeding unbounded.');
+}
+process.stdout.write(`Pass 2: writing feature_ids to Qdrant${effectiveDryRun ? ' (DRY RUN)' : ''}...\n`);
 
 for (const [cluster, entry] of clusterData) {
   const resolved = clusterResolved.get(cluster);
@@ -165,21 +172,32 @@ for (const [cluster, entry] of clusterData) {
     continue;
   }
 
-  if (DRY_RUN) {
-    totalPatched += entry.pointIds.length - entry.alreadyPatched;
+  if (effectiveDryRun) {
+    const remaining = entry.pointIds.length - entry.alreadyPatched;
+    if (LIMIT !== null && totalPatched + remaining > LIMIT) {
+      const allowed = Math.max(0, LIMIT - totalPatched);
+      totalPatched += allowed;
+      totalSkipped += remaining - allowed + entry.alreadyPatched;
+      if (allowed === 0) break;
+      continue;
+    }
+    totalPatched += remaining;
     totalSkipped += entry.alreadyPatched;
     continue;
   }
 
   // Write in batches of 100 point IDs per Qdrant call
   for (let i = 0; i < entry.pointIds.length; i += 100) {
+    if (LIMIT !== null && totalPatched >= LIMIT) break;
     const ids = entry.pointIds.slice(i, i + 100);
+    const writableIds = LIMIT !== null ? ids.slice(0, Math.max(0, LIMIT - totalPatched)) : ids;
+    if (writableIds.length === 0) break;
     try {
       const r = await fetch(`${QDRANT_URL}/collections/${QDRANT_COLLECTION}/points/payload`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          points: ids,
+          points: writableIds,
           payload: {
             feature_ids: resolved.feature_ids,
             lane_ids:    resolved.lane_ids,
@@ -188,16 +206,18 @@ for (const [cluster, entry] of clusterData) {
         }),
         signal: AbortSignal.timeout(20_000),
       });
-      if (r.ok) totalPatched += ids.length;
-      else totalSkipped += ids.length;
+      if (r.ok) totalPatched += writableIds.length;
+      else totalSkipped += writableIds.length;
     } catch {
-      totalSkipped += ids.length;
+      totalSkipped += writableIds.length;
     }
   }
 
   if ((totalPatched + totalSkipped) % 5000 < 200) {
     process.stdout.write(`  patched ${totalPatched} / skipped ${totalSkipped}...\n`);
   }
+
+  if (LIMIT !== null && totalPatched >= LIMIT) break;
 }
 
 // ── Summary ───────────────────────────────────────────────────────────────────
@@ -209,7 +229,7 @@ console.log(`  Patched       : ${totalPatched}${DRY_RUN ? ' (dry run)' : ''}`);
 console.log(`  Skipped       : ${totalSkipped}`);
 console.log(`  Top-N         : ${TOP_N} feature_ids per cluster`);
 
-if (DRY_RUN) {
+if (effectiveDryRun) {
   console.log('\n  Re-run without --dry-run to apply.');
 } else {
   console.log('\n  ✓ Done. Re-run smoke:golden-retrieval to verify feature coverage.');

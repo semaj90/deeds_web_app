@@ -20,7 +20,7 @@ CREATE TABLE IF NOT EXISTS kag_dag_runs (
 
 CREATE TABLE IF NOT EXISTS nes_chrom_packets (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  packet_key text NOT NULL UNIQUE,
+  packet_key text NOT NULL,
   query_hash text NOT NULL,
   chunk_id text NOT NULL,
   source_ref text NOT NULL,
@@ -42,6 +42,7 @@ CREATE TABLE IF NOT EXISTS nes_chrom_packets (
 
 CREATE INDEX IF NOT EXISTS nes_chrom_packets_query_hash_idx ON nes_chrom_packets(query_hash);
 CREATE INDEX IF NOT EXISTS nes_chrom_packets_chunk_id_idx ON nes_chrom_packets(chunk_id);
+CREATE UNIQUE INDEX IF NOT EXISTS nes_chrom_packets_packet_key_key ON nes_chrom_packets(packet_key);
 CREATE INDEX IF NOT EXISTS nes_chrom_packets_source_ref_idx ON nes_chrom_packets(source_ref);
 CREATE INDEX IF NOT EXISTS nes_chrom_packets_feature_id_idx ON nes_chrom_packets(feature_id);
 CREATE INDEX IF NOT EXISTS nes_chrom_packets_qdrant_point_idx ON nes_chrom_packets(qdrant_point_id);

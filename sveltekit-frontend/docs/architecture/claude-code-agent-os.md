@@ -31,7 +31,7 @@ production state.
 | Project subagents (`.claude/agents/*.md`) | task-scoped specialists with restricted tool sets | repo |
 | Hooks (`PreToolUse` / `PostToolUse` / `UserPromptSubmit` / …) | policy gates, redaction, audit trail | repo |
 | TRACE MCP (`src/mcp/trace-mcp-server.ts`, port 8788) | syscall boundary — every model→infra call passes through a registered tool | repo |
-| `gemma4-offload` MCP (stdio, [scripts/mcp/gemma4-offload-mcp.mjs](../../scripts/mcp/gemma4-offload-mcp.mjs)) | local generation routing for cheap subtasks | repo |
+| `gemma4-offload` MCP (stdio, [scripts/mcp/gemma4-offload-mcp.mjs](../../scripts/mcp/gemma4-offload-mcp.mjs)) | repo-audit-only generation routing for report snippets and runtime diagnostics | repo |
 | SvelteKit handlers (`src/routes/api/**`) | typed kernel services | repo |
 | Drizzle / `pg` Pool | only DB caller | repo |
 | Postgres / Qdrant / Neo4j / Redis / CouchDB / Obsidian | storage devices | infra |

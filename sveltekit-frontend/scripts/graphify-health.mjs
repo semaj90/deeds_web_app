@@ -17,7 +17,6 @@
  *   node scripts/graphify-health.mjs --json    (print JSON to stdout, no files)
  */
 
-import { createClient } from 'redis';
 import { readFileSync, writeFileSync, existsSync, readdirSync } from 'fs';
 import { join, resolve } from 'path';
 import { execSync } from 'child_process';
@@ -32,6 +31,15 @@ const QUIET       = process.argv.includes('--quiet');
 const JSON_ONLY   = process.argv.includes('--json');
 
 function log(...args) { if (!QUIET && !JSON_ONLY) console.log(...args); }
+
+function readJsonFile(filePath) {
+  if (!existsSync(filePath)) return null;
+  try {
+    return JSON.parse(readFileSync(filePath, 'utf8'));
+  } catch {
+    return null;
+  }
+}
 
 async function readRedisJsonLike(redis, key) {
   const keyType = await redis.type(key).catch(() => 'none');
@@ -204,6 +212,29 @@ function seedStats() {
   }
 }
 
+function graphifyStartupCache() {
+  const candidates = [
+    join(ROOT, '.tmp', 'graphify-daily-startup.json'),
+    join(ROOT, 'logs', 'task-output', 'graphify-daily-startup.json'),
+  ];
+  for (const p of candidates) {
+    const data = readJsonFile(p);
+    if (data) {
+      return {
+        path: p,
+        ...data,
+      };
+    }
+  }
+  return {
+    path: null,
+    generatedAt: null,
+    status: 'missing',
+    reason: 'missing',
+    detail: 'graphify daily validation cache not found',
+  };
+}
+
 // ── ts7 check ────────────────────────────────────────────────────────────────
 
 function ts7Check() {
@@ -227,6 +258,13 @@ function formatMd(h) {
   const agentsStatus= h.agentsMdCount > 0 ? '✅' : '⚠️';
   const autoencoderStatus = h.autoencoderReady ? '✅' : '⚠️';
   const seedStatus = h.seedStatus === 'ok' ? '✅' : h.seedStatus === 'not_run' ? '⚠️' : '❌';
+  const graphifyStatus = h.graphifyStartup?.status === 'complete'
+    ? '✅'
+    : h.graphifyStartup?.status === 'skipped'
+      ? '⚠️'
+      : h.graphifyStartup?.status === 'failed'
+        ? '❌'
+        : '⚠️';
   const autoencoderDetail = h.autoencoderReady
     ? `trainedAt=${h.autoencoderWeightsTrainedAt}, centroids=${h.autoencoderCentroidsPresent ? 'yes' : 'no'}, encoded=${h.autoencoderEncodedCount}`
     : `weightsType=${h.autoencoderWeightsType ?? 'unknown'}, encodedType=${h.autoencoderEncodedType ?? 'unknown'}, centroids=${h.autoencoderCentroidsPresent ? 'yes' : 'no'}`;
@@ -252,6 +290,7 @@ function formatMd(h) {
 | Autoencoder weights | ${autoencoderDetail} | ${autoencoderStatus} |
 | Atlas seed count | ${h.seedCount} | ${h.seedGenerated ? '\u2705' : h.seedWarning ? '\u26a0\ufe0f' : '\u274c'} |
 | Atlas seed status | ${h.seedStatus} | - |
+| Graphify daily | ${h.graphifyStartup?.status ?? 'missing'} (${h.graphifyStartup?.reason ?? 'unknown'}) | ${graphifyStatus} |
 ${Object.keys(h.seedAreaBreakdown ?? {}).length > 0 ? `| Seed area breakdown | ${Object.entries(h.seedAreaBreakdown).map(([k,v]) => `${k}:${v}`).join(', ')} | - |\n` : ''}
 
 ## Graphify Tiers
@@ -266,7 +305,7 @@ ${Object.keys(h.seedAreaBreakdown ?? {}).length > 0 ? `| Seed area breakdown | $
 
 ## Recommendations
 
-${h.gemma4Coverage < 80 ? `- ⚠️  Run \`npm run graphify:batch-gpu-analysis\` — only ${coveragePct} of wiki notes have Gemma4 summaries\n` : ''}${h.bowChunkTiles === 0 ? `- ⚠️  Run \`npm run graphify:bow-tiles:fast\` — no BoW tiles in Redis\n` : ''}${h.glyphCount === 0 ? `- ⚠️  Run \`npm run graphify:batch-gpu-analysis\` — glyph_atlas is empty\n` : ''}${h.agentsMdCount === 0 ? `- ⚠️  Run \`npm run graphify:agents-md\` — no AGENTS.md mirrors found\n` : ''}${h.gemma4Coverage >= 80 && h.bowChunkTiles > 100 && h.glyphCount > 0 ? `- ✅ All tiers healthy — no action needed\n` : ''}
+${h.graphifyStartup?.status === 'failed' ? `- ⚠️  Graphify failed due to ${h.graphifyStartup?.reason ?? 'unknown'} — refresh the graph after fixing the upstream cause\n` : ''}${h.graphifyStartup?.status === 'skipped' && h.graphifyStartup?.reason && h.graphifyStartup.reason !== 'cooldown' ? `- ⚠️  Graphify skipped because ${h.graphifyStartup.reason} — refresh the graph after the service/env issue is resolved\n` : ''}${h.gemma4Coverage < 80 ? `- ⚠️  Run \`npm run graphify:batch-gpu-analysis\` — only ${coveragePct} of wiki notes have Gemma4 summaries\n` : ''}${h.bowChunkTiles === 0 ? `- ⚠️  Run \`npm run graphify:bow-tiles:fast\` — no BoW tiles in Redis\n` : ''}${h.glyphCount === 0 ? `- ⚠️  Run \`npm run graphify:batch-gpu-analysis\` — glyph_atlas is empty\n` : ''}${h.agentsMdCount === 0 ? `- ⚠️  Run \`npm run graphify:agents-md\` — no AGENTS.md mirrors found\n` : ''}${h.gemma4Coverage >= 80 && h.bowChunkTiles > 100 && h.glyphCount > 0 ? `- ✅ All tiers healthy — no action needed\n` : ''}
 ${h.autoencoderReady ? '' : `- ⚠️  Run \`npm run graphify:autoencoder:train\` — autoencoder is still on Xavier placeholder weights\n`}
 ## Raw JSON
 
@@ -276,10 +315,16 @@ See \`docs/graph/graphify-health.json\` for machine-readable data.
 
 // ── Main ─────────────────────────────────────────────────────────────────────
 
-let redis;
+let redis = null;
 try {
-  redis = createClient({ url: REDIS_URL });
-  await redis.connect();
+  const redisMod = await import('redis');
+  const createClient = redisMod.createClient ?? redisMod.default?.createClient;
+  if (typeof createClient === 'function') {
+    redis = createClient({ url: REDIS_URL });
+    await redis.connect();
+  } else if (!QUIET && !JSON_ONLY) {
+    console.error('Redis client module unavailable — some metrics will be 0');
+  }
 } catch {
   if (!QUIET && !JSON_ONLY) console.error(`Cannot reach Redis at ${REDIS_URL} — some metrics will be 0`);
   redis = null;
@@ -311,6 +356,7 @@ const [rStats, qStats] = await Promise.all([
 const gStats  = graphJsonStats();
 const aCount  = agentsMdCount();
 const sStats  = seedStats();
+const gStartup = graphifyStartupCache();
 const smoke   = redis ? await aceSmokeResult(redis, qStats) : { wikiNotesPresent: false, glyphAtlasPresent: false, httpProbesSkipped: true };
 const ts7     = ts7Check();
 
@@ -349,6 +395,7 @@ const health = {
   seedStatus:      sStats.seedStatus,
   seedGeneratedAt: sStats.seedGeneratedAt,
   seedWarning:     sStats.seedWarning,
+  graphifyStartup:  gStartup,
   // ts7
   ts7Available: ts7.available,
   ts7Note: ts7.note,
@@ -380,3 +427,4 @@ log(`  ✓ Wrote ${jsonPath}`);
 log(`  ✓ Wrote ${mdPath}`);
 log(`  Seed count:      ${health.seedCount} (${health.seedStatus})`);
 if (health.seedMsgWarning) log(`  Seed warning:    ${health.seedMsgWarning}`);
+log(`  Graphify daily:  ${health.graphifyStartup?.status ?? 'missing'} (${health.graphifyStartup?.reason ?? 'unknown'})`);

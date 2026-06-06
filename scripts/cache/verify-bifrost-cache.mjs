@@ -1,7 +1,24 @@
 import Redis from 'ioredis';
+import dotenv from 'dotenv';
 import crypto from 'crypto';
+import { resolve } from 'path';
 
-const redis = new Redis('redis://127.0.0.1:6379');
+const ROOT = process.cwd();
+dotenv.config({ path: resolve(ROOT, '.env.local'), override: false });
+dotenv.config({ path: resolve(ROOT, '.env'), override: false });
+dotenv.config({ path: resolve(ROOT, 'sveltekit-frontend/.env.local'), override: false });
+dotenv.config({ path: resolve(ROOT, 'sveltekit-frontend/.env'), override: false });
+
+const REDIS_URL = process.env.REDIS_URL || 'redis://127.0.0.1:6379';
+const REDIS_PASSWORD = process.env.REDIS_PASSWORD || process.env.REDIS_PASS || undefined;
+const redis = new Redis(REDIS_URL, {
+  password: REDIS_PASSWORD,
+  lazyConnect: true,
+  maxRetriesPerRequest: 1,
+  enableOfflineQueue: false,
+  retryStrategy: () => null,
+  connectTimeout: 2000,
+});
 
 function canonicalJson(obj) {
   if (typeof obj !== 'object' || obj === null) return JSON.stringify(obj);
@@ -23,6 +40,7 @@ async function verifyBifrostCache() {
   console.log("🔍 Verifying Bifrost Cache Layer...");
   
   try {
+    await redis.connect();
     const stablePrefix = {
       systemPrompt: "You are a legal AI.",
       modelId: "gemma4-tq",

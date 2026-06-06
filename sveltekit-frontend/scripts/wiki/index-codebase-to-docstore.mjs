@@ -20,6 +20,7 @@
 import { readFileSync, writeFileSync, mkdirSync, readdirSync, existsSync } from 'node:fs';
 import { join, resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import dotenv from 'dotenv';
 import Redis from 'ioredis';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -28,6 +29,12 @@ const RUNS_DIR = join(ROOT, 'memory', 'runs');
 const MANIFEST_DIR = join(ROOT, 'memory', 'docstore');
 
 const DRY_RUN = process.argv.includes('--dry-run');
+
+// Load workspace env so Redis auth is available when the script is run
+// directly or from the graphify startup wrapper.
+dotenv.config({ path: resolve(ROOT, '.env'), override: false });
+dotenv.config({ path: resolve(ROOT, '.env.local'), override: false });
+
 const REDIS_URL = process.env.REDIS_URL ?? 'redis://127.0.0.1:6379';
 const REDIS_PASSWORD = process.env.REDIS_PASSWORD || process.env.REDIS_PASS || undefined;
 function redisOpts(extra = {}) {
@@ -253,6 +260,18 @@ async function main() {
   let redis;
   try {
     redis = new Redis(redisOpts({ lazyConnect: true, enableOfflineQueue: false }));
+    redis.on('error', (err) => {
+      const msg = err?.message ?? String(err);
+      if (msg.includes('NOAUTH') || msg.includes('Authentication required')) {
+        console.warn('[docstore] Redis authentication failed (non-fatal):', msg);
+        return;
+      }
+      if (msg.includes('ECONNREFUSED')) {
+        console.warn('[docstore] Redis unavailable (non-fatal):', msg);
+        return;
+      }
+      console.warn('[docstore] Redis error (non-fatal):', msg);
+    });
     await redis.connect();
 
     const pipe = redis.pipeline();

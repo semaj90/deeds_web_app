@@ -145,6 +145,86 @@ function buildFeatureLabelMap(rows) {
   return map;
 }
 
+function deriveGapGroupKey(row) {
+  const featureId = row?.featureId ? normalizePathLike(row.featureId) : null;
+  if (featureId) return `feature_id:${featureId}`;
+
+  const sourceRef = row?.sourceRef ? normalizePathLike(row.sourceRef) : null;
+  if (sourceRef) {
+    const parts = sourceRef.split('/').filter(Boolean);
+    const prefix = parts.length > 2 ? parts.slice(0, 2).join('/') : parts.slice(0, 1).join('/');
+    if (prefix) return `source_ref_prefix:${prefix}`;
+  }
+
+  const pathValue = row?.path ? normalizePathLike(row.path) : null;
+  if (pathValue) {
+    const parts = pathValue.split('/').filter(Boolean);
+    const prefix = parts.length > 2 ? parts.slice(0, 2).join('/') : parts.slice(0, 1).join('/');
+    if (prefix) return `path_prefix:${prefix}`;
+  }
+
+  return 'unknown-lineage';
+}
+
+function buildHigherHopGapGroups(lineages, limit = 40) {
+  const groups = new Map();
+
+  for (const row of lineages) {
+    if (!row.missingHigherHopStages || row.missingHigherHopStages.length === 0) continue;
+    const groupKey = deriveGapGroupKey(row);
+    const existing = groups.get(groupKey) ?? {
+      groupKey,
+      rowCount: 0,
+      featureIds: new Set(),
+      sourceRefs: new Set(),
+      paths: new Set(),
+      missingStageCounts: {},
+      sampleLineages: [],
+      repairActions: new Set(),
+    };
+
+    existing.rowCount += 1;
+    if (row.featureId) existing.featureIds.add(row.featureId);
+    if (row.sourceRef) existing.sourceRefs.add(row.sourceRef);
+    if (row.path) existing.paths.add(row.path);
+
+    for (const stage of row.missingHigherHopStages) {
+      existing.missingStageCounts[stage] = (existing.missingStageCounts[stage] ?? 0) + 1;
+      if (stage === 'somCluster') existing.repairActions.add('rederive som_cluster from topology / cluster join');
+      if (stage === 'glyphRecord') existing.repairActions.add('materialize glyph_record from SOM / glyph lane');
+      if (stage === 'qdrantHit') existing.repairActions.add('backfill qdrant_point_id / qdrant payload join');
+      if (stage === 'redisHotKey') existing.repairActions.add('replay runtime packet and restore redis hot key');
+      if (stage === 'neo4jNode') existing.repairActions.add('relink or materialize neo4j node mapping');
+    }
+
+    if (existing.sampleLineages.length < 5) {
+      existing.sampleLineages.push({
+        sourceRef: row.sourceRef ?? null,
+        featureId: row.featureId ?? null,
+        path: row.path ?? null,
+        missingHigherHopStages: row.missingHigherHopStages,
+        lineageScorePct: row.lineageScorePct,
+      });
+    }
+
+    groups.set(groupKey, existing);
+  }
+
+  return [...groups.values()]
+    .map((group) => ({
+      groupKey: group.groupKey,
+      rowCount: group.rowCount,
+      featureIds: [...group.featureIds].slice(0, 8),
+      sourceRefs: [...group.sourceRefs].slice(0, 8),
+      paths: [...group.paths].slice(0, 8),
+      missingStageCounts: group.missingStageCounts,
+      repairActions: [...group.repairActions].slice(0, 8),
+      sampleLineages: group.sampleLineages,
+    }))
+    .sort((a, b) => b.rowCount - a.rowCount)
+    .slice(0, limit);
+}
+
 function loadSurfaces() {
   return Object.entries(INPUTS).map(([key, filePath]) => ({
     key,
@@ -324,8 +404,8 @@ function buildDiscoveryIndex(files, aliases) {
   return index;
 }
 
-function buildHigherHopCandidateDiscovery() {
-  const files = collectDiscoveryFiles();
+function buildHigherHopCandidateDiscovery(limit) {
+  const files = collectDiscoveryFiles(Number.isFinite(limit) && limit > 0 ? limit : undefined);
   const aliases = [...new Set(HOP_DISCOVERY_SPECS.flatMap((spec) => spec.fields))];
   const index = buildDiscoveryIndex(files, aliases);
 
@@ -356,6 +436,50 @@ function buildHigherHopCandidateDiscovery() {
       };
     }),
   };
+}
+
+function parseLineageCliArgs(argv = process.argv.slice(2)) {
+  const options = {
+    sampleMode: false,
+    sampleLimit: null,
+    maxFiles: null,
+  };
+
+  for (const arg of argv) {
+    if (arg === '--fast') {
+      options.sampleMode = true;
+      options.sampleLimit = options.sampleLimit ?? 100;
+      options.maxFiles = options.maxFiles ?? 25;
+      continue;
+    }
+    if (arg.startsWith('--limit=')) {
+      const value = Number(arg.slice('--limit='.length));
+      if (Number.isFinite(value) && value > 0) {
+        options.sampleMode = true;
+        options.sampleLimit = value;
+      }
+      continue;
+    }
+    if (arg.startsWith('--sample=')) {
+      const value = Number(arg.slice('--sample='.length));
+      if (Number.isFinite(value) && value > 0) {
+        options.sampleMode = true;
+        options.sampleLimit = value;
+      }
+      continue;
+    }
+    if (arg.startsWith('--max-files=')) {
+      const value = Number(arg.slice('--max-files='.length));
+      if (Number.isFinite(value) && value > 0) {
+        options.maxFiles = value;
+      }
+    }
+  }
+
+  if (options.sampleMode && !options.sampleLimit) options.sampleLimit = 100;
+  if (options.sampleMode && !options.maxFiles) options.maxFiles = 25;
+
+  return options;
 }
 
 function stageValue(row, featureLabelMap) {
@@ -875,7 +999,24 @@ async function probeNeo4jCodebaseFile() {
   }
 }
 
-async function buildLiveHopProbes() {
+async function buildLiveHopProbes(sampleMode = false) {
+  if (sampleMode) {
+    const skipped = (hop, source, envName, note) => {
+      const bucket = createLiveProbeBucket(hop, source, envName);
+      bucket.status = 'skipped';
+      bucket.note = note;
+      return bucket;
+    };
+    return {
+      routeRuntimePackets: skipped('routeRuntimePackets', 'postgres', 'DATABASE_URL', 'skipped in sample mode'),
+      parentAtlasDocuments: skipped('parentAtlasDocuments', 'postgres', 'DATABASE_URL', 'skipped in sample mode'),
+      atlasFeatureMapSynthesized: skipped('atlasFeatureMapSynthesized', 'postgres', 'DATABASE_URL', 'skipped in sample mode'),
+      atlasFeatureSynthesis: skipped('atlasFeatureSynthesis', 'postgres', 'DATABASE_URL', 'skipped in sample mode'),
+      qdrantCodebaseChunks768: skipped('qdrantHit', 'qdrant', 'QDRANT_URL', 'skipped in sample mode'),
+      redisHotKeys: skipped('redisHotKey', 'redis', 'REDIS_URL', 'skipped in sample mode'),
+      neo4jCodebaseFile: skipped('neo4jNode', 'neo4j', 'NEO4J_URI', 'skipped in sample mode'),
+    };
+  }
   return {
     routeRuntimePackets: await probePostgresTable('route_runtime_packets', ['sourceRefs', 'featureIds', 'somCluster', 'qdrantHits', 'redisHotKeys']),
     parentAtlasDocuments: await probePostgresTable('parent_atlas_documents', ['source_ref', 'feature_id', 'rel_path', 'qdrant_point_id']),
@@ -887,12 +1028,16 @@ async function buildLiveHopProbes() {
   };
 }
 
-async function buildReport() {
+async function buildReport(options = {}) {
+  const sampleMode = Boolean(options.sampleMode);
+  const sampleLimit = Number.isFinite(options.sampleLimit) && options.sampleLimit > 0 ? Number(options.sampleLimit) : null;
+  const maxFiles = Number.isFinite(options.maxFiles) && options.maxFiles > 0 ? Number(options.maxFiles) : null;
   const surfaces = loadSurfaces();
   const allRows = surfaces.flatMap((surface) => surface.rows.map((row) => ({ ...row, __surface: surface.key, __filePath: surface.relPath })));
-  const featureLabelMap = buildFeatureLabelMap(allRows);
-  const higherHopCandidateDiscovery = buildHigherHopCandidateDiscovery();
-  const liveHopProbes = await buildLiveHopProbes();
+  const sampledRows = sampleMode && sampleLimit ? allRows.slice(0, sampleLimit) : allRows;
+  const featureLabelMap = buildFeatureLabelMap(sampleMode ? sampledRows : allRows);
+  const higherHopCandidateDiscovery = buildHigherHopCandidateDiscovery(maxFiles ?? undefined);
+  const liveHopProbes = await buildLiveHopProbes(sampleMode);
   const fieldNameMismatchDiscovery = {
     qdrantHit: {
       actualFieldNamesFound: liveHopProbes.qdrantCodebaseChunks768.actualFieldNamesFound ?? [],
@@ -912,7 +1057,7 @@ async function buildReport() {
     },
   };
 
-  const lineages = allRows.map((row) => stageValue(row, featureLabelMap));
+  const lineages = sampledRows.map((row) => stageValue(row, featureLabelMap));
   const sourceRefRows = lineages.filter((row) => Boolean(row.sourceRef));
   const featureIdRows = lineages.filter((row) => Boolean(row.featureId));
   const featureLabelRows = lineages.filter((row) => row.featureLabels.length > 0);
@@ -1001,8 +1146,14 @@ async function buildReport() {
     })
     .sort((a, b) => b.rowCount - a.rowCount);
 
+  const higherHopGapGroups = buildHigherHopGapGroups(lineages, sampleMode ? 20 : 40);
+
   const report = {
     generatedAt: new Date().toISOString(),
+    sampleMode,
+    sampleLimit: sampleLimit ?? null,
+    maxFiles: maxFiles ?? null,
+    warning: sampleMode ? 'bounded sample; coverage is directional, not exhaustive' : null,
     inputs: Object.fromEntries(Object.entries(INPUTS).map(([key, filePath]) => [key, relativeDisplay(REPO_ROOT, filePath)])),
     summary: {
       totalRows: lineages.length,
@@ -1025,8 +1176,13 @@ async function buildReport() {
       liveHopProbes,
       averageLineageScorePct,
       maxLineageScorePct: lineages.reduce((max, row) => Math.max(max, row.lineageScorePct), 0),
-      sampleCount: Math.min(lineages.length, 40),
+      sampleCount: sampleMode ? Math.min(lineages.length, sampleLimit ?? 40) : Math.min(lineages.length, 40),
+      sampleMode,
+      sampleLimit: sampleLimit ?? null,
+      maxFiles: maxFiles ?? null,
+      warning: sampleMode ? 'bounded sample; coverage is directional, not exhaustive' : null,
       missingHigherHopRows: lineages.filter((row) => row.missingHigherHopStages.length > 0).length,
+      higherHopGapGroups,
       featureGroups,
       sampleLineages: lineages.slice(0, 40).map((row) => ({
         sourceRef: row.sourceRef,
@@ -1053,6 +1209,13 @@ async function buildReport() {
     '# Feature Lineage Report',
     '',
     `Generated: ${report.generatedAt}`,
+    '',
+    '## Sampling',
+    '',
+    `- sample mode: ${report.sampleMode ? 'yes' : 'no'}`,
+    `- sample limit: ${report.sampleLimit ?? 'full'}`,
+    `- max discovery files: ${report.maxFiles ?? 'full'}`,
+    `- warning: ${report.warning ?? 'none'}`,
     '',
     '## Coverage',
     '',
@@ -1156,6 +1319,19 @@ async function buildReport() {
     `- max lineage score: ${report.summary.maxLineageScorePct}%`,
     `- rows missing higher-hop stages: ${report.summary.missingHigherHopRows}`,
     '',
+    '## Higher-Hop Gap Groups',
+    '',
+    ...report.summary.higherHopGapGroups.slice(0, 40).map((group) => [
+      `- ${group.groupKey}`,
+      `  - row count: ${group.rowCount}`,
+      `  - featureIds: ${group.featureIds.join(', ') || 'none'}`,
+      `  - sourceRefs: ${group.sourceRefs.join(', ') || 'none'}`,
+      `  - paths: ${group.paths.join(', ') || 'none'}`,
+      `  - missing stages: ${Object.entries(group.missingStageCounts).map(([stage, count]) => `${stage}:${count}`).join(', ') || 'none'}`,
+      `  - repair actions: ${group.repairActions.join(' | ') || 'none'}`,
+      `  - sample lineages: ${group.sampleLineages.map((row) => `${row.sourceRef ?? 'n/a'} -> ${row.missingHigherHopStages.join('+')}`).join(' | ') || 'none'}`,
+    ].join('\n')),
+    '',
     '## Feature Groups',
     '',
     ...report.summary.featureGroups.slice(0, 40).map((group) => [
@@ -1194,7 +1370,9 @@ async function buildReport() {
   console.log(`Average lineage score: ${report.summary.averageLineageScorePct}%`);
 }
 
-buildReport().catch((error) => {
+const cliOptions = parseLineageCliArgs();
+
+buildReport(cliOptions).catch((error) => {
   console.error(error);
   process.exitCode = 1;
 });

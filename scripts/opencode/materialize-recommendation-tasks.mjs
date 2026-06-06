@@ -21,6 +21,7 @@ const OUT_NDJ = path.join(OUT_DIR, 'tasks.ndjson');
 const OUT_MD  = path.join(OUT_DIR, 'tasks.md');
 
 const DRY_RUN = process.argv.includes('--dry-run');
+const FORWARD_LEGACY = process.argv.includes('--forward-legacy');
 
 // ── Risk heuristic ─────────────────────────────────────────────────────────────
 function deriveRisk(rec) {
@@ -297,33 +298,37 @@ async function main() {
     await fs.writeFile(OUT_MD, md, 'utf8');
     console.log(`\n  ✅ wrote ${OUT_NDJ}`);
     console.log(`  ✅ wrote ${OUT_MD}`);
-    // Forward a summary of created tasks to the local gemma4 retrieval hook (dry-run safe)
-    try {
-      const { execSync } = await import('child_process');
-      const hookScript = path.join(ROOT, 'scripts', 'opencode', 'gemma4-retrieval-hook.mjs');
-      const MAX_HOOKS = 20;
-      const toSend = normalizedTasks.slice(0, MAX_HOOKS);
-      for (const t of toSend) {
-        const payload = {
-          query: t.title || 'materialize task',
-          selectedCardIds: [t.task_id],
-          sourceRefs: t.sourceRefs || [],
-          rerankScore: 0,
-          tool: 'materialize_recommendation_task',
-          outcome: 'task_created',
-          feedback: 'accepted',
-        };
-        try {
-          execSync(`node "${hookScript}"`, { input: JSON.stringify(payload), encoding: 'utf-8' });
-        } catch (e) {
-          console.warn('hook forward failed for', t.task_id, e.message);
+    if (FORWARD_LEGACY) {
+      // Optional compatibility path for older workflows.
+      try {
+        const { execSync } = await import('child_process');
+        const hookScript = path.join(ROOT, 'scripts', 'opencode', 'gemma4-retrieval-hook.mjs');
+        const MAX_HOOKS = 20;
+        const toSend = normalizedTasks.slice(0, MAX_HOOKS);
+        for (const t of toSend) {
+          const payload = {
+            query: t.title || 'materialize task',
+            selectedCardIds: [t.task_id],
+            sourceRefs: t.sourceRefs || [],
+            rerankScore: 0,
+            tool: 'materialize_recommendation_task',
+            outcome: 'task_created',
+            feedback: 'accepted',
+          };
+          try {
+            execSync(`node "${hookScript}"`, { input: JSON.stringify(payload), encoding: 'utf-8' });
+          } catch (e) {
+            console.warn('hook forward failed for', t.task_id, e.message);
+          }
         }
+        console.log(
+          `  forwarded ${Math.min(toSend.length, MAX_HOOKS)} tasks to gemma4 retrieval hook (legacy)`
+        );
+      } catch (e) {
+        console.warn('Failed to forward tasks to gemma4 hook:', e.message);
       }
-      console.log(
-        `  forwarded ${Math.min(toSend.length, MAX_HOOKS)} tasks to gemma4 retrieval hook (legacy)`
-      );
-    } catch (e) {
-      console.warn('Failed to forward tasks to gemma4 hook:', e.message);
+    } else {
+      console.log('  legacy gemma4 hook forwarding skipped (use --forward-legacy to enable)');
     }
   } else {
     console.log(`\n  dry-run: would write ${normalizedTasks.length} tasks`);

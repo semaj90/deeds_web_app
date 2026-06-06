@@ -1088,12 +1088,19 @@
     "scripts/error-resolution/tests/validation-service.test.ts",
     "scripts/error-resolution/tests/validation-service.test.ts"
   ],
+  "scripts/atlas/connection-config.mjs": [
+    "scripts/tests/atlas-connection-config.test.mjs",
+    "scripts/tests/atlas-connection-config.test.mjs"
+  ],
   "sveltekit-frontend/scripts/backup-consolidation/comparison.mjs": [
     "sveltekit-frontend/scripts/backup-consolidation/tests/comparison-engine.test.mjs"
   ],
   "sveltekit-frontend/scripts/backup-consolidation/config.mjs": [
     "sveltekit-frontend/scripts/backup-consolidation/tests/comparison-engine.test.mjs",
     "sveltekit-frontend/scripts/backup-consolidation/tests/pattern-matching.test.mjs"
+  ],
+  "sveltekit-frontend/src/lib/server/features/ai/ace/telemetry-source-ref-fallback.ts": [
+    "sveltekit-frontend/scripts/tests/telemetry-source-ref-fallback.test.mjs"
   ],
   "sveltekit-frontend/src/lib/server/ace/hot-cluster-reader.ts": [
     "sveltekit-frontend/src/lib/server/ace/hot-cluster-reader.spec.ts",

@@ -184,5 +184,7 @@ export * from './schema/atlas-cards.js';
 export * from './schema/synthesis-logs.js';
 
 export * from './schema/atlas-dict.js';
+export * from './schema/parent-atlas-jobs.js';
+export * from './schema/parent-atlas-documents.js';
+export * from './schema/atlas-feature-map-synthesized.js';
 export * from './schema/route_runtime_packets.js';
-

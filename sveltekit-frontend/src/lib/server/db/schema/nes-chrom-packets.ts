@@ -1,6 +1,18 @@
-import { index, integer, jsonb, pgTable, real, text, timestamp, uuid, vector } from 'drizzle-orm/pg-core';
+import { customType, index, integer, jsonb, pgTable, real, smallint, text, timestamp, uniqueIndex, uuid, vector } from 'drizzle-orm/pg-core';
 import { sql } from 'drizzle-orm';
 import { kagDagRuns } from './kag-dag.js';
+
+const bytea = customType<{ data: Buffer; driverData: Buffer }>({
+  dataType() {
+    return 'bytea';
+  },
+  fromDriver(value) {
+    return value as Buffer;
+  },
+  toDriver(value) {
+    return value;
+  },
+});
 
 /**
  * NES chrom packets
@@ -15,7 +27,7 @@ import { kagDagRuns } from './kag-dag.js';
  */
 export const nesChromPackets = pgTable('nes_chrom_packets', {
   id: uuid('id').primaryKey().defaultRandom(),
-  packetKey: text('packet_key').notNull().unique(),
+  packetKey: text('packet_key').notNull(),
   queryHash: text('query_hash').notNull(),
   chunkId: text('chunk_id').notNull(),
   sourceRef: text('source_ref').notNull(),
@@ -34,11 +46,17 @@ export const nesChromPackets = pgTable('nes_chrom_packets', {
   featureIds: text('feature_ids').array(),
   somCluster: text('som_cluster'),
   laneIds: text('lane_ids').array(),
+  sourceRefId: integer('source_ref_id'),
+  featureCode: integer('feature_code'),
+  somCode: smallint('som_code'),
+  confidenceScore: smallint('confidence_score'),
+  packetZstd: bytea('packet_zstd'),
   createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),
   updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow(),
 }, (table) => ({
   queryHashIdx: index('nes_chrom_packets_query_hash_idx').on(table.queryHash),
   chunkIdx: index('nes_chrom_packets_chunk_id_idx').on(table.chunkId),
+  packetKeyUq: uniqueIndex('nes_chrom_packets_packet_key_key').on(table.packetKey),
   sourceRefIdx: index('nes_chrom_packets_source_ref_idx').on(table.sourceRef),
   featureIdx: index('nes_chrom_packets_feature_id_idx').on(table.featureId),
   qdrantIdx: index('nes_chrom_packets_qdrant_point_idx').on(table.qdrantPointId),
@@ -49,6 +67,9 @@ export const nesChromPackets = pgTable('nes_chrom_packets', {
   featureIdsGin: index('idx_nes_chrom_packets_feature_ids_gin').using('gin', table.featureIds),
   somClusterIdx: index('idx_nes_chrom_packets_som_cluster').on(table.somCluster),
   laneIdsGin: index('idx_nes_chrom_packets_lane_ids_gin').using('gin', table.laneIds),
+  sourceRefIdIdx: index('nes_chrom_packets_source_ref_id_idx').on(table.sourceRefId),
+  featureCodeIdx: index('nes_chrom_packets_feature_code_idx').on(table.featureCode),
+  somCodeIdx: index('nes_chrom_packets_som_code_idx').on(table.somCode),
 }));
 
 /**

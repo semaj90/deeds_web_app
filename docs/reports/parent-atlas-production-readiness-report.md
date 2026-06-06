@@ -1,6 +1,6 @@
 # Parent Atlas Production Readiness Audit
 
-Generated: 2026-06-05T17:23:24.227Z
+Generated: 2026-06-06T06:22:10.140Z
 
 ## Summary
 
@@ -16,7 +16,7 @@ Generated: 2026-06-05T17:23:24.227Z
 - Route runtime packets: 33
 - Qdrant points: 76261
 - Neo4j CodebaseFile nodes: 25269
-- Redis LOD0 latest packet coverage: 28/33
+- Redis LOD0 latest packet coverage: 1/33
 - Native JSON parser: native addon path present; fallback present
 - NDJSON files discovered with rg -uuu: 128
 - Phase 101 batch summaries: 35 succeeded / 0 failed
@@ -93,11 +93,11 @@ Generated: 2026-06-05T17:23:24.227Z
 - PASS [postgres] table:codebase_chunk_index: codebase_chunk_index exists with 40754 rows
 - PASS [postgres] table:agent_pickup_queue: agent_pickup_queue exists with 123 rows
 - PASS [postgres] parent_atlas_documents:sourceRef: Parent Atlas sourceRefs: 3799/3799
-- PASS [postgres] parent_atlas_documents:summaries: Parent Atlas summaries: 3799/3799
+- PASS [postgres] parent_atlas_documents:summaries: Parent Atlas summaries: 3794/3799
 - PASS [postgres] active-production:topology: Active production qdrant-without-SOM rows: 0
 - PASS [postgres] nes-chrom:sourceRef-parent-join: NES/CHROM packets matching Parent Atlas: 22/27
 - PASS [postgres] route-runtime:sourceRefs: Runtime packets with sourceRefs: 30/33
-- PASS [redis] lod0:route-runtime: Redis LOD0 runtime packets: 28/33
+- PASS [redis] lod0:route-runtime: Redis LOD0 runtime packets: 1/33
 - PASS [qdrant] collection:codebase_chunks_768: Qdrant codebase_chunks_768 points: 76261
 - PASS [neo4j] contextual-tree: Neo4j CodebaseFile=25269, ParentAtlasFeature=1701
 

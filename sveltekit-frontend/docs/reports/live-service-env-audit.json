@@ -1,0 +1,60 @@
+{
+  "generatedAt": "2026-06-05T21:34:21.017Z",
+  "env": {
+    "DATABASE_URL": "yes",
+    "POSTGRES_HOST": "no",
+    "POSTGRES_PORT": "no",
+    "QDRANT_URL": "yes",
+    "NEO4J_URI": "yes",
+    "REDIS_URL": "yes"
+  },
+  "services": {
+    "postgres": {
+      "envPresent": true,
+      "rawUrl": "postgresql://legal_admin:123456@127.0.0.1:5434/legal_ai_db",
+      "normalizedHost": "127.0.0.1",
+      "normalizedPort": 5434,
+      "expectedHost": "127.0.0.1",
+      "expectedPort": 5434,
+      "tcpReachable": true,
+      "recommendation": "READY",
+      "note": "TCP connect succeeded"
+    },
+    "qdrant": {
+      "envPresent": true,
+      "rawUrl": "http://127.0.0.1:6333",
+      "normalizedHost": "127.0.0.1",
+      "normalizedPort": 6333,
+      "expectedHost": "127.0.0.1",
+      "expectedPort": 6333,
+      "tcpReachable": true,
+      "httpReachable": true,
+      "httpStatus": 200,
+      "recommendation": "READY",
+      "note": "HTTP 200"
+    },
+    "neo4j": {
+      "envPresent": true,
+      "rawUrl": "bolt://127.0.0.1:7687",
+      "normalizedHost": "127.0.0.1",
+      "normalizedPort": 7687,
+      "expectedHost": "127.0.0.1",
+      "expectedPort": 7687,
+      "tcpReachable": true,
+      "driverReachable": true,
+      "recommendation": "READY",
+      "note": "driver verifyConnectivity succeeded"
+    },
+    "redis": {
+      "envPresent": true,
+      "rawUrl": "redis://127.0.0.1:6379",
+      "normalizedHost": "127.0.0.1",
+      "normalizedPort": 6379,
+      "expectedHost": "127.0.0.1",
+      "expectedPort": 6379,
+      "tcpReachable": true,
+      "recommendation": "READY",
+      "note": "TCP connect succeeded"
+    }
+  }
+}

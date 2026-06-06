@@ -37,6 +37,20 @@ const SOURCE_REF_ALIASES = new Set(['source_ref', 'sourceRef', 'sourceRefs', 'fi
 const FEATURE_ID_ALIASES = new Set(['feature_id', 'featureId', 'feature_ids', 'featureIds', 'feature', 'feature_label', 'featureLabel']);
 const QDRANT_POINT_ALIASES = new Set(['qdrant_point_id', 'qdrantPointId', 'point_id', 'pointId', 'id']);
 const GRAPH_NODE_ALIASES = new Set(['neo4j_node', 'neo4jNode', 'node_id', 'nodeId', 'graph_node', 'graphNode', 'filePath', 'sourceRef']);
+const CANONICAL_ALIAS_GROUPS = {
+  source_ref: SOURCE_REF_ALIASES,
+  feature_id: FEATURE_ID_ALIASES,
+  qdrant_point_id: QDRANT_POINT_ALIASES,
+  graph_node: GRAPH_NODE_ALIASES,
+};
+const REQUIRE_READY_CANONICALS = {
+  postgres: ['source_ref', 'feature_id'],
+  neo4j: ['graph_node'],
+  qdrant: ['source_ref', 'feature_id', 'qdrant_point_id'],
+  duckdb: ['source_ref', 'feature_id'],
+  couchdb: ['source_ref'],
+  packets: ['source_ref', 'feature_id'],
+};
 const EXPECTED_QDRANT_PAYLOAD_KEYS = ['source_ref', 'file_path', 'feature_id', 'qdrant_point_id', 'som_cluster'];
 const EXPECTED_DUCKDB_COLUMNS = ['source_ref', 'feature_id', 'sourceRef', 'featureId'];
 const EXPECTED_NEO4J_PROPERTIES = ['filePath', 'sourceRef', 'feature_id', 'featureId', 'file_path', 'source_ref'];
@@ -117,31 +131,37 @@ function collectFieldNames(node, fieldNames, prefix = '', depth = 0, maxDepth = 
   }
 }
 
+function aliasCandidates(fieldName) {
+  const value = String(fieldName ?? '');
+  if (!value) return [];
+  const candidates = new Set([value]);
+  const strippedPrefix = value.replace(/^(payload|properties|property|node|data)\./i, '');
+  candidates.add(strippedPrefix);
+  candidates.add(strippedPrefix.split('.').pop() ?? strippedPrefix);
+  candidates.add(value.split('.').pop() ?? value);
+  return [...candidates].filter(Boolean);
+}
+
+function fieldMatchesAlias(fieldName, alias) {
+  return aliasCandidates(fieldName).includes(alias);
+}
+
 function compareAliases(actualFieldNames, expectedAliases) {
   const actual = [...new Set(actualFieldNames)].sort();
   const expected = [...new Set(expectedAliases)].sort();
-  const actualSet = new Set(actual);
   return {
     actualFieldNames: actual,
     expectedAliases: expected,
-    expectedAliasesPresent: expected.filter((alias) => actualSet.has(alias)),
-    expectedAliasesMissing: expected.filter((alias) => !actualSet.has(alias)),
+    expectedAliasesPresent: expected.filter((alias) => actual.some((fieldName) => fieldMatchesAlias(fieldName, alias))),
+    expectedAliasesMissing: expected.filter((alias) => !actual.some((fieldName) => fieldMatchesAlias(fieldName, alias))),
   };
-}
-
-function canonicalizeFieldName(fieldName) {
-  if (SOURCE_REF_ALIASES.has(fieldName)) return 'source_ref';
-  if (FEATURE_ID_ALIASES.has(fieldName)) return 'feature_id';
-  if (QDRANT_POINT_ALIASES.has(fieldName)) return 'qdrant_point_id';
-  if (GRAPH_NODE_ALIASES.has(fieldName)) return 'graph_node';
-  return null;
 }
 
 function deriveCanonicalJoins(actualFieldNames) {
   const canonicalSet = new Set();
-  for (const fieldName of actualFieldNames) {
-    const canonical = canonicalizeFieldName(fieldName);
-    if (canonical) canonicalSet.add(canonical);
+  for (const [canonical, aliases] of Object.entries(CANONICAL_ALIAS_GROUPS)) {
+    const matched = actualFieldNames.some((fieldName) => aliasCandidates(fieldName).some((candidate) => aliases.has(candidate)));
+    if (matched) canonicalSet.add(canonical);
   }
   return canonicalSet;
 }
@@ -160,6 +180,11 @@ function normalizeAliasCoverage(actualFieldNames, expectedAliases) {
     expectedAliasesMissing: aliasCoverage.expectedAliasesMissing,
     canonicalJoins: deriveCanonicalJoins(aliasCoverage.actualFieldNames),
   };
+}
+
+function aliasReady(actualFieldNames, requiredCanonicals) {
+  const canonicalSet = deriveCanonicalJoins(actualFieldNames);
+  return requiredCanonicals.every((canonical) => canonicalSet.has(canonical));
 }
 
 function recursiveFiles(root, predicate, limit = 200) {
@@ -191,6 +216,24 @@ function recursiveFiles(root, predicate, limit = 200) {
 
 function uniqueStrings(values) {
   return [...new Set(values.filter(Boolean))];
+}
+
+function summarizeAliasFamilies(fields = []) {
+  const fieldSet = new Set(fields.filter(Boolean).map(String));
+
+  const families = {
+    source_ref: ['source_ref', 'sourceRef', 'sourceRefs', 'file_path', 'filePath', 'relative_path', 'relPath', 'path'],
+    feature_id: ['feature_id', 'featureId', 'feature_ids', 'featureIds', 'feature', 'feature_label', 'featureLabel'],
+    qdrant_point_id: ['qdrant_point_id', 'qdrantPointId', 'point_id', 'pointId', 'id'],
+    neo4j_node: ['neo4j_node', 'neo4jNode', 'node_id', 'nodeId', 'graph_node', 'graphNode', 'filePath', 'sourceRef'],
+  };
+
+  return Object.fromEntries(
+    Object.entries(families).map(([family, aliases]) => [
+      family,
+      aliases.filter((alias) => fieldSet.has(alias)),
+    ]),
+  );
 }
 
 function findDuckDbFiles() {
@@ -289,10 +332,8 @@ async function inspectPostgres(e, report) {
         atlas_feature_synthesis: ['source_ref', 'feature_id', 'primary_cluster_id', 'avg_confidence'],
       }[tableName] ?? [];
       const aliasCoverage = normalizeAliasCoverage(columns, expectedAliases);
-      const hasSourceRef = aliasCoverage.canonicalJoins.has('source_ref');
-      const hasFeatureId = aliasCoverage.canonicalJoins.has('feature_id');
-      const ready = rowCount > 0 && (hasSourceRef || hasFeatureId || aliasCoverage.expectedAliasesMissing.length === 0);
-      const fieldNameMismatch = rowCount > 0 && !ready && aliasCoverage.expectedAliasesPresent.length > 0;
+      const ready = rowCount > 0 && deriveReadyFromAliases(columns, REQUIRE_READY_CANONICALS.postgres);
+      const fieldNameMismatch = rowCount > 0 && !ready;
       const dataAbsent = exists && rowCount === 0;
       const status = dataAbsent ? 'DATA_ABSENT' : ready ? 'READY' : fieldNameMismatch ? 'FIELD_NAME_MISMATCH' : 'SOURCE_UNAVAILABLE';
       tableStatuses.push({
@@ -312,19 +353,21 @@ async function inspectPostgres(e, report) {
 
     const allReady = tableStatuses.every((entry) => entry.status === 'READY');
     const anyMismatch = tableStatuses.some((entry) => entry.status === 'FIELD_NAME_MISMATCH');
-    const anyMissing = tableStatuses.some((entry) => entry.status === 'MATERIALIZATION_MISSING');
     const anyAbsent = tableStatuses.some((entry) => entry.status === 'DATA_ABSENT');
+    const anyUnavailable = tableStatuses.some((entry) => entry.status === 'SOURCE_UNAVAILABLE');
+    const anyMissing = tableStatuses.some((entry) => entry.status === 'MATERIALIZATION_MISSING');
 
     return finalizeLane(lane, {
       evidence: summary,
       ready: allReady,
       fieldNameMismatch: anyMismatch,
-      materializationMissing: anyMissing,
       dataAbsent: anyAbsent,
+      sourceUnavailable: anyUnavailable,
+      materializationMissing: anyMissing,
       actualFieldNames: uniqueStrings(tableStatuses.flatMap((entry) => entry.actualFieldNames ?? [])),
       expectedAliasesPresent: uniqueStrings(tableStatuses.flatMap((entry) => entry.expectedAliasesPresent ?? [])),
       expectedAliasesMissing: uniqueStrings(tableStatuses.flatMap((entry) => entry.expectedAliasesMissing ?? [])),
-      preferredStatus: allReady ? 'READY' : anyMissing ? 'MATERIALIZATION_MISSING' : anyMismatch ? 'FIELD_NAME_MISMATCH' : 'DATA_ABSENT',
+      preferredStatus: allReady ? 'READY' : anyUnavailable ? 'SOURCE_UNAVAILABLE' : anyMissing ? 'MATERIALIZATION_MISSING' : anyMismatch ? 'FIELD_NAME_MISMATCH' : 'DATA_ABSENT',
     });
   } catch (error) {
     return finalizeLane(lane, {
@@ -402,9 +445,8 @@ async function inspectNeo4j(e, report) {
       }));
 
       const aliasCoverage = normalizeAliasCoverage(actualFieldNames, EXPECTED_NEO4J_PROPERTIES);
-      const hasGraphNode = aliasCoverage.canonicalJoins.has('graph_node');
-      const ready = nodes.length > 0 && hasGraphNode;
-      const fieldNameMismatch = nodes.length > 0 && !ready && aliasCoverage.expectedAliasesPresent.length > 0;
+      const ready = nodes.length > 0 && deriveReadyFromAliases([...actualFieldNames], REQUIRE_READY_CANONICALS.neo4j);
+      const fieldNameMismatch = nodes.length > 0 && !ready;
       return finalizeLane(lane, {
         evidence: relationTypes.map((entry) => `${entry.relationType}:${entry.count}`),
         actualFieldNames: aliasCoverage.actualFieldNames,
@@ -444,7 +486,7 @@ async function inspectQdrant(e, report) {
   try {
     const collectionRes = await fetchJson(`${base}/collections/${QDRANT_COLLECTION}`, {}, 5000);
     if (!collectionRes.response?.ok) {
-      return finalizeLane(lane, { materializationMissing: true, evidence: [`collection missing or unreachable (${collectionRes.response?.status ?? 'no response'})`] });
+      return finalizeLane(lane, { sourceUnavailable: true, evidence: [`collection missing or unreachable (${collectionRes.response?.status ?? 'no response'})`] });
     }
     const scrollRes = await fetchJson(
       `${base}/collections/${QDRANT_COLLECTION}/points/scroll`,
@@ -477,9 +519,8 @@ async function inspectQdrant(e, report) {
       }
     }
     const aliasCoverage = normalizeAliasCoverage(actualFieldNames, EXPECTED_QDRANT_PAYLOAD_KEYS.map((key) => `payload.${key}`).concat(EXPECTED_QDRANT_PAYLOAD_KEYS));
-    const hasPointId = aliasCoverage.canonicalJoins.has('qdrant_point_id');
-    const ready = points.length > 0 && hasPointId;
-    const fieldNameMismatch = points.length > 0 && !ready && aliasCoverage.expectedAliasesPresent.length > 0;
+    const ready = points.length > 0 && deriveReadyFromAliases(actualFieldNames, REQUIRE_READY_CANONICALS.qdrant);
+    const fieldNameMismatch = points.length > 0 && !ready;
     return finalizeLane(lane, {
       evidence: [`points=${points.length}`, `payloadKeys=${[...samplePayloadKeys].slice(0, 12).join(', ') || 'none'}`],
       actualFieldNames: aliasCoverage.actualFieldNames,
@@ -521,9 +562,13 @@ function inspectDuckDbFile(filePath) {
   const columnRows = duckdbQuery(filePath, `SELECT table_name, column_name FROM information_schema.columns WHERE table_schema NOT IN ('information_schema', 'pg_catalog') ORDER BY table_name, ordinal_position`);
   const columns = columnRows.error ? [] : columnRows.rows ?? [];
   const actualFieldNames = [...new Set(columns.map((row) => row.column_name))].sort();
-  const aliasCoverage = summarizeAliasFamilies(actualFieldNames, EXPECTED_DUCKDB_COLUMNS);
-  const ready = aliasCoverage.expectedAliasesPresent.length > 0;
-  const fieldNameMismatch = aliasCoverage.expectedAliasesMissing.length > 0 && ready;
+  const aliasCoverage = normalizeAliasCoverage(actualFieldNames, EXPECTED_DUCKDB_COLUMNS);
+  const aliasFamilies = summarizeAliasFamilies(actualFieldNames);
+  const canonicalJoins = deriveCanonicalJoins(actualFieldNames);
+  const sourceRefDerived = canonicalJoins.has('source_ref');
+  const featureIdDerived = canonicalJoins.has('feature_id');
+  const ready = columns.length > 0 && (sourceRefDerived || featureIdDerived);
+  const fieldNameMismatch = columns.length > 0 && !sourceRefDerived && !featureIdDerived;
   return {
     filePath,
     status: ready ? 'READY' : fieldNameMismatch ? 'FIELD_NAME_MISMATCH' : 'DATA_ABSENT',
@@ -532,6 +577,8 @@ function inspectDuckDbFile(filePath) {
     views: viewNames,
     columns,
     actualFieldNames,
+    aliasFamilies,
+    canonicalJoins: [...canonicalJoins],
     expectedAliasesMissing: aliasCoverage.expectedAliasesMissing,
     expectedAliasesPresent: aliasCoverage.expectedAliasesPresent,
   };
@@ -541,7 +588,7 @@ function inspectDuckDb(report) {
   const lane = createLane('duckdb', 'Offline analytical joins / rollups');
   const files = listDuckDbInventory();
   if (files.length === 0) {
-    return finalizeLane(lane, { dataAbsent: true, evidence: ['no .duckdb files discovered'] });
+    return finalizeLane(lane, { sourceUnavailable: true, evidence: ['no .duckdb files discovered'] });
   }
   const samples = files.slice(0, 5).map((entry) => inspectDuckDbFile(entry.filePath));
   const ready = samples.some((sample) => sample.status === 'READY');
@@ -639,16 +686,14 @@ function buildSummary(lanes, packetSurfaceDetails, duckdbInventory) {
   const counts = statuses.reduce((acc, status) => {
     acc[status] = (acc[status] ?? 0) + 1;
     return acc;
-  }, { READY: 0, FIELD_NAME_MISMATCH: 0, MATERIALIZATION_MISSING: 0, SOURCE_UNAVAILABLE: 0, DATA_ABSENT: 0 });
+  }, { READY: 0, FIELD_NAME_MISMATCH: 0, SOURCE_UNAVAILABLE: 0, DATA_ABSENT: 0 });
   const overall = counts.SOURCE_UNAVAILABLE > 0
     ? 'SOURCE_UNAVAILABLE'
-    : counts.MATERIALIZATION_MISSING > 0
-      ? 'MATERIALIZATION_MISSING'
-      : counts.FIELD_NAME_MISMATCH > 0
-        ? 'FIELD_NAME_MISMATCH'
-        : counts.DATA_ABSENT > 0
-          ? 'DATA_ABSENT'
-          : 'READY';
+    : counts.FIELD_NAME_MISMATCH > 0
+      ? 'FIELD_NAME_MISMATCH'
+      : counts.DATA_ABSENT > 0
+        ? 'DATA_ABSENT'
+        : 'READY';
   return {
     counts,
     overall,
@@ -669,7 +714,6 @@ function renderMarkdown(report) {
     `- overall: ${report.summary.overall}`,
     `- READY: ${report.summary.counts.READY}`,
     `- FIELD_NAME_MISMATCH: ${report.summary.counts.FIELD_NAME_MISMATCH}`,
-    `- MATERIALIZATION_MISSING: ${report.summary.counts.MATERIALIZATION_MISSING}`,
     `- SOURCE_UNAVAILABLE: ${report.summary.counts.SOURCE_UNAVAILABLE}`,
     `- DATA_ABSENT: ${report.summary.counts.DATA_ABSENT}`,
     '',
@@ -729,7 +773,7 @@ async function main() {
     duckdbInventory: [],
     summary: {
       overall: 'SOURCE_UNAVAILABLE',
-      counts: { READY: 0, FIELD_NAME_MISMATCH: 0, MATERIALIZATION_MISSING: 0, SOURCE_UNAVAILABLE: 0, DATA_ABSENT: 0 },
+      counts: { READY: 0, FIELD_NAME_MISMATCH: 0, SOURCE_UNAVAILABLE: 0, DATA_ABSENT: 0 },
       lanes: {},
       packetSurfaceDetails: {},
       duckdbInventory: [],
@@ -746,7 +790,6 @@ async function main() {
   const duckdbLane = finalizeLane(createLane('duckdb', 'Offline analytical joins / rollups'), {
     ready: duckdbInventory.some((entry) => entry.status === 'READY'),
     fieldNameMismatch: duckdbInventory.some((entry) => entry.status === 'FIELD_NAME_MISMATCH'),
-    materializationMissing: duckdbInventory.some((entry) => entry.status === 'MATERIALIZATION_MISSING'),
     dataAbsent: duckdbInventory.every((entry) => entry.status === 'DATA_ABSENT'),
     sourceUnavailable: duckdbInventory.every((entry) => entry.status === 'SOURCE_UNAVAILABLE'),
     evidence: duckdbInventory.slice(0, 5).flatMap((entry) => entry.evidence ?? []),
@@ -784,7 +827,7 @@ async function main() {
   console.log(`Wrote ${REPORT_JSON}`);
   console.log(`Wrote ${REPORT_MD}`);
   console.log(`Overall: ${report.summary.overall}`);
-  console.log(`READY ${report.summary.counts.READY} / FIELD_NAME_MISMATCH ${report.summary.counts.FIELD_NAME_MISMATCH} / MATERIALIZATION_MISSING ${report.summary.counts.MATERIALIZATION_MISSING} / SOURCE_UNAVAILABLE ${report.summary.counts.SOURCE_UNAVAILABLE} / DATA_ABSENT ${report.summary.counts.DATA_ABSENT}`);
+  console.log(`READY ${report.summary.counts.READY} / FIELD_NAME_MISMATCH ${report.summary.counts.FIELD_NAME_MISMATCH} / SOURCE_UNAVAILABLE ${report.summary.counts.SOURCE_UNAVAILABLE} / DATA_ABSENT ${report.summary.counts.DATA_ABSENT}`);
 }
 
 main().catch((error) => {

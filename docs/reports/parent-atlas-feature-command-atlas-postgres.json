@@ -1,25 +1,24 @@
 {
-  "generatedAt": "2026-06-01T20:57:07.169Z",
+  "generatedAt": "2026-06-06T07:45:13.261Z",
   "inputs": {
     "manifestPath": "C:\\Users\\james\\Videos\\deeds-web-app\\docs\\reports\\parent-atlas-feature-command-atlas.json",
     "postgresTable": "parent_atlas_vectors"
   },
   "summary": {
     "lanesMirrored": 6,
-    "recordsWritten": 6,
-    "postgresRowsWritten": 6,
+    "recordsWritten": 0,
+    "postgresRowsWritten": 0,
     "embeddingMode": "ollama-or-fallback",
     "embeddingColumn": "embedding_768",
-    "applied": true
+    "applied": false
   },
   "postgres": {
-    "attempted": true,
-    "applied": true,
+    "attempted": false,
+    "applied": false,
     "rows": 6,
-    "recordsWritten": 6,
-    "verifiedRows": 6,
-    "table": "parent_atlas_vectors",
-    "embeddingColumn": "embedding_768"
+    "recordsWritten": 0,
+    "verifiedRows": 0,
+    "table": "parent_atlas_vectors"
   },
   "lanes": [
     {
@@ -27,48 +26,48 @@
       "recordId": "parent_atlas:sourceRef_spine",
       "sourceRef": "local:docs/operator/atlas-production-roadmap.md#L10",
       "featureId": "phase_4_admin_copilot_ui_integration",
-      "recordStatus": "written",
-      "vectorStatus": "written"
+      "recordStatus": "prepared",
+      "vectorStatus": "prepared"
     },
     {
       "laneId": "durable_truth",
       "recordId": "parent_atlas:durable_truth",
       "sourceRef": "local:docs/archive/sessions/SESSION_SUMMARY_APRIL_9_2026.md#L238",
       "featureId": "2_gpu_audit_storage_postgresql_jsonb_chosen",
-      "recordStatus": "written",
-      "vectorStatus": "written"
+      "recordStatus": "prepared",
+      "vectorStatus": "prepared"
     },
     {
       "laneId": "retrieval_memory",
       "recordId": "parent_atlas:retrieval_memory",
       "sourceRef": "local:docs/reports/turbovec-evaluation-plan.md#L8",
       "featureId": "the_4_layer_retrieval_stack",
-      "recordStatus": "written",
-      "vectorStatus": "written"
+      "recordStatus": "prepared",
+      "vectorStatus": "prepared"
     },
     {
       "laneId": "graph_topology",
       "recordId": "parent_atlas:graph_topology",
       "sourceRef": "local:docs/CODEBASE_INDEXING_PIPELINE.md#L79",
       "featureId": "from_sveltekit_frontend",
-      "recordStatus": "written",
-      "vectorStatus": "written"
+      "recordStatus": "prepared",
+      "vectorStatus": "prepared"
     },
     {
       "laneId": "compute_ranking",
       "recordId": "parent_atlas:compute_ranking",
       "sourceRef": "local:docs/reports/audit-summary-report.md#L151",
       "featureId": "integration_features_to_look_for",
-      "recordStatus": "written",
-      "vectorStatus": "written"
+      "recordStatus": "prepared",
+      "vectorStatus": "prepared"
     },
     {
       "laneId": "orchestration_future",
       "recordId": "parent_atlas:orchestration_future",
       "sourceRef": "local:docs/reports/audit-summary-report.md#L29",
       "featureId": "expanded_architecture_opencode_ace_graphrag",
-      "recordStatus": "written",
-      "vectorStatus": "written"
+      "recordStatus": "prepared",
+      "vectorStatus": "prepared"
     }
   ]
 }

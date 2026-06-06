@@ -1,7 +1,7 @@
 # Codebase Index Loop TODO
 
 ## Goal
-Finish the canonical graphRAG indexing loop once, then reuse it everywhere: graph ingest, Redis centroids, SOM autoencoding, LLMS.md atlas refresh, and Karpathy GPU ranking.
+Finish the canonical graphRAG indexing loop once, then reuse it everywhere: graph ingest, Redis centroids, SOM autoencoding, LLMS.md atlas refresh, Karpathy GPU ranking, and golden retrieval packet replay.
 
 ## Current Artifacts
 - Graph: `docs/graph/codebase-graph.json` (32,044 files, 1,401 dirs, 0 clusters)
@@ -28,6 +28,7 @@ Finish the canonical graphRAG indexing loop once, then reuse it everywhere: grap
 6. `npm run ae:backfill` pushes the new embeddings back into Qdrant.
 7. `npm run llms:write && npm run llms:index` refreshes the LLMS.md atlas.
 8. `npm run karpathy:gpu:insights` rebuilds Karpathy scores on top of the atlas.
+9. `npm run smoke:golden-retrieval` verifies the packet writer/reader/updater path; the remaining soft yellow is `feature_ids` coverage on older Qdrant payloads.
 
 ## No Duplicate Paths
 `graphify:daily` is the shared ingest entrypoint.
@@ -35,6 +36,7 @@ Finish the canonical graphRAG indexing loop once, then reuse it everywhere: grap
 `HypergraphRoutingService` now merges the hot set into the routed cluster ids so retrieval sees the same hot-cluster lane as ACE warmup.
 `search:sync:pg` now mirrors Qdrant content vectors into `code_retrieval_chunks` and the Postgres hybrid smoke checks the FTS/vector lane.
 `create:todo` is the single TODO generator; `skill:codebase-todo:*` aliases to it.
+Golden retrieval is the read-only replay gate for packet writer/reader/updater coverage. Keep the `feature_ids` backfill lane visible until older Qdrant payloads carry that field.
 
 ## Next Step
 Run the canonical loop, then regenerate this TODO so the task list stays aligned with the latest atlas.
@@ -46,6 +48,12 @@ After the canonical loop is current, run a codebase mapping pass against the act
 - missing persistence
 - indexing/storage gaps
 - leak and optimization candidates
+
+## Engram Sidecar Gap Map
+- Durable address registry is still missing as a single contract. Track the explicit ownership fields (`memory_id`, `source_id`, `chunk_id`, `summary_id`, `cluster_id`, `packet_id`, `embedding_id`) in one registry before widening the sidecar.
+- Semantic cache policy is still fragmented across Redis exact-match, semantic cache, Bifrost, Qdrant, and ACE packet caches. Keep the exact-cache key contract, semantic-cache compatibility contract, packet-version contract, and invalidation rule visible in the backlog.
+- Deque semantics should stay bounded to recent-session memory only; queue semantics should remain for ingestion/backfill/embedding/rebuild jobs. Do not blur those roles in the next registry pass.
+- The existing `engram-memory.ts` and `local-engram-memory-adapter.ts` are the current seed, not the durable registry boundary.
 
 ## Audit Checkpoint
 - Chunk 2 dependency smoke is passing for `smoke:fast-ast` and `graphify:deep:smoke`.
@@ -60,6 +68,9 @@ After the canonical loop is current, run a codebase mapping pass against the act
 - OpenCode config already advertises 64K TurboQuant context and remote MCP endpoints for TRACE / TurboVec / Engram / LangExtract.
 - Added a read-only inference-log smoke task: `npm run smoke:inference-log` and a VS Code task `🧾 Observability: Inference Log Smoke`.
 - `npm run audit:inference-observability` passes against live native CouchDB `http://127.0.0.1:5984/` and RabbitMQ `http://127.0.0.1:15672/api/overview`; Docker containers are not required for the audit to pass.
+- Golden retrieval is green at 7/7; the only soft yellow left is `feature_ids` in older Qdrant payloads, which stays on the `atlas:qdrant:feature-ids:derive` lane.
+- `npm run atlas:qdrant:source-refs:backfill:dry` is read-only and reports 3,253 attempted / 0 updated / 3,253 skipped, so the remaining work is payload backfill coverage rather than a missing replay gate.
+- The feature-id derivation lane is effectively closed after the bounded patch check; the remaining payload gap is now `somRow/somCol` coverage on older points. Keep SOM materialization separate from golden retrieval replay claims.
 
 ## Feature Map Update
 - Added `gpu-compute-plane` to `src/lib/server/atlas/master-feature-map.ts`.

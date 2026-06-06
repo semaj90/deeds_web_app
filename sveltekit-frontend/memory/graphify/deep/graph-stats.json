@@ -1,29 +1,29 @@
 {
-  "generatedAt": "2026-06-05T02:04:02.638Z",
-  "nodeCount": 55000,
-  "edgeCount": 84487,
-  "resolvedEdges": 9384,
+  "generatedAt": "2026-06-06T05:58:39.499Z",
+  "nodeCount": 55076,
+  "edgeCount": 84679,
+  "resolvedEdges": 9416,
   "unresolvedEdges": 8528,
-  "externalEdges": 64872,
+  "externalEdges": 65032,
   "edgeTypeBreakdown": {
-    "imports_static": 67184,
-    "imports_dynamic": 2379,
+    "imports_static": 67346,
+    "imports_dynamic": 2384,
     "env_dependency": 1746,
-    "neo4j_dependency": 554,
-    "qdrant_dependency": 1453,
-    "redis_dependency": 3393,
+    "neo4j_dependency": 562,
+    "qdrant_dependency": 1455,
+    "redis_dependency": 3399,
     "exports_from": 1983,
     "mcp_tool_calls": 496,
     "db_dependency": 355,
-    "test_covers_file": 4941,
+    "test_covers_file": 4950,
     "svelte_route_uses_loader": 3
   },
   "zoneBreakdown": {
-    "shared": 47416,
+    "shared": 47471,
     "types": 1038,
-    "test": 1471,
+    "test": 1474,
     "config": 140,
-    "script": 4896,
+    "script": 4914,
     "client": 3,
     "server": 29,
     "route": 7
@@ -32,5 +32,5 @@
   "routeCount": 50,
   "testCount": 30,
   "neighborhoodsComputed": 100,
-  "coveredFiles": 993
+  "coveredFiles": 995
 }

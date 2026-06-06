@@ -117,6 +117,80 @@ retrieval funnel. The codebase intelligence pipeline extends that funnel with a 
 
 ---
 
+## Packet Backfill Tail — Read-Only Plan
+
+The runtime packet density audit now has a bounded repair plan rather than a vague backlog.
+
+Generated report:
+- `docs/reports/runtime-packet-backfill-plan.md`
+- `docs/reports/runtime-packet-backfill-plan.json`
+
+Current live classification from `route_runtime_packets`:
+- 33 packets analyzed
+- 1 packet requires replay
+- 3 missing `sourceRefs` recoverable from Qdrant hit / pathmap evidence
+- 3 missing `featureIds` recoverable from feature labels/pathmap evidence
+- 1 missing `qdrantHits` requires replay
+- 1 missing `redisKeys` requires replay
+- `parentAtlasDocuments` remain a join/backfill repair
+- `somCluster` is recoverable from Qdrant hit metadata
+- `glyphRecord` and `neo4jNode` remain higher-hop materialization/backfill work
+
+Repair order:
+1. replay the empty-pointer packet
+2. backfill recoverable `sourceRefs` / `featureIds`
+3. repair higher-hop materialization fields
+4. keep Parent Atlas and Graphify in the utility lane for semantic indexing and ACE quick hits
+
+Command:
+```bash
+npm run atlas:runtime-packet-backfill:plan
+```
+
+This is read-only. It does not mutate packets, Qdrant, Neo4j, Redis, or live DB state.
+
+---
+
+## Postgres Contract Mirrors — Read-Only Audit
+
+The PG18 promotion lane is now backed by a mirror audit that compares:
+- manual Drizzle SQL
+- leaf Drizzle schema files
+- `schema-postgres.ts` as a consulted contract barrel
+- live `information_schema` when Postgres is reachable
+
+Generated report:
+- `docs/reports/postgres-contract-mirrors-report.md`
+- `docs/reports/postgres-contract-mirrors-report.json`
+
+Current classification:
+- `atlas_feature_map` — `LIVE_DB_ALIGNED`
+- `route_runtime_packets` — `LIVE_DB_ALIGNED`
+- `task_semantic_packets` — `INDEX_MISMATCH`
+- `parent_atlas_jobs` — `SQL_ONLY`
+- `parent_atlas_documents` — `SQL_ONLY`
+- `atlas_feature_map_synthesized` — `SQL_ONLY`
+- `nes_chrom_packets` — `COLUMN_MISMATCH`
+- `nes_chrom_kag_dag_hits` — `COLUMN_MISMATCH`
+
+Interpretation:
+- `route_runtime_packets` is in the live DB and mirrored cleanly, so the packet runtime is not the blocker.
+- `parent_atlas_documents` and `atlas_feature_map_synthesized` exist live, but they are still file-backed only in this repo.
+- The remaining contract drift is mostly in mirror alignment (`task_semantic_packets`, `nes_chrom_packets`, `nes_chrom_kag_dag_hits`) and missing Drizzle mirrors for the two Parent Atlas promotion tables.
+- That means the boundary issue is promotion/mirroring, not the offline indexing layer itself.
+
+Notes:
+- primary-key indexes are ignored in live comparisons because they are implicit
+- this audit is read-only
+- no migrations, no schema changes, no DB writes
+
+Command:
+```bash
+npm run atlas:postgres-contract-mirrors
+```
+
+---
+
 ## Next Steps — Ordered by Impact
 
 ### Step 1 ✅ DONE — Fix the collection name (30 min, CRITICAL)

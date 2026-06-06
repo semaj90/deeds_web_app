@@ -1,0 +1,2111 @@
+{
+  "generatedAt": "2026-06-05T21:50:20.966Z",
+  "inputs": {
+    "runtimePacketDensity": "docs\\reports\\runtime-packet-density-report.json",
+    "featureLineage": "docs\\reports\\feature-lineage-report.json",
+    "hiddenPacketPathmap": "docs\\reports\\hidden-packet-pathmap-report.json",
+    "routeRuntimePackets": "route_runtime_packets (live)"
+  },
+  "liveRouteRuntimePackets": {
+    "reachable": true,
+    "rowCount": 33,
+    "error": null
+  },
+  "summary": {
+    "analyzedPackets": 33,
+    "emptyPointerPackets": 1,
+    "optimalPackets": 32,
+    "avgHydrationRatio": "88.38%",
+    "missingFieldCounts": {
+      "somCluster": 32,
+      "glyphRecord": 33,
+      "neo4jNode": 33,
+      "rankedCards": 33,
+      "parentAtlasDocuments": 23,
+      "sourceRefs": 3,
+      "featureIds": 3,
+      "qdrantHits": 1,
+      "redisKeys": 1
+    },
+    "fieldClassificationCounts": {
+      "RECOVERABLE_FROM_QDRANT_HIT": 2,
+      "RECOVERABLE_FROM_FEATURE_LABELS": 1,
+      "NEEDS_REPLAY": 3,
+      "RECOVERABLE_FROM_PARENT_ATLAS": 3
+    },
+    "packetClassificationCounts": {
+      "RECOVERABLE_FROM_PARENT_ATLAS": 32,
+      "NEEDS_REPLAY": 1
+    },
+    "packetTailNeedsReplay": 1,
+    "packetTailRecoverable": 32
+  },
+  "fieldPlans": [
+    {
+      "field": "sourceRefs",
+      "missingCount": 3,
+      "classification": "RECOVERABLE_FROM_QDRANT_HIT",
+      "samplePacketIds": [
+        "16",
+        "4",
+        "1"
+      ],
+      "evidence": {
+        "hiddenPacketCoverage": {
+          "sourceRefCoveragePct": 100,
+          "featureIdCoveragePct": 100,
+          "featureLabelCoveragePct": 100
+        },
+        "lineageCoverage": {
+          "sourceRefRows": 1000,
+          "featureIdRows": 1000,
+          "featureLabelRows": 1000,
+          "parentAtlasDocRows": null,
+          "somRows": null,
+          "glyphRows": null,
+          "qdrantRows": null,
+          "redisRows": null,
+          "neo4jRows": null
+        },
+        "runtimeMissingTally": {
+          "somCluster": 32,
+          "glyphRecord": 33,
+          "neo4jNode": 33,
+          "rankedCards": 33,
+          "parentAtlasDocuments": 23,
+          "sourceRefs": 3,
+          "featureIds": 3,
+          "qdrantHits": 1,
+          "redisKeys": 1
+        }
+      },
+      "notes": "Packet 1 is empty-pointer and still needs replay; the rest can be reconstructed from Qdrant hits and pathmap/parent-atlas joins."
+    },
+    {
+      "field": "featureIds",
+      "missingCount": 3,
+      "classification": "RECOVERABLE_FROM_FEATURE_LABELS",
+      "samplePacketIds": [
+        "16",
+        "4",
+        "1"
+      ],
+      "evidence": {
+        "hiddenPacketCoverage": {
+          "sourceRefCoveragePct": 100,
+          "featureIdCoveragePct": 100,
+          "featureLabelCoveragePct": 100
+        },
+        "lineageCoverage": {
+          "sourceRefRows": 1000,
+          "featureIdRows": 1000,
+          "featureLabelRows": 1000,
+          "parentAtlasDocRows": null,
+          "somRows": null,
+          "glyphRows": null,
+          "qdrantRows": null,
+          "redisRows": null,
+          "neo4jRows": null
+        },
+        "runtimeMissingTally": {
+          "somCluster": 32,
+          "glyphRecord": 33,
+          "neo4jNode": 33,
+          "rankedCards": 33,
+          "parentAtlasDocuments": 23,
+          "sourceRefs": 3,
+          "featureIds": 3,
+          "qdrantHits": 1,
+          "redisKeys": 1
+        }
+      },
+      "notes": "Packet 1 is empty-pointer and still needs replay; the other missing feature IDs can be derived from feature labels/pathmap."
+    },
+    {
+      "field": "qdrantHits",
+      "missingCount": 1,
+      "classification": "NEEDS_REPLAY",
+      "samplePacketIds": [
+        "1"
+      ],
+      "evidence": {
+        "hiddenPacketCoverage": {
+          "sourceRefCoveragePct": 100,
+          "featureIdCoveragePct": 100,
+          "featureLabelCoveragePct": 100
+        },
+        "lineageCoverage": {
+          "sourceRefRows": 1000,
+          "featureIdRows": 1000,
+          "featureLabelRows": 1000,
+          "parentAtlasDocRows": null,
+          "somRows": null,
+          "glyphRows": null,
+          "qdrantRows": null,
+          "redisRows": null,
+          "neo4jRows": null
+        },
+        "runtimeMissingTally": {
+          "somCluster": 32,
+          "glyphRecord": 33,
+          "neo4jNode": 33,
+          "rankedCards": 33,
+          "parentAtlasDocuments": 23,
+          "sourceRefs": 3,
+          "featureIds": 3,
+          "qdrantHits": 1,
+          "redisKeys": 1
+        }
+      },
+      "notes": "The empty-pointer packet has no source/feature anchors, so the missing Qdrant hit must be replayed."
+    },
+    {
+      "field": "redisKeys",
+      "missingCount": 1,
+      "classification": "NEEDS_REPLAY",
+      "samplePacketIds": [
+        "1"
+      ],
+      "evidence": {
+        "hiddenPacketCoverage": {
+          "sourceRefCoveragePct": 100,
+          "featureIdCoveragePct": 100,
+          "featureLabelCoveragePct": 100
+        },
+        "lineageCoverage": {
+          "sourceRefRows": 1000,
+          "featureIdRows": 1000,
+          "featureLabelRows": 1000,
+          "parentAtlasDocRows": null,
+          "somRows": null,
+          "glyphRows": null,
+          "qdrantRows": null,
+          "redisRows": null,
+          "neo4jRows": null
+        },
+        "runtimeMissingTally": {
+          "somCluster": 32,
+          "glyphRecord": 33,
+          "neo4jNode": 33,
+          "rankedCards": 33,
+          "parentAtlasDocuments": 23,
+          "sourceRefs": 3,
+          "featureIds": 3,
+          "qdrantHits": 1,
+          "redisKeys": 1
+        }
+      },
+      "notes": "The empty-pointer packet cannot reconstruct Redis hot keys without replay."
+    },
+    {
+      "field": "parentAtlasDocuments",
+      "missingCount": 23,
+      "classification": "RECOVERABLE_FROM_PARENT_ATLAS",
+      "samplePacketIds": [
+        "31",
+        "28",
+        "27",
+        "24",
+        "23",
+        "20"
+      ],
+      "evidence": {
+        "hiddenPacketCoverage": {
+          "sourceRefCoveragePct": 100,
+          "featureIdCoveragePct": 100,
+          "featureLabelCoveragePct": 100
+        },
+        "lineageCoverage": {
+          "sourceRefRows": 1000,
+          "featureIdRows": 1000,
+          "featureLabelRows": 1000,
+          "parentAtlasDocRows": null,
+          "somRows": null,
+          "glyphRows": null,
+          "qdrantRows": null,
+          "redisRows": null,
+          "neo4jRows": null
+        },
+        "runtimeMissingTally": {
+          "somCluster": 32,
+          "glyphRecord": 33,
+          "neo4jNode": 33,
+          "rankedCards": 33,
+          "parentAtlasDocuments": 23,
+          "sourceRefs": 3,
+          "featureIds": 3,
+          "qdrantHits": 1,
+          "redisKeys": 1
+        }
+      },
+      "notes": "Parent Atlas rows are present and the sourceRef/featureId spine is complete, so this is a join/backfill repair rather than ingest."
+    },
+    {
+      "field": "somCluster",
+      "missingCount": 32,
+      "classification": "RECOVERABLE_FROM_QDRANT_HIT",
+      "samplePacketIds": [
+        "33",
+        "32",
+        "31",
+        "30",
+        "29",
+        "28"
+      ],
+      "evidence": {
+        "hiddenPacketCoverage": {
+          "sourceRefCoveragePct": 100,
+          "featureIdCoveragePct": 100,
+          "featureLabelCoveragePct": 100
+        },
+        "lineageCoverage": {
+          "sourceRefRows": 1000,
+          "featureIdRows": 1000,
+          "featureLabelRows": 1000,
+          "parentAtlasDocRows": null,
+          "somRows": null,
+          "glyphRows": null,
+          "qdrantRows": null,
+          "redisRows": null,
+          "neo4jRows": null
+        },
+        "runtimeMissingTally": {
+          "somCluster": 32,
+          "glyphRecord": 33,
+          "neo4jNode": 33,
+          "rankedCards": 33,
+          "parentAtlasDocuments": 23,
+          "sourceRefs": 3,
+          "featureIds": 3,
+          "qdrantHits": 1,
+          "redisKeys": 1
+        }
+      },
+      "notes": "SOM cluster backfill should come from Qdrant hit metadata when available; only the empty-pointer packet lacks enough anchors for replay-free repair."
+    },
+    {
+      "field": "glyphRecord",
+      "missingCount": 33,
+      "classification": "RECOVERABLE_FROM_PARENT_ATLAS",
+      "samplePacketIds": [
+        "33",
+        "32",
+        "31",
+        "30",
+        "29",
+        "28"
+      ],
+      "evidence": {
+        "hiddenPacketCoverage": {
+          "sourceRefCoveragePct": 100,
+          "featureIdCoveragePct": 100,
+          "featureLabelCoveragePct": 100
+        },
+        "lineageCoverage": {
+          "sourceRefRows": 1000,
+          "featureIdRows": 1000,
+          "featureLabelRows": 1000,
+          "parentAtlasDocRows": null,
+          "somRows": null,
+          "glyphRows": null,
+          "qdrantRows": null,
+          "redisRows": null,
+          "neo4jRows": null
+        },
+        "runtimeMissingTally": {
+          "somCluster": 32,
+          "glyphRecord": 33,
+          "neo4jNode": 33,
+          "rankedCards": 33,
+          "parentAtlasDocuments": 23,
+          "sourceRefs": 3,
+          "featureIds": 3,
+          "qdrantHits": 1,
+          "redisKeys": 1
+        }
+      },
+      "notes": "Glyph records are a materialization/backfill concern, not a broad re-ingest problem."
+    },
+    {
+      "field": "neo4jNode",
+      "missingCount": 33,
+      "classification": "RECOVERABLE_FROM_PARENT_ATLAS",
+      "samplePacketIds": [
+        "33",
+        "32",
+        "31",
+        "30",
+        "29",
+        "28"
+      ],
+      "evidence": {
+        "hiddenPacketCoverage": {
+          "sourceRefCoveragePct": 100,
+          "featureIdCoveragePct": 100,
+          "featureLabelCoveragePct": 100
+        },
+        "lineageCoverage": {
+          "sourceRefRows": 1000,
+          "featureIdRows": 1000,
+          "featureLabelRows": 1000,
+          "parentAtlasDocRows": null,
+          "somRows": null,
+          "glyphRows": null,
+          "qdrantRows": null,
+          "redisRows": null,
+          "neo4jRows": null
+        },
+        "runtimeMissingTally": {
+          "somCluster": 32,
+          "glyphRecord": 33,
+          "neo4jNode": 33,
+          "rankedCards": 33,
+          "parentAtlasDocuments": 23,
+          "sourceRefs": 3,
+          "featureIds": 3,
+          "qdrantHits": 1,
+          "redisKeys": 1
+        }
+      },
+      "notes": "Neo4j nodes can be reconstructed from the sourceRef/featureId spine and graph-truth joins once the graph lane is available."
+    },
+    {
+      "field": "rankedCards",
+      "missingCount": 33,
+      "classification": "NEEDS_REPLAY",
+      "samplePacketIds": [
+        "33",
+        "32",
+        "31",
+        "30",
+        "29",
+        "28"
+      ],
+      "evidence": {
+        "hiddenPacketCoverage": {
+          "sourceRefCoveragePct": 100,
+          "featureIdCoveragePct": 100,
+          "featureLabelCoveragePct": 100
+        },
+        "lineageCoverage": {
+          "sourceRefRows": 1000,
+          "featureIdRows": 1000,
+          "featureLabelRows": 1000,
+          "parentAtlasDocRows": null,
+          "somRows": null,
+          "glyphRows": null,
+          "qdrantRows": null,
+          "redisRows": null,
+          "neo4jRows": null
+        },
+        "runtimeMissingTally": {
+          "somCluster": 32,
+          "glyphRecord": 33,
+          "neo4jNode": 33,
+          "rankedCards": 33,
+          "parentAtlasDocuments": 23,
+          "sourceRefs": 3,
+          "featureIds": 3,
+          "qdrantHits": 1,
+          "redisKeys": 1
+        }
+      },
+      "notes": "Ranked cards on the empty-pointer packet require replay."
+    }
+  ],
+  "packetPlans": [
+    {
+      "packetId": "33",
+      "densityScore": "88.01%",
+      "classification": "optimal",
+      "backfillClassification": "RECOVERABLE_FROM_PARENT_ATLAS",
+      "emptyPointers": false,
+      "counts": {
+        "sourceRefs": 2,
+        "featureIds": 2,
+        "qdrantHits": 8,
+        "redisKeys": 1,
+        "parentAtlasDocuments": 1,
+        "somCluster": 0,
+        "glyphRecord": 0,
+        "neo4jNode": 0,
+        "rankedCards": 0
+      },
+      "missingFields": [
+        "somCluster",
+        "glyphRecord",
+        "neo4jNode",
+        "rankedCards"
+      ],
+      "db": {
+        "id": "33",
+        "sourceRefs": [
+          "sveltekit-frontend/src/workers/LLMS.md",
+          "sveltekit-frontend/src/mcp-gpu-orchestrator.ts"
+        ],
+        "featureIds": [
+          "shims",
+          "sveltekit-frontend"
+        ],
+        "laneIds": [],
+        "clusterId": "",
+        "somCluster": "",
+        "qdrantHits": 8,
+        "redisHotKeys": [
+          "ace:cartridge:1:3afd5c91641b60c3"
+        ]
+      },
+      "suggestedActions": [
+        "derive SOM cluster from qdrant hit / parent atlas mapping",
+        "materialize glyph record from higher-hop atlas state",
+        "rebuild Neo4j node from sourceRef/featureId spine",
+        "replay downstream ranking stage"
+      ]
+    },
+    {
+      "packetId": "32",
+      "densityScore": "88.35%",
+      "classification": "optimal",
+      "backfillClassification": "RECOVERABLE_FROM_PARENT_ATLAS",
+      "emptyPointers": false,
+      "counts": {
+        "sourceRefs": 2,
+        "featureIds": 2,
+        "qdrantHits": 8,
+        "redisKeys": 1,
+        "parentAtlasDocuments": 1,
+        "somCluster": 0,
+        "glyphRecord": 0,
+        "neo4jNode": 0,
+        "rankedCards": 0
+      },
+      "missingFields": [
+        "somCluster",
+        "glyphRecord",
+        "neo4jNode",
+        "rankedCards"
+      ],
+      "db": {
+        "id": "32",
+        "sourceRefs": [
+          "sveltekit-frontend/scripts/activity/log-developer-activity.mjs",
+          "sveltekit-frontend/src/hooks.server.ts"
+        ],
+        "featureIds": [
+          "shims",
+          "sveltekit-frontend"
+        ],
+        "laneIds": [],
+        "clusterId": "",
+        "somCluster": "",
+        "qdrantHits": 8,
+        "redisHotKeys": [
+          "ace:cartridge:1:bd835b1c4de47ace"
+        ]
+      },
+      "suggestedActions": [
+        "derive SOM cluster from qdrant hit / parent atlas mapping",
+        "materialize glyph record from higher-hop atlas state",
+        "rebuild Neo4j node from sourceRef/featureId spine",
+        "replay downstream ranking stage"
+      ]
+    },
+    {
+      "packetId": "31",
+      "densityScore": "90.95%",
+      "classification": "optimal",
+      "backfillClassification": "RECOVERABLE_FROM_PARENT_ATLAS",
+      "emptyPointers": false,
+      "counts": {
+        "sourceRefs": 5,
+        "featureIds": 5,
+        "qdrantHits": 8,
+        "redisKeys": 1,
+        "parentAtlasDocuments": 0,
+        "somCluster": 0,
+        "glyphRecord": 0,
+        "neo4jNode": 0,
+        "rankedCards": 0
+      },
+      "missingFields": [
+        "parentAtlasDocuments",
+        "somCluster",
+        "glyphRecord",
+        "neo4jNode",
+        "rankedCards"
+      ],
+      "db": {
+        "id": "31",
+        "sourceRefs": [
+          "sveltekit-frontend/scripts/agent-diagnose.mjs",
+          "sveltekit-frontend/scripts/activity/log-developer-activity.mjs",
+          "sveltekit-frontend/scripts/analyze-graph-ai.mjs",
+          "sveltekit-frontend/scripts/apply-migration.ps1",
+          "sveltekit-frontend/scripts/ace/ask-gemma4.mjs"
+        ],
+        "featureIds": [
+          "shims",
+          "shims",
+          "shims",
+          "shims",
+          "shims"
+        ],
+        "laneIds": [],
+        "clusterId": "",
+        "somCluster": "",
+        "qdrantHits": 8,
+        "redisHotKeys": [
+          "ace:cartridge:1:1b3bd13c54620cc1"
+        ]
+      },
+      "suggestedActions": [
+        "refresh parent atlas join rows",
+        "derive SOM cluster from qdrant hit / parent atlas mapping",
+        "materialize glyph record from higher-hop atlas state",
+        "rebuild Neo4j node from sourceRef/featureId spine",
+        "replay downstream ranking stage"
+      ]
+    },
+    {
+      "packetId": "30",
+      "densityScore": "89.38%",
+      "classification": "optimal",
+      "backfillClassification": "RECOVERABLE_FROM_PARENT_ATLAS",
+      "emptyPointers": false,
+      "counts": {
+        "sourceRefs": 3,
+        "featureIds": 3,
+        "qdrantHits": 8,
+        "redisKeys": 1,
+        "parentAtlasDocuments": 1,
+        "somCluster": 0,
+        "glyphRecord": 0,
+        "neo4jNode": 0,
+        "rankedCards": 0
+      },
+      "missingFields": [
+        "somCluster",
+        "glyphRecord",
+        "neo4jNode",
+        "rankedCards"
+      ],
+      "db": {
+        "id": "30",
+        "sourceRefs": [
+          "sveltekit-frontend/scripts/ace/ask-gemma4.mjs",
+          "sveltekit-frontend/scripts/activity/log-developer-activity.mjs",
+          "sveltekit-frontend/src/hooks.server.ts"
+        ],
+        "featureIds": [
+          "shims",
+          "shims",
+          "sveltekit-frontend"
+        ],
+        "laneIds": [],
+        "clusterId": "",
+        "somCluster": "",
+        "qdrantHits": 8,
+        "redisHotKeys": [
+          "ace:cartridge:1:96d9e9b92acd0d05"
+        ]
+      },
+      "suggestedActions": [
+        "derive SOM cluster from qdrant hit / parent atlas mapping",
+        "materialize glyph record from higher-hop atlas state",
+        "rebuild Neo4j node from sourceRef/featureId spine",
+        "replay downstream ranking stage"
+      ]
+    },
+    {
+      "packetId": "29",
+      "densityScore": "86.65%",
+      "classification": "optimal",
+      "backfillClassification": "RECOVERABLE_FROM_PARENT_ATLAS",
+      "emptyPointers": false,
+      "counts": {
+        "sourceRefs": 1,
+        "featureIds": 1,
+        "qdrantHits": 8,
+        "redisKeys": 1,
+        "parentAtlasDocuments": 1,
+        "somCluster": 0,
+        "glyphRecord": 0,
+        "neo4jNode": 0,
+        "rankedCards": 0
+      },
+      "missingFields": [
+        "somCluster",
+        "glyphRecord",
+        "neo4jNode",
+        "rankedCards"
+      ],
+      "db": {
+        "id": "29",
+        "sourceRefs": [
+          "sveltekit-frontend/src/hooks.server.ts"
+        ],
+        "featureIds": [
+          "sveltekit-frontend"
+        ],
+        "laneIds": [],
+        "clusterId": "",
+        "somCluster": "",
+        "qdrantHits": 8,
+        "redisHotKeys": [
+          "ace:cartridge:1:4d4c384d707d492a"
+        ]
+      },
+      "suggestedActions": [
+        "derive SOM cluster from qdrant hit / parent atlas mapping",
+        "materialize glyph record from higher-hop atlas state",
+        "rebuild Neo4j node from sourceRef/featureId spine",
+        "replay downstream ranking stage"
+      ]
+    },
+    {
+      "packetId": "28",
+      "densityScore": "90.52%",
+      "classification": "optimal",
+      "backfillClassification": "RECOVERABLE_FROM_PARENT_ATLAS",
+      "emptyPointers": false,
+      "counts": {
+        "sourceRefs": 4,
+        "featureIds": 4,
+        "qdrantHits": 8,
+        "redisKeys": 1,
+        "parentAtlasDocuments": 0,
+        "somCluster": 0,
+        "glyphRecord": 0,
+        "neo4jNode": 0,
+        "rankedCards": 0
+      },
+      "missingFields": [
+        "parentAtlasDocuments",
+        "somCluster",
+        "glyphRecord",
+        "neo4jNode",
+        "rankedCards"
+      ],
+      "db": {
+        "id": "28",
+        "sourceRefs": [
+          "sveltekit-frontend/scripts/ace/ask-gemma4.mjs",
+          "sveltekit-frontend/scripts/activity/log-developer-activity.mjs",
+          "sveltekit-frontend/scripts/ace/export-transition-memory.mjs",
+          "sveltekit-frontend/scripts/ace/persist-authority-test.mjs"
+        ],
+        "featureIds": [
+          "shims",
+          "shims",
+          "shims",
+          "shims"
+        ],
+        "laneIds": [],
+        "clusterId": "",
+        "somCluster": "",
+        "qdrantHits": 8,
+        "redisHotKeys": [
+          "ace:cartridge:1:360e94085b6d2dbc"
+        ]
+      },
+      "suggestedActions": [
+        "refresh parent atlas join rows",
+        "derive SOM cluster from qdrant hit / parent atlas mapping",
+        "materialize glyph record from higher-hop atlas state",
+        "rebuild Neo4j node from sourceRef/featureId spine",
+        "replay downstream ranking stage"
+      ]
+    },
+    {
+      "packetId": "27",
+      "densityScore": "89.43%",
+      "classification": "optimal",
+      "backfillClassification": "RECOVERABLE_FROM_PARENT_ATLAS",
+      "emptyPointers": false,
+      "counts": {
+        "sourceRefs": 3,
+        "featureIds": 3,
+        "qdrantHits": 8,
+        "redisKeys": 1,
+        "parentAtlasDocuments": 0,
+        "somCluster": 0,
+        "glyphRecord": 0,
+        "neo4jNode": 0,
+        "rankedCards": 0
+      },
+      "missingFields": [
+        "parentAtlasDocuments",
+        "somCluster",
+        "glyphRecord",
+        "neo4jNode",
+        "rankedCards"
+      ],
+      "db": {
+        "id": "27",
+        "sourceRefs": [
+          "sveltekit-frontend/scripts/ace/ask-gemma4.mjs",
+          "sveltekit-frontend/scripts/ace/export-transition-memory.mjs",
+          "sveltekit-frontend/scripts/ace/persist-authority-test.mjs"
+        ],
+        "featureIds": [
+          "shims",
+          "shims",
+          "shims"
+        ],
+        "laneIds": [],
+        "clusterId": "",
+        "somCluster": "",
+        "qdrantHits": 8,
+        "redisHotKeys": [
+          "ace:cartridge:1:c6efb3230c1aeaae"
+        ]
+      },
+      "suggestedActions": [
+        "refresh parent atlas join rows",
+        "derive SOM cluster from qdrant hit / parent atlas mapping",
+        "materialize glyph record from higher-hop atlas state",
+        "rebuild Neo4j node from sourceRef/featureId spine",
+        "replay downstream ranking stage"
+      ]
+    },
+    {
+      "packetId": "26",
+      "densityScore": "87.97%",
+      "classification": "optimal",
+      "backfillClassification": "RECOVERABLE_FROM_PARENT_ATLAS",
+      "emptyPointers": false,
+      "counts": {
+        "sourceRefs": 2,
+        "featureIds": 2,
+        "qdrantHits": 8,
+        "redisKeys": 1,
+        "parentAtlasDocuments": 1,
+        "somCluster": 0,
+        "glyphRecord": 0,
+        "neo4jNode": 0,
+        "rankedCards": 0
+      },
+      "missingFields": [
+        "somCluster",
+        "glyphRecord",
+        "neo4jNode",
+        "rankedCards"
+      ],
+      "db": {
+        "id": "26",
+        "sourceRefs": [
+          "sveltekit-frontend/scripts/ace/ask-gemma4.mjs",
+          "sveltekit-frontend/src/hooks.server.ts"
+        ],
+        "featureIds": [
+          "shims",
+          "sveltekit-frontend"
+        ],
+        "laneIds": [],
+        "clusterId": "",
+        "somCluster": "",
+        "qdrantHits": 8,
+        "redisHotKeys": [
+          "ace:cartridge:1:9ee5e54952770744"
+        ]
+      },
+      "suggestedActions": [
+        "derive SOM cluster from qdrant hit / parent atlas mapping",
+        "materialize glyph record from higher-hop atlas state",
+        "rebuild Neo4j node from sourceRef/featureId spine",
+        "replay downstream ranking stage"
+      ]
+    },
+    {
+      "packetId": "25",
+      "densityScore": "86.84%",
+      "classification": "optimal",
+      "backfillClassification": "RECOVERABLE_FROM_PARENT_ATLAS",
+      "emptyPointers": false,
+      "counts": {
+        "sourceRefs": 1,
+        "featureIds": 1,
+        "qdrantHits": 8,
+        "redisKeys": 1,
+        "parentAtlasDocuments": 1,
+        "somCluster": 0,
+        "glyphRecord": 0,
+        "neo4jNode": 0,
+        "rankedCards": 0
+      },
+      "missingFields": [
+        "somCluster",
+        "glyphRecord",
+        "neo4jNode",
+        "rankedCards"
+      ],
+      "db": {
+        "id": "25",
+        "sourceRefs": [
+          "sveltekit-frontend/src/mcp-gpu-orchestrator.ts"
+        ],
+        "featureIds": [
+          "sveltekit-frontend"
+        ],
+        "laneIds": [],
+        "clusterId": "",
+        "somCluster": "",
+        "qdrantHits": 8,
+        "redisHotKeys": [
+          "ace:cartridge:1:ebc8cdd4145caacf"
+        ]
+      },
+      "suggestedActions": [
+        "derive SOM cluster from qdrant hit / parent atlas mapping",
+        "materialize glyph record from higher-hop atlas state",
+        "rebuild Neo4j node from sourceRef/featureId spine",
+        "replay downstream ranking stage"
+      ]
+    },
+    {
+      "packetId": "24",
+      "densityScore": "90.52%",
+      "classification": "optimal",
+      "backfillClassification": "RECOVERABLE_FROM_PARENT_ATLAS",
+      "emptyPointers": false,
+      "counts": {
+        "sourceRefs": 4,
+        "featureIds": 4,
+        "qdrantHits": 8,
+        "redisKeys": 1,
+        "parentAtlasDocuments": 0,
+        "somCluster": 0,
+        "glyphRecord": 0,
+        "neo4jNode": 0,
+        "rankedCards": 0
+      },
+      "missingFields": [
+        "parentAtlasDocuments",
+        "somCluster",
+        "glyphRecord",
+        "neo4jNode",
+        "rankedCards"
+      ],
+      "db": {
+        "id": "24",
+        "sourceRefs": [
+          "sveltekit-frontend/scripts/ace/ask-gemma4.mjs",
+          "sveltekit-frontend/scripts/activity/log-developer-activity.mjs",
+          "sveltekit-frontend/scripts/ace/export-transition-memory.mjs",
+          "sveltekit-frontend/scripts/ace/persist-authority-test.mjs"
+        ],
+        "featureIds": [
+          "shims",
+          "shims",
+          "shims",
+          "shims"
+        ],
+        "laneIds": [],
+        "clusterId": "",
+        "somCluster": "",
+        "qdrantHits": 8,
+        "redisHotKeys": [
+          "ace:cartridge:1:6a058b76b6d7100c"
+        ]
+      },
+      "suggestedActions": [
+        "refresh parent atlas join rows",
+        "derive SOM cluster from qdrant hit / parent atlas mapping",
+        "materialize glyph record from higher-hop atlas state",
+        "rebuild Neo4j node from sourceRef/featureId spine",
+        "replay downstream ranking stage"
+      ]
+    },
+    {
+      "packetId": "23",
+      "densityScore": "90.52%",
+      "classification": "optimal",
+      "backfillClassification": "RECOVERABLE_FROM_PARENT_ATLAS",
+      "emptyPointers": false,
+      "counts": {
+        "sourceRefs": 4,
+        "featureIds": 4,
+        "qdrantHits": 8,
+        "redisKeys": 1,
+        "parentAtlasDocuments": 0,
+        "somCluster": 0,
+        "glyphRecord": 0,
+        "neo4jNode": 0,
+        "rankedCards": 0
+      },
+      "missingFields": [
+        "parentAtlasDocuments",
+        "somCluster",
+        "glyphRecord",
+        "neo4jNode",
+        "rankedCards"
+      ],
+      "db": {
+        "id": "23",
+        "sourceRefs": [
+          "sveltekit-frontend/scripts/ace/ask-gemma4.mjs",
+          "sveltekit-frontend/scripts/activity/log-developer-activity.mjs",
+          "sveltekit-frontend/scripts/ace/export-transition-memory.mjs",
+          "sveltekit-frontend/scripts/ace/persist-authority-test.mjs"
+        ],
+        "featureIds": [
+          "shims",
+          "shims",
+          "shims",
+          "shims"
+        ],
+        "laneIds": [],
+        "clusterId": "",
+        "somCluster": "",
+        "qdrantHits": 8,
+        "redisHotKeys": [
+          "ace:cartridge:1:546d8a871b1d0d33"
+        ]
+      },
+      "suggestedActions": [
+        "refresh parent atlas join rows",
+        "derive SOM cluster from qdrant hit / parent atlas mapping",
+        "materialize glyph record from higher-hop atlas state",
+        "rebuild Neo4j node from sourceRef/featureId spine",
+        "replay downstream ranking stage"
+      ]
+    },
+    {
+      "packetId": "22",
+      "densityScore": "86.84%",
+      "classification": "optimal",
+      "backfillClassification": "RECOVERABLE_FROM_PARENT_ATLAS",
+      "emptyPointers": false,
+      "counts": {
+        "sourceRefs": 1,
+        "featureIds": 1,
+        "qdrantHits": 8,
+        "redisKeys": 1,
+        "parentAtlasDocuments": 1,
+        "somCluster": 0,
+        "glyphRecord": 0,
+        "neo4jNode": 0,
+        "rankedCards": 0
+      },
+      "missingFields": [
+        "somCluster",
+        "glyphRecord",
+        "neo4jNode",
+        "rankedCards"
+      ],
+      "db": {
+        "id": "22",
+        "sourceRefs": [
+          "sveltekit-frontend/src/mcp-gpu-orchestrator.ts"
+        ],
+        "featureIds": [
+          "sveltekit-frontend"
+        ],
+        "laneIds": [],
+        "clusterId": "",
+        "somCluster": "",
+        "qdrantHits": 8,
+        "redisHotKeys": [
+          "ace:cartridge:1:3317047aa8d6fc14"
+        ]
+      },
+      "suggestedActions": [
+        "derive SOM cluster from qdrant hit / parent atlas mapping",
+        "materialize glyph record from higher-hop atlas state",
+        "rebuild Neo4j node from sourceRef/featureId spine",
+        "replay downstream ranking stage"
+      ]
+    },
+    {
+      "packetId": "21",
+      "densityScore": "87.97%",
+      "classification": "optimal",
+      "backfillClassification": "RECOVERABLE_FROM_PARENT_ATLAS",
+      "emptyPointers": false,
+      "counts": {
+        "sourceRefs": 2,
+        "featureIds": 2,
+        "qdrantHits": 8,
+        "redisKeys": 1,
+        "parentAtlasDocuments": 1,
+        "somCluster": 0,
+        "glyphRecord": 0,
+        "neo4jNode": 0,
+        "rankedCards": 0
+      },
+      "missingFields": [
+        "somCluster",
+        "glyphRecord",
+        "neo4jNode",
+        "rankedCards"
+      ],
+      "db": {
+        "id": "21",
+        "sourceRefs": [
+          "sveltekit-frontend/scripts/agent-diagnose.mjs",
+          "sveltekit-frontend/src/hooks.server.ts"
+        ],
+        "featureIds": [
+          "shims",
+          "sveltekit-frontend"
+        ],
+        "laneIds": [],
+        "clusterId": "",
+        "somCluster": "",
+        "qdrantHits": 8,
+        "redisHotKeys": [
+          "ace:cartridge:1:10d5bad8c16deef2"
+        ]
+      },
+      "suggestedActions": [
+        "derive SOM cluster from qdrant hit / parent atlas mapping",
+        "materialize glyph record from higher-hop atlas state",
+        "rebuild Neo4j node from sourceRef/featureId spine",
+        "replay downstream ranking stage"
+      ]
+    },
+    {
+      "packetId": "20",
+      "densityScore": "89.42%",
+      "classification": "optimal",
+      "backfillClassification": "RECOVERABLE_FROM_PARENT_ATLAS",
+      "emptyPointers": false,
+      "counts": {
+        "sourceRefs": 3,
+        "featureIds": 3,
+        "qdrantHits": 8,
+        "redisKeys": 1,
+        "parentAtlasDocuments": 0,
+        "somCluster": 0,
+        "glyphRecord": 0,
+        "neo4jNode": 0,
+        "rankedCards": 0
+      },
+      "missingFields": [
+        "parentAtlasDocuments",
+        "somCluster",
+        "glyphRecord",
+        "neo4jNode",
+        "rankedCards"
+      ],
+      "db": {
+        "id": "20",
+        "sourceRefs": [
+          "sveltekit-frontend/scripts/ace/ask-gemma4.mjs",
+          "sveltekit-frontend/scripts/ace/export-transition-memory.mjs",
+          "sveltekit-frontend/scripts/ace/persist-authority-test.mjs"
+        ],
+        "featureIds": [
+          "shims",
+          "shims",
+          "shims"
+        ],
+        "laneIds": [],
+        "clusterId": "",
+        "somCluster": "",
+        "qdrantHits": 8,
+        "redisHotKeys": [
+          "ace:cartridge:1:a83063dc47fe049c"
+        ]
+      },
+      "suggestedActions": [
+        "refresh parent atlas join rows",
+        "derive SOM cluster from qdrant hit / parent atlas mapping",
+        "materialize glyph record from higher-hop atlas state",
+        "rebuild Neo4j node from sourceRef/featureId spine",
+        "replay downstream ranking stage"
+      ]
+    },
+    {
+      "packetId": "19",
+      "densityScore": "87.97%",
+      "classification": "optimal",
+      "backfillClassification": "RECOVERABLE_FROM_PARENT_ATLAS",
+      "emptyPointers": false,
+      "counts": {
+        "sourceRefs": 2,
+        "featureIds": 2,
+        "qdrantHits": 8,
+        "redisKeys": 1,
+        "parentAtlasDocuments": 1,
+        "somCluster": 0,
+        "glyphRecord": 0,
+        "neo4jNode": 0,
+        "rankedCards": 0
+      },
+      "missingFields": [
+        "somCluster",
+        "glyphRecord",
+        "neo4jNode",
+        "rankedCards"
+      ],
+      "db": {
+        "id": "19",
+        "sourceRefs": [
+          "sveltekit-frontend/scripts/agent-diagnose.mjs",
+          "sveltekit-frontend/src/hooks.server.ts"
+        ],
+        "featureIds": [
+          "shims",
+          "sveltekit-frontend"
+        ],
+        "laneIds": [],
+        "clusterId": "",
+        "somCluster": "",
+        "qdrantHits": 8,
+        "redisHotKeys": [
+          "ace:cartridge:1:a3383a3ada83d202"
+        ]
+      },
+      "suggestedActions": [
+        "derive SOM cluster from qdrant hit / parent atlas mapping",
+        "materialize glyph record from higher-hop atlas state",
+        "rebuild Neo4j node from sourceRef/featureId spine",
+        "replay downstream ranking stage"
+      ]
+    },
+    {
+      "packetId": "18",
+      "densityScore": "89.23%",
+      "classification": "optimal",
+      "backfillClassification": "RECOVERABLE_FROM_PARENT_ATLAS",
+      "emptyPointers": false,
+      "counts": {
+        "sourceRefs": 3,
+        "featureIds": 3,
+        "qdrantHits": 8,
+        "redisKeys": 1,
+        "parentAtlasDocuments": 2,
+        "somCluster": 0,
+        "glyphRecord": 0,
+        "neo4jNode": 0,
+        "rankedCards": 0
+      },
+      "missingFields": [
+        "somCluster",
+        "glyphRecord",
+        "neo4jNode",
+        "rankedCards"
+      ],
+      "db": {
+        "id": "18",
+        "sourceRefs": [
+          "sveltekit-frontend/src/app.d.ts",
+          "sveltekit-frontend/src/app.postcss",
+          "sveltekit-frontend/src/global.d.ts"
+        ],
+        "featureIds": [
+          "sveltekit-frontend",
+          "shims",
+          "sveltekit-frontend"
+        ],
+        "laneIds": [],
+        "clusterId": "",
+        "somCluster": "",
+        "qdrantHits": 8,
+        "redisHotKeys": [
+          "ace:cartridge:1:951e299640687e1d"
+        ]
+      },
+      "suggestedActions": [
+        "derive SOM cluster from qdrant hit / parent atlas mapping",
+        "materialize glyph record from higher-hop atlas state",
+        "rebuild Neo4j node from sourceRef/featureId spine",
+        "replay downstream ranking stage"
+      ]
+    },
+    {
+      "packetId": "17",
+      "densityScore": "90.52%",
+      "classification": "optimal",
+      "backfillClassification": "RECOVERABLE_FROM_PARENT_ATLAS",
+      "emptyPointers": false,
+      "counts": {
+        "sourceRefs": 4,
+        "featureIds": 4,
+        "qdrantHits": 8,
+        "redisKeys": 1,
+        "parentAtlasDocuments": 0,
+        "somCluster": 0,
+        "glyphRecord": 0,
+        "neo4jNode": 0,
+        "rankedCards": 0
+      },
+      "missingFields": [
+        "parentAtlasDocuments",
+        "somCluster",
+        "glyphRecord",
+        "neo4jNode",
+        "rankedCards"
+      ],
+      "db": {
+        "id": "17",
+        "sourceRefs": [
+          "sveltekit-frontend/scripts/ace/ask-gemma4.mjs",
+          "sveltekit-frontend/scripts/activity/log-developer-activity.mjs",
+          "sveltekit-frontend/scripts/ace/export-transition-memory.mjs",
+          "sveltekit-frontend/scripts/ace/persist-authority-test.mjs"
+        ],
+        "featureIds": [
+          "shims",
+          "shims",
+          "shims",
+          "shims"
+        ],
+        "laneIds": [],
+        "clusterId": "",
+        "somCluster": "",
+        "qdrantHits": 8,
+        "redisHotKeys": [
+          "ace:cartridge:1:ff7501a879fa62d5"
+        ]
+      },
+      "suggestedActions": [
+        "refresh parent atlas join rows",
+        "derive SOM cluster from qdrant hit / parent atlas mapping",
+        "materialize glyph record from higher-hop atlas state",
+        "rebuild Neo4j node from sourceRef/featureId spine",
+        "replay downstream ranking stage"
+      ]
+    },
+    {
+      "packetId": "16",
+      "densityScore": "85.62%",
+      "classification": "optimal",
+      "backfillClassification": "RECOVERABLE_FROM_PARENT_ATLAS",
+      "emptyPointers": false,
+      "counts": {
+        "sourceRefs": 0,
+        "featureIds": 0,
+        "qdrantHits": 8,
+        "redisKeys": 1,
+        "parentAtlasDocuments": 0,
+        "somCluster": 0,
+        "glyphRecord": 0,
+        "neo4jNode": 0,
+        "rankedCards": 0
+      },
+      "missingFields": [
+        "sourceRefs",
+        "featureIds",
+        "parentAtlasDocuments",
+        "somCluster",
+        "glyphRecord",
+        "neo4jNode",
+        "rankedCards"
+      ],
+      "db": {
+        "id": "16",
+        "sourceRefs": [],
+        "featureIds": [],
+        "laneIds": [],
+        "clusterId": "",
+        "somCluster": "",
+        "qdrantHits": 8,
+        "redisHotKeys": [
+          "ace:cartridge:1:7e176c63a90af338"
+        ]
+      },
+      "suggestedActions": [
+        "backfill sourceRefs from qdrant hits or pathmap evidence",
+        "backfill featureIds from feature labels/pathmap evidence",
+        "refresh parent atlas join rows",
+        "derive SOM cluster from qdrant hit / parent atlas mapping",
+        "materialize glyph record from higher-hop atlas state",
+        "rebuild Neo4j node from sourceRef/featureId spine",
+        "replay downstream ranking stage"
+      ]
+    },
+    {
+      "packetId": "15",
+      "densityScore": "85.92%",
+      "classification": "optimal",
+      "backfillClassification": "RECOVERABLE_FROM_PARENT_ATLAS",
+      "emptyPointers": false,
+      "counts": {
+        "sourceRefs": 1,
+        "featureIds": 1,
+        "qdrantHits": 8,
+        "redisKeys": 1,
+        "parentAtlasDocuments": 0,
+        "somCluster": 0,
+        "glyphRecord": 0,
+        "neo4jNode": 0,
+        "rankedCards": 0
+      },
+      "missingFields": [
+        "parentAtlasDocuments",
+        "somCluster",
+        "glyphRecord",
+        "neo4jNode",
+        "rankedCards"
+      ],
+      "db": {
+        "id": "15",
+        "sourceRefs": [
+          "sveltekit-frontend/unknown"
+        ],
+        "featureIds": [
+          "shims"
+        ],
+        "laneIds": [],
+        "clusterId": "",
+        "somCluster": "",
+        "qdrantHits": 8,
+        "redisHotKeys": [
+          "ace:cartridge:1:0624747c04372106"
+        ]
+      },
+      "suggestedActions": [
+        "refresh parent atlas join rows",
+        "derive SOM cluster from qdrant hit / parent atlas mapping",
+        "materialize glyph record from higher-hop atlas state",
+        "rebuild Neo4j node from sourceRef/featureId spine",
+        "replay downstream ranking stage"
+      ]
+    },
+    {
+      "packetId": "14",
+      "densityScore": "89.68%",
+      "classification": "optimal",
+      "backfillClassification": "RECOVERABLE_FROM_PARENT_ATLAS",
+      "emptyPointers": false,
+      "counts": {
+        "sourceRefs": 5,
+        "featureIds": 5,
+        "qdrantHits": 8,
+        "redisKeys": 1,
+        "parentAtlasDocuments": 0,
+        "somCluster": 0,
+        "glyphRecord": 0,
+        "neo4jNode": 0,
+        "rankedCards": 0
+      },
+      "missingFields": [
+        "parentAtlasDocuments",
+        "somCluster",
+        "glyphRecord",
+        "neo4jNode",
+        "rankedCards"
+      ],
+      "db": {
+        "id": "14",
+        "sourceRefs": [
+          "sveltekit-frontend/unknown",
+          "sveltekit-frontend/unknown",
+          "sveltekit-frontend/unknown",
+          "sveltekit-frontend/unknown",
+          "sveltekit-frontend/unknown"
+        ],
+        "featureIds": [
+          "shims",
+          "shims",
+          "shims",
+          "shims",
+          "shims"
+        ],
+        "laneIds": [],
+        "clusterId": "",
+        "somCluster": "",
+        "qdrantHits": 8,
+        "redisHotKeys": [
+          "ace:cartridge:1:d81bd490cc466dcb"
+        ]
+      },
+      "suggestedActions": [
+        "refresh parent atlas join rows",
+        "derive SOM cluster from qdrant hit / parent atlas mapping",
+        "materialize glyph record from higher-hop atlas state",
+        "rebuild Neo4j node from sourceRef/featureId spine",
+        "replay downstream ranking stage"
+      ]
+    },
+    {
+      "packetId": "13",
+      "densityScore": "85.92%",
+      "classification": "optimal",
+      "backfillClassification": "RECOVERABLE_FROM_PARENT_ATLAS",
+      "emptyPointers": false,
+      "counts": {
+        "sourceRefs": 1,
+        "featureIds": 1,
+        "qdrantHits": 8,
+        "redisKeys": 1,
+        "parentAtlasDocuments": 0,
+        "somCluster": 0,
+        "glyphRecord": 0,
+        "neo4jNode": 0,
+        "rankedCards": 0
+      },
+      "missingFields": [
+        "parentAtlasDocuments",
+        "somCluster",
+        "glyphRecord",
+        "neo4jNode",
+        "rankedCards"
+      ],
+      "db": {
+        "id": "13",
+        "sourceRefs": [
+          "sveltekit-frontend/unknown"
+        ],
+        "featureIds": [
+          "shims"
+        ],
+        "laneIds": [],
+        "clusterId": "",
+        "somCluster": "",
+        "qdrantHits": 8,
+        "redisHotKeys": [
+          "ace:cartridge:1:58d593fe9bc6afac"
+        ]
+      },
+      "suggestedActions": [
+        "refresh parent atlas join rows",
+        "derive SOM cluster from qdrant hit / parent atlas mapping",
+        "materialize glyph record from higher-hop atlas state",
+        "rebuild Neo4j node from sourceRef/featureId spine",
+        "replay downstream ranking stage"
+      ]
+    },
+    {
+      "packetId": "12",
+      "densityScore": "89.68%",
+      "classification": "optimal",
+      "backfillClassification": "RECOVERABLE_FROM_PARENT_ATLAS",
+      "emptyPointers": false,
+      "counts": {
+        "sourceRefs": 5,
+        "featureIds": 5,
+        "qdrantHits": 8,
+        "redisKeys": 1,
+        "parentAtlasDocuments": 0,
+        "somCluster": 0,
+        "glyphRecord": 0,
+        "neo4jNode": 0,
+        "rankedCards": 0
+      },
+      "missingFields": [
+        "parentAtlasDocuments",
+        "somCluster",
+        "glyphRecord",
+        "neo4jNode",
+        "rankedCards"
+      ],
+      "db": {
+        "id": "12",
+        "sourceRefs": [
+          "sveltekit-frontend/unknown",
+          "sveltekit-frontend/unknown",
+          "sveltekit-frontend/unknown",
+          "sveltekit-frontend/unknown",
+          "sveltekit-frontend/unknown"
+        ],
+        "featureIds": [
+          "shims",
+          "shims",
+          "shims",
+          "shims",
+          "shims"
+        ],
+        "laneIds": [],
+        "clusterId": "",
+        "somCluster": "",
+        "qdrantHits": 8,
+        "redisHotKeys": [
+          "ace:cartridge:1:06a30620527e665c"
+        ]
+      },
+      "suggestedActions": [
+        "refresh parent atlas join rows",
+        "derive SOM cluster from qdrant hit / parent atlas mapping",
+        "materialize glyph record from higher-hop atlas state",
+        "rebuild Neo4j node from sourceRef/featureId spine",
+        "replay downstream ranking stage"
+      ]
+    },
+    {
+      "packetId": "11",
+      "densityScore": "89.26%",
+      "classification": "optimal",
+      "backfillClassification": "RECOVERABLE_FROM_PARENT_ATLAS",
+      "emptyPointers": false,
+      "counts": {
+        "sourceRefs": 5,
+        "featureIds": 5,
+        "qdrantHits": 8,
+        "redisKeys": 1,
+        "parentAtlasDocuments": 0,
+        "somCluster": 0,
+        "glyphRecord": 0,
+        "neo4jNode": 0,
+        "rankedCards": 0
+      },
+      "missingFields": [
+        "parentAtlasDocuments",
+        "somCluster",
+        "glyphRecord",
+        "neo4jNode",
+        "rankedCards"
+      ],
+      "db": {
+        "id": "11",
+        "sourceRefs": [
+          "sveltekit-frontend/unknown",
+          "sveltekit-frontend/unknown",
+          "sveltekit-frontend/unknown",
+          "sveltekit-frontend/unknown",
+          "sveltekit-frontend/unknown"
+        ],
+        "featureIds": [
+          "shims",
+          "shims",
+          "shims",
+          "shims",
+          "shims"
+        ],
+        "laneIds": [],
+        "clusterId": "",
+        "somCluster": "",
+        "qdrantHits": 8,
+        "redisHotKeys": [
+          "ace:cartridge:1:4fbcd1c84abb1fd1"
+        ]
+      },
+      "suggestedActions": [
+        "refresh parent atlas join rows",
+        "derive SOM cluster from qdrant hit / parent atlas mapping",
+        "materialize glyph record from higher-hop atlas state",
+        "rebuild Neo4j node from sourceRef/featureId spine",
+        "replay downstream ranking stage"
+      ]
+    },
+    {
+      "packetId": "10",
+      "densityScore": "89.68%",
+      "classification": "optimal",
+      "backfillClassification": "RECOVERABLE_FROM_PARENT_ATLAS",
+      "emptyPointers": false,
+      "counts": {
+        "sourceRefs": 5,
+        "featureIds": 5,
+        "qdrantHits": 8,
+        "redisKeys": 1,
+        "parentAtlasDocuments": 0,
+        "somCluster": 0,
+        "glyphRecord": 0,
+        "neo4jNode": 0,
+        "rankedCards": 0
+      },
+      "missingFields": [
+        "parentAtlasDocuments",
+        "somCluster",
+        "glyphRecord",
+        "neo4jNode",
+        "rankedCards"
+      ],
+      "db": {
+        "id": "10",
+        "sourceRefs": [
+          "sveltekit-frontend/unknown",
+          "sveltekit-frontend/unknown",
+          "sveltekit-frontend/unknown",
+          "sveltekit-frontend/unknown",
+          "sveltekit-frontend/unknown"
+        ],
+        "featureIds": [
+          "shims",
+          "shims",
+          "shims",
+          "shims",
+          "shims"
+        ],
+        "laneIds": [],
+        "clusterId": "",
+        "somCluster": "",
+        "qdrantHits": 8,
+        "redisHotKeys": [
+          "ace:cartridge:1:97ab22166562ffbb"
+        ]
+      },
+      "suggestedActions": [
+        "refresh parent atlas join rows",
+        "derive SOM cluster from qdrant hit / parent atlas mapping",
+        "materialize glyph record from higher-hop atlas state",
+        "rebuild Neo4j node from sourceRef/featureId spine",
+        "replay downstream ranking stage"
+      ]
+    },
+    {
+      "packetId": "9",
+      "densityScore": "89.41%",
+      "classification": "optimal",
+      "backfillClassification": "RECOVERABLE_FROM_PARENT_ATLAS",
+      "emptyPointers": false,
+      "counts": {
+        "sourceRefs": 5,
+        "featureIds": 5,
+        "qdrantHits": 8,
+        "redisKeys": 1,
+        "parentAtlasDocuments": 0,
+        "somCluster": 0,
+        "glyphRecord": 0,
+        "neo4jNode": 0,
+        "rankedCards": 0
+      },
+      "missingFields": [
+        "parentAtlasDocuments",
+        "somCluster",
+        "glyphRecord",
+        "neo4jNode",
+        "rankedCards"
+      ],
+      "db": {
+        "id": "9",
+        "sourceRefs": [
+          "sveltekit-frontend/unknown",
+          "sveltekit-frontend/unknown",
+          "sveltekit-frontend/unknown",
+          "sveltekit-frontend/unknown",
+          "sveltekit-frontend/unknown"
+        ],
+        "featureIds": [
+          "shims",
+          "shims",
+          "shims",
+          "shims",
+          "shims"
+        ],
+        "laneIds": [],
+        "clusterId": "",
+        "somCluster": "",
+        "qdrantHits": 8,
+        "redisHotKeys": [
+          "ace:cartridge:1:6071579337a8a887"
+        ]
+      },
+      "suggestedActions": [
+        "refresh parent atlas join rows",
+        "derive SOM cluster from qdrant hit / parent atlas mapping",
+        "materialize glyph record from higher-hop atlas state",
+        "rebuild Neo4j node from sourceRef/featureId spine",
+        "replay downstream ranking stage"
+      ]
+    },
+    {
+      "packetId": "8",
+      "densityScore": "86.11%",
+      "classification": "optimal",
+      "backfillClassification": "RECOVERABLE_FROM_PARENT_ATLAS",
+      "emptyPointers": false,
+      "counts": {
+        "sourceRefs": 1,
+        "featureIds": 1,
+        "qdrantHits": 8,
+        "redisKeys": 1,
+        "parentAtlasDocuments": 0,
+        "somCluster": 0,
+        "glyphRecord": 0,
+        "neo4jNode": 0,
+        "rankedCards": 0
+      },
+      "missingFields": [
+        "parentAtlasDocuments",
+        "somCluster",
+        "glyphRecord",
+        "neo4jNode",
+        "rankedCards"
+      ],
+      "db": {
+        "id": "8",
+        "sourceRefs": [
+          "sveltekit-frontend/unknown"
+        ],
+        "featureIds": [
+          "shims"
+        ],
+        "laneIds": [],
+        "clusterId": "",
+        "somCluster": "",
+        "qdrantHits": 8,
+        "redisHotKeys": [
+          "ace:cartridge:1:4c540e79290dd050"
+        ]
+      },
+      "suggestedActions": [
+        "refresh parent atlas join rows",
+        "derive SOM cluster from qdrant hit / parent atlas mapping",
+        "materialize glyph record from higher-hop atlas state",
+        "rebuild Neo4j node from sourceRef/featureId spine",
+        "replay downstream ranking stage"
+      ]
+    },
+    {
+      "packetId": "7",
+      "densityScore": "90.54%",
+      "classification": "optimal",
+      "backfillClassification": "RECOVERABLE_FROM_PARENT_ATLAS",
+      "emptyPointers": false,
+      "counts": {
+        "sourceRefs": 5,
+        "featureIds": 5,
+        "qdrantHits": 8,
+        "redisKeys": 1,
+        "parentAtlasDocuments": 0,
+        "somCluster": 0,
+        "glyphRecord": 0,
+        "neo4jNode": 0,
+        "rankedCards": 0
+      },
+      "missingFields": [
+        "parentAtlasDocuments",
+        "somCluster",
+        "glyphRecord",
+        "neo4jNode",
+        "rankedCards"
+      ],
+      "db": {
+        "id": "7",
+        "sourceRefs": [
+          "sveltekit-frontend/.venv/Lib/python3.9/site-packages/pip/_internal/network/cache.py",
+          "sveltekit-frontend/unknown",
+          "sveltekit-frontend/unknown",
+          "sveltekit-frontend/unknown",
+          "sveltekit-frontend/unknown"
+        ],
+        "featureIds": [
+          "shims",
+          "shims",
+          "shims",
+          "shims",
+          "shims"
+        ],
+        "laneIds": [],
+        "clusterId": "",
+        "somCluster": "",
+        "qdrantHits": 8,
+        "redisHotKeys": [
+          "ace:cartridge:1:822427c785c77753"
+        ]
+      },
+      "suggestedActions": [
+        "refresh parent atlas join rows",
+        "derive SOM cluster from qdrant hit / parent atlas mapping",
+        "materialize glyph record from higher-hop atlas state",
+        "rebuild Neo4j node from sourceRef/featureId spine",
+        "replay downstream ranking stage"
+      ]
+    },
+    {
+      "packetId": "6",
+      "densityScore": "89.83%",
+      "classification": "optimal",
+      "backfillClassification": "RECOVERABLE_FROM_PARENT_ATLAS",
+      "emptyPointers": false,
+      "counts": {
+        "sourceRefs": 5,
+        "featureIds": 5,
+        "qdrantHits": 8,
+        "redisKeys": 1,
+        "parentAtlasDocuments": 0,
+        "somCluster": 0,
+        "glyphRecord": 0,
+        "neo4jNode": 0,
+        "rankedCards": 0
+      },
+      "missingFields": [
+        "parentAtlasDocuments",
+        "somCluster",
+        "glyphRecord",
+        "neo4jNode",
+        "rankedCards"
+      ],
+      "db": {
+        "id": "6",
+        "sourceRefs": [
+          "sveltekit-frontend/unknown",
+          "sveltekit-frontend/unknown",
+          "sveltekit-frontend/unknown",
+          "sveltekit-frontend/unknown",
+          "sveltekit-frontend/unknown"
+        ],
+        "featureIds": [
+          "shims",
+          "shims",
+          "shims",
+          "shims",
+          "shims"
+        ],
+        "laneIds": [],
+        "clusterId": "",
+        "somCluster": "",
+        "qdrantHits": 8,
+        "redisHotKeys": [
+          "ace:cartridge:1:1de90d1187831008"
+        ]
+      },
+      "suggestedActions": [
+        "refresh parent atlas join rows",
+        "derive SOM cluster from qdrant hit / parent atlas mapping",
+        "materialize glyph record from higher-hop atlas state",
+        "rebuild Neo4j node from sourceRef/featureId spine",
+        "replay downstream ranking stage"
+      ]
+    },
+    {
+      "packetId": "5",
+      "densityScore": "89.81%",
+      "classification": "optimal",
+      "backfillClassification": "RECOVERABLE_FROM_PARENT_ATLAS",
+      "emptyPointers": false,
+      "counts": {
+        "sourceRefs": 5,
+        "featureIds": 5,
+        "qdrantHits": 8,
+        "redisKeys": 1,
+        "parentAtlasDocuments": 0,
+        "somCluster": 0,
+        "glyphRecord": 0,
+        "neo4jNode": 0,
+        "rankedCards": 0
+      },
+      "missingFields": [
+        "parentAtlasDocuments",
+        "somCluster",
+        "glyphRecord",
+        "neo4jNode",
+        "rankedCards"
+      ],
+      "db": {
+        "id": "5",
+        "sourceRefs": [
+          "sveltekit-frontend/unknown",
+          "sveltekit-frontend/unknown",
+          "sveltekit-frontend/unknown",
+          "sveltekit-frontend/unknown",
+          "sveltekit-frontend/unknown"
+        ],
+        "featureIds": [
+          "shims",
+          "shims",
+          "shims",
+          "shims",
+          "shims"
+        ],
+        "laneIds": [],
+        "clusterId": "",
+        "somCluster": "",
+        "qdrantHits": 8,
+        "redisHotKeys": [
+          "ace:cartridge:1:08ba6178c85b4d4e"
+        ]
+      },
+      "suggestedActions": [
+        "refresh parent atlas join rows",
+        "derive SOM cluster from qdrant hit / parent atlas mapping",
+        "materialize glyph record from higher-hop atlas state",
+        "rebuild Neo4j node from sourceRef/featureId spine",
+        "replay downstream ranking stage"
+      ]
+    },
+    {
+      "packetId": "4",
+      "densityScore": "85.81%",
+      "classification": "optimal",
+      "backfillClassification": "RECOVERABLE_FROM_PARENT_ATLAS",
+      "emptyPointers": false,
+      "counts": {
+        "sourceRefs": 0,
+        "featureIds": 0,
+        "qdrantHits": 8,
+        "redisKeys": 1,
+        "parentAtlasDocuments": 0,
+        "somCluster": 0,
+        "glyphRecord": 0,
+        "neo4jNode": 0,
+        "rankedCards": 0
+      },
+      "missingFields": [
+        "sourceRefs",
+        "featureIds",
+        "parentAtlasDocuments",
+        "somCluster",
+        "glyphRecord",
+        "neo4jNode",
+        "rankedCards"
+      ],
+      "db": {
+        "id": "4",
+        "sourceRefs": [],
+        "featureIds": [],
+        "laneIds": [],
+        "clusterId": "",
+        "somCluster": "",
+        "qdrantHits": 8,
+        "redisHotKeys": [
+          "ace:cartridge:1:ba92e263a5793bed"
+        ]
+      },
+      "suggestedActions": [
+        "backfill sourceRefs from qdrant hits or pathmap evidence",
+        "backfill featureIds from feature labels/pathmap evidence",
+        "refresh parent atlas join rows",
+        "derive SOM cluster from qdrant hit / parent atlas mapping",
+        "materialize glyph record from higher-hop atlas state",
+        "rebuild Neo4j node from sourceRef/featureId spine",
+        "replay downstream ranking stage"
+      ]
+    },
+    {
+      "packetId": "3",
+      "densityScore": "86.77%",
+      "classification": "optimal",
+      "backfillClassification": "RECOVERABLE_FROM_PARENT_ATLAS",
+      "emptyPointers": false,
+      "counts": {
+        "sourceRefs": 1,
+        "featureIds": 1,
+        "qdrantHits": 8,
+        "redisKeys": 1,
+        "parentAtlasDocuments": 0,
+        "somCluster": 0,
+        "glyphRecord": 0,
+        "neo4jNode": 0,
+        "rankedCards": 0
+      },
+      "missingFields": [
+        "parentAtlasDocuments",
+        "somCluster",
+        "glyphRecord",
+        "neo4jNode",
+        "rankedCards"
+      ],
+      "db": {
+        "id": "3",
+        "sourceRefs": [
+          "sveltekit-frontend/unknown"
+        ],
+        "featureIds": [
+          "shims"
+        ],
+        "laneIds": [],
+        "clusterId": "",
+        "somCluster": "",
+        "qdrantHits": 8,
+        "redisHotKeys": [
+          "ace:cartridge:1:212c57e6f8ee6ded"
+        ]
+      },
+      "suggestedActions": [
+        "refresh parent atlas join rows",
+        "derive SOM cluster from qdrant hit / parent atlas mapping",
+        "materialize glyph record from higher-hop atlas state",
+        "rebuild Neo4j node from sourceRef/featureId spine",
+        "replay downstream ranking stage"
+      ]
+    },
+    {
+      "packetId": "2",
+      "densityScore": "88.74%",
+      "classification": "optimal",
+      "backfillClassification": "RECOVERABLE_FROM_PARENT_ATLAS",
+      "emptyPointers": false,
+      "counts": {
+        "sourceRefs": 2,
+        "featureIds": 2,
+        "qdrantHits": 8,
+        "redisKeys": 1,
+        "parentAtlasDocuments": 0,
+        "somCluster": 0,
+        "glyphRecord": 0,
+        "neo4jNode": 0,
+        "rankedCards": 0
+      },
+      "missingFields": [
+        "parentAtlasDocuments",
+        "somCluster",
+        "glyphRecord",
+        "neo4jNode",
+        "rankedCards"
+      ],
+      "db": {
+        "id": "2",
+        "sourceRefs": [
+          "sveltekit-frontend/.venv/Lib/python3.9/site-packages/pip/_internal/cache.py",
+          "sveltekit-frontend/unknown"
+        ],
+        "featureIds": [
+          "shims",
+          "shims"
+        ],
+        "laneIds": [],
+        "clusterId": "",
+        "somCluster": "",
+        "qdrantHits": 8,
+        "redisHotKeys": [
+          "ace:cartridge:1:473463c5ae07ef36"
+        ]
+      },
+      "suggestedActions": [
+        "refresh parent atlas join rows",
+        "derive SOM cluster from qdrant hit / parent atlas mapping",
+        "materialize glyph record from higher-hop atlas state",
+        "rebuild Neo4j node from sourceRef/featureId spine",
+        "replay downstream ranking stage"
+      ]
+    },
+    {
+      "packetId": "1",
+      "densityScore": "82.68%",
+      "classification": "empty-pointers",
+      "backfillClassification": "NEEDS_REPLAY",
+      "emptyPointers": true,
+      "counts": {
+        "sourceRefs": 0,
+        "featureIds": 0,
+        "qdrantHits": 0,
+        "redisKeys": 0,
+        "parentAtlasDocuments": 0,
+        "somCluster": 1,
+        "glyphRecord": 0,
+        "neo4jNode": 0,
+        "rankedCards": 0
+      },
+      "missingFields": [
+        "sourceRefs",
+        "featureIds",
+        "qdrantHits",
+        "redisKeys",
+        "parentAtlasDocuments",
+        "glyphRecord",
+        "neo4jNode",
+        "rankedCards"
+      ],
+      "db": {
+        "id": "1",
+        "sourceRefs": [],
+        "featureIds": [],
+        "laneIds": [],
+        "clusterId": "cluster:1",
+        "somCluster": "som:1",
+        "qdrantHits": 0,
+        "redisHotKeys": []
+      },
+      "suggestedActions": [
+        "backfill sourceRefs from qdrant hits or pathmap evidence",
+        "backfill featureIds from feature labels/pathmap evidence",
+        "replay packet or rerun qdrant enrichment",
+        "recompute exact/semantic cache keys from packet provenance",
+        "refresh parent atlas join rows",
+        "materialize glyph record from higher-hop atlas state",
+        "rebuild Neo4j node from sourceRef/featureId spine",
+        "replay downstream ranking stage"
+      ]
+    }
+  ],
+  "notes": [
+    "This plan is read-only.",
+    "It does not mutate DB rows, packets, Qdrant, Neo4j, or Redis.",
+    "The only live read is route_runtime_packets when the DB is reachable."
+  ]
+}

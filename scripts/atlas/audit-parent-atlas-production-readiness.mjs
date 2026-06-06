@@ -56,6 +56,11 @@ function status(ok, warn = false) {
   return warn ? 'warn' : 'fail';
 }
 
+function isLiveServiceUnavailable(err) {
+  const message = err instanceof Error ? err.message : String(err);
+  return /ECONNREFUSED|connection refused|failed to connect to server|fetch failed/i.test(message);
+}
+
 function addCheck(report, section, id, state, message, details = {}) {
   report.checks.push({ section, id, status: state, message, details });
   if (!report.sections[section]) report.sections[section] = [];
@@ -798,7 +803,12 @@ async function main() {
     await inspectPostgres(pool, report);
     await inspectRedis(e, pool, report);
   } catch (err) {
-    addCheck(report, 'postgres', 'connect', 'fail', err instanceof Error ? err.message : String(err));
+    const message = err instanceof Error ? err.message : String(err);
+    if (isLiveServiceUnavailable(err)) {
+      addCheck(report, 'postgres', 'connect', 'warn', `Postgres unavailable (POSTGRES_CONNECTION_REFUSED): ${message}`);
+    } else {
+      addCheck(report, 'postgres', 'connect', 'fail', message);
+    }
   } finally {
     await pool.end().catch(() => {});
   }

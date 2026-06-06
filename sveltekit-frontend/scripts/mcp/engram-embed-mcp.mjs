@@ -1,15 +1,15 @@
 #!/usr/bin/env node
 /**
  * Engram Embed MCP Server
- * 
+ *
  * Exposes 768-dim embedding, Bifrost ingestion, ACE packet injection,
  * and user chat memory store as MCP tools.
  *
  * Transport chain:
- *   gRPC :50051 → QUIC/NATS :4222 → HTTP batch /api/embed → HTTP sequential /api/embeddings
+ *   llama-server /v1/embeddings → Ollama /api/embed → local ONNX → Ollama /api/embeddings
  *
  * Backed by: embeddinggemma:latest via Ollama :11434
- * 
+ *
  * Start: node scripts/mcp/engram-embed-mcp.mjs
  * Health: node scripts/mcp/engram-embed-mcp.mjs --health
  */
@@ -27,25 +27,23 @@ const MODEL_DIR = resolve(__dirname, '..', '..', 'static', 'embeddinggemma_300m_
 const MODEL_PATH = resolve(MODEL_DIR, 'model.onnx');
 
 const PORT = parseInt(process.env.ENGRAM_MCP_PORT ?? '8792', 10);
+const LLAMA_SERVER_URL =
+  process.env.LLAMA_SERVER_URL ??
+  process.env.TURBO_URL ??
+  process.env.OLLAMA_EMBED_BASE_URL ??
+  'http://127.0.0.1:8090';
 const OLLAMA_URL = process.env.OLLAMA_URL ?? process.env.OLLAMA_BASE_URL ?? 'http://127.0.0.1:11434';
-const OLLAMA_EMBED_BASE_URL = process.env.OLLAMA_EMBED_BASE_URL || process.env.EMBED_BASE_URL || 'http://127.0.0.1:8081';
 const QDRANT_URL = process.env.QDRANT_URL ?? 'http://127.0.0.1:6333';
 const REDIS_URL = process.env.REDIS_URL ?? 'redis://127.0.0.1:6379';
-const EMBED_MODEL = process.env.OLLAMA_EMBED_MODEL ?? 'embeddinggemma:latest';
+const EMBED_MODEL =
+  process.env.LLAMA_EMBED_MODEL ??
+  process.env.OLLAMA_EMBED_MODEL ??
+  'embeddinggemma';
 const EMBED_DIM = 768;
 let redisClient = null;
 let redisClientPromise = null;
 
-let llamaEmbedUrl = OLLAMA_EMBED_BASE_URL;
-if (llamaEmbedUrl) {
-  if (!llamaEmbedUrl.endsWith('/v1/embeddings') && !llamaEmbedUrl.endsWith('/v1/embeddings/')) {
-    if (llamaEmbedUrl.endsWith('/v1') || llamaEmbedUrl.endsWith('/v1/')) {
-      llamaEmbedUrl = llamaEmbedUrl.replace(/\/$/, '') + '/embeddings';
-    } else {
-      llamaEmbedUrl = llamaEmbedUrl.replace(/\/$/, '') + '/v1/embeddings';
-    }
-  }
-}
+let llamaEmbedUrl = LLAMA_SERVER_URL.replace(/\/$/, '') + '/v1/embeddings';
 
 async function getRedis() {
   if (redisClient) return redisClient;
@@ -79,22 +77,54 @@ async function getRedis() {
 }
 
 // ── Health check mode ──────────────────────────────────────────────────────────
-if (process.argv.includes('--health')) {
-  // Test embed endpoint
+async function checkLlamaServer(base = LLAMA_SERVER_URL) {
+  const url = base.replace(/\/$/, '');
   try {
-    const res = await fetch(`${OLLAMA_URL}/api/tags`);
+    const res = await fetch(`${url}/health`, { signal: AbortSignal.timeout(5000) });
+    if (!res.ok) return { ok: false, url, status: res.status };
+    return { ok: true, url, status: res.status };
+  } catch (err) {
+    return { ok: false, url, error: err instanceof Error ? err.message : String(err) };
+  }
+}
+
+if (process.argv.includes('--health')) {
+  const llamaServerHealth = await checkLlamaServer();
+  if (llamaServerHealth.ok) {
+    console.log(JSON.stringify({
+      status: 'ok',
+      server: 'engram-embed-mcp',
+      port: PORT,
+      embed_model: EMBED_MODEL,
+      embed_backend: 'llama-server',
+      llama_server_url: llamaServerHealth.url,
+    }));
+    process.exit(0);
+  }
+
+  // Fallback to Ollama if llama-server is not OK.
+  try {
+    const res = await fetch(`${OLLAMA_URL}/api/tags`, { signal: AbortSignal.timeout(5000) });
     const data = await res.json();
-    const hasEmbedModel = data.models?.some(m => m.name === EMBED_MODEL || m.name.startsWith('embeddinggemma'));
+    const hasEmbedModel = Array.isArray(data.models)
+      ? data.models.some((m) => m?.name === EMBED_MODEL || String(m?.name ?? '').startsWith('embeddinggemma'))
+      : false;
     console.log(JSON.stringify({
       status: hasEmbedModel ? 'ok' : 'warn',
       server: 'engram-embed-mcp',
       port: PORT,
       embed_model: EMBED_MODEL,
+      embed_backend: 'ollama',
       embed_model_present: hasEmbedModel,
       ollama_url: OLLAMA_URL,
+      llama_server_status: llamaServerHealth,
     }));
   } catch (err) {
-    console.log(JSON.stringify({ status: 'error', error: err.message }));
+    console.log(JSON.stringify({
+      status: 'error',
+      error: err instanceof Error ? err.message : String(err),
+      llama_server_status: llamaServerHealth,
+    }));
   }
   process.exit(0);
 }
@@ -556,18 +586,24 @@ const TOOLS = {
       try {
         const res = await fetch(`${OLLAMA_URL}/api/tags`, { signal: AbortSignal.timeout(5000) });
         const data = await res.json();
-        const models = data.models?.map(m => m.name) ?? [];
-        const hasEmbedModel = models.some(n => n.startsWith('embeddinggemma'));
+        const models = Array.isArray(data.models) ? data.models.map((m) => m?.name).filter(Boolean) : [];
+        const hasEmbedModel = models.some((n) => String(n).startsWith('embeddinggemma'));
         return {
+          ok: true,
           ollama_ok: res.ok,
-          embed_model: EMBED_MODEL,
           embed_model_present: hasEmbedModel,
-          models_available: models,
-          qdrant_url: QDRANT_URL,
-          redis_url: REDIS_URL,
+          model: EMBED_MODEL,
+          ollama_url: OLLAMA_URL,
         };
       } catch (err) {
-        return { ollama_ok: false, error: err.message };
+        return {
+          ok: false,
+          ollama_ok: false,
+          embed_model_present: false,
+          error: err instanceof Error ? err.message : String(err),
+          model: EMBED_MODEL,
+          ollama_url: OLLAMA_URL,
+        };
       }
     },
   },
@@ -621,11 +657,12 @@ const TOOLS = {
         if (primed) {
           try {
             const redis = await getRedis();
-            await redis.set(cacheKey, '1', 'EX', 3600); // 1h — matches llama-server KV TTL
+            await redis.set(cacheKey, '1', 'EX', 3600);
           } catch { /* redis optional */ }
         }
+
         return {
-          ok: primed,
+          ok: true,
           status: primed ? 'primed' : 'failed',
           http_status: res.status,
           cache_key: cacheKey,
@@ -633,7 +670,7 @@ const TOOLS = {
           turbo_url: base,
         };
       } catch (err) {
-        return { ok: false, status: 'error', error: err.message, cache_key: cacheKey };
+        return { ok: false, status: 'error', error: err instanceof Error ? err.message : String(err), cache_key: cacheKey };
       }
     },
   },
@@ -654,10 +691,10 @@ const TOOLS = {
           const res = await fetch(`${base}${path}`, { signal: AbortSignal.timeout(5000) });
           results[path] = res.ok ? await res.json() : { status: res.status };
         } catch (err) {
-          results[path] = { error: err.message };
+          results[path] = { error: err instanceof Error ? err.message : String(err) };
         }
       }
-      return { turbo_url: base, ...results };
+      return { ok: true, turbo_url: base, ...results };
     },
   },
 

@@ -1,16 +1,75 @@
 #!/usr/bin/env node
 import { spawnSync } from 'node:child_process';
-import { mkdirSync, existsSync, statSync } from 'node:fs';
+import { mkdirSync, existsSync, statSync, writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import dotenv from 'dotenv';
+import Redis from 'ioredis';
 
 const __dirname = resolve(fileURLToPath(import.meta.url), '..');
 const ROOT = resolve(__dirname, '..', '..');
 const LOG_DIR = resolve(ROOT, 'logs', 'task-output');
+const TMP_DIR = resolve(ROOT, '.tmp');
 const STAMP = resolve(LOG_DIR, '.graphify-daily-last-run');
+const LOG_PATH = resolve(LOG_DIR, 'graphify-daily-startup.log');
+const CACHE_PATH = resolve(LOG_DIR, 'graphify-daily-startup.json');
+const TMP_CACHE_PATH = resolve(TMP_DIR, 'graphify-daily-startup.json');
 const COOLDOWN_SEC = 3600;
 
+// Load the frontend env before spawning graphify so Redis/Qdrant/Postgres
+// auth and host values are available to every nested npm script.
+dotenv.config({ path: resolve(ROOT, '.env'), override: false });
+dotenv.config({ path: resolve(ROOT, '.env.local'), override: false });
+
 mkdirSync(LOG_DIR, { recursive: true });
+mkdirSync(TMP_DIR, { recursive: true });
+
+function resolveRedisConnection() {
+  const rawUrl = process.env.REDIS_URL || 'redis://127.0.0.1:6379';
+  const parsed = new URL(rawUrl);
+  const host = (parsed.hostname || '127.0.0.1') === '0.0.0.0' ? '127.0.0.1' : (parsed.hostname || '127.0.0.1');
+  const port = Number(parsed.port || 6379) || 6379;
+  const password = process.env.REDIS_PASSWORD || process.env.REDIS_PASS || parsed.password || undefined;
+  return { host, port, password };
+}
+
+function writeValidationCache(payload) {
+  const cache = {
+    generatedAt: new Date().toISOString(),
+    ...payload,
+  };
+  writeFileSync(CACHE_PATH, `${JSON.stringify(cache, null, 2)}\n`, 'utf8');
+  writeFileSync(TMP_CACHE_PATH, `${JSON.stringify(cache, null, 2)}\n`, 'utf8');
+  return cache;
+}
+
+async function preflightRedisAuth() {
+  const redis = new Redis({
+    ...resolveRedisConnection(),
+    lazyConnect: true,
+    connectTimeout: 3000,
+    maxRetriesPerRequest: 1,
+  });
+  const onError = () => {};
+  redis.on('error', onError);
+  try {
+    await redis.connect();
+    await redis.ping();
+    return { ok: true };
+  } catch (err) {
+    const msg = String(err?.message ?? err);
+    if (msg.includes('NOAUTH') || msg.includes('Authentication required') || msg.includes('WRONGPASS')) {
+      return { ok: false, reason: 'AUTH_REQUIRED', message: msg };
+    }
+    if (msg.includes('ECONNREFUSED')) {
+      return { ok: false, reason: 'SERVICE_STOPPED', message: msg };
+    }
+    return { ok: false, reason: 'REDIS_UNAVAILABLE', message: msg };
+  } finally {
+    try { await redis.quit(); } catch {}
+    redis.off('error', onError);
+  }
+}
 
 const shouldSkip = existsSync(STAMP)
   ? (Date.now() - statSync(STAMP).mtimeMs) / 1000 < COOLDOWN_SEC
@@ -18,7 +77,36 @@ const shouldSkip = existsSync(STAMP)
 
 if (shouldSkip) {
   const mins = Math.round((Date.now() - statSync(STAMP).mtimeMs) / 60000);
-  console.log(`🗺️ graphify:daily skipped — last run ${mins} min ago (cooldown ${COOLDOWN_SEC / 60} min)`);
+  const message = `🗺️ graphify:daily skipped — last run ${mins} min ago (cooldown ${COOLDOWN_SEC / 60} min)`;
+  console.log(message);
+  writeValidationCache({
+    status: 'skipped',
+    reason: 'cooldown',
+    detail: message,
+    lastRunStamp: STAMP,
+    cooldownSec: COOLDOWN_SEC,
+  });
+  process.exit(0);
+}
+
+const redisGate = await preflightRedisAuth();
+if (!redisGate.ok) {
+  const reason = redisGate.reason === 'AUTH_REQUIRED'
+    ? 'Redis auth required'
+    : redisGate.reason === 'SERVICE_STOPPED'
+      ? 'Redis unavailable'
+      : 'Redis unavailable';
+  const message = redisGate.message ? `: ${redisGate.message}` : '';
+  const clean = `🗺️ graphify:daily skipped — ${reason}${message}`;
+  console.warn(clean);
+  writeFileSync(LOG_PATH, `${new Date().toISOString()} ${clean}\n`, 'utf8');
+  writeValidationCache({
+    status: 'skipped',
+    reason: redisGate.reason,
+    detail: redisGate.message ?? reason,
+    graphFailedDueTo: reason,
+    redis: resolveRedisConnection(),
+  });
   process.exit(0);
 }
 
@@ -28,35 +116,44 @@ const run = process.platform === 'win32'
       ['/d', '/s', '/c', 'npm run graphify:daily'],
       {
         cwd: ROOT,
-        encoding: 'utf8',
+        stdio: 'inherit',
         windowsHide: true,
       }
     )
   : spawnSync('npm', ['run', 'graphify:daily'], {
       cwd: ROOT,
-      encoding: 'utf8',
+      stdio: 'inherit',
       windowsHide: true,
     });
 
-const logPath = resolve(LOG_DIR, 'graphify-daily-startup.log');
-const combined = `${run.stdout || ''}${run.stderr || ''}`.trim();
-if (combined) {
-  mkdirSync(LOG_DIR, { recursive: true });
-  await import('node:fs').then(({ writeFileSync }) => writeFileSync(logPath, combined + '\n', 'utf8'));
-}
-
 if (run.status === 0) {
-  await import('node:fs').then(({ writeFileSync }) => writeFileSync(STAMP, new Date().toISOString() + '\n', 'utf8'));
+  writeFileSync(STAMP, new Date().toISOString() + '\n', 'utf8');
+  writeFileSync(LOG_PATH, `${new Date().toISOString()} graphify:daily complete\n`, 'utf8');
+  writeValidationCache({
+    status: 'complete',
+    reason: null,
+    detail: 'graphify:daily completed successfully',
+    graphFailedDueTo: null,
+    redis: resolveRedisConnection(),
+  });
   console.log('🗺️ graphify:daily complete');
   process.exit(0);
 }
 
 const runError = run.error ? String(run.error.message ?? run.error) : '';
 const exitBits = [
-  combined || 'graphify:daily failed',
+  'graphify:daily failed',
   runError ? `[spawn error] ${runError}` : '',
   typeof run.status === 'number' ? `[exit code] ${run.status}` : '',
   run.signal ? `[signal] ${run.signal}` : '',
 ].filter(Boolean);
+writeFileSync(LOG_PATH, `${new Date().toISOString()} ${exitBits.join(' | ')}\n`, 'utf8');
+writeValidationCache({
+  status: 'failed',
+  reason: runError || (run.signal ? `signal:${run.signal}` : `exit:${run.status ?? 1}`),
+  detail: exitBits.join(' | '),
+  graphFailedDueTo: runError || (run.signal ? `signal:${run.signal}` : `exit:${run.status ?? 1}`),
+  redis: resolveRedisConnection(),
+});
 console.error(exitBits.join('\n'));
 process.exit(run.status ?? 1);

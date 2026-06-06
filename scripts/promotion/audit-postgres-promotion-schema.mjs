@@ -16,7 +16,7 @@ dotenv.config({ path: resolve(ROOT, 'sveltekit-frontend/.env') });
 
 const TARGET_TABLES = [
   'task_semantic_packets', 'parent_atlas_documents', 'parent_atlas_vectors',
-  'code_llm_index', 'nes_chrom_packets', 'atlas_feature_profiles',
+  'route_runtime_packets', 'code_llm_index', 'nes_chrom_packets', 'atlas_feature_profiles',
   'atlas_dependency_edges', 'atlas_hot_keyword_clusters', 'atlas_retrieval_events',
 ];
 

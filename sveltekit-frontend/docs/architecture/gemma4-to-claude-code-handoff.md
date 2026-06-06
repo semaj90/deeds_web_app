@@ -23,7 +23,7 @@ Plan + cost model: [next_steps/active/2026-05-09_gemma4-mcp-synthesis-loop.md](.
 
 | Lane | Where it runs | Output | Claude tokens spent |
 |------|---------------|--------|---------------------|
-| 1. Retrieval | Gemma4 → `gemma4-offload` MCP → TRACE MCP tools | `scratch/synthesis-runs/<ts>/raw-retrieval.json` | 0 |
+| 1. Retrieval | Gemma4 → `gemma4-offload` MCP → TRACE MCP tools (repo-audit only) | `scratch/synthesis-runs/<ts>/raw-retrieval.json` | 0 |
 | 2. Graph analysis | Neo4j read-only Cypher + CouchDB views | `…/graph-analysis.json` | 0 |
 | 3. Rerank + fallback | Gemma4 reranks; if confidence < 0.6 calls `kag.expand` or `web_search` and merges | `…/ranked-context.json` | 0 |
 | 4. Synthesis | Gemma4 single-shot writes the brief | `memory/implementation-briefs/<ts>_<slug>.md` | 0 |
@@ -99,7 +99,7 @@ constraints, and steps. Net savings ≈ 75-90 %.
 |------|------|-----------|
 | **Gemma4** (TurboQuant :8090, Ollama fallback) | local retrieval, rerank, synthesis, drafts the brief | edit code files, run shell, call Claude API |
 | **TRACE MCP** (port 8788) | the syscall boundary — every infrastructure read flows through a registered tool | expose write verbs by default |
-| **`gemma4-offload` MCP** (stdio) | gives *Claude Code* a way to offload short-form generation back to Gemma4 (drafting commit messages, paraphrasing, classifying) | replace TRACE MCP for retrieval — different concern |
+| **`gemma4-offload` MCP** (stdio) | gives *Claude Code* a way to offload repo-audit summaries and runtime diagnostics back to Gemma4 | use `repo_report_answer` for report snippets; do not use for general chat or model selection |
 | **Claude Code** | implementation operator: reads brief, edits files, runs smoke, follows skills+hooks | do the retrieval/discovery itself when a brief exists |
 | **`.claude/skills/*`** | reusable workflow rules loaded automatically when relevant (Bits UI, UnoCSS, Drizzle review, TRACE MCP tooling) | be a substitute for the brief — they're the *how*, the brief is the *what* |
 | **`.claude/agents/*`** | task-scoped sub-agents with declared tool preferences (drizzle-inspector, sveltekit-route-auditor, topology-medic, obsidian-cartographer) | hard-restrict tools — `tools:` is a hint per Anthropic docs; use hooks for sandboxing |
@@ -117,7 +117,7 @@ constraints, and steps. Net savings ≈ 75-90 %.
 
 ## Status / what's shipped
 
-- ✅ `gemma4-offload` stdio MCP (4 tools: chat, summarize, classify, health) — commit `2970e39977`.
+- ✅ `gemma4-offload` stdio MCP (repo-audit-only tool surface: `repo_report_answer`, `gemma4_summarize`, `gemma4_classify`, `gemma4_health`) — commit `2970e39977`.
 - ✅ Validator gates G29 (destructive-SQL pending) + G30 (MCP handshake) + G31 (MCP roundtrip) — commit `2970e39977`.
 - ✅ Architecture docs for the agent-OS, Drizzle inspection MCP, store alignment — commit `6df1cd1dff`.
 - ⏳ Phase A scaffolding: `.claude/skills/*` + `.claude/agents/*` + this doc (this commit).

@@ -139,7 +139,7 @@ if (pgSchemaReport) {
   const allGreen = Object.values(gates).every(v => v === true || v === 'ok' || v === 'present');
   if (allGreen) {
     postgresSchemaStatus = 'GREEN';
-    postgresSchemaDetail = `Schema audit passed — Postgres ${pgSchemaReport.postgres_version ?? '?'}, all required tables/cols present`;
+    postgresSchemaDetail = `Postgres 18 contract passed — ${pgSchemaReport.postgres_version ?? '?'}, all required tables/cols present`;
   } else {
     const failed = Object.entries(gates).filter(([, v]) => v !== true && v !== 'ok' && v !== 'present').map(([k]) => k);
     postgresSchemaStatus = 'YELLOW';
@@ -148,6 +148,18 @@ if (pgSchemaReport) {
   if (!pg18 && pgSchemaReport.postgres_version) {
     postgresSchemaDetail += ` — NOTE: live DB is Postgres ${pgSchemaReport.postgres_version}; project targets Postgres 18 lane`;
   }
+}
+
+let postgres18ContractStatus = postgresSchemaStatus;
+let postgres18ContractDetail = postgresSchemaDetail;
+if (pgSchemaReport) {
+  const pg18 = pgSchemaReport.gates?.postgres_is_18 === true || pgSchemaReport.postgres_version?.includes('18') === true;
+  const ready = postgresSchemaStatus === 'GREEN' && pg18;
+  postgres18ContractStatus = ready ? 'GREEN' : 'YELLOW';
+  postgres18ContractDetail = ready
+    ? `Postgres 18 contract is explicit and satisfied — ${pgSchemaReport.postgres_version ?? '?'}, alias_id + parent_atlas_documents + task_semantic_packets + pgvector present`
+    : `Postgres 18 contract is present but not fully satisfied — ${pgSchemaReport.postgres_version ?? '?'}`
+      + (pg18 ? '' : ' (live DB is not reporting Postgres 18)');
 }
 
 // ── NEW GATES: Drizzle drift audit ───────────────────────────────────────────
@@ -357,6 +369,7 @@ const result = {
   offline_synthesis_dry_run: { status: synthDryRunStatus, detail: synthDryRunDetail },
   // New schema/index gates
   postgres_schema_preflight: { status: postgresSchemaStatus, detail: postgresSchemaDetail },
+  postgres18_contract: { status: postgres18ContractStatus, detail: postgres18ContractDetail },
   drizzle_drift_audit: { status: drizzleDriftStatus, detail: drizzleDriftDetail },
   alias_id_verified: { status: aliasIdVerifiedStatus, detail: aliasIdVerifiedDetail },
   parent_atlas_documents_ready: { status: parentAtlasDocStatus, detail: parentAtlasDocDetail },
@@ -398,6 +411,7 @@ const mdLines = [
   `| Card validation | ${cardValidationStatus === 'GREEN' ? '✅' : cardValidationStatus === 'YELLOW' ? '🟡' : '⚠️'} ${cardValidationStatus} | ${cardValidationDetail} |`,
   `| alias_id schema | ${aliasIdStatus === 'UNBLOCKED' ? '✅' : aliasIdStatus === 'BLOCKED' ? '❌' : '⚠️'} ${aliasIdStatus} | ${aliasIdDetail} |`,
   `| Synthesis dry-run | ${synthDryRunStatus === 'GREEN' ? '✅' : synthDryRunStatus === 'YELLOW' ? '🟡' : '⚠️'} ${synthDryRunStatus} | ${synthDryRunDetail} |`,
+  `| Postgres 18 contract | ${postgres18ContractStatus === 'GREEN' ? '✅' : postgres18ContractStatus === 'YELLOW' ? '🟡' : '⚠️'} ${postgres18ContractStatus} | ${postgres18ContractDetail} |`,
   `| Superseded score candidates | ${supersededScoreStatus === 'GREEN' ? '✅' : supersededScoreStatus === 'RED' ? '❌' : supersededScoreStatus === 'YELLOW' ? '🟡' : '⚠️'} ${supersededScoreStatus} | ${supersededScoreDetail} |`,
   `| **Can run bounded apply** | ${canRunBoundedApply ? '✅ YES' : '❌ NO'} | ${canRunBoundedApply ? 'All gates green' : boundedApplyBlockers.join('; ')} |`,
   '',

@@ -36,7 +36,7 @@ When navigating the codebase, **always** use `rg` (ripgrep) first.
 ## Environment Variable Management
 Ensure the following environment variables are set when running tooling:
 *   `OPENAI_HARD_INPUT_CAP`: Defines the token limit that triggers compaction (default 24000).
-*   `TURBO_CTX_SIZE`: Target context window size for the model (e.g., 32768).
+*   `TURBO_CTX_SIZE`: Target context window size for the model (e.g., 64k).
 *   `ACE_PACKET_TOKEN_CAP`: Maximum allowed token count for the compacted ACE packet (e.g., 3500).
 *   `MCP_RESULT_TOKEN_CAP`: Token cap for MCP results (e.g., 800).
 

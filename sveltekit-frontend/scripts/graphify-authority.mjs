@@ -6,14 +6,18 @@
  * mirrors them to Redis, and patches Qdrant payloads.
  */
 
+import dotenv from 'dotenv';
 import neo4jPkg from 'neo4j-driver';
 import { Redis } from 'ioredis';
 import fetch from 'node-fetch';
+
+dotenv.config();
 
 const REDIS_URL      = process.env.REDIS_URL       ?? 'redis://127.0.0.1:6379';
 const NEO4J_URI      = process.env.NEO4J_URI       ?? 'bolt://localhost:7687';
 const NEO4J_USER     = process.env.NEO4J_USER      ?? 'neo4j';
 const NEO4J_PASS     = process.env.NEO4J_PASSWORD  ?? 'neo4j123';
+const REDIS_PASSWORD = process.env.REDIS_PASSWORD  ?? process.env.REDIS_PASS ?? undefined;
 const QDRANT_URL     = process.env.QDRANT_URL      ?? 'http://127.0.0.1:6333';
 const COLLECTION     = 'codebase_chunks_768';
 
@@ -71,7 +75,13 @@ async function main() {
       ORDER BY n.pagerank DESC
     `);
     
-    const redis = new Redis(REDIS_URL, { lazyConnect: true });
+    const redis = new Redis(REDIS_URL, {
+      password: REDIS_PASSWORD,
+      lazyConnect: true,
+      connectTimeout: 4000,
+      maxRetriesPerRequest: 1,
+    });
+    redis.on('error', () => {});
     await redis.connect();
     
     const scoreMap = new Map();

@@ -1,0 +1,77 @@
+{
+  "schema": "live_service_env.v1",
+  "generatedAt": "2026-06-05T21:32:48.527Z",
+  "readOnly": true,
+  "services": [
+    {
+      "name": "Postgres 18",
+      "expected": {
+        "host": "127.0.0.1",
+        "port": 5434
+      },
+      "envDisplay": "127.0.0.1:5434",
+      "probeDisplay": "3ms",
+      "detail": "DATABASE_URL=postgresql://legal_admin:123456@127.0.0.1:5434/legal_ai_db",
+      "status": "READY"
+    },
+    {
+      "name": "Qdrant",
+      "expected": {
+        "host": "127.0.0.1",
+        "port": 6333
+      },
+      "envDisplay": "127.0.0.1:6333",
+      "probeDisplay": "1ms",
+      "detail": "QDRANT_URL=http://127.0.0.1:6333",
+      "status": "READY"
+    },
+    {
+      "name": "Neo4j",
+      "expected": {
+        "host": "127.0.0.1",
+        "port": 7687
+      },
+      "envDisplay": "127.0.0.1:7687",
+      "probeDisplay": "1ms",
+      "detail": "NEO4J_URI=bolt://127.0.0.1:7687",
+      "status": "READY"
+    },
+    {
+      "name": "Redis",
+      "expected": {
+        "host": "127.0.0.1",
+        "port": 6379
+      },
+      "envDisplay": "127.0.0.1:6379",
+      "probeDisplay": "0ms",
+      "detail": "REDIS_URL=redis://127.0.0.1:6379",
+      "status": "READY"
+    }
+  ],
+  "provenance": {
+    "spine": [
+      "source_ref",
+      "parent_atlas_documents",
+      "feature_id",
+      "atlas_feature_map",
+      "qdrant_point_id",
+      "route_runtime_packets",
+      "neo4j contextual tree"
+    ]
+  },
+  "qdrantBackfill": {
+    "ready": true,
+    "blockers": [],
+    "notes": "Qdrant backfill can proceed read-only from provenance sources"
+  },
+  "summary": {
+    "counts": {
+      "READY": 4,
+      "ENV_MISMATCH": 0,
+      "PORT_MISMATCH": 0,
+      "SERVICE_STOPPED": 0,
+      "AUTH_REQUIRED": 0,
+      "SOURCE_UNAVAILABLE": 0
+    }
+  }
+}

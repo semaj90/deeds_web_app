@@ -8,7 +8,7 @@
  *
  * Checks:
  *   turbovec  :8791  — HTTP POST /mcp only
- *   engram    :8792  — HTTP POST /mcp  +  stdio (spawned subprocess)
+ *   engram    :8792  — stdio only (spawned subprocess via OpenCode)
  *   langext   :8793  — HTTP POST /mcp only
  *
  * Exit codes:
@@ -21,7 +21,7 @@
  */
 
 import { mkdir, writeFile } from 'node:fs/promises';
-import { existsSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import { spawn } from 'node:child_process';
 import { resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -30,11 +30,47 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = resolve(__dirname, '..', '..');
 const TMP_DIR = resolve(ROOT, '.tmp');
 
-const SIDECARS = [
-  { name: 'turbovec-sidecar', port: 8791, checkStdio: false },
-  { name: 'engram-embed',      port: 8792, checkStdio: true  },
-  { name: 'langextract',       port: 8793, checkStdio: false },
-];
+function loadSidecars() {
+  const opencodePath = resolve(ROOT, 'opencode.json');
+  if (!existsSync(opencodePath)) {
+    return [
+      { name: 'turbovec-sidecar', port: 8791, transport: 'http', enabled: true },
+      { name: 'engram-embed', port: 8792, transport: 'stdio', enabled: true },
+      { name: 'langextract', port: 8793, transport: 'http', enabled: true },
+    ];
+  }
+
+  const raw = JSON.parse(readFileSync(opencodePath, 'utf8'));
+  const mcp = raw.mcp ?? {};
+  const wanted = ['turbovec', 'turbovec-sidecar', 'engram-embed', 'langextract'];
+  const list = [];
+
+  for (const name of wanted) {
+    const cfg = mcp[name];
+    if (!cfg) continue;
+    if (cfg.type === 'remote') {
+      list.push({
+        name,
+        port: Number(String(cfg.url ?? '').match(/:(\d+)\//)?.[1] ?? '0'),
+        transport: 'http',
+        enabled: cfg.enabled !== false,
+        url: cfg.url,
+      });
+    } else if (cfg.type === 'local') {
+      list.push({
+        name,
+        port: 0,
+        transport: 'stdio',
+        enabled: cfg.enabled !== false,
+        command: cfg.command,
+        args: cfg.args ?? [],
+      });
+    }
+  }
+  return list;
+}
+
+const SIDECARS = loadSidecars();
 
 const INITIALIZE_REQUEST = JSON.stringify({
   jsonrpc: '2.0',
@@ -227,19 +263,26 @@ const results = [];
 let anyTransportError = false;
 
 for (const sidecar of SIDECARS) {
-  const httpResult = await probeHttp(sidecar.port);
-
   const entry = {
     name: sidecar.name,
     port: sidecar.port,
-    http: httpResult,
+    transport: sidecar.transport,
   };
 
-  if (httpResult.status === 'TRANSPORT_ERROR') {
-    anyTransportError = true;
+  if (sidecar.enabled === false) {
+    if (sidecar.transport === 'stdio') entry.stdio = { status: 'SKIPPED', detail: 'Disabled in opencode.json' };
+    else entry.http = { status: 'SKIPPED', detail: 'Disabled in opencode.json' };
+    results.push(entry);
+    continue;
   }
 
-  if (sidecar.checkStdio) {
+  if (sidecar.transport === 'http') {
+    const httpResult = await probeHttp(sidecar.port);
+    entry.http = httpResult;
+    if (httpResult.status === 'TRANSPORT_ERROR') {
+      anyTransportError = true;
+    }
+  } else if (sidecar.transport === 'stdio') {
     const scriptPath = resolve(__dirname, 'engram-embed-mcp.mjs');
     if (!existsSync(scriptPath)) {
       entry.stdio = { status: 'FAIL', detail: `Script not found: ${scriptPath}` };
@@ -247,9 +290,7 @@ for (const sidecar of SIDECARS) {
       const stdioResult = await probeStdio(scriptPath, ['--stdio']);
       entry.stdio = stdioResult;
       if (stdioResult.status === 'FAIL') {
-        // stdio failure is NOT a transport error for exit code purposes
-        // (the sidecar may simply not be meant to run stand-alone in this env)
-        // But we report it prominently.
+        anyTransportError = true;
       }
     }
   }
@@ -290,8 +331,12 @@ const mdLines = [
 ];
 
 for (const r of results) {
-  const icon = r.http.status === 'OK' ? '✅' : r.http.status === 'DOWN' ? '⚠️' : r.http.status === 'TRANSPORT_ALIVE' ? '🟡' : '❌';
-  mdLines.push(`| ${r.name} | ${r.port} | ${icon} ${r.http.status} | ${r.http.detail} |`);
+  const transport = r.transport ?? 'http';
+  const entry = transport === 'stdio' ? r.stdio : r.http;
+  const status = entry?.status ?? 'UNKNOWN';
+  const detail = entry?.detail ?? 'No transport result';
+  const icon = status === 'OK' ? '✅' : status === 'DOWN' ? '⚠️' : status === 'SKIPPED' ? '⏭️' : status === 'TRANSPORT_ALIVE' ? '🟡' : status === 'UNKNOWN' ? '❔' : '❌';
+  mdLines.push(`| ${r.name} | ${r.port} | ${icon} ${status} | ${detail} |`);
 }
 
 const stdioEntries = results.filter((r) => r.stdio);
@@ -324,10 +369,16 @@ await writeFile(
 // Console output
 console.log('\n=== MCP Sidecar Transport Audit ===\n');
 for (const r of results) {
-  const httpIcon = r.http.status === 'OK' ? '✅' : r.http.status === 'DOWN' ? '⚠️ ' : r.http.status === 'TRANSPORT_ALIVE' ? '🟡' : '❌';
-  console.log(`  ${httpIcon} [HTTP] ${r.name}:${r.port}  ${r.http.status}  — ${r.http.detail}`);
+  if (r.http) {
+  const httpIcon = r.http.status === 'OK' ? '✅' : r.http.status === 'DOWN' ? '⚠️ ' : r.http.status === 'SKIPPED' ? '⏭️ ' : r.http.status === 'TRANSPORT_ALIVE' ? '🟡' : '❌';
+    if (r.http.status !== 'SKIPPED') {
+      console.log(`  ${httpIcon} [HTTP] ${r.name}:${r.port}  ${r.http.status}  — ${r.http.detail}`);
+    } else {
+      console.log(`  ⏭️ [HTTP] ${r.name}:${r.port}  SKIPPED  — ${r.http.detail}`);
+    }
+  }
   if (r.stdio) {
-    const stdioIcon = r.stdio.status === 'OK' ? '✅' : '❌';
+    const stdioIcon = r.stdio.status === 'OK' ? '✅' : r.stdio.status === 'DOWN' ? '⚠️ ' : r.stdio.status === 'SKIPPED' ? '⏭️ ' : '❌';
     console.log(`  ${stdioIcon} [STDIO] ${r.name}  ${r.stdio.status}  — ${r.stdio.detail}`);
   }
 }

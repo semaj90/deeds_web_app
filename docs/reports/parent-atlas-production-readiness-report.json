@@ -1,6 +1,6 @@
 {
   "schema": "parent_atlas_production_readiness.v1",
-  "generatedAt": "2026-06-05T17:23:24.227Z",
+  "generatedAt": "2026-06-06T06:22:10.140Z",
   "readOnly": true,
   "sections": {
     "summary-batch": [
@@ -297,7 +297,7 @@
         "message": "sveltekit-frontend/src/lib/server/db/schema/nes-chrom-packets.ts exists",
         "details": {
           "exists": true,
-          "bytes": 4357,
+          "bytes": 5118,
           "relPath": "sveltekit-frontend/src/lib/server/db/schema/nes-chrom-packets.ts"
         }
       },
@@ -317,7 +317,7 @@
         "message": "sveltekit-frontend/src/lib/server/db/schema/index.ts exists",
         "details": {
           "exists": true,
-          "bytes": 3953,
+          "bytes": 4084,
           "relPath": "sveltekit-frontend/src/lib/server/db/schema/index.ts"
         }
       },
@@ -529,31 +529,31 @@
         "message": "rg -uuu found 128 NDJSON files",
         "details": {
           "sample": [
-            ".opencode\\ingest\\nodes.ndjson",
-            ".opencode\\ingest\\edges.ndjson",
-            ".opencode\\gemma4_candidates.ndjson",
-            ".opencode\\fixes\\fixes.ndjson",
-            ".opencode\\recommendations\\tasks.ndjson",
-            ".opencode\\recommendations\\tasks-with-improved-titles.ndjson",
-            ".opencode\\quarantine\\invalid-cards.ndjson",
-            ".opencode\\outcome-ledger.ndjson",
-            ".opencode\\outcome-ledger-with-cardIds.ndjson",
-            ".opencode\\ace-packets\\index.ndjson",
-            ".opencode\\ace-packets_stale\\index.ndjson",
-            ".opencode\\ndjson\\parents-atlas-test\\ledger.ndjson",
-            ".opencode\\ndjson\\parents-atlas-test\\2026-05-30-test-1780159729769.ndjson",
-            ".opencode\\ndjson\\minified-ace-index.ndjson",
-            ".opencode\\ndjson\\graph-edges.ndjson",
-            ".opencode\\ndjson\\enriched-ledger.ndjson",
-            ".opencode\\ndjson\\enriched-candidates.ndjson",
-            ".opencode\\ndjson\\cluster-summary.ndjson",
-            ".tmp\\superseded-score-candidates.ndjson",
-            ".tmp\\source-ref-repair-candidates.ndjson",
-            ".tmp\\retrieval-pass-dry-run.ndjson",
-            "tmp\\llm-wiki-chunks\\_combined.ndjson",
-            "tmp\\llm-wiki-chunks\\tokenization.ndjson",
-            "tmp\\llm-wiki-chunks\\tokenization-rg.ndjson",
-            "tmp\\llm-wiki-chunks\\som-clustering.ndjson"
+            "sveltekit-frontend\\tmp\\qdrant-embeddings-test.ndjson",
+            "sveltekit-frontend\\tmp\\hypergraph-assignments.ndjson",
+            "sveltekit-frontend\\tmp\\hypergraph\\codebase_chunks_768-embeddings.ndjson",
+            "sveltekit-frontend\\tmp\\hypergraph\\codebase_chunks_768-assignments.ndjson",
+            "sveltekit-frontend\\tmp\\embeddings-smoke.ndjson",
+            "sveltekit-frontend\\tmp\\codebase_chunks_768-embeddings.ndjson",
+            "sveltekit-frontend\\tmp\\chunks\\parents-corpus-rg.ndjson",
+            "sveltekit-frontend\\tmp\\chunks\\parents-corpus-expanded.ndjson",
+            "sveltekit-frontend\\tmp\\chunks\\parents-corpus-all.ndjson",
+            "sveltekit-frontend\\tmp\\chunks\\parents-corpus-4d.ndjson",
+            "sveltekit-frontend\\tmp\\assignments.ndjson",
+            "sveltekit-frontend\\tmp\\assignments-test.ndjson",
+            "sveltekit-frontend\\tmp\\assignments-ci.ndjson",
+            "scripts\\atlas\\out\\tool-usage-edges.ndjson",
+            "scripts\\atlas\\out\\synthetic-traces.ndjson",
+            "scripts\\atlas\\out\\db-usage-edges.ndjson",
+            "scripts\\atlas\\out\\calls-edges-2026-05-29.ndjson",
+            "scripts\\atlas\\out\\cache-usage-edges.ndjson",
+            "sveltekit-frontend\\sveltekit-frontend\\tmp\\embeddings-smoke.ndjson",
+            "sveltekit-frontend\\svelte-check-machine.ndjson",
+            "docs\\packets\\session-features.ndjson",
+            "docs\\packets\\rg-knowledge-packets.ndjson",
+            "docs\\ai-os\\agentic-progress-log.ndjson",
+            "sveltekit-frontend\\static\\dev-graphs\\validation\\history.ndjson",
+            ".opencode\\recommendations\\tasks.ndjson"
           ]
         }
       }
@@ -640,7 +640,7 @@
       {
         "id": "parent_atlas_documents:summaries",
         "status": "pass",
-        "message": "Parent Atlas summaries: 3799/3799",
+        "message": "Parent Atlas summaries: 3794/3799",
         "details": {}
       },
       {
@@ -674,7 +674,7 @@
       {
         "id": "lod0:route-runtime",
         "status": "pass",
-        "message": "Redis LOD0 runtime packets: 28/33",
+        "message": "Redis LOD0 runtime packets: 1/33",
         "details": {}
       }
     ],
@@ -1009,7 +1009,7 @@
       "message": "sveltekit-frontend/src/lib/server/db/schema/nes-chrom-packets.ts exists",
       "details": {
         "exists": true,
-        "bytes": 4357,
+        "bytes": 5118,
         "relPath": "sveltekit-frontend/src/lib/server/db/schema/nes-chrom-packets.ts"
       }
     },
@@ -1031,7 +1031,7 @@
       "message": "sveltekit-frontend/src/lib/server/db/schema/index.ts exists",
       "details": {
         "exists": true,
-        "bytes": 3953,
+        "bytes": 4084,
         "relPath": "sveltekit-frontend/src/lib/server/db/schema/index.ts"
       }
     },
@@ -1262,31 +1262,31 @@
       "message": "rg -uuu found 128 NDJSON files",
       "details": {
         "sample": [
-          ".opencode\\ingest\\nodes.ndjson",
-          ".opencode\\ingest\\edges.ndjson",
-          ".opencode\\gemma4_candidates.ndjson",
-          ".opencode\\fixes\\fixes.ndjson",
-          ".opencode\\recommendations\\tasks.ndjson",
-          ".opencode\\recommendations\\tasks-with-improved-titles.ndjson",
-          ".opencode\\quarantine\\invalid-cards.ndjson",
-          ".opencode\\outcome-ledger.ndjson",
-          ".opencode\\outcome-ledger-with-cardIds.ndjson",
-          ".opencode\\ace-packets\\index.ndjson",
-          ".opencode\\ace-packets_stale\\index.ndjson",
-          ".opencode\\ndjson\\parents-atlas-test\\ledger.ndjson",
-          ".opencode\\ndjson\\parents-atlas-test\\2026-05-30-test-1780159729769.ndjson",
-          ".opencode\\ndjson\\minified-ace-index.ndjson",
-          ".opencode\\ndjson\\graph-edges.ndjson",
-          ".opencode\\ndjson\\enriched-ledger.ndjson",
-          ".opencode\\ndjson\\enriched-candidates.ndjson",
-          ".opencode\\ndjson\\cluster-summary.ndjson",
-          ".tmp\\superseded-score-candidates.ndjson",
-          ".tmp\\source-ref-repair-candidates.ndjson",
-          ".tmp\\retrieval-pass-dry-run.ndjson",
-          "tmp\\llm-wiki-chunks\\_combined.ndjson",
-          "tmp\\llm-wiki-chunks\\tokenization.ndjson",
-          "tmp\\llm-wiki-chunks\\tokenization-rg.ndjson",
-          "tmp\\llm-wiki-chunks\\som-clustering.ndjson"
+          "sveltekit-frontend\\tmp\\qdrant-embeddings-test.ndjson",
+          "sveltekit-frontend\\tmp\\hypergraph-assignments.ndjson",
+          "sveltekit-frontend\\tmp\\hypergraph\\codebase_chunks_768-embeddings.ndjson",
+          "sveltekit-frontend\\tmp\\hypergraph\\codebase_chunks_768-assignments.ndjson",
+          "sveltekit-frontend\\tmp\\embeddings-smoke.ndjson",
+          "sveltekit-frontend\\tmp\\codebase_chunks_768-embeddings.ndjson",
+          "sveltekit-frontend\\tmp\\chunks\\parents-corpus-rg.ndjson",
+          "sveltekit-frontend\\tmp\\chunks\\parents-corpus-expanded.ndjson",
+          "sveltekit-frontend\\tmp\\chunks\\parents-corpus-all.ndjson",
+          "sveltekit-frontend\\tmp\\chunks\\parents-corpus-4d.ndjson",
+          "sveltekit-frontend\\tmp\\assignments.ndjson",
+          "sveltekit-frontend\\tmp\\assignments-test.ndjson",
+          "sveltekit-frontend\\tmp\\assignments-ci.ndjson",
+          "scripts\\atlas\\out\\tool-usage-edges.ndjson",
+          "scripts\\atlas\\out\\synthetic-traces.ndjson",
+          "scripts\\atlas\\out\\db-usage-edges.ndjson",
+          "scripts\\atlas\\out\\calls-edges-2026-05-29.ndjson",
+          "scripts\\atlas\\out\\cache-usage-edges.ndjson",
+          "sveltekit-frontend\\sveltekit-frontend\\tmp\\embeddings-smoke.ndjson",
+          "sveltekit-frontend\\svelte-check-machine.ndjson",
+          "docs\\packets\\session-features.ndjson",
+          "docs\\packets\\rg-knowledge-packets.ndjson",
+          "docs\\ai-os\\agentic-progress-log.ndjson",
+          "sveltekit-frontend\\static\\dev-graphs\\validation\\history.ndjson",
+          ".opencode\\recommendations\\tasks.ndjson"
         ]
       }
     },
@@ -1382,7 +1382,7 @@
       "section": "postgres",
       "id": "parent_atlas_documents:summaries",
       "status": "pass",
-      "message": "Parent Atlas summaries: 3799/3799",
+      "message": "Parent Atlas summaries: 3794/3799",
       "details": {}
     },
     {
@@ -1418,7 +1418,7 @@
       "section": "redis",
       "id": "lod0:route-runtime",
       "status": "pass",
-      "message": "Redis LOD0 runtime packets: 28/33",
+      "message": "Redis LOD0 runtime packets: 1/33",
       "details": {}
     },
     {
@@ -1452,7 +1452,7 @@
       "total": 3799,
       "with_source_ref": 3799,
       "with_feature_id": 3799,
-      "with_summary": 3799
+      "with_summary": 3794
     },
     "topologyCoverage": {
       "raw_total": 14465,
@@ -1482,20 +1482,20 @@
   "redis": {
     "available": true,
     "latestRuntimePacketsChecked": 33,
-    "lod0Found": 28,
-    "lod0Missing": 5
+    "lod0Found": 1,
+    "lod0Missing": 32
   },
   "qdrant": {
     "available": true,
     "url": "http://127.0.0.1:6333",
     "collection": "codebase_chunks_768",
     "pointsCount": 76261,
-    "indexedVectorsCount": 143664,
+    "indexedVectorsCount": 152502,
     "status": "green"
   },
   "neo4j": {
     "available": true,
-    "uri": "bolt://localhost:7687",
+    "uri": "bolt://127.0.0.1:7687",
     "totalNodes": 58224,
     "codebaseFiles": 25269,
     "parentAtlasFeatures": 1701,
@@ -1506,7 +1506,7 @@
   "drizzle": {
     "nesChromSchema": {
       "exists": true,
-      "bytes": 4357,
+      "bytes": 5118,
       "relPath": "sveltekit-frontend/src/lib/server/db/schema/nes-chrom-packets.ts"
     },
     "routeRuntimeSchema": {
@@ -1516,7 +1516,7 @@
     },
     "schemaIndex": {
       "exists": true,
-      "bytes": 3953,
+      "bytes": 4084,
       "relPath": "sveltekit-frontend/src/lib/server/db/schema/index.ts"
     },
     "schemaPostgres": {
@@ -1626,31 +1626,31 @@
     "status": "pass",
     "total": 128,
     "sample": [
-      ".opencode\\ingest\\nodes.ndjson",
-      ".opencode\\ingest\\edges.ndjson",
-      ".opencode\\gemma4_candidates.ndjson",
-      ".opencode\\fixes\\fixes.ndjson",
-      ".opencode\\recommendations\\tasks.ndjson",
-      ".opencode\\recommendations\\tasks-with-improved-titles.ndjson",
-      ".opencode\\quarantine\\invalid-cards.ndjson",
-      ".opencode\\outcome-ledger.ndjson",
-      ".opencode\\outcome-ledger-with-cardIds.ndjson",
-      ".opencode\\ace-packets\\index.ndjson",
-      ".opencode\\ace-packets_stale\\index.ndjson",
-      ".opencode\\ndjson\\parents-atlas-test\\ledger.ndjson",
-      ".opencode\\ndjson\\parents-atlas-test\\2026-05-30-test-1780159729769.ndjson",
-      ".opencode\\ndjson\\minified-ace-index.ndjson",
-      ".opencode\\ndjson\\graph-edges.ndjson",
-      ".opencode\\ndjson\\enriched-ledger.ndjson",
-      ".opencode\\ndjson\\enriched-candidates.ndjson",
-      ".opencode\\ndjson\\cluster-summary.ndjson",
-      ".tmp\\superseded-score-candidates.ndjson",
-      ".tmp\\source-ref-repair-candidates.ndjson",
-      ".tmp\\retrieval-pass-dry-run.ndjson",
-      "tmp\\llm-wiki-chunks\\_combined.ndjson",
-      "tmp\\llm-wiki-chunks\\tokenization.ndjson",
-      "tmp\\llm-wiki-chunks\\tokenization-rg.ndjson",
-      "tmp\\llm-wiki-chunks\\som-clustering.ndjson"
+      "sveltekit-frontend\\tmp\\qdrant-embeddings-test.ndjson",
+      "sveltekit-frontend\\tmp\\hypergraph-assignments.ndjson",
+      "sveltekit-frontend\\tmp\\hypergraph\\codebase_chunks_768-embeddings.ndjson",
+      "sveltekit-frontend\\tmp\\hypergraph\\codebase_chunks_768-assignments.ndjson",
+      "sveltekit-frontend\\tmp\\embeddings-smoke.ndjson",
+      "sveltekit-frontend\\tmp\\codebase_chunks_768-embeddings.ndjson",
+      "sveltekit-frontend\\tmp\\chunks\\parents-corpus-rg.ndjson",
+      "sveltekit-frontend\\tmp\\chunks\\parents-corpus-expanded.ndjson",
+      "sveltekit-frontend\\tmp\\chunks\\parents-corpus-all.ndjson",
+      "sveltekit-frontend\\tmp\\chunks\\parents-corpus-4d.ndjson",
+      "sveltekit-frontend\\tmp\\assignments.ndjson",
+      "sveltekit-frontend\\tmp\\assignments-test.ndjson",
+      "sveltekit-frontend\\tmp\\assignments-ci.ndjson",
+      "scripts\\atlas\\out\\tool-usage-edges.ndjson",
+      "scripts\\atlas\\out\\synthetic-traces.ndjson",
+      "scripts\\atlas\\out\\db-usage-edges.ndjson",
+      "scripts\\atlas\\out\\calls-edges-2026-05-29.ndjson",
+      "scripts\\atlas\\out\\cache-usage-edges.ndjson",
+      "sveltekit-frontend\\sveltekit-frontend\\tmp\\embeddings-smoke.ndjson",
+      "sveltekit-frontend\\svelte-check-machine.ndjson",
+      "docs\\packets\\session-features.ndjson",
+      "docs\\packets\\rg-knowledge-packets.ndjson",
+      "docs\\ai-os\\agentic-progress-log.ndjson",
+      "sveltekit-frontend\\static\\dev-graphs\\validation\\history.ndjson",
+      ".opencode\\recommendations\\tasks.ndjson"
     ]
   },
   "summary": {

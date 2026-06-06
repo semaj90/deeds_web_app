@@ -1,6 +1,6 @@
 {
-  "runId": "2026-06-03T19-42-51",
-  "indexedAt": "2026-06-05T02:04:06.788Z",
+  "runId": "2026-06-06T02-04-19",
+  "indexedAt": "2026-06-06T05:58:44.268Z",
   "clusterCount": 0,
   "relTypeCount": 0,
   "totalCards": 2,
@@ -11,8 +11,8 @@
       "db": "wiki_cards"
     },
     "redis": {
-      "ok": false,
-      "written": 0,
+      "ok": true,
+      "written": 3,
       "ttlSeconds": 21600
     }
   },

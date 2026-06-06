@@ -16,6 +16,7 @@ This page is the navigation entry for the Parent Atlas workstream. It links the 
 - [Legal-AI Parent Atlas Product Integration](</C:/Users/james/Videos/deeds-web-app/docs/architecture/legal-ai-parent-atlas-product-integration.md>)
 - [Neo4j GraphRAG Parent Atlas](</C:/Users/james/Videos/deeds-web-app/docs/architecture/neo4j-graphrag-parent-atlas.md>)
 - [Unified ACE / Engram / NES Pipeline](</C:/Users/james/Videos/deeds-web-app/docs/architecture/unified-ace-engram-pipeline.md>)
+- [OpenCode Routing Guardrails](</C:/Users/james/Videos/deeds-web-app/docs/reports/sessions/OPENCODE_ROUTING_GUARDRAILS_2026-06-05.md>)
 - [Offline Synthesis Parent Atlas](</C:/Users/james/Videos/deeds-web-app/docs/architecture/offline-synthesis-parent-atlas.md>)
 - [VRAM Hygiene Policy](</C:/Users/james/Videos/deeds-web-app/docs/architecture/vram-hygiene-policy.md>)
 
@@ -32,6 +33,7 @@ This page is the navigation entry for the Parent Atlas workstream. It links the 
 - [Compressed semantic geometry report](</C:/Users/james/Videos/deeds-web-app/docs/reports/compressed-semantic-geometry-report.md>)
 - [Hidden packet pathmap report](</C:/Users/james/Videos/deeds-web-app/docs/reports/hidden-packet-pathmap-report.md>)
 - [Hidden packet pathmap DuckDB report](</C:/Users/james/Videos/deeds-web-app/docs/reports/hidden-packet-pathmap-duckdb-report.md>)
+- [Live service env report](</C:/Users/james/Videos/deeds-web-app/docs/reports/live-service-env-report.md>)
 - [Doc-feature crosswalk](</C:/Users/james/Videos/deeds-web-app/docs/reports/doc-feature-crosswalk-2026-06-01.md>)
 - [PyTorch / Qdrant / Redis / SOM index](</C:/Users/james/Videos/deeds-web-app/docs/reports/pytorch-qdrant-redis-som-index-2026-06-01.md>)
 - [Production Qdrant without SOM report](</C:/Users/james/Videos/deeds-web-app/docs/reports/production-qdrant-no-som-report.md>)
@@ -100,6 +102,7 @@ This page is the navigation entry for the Parent Atlas workstream. It links the 
 - finish P3 provenance parity and quality review
 - finish P4 provenance UI and trust-tier editing
 - finish P5 feature registry reconciliation and command mapping
+- run live-service env audit before qdrant backfill applies
 - keep offline mirrors downstream-only
 
 ## Retrieval abstraction and future cuVS swap

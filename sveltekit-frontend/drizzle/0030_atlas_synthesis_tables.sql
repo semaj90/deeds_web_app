@@ -35,7 +35,7 @@ CREATE TABLE "nes_chrom_packets" (
 	"lane_ids" text[],
 	"created_at" timestamp with time zone DEFAULT now(),
 	"updated_at" timestamp with time zone DEFAULT now(),
-	CONSTRAINT "nes_chrom_packets_packet_key_unique" UNIQUE("packet_key")
+	CONSTRAINT "nes_chrom_packets_packet_key_key" UNIQUE("packet_key")
 );
 --> statement-breakpoint
 CREATE TABLE "atlas_feature_map" (

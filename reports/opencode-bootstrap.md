@@ -1,13 +1,14 @@
 # OpenCode Workspace Bootstrap
 
-Generated: 2026-05-27T17:21:02.585Z
+Generated: 2026-06-06T02:41:02.903Z
 Repo: C:\Users\james\Videos\deeds-web-app
 
 ## Steps
 - claude-mem-ensure: ok (status 0)
 - mcp-health: ok (status 0)
-- startup-truth: ok (status 0)
 - ace-daily-todo-summary: ok (status 0)
+- recommendations-graph-truth: ok (status 0)
+- bifrost-cache-verify: ok (status 0)
 
 ## Outputs
 - C:\Users\james\Videos\deeds-web-app\.opencode\ace-context.json
@@ -17,21 +18,64 @@ Repo: C:\Users\james\Videos\deeds-web-app
 - C:\Users\james\Videos\deeds-web-app\.tmp\claude-mem-ensure.json
 
 ## Loaded Docs
+- docs\atlas-calls-extractor-implementation.md
+- docs\atlas-graph-plan-update.md
+- docs\ATLAS-PHASES-ROADMAP-INDEX.md
+- docs\atlas-runtime-intent-graph-architecture.md
+- docs\atlas-uses-db-extractor-implementation.md
 - docs\atlas-vendor-wheels.md
+- docs\ATLAS_NEXT_PHASE_SUMMARY.md
+- docs\CODEBASE-FEATURE-MAPPING-2026-05-29.md
 - docs\documents-atlas-index.md
+- docs\feature-pillar-barrel-migration.md
+- docs\parent-atlas-100pct-next-steps.md
+- docs\REDIS-CACHE-CONSOLIDATION-2026-05-29.md
+- docs\REDIS-SHARED-UTILITIES-API.md
+- docs\SESSION_2026-05-29_COMPLETE_SUMMARY.md
 - docs\status\feature-tracking-roadmap.md
 - docs\status\GPU_SEMANTIC_WIKI_SUMMARY.md
 - docs\status\GPU_UTILIZATION_REPORT_2026-04-11.md
+- docs\skills\parent-atlas-batch-summarizer.md
+- docs\session-notes\46_26__adiff.txt
+- docs\session-notes\58_26_next_steps_graphanalysis_ingestion_analysis.txt
+- docs\session-notes\59_26cudagraphdeepresearch.txt
+- docs\session-notes\5_13_evidnce_processing_features.txt
+- docs\session-notes\5_27summarytododate.md
+- docs\session-notes\cudagraphloops_59.txt
+- docs\session-notes\cudagraphs510_26.txt
+- docs\session-notes\cudagraph_510.txt
+- docs\session-notes\cudagraph_519implemntation.txt
+- docs\session-notes\feature_321_contextgraph_.txt
+- docs\session-notes\gemma4_mapping_token_quantization_ace_518.txt
+- docs\session-notes\hermes_workspace_51126.txt
+- docs\session-notes\hypergraphcache_sarch_518_todo.txt
+- docs\session-notes\knowledgecard_validations.md
+- docs\session-notes\langgraph_chain_4626.txt
+- docs\session-notes\parentatlast_pt3_52226.txt
+- docs\session-notes\redis-backup-20260412-203517.txt
+- docs\session-notes\TODO-2026-05-19-codebase-multihop-feature-labeling.md
+- docs\session-notes\TODO-2026-05-20-production-feature-map.md
+- docs\session-notes\TODO_ATLAS.md
+- docs\session-notes\trace_response.txt
 - docs\reports\ace-packet-smoke-report.json
 - docs\reports\ace-packet-smoke-report.md
+- docs\reports\atlas-feature-map-duckdb-report.json
+- docs\reports\atlas-feature-map-duckdb-report.md
 - docs\reports\audit-summary-report.md
 - docs\reports\autoencoder-som-map.md
 - docs\reports\cache-effectiveness-report.json
 - docs\reports\cache-effectiveness.json
 - docs\reports\codebase-semantics-neo4j-report.json
 - docs\reports\codebase-semantics-neo4j-report.md
+- docs\reports\cold-archive-manifest-2026-06-02.json
+- docs\reports\cold-archive-manifest-2026-06-03.json
+- docs\reports\cold-archive-manifest-2026-06-05.json
 - docs\reports\compact-cache-prewarm-report.json
 - docs\reports\compact-cache-prewarm-report.md
+- docs\reports\compressed-semantic-geometry-report.json
+- docs\reports\compressed-semantic-geometry-report.md
+- docs\reports\contextual-tree-readiness-report.json
+- docs\reports\contextual-tree-readiness-report.md
 - docs\reports\context_summary_report.md
 - docs\reports\contract-error-map-report.json
 - docs\reports\contract-error-map-report.md
@@ -39,9 +83,12 @@ Repo: C:\Users\james\Videos\deeds-web-app
 - docs\reports\couchdb-ingest-report.md
 - docs\reports\cross-domain-routing-eval.json
 - docs\reports\cross-domain-routing-eval.md
+- docs\reports\current-corpus-promotion-preflight.md
 - docs\reports\deep-graph-relations-report.md
 - docs\reports\dev-service-health-report.json
 - docs\reports\directory-analysis-report.md
+- docs\reports\doc-feature-crosswalk-2026-06-01.json
+- docs\reports\doc-feature-crosswalk-2026-06-01.md
 - docs\reports\drizzle-audit-cleaned-utf8.json
 - docs\reports\drizzle-audit-cleaned.json
 - docs\reports\drizzle-audit-current-utf8.json
@@ -51,52 +98,6 @@ Repo: C:\Users\james\Videos\deeds-web-app
 - docs\reports\drizzle-schema-validation-report.md
 - docs\reports\drizzle-shadow-tables-v2.txt
 - docs\reports\drizzle-shadow-tables-v3.txt
-- docs\reports\drizzle-shadow-tables-v4.txt
-- docs\reports\drizzle-shadow-tables.txt
-- docs\reports\dynamic-import-report.md
-- docs\reports\error-fix-dag-report.json
-- docs\reports\error-fix-dag-report.md
-- docs\reports\gpu-job-queue-smoke-report.json
-- docs\reports\gpu-job-queue-smoke-report.md
-- docs\reports\hermes-self-healing-events.jsonl
-- docs\reports\hermes-self-healing-report.json
-- docs\reports\index-gap-memory-report.json
-- docs\reports\index-gap-memory-report.md
-- docs\reports\inference-backend-benchmark.json
-- docs\reports\inference-backend-benchmark.md
-- docs\reports\lane-routing-eval.json
-- docs\reports\lane-routing-eval.md
-- docs\reports\legacy-field-usage.json
-- docs\reports\messy-query-routing-eval.json
-- docs\reports\messy-query-routing-eval.md
-- docs\reports\model-inventory.json
-- docs\reports\model-inventory.md
-- docs\reports\openai-context-compaction-integration-plan.md
-- docs\reports\pgvector-audit-report.json
-- docs\reports\pgvector-index-plan.md
-- docs\reports\phase6e-contract-finding-triage.md
-- docs\reports\preflight-operator-report.json
-- docs\reports\programming-doc-feature-gap-report.md
-- docs\reports\real-world-routing-eval.json
-- docs\reports\real-world-routing-eval.md
-- docs\reports\resilience-continuity-recommendations.md
-- docs\reports\retrieval-comparison-smoke.json
-- docs\reports\rg-search-integrity-report.json
-- docs\reports\rg-search-integrity-report.md
-- docs\reports\rg_napi.txt
-- docs\reports\rg_turbovec.txt
-- docs\reports\schema-indexer-contract-report.json
-- docs\reports\schema-indexer-contract-report.md
-- docs\reports\schema-mismatch-remediation-plan.md
-- docs\reports\simd-bridge-memory-audit.json
-- docs\reports\simd-bridge-memory-audit.md
-- docs\reports\startup-health-trace-report.json
-- docs\reports\sveltekit-form-contracts-report.json
-- docs\reports\synthesis-log-latest.md
-- docs\reports\trace-full-loop-smoke-report-2026-05-20.json
-- docs\reports\trace-full-loop-smoke-report-2026-05-20.md
-- docs\reports\ts7-suppressed-errors.md
-- docs\reports\turbovec-benchmark-report.md
 
 ## Bash Tools
 - agents:write:workspace => node sveltekit-frontend/scripts/generate-agents-md.mjs
@@ -115,70 +116,70 @@ Repo: C:\Users\james\Videos\deeds-web-app
 - atlas:qdrant:tag => node scripts/atlas/tag-qdrant-codebase-payloads.mjs
 - atlas:qdrant:cluster-audit => node scripts/atlas/qdrant-cluster-tag-audit.mjs
 - atlas:qdrant:cluster-audit:dry => node scripts/atlas/qdrant-cluster-tag-audit.mjs --dry-run
+- atlas:components:qdrant => node scripts/atlas/index-component-profiles-qdrant.mjs
 - atlas:neo4j:ingest => node scripts/atlas/project-neo4j-graphrag.mjs
 - atlas:couchdb:mapreduce => node scripts/atlas/ingest-couchdb-mapreduce.mjs
 - atlas:redis:sync => node scripts/atlas/sync-redis-ace-cards.mjs
 - atlas:engram:sync => node scripts/atlas/sync-engram-memory.mjs
 - atlas:engram:sync:write => node scripts/atlas/sync-engram-memory.mjs --write
+- atlas:ingest-glyphs => node scripts/atlas/ingest-ace-cards-to-glyphs.mjs
+- atlas:compute-rewards => node scripts/atlas/compute-glyph-rewards.mjs
+- atlas:compute-rewards:embed => node scripts/atlas/compute-glyph-rewards.mjs --embed --apply
+- atlas:sample-training => node scripts/atlas/sample-glyphs-for-training.mjs
+- atlas:build-pairs => node scripts/atlas/glyphs-to-training-pairs.mjs
+- atlas:smoke-glyphs => node scripts/atlas/smoke-glyph-pipeline.mjs
+- atlas:train => node scripts/atlas/sample-glyphs-for-training.mjs && python scripts/train_lora_adapter.py --dataset scripts/training-datasets/active-sample-latest.jsonl
+- atlas:record-checkpoint => node scripts/atlas/record-lora-checkpoint.mjs
 - opencode:post-memory => node scripts/opencode/post-memory.mjs
 - opencode:bootstrap => node scripts/opencode/bootstrap-workspace.mjs
 - atlas:feature-gap => npm --prefix sveltekit-frontend run feature-gap:registry:report
-- codebase:semantic-index:smoke => npm --prefix sveltekit-frontend run codebase:semantic-index:smoke
-- codebase:semantic-index:report => npm --prefix sveltekit-frontend run codebase:semantic-index:report
-- startup:redis8-eval => docker compose -f docker-compose.redis8-eval.yml up -d
-- smoke:redis8-eval => powershell.exe -NoProfile -ExecutionPolicy Bypass -File scripts/vector/smoke-redis8-qdr1.ps1
-- smoke:redis8-eval:node => node scripts/vector/smoke-redis8-qdrant.js
-- opencode:redis8-eval => powershell.exe -NoProfile -ExecutionPolicy Bypass -File scripts/vector/smoke-redis8-qdrant.ps1
-- atlas:validate => node scripts/atlas/validate-parent-atlas.mjs
-- atlas:dry-run => npm run atlas:root:index && npm run atlas:routes:import && npm run atlas:imports:static && npm run atlas:imports:dynamic && npm run atlas:env:map && npm run atlas:engram:sync && npm run atlas:validate
-- turbo:opencode => opencode
-- turbo:trace-smoke => mkdir -p .tmp/audits && opencode run -m turboquant/gemma4-tq --agent trace-audit --format json "Use TRACE MCP first. Call trace_kag_search or search_dev_context for SvelteKit 2 Svelte 5 Drizzle Zod Bits UI audit. If no TRACE tool is available, say TRACE_MCP_NOT_AVAILABLE." | tee .tmp/audits/trace-smoke.ndjson
-- atlas:health => npm run services:health
-- atlas:dry => npm run atlas:dry-run
-- audit:legacy-atlas-fields => node scripts/audit-legacy-atlas-fields.mjs
-- engram:ranker:upgrade => node scripts/engram/upgrade-engram-ranker.mjs
-- phase8:graph-first:verify => npm run audit:retrieval-comparison && npm run phase8:cache:effectiveness && npm run audit:legacy-atlas-fields && npm run ci:all
-- redis:cards:keys => echo 'Redis cards keys OK'
-- graph:dynamic-imports:report => echo 'Dynamic imports graph OK'
-- opencode:root => opencode
-- opencode:app => cd sveltekit-frontend && opencode
-- atlas:rollback => node scripts/atlas/rollback-atlas-run.mjs
-- atlas:rollback:dry-run => node scripts/atlas/rollback-atlas-run.mjs --dry-run
-- trace:smoke => curl http://127.0.0.1:8788/health
-- graphify:karpathy-batch => node scripts/graphify/graphify-batch-karpathy-analysis.mjs
-- graphify:karpathy-batch:test => node scripts/graphify/graphify-batch-karpathy-analysis.mjs --limit=1
-- graphify:karpathy-batch:write => node scripts/graphify/graphify-batch-karpathy-analysis.mjs --write
-- graphify:batch-gpu-analysis => npm run ace:startup-health && node scripts/graphify/graphify-batch-gpu-analysis.mjs
-- smoke:graphify => cd sveltekit-frontend && node scripts/tests/smoke-graphify.mjs
-- graph:relations:build => npx tsx scripts/graph/build-deep-relations-jsonl.mjs build
-- graph:relations:inspect => npx tsx scripts/graph/build-deep-relations-jsonl.mjs inspect
-- graph:relations:smoke => npx tsx scripts/graph/build-deep-relations-jsonl.mjs run_smoke
-- graph:clusters:build => npx tsx scripts/graph/build-clusters.mjs
-- redis:graph:cache => npx tsx scripts/redis/cache-graph-relations.mjs
-- codebase:semantic-index => node scripts/codebase-semantic-indexer.mjs
-- graphify:health => cd sveltekit-frontend && npm run graphify:health
-- atlas:build => npm run ace:startup-health && npm run atlas:root:index && npm run atlas:workspace && npm run atlas:language && npm run atlas:imports && npm run atlas:env && npm run atlas:routes && npm run atlas:qdrant:tag && npm run atlas:neo4j:ingest && npm run atlas:couchdb:mapreduce && npm run graphify:karpathy-batch && npm run atlas:redis:sync && npm run atlas:validate
-- atlas:root:full => npm run ace:startup-health && npm run atlas:root:index && npm run atlas:routes:import && npm run atlas:imports:static && npm run atlas:imports:dynamic && npm run atlas:env:map && npm run atlas:qdrant:tag && npm run atlas:neo4j:ingest && npm run atlas:couchdb:mapreduce && npm run graphify:karpathy-batch && npm run atlas:redis:sync && npm run atlas:engram:sync && npm run agents:write && npm run atlas:validate
-- phase76:ace => node scripts/phase76-ace-prompt-engineer.mjs
-- phase76:mcp => node scripts/phase76-mcp-server.mjs
-- phase76:mcp:health => curl http://localhost:3002/health
-- phase76:mcp:tools => curl http://localhost:3002/tools
-- services:health => node scripts/atlas/validate-dev-services.mjs
-- services:health:json => node scripts/atlas/validate-dev-services.mjs --json
-- services:health:strict => node scripts/atlas/validate-dev-services.mjs --strict
-- startup:health => pwsh -NoProfile -ExecutionPolicy Bypass -File scripts/startup-health-and-trace.ps1
-- startup:health:json => pwsh -NoProfile -ExecutionPolicy Bypass -File scripts/startup-health-and-trace.ps1 -JsonOnly
-- startup:health:strict => pwsh -NoProfile -ExecutionPolicy Bypass -File scripts/startup-health-and-trace.ps1 -Strict
-- ace:daily-todo-summary => node scripts/ace-daily-todo-summary.mjs
-- atlas:hyperrag:expand => node sveltekit-frontend/scripts/atlas/hyperrag-expand.mjs
-- atlas:hyperrag:project => node sveltekit-frontend/scripts/atlas/topology-project-4d.mjs
-- atlas:hyperrag:rerank => node sveltekit-frontend/scripts/atlas/topology-rerank.mjs
-- atlas:hyperrag:trace => node sveltekit-frontend/scripts/atlas/atlas-answer-trace.mjs
-- atlas:messy-routing => node scripts/atlas/eval-messy-query-routing.mjs
-- atlas:ingest:full => node sveltekit-frontend/scripts/atlas/chunk-text-notes.mjs --input ../data/parents-atlas --out tmp/chunks/parents-corpus-all.ndjson && node sveltekit-frontend/scripts/atlas/build-rg-search-matrix.mjs --input tmp/chunks/parents-corpus-all.ndjson --out tmp/chunks/parents-corpus-rg.ndjson && node sveltekit-frontend/scripts/atlas/embed-chunks.mjs --input tmp/chunks/parents-corpus-rg.ndjson --collection parents_atlas_chunks && node sveltekit-frontend/scripts/atlas/qdrant-tag-backfill.mjs --collection parents_atlas_chunks --from-ndjson tmp/chunks/parents-corpus-rg.ndjson && node sveltekit-frontend/scripts/atlas/hyperrag-expand.mjs --input tmp/chunks/parents-corpus-rg.ndjson --out tmp/chunks/parents-corpus-expanded.ndjson && node sveltekit-frontend/scripts/atlas/topology-project-4d.mjs --input tmp/chunks/parents-corpus-expanded.ndjson --out tmp/chunks/parents-corpus-4d.ndjson
-- atlas:retry-index => node scripts/ai-os/build-atlas-retry-index.mjs
-- atlas:rlm => npx tsx scripts/atlas/rlm-condense-index.ts
-- graph:exports => node scripts/atlas/generate-graph-exports.mjs
+- atlas:kanban:turbovec-consolidation => npm --prefix sveltekit-frontend run atlas:kanban:consolidate:turbovec
+- atlas:feature-command-atlas => node scripts/atlas/parent-atlas-feature-command-atlas.mjs
+- atlas:feature-command-atlas:project => node scripts/atlas/project-parent-atlas-feature-command-atlas.mjs
+- atlas:feature-command-atlas:qdrant => node scripts/atlas/project-parent-atlas-feature-command-atlas-qdrant.mjs
+- atlas:feature-command-atlas:postgres => node scripts/atlas/mirror-parent-atlas-feature-command-atlas-postgres.mjs
+- atlas:feature-command-atlas:postgres:dry => node scripts/atlas/mirror-parent-atlas-feature-command-atlas-postgres.mjs --dry-run
+- atlas:parent-atlas:apply-cypher => node scripts/atlas/apply-parent-atlas-cypher.mjs
+- atlas:parent-atlas:apply-cypher:dry => node scripts/atlas/apply-parent-atlas-cypher.mjs --dry-run
+- atlas:phase6:simulate => node scripts/atlas/phase6-synthetic-trace-simulator.mjs --no-neo4j
+- atlas:phase6:simulate:dry => node scripts/atlas/phase6-synthetic-trace-simulator.mjs --dry-run --no-neo4j --no-redis
+- atlas:phase6:simulate:full => node scripts/atlas/phase6-synthetic-trace-simulator.mjs
+- atlas:parent-atlas:promote => node scripts/atlas/promote-to-postgres.mjs --apply
+- atlas:parent-atlas:promote:dry => node scripts/atlas/promote-to-postgres.mjs
+- atlas:parent-atlas:wire-qdrant => node scripts/atlas/wire-atlas-qdrant.mjs --apply --skip-embed
+- atlas:parent-atlas:wire-qdrant:dry => node scripts/atlas/wire-atlas-qdrant.mjs
+- atlas:parent-atlas:refresh => node scripts/atlas/promote-to-postgres.mjs --apply && node scripts/atlas/wire-atlas-qdrant.mjs --apply --skip-embed
+- atlas:sourceRef:warmup => node scripts/atlas/sourceRef-first-join-warmup.mjs
+- atlas:sourceRef:warmup:dry => node scripts/atlas/sourceRef-first-join-warmup.mjs --dry-run
+- atlas:sourceRef:hot-join:warmup => node scripts/atlas/sourceRef-first-hot-join-warmup.mjs
+- atlas:sourceRef:hot-join:warmup:dry => node scripts/atlas/sourceRef-first-hot-join-warmup.mjs --dry-run
+- atlas:sourceRef:context:neo4j => node scripts/atlas/project-sourceRef-context-neo4j.mjs
+- atlas:sourceRef:context:neo4j:dry => node scripts/atlas/project-sourceRef-context-neo4j.mjs --dry-run
+- atlas:graph-truth:sync => node scripts/atlas/sync-graph-truth-neo4j.mjs
+- atlas:graph-truth:sync:dry => node scripts/atlas/sync-graph-truth-neo4j.mjs --dry-run
+- atlas:graph-truth:sync:apply => node scripts/atlas/sync-graph-truth-neo4j.mjs --apply
+- atlas:feature-map:synthesize => node scripts/atlas/build-synthesized-map.mjs
+- atlas:feature-map:synthesize:apply => node scripts/atlas/build-synthesized-map.mjs --apply
+- atlas:feature-map:synthesize:dry => node scripts/atlas/build-synthesized-map.mjs --dry-run
+- atlas:qdrant:som-from-centroids => node scripts/atlas/backfill-qdrant-som-from-centroids.mjs
+- atlas:qdrant:som-from-centroids:apply => node scripts/atlas/backfill-qdrant-som-from-centroids.mjs --apply
+- atlas:coverage:qdrant-no-som => node scripts/atlas/report-production-qdrant-no-som.mjs
+- atlas:coverage:no-qdrant => node scripts/atlas/report-production-no-qdrant.mjs
+- atlas:ingest:no-qdrant => node scripts/atlas/ingest-production-no-qdrant-source-refs.mjs
+- atlas:ingest:no-qdrant:apply => node scripts/atlas/ingest-production-no-qdrant-source-refs.mjs --apply
+- atlas:coverage:qdrant-no-som:test => node --test scripts/tests/report-production-qdrant-no-som.test.mjs
+- recommendations:graph-truth => node scripts/tests/smoke-multi-hop-traversal.mjs && node scripts/opencode/build-recommendations.mjs && node scripts/opencode/materialize-recommendation-tasks.mjs
+- atlas:phase101:packetize => node scripts/atlas/phase101-parent-atlas-packetize.mjs --dry-run
+- atlas:rg-dumps:index => node scripts/atlas/chunk-rg-search-dumps.mjs
+- atlas:rg-dumps:index:dry => node scripts/atlas/chunk-rg-search-dumps.mjs --dry-run
+- atlas:rg-dumps:extract => node scripts/atlas/extract-rg-dump-packets.mjs
+- atlas:rg-dumps:extract:dry => node scripts/atlas/extract-rg-dump-packets.mjs --dry-run
+- atlas:qdrant:payload-indexes => node scripts/atlas/create-qdrant-payload-indexes.mjs
+- atlas:qdrant:payload-indexes:dry => node scripts/atlas/create-qdrant-payload-indexes.mjs --dry-run
+- atlas:rg-dumps:project => node scripts/atlas/project-parent-atlas-rg-dump-packets.mjs
+- atlas:rg-dumps:project:write => node scripts/atlas/project-parent-atlas-rg-dump-packets.mjs --write-postgres --write-qdrant --write-cypher
+- atlas:rg-dumps:project:dry => node scripts/atlas/project-parent-atlas-rg-dump-packets.mjs --dry-run
+- atlas:dirty-tree:classify => node scripts/atlas/classify-dirty-tree.mjs
 
 ## Warnings
 - None

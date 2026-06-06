@@ -57,7 +57,7 @@
   "provider": {
     "turboquant": {
       "npm": "@ai-sdk/openai-compatible",
-      "name": "Local llama-server :8090",
+      "name": "Local llama-server :8090 (repo-audit lane)",
       "options": {
         "baseURL": "http://127.0.0.1:8090/v1",
         "apiKey": "local"
@@ -88,14 +88,14 @@
     },
     "ollama_disabled": {
       "npm": "@ai-sdk/openai-compatible",
-      "name": "Ollama local :11434 (fallback only)",
+      "name": "Ollama local :11434 (embedding fallback only)",
       "options": {
         "baseURL": "http://127.0.0.1:11434/v1",
         "apiKey": "ollama"
       },
       "models": {
         "embeddinggemma": {
-          "name": "EmbeddingGemma — 768-dim embeddings (primary embed model)",
+          "name": "EmbeddingGemma — 768-dim embeddings",
           "limit": {
             "context": 8192,
             "output": 0
@@ -157,13 +157,13 @@
       "description": "Validate Windows workspace, sidecars, semantic indexing, and feature readiness",
       "agent": "atlas-context",
       "subtask": true,
-      "template": "First run `npm --prefix .. run opencode:bootstrap` to refresh ACE context and MCP health. Then validate config, discover scripts, check sidecars, run codebase indexing, and write memory/agent-runs/latest-workspace-ready.json."
+      "template": "First run `npm --prefix .. run opencode:bootstrap` to refresh ACE context, recommendations, Bitfrost verification, and MCP health. Then validate config, discover scripts, check sidecars, run codebase indexing, and write memory/agent-runs/latest-workspace-ready.json. Use ACE hits and recommendations first; do not jump to model-only answers."
     },
     "workspace-bootstrap": {
       "description": "Refresh ACE context, local health, and report artifacts from the main repo",
       "agent": "atlas-context",
       "subtask": false,
-      "template": "Run `npm --prefix .. run opencode:bootstrap` from the repo root to refresh ACE context, TODO summary, MCP health, and semantic index. Do not modify files."
+      "template": "Run `npm --prefix .. run opencode:bootstrap` from the repo root to refresh ACE context, TODO summary, MCP health, semantic index, recommendations, and Bitfrost verification. Do not modify files. Prefer ACE hits and recommendations before any model-only response."
     },
     "graph-export-recover": {
       "description": "Recover graph export artifacts without task delegation",
@@ -202,6 +202,7 @@
     },
     "gemma4-offload": {
       "type": "local",
+      "description": "Repo-audit-only MCP for evidence-grounded summaries and classifications.",
       "command": [
         "node",
         "scripts/mcp/gemma4-offload-mcp.mjs"
@@ -211,9 +212,11 @@
     },
     "engram-embed": {
       "type": "local",
+      "description": "stdio-only embeddings MCP; no chat or generic generation.",
       "command": [
         "node",
-        "scripts/mcp/engram-embed-mcp.mjs"
+        "scripts/mcp/engram-embed-mcp.mjs",
+        "--stdio"
       ],
       "enabled": true,
       "timeout": 60000
@@ -241,7 +244,7 @@
       "model": "turboquant/gemma4-legal.gguf",
       "temperature": 0.2,
       "steps": 8,
-      "prompt": "Never read full files by default. Retrieval order: ace-stream(query) -> ace.packet(query) -> npm run index:clusters:query -- \"<query>\" -> atlas.search(query) -> rg exact section -> read a 40-80 line window. If exact match fails, use Semantic Variance Recovery: file discovery, rg confirmed paths, fuzzy search, Qdrant tag recall, Redis ACE semantic cache, LangExtract entities, did-you-mean cosine candidates, ACE packet, and Gemma4 stream. Prefer sourceRefs, chunkIds, summaries, searchGroups, cache keys, and commands. Do not load docs/llms/generated/*.txt fully. Do not inject raw 30MB JSON or full atlas maps. If context is missing or degraded, say what is missing instead of guessing.\n\nSemantic Recovery Layer: failure -> exact search fails -> fuzzy search (Fuse.js / rg loose) -> semantic search (Qdrant cosine) -> tag recall (clusterTags) -> entity extraction (LangExtract) -> suggestion (did you mean) -> build ACE packet.\n\nNever use the task tool for deterministic recovery commands. Prefer ace-stream first, then ace.packet if needed, then cluster query, then atlas search. Use /recover:graph for graph export recovery.\n\nACE Resilient Tool Fallback Ladder + Semantic Variance Recovery:\nIf a tool call fails with SchemaError(Missing key [\"description\"]), retry once with:\n- description: clear purpose of the command\n- command: exact command\nWhen searching for files by name:\n- never use content Grep first\n- use file discovery:\n  rg --files -uu | rg \"<filename-pattern>\"\n- if that fails, use:\n  Get-ChildItem -Recurse -Force -File -Include <names> | Select-Object -ExpandProperty FullName\nRetrieval order:\n1. exact file discovery\n2. rg confirmed paths\n3. Qdrant tag search\n4. Redis semantic cache\n5. LangExtract entities\n6. did-you-mean cosine match\n7. ACE packet\n8. Gemma4 stream\n\nIf exact match fails, add varianceRecovery to the ACE packet:\n{\n  \"varianceRecovery\": {\n    \"exactMatchFailed\": true,\n    \"didYouMean\": [],\n    \"qdrantTags\": [],\n    \"langextractEntities\": [],\n    \"semanticCacheHits\": [],\n    \"nextSteps\": []\n  }\n}\nDo not manually inject fake metrics.\nDo not read whole files.\nDo not pretend MCP ran if it did not.",
+      "prompt": "Repo evidence first. Check .opencode/recommendations/recommendations.json, .opencode/recommendations/recommendations.md, .opencode/recommendations/recommendation-events.jsonl, .opencode/tasks/task-state.json, .opencode/tasks/task-state.md, .opencode/tasks/task-events.jsonl, docs/graph/recommendations.md, docs/reports/temporal-task-registry-report.md, and the relevant Parent Atlas or ACE report before answering. Use report or command output only. Findings are historical, recommendations are append-only inbox items, tasks are persistent, and task-history packets record transitions. If evidence is missing, say what report or command is needed. Use Gemma4 only after evidence is gathered, and only for repo-audit summaries. Never use it for generic chat, model selection, or tutorials.",
       "permission": {
         "*": "deny",
         "read": "ask",
@@ -296,7 +299,7 @@
       "model": "turboquant/gemma4-legal.gguf",
       "temperature": 0,
       "steps": 10,
-      "prompt": "Use MCP tools first, but do not call every tool. Default order: trace.kag_search or trace.atlas_query, then context.build_kv_packet, then ace.compact_search. Only call gemma4-offload for model/runtime diagnostics. Keep engram-embed, turbovec-sidecar, and langextract opt-in unless the user explicitly asks for those lanes.",
+      "prompt": "Repo evidence first. Check .opencode/recommendations/recommendations.json, .opencode/recommendations/recommendations.md, .opencode/recommendations/recommendation-events.jsonl, .opencode/tasks/task-state.json, .opencode/tasks/task-state.md, .opencode/tasks/task-events.jsonl, docs/graph/recommendations.md, reports/parent-atlas-open-lanes-todo.md, docs/reports/engram-adapter-decision-report.md, and the relevant Parent Atlas or ACE evidence before answering. Use MCP tools in this order: trace.kag_search or trace.atlas_query, then context.build_kv_packet, then ace.compact_search. Treat gemma4-offload as repo-audit-only: use repo_report_answer for report snippets, file snippets, or command output; gemma4_chat is deprecated. Keep engram-embed, turbovec-sidecar, and langextract opt-in unless the user explicitly asks for those lanes.",
       "permission": {
         "*": "deny",
         "read": "ask",
@@ -420,11 +423,11 @@
       }
     },
     "hermes-ace": {
-      "description": "Hermes-ACE local agent using ACE context, MCP tools, and local Gemma4 64K.",
+      "description": "Hermes-ACE local agent using ACE context, MCP tools, and repo-audit-only local Gemma4.",
       "model": "turboquant/gemma4-legal.gguf",
       "temperature": 0,
       "steps": 12,
-      "prompt": "Before reading any .md, .json, .sql, or schema file, call: 1. atlas.compact_context, 2. context.build_kv_packet, 3. ace.compact_search. Do not read whole Markdown files. Use grep/list first. If raw file access is required, read only the smallest line window needed using file.read_window. Prefer compressed cards, source refs, and stablePrefixHash. You are the Hermes-ACE legal AI agent running on gemma4-legal.gguf (merged rotorquant) via TurboQuant :8090. Follow .github/instructions/opencode-context-prefetch.instructions.md. Use MCP tools in this priority order: (1) trace.kag_search or trace.atlas_query for knowledge retrieval, (2) turbovec-sidecar for cosine ranking and chunk-id scoring, (3) engram-embed for 768-dim embeddings and Bifrost ingestion, (4) langextract for citation and entity extraction, (5) ldr.search_history then ldr.quick_summary for external research context, (6) ldr.start_research + ldr.poll_status for deep async research on complex legal questions. Always include chunk_ids and cluster_labels in synthesis context. For image evidence, depth maps are stored in MinIO at evidence/{caseId}/{evidenceId}-depth.png — reference via ai_analysis.depthAnalysis.depthMapUrl. Do not edit files without explicit user approval. Do not mutate live Postgres schema.\n\nACE Resilient Tool Fallback Ladder + Semantic Variance Recovery:\nIf a tool call fails with SchemaError(Missing key [\"description\"]), retry once with:\n- description: clear purpose of the command\n- command: exact command\nWhen searching for files by name:\n- never use content Grep first\n- use file discovery:\n  rg --files -uu | rg \"<filename-pattern>\"\n- if that fails, use:\n  Get-ChildItem -Recurse -Force -File -Include <names> | Select-Object -ExpandProperty FullName\nRetrieval order:\n1. exact file discovery\n2. rg confirmed paths\n3. Qdrant tag search\n4. Redis semantic cache\n5. LangExtract entities\n6. did-you-mean cosine match\n7. ACE packet\n8. Gemma4 stream\n\nIf exact match fails, add varianceRecovery to the ACE packet:\n{\n  \"varianceRecovery\": {\n    \"exactMatchFailed\": true,\n    \"didYouMean\": [],\n    \"qdrantTags\": [],\n    \"langextractEntities\": [],\n    \"semanticCacheHits\": [],\n    \"nextSteps\": []\n  }\n}\nDo not manually inject fake metrics.\nDo not read whole files.\nDo not pretend MCP ran if it did not.",
+      "prompt": "Repo evidence first. Check .opencode/recommendations/recommendations.json, .opencode/recommendations/recommendations.md, .opencode/recommendations/recommendation-events.jsonl, .opencode/tasks/task-state.json, .opencode/tasks/task-state.md, .opencode/tasks/task-events.jsonl, docs/graph/recommendations.md, docs/reports/temporal-task-registry-report.md, docs/reports/engram-adapter-decision-report.md, and the matching Parent Atlas report before answering. Before reading any .md, .json, .sql, or schema file, call: 1. atlas.compact_context, 2. context.build_kv_packet, 3. ace.compact_search. Do not read whole Markdown files. Use grep/list first. If raw file access is required, read only the smallest line window needed using file.read_window. Prefer compressed cards, source refs, and stablePrefixHash. Use MCP tools in this order: trace.kag_search or trace.atlas_query, then turbovec-sidecar, then engram-embed, then langextract, then ldr.search_history / ldr.quick_summary, then ldr.start_research / ldr.poll_status. Use Gemma4 only after repo evidence is gathered, and only for repo-audit summaries or runtime diagnostics. Never use it for generic chat, model selection, or tutorials. Prefer repo_report_answer over gemma4_chat, which is deprecated.",
       "permission": {
         "*": "deny",
         "read": "ask",

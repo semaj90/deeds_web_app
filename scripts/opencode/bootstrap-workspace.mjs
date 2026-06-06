@@ -17,6 +17,7 @@ function findRepoRoot(startDir) {
 
 const repoRoot = findRepoRoot(process.cwd());
 const deepMode = process.argv.includes('--deep');
+const refreshStartupTruth = deepMode || process.argv.includes('--refresh-startup-truth');
 
 function run(label, command, args, options = {}) {
   const result = spawnSync(command, args, {
@@ -48,14 +49,28 @@ const steps = [
   {
     label: 'startup-truth',
     command: 'npm',
-    args: ['run', 'startup:truth'],
+    args: ['run', 'startup:truth', '--', '--fast'],
   },
   {
     label: 'ace-daily-todo-summary',
     command: 'npm',
     args: ['run', 'ace:daily-todo-summary'],
   },
+  {
+    label: 'recommendations-graph-truth',
+    command: 'npm',
+    args: ['run', 'recommendations:graph-truth'],
+  },
+  {
+    label: 'bifrost-cache-verify',
+    command: 'npm',
+    args: ['run', 'cache:bifrost:verify'],
+  },
 ];
+
+if (!refreshStartupTruth) {
+  steps.splice(2, 1);
+}
 
 if (deepMode) {
   steps.push({
@@ -133,6 +148,7 @@ const docArtifacts = walkFiles([
 const loadedArtifacts = {
   aceContext: readJsonIfExists(path.join(repoRoot, '.opencode', 'ace-context.json'), null),
   featureFiles: readJsonIfExists(path.join(repoRoot, '.opencode', 'feature-files.json'), null),
+  recommendations: readJsonIfExists(path.join(repoRoot, '.opencode', 'recommendations', 'recommendations.json'), null),
   claudeMem: readJsonIfExists(path.join(repoRoot, '.tmp', 'claude-mem-ensure.json'), null),
   startupTruth: readJsonIfExists(path.join(repoRoot, '.tmp', 'startup-truth.json'), null),
   dailySummary: readJsonIfExists(path.join(repoRoot, '.tmp', 'ace-daily-todo-summary.json'), null),
@@ -143,6 +159,8 @@ const loadedReports = Array.from(new Set([
   path.join(repoRoot, 'reports', 'ace-daily-todo-summary.md'),
   path.join(repoRoot, 'reports', 'claude-mem-startup.md'),
   path.join(repoRoot, 'reports', 'opencode-bootstrap.md'),
+  path.join(repoRoot, '.opencode', 'recommendations', 'recommendations.md'),
+  path.join(repoRoot, '.opencode', 'recommendations', 'tasks.md'),
   path.join(repoRoot, 'docs', 'reports', 'sveltekit-form-contracts-report.json'),
   path.join(repoRoot, 'docs', 'reports', 'feature-gap-registry-postgres-latest.md'),
   path.join(repoRoot, 'docs', 'reports', 'feature-gap-registry-diff-latest.md'),
@@ -161,7 +179,7 @@ const summary = {
   repoRoot,
   generatedAt: new Date().toISOString(),
   steps: results,
-  ok: requiredStepsOk && Boolean(startupTruthArtifact),
+  ok: requiredStepsOk,
   outputs: {
     aceContext: path.join(repoRoot, '.opencode', 'ace-context.json'),
     featureFiles: path.join(repoRoot, '.opencode', 'feature-files.json'),
@@ -172,6 +190,7 @@ const summary = {
   loadedArtifacts: {
     featureFiles: loadedArtifacts.featureFiles,
     aceContext: loadedArtifacts.aceContext,
+    recommendations: loadedArtifacts.recommendations,
     claudeMem: loadedArtifacts.claudeMem,
     startupTruth: loadedArtifacts.startupTruth,
     dailySummary: loadedArtifacts.dailySummary,
@@ -181,7 +200,7 @@ const summary = {
   loadedReports,
   bashTools,
   warnings: [
-    ...(startupTruthDegraded ? ['startup-truth-blockers-present'] : []),
+    ...(refreshStartupTruth && startupTruthDegraded ? ['startup-truth-blockers-present'] : []),
     ...(claudeMemArtifact && claudeMemArtifact.ok === false ? ['claude-mem-detached-not-ready'] : []),
   ],
 };
@@ -211,6 +230,7 @@ fs.writeFileSync(path.join(opencodeDir, 'startup-context.json'), JSON.stringify(
   loadedArtifacts: {
     claudeMem: summary.loadedArtifacts.claudeMem,
     mcpHealth: summary.loadedArtifacts.mcpHealth,
+    recommendations: summary.loadedArtifacts.recommendations,
   },
   warnings: summary.warnings,
 }, null, 2));

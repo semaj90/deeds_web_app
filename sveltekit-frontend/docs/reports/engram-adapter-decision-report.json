@@ -1,0 +1,38 @@
+{
+  "summary": {
+    "decision": "HINT_ONLY_ADAPTER",
+    "hintOnly": true,
+    "firstClass": false,
+    "repoReportAnswer": true,
+    "legacyGemma": true,
+    "engramEmbedExists": true,
+    "evidenceCount": 5
+  },
+  "evidence": [
+    {
+      "label": "local-engram adapter",
+      "file": "src\\lib\\server\\memory\\local-engram-memory-adapter.ts",
+      "detail": "getRoutingHints/recordTransition/recordWorkflowMemory and low_hint trust only"
+    },
+    {
+      "label": "engram memory store",
+      "file": "src\\lib\\server\\ai\\engram-memory.ts",
+      "detail": "Redis-backed bigram transition memory with low-trust hints"
+    },
+    {
+      "label": "OpenCode prompt gating",
+      "file": "opencode.json",
+      "detail": "repo evidence first and repo_report_answer preferred"
+    },
+    {
+      "label": "Gemma4 handoff docs",
+      "file": "docs\\architecture\\gemma4-to-claude-code-handoff.md",
+      "detail": "repo-audit-only and report snippets, not generic chat"
+    },
+    {
+      "label": "legacy gemma boundary",
+      "file": "scripts\\mcp\\gemma4-offload-mcp.mjs",
+      "detail": "legacy gemma route still present but should remain deprecated"
+    }
+  ]
+}

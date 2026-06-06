@@ -5,7 +5,7 @@
 ALTER TABLE public.task_semantic_packets
   ADD COLUMN IF NOT EXISTS alias_id text;
 
-CREATE INDEX IF NOT EXISTS idx_task_semantic_packets_alias_id
+CREATE INDEX IF NOT EXISTS task_semantic_packets_alias_id_idx
   ON public.task_semantic_packets(alias_id);
 
 CREATE INDEX IF NOT EXISTS idx_atlas_feature_profiles_metadata_gin

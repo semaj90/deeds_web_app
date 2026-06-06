@@ -1,10 +1,10 @@
 {
-  "generatedAt": "2026-06-05T14:13:35.970Z",
-  "totalCount": 18,
+  "generatedAt": "2026-06-06T02:41:01.485Z",
+  "totalCount": 12,
   "clusters": {
     "UI Components": [
       {
-        "id": "import_error_deccde7d",
+        "id": "import_error_92b352f1",
         "type": "developer_recommendation",
         "cluster": "UI Components",
         "title": "src/lib/components/ui/index.ts — 42 unresolved imports",
@@ -18,7 +18,7 @@
         "featureStatus": "degraded"
       },
       {
-        "id": "import_error_15bcec7c",
+        "id": "import_error_246bff40",
         "type": "developer_recommendation",
         "cluster": "UI Components",
         "title": "src/lib/components/ui/gaming/n64/index.ts — 29 unresolved imports",
@@ -32,7 +32,7 @@
         "featureStatus": "degraded"
       },
       {
-        "id": "import_error_842eb5b9",
+        "id": "import_error_17cc27f3",
         "type": "developer_recommendation",
         "cluster": "UI Components",
         "title": "src/lib/components/ui/gaming/index.ts — 18 unresolved imports",
@@ -46,7 +46,7 @@
         "featureStatus": "degraded"
       },
       {
-        "id": "import_error_a0fb5148",
+        "id": "import_error_0a2ed3a1",
         "type": "developer_recommendation",
         "cluster": "UI Components",
         "title": "src/lib/components/ui/alert-dialog/index.js — 12 unresolved imports",
@@ -60,7 +60,7 @@
         "featureStatus": "degraded"
       },
       {
-        "id": "import_error_6e12b1ca",
+        "id": "import_error_8bc815c2",
         "type": "developer_recommendation",
         "cluster": "UI Components",
         "title": "src/lib/components/ui/dialog/index.ts — 11 unresolved imports",
@@ -76,7 +76,7 @@
     ],
     "General": [
       {
-        "id": "import_error_b068f027",
+        "id": "import_error_7ab56ec3",
         "type": "developer_recommendation",
         "cluster": "General",
         "title": "src/lib/icons/yorha/index.ts — 12 unresolved imports",
@@ -90,7 +90,7 @@
         "featureStatus": "degraded"
       },
       {
-        "id": "stale_feature_224560fe",
+        "id": "stale_feature_e5e3087e",
         "type": "missing_feature",
         "cluster": "General",
         "title": "Feature not implemented: Priority 2: VLM POI Integration (90 min)",
@@ -104,7 +104,7 @@
         "featureStatus": "missing"
       },
       {
-        "id": "stale_feature_9af2c0d9",
+        "id": "stale_feature_c280c6f8",
         "type": "missing_feature",
         "cluster": "General",
         "title": "Feature not implemented: Priority 3: Audit Dashboard Web UI (3-4 hours)",
@@ -118,7 +118,7 @@
         "featureStatus": "missing"
       },
       {
-        "id": "stale_feature_25f66dd6",
+        "id": "stale_feature_c84a8119",
         "type": "missing_feature",
         "cluster": "General",
         "title": "Feature not implemented: Priority 4: Auto-Fix Orchestrator (6-8 hours)",
@@ -132,7 +132,7 @@
         "featureStatus": "missing"
       },
       {
-        "id": "stale_feature_3ff41859",
+        "id": "stale_feature_73babe23",
         "type": "missing_feature",
         "cluster": "General",
         "title": "Feature not implemented: Phase 3: Post-Synthesis Quality Review (RunID: `stage-2c-500`)",
@@ -148,7 +148,7 @@
     ],
     "Agent Workflow": [
       {
-        "id": "unclassified_8f4ebf76",
+        "id": "unclassified_5b109497",
         "type": "feature:unclassified",
         "cluster": "Agent Workflow",
         "title": "4 files unclassified with >10 imports",
@@ -167,7 +167,7 @@
     ],
     "Legal Workspace": [
       {
-        "id": "stale_feature_b49f8f6d",
+        "id": "stale_feature_20960db4",
         "type": "missing_feature",
         "cluster": "Legal Workspace",
         "title": "Feature not implemented: Priority 1: Evidence Upload UI (1 hour)",
@@ -180,123 +180,11 @@
         "priority": "low",
         "featureStatus": "missing"
       }
-    ],
-    "Parent Atlas Coverage": [
-      {
-        "id": "atlas_coverage_79e5f292",
-        "type": "atlas_coverage_gap",
-        "cluster": "Parent Atlas Coverage",
-        "title": "Qdrant coverage: 33% (3539 files unembedded)",
-        "why": "3539 parent_atlas_documents rows have no qdrant_point_id. ACE packet source_refs will be empty for these files until embedded.",
-        "sourceRefs": [
-          "scripts/graphify/semantic-index.mjs"
-        ],
-        "action": "Run graphify:semantic to embed 3539 missing files",
-        "next_command": "npm run graphify:semantic",
-        "priority": "high",
-        "featureStatus": "degraded",
-        "metrics": {
-          "total": 5253,
-          "covered": 1714,
-          "pct": 33
-        }
-      },
-      {
-        "id": "atlas_coverage_155319fd",
-        "type": "atlas_coverage_gap",
-        "cluster": "Parent Atlas Coverage",
-        "title": "SOM cluster coverage: 29% (3744 files unclassified)",
-        "why": "3744 parent_atlas_documents rows have no cluster_id. ACE packet cluster_id, som_cluster, and topology boosting are unavailable for these files.",
-        "sourceRefs": [
-          "scripts/graphify/semantic-cluster.mjs"
-        ],
-        "action": "Run graphify:semantic-cluster to assign cluster_id to 3744 files",
-        "next_command": "npm run graphify:semantic-cluster",
-        "priority": "high",
-        "featureStatus": "degraded",
-        "metrics": {
-          "total": 5253,
-          "covered": 1509,
-          "pct": 29
-        }
-      },
-      {
-        "id": "atlas_coverage_021ee808",
-        "type": "atlas_coverage_gap",
-        "cluster": "Parent Atlas Coverage",
-        "title": "atlas_feature_synthesis has only 12 rows — feature rollups incomplete",
-        "why": "Feature-level ACE context (feature_ids, lane_ids) is sparse. Only 12 features have synthesized rollups; full codebase has hundreds of features.",
-        "sourceRefs": [
-          "scripts/atlas/gemma4-parent-atlas-summaries.mjs"
-        ],
-        "action": "Run Gemma4 parent atlas summary pipeline to build feature synthesis rows",
-        "next_command": "npm run atlas:summaries:apply",
-        "priority": "medium",
-        "featureStatus": "degraded",
-        "metrics": {
-          "synthTotal": 12
-        }
-      },
-      {
-        "id": "atlas_coverage_f489f8eb",
-        "type": "atlas_coverage_gap",
-        "cluster": "Parent Atlas Coverage",
-        "title": "2201 atlas_feature_map rows not joined to parent_atlas_documents",
-        "why": "These files have feature map entries but no canonical parent_atlas_documents record. They are invisible to ACE packet assembly and cannot contribute to feature_ids.",
-        "sourceRefs": [
-          "scripts/atlas/sync-parent-atlas.mjs"
-        ],
-        "action": "Re-run atlas sync to backfill missing parent_atlas_documents rows",
-        "next_command": "npm run atlas:sync",
-        "priority": "high",
-        "featureStatus": "degraded",
-        "metrics": {
-          "afmTotal": 5740,
-          "notInPad": 2201,
-          "matched": 3539
-        }
-      },
-      {
-        "id": "atlas_coverage_049f4bdb",
-        "type": "atlas_coverage_gap",
-        "cluster": "Parent Atlas Coverage",
-        "title": "SOM cluster on atlas_feature_map: 31% (3941 missing)",
-        "why": "3941 atlas_feature_map rows have no som_cluster. SOM topology boosting in ACE scoring is limited to 31% of the feature map.",
-        "sourceRefs": [
-          "scripts/graphify/som-topology-pipeline.mjs"
-        ],
-        "action": "Run graphify:semantic-cluster to populate som_cluster on atlas_feature_map",
-        "next_command": "npm run graphify:semantic-cluster",
-        "priority": "medium",
-        "featureStatus": "degraded",
-        "metrics": {
-          "afmTotal": 5740,
-          "afmWithSom": 1799,
-          "afmSomPct": 31
-        }
-      },
-      {
-        "id": "atlas_coverage_576ea1b4",
-        "type": "atlas_coverage_gap",
-        "cluster": "Parent Atlas Coverage",
-        "title": "route_runtime_packets is empty — hot-path scoring unavailable",
-        "why": "ACE hot-path scoring (route_runtime_packets) has 0 rows. Routes cannot be boosted by actual request frequency. redis_hot_keys will be empty.",
-        "sourceRefs": [
-          "src/routes/api/sse/chat/+server.ts"
-        ],
-        "action": "Instrument routes to emit runtime telemetry packets",
-        "next_command": "",
-        "priority": "low",
-        "featureStatus": "missing",
-        "metrics": {
-          "rrpTotal": 0
-        }
-      }
     ]
   },
   "top10": [
     {
-      "id": "import_error_deccde7d",
+      "id": "import_error_92b352f1",
       "type": "developer_recommendation",
       "cluster": "UI Components",
       "title": "src/lib/components/ui/index.ts — 42 unresolved imports",
@@ -310,7 +198,7 @@
       "featureStatus": "degraded"
     },
     {
-      "id": "import_error_15bcec7c",
+      "id": "import_error_246bff40",
       "type": "developer_recommendation",
       "cluster": "UI Components",
       "title": "src/lib/components/ui/gaming/n64/index.ts — 29 unresolved imports",
@@ -324,7 +212,7 @@
       "featureStatus": "degraded"
     },
     {
-      "id": "import_error_842eb5b9",
+      "id": "import_error_17cc27f3",
       "type": "developer_recommendation",
       "cluster": "UI Components",
       "title": "src/lib/components/ui/gaming/index.ts — 18 unresolved imports",
@@ -338,7 +226,7 @@
       "featureStatus": "degraded"
     },
     {
-      "id": "import_error_a0fb5148",
+      "id": "import_error_0a2ed3a1",
       "type": "developer_recommendation",
       "cluster": "UI Components",
       "title": "src/lib/components/ui/alert-dialog/index.js — 12 unresolved imports",
@@ -352,21 +240,7 @@
       "featureStatus": "degraded"
     },
     {
-      "id": "import_error_6e12b1ca",
-      "type": "developer_recommendation",
-      "cluster": "UI Components",
-      "title": "src/lib/components/ui/dialog/index.ts — 11 unresolved imports",
-      "why": "Feature \"ui\" barrel/index has 11 dangling import refs (mapreduce v4 scan)",
-      "sourceRefs": [
-        "src/lib/components/ui/dialog/index.ts"
-      ],
-      "action": "Audit barrel re-exports; remove or fix dangling import paths",
-      "next_command": "node scripts/atlas/debug-import-resolve.mjs <import> 'src/lib/components/ui/dialog/index.ts'",
-      "priority": "high",
-      "featureStatus": "degraded"
-    },
-    {
-      "id": "import_error_b068f027",
+      "id": "import_error_7ab56ec3",
       "type": "developer_recommendation",
       "cluster": "General",
       "title": "src/lib/icons/yorha/index.ts — 12 unresolved imports",
@@ -380,64 +254,21 @@
       "featureStatus": "degraded"
     },
     {
-      "id": "atlas_coverage_79e5f292",
-      "type": "atlas_coverage_gap",
-      "cluster": "Parent Atlas Coverage",
-      "title": "Qdrant coverage: 33% (3539 files unembedded)",
-      "why": "3539 parent_atlas_documents rows have no qdrant_point_id. ACE packet source_refs will be empty for these files until embedded.",
+      "id": "import_error_8bc815c2",
+      "type": "developer_recommendation",
+      "cluster": "UI Components",
+      "title": "src/lib/components/ui/dialog/index.ts — 11 unresolved imports",
+      "why": "Feature \"ui\" barrel/index has 11 dangling import refs (mapreduce v4 scan)",
       "sourceRefs": [
-        "scripts/graphify/semantic-index.mjs"
+        "src/lib/components/ui/dialog/index.ts"
       ],
-      "action": "Run graphify:semantic to embed 3539 missing files",
-      "next_command": "npm run graphify:semantic",
+      "action": "Audit barrel re-exports; remove or fix dangling import paths",
+      "next_command": "node scripts/atlas/debug-import-resolve.mjs <import> 'src/lib/components/ui/dialog/index.ts'",
       "priority": "high",
-      "featureStatus": "degraded",
-      "metrics": {
-        "total": 5253,
-        "covered": 1714,
-        "pct": 33
-      }
+      "featureStatus": "degraded"
     },
     {
-      "id": "atlas_coverage_155319fd",
-      "type": "atlas_coverage_gap",
-      "cluster": "Parent Atlas Coverage",
-      "title": "SOM cluster coverage: 29% (3744 files unclassified)",
-      "why": "3744 parent_atlas_documents rows have no cluster_id. ACE packet cluster_id, som_cluster, and topology boosting are unavailable for these files.",
-      "sourceRefs": [
-        "scripts/graphify/semantic-cluster.mjs"
-      ],
-      "action": "Run graphify:semantic-cluster to assign cluster_id to 3744 files",
-      "next_command": "npm run graphify:semantic-cluster",
-      "priority": "high",
-      "featureStatus": "degraded",
-      "metrics": {
-        "total": 5253,
-        "covered": 1509,
-        "pct": 29
-      }
-    },
-    {
-      "id": "atlas_coverage_f489f8eb",
-      "type": "atlas_coverage_gap",
-      "cluster": "Parent Atlas Coverage",
-      "title": "2201 atlas_feature_map rows not joined to parent_atlas_documents",
-      "why": "These files have feature map entries but no canonical parent_atlas_documents record. They are invisible to ACE packet assembly and cannot contribute to feature_ids.",
-      "sourceRefs": [
-        "scripts/atlas/sync-parent-atlas.mjs"
-      ],
-      "action": "Re-run atlas sync to backfill missing parent_atlas_documents rows",
-      "next_command": "npm run atlas:sync",
-      "priority": "high",
-      "featureStatus": "degraded",
-      "metrics": {
-        "afmTotal": 5740,
-        "notInPad": 2201,
-        "matched": 3539
-      }
-    },
-    {
-      "id": "unclassified_8f4ebf76",
+      "id": "unclassified_5b109497",
       "type": "feature:unclassified",
       "cluster": "Agent Workflow",
       "title": "4 files unclassified with >10 imports",
@@ -452,6 +283,48 @@
       "next_command": "node scripts/atlas/mapreduce-consolidated-index.mjs \"--output=.tmp/mapreduce-full-v4.ndjson\"",
       "priority": "medium",
       "featureStatus": "degraded"
+    },
+    {
+      "id": "stale_feature_20960db4",
+      "type": "missing_feature",
+      "cluster": "Legal Workspace",
+      "title": "Feature not implemented: Priority 1: Evidence Upload UI (1 hour)",
+      "why": "feature not yet implemented",
+      "sourceRefs": [
+        "local:docs/archive/sessions/SESSION_SUMMARY_APRIL_9_2026.md#L182"
+      ],
+      "action": "rg \"Display extracted text preview\" src docs tests",
+      "next_command": "",
+      "priority": "low",
+      "featureStatus": "missing"
+    },
+    {
+      "id": "stale_feature_e5e3087e",
+      "type": "missing_feature",
+      "cluster": "General",
+      "title": "Feature not implemented: Priority 2: VLM POI Integration (90 min)",
+      "why": "feature not yet implemented",
+      "sourceRefs": [
+        "local:docs/archive/sessions/SESSION_SUMMARY_APRIL_9_2026.md#L188"
+      ],
+      "action": "rg \"Wire photo VLM analysis to UI\" src docs tests",
+      "next_command": "",
+      "priority": "low",
+      "featureStatus": "missing"
+    },
+    {
+      "id": "stale_feature_c280c6f8",
+      "type": "missing_feature",
+      "cluster": "General",
+      "title": "Feature not implemented: Priority 3: Audit Dashboard Web UI (3-4 hours)",
+      "why": "feature not yet implemented",
+      "sourceRefs": [
+        "local:docs/archive/sessions/SESSION_SUMMARY_APRIL_9_2026.md#L194"
+      ],
+      "action": "rg \"Real-time GPU metrics (VRAM, temperature, utilization)\" src docs tests",
+      "next_command": "",
+      "priority": "low",
+      "featureStatus": "missing"
     }
   ],
   "inputs": {

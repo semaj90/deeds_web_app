@@ -32,11 +32,19 @@ ON CONFLICT (lane_id) DO NOTHING;
 
 -- Add compact routing columns to nes_chrom_packets (hot path, no JSONB scan needed)
 ALTER TABLE nes_chrom_packets
-    ADD COLUMN IF NOT EXISTS source_ref_id    INTEGER,
-    ADD COLUMN IF NOT EXISTS feature_code     INTEGER,
-    ADD COLUMN IF NOT EXISTS som_code         SMALLINT,
-    ADD COLUMN IF NOT EXISTS confidence_score SMALLINT,
-    ADD COLUMN IF NOT EXISTS packet_zstd      BYTEA;
+    ADD COLUMN IF NOT EXISTS source_ref_id INTEGER;
+
+ALTER TABLE nes_chrom_packets
+    ADD COLUMN IF NOT EXISTS feature_code INTEGER;
+
+ALTER TABLE nes_chrom_packets
+    ADD COLUMN IF NOT EXISTS som_code SMALLINT;
+
+ALTER TABLE nes_chrom_packets
+    ADD COLUMN IF NOT EXISTS confidence_score SMALLINT;
+
+ALTER TABLE nes_chrom_packets
+    ADD COLUMN IF NOT EXISTS packet_zstd BYTEA;
 
 CREATE INDEX IF NOT EXISTS nes_chrom_packets_source_ref_id_idx
     ON nes_chrom_packets (source_ref_id);

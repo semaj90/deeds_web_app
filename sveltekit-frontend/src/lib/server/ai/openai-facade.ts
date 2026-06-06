@@ -260,6 +260,75 @@ function buildBudgetTrace(
   };
 }
 
+async function persistEngramChatMemory(input: {
+  userId?: string;
+  query: string;
+  answer: string;
+  model: string;
+  selectedLane?: string;
+  cacheHit?: string;
+}): Promise<void> {
+  const userId = String(input.userId ?? '').trim();
+  const query = String(input.query ?? '').trim();
+  const answer = String(input.answer ?? '').trim();
+  if (!userId || !query || !answer) return;
+
+  try {
+    const redis = await Promise.resolve(getRedis());
+    if (!redis || typeof redis.zadd !== 'function') return;
+
+    const key = `user:memory:${userId}`;
+    const now = Date.now();
+    const ttlSeconds = 60 * 60 * 24 * 7;
+    const maxTurns = 50;
+
+    const userTurn = JSON.stringify({
+      role: 'user',
+      content: query.slice(0, 4000),
+      ts: now,
+      metadata: {
+        source: 'openai-facade',
+        model: input.model,
+        lane: input.selectedLane ?? null,
+        cacheHit: input.cacheHit ?? null,
+      },
+    });
+    const assistantTurn = JSON.stringify({
+      role: 'assistant',
+      content: answer.slice(0, 4000),
+      ts: now + 1,
+      metadata: {
+        source: 'openai-facade',
+        model: input.model,
+        lane: input.selectedLane ?? null,
+        cacheHit: input.cacheHit ?? null,
+      },
+    });
+
+    const multi = typeof redis.multi === 'function' ? redis.multi() : null;
+    if (multi && typeof multi.zadd === 'function' && typeof multi.zremrangebyrank === 'function' && typeof multi.expire === 'function') {
+      multi
+        .zadd(key, now, userTurn)
+        .zadd(key, now + 1, assistantTurn)
+        .zremrangebyrank(key, 0, -(maxTurns + 1))
+        .expire(key, ttlSeconds);
+      await multi.exec();
+      return;
+    }
+
+    await redis.zadd(key, now, userTurn);
+    await redis.zadd(key, now + 1, assistantTurn);
+    if (typeof redis.zremrangebyrank === 'function') {
+      await redis.zremrangebyrank(key, 0, -(maxTurns + 1));
+    }
+    if (typeof redis.expire === 'function') {
+      await redis.expire(key, ttlSeconds);
+    }
+  } catch (err) {
+    console.warn('[openai-facade] engram chat memory write failed:', err);
+  }
+}
+
 type InferenceLane = 'hermes' | 'turboquant' | 'bifrost';
 
 async function runHermesChat(
@@ -468,6 +537,14 @@ export async function runChatCompletion(
   try {
     const cachedScenario = await lookupScenario(query);
     if (cachedScenario.hit && cachedScenario.response) {
+      void persistEngramChatMemory({
+        userId: opts.userId,
+        query,
+        answer: cachedScenario.response,
+        model: internalModel,
+        selectedLane: cachedScenario.source === 'redis' ? 'redis' : 'bifrost',
+        cacheHit: 'scenario-cache',
+      });
       return wrapResponse({
         content: cachedScenario.response,
         model: internalModel,
@@ -588,6 +665,14 @@ export async function runChatCompletion(
       text = extractAssistantText(result);
     }
     text = text.trim() || '[No assistant content returned by model]';
+    void persistEngramChatMemory({
+      userId: opts.userId,
+      query,
+      answer: text,
+      model: rawModel,
+      selectedLane: selectedLane,
+      cacheHit: 'raw',
+    });
     return wrapResponse({
       content: text,
       model: rawModel,
@@ -651,6 +736,14 @@ export async function runChatCompletion(
         return null;
       }
     })();
+    void persistEngramChatMemory({
+      userId: opts.userId,
+      query,
+      answer: agentResult.answer,
+      model: internalModel,
+      selectedLane: canUseTurboQuantNow ? 'turboquant' : 'hermes',
+      cacheHit: agentResult.cacheTier ? 'prior-answer' : 'none',
+    });
     return wrapResponse({
       content: agentResult.answer,
       model: internalModel,
@@ -668,6 +761,7 @@ export async function runChatCompletion(
         codeLlmHit: agentResult.cacheTier !== undefined,
         cacheHit: agentResult.cacheTier ? 'prior-answer' : 'none',
       },
+      selectedLane: canUseTurboQuantNow ? 'turboquant' : 'bifrost',
       hmm: agentHmmResult
         ? {
             hmmAnalyzerUsed: true,

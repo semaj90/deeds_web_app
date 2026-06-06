@@ -23,12 +23,19 @@ import { fileURLToPath, pathToFileURL } from 'url';
 import { existsSync } from 'fs';
 import fs from 'fs/promises';
 import crypto from 'crypto';
+import dotenv from 'dotenv';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = resolve(__dirname, '..', '..');
 
+dotenv.config({ path: resolve(ROOT, '.env.local'), override: false });
+dotenv.config({ path: resolve(ROOT, '.env'), override: false });
+dotenv.config({ path: resolve(ROOT, 'sveltekit-frontend/.env.local'), override: false });
+dotenv.config({ path: resolve(ROOT, 'sveltekit-frontend/.env'), override: false });
+
 const QDRANT_URL  = process.env.QDRANT_URL  || 'http://127.0.0.1:6333';
 const REDIS_URL   = process.env.REDIS_URL   || 'redis://127.0.0.1:6379';
+const REDIS_PASSWORD = process.env.REDIS_PASSWORD || process.env.REDIS_PASS || undefined;
 const OLLAMA_URL  = process.env.OLLAMA_URL  || 'http://127.0.0.1:11434';
 
 // ── Load simdjson native addon ─────────────────────────────────────────────────
@@ -76,6 +83,7 @@ async function probeRedis() {
   const ioredisPath = resolve(ROOT, 'sveltekit-frontend', 'node_modules', 'ioredis', 'built', 'index.js');
   const { default: Redis } = await import(pathToFileURL(ioredisPath).href);
   const client = new Redis(REDIS_URL, {
+    password: REDIS_PASSWORD,
     lazyConnect: true,
     maxRetriesPerRequest: 1,
     enableOfflineQueue: false,

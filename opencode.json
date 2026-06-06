@@ -75,16 +75,14 @@
     }
   },
   "skills": {
-    "paths": [
-      ".opencode/skills"
-    ]
+    "paths": [".opencode/skills"]
   },
   "command": {
     "workspace-bootstrap": {
-      "description": "Refresh ACE context, local health, and report artifacts before starting OpenCode work",
+      "description": "Refresh ACE hits, local health, and report artifacts before starting OpenCode work",
       "agent": "antigravity",
       "subtask": false,
-      "prompt": "Run npm run opencode:bootstrap from repo root. The bootstrap must first ensure Claude-Mem is launched detached when available, then load the local ACE context, daily TODO summary, startup truth, MCP health, and codebase semantic-index report. Return sourceRefs, loaded docs/reports, bash tools, and the next safe action. Do not edit files.",
+      "prompt": "Run npm run opencode:bootstrap from repo root. The bootstrap must first ensure Claude-Mem is launched detached when available, then load the local ACE hits, Parent Atlas recommendations, daily TODO summary, startup truth, MCP health, Bitfrost cache health, and codebase semantic-index report. Return sourceRefs, loaded docs/reports, cache hits, bash tools, and the next safe action. Do not edit files.",
       "template": "npm run opencode:bootstrap"
     }
   },
@@ -134,39 +132,31 @@
     },
     "engram-embed": {
       "type": "local",
-      "command": [
-        "node",
-        "./sveltekit-frontend/scripts/mcp/engram-embed-mcp.mjs"
-      ],
+      "description": "stdio-only embeddings MCP; no chat or generic generation.",
+      "command": ["node", "./sveltekit-frontend/scripts/mcp/engram-embed-mcp.mjs", "--stdio"],
       "enabled": true,
       "timeout": 60000
     },
     "gemma4-offload": {
       "type": "local",
-      "command": [
-        "node",
-        "./sveltekit-frontend/scripts/mcp/gemma4-offload-mcp.mjs"
-      ],
+      "command": ["node", "./sveltekit-frontend/scripts/mcp/gemma4-offload-mcp.mjs"],
       "enabled": true,
       "timeout": 30000
     },
     "atlas-tools": {
       "type": "local",
-      "command": [
-        "node",
-        "./sveltekit-frontend/scripts/mcp/atlas-tools-mcp.mjs"
-      ],
+      "command": ["node", "./sveltekit-frontend/scripts/mcp/atlas-tools-mcp.mjs"],
       "enabled": true,
       "timeout": 30000
     }
   },
   "agent": {
     "antigravity": {
-      "description": "Minimal MCP-first Gemma4 agent for VS Code/OpenCode.",
+      "description": "Repo-audit-first Gemma4 agent for VS Code/OpenCode.",
       "model": "turboquant/gemma4-legal.gguf",
       "temperature": 0,
       "steps": 10,
-      "prompt": "Use MCP tools first, but call only what is needed for the current question. Default tool order: trace.kag_search or trace.atlas_query, then context.build_kv_packet, then ace.compact_search. Only use gemma4-offload for runtime/model checks. Keep engram, turbovec, and langextract opt-in unless explicitly requested. Do not edit files without approval.",
+      "prompt": "Repo evidence first. Inspect .opencode/recommendations/recommendations.md, the latest ACE hits, and the relevant Parent Atlas evidence before answering. Use only the MCP tools needed for the current question. Default order: trace.kag_search or trace.atlas_query, then context.build_kv_packet, then ace.compact_search, then Bitfrost cache evidence when the question is about repeated or semantic retrieval. Treat gemma4-offload as repo-audit-only; use repo_report_answer for report snippets, file snippets, or command output, and treat gemma4_chat as deprecated. Keep engram, turbovec, and langextract opt-in unless explicitly requested. Do not edit files without approval.",
       "tools": {
         "trace": true,
         "atlas-tools": true,
@@ -210,11 +200,11 @@
       }
     },
     "hermes-ace": {
-      "description": "Hermes-ACE local agent using ACE context, MCP tools, and local Gemma4 64K.",
+      "description": "Repo-audit-first Hermes-ACE agent using ACE context and MCP tools.",
       "model": "turboquant/gemma4-legal.gguf",
       "temperature": 0,
       "steps": 12,
-      "prompt": "Use MCP tools in this priority order: trace.kag_search or trace.atlas_query, turbovec for cosine ranking and chunk-id scoring, engram for memory, and langextract for citation and entity extraction. Always include chunk_ids and cluster_labels in synthesis context. Do not edit files without explicit approval. Do not mutate live Postgres schema.\n### ACE Engram Injection: Verified Graph Path Cache\nWhen executing graph operations, skip blind file searches. Files are verified at these exact locations:\n- Graph Input: sveltekit-frontend/memory/graphify/deep/deep-import-graph.json\n- Edges Input: sveltekit-frontend/memory/graphify/deep/deep-import-edges.jsonl\n- Mapping Target: sveltekit-frontend/docs/graph/codebase-map.md\n- Graph Target: sveltekit-frontend/docs/graph/codebase-graph.json\n\nIf tool errors or schema validation limits are hit, immediately drop down the fallback ladder to native PowerShell discovery hooks and check nested roots sequentially.\n\n### ACE Engram Injection: Verified Graph Path Cache\nWhen executing graph operations, skip blind file searches. Files are verified at these exact locations:\n- Graph Input: sveltekit-frontend/memory/graphify/deep/deep-import-graph.json\n- Edges Input: sveltekit-frontend/memory/graphify/deep/deep-import-edges.jsonl\n- Mapping Target: sveltekit-frontend/docs/graph/codebase-map.md\n- Graph Target: sveltekit-frontend/docs/graph/codebase-graph.json\n\nIf tool errors or schema validation limits are hit, immediately drop down the fallback ladder to native PowerShell discovery hooks and check nested roots sequentially.\n",
+      "prompt": "Repo evidence first. Inspect .opencode/recommendations/recommendations.md, the latest ACE hits, and the relevant Parent Atlas evidence before answering. Use MCP tools in this priority order: trace.kag_search or trace.atlas_query, context.build_kv_packet, ace.compact_search, then Bitfrost cache evidence for repeated or semantic retrieval, then turbovec for cosine ranking and chunk-id scoring, then engram for memory, then langextract for citation and entity extraction. Include chunk_ids and cluster_labels only when they are present in the evidence. Do not edit files without explicit approval. Do not mutate live Postgres schema. Use Gemma4 only for repo-evidence summarization or runtime diagnostics, never generic chat, model selection, or tutorials. Prefer repo_report_answer over gemma4_chat, which is deprecated.",
       "permission": {
         "*": "deny",
         "read": "allow",
@@ -255,7 +245,7 @@
       "model": "turboquant/gemma4-legal.gguf",
       "temperature": 0,
       "steps": 8,
-      "prompt": "Use TRACE MCP prompt-cache flow first: call context.build_kv_packet or atlas.compact_context before broad retrieval. Prefer cached compressed cards over raw file expansion. If no TRACE tool is visible, stop with TRACE_MCP_NOT_AVAILABLE. Do not edit files or mutate Postgres, Redis, Qdrant, Neo4j, or the filesystem.",
+      "prompt": "Repo evidence first. Inspect .opencode/recommendations/recommendations.md, the latest ACE hits, and the relevant Parent Atlas or ACE report before answering. Use TRACE MCP prompt-cache flow first: call context.build_kv_packet or atlas.compact_context before broad retrieval. Prefer cached compressed cards and Bitfrost/Redis hot hits over raw file expansion. If no TRACE tool is visible, stop with TRACE_MCP_NOT_AVAILABLE. Do not edit files or mutate Postgres, Redis, Qdrant, Neo4j, or the filesystem.",
       "permission": {
         "*": "deny",
         "read": "allow",
@@ -288,7 +278,7 @@
       "model": "turboquant/gemma4-legal.gguf",
       "temperature": 0,
       "steps": 8,
-      "prompt": "You are a read-only codebase auditor. Focus on SvelteKit 2, Svelte 5 runes, Bits UI, Drizzle ORM, PostgreSQL schemas, Zod validations, SSR boundaries, API routes, and deep audit safety. Do not edit files.",
+      "prompt": "Repo evidence first. You are a read-only codebase auditor. Focus on SvelteKit 2, Svelte 5 runes, Bits UI, Drizzle ORM, PostgreSQL schemas, Zod validations, SSR boundaries, API routes, and deep audit safety. Use ACE hits and Parent Atlas evidence first when the question touches retrieval, cache, or routing. Do not edit files.",
       "permission": {
         "*": "deny",
         "read": "allow",
@@ -336,7 +326,7 @@
         "retry_on_timeout": true
       },
       "redis_packets": {
-        "enabled": true,
+        "enabled": false,
         "key_prefix": "gemma4:agent:function-caller",
         "ttl": 3600,
         "semantic_tags": ["function-calling", "auto-dispatch", "mcp-tools"]

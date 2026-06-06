@@ -1,0 +1,288 @@
+{
+  "generatedAt": "2026-06-06T05:59:42.006Z",
+  "rootRegistryPath": "C:\\Users\\james\\Documents\\Codex\\2026-05-12\\ve-updated-the-local-quantization-notebook\\docs\\atlas\\feature-registry.json",
+  "appRegistryPath": "C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\docs\\atlas\\feature-registry.json",
+  "sourceStatus": {
+    "rootRegistry": "READY",
+    "appRegistry": "READY"
+  },
+  "root": {
+    "rowCount": 18,
+    "uniqueCount": 18,
+    "sample": [
+      {
+        "feature_id": "retrieval_spine",
+        "status": "implemented",
+        "storage_lane": "redis-hot + qdrant + postgres",
+        "retrieval_lane": "hybrid-ace"
+      },
+      {
+        "feature_id": "turbovec_prefilter",
+        "status": "implemented",
+        "storage_lane": "redis-hot + qdrant",
+        "retrieval_lane": "cluster-prefilter"
+      },
+      {
+        "feature_id": "karpathy_authority_overlay",
+        "status": "implemented",
+        "storage_lane": "redis-hot + json artifact",
+        "retrieval_lane": "authority-boost"
+      },
+      {
+        "feature_id": "karpathy_redis_hot_lane",
+        "status": "implemented",
+        "storage_lane": "redis-hot",
+        "retrieval_lane": "authority-overlay"
+      },
+      {
+        "feature_id": "ace_context_pack_cache",
+        "status": "implemented",
+        "storage_lane": "redis-hot + postgres + file snapshot",
+        "retrieval_lane": "ace-context-pack"
+      }
+    ]
+  },
+  "app": {
+    "rowCount": 4209,
+    "uniqueCount": 4208,
+    "sample": [
+      {
+        "feature_id": "opencode_mcp_atlas__root",
+        "status": "implemented",
+        "storage_lane": null,
+        "retrieval_lane": null
+      },
+      {
+        "feature_id": "yorha_legal_ai_agentic_progress_log",
+        "status": "implemented",
+        "storage_lane": null,
+        "retrieval_lane": null
+      },
+      {
+        "feature_id": "2026_05_22t20_15_00_000z_cache_trace_failed",
+        "status": "implemented",
+        "storage_lane": null,
+        "retrieval_lane": null
+      },
+      {
+        "feature_id": "2026_05_22t20_16_00_000z_toon_packet_shape_partial",
+        "status": "implemented",
+        "storage_lane": null,
+        "retrieval_lane": null
+      },
+      {
+        "feature_id": "2026_05_22t20_17_00_000z_qdrant_payload_parity_partial",
+        "status": "implemented",
+        "storage_lane": null,
+        "retrieval_lane": null
+      }
+    ]
+  },
+  "diff": {
+    "rootMatched": 0,
+    "rootMissingInApp": 18,
+    "appMissingInRoot": 4209,
+    "rootMissingSamples": [
+      {
+        "feature_id": "retrieval_spine",
+        "status": "implemented",
+        "owner_file": "docs/reports/retrieval-truth-2026-05-20.md"
+      },
+      {
+        "feature_id": "turbovec_prefilter",
+        "status": "implemented",
+        "owner_file": "docs/reports/retrieval-truth-2026-05-20.md"
+      },
+      {
+        "feature_id": "karpathy_authority_overlay",
+        "status": "implemented",
+        "owner_file": "docs/reports/retrieval-truth-2026-05-20.md"
+      },
+      {
+        "feature_id": "karpathy_redis_hot_lane",
+        "status": "implemented",
+        "owner_file": "docs/reports/retrieval-truth-2026-05-20.md"
+      },
+      {
+        "feature_id": "ace_context_pack_cache",
+        "status": "implemented",
+        "owner_file": "docs/reports/memory-registry-schema-contract-2026-05-20.md"
+      },
+      {
+        "feature_id": "intent_synthesis",
+        "status": "implemented",
+        "owner_file": "docs/reports/memory-registry-schema-contract-2026-05-20.md"
+      },
+      {
+        "feature_id": "feature_label_registry",
+        "status": "partial",
+        "owner_file": "CONTRACT-feature-label-registry-2026-05-19.md"
+      },
+      {
+        "feature_id": "pgvector_multi_table_lane",
+        "status": "implemented",
+        "owner_file": "docs/reports/pgvector-inventory-2026-05-20.md"
+      },
+      {
+        "feature_id": "redis_agent_memory_server_eval",
+        "status": "missing",
+        "owner_file": "MASTER-FEATURE-TODO-2026-05-20.md"
+      },
+      {
+        "feature_id": "claude_mem_opencode_reference",
+        "status": "partial",
+        "owner_file": "MASTER-FEATURE-TODO-2026-05-20.md"
+      },
+      {
+        "feature_id": "feature_gap_registry",
+        "status": "partial",
+        "owner_file": "MASTER-FEATURE-TODO-2026-05-20.md"
+      },
+      {
+        "feature_id": "codebase_semantic_index",
+        "status": "implemented",
+        "owner_file": "docs/reports/retrieval-truth-2026-05-20.md"
+      },
+      {
+        "feature_id": "semantic_cache_policy",
+        "status": "partial",
+        "owner_file": "docs/reports/engram-sidecar-gap-map-2026-05-20.md"
+      },
+      {
+        "feature_id": "memory_address_registry",
+        "status": "missing",
+        "owner_file": "docs/reports/memory-registry-schema-contract-2026-05-20.md"
+      },
+      {
+        "feature_id": "ace_packet_flow",
+        "status": "implemented",
+        "owner_file": "docs/reports/did-you-mean-intent-scorer-contract-2026-05-20.md"
+      },
+      {
+        "feature_id": "cluster_card_flow",
+        "status": "partial",
+        "owner_file": "reference/REF-storage-synthesis-and-publish-2026-05-20.md"
+      },
+      {
+        "feature_id": "feature_labeling_pipeline",
+        "status": "partial",
+        "owner_file": "CONTRACT-feature-label-registry-2026-05-19.md"
+      },
+      {
+        "feature_id": "duckdb_analytics_lane",
+        "status": "missing",
+        "owner_file": "docs/reports/pgvector-inventory-2026-05-20.md"
+      }
+    ],
+    "appOrphanSamples": [
+      {
+        "feature_id": "opencode_mcp_atlas__root",
+        "status": "implemented",
+        "owner_file": null
+      },
+      {
+        "feature_id": "yorha_legal_ai_agentic_progress_log",
+        "status": "implemented",
+        "owner_file": null
+      },
+      {
+        "feature_id": "2026_05_22t20_15_00_000z_cache_trace_failed",
+        "status": "implemented",
+        "owner_file": null
+      },
+      {
+        "feature_id": "2026_05_22t20_16_00_000z_toon_packet_shape_partial",
+        "status": "implemented",
+        "owner_file": null
+      },
+      {
+        "feature_id": "2026_05_22t20_17_00_000z_qdrant_payload_parity_partial",
+        "status": "implemented",
+        "owner_file": null
+      },
+      {
+        "feature_id": "2026_05_22t20_18_00_000z_bifrost_cards_smoke_solved",
+        "status": "implemented",
+        "owner_file": null
+      },
+      {
+        "feature_id": "2026_05_22t20_19_00_000z_check_script_blocked",
+        "status": "implemented",
+        "owner_file": null
+      },
+      {
+        "feature_id": "2026_05_22t20_20_00_000z_atlas_build_partial",
+        "status": "implemented",
+        "owner_file": null
+      },
+      {
+        "feature_id": "2026_05_23t03_28_26_412z_unknown_partial",
+        "status": "implemented",
+        "owner_file": null
+      },
+      {
+        "feature_id": "2026_05_23t03_29_33_989z_type_check_chat_stream_solved",
+        "status": "implemented",
+        "owner_file": null
+      },
+      {
+        "feature_id": "couchdb_mapreduce_atlas_ingestion__root",
+        "status": "implemented",
+        "owner_file": null
+      },
+      {
+        "feature_id": "couchdb_mapreduce_atlas_ingestion",
+        "status": "implemented",
+        "owner_file": null
+      },
+      {
+        "feature_id": "doc_types",
+        "status": "implemented",
+        "owner_file": null
+      },
+      {
+        "feature_id": "views",
+        "status": "implemented",
+        "owner_file": null
+      },
+      {
+        "feature_id": "deepseek_engram_architecture_search__root",
+        "status": "implemented",
+        "owner_file": null
+      },
+      {
+        "feature_id": "deepseek_engram_architecture_search",
+        "status": "implemented",
+        "owner_file": null
+      },
+      {
+        "feature_id": "inputs",
+        "status": "implemented",
+        "owner_file": null
+      },
+      {
+        "feature_id": "candidate_roles",
+        "status": "implemented",
+        "owner_file": null
+      },
+      {
+        "feature_id": "search_questions",
+        "status": "implemented",
+        "owner_file": null
+      },
+      {
+        "feature_id": "code_anchors_verified",
+        "status": "implemented",
+        "owner_file": null
+      }
+    ]
+  },
+  "summary": {
+    "classification": "OVERLAY_MISMATCH",
+    "rootRegistryRows": 18,
+    "appRegistryRows": 4209,
+    "rootMatchedInApp": 0,
+    "rootMissingInApp": 18,
+    "appMissingInRoot": 4209
+  }
+}
