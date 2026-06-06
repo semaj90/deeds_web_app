@@ -464,7 +464,9 @@
     "ndjson:mapreduce:dry": "node scripts/atlas/ndjson-mapreduce-join.mjs --dry-run",
     "ndjson:mapreduce:map": "node scripts/atlas/ndjson-mapreduce-join.mjs --phase map",
     "ndjson:mapreduce:reduce": "node scripts/atlas/ndjson-mapreduce-join.mjs --phase reduce",
-    "ndjson:mapreduce:minify": "node scripts/atlas/ndjson-mapreduce-join.mjs --phase minify"
+    "ndjson:mapreduce:minify": "node scripts/atlas/ndjson-mapreduce-join.mjs --phase minify",
+    "atlas:smoke:traversal": "node scripts/atlas/smoke-feature-traversal.mjs",
+    "atlas:smoke:traversal:targeted": "node scripts/atlas/smoke-feature-traversal.mjs --source-ref"
   },
   "devDependencies": {
     "@ast-grep/cli": "0.42.3",
@@ -535,4 +537,3 @@
     "zod-to-json-schema": "file:C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/mcp/zod-to-json-schema-bridge"
   }
 }
-

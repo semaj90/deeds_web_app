@@ -1,22 +1,22 @@
 # Parent Atlas Production Readiness Audit
 
-Generated: 2026-06-06T06:22:10.140Z
+Generated: 2026-06-06T17:13:57.438Z
 
 ## Summary
 
-- PASS: 65
-- WARN: 1
+- PASS: 63
+- WARN: 3
 - FAIL: 0
 
 ## Key Signals
 
 - Parent Atlas documents: 5253
-- Atlas feature map rows: 14465
+- Atlas feature map rows: 14471
 - NES/CHROM packets: 27
 - Route runtime packets: 33
-- Qdrant points: 76261
+- Qdrant points: 76506
 - Neo4j CodebaseFile nodes: 25269
-- Redis LOD0 latest packet coverage: 1/33
+- Redis LOD0 latest packet coverage: 0/33
 - Native JSON parser: native addon path present; fallback present
 - NDJSON files discovered with rg -uuu: 128
 - Phase 101 batch summaries: 35 succeeded / 0 failed
@@ -84,7 +84,7 @@ Generated: 2026-06-06T06:22:10.140Z
 - PASS [offline] scripts/atlas/materialize-hidden-packet-pathmap-duckdb.mjs: scripts/atlas/materialize-hidden-packet-pathmap-duckdb.mjs exists
 - PASS [offline] rg-uu:ndjson-inventory: rg -uuu found 128 NDJSON files
 - PASS [postgres] table:parent_atlas_documents: parent_atlas_documents exists with 5253 rows
-- PASS [postgres] table:atlas_feature_map: atlas_feature_map exists with 14465 rows
+- PASS [postgres] table:atlas_feature_map: atlas_feature_map exists with 14471 rows
 - PASS [postgres] table:atlas_feature_map_synthesized: atlas_feature_map_synthesized exists with 14465 rows
 - PASS [postgres] table:nes_chrom_packets: nes_chrom_packets exists with 27 rows
 - PASS [postgres] table:nes_chrom_kag_dag_hits: nes_chrom_kag_dag_hits exists with 32 rows
@@ -94,11 +94,11 @@ Generated: 2026-06-06T06:22:10.140Z
 - PASS [postgres] table:agent_pickup_queue: agent_pickup_queue exists with 123 rows
 - PASS [postgres] parent_atlas_documents:sourceRef: Parent Atlas sourceRefs: 3799/3799
 - PASS [postgres] parent_atlas_documents:summaries: Parent Atlas summaries: 3794/3799
-- PASS [postgres] active-production:topology: Active production qdrant-without-SOM rows: 0
+- WARN [postgres] active-production:topology: Active production qdrant-without-SOM rows: 2
 - PASS [postgres] nes-chrom:sourceRef-parent-join: NES/CHROM packets matching Parent Atlas: 22/27
 - PASS [postgres] route-runtime:sourceRefs: Runtime packets with sourceRefs: 30/33
-- PASS [redis] lod0:route-runtime: Redis LOD0 runtime packets: 1/33
-- PASS [qdrant] collection:codebase_chunks_768: Qdrant codebase_chunks_768 points: 76261
+- WARN [redis] lod0:route-runtime: Redis LOD0 runtime packets: 0/33
+- PASS [qdrant] collection:codebase_chunks_768: Qdrant codebase_chunks_768 points: 76506
 - PASS [neo4j] contextual-tree: Neo4j CodebaseFile=25269, ParentAtlasFeature=1701
 
 ## Audit Guardrails

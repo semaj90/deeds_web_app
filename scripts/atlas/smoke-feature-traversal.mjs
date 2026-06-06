@@ -52,10 +52,11 @@ const QDRANT    = (E.QDRANT_URL || 'http://127.0.0.1:6333').replace(/\/$/, '');
 const NEO4J_URI = E.NEO4J_URI  || 'bolt://localhost:7687';
 const NEO4J_USR = E.NEO4J_USER || E.NEO4J_USERNAME || 'neo4j';
 const NEO4J_PWD = E.NEO4J_PASSWORD || E.NEO4J_PASS || 'neo4j123';
-const REDIS_URL = E.REDIS_URL;
 const REDIS_HOST = E.REDIS_HOST || '127.0.0.1';
 const REDIS_PORT = parseInt(E.REDIS_PORT || '6379', 10);
 const REDIS_PASS = E.REDIS_PASSWORD || E.REDIS_PASS || '';
+// Always use host/port/password form — REDIS_URL often omits password
+const REDIS_URL = null;
 
 const JSON_MODE = process.argv.includes('--json');
 const REPORT_PATH = path.join(ROOT, '.tmp', 'smoke-feature-traversal-report.json');
@@ -289,9 +290,11 @@ async function traverseOne(sourceRef, pool, neo4jDriver) {
   }
 
   // 14. Traversal packet assembled
-  const hasCore = pad && pad.feature_id && (qdrantId || somCluster);
+  // Core = feature_id + Neo4j graph; Qdrant/SOM are enrichment (data-density gaps, not wiring bugs)
+  const neo4jOk = checks.some(c => c.label === 'BELONGS_TO_FEATURE edge exists' && c.ok);
+  const hasCore = pad && pad.feature_id && neo4jOk;
   if (hasCore) checks.push(pass('traversal packet assembled'));
-  else checks.push(fail('traversal packet assembled', 'missing core fields'));
+  else checks.push(fail('traversal packet assembled', !pad?.feature_id ? 'no feature_id' : 'Neo4j graph not wired'));
 
   // Recommendation candidates (files in same feature, ranked by authority)
   if (pad.feature_id) {
