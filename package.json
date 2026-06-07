@@ -121,6 +121,11 @@
     "atlas:dedup:chunks:dry": "node scripts/atlas/dedup-codebase-chunk-index.mjs",
     "atlas:superseded-score:candidate": "node scripts/packets/score-superseded-originals.mjs",
     "atlas:doc-crosswalk": "node scripts/atlas/doc-feature-crosswalk.mjs",
+    "atlas:overlay:crosswalk": "node scripts/atlas/crosswalk-root-overlay.mjs",
+    "atlas:overlay:crosswalk:dry": "node scripts/atlas/crosswalk-root-overlay.mjs --dry-run",
+    "atlas:overlay:sync:audit": "node scripts/atlas/audit-parent-atlas-overlay-sync.mjs",
+    "atlas:overlay:sync:audit:catalog": "node scripts/atlas/audit-parent-atlas-overlay-sync.mjs --source=repo-root",
+    "atlas:overlay:sync:audit:crosswalk": "node scripts/atlas/audit-parent-atlas-overlay-sync.mjs --source=external-codex",
     "atlas:som:load": "node scripts/atlas/load-som-packets-to-redis.mjs --apply",
     "atlas:som:load:dry": "node scripts/atlas/load-som-packets-to-redis.mjs",
     "atlas:pytorch:qdrant:som:index": "node scripts/atlas/pytorch-qdrant-redis-som-index.mjs",
@@ -466,7 +471,14 @@
     "ndjson:mapreduce:reduce": "node scripts/atlas/ndjson-mapreduce-join.mjs --phase reduce",
     "ndjson:mapreduce:minify": "node scripts/atlas/ndjson-mapreduce-join.mjs --phase minify",
     "atlas:smoke:traversal": "node scripts/atlas/smoke-feature-traversal.mjs",
-    "atlas:smoke:traversal:targeted": "node scripts/atlas/smoke-feature-traversal.mjs --source-ref"
+    "atlas:smoke:traversal:targeted": "node scripts/atlas/smoke-feature-traversal.mjs --source-ref",
+    "atlas:parent-atlas:overlay-crosswalk": "node sveltekit-frontend/scripts/atlas/audit-parent-atlas-overlay-crosswalk.mjs",
+    "atlas:memory-address:seed": "node scripts/atlas/seed-memory-address-registry.mjs",
+    "atlas:memory-address:seed:dry": "node scripts/atlas/seed-memory-address-registry.mjs --dry-run",
+    "atlas:memory-address:smoke": "node scripts/atlas/smoke-memory-address-registry.mjs",
+    "graph:bitfrost-qdrant-sync": "node scripts/graph/bitfrost-qdrant-sync.mjs",
+    "graph:bitfrost-qdrant-sync:dry": "node scripts/graph/bitfrost-qdrant-sync.mjs --dry-run",
+    "graph:bitfrost-qdrant-sync:neo4j": "node scripts/graph/bitfrost-qdrant-sync.mjs --neo4j"
   },
   "devDependencies": {
     "@ast-grep/cli": "0.42.3",

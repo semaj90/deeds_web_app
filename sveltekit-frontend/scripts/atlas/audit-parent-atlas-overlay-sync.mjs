@@ -6,10 +6,18 @@ import { fileURLToPath } from 'node:url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const APP_ROOT = path.resolve(__dirname, '..', '..');
-const DOCS_ROOT = path.resolve('C:\\Users\\james\\Documents\\Codex\\2026-05-12\\ve-updated-the-local-quantization-notebook');
+// Prefer repo root registry (sibling of sveltekit-frontend/) so the audit
+// compares the two in-repo copies, not an external Codex workspace.
+const REPO_ROOT = path.resolve(APP_ROOT, '..');
+const EXTERNAL_DOCS_ROOT = path.resolve('C:\\Users\\james\\Documents\\Codex\\2026-05-12\\ve-updated-the-local-quantization-notebook');
 
 const APP_REGISTRY = path.join(APP_ROOT, 'docs', 'atlas', 'feature-registry.json');
-const ROOT_REGISTRY = path.join(DOCS_ROOT, 'docs', 'atlas', 'feature-registry.json');
+// Use repo root registry if it exists, otherwise fall back to the external Codex path.
+const REPO_ROOT_REGISTRY = path.join(REPO_ROOT, 'docs', 'atlas', 'feature-registry.json');
+const EXTERNAL_ROOT_REGISTRY = path.join(EXTERNAL_DOCS_ROOT, 'docs', 'atlas', 'feature-registry.json');
+const ROOT_REGISTRY = (await (async () => {
+  try { await fs.access(REPO_ROOT_REGISTRY); return REPO_ROOT_REGISTRY; } catch { return EXTERNAL_ROOT_REGISTRY; }
+})());
 const OUT_JSON = path.join(APP_ROOT, 'docs', 'reports', 'parent-atlas-overlay-sync-report.json');
 const OUT_MD = path.join(APP_ROOT, 'docs', 'reports', 'parent-atlas-overlay-sync-report.md');
 

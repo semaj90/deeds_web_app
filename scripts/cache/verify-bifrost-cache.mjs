@@ -4,6 +4,11 @@ import crypto from 'crypto';
 import { resolve } from 'path';
 
 const ROOT = process.cwd();
+
+if (process.env.REDIS_ENABLED === 'false' || process.env.ENGRAM_ONLY === 'true') {
+  console.log('[bifrost-verify] REDIS_ENABLED=false — skipping (Engram-only mode)');
+  process.exit(0);
+}
 dotenv.config({ path: resolve(ROOT, '.env.local'), override: false });
 dotenv.config({ path: resolve(ROOT, '.env'), override: false });
 dotenv.config({ path: resolve(ROOT, 'sveltekit-frontend/.env.local'), override: false });

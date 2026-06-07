@@ -1,0 +1,42 @@
+[package]
+name = "turbovec-napi"
+version = "0.1.0"
+edition = "2021"
+description = "N-API packet compiler: sourceRef hashing, edge dedupe, SOM scoring, JSONL load, Qdrant payload packing"
+
+[lib]
+crate-type = ["cdylib"]
+name = "turbovec_napi"
+
+[dependencies]
+# N-API bindings
+napi = { version = "2", features = ["napi4", "async"] }
+napi-derive = "2"
+
+# Existing turbovec quantization/search crate
+turbovec = { path = "../../turbovec/turbovec" }
+
+# SIMD JSON parsing (same dep as simd-bridge/rust-simdjson)
+simd-json = "0.17"
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+
+# Parallel iterators
+rayon = "1.10"
+
+# Fast hashing for sourceRef keys and edge deduplication
+rustc-hash = "2"
+twox-hash = { version = "1", features = ["std"] }
+
+# MessagePack serialization for Qdrant payloads
+rmp-serde = "1"
+rmp = "0.8"
+
+[build-dependencies]
+napi-build = "2"
+
+[profile.release]
+opt-level = 3
+lto = true
+codegen-units = 1
+strip = "symbols"

@@ -862,7 +862,11 @@ const dirRows = Object.entries(dirMap)
   .sort((a, b) => a.score - b.score);
 
 // Load temporal activity scores (populated by scripts/backfill-activity-scores.ts)
-const activityScores = redis ? await redis.hgetall('gpu:activity:dir_scores') : {};
+let activityScores = {};
+if (redis) {
+  try { activityScores = await redis.hgetall('gpu:activity:dir_scores') ?? {}; }
+  catch { /* connection closed after long index run — activity scores unavailable */ }
+}
 
 // Write wiki:note:dir:* Redis keys for ACE KAG context
 for (const d of dirRows) {
@@ -1352,5 +1356,5 @@ console.log(`   Outputs: docs/graph/codebase-graph.json  docs/graph/codebase-map
 await flushCheckpoint();
 if (redis) {
   try { await redis.del(CHECKPOINT_KEY); } catch { /* non-fatal */ }
-  await redis.quit();
+  try { await redis.quit(); } catch { /* non-fatal */ }
 }

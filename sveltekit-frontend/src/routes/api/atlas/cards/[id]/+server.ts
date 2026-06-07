@@ -24,7 +24,8 @@ function versionHash(data: unknown): string {
 }
 
 // ── Handler ───────────────────────────────────────────────────────────────────
-export const GET: RequestHandler = async ({ params, request }) => {
+export const GET: RequestHandler = async ({ params, request, locals}) => {
+  if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
 	const { id } = params;
 	if (!id) return json({ ok: false, error: 'Missing id' }, { status: 400 });
 

@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-06-06T02:41:02.903Z",
+  "generatedAt": "2026-06-06T07:47:23.117Z",
   "bashTools": [
     "agents:write:workspace => node sveltekit-frontend/scripts/generate-agents-md.mjs",
     "atlas:root:index => node scripts/atlas/index-repo-root.mjs",
@@ -620,6 +620,7 @@
     "reports\\h6-retrieval-status.md",
     "reports\\opencode-bootstrap.md",
     "reports\\p2-gates-closed.md",
+    "reports\\parent-atlas-open-lanes-todo.md",
     "reports\\parent-atlas-validation.md",
     "reports\\phase-lane-completion.md",
     "reports\\phase17-pytorch-feature-summary.md",
@@ -889,6 +890,7 @@
     "memory\\datasets\\llm_synthesis\\2026-05-29.jsonl",
     "memory\\datasets\\llm_synthesis\\2026-05-30.jsonl",
     "memory\\datasets\\llm_synthesis\\2026-06-03.jsonl",
+    "memory\\datasets\\llm_synthesis\\2026-06-06.jsonl",
     "memory\\clusters\\failure-clusters.json",
     "memory\\clusters\\graph_analysis_ready.json",
     "memory\\atlas\\documents-atlas.latest.md",
@@ -930,6 +932,8 @@
     "sveltekit-frontend\\docs\\reports\\couchdb-summary-card-snapshot.json",
     "sveltekit-frontend\\docs\\reports\\deep-graph-relations-report.md",
     "sveltekit-frontend\\docs\\reports\\duckdb-summary-card-report.json",
+    "sveltekit-frontend\\docs\\reports\\engram-adapter-decision-report.json",
+    "sveltekit-frontend\\docs\\reports\\engram-adapter-decision-report.md",
     "sveltekit-frontend\\docs\\reports\\feature-card-couchdb-design.json",
     "sveltekit-frontend\\docs\\reports\\feature-card-couchdb-design.md",
     "sveltekit-frontend\\docs\\reports\\feature-card-duckdb-inspect.json",
@@ -955,6 +959,8 @@
     "sveltekit-frontend\\docs\\reports\\live-service-env-audit.md",
     "sveltekit-frontend\\docs\\reports\\neo4j-cards-write-latest.json",
     "sveltekit-frontend\\docs\\reports\\neo4j-summary-card-report.json",
+    "sveltekit-frontend\\docs\\reports\\parent-atlas-overlay-sync-report.json",
+    "sveltekit-frontend\\docs\\reports\\parent-atlas-overlay-sync-report.md",
     "sveltekit-frontend\\docs\\reports\\parents_atlas_dashboard_report.md",
     "sveltekit-frontend\\docs\\reports\\postgres-contract-mirrors-report.json",
     "sveltekit-frontend\\docs\\reports\\postgres-contract-mirrors-report.md",
@@ -974,6 +980,8 @@
     "sveltekit-frontend\\docs\\reports\\task-semantic-packet-latest.md",
     "sveltekit-frontend\\docs\\reports\\task-semantic-packet-workflow-latest.json",
     "sveltekit-frontend\\docs\\reports\\task-semantic-packet-workflow-latest.md",
+    "sveltekit-frontend\\docs\\reports\\temporal-task-registry-report.json",
+    "sveltekit-frontend\\docs\\reports\\temporal-task-registry-report.md",
     "sveltekit-frontend\\docs\\reports\\top-100-codebase-summary-cards.md",
     "sveltekit-frontend\\docs\\profile-cards\\data\\sveltekit-frontend_src_lib_server_ace_context-assembler.ts.json",
     "sveltekit-frontend\\docs\\profile-cards\\data\\sveltekit-frontend_src_lib_server_atlas_route-feature-map.ts.json",
@@ -3968,6 +3976,7 @@
     "sveltekit-frontend\\memory\\ingest\\processed\\graphify_deep_imports_2026-06-05T21-38-57-241Z.jsonl",
     "sveltekit-frontend\\memory\\ingest\\processed\\graphify_deep_imports_2026-06-06T02-22-16-265Z.jsonl",
     "sveltekit-frontend\\memory\\ingest\\processed\\graphify_deep_imports_2026-06-06T02-36-27-573Z.jsonl",
+    "sveltekit-frontend\\memory\\ingest\\processed\\graphify_deep_imports_2026-06-06T05-58-39-752Z.jsonl",
     "sveltekit-frontend\\memory\\ingest\\processed\\kag-session-2026-05-06-windows-hardening.jsonl",
     "sveltekit-frontend\\memory\\ingest\\processed\\kag-session-2026-05-06.jsonl",
     "sveltekit-frontend\\memory\\ingest\\processed\\kag_error_2e53fd23_2026-05-06T22-34-56.jsonl",
@@ -4575,5 +4584,7 @@
       }
     }
   },
-  "warnings": []
+  "warnings": [
+    "startup-truth-blockers-present"
+  ]
 }

@@ -1,72 +1,89 @@
-# Parent Atlas Open Lanes TODO
+# Parent Atlas Open Lanes — Finish List
 
-Generated from the current workstation evidence. This is the finish list for the remaining open lanes.
+Generated: 2026-06-06. Single authoritative finish list. Do not append — rewrite in place.
 
-## Already Wired
+---
 
-- OpenCode bootstrap now pulls ACE/recommendation evidence and verifies Bitfrost without blocking on a full startup-truth sweep.
-- Recommendation materialization no longer forwards to the legacy Gemma4 hook by default.
-- Parent Atlas, feature lineage, runtime packet, and PostgreSQL mirror audits are already in place.
+## Architecture: Four Separate Concerns
 
-## Open Lanes
+| Layer | Schema | Rows | Purpose |
+|-------|--------|------|---------|
+| Feature Catalog (App) | `featureKey / title / status / sourceRefs` | 4,209 | UI features, ACE retrieval, doc inventory |
+| Deployment Registry (Root) | `feature_id / storage_lane / retrieval_lane` | 18 | Architecture lanes — retrieval_spine, turbovec_prefilter, ace_packet_flow, etc. |
+| Crosswalk Table | `feature_id / featureKey / match_score / match_type / verified` | bridge | Durable ownership contract between the two taxonomies |
+| Temporal Task Registry | `recommendation-events.jsonl / task-state.json` | append-only | Kanban persistence — correct pattern, already wired |
 
-### 1. Engram / Gemma4 memory wiring
-- Status: partial
-- Missing: explicit Engram adapter decision report
-- Finish line:
-  - keep Engram hint-only unless a first-class adapter is explicitly justified
-  - keep `repo_report_answer` as the repo-audit path
-  - keep `gemma4_chat` deprecated
-  - use `npm run atlas:engram-adapter:decision` to track the lane
-  - review `sveltekit-frontend/docs/reports/engram-adapter-decision-report.md` for the current decision
+**The two registries use disjoint taxonomies and must not be merged.** The crosswalk is the correct artifact.
 
-### 2. Parent Atlas overlay sync
-- Status: partial
-- Missing: frontend overlay parity for the root atlas registry
-- Finish line:
-  - keep `sveltekit-frontend/docs/atlas/feature-registry.json` mirrored from the root registry
-  - keep doc-indexing reading app-side reports first
+**Audit classification model** (replaces `OVERLAY_MISMATCH`):
 
-### 3. Feature-gap registry completion
-- Status: partial
-- Missing: row-level reconciliation for the remaining live gaps
-- Finish line:
-  - keep the live registry regenerated from the synced overlay
-  - reconcile the remaining missing rows without broad ingest
+| Classification | Meaning |
+|----------------|---------|
+| `CATALOG_ALIGNED` | repo-root ↔ app catalog — same schema, 4208/4209 overlap |
+| `TAXONOMY_MISMATCH` | external deployment taxonomy ↔ app catalog — expected, solved by crosswalk |
+| `CROSSWALK_REQUIRED` | ≥1 root lane has zero app matches — needs new entry or manual verification |
 
-### 4. Graph / KAG / DAG refresh manifest
-- Status: partial
-- Missing: invalidation and promotion coordination
-- Finish line:
-  - wire refresh-manifest invalidation to atlas truth promotion
-  - keep graph refreshes from drifting away from the promoted truth
+**Operational layer discipline**:
 
-### 5. PyTorch / LibTorch feature extraction lane
-- Status: partial
-- Missing: a named workstation completion artifact
-- Finish line:
-  - bind the existing GPU outputs to the parent atlas registry
-  - keep the canonical `768 -> 256 -> 64` lane intact
+| Layer | Purpose |
+|-------|---------|
+| stdout | JSON-RPC / MCP protocol only |
+| stderr | human diagnostics only |
+| NDJSON | append-only event ledgers (graphify-events, packet-events, task-events, recommendation-events) |
+| JSONB / Postgres | canonical state |
+| Redis | hot cache |
+| Qdrant | vectors |
+| Neo4j | graph truth |
+| CouchDB | archival snapshots |
+| TOON | compressed transient packets |
 
-### 6. XGBoost / gradient tree boosting reranker
-- Status: partial
-- Missing: formal reranker contract
-- Finish line:
-  - decide whether XGBoost stays a side-channel hotness scorer or becomes a formal reranker input
-  - keep phase 18 bounded until the contract is explicit
+---
 
-## Finish Order
+## Already Closed
 
-1. Engram adapter decision
-2. Parent Atlas overlay sync
-3. Feature-gap registry reconciliation
-4. Graph refresh invalidation / promotion wiring
-5. PyTorch workstation artifact
-6. XGBoost reranker contract
+| Lane | Evidence |
+|------|----------|
+| OpenCode bootstrap / ACE evidence pull | `reports/opencode-bootstrap.md` — bootstrap wired |
+| Recommendation materialization (legacy Gemma4 hook) | `npm run atlas:engram-adapter:decision` → `HINT_ONLY_ADAPTER`; `gemma4_chat` deprecated |
+| Temporal registry | `atlas_task_registry` table wired; time-indexed event anchoring active in atlas spine |
+| Graphify startup health cache | warm graph state restored from Redis on folder open without full rebuild |
+| Parent Atlas / feature lineage / runtime packet / PostgreSQL mirror audits | audit scripts in place; `atlas:production-readiness` returns 63 PASS / 3 WARN / 0 FAIL |
+| Traversal smoke | `npm run atlas:smoke:traversal` — 75/75 pass |
+| Engram adapter decision (Lane 1) | `HINT_ONLY_ADAPTER` locked; `repo_report_answer` is the canonical repo-audit path |
+| Parent Atlas overlay crosswalk (Lane 2) | `CATALOG_ALIGNED` (4208/4209 key overlap; rootMissingInApp=0; appMissingInRoot=0); crosswalk bridge at `docs/reports/parent-atlas-crosswalk.{json,md}`; 18/18 deployment lanes matched |
+| Feature-gap registry reconciliation (Lane 3) | `npm run atlas:feature-gap` → 8 rows, all `implemented`, `missingLiveAtlasContract: false` |
+| Graph refresh invalidation / promotion wiring (Lane 4) | `promote-to-postgres.mjs` calls `write-graph-refresh-manifest.mjs` as post-promote hook |
+| PyTorch workstation artifact (Lane 5) | `gpu:karpathy:summary` Redis key active (last run 2026-06-05); `gpu:karpathy:scores` feeds ACE authority blend |
+| XGBoost reranker contract (Lane 6) | `side-channel-hotness-scorer` decision locked; contract at `sveltekit-frontend/docs/reports/xgboost-reranker-contract.md`; phase 18 stays bounded |
+
+| Memory Address Registry (Lane A) | `atlas_memory_address_registry` seeded: 9,099 rows (5,253 postgres/atlas + 3,846 qdrant/karpathy); smoke 8/8 PASS; FK integrity clean; feature_id 100%; Qdrant 42.3% |
+
+---
+
+## Open Lanes — Finish Order
+
+---
+
+### Lane B — UI Cluster / Trust-Tier Controls
+
+**Status**: open — unblocked (Lane A complete)
+
+**Finish line**:
+- Surface `som_cluster` and `trust_tier` labels in the codebase topology UI (`src/routes/(app)/code-intel/topology/+page.svelte`)
+- Wire `atlas_feature_map.som_cluster` + `atlas_feature_map.centroid_id` into the topology route load function
+- Add cluster badge component alongside existing node inspector
+- Only begin after Memory Address Registry seed is complete (Lane A)
+
+---
 
 ## Exit Criteria
 
-- Parent Atlas reports stay app-root aware.
-- OpenCode sessions use ACE hits, recommendations, and Bitfrost evidence first.
-- No lane depends on a hidden legacy Gemma4 forwarding path.
-- The open lanes have explicit commands and evidence files.
+| Criterion | Status |
+|-----------|--------|
+| Overlay audit = `CATALOG_ALIGNED` (repo-root ↔ app) | ✅ 4208/4209 overlap |
+| Deployment crosswalk = all 18 lanes matched | ✅ 18/18 SEMANTIC matches |
+| `atlas:smoke:traversal` = 75/75 | ✅ PASS |
+| No lane depends on hidden legacy Gemma4 forwarding path | ✅ PASS |
+| Memory Address Registry table seeded | ✅ 9,099 rows; smoke 8/8 PASS |
+| Three missing root lanes have crosswalk entries | ⏳ pending — `redis_agent_memory_server_eval`, `memory_address_registry`, `duckdb_analytics_lane` (evaluation-deferred, not blocking) |
+| UI topology shows SOM cluster + trust-tier badges | ⏳ pending Lane B |

@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-05-30T18:51:58.450Z",
+  "generatedAt": "2026-06-06T17:28:44.768Z",
   "mode": "live",
   "root": "C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend",
   "inputStatus": {
@@ -10,7 +10,7 @@
     "docsAtlasIndex": {
       "present": true,
       "path": "C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\docs\\atlas-index\\codebase-atlas.min.json",
-      "generatedAt": "2026-05-30T16:55:51.300Z"
+      "generatedAt": "2026-06-06T17:01:04.833Z"
     },
     "authorityLatest": {
       "present": true,
@@ -27,7 +27,7 @@
     },
     "qdrantClusterTags": {
       "present": true,
-      "path": "C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\memory\\runs\\2026-05-30T17-19-54\\qdrant_cluster_tags.json",
+      "path": "C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\memory\\runs\\2026-06-03T15-49-51\\qdrant_cluster_tags.json",
       "clusterCount": 1289
     },
     "featureMapCards": {

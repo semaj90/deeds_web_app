@@ -263,7 +263,7 @@ let redisAuthDetail = 'Redis auth not probed — run audit scripts to check conn
 if (pgSchemaReport?.redis_auth_checked !== undefined) {
   redisAuthStatus = pgSchemaReport.redis_auth_required === false ? 'GREEN' : 'YELLOW';
   redisAuthDetail = pgSchemaReport.redis_auth_required === false
-    ? 'legal-ai-redis responds to empty-password AUTH (container default)'
+    ? 'legal-ai-valkey responds to empty-password AUTH (container default)'
     : 'Redis requires non-empty AUTH — set REDIS_PASSWORD env var before promotion apply';
 }
 // Also check if TS bridge audit has redis info

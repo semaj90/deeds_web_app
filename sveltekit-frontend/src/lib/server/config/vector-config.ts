@@ -111,6 +111,7 @@ export const VECTOR_CONFIG = {
     document_knowledge_768: { vectors: ['default'], on_disk_payload: true },
     external_programming_docs_768: { vectors: ['default'], on_disk_payload: true },
     feature_maps: { vectors: ['summary'], on_disk_payload: true },
+    research_memory_768: { vectors: ['content'], on_disk_payload: true },
   },
 
   /** Qdrant HNSW config applied to all collections */

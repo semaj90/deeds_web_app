@@ -116,7 +116,7 @@ try {
   result.connectError = e.message ?? String(e);
   result.summary = `FAIL — connect error: ${result.connectError}`;
   if (/ECONNREFUSED|ETIMEDOUT|ENOTFOUND/.test(result.connectError)) {
-    result.recommendation = `Check that the Valkey container is running: docker ps | grep legal-ai-redis\nOr set REDIS_URL=redis://127.0.0.1:6379 in .env`;
+    result.recommendation = `Check that the Valkey container is running: docker ps | grep legal-ai-valkey\nOr set REDIS_URL=redis://:redis@127.0.0.1:6379 in .env`;
   }
   await client.disconnect();
   finish(2);

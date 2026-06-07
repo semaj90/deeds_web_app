@@ -1,6 +1,6 @@
 {
   "schema": "parent_atlas_production_readiness.v1",
-  "generatedAt": "2026-06-06T17:13:57.438Z",
+  "generatedAt": "2026-06-06T18:05:22.494Z",
   "readOnly": true,
   "sections": {
     "summary-batch": [
@@ -529,22 +529,19 @@
         "message": "rg -uuu found 128 NDJSON files",
         "details": {
           "sample": [
-            ".opencode\\fixes\\fixes.ndjson",
+            "docs\\packets\\session-features.ndjson",
+            "docs\\packets\\rg-knowledge-packets.ndjson",
+            "docs\\ai-os\\agentic-progress-log.ndjson",
             ".opencode\\recommendations\\tasks.ndjson",
             ".opencode\\recommendations\\tasks-with-improved-titles.ndjson",
             ".opencode\\quarantine\\invalid-cards.ndjson",
             ".opencode\\outcome-ledger.ndjson",
             ".opencode\\outcome-ledger-with-cardIds.ndjson",
-            "docs\\ai-os\\agentic-progress-log.ndjson",
-            "docs\\packets\\session-features.ndjson",
-            "docs\\packets\\rg-knowledge-packets.ndjson",
-            ".tmp\\chunks\\feature-chunks.ndjson",
-            ".tmp\\calls-edges-clean.ndjson",
-            ".tmp\\analysis\\backfill-proposals.ndjson",
             ".tmp\\superseded-score-candidates.ndjson",
             ".tmp\\source-ref-repair-candidates.ndjson",
             ".tmp\\retrieval-pass-dry-run.ndjson",
             ".tmp\\path-map.ndjson",
+            "deeds_labs\\snapshots\\2026-03-15-root\\misc\\svelte-errors.ndjson",
             ".tmp\\parent_atlas_packets\\rg-dumps\\rg-dump-packets.ndjson",
             ".tmp\\offline-synthesis\\hidden-packet-pathmap.ndjson",
             ".tmp\\offline-synthesis\\consolidated-index.ndjson",
@@ -553,7 +550,10 @@
             ".tmp\\mapreduce-full.ndjson",
             ".tmp\\mapreduce-full-v4.ndjson",
             ".tmp\\mapreduce-full-v3.ndjson",
-            ".tmp\\mapreduce-full-v2.ndjson"
+            ".tmp\\mapreduce-full-v2.ndjson",
+            ".tmp\\ingest\\test-tasks.ndjson",
+            ".tmp\\ingest\\tasks.ndjson",
+            ".tmp\\ingest\\task-proposals.ndjson"
           ]
         }
       }
@@ -650,7 +650,7 @@
         "details": {
           "raw_total": 14471,
           "raw_with_som": 10494,
-          "raw_with_qdrant": 11008,
+          "raw_with_qdrant": 13064,
           "active_total": 4814,
           "active_with_som": 4812,
           "active_with_qdrant": 4814,
@@ -1262,22 +1262,19 @@
       "message": "rg -uuu found 128 NDJSON files",
       "details": {
         "sample": [
-          ".opencode\\fixes\\fixes.ndjson",
+          "docs\\packets\\session-features.ndjson",
+          "docs\\packets\\rg-knowledge-packets.ndjson",
+          "docs\\ai-os\\agentic-progress-log.ndjson",
           ".opencode\\recommendations\\tasks.ndjson",
           ".opencode\\recommendations\\tasks-with-improved-titles.ndjson",
           ".opencode\\quarantine\\invalid-cards.ndjson",
           ".opencode\\outcome-ledger.ndjson",
           ".opencode\\outcome-ledger-with-cardIds.ndjson",
-          "docs\\ai-os\\agentic-progress-log.ndjson",
-          "docs\\packets\\session-features.ndjson",
-          "docs\\packets\\rg-knowledge-packets.ndjson",
-          ".tmp\\chunks\\feature-chunks.ndjson",
-          ".tmp\\calls-edges-clean.ndjson",
-          ".tmp\\analysis\\backfill-proposals.ndjson",
           ".tmp\\superseded-score-candidates.ndjson",
           ".tmp\\source-ref-repair-candidates.ndjson",
           ".tmp\\retrieval-pass-dry-run.ndjson",
           ".tmp\\path-map.ndjson",
+          "deeds_labs\\snapshots\\2026-03-15-root\\misc\\svelte-errors.ndjson",
           ".tmp\\parent_atlas_packets\\rg-dumps\\rg-dump-packets.ndjson",
           ".tmp\\offline-synthesis\\hidden-packet-pathmap.ndjson",
           ".tmp\\offline-synthesis\\consolidated-index.ndjson",
@@ -1286,7 +1283,10 @@
           ".tmp\\mapreduce-full.ndjson",
           ".tmp\\mapreduce-full-v4.ndjson",
           ".tmp\\mapreduce-full-v3.ndjson",
-          ".tmp\\mapreduce-full-v2.ndjson"
+          ".tmp\\mapreduce-full-v2.ndjson",
+          ".tmp\\ingest\\test-tasks.ndjson",
+          ".tmp\\ingest\\tasks.ndjson",
+          ".tmp\\ingest\\task-proposals.ndjson"
         ]
       }
     },
@@ -1393,7 +1393,7 @@
       "details": {
         "raw_total": 14471,
         "raw_with_som": 10494,
-        "raw_with_qdrant": 11008,
+        "raw_with_qdrant": 13064,
         "active_total": 4814,
         "active_with_som": 4812,
         "active_with_qdrant": 4814,
@@ -1457,7 +1457,7 @@
     "topologyCoverage": {
       "raw_total": 14471,
       "raw_with_som": 10494,
-      "raw_with_qdrant": 11008,
+      "raw_with_qdrant": 13064,
       "active_total": 4814,
       "active_with_som": 4812,
       "active_with_qdrant": 4814,
@@ -1490,8 +1490,8 @@
     "url": "http://127.0.0.1:6333",
     "collection": "codebase_chunks_768",
     "pointsCount": 76506,
-    "indexedVectorsCount": 152992,
-    "status": "green"
+    "indexedVectorsCount": 210224,
+    "status": "grey"
   },
   "neo4j": {
     "available": true,
@@ -1626,22 +1626,19 @@
     "status": "pass",
     "total": 128,
     "sample": [
-      ".opencode\\fixes\\fixes.ndjson",
+      "docs\\packets\\session-features.ndjson",
+      "docs\\packets\\rg-knowledge-packets.ndjson",
+      "docs\\ai-os\\agentic-progress-log.ndjson",
       ".opencode\\recommendations\\tasks.ndjson",
       ".opencode\\recommendations\\tasks-with-improved-titles.ndjson",
       ".opencode\\quarantine\\invalid-cards.ndjson",
       ".opencode\\outcome-ledger.ndjson",
       ".opencode\\outcome-ledger-with-cardIds.ndjson",
-      "docs\\ai-os\\agentic-progress-log.ndjson",
-      "docs\\packets\\session-features.ndjson",
-      "docs\\packets\\rg-knowledge-packets.ndjson",
-      ".tmp\\chunks\\feature-chunks.ndjson",
-      ".tmp\\calls-edges-clean.ndjson",
-      ".tmp\\analysis\\backfill-proposals.ndjson",
       ".tmp\\superseded-score-candidates.ndjson",
       ".tmp\\source-ref-repair-candidates.ndjson",
       ".tmp\\retrieval-pass-dry-run.ndjson",
       ".tmp\\path-map.ndjson",
+      "deeds_labs\\snapshots\\2026-03-15-root\\misc\\svelte-errors.ndjson",
       ".tmp\\parent_atlas_packets\\rg-dumps\\rg-dump-packets.ndjson",
       ".tmp\\offline-synthesis\\hidden-packet-pathmap.ndjson",
       ".tmp\\offline-synthesis\\consolidated-index.ndjson",
@@ -1650,7 +1647,10 @@
       ".tmp\\mapreduce-full.ndjson",
       ".tmp\\mapreduce-full-v4.ndjson",
       ".tmp\\mapreduce-full-v3.ndjson",
-      ".tmp\\mapreduce-full-v2.ndjson"
+      ".tmp\\mapreduce-full-v2.ndjson",
+      ".tmp\\ingest\\test-tasks.ndjson",
+      ".tmp\\ingest\\tasks.ndjson",
+      ".tmp\\ingest\\task-proposals.ndjson"
     ]
   },
   "summary": {

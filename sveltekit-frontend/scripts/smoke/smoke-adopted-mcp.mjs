@@ -39,7 +39,7 @@ const PROBES = [
     name: 'redis-readonly',
     cmd: 'uvx', args: ['mcp-server-redis'],
     env: { REDIS_HOST: 'localhost', REDIS_PORT: '6379', REDIS_DB: '0', REDIS_PASSWORD: 'redis' },
-    note: 'requires uv + Redis on :6379 (legal-ai-redis container)',
+    note: 'requires uv + Redis on :6379 (legal-ai-valkey container)',
   },
   {
     name: 'postgres-readonly',

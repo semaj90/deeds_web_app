@@ -16,6 +16,7 @@ import { ENV } from '$lib/server/env.server.js';
 import { qdrant } from '$lib/server/vector/qdrant-manager.js';
 import { generateEmbedding } from '$lib/server/grpc/embedding-client.js';
 import { chunkText, truncateForEmbed } from './research-utils.js';
+import { buildVectorPayload } from '$lib/server/config/vector-config.js';
 
 export type ResearchSource =
   | 'github_issue'
@@ -190,7 +191,7 @@ export async function ingestResearchChunks(
             const segId = `${chunk.id}_s${si}`;
             points.push({
               id: chunkIdToUint(segId),
-              vector: { content: embedding },
+              vector: buildVectorPayload(RESEARCH_COLLECTION, embedding),
               payload: {
                 chunk_id: segId,
                 parent_id: chunk.id,

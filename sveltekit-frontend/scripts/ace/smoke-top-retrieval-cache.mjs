@@ -7,7 +7,7 @@ import { fileURLToPath } from 'node:url';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, '..', '..');
 const CACHE_DIR = path.resolve(ROOT, '.cache', 'ace', 'top-retrieval');
-const REDIS_CONTAINER = process.env.DEEDS_REDIS_CONTAINER || 'legal-ai-redis';
+const REDIS_CONTAINER = process.env.REDIS_CONTAINER ?? process.env.DEEDS_REDIS_CONTAINER ?? 'legal-ai-valkey';
 
 function buildAceTopRetrievalCacheKey(queryHash, topN = 20) {
   return `ace:retrieval:topn:${queryHash}:${topN}`;

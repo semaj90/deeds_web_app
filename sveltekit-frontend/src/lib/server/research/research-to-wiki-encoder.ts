@@ -2,6 +2,7 @@ import { couchPut, type ResearchNote } from '$lib/server/features/codebase-intel
 import { generateSingleEmbedding } from '../grpc/embedding-client.js';
 import { qdrant } from '../vector/qdrant-manager.js';
 import { getNeo4jDriver } from '../neo4j-driver.js';
+import { buildVectorPayload } from '$lib/server/config/vector-config.js';
 
 /**
  * Research-to-Wiki Encoder: Bridges external research findings into the
@@ -40,7 +41,7 @@ export async function encodeResearchToWiki(params: {
       points: [
         {
           id: crypto.randomUUID(),
-          vector: { content: embedding },
+          vector: buildVectorPayload('synthesis_memory_768', embedding),
           payload: { ...note, vector_type: 'research_note' },
         },
       ],

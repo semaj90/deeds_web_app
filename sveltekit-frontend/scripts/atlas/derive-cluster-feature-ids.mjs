@@ -21,6 +21,8 @@
  *   node scripts/atlas/derive-cluster-feature-ids.mjs --top=8      # feature_ids per cluster
  */
 
+import { qdrant as _qdrantClient } from '../lib/qdrant-client.mjs';
+
 const DRY_RUN = process.argv.includes('--dry-run');
 const APPLY   = process.argv.includes('--apply');
 const FORCE   = process.argv.includes('--force');
@@ -60,20 +62,7 @@ let guard = 0;
 
 process.stdout.write('Pass 1: scanning all points...\n');
 
-while (guard < 500) {
-  guard++;
-  const res = await fetch(`${QDRANT_URL}/collections/${QDRANT_COLLECTION}/points/scroll`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ limit: BATCH, offset: scrollOffset, with_payload: true, with_vector: false }),
-    signal: AbortSignal.timeout(20_000),
-  });
-
-  if (!res.ok) { console.error('Qdrant scroll error', res.status); break; }
-  const data = await res.json();
-  const points = data?.result?.points ?? [];
-  if (!points.length) break;
-
+for await (const points of _qdrantClient.scroll(QDRANT_COLLECTION, { limit: BATCH, withPayload: true, withVector: false })) {
   for (const point of points) {
     totalScanned++;
     const p = point.payload ?? {};
@@ -114,10 +103,6 @@ while (guard < 500) {
   }
 
   if (totalScanned % 5000 === 0) process.stdout.write(`  scanned ${totalScanned}...\n`);
-
-  const next = data?.result?.next_page_offset;
-  if (next === null || next === undefined || !points.length) break;
-  scrollOffset = next;
 }
 
 process.stdout.write(`  done. scanned ${totalScanned}, found ${clusterData.size} clusters.\n\n`);
@@ -186,32 +171,19 @@ for (const [cluster, entry] of clusterData) {
     continue;
   }
 
-  // Write in batches of 100 point IDs per Qdrant call
-  for (let i = 0; i < entry.pointIds.length; i += 100) {
-    if (LIMIT !== null && totalPatched >= LIMIT) break;
-    const ids = entry.pointIds.slice(i, i + 100);
-    const writableIds = LIMIT !== null ? ids.slice(0, Math.max(0, LIMIT - totalPatched)) : ids;
-    if (writableIds.length === 0) break;
-    try {
-      const r = await fetch(`${QDRANT_URL}/collections/${QDRANT_COLLECTION}/points/payload`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          points: writableIds,
-          payload: {
-            feature_ids: resolved.feature_ids,
-            lane_ids:    resolved.lane_ids,
-            som_cluster: cluster,
-          },
-        }),
-        signal: AbortSignal.timeout(20_000),
-      });
-      if (r.ok) totalPatched += writableIds.length;
-      else totalSkipped += writableIds.length;
-    } catch {
-      totalSkipped += writableIds.length;
-    }
-  }
+  // Write via centralized IPv4-forced client (handles chunking internally)
+  const writableIds = LIMIT !== null
+    ? entry.pointIds.slice(0, Math.max(0, LIMIT - totalPatched))
+    : entry.pointIds;
+  if (writableIds.length === 0) { totalSkipped += entry.pointIds.length; continue; }
+
+  const { patched: p, failed: f } = await _qdrantClient.patchPayload(
+    QDRANT_COLLECTION,
+    writableIds,
+    { feature_ids: resolved.feature_ids, lane_ids: resolved.lane_ids, som_cluster: cluster },
+  );
+  totalPatched += p;
+  totalSkipped += f + (entry.pointIds.length - writableIds.length);
 
   if ((totalPatched + totalSkipped) % 5000 < 200) {
     process.stdout.write(`  patched ${totalPatched} / skipped ${totalSkipped}...\n`);

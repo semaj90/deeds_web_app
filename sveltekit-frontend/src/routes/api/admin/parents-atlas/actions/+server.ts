@@ -44,7 +44,8 @@ const TOPIC_LABELS: Record<string, string> = {
 	'graph-rag': 'Graph-Enhanced Retrieval (GraphRAG)',
 };
 
-export const POST: RequestHandler = async ({ request }) => {
+export const POST: RequestHandler = async ({ request, locals}) => {
+  if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
 	try {
 		const body = await request.json();
 		const { action, query } = body;

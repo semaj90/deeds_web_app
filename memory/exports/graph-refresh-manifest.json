@@ -1,8 +1,8 @@
 {
-  "generatedAt": "2026-06-01T05:50:47.218Z",
+  "generatedAt": "2026-06-07T04:19:15.390Z",
   "nodeCount": 0,
   "edgeCount": 0,
-  "exportCount": 486,
+  "exportCount": 488,
   "exports": [
     {
       "file": "memory/exports/cluster-cards.jsonl",
@@ -11,6 +11,10 @@
     {
       "file": "memory/exports/pathway-cards.jsonl",
       "rows": 12
+    },
+    {
+      "file": "memory/exports/ace-packet-ingest-report.json",
+      "rows": 1
     },
     {
       "file": "memory/exports/all-lanes-parent-atlas-report.json",
@@ -146,6 +150,10 @@
     },
     {
       "file": "memory/exports/som-metrics.json",
+      "rows": 1
+    },
+    {
+      "file": "memory/exports/som-packets-redis-load.json",
       "rows": 1
     },
     {

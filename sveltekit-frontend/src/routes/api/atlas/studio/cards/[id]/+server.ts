@@ -34,7 +34,8 @@ function normalizeRowToCard(row: any, kindHint?: 'rag' | 'cluster') {
   };
 }
 
-export const GET: RequestHandler = async ({ params }) => {
+export const GET: RequestHandler = async ({ params, locals}) => {
+  if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
   const id = params.id;
   if (!id) return json({ ok: false, error: 'missing id' }, { status: 400 });
 

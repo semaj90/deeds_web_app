@@ -25,6 +25,33 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { readFileSync, existsSync } from 'node:fs';
 import { createConnection } from 'node:net';
+import http from 'node:http';
+
+// IPv4-forced keepalive agent — bypasses wslrelay on ::1 (QDRANT_HOST_IPV6_RELAY_COLLISION)
+const qdrantAgent = new http.Agent({ keepAlive: true, family: 4, maxSockets: 4 });
+
+function qdrantPost(urlStr, body, timeoutMs = 15_000) {
+  return new Promise((resolve, reject) => {
+    const u = new URL(urlStr);
+    const payload = JSON.stringify(body);
+    const req = http.request({
+      agent: qdrantAgent, hostname: u.hostname, port: parseInt(u.port || '6333', 10),
+      family: 4, path: u.pathname + u.search, method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Content-Length': Buffer.byteLength(payload) },
+    }, (res) => {
+      const chunks = [];
+      res.on('data', c => chunks.push(c));
+      res.on('end', () => {
+        try { resolve(JSON.parse(Buffer.concat(chunks).toString('utf8'))); }
+        catch { reject(new Error(`Qdrant non-JSON response (${res.statusCode})`)); }
+      });
+    });
+    req.setTimeout(timeoutMs, () => req.destroy(new Error('Qdrant timeout')));
+    req.on('error', reject);
+    req.write(payload);
+    req.end();
+  });
+}
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, '../..');
@@ -43,7 +70,7 @@ for (const env of [path.join(ROOT, 'sveltekit-frontend', '.env'), path.join(ROOT
 const VERBOSE = process.argv.includes('--verbose');
 
 const QDRANT_URL      = process.env.QDRANT_URL ?? 'http://127.0.0.1:6333';
-const EMBED_BASE_URL  = process.env.OLLAMA_EMBED_BASE_URL ?? 'http://127.0.0.1:8081';
+const EMBED_BASE_URL  = process.env.OLLAMA_EMBED_BASE_URL ?? 'http://127.0.0.1:11434';
 const EMBED_MODEL     = process.env.OLLAMA_EMBED_MODEL ?? 'embeddinggemma:latest';
 const REDIS_HOST      = process.env.REDIS_HOST ?? '127.0.0.1';
 const REDIS_PORT      = parseInt(process.env.REDIS_PORT ?? '6379', 10);
@@ -87,19 +114,13 @@ async function embedQuery(query) {
 }
 
 async function qdrantSearch(embedding) {
-  const res = await fetch(`${QDRANT_URL}/collections/${COLLECTION}/points/search`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      vector: { name: 'content', vector: embedding },
-      limit: 10,
-      with_payload: true,
-      with_vector: false,
-    }),
-    signal: AbortSignal.timeout(15_000),
+  const data = await qdrantPost(`${QDRANT_URL}/collections/${COLLECTION}/points/search`, {
+    vector: { name: 'content', vector: embedding },
+    limit: 10,
+    with_payload: true,
+    with_vector: false,
   });
-  if (!res.ok) throw new Error(`Qdrant search failed: ${res.status}`);
-  const data = await res.json();
+  if (data?.status !== 'ok') throw new Error(`Qdrant search error: ${JSON.stringify(data?.status)}`);
   return data.result ?? [];
 }
 
@@ -246,7 +267,7 @@ try {
   const { spawnSync } = await import('node:child_process');
   const passArgs = REDIS_PASS ? ['-a', REDIS_PASS, '--no-auth-warning'] : [];
   // Check if any bitfrost:retrieval:* key with Valkey/redis in it exists
-  const keysResult = spawnSync('docker', ['exec', 'legal-ai-redis', 'redis-cli', ...passArgs, 'KEYS', 'bitfrost:retrieval:*'], {
+  const keysResult = spawnSync('docker', ['exec', process.env.REDIS_CONTAINER ?? 'legal-ai-valkey', 'redis-cli', ...passArgs, 'KEYS', 'bitfrost:retrieval:*'], {
     encoding: 'utf8', timeout: 5000
   });
   if (keysResult.status === 0) {

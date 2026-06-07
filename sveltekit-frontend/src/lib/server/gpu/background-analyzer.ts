@@ -131,7 +131,7 @@ export async function analyzeEvidenceGpu(
           points: [
             {
               id: caseId,
-              vector: { content: caseEmbResult.embedding },
+              vector: { description: caseEmbResult.embedding },
               payload: {
                 case_id: caseId,
                 type: 'case_aggregate',
@@ -292,7 +292,7 @@ async function analyzeEvidenceBatchGpu(caseId: string, evidenceIds: string[]): P
           points: [
             {
               id: caseId,
-              vector: { content: caseEmbResult.embedding },
+              vector: { description: caseEmbResult.embedding },
               payload: {
                 case_id: caseId,
                 type: 'case_aggregate',

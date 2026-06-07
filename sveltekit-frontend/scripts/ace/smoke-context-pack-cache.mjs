@@ -6,7 +6,7 @@ import { fileURLToPath } from 'node:url';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, '..', '..');
 const SNAPSHOT_DIR = path.resolve(ROOT, '.cache', 'ace', 'context-packs');
-const REDIS_CONTAINER = process.env.DEEDS_REDIS_CONTAINER || 'legal-ai-redis';
+const REDIS_CONTAINER = process.env.REDIS_CONTAINER ?? process.env.DEEDS_REDIS_CONTAINER ?? 'legal-ai-valkey';
 
 function buildAceContextCacheKey(contextId, version = 'v1') {
   return `ace:context:${contextId}:${version}`;

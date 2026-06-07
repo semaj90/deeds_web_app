@@ -98,7 +98,9 @@ function redisDockerExec(args) {
   return new Promise((resolve) => {
     const REDIS_PASSWORD = process.env.REDIS_PASSWORD || process.env.REDIS_PASS || '';
     const passArgs = REDIS_PASSWORD ? ['-a', REDIS_PASSWORD, '--no-auth-warning'] : [];
-    const result = spawnSync('docker', ['exec', 'legal-ai-redis', 'redis-cli', ...passArgs, ...args.map(String)], {
+    // Try canonical container name, then Valkey alias
+    const containerName = process.env.REDIS_CONTAINER ?? 'legal-ai-valkey';
+    const result = spawnSync('docker', ['exec', containerName, 'redis-cli', ...passArgs, ...args.map(String)], {
       encoding: 'utf8',
       timeout: 5000,
     });

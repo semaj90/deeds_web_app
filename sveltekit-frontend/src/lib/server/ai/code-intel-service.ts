@@ -1,6 +1,7 @@
 import { db } from '$lib/server/db/client';
 import { kagDagRuns, topologySnapshots, memoryGainAudits, qdrantCentroidClusters } from '$lib/server/db/schema.js';
 import { tensorAnalysisCache } from '$lib/server/db/schema/topology.js';
+import { atlasFeatureMap } from '$lib/server/db/schema/atlas-feature-map.js';
 import { desc, count, eq, sql, avg } from 'drizzle-orm';
 import { ENV } from '$lib/server/env.server.js';
 import { getGraphMLStatus } from '$lib/server/grpc/graph-ml-client.js';
@@ -159,9 +160,15 @@ export async function getTopologySnapshot(snapshotId?: string) {
 			manifold4_w:          tensorAnalysisCache.manifold4W,
 			topo_class:           tensorAnalysisCache.topoClass,
 			qdrant_payload:       tensorAnalysisCache.qdrantPayload,
+			// atlasFeatureMap enrichment — SOM cluster + centroid from the lineage table
+			afm_som_cluster:      atlasFeatureMap.somCluster,
+			afm_centroid_id:      atlasFeatureMap.centroidId,
+			afm_cluster_id:       atlasFeatureMap.clusterId,
+			afm_feature_id:       atlasFeatureMap.featureId,
 		})
 		.from(topologyPositions)
 		.leftJoin(tensorAnalysisCache, eq(topologyPositions.stableKey, tensorAnalysisCache.stableKey))
+		.leftJoin(atlasFeatureMap, eq(topologyPositions.stableKey, atlasFeatureMap.sourceRef))
 		.where(eq(topologyPositions.snapshotId, snapshot[0].id));
 
 	return {

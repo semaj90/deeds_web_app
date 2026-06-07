@@ -15,7 +15,7 @@ const DRY = process.argv.includes('--dry');
 
 const SERVICES = [
 	{ service: 'postgres', container: 'legal-ai-postgres' },
-	{ service: 'redis', container: 'legal-ai-redis' },
+	{ service: 'redis', container: 'legal-ai-valkey' },
 	{ service: 'qdrant', container: 'legal-ai-qdrant' },
 	{ service: 'seaweedfs-master', container: 'legal-ai-seaweed-master' },
 	{ service: 'seaweedfs-volume', container: 'legal-ai-seaweed-volume' },

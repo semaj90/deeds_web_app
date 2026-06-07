@@ -102,7 +102,7 @@ function startGPUServer() {
 
 function startRedisCache() {
   log('cache', 'Starting Redis (L1 exact-match cache)...');
-  const proc = spawn('docker', ['start', 'legal-ai-redis'], {
+  const proc = spawn('docker', ['start', 'legal-ai-valkey'], {
     stdio: 'inherit',
   });
   proc.on('error', (err) => log('error', `Redis startup failed: ${err.message}`));

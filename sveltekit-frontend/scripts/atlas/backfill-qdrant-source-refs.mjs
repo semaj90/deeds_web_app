@@ -3,6 +3,7 @@ import { mkdirSync, readFileSync, writeFileSync, existsSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 import { Pool } from 'pg';
 import { config as loadEnv } from 'dotenv';
+import { qdrant as _qdrant } from '../lib/qdrant-client.mjs';
 
 // Load env
 for (const dir of [process.cwd(), resolve(process.cwd(), '..')]) {
@@ -49,24 +50,7 @@ function buildSourceRefs(relativePath) {
 
 async function buildQdrantPointIndex() {
   const index = new Map();
-  let offset = null;
-  let guard = 0;
-  while (guard < 200) {
-    guard++;
-    const res = await fetch(`${QDRANT_URL}/collections/${QDRANT_COLLECTION}/points/scroll`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        limit: 256,
-        offset,
-        with_payload: true,
-        with_vector: false,
-      }),
-      signal: AbortSignal.timeout(20_000),
-    });
-    if (!res.ok) break;
-    const data = await res.json();
-    const points = Array.isArray(data?.result?.points) ? data.result.points : [];
+  for await (const points of _qdrant.scroll(QDRANT_COLLECTION, { limit: 256, withPayload: true, withVector: false })) {
     for (const point of points) {
       const payload = point?.payload ?? {};
       const filePath = String(payload.file_path ?? payload.relativePath ?? '').trim();
@@ -75,29 +59,15 @@ async function buildQdrantPointIndex() {
       ids.push(point.id);
       index.set(filePath, ids);
     }
-    const next = data?.result?.next_page_offset;
-    if (next === null || next === undefined || points.length === 0) break;
-    offset = next;
   }
   return index;
 }
 
 async function qdrantCoverageSample(sampleLimit = 25) {
   try {
-    const res = await fetch(`${QDRANT_URL}/collections/${QDRANT_COLLECTION}/points/scroll`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        limit: sampleLimit,
-        with_payload: true,
-        with_vector: false,
-      }),
-      signal: AbortSignal.timeout(10_000),
+    const data = await _qdrant.post(`/collections/${QDRANT_COLLECTION}/points/scroll`, {
+      limit: sampleLimit, with_payload: true, with_vector: false,
     });
-    if (!res.ok) {
-      return { ok: false, status: res.status, total: 0, withSourceRefs: 0, coverage: 0 };
-    }
-    const data = await res.json();
     const points = Array.isArray(data?.result?.points) ? data.result.points : [];
     const withSourceRefs = points.filter((point) => {
       const payload = point?.payload ?? {};
@@ -109,21 +79,13 @@ async function qdrantCoverageSample(sampleLimit = 25) {
       return refs.length > 0;
     }).length;
     return {
-      ok: true,
-      status: res.status,
-      total: points.length,
-      withSourceRefs,
+      ok: true, status: 200, total: points.length, withSourceRefs,
       coverage: points.length > 0 ? Number((withSourceRefs / points.length).toFixed(3)) : 0,
       sample: points,
     };
   } catch (error) {
     return {
-      ok: false,
-      status: 0,
-      total: 0,
-      withSourceRefs: 0,
-      coverage: 0,
-      sample: [],
+      ok: false, status: 0, total: 0, withSourceRefs: 0, coverage: 0, sample: [],
       error: error instanceof Error ? error.message : String(error),
     };
   }
@@ -157,23 +119,10 @@ async function main() {
             return;
           }
           try {
-            const res = await fetch(`${QDRANT_URL}/collections/${QDRANT_COLLECTION}/points/payload`, {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                points: [point.id],
-                payload: {
-                  sourceRefs,
-                  source_refs: sourceRefs,
-                },
-              }),
-              signal: AbortSignal.timeout(15_000),
-            });
-            if (res.ok) {
-              updated++;
-            } else {
-              skipped++;
-            }
+            const { patched } = await _qdrant.patchPayload(
+              QDRANT_COLLECTION, [point.id], { sourceRefs, source_refs: sourceRefs }
+            );
+            if (patched > 0) updated++; else skipped++;
           } catch {
             skipped++;
           }
@@ -216,23 +165,10 @@ async function main() {
                 skipped++;
                 return;
               }
-              const res = await fetch(`${QDRANT_URL}/collections/${QDRANT_COLLECTION}/points/payload`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                  points: pointIds,
-                  payload: {
-                    sourceRefs,
-                    source_refs: sourceRefs,
-                  },
-                }),
-                signal: AbortSignal.timeout(15_000),
-              });
-              if (res.ok) {
-                updated++;
-              } else {
-                skipped++;
-              }
+              const { patched } = await _qdrant.patchPayload(
+                QDRANT_COLLECTION, pointIds, { sourceRefs, source_refs: sourceRefs }
+              );
+              if (patched > 0) updated++; else skipped++;
             } catch {
               skipped++;
             }

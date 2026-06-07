@@ -113,7 +113,7 @@ setTimeout(() => {
     console.error('Troubleshooting:');
     console.error('  1. Verify tsx/ts-node is installed: npm install -g tsx');
     console.error('  2. Check TypeScript compilation: npm run typecheck');
-    console.error('  3. Verify Redis is running: docker start legal-ai-redis');
+    console.error('  3. Verify Redis is running: docker start legal-ai-valkey');
     console.error('  4. View logs: tail -f logs/mcp-server.log');
     mcp.kill();
     process.exit(1);

@@ -1,0 +1,1035 @@
+{
+  "generatedAt": "2026-06-06T17:27:04.702Z",
+  "rootCount": 18,
+  "appCount": 4209,
+  "rootMatchedCount": 18,
+  "rootUnmatchedCount": 0,
+  "crosswalk": [
+    {
+      "feature_id": "retrieval_spine",
+      "status": "implemented",
+      "storage_lane": "redis-hot + qdrant + postgres",
+      "retrieval_lane": "hybrid-ace",
+      "nextAction": "Reconcile against the live codebase atlas and keep labels normalized.",
+      "appMatches": [
+        {
+          "featureKey": "subgraph_instruction_programming_kag_ace_topology__overview",
+          "title": "Overview",
+          "status": "implemented",
+          "score": 0.38461538461538464
+        },
+        {
+          "featureKey": "subgraph_instruction_programming_kag_ace_topology_todo__goal",
+          "title": "Goal",
+          "status": "implemented",
+          "score": 0.38461538461538464
+        },
+        {
+          "featureKey": "the_4_layer_retrieval_stack",
+          "title": "The 4-Layer Retrieval Stack:",
+          "status": "implemented",
+          "score": 0.38461538461538464
+        },
+        {
+          "featureKey": "codebase_atlas_index",
+          "title": "codebase atlas index",
+          "status": "implemented",
+          "score": 0.36363636363636365
+        },
+        {
+          "featureKey": "system_boundary",
+          "title": "System Boundary",
+          "status": "implemented",
+          "score": 0.34615384615384615
+        },
+        {
+          "featureKey": "feature_map_context",
+          "title": "Feature Map Context",
+          "status": "implemented",
+          "score": 0.34615384615384615
+        },
+        {
+          "featureKey": "implementation_guidance",
+          "title": "Implementation Guidance",
+          "status": "implemented",
+          "score": 0.34615384615384615
+        },
+        {
+          "featureKey": "1_architectural_principles",
+          "title": "1. Architectural Principles",
+          "status": "implemented",
+          "score": 0.34615384615384615
+        }
+      ]
+    },
+    {
+      "feature_id": "turbovec_prefilter",
+      "status": "implemented",
+      "storage_lane": "redis-hot + qdrant",
+      "retrieval_lane": "cluster-prefilter",
+      "nextAction": "Keep this as a non-blocking narrowing stage before semantic recall.",
+      "appMatches": [
+        {
+          "featureKey": "the_4_layer_retrieval_stack",
+          "title": "The 4-Layer Retrieval Stack:",
+          "status": "implemented",
+          "score": 0.36
+        },
+        {
+          "featureKey": "package_map",
+          "title": "package map",
+          "status": "implemented",
+          "score": 0.3333333333333333
+        },
+        {
+          "featureKey": "qdrant_search_contract__root",
+          "title": "qdrant-search-contract",
+          "status": "implemented",
+          "score": 0.32
+        },
+        {
+          "featureKey": "integration_features_to_look_for",
+          "title": "Integration features to look for",
+          "status": "implemented",
+          "score": 0.32
+        },
+        {
+          "featureKey": "directory_role_map",
+          "title": "Directory Role Map",
+          "status": "implemented",
+          "score": 0.3076923076923077
+        },
+        {
+          "featureKey": "feature_map",
+          "title": "feature map",
+          "status": "implemented",
+          "score": 0.3
+        },
+        {
+          "featureKey": "how_to_update_this_map",
+          "title": "How to Update This Map",
+          "status": "implemented",
+          "score": 0.3
+        },
+        {
+          "featureKey": "pipeline_fit",
+          "title": "Pipeline Fit",
+          "status": "implemented",
+          "score": 0.28
+        }
+      ]
+    },
+    {
+      "feature_id": "karpathy_authority_overlay",
+      "status": "implemented",
+      "storage_lane": "redis-hot + json artifact",
+      "retrieval_lane": "authority-boost",
+      "nextAction": "Feed the authority snapshot into the feature-gap diff as a routing prior.",
+      "appMatches": [
+        {
+          "featureKey": "1_retrieval_stages",
+          "title": "1. Retrieval Stages",
+          "status": "implemented",
+          "score": 0.3333333333333333
+        },
+        {
+          "featureKey": "query_routing_evaluation_phase_18",
+          "title": "Query Routing Evaluation — Phase 18",
+          "status": "implemented",
+          "score": 0.3076923076923077
+        },
+        {
+          "featureKey": "where_each_technology_fits",
+          "title": "Where each technology fits",
+          "status": "implemented",
+          "score": 0.3076923076923077
+        },
+        {
+          "featureKey": "3_query_routing_results",
+          "title": "3. Query Routing Results",
+          "status": "implemented",
+          "score": 0.3076923076923077
+        },
+        {
+          "featureKey": "the_4_layer_retrieval_stack",
+          "title": "The 4-Layer Retrieval Stack:",
+          "status": "implemented",
+          "score": 0.3076923076923077
+        },
+        {
+          "featureKey": "phase_15b_adaptive_retrieval_lane_routing_evaluator",
+          "title": "Phase 15B — Adaptive Retrieval Lane-Routing Evaluator",
+          "status": "implemented",
+          "score": 0.29411764705882354
+        },
+        {
+          "featureKey": "2_redis_bitfrost_sample",
+          "title": "2. Redis BitFrost Sample",
+          "status": "implemented",
+          "score": 0.29411764705882354
+        },
+        {
+          "featureKey": "compact_384d_warden_routing_cache_prewarm_report",
+          "title": "Compact 384d Warden Routing Cache Prewarm Report",
+          "status": "implemented",
+          "score": 0.2857142857142857
+        }
+      ]
+    },
+    {
+      "feature_id": "karpathy_redis_hot_lane",
+      "status": "implemented",
+      "storage_lane": "redis-hot",
+      "retrieval_lane": "authority-overlay",
+      "nextAction": "Keep this as the current low-latency hot path; do not replace it with Redis Agent Memory Server unless evaluation proves a gain.",
+      "appMatches": [
+        {
+          "featureKey": "where_each_technology_fits",
+          "title": "Where each technology fits",
+          "status": "implemented",
+          "score": 0.38235294117647056
+        },
+        {
+          "featureKey": "q2_2026_current",
+          "title": "Q2 2026 (Current)",
+          "status": "implemented",
+          "score": 0.36363636363636365
+        },
+        {
+          "featureKey": "1_retrieval_stages",
+          "title": "1. Retrieval Stages",
+          "status": "implemented",
+          "score": 0.3333333333333333
+        },
+        {
+          "featureKey": "simd_bridge_memory_vram_safety_audit",
+          "title": "SIMD Bridge Memory & VRAM Safety Audit",
+          "status": "implemented",
+          "score": 0.3076923076923077
+        },
+        {
+          "featureKey": "2_implementation_strategy",
+          "title": "2. Implementation Strategy",
+          "status": "implemented",
+          "score": 0.3076923076923077
+        },
+        {
+          "featureKey": "feature_map",
+          "title": "feature map",
+          "status": "implemented",
+          "score": 0.3
+        },
+        {
+          "featureKey": "query_routing_evaluation_phase_18",
+          "title": "Query Routing Evaluation — Phase 18",
+          "status": "implemented",
+          "score": 0.29411764705882354
+        },
+        {
+          "featureKey": "load_balancing_and_sidecar_guidance",
+          "title": "Load balancing and sidecar guidance",
+          "status": "implemented",
+          "score": 0.29411764705882354
+        }
+      ]
+    },
+    {
+      "feature_id": "ace_context_pack_cache",
+      "status": "implemented",
+      "storage_lane": "redis-hot + postgres + file snapshot",
+      "retrieval_lane": "ace-context-pack",
+      "nextAction": "Use this as the durable hot-pointer layer for the registry diff summary.",
+      "appMatches": [
+        {
+          "featureKey": "findings",
+          "title": "Findings",
+          "status": "implemented",
+          "score": 0.36363636363636365
+        },
+        {
+          "featureKey": "where_each_technology_fits",
+          "title": "Where each technology fits",
+          "status": "implemented",
+          "score": 0.35714285714285715
+        },
+        {
+          "featureKey": "integration_features_to_look_for",
+          "title": "Integration features to look for",
+          "status": "implemented",
+          "score": 0.35714285714285715
+        },
+        {
+          "featureKey": "feature_checklist",
+          "title": "Feature checklist",
+          "status": "implemented",
+          "score": 0.35714285714285715
+        },
+        {
+          "featureKey": "drizzle_postgres_contract_report",
+          "title": "Drizzle ↔ Postgres Contract Report",
+          "status": "implemented",
+          "score": 0.35714285714285715
+        },
+        {
+          "featureKey": "deepseek_engram_architecture_search",
+          "title": "DeepSeek Engram Architecture Search",
+          "status": "implemented",
+          "score": 0.3333333333333333
+        },
+        {
+          "featureKey": "session_summary_april_9_2026",
+          "title": "Session Summary — April 9, 2026",
+          "status": "implemented",
+          "score": 0.3333333333333333
+        },
+        {
+          "featureKey": "ace_packet_integration_smoke_report",
+          "title": "ACE Packet Integration Smoke Report",
+          "status": "implemented",
+          "score": 0.3333333333333333
+        }
+      ]
+    },
+    {
+      "feature_id": "intent_synthesis",
+      "status": "implemented",
+      "storage_lane": "postgres + redis-hot",
+      "retrieval_lane": "grpo-lite",
+      "nextAction": "Use the reward loop to tag missing feature surfaces and duplicates.",
+      "appMatches": [
+        {
+          "featureKey": "findings",
+          "title": "Findings",
+          "status": "implemented",
+          "score": 0.36363636363636365
+        },
+        {
+          "featureKey": "drizzle_postgres_contract_report",
+          "title": "Drizzle ↔ Postgres Contract Report",
+          "status": "implemented",
+          "score": 0.35714285714285715
+        },
+        {
+          "featureKey": "high_1",
+          "title": "HIGH (1)",
+          "status": "implemented",
+          "score": 0.3333333333333333
+        },
+        {
+          "featureKey": "simd_bridge_memory_vram_safety_audit",
+          "title": "SIMD Bridge Memory & VRAM Safety Audit",
+          "status": "implemented",
+          "score": 0.3076923076923077
+        },
+        {
+          "featureKey": "restores_a_specific_snapshot_folder",
+          "title": "Restores a specific snapshot folder",
+          "status": "implemented",
+          "score": 0.2962962962962963
+        },
+        {
+          "featureKey": "integration_features_to_look_for",
+          "title": "Integration features to look for",
+          "status": "implemented",
+          "score": 0.2962962962962963
+        },
+        {
+          "featureKey": "2_critical_discrepancies",
+          "title": "2. Critical Discrepancies",
+          "status": "implemented",
+          "score": 0.2857142857142857
+        },
+        {
+          "featureKey": "running_the_pipeline",
+          "title": "Running the Pipeline",
+          "status": "implemented",
+          "score": 0.2727272727272727
+        }
+      ]
+    },
+    {
+      "feature_id": "feature_label_registry",
+      "status": "partial",
+      "storage_lane": "contract-doc + planned registry",
+      "retrieval_lane": "label-normalization",
+      "nextAction": "Promote the contract into a generated registry once live atlas inputs exist.",
+      "appMatches": [
+        {
+          "featureKey": "llm_todos",
+          "title": "llm todos",
+          "status": "implemented",
+          "score": 0.2857142857142857
+        },
+        {
+          "featureKey": "8_action_tracker",
+          "title": "8. Action Tracker",
+          "status": "implemented",
+          "score": 0.2608695652173913
+        },
+        {
+          "featureKey": "feature_parity_audit_2026_05_10",
+          "title": "Feature Parity Audit - 2026-05-10",
+          "status": "implemented",
+          "score": 0.25
+        },
+        {
+          "featureKey": "repo_qdrant_payload_atlas__top_entries",
+          "title": "Top Entries",
+          "status": "implemented",
+          "score": 0.23076923076923078
+        },
+        {
+          "featureKey": "feature_parity_2026_05_10__summary",
+          "title": "Summary",
+          "status": "implemented",
+          "score": 0.21739130434782608
+        },
+        {
+          "featureKey": "feature_parity_2026_05_10__notes",
+          "title": "Notes",
+          "status": "implemented",
+          "score": 0.21739130434782608
+        },
+        {
+          "featureKey": "phase_4_admin_copilot_ui_integration",
+          "title": "Phase 4: Admin Copilot UI Integration",
+          "status": "missing",
+          "score": 0.21739130434782608
+        },
+        {
+          "featureKey": "3_unified_agentic_workflow_commands",
+          "title": "3. Unified Agentic Workflow Commands",
+          "status": "implemented",
+          "score": 0.21739130434782608
+        }
+      ]
+    },
+    {
+      "feature_id": "pgvector_multi_table_lane",
+      "status": "implemented",
+      "storage_lane": "postgres pgvector",
+      "retrieval_lane": "vector-recall",
+      "nextAction": "Keep dimension drift frozen until the live 384d/768d reconciliation is explicit.",
+      "appMatches": [
+        {
+          "featureKey": "db_schema_drift_audit_2026_05_10",
+          "title": "DB Schema Drift Audit - 2026-05-10",
+          "status": "implemented",
+          "score": 0.3125
+        },
+        {
+          "featureKey": "layer_1_cold_tier_ground_truth_768d",
+          "title": "Layer 1: Cold Tier — Ground Truth 768d",
+          "status": "implemented",
+          "score": 0.2916666666666667
+        },
+        {
+          "featureKey": "3_high_performance_pgvector_hnsw_indexing",
+          "title": "3. High-Performance pgvector HNSW Indexing",
+          "status": "implemented",
+          "score": 0.2916666666666667
+        },
+        {
+          "featureKey": "pgvector_hnsw_index_plan_phase_6e",
+          "title": "pgvector HNSW Index Plan (Phase 6E)",
+          "status": "implemented",
+          "score": 0.2916666666666667
+        },
+        {
+          "featureKey": "vector_dimension_policy_operator_gate_no_code_change_yet",
+          "title": "Vector Dimension Policy (operator gate — no code change yet)",
+          "status": "implemented",
+          "score": 0.2916666666666667
+        },
+        {
+          "featureKey": "drizzle_postgres_contract_report",
+          "title": "Drizzle ↔ Postgres Contract Report",
+          "status": "implemented",
+          "score": 0.2857142857142857
+        },
+        {
+          "featureKey": "model_artifact_inventory_phase_9c",
+          "title": "Model Artifact Inventory (Phase 9C)",
+          "status": "implemented",
+          "score": 0.2857142857142857
+        },
+        {
+          "featureKey": "db_schema_drift_2026_05_10__summary",
+          "title": "Summary",
+          "status": "implemented",
+          "score": 0.25
+        }
+      ]
+    },
+    {
+      "feature_id": "redis_agent_memory_server_eval",
+      "status": "missing",
+      "storage_lane": "evaluation-only",
+      "retrieval_lane": "mcp-memory-lane",
+      "nextAction": "Evaluate in an isolated redis:8 container and compare against ACE Context Pack Cache.",
+      "appMatches": [
+        {
+          "featureKey": "redis_bitfrost_lane",
+          "title": "Redis/BitFrost Lane",
+          "status": "implemented",
+          "score": 0.38461538461538464
+        },
+        {
+          "featureKey": "6_aggregate_and_cache_active_feature_context_cards_in_redis",
+          "title": "6. Aggregate and cache active feature context cards in Redis",
+          "status": "implemented",
+          "score": 0.3333333333333333
+        },
+        {
+          "featureKey": "repo_redis_ace_cards__top_entries",
+          "title": "Top Entries",
+          "status": "implemented",
+          "score": 0.3076923076923077
+        },
+        {
+          "featureKey": "subgraph_instruction_programming_kag_ace_topology_todo",
+          "title": "Subgraph Instruction Programming + KAG/ACE Topology TODO",
+          "status": "implemented",
+          "score": 0.2857142857142857
+        },
+        {
+          "featureKey": "q2_2026_current",
+          "title": "Q2 2026 (Current)",
+          "status": "implemented",
+          "score": 0.2727272727272727
+        },
+        {
+          "featureKey": "missing_tables",
+          "title": "Missing Tables",
+          "status": "implemented",
+          "score": 0.2647058823529412
+        },
+        {
+          "featureKey": "session_summary_april_9_2026",
+          "title": "Session Summary — April 9, 2026",
+          "status": "implemented",
+          "score": 0.25
+        },
+        {
+          "featureKey": "native_bridge_verification_audit_2026_05_12",
+          "title": "Native Bridge Verification Audit — 2026-05-12",
+          "status": "implemented",
+          "score": 0.25
+        }
+      ]
+    },
+    {
+      "feature_id": "claude_mem_opencode_reference",
+      "status": "partial",
+      "storage_lane": "reference-only",
+      "retrieval_lane": "open-code-memory-pattern",
+      "nextAction": "Use as a pattern reference only; keep durable memory Postgres-first.",
+      "appMatches": [
+        {
+          "featureKey": "1_retrieval_stages",
+          "title": "1. Retrieval Stages",
+          "status": "implemented",
+          "score": 0.3333333333333333
+        },
+        {
+          "featureKey": "error_analysis_architecture",
+          "title": "Error Analysis Architecture",
+          "status": "implemented",
+          "score": 0.3333333333333333
+        },
+        {
+          "featureKey": "postgres17_reference",
+          "title": "postgres17-reference",
+          "status": "implemented",
+          "score": 0.3333333333333333
+        },
+        {
+          "featureKey": "pathway_cards_spec__root",
+          "title": "pathway-cards-spec",
+          "status": "implemented",
+          "score": 0.3
+        },
+        {
+          "featureKey": "rabbitmq_workflow_fabric",
+          "title": "RabbitMQ Workflow Fabric",
+          "status": "implemented",
+          "score": 0.3
+        },
+        {
+          "featureKey": "postgresql_17_postgres17_reference",
+          "title": "PostgreSQL 17 — postgres17-reference",
+          "status": "implemented",
+          "score": 0.29411764705882354
+        },
+        {
+          "featureKey": "workspace_and_vs_code_scope",
+          "title": "Workspace and VS Code Scope",
+          "status": "implemented",
+          "score": 0.2857142857142857
+        },
+        {
+          "featureKey": "layered_architecture",
+          "title": "Layered Architecture",
+          "status": "implemented",
+          "score": 0.2727272727272727
+        }
+      ]
+    },
+    {
+      "feature_id": "feature_gap_registry",
+      "status": "partial",
+      "storage_lane": "postgres + docs bootstrap",
+      "retrieval_lane": "agentic-audit",
+      "nextAction": "Replace bootstrap rows with a live codebase atlas scan when the app workspace is mounted.",
+      "appMatches": [
+        {
+          "featureKey": "feature_parity_audit_2026_05_10",
+          "title": "Feature Parity Audit - 2026-05-10",
+          "status": "implemented",
+          "score": 0.375
+        },
+        {
+          "featureKey": "codebase_atlas_index",
+          "title": "codebase atlas index",
+          "status": "implemented",
+          "score": 0.36363636363636365
+        },
+        {
+          "featureKey": "1_retrieval_stages",
+          "title": "1. Retrieval Stages",
+          "status": "implemented",
+          "score": 0.3333333333333333
+        },
+        {
+          "featureKey": "native_bridge_verification_audit_2026_05_12",
+          "title": "Native Bridge Verification Audit — 2026-05-12",
+          "status": "implemented",
+          "score": 0.3333333333333333
+        },
+        {
+          "featureKey": "codebase_atlas",
+          "title": "codebase atlas",
+          "status": "implemented",
+          "score": 0.3333333333333333
+        },
+        {
+          "featureKey": "the_safe_audit_baseline",
+          "title": "The \"Safe Audit\" baseline",
+          "status": "implemented",
+          "score": 0.3333333333333333
+        },
+        {
+          "featureKey": "db_schema_drift_audit_2026_05_10",
+          "title": "DB Schema Drift Audit - 2026-05-10",
+          "status": "implemented",
+          "score": 0.3125
+        },
+        {
+          "featureKey": "crud_operations_audit_april_9_2026",
+          "title": "CRUD Operations Audit (April 9, 2026)",
+          "status": "implemented",
+          "score": 0.3076923076923077
+        }
+      ]
+    },
+    {
+      "feature_id": "codebase_semantic_index",
+      "status": "implemented",
+      "storage_lane": "qdrant + pgvector + redis-hot",
+      "retrieval_lane": "codebase-semantic-search",
+      "nextAction": "Use live codebase atlas outputs to replace bootstrap assumptions with source-derived coverage.",
+      "appMatches": [
+        {
+          "featureKey": "codebase_atlas_index",
+          "title": "codebase atlas index",
+          "status": "implemented",
+          "score": 0.36363636363636365
+        },
+        {
+          "featureKey": "canonical_source",
+          "title": "Canonical source",
+          "status": "implemented",
+          "score": 0.3333333333333333
+        },
+        {
+          "featureKey": "feature_parity_audit_2026_05_10",
+          "title": "Feature Parity Audit - 2026-05-10",
+          "status": "implemented",
+          "score": 0.3125
+        },
+        {
+          "featureKey": "phase_15b_adaptive_retrieval_lane_routing_evaluator",
+          "title": "Phase 15B — Adaptive Retrieval Lane-Routing Evaluator",
+          "status": "implemented",
+          "score": 0.29411764705882354
+        },
+        {
+          "featureKey": "1_architectural_principles",
+          "title": "1. Architectural Principles",
+          "status": "implemented",
+          "score": 0.2857142857142857
+        },
+        {
+          "featureKey": "where_each_technology_fits",
+          "title": "Where each technology fits",
+          "status": "implemented",
+          "score": 0.2857142857142857
+        },
+        {
+          "featureKey": "integration_features_to_look_for",
+          "title": "Integration features to look for",
+          "status": "implemented",
+          "score": 0.2857142857142857
+        },
+        {
+          "featureKey": "model_artifact_inventory_phase_9c",
+          "title": "Model Artifact Inventory (Phase 9C)",
+          "status": "implemented",
+          "score": 0.2857142857142857
+        }
+      ]
+    },
+    {
+      "feature_id": "semantic_cache_policy",
+      "status": "partial",
+      "storage_lane": "redis exact + redis semantic + bifrost prefix + ace packet",
+      "retrieval_lane": "cache-policy-contract",
+      "nextAction": "Normalize one exact-cache key contract, one semantic-cache compatibility contract, and one invalidation rule.",
+      "appMatches": [
+        {
+          "featureKey": "findings",
+          "title": "Findings",
+          "status": "implemented",
+          "score": 0.45454545454545453
+        },
+        {
+          "featureKey": "ace_packet_integration_smoke_report",
+          "title": "ACE Packet Integration Smoke Report",
+          "status": "implemented",
+          "score": 0.4166666666666667
+        },
+        {
+          "featureKey": "3_3_redis_bitfrost_hot_cache",
+          "title": "3.3 Redis / BitFrost Hot Cache",
+          "status": "implemented",
+          "score": 0.3793103448275862
+        },
+        {
+          "featureKey": "feature_checklist",
+          "title": "Feature checklist",
+          "status": "implemented",
+          "score": 0.3793103448275862
+        },
+        {
+          "featureKey": "where_each_technology_fits",
+          "title": "Where each technology fits",
+          "status": "implemented",
+          "score": 0.3448275862068966
+        },
+        {
+          "featureKey": "ace_packet_injection",
+          "title": "ACE Packet Injection",
+          "status": "implemented",
+          "score": 0.3333333333333333
+        },
+        {
+          "featureKey": "blended_contextual_hits",
+          "title": "Blended Contextual Hits",
+          "status": "implemented",
+          "score": 0.3333333333333333
+        },
+        {
+          "featureKey": "high_1",
+          "title": "HIGH (1)",
+          "status": "implemented",
+          "score": 0.3333333333333333
+        }
+      ]
+    },
+    {
+      "feature_id": "memory_address_registry",
+      "status": "missing",
+      "storage_lane": "postgres-first",
+      "retrieval_lane": "durable-memory-addressing",
+      "nextAction": "Promote the registry contract into durable tables when the live app workspace is mounted.",
+      "appMatches": [
+        {
+          "featureKey": "findings",
+          "title": "Findings",
+          "status": "implemented",
+          "score": 0.36363636363636365
+        },
+        {
+          "featureKey": "drizzle_postgres_contract_report",
+          "title": "Drizzle ↔ Postgres Contract Report",
+          "status": "implemented",
+          "score": 0.35714285714285715
+        },
+        {
+          "featureKey": "high_1",
+          "title": "HIGH (1)",
+          "status": "implemented",
+          "score": 0.3333333333333333
+        },
+        {
+          "featureKey": "db_schema_drift_audit_2026_05_10",
+          "title": "DB Schema Drift Audit - 2026-05-10",
+          "status": "implemented",
+          "score": 0.3125
+        },
+        {
+          "featureKey": "simd_bridge_memory_vram_safety_audit",
+          "title": "SIMD Bridge Memory & VRAM Safety Audit",
+          "status": "implemented",
+          "score": 0.3076923076923077
+        },
+        {
+          "featureKey": "feature_map",
+          "title": "feature map",
+          "status": "implemented",
+          "score": 0.3
+        },
+        {
+          "featureKey": "2_critical_discrepancies",
+          "title": "2. Critical Discrepancies",
+          "status": "implemented",
+          "score": 0.2857142857142857
+        },
+        {
+          "featureKey": "missing_tables",
+          "title": "Missing Tables",
+          "status": "implemented",
+          "score": 0.28
+        }
+      ]
+    },
+    {
+      "feature_id": "ace_packet_flow",
+      "status": "implemented",
+      "storage_lane": "redis-hot + ace packet cache",
+      "retrieval_lane": "packet-reuse",
+      "nextAction": "Keep packet reuse observation-first until the live atlas scan proves compatibility.",
+      "appMatches": [
+        {
+          "featureKey": "ace_packet_injection",
+          "title": "ACE Packet Injection",
+          "status": "implemented",
+          "score": 0.3333333333333333
+        },
+        {
+          "featureKey": "ace_packet_integration_smoke_report",
+          "title": "ACE Packet Integration Smoke Report",
+          "status": "implemented",
+          "score": 0.3333333333333333
+        },
+        {
+          "featureKey": "integration_features_to_look_for",
+          "title": "Integration features to look for",
+          "status": "implemented",
+          "score": 0.3225806451612903
+        },
+        {
+          "featureKey": "redis_bitfrost_lane",
+          "title": "Redis/BitFrost Lane",
+          "status": "implemented",
+          "score": 0.3076923076923077
+        },
+        {
+          "featureKey": "drizzle_postgres_contract_report",
+          "title": "Drizzle ↔ Postgres Contract Report",
+          "status": "implemented",
+          "score": 0.2857142857142857
+        },
+        {
+          "featureKey": "workstation_parent_atlas_observability_dashboard",
+          "title": "Workstation Parent Atlas Observability Dashboard",
+          "status": "implemented",
+          "score": 0.2857142857142857
+        },
+        {
+          "featureKey": "codebase_atlas_index",
+          "title": "codebase atlas index",
+          "status": "implemented",
+          "score": 0.2727272727272727
+        },
+        {
+          "featureKey": "findings",
+          "title": "Findings",
+          "status": "implemented",
+          "score": 0.2727272727272727
+        }
+      ]
+    },
+    {
+      "feature_id": "cluster_card_flow",
+      "status": "partial",
+      "storage_lane": "postgres + qdrant + redis-hot",
+      "retrieval_lane": "cluster-card-synthesis",
+      "nextAction": "Promote the cluster-card contract into generated outputs after the live feature registry is replaced.",
+      "appMatches": [
+        {
+          "featureKey": "findings",
+          "title": "Findings",
+          "status": "implemented",
+          "score": 0.45454545454545453
+        },
+        {
+          "featureKey": "postgres17_reference",
+          "title": "postgres17-reference",
+          "status": "implemented",
+          "score": 0.4444444444444444
+        },
+        {
+          "featureKey": "drizzle_postgres_contract_report",
+          "title": "Drizzle ↔ Postgres Contract Report",
+          "status": "implemented",
+          "score": 0.42857142857142855
+        },
+        {
+          "featureKey": "directory_role_map",
+          "title": "Directory Role Map",
+          "status": "implemented",
+          "score": 0.38461538461538464
+        },
+        {
+          "featureKey": "cuda_reference",
+          "title": "cuda-reference",
+          "status": "implemented",
+          "score": 0.375
+        },
+        {
+          "featureKey": "webgpu_reference",
+          "title": "webgpu-reference",
+          "status": "implemented",
+          "score": 0.375
+        },
+        {
+          "featureKey": "postgresql_17",
+          "title": "PostgreSQL 17",
+          "status": "implemented",
+          "score": 0.36363636363636365
+        },
+        {
+          "featureKey": "session_summary_april_9_2026",
+          "title": "Session Summary — April 9, 2026",
+          "status": "implemented",
+          "score": 0.3333333333333333
+        }
+      ]
+    },
+    {
+      "feature_id": "feature_labeling_pipeline",
+      "status": "partial",
+      "storage_lane": "redis + qdrant + docs",
+      "retrieval_lane": "label-normalization",
+      "nextAction": "Replace contract-only labels with source-derived labels from the live codebase atlas scan.",
+      "appMatches": [
+        {
+          "featureKey": "repo_qdrant_payload_atlas__top_entries",
+          "title": "Top Entries",
+          "status": "implemented",
+          "score": 0.38461538461538464
+        },
+        {
+          "featureKey": "feature_parity_audit_2026_05_10",
+          "title": "Feature Parity Audit - 2026-05-10",
+          "status": "implemented",
+          "score": 0.375
+        },
+        {
+          "featureKey": "codebase_atlas_index",
+          "title": "codebase atlas index",
+          "status": "implemented",
+          "score": 0.36363636363636365
+        },
+        {
+          "featureKey": "findings",
+          "title": "Findings",
+          "status": "implemented",
+          "score": 0.36363636363636365
+        },
+        {
+          "featureKey": "language_counts",
+          "title": "language counts",
+          "status": "implemented",
+          "score": 0.35714285714285715
+        },
+        {
+          "featureKey": "1_retrieval_stages",
+          "title": "1. Retrieval Stages",
+          "status": "implemented",
+          "score": 0.3333333333333333
+        },
+        {
+          "featureKey": "codebase_atlas",
+          "title": "codebase atlas",
+          "status": "implemented",
+          "score": 0.3333333333333333
+        },
+        {
+          "featureKey": "high_1",
+          "title": "HIGH (1)",
+          "status": "implemented",
+          "score": 0.3333333333333333
+        }
+      ]
+    },
+    {
+      "feature_id": "duckdb_analytics_lane",
+      "status": "missing",
+      "storage_lane": "duckdb analytical only",
+      "retrieval_lane": "offline-rollups",
+      "nextAction": "Keep DuckDB as an analytical consumer until the export-manifest and live atlas scan are stable.",
+      "appMatches": [
+        {
+          "featureKey": "model_artifact_inventory_phase_9c",
+          "title": "Model Artifact Inventory (Phase 9C)",
+          "status": "implemented",
+          "score": 0.2857142857142857
+        },
+        {
+          "featureKey": "workstation_parent_atlas_observability_dashboard",
+          "title": "Workstation Parent Atlas Observability Dashboard",
+          "status": "implemented",
+          "score": 0.2857142857142857
+        },
+        {
+          "featureKey": "deepseek_engram_architecture_search",
+          "title": "DeepSeek Engram Architecture Search",
+          "status": "implemented",
+          "score": 0.2777777777777778
+        },
+        {
+          "featureKey": "codebase_atlas_index",
+          "title": "codebase atlas index",
+          "status": "implemented",
+          "score": 0.2727272727272727
+        },
+        {
+          "featureKey": "parent_atlas_karpathy_pipeline",
+          "title": "Parent Atlas Karpathy Pipeline",
+          "status": "implemented",
+          "score": 0.2631578947368421
+        },
+        {
+          "featureKey": "recommendations",
+          "title": "Recommendations",
+          "status": "implemented",
+          "score": 0.25
+        },
+        {
+          "featureKey": "feature_parity_audit_2026_05_10",
+          "title": "Feature Parity Audit - 2026-05-10",
+          "status": "implemented",
+          "score": 0.25
+        },
+        {
+          "featureKey": "codebase_atlas",
+          "title": "codebase atlas",
+          "status": "implemented",
+          "score": 0.25
+        }
+      ]
+    }
+  ]
+}

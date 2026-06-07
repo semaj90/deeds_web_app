@@ -8,6 +8,7 @@ import { qdrant, deterministicPointId } from '$lib/server/vector/qdrant-manager.
 import { pgVectorService, type PgVectorSearchResult } from './PgVectorService.js';
 import { qdrantBreaker } from '$lib/server/circuit-breaker.js';
 import { retry, retryPredicates } from '$lib/server/utils/retry.js';
+import { buildVectorPayload } from '$lib/server/config/vector-config.js';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -59,27 +60,27 @@ export class MultiVectorStore {
 		try {
 			const pointId = deterministicPointId(doc.id);
 			await qdrantBreaker.call(() =>
-        retry(
-          () =>
-            qdrant.upsert({
-              collection,
-              wait: true,
-              points: [
-                {
-                  id: pointId,
-                  vector: { content: doc.embedding },
-                  payload: {
-                    document_id: doc.id,
-                    content: doc.content,
-                    source: doc.source ?? 'unknown',
-                    ...(doc.metadata ?? {}),
-                  },
-                },
-              ],
-            } as any),
-          { maxAttempts: 2, baseDelayMs: 300, isRetryable: retryPredicates.networkOrServer }
-        )
-      );
+				retry(
+					() =>
+						qdrant.upsert({
+							collection,
+							wait: true,
+							points: [
+								{
+									id: pointId,
+									vector: buildVectorPayload(collection, doc.embedding),
+									payload: {
+										document_id: doc.id,
+										content: doc.content,
+										source: doc.source ?? 'unknown',
+										...(doc.metadata ?? {}),
+									},
+								},
+							],
+						}),
+					{ maxAttempts: 2, baseDelayMs: 300, isRetryable: retryPredicates.networkOrServer }
+				)
+			);
 			qdrantResult = { ok: true };
 		} catch (error) {
 			qdrantResult = { ok: false, error: (error as Error).message };
@@ -136,6 +137,7 @@ export class MultiVectorStore {
 				provider: 'pgvector' as const
 			}));
 
+		// Race: use winner if it resolves, fall back to Promise.any if winner rejects
 		try {
 			const winner = await Promise.race([qdrantPromise, pgPromise]);
 			return {
@@ -144,7 +146,6 @@ export class MultiVectorStore {
 				latencyMs: Date.now() - start
 			};
 		} catch {
-			// If first-to-respond fails, wait for the other
 			try {
 				const fallback = await Promise.any([qdrantPromise, pgPromise]);
 				return {
@@ -236,11 +237,12 @@ export class MultiVectorStore {
 	): Promise<MultiStoreSearchResult[]> {
 		const results = await qdrantBreaker.call(() =>
 			retry(
-				() => qdrant.client.search(collection, {
-					vector: { name: 'content', vector: embedding },
-					limit: topK,
-					with_payload: true
-				}),
+				() =>
+					qdrant.client.search(collection, {
+						vector: { name: 'content', vector: embedding },
+						limit: topK,
+						with_payload: true
+					}),
 				{ maxAttempts: 2, baseDelayMs: 200, isRetryable: retryPredicates.networkOrServer }
 			)
 		);

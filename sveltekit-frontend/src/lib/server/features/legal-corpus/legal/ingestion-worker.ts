@@ -12,6 +12,7 @@ import { getSeaweedFile as getFile, putSeaweedObject as putObject } from '$lib/s
 import { generateEmbeddings } from '$lib/server/grpc/embedding-client.js';
 import { chunkLegalDocument } from '$lib/server/indexer/legal-chunker.js';
 import { qdrant } from '$lib/server/vector/qdrant-manager.js';
+import { buildVectorPayload } from '$lib/server/config/vector-config.js';
 import { randomUUID } from 'crypto';
 
 const BUCKET = process.env.MINIO_LIBRARY_BUCKET ?? 'legal-library';
@@ -433,7 +434,7 @@ async function _runPipeline(documentId: string, jobId: string): Promise<IngestRe
 				collection: 'documents',
 				points: qdrantPoints.map((p) => ({
 					id: p.id,
-					vector: { content: p.vector },
+					vector: buildVectorPayload('legal_documents', p.vector),
 					payload: {
 						document_id: documentId,
 						title: doc.title,

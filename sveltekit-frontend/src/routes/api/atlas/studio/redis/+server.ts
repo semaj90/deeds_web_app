@@ -60,7 +60,8 @@ function resolvePrefix(param: string | null): AllowedPrefix | null {
 }
 
 // ── Entry point ───────────────────────────────────────────────────────────────
-export const GET: RequestHandler = async ({ url }) => {
+export const GET: RequestHandler = async ({ url, locals}) => {
+  if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
 	const prefixParam = url.searchParams.get('prefix');
 	const cursorParam = url.searchParams.get('cursor') ?? '0';
 	const limitParam = url.searchParams.get('limit');

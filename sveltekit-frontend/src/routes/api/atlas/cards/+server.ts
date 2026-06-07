@@ -97,7 +97,8 @@ async function fetchFromDb(
 }
 
 // ── Handler ───────────────────────────────────────────────────────────────────
-export const GET: RequestHandler = async ({ url, request }) => {
+export const GET: RequestHandler = async ({ url, request, locals}) => {
+  if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
 	const limitParam = parseInt(url.searchParams.get('limit') ?? String(PAGE_SIZE_DEFAULT), 10);
 	const limit = Number.isFinite(limitParam)
 		? Math.min(Math.max(limitParam, 1), PAGE_SIZE_MAX)

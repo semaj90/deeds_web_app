@@ -51,7 +51,8 @@ const importBodySchema = z.union([
   z.array(observationSchema)
 ]);
 
-export const POST = async ({ request }) => {
+export const POST = async ({ request, locals}) => {
+  if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
   try {
     const body = await request.json();
     const result = importBodySchema.safeParse(body);
@@ -67,6 +68,7 @@ export const POST = async ({ request }) => {
   }
 };
 
+// Public: returns schema/usage info only, no data read.
 export const GET = async () => {
   return json({ ok: true, info: 'POST JSON or JSONL to import Claude-mem observations' });
 };

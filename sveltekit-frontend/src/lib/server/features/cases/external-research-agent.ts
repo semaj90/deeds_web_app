@@ -3,6 +3,7 @@ import { db } from '$lib/server/db/client';
 import { researchSummaries, contextTimeline, users } from '$lib/server/db/schema-postgres.js';
 import { performWebSearch, scrapeUrl } from '$lib/server/ai/web-search-utils.js';
 import { bifrostChat, VLM_MODELS } from '$lib/server/ollama.js';
+import { buildVectorPayload } from '$lib/server/config/vector-config.js';
 import { eq, sql } from 'drizzle-orm';
 import crypto from 'node:crypto';
 
@@ -126,7 +127,7 @@ export async function performExternalResearch(
 					body: JSON.stringify({
 						points: [{
 							id: summaryRow.id,
-							vector: { content: vector },
+							vector: buildVectorPayload('research_memory_768', vector as number[]),
 							payload: {
 								url: result.url,
 								title: result.title,

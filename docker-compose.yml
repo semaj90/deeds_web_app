@@ -104,9 +104,9 @@ services:
 
   # Valkey Bundle — caching, sessions, semantic cache, pub/sub
   # Open-source Redis-compatible bundle with JSON/Search/Bloom support.
-  redis:
+  valkey:
     image: valkey/valkey-bundle:8.1.1
-    container_name: legal-ai-redis
+    container_name: legal-ai-valkey
     restart: unless-stopped
     deploy:
       resources:
@@ -141,7 +141,7 @@ services:
       --slowlog-log-slower-than 10000
       --slowlog-max-len 128
     volumes:
-      - redis_data:/data
+      - valkey_data:/data
     networks:
       - legal-ai-network
     healthcheck:
@@ -187,6 +187,7 @@ services:
   # Legacy MinIO-compatible evidence file storage (S3-compatible adapter only)
   # SeaweedFS is the canonical object-store backend in this repo.
   minio:
+    profiles: ["legacy-minio"]
     image: minio/minio:latest
     container_name: legal-ai-minio
     restart: unless-stopped
@@ -775,7 +776,7 @@ services:
       LANGFUSE_S3_MEDIA_UPLOAD_FORCE_PATH_STYLE: "true"
       LANGFUSE_S3_MEDIA_UPLOAD_PREFIX: media/
       LANGFUSE_USE_AZURE_BLOB: "false"
-      REDIS_HOST: redis
+      REDIS_HOST: valkey
       REDIS_PORT: "6379"
       REDIS_TLS_ENABLED: "false"
       NEXTAUTH_URL: http://localhost:3030
@@ -853,7 +854,7 @@ services:
       QDRANT_URL: http://qdrant:6333
       QDRANT_GRPC_HOST: qdrant
       QDRANT_GRPC_PORT: "6334"
-      REDIS_URL: redis://redis:6379
+      REDIS_URL: redis://:redis@valkey:6379
       OLLAMA_URL: http://host.docker.internal:11434
       GRPC_PORT: "50055"
       HTTP_PORT: "8096"
@@ -861,7 +862,7 @@ services:
       - "host.docker.internal:host-gateway"
     depends_on:
       - postgres
-      - redis
+      - valkey
       - qdrant
     networks:
       - legal-ai-network
@@ -890,7 +891,7 @@ services:
       - "8097:8097"
     environment:
       OLLAMA_URL: http://host.docker.internal:11434
-      REDIS_URL: redis://redis:6379
+      REDIS_URL: redis://:redis@valkey:6379
       EMBED_MODEL: "embeddinggemma:latest"
       EMBED_BATCH_MAX: "4"
       GRPC_PORT: "50051"
@@ -930,7 +931,7 @@ services:
       QDRANT_URL: http://qdrant:6333
       QDRANT_GRPC_HOST: qdrant
       QDRANT_GRPC_PORT: "6334"
-      REDIS_URL: redis://redis:6379
+      REDIS_URL: redis://:redis@valkey:6379
       OLLAMA_URL: http://host.docker.internal:11434
       EMBED_SERVICE_URL: http://go-embedding-service:8097
       EMBED_MODEL: "embeddinggemma:latest"
@@ -985,7 +986,7 @@ services:
       - CUDA_VISIBLE_DEVICES=${CUDA_VISIBLE_DEVICES:-0}
       - HF_HUB_CACHE=/workspace/cache
       - DATABASE_URL=postgresql://legal_admin:123456@postgres:5432/legal_ai_db
-      - REDIS_URL=redis://redis:6379/0
+      - REDIS_URL=redis://:redis@valkey:6379/0
       # torch.compile() persistent kernel cache — avoids 10-30 min recompile on restart
       - TORCHINDUCTOR_CACHE_DIR=/workspace/.cache/torchinductor
       - TRITON_CACHE_DIR=/workspace/.cache/triton
@@ -1023,7 +1024,7 @@ services:
       timeout: 10s
       retries: 3
     depends_on:
-      - redis
+      - valkey
     networks:
       - legal-ai-network
     restart: unless-stopped
@@ -1060,7 +1061,7 @@ services:
       - NEO4J_USER=${NEO4J_USER:-neo4j}
       - NEO4J_PASSWORD=${NEO4J_PASSWORD:-password}
       - DATABASE_URL=postgresql://legal_admin:123456@postgres:5432/legal_ai_db
-      - REDIS_URL=redis://redis:6379/1
+      - REDIS_URL=redis://:redis@valkey:6379/1
       - LLM_MODEL=${LLM_MODEL:-gemma4-legal-vlm:latest}
       - EMBED_MODEL=${EMBED_MODEL:-embeddinggemma:latest}
       - LANGFUSE_HOST=http://langfuse-web:3000
@@ -1077,7 +1078,7 @@ services:
       - torchinductor_cache:/app/.cache/torchinductor
       - triton_cache:/app/.cache/triton
     depends_on:
-      - redis
+      - valkey
       - qdrant
     networks:
       - legal-ai-network
@@ -1094,7 +1095,7 @@ services:
 volumes:
   bifrost_data:
     driver: local
-  redis_data:
+  valkey_data:
     driver: local
   qdrant_data:
     driver: local

@@ -524,6 +524,17 @@ if ($kvProfile -eq 'atomicbot') {
 
 
 
+# -- Reasoning format: suppress chain-of-thought for OpenCode/short queries --
+# Default: none (stops thinking loops on short prompts like "test").
+# Set TURBO_REASONING_FORMAT=deepseek in .env to re-enable for long-form tasks.
+$reasoningFormat = if ($env:TURBO_REASONING_FORMAT) { $env:TURBO_REASONING_FORMAT } else { 'none' }
+if (Test-LlamaFlag $llama '--reasoning-format') {
+    $baseArgs = $baseArgs + @('--reasoning-format', $reasoningFormat)
+    Write-Host "Reasoning format: --reasoning-format $reasoningFormat" -ForegroundColor Cyan
+} else {
+    Write-Host "Reasoning format: --reasoning-format not supported by this binary - skipping" -ForegroundColor DarkYellow
+}
+
 # -- Tool-calling: --jinja for OpenAI function-call format ----------------
 if (Test-LlamaFlag $llama '--jinja') {
     Write-Host "Tool calling: --jinja enabled (OpenCode/TRACE MCP loop)" -ForegroundColor Cyan

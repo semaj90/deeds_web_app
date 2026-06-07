@@ -13,7 +13,8 @@ const scenarioUpsertSchema = z.object({
   embedding: z.array(z.number()).nullish(),
 });
 
-export const POST: RequestHandler = async ({ request }) => {
+export const POST: RequestHandler = async ({ request, locals}) => {
+  if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
   try {
     const body = await request.json();
     const result = scenarioUpsertSchema.safeParse(body);
@@ -27,7 +28,8 @@ export const POST: RequestHandler = async ({ request }) => {
   }
 };
 
-export const GET: RequestHandler = async ({ url }) => {
+export const GET: RequestHandler = async ({ url, locals}) => {
+  if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
   try {
     const id = url.searchParams.get('id');
     if (id) {

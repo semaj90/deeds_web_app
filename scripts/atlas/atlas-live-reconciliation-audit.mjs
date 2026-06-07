@@ -142,7 +142,7 @@ const REDIS_PASSWORD = (() => {
     try { const u = new URL(url); if (u.password) return decodeURIComponent(u.password); } catch { /* */ }
     return process.env.REDIS_PASSWORD ?? process.env.VALKEY_PASSWORD ?? 'redis';
 })();
-const REDIS_CONTAINER = process.env.REDIS_CONTAINER ?? 'legal-ai-redis';
+const REDIS_CONTAINER = process.env.REDIS_CONTAINER ?? 'legal-ai-valkey';
 
 /**
  * Run a redis-cli command via `docker exec` against the named container.

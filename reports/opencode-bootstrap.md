@@ -1,14 +1,15 @@
 # OpenCode Workspace Bootstrap
 
-Generated: 2026-06-06T02:41:02.903Z
+Generated: 2026-06-06T07:47:23.117Z
 Repo: C:\Users\james\Videos\deeds-web-app
 
 ## Steps
 - claude-mem-ensure: ok (status 0)
 - mcp-health: ok (status 0)
-- ace-daily-todo-summary: ok (status 0)
-- recommendations-graph-truth: ok (status 0)
-- bifrost-cache-verify: ok (status 0)
+- startup-truth: fail (status 1)
+- ace-daily-todo-summary: fail (status 3221226091)
+- recommendations-graph-truth: fail (status 3221226091)
+- bifrost-cache-verify: fail (status 3221226091)
 
 ## Outputs
 - C:\Users\james\Videos\deeds-web-app\.opencode\ace-context.json
@@ -182,7 +183,7 @@ Repo: C:\Users\james\Videos\deeds-web-app
 - atlas:dirty-tree:classify => node scripts/atlas/classify-dirty-tree.mjs
 
 ## Warnings
-- None
+- startup-truth-blockers-present
 
 ## Overall
-- ok
+- degraded

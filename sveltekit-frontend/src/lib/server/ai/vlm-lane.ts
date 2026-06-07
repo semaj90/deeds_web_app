@@ -1,4 +1,4 @@
-import { generateText } from 'ai';
+import { streamText } from 'ai';
 import { llamaServer, LOCAL_VLM_MODEL } from './local-llama-provider.js';
 import { parseVlmPlan, type VlmPlan } from './vlm-plan-parser.js';
 import { dispatchTools, type ToolResult } from './tool-dispatcher.js';
@@ -74,14 +74,14 @@ export async function runVlmLane(req: LaneRequest): Promise<VlmLaneResult> {
 
 		let rawText = '';
 		try {
-			const result = await generateText({
+			const result = streamText({
 				model: llamaServer(LOCAL_VLM_MODEL),
 				messages: [{ role: 'user', content: userContent }],
 				maxOutputTokens: 1024,
 				temperature: 0.2,
-				abortSignal: AbortSignal.timeout(60_000),
+				abortSignal: AbortSignal.timeout(90_000),
 			});
-			rawText = result.text ?? '';
+			rawText = await result.text;
 		} catch (err) {
 			answer = `VLM inference failed: ${(err as Error).message}`;
 			break;

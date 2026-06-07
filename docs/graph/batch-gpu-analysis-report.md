@@ -1,8 +1,8 @@
 # Karpathy Synthesis Lane - Production
 
-- limit: 50
-- runId: synthesis_1780279635692
-- mode: WRITE
+- limit: 1
+- runId: synthesis_1780811205714
+- mode: DRY_RUN
 - force: false
 
 ## Top Entries

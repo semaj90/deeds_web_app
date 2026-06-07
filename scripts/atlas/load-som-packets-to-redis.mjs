@@ -48,7 +48,7 @@ const env = loadEnv();
 const REDIS_HOST = env.REDIS_HOST || 'localhost';
 const REDIS_PORT = parseInt(env.REDIS_PORT || '6379', 10);
 const REDIS_PASS = env.REDIS_PASSWORD || env.REDIS_PASS || '';
-const DOCKER_CONTAINER = env.REDIS_CONTAINER || 'legal-ai-redis';
+const DOCKER_CONTAINER = env.REDIS_CONTAINER || 'legal-ai-valkey';
 
 // ── NDJSON reader ────────────────────────────────────────────────────────────
 

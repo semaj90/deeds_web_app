@@ -9,7 +9,7 @@ const ROOT = path.resolve(__dirname, '../..');
 const TMP_DIR = path.join(ROOT, '.tmp');
 const OUT_JSON = path.join(TMP_DIR, 'redis-flavor-check.json');
 const OUT_MD = path.join(TMP_DIR, 'redis-flavor-check.md');
-const CONTAINER = process.env.REDIS_CONTAINER_NAME || 'legal-ai-redis';
+const CONTAINER = process.env.REDIS_CONTAINER_NAME || 'legal-ai-valkey';
 const ENV_PATHS = [
   path.join(ROOT, '.env.local'),
   path.join(ROOT, '.env'),

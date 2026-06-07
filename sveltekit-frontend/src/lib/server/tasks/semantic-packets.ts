@@ -21,6 +21,7 @@ import { getJson, setJsonWithTtl } from '$lib/server/redis';
 import { callOllamaChat } from '$lib/server/ollama';
 import { generateEmbeddings } from '$lib/server/grpc/embedding-client';
 import { traceSpan } from '$lib/server/observability/langfuse';
+import { buildVectorPayload } from '$lib/server/config/vector-config.js';
 import { desc, eq, sql } from 'drizzle-orm';
 
 const TASK_COLLECTION = process.env.TASKS_QDRANT_COLLECTION || 'codebase_chunks_768';
@@ -404,7 +405,7 @@ export async function createTaskSemanticPacket(taskId: number) {
     points: [
       {
         id: qdrantPointId,
-        vector: { content: embedding },
+        vector: buildVectorPayload('codebase_chunks_768', embedding),
         payload: packetRow,
       },
     ],

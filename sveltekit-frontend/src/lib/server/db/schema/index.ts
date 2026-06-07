@@ -80,6 +80,7 @@ export * from './summary-cards.js';
 export * from './normalize-labels.js';
 export * from './nes-chrom-packets.js';
 export * from './atlas-feature-map.js';
+export * from './atlas-memory-address-registry.js';
 export * from './atlas-dict.js';
 
 // 2026-05-30 drift remediation — DO NOT add the Round-1 sidecars

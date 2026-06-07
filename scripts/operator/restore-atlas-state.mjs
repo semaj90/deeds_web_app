@@ -93,7 +93,7 @@ async function main() {
 
   // Resolve active container names
   const pgContainer = resolveContainerName('legal-ai-postgres');
-  const redisContainer = resolveContainerName('legal-ai-redis');
+  const redisContainer = resolveContainerName('legal-ai-valkey');
   const qdrantContainer = resolveContainerName('legal-ai-qdrant');
   const neo4jContainer = resolveContainerName('legal-ai-neo4j');
 

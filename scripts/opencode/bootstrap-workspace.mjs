@@ -18,6 +18,7 @@ function findRepoRoot(startDir) {
 const repoRoot = findRepoRoot(process.cwd());
 const deepMode = process.argv.includes('--deep');
 const refreshStartupTruth = deepMode || process.argv.includes('--refresh-startup-truth');
+const ENGRAM_ONLY = process.env.ENGRAM_ONLY === 'true' || process.env.REDIS_ENABLED === 'false';
 
 function run(label, command, args, options = {}) {
   const result = spawnSync(command, args, {
@@ -56,16 +57,18 @@ const steps = [
     command: 'npm',
     args: ['run', 'ace:daily-todo-summary'],
   },
-  {
-    label: 'recommendations-graph-truth',
-    command: 'npm',
-    args: ['run', 'recommendations:graph-truth'],
-  },
-  {
-    label: 'bifrost-cache-verify',
-    command: 'npm',
-    args: ['run', 'cache:bifrost:verify'],
-  },
+  ...(ENGRAM_ONLY ? [] : [
+    {
+      label: 'recommendations-graph-truth',
+      command: 'npm',
+      args: ['run', 'recommendations:graph-truth'],
+    },
+    {
+      label: 'bifrost-cache-verify',
+      command: 'npm',
+      args: ['run', 'cache:bifrost:verify'],
+    },
+  ]),
 ];
 
 if (!refreshStartupTruth) {

@@ -28,7 +28,7 @@
  * Prerequisites:
  *   - Qdrant codebase_chunks_768 populated (npm run graphify:semantic)
  *   - tensorrt_bridge.node built (simd-bridge/cpp)
- *   - Redis running (legal-ai-redis)
+ *   - Redis running (legal-ai-valkey)
  */
 
 import { mkdirSync, writeFileSync, existsSync } from 'node:fs';

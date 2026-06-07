@@ -55,14 +55,16 @@
         "retry_backoff_max": 10000
       }
     },
-    "turboquant_backend": {
+    "openai": {
       "keys": [
         {
           "name": "turboquant-local",
           "value": "local",
           "weight": 1,
           "models": [
-            "*"
+            "gemma4-rotorquant:latest",
+            "gemma4-legal-vlm:latest",
+            "gemma3-legal:latest"
           ]
         }
       ],

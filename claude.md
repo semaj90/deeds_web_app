@@ -1227,24 +1227,59 @@ bash scripts/audit/backend-infrastructure-audit.sh
 
 **Windows 10 limitation:** Docker's VHDX never auto-shrinks. Must compact manually after cleanup.
 
-**Compaction steps** (after any `docker rmi` / prune):
+**VHDX locations:**
+- `C:\Users\james\AppData\Local\Docker\wsl\disk\docker_data.vhdx` — main data volume (158 GB as of 2026-06-06)
+- `C:\Users\james\AppData\Local\Docker\wsl\main\ext4.vhdx` — WSL system (~0.09 GB)
+
+**Compact script** (saved to Desktop for convenience): `C:\Users\james\Desktop\compact-docker-vhdx.ps1`
+
+**Compaction steps** (requires Admin — OOM errors mean this is needed):
 ```powershell
-# 1. Prune inside Docker
-docker system prune -a --volumes && docker builder prune -a
+# 1. Prune inside Docker FIRST (frees space inside the VHDX before compacting)
+docker system prune -a --volumes
+docker builder prune -a
 # 2. Quit Docker Desktop from system tray
 # 3. Shut down WSL
 wsl --shutdown
-# 4. Compact via diskpart
+# 4. Run compact script AS ADMINISTRATOR (right-click -> Run with PowerShell as Admin):
+& "C:\Users\james\Desktop\compact-docker-vhdx.ps1"
+# OR manually via diskpart (Admin PowerShell):
 diskpart
-select vdisk file="C:\Users\james\AppData\Local\Docker\wsl\disk\docker_data.vhdx"
-compact vdisk
-detach vdisk
-exit
+# Inside diskpart interactive prompt:
+#   select vdisk file="C:\Users\james\AppData\Local\Docker\wsl\disk\docker_data.vhdx"
+#   attach vdisk readonly
+#   compact vdisk
+#   detach vdisk
+#   exit
 ```
+
+**CRITICAL: diskpart requires Administrator elevation** — it will silently do nothing without it.
 
 **Set disk cap:** Docker Desktop Settings > Resources > Advanced > Disk image size (e.g., 64 GB)
 
 **Move to another drive:** Docker Desktop Settings > Resources > Advanced > Disk image location
+
+## Docker: Use docker exec directly (NOT Node.js wrappers)
+
+**OOM errors occur when Node.js loads Docker SDK or spawns child processes for Docker commands.**
+Use `docker exec` directly via Bash/PowerShell tool — never wrap in Node.js scripts.
+
+```bash
+# ✅ CORRECT — direct docker exec
+docker exec legal-ai-postgres psql -U legal_admin -d legal_ai_db -c "SELECT COUNT(*) FROM users"
+docker exec legal-ai-redis redis-cli PING
+docker exec legal-ai-qdrant curl -s http://localhost:6333/collections
+
+# ❌ WRONG — Node.js Docker SDK (causes OOM)
+# const docker = new Docker(); docker.getContainer('...').exec(...)
+# require('dockerode') / import Docker from 'dockerode'
+# child_process.exec('docker ...') from inside a Node.js script
+
+# ✅ CORRECT — DB queries from scripts (use pg Pool directly, not Docker SDK)
+# const pool = new pg.Pool({ connectionString: process.env.DATABASE_URL });
+```
+
+**For smoke/seed scripts that need DB access:** connect directly via `pg.Pool` to `127.0.0.1:5434` — never spawn Docker from Node.
 
 ---
 

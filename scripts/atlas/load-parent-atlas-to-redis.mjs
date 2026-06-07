@@ -82,7 +82,7 @@ async function main() {
     return;
   }
 
-  const DOCKER_CONTAINER = env.REDIS_CONTAINER ?? 'legal-ai-redis';
+  const DOCKER_CONTAINER = env.REDIS_CONTAINER ?? 'legal-ai-valkey';
   const FORCE_DOCKER = argv.includes('--docker');
   let useDocker = FORCE_DOCKER;
 

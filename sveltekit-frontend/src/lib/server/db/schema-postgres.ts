@@ -4795,4 +4795,5 @@ export type NewGlyphRecord_DB = typeof glyphRecords.$inferInsert;
 
 export * from './schema/nes-chrom-packets.js';
 export * from './schema/atlas-feature-map.js';
+export * from './schema/atlas-dict.js';
 

@@ -20,6 +20,7 @@
 import { readFileSync, existsSync } from 'node:fs';
 import { resolve, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { qdrant } from '../lib/qdrant-client.mjs';
 
 const __dirname = fileURLToPath(new URL('.', import.meta.url));
 const ROOT = resolve(__dirname, '../..');
@@ -30,7 +31,6 @@ const LIMIT_A  = process.argv.find(a => a.startsWith('--limit='));
 const LIMIT    = LIMIT_A ? parseInt(LIMIT_A.split('=')[1]) : 0;  // 0 = all
 const BATCH    = 200;
 
-const QDRANT_URL        = process.env.QDRANT_URL        ?? 'http://127.0.0.1:6333';
 const QDRANT_COLLECTION = process.env.QDRANT_COLLECTION ?? 'codebase_chunks_768';
 
 const NDJSON_PATH = join(ROOT, '..', '.opencode', 'ndjson', 'cluster-summary.ndjson');
@@ -64,72 +64,15 @@ console.log(`  Mode: ${DRY_RUN ? 'DRY RUN' : 'LIVE'}${FORCE ? ' --force' : ''}${
 
 // ── Scroll Qdrant and patch ───────────────────────────────────────────────────
 
-async function qdrantSetPayload(points) {
-  const res = await fetch(
-    `${QDRANT_URL}/collections/${QDRANT_COLLECTION}/points/payload`,
-    {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ points }),
-      signal: AbortSignal.timeout(30_000),
-    }
-  );
-  if (!res.ok) {
-    const text = await res.text().catch(() => '');
-    throw new Error(`Qdrant set_payload failed ${res.status}: ${text.slice(0, 200)}`);
-  }
-}
-
-let scrollOffset = null;
 let totalScanned = 0;
 let totalPatched = 0;
 let totalSkipped = 0;
 let totalNoSom   = 0;
 
-/** @type {Array<{id: string|number, payload: Record<string,unknown>}>} */
-let patchBatch = [];
+/** @type {Map<string, string[]>} cluster_key → point IDs to patch */
+const pendingByCluster = new Map();
 
-async function flushBatch() {
-  if (!patchBatch.length) return;
-  if (!DRY_RUN) {
-    // Qdrant batch set_payload: one call per point (set_payload supports points[] array)
-    for (const { id, payload } of patchBatch) {
-      await fetch(
-        `${QDRANT_URL}/collections/${QDRANT_COLLECTION}/points/payload`,
-        {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ points: [id], payload }),
-          signal: AbortSignal.timeout(15_000),
-        }
-      );
-    }
-  }
-  totalPatched += patchBatch.length;
-  patchBatch = [];
-}
-
-let guard = 0;
-while (guard < 500) {
-  guard++;
-
-  const res = await fetch(`${QDRANT_URL}/collections/${QDRANT_COLLECTION}/points/scroll`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      limit: BATCH,
-      offset: scrollOffset,
-      with_payload: true,
-      with_vector: false,
-    }),
-    signal: AbortSignal.timeout(20_000),
-  });
-
-  if (!res.ok) { console.error('Qdrant scroll error', res.status); break; }
-  const data = await res.json();
-  const points = data?.result?.points ?? [];
-  if (!points.length) break;
-
+for await (const points of qdrant.scroll(QDRANT_COLLECTION, { limit: BATCH, withPayload: true, withVector: false })) {
   for (const point of points) {
     totalScanned++;
     if (LIMIT && totalScanned > LIMIT) break;
@@ -138,18 +81,12 @@ while (guard < 500) {
     const somRow = p.somRow ?? p.som_row;
     const somCol = p.somCol ?? p.som_col;
 
-    if (somRow == null || somCol == null) {
-      totalNoSom++;
-      continue;
-    }
+    if (somRow == null || somCol == null) { totalNoSom++; continue; }
 
     const clusterKey = `${somRow}:${somCol}`;
     const entry = clusterMap.get(clusterKey);
 
-    if (!entry) {
-      totalNoSom++;
-      continue;
-    }
+    if (!entry) { totalNoSom++; continue; }
 
     // Skip already-patched unless --force
     if (!FORCE && p.som_cluster === clusterKey && Array.isArray(p.feature_ids) && p.feature_ids.length > 0) {
@@ -157,29 +94,38 @@ while (guard < 500) {
       continue;
     }
 
-    patchBatch.push({
-      id: point.id,
-      payload: {
-        som_cluster: clusterKey,
-        feature_ids: entry.feature_ids,
-        lane_ids:    entry.lane_ids,
-      },
-    });
-
-    if (patchBatch.length >= BATCH) {
-      process.stdout.write(`\r  patched ${totalPatched + patchBatch.length} / scanned ${totalScanned}...`);
-      await flushBatch();
-    }
+    if (!pendingByCluster.has(clusterKey)) pendingByCluster.set(clusterKey, []);
+    pendingByCluster.get(clusterKey).push(point.id);
   }
 
   if (LIMIT && totalScanned >= LIMIT) break;
 
-  const next = data?.result?.next_page_offset;
-  if (next === null || next === undefined || !points.length) break;
-  scrollOffset = next;
+  if (totalScanned % 5000 === 0) process.stdout.write(`  scanned ${totalScanned}...\n`);
 }
 
-await flushBatch();
+process.stdout.write(`  done. scanned ${totalScanned}, ${pendingByCluster.size} clusters to patch.\n\n`);
+
+// ── Write patches ─────────────────────────────────────────────────────────────
+
+if (!DRY_RUN) {
+  for (const [clusterKey, ids] of pendingByCluster) {
+    const entry = clusterMap.get(clusterKey);
+    if (!entry) continue;
+    const { patched: p, failed: f } = await qdrant.patchPayload(
+      QDRANT_COLLECTION,
+      ids,
+      { som_cluster: clusterKey, feature_ids: entry.feature_ids, lane_ids: entry.lane_ids },
+    );
+    totalPatched += p;
+    // failed points counted as no-som (no SOM data available)
+    totalNoSom += f;
+    if ((totalPatched + totalSkipped) % 5000 < 200) {
+      process.stdout.write(`  patched ${totalPatched} / skipped ${totalSkipped}...\n`);
+    }
+  }
+} else {
+  for (const ids of pendingByCluster.values()) totalPatched += ids.length;
+}
 
 // ── Summary ───────────────────────────────────────────────────────────────────
 

@@ -12,7 +12,8 @@
       "models": {
         "gemma4-legal.gguf": {
           "name": "Gemma4 Legal",
-          "contextLength": 65536
+          "contextLength": 65536,
+          "reasoning": false
         }
       }
     }
@@ -43,17 +44,22 @@
     "turbovec": {
       "type": "remote",
       "url": "http://127.0.0.1:8791/mcp",
-      "enabled": false,
+      "enabled": true,
       "timeout": 30000
     },
     "engram-embed": {
       "type": "local",
       "command": [
         "node",
-        "./sveltekit-frontend/scripts/mcp/engram-embed-mcp.mjs"
+        "./sveltekit-frontend/scripts/mcp/engram-embed-mcp.mjs",
+        "--stdio"
       ],
       "enabled": true,
-      "timeout": 60000
+      "timeout": 60000,
+      "env": {
+        "ENGRAM_ONLY": "true",
+        "REDIS_ENABLED": "false"
+      }
     },
     "gemma4-offload": {
       "type": "local",
@@ -62,12 +68,15 @@
         "./sveltekit-frontend/scripts/mcp/gemma4-offload-mcp.mjs"
       ],
       "enabled": true,
-      "timeout": 30000
+      "timeout": 30000,
+      "env": {
+        "ENGRAM_ONLY": "true"
+      }
     }
   },
   "instructions": [
-    "AGENTS.md",
-    "docs/ai-os/*.md"
+    ".opencode/system.md",
+    "AGENTS.md"
   ],
   "watcher": {
     "ignore": [

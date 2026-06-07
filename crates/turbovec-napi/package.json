@@ -1,0 +1,26 @@
+{
+  "name": "@deeds/turbovec-napi",
+  "version": "0.1.0",
+  "description": "N-API packet compiler: JSONL load, source_ref hashing, edge dedupe, SOM scoring, Qdrant payload packing",
+  "main": "wrapper.js",
+  "types": "wrapper.d.ts",
+  "scripts": {
+    "build": "cargo build --release && napi build --platform --release",
+    "build:debug": "cargo build && napi build --platform",
+    "artifacts": "napi artifacts",
+    "test": "node test.mjs"
+  },
+  "devDependencies": {
+    "@napi-rs/cli": "^2.18.4"
+  },
+  "napi": {
+    "name": "turbovec-napi",
+    "triples": {
+      "defaults": false,
+      "additional": [
+        "x86_64-pc-windows-msvc"
+      ]
+    }
+  },
+  "license": "MIT"
+}

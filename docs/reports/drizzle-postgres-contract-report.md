@@ -1,6 +1,6 @@
 # Drizzle ↔ Postgres Contract Report
 
-Generated: 2026-06-04T23:58:06.915Z  |  Findings: 881
+Generated: 2026-06-07T00:57:12.306Z  |  Findings: 880
 
 ### unsafe_drizzle_update_delete  (medium)
 **Problem:** .delete() or .update() call without visible .where() — risks unscoped table mutation.
@@ -4046,11 +4046,17 @@ Generated: 2026-06-04T23:58:06.915Z  |  Findings: 881
 **File:** `sveltekit-frontend\src\lib\server\db\schema\models.ts`
 **Validate:** `npm run db:check`, `npm run db:generate`
 
-### missing_column  (medium)
-**Problem:** Column nes_chrom_kag_dag_hits.metadata in Drizzle schema but absent from live DB.
-**Fix:** ALTER TABLE nes_chrom_kag_dag_hits ADD COLUMN IF NOT EXISTS metadata ...
-**File:** `sveltekit-frontend\src\lib\server\db\schema\nes-chrom-packets.ts`
-**Validate:** `npm run db:check`
+### live_db_schema_drift  (high)
+**Problem:** parent_atlas_documents.id: Drizzle says integer, live DB says bigint.
+**Fix:** Align Drizzle schema to match DB type OR migrate DB column.
+**File:** `sveltekit-frontend\src\lib\server\db\schema\parent-atlas-documents.ts`
+**Validate:** `npm run db:check`, `npm run audit:contracts`
+
+### live_db_schema_drift  (high)
+**Problem:** parent_atlas_jobs.status: Drizzle says text, live DB says character varying.
+**Fix:** Align Drizzle schema to match DB type OR migrate DB column.
+**File:** `sveltekit-frontend\src\lib\server\db\schema\parent-atlas-jobs.ts`
+**Validate:** `npm run db:check`, `npm run audit:contracts`
 
 ### missing_table  (medium)
 **Problem:** Table "rag_cards" declared in Drizzle schema but absent from live DB — migration pending.
@@ -4526,23 +4532,17 @@ Generated: 2026-06-04T23:58:06.915Z  |  Findings: 881
 **File:** `sveltekit-frontend\src\lib\server\db\schema-postgres.ts`
 **Validate:** `npm run db:check`, `npm run db:generate`
 
-### missing_column  (medium)
-**Problem:** Column codebase_chunk_index.centroid_id in Drizzle schema but absent from live DB.
-**Fix:** ALTER TABLE codebase_chunk_index ADD COLUMN IF NOT EXISTS centroid_id ...
+### live_db_schema_drift  (high)
+**Problem:** codebase_chunk_index.centroid_id: Drizzle says uuid, live DB says text.
+**Fix:** Align Drizzle schema to match DB type OR migrate DB column.
 **File:** `sveltekit-frontend\src\lib\server\db\schema-postgres.ts`
-**Validate:** `npm run db:check`
+**Validate:** `npm run db:check`, `npm run audit:contracts`
 
-### missing_column  (medium)
-**Problem:** Column codebase_chunk_index.compressed_embedding in Drizzle schema but absent from live DB.
-**Fix:** ALTER TABLE codebase_chunk_index ADD COLUMN IF NOT EXISTS compressed_embedding ...
+### live_db_schema_drift  (high)
+**Problem:** codebase_chunk_index.compressed_embedding: Drizzle says vector, live DB says jsonb.
+**Fix:** Align Drizzle schema to match DB type OR migrate DB column.
 **File:** `sveltekit-frontend\src\lib\server\db\schema-postgres.ts`
-**Validate:** `npm run db:check`
-
-### missing_column  (medium)
-**Problem:** Column codebase_chunk_index.reconstruction_error in Drizzle schema but absent from live DB.
-**Fix:** ALTER TABLE codebase_chunk_index ADD COLUMN IF NOT EXISTS reconstruction_error ...
-**File:** `sveltekit-frontend\src\lib\server\db\schema-postgres.ts`
-**Validate:** `npm run db:check`
+**Validate:** `npm run db:check`, `npm run audit:contracts`
 
 ### missing_column  (medium)
 **Problem:** Column codebase_chunk_index.routing_tier in Drizzle schema but absent from live DB.
@@ -5194,12 +5194,6 @@ Generated: 2026-06-04T23:58:06.915Z  |  Findings: 881
 
 ### migration_schema_drift  (low)
 **Problem:** Table "card_source_refs" in SQL migrations but not declared in Drizzle schema (may be a filtered/legacy table).
-**Fix:** Add to schema-postgres.ts OR add to tablesFilter in drizzle.config.ts.
-**File:** `sveltekit-frontend/drizzle/`
-**Validate:** `npm run db:check`
-
-### migration_schema_drift  (low)
-**Problem:** Table "atlas_feature_map_synthesized" in SQL migrations but not declared in Drizzle schema (may be a filtered/legacy table).
 **Fix:** Add to schema-postgres.ts OR add to tablesFilter in drizzle.config.ts.
 **File:** `sveltekit-frontend/drizzle/`
 **Validate:** `npm run db:check`
