@@ -3,12 +3,14 @@ import type { RequestHandler } from './$types';
 import { db } from '$lib/server/db/client';
 import { contextTimeline } from '$lib/server/db/schema/context-timeline';
 import { z } from 'zod';
+import { recordReward } from '$lib/server/features/ai/ace/packet-reward-writer.js';
 
 const feedbackSchema = z.object({
 	eventType: z.enum(['feedback', 'citation', 'research']),
 	signal: z.enum(['thumbs_up', 'thumbs_down', 'dwell_long', 'dwell_short', 'citation_saved']),
 	pipeline: z.string().default('ace'),
 	summaryId: z.string().uuid().optional(),
+	packetUuid: z.string().uuid().optional(),
 	payload: z.record(z.string(), z.any()).default({}),
 	sessionId: z.string().optional()
 });
@@ -32,7 +34,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 			return json({ error: parsed.error.issues[0]?.message ?? 'Invalid feedback data' }, { status: 400 });
 		}
 
-		const { eventType, signal, pipeline, summaryId, payload, sessionId } = parsed.data;
+		const { eventType, signal, pipeline, summaryId, packetUuid, payload, sessionId } = parsed.data;
 
 		// 1. Record event in context_timeline (Audit trail & RL seed)
 		await db.insert(contextTimeline).values({
@@ -47,10 +49,18 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 			grpoReward: signal === 'thumbs_up' || signal === 'citation_saved' ? 1.0 : signal === 'thumbs_down' ? -1.0 : 0.1
 		});
 
-		// 2. Trigger async hypergraph adaptation if signal is significant
+		// 2. Record packet reward if a packetUuid was provided
+		if (packetUuid) {
+			recordReward({
+				packetUuid,
+				accepted: signal === 'thumbs_up',
+				rejected: signal === 'thumbs_down',
+				cited: signal === 'citation_saved',
+			});
+		}
+
+		// 3. Trigger async hypergraph adaptation if signal is significant
 		if (signal === 'thumbs_up' || signal === 'citation_saved') {
-			// In production, this would increment the 'hg:adapt:pending' counter in Redis
-			// and trigger building the 4D hypergraph if the threshold is met.
 			console.log(`[RL-Loop] Recorded ${signal} signal for pipeline ${pipeline}. Adaptation pending.`);
 		}
 

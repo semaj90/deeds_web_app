@@ -1,0 +1,90 @@
+{
+  "generatedAt": "2026-06-07T07:45:19.696Z",
+  "packetCount": 33,
+  "stateDistrib": [],
+  "topRefs": [
+    {
+      "source_ref": "sveltekit-frontend/unknown",
+      "hits": 44
+    },
+    {
+      "source_ref": "sveltekit-frontend/scripts/ace/ask-gemma4.mjs",
+      "hits": 9
+    },
+    {
+      "source_ref": "sveltekit-frontend/scripts/activity/log-developer-activity.mjs",
+      "hits": 7
+    },
+    {
+      "source_ref": "sveltekit-frontend/src/hooks.server.ts",
+      "hits": 6
+    },
+    {
+      "source_ref": "sveltekit-frontend/scripts/ace/persist-authority-test.mjs",
+      "hits": 6
+    },
+    {
+      "source_ref": "sveltekit-frontend/scripts/ace/export-transition-memory.mjs",
+      "hits": 6
+    },
+    {
+      "source_ref": "sveltekit-frontend/scripts/agent-diagnose.mjs",
+      "hits": 3
+    },
+    {
+      "source_ref": "sveltekit-frontend/src/mcp-gpu-orchestrator.ts",
+      "hits": 3
+    },
+    {
+      "source_ref": "sveltekit-frontend/.venv/Lib/python3.9/site-packages/pip/_internal/cache.py",
+      "hits": 1
+    },
+    {
+      "source_ref": "sveltekit-frontend/src/workers/LLMS.md",
+      "hits": 1
+    },
+    {
+      "source_ref": "sveltekit-frontend/scripts/analyze-graph-ai.mjs",
+      "hits": 1
+    },
+    {
+      "source_ref": "sveltekit-frontend/src/app.d.ts",
+      "hits": 1
+    },
+    {
+      "source_ref": "sveltekit-frontend/scripts/apply-migration.ps1",
+      "hits": 1
+    },
+    {
+      "source_ref": "sveltekit-frontend/src/global.d.ts",
+      "hits": 1
+    },
+    {
+      "source_ref": "sveltekit-frontend/.venv/Lib/python3.9/site-packages/pip/_internal/network/cache.py",
+      "hits": 1
+    },
+    {
+      "source_ref": "sveltekit-frontend/src/app.postcss",
+      "hits": 1
+    }
+  ],
+  "edgeSummary": [
+    {
+      "etype": "CALLS",
+      "n": 106515,
+      "avg_weight": 1
+    },
+    {
+      "etype": "USES_TOOL",
+      "n": 1074,
+      "avg_weight": 1
+    },
+    {
+      "etype": "USES_DB",
+      "n": 464,
+      "avg_weight": 1
+    }
+  ],
+  "factSummary": [],
+  "featureLeaderboard": []
+}

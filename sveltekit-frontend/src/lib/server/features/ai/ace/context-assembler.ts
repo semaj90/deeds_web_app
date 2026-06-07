@@ -1,6 +1,7 @@
 import { resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { pgRows, db } from '$lib/server/db/client';
+import { syncTokenMap } from './packet-reward-writer.js';
 /**
  * ACE Context Assembler — Central Orchestration Module
  *
@@ -1558,6 +1559,12 @@ export async function assembleACEContext(opts: {
                 })
               )
               .catch(() => {});
+            // Populate token map from this packet's source_refs (fire-and-forget)
+            syncTokenMap(
+              String(insertedId),
+              telemetrySourceRefs,
+              featureIds[0] ?? null
+            );
           }
         }).catch(() => { /* telemetry — never throw */ });
       }).catch(() => { /* non-blocking */ });
