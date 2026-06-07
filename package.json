@@ -106,7 +106,10 @@
     "packets:intent:build:dry": "node scripts/packets/build-intent-graph.mjs --dry-run",
     "packets:rewards:compute": "node scripts/packets/compute-glyph-rewards.mjs",
     "packets:rewards:compute:dry": "node scripts/packets/compute-glyph-rewards.mjs --dry-run",
-    "packets:pipeline": "npm run packets:export && npm run packets:edges:normalize && npm run packets:duckdb:reduce && npm run packets:postgres:load && npm run packets:valkey:warm && npm run packets:neo4j:edges",
+    "packets:synthesize": "node scripts/packets/synthesize-packet-sidecars.mjs",
+    "packets:synthesize:dry": "node scripts/packets/synthesize-packet-sidecars.mjs --dry-run",
+    "packets:sync": "npm run packets:export && npm run packets:synthesize && npm run packets:postgres:load && npm run packets:neo4j:edges",
+    "packets:pipeline": "npm run packets:export && npm run packets:synthesize && npm run packets:duckdb:reduce && npm run packets:postgres:load && npm run packets:valkey:warm && npm run packets:neo4j:edges",
     "packets:pipeline:dry": "npm run packets:export:dry && npm run packets:duckdb:reduce:dry && npm run packets:postgres:load:dry && npm run packets:valkey:warm:dry && npm run packets:neo4j:edges:dry",
     "atlas:qdrant:payload-indexes": "node scripts/atlas/create-qdrant-payload-indexes.mjs",
     "atlas:qdrant:payload-indexes:dry": "node scripts/atlas/create-qdrant-payload-indexes.mjs --dry-run",
@@ -495,7 +498,9 @@
     "atlas:memory-address:smoke": "node scripts/atlas/smoke-memory-address-registry.mjs",
     "graph:bitfrost-qdrant-sync": "node scripts/graph/bitfrost-qdrant-sync.mjs",
     "graph:bitfrost-qdrant-sync:dry": "node scripts/graph/bitfrost-qdrant-sync.mjs --dry-run",
-    "graph:bitfrost-qdrant-sync:neo4j": "node scripts/graph/bitfrost-qdrant-sync.mjs --neo4j"
+    "graph:bitfrost-qdrant-sync:neo4j": "node scripts/graph/bitfrost-qdrant-sync.mjs --neo4j",
+    "packets:supervision:refresh": "node scripts/packets/refresh-supervision-graph.mjs",
+    "packets:supervision:refresh:dry": "node scripts/packets/refresh-supervision-graph.mjs --dry-run"
   },
   "devDependencies": {
     "@ast-grep/cli": "0.42.3",

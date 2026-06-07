@@ -40,6 +40,11 @@ export function normalizeTelemetrySourceRef(value: unknown): string | null {
 
   if (ref === 'unknown' || ref.endsWith('/unknown')) return null;
   if (/^(node_modules|\.svelte-kit|\.vite|dist|build)\//.test(ref)) return null;
+  // Reject venv, non-source assets, and binary/data files
+  if (/\.(venv|venv2|venv3|env)\//.test(ref)) return null;
+  if (/\.venv\//.test(ref)) return null;
+  if (/\.(md|json|jsonl|ndjson|parquet|duckdb|sql|txt|log|csv|yaml|yml|toml|lock|png|jpg|gif|svg|ico|wasm|bin|node)$/.test(ref)) return null;
+  // Only keep src/** and scripts/** that live under sveltekit-frontend
   if (ref.startsWith('src/')) ref = `sveltekit-frontend/${ref}`;
 
   return ref;
