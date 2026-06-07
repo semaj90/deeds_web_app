@@ -1864,10 +1864,21 @@ export async function assembleACEContext(opts: {
                       source_refs: telemetryRefs.slice(0, 20),
                       lane_ids: [],
                       route: opts.filePath ? `file:${opts.filePath}` : '/api/sse/chat',
+                      route_id: qHash,
                       cache_tier: 'redis',
                       qdrant_hits: qHits,
                       redis_hot_keys: redisHotKeys,
                       latency_ms: Date.now() - policyStartedAt,
+                      ranked_cards: (Array.isArray(cartridgeResults.topChunks)
+                        ? cartridgeResults.topChunks : [])
+                        .slice(0, 10)
+                        .map((c: any) => ({
+                          ref: telemetrySourceRefFromContext(c as Record<string, unknown>),
+                          score: c.score ?? c.relevanceScore ?? null,
+                        }))
+                        .filter((c: { ref: string | null; score: number | null }) => c.ref),
+                      db_tables: [],   // backfilled by packets:supervision:refresh via db_usage_calls join
+                      tool_calls: [],  // backfilled by packets:supervision:refresh via calls_edges join
                     }),
                     1,
                     telemetryRefs.length > 0
@@ -3718,6 +3729,7 @@ export async function assembleACEContext(opts: {
               source_refs: telemetrySourceRefs.slice(0, 20),
               lane_ids: laneIds,
               route: opts.filePath ? `file:${opts.filePath}` : '/api/sse/chat',
+              route_id: qHash,
               cache_tier: String(finalContext.cachePlanner?.source ?? ''),
               cache_hit: finalContext.cachePlanner?.hit ?? false,
               qdrant_hits: qHits,
@@ -3725,6 +3737,17 @@ export async function assembleACEContext(opts: {
               cluster_id: String(_p.cluster_id ?? ''),
               latency_ms: latencyMs,
               source_ref_quality: _rrpSrcQuality,
+              ranked_cards: (Array.isArray(finalContext.acePayloads)
+                ? (finalContext.acePayloads as any[]) : [])
+                .slice(0, 10)
+                .map((c: any) => ({
+                  ref: telemetrySourceRefFromContext(c as Record<string, unknown>),
+                  score: c.aceScore ?? c.score ?? c.relevanceScore ?? null,
+                  lane: c.sourceKind ?? c.lane ?? null,
+                }))
+                .filter((c: { ref: string | null }) => c.ref),
+              db_tables: [],   // backfilled by packets:supervision:refresh via db_usage_calls join
+              tool_calls: [],  // backfilled by packets:supervision:refresh via calls_edges join
             }),
             1,
             _rrpSrcQuality,
