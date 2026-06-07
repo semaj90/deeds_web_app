@@ -1519,8 +1519,8 @@ export async function assembleACEContext(opts: {
              (route, query_hash, query_preview,
               source_refs, feature_ids, lane_ids, cluster_id, som_cluster,
               qdrant_hits, redis_hot_keys, cache_hit, cache_tier,
-              user_id, session_id)
-           VALUES ($1,$2,$3,$4::jsonb,$5::jsonb,$6::jsonb,$7,$8,$9,$10::jsonb,$11,$12,$13,$14)
+              user_id, session_id, raw)
+           VALUES ($1,$2,$3,$4::jsonb,$5::jsonb,$6::jsonb,$7,$8,$9,$10::jsonb,$11,$12,$13,$14,$15::jsonb)
            RETURNING id`,
           [
             opts.filePath ? `file:${opts.filePath}` : '/api/sse/chat',
@@ -1537,6 +1537,7 @@ export async function assembleACEContext(opts: {
             String(_p.cache_hit ?? ''),
             opts.userId ? parseInt(opts.userId, 10) || null : null,
             opts.conversationId ?? null,
+            JSON.stringify({ feature_id: featureIds[0] ?? null, som_cluster: telemetrySomCluster || null }),
           ]
         ).then((res) => {
           const insertedId = res.rows[0]?.id;
@@ -1826,7 +1827,7 @@ export async function assembleACEContext(opts: {
                 ).catch(() => ({ rows: [] as any[] }));
                 
                 const featureIdMap = new Map((featuresRes.rows || []).map((r: any) => [r.source_ref, r.feature_id]));
-                const featureIds = telemetryRefs.map(ref => featureIdMap.get(ref) || 'shims').filter(Boolean);
+                const featureIds = telemetryRefs.map(ref => featureIdMap.get(ref) ?? null).filter((id): id is string => id !== null && id !== '' && id !== 'shims' && id !== 'sveltekit-frontend');
                 const redisHotKeys = [cartridgeKey];
                 const qHits = cartridgeResults.results?.length ?? 0;
                 
@@ -1835,8 +1836,9 @@ export async function assembleACEContext(opts: {
                      (route, query_hash, query_preview,
                       source_refs, feature_ids, lane_ids, cluster_id, som_cluster,
                       qdrant_hits, redis_hot_keys, cache_hit, cache_tier,
-                      user_id, session_id, latency_ms)
-                   VALUES ($1,$2,$3,$4::jsonb,$5::jsonb,$6::jsonb,$7,$8,$9,$10::jsonb,$11,$12,$13,$14,$15)
+                      user_id, session_id, latency_ms, raw,
+                      packet_version, source_ref_quality)
+                   VALUES ($1,$2,$3,$4::jsonb,$5::jsonb,$6::jsonb,$7,$8,$9,$10::jsonb,$11,$12,$13,$14,$15,$16::jsonb,$17,$18)
                    RETURNING id`,
                   [
                     opts.filePath ? `file:${opts.filePath}` : '/api/sse/chat',
@@ -1854,6 +1856,27 @@ export async function assembleACEContext(opts: {
                     opts.userId ? parseInt(opts.userId, 10) || null : null,
                     opts.conversationId ?? null,
                     Date.now() - policyStartedAt,
+                    JSON.stringify({
+                      packet_version: 1,
+                      feature_id: featureIds[0] ?? null,
+                      feature_ids: featureIds,
+                      som_cluster: activeClusterSummary ? String(activeClusterSummary.clusterId) : null,
+                      source_refs: telemetryRefs.slice(0, 20),
+                      lane_ids: [],
+                      route: opts.filePath ? `file:${opts.filePath}` : '/api/sse/chat',
+                      cache_tier: 'redis',
+                      qdrant_hits: qHits,
+                      redis_hot_keys: redisHotKeys,
+                      latency_ms: Date.now() - policyStartedAt,
+                    }),
+                    1,
+                    telemetryRefs.length > 0
+                      ? telemetryRefs.filter((r: string) =>
+                          /^(src|scripts|drizzle|docs)\/.+\.(ts|js|mjs|svelte)$/.test(r) &&
+                          !r.includes('.venv') && !r.includes('unknown') &&
+                          !r.includes('node_modules') && !r.includes('backup-')
+                        ).length / telemetryRefs.length
+                      : 0,
                   ]
                 ).then((res) => {
                   const insertedId = res.rows[0]?.id;
@@ -3655,13 +3678,21 @@ export async function assembleACEContext(opts: {
           })();
         }
 
+        const _rrpSrcQuality = telemetrySourceRefs.length > 0
+          ? telemetrySourceRefs.filter((r: string) =>
+              /^(src|scripts|drizzle|docs)\/.+\.(ts|js|mjs|svelte)$/.test(r) &&
+              !r.includes('.venv') && !r.includes('unknown') &&
+              !r.includes('node_modules') && !r.includes('backup-')
+            ).length / telemetrySourceRefs.length
+          : 0;
         pgPool.query(
           `INSERT INTO route_runtime_packets
              (route, query_hash, query_preview,
               source_refs, feature_ids, lane_ids, cluster_id, som_cluster,
               qdrant_hits, redis_hot_keys, cache_hit, cache_tier,
-              user_id, session_id, latency_ms)
-           VALUES ($1,$2,$3,$4::jsonb,$5::jsonb,$6::jsonb,$7,$8,$9,$10::jsonb,$11,$12,$13,$14,$15)
+              user_id, session_id, latency_ms, raw,
+              packet_version, source_ref_quality)
+           VALUES ($1,$2,$3,$4::jsonb,$5::jsonb,$6::jsonb,$7,$8,$9,$10::jsonb,$11,$12,$13,$14,$15,$16::jsonb,$17,$18)
            RETURNING id`,
           [
             opts.filePath ? `file:${opts.filePath}` : '/api/sse/chat',
@@ -3679,6 +3710,24 @@ export async function assembleACEContext(opts: {
             opts.userId ? parseInt(opts.userId, 10) || null : null,
             opts.conversationId ?? null,
             latencyMs,
+            JSON.stringify({
+              packet_version: 1,
+              feature_id: featureIds[0] ?? null,
+              feature_ids: featureIds,
+              som_cluster: telemetrySomCluster || null,
+              source_refs: telemetrySourceRefs.slice(0, 20),
+              lane_ids: laneIds,
+              route: opts.filePath ? `file:${opts.filePath}` : '/api/sse/chat',
+              cache_tier: String(finalContext.cachePlanner?.source ?? ''),
+              cache_hit: finalContext.cachePlanner?.hit ?? false,
+              qdrant_hits: qHits,
+              redis_hot_keys: redisHotKeys,
+              cluster_id: String(_p.cluster_id ?? ''),
+              latency_ms: latencyMs,
+              source_ref_quality: _rrpSrcQuality,
+            }),
+            1,
+            _rrpSrcQuality,
           ],
         ).then((res) => {
           const insertedId = res.rows[0]?.id;
