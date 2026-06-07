@@ -62,7 +62,25 @@ interface RedisPacket {
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════
-// SEMANTIC EXTRACTION — Regex + NLP patterns
+// SEMANTIC ROUTING GATE: Check for immediate cache hits or router answers
+const checkCacheOrRouter = (query: string) => {
+    // 1. Check exact cache hit
+    if (await this.redisClient.get(`ace:hit:${query}`)) {
+        return { status: 'CACHE_HIT', data: JSON.parse(await this.redisClient.get(`ace:hit:${query}`)) };
+    }
+
+    // 2. Check semantic summary cache
+    if (await this.redisClient.get(`summary:query:${query}`)) {
+        return { status: 'SUMMARY_HIT', data: JSON.parse(await this.redisClient.get(`summary:query:${query}`)) };
+    }
+
+    // 3. Check if a simple, direct answer is cached (e.g., from a previous chat turn)
+    if (await this.redisClient.get(`chat:answer:${query}`)) {
+        return { status: 'CHAT_HIT', data: JSON.parse(await this.redisClient.get(`chat:answer:${query}`)) };
+    }
+
+    return { status: 'FAIL', data: null };
+};
 // ═══════════════════════════════════════════════════════════════════════════════
 
 const SEMANTIC_PATTERNS = {

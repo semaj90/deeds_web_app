@@ -1,7 +1,7 @@
 # NES/CHROM Packet Pipeline — Active Roadmap
 
 **Created**: 2026-06-07  
-**Status**: Phase 1 complete → Phase 2 next  
+**Status**: Phases 2–9 complete ✅ — run `npm run packets:phase9:preflight` then upload to Colab G4  
 **Estimated total**: 8-12 hours across all phases  
 **Session**: Continues from SESSION_2026-05-29_ATLAS_PHASE_2_VALIDATION.md
 
@@ -55,11 +55,11 @@ From SESSION_2026-05-29_ATLAS_PHASE_2_VALIDATION.md — supervision > retrieval:
 | **2** ✅ | NES packet pipeline (JSONL + Postgres + Valkey + Neo4j) | 3-4h | **Infrastructure** | Interchange format locked |
 | **3** ✅ | USES_DB + USES_TOOL extraction + normalize-edges + Neo4j load | 2-3h | **Topology** | 108,053 CALLS/USES_DB/USES_TOOL edges in Neo4j |
 | **4** ✅ | Runtime intent graph (RESOLVES_INTENT) | 2h | **Behavioral** | `build-intent-graph.mjs` wired; fires on `feature_id` packets |
-| **5** | Graph mutation ledger (INVALIDATED_BY) | 1-2h | **Invalidation** | Stale-aware inference |
-| **6** | Synthetic trace simulator | 2-3h | **Supervision** | Baseline reward scores |
+| **5** ✅ | Graph mutation ledger (INVALIDATED_BY) | 1-2h | **Invalidation** | `invalidate-stale-edges.mjs`; 12 stale edges detected from HEAD~1 |
+| **6** ✅ | Synthetic trace simulator | 2-3h | **Supervision** | 99 traces (33 packets × 3 variants); `simulate-traces.mjs` live |
 | **7** ✅ | Glyph reward computation | 1-2h | **Outcome** | 33 packets scored; `compute-glyph-rewards.mjs` live |
-| **8** | LoRA training pair generation | 1-2h | **Signal** | Supervision data |
-| **9** | LoRA fine-tuning (Unsloth) | 3-4h | **Training** | Better tool selection |
+| **8** ✅ | LoRA training pair generation | 1-2h | **Signal** | 30 pairs (reward ≥ 0.7); `build-lora-pairs.mjs` live |
+| **9** ✅ | LoRA fine-tuning (Unsloth) | 3-4h | **Training** | `colab-lora-finetune.ipynb` ready; 99 contrastive pairs; `npm run packets:phase9:preflight` |
 
 **Critical shift**: Phases 3-5 = structure. Phases 6-9 = supervision. Without supervision, LoRA has nothing to learn from.
 

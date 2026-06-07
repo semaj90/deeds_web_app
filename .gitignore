@@ -651,6 +651,14 @@ src/lib/wasm/dist/
 ########################################
 *.jsonl
 !docs/reports/workstation-soak-history.jsonl
+# NES/CHROM packet pipeline interchange files — must be tracked
+!memory/packets/*.jsonl
+!memory/packets/lora-training-pairs*.jsonl
+!memory/packets/synthetic-traces.jsonl
+!memory/packets/atlas-*.jsonl
+!memory/packets/nes-chrom-packets.jsonl
+!scripts/atlas/out/*.ndjson
+!.opencode/ndjson/*.ndjson
 *.txt
 !README*.txt
 !LICENSE*.txt

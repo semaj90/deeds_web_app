@@ -2093,6 +2093,12 @@
     "serverDeps": 0,
     "dbDeps": 0
   },
+  "sveltekit-frontend/src/routes/api/ace/packets/+server.ts": {
+    "zone": "shared",
+    "directDeps": 0,
+    "serverDeps": 0,
+    "dbDeps": 0
+  },
   "sveltekit-frontend/src/routes/api/ace/rank/+server.ts": {
     "zone": "shared",
     "directDeps": 0,
@@ -3060,6 +3066,12 @@
     "dbDeps": 0
   },
   "sveltekit-frontend/src/routes/api/cache/recent-queries/+server.ts": {
+    "zone": "shared",
+    "directDeps": 0,
+    "serverDeps": 0,
+    "dbDeps": 0
+  },
+  "sveltekit-frontend/src/routes/api/cache/rpc/+server.ts": {
     "zone": "shared",
     "directDeps": 0,
     "serverDeps": 0,

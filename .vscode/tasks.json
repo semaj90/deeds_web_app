@@ -404,15 +404,15 @@
       "detail": "Runs checklist Phase 0/1/8 health + memory + Bifrost boundary checks and writes docs/reports/kag-phase-gate-latest.json."
     },
     {
-      "label": "ACE: TurboVec Sidecar :8791 (Python, detached)",
+      "label": "ACE: TurboVec MCP Sidecar :8791 (Node, detached)",
       "type": "shell",
-      "command": "pwsh -NoProfile -Command \"$p = Get-NetTCPConnection -LocalPort 8791 -ErrorAction SilentlyContinue; if ($p) { Write-Host '⚡ TurboVec sidecar already running on :8791' } else { Start-Process python -ArgumentList 'scripts/ingest/turbovec-sidecar.py' -WorkingDirectory '${workspaceFolder}' -WindowStyle Hidden; Start-Sleep 2; $h = Invoke-RestMethod http://127.0.0.1:8791/health -ErrorAction SilentlyContinue; if ($h.status -eq 'ok') { Write-Host '⚡ TurboVec sidecar started :8791 OK' } else { Write-Host '⚠️ TurboVec sidecar may not have started — check manually' } }\"",
+      "command": "pwsh -NoProfile -Command \"$p = Get-NetTCPConnection -LocalPort 8791 -State Listen -ErrorAction SilentlyContinue; if ($p) { $proc = Get-CimInstance Win32_Process -Filter \\\"ProcessId=$($p.OwningProcess)\\\" -ErrorAction SilentlyContinue; if ($proc.Name -like '*node*') { Write-Host '⚡ TurboVec MCP sidecar already running on :8791'; exit 0 } else { Write-Host \\\"⚠️ Wrong process on :8791 ($($proc.Name)) — killing\\\"; Stop-Process -Id $p.OwningProcess -Force -ErrorAction SilentlyContinue; Start-Sleep 1 } }; Start-Process node -ArgumentList 'scripts/mcp/turbovec-sidecar-mcp.mjs' -WorkingDirectory '${workspaceFolder}/sveltekit-frontend' -WindowStyle Hidden; Start-Sleep 2; $h = Invoke-RestMethod http://127.0.0.1:8791/health -ErrorAction SilentlyContinue; if ($h.server -eq 'turbovec-sidecar-mcp') { Write-Host '⚡ TurboVec MCP sidecar started :8791 OK' } else { Write-Host '⚠️ TurboVec MCP sidecar may not have started — run: node sveltekit-frontend/scripts/mcp/turbovec-sidecar-mcp.mjs' }\"",
       "options": { "cwd": "${workspaceFolder}" },
       "group": "build",
       "problemMatcher": [],
       "runOptions": { "runOn": "folderOpen" },
       "presentation": { "echo": true, "reveal": "silent", "focus": false, "panel": "shared", "showReuseMessage": false, "clear": false },
-      "detail": "Start the TurboVec Python ANN sidecar on :8791 (detached, idempotent — skips if already running). Used by rerank-cards.mjs for 2-bit quantized vector search over ACE packet embeddings."
+      "detail": "Start the TurboVec Node.js MCP sidecar on :8791 (detached, idempotent — kills wrong-process imposters, skips if node already listening). Serves POST /mcp JSON-RPC for turbovec.rank_chunks, turbovec.quantize_deque, turbovec.cluster_label_inject, turbovec.avx2_batch_score tools."
     },
     {
       "label": "ACE: Stub + Rank + Rerank + Recommend (full pipeline)",

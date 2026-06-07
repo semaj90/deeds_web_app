@@ -1,12 +1,8 @@
 {
-  "generatedAt": "2026-06-07T07:45:19.696Z",
+  "generatedAt": "2026-06-07T17:08:24.061Z",
   "packetCount": 33,
   "stateDistrib": [],
   "topRefs": [
-    {
-      "source_ref": "sveltekit-frontend/unknown",
-      "hits": 44
-    },
     {
       "source_ref": "sveltekit-frontend/scripts/ace/ask-gemma4.mjs",
       "hits": 9
@@ -16,7 +12,7 @@
       "hits": 7
     },
     {
-      "source_ref": "sveltekit-frontend/src/hooks.server.ts",
+      "source_ref": "sveltekit-frontend/scripts/ace/export-transition-memory.mjs",
       "hits": 6
     },
     {
@@ -24,19 +20,31 @@
       "hits": 6
     },
     {
-      "source_ref": "sveltekit-frontend/scripts/ace/export-transition-memory.mjs",
+      "source_ref": "sveltekit-frontend/src/hooks.server.ts",
       "hits": 6
-    },
-    {
-      "source_ref": "sveltekit-frontend/scripts/agent-diagnose.mjs",
-      "hits": 3
     },
     {
       "source_ref": "sveltekit-frontend/src/mcp-gpu-orchestrator.ts",
       "hits": 3
     },
     {
-      "source_ref": "sveltekit-frontend/.venv/Lib/python3.9/site-packages/pip/_internal/cache.py",
+      "source_ref": "sveltekit-frontend/scripts/agent-diagnose.mjs",
+      "hits": 3
+    },
+    {
+      "source_ref": "sveltekit-frontend/scripts/apply-migration.ps1",
+      "hits": 1
+    },
+    {
+      "source_ref": "sveltekit-frontend/src/app.d.ts",
+      "hits": 1
+    },
+    {
+      "source_ref": "sveltekit-frontend/src/app.postcss",
+      "hits": 1
+    },
+    {
+      "source_ref": "sveltekit-frontend/src/global.d.ts",
       "hits": 1
     },
     {
@@ -46,45 +54,52 @@
     {
       "source_ref": "sveltekit-frontend/scripts/analyze-graph-ai.mjs",
       "hits": 1
-    },
-    {
-      "source_ref": "sveltekit-frontend/src/app.d.ts",
-      "hits": 1
-    },
-    {
-      "source_ref": "sveltekit-frontend/scripts/apply-migration.ps1",
-      "hits": 1
-    },
-    {
-      "source_ref": "sveltekit-frontend/src/global.d.ts",
-      "hits": 1
-    },
-    {
-      "source_ref": "sveltekit-frontend/.venv/Lib/python3.9/site-packages/pip/_internal/network/cache.py",
-      "hits": 1
-    },
-    {
-      "source_ref": "sveltekit-frontend/src/app.postcss",
-      "hits": 1
     }
   ],
   "edgeSummary": [
     {
-      "etype": "CALLS",
-      "n": 106515,
+      "etype": "USES_SOURCE_REF",
+      "n": 92,
       "avg_weight": 1
     },
     {
-      "etype": "USES_TOOL",
-      "n": 1074,
+      "etype": "SUPPORTS_FEATURE",
+      "n": 92,
       "avg_weight": 1
     },
     {
-      "etype": "USES_DB",
-      "n": 464,
+      "etype": "USED_ROUTE",
+      "n": 33,
+      "avg_weight": 1
+    },
+    {
+      "etype": "HAS_FEATURE",
+      "n": 30,
+      "avg_weight": 1
+    },
+    {
+      "etype": "IN_CLUSTER",
+      "n": 1,
       "avg_weight": 1
     }
   ],
-  "factSummary": [],
-  "featureLeaderboard": []
+  "factSummary": [
+    {
+      "ftype": "source_ref",
+      "n": 92,
+      "avg_score": 1
+    },
+    {
+      "ftype": "feature",
+      "n": 30,
+      "avg_score": 1
+    }
+  ],
+  "featureLeaderboard": [
+    {
+      "feature_id": "sveltekit-frontend",
+      "packets": 10,
+      "avg_reward": 0.7000000000000001
+    }
+  ]
 }

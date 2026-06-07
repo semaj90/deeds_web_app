@@ -78,13 +78,8 @@ async function run() {
   console.log(`  packets loaded: ${packetCount}`);
 
   if (fs.existsSync(FACTS_FILE)) {
-    duckdb(`CREATE OR REPLACE TABLE facts AS SELECT
-      json->>'$.fact_type'  AS fact_type,
-      json->>'$.fact_key'   AS fact_key,
-      json->>'$.fact_value' AS fact_value,
-      TRY_CAST(json->>'$.score' AS DOUBLE) AS score,
-      json->>'$.packet_uuid' AS packet_uuid
-    FROM read_ndjson('${ff}', ignore_errors=true, columns={json: 'JSON'});`);
+    duckdb(`CREATE OR REPLACE TABLE facts AS
+    SELECT * FROM read_ndjson('${ff}', ignore_errors=true);`);
     const fc = duckdb(`SELECT count(*) AS n FROM facts;`, { json: true })[0]?.n ?? 0;
     console.log(`  facts loaded: ${fc}`);
   }
