@@ -204,6 +204,10 @@ const EXCLUDE_DIRS = new Set([
   'node_modules', '.svelte-kit', 'build', 'dist', '.git', '__mocks__', '__tests__',
   'static', // WASM/ONNX/model binaries — not source
   '.cache', 'coverage', 'logs',
+  // Non-source dirs that bloat the graph (gitignored archives, model weights, tooling artifacts)
+  '.opencode', 'deeds_labs', 'granite-docling-258M', 'turbovec', 'models',
+  '.tmp', 'llm', 'storage', 'lawpdfs', 'phase13graph_exportgenerator',
+  '.svelte-error-fixes-backup', 'qdrant-windows', 'vscode-extension',
 ]);
 
 function* walk(dir) {
