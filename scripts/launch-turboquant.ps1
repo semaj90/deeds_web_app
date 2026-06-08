@@ -535,6 +535,17 @@ if (Test-LlamaFlag $llama '--reasoning-format') {
     Write-Host "Reasoning format: --reasoning-format not supported by this binary - skipping" -ForegroundColor DarkYellow
 }
 
+# -- Chat template: gemma3 overrides the GGUF-embedded 'gemma' template which
+# predates system-role and tool-call support (props shows supports_system_role:false).
+# gemma3 is the llama.cpp built-in that matches Gemma 3/4 instruct format.
+$chatTemplate = if ($env:TURBO_CHAT_TEMPLATE) { $env:TURBO_CHAT_TEMPLATE } else { 'gemma3' }
+if (Test-LlamaFlag $llama '--chat-template') {
+    $baseArgs = $baseArgs + @('--chat-template', $chatTemplate)
+    Write-Host "Chat template: --chat-template $chatTemplate (overrides GGUF-embedded 'gemma' variant)" -ForegroundColor Cyan
+} else {
+    Write-Host "Chat template: --chat-template not supported - system prompt may be dropped" -ForegroundColor Yellow
+}
+
 # -- Tool-calling: --jinja for OpenAI function-call format ----------------
 if (Test-LlamaFlag $llama '--jinja') {
     Write-Host "Tool calling: --jinja enabled (OpenCode/TRACE MCP loop)" -ForegroundColor Cyan
