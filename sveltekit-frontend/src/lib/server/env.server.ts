@@ -187,6 +187,7 @@ export const ENV = {
   EMBEDDING_QUIC_ENABLED:
     (privateEnv.EMBEDDING_QUIC_ENABLED ?? privateEnv.QUIC_ENABLED ?? 'false') === 'true',
   NATS_URL: privateEnv.NATS_URL ?? `nats://${LOOPBACK_IP}:4222`,
+  INDEX_WORKER_URL: privateEnv.INDEX_WORKER_URL ?? `http://${LOOPBACK_IP}:8101`,
   // TensorRT-LLM inference (main gpu profile exposes 8099; Triton uses TRITON_URL on 8000)
   TENSORRT_URL:
     privateEnv.TENSORRT_URL ?? privateEnv.TENSORRT_SERVICE_URL ?? `http://${LOOPBACK_IP}:8099`,

@@ -58,7 +58,7 @@ export async function ensurePromptIndex(redis: Redis): Promise<void> {
       'kind',  'TAG',
       'tags',  'TAG',  'SEPARATOR', ',',
       'model', 'TAG',
-      'vec',   'VECTOR', 'HNSW', '8',
+      'vec',   'VECTOR', 'HNSW', '10',
                'TYPE', 'FLOAT32',
                'DIM', String(DIM),
                'DISTANCE_METRIC', 'COSINE',

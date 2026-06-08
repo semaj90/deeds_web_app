@@ -27,8 +27,9 @@ const EMBED_URL   = 'http://127.0.0.1:5173/api/embed';
 const OLLAMA_URL  = 'http://127.0.0.1:11434';
 const EMBED_MODEL = 'embeddinggemma:latest';
 
-const TEST_PREFIX = 'smoke:semvalkey:';
-const TTL_SHORT   = 10; // seconds — short enough to verify expiry
+const TEST_PREFIX    = 'smoke:semvalkey:';
+const SEM_IDX_PREFIX = 'prompt:sem:v1:'; // must match FT index prefix
+const TTL_SHORT      = 10; // seconds — short enough to verify expiry
 
 let pass = 0;
 let fail = 0;
@@ -94,7 +95,9 @@ const TEST_HASH     = sha256(TEST_PROMPT);
 const EXACT_KEY     = `${TEST_PREFIX}exact:${TEST_HASH}`;
 const STATS_KEY     = `${TEST_PREFIX}stats`;
 const RULE_KEY      = `${TEST_PREFIX}rule:test-rule`;
-const SEM_KEY       = `${TEST_PREFIX}sem:${TEST_HASH}`;
+// Semantic packet must live under the FT index prefix (prompt:sem:v1:*)
+// so FT.SEARCH can find it. Tracked separately for cleanup.
+const SEM_KEY       = `${SEM_IDX_PREFIX}smoke:${TEST_HASH}`;
 
 // Cleanup any prior smoke run
 const cleanupKeys = await redis.keys(`${TEST_PREFIX}*`);
