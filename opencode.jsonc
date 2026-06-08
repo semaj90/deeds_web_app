@@ -10,7 +10,7 @@
         "apiKey": "local"
       },
       "models": {
-        "gemma4-legal.gguf": {
+        "gemma4-legal-iq4xs-direct.gguf": {
           "name": "Gemma4 Legal",
           "tools": true,
           "reasoning": false,
@@ -22,7 +22,7 @@
       }
     }
   },
-  "model": "bifrost-local/gemma4-legal.gguf",
+  "model": "bifrost-local/gemma4-legal-iq4xs-direct.gguf",
   "permission": {
     "bash": "ask",
     "edit": "ask",

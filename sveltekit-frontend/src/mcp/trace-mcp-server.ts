@@ -7401,24 +7401,18 @@ const nodeServer = http.createServer(async (req, res) => {
     res.end(JSON.stringify({ ok: true, version: '1.0.0', uptime: process.uptime() }));
     return;
   }
-  // SDK's handleGetRequest requires Accept: text/event-stream. OpenCode and some
-  // clients omit it on GET /mcp. Hono's getRequestListener reads rawHeaders (the
-  // flat [name,value,...] array), not the parsed req.headers object — patch both.
-  if (req.method === 'GET') {
-    const accept = req.headers['accept'] ?? '';
-    if (!accept.includes('text/event-stream')) {
-      const patched = accept ? `${accept}, text/event-stream` : 'application/json, text/event-stream';
-      req.headers['accept'] = patched;
-      // Patch rawHeaders too — Hono reads these when building the Web Request
-      const rawIdx = (req.rawHeaders as string[]).findIndex(
-        (h, i) => i % 2 === 0 && h.toLowerCase() === 'accept'
-      );
-      if (rawIdx !== -1) {
-        (req.rawHeaders as string[])[rawIdx + 1] = patched;
-      } else {
-        (req.rawHeaders as string[]).push('accept', patched);
-      }
-    }
+  // Stateless StreamableHTTPServerTransport (sessionIdGenerator: undefined) does not
+  // support GET-based SSE session establishment. A GET /mcp with no Mcp-Session-Id
+  // header causes the SDK to return an empty 200 stream that never emits an endpoint
+  // event — OpenCode and Cline time out waiting and mark the server as failed.
+  // Respond with 405 so clients immediately fall back to POST-only Streamable HTTP.
+  if (req.method === 'GET' && req.url === '/mcp') {
+    res.writeHead(405, {
+      'Content-Type': 'application/json',
+      'Allow': 'POST',
+    });
+    res.end(JSON.stringify({ error: 'Stateless transport: use POST /mcp for all requests' }));
+    return;
   }
   // Serialize: each request waits for the previous one to finish + close.
   const myTurn = mcpQueueTail.then(() => handleMcp(req, res));
