@@ -39,9 +39,9 @@ const LIMIT_IDX = argv.indexOf('--limit');
 const LIMIT = LIMIT_IDX >= 0 ? parseInt(argv[LIMIT_IDX + 1], 10) : 0;
 
 const CANDIDATES_PATH = resolve(ROOT, 'memory', 'packets', 'semantic-cache-candidates.jsonl');
-const TTL_PACKET  = 3600;
-const TTL_FEATURE = 3600;
-const TTL_SRCREF  = 7200;
+const TTL_PACKET  = 86400;   // 24h
+const TTL_FEATURE = 86400;   // 24h
+const TTL_SRCREF  = 172800;  // 48h
 
 if (!fs.existsSync(CANDIDATES_PATH)) {
   console.error(`[bifrost-warm] candidates file not found: ${CANDIDATES_PATH}`);
@@ -64,6 +64,15 @@ redis.on('error', () => {});
 // ── Helpers ───────────────────────────────────────────────────────────────
 function sha256hex(s) {
   return crypto.createHash('sha256').update(String(s)).digest('hex');
+}
+
+// Normalize a raw query to a stable intent string for cross-phrasing cache hits
+function intentNormalize(text) {
+  return String(text)
+    .toLowerCase()
+    .replace(/[^\w\s]/g, ' ')   // strip punctuation
+    .replace(/\s+/g, ' ')
+    .trim();
 }
 
 function makePacketValue(c) {
@@ -99,6 +108,7 @@ async function main() {
   let processed = 0;
   let written = 0;
   let skipped = 0;
+  let intents = 0;
 
   for await (const line of rl) {
     if (!line.trim()) continue;
@@ -138,6 +148,14 @@ async function main() {
     // 3. reward sorted set
     pipeline.zadd('bifrost:sem:reward:zset', reward, c.query_hash);
 
+    // 4. intent index — normalized prompt text → query_hash (enables cross-phrasing hits)
+    const promptText = c.prompt || c.answer_hint || '';
+    if (promptText) {
+      const intentHash = sha256hex(intentNormalize(promptText)).slice(0, 16);
+      pipeline.setex(`bifrost:sem:intent:${intentHash}`, TTL_PACKET, c.query_hash);
+      intents++;
+    }
+
     await pipeline.exec();
     written++;
 
@@ -159,16 +177,17 @@ async function main() {
     console.log(`[bifrost-warm] feature index: ${featureIndex.size} features written`);
   }
 
-  console.log(`[bifrost-warm] processed=${processed}  written=${written}  skipped=${skipped}`);
+  console.log(`[bifrost-warm] processed=${processed}  written=${written}  skipped=${skipped}  intents=${intents}`);
 
   if (!DRY_RUN) {
     // Summary key for monitoring
-    await redis.setex('bifrost:sem:warm:summary', 600, JSON.stringify({
+    await redis.setex('bifrost:sem:warm:summary', 86400, JSON.stringify({
       ts: new Date().toISOString(),
       processed,
       written,
       skipped,
       features: featureIndex.size,
+      intents,
     }));
     await redis.quit();
   }

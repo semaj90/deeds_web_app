@@ -105,6 +105,29 @@ async function main() {
   console.log(`  [i] bifrost:sem:sourceRef:* → ${srcRefKeys.length} source ref index entries`);
   if (srcRefKeys.length > 0) pass++;
 
+  // 6. intent index
+  const intentKeys = await redis.keys('bifrost:sem:intent:*');
+  if (intentKeys.length > 0) {
+    console.log(`  [✓] bifrost:sem:intent:* → ${intentKeys.length} intent index entries`);
+    pass++;
+  } else {
+    console.warn(`  [!] no bifrost:sem:intent:* keys — re-run: npm run bifrost:semantic:warm`);
+    fail++;
+  }
+
+  // 7. TTL sanity — packet key should survive at least an hour
+  const sampleQh = await redis.zrevrangebyscore('bifrost:sem:reward:zset', '+inf', '-inf', 'LIMIT', 0, 1);
+  if (sampleQh.length > 0) {
+    const ttl = await redis.ttl(`bifrost:sem:packet:${sampleQh[0]}`);
+    if (ttl > 3600) {
+      console.log(`  [✓] packet TTL healthy: ${ttl}s (~${Math.round(ttl/3600)}h remaining)`);
+      pass++;
+    } else {
+      console.warn(`  [!] packet TTL low: ${ttl}s — consider increasing TTL_PACKET in warm script`);
+      fail++;
+    }
+  }
+
   console.log(`\n[bifrost-verify] ${pass} checks passed, ${fail} failed`);
 
   await redis.quit();
