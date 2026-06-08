@@ -12,8 +12,12 @@
       "models": {
         "gemma4-legal.gguf": {
           "name": "Gemma4 Legal",
-          "contextLength": 65536,
-          "reasoning": false
+          "tools": true,
+          "reasoning": false,
+          "limit": {
+            "context": 65536,
+            "output": 8192
+          }
         }
       }
     }
