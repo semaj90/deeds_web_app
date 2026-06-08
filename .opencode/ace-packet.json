@@ -1,117 +1,20 @@
 {
-  "generatedAt": "2026-06-07T23:26:29.860Z",
+  "_note": "Trimmed by Claude — full content in Qdrant/Redis, not for OpenCode context",
+  "generatedAt": "2026-06-08T16:03:50.561Z",
   "query": "ACE context retrieval",
   "tokenBudget": 6000,
-  "tokenEstimate": 5997,
-  "totalCards": 76,
-  "droppedCards": 115,
-  "sourceRefs": {
-    "ab50ab47db6aaa21": "docs\\documents-atlas-index.md",
-    "ef048099204c051a": "claude.md",
-    "a5fdb19fab930b64": "claude-mem\\CLAUDE.md",
-    "1a1c4d2f01240d7a": "AGENTS.md",
-    "c51c3c7f494109e6": "59_26cudagraphdeepresearch.txt",
-    "4f023052299e1b1f": "520_26__.txt",
-    "d863307bfb2349ea": "5_19_26_todopt2.txt",
-    "417cc6f0727f8a6f": "5_7_26.txt",
-    "4be07683245046d6": "auto_uploadanalysis_4326.txt",
-    "a7472f13eb6037d9": "331_26.txt",
-    "aa6fc6f316acb163": "328_26.txt",
-    "621c91ec91b31f95": "522_26_todo_phases.txt",
-    "e3d2419972c34661": "419_26next_steps.txt",
-    "b90b5703eaa40fc3": "517_26_llmwikikarapathy.txt",
-    "88ab04ec8d217809": "claude-mem\\plans\\01-hook-io-discipline.md",
-    "72c355fb2ea7f4fe": "320ragkagdag.txt",
-    "0986e4da4a0c5fbc": "cudagraph_519implemntation.txt",
-    "17cff96e3627b85d": "423_whatdwedo.txt",
-    "f6c5f473eb5260c0": "46_next_steps_26.txt",
-    "9e5513fd6751b154": "59_26.txt",
-    "fc70717c0908948f": "32726.txt",
-    "7a02356b94cd64d0": "5_23_26_pt_6_todo.txt",
-    "f355af05f6c82901": "claude-mem\\plans\\2026-04-25-cynical-deletion.md",
-    "acc3c3f5395e3678": "ast_building_421.txt",
-    "33184c006a286aa7": "424_nextsteps.txt",
-    "e9320c2ca649d795": "51726__.txt",
-    "37c36cf7d9074f2c": "4_18_evaldeepresearch.txt",
-    "8d408ffd2bf57435": "claude-mem\\plans\\04-installer-transparency.md",
-    "259bf97184851109": "docs\\archive\\sessions\\SESSION_SUMMARY_APRIL_9_2026.md",
-    "913a3e6d64a0b1f4": "docs\\archive\\CRUD_OPERATIONS_AUDIT.md",
-    "75cf28b5b0b71dd1": "COMPREHENSIVE_AUDIT_REPORT.md",
-    "28149b90867a1eab": "claude-mem\\CHANGELOG.md",
-    "af85fe76d83a5b46": "docs\\legacy-reference\\PRODUCTION_AUDIT_2026-03-09.md",
-    "12cb47c829b24000": "claude-mem\\plugin\\skills\\design-is\\SKILL.md",
-    "3a37895ff055f7b0": "5_20_pt3.txt",
-    "5169db3a7a1fdfd6": ".python311\\lib\\python3.11\\idlelib\\NEWS2x.txt",
-    "70502d7d98f7eca4": "514_26__.txt",
-    "624809cbde794161": "318_26.txt",
-    "dd90e81428be06af": "5_16_pt3_morning.txt",
-    "d24ec84399ca5e1a": "45_26_nextsteps.txt",
-    "2f1d8b8442785803": "analysis-errors.txt",
-    "4ce8069ae8689dc3": "43_26-pt3.txt",
-    "3c3984b88f74ee98": "CODEBASE_MAP.md",
-    "1cfe33fbccfd5dbd": ".github\\agents\\route-triage-engineer.agent.md",
-    "fdfebf6133ae0380": "CACHE_WARMUP_STATUS.md",
-    "6b5dfa90a7e9c29e": "58_26_next_steps_graphanalysis_ingestion_analysis.txt",
-    "666cfae1375b41bd": "docs\\opencode\\SUB-MASTER-FEATURE-TODO-2026-05-27.md",
-    "d7b8c64d471d1d83": "docs\\error-analysis-architecture.md",
-    "31acb250ee62ba21": "claude_code_phases413.txt",
-    "dc6c1191f9f115e7": "330_26.txt",
-    "7488232186d0c56e": "419_nextsteps__.txt",
-    "f52ada0cb3dc0811": "claude-mem\\plans\\2026-04-29-installer-streamline.md",
-    "8af523d8fafb921d": "claude-mem\\.claude\\reports\\test-audit-2026-01-05.md",
-    "31c433f8a136ae5f": "42_26ptnextsteps.txt",
-    "9a56f6c64dc8f9a5": "docs\\CODEBASE_DIRECTORY_MAP.md",
-    "1c6e12bf180d50e3": "AUDIT_COMPILATION_COMPLETE.md",
-    "d0efad1e918a46c0": "3_16_26.txt",
-    "6770951087452f9f": "claude-mem\\plugin\\modes\\law-study-CLAUDE.md",
-    "ef32c5c93acd74c9": ".claude\\skills\\codebase-mapping-json-ingestion.md",
-    "2cf2d13b16361f81": "docs\\research\\deep-research-topics.md",
-    "e6af15aed1009305": "docs\\legacy-reference\\PRODUCTION_AUDIT_2026-03-15.md",
-    "ebaa006fcfb12629": "claude-mem\\.claude\\commands\\anti-pattern-czar.md",
-    "b20ff2e23ff58f82": "AUDIT_COMPILATION_PHASE_1.md",
-    "f296a38660515392": "claude-mem\\plans\\06-worker-env-isolation.md",
-    "b6673c841175e985": "docs\\security\\STACK_AUDIT_PORTS.md",
-    "df97cb914c329303": "417_26_var.txt",
-    "7ef9abb53ce2c38d": "319_26_nextsteps.txt",
-    "101f3b896832662f": "claude-mem\\.plan\\npx-distribution.md",
-    "d1edcfb8f151fffc": "docs\\atlas\\phase-lanes.md",
-    "b508b68f97503cab": "claude-mem\\docs\\server-beta-architecture-and-team-vision.md",
-    "162517cc7aab2991": "claude-mem\\plans\\03-worker-lifecycle.md",
-    "dd7c7c15fa10da6a": "claude-mem\\plans\\2026-05-06-observation-queue-engine-deep-dive.md",
-    "b9fc06b93c4ae03a": "5_15_26__todopt1.txt",
-    "e1860b298dc7d37f": "3_29_26.txt",
-    "6415cebe1740e19d": "5_23_26_pt5.txt",
-    "a89f65433e3f7a52": ".opencode\\agents\\atlas-context.md"
-  },
-  "cards": {
-    "_note": "card content trimmed — use ace:packet:latest Redis key or re-run cache-ace-packet.mjs",
-    "count": 76,
-    "sample": [
-      {
-        "id": "ab50ab47db6aaa21",
-        "score": 0.7798,
-        "sourceRef": "docs\\documents-atlas-index.md"
-      },
-      {
-        "id": "ef048099204c051a",
-        "score": 0.7715,
-        "sourceRef": "claude.md"
-      },
-      {
-        "id": "a5fdb19fab930b64",
-        "score": 0.6726,
-        "sourceRef": "claude-mem\\CLAUDE.md"
-      },
-      {
-        "id": "1a1c4d2f01240d7a",
-        "score": 0.6712,
-        "sourceRef": "AGENTS.md"
-      },
-      {
-        "id": "c51c3c7f494109e6",
-        "score": 0.666,
-        "sourceRef": "59_26cudagraphdeepresearch.txt"
-      }
-    ]
-  }
+  "tokenEstimate": 5984,
+  "cardCount": 67,
+  "sample": [
+    {
+      "id": "0d1da1870d5a8375",
+      "score": 0.8212
+    },
+    {
+      "id": "1f9a61cd4226b691",
+      "score": 0.8207
+    }
+  ],
+  "totalCards": 67,
+  "droppedCards": 294
 }
