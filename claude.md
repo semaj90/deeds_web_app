@@ -2228,6 +2228,79 @@ See `memory/reconstruction-3-tracks.md` for full SceneIntent schema, RabbitMQ qu
 - `memory/docker-sveltekit.md` — Docker SSR deployment, Dockerfile, docker-compose
 - `tests/e2e/*.spec.ts` — Playwright visual regression / 500-error tester (uses `page.screenshot()`)
 
+## OpenCode + llama-server Config — Validated Shape (June 2026)
+
+### Root cause: GGUF-embedded `gemma` chat template drops system role
+
+`gemma4-legal-iq4xs-direct.gguf` embeds the old `gemma` chat template which predates system-role and tool-call support. Without `--chat-template gemma3`, llama-server reports:
+```
+chat_format: Content-only
+supports_system_role: false
+supports_tool_calls: false
+prompt_tokens: 3   ← system message silently dropped
+```
+System prompt is ignored entirely. Model outputs training-trace completions instead of following instructions.
+
+**Fix in `launch-turboquant.ps1`**: add `--chat-template gemma3` before `--jinja`.
+
+```powershell
+$baseArgs = $baseArgs + @('--chat-template', 'gemma3')   # REQUIRED before --jinja
+$baseArgs = $baseArgs + @('--jinja')
+```
+
+Override via env: `$env:TURBO_CHAT_TEMPLATE = 'gemma3'` (default). After restart, `/props` should show `supports_system_role: true, supports_tool_calls: true`.
+
+**Sanity check** (run after any llama-server restart):
+```powershell
+curl.exe http://127.0.0.1:8090/v1/chat/completions `
+  -H "Content-Type: application/json" `
+  -d '{"model":"gemma4-legal-iq4xs-direct.gguf","messages":[{"role":"system","content":"Reply only OK"},{"role":"user","content":"test"}],"temperature":0,"stream":false,"max_tokens":10}'
+# Expected: {"choices":[{"message":{"content":"OK"}}]...}
+# Bad:      content:"-2b-it-best-te:" → chat template wrong, restart with --chat-template gemma3
+```
+
+### opencode.jsonc model block
+
+Use `limit.context` / `limit.output` (not `contextLength`) and match the exact server model ID:
+
+```jsonc
+"models": {
+  "gemma4-legal-iq4xs-direct.gguf": {   // must match /v1/models id exactly
+    "name": "Gemma4 Legal",
+    "tools": true,           // REQUIRED for tool-call streaming
+    "reasoning": false,
+    "limit": {
+      "context": 65536,      // NOT contextLength — ignored by @ai-sdk/openai-compatible
+      "output": 8192
+    }
+  }
+},
+"model": "bifrost-local/gemma4-legal-iq4xs-direct.gguf"
+```
+
+### TRACE MCP transport
+
+`StreamableHTTPServerTransport` with `sessionIdGenerator: undefined` (stateless) does not support GET-based SSE session establishment. GET `/mcp` now returns `405 Allow: POST` immediately — OpenCode falls back to POST-only Streamable HTTP. POST `tools/list` returns 124 tools.
+
+```jsonc
+"trace": {
+  "type": "remote",
+  "url": "http://127.0.0.1:8788/mcp",
+  "headers": { "Accept": "application/json, text/event-stream" }
+}
+```
+
+### Instruction pollution guard
+
+`instructions` array must only list files that are provably clean:
+- `.opencode/system.md` — safe (no card imports, no `Self-Correction` strings)
+- `AGENTS.md` — safe (rules only)
+- Do NOT include `.opencode/cards/**`, `TOC.md`, audit reports, session transcripts
+
+**`Self-Correction` contamination** (seen in `.opencode/cards/*.json`): if OpenCode loads these as context, Gemma4 completes the training-trace pattern. Detection: `rg "Self-Correction" .opencode/`. Fix: delete contaminated cards; never add `.opencode/cards/` to `instructions`.
+
+---
+
 ## OpenCode / Memory Authority
 
 - `MASTER-FEATURE-TODO-2026-05-20.md` is the master phase plan for lane completion and backlog tracking.
