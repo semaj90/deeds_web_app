@@ -1,5 +1,5 @@
 # Codebase Graph Plan — Fast AST (20-Gate)
-> Generated: 2026-06-08T03:32:29.217Z
+> Generated: 2026-06-08T03:36:56.361Z
 > Mode: `fast-ast` (CPU only)
 
 ## Stats
@@ -10,7 +10,7 @@
 | Components | 916 |
 | API handlers | 3222 |
 | TODOs | 779 |
-| Dirs | 786 |
+| Dirs | 790 |
 
 ## Gate Failures (action needed)
 | Gate | Fail Count |
@@ -20,7 +20,7 @@
 | G11 Localhost | 709 |
 | G14 Svelte4 | 5 |
 | G15 SSR unsafe | 0 |
-| G16 No test | 94 |
+| G16 No test | 95 |
 | G20 Cyclic | 1 |
 
 ## Files with TODO/FIXME
@@ -37,13 +37,13 @@
 - `scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/gallery/+server.ts` — 6 marker(s)
 - `scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/ingest/[jobId]/+server.ts` — 6 marker(s)
 - `scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/intake/case/+server.ts` — 6 marker(s)
-- `scripts/api-cleanup/reports/backup-2025-12-14T21-11-49-641Z/document/[id]/+server.ts` — 6 marker(s)
+- `scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/document/[id]/+server.ts` — 6 marker(s)
 - `sveltekit-frontend/scripts/phase104-backups/src/lib/server/ai/feedback-loop.ts` — 6 marker(s)
 - `scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/document/[id]/+server.ts` — 6 marker(s)
 - `scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/gallery/+server.ts` — 6 marker(s)
 - `scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/ingest/[jobId]/+server.ts` — 6 marker(s)
 - `scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/intake/case/+server.ts` — 6 marker(s)
-- `scripts/api-cleanup/reports/backup-2025-12-14T21-11-49-641Z/document/[id]/+server.ts` — 6 marker(s)
+- `scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/document/[id]/+server.ts` — 6 marker(s)
 
 ## ACE usage
 Redis `code:index:manifest`, `code:index:tag:{word}`, `code:index:gate-stats`, `wiki:note:dir:*`

@@ -26,20 +26,21 @@ function pseudoEmbedding(text, dim = 768) {
 }
 
 async function fetchEmbedding(text) {
+  const ollamaUrl = (process.env.OLLAMA_BASE_URL ?? 'http://localhost:11434')
+    .replace(/^0\.0\.0\.0/, '127.0.0.1').replace(/\/$/, '');
+  const embedModel = process.env.OLLAMA_EMBED_MODEL ?? 'embeddinggemma:latest';
   try {
-    const ollamaUrl = process.env.OLLAMA_BASE_URL ?? 'http://localhost:11434';
-    const embedModel = process.env.OLLAMA_EMBED_MODEL ?? 'embeddinggemma:latest';
-    const res = await fetch(`${ollamaUrl}/api/embeddings`, {
+    // Use /api/embed (batch API) — faster than legacy /api/embeddings
+    const res = await fetch(`${ollamaUrl}/api/embed`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ model: embedModel, prompt: text }),
-      signal: AbortSignal.timeout(15000),
+      body: JSON.stringify({ model: embedModel, input: [text] }),
+      signal: AbortSignal.timeout(30_000),
     });
     if (res.ok) {
       const d = await res.json();
-      if (Array.isArray(d.embedding) && d.embedding.length === 768) {
-        return d.embedding;
-      }
+      const vec = d.embeddings?.[0] ?? d.embedding;
+      if (Array.isArray(vec) && vec.length === 768) return vec;
     }
   } catch {}
   return pseudoEmbedding(text);

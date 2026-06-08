@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-06-01T02:07:15.786Z",
+  "generatedAt": "2026-06-08T03:16:58.783Z",
   "limit": 100,
   "source": "codebase-map",
   "rows": [
@@ -33,17 +33,30 @@
       "rank": 3,
       "directory": "`deeds_labs/frontend/sveltekit-frontend-archive/dirs`",
       "score": 43,
-      "files": 10305,
-      "lines": 1185893,
+      "files": 10300,
+      "lines": 1184731,
       "apis": 1415,
       "authZod": "305/1655",
-      "todos": 5840,
+      "todos": 5839,
       "flags": "🔴ssr 🟡sv4 🟠lh",
       "status": "⚠️",
       "source": "codebase-map"
     },
     {
       "rank": 4,
+      "directory": "`scripts/api-cleanup/reports/backup-2025-12-14T21-11-49-641Z`",
+      "score": 43,
+      "files": 170,
+      "lines": 8380,
+      "apis": 162,
+      "authZod": "12/8",
+      "todos": 28,
+      "flags": "🟠lh",
+      "status": "⚠️",
+      "source": "codebase-map"
+    },
+    {
+      "rank": 5,
       "directory": "`deeds_labs/api-legacy/api`",
       "score": 44,
       "files": 2,
@@ -56,7 +69,7 @@
       "source": "codebase-map"
     },
     {
-      "rank": 5,
+      "rank": 6,
       "directory": "`deeds_labs/api-legacy/api/agents`",
       "score": 45,
       "files": 2,
@@ -69,7 +82,7 @@
       "source": "codebase-map"
     },
     {
-      "rank": 6,
+      "rank": 7,
       "directory": "`deeds_labs/api-legacy/api/analytics`",
       "score": 45,
       "files": 2,
@@ -82,7 +95,7 @@
       "source": "codebase-map"
     },
     {
-      "rank": 7,
+      "rank": 8,
       "directory": "`deeds_labs/api-legacy/api/brain`",
       "score": 45,
       "files": 2,
@@ -95,7 +108,7 @@
       "source": "codebase-map"
     },
     {
-      "rank": 8,
+      "rank": 9,
       "directory": "`deeds_labs/api-legacy/api/chat-test`",
       "score": 45,
       "files": 2,
@@ -108,7 +121,7 @@
       "source": "codebase-map"
     },
     {
-      "rank": 9,
+      "rank": 10,
       "directory": "`deeds_labs/api-legacy/api/debug`",
       "score": 45,
       "files": 2,
@@ -121,7 +134,7 @@
       "source": "codebase-map"
     },
     {
-      "rank": 10,
+      "rank": 11,
       "directory": "`deeds_labs/api-legacy/api/document`",
       "score": 45,
       "files": 2,
@@ -134,7 +147,7 @@
       "source": "codebase-map"
     },
     {
-      "rank": 11,
+      "rank": 12,
       "directory": "`deeds_labs/api-legacy/api/embeddings`",
       "score": 45,
       "files": 6,
@@ -147,7 +160,7 @@
       "source": "codebase-map"
     },
     {
-      "rank": 12,
+      "rank": 13,
       "directory": "`deeds_labs/api-legacy/api/metrics`",
       "score": 45,
       "files": 2,
@@ -160,7 +173,7 @@
       "source": "codebase-map"
     },
     {
-      "rank": 13,
+      "rank": 14,
       "directory": "`deeds_labs/api-legacy/api/native`",
       "score": 45,
       "files": 2,
@@ -173,7 +186,7 @@
       "source": "codebase-map"
     },
     {
-      "rank": 14,
+      "rank": 15,
       "directory": "`deeds_labs/api-legacy/api/orchestrator`",
       "score": 45,
       "files": 2,
@@ -186,7 +199,7 @@
       "source": "codebase-map"
     },
     {
-      "rank": 15,
+      "rank": 16,
       "directory": "`deeds_labs/api-legacy/api/pgai`",
       "score": 45,
       "files": 2,
@@ -199,7 +212,7 @@
       "source": "codebase-map"
     },
     {
-      "rank": 16,
+      "rank": 17,
       "directory": "`deeds_labs/api-legacy/api/security`",
       "score": 45,
       "files": 2,
@@ -212,7 +225,7 @@
       "source": "codebase-map"
     },
     {
-      "rank": 17,
+      "rank": 18,
       "directory": "`deeds_labs/api-legacy/api/websearch`",
       "score": 45,
       "files": 2,
@@ -225,7 +238,7 @@
       "source": "codebase-map"
     },
     {
-      "rank": 18,
+      "rank": 19,
       "directory": "`deeds_labs/archived-dead-code/dev-routes/test`",
       "score": 45,
       "files": 2,
@@ -238,7 +251,7 @@
       "source": "codebase-map"
     },
     {
-      "rank": 19,
+      "rank": 20,
       "directory": "`deeds_labs/projects/legacy-projects/commas-previews`",
       "score": 45,
       "files": 20,
@@ -251,7 +264,7 @@
       "source": "codebase-map"
     },
     {
-      "rank": 20,
+      "rank": 21,
       "directory": "`deeds_labs/routes-parked-full/websocket`",
       "score": 45,
       "files": 1,
@@ -264,7 +277,7 @@
       "source": "codebase-map"
     },
     {
-      "rank": 21,
+      "rank": 22,
       "directory": "`deeds_labs/snapshots/2026-03-15-root/deeds-web-app-subdir`",
       "score": 45,
       "files": 1,
@@ -277,7 +290,7 @@
       "source": "codebase-map"
     },
     {
-      "rank": 22,
+      "rank": 23,
       "directory": "`deeds_labs/snapshots/2026-03-15-root/ts`",
       "score": 45,
       "files": 33,
@@ -290,7 +303,7 @@
       "source": "codebase-map"
     },
     {
-      "rank": 23,
+      "rank": 24,
       "directory": "`scripts/api-cleanup`",
       "score": 45,
       "files": 40,
@@ -303,7 +316,7 @@
       "source": "codebase-map"
     },
     {
-      "rank": 24,
+      "rank": 25,
       "directory": "`scripts/api-cleanup/reports`",
       "score": 45,
       "files": 6,
@@ -316,20 +329,20 @@
       "source": "codebase-map"
     },
     {
-      "rank": 25,
+      "rank": 26,
       "directory": "`scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z`",
       "score": 45,
-      "files": 2648,
-      "lines": 183248,
-      "apis": 2474,
-      "authZod": "280/376",
-      "todos": 668,
+      "files": 2484,
+      "lines": 175092,
+      "apis": 2318,
+      "authZod": "272/372",
+      "todos": 644,
       "flags": "🟠lh",
       "status": "⚠️",
       "source": "codebase-map"
     },
     {
-      "rank": 26,
+      "rank": 27,
       "directory": "`deeds_labs/api-legacy/api/legal`",
       "score": 47,
       "files": 12,
@@ -342,7 +355,7 @@
       "source": "codebase-map"
     },
     {
-      "rank": 27,
+      "rank": 28,
       "directory": "`deeds_labs/frontend/svelte4-archive/routes`",
       "score": 47,
       "files": 13,
@@ -355,7 +368,7 @@
       "source": "codebase-map"
     },
     {
-      "rank": 28,
+      "rank": 29,
       "directory": "`deeds_labs/api-legacy/api/ace`",
       "score": 50,
       "files": 10,
@@ -368,7 +381,7 @@
       "source": "codebase-map"
     },
     {
-      "rank": 29,
+      "rank": 30,
       "directory": "`deeds_labs/api-legacy/api/attention`",
       "score": 50,
       "files": 2,
@@ -381,7 +394,7 @@
       "source": "codebase-map"
     },
     {
-      "rank": 30,
+      "rank": 31,
       "directory": "`deeds_labs/api-legacy/api/audit`",
       "score": 50,
       "files": 4,
@@ -394,7 +407,7 @@
       "source": "codebase-map"
     },
     {
-      "rank": 31,
+      "rank": 32,
       "directory": "`deeds_labs/api-legacy/api/cache`",
       "score": 50,
       "files": 2,
@@ -407,7 +420,7 @@
       "source": "codebase-map"
     },
     {
-      "rank": 32,
+      "rank": 33,
       "directory": "`deeds_labs/api-legacy/api/chat`",
       "score": 50,
       "files": 2,
@@ -420,7 +433,7 @@
       "source": "codebase-map"
     },
     {
-      "rank": 33,
+      "rank": 34,
       "directory": "`deeds_labs/api-legacy/api/consolidation`",
       "score": 50,
       "files": 2,
@@ -433,7 +446,7 @@
       "source": "codebase-map"
     },
     {
-      "rank": 34,
+      "rank": 35,
       "directory": "`deeds_labs/api-legacy/api/dashboard`",
       "score": 50,
       "files": 4,
@@ -446,7 +459,7 @@
       "source": "codebase-map"
     },
     {
-      "rank": 35,
+      "rank": 36,
       "directory": "`deeds_labs/api-legacy/api/dev`",
       "score": 50,
       "files": 2,
@@ -459,7 +472,7 @@
       "source": "codebase-map"
     },
     {
-      "rank": 36,
+      "rank": 37,
       "directory": "`deeds_labs/api-legacy/api/dimensional-cache`",
       "score": 50,
       "files": 2,
@@ -472,7 +485,7 @@
       "source": "codebase-map"
     },
     {
-      "rank": 37,
+      "rank": 38,
       "directory": "`deeds_labs/api-legacy/api/docling`",
       "score": 50,
       "files": 2,
@@ -485,7 +498,7 @@
       "source": "codebase-map"
     },
     {
-      "rank": 38,
+      "rank": 39,
       "directory": "`deeds_labs/api-legacy/api/documents`",
       "score": 50,
       "files": 12,
@@ -498,7 +511,7 @@
       "source": "codebase-map"
     },
     {
-      "rank": 39,
+      "rank": 40,
       "directory": "`deeds_labs/api-legacy/api/embed`",
       "score": 50,
       "files": 4,
@@ -511,7 +524,7 @@
       "source": "codebase-map"
     },
     {
-      "rank": 40,
+      "rank": 41,
       "directory": "`deeds_labs/api-legacy/api/error-brain`",
       "score": 50,
       "files": 4,
@@ -524,7 +537,7 @@
       "source": "codebase-map"
     },
     {
-      "rank": 41,
+      "rank": 42,
       "directory": "`deeds_labs/api-legacy/api/errors`",
       "score": 50,
       "files": 4,
@@ -537,7 +550,7 @@
       "source": "codebase-map"
     },
     {
-      "rank": 42,
+      "rank": 43,
       "directory": "`deeds_labs/api-legacy/api/evidence-canvas`",
       "score": 50,
       "files": 4,
@@ -550,7 +563,7 @@
       "source": "codebase-map"
     },
     {
-      "rank": 43,
+      "rank": 44,
       "directory": "`deeds_labs/api-legacy/api/gpu-test-simple`",
       "score": 50,
       "files": 2,
@@ -563,7 +576,7 @@
       "source": "codebase-map"
     },
     {
-      "rank": 44,
+      "rank": 45,
       "directory": "`deeds_labs/api-legacy/api/ibm-vision`",
       "score": 50,
       "files": 2,
@@ -576,7 +589,7 @@
       "source": "codebase-map"
     },
     {
-      "rank": 45,
+      "rank": 46,
       "directory": "`deeds_labs/api-legacy/api/ingestion`",
       "score": 50,
       "files": 2,
@@ -589,7 +602,7 @@
       "source": "codebase-map"
     },
     {
-      "rank": 46,
+      "rank": 47,
       "directory": "`deeds_labs/api-legacy/api/jobs`",
       "score": 50,
       "files": 2,
@@ -602,7 +615,7 @@
       "source": "codebase-map"
     },
     {
-      "rank": 47,
+      "rank": 48,
       "directory": "`deeds_labs/api-legacy/api/laws`",
       "score": 50,
       "files": 14,
@@ -615,7 +628,7 @@
       "source": "codebase-map"
     },
     {
-      "rank": 48,
+      "rank": 49,
       "directory": "`deeds_labs/api-legacy/api/legal-ai`",
       "score": 50,
       "files": 4,
@@ -628,7 +641,7 @@
       "source": "codebase-map"
     },
     {
-      "rank": 49,
+      "rank": 50,
       "directory": "`deeds_labs/api-legacy/api/mcp`",
       "score": 50,
       "files": 6,
@@ -641,7 +654,7 @@
       "source": "codebase-map"
     },
     {
-      "rank": 50,
+      "rank": 51,
       "directory": "`deeds_labs/api-legacy/api/ocr`",
       "score": 50,
       "files": 2,
@@ -654,7 +667,7 @@
       "source": "codebase-map"
     },
     {
-      "rank": 51,
+      "rank": 52,
       "directory": "`deeds_labs/api-legacy/api/ollama`",
       "score": 50,
       "files": 6,
@@ -667,7 +680,7 @@
       "source": "codebase-map"
     },
     {
-      "rank": 52,
+      "rank": 53,
       "directory": "`deeds_labs/api-legacy/api/onnx`",
       "score": 50,
       "files": 2,
@@ -680,7 +693,7 @@
       "source": "codebase-map"
     },
     {
-      "rank": 53,
+      "rank": 54,
       "directory": "`deeds_labs/api-legacy/api/persons`",
       "score": 50,
       "files": 4,
@@ -693,7 +706,7 @@
       "source": "codebase-map"
     },
     {
-      "rank": 54,
+      "rank": 55,
       "directory": "`deeds_labs/api-legacy/api/realtime`",
       "score": 50,
       "files": 2,
@@ -706,7 +719,7 @@
       "source": "codebase-map"
     },
     {
-      "rank": 55,
+      "rank": 56,
       "directory": "`deeds_labs/api-legacy/api/redis-orchestrator`",
       "score": 50,
       "files": 2,
@@ -719,7 +732,7 @@
       "source": "codebase-map"
     },
     {
-      "rank": 56,
+      "rank": 57,
       "directory": "`deeds_labs/api-legacy/api/route-operations`",
       "score": 50,
       "files": 2,
@@ -732,7 +745,7 @@
       "source": "codebase-map"
     },
     {
-      "rank": 57,
+      "rank": 58,
       "directory": "`deeds_labs/api-legacy/api/setup-database`",
       "score": 50,
       "files": 2,
@@ -745,7 +758,7 @@
       "source": "codebase-map"
     },
     {
-      "rank": 58,
+      "rank": 59,
       "directory": "`deeds_labs/api-legacy/api/sse`",
       "score": 50,
       "files": 4,
@@ -758,7 +771,7 @@
       "source": "codebase-map"
     },
     {
-      "rank": 59,
+      "rank": 60,
       "directory": "`deeds_labs/api-legacy/api/system`",
       "score": 50,
       "files": 6,
@@ -771,7 +784,7 @@
       "source": "codebase-map"
     },
     {
-      "rank": 60,
+      "rank": 61,
       "directory": "`deeds_labs/api-legacy/api/test`",
       "score": 50,
       "files": 6,
@@ -784,7 +797,7 @@
       "source": "codebase-map"
     },
     {
-      "rank": 61,
+      "rank": 62,
       "directory": "`deeds_labs/api-legacy/api/upload-analyze`",
       "score": 50,
       "files": 2,
@@ -797,7 +810,7 @@
       "source": "codebase-map"
     },
     {
-      "rank": 62,
+      "rank": 63,
       "directory": "`deeds_labs/api-legacy/api/vector`",
       "score": 50,
       "files": 4,
@@ -810,7 +823,7 @@
       "source": "codebase-map"
     },
     {
-      "rank": 63,
+      "rank": 64,
       "directory": "`deeds_labs/api-legacy/api/wasm`",
       "score": 50,
       "files": 2,
@@ -823,7 +836,7 @@
       "source": "codebase-map"
     },
     {
-      "rank": 64,
+      "rank": 65,
       "directory": "`deeds_labs/api-routes/health/search`",
       "score": 50,
       "files": 1,
@@ -836,7 +849,7 @@
       "source": "codebase-map"
     },
     {
-      "rank": 65,
+      "rank": 66,
       "directory": "`deeds_labs/routes-parked-full/auth/test-relay`",
       "score": 50,
       "files": 1,
@@ -849,7 +862,7 @@
       "source": "codebase-map"
     },
     {
-      "rank": 66,
+      "rank": 67,
       "directory": "`deeds_labs/routes-parked-full/healthz`",
       "score": 50,
       "files": 1,
@@ -862,7 +875,7 @@
       "source": "codebase-map"
     },
     {
-      "rank": 67,
+      "rank": 68,
       "directory": "`deeds_labs/services/archived-apis/phase78`",
       "score": 50,
       "files": 1,
@@ -875,7 +888,7 @@
       "source": "codebase-map"
     },
     {
-      "rank": 68,
+      "rank": 69,
       "directory": "`deeds_labs/services/archived-apis/stubs`",
       "score": 50,
       "files": 1,
@@ -888,7 +901,7 @@
       "source": "codebase-map"
     },
     {
-      "rank": 69,
+      "rank": 70,
       "directory": "`src/routes/api/atlas`",
       "score": 50,
       "files": 4,
@@ -901,7 +914,7 @@
       "source": "codebase-map"
     },
     {
-      "rank": 70,
+      "rank": 71,
       "directory": "`deeds_labs/projects/legacy-projects/sveltekit-evidence`",
       "score": 51,
       "files": 29,
@@ -914,7 +927,7 @@
       "source": "codebase-map"
     },
     {
-      "rank": 71,
+      "rank": 72,
       "directory": "`deeds_labs/api-legacy/api/bench`",
       "score": 53,
       "files": 10,
@@ -927,7 +940,7 @@
       "source": "codebase-map"
     },
     {
-      "rank": 72,
+      "rank": 73,
       "directory": "`deeds_labs/api-legacy/api/cases`",
       "score": 53,
       "files": 16,
@@ -940,7 +953,7 @@
       "source": "codebase-map"
     },
     {
-      "rank": 73,
+      "rank": 74,
       "directory": "`deeds_labs/api-legacy/api/internal`",
       "score": 53,
       "files": 22,
@@ -953,7 +966,7 @@
       "source": "codebase-map"
     },
     {
-      "rank": 74,
+      "rank": 75,
       "directory": "`deeds_labs/docs/reference/api-backups`",
       "score": 53,
       "files": 8,
@@ -966,7 +979,7 @@
       "source": "codebase-map"
     },
     {
-      "rank": 75,
+      "rank": 76,
       "directory": "`deeds_labs/api-legacy/api/v1`",
       "score": 54,
       "files": 80,
@@ -979,7 +992,7 @@
       "source": "codebase-map"
     },
     {
-      "rank": 76,
+      "rank": 77,
       "directory": "`deeds_labs/api-legacy/api/search`",
       "score": 55,
       "files": 10,
@@ -992,7 +1005,7 @@
       "source": "codebase-map"
     },
     {
-      "rank": 77,
+      "rank": 78,
       "directory": "`deeds_labs/api-legacy/api/trt-llm`",
       "score": 55,
       "files": 6,
@@ -1005,7 +1018,7 @@
       "source": "codebase-map"
     },
     {
-      "rank": 78,
+      "rank": 79,
       "directory": "`deeds_labs/api-legacy/api/yorha`",
       "score": 55,
       "files": 8,
@@ -1018,7 +1031,7 @@
       "source": "codebase-map"
     },
     {
-      "rank": 79,
+      "rank": 80,
       "directory": "`deeds_labs/docs/reference`",
       "score": 55,
       "files": 21,
@@ -1027,19 +1040,6 @@
       "authZod": "1/3",
       "todos": 3,
       "flags": "—",
-      "status": "⚠️",
-      "source": "codebase-map"
-    },
-    {
-      "rank": 80,
-      "directory": "`deeds_labs/projects/legacy-projects/src`",
-      "score": 55,
-      "files": 152,
-      "lines": 31543,
-      "apis": 23,
-      "authZod": "6/28",
-      "todos": 4,
-      "flags": "🟡sv4 🟠lh",
       "status": "⚠️",
       "source": "codebase-map"
     },
@@ -1058,6 +1058,19 @@
     },
     {
       "rank": 82,
+      "directory": "`deeds_labs/projects/legacy-projects/src`",
+      "score": 56,
+      "files": 151,
+      "lines": 31528,
+      "apis": 22,
+      "authZod": "6/28",
+      "todos": 4,
+      "flags": "🟡sv4 🟠lh",
+      "status": "⚠️",
+      "source": "codebase-map"
+    },
+    {
+      "rank": 83,
       "directory": "`deeds_labs/api-legacy/api/evidence`",
       "score": 57,
       "files": 14,
@@ -1070,7 +1083,7 @@
       "source": "codebase-map"
     },
     {
-      "rank": 83,
+      "rank": 84,
       "directory": "`deeds_labs/api-legacy/api/doc`",
       "score": 58,
       "files": 2,
@@ -1083,7 +1096,7 @@
       "source": "codebase-map"
     },
     {
-      "rank": 84,
+      "rank": 85,
       "directory": "`sveltekit-frontend/src/routes/.well-known`",
       "score": 58,
       "files": 4,
@@ -1096,7 +1109,7 @@
       "source": "codebase-map"
     },
     {
-      "rank": 85,
+      "rank": 86,
       "directory": "`deeds_labs/frontend/svelte4-archive/api-routes`",
       "score": 59,
       "files": 9,
@@ -1109,7 +1122,7 @@
       "source": "codebase-map"
     },
     {
-      "rank": 86,
+      "rank": 87,
       "directory": "`.svelte-error-fixes-backup/sveltekit-frontend/src/lib`",
       "score": 60,
       "files": 516,
@@ -1122,7 +1135,7 @@
       "source": "codebase-map"
     },
     {
-      "rank": 87,
+      "rank": 88,
       "directory": "`.svelte-error-fixes-backup/sveltekit-frontend/src/routes`",
       "score": 60,
       "files": 115,
@@ -1135,7 +1148,7 @@
       "source": "codebase-map"
     },
     {
-      "rank": 88,
+      "rank": 89,
       "directory": "`deeds_labs/api-legacy/api/admin`",
       "score": 60,
       "files": 8,
@@ -1148,7 +1161,7 @@
       "source": "codebase-map"
     },
     {
-      "rank": 89,
+      "rank": 90,
       "directory": "`deeds_labs/api-legacy/api/canvas`",
       "score": 60,
       "files": 2,
@@ -1161,7 +1174,7 @@
       "source": "codebase-map"
     },
     {
-      "rank": 90,
+      "rank": 91,
       "directory": "`deeds_labs/api-legacy/api/database-test`",
       "score": 60,
       "files": 2,
@@ -1174,7 +1187,7 @@
       "source": "codebase-map"
     },
     {
-      "rank": 91,
+      "rank": 92,
       "directory": "`deeds_labs/api-legacy/api/db-test`",
       "score": 60,
       "files": 2,
@@ -1187,7 +1200,7 @@
       "source": "codebase-map"
     },
     {
-      "rank": 92,
+      "rank": 93,
       "directory": "`deeds_labs/api-legacy/api/dev-auth`",
       "score": 60,
       "files": 2,
@@ -1200,7 +1213,7 @@
       "source": "codebase-map"
     },
     {
-      "rank": 93,
+      "rank": 94,
       "directory": "`deeds_labs/api-legacy/api/fix-schema`",
       "score": 60,
       "files": 2,
@@ -1213,7 +1226,7 @@
       "source": "codebase-map"
     },
     {
-      "rank": 94,
+      "rank": 95,
       "directory": "`deeds_labs/api-legacy/api/graph`",
       "score": 60,
       "files": 8,
@@ -1226,7 +1239,7 @@
       "source": "codebase-map"
     },
     {
-      "rank": 95,
+      "rank": 96,
       "directory": "`deeds_labs/api-legacy/api/poi`",
       "score": 60,
       "files": 2,
@@ -1239,7 +1252,7 @@
       "source": "codebase-map"
     },
     {
-      "rank": 96,
+      "rank": 97,
       "directory": "`deeds_labs/api-legacy/api/routes`",
       "score": 60,
       "files": 46,
@@ -1252,7 +1265,7 @@
       "source": "codebase-map"
     },
     {
-      "rank": 97,
+      "rank": 98,
       "directory": "`deeds_labs/api-legacy/api/search-pgvector-optimized`",
       "score": 60,
       "files": 2,
@@ -1265,7 +1278,7 @@
       "source": "codebase-map"
     },
     {
-      "rank": 98,
+      "rank": 99,
       "directory": "`deeds_labs/api-legacy/api/ws`",
       "score": 60,
       "files": 2,
@@ -1278,28 +1291,15 @@
       "source": "codebase-map"
     },
     {
-      "rank": 99,
+      "rank": 100,
       "directory": "`deeds_labs/frontend/svelte4-archive/components`",
       "score": 60,
-      "files": 319,
-      "lines": 86352,
+      "files": 318,
+      "lines": 85918,
       "apis": 0,
       "authZod": "6/22",
       "todos": 67,
       "flags": "🔴ssr 🟡sv4 🟠lh",
-      "status": "⚠️",
-      "source": "codebase-map"
-    },
-    {
-      "rank": 100,
-      "directory": "`deeds_labs/frontend/svelte4-archive/routes-test-archive`",
-      "score": 60,
-      "files": 2,
-      "lines": 18,
-      "apis": 1,
-      "authZod": "0/1",
-      "todos": 0,
-      "flags": "—",
       "status": "⚠️",
       "source": "codebase-map"
     }

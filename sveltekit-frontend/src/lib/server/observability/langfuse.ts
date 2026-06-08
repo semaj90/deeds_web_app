@@ -630,6 +630,79 @@ export async function traceSpan<T>(
 }
 
 /**
+ * Trace a full bifrost semantic routing decision.
+ *
+ * Records the complete routing path (exact hash → feature semantic → qdrant
+ * fallback → postgres fallback → gemma4 generate → reward write) as a single
+ * Langfuse trace with one span per lane that was attempted.
+ *
+ * routeLanes is an array of completed routing steps:
+ *   { name, hit, latency_ms, metadata? }
+ *
+ * Call fire-and-forget (don't await in hot paths) or await before response.
+ */
+export async function traceRouterDecision(opts: {
+	query: string;
+	queryHash: string;
+	featureId?: string;
+	cacheHit: boolean;
+	cacheTier: 'valkey-exact' | 'valkey-semantic' | 'qdrant-fallback' | 'postgres-fallback' | 'gemma4-generate' | 'none';
+	reward?: number;
+	sourceRefCount?: number;
+	packetUuid?: string;
+	durationMs: number;
+	routeLanes?: Array<{ name: string; hit: boolean; latency_ms: number; metadata?: Record<string, unknown> }>;
+}): Promise<void> {
+	const langfuse = await getLangfuse();
+	if (!langfuse) return;
+
+	const trace = langfuse.trace({
+		name: 'ace.query',
+		input: opts.query.slice(0, 500),
+		metadata: {
+			queryHash: opts.queryHash,
+			featureId: opts.featureId ?? 'unknown',
+			cacheHit: opts.cacheHit,
+			cacheTier: opts.cacheTier,
+			reward: opts.reward ?? 0,
+			sourceRefCount: opts.sourceRefCount ?? 0,
+			packetUuid: opts.packetUuid,
+			durationMs: opts.durationMs,
+		},
+		tags: [
+			'bifrost',
+			'ace-query',
+			opts.cacheHit ? 'cache-hit' : 'cache-miss',
+			opts.cacheTier,
+			opts.featureId ?? 'unknown',
+		],
+	});
+
+	for (const lane of (opts.routeLanes ?? [])) {
+		const span = trace.span({
+			name: lane.name,
+			input: _safeStringify(lane.metadata ?? {}, 200),
+		});
+		span.end({
+			output: `${lane.hit ? 'HIT' : 'MISS'} (${lane.latency_ms}ms)`,
+			level: lane.hit ? 'DEFAULT' : 'WARNING',
+		});
+	}
+
+	// Top-level span for reward write
+	if (opts.reward !== undefined && opts.reward > 0) {
+		const rwSpan = trace.span({ name: 'reward.write', input: String(opts.reward) });
+		rwSpan.end({ output: `reward=${opts.reward.toFixed(4)}` });
+	}
+
+	try {
+		await langfuse.flushAsync();
+	} catch {
+		// Non-fatal
+	}
+}
+
+/**
  * Shut down the Langfuse client.
  */
 export async function shutdownLangfuse(): Promise<void> {

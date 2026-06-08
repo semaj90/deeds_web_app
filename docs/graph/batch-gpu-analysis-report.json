@@ -1,8 +1,8 @@
 {
   "repo": "deeds-web-app",
-  "generatedAt": "2026-06-07T05:46:45.713Z",
-  "runId": "synthesis_1780811205714",
-  "limit": 1,
+  "generatedAt": "2026-06-08T03:16:58.673Z",
+  "runId": "synthesis_1780888618678",
+  "limit": 500,
   "status": "completed",
   "force": false,
   "top100Artifact": "sveltekit-frontend/docs/graph/codebase-pagerank-top100.json"

@@ -1,3 +1,11 @@
+there's two node_modules 150k files in it.
+there's ~400k files.
+then almost done, automatically appends, temporally indexing it.
+c++
+rpc is. because they didn't own c++
+
+
+
 now we have feature_id table added we'll go directory by directory
 1. needs validation check for batch summaries
 2. ndjson offline processing indexing (possibly scripts tests not aligning) it needs cognitive organzing multi hop traversal bit envoding autoencoding jsonb for grpc serialization vs code workspae utility then grpc mcp? for our sveltekit 2 app

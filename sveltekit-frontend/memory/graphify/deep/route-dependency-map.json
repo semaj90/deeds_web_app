@@ -2585,12 +2585,6 @@
     "serverDeps": 0,
     "dbDeps": 0
   },
-  "sveltekit-frontend/src/routes/api/ai/models/+server.ts": {
-    "zone": "shared",
-    "directDeps": 0,
-    "serverDeps": 0,
-    "dbDeps": 0
-  },
   "sveltekit-frontend/src/routes/api/ai/personas/+server.ts": {
     "zone": "shared",
     "directDeps": 0,
@@ -3036,18 +3030,6 @@
     "dbDeps": 0
   },
   "sveltekit-frontend/src/routes/api/cache/invalidate/+server.ts": {
-    "zone": "shared",
-    "directDeps": 0,
-    "serverDeps": 0,
-    "dbDeps": 0
-  },
-  "sveltekit-frontend/src/routes/api/cache/llm/clean/+server.ts": {
-    "zone": "shared",
-    "directDeps": 0,
-    "serverDeps": 0,
-    "dbDeps": 0
-  },
-  "sveltekit-frontend/src/routes/api/cache/llm/stats/+server.ts": {
     "zone": "shared",
     "directDeps": 0,
     "serverDeps": 0,
@@ -4055,12 +4037,6 @@
     "serverDeps": 0,
     "dbDeps": 0
   },
-  "sveltekit-frontend/src/routes/api/courtroom/models/+server.ts": {
-    "zone": "shared",
-    "directDeps": 0,
-    "serverDeps": 0,
-    "dbDeps": 0
-  },
   "sveltekit-frontend/src/routes/api/dashboard/stats/+server.ts": {
     "zone": "shared",
     "directDeps": 0,
@@ -4776,6 +4752,12 @@
     "dbDeps": 0
   },
   "sveltekit-frontend/src/routes/api/indexing/+server.ts": {
+    "zone": "shared",
+    "directDeps": 0,
+    "serverDeps": 0,
+    "dbDeps": 0
+  },
+  "sveltekit-frontend/src/routes/api/indexing/queue/+server.ts": {
     "zone": "shared",
     "directDeps": 0,
     "serverDeps": 0,
@@ -6261,12 +6243,6 @@
     "zone": "shared",
     "directDeps": 0,
     "serverDeps": 0,
-    "dbDeps": 0
-  },
-  "sveltekit-frontend/src/routes/api/v1/models/+server.ts": {
-    "zone": "shared",
-    "directDeps": 1,
-    "serverDeps": 1,
     "dbDeps": 0
   },
   "sveltekit-frontend/src/routes/api/v1/query/+server.ts": {

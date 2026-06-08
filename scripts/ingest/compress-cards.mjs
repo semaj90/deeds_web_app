@@ -283,13 +283,8 @@ async function main() {
     ``,
     `## Top 10 Cards`,
     ...packedCards.slice(0, 10).map((c, i) =>
-      `${i+1}. \`${c.source}\` — score ${fmt(c.score)}`
+      `${i+1}. \`${c.sourceRef ?? c.id}\` — score ${fmt(c.score)}`
     ),
-    ``,
-    `## Next Gate`,
-    `Wire real embeddings: replace \`pseudoEmbed()\` in embed-cards.mjs + rank-cards.mjs`,
-    `with \`POST http://localhost:11434/api/embed\` (Ollama embeddinggemma:latest).`,
-    `Then wire Qdrant search, Neo4j edge expansion, Redis packet cache, Langfuse trace.`,
   ];
   const summaryMd = summaryLines.join('\n');
 
