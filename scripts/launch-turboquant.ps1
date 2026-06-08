@@ -535,34 +535,22 @@ if (Test-LlamaFlag $llama '--reasoning-format') {
     Write-Host "Reasoning format: --reasoning-format not supported by this binary - skipping" -ForegroundColor DarkYellow
 }
 
-# -- Chat template: use custom jinja file instead of embedded GGUF template --
-# The embedded gemma GGUF template predates system-role support and silently
-# drops the system message (supports_system_role: false). Always override with
-# the repo-local Gemma4/OpenCode template that handles system + tool calls.
-# Set TURBO_CHAT_TEMPLATE_FILE to an absolute path to override; set to 'none'
-# to skip (e.g. if you have a GGUF with a correct embedded template).
-$chatTemplateFile = if ($env:TURBO_CHAT_TEMPLATE_FILE -and $env:TURBO_CHAT_TEMPLATE_FILE -ne 'none') {
-    $env:TURBO_CHAT_TEMPLATE_FILE
-} elseif ($env:TURBO_CHAT_TEMPLATE_FILE -eq 'none') {
-    $null
-} else {
-    Join-Path $PSScriptRoot "..\configs\templates\gemma4-opencode.jinja"
-}
-
-if ($chatTemplateFile -and (Test-Path $chatTemplateFile)) {
-    if (Test-LlamaFlag $llama '--chat-template-file') {
-        $baseArgs = $baseArgs + @('--chat-template-file', $chatTemplateFile)
-        Write-Host "Chat template: --chat-template-file $chatTemplateFile" -ForegroundColor Cyan
-    } elseif (Test-LlamaFlag $llama '--chat-template') {
-        # Older binaries support --chat-template <name> but not --chat-template-file.
-        # Fall back to gemma3 named template (better than embedded gemma which drops system role).
-        $baseArgs = $baseArgs + @('--chat-template', 'gemma3')
-        Write-Host "Chat template: --chat-template gemma3 (binary lacks --chat-template-file)" -ForegroundColor Yellow
+# -- Chat template: opt-in only via TURBO_CHAT_TEMPLATE_FILE env var ------
+# DEFAULT: no --chat-template flag at all. On gemma4-legal-iq4xs-direct.gguf
+# (build b8757+), omitting --chat-template gives supports_system_role:true
+# and correct SYSTEM_OK obedience. Passing --chat-template gemma or gemma3
+# drops prompt_tokens to 3-4 and discards the system message entirely.
+# HARD RULE: never inject --chat-template <name>. Only --chat-template-file
+# when explicitly requested via env var.
+if ($env:TURBO_CHAT_TEMPLATE_FILE -and $env:TURBO_CHAT_TEMPLATE_FILE -ne 'none') {
+    if (Test-Path $env:TURBO_CHAT_TEMPLATE_FILE) {
+        $baseArgs = $baseArgs + @('--chat-template-file', $env:TURBO_CHAT_TEMPLATE_FILE)
+        Write-Host "Chat template: --chat-template-file $($env:TURBO_CHAT_TEMPLATE_FILE)" -ForegroundColor Cyan
     } else {
-        Write-Host "Chat template: neither --chat-template-file nor --chat-template supported - system role may be dropped" -ForegroundColor DarkYellow
+        Write-Host "Chat template: TURBO_CHAT_TEMPLATE_FILE set but file not found at $($env:TURBO_CHAT_TEMPLATE_FILE) - skipping" -ForegroundColor Yellow
     }
-} elseif ($chatTemplateFile) {
-    Write-Host "Chat template: file not found at $chatTemplateFile - skipping (set TURBO_CHAT_TEMPLATE_FILE or place file at configs/templates/gemma4-opencode.jinja)" -ForegroundColor Yellow
+} else {
+    Write-Host "Chat template: none (GGUF built-in, supports_system_role via --jinja)" -ForegroundColor DarkGray
 }
 
 # -- Tool-calling: --jinja for OpenAI function-call format ----------------

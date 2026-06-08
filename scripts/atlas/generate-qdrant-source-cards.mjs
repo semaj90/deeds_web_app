@@ -2,13 +2,12 @@
 /**
  * generate-qdrant-source-cards.mjs — Phase 3 prerequisite
  *
- * Creates .opencode/cards/{id}.json entries for every file_path in
+ * Creates neschrom97/cards/{id}.json entries for every file_path in
  * codebase_chunks_768 that has a som_cluster assignment, using the
  * T0 deterministic summary from Postgres file_summaries where available.
  *
- * This bridges the gap between Qdrant's src/ file index and the
- * .opencode/cards/ NES-CHROM card store so Phase 3 attribution can
- * reach 70%+ match rate.
+ * Writes to neschrom97/cards/ (not .opencode/cards/) to avoid
+ * overloading OpenCode context with 8k+ JSON files.
  *
  * Usage:
  *   node scripts/atlas/generate-qdrant-source-cards.mjs --dry-run
@@ -21,9 +20,7 @@ import crypto from 'node:crypto';
 import { fileURLToPath } from 'node:url';
 import pg from 'pg';
 import dotenv from 'dotenv';
-
-const __dir = path.dirname(fileURLToPath(import.meta.url));
-const ROOT = path.resolve(__dir, '../..');
+import { ROOT, CARDS_DIR as NESCHROM_CARDS_DIR, ensureDirs } from './_neschrom-paths.mjs';
 
 dotenv.config({ path: path.join(ROOT, '.env'), override: false });
 
@@ -31,7 +28,7 @@ const argv = process.argv.slice(2);
 const DRY_RUN = !argv.includes('--apply');
 const VERBOSE = argv.includes('--verbose');
 
-const CARDS_DIR   = path.join(ROOT, '.opencode', 'cards');
+const CARDS_DIR   = NESCHROM_CARDS_DIR;
 const QDRANT_URL  = process.env.QDRANT_URL ?? 'http://127.0.0.1:6333';
 const COLLECTION  = 'codebase_chunks_768';
 const SCROLL_LIMIT = 500;
@@ -111,7 +108,7 @@ async function main() {
   }
 
   let created = 0, skipped = 0;
-  fs.mkdirSync(CARDS_DIR, { recursive: true });
+  ensureDirs();
 
   for (const [filePath, cluster] of qdrantMap) {
     const id = cardId(filePath);

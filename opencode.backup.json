@@ -68,18 +68,7 @@
     }
   },
   "skills": {
-    "paths": [
-      ".opencode/skills"
-    ]
-  },
-  "command": {
-    "workspace-bootstrap": {
-      "description": "Refresh ACE context, local health, and report artifacts before starting OpenCode work",
-      "agent": "antigravity",
-      "subtask": false,
-      "prompt": "Run npm run opencode:bootstrap from repo root. The bootstrap must first ensure Claude-Mem is launched detached when available, then load the local ACE context, daily TODO summary, startup truth, MCP health, and codebase semantic-index report. Return sourceRefs, loaded docs/reports, bash tools, and the next safe action. Do not edit files.",
-      "template": "npm run opencode:bootstrap"
-    }
+    "paths": [".opencode/skills"]
   },
   "permission": {
     "read": "allow",
@@ -126,28 +115,19 @@
     },
     "engram-embed": {
       "type": "local",
-      "command": [
-        "node",
-        "./sveltekit-frontend/scripts/mcp/engram-embed-mcp.mjs"
-      ],
+      "command": ["node", "./sveltekit-frontend/scripts/mcp/engram-embed-mcp.mjs"],
       "enabled": true,
       "timeout": 60000
     },
     "gemma4-offload": {
       "type": "local",
-      "command": [
-        "node",
-        "./sveltekit-frontend/scripts/mcp/gemma4-offload-mcp.mjs"
-      ],
+      "command": ["node", "./sveltekit-frontend/scripts/mcp/gemma4-offload-mcp.mjs"],
       "enabled": true,
       "timeout": 30000
     },
     "atlas-tools": {
       "type": "local",
-      "command": [
-        "node",
-        "./sveltekit-frontend/scripts/mcp/atlas-tools-mcp.mjs"
-      ],
+      "command": ["node", "./sveltekit-frontend/scripts/mcp/atlas-tools-mcp.mjs"],
       "enabled": true,
       "timeout": 30000
     }

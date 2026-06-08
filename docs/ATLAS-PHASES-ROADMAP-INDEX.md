@@ -1,7 +1,7 @@
 # Atlas Phases Roadmap — Complete Index (May 29, 2026)
 
-**Status:** Phase 2 complete, Phase 3-6 + Runtime Intent Graph planned  
-**Total Architecture Scope:** Static graph → Runtime intent tracking  
+**Status:** Phase 2 complete, Phase 3-6 + Runtime Intent Graph planned
+**Total Architecture Scope:** Static graph → Runtime intent tracking
 **Implementation Horizon:** 3-4 weeks (Phases 3-6) + 1-4 weeks (Runtime intent graph)
 
 ---
@@ -222,13 +222,13 @@ After reading REDIS-SHARED-UTILITIES-API.md:
 src/lib/server/cache/
   ├── shared-cache-api.ts          # 4 reusable patterns (150 lines)
   ├── cache-config.ts              # TTLs, keys, schemas (80 lines)
-  
+
 src/lib/server/scoring/
   ├── authority-scorer.ts          # Karpathy blend (100 lines)
-  
+
 src/lib/server/cases/
   ├── timeline-builder.ts          # Query builder + cache (120 lines)
-  
+
 src/lib/server/analysis/
   ├── entity-extractor-unified.ts  # Pluggable registry (150 lines)
 ```
@@ -305,3 +305,50 @@ MATCH (e:Edge) RETURN count(DISTINCT e.featureId) // coverage
 ---
 
 **Ready to begin. See you Day 1 morning — start with consolidation 1 (embedding cache).**
+Atlas packet architecture
+
+You're converging on:
+
+Codebase
+   ↓
+AST
+   ↓
+Atlas feature map
+   ↓
+code_relations_v1
+
+Runtime
+   ↓
+route_runtime_packets
+   ↓
+route_packet_rewards
+
+Database
+   ↓
+db_usage_calls
+
+Graph
+   ↓
+calls_edges
+   ↓
+Neo4j
+
+Embedding
+   ↓
+Qdrant
+   ↓
+TurboVec
+
+Training
+   ↓
+Gemma4 supervision
+   ↓
+XGBoost router
+
+That is effectively a retrieval provenance graph.
+
+The thing I would investigate immediately is:
+
+scripts/atlas/out/db-usage-edges.ndjson
+
+because I suspect the extractor already generated the graph, but the loader that populates code_relations_v1 never ran. If that's true, you don't need another extractor—you need an NDJSON → Postgres graph importer and then connect those edges to your new route_packet_rewards supervision layer.

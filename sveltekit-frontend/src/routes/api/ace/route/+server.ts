@@ -34,15 +34,31 @@ export const POST: RequestHandler = async ({ request, locals }) => {
   const cacheHit = result.trace.some((t) => t.hit);
   const hitLane = result.trace.find((t) => t.hit);
 
+  // Map packet cache_hit to cacheTier enum expected by traceRouterDecision
+  const cacheTierMap: Record<string, Parameters<typeof traceRouterDecision>[0]['cacheTier']> = {
+    redis:   'valkey-exact',
+    bifrost: 'valkey-semantic',
+    qdrant:  'qdrant-fallback',
+    none:    'none',
+  };
+  const cacheTier = cacheTierMap[result.packet?.cache_hit ?? 'none'] ??
+    ((hitLane?.lane as string | undefined)?.includes('qdrant') ? 'qdrant-fallback' : 'none');
+
   // Fire-and-forget Langfuse trace — never blocks response
   traceRouterDecision({
     query: parsed.data.query,
     queryHash,
-    featureId: parsed.data.featureHint ?? result.packet?.feature_id,
+    // Prefer first source_ref (file path) over semantic feature_id label so route_packet_rewards
+    // can join against code_relations_v1.source_file. Fall back to featureHint/feature_ids if no
+    // file-path source_ref is available.
+    featureId: (() => {
+      const firstRef = result.packet?.source_refs?.[0];
+      if (firstRef && (firstRef.startsWith('src/') || firstRef.startsWith('scripts/'))) return firstRef;
+      return parsed.data.featureHint ?? result.packet?.feature_ids?.[0];
+    })(),
     cacheHit,
-    cacheTier: (hitLane?.lane as Parameters<typeof traceRouterDecision>[0]['cacheTier']) ?? 'none',
-    reward: result.packet?.reward,
-    sourceRefCount: (result.packet?.source_refs as unknown[])?.length,
+    cacheTier,
+    sourceRefCount: result.packet?.source_refs?.length,
     packetUuid: result.packet?.packet_id,
     durationMs,
     routeLanes: result.trace.map((t) => ({

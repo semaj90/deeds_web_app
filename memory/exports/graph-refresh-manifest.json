@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-06-07T23:33:09.481Z",
+  "generatedAt": "2026-06-08T20:42:19.557Z",
   "nodeCount": 0,
   "edgeCount": 0,
   "exportCount": 488,
@@ -191,7 +191,8 @@
     "Graph",
     "Infra",
     "Performance",
-    "Retrieval"
+    "Retrieval",
+    "UI"
   ],
   "producer": "graph-refresh",
   "source": "docs/graph/codebase-graph.json",

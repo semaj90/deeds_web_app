@@ -1,20 +1,1218 @@
 {
-  "_note": "Trimmed by Claude — full content in Qdrant/Redis, not for OpenCode context",
-  "generatedAt": "2026-06-08T16:03:50.561Z",
+  "generatedAt": "2026-06-08T20:47:07.842Z",
   "query": "ACE context retrieval",
   "tokenBudget": 6000,
   "tokenEstimate": 5984,
-  "cardCount": 67,
-  "sample": [
+  "totalCards": 67,
+  "droppedCards": 294,
+  "sourceRefs": {
+    "0d1da1870d5a8375": "deeds_labs\\frontend\\sveltekit-frontend-archive\\dirs\\docs\\CLAUDE.md",
+    "1f9a61cd4226b691": "sveltekit-frontend\\CLAUDE.md",
+    "ab50ab47db6aaa21": "memory\\atlas\\documents-atlas.latest.md",
+    "ef048099204c051a": "CLAUDE.md",
+    "d8dbe06bae100588": "deeds_labs\\frontend\\sveltekit-frontend-archive\\docs\\docs_readme\\organized-markdown-docs\\.vscode\\claude.md",
+    "97b62e9e9d7a9d3f": "deeds_labs\\frontend\\sveltekit-frontend-archive\\docs\\docs_readme\\organized-markdown-docs\\sveltekit-frontend_.vscode\\claude.md",
+    "24a063c0fa02cb54": "sveltekit-frontend\\docs\\master_agents.md",
+    "b121cace1b867111": "docs\\session-notes\\TODO_ATLAS.md",
+    "4302c4a782b7095f": "sveltekit-frontend\\.tmp\\ingest\\atlas-data-files.md",
+    "1b1ce423891428e6": "sveltekit-frontend\\docs\\todo\\gpu_karpathy_feature_mapping_atlas_plan.md",
+    "22904a7e8de836a0": "sveltekit-frontend\\.github\\claude.md",
+    "5b1ce52598b775af": "deeds_labs\\projects\\legacy-projects\\documents\\COMPONENT_ARCHITECTURE_ANALYSIS2.md",
+    "ea157a37d8e5b4b3": "docs\\reports\\parent-atlas-crosswalk.md",
+    "6e483fae819f00b8": "sveltekit-frontend\\AGENTS.md",
+    "c51c3c7f494109e6": "docs\\session-notes\\59_26cudagraphdeepresearch.txt",
+    "e5787eba58b575aa": "deeds_labs\\frontend\\sveltekit-frontend-archive\\dirs\\deeds_labs\\kiro-archive\\specs\\svelte5-error-remediation\\requirements.md",
+    "bac13c2ded6ad8d3": "docs\\session-notes\\parentatlast_pt3_52226.txt",
+    "216d8bd3c613c735": "docs\\session-notes\\todo_56_-pt1.txt",
+    "344d75bc100acdb4": "docs\\session-notes\\reviewtableforrefernce_4926.txt",
+    "4f023052299e1b1f": "docs\\session-notes\\520_26__.txt",
+    "c7afb61d12d2f0f7": "docs\\parent-atlas-100pct-next-steps.md",
+    "3580f33c0dc2080d": "docs\\reports\\sessions\\MD_TASK_AUDIT_REPORT.md",
+    "c905af8bae54b8d3": "docs\\session-notes\\errforfixinggemini_31.txt",
+    "d863307bfb2349ea": "docs\\session-notes\\5_19_26_todopt2.txt",
+    "417cc6f0727f8a6f": "docs\\session-notes\\5_7_26.txt",
+    "4be07683245046d6": "docs\\session-notes\\auto_uploadanalysis_4326.txt",
+    "a7472f13eb6037d9": "docs\\session-notes\\331_26.txt",
+    "aa6fc6f316acb163": "docs\\session-notes\\328_26.txt",
+    "621c91ec91b31f95": "docs\\session-notes\\522_26_todo_phases.txt",
+    "155c92982bcc6a19": "docs\\session-notes\\npmrundevfull_51026.txt",
+    "e3d2419972c34661": "docs\\session-notes\\419_26next_steps.txt",
+    "b90b5703eaa40fc3": "docs\\session-notes\\517_26_llmwikikarapathy.txt",
+    "1f89f88838c1516b": "docs\\session-notes\\todo_desktop_needspathmaping_clusterdirectory_fast521.txt",
+    "10f58deb9e9aa745": "docs\\session-notes\\nes_cache_wipgrpo.txt",
+    "72c355fb2ea7f4fe": "docs\\session-notes\\320ragkagdag.txt",
+    "0986e4da4a0c5fbc": "docs\\session-notes\\cudagraph_519implemntation.txt",
+    "17cff96e3627b85d": "docs\\session-notes\\423_whatdwedo.txt",
+    "99adcb83501e10fe": "deeds_labs\\frontend\\sveltekit-frontend-archive\\dirs\\deeds_labs\\kiro-archive\\specs\\agentic-error-analysis-diffs\\API_DOCUMENTATION.md",
+    "f6c5f473eb5260c0": "docs\\session-notes\\46_next_steps_26.txt",
+    "a5fdb19fab930b64": "claude-mem\\CLAUDE.md",
+    "9e5513fd6751b154": "docs\\session-notes\\59_26.txt",
+    "fc70717c0908948f": "docs\\session-notes\\32726.txt",
+    "80db14b8e4334148": "docs\\session-notes\\todopt2_31726.txt",
+    "d29ba7da14eb6732": "docs\\session-notes\\neo4j_57_26.txt",
+    "7a02356b94cd64d0": "docs\\session-notes\\5_23_26_pt_6_todo.txt",
+    "7bf3beb8d12e800b": "deeds_labs\\snapshots\\2026-03-15-v1\\root-session-logs\\1_13_26_codebaseindexer.txt",
+    "797008df1f523f13": "deeds_labs\\projects\\legacy-projects\\documents\\PHASE34B-EXECUTION-PLAN.md",
+    "0a03d9d7ed7ae4f0": "docs\\session-notes\\next_stesp_321.txt",
+    "d8840425d6f28cc6": "deeds_labs\\snapshots\\2026-03-15-v2\\txt-session-logs\\all_routes_12_21.txt",
+    "acc3c3f5395e3678": "docs\\session-notes\\ast_building_421.txt",
+    "9c1e6521d2b80b35": "deeds_labs\\snapshots\\2026-03-15-v1\\root-session-logs\\1_20_26.txt",
+    "2de906782b4c09d7": "docs\\session-notes\\next_steps51026.txt",
+    "a64d899e13ec0353": "claude.md",
+    "9e17b3db108dbe0c": "deeds_labs\\frontend\\sveltekit-frontend-archive\\dirs\\docs\\PHASE78_AST_ARCHITECTURE_DIAGRAM.txt",
+    "9b11e6a27c052ecf": "deeds_labs\\snapshots\\2026-03-15-v2\\md-session-phase\\readme_ast_72_12_1.md",
+    "33184c006a286aa7": "docs\\session-notes\\424_nextsteps.txt",
+    "d5abae3f5a8db189": "deeds_labs\\snapshots\\2026-03-15-v1\\root-session-logs\\12_28_phase89_pt3.txt",
+    "045eca9f79dfce91": "deeds_labs\\snapshots\\2026-03-10\\stale-md-files\\PHASE80_TOP1000_FIXING_PLAN.md",
+    "4a12dd7f760d1da4": "deeds_labs\\projects\\legacy-projects\\documents\\tensorrt-llm-errors-guide.md",
+    "e9320c2ca649d795": "docs\\session-notes\\51726__.txt",
+    "e5e34fc761196e57": "docs\\session-notes\\fileaudit322_26.txt",
+    "8c9f611ae53f923d": "docs\\session-notes\\feature_321_contextgraph_.txt",
+    "8f0db4ca8e1542f6": "deeds_labs\\snapshots\\2026-03-15-v1\\root-phase-docs\\phase76_12_20.txt",
+    "8fad9d5406df4d62": "sveltekit-frontend\\docs\\reports\\codebase-semantic-index-latest.md",
+    "c304ccf9281c8804": "deeds_labs\\frontend\\sveltekit-frontend-archive\\dirs\\deeds_labs\\kiro-archive\\specs\\api-cleanup-corruption-fix\\tasks.md",
+    "1852c043ad66769c": "deeds_labs\\snapshots\\2026-03-15-v1\\root-session-logs\\12_21_25__weekly_knowlesdgebase.txt",
+    "25256e3d4bdb63c7": "deeds_labs\\snapshots\\2026-03-15-v2\\txt-session-logs\\codebaseindex_ui_1_2_26.txt"
+  },
+  "cards": [
     {
       "id": "0d1da1870d5a8375",
-      "score": 0.8212
+      "title": "### Critical Pattern: Error Count Increase is Progress\r \r **Observation:** After fixing syntax errors in `cognitive-cach",
+      "sourceRef": "deeds_labs\\frontend\\sveltekit-frontend-archive\\dirs\\docs\\CLAUDE.md",
+      "score": 0.8205,
+      "signals": {
+        "semantic": 0.494,
+        "recency": 0.976,
+        "errorBoost": 1,
+        "todoBoost": 1,
+        "sourceRefConfidence": 1
+      },
+      "summary": "**Observation:** After fixing syntax errors in `cognitive-cache-integration. ts` and `minio-service.",
+      "selected": true,
+      "compressed": "### ### Critical Pattern: Error Count Increase is Progress\r \r **Observation:** After fixing syntax errors in `cognitive-cach\n**source**: `deeds_labs\\frontend\\sveltekit-frontend-archive\\dirs\\docs\\CLAUDE.md`\n**Observation:** After fixing syntax errors in `cognitive-cache-integration. ts` and `minio-service.\n**errors**: database: \"postgres\";  // ❌ SYNTAX ERROR: semicolon instead of comma",
+      "charCount": 387
     },
     {
       "id": "1f9a61cd4226b691",
-      "score": 0.8207
+      "title": "**Last Updated: May 6, 2026**\r \r Use this execution order for GPU, indexing, cache, and agentic tool-call work:\r \r ### 1",
+      "sourceRef": "sveltekit-frontend\\CLAUDE.md",
+      "score": 0.82,
+      "signals": {
+        "semantic": 0.493,
+        "recency": 0.976,
+        "errorBoost": 1,
+        "todoBoost": 1,
+        "sourceRefConfidence": 1
+      },
+      "summary": "- Expose tool usage in YorHA metadata (`yorha. **Named tools**: `trace.",
+      "selected": true,
+      "compressed": "### **Last Updated: May 6, 2026**\r \r Use this execution order for GPU, indexing, cache, and agentic tool-call work:\r \r ### 1\n**source**: `sveltekit-frontend\\CLAUDE.md`\n- Expose tool usage in YorHA metadata (`yorha. **Named tools**: `trace.",
+      "charCount": 239
+    },
+    {
+      "id": "ab50ab47db6aaa21",
+      "title": "📅 Session Logs & Timelines",
+      "sourceRef": "memory\\atlas\\documents-atlas.latest.md",
+      "score": 0.8066,
+      "signals": {
+        "semantic": 0.511,
+        "recency": 0.976,
+        "errorBoost": 1,
+        "todoBoost": 1,
+        "sourceRefConfidence": 1
+      },
+      "summary": "",
+      "selected": true,
+      "compressed": "### 📅 Session Logs & Timelines\n**source**: `memory\\atlas\\documents-atlas.latest.md`\n**errors**: \"summary\": \"@echo off cd /d \\\"C:\\\\Users\\\\james\\\\Desktop\\\\web-app\\\" start /min powershell -WindowStyle Hidden -ExecutionP | \"summary\": \"yes continue and This error: archiveLargeFile is not defined means your Phase 6E archive path was designed b | \"Error: --domain must be one of: evidence, civil-procedure, torts, contracts, criminal\",",
+      "charCount": 431
+    },
+    {
+      "id": "ef048099204c051a",
+      "title": "password_reset_tokens.user_id: uuid → integer (0 rows in table — matches users.id)",
+      "sourceRef": "CLAUDE.md",
+      "score": 0.7983,
+      "signals": {
+        "semantic": 0.466,
+        "recency": 0.976,
+        "errorBoost": 1,
+        "todoBoost": 1,
+        "sourceRefConfidence": 1
+      },
+      "summary": "password_reset_tokens. user_id: uuid → integer (0 rows in table — matches users.",
+      "selected": true,
+      "compressed": "### password_reset_tokens.user_id: uuid → integer (0 rows in table — matches users.id)\n**source**: `CLAUDE.md`\npassword_reset_tokens. user_id: uuid → integer (0 rows in table — matches users.",
+      "charCount": 191
+    },
+    {
+      "id": "d8dbe06bae100588",
+      "title": "### Common Issues and Solutions\r \r #### TypeScript Errors\r ```yaml\r Missing Dependencies:\r   Error: \"Cannot find module ",
+      "sourceRef": "deeds_labs\\frontend\\sveltekit-frontend-archive\\docs\\docs_readme\\organized-markdown-docs\\.vscode\\claude.md",
+      "score": 0.7977,
+      "signals": {
+        "semantic": 0.506,
+        "recency": 0.976,
+        "errorBoost": 0.819,
+        "todoBoost": 1,
+        "sourceRefConfidence": 1
+      },
+      "summary": "",
+      "selected": true,
+      "compressed": "### ### Common Issues and Solutions\r \r #### TypeScript Errors\r ```yaml\r Missing Dependencies:\r   Error: \"Cannot find module \n**source**: `deeds_labs\\frontend\\sveltekit-frontend-archive\\docs\\docs_readme\\organized-markdown-docs\\.vscode\\claude.md`\n**errors**: Error: \"Cannot find module 'fuse.js'\" | Error: \"Cannot find module 'fuse'\" | Error: \"Cannot find name 'env'\"",
+      "charCount": 365
+    },
+    {
+      "id": "97b62e9e9d7a9d3f",
+      "title": "### Common Issues and Solutions  #### TypeScript Errors  ```yaml Missing Dependencies:   Error: \"Cannot find module 'fus",
+      "sourceRef": "deeds_labs\\frontend\\sveltekit-frontend-archive\\docs\\docs_readme\\organized-markdown-docs\\sveltekit-frontend_.vscode\\claude.md",
+      "score": 0.7964,
+      "signals": {
+        "semantic": 0.503,
+        "recency": 0.976,
+        "errorBoost": 0.819,
+        "todoBoost": 1,
+        "sourceRefConfidence": 1
+      },
+      "summary": "",
+      "selected": true,
+      "compressed": "### ### Common Issues and Solutions  #### TypeScript Errors  ```yaml Missing Dependencies:   Error: \"Cannot find module 'fus\n**source**: `deeds_labs\\frontend\\sveltekit-frontend-archive\\docs\\docs_readme\\organized-markdown-docs\\sveltekit-frontend_.vscode\\claude.md`\n**errors**: Error: \"Cannot find module 'fuse.js'\" | Error: \"Cannot find module 'fuse'\" | Error: \"Cannot find name 'env'\"",
+      "charCount": 384
+    },
+    {
+      "id": "24a063c0fa02cb54",
+      "title": "Session 2026-05-10 — Operational Layer Verified Green",
+      "sourceRef": "sveltekit-frontend\\docs\\master_agents.md",
+      "score": 0.7948,
+      "signals": {
+        "semantic": 0.484,
+        "recency": 0.976,
+        "errorBoost": 0.935,
+        "todoBoost": 1,
+        "sourceRefConfidence": 1
+      },
+      "summary": "| `0013_codeintel_indexes. | `0016_codeintel_schema.",
+      "selected": true,
+      "compressed": "### Session 2026-05-10 — Operational Layer Verified Green\n**source**: `sveltekit-frontend\\docs\\master_agents.md`\n| `0013_codeintel_indexes. | `0016_codeintel_schema.\n**errors**: - ❌ Not installed as a Python package",
+      "charCount": 215
+    },
+    {
+      "id": "b121cace1b867111",
+      "title": "- [x] Create `scripts/atlas/audit-contract-map.mjs`.\r - [x] Create `scripts/atlas/audit-drizzle-meta-hygiene.mjs`.\r - [x",
+      "sourceRef": "docs\\session-notes\\TODO_ATLAS.md",
+      "score": 0.7828,
+      "signals": {
+        "semantic": 0.491,
+        "recency": 0.976,
+        "errorBoost": 0.888,
+        "todoBoost": 1,
+        "sourceRefConfidence": 1
+      },
+      "summary": "- [x] Create `scripts/atlas/audit-contract-map. - [x] Create `scripts/atlas/audit-drizzle-meta-hygiene.",
+      "selected": true,
+      "compressed": "### - [x] Create `scripts/atlas/audit-contract-map.mjs`.\r - [x] Create `scripts/atlas/audit-drizzle-meta-hygiene.mjs`.\r - [x\n**source**: `docs\\session-notes\\TODO_ATLAS.md`\n- [x] Create `scripts/atlas/audit-contract-map. - [x] Create `scripts/atlas/audit-drizzle-meta-hygiene.",
+      "charCount": 275
+    },
+    {
+      "id": "4302c4a782b7095f",
+      "title": "Atlas Data Files Inventory",
+      "sourceRef": "sveltekit-frontend\\.tmp\\ingest\\atlas-data-files.md",
+      "score": 0.7651,
+      "signals": {
+        "semantic": 0.486,
+        "recency": 0.976,
+        "errorBoost": 1,
+        "todoBoost": 1,
+        "sourceRefConfidence": 1
+      },
+      "summary": "Generated: 2026-05-30T23:10:44. cache\\ace\\context-packs\\ace_context_local-json-hit_v1.",
+      "selected": true,
+      "compressed": "### Atlas Data Files Inventory\n**source**: `sveltekit-frontend\\.tmp\\ingest\\atlas-data-files.md`\nGenerated: 2026-05-30T23:10:44. cache\\ace\\context-packs\\ace_context_local-json-hit_v1.",
+      "charCount": 182
+    },
+    {
+      "id": "1b1ce423891428e6",
+      "title": "2. Existing Feature Families",
+      "sourceRef": "sveltekit-frontend\\docs\\todo\\gpu_karpathy_feature_mapping_atlas_plan.md",
+      "score": 0.7292,
+      "signals": {
+        "semantic": 0.511,
+        "recency": 0.976,
+        "errorBoost": 0.435,
+        "todoBoost": 1,
+        "sourceRefConfidence": 1
+      },
+      "summary": "Not raw model KV cache. Use topological sort for dependency order, not semantic similarity.",
+      "selected": true,
+      "compressed": "### 2. Existing Feature Families\n**source**: `sveltekit-frontend\\docs\\todo\\gpu_karpathy_feature_mapping_atlas_plan.md`\nNot raw model KV cache. Use topological sort for dependency order, not semantic similarity.",
+      "charCount": 210
+    },
+    {
+      "id": "22904a7e8de836a0",
+      "title": "🧬 Phase 72 Error Clustering Strategy",
+      "sourceRef": "sveltekit-frontend\\.github\\claude.md",
+      "score": 0.7199,
+      "signals": {
+        "semantic": 0.498,
+        "recency": 0.976,
+        "errorBoost": 0.819,
+        "todoBoost": 0.75,
+        "sourceRefConfidence": 1
+      },
+      "summary": "- `status: number: responseText? - Missing `import type { uploadWithXhr } from '.",
+      "selected": true,
+      "compressed": "### 🧬 Phase 72 Error Clustering Strategy\n**source**: `sveltekit-frontend\\.github\\claude.md`\n- `status: number: responseText? - Missing `import type { uploadWithXhr } from '.",
+      "charCount": 174
+    },
+    {
+      "id": "5b1ce52598b775af",
+      "title": "npx svelte-check --tsconfig ./tsconfig.json\r ```\r \r ### **Error Categories Identified**\r 1. **Syntax Errors (30%)** - Se",
+      "sourceRef": "deeds_labs\\projects\\legacy-projects\\documents\\COMPONENT_ARCHITECTURE_ANALYSIS2.md",
+      "score": 0.7144,
+      "signals": {
+        "semantic": 0.512,
+        "recency": 0.976,
+        "errorBoost": 1,
+        "todoBoost": 1,
+        "sourceRefConfidence": 0.5
+      },
+      "summary": "npx svelte-check --tsconfig . import Button from '$lib/components/ui/Button.",
+      "selected": true,
+      "compressed": "### npx svelte-check --tsconfig ./tsconfig.json\r ```\r \r ### **Error Categories Identified**\r 1. **Syntax Errors (30%)** - Se\n**source**: `deeds_labs\\projects\\legacy-projects\\documents\\COMPONENT_ARCHITECTURE_ANALYSIS2.md`\nnpx svelte-check --tsconfig . import Button from '$lib/components/ui/Button.\n**errors**: // ❌ WRONG - causes preprocessing failure | // ❌ WRONG - Svelte 4 pattern | // ❌ WRONG - missing extensions, wrong paths",
+      "charCount": 430
+    },
+    {
+      "id": "ea157a37d8e5b4b3",
+      "title": "Root → App Crosswalk",
+      "sourceRef": "docs\\reports\\parent-atlas-crosswalk.md",
+      "score": 0.7134,
+      "signals": {
+        "semantic": 0.513,
+        "recency": 0.976,
+        "errorBoost": 0.458,
+        "todoBoost": 1,
+        "sourceRefConfidence": 1
+      },
+      "summary": "Each root lane mapped to the best-matching app features (score ≥ 0. - nextAction: Reconcile against the live codebase atlas and keep labels normalized.",
+      "selected": true,
+      "compressed": "### Root → App Crosswalk\n**source**: `docs\\reports\\parent-atlas-crosswalk.md`\nEach root lane mapped to the best-matching app features (score ≥ 0. - nextAction: Reconcile against the live codebase atlas and keep labels normalized.",
+      "charCount": 229
+    },
+    {
+      "id": "6e483fae819f00b8",
+      "title": "Directory tree map",
+      "sourceRef": "sveltekit-frontend\\AGENTS.md",
+      "score": 0.713,
+      "signals": {
+        "semantic": 0.508,
+        "recency": 0.976,
+        "errorBoost": 1,
+        "todoBoost": 0,
+        "sourceRefConfidence": 1
+      },
+      "summary": "` | 19 | — | — | `_` | `agents_md({ path: \". cache` | 9 | — | — | `_cache` | `agents_md({ path: \".",
+      "selected": true,
+      "compressed": "### Directory tree map\n**source**: `sveltekit-frontend\\AGENTS.md`\n` | 19 | — | — | `_` | `agents_md({ path: \". cache` | 9 | — | — | `_cache` | `agents_md({ path: \".",
+      "charCount": 164
+    },
+    {
+      "id": "c51c3c7f494109e6",
+      "title": "docker volume rm deeds_langfuse_data deeds_clickhouse_data\r ```\r \r Re-enable only if you need to debug a latency regress",
+      "sourceRef": "docs\\session-notes\\59_26cudagraphdeepresearch.txt",
+      "score": 0.7128,
+      "signals": {
+        "semantic": 0.529,
+        "recency": 0.976,
+        "errorBoost": 1,
+        "todoBoost": 1,
+        "sourceRefConfidence": 0.5
+      },
+      "summary": " Redis ace:autoencoder:decoder:weights (OLS from run-tensor-topology-mapreduce. mjs) — EMPTY currently 2.",
+      "selected": true,
+      "compressed": "### docker volume rm deeds_langfuse_data deeds_clickhouse_data\r ```\r \r Re-enable only if you need to debug a latency regress\n**source**: `docs\\session-notes\\59_26cudagraphdeepresearch.txt`\nRe-enable only if you need to debug a latency regression that Redis stats can't explain. Write c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\scripts\\kb\\export-lane-router-training-set.\n**errors**: console.error('[lane-export] Error:', err.message);",
+      "charCount": 446
+    },
+    {
+      "id": "e5787eba58b575aa",
+      "title": "Requirements",
+      "sourceRef": "deeds_labs\\frontend\\sveltekit-frontend-archive\\dirs\\deeds_labs\\kiro-archive\\specs\\svelte5-error-remediation\\requirements.md",
+      "score": 0.7118,
+      "signals": {
+        "semantic": 0.505,
+        "recency": 0.976,
+        "errorBoost": 1,
+        "todoBoost": 1,
+        "sourceRefConfidence": 0.5
+      },
+      "summary": "> As a developer, I want all syntax errors fixed so that TypeScript can parse the codebase successfully. > As a developer, I want all type errors resolved so that TypeScript can type-check the codebase successfully.",
+      "selected": true,
+      "compressed": "### Requirements\n**source**: `deeds_labs\\frontend\\sveltekit-frontend-archive\\dirs\\deeds_labs\\kiro-archive\\specs\\svelte5-error-remediation\\requirements.md`\n> As a developer, I want all syntax errors fixed so that TypeScript can parse the codebase successfully. > As a developer, I want all type errors resolved so that TypeScript can type-check the codebase successfully.",
+      "charCount": 370
+    },
+    {
+      "id": "bac13c2ded6ad8d3",
+      "title": "did we implement all phases of the karapathy gpu codebasse indexing with semantic redisvl cache for bitfrost inference t",
+      "sourceRef": "docs\\session-notes\\parentatlast_pt3_52226.txt",
+      "score": 0.7117,
+      "signals": {
+        "semantic": 0.498,
+        "recency": 0.976,
+        "errorBoost": 0.731,
+        "todoBoost": 0.5,
+        "sourceRefConfidence": 1
+      },
+      "summary": "did we implement all phases of the karapathy gpu codebasse indexing with semantic redisvl cache for bitfrost inference to handle the turbovec ingestion compression for neo4j graphrag couchdb duckdb redis ace nes chrom cards to qdrant centroids kmeans clustering and som autoencode",
+      "selected": true,
+      "compressed": "### did we implement all phases of the karapathy gpu codebasse indexing with semantic redisvl cache for bitfrost inference t\n**source**: `docs\\session-notes\\parentatlast_pt3_52226.txt`\ndid we implement all phases of the karapathy gpu codebasse indexing with semantic redisvl cache for bitfrost inference to handle the turbovec ingestion compression for neo4j graphrag couchdb duckdb redis ace nes chrom cards to qdrant centroids kmeans clustering and som autoencoder ?  find all releva",
+      "charCount": 485
+    },
+    {
+      "id": "216d8bd3c613c735",
+      "title": "### Current VRAM budget (RTX 3060 Ti, gemma4-legal-vlm 5.3GB Q4_K_M)\r \r ```\r Model weights (Q4_K_M):   5.3 GB\r KV cache ",
+      "sourceRef": "docs\\session-notes\\todo_56_-pt1.txt",
+      "score": 0.7107,
+      "signals": {
+        "semantic": 0.523,
+        "recency": 0.976,
+        "errorBoost": 1,
+        "todoBoost": 1,
+        "sourceRefConfidence": 0.5
+      },
+      "summary": "- Effective compression: 512/(16×128×2) = 512/4096 = 12. - With turbo3 on top: 12.",
+      "selected": true,
+      "compressed": "### ### Current VRAM budget (RTX 3060 Ti, gemma4-legal-vlm 5.3GB Q4_K_M)\r \r ```\r Model weights (Q4_K_M):   5.3 GB\r KV cache \n**source**: `docs\\session-notes\\todo_56_-pt1.txt`\n- Effective compression: 512/(16×128×2) = 512/4096 = 12. - With turbo3 on top: 12.\n**errors**: TIER X — Name: PASS ✅ / WARN ⚠️ / FAIL ❌ / SKIP",
+      "charCount": 317
+    },
+    {
+      "id": "344d75bc100acdb4",
+      "title": "path and find the bug.\r What Was Built\r 1. Database Schema Enhancement\r Next Steps (Future Sessions)\r Evidence Upload UI",
+      "sourceRef": "docs\\session-notes\\reviewtableforrefernce_4926.txt",
+      "score": 0.7102,
+      "signals": {
+        "semantic": 0.522,
+        "recency": 0.976,
+        "errorBoost": 1,
+        "todoBoost": 1,
+        "sourceRefConfidence": 0.5
+      },
+      "summary": "path and find the bug. schema-postgres.",
+      "selected": true,
+      "compressed": "### path and find the bug.\r What Was Built\r 1. Database Schema Enhancement\r Next Steps (Future Sessions)\r Evidence Upload UI\n**source**: `docs\\session-notes\\reviewtableforrefernce_4926.txt`\npath and find the bug. schema-postgres.\n**errors**: Per project rules, all GET API routes must return the SAME JSON shape on error as on success. Catch blocks should return | Search for GET handlers in `src/routes/api/` that have catch blocks returning `json({ error: ... }, { status: 500 })` or | return json({ error: 'Failed' }, { status: 500 }); // different shape",
+      "charCount": 557
+    },
+    {
+      "id": "4f023052299e1b1f",
+      "title": "to do, 5_20_26\r \r we already have auth-utilis?\r npm run atlas:build && npm run index:codebase:fast:plan && npmphify:deep",
+      "sourceRef": "docs\\session-notes\\520_26__.txt",
+      "score": 0.7097,
+      "signals": {
+        "semantic": 0.52,
+        "recency": 0.976,
+        "errorBoost": 1,
+        "todoBoost": 1,
+        "sourceRefConfidence": 0.5
+      },
+      "summary": "we already have auth-utilis? npm run atlas:build && npm run index:codebase:fast:plan && npmphify:deep:ingest && npm run graphify:deep:smoke && npm run smokst && npm run smoke:kag && npm run graphify:kag-notes && npm runy:docstore && npm run graphify:authority m continuing from th",
+      "selected": true,
+      "compressed": "### to do, 5_20_26\r \r we already have auth-utilis?\r npm run atlas:build && npm run index:codebase:fast:plan && npmphify:deep\n**source**: `docs\\session-notes\\520_26__.txt`\nwe already have auth-utilis? npm run atlas:build && npm run index:codebase:fast:plan && npmphify:deep:ingest && npm run graphify:deep:smoke && npm run smokst && npm run smoke:kag && npm run graphify:kag-notes && npm runy:docstore && npm run graphify:authority m continuing from the MCP probe quick wi\n**errors**: Error: UNKNOWN: unknown error, open 'C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\docs\\atlas-index\\codebase-at | ⚠️ Redis failed: Vite module runner has been closed. | ⚠️ DB failed: Vite module runner has been closed.",
+      "charCount": 711
+    },
+    {
+      "id": "c7afb61d12d2f0f7",
+      "title": "What Unlocks at 100%",
+      "sourceRef": "docs\\parent-atlas-100pct-next-steps.md",
+      "score": 0.7097,
+      "signals": {
+        "semantic": 0.517,
+        "recency": 0.976,
+        "errorBoost": 0.342,
+        "todoBoost": 1,
+        "sourceRefConfidence": 1
+      },
+      "summary": "The `som_boost` weight (0. 08) currently contributes 0 for ~36% of files.",
+      "selected": true,
+      "compressed": "### What Unlocks at 100%\n**source**: `docs\\parent-atlas-100pct-next-steps.md`\nThe `som_boost` weight (0. 08) currently contributes 0 for ~36% of files.\n**cmds**:\n```\nnpm run karpathy:gpu\n---\nnode scripts/evals/embed-head-to-head.mjs\n```",
+      "charCount": 236
+    },
+    {
+      "id": "3580f33c0dc2080d",
+      "title": "✓ Loaded 79 completed features from MEMORY.md  📄 Found 397 markdown files to audit  ═══════════════════════════════════",
+      "sourceRef": "docs\\reports\\sessions\\MD_TASK_AUDIT_REPORT.md",
+      "score": 0.7092,
+      "signals": {
+        "semantic": 0.519,
+        "recency": 0.976,
+        "errorBoost": 1,
+        "todoBoost": 1,
+        "sourceRefConfidence": 0.5
+      },
+      "summary": "✓ Loaded 79 completed features from MEMORY. 📄 ARCHITECTURAL_CLEANUP_PLAN.",
+      "selected": true,
+      "compressed": "### ✓ Loaded 79 completed features from MEMORY.md  📄 Found 397 markdown files to audit  ═══════════════════════════════════\n**source**: `docs\\reports\\sessions\\MD_TASK_AUDIT_REPORT.md`\n✓ Loaded 79 completed features from MEMORY. 📄 ARCHITECTURAL_CLEANUP_PLAN.",
+      "charCount": 259
+    },
+    {
+      "id": "c905af8bae54b8d3",
+      "title": "3. Tool Merging & Salvaging",
+      "sourceRef": "docs\\session-notes\\errforfixinggemini_31.txt",
+      "score": 0.7092,
+      "signals": {
+        "semantic": 0.519,
+        "recency": 0.976,
+        "errorBoost": 1,
+        "todoBoost": 1,
+        "sourceRefConfidence": 0.5
+      },
+      "summary": "- [ ] **MCP Enhancement**: Add a `recommend_fix` tool to `phase76-mcp-server. mjs` that pulls context from `fix-recommender.",
+      "selected": true,
+      "compressed": "### 3. Tool Merging & Salvaging\n**source**: `docs\\session-notes\\errforfixinggemini_31.txt`\n- [ ] **MCP Enhancement**: Add a `recommend_fix` tool to `phase76-mcp-server. mjs` that pulls context from `fix-recommender.\n**errors**: For FlashAttention 2 on their RTX 3060 Ti, the SM 8.6 architecture does support it, and Ollama enables FA2 automatically",
+      "charCount": 348
+    },
+    {
+      "id": "d863307bfb2349ea",
+      "title": "see you've typed \"test.\"\r Since the application has many interconnected layers (database, AI pipelines, complex frontend",
+      "sourceRef": "docs\\session-notes\\5_19_26_todopt2.txt",
+      "score": 0.7091,
+      "signals": {
+        "semantic": 0.519,
+        "recency": 0.976,
+        "errorBoost": 1,
+        "todoBoost": 1,
+        "sourceRefConfidence": 0.5
+      },
+      "summary": "see you've typed \"test. Since the application has many interconnected layers (database, AI pipelines, complex frontend forms, and microservices), I need a little more context to ensure I test the correct component.",
+      "selected": true,
+      "compressed": "### see you've typed \"test.\"\r Since the application has many interconnected layers (database, AI pipelines, complex frontend\n**source**: `docs\\session-notes\\5_19_26_todopt2.txt`\nsee you've typed \"test. Since the application has many interconnected layers (database, AI pipelines, complex frontend forms, and microservices), I need a little more context to ensure I test the correct component.",
+      "charCount": 392
+    },
+    {
+      "id": "417cc6f0727f8a6f",
+      "title": "ls \"/c/Users/james/Desktop/llama-server-cuda/llama-server.exe\" 2>/dev/null && echo \"FOUND at Desktop\" || echo \"NOT at De",
+      "sourceRef": "docs\\session-notes\\5_7_26.txt",
+      "score": 0.7091,
+      "signals": {
+        "semantic": 0.519,
+        "recency": 0.976,
+        "errorBoost": 1,
+        "todoBoost": 1,
+        "sourceRefConfidence": 0.5
+      },
+      "summary": "ls \"/c/Users/james/Desktop/llama-server-cuda/llama-server. /c/Users/james/Videos/deeds-web-app/sveltekit-frontend/scripts/start-trace-stack.",
+      "selected": true,
+      "compressed": "### ls \"/c/Users/james/Desktop/llama-server-cuda/llama-server.exe\" 2>/dev/null && echo \"FOUND at Desktop\" || echo \"NOT at De\n**source**: `docs\\session-notes\\5_7_26.txt`\nls \"/c/Users/james/Desktop/llama-server-cuda/llama-server. /c/Users/james/Videos/deeds-web-app/sveltekit-frontend/scripts/start-trace-stack.",
+      "charCount": 309
+    },
+    {
+      "id": "4be07683245046d6",
+      "title": "Verification",
+      "sourceRef": "docs\\session-notes\\auto_uploadanalysis_4326.txt",
+      "score": 0.7083,
+      "signals": {
+        "semantic": 0.516,
+        "recency": 0.976,
+        "errorBoost": 1,
+        "todoBoost": 1,
+        "sourceRefConfidence": 0.5
+      },
+      "summary": " Ask \"what is habeas corpus? User has answered your questions: \"The /cases/[id]/chat route already exists with CaseChatPanel using ChatSession.",
+      "selected": true,
+      "compressed": "### Verification\n**source**: `docs\\session-notes\\auto_uploadanalysis_4326.txt`\n Ask \"what is habeas corpus? User has answered your questions: \"The /cases/[id]/chat route already exists with CaseChatPanel using ChatSession.\n**errors**: Failed to save user message DrizzleQueryError: Failed query: insert into \"chat_messages\" (\"id\", \"chat_id\", \"user_id\", \"r | cause: error: relation \"chat_messages\" does not exist | [embedding-client] QUIC/NATS embedding failed: 503",
+      "charCount": 464
+    },
+    {
+      "id": "a7472f13eb6037d9",
+      "title": "Audit all +server.ts files under sveltekit-frontend/src/routes/api/ for catch blocks that return error responses with a ",
+      "sourceRef": "docs\\session-notes\\331_26.txt",
+      "score": 0.7081,
+      "signals": {
+        "semantic": 0.516,
+        "recency": 0.976,
+        "errorBoost": 1,
+        "todoBoost": 1,
+        "sourceRefConfidence": 0.5
+      },
+      "summary": "Audit all +server. ts files under sveltekit-frontend/src/routes/api/ for catch blocks that return error responses with a DIFFERENT data shape than the success response.",
+      "selected": true,
+      "compressed": "### Audit all +server.ts files under sveltekit-frontend/src/routes/api/ for catch blocks that return error responses with a \n**source**: `docs\\session-notes\\331_26.txt`\nAudit all +server. ts files under sveltekit-frontend/src/routes/api/ for catch blocks that return error responses with a DIFFERENT data shape than the success response.\n**errors**: - BAD DEGRADED: `json({ error: 'Failed' }, { status: 500 })` (missing sessions/total keys) | 2. But the catch block returns `json({ error: '...' }, { status: 500 })` WITHOUT including `someKey` | 4:13:19 PM [vite] (client) Pre-transform error: Failed to resolve import \"$lib/services/contextual-intelligence-service\"",
+      "charCount": 666
+    },
+    {
+      "id": "aa6fc6f316acb163",
+      "title": "GRPO Strategy Wizard — 5 files created/modified:\r \r File\tAction\r grpo-types.ts\tCreated — StrategyRecommendation, Strateg",
+      "sourceRef": "docs\\session-notes\\328_26.txt",
+      "score": 0.7069,
+      "signals": {
+        "semantic": 0.512,
+        "recency": 0.976,
+        "errorBoost": 1,
+        "todoBoost": 1,
+        "sourceRefConfidence": 0.5
+      },
+      "summary": "grpo-types. grpo-strategy.",
+      "selected": true,
+      "compressed": "### GRPO Strategy Wizard — 5 files created/modified:\r \r File\tAction\r grpo-types.ts\tCreated — StrategyRecommendation, Strateg\n**source**: `docs\\session-notes\\328_26.txt`\ngrpo-types. grpo-strategy.\n**errors**: Wrap handler bodies in try { ... } catch { return json({ error: '...' }, { status: 500 }) } | Wrap handler bodies in try { ... } catch { return json({ error: '...' }, { status: 500 }) } | Wrap handler bodies in try { ... } catch { return json({ error: '...' }, { status: 500 }) }",
+      "charCount": 487
+    },
+    {
+      "id": "621c91ec91b31f95",
+      "title": "Flow:\r 1. embed incoming prompt\r 2. search nearest cached prompt\r 3. if score >= 0.90, return cached response\r 4. else c",
+      "sourceRef": "docs\\session-notes\\522_26_todo_phases.txt",
+      "score": 0.7061,
+      "signals": {
+        "semantic": 0.51,
+        "recency": 0.976,
+        "errorBoost": 1,
+        "todoBoost": 1,
+        "sourceRefConfidence": 0.5
+      },
+      "summary": " if score >= 0. did we finish this?",
+      "selected": true,
+      "compressed": "### Flow:\r 1. embed incoming prompt\r 2. search nearest cached prompt\r 3. if score >= 0.90, return cached response\r 4. else c\n**source**: `docs\\session-notes\\522_26_todo_phases.txt`\n if score >= 0. did we finish this?",
+      "charCount": 216
+    },
+    {
+      "id": "155c92982bcc6a19",
+      "title": "--profile gpu:  + tensorrt-llm (stop Ollama first!)        (~16GB)",
+      "sourceRef": "docs\\session-notes\\npmrundevfull_51026.txt",
+      "score": 0.7059,
+      "signals": {
+        "semantic": 0.509,
+        "recency": 0.976,
+        "errorBoost": 1,
+        "todoBoost": 1,
+        "sourceRefConfidence": 0.5
+      },
+      "summary": "--profile gpu:  + tensorrt-llm (stop Ollama first!     image: caddy:2.",
+      "selected": true,
+      "compressed": "### --profile gpu:  + tensorrt-llm (stop Ollama first!)        (~16GB)\n**source**: `docs\\session-notes\\npmrundevfull_51026.txt`\n--profile gpu:  + tensorrt-llm (stop Ollama first!     image: caddy:2.\n**errors**: All Docker containers wired\t✅ 25+ services in docker-compose.yml\t❌ broken script\tSee bug below | gRPC (Go search/embed/retrieval)\t✅ 3 Go services in compose\t❌ NOT in dev:full\tUse dev:grpc for the gRPC lane | CUDA server (TensorRT-LLM)\t✅ but behind --profile gpu\t❌ NOT in dev:full\tUse --profile gpu separately",
+      "charCount": 519
+    },
+    {
+      "id": "e3d2419972c34661",
+      "title": "continue with codebase indexing gpu acceleration karapthy llm wiki obision notebok for ace plan ollama making with our g",
+      "sourceRef": "docs\\session-notes\\419_26next_steps.txt",
+      "score": 0.7057,
+      "signals": {
+        "semantic": 0.509,
+        "recency": 0.976,
+        "errorBoost": 1,
+        "todoBoost": 1,
+        "sourceRefConfidence": 0.5
+      },
+      "summary": "continue with codebase indexing gpu acceleration karapthy llm wiki obision notebok for ace plan ollama making with our gemma4 and make sure all vlm tasks work with to do if merging our finetuning with vlm audio all in one works yet?  i thought we did it and got confused with lite",
+      "selected": true,
+      "compressed": "### continue with codebase indexing gpu acceleration karapthy llm wiki obision notebok for ace plan ollama making with our g\n**source**: `docs\\session-notes\\419_26next_steps.txt`\ncontinue with codebase indexing gpu acceleration karapthy llm wiki obision notebok for ace plan ollama making with our gemma4 and make sure all vlm tasks work with to do if merging our finetuning with vlm audio all in one works yet?  i thought we did it and got confused with litert turboquant for cp",
+      "charCount": 479
+    },
+    {
+      "id": "b90b5703eaa40fc3",
+      "title": "npm run atlas:parents:eval        # Re-runs evaluation against the 25-query E2E messy query suite\r Every command is vali",
+      "sourceRef": "docs\\session-notes\\517_26_llmwikikarapathy.txt",
+      "score": 0.7048,
+      "signals": {
+        "semantic": 0.506,
+        "recency": 0.976,
+        "errorBoost": 1,
+        "todoBoost": 1,
+        "sourceRefConfidence": 0.5
+      },
+      "summary": "Every command is validated, integrated, and fully operational.  You now possess a stateful, reproducible AI system built to survive any workstation teardown or rebuild!",
+      "selected": true,
+      "compressed": "### npm run atlas:parents:eval        # Re-runs evaluation against the 25-query E2E messy query suite\r Every command is vali\n**source**: `docs\\session-notes\\517_26_llmwikikarapathy.txt`\nEvery command is validated, integrated, and fully operational.  You now possess a stateful, reproducible AI system built to survive any workstation teardown or rebuild!\n**errors**: <tool_use_error>Error: No such tool available: Bash. Bash exists but is not enabled in this context. Use one of the avai",
+      "charCount": 487
+    },
+    {
+      "id": "1f89f88838c1516b",
+      "title": "Priority Tasks",
+      "sourceRef": "docs\\session-notes\\todo_desktop_needspathmaping_clusterdirectory_fast521.txt",
+      "score": 0.7041,
+      "signals": {
+        "semantic": 0.504,
+        "recency": 0.976,
+        "errorBoost": 1,
+        "todoBoost": 1,
+        "sourceRefConfidence": 0.5
+      },
+      "summary": "agent/workflows/agentic-error-fixing. agent/workflows/agentic-error-fixing.",
+      "selected": true,
+      "compressed": "### Priority Tasks\n**source**: `docs\\session-notes\\todo_desktop_needspathmaping_clusterdirectory_fast521.txt`\nagent/workflows/agentic-error-fixing. agent/workflows/agentic-error-fixing.",
+      "charCount": 185
+    },
+    {
+      "id": "10f58deb9e9aa745",
+      "title": "{\"step_index\":0,\"source\":\"USER_EXPLICIT\",\"type\":\"USER_INPUT\",\"status\":\"DONE\",\"created_at\":\"2026-05-19T21:36:41Z\",\"conten",
+      "sourceRef": "docs\\session-notes\\nes_cache_wipgrpo.txt",
+      "score": 0.7038,
+      "signals": {
+        "semantic": 0.503,
+        "recency": 0.976,
+        "errorBoost": 1,
+        "todoBoost": 1,
+        "sourceRefConfidence": 0.5
+      },
+      "summary": "{\"step_index\":0,\"source\":\"USER_EXPLICIT\",\"type\":\"USER_INPUT\",\"status\":\"DONE\",\"created_at\":\"2026-05-19T21:36:41Z\",\"content\":\"<USER_REQUEST>\\nExtend generate-module-cartridges. mjs to generate cartridge metadata.",
+      "selected": true,
+      "compressed": "### {\"step_index\":0,\"source\":\"USER_EXPLICIT\",\"type\":\"USER_INPUT\",\"status\":\"DONE\",\"created_at\":\"2026-05-19T21:36:41Z\",\"conten\n**source**: `docs\\session-notes\\nes_cache_wipgrpo.txt`\n{\"step_index\":0,\"source\":\"USER_EXPLICIT\",\"type\":\"USER_INPUT\",\"status\":\"DONE\",\"created_at\":\"2026-05-19T21:36:41Z\",\"content\":\"<USER_REQUEST>\\nExtend generate-module-cartridges. mjs to generate cartridge metadata.\n**errors**: {\"step_index\":23,\"source\":\"MODEL\",\"type\":\"VIEW_FILE\",\"status\":\"DONE\",\"created_at\":\"2026-05-19T21:37:43Z\",\"content\":\"Crea",
+      "charCount": 523
+    },
+    {
+      "id": "72c355fb2ea7f4fe",
+      "title": "Full Audit Results\r Search Pipeline: ALL WIRED\r Component\tVerdict\r Ripgrep\tWIRED — real rg binary spawn, MCP tool\r RAG\tW",
+      "sourceRef": "docs\\session-notes\\320ragkagdag.txt",
+      "score": 0.7012,
+      "signals": {
+        "semantic": 0.496,
+        "recency": 0.976,
+        "errorBoost": 1,
+        "todoBoost": 1,
+        "sourceRefConfidence": 0.5
+      },
+      "summary": "DAG\tWIRED — Kahn's topological sort via ? Chunking: legal-chunker.",
+      "selected": true,
+      "compressed": "### Full Audit Results\r Search Pipeline: ALL WIRED\r Component\tVerdict\r Ripgrep\tWIRED — real rg binary spawn, MCP tool\r RAG\tW\n**source**: `docs\\session-notes\\320ragkagdag.txt`\nDAG\tWIRED — Kahn's topological sort via ? Chunking: legal-chunker.",
+      "charCount": 241
+    },
+    {
+      "id": "0986e4da4a0c5fbc",
+      "title": "{\"step_index\":0,\"source\":\"USER_EXPLICIT\",\"type\":\"USER_INPUT\",\"status\":\"DONE\",\"created_at\":\"2026-05-19T21:36:41Z\",\"conten",
+      "sourceRef": "docs\\session-notes\\cudagraph_519implemntation.txt",
+      "score": 0.701,
+      "signals": {
+        "semantic": 0.495,
+        "recency": 0.976,
+        "errorBoost": 1,
+        "todoBoost": 1,
+        "sourceRefConfidence": 0.5
+      },
+      "summary": "{\"step_index\":0,\"source\":\"USER_EXPLICIT\",\"type\":\"USER_INPUT\",\"status\":\"DONE\",\"created_at\":\"2026-05-19T21:36:41Z\",\"content\":\"<USER_REQUEST>\\nInspect simd-bridge/cpp/libtorch_graph. cc to check the CUDA graph structure.",
+      "selected": true,
+      "compressed": "### {\"step_index\":0,\"source\":\"USER_EXPLICIT\",\"type\":\"USER_INPUT\",\"status\":\"DONE\",\"created_at\":\"2026-05-19T21:36:41Z\",\"conten\n**source**: `docs\\session-notes\\cudagraph_519implemntation.txt`\n{\"step_index\":0,\"source\":\"USER_EXPLICIT\",\"type\":\"USER_INPUT\",\"status\":\"DONE\",\"created_at\":\"2026-05-19T21:36:41Z\",\"content\":\"<USER_REQUEST>\\nInspect simd-bridge/cpp/libtorch_graph. cc to check the CUDA graph structure.\n**errors**: {\"step_index\":31,\"source\":\"MODEL\",\"type\":\"VIEW_FILE\",\"status\":\"DONE\",\"created_at\":\"2026-05-19T21:38:14Z\",\"content\":\"Crea | {\"step_index\":58,\"source\":\"MODEL\",\"type\":\"VIEW_FILE\",\"status\":\"DONE\",\"created_at\":\"2026-05-19T21:42:35Z\",\"content\":\"Crea",
+      "charCount": 662
+    },
+    {
+      "id": "17cff96e3627b85d",
+      "title": "Docker service health check.\r \r VS Code tasks.json changes (last 3 days) — 4 commits touched it, adding:\r \r \"Dev Server ",
+      "sourceRef": "docs\\session-notes\\423_whatdwedo.txt",
+      "score": 0.701,
+      "signals": {
+        "semantic": 0.495,
+        "recency": 0.976,
+        "errorBoost": 1,
+        "todoBoost": 1,
+        "sourceRefConfidence": 0.5
+      },
+      "summary": "Docker service health check. VS Code tasks.",
+      "selected": true,
+      "compressed": "### Docker service health check.\r \r VS Code tasks.json changes (last 3 days) — 4 commits touched it, adding:\r \r \"Dev Server \n**source**: `docs\\session-notes\\423_whatdwedo.txt`\nDocker service health check. VS Code tasks.",
+      "charCount": 219
+    },
+    {
+      "id": "99adcb83501e10fe",
+      "title": "Endpoints",
+      "sourceRef": "deeds_labs\\frontend\\sveltekit-frontend-archive\\dirs\\deeds_labs\\kiro-archive\\specs\\agentic-error-analysis-diffs\\API_DOCUMENTATION.md",
+      "score": 0.7004,
+      "signals": {
+        "semantic": 0.55,
+        "recency": 0.976,
+        "errorBoost": 0.819,
+        "todoBoost": 1,
+        "sourceRefConfidence": 0.5
+      },
+      "summary": "Analyzes a TypeScript or Svelte error and provides intelligent suggestions for fixes. Generates a code patch for a selected fix from a previous analysis.",
+      "selected": true,
+      "compressed": "### Endpoints\n**source**: `deeds_labs\\frontend\\sveltekit-frontend-archive\\dirs\\deeds_labs\\kiro-archive\\specs\\agentic-error-analysis-diffs\\API_DOCUMENTATION.md`\nAnalyzes a TypeScript or Svelte error and provides intelligent suggestions for fixes. Generates a code patch for a selected fix from a previous analysis.",
+      "charCount": 313
+    },
+    {
+      "id": "f6c5f473eb5260c0",
+      "title": "review these edits \r The UI pages show 500 errors (pre-existing nodejs-whisper path resolution issue — unrelated to our ",
+      "sourceRef": "docs\\session-notes\\46_next_steps_26.txt",
+      "score": 0.7,
+      "signals": {
+        "semantic": 0.511,
+        "recency": 0.976,
+        "errorBoost": 0.958,
+        "todoBoost": 1,
+        "sourceRefConfidence": 0.5
+      },
+      "summary": "The UI pages show 500 errors (pre-existing nodejs-whisper path resolution issue — unrelated to our agent changes).  The API tests are the key results here.",
+      "selected": true,
+      "compressed": "### review these edits \r The UI pages show 500 errors (pre-existing nodejs-whisper path resolution issue — unrelated to our \n**source**: `docs\\session-notes\\46_next_steps_26.txt`\nThe UI pages show 500 errors (pre-existing nodejs-whisper path resolution issue — unrelated to our agent changes).  The API tests are the key results here.",
+      "charCount": 334
+    },
+    {
+      "id": "a5fdb19fab930b64",
+      "title": "Exit Code Strategy",
+      "sourceRef": "claude-mem\\CLAUDE.md",
+      "score": 0.6994,
+      "signals": {
+        "semantic": 0.485,
+        "recency": 0.976,
+        "errorBoost": 0.546,
+        "todoBoost": 1,
+        "sourceRefConfidence": 1
+      },
+      "summary": "**Philosophy**: Worker/hook errors exit with code 0 to prevent Windows Terminal tab accumulation.  The wrapper/plugin layer handles restart logic.",
+      "selected": true,
+      "compressed": "### Exit Code Strategy\n**source**: `claude-mem\\CLAUDE.md`\n**Philosophy**: Worker/hook errors exit with code 0 to prevent Windows Terminal tab accumulation.  The wrapper/plugin layer handles restart logic.",
+      "charCount": 204
+    },
+    {
+      "id": "9e5513fd6751b154",
+      "title": "uick grep verification\r IN\r pkill -f \"tsx.*esm/api\" 2>/dev/null; pkill -f \"node -e\" 2>/dev/null; sleep 1\r echo \"=== disc",
+      "sourceRef": "docs\\session-notes\\59_26.txt",
+      "score": 0.6991,
+      "signals": {
+        "semantic": 0.49,
+        "recency": 0.976,
+        "errorBoost": 1,
+        "todoBoost": 1,
+        "sourceRefConfidence": 0.5
+      },
+      "summary": "pkill -f \"tsx. grep -n \"BROWSER_CONTEXT_DISCLAIMER\" src/lib/server/admin/ai-chat-service.",
+      "selected": true,
+      "compressed": "### uick grep verification\r IN\r pkill -f \"tsx.*esm/api\" 2>/dev/null; pkill -f \"node -e\" 2>/dev/null; sleep 1\r echo \"=== disc\n**source**: `docs\\session-notes\\59_26.txt`\npkill -f \"tsx. grep -n \"BROWSER_CONTEXT_DISCLAIMER\" src/lib/server/admin/ai-chat-service.\n**errors**: kag.ingest_error MCP tool → writes to error_fingerprints Postgres + ace:error:* Redis with 24h TTL",
+      "charCount": 368
+    },
+    {
+      "id": "fc70717c0908948f",
+      "title": "List simulation frontend files\r IN\r ls c:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/routes/\\(app\\)/simulat",
+      "sourceRef": "docs\\session-notes\\32726.txt",
+      "score": 0.6985,
+      "signals": {
+        "semantic": 0.488,
+        "recency": 0.976,
+        "errorBoost": 1,
+        "todoBoost": 1,
+        "sourceRefConfidence": 0.5
+      },
+      "summary": "Two errors to fix.  Let me read the simulation frontend files and address them.",
+      "selected": true,
+      "compressed": "### List simulation frontend files\r IN\r ls c:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/routes/\\(app\\)/simulat\n**source**: `docs\\session-notes\\32726.txt`\nTwo errors to fix.  Let me read the simulation frontend files and address them.",
+      "charCount": 247
+    },
+    {
+      "id": "80db14b8e4334148",
+      "title": "2023_2024caliLegIndex.pdf is the same file as California_Legislative_Index_2023-24.pdf — it's the original filename stil",
+      "sourceRef": "docs\\session-notes\\todopt2_31726.txt",
+      "score": 0.6979,
+      "signals": {
+        "semantic": 0.505,
+        "recency": 0.976,
+        "errorBoost": 0.958,
+        "todoBoost": 1,
+        "sourceRefConfidence": 0.5
+      },
+      "summary": "2023_2024caliLegIndex. pdf is the same file as California_Legislative_Index_2023-24.",
+      "selected": true,
+      "compressed": "### 2023_2024caliLegIndex.pdf is the same file as California_Legislative_Index_2023-24.pdf — it's the original filename stil\n**source**: `docs\\session-notes\\todopt2_31726.txt`\n2023_2024caliLegIndex. pdf is the same file as California_Legislative_Index_2023-24.\n**errors**: ❌ Failed: relation \"library_documents\" does not exist | ❌ Failed: relation \"library_documents\" does not exist | ❌ Failed: relation \"library_documents\" does not exist",
+      "charCount": 438
+    },
+    {
+      "id": "d29ba7da14eb6732",
+      "title": "Full test run results. All commands from `sveltekit-frontend/`.\r \r ### Stage 1: PageRank\r \r **Command:** `NEO4J_PASSWORD",
+      "sourceRef": "docs\\session-notes\\neo4j_57_26.txt",
+      "score": 0.6971,
+      "signals": {
+        "semantic": 0.484,
+        "recency": 0.976,
+        "errorBoost": 1,
+        "todoBoost": 1,
+        "sourceRefConfidence": 0.5
+      },
+      "summary": "Full test run results.  All commands from `sveltekit-frontend/`.",
+      "selected": true,
+      "compressed": "### Full test run results. All commands from `sveltekit-frontend/`.\r \r ### Stage 1: PageRank\r \r **Command:** `NEO4J_PASSWORD\n**source**: `docs\\session-notes\\neo4j_57_26.txt`\nFull test run results.  All commands from `sveltekit-frontend/`.",
+      "charCount": 238
+    },
+    {
+      "id": "7a02356b94cd64d0",
+      "title": "yes continue and \r This error:\r archiveLargeFile is not defined\r means your Phase 6E archive path was designed but never",
+      "sourceRef": "docs\\session-notes\\5_23_26_pt_6_todo.txt",
+      "score": 0.6969,
+      "signals": {
+        "semantic": 0.492,
+        "recency": 0.976,
+        "errorBoost": 0.981,
+        "todoBoost": 1,
+        "sourceRefConfidence": 0.5
+      },
+      "summary": "means your Phase 6E archive path was designed but never implemented. scripts/atlas/archive-large-file.",
+      "selected": true,
+      "compressed": "### yes continue and \r This error:\r archiveLargeFile is not defined\r means your Phase 6E archive path was designed but never\n**source**: `docs\\session-notes\\5_23_26_pt_6_todo.txt`\nmeans your Phase 6E archive path was designed but never implemented. scripts/atlas/archive-large-file.\n**errors**: This error: | error: err.message",
+      "charCount": 327
+    },
+    {
+      "id": "7bf3beb8d12e800b",
+      "title": "What would you like to tackle first?\r \r Generate file cleanup script?\r Fix Qdrant query to work with actual payload stru",
+      "sourceRef": "deeds_labs\\snapshots\\2026-03-15-v1\\root-session-logs\\1_13_26_codebaseindexer.txt",
+      "score": 0.6954,
+      "signals": {
+        "semantic": 0.537,
+        "recency": 0.976,
+        "errorBoost": 1,
+        "todoBoost": 1,
+        "sourceRefConfidence": 0.5
+      },
+      "summary": "What would you like to tackle first? Generate file cleanup script?",
+      "selected": true,
+      "compressed": "### What would you like to tackle first?\r \r Generate file cleanup script?\r Fix Qdrant query to work with actual payload stru\n**source**: `deeds_labs\\snapshots\\2026-03-15-v1\\root-session-logs\\1_13_26_codebaseindexer.txt`\nWhat would you like to tackle first? Generate file cleanup script?\n**errors**: SyntaxError: Unexpected reserved word | : Line 16: maxRetries: number; validationTimeout: number; backupDir: string; - Valid. Line 20: success: boolean; strateg | has specific corruption. I will create scripts/fix-comma-syntax.mjs to target errors, string[] and error: garbage.",
+      "charCount": 576
+    },
+    {
+      "id": "797008df1f523f13",
+      "title": "✨ Next Actions (In Order)",
+      "sourceRef": "deeds_labs\\projects\\legacy-projects\\documents\\PHASE34B-EXECUTION-PLAN.md",
+      "score": 0.6949,
+      "signals": {
+        "semantic": 0.534,
+        "recency": 0.976,
+        "errorBoost": 0.819,
+        "todoBoost": 1,
+        "sourceRefConfidence": 0.5
+      },
+      "summary": "  - Error count: Reduced?  By how much?",
+      "selected": true,
+      "compressed": "### ✨ Next Actions (In Order)\n**source**: `deeds_labs\\projects\\legacy-projects\\documents\\PHASE34B-EXECUTION-PLAN.md`\n  - Error count: Reduced?  By how much?",
+      "charCount": 156
+    },
+    {
+      "id": "0a03d9d7ed7ae4f0",
+      "title": "ce — this is exactly the kind of system-level thinking your stack needs right now. I read your attached log + notes, and",
+      "sourceRef": "docs\\session-notes\\next_stesp_321.txt",
+      "score": 0.6935,
+      "signals": {
+        "semantic": 0.51,
+        "recency": 0.976,
+        "errorBoost": 1,
+        "todoBoost": 1,
+        "sourceRefConfidence": 0.5
+      },
+      "summary": "ce — this is exactly the kind of system-level thinking your stack needs right now.  I read your attached log + notes, and here’s the real picture + what to do next (clean, production direction).",
+      "selected": true,
+      "compressed": "### ce — this is exactly the kind of system-level thinking your stack needs right now. I read your attached log + notes, and\n**source**: `docs\\session-notes\\next_stesp_321.txt`\nce — this is exactly the kind of system-level thinking your stack needs right now.  I read your attached log + notes, and here’s the real picture + what to do next (clean, production direction).\n**errors**: ❌ Current problem | // ❌ REMOVE LLM call | // ❌ REMOVE heavy embedding generation",
+      "charCount": 465
+    },
+    {
+      "id": "d8840425d6f28cc6",
+      "title": "Create embeddings for semantic search",
+      "sourceRef": "deeds_labs\\snapshots\\2026-03-15-v2\\txt-session-logs\\all_routes_12_21.txt",
+      "score": 0.6927,
+      "signals": {
+        "semantic": 0.529,
+        "recency": 0.976,
+        "errorBoost": 1,
+        "todoBoost": 1,
+        "sourceRefConfidence": 0.5
+      },
+      "summary": "I will rewrite the prompt logic forExported to phase78-patches. json and phase78-patches.",
+      "selected": true,
+      "compressed": "### Create embeddings for semantic search\n**source**: `deeds_labs\\snapshots\\2026-03-15-v2\\txt-session-logs\\all_routes_12_21.txt`\nI will rewrite the prompt logic forExported to phase78-patches. json and phase78-patches.\n**errors**: Patch quality: ❌ Incomplete (LLM generation failed or was truncated)",
+      "charCount": 299
+    },
+    {
+      "id": "acc3c3f5395e3678",
+      "title": "continue we need to ingest the ast graph after for hit redis hits using bitfrost? I've completed the research into your ",
+      "sourceRef": "docs\\session-notes\\ast_building_421.txt",
+      "score": 0.6918,
+      "signals": {
+        "semantic": 0.505,
+        "recency": 0.976,
+        "errorBoost": 1,
+        "todoBoost": 1,
+        "sourceRefConfidence": 0.5
+      },
+      "summary": "continue we need to ingest the ast graph after for hit redis hits using bitfrost?  I've completed the research into your request for \"Phase 66/89\" infrastructure and the \"awk deeds_lab\" search.",
+      "selected": true,
+      "compressed": "### continue we need to ingest the ast graph after for hit redis hits using bitfrost? I've completed the research into your \n**source**: `docs\\session-notes\\ast_building_421.txt`\ncontinue we need to ingest the ast graph after for hit redis hits using bitfrost?  I've completed the research into your request for \"Phase 66/89\" infrastructure and the \"awk deeds_lab\" search.\n**errors**: failed: 0,",
+      "charCount": 395
+    },
+    {
+      "id": "9c1e6521d2b80b35",
+      "title": "changes you saw—particularly the extensive edits to EvidenceCard.svelte and EvidenceCanvas.svelte—were to fix import err",
+      "sourceRef": "deeds_labs\\snapshots\\2026-03-15-v1\\root-session-logs\\1_20_26.txt",
+      "score": 0.6917,
+      "signals": {
+        "semantic": 0.526,
+        "recency": 0.976,
+        "errorBoost": 1,
+        "todoBoost": 1,
+        "sourceRefConfidence": 0.5
+      },
+      "summary": "changes you saw—particularly the extensive edits to EvidenceCard. svelte and EvidenceCanvas.",
+      "selected": true,
+      "compressed": "### changes you saw—particularly the extensive edits to EvidenceCard.svelte and EvidenceCanvas.svelte—were to fix import err\n**source**: `deeds_labs\\snapshots\\2026-03-15-v1\\root-session-logs\\1_20_26.txt`\nchanges you saw—particularly the extensive edits to EvidenceCard. svelte and EvidenceCanvas.\n**errors**: Error: No value exists in scope for the shorthand property 'scope'. Either declare one or provide an initializer. | Error: Cannot find name 'args'. | Error: Declaration or statement expected.",
+      "charCount": 500
+    },
+    {
+      "id": "2de906782b4c09d7",
+      "title": "next_steps_510_26\r \"Match RotorQuant to SvelteKit 2\"\r Category mismatch — RotorQuant is a llama-server binary swap. Svel",
+      "sourceRef": "docs\\session-notes\\next_steps51026.txt",
+      "score": 0.6913,
+      "signals": {
+        "semantic": 0.504,
+        "recency": 0.976,
+        "errorBoost": 1,
+        "todoBoost": 1,
+        "sourceRefConfidence": 0.5
+      },
+      "summary": "Category mismatch — RotorQuant is a llama-server binary swap.  SvelteKit only sees it through bifrostChat() in $lib/server/ollama.",
+      "selected": true,
+      "compressed": "### next_steps_510_26\r \"Match RotorQuant to SvelteKit 2\"\r Category mismatch — RotorQuant is a llama-server binary swap. Svel\n**source**: `docs\\session-notes\\next_steps51026.txt`\nCategory mismatch — RotorQuant is a llama-server binary swap.  SvelteKit only sees it through bifrostChat() in $lib/server/ollama.\n**errors**: ❌ CUDA Graph capture for attentionScoreGPU (deferred behind Nsight baseline) | ❌ RotorQuant Gemma 4 head_dim verification (1-day spike) | ❌ ARCHITECTURE.md mapping 75+ server subsystems → feature domains (PR-7, deferred)",
+      "charCount": 541
+    },
+    {
+      "id": "a64d899e13ec0353",
+      "title": "- **ioredis cold-start in startup scripts**: `legal-ai-redis` Docker container may start *after* folderOpen pipelines fi",
+      "sourceRef": "claude.md",
+      "score": 0.69,
+      "signals": {
+        "semantic": 0.492,
+        "recency": 0.679,
+        "errorBoost": 1,
+        "todoBoost": 0,
+        "sourceRefConfidence": 1
+      },
+      "summary": "- **ioredis cold-start in startup scripts**: `legal-ai-redis` Docker container may start *after* folderOpen pipelines fire.  Default ioredis behavior reconnects forever and spams unhandled `error` events.",
+      "selected": true,
+      "compressed": "### - **ioredis cold-start in startup scripts**: `legal-ai-redis` Docker container may start *after* folderOpen pipelines fi\n**source**: `claude.md`\n- **ioredis cold-start in startup scripts**: `legal-ai-redis` Docker container may start *after* folderOpen pipelines fire.  Default ioredis behavior reconnects forever and spams unhandled `error` events.",
+      "charCount": 353
+    },
+    {
+      "id": "9e17b3db108dbe0c",
+      "title": "```\r ┌─────────────────────────────────────────────────────────────────────────────┐\r │                   PHASE 78: AST-",
+      "sourceRef": "deeds_labs\\frontend\\sveltekit-frontend-archive\\dirs\\docs\\PHASE78_AST_ARCHITECTURE_DIAGRAM.txt",
+      "score": 0.69,
+      "signals": {
+        "semantic": 0.5,
+        "recency": 0.976,
+        "errorBoost": 0.865,
+        "todoBoost": 1,
+        "sourceRefConfidence": 0.5
+      },
+      "summary": "",
+      "selected": true,
+      "compressed": "### ```\r ┌─────────────────────────────────────────────────────────────────────────────┐\r │                   PHASE 78: AST-\n**source**: `deeds_labs\\frontend\\sveltekit-frontend-archive\\dirs\\docs\\PHASE78_AST_ARCHITECTURE_DIAGRAM.txt`\n**errors**: ❌ Regex parse log → Count errors per file → Fix randomly | ❌ No understanding of code structure | ❌ No dependency awareness",
+      "charCount": 368
+    },
+    {
+      "id": "9b11e6a27c052ecf",
+      "title": "Phase 72 · AST Checkpoint 12.1 — Next Steps\r =========================================\r \r Context Snapshot\r ------------",
+      "sourceRef": "deeds_labs\\snapshots\\2026-03-15-v2\\md-session-phase\\readme_ast_72_12_1.md",
+      "score": 0.69,
+      "signals": {
+        "semantic": 0.521,
+        "recency": 0.976,
+        "errorBoost": 1,
+        "todoBoost": 1,
+        "sourceRefConfidence": 0.5
+      },
+      "summary": "Phase 72 · AST Checkpoint 12. - Latest `svelte-check` run dies before diagnostics because `js_tests/svelte.",
+      "selected": true,
+      "compressed": "### Phase 72 · AST Checkpoint 12.1 — Next Steps\r =========================================\r \r Context Snapshot\r ------------\n**source**: `deeds_labs\\snapshots\\2026-03-15-v2\\md-session-phase\\readme_ast_72_12_1.md`\nPhase 72 · AST Checkpoint 12. - Latest `svelte-check` run dies before diagnostics because `js_tests/svelte.",
+      "charCount": 320
+    },
+    {
+      "id": "33184c006a286aa7",
+      "title": "hese tables ARE in Drizzle migrations (they were already generated when schema-postgres.ts was the single source), so th",
+      "sourceRef": "docs\\session-notes\\424_nextsteps.txt",
+      "score": 0.6896,
+      "signals": {
+        "semantic": 0.511,
+        "recency": 0.976,
+        "errorBoost": 0.888,
+        "todoBoost": 1,
+        "sourceRefConfidence": 0.5
+      },
+      "summary": "hese tables ARE in Drizzle migrations (they were already generated when schema-postgres. ts was the single source), so they do exist in Postgres.",
+      "selected": true,
+      "compressed": "### hese tables ARE in Drizzle migrations (they were already generated when schema-postgres.ts was the single source), so th\n**source**: `docs\\session-notes\\424_nextsteps.txt`\nhese tables ARE in Drizzle migrations (they were already generated when schema-postgres. ts was the single source), so they do exist in Postgres.",
+      "charCount": 321
+    },
+    {
+      "id": "d5abae3f5a8db189",
+      "title": "Or run individual steps:",
+      "sourceRef": "deeds_labs\\snapshots\\2026-03-15-v1\\root-session-logs\\12_28_phase89_pt3.txt",
+      "score": 0.6896,
+      "signals": {
+        "semantic": 0.52,
+        "recency": 0.976,
+        "errorBoost": 1,
+        "todoBoost": 1,
+        "sourceRefConfidence": 0.5
+      },
+      "summary": "node scripts/phase89-incremental-embedder. mjs svelte-check .",
+      "selected": true,
+      "compressed": "### Or run individual steps:\n**source**: `deeds_labs\\snapshots\\2026-03-15-v1\\root-session-logs\\12_28_phase89_pt3.txt`\nnode scripts/phase89-incremental-embedder. mjs svelte-check .",
+      "charCount": 179
+    },
+    {
+      "id": "045eca9f79dfce91",
+      "title": "After chunk complete",
+      "sourceRef": "deeds_labs\\snapshots\\2026-03-10\\stale-md-files\\PHASE80_TOP1000_FIXING_PLAN.md",
+      "score": 0.6894,
+      "signals": {
+        "semantic": 0.508,
+        "recency": 0.976,
+        "errorBoost": 0.842,
+        "todoBoost": 1,
+        "sourceRefConfidence": 0.5
+      },
+      "summary": "npx svelte-check --output machine 2>&1 > logs/errors/phase80-post-chunk0. - One commit per critical file (P0.",
+      "selected": true,
+      "compressed": "### After chunk complete\n**source**: `deeds_labs\\snapshots\\2026-03-10\\stale-md-files\\PHASE80_TOP1000_FIXING_PLAN.md`\nnpx svelte-check --output machine 2>&1 > logs/errors/phase80-post-chunk0. - One commit per critical file (P0.",
+      "charCount": 226
+    },
+    {
+      "id": "4a12dd7f760d1da4",
+      "title": "### 🔴 **Error 1: NCCL Symbol Missing**\r ```bash\r ImportError: /home/james/trt_env_310/lib/python3.10/site-packages/torc",
+      "sourceRef": "deeds_labs\\projects\\legacy-projects\\documents\\tensorrt-llm-errors-guide.md",
+      "score": 0.6893,
+      "signals": {
+        "semantic": 0.519,
+        "recency": 0.976,
+        "errorBoost": 1,
+        "todoBoost": 1,
+        "sourceRefConfidence": 0.5
+      },
+      "summary": "- **Environment**: PyTorch 2. - **Location**: `libtorch_cuda.",
+      "selected": true,
+      "compressed": "### ### 🔴 **Error 1: NCCL Symbol Missing**\r ```bash\r ImportError: /home/james/trt_env_310/lib/python3.10/site-packages/torc\n**source**: `deeds_labs\\projects\\legacy-projects\\documents\\tensorrt-llm-errors-guide.md`\n- **Environment**: PyTorch 2. - **Location**: `libtorch_cuda.\n**errors**: ImportError: /home/james/trt_env_310/lib/python3.10/site-packages/torch/lib/libtorch_cuda.so: | ImportError: /home/james/trt_env_310/lib/python3.10/site-packages/tensorrt_llm/libs/libth_common.so: | ModuleNotFoundError: No module named 'torch'",
+      "charCount": 531
+    },
+    {
+      "id": "e9320c2ca649d795",
+      "title": "Now I understand the full picture. The key format is {som_bmu_row_bucket}|{gpu_cluster}|{trust_tier}. At query time, we'",
+      "sourceRef": "docs\\session-notes\\51726__.txt",
+      "score": 0.6891,
+      "signals": {
+        "semantic": 0.499,
+        "recency": 0.976,
+        "errorBoost": 0.912,
+        "todoBoost": 1,
+        "sourceRefConfidence": 0.5
+      },
+      "summary": "Now I understand the full picture.  The key format is {som_bmu_row_bucket}|{gpu_cluster}|{trust_tier}.",
+      "selected": true,
+      "compressed": "### Now I understand the full picture. The key format is {som_bmu_row_bucket}|{gpu_cluster}|{trust_tier}. At query time, we'\n**source**: `docs\\session-notes\\51726__.txt`\nNow I understand the full picture.  The key format is {som_bmu_row_bucket}|{gpu_cluster}|{trust_tier}.",
+      "charCount": 272
+    },
+    {
+      "id": "e5e34fc761196e57",
+      "title": "ood — those LOW-value files were already absent from their expected paths; prior sessions had already removed them. The ",
+      "sourceRef": "docs\\session-notes\\fileaudit322_26.txt",
+      "score": 0.689,
+      "signals": {
+        "semantic": 0.497,
+        "recency": 0.976,
+        "errorBoost": 1,
+        "todoBoost": 1,
+        "sourceRefConfidence": 0.5
+      },
+      "summary": "ood — those LOW-value files were already absent from their expected paths; prior sessions had already removed them.  The HIGH/MEDIUM value files (vlm-document-analyzer.",
+      "selected": true,
+      "compressed": "### ood — those LOW-value files were already absent from their expected paths; prior sessions had already removed them. The \n**source**: `docs\\session-notes\\fileaudit322_26.txt`\nood — those LOW-value files were already absent from their expected paths; prior sessions had already removed them.  The HIGH/MEDIUM value files (vlm-document-analyzer.",
+      "charCount": 346
+    },
+    {
+      "id": "8c9f611ae53f923d",
+      "title": "Read constitution-pipeline.ts, lines 1 to 100\r \r Searched for files matching **/*evidence-graph-service.ts*, 1 match\r Re",
+      "sourceRef": "docs\\session-notes\\feature_321_contextgraph_.txt",
+      "score": 0.6889,
+      "signals": {
+        "semantic": 0.489,
+        "recency": 0.976,
+        "errorBoost": 0.935,
+        "todoBoost": 1,
+        "sourceRefConfidence": 0.5
+      },
+      "summary": "Read constitution-pipeline. Searched for files matching **/*evidence-graph-service.",
+      "selected": true,
+      "compressed": "### Read constitution-pipeline.ts, lines 1 to 100\r \r Searched for files matching **/*evidence-graph-service.ts*, 1 match\r Re\n**source**: `docs\\session-notes\\feature_321_contextgraph_.txt`\nRead constitution-pipeline. Searched for files matching **/*evidence-graph-service.",
+      "charCount": 271
+    },
+    {
+      "id": "8f0db4ca8e1542f6",
+      "title": "node scripts/phase76-acp-cli.mjs interactive\r 📋 VS Code Tasks Added\r Task\tShortcut\r 🔧 Phase 76: ACP - List All Tools\tV",
+      "sourceRef": "deeds_labs\\snapshots\\2026-03-15-v1\\root-phase-docs\\phase76_12_20.txt",
+      "score": 0.6883,
+      "signals": {
+        "semantic": 0.516,
+        "recency": 0.976,
+        "errorBoost": 1,
+        "todoBoost": 1,
+        "sourceRefConfidence": 0.5
+      },
+      "summary": "node scripts/phase76-acp-cli.   - gemma3-legal:latest (7.",
+      "selected": true,
+      "compressed": "### node scripts/phase76-acp-cli.mjs interactive\r 📋 VS Code Tasks Added\r Task\tShortcut\r 🔧 Phase 76: ACP - List All Tools\tV\n**source**: `deeds_labs\\snapshots\\2026-03-15-v1\\root-phase-docs\\phase76_12_20.txt`\nnode scripts/phase76-acp-cli.   - gemma3-legal:latest (7.\n**errors**: ty 6: Results ranked by similarity score > should validate query is non-empty                                   [rag_loo | message: 'Validation error: Query cannot be empty', | originalError: undefined",
+      "charCount": 479
+    },
+    {
+      "id": "8fad9d5406df4d62",
+      "title": "Open Checklist Items",
+      "sourceRef": "sveltekit-frontend\\docs\\reports\\codebase-semantic-index-latest.md",
+      "score": 0.688,
+      "signals": {
+        "semantic": 0.516,
+        "recency": 0.976,
+        "errorBoost": 1,
+        "todoBoost": 1,
+        "sourceRefConfidence": 0.5
+      },
+      "summary": "agent/workflows/agentic-error-fixing. agent/workflows/agentic-error-fixing.",
+      "selected": true,
+      "compressed": "### Open Checklist Items\n**source**: `sveltekit-frontend\\docs\\reports\\codebase-semantic-index-latest.md`\nagent/workflows/agentic-error-fixing. agent/workflows/agentic-error-fixing.",
+      "charCount": 180
+    },
+    {
+      "id": "c304ccf9281c8804",
+      "title": "This plan converts the API cleanup design into actionable implementation tasks. Each task builds incrementally, starting",
+      "sourceRef": "deeds_labs\\frontend\\sveltekit-frontend-archive\\dirs\\deeds_labs\\kiro-archive\\specs\\api-cleanup-corruption-fix\\tasks.md",
+      "score": 0.688,
+      "signals": {
+        "semantic": 0.505,
+        "recency": 0.976,
+        "errorBoost": 0.842,
+        "todoBoost": 1,
+        "sourceRefConfidence": 0.5
+      },
+      "summary": "This plan converts the API cleanup design into actionable implementation tasks.  Each task builds incrementally, starting with scanning and analysis, moving to automated fixes, and concluding with validation and reporting.",
+      "selected": true,
+      "compressed": "### This plan converts the API cleanup design into actionable implementation tasks. Each task builds incrementally, starting\n**source**: `deeds_labs\\frontend\\sveltekit-frontend-archive\\dirs\\deeds_labs\\kiro-archive\\specs\\api-cleanup-corruption-fix\\tasks.md`\nThis plan converts the API cleanup design into actionable implementation tasks.  Each task builds incrementally, starting with scanning and analysis, moving to automated fixes, and concluding with validation and reporting.",
+      "charCount": 479
+    },
+    {
+      "id": "1852c043ad66769c",
+      "title": "esn't exist. Let me create it first:\r \r …\\sveltekit-frontend > New-Item -ItemType Directory -Path .\\out -Force\r \r PS C:\\",
+      "sourceRef": "deeds_labs\\snapshots\\2026-03-15-v1\\root-session-logs\\12_21_25__weekly_knowlesdgebase.txt",
+      "score": 0.6876,
+      "signals": {
+        "semantic": 0.514,
+        "recency": 0.976,
+        "errorBoost": 1,
+        "todoBoost": 1,
+        "sourceRefConfidence": 0.5
+      },
+      "summary": "esn't exist. …\\sveltekit-frontend > New-Item -ItemType Directory -Path .",
+      "selected": true,
+      "compressed": "### esn't exist. Let me create it first:\r \r …\\sveltekit-frontend > New-Item -ItemType Directory -Path .\\out -Force\r \r PS C:\\\n**source**: `deeds_labs\\snapshots\\2026-03-15-v1\\root-session-logs\\12_21_25__weekly_knowlesdgebase.txt`\nesn't exist. …\\sveltekit-frontend > New-Item -ItemType Directory -Path .\n**errors**: ❌ Errors: 0 | ❌ FAILED - Cluster Stability Issue Detected | ❌ Updated: 0",
+      "charCount": 385
+    },
+    {
+      "id": "25256e3d4bdb63c7",
+      "title": "The UI falls back to demo data if Qdrant isn't connected, so it will work even without the backend running.\r \r yes make ",
+      "sourceRef": "deeds_labs\\snapshots\\2026-03-15-v2\\txt-session-logs\\codebaseindex_ui_1_2_26.txt",
+      "score": 0.6874,
+      "signals": {
+        "semantic": 0.514,
+        "recency": 0.976,
+        "errorBoost": 1,
+        "todoBoost": 1,
+        "sourceRefConfidence": 0.5
+      },
+      "summary": "The UI falls back to demo data if Qdrant isn't connected, so it will work even without the backend running. Phase 8 (Redis Coordinate Caching) - Tasks 8.",
+      "selected": true,
+      "compressed": "### The UI falls back to demo data if Qdrant isn't connected, so it will work even without the backend running.\r \r yes make \n**source**: `deeds_labs\\snapshots\\2026-03-15-v2\\txt-session-logs\\codebaseindex_ui_1_2_26.txt`\nThe UI falls back to demo data if Qdrant isn't connected, so it will work even without the backend running. Phase 8 (Redis Coordinate Caching) - Tasks 8.",
+      "charCount": 372
     }
-  ],
-  "totalCards": 67,
-  "droppedCards": 294
+  ]
 }

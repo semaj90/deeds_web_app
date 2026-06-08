@@ -15,15 +15,14 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-
-const __dir = path.dirname(fileURLToPath(import.meta.url));
-const ROOT = path.resolve(__dir, '../..');
+import { ROOT, CARDS_DIR as NESCHROM_CARDS, LEGACY_CARDS_DIR } from './_neschrom-paths.mjs';
 
 const argv = process.argv.slice(2);
 const DRY_RUN = !argv.includes('--apply');
 const VERBOSE = argv.includes('--verbose');
 
-const CARDS_DIR    = path.join(ROOT, '.opencode', 'cards');
+// Read from both dirs; write enriched cards back to whichever dir they came from
+const CARDS_DIR    = NESCHROM_CARDS;
 const EXPORTS_DIR  = path.join(ROOT, 'memory', 'exports');
 const REPORT_PATH  = path.join(EXPORTS_DIR, 'cluster-attribution-report.json');
 const SUMMARY_PATH = path.join(EXPORTS_DIR, 'cluster-summary.json');
@@ -47,14 +46,22 @@ function normalizeSource(src) {
 }
 
 // ─── Load all cards ────────────────────────────────────────────────────────
+// Reads from neschrom97/cards/ (primary) + .opencode/cards/ (legacy, read-only)
 function loadCards() {
-  const files = fs.readdirSync(CARDS_DIR).filter(f => f.endsWith('.json') && f !== 'index.json');
   const cards = [];
-  for (const file of files) {
-    try {
-      const card = JSON.parse(fs.readFileSync(path.join(CARDS_DIR, file), 'utf8'));
-      if (card.id && card.source) cards.push({ file, card });
-    } catch { /* skip malformed */ }
+  const dirs = [
+    { dir: NESCHROM_CARDS, writable: true },
+    { dir: LEGACY_CARDS_DIR, writable: false },
+  ];
+  for (const { dir, writable } of dirs) {
+    if (!fs.existsSync(dir)) continue;
+    const files = fs.readdirSync(dir).filter(f => f.endsWith('.json') && f !== 'index.json');
+    for (const file of files) {
+      try {
+        const card = JSON.parse(fs.readFileSync(path.join(dir, file), 'utf8'));
+        if (card.id && card.source) cards.push({ file, card, dir, writable });
+      } catch { /* skip malformed */ }
+    }
   }
   return cards;
 }
@@ -122,7 +129,7 @@ async function main() {
   let matched = 0, unmatched = 0, updated = 0, alreadyHas = 0;
   const clusterDist = {};
 
-  for (const { file, card } of cards) {
+  for (const { file, card, dir: cardDir, writable } of cards) {
     const normSource = normalizeSource(card.source);
     const hit = normSource ? clusterMap.get(normSource) : null;
 
@@ -138,11 +145,11 @@ async function main() {
       const needsUpdate = card.som_cluster == null || card.gpuCluster == null;
       if (needsUpdate) {
         updated++;
-        if (!DRY_RUN) {
+        if (!DRY_RUN && writable) {
           const enriched = { ...card };
           if (sc != null) enriched.som_cluster = sc;
           if (gc != null) enriched.gpuCluster = gc;
-          fs.writeFileSync(path.join(CARDS_DIR, file), JSON.stringify(enriched, null, 2), 'utf8');
+          fs.writeFileSync(path.join(cardDir, file), JSON.stringify(enriched, null, 2), 'utf8');
         }
         if (VERBOSE) console.log(`    [enrich] ${card.id} → som_cluster=${sc} gpuCluster=${gc}`);
       } else {

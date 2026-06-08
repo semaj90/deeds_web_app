@@ -17,7 +17,17 @@ Invoke skills only when they are relevant to the current task.
 - When unsure, search the repo before editing.
 
 ## Output rules
+## Runtime
 
+- Prefer Ollama `:11434` for Gemma4 unless llama-server template tests pass.
+- Ollama `:11434` requires `think: false`.
+- llama-server `:8090` requires:
+  - `stream: true`
+  - exact `/v1/models` model id
+  - explicit chat template
+  - system prompt sanity check before tool use
+- Never call `generateText()` against reasoning models — use `streamText()`.
+- Strip `<think>` / reasoning metadata before display.
 Never output:
 - `Thinking:` / `Thinking Process:` / `Plan:` / `Execution Plan:` / `Next Step:`
 - Task-completion announcements: "Task complete", "I have updated X", "I will now..."

@@ -2,27 +2,70 @@
   "$schema": "https://opencode.ai/config.json",
   "shell": "pwsh",
   "provider": {
-    "bifrost-local": {
+    "ollama": {
       "npm": "@ai-sdk/openai-compatible",
-      "name": "Bifrost Gemma4 Local",
+      "name": "Ollama",
+      "options": {
+        "baseURL": "http://127.0.0.1:11434/v1",
+        "apiKey": "local"
+      },
+      "models": {
+        "gemma4-rotorquant:latest": {
+          "name": "Gemma4 RotorQuant",
+          "tools": true,
+          "reasoning": false,
+          "limit": {
+            "context": 65536,
+            "output": 8192
+          },
+          "options": {
+            "temperature": 0,
+            "think": false,
+            "stop": [
+              "<think>",
+              "</think>",
+              "Thinking:",
+              "Self-Correction",
+              "_gemma3",
+              "gemma3.5-27"
+            ]
+          }
+        }
+      }
+    },
+    "llama-server": {
+      "npm": "@ai-sdk/openai-compatible",
+      "name": "llama-server",
       "options": {
         "baseURL": "http://127.0.0.1:8090/v1",
         "apiKey": "local"
       },
       "models": {
         "gemma4-legal-iq4xs-direct.gguf": {
-          "name": "Gemma4 Legal",
+          "name": "Gemma4 Legal llama-server",
           "tools": true,
           "reasoning": false,
           "limit": {
             "context": 65536,
             "output": 8192
+          },
+          "options": {
+            "temperature": 0,
+            "stream": true,
+            "stop": [
+              "<think>",
+              "</think>",
+              "Thinking:",
+              "Self-Correction",
+              "_gemma3",
+              "gemma3.5-27"
+            ]
           }
         }
       }
     }
   },
-  "model": "bifrost-local/gemma4-legal-iq4xs-direct.gguf",
+  "model": "ollama/gemma4-rotorquant:latest",
   "permission": {
     "bash": "ask",
     "edit": "ask",
@@ -118,6 +161,7 @@
       ".opencode/memory/**",
       ".opencode/tools/**",
       ".opencode/node_modules/**",
+      "neschrom97/**",
       "sveltekit-frontend/node_modules/**",
       "sveltekit-frontend/.svelte-kit/**",
       "sveltekit-frontend/static/ort/**",

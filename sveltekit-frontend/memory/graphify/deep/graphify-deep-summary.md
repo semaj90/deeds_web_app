@@ -1,22 +1,22 @@
 # Deep Import Graph - Phase A
-Generated: 2026-06-08T03:36:57.433Z
+Generated: 2026-06-08T20:42:11.443Z
 
 ## Stats
 | Metric | Value |
 |--------|-------|
-| Nodes | 14983 |
-| Total edges | 36224 |
-| Resolved edges | 5071 |
-| Unresolved (local) | 3107 |
-| External refs | 27731 |
+| Nodes | 14993 |
+| Total edges | 36278 |
+| Resolved edges | 5157 |
+| Unresolved (local) | 3031 |
+| External refs | 27775 |
 | Neighborhoods computed | 100 |
 | Test-covered files | 900 |
 
 ## Zone Breakdown
 | Zone | Count |
 |------|-------|
-| shared | 8603 |
-| script | 4876 |
+| shared | 8540 |
+| script | 4949 |
 | test | 1237 |
 | types | 208 |
 | server | 29 |
@@ -27,16 +27,16 @@ Generated: 2026-06-08T03:36:57.433Z
 ## Edge Type Breakdown
 | Type | Count |
 |------|-------|
-| imports_static | 26873 |
+| imports_static | 26912 |
 | test_covers_file | 3929 |
 | redis_dependency | 1604 |
 | imports_dynamic | 1217 |
-| qdrant_dependency | 784 |
+| qdrant_dependency | 798 |
 | exports_from | 501 |
 | neo4j_dependency | 367 |
 | mcp_tool_calls | 358 |
 | env_dependency | 357 |
-| db_dependency | 233 |
+| db_dependency | 234 |
 | svelte_route_uses_loader | 1 |
 
 ## Top 20 Coupling Hotspots (directFanIn)
@@ -48,7 +48,7 @@ Generated: 2026-06-08T03:36:57.433Z
 | 4 | `sveltekit-frontend/tests/helpers/env-ports.ts` | shared | 78 | 0 |
 | 5 | `sveltekit-frontend/src/lib/server/db/client.ts` | shared | 77 | 5 |
 | 6 | `claude-mem/src/shared/paths.ts` | shared | 57 | 2 |
-| 7 | `sveltekit-frontend/src/lib/server/redis.js` | shared | 44 | 2 |
+| 7 | `sveltekit-frontend/src/lib/server/redis.js` | shared | 42 | 2 |
 | 8 | `sveltekit-frontend/src/lib/server/env.server.ts` | shared | 40 | 0 |
 | 9 | `src/lib/server/ace/context-assembler.ts` | server | 38 | 0 |
 | 10 | `claude-mem/src/shared/SettingsDefaultsManager.ts` | shared | 37 | 0 |

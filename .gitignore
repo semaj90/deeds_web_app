@@ -928,3 +928,6 @@ legal_ai_db_backup.dump
 # Structured offline directory
 /offline-data/
 
+
+# NES-CHROM97 offline card store (large, not tracked)
+neschrom97/

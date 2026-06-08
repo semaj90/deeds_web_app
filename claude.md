@@ -2230,33 +2230,33 @@ See `memory/reconstruction-3-tracks.md` for full SceneIntent schema, RabbitMQ qu
 
 ## OpenCode + llama-server Config — Validated Shape (June 2026)
 
-### Root cause: GGUF-embedded `gemma` chat template drops system role
+### Root cause: embedded GGUF template drops system role
 
-`gemma4-legal-iq4xs-direct.gguf` embeds the old `gemma` chat template which predates system-role and tool-call support. Without `--chat-template gemma3`, llama-server reports:
+The embedded `gemma` chat template in `gemma4-legal-iq4xs-direct.gguf` predates system-role support. Without overriding it, `/props` shows `supports_system_role: false` and the system prompt is silently dropped.
+
+**Fix (wired in `launch-turboquant.ps1`)**: pass `--chat-template-file configs/templates/gemma4-opencode.jinja` before `--jinja`. The jinja template in this repo handles system role (injected as `user/Understood` pair) and tool calls (`tool_call` fenced blocks).
+
 ```
-chat_format: Content-only
-supports_system_role: false
-supports_tool_calls: false
-prompt_tokens: 3   ← system message silently dropped
-```
-System prompt is ignored entirely. Model outputs training-trace completions instead of following instructions.
-
-**Fix in `launch-turboquant.ps1`**: add `--chat-template gemma3` before `--jinja`.
-
-```powershell
-$baseArgs = $baseArgs + @('--chat-template', 'gemma3')   # REQUIRED before --jinja
-$baseArgs = $baseArgs + @('--jinja')
+llama-server.exe -m model.gguf
+  --chat-template-file configs/templates/gemma4-opencode.jinja
+  --jinja --reasoning-format none
+  -c 65536 -ngl 99 -fa on -ctk q8_0 -ctv q8_0
+  --cache-prompt --cache-reuse 256
 ```
 
-Override via env: `$env:TURBO_CHAT_TEMPLATE = 'gemma3'` (default). After restart, `/props` should show `supports_system_role: true, supports_tool_calls: true`.
+**Env override**: set `TURBO_CHAT_TEMPLATE_FILE=<absolute path>` to use a different template; set `TURBO_CHAT_TEMPLATE_FILE=none` to skip (only if GGUF has a correct embedded template).
+
+Do NOT pass: `--chat-template gemma`, `--chat-template gemma3`, `--reasoning auto`, `--reasoning-budget 0` — older named templates cause `supports_system_role: false` on this build.
+
+After restart with `--chat-template-file`, `/props` shows `supports_system_role: true, supports_tool_calls: true`.
 
 **Sanity check** (run after any llama-server restart):
 ```powershell
 curl.exe http://127.0.0.1:8090/v1/chat/completions `
   -H "Content-Type: application/json" `
-  -d '{"model":"gemma4-legal-iq4xs-direct.gguf","messages":[{"role":"system","content":"Reply only OK"},{"role":"user","content":"test"}],"temperature":0,"stream":false,"max_tokens":10}'
-# Expected: {"choices":[{"message":{"content":"OK"}}]...}
-# Bad:      content:"-2b-it-best-te:" → chat template wrong, restart with --chat-template gemma3
+  -d '{"model":"gemma4-legal-iq4xs-direct.gguf","messages":[{"role":"system","content":"Reply exactly: SYSTEM_OK"},{"role":"user","content":"hello"}],"temperature":0,"stream":false,"max_tokens":16}'
+# Expected content: SYSTEM_OK
+# Bad (training-trace): "gemma3.5-27-g..." → --chat-template was passed, restart without it
 ```
 
 ### opencode.jsonc model block
