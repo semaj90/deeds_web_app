@@ -13,16 +13,16 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-
-const __dir = path.dirname(fileURLToPath(import.meta.url));
-const ROOT = path.resolve(__dir, '../..');
+import { ROOT, CARDS_DIR, LEGACY_CARDS_DIR } from './_neschrom-paths.mjs';
 
 const argv = process.argv.slice(2);
 const DRY_RUN = argv.includes('--dry-run');
 const APPLY = argv.includes('--apply');
 const VERBOSE = argv.includes('--verbose');
 
-const CARDS_DIR = path.join(ROOT, '.opencode', 'cards');
+// Read from neschrom97/cards/ (primary) + .opencode/cards/ (legacy)
+const ACTIVE_CARDS_DIR = fs.existsSync(CARDS_DIR) && fs.readdirSync(CARDS_DIR).length > 0
+  ? CARDS_DIR : LEGACY_CARDS_DIR;
 const SOM_METRICS_PATH = path.join(ROOT, 'memory', 'exports', 'som-metrics.json');
 
 async function main() {
@@ -56,13 +56,13 @@ async function main() {
   let updated = 0;
   let skipped = 0;
 
-  if (fs.existsSync(CARDS_DIR)) {
-    const files = fs.readdirSync(CARDS_DIR);
+  if (fs.existsSync(ACTIVE_CARDS_DIR)) {
+    const files = fs.readdirSync(ACTIVE_CARDS_DIR);
     for (const file of files) {
       if (!file.endsWith('.json')) continue;
 
       try {
-        const cardPath = path.join(CARDS_DIR, file);
+        const cardPath = path.join(ACTIVE_CARDS_DIR, file);
         const content = fs.readFileSync(cardPath, 'utf8');
         const card = JSON.parse(content);
 

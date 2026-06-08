@@ -19,9 +19,8 @@ import { createReadStream, existsSync, mkdirSync, writeFileSync, readFileSync, r
 import { createInterface } from 'readline';
 import { resolve, join, dirname, extname } from 'path';
 import { fileURLToPath } from 'url';
+import { ROOT as REPO_ROOT, CARDS_DIR as NESCHROM_CARDS_DIR, LEGACY_CARDS_DIR } from './_neschrom-paths.mjs';
 
-const __dirname = dirname(fileURLToPath(import.meta.url));
-const REPO_ROOT = resolve(__dirname, '..', '..');
 const OUT_DIR = join(REPO_ROOT, '.tmp');
 mkdirSync(OUT_DIR, { recursive: true });
 
@@ -38,7 +37,8 @@ const CARD_FILE = cardFileArg
   ? resolve(REPO_ROOT, cardFileArg)
   : CARD_FILE_CANDIDATES.find(f => existsSync(f) && statSync(f).size > 100);
 
-const RAW_CARDS_DIR = join(REPO_ROOT, '.opencode', 'cards');
+const RAW_CARDS_DIR = existsSync(NESCHROM_CARDS_DIR) && readdirSync(NESCHROM_CARDS_DIR).filter(f => f.endsWith('.json')).length > 0
+  ? NESCHROM_CARDS_DIR : LEGACY_CARDS_DIR;
 
 console.log(`\n🔧 Card sourceRef Repair`);
 console.log(`════════════════════════════════════════`);

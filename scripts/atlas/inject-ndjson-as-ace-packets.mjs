@@ -42,9 +42,7 @@ import path from 'node:path';
 import crypto from 'node:crypto';
 import { fileURLToPath } from 'node:url';
 import Redis from 'ioredis';
-
-const __dir = path.dirname(fileURLToPath(import.meta.url));
-const ROOT = path.resolve(__dir, '../..');
+import { ROOT, CARDS_DIR as NESCHROM_CARDS_DIR, LEGACY_CARDS_DIR } from './_neschrom-paths.mjs';
 
 const argv = process.argv.slice(2);
 const APPLY         = argv.includes('--apply');
@@ -114,7 +112,8 @@ function readJson(filePath, fallback = null) {
 
 // ── Card snippet sampler ─────────────────────────────────────────────────────
 
-const cardsDir = path.join(ROOT, '.opencode', 'cards');
+const cardsDir = fs.existsSync(NESCHROM_CARDS_DIR) && fs.readdirSync(NESCHROM_CARDS_DIR).filter(f => f.endsWith('.json')).length > 0
+  ? NESCHROM_CARDS_DIR : LEGACY_CARDS_DIR;
 const cardCache = new Map();
 
 function sampleCardSnippet(cardId) {

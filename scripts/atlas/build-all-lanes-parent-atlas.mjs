@@ -26,9 +26,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-
-const __dir = path.dirname(fileURLToPath(import.meta.url));
-const ROOT = path.resolve(__dir, '../..');
+import { ROOT, CARDS_DIR as NESCHROM_CARDS_DIR, LEGACY_CARDS_DIR } from './_neschrom-paths.mjs';
 
 const APPLY = process.argv.includes('--apply');
 const VERBOSE = process.argv.includes('--verbose');
@@ -52,7 +50,8 @@ function makeEdge(lane, from, to, edge_type, weight = 1.0) {
 // ─── Lane Extractors ─────────────────────────────────────────────────────
 
 function extractCardLane() {
-  const cardsDir = path.join(ROOT, '.opencode', 'cards');
+  const cardsDir = fs.existsSync(NESCHROM_CARDS_DIR) && fs.readdirSync(NESCHROM_CARDS_DIR).filter(f => f.endsWith('.json')).length > 0
+    ? NESCHROM_CARDS_DIR : LEGACY_CARDS_DIR;
   const nodes = [];
   const edges = [];
 

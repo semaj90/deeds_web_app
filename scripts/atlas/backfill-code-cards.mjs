@@ -9,16 +9,12 @@ import fs from 'node:fs';
 import path from 'node:path';
 import crypto from 'node:crypto';
 import { fileURLToPath } from 'node:url';
-
-const __dir = path.dirname(fileURLToPath(import.meta.url));
-const ROOT = path.resolve(__dir, '../..');
+import { ROOT, CARDS_DIR, ensureDirs } from './_neschrom-paths.mjs';
 
 const argv = process.argv.slice(2);
 const DRY_RUN = argv.includes('--dry-run');
 const APPLY = argv.includes('--apply');
 const VERBOSE = argv.includes('--verbose');
-
-const CARDS_DIR = path.join(ROOT, '.opencode', 'cards');
 const OUTCOME_LEDGER_PATH = path.join(ROOT, '.opencode', 'outcome-ledger.ndjson');
 const REPORT_PATH = path.join(ROOT, 'memory', 'exports', 'backfill-code-cards-report.json');
 

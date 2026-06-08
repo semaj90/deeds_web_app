@@ -33,16 +33,15 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-
-const __dir = path.dirname(fileURLToPath(import.meta.url));
-const ROOT = path.resolve(__dir, '../..');
+import { ROOT, CARDS_DIR as NESCHROM_CARDS_DIR, LEGACY_CARDS_DIR } from './_neschrom-paths.mjs';
 
 const argv = process.argv.slice(2);
 const DRY_RUN = argv.includes('--dry-run');
 const APPLY = argv.includes('--apply');
 const VERBOSE = argv.includes('--verbose');
 
-const CARDS_DIR = path.join(ROOT, '.opencode', 'cards');
+const CARDS_DIR = fs.existsSync(NESCHROM_CARDS_DIR) && fs.readdirSync(NESCHROM_CARDS_DIR).filter(f => f.endsWith('.json')).length > 0
+  ? NESCHROM_CARDS_DIR : LEGACY_CARDS_DIR;
 const OUTCOME_LEDGER_JOINED = path.join(ROOT, '.opencode', 'outcome-ledger-with-cardIds.ndjson');
 const SOURCEREF_MAP = path.join(ROOT, 'memory', 'exports', 'sourceRef-cardId-map.json');
 const REPORT_PATH = path.join(ROOT, 'memory', 'exports', 'reward-attribution-report.json');

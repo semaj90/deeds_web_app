@@ -22,10 +22,12 @@
  */
 
 import fs from 'fs/promises';
-import { existsSync, statSync } from 'fs';
+import { existsSync, statSync, readdirSync } from 'fs';
 import path from 'path';
 import crypto from 'crypto';
 import { createRequire } from 'module';
+import { fileURLToPath } from 'url';
+import { CARDS_DIR as NESCHROM_CARDS_DIR, LEGACY_CARDS_DIR } from '../atlas/_neschrom-paths.mjs';
 
 const _require = createRequire(import.meta.url);
 
@@ -48,7 +50,8 @@ async function ollamaEmbed(text, host = 'http://localhost:11434') {
 }
 
 const ROOT = process.cwd();
-const CARDS_DIR   = path.join(ROOT, '.opencode', 'cards');
+const CARDS_DIR = existsSync(NESCHROM_CARDS_DIR) && readdirSync(NESCHROM_CARDS_DIR).filter(f => f.endsWith('.json')).length > 0
+  ? NESCHROM_CARDS_DIR : LEGACY_CARDS_DIR;
 const EMB_DIR     = path.join(ROOT, '.opencode', 'embeddings');
 const TMP_DIR     = path.join(ROOT, '.tmp');
 const OUT_REPORT  = path.join(TMP_DIR, 'retrieval-ranking-report.json');

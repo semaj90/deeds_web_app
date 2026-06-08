@@ -36,15 +36,15 @@ import fs from 'node:fs';
 import path from 'node:path';
 import readline from 'node:readline';
 import { fileURLToPath } from 'node:url';
-
-const __dir = path.dirname(fileURLToPath(import.meta.url));
-const ROOT  = path.resolve(__dir, '../..');
+import { ROOT, CARDS_DIR as NESCHROM_CARDS_DIR, LEGACY_CARDS_DIR } from './_neschrom-paths.mjs';
 
 const argv    = process.argv.slice(2);
 const DRY_RUN = argv.includes('--dry-run');
 const PHASE   = argv[argv.indexOf('--phase') + 1] || 'all';
 
-const CARDS_DIR    = path.join(ROOT, '.opencode/cards');
+// Read from neschrom97/cards/ (primary) with .opencode/cards/ as fallback
+const CARDS_DIR = fs.existsSync(NESCHROM_CARDS_DIR) && fs.readdirSync(NESCHROM_CARDS_DIR).length > 0
+  ? NESCHROM_CARDS_DIR : LEGACY_CARDS_DIR;
 const OC_DIR       = path.join(ROOT, '.opencode');
 const OUT_DIR      = path.join(ROOT, '.opencode/ndjson');
 const MANIFEST_PATH = path.join(ROOT, 'docs/reports/parent-atlas-feature-command-atlas.json');
