@@ -1,49 +1,49 @@
 # Codebase Graph Plan — Fast AST (20-Gate)
-> Generated: 2026-06-08T00:07:59.626Z
+> Generated: 2026-06-08T03:32:29.217Z
 > Mode: `fast-ast` (CPU only)
 
 ## Stats
 | Metric | Count |
 |--------|-------|
-| Files | 55462 |
-| Routes | 1101 |
-| Components | 5348 |
-| API handlers | 5547 |
-| TODOs | 7691 |
-| Dirs | 1422 |
+| Files | 14983 |
+| Routes | 1097 |
+| Components | 916 |
+| API handlers | 3222 |
+| TODOs | 779 |
+| Dirs | 786 |
 
 ## Gate Failures (action needed)
 | Gate | Fail Count |
 |------|-----------|
 | G4 No auth | 9 |
 | G5 No Zod  | 1 |
-| G11 Localhost | 1623 |
-| G14 Svelte4 | 143 |
+| G11 Localhost | 709 |
+| G14 Svelte4 | 5 |
 | G15 SSR unsafe | 0 |
 | G16 No test | 94 |
-| G20 Cyclic | 2 |
+| G20 Cyclic | 1 |
 
 ## Files with TODO/FIXME
-- `deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/proto/legal_api_pb.js` — 2370 marker(s)
-- `deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/proto/legal_api_pb.js` — 2370 marker(s)
-- `deeds_labs/services/python-middleware/python_codebase/utilities/scripts/backups/phase34b/lib/optimization/index.ts` — 79 marker(s)
-- `deeds_labs/snapshots/2026-03-10/bucket-c-stale/.phase72-backups/2025-12-18T00-32-14/src/lib/components/ui/context-menu/index.ts` — 79 marker(s)
-- `deeds_labs/snapshots/2026-03-10/bucket-c-stale/.phase72-backups/2025-12-18T00-32-14/src/lib/components/ui/context-menu/index.ts` — 79 marker(s)
-- `deeds_labs/snapshots/2026-03-10/bucket-c-stale/.phase72-backups/2025-12-18T00-32-30/src/lib/machines/index.ts` — 79 marker(s)
-- `deeds_labs/snapshots/2026-03-10/bucket-c-stale/.phase72-backups/2025-12-18T00-32-30/src/lib/optimization/index.ts` — 79 marker(s)
-- `deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/components/ui/gaming/core/useGamingEvolution.js` — 31 marker(s)
-- `deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/components/ui/gaming/core/useGamingEvolution.js` — 31 marker(s)
-- `deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/utils/parallaxDynamic.js` — 22 marker(s)
-- `deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/utils/parallaxDynamic.js` — 22 marker(s)
 - `docker/langgraph-synthesis/.venv/Lib/site-packages/torch/utils/model_dump/code.js` — 14 marker(s)
 - `docker/langgraph-synthesis/.venv/Lib/site-packages/torch/utils/model_dump/code.js` — 14 marker(s)
-- `deeds_labs/frontend/sveltekit-frontend-archive/dirs/src_fixed/vector-service.ts` — 13 marker(s)
-- `deeds_labs/frontend/sveltekit-frontend-archive/dirs/src_fixed/vector-service.ts` — 13 marker(s)
 - `sveltekit-frontend/scripts/phase104-backups/src/lib/services/vector-service.ts` — 13 marker(s)
-- `deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/workers/aiProcessingWorker.js` — 12 marker(s)
-- `deeds_labs/routes-parked-full/admin/users/[userId]/+page.svelte` — 12 marker(s)
-- `deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/workers/aiProcessingWorker.js` — 12 marker(s)
-- `deeds_labs/frontend/sveltekit-frontend-archive/dirs/archives/unused-2026-02-14/lib/workers/aiProcessingWorker.js` — 12 marker(s)
+- `scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/enhanced/components/[slug]/+server.ts` — 11 marker(s)
+- `scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/enhanced/components/[slug]/+server.ts` — 11 marker(s)
+- `scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/v1/evidence/[id]/ocr/+server.ts` — 7 marker(s)
+- `scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/v1/timeline/[caseId]/+server.ts` — 7 marker(s)
+- `scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/v1/evidence/[id]/ocr/+server.ts` — 7 marker(s)
+- `scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/v1/timeline/[caseId]/+server.ts` — 7 marker(s)
+- `scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/document/[id]/+server.ts` — 6 marker(s)
+- `scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/gallery/+server.ts` — 6 marker(s)
+- `scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/ingest/[jobId]/+server.ts` — 6 marker(s)
+- `scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/intake/case/+server.ts` — 6 marker(s)
+- `scripts/api-cleanup/reports/backup-2025-12-14T21-11-49-641Z/document/[id]/+server.ts` — 6 marker(s)
+- `sveltekit-frontend/scripts/phase104-backups/src/lib/server/ai/feedback-loop.ts` — 6 marker(s)
+- `scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/document/[id]/+server.ts` — 6 marker(s)
+- `scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/gallery/+server.ts` — 6 marker(s)
+- `scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/ingest/[jobId]/+server.ts` — 6 marker(s)
+- `scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/intake/case/+server.ts` — 6 marker(s)
+- `scripts/api-cleanup/reports/backup-2025-12-14T21-11-49-641Z/document/[id]/+server.ts` — 6 marker(s)
 
 ## ACE usage
 Redis `code:index:manifest`, `code:index:tag:{word}`, `code:index:gate-stats`, `wiki:note:dir:*`
