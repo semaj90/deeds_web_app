@@ -149,7 +149,7 @@ $model = if ($env:ROTORQUANT_MODEL_PATH) {
     $ollamaBlob = $null
     $manifestRoot = Join-Path $env:USERPROFILE '.ollama\models\manifests\registry.ollama.ai\library'
     $blobRoot     = Join-Path $env:USERPROFILE '.ollama\models\blobs'
-    $preferredTags = @('gemma3-legal', 'gemma4-legal', 'gemma4-rotorquant', 'gemma3-legal-optimized')
+    $preferredTags = @('gemma4-legal', 'gemma4-rotorquant')
     foreach ($tag in $preferredTags) {
         $mf = Join-Path $manifestRoot "$tag\latest"
         if (-not (Test-Path $mf)) { continue }
@@ -252,7 +252,7 @@ if ($supportedKv -notcontains $kvV) {
 
 if (-not (Test-Path $llama)) { throw "llama-server.exe not found at $llama" }
 if (-not $model) {
-  throw "No model GGUF found. Set ROTORQUANT_MODEL_PATH=<path to GGUF>, or place gemma4-legal.gguf in vendor/models/, or ensure gemma3-legal/gemma4-rotorquant is pulled in Ollama (~/.ollama/models/)."
+  throw "No model GGUF found. Set ROTORQUANT_MODEL_PATH=<path to GGUF>, or place gemma4-legal.gguf in vendor/models/, or ensure gemma4-rotorquant is pulled in Ollama (~/.ollama/models/)."
 }
 if (-not (Test-Path $model)) { throw "TurboQuant model GGUF not found at: $model" }
 
@@ -535,15 +535,34 @@ if (Test-LlamaFlag $llama '--reasoning-format') {
     Write-Host "Reasoning format: --reasoning-format not supported by this binary - skipping" -ForegroundColor DarkYellow
 }
 
-# -- Chat template: gemma3 overrides the GGUF-embedded 'gemma' template which
-# predates system-role and tool-call support (props shows supports_system_role:false).
-# gemma3 is the llama.cpp built-in that matches Gemma 3/4 instruct format.
-$chatTemplate = if ($env:TURBO_CHAT_TEMPLATE) { $env:TURBO_CHAT_TEMPLATE } else { 'gemma3' }
-if (Test-LlamaFlag $llama '--chat-template') {
-    $baseArgs = $baseArgs + @('--chat-template', $chatTemplate)
-    Write-Host "Chat template: --chat-template $chatTemplate (overrides GGUF-embedded 'gemma' variant)" -ForegroundColor Cyan
+# -- Chat template: use custom jinja file instead of embedded GGUF template --
+# The embedded gemma GGUF template predates system-role support and silently
+# drops the system message (supports_system_role: false). Always override with
+# the repo-local Gemma4/OpenCode template that handles system + tool calls.
+# Set TURBO_CHAT_TEMPLATE_FILE to an absolute path to override; set to 'none'
+# to skip (e.g. if you have a GGUF with a correct embedded template).
+$chatTemplateFile = if ($env:TURBO_CHAT_TEMPLATE_FILE -and $env:TURBO_CHAT_TEMPLATE_FILE -ne 'none') {
+    $env:TURBO_CHAT_TEMPLATE_FILE
+} elseif ($env:TURBO_CHAT_TEMPLATE_FILE -eq 'none') {
+    $null
 } else {
-    Write-Host "Chat template: --chat-template not supported - system prompt may be dropped" -ForegroundColor Yellow
+    Join-Path $PSScriptRoot "..\configs\templates\gemma4-opencode.jinja"
+}
+
+if ($chatTemplateFile -and (Test-Path $chatTemplateFile)) {
+    if (Test-LlamaFlag $llama '--chat-template-file') {
+        $baseArgs = $baseArgs + @('--chat-template-file', $chatTemplateFile)
+        Write-Host "Chat template: --chat-template-file $chatTemplateFile" -ForegroundColor Cyan
+    } elseif (Test-LlamaFlag $llama '--chat-template') {
+        # Older binaries support --chat-template <name> but not --chat-template-file.
+        # Fall back to gemma3 named template (better than embedded gemma which drops system role).
+        $baseArgs = $baseArgs + @('--chat-template', 'gemma3')
+        Write-Host "Chat template: --chat-template gemma3 (binary lacks --chat-template-file)" -ForegroundColor Yellow
+    } else {
+        Write-Host "Chat template: neither --chat-template-file nor --chat-template supported - system role may be dropped" -ForegroundColor DarkYellow
+    }
+} elseif ($chatTemplateFile) {
+    Write-Host "Chat template: file not found at $chatTemplateFile - skipping (set TURBO_CHAT_TEMPLATE_FILE or place file at configs/templates/gemma4-opencode.jinja)" -ForegroundColor Yellow
 }
 
 # -- Tool-calling: --jinja for OpenAI function-call format ----------------
