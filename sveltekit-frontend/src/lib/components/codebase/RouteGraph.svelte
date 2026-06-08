@@ -47,6 +47,7 @@
 	let d3Module: any = $state(null);
 	let isLoading = $state(true);
 	let transform = $state({ x: 0, y: 0, k: 1 });
+	let zoomBehavior: any = null;
 
 	const nodeColors: Record<string, string> = {
 		route: '#a855f7',      // Purple
@@ -105,14 +106,14 @@
 			.attr('class', 'graph-container');
 
 		// Setup zoom behavior
-		const zoom = d3.zoom()
+		zoomBehavior = d3.zoom()
 			.scaleExtent([0.1, 4])
 			.on('zoom', (event: any) => {
 				g.attr('transform', event.transform);
 				transform = { x: event.transform.x, y: event.transform.y, k: event.transform.k };
 			});
 
-		d3.select(svg).call(zoom);
+		d3.select(svg).call(zoomBehavior);
 
 		// Create arrow marker for edges
 		d3.select(svg).append('defs').append('marker')
@@ -236,8 +237,7 @@
 				.attr('x2', (d: any) => d.target.x)
 				.attr('y2', (d: any) => d.target.y);
 
-			node.attr('transform', (d: any) => `translate(${d.x},
-	${d.y})`);
+			node.attr('transform', (d: any) => `translate(${d.x}, ${d.y})`);
 		});
 
 		function dragstarted(event: any, d: any) {
@@ -263,24 +263,18 @@
 	});
 
 	function zoomIn() {
-		if (!d3Module || !svg) return;
-		d3Module.select(svg).transition().call(
-			d3Module.zoom().scaleBy, 1.3
-		);
+		if (!d3Module || !svg || !zoomBehavior) return;
+		d3Module.select(svg).transition().call(zoomBehavior.scaleBy, 1.3);
 	}
 
 	function zoomOut() {
-		if (!d3Module || !svg) return;
-		d3Module.select(svg).transition().call(
-			d3Module.zoom().scaleBy, 0.7
-		);
+		if (!d3Module || !svg || !zoomBehavior) return;
+		d3Module.select(svg).transition().call(zoomBehavior.scaleBy, 0.7);
 	}
 
 	function resetZoom() {
-		if (!d3Module || !svg) return;
-		d3Module.select(svg).transition().call(
-			d3Module.zoom().transform, d3Module.zoomIdentity
-		);
+		if (!d3Module || !svg || !zoomBehavior) return;
+		d3Module.select(svg).transition().call(zoomBehavior.transform, d3Module.zoomIdentity);
 	}
 </script>
 

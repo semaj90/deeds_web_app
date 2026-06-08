@@ -1,3 +1,5 @@
+import { createHash } from 'node:crypto';
+
 /**
  * SemanticPromptPacket — canonical shape for Valkey prompt/rule/fix/sourceRef cards.
  *
@@ -135,7 +137,6 @@ export function normalizePrompt(raw: string): string {
 }
 
 export function hashPrompt(normalized: string): string {
-  const { createHash } = require('node:crypto') as typeof import('node:crypto');
   return createHash('sha256').update(normalized).digest('hex');
 }
 

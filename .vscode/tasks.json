@@ -1384,6 +1384,117 @@
       }
     },
     {
+      "label": "🧠 Startup: Valkey Semantic Index",
+      "type": "shell",
+      "command": "npm run valkey:index:create",
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend",
+        "env": {
+          "REDIS_HOST": "127.0.0.1",
+          "REDIS_PORT": "6379",
+          "REDIS_PASSWORD": "redis"
+        }
+      },
+      "runOptions": {
+        "runOn": "folderOpen"
+      },
+      "isBackground": false,
+      "dependsOn": "🩺 Startup: Service Health Check",
+      "group": "build",
+      "problemMatcher": [],
+      "presentation": {
+        "echo": false,
+        "reveal": "silent",
+        "focus": false,
+        "panel": "shared",
+        "showReuseMessage": false,
+        "clear": false
+      },
+      "detail": "Create (or verify) the Valkey FT HNSW index prompt:sem:idx (768-dim, cosine). Safe to re-run — skips when index already exists."
+    },
+    {
+      "label": "🧠 Startup: Seed OpenCode Rules",
+      "type": "shell",
+      "command": "npm run valkey:seed:rules:embed",
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend",
+        "env": {
+          "REDIS_HOST": "127.0.0.1",
+          "REDIS_PORT": "6379",
+          "REDIS_PASSWORD": "redis"
+        }
+      },
+      "runOptions": {
+        "runOn": "folderOpen"
+      },
+      "isBackground": false,
+      "dependsOn": "🧠 Startup: Valkey Semantic Index",
+      "group": "build",
+      "problemMatcher": [],
+      "presentation": {
+        "echo": false,
+        "reveal": "silent",
+        "focus": false,
+        "panel": "shared",
+        "showReuseMessage": false,
+        "clear": false
+      },
+      "detail": "Seed 13 rule cards + 8 fix cards into Valkey with 768-dim embedding vectors (opencode:rule:v1:* / opencode:fix:v1:* / prompt:sem:v1:rule:* / prompt:sem:v1:fix:*)."
+    },
+    {
+      "label": "🧪 Startup: Semantic Valkey Smoke",
+      "type": "shell",
+      "command": "npm run smoke:semantic-valkey",
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend",
+        "env": {
+          "REDIS_HOST": "127.0.0.1",
+          "REDIS_PORT": "6379",
+          "REDIS_PASSWORD": "redis"
+        }
+      },
+      "runOptions": {
+        "runOn": "folderOpen"
+      },
+      "isBackground": false,
+      "dependsOn": "🧠 Startup: Seed OpenCode Rules",
+      "group": "build",
+      "problemMatcher": [],
+      "presentation": {
+        "echo": false,
+        "reveal": "silent",
+        "focus": false,
+        "panel": "shared",
+        "showReuseMessage": false,
+        "clear": false
+      },
+      "detail": "8-gate smoke: exact cache hit, semantic vector hit, low-score miss→model_call, <think> stripping, rule card count ≤20, sourceRefs round-trip, TTL applied, stats counter. Gates 2/3 soft-skip when embedding service is down."
+    },
+    {
+      "label": "🔑 Valkey: Recreate Index (--drop-first)",
+      "type": "shell",
+      "command": "npm run valkey:index:recreate",
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend",
+        "env": {
+          "REDIS_HOST": "127.0.0.1",
+          "REDIS_PORT": "6379",
+          "REDIS_PASSWORD": "redis"
+        }
+      },
+      "group": "build",
+      "problemMatcher": [],
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "shared",
+        "showReuseMessage": false,
+        "clear": true
+      },
+      "detail": "Drop and recreate the prompt:sem:idx FT index (use when DIM or schema changes). Does NOT reseed — run Seed OpenCode Rules after."
+    },
+    {
       "label": "🗺️ Startup: Auto-Map Codebase (graphify:daily)",
       "type": "shell",
       "command": "node scripts/startup/run-graphify-daily-startup.mjs",
@@ -1397,7 +1508,7 @@
         "runOn": "folderOpen"
       },
       "isBackground": true,
-      "dependsOn": "🩺 Startup: Service Health Check",
+      "dependsOn": "🧪 Startup: Semantic Valkey Smoke",
       "problemMatcher": {
         "owner": "graphify",
         "pattern": {

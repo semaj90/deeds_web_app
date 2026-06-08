@@ -1,14 +1,17 @@
-#!/usr/bin/env node
+﻿#!/usr/bin/env node
 /**
  * Startup health check — verifies MCP /mcp POST (not just /health GET),
  * turbovec MCP, core services, and optionally warms the LLM if idle.
  *
- * LLM warm strategy:
- *   1. Check Redis for a recent atlas:summary:exact:v1: hit → use cached
- *      lod1Summary as the warm prompt (saves full inference tokens)
- *   2. If no cache hit AND LLM is not busy (slot.n_tokens_cached > 0 means
- *      it has KV from a prior session) → send a short prompt to prime KV cache
- *   3. If LLM is busy (n_tokens_processed > 0 at the slot level) → skip
+ * Startup dependency order:
+ *   Service Health Check -> Valkey Semantic Index -> Seed OpenCode Rules
+ *     -> Semantic Valkey Smoke -> Auto-Map Codebase / Parent Atlas
+ *
+ * LLM warm strategy (TurboQuant-first):
+ *   1. Try TurboQuant :8090  <- what we want to keep hot
+ *   2. Fall back to Ollama :11434
+ *   3. Use cached atlas:summary:exact:v1: lod1Summary as prompt prefix
+ *   4. Skip if slot is busy
  */
 import { spawnSync } from 'node:child_process';
 import fs from 'node:fs';
@@ -20,23 +23,42 @@ const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '.
 const TMP_DIR = path.resolve(ROOT, '.tmp');
 const STATUS_PATH = path.resolve(TMP_DIR, 'ace-startup-status.json');
 
-const REDIS_URL = process.env.REDIS_URL ?? 'redis://127.0.0.1:6379';
-const TURBO_URL = 'http://127.0.0.1:8090';
-const TRACE_URL = 'http://127.0.0.1:8788';
+const REDIS_HOST = process.env.REDIS_HOST ?? '127.0.0.1';
+const REDIS_PORT = Number(process.env.REDIS_PORT ?? 6379);
+// Patch 3: default password is 'redis', never empty — matches docker-compose.yml
+const REDIS_PASS = process.env.REDIS_PASSWORD ?? process.env.REDIS_PASS ?? 'redis';
+
+const TURBO_URL    = 'http://127.0.0.1:8090';
+const TRACE_URL    = 'http://127.0.0.1:8788';
 const TURBOVEC_URL = 'http://127.0.0.1:8791';
-const OLLAMA_URL = 'http://127.0.0.1:11434';
-const TIMEOUT_MS = 3000;
+const OLLAMA_URL   = 'http://127.0.0.1:11434';
+const TIMEOUT_MS   = 3000;
+
+// Shared ioredis options — always use object form, never REDIS_URL string
+// (avoids password-in-URL special-character parsing bugs)
+function redisOpts(connectTimeout = 2000) {
+  return {
+    host: REDIS_HOST,
+    port: REDIS_PORT,
+    password: REDIS_PASS || undefined,
+    lazyConnect: true,
+    maxRetriesPerRequest: 1,
+    enableOfflineQueue: false,
+    retryStrategy: () => null,
+    connectTimeout,
+  };
+}
 
 const services = [
-  { name: 'Redis',          kind: 'redis' },
-  { name: 'Qdrant',         url: 'http://127.0.0.1:6333/collections' },
-  { name: 'Ollama',         url: `${OLLAMA_URL}/api/tags` },
-  { name: 'Postgres',       kind: 'postgres' },
-  { name: 'Bifrost',        url: 'http://127.0.0.1:3040/health' },
-  { name: 'TurboQuant',     url: `${TURBO_URL}/health` },
-  { name: 'Go Retrieval',   url: 'http://127.0.0.1:8100/health' },
-  { name: 'Topology Search',url: 'http://127.0.0.1:8101/health', soft: true },
-  { name: 'RabbitMQ API',   kind: 'rabbitmq' },
+  { name: 'Redis',           kind: 'redis' },
+  { name: 'Qdrant',          url: 'http://127.0.0.1:6333/collections' },
+  { name: 'Ollama',          url: `${OLLAMA_URL}/api/tags` },
+  { name: 'Postgres',        kind: 'postgres' },
+  { name: 'Bifrost',         url: 'http://127.0.0.1:3040/health' },
+  { name: 'TurboQuant',      url: `${TURBO_URL}/health` },
+  { name: 'Go Retrieval',    url: 'http://127.0.0.1:8100/health', kind: 'goRetrieval' },
+  { name: 'Topology Search', url: 'http://127.0.0.1:8101/health', soft: true },
+  { name: 'RabbitMQ API',    kind: 'rabbitmq' },
 ];
 
 let pass = 0;
@@ -44,6 +66,7 @@ let fail = 0;
 const state = {
   bifrost: 'red', retrievalGo: 'red', turboquant: 'red',
   topologySearch: 'red', traceMcp: 'red', turbovecMcp: 'red',
+  karpathyScores: 'red', authorityTop: 'red',
   sveltekit: 'yellow',
   backgroundJobs: { graphifySom: 'skipped', graphSynthesize: 'skipped' },
 };
@@ -57,74 +80,164 @@ function run(cmd, args, opts = {}) {
   return spawnSync(cmd, args, { encoding: 'utf8', windowsHide: true, ...opts });
 }
 
-function testHttp(url, timeoutSec = 2) {
-  const body = `$ErrorActionPreference="Stop"; Invoke-RestMethod -Uri '${url}' -TimeoutSec ${timeoutSec} | Out-Null;`;
-  return run('pwsh', ['-NoProfile', '-Command', body]);
+// Patch 1: always send Accept header that matches MCP SSE responses
+async function testHttp(url, timeoutSec = 2) {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), timeoutSec * 1000);
+  try {
+    const res = await fetch(url, {
+      signal: controller.signal,
+      headers: { Accept: 'application/json, text/event-stream' },
+    });
+    clearTimeout(timer);
+    return res.ok || res.status < 500 ? { status: 0 } : { status: 1, stderr: `HTTP ${res.status}` };
+  } catch (err) {
+    clearTimeout(timer);
+    return { status: 1, stderr: err?.message ?? `${url} unreachable` };
+  }
 }
 
-function testRedis() { return run('cmd.exe', ['/d', '/s', '/c', 'redis-cli PING']); }
+async function testRedis() {
+  const redis = new Redis(redisOpts(2000));
+  redis.on('error', () => {});
+  try {
+    await redis.connect();
+    const pong = await redis.ping();
+    await redis.quit();
+    return pong === 'PONG' ? { status: 0 } : { status: 1, stderr: `unexpected ping reply: ${pong}` };
+  } catch (err) {
+    try { await redis.quit(); } catch {}
+    return { status: 1, stderr: err?.message ?? 'Redis unreachable' };
+  }
+}
 
 function testPostgres() {
   const body = `$ErrorActionPreference="Stop"; docker ps --format '{{.Names}}' | Select-String -Pattern 'postgres' | Out-Null;`;
   return run('pwsh', ['-NoProfile', '-Command', body]);
 }
 
-function testRabbitMQ() {
-  const body = `$ErrorActionPreference="Stop"; Invoke-RestMethod -Uri 'http://127.0.0.1:15672/api/healthchecks/node' -TimeoutSec 3 | Out-Null;`;
-  return run('pwsh', ['-NoProfile', '-Command', body]);
-}
-
-// ── MCP /mcp POST probe ────────────────────────────────────────────────────────
-// Tests that the MCP server actually handles JSON-RPC, not just /health GET.
-// Parses the SSE envelope (data: {...}) or raw JSON.
-async function probeMcpEndpoint(baseUrl, label) {
+async function testRabbitMQ() {
   const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(), TIMEOUT_MS);
+  const timer = setTimeout(() => controller.abort(), 3000);
   try {
-    const res = await fetch(`${baseUrl}/mcp`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', Accept: 'application/json, text/event-stream' },
-      body: JSON.stringify({ jsonrpc: '2.0', id: 1, method: 'tools/list', params: {} }),
+    const res = await fetch('http://127.0.0.1:15672/api/healthchecks/node', {
+      headers: { Authorization: 'Basic ' + Buffer.from('guest:guest').toString('base64') },
       signal: controller.signal,
     });
     clearTimeout(timer);
-    if (!res.ok) return { ok: false, error: `HTTP ${res.status}` };
-    const raw = await res.text();
-    let parsed = null;
-    for (const line of raw.split('\n')) {
-      if (line.startsWith('data: ')) {
-        try { parsed = JSON.parse(line.slice(6)); break; } catch {}
-      }
-    }
-    if (!parsed) { try { parsed = JSON.parse(raw); } catch {} }
-    const tools = parsed?.result?.tools;
-    if (!Array.isArray(tools)) return { ok: false, error: 'no tools array in response' };
-    return { ok: true, toolCount: tools.length };
+    if (!res.ok) return { status: 1, stderr: `HTTP ${res.status}` };
+    const body = await res.json();
+    return body.status === 'ok' ? { status: 0 } : { status: 1, stderr: `status=${body.status}` };
   } catch (err) {
     clearTimeout(timer);
-    return { ok: false, error: err?.message ?? String(err) };
+    return { status: 1, stderr: err?.message ?? 'RabbitMQ unreachable' };
   }
 }
 
-// ── Redis summary cache prefix check ──────────────────────────────────────────
-// Looks for any recent atlas:summary:exact:v1: key and extracts lod1Summary.
-// Returns null if Redis is down or no cached summary exists.
-async function fetchCachedSummaryPrompt() {
-  const redis = new Redis(REDIS_URL, {
-    lazyConnect: true,
-    maxRetriesPerRequest: 1,
-    enableOfflineQueue: false,
-    retryStrategy: () => null,
-    connectTimeout: 1500,
+// Patch 2: Go Retrieval degraded-state parsing.
+// status=degraded with embeddingServiceUp + pgvectorConnected + qdrantConnected = true
+// and only redisConnected=false => WARN (yellow), not hard fail.
+async function testGoRetrieval(url) {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), 4000);
+  try {
+    const res = await fetch(url, {
+      signal: controller.signal,
+      headers: { Accept: 'application/json, text/event-stream' },
+    });
+    clearTimeout(timer);
+    if (!res.ok) return { status: 1, stderr: `HTTP ${res.status}` };
+    const body = await res.json().catch(() => null);
+    if (!body) return { status: 0 };
+    if (body.status === 'ok') return { status: 0 };
+    if (body.status === 'degraded') {
+      const coreUp = body.embeddingServiceUp !== false
+        && body.pgvectorConnected !== false
+        && body.qdrantConnected !== false;
+      if (coreUp) {
+        const failed = Object.entries(body)
+          .filter(([k, v]) => k !== 'status' && v === false)
+          .map(([k]) => k);
+        return { status: 0, warn: `degraded (${failed.join(', ')} = false)` };
+      }
+    }
+    return { status: 1, stderr: `status=${body.status ?? 'unknown'}` };
+  } catch (err) {
+    clearTimeout(timer);
+    return { status: 1, stderr: err?.message ?? 'Go Retrieval unreachable' };
+  }
+}
+
+// ── MCP /mcp POST probe ───────────────────────────────────────────────────────
+// Patch 4: two-step initialize -> tools/list.
+// initialize is required by some MCP servers before tools/list will succeed.
+async function probeMcpEndpoint(baseUrl) {
+  const mcpUrl = `${baseUrl}/mcp`;
+
+  async function mcpCall(method, params = {}) {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), TIMEOUT_MS);
+    try {
+      const res = await fetch(mcpUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Accept: 'application/json, text/event-stream',
+        },
+        body: JSON.stringify({ jsonrpc: '2.0', id: 1, method, params }),
+        signal: controller.signal,
+      });
+      clearTimeout(timer);
+      if (!res.ok) return { ok: false, error: `HTTP ${res.status}` };
+      const raw = await res.text();
+      let parsed = null;
+      for (const line of raw.split('\n')) {
+        if (line.startsWith('data: ')) {
+          try { parsed = JSON.parse(line.slice(6)); break; } catch {}
+        }
+      }
+      if (!parsed) { try { parsed = JSON.parse(raw); } catch {} }
+      return { ok: true, parsed };
+    } catch (err) {
+      clearTimeout(timer);
+      return { ok: false, error: err?.message ?? String(err) };
+    }
+  }
+
+  const initResult = await mcpCall('initialize', {
+    protocolVersion: '2024-11-05',
+    clientInfo: { name: 'startup-health-check', version: '1.0' },
+    capabilities: {},
   });
+  if (!initResult.ok) return { ok: false, error: `initialize failed: ${initResult.error}` };
+
+  const listResult = await mcpCall('tools/list');
+  if (!listResult.ok) return { ok: false, error: `tools/list failed: ${listResult.error}` };
+
+  const tools = listResult.parsed?.result?.tools;
+  return { ok: true, toolCount: Array.isArray(tools) ? tools.length : 0 };
+}
+
+// ── Redis summary cache — SCAN (not KEYS) ─────────────────────────────────────
+// Patch 5: scanStream avoids blocking Redis on large atlas caches.
+async function fetchCachedSummaryPrompt() {
+  const redis = new Redis(redisOpts(1500));
   redis.on('error', () => {});
   try {
     await redis.connect();
-    const keys = await redis.keys('atlas:summary:exact:v1:*');
-    if (!keys.length) return null;
-    // Pick the most recently written key (highest TTL = freshest)
-    const ttls = await Promise.all(keys.slice(0, 10).map(k => redis.ttl(k)));
-    const best = keys[ttls.indexOf(Math.max(...ttls))];
+    const collected = [];
+    const stream = redis.scanStream({ match: 'atlas:summary:exact:v1:*', count: 20 });
+    await new Promise((resolve, reject) => {
+      stream.on('data', (keys) => {
+        collected.push(...keys);
+        if (collected.length >= 20) stream.pause();
+      });
+      stream.on('end', resolve);
+      stream.on('error', reject);
+    });
+    if (!collected.length) return null;
+    const ttls = await Promise.all(collected.slice(0, 10).map(k => redis.ttl(k)));
+    const best = collected[ttls.indexOf(Math.max(...ttls))];
     const raw = await redis.get(best);
     if (!raw) return null;
     const record = JSON.parse(raw);
@@ -137,6 +250,24 @@ async function fetchCachedSummaryPrompt() {
   }
 }
 
+// ── Atlas dependency keys: Karpathy scores + authority top ───────────────────
+async function checkAtlasKeys() {
+  const redis = new Redis(redisOpts(1500));
+  redis.on('error', () => {});
+  try {
+    await redis.connect();
+    const [karpathyLen, authorityLen] = await Promise.all([
+      redis.hlen('gpu:karpathy:scores'),
+      redis.zcard('ace:authority:top').catch(() => redis.hlen('ace:authority:top')),
+    ]);
+    return { karpathyLen, authorityLen };
+  } catch {
+    return { karpathyLen: 0, authorityLen: 0 };
+  } finally {
+    try { await redis.quit(); } catch {}
+  }
+}
+
 // ── LLM busy check via llama-server /slots ────────────────────────────────────
 async function isLlamaServerIdle() {
   const controller = new AbortController();
@@ -144,27 +275,51 @@ async function isLlamaServerIdle() {
   try {
     const res = await fetch(`${TURBO_URL}/slots`, { signal: controller.signal });
     clearTimeout(timer);
-    if (!res.ok) return null; // server up but /slots not exposed
+    if (!res.ok) return null;
     const slots = await res.json();
     if (!Array.isArray(slots) || slots.length === 0) return true;
-    // idle = no slot has tokens currently being processed
     return slots.every(s => !s.is_processing && (s.n_tokens_cached ?? 0) >= 0);
   } catch {
     clearTimeout(timer);
-    return null; // can't determine — skip warm
+    return null;
   }
 }
 
-// ── LLM warm via Ollama (think:false, very short) ─────────────────────────────
-// Uses a cached summary snippet as the prompt to prime KV cache cheaply.
-// Falls back to a fixed 8-token sentinel if no cache hit.
+// ── LLM warm — Patch 6: TurboQuant first, Ollama fallback ────────────────────
 async function warmLlm(promptPrefix) {
   const prompt = promptPrefix
     ? `Continue from: ${promptPrefix.slice(0, 200)}`
     : 'System ready.';
 
-  const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(), 20000);
+  // TurboQuant (llama-server) — stream:true required for Gemma4
+  const turboController = new AbortController();
+  const turboTimer = setTimeout(() => turboController.abort(), 25000);
+  try {
+    const res = await fetch(`${TURBO_URL}/v1/chat/completions`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'gemma4-rotorquant:latest',
+        messages: [{ role: 'user', content: prompt }],
+        max_tokens: 1,
+        temperature: 0,
+        stream: true,
+        cache_prompt: true,
+      }),
+      signal: turboController.signal,
+    });
+    clearTimeout(turboTimer);
+    if (res.ok) {
+      await res.body?.cancel();
+      return { warmed: true, via: 'TurboQuant :8090' };
+    }
+  } catch {
+    clearTimeout(turboTimer);
+  }
+
+  // Ollama fallback
+  const ollamaController = new AbortController();
+  const ollamaTimer = setTimeout(() => ollamaController.abort(), 20000);
   try {
     const res = await fetch(`${OLLAMA_URL}/api/chat`, {
       method: 'POST',
@@ -174,126 +329,164 @@ async function warmLlm(promptPrefix) {
         messages: [{ role: 'user', content: prompt }],
         stream: false,
         think: false,
-        options: { temperature: 0, num_predict: 1 }, // 1 token — just prime KV
+        options: { temperature: 0, num_predict: 1 },
       }),
-      signal: controller.signal,
+      signal: ollamaController.signal,
     });
-    clearTimeout(timer);
-    return res.ok;
+    clearTimeout(ollamaTimer);
+    return { warmed: res.ok, via: 'Ollama :11434' };
   } catch {
-    clearTimeout(timer);
-    return false;
+    clearTimeout(ollamaTimer);
+    return { warmed: false, via: 'none' };
   }
 }
 
 // ── Main ──────────────────────────────────────────────────────────────────────
-console.log('── Startup Health Check ──');
+console.log('-- Startup Health Check --');
 
 for (const service of services) {
   try {
     let result;
+
     if (service.kind === 'redis') {
-      result = testRedis();
-      if (result.status !== 0) throw new Error((result.stderr || result.stdout || '').trim() || 'redis-cli PING failed');
-      console.log('✅ Redis');
+      result = await testRedis();
+      if (result.status !== 0) throw new Error((result.stderr || result.stdout || '').trim() || 'Redis unreachable');
+      console.log('OK Redis');
       pass += 1; continue;
     }
     if (service.kind === 'postgres') {
       result = testPostgres();
       if (result.status !== 0) throw new Error('postgres container not detected');
-      console.log('✅ Postgres container');
+      console.log('OK Postgres container');
       pass += 1; continue;
     }
     if (service.kind === 'rabbitmq') {
-      result = testRabbitMQ();
-      if (result.status !== 0) throw new Error('RabbitMQ management API unreachable');
-      console.log('✅ RabbitMQ API');
+      result = await testRabbitMQ();
+      if (result.status !== 0) throw new Error((result.stderr || '').trim() || 'RabbitMQ management API unreachable');
+      console.log('OK RabbitMQ API');
+      pass += 1; continue;
+    }
+    if (service.kind === 'goRetrieval') {
+      result = await testGoRetrieval(service.url);
+      if (result.status !== 0) {
+        if (service.soft) {
+          console.log(`SKIP Go Retrieval -- ${result.stderr}`);
+          state.retrievalGo = 'yellow';
+          continue;
+        }
+        throw new Error(result.stderr || 'Go Retrieval unreachable');
+      }
+      if (result.warn) {
+        console.log(`WARN Go Retrieval: ${result.warn}`);
+        state.retrievalGo = 'yellow';
+      } else {
+        console.log('OK Go Retrieval');
+        state.retrievalGo = 'green';
+      }
       pass += 1; continue;
     }
 
-    result = testHttp(service.url, 2);
+    result = await testHttp(service.url, 2);
     if (result.status !== 0) {
       if (service.soft) {
-        console.log(`⏭️  ${service.name} skipped (soft dependency)`);
-        state.topologySearch = 'yellow';
+        console.log(`SKIP ${service.name} (soft dependency)`);
+        if (service.name === 'Topology Search') state.topologySearch = 'yellow';
         continue;
       }
       throw new Error((result.stderr || result.stdout || '').trim() || `${service.name} unreachable`);
     }
-    console.log(`✅ ${service.name}`);
+    console.log(`OK ${service.name}`);
     pass += 1;
-    if (service.name === 'Bifrost')      state.bifrost = 'green';
-    if (service.name === 'Go Retrieval') state.retrievalGo = 'green';
-    if (service.name === 'TurboQuant')   state.turboquant = 'green';
+    if (service.name === 'Bifrost')         state.bifrost = 'green';
+    if (service.name === 'TurboQuant')      state.turboquant = 'green';
     if (service.name === 'Topology Search') state.topologySearch = 'green';
   } catch (err) {
-    console.log(`❌ ${service.name}: ${err?.message ?? err}`);
+    console.log(`FAIL ${service.name}: ${err?.message ?? err}`);
     fail += 1;
-    if (service.name === 'Bifrost')      state.bifrost = 'yellow';
-    if (service.name === 'Go Retrieval') state.retrievalGo = 'yellow';
-    if (service.name === 'TurboQuant')   state.turboquant = 'red';
+    if (service.name === 'Bifrost')    state.bifrost = 'yellow';
+    if (service.name === 'TurboQuant') state.turboquant = 'red';
   }
 }
 
-// ── MCP /mcp POST probes (async) ──────────────────────────────────────────────
-console.log('── MCP /mcp probes ──');
+// -- MCP /mcp POST probes (initialize -> tools/list) --------------------------
+console.log('-- MCP /mcp probes --');
 
 const [traceResult, turbovecResult] = await Promise.all([
-  probeMcpEndpoint(TRACE_URL, 'TRACE MCP'),
-  probeMcpEndpoint(TURBOVEC_URL, 'TurboVec MCP'),
+  probeMcpEndpoint(TRACE_URL),
+  probeMcpEndpoint(TURBOVEC_URL),
 ]);
 
 if (traceResult.ok) {
-  console.log(`✅ TRACE MCP :8788/mcp  (${traceResult.toolCount} tools)`);
+  console.log(`OK TRACE MCP :8788/mcp  (${traceResult.toolCount} tools)`);
   state.traceMcp = 'green';
   pass += 1;
 } else {
-  console.log(`❌ TRACE MCP :8788/mcp — ${traceResult.error}`);
-  console.log('   → restart: node scripts/ensure-mcp-server.mjs --spawn --force');
+  console.log(`FAIL TRACE MCP :8788/mcp -- ${traceResult.error}`);
+  console.log('   -> restart: node scripts/ensure-mcp-server.mjs --spawn --force');
   state.traceMcp = 'red';
   fail += 1;
 }
 
 if (turbovecResult.ok) {
-  console.log(`✅ TurboVec MCP :8791/mcp  (${turbovecResult.toolCount} tools)`);
+  console.log(`OK TurboVec MCP :8791/mcp  (${turbovecResult.toolCount} tools)`);
   state.turbovecMcp = 'green';
   pass += 1;
 } else {
-  console.log(`❌ TurboVec MCP :8791/mcp — ${turbovecResult.error}`);
-  console.log('   → restart: node scripts/mcp/turbovec-sidecar-mcp.mjs &');
+  console.log(`FAIL TurboVec MCP :8791/mcp -- ${turbovecResult.error}`);
+  console.log('   -> restart: node scripts/mcp/turbovec-sidecar-mcp.mjs &');
   state.turbovecMcp = 'red';
   fail += 1;
 }
 
-// ── LLM warm (skip if busy or llama-server down) ──────────────────────────────
-console.log('── LLM warm check ──');
-const ollamaUp = testHttp(`${OLLAMA_URL}/api/tags`, 2).status === 0;
+// -- Atlas dependency keys ----------------------------------------------------
+console.log('-- Atlas key presence --');
+const atlasKeys = await checkAtlasKeys();
 
-if (!ollamaUp) {
-  console.log('⏭️  Ollama down — skipping LLM warm');
+if (atlasKeys.karpathyLen > 0) {
+  console.log(`OK gpu:karpathy:scores (${atlasKeys.karpathyLen} entries)`);
+  state.karpathyScores = 'green';
+  pass += 1;
 } else {
-  // 1. Check Redis cache for a summary prompt prefix (saves ~400 input tokens)
+  console.log('WARN gpu:karpathy:scores empty -- run: npm run karpathy:gpu');
+  state.karpathyScores = 'yellow';
+}
+
+if (atlasKeys.authorityLen > 0) {
+  console.log(`OK ace:authority:top (${atlasKeys.authorityLen} entries)`);
+  state.authorityTop = 'green';
+  pass += 1;
+} else {
+  console.log('WARN ace:authority:top empty -- run: npm run graphify:authority');
+  state.authorityTop = 'yellow';
+}
+
+// -- LLM warm (TurboQuant-first) ----------------------------------------------
+console.log('-- LLM warm check --');
+const turboUp  = (await testHttp(`${TURBO_URL}/health`, 2)).status === 0;
+const ollamaUp = (await testHttp(`${OLLAMA_URL}/api/tags`, 2)).status === 0;
+
+if (!turboUp && !ollamaUp) {
+  console.log('SKIP TurboQuant + Ollama both down -- skipping LLM warm');
+} else {
   const cachedPrompt = await fetchCachedSummaryPrompt();
   if (cachedPrompt) {
-    console.log('♻️  Using cached lod1Summary as warm prompt prefix (Redis hit)');
+    console.log('CACHE Using cached lod1Summary as warm prompt prefix (Redis hit)');
   }
-
-  // 2. Only warm if llama-server slot is idle
   const idle = await isLlamaServerIdle();
   if (idle === false) {
-    console.log('⏭️  llama-server busy — skipping warm to avoid queuing');
+    console.log('SKIP llama-server busy -- skipping warm to avoid queuing');
   } else {
-    process.stdout.write('🔥 Warming LLM KV cache (1-token probe)… ');
-    const warmed = await warmLlm(cachedPrompt);
-    console.log(warmed ? 'done' : 'skipped (Ollama not responding in time)');
+    process.stdout.write('WARM LLM KV cache (1-token probe)... ');
+    const { warmed, via } = await warmLlm(cachedPrompt);
+    console.log(warmed ? `done (via ${via})` : 'skipped (no LLM responded in time)');
   }
 }
 
-// ── Summary ───────────────────────────────────────────────────────────────────
+// -- Summary ------------------------------------------------------------------
 state.sveltekit = fail > 0 ? 'yellow' : 'yellow';
 writeStatus();
-console.log(`── summary: PASS=${pass} FAIL=${fail} ──`);
+console.log(`-- summary: PASS=${pass} FAIL=${fail} --`);
 if (fail > 0) {
-  console.log('⚠️  degraded startup state recorded in .tmp/ace-startup-status.json');
+  console.log('WARN degraded startup state recorded in .tmp/ace-startup-status.json');
 }
 process.exitCode = 0;

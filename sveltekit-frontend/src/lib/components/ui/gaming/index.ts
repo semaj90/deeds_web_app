@@ -12,7 +12,6 @@
 // 8-bit NES-style Components
 export { default as NES8BitButton } from './8bit/NES8BitButton.svelte';
 export { default as NES8BitContainer } from './8bit/NES8BitContainer.svelte';
-// NES8BitDialog, NES8BitProgress, NES8BitInput, NES8BitBadge — not yet implemented
 
 // 16-bit SNES-style Enhanced Components
 export { default as SNES16BitButton } from './16bit/SNES16BitButton.svelte';

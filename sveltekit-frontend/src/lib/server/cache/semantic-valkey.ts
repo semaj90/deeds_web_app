@@ -142,6 +142,16 @@ export async function getExactMatch(
   return redis.get(exactKey(inputHash));
 }
 
+/** Store an exact-match answer string keyed by SHA-256 hash. */
+export async function setExactMatch(
+  redis: Redis,
+  inputHash: string,
+  answer: string,
+  ttlSeconds = 3600,
+): Promise<void> {
+  await redis.set(exactKey(inputHash), answer, 'EX', ttlSeconds);
+}
+
 /** Get a cached router decision so re-embedding is skipped for repeat prompts. */
 export async function getCachedRouterDecision(
   redis: Redis,
