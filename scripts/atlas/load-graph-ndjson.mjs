@@ -2,15 +2,20 @@
 /**
  * load-graph-ndjson.mjs
  *
- * Loads NDJSON graph files into Postgres flat tables:
- *   db-usage-edges.ndjson  → db_usage_calls
- *   calls-edges-*.ndjson   → calls_edges
+ * Loads NDJSON graph files into Postgres flat tables + code_relations_v1:
+ *   db-usage-edges.ndjson    → db_usage_calls   + code_relations_v1 (DB_CALL)
+ *   calls-edges-*.ndjson     → calls_edges      + code_relations_v1 (CALLS)
+ *   tool-usage-edges.ndjson  → tool_usage_calls + code_relations_v1 (TOOL_CALL)
+ *   cache-usage-edges.ndjson → cache_usage_calls+ code_relations_v1 (CACHE_READ/WRITE)
  *
  * Usage:
  *   node scripts/atlas/load-graph-ndjson.mjs --dry-run
  *   node scripts/atlas/load-graph-ndjson.mjs --apply
- *   node scripts/atlas/load-graph-ndjson.mjs --apply --only=db   (db_usage_calls only)
- *   node scripts/atlas/load-graph-ndjson.mjs --apply --only=calls (calls_edges only)
+ *   node scripts/atlas/load-graph-ndjson.mjs --apply --only=db
+ *   node scripts/atlas/load-graph-ndjson.mjs --apply --only=calls
+ *   node scripts/atlas/load-graph-ndjson.mjs --apply --only=tool
+ *   node scripts/atlas/load-graph-ndjson.mjs --apply --only=cache
+ *   node scripts/atlas/load-graph-ndjson.mjs --apply --only=relations  (sync only)
  */
 
 import fs from 'node:fs';
@@ -25,8 +30,16 @@ const APPLY = process.argv.includes('--apply');
 const ONLY  = process.argv.find(a => a.startsWith('--only='))?.split('=')[1] ?? 'all';
 const BATCH = 500;
 
-const DB_USAGE_FILE  = path.join(ROOT, 'scripts/atlas/out/db-usage-edges.ndjson');
-const CALLS_FILE     = path.join(ROOT, 'scripts/atlas/out/calls-edges-2026-05-29.ndjson');
+const OUT = path.join(ROOT, 'scripts/atlas/out');
+const DB_USAGE_FILE    = path.join(OUT, 'db-usage-edges.ndjson');
+const TOOL_USAGE_FILE  = path.join(OUT, 'tool-usage-edges.ndjson');
+const CACHE_USAGE_FILE = path.join(OUT, 'cache-usage-edges.ndjson');
+
+// Find latest calls-edges file
+const CALLS_FILE = (() => {
+  const files = fs.readdirSync(OUT).filter(f => f.startsWith('calls-edges')).sort().reverse();
+  return files.length ? path.join(OUT, files[0]) : null;
+})();
 
 function loadEnv() {
   for (const p of [
@@ -49,11 +62,11 @@ const DATABASE_URL =
 function normPath(p) {
   return (p ?? '')
     .replace(/\\/g, '/')
-    .replace(/^.*deeds-web-app\//, '')
-    .replace(/^C:\/.*?deeds-web-app\//, '');
+    .replace(/^[A-Z]:\/.*?deeds-web-app\//, '')
+    .replace(/^.*deeds-web-app\//, '');
 }
 
-// ── calls_edges noise filter (same as ingest-calls-to-postgres) ───────────────
+// ── calls_edges noise filter ──────────────────────────────────────────────────
 
 const NOISE_PREFIXES = [
   '$state','$derived','$effect','$props','$bindable',
@@ -84,7 +97,7 @@ function isCallsNoise(callee) {
   return false;
 }
 
-// ── Stream NDJSON file ────────────────────────────────────────────────────────
+// ── Stream NDJSON ─────────────────────────────────────────────────────────────
 
 async function* readNdjson(file) {
   const rl = createInterface({ input: fs.createReadStream(file), crlfDelay: Infinity });
@@ -94,11 +107,80 @@ async function* readNdjson(file) {
   }
 }
 
+// ── DDL guards ────────────────────────────────────────────────────────────────
+
+async function ensureTables(pool) {
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS calls_edges (
+      id        bigserial PRIMARY KEY,
+      src       text NOT NULL,
+      dst       text NOT NULL,
+      edge_type text NOT NULL DEFAULT 'CALLS',
+      src_kind  text,
+      weight    real NOT NULL DEFAULT 1.0,
+      line_num  integer,
+      UNIQUE (src, dst, edge_type)
+    );
+    CREATE TABLE IF NOT EXISTS tool_usage_calls (
+      id          bigserial PRIMARY KEY,
+      source_file text NOT NULL,
+      caller      text,
+      tool        text NOT NULL,
+      endpoint    text,
+      call_type   text,
+      line_num    integer
+    );
+    CREATE TABLE IF NOT EXISTS cache_usage_calls (
+      id          bigserial PRIMARY KEY,
+      source_file text NOT NULL,
+      cache_type  text NOT NULL,
+      operation   text NOT NULL,
+      endpoint    text,
+      line_num    integer
+    );
+  `);
+}
+
+// ── Batch upsert into code_relations_v1 ───────────────────────────────────────
+
+async function upsertRelations(pool, rows) {
+  for (let i = 0; i < rows.length; i += BATCH) {
+    const batch = rows.slice(i, i + BATCH);
+    const client = await pool.connect();
+    try {
+      await client.query('BEGIN');
+      for (const r of batch) {
+        await client.query(`
+          INSERT INTO code_relations_v1
+            (source_file, target_file, source_symbol, target_symbol,
+             relation_type, source_kind, weight, metadata)
+          VALUES ($1,$2,$3,$4,$5,$6,$7,$8)
+          ON CONFLICT (source_file, target_file, relation_type, source_kind)
+            WHERE target_file IS NOT NULL
+          DO UPDATE SET
+            weight      = GREATEST(code_relations_v1.weight, EXCLUDED.weight),
+            last_seen_at = now(),
+            metadata    = code_relations_v1.metadata || EXCLUDED.metadata
+        `, [
+          r.source_file, r.target_file,
+          r.source_symbol ?? null, r.target_symbol ?? null,
+          r.relation_type, r.source_kind,
+          r.weight ?? 1.0,
+          JSON.stringify(r.metadata ?? {}),
+        ]);
+      }
+      await client.query('COMMIT');
+    } catch (err) {
+      await client.query('ROLLBACK');
+      console.error('  relations ROLLBACK batch', i, err.message);
+    } finally { client.release(); }
+  }
+}
+
 // ── Loaders ───────────────────────────────────────────────────────────────────
 
 async function loadDbUsage(pool) {
-  console.log('\n── Loading db_usage_calls ───────────────────────────────────');
-
+  console.log('\n── db_usage_calls ───────────────────────────────────────────');
   const rows = [];
   for await (const e of readNdjson(DB_USAGE_FILE)) {
     rows.push({
@@ -111,14 +193,12 @@ async function loadDbUsage(pool) {
     });
   }
   console.log(`  Read: ${rows.length} rows`);
-
   if (!APPLY) {
     for (const r of rows.slice(0, 3)) console.log(`  ${r.source_file} → ${r.table_name} (${r.operation})`);
     return rows.length;
   }
 
   await pool.query('TRUNCATE db_usage_calls');
-
   let applied = 0;
   for (let i = 0; i < rows.length; i += BATCH) {
     const batch = rows.slice(i, i + BATCH);
@@ -126,10 +206,10 @@ async function loadDbUsage(pool) {
     try {
       await client.query('BEGIN');
       for (const r of batch) {
-        await client.query(`
-          INSERT INTO db_usage_calls (source_file, caller, table_name, operation, call_type, line_num)
-          VALUES ($1,$2,$3,$4,$5,$6)
-        `, [r.source_file, r.caller, r.table_name, r.operation, r.call_type, r.line_num]);
+        await client.query(
+          `INSERT INTO db_usage_calls (source_file, caller, table_name, operation, call_type, line_num)
+           VALUES ($1,$2,$3,$4,$5,$6)`,
+          [r.source_file, r.caller, r.table_name, r.operation, r.call_type, r.line_num]);
       }
       await client.query('COMMIT');
       applied += batch.length;
@@ -138,18 +218,142 @@ async function loadDbUsage(pool) {
       console.error('  ROLLBACK', i, err.message);
     } finally { client.release(); }
   }
+  console.log(`  Inserted: ${applied}`);
 
-  console.log(`  Inserted: ${applied} rows`);
+  // Sync into code_relations_v1
+  const relRows = rows.map(r => ({
+    source_file:   r.source_file,
+    target_file:   `db:${r.table_name}`,
+    source_symbol: r.caller,
+    target_symbol: r.operation,
+    relation_type: 'DB_CALL',
+    source_kind:   r.call_type ?? 'drizzle',
+    weight:        1.0,
+    metadata:      { line_num: r.line_num, operation: r.operation },
+  }));
+  await upsertRelations(pool, relRows);
+  console.log(`  Synced ${relRows.length} → code_relations_v1 (DB_CALL)`);
+  return applied;
+}
+
+async function loadToolUsage(pool) {
+  console.log('\n── tool_usage_calls ─────────────────────────────────────────');
+  const rows = [];
+  for await (const e of readNdjson(TOOL_USAGE_FILE)) {
+    rows.push({
+      source_file: normPath(e.source_file ?? ''),
+      caller:      e.caller ?? null,
+      tool:        e.tool ?? e.endpoint ?? 'unknown',
+      endpoint:    e.endpoint ?? null,
+      call_type:   e.type ?? null,
+      line_num:    e.line_num ?? null,
+    });
+  }
+  console.log(`  Read: ${rows.length} rows`);
+  if (!APPLY) {
+    for (const r of rows.slice(0, 3)) console.log(`  ${r.source_file} → ${r.tool}`);
+    return rows.length;
+  }
+
+  await pool.query('TRUNCATE tool_usage_calls');
+  let applied = 0;
+  for (let i = 0; i < rows.length; i += BATCH) {
+    const batch = rows.slice(i, i + BATCH);
+    const client = await pool.connect();
+    try {
+      await client.query('BEGIN');
+      for (const r of batch) {
+        await client.query(
+          `INSERT INTO tool_usage_calls (source_file, caller, tool, endpoint, call_type, line_num)
+           VALUES ($1,$2,$3,$4,$5,$6)`,
+          [r.source_file, r.caller, r.tool, r.endpoint, r.call_type, r.line_num]);
+      }
+      await client.query('COMMIT');
+      applied += batch.length;
+    } catch (err) {
+      await client.query('ROLLBACK');
+      console.error('  ROLLBACK', i, err.message);
+    } finally { client.release(); }
+  }
+  console.log(`  Inserted: ${applied}`);
+
+  const relRows = rows.map(r => ({
+    source_file:   r.source_file,
+    target_file:   r.endpoint ?? `tool:${r.tool}`,
+    source_symbol: r.caller,
+    target_symbol: r.tool,
+    relation_type: 'TOOL_CALL',
+    source_kind:   r.call_type ?? 'api_route',
+    weight:        1.0,
+    metadata:      { line_num: r.line_num, endpoint: r.endpoint },
+  }));
+  await upsertRelations(pool, relRows);
+  console.log(`  Synced ${relRows.length} → code_relations_v1 (TOOL_CALL)`);
+  return applied;
+}
+
+async function loadCacheUsage(pool) {
+  console.log('\n── cache_usage_calls ────────────────────────────────────────');
+  const rows = [];
+  for await (const e of readNdjson(CACHE_USAGE_FILE)) {
+    rows.push({
+      source_file: normPath(e.source_file ?? ''),
+      cache_type:  e.cache_type ?? 'unknown',
+      operation:   e.operation ?? 'unknown',
+      endpoint:    e.endpoint ?? null,
+      line_num:    e.line_num ?? null,
+    });
+  }
+  console.log(`  Read: ${rows.length} rows`);
+  if (!APPLY) {
+    for (const r of rows.slice(0, 3)) console.log(`  ${r.source_file} → ${r.cache_type} (${r.operation})`);
+    return rows.length;
+  }
+
+  await pool.query('TRUNCATE cache_usage_calls');
+  let applied = 0;
+  for (let i = 0; i < rows.length; i += BATCH) {
+    const batch = rows.slice(i, i + BATCH);
+    const client = await pool.connect();
+    try {
+      await client.query('BEGIN');
+      for (const r of batch) {
+        await client.query(
+          `INSERT INTO cache_usage_calls (source_file, cache_type, operation, endpoint, line_num)
+           VALUES ($1,$2,$3,$4,$5)`,
+          [r.source_file, r.cache_type, r.operation, r.endpoint, r.line_num]);
+      }
+      await client.query('COMMIT');
+      applied += batch.length;
+    } catch (err) {
+      await client.query('ROLLBACK');
+      console.error('  ROLLBACK', i, err.message);
+    } finally { client.release(); }
+  }
+  console.log(`  Inserted: ${applied}`);
+
+  const relType = (op) => op === 'write' ? 'CACHE_WRITE' : 'CACHE_READ';
+  const relRows = rows.map(r => ({
+    source_file:   r.source_file,
+    target_file:   r.endpoint ?? `cache:${r.cache_type}`,
+    source_symbol: null,
+    target_symbol: r.cache_type,
+    relation_type: relType(r.operation),
+    source_kind:   'cache_op',
+    weight:        1.0,
+    metadata:      { line_num: r.line_num, operation: r.operation },
+  }));
+  await upsertRelations(pool, relRows);
+  console.log(`  Synced ${relRows.length} → code_relations_v1 (CACHE_READ/WRITE)`);
   return applied;
 }
 
 async function loadCallsEdges(pool) {
-  console.log('\n── Loading calls_edges ──────────────────────────────────────');
+  if (!CALLS_FILE) { console.log('\n── calls_edges: no file found, skipping'); return 0; }
+  console.log(`\n── calls_edges (${path.basename(CALLS_FILE)}) ──────────────────`);
 
-  // Stream + filter into deduped map: src|dst → {weight, line_num, src_kind}
   const dedup = new Map();
   let total = 0, noise = 0;
-
   for await (const e of readNdjson(CALLS_FILE)) {
     total++;
     const callee = e.callee ?? '';
@@ -157,30 +361,19 @@ async function loadCallsEdges(pool) {
     const src = normPath(e.source_file ?? '');
     const key = `${src}|${callee}`;
     if (!dedup.has(key)) {
-      dedup.set(key, {
-        src,
-        dst:      callee,
-        src_kind: e.kind ?? e.type ?? 'function_call',
-        line_num: e.line_num ?? null,
-        weight:   1.0,
-      });
+      dedup.set(key, { src, dst: callee, src_kind: e.kind ?? e.type ?? 'function_call', line_num: e.line_num ?? null, weight: 1.0 });
     } else {
-      dedup.get(key).weight += 0.1; // frequency boost
+      dedup.get(key).weight += 0.1;
     }
   }
-
   const rows = [...dedup.values()];
-  console.log(`  Total lines:   ${total}`);
-  console.log(`  Noise filtered: ${noise}`);
-  console.log(`  Unique edges:   ${rows.length}`);
-
+  console.log(`  Total: ${total}  Noise: ${noise}  Unique: ${rows.length}`);
   if (!APPLY) {
     for (const r of rows.slice(0, 3)) console.log(`  ${r.src} → ${r.dst}`);
     return rows.length;
   }
 
   await pool.query(`DELETE FROM calls_edges WHERE edge_type = 'CALLS'`);
-
   let applied = 0;
   for (let i = 0; i < rows.length; i += BATCH) {
     const batch = rows.slice(i, i + BATCH);
@@ -192,7 +385,7 @@ async function loadCallsEdges(pool) {
           INSERT INTO calls_edges (src, dst, edge_type, src_kind, weight, line_num)
           VALUES ($1,$2,'CALLS',$3,$4,$5)
           ON CONFLICT (src, dst, edge_type) DO UPDATE
-            SET weight = calls_edges.weight + 0.1,
+            SET weight   = calls_edges.weight + 0.1,
                 line_num = COALESCE(calls_edges.line_num, EXCLUDED.line_num)
         `, [r.src, r.dst, r.src_kind, r.weight, r.line_num]);
       }
@@ -206,56 +399,99 @@ async function loadCallsEdges(pool) {
   }
   console.log();
 
+  // Sync signal edges into code_relations_v1 (cap at 50k to avoid bloat)
+  const relRows = rows.slice(0, 50_000)
+    .filter(r => r.src && r.dst && r.src !== r.dst)
+    .map(r => ({
+      source_file:   r.src,
+      target_file:   null,   // callee is a symbol, not a file
+      source_symbol: null,
+      target_symbol: r.dst,
+      relation_type: 'CALLS',
+      source_kind:   r.src_kind,
+      weight:        r.weight,
+      metadata:      { line_num: r.line_num },
+    }));
+  // CALLS with no target_file use a separate upsert (no unique constraint applies)
+  for (let i = 0; i < relRows.length; i += BATCH) {
+    const batch = relRows.slice(i, i + BATCH);
+    const client = await pool.connect();
+    try {
+      await client.query('BEGIN');
+      for (const r of batch) {
+        await client.query(`
+          INSERT INTO code_relations_v1
+            (source_file, target_file, source_symbol, target_symbol,
+             relation_type, source_kind, weight, metadata)
+          VALUES ($1,$2,$3,$4,$5,$6,$7,$8)
+          ON CONFLICT DO NOTHING
+        `, [
+          r.source_file, r.target_file,
+          r.source_symbol, r.target_symbol,
+          r.relation_type, r.source_kind,
+          r.weight, JSON.stringify(r.metadata),
+        ]);
+      }
+      await client.query('COMMIT');
+    } catch (err) {
+      await client.query('ROLLBACK');
+    } finally { client.release(); }
+  }
+  console.log(`  Synced ${relRows.length} → code_relations_v1 (CALLS)`);
   return applied;
 }
 
-// ── Main ─────────────────────────────────────────────────────────────────────
+// ── Main ──────────────────────────────────────────────────────────────────────
 
 async function main() {
   console.log('══ Load Graph NDJSON → Postgres ═════════════════════════════');
   console.log(`  Mode: ${APPLY ? 'APPLY' : 'DRY-RUN'}  Only: ${ONLY}`);
 
-  const pool = new pg.Pool({ connectionString: DATABASE_URL });
+  const pool = new pg.Pool({ connectionString: DATABASE_URL, max: 5 });
 
-  let dbRows = 0, callsRows = 0;
-  if (ONLY === 'all' || ONLY === 'db')    dbRows    = await loadDbUsage(pool);
-  if (ONLY === 'all' || ONLY === 'calls') callsRows = await loadCallsEdges(pool);
+  if (APPLY) await ensureTables(pool);
+
+  if (ONLY === 'all' || ONLY === 'db')        await loadDbUsage(pool);
+  if (ONLY === 'all' || ONLY === 'tool')      await loadToolUsage(pool);
+  if (ONLY === 'all' || ONLY === 'cache')     await loadCacheUsage(pool);
+  if (ONLY === 'all' || ONLY === 'calls')     await loadCallsEdges(pool);
 
   if (APPLY) {
     const { rows } = await pool.query(`
-      SELECT 'db_usage_calls' AS tbl, COUNT(*) AS cnt FROM db_usage_calls
-      UNION ALL
-      SELECT 'calls_edges',          COUNT(*)          FROM calls_edges
-      UNION ALL
-      SELECT 'code_relations_v1',    COUNT(*)          FROM code_relations_v1
+      SELECT tbl, cnt FROM (
+        SELECT 'db_usage_calls'    AS tbl, COUNT(*) AS cnt FROM db_usage_calls    UNION ALL
+        SELECT 'tool_usage_calls'  AS tbl, COUNT(*) AS cnt FROM tool_usage_calls  UNION ALL
+        SELECT 'cache_usage_calls' AS tbl, COUNT(*) AS cnt FROM cache_usage_calls UNION ALL
+        SELECT 'calls_edges'       AS tbl, COUNT(*) AS cnt FROM calls_edges       UNION ALL
+        SELECT 'code_relations_v1' AS tbl, COUNT(*) AS cnt FROM code_relations_v1
+      ) t ORDER BY tbl
     `);
     console.log('\n  Final counts:');
     for (const r of rows) console.log(`    ${r.tbl}: ${r.cnt}`);
 
-    // Provenance join check
+    // Provenance join: which source files have both DB usage AND live packets?
     const { rows: prov } = await pool.query(`
       SELECT
         d.source_file,
         d.table_name,
         d.operation,
-        COUNT(rp.id) AS packet_hits,
-        COALESCE(AVG(rw.prior_reward), 0) AS avg_prior_reward
+        COUNT(DISTINCT rp.id)        AS packet_hits,
+        ROUND(AVG(rw.prior_reward)::numeric, 3) AS avg_reward
       FROM db_usage_calls d
-      LEFT JOIN route_runtime_packets rp
+      JOIN route_runtime_packets rp
         ON rp.source_refs::text ILIKE '%' || d.source_file || '%'
       LEFT JOIN route_packet_rewards rw ON rw.packet_uuid = rp.packet_uuid
       GROUP BY d.source_file, d.table_name, d.operation
-      HAVING COUNT(rp.id) > 0
       ORDER BY packet_hits DESC
-      LIMIT 5
+      LIMIT 8
     `);
     if (prov.length) {
       console.log('\n  Provenance joins (db_usage ↔ packets):');
       for (const r of prov) {
-        console.log(`    ${r.source_file} → ${r.table_name}.${r.operation}  packets=${r.packet_hits} avg_reward=${Number(r.avg_prior_reward).toFixed(2)}`);
+        console.log(`    ${r.source_file} → ${r.table_name}.${r.operation}  hits=${r.packet_hits} avg_reward=${r.avg_reward ?? 'null'}`);
       }
     } else {
-      console.log('\n  No provenance joins yet (needs live packet data).');
+      console.log('\n  No provenance joins yet (route_runtime_packets source_refs not matching db_usage paths).');
     }
   }
 
