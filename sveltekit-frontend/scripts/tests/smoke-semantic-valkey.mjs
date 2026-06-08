@@ -241,7 +241,11 @@ if (JSON.stringify(parsed) === JSON.stringify(testSourceRefs)) {
 }
 
 // ── Gate 7: TTL applied ───────────────────────────────────────────────────────
-const ttlRemaining = await redis.ttl(EXACT_KEY);
+// Write a fresh key immediately before checking — don't rely on the Gate 1 key
+// surviving the Ollama embed calls (which can take >10s on cold start).
+const TTL_GATE7_KEY = `${TEST_PREFIX}ttl-check`;
+await redis.set(TTL_GATE7_KEY, '1', { EX: TTL_SHORT });
+const ttlRemaining = await redis.ttl(TTL_GATE7_KEY);
 if (ttlRemaining > 0 && ttlRemaining <= TTL_SHORT) {
   ok(7, `TTL applied (${ttlRemaining}s remaining ≤ ${TTL_SHORT}s)`);
 } else {
