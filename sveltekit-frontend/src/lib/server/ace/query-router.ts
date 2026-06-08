@@ -237,6 +237,56 @@ export async function routeQuery(opts: QueryRouterOpts): Promise<QueryRouterResu
     }
   }
 
+  // ── Lane 1.2: Bifrost semantic packet lookup ──────────────────────────
+  // Checks warm-bifrost-semantic-cache keys written by npm run bifrost:semantic:warm.
+  // Key: bifrost:sem:packet:{query_hash}  TTL 24h
+  // Also probes intent index: bifrost:sem:intent:{normalized_hash}
+  if (cacheHit === 'none') {
+    const t0 = Date.now();
+    try {
+      // 1. Direct query-hash lookup
+      let bifrostRaw = await redis.get(`bifrost:sem:packet:${queryHash}`).catch(() => null);
+
+      // 2. Intent-normalized lookup (cross-phrasing)
+      if (!bifrostRaw) {
+        const intentNorm = query.toLowerCase().replace(/[^\w\s]/g, ' ').replace(/\s+/g, ' ').trim();
+        const intentHash = crypto.createHash('sha256').update(intentNorm).digest('hex').slice(0, 16);
+        const intentQh = await redis.get(`bifrost:sem:intent:${intentHash}`).catch(() => null);
+        if (intentQh) {
+          bifrostRaw = await redis.get(`bifrost:sem:packet:${intentQh}`).catch(() => null);
+        }
+      }
+
+      if (bifrostRaw) {
+        const bp = JSON.parse(bifrostRaw) as {
+          source_refs?: string[];
+          feature_id?: string;
+          token_hints?: string[];
+          answer_hint?: string;
+          state?: { som_cluster?: string };
+        };
+        if (bp.source_refs?.length) {
+          for (const ref of bp.source_refs) {
+            if (ref && !sourceRefs.includes(ref)) sourceRefs.push(ref);
+          }
+        }
+        if (bp.feature_id && !featureIds.includes(bp.feature_id)) {
+          featureIds.unshift(bp.feature_id);
+        }
+        if (bp.state?.som_cluster && !clusterId) {
+          clusterId = bp.state.som_cluster;
+          somClusterFound = bp.state.som_cluster;
+        }
+        cacheHit = 'bifrost';
+        trace.push({ lane: 'bifrost-sem', hit: true, latency_ms: Date.now() - t0 });
+      } else {
+        trace.push({ lane: 'bifrost-sem', hit: false, latency_ms: Date.now() - t0 });
+      }
+    } catch {
+      trace.push({ lane: 'bifrost-sem', hit: false, latency_ms: Date.now() - t0 });
+    }
+  }
+
   // ── Lane 2: sourceRef direct lookup ───────────────────────────────────
   const maybeRef = looksLikeSourceRef(query);
   if (maybeRef) {
