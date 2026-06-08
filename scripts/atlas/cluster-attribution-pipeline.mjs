@@ -1,29 +1,10 @@
 #!/usr/bin/env node
 /**
- * cluster-attribution-pipeline.mjs
+ * cluster-attribution-pipeline.mjs — Phase 3: Cluster Attribution
  *
- * PHASE 3: Cluster Attribution Pipeline
- *
- * Purpose:
- *   Map GPU k-means clustering results to card objects.
- *   Links cards to SOM clusters and other topology groupings.
- *
- * Input:
- *   - .opencode/cards/*.json (enriched with rewards from Phase 2)
- *   - Qdrant cluster metadata (from Phase 19C)
- *   - Neo4j cluster assignments (from Phase 19C)
- *
- * Process:
- *   1. Query Qdrant for cluster assignments (som_bmu_row, som_bmu_col, som_cluster)
- *   2. Query Neo4j for gpuCluster assignments
- *   3. For each card, locate cluster metadata
- *   4. Enrich card with cluster fields
- *   5. Generate cluster attribution report
- *
- * Output:
- *   - .opencode/cards/*.json — enriched with cluster fields
- *   - memory/exports/cluster-attribution-report.json
- *   - memory/exports/cluster-summary.json
+ * Joins .opencode/cards/*.json to Qdrant codebase_chunks_768 payloads
+ * by matching card.source (file path) to point.payload.file_path.
+ * Writes som_cluster + gpuCluster back to card JSON files.
  *
  * Usage:
  *   node scripts/atlas/cluster-attribution-pipeline.mjs --dry-run
@@ -39,158 +20,189 @@ const __dir = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dir, '../..');
 
 const argv = process.argv.slice(2);
-const DRY_RUN = argv.includes('--dry-run');
-const APPLY = argv.includes('--apply');
+const DRY_RUN = !argv.includes('--apply');
 const VERBOSE = argv.includes('--verbose');
 
-const CARDS_DIR = path.join(ROOT, '.opencode', 'cards');
-const REPORT_PATH = path.join(ROOT, 'memory', 'exports', 'cluster-attribution-report.json');
-const SUMMARY_PATH = path.join(ROOT, 'memory', 'exports', 'cluster-summary.json');
+const CARDS_DIR    = path.join(ROOT, '.opencode', 'cards');
+const EXPORTS_DIR  = path.join(ROOT, 'memory', 'exports');
+const REPORT_PATH  = path.join(EXPORTS_DIR, 'cluster-attribution-report.json');
+const SUMMARY_PATH = path.join(EXPORTS_DIR, 'cluster-summary.json');
 
-// ─── Load Cards ───────────────────────────────────────────────────────────
+const QDRANT_URL   = process.env.QDRANT_URL ?? 'http://127.0.0.1:6333';
+const COLLECTION   = 'codebase_chunks_768';
+const SCROLL_LIMIT = 500; // points per scroll page
 
-function loadAllCards() {
-  if (!fs.existsSync(CARDS_DIR)) {
-    console.error(`❌ Cards directory not found: ${CARDS_DIR}`);
-    return [];
-  }
+// ─── Normalize source → file_path ─────────────────────────────────────────
+// Cards store source as backslash paths; Qdrant stores forward-slash file_path.
+// Qdrant codebase_chunks_768 was indexed from sveltekit-frontend/ so paths are
+// relative to that dir (e.g. "src/routes/..." not "sveltekit-frontend/src/...").
+function normalizeSource(src) {
+  if (!src) return null;
+  let s = src.split('\\').join('/');
+  // strip sveltekit-frontend/ prefix if present
+  s = s.replace(/^.*?sveltekit-frontend\//, '');
+  // strip other leading path components until a known repo-relative prefix
+  s = s.replace(/^.*?(?=src\/|scripts\/|docs\/|proto\/|memory\/)/, '');
+  return s;
+}
 
-  const files = fs.readdirSync(CARDS_DIR);
+// ─── Load all cards ────────────────────────────────────────────────────────
+function loadCards() {
+  const files = fs.readdirSync(CARDS_DIR).filter(f => f.endsWith('.json') && f !== 'index.json');
   const cards = [];
-
   for (const file of files) {
-    if (!file.endsWith('.json')) continue;
-
     try {
-      const content = fs.readFileSync(path.join(CARDS_DIR, file), 'utf8');
-      const card = JSON.parse(content);
-      cards.push({ file, cardId: card.id, card });
-    } catch (e) {
-      if (VERBOSE) console.log(`  [skip] ${file}: ${e.message}`);
-    }
+      const card = JSON.parse(fs.readFileSync(path.join(CARDS_DIR, file), 'utf8'));
+      if (card.id && card.source) cards.push({ file, card });
+    } catch { /* skip malformed */ }
   }
-
   return cards;
 }
 
-// ─── Main ────────────────────────────────────────────────────────────────
+// ─── Build file_path → cluster map from Qdrant ────────────────────────────
+async function buildClusterMap() {
+  const map = new Map(); // file_path → { som_cluster, gpuCluster }
+  let offset = null;
+  let page = 0;
 
-async function main() {
-  console.log('\n── Cluster Attribution Pipeline (Phase 3) ─────────────────');
+  console.log(`  Scrolling Qdrant ${COLLECTION} for cluster payloads...`);
+  while (true) {
+    const body = {
+      limit: SCROLL_LIMIT,
+      with_payload: ['file_path', 'som_cluster', 'gpuCluster'],
+      with_vector: false,
+    };
+    if (offset) body.offset = offset;
 
-  // Load all cards
-  console.log('  Step 1: Load all cards...');
-  const allCards = loadAllCards();
+    const res = await fetch(`${QDRANT_URL}/collections/${COLLECTION}/points/scroll`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+      signal: AbortSignal.timeout(30_000),
+    });
 
-  if (allCards.length === 0) {
-    console.error('  ❌ No cards found');
-    process.exit(1);
+    if (!res.ok) throw new Error(`Qdrant scroll HTTP ${res.status}`);
+    const data = await res.json();
+    const points = data.result?.points ?? [];
+
+    for (const pt of points) {
+      const fp = pt.payload?.file_path;
+      const sc = pt.payload?.som_cluster;
+      const gc = pt.payload?.gpuCluster;
+      if (fp && (sc != null || gc != null)) {
+        // keep highest-confidence entry (prefer one with both fields)
+        const existing = map.get(fp);
+        if (!existing || (sc != null && gc != null)) {
+          map.set(fp, { som_cluster: sc ?? null, gpuCluster: gc ?? null });
+        }
+      }
+    }
+
+    page++;
+    if (VERBOSE && page % 10 === 0) console.log(`    page ${page}, ${map.size} unique paths indexed`);
+
+    offset = data.result?.next_page_offset;
+    if (!offset || points.length === 0) break;
   }
 
-  console.log(`  ✅ Loaded ${allCards.length} cards`);
+  console.log(`  ✅ Indexed ${map.size} file paths with cluster assignments (${page} pages)`);
+  return map;
+}
 
-  // Check for existing cluster metadata
-  console.log('  Step 2: Check for cluster metadata...');
-  let cardsWithClusterMeta = 0;
-  const clusterMapping = {};
+// ─── Main ──────────────────────────────────────────────────────────────────
+async function main() {
+  console.log('\n── Cluster Attribution Pipeline (Phase 3) ─────────────────');
+  console.log(`  mode: ${DRY_RUN ? 'DRY-RUN (--apply to write)' : 'APPLY'}`);
 
-  for (const { cardId, card } of allCards) {
-    // Check if card already has cluster fields (from Qdrant payload or Neo4j)
-    if (card.som_bmu_row !== undefined || card.som_cluster !== undefined || card.gpuCluster !== undefined) {
-      cardsWithClusterMeta++;
+  const cards = loadCards();
+  console.log(`  ✅ Loaded ${cards.length} cards`);
 
-      // Index for analysis
-      if (card.som_cluster) {
-        if (!clusterMapping[card.som_cluster]) {
-          clusterMapping[card.som_cluster] = [];
-        }
-        clusterMapping[card.som_cluster].push(cardId);
+  const clusterMap = await buildClusterMap();
+
+  let matched = 0, unmatched = 0, updated = 0, alreadyHas = 0;
+  const clusterDist = {};
+
+  for (const { file, card } of cards) {
+    const normSource = normalizeSource(card.source);
+    const hit = normSource ? clusterMap.get(normSource) : null;
+
+    if (hit) {
+      matched++;
+      const sc = hit.som_cluster;
+      const gc = hit.gpuCluster;
+
+      if (sc != null) {
+        clusterDist[sc] = (clusterDist[sc] ?? 0) + 1;
       }
+
+      const needsUpdate = card.som_cluster == null || card.gpuCluster == null;
+      if (needsUpdate) {
+        updated++;
+        if (!DRY_RUN) {
+          const enriched = { ...card };
+          if (sc != null) enriched.som_cluster = sc;
+          if (gc != null) enriched.gpuCluster = gc;
+          fs.writeFileSync(path.join(CARDS_DIR, file), JSON.stringify(enriched, null, 2), 'utf8');
+        }
+        if (VERBOSE) console.log(`    [enrich] ${card.id} → som_cluster=${sc} gpuCluster=${gc}`);
+      } else {
+        alreadyHas++;
+      }
+    } else {
+      unmatched++;
+      if (VERBOSE) console.log(`    [miss] ${card.id} source="${card.source}"`);
     }
   }
 
-  console.log(`  ✅ Found ${cardsWithClusterMeta} cards with cluster metadata`);
-  console.log(`  ℹ️  Unique clusters: ${Object.keys(clusterMapping).length}`);
+  // Reports
+  fs.mkdirSync(EXPORTS_DIR, { recursive: true });
 
-  // Note: Full cluster attribution requires:
-  // - Qdrant connection (to fetch som_bmu_row/col/cluster from payloads)
-  // - Neo4j connection (to fetch gpuCluster assignments)
-  // These require running services. For now, we report what exists.
-
-  // Generate reports
-  console.log('  Step 3: Generate cluster attribution reports...');
+  const sortedClusters = Object.entries(clusterDist)
+    .sort((a, b) => b[1] - a[1])
+    .map(([clusterId, count]) => ({ clusterId: Number(clusterId), count }));
 
   const report = {
     timestamp: new Date().toISOString(),
-    mode: DRY_RUN ? 'dry-run' : APPLY ? 'apply' : 'preview',
+    mode: DRY_RUN ? 'dry-run' : 'apply',
     phase: 'Phase 3: Cluster Attribution',
-    inputs: {
-      totalCards: allCards.length,
-      cardsWithClusterMeta: cardsWithClusterMeta,
-    },
-    findings: {
-      status: 'READY FOR EXECUTION',
-      requirements: [
-        'Qdrant service running (port 6333) to fetch som_bmu_row/col/cluster from payloads',
-        'Neo4j service running (port 7687) to fetch gpuCluster assignments',
-        'DuckDB or similar for analytics on cluster distributions',
-      ],
-      nextSteps: [
-        '1. Verify Qdrant is running: npm run qdrant:health',
-        '2. Verify Neo4j is running: npm run neo4j:health',
-        '3. Run: npm run atlas:cluster-attribution:qdrant-fetch',
-        '4. Run: npm run atlas:cluster-attribution:neo4j-fetch',
-        '5. Enrich all cards with cluster assignments',
-      ],
-    },
-    clusterDistribution: {
-      totalClusters: Object.keys(clusterMapping).length,
-      cardsPerCluster: Object.entries(clusterMapping).map(([clusterId, cardIds]) => ({
-        clusterId,
-        count: cardIds.length,
-        cardIds: cardIds.slice(0, 5), // Sample first 5
-      })),
-    },
+    cards: { total: cards.length, matched, unmatched, updated, alreadyHas },
+    qdrant: { collection: COLLECTION, uniqueFilePaths: clusterMap.size },
+    clusterDistribution: sortedClusters,
   };
-
   const summary = {
     timestamp: new Date().toISOString(),
-    totalCards: allCards.length,
-    cardsWithClusterMeta: cardsWithClusterMeta,
-    clusterCount: Object.keys(clusterMapping).length,
-    status: 'Ready for full cluster attribution (requires Qdrant + Neo4j services)',
+    total: cards.length, matched, unmatched, updated,
+    uniqueClusters: sortedClusters.length,
+    topClusters: sortedClusters.slice(0, 10),
   };
 
   if (!DRY_RUN) {
-    fs.mkdirSync(path.dirname(REPORT_PATH), { recursive: true });
-    fs.writeFileSync(REPORT_PATH, JSON.stringify(report, null, 2), 'utf8');
-    fs.writeFileSync(SUMMARY_PATH, JSON.stringify(summary, null, 2), 'utf8');
-    console.log(`  ✅ Wrote report → ${REPORT_PATH}`);
-    console.log(`  ✅ Wrote summary → ${SUMMARY_PATH}`);
+    fs.writeFileSync(REPORT_PATH, JSON.stringify(report, null, 2));
+    fs.writeFileSync(SUMMARY_PATH, JSON.stringify(summary, null, 2));
+    console.log(`  ✅ Wrote report → memory/exports/cluster-attribution-report.json`);
+    console.log(`  ✅ Wrote summary → memory/exports/cluster-summary.json`);
   }
 
-  // Summary
-  console.log('\n── Summary ────────────────────────────────────────────────');
-  console.log(`  Total cards: ${allCards.length}`);
-  console.log(`  Cards with cluster metadata: ${cardsWithClusterMeta}`);
-  console.log(`  Unique clusters found: ${Object.keys(clusterMapping).length}`);
-  console.log(`  Status: READY FOR FULL ATTRIBUTION`);
+  console.log('\n── Results ────────────────────────────────────────────────');
+  console.log(`  Cards total:       ${cards.length}`);
+  console.log(`  Matched to Qdrant: ${matched}`);
+  console.log(`  Unmatched:         ${unmatched}`);
+  console.log(`  Newly enriched:    ${updated}${DRY_RUN ? ' (dry-run, not written)' : ''}`);
+  console.log(`  Already had data:  ${alreadyHas}`);
+  console.log(`  Unique clusters:   ${sortedClusters.length}`);
+  if (sortedClusters.length > 0) {
+    console.log(`  Top clusters:      ${sortedClusters.slice(0, 5).map(c => `${c.clusterId}(${c.count})`).join('  ')}`);
+  }
 
   if (DRY_RUN) {
-    console.log('\n[DRY-RUN] Reports generated. Use --apply to save.');
-  } else if (APPLY) {
-    console.log('\n✅ Cluster attribution analysis complete!');
-    console.log('\nTo complete cluster attribution, ensure services are running:');
-    console.log('  - Qdrant (port 6333)');
-    console.log('  - Neo4j (port 7687)');
-    console.log('\nThen run: npm run atlas:cluster-attribution:qdrant-fetch');
+    console.log('\n  Run with --apply to write enriched cards and reports.');
+  } else {
+    console.log('\n  ✅ Phase 3 complete → ready for Phase 4 (Vector64 dry-run)');
   }
-
-  process.exit(0);
 }
 
-main().catch((err) => {
-  console.error('\n❌ Error:', err.message);
+main().catch(err => {
+  console.error('\n❌', err.message);
   if (VERBOSE) console.error(err.stack);
   process.exit(1);
 });

@@ -1,7 +1,38 @@
 {
-  "timestamp": "2026-05-30T05:14:13.537Z",
-  "totalCards": 9373,
-  "cardsWithClusterMeta": 9372,
-  "clusterCount": 0,
-  "status": "Ready for full cluster attribution (requires Qdrant + Neo4j services)"
+  "timestamp": "2026-06-08T03:12:47.148Z",
+  "total": 7992,
+  "matched": 117,
+  "unmatched": 7875,
+  "updated": 14,
+  "uniqueClusters": 7,
+  "topClusters": [
+    {
+      "clusterId": 46,
+      "count": 52
+    },
+    {
+      "clusterId": 61,
+      "count": 29
+    },
+    {
+      "clusterId": 25,
+      "count": 16
+    },
+    {
+      "clusterId": 60,
+      "count": 9
+    },
+    {
+      "clusterId": 39,
+      "count": 5
+    },
+    {
+      "clusterId": 47,
+      "count": 4
+    },
+    {
+      "clusterId": 31,
+      "count": 2
+    }
+  ]
 }

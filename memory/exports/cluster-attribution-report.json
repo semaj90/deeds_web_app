@@ -1,28 +1,46 @@
 {
-  "timestamp": "2026-05-30T05:14:13.536Z",
+  "timestamp": "2026-06-08T03:12:47.147Z",
   "mode": "apply",
   "phase": "Phase 3: Cluster Attribution",
-  "inputs": {
-    "totalCards": 9373,
-    "cardsWithClusterMeta": 9372
+  "cards": {
+    "total": 7992,
+    "matched": 117,
+    "unmatched": 7875,
+    "updated": 14,
+    "alreadyHas": 103
   },
-  "findings": {
-    "status": "READY FOR EXECUTION",
-    "requirements": [
-      "Qdrant service running (port 6333) to fetch som_bmu_row/col/cluster from payloads",
-      "Neo4j service running (port 7687) to fetch gpuCluster assignments",
-      "DuckDB or similar for analytics on cluster distributions"
-    ],
-    "nextSteps": [
-      "1. Verify Qdrant is running: npm run qdrant:health",
-      "2. Verify Neo4j is running: npm run neo4j:health",
-      "3. Run: npm run atlas:cluster-attribution:qdrant-fetch",
-      "4. Run: npm run atlas:cluster-attribution:neo4j-fetch",
-      "5. Enrich all cards with cluster assignments"
-    ]
+  "qdrant": {
+    "collection": "codebase_chunks_768",
+    "uniqueFilePaths": 8163
   },
-  "clusterDistribution": {
-    "totalClusters": 0,
-    "cardsPerCluster": []
-  }
+  "clusterDistribution": [
+    {
+      "clusterId": 46,
+      "count": 52
+    },
+    {
+      "clusterId": 61,
+      "count": 29
+    },
+    {
+      "clusterId": 25,
+      "count": 16
+    },
+    {
+      "clusterId": 60,
+      "count": 9
+    },
+    {
+      "clusterId": 39,
+      "count": 5
+    },
+    {
+      "clusterId": 47,
+      "count": 4
+    },
+    {
+      "clusterId": 31,
+      "count": 2
+    }
+  ]
 }
