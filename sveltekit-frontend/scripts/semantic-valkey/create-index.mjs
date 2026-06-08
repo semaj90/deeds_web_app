@@ -68,7 +68,7 @@ await redis.sendCommand([
   'kind',  'TAG',                          // pre-filter: prompt | rule | fix | source_ref | error
   'tags',  'TAG',  'SEPARATOR', ',',       // comma-separated tag list
   'model', 'TAG',                          // pre-filter by model name
-  'vec',   'VECTOR', 'HNSW', '8',
+  'vec',   'VECTOR', 'HNSW', '10',
            'TYPE',            'FLOAT32',
            'DIM',             String(DIM),
            'DISTANCE_METRIC', 'COSINE',

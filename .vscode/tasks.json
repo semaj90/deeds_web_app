@@ -1384,7 +1384,7 @@
       }
     },
     {
-      "label": "🧠 Startup: Valkey Semantic Index",
+      "label": "🔑 Startup: Valkey Semantic Index (create-index)",
       "type": "shell",
       "command": "npm run valkey:index:create",
       "options": {
@@ -1413,7 +1413,7 @@
       "detail": "Create (or verify) the Valkey FT HNSW index prompt:sem:idx (768-dim, cosine). Safe to re-run — skips when index already exists."
     },
     {
-      "label": "🧠 Startup: Seed OpenCode Rules",
+      "label": "🔑 Startup: Valkey Seed OpenCode Rules",
       "type": "shell",
       "command": "npm run valkey:seed:rules:embed",
       "options": {
@@ -1428,7 +1428,7 @@
         "runOn": "folderOpen"
       },
       "isBackground": false,
-      "dependsOn": "🧠 Startup: Valkey Semantic Index",
+      "dependsOn": "🔑 Startup: Valkey Semantic Index (create-index)",
       "group": "build",
       "problemMatcher": [],
       "presentation": {
@@ -1457,7 +1457,7 @@
         "runOn": "folderOpen"
       },
       "isBackground": false,
-      "dependsOn": "🧠 Startup: Seed OpenCode Rules",
+      "dependsOn": "🔑 Startup: Valkey Seed OpenCode Rules",
       "group": "build",
       "problemMatcher": [],
       "presentation": {
