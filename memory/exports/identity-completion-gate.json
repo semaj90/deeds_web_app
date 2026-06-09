@@ -1,0 +1,54 @@
+{
+  "ts": "2026-06-09T22:38:48.002Z",
+  "gates": {
+    "qdrant_feature_id": {
+      "status": "PASS",
+      "threshold": 0.95,
+      "coverage": 0.9887893537696769,
+      "coveragePct": "98.9%",
+      "numerator": 76382,
+      "denominator": 77248
+    },
+    "qdrant_canonical_ref": {
+      "status": "PASS",
+      "threshold": 0.98,
+      "coverage": 0.9948218724109362,
+      "coveragePct": "99.5%",
+      "numerator": 76848,
+      "denominator": 77248
+    },
+    "qdrant_som": {
+      "status": "PASS",
+      "threshold": 0.99,
+      "coverage": 0.995210231980116,
+      "coveragePct": "99.5%",
+      "numerator": 76878,
+      "denominator": 77248
+    },
+    "qdrant_karpathy": {
+      "status": "PASS",
+      "threshold": 0.03,
+      "coverage": 0.0362339478044739,
+      "coveragePct": "3.6%",
+      "numerator": 2799,
+      "denominator": 77248
+    },
+    "neo4j_canonical": {
+      "status": "PASS",
+      "threshold": 0.5,
+      "coverage": 0.5591296492675072,
+      "coveragePct": "55.9%",
+      "numerator": 14236,
+      "denominator": 25461
+    },
+    "valkey_warm": {
+      "status": "PASS",
+      "threshold": 0.9,
+      "coverage": 1,
+      "coveragePct": "100.0%",
+      "numerator": 8150,
+      "denominator": 7725
+    }
+  },
+  "overall": "PASS"
+}

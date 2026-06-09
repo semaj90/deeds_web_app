@@ -8,15 +8,20 @@
  * a markdown recommendation report.
  */
 import process from 'node:process';
-import { mkdirSync, writeFileSync, existsSync } from 'node:fs';
+import { mkdirSync, writeFileSync, existsSync, appendFileSync } from 'node:fs';
 import { resolve, dirname } from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 import { createRequire } from 'node:module';
 import { createHash } from 'node:crypto';
 import Redis from 'ioredis';
 import pg from 'pg';
 import dotenv from 'dotenv';
 dotenv.config();
+
+// ── Canonical source-ref helper ──────────────────────────────────────────────
+const _canonicalHelperPath = resolve(dirname(fileURLToPath(import.meta.url)), '../lib/canonical-source-ref.mjs');
+const { normalizeSourceRef: _canonNorm, sourceRefVariants: _canonVariants } =
+  await import(pathToFileURL(_canonicalHelperPath).href);
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = resolve(__dirname, '../../sveltekit-frontend');
@@ -76,7 +81,7 @@ const FORCE      = args.includes('--force');
 const HIT_LOG_HOURS = parseInt(
   args.find(a => a.startsWith('--hours='))?.split('=')[1] ?? '24', 10) || 24;
 const limitIdx = args.indexOf('--limit');
-const LIMIT = limitIdx !== -1 ? parseInt(args[limitIdx + 1], 10) : 50;
+const LIMIT = limitIdx !== -1 ? parseInt(args[limitIdx + 1], 10) : 200;
 
 // ── Config ────────────────────────────────────────────────────────────────────
 const QDRANT_URL = process.env.QDRANT_URL ?? 'http://localhost:6333';
@@ -159,9 +164,10 @@ function getNeo4jPath(record = {}) {
 function qdrantPathVariants(path) {
   const normalized = normalizeRepoPath(path);
   if (!normalized) return [];
+  // Use canonical helper variants + legacy repo-prefixed forms for completeness.
+  const canonicalVariants = _canonVariants(normalized);
   return [...new Set([
-    normalized,
-    `sveltekit-frontend/${normalized}`,
+    ...canonicalVariants,
     `deeds-web-app/${normalized}`,
     `deeds-web-app/sveltekit-frontend/${normalized}`,
   ])];
@@ -239,9 +245,36 @@ async function neo4jQuery(cypher, params = {}) {
   return d.results[0]?.data ?? [];
 }
 
+// Path prefixes that are noise — backup archives, venvs, generated reports.
+// These inflate PageRank (many cross-references inside backup dirs) but add
+// no signal to the authority blend.
+const NOISE_PATH_PREFIXES = [
+  'scripts/api-cleanup/',
+  'scripts/tests/backup',
+  '.venv/',
+  'node_modules/',
+  'deeds_labs/',
+  'scratch/',
+  'logs/',
+  'reports/backup',
+];
+
+function isNoisePath(filePath) {
+  if (!filePath) return true;
+  const norm = normalizeRepoPath(filePath) ?? filePath;
+  return NOISE_PATH_PREFIXES.some(p => norm.startsWith(p) || norm.includes('/' + p));
+}
+
 async function fetchTopByPageRank(limit) {
   const rows = await neo4jQuery(
     `MATCH (n:CodebaseFile) WHERE n.graphPageRank IS NOT NULL
+       AND n.filePath IS NOT NULL
+       AND NOT n.filePath CONTAINS 'api-cleanup'
+       AND NOT n.filePath CONTAINS '.venv'
+       AND NOT n.filePath CONTAINS 'node_modules'
+       AND NOT n.filePath CONTAINS 'deeds_labs'
+       AND NOT n.filePath CONTAINS '/backup'
+       AND NOT n.filePath CONTAINS 'scratch/'
      RETURN coalesce(n.stableKey, n.filePath, n.relativePath) AS stableKey,
             n.graphPageRank AS pr,
             coalesce(n.graphAuthorityScore, 0) AS authority,
@@ -270,6 +303,7 @@ async function fetchTopByPageRank(limit) {
   const MAX_PER_COMMUNITY = 30;
 
   for (const item of results) {
+    if (isNoisePath(item.stableKey)) continue; // JS-side guard for anything Cypher missed
     const dir = dirname(normalizeRepoPath(item.stableKey) || '');
     const dirCount = dirCounts.get(dir) || 0;
     const commCount = communityCounts.get(item.community) || 0;
@@ -292,6 +326,9 @@ const QDRANT_BATCH_SIZE = 25;
 // Phase B: path→cluster reverse index built during Qdrant scroll
 const _pathToCluster = new Map(); // stableKey → clusterKey
 
+// matched_by map: canonical path → which Qdrant payload field matched
+const _matchedByField = new Map();
+
 async function fetchEmbeddingsBatch(filePaths) {
   const result = new Map();
   if (!filePaths.length) return result;
@@ -300,7 +337,7 @@ async function fetchEmbeddingsBatch(filePaths) {
     const chunk = filePaths.slice(i, i + QDRANT_BATCH_SIZE);
     try {
       const allVariants = chunk.flatMap(fp => qdrantPathVariants(fp));
-      const filterKeys = ['file_path', 'filePath', 'relativePath', 'relative_path', 'path', 'stable_key', 'stableKey'];
+      const filterKeys = ['file_path', 'filePath', 'relativePath', 'relative_path', 'path', 'stable_key', 'stableKey', 'sourceRef'];
       const should = filterKeys.map(k => ({
         key: k,
         match: { any: allVariants }
@@ -311,7 +348,7 @@ async function fetchEmbeddingsBatch(filePaths) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           filter: { should },
-          limit: chunk.length * 10, 
+          limit: chunk.length * 10,
           with_vector: true,
           with_payload: true,
         }),
@@ -323,11 +360,17 @@ async function fetchEmbeddingsBatch(filePaths) {
         ? JSON.parse(gpu.simdJsonParse(raw))
         : JSON.parse(raw);
       for (const pt of (data.result?.points ?? [])) {
-        const fp = normalizeRepoPath(getPayloadPath(pt.payload));
+        const rawFp = getPayloadPath(pt.payload);
+        const fp = normalizeRepoPath(rawFp);
         if (!fp) continue;
         const vec = pt.vector?.content ?? pt.vector;
         if (Array.isArray(vec) && vec.length === 768) {
-          if (!result.has(fp)) result.set(fp, new Float32Array(vec));
+          if (!result.has(fp)) {
+            result.set(fp, new Float32Array(vec));
+            // Record which payload field was the match source
+            const matchedField = filterKeys.find(k => pt.payload?.[k] != null) ?? 'unknown';
+            _matchedByField.set(fp, matchedField);
+          }
         }
         // Phase B: capture cluster_key from payload for reverse index
         const ck = pt.payload?.cluster_key ?? pt.payload?.clusterId ?? pt.payload?.cluster_id;
@@ -566,6 +609,35 @@ async function main() {
     console.warn('[karpathy] No embeddings found in Qdrant.');
   }
 
+  // Write miss report — files that had no Qdrant embedding hit.
+  const MISS_REPORT = resolve(REPO, 'memory/exports/karpathy-qdrant-misses.jsonl');
+  mkdirSync(dirname(MISS_REPORT), { recursive: true });
+  const missLines = [];
+  for (const c of candidates) {
+    const normKey = normalizeRepoPath(c.stableKey);
+    if (!normKey || embeddingMap.has(normKey)) continue;
+    missLines.push(JSON.stringify({
+      ts: new Date().toISOString(),
+      stableKey: c.stableKey,
+      normKey,
+      variants: qdrantPathVariants(c.stableKey),
+      pr: c.pr,
+    }));
+  }
+  if (missLines.length > 0) {
+    writeFileSync(MISS_REPORT, missLines.join('\n') + '\n');
+    console.log(`[karpathy] Miss report: ${missLines.length} misses → ${MISS_REPORT}`);
+  }
+
+  // Log matched_by field distribution
+  const matchedByDist = {};
+  for (const field of _matchedByField.values()) {
+    matchedByDist[field] = (matchedByDist[field] ?? 0) + 1;
+  }
+  if (Object.keys(matchedByDist).length > 0) {
+    console.log('[karpathy] Qdrant matched_by field distribution:', matchedByDist);
+  }
+
   // Shared Redis client for probe cache + later score writes
   let _earlyRedis = null;
   if (!DRY) {
@@ -615,6 +687,18 @@ async function main() {
     ? gpuAttentionScores.reduce((sum, value) => sum + value, 0) / gpuAttentionScores.length
     : 0;
 
+  // Min-max normalize pr and authority across this candidate batch so neither
+  // raw scale dominates the blend. PageRank ~0-7, authority ~0-12749 — without
+  // normalization the authority term swamps the 0.4·PR + 0.3·attention terms.
+  const prValues = candidates.map(c => c.pr);
+  const authValues = candidates.map(c => c.authority);
+  const prMin = Math.min(...prValues);
+  const prMax = Math.max(...prValues);
+  const authMin = Math.min(...authValues);
+  const authMax = Math.max(...authValues);
+  const prRange = prMax - prMin || 1;
+  const authRange = authMax - authMin || 1;
+
   const finalResults = [];
   for (let i = 0; i < candidates.length; i++) {
     const c = candidates[i];
@@ -629,8 +713,10 @@ async function main() {
         attention = attentionCpu;
       }
     }
-    
-    const blend = computeKarpathyBlend(c.pr, c.authority, attention);
+
+    const prNorm = (c.pr - prMin) / prRange;
+    const authNorm = (c.authority - authMin) / authRange;
+    const blend = computeKarpathyBlend(prNorm, authNorm, attention);
     finalResults.push({
       ...c,
       attention,
@@ -640,6 +726,7 @@ async function main() {
       attentionPeak: runAttentionPeak,
       attentionMean: runAttentionMean,
       blend,
+      matched_by: _matchedByField.get(normalizeRepoPath(c.stableKey)) ?? null,
     });
   }
 
