@@ -84,4 +84,24 @@ export async function appendOutcomeLedger(event: Record<string, unknown>): Promi
     // Map outcome string to reward scores if reward not already set
     let reward = event.reward;
     if (reward === undefined || reward === null) {
-      if (typeof event.outcome === 'string
+      if (typeof event.outcome === 'string') {
+        const outcome = event.outcome.toLowerCase();
+        if (outcome === 'success') {
+          reward = 1.0;
+        } else if (outcome === 'partial') {
+          reward = 0.5;
+        } else if (outcome === 'failure') {
+          reward = 0.0;
+        } else if (outcome === 'pending') {
+          reward = null;
+        }
+      }
+    }
+
+    const out = JSON.stringify({ ...event, reward, ts: new Date().toISOString() }) + '\n';
+    await fs.appendFile(p, out, { encoding: 'utf8' });
+  } catch (err) {
+    // Non-fatal observability helper — swallow errors
+    console.warn('[OutcomeLedger] append failed:', (err as Error)?.message ?? err);
+  }
+}
