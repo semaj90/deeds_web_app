@@ -1,0 +1,367 @@
+{
+  "generated": "2026-06-09",
+  "scope": "C:\\Users\\james\\Videos\\deeds-web-app",
+  "summary": {
+    "powershell_count": 54,
+    "bash_count": 20,
+    "docker_compose_root": 6,
+    "docker_compose_sub": 7,
+    "nodejs_startup_scripts": 7,
+    "npm_infra_scripts": 35,
+    "canonical_replacement": "scripts/dev/start-parent-atlas.ps1"
+  },
+  "docker_compose": {
+    "canonical": "docker-compose.yml",
+    "files": [
+      {
+        "path": "docker-compose.yml",
+        "profiles": ["default", "full", "gpu"],
+        "services": ["postgres:5434", "redis:6379", "qdrant:6333", "rabbitmq:5672", "neo4j:7474", "couchdb:5984", "nats:4222", "minio:9000", "bifrost", "searxng", "langfuse", "go-retrieval", "go-embed"],
+        "status": "CANONICAL",
+        "use": "Use this for all environments"
+      },
+      {
+        "path": "docker-compose.dev.yml",
+        "profiles": ["default"],
+        "services": ["postgres:5433", "redis:6379", "legal-gateway", "enhanced-rag"],
+        "status": "SUPERSEDED",
+        "use": "Superseded by main compose"
+      },
+      {
+        "path": "docker-compose.test.yml",
+        "profiles": ["default"],
+        "services": ["test postgres", "test redis"],
+        "status": "CI_ONLY",
+        "use": "CI only"
+      },
+      {
+        "path": "docker-compose.vector.yml",
+        "profiles": [],
+        "services": ["qdrant"],
+        "status": "SUPERSEDED",
+        "use": "Superseded"
+      },
+      {
+        "path": "docker-compose.redis8-eval.yml",
+        "profiles": [],
+        "services": ["redis8"],
+        "status": "EVALUATION_ONLY",
+        "use": "Redis 8 evaluation only"
+      },
+      {
+        "path": "docker-compose.production.yml",
+        "profiles": [],
+        "services": ["all production services"],
+        "status": "OPS_ONLY",
+        "use": "Production ops only"
+      },
+      {
+        "path": "sveltekit-frontend/docker-compose.dev.yml",
+        "profiles": [],
+        "services": ["sveltekit dev"],
+        "status": "SUPERSEDED",
+        "use": "Superseded by root"
+      },
+      {
+        "path": "sveltekit-frontend/docker-compose.light.yml",
+        "profiles": [],
+        "services": ["minimal stack"],
+        "status": "SUPERSEDED",
+        "use": "Superseded"
+      },
+      {
+        "path": "sveltekit-frontend/docker-compose.full.yml",
+        "profiles": [],
+        "services": ["full stack"],
+        "status": "SUPERSEDED",
+        "use": "Superseded by --profile full"
+      },
+      {
+        "path": "sveltekit-frontend/docker-compose.phase89.yml",
+        "profiles": [],
+        "services": ["phase89 snapshot"],
+        "status": "OBSOLETE",
+        "use": "Phase 89 snapshot — do not use"
+      },
+      {
+        "path": "infra/caddy/docker-compose.caddy.yml",
+        "profiles": [],
+        "services": ["caddy:8443 QUIC"],
+        "status": "OPTIONAL",
+        "use": "Optional reverse proxy"
+      },
+      {
+        "path": "claude-mem/docker-compose.yml",
+        "profiles": [],
+        "services": ["claude-mem plugin"],
+        "status": "DEV_TOOL_ONLY",
+        "use": "Dev tool only"
+      },
+      {
+        "path": "docker/docker-compose.gpu.yml",
+        "profiles": [],
+        "services": ["GPU inference"],
+        "status": "SUPERSEDED",
+        "use": "Superseded by --profile gpu"
+      }
+    ]
+  },
+  "powershell_scripts": {
+    "active": [
+      {
+        "path": "scripts/start-all.ps1",
+        "purpose": "Master startup (Docker + Ollama + health)",
+        "ports": "all",
+        "required_env": ["POSTGRES_PASSWORD", "REDIS_PASSWORD"],
+        "status": "ACTIVE",
+        "notes": "Verbose, best for first run"
+      },
+      {
+        "path": "scripts/launch-turboquant.ps1",
+        "purpose": "llama-server with TurboQuant KV cache",
+        "ports": ["8090"],
+        "required_env": ["LLAMA_SERVER_PATH", "TURBO_PROFILE", "TURBO_CTX"],
+        "status": "ACTIVE",
+        "notes": "Use for GPU inference"
+      },
+      {
+        "path": "scripts/launch-embed-server.ps1",
+        "purpose": "Embedding server",
+        "ports": ["8097"],
+        "required_env": [],
+        "status": "ACTIVE"
+      },
+      {
+        "path": "scripts/startup-health-and-trace.ps1",
+        "purpose": "Health gate with JSON output",
+        "ports": [],
+        "required_env": ["DATABASE_URL", "REDIS_URL"],
+        "status": "ACTIVE",
+        "notes": "Pre-flight check"
+      },
+      {
+        "path": "scripts/ace-startup-with-cooldown.ps1",
+        "purpose": "ACE incremental startup (1h cooldown)",
+        "ports": [],
+        "required_env": ["DATABASE_URL", "REDIS_URL"],
+        "status": "ACTIVE"
+      },
+      {
+        "path": "scripts/production-gate.ps1",
+        "purpose": "Production readiness check",
+        "ports": [],
+        "required_env": ["all service URLs"],
+        "status": "ACTIVE"
+      },
+      {
+        "path": "scripts/setup-ace-rabbitmq.ps1",
+        "purpose": "RabbitMQ queues/exchanges setup",
+        "ports": ["5672"],
+        "required_env": ["RABBITMQ_USER", "RABBITMQ_PASS"],
+        "status": "ONE_TIME_SETUP"
+      },
+      {
+        "path": "scripts/setup-ace-minio.ps1",
+        "purpose": "MinIO/SeaweedFS bucket setup",
+        "ports": ["8333", "9000"],
+        "required_env": ["MINIO_ACCESS_KEY", "MINIO_SECRET_KEY"],
+        "status": "ONE_TIME_SETUP"
+      },
+      {
+        "path": "scripts/start-whisper-server.ps1",
+        "purpose": "Whisper STT server",
+        "ports": [],
+        "required_env": [],
+        "status": "OPTIONAL"
+      },
+      {
+        "path": "scripts/start-rtx8gb-service.ps1",
+        "purpose": "RTX 8GB GPU service",
+        "ports": [],
+        "required_env": ["CUDA_VISIBLE_DEVICES"],
+        "status": "OPTIONAL_GPU"
+      },
+      {
+        "path": "scripts/dev-agentic.ps1",
+        "purpose": "Agentic dev environment",
+        "ports": [],
+        "required_env": [],
+        "status": "DEV_TOOL"
+      }
+    ],
+    "deprecated": [
+      {
+        "path": "scripts/start-dev-environment.ps1",
+        "reason": "Uses phase66-* container names (old naming)",
+        "replacement": "docker compose up -d with docker-compose.yml"
+      }
+    ]
+  },
+  "bash_scripts": [
+    {
+      "path": "scripts/start_infrastructure.sh",
+      "purpose": "Start/stop/status individual containers",
+      "status": "SUPERSEDED",
+      "notes": "Superseded by compose"
+    },
+    {
+      "path": "scripts/start_services.sh",
+      "purpose": "docker run individual services",
+      "status": "OBSOLETE",
+      "notes": "Replaced by compose"
+    },
+    {
+      "path": "scripts/start-triton.sh",
+      "purpose": "TensorRT Triton inference server",
+      "status": "OPTIONAL_GPU"
+    },
+    {
+      "path": "scripts/bootstrap_rabbitmq.sh",
+      "purpose": "RabbitMQ init",
+      "status": "ONE_TIME_SETUP"
+    },
+    {
+      "path": "scripts/setup-ace-minio.sh",
+      "purpose": "MinIO/S3 bucket setup",
+      "status": "ONE_TIME_SETUP"
+    },
+    {
+      "path": "scripts/setup-ace-rabbitmq.sh",
+      "purpose": "RabbitMQ queues setup",
+      "status": "ONE_TIME_SETUP"
+    },
+    {
+      "path": "scripts/setup_rabbitmq_dlq.sh",
+      "purpose": "DLQ configuration",
+      "status": "ONE_TIME_SETUP"
+    },
+    {
+      "path": "scripts/startup/health-check.sh",
+      "purpose": "Generic health probe",
+      "status": "SUPERSEDED",
+      "notes": "Superseded by startup-health-and-trace.ps1"
+    },
+    {
+      "path": "scripts/startup/init-workspace.sh",
+      "purpose": "Workspace init",
+      "status": "ACTIVE",
+      "notes": "Used by CI"
+    }
+  ],
+  "nodejs_scripts": [
+    {
+      "path": "scripts/startup/start-mcp-server.mjs",
+      "purpose": "TRACE MCP server :8788",
+      "status": "ACTIVE"
+    },
+    {
+      "path": "scripts/startup/check-redis-flavor.mjs",
+      "purpose": "Detects Valkey vs Redis",
+      "status": "ACTIVE"
+    },
+    {
+      "path": "scripts/startup/smoke-valkey-node-client.mjs",
+      "purpose": "Valkey smoke test",
+      "status": "ACTIVE"
+    },
+    {
+      "path": "scripts/startup/startup-truth.mjs",
+      "purpose": "Verifies startup state matches expected",
+      "status": "ACTIVE"
+    },
+    {
+      "path": "scripts/startup/build-cuda-libtorch-on-startup.mjs",
+      "purpose": "CUDA bridge warm-up",
+      "status": "ACTIVE_GPU_ONLY"
+    },
+    {
+      "path": "scripts/ace-startup-health.mjs",
+      "purpose": "ACE pipeline health reporter",
+      "status": "ACTIVE"
+    },
+    {
+      "path": "scripts/atlas/check-infra.mjs",
+      "purpose": "Infrastructure health check",
+      "status": "ACTIVE"
+    },
+    {
+      "path": "scripts/atlas/validate-dev-services.mjs",
+      "purpose": "Dev services validation",
+      "status": "ACTIVE"
+    },
+    {
+      "path": "scripts/atlas/atlas-lane-health-loop.mjs",
+      "purpose": "Continuous health monitoring",
+      "status": "ACTIVE"
+    }
+  ],
+  "npm_scripts": [
+    { "name": "dev", "command": "vite dev :5173 with env injection", "status": "CANONICAL_DEV" },
+    { "name": "startup:ace", "command": "ace-incremental-startup.mjs", "status": "ACTIVE" },
+    { "name": "startup:health", "command": "startup-health-and-trace.ps1", "status": "ACTIVE" },
+    { "name": "startup:truth", "command": "startup-truth.mjs", "status": "ACTIVE" },
+    { "name": "startup:redis:flavor", "command": "check-redis-flavor.mjs", "status": "ACTIVE" },
+    { "name": "turbo:start", "command": "llama-server (text-only)", "status": "ACTIVE_GPU" },
+    { "name": "turbo:start:detached", "command": "detached llama-server", "status": "ACTIVE_GPU" },
+    { "name": "health:api", "command": "ace-startup-health.mjs", "status": "ACTIVE" },
+    { "name": "start-with-smoke", "command": "smoke gate + dev", "status": "ACTIVE" },
+    { "name": "start:dev:smoke", "command": "smoke + dev combined", "status": "ACTIVE" },
+    { "name": "startup:redis8-eval", "command": "docker compose redis8 eval", "status": "EVALUATION_ONLY" },
+    { "name": "smoke:gpu", "command": "GPU bridge probe", "status": "ACTIVE_GPU" },
+    { "name": "karpathy:gpu", "command": "Karpathy authority blend", "status": "ACTIVE" },
+    { "name": "karpathy:backfill:qdrant", "command": "Backfill karpathy → Qdrant", "status": "NEW_PHASE7" },
+    { "name": "neo4j:align:source-refs", "command": "Set canonicalSourceRef on Neo4j", "status": "NEW_PHASE7" },
+    { "name": "identity:warm", "command": "Warm Valkey feature cache", "status": "NEW_PHASE7" },
+    { "name": "identity:gate", "command": "Run identity completion gate", "status": "NEW_PHASE7" }
+  ],
+  "duplicate_risks": {
+    "docker_compose_stacks": {
+      "description": "Multiple compose files define Postgres+Redis stack",
+      "risk": "Port conflicts if run simultaneously",
+      "canonical_port": 5434,
+      "conflicting_ports": [5433],
+      "fix": "Use only docker-compose.yml from repo root"
+    },
+    "container_name_conflicts": {
+      "old_pattern": "phase66-*",
+      "new_pattern": "legal-ai-*",
+      "check_command": "docker ps -a --format '{{.Names}}' | grep -E 'phase66|legal-ai'"
+    },
+    "postgres_port_conflict": {
+      "docker_compose_dev_yml": 5433,
+      "docker_compose_yml": 5434,
+      "warning": "DATABASE_URL in .env must match whichever is running"
+    }
+  },
+  "recommended_commands": {
+    "start_default": "docker compose up -d",
+    "start_full": "docker compose --profile full up -d",
+    "stop": "docker compose down",
+    "status": "docker compose ps",
+    "start_gpu_inference": "$env:TURBO_PROFILE = 'turboquant-safe'; $env:TURBO_CTX = '65536'; ./scripts/launch-turboquant.ps1",
+    "preflight_health": "npm run startup:health",
+    "start_sveltekit_dev": "cd sveltekit-frontend && npm run dev",
+    "identity_pipeline": ["npm run karpathy:gpu", "npm run identity:warm", "npm run identity:gate"]
+  },
+  "new_canonical_scripts": [
+    {
+      "path": "scripts/dev/start-parent-atlas.ps1",
+      "purpose": "Start postgres+redis+qdrant+neo4j+rabbitmq"
+    },
+    {
+      "path": "scripts/dev/stop-parent-atlas.ps1",
+      "purpose": "Stop and remove containers"
+    },
+    {
+      "path": "scripts/dev/status-parent-atlas.ps1",
+      "purpose": "Show service health"
+    }
+  ],
+  "deprecated_archive": [
+    "scripts/start_services.sh",
+    "scripts/start-dev-environment.ps1",
+    "sveltekit-frontend/docker-compose.phase89.yml",
+    "sveltekit-frontend/docker-compose.light.yml",
+    "sveltekit-frontend/docker-compose.full.yml"
+  ]
+}

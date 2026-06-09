@@ -719,6 +719,7 @@ async function main() {
     const blend = computeKarpathyBlend(prNorm, authNorm, attention);
     finalResults.push({
       ...c,
+      stableKey: _canonNorm(c.stableKey) ?? normalizeRepoPath(c.stableKey) ?? c.stableKey,
       attention,
       attentionCpu,
       attentionGpu,

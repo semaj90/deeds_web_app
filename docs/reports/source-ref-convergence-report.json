@@ -1,0 +1,59 @@
+{
+  "generatedAt": "2026-06-09T23:36:37.767Z",
+  "sampleSize": 200,
+  "systems": {
+    "neo4j": {
+      "withCanonicalSourceRef": 200,
+      "canonicalMatchRate": "100.0%"
+    },
+    "qdrant": {
+      "hits": 194,
+      "misses": 6,
+      "hitRate": "97.0%",
+      "collectionSizeAfterPrune": 54195
+    },
+    "karpathy": {
+      "hits": 89,
+      "misses": 111,
+      "hitRate": "44.5%"
+    },
+    "atlas": {
+      "hits": 0,
+      "misses": 200,
+      "note": "Atlas packets use task refs; file-path hits are incidental"
+    }
+  },
+  "convergence": {
+    "fullyAligned": 89,
+    "fullyAlignedPct": "44.5%",
+    "needsReindex": 0,
+    "neverIndexed": 6
+  },
+  "needsReindexSample": [],
+  "neverIndexedSample": [
+    {
+      "canonical": "src/lib/server/db/vector-schema.ts",
+      "pr": 1.547931724977365
+    },
+    {
+      "canonical": "src/lib/server/db/schema-actual.ts",
+      "pr": 1.47704714405275
+    },
+    {
+      "canonical": "src/lib/server/db/lucia-schema.ts",
+      "pr": 1.42560592709797
+    },
+    {
+      "canonical": "src/lib/server/db/additional-tables.ts",
+      "pr": 1.375837841376685
+    },
+    {
+      "canonical": "src/routes/(app)/cases/[id]/canvas/+page.server.ts",
+      "pr": 1.3671730070653145
+    },
+    {
+      "canonical": "src/routes/(analysis)@/+layout.server.ts",
+      "pr": 1.3670986589613254
+    }
+  ]
+}

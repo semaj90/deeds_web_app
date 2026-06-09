@@ -1,11 +1,11 @@
 # Codebase Graph Plan — Fast AST (20-Gate)
-> Generated: 2026-06-09T16:30:38.060Z
+> Generated: 2026-06-09T23:21:25.114Z
 > Mode: `fast-ast` (CPU only)
 
 ## Stats
 | Metric | Count |
 |--------|-------|
-| Files | 23185 |
+| Files | 23216 |
 | Routes | 1099 |
 | Components | 917 |
 | API handlers | 3223 |

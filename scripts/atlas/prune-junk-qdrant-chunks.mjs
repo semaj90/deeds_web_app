@@ -60,6 +60,8 @@ const JUNK_PREFIXES = [
   'deeds_labs/',
   'granite-docling/',
   'models/embeddinggemma',   // raw model weights, not source
+  'scripts/api-cleanup/',    // archived report artifacts from old cleanup pass
+  '../scripts/api-cleanup/', // same with leading ../ from old indexer working dir
 ];
 
 // ── Qdrant helpers ────────────────────────────────────────────────────
