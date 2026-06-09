@@ -1,4 +1,4 @@
-# Atlas Lane Health — 2026-05-29T00:24:54.044Z
+# Atlas Lane Health — 2026-06-08T23:13:28.379Z
 
 ## C++ / CUDA Build (simd-bridge)
 | Check | Status |
@@ -13,15 +13,15 @@
 ## Atlas Files
 | File | Status |
 |------|--------|
-| codesbaseAtlas | ✅ 1818KB |
+| codesbaseAtlas | ✅ 1817KB |
 | featureRegistry | ✅ 2618KB |
-| featureRegistryTmp | ✅ 6KB |
+| featureRegistryTmp | ✅ 20KB |
 | cartridgeSeeds | ✅ 2729KB |
-| aceContext | ✅ 356KB |
+| aceContext | ✅ 40KB |
 | startupStatus | ✅ 0KB |
 
 ## Cartridge Seeds
-✅ 4173 seeds, age 598min
+✅ 4173 seeds, age 0min
 
 Regen: `node scripts/atlas/atlas-to-cartridge-seed.mjs`
 
@@ -29,15 +29,18 @@ Regen: `node scripts/atlas/atlas-to-cartridge-seed.mjs`
 ```json
 {
   "bifrost": "green",
-  "retrievalGo": "green",
+  "retrievalGo": "yellow",
   "turboquant": "green",
-  "topologySearch": "green",
+  "topologySearch": "yellow",
   "traceMcp": "green",
+  "turbovecMcp": "green",
+  "karpathyScores": "green",
+  "authorityTop": "green",
   "sveltekit": "yellow",
   "backgroundJobs": {
     "graphifySom": "skipped",
     "graphSynthesize": "skipped"
   },
-  "timestamp": "2026-05-28T15:32:16.475Z"
+  "timestamp": "2026-06-08T22:54:17.929Z"
 }
 ```

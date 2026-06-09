@@ -1,4 +1,10 @@
 {
+  "src/routes/admin/cache/+page.svelte": {
+    "zone": "route",
+    "directDeps": 1,
+    "serverDeps": 0,
+    "dbDeps": 0
+  },
   "src/routes/api/ace/ask/+server.ts": {
     "zone": "route",
     "directDeps": 0,
@@ -28,6 +34,12 @@
     "directDeps": 3,
     "serverDeps": 0,
     "dbDeps": 1
+  },
+  "src/routes/api/cache/stats/+server.ts": {
+    "zone": "route",
+    "directDeps": 1,
+    "serverDeps": 0,
+    "dbDeps": 0
   },
   "src/routes/api/chat/stream/+server.ts": {
     "zone": "route",
@@ -217,7 +229,7 @@
   },
   "sveltekit-frontend/src/routes/(app)/admin/cache/+page.svelte": {
     "zone": "shared",
-    "directDeps": 0,
+    "directDeps": 2,
     "serverDeps": 0,
     "dbDeps": 0
   },

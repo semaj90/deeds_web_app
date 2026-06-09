@@ -1,34 +1,34 @@
 # Deep Import Graph - Phase A
-Generated: 2026-06-08T20:42:11.443Z
+Generated: 2026-06-08T22:56:04.680Z
 
 ## Stats
 | Metric | Value |
 |--------|-------|
-| Nodes | 14993 |
-| Total edges | 36278 |
-| Resolved edges | 5157 |
+| Nodes | 15007 |
+| Total edges | 36327 |
+| Resolved edges | 5189 |
 | Unresolved (local) | 3031 |
-| External refs | 27775 |
+| External refs | 27792 |
 | Neighborhoods computed | 100 |
 | Test-covered files | 900 |
 
 ## Zone Breakdown
 | Zone | Count |
 |------|-------|
-| shared | 8540 |
-| script | 4949 |
-| test | 1237 |
-| types | 208 |
+| shared | 8541 |
+| script | 4957 |
+| test | 1238 |
+| types | 209 |
 | server | 29 |
 | config | 20 |
-| route | 7 |
-| client | 3 |
+| route | 9 |
+| client | 4 |
 
 ## Edge Type Breakdown
 | Type | Count |
 |------|-------|
-| imports_static | 26912 |
-| test_covers_file | 3929 |
+| imports_static | 26959 |
+| test_covers_file | 3931 |
 | redis_dependency | 1604 |
 | imports_dynamic | 1217 |
 | qdrant_dependency | 798 |
@@ -52,13 +52,13 @@ Generated: 2026-06-08T20:42:11.443Z
 | 8 | `sveltekit-frontend/src/lib/server/env.server.ts` | shared | 40 | 0 |
 | 9 | `src/lib/server/ace/context-assembler.ts` | server | 38 | 0 |
 | 10 | `claude-mem/src/shared/SettingsDefaultsManager.ts` | shared | 37 | 0 |
-| 11 | `sveltekit-frontend/src/lib/server/db/schema-postgres.ts` | shared | 28 | 4 |
-| 12 | `sveltekit-frontend/tests/e2e/route-forensic/_helpers.ts` | shared | 27 | 1 |
-| 13 | `scripts/error-resolution/types.ts` | script | 24 | 0 |
-| 14 | `sveltekit-frontend/src/lib/server/vector/qdrant-manager.ts` | shared | 24 | 9 |
+| 11 | `scripts/atlas/_neschrom-paths.mjs` | script | 32 | 0 |
+| 12 | `scripts/atlas/_neschrom-paths.mjs` | script | 32 | 0 |
+| 13 | `sveltekit-frontend/src/lib/server/db/schema-postgres.ts` | shared | 28 | 4 |
+| 14 | `sveltekit-frontend/tests/e2e/route-forensic/_helpers.ts` | shared | 27 | 1 |
 | 15 | `scripts/error-resolution/types.ts` | script | 24 | 0 |
-| 16 | `claude-mem/src/services/worker-types.ts` | types | 22 | 1 |
-| 17 | `sveltekit-frontend/.docker-build/scripts/qdrant-client.mjs` | shared | 22 | 0 |
-| 18 | `claude-mem/src/services/sqlite/SessionStore.ts` | shared | 21 | 8 |
-| 19 | `sveltekit-frontend/src/routes/api/sse/chat/+server.ts` | shared | 21 | 2 |
-| 20 | `scripts/api-cleanup/scanner.ts` | script | 20 | 0 |
+| 16 | `sveltekit-frontend/src/lib/server/vector/qdrant-manager.ts` | shared | 24 | 9 |
+| 17 | `scripts/error-resolution/types.ts` | script | 24 | 0 |
+| 18 | `claude-mem/src/services/worker-types.ts` | types | 22 | 1 |
+| 19 | `sveltekit-frontend/.docker-build/scripts/qdrant-client.mjs` | shared | 22 | 0 |
+| 20 | `claude-mem/src/services/sqlite/SessionStore.ts` | shared | 21 | 8 |

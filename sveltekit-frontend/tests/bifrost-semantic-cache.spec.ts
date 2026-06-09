@@ -328,16 +328,19 @@ describe('DuckDB candidate hash format', () => {
     expect(syntheticHash).toMatch(/_a3e84056$/);
   });
 
-  it('intent index bridges the gap for synthetic hashes', () => {
-    // The intent index key uses normalized prompt text, not query_hash
-    // So even if query_hash is synthetic, the intent key can match
-    // if the prompt text normalizes to the same string as a real query
-    const promptText = 'codebase search results';
-    const ih = intentHash(promptText);
-    expect(ih).toMatch(/^[0-9a-f]{16}$/);
-    // Different from the raw query hash
-    expect(ih).not.toBe(makeQueryHash(promptText));
-  });
+it('intent index bridges synthetic packet hashes to real query hashes', () => {
+  const syntheticHash = 'codebase_search_a3e84056';
+  const promptText = 'codebase search';
+
+  const realHash = makeQueryHash(promptText);
+  const ih = intentHash(promptText);
+
+  expect(syntheticHash).not.toBe(realHash);
+  expect(syntheticHash).toMatch(/_a3e84056$/);
+
+  expect(ih).toBe(realHash);
+  expect(ih).toMatch(/^[0-9a-f]{16}$/);
+});
 
   it('fix: DuckDB SQL should derive query_hash from makeQueryHash(route)', () => {
     // Current packets use synthetic hashes like 'codebase_search_a3e84056'

@@ -28,7 +28,7 @@ const DATABASE_URL = process.env.DATABASE_URL || 'postgresql://legal_admin:12345
 const OLLAMA_BASE_URL = process.env.OLLAMA_BASE_URL || 'http://127.0.0.1:11434';
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY || '';
 const QDRANT_URL = process.env.QDRANT_URL || 'http://localhost:6333';
-const MODEL = process.env.SUGGESTION_MODEL || 'gemma3-legal:latest';
+const MODEL = process.env.SUGGESTION_MODEL || 'gemma4-rotorquant';
 
 // Initialize database
 const sql = postgres(DATABASE_URL);

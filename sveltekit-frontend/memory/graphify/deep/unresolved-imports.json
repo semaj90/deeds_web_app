@@ -73,6 +73,7 @@
     "scripts/atlas/create-agent-pickup-packets.mjs",
     "scripts/atlas/create-qdrant-feature-maps.mjs",
     "scripts/atlas/daily-graphify-cold-processing.mjs",
+    "scripts/atlas/declare-rabbitmq-queues.mjs",
     "scripts/atlas/dedup-codebase-chunk-index.mjs",
     "scripts/atlas/dedupe-temporal-appends.mjs",
     "scripts/atlas/dependency-context-mapper.mjs",
@@ -158,6 +159,7 @@
     "scripts/atlas/phase-19c-knowledge-consolidation.mjs",
     "scripts/atlas/phase-19c-neo4j-sync.mjs",
     "scripts/atlas/phase-19c-qdrant-index.mjs",
+    "scripts/atlas/phase100-agentic-error-pipeline.mjs",
     "scripts/atlas/phase6-synthetic-trace-simulator.mjs",
     "scripts/atlas/plan-archive-moves.mjs",
     "scripts/atlas/populate-route-packet-rewards.mjs",
@@ -767,6 +769,7 @@
     "scripts/atlas/create-qdrant-feature-maps.mjs",
     "scripts/atlas/crosswalk-root-overlay.mjs",
     "scripts/atlas/daily-graphify-cold-processing.mjs",
+    "scripts/atlas/declare-rabbitmq-queues.mjs",
     "scripts/atlas/dedup-codebase-chunk-index.mjs",
     "scripts/atlas/dedupe-temporal-appends.mjs",
     "scripts/atlas/dependency-context-mapper.mjs",
@@ -2736,6 +2739,7 @@
     "scripts/atlas/ingest-ace-cards-to-glyphs.mjs",
     "scripts/atlas/ingest-ace-cards-to-glyphs.safe.mjs",
     "scripts/atlas/ingest-markdown-cards.mjs",
+    "scripts/atlas/ingest-svelte-check-errors.mjs",
     "scripts/atlas/ingest-topology-to-neo4j.mjs",
     "scripts/atlas/mapreduce-consolidated-index.mjs",
     "scripts/atlas/mapreduce-path-join.mjs",
@@ -3336,6 +3340,7 @@
     "scripts/health-check-sidecars.mjs",
     "scripts/index-lawpdfs-to-rag.ts",
     "scripts/ingest/intent-cache.mjs",
+    "scripts/ingest/rank-cards.mjs",
     "scripts/opencode/monitor-claude-mem-poll.mjs",
     "scripts/opencode/nightly-summary.mjs",
     "scripts/opencode/smoke-validate.js",
@@ -3574,6 +3579,7 @@
     "scripts/apply-syntax-fixes.mjs",
     "scripts/atlas/build-component-profiles.mjs",
     "scripts/atlas/chunk-repo.ts",
+    "scripts/atlas/ingest-svelte-check-errors.mjs",
     "scripts/atlas/parent-atlas-coverage-recommendations.mjs",
     "scripts/atlas/preflight-parent-join-readiness.mjs",
     "scripts/atlas/token-card-weight-updater.mjs",
@@ -4545,6 +4551,7 @@
     "scripts/atlas/materialize-hidden-packet-pathmap-duckdb.mjs",
     "scripts/atlas/materialize-mapreduce-duckdb.mjs",
     "scripts/atlas/missing-features-review.mjs",
+    "scripts/atlas/phase100-agentic-error-pipeline.mjs",
     "scripts/atlas/promote-to-postgres.mjs",
     "scripts/atlas/push-parent-atlas-to-couchdb.mjs",
     "scripts/atlas/qdrant-postgres-mirror-reconciliation.mjs",
@@ -6184,6 +6191,7 @@
     "scripts/atlas/create-qdrant-feature-maps.mjs",
     "scripts/atlas/crosswalk-root-overlay.mjs",
     "scripts/atlas/daily-graphify-cold-processing.mjs",
+    "scripts/atlas/declare-rabbitmq-queues.mjs",
     "scripts/atlas/dedup-codebase-chunk-index.mjs",
     "scripts/atlas/dedupe-temporal-appends.mjs",
     "scripts/atlas/dependency-context-mapper.mjs",
@@ -6706,6 +6714,7 @@
     "claude-mem/src/services/smart-file-read/parser.ts",
     "scripts/atlas/atlas-live-reconciliation-audit.mjs",
     "scripts/atlas/compute-glyph-rewards.mjs",
+    "scripts/atlas/declare-rabbitmq-queues.mjs",
     "scripts/atlas/dir-pipeline.mjs",
     "scripts/atlas/gpu-accelerate-lanes.mjs",
     "scripts/atlas/gpu-enrich-parent-atlas.mjs",
@@ -7871,6 +7880,7 @@
     "sveltekit-frontend/tests/assist-feedback.spec.ts",
     "sveltekit-frontend/tests/autoencoder-encoded64.spec.ts",
     "sveltekit-frontend/tests/autoencoder-projection-smoke.spec.ts",
+    "sveltekit-frontend/tests/bifrost-semantic-cache.spec.ts",
     "sveltekit-frontend/tests/build-codebase-relationships.spec.ts",
     "sveltekit-frontend/tests/cache-consolidation-smoke.spec.ts",
     "sveltekit-frontend/tests/cache-keys.spec.ts",
@@ -14177,6 +14187,7 @@
     "scripts/atlas/organize-rg-search-transcripts.mjs",
     "scripts/atlas/phase-19c-knowledge-consolidation.mjs",
     "scripts/atlas/phase-19c-qdrant-index.mjs",
+    "scripts/atlas/phase100-agentic-error-pipeline.mjs",
     "scripts/atlas/phase6-synthetic-trace-simulator.mjs",
     "scripts/atlas/preassemble-ace-packets.mjs",
     "scripts/atlas/project-codebase-topology.mjs",
@@ -14385,6 +14396,7 @@
     "sveltekit-frontend/src/routes/api/files/+server.ts",
     "sveltekit-frontend/tests/ace-hits-cache.spec.ts",
     "sveltekit-frontend/tests/agents-md-ingest.spec.ts",
+    "sveltekit-frontend/tests/bifrost-semantic-cache.spec.ts",
     "sveltekit-frontend/update_pathway.cjs"
   ],
   "EXTERNAL:ts-morph": [
@@ -16507,6 +16519,7 @@
     "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/phase82/svelte-upgrade/+server.ts",
     "scripts/atlas/lib/phase89-sse-stream.mjs",
     "scripts/error-resolution/tests/import-fixer.test.ts",
+    "src/routes/admin/cache/+page.svelte",
     "src/routes/atlas/studio/+page.svelte",
     "sveltekit-frontend/ambient.d.ts",
     "sveltekit-frontend/scripts/phase104-backups/src/lib/types/global.ts",
@@ -18275,6 +18288,9 @@
   ],
   "EXTERNAL:@/lib/server/utils/validateRequest": [
     "src/routes/api/ace/ask/+server.ts"
+  ],
+  "EXTERNAL:sveltekit/types": [
+    "src/routes/api/cache/stats/+server.ts"
   ],
   "EXTERNAL:sveltekit-frontend/src/lib/server/observability/synthesis-logger.ts": [
     "src/routes/api/chat/stream/+server.ts"
@@ -20399,10 +20415,6 @@
     "sveltekit-frontend/src/lib/ai/citation-cache.ts",
     "sveltekit-frontend/src/lib/ai/client-cache.ts",
     "sveltekit-frontend/src/lib/components/evidence/board-persistence.svelte.ts"
-  ],
-  "EXTERNAL:$lib/gpu/gpu-compute-pipeline.js": [
-    "sveltekit-frontend/src/lib/ai/client-embed.ts",
-    "sveltekit-frontend/src/lib/components/yorha/dashboard/GPUMetrics.svelte"
   ],
   "EXTERNAL:idb-keyval": [
     "sveltekit-frontend/src/lib/cache/indexdb-cache.svelte.ts",
@@ -24019,9 +24031,6 @@
     "sveltekit-frontend/src/routes/(app)/admin/api-testing/agentic-events/+server.ts",
     "sveltekit-frontend/src/routes/(app)/admin/api-testing/agentic-loop/+server.ts",
     "sveltekit-frontend/src/routes/api/ml/cluster-status/+server.ts"
-  ],
-  "EXTERNAL:$lib/gpu/gpu-compute-pipeline": [
-    "sveltekit-frontend/src/routes/(app)/admin/cache/+page.svelte"
   ],
   "EXTERNAL:$lib/components/codebase/RouteGraph.svelte": [
     "sveltekit-frontend/src/routes/(app)/admin/codebase-graph/+page.svelte"
