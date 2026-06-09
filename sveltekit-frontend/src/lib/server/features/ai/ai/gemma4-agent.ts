@@ -35,7 +35,7 @@ import { queryTopology } from '$lib/server/retrieval/topology-search-client.js';
 import { db, pool } from '$lib/server/db/client';
 import { contextTimeline } from '$lib/server/db/schema-postgres.js';
 import { logInference } from '$lib/server/observability/inference-log.js';
-import { appendOutcomeLedger } from '$lib/server/observability/outcome-ledger.js';
+import { appendOutcomeLedger, computeAgentReward } from '$lib/server/observability/outcome-ledger.js';
 import { trackTokenUsage } from '$lib/server/ai/token-tracker.js';
 import { resolveRuntimeConfig } from '$lib/server/ai/inference-configs.js';
 import { canUseTurboQuant, gatePreferredBackend } from '$lib/server/ai/backend-runtime-guards.js';
@@ -2356,7 +2356,16 @@ export async function runGemma4Agent(
     sourceRefs: filePathMeta ? [filePathMeta] : [],
     graphVersion: process.env.ATLAS_VERSION ?? null,
     outcome: hasSideEffect ? 'side_effect' : 'answer',
-    reward: null,
+    cacheTier: resultCacheTier ?? null,
+    rounds: round,
+    reward: computeAgentReward({
+      finalAnswerFound: !!finalAnswer,
+      rounds: round,
+      maxRounds: MAX_ROUNDS,
+      toolsUsed,
+      hasSideEffect,
+      cacheHit: resultCacheTier != null && resultCacheTier !== 'L4_none',
+    }),
   });
 
   // Persist a fresh fix-memory entry when the agent ran a side-effect tool

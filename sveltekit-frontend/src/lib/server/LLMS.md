@@ -216,3 +216,6 @@ Run `npm run llms:write` to regenerate.
 - **This directory**: no tasks or fixes in current run
 
 <!-- /atlas-append:0bf81df426b5 -->
+
+## Constraints
+- [2026-06-09] This module is the primary orchestration point for Retrieval-Augmented Generation (RAG) pipelines. It coordinates calls to various retrieval services (e.g., Qdrant, graph traversal, document search) and synthesizes the final context packet before passing it to the LLM. Key functions include source chunking, evidence merging, and authority scoring.

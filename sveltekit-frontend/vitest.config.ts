@@ -222,6 +222,8 @@ export default defineConfig({
       'tests/autoencoder-encoded64.spec.ts',
       'tests/feature-map.integrity.spec.ts',
       'tests/rg-cluster-pivot.spec.ts',
+      // Phase 12C — bifrost semantic cache correctness + drift prevention
+      'tests/bifrost-semantic-cache.spec.ts',
     ],
     exclude: [
       'node_modules/**',

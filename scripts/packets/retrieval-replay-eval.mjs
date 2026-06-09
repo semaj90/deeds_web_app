@@ -93,16 +93,16 @@ const evidence = {
 };
 
 const results = queries.map(q => {
-  const checks = Object.fromEntries(q.must_hit?.map(hit => [hit, Boolean(evidence[hit])]) || []);
+  const checks = Object.fromEntries((q.must_hit ?? []).map(hit => [hit, Boolean(evidence[hit])]));
   const passed = Object.values(checks).every(Boolean);
   return {
     id: q.id,
     lane: q.lane,
     query: q.query,
     must_hit: q.must_hit ?? [],
-    checks: checks,
-    passed: passed,
-    topK: q.topK
+    checks,
+    passed,
+    topK
   };
 });
 
@@ -115,8 +115,8 @@ const report = {
   queries: results.length,
   pass_count: passCount,
   success_rate: successRate,
-  passed: passed,
-  evidence: evidence,
+  passed,
+  evidence,
   global_checks: Object.fromEntries(
     Object.entries(globalChecks).map(([k, v]) => [k, {
       ok: v.ok,
@@ -124,8 +124,8 @@ const report = {
       stderr: v.stderr
     }])
   ),
-  qdrant: qdrant,
-  results: results
+  qdrant,
+  results
 };
 
 fs.writeFileSync('.tmp/retrieval-replay-report.json', JSON.stringify(report, null, 2));
@@ -140,7 +140,7 @@ const md = [
   '',
   '## Evidence',
   '',
-  ...Object.entries(evidence).map(([k,v]) => `- ${k}: ${v ? '✅' : '❌'}`),
+  ...Object.entries(evidence).map(([k, v]) => `- ${k}: ${v ? '✅' : '❌'}`),
   '',
   '## Results',
   '',

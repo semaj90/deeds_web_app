@@ -1,6 +1,6 @@
 # NES Chrom Backfill Report
 
-Generated: 2026-06-04T15:27:18.146Z
+Generated: 2026-06-09T02:15:38.758Z
 
 ## Inputs
 
@@ -10,9 +10,9 @@ Generated: 2026-06-04T15:27:18.146Z
 
 ## Outputs
 
-- packets written: 0
-- hits written: 0
-- kag_dag_runs seeded: 0
+- packets written: 25
+- hits written: 25
+- kag_dag_runs seeded: 1
 
 ## Top Packets
 

@@ -53,7 +53,7 @@ import {
   traceVectorSearch,
   traceEmbedding,
 } from '$lib/server/observability/langfuse.js';
-import { appendOutcomeLedger } from '$lib/server/observability/outcome-ledger.js';
+import { appendOutcomeLedger, computeRetrievalReward } from '$lib/server/observability/outcome-ledger.js';
 import { mkdirSync } from 'node:fs';
 import { promises as fsPromises } from 'node:fs';
 import crypto from 'node:crypto';
