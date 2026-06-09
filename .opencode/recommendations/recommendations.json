@@ -1,10 +1,10 @@
 {
-  "generatedAt": "2026-06-09T03:43:28.084Z",
+  "generatedAt": "2026-06-09T16:11:03.019Z",
   "totalCount": 18,
   "clusters": {
     "UI Components": [
       {
-        "id": "import_error_477c81bf",
+        "id": "import_error_86d13d0c",
         "type": "developer_recommendation",
         "cluster": "UI Components",
         "title": "src/lib/components/ui/index.ts — 42 unresolved imports",
@@ -18,7 +18,7 @@
         "featureStatus": "degraded"
       },
       {
-        "id": "import_error_520f81c4",
+        "id": "import_error_b59ad624",
         "type": "developer_recommendation",
         "cluster": "UI Components",
         "title": "src/lib/components/ui/gaming/n64/index.ts — 29 unresolved imports",
@@ -32,7 +32,7 @@
         "featureStatus": "degraded"
       },
       {
-        "id": "import_error_14e2d483",
+        "id": "import_error_a3d7eab5",
         "type": "developer_recommendation",
         "cluster": "UI Components",
         "title": "src/lib/components/ui/gaming/index.ts — 18 unresolved imports",
@@ -46,7 +46,7 @@
         "featureStatus": "degraded"
       },
       {
-        "id": "import_error_feccdcc4",
+        "id": "import_error_7741a9f8",
         "type": "developer_recommendation",
         "cluster": "UI Components",
         "title": "src/lib/components/ui/alert-dialog/index.js — 12 unresolved imports",
@@ -60,7 +60,7 @@
         "featureStatus": "degraded"
       },
       {
-        "id": "import_error_62adb6d1",
+        "id": "import_error_71a18430",
         "type": "developer_recommendation",
         "cluster": "UI Components",
         "title": "src/lib/components/ui/dialog/index.ts — 11 unresolved imports",
@@ -76,7 +76,7 @@
     ],
     "General": [
       {
-        "id": "import_error_409d4395",
+        "id": "import_error_84abe35e",
         "type": "developer_recommendation",
         "cluster": "General",
         "title": "src/lib/icons/yorha/index.ts — 12 unresolved imports",
@@ -90,7 +90,7 @@
         "featureStatus": "degraded"
       },
       {
-        "id": "stale_feature_025f731b",
+        "id": "stale_feature_a57f2f4c",
         "type": "missing_feature",
         "cluster": "General",
         "title": "Feature not implemented: Priority 2: VLM POI Integration (90 min)",
@@ -104,7 +104,7 @@
         "featureStatus": "missing"
       },
       {
-        "id": "stale_feature_ac53261d",
+        "id": "stale_feature_0289d01f",
         "type": "missing_feature",
         "cluster": "General",
         "title": "Feature not implemented: Priority 3: Audit Dashboard Web UI (3-4 hours)",
@@ -118,7 +118,7 @@
         "featureStatus": "missing"
       },
       {
-        "id": "stale_feature_889c8c96",
+        "id": "stale_feature_5243cfec",
         "type": "missing_feature",
         "cluster": "General",
         "title": "Feature not implemented: Priority 4: Auto-Fix Orchestrator (6-8 hours)",
@@ -132,7 +132,7 @@
         "featureStatus": "missing"
       },
       {
-        "id": "stale_feature_99fe17d5",
+        "id": "stale_feature_91d2a4b8",
         "type": "missing_feature",
         "cluster": "General",
         "title": "Feature not implemented: Phase 3: Post-Synthesis Quality Review (RunID: `stage-2c-500`)",
@@ -148,7 +148,7 @@
     ],
     "Agent Workflow": [
       {
-        "id": "unclassified_2cbb7c82",
+        "id": "unclassified_c5689651",
         "type": "feature:unclassified",
         "cluster": "Agent Workflow",
         "title": "4 files unclassified with >10 imports",
@@ -167,7 +167,7 @@
     ],
     "Legal Workspace": [
       {
-        "id": "stale_feature_bfbd20ec",
+        "id": "stale_feature_8e27ae04",
         "type": "missing_feature",
         "cluster": "Legal Workspace",
         "title": "Feature not implemented: Priority 1: Evidence Upload UI (1 hour)",
@@ -183,7 +183,7 @@
     ],
     "Parent Atlas Coverage": [
       {
-        "id": "atlas_coverage_cacb718e",
+        "id": "atlas_coverage_0d62a6e4",
         "type": "atlas_coverage_gap",
         "cluster": "Parent Atlas Coverage",
         "title": "Qdrant coverage: 33% (3539 files unembedded)",
@@ -202,7 +202,7 @@
         }
       },
       {
-        "id": "atlas_coverage_e433d78e",
+        "id": "atlas_coverage_a74e4cf0",
         "type": "atlas_coverage_gap",
         "cluster": "Parent Atlas Coverage",
         "title": "SOM cluster coverage: 29% (3744 files unclassified)",
@@ -221,7 +221,7 @@
         }
       },
       {
-        "id": "atlas_coverage_7b6b2d53",
+        "id": "atlas_coverage_546b7d18",
         "type": "atlas_coverage_gap",
         "cluster": "Parent Atlas Coverage",
         "title": "atlas_feature_synthesis has only 12 rows — feature rollups incomplete",
@@ -238,7 +238,7 @@
         }
       },
       {
-        "id": "atlas_coverage_39f0047a",
+        "id": "atlas_coverage_0655b487",
         "type": "atlas_coverage_gap",
         "cluster": "Parent Atlas Coverage",
         "title": "2201 atlas_feature_map rows not joined to parent_atlas_documents",
@@ -257,7 +257,7 @@
         }
       },
       {
-        "id": "atlas_coverage_7d451129",
+        "id": "atlas_coverage_8c871631",
         "type": "atlas_coverage_gap",
         "cluster": "Parent Atlas Coverage",
         "title": "SOM cluster on atlas_feature_map: 31% (3941 missing)",
@@ -276,7 +276,7 @@
         }
       },
       {
-        "id": "atlas_coverage_dd03a8eb",
+        "id": "atlas_coverage_fa988191",
         "type": "atlas_coverage_gap",
         "cluster": "Parent Atlas Coverage",
         "title": "route_runtime_packets is empty — hot-path scoring unavailable",
@@ -296,7 +296,7 @@
   },
   "top10": [
     {
-      "id": "import_error_477c81bf",
+      "id": "import_error_86d13d0c",
       "type": "developer_recommendation",
       "cluster": "UI Components",
       "title": "src/lib/components/ui/index.ts — 42 unresolved imports",
@@ -310,7 +310,7 @@
       "featureStatus": "degraded"
     },
     {
-      "id": "import_error_520f81c4",
+      "id": "import_error_b59ad624",
       "type": "developer_recommendation",
       "cluster": "UI Components",
       "title": "src/lib/components/ui/gaming/n64/index.ts — 29 unresolved imports",
@@ -324,7 +324,7 @@
       "featureStatus": "degraded"
     },
     {
-      "id": "import_error_14e2d483",
+      "id": "import_error_a3d7eab5",
       "type": "developer_recommendation",
       "cluster": "UI Components",
       "title": "src/lib/components/ui/gaming/index.ts — 18 unresolved imports",
@@ -338,7 +338,7 @@
       "featureStatus": "degraded"
     },
     {
-      "id": "import_error_feccdcc4",
+      "id": "import_error_7741a9f8",
       "type": "developer_recommendation",
       "cluster": "UI Components",
       "title": "src/lib/components/ui/alert-dialog/index.js — 12 unresolved imports",
@@ -352,7 +352,7 @@
       "featureStatus": "degraded"
     },
     {
-      "id": "import_error_62adb6d1",
+      "id": "import_error_71a18430",
       "type": "developer_recommendation",
       "cluster": "UI Components",
       "title": "src/lib/components/ui/dialog/index.ts — 11 unresolved imports",
@@ -366,7 +366,7 @@
       "featureStatus": "degraded"
     },
     {
-      "id": "import_error_409d4395",
+      "id": "import_error_84abe35e",
       "type": "developer_recommendation",
       "cluster": "General",
       "title": "src/lib/icons/yorha/index.ts — 12 unresolved imports",
@@ -380,7 +380,7 @@
       "featureStatus": "degraded"
     },
     {
-      "id": "atlas_coverage_cacb718e",
+      "id": "atlas_coverage_0d62a6e4",
       "type": "atlas_coverage_gap",
       "cluster": "Parent Atlas Coverage",
       "title": "Qdrant coverage: 33% (3539 files unembedded)",
@@ -399,7 +399,7 @@
       }
     },
     {
-      "id": "atlas_coverage_e433d78e",
+      "id": "atlas_coverage_a74e4cf0",
       "type": "atlas_coverage_gap",
       "cluster": "Parent Atlas Coverage",
       "title": "SOM cluster coverage: 29% (3744 files unclassified)",
@@ -418,7 +418,7 @@
       }
     },
     {
-      "id": "atlas_coverage_39f0047a",
+      "id": "atlas_coverage_0655b487",
       "type": "atlas_coverage_gap",
       "cluster": "Parent Atlas Coverage",
       "title": "2201 atlas_feature_map rows not joined to parent_atlas_documents",
@@ -437,7 +437,7 @@
       }
     },
     {
-      "id": "unclassified_2cbb7c82",
+      "id": "unclassified_c5689651",
       "type": "feature:unclassified",
       "cluster": "Agent Workflow",
       "title": "4 files unclassified with >10 imports",

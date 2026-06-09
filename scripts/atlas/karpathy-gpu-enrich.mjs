@@ -87,6 +87,7 @@ const NEO4J_PASS = process.env.NEO4J_PASSWORD ?? process.env.NEO4J_PASS ?? 'neo4
 const REDIS_URL    = process.env.REDIS_URL ?? 'redis://127.0.0.1:6379';
 const REDIS_PASS   = process.env.REDIS_PASSWORD ?? 'redis';
 const DATABASE_URL = process.env.DATABASE_URL;
+const KARPATHY_TTL = Number(process.env.KARPATHY_REDIS_TTL ?? 7 * 24 * 3600); // 7d default
 
 // ── Shared Path Helpers ───────────────────────────────────────────────────────
 
@@ -719,7 +720,7 @@ async function main() {
     for (const r of finalResults) {
       pipe.hset('gpu:karpathy:scores', r.stableKey, JSON.stringify(r));
     }
-    pipe.expire('gpu:karpathy:scores', 604800);
+    pipe.expire('gpu:karpathy:scores', KARPATHY_TTL);
 
     // Phase B: write path→cluster reverse index + cluster member sorted sets
     const clusterPipe = redis.pipeline();
@@ -746,7 +747,7 @@ async function main() {
       for (const [key, vec] of encodedMap) {
         encodedPipe.hset('gpu:karpathy:encoded', key, Array.from(vec).join(','));
       }
-      encodedPipe.expire('gpu:karpathy:encoded', 604800);
+      encodedPipe.expire('gpu:karpathy:encoded', KARPATHY_TTL);
       await encodedPipe.exec();
     }
 

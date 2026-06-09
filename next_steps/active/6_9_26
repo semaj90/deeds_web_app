@@ -1,0 +1,294 @@
+# Parent Atlas Workstation Completion Checklist
+
+Generated: 2026-06-09
+
+## Overall Completion
+
+Current Estimated Completion: 78%
+
+---
+
+# Phase 0 — Foundation
+
+## Infrastructure
+
+* [x] Postgres operational
+* [x] Redis / Valkey operational
+* [x] Neo4j operational
+* [x] Qdrant operational
+* [x] Ollama operational
+* [x] EmbeddingGemma operational
+
+Progress: 100%
+
+---
+
+# Phase 1 — Codebase Indexing
+
+## Source Discovery
+
+* [x] Fast AST scanner
+* [x] Route indexing
+* [x] Import graph generation
+* [x] Deep dependency graph
+* [x] Feature extraction
+* [x] Cluster attribution
+
+Metrics
+
+* 23,183 files scanned
+* 55,452 graph nodes
+* 84,979 graph edges
+* 123,921 atlas cards
+
+Progress: 100%
+
+---
+
+# Phase 2 — Vector Layer
+
+## Qdrant
+
+* [x] codebase_chunks_768 collection
+* [x] embedding pipeline
+* [x] feature_id payloads
+* [x] SOM coordinates
+* [x] cluster assignments
+* [x] payload enrichment
+
+Metrics
+
+* 77,248 vectors
+* SOM coverage ≈ 100%
+
+Progress: 98%
+
+Remaining
+
+* [ ] karpathy_attention payload backfill
+
+---
+
+# Phase 3 — Graph Layer
+
+## Neo4j
+
+* [x] import graph
+* [x] route graph
+* [x] dependency graph
+* [x] USES_DB edge generation
+
+Metrics
+
+* 293 USES_DB edges resolved
+* 104 table references resolved
+
+Progress: 85%
+
+Remaining
+
+* [ ] canonical sourceRef on nodes
+* [ ] feature_id alignment
+* [ ] Qdrant join validation
+
+---
+
+# Phase 4 — Parent Atlas
+
+## Atlas Records
+
+* [x] parent atlas cards
+* [x] packet generation
+* [x] cluster attribution
+* [x] lineage exports
+
+Metrics
+
+* 123,921 records
+* 8,170 cluster assignments
+* 8,170 CHR97 cards
+
+Progress: 90%
+
+Remaining
+
+* [ ] sourceRef normalization
+* [ ] packet replay validation
+* [ ] lineage completion gate
+
+---
+
+# Phase 5 — CHR97 Runtime
+
+## Card Bank
+
+* [x] card generation
+* [x] source card exports
+* [x] packetization
+
+Metrics
+
+* 8,170 cards
+
+Progress: 85%
+
+Remaining
+
+* [ ] card lineage verification
+* [ ] packet replay tests
+* [ ] retrieval ranking validation
+
+---
+
+# Phase 6 — Reward / Outcome System
+
+## Outcome Ledger
+
+* [x] reward attribution
+* [x] outcome ledger integration
+* [x] feedback routing
+
+Metrics
+
+* Phase 6B complete
+
+Progress: 100%
+
+---
+
+# Phase 7 — Identity Alignment
+
+## Cross-System Identity
+
+Current Bottleneck
+
+Status: 55%
+
+Required
+
+* [ ] canonicalSourceRef helper
+* [ ] sourceRef hash contract
+* [ ] path normalization
+* [ ] relativePath alignment
+* [ ] Qdrant join repair
+* [ ] Neo4j join repair
+* [ ] Atlas join repair
+* [ ] Karpathy join repair
+
+This is the largest remaining blocker.
+
+---
+
+# Phase 8 — Semantic Cache
+
+## Bifrost / Valkey
+
+Current State
+
+* semantic cache implemented
+* packet cache contract partially implemented
+
+Problems
+
+* bifrost:sem:packet:* keys = 0
+* packet hydration incomplete
+* lineage cache incomplete
+
+Progress: 60%
+
+Remaining
+
+* [ ] packet cache warmer
+* [ ] sourceRef cache index
+* [ ] feature cache index
+* [ ] replay cache validation
+
+---
+
+# Phase 9 — Karpathy Layer
+
+Current
+
+* GPU enrichment pipeline exists
+* Qdrant integration exists
+
+Problems
+
+* karpathy_attention coverage not populated
+* path mismatches prevent joins
+
+Progress: 35%
+
+Remaining
+
+* [ ] canonical path matching
+* [ ] enrichment backfill
+* [ ] ranking validation
+
+---
+
+# Phase 10 — Retrieval Replay
+
+Current
+
+* retrieval infrastructure exists
+
+Remaining
+
+* [ ] identity replay tests
+* [ ] packet replay tests
+* [ ] feature replay tests
+* [ ] multi-hop graph replay tests
+
+Progress: 40%
+
+---
+
+# Phase 11 — Completion Gate
+
+Not yet built
+
+Required
+
+* [ ] coverage audit
+* [ ] identity audit
+* [ ] replay audit
+* [ ] lineage audit
+* [ ] final completion report
+
+Progress: 0%
+
+---
+
+# Completion Forecast
+
+Completed
+
+* Infrastructure
+* Atlas generation
+* Qdrant population
+* SOM topology
+* CHR97 card generation
+* Reward attribution
+* Database lineage
+
+Mostly Complete
+* Neo4j
+* Parent Atlas
+* Semantic cache
+
+Major Remaining Work
+1. Identity alignment
+2. Karpathy backfill
+3. Packet cache hydration
+4. Replay validation
+5. Completion gate
+
+Overall Completion
+78%
+Expected Completion After Identity Alignment
+≈ 90%
+Expected Completion After Replay Validation
+≈ 95%
+Expected Completion After Completion Gate
+≈ 100%

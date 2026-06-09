@@ -58,6 +58,7 @@ const HOURS     = parseInt(args.find(a => a.startsWith('--hours='))?.split('=')[
 const DB_URL    = process.env.DATABASE_URL ?? 'postgresql://legal_admin:123456@127.0.0.1:5434/legal_ai_db';
 const REDIS_URL = process.env.REDIS_URL    ?? 'redis://127.0.0.1:6379';
 const REDIS_PASSWORD = process.env.REDIS_PASSWORD || process.env.REDIS_PASS || undefined;
+const ACE_ATLAS_TTL = Number(process.env.ACE_ATLAS_REDIS_TTL ?? 7 * ACE_ATLAS_TTL); // 7d default
 function redisOpts(extra = {}) {
   const u = new URL(REDIS_URL);
   return { host: u.hostname || '127.0.0.1', port: Number(u.port) || 6379, password: REDIS_PASSWORD, ...extra };
@@ -336,8 +337,8 @@ if (!NO_REDIS) {
     const { default: Redis } = await import('ioredis');
     const r = new Redis(redisOpts({ lazyConnect: true }));
     await r.connect();
-    await r.setex('ace:atlas:latest',         24 * 3600, minJson);
-    await r.setex('ace:atlas:latest:summary', 24 * 3600, JSON.stringify({
+    await r.setex('ace:atlas:latest',         ACE_ATLAS_TTL, minJson);
+    await r.setex('ace:atlas:latest:summary', ACE_ATLAS_TTL, JSON.stringify({
       generated_at: atlas.generated_at,
       hours_window: HOURS,
       ...stats,
@@ -569,12 +570,12 @@ if (!DRY_RUN) {
       const { default: Redis } = await import('ioredis');
       const r = new Redis(redisOpts({ lazyConnect: true }));
       await r.connect();
-      await r.setex('ace:atlas:dirs', 24 * 3600, dirsJson);
+      await r.setex('ace:atlas:dirs', ACE_ATLAS_TTL, dirsJson);
       // Per-directory cache for O(1) skill lookups
       const pipe = r.pipeline();
       for (const d of dirCards) {
         const slug = (d.d || '_root').replace(/[\/\(\)]/g, '_');
-        pipe.setex(`ace:atlas:dir:${slug}`, 24 * 3600, JSON.stringify(d));
+        pipe.setex(`ace:atlas:dir:${slug}`, ACE_ATLAS_TTL, JSON.stringify(d));
       }
       await pipe.exec().catch(() => {});
       await r.quit().catch(() => {});

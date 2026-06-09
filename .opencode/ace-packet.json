@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-06-09T03:43:22.371Z",
+  "generatedAt": "2026-06-09T16:10:56.974Z",
   "query": "ACE context retrieval",
   "tokenBudget": 6000,
   "tokenEstimate": 5990,
@@ -236,10 +236,10 @@
       "id": "35b0a6dd813d2813",
       "title": "smoke-feature-registry.mjs",
       "sourceRef": "sveltekit-frontend/../scripts/atlas/smoke-feature-registry.mjs",
-      "score": 0.6286,
+      "score": 0.6268,
       "signals": {
         "semantic": 0.787,
-        "recency": 0.998,
+        "recency": 0.981,
         "errorBoost": 0.023,
         "todoBoost": 0,
         "sourceRefConfidence": 1
@@ -253,10 +253,10 @@
       "id": "38f8fe8530806af7",
       "title": "audit-feature-registry.mjs",
       "sourceRef": "sveltekit-frontend/../scripts/atlas/audit-feature-registry.mjs",
-      "score": 0.6251,
+      "score": 0.6234,
       "signals": {
         "semantic": 0.787,
-        "recency": 0.998,
+        "recency": 0.981,
         "errorBoost": 0,
         "todoBoost": 0,
         "sourceRefConfidence": 1
@@ -270,10 +270,10 @@
       "id": "1f9adf66f5d38fa5",
       "title": "sourceRef-parent-join-archive-plan.mjs",
       "sourceRef": "sveltekit-frontend/../scripts/atlas/sourceRef-parent-join-archive-plan.mjs",
-      "score": 0.6161,
+      "score": 0.6143,
       "signals": {
         "semantic": 0.787,
-        "recency": 0.998,
+        "recency": 0.981,
         "errorBoost": 0.023,
         "todoBoost": 0,
         "sourceRefConfidence": 1
@@ -287,10 +287,10 @@
       "id": "5bec8e54a2ad66ba",
       "title": "inspect-feature-map-status.mjs",
       "sourceRef": "sveltekit-frontend/../scripts/atlas/inspect-feature-map-status.mjs",
-      "score": 0.6126,
+      "score": 0.6109,
       "signals": {
         "semantic": 0.787,
-        "recency": 0.998,
+        "recency": 0.981,
         "errorBoost": 0,
         "todoBoost": 0,
         "sourceRefConfidence": 1
@@ -304,10 +304,10 @@
       "id": "3c3d0f55d5efa11b",
       "title": "smoke-ace-packet-builder.mjs",
       "sourceRef": "sveltekit-frontend/scripts/atlas/smoke-ace-packet-builder.mjs",
-      "score": 0.5955,
+      "score": 0.5938,
       "signals": {
         "semantic": 0.787,
-        "recency": 0.998,
+        "recency": 0.981,
         "errorBoost": 0.069,
         "todoBoost": 0,
         "sourceRefConfidence": 1
@@ -321,10 +321,10 @@
       "id": "124df934d629de72",
       "title": "phase-19c-qdrant-index.mjs",
       "sourceRef": "sveltekit-frontend/../scripts/atlas/phase-19c-qdrant-index.mjs",
-      "score": 0.592,
+      "score": 0.5903,
       "signals": {
         "semantic": 0.787,
-        "recency": 0.998,
+        "recency": 0.981,
         "errorBoost": 0.046,
         "todoBoost": 0,
         "sourceRefConfidence": 1
@@ -338,10 +338,10 @@
       "id": "1be946d57f76d039",
       "title": "qdrant-postgres-mirror-reconciliation.mjs",
       "sourceRef": "sveltekit-frontend/../scripts/atlas/qdrant-postgres-mirror-reconciliation.mjs",
-      "score": 0.592,
+      "score": 0.5903,
       "signals": {
         "semantic": 0.787,
-        "recency": 0.998,
+        "recency": 0.981,
         "errorBoost": 0.046,
         "todoBoost": 0,
         "sourceRefConfidence": 1
@@ -355,10 +355,10 @@
       "id": "33a9c9029713083c",
       "title": "pytorch-qdrant-redis-som-index.mjs",
       "sourceRef": "sveltekit-frontend/../scripts/atlas/pytorch-qdrant-redis-som-index.mjs",
-      "score": 0.592,
+      "score": 0.5903,
       "signals": {
         "semantic": 0.787,
-        "recency": 0.998,
+        "recency": 0.981,
         "errorBoost": 0.046,
         "todoBoost": 0,
         "sourceRefConfidence": 1
@@ -372,10 +372,10 @@
       "id": "02732102fbbbc842",
       "title": "AtlasSourceRefs.svelte",
       "sourceRef": "sveltekit-frontend/src/lib/components/atlas/AtlasSourceRefs.svelte",
-      "score": 0.5886,
+      "score": 0.5868,
       "signals": {
         "semantic": 0.787,
-        "recency": 0.998,
+        "recency": 0.981,
         "errorBoost": 0.023,
         "todoBoost": 0,
         "sourceRefConfidence": 1
@@ -389,10 +389,10 @@
       "id": "0471eaff7a8de110",
       "title": "sourceRef-first-hot-join-warmup.mjs",
       "sourceRef": "sveltekit-frontend/../scripts/atlas/sourceRef-first-hot-join-warmup.mjs",
-      "score": 0.5886,
+      "score": 0.5868,
       "signals": {
         "semantic": 0.787,
-        "recency": 0.998,
+        "recency": 0.981,
         "errorBoost": 0.023,
         "todoBoost": 0,
         "sourceRefConfidence": 1
@@ -406,10 +406,10 @@
       "id": "200bb4a002c1dd4c",
       "title": "normalize-sourcerefs.mjs",
       "sourceRef": "sveltekit-frontend/../scripts/atlas/normalize-sourcerefs.mjs",
-      "score": 0.5886,
+      "score": 0.5868,
       "signals": {
         "semantic": 0.787,
-        "recency": 0.998,
+        "recency": 0.981,
         "errorBoost": 0.023,
         "todoBoost": 0,
         "sourceRefConfidence": 1
@@ -423,10 +423,10 @@
       "id": "2d41b2efbb11a1f0",
       "title": "sourceRef-first-nes-glyph-compress.mjs",
       "sourceRef": "sveltekit-frontend/../scripts/atlas/sourceRef-first-nes-glyph-compress.mjs",
-      "score": 0.5886,
+      "score": 0.5868,
       "signals": {
         "semantic": 0.787,
-        "recency": 0.998,
+        "recency": 0.981,
         "errorBoost": 0.023,
         "todoBoost": 0,
         "sourceRefConfidence": 1
@@ -440,10 +440,10 @@
       "id": "3b2f1bc9839b7ea3",
       "title": "sourceRef-first-parent-atlas-refresh.mjs",
       "sourceRef": "sveltekit-frontend/../scripts/atlas/sourceRef-first-parent-atlas-refresh.mjs",
-      "score": 0.5886,
+      "score": 0.5868,
       "signals": {
         "semantic": 0.787,
-        "recency": 0.998,
+        "recency": 0.981,
         "errorBoost": 0.023,
         "todoBoost": 0,
         "sourceRefConfidence": 1
@@ -457,10 +457,10 @@
       "id": "408f683cded8fc33",
       "title": "project-sourceRef-context-neo4j.mjs",
       "sourceRef": "sveltekit-frontend/../scripts/atlas/project-sourceRef-context-neo4j.mjs",
-      "score": 0.5886,
+      "score": 0.5868,
       "signals": {
         "semantic": 0.787,
-        "recency": 0.998,
+        "recency": 0.981,
         "errorBoost": 0.023,
         "todoBoost": 0,
         "sourceRefConfidence": 1
@@ -474,10 +474,10 @@
       "id": "52dd242ec3d0c007",
       "title": "sourceRef-first-join-warmup.mjs",
       "sourceRef": "sveltekit-frontend/../scripts/atlas/sourceRef-first-join-warmup.mjs",
-      "score": 0.5886,
+      "score": 0.5868,
       "signals": {
         "semantic": 0.787,
-        "recency": 0.998,
+        "recency": 0.981,
         "errorBoost": 0.023,
         "todoBoost": 0,
         "sourceRefConfidence": 1
@@ -491,10 +491,10 @@
       "id": "00f51214e6c62573",
       "title": "create-qdrant-feature-maps.mjs",
       "sourceRef": "sveltekit-frontend/../scripts/atlas/create-qdrant-feature-maps.mjs",
-      "score": 0.5886,
+      "score": 0.5868,
       "signals": {
         "semantic": 0.787,
-        "recency": 0.998,
+        "recency": 0.981,
         "errorBoost": 0.023,
         "todoBoost": 0,
         "sourceRefConfidence": 1
@@ -508,10 +508,10 @@
       "id": "096eb63e9b9c81e0",
       "title": "load-som-packets-to-redis.mjs",
       "sourceRef": "sveltekit-frontend/../scripts/atlas/load-som-packets-to-redis.mjs",
-      "score": 0.5886,
+      "score": 0.5868,
       "signals": {
         "semantic": 0.787,
-        "recency": 0.998,
+        "recency": 0.981,
         "errorBoost": 0.023,
         "todoBoost": 0,
         "sourceRefConfidence": 1
@@ -525,10 +525,10 @@
       "id": "0c2e891b99968cde",
       "title": "build-documents-atlas.mjs",
       "sourceRef": "sveltekit-frontend/scripts/build-documents-atlas.mjs",
-      "score": 0.5886,
+      "score": 0.5868,
       "signals": {
         "semantic": 0.787,
-        "recency": 0.998,
+        "recency": 0.981,
         "errorBoost": 0.023,
         "todoBoost": 0,
         "sourceRefConfidence": 1
@@ -542,10 +542,10 @@
       "id": "0c56380df1325b97",
       "title": "phase89-adaptive-chunker.mjs",
       "sourceRef": "sveltekit-frontend/../scripts/atlas/lib/phase89-adaptive-chunker.mjs",
-      "score": 0.5886,
+      "score": 0.5868,
       "signals": {
         "semantic": 0.787,
-        "recency": 0.998,
+        "recency": 0.981,
         "errorBoost": 0.023,
         "todoBoost": 0,
         "sourceRefConfidence": 1
@@ -559,10 +559,10 @@
       "id": "0d11b60e94b8610a",
       "title": "setup-qdrant-collections.mjs",
       "sourceRef": "sveltekit-frontend/../scripts/docs-atlas/setup-qdrant-collections.mjs",
-      "score": 0.5886,
+      "score": 0.5868,
       "signals": {
         "semantic": 0.787,
-        "recency": 0.998,
+        "recency": 0.981,
         "errorBoost": 0.023,
         "todoBoost": 0,
         "sourceRefConfidence": 1
@@ -576,10 +576,10 @@
       "id": "0d25acc43eac7354",
       "title": "phase2-atlas-calls-extractor.mjs",
       "sourceRef": "sveltekit-frontend/../scripts/atlas/phase2-atlas-calls-extractor.mjs",
-      "score": 0.5886,
+      "score": 0.5868,
       "signals": {
         "semantic": 0.787,
-        "recency": 0.998,
+        "recency": 0.981,
         "errorBoost": 0.023,
         "todoBoost": 0,
         "sourceRefConfidence": 1
@@ -593,10 +593,10 @@
       "id": "11032e0bc6f756ea",
       "title": "validate-pg18-redis-bifrost-stack.mjs",
       "sourceRef": "sveltekit-frontend/../scripts/atlas/validate-pg18-redis-bifrost-stack.mjs",
-      "score": 0.5886,
+      "score": 0.5868,
       "signals": {
         "semantic": 0.787,
-        "recency": 0.998,
+        "recency": 0.981,
         "errorBoost": 0.023,
         "todoBoost": 0,
         "sourceRefConfidence": 1
@@ -610,10 +610,10 @@
       "id": "119a0faac4bd64c9",
       "title": "build_summaries_from_atlas.mjs",
       "sourceRef": "sveltekit-frontend/scripts/opencode/build_summaries_from_atlas.mjs",
-      "score": 0.5886,
+      "score": 0.5868,
       "signals": {
         "semantic": 0.787,
-        "recency": 0.998,
+        "recency": 0.981,
         "errorBoost": 0.023,
         "todoBoost": 0,
         "sourceRefConfidence": 1
@@ -627,10 +627,10 @@
       "id": "1254f12bc033ff05",
       "title": "build-rg-search-matrix.mjs",
       "sourceRef": "sveltekit-frontend/scripts/atlas/build-rg-search-matrix.mjs",
-      "score": 0.5886,
+      "score": 0.5868,
       "signals": {
         "semantic": 0.787,
-        "recency": 0.998,
+        "recency": 0.981,
         "errorBoost": 0.023,
         "todoBoost": 0,
         "sourceRefConfidence": 1
@@ -644,10 +644,10 @@
       "id": "199b2f888ab4754c",
       "title": "warm-redis-lod-cache.mjs",
       "sourceRef": "sveltekit-frontend/../scripts/atlas/warm-redis-lod-cache.mjs",
-      "score": 0.5886,
+      "score": 0.5868,
       "signals": {
         "semantic": 0.787,
-        "recency": 0.998,
+        "recency": 0.981,
         "errorBoost": 0.023,
         "todoBoost": 0,
         "sourceRefConfidence": 1
@@ -661,10 +661,10 @@
       "id": "218b5b9e5976efca",
       "title": "phase89-embed.mjs",
       "sourceRef": "sveltekit-frontend/../scripts/atlas/lib/phase89-embed.mjs",
-      "score": 0.5886,
+      "score": 0.5868,
       "signals": {
         "semantic": 0.787,
-        "recency": 0.998,
+        "recency": 0.981,
         "errorBoost": 0.023,
         "todoBoost": 0,
         "sourceRefConfidence": 1
@@ -678,10 +678,10 @@
       "id": "24f6d4f36bef9284",
       "title": "qdrant-upsert-atlas.mjs",
       "sourceRef": "sveltekit-frontend/../scripts/qdrant-upsert-atlas.mjs",
-      "score": 0.5886,
+      "score": 0.5868,
       "signals": {
         "semantic": 0.787,
-        "recency": 0.998,
+        "recency": 0.981,
         "errorBoost": 0.023,
         "todoBoost": 0,
         "sourceRefConfidence": 1
@@ -695,10 +695,10 @@
       "id": "273e043b3bb891a7",
       "title": "generate-phase19b-dryrun.mjs",
       "sourceRef": "sveltekit-frontend/../scripts/atlas/generate-phase19b-dryrun.mjs",
-      "score": 0.5886,
+      "score": 0.5868,
       "signals": {
         "semantic": 0.787,
-        "recency": 0.998,
+        "recency": 0.981,
         "errorBoost": 0.023,
         "todoBoost": 0,
         "sourceRefConfidence": 1
@@ -712,10 +712,10 @@
       "id": "2acc7f7967fdf222",
       "title": "project-parent-atlas-feature-command-atlas-qdrant.mjs",
       "sourceRef": "sveltekit-frontend/../scripts/atlas/project-parent-atlas-feature-command-atlas-qdrant.mjs",
-      "score": 0.5886,
+      "score": 0.5868,
       "signals": {
         "semantic": 0.787,
-        "recency": 0.998,
+        "recency": 0.981,
         "errorBoost": 0.023,
         "todoBoost": 0,
         "sourceRefConfidence": 1
@@ -729,10 +729,10 @@
       "id": "2c44369022f9fc60",
       "title": "mirror-parent-atlas-feature-command-atlas-postgres.mjs",
       "sourceRef": "sveltekit-frontend/../scripts/atlas/mirror-parent-atlas-feature-command-atlas-postgres.mjs",
-      "score": 0.5886,
+      "score": 0.5868,
       "signals": {
         "semantic": 0.787,
-        "recency": 0.998,
+        "recency": 0.981,
         "errorBoost": 0.023,
         "todoBoost": 0,
         "sourceRefConfidence": 1
@@ -746,10 +746,10 @@
       "id": "2dd4d4e8edcdad94",
       "title": "inject-ndjson-as-ace-packets.mjs",
       "sourceRef": "sveltekit-frontend/../scripts/atlas/inject-ndjson-as-ace-packets.mjs",
-      "score": 0.5886,
+      "score": 0.5868,
       "signals": {
         "semantic": 0.787,
-        "recency": 0.998,
+        "recency": 0.981,
         "errorBoost": 0.023,
         "todoBoost": 0,
         "sourceRefConfidence": 1
@@ -763,10 +763,10 @@
       "id": "307736bff5caa871",
       "title": "sync-cluster-tags-redis.mjs",
       "sourceRef": "sveltekit-frontend/../scripts/atlas/sync-cluster-tags-redis.mjs",
-      "score": 0.5886,
+      "score": 0.5868,
       "signals": {
         "semantic": 0.787,
-        "recency": 0.998,
+        "recency": 0.981,
         "errorBoost": 0.023,
         "todoBoost": 0,
         "sourceRefConfidence": 1
@@ -780,10 +780,10 @@
       "id": "31bcf751ef8c3e8d",
       "title": "load-parent-atlas-to-redis.mjs",
       "sourceRef": "sveltekit-frontend/../scripts/atlas/load-parent-atlas-to-redis.mjs",
-      "score": 0.5886,
+      "score": 0.5868,
       "signals": {
         "semantic": 0.787,
-        "recency": 0.998,
+        "recency": 0.981,
         "errorBoost": 0.023,
         "todoBoost": 0,
         "sourceRefConfidence": 1
@@ -797,10 +797,10 @@
       "id": "36a51314d4a03cd6",
       "title": "mirror-parent-atlas-to-postgres.mjs",
       "sourceRef": "sveltekit-frontend/../scripts/atlas/mirror-parent-atlas-to-postgres.mjs",
-      "score": 0.5886,
+      "score": 0.5868,
       "signals": {
         "semantic": 0.787,
-        "recency": 0.998,
+        "recency": 0.981,
         "errorBoost": 0.023,
         "todoBoost": 0,
         "sourceRefConfidence": 1
@@ -814,10 +814,10 @@
       "id": "3b05992d9798a20e",
       "title": "smoke-vram-hygiene.mjs",
       "sourceRef": "sveltekit-frontend/../scripts/atlas/smoke-vram-hygiene.mjs",
-      "score": 0.5886,
+      "score": 0.5868,
       "signals": {
         "semantic": 0.787,
-        "recency": 0.998,
+        "recency": 0.981,
         "errorBoost": 0.023,
         "todoBoost": 0,
         "sourceRefConfidence": 1
@@ -831,10 +831,10 @@
       "id": "3b655b40adf00bde",
       "title": "unified-atlas-trace.mjs",
       "sourceRef": "sveltekit-frontend/../scripts/atlas/unified-atlas-trace.mjs",
-      "score": 0.5886,
+      "score": 0.5868,
       "signals": {
         "semantic": 0.787,
-        "recency": 0.998,
+        "recency": 0.981,
         "errorBoost": 0.023,
         "todoBoost": 0,
         "sourceRefConfidence": 1
@@ -848,10 +848,10 @@
       "id": "3db7e94a45560e6a",
       "title": "phase2-glyphs-grpo-rewards.mjs",
       "sourceRef": "sveltekit-frontend/../scripts/atlas/phase2-glyphs-grpo-rewards.mjs",
-      "score": 0.5886,
+      "score": 0.5868,
       "signals": {
         "semantic": 0.787,
-        "recency": 0.998,
+        "recency": 0.981,
         "errorBoost": 0.023,
         "todoBoost": 0,
         "sourceRefConfidence": 1
@@ -865,10 +865,10 @@
       "id": "4008c56d1cd0623c",
       "title": "index-programming-docs-qdrant.mjs",
       "sourceRef": "sveltekit-frontend/../scripts/docs-atlas/index-programming-docs-qdrant.mjs",
-      "score": 0.5886,
+      "score": 0.5868,
       "signals": {
         "semantic": 0.787,
-        "recency": 0.998,
+        "recency": 0.981,
         "errorBoost": 0.023,
         "todoBoost": 0,
         "sourceRefConfidence": 1
@@ -882,10 +882,10 @@
       "id": "430aee7a588fb8ea",
       "title": "preassemble-ace-packets.mjs",
       "sourceRef": "sveltekit-frontend/../scripts/atlas/preassemble-ace-packets.mjs",
-      "score": 0.5886,
+      "score": 0.5868,
       "signals": {
         "semantic": 0.787,
-        "recency": 0.998,
+        "recency": 0.981,
         "errorBoost": 0.023,
         "todoBoost": 0,
         "sourceRefConfidence": 1
@@ -899,10 +899,10 @@
       "id": "44dc52904c83ca9d",
       "title": "smoke-atlas-tools-mcp.mjs",
       "sourceRef": "sveltekit-frontend/../scripts/opencode/smoke-atlas-tools-mcp.mjs",
-      "score": 0.5886,
+      "score": 0.5868,
       "signals": {
         "semantic": 0.787,
-        "recency": 0.998,
+        "recency": 0.981,
         "errorBoost": 0.023,
         "todoBoost": 0,
         "sourceRefConfidence": 1
@@ -916,10 +916,10 @@
       "id": "49de1fb16ad19f03",
       "title": "phase89-rrf.mjs",
       "sourceRef": "sveltekit-frontend/../scripts/atlas/lib/phase89-rrf.mjs",
-      "score": 0.5886,
+      "score": 0.5868,
       "signals": {
         "semantic": 0.787,
-        "recency": 0.998,
+        "recency": 0.981,
         "errorBoost": 0.023,
         "todoBoost": 0,
         "sourceRefConfidence": 1
@@ -933,10 +933,10 @@
       "id": "4c68cfdd78e28ec9",
       "title": "gemma4-tasker.mjs",
       "sourceRef": "sveltekit-frontend/../scripts/atlas/ingester/gemma4-tasker.mjs",
-      "score": 0.5886,
+      "score": 0.5868,
       "signals": {
         "semantic": 0.787,
-        "recency": 0.998,
+        "recency": 0.981,
         "errorBoost": 0.023,
         "todoBoost": 0,
         "sourceRefConfidence": 1
@@ -950,10 +950,10 @@
       "id": "4eba06e02eccaf7d",
       "title": "glyph-atlas-builder.ts",
       "sourceRef": "sveltekit-frontend/src/lib/server/graph/glyph-atlas-builder.ts",
-      "score": 0.5886,
+      "score": 0.5868,
       "signals": {
         "semantic": 0.787,
-        "recency": 0.998,
+        "recency": 0.981,
         "errorBoost": 0.023,
         "todoBoost": 0,
         "sourceRefConfidence": 1
@@ -967,10 +967,10 @@
       "id": "54cacd8fbdca40fe",
       "title": "phase89-cuda-tags.mjs",
       "sourceRef": "sveltekit-frontend/../scripts/atlas/lib/phase89-cuda-tags.mjs",
-      "score": 0.5886,
+      "score": 0.5868,
       "signals": {
         "semantic": 0.787,
-        "recency": 0.998,
+        "recency": 0.981,
         "errorBoost": 0.023,
         "todoBoost": 0,
         "sourceRefConfidence": 1
@@ -984,10 +984,10 @@
       "id": "59e8c2af96f154a2",
       "title": "generate-gemma4-patch-card-recommendations.mjs",
       "sourceRef": "sveltekit-frontend/../scripts/atlas/generate-gemma4-patch-card-recommendations.mjs",
-      "score": 0.5886,
+      "score": 0.5868,
       "signals": {
         "semantic": 0.787,
-        "recency": 0.998,
+        "recency": 0.981,
         "errorBoost": 0.023,
         "todoBoost": 0,
         "sourceRefConfidence": 1
@@ -1001,10 +1001,10 @@
       "id": "1a454d8cc9ac3c53",
       "title": "atlas-cards.ts",
       "sourceRef": "sveltekit-frontend/src/lib/server/db/schema/atlas-cards.ts",
-      "score": 0.5851,
+      "score": 0.5834,
       "signals": {
         "semantic": 0.787,
-        "recency": 0.998,
+        "recency": 0.981,
         "errorBoost": 0,
         "todoBoost": 0,
         "sourceRefConfidence": 1
@@ -1018,10 +1018,10 @@
       "id": "36b26feecd7e4463",
       "title": "atlas-dict.ts",
       "sourceRef": "sveltekit-frontend/src/lib/server/db/schema/atlas-dict.ts",
-      "score": 0.5851,
+      "score": 0.5834,
       "signals": {
         "semantic": 0.787,
-        "recency": 0.998,
+        "recency": 0.981,
         "errorBoost": 0,
         "todoBoost": 0,
         "sourceRefConfidence": 1
@@ -1035,10 +1035,10 @@
       "id": "0861a5453452b95b",
       "title": "+server.ts",
       "sourceRef": "sveltekit-frontend/src/routes/api/library/ingest-dev-docs/+server.ts",
-      "score": 0.5851,
+      "score": 0.5834,
       "signals": {
         "semantic": 0.787,
-        "recency": 0.998,
+        "recency": 0.981,
         "errorBoost": 0,
         "todoBoost": 0,
         "sourceRefConfidence": 1
@@ -1052,10 +1052,10 @@
       "id": "0fce794d68b08a2e",
       "title": "+server.ts",
       "sourceRef": "sveltekit-frontend/src/routes/api/admin/atlas/messy-routing/+server.ts",
-      "score": 0.5851,
+      "score": 0.5834,
       "signals": {
         "semantic": 0.787,
-        "recency": 0.998,
+        "recency": 0.981,
         "errorBoost": 0,
         "todoBoost": 0,
         "sourceRefConfidence": 1
@@ -1069,10 +1069,10 @@
       "id": "292e24954b8b0cd5",
       "title": "+server.ts",
       "sourceRef": "sveltekit-frontend/src/routes/api/admin/atlas/hyperrag/+server.ts",
-      "score": 0.5851,
+      "score": 0.5834,
       "signals": {
         "semantic": 0.787,
-        "recency": 0.998,
+        "recency": 0.981,
         "errorBoost": 0,
         "todoBoost": 0,
         "sourceRefConfidence": 1
@@ -1086,10 +1086,10 @@
       "id": "426617a04f92739c",
       "title": "+server.ts",
       "sourceRef": "sveltekit-frontend/src/routes/api/atlas/audit/+server.ts",
-      "score": 0.5851,
+      "score": 0.5834,
       "signals": {
         "semantic": 0.787,
-        "recency": 0.998,
+        "recency": 0.981,
         "errorBoost": 0,
         "todoBoost": 0,
         "sourceRefConfidence": 1
@@ -1103,10 +1103,10 @@
       "id": "4f304bbc25d6defe",
       "title": "+server.ts",
       "sourceRef": "sveltekit-frontend/src/routes/api/atlas/cards/[id]/+server.ts",
-      "score": 0.5851,
+      "score": 0.5834,
       "signals": {
         "semantic": 0.787,
-        "recency": 0.998,
+        "recency": 0.981,
         "errorBoost": 0,
         "todoBoost": 0,
         "sourceRefConfidence": 1
@@ -1120,10 +1120,10 @@
       "id": "56ec8ca25de076a8",
       "title": "+server.ts",
       "sourceRef": "sveltekit-frontend/src/routes/api/docs/+server.ts",
-      "score": 0.5851,
+      "score": 0.5834,
       "signals": {
         "semantic": 0.787,
-        "recency": 0.998,
+        "recency": 0.981,
         "errorBoost": 0,
         "todoBoost": 0,
         "sourceRefConfidence": 1
@@ -1137,10 +1137,10 @@
       "id": "5c4aa90884e87a42",
       "title": "+server.ts",
       "sourceRef": "sveltekit-frontend/src/routes/api/atlas/studio/cards/+server.ts",
-      "score": 0.5851,
+      "score": 0.5834,
       "signals": {
         "semantic": 0.787,
-        "recency": 0.998,
+        "recency": 0.981,
         "errorBoost": 0,
         "todoBoost": 0,
         "sourceRefConfidence": 1
@@ -1154,10 +1154,10 @@
       "id": "5e9de3a611cdac81",
       "title": "+server.ts",
       "sourceRef": "sveltekit-frontend/src/routes/api/graph/glyph-atlas/compare/+server.ts",
-      "score": 0.5851,
+      "score": 0.5834,
       "signals": {
         "semantic": 0.787,
-        "recency": 0.998,
+        "recency": 0.981,
         "errorBoost": 0,
         "todoBoost": 0,
         "sourceRefConfidence": 1
@@ -1171,10 +1171,10 @@
       "id": "0c8dc42fe5b9c990",
       "title": "LLMS.md",
       "sourceRef": "sveltekit-frontend/../scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/mcp/docs/test/LLMS.md",
-      "score": 0.5851,
+      "score": 0.5834,
       "signals": {
         "semantic": 0.787,
-        "recency": 0.998,
+        "recency": 0.981,
         "errorBoost": 0,
         "todoBoost": 0,
         "sourceRefConfidence": 1
@@ -1188,10 +1188,10 @@
       "id": "18a03b135610158c",
       "title": "+server.ts",
       "sourceRef": "sveltekit-frontend/../scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/context7/docs/+server.ts",
-      "score": 0.5851,
+      "score": 0.5834,
       "signals": {
         "semantic": 0.787,
-        "recency": 0.998,
+        "recency": 0.981,
         "errorBoost": 0,
         "todoBoost": 0,
         "sourceRefConfidence": 1
@@ -1205,10 +1205,10 @@
       "id": "4610ae840c1e1761",
       "title": "LLMS.md",
       "sourceRef": "sveltekit-frontend/../scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/docs/[docId]/shards/LLMS.md",
-      "score": 0.5851,
+      "score": 0.5834,
       "signals": {
         "semantic": 0.787,
-        "recency": 0.998,
+        "recency": 0.981,
         "errorBoost": 0,
         "todoBoost": 0,
         "sourceRefConfidence": 1
@@ -1222,10 +1222,10 @@
       "id": "4cff000aac1238aa",
       "title": "LLMS.md",
       "sourceRef": "sveltekit-frontend/../scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/context7/docs/LLMS.md",
-      "score": 0.5851,
+      "score": 0.5834,
       "signals": {
         "semantic": 0.787,
-        "recency": 0.998,
+        "recency": 0.981,
         "errorBoost": 0,
         "todoBoost": 0,
         "sourceRefConfidence": 1
@@ -1239,10 +1239,10 @@
       "id": "55cd6b5cd9f32a0d",
       "title": "LLMS.md",
       "sourceRef": "sveltekit-frontend/../scripts/api-cleanup/reports/backup-2025-12-14T21-11-49-641Z/mcp/context72/get-library-docs/LLMS.md",
-      "score": 0.5851,
+      "score": 0.5834,
       "signals": {
         "semantic": 0.787,
-        "recency": 0.998,
+        "recency": 0.981,
         "errorBoost": 0,
         "todoBoost": 0,
         "sourceRefConfidence": 1
@@ -1256,10 +1256,10 @@
       "id": "5c5656b82bdb743f",
       "title": "+server.ts",
       "sourceRef": "sveltekit-frontend/../scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/mcp/context72/get-library-docs/+server.ts",
-      "score": 0.5851,
+      "score": 0.5834,
       "signals": {
         "semantic": 0.787,
-        "recency": 0.998,
+        "recency": 0.981,
         "errorBoost": 0,
         "todoBoost": 0,
         "sourceRefConfidence": 1
@@ -1273,10 +1273,10 @@
       "id": "01aa64a034142acc",
       "title": "atlas-lane-health-loop.mjs",
       "sourceRef": "sveltekit-frontend/../scripts/atlas/atlas-lane-health-loop.mjs",
-      "score": 0.5851,
+      "score": 0.5834,
       "signals": {
         "semantic": 0.787,
-        "recency": 0.998,
+        "recency": 0.981,
         "errorBoost": 0,
         "todoBoost": 0,
         "sourceRefConfidence": 1
@@ -1290,10 +1290,10 @@
       "id": "0210e6e1ca58fa5f",
       "title": "generate-task-summaries.mjs",
       "sourceRef": "sveltekit-frontend/../scripts/atlas/generate-task-summaries.mjs",
-      "score": 0.5851,
+      "score": 0.5834,
       "signals": {
         "semantic": 0.787,
-        "recency": 0.998,
+        "recency": 0.981,
         "errorBoost": 0,
         "todoBoost": 0,
         "sourceRefConfidence": 1
@@ -1307,10 +1307,10 @@
       "id": "021d87c04286868f",
       "title": "audit-model-artifacts.mjs",
       "sourceRef": "sveltekit-frontend/../scripts/atlas/audit-model-artifacts.mjs",
-      "score": 0.5851,
+      "score": 0.5834,
       "signals": {
         "semantic": 0.787,
-        "recency": 0.998,
+        "recency": 0.981,
         "errorBoost": 0,
         "todoBoost": 0,
         "sourceRefConfidence": 1
@@ -1324,10 +1324,10 @@
       "id": "02305d35436668c1",
       "title": "generate-task-summary-packets.mjs",
       "sourceRef": "sveltekit-frontend/../scripts/atlas/generate-task-summary-packets.mjs",
-      "score": 0.5851,
+      "score": 0.5834,
       "signals": {
         "semantic": 0.787,
-        "recency": 0.998,
+        "recency": 0.981,
         "errorBoost": 0,
         "todoBoost": 0,
         "sourceRefConfidence": 1
@@ -1341,10 +1341,10 @@
       "id": "03f28cc3226abc45",
       "title": "project-parent-atlas-rg-dump-packets.mjs",
       "sourceRef": "sveltekit-frontend/../scripts/atlas/project-parent-atlas-rg-dump-packets.mjs",
-      "score": 0.5851,
+      "score": 0.5834,
       "signals": {
         "semantic": 0.787,
-        "recency": 0.998,
+        "recency": 0.981,
         "errorBoost": 0,
         "todoBoost": 0,
         "sourceRefConfidence": 1
@@ -1358,10 +1358,10 @@
       "id": "06d37c89e53dd341",
       "title": "prepare_duckdb_inputs.mjs",
       "sourceRef": "sveltekit-frontend/../scripts/atlas/ingester/prepare_duckdb_inputs.mjs",
-      "score": 0.5851,
+      "score": 0.5834,
       "signals": {
         "semantic": 0.787,
-        "recency": 0.998,
+        "recency": 0.981,
         "errorBoost": 0,
         "todoBoost": 0,
         "sourceRefConfidence": 1
@@ -1375,10 +1375,10 @@
       "id": "06f2846c7109c0ad",
       "title": "vector64-dryrun.mjs",
       "sourceRef": "sveltekit-frontend/../scripts/atlas/vector64-dryrun.mjs",
-      "score": 0.5851,
+      "score": 0.5834,
       "signals": {
         "semantic": 0.787,
-        "recency": 0.998,
+        "recency": 0.981,
         "errorBoost": 0,
         "todoBoost": 0,
         "sourceRefConfidence": 1
@@ -1392,10 +1392,10 @@
       "id": "0756520a3b8b4a12",
       "title": "rg_atlas_tools.ts",
       "sourceRef": "sveltekit-frontend/src/mcp/rg_atlas_tools.ts",
-      "score": 0.5851,
+      "score": 0.5834,
       "signals": {
         "semantic": 0.787,
-        "recency": 0.998,
+        "recency": 0.981,
         "errorBoost": 0,
         "todoBoost": 0,
         "sourceRefConfidence": 1
@@ -1409,10 +1409,10 @@
       "id": "08dd668c758a58e8",
       "title": "audit-parent-atlas-consistency.mjs",
       "sourceRef": "sveltekit-frontend/../scripts/atlas/audit-parent-atlas-consistency.mjs",
-      "score": 0.5851,
+      "score": 0.5834,
       "signals": {
         "semantic": 0.787,
-        "recency": 0.998,
+        "recency": 0.981,
         "errorBoost": 0,
         "todoBoost": 0,
         "sourceRefConfidence": 1
@@ -1426,10 +1426,10 @@
       "id": "09b64ef19306732a",
       "title": "update-parent-atlas.ts",
       "sourceRef": "sveltekit-frontend/../scripts/atlas/update-parent-atlas.ts",
-      "score": 0.5851,
+      "score": 0.5834,
       "signals": {
         "semantic": 0.787,
-        "recency": 0.998,
+        "recency": 0.981,
         "errorBoost": 0,
         "todoBoost": 0,
         "sourceRefConfidence": 1
@@ -1443,10 +1443,10 @@
       "id": "0c156b7de395be4e",
       "title": "fetch-llm-wiki-corpus.mjs",
       "sourceRef": "sveltekit-frontend/../scripts/atlas/fetch-llm-wiki-corpus.mjs",
-      "score": 0.5851,
+      "score": 0.5834,
       "signals": {
         "semantic": 0.787,
-        "recency": 0.998,
+        "recency": 0.981,
         "errorBoost": 0,
         "todoBoost": 0,
         "sourceRefConfidence": 1
@@ -1460,10 +1460,10 @@
       "id": "0c5bdba537358a54",
       "title": "couchdb-turbovec-ingest.mjs",
       "sourceRef": "sveltekit-frontend/../scripts/docs-atlas/couchdb-turbovec-ingest.mjs",
-      "score": 0.5851,
+      "score": 0.5834,
       "signals": {
         "semantic": 0.787,
-        "recency": 0.998,
+        "recency": 0.981,
         "errorBoost": 0,
         "todoBoost": 0,
         "sourceRefConfidence": 1
@@ -1477,10 +1477,10 @@
       "id": "0cb3f89d0f8f5aac",
       "title": "score-superseded-originals.mjs",
       "sourceRef": "sveltekit-frontend/../scripts/atlas/score-superseded-originals.mjs",
-      "score": 0.5851,
+      "score": 0.5834,
       "signals": {
         "semantic": 0.787,
-        "recency": 0.998,
+        "recency": 0.981,
         "errorBoost": 0,
         "todoBoost": 0,
         "sourceRefConfidence": 1
@@ -1494,10 +1494,10 @@
       "id": "0d0c91ed1233c6a7",
       "title": "project-codebase-topology.mjs",
       "sourceRef": "sveltekit-frontend/../scripts/atlas/project-codebase-topology.mjs",
-      "score": 0.5851,
+      "score": 0.5834,
       "signals": {
         "semantic": 0.787,
-        "recency": 0.998,
+        "recency": 0.981,
         "errorBoost": 0,
         "todoBoost": 0,
         "sourceRefConfidence": 1
@@ -1511,10 +1511,10 @@
       "id": "0d1147fceb1df0c2",
       "title": "write-graph-refresh-manifest.mjs",
       "sourceRef": "sveltekit-frontend/../scripts/atlas/write-graph-refresh-manifest.mjs",
-      "score": 0.5851,
+      "score": 0.5834,
       "signals": {
         "semantic": 0.787,
-        "recency": 0.998,
+        "recency": 0.981,
         "errorBoost": 0,
         "todoBoost": 0,
         "sourceRefConfidence": 1
@@ -1528,10 +1528,10 @@
       "id": "0e4e44c1869640b9",
       "title": "validate-dev-services.mjs",
       "sourceRef": "sveltekit-frontend/../scripts/atlas/validate-dev-services.mjs",
-      "score": 0.5851,
+      "score": 0.5834,
       "signals": {
         "semantic": 0.787,
-        "recency": 0.998,
+        "recency": 0.981,
         "errorBoost": 0,
         "todoBoost": 0,
         "sourceRefConfidence": 1
@@ -1545,10 +1545,10 @@
       "id": "0fa5a77c06e78a44",
       "title": "compute-glyph-rewards.mjs",
       "sourceRef": "sveltekit-frontend/../scripts/atlas/compute-glyph-rewards.mjs",
-      "score": 0.5851,
+      "score": 0.5834,
       "signals": {
         "semantic": 0.787,
-        "recency": 0.998,
+        "recency": 0.981,
         "errorBoost": 0,
         "todoBoost": 0,
         "sourceRefConfidence": 1
@@ -1562,10 +1562,10 @@
       "id": "0fb5d490b4880d66",
       "title": "summarize-tool-usage-graph.mjs",
       "sourceRef": "sveltekit-frontend/../scripts/atlas/summarize-tool-usage-graph.mjs",
-      "score": 0.5851,
+      "score": 0.5834,
       "signals": {
         "semantic": 0.787,
-        "recency": 0.998,
+        "recency": 0.981,
         "errorBoost": 0,
         "todoBoost": 0,
         "sourceRefConfidence": 1
@@ -1579,10 +1579,10 @@
       "id": "112c8fc57b556a6f",
       "title": "unified-codebase-ingester.mjs",
       "sourceRef": "sveltekit-frontend/../scripts/atlas/unified-codebase-ingester.mjs",
-      "score": 0.5851,
+      "score": 0.5834,
       "signals": {
         "semantic": 0.787,
-        "recency": 0.998,
+        "recency": 0.981,
         "errorBoost": 0,
         "todoBoost": 0,
         "sourceRefConfidence": 1
@@ -1596,10 +1596,10 @@
       "id": "1166366d525d8bc0",
       "title": "+page.svelte",
       "sourceRef": "sveltekit-frontend/src/routes/atlas/library/+page.svelte",
-      "score": 0.5851,
+      "score": 0.5834,
       "signals": {
         "semantic": 0.787,
-        "recency": 0.998,
+        "recency": 0.981,
         "errorBoost": 0,
         "todoBoost": 0,
         "sourceRefConfidence": 1
@@ -1613,10 +1613,10 @@
       "id": "135d6afcf9c7f628",
       "title": "dir-pipeline.mjs",
       "sourceRef": "sveltekit-frontend/../scripts/atlas/dir-pipeline.mjs",
-      "score": 0.5851,
+      "score": 0.5834,
       "signals": {
         "semantic": 0.787,
-        "recency": 0.998,
+        "recency": 0.981,
         "errorBoost": 0,
         "todoBoost": 0,
         "sourceRefConfidence": 1
@@ -1630,10 +1630,10 @@
       "id": "1426ff401b1fd76a",
       "title": "publish-bifrost-invalidation.mjs",
       "sourceRef": "sveltekit-frontend/../scripts/atlas/publish-bifrost-invalidation.mjs",
-      "score": 0.5851,
+      "score": 0.5834,
       "signals": {
         "semantic": 0.787,
-        "recency": 0.998,
+        "recency": 0.981,
         "errorBoost": 0,
         "todoBoost": 0,
         "sourceRefConfidence": 1
@@ -1647,10 +1647,10 @@
       "id": "1495dc975bed7ead",
       "title": "derive-semantic-api-tags.mjs",
       "sourceRef": "sveltekit-frontend/../scripts/atlas/derive-semantic-api-tags.mjs",
-      "score": 0.5851,
+      "score": 0.5834,
       "signals": {
         "semantic": 0.787,
-        "recency": 0.998,
+        "recency": 0.981,
         "errorBoost": 0,
         "todoBoost": 0,
         "sourceRefConfidence": 1
@@ -1664,10 +1664,10 @@
       "id": "16a331ea56627317",
       "title": "chr97-k-sweep.mjs",
       "sourceRef": "sveltekit-frontend/../scripts/atlas/chr97-k-sweep.mjs",
-      "score": 0.5851,
+      "score": 0.5834,
       "signals": {
         "semantic": 0.787,
-        "recency": 0.998,
+        "recency": 0.981,
         "errorBoost": 0,
         "todoBoost": 0,
         "sourceRefConfidence": 1
@@ -1681,10 +1681,10 @@
       "id": "16a4d851bc9ad870",
       "title": "eval-real-world-routing.mjs",
       "sourceRef": "sveltekit-frontend/../scripts/atlas/eval-real-world-routing.mjs",
-      "score": 0.5851,
+      "score": 0.5834,
       "signals": {
         "semantic": 0.787,
-        "recency": 0.998,
+        "recency": 0.981,
         "errorBoost": 0,
         "todoBoost": 0,
         "sourceRefConfidence": 1
@@ -1698,10 +1698,10 @@
       "id": "18b44f0bde66f0ce",
       "title": "drizzle-sidecar-policy.mjs",
       "sourceRef": "sveltekit-frontend/../scripts/atlas/drizzle-sidecar-policy.mjs",
-      "score": 0.5851,
+      "score": 0.5834,
       "signals": {
         "semantic": 0.787,
-        "recency": 0.998,
+        "recency": 0.981,
         "errorBoost": 0,
         "todoBoost": 0,
         "sourceRefConfidence": 1
@@ -1715,10 +1715,10 @@
       "id": "1928366752be4572",
       "title": "graphify-cluster-summaries.mjs",
       "sourceRef": "sveltekit-frontend/../scripts/atlas/graphify-cluster-summaries.mjs",
-      "score": 0.5851,
+      "score": 0.5834,
       "signals": {
         "semantic": 0.787,
-        "recency": 0.998,
+        "recency": 0.981,
         "errorBoost": 0,
         "todoBoost": 0,
         "sourceRefConfidence": 1
@@ -1732,10 +1732,10 @@
       "id": "19e91d7fe468828b",
       "title": "audit-contract-map.mjs",
       "sourceRef": "sveltekit-frontend/../scripts/atlas/audit-contract-map.mjs",
-      "score": 0.5851,
+      "score": 0.5834,
       "signals": {
         "semantic": 0.787,
-        "recency": 0.998,
+        "recency": 0.981,
         "errorBoost": 0,
         "todoBoost": 0,
         "sourceRefConfidence": 1
@@ -1749,10 +1749,10 @@
       "id": "1a90251fea015a8a",
       "title": "audit-repo-hygiene.mjs",
       "sourceRef": "sveltekit-frontend/../scripts/atlas/audit-repo-hygiene.mjs",
-      "score": 0.5851,
+      "score": 0.5834,
       "signals": {
         "semantic": 0.787,
-        "recency": 0.998,
+        "recency": 0.981,
         "errorBoost": 0,
         "todoBoost": 0,
         "sourceRefConfidence": 1
@@ -1766,10 +1766,10 @@
       "id": "1b448b74a51bc29b",
       "title": "quarantine-vendor-rows.mjs",
       "sourceRef": "sveltekit-frontend/../scripts/atlas/quarantine-vendor-rows.mjs",
-      "score": 0.5851,
+      "score": 0.5834,
       "signals": {
         "semantic": 0.787,
-        "recency": 0.998,
+        "recency": 0.981,
         "errorBoost": 0,
         "todoBoost": 0,
         "sourceRefConfidence": 1
@@ -1783,10 +1783,10 @@
       "id": "1b6d06bffe2fe2bd",
       "title": "enqueue-offline-cuvs.mjs",
       "sourceRef": "sveltekit-frontend/../scripts/atlas/enqueue-offline-cuvs.mjs",
-      "score": 0.5851,
+      "score": 0.5834,
       "signals": {
         "semantic": 0.787,
-        "recency": 0.998,
+        "recency": 0.981,
         "errorBoost": 0,
         "todoBoost": 0,
         "sourceRefConfidence": 1
@@ -1800,10 +1800,10 @@
       "id": "1bc654652b19700e",
       "title": "xgboost-hotness-score.mjs",
       "sourceRef": "sveltekit-frontend/../scripts/atlas/xgboost-hotness-score.mjs",
-      "score": 0.5851,
+      "score": 0.5834,
       "signals": {
         "semantic": 0.787,
-        "recency": 0.998,
+        "recency": 0.981,
         "errorBoost": 0,
         "todoBoost": 0,
         "sourceRefConfidence": 1
@@ -1817,10 +1817,10 @@
       "id": "1c239b92556cbb40",
       "title": "ingest-markdown-cards.mjs",
       "sourceRef": "sveltekit-frontend/../scripts/atlas/ingest-markdown-cards.mjs",
-      "score": 0.5851,
+      "score": 0.5834,
       "signals": {
         "semantic": 0.787,
-        "recency": 0.998,
+        "recency": 0.981,
         "errorBoost": 0,
         "todoBoost": 0,
         "sourceRefConfidence": 1
@@ -1834,10 +1834,10 @@
       "id": "1f35103acabfb9b0",
       "title": "validate-parent-atlas.mjs",
       "sourceRef": "sveltekit-frontend/../scripts/atlas/validate-parent-atlas.mjs",
-      "score": 0.5851,
+      "score": 0.5834,
       "signals": {
         "semantic": 0.787,
-        "recency": 0.998,
+        "recency": 0.981,
         "errorBoost": 0,
         "todoBoost": 0,
         "sourceRefConfidence": 1
@@ -1851,10 +1851,10 @@
       "id": "20987380983ae71b",
       "title": "extract-session-notes-to-packets.mjs",
       "sourceRef": "sveltekit-frontend/../scripts/atlas/extract-session-notes-to-packets.mjs",
-      "score": 0.5851,
+      "score": 0.5834,
       "signals": {
         "semantic": 0.787,
-        "recency": 0.998,
+        "recency": 0.981,
         "errorBoost": 0,
         "todoBoost": 0,
         "sourceRefConfidence": 1
@@ -1868,10 +1868,10 @@
       "id": "21b53008869e0ab0",
       "title": "dedup-codebase-chunk-index.mjs",
       "sourceRef": "sveltekit-frontend/../scripts/atlas/dedup-codebase-chunk-index.mjs",
-      "score": 0.5851,
+      "score": 0.5834,
       "signals": {
         "semantic": 0.787,
-        "recency": 0.998,
+        "recency": 0.981,
         "errorBoost": 0,
         "todoBoost": 0,
         "sourceRefConfidence": 1
@@ -1885,10 +1885,10 @@
       "id": "24675a8b9d3c401d",
       "title": "export-neo4j-dryrun.mjs",
       "sourceRef": "sveltekit-frontend/../scripts/atlas/export-neo4j-dryrun.mjs",
-      "score": 0.5851,
+      "score": 0.5834,
       "signals": {
         "semantic": 0.787,
-        "recency": 0.998,
+        "recency": 0.981,
         "errorBoost": 0,
         "todoBoost": 0,
         "sourceRefConfidence": 1
@@ -1902,10 +1902,10 @@
       "id": "27d7e849cd765156",
       "title": "compare-external-docs-to-features.mjs",
       "sourceRef": "sveltekit-frontend/../scripts/docs-atlas/compare-external-docs-to-features.mjs",
-      "score": 0.5851,
+      "score": 0.5834,
       "signals": {
         "semantic": 0.787,
-        "recency": 0.998,
+        "recency": 0.981,
         "errorBoost": 0,
         "todoBoost": 0,
         "sourceRefConfidence": 1
@@ -1919,10 +1919,10 @@
       "id": "282c4b887eb8d919",
       "title": "graphrag-kmeans-communities.mjs",
       "sourceRef": "sveltekit-frontend/../scripts/atlas/graphrag-kmeans-communities.mjs",
-      "score": 0.5851,
+      "score": 0.5834,
       "signals": {
         "semantic": 0.787,
-        "recency": 0.998,
+        "recency": 0.981,
         "errorBoost": 0,
         "todoBoost": 0,
         "sourceRefConfidence": 1
@@ -1936,10 +1936,10 @@
       "id": "2a6db56d994ed230",
       "title": "test-multi-tenant-isolation.mjs",
       "sourceRef": "sveltekit-frontend/../scripts/atlas/test-multi-tenant-isolation.mjs",
-      "score": 0.5851,
+      "score": 0.5834,
       "signals": {
         "semantic": 0.787,
-        "recency": 0.998,
+        "recency": 0.981,
         "errorBoost": 0,
         "todoBoost": 0,
         "sourceRefConfidence": 1
@@ -1953,10 +1953,10 @@
       "id": "2af99ffc060a5667",
       "title": "validate-knowledge-cards.mjs",
       "sourceRef": "sveltekit-frontend/../scripts/atlas/validate-knowledge-cards.mjs",
-      "score": 0.5851,
+      "score": 0.5834,
       "signals": {
         "semantic": 0.787,
-        "recency": 0.998,
+        "recency": 0.981,
         "errorBoost": 0,
         "todoBoost": 0,
         "sourceRefConfidence": 1
@@ -1970,10 +1970,10 @@
       "id": "2b02ef49ba664498",
       "title": "persist-topology.mjs",
       "sourceRef": "sveltekit-frontend/../scripts/atlas/persist-topology.mjs",
-      "score": 0.5851,
+      "score": 0.5834,
       "signals": {
         "semantic": 0.787,
-        "recency": 0.998,
+        "recency": 0.981,
         "errorBoost": 0,
         "todoBoost": 0,
         "sourceRefConfidence": 1
@@ -1987,10 +1987,10 @@
       "id": "2b43ab24f3b3b7b7",
       "title": "embed.ts",
       "sourceRef": "sveltekit-frontend/src/lib/server/rg-atlas/embed.ts",
-      "score": 0.5851,
+      "score": 0.5834,
       "signals": {
         "semantic": 0.787,
-        "recency": 0.998,
+        "recency": 0.981,
         "errorBoost": 0,
         "todoBoost": 0,
         "sourceRefConfidence": 1
@@ -2004,10 +2004,10 @@
       "id": "2ba4d480ef0b566b",
       "title": "normalize-doc-markdown.mjs",
       "sourceRef": "sveltekit-frontend/../scripts/docs-atlas/normalize-doc-markdown.mjs",
-      "score": 0.5851,
+      "score": 0.5834,
       "signals": {
         "semantic": 0.787,
-        "recency": 0.998,
+        "recency": 0.981,
         "errorBoost": 0,
         "todoBoost": 0,
         "sourceRefConfidence": 1
@@ -2021,10 +2021,10 @@
       "id": "2c92e8cd6e4a1be8",
       "title": "generate-glyph-upsert-preview.mjs",
       "sourceRef": "sveltekit-frontend/../scripts/atlas/generate-glyph-upsert-preview.mjs",
-      "score": 0.5851,
+      "score": 0.5834,
       "signals": {
         "semantic": 0.787,
-        "recency": 0.998,
+        "recency": 0.981,
         "errorBoost": 0,
         "todoBoost": 0,
         "sourceRefConfidence": 1
@@ -2038,10 +2038,10 @@
       "id": "2cb4c9b536f2cf63",
       "title": "drizzle-drift-audit.mjs",
       "sourceRef": "sveltekit-frontend/../scripts/atlas/drizzle-drift-audit.mjs",
-      "score": 0.5851,
+      "score": 0.5834,
       "signals": {
         "semantic": 0.787,
-        "recency": 0.998,
+        "recency": 0.981,
         "errorBoost": 0,
         "todoBoost": 0,
         "sourceRefConfidence": 1
@@ -2055,10 +2055,10 @@
       "id": "2cf60d1708e696f9",
       "title": "unified-ingester.mjs",
       "sourceRef": "sveltekit-frontend/../scripts/atlas/ingester/unified-ingester.mjs",
-      "score": 0.5851,
+      "score": 0.5834,
       "signals": {
         "semantic": 0.787,
-        "recency": 0.998,
+        "recency": 0.981,
         "errorBoost": 0,
         "todoBoost": 0,
         "sourceRefConfidence": 1
@@ -2072,10 +2072,10 @@
       "id": "2d4d2058f6b263fb",
       "title": "AtlasShaderBackdrop.svelte",
       "sourceRef": "sveltekit-frontend/src/lib/components/atlas/AtlasShaderBackdrop.svelte",
-      "score": 0.5851,
+      "score": 0.5834,
       "signals": {
         "semantic": 0.787,
-        "recency": 0.998,
+        "recency": 0.981,
         "errorBoost": 0,
         "todoBoost": 0,
         "sourceRefConfidence": 1
@@ -2089,10 +2089,10 @@
       "id": "2dcbabe822ad1367",
       "title": "batch-cluster-summarizer.mjs",
       "sourceRef": "sveltekit-frontend/../scripts/atlas/batch-cluster-summarizer.mjs",
-      "score": 0.5851,
+      "score": 0.5834,
       "signals": {
         "semantic": 0.787,
-        "recency": 0.998,
+        "recency": 0.981,
         "errorBoost": 0,
         "todoBoost": 0,
         "sourceRefConfidence": 1
@@ -2106,10 +2106,10 @@
       "id": "2ec83384c1e8ca57",
       "title": "sample-glyphs-for-training.mjs",
       "sourceRef": "sveltekit-frontend/../scripts/atlas/sample-glyphs-for-training.mjs",
-      "score": 0.5851,
+      "score": 0.5834,
       "signals": {
         "semantic": 0.787,
-        "recency": 0.998,
+        "recency": 0.981,
         "errorBoost": 0,
         "todoBoost": 0,
         "sourceRefConfidence": 1
@@ -2123,10 +2123,10 @@
       "id": "2f3c72d161f1692e",
       "title": "drizzle-user-id-drift-audit.mjs",
       "sourceRef": "sveltekit-frontend/../scripts/atlas/drizzle-user-id-drift-audit.mjs",
-      "score": 0.5851,
+      "score": 0.5834,
       "signals": {
         "semantic": 0.787,
-        "recency": 0.998,
+        "recency": 0.981,
         "errorBoost": 0,
         "todoBoost": 0,
         "sourceRefConfidence": 1
@@ -2140,10 +2140,10 @@
       "id": "31091d6a14d02231",
       "title": "run-all-docs-pipeline.mjs",
       "sourceRef": "sveltekit-frontend/../scripts/docs-atlas/run-all-docs-pipeline.mjs",
-      "score": 0.5851,
+      "score": 0.5834,
       "signals": {
         "semantic": 0.787,
-        "recency": 0.998,
+        "recency": 0.981,
         "errorBoost": 0,
         "todoBoost": 0,
         "sourceRefConfidence": 1
@@ -2157,10 +2157,10 @@
       "id": "32817e30dd7cacea",
       "title": "ingest-codebase-tasker.mjs",
       "sourceRef": "sveltekit-frontend/../scripts/atlas/ingest-codebase-tasker.mjs",
-      "score": 0.5851,
+      "score": 0.5834,
       "signals": {
         "semantic": 0.787,
-        "recency": 0.998,
+        "recency": 0.981,
         "errorBoost": 0,
         "todoBoost": 0,
         "sourceRefConfidence": 1
@@ -2174,10 +2174,10 @@
       "id": "32e311b180b78cf2",
       "title": "feature-card-semantic-index.ts",
       "sourceRef": "sveltekit-frontend/src/lib/server/atlas/feature-card-semantic-index.ts",
-      "score": 0.5851,
+      "score": 0.5834,
       "signals": {
         "semantic": 0.787,
-        "recency": 0.998,
+        "recency": 0.981,
         "errorBoost": 0,
         "todoBoost": 0,
         "sourceRefConfidence": 1
@@ -2191,10 +2191,10 @@
       "id": "3519202b54de6741",
       "title": "normalize-source-ref-id.mjs",
       "sourceRef": "sveltekit-frontend/../scripts/atlas/normalize-source-ref-id.mjs",
-      "score": 0.5851,
+      "score": 0.5834,
       "signals": {
         "semantic": 0.787,
-        "recency": 0.998,
+        "recency": 0.981,
         "errorBoost": 0,
         "todoBoost": 0,
         "sourceRefConfidence": 1
@@ -2208,10 +2208,10 @@
       "id": "357d712a0ba40bf9",
       "title": "mapreduce-consolidated-index.mjs",
       "sourceRef": "sveltekit-frontend/../scripts/atlas/mapreduce-consolidated-index.mjs",
-      "score": 0.5851,
+      "score": 0.5834,
       "signals": {
         "semantic": 0.787,
-        "recency": 0.998,
+        "recency": 0.981,
         "errorBoost": 0,
         "todoBoost": 0,
         "sourceRefConfidence": 1
@@ -2225,10 +2225,10 @@
       "id": "35fcfce4937c188a",
       "title": "+page.svelte",
       "sourceRef": "sveltekit-frontend/src/routes/admin/parents-atlas/+page.svelte",
-      "score": 0.5851,
+      "score": 0.5834,
       "signals": {
         "semantic": 0.787,
-        "recency": 0.998,
+        "recency": 0.981,
         "errorBoost": 0,
         "todoBoost": 0,
         "sourceRefConfidence": 1
@@ -2242,10 +2242,10 @@
       "id": "38fe4406757b5025",
       "title": "dependency-context-mapper.mjs",
       "sourceRef": "sveltekit-frontend/../scripts/atlas/dependency-context-mapper.mjs",
-      "score": 0.5851,
+      "score": 0.5834,
       "signals": {
         "semantic": 0.787,
-        "recency": 0.998,
+        "recency": 0.981,
         "errorBoost": 0,
         "todoBoost": 0,
         "sourceRefConfidence": 1
@@ -2259,10 +2259,10 @@
       "id": "392e6175b8ee5da5",
       "title": "chunk-rg-search-dumps.mjs",
       "sourceRef": "sveltekit-frontend/../scripts/atlas/chunk-rg-search-dumps.mjs",
-      "score": 0.5851,
+      "score": 0.5834,
       "signals": {
         "semantic": 0.787,
-        "recency": 0.998,
+        "recency": 0.981,
         "errorBoost": 0,
         "todoBoost": 0,
         "sourceRefConfidence": 1
@@ -2276,10 +2276,10 @@
       "id": "39cc406e000f77df",
       "title": "record-retrieval-outcome.mjs",
       "sourceRef": "sveltekit-frontend/../scripts/atlas/record-retrieval-outcome.mjs",
-      "score": 0.5851,
+      "score": 0.5834,
       "signals": {
         "semantic": 0.787,
-        "recency": 0.998,
+        "recency": 0.981,
         "errorBoost": 0,
         "todoBoost": 0,
         "sourceRefConfidence": 1
@@ -2293,10 +2293,10 @@
       "id": "3b7d927334fff7e7",
       "title": "backfill-atlas-links.mjs",
       "sourceRef": "sveltekit-frontend/../scripts/atlas/backfill-atlas-links.mjs",
-      "score": 0.5851,
+      "score": 0.5834,
       "signals": {
         "semantic": 0.787,
-        "recency": 0.998,
+        "recency": 0.981,
         "errorBoost": 0,
         "todoBoost": 0,
         "sourceRefConfidence": 1
@@ -2310,10 +2310,10 @@
       "id": "3c682d3759d43743",
       "title": "+page.svelte",
       "sourceRef": "sveltekit-frontend/src/routes/dashboard/atlas-control-panel/+page.svelte",
-      "score": 0.5851,
+      "score": 0.5834,
       "signals": {
         "semantic": 0.787,
-        "recency": 0.998,
+        "recency": 0.981,
         "errorBoost": 0,
         "todoBoost": 0,
         "sourceRefConfidence": 1
@@ -2327,10 +2327,10 @@
       "id": "3d86303104dfed0c",
       "title": "materialize-gemma-recommendations.mjs",
       "sourceRef": "sveltekit-frontend/../scripts/atlas/materialize-gemma-recommendations.mjs",
-      "score": 0.5851,
+      "score": 0.5834,
       "signals": {
         "semantic": 0.787,
-        "recency": 0.998,
+        "recency": 0.981,
         "errorBoost": 0,
         "todoBoost": 0,
         "sourceRefConfidence": 1
@@ -2344,10 +2344,10 @@
       "id": "3dbe041a3d15d46f",
       "title": "cache-feature-cards.mjs",
       "sourceRef": "sveltekit-frontend/../scripts/atlas/cache-feature-cards.mjs",
-      "score": 0.5851,
+      "score": 0.5834,
       "signals": {
         "semantic": 0.787,
-        "recency": 0.998,
+        "recency": 0.981,
         "errorBoost": 0,
         "todoBoost": 0,
         "sourceRefConfidence": 1
@@ -2361,10 +2361,10 @@
       "id": "3f5e21ea1f4a93b5",
       "title": "export-atlas-cards.mjs",
       "sourceRef": "sveltekit-frontend/../scripts/atlas/export-atlas-cards.mjs",
-      "score": 0.5851,
+      "score": 0.5834,
       "signals": {
         "semantic": 0.787,
-        "recency": 0.998,
+        "recency": 0.981,
         "errorBoost": 0,
         "todoBoost": 0,
         "sourceRefConfidence": 1
@@ -2378,10 +2378,10 @@
       "id": "40875d7001ebf667",
       "title": "cluster-attribution-pipeline.mjs",
       "sourceRef": "sveltekit-frontend/../scripts/atlas/cluster-attribution-pipeline.mjs",
-      "score": 0.5851,
+      "score": 0.5834,
       "signals": {
         "semantic": 0.787,
-        "recency": 0.998,
+        "recency": 0.981,
         "errorBoost": 0,
         "todoBoost": 0,
         "sourceRefConfidence": 1
@@ -2395,10 +2395,10 @@
       "id": "40fae45edc902a35",
       "title": "kmeans-cluster.ts",
       "sourceRef": "sveltekit-frontend/src/lib/server/rg-atlas/kmeans-cluster.ts",
-      "score": 0.5851,
+      "score": 0.5834,
       "signals": {
         "semantic": 0.787,
-        "recency": 0.998,
+        "recency": 0.981,
         "errorBoost": 0,
         "todoBoost": 0,
         "sourceRefConfidence": 1
@@ -2412,10 +2412,10 @@
       "id": "4113bf994da41e73",
       "title": "feature-barrel-generator.mjs",
       "sourceRef": "sveltekit-frontend/../scripts/atlas/feature-barrel-generator.mjs",
-      "score": 0.5851,
+      "score": 0.5834,
       "signals": {
         "semantic": 0.787,
-        "recency": 0.998,
+        "recency": 0.981,
         "errorBoost": 0,
         "todoBoost": 0,
         "sourceRefConfidence": 1
@@ -2429,10 +2429,10 @@
       "id": "417547164426c394",
       "title": "neo4j-graph-enrich.mjs",
       "sourceRef": "sveltekit-frontend/../scripts/atlas/neo4j-graph-enrich.mjs",
-      "score": 0.5851,
+      "score": 0.5834,
       "signals": {
         "semantic": 0.787,
-        "recency": 0.998,
+        "recency": 0.981,
         "errorBoost": 0,
         "todoBoost": 0,
         "sourceRefConfidence": 1
@@ -2446,10 +2446,10 @@
       "id": "422cedc08ddf820d",
       "title": "index-atlas-card.mjs",
       "sourceRef": "sveltekit-frontend/../scripts/atlas/index-atlas-card.mjs",
-      "score": 0.5851,
+      "score": 0.5834,
       "signals": {
         "semantic": 0.787,
-        "recency": 0.998,
+        "recency": 0.981,
         "errorBoost": 0,
         "todoBoost": 0,
         "sourceRefConfidence": 1
@@ -2463,10 +2463,10 @@
       "id": "4232be0b509a16cc",
       "title": "derive-lod-summaries.mjs",
       "sourceRef": "sveltekit-frontend/../scripts/atlas/derive-lod-summaries.mjs",
-      "score": 0.5851,
+      "score": 0.5834,
       "signals": {
         "semantic": 0.787,
-        "recency": 0.998,
+        "recency": 0.981,
         "errorBoost": 0,
         "todoBoost": 0,
         "sourceRefConfidence": 1
@@ -2480,10 +2480,10 @@
       "id": "4363fec1c15815d7",
       "title": "mcp_unwrap.mjs",
       "sourceRef": "sveltekit-frontend/../scripts/atlas/lib/mcp_unwrap.mjs",
-      "score": 0.5851,
+      "score": 0.5834,
       "signals": {
         "semantic": 0.787,
-        "recency": 0.998,
+        "recency": 0.981,
         "errorBoost": 0,
         "todoBoost": 0,
         "sourceRefConfidence": 1
@@ -2497,10 +2497,10 @@
       "id": "448b44b544085a1a",
       "title": "archive-cold-originals.mjs",
       "sourceRef": "sveltekit-frontend/../scripts/atlas/archive-cold-originals.mjs",
-      "score": 0.5851,
+      "score": 0.5834,
       "signals": {
         "semantic": 0.787,
-        "recency": 0.998,
+        "recency": 0.981,
         "errorBoost": 0,
         "todoBoost": 0,
         "sourceRefConfidence": 1
@@ -2514,10 +2514,10 @@
       "id": "44ef94b09fa2eb95",
       "title": "chunk-repo.ts",
       "sourceRef": "sveltekit-frontend/../scripts/atlas/chunk-repo.ts",
-      "score": 0.5851,
+      "score": 0.5834,
       "signals": {
         "semantic": 0.787,
-        "recency": 0.998,
+        "recency": 0.981,
         "errorBoost": 0,
         "todoBoost": 0,
         "sourceRefConfidence": 1
@@ -2531,10 +2531,10 @@
       "id": "45f86a419cded8aa",
       "title": "record-fix-outcome.mjs",
       "sourceRef": "sveltekit-frontend/../scripts/atlas/record-fix-outcome.mjs",
-      "score": 0.5851,
+      "score": 0.5834,
       "signals": {
         "semantic": 0.787,
-        "recency": 0.998,
+        "recency": 0.981,
         "errorBoost": 0,
         "todoBoost": 0,
         "sourceRefConfidence": 1
@@ -2548,10 +2548,10 @@
       "id": "4649f93375bc02ff",
       "title": "test_llm_call.mjs",
       "sourceRef": "sveltekit-frontend/../scripts/atlas/ingester/test_llm_call.mjs",
-      "score": 0.5851,
+      "score": 0.5834,
       "signals": {
         "semantic": 0.787,
-        "recency": 0.998,
+        "recency": 0.981,
         "errorBoost": 0,
         "todoBoost": 0,
         "sourceRefConfidence": 1
@@ -2565,10 +2565,10 @@
       "id": "47f70d876cdfeec1",
       "title": "atlas-routing-matrix.ts",
       "sourceRef": "sveltekit-frontend/src/lib/server/ace/atlas-routing-matrix.ts",
-      "score": 0.5851,
+      "score": 0.5834,
       "signals": {
         "semantic": 0.787,
-        "recency": 0.998,
+        "recency": 0.981,
         "errorBoost": 0,
         "todoBoost": 0,
         "sourceRefConfidence": 1
@@ -2582,10 +2582,10 @@
       "id": "498ec7b18a12df80",
       "title": "progress.mjs",
       "sourceRef": "sveltekit-frontend/../scripts/atlas/lib/progress.mjs",
-      "score": 0.5851,
+      "score": 0.5834,
       "signals": {
         "semantic": 0.787,
-        "recency": 0.998,
+        "recency": 0.981,
         "errorBoost": 0,
         "todoBoost": 0,
         "sourceRefConfidence": 1
@@ -2599,10 +2599,10 @@
       "id": "4c7dfcf4c99fb468",
       "title": "_atlas-utils.mjs",
       "sourceRef": "sveltekit-frontend/../scripts/atlas/_atlas-utils.mjs",
-      "score": 0.5851,
+      "score": 0.5834,
       "signals": {
         "semantic": 0.787,
-        "recency": 0.998,
+        "recency": 0.981,
         "errorBoost": 0,
         "todoBoost": 0,
         "sourceRefConfidence": 1
@@ -2616,10 +2616,10 @@
       "id": "4d1cfe26ad7657ec",
       "title": "token-card-weight-updater.mjs",
       "sourceRef": "sveltekit-frontend/../scripts/atlas/token-card-weight-updater.mjs",
-      "score": 0.5851,
+      "score": 0.5834,
       "signals": {
         "semantic": 0.787,
-        "recency": 0.998,
+        "recency": 0.981,
         "errorBoost": 0,
         "todoBoost": 0,
         "sourceRefConfidence": 1
@@ -2633,10 +2633,10 @@
       "id": "4d6a156a5baa9a82",
       "title": "generate_parent_atlas_packets.mjs",
       "sourceRef": "sveltekit-frontend/../scripts/atlas/generate_parent_atlas_packets.mjs",
-      "score": 0.5851,
+      "score": 0.5834,
       "signals": {
         "semantic": 0.787,
-        "recency": 0.998,
+        "recency": 0.981,
         "errorBoost": 0,
         "todoBoost": 0,
         "sourceRefConfidence": 1
@@ -2650,10 +2650,10 @@
       "id": "4d812097ca2895dd",
       "title": "archive-to-couchdb.mjs",
       "sourceRef": "sveltekit-frontend/../scripts/atlas/archive-to-couchdb.mjs",
-      "score": 0.5851,
+      "score": 0.5834,
       "signals": {
         "semantic": 0.787,
-        "recency": 0.998,
+        "recency": 0.981,
         "errorBoost": 0,
         "todoBoost": 0,
         "sourceRefConfidence": 1
@@ -2667,10 +2667,10 @@
       "id": "4debc84cf04d4ebc",
       "title": "codebase-semantics-neo4j-report.mjs",
       "sourceRef": "sveltekit-frontend/../scripts/atlas/codebase-semantics-neo4j-report.mjs",
-      "score": 0.5851,
+      "score": 0.5834,
       "signals": {
         "semantic": 0.787,
-        "recency": 0.998,
+        "recency": 0.981,
         "errorBoost": 0,
         "todoBoost": 0,
         "sourceRefConfidence": 1
@@ -2684,10 +2684,10 @@
       "id": "4e1ae49e4cc4eb08",
       "title": "cosine-blend.ts",
       "sourceRef": "sveltekit-frontend/src/lib/server/rg-atlas/cosine-blend.ts",
-      "score": 0.5851,
+      "score": 0.5834,
       "signals": {
         "semantic": 0.787,
-        "recency": 0.998,
+        "recency": 0.981,
         "errorBoost": 0,
         "todoBoost": 0,
         "sourceRefConfidence": 1
@@ -2701,10 +2701,10 @@
       "id": "4e95a0cdfaa8d7f1",
       "title": "run.ts",
       "sourceRef": "sveltekit-frontend/src/lib/server/rg-atlas/run.ts",
-      "score": 0.5851,
+      "score": 0.5834,
       "signals": {
         "semantic": 0.787,
-        "recency": 0.998,
+        "recency": 0.981,
         "errorBoost": 0,
         "todoBoost": 0,
         "sourceRefConfidence": 1
@@ -2718,10 +2718,10 @@
       "id": "4f17e0433dbc85ab",
       "title": "label-features.mjs",
       "sourceRef": "sveltekit-frontend/../scripts/atlas/label-features.mjs",
-      "score": 0.5851,
+      "score": 0.5834,
       "signals": {
         "semantic": 0.787,
-        "recency": 0.998,
+        "recency": 0.981,
         "errorBoost": 0,
         "todoBoost": 0,
         "sourceRefConfidence": 1
@@ -2735,10 +2735,10 @@
       "id": "4f1ef4a1a880dfc2",
       "title": "run-codebase-pipeline.mjs",
       "sourceRef": "sveltekit-frontend/../scripts/atlas/run-codebase-pipeline.mjs",
-      "score": 0.5851,
+      "score": 0.5834,
       "signals": {
         "semantic": 0.787,
-        "recency": 0.998,
+        "recency": 0.981,
         "errorBoost": 0,
         "todoBoost": 0,
         "sourceRefConfidence": 1
@@ -2752,10 +2752,10 @@
       "id": "4f23b016d899b6b3",
       "title": "rg-search-matrix.ts",
       "sourceRef": "sveltekit-frontend/src/lib/server/atlas/rg-search-matrix.ts",
-      "score": 0.5851,
+      "score": 0.5834,
       "signals": {
         "semantic": 0.787,
-        "recency": 0.998,
+        "recency": 0.981,
         "errorBoost": 0,
         "todoBoost": 0,
         "sourceRefConfidence": 1
@@ -2769,10 +2769,10 @@
       "id": "4f3acb9f76d0ba90",
       "title": "extract-calls-graph.mjs",
       "sourceRef": "sveltekit-frontend/../scripts/atlas/extract-calls-graph.mjs",
-      "score": 0.5851,
+      "score": 0.5834,
       "signals": {
         "semantic": 0.787,
-        "recency": 0.998,
+        "recency": 0.981,
         "errorBoost": 0,
         "todoBoost": 0,
         "sourceRefConfidence": 1
@@ -2786,10 +2786,10 @@
       "id": "4f46d7b33147b03b",
       "title": "nes-packet-v1.schema.mjs",
       "sourceRef": "sveltekit-frontend/src/lib/server/atlas/nes-packet-v1.schema.mjs",
-      "score": 0.5851,
+      "score": 0.5834,
       "signals": {
         "semantic": 0.787,
-        "recency": 0.998,
+        "recency": 0.981,
         "errorBoost": 0,
         "todoBoost": 0,
         "sourceRefConfidence": 1
@@ -2803,10 +2803,10 @@
       "id": "501b2de79b3b2412",
       "title": "types.ts",
       "sourceRef": "sveltekit-frontend/src/lib/server/atlas/types.ts",
-      "score": 0.5851,
+      "score": 0.5834,
       "signals": {
         "semantic": 0.787,
-        "recency": 0.998,
+        "recency": 0.981,
         "errorBoost": 0,
         "todoBoost": 0,
         "sourceRefConfidence": 1
@@ -2820,10 +2820,10 @@
       "id": "5077d22c35687c76",
       "title": "auto-schema-evolution.mjs",
       "sourceRef": "sveltekit-frontend/../scripts/atlas/auto-schema-evolution.mjs",
-      "score": 0.5851,
+      "score": 0.5834,
       "signals": {
         "semantic": 0.787,
-        "recency": 0.998,
+        "recency": 0.981,
         "errorBoost": 0,
         "todoBoost": 0,
         "sourceRefConfidence": 1
@@ -2837,10 +2837,10 @@
       "id": "52539df2ff3f2f78",
       "title": "parent-atlas-packet-assembler.ts",
       "sourceRef": "sveltekit-frontend/src/lib/server/ace/parent-atlas-packet-assembler.ts",
-      "score": 0.5851,
+      "score": 0.5834,
       "signals": {
         "semantic": 0.787,
-        "recency": 0.998,
+        "recency": 0.981,
         "errorBoost": 0,
         "todoBoost": 0,
         "sourceRefConfidence": 1
@@ -2854,10 +2854,10 @@
       "id": "52a6dc892705e905",
       "title": "eval-lane-routing.mjs",
       "sourceRef": "sveltekit-frontend/../scripts/atlas/eval-lane-routing.mjs",
-      "score": 0.5851,
+      "score": 0.5834,
       "signals": {
         "semantic": 0.787,
-        "recency": 0.998,
+        "recency": 0.981,
         "errorBoost": 0,
         "todoBoost": 0,
         "sourceRefConfidence": 1
@@ -2871,10 +2871,10 @@
       "id": "52b65405f76f132b",
       "title": "master-feature-map.schema.ts",
       "sourceRef": "sveltekit-frontend/src/lib/server/atlas/master-feature-map.schema.ts",
-      "score": 0.5851,
+      "score": 0.5834,
       "signals": {
         "semantic": 0.787,
-        "recency": 0.998,
+        "recency": 0.981,
         "errorBoost": 0,
         "todoBoost": 0,
         "sourceRefConfidence": 1
@@ -2888,10 +2888,10 @@
       "id": "530e462e641df833",
       "title": "NesAtlasModal.svelte",
       "sourceRef": "sveltekit-frontend/src/lib/components/atlas/NesAtlasModal.svelte",
-      "score": 0.5851,
+      "score": 0.5834,
       "signals": {
         "semantic": 0.787,
-        "recency": 0.998,
+        "recency": 0.981,
         "errorBoost": 0,
         "todoBoost": 0,
         "sourceRefConfidence": 1
@@ -2905,10 +2905,10 @@
       "id": "534619a88d7dc280",
       "title": "summarize-calls-graph.mjs",
       "sourceRef": "sveltekit-frontend/../scripts/atlas/summarize-calls-graph.mjs",
-      "score": 0.5851,
+      "score": 0.5834,
       "signals": {
         "semantic": 0.787,
-        "recency": 0.998,
+        "recency": 0.981,
         "errorBoost": 0,
         "todoBoost": 0,
         "sourceRefConfidence": 1
@@ -2922,10 +2922,10 @@
       "id": "53b9c7fee7e66ef7",
       "title": "atlas-parent-indexing.mjs",
       "sourceRef": "sveltekit-frontend/../scripts/atlas-parent-indexing.mjs",
-      "score": 0.5851,
+      "score": 0.5834,
       "signals": {
         "semantic": 0.787,
-        "recency": 0.998,
+        "recency": 0.981,
         "errorBoost": 0,
         "todoBoost": 0,
         "sourceRefConfidence": 1
@@ -2939,10 +2939,10 @@
       "id": "540773cdfce67ab3",
       "title": "embed-atlas-cards.mjs",
       "sourceRef": "sveltekit-frontend/../scripts/atlas/embed-atlas-cards.mjs",
-      "score": 0.5851,
+      "score": 0.5834,
       "signals": {
         "semantic": 0.787,
-        "recency": 0.998,
+        "recency": 0.981,
         "errorBoost": 0,
         "todoBoost": 0,
         "sourceRefConfidence": 1
@@ -2956,10 +2956,10 @@
       "id": "545693dd790bb4a3",
       "title": "extract-cache-usage.mjs",
       "sourceRef": "sveltekit-frontend/../scripts/atlas/extract-cache-usage.mjs",
-      "score": 0.5851,
+      "score": 0.5834,
       "signals": {
         "semantic": 0.787,
-        "recency": 0.998,
+        "recency": 0.981,
         "errorBoost": 0,
         "todoBoost": 0,
         "sourceRefConfidence": 1
@@ -2973,10 +2973,10 @@
       "id": "552f6c3e24b6b2bc",
       "title": "feature_labelling.mjs",
       "sourceRef": "sveltekit-frontend/../scripts/atlas/feature_labelling.mjs",
-      "score": 0.5851,
+      "score": 0.5834,
       "signals": {
         "semantic": 0.787,
-        "recency": 0.998,
+        "recency": 0.981,
         "errorBoost": 0,
         "todoBoost": 0,
         "sourceRefConfidence": 1
@@ -2990,10 +2990,10 @@
       "id": "562e305fcd48a02b",
       "title": "bench-inference-backends.mjs",
       "sourceRef": "sveltekit-frontend/../scripts/atlas/bench-inference-backends.mjs",
-      "score": 0.5851,
+      "score": 0.5834,
       "signals": {
         "semantic": 0.787,
-        "recency": 0.998,
+        "recency": 0.981,
         "errorBoost": 0,
         "todoBoost": 0,
         "sourceRefConfidence": 1
@@ -3007,10 +3007,10 @@
       "id": "58b89a2b08b311a9",
       "title": "generate-import-updates.mjs",
       "sourceRef": "sveltekit-frontend/../scripts/atlas/generate-import-updates.mjs",
-      "score": 0.5851,
+      "score": 0.5834,
       "signals": {
         "semantic": 0.787,
-        "recency": 0.998,
+        "recency": 0.981,
         "errorBoost": 0,
         "todoBoost": 0,
         "sourceRefConfidence": 1
@@ -3024,10 +3024,10 @@
       "id": "5a643f06d7c4d9e2",
       "title": "create-agent-pickup-packets.mjs",
       "sourceRef": "sveltekit-frontend/../scripts/atlas/create-agent-pickup-packets.mjs",
-      "score": 0.5851,
+      "score": 0.5834,
       "signals": {
         "semantic": 0.787,
-        "recency": 0.998,
+        "recency": 0.981,
         "errorBoost": 0,
         "todoBoost": 0,
         "sourceRefConfidence": 1
@@ -3041,10 +3041,10 @@
       "id": "5a6e88cfd55bd2c7",
       "title": "render-parent-atlas-readable.mjs",
       "sourceRef": "sveltekit-frontend/../scripts/atlas/render-parent-atlas-readable.mjs",
-      "score": 0.5851,
+      "score": 0.5834,
       "signals": {
         "semantic": 0.787,
-        "recency": 0.998,
+        "recency": 0.981,
         "errorBoost": 0,
         "todoBoost": 0,
         "sourceRefConfidence": 1
@@ -3058,10 +3058,10 @@
       "id": "5d8a283f2299aabf",
       "title": "chr97-sprite-eval.mjs",
       "sourceRef": "sveltekit-frontend/../scripts/atlas/chr97-sprite-eval.mjs",
-      "score": 0.5851,
+      "score": 0.5834,
       "signals": {
         "semantic": 0.787,
-        "recency": 0.998,
+        "recency": 0.981,
         "errorBoost": 0,
         "todoBoost": 0,
         "sourceRefConfidence": 1
@@ -3075,10 +3075,10 @@
       "id": "5daa42706329ed9f",
       "title": "project-programming-docs-neo4j.mjs",
       "sourceRef": "sveltekit-frontend/../scripts/docs-atlas/project-programming-docs-neo4j.mjs",
-      "score": 0.5851,
+      "score": 0.5834,
       "signals": {
         "semantic": 0.787,
-        "recency": 0.998,
+        "recency": 0.981,
         "errorBoost": 0,
         "todoBoost": 0,
         "sourceRefConfidence": 1
@@ -3092,10 +3092,10 @@
       "id": "6036ae05777d730d",
       "title": "check-chat-data.mjs",
       "sourceRef": "sveltekit-frontend/../scripts/atlas/check-chat-data.mjs",
-      "score": 0.5851,
+      "score": 0.5834,
       "signals": {
         "semantic": 0.787,
-        "recency": 0.998,
+        "recency": 0.981,
         "errorBoost": 0,
         "todoBoost": 0,
         "sourceRefConfidence": 1
@@ -3109,10 +3109,10 @@
       "id": "2a905f73589bbaf6",
       "title": "tool-usage-graph-summary.json",
       "sourceRef": "sveltekit-frontend/../scripts/atlas/out/tool-usage-graph-summary.json",
-      "score": 0.5851,
+      "score": 0.5834,
       "signals": {
         "semantic": 0.787,
-        "recency": 0.998,
+        "recency": 0.981,
         "errorBoost": 0,
         "todoBoost": 0,
         "sourceRefConfidence": 1
@@ -3126,10 +3126,10 @@
       "id": "561331e0a24851f4",
       "title": "glyph-upserts-fixed-2026-05-29.sql",
       "sourceRef": "sveltekit-frontend/../scripts/atlas/out/glyph-upserts-fixed-2026-05-29.sql",
-      "score": 0.5851,
+      "score": 0.5834,
       "signals": {
         "semantic": 0.787,
-        "recency": 0.998,
+        "recency": 0.981,
         "errorBoost": 0,
         "todoBoost": 0,
         "sourceRefConfidence": 1
@@ -3143,10 +3143,10 @@
       "id": "0da4e5ec02430eeb",
       "title": "service-runbook.md",
       "sourceRef": "sveltekit-frontend/../scripts/atlas/service-runbook.md",
-      "score": 0.5851,
+      "score": 0.5834,
       "signals": {
         "semantic": 0.787,
-        "recency": 0.998,
+        "recency": 0.981,
         "errorBoost": 0,
         "todoBoost": 0,
         "sourceRefConfidence": 1
@@ -3160,10 +3160,10 @@
       "id": "188cc6f93b395090",
       "title": "README.md",
       "sourceRef": "sveltekit-frontend/../scripts/atlas/README.md",
-      "score": 0.5851,
+      "score": 0.5834,
       "signals": {
         "semantic": 0.787,
-        "recency": 0.998,
+        "recency": 0.981,
         "errorBoost": 0,
         "todoBoost": 0,
         "sourceRefConfidence": 1
@@ -3177,10 +3177,10 @@
       "id": "363a03e02db9841a",
       "title": "LLMS.md",
       "sourceRef": "sveltekit-frontend/src/lib/server/atlas/LLMS.md",
-      "score": 0.5851,
+      "score": 0.5834,
       "signals": {
         "semantic": 0.787,
-        "recency": 0.998,
+        "recency": 0.981,
         "errorBoost": 0,
         "todoBoost": 0,
         "sourceRefConfidence": 1
@@ -3194,10 +3194,10 @@
       "id": "5c4223f16ba56d5c",
       "title": "tool-usage-graph-summary.md",
       "sourceRef": "sveltekit-frontend/../scripts/atlas/out/tool-usage-graph-summary.md",
-      "score": 0.5851,
+      "score": 0.5834,
       "signals": {
         "semantic": 0.787,
-        "recency": 0.998,
+        "recency": 0.981,
         "errorBoost": 0,
         "todoBoost": 0,
         "sourceRefConfidence": 1
@@ -3211,10 +3211,10 @@
       "id": "5cc23fd22c9cf0aa",
       "title": "llms.md",
       "sourceRef": "sveltekit-frontend/../scripts/atlas/lib/llms.md",
-      "score": 0.5851,
+      "score": 0.5834,
       "signals": {
         "semantic": 0.787,
-        "recency": 0.998,
+        "recency": 0.981,
         "errorBoost": 0,
         "todoBoost": 0,
         "sourceRefConfidence": 1
@@ -3228,10 +3228,10 @@
       "id": "22118a2b21ea9f5b",
       "title": "agentic-proposal-join-spine.spec.ts",
       "sourceRef": "sveltekit-frontend/src/lib/server/analysis/agentic-proposal-join-spine.spec.ts",
-      "score": 0.5826,
+      "score": 0.5809,
       "signals": {
         "semantic": 0.787,
-        "recency": 0.998,
+        "recency": 0.981,
         "errorBoost": 0,
         "todoBoost": 0,
         "sourceRefConfidence": 0.85
@@ -3245,10 +3245,10 @@
       "id": "2788200bb6568ef8",
       "title": "retrieval-gpu-cluster.spec.ts",
       "sourceRef": "sveltekit-frontend/src/lib/server/types/retrieval-gpu-cluster.spec.ts",
-      "score": 0.5826,
+      "score": 0.5809,
       "signals": {
         "semantic": 0.787,
-        "recency": 0.998,
+        "recency": 0.981,
         "errorBoost": 0,
         "todoBoost": 0,
         "sourceRefConfidence": 0.85
@@ -3262,10 +3262,10 @@
       "id": "283763c801936c59",
       "title": "graphrag-stage-plan.ts",
       "sourceRef": "sveltekit-frontend/src/lib/server/retrieval/graphrag-stage-plan.ts",
-      "score": 0.5826,
+      "score": 0.5809,
       "signals": {
         "semantic": 0.787,
-        "recency": 0.998,
+        "recency": 0.981,
         "errorBoost": 0,
         "todoBoost": 0,
         "sourceRefConfidence": 0.85
@@ -3279,10 +3279,10 @@
       "id": "3965f8adb4ab2661",
       "title": "token-budget.spec.ts",
       "sourceRef": "sveltekit-frontend/src/lib/server/llm/token-budget.spec.ts",
-      "score": 0.5826,
+      "score": 0.5809,
       "signals": {
         "semantic": 0.787,
-        "recency": 0.998,
+        "recency": 0.981,
         "errorBoost": 0,
         "todoBoost": 0,
         "sourceRefConfidence": 0.85
@@ -3296,10 +3296,10 @@
       "id": "458c98afea488866",
       "title": "+page.svelte",
       "sourceRef": "sveltekit-frontend/src/routes/(app)/admin/memory-inspector/+page.svelte",
-      "score": 0.5826,
+      "score": 0.5809,
       "signals": {
         "semantic": 0.787,
-        "recency": 0.998,
+        "recency": 0.981,
         "errorBoost": 0,
         "todoBoost": 0,
         "sourceRefConfidence": 0.85
@@ -3313,10 +3313,10 @@
       "id": "4658173bdbb44fc9",
       "title": "+server.ts",
       "sourceRef": "sveltekit-frontend/../scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/admin/inspector/+server.ts",
-      "score": 0.5826,
+      "score": 0.5809,
       "signals": {
         "semantic": 0.787,
-        "recency": 0.998,
+        "recency": 0.981,
         "errorBoost": 0,
         "todoBoost": 0,
         "sourceRefConfidence": 0.85
@@ -3330,10 +3330,10 @@
       "id": "4a29a823cda5a3f0",
       "title": "CitationInspector.svelte",
       "sourceRef": "sveltekit-frontend/src/lib/components/source-validation/CitationInspector.svelte",
-      "score": 0.5826,
+      "score": 0.5809,
       "signals": {
         "semantic": 0.787,
-        "recency": 0.998,
+        "recency": 0.981,
         "errorBoost": 0,
         "todoBoost": 0,
         "sourceRefConfidence": 0.85
@@ -3347,10 +3347,10 @@
       "id": "4f61e447de8e8b03",
       "title": "demos-showcase.spec.ts",
       "sourceRef": "sveltekit-frontend/tests/demos-showcase.spec.ts",
-      "score": 0.5826,
+      "score": 0.5809,
       "signals": {
         "semantic": 0.787,
-        "recency": 0.998,
+        "recency": 0.981,
         "errorBoost": 0,
         "todoBoost": 0,
         "sourceRefConfidence": 0.85
@@ -3364,10 +3364,10 @@
       "id": "4f9e5c53ec822c2c",
       "title": "RelationshipInspector.svelte",
       "sourceRef": "sveltekit-frontend/src/lib/components/evidence/RelationshipInspector.svelte",
-      "score": 0.5826,
+      "score": 0.5809,
       "signals": {
         "semantic": 0.787,
-        "recency": 0.998,
+        "recency": 0.981,
         "errorBoost": 0,
         "todoBoost": 0,
         "sourceRefConfidence": 0.85
@@ -3381,10 +3381,10 @@
       "id": "0a3e38a48683d3be",
       "title": "bifrost-trace-smoke.mjs",
       "sourceRef": "sveltekit-frontend/../scripts/smoke/bifrost-trace-smoke.mjs",
-      "score": 0.562,
+      "score": 0.5603,
       "signals": {
         "semantic": 0.787,
-        "recency": 0.998,
+        "recency": 0.981,
         "errorBoost": 0.046,
         "todoBoost": 0,
         "sourceRefConfidence": 0.85
@@ -3398,10 +3398,10 @@
       "id": "0b64a564fbfdfc39",
       "title": "phase76-ace-prompt-engineer.mjs",
       "sourceRef": "sveltekit-frontend/../scripts/phase76-ace-prompt-engineer.mjs",
-      "score": 0.562,
+      "score": 0.5603,
       "signals": {
         "semantic": 0.787,
-        "recency": 0.998,
+        "recency": 0.981,
         "errorBoost": 0.046,
         "todoBoost": 0,
         "sourceRefConfidence": 0.85
@@ -3415,10 +3415,10 @@
       "id": "17749f0b69ea2d1d",
       "title": "ace-builder.ts",
       "sourceRef": "sveltekit-frontend/src/lib/server/ai/ace-builder.ts",
-      "score": 0.562,
+      "score": 0.5603,
       "signals": {
         "semantic": 0.787,
-        "recency": 0.998,
+        "recency": 0.981,
         "errorBoost": 0.046,
         "todoBoost": 0,
         "sourceRefConfidence": 0.85
@@ -3432,10 +3432,10 @@
       "id": "4b6cdb4e698754cf",
       "title": "parse-build-errors.mjs",
       "sourceRef": "sveltekit-frontend/scripts/parse-build-errors.mjs",
-      "score": 0.562,
+      "score": 0.5603,
       "signals": {
         "semantic": 0.787,
-        "recency": 0.998,
+        "recency": 0.981,
         "errorBoost": 0.046,
         "todoBoost": 0,
         "sourceRefConfidence": 0.85
@@ -3449,10 +3449,10 @@
       "id": "016058a6bf4a8194",
       "title": "workspace-operations.ts",
       "sourceRef": "sveltekit-frontend/src/lib/server/db/workspace-operations.ts",
-      "score": 0.5586,
+      "score": 0.5568,
       "signals": {
         "semantic": 0.787,
-        "recency": 0.998,
+        "recency": 0.981,
         "errorBoost": 0.023,
         "todoBoost": 0,
         "sourceRefConfidence": 0.85
@@ -3466,10 +3466,10 @@
       "id": "0ea404ac2a08bb79",
       "title": "error_timeline.ts",
       "sourceRef": "sveltekit-frontend/src/lib/server/db/schema/error_timeline.ts",
-      "score": 0.5586,
+      "score": 0.5568,
       "signals": {
         "semantic": 0.787,
-        "recency": 0.998,
+        "recency": 0.981,
         "errorBoost": 0.023,
         "todoBoost": 0,
         "sourceRefConfidence": 0.85
@@ -3483,10 +3483,10 @@
       "id": "11b6c4d83a8621d2",
       "title": "redisPubSub.ts",
       "sourceRef": "sveltekit-frontend/src/lib/server/redisPubSub.ts",
-      "score": 0.5586,
+      "score": 0.5568,
       "signals": {
         "semantic": 0.787,
-        "recency": 0.998,
+        "recency": 0.981,
         "errorBoost": 0.023,
         "todoBoost": 0,
         "sourceRefConfidence": 0.85
@@ -3500,10 +3500,10 @@
       "id": "21977c0d43a24b76",
       "title": "qdrant-sync.ts",
       "sourceRef": "sveltekit-frontend/src/lib/server/db/qdrant-sync.ts",
-      "score": 0.5586,
+      "score": 0.5568,
       "signals": {
         "semantic": 0.787,
-        "recency": 0.998,
+        "recency": 0.981,
         "errorBoost": 0.023,
         "todoBoost": 0,
         "sourceRefConfidence": 0.85
@@ -3517,10 +3517,10 @@
       "id": "31c09f91a8f34aa9",
       "title": "error_events.ts",
       "sourceRef": "sveltekit-frontend/src/lib/server/db/schema/error_events.ts",
-      "score": 0.5586,
+      "score": 0.5568,
       "signals": {
         "semantic": 0.787,
-        "recency": 0.998,
+        "recency": 0.981,
         "errorBoost": 0.023,
         "todoBoost": 0,
         "sourceRefConfidence": 0.85
@@ -3534,10 +3534,10 @@
       "id": "3762df58ac576154",
       "title": "workspace-sessions.ts",
       "sourceRef": "sveltekit-frontend/src/lib/server/db/schema/workspace-sessions.ts",
-      "score": 0.5586,
+      "score": 0.5568,
       "signals": {
         "semantic": 0.787,
-        "recency": 0.998,
+        "recency": 0.981,
         "errorBoost": 0.023,
         "todoBoost": 0,
         "sourceRefConfidence": 0.85
@@ -3551,10 +3551,10 @@
       "id": "3fd8e435fa06b122",
       "title": "0012_error_brain_diffs.sql",
       "sourceRef": "sveltekit-frontend/src/lib/server/db/migrations/0012_error_brain_diffs.sql",
-      "score": 0.5586,
+      "score": 0.5568,
       "signals": {
         "semantic": 0.787,
-        "recency": 0.998,
+        "recency": 0.981,
         "errorBoost": 0.023,
         "todoBoost": 0,
         "sourceRefConfidence": 0.85
@@ -3568,10 +3568,10 @@
       "id": "428eb74d9a95fd2e",
       "title": "schema-phase89-preserved.ts",
       "sourceRef": "sveltekit-frontend/src/lib/server/db/schema-phase89-preserved.ts",
-      "score": 0.5586,
+      "score": 0.5568,
       "signals": {
         "semantic": 0.787,
-        "recency": 0.998,
+        "recency": 0.981,
         "errorBoost": 0.023,
         "todoBoost": 0,
         "sourceRefConfidence": 0.85
@@ -3585,10 +3585,10 @@
       "id": "5966573800ba8601",
       "title": "error_brain_analysis.ts",
       "sourceRef": "sveltekit-frontend/src/lib/server/db/schema/error_brain_analysis.ts",
-      "score": 0.5586,
+      "score": 0.5568,
       "signals": {
         "semantic": 0.787,
-        "recency": 0.998,
+        "recency": 0.981,
         "errorBoost": 0.023,
         "todoBoost": 0,
         "sourceRefConfidence": 0.85
@@ -3602,10 +3602,10 @@
       "id": "5a255c2ee1a84954",
       "title": "workspace-notes.ts",
       "sourceRef": "sveltekit-frontend/src/lib/server/db/schema/workspace-notes.ts",
-      "score": 0.5586,
+      "score": 0.5568,
       "signals": {
         "semantic": 0.787,
-        "recency": 0.998,
+        "recency": 0.981,
         "errorBoost": 0.023,
         "todoBoost": 0,
         "sourceRefConfidence": 0.85
@@ -3619,10 +3619,10 @@
       "id": "020a94258b9e1fed",
       "title": "ace-cartridge.ts",
       "sourceRef": "sveltekit-frontend/src/lib/server/ai/ace-cartridge.ts",
-      "score": 0.5586,
+      "score": 0.5568,
       "signals": {
         "semantic": 0.787,
-        "recency": 0.998,
+        "recency": 0.981,
         "errorBoost": 0.023,
         "todoBoost": 0,
         "sourceRefConfidence": 0.85
@@ -3636,10 +3636,10 @@
       "id": "02a16ca235f25d85",
       "title": "redis-cache.ts",
       "sourceRef": "sveltekit-frontend/src/lib/server/ff1/storage/redis-cache.ts",
-      "score": 0.5586,
+      "score": 0.5568,
       "signals": {
         "semantic": 0.787,
-        "recency": 0.998,
+        "recency": 0.981,
         "errorBoost": 0.023,
         "todoBoost": 0,
         "sourceRefConfidence": 0.85
@@ -3653,10 +3653,10 @@
       "id": "0851a854f0d3a75f",
       "title": "webgpu-palace-compression.ts",
       "sourceRef": "sveltekit-frontend/src/lib/gpu/webgpu-palace-compression.ts",
-      "score": 0.5586,
+      "score": 0.5568,
       "signals": {
         "semantic": 0.787,
-        "recency": 0.998,
+        "recency": 0.981,
         "errorBoost": 0.023,
         "todoBoost": 0,
         "sourceRefConfidence": 0.85
@@ -3670,10 +3670,10 @@
       "id": "08fe7442a192f43f",
       "title": "YoRHaCommandInterface.svelte",
       "sourceRef": "sveltekit-frontend/src/lib/components/yorha/_simulations/YoRHaCommandInterface.svelte",
-      "score": 0.5586,
+      "score": 0.5568,
       "signals": {
         "semantic": 0.787,
-        "recency": 0.998,
+        "recency": 0.981,
         "errorBoost": 0.023,
         "todoBoost": 0,
         "sourceRefConfidence": 0.85
@@ -3687,10 +3687,10 @@
       "id": "0a113a116a38352f",
       "title": "llm-cache-trace.ts",
       "sourceRef": "sveltekit-frontend/src/lib/server/ai/llm-cache-trace.ts",
-      "score": 0.5586,
+      "score": 0.5568,
       "signals": {
         "semantic": 0.787,
-        "recency": 0.998,
+        "recency": 0.981,
         "errorBoost": 0.023,
         "todoBoost": 0,
         "sourceRefConfidence": 0.85
@@ -3704,10 +3704,10 @@
       "id": "0a804a81afc4d490",
       "title": "qdrant-parser.ts",
       "sourceRef": "sveltekit-frontend/src/lib/server/utils/qdrant-parser.ts",
-      "score": 0.5586,
+      "score": 0.5568,
       "signals": {
         "semantic": 0.787,
-        "recency": 0.998,
+        "recency": 0.981,
         "errorBoost": 0.023,
         "todoBoost": 0,
         "sourceRefConfidence": 0.85
@@ -3721,10 +3721,10 @@
       "id": "0b3f416150eaca83",
       "title": "vite-error-schema.ts",
       "sourceRef": "sveltekit-frontend/src/lib/db/vite-error-schema.ts",
-      "score": 0.5586,
+      "score": 0.5568,
       "signals": {
         "semantic": 0.787,
-        "recency": 0.998,
+        "recency": 0.981,
         "errorBoost": 0.023,
         "todoBoost": 0,
         "sourceRefConfidence": 0.85
@@ -3738,10 +3738,10 @@
       "id": "0c300c1a0a4495da",
       "title": "gemma4-e2b-client.ts",
       "sourceRef": "sveltekit-frontend/src/lib/ai/gemma4-e2b-client.ts",
-      "score": 0.5586,
+      "score": 0.5568,
       "signals": {
         "semantic": 0.787,
-        "recency": 0.998,
+        "recency": 0.981,
         "errorBoost": 0.023,
         "todoBoost": 0,
         "sourceRefConfidence": 0.85
@@ -3755,10 +3755,10 @@
       "id": "0c34dcb26b27a97a",
       "title": "ErrorStreamMonitor.svelte",
       "sourceRef": "sveltekit-frontend/src/lib/components/ErrorStreamMonitor.svelte",
-      "score": 0.5586,
+      "score": 0.5568,
       "signals": {
         "semantic": 0.787,
-        "recency": 0.998,
+        "recency": 0.981,
         "errorBoost": 0.023,
         "todoBoost": 0,
         "sourceRefConfidence": 0.85
@@ -3772,10 +3772,10 @@
       "id": "0d911340c3d5e42f",
       "title": "gemma4-adapter.mjs",
       "sourceRef": "sveltekit-frontend/../scripts/opencode/gemma4-adapter.mjs",
-      "score": 0.5586,
+      "score": 0.5568,
       "signals": {
         "semantic": 0.787,
-        "recency": 0.998,
+        "recency": 0.981,
         "errorBoost": 0.023,
         "todoBoost": 0,
         "sourceRefConfidence": 0.85
@@ -3789,10 +3789,10 @@
       "id": "0da0c8be88588ccb",
       "title": "patch-opencode-agent-prompt.mjs",
       "sourceRef": "sveltekit-frontend/../scripts/dev/patch-opencode-agent-prompt.mjs",
-      "score": 0.5586,
+      "score": 0.5568,
       "signals": {
         "semantic": 0.787,
-        "recency": 0.998,
+        "recency": 0.981,
         "errorBoost": 0.023,
         "todoBoost": 0,
         "sourceRefConfidence": 0.85
@@ -3806,10 +3806,10 @@
       "id": "0f60c347677fe8fa",
       "title": "phase2-fix-colon-comma-swap.mjs",
       "sourceRef": "sveltekit-frontend/../scripts/phase2-fix-colon-comma-swap.mjs",
-      "score": 0.5586,
+      "score": 0.5568,
       "signals": {
         "semantic": 0.787,
-        "recency": 0.998,
+        "recency": 0.981,
         "errorBoost": 0.023,
         "todoBoost": 0,
         "sourceRefConfidence": 0.85
@@ -3823,10 +3823,10 @@
       "id": "0fa81613de265dc9",
       "title": "bootstrap-workspace-tasks.mjs",
       "sourceRef": "sveltekit-frontend/../scripts/opencode/bootstrap-workspace-tasks.mjs",
-      "score": 0.5586,
+      "score": 0.5568,
       "signals": {
         "semantic": 0.787,
-        "recency": 0.998,
+        "recency": 0.981,
         "errorBoost": 0.023,
         "todoBoost": 0,
         "sourceRefConfidence": 0.85
@@ -3840,10 +3840,10 @@
       "id": "102ba643a6efe1ba",
       "title": "karpathy-qdrant-cluster-backfill.ts",
       "sourceRef": "sveltekit-frontend/src/lib/server/ace/karpathy-qdrant-cluster-backfill.ts",
-      "score": 0.5586,
+      "score": 0.5568,
       "signals": {
         "semantic": 0.787,
-        "recency": 0.998,
+        "recency": 0.981,
         "errorBoost": 0.023,
         "todoBoost": 0,
         "sourceRefConfidence": 0.85
@@ -3857,10 +3857,10 @@
       "id": "107029b97f3d4f8a",
       "title": "store-qdrant.mjs",
       "sourceRef": "sveltekit-frontend/../scripts/ingest/store-qdrant.mjs",
-      "score": 0.5586,
+      "score": 0.5568,
       "signals": {
         "semantic": 0.787,
-        "recency": 0.998,
+        "recency": 0.981,
         "errorBoost": 0.023,
         "todoBoost": 0,
         "sourceRefConfidence": 0.85
@@ -3874,10 +3874,10 @@
       "id": "1075e43dd1f83d02",
       "title": "catalog-todo-items.mjs",
       "sourceRef": "sveltekit-frontend/../scripts/catalog-todo-items.mjs",
-      "score": 0.5586,
+      "score": 0.5568,
       "signals": {
         "semantic": 0.787,
-        "recency": 0.998,
+        "recency": 0.981,
         "errorBoost": 0.023,
         "todoBoost": 0,
         "sourceRefConfidence": 0.85
@@ -3891,10 +3891,10 @@
       "id": "116fdbfb6b3e85d9",
       "title": "batch-error-analysis.ts",
       "sourceRef": "sveltekit-frontend/src/lib/server/analysis/batch-error-analysis.ts",
-      "score": 0.5586,
+      "score": 0.5568,
       "signals": {
         "semantic": 0.787,
-        "recency": 0.998,
+        "recency": 0.981,
         "errorBoost": 0.023,
         "todoBoost": 0,
         "sourceRefConfidence": 0.85
@@ -3908,10 +3908,10 @@
       "id": "12c1a2f41904835f",
       "title": "qdrant-sync.ts",
       "sourceRef": "sveltekit-frontend/../scripts/sync-labels/qdrant-sync.ts",
-      "score": 0.5586,
+      "score": 0.5568,
       "signals": {
         "semantic": 0.787,
-        "recency": 0.998,
+        "recency": 0.981,
         "errorBoost": 0.023,
         "todoBoost": 0,
         "sourceRefConfidence": 0.85
@@ -3925,10 +3925,10 @@
       "id": "14b3e84d987085e9",
       "title": "phase3-file-inventory.mjs",
       "sourceRef": "sveltekit-frontend/../scripts/phase3-file-inventory.mjs",
-      "score": 0.5586,
+      "score": 0.5568,
       "signals": {
         "semantic": 0.787,
-        "recency": 0.998,
+        "recency": 0.981,
         "errorBoost": 0.023,
         "todoBoost": 0,
         "sourceRefConfidence": 0.85
@@ -3942,10 +3942,10 @@
       "id": "16f41478779f62ea",
       "title": "start-with-smoke.mjs",
       "sourceRef": "sveltekit-frontend/../scripts/start-with-smoke.mjs",
-      "score": 0.5586,
+      "score": 0.5568,
       "signals": {
         "semantic": 0.787,
-        "recency": 0.998,
+        "recency": 0.981,
         "errorBoost": 0.023,
         "todoBoost": 0,
         "sourceRefConfidence": 0.85
@@ -3959,10 +3959,10 @@
       "id": "170c636a28564bf3",
       "title": "ace-hit-tagger.ts",
       "sourceRef": "sveltekit-frontend/src/lib/server/ace/ace-hit-tagger.ts",
-      "score": 0.5586,
+      "score": 0.5568,
       "signals": {
         "semantic": 0.787,
-        "recency": 0.998,
+        "recency": 0.981,
         "errorBoost": 0.023,
         "todoBoost": 0,
         "sourceRefConfidence": 0.85
@@ -3976,10 +3976,10 @@
       "id": "180cd3381d338b5e",
       "title": "inject-ace-engram.ts",
       "sourceRef": "sveltekit-frontend/../scripts/inject-ace-engram.ts",
-      "score": 0.5586,
+      "score": 0.5568,
       "signals": {
         "semantic": 0.787,
-        "recency": 0.998,
+        "recency": 0.981,
         "errorBoost": 0.023,
         "todoBoost": 0,
         "sourceRefConfidence": 0.85
@@ -3993,10 +3993,10 @@
       "id": "19e3d469f57f17f9",
       "title": "POIFaceMatchDialog.svelte",
       "sourceRef": "sveltekit-frontend/src/lib/components/poi/POIFaceMatchDialog.svelte",
-      "score": 0.5586,
+      "score": 0.5568,
       "signals": {
         "semantic": 0.787,
-        "recency": 0.998,
+        "recency": 0.981,
         "errorBoost": 0.023,
         "todoBoost": 0,
         "sourceRefConfidence": 0.85
@@ -4010,10 +4010,10 @@
       "id": "19ea50f4f6e8dde8",
       "title": "qdrant-quantize-collections.mjs",
       "sourceRef": "sveltekit-frontend/../scripts/qdrant-quantize-collections.mjs",
-      "score": 0.5586,
+      "score": 0.5568,
       "signals": {
         "semantic": 0.787,
-        "recency": 0.998,
+        "recency": 0.981,
         "errorBoost": 0.023,
         "todoBoost": 0,
         "sourceRefConfidence": 0.85
@@ -4027,10 +4027,10 @@
       "id": "1a637b4929d3fe02",
       "title": "phase2-fix-ts1005-simple.mjs",
       "sourceRef": "sveltekit-frontend/../scripts/phase2-fix-ts1005-simple.mjs",
-      "score": 0.5586,
+      "score": 0.5568,
       "signals": {
         "semantic": 0.787,
-        "recency": 0.998,
+        "recency": 0.981,
         "errorBoost": 0.023,
         "todoBoost": 0,
         "sourceRefConfidence": 0.85

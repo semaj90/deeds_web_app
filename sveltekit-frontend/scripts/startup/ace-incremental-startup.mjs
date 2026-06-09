@@ -388,6 +388,43 @@ async function runIncrementalLane(redis) {
       timeout: 60_000,
     });
 
+    // ── Postgres prune — code_retrieval_chunks rows older than 30 days ──────────
+    // Runs at most once per 30 days (Redis cooldown key). Deletes stale rows and
+    // VACUUMS to reclaim disk. Safe to skip if DB is unavailable — required:false.
+    const pruneCooldownKey = 'startup:pg-prune:code-chunks:last_run';
+    const pruneStampRaw = await redis.get(pruneCooldownKey).catch(() => null);
+    const pruneAgeMs = pruneStampRaw ? Date.now() - new Date(pruneStampRaw).getTime() : Infinity;
+    const PRUNE_INTERVAL_MS = 30 * 24 * 60 * 60 * 1000; // 30 days
+    if (pruneAgeMs > PRUNE_INTERVAL_MS) {
+      try {
+        const { default: pg } = await import('pg');
+        const pool = new pg.Pool({
+          connectionString: process.env.DATABASE_URL,
+          max: 1,
+          connectionTimeoutMillis: 5000,
+          idleTimeoutMillis: 5000,
+        });
+        const del = await pool.query(
+          "DELETE FROM code_retrieval_chunks WHERE created_at < NOW() - INTERVAL '30 days'"
+        );
+        console.log(`[startup] pg-prune: deleted ${del.rowCount} stale code_retrieval_chunks`);
+        if (del.rowCount > 0) {
+          await pool.query('VACUUM ANALYZE code_retrieval_chunks');
+          console.log('[startup] pg-prune: VACUUM ANALYZE complete');
+        }
+        await pool.end();
+        await redis.set(pruneCooldownKey, new Date().toISOString(), 'EX', PRUNE_INTERVAL_MS / 1000).catch(() => {});
+        log.pgPrune = { deleted: del.rowCount, status: 'PASS' };
+      } catch (err) {
+        console.warn('[startup] pg-prune: skipped —', err.message);
+        log.pgPrune = { status: 'SKIP', error: err.message };
+      }
+    } else {
+      const ageDays = (pruneAgeMs / 86_400_000).toFixed(1);
+      console.log(`[startup] pg-prune: cooldown active (last ran ${ageDays}d ago)`);
+      log.pgPrune = { status: 'cooldown', ageDays };
+    }
+
     // Update Redis state and sha baseline.
     if (head !== 'unknown') await redis.set(POLICY.redisStateKeys.lastSha, head);
     await redis.hset('ace:startup:latest', {

@@ -376,29 +376,69 @@ if (-not $TurboSpeculative) {
 }
 Write-Host ""
 
-# -- Already healthy? -----------------------------------------------------
+# -- Already healthy? ---------------------------------------------------------
+# Accept the running server only if context AND jinja/system-role are correct.
+# A stale server launched with --chat-template gemma (or without --jinja) will
+# have supports_system_role:false and silently drop system prompts — that is the
+# exact failure mode that caused the duplicate-process VRAM blowout (Jun 9 2026).
+# Kill and restart whenever: ctx mismatch OR props check fails OR /props unavailable.
 if (-not $StatusOnly) {
     try {
         $slotsInfo = Invoke-RestMethod ("http://127.0.0.1:$port/slots") -TimeoutSec 2 -ErrorAction Stop
         if ($slotsInfo -and $slotsInfo.Count -gt 0) {
             $runningCtx = $slotsInfo[0].n_ctx
-            if ($runningCtx -eq [int]$ctxLen) {
-                Write-Host "TurboQuant already healthy on http://127.0.0.1:$port with target context size ($ctxLen)" -ForegroundColor Yellow
+            $ctxOk = ($runningCtx -eq [int]$ctxLen)
+
+            # Verify supports_system_role via /props (requires --jinja on this binary)
+            $jinjaOk = $false
+            try {
+                $props = Invoke-RestMethod ("http://127.0.0.1:$port/props") -TimeoutSec 2 -ErrorAction Stop
+                $jinjaOk = ($props.system_prompt.supports_system_role -eq $true) -or ($props.supports_system_role -eq $true)
+            } catch {
+                # /props unavailable on old builds — treat as unknown, require restart
+                $jinjaOk = $false
+            }
+
+            if ($ctxOk -and $jinjaOk) {
+                Write-Host "TurboQuant already healthy on http://127.0.0.1:$port (ctx=$ctxLen, system_role=OK)" -ForegroundColor Yellow
                 exit 0
             } else {
-                Write-Host "TurboQuant running on http://127.0.0.1:$port but with different context size: $runningCtx (target: $ctxLen). Proceeding with restart." -ForegroundColor Cyan
+                $reason = @()
+                if (-not $ctxOk)   { $reason += "ctx mismatch: running=$runningCtx target=$ctxLen" }
+                if (-not $jinjaOk) { $reason += "supports_system_role:false (stale --chat-template or missing --jinja)" }
+                Write-Host ("TurboQuant on :$port needs restart — $($reason -join '; ')") -ForegroundColor Cyan
                 $runningPids = Get-NetTCPConnection -LocalPort $port -ErrorAction SilentlyContinue | Select-Object -ExpandProperty OwningProcess -Unique
                 if ($runningPids) {
-                    Write-Host "Stopping process(es) using port ${port}: $runningPids" -ForegroundColor Cyan
+                    Write-Host "Stopping process(es) using port ${port}: $($runningPids -join ', ')" -ForegroundColor Cyan
                     $runningPids | ForEach-Object { Stop-Process -Id $_ -Force -ErrorAction SilentlyContinue }
-                    Start-Sleep -Seconds 1
+                    Start-Sleep -Seconds 2
                 }
             }
         } else {
-            # Fall back to health endpoint if /slots is empty or doesn't return list structure
-            Invoke-RestMethod ("http://127.0.0.1:$port/health") -TimeoutSec 1 | Out-Null
-            Write-Host "TurboQuant already healthy on http://127.0.0.1:$port" -ForegroundColor Yellow
-            exit 0
+            # /slots returned empty — fall back to /props check before accepting
+            try {
+                $props = Invoke-RestMethod ("http://127.0.0.1:$port/props") -TimeoutSec 2 -ErrorAction Stop
+                $jinjaOk = ($props.system_prompt.supports_system_role -eq $true) -or ($props.supports_system_role -eq $true)
+                if ($jinjaOk) {
+                    Write-Host "TurboQuant already healthy on http://127.0.0.1:$port (system_role=OK)" -ForegroundColor Yellow
+                    exit 0
+                } else {
+                    Write-Host "TurboQuant on :$port has supports_system_role:false — killing stale server" -ForegroundColor Cyan
+                    $runningPids = Get-NetTCPConnection -LocalPort $port -ErrorAction SilentlyContinue | Select-Object -ExpandProperty OwningProcess -Unique
+                    if ($runningPids) {
+                        $runningPids | ForEach-Object { Stop-Process -Id $_ -Force -ErrorAction SilentlyContinue }
+                        Start-Sleep -Seconds 2
+                    }
+                }
+            } catch {
+                # /props also unavailable — kill anything on the port and restart clean
+                Write-Host "TurboQuant on :$port did not respond to /props — forcing restart" -ForegroundColor Yellow
+                $runningPids = Get-NetTCPConnection -LocalPort $port -ErrorAction SilentlyContinue | Select-Object -ExpandProperty OwningProcess -Unique
+                if ($runningPids) {
+                    $runningPids | ForEach-Object { Stop-Process -Id $_ -Force -ErrorAction SilentlyContinue }
+                    Start-Sleep -Seconds 2
+                }
+            }
         }
     } catch {
         # Server down or endpoint not supporting /slots, proceed with start

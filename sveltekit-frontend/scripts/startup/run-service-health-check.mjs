@@ -329,6 +329,7 @@ async function warmLlm(promptPrefix) {
         messages: [{ role: 'user', content: prompt }],
         stream: false,
         think: false,
+        keep_alive: 0,
         options: { temperature: 0, num_predict: 1 },
       }),
       signal: ollamaController.signal,
