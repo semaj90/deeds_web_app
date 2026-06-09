@@ -2356,7 +2356,7 @@ export async function runGemma4Agent(
       maxRounds: MAX_ROUNDS,
       toolsUsed,
       hasSideEffect,
-      cacheHit: resultCacheTier != null && resultCacheTier !== 'L4_none',
+      cacheHit: resultCacheTier != null,
       toolError: false,
     });
     void appendOutcomeLedger({

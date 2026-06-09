@@ -3159,14 +3159,34 @@ export async function assembleACEContext(opts: {
         .catch((err) => console.warn('[ACE Run Log] failed:', (err as Error)?.message ?? err));
 
       // Append a lightweight observation to the outcome ledger for retrieval runs
-      void appendOutcomeLedger({
-        source: 'context-assembler',
-        intent: query,
-        tool: 'retrieval',
-        sourceRefs: agentsMd?.resolvedKey ? [agentsMd.resolvedKey] : [],
-        totalFound: aceHits.length + (codebaseContext?.length ?? 0),
-        metadata: { budgetTier: policyDecision.budget.tier },
-      });
+      {
+        const retriSrcRefs = agentsMd?.resolvedKey ? [agentsMd.resolvedKey] : [];
+        const retriTotalFound = aceHits.length + (codebaseContext?.length ?? 0);
+        const retriBudgetTier = policyDecision.budget.tier;
+        const retriFeatureId = querySection?.section ?? null;
+        const { reward: retriReward, reward_reason: retriRewardReason } = computeRetrievalReward({
+          totalFound: retriTotalFound,
+          sourceRefs: retriSrcRefs,
+          featureId: retriFeatureId,
+          budgetTier: retriBudgetTier,
+          cacheHit: false,
+          hasContext: retriTotalFound > 0,
+        });
+        void appendOutcomeLedger({
+          type: 'observation',
+          source: 'context-assembler',
+          intent: query,
+          feature_id: retriFeatureId,
+          tool: 'retrieval',
+          sourceRefs: retriSrcRefs,
+          totalFound: retriTotalFound,
+          cacheHit: false,
+          reward: retriReward,
+          reward_reason: retriRewardReason,
+          graphVersion: process.env.ATLAS_VERSION ?? null,
+          metadata: { budgetTier: retriBudgetTier },
+        });
+      }
 
       // Fire-and-forget: record retrieval event as a HyperGraphRAG hyperedge
       {
