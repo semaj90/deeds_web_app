@@ -1,20 +1,20 @@
 # ACE Packet Summary
 
-Generated: 2026-06-09T01:28:45.765Z
+Generated: 2026-06-09T03:43:22.371Z
 Query: "ACE context retrieval"
-Cards: 67 / budget: 6000 tokens (~5984 used)
+Cards: 224 / budget: 6000 tokens (~5990 used)
 
 ## Areas
-- **misc** — 67 cards (top score: 0.8199)
+- **misc** — 224 cards (top score: 0.6286)
 
 ## Top 10 Cards
-1. `deeds_labs\frontend\sveltekit-frontend-archive\dirs\docs\CLAUDE.md` — score 0.8199
-2. `sveltekit-frontend\CLAUDE.md` — score 0.8194
-3. `memory\atlas\documents-atlas.latest.md` — score 0.8059
-4. `CLAUDE.md` — score 0.7976
-5. `deeds_labs\frontend\sveltekit-frontend-archive\docs\docs_readme\organized-markdown-docs\.vscode\claude.md` — score 0.7970
-6. `deeds_labs\frontend\sveltekit-frontend-archive\docs\docs_readme\organized-markdown-docs\sveltekit-frontend_.vscode\claude.md` — score 0.7958
-7. `sveltekit-frontend\docs\master_agents.md` — score 0.7942
-8. `docs\session-notes\TODO_ATLAS.md` — score 0.7821
-9. `sveltekit-frontend\.tmp\ingest\atlas-data-files.md` — score 0.7645
-10. `sveltekit-frontend\docs\todo\gpu_karpathy_feature_mapping_atlas_plan.md` — score 0.7286
+1. `sveltekit-frontend/../scripts/atlas/smoke-feature-registry.mjs` — score 0.6286
+2. `sveltekit-frontend/../scripts/atlas/audit-feature-registry.mjs` — score 0.6251
+3. `sveltekit-frontend/../scripts/atlas/sourceRef-parent-join-archive-plan.mjs` — score 0.6161
+4. `sveltekit-frontend/../scripts/atlas/inspect-feature-map-status.mjs` — score 0.6126
+5. `sveltekit-frontend/scripts/atlas/smoke-ace-packet-builder.mjs` — score 0.5955
+6. `sveltekit-frontend/../scripts/atlas/phase-19c-qdrant-index.mjs` — score 0.5920
+7. `sveltekit-frontend/../scripts/atlas/qdrant-postgres-mirror-reconciliation.mjs` — score 0.5920
+8. `sveltekit-frontend/../scripts/atlas/pytorch-qdrant-redis-som-index.mjs` — score 0.5920
+9. `sveltekit-frontend/src/lib/components/atlas/AtlasSourceRefs.svelte` — score 0.5886
+10. `sveltekit-frontend/../scripts/atlas/sourceRef-first-hot-join-warmup.mjs` — score 0.5886

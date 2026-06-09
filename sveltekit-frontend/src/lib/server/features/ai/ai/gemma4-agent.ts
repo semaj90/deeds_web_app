@@ -2349,24 +2349,31 @@ export async function runGemma4Agent(
     });
 
   // Append a lightweight observation to the outcome ledger for downstream reward attribution
-  void appendOutcomeLedger({
-    source: 'gemma4-agent',
-    intent: pipeline ?? query,
-    tools: toolsUsed,
-    sourceRefs: filePathMeta ? [filePathMeta] : [],
-    graphVersion: process.env.ATLAS_VERSION ?? null,
-    outcome: hasSideEffect ? 'side_effect' : 'answer',
-    cacheTier: resultCacheTier ?? null,
-    rounds: round,
-    reward: computeAgentReward({
+  {
+    const { reward: agentReward, reward_reason: agentRewardReason } = computeAgentReward({
       finalAnswerFound: !!finalAnswer,
       rounds: round,
       maxRounds: MAX_ROUNDS,
       toolsUsed,
       hasSideEffect,
       cacheHit: resultCacheTier != null && resultCacheTier !== 'L4_none',
-    }),
-  });
+      toolError: false,
+    });
+    void appendOutcomeLedger({
+      type: 'observation',
+      source: 'gemma4-agent',
+      intent: pipeline ?? query,
+      feature_id: pipeline ?? null,
+      tools: toolsUsed,
+      sourceRefs: filePathMeta ? [filePathMeta] : [],
+      graphVersion: process.env.ATLAS_VERSION ?? null,
+      outcome: hasSideEffect ? 'side_effect' : 'answer',
+      cacheTier: resultCacheTier ?? null,
+      rounds: round,
+      reward: agentReward,
+      reward_reason: agentRewardReason,
+    });
+  }
 
   // Persist a fresh fix-memory entry when the agent ran a side-effect tool
   // (apply_shadow_patch / revert_fix / verify_fix). Verification status is

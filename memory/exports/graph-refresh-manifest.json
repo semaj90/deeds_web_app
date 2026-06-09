@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-06-09T01:25:41.031Z",
+  "generatedAt": "2026-06-09T04:16:39.778Z",
   "nodeCount": 0,
   "edgeCount": 0,
   "exportCount": 488,
@@ -188,9 +188,8 @@
   "domains": [
     "Agent",
     "General",
-    "Graph",
     "Infra",
-    "Performance",
+    "Legal",
     "Retrieval",
     "UI"
   ],

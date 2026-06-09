@@ -314,7 +314,7 @@ async function fetchEmbeddingsBatch(filePaths) {
           with_vector: true,
           with_payload: true,
         }),
-        signal: AbortSignal.timeout(15_000),
+        signal: AbortSignal.timeout(45_000),
       });
       if (!res.ok) continue;
       const raw = await res.text();

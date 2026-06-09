@@ -1,6 +1,6 @@
 # Karpathy GPU Authority Blend
 
-Generated: 2026-06-08T21:52:34.597Z
+Generated: 2026-06-09T04:15:57.930Z
 
 - FP16 mode: auto (default)
 - FP32 compare: false

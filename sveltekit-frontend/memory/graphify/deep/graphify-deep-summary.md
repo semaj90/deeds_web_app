@@ -1,14 +1,14 @@
 # Deep Import Graph - Phase A
-Generated: 2026-06-09T02:44:20.333Z
+Generated: 2026-06-09T04:09:07.056Z
 
 ## Stats
 | Metric | Value |
 |--------|-------|
-| Nodes | 23181 |
-| Total edges | 36351 |
-| Resolved edges | 5189 |
+| Nodes | 23183 |
+| Total edges | 36359 |
+| Resolved edges | 5191 |
 | Unresolved (local) | 3031 |
-| External refs | 27816 |
+| External refs | 27822 |
 | Neighborhoods computed | 100 |
 | Test-covered files | 900 |
 
@@ -16,7 +16,7 @@ Generated: 2026-06-09T02:44:20.333Z
 | Zone | Count |
 |------|-------|
 | shared | 16711 |
-| script | 4961 |
+| script | 4963 |
 | test | 1238 |
 | types | 209 |
 | server | 29 |
@@ -27,7 +27,7 @@ Generated: 2026-06-09T02:44:20.333Z
 ## Edge Type Breakdown
 | Type | Count |
 |------|-------|
-| imports_static | 26979 |
+| imports_static | 26987 |
 | test_covers_file | 3931 |
 | redis_dependency | 1606 |
 | imports_dynamic | 1217 |
@@ -52,8 +52,8 @@ Generated: 2026-06-09T02:44:20.333Z
 | 8 | `sveltekit-frontend/src/lib/server/env.server.ts` | shared | 40 | 0 |
 | 9 | `src/lib/server/ace/context-assembler.ts` | server | 38 | 0 |
 | 10 | `claude-mem/src/shared/SettingsDefaultsManager.ts` | shared | 37 | 0 |
-| 11 | `scripts/atlas/_neschrom-paths.mjs` | script | 32 | 0 |
-| 12 | `scripts/atlas/_neschrom-paths.mjs` | script | 32 | 0 |
+| 11 | `scripts/atlas/_neschrom-paths.mjs` | script | 34 | 0 |
+| 12 | `scripts/atlas/_neschrom-paths.mjs` | script | 34 | 0 |
 | 13 | `sveltekit-frontend/src/lib/server/db/schema-postgres.ts` | shared | 28 | 4 |
 | 14 | `sveltekit-frontend/tests/e2e/route-forensic/_helpers.ts` | shared | 27 | 1 |
 | 15 | `scripts/error-resolution/types.ts` | script | 24 | 0 |
