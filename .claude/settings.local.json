@@ -440,7 +440,8 @@
       "PowerShell(try { $r = Invoke-WebRequest -Uri \"http://127.0.0.1:6333/collections/codebase_chunks_768\" -TimeoutSec 5 -UseBasicParsing; $r.StatusCode; $r.Content | ConvertFrom-Json | Select-Object -First 3 } catch { $_.Exception.Message })",
       "PowerShell(Get-ChildItem \"C:\\\\Users\\\\james\\\\Videos\\\\deeds-web-app\\\\scripts\\\\atlas\\\\\" | Where-Object { $_.Name -match \"materialize|packet|preassemble\" } | Select-Object Name, Length | Sort-Object Name)",
       "PowerShell(Get-ChildItem \"C:\\\\Users\\\\james\\\\Videos\\\\deeds-web-app\\\\scripts\\\\atlas\\\\\" | Select-Object Name | Where-Object { $_.Name -match \"materialize|preassemble|packet|nes\" })",
-      "Read(//tmp/**)"
+      "Read(//tmp/**)",
+      "Bash(export ATLAS_DOCKER_NETWORK=deeds-web-app_legal-ai-network)"
     ],
     "deny": [],
     "ask": []

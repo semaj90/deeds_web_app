@@ -14,6 +14,8 @@ import { resolve, join, relative } from 'node:path';
 import { readdir, readFile } from 'node:fs/promises';
 import { existsSync } from 'node:fs';
 import { createRequire } from 'node:module';
+import fs from 'node:fs';
+import pg from 'pg';
 
 const require = createRequire(import.meta.url);
 const graphEngine = require('../../simd-bridge/rust/graph-engine/index.js');
