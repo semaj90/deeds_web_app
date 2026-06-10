@@ -142,6 +142,79 @@ async function run() {
       console.log(`   ... and ${comm.size - 5} more files.`);
     }
   }
+
+  // Load environment and persist to database
+  console.log('\n── Writing communities to codebase_files ────────────');
+
+  function loadEnv(filePath) {
+    if (!existsSync(filePath)) return {};
+    const env = {};
+    for (const line of fs.readFileSync(filePath, 'utf8').split(/\r?\n/)) {
+      const trimmed = line.trim();
+      if (!trimmed || trimmed.startsWith('#')) continue;
+      const idx = trimmed.indexOf('=');
+      if (idx === -1) continue;
+      const key = trimmed.slice(0, idx).trim();
+      let value = trimmed.slice(idx + 1).trim();
+      if ((value.startsWith('"') && value.endsWith('"')) || (value.startsWith("'") && value.endsWith("'"))) {
+        value = value.slice(1, -1);
+      }
+      env[key] = value;
+    }
+    return env;
+  }
+
+  const ROOT = resolve(process.cwd());
+  const env = {
+    ...loadEnv(join(ROOT, '.env')),
+    ...loadEnv(join(ROOT, 'sveltekit-frontend', '.env')),
+    ...process.env,
+  };
+
+  const DATABASE_URL = env.DATABASE_URL || env.ADMIN_DATABASE_URL || 'postgresql://legal_admin:123456@127.0.0.1:5434/legal_ai_db';
+  const pool = new pg.Pool({ connectionString: DATABASE_URL });
+
+  try {
+    // Map relative paths to file_path column in codebase_files
+    const updates = [];
+    for (const comm of communities) {
+      for (const nodeId of comm.nodeIds) {
+        updates.push({
+          filePath: nodeId,
+          communityId: comm.communityId,
+        });
+      }
+    }
+
+    console.log(`Writing ${updates.length} community assignments...`);
+
+    // Batch update
+    const BATCH_SIZE = 500;
+    for (let i = 0; i < updates.length; i += BATCH_SIZE) {
+      const batch = updates.slice(i, i + BATCH_SIZE);
+      const values = batch.map((u, idx) => `($${idx * 2 + 1}, $${idx * 2 + 2})`).join(',');
+      const params = [];
+      for (const u of batch) {
+        params.push(u.filePath);
+        params.push(u.communityId);
+      }
+
+      await pool.query(
+        `INSERT INTO codebase_files (file_path, community_id)
+         VALUES ${values}
+         ON CONFLICT (file_path) DO UPDATE SET
+           community_id = EXCLUDED.community_id`,
+        params
+      );
+    }
+
+    console.log(`✓ Persisted ${updates.length} communities to codebase_files`);
+  } catch (err) {
+    console.error('❌ Database write failed:', err.message);
+    process.exit(1);
+  } finally {
+    await pool.end();
+  }
 }
 
 run().catch(console.error);
