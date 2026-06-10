@@ -12,7 +12,7 @@
       "notes": "Stored as Ollama blob at %USERPROFILE%\\.ollama\\blobs\\sha256-a79de882... Set TURBO_MODEL_PATH to the blob path or a converted GGUF. 5.3 GB on disk. Requires TURBO_NGL=99 on RTX 3060 Ti.",
       "embeddingDim": null,
       "port": 8090,
-      "contextLen": 16384,
+      "contextLen": 64000,
       "quantization": "q4_K_M",
       "tags": ["chat", "legal", "vlm", "primary"]
     },
@@ -88,7 +88,7 @@
       "notes": "gitignored binary blob in vendor/models/. Set TURBO_MODEL_PATH to this absolute path in .env.",
       "embeddingDim": null,
       "port": 8090,
-      "contextLen": 16384,
+      "contextLen": 64000,
       "quantization": "q4_K_M",
       "tags": ["chat", "legal", "vlm", "vendor", "primary"]
     },
@@ -118,7 +118,7 @@
       "notes": "Place at models/gemma4-rotorquant:latest-iq4xs-direct.gguf. ROTORQUANT_MODEL_PATH and TURBO_MODEL_PATH both point here in .env. Runs on stock llama.cpp (no TurboQuant binary needed). 59.8 tok/s vs 21.6 for round-trip variant. DO NOT replace with the non-direct (round-trip) build.",
       "embeddingDim": null,
       "port": 8090,
-      "contextLen": 16384,
+      "contextLen": 64000,
       "quantization": "iq4_xs",
       "tags": ["chat", "legal", "rotorquant", "canonical", "primary", "merged"]
     },
@@ -132,7 +132,7 @@
       "notes": "Non-merged base model. 21.6 tok/s, 1762ms TTFT on RTX 3060 Ti — use gemma4-rotorquant:latest-iq4xs-direct instead for production. Only keep if round-trip LoRA injection testing is needed.",
       "embeddingDim": null,
       "port": 8090,
-      "contextLen": 16384,
+      "contextLen": 64000,
       "quantization": "iq4_xs",
       "tags": ["chat", "rotorquant", "base-model", "non-canonical"]
     }

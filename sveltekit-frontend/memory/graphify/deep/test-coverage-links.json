@@ -1826,12 +1826,6 @@
   "sveltekit-frontend/src/routes/api/ai/generate-report/[scope]/+server.ts": [
     "sveltekit-frontend/tests/routes/auto/api/ai/generate-report/__scope.test.ts"
   ],
-  "sveltekit-frontend/src/routes/api/ai/hermes-plan/+server.ts": [
-    "sveltekit-frontend/tests/routes/auto/api/ai/hermes-plan.test.ts"
-  ],
-  "sveltekit-frontend/src/routes/api/ai/hermes-run/+server.ts": [
-    "sveltekit-frontend/tests/routes/auto/api/ai/hermes-run.test.ts"
-  ],
   "sveltekit-frontend/src/routes/api/ai/judge/+server.ts": [
     "sveltekit-frontend/tests/routes/auto/api/ai/judge.test.ts"
   ],

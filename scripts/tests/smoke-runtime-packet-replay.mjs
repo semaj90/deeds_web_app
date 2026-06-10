@@ -135,20 +135,74 @@ async function run() {
   console.log(`✓ Resolved replay lookups: ${resolvedLookupCount}`);
 
   // 6. Traverse Neo4j 2-hop neighborhood using the reconstructed seeds
-  console.log('\n⏳ Traversing Neo4j using decompressed seeds...');
+  console.log('\n⏳ Expanding seeds and traversing Neo4j using decompressed seeds...');
   const driver = neo4j.driver(NEO4J_URI, neo4j.auth.basic(NEO4J_USER, NEO4J_PASS));
   const session = driver.session({ database: 'neo4j' });
 
-  // Map paths to Neo4j format (strip 'sveltekit-frontend/' prefix)
-  const seeds = decompressed.sourceRefs.map(r => r.replace(/^sveltekit-frontend\//, ''));
+  function normalizeSourceRef(ref) {
+    return String(ref ?? '')
+      .replace(/\\/g, '/')
+      .replace(/^sveltekit-frontend\//, '')
+      .replace(/^\.\//, '');
+  }
+
+  const expandedSeeds = new Set();
+  for (const ref of decompressed.sourceRefs) {
+    expandedSeeds.add(ref);
+    expandedSeeds.add(normalizeSourceRef(ref));
+  }
+
+  // Expand through Postgres identity chain (atlas_feature_map)
+  try {
+    const refsArray = [...expandedSeeds];
+    const dbRes = await pool.query(
+      `SELECT source_ref, feature_id, centroid_id, packet_id 
+       FROM atlas_feature_map 
+       WHERE source_ref = ANY($1) 
+          OR source_ref = ANY(SELECT regexp_replace(x, '^sveltekit-frontend/', '') FROM unnest($1::text[]) x)`,
+      [refsArray]
+    );
+
+    for (const row of dbRes.rows) {
+      if (row.source_ref) {
+        expandedSeeds.add(row.source_ref);
+        expandedSeeds.add(normalizeSourceRef(row.source_ref));
+      }
+      if (row.feature_id) {
+        const featRes = await pool.query(
+          `SELECT source_ref FROM atlas_feature_map WHERE feature_id = $1 LIMIT 10`,
+          [row.feature_id]
+        );
+        for (const fRow of featRes.rows) {
+          expandedSeeds.add(fRow.source_ref);
+          expandedSeeds.add(normalizeSourceRef(fRow.source_ref));
+        }
+      }
+      if (row.centroid_id) {
+        const centroidRes = await pool.query(
+          `SELECT source_ref FROM atlas_feature_map WHERE centroid_id = $1 LIMIT 10`,
+          [row.centroid_id]
+        );
+        for (const cRow of centroidRes.rows) {
+          expandedSeeds.add(cRow.source_ref);
+          expandedSeeds.add(normalizeSourceRef(cRow.source_ref));
+        }
+      }
+    }
+  } catch (err) {
+    console.warn('⚠️ Seed expansion failed (non-fatal):', err.message);
+  }
+
+  // Map paths to Neo4j format (both raw and normalized)
+  const seeds = [...expandedSeeds].map(r => r.replace(/^sveltekit-frontend\//, ''));
   let neighbors = [];
 
   try {
     const result = await session.run(
-      `MATCH (c:CodebaseFile)-[:IMPORTS*1..2]-(n:CodebaseFile)
-       WHERE c.path IN $seeds AND c <> n
+      `MATCH (c:CodebaseFile)-[:IMPORTS|BELONGS_TO_FEATURE|HAS_CENTROID|SIMILAR_TOPOLOGY*1..2]-(n:CodebaseFile)
+       WHERE (c.path IN $seeds OR c.stableKey IN $seeds) AND c <> n
        RETURN DISTINCT n.path AS path
-       LIMIT 10`,
+       LIMIT 15`,
       { seeds }
     );
     neighbors = result.records.map(rec => rec.get('path'));

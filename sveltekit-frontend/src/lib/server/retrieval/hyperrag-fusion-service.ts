@@ -5,7 +5,7 @@ import { resolve } from 'node:path';
 import { generateSingleEmbedding } from '$lib/server/grpc/embedding-client.js';
 import { nearestCluster } from '$lib/server/retrieval/centroid-cache.js';
 import { applyClusterCoherenceBoost } from '$lib/server/retrieval/cluster-aware-reranker.js';
-import { getTopAuthorityNodes, getImpactNeighborhood } from '$lib/server/graph/neo4j-gds.js';
+import { getTopAuthorityNodes, getImpactNeighborhood, runDijkstraContext } from '$lib/server/graph/neo4j-gds.js';
 import { MultiQueryGenerator } from '$lib/server/ai/multi-query-generator.js';
 import { buildAceContextPlannerState, loadAceContextPlannerHit } from '$lib/server/ace/context-cache-planner.js';
 import { SummaryLensesService, type SummaryLensHit } from '$lib/server/retrieval/summary-lenses.js';
@@ -621,15 +621,86 @@ export class HyperRagFusionService {
       })
       .sort((a, b) => b.score - a.score);
 
-    // 6. Graph Path Expansion (Impact Analysis)
+    // 6. Graph Path Expansion (Impact Analysis + Dijkstra Contextual Routing)
     const graphPaths: unknown[] = [];
     if (useGraph && ranked.length > 0) {
-      // Expand from the top hit
+      // 6a. APOC impact neighborhood from top hit
       const topHit = ranked[0];
       const stableKey = String(topHit.payload?.stable_key ?? topHit.id);
       const impact = await getImpactNeighborhood(stableKey, 2, 20).catch(() => null);
       if (impact) {
         graphPaths.push(impact);
+      }
+
+      // 6b. Dijkstra: source = top Qdrant hit, targets = next 7 hits
+      // Single GDS call: point-to-point when 1 target, SSSP-with-filter otherwise.
+      // finalScore = 0.7 * qdrantScore + 0.3 * (1 / (1 + pathCost))
+      const topSeeds = ranked
+        .slice(0, 8)
+        .map(h => h.sourcePath ?? String(h.payload?.source_ref ?? h.payload?.stable_key ?? ''))
+        .filter(Boolean);
+
+      if (topSeeds.length > 0) {
+        const dijkstraPaths = await runDijkstraContext({
+          sourceRef:  topSeeds[0],
+          targetRefs: topSeeds.slice(1),
+          limit:      25,
+        }).catch(() => null);
+
+        if (dijkstraPaths && dijkstraPaths.hits.length > 0) {
+          graphPaths.push(dijkstraPaths);
+
+          // Build path-cost lookup
+          const pathCostMap = new Map<string, number>();
+          for (const dHit of dijkstraPaths.hits) {
+            const cost = dHit.totalCost;
+            if (dHit.stableKey) pathCostMap.set(dHit.stableKey, cost);
+            if (dHit.sourceRef)  pathCostMap.set(dHit.sourceRef,  cost);
+            if (dHit.path)       pathCostMap.set(dHit.path,        cost);
+          }
+
+          // Re-score existing Qdrant hits with fusion formula
+          for (const hit of ranked) {
+            const sk = String(hit.payload?.stable_key ?? '');
+            const sr = hit.sourcePath ?? String(hit.payload?.source_ref ?? '');
+            const pathCost = pathCostMap.get(sk) ?? pathCostMap.get(sr);
+            if (pathCost !== undefined) {
+              const pathBoost = 1 / (1 + pathCost);
+              const fusedScore = 0.7 * hit.signals.dense + 0.3 * pathBoost;
+              hit.score = Math.min(1, fusedScore);
+              hit.signals.graphAuthority = (hit.signals.graphAuthority ?? 0) + 0.3 * pathBoost;
+              hit.reasons.push(`dijkstra_fused(cost=${pathCost.toFixed(3)})`);
+            }
+          }
+
+          // Inject new path nodes not already in ranked
+          const existingRefs = new Set<string>(
+            ranked.flatMap(h => [
+              String(h.payload?.stable_key ?? ''),
+              h.sourcePath ?? '',
+              String(h.payload?.source_ref ?? ''),
+            ]).filter(Boolean)
+          );
+          for (const dHit of dijkstraPaths.hits) {
+            const ref = dHit.sourceRef ?? dHit.stableKey ?? dHit.path ?? '';
+            if (!ref || existingRefs.has(ref)) continue;
+            const pathBoost = 1 / (1 + dHit.totalCost);
+            const pathScore = 0.3 * pathBoost;
+            ranked.push({
+              id:         dHit.stableKey,
+              score:      pathScore,
+              sourcePath: dHit.sourceRef ?? dHit.path,
+              payload:    { stable_key: dHit.stableKey, source_ref: dHit.sourceRef, ...(dHit.hopPath.length ? { hop_path: dHit.hopPath } : {}) },
+              vector:     [],
+              signals:    { dense: 0, topologyRouted: 0, graphAuthority: pathScore, lexicalBoost: 0, taskBoost: 0, aceBoost: 0, engramBoost: 0, turbovec: 0, topoClass: '' },
+              reasons:    [`dijkstra_path_node(cost=${dHit.totalCost.toFixed(3)})`],
+              lane:       'kag',
+            } as typeof ranked[number]);
+            existingRefs.add(ref);
+          }
+
+          ranked.sort((a, b) => b.score - a.score);
+        }
       }
     }
 

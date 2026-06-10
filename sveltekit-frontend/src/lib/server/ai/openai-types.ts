@@ -130,7 +130,7 @@ export interface OpenAIChatCompletionResponse {
     packetHit?: boolean;
     topK?: number;
     chunkCount?: number;
-    inferenceLane?: 'hermes' | 'turboquant' | 'bifrost';
+    inferenceLane?: 'ldr' | 'turboquant' | 'bifrost';
     runtimeProfile?: string;
     runtimeAvailable?: boolean;
     turboQuantEnabled?: boolean;

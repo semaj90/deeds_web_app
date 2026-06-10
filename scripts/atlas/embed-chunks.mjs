@@ -28,6 +28,7 @@
 
 import fs        from 'node:fs';
 import path      from 'node:path';
+import crypto    from 'node:crypto';
 import { fileURLToPath } from 'node:url';
 
 const __dir = path.dirname(fileURLToPath(import.meta.url));
@@ -180,12 +181,26 @@ async function main() {
           vectorSize = vector.length;
           await ensureCollection(COLLECTION, vectorSize);
         }
+        // Normalize source_ref: prefer explicit field, fall back to source_path
+        const sourceRef = rec.source_ref
+          ?? rec.source_path?.replace(/\\/g, '/').replace(/^sveltekit-frontend\//, '')
+          ?? '';
+
         points.push({
           id:      chunkIdToQdrantId(rec.chunk_id),
           vector,
           payload: {
+            // canonical identity fields (used by HyperRAG + atlas_feature_map)
+            source_ref:   sourceRef,
+            source_path:  sourceRef,   // mirror of source_ref for legacy consumers
+            feature_id:   rec.feature_id   ?? null,
+            file_kind:    rec.file_kind     ?? rec.source_type ?? null,
+            route_id:     rec.route_id      ?? null,
+            centroid_id:  rec.centroid_id   ?? null,
+            packet_id:    rec.packet_id     ?? null,
+            text_hash:    rec.text ? crypto.createHash('sha256').update(rec.text).digest('hex').slice(0, 16) : null,
+            // legacy compat
             chunk_id:    rec.chunk_id,
-            source_path: rec.source_path,
             source_type: rec.source_type,
             chunk_index: rec.chunk_index,
             text:        rec.text,

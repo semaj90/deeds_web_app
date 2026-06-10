@@ -29,6 +29,23 @@ import { auditBuffer } from '$lib/server/audit/api-audit-buffer';
 import { ensureRedis, getRedis } from '$lib/server/redis.js';
 import { checkHooksRateLimit, startCleanup } from '$lib/server/middleware/rate-limiter.js';
 import { sql } from 'drizzle-orm';
+import fs from 'node:fs';
+import path from 'node:path';
+
+// ── Vite API JSONL log (feeds repair-loop agent) ─────────────────────────
+const VITE_API_LOG = path.resolve(process.cwd(), '..', 'logs', 'vite-api.jsonl');
+let _viteLogFd: number | null = null;
+function appendViteLog(entry: Record<string, unknown>): void {
+  if (!dev) return;
+  try {
+    if (_viteLogFd === null) {
+      const dir = path.dirname(VITE_API_LOG);
+      if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+      _viteLogFd = fs.openSync(VITE_API_LOG, 'a');
+    }
+    fs.writeSync(_viteLogFd, JSON.stringify(entry) + '\n');
+  } catch { /* non-fatal — never break the request pipeline */ }
+}
 
 // ── Request Timeout Constants ────────────────────────────────────────────
 const DEFAULT_REQUEST_TIMEOUT = 30_000; // 30s for normal routes
@@ -891,6 +908,21 @@ export const handle: Handle = async ({ event, resolve }) => {
     requestId,
     userId: event.locals.user?.id,
   });
+
+  // JSONL sink for the repair-loop agent (dev-only, /api/* routes)
+  if (dev && event.url.pathname.startsWith('/api/')) {
+    const logEntry: Record<string, unknown> = {
+      ts:     new Date().toISOString(),
+      method: event.request.method,
+      url:    event.url.pathname + (event.url.search || ''),
+      status: response.status,
+      ms:     duration,
+    };
+    if (response.status >= 400) {
+      logEntry.error = `HTTP ${response.status} on ${event.request.method} ${event.url.pathname}`;
+    }
+    appendViteLog(logEntry);
+  }
 
   // Push to persistent audit log (batched, best-effort)
   auditBuffer.push({

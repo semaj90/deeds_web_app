@@ -1,53 +1,35 @@
 {
-  "ts": "2026-06-10T04:05:42.886Z",
+  "ts": "2026-06-10T15:12:17.942Z",
   "gates": {
     "qdrant_feature_id": {
-      "status": "PASS",
-      "threshold": 0.95,
-      "coverage": 0.9833674466633475,
-      "coveragePct": "98.3%",
-      "numerator": 53329,
-      "denominator": 54231
+      "status": "SKIP",
+      "reason": "Qdrant unavailable",
+      "coverage": null
     },
     "qdrant_canonical_ref": {
-      "status": "PASS",
-      "threshold": 0.98,
-      "coverage": 0.992624144861795,
-      "coveragePct": "99.3%",
-      "numerator": 53831,
-      "denominator": 54231
+      "status": "SKIP",
+      "reason": "Qdrant unavailable",
+      "coverage": null
     },
     "qdrant_som": {
-      "status": "PASS",
-      "threshold": 0.99,
-      "coverage": 0.9925135070347219,
-      "coveragePct": "99.3%",
-      "numerator": 53825,
-      "denominator": 54231
+      "status": "SKIP",
+      "reason": "Qdrant unavailable",
+      "coverage": null
     },
     "qdrant_karpathy": {
-      "status": "PASS",
-      "threshold": 0.03,
-      "coverage": 0.0571444376832439,
-      "coveragePct": "5.7%",
-      "numerator": 3099,
-      "denominator": 54231
+      "status": "SKIP",
+      "reason": "Qdrant unavailable",
+      "coverage": null
     },
     "neo4j_canonical": {
-      "status": "PASS",
-      "threshold": 0.5,
-      "coverage": 0.5591296492675072,
-      "coveragePct": "55.9%",
-      "numerator": 14236,
-      "denominator": 25461
+      "status": "SKIP",
+      "reason": "Neo4j unavailable: fetch failed",
+      "coverage": null
     },
     "valkey_warm": {
-      "status": "PASS",
-      "threshold": 0.9,
-      "coverage": 1,
-      "coveragePct": "100.0%",
-      "numerator": 8150,
-      "denominator": 5423
+      "status": "SKIP",
+      "reason": "Redis unavailable: Connection is closed.",
+      "coverage": null
     }
   },
   "overall": "PASS"

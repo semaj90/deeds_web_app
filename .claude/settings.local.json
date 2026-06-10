@@ -427,7 +427,20 @@
       "Bash(if [ -d \"src/routes/api/gpu\" ])",
       "Bash(then mkdir -p archived/routes/api)",
       "Bash(if [ -d \"src/routes/api/health/gpu\" ])",
-      "Bash(then mkdir -p archived/routes/api/health)"
+      "Bash(then mkdir -p archived/routes/api/health)",
+      "Read(//c/c/Users/james/Videos/deeds-web-app/sveltekit-frontend/scripts/**)",
+      "Read(//c/Users/james/Videos/deeds-web-app/scripts/**)",
+      "PowerShell(docker exec legal-ai-postgres cat /var/lib/postgresql/18/docker/pg_hba.conf 2>&1)",
+      "PowerShell(docker exec legal-ai-postgres cat /var/lib/postgresql/18/docker/pg_hba.conf)",
+      "Bash(PGPASSWORD=123456 PGSSLMODE=disable psql \"postgresql://legal_admin@127.0.0.1:5434/legal_ai_db?sslmode=disable\" -c \"SELECT 1\")",
+      "PowerShell(try { $r = Invoke-WebRequest -Uri \"http://127.0.0.1:7474\" -TimeoutSec 5 -ErrorAction Stop; $r.StatusCode } catch { $_.Exception.Message })",
+      "PowerShell(try { $r = Invoke-WebRequest -Uri \"http://localhost:7474\" -TimeoutSec 5 -UseBasicParsing -ErrorAction Stop; $r.StatusCode } catch { $_.Exception.Message })",
+      "PowerShell(ls \"$env:TEMP\\\\atlas-sync\")",
+      "PowerShell(ls \"$env:TEMP\\\\atlas-sync2\")",
+      "PowerShell(try { $r = Invoke-WebRequest -Uri \"http://127.0.0.1:6333/collections/codebase_chunks_768\" -TimeoutSec 5 -UseBasicParsing; $r.StatusCode; $r.Content | ConvertFrom-Json | Select-Object -First 3 } catch { $_.Exception.Message })",
+      "PowerShell(Get-ChildItem \"C:\\\\Users\\\\james\\\\Videos\\\\deeds-web-app\\\\scripts\\\\atlas\\\\\" | Where-Object { $_.Name -match \"materialize|packet|preassemble\" } | Select-Object Name, Length | Sort-Object Name)",
+      "PowerShell(Get-ChildItem \"C:\\\\Users\\\\james\\\\Videos\\\\deeds-web-app\\\\scripts\\\\atlas\\\\\" | Select-Object Name | Where-Object { $_.Name -match \"materialize|preassemble|packet|nes\" })",
+      "Read(//tmp/**)"
     ],
     "deny": [],
     "ask": []

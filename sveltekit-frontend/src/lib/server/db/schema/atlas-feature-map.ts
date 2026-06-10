@@ -16,6 +16,7 @@ export const atlasFeatureMap = pgTable('atlas_feature_map', {
   qdrantPointId:      text('qdrant_point_id'),
   neo4jNodeId:        text('neo4j_node_id'),
   nesCardId:          text('nes_card_id'),
+  packetId:           text('packet_id'),
   laneIds:            text('lane_ids').array().notNull().default(sql`'{}'::text[]`),
   atlasVersion:       integer('atlas_version').notNull().default(1),
   indexedAt:          timestamp('indexed_at', { withTimezone: true }).defaultNow(),

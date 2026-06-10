@@ -450,6 +450,7 @@ async function run() {
       id: allIds[i],
       payload: {
         cluster_id:     clusterId,
+        centroid_id:    clusterId,
         cluster_k:      K,
         som_cluster:    bmu,
         som_bmu_row:    somRow(bmu),

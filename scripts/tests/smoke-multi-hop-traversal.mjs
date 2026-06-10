@@ -232,36 +232,104 @@ async function main() {
       console.log(`  ✓ cluster_id  : ${afmDoc.cluster_id}`);
       console.log(`  ✓ lane_ids    : [${(afmDoc.lane_ids || []).join(', ')}]`);
 
-      if (afmDoc.qdrant_point_id && afmDoc.qdrant_point_id !== 'unknown') {
-        const qdrantPointUrl = `${QDRANT_URL}/collections/codebase_chunks_768/points/${afmDoc.qdrant_point_id}`;
-        console.log(`⏳ Fetching point from Qdrant: ${qdrantPointUrl}`);
-        const qdrantRes = await fetch(qdrantPointUrl, { signal: AbortSignal.timeout(10_000) });
-        if (qdrantRes.ok) {
-          const qdrantData = await qdrantRes.json();
-          const payload = qdrantData?.result?.payload || {};
-          report.qdrant = {
-            ok: true,
-            status: qdrantRes.status,
-            filePath: payload.file_path || payload.sourceRef || null,
-            sourceRef: payload.sourceRef || null,
-            somCluster: payload.som_cluster ?? null,
-            centroidId: payload.centroid_id ?? null,
-            clusterId: payload.cluster_id ?? null,
-          };
-          console.log(`  ✓ Qdrant match: file_path = "${payload.file_path || payload.sourceRef}"`);
-          console.log(`  ✓ Qdrant match: som_cluster = ${payload.som_cluster}`);
-        } else {
-          report.qdrant = {
-            ok: false,
-            status: qdrantRes.status,
-          };
-          report.issues.push({
-            level: 'warn',
-            stage: 'qdrant-point',
-            message: `Qdrant fetch failed with status ${qdrantRes.status}`,
-          });
-          console.warn(`  ⚠️ Qdrant fetch failed with status: ${qdrantRes.status}`);
+      // Qdrant Lookup with Fallback Resolution
+      const resolvedRes = await (async () => {
+        const normSourceRef = sourceRef.replace(/^sveltekit-frontend\//, '');
+        // 1. Try direct Point ID
+        if (afmDoc.qdrant_point_id && afmDoc.qdrant_point_id !== 'unknown') {
+          const qdrantPointUrl = `${QDRANT_URL}/collections/codebase_chunks_768/points/${afmDoc.qdrant_point_id}`;
+          console.log(`⏳ Fetching point from Qdrant by ID: ${qdrantPointUrl}`);
+          try {
+            const qdrantRes = await fetch(qdrantPointUrl, { signal: AbortSignal.timeout(10_000) });
+            if (qdrantRes.ok) {
+              const qdrantData = await qdrantRes.json();
+              if (qdrantData?.result) return { method: 'point_id', point: qdrantData.result };
+            }
+          } catch (e) {}
         }
+        // 2. Scroll/filter by source_ref
+        console.log(`⏳ Point ID not found/404. Falling back to scrolling by source_ref: "${sourceRef}"`);
+        const scrollUrl = `${QDRANT_URL}/collections/codebase_chunks_768/points/scroll`;
+        try {
+          const res = await fetch(scrollUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              limit: 1,
+              with_payload: true,
+              filter: {
+                must: [
+                  { key: 'source_ref', match: { value: sourceRef } }
+                ]
+              }
+            })
+          });
+          if (res.ok) {
+            const data = await res.json();
+            const pt = data.result?.points?.[0];
+            if (pt) {
+              // Update database qdrant_point_id mapping
+              await pool.query(
+                `UPDATE atlas_feature_map SET qdrant_point_id = $1 WHERE source_ref = $2 OR source_ref = $3`,
+                [pt.id, sourceRef, normSourceRef]
+              ).catch(() => {});
+              return { method: 'source_ref_scroll', point: pt };
+            }
+          }
+        } catch (e) {}
+
+        // 3. Filter by feature_id
+        if (padDoc.feature_id) {
+          console.log(`⏳ Scroll by source_ref empty. Falling back to feature_id: "${padDoc.feature_id}"`);
+          try {
+            const res = await fetch(scrollUrl, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                limit: 1,
+                with_payload: true,
+                filter: {
+                  must: [
+                    { key: 'feature_id', match: { value: padDoc.feature_id } }
+                  ]
+                }
+              })
+            });
+            if (res.ok) {
+              const data = await res.json();
+              const pt = data.result?.points?.[0];
+              if (pt) return { method: 'feature_id_scroll', point: pt };
+            }
+          } catch (e) {}
+        }
+        return null;
+      })();
+
+      if (resolvedRes) {
+        const pt = resolvedRes.point;
+        const payload = pt.payload || {};
+        report.qdrant = {
+          ok: true,
+          method: resolvedRes.method,
+          pointId: pt.id,
+          filePath: payload.file_path || payload.sourceRef || null,
+          sourceRef: payload.sourceRef || null,
+          somCluster: payload.som_cluster ?? null,
+          centroidId: payload.centroid_id ?? null,
+          clusterId: payload.cluster_id ?? null,
+        };
+        console.log(`  ✓ Qdrant matched via [${resolvedRes.method}]: file_path = "${payload.file_path || payload.sourceRef}"`);
+        console.log(`  ✓ Qdrant match: som_cluster = ${payload.som_cluster}`);
+      } else {
+        report.qdrant = {
+          ok: false,
+        };
+        report.issues.push({
+          level: 'warn',
+          stage: 'qdrant-point',
+          message: 'stale_qdrant_id: Qdrant point lookup failed across all fallback resolution strategies',
+        });
+        console.warn('  ⚠️ Qdrant point lookup failed across all fallback resolution strategies');
       }
     }
     console.log();

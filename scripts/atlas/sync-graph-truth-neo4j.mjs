@@ -85,7 +85,7 @@ async function main() {
 
     console.log('⏳ Querying atlas_feature_map...');
     const afmRes = await pool.query(
-      `SELECT source_ref, feature_id, som_cluster, centroid_id, cluster_id FROM atlas_feature_map`
+      `SELECT source_ref, feature_id, som_cluster, centroid_id, cluster_id, som_bmu_row, som_bmu_col FROM atlas_feature_map`
     );
     afmRows = afmRes.rows;
     console.log(`  ✓ Loaded ${afmRows.length} mappings from atlas_feature_map`);
@@ -147,12 +147,30 @@ async function main() {
   console.log(`  ✓ Filtered codebase test covers: ${coversToSync.length}`);
 
   // ── 3. Build Similar Topology Edges ────────────────────────────────────────
-  // Group files by cluster
+  // Canonical edge costs (used in GDS projection + Dijkstra)
+  const COSTS = {
+    HAS_CENTROID:       0.10,
+    IMPORTS:            0.15,
+    CALLS:              0.15,
+    CONTAINS:           0.25,
+    HAS_CHUNK:          0.20,
+    BELONGS_TO_CLUSTER: 0.30,
+    REFERENCES:         0.35,
+    SIMILAR_TOPOLOGY:   0.40, // overridden per-edge by SOM grid distance below
+  };
+
+  // Group files by cluster — track SOM coords for cost calculation
+  const SOM_GRID = 20; // 20×20 SOM grid
+
   const filesByCluster = new Map();
+  const somCoordsByPath = new Map(); // normPath → { row, col }
   for (const file of afmRows) {
     const normPath = normalizeNeo4jPath(file.source_ref);
     if (!codebaseFilesSet.has(normPath)) continue;
     const cluster = file.som_cluster || file.centroid_id || file.cluster_id;
+    if (file.som_bmu_row != null && file.som_bmu_col != null) {
+      somCoordsByPath.set(normPath, { row: Number(file.som_bmu_row), col: Number(file.som_bmu_col) });
+    }
     if (!cluster) continue;
     if (!filesByCluster.has(cluster)) {
       filesByCluster.set(cluster, []);
@@ -169,7 +187,16 @@ async function main() {
         if (filePaths.length > j) {
           const tgt = filePaths[(i + j) % filePaths.length];
           if (src !== tgt) {
-            similarToSync.push({ from: src, to: tgt, cluster });
+            // Topology cost: SOM grid distance capped at grid size
+            // formula: Math.min(1, somGridDistance / SOM_GRID) per spec
+            const sc = somCoordsByPath.get(src);
+            const tc = somCoordsByPath.get(tgt);
+            let topologyCost = COSTS.SIMILAR_TOPOLOGY; // static fallback when SOM coords unavailable
+            if (sc && tc) {
+              const dist = Math.sqrt(Math.pow(sc.row - tc.row, 2) + Math.pow(sc.col - tc.col, 2));
+              topologyCost = Math.min(1, dist / SOM_GRID);
+            }
+            similarToSync.push({ from: src, to: tgt, cluster, cost: topologyCost });
           }
         }
       }
@@ -259,9 +286,10 @@ async function main() {
             MATCH (c:CodebaseFile {path: row.path})
             MATCH (f:ParentAtlasFeature {featureId: row.featureId})
             MERGE (c)-[r:BELONGS_TO_FEATURE]->(f)
-            SET r.updatedAt = datetime()
+            SET r.cost = $cost,
+                r.updatedAt = datetime()
           `,
-          { belongsTo: chunk }
+          { belongsTo: chunk, cost: COSTS.BELONGS_TO_CLUSTER }
         )
       );
     }
@@ -279,9 +307,10 @@ async function main() {
             MERGE (c1)-[r:IMPORTS]->(c2)
             SET r.isDyn = row.isDyn,
                 r.type = row.type,
+                r.cost = $cost,
                 r.updatedAt = datetime()
           `,
-          { imports: chunk }
+          { imports: chunk, cost: COSTS.IMPORTS }
         )
       );
     }
@@ -297,9 +326,10 @@ async function main() {
             MATCH (c1:CodebaseFile {path: row.from})
             MATCH (c2:CodebaseFile {path: row.to})
             MERGE (c1)-[r:TEST_COVERS_FILE]->(c2)
-            SET r.updatedAt = datetime()
+            SET r.cost = $cost,
+                r.updatedAt = datetime()
           `,
-          { covers: chunk }
+          { covers: chunk, cost: COSTS.REFERENCES }
         )
       );
     }
@@ -316,9 +346,30 @@ async function main() {
             MATCH (c2:CodebaseFile {path: row.to})
             MERGE (c1)-[r:SIMILAR_TOPOLOGY]->(c2)
             SET r.cluster = row.cluster,
+                r.cost = row.cost,
                 r.updatedAt = datetime()
           `,
           { similar: chunk }
+        )
+      );
+    }
+
+    // G. Sync HAS_CENTROID relationships (centroid cluster membership)
+    const hasCentroid = afmRows
+      .filter(r => r.centroid_id)
+      .map(r => ({ path: normalizeNeo4jPath(r.source_ref), centroidId: r.centroid_id }));
+    console.log(`⏳ Projecting ${hasCentroid.length} HAS_CENTROID relationships...`);
+    for (let i = 0; i < hasCentroid.length; i += batchSize) {
+      const chunk = hasCentroid.slice(i, i + batchSize);
+      await session.executeWrite((tx) =>
+        tx.run(
+          `UNWIND $edges AS row
+           MERGE (c:CodebaseFile {path: row.path})
+           MERGE (cent:Centroid {id: row.centroidId})
+           MERGE (c)-[r:HAS_CENTROID]->(cent)
+           SET r.cost = $cost,
+               r.updatedAt = datetime()`,
+          { edges: chunk, cost: COSTS.HAS_CENTROID }
         )
       );
     }

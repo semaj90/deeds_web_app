@@ -114,6 +114,9 @@ while (guard < 600) {
         centroidId:   null,
         qdrantPointId: null,
         gpuCluster:   null,
+        packetId:     null,
+        fileKind:     null,
+        tags:         [],
       });
     }
 
@@ -130,7 +133,16 @@ while (guard < 600) {
 
     if (!entry.somCluster && somCluster != null)  entry.somCluster  = String(somCluster);
     if (!entry.centroidId && centroidId != null)  entry.centroidId  = String(centroidId);
-    if (!entry.gpuCluster && gpuCluster != null) entry.gpuCluster = String(gpuCluster);
+    if (!entry.gpuCluster && gpuCluster != null)  entry.gpuCluster  = String(gpuCluster);
+
+    // New canonical payload fields
+    if (!entry.packetId  && p.packet_id)   entry.packetId  = String(p.packet_id);
+    if (!entry.fileKind  && (p.file_kind ?? p.source_type)) entry.fileKind = String(p.file_kind ?? p.source_type);
+    if (Array.isArray(p.tags)) {
+      for (const t of p.tags) {
+        if (typeof t === 'string' && !entry.tags.includes(t)) entry.tags.push(t);
+      }
+    }
 
     // Collect feature_ids (from backfill or singular feature_id)
     if (Array.isArray(p.feature_ids) && p.feature_ids.length) {
@@ -191,8 +203,8 @@ const pool = new pg.Pool({ connectionString: DATABASE_URL });
 const UPSERT = `
   INSERT INTO atlas_feature_map
     (normalized_path, source_ref, feature_id, related_feature_ids,
-     cluster_id, centroid_id, som_cluster, qdrant_point_id, lane_ids, indexed_at)
-  VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,now())
+     cluster_id, centroid_id, som_cluster, qdrant_point_id, lane_ids, packet_id, indexed_at)
+  VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,now())
   ON CONFLICT (normalized_path) DO UPDATE SET
     source_ref          = EXCLUDED.source_ref,
     feature_id          = COALESCE(EXCLUDED.feature_id, atlas_feature_map.feature_id),
@@ -206,6 +218,7 @@ const UPSERT = `
     lane_ids            = CASE WHEN array_length(EXCLUDED.lane_ids, 1) > 0
                                THEN EXCLUDED.lane_ids
                                ELSE atlas_feature_map.lane_ids END,
+    packet_id           = COALESCE(EXCLUDED.packet_id, atlas_feature_map.packet_id),
     indexed_at          = now()
 `;
 
@@ -232,6 +245,7 @@ for (let i = 0; i < entries.length; i += 50) {
         e.somCluster,          // som_cluster
         e.qdrantPointId,       // qdrant_point_id
         e.laneIds,             // lane_ids (text[])
+        e.packetId ?? null,    // packet_id
       ]);
       upserted++;
     }

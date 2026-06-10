@@ -2,23 +2,25 @@
 /**
  * scripts/ae-train.mjs
  *
- * Trains a 768→256→64 autoencoder on embeddings from Qdrant codebase_chunks_768
- * and saves the resulting weights to Redis (ace:autoencoder:weights + ace:autoencoder:meta).
+ * Trains a 768→256→64 encoder on embeddings from Qdrant codebase_chunks_768
+ * and saves the encoder weights to Redis (ace:autoencoder:weights + ace:autoencoder:meta).
  *
- * Architecture:
- *   Encoder: Linear(768→256, ReLU) → Linear(256→64)
- *   Decoder: Linear(64→256, ReLU) → Linear(256→768)
- *   Loss: MSE reconstruction + L2 weight regularization
+ * Architecture (encoder-only with tied-weight reconstruction for training):
+ *   Encoder:     Linear(768→256, ReLU) → Linear(256→64)        [W1/b1, W2/b2]
+ *   Reconstruction: Linear(64→256, ReLU) → Linear(256→768)     [W2^T, W1^T — tied, no extra params]
+ *   Loss: MSE(x, reconstruct(encode(x))) + L2 on W1/W2
  *   Optimizer: SGD with momentum + cosine LR decay
  *
+ * Saves only W1,b1,W2,b2 to Redis — matches autoencoder-backfill-qdrant.mjs expectations.
+ *
  * Usage:
- *   npm run ae:train                        (30 epochs, batch 64, lr 0.01)
- *   npm run ae:train -- --epochs 60 --lr 0.005 --batch 128
- *   npm run ae:train -- --dry-run           (validate data load, no training/save)
- *   npm run ae:train -- --force             (overwrite existing weights)
+ *   npm run ae:train:js                        (30 epochs, batch 64, lr 0.01)
+ *   npm run ae:train:js -- --epochs 60 --lr 0.005 --batch 128
+ *   npm run ae:train:js -- --dry-run           (validate data load, no training/save)
+ *   npm run ae:train:js -- --force             (overwrite existing weights)
  *
  * Weight format (Redis hash ace:autoencoder:weights):
- *   W1: comma-separated Float32 (256×768 = 196608 values, PyTorch row-major)
+ *   W1: comma-separated Float32 (256×768 = 196608 values, row-major)
  *   b1: comma-separated Float32 (256)
  *   W2: comma-separated Float32 (64×256 = 16384 values)
  *   b2: comma-separated Float32 (64)
@@ -32,12 +34,12 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 // ── Config ────────────────────────────────────────────────────────────────────
-const QDRANT_URL   = process.env.QDRANT_URL  ?? 'http://localhost:6333';
-const REDIS_URL    = process.env.REDIS_URL   ?? 'redis://localhost:6379';
-const COLLECTION   = 'codebase_chunks_768';
-const CONTENT_DIM  = 768;
-const HIDDEN_DIM   = 256;
-const ENCODED_DIM  = 64;
+const QDRANT_URL  = process.env.QDRANT_URL ?? 'http://localhost:6333';
+const REDIS_URL   = process.env.REDIS_URL  ?? 'redis://localhost:6379';
+const COLLECTION  = 'codebase_chunks_768';
+const CONTENT_DIM = 768;
+const HIDDEN_DIM  = 256;
+const ENCODED_DIM = 64;
 
 const args = process.argv.slice(2);
 function parseArg(flag, fallback) {
@@ -49,14 +51,14 @@ function parseArg(flag, fallback) {
 }
 
 const FLAGS = {
-  epochs:  parseArg('--epochs',    30),
-  batch:   parseArg('--batch',     64),
-  lr:      parseArg('--lr',      0.01),
-  l2:      parseArg('--l2',     1e-5),
-  limit:   parseArg('--limit',  Infinity),
-  dryRun:  args.includes('--dry-run'),
-  force:   args.includes('--force'),
-  quiet:   args.includes('--quiet'),
+  epochs: parseArg('--epochs',   30),
+  batch:  parseArg('--batch',    64),
+  lr:     parseArg('--lr',     0.01),
+  l2:     parseArg('--l2',    1e-5),
+  limit:  parseArg('--limit', Infinity),
+  dryRun: args.includes('--dry-run'),
+  force:  args.includes('--force'),
+  quiet:  args.includes('--quiet'),
 };
 
 const log = (...a) => { if (!FLAGS.quiet) console.log(...a); };
@@ -83,7 +85,8 @@ function xavierUniform(rows, cols) {
 
 function zeros(n) { return new Float32Array(n); }
 
-// ── Forward pass ──────────────────────────────────────────────────────────────
+// ── Linear layer: y = ReLU?(x @ W^T + b) ─────────────────────────────────────
+// W shape: (outDim × inDim) row-major — PyTorch convention
 function matMulAdd(x, W, b, n, inDim, outDim, relu) {
   const out = new Float32Array(n * outDim);
   for (let i = 0; i < n; i++) {
@@ -99,22 +102,38 @@ function matMulAdd(x, W, b, n, inDim, outDim, relu) {
   return out;
 }
 
-function reluMask(x) {
-  const m = new Float32Array(x.length);
-  for (let i = 0; i < x.length; i++) m[i] = x[i] > 0 ? 1 : 0;
-  return m;
+// Transposed multiply: y = ReLU?(x @ W + c)  [W is (inDim × outDim), applied as W^T]
+// Used for tied-weight decoder: W2^T: (ENCODED→HIDDEN), W1^T: (HIDDEN→CONTENT)
+function matMulAddTranspose(x, W, c, n, wRows, wCols, relu) {
+  // W shape: (wRows × wCols); transpose multiply treats it as (wCols × wRows)
+  // inDim = wRows, outDim = wCols
+  const out = new Float32Array(n * wCols);
+  for (let i = 0; i < n; i++) {
+    const xOff = i * wRows;
+    const yOff = i * wCols;
+    for (let h = 0; h < wCols; h++) {
+      let act = c ? c[h] : 0;
+      for (let d = 0; d < wRows; d++) act += x[xOff + d] * W[d * wCols + h];
+      out[yOff + h] = relu ? Math.max(0, act) : act;
+    }
+  }
+  return out;
 }
 
-// Forward: input batch n×768 → encoded n×64 + intermediates for backprop
+// ── Forward pass: encode → tied-weight decode → return all intermediates ──────
 function forward(x, n, W) {
-  const h1 = matMulAdd(x,  W.W1, W.b1, n, CONTENT_DIM, HIDDEN_DIM, true);  // n×256, ReLU
+  // Encoder
+  const h1 = matMulAdd(x,  W.W1, W.b1, n, CONTENT_DIM, HIDDEN_DIM,  true);  // n×256, ReLU
   const z  = matMulAdd(h1, W.W2, W.b2, n, HIDDEN_DIM,  ENCODED_DIM, false); // n×64
-  const h2 = matMulAdd(z,  W.W3, W.b3, n, ENCODED_DIM, HIDDEN_DIM, true);   // n×256, ReLU
-  const xr = matMulAdd(h2, W.W4, W.b4, n, HIDDEN_DIM,  CONTENT_DIM, false); // n×768
-  return { h1, z, h2, xr };
+
+  // Tied-weight decoder: W2^T then W1^T (no new parameters)
+  const dh = matMulAddTranspose(z,  W.W2, null, n, ENCODED_DIM, HIDDEN_DIM,  true);  // n×256, ReLU
+  const xr = matMulAddTranspose(dh, W.W1, null, n, HIDDEN_DIM,  CONTENT_DIM, false); // n×768
+
+  return { h1, z, dh, xr };
 }
 
-// MSE loss over batch
+// MSE loss
 function mseLoss(xr, x, n) {
   let loss = 0;
   for (let i = 0; i < n * CONTENT_DIM; i++) {
@@ -124,82 +143,78 @@ function mseLoss(xr, x, n) {
   return loss / (n * CONTENT_DIM);
 }
 
-// ── Backward pass (manual backprop) ──────────────────────────────────────────
+// ── Backward pass ─────────────────────────────────────────────────────────────
+// Gradients flow back through tied decoder (W2^T, W1^T) into W1 and W2.
+// Both the forward path AND the transposed path contribute grads to the same W1/W2.
 function backward(x, n, W, cache) {
-  const { h1, z, h2, xr } = cache;
-
-  // dL/dxr = 2*(xr - x) / (n*CONTENT_DIM)
+  const { h1, z, dh, xr } = cache;
   const scale = 2 / (n * CONTENT_DIM);
 
-  // --- Decoder (W4, b4) ---
+  // dL/dxr
   const dxr = new Float32Array(n * CONTENT_DIM);
   for (let i = 0; i < dxr.length; i++) dxr[i] = (xr[i] - x[i]) * scale;
 
-  const dW4 = new Float32Array(CONTENT_DIM * HIDDEN_DIM);
-  const db4 = new Float32Array(CONTENT_DIM);
-  const dh2 = new Float32Array(n * HIDDEN_DIM);
+  // ── Backward through W1^T (decoder second layer: dh → xr) ────────────────
+  // xr[i,j] = sum_k dh[i,k] * W1[k,j]  (transpose product, W1 is outDim×inDim = 256×768)
+  // dL/dW1[k,j] += dxr[i,j] * dh[i,k]  (same as forward path but transposed role)
+  // dL/ddh[i,k]  = sum_j dxr[i,j] * W1[k,j]
+  const dW1_dec = new Float32Array(HIDDEN_DIM * CONTENT_DIM);
+  const ddh     = new Float32Array(n * HIDDEN_DIM);
 
-  // dL/dW4[j,k] = Σ_i dxr[i,j] * h2[i,k]
   for (let i = 0; i < n; i++) {
     for (let j = 0; j < CONTENT_DIM; j++) {
       const gj = dxr[i * CONTENT_DIM + j];
-      db4[j] += gj;
-      const wOff = j * HIDDEN_DIM;
-      const h2Off = i * HIDDEN_DIM;
       for (let k = 0; k < HIDDEN_DIM; k++) {
-        dW4[wOff + k] += gj * h2[h2Off + k];
-        dh2[h2Off + k] += gj * W.W4[wOff + k];
+        dW1_dec[k * CONTENT_DIM + j] += gj * dh[i * HIDDEN_DIM + k];
+        ddh[i * HIDDEN_DIM + k]      += gj * W.W1[k * CONTENT_DIM + j];
       }
     }
   }
 
-  // ReLU gate on h2
-  const mask2 = reluMask(h2);
-  for (let i = 0; i < dh2.length; i++) dh2[i] *= mask2[i];
+  // ReLU gate on dh
+  for (let i = 0; i < ddh.length; i++) if (dh[i] <= 0) ddh[i] = 0;
 
-  // --- Encoder W3, b3 ---
-  const dW3 = new Float32Array(HIDDEN_DIM * ENCODED_DIM);
-  const db3 = new Float32Array(HIDDEN_DIM);
-  const dz  = new Float32Array(n * ENCODED_DIM);
+  // ── Backward through W2^T (decoder first layer: z → dh) ──────────────────
+  // dh[i,k] = sum_m z[i,m] * W2[m,k]  (W2 is 64×256, transpose gives 256×64)
+  // dL/dW2[m,k] += ddh[i,k] * z[i,m]
+  // dL/dz[i,m]   = sum_k ddh[i,k] * W2[m,k]
+  const dW2_dec = new Float32Array(ENCODED_DIM * HIDDEN_DIM);
+  const dz      = new Float32Array(n * ENCODED_DIM);
 
   for (let i = 0; i < n; i++) {
-    for (let j = 0; j < HIDDEN_DIM; j++) {
-      const gj = dh2[i * HIDDEN_DIM + j];
-      db3[j] += gj;
-      const wOff = j * ENCODED_DIM;
-      const zOff = i * ENCODED_DIM;
-      for (let k = 0; k < ENCODED_DIM; k++) {
-        dW3[wOff + k] += gj * z[zOff + k];
-        dz[zOff + k]  += gj * W.W3[wOff + k];
+    for (let k = 0; k < HIDDEN_DIM; k++) {
+      const gk = ddh[i * HIDDEN_DIM + k];
+      for (let m = 0; m < ENCODED_DIM; m++) {
+        dW2_dec[m * HIDDEN_DIM + k] += gk * z[i * ENCODED_DIM + m];
+        dz[i * ENCODED_DIM + m]     += gk * W.W2[m * HIDDEN_DIM + k];
       }
     }
   }
 
-  // --- Encoder W2, b2 ---
-  const dW2 = new Float32Array(ENCODED_DIM * HIDDEN_DIM);
-  const db2 = new Float32Array(ENCODED_DIM);
-  const dh1 = new Float32Array(n * HIDDEN_DIM);
+  // ── Backward through encoder W2 (h1 → z) ─────────────────────────────────
+  const dW2_enc = new Float32Array(ENCODED_DIM * HIDDEN_DIM);
+  const db2     = new Float32Array(ENCODED_DIM);
+  const dh1     = new Float32Array(n * HIDDEN_DIM);
 
   for (let i = 0; i < n; i++) {
     for (let j = 0; j < ENCODED_DIM; j++) {
       const gj = dz[i * ENCODED_DIM + j];
       db2[j] += gj;
-      const wOff = j * HIDDEN_DIM;
+      const wOff  = j * HIDDEN_DIM;
       const h1Off = i * HIDDEN_DIM;
       for (let k = 0; k < HIDDEN_DIM; k++) {
-        dW2[wOff + k] += gj * h1[h1Off + k];
-        dh1[h1Off + k] += gj * W.W2[wOff + k];
+        dW2_enc[wOff + k]    += gj * h1[h1Off + k];
+        dh1[h1Off + k]       += gj * W.W2[wOff + k];
       }
     }
   }
 
   // ReLU gate on h1
-  const mask1 = reluMask(h1);
-  for (let i = 0; i < dh1.length; i++) dh1[i] *= mask1[i];
+  for (let i = 0; i < h1.length; i++) if (h1[i] <= 0) dh1[i] = 0;
 
-  // --- Encoder W1, b1 ---
-  const dW1 = new Float32Array(HIDDEN_DIM * CONTENT_DIM);
-  const db1 = new Float32Array(HIDDEN_DIM);
+  // ── Backward through encoder W1 (x → h1) ─────────────────────────────────
+  const dW1_enc = new Float32Array(HIDDEN_DIM * CONTENT_DIM);
+  const db1     = new Float32Array(HIDDEN_DIM);
 
   for (let i = 0; i < n; i++) {
     for (let j = 0; j < HIDDEN_DIM; j++) {
@@ -208,31 +223,36 @@ function backward(x, n, W, cache) {
       const wOff = j * CONTENT_DIM;
       const xOff = i * CONTENT_DIM;
       for (let k = 0; k < CONTENT_DIM; k++) {
-        dW1[wOff + k] += gj * x[xOff + k];
+        dW1_enc[wOff + k] += gj * x[xOff + k];
       }
     }
   }
 
-  return { dW1, db1, dW2, db2, dW3, db3, dW4, db4 };
+  // Accumulate tied grads: W1 and W2 each get grad from both encoder and decoder paths
+  const dW1 = new Float32Array(HIDDEN_DIM * CONTENT_DIM);
+  const dW2 = new Float32Array(ENCODED_DIM * HIDDEN_DIM);
+  for (let i = 0; i < dW1.length; i++) dW1[i] = dW1_enc[i] + dW1_dec[i];
+  for (let i = 0; i < dW2.length; i++) dW2[i] = dW2_enc[i] + dW2_dec[i];
+
+  return { dW1, db1, dW2, db2 };
 }
 
-// ── SGD update with momentum + L2 ────────────────────────────────────────────
+// ── SGD update with momentum + L2 ─────────────────────────────────────────────
 function updateParams(W, grads, velocity, lr, l2) {
   const momentum = 0.9;
-  const paramNames = ['W1','b1','W2','b2','W3','b3','W4','b4'];
-  for (const name of paramNames) {
+  for (const name of ['W1', 'b1', 'W2', 'b2']) {
     const p = W[name];
     const g = grads[`d${name}`];
     const v = velocity[name];
     for (let i = 0; i < p.length; i++) {
-      const grad = g[i] + l2 * p[i];  // L2 regularisation
+      const grad = g[i] + l2 * p[i];
       v[i] = momentum * v[i] - lr * grad;
       p[i] += v[i];
     }
   }
 }
 
-// ── Qdrant scroll for embeddings ──────────────────────────────────────────────
+// ── Qdrant scroll ─────────────────────────────────────────────────────────────
 async function fetchVectors(limit) {
   const vectors = [];
   let offset = null;
@@ -243,12 +263,7 @@ async function fetchVectors(limit) {
     const res = await fetch(`${QDRANT_URL}/collections/${COLLECTION}/points/scroll`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        limit: batchSize,
-        offset,
-        with_payload: false,
-        with_vector: ['content'],
-      }),
+      body: JSON.stringify({ limit: batchSize, offset, with_payload: false, with_vector: ['content'] }),
     });
     if (!res.ok) throw new Error(`Qdrant scroll HTTP ${res.status}: ${await res.text()}`);
     const data = await res.json();
@@ -261,18 +276,15 @@ async function fetchVectors(limit) {
         vectors.push(new Float32Array(v));
       }
     }
-
     offset = data.result?.next_page_offset ?? null;
     process.stdout.write(`\r  [qdrant] loaded ${vectors.length}  `);
     if (!offset) break;
   }
-
   console.log();
-  log(`[qdrant] Total vectors loaded: ${vectors.length}`);
+  log(`[qdrant] Total vectors: ${vectors.length}`);
   return vectors;
 }
 
-// ── Shuffle in-place ──────────────────────────────────────────────────────────
 function shuffle(arr) {
   for (let i = arr.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
@@ -280,17 +292,15 @@ function shuffle(arr) {
   }
 }
 
-// ── Cosine LR schedule ────────────────────────────────────────────────────────
-function cosineLr(baseLr, epoch, totalEpochs) {
-  return baseLr * 0.5 * (1 + Math.cos(Math.PI * epoch / totalEpochs));
+function cosineLr(baseLr, epoch, total) {
+  return baseLr * 0.5 * (1 + Math.cos(Math.PI * epoch / total));
 }
 
 // ── Main ──────────────────────────────────────────────────────────────────────
 async function main() {
-  log('=== ae:train — 768→256→64 Autoencoder ===');
+  log('=== ae:train:js — 768→256→64 encoder (tied-weight reconstruction) ===');
   log(`[cfg] epochs=${FLAGS.epochs} batch=${FLAGS.batch} lr=${FLAGS.lr} l2=${FLAGS.l2} dryRun=${FLAGS.dryRun}`);
 
-  // Check Redis for existing weights
   const redis = makeRedis();
   try {
     await redis.connect();
@@ -298,18 +308,17 @@ async function main() {
     const meta = await redis.hgetall('ace:autoencoder:meta');
     if (meta?.trainedAt && !FLAGS.force) {
       log(`[redis] Existing weights found — trainedAt=${meta.trainedAt} bestLoss=${meta.bestLoss}`);
-      log(`  Use --force to overwrite.`);
+      log('  Use --force to overwrite.');
+      await redis.disconnect().catch(() => {});
       process.exit(0);
     }
   } catch (err) {
-    console.warn(`[redis] Could not connect: ${err.message}. Will save locally if dry-run skipped.`);
-    await redis.disconnect().catch(() => {});
+    console.warn(`[redis] Connect failed: ${err.message}`);
   }
 
-  // Load vectors
   const vectors = await fetchVectors(FLAGS.limit);
   if (vectors.length < 10) {
-    console.error(`Not enough vectors to train (got ${vectors.length}, need ≥10)`);
+    console.error(`Not enough vectors (got ${vectors.length}, need ≥10)`);
     process.exit(1);
   }
 
@@ -319,23 +328,17 @@ async function main() {
     process.exit(0);
   }
 
-  // Init weights
+  // Encoder weights only — W3/W4 do NOT exist; decoder uses W2^T and W1^T
   const W = {
     W1: xavierUniform(HIDDEN_DIM, CONTENT_DIM),
     b1: zeros(HIDDEN_DIM),
     W2: xavierUniform(ENCODED_DIM, HIDDEN_DIM),
     b2: zeros(ENCODED_DIM),
-    W3: xavierUniform(HIDDEN_DIM, ENCODED_DIM),
-    b3: zeros(HIDDEN_DIM),
-    W4: xavierUniform(CONTENT_DIM, HIDDEN_DIM),
-    b4: zeros(CONTENT_DIM),
   };
 
   const velocity = {
     W1: zeros(W.W1.length), b1: zeros(W.b1.length),
     W2: zeros(W.W2.length), b2: zeros(W.b2.length),
-    W3: zeros(W.W3.length), b3: zeros(W.b3.length),
-    W4: zeros(W.W4.length), b4: zeros(W.b4.length),
   };
 
   const indices = Array.from({ length: vectors.length }, (_, i) => i);
@@ -354,17 +357,14 @@ async function main() {
       const batchIdx = indices.slice(bi, bi + FLAGS.batch);
       const n = batchIdx.length;
 
-      // Pack batch into flat Float32Array
       const x = new Float32Array(n * CONTENT_DIM);
       for (let i = 0; i < n; i++) x.set(vectors[batchIdx[i]], i * CONTENT_DIM);
 
-      // Forward
       const cache = forward(x, n, W);
       const loss  = mseLoss(cache.xr, x, n);
       epochLoss += loss;
       batches++;
 
-      // Backward
       const grads = backward(x, n, W, cache);
       updateParams(W, grads, velocity, lr, FLAGS.l2);
     }
@@ -380,10 +380,9 @@ async function main() {
   const durationMs = Date.now() - t0;
   log(`\n[train] Complete — bestLoss=${bestLoss.toFixed(6)} in ${(durationMs / 1000).toFixed(1)}s`);
 
-  // Save to Redis
-  // Only save the encoder half (W1,b1,W2,b2) — the backfill script only uses encoder
+  // Save encoder weights (W1/b1/W2/b2) to Redis
   try {
-    await redis.connect();
+    await redis.connect().catch(() => {});
     await redis.ping();
     await redis.hset('ace:autoencoder:weights',
       'W1', Array.from(W.W1).join(','),
@@ -400,23 +399,20 @@ async function main() {
       'vectorCount', String(vectors.length),
       'durationMs',  String(durationMs),
     );
-    log(`[redis] Weights saved — ace:autoencoder:weights + ace:autoencoder:meta`);
+    log('[redis] Weights saved — ace:autoencoder:weights (W1/b1/W2/b2) + ace:autoencoder:meta');
   } catch (err) {
     console.error(`[redis] Failed to save weights: ${err.message}`);
     process.exit(1);
   } finally {
-    await redis.disconnect().catch(() => {});
+    try {
+      redis.disconnect();
+    } catch (e) {}
   }
 
-  console.log(JSON.stringify({
-    status: 'ok',
-    bestLoss,
-    vectorCount: vectors.length,
-    durationMs,
-  }));
+  console.log(JSON.stringify({ status: 'ok', bestLoss, vectorCount: vectors.length, durationMs }));
 }
 
 main().catch(err => {
-  console.error('[ae:train] Fatal:', err);
+  console.error('[ae:train:js] Fatal:', err);
   process.exit(1);
 });

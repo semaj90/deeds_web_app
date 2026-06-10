@@ -2561,18 +2561,6 @@
     "serverDeps": 0,
     "dbDeps": 0
   },
-  "sveltekit-frontend/src/routes/api/ai/hermes-plan/+server.ts": {
-    "zone": "shared",
-    "directDeps": 0,
-    "serverDeps": 0,
-    "dbDeps": 0
-  },
-  "sveltekit-frontend/src/routes/api/ai/hermes-run/+server.ts": {
-    "zone": "shared",
-    "directDeps": 0,
-    "serverDeps": 0,
-    "dbDeps": 0
-  },
   "sveltekit-frontend/src/routes/api/ai/intent-dispatch/+server.ts": {
     "zone": "shared",
     "directDeps": 0,

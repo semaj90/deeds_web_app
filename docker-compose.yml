@@ -1089,6 +1089,44 @@ services:
       timeout: 15s
       retries: 3
 
+  # ═══════════════════════════════════════════════════════════════════
+  # ATLAS RUNNER — Trusted maintenance worker for graph/retrieval jobs
+  # ═══════════════════════════════════════════════════════════════════
+  # Runs inside Docker network to access Postgres/Neo4j/Qdrant via DNS
+  # Use: docker compose --profile tools run --rm atlas-runner sh -c "..."
+  # Or:  npm run atlas:runner -- "..."
+  atlas-runner:
+    image: node:22-alpine
+    profiles: ["tools"]
+    working_dir: /workspace
+    volumes:
+      - ./:/workspace
+    environment:
+      - DATABASE_URL=postgresql://legal_admin:${POSTGRES_PASSWORD:-123456}@legal-ai-postgres:5432/legal_ai_db
+      - NEO4J_URI=bolt://legal-ai-neo4j:7687
+      - NEO4J_USER=neo4j
+      - NEO4J_PASSWORD=${NEO4J_PASSWORD:-neo4j}
+      - REDIS_HOST=legal-ai-valkey
+      - REDIS_PORT=6379
+      - REDIS_PASSWORD=${REDIS_PASSWORD}
+      - QDRANT_URL=http://legal-ai-qdrant:6333
+      - OLLAMA_URL=http://host.docker.internal:11434
+      - LLAMA_URL=http://host.docker.internal:8090
+      - NODE_ENV=production
+    networks:
+      - legal-ai-network
+    depends_on:
+      legal-ai-postgres:
+        condition: service_healthy
+      legal-ai-neo4j:
+        condition: service_healthy
+      legal-ai-qdrant:
+        condition: service_healthy
+      legal-ai-valkey:
+        condition: service_healthy
+    stdin_open: true
+    tty: true
+
 # ═══════════════════════════════════════════════════════════════════
 # VOLUMES — names preserved for existing data compatibility
 # ═══════════════════════════════════════════════════════════════════

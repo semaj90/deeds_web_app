@@ -2,7 +2,10 @@ import fs from 'node:fs/promises';
 import { existsSync } from 'node:fs';
 import path from 'node:path';
 
-const ROOT = path.resolve(process.cwd());
+import { fileURLToPath } from 'node:url';
+
+const __dir = path.dirname(fileURLToPath(import.meta.url));
+const ROOT = path.resolve(__dir, '../..');
 const RECS_JSON = path.join(ROOT, '.opencode', 'recommendations', 'recommendations.json');
 const RECS_MD = path.join(ROOT, '.opencode', 'recommendations', 'recommendations.md');
 
@@ -47,6 +50,13 @@ export async function mergeSelfHealRecommendations(newRecs) {
 		} catch {
 			// corrupt or missing — start fresh
 		}
+	}
+
+	if (!existing || typeof existing !== 'object') {
+		existing = {};
+	}
+	if (!existing.clusters) {
+		existing.clusters = {};
 	}
 
 	// Update the "Self-Healing Retrieval" cluster

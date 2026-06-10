@@ -253,18 +253,21 @@ export async function ensureGdsProjection(force = false): Promise<{ created: boo
       };
     }
 
-    // Create projection
+    // Create projection — costs must match COSTS table in sync-graph-truth-neo4j.mjs
     const result = await session.run(`
       CALL gds.graph.project(
         $name,
-        ['File', 'Directory', 'Cluster', 'WikiNote', 'ResearchNote', 'SummaryLens'],
+        ['File', 'Directory', 'Cluster', 'WikiNote', 'ResearchNote', 'SummaryLens', 'Centroid', 'CodebaseFile', 'ParentAtlasFeature'],
         {
-          IMPORTS:            { orientation: 'NATURAL' },
-          CONTAINS:           { orientation: 'NATURAL' },
-          BELONGS_TO_CLUSTER: { orientation: 'UNDIRECTED' },
-          REFERENCES:         { orientation: 'NATURAL' },
-          SIMILAR_TOPOLOGY:   { orientation: 'UNDIRECTED' },
-          HAS_CHUNK:          { orientation: 'NATURAL' }
+          IMPORTS:            { orientation: 'NATURAL',    properties: { cost: { property: 'cost', defaultValue: 0.15 } } },
+          CALLS:              { orientation: 'NATURAL',    properties: { cost: { property: 'cost', defaultValue: 0.15 } } },
+          CONTAINS:           { orientation: 'NATURAL',    properties: { cost: { property: 'cost', defaultValue: 0.25 } } },
+          HAS_CHUNK:          { orientation: 'NATURAL',    properties: { cost: { property: 'cost', defaultValue: 0.20 } } },
+          BELONGS_TO_CLUSTER: { orientation: 'UNDIRECTED', properties: { cost: { property: 'cost', defaultValue: 0.30 } } },
+          REFERENCES:         { orientation: 'NATURAL',    properties: { cost: { property: 'cost', defaultValue: 0.35 } } },
+          SIMILAR_TOPOLOGY:   { orientation: 'UNDIRECTED', properties: { cost: { property: 'cost', defaultValue: 0.40 } } },
+          HAS_CENTROID:       { orientation: 'UNDIRECTED', properties: { cost: { property: 'cost', defaultValue: 0.10 } } },
+          BELONGS_TO_FEATURE: { orientation: 'UNDIRECTED', properties: { cost: { property: 'cost', defaultValue: 0.10 } } }
         }
       )
       YIELD nodeCount, relationshipCount
@@ -912,6 +915,223 @@ export async function getUnclassifiedFileCount(): Promise<number> {
       RETURN count(f) AS unclassified
     `);
     return (result.records[0]?.get('unclassified') as number | null) ?? 0;
+  } finally {
+    await session.close();
+  }
+}
+
+// ── Dijkstra contextual search ────────────────────────────────────────────────
+
+export interface DijkstraHit {
+  stableKey: string;
+  path?: string;
+  featureId?: string;
+  sourceRef?: string;
+  totalCost: number;
+  hopPath: string[];
+  costs: number[];
+}
+
+export interface DijkstraContextResult {
+  sourceRef: string;
+  hits: DijkstraHit[];
+  totalCount: number;
+  durationMs: number;
+  gdsUsed: boolean;
+}
+
+/**
+ * GDS Dijkstra contextual search.
+ *
+ * When exactly 1 targetRef is given: gds.shortestPath.dijkstra.stream (point-to-point).
+ * Otherwise:                         gds.allShortestPaths.delta.stream (SSSP), optionally
+ *                                    filtered to targetRefs when non-empty.
+ *
+ * Nodes are matched by source_ref, path, feature_id, or name.
+ * Falls back to variable-length Cypher expansion when GDS is unavailable.
+ *
+ * Edge cost model (written by sync-graph-truth-neo4j.mjs):
+ *   HAS_CENTROID       → 0.10   IMPORTS/CALLS → 0.15
+ *   HAS_CHUNK          → 0.20   CONTAINS      → 0.25
+ *   BELONGS_TO_CLUSTER → 0.30   REFERENCES    → 0.35
+ *   SIMILAR_TOPOLOGY   → min(1, somDist/20)
+ */
+
+// helper — build a canonical identifier string for a GDS node
+const NODE_COALESCE = `coalesce(
+  gds.util.asNode(nodeId).source_ref,
+  gds.util.asNode(nodeId).path,
+  gds.util.asNode(nodeId).feature_id,
+  gds.util.asNode(nodeId).centroid_id,
+  gds.util.asNode(nodeId).name
+)`;
+
+function recordToDijkstraHit(r: import('neo4j-driver').Record, totalCostKey = 'totalCost'): DijkstraHit {
+  const target = r.get('target') as Record<string, unknown> | null;
+  return {
+    stableKey: r.get('stableKey') as string,
+    path:      target?.path as string | undefined ?? r.get('nodePath') as string | undefined,
+    featureId: target?.feature_id as string | undefined ?? r.get('featureId') as string | undefined,
+    sourceRef: target?.source_ref as string | undefined ?? r.get('nodeSourceRef') as string | undefined,
+    totalCost: r.get(totalCostKey) as number,
+    hopPath:   r.get('path') as string[] ?? [],
+    costs:     r.get('costs') as number[] ?? [],
+  };
+}
+
+async function runDijkstraPair(
+  session: import('neo4j-driver').Session,
+  sourceRef: string,
+  targetRef: string,
+  limit: number
+): Promise<DijkstraHit[]> {
+  const result = await session.run(`
+    MATCH (source)
+    WHERE source.source_ref = $sourceRef
+       OR source.path        = $sourceRef
+       OR source.feature_id  = $sourceRef
+    MATCH (target)
+    WHERE target.source_ref = $targetRef
+       OR target.path        = $targetRef
+       OR target.feature_id  = $targetRef
+    CALL gds.shortestPath.dijkstra.stream($name, {
+      sourceNode: id(source),
+      targetNode: id(target),
+      relationshipWeightProperty: 'cost'
+    })
+    YIELD totalCost, nodeIds, costs
+    RETURN
+      totalCost,
+      costs,
+      [nodeId IN nodeIds | ${NODE_COALESCE}] AS path,
+      coalesce(
+        gds.util.asNode(nodeIds[-1]).source_ref,
+        gds.util.asNode(nodeIds[-1]).path,
+        gds.util.asNode(nodeIds[-1]).feature_id,
+        gds.util.asNode(nodeIds[-1]).name
+      ) AS stableKey,
+      gds.util.asNode(nodeIds[-1]) AS target
+    LIMIT $limit
+  `, { name: PROJECTION_NAME, sourceRef, targetRef, limit });
+
+  return result.records.map(r => recordToDijkstraHit(r));
+}
+
+async function runDijkstraNeighborhood(
+  session: import('neo4j-driver').Session,
+  sourceRef: string,
+  targetRefs: string[],
+  limit: number
+): Promise<DijkstraHit[]> {
+  const result = await session.run(`
+    MATCH (source)
+    WHERE source.source_ref = $sourceRef
+       OR source.path        = $sourceRef
+       OR source.feature_id  = $sourceRef
+    CALL gds.allShortestPaths.delta.stream($name, {
+      sourceNode: id(source),
+      relationshipWeightProperty: 'cost',
+      delta: 1.0
+    })
+    YIELD targetNode, totalCost, nodeIds, costs
+    WITH targetNode, totalCost, nodeIds, costs
+    WHERE size($targetRefs) = 0
+       OR any(ref IN $targetRefs WHERE
+            gds.util.asNode(targetNode).source_ref = ref
+         OR gds.util.asNode(targetNode).path        = ref
+         OR gds.util.asNode(targetNode).feature_id  = ref
+       )
+    RETURN
+      totalCost,
+      costs,
+      [nodeId IN nodeIds | ${NODE_COALESCE}] AS path,
+      coalesce(
+        gds.util.asNode(targetNode).source_ref,
+        gds.util.asNode(targetNode).path,
+        gds.util.asNode(targetNode).feature_id,
+        gds.util.asNode(targetNode).name
+      ) AS stableKey,
+      gds.util.asNode(targetNode) AS target
+    ORDER BY totalCost ASC
+    LIMIT $limit
+  `, { name: PROJECTION_NAME, sourceRef, targetRefs, limit });
+
+  return result.records.map(r => recordToDijkstraHit(r));
+}
+
+export async function runDijkstraContext({
+  sourceRef,
+  targetRefs = [],
+  limit = 25,
+}: {
+  sourceRef: string;
+  targetRefs?: string[];
+  limit?: number;
+}): Promise<DijkstraContextResult> {
+  if (!sourceRef) {
+    return { sourceRef: '', hits: [], totalCount: 0, durationMs: 0, gdsUsed: false };
+  }
+
+  await ensureGdsProjection();
+
+  const driver = getNeo4jDriver();
+  const session = driver.session();
+  const t0 = Date.now();
+
+  try {
+    const { gdsAvailable, projectionExists } = await getGdsStatus();
+
+    if (gdsAvailable && projectionExists) {
+      let hits: DijkstraHit[] = [];
+      try {
+        if (targetRefs.length === 1) {
+          hits = await runDijkstraPair(session, sourceRef, targetRefs[0], limit);
+        } else {
+          hits = await runDijkstraNeighborhood(session, sourceRef, targetRefs, limit);
+        }
+      } catch { /* GDS procedure unavailable — fall through to Cypher fallback */ }
+
+      if (hits.length > 0) {
+        hits = hits.sort((a, b) => a.totalCost - b.totalCost).slice(0, limit);
+        return { sourceRef, hits, totalCount: hits.length, durationMs: Date.now() - t0, gdsUsed: true };
+      }
+    }
+
+    // ── Fallback: variable-length Cypher expansion ────────────────────────────
+    const fallbackHits: DijkstraHit[] = [];
+    try {
+      const result = await session.run(`
+        MATCH (start)
+        WHERE start.source_ref = $sourceRef OR start.path = $sourceRef OR start.feature_id = $sourceRef
+        MATCH p = (start)-[*1..3]-(n)
+        WHERE (n.source_ref IS NOT NULL OR n.path IS NOT NULL) AND n.source_ref <> $sourceRef AND n.path <> $sourceRef
+        WITH n, min(length(p)) AS dist
+        RETURN
+          coalesce(n.source_ref, n.path, n.feature_id) AS stableKey,
+          n.path        AS nodePath,
+          n.feature_id  AS featureId,
+          n.source_ref  AS nodeSourceRef,
+          dist          AS totalCost
+        ORDER BY totalCost ASC
+        LIMIT $limit
+      `, { sourceRef, limit });
+
+      for (const r of result.records) {
+        fallbackHits.push({
+          stableKey: r.get('stableKey') as string,
+          path:      r.get('nodePath') as string | undefined,
+          featureId: r.get('featureId') as string | undefined,
+          sourceRef: r.get('nodeSourceRef') as string | undefined,
+          totalCost: Number(r.get('totalCost')) * 0.25,
+          hopPath:   [],
+          costs:     [],
+        });
+      }
+    } catch { /* graph unavailable */ }
+
+    const hits = fallbackHits.sort((a, b) => a.totalCost - b.totalCost).slice(0, limit);
+    return { sourceRef, hits, totalCount: hits.length, durationMs: Date.now() - t0, gdsUsed: false };
+
   } finally {
     await session.close();
   }
