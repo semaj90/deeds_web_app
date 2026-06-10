@@ -189,3 +189,71 @@ Expected Completion After Replay Validation
 ≈ 95%
 Expected Completion After Completion Gate
 ≈ 100%
+Now I have enough ground truth. Here's the honest 0–100% map with what actually exists vs what the percentages mean:
+
+Where things actually are
+The spine (done — stop counting these):
+The identity gate, replay, lineage, CHR97, and production readiness are fully audited and passing. That work is complete. It doesn't contribute to the remaining 0–100 because it's the foundation, not the product.
+
+Real status by layer
+NDJSON → JSONB / GIN indexing — ~70%
+
+What exists: inject-ndjson-as-ace-packets.mjs (539 lines) reads .opencode/ndjson/ cluster summaries, graph edges, enriched candidates, cards and writes ace:packet:* Redis keys. GIN indexes on nes_chrom_packets exist (source_refs, payload, feature_ids, lane_ids). HNSW index on embedding exists.
+
+Gap: nes_chrom_packets.embedding is NULL for all 27 rows — the HNSW index exists but has nothing to search. The inject-ndjson-as-ace-packets.mjs writes to Redis, not to nes_chrom_packets JSONB columns directly. No Postgres-side NDJSON materializer writes embeddings back to the table.
+
+DuckDB MapReduce — ~85%
+
+What exists: 3 DuckDB .duckdb files + matching JSON/MD reports in docs/reports/. Multiple scripts (materialize-mapreduce-duckdb.mjs, ndjson-mapreduce-join.mjs, audit-contextual-tree-readiness.mjs) spawn DuckDB CLI for offline joins. Reports are generated.
+
+Gap: DuckDB is used as an external process only — no in-process joins feeding live Postgres writes. The "join" results live in reports, not in live tables.
+
+pgvector mirrored retrieval — ~65%
+
+What exists: qdrant-postgres-mirror-reconciliation.mjs (278 lines) exists. nes_chrom_packets has an HNSW index ready. atlas_feature_map has qdrant_point_id linking to Qdrant. The reconciliation script audits drift but doesn't actively mirror ANN search results.
+
+Gap: No live server code path that queries nes_chrom_packets HNSW as a Qdrant fallback. Embeddings are NULL so ANN on that table returns nothing.
+
+HyperRAG dense search — ~72%
+
+What exists: Two live routes — /api/rag/hyperrag/+server.ts (317 lines, Phase A–E pipeline) and /api/search/hyperrag/+server.ts (62 lines). A hyperrag-smoke.spec.ts test exists. The Phase A–E pipeline (embed → Qdrant → wiki enrichment → RotorQuant synthesis → audit log) is implemented.
+Gap: The smoke test requires RotorQuant to be running. No offline/degraded path. The /api/search/hyperrag route is a thin wrapper, not the full pipeline. No client UI surfaces the HyperRAG endpoint.
+Agentic error-fixing loop — ~65%
+What exists: phase100-agentic-error-pipeline.mjs exists. workflow-loop.ts (229 lines) in src/lib/server/ai/error-agent/. build-error-fix-dag.mjs in scripts. codebase-error-fixer.mjs script exists.
+Gap: The workflow loop is not wired into any live /api/ route. It's a server-side module with no HTTP surface. No Playwright test validates end-to-end error → fix → verify.
+Local deep-research tool calling — ~60%
+What exists: src/lib/server/ai/ldr/deep-research.ts exists. Routes at /api/ai/legal-research, /api/analytics/deep-research, /api/codebase-index/deep-research. The code-intel/research page route exists.
+Gap: ldr/deep-research.ts size unknown — need to check if it's a stub or full implementation. No tool-calling loop (the "local" in local-deep-research implies running the research loop against local data without external web calls — unclear if wired).
+NES/CHR card packets — ~65%
+What exists: 27 rows in nes_chrom_packets with full GIN/HNSW index setup. backfill-nes-chrom-packets.mjs, chr97-inject-engram-ace.mjs. The table schema is production-grade (JSONB, GIN, HNSW, all columns populated except embedding).
+Gap: 27 rows is not production scale. embedding is NULL for all 27 rows — the HNSW index can't be used. nes_card_id in atlas_feature_map is NULL for all rows (no card linking).
+gRPC / protobuf / toon encoding — ~35%
+What exists: Proto files in proto/active/. toon.ts (175 lines) — a compact JSON packet encoder that compresses {query, features[], memory[]} into short-key format for gRPC payloads. graph_ml.proto with SOM/K-Means/PageRank RPC definitions. gRPC client stubs in src/lib/server/grpc/.
+Gap: No gRPC server implementation. The toon encoder exists but isn't connected to a live gRPC transport. The proto definitions are ahead of any running service.
+4D topology / SOM ranking — ~70%
+What exists: persist-topology.mjs, project-codebase-topology.mjs, ingest-topology-batched.mjs. SOM coordinates in Qdrant payload (som_bmu_col/row). ace/multihop-contextual-tree.ts references topology. som_cluster and som_code columns in nes_chrom_packets with btree indexes.
+Gap: The topo-byte candidate cache (ace:topo:{class}:{hash}) is defined but unclear if populated. Topology feeds into ACE via multihop-contextual-tree.ts but the 4D sort (semantic_z + grpo_w dimensions) is not confirmed active in the retrieval path.
+Engram storage / reward recall — ~65%
+What exists: sync-engram-memory.mjs (168 lines). engram-plugin-adapter.mjs with Redis/noop adapters. src/lib/server/memory/engram-memory.ts, local-engram-memory-adapter.ts. schema-engram.ts (50 lines).
+Gap: Not wired into the live request path. The engram adapter writes are fire-and-forget from offline scripts, not from request handlers.
+Playwright testing — ~40%
+What exists: 30 spec files in tests/e2e/. Active: chat.spec.ts (25KB), vlm-inference-vision.spec.ts (23KB), evidence-case-link-canvas.spec.ts (12KB). HyperRAG: hyperrag-smoke.spec.ts. Auth: auth-login-db.spec.ts (11 tests passing).
+Gap: Most specs require live services (RotorQuant, Ollama, Neo4j). No CI baseline that passes without GPU services. No specs for the error-fixing agent loop, engram recall, or 4D topology routes.
+Web worker / service worker cache bridge — ~30%
+What exists: sw.js (681 lines, v1.6.0) with aggressive caching for shells/static/WASM/API patterns. packet-cache.worker.ts (118 lines) — IndexedDB PUT/GET/DELETE for ACE packets. ace-artifact-cache.worker.ts (14 lines — stub). 5 other workers exist.
+Gap: ace-artifact-cache.worker.ts is 14 lines (stub). No bridge between the service worker's cache and the packet-cache worker's IndexedDB. The SW caches API responses but doesn't route atlas packet reads through the IndexedDB worker. packet-cache.worker.ts is not imported by any component.
+What actually moves the needle
+The remaining 20–30% is not one big thing. It's four concrete gaps:
+Gap 1: nes_chrom_packets.embedding is NULL — the HNSW index exists, all other columns are populated, but no script has ever run the embed step for these 27 rows. Fix: embed nes_chrom_packets.summary via Ollama and write back. One script, ~1 hour.
+Gap 2: inject-ndjson-as-ace-packets.mjs --apply has never been run in the reported state — Redis has ace:packet:* keys, but whether the 396 SOM cluster packets + 745 edge packets are actually in Redis right now is unknown. Verify then run.
+Gap 3: The error-fixing agent has no HTTP surface — workflow-loop.ts exists but /api/ route is missing. One route file wires it.
+Gap 4: packet-cache.worker.ts is orphaned — the worker exists but nothing imports it. The SW caches API responses but doesn't touch the IndexedDB packet store.
+The packages/parent-atlas/ re-org is cosmetic until gaps 1–4 are closed. 354 scripts in scripts/atlas/ already exist — packaging them doesn't increase coverage.
+Recommended build order (highest leverage first)
+Priority	Task	What it unblocks
+P0	Embed nes_chrom_packets.summary → write embedding column	HNSW ANN search on packet table, pgvector mirror retrieval
+P1	Run inject-ndjson-as-ace-packets.mjs --apply and verify Redis keys	ACE packet injection, 4D topology in retrieval
+P2	Wire workflow-loop.ts into /api/ai/error-agent route	Agentic error-fixing HTTP surface, Playwright testable
+P3	Import packet-cache.worker.ts from ACE chat component	SW ↔ IndexedDB bridge, worker cache layer active
+P4	Playwright smoke for P0–P3 (one spec, 4 assertions)	CI coverage for new surfaces
+The packages/parent-atlas/ structure is worth creating only after P0–P3 are done — at that point there's something real to export. Right now it would just be a re-org of scripts that already have path

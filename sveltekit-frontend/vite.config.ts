@@ -7,7 +7,20 @@ import { defineConfig } from 'vite';
 // vscodeErrorLogger was archived — stub it to no-op
 const vscodeErrorLogger = (_opts?: { enabled?: boolean }) => null;
 
-// ── Dev request logger — logs /api/* hits + 4xx/5xx to terminal ───────────
+// ── Dev request logger — logs /api/* hits + 4xx/5xx to terminal + JSONL ───
+const DEV_LOG_FILE = path.resolve(__dirname, '../logs/vite-api.jsonl');
+let _devLogStream: import('fs').WriteStream | null = null;
+function getDevLogStream() {
+  if (_devLogStream) return _devLogStream;
+  try {
+    const dir = path.dirname(DEV_LOG_FILE);
+    if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+    _devLogStream = fs.createWriteStream(DEV_LOG_FILE, { flags: 'a' });
+    _devLogStream.on('error', () => { _devLogStream = null; });
+  } catch { _devLogStream = null; }
+  return _devLogStream;
+}
+
 function devRequestLoggerPlugin(enabled: boolean) {
   if (!enabled) return null;
   return {
@@ -20,13 +33,16 @@ function devRequestLoggerPlugin(enabled: boolean) {
         res.on('finish', () => {
           const ms     = Date.now() - start;
           const status = res.statusCode;
-          const isApi  = url.startsWith('/api/') || url.includes('hermes') || url.includes('stream');
+          const isApi  = url.startsWith('/api/') || url.includes('stream');
           const isErr  = status >= 400;
           if (!isApi && !isErr) return;
           const color  = status >= 500 ? '\x1b[31m' : status >= 400 ? '\x1b[33m' : status >= 300 ? '\x1b[36m' : '\x1b[32m';
           const reset  = '\x1b[0m';
           const dim    = '\x1b[2m';
           console.log(`${color}[vite:api] ${method} ${url} → ${status}${reset} ${dim}${ms}ms${reset}`);
+          // Write JSONL entry for agentic error fixing
+          const entry = JSON.stringify({ ts: new Date().toISOString(), method, url, status, ms, isErr });
+          getDevLogStream()?.write(entry + '\n');
         });
         next();
       });
