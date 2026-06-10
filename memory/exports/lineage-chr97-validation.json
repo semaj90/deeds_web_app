@@ -1,0 +1,134 @@
+{
+  "ts": "2026-06-10T04:06:11.438Z",
+  "overall": "PASS",
+  "passRate": 1,
+  "passRatePct": "100.0%",
+  "threshold": 0.95,
+  "passed": 13,
+  "failed": 0,
+  "total": 13,
+  "taxonomy_note": "nes_chrom_packets.feature_id and atlas_feature_map.feature_id use different classification systems — exact match is not expected; C1 checks structural source_ref presence only.",
+  "checks": [
+    {
+      "id": "C1:ncp_in_atlas",
+      "status": "pass",
+      "message": "nes_chrom_packets in atlas_feature_map: 27/27 (100.0%)",
+      "detail": {
+        "total": 27,
+        "in_atlas": 27
+      }
+    },
+    {
+      "id": "C2:ncp_feature_id",
+      "status": "pass",
+      "message": "nes_chrom_packets with feature_id: 27/27 (100.0%)",
+      "detail": {
+        "withFeature": 27,
+        "total": 27
+      }
+    },
+    {
+      "id": "C3:ncp_chunk_id",
+      "status": "pass",
+      "message": "nes_chrom_packets with chunk_id: 27/27 (100.0%)",
+      "detail": {
+        "withChunk": 27,
+        "total": 27
+      }
+    },
+    {
+      "id": "C4:ncp_kag_node_key",
+      "status": "pass",
+      "message": "nes_chrom_packets with kag_node_key: 27/27 (100.0%)",
+      "detail": {
+        "withKagKey": 27,
+        "total": 27
+      }
+    },
+    {
+      "id": "C5:ncp_qdrant_reachability",
+      "status": "pass",
+      "message": "nes_chrom_packets qdrant_point_id: 20/27 have ID (74.1%); Qdrant reachable: 10/10 sampled (100.0%)",
+      "detail": {
+        "withQdrantId": 20,
+        "qdrantMissing": 7,
+        "total": 27,
+        "qdrantIdRate": 0.7407,
+        "qdrantReachRate": 1
+      }
+    },
+    {
+      "id": "C6:kag_hits_to_ncp",
+      "status": "pass",
+      "message": "nes_chrom_kag_dag_hits → nes_chrom_packets: 32/32 (100.0%)",
+      "detail": {
+        "total": 32,
+        "matched_to_ncp": 32
+      }
+    },
+    {
+      "id": "C7:kag_chunk_join",
+      "status": "pass",
+      "message": "kag_dag_hits chunk_id → nes_chrom_packets: 32/32 (100.0%)",
+      "detail": {
+        "total": 32,
+        "via_chunk": 32
+      }
+    },
+    {
+      "id": "C8:kag_source_ref_join",
+      "status": "pass",
+      "message": "kag_dag_hits → nes_chrom_packets (source_ref OR chunk_id): 32/32 (100.0%)",
+      "detail": {
+        "total": 32,
+        "via_either": 32,
+        "note": "multi-file cluster hits join via chunk_id when source_ref is a constituent file"
+      }
+    },
+    {
+      "id": "C9:sprite_engramKey",
+      "status": "pass",
+      "message": "chr97-sprites engramKey: 200/200 (100.0%)",
+      "detail": {
+        "withEngramKey": 200,
+        "total": 200
+      }
+    },
+    {
+      "id": "C10:sprite_hash",
+      "status": "pass",
+      "message": "chr97-sprites sprite.hash: 200/200 (100.0%)",
+      "detail": {
+        "withSpriteHash": 200,
+        "total": 200
+      }
+    },
+    {
+      "id": "C11:sprite_reward_score",
+      "status": "pass",
+      "message": "chr97-sprites rankedCard.score > 0: 200/200 (100.0%)",
+      "detail": {
+        "withRewardScore": 200,
+        "total": 200
+      }
+    },
+    {
+      "id": "C12:bout_winner",
+      "status": "pass",
+      "message": "chr97-eval-bouts with winner: 1500/1500 (100.0%)",
+      "detail": {
+        "withWinner": 1500,
+        "total": 1500
+      }
+    },
+    {
+      "id": "C13:bout_reward_scores",
+      "status": "pass",
+      "message": "chr97-eval-bouts with valid challenger+defender rewards: 1500/1500 (100.0%) — note: reward_delta is negative when defender wins (expected bout semantics)",
+      "detail": {
+        "withValidRewards": 1500,
+        "total": 1500
+      }
+    }
+  ]
+}

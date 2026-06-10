@@ -60,7 +60,7 @@ export default {
     '!card_source_refs', '!codebase_graph_analysis', '!codebase_mapreduce_jobs',
     '!codebase_search_cache', '!codebase_wiki_pages',
     '!graph_expansion_cache', '!gpu_performance_metrics',
-    '!hermes_dag_runs', '!mapreduce_map_queue', '!mapreduce_reduce_results',
+    '!mapreduce_map_queue', '!mapreduce_reduce_results',
     // Added 2026-05-30 (Tier D): custom migrations journal (managed by db/migrate.ts, not drizzle-kit)
     '!migrations',
   ],

@@ -1,0 +1,235 @@
+{
+  "schema": "parent_atlas_final_completion.v1",
+  "ts": "2026-06-10T04:06:29.236Z",
+  "overall": "PASS",
+  "blockers": [],
+  "milestones": {
+    "M1": {
+      "status": "PASS",
+      "gates": 6,
+      "passed": 6,
+      "generatedAt": "2026-06-10T04:05:42.886Z",
+      "detail": {
+        "qdrant_feature_id": {
+          "status": "PASS",
+          "coverage": "98.3%"
+        },
+        "qdrant_canonical_ref": {
+          "status": "PASS",
+          "coverage": "99.3%"
+        },
+        "qdrant_som": {
+          "status": "PASS",
+          "coverage": "99.3%"
+        },
+        "qdrant_karpathy": {
+          "status": "PASS",
+          "coverage": "5.7%"
+        },
+        "neo4j_canonical": {
+          "status": "PASS",
+          "coverage": "55.9%"
+        },
+        "valkey_warm": {
+          "status": "PASS",
+          "coverage": "100.0%"
+        }
+      }
+    },
+    "M2": {
+      "status": "PASS",
+      "replayRatePct": "100.0%",
+      "sample": 302,
+      "replay_success": 302,
+      "sourceRefHash": "100.0%",
+      "feature_id": "100.0%",
+      "cluster_id_note": "optional_reserved — NULL until GPU cluster bridge implemented",
+      "generatedAt": "2026-06-10T04:06:03.563Z"
+    },
+    "M3": {
+      "status": "PASS",
+      "passed": 7,
+      "failed": 0,
+      "total": 7,
+      "generatedAt": "2026-06-10T03:49:35.863Z",
+      "checks": [
+        {
+          "id": "L1:atlas_feature_map",
+          "status": "pass",
+          "message": "atlas_feature_map: 14471 rows, 10947 with feature_id (75.6%), 1122 distinct features"
+        },
+        {
+          "id": "L2:task_semantic_packets",
+          "status": "pass",
+          "message": "task_semantic_packets: 302 rows, feature_id 302/302, hash 302/302"
+        },
+        {
+          "id": "L3:nes_chrom_packets",
+          "status": "pass",
+          "message": "nes_chrom_packets: 27 rows, 18 features, 2 lanes, 27 with summary"
+        },
+        {
+          "id": "L4:chr97_sprites",
+          "status": "pass",
+          "message": "chr97-sprites.ndjson: 200 lines, engramKey present: true, sprite.hash present: true"
+        },
+        {
+          "id": "L5:chr97_eval_bouts",
+          "status": "pass",
+          "message": "chr97-eval-bouts.ndjson: 1500 lines"
+        },
+        {
+          "id": "L6:nes_chrom_kag_dag_hits",
+          "status": "pass",
+          "message": "nes_chrom_kag_dag_hits: 32 entries, 15 distinct nodes, 26 distinct chunks"
+        },
+        {
+          "id": "L7:feature_id_crosscheck",
+          "status": "pass",
+          "message": "nes_chrom feature_ids in atlas_feature_map: 18/18"
+        }
+      ]
+    },
+    "M4": {
+      "status": "PASS",
+      "passed": 13,
+      "failed": 0,
+      "total": 13,
+      "passRatePct": "100.0%",
+      "generatedAt": "2026-06-10T04:06:11.438Z",
+      "checks": [
+        {
+          "id": "C1:ncp_in_atlas",
+          "status": "pass",
+          "message": "nes_chrom_packets in atlas_feature_map: 27/27 (100.0%)"
+        },
+        {
+          "id": "C2:ncp_feature_id",
+          "status": "pass",
+          "message": "nes_chrom_packets with feature_id: 27/27 (100.0%)"
+        },
+        {
+          "id": "C3:ncp_chunk_id",
+          "status": "pass",
+          "message": "nes_chrom_packets with chunk_id: 27/27 (100.0%)"
+        },
+        {
+          "id": "C4:ncp_kag_node_key",
+          "status": "pass",
+          "message": "nes_chrom_packets with kag_node_key: 27/27 (100.0%)"
+        },
+        {
+          "id": "C5:ncp_qdrant_reachability",
+          "status": "pass",
+          "message": "nes_chrom_packets qdrant_point_id: 20/27 have ID (74.1%); Qdrant reachable: 10/10 sampled (100.0%)"
+        },
+        {
+          "id": "C6:kag_hits_to_ncp",
+          "status": "pass",
+          "message": "nes_chrom_kag_dag_hits → nes_chrom_packets: 32/32 (100.0%)"
+        },
+        {
+          "id": "C7:kag_chunk_join",
+          "status": "pass",
+          "message": "kag_dag_hits chunk_id → nes_chrom_packets: 32/32 (100.0%)"
+        },
+        {
+          "id": "C8:kag_source_ref_join",
+          "status": "pass",
+          "message": "kag_dag_hits → nes_chrom_packets (source_ref OR chunk_id): 32/32 (100.0%)"
+        },
+        {
+          "id": "C9:sprite_engramKey",
+          "status": "pass",
+          "message": "chr97-sprites engramKey: 200/200 (100.0%)"
+        },
+        {
+          "id": "C10:sprite_hash",
+          "status": "pass",
+          "message": "chr97-sprites sprite.hash: 200/200 (100.0%)"
+        },
+        {
+          "id": "C11:sprite_reward_score",
+          "status": "pass",
+          "message": "chr97-sprites rankedCard.score > 0: 200/200 (100.0%)"
+        },
+        {
+          "id": "C12:bout_winner",
+          "status": "pass",
+          "message": "chr97-eval-bouts with winner: 1500/1500 (100.0%)"
+        },
+        {
+          "id": "C13:bout_reward_scores",
+          "status": "pass",
+          "message": "chr97-eval-bouts with valid challenger+defender rewards: 1500/1500 (100.0%) — note: reward_delta is negative when defender wins (expected bout semantics)"
+        }
+      ],
+      "taxonomy_note": "nes_chrom_packets.feature_id and atlas_feature_map.feature_id use different classification systems — exact match is not expected; C1 checks structural source_ref presence only."
+    },
+    "M5": {
+      "status": "WARN",
+      "pass": 64,
+      "warn": 2,
+      "fail": 0,
+      "total": 66,
+      "sections": [
+        "summary-batch",
+        "gpu",
+        "native-json-parser",
+        "drizzle",
+        "offline",
+        "postgres",
+        "redis",
+        "qdrant",
+        "neo4j"
+      ],
+      "generatedAt": "2026-06-10T04:06:19.202Z"
+    }
+  },
+  "convergence": {
+    "sampleSize": 200,
+    "generatedAt": "2026-06-10T03:26:19.731Z",
+    "qdrant": {
+      "hitRate": "97.0%",
+      "hitRateExcludingDeleted": "99.0%",
+      "deletedFromDisk": 4,
+      "notYetIndexed": 2,
+      "collectionSize": 54195
+    },
+    "karpathy": {
+      "hitRate": "44.5%",
+      "hits": 89,
+      "misses": 111
+    },
+    "neo4j": {
+      "canonicalMatchRate": "100.0%"
+    },
+    "fullyAligned": "44.5%"
+  },
+  "knownGaps": [
+    {
+      "id": "cluster_id_bridge",
+      "severity": "deferred",
+      "description": "task_semantic_packets.cluster_id is NULL for all 302 rows. atlas_feature_map.cluster_id holds numeric GPU k-means assignments (many-to-many with feature_id). GPU cluster → task packet bridge is not yet implemented.",
+      "blocksShipping": false
+    },
+    {
+      "id": "karpathy_coverage",
+      "severity": "advisory",
+      "description": "Karpathy Redis scores cover the top-200 PageRank files (223 entries). Random-sample hit rate is 44.5%. Run npm run karpathy:gpu:top200 on a wider sample to raise coverage.",
+      "blocksShipping": false
+    },
+    {
+      "id": "nes_chrom_packets_scale",
+      "severity": "advisory",
+      "description": "nes_chrom_packets has 27 rows across 18 features and 2 lanes. CHR97 lineage is structurally sound but not yet at full production scale.",
+      "blocksShipping": false
+    },
+    {
+      "id": "ncp_qdrant_id_partial",
+      "severity": "advisory",
+      "description": "nes_chrom_packets: 20/27 (74.1%) have a qdrant_point_id. The 7 without IDs are still fully resolvable via source_ref and chunk_id joins.",
+      "blocksShipping": false
+    }
+  ]
+}

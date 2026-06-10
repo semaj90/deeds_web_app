@@ -1,6 +1,6 @@
 {
   "schema": "parent_atlas_production_readiness.v1",
-  "generatedAt": "2026-06-06T18:05:22.494Z",
+  "generatedAt": "2026-06-10T04:06:19.202Z",
   "readOnly": true,
   "sections": {
     "summary-batch": [
@@ -110,7 +110,7 @@
         "message": "sveltekit-frontend/scripts/train-autoencoder.mjs exists",
         "details": {
           "exists": true,
-          "bytes": 21827,
+          "bytes": 21334,
           "relPath": "sveltekit-frontend/scripts/train-autoencoder.mjs"
         }
       },
@@ -317,7 +317,7 @@
         "message": "sveltekit-frontend/src/lib/server/db/schema/index.ts exists",
         "details": {
           "exists": true,
-          "bytes": 4084,
+          "bytes": 4146,
           "relPath": "sveltekit-frontend/src/lib/server/db/schema/index.ts"
         }
       },
@@ -459,7 +459,7 @@
         "message": "scripts/atlas/ndjson-mapreduce-join.mjs exists",
         "details": {
           "exists": true,
-          "bytes": 19979,
+          "bytes": 20624,
           "relPath": "scripts/atlas/ndjson-mapreduce-join.mjs"
         }
       },
@@ -526,34 +526,34 @@
       {
         "id": "rg-uu:ndjson-inventory",
         "status": "pass",
-        "message": "rg -uuu found 128 NDJSON files",
+        "message": "rg -uuu found 125 NDJSON files",
         "details": {
           "sample": [
             "docs\\packets\\session-features.ndjson",
             "docs\\packets\\rg-knowledge-packets.ndjson",
             "docs\\ai-os\\agentic-progress-log.ndjson",
-            ".opencode\\recommendations\\tasks.ndjson",
-            ".opencode\\recommendations\\tasks-with-improved-titles.ndjson",
-            ".opencode\\quarantine\\invalid-cards.ndjson",
-            ".opencode\\outcome-ledger.ndjson",
-            ".opencode\\outcome-ledger-with-cardIds.ndjson",
+            "sveltekit-frontend\\tmp\\qdrant-embeddings-test.ndjson",
+            "sveltekit-frontend\\tmp\\hypergraph-assignments.ndjson",
+            "sveltekit-frontend\\tmp\\hypergraph\\codebase_chunks_768-embeddings.ndjson",
+            "sveltekit-frontend\\tmp\\hypergraph\\codebase_chunks_768-assignments.ndjson",
+            "sveltekit-frontend\\tmp\\embeddings-smoke.ndjson",
+            "sveltekit-frontend\\tmp\\codebase_chunks_768-embeddings.ndjson",
+            "sveltekit-frontend\\tmp\\chunks\\parents-corpus-rg.ndjson",
+            "sveltekit-frontend\\tmp\\chunks\\parents-corpus-expanded.ndjson",
+            "sveltekit-frontend\\tmp\\chunks\\parents-corpus-all.ndjson",
+            "sveltekit-frontend\\tmp\\chunks\\parents-corpus-4d.ndjson",
+            "sveltekit-frontend\\tmp\\assignments.ndjson",
+            "sveltekit-frontend\\tmp\\assignments-test.ndjson",
+            "sveltekit-frontend\\tmp\\assignments-ci.ndjson",
             ".tmp\\superseded-score-candidates.ndjson",
             ".tmp\\source-ref-repair-candidates.ndjson",
             ".tmp\\retrieval-pass-dry-run.ndjson",
             ".tmp\\path-map.ndjson",
-            "deeds_labs\\snapshots\\2026-03-15-root\\misc\\svelte-errors.ndjson",
             ".tmp\\parent_atlas_packets\\rg-dumps\\rg-dump-packets.ndjson",
+            "sveltekit-frontend\\sveltekit-frontend\\tmp\\embeddings-smoke.ndjson",
             ".tmp\\offline-synthesis\\hidden-packet-pathmap.ndjson",
             ".tmp\\offline-synthesis\\consolidated-index.ndjson",
-            ".tmp\\missing-sourceref.ndjson",
-            ".tmp\\mapreduce-test.ndjson",
-            ".tmp\\mapreduce-full.ndjson",
-            ".tmp\\mapreduce-full-v4.ndjson",
-            ".tmp\\mapreduce-full-v3.ndjson",
-            ".tmp\\mapreduce-full-v2.ndjson",
-            ".tmp\\ingest\\test-tasks.ndjson",
-            ".tmp\\ingest\\tasks.ndjson",
-            ".tmp\\ingest\\task-proposals.ndjson"
+            ".tmp\\missing-sourceref.ndjson"
           ]
         }
       }
@@ -602,9 +602,9 @@
       {
         "id": "table:route_runtime_packets",
         "status": "pass",
-        "message": "route_runtime_packets exists with 33 rows",
+        "message": "route_runtime_packets exists with 48 rows",
         "details": {
-          "count": 33
+          "count": 48
         }
       },
       {
@@ -666,15 +666,15 @@
       {
         "id": "route-runtime:sourceRefs",
         "status": "pass",
-        "message": "Runtime packets with sourceRefs: 30/33",
+        "message": "Runtime packets with sourceRefs: 29/48",
         "details": {}
       }
     ],
     "redis": [
       {
         "id": "lod0:route-runtime",
-        "status": "warn",
-        "message": "Redis LOD0 runtime packets: 0/33",
+        "status": "pass",
+        "message": "Redis LOD0 runtime packets: 3/48",
         "details": {}
       }
     ],
@@ -682,7 +682,7 @@
       {
         "id": "collection:codebase_chunks_768",
         "status": "pass",
-        "message": "Qdrant codebase_chunks_768 points: 76506",
+        "message": "Qdrant codebase_chunks_768 points: 54231",
         "details": {}
       }
     ],
@@ -690,7 +690,7 @@
       {
         "id": "contextual-tree",
         "status": "pass",
-        "message": "Neo4j CodebaseFile=25269, ParentAtlasFeature=1701",
+        "message": "Neo4j CodebaseFile=25461, ParentAtlasFeature=1701",
         "details": {}
       }
     ]
@@ -811,7 +811,7 @@
       "message": "sveltekit-frontend/scripts/train-autoencoder.mjs exists",
       "details": {
         "exists": true,
-        "bytes": 21827,
+        "bytes": 21334,
         "relPath": "sveltekit-frontend/scripts/train-autoencoder.mjs"
       }
     },
@@ -1031,7 +1031,7 @@
       "message": "sveltekit-frontend/src/lib/server/db/schema/index.ts exists",
       "details": {
         "exists": true,
-        "bytes": 4084,
+        "bytes": 4146,
         "relPath": "sveltekit-frontend/src/lib/server/db/schema/index.ts"
       }
     },
@@ -1185,7 +1185,7 @@
       "message": "scripts/atlas/ndjson-mapreduce-join.mjs exists",
       "details": {
         "exists": true,
-        "bytes": 19979,
+        "bytes": 20624,
         "relPath": "scripts/atlas/ndjson-mapreduce-join.mjs"
       }
     },
@@ -1259,34 +1259,34 @@
       "section": "offline",
       "id": "rg-uu:ndjson-inventory",
       "status": "pass",
-      "message": "rg -uuu found 128 NDJSON files",
+      "message": "rg -uuu found 125 NDJSON files",
       "details": {
         "sample": [
           "docs\\packets\\session-features.ndjson",
           "docs\\packets\\rg-knowledge-packets.ndjson",
           "docs\\ai-os\\agentic-progress-log.ndjson",
-          ".opencode\\recommendations\\tasks.ndjson",
-          ".opencode\\recommendations\\tasks-with-improved-titles.ndjson",
-          ".opencode\\quarantine\\invalid-cards.ndjson",
-          ".opencode\\outcome-ledger.ndjson",
-          ".opencode\\outcome-ledger-with-cardIds.ndjson",
+          "sveltekit-frontend\\tmp\\qdrant-embeddings-test.ndjson",
+          "sveltekit-frontend\\tmp\\hypergraph-assignments.ndjson",
+          "sveltekit-frontend\\tmp\\hypergraph\\codebase_chunks_768-embeddings.ndjson",
+          "sveltekit-frontend\\tmp\\hypergraph\\codebase_chunks_768-assignments.ndjson",
+          "sveltekit-frontend\\tmp\\embeddings-smoke.ndjson",
+          "sveltekit-frontend\\tmp\\codebase_chunks_768-embeddings.ndjson",
+          "sveltekit-frontend\\tmp\\chunks\\parents-corpus-rg.ndjson",
+          "sveltekit-frontend\\tmp\\chunks\\parents-corpus-expanded.ndjson",
+          "sveltekit-frontend\\tmp\\chunks\\parents-corpus-all.ndjson",
+          "sveltekit-frontend\\tmp\\chunks\\parents-corpus-4d.ndjson",
+          "sveltekit-frontend\\tmp\\assignments.ndjson",
+          "sveltekit-frontend\\tmp\\assignments-test.ndjson",
+          "sveltekit-frontend\\tmp\\assignments-ci.ndjson",
           ".tmp\\superseded-score-candidates.ndjson",
           ".tmp\\source-ref-repair-candidates.ndjson",
           ".tmp\\retrieval-pass-dry-run.ndjson",
           ".tmp\\path-map.ndjson",
-          "deeds_labs\\snapshots\\2026-03-15-root\\misc\\svelte-errors.ndjson",
           ".tmp\\parent_atlas_packets\\rg-dumps\\rg-dump-packets.ndjson",
+          "sveltekit-frontend\\sveltekit-frontend\\tmp\\embeddings-smoke.ndjson",
           ".tmp\\offline-synthesis\\hidden-packet-pathmap.ndjson",
           ".tmp\\offline-synthesis\\consolidated-index.ndjson",
-          ".tmp\\missing-sourceref.ndjson",
-          ".tmp\\mapreduce-test.ndjson",
-          ".tmp\\mapreduce-full.ndjson",
-          ".tmp\\mapreduce-full-v4.ndjson",
-          ".tmp\\mapreduce-full-v3.ndjson",
-          ".tmp\\mapreduce-full-v2.ndjson",
-          ".tmp\\ingest\\test-tasks.ndjson",
-          ".tmp\\ingest\\tasks.ndjson",
-          ".tmp\\ingest\\task-proposals.ndjson"
+          ".tmp\\missing-sourceref.ndjson"
         ]
       }
     },
@@ -1339,9 +1339,9 @@
       "section": "postgres",
       "id": "table:route_runtime_packets",
       "status": "pass",
-      "message": "route_runtime_packets exists with 33 rows",
+      "message": "route_runtime_packets exists with 48 rows",
       "details": {
-        "count": 33
+        "count": 48
       }
     },
     {
@@ -1411,28 +1411,28 @@
       "section": "postgres",
       "id": "route-runtime:sourceRefs",
       "status": "pass",
-      "message": "Runtime packets with sourceRefs: 30/33",
+      "message": "Runtime packets with sourceRefs: 29/48",
       "details": {}
     },
     {
       "section": "redis",
       "id": "lod0:route-runtime",
-      "status": "warn",
-      "message": "Redis LOD0 runtime packets: 0/33",
+      "status": "pass",
+      "message": "Redis LOD0 runtime packets: 3/48",
       "details": {}
     },
     {
       "section": "qdrant",
       "id": "collection:codebase_chunks_768",
       "status": "pass",
-      "message": "Qdrant codebase_chunks_768 points: 76506",
+      "message": "Qdrant codebase_chunks_768 points: 54231",
       "details": {}
     },
     {
       "section": "neo4j",
       "id": "contextual-tree",
       "status": "pass",
-      "message": "Neo4j CodebaseFile=25269, ParentAtlasFeature=1701",
+      "message": "Neo4j CodebaseFile=25461, ParentAtlasFeature=1701",
       "details": {}
     }
   ],
@@ -1443,7 +1443,7 @@
       "atlas_feature_map_synthesized": 14465,
       "nes_chrom_packets": 27,
       "nes_chrom_kag_dag_hits": 32,
-      "route_runtime_packets": 33,
+      "route_runtime_packets": 48,
       "task_semantic_packets": 302,
       "codebase_chunk_index": 40754,
       "agent_pickup_queue": 123
@@ -1472,36 +1472,36 @@
       "with_som_cluster": 16
     },
     "routeRuntimePackets": {
-      "total": 33,
-      "with_source_refs": 30,
-      "with_feature_ids": 30,
-      "with_qdrant_hits": 32,
-      "with_cluster": 1
+      "total": 48,
+      "with_source_refs": 29,
+      "with_feature_ids": 22,
+      "with_qdrant_hits": 43,
+      "with_cluster": 16
     }
   },
   "redis": {
     "available": true,
-    "latestRuntimePacketsChecked": 33,
-    "lod0Found": 0,
-    "lod0Missing": 33
+    "latestRuntimePacketsChecked": 48,
+    "lod0Found": 3,
+    "lod0Missing": 45
   },
   "qdrant": {
     "available": true,
     "url": "http://127.0.0.1:6333",
     "collection": "codebase_chunks_768",
-    "pointsCount": 76506,
-    "indexedVectorsCount": 210224,
-    "status": "grey"
+    "pointsCount": 54231,
+    "indexedVectorsCount": 111850,
+    "status": "green"
   },
   "neo4j": {
     "available": true,
     "uri": "bolt://127.0.0.1:7687",
-    "totalNodes": 58224,
-    "codebaseFiles": 25269,
+    "totalNodes": 163265,
+    "codebaseFiles": 25461,
     "parentAtlasFeatures": 1701,
-    "totalRelationships": 394257,
+    "totalRelationships": 502297,
     "belongsToFeature": 10506,
-    "similarTopology": 165005
+    "similarTopology": 166013
   },
   "drizzle": {
     "nesChromSchema": {
@@ -1516,7 +1516,7 @@
     },
     "schemaIndex": {
       "exists": true,
-      "bytes": 4084,
+      "bytes": 4146,
       "relPath": "sveltekit-frontend/src/lib/server/db/schema/index.ts"
     },
     "schemaPostgres": {
@@ -1588,7 +1588,7 @@
     },
     {
       "exists": true,
-      "bytes": 19979,
+      "bytes": 20624,
       "relPath": "scripts/atlas/ndjson-mapreduce-join.mjs"
     },
     {
@@ -1624,39 +1624,39 @@
   ],
   "ndjsonInventory": {
     "status": "pass",
-    "total": 128,
+    "total": 125,
     "sample": [
       "docs\\packets\\session-features.ndjson",
       "docs\\packets\\rg-knowledge-packets.ndjson",
       "docs\\ai-os\\agentic-progress-log.ndjson",
-      ".opencode\\recommendations\\tasks.ndjson",
-      ".opencode\\recommendations\\tasks-with-improved-titles.ndjson",
-      ".opencode\\quarantine\\invalid-cards.ndjson",
-      ".opencode\\outcome-ledger.ndjson",
-      ".opencode\\outcome-ledger-with-cardIds.ndjson",
+      "sveltekit-frontend\\tmp\\qdrant-embeddings-test.ndjson",
+      "sveltekit-frontend\\tmp\\hypergraph-assignments.ndjson",
+      "sveltekit-frontend\\tmp\\hypergraph\\codebase_chunks_768-embeddings.ndjson",
+      "sveltekit-frontend\\tmp\\hypergraph\\codebase_chunks_768-assignments.ndjson",
+      "sveltekit-frontend\\tmp\\embeddings-smoke.ndjson",
+      "sveltekit-frontend\\tmp\\codebase_chunks_768-embeddings.ndjson",
+      "sveltekit-frontend\\tmp\\chunks\\parents-corpus-rg.ndjson",
+      "sveltekit-frontend\\tmp\\chunks\\parents-corpus-expanded.ndjson",
+      "sveltekit-frontend\\tmp\\chunks\\parents-corpus-all.ndjson",
+      "sveltekit-frontend\\tmp\\chunks\\parents-corpus-4d.ndjson",
+      "sveltekit-frontend\\tmp\\assignments.ndjson",
+      "sveltekit-frontend\\tmp\\assignments-test.ndjson",
+      "sveltekit-frontend\\tmp\\assignments-ci.ndjson",
       ".tmp\\superseded-score-candidates.ndjson",
       ".tmp\\source-ref-repair-candidates.ndjson",
       ".tmp\\retrieval-pass-dry-run.ndjson",
       ".tmp\\path-map.ndjson",
-      "deeds_labs\\snapshots\\2026-03-15-root\\misc\\svelte-errors.ndjson",
       ".tmp\\parent_atlas_packets\\rg-dumps\\rg-dump-packets.ndjson",
+      "sveltekit-frontend\\sveltekit-frontend\\tmp\\embeddings-smoke.ndjson",
       ".tmp\\offline-synthesis\\hidden-packet-pathmap.ndjson",
       ".tmp\\offline-synthesis\\consolidated-index.ndjson",
-      ".tmp\\missing-sourceref.ndjson",
-      ".tmp\\mapreduce-test.ndjson",
-      ".tmp\\mapreduce-full.ndjson",
-      ".tmp\\mapreduce-full-v4.ndjson",
-      ".tmp\\mapreduce-full-v3.ndjson",
-      ".tmp\\mapreduce-full-v2.ndjson",
-      ".tmp\\ingest\\test-tasks.ndjson",
-      ".tmp\\ingest\\tasks.ndjson",
-      ".tmp\\ingest\\task-proposals.ndjson"
+      ".tmp\\missing-sourceref.ndjson"
     ]
   },
   "summary": {
     "counts": {
-      "pass": 63,
-      "warn": 3,
+      "pass": 64,
+      "warn": 2,
       "fail": 0
     }
   },
@@ -1948,7 +1948,7 @@
       },
       "trainAutoencoderMjs": {
         "exists": true,
-        "bytes": 21827,
+        "bytes": 21334,
         "relPath": "sveltekit-frontend/scripts/train-autoencoder.mjs"
       },
       "somPipeline": {

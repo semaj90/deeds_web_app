@@ -31,6 +31,7 @@
   },
   // ensure the proto outputs are part of the project used by eslint's parser
   "include": [
+    ".opencode/tools/**/*.ts",
     "src/**/*",
     "tests/**/*",
     "uno.config.ts",

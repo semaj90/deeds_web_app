@@ -70,6 +70,7 @@ function computeAttentionScoresGpu(queryVector, corpusVectors, dim) {
 // ── Args ──────────────────────────────────────────────────────────────────────
 const args = process.argv.slice(2);
 const DRY = args.includes('--dry-run');
+const DRY_RUN_CANDIDATES = args.includes('--dry-run-candidates'); // print candidate funnel only, no GPU
 // FP16 is the default when the GPU addon supports it; --fp32 forces CPU path
 const FORCE_FP32 = args.includes('--fp32');
 const ENABLE_FP16 = !FORCE_FP32; // auto-enabled; was --fp16 flag (H4)
@@ -638,6 +639,58 @@ async function main() {
     console.log('[karpathy] Qdrant matched_by field distribution:', matchedByDist);
   }
 
+  // ── Candidate funnel summary ─────────────────────────────────────────────────
+  const candidatesFromNeo4j = candidates.length;
+  const candidatesWithEmbeddings = embeddingMap.size;
+  const candidatesNoEmbedding = candidatesFromNeo4j - candidatesWithEmbeddings;
+
+  // Check Redis for already-scored count (read-only, best-effort)
+  let alreadyScoredCount = 0;
+  let totalScoresInRedis = 0;
+  try {
+    const _funnelRedis = new Redis(REDIS_URL, {
+      password: REDIS_PASS || undefined,
+      lazyConnect: true, maxRetriesPerRequest: 1,
+      enableOfflineQueue: false, retryStrategy: () => null,
+    });
+    _funnelRedis.on('error', () => {});
+    await _funnelRedis.connect().catch(() => {});
+    totalScoresInRedis = await _funnelRedis.hlen('gpu:karpathy:scores').catch(() => 0);
+    // count how many candidates are already in Redis
+    const pipe = _funnelRedis.pipeline();
+    for (const c of candidates) {
+      const normKey = _canonNorm(c.stableKey) ?? normalizeRepoPath(c.stableKey) ?? c.stableKey;
+      pipe.hexists('gpu:karpathy:scores', normKey);
+    }
+    const existsResults = await pipe.exec().catch(() => []);
+    alreadyScoredCount = existsResults.filter(([, v]) => v === 1).length;
+    await _funnelRedis.quit().catch(() => {});
+  } catch { /* Redis unavailable — skip */ }
+
+  const newlyScored = candidatesWithEmbeddings - alreadyScoredCount;
+
+  console.log('\n[karpathy] === Candidate Funnel ===');
+  console.log(`  target_limit              : ${LIMIT}`);
+  console.log(`  candidates_from_neo4j     : ${candidatesFromNeo4j}  (fetched ${LIMIT * 2} from Neo4j, deduped to ${candidatesFromNeo4j})`);
+  console.log(`  candidates_with_embeddings: ${candidatesWithEmbeddings}`);
+  console.log(`  skipped_no_qdrant_hit     : ${candidatesNoEmbedding}`);
+  console.log(`  already_scored_in_redis   : ${alreadyScoredCount}`);
+  console.log(`  newly_scored_estimate     : ${newlyScored > 0 ? newlyScored : 0}`);
+  console.log(`  total_scores_in_redis     : ${totalScoresInRedis}`);
+  if (candidatesNoEmbedding > 0) {
+    const topMissed = candidates
+      .filter(c => { const k = normalizeRepoPath(c.stableKey); return k && !embeddingMap.has(k); })
+      .slice(0, 5)
+      .map(c => `${normalizeRepoPath(c.stableKey) ?? c.stableKey} (PR: ${c.pr?.toFixed?.(3)})`);
+    console.log(`  top_skipped_no_embedding  :\n    ${topMissed.join('\n    ')}`);
+  }
+  console.log('');
+
+  if (DRY_RUN_CANDIDATES) {
+    console.log('[karpathy] --dry-run-candidates: stopping before GPU pass.');
+    return;
+  }
+
   // Shared Redis client for probe cache + later score writes
   let _earlyRedis = null;
   if (!DRY) {
@@ -864,6 +917,16 @@ async function main() {
     }
     writeFileSync(REPORT, md);
   }
+
+  // Final run summary
+  console.log('\n[karpathy] === Run Summary ===');
+  console.log(`  requested_limit           : ${LIMIT}`);
+  console.log(`  candidates_from_neo4j     : ${candidatesFromNeo4j}`);
+  console.log(`  candidates_with_embeddings: ${candidatesWithEmbeddings}`);
+  console.log(`  skipped_no_qdrant_hit     : ${candidatesNoEmbedding}`);
+  console.log(`  newly_scored              : ${finalResults.length}`);
+  console.log(`  total_scores_in_redis     : ${totalScoresInRedis + finalResults.length}`);
+  console.log('');
 
   const logFile = resolve(LOG_DIR, `karpathy-gpu-${Date.now()}.json`);
   writeFileSync(logFile, JSON.stringify({ ...log_state, results: finalResults }, null, 2));

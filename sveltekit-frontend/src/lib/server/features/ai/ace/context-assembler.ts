@@ -87,7 +87,7 @@ import {
 } from '$lib/server/gpu/libtorch-bridge.js';
 import { logInference } from '$lib/server/observability/inference-log.js';
 import { determineACEPolicy } from '../../../ace/policy.js';
-import { fetchDbSchemaContext } from '$lib/server/ai/hermes/tools/db-schema-tools.js';
+import { fetchDbSchemaContext } from '$lib/server/ai/ldr/db-schema-tools.js';
 import {
   recordChunkHits,
   recordQueryLog,

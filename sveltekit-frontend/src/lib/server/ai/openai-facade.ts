@@ -105,7 +105,7 @@ interface RunOpts {
 function resolveInternalModel(requested: string): string {
   // Drop any trailing `:latest` to normalise comparisons
   const m = requested.toLowerCase().replace(/:latest$/, '');
-  if (m === 'yorha-hermes' || m === 'gemma4-rotorquant:latest') return 'gemma4-rotorquant:latest';
+  if (m === 'yorha-ldr' || m === 'gemma4-rotorquant:latest') return 'gemma4-rotorquant:latest';
   if (m.startsWith('yorha') || m.startsWith('legal') || m.includes('vlm')) {
     return 'gemma4-rotorquant:latest';
   }
@@ -329,32 +329,76 @@ async function persistEngramChatMemory(input: {
   }
 }
 
-type InferenceLane = 'hermes' | 'turboquant' | 'bifrost';
+type InferenceLane = 'ldr' | 'turboquant' | 'bifrost';
 
-async function runHermesChat(
+async function runLdrChat(
   messages: Array<{ role: 'user' | 'assistant' | 'system'; content: string }>,
-  maxTokens: number,
-  temperature?: number
+  _maxTokens: number,
+  _temperature?: number
 ): Promise<string> {
-  const res = await fetch(`${ENV.HERMES_API_URL}/v1/chat/completions`, {
+  const base = ENV.LDR_BASE_URL;
+  // Build a query string from the last user message
+  const lastUser = [...messages].reverse().find(m => m.role === 'user');
+  const query = lastUser?.content ?? messages.map(m => m.content).join('\n');
+
+  // Authenticate with session cookie
+  const loginRes = await fetch(`${base}/api/auth/login`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
-      model: 'gemma4-rotorquant:latest',
-      messages,
-      max_tokens: maxTokens,
-      temperature: temperature ?? 0.2,
-      stream: false,
+      username: ENV.LDR_USERNAME ?? 'admin',
+      password: ENV.LDR_PASSWORD ?? 'admin',
     }),
-    signal: AbortSignal.timeout(120_000),
+    signal: AbortSignal.timeout(15_000),
+  });
+  const setCookie = loginRes.headers.get('set-cookie') ?? '';
+  const sessionCookie = setCookie.split(';')[0] ?? '';
+
+  // Start research
+  const startRes = await fetch(`${base}/api/start_research`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      ...(sessionCookie ? { Cookie: sessionCookie } : {}),
+    },
+    body: JSON.stringify({ query, mode: 'quick' }),
+    signal: AbortSignal.timeout(15_000),
   });
 
-  if (!res.ok) {
-    throw new Error(`Hermes chat failed (${res.status}): ${await res.text().catch(() => '')}`);
+  if (!startRes.ok) {
+    throw new Error(`LDR start_research failed (${startRes.status}): ${await startRes.text().catch(() => '')}`);
   }
 
-  const data = (await res.json()) as { choices?: Array<{ message?: { content?: string } }> };
-  return data.choices?.[0]?.message?.content ?? '';
+  const { research_id } = (await startRes.json()) as { research_id: string };
+
+  // Poll until complete (max 120s)
+  const deadline = Date.now() + 120_000;
+  while (Date.now() < deadline) {
+    await new Promise(r => setTimeout(r, 3000));
+    const statusRes = await fetch(`${base}/api/status/${research_id}`, {
+      headers: sessionCookie ? { Cookie: sessionCookie } : {},
+      signal: AbortSignal.timeout(10_000),
+    });
+    if (!statusRes.ok) continue;
+    const status = (await statusRes.json()) as { status: string };
+    if (status.status === 'complete' || status.status === 'completed') break;
+    if (status.status === 'error' || status.status === 'failed') {
+      throw new Error(`LDR research failed: ${JSON.stringify(status)}`);
+    }
+  }
+
+  // Fetch report
+  const reportRes = await fetch(`${base}/api/report/${research_id}`, {
+    headers: sessionCookie ? { Cookie: sessionCookie } : {},
+    signal: AbortSignal.timeout(15_000),
+  });
+
+  if (!reportRes.ok) {
+    throw new Error(`LDR report fetch failed (${reportRes.status})`);
+  }
+
+  const report = (await reportRes.json()) as { content?: string; summary?: string };
+  return report.content ?? report.summary ?? '';
 }
 
 function clampRequestedMaxTokens(requested: number | undefined): number {
@@ -410,14 +454,14 @@ function determineInferenceLane(
     acePacketTokens > 6000 ||
     requestedMaxTokens > 4096
   ) {
-    return 'hermes';
+    return 'ldr';
   }
 
   if (hasSpecializedRetrieval) {
-    return canUseTurboQuantNow ? 'turboquant' : 'hermes';
+    return canUseTurboQuantNow ? 'turboquant' : 'ldr';
   }
 
-  return canUseTurboQuantNow ? 'turboquant' : 'hermes';
+  return canUseTurboQuantNow ? 'turboquant' : 'ldr';
 }
 
 type AceSelectedLane = 'redis' | 'turboquant' | 'bifrost';
@@ -549,7 +593,7 @@ export async function runChatCompletion(
         content: cachedScenario.response,
         model: internalModel,
         durationMs: Date.now() - startMs,
-        inferenceLane: cachedScenario.source === 'redis' ? undefined : (canUseTurboQuantNow ? 'turboquant' : 'hermes'),
+        inferenceLane: cachedScenario.source === 'redis' ? undefined : (canUseTurboQuantNow ? 'turboquant' : 'ldr'),
         runtimeProfile: runtime.profile,
         runtimeAvailable: runtime.runtimeAvailable,
         turboQuantEnabled: runtime.turboQuant,
@@ -642,7 +686,7 @@ export async function runChatCompletion(
     let text: string;
     const selectedLane = 'bifrost';
     if (selectedLane === 'bifrost') {
-      text = await runHermesChat(mappedMsgs, requestedMaxTokens, req.temperature);
+      text = await runLdrChat(mappedMsgs, requestedMaxTokens, req.temperature);
     } else if (canUseTurboQuantNow) {
       try {
         const result = await turboQuantChat(mappedMsgs, internalModel, {
@@ -741,14 +785,14 @@ export async function runChatCompletion(
       query,
       answer: agentResult.answer,
       model: internalModel,
-      selectedLane: canUseTurboQuantNow ? 'turboquant' : 'hermes',
+      selectedLane: canUseTurboQuantNow ? 'turboquant' : 'ldr',
       cacheHit: agentResult.cacheTier ? 'prior-answer' : 'none',
     });
     return wrapResponse({
       content: agentResult.answer,
       model: internalModel,
       durationMs: Date.now() - startMs,
-      inferenceLane: canUseTurboQuantNow ? 'turboquant' : 'hermes',
+      inferenceLane: canUseTurboQuantNow ? 'turboquant' : 'ldr',
       runtimeProfile: runtime.profile,
       runtimeAvailable: runtime.runtimeAvailable,
       turboQuantEnabled: runtime.turboQuant,
@@ -1524,11 +1568,11 @@ export async function runChatCompletion(
         text = await runBifrost();
       } catch (bifrostErr) {
         fallbackReason = `${fallbackReason};bifrost_failed`;
-        console.warn('[ACE Lane Router] Bifrost fallback failed; trying Hermes:', bifrostErr);
-        const hermesStartedMs = Date.now();
-        text = await runHermesChat(messages, requestedMaxTokens, req.temperature);
+        console.warn('[ACE Lane Router] Bifrost fallback failed; trying LDR:', bifrostErr);
+        const ldrStartedMs = Date.now();
+        text = await runLdrChat(messages, requestedMaxTokens, req.temperature);
         // Keep generation lane aligned with the actual fallback backend.
-        bifrostMs = Math.max(bifrostMs, Date.now() - hermesStartedMs);
+        bifrostMs = Math.max(bifrostMs, Date.now() - ldrStartedMs);
       }
     }
   } else {
@@ -1542,16 +1586,16 @@ export async function runChatCompletion(
           text = await runTurboquant();
         } catch (turboErr) {
           fallbackReason = `${fallbackReason};turboquant_failed`;
-          console.warn('[ACE Lane Router] TurboQuant fallback failed; trying Hermes:', turboErr);
-          const hermesStartedMs = Date.now();
-          text = await runHermesChat(messages, requestedMaxTokens, req.temperature);
-          bifrostMs = Math.max(bifrostMs, Date.now() - hermesStartedMs);
+          console.warn('[ACE Lane Router] TurboQuant fallback failed; trying LDR:', turboErr);
+          const ldrStartedMs2 = Date.now();
+          text = await runLdrChat(messages, requestedMaxTokens, req.temperature);
+          bifrostMs = Math.max(bifrostMs, Date.now() - ldrStartedMs2);
         }
       } else {
         fallbackReason = `${fallbackReason};turboquant_unavailable`;
-        const hermesStartedMs = Date.now();
-        text = await runHermesChat(messages, requestedMaxTokens, req.temperature);
-        bifrostMs = Math.max(bifrostMs, Date.now() - hermesStartedMs);
+        const ldrStartedMs3 = Date.now();
+        text = await runLdrChat(messages, requestedMaxTokens, req.temperature);
+        bifrostMs = Math.max(bifrostMs, Date.now() - ldrStartedMs3);
       }
     }
   }
@@ -1798,7 +1842,7 @@ function wrapResponse(args: {
     packetHit?: boolean;
     topK?: number;
   };
-  inferenceLane?: 'hermes' | 'turboquant' | 'bifrost';
+  inferenceLane?: 'ldr' | 'turboquant' | 'bifrost';
   runtimeProfile?: string;
   runtimeAvailable?: boolean;
   turboQuantEnabled?: boolean;
@@ -1918,7 +1962,7 @@ export const ADVERTISED_MODELS = [
   { id: 'gemma4-raw',     owned_by: 'local' },  // → gemma4-rotorquant:latest (direct, no ACE)
   { id: 'yorha-legal',    owned_by: 'yorha' },   // → gemma4-rotorquant:latest (alias)
   { id: 'yorha-fast',     owned_by: 'yorha' },   // → gemma3:270m
-  { id: 'yorha-hermes',   owned_by: 'yorha' },   // → hermes composer (HERMES_API_URL → bifrostChat gemma4-rotorquant:latest)
+  { id: 'yorha-ldr',      owned_by: 'yorha' },   // → local-deep-research (LDR_BASE_URL → gemma4-hermes-64k:latest)
   { id: 'gemma4-rotorquant:latest',   owned_by: 'yorha' },   // → gemma4-rotorquant:latest explicit
   { id: 'gemma3-legal',   owned_by: 'yorha' },   // → gemma3-legal
   { id: 'gemma3:270m',    owned_by: 'ollama' },

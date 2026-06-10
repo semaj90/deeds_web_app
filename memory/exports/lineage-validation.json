@@ -1,0 +1,82 @@
+{
+  "ts": "2026-06-10T03:49:35.863Z",
+  "overall": "PASS",
+  "passed": 7,
+  "failed": 0,
+  "checks": [
+    {
+      "id": "L1:atlas_feature_map",
+      "status": "pass",
+      "message": "atlas_feature_map: 14471 rows, 10947 with feature_id (75.6%), 1122 distinct features",
+      "detail": {
+        "total": 14471,
+        "with_feature": 10947,
+        "with_source_ref": 14471,
+        "distinct_features": 1122
+      }
+    },
+    {
+      "id": "L2:task_semantic_packets",
+      "status": "pass",
+      "message": "task_semantic_packets: 302 rows, feature_id 302/302, hash 302/302",
+      "detail": {
+        "total": 302,
+        "with_feature": 302,
+        "with_hash": 302,
+        "with_canonical": 302,
+        "distinct_features": 14
+      }
+    },
+    {
+      "id": "L3:nes_chrom_packets",
+      "status": "pass",
+      "message": "nes_chrom_packets: 27 rows, 18 features, 2 lanes, 27 with summary",
+      "detail": {
+        "total": 27,
+        "with_feature": 27,
+        "with_source_ref": 27,
+        "with_summary": 27,
+        "distinct_features": 18,
+        "distinct_lanes": 2
+      }
+    },
+    {
+      "id": "L4:chr97_sprites",
+      "status": "pass",
+      "message": "chr97-sprites.ndjson: 200 lines, engramKey present: true, sprite.hash present: true",
+      "detail": {
+        "path": "C:\\Users\\james\\Videos\\deeds-web-app\\.tmp\\ingest\\chr97-sprites.ndjson",
+        "lines": 200
+      }
+    },
+    {
+      "id": "L5:chr97_eval_bouts",
+      "status": "pass",
+      "message": "chr97-eval-bouts.ndjson: 1500 lines",
+      "detail": {
+        "path": "C:\\Users\\james\\Videos\\deeds-web-app\\.tmp\\ingest\\chr97-eval-bouts.ndjson",
+        "lines": 1500
+      }
+    },
+    {
+      "id": "L6:nes_chrom_kag_dag_hits",
+      "status": "pass",
+      "message": "nes_chrom_kag_dag_hits: 32 entries, 15 distinct nodes, 26 distinct chunks",
+      "detail": {
+        "total": 32,
+        "distinct_nodes": 15,
+        "distinct_chunks": 26
+      }
+    },
+    {
+      "id": "L7:feature_id_crosscheck",
+      "status": "pass",
+      "message": "nes_chrom feature_ids in atlas_feature_map: 18/18",
+      "detail": {
+        "total": 18,
+        "inAtlas": 18,
+        "missing": []
+      }
+    }
+  ]
+}

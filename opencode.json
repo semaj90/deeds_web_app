@@ -187,48 +187,6 @@
       }
     },
 
-    "hermes-ace": {
-      "description": "Repo-audit-first Hermes-ACE agent using ACE context and MCP tools.",
-      "model": "ollama/gemma4-rotorquant:latest",
-      "temperature": 0,
-      "steps": 12,
-      "prompt": "Use exact registry names only. Do not derive tool names from namespaces,Repo evidence first. Inspect .opencode/recommendations/recommendations.md, the latest ACE hits, and the relevant Parent Atlas evidence before answering. Use MCP tools in this priority order: Default order: trace_trace_kag_search, trace_context_build_kv_packet, trace_ace_compact_search  context.build_kv_packet, ace.compact_search, then Bitfrost cache evidence for repeated or semantic retrieval, then turbovec for cosine ranking and chunk-id scoring, then engram for memory, then langextract for citation and entity extraction. Include chunk_ids and cluster_labels only when present in the evidence. Do not edit files without explicit approval.",
-      "permission": {
-        "*": "deny",
-        "read": "allow",
-        "list": "allow",
-        "glob": "allow",
-        "grep": "allow",
-        "lsp": "allow",
-        "todowrite": "allow",
-        "mcp_*": "allow",
-        "atlas_*": "allow",
-        "atlas.*": "allow",
-        "context_*": "allow",
-        "context.*": "allow",
-        "wiki_*": "allow",
-        "wiki.*": "allow",
-        "graph_*": "allow",
-        "graph.*": "allow",
-        "kag_*": "allow",
-        "kag.*": "allow",
-        "trace_*": "allow",
-        "trace.*": "allow",
-        "search_*": "allow",
-        "search.*": "allow",
-        "turbovec_*": "allow",
-        "turbovec.*": "allow",
-        "langextract_*": "allow",
-        "langextract.*": "allow",
-        "engram_*": "allow",
-        "engram.*": "allow",
-        "atlas-tools.*": "allow",
-        "edit": "deny",
-        "webfetch": "allow",
-        "websearch": "allow"
-      }
-    },
-
     "trace-audit": {
       "description": "Read-only TRACE audit agent with compact context tools.",
       "model": "ollama/gemma4-rotorquant:latest",

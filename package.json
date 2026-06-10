@@ -253,7 +253,6 @@
     "bench:turbo": "pwsh -NoProfile -ExecutionPolicy Bypass -File scripts/bench-openai-compatible.ps1",
     "bench:turbo:8k": "pwsh -NoProfile -ExecutionPolicy Bypass -File scripts/bench-openai-compatible.ps1 -MaxTokens 8192",
     "bench:turbo:16k": "pwsh -NoProfile -ExecutionPolicy Bypass -File scripts/bench-openai-compatible.ps1 -MaxTokens 16384",
-    "bench:hermes": "pwsh -NoProfile -ExecutionPolicy Bypass -File scripts/bench-openai-compatible.ps1 -BaseUrl http://127.0.0.1:11434/v1 -Model hermes3:latest -Label hermes-ollama",
     "turbo:status": "node sveltekit-frontend/scripts/ensure-llama-server.mjs",
     "turbo:start": "node sveltekit-frontend/scripts/ensure-llama-server.mjs --spawn --text-only",
     "turbo:start:detached": "node sveltekit-frontend/scripts/ensure-llama-server.mjs --spawn --text-only",
@@ -571,7 +570,7 @@
     "svelte-check": "^4.0.0",
     "ts-morph": "27.0.2",
     "tsx": "4.20.6",
-    "typescript": "^5.0.0",
+    "typescript": "5.9.3",
     "vite": "^6.0.0",
     "vitest": "^3.0.0"
   },

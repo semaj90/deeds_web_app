@@ -215,8 +215,6 @@ export const ENV = {
   RERANK_URL: privateEnv.RERANK_URL ?? privateEnv.RERANK_BASE_URL ?? `http://${LOOPBACK_IP}:8090`,
   VLM_BASE_URL: privateEnv.VLM_BASE_URL ?? `http://${LOOPBACK_IP}:8085`,
   LITERT_BASE_URL: privateEnv.LITERT_BASE_URL ?? `http://${LOOPBACK_IP}:8070`,
-  /** Hermes planner / tool-use executor (Python FastAPI, port 8642) */
-  HERMES_API_URL: privateEnv.HERMES_API_URL ?? privateEnv.HERMES_URL ?? `http://${LOOPBACK_IP}:8642`,
   // Neo4j graph database
   NEO4J_URI: privateEnv.NEO4J_URI ?? privateEnv.NEO4J_URL ?? `bolt://${LOOPBACK_IP}:7687`,
   NEO4J_USER: privateEnv.NEO4J_USER ?? privateEnv.NEO4J_USERNAME ?? 'neo4j',
@@ -321,6 +319,8 @@ export const ENV = {
   // Local Deep Research service (port 5000) — multi-engine research agent
   LDR_BASE_URL: privateEnv.LDR_BASE_URL ?? `http://${LOOPBACK_IP}:5000`,
   LDR_ENABLED: (privateEnv.LDR_ENABLED ?? 'true') === 'true',
+  LDR_USERNAME: privateEnv.LDR_USERNAME ?? 'admin',
+  LDR_PASSWORD: privateEnv.LDR_PASSWORD ?? 'admin',
   // RAG microservice (port 8103)
   RAG_SERVICE_URL: privateEnv.RAG_SERVICE_URL ?? `http://${LOOPBACK_IP}:8103`,
   // Image Synthesis + 3D Reconstruction service (Wan2.1 + DepthAnything, port 8092)

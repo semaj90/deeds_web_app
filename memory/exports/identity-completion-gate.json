@@ -1,37 +1,37 @@
 {
-  "ts": "2026-06-09T23:05:28.118Z",
+  "ts": "2026-06-10T04:05:42.886Z",
   "gates": {
     "qdrant_feature_id": {
       "status": "PASS",
       "threshold": 0.95,
-      "coverage": 0.9840206661131101,
-      "coveragePct": "98.4%",
+      "coverage": 0.9833674466633475,
+      "coveragePct": "98.3%",
       "numerator": 53329,
-      "denominator": 54195
+      "denominator": 54231
     },
     "qdrant_canonical_ref": {
       "status": "PASS",
       "threshold": 0.98,
-      "coverage": 0.9926192453178337,
+      "coverage": 0.992624144861795,
       "coveragePct": "99.3%",
-      "numerator": 53795,
-      "denominator": 54195
+      "numerator": 53831,
+      "denominator": 54231
     },
     "qdrant_som": {
       "status": "PASS",
       "threshold": 0.99,
-      "coverage": 0.9931728019189963,
+      "coverage": 0.9925135070347219,
       "coveragePct": "99.3%",
       "numerator": 53825,
-      "denominator": 54195
+      "denominator": 54231
     },
     "qdrant_karpathy": {
       "status": "PASS",
       "threshold": 0.03,
-      "coverage": 0.051646830888458346,
-      "coveragePct": "5.2%",
-      "numerator": 2799,
-      "denominator": 54195
+      "coverage": 0.0571444376832439,
+      "coveragePct": "5.7%",
+      "numerator": 3099,
+      "denominator": 54231
     },
     "neo4j_canonical": {
       "status": "PASS",
@@ -47,7 +47,7 @@
       "coverage": 1,
       "coveragePct": "100.0%",
       "numerator": 8150,
-      "denominator": 5420
+      "denominator": 5423
     }
   },
   "overall": "PASS"

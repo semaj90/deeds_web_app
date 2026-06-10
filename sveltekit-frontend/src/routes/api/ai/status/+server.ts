@@ -17,7 +17,7 @@ export const GET: RequestHandler = async ({ locals }) => {
         runtimeNotes: null,
         ollamaStatus: 'unauthorized',
         ollamaUrl: ENV.OLLAMA_BASE_URL ?? null,
-        hermesUrl: ENV.HERMES_API_URL ?? null,
+        ldrUrl: ENV.LDR_BASE_URL ?? null,
       },
       { status: 401 }
     );
@@ -47,6 +47,6 @@ export const GET: RequestHandler = async ({ locals }) => {
     runtimeNotes: runtime.notes,
     ollamaStatus,
     ollamaUrl: ENV.OLLAMA_BASE_URL ?? null,
-    hermesUrl: ENV.HERMES_API_URL ?? null,
+    ldrUrl: ENV.LDR_BASE_URL ?? null,
   });
 };

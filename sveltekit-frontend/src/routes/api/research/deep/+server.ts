@@ -1,7 +1,7 @@
 import { json } from '@sveltejs/kit';
 import { z } from 'zod';
 import type { RequestHandler } from './$types';
-import { executeDeepResearch } from '$lib/server/ai/hermes/deep-research-dag.js';
+import { executeDeepResearch } from '$lib/server/ai/ldr/deep-research.js';
 import { recordContextCacheAccess } from '$lib/server/cache/ace-context-cache-metrics.js';
 
 const bodySchema = z.object({

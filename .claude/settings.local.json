@@ -427,8 +427,7 @@
       "Bash(if [ -d \"src/routes/api/gpu\" ])",
       "Bash(then mkdir -p archived/routes/api)",
       "Bash(if [ -d \"src/routes/api/health/gpu\" ])",
-      "Bash(then mkdir -p archived/routes/api/health)",
-      "PowerShell(& 'C:\\\\Users\\\\james\\\\Videos\\\\deeds-web-app\\\\sveltekit-frontend\\\\scripts\\\\setup\\\\hermes\\\\start-hermes-stack.ps1' -NoBrowser 2>&1)"
+      "Bash(then mkdir -p archived/routes/api/health)"
     ],
     "deny": [],
     "ask": []

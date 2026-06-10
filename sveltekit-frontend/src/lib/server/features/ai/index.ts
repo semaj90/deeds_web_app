@@ -51,14 +51,6 @@ export * from './agents/trace-subagent-orchestrator.js';
 // From sveltekit-frontend/src/lib/server/features/ai/ai/gemma4-agent.ts
 export * from './ai/gemma4-agent.js';
 
-// From sveltekit-frontend/src/lib/server/features/ai/ai/hermes/deep-research-dag.ts
-export * from './ai/hermes/deep-research-dag.js';
-
-// From sveltekit-frontend/src/lib/server/features/ai/ai/hermes/dispatcher.ts
-export * from './ai/hermes/dispatcher.js';
-
-// From sveltekit-frontend/src/lib/server/features/ai/ai/hermes/tools/db-schema-tools.ts
-export * from './ai/hermes/tools/db-schema-tools.js';
 
 // From sveltekit-frontend/src/lib/server/features/ai/ai/hypergraph-store.ts
 export * from './ai/hypergraph-store.js';

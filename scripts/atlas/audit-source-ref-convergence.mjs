@@ -14,7 +14,7 @@
  *   node scripts/atlas/audit-source-ref-convergence.mjs --sample 50
  */
 
-import { mkdirSync, writeFileSync } from 'node:fs';
+import { mkdirSync, writeFileSync, existsSync } from 'node:fs';
 import { resolve, dirname } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import Redis from 'ioredis';
@@ -116,20 +116,44 @@ const sample = sampleFiles.map(f => {
 }).filter(f => f.canonical && f.hash);
 console.log(`[2/5] ${sample.length} files have resolvable canonical form`);
 
+// ── Disk existence check (used to classify Qdrant misses) ────────────────────
+
+const REPO_ROOT = REPO;
+const SVELTE_ROOT = resolve(REPO, 'sveltekit-frontend');
+
+function fileExistsOnDisk(canonical) {
+  if (!canonical) return false;
+  // Check under repo root and sveltekit-frontend
+  return existsSync(resolve(REPO_ROOT, canonical))
+    || existsSync(resolve(SVELTE_ROOT, canonical));
+}
+
 // ── 3. Check Qdrant for each hash ─────────────────────────────────────────────
 
 console.log('\n[3/5] Checking Qdrant hits per hash...');
 let qdrantHits = 0, qdrantMisses = 0;
+let diskDeletedCount = 0, notYetIndexedCount = 0;
 const qdrantResults = [];
 for (let i = 0; i < sample.length; i++) {
   const f = sample[i];
   const count = await qdrantHashLookup(f.hash);
   const hit = count > 0;
-  if (hit) qdrantHits++; else qdrantMisses++;
-  qdrantResults.push({ ...f, qdrantChunks: count });
+  if (hit) {
+    qdrantHits++;
+    qdrantResults.push({ ...f, qdrantChunks: count, missClass: 'qdrant_hit' });
+  } else {
+    qdrantMisses++;
+    const onDisk = fileExistsOnDisk(f.canonical);
+    const missClass = onDisk ? 'not_yet_indexed' : 'deleted_from_disk';
+    if (onDisk) notYetIndexedCount++; else diskDeletedCount++;
+    qdrantResults.push({ ...f, qdrantChunks: count, missClass });
+  }
   if ((i + 1) % 20 === 0) process.stdout.write(`  [${i + 1}/${sample.length}]\r`);
 }
-console.log(`\n[3/5] Qdrant: ${qdrantHits} hits / ${qdrantMisses} misses (${((qdrantHits/sample.length)*100).toFixed(1)}%)`);
+const indexableCount = sample.length - diskDeletedCount;
+const adjustedHitRate = indexableCount > 0 ? ((qdrantHits / indexableCount) * 100).toFixed(1) : '0.0';
+console.log(`\n[3/5] Qdrant: ${qdrantHits} hits / ${qdrantMisses} misses (${((qdrantHits/sample.length)*100).toFixed(1)}% raw, ${adjustedHitRate}% excluding deleted)`);
+console.log(`       deleted_from_disk: ${diskDeletedCount}  |  not_yet_indexed: ${notYetIndexedCount}`);
 
 // ── 4. Check Karpathy Redis ───────────────────────────────────────────────────
 
@@ -190,10 +214,17 @@ const neo4jCanonicalMatch = sample.filter(f => f.neo4jCanonical === f.canonical)
 
 // Files that miss Qdrant but have karpathy (should be re-indexed)
 const needsReindex = finalResults.filter(f => f.qdrantChunks === 0 && f.karpathyScore !== null);
-// Files that miss both Qdrant and karpathy (never indexed)
-const neverIndexed = finalResults.filter(f => f.qdrantChunks === 0 && f.karpathyScore === null);
+// Files deleted from disk (phantom Neo4j nodes — not a real miss)
+const deletedFromDisk = finalResults.filter(f => f.missClass === 'deleted_from_disk');
+// Files on disk but missing from both Qdrant and karpathy (truly never indexed)
+const notYetIndexed = finalResults.filter(f => f.missClass === 'not_yet_indexed' && f.karpathyScore === null);
 // All-systems-hit
 const fullyAligned = finalResults.filter(f => f.qdrantChunks > 0 && f.karpathyScore !== null);
+
+const indexable = finalResults.filter(f => f.missClass !== 'deleted_from_disk');
+const adjustedQdrantHitRate = indexable.length > 0
+  ? `${((qdrantHits / indexable.length) * 100).toFixed(1)}%`
+  : '0.0%';
 
 const report = {
   generatedAt: new Date().toISOString(),
@@ -207,6 +238,9 @@ const report = {
       hits: qdrantHits,
       misses: qdrantMisses,
       hitRate: `${((qdrantHits / sample.length) * 100).toFixed(1)}%`,
+      hitRateExcludingDeleted: adjustedQdrantHitRate,
+      deletedFromDisk: deletedFromDisk.length,
+      notYetIndexed: notYetIndexed.length,
       collectionSizeAfterPrune: 54195,
     },
     karpathy: {
@@ -224,10 +258,12 @@ const report = {
     fullyAligned: fullyAligned.length,
     fullyAlignedPct: `${((fullyAligned.length / sample.length) * 100).toFixed(1)}%`,
     needsReindex: needsReindex.length,
-    neverIndexed: neverIndexed.length,
+    deletedFromDisk: deletedFromDisk.length,
+    notYetIndexed: notYetIndexed.length,
   },
   needsReindexSample: needsReindex.slice(0, 20).map(f => ({ canonical: f.canonical, pr: f.pr })),
-  neverIndexedSample: neverIndexed.slice(0, 20).map(f => ({ canonical: f.canonical, pr: f.pr })),
+  deletedFromDiskSample: deletedFromDisk.slice(0, 20).map(f => ({ canonical: f.canonical, pr: f.pr })),
+  notYetIndexedSample: notYetIndexed.slice(0, 20).map(f => ({ canonical: f.canonical, pr: f.pr })),
 };
 
 const md = [
@@ -241,7 +277,7 @@ const md = [
   `| System | Hits | Misses | Hit Rate |`,
   `|--------|------|--------|----------|`,
   `| Neo4j (canonical assigned) | ${neo4jHashed} | ${sample.length - neo4jHashed} | ${((neo4jHashed/sample.length)*100).toFixed(1)}% |`,
-  `| Qdrant (chunks by hash) | ${qdrantHits} | ${qdrantMisses} | ${report.systems.qdrant.hitRate} |`,
+  `| Qdrant (chunks by hash) | ${qdrantHits} | ${qdrantMisses} | ${report.systems.qdrant.hitRate} raw / ${report.systems.qdrant.hitRateExcludingDeleted} excl. deleted |`,
   `| Karpathy (Redis blend score) | ${karpHits} | ${karpMisses} | ${report.systems.karpathy.hitRate} |`,
   `| Atlas (task_semantic_packets) | ${atlasHits} | ${atlasMisses} | task refs, not file refs |`,
   ``,
@@ -251,15 +287,22 @@ const md = [
   `|--------|-------|---|`,
   `| Fully aligned (Neo4j + Qdrant + Karpathy) | ${fullyAligned.length} | ${report.convergence.fullyAlignedPct} |`,
   `| In Karpathy, missing from Qdrant (needs re-index) | ${needsReindex.length} | ${((needsReindex.length/sample.length)*100).toFixed(1)}% |`,
-  `| Missing from both Qdrant + Karpathy (never indexed) | ${neverIndexed.length} | ${((neverIndexed.length/sample.length)*100).toFixed(1)}% |`,
+  `| Deleted from disk (phantom Neo4j nodes) | ${deletedFromDisk.length} | ${((deletedFromDisk.length/sample.length)*100).toFixed(1)}% |`,
+  `| On disk but not yet indexed | ${notYetIndexed.length} | ${((notYetIndexed.length/sample.length)*100).toFixed(1)}% |`,
+  ``,
+  `> **Adjusted Qdrant hit rate** (excluding deleted-from-disk phantoms): **${adjustedQdrantHitRate}**`,
   ``,
   `## Files Needing Re-index (top ${Math.min(needsReindex.length, 20)})`,
   ``,
   ...needsReindex.slice(0, 20).map(f => `- \`${f.canonical}\` (PR: ${f.pr?.toFixed?.(3) ?? 'n/a'})`),
   ``,
-  `## Files Never Indexed (top ${Math.min(neverIndexed.length, 20)})`,
+  `## Deleted From Disk — Phantom Neo4j Nodes (top ${Math.min(deletedFromDisk.length, 20)})`,
   ``,
-  ...neverIndexed.slice(0, 20).map(f => `- \`${f.canonical}\` (PR: ${f.pr?.toFixed?.(3) ?? 'n/a'})`),
+  ...deletedFromDisk.slice(0, 20).map(f => `- \`${f.canonical}\` (PR: ${f.pr?.toFixed?.(3) ?? 'n/a'})`),
+  ``,
+  `## Not Yet Indexed — On Disk but Missing (top ${Math.min(notYetIndexed.length, 20)})`,
+  ``,
+  ...notYetIndexed.slice(0, 20).map(f => `- \`${f.canonical}\` (PR: ${f.pr?.toFixed?.(3) ?? 'n/a'})`),
 ].join('\n');
 
 const reportDir = resolve(REPO, 'docs/reports');
@@ -269,9 +312,11 @@ writeFileSync(resolve(reportDir, 'source-ref-convergence-report.md'), md);
 
 console.log('\n[convergence-audit] === Summary ===');
 console.log(`  Sample            : ${sample.length} files`);
-console.log(`  Qdrant hit rate   : ${report.systems.qdrant.hitRate}`);
+console.log(`  Qdrant hit rate   : ${report.systems.qdrant.hitRate} raw`);
+console.log(`  Qdrant hit rate   : ${adjustedQdrantHitRate} (excl. ${diskDeletedCount} deleted-from-disk)`);
 console.log(`  Karpathy hit rate : ${report.systems.karpathy.hitRate}`);
 console.log(`  Fully aligned     : ${fullyAligned.length}/${sample.length} (${report.convergence.fullyAlignedPct})`);
 console.log(`  Needs re-index    : ${needsReindex.length}`);
-console.log(`  Never indexed     : ${neverIndexed.length}`);
+console.log(`  Deleted from disk : ${deletedFromDisk.length}`);
+console.log(`  Not yet indexed   : ${notYetIndexed.length}`);
 console.log(`\n  Report → docs/reports/source-ref-convergence-report.md`);
