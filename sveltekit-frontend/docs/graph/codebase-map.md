@@ -1,5 +1,5 @@
 # Codebase Map — 20-Gate Deep Audit
-> Generated: 2026-06-10T18:59:00.446Z
+> Generated: 2026-06-10T19:15:14.506Z
 > Mode: `fast-ast` · CPU-only · No GPU required
 > Regenerate: `npm run index:codebase:fast:plan`
 
@@ -8,7 +8,7 @@
 ## Summary
 | Metric | Count |
 |--------|-------|
-| Files scanned | 23272 |
+| Files scanned | 23277 |
 | Directories analysed | 787 |
 | Route files | 1097 |
 | Svelte components | 917 |
@@ -31,13 +31,13 @@
 |------|-------|------|------|
 | G4  | Auth guard on API routes | 833 | 10 |
 | G5  | Zod validation on API routes | 583 | 1 |
-| G11 | No hardcoded localhost (excl env.server) | 22557 | 715 |
-| G14a | No `export let` (Svelte 4 props) | 23271 | 1 |
-| G14b | No `$:` reactive declarations | 23270 | 2 |
-| G14c | No `on:event=` directives | 23269 | 3 |
-| G14d | No `createEventDispatcher()` | 23272 | 0 |
-| G14e | No runes in plain `.ts` files | 23248 | 24 |
-| G15 | No SSR-unsafe globals (unguarded) | 23272 | 0 |
+| G11 | No hardcoded localhost (excl env.server) | 22562 | 715 |
+| G14a | No `export let` (Svelte 4 props) | 23276 | 1 |
+| G14b | No `$:` reactive declarations | 23275 | 2 |
+| G14c | No `on:event=` directives | 23274 | 3 |
+| G14d | No `createEventDispatcher()` | 23277 | 0 |
+| G14e | No runes in plain `.ts` files | 23253 | 24 |
+| G15 | No SSR-unsafe globals (unguarded) | 23277 | 0 |
 | G16 | Server routes have test pairing | 681 | 95 |
 | G17 | Server routes have error handling | 740 | 117 |
 | G20 | Cyclic import pairs | — | 1 |
@@ -357,9 +357,9 @@
 | ✅ | `sveltekit-frontend/.venv/Lib/python3.9` | 90 | 5 | 2421 | 0 | 0/0 | 0 | — |
 | ✅ | `sveltekit-frontend/.venv_turbovec/Lib/site-packages` | 90 | 1 | 7857 | 0 | 0/0 | 0 | — |
 | ✅ | `sveltekit-frontend/config` | 90 | 1 | 140 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/docs` | 90 | 1 | 5308005 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/docs` | 90 | 1 | 5308120 | 0 | 0/0 | 0 | — |
 | ✅ | `sveltekit-frontend/docs/atlas-index` | 90 | 4 | 61520 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/docs/graph` | 90 | 19 | 5080219 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/docs/graph` | 90 | 19 | 5080334 | 0 | 0/0 | 0 | — |
 | ✅ | `sveltekit-frontend/docs/obsidian-vault` | 90 | 2 | 108 | 0 | 0/0 | 0 | — |
 | ✅ | `sveltekit-frontend/docs/profile-cards/data` | 90 | 20 | 1588 | 0 | 0/0 | 0 | — |
 | ✅ | `sveltekit-frontend/docs/reports` | 90 | 36 | 164508 | 0 | 0/0 | 0 | — |
@@ -381,7 +381,7 @@
 | ✅ | `sveltekit-frontend/memory/features` | 90 | 3 | 623 | 0 | 0/0 | 0 | — |
 | ✅ | `sveltekit-frontend/memory/graph` | 90 | 1 | 3480 | 0 | 0/0 | 0 | — |
 | ✅ | `sveltekit-frontend/memory/graphify/deep` | 90 | 5 | 340084 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/memory/graphify/gds` | 90 | 87 | 1811875 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/memory/graphify/gds` | 90 | 88 | 1882972 | 0 | 0/0 | 0 | — |
 | ✅ | `sveltekit-frontend/memory/index` | 90 | 6 | 1672 | 0 | 0/0 | 0 | — |
 | ✅ | `sveltekit-frontend/memory/kag-notes` | 90 | 1 | 16 | 0 | 0/0 | 0 | — |
 | ✅ | `sveltekit-frontend/memory/kb` | 90 | 1 | 88473 | 0 | 0/0 | 0 | — |
@@ -796,7 +796,7 @@
 | ✅ | `sveltekit-frontend/scripts/tests` | 95 | 74 | 15583 | 0 | 4/25 | 0 | 🟠lh |
 | ✅ | `sveltekit-frontend/src/mcp` | 95 | 16 | 18420 | 0 | 1/21 | 0 | 🟠lh |
 | ✅ | `.claude/hooks` | 100 | 2 | 164 | 0 | 0/2 | 0 | — |
-| ✅ | `scripts/atlas` | 100 | 774 | 204712 | 5 | 0/464 | 2 | 🟠lh |
+| ✅ | `scripts/atlas` | 100 | 778 | 205628 | 5 | 0/466 | 2 | 🟠lh |
 | ✅ | `scripts/atlas/lib` | 100 | 33 | 4992 | 3 | 0/12 | 0 | 🟠lh |
 | ✅ | `scripts/db-tests` | 100 | 12 | 560 | 0 | 0/0 | 0 | — |
 | ✅ | `scripts/graphify` | 100 | 8 | 772 | 0 | 0/4 | 0 | — |
@@ -1150,16 +1150,16 @@ _No unguarded SSR-unsafe globals. ✅_
 | Module | Consumer Count |
 |--------|----------------|
 | `@sveltejs/kit` | 3341 |
-| `node:path` | 1266 |
+| `node:path` | 1270 |
 | `path` | 1140 |
-| `node:fs` | 1109 |
+| `node:fs` | 1115 |
 | `vitest` | 926 |
+| `node:url` | 919 |
 | `fs` | 918 |
-| `node:url` | 915 |
 | `drizzle-orm` | 858 |
 | `zod` | 782 |
 | `$lib/types` | 616 |
-| `pg` | 516 |
+| `pg` | 522 |
 | `$lib/server/db/client` | 497 |
 | `$lib/server/env.server.js` | 458 |
 | `node:crypto` | 373 |
