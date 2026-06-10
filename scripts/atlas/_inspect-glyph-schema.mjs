@@ -1,0 +1,14 @@
+import pg from 'pg';
+const p = new pg.Pool({connectionString:'postgresql://legal_admin:123456@127.0.0.1:5434/legal_ai_db'});
+const r = await p.query(`SELECT column_name, data_type FROM information_schema.columns WHERE table_name='glyph_records' ORDER BY ordinal_position`);
+r.rows.forEach(r => console.log(r.column_name.padEnd(25), r.data_type));
+console.log('\n--- indexes ---');
+const ix = await p.query(`SELECT indexname, indexdef FROM pg_indexes WHERE tablename='glyph_records'`);
+ix.rows.forEach(r => console.log(r.indexname));
+console.log('\n--- unique constraints ---');
+const uc = await p.query(`SELECT conname, pg_get_constraintdef(oid) AS def FROM pg_constraint WHERE conrelid='glyph_records'::regclass AND contype IN ('u','p')`);
+uc.rows.forEach(r => console.log(r.conname, r.def));
+console.log('\n--- sample join ---');
+const j = await p.query(`SELECT n.packet_key, a.som_bmu_row, a.som_bmu_col, a.centroid_id, a.som_cluster FROM nes_chrom_packets n LEFT JOIN atlas_feature_map a ON a.packet_id = n.packet_key LIMIT 3`);
+j.rows.forEach(r => console.log(JSON.stringify(r)));
+await p.end();

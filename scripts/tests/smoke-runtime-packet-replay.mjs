@@ -236,6 +236,7 @@ async function run() {
       next_command: 'npm run graphify:semantic',
       priority: 'medium',
       featureStatus: 'degraded',
+      route: packetRow.route || '/api/sse/chat',
     });
   } else {
     console.log(`  ✓ Context density OK (${decompressed.sourceRefs.length} refs matching)`);
@@ -256,6 +257,7 @@ async function run() {
       next_command: 'npm run graph:refresh',
       priority: 'high',
       featureStatus: 'degraded',
+      route: packetRow.route || '/api/sse/chat',
     });
   } else {
     console.log(`  ✓ Graph neighborhood OK (${neighbors.length} neighbors traversed)`);

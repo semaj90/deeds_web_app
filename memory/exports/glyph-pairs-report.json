@@ -1,18 +1,15 @@
 {
-  "timestamp": "2026-06-03T18:27:08.071Z",
+  "timestamp": "2026-06-10T17:42:03.018Z",
   "inputFile": "C:\\Users\\james\\Videos\\deeds-web-app\\scripts\\training-datasets\\active-sample-latest.jsonl",
-  "totalPairs": 28,
+  "totalPairs": 112,
   "bySection": {
-    "UNKNOWN": 20,
-    "LEGAL_AUTHORITY": 4,
-    "FACTS": 3,
-    "CLAIMS": 1
+    "UNKNOWN": 112
   },
   "rewardDistribution": {
-    "min": 0.47302917,
-    "max": 0.51353514,
-    "avg": 0.5021905439285714
+    "min": 0.15749879,
+    "max": 0.5267757,
+    "avg": 0.5004152061607144
   },
-  "outPath": "C:\\Users\\james\\Videos\\deeds-web-app\\scripts\\training-datasets\\glyph-pairs-2026-06-03T18-27-08-072Z.jsonl",
+  "outPath": "C:\\Users\\james\\Videos\\deeds-web-app\\scripts\\training-datasets\\glyph-pairs-2026-06-10T17-42-03-019Z.jsonl",
   "latestPath": "C:\\Users\\james\\Videos\\deeds-web-app\\scripts\\training-datasets\\glyph-pairs-latest.jsonl"
 }
