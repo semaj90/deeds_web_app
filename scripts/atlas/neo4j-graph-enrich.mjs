@@ -467,16 +467,42 @@ function debugPayloadAliases(points, limit = 5) {
 
 async function qdrantPatchBatch(patches) {
   const CHUNK = 100;
+  let errors = [];
+  let written = 0;
+
   for (let i = 0; i < patches.length; i += CHUNK) {
     const chunk = patches.slice(i, i + CHUNK);
-    await Promise.all(chunk.map(({ id, payload }) =>
+    const results = await Promise.allSettled(chunk.map(({ id, payload }) =>
       fetch(`${QDRANT_URL}/collections/${QDRANT_COLL}/points/payload`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ payload, points: [id] }),
-      }).catch(() => {})
+        signal: AbortSignal.timeout(5000),
+      }).then(async res => {
+        if (!res.ok) {
+          const text = await res.text();
+          throw new Error(`HTTP ${res.status}: ${text}`);
+        }
+        const data = await res.json();
+        return { success: true, data };
+      })
     ));
+
+    for (const r of results) {
+      if (r.status === 'fulfilled') {
+        written++;
+      } else {
+        errors.push(r.reason?.message || 'Unknown error');
+      }
+    }
   }
+
+  if (errors.length > 0) {
+    const summary = errors.slice(0, 5).join('; ');
+    throw new Error(`Qdrant batch failed: ${written}/${patches.length} written. First errors: ${summary}`);
+  }
+
+  console.log(`   Qdrant batch complete: ${written}/${patches.length} patches written`);
 }
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
@@ -737,6 +763,8 @@ async function main() {
       let matchedFiles = 0;
       let missedFiles  = 0;
       const topMisses  = [];
+      let nullCommunityCount = 0;
+
       for (const e of enriched) {
         const ids = findQdrantPointIds(qdrantIndex, e);
         if (!ids.size) {
@@ -745,6 +773,8 @@ async function main() {
           continue;
         }
         matchedFiles++;
+        if (e.communityId === null) nullCommunityCount++;
+
         const payload = {
           graphAuthorityScore: e.graphAuthorityScore,
           communityId:         e.communityId,
@@ -770,6 +800,7 @@ async function main() {
       const dryNote = DRY_RUN ? ' (dry — no writes)' : '';
       summary.gates.GDS7 = patches.length > 0 ? `PASS: ${patches.length} patches (${matchedFiles}/${total} files matched, ${matchRate})${dryNote}` : 'WARN: 0 patches';
       console.log(`   Qdrant patches: ${patches.length}  matched ${matchedFiles}/${total} files (${matchRate})${dryNote}`);
+      if (nullCommunityCount > 0) console.log(`   ⚠ Warning: ${nullCommunityCount} files have null communityId (no Louvain assignment)`);
       if (topMisses.length) console.log(`   Top misses: ${topMisses.slice(0, 5).join(', ')}`);
 
       if (!DRY_RUN) {

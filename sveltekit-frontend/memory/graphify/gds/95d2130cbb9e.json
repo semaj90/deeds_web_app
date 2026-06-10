@@ -1,0 +1,2140 @@
+{
+  "runId": "95d2130cbb9e",
+  "startedAt": "2026-06-10T19:23:25.937Z",
+  "gdsAvailable": true,
+  "pagerankRows": 54,
+  "communities": 11,
+  "authorityScoresComputed": 100,
+  "qdrantPatched": 0,
+  "redisCached": 0,
+  "gates": {
+    "GDS1": "PASS",
+    "GDS2": "PASS",
+    "GDS3": "PASS",
+    "GDS4": "PASS",
+    "GDS5": "PASS",
+    "GDS6": "PASS",
+    "GDS7": "PASS: 1402 patches (97/100 files matched, 97%) (dry — no writes)",
+    "GDS8": "PASS: 100 entries (dry — no writes)",
+    "GDS9": "PASS"
+  },
+  "qdrant": {
+    "indexSize": 11213,
+    "enrichedCount": 100,
+    "matched": 97,
+    "missed": 3,
+    "matchRate": "97%",
+    "topMisses": [
+      "src/lib/server/cartridge/chr97-builder.ts",
+      "src/lib/machines/evidence-lifecycle-machine.ts",
+      ".tmp/valkey_verify.json"
+    ]
+  },
+  "finishedAt": "2026-06-10T19:23:51.623Z",
+  "topAuthorities": [
+    {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/server/db/connections.ts",
+      "graphAuthorityScore": 0.5,
+      "communityId": "community:13883",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/server/db/enhanced-vector-operations.ts",
+      "graphAuthorityScore": 0.5,
+      "communityId": "community:14090",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/server/db/jsonb-legal-schema.ts",
+      "graphAuthorityScore": 0.5,
+      "communityId": "community:14196",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/server/db/pgvector-utils.temp.ts",
+      "graphAuthorityScore": 0.5,
+      "communityId": "community:13847",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/server/db/pgvector-utils.ts",
+      "graphAuthorityScore": 0.5,
+      "communityId": "community:13854",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/server/db/postgres-knowledge.ts",
+      "graphAuthorityScore": 0.5,
+      "communityId": "community:13850",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/server/db/qdrant-integration.ts",
+      "graphAuthorityScore": 0.5,
+      "communityId": "community:13911",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/server/db/qdrant-sync.ts",
+      "graphAuthorityScore": 0.5,
+      "communityId": "community:13851",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/server/db/queries.ts",
+      "graphAuthorityScore": 0.5,
+      "communityId": "community:13971",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/server/db/relations.ts",
+      "graphAuthorityScore": 0.5,
+      "communityId": "community:14241",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/server/db/schema-charges.ts",
+      "graphAuthorityScore": 0.5,
+      "communityId": "community:13878",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/server/db/schema-chat.ts",
+      "graphAuthorityScore": 0.5,
+      "communityId": "community:14097",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/server/db/schema-evidence-crud.ts",
+      "graphAuthorityScore": 0.5,
+      "communityId": "community:14095",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/server/db/schema-gpu-cache.ts",
+      "graphAuthorityScore": 0.5,
+      "communityId": "community:14283",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/server/db/schema-ingestion.ts",
+      "graphAuthorityScore": 0.5,
+      "communityId": "community:14096",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/server/db/schema-pgvector-512.ts",
+      "graphAuthorityScore": 0.5,
+      "communityId": "community:16838",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/server/db/schema-phase78.ts",
+      "graphAuthorityScore": 0.5,
+      "communityId": "community:14102",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/server/db/schema-phase89-preserved.ts",
+      "graphAuthorityScore": 0.5,
+      "communityId": "community:13877",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/server/db/schema-postgres.ts",
+      "graphAuthorityScore": 0.5,
+      "communityId": "community:13879",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/server/db/schema-test-rag.ts",
+      "graphAuthorityScore": 0.5,
+      "communityId": "community:14135",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/server/db/schema-timeline.ts",
+      "graphAuthorityScore": 0.5,
+      "communityId": "community:13876",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/server/db/schema-web.ts",
+      "graphAuthorityScore": 0.5,
+      "communityId": "community:14103",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/server/ace-ingest-progress.ts",
+      "graphAuthorityScore": 0.45,
+      "communityId": "community:14016",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/server/ace/ace-wiki.ts",
+      "graphAuthorityScore": 0.45,
+      "communityId": "community:14161",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/server/ace/context-assembler.ts",
+      "graphAuthorityScore": 0.45,
+      "communityId": "community:14160",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/server/ace/gemma4-codeintel.ts",
+      "graphAuthorityScore": 0.45,
+      "communityId": "community:14034",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/server/ace/policy.ts",
+      "graphAuthorityScore": 0.45,
+      "communityId": "community:14159",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/server/ace/tag-sync.ts",
+      "graphAuthorityScore": 0.45,
+      "communityId": "community:13849",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/server/agent/subagents.ts",
+      "graphAuthorityScore": 0.45,
+      "communityId": "community:14176",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/server/ai/lang-extract.ts",
+      "graphAuthorityScore": 0.45,
+      "communityId": "community:14193",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/server/ai/langgraph-research.ts",
+      "graphAuthorityScore": 0.45,
+      "communityId": "community:14163",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/server/ai/ollama-client.ts",
+      "graphAuthorityScore": 0.45,
+      "communityId": "community:13904",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/server/ai/ollama-config.ts",
+      "graphAuthorityScore": 0.45,
+      "communityId": "community:14180",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/server/analysis/analysis-jobs.ts",
+      "graphAuthorityScore": 0.45,
+      "communityId": "community:14014",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/server/analysis/entity-extraction.ts",
+      "graphAuthorityScore": 0.45,
+      "communityId": "community:13992",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/server/analytics/agentic-web-indexer.ts",
+      "graphAuthorityScore": 0.45,
+      "communityId": "community:14149",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/server/analytics/architectural-guard.ts",
+      "graphAuthorityScore": 0.45,
+      "communityId": "community:14156",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/server/analytics/minified-research-cache.ts",
+      "graphAuthorityScore": 0.45,
+      "communityId": "community:14239",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/server/analytics/search-analytics.ts",
+      "graphAuthorityScore": 0.45,
+      "communityId": "community:14132",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/server/audit/api-audit-buffer.ts",
+      "graphAuthorityScore": 0.45,
+      "communityId": "community:14093",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/server/audit/gemma-tool-router.ts",
+      "graphAuthorityScore": 0.45,
+      "communityId": "community:14223",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/server/audit/gpu-audit-orchestrator.ts",
+      "graphAuthorityScore": 0.45,
+      "communityId": "community:14224",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/server/cache-keys.ts",
+      "graphAuthorityScore": 0.45,
+      "communityId": "community:13938",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/server/cache.ts",
+      "graphAuthorityScore": 0.45,
+      "communityId": "community:14266",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/server/cache/cartridge-tensor-bridge.ts",
+      "graphAuthorityScore": 0.45,
+      "communityId": "community:13935",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/server/cache/pdf-export-cache.ts",
+      "graphAuthorityScore": 0.45,
+      "communityId": "community:14177",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/server/cache/report-template-cache.ts",
+      "graphAuthorityScore": 0.45,
+      "communityId": "community:14268",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/server/cartridge/chr97-builder.ts",
+      "graphAuthorityScore": 0.45,
+      "communityId": "community:13875",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/server/cartridge/glyph-mappers.ts",
+      "graphAuthorityScore": 0.45,
+      "communityId": "community:14235",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/server/cartridge/glyph-tile-engine.ts",
+      "graphAuthorityScore": 0.45,
+      "communityId": "community:13936",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/server/clients/ollama.ts",
+      "graphAuthorityScore": 0.45,
+      "communityId": "community:14186",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/server/concurrency/advisory-locks.ts",
+      "graphAuthorityScore": 0.45,
+      "communityId": "community:14100",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/server/config.ts",
+      "graphAuthorityScore": 0.45,
+      "communityId": "community:14181",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/server/config/ollama.ts",
+      "graphAuthorityScore": 0.45,
+      "communityId": "community:14178",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/server/db-shim.ts",
+      "graphAuthorityScore": 0.45,
+      "communityId": "community:14114",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/ai/base64-fp32-quantizer.ts",
+      "graphAuthorityScore": 0.4,
+      "communityId": "community:14087",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/ai/client-router.ts",
+      "graphAuthorityScore": 0.4,
+      "communityId": "community:13934",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/ai/model-ids.ts",
+      "graphAuthorityScore": 0.4,
+      "communityId": "community:14122",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/cache/cache-service.svelte.ts",
+      "graphAuthorityScore": 0.4,
+      "communityId": "community:14269",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/cache/indexdb-cache.svelte.ts",
+      "graphAuthorityScore": 0.4,
+      "communityId": "community:14267",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/client/workflow-event-stream.ts",
+      "graphAuthorityScore": 0.4,
+      "communityId": "community:14280",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/components/cases/index.ts",
+      "graphAuthorityScore": 0.4,
+      "communityId": "community:13900",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/components/components-shims.d.ts",
+      "graphAuthorityScore": 0.4,
+      "communityId": "community:14079",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/components/evidence/board-history.svelte.ts",
+      "graphAuthorityScore": 0.4,
+      "communityId": "community:14236",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/components/evidence/board-persistence.svelte.ts",
+      "graphAuthorityScore": 0.4,
+      "communityId": "community:13939",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/components/evidence/evidence-utils.ts",
+      "graphAuthorityScore": 0.4,
+      "communityId": "community:13984",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/components/ui/alert-dialog/types.ts",
+      "graphAuthorityScore": 0.4,
+      "communityId": "community:13823",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/components/ui/bits/compound.ts",
+      "graphAuthorityScore": 0.4,
+      "communityId": "community:14092",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/components/ui/gaming/constants/gaming-constants.ts",
+      "graphAuthorityScore": 0.4,
+      "communityId": "community:14123",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/components/ui/gaming/n64/N64ToastStore.svelte.ts",
+      "graphAuthorityScore": 0.4,
+      "communityId": "community:14089",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/components/ui/gaming/n64/index.ts",
+      "graphAuthorityScore": 0.4,
+      "communityId": "community:14084",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/components/ui/gaming/types/gaming-types-minimal.ts",
+      "graphAuthorityScore": 0.4,
+      "communityId": "community:16751",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/components/ui/gaming/types/gaming-types.ts",
+      "graphAuthorityScore": 0.4,
+      "communityId": "community:13908",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/config/database.ts",
+      "graphAuthorityScore": 0.4,
+      "communityId": "community:14182",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/config/env.server.ts",
+      "graphAuthorityScore": 0.4,
+      "communityId": "community:14179",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/config/redis-config.ts",
+      "graphAuthorityScore": 0.4,
+      "communityId": "community:14183",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/data/types.ts",
+      "graphAuthorityScore": 0.4,
+      "communityId": "community:13983",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/db/pool.ts",
+      "graphAuthorityScore": 0.4,
+      "communityId": "community:14119",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/db/schema.ts",
+      "graphAuthorityScore": 0.4,
+      "communityId": "community:14197",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/db/schema/ace-web.ts",
+      "graphAuthorityScore": 0.4,
+      "communityId": "community:14106",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/db/schema/evidence.ts",
+      "graphAuthorityScore": 0.4,
+      "communityId": "community:13880",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/db/schema/gpuInferenceDemo.ts",
+      "graphAuthorityScore": 0.4,
+      "communityId": "community:14105",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/db/schema/route-health-tables.ts",
+      "graphAuthorityScore": 0.4,
+      "communityId": "community:14243",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/db/vite-error-schema.ts",
+      "graphAuthorityScore": 0.4,
+      "communityId": "community:14107",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/env.server.ts",
+      "graphAuthorityScore": 0.4,
+      "communityId": "community:14194",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/gpu/gpu-compute-pipeline.ts",
+      "graphAuthorityScore": 0.4,
+      "communityId": "community:13885",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/gpu/gpu-search-reranker.ts",
+      "graphAuthorityScore": 0.4,
+      "communityId": "community:13921",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/gpu/shader-registry.ts",
+      "graphAuthorityScore": 0.4,
+      "communityId": "community:13914",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/machines/evidence-analysis-machine.ts",
+      "graphAuthorityScore": 0.4,
+      "communityId": "community:14278",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/machines/evidence-lifecycle-machine.ts",
+      "graphAuthorityScore": 0.4,
+      "communityId": "community:14277",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/machines/retrieval-machine.ts",
+      "graphAuthorityScore": 0.4,
+      "communityId": "community:14125",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/polyfills.ts",
+      "graphAuthorityScore": 0.4,
+      "communityId": "community:13941",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/schemas/board.ts",
+      "graphAuthorityScore": 0.4,
+      "communityId": "community:14192",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/schemas/evidence-upload.ts",
+      "graphAuthorityScore": 0.4,
+      "communityId": "community:13985",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/schemas/evidence.ts",
+      "graphAuthorityScore": 0.4,
+      "communityId": "community:13981",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": ".tmp/valkey_verify.json",
+      "graphAuthorityScore": 0.35,
+      "communityId": "community:18090",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/server/ai/token-tracker.ts",
+      "graphAuthorityScore": 0.35,
+      "communityId": "community:14238",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/server/auth-guard.js",
+      "graphAuthorityScore": 0.35,
+      "communityId": "community:14250",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/server/auth.ts",
+      "graphAuthorityScore": 0.35,
+      "communityId": "community:14249",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/ai/e2b/session.ts",
+      "graphAuthorityScore": 0.3,
+      "communityId": "community:13927",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    }
+  ],
+  "allAuthorities": [
+    {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/server/db/connections.ts",
+      "graphAuthorityScore": 0.5,
+      "communityId": "community:13883",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/server/db/enhanced-vector-operations.ts",
+      "graphAuthorityScore": 0.5,
+      "communityId": "community:14090",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/server/db/jsonb-legal-schema.ts",
+      "graphAuthorityScore": 0.5,
+      "communityId": "community:14196",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/server/db/pgvector-utils.temp.ts",
+      "graphAuthorityScore": 0.5,
+      "communityId": "community:13847",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/server/db/pgvector-utils.ts",
+      "graphAuthorityScore": 0.5,
+      "communityId": "community:13854",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/server/db/postgres-knowledge.ts",
+      "graphAuthorityScore": 0.5,
+      "communityId": "community:13850",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/server/db/qdrant-integration.ts",
+      "graphAuthorityScore": 0.5,
+      "communityId": "community:13911",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/server/db/qdrant-sync.ts",
+      "graphAuthorityScore": 0.5,
+      "communityId": "community:13851",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/server/db/queries.ts",
+      "graphAuthorityScore": 0.5,
+      "communityId": "community:13971",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/server/db/relations.ts",
+      "graphAuthorityScore": 0.5,
+      "communityId": "community:14241",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/server/db/schema-charges.ts",
+      "graphAuthorityScore": 0.5,
+      "communityId": "community:13878",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/server/db/schema-chat.ts",
+      "graphAuthorityScore": 0.5,
+      "communityId": "community:14097",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/server/db/schema-evidence-crud.ts",
+      "graphAuthorityScore": 0.5,
+      "communityId": "community:14095",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/server/db/schema-gpu-cache.ts",
+      "graphAuthorityScore": 0.5,
+      "communityId": "community:14283",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/server/db/schema-ingestion.ts",
+      "graphAuthorityScore": 0.5,
+      "communityId": "community:14096",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/server/db/schema-pgvector-512.ts",
+      "graphAuthorityScore": 0.5,
+      "communityId": "community:16838",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/server/db/schema-phase78.ts",
+      "graphAuthorityScore": 0.5,
+      "communityId": "community:14102",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/server/db/schema-phase89-preserved.ts",
+      "graphAuthorityScore": 0.5,
+      "communityId": "community:13877",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/server/db/schema-postgres.ts",
+      "graphAuthorityScore": 0.5,
+      "communityId": "community:13879",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/server/db/schema-test-rag.ts",
+      "graphAuthorityScore": 0.5,
+      "communityId": "community:14135",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/server/db/schema-timeline.ts",
+      "graphAuthorityScore": 0.5,
+      "communityId": "community:13876",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/server/db/schema-web.ts",
+      "graphAuthorityScore": 0.5,
+      "communityId": "community:14103",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/server/ace-ingest-progress.ts",
+      "graphAuthorityScore": 0.45,
+      "communityId": "community:14016",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/server/ace/ace-wiki.ts",
+      "graphAuthorityScore": 0.45,
+      "communityId": "community:14161",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/server/ace/context-assembler.ts",
+      "graphAuthorityScore": 0.45,
+      "communityId": "community:14160",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/server/ace/gemma4-codeintel.ts",
+      "graphAuthorityScore": 0.45,
+      "communityId": "community:14034",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/server/ace/policy.ts",
+      "graphAuthorityScore": 0.45,
+      "communityId": "community:14159",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/server/ace/tag-sync.ts",
+      "graphAuthorityScore": 0.45,
+      "communityId": "community:13849",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/server/agent/subagents.ts",
+      "graphAuthorityScore": 0.45,
+      "communityId": "community:14176",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/server/ai/lang-extract.ts",
+      "graphAuthorityScore": 0.45,
+      "communityId": "community:14193",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/server/ai/langgraph-research.ts",
+      "graphAuthorityScore": 0.45,
+      "communityId": "community:14163",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/server/ai/ollama-client.ts",
+      "graphAuthorityScore": 0.45,
+      "communityId": "community:13904",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/server/ai/ollama-config.ts",
+      "graphAuthorityScore": 0.45,
+      "communityId": "community:14180",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/server/analysis/analysis-jobs.ts",
+      "graphAuthorityScore": 0.45,
+      "communityId": "community:14014",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/server/analysis/entity-extraction.ts",
+      "graphAuthorityScore": 0.45,
+      "communityId": "community:13992",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/server/analytics/agentic-web-indexer.ts",
+      "graphAuthorityScore": 0.45,
+      "communityId": "community:14149",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/server/analytics/architectural-guard.ts",
+      "graphAuthorityScore": 0.45,
+      "communityId": "community:14156",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/server/analytics/minified-research-cache.ts",
+      "graphAuthorityScore": 0.45,
+      "communityId": "community:14239",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/server/analytics/search-analytics.ts",
+      "graphAuthorityScore": 0.45,
+      "communityId": "community:14132",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/server/audit/api-audit-buffer.ts",
+      "graphAuthorityScore": 0.45,
+      "communityId": "community:14093",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/server/audit/gemma-tool-router.ts",
+      "graphAuthorityScore": 0.45,
+      "communityId": "community:14223",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/server/audit/gpu-audit-orchestrator.ts",
+      "graphAuthorityScore": 0.45,
+      "communityId": "community:14224",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/server/cache-keys.ts",
+      "graphAuthorityScore": 0.45,
+      "communityId": "community:13938",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/server/cache.ts",
+      "graphAuthorityScore": 0.45,
+      "communityId": "community:14266",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/server/cache/cartridge-tensor-bridge.ts",
+      "graphAuthorityScore": 0.45,
+      "communityId": "community:13935",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/server/cache/pdf-export-cache.ts",
+      "graphAuthorityScore": 0.45,
+      "communityId": "community:14177",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/server/cache/report-template-cache.ts",
+      "graphAuthorityScore": 0.45,
+      "communityId": "community:14268",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/server/cartridge/chr97-builder.ts",
+      "graphAuthorityScore": 0.45,
+      "communityId": "community:13875",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/server/cartridge/glyph-mappers.ts",
+      "graphAuthorityScore": 0.45,
+      "communityId": "community:14235",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/server/cartridge/glyph-tile-engine.ts",
+      "graphAuthorityScore": 0.45,
+      "communityId": "community:13936",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/server/clients/ollama.ts",
+      "graphAuthorityScore": 0.45,
+      "communityId": "community:14186",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/server/concurrency/advisory-locks.ts",
+      "graphAuthorityScore": 0.45,
+      "communityId": "community:14100",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/server/config.ts",
+      "graphAuthorityScore": 0.45,
+      "communityId": "community:14181",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/server/config/ollama.ts",
+      "graphAuthorityScore": 0.45,
+      "communityId": "community:14178",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/server/db-shim.ts",
+      "graphAuthorityScore": 0.45,
+      "communityId": "community:14114",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/ai/base64-fp32-quantizer.ts",
+      "graphAuthorityScore": 0.4,
+      "communityId": "community:14087",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/ai/client-router.ts",
+      "graphAuthorityScore": 0.4,
+      "communityId": "community:13934",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/ai/model-ids.ts",
+      "graphAuthorityScore": 0.4,
+      "communityId": "community:14122",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/cache/cache-service.svelte.ts",
+      "graphAuthorityScore": 0.4,
+      "communityId": "community:14269",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/cache/indexdb-cache.svelte.ts",
+      "graphAuthorityScore": 0.4,
+      "communityId": "community:14267",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/client/workflow-event-stream.ts",
+      "graphAuthorityScore": 0.4,
+      "communityId": "community:14280",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/components/cases/index.ts",
+      "graphAuthorityScore": 0.4,
+      "communityId": "community:13900",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/components/components-shims.d.ts",
+      "graphAuthorityScore": 0.4,
+      "communityId": "community:14079",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/components/evidence/board-history.svelte.ts",
+      "graphAuthorityScore": 0.4,
+      "communityId": "community:14236",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/components/evidence/board-persistence.svelte.ts",
+      "graphAuthorityScore": 0.4,
+      "communityId": "community:13939",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/components/evidence/evidence-utils.ts",
+      "graphAuthorityScore": 0.4,
+      "communityId": "community:13984",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/components/ui/alert-dialog/types.ts",
+      "graphAuthorityScore": 0.4,
+      "communityId": "community:13823",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/components/ui/bits/compound.ts",
+      "graphAuthorityScore": 0.4,
+      "communityId": "community:14092",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/components/ui/gaming/constants/gaming-constants.ts",
+      "graphAuthorityScore": 0.4,
+      "communityId": "community:14123",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/components/ui/gaming/n64/N64ToastStore.svelte.ts",
+      "graphAuthorityScore": 0.4,
+      "communityId": "community:14089",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/components/ui/gaming/n64/index.ts",
+      "graphAuthorityScore": 0.4,
+      "communityId": "community:14084",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/components/ui/gaming/types/gaming-types-minimal.ts",
+      "graphAuthorityScore": 0.4,
+      "communityId": "community:16751",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/components/ui/gaming/types/gaming-types.ts",
+      "graphAuthorityScore": 0.4,
+      "communityId": "community:13908",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/config/database.ts",
+      "graphAuthorityScore": 0.4,
+      "communityId": "community:14182",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/config/env.server.ts",
+      "graphAuthorityScore": 0.4,
+      "communityId": "community:14179",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/config/redis-config.ts",
+      "graphAuthorityScore": 0.4,
+      "communityId": "community:14183",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/data/types.ts",
+      "graphAuthorityScore": 0.4,
+      "communityId": "community:13983",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/db/pool.ts",
+      "graphAuthorityScore": 0.4,
+      "communityId": "community:14119",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/db/schema.ts",
+      "graphAuthorityScore": 0.4,
+      "communityId": "community:14197",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/db/schema/ace-web.ts",
+      "graphAuthorityScore": 0.4,
+      "communityId": "community:14106",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/db/schema/evidence.ts",
+      "graphAuthorityScore": 0.4,
+      "communityId": "community:13880",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/db/schema/gpuInferenceDemo.ts",
+      "graphAuthorityScore": 0.4,
+      "communityId": "community:14105",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/db/schema/route-health-tables.ts",
+      "graphAuthorityScore": 0.4,
+      "communityId": "community:14243",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/db/vite-error-schema.ts",
+      "graphAuthorityScore": 0.4,
+      "communityId": "community:14107",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/env.server.ts",
+      "graphAuthorityScore": 0.4,
+      "communityId": "community:14194",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/gpu/gpu-compute-pipeline.ts",
+      "graphAuthorityScore": 0.4,
+      "communityId": "community:13885",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/gpu/gpu-search-reranker.ts",
+      "graphAuthorityScore": 0.4,
+      "communityId": "community:13921",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/gpu/shader-registry.ts",
+      "graphAuthorityScore": 0.4,
+      "communityId": "community:13914",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/machines/evidence-analysis-machine.ts",
+      "graphAuthorityScore": 0.4,
+      "communityId": "community:14278",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/machines/evidence-lifecycle-machine.ts",
+      "graphAuthorityScore": 0.4,
+      "communityId": "community:14277",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/machines/retrieval-machine.ts",
+      "graphAuthorityScore": 0.4,
+      "communityId": "community:14125",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/polyfills.ts",
+      "graphAuthorityScore": 0.4,
+      "communityId": "community:13941",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/schemas/board.ts",
+      "graphAuthorityScore": 0.4,
+      "communityId": "community:14192",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/schemas/evidence-upload.ts",
+      "graphAuthorityScore": 0.4,
+      "communityId": "community:13985",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/schemas/evidence.ts",
+      "graphAuthorityScore": 0.4,
+      "communityId": "community:13981",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": ".tmp/valkey_verify.json",
+      "graphAuthorityScore": 0.35,
+      "communityId": "community:18090",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/server/ai/token-tracker.ts",
+      "graphAuthorityScore": 0.35,
+      "communityId": "community:14238",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/server/auth-guard.js",
+      "graphAuthorityScore": 0.35,
+      "communityId": "community:14250",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/server/auth.ts",
+      "graphAuthorityScore": 0.35,
+      "communityId": "community:14249",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/ai/e2b/session.ts",
+      "graphAuthorityScore": 0.3,
+      "communityId": "community:13927",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    }
+  ],
+  "byPath": {
+    "src/lib/server/db/connections.ts": {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/server/db/connections.ts",
+      "graphAuthorityScore": 0.5,
+      "communityId": "community:13883",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    "src/lib/server/db/enhanced-vector-operations.ts": {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/server/db/enhanced-vector-operations.ts",
+      "graphAuthorityScore": 0.5,
+      "communityId": "community:14090",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    "src/lib/server/db/jsonb-legal-schema.ts": {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/server/db/jsonb-legal-schema.ts",
+      "graphAuthorityScore": 0.5,
+      "communityId": "community:14196",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    "src/lib/server/db/pgvector-utils.temp.ts": {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/server/db/pgvector-utils.temp.ts",
+      "graphAuthorityScore": 0.5,
+      "communityId": "community:13847",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    "src/lib/server/db/pgvector-utils.ts": {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/server/db/pgvector-utils.ts",
+      "graphAuthorityScore": 0.5,
+      "communityId": "community:13854",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    "src/lib/server/db/postgres-knowledge.ts": {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/server/db/postgres-knowledge.ts",
+      "graphAuthorityScore": 0.5,
+      "communityId": "community:13850",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    "src/lib/server/db/qdrant-integration.ts": {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/server/db/qdrant-integration.ts",
+      "graphAuthorityScore": 0.5,
+      "communityId": "community:13911",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    "src/lib/server/db/qdrant-sync.ts": {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/server/db/qdrant-sync.ts",
+      "graphAuthorityScore": 0.5,
+      "communityId": "community:13851",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    "src/lib/server/db/queries.ts": {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/server/db/queries.ts",
+      "graphAuthorityScore": 0.5,
+      "communityId": "community:13971",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    "src/lib/server/db/relations.ts": {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/server/db/relations.ts",
+      "graphAuthorityScore": 0.5,
+      "communityId": "community:14241",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    "src/lib/server/db/schema-charges.ts": {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/server/db/schema-charges.ts",
+      "graphAuthorityScore": 0.5,
+      "communityId": "community:13878",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    "src/lib/server/db/schema-chat.ts": {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/server/db/schema-chat.ts",
+      "graphAuthorityScore": 0.5,
+      "communityId": "community:14097",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    "src/lib/server/db/schema-evidence-crud.ts": {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/server/db/schema-evidence-crud.ts",
+      "graphAuthorityScore": 0.5,
+      "communityId": "community:14095",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    "src/lib/server/db/schema-gpu-cache.ts": {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/server/db/schema-gpu-cache.ts",
+      "graphAuthorityScore": 0.5,
+      "communityId": "community:14283",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    "src/lib/server/db/schema-ingestion.ts": {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/server/db/schema-ingestion.ts",
+      "graphAuthorityScore": 0.5,
+      "communityId": "community:14096",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    "src/lib/server/db/schema-pgvector-512.ts": {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/server/db/schema-pgvector-512.ts",
+      "graphAuthorityScore": 0.5,
+      "communityId": "community:16838",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    "src/lib/server/db/schema-phase78.ts": {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/server/db/schema-phase78.ts",
+      "graphAuthorityScore": 0.5,
+      "communityId": "community:14102",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    "src/lib/server/db/schema-phase89-preserved.ts": {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/server/db/schema-phase89-preserved.ts",
+      "graphAuthorityScore": 0.5,
+      "communityId": "community:13877",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    "src/lib/server/db/schema-postgres.ts": {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/server/db/schema-postgres.ts",
+      "graphAuthorityScore": 0.5,
+      "communityId": "community:13879",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    "src/lib/server/db/schema-test-rag.ts": {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/server/db/schema-test-rag.ts",
+      "graphAuthorityScore": 0.5,
+      "communityId": "community:14135",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    "src/lib/server/db/schema-timeline.ts": {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/server/db/schema-timeline.ts",
+      "graphAuthorityScore": 0.5,
+      "communityId": "community:13876",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    "src/lib/server/db/schema-web.ts": {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/server/db/schema-web.ts",
+      "graphAuthorityScore": 0.5,
+      "communityId": "community:14103",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    "src/lib/server/ace-ingest-progress.ts": {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/server/ace-ingest-progress.ts",
+      "graphAuthorityScore": 0.45,
+      "communityId": "community:14016",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    "src/lib/server/ace/ace-wiki.ts": {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/server/ace/ace-wiki.ts",
+      "graphAuthorityScore": 0.45,
+      "communityId": "community:14161",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    "src/lib/server/ace/context-assembler.ts": {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/server/ace/context-assembler.ts",
+      "graphAuthorityScore": 0.45,
+      "communityId": "community:14160",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    "src/lib/server/ace/gemma4-codeintel.ts": {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/server/ace/gemma4-codeintel.ts",
+      "graphAuthorityScore": 0.45,
+      "communityId": "community:14034",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    "src/lib/server/ace/policy.ts": {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/server/ace/policy.ts",
+      "graphAuthorityScore": 0.45,
+      "communityId": "community:14159",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    "src/lib/server/ace/tag-sync.ts": {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/server/ace/tag-sync.ts",
+      "graphAuthorityScore": 0.45,
+      "communityId": "community:13849",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    "src/lib/server/agent/subagents.ts": {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/server/agent/subagents.ts",
+      "graphAuthorityScore": 0.45,
+      "communityId": "community:14176",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    "src/lib/server/ai/lang-extract.ts": {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/server/ai/lang-extract.ts",
+      "graphAuthorityScore": 0.45,
+      "communityId": "community:14193",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    "src/lib/server/ai/langgraph-research.ts": {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/server/ai/langgraph-research.ts",
+      "graphAuthorityScore": 0.45,
+      "communityId": "community:14163",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    "src/lib/server/ai/ollama-client.ts": {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/server/ai/ollama-client.ts",
+      "graphAuthorityScore": 0.45,
+      "communityId": "community:13904",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    "src/lib/server/ai/ollama-config.ts": {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/server/ai/ollama-config.ts",
+      "graphAuthorityScore": 0.45,
+      "communityId": "community:14180",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    "src/lib/server/analysis/analysis-jobs.ts": {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/server/analysis/analysis-jobs.ts",
+      "graphAuthorityScore": 0.45,
+      "communityId": "community:14014",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    "src/lib/server/analysis/entity-extraction.ts": {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/server/analysis/entity-extraction.ts",
+      "graphAuthorityScore": 0.45,
+      "communityId": "community:13992",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    "src/lib/server/analytics/agentic-web-indexer.ts": {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/server/analytics/agentic-web-indexer.ts",
+      "graphAuthorityScore": 0.45,
+      "communityId": "community:14149",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    "src/lib/server/analytics/architectural-guard.ts": {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/server/analytics/architectural-guard.ts",
+      "graphAuthorityScore": 0.45,
+      "communityId": "community:14156",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    "src/lib/server/analytics/minified-research-cache.ts": {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/server/analytics/minified-research-cache.ts",
+      "graphAuthorityScore": 0.45,
+      "communityId": "community:14239",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    "src/lib/server/analytics/search-analytics.ts": {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/server/analytics/search-analytics.ts",
+      "graphAuthorityScore": 0.45,
+      "communityId": "community:14132",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    "src/lib/server/audit/api-audit-buffer.ts": {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/server/audit/api-audit-buffer.ts",
+      "graphAuthorityScore": 0.45,
+      "communityId": "community:14093",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    "src/lib/server/audit/gemma-tool-router.ts": {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/server/audit/gemma-tool-router.ts",
+      "graphAuthorityScore": 0.45,
+      "communityId": "community:14223",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    "src/lib/server/audit/gpu-audit-orchestrator.ts": {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/server/audit/gpu-audit-orchestrator.ts",
+      "graphAuthorityScore": 0.45,
+      "communityId": "community:14224",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    "src/lib/server/cache-keys.ts": {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/server/cache-keys.ts",
+      "graphAuthorityScore": 0.45,
+      "communityId": "community:13938",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    "src/lib/server/cache.ts": {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/server/cache.ts",
+      "graphAuthorityScore": 0.45,
+      "communityId": "community:14266",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    "src/lib/server/cache/cartridge-tensor-bridge.ts": {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/server/cache/cartridge-tensor-bridge.ts",
+      "graphAuthorityScore": 0.45,
+      "communityId": "community:13935",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    "src/lib/server/cache/pdf-export-cache.ts": {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/server/cache/pdf-export-cache.ts",
+      "graphAuthorityScore": 0.45,
+      "communityId": "community:14177",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    "src/lib/server/cache/report-template-cache.ts": {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/server/cache/report-template-cache.ts",
+      "graphAuthorityScore": 0.45,
+      "communityId": "community:14268",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    "src/lib/server/cartridge/chr97-builder.ts": {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/server/cartridge/chr97-builder.ts",
+      "graphAuthorityScore": 0.45,
+      "communityId": "community:13875",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    "src/lib/server/cartridge/glyph-mappers.ts": {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/server/cartridge/glyph-mappers.ts",
+      "graphAuthorityScore": 0.45,
+      "communityId": "community:14235",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    "src/lib/server/cartridge/glyph-tile-engine.ts": {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/server/cartridge/glyph-tile-engine.ts",
+      "graphAuthorityScore": 0.45,
+      "communityId": "community:13936",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    "src/lib/server/clients/ollama.ts": {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/server/clients/ollama.ts",
+      "graphAuthorityScore": 0.45,
+      "communityId": "community:14186",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    "src/lib/server/concurrency/advisory-locks.ts": {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/server/concurrency/advisory-locks.ts",
+      "graphAuthorityScore": 0.45,
+      "communityId": "community:14100",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    "src/lib/server/config.ts": {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/server/config.ts",
+      "graphAuthorityScore": 0.45,
+      "communityId": "community:14181",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    "src/lib/server/config/ollama.ts": {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/server/config/ollama.ts",
+      "graphAuthorityScore": 0.45,
+      "communityId": "community:14178",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    "src/lib/server/db-shim.ts": {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/server/db-shim.ts",
+      "graphAuthorityScore": 0.45,
+      "communityId": "community:14114",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    "src/lib/ai/base64-fp32-quantizer.ts": {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/ai/base64-fp32-quantizer.ts",
+      "graphAuthorityScore": 0.4,
+      "communityId": "community:14087",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    "src/lib/ai/client-router.ts": {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/ai/client-router.ts",
+      "graphAuthorityScore": 0.4,
+      "communityId": "community:13934",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    "src/lib/ai/model-ids.ts": {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/ai/model-ids.ts",
+      "graphAuthorityScore": 0.4,
+      "communityId": "community:14122",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    "src/lib/cache/cache-service.svelte.ts": {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/cache/cache-service.svelte.ts",
+      "graphAuthorityScore": 0.4,
+      "communityId": "community:14269",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    "src/lib/cache/indexdb-cache.svelte.ts": {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/cache/indexdb-cache.svelte.ts",
+      "graphAuthorityScore": 0.4,
+      "communityId": "community:14267",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    "src/lib/client/workflow-event-stream.ts": {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/client/workflow-event-stream.ts",
+      "graphAuthorityScore": 0.4,
+      "communityId": "community:14280",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    "src/lib/components/cases/index.ts": {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/components/cases/index.ts",
+      "graphAuthorityScore": 0.4,
+      "communityId": "community:13900",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    "src/lib/components/components-shims.d.ts": {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/components/components-shims.d.ts",
+      "graphAuthorityScore": 0.4,
+      "communityId": "community:14079",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    "src/lib/components/evidence/board-history.svelte.ts": {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/components/evidence/board-history.svelte.ts",
+      "graphAuthorityScore": 0.4,
+      "communityId": "community:14236",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    "src/lib/components/evidence/board-persistence.svelte.ts": {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/components/evidence/board-persistence.svelte.ts",
+      "graphAuthorityScore": 0.4,
+      "communityId": "community:13939",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    "src/lib/components/evidence/evidence-utils.ts": {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/components/evidence/evidence-utils.ts",
+      "graphAuthorityScore": 0.4,
+      "communityId": "community:13984",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    "src/lib/components/ui/alert-dialog/types.ts": {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/components/ui/alert-dialog/types.ts",
+      "graphAuthorityScore": 0.4,
+      "communityId": "community:13823",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    "src/lib/components/ui/bits/compound.ts": {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/components/ui/bits/compound.ts",
+      "graphAuthorityScore": 0.4,
+      "communityId": "community:14092",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    "src/lib/components/ui/gaming/constants/gaming-constants.ts": {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/components/ui/gaming/constants/gaming-constants.ts",
+      "graphAuthorityScore": 0.4,
+      "communityId": "community:14123",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    "src/lib/components/ui/gaming/n64/N64ToastStore.svelte.ts": {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/components/ui/gaming/n64/N64ToastStore.svelte.ts",
+      "graphAuthorityScore": 0.4,
+      "communityId": "community:14089",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    "src/lib/components/ui/gaming/n64/index.ts": {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/components/ui/gaming/n64/index.ts",
+      "graphAuthorityScore": 0.4,
+      "communityId": "community:14084",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    "src/lib/components/ui/gaming/types/gaming-types-minimal.ts": {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/components/ui/gaming/types/gaming-types-minimal.ts",
+      "graphAuthorityScore": 0.4,
+      "communityId": "community:16751",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    "src/lib/components/ui/gaming/types/gaming-types.ts": {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/components/ui/gaming/types/gaming-types.ts",
+      "graphAuthorityScore": 0.4,
+      "communityId": "community:13908",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    "src/lib/config/database.ts": {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/config/database.ts",
+      "graphAuthorityScore": 0.4,
+      "communityId": "community:14182",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    "src/lib/config/env.server.ts": {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/config/env.server.ts",
+      "graphAuthorityScore": 0.4,
+      "communityId": "community:14179",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    "src/lib/config/redis-config.ts": {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/config/redis-config.ts",
+      "graphAuthorityScore": 0.4,
+      "communityId": "community:14183",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    "src/lib/data/types.ts": {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/data/types.ts",
+      "graphAuthorityScore": 0.4,
+      "communityId": "community:13983",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    "src/lib/db/pool.ts": {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/db/pool.ts",
+      "graphAuthorityScore": 0.4,
+      "communityId": "community:14119",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    "src/lib/db/schema.ts": {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/db/schema.ts",
+      "graphAuthorityScore": 0.4,
+      "communityId": "community:14197",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    "src/lib/db/schema/ace-web.ts": {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/db/schema/ace-web.ts",
+      "graphAuthorityScore": 0.4,
+      "communityId": "community:14106",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    "src/lib/db/schema/evidence.ts": {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/db/schema/evidence.ts",
+      "graphAuthorityScore": 0.4,
+      "communityId": "community:13880",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    "src/lib/db/schema/gpuInferenceDemo.ts": {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/db/schema/gpuInferenceDemo.ts",
+      "graphAuthorityScore": 0.4,
+      "communityId": "community:14105",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    "src/lib/db/schema/route-health-tables.ts": {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/db/schema/route-health-tables.ts",
+      "graphAuthorityScore": 0.4,
+      "communityId": "community:14243",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    "src/lib/db/vite-error-schema.ts": {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/db/vite-error-schema.ts",
+      "graphAuthorityScore": 0.4,
+      "communityId": "community:14107",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    "src/lib/env.server.ts": {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/env.server.ts",
+      "graphAuthorityScore": 0.4,
+      "communityId": "community:14194",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    "src/lib/gpu/gpu-compute-pipeline.ts": {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/gpu/gpu-compute-pipeline.ts",
+      "graphAuthorityScore": 0.4,
+      "communityId": "community:13885",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    "src/lib/gpu/gpu-search-reranker.ts": {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/gpu/gpu-search-reranker.ts",
+      "graphAuthorityScore": 0.4,
+      "communityId": "community:13921",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    "src/lib/gpu/shader-registry.ts": {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/gpu/shader-registry.ts",
+      "graphAuthorityScore": 0.4,
+      "communityId": "community:13914",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    "src/lib/machines/evidence-analysis-machine.ts": {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/machines/evidence-analysis-machine.ts",
+      "graphAuthorityScore": 0.4,
+      "communityId": "community:14278",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    "src/lib/machines/evidence-lifecycle-machine.ts": {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/machines/evidence-lifecycle-machine.ts",
+      "graphAuthorityScore": 0.4,
+      "communityId": "community:14277",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    "src/lib/machines/retrieval-machine.ts": {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/machines/retrieval-machine.ts",
+      "graphAuthorityScore": 0.4,
+      "communityId": "community:14125",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    "src/lib/polyfills.ts": {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/polyfills.ts",
+      "graphAuthorityScore": 0.4,
+      "communityId": "community:13941",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    "src/lib/schemas/board.ts": {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/schemas/board.ts",
+      "graphAuthorityScore": 0.4,
+      "communityId": "community:14192",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    "src/lib/schemas/evidence-upload.ts": {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/schemas/evidence-upload.ts",
+      "graphAuthorityScore": 0.4,
+      "communityId": "community:13985",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    "src/lib/schemas/evidence.ts": {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/schemas/evidence.ts",
+      "graphAuthorityScore": 0.4,
+      "communityId": "community:13981",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    ".tmp/valkey_verify.json": {
+      "filePath": ".tmp/valkey_verify.json",
+      "graphAuthorityScore": 0.35,
+      "communityId": "community:18090",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    "src/lib/server/ai/token-tracker.ts": {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/server/ai/token-tracker.ts",
+      "graphAuthorityScore": 0.35,
+      "communityId": "community:14238",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    "src/lib/server/auth-guard.js": {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/server/auth-guard.js",
+      "graphAuthorityScore": 0.35,
+      "communityId": "community:14250",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    "src/lib/server/auth.ts": {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/server/auth.ts",
+      "graphAuthorityScore": 0.35,
+      "communityId": "community:14249",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    },
+    "src/lib/ai/e2b/session.ts": {
+      "filePath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/ai/e2b/session.ts",
+      "graphAuthorityScore": 0.3,
+      "communityId": "community:13927",
+      "pagerank": 0.15000000000000002,
+      "topoClass": "unclassified"
+    }
+  }
+}

@@ -442,7 +442,11 @@
       "PowerShell(Get-ChildItem \"C:\\\\Users\\\\james\\\\Videos\\\\deeds-web-app\\\\scripts\\\\atlas\\\\\" | Select-Object Name | Where-Object { $_.Name -match \"materialize|preassemble|packet|nes\" })",
       "Read(//tmp/**)",
       "Bash(export ATLAS_DOCKER_NETWORK=deeds-web-app_legal-ai-network)",
-      "Bash(git tag -a atlas/2.0-phase-2b-complete -m 'ATLAS-2.0 Phase 2B Complete *)"
+      "Bash(git tag -a atlas/2.0-phase-2b-complete -m 'ATLAS-2.0 Phase 2B Complete *)",
+      "Bash(ATLAS_DOCKER_NETWORK=deeds-web-app_legal-ai-network node scripts/atlas/neo4j-graph-enrich.mjs --dry-run --limit=100)",
+      "Bash(ATLAS_DOCKER_NETWORK=deeds-web-app_legal-ai-network node scripts/atlas/neo4j-graph-enrich.mjs --limit=200)",
+      "Bash(ATLAS_DOCKER_NETWORK=deeds-web-app_legal-ai-network timeout 300 node scripts/atlas/neo4j-graph-enrich.mjs)",
+      "Bash(ATLAS_DOCKER_NETWORK=deeds-web-app_legal-ai-network node scripts/atlas/neo4j-graph-enrich.mjs)"
     ],
     "deny": [],
     "ask": []
