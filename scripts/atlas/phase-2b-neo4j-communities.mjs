@@ -94,7 +94,7 @@ async function runNeo4jSync() {
   return new Promise((resolve, reject) => {
     const scriptPath = path.join(__dirname, 'sync-graph-truth-neo4j.mjs');
     console.log(`⏳ Step 1: Running Neo4j sync...`);
-    const proc = spawn('node', [scriptPath, '--apply'], { stdio: 'inherit', cwd: __dirname });
+    const proc = spawn('node', [scriptPath, '--apply'], { stdio: 'inherit', cwd: ROOT });
 
     proc.on('close', (code) => {
       if (code === 0) {
@@ -114,7 +114,7 @@ async function runCommunityDetection() {
   return new Promise((resolve, reject) => {
     const scriptPath = path.join(__dirname, 'graphrag-kmeans-communities.mjs');
     console.log(`⏳ Step 3: Running Rust community detection...`);
-    const proc = spawn('node', [scriptPath], { stdio: 'inherit', cwd: __dirname });
+    const proc = spawn('node', [scriptPath], { stdio: 'inherit', cwd: ROOT });
 
     proc.on('close', (code) => {
       if (code === 0) {

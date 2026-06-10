@@ -441,7 +441,8 @@
       "PowerShell(Get-ChildItem \"C:\\\\Users\\\\james\\\\Videos\\\\deeds-web-app\\\\scripts\\\\atlas\\\\\" | Where-Object { $_.Name -match \"materialize|packet|preassemble\" } | Select-Object Name, Length | Sort-Object Name)",
       "PowerShell(Get-ChildItem \"C:\\\\Users\\\\james\\\\Videos\\\\deeds-web-app\\\\scripts\\\\atlas\\\\\" | Select-Object Name | Where-Object { $_.Name -match \"materialize|preassemble|packet|nes\" })",
       "Read(//tmp/**)",
-      "Bash(export ATLAS_DOCKER_NETWORK=deeds-web-app_legal-ai-network)"
+      "Bash(export ATLAS_DOCKER_NETWORK=deeds-web-app_legal-ai-network)",
+      "Bash(git tag -a atlas/2.0-phase-2b-complete -m 'ATLAS-2.0 Phase 2B Complete *)"
     ],
     "deny": [],
     "ask": []
