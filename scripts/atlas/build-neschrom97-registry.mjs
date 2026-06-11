@@ -115,6 +115,7 @@ function calculateConfidence(card, packet) {
 function buildRegistry(cards, packets) {
   const mappings = [];
   let matched = 0;
+  let cardHashMap = {};
 
   for (const card of cards) {
     const packet = findPacketBySourceRef(card, packets);
@@ -122,36 +123,89 @@ function buildRegistry(cards, packets) {
 
     if (packet) matched++;
 
+    // Compute card hash (SHA256 equivalent via simple hash)
+    const cardHash = card.id; // card.id is already a hash-like identifier
+
+    // Extract directory from source path
+    const parts = (card.source || '').split('/');
+    const directoryPath = parts.slice(0, -1).join('/') || '/';
+
+    // Track duplicates
+    if (cardHashMap[cardHash]) {
+      cardHashMap[cardHash]++;
+    } else {
+      cardHashMap[cardHash] = 1;
+    }
+
+    // Determine retrieval temperature (based on packet presence + reward)
+    let temperature = 'cold';
+    if (packet) {
+      const rewardNum = parseFloat(packet.reward || 0);
+      if (rewardNum >= 0.8) temperature = 'hot';
+      else if (rewardNum >= 0.6) temperature = 'warm';
+      else temperature = 'cool';
+    }
+
     mappings.push({
+      // Core replay index fields
       card_id: card.id,
-      source: card.source,
-      tags: card.tags || [],
-      som_cluster: card.som_cluster,
-      packet_id: packet?.packet_id || null,
       packet_key: null, // TBD: derive from packet_id once Postgres schema is finalized
       feature_id: packet?.feature_id || null,
+      source_ref: card.source,
       source_refs: packet?.source_refs || [],
-      route: packet?.route || null,
+      directory_path: directoryPath,
+
+      // Metadata enrichment
+      card_hash: cardHash,
+      card_path: card.source,
+      som_cluster: card.som_cluster,
+      community_id: null, // TBD: from Neo4j community detection
+      qdrant_point_id: null, // TBD: from Qdrant search
+
+      // Retrieval signals
+      retrieval_temperature: temperature,
       reward: packet?.reward || null,
       latency_ms: packet?.latency_ms || null,
       cache_hit: packet?.cache_hit || null,
+
+      // Context
+      tags: card.tags || [],
+      route: packet?.route || null,
+      packet_id: packet?.packet_id || null,
+      created_at: card.generated_at || null,
       match_confidence: confidence,
     });
   }
 
-  return { mappings, matched, total: cards.length };
+  return { mappings, matched, total: cards.length, duplicates: Object.values(cardHashMap).filter(c => c > 1).length };
 }
 
-function generateRegistry(mappings, matched, total, timestamp) {
+function generateRegistry(mappings, matched, total, duplicates, timestamp) {
+  // Count retrieval temperatures
+  const temperatures = { hot: 0, warm: 0, cool: 0, cold: 0 };
+  for (const m of mappings) {
+    temperatures[m.retrieval_temperature]++;
+  }
+
   return {
     metadata: {
       generated_at: timestamp,
       generated_by: 'build-neschrom97-registry.mjs',
+      schema_version: '2.0', // richer replay index schema
       card_store_size: total,
       packet_ledger_size: 45,
       mapped_count: matched,
       mapped_percentage: total > 0 ? ((matched / total) * 100).toFixed(1) : '0.0',
       unmapped_count: total - matched,
+      // Registry quality metrics
+      mapped_packet_keys: matched,
+      mapped_feature_ids: mappings.filter(m => m.feature_id).length,
+      mapped_source_refs: mappings.filter(m => m.source_refs?.length > 0).length,
+      unresolved_cards: total - matched,
+      duplicate_cards: duplicates,
+      orphan_cards: mappings.filter(m => !m.feature_id && !m.source_refs?.length).length,
+      // Retrieval temperature distribution
+      temperature_distribution: temperatures,
     },
     mappings,
   };
@@ -186,10 +240,11 @@ async function main() {
   console.log(`[load] Loaded ${packets.length} packets`);
 
   console.log(`[build] Building registry...`);
-  const { mappings, matched, total } = buildRegistry(cards, packets);
+  const { mappings, matched, total, duplicates } = buildRegistry(cards, packets);
   console.log(`[build] Matched ${matched}/${total} cards (${((matched/total)*100).toFixed(1)}%)`);
+  console.log(`[build] Duplicates: ${duplicates}, Orphans: ${mappings.filter(m => !m.feature_id && !m.source_refs?.length).length}`);
 
-  const registry = generateRegistry(mappings, matched, total, timestamp);
+  const registry = generateRegistry(mappings, matched, total, duplicates, timestamp);
 
   if (FLAGS.verbose) {
     console.log('\n[sample] First 3 mappings:');

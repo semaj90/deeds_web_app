@@ -71,8 +71,18 @@ function testCardCount(meta, mappings) {
 }
 
 function testMappingStructure(mappings) {
-  // Check first 10 mappings for required fields
-  const required = ['card_id', 'source', 'tags', 'som_cluster', 'packet_id', 'feature_id', 'match_confidence'];
+  // Check first 10 mappings for required replay index fields
+  const required = [
+    'card_id',
+    'card_hash',
+    'card_path',
+    'source_ref',
+    'directory_path',
+    'feature_id',
+    'packet_key',
+    'retrieval_temperature',
+    'match_confidence',
+  ];
 
   for (let i = 0; i < Math.min(10, mappings.length); i++) {
     const m = mappings[i];
