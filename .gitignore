@@ -935,3 +935,6 @@ neschrom97/
 # Large generated Atlas audit reports; keep on disk, never commit
 docs/reports/ignored-directory-audit.json
 docs/reports/ignored-directory-audit.md
+docs/reports/ignored-directory-audit.min.json
+docs/reports/ignored-directory-audit*.gz
+docs/reports/ignored-directory-audit*.zst

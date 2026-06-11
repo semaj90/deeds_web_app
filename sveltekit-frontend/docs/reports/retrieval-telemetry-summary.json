@@ -1,0 +1,115 @@
+{
+  "generatedAt": "2026-06-11T15:21:16.520Z",
+  "phase": "3D",
+  "name": "retrieval-telemetry",
+  "classification": "COLLECTING",
+  "targetRows": 1000,
+  "qdrant": {
+    "runtimeCollection": "legal_documents",
+    "codebaseCollection": "codebase_chunks_768"
+  },
+  "expectedColumns": [
+    "id",
+    "created_at",
+    "query",
+    "query_hash",
+    "latency_ms",
+    "vector_hits",
+    "trigram_hits",
+    "fts_hits",
+    "selected_packet_key",
+    "selected_packet_keys",
+    "selected_feature_id",
+    "feature_ids",
+    "fusion_score",
+    "cache_hit",
+    "surface",
+    "environment",
+    "retrieval_strategy"
+  ],
+  "postgres": {
+    "status": "READY",
+    "tableExists": true,
+    "columns": [
+      "id",
+      "created_at",
+      "query",
+      "query_hash",
+      "latency_ms",
+      "vector_hits",
+      "trigram_hits",
+      "fts_hits",
+      "selected_packet_key",
+      "selected_packet_keys",
+      "selected_feature_id",
+      "feature_ids",
+      "fusion_score",
+      "cache_hit",
+      "surface",
+      "environment",
+      "retrieval_strategy"
+    ],
+    "rows": 4,
+    "realRows": 2,
+    "smokeRows": 2,
+    "error": null
+  },
+  "metrics": {
+    "queryCount": 4,
+    "realQueryCount": 2,
+    "smokeQueryCount": 2,
+    "uniqueQueries": 4,
+    "meanLatencyMs": 13.75,
+    "p50LatencyMs": 8,
+    "p95LatencyMs": 33.65,
+    "p99LatencyMs": 37.13,
+    "cacheHitRatio": 0
+  },
+  "bySurface": [
+    {
+      "surface": "ci",
+      "rows": 2
+    },
+    {
+      "surface": "hyperrag-packet-rpc",
+      "rows": 1
+    },
+    {
+      "surface": "probe",
+      "rows": 1
+    }
+  ],
+  "topFeatures": [
+    {
+      "feature_id": "retrieval-telemetry",
+      "rows": 2
+    },
+    {
+      "feature_id": "ai",
+      "rows": 1
+    }
+  ],
+  "byStrategy": [
+    {
+      "retrieval_strategy": "smoke",
+      "rows": 2
+    },
+    {
+      "retrieval_strategy": "hyperrag_packet_rpc",
+      "rows": 1
+    },
+    {
+      "retrieval_strategy": "probe",
+      "rows": 1
+    }
+  ],
+  "sourceDocs": [
+    "..\\docs\\reports\\PHASE-3D-RETRIEVAL-TELEMETRY.md",
+    "..\\reports\\parent-atlas-open-lanes-todo.md"
+  ],
+  "nextActions": [
+    "continue collecting real retrieval records until realRows >= 1000",
+    "smoke rows only prove insertion and do not count toward behavioral temperature",
+    "do not automate cache policy from structural temperature alone"
+  ]
+}

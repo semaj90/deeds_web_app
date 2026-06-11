@@ -7,8 +7,7 @@
  * Non-blocking: failures are logged but do not interrupt query execution.
  */
 
-import { db } from '$lib/server/db/client';
-import { retrievalTelemetry } from '$lib/server/db/schema-postgres';
+import { pool } from '$lib/server/db/client.js';
 import crypto from 'node:crypto';
 
 export interface RetrievalTelemetrySignal {
@@ -17,12 +16,20 @@ export interface RetrievalTelemetrySignal {
   vectorHits: number;
   trigramHits: number;
   ftsHits: number;
-  selectedPacketKey?: string;
-  selectedFeatureId?: string;
+  selectedPacketKey?: string | null;
+  selectedPacketKeys?: string[];
+  selectedFeatureId?: string | null;
+  featureIds?: string[];
   fusionScore?: number;
   cacheHit?: boolean;
   surface: string;
   environment: string;
+  retrievalStrategy?: string;
+}
+
+function cleanStringArray(values: unknown): string[] {
+  if (!Array.isArray(values)) return [];
+  return [...new Set(values.map((value) => String(value ?? '').trim()).filter(Boolean))];
 }
 
 /**
@@ -42,23 +49,48 @@ export async function recordRetrievalTelemetry(signal: RetrievalTelemetrySignal)
       .update(signal.query)
       .digest('hex');
 
-    await db
-      .insert(retrievalTelemetry)
-      .values({
-        query: signal.query.slice(0, 2000),
+    const selectedPacketKeys = cleanStringArray(signal.selectedPacketKeys);
+    const featureIds = cleanStringArray(signal.featureIds);
+
+    await pool.query(
+      `
+        insert into retrieval_telemetry (
+          query,
+          query_hash,
+          latency_ms,
+          vector_hits,
+          trigram_hits,
+          fts_hits,
+          selected_packet_key,
+          selected_packet_keys,
+          selected_feature_id,
+          feature_ids,
+          fusion_score,
+          cache_hit,
+          surface,
+          environment,
+          retrieval_strategy
+        )
+        values ($1, $2, $3, $4, $5, $6, $7, $8::jsonb, $9, $10::jsonb, $11, $12, $13, $14, $15)
+      `,
+      [
+        signal.query.slice(0, 2000),
         queryHash,
-        latencyMs: signal.latencyMs,
-        vectorHits: signal.vectorHits,
-        trigramHits: signal.trigramHits,
-        ftsHits: signal.ftsHits,
-        selectedPacketKey: signal.selectedPacketKey || null,
-        selectedFeatureId: signal.selectedFeatureId || null,
-        fusionScore: signal.fusionScore || null,
-        cacheHit: signal.cacheHit || false,
-        surface: signal.surface,
-        environment: signal.environment,
-      })
-      .run();
+        Math.max(0, Math.round(Number(signal.latencyMs ?? 0))),
+        Math.max(0, Math.round(Number(signal.vectorHits ?? 0))),
+        Math.max(0, Math.round(Number(signal.trigramHits ?? 0))),
+        Math.max(0, Math.round(Number(signal.ftsHits ?? 0))),
+        signal.selectedPacketKey ?? selectedPacketKeys[0] ?? null,
+        JSON.stringify(selectedPacketKeys),
+        signal.selectedFeatureId ?? featureIds[0] ?? null,
+        JSON.stringify(featureIds),
+        signal.fusionScore ?? null,
+        Boolean(signal.cacheHit),
+        signal.surface,
+        signal.environment,
+        signal.retrievalStrategy ?? 'hybrid',
+      ],
+    );
   } catch (err) {
     // Telemetry failure should not block queries
     console.error('[Telemetry] Failed to record retrieval signal:', {
@@ -80,22 +112,7 @@ export async function recordRetrievalTelemetryBatch(signals: RetrievalTelemetryS
   if (signals.length === 0) return;
 
   try {
-    const records = signals.map((signal) => ({
-      query: signal.query.slice(0, 2000),
-      queryHash: crypto.createHash('sha256').update(signal.query).digest('hex'),
-      latencyMs: signal.latencyMs,
-      vectorHits: signal.vectorHits,
-      trigramHits: signal.trigramHits,
-      ftsHits: signal.ftsHits,
-      selectedPacketKey: signal.selectedPacketKey || null,
-      selectedFeatureId: signal.selectedFeatureId || null,
-      fusionScore: signal.fusionScore || null,
-      cacheHit: signal.cacheHit || false,
-      surface: signal.surface,
-      environment: signal.environment,
-    }));
-
-    await db.insert(retrievalTelemetry).values(records).run();
+    await Promise.all(signals.map((signal) => recordRetrievalTelemetry(signal)));
   } catch (err) {
     console.error('[Telemetry] Failed to record batch:', {
       count: signals.length,

@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-06-11T05:39:28.739Z",
+  "generatedAt": "2026-06-11T15:21:16.464Z",
   "repo": "sveltekit-frontend",
   "evidenceFirst": true,
   "roles": {
@@ -13,22 +13,22 @@
     "snapshotJson": ".opencode\\recommendations\\recommendations.json",
     "snapshotMd": ".opencode\\recommendations\\recommendations.md",
     "eventsJsonl": ".opencode\\recommendations\\recommendation-events.jsonl",
-    "currentCount": 199
+    "currentCount": 235
   },
   "tasks": {
     "stateJson": ".opencode\\tasks\\task-state.json",
     "stateMd": ".opencode\\tasks\\task-state.md",
     "eventsJsonl": ".opencode\\tasks\\task-events.jsonl",
-    "currentCount": 12,
-    "openCount": 4
+    "currentCount": 13,
+    "openCount": 5
   },
   "activeLane": {
-    "taskId": "task_4_circular_dependency_chains_of_3_files",
-    "title": "4 circular dependency chains of 3+ files",
+    "taskId": "task_phase_3d_retrieval_telemetry",
+    "title": "Phase 3D retrieval telemetry",
     "priority": "HIGH",
-    "status": "TODO",
-    "command": null,
-    "sourceRecommendationKey": "4_circular_dependency_chains_of_3_files"
+    "status": "IN_PROGRESS",
+    "command": "npm run atlas:phase3d:telemetry-summary",
+    "sourceRecommendationKey": "phase-3d-retrieval-telemetry"
   },
   "openLanesTodo": "reports\\parent-atlas-open-lanes-todo.md",
   "reports": {

@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-06-11T05:39:28.739Z",
+  "generatedAt": "2026-06-11T15:21:16.464Z",
   "sourceFiles": {
     "recommendationEvents": ".opencode\\recommendations\\recommendation-events.jsonl",
     "taskEvents": ".opencode\\tasks\\task-events.jsonl",
@@ -7,32 +7,90 @@
   },
   "counts": {
     "findings": 0,
-    "recommendations": 199,
-    "tasks": 12,
-    "historyPackets": 20
+    "recommendations": 235,
+    "tasks": 13,
+    "historyPackets": 22
   },
   "summary": {
-    "runId": "2026-06-11T05:39:28.739Z",
+    "runId": "2026-06-11T15:21:16.464Z",
     "findingCount": 0,
-    "recommendationCount": 199,
-    "taskCount": 12,
-    "historyCount": 20,
-    "promotedRecommendations": 12,
+    "recommendationCount": 235,
+    "taskCount": 13,
+    "historyCount": 22,
+    "promotedRecommendations": 13,
     "activeLane": {
-      "taskId": "task_4_circular_dependency_chains_of_3_files",
-      "title": "4 circular dependency chains of 3+ files",
+      "taskId": "task_phase_3d_retrieval_telemetry",
+      "title": "Phase 3D retrieval telemetry",
       "priority": "HIGH",
-      "status": "TODO",
-      "command": null,
-      "sourceRecommendationKey": "4_circular_dependency_chains_of_3_files"
+      "status": "IN_PROGRESS",
+      "command": "npm run atlas:phase3d:telemetry-summary",
+      "sourceRecommendationKey": "phase-3d-retrieval-telemetry"
     }
   },
   "taskState": {
-    "generatedAt": "2026-06-11T05:39:28.739Z",
-    "recommendationEventsCount": 199,
-    "taskEventsCount": 20,
-    "promotedRecommendationsCount": 12,
+    "generatedAt": "2026-06-11T15:21:16.464Z",
+    "recommendationEventsCount": 235,
+    "taskEventsCount": 22,
+    "promotedRecommendationsCount": 13,
     "tasks": [
+      {
+        "task_id": "task_phase_3d_retrieval_telemetry",
+        "title": "Phase 3D retrieval telemetry",
+        "description": "Capture behavioral retrieval telemetry before automating cache policy, feature governance, or SeaweedFS promotion.",
+        "priority": "HIGH",
+        "status": "IN_PROGRESS",
+        "source_recommendation_key": "phase-3d-retrieval-telemetry",
+        "command": "npm run atlas:phase3d:telemetry-summary",
+        "feature_id": "retrieval-telemetry",
+        "source_refs": [
+          "../docs/reports/PHASE-3D-RETRIEVAL-TELEMETRY.md",
+          "../reports/parent-atlas-open-lanes-todo.md"
+        ],
+        "evidence_refs": [
+          "../docs/reports/PHASE-3D-RETRIEVAL-TELEMETRY.md",
+          "../reports/parent-atlas-open-lanes-todo.md"
+        ],
+        "first_seen": "2026-06-11T14:22:58.859Z",
+        "last_seen": "2026-06-11T14:25:34.822Z",
+        "created_at": "2026-06-11T14:22:58.859Z",
+        "updated_at": "2026-06-11T14:25:34.822Z",
+        "history": [
+          {
+            "event_id": "task_5ed41d869430",
+            "event_type": "TASK_CREATED",
+            "created_at": "2026-06-11T14:22:58.859Z",
+            "run_id": "2026-06-11T04:33:05.170Z",
+            "task_id": "task_phase_3d_retrieval_telemetry",
+            "source_recommendation_key": "phase-3d-retrieval-telemetry",
+            "title": "Phase 3D retrieval telemetry",
+            "description": "Capture behavioral retrieval telemetry before automating cache policy, feature governance, or SeaweedFS promotion.",
+            "priority": "HIGH",
+            "status": "TODO",
+            "parent_task_id": null,
+            "command": "npm run atlas:phase3d:telemetry-summary",
+            "feature_id": "retrieval-telemetry",
+            "source_refs": [
+              "../docs/reports/PHASE-3D-RETRIEVAL-TELEMETRY.md",
+              "../reports/parent-atlas-open-lanes-todo.md"
+            ],
+            "evidence_refs": [
+              "../docs/reports/PHASE-3D-RETRIEVAL-TELEMETRY.md",
+              "../reports/parent-atlas-open-lanes-todo.md"
+            ]
+          },
+          {
+            "event_id": "task_20ab3089d5c6",
+            "event_type": "TASK_STATUS_CHANGED",
+            "created_at": "2026-06-11T14:25:34.822Z",
+            "run_id": "2026-06-11T14:25:34.820Z",
+            "task_id": "task_phase_3d_retrieval_telemetry",
+            "previous_state": "TODO",
+            "new_state": "IN_PROGRESS",
+            "reason": "bootstrap-selected-lane:phase-3d-retrieval-telemetry"
+          }
+        ],
+        "seen_count": 3
+      },
       {
         "task_id": "task_27_api_route_handlers_lack_auth_guards",
         "title": "27 API route handlers lack auth guards",
@@ -127,7 +185,7 @@
             ]
           }
         ],
-        "seen_count": 16
+        "seen_count": 19
       },
       {
         "task_id": "task_graph_missing_neighborhood",
@@ -271,7 +329,7 @@
             ]
           }
         ],
-        "seen_count": 16
+        "seen_count": 19
       },
       {
         "task_id": "task_active_production_topology_mirror",
@@ -606,7 +664,7 @@
             ]
           }
         ],
-        "seen_count": 16
+        "seen_count": 19
       },
       {
         "task_id": "task_command_mapping_mcp_allowlist",
@@ -654,7 +712,7 @@
             ]
           }
         ],
-        "seen_count": 16
+        "seen_count": 19
       },
       {
         "task_id": "task_atlas_topology_mirror_infer_siblings",
@@ -760,15 +818,15 @@
             ]
           }
         ],
-        "seen_count": 16
+        "seen_count": 19
       }
     ],
     "recommendationSummary": [
       {
         "recommendation_key": "4_circular_dependency_chains_of_3_files",
-        "count": 16,
+        "count": 19,
         "first_seen": "2026-06-11T03:18:47.299Z",
-        "last_seen": "2026-06-11T05:39:21.747Z",
+        "last_seen": "2026-06-11T14:26:21.415Z",
         "title": "4 circular dependency chains of 3+ files",
         "severity": "HIGH",
         "command": null,
@@ -777,9 +835,9 @@
       },
       {
         "recommendation_key": "27_api_route_handlers_lack_auth_guards",
-        "count": 16,
+        "count": 19,
         "first_seen": "2026-06-11T03:18:47.300Z",
-        "last_seen": "2026-06-11T05:39:21.748Z",
+        "last_seen": "2026-06-11T14:26:21.416Z",
         "title": "27 API route handlers lack auth guards",
         "severity": "HIGH",
         "command": null,
@@ -788,9 +846,9 @@
       },
       {
         "recommendation_key": "25_files_have_0_importers_and_are_not_entrypoints",
-        "count": 16,
+        "count": 19,
         "first_seen": "2026-06-11T03:18:47.300Z",
-        "last_seen": "2026-06-11T05:39:21.748Z",
+        "last_seen": "2026-06-11T14:26:21.416Z",
         "title": "25 files have 0 importers and are not entrypoints",
         "severity": "MEDIUM",
         "command": null,
@@ -799,9 +857,9 @@
       },
       {
         "recommendation_key": "30_files_each_depended_on_by_50_files_transitively",
-        "count": 16,
+        "count": 19,
         "first_seen": "2026-06-11T03:18:47.300Z",
-        "last_seen": "2026-06-11T05:39:21.748Z",
+        "last_seen": "2026-06-11T14:26:21.416Z",
         "title": "30 files each depended on by >50 files transitively",
         "severity": "MEDIUM",
         "command": null,
@@ -810,9 +868,9 @@
       },
       {
         "recommendation_key": "157_api_routes_lack_zod_input_validation",
-        "count": 16,
+        "count": 19,
         "first_seen": "2026-06-11T03:18:47.300Z",
-        "last_seen": "2026-06-11T05:39:21.748Z",
+        "last_seen": "2026-06-11T14:26:21.416Z",
         "title": "157 API routes lack Zod input validation",
         "severity": "MEDIUM",
         "command": null,
@@ -821,9 +879,9 @@
       },
       {
         "recommendation_key": "35_files_in_circular_dependency_chains_have_no_paired_test",
-        "count": 16,
+        "count": 19,
         "first_seen": "2026-06-11T03:18:47.300Z",
-        "last_seen": "2026-06-11T05:39:21.748Z",
+        "last_seen": "2026-06-11T14:26:21.416Z",
         "title": "35 files in circular dependency chains have no paired test",
         "severity": "MEDIUM",
         "command": null,
@@ -832,9 +890,9 @@
       },
       {
         "recommendation_key": "243_substantial_files_import_libraries_but_have_0_consumers",
-        "count": 16,
+        "count": 19,
         "first_seen": "2026-06-11T03:18:47.300Z",
-        "last_seen": "2026-06-11T05:39:21.748Z",
+        "last_seen": "2026-06-11T14:26:21.416Z",
         "title": "243 substantial files import libraries but have 0 consumers",
         "severity": "MEDIUM",
         "command": null,
@@ -843,9 +901,9 @@
       },
       {
         "recommendation_key": "11_2_file_circular_dependency_pairs",
-        "count": 16,
+        "count": 19,
         "first_seen": "2026-06-11T03:18:47.300Z",
-        "last_seen": "2026-06-11T05:39:21.748Z",
+        "last_seen": "2026-06-11T14:26:21.416Z",
         "title": "11 2-file circular dependency pairs",
         "severity": "LOW",
         "command": null,
@@ -909,9 +967,9 @@
       },
       {
         "recommendation_key": "parent-atlas-overlay-mismatch",
-        "count": 16,
+        "count": 19,
         "first_seen": "2026-06-11T03:18:47.301Z",
-        "last_seen": "2026-06-11T05:39:21.748Z",
+        "last_seen": "2026-06-11T14:26:21.417Z",
         "title": "Parent Atlas overlay mismatch",
         "severity": "MEDIUM",
         "command": "npm run atlas:parent-atlas:overlay-crosswalk",
@@ -920,9 +978,9 @@
       },
       {
         "recommendation_key": "command-mapping-mcp-allowlist",
-        "count": 16,
+        "count": 19,
         "first_seen": "2026-06-11T03:18:47.301Z",
-        "last_seen": "2026-06-11T05:39:21.748Z",
+        "last_seen": "2026-06-11T14:26:21.417Z",
         "title": "Command Mapping -> MCP allowlist",
         "severity": "MEDIUM",
         "command": "npm run opencode:tasks:refresh",
@@ -931,9 +989,9 @@
       },
       {
         "recommendation_key": "synthetic-evidence-concept-cards",
-        "count": 16,
+        "count": 19,
         "first_seen": "2026-06-11T03:18:47.301Z",
-        "last_seen": "2026-06-11T05:39:21.748Z",
+        "last_seen": "2026-06-11T14:26:21.417Z",
         "title": "Synthetic Evidence concept cards",
         "severity": "LOW",
         "command": "npm run opencode:tasks:refresh",
@@ -950,6 +1008,17 @@
         "command": "npm run atlas:coverage:qdrant-no-som",
         "source": "report:production-qdrant-no-som",
         "feature_id": "som"
+      },
+      {
+        "recommendation_key": "phase-3d-retrieval-telemetry",
+        "count": 3,
+        "first_seen": "2026-06-11T14:22:58.715Z",
+        "last_seen": "2026-06-11T14:26:21.417Z",
+        "title": "Phase 3D retrieval telemetry",
+        "severity": "HIGH",
+        "command": "npm run atlas:phase3d:telemetry-summary",
+        "source": "report:phase-3d",
+        "feature_id": "retrieval-telemetry"
       }
     ]
   }
