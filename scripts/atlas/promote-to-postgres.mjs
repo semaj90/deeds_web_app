@@ -290,6 +290,19 @@ if (APPLY && (inserted - errors.length) > 0) {
     const { execFileSync } = await import('node:child_process');
     execFileSync('node', [resolve(ROOT, 'scripts/atlas/write-graph-refresh-manifest.mjs')], { stdio: 'inherit' });
     console.log('🔄 Graph refresh manifest invalidated after promotion.');
+
+    const manifestPath = resolve(ROOT, 'memory/exports/graph-refresh-manifest.json');
+    const manifest = JSON.parse(readFileSync(manifestPath, 'utf8'));
+    const digest = String(manifest?.hashes?.clusterCardsSha256 ?? manifest?.generatedAt ?? '').slice(0, 16);
+    if (digest) {
+      const tsx = await import('tsx/esm/api').catch(() => null);
+      if (tsx?.register) tsx.register();
+      const { invalidateGraphCaches } = await import(resolve(ROOT, 'sveltekit-frontend/src/lib/server/cache/cache-invalidation.ts'));
+      await invalidateGraphCaches(digest);
+      console.log('🧹 Graph cache invalidation applied after promotion.');
+    } else {
+      console.warn('⚠️  Graph cache invalidation skipped: no manifest digest available.');
+    }
   } catch (e) {
     console.warn('⚠️  Graph refresh manifest post-hook failed (non-fatal):', e.message);
   }

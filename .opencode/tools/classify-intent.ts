@@ -16,24 +16,6 @@ function safePattern(input: string) {
   );
 }
 
-import { tool } from 'ai';
-import { z } from 'zod';
-
-const intentEnum = z.enum(['repair', 'research', 'planning']);
-const domainEnum = z.enum(['retrieval', 'graph', 'agent-workflow', 'general']);
-const subdomainEnum = z.enum(['ace-pipeline', 'tool-schema', 'cache', 'unknown']);
-
-function safePattern(input: string) {
-  return (
-    input
-      .split(/\s+/)
-      .slice(0, 5)
-      .map((s) => s.replace(/[^\w.-]/g, ''))
-      .filter(Boolean)
-      .join('|') || 'TODO|FIXME|error'
-  );
-}
-
 export const classifyIntent = tool({
   description:
     'Classify a user prompt into intent, domain, subdomain, confidence, and a read-only evidence-gathering command. TurboVec reranks candidates only; it does not read files directly.',

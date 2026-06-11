@@ -1,0 +1,31 @@
+[package]
+name = "atlas-packet-parser"
+version = "0.1.0"
+edition = "2021"
+description = "N-API large JSON/NDJSON packet parser streaming to MessagePack chunks"
+
+[lib]
+crate-type = ["cdylib"]
+name = "atlas_packet_parser"
+
+[dependencies]
+# N-API bindings
+napi = { version = "2", features = ["napi4", "async"] }
+napi-derive = "2"
+
+# JSON/MessagePack serialization
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+rmp-serde = "1.1"
+
+# Parallel iterators
+rayon = "1.10"
+
+[build-dependencies]
+napi-build = "2"
+
+[profile.release]
+opt-level = 3
+lto = true
+codegen-units = 1
+strip = "symbols"

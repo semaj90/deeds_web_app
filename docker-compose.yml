@@ -29,10 +29,15 @@ services:
 
   # PostgreSQL 18 + pgvector — primary database
   # NOTE: Stop native postgres.exe first to free port 5432
+  # Optimizations: AIO (async I/O), skip-scan indexes, temporal constraints
   postgres:
     image: pgvector/pgvector:pg18
     container_name: legal-ai-postgres
     restart: unless-stopped
+    command:
+      - "postgres"
+      - "-c"
+      - "io_method=posix_aio"
     deploy:
       resources:
         limits:

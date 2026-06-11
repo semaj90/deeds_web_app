@@ -1,0 +1,603 @@
+{
+  "schema": "neschrom97_qdrant_tag_apply.v1",
+  "generatedAt": "2026-06-11T19:52:12.156Z",
+  "collection": "codebase_chunks_768",
+  "qdrantUrl": "http://127.0.0.1:6333",
+  "scope": {
+    "readOnly": false,
+    "excludedCollections": [
+      "legal_documents"
+    ]
+  },
+  "inputs": {
+    "cardsDir": "neschrom97/cards",
+    "packetRegistry": "docs/reports/neschrom97-card-registry.json"
+  },
+  "summary": {
+    "cardsTotal": 8170,
+    "livePacketsTotal": 20,
+    "matchedPackets": 20,
+    "unmatchedPackets": 0,
+    "retrievedQdrantPoints": 19,
+    "retrieveFailures": 0,
+    "applyMode": true,
+    "limit": null,
+    "patchedPoints": 19
+  },
+  "topTags": [
+    {
+      "tag": "surface:neschrom97",
+      "count": 20
+    },
+    {
+      "tag": "surface:hyperrag",
+      "count": 20
+    },
+    {
+      "tag": "directory:src/lib/components/ui",
+      "count": 4
+    },
+    {
+      "tag": "card:a737528a4d86cad9",
+      "count": 2
+    },
+    {
+      "tag": "source_ref:src/lib/cache/cache-service.svelte.ts",
+      "count": 2
+    },
+    {
+      "tag": "directory:src/lib/cache",
+      "count": 2
+    },
+    {
+      "tag": "card:f0aff2609fc63ff9",
+      "count": 1
+    },
+    {
+      "tag": "source_ref:src/lib/icons/yorha/index.ts",
+      "count": 1
+    },
+    {
+      "tag": "packet:nes:unclassified:71db4b96c7f2c392:a8939096ca48",
+      "count": 1
+    },
+    {
+      "tag": "directory:src/lib/icons/yorha",
+      "count": 1
+    },
+    {
+      "tag": "card:33cbb1aa17dc775c",
+      "count": 1
+    },
+    {
+      "tag": "source_ref:src/lib/index.ts",
+      "count": 1
+    },
+    {
+      "tag": "packet:nes:unclassified:71db4b96c7f2c392:76455727aa6b",
+      "count": 1
+    },
+    {
+      "tag": "directory:src/lib",
+      "count": 1
+    },
+    {
+      "tag": "card:8e71d5ed15c8006e",
+      "count": 1
+    },
+    {
+      "tag": "source_ref:src/lib/server/services/knowledge-search/index.ts",
+      "count": 1
+    },
+    {
+      "tag": "packet:nes:unclassified:71db4b96c7f2c392:694f66e087f2",
+      "count": 1
+    },
+    {
+      "tag": "directory:src/lib/server/services/knowledge-search",
+      "count": 1
+    },
+    {
+      "tag": "card:5aacd12c7c3179e8",
+      "count": 1
+    },
+    {
+      "tag": "source_ref:src/lib/components/ui/svelte5-index.ts",
+      "count": 1
+    }
+  ],
+  "matchedSamples": [
+    {
+      "card_id": "f0aff2609fc63ff9",
+      "packet_key": "nes:unclassified:71db4b96c7f2c392:a8939096ca48",
+      "qdrant_point_id": 667558372,
+      "source_ref": "src/lib/icons/yorha/index.ts",
+      "feature_id": "yorha",
+      "feature_label": "index.ts",
+      "directory_path": "src/lib/icons/yorha",
+      "tags": [
+        "surface:neschrom97",
+        "surface:hyperrag",
+        "card:f0aff2609fc63ff9",
+        "source_ref:src/lib/icons/yorha/index.ts",
+        "packet:nes:unclassified:71db4b96c7f2c392:a8939096ca48",
+        "directory:src/lib/icons/yorha"
+      ],
+      "source_tag_count": 0,
+      "added_tag_count": 6
+    },
+    {
+      "card_id": "33cbb1aa17dc775c",
+      "packet_key": "nes:unclassified:71db4b96c7f2c392:76455727aa6b",
+      "qdrant_point_id": 479854035,
+      "source_ref": "src/lib/index.ts",
+      "feature_id": "sveltekit-frontend",
+      "feature_label": "index.ts",
+      "directory_path": "src/lib",
+      "tags": [
+        "surface:neschrom97",
+        "surface:hyperrag",
+        "card:33cbb1aa17dc775c",
+        "source_ref:src/lib/index.ts",
+        "packet:nes:unclassified:71db4b96c7f2c392:76455727aa6b",
+        "directory:src/lib"
+      ],
+      "source_tag_count": 0,
+      "added_tag_count": 6
+    },
+    {
+      "card_id": "8e71d5ed15c8006e",
+      "packet_key": "nes:unclassified:71db4b96c7f2c392:694f66e087f2",
+      "qdrant_point_id": 65225470,
+      "source_ref": "src/lib/server/services/knowledge-search/index.ts",
+      "feature_id": "knowledge-search",
+      "feature_label": "index.ts",
+      "directory_path": "src/lib/server/services/knowledge-search",
+      "tags": [
+        "surface:neschrom97",
+        "surface:hyperrag",
+        "card:8e71d5ed15c8006e",
+        "source_ref:src/lib/server/services/knowledge-search/index.ts",
+        "packet:nes:unclassified:71db4b96c7f2c392:694f66e087f2",
+        "directory:src/lib/server/services/knowledge-search"
+      ],
+      "source_tag_count": 0,
+      "added_tag_count": 6
+    },
+    {
+      "card_id": "5aacd12c7c3179e8",
+      "packet_key": "nes:ui:71db4b96c7f2c392:fc7e65d4c227",
+      "qdrant_point_id": 310362890,
+      "source_ref": "src/lib/components/ui/svelte5-index.ts",
+      "feature_id": "ui",
+      "feature_label": "svelte5-index.ts",
+      "directory_path": "src/lib/components/ui",
+      "tags": [
+        "surface:neschrom97",
+        "surface:hyperrag",
+        "card:5aacd12c7c3179e8",
+        "source_ref:src/lib/components/ui/svelte5-index.ts",
+        "packet:nes:ui:71db4b96c7f2c392:fc7e65d4c227",
+        "directory:src/lib/components/ui"
+      ],
+      "source_tag_count": 0,
+      "added_tag_count": 6
+    },
+    {
+      "card_id": "84ec5ed46842236d",
+      "packet_key": "nes:ui:71db4b96c7f2c392:e7c1777f7ac6",
+      "qdrant_point_id": 819543807,
+      "source_ref": "src/lib/components/ui/avatar/index.ts",
+      "feature_id": "avatar",
+      "feature_label": "index.ts",
+      "directory_path": "src/lib/components/ui/avatar",
+      "tags": [
+        "surface:neschrom97",
+        "surface:hyperrag",
+        "card:84ec5ed46842236d",
+        "source_ref:src/lib/components/ui/avatar/index.ts",
+        "packet:nes:ui:71db4b96c7f2c392:e7c1777f7ac6",
+        "directory:src/lib/components/ui/avatar"
+      ],
+      "source_tag_count": 0,
+      "added_tag_count": 6
+    },
+    {
+      "card_id": "d5b3b6369ecc7d6f",
+      "packet_key": "nes:ui:71db4b96c7f2c392:bfc8d5267ed2",
+      "qdrant_point_id": 1030716109,
+      "source_ref": "src/lib/components/ui/tooltip.ts",
+      "feature_id": "ui",
+      "feature_label": "tooltip.ts",
+      "directory_path": "src/lib/components/ui",
+      "tags": [
+        "surface:neschrom97",
+        "surface:hyperrag",
+        "card:d5b3b6369ecc7d6f",
+        "source_ref:src/lib/components/ui/tooltip.ts",
+        "packet:nes:ui:71db4b96c7f2c392:bfc8d5267ed2",
+        "directory:src/lib/components/ui"
+      ],
+      "source_tag_count": 0,
+      "added_tag_count": 6
+    },
+    {
+      "card_id": "f916ccb023522ffc",
+      "packet_key": "nes:ui:71db4b96c7f2c392:bf105bc7746f",
+      "qdrant_point_id": 1853558386,
+      "source_ref": "src/lib/components/ui/Card.js",
+      "feature_id": "ui",
+      "feature_label": "Card.js",
+      "directory_path": "src/lib/components/ui",
+      "tags": [
+        "surface:neschrom97",
+        "surface:hyperrag",
+        "card:f916ccb023522ffc",
+        "source_ref:src/lib/components/ui/Card.js",
+        "packet:nes:ui:71db4b96c7f2c392:bf105bc7746f",
+        "directory:src/lib/components/ui"
+      ],
+      "source_tag_count": 0,
+      "added_tag_count": 6
+    },
+    {
+      "card_id": "63729a27cab900a1",
+      "packet_key": "nes:ui:71db4b96c7f2c392:b9c3a023e8eb",
+      "qdrant_point_id": 994898614,
+      "source_ref": "src/lib/components/ui/table/index.ts",
+      "feature_id": "table",
+      "feature_label": "index.ts",
+      "directory_path": "src/lib/components/ui/table",
+      "tags": [
+        "surface:neschrom97",
+        "surface:hyperrag",
+        "card:63729a27cab900a1",
+        "source_ref:src/lib/components/ui/table/index.ts",
+        "packet:nes:ui:71db4b96c7f2c392:b9c3a023e8eb",
+        "directory:src/lib/components/ui/table"
+      ],
+      "source_tag_count": 0,
+      "added_tag_count": 6
+    },
+    {
+      "card_id": "63502acbae549d85",
+      "packet_key": "nes:ui:71db4b96c7f2c392:b94f8a402143",
+      "qdrant_point_id": 1582975295,
+      "source_ref": "src/lib/components/dashboard/index.ts",
+      "feature_id": "dashboard",
+      "feature_label": "index.ts",
+      "directory_path": "src/lib/components/dashboard",
+      "tags": [
+        "surface:neschrom97",
+        "surface:hyperrag",
+        "card:63502acbae549d85",
+        "source_ref:src/lib/components/dashboard/index.ts",
+        "packet:nes:ui:71db4b96c7f2c392:b94f8a402143",
+        "directory:src/lib/components/dashboard"
+      ],
+      "source_tag_count": 0,
+      "added_tag_count": 6
+    },
+    {
+      "card_id": "8c9c07250667e63e",
+      "packet_key": "nes:ui:71db4b96c7f2c392:9d5eab8cd93e",
+      "qdrant_point_id": 1203863982,
+      "source_ref": "src/lib/components/ui/tabs/index.ts",
+      "feature_id": "tabs",
+      "feature_label": "index.ts",
+      "directory_path": "src/lib/components/ui/tabs",
+      "tags": [
+        "surface:neschrom97",
+        "surface:hyperrag",
+        "card:8c9c07250667e63e",
+        "source_ref:src/lib/components/ui/tabs/index.ts",
+        "packet:nes:ui:71db4b96c7f2c392:9d5eab8cd93e",
+        "directory:src/lib/components/ui/tabs"
+      ],
+      "source_tag_count": 0,
+      "added_tag_count": 6
+    },
+    {
+      "card_id": "c99c045b77d28ff7",
+      "packet_key": "nes:ui:71db4b96c7f2c392:69a256e07545",
+      "qdrant_point_id": 514744169,
+      "source_ref": "src/lib/components/ui/index.ts",
+      "feature_id": "ui",
+      "feature_label": "index.ts",
+      "directory_path": "src/lib/components/ui",
+      "tags": [
+        "surface:neschrom97",
+        "surface:hyperrag",
+        "card:c99c045b77d28ff7",
+        "source_ref:src/lib/components/ui/index.ts",
+        "packet:nes:ui:71db4b96c7f2c392:69a256e07545",
+        "directory:src/lib/components/ui"
+      ],
+      "source_tag_count": 0,
+      "added_tag_count": 6
+    },
+    {
+      "card_id": "b3f60b9b946c433a",
+      "packet_key": "nes:ui:71db4b96c7f2c392:622703abaa52",
+      "qdrant_point_id": 1565665475,
+      "source_ref": "src/lib/components/codebase/index.ts",
+      "feature_id": "codebase",
+      "feature_label": "index.ts",
+      "directory_path": "src/lib/components/codebase",
+      "tags": [
+        "surface:neschrom97",
+        "surface:hyperrag",
+        "card:b3f60b9b946c433a",
+        "source_ref:src/lib/components/codebase/index.ts",
+        "packet:nes:ui:71db4b96c7f2c392:622703abaa52",
+        "directory:src/lib/components/codebase"
+      ],
+      "source_tag_count": 0,
+      "added_tag_count": 6
+    },
+    {
+      "card_id": "cc3e931a7198f4c1",
+      "packet_key": "nes:ui:71db4b96c7f2c392:504c954e5851",
+      "qdrant_point_id": 223723270,
+      "source_ref": "src/lib/components/shells/index.ts",
+      "feature_id": "shells",
+      "feature_label": "index.ts",
+      "directory_path": "src/lib/components/shells",
+      "tags": [
+        "surface:neschrom97",
+        "surface:hyperrag",
+        "card:cc3e931a7198f4c1",
+        "source_ref:src/lib/components/shells/index.ts",
+        "packet:nes:ui:71db4b96c7f2c392:504c954e5851",
+        "directory:src/lib/components/shells"
+      ],
+      "source_tag_count": 0,
+      "added_tag_count": 6
+    },
+    {
+      "card_id": "9e9bce4a816d016b",
+      "packet_key": "nes:ui:71db4b96c7f2c392:43fa8b523273",
+      "qdrant_point_id": 689872992,
+      "source_ref": "src/lib/components/ui/dialog/index.ts",
+      "feature_id": "dialog",
+      "feature_label": "index.ts",
+      "directory_path": "src/lib/components/ui/dialog",
+      "tags": [
+        "surface:neschrom97",
+        "surface:hyperrag",
+        "card:9e9bce4a816d016b",
+        "source_ref:src/lib/components/ui/dialog/index.ts",
+        "packet:nes:ui:71db4b96c7f2c392:43fa8b523273",
+        "directory:src/lib/components/ui/dialog"
+      ],
+      "source_tag_count": 0,
+      "added_tag_count": 6
+    },
+    {
+      "card_id": "490ba98b6dcc70cb",
+      "packet_key": "nes:ui:71db4b96c7f2c392:2008c51548ef",
+      "qdrant_point_id": 358937281,
+      "source_ref": "src/lib/components/ui/gaming/n64/index.ts",
+      "feature_id": "n64",
+      "feature_label": "index.ts",
+      "directory_path": "src/lib/components/ui/gaming/n64",
+      "tags": [
+        "surface:neschrom97",
+        "surface:hyperrag",
+        "card:490ba98b6dcc70cb",
+        "source_ref:src/lib/components/ui/gaming/n64/index.ts",
+        "packet:nes:ui:71db4b96c7f2c392:2008c51548ef",
+        "directory:src/lib/components/ui/gaming/n64"
+      ],
+      "source_tag_count": 0,
+      "added_tag_count": 6
+    },
+    {
+      "card_id": "878b22de1bfd5286",
+      "packet_key": "nes:ui:71db4b96c7f2c392:0f57fc3871cf",
+      "qdrant_point_id": 1176688800,
+      "source_ref": "src/lib/components/ui/progress/index.ts",
+      "feature_id": "progress",
+      "feature_label": "index.ts",
+      "directory_path": "src/lib/components/ui/progress",
+      "tags": [
+        "surface:neschrom97",
+        "surface:hyperrag",
+        "card:878b22de1bfd5286",
+        "source_ref:src/lib/components/ui/progress/index.ts",
+        "packet:nes:ui:71db4b96c7f2c392:0f57fc3871cf",
+        "directory:src/lib/components/ui/progress"
+      ],
+      "source_tag_count": 0,
+      "added_tag_count": 6
+    },
+    {
+      "card_id": "2c6ac258b1bf8522",
+      "packet_key": "nes:ui:71db4b96c7f2c392:0d28c36abba9",
+      "qdrant_point_id": 1106851995,
+      "source_ref": "src/lib/components/ui/card/index.ts",
+      "feature_id": "card",
+      "feature_label": "index.ts",
+      "directory_path": "src/lib/components/ui/card",
+      "tags": [
+        "surface:neschrom97",
+        "surface:hyperrag",
+        "card:2c6ac258b1bf8522",
+        "source_ref:src/lib/components/ui/card/index.ts",
+        "packet:nes:ui:71db4b96c7f2c392:0d28c36abba9",
+        "directory:src/lib/components/ui/card"
+      ],
+      "source_tag_count": 0,
+      "added_tag_count": 6
+    },
+    {
+      "card_id": "a737528a4d86cad9",
+      "packet_key": "nes:feature:cache:71db4b96c7f2c392:4e59778e30e7",
+      "qdrant_point_id": 51835002,
+      "source_ref": "src/lib/cache/cache-service.svelte.ts",
+      "feature_id": "cache",
+      "feature_label": "cache-service.svelte.ts",
+      "directory_path": "src/lib/cache",
+      "tags": [
+        "surface:neschrom97",
+        "surface:hyperrag",
+        "card:a737528a4d86cad9",
+        "source_ref:src/lib/cache/cache-service.svelte.ts",
+        "packet:nes:feature:cache:71db4b96c7f2c392:4e59778e30e7",
+        "directory:src/lib/cache"
+      ],
+      "source_tag_count": 0,
+      "added_tag_count": 6
+    },
+    {
+      "card_id": "0fd64ff0c8fe50da",
+      "packet_key": "nes:cluster:19067cadf0:fb3aec99cf9cad58:2a4fa7fc93cb",
+      "qdrant_point_id": 24402830,
+      "source_ref": "src/lib/ai/citation-cache.ts",
+      "feature_id": "ai",
+      "feature_label": "citation-cache.ts",
+      "directory_path": "src/lib/ai",
+      "tags": [
+        "surface:neschrom97",
+        "surface:hyperrag",
+        "card:0fd64ff0c8fe50da",
+        "source_ref:src/lib/ai/citation-cache.ts",
+        "packet:nes:cluster:19067cadf0:fb3aec99cf9cad58:2a4fa7fc93cb",
+        "directory:src/lib/ai"
+      ],
+      "source_tag_count": 0,
+      "added_tag_count": 6
+    },
+    {
+      "card_id": "a737528a4d86cad9",
+      "packet_key": "nes:cache:71db4b96c7f2c392:4e59778e30e7",
+      "qdrant_point_id": 51835002,
+      "source_ref": "src/lib/cache/cache-service.svelte.ts",
+      "feature_id": "cache",
+      "feature_label": "cache-service.svelte.ts",
+      "directory_path": "src/lib/cache",
+      "tags": [
+        "surface:neschrom97",
+        "surface:hyperrag",
+        "card:a737528a4d86cad9",
+        "source_ref:src/lib/cache/cache-service.svelte.ts",
+        "packet:nes:cache:71db4b96c7f2c392:4e59778e30e7",
+        "directory:src/lib/cache"
+      ],
+      "source_tag_count": 0,
+      "added_tag_count": 6
+    }
+  ],
+  "unmatchedSamples": [],
+  "qdrantSamples": [
+    {
+      "id": "667558372",
+      "payload_tags": [
+        "icons",
+        "yorha",
+        "index"
+      ],
+      "payload_source_ref": "src/lib/icons/yorha/index.ts#chunk-0",
+      "payload_feature_id": "utility"
+    },
+    {
+      "id": "479854035",
+      "payload_tags": [
+        "index"
+      ],
+      "payload_source_ref": "src/lib/index.ts#chunk-3",
+      "payload_feature_id": "utility"
+    },
+    {
+      "id": "65225470",
+      "payload_tags": [
+        "services",
+        "knowledge-search",
+        "index"
+      ],
+      "payload_source_ref": "src/lib/server/services/knowledge-search/index.ts#chunk-1",
+      "payload_feature_id": "utility"
+    },
+    {
+      "id": "310362890",
+      "payload_tags": [
+        "components",
+        "svelte5-index",
+        "svelte5",
+        "index"
+      ],
+      "payload_source_ref": "src/lib/components/ui/svelte5-index.ts#chunk-2",
+      "payload_feature_id": "utility"
+    },
+    {
+      "id": "819543807",
+      "payload_tags": [
+        "components",
+        "avatar",
+        "index"
+      ],
+      "payload_source_ref": "src/lib/components/ui/avatar/index.ts#chunk-0",
+      "payload_feature_id": "avatar"
+    },
+    {
+      "id": "1030716109",
+      "payload_tags": [
+        "components",
+        "tooltip"
+      ],
+      "payload_source_ref": "src/lib/components/ui/tooltip.ts#chunk-0",
+      "payload_feature_id": "atlas-context"
+    },
+    {
+      "id": "1853558386",
+      "payload_tags": [
+        "components",
+        "card",
+        "card.svelte"
+      ],
+      "payload_source_ref": "src/lib/components/ui/Card.js#chunk-0",
+      "payload_feature_id": "atlas-context"
+    },
+    {
+      "id": "994898614",
+      "payload_tags": [
+        "components",
+        "table",
+        "index"
+      ],
+      "payload_source_ref": "src/lib/components/ui/table/index.ts#chunk-1",
+      "payload_feature_id": "atlas-context"
+    },
+    {
+      "id": "1582975295",
+      "payload_tags": [
+        "components",
+        "dashboard",
+        "index"
+      ],
+      "payload_source_ref": "src/lib/components/dashboard/index.ts#chunk-0",
+      "payload_feature_id": "dashboard"
+    },
+    {
+      "id": "1203863982",
+      "payload_tags": [
+        "components",
+        "tabs",
+        "index",
+        "tabs.svelte",
+        "tabscontent.svelte",
+        "tabslist.svelte",
+        "tabsroot.svelte",
+        "tabstrigger.svelte",
+        "enhanced-svelte5-types"
+      ],
+      "payload_source_ref": "src/lib/components/ui/tabs/index.ts#chunk-0",
+      "payload_feature_id": "atlas-context"
+    }
+  ],
+  "retrieveFailures": [],
+  "nextActions": [
+    "Write the matched payloads to codebase_chunks_768.",
+    "Keep legal_documents untouched."
+  ]
+}

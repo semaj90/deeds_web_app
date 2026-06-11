@@ -1,0 +1,593 @@
+{
+  "schema": "neschrom97_qdrant_tag_plan.v1",
+  "generatedAt": "2026-06-11T19:38:50.149Z",
+  "input": "docs/reports/neschrom97-card-registry.json",
+  "scope": {
+    "primaryCollection": "codebase_chunks_768",
+    "excludedCollections": [
+      "legal_documents"
+    ],
+    "readOnly": true
+  },
+  "summary": {
+    "registryCards": 8170,
+    "registryPackets": 14956,
+    "joinedCardSamples": 10,
+    "unjoinedCardSamples": 10,
+    "cardPacketJoinCoverage": 0.9169,
+    "cardFeatureCoverage": 0.9169,
+    "readyToTagSamples": 10,
+    "needsJoinBackfillSamples": 10,
+    "recommendedPayloadKeys": [
+      "card_id",
+      "packet_key",
+      "source_ref",
+      "feature_id",
+      "directory_path",
+      "surface:neschrom97"
+    ]
+  },
+  "payloadTemplate": {
+    "collection": "codebase_chunks_768",
+    "payload": {
+      "card_id": "<card_id>",
+      "packet_key": "<packet_key>",
+      "source_ref": "<source_ref>",
+      "feature_id": "<feature_id>",
+      "feature_label": "<feature_label|null>",
+      "directory_path": "<directory_path|null>",
+      "surface": "neschrom97",
+      "qdrant_tags": [
+        "surface:neschrom97",
+        "surface:hyperrag"
+      ]
+    }
+  },
+  "tagHistogram": [
+    {
+      "tag": "surface:neschrom97",
+      "count": 10
+    },
+    {
+      "tag": "surface:hyperrag",
+      "count": 10
+    },
+    {
+      "tag": "directory:src/lib/components",
+      "count": 3
+    },
+    {
+      "tag": "feature:utility",
+      "count": 2
+    },
+    {
+      "tag": "card:00077aad3e4544dd",
+      "count": 1
+    },
+    {
+      "tag": "packet:nes:scripts:f9833631",
+      "count": 1
+    },
+    {
+      "tag": "source_ref:src/lib/components/types.ts",
+      "count": 1
+    },
+    {
+      "tag": "feature:scripts",
+      "count": 1
+    },
+    {
+      "tag": "card:000daa8131cc5445",
+      "count": 1
+    },
+    {
+      "tag": "packet:nes:bits-ui:d6068edc",
+      "count": 1
+    },
+    {
+      "tag": "source_ref:src/routes/(app)/demos/bits-ui/+page.svelte",
+      "count": 1
+    },
+    {
+      "tag": "feature:bits-ui",
+      "count": 1
+    },
+    {
+      "tag": "directory:src/routes/(app)/demos/bits-ui",
+      "count": 1
+    },
+    {
+      "tag": "card:000dec1320dc083e",
+      "count": 1
+    },
+    {
+      "tag": "packet:nes:scripts/case_data/_cache/federal_employee_liability_be9c7168_json:68772ed9",
+      "count": 1
+    },
+    {
+      "tag": "source_ref:../scripts/case_data/_cache/federal_employee_liability_be9c7168.json",
+      "count": 1
+    },
+    {
+      "tag": "feature:feat:scripts/case_data/_cache/federal_employee_liability_be9c7168_json",
+      "count": 1
+    },
+    {
+      "tag": "directory:../scripts/case_data/_cache",
+      "count": 1
+    },
+    {
+      "tag": "card:0011b1119716bfde",
+      "count": 1
+    },
+    {
+      "tag": "packet:nes:utility:2202cfff",
+      "count": 1
+    }
+  ],
+  "readyGroups": [
+    {
+      "key": "utility::src/lib/components",
+      "feature_id": "utility",
+      "feature_label": "CaseOutcomePrediction.svelte",
+      "directory_path": "src/lib/components",
+      "count": 2,
+      "packet_keys": [
+        "nes:utility:2202cfff",
+        "nes:utility:72eb3ee5"
+      ],
+      "source_refs": [
+        "src/lib/components/CaseOutcomePrediction.svelte",
+        "src/lib/components/LegalCorpusSearch.svelte"
+      ],
+      "tags": [
+        "surface:neschrom97",
+        "surface:hyperrag",
+        "card:0011b1119716bfde",
+        "packet:nes:utility:2202cfff",
+        "source_ref:src/lib/components/CaseOutcomePrediction.svelte",
+        "feature:utility",
+        "directory:src/lib/components",
+        "card:0033039f346e5be4",
+        "packet:nes:utility:72eb3ee5",
+        "source_ref:src/lib/components/LegalCorpusSearch.svelte"
+      ]
+    },
+    {
+      "key": "bits-ui::src/routes/(app)/demos/bits-ui",
+      "feature_id": "bits-ui",
+      "feature_label": "+page.svelte",
+      "directory_path": "src/routes/(app)/demos/bits-ui",
+      "count": 1,
+      "packet_keys": [
+        "nes:bits-ui:d6068edc"
+      ],
+      "source_refs": [
+        "src/routes/(app)/demos/bits-ui/+page.svelte"
+      ],
+      "tags": [
+        "surface:neschrom97",
+        "surface:hyperrag",
+        "card:000daa8131cc5445",
+        "packet:nes:bits-ui:d6068edc",
+        "source_ref:src/routes/(app)/demos/bits-ui/+page.svelte",
+        "feature:bits-ui",
+        "directory:src/routes/(app)/demos/bits-ui"
+      ]
+    },
+    {
+      "key": "feat:scripts/api-cleanup/reports/backup-2025-12-14t20-51-26-276z/ai/find/_server_ts::../scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/ai/find",
+      "feature_id": "feat:scripts/api-cleanup/reports/backup-2025-12-14t20-51-26-276z/ai/find/_server_ts",
+      "feature_label": "+server.ts",
+      "directory_path": "../scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/ai/find",
+      "count": 1,
+      "packet_keys": [
+        "nes:scripts/api-cleanup/reports/backup-2025-12-14t20-51-26-276z/ai/find/_server_ts:e874a4bc"
+      ],
+      "source_refs": [
+        "../scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/ai/find/+server.ts"
+      ],
+      "tags": [
+        "surface:neschrom97",
+        "surface:hyperrag",
+        "card:002ba3e702fa3a8d",
+        "packet:nes:scripts/api-cleanup/reports/backup-2025-12-14t20-51-26-276z/ai/find/_server_ts:e874a4bc",
+        "source_ref:../scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/ai/find/+server.ts",
+        "feature:feat:scripts/api-cleanup/reports/backup-2025-12-14t20-51-26-276z/ai/find/_server_ts",
+        "directory:../scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/ai/find"
+      ]
+    },
+    {
+      "key": "feat:scripts/api-cleanup/reports/backup-2025-12-14t20-51-26-276z/benchmark/simd/llms_::../scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/benchmark/simd",
+      "feature_id": "feat:scripts/api-cleanup/reports/backup-2025-12-14t20-51-26-276z/benchmark/simd/llms_",
+      "feature_label": "LLMS.md",
+      "directory_path": "../scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/benchmark/simd",
+      "count": 1,
+      "packet_keys": [
+        "nes:scripts/api-cleanup/reports/backup-2025-12-14t20-51-26-276z/benchmark/simd/llms_:4b429e62"
+      ],
+      "source_refs": [
+        "../scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/benchmark/simd/LLMS.md"
+      ],
+      "tags": [
+        "surface:neschrom97",
+        "surface:hyperrag",
+        "card:0014aa7f00261539",
+        "packet:nes:scripts/api-cleanup/reports/backup-2025-12-14t20-51-26-276z/benchmark/simd/llms_:4b429e62",
+        "source_ref:../scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/benchmark/simd/LLMS.md",
+        "feature:feat:scripts/api-cleanup/reports/backup-2025-12-14t20-51-26-276z/benchmark/simd/llms_",
+        "directory:../scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/benchmark/simd"
+      ]
+    },
+    {
+      "key": "feat:scripts/api-cleanup/reports/backup-2025-12-14t20-51-26-276z/optimize-memory/_ser::../scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/optimize-memory",
+      "feature_id": "feat:scripts/api-cleanup/reports/backup-2025-12-14t20-51-26-276z/optimize-memory/_ser",
+      "feature_label": "+server.ts",
+      "directory_path": "../scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/optimize-memory",
+      "count": 1,
+      "packet_keys": [
+        "nes:scripts/api-cleanup/reports/backup-2025-12-14t20-51-26-276z/optimize-memory/_ser:63a9bb1f"
+      ],
+      "source_refs": [
+        "../scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/optimize-memory/+server.ts"
+      ],
+      "tags": [
+        "surface:neschrom97",
+        "surface:hyperrag",
+        "card:001cd5a620f385ca",
+        "packet:nes:scripts/api-cleanup/reports/backup-2025-12-14t20-51-26-276z/optimize-memory/_ser:63a9bb1f",
+        "source_ref:../scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/optimize-memory/+server.ts",
+        "feature:feat:scripts/api-cleanup/reports/backup-2025-12-14t20-51-26-276z/optimize-memory/_ser",
+        "directory:../scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/optimize-memory"
+      ]
+    },
+    {
+      "key": "feat:scripts/api-cleanup/reports/backup-2025-12-14t21-11-49-641z/yolo/llms_md::../scripts/api-cleanup/reports/backup-2025-12-14T21-11-49-641Z/yolo",
+      "feature_id": "feat:scripts/api-cleanup/reports/backup-2025-12-14t21-11-49-641z/yolo/llms_md",
+      "feature_label": "LLMS.md",
+      "directory_path": "../scripts/api-cleanup/reports/backup-2025-12-14T21-11-49-641Z/yolo",
+      "count": 1,
+      "packet_keys": [
+        "nes:scripts/api-cleanup/reports/backup-2025-12-14t21-11-49-641z/yolo/llms_md:60736998"
+      ],
+      "source_refs": [
+        "../scripts/api-cleanup/reports/backup-2025-12-14T21-11-49-641Z/yolo/LLMS.md"
+      ],
+      "tags": [
+        "surface:neschrom97",
+        "surface:hyperrag",
+        "card:0036cdaebecec57b",
+        "packet:nes:scripts/api-cleanup/reports/backup-2025-12-14t21-11-49-641z/yolo/llms_md:60736998",
+        "source_ref:../scripts/api-cleanup/reports/backup-2025-12-14T21-11-49-641Z/yolo/LLMS.md",
+        "feature:feat:scripts/api-cleanup/reports/backup-2025-12-14t21-11-49-641z/yolo/llms_md",
+        "directory:../scripts/api-cleanup/reports/backup-2025-12-14T21-11-49-641Z/yolo"
+      ]
+    },
+    {
+      "key": "feat:scripts/case_data/_cache/federal_employee_liability_be9c7168_json::../scripts/case_data/_cache",
+      "feature_id": "feat:scripts/case_data/_cache/federal_employee_liability_be9c7168_json",
+      "feature_label": "federal_employee_liability_be9c7168.json",
+      "directory_path": "../scripts/case_data/_cache",
+      "count": 1,
+      "packet_keys": [
+        "nes:scripts/case_data/_cache/federal_employee_liability_be9c7168_json:68772ed9"
+      ],
+      "source_refs": [
+        "../scripts/case_data/_cache/federal_employee_liability_be9c7168.json"
+      ],
+      "tags": [
+        "surface:neschrom97",
+        "surface:hyperrag",
+        "card:000dec1320dc083e",
+        "packet:nes:scripts/case_data/_cache/federal_employee_liability_be9c7168_json:68772ed9",
+        "source_ref:../scripts/case_data/_cache/federal_employee_liability_be9c7168.json",
+        "feature:feat:scripts/case_data/_cache/federal_employee_liability_be9c7168_json",
+        "directory:../scripts/case_data/_cache"
+      ]
+    },
+    {
+      "key": "feat:scripts/tests/test-phoenix-prosecutor_mjs::../scripts/tests",
+      "feature_id": "feat:scripts/tests/test-phoenix-prosecutor_mjs",
+      "feature_label": "test-phoenix-prosecutor.mjs",
+      "directory_path": "../scripts/tests",
+      "count": 1,
+      "packet_keys": [
+        "nes:scripts/tests/test-phoenix-prosecutor_mjs:4904b4d4"
+      ],
+      "source_refs": [
+        "../scripts/tests/test-phoenix-prosecutor.mjs"
+      ],
+      "tags": [
+        "surface:neschrom97",
+        "surface:hyperrag",
+        "card:007a419e167b1986",
+        "packet:nes:scripts/tests/test-phoenix-prosecutor_mjs:4904b4d4",
+        "source_ref:../scripts/tests/test-phoenix-prosecutor.mjs",
+        "feature:feat:scripts/tests/test-phoenix-prosecutor_mjs",
+        "directory:../scripts/tests"
+      ]
+    },
+    {
+      "key": "scripts::src/lib/components",
+      "feature_id": "scripts",
+      "feature_label": "types.ts",
+      "directory_path": "src/lib/components",
+      "count": 1,
+      "packet_keys": [
+        "nes:scripts:f9833631"
+      ],
+      "source_refs": [
+        "src/lib/components/types.ts"
+      ],
+      "tags": [
+        "surface:neschrom97",
+        "surface:hyperrag",
+        "card:00077aad3e4544dd",
+        "packet:nes:scripts:f9833631",
+        "source_ref:src/lib/components/types.ts",
+        "feature:scripts",
+        "directory:src/lib/components"
+      ]
+    }
+  ],
+  "readySamples": [
+    {
+      "card_id": "00077aad3e4544dd",
+      "packet_key": "nes:scripts:f9833631",
+      "source_ref": "src/lib/components/types.ts",
+      "feature_id": "scripts",
+      "feature_label": "types.ts",
+      "directory_path": "src/lib/components",
+      "tags": [
+        "surface:neschrom97",
+        "surface:hyperrag",
+        "card:00077aad3e4544dd",
+        "packet:nes:scripts:f9833631",
+        "source_ref:src/lib/components/types.ts",
+        "feature:scripts",
+        "directory:src/lib/components"
+      ]
+    },
+    {
+      "card_id": "000daa8131cc5445",
+      "packet_key": "nes:bits-ui:d6068edc",
+      "source_ref": "src/routes/(app)/demos/bits-ui/+page.svelte",
+      "feature_id": "bits-ui",
+      "feature_label": "+page.svelte",
+      "directory_path": "src/routes/(app)/demos/bits-ui",
+      "tags": [
+        "surface:neschrom97",
+        "surface:hyperrag",
+        "card:000daa8131cc5445",
+        "packet:nes:bits-ui:d6068edc",
+        "source_ref:src/routes/(app)/demos/bits-ui/+page.svelte",
+        "feature:bits-ui",
+        "directory:src/routes/(app)/demos/bits-ui"
+      ]
+    },
+    {
+      "card_id": "000dec1320dc083e",
+      "packet_key": "nes:scripts/case_data/_cache/federal_employee_liability_be9c7168_json:68772ed9",
+      "source_ref": "../scripts/case_data/_cache/federal_employee_liability_be9c7168.json",
+      "feature_id": "feat:scripts/case_data/_cache/federal_employee_liability_be9c7168_json",
+      "feature_label": "federal_employee_liability_be9c7168.json",
+      "directory_path": "../scripts/case_data/_cache",
+      "tags": [
+        "surface:neschrom97",
+        "surface:hyperrag",
+        "card:000dec1320dc083e",
+        "packet:nes:scripts/case_data/_cache/federal_employee_liability_be9c7168_json:68772ed9",
+        "source_ref:../scripts/case_data/_cache/federal_employee_liability_be9c7168.json",
+        "feature:feat:scripts/case_data/_cache/federal_employee_liability_be9c7168_json",
+        "directory:../scripts/case_data/_cache"
+      ]
+    },
+    {
+      "card_id": "0011b1119716bfde",
+      "packet_key": "nes:utility:2202cfff",
+      "source_ref": "src/lib/components/CaseOutcomePrediction.svelte",
+      "feature_id": "utility",
+      "feature_label": "CaseOutcomePrediction.svelte",
+      "directory_path": "src/lib/components",
+      "tags": [
+        "surface:neschrom97",
+        "surface:hyperrag",
+        "card:0011b1119716bfde",
+        "packet:nes:utility:2202cfff",
+        "source_ref:src/lib/components/CaseOutcomePrediction.svelte",
+        "feature:utility",
+        "directory:src/lib/components"
+      ]
+    },
+    {
+      "card_id": "0014aa7f00261539",
+      "packet_key": "nes:scripts/api-cleanup/reports/backup-2025-12-14t20-51-26-276z/benchmark/simd/llms_:4b429e62",
+      "source_ref": "../scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/benchmark/simd/LLMS.md",
+      "feature_id": "feat:scripts/api-cleanup/reports/backup-2025-12-14t20-51-26-276z/benchmark/simd/llms_",
+      "feature_label": "LLMS.md",
+      "directory_path": "../scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/benchmark/simd",
+      "tags": [
+        "surface:neschrom97",
+        "surface:hyperrag",
+        "card:0014aa7f00261539",
+        "packet:nes:scripts/api-cleanup/reports/backup-2025-12-14t20-51-26-276z/benchmark/simd/llms_:4b429e62",
+        "source_ref:../scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/benchmark/simd/LLMS.md",
+        "feature:feat:scripts/api-cleanup/reports/backup-2025-12-14t20-51-26-276z/benchmark/simd/llms_",
+        "directory:../scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/benchmark/simd"
+      ]
+    },
+    {
+      "card_id": "001cd5a620f385ca",
+      "packet_key": "nes:scripts/api-cleanup/reports/backup-2025-12-14t20-51-26-276z/optimize-memory/_ser:63a9bb1f",
+      "source_ref": "../scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/optimize-memory/+server.ts",
+      "feature_id": "feat:scripts/api-cleanup/reports/backup-2025-12-14t20-51-26-276z/optimize-memory/_ser",
+      "feature_label": "+server.ts",
+      "directory_path": "../scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/optimize-memory",
+      "tags": [
+        "surface:neschrom97",
+        "surface:hyperrag",
+        "card:001cd5a620f385ca",
+        "packet:nes:scripts/api-cleanup/reports/backup-2025-12-14t20-51-26-276z/optimize-memory/_ser:63a9bb1f",
+        "source_ref:../scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/optimize-memory/+server.ts",
+        "feature:feat:scripts/api-cleanup/reports/backup-2025-12-14t20-51-26-276z/optimize-memory/_ser",
+        "directory:../scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/optimize-memory"
+      ]
+    },
+    {
+      "card_id": "002ba3e702fa3a8d",
+      "packet_key": "nes:scripts/api-cleanup/reports/backup-2025-12-14t20-51-26-276z/ai/find/_server_ts:e874a4bc",
+      "source_ref": "../scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/ai/find/+server.ts",
+      "feature_id": "feat:scripts/api-cleanup/reports/backup-2025-12-14t20-51-26-276z/ai/find/_server_ts",
+      "feature_label": "+server.ts",
+      "directory_path": "../scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/ai/find",
+      "tags": [
+        "surface:neschrom97",
+        "surface:hyperrag",
+        "card:002ba3e702fa3a8d",
+        "packet:nes:scripts/api-cleanup/reports/backup-2025-12-14t20-51-26-276z/ai/find/_server_ts:e874a4bc",
+        "source_ref:../scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/ai/find/+server.ts",
+        "feature:feat:scripts/api-cleanup/reports/backup-2025-12-14t20-51-26-276z/ai/find/_server_ts",
+        "directory:../scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/ai/find"
+      ]
+    },
+    {
+      "card_id": "0033039f346e5be4",
+      "packet_key": "nes:utility:72eb3ee5",
+      "source_ref": "src/lib/components/LegalCorpusSearch.svelte",
+      "feature_id": "utility",
+      "feature_label": "LegalCorpusSearch.svelte",
+      "directory_path": "src/lib/components",
+      "tags": [
+        "surface:neschrom97",
+        "surface:hyperrag",
+        "card:0033039f346e5be4",
+        "packet:nes:utility:72eb3ee5",
+        "source_ref:src/lib/components/LegalCorpusSearch.svelte",
+        "feature:utility",
+        "directory:src/lib/components"
+      ]
+    },
+    {
+      "card_id": "0036cdaebecec57b",
+      "packet_key": "nes:scripts/api-cleanup/reports/backup-2025-12-14t21-11-49-641z/yolo/llms_md:60736998",
+      "source_ref": "../scripts/api-cleanup/reports/backup-2025-12-14T21-11-49-641Z/yolo/LLMS.md",
+      "feature_id": "feat:scripts/api-cleanup/reports/backup-2025-12-14t21-11-49-641z/yolo/llms_md",
+      "feature_label": "LLMS.md",
+      "directory_path": "../scripts/api-cleanup/reports/backup-2025-12-14T21-11-49-641Z/yolo",
+      "tags": [
+        "surface:neschrom97",
+        "surface:hyperrag",
+        "card:0036cdaebecec57b",
+        "packet:nes:scripts/api-cleanup/reports/backup-2025-12-14t21-11-49-641z/yolo/llms_md:60736998",
+        "source_ref:../scripts/api-cleanup/reports/backup-2025-12-14T21-11-49-641Z/yolo/LLMS.md",
+        "feature:feat:scripts/api-cleanup/reports/backup-2025-12-14t21-11-49-641z/yolo/llms_md",
+        "directory:../scripts/api-cleanup/reports/backup-2025-12-14T21-11-49-641Z/yolo"
+      ]
+    },
+    {
+      "card_id": "007a419e167b1986",
+      "packet_key": "nes:scripts/tests/test-phoenix-prosecutor_mjs:4904b4d4",
+      "source_ref": "../scripts/tests/test-phoenix-prosecutor.mjs",
+      "feature_id": "feat:scripts/tests/test-phoenix-prosecutor_mjs",
+      "feature_label": "test-phoenix-prosecutor.mjs",
+      "directory_path": "../scripts/tests",
+      "tags": [
+        "surface:neschrom97",
+        "surface:hyperrag",
+        "card:007a419e167b1986",
+        "packet:nes:scripts/tests/test-phoenix-prosecutor_mjs:4904b4d4",
+        "source_ref:../scripts/tests/test-phoenix-prosecutor.mjs",
+        "feature:feat:scripts/tests/test-phoenix-prosecutor_mjs",
+        "directory:../scripts/tests"
+      ]
+    }
+  ],
+  "joinBackfillSamples": [
+    {
+      "source_ref": ".venv/Lib/python3.9/site-packages/pip/_vendor/pygments/plugin.py",
+      "feature_id": null,
+      "feature_label": null,
+      "directory_path": ".venv/Lib/python3.9/site-packages/pip/_vendor/pygments",
+      "action": "NEEDS_JOIN_BACKFILL",
+      "reason": "No packet join in registry sample"
+    },
+    {
+      "source_ref": ".venv/Lib/python3.9/site-packages/pip/_vendor/rich/columns.py",
+      "feature_id": null,
+      "feature_label": null,
+      "directory_path": ".venv/Lib/python3.9/site-packages/pip/_vendor/rich",
+      "action": "NEEDS_JOIN_BACKFILL",
+      "reason": "No packet join in registry sample"
+    },
+    {
+      "source_ref": ".venv/Lib/python3.9/site-packages/pip/_internal/req/req_set.py",
+      "feature_id": null,
+      "feature_label": null,
+      "directory_path": ".venv/Lib/python3.9/site-packages/pip/_internal/req",
+      "action": "NEEDS_JOIN_BACKFILL",
+      "reason": "No packet join in registry sample"
+    },
+    {
+      "source_ref": ".venv/Lib/python3.9/site-packages/pip/_vendor/requests/api.py",
+      "feature_id": null,
+      "feature_label": null,
+      "directory_path": ".venv/Lib/python3.9/site-packages/pip/_vendor/requests",
+      "action": "NEEDS_JOIN_BACKFILL",
+      "reason": "No packet join in registry sample"
+    },
+    {
+      "source_ref": ".venv/Lib/python3.9/site-packages/numpy/_core/tests/test_shape_base.py",
+      "feature_id": null,
+      "feature_label": null,
+      "directory_path": ".venv/Lib/python3.9/site-packages/numpy/_core/tests",
+      "action": "NEEDS_JOIN_BACKFILL",
+      "reason": "No packet join in registry sample"
+    },
+    {
+      "source_ref": ".venv/Lib/python3.9/site-packages/pip/_internal/commands/search.py",
+      "feature_id": null,
+      "feature_label": null,
+      "directory_path": ".venv/Lib/python3.9/site-packages/pip/_internal/commands",
+      "action": "NEEDS_JOIN_BACKFILL",
+      "reason": "No packet join in registry sample"
+    },
+    {
+      "source_ref": ".venv/Lib/python3.9/site-packages/numpy/f2py/tests/test_symbolic.py",
+      "feature_id": null,
+      "feature_label": null,
+      "directory_path": ".venv/Lib/python3.9/site-packages/numpy/f2py/tests",
+      "action": "NEEDS_JOIN_BACKFILL",
+      "reason": "No packet join in registry sample"
+    },
+    {
+      "source_ref": ".venv/Lib/python3.9/site-packages/numpy/f2py/f2py2e.py",
+      "feature_id": null,
+      "feature_label": null,
+      "directory_path": ".venv/Lib/python3.9/site-packages/numpy/f2py",
+      "action": "NEEDS_JOIN_BACKFILL",
+      "reason": "No packet join in registry sample"
+    },
+    {
+      "source_ref": ".venv/Lib/python3.9/site-packages/pip/_internal/utils/datetime.py",
+      "feature_id": null,
+      "feature_label": null,
+      "directory_path": ".venv/Lib/python3.9/site-packages/pip/_internal/utils",
+      "action": "NEEDS_JOIN_BACKFILL",
+      "reason": "No packet join in registry sample"
+    },
+    {
+      "source_ref": ".venv/Lib/python3.9/site-packages/numpy/typing/tests/data/pass/ufuncs.py",
+      "feature_id": null,
+      "feature_label": null,
+      "directory_path": ".venv/Lib/python3.9/site-packages/numpy/typing/tests/data/pass",
+      "action": "NEEDS_JOIN_BACKFILL",
+      "reason": "No packet join in registry sample"
+    }
+  ],
+  "nextRepairActions": [
+    "Patch Qdrant payloads for the ready-to-tag sample groups first.",
+    "Backfill missing packet joins for unjoined registry samples before broad payload writes.",
+    "Keep legal_documents separate from codebase_chunks_768.",
+    "Treat feature_label as derived display metadata, not canonical identity."
+  ]
+}

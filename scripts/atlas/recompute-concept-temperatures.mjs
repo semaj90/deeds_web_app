@@ -30,8 +30,8 @@ async function main() {
             where
               created_at >= now() - interval '7 days'
               and (
-                selected_feature_id = any(concept_records.feature_ids)
-                or selected_packet_key = any(concept_records.packet_keys)
+                (selected_feature_id is not null and concept_records.feature_ids @> jsonb_build_array(selected_feature_id))
+                or (selected_packet_key is not null and concept_records.packet_keys @> jsonb_build_array(selected_packet_key))
               )
           ), 0)) / 100.0
         )

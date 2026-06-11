@@ -218,7 +218,7 @@ export async function runWorkflowLoop(
     timestamp: now().toISOString(),
   });
 
-  return {
+  const result: WorkflowLoopResult = {
     runId,
     status: smoke.passed ? 'repaired' : 'needs_review',
     classification,
@@ -226,4 +226,37 @@ export async function runWorkflowLoop(
     smoke,
     logged: true,
   };
+
+  // Record agent trace for Phase 3F learning pipeline (fire-and-forget)
+  void (async () => {
+    try {
+      const { recordAgentTrace } = await import('$lib/server/observability/agent-trace-recorder.js');
+
+      // Extract selected_concepts from repair suggestions (minimal semantics)
+      // and touched files as pseudo-concepts
+      const selectedConcepts: string[] = [
+        ...new Set([
+          `hmm:${classification.hmmErrorClass}`,
+          `lane:${classification.lane}`,
+          ...repair.touchedFiles.map(f => `file:${f}`),
+        ])
+      ];
+
+      await recordAgentTrace({
+        query: input.query,
+        retrievalStrategy: 'structural',
+        selectedConcepts,
+        selectedPackets: repair.touchedFiles,
+        toolsCalled: ['workflow-loop', 'hmm-classifier', classification.lane],
+        outcome: smoke.passed ? 'success' : 'partial',
+        reward: smoke.passed ? Math.max(0.5, 1 - classification.riskScore * 0.5) : 0.3,
+        taskId: input.caseId ?? undefined,
+        traceSource: 'error-agent',
+      });
+    } catch (err) {
+      console.error('[Phase3F] Error-agent trace recording failed (non-blocking):', (err as Error)?.message);
+    }
+  })();
+
+  return result;
 }

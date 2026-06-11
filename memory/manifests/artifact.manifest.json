@@ -1,0 +1,9 @@
+{
+  "artifact_path": "C:\\Users\\james\\Videos\\deeds-web-app\\docs\\reports\\neschrom97-card-registry.json",
+  "sha256": "f85070ab5d40f16bdef1257cc72252c5b6f4b89cf3da59abd46efba694980eac",
+  "size_bytes": 6266090,
+  "format": "ndjson",
+  "row_count_estimate": 237414,
+  "sample_path": "memory/manifests/sample.json",
+  "manifest_path": "memory/manifests/artifact.manifest.json"
+}

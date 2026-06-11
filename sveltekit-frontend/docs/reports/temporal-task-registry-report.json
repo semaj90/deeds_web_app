@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-06-11T15:21:16.464Z",
+  "generatedAt": "2026-06-11T19:28:35.280Z",
   "sourceFiles": {
     "recommendationEvents": ".opencode\\recommendations\\recommendation-events.jsonl",
     "taskEvents": ".opencode\\tasks\\task-events.jsonl",
@@ -12,7 +12,7 @@
     "historyPackets": 22
   },
   "summary": {
-    "runId": "2026-06-11T15:21:16.464Z",
+    "runId": "2026-06-11T19:28:35.280Z",
     "findingCount": 0,
     "recommendationCount": 235,
     "taskCount": 13,
@@ -28,7 +28,7 @@
     }
   },
   "taskState": {
-    "generatedAt": "2026-06-11T15:21:16.464Z",
+    "generatedAt": "2026-06-11T19:28:35.280Z",
     "recommendationEventsCount": 235,
     "taskEventsCount": 22,
     "promotedRecommendationsCount": 13,

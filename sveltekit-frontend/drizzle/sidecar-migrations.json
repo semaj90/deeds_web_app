@@ -208,6 +208,15 @@
       "appliedAt": "2026-06-01",
       "requiresJournalEntry": false,
       "validationCommand": "docker exec legal-ai-postgres psql -U legal_admin -d legal_ai_db -c \"SELECT to_regclass('public.task_cluster_links');\""
+    },
+    {
+      "file": "20260611_atlas_packets_schema.sql",
+      "status": "manual_sidecar",
+      "reason": "Create atlas_packets table with pgvector, gin payload index, and composite indexes to index large packet payloads.",
+      "appliedBy": "antigravity",
+      "appliedAt": "2026-06-11",
+      "requiresJournalEntry": false,
+      "validationCommand": "docker exec legal-ai-postgres psql -U legal_admin -d legal_ai_db -c \"SELECT table_name FROM information_schema.tables WHERE table_name='atlas_packets';\""
     }
   ]
 }

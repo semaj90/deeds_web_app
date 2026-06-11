@@ -71,6 +71,7 @@ function qdrantUrlFromParts(): string | undefined {
 
 export const ENV = {
   DATABASE_URL: privateEnv.DATABASE_URL ?? privateEnv.POSTGRES_URL ?? DEV.DATABASE_URL,
+  AGENT_TRACE_ENABLED: privateEnv.AGENT_TRACE_ENABLED ?? 'true',
   REDIS_URL: normalizeRedisUrl(privateEnv.REDIS_URL ?? DEV.REDIS_URL),
   REDIS_PASSWORD: privateEnv.REDIS_PASSWORD ?? privateEnv.REDIS_PASS ?? '',
   QDRANT_URL: privateEnv.QDRANT_URL ?? qdrantUrlFromParts() ?? DEV.QDRANT_URL,

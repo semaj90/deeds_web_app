@@ -1,0 +1,593 @@
+# Phase 16 Runtime Artifact Locator Report
+
+**Generated**: 2026-06-11T20:20:36.076Z
+**Checkout**: C:\Users\james\Videos\deeds-web-app
+
+## Summary
+
+| Artifact | Found |
+|----------|-------|
+| graph-refresh-manifest.json | ✅ YES |
+| invalidation code | ✅ YES |
+| promotion wiring | ✅ YES |
+| refresh scripts | ✅ YES |
+
+## Decision
+
+**Phase 16 runtime patch available: bind manifest + verify gates**
+
+## Detailed Findings
+
+### Grep Results by Pattern
+
+#### "graph-refresh-manifest"
+`.\duckdb\smoke-duckdb.ps1:17:$Manifest     = "memory\exports\graph-refresh-manifest.json"`
+`.\duckdb\smoke-duckdb.ps1:34:    # Support both flat shape { status } and nested { "graph-refresh-manifest": { status } }`
+`.\duckdb\smoke-duckdb.ps1:36:              elseif ($ManifestContent.'graph-refresh-manifest') { $ManifestContent.'graph-refresh-manifest'.status } ``
+`.\phase13graph_exportgenerator\WIRE-GRAPH-EXPORTS.md:54:memory/exports/graph-refresh-manifest.json`
+`.\phase13graph_exportgenerator\generate-graph-exports.mjs:6: * - memory/exports/graph-refresh-manifest.json`
+`.\phase13graph_exportgenerator\generate-graph-exports.mjs:29:const MANIFEST_PATH = path.join(EXPORT_DIR, 'graph-refresh-manifest.json');`
+`.\package.json:456:    "graph:manifest": "node scripts/atlas/write-graph-refresh-manifest.mjs",`
+`.\docs\atlas\phase-1.5-atlas-feature-registry.md:72:When generating `memory/exports/graph-refresh-manifest.json` prefer the richer schema below so downstream DuckDB smoke and validation have more fields to assert against:`
+`.\docs\atlas\phase-1.5-atlas-feature-registry.md:106:1. Find who should generate `graph-refresh-manifest.json` (producer script).`
+`.\docs\atlas\phase-1.5-atlas-feature-registry.md:107:2. Ensure that producer writes the richer manifest (this repo now has `scripts/atlas/write-graph-refresh-manifest.mjs`).`
+`.\docs\graph\kanban-board.json:63642:            "local:memory/exports/graph-refresh-manifest.json",`
+`.\docs\graph\codebase-graph.json:193939:      "rel": "scripts/atlas/write-graph-refresh-manifest.mjs",`
+`.\docs\graph\codebase-graph.json:193945:        "write-graph-refresh-manifest.mjs",`
+`.\docs\graph\codebase-graph.json:193948:      "summary": "write-graph-refresh-manifest.mjs",`
+`.\docs\graph\codebase-graph.json:234180:    "write-graph-refresh-manifest.mjs": [`
+`.\docs\graph\codebase-graph.json:234181:      "scripts/atlas/write-graph-refresh-manifest.mjs"`
+`.\docs\reports\sessions\WIRE-GRAPH-EXPORTS.md:40:memory/exports/graph-refresh-manifest.json`
+`.\docs\reports\sessions\QUICK_REFERENCE.md:42:| **DuckDB** | ✅ Exported | graph-refresh-manifest.json, cluster-cards.jsonl |`
+`.\docs\reports\sessions\PROJECT_HANDOFF_FINAL_REPORT.md:103:	- graph-refresh-manifest.json`
+`.\docs\reports\sessions\IMPLEMENTATION_COMPLETE_2026-05-29.md:19:- [x] DuckDB exports validated: graph-refresh-manifest.json, cluster-cards.jsonl`
+`.\docs\reports\sessions\GRAPH_INGESTION_COMPLETE.md:81:- graph-refresh-manifest.json — Metadata (55K nodes, 7.4K edges)`
+`.\docs\reports\sessions\ARCHITECTURE_NEXT_PHASES_2026-05-29.md:17:  - DuckDB: Exports validated (cluster-cards.jsonl, graph-refresh-manifest.json)`
+`.\docs\reports\phase16-runtime-artifact-locator.md:10:| graph-refresh-manifest.json | ✅ YES |`
+`.\docs\reports\phase16-runtime-artifact-locator.md:23:#### "graph-refresh-manifest"`
+`.\docs\reports\phase16-runtime-artifact-locator.md:24:`.\phase13graph_exportgenerator\WIRE-GRAPH-EXPORTS.md:54:memory/exports/graph-refresh-manifest.json``
+`.\docs\reports\phase16-runtime-artifact-locator.md:25:`.\phase13graph_exportgenerator\generate-graph-exports.mjs:6: * - memory/exports/graph-refresh-manifest.json``
+`.\docs\reports\phase16-runtime-artifact-locator.md:26:`.\phase13graph_exportgenerator\generate-graph-exports.mjs:29:const MANIFEST_PATH = path.join(EXPORT_DIR, 'graph-refresh-manifest.json');``
+`.\docs\reports\phase16-runtime-artifact-locator.md:27:`.\package.json:454:    "graph:manifest": "node scripts/atlas/write-graph-refresh-manifest.mjs",``
+`.\docs\reports\phase16-runtime-artifact-locator.md:28:`.\duckdb\smoke-duckdb.ps1:17:$Manifest     = "memory\exports\graph-refresh-manifest.json"``
+`.\docs\reports\phase16-runtime-artifact-locator.md:29:`.\duckdb\smoke-duckdb.ps1:34:    # Support both flat shape { status } and nested { "graph-refresh-manifest": { status } }``
+`.\docs\reports\phase16-runtime-artifact-locator.md:30:`.\duckdb\smoke-duckdb.ps1:36:              elseif ($ManifestContent.'graph-refresh-manifest') { $ManifestContent.'graph-refresh-manifest'.status } ```
+`.\docs\reports\phase16-runtime-artifact-locator.md:31:`.\memory\graphify\deep\deep-import-graph.json:488163:      "path": "memory/exports/graph-refresh-manifest.json",``
+`.\docs\reports\phase16-runtime-artifact-locator.md:32:`.\memory\graphify\deep\deep-import-graph.json:488164:      "rel": "memory/exports/graph-refresh-manifest.json",``
+`.\docs\reports\phase16-runtime-artifact-locator.md:33:`.\memory\graphify\deep\deep-import-graph.json:511275:      "path": "scripts/atlas/write-graph-refresh-manifest.mjs",``
+`.\docs\reports\phase16-runtime-artifact-locator.md:34:`.\memory\graphify\deep\deep-import-graph.json:511276:      "rel": "scripts/atlas/write-graph-refresh-manifest.mjs",``
+`.\docs\reports\phase16-runtime-artifact-locator.md:35:`.\memory\graphify\deep\deep-import-graph.json:511282:        "write-graph-refresh-manifest.mjs",``
+`.\docs\reports\phase16-runtime-artifact-locator.md:36:`.\memory\graphify\deep\deep-import-graph.json:511285:      "summary": "write-graph-refresh-manifest.mjs",``
+`.\docs\reports\phase16-runtime-artifact-locator.md:37:`.\memory\graphify\deep\deep-import-graph.json:531275:      "path": "sveltekit-frontend/memory/exports/graph-refresh-manifest.json",``
+`.\docs\reports\phase16-runtime-artifact-locator.md:38:`.\memory\graphify\deep\deep-import-graph.json:531276:      "rel": "sveltekit-frontend/memory/exports/graph-refresh-manifest.json",``
+`.\docs\reports\phase16-runtime-artifact-locator.md:39:`.\memory\graphify\deep\deep-import-graph.json:652521:      "path": "scripts/atlas/write-graph-refresh-manifest.mjs",``
+`.\docs\reports\phase16-runtime-artifact-locator.md:40:`.\memory\graphify\deep\deep-import-graph.json:652522:      "rel": "scripts/atlas/write-graph-refresh-manifest.mjs",``
+`.\docs\reports\phase16-runtime-artifact-locator.md:41:`.\memory\graphify\deep\deep-import-graph.json:652528:        "write-graph-refresh-manifest.mjs",``
+`.\docs\reports\phase16-runtime-artifact-locator.md:42:`.\memory\graphify\deep\deep-import-graph.json:652531:      "summary": "write-graph-refresh-manifest.mjs",``
+`.\docs\reports\phase16-runtime-artifact-locator.md:43:`.\docs\reports\sessions\WIRE-GRAPH-EXPORTS.md:40:memory/exports/graph-refresh-manifest.json``
+`.\docs\reports\phase16-runtime-artifact-locator.md:44:`.\docs\reports\sessions\QUICK_REFERENCE.md:42:| **DuckDB** | ✅ Exported | graph-refresh-manifest.json, cluster-cards.jsonl |``
+`.\docs\reports\phase16-runtime-artifact-locator.md:45:`.\docs\reports\sessions\PROJECT_HANDOFF_FINAL_REPORT.md:103:	- graph-refresh-manifest.json``
+`.\docs\reports\phase16-runtime-artifact-locator.md:46:`.\docs\reports\sessions\IMPLEMENTATION_COMPLETE_2026-05-29.md:19:- [x] DuckDB exports validated: graph-refresh-manifest.json, cluster-cards.jsonl``
+`.\docs\reports\phase16-runtime-artifact-locator.md:47:`.\docs\reports\sessions\GRAPH_INGESTION_COMPLETE.md:81:- graph-refresh-manifest.json — Metadata (55K nodes, 7.4K edges)``
+`.\docs\reports\phase16-runtime-artifact-locator.md:48:`.\docs\reports\sessions\ARCHITECTURE_NEXT_PHASES_2026-05-29.md:17:  - DuckDB: Exports validated (cluster-cards.jsonl, graph-refresh-manifest.json)``
+`.\docs\reports\phase16-runtime-artifact-locator.md:49:`.\docs\reports\neschrom97-card-taxonomy.json:8070:      "path": "sveltekit-frontend/../scripts/atlas/write-graph-refresh-manifest.mjs",``
+`.\docs\reports\phase16-runtime-artifact-locator.md:50:`.\docs\reports\neschrom97-card-taxonomy.json:8078:        "write-graph-refresh-manifest",``
+`.\docs\reports\phase16-runtime-artifact-locator.md:51:`.\docs\reports\neschrom97-card-registry.json:12537:        "nes:scripts/atlas/write-graph-refresh-manifest_mjs:968f45b7"``
+`.\docs\reports\phase16-runtime-artifact-locator.md:52:`.\docs\reports\neschrom97-card-registry.json:12542:      "source_ref": "../scripts/atlas/write-graph-refresh-manifest.mjs",``
+`.\docs\reports\phase16-runtime-artifact-locator.md:53:`.\docs\reports\neschrom97-card-registry.json:12544:        "feat:scripts/atlas/write-graph-refresh-manifest_mjs"``
+`.\docs\reports\phase16-runtime-artifact-locator.md:54:`.\docs\reports\neschrom97-card-registry.json:12546:      "feature_id": "feat:scripts/atlas/write-graph-refresh-manifest_mjs",``
+`.\docs\reports\phase16-runtime-artifact-locator.md:55:`.\docs\reports\neschrom97-card-registry.json:12553:        "write-graph-refresh-manifest",``
+`.\docs\reports\phase16-runtime-artifact-locator.md:56:`.\docs\reports\neschrom97-card-registry.json:12559:      "title": "write-graph-refresh-manifest.mjs",``
+`.\docs\reports\phase16-runtime-artifact-locator.md:57:`.\docs\reports\index-gap-memory-report.json:3098:      "title": "memory/exports/graph-refresh-manifest.json",``
+`.\docs\reports\phase16-runtime-artifact-locator.md:58:`.\docs\reports\index-gap-memory-report.json:3099:      "summary": "modified tracked file not represented in the local atlas overlay | M | graph-refresh-manifest.json",``
+`.\docs\reports\phase16-runtime-artifact-locator.md:59:`.\docs\reports\index-gap-memory-report.json:3101:        "local:memory/exports/graph-refresh-manifest.json",``
+`.\docs\reports\phase16-runtime-artifact-locator.md:60:`.\docs\reports\index-gap-memory-report.json:3102:        "memory/exports/graph-refresh-manifest.json"``
+`.\docs\reports\phase16-runtime-artifact-locator.md:61:`.\docs\reports\index-gap-memory-report.json:3105:        "memory/exports/graph-refresh-manifest.json",``
+`.\docs\reports\phase16-runtime-artifact-locator.md:62:`.\docs\reports\index-gap-memory-report.json:3110:        "memory/exports/graph-refresh-manifest.json"``
+`.\docs\reports\phase16-runtime-artifact-locator.md:63:`.\docs\reports\index-gap-memory-report.json:3124:        "graph-refresh-manifest.json"``
+`.\docs\reports\phase16-runtime-artifact-locator.md:64:`.\docs\reports\index-gap-memory-report.json:3129:          "memory/exports/graph-refresh-manifest.js"``
+`.\docs\reports\phase16-runtime-artifact-locator.md:65:`.\docs\reports\index-gap-memory-report.json:3168:        "git status --porcelain --untracked-files=all | Select-String \"memory/exports/graph-refresh-manifest\\.json\"",``
+`.\docs\reports\phase16-runtime-artifact-locator.md:66:`.\docs\reports\index-gap-memory-report.json:3169:        "rg --files -uu | rg \"memory/exports/graph-refresh-manifest\\.json\"",``
+`.\docs\reports\phase16-runtime-artifact-locator.md:67:`.\docs\reports\index-gap-memory-report.json:3170:        "rg -n -uu \"graph-refresh-manifest\\.json\" sveltekit-frontend/src sveltekit-frontend/scripts docs scripts"``
+`.\docs\reports\phase16-runtime-artifact-locator.md:68:`.\docs\reports\index-gap-memory-report.json:6587:          "sveltekit-frontend/memory/exports/graph-refresh-manifest.js",``
+`.\docs\reports\phase16-runtime-artifact-locator.md:69:`.\docs\reports\doc-feature-crosswalk-2026-06-01.json:611:        "memory/exports/graph-refresh-manifest.json",``
+`.\docs\reports\phase16-runtime-artifact-locator.md:70:`.\docs\reports\directory-topology-map.json:22080:      "source_ref": "scripts/atlas/write-graph-refresh-manifest.mjs",``
+`.\docs\reports\phase16-runtime-artifact-locator.md:71:`.\docs\graph\kanban-board.json:63642:            "local:memory/exports/graph-refresh-manifest.json",``
+`.\docs\reports\phase16-runtime-artifact-locator.md:72:`.\docs\graph\codebase-graph.json:193939:      "rel": "scripts/atlas/write-graph-refresh-manifest.mjs",``
+`.\docs\reports\phase16-runtime-artifact-locator.md:73:`.\docs\graph\codebase-graph.json:193945:        "write-graph-refresh-manifest.mjs",``
+`.\docs\reports\phase16-runtime-artifact-locator.md:74:`.\docs\graph\codebase-graph.json:193948:      "summary": "write-graph-refresh-manifest.mjs",``
+`.\docs\reports\phase16-runtime-artifact-locator.md:75:`.\docs\graph\codebase-graph.json:234180:    "write-graph-refresh-manifest.mjs": [``
+`.\docs\reports\phase16-runtime-artifact-locator.md:76:`.\docs\graph\codebase-graph.json:234181:      "scripts/atlas/write-graph-refresh-manifest.mjs"``
+`.\docs\reports\phase16-runtime-artifact-locator.md:77:`.\docs\atlas\phase-1.5-atlas-feature-registry.md:72:When generating `memory/exports/graph-refresh-manifest.json` prefer the richer schema below so downstream DuckDB smoke and validation have more fields to assert against:``
+`.\docs\reports\phase16-runtime-artifact-locator.md:78:`.\docs\atlas\phase-1.5-atlas-feature-registry.md:106:1. Find who should generate `graph-refresh-manifest.json` (producer script).``
+`.\docs\reports\phase16-runtime-artifact-locator.md:79:`.\docs\atlas\phase-1.5-atlas-feature-registry.md:107:2. Ensure that producer writes the richer manifest (this repo now has `scripts/atlas/write-graph-refresh-manifest.mjs`).``
+`.\docs\reports\phase16-runtime-artifact-locator.md:80:`.\memory\exports\graph-refresh-manifest.json:232:  "generator": "scripts/atlas/write-graph-refresh-manifest.mjs",``
+`.\docs\reports\phase16-runtime-artifact-locator.md:81:`.\reports\parent-atlas-open-lanes-todo.md:55:| Graph refresh invalidation / promotion wiring (Lane 4) | `promote-to-postgres.mjs` calls `write-graph-refresh-manifest.mjs` as post-promote hook |``
+`.\docs\reports\phase16-runtime-artifact-locator.md:82:`.\scripts\opencode\smoke-opencode-commands.mjs:131:assertFile('memory/exports/graph-refresh-manifest.json', 'npm run graph:manifest');``
+`.\docs\reports\phase16-runtime-artifact-locator.md:83:`.\scripts\opencode\smoke-opencode-commands.mjs:163:const manifest = readJson('memory/exports/graph-refresh-manifest.json');``
+`.\docs\reports\phase16-runtime-artifact-locator.md:84:`.\scripts\opencode\smoke-opencode-commands.mjs:166:  // and the legacy nested shape { "graph-refresh-manifest": { status, ... } }``
+`.\docs\reports\phase16-runtime-artifact-locator.md:85:`.\scripts\opencode\smoke-opencode-commands.mjs:169:    : (manifest['graph-refresh-manifest'] || null);``
+`.\docs\reports\phase16-runtime-artifact-locator.md:86:`.\scripts\opencode\smoke-opencode-commands.mjs:172:    fail('graph-refresh-manifest: unrecognised shape (no status/generatedAt at root or nested key)',``
+`.\docs\reports\phase16-runtime-artifact-locator.md:87:`.\scripts\opencode\smoke-opencode-commands.mjs:176:      fail('graph-refresh-manifest: missing generatedAt', '', 'npm run graph:manifest');``
+`.\docs\reports\phase16-runtime-artifact-locator.md:88:`.\scripts\opencode\smoke-opencode-commands.mjs:178:      pass('graph-refresh-manifest: has generatedAt');``
+`.\docs\reports\phase16-runtime-artifact-locator.md:89:`.\scripts\opencode\smoke-opencode-commands.mjs:179:      assertFreshTimestamp(flat.generatedAt, 72, 'graph-refresh-manifest.generatedAt');``
+`.\docs\reports\phase16-runtime-artifact-locator.md:90:`.\scripts\opencode\smoke-opencode-commands.mjs:182:      fail('graph-refresh-manifest: nodeCount must be a number');``
+`.\docs\reports\phase16-runtime-artifact-locator.md:91:`.\scripts\opencode\smoke-opencode-commands.mjs:184:      pass(`graph-refresh-manifest: nodeCount=${flat.nodeCount}`);``
+`.\docs\reports\phase16-runtime-artifact-locator.md:92:`.\scripts\opencode\smoke-opencode-commands.mjs:187:      fail('graph-refresh-manifest: edgeCount must be a number');``
+`.\docs\reports\phase16-runtime-artifact-locator.md:93:`.\scripts\opencode\smoke-opencode-commands.mjs:189:      pass(`graph-refresh-manifest: edgeCount=${flat.edgeCount}`);``
+`.\docs\reports\phase16-runtime-artifact-locator.md:94:`.\scripts\opencode\smoke-opencode-commands.mjs:192:      fail('graph-refresh-manifest: missing status field', '', 'npm run graph:manifest');``
+`.\docs\reports\phase16-runtime-artifact-locator.md:95:`.\scripts\opencode\smoke-opencode-commands.mjs:194:      fail('graph-refresh-manifest: status is "stub" — manifest not yet populated',``
+`.\docs\reports\phase16-runtime-artifact-locator.md:96:`.\scripts\opencode\smoke-opencode-commands.mjs:197:      pass(`graph-refresh-manifest: status=${flat.status}`);``
+`.\docs\reports\phase16-runtime-artifact-locator.md:97:`.\scripts\atlas\write-graph-refresh-manifest.mjs:3: * write-graph-refresh-manifest.mjs``
+`.\docs\reports\phase16-runtime-artifact-locator.md:98:`.\scripts\atlas\write-graph-refresh-manifest.mjs:5: * Creates memory/exports/graph-refresh-manifest.json with a real shape.``
+`.\docs\reports\phase16-runtime-artifact-locator.md:99:`.\scripts\atlas\write-graph-refresh-manifest.mjs:18:const MANIFEST_PATH = path.join(EXPORT_DIR, 'graph-refresh-manifest.json');``
+`.\docs\reports\phase16-runtime-artifact-locator.md:100:`.\scripts\atlas\write-graph-refresh-manifest.mjs:70:      if (e === 'graph-refresh-manifest.json') continue;``
+`.\docs\reports\phase16-runtime-artifact-locator.md:101:`.\scripts\atlas\write-graph-refresh-manifest.mjs:128:    generator: 'scripts/atlas/write-graph-refresh-manifest.mjs',``
+`.\docs\reports\phase16-runtime-artifact-locator.md:102:`.\scripts\atlas\write-graph-refresh-manifest.mjs:135:  console.log('[write-graph-refresh-manifest] wrote:', path.relative(root, MANIFEST_PATH));``
+`.\docs\reports\phase16-runtime-artifact-locator.md:103:`.\scripts\atlas\promote-to-postgres.mjs:291:    execFileSync('node', [resolve(ROOT, 'scripts/atlas/write-graph-refresh-manifest.mjs')], { stdio: 'inherit' });``
+`.\docs\reports\phase16-runtime-artifact-locator.md:104:`.\scripts\atlas\phase-19c-knowledge-consolidation.mjs:13: *   - memory/exports/graph-refresh-manifest.json (graphify output)``
+`.\docs\reports\phase16-runtime-artifact-locator.md:105:`.\scripts\atlas\phase-19c-knowledge-consolidation.mjs:56:const MANIFEST_PATH = path.join(ROOT, 'memory', 'exports', 'graph-refresh-manifest.json');``
+`.\docs\reports\phase16-runtime-artifact-locator.md:106:`.\scripts\atlas\locate-phase16-runtime-artifacts.mjs:7: * Answers: Are graph-refresh-manifest.json, invalidation code, and promotion wiring``
+`.\docs\reports\phase16-runtime-artifact-locator.md:107:`.\scripts\atlas\locate-phase16-runtime-artifacts.mjs:20:  'graph-refresh-manifest',``
+`.\docs\reports\phase16-runtime-artifact-locator.md:108:`.\scripts\atlas\locate-phase16-runtime-artifacts.mjs:97:  const hasManifest = allHits.some((h) => h.includes('graph-refresh-manifest.json'));``
+`.\docs\reports\phase16-runtime-artifact-locator.md:109:`.\scripts\atlas\locate-phase16-runtime-artifacts.mjs:137:| graph-refresh-manifest.json | ${results.findings.summary.graph_refresh_manifest ? '✅ YES' : '❌ NO'} |``
+`.\docs\reports\phase16-runtime-artifact-locator.md:110:`.\scripts\atlas\locate-phase16-runtime-artifacts.mjs:169:1. Bind \`graph-refresh-manifest.json\```
+`.\docs\reports\phase16-runtime-artifact-locator.md:111:`.\scripts\atlas\locate-phase16-runtime-artifacts.mjs:200:  console.log(`graph-refresh-manifest.json: ${results.findings.summary.graph_refresh_manifest ? '✅' : '❌'}`);``
+`.\docs\reports\phase16-runtime-artifact-locator.md:112:`.\scripts\atlas\generate-graph-exports.mjs:6: * - memory/exports/graph-refresh-manifest.json``
+`.\docs\reports\phase16-runtime-artifact-locator.md:113:`.\scripts\atlas\generate-graph-exports.mjs:33:const MANIFEST_PATH = path.join(EXPORT_DIR, 'graph-refresh-manifest.json');``
+`.\docs\reports\phase16-runtime-artifact-locator.md:114:`.\next_steps\active\2026-05-30_PHASE_19B_UNIFIED_PIPELINE_READY.md:252:- Status: Missing graph-refresh-manifest.json``
+`.\docs\reports\phase16-runtime-artifact-locator.md:115:`.\sveltekit-frontend\docs\graph\deep-import-graph.json:1794472:      "rel": "memory/exports/graph-refresh-manifest.json",``
+`.\docs\reports\phase16-runtime-artifact-locator.md:116:`.\sveltekit-frontend\docs\graph\deep-import-graph.json:1877612:      "rel": "scripts/atlas/write-graph-refresh-manifest.mjs",``
+`.\docs\reports\phase16-runtime-artifact-locator.md:117:`.\sveltekit-frontend\docs\graph\deep-import-graph.json:1877618:        "write-graph-refresh-manifest.mjs",``
+`.\docs\reports\phase16-runtime-artifact-locator.md:118:`.\sveltekit-frontend\docs\graph\deep-import-graph.json:1877621:      "summary": "write-graph-refresh-manifest.mjs",``
+`.\docs\reports\phase16-runtime-artifact-locator.md:119:`.\sveltekit-frontend\docs\graph\deep-import-graph.json:1950380:      "rel": "sveltekit-frontend/memory/exports/graph-refresh-manifest.json",``
+`.\docs\reports\phase16-runtime-artifact-locator.md:120:`.\sveltekit-frontend\docs\graph\deep-import-graph.json:2381020:      "rel": "scripts/atlas/write-graph-refresh-manifest.mjs",``
+`.\docs\reports\phase16-runtime-artifact-locator.md:121:`.\sveltekit-frontend\docs\graph\deep-import-graph.json:2381026:        "write-graph-refresh-manifest.mjs",``
+`.\docs\reports\phase16-runtime-artifact-locator.md:122:`.\sveltekit-frontend\docs\graph\deep-import-graph.json:2381029:      "summary": "write-graph-refresh-manifest.mjs",``
+`.\docs\reports\phase16-runtime-artifact-locator.md:123:`.\sveltekit-frontend\docs\graph\deep-audit-ast.json:55725:          "file": "scripts/atlas/write-graph-refresh-manifest.mjs",``
+`.\docs\reports\phase16-runtime-artifact-locator.md:124:`.\sveltekit-frontend\docs\graph\deep-audit-ast.json:66055:          "file": "scripts/atlas/write-graph-refresh-manifest.mjs",``
+`.\docs\reports\phase16-runtime-artifact-locator.md:125:`.\sveltekit-frontend\docs\todo\bitfrost_turboquant_turbovec_production_todo.md:114:- The `duckdb\smoke-duckdb.ps1` wrapper delegates to `scripts\duckdb\smoke-duckdb.ps1`, which reads `memory/exports/graph-refresh-manifest.json`, `cluster-cards.jsonl`, and `pathway-cards.jsonl`.``
+`.\docs\reports\phase16-runtime-artifact-locator.md:126:`.\sveltekit-frontend\next_steps\plans\bitfrost_turboquant_turbovec_production_todo.md:109:- The `duckdb\smoke-duckdb.ps1` wrapper delegates to `scripts\duckdb\smoke-duckdb.ps1`, which reads `memory/exports/graph-refresh-manifest.json`, `cluster-cards.jsonl`, and `pathway-cards.jsonl`.``
+`.\docs\reports\phase16-runtime-artifact-locator.md:127:`.\sveltekit-frontend\memory\agent-runs\latest-recovery.json:13:    "memory/exports/graph-refresh-manifest.json",``
+`.\docs\reports\phase16-runtime-artifact-locator.md:128:`.\sveltekit-frontend\memory\agent-runs\latest-recovery.json:24:    "Inspect graph-refresh-manifest.json promotionState",``
+`.\docs\reports\phase16-runtime-artifact-locator.md:129:`.\sveltekit-frontend\memory\agent-runs\latest-recovery.json:29:    "manifestPath": "C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\memory\\exports\\graph-refresh-manifest.json",``
+`.\docs\reports\phase16-runtime-artifact-locator.md:130:`.\sveltekit-frontend\memory\agent-runs\latest-recovery.json:62:      "stdout": "[graph-exports] wrote: memory\\exports\\graph-refresh-manifest.json\n[graph-exports] wrote: memory\\exports\\cluster-cards.jsonl 0 rows\n[graph-exports] wrote: memory\\exports\\pathway-cards.jsonl 12 rows\n[graph-exports] status: generated, promotionState: unpromoted",``
+`.\docs\reports\phase16-runtime-artifact-locator.md:131:`.\sveltekit-frontend\memory\graphify\deep\unresolved-imports.json:270:    "scripts/atlas/write-graph-refresh-manifest.mjs",``
+`.\docs\reports\phase16-runtime-artifact-locator.md:132:`.\sveltekit-frontend\memory\graphify\deep\unresolved-imports.json:1017:    "scripts/atlas/write-graph-refresh-manifest.mjs",``
+`.\docs\reports\phase16-runtime-artifact-locator.md:133:`.\sveltekit-frontend\memory\graphify\gds\2539fec52b3e.json:32840:      "filePath": "scripts/atlas/write-graph-refresh-manifest.mjs",``
+`.\docs\reports\phase16-runtime-artifact-locator.md:134:`.\sveltekit-frontend\memory\graphify\gds\2539fec52b3e.json:65496:    "scripts/atlas/write-graph-refresh-manifest.mjs": {``
+`.\docs\reports\phase16-runtime-artifact-locator.md:135:`.\sveltekit-frontend\memory\graphify\gds\2539fec52b3e.json:65497:      "filePath": "scripts/atlas/write-graph-refresh-manifest.mjs",``
+`.\docs\reports\phase16-runtime-artifact-locator.md:136:`.\sveltekit-frontend\memory\graphify\gds\39dea0098dd2.json:32840:      "filePath": "scripts/atlas/write-graph-refresh-manifest.mjs",``
+`.\docs\reports\phase16-runtime-artifact-locator.md:137:`.\sveltekit-frontend\memory\graphify\gds\39dea0098dd2.json:65496:    "scripts/atlas/write-graph-refresh-manifest.mjs": {``
+`.\docs\reports\phase16-runtime-artifact-locator.md:138:`.\sveltekit-frontend\memory\graphify\gds\39dea0098dd2.json:65497:      "filePath": "scripts/atlas/write-graph-refresh-manifest.mjs",``
+`.\docs\reports\phase16-runtime-artifact-locator.md:139:`.\sveltekit-frontend\scripts\bifrost\smoke-card-context.mjs:115:      manifest: readJson('memory/exports/graph-refresh-manifest.json'),``
+`.\docs\reports\phase16-runtime-artifact-locator.md:140:`.\sveltekit-frontend\scripts\cards\build-json-cards.mjs:364:      graphRefreshManifest: 'memory/exports/graph-refresh-manifest.json',``
+`.\docs\reports\phase16-runtime-artifact-locator.md:141:`.\sveltekit-frontend\scripts\cards\build-json-cards.mjs:418:writeJson('memory/exports/graph-refresh-manifest.json', manifest);``
+`.\docs\reports\phase16-runtime-artifact-locator.md:142:`.\sveltekit-frontend\scripts\duckdb\smoke-duckdb.ps1:26:$manifest = Join-Path $root 'memory/exports/graph-refresh-manifest.json'``
+`.\docs\reports\phase16-runtime-artifact-locator.md:143:`.\sveltekit-frontend\scripts\atlas\generate-graph-exports.mjs:6: * - memory/exports/graph-refresh-manifest.json``
+`.\docs\reports\phase16-runtime-artifact-locator.md:144:`.\sveltekit-frontend\scripts\atlas\generate-graph-exports.mjs:51:const MANIFEST_PATH = path.join(EXPORT_DIR, 'graph-refresh-manifest.json');``
+`.\docs\reports\phase16-runtime-artifact-locator.md:145:`.\sveltekit-frontend\scripts\dev\recover-graph.mjs:77:const manifestPath = path.join(root, 'memory', 'exports', 'graph-refresh-manifest.json');``
+`.\docs\reports\phase16-runtime-artifact-locator.md:146:`.\sveltekit-frontend\scripts\dev\recover-graph.mjs:87:    'memory/exports/graph-refresh-manifest.json',``
+`.\docs\reports\phase16-runtime-artifact-locator.md:147:`.\sveltekit-frontend\scripts\dev\recover-graph.mjs:98:    'Inspect graph-refresh-manifest.json promotionState',``
+`.\docs\reports\phase16-runtime-artifact-locator.md:148:`.\sveltekit-frontend\memory\graphify\gds\latest.json:32840:      "filePath": "scripts/atlas/write-graph-refresh-manifest.mjs",``
+`.\docs\reports\phase16-runtime-artifact-locator.md:149:`.\sveltekit-frontend\memory\graphify\gds\latest.json:65496:    "scripts/atlas/write-graph-refresh-manifest.mjs": {``
+`.\docs\reports\phase16-runtime-artifact-locator.md:150:`.\sveltekit-frontend\memory\graphify\gds\latest.json:65497:      "filePath": "scripts/atlas/write-graph-refresh-manifest.mjs",``
+`.\docs\reports\phase16-runtime-artifact-locator.md:151:`.\sveltekit-frontend\memory\graphify\gds\fe5bac8318f4.json:32840:      "filePath": "scripts/atlas/write-graph-refresh-manifest.mjs",``
+`.\docs\reports\phase16-runtime-artifact-locator.md:152:`.\sveltekit-frontend\memory\graphify\gds\fe5bac8318f4.json:65496:    "scripts/atlas/write-graph-refresh-manifest.mjs": {``
+`.\docs\reports\phase16-runtime-artifact-locator.md:153:`.\sveltekit-frontend\memory\graphify\gds\fe5bac8318f4.json:65497:      "filePath": "scripts/atlas/write-graph-refresh-manifest.mjs",``
+`.\docs\reports\phase16-runtime-artifact-locator.md:154:`.\sveltekit-frontend\memory\graphify\gds\de92f1995482.json:32840:      "filePath": "scripts/atlas/write-graph-refresh-manifest.mjs",``
+`.\docs\reports\phase16-runtime-artifact-locator.md:155:`.\sveltekit-frontend\memory\graphify\gds\de92f1995482.json:65496:    "scripts/atlas/write-graph-refresh-manifest.mjs": {``
+`.\docs\reports\phase16-runtime-artifact-locator.md:156:`.\sveltekit-frontend\memory\graphify\gds\de92f1995482.json:65497:      "filePath": "scripts/atlas/write-graph-refresh-manifest.mjs",``
+`.\docs\reports\phase16-runtime-artifact-locator.md:157:`.\sveltekit-frontend\memory\graphify\gds\9f88ba87130f.json:32840:      "filePath": "scripts/atlas/write-graph-refresh-manifest.mjs",``
+`.\docs\reports\phase16-runtime-artifact-locator.md:158:`.\sveltekit-frontend\memory\graphify\gds\9f88ba87130f.json:65496:    "scripts/atlas/write-graph-refresh-manifest.mjs": {``
+`.\docs\reports\phase16-runtime-artifact-locator.md:159:`.\sveltekit-frontend\memory\graphify\gds\9f88ba87130f.json:65497:      "filePath": "scripts/atlas/write-graph-refresh-manifest.mjs",``
+`.\docs\reports\phase16-runtime-artifact-locator.md:160:`.\sveltekit-frontend\memory\graphify\gds\87ce8522450e.json:32840:      "filePath": "scripts/atlas/write-graph-refresh-manifest.mjs",``
+`.\docs\reports\phase16-runtime-artifact-locator.md:161:`.\sveltekit-frontend\memory\graphify\gds\87ce8522450e.json:65496:    "scripts/atlas/write-graph-refresh-manifest.mjs": {``
+`.\docs\reports\phase16-runtime-artifact-locator.md:162:`.\sveltekit-frontend\memory\graphify\gds\87ce8522450e.json:65497:      "filePath": "scripts/atlas/write-graph-refresh-manifest.mjs",``
+`.\docs\reports\phase16-runtime-artifact-locator.md:163:`.\sveltekit-frontend\memory\graphify\gds\79718ea5b812.json:32840:      "filePath": "scripts/atlas/write-graph-refresh-manifest.mjs",``
+`.\docs\reports\phase16-runtime-artifact-locator.md:164:`.\sveltekit-frontend\memory\graphify\gds\79718ea5b812.json:65496:    "scripts/atlas/write-graph-refresh-manifest.mjs": {``
+`.\docs\reports\phase16-runtime-artifact-locator.md:165:`.\sveltekit-frontend\memory\graphify\gds\79718ea5b812.json:65497:      "filePath": "scripts/atlas/write-graph-refresh-manifest.mjs",``
+`.\docs\reports\phase16-runtime-artifact-locator.md:206:1. Bind `graph-refresh-manifest.json``
+`.\docs\reports\phase16-runtime-artifact-locator.json:5:    "graph-refresh-manifest",`
+`.\docs\reports\phase16-runtime-artifact-locator.json:15:      "graph-refresh-manifest": [`
+`.\docs\reports\phase16-runtime-artifact-locator.json:16:        ".\\phase13graph_exportgenerator\\WIRE-GRAPH-EXPORTS.md:54:memory/exports/graph-refresh-manifest.json\r",`
+`.\docs\reports\phase16-runtime-artifact-locator.json:17:        ".\\phase13graph_exportgenerator\\generate-graph-exports.mjs:6: * - memory/exports/graph-refresh-manifest.json\r",`
+`.\docs\reports\phase16-runtime-artifact-locator.json:18:        ".\\phase13graph_exportgenerator\\generate-graph-exports.mjs:29:const MANIFEST_PATH = path.join(EXPORT_DIR, 'graph-refresh-manifest.json');\r",`
+`.\docs\reports\phase16-runtime-artifact-locator.json:19:        ".\\package.json:454:    \"graph:manifest\": \"node scripts/atlas/write-graph-refresh-manifest.mjs\",",`
+`.\docs\reports\phase16-runtime-artifact-locator.json:20:        ".\\duckdb\\smoke-duckdb.ps1:17:$Manifest     = \"memory\\exports\\graph-refresh-manifest.json\"\r",`
+`.\docs\reports\phase16-runtime-artifact-locator.json:21:        ".\\duckdb\\smoke-duckdb.ps1:34:    # Support both flat shape { status } and nested { \"graph-refresh-manifest\": { status } }\r",`
+`.\docs\reports\phase16-runtime-artifact-locator.json:22:        ".\\duckdb\\smoke-duckdb.ps1:36:              elseif ($ManifestContent.'graph-refresh-manifest') { $ManifestContent.'graph-refresh-manifest'.status } `\r",`
+`.\docs\reports\phase16-runtime-artifact-locator.json:23:        ".\\memory\\graphify\\deep\\deep-import-graph.json:488163:      \"path\": \"memory/exports/graph-refresh-manifest.json\",",`
+`.\docs\reports\phase16-runtime-artifact-locator.json:24:        ".\\memory\\graphify\\deep\\deep-import-graph.json:488164:      \"rel\": \"memory/exports/graph-refresh-manifest.json\",",`
+`.\docs\reports\phase16-runtime-artifact-locator.json:25:        ".\\memory\\graphify\\deep\\deep-import-graph.json:511275:      \"path\": \"scripts/atlas/write-graph-refresh-manifest.mjs\",",`
+`.\docs\reports\phase16-runtime-artifact-locator.json:26:        ".\\memory\\graphify\\deep\\deep-import-graph.json:511276:      \"rel\": \"scripts/atlas/write-graph-refresh-manifest.mjs\",",`
+`.\docs\reports\phase16-runtime-artifact-locator.json:27:        ".\\memory\\graphify\\deep\\deep-import-graph.json:511282:        \"write-graph-refresh-manifest.mjs\",",`
+`.\docs\reports\phase16-runtime-artifact-locator.json:28:        ".\\memory\\graphify\\deep\\deep-import-graph.json:511285:      \"summary\": \"write-graph-refresh-manifest.mjs\",",`
+`.\docs\reports\phase16-runtime-artifact-locator.json:29:        ".\\memory\\graphify\\deep\\deep-import-graph.json:531275:      \"path\": \"sveltekit-frontend/memory/exports/graph-refresh-manifest.json\",",`
+`.\docs\reports\phase16-runtime-artifact-locator.json:30:        ".\\memory\\graphify\\deep\\deep-import-graph.json:531276:      \"rel\": \"sveltekit-frontend/memory/exports/graph-refresh-manifest.json\",",`
+`.\docs\reports\phase16-runtime-artifact-locator.json:31:        ".\\memory\\graphify\\deep\\deep-import-graph.json:652521:      \"path\": \"scripts/atlas/write-graph-refresh-manifest.mjs\",",`
+`.\docs\reports\phase16-runtime-artifact-locator.json:32:        ".\\memory\\graphify\\deep\\deep-import-graph.json:652522:      \"rel\": \"scripts/atlas/write-graph-refresh-manifest.mjs\",",`
+`.\docs\reports\phase16-runtime-artifact-locator.json:33:        ".\\memory\\graphify\\deep\\deep-import-graph.json:652528:        \"write-graph-refresh-manifest.mjs\",",`
+`.\docs\reports\phase16-runtime-artifact-locator.json:34:        ".\\memory\\graphify\\deep\\deep-import-graph.json:652531:      \"summary\": \"write-graph-refresh-manifest.mjs\",",`
+`.\docs\reports\phase16-runtime-artifact-locator.json:35:        ".\\docs\\reports\\sessions\\WIRE-GRAPH-EXPORTS.md:40:memory/exports/graph-refresh-manifest.json\r",`
+`.\docs\reports\phase16-runtime-artifact-locator.json:36:        ".\\docs\\reports\\sessions\\QUICK_REFERENCE.md:42:| **DuckDB** | ✅ Exported | graph-refresh-manifest.json, cluster-cards.jsonl |",`
+`.\docs\reports\phase16-runtime-artifact-locator.json:37:        ".\\docs\\reports\\sessions\\PROJECT_HANDOFF_FINAL_REPORT.md:103:\t- graph-refresh-manifest.json\r",`
+`.\docs\reports\phase16-runtime-artifact-locator.json:38:        ".\\docs\\reports\\sessions\\IMPLEMENTATION_COMPLETE_2026-05-29.md:19:- [x] DuckDB exports validated: graph-refresh-manifest.json, cluster-cards.jsonl",`
+`.\docs\reports\phase16-runtime-artifact-locator.json:39:        ".\\docs\\reports\\sessions\\GRAPH_INGESTION_COMPLETE.md:81:- graph-refresh-manifest.json — Metadata (55K nodes, 7.4K edges)",`
+`.\docs\reports\phase16-runtime-artifact-locator.json:40:        ".\\docs\\reports\\sessions\\ARCHITECTURE_NEXT_PHASES_2026-05-29.md:17:  - DuckDB: Exports validated (cluster-cards.jsonl, graph-refresh-manifest.json)",`
+`.\docs\reports\phase16-runtime-artifact-locator.json:41:        ".\\docs\\reports\\neschrom97-card-taxonomy.json:8070:      \"path\": \"sveltekit-frontend/../scripts/atlas/write-graph-refresh-manifest.mjs\",",`
+`.\docs\reports\phase16-runtime-artifact-locator.json:42:        ".\\docs\\reports\\neschrom97-card-taxonomy.json:8078:        \"write-graph-refresh-manifest\",",`
+`.\docs\reports\phase16-runtime-artifact-locator.json:43:        ".\\docs\\reports\\neschrom97-card-registry.json:12537:        \"nes:scripts/atlas/write-graph-refresh-manifest_mjs:968f45b7\"",`
+`.\docs\reports\phase16-runtime-artifact-locator.json:44:        ".\\docs\\reports\\neschrom97-card-registry.json:12542:      \"source_ref\": \"../scripts/atlas/write-graph-refresh-manifest.mjs\",",`
+`.\docs\reports\phase16-runtime-artifact-locator.json:45:        ".\\docs\\reports\\neschrom97-card-registry.json:12544:        \"feat:scripts/atlas/write-graph-refresh-manifest_mjs\"",`
+`.\docs\reports\phase16-runtime-artifact-locator.json:46:        ".\\docs\\reports\\neschrom97-card-registry.json:12546:      \"feature_id\": \"feat:scripts/atlas/write-graph-refresh-manifest_mjs\",",`
+`.\docs\reports\phase16-runtime-artifact-locator.json:47:        ".\\docs\\reports\\neschrom97-card-registry.json:12553:        \"write-graph-refresh-manifest\",",`
+`.\docs\reports\phase16-runtime-artifact-locator.json:48:        ".\\docs\\reports\\neschrom97-card-registry.json:12559:      \"title\": \"write-graph-refresh-manifest.mjs\",",`
+`.\docs\reports\phase16-runtime-artifact-locator.json:49:        ".\\docs\\reports\\index-gap-memory-report.json:3098:      \"title\": \"memory/exports/graph-refresh-manifest.json\",\r",`
+`.\docs\reports\phase16-runtime-artifact-locator.json:50:        ".\\docs\\reports\\index-gap-memory-report.json:3099:      \"summary\": \"modified tracked file not represented in the local atlas overlay | M | graph-refresh-manifest.json\",\r",`
+`.\docs\reports\phase16-runtime-artifact-locator.json:51:        ".\\docs\\reports\\index-gap-memory-report.json:3101:        \"local:memory/exports/graph-refresh-manifest.json\",\r",`
+`.\docs\reports\phase16-runtime-artifact-locator.json:52:        ".\\docs\\reports\\index-gap-memory-report.json:3102:        \"memory/exports/graph-refresh-manifest.json\"\r",`
+`.\docs\reports\phase16-runtime-artifact-locator.json:53:        ".\\docs\\reports\\index-gap-memory-report.json:3105:        \"memory/exports/graph-refresh-manifest.json\",\r",`
+`.\docs\reports\phase16-runtime-artifact-locator.json:54:        ".\\docs\\reports\\index-gap-memory-report.json:3110:        \"memory/exports/graph-refresh-manifest.json\"\r",`
+`.\docs\reports\phase16-runtime-artifact-locator.json:55:        ".\\docs\\reports\\index-gap-memory-report.json:3124:        \"graph-refresh-manifest.json\"\r",`
+`.\docs\reports\phase16-runtime-artifact-locator.json:56:        ".\\docs\\reports\\index-gap-memory-report.json:3129:          \"memory/exports/graph-refresh-manifest.js\"\r",`
+`.\docs\reports\phase16-runtime-artifact-locator.json:57:        ".\\docs\\reports\\index-gap-memory-report.json:3168:        \"git status --porcelain --untracked-files=all | Select-String \\\"memory/exports/graph-refresh-manifest\\\\.json\\\"\",\r",`
+`.\docs\reports\phase16-runtime-artifact-locator.json:58:        ".\\docs\\reports\\index-gap-memory-report.json:3169:        \"rg --files -uu | rg \\\"memory/exports/graph-refresh-manifest\\\\.json\\\"\",\r",`
+`.\docs\reports\phase16-runtime-artifact-locator.json:59:        ".\\docs\\reports\\index-gap-memory-report.json:3170:        \"rg -n -uu \\\"graph-refresh-manifest\\\\.json\\\" sveltekit-frontend/src sveltekit-frontend/scripts docs scripts\"\r",`
+`.\docs\reports\phase16-runtime-artifact-locator.json:60:        ".\\docs\\reports\\index-gap-memory-report.json:6587:          \"sveltekit-frontend/memory/exports/graph-refresh-manifest.js\",\r",`
+`.\docs\reports\phase16-runtime-artifact-locator.json:61:        ".\\docs\\reports\\doc-feature-crosswalk-2026-06-01.json:611:        \"memory/exports/graph-refresh-manifest.json\",",`
+`.\docs\reports\phase16-runtime-artifact-locator.json:62:        ".\\docs\\reports\\directory-topology-map.json:22080:      \"source_ref\": \"scripts/atlas/write-graph-refresh-manifest.mjs\",",`
+`.\docs\reports\phase16-runtime-artifact-locator.json:63:        ".\\docs\\graph\\kanban-board.json:63642:            \"local:memory/exports/graph-refresh-manifest.json\",",`
+`.\docs\reports\phase16-runtime-artifact-locator.json:64:        ".\\docs\\graph\\codebase-graph.json:193939:      \"rel\": \"scripts/atlas/write-graph-refresh-manifest.mjs\",",`
+`.\docs\reports\phase16-runtime-artifact-locator.json:65:        ".\\docs\\graph\\codebase-graph.json:193945:        \"write-graph-refresh-manifest.mjs\",",`
+`.\docs\reports\phase16-runtime-artifact-locator.json:66:        ".\\docs\\graph\\codebase-graph.json:193948:      \"summary\": \"write-graph-refresh-manifest.mjs\",",`
+`.\docs\reports\phase16-runtime-artifact-locator.json:67:        ".\\docs\\graph\\codebase-graph.json:234180:    \"write-graph-refresh-manifest.mjs\": [",`
+`.\docs\reports\phase16-runtime-artifact-locator.json:68:        ".\\docs\\graph\\codebase-graph.json:234181:      \"scripts/atlas/write-graph-refresh-manifest.mjs\"",`
+`.\docs\reports\phase16-runtime-artifact-locator.json:69:        ".\\docs\\atlas\\phase-1.5-atlas-feature-registry.md:72:When generating `memory/exports/graph-refresh-manifest.json` prefer the richer schema below so downstream DuckDB smoke and validation have more fields to assert against:\r",`
+`.\docs\reports\phase16-runtime-artifact-locator.json:70:        ".\\docs\\atlas\\phase-1.5-atlas-feature-registry.md:106:1. Find who should generate `graph-refresh-manifest.json` (producer script).\r",`
+`.\docs\reports\phase16-runtime-artifact-locator.json:71:        ".\\docs\\atlas\\phase-1.5-atlas-feature-registry.md:107:2. Ensure that producer writes the richer manifest (this repo now has `scripts/atlas/write-graph-refresh-manifest.mjs`).\r",`
+`.\docs\reports\phase16-runtime-artifact-locator.json:72:        ".\\memory\\exports\\graph-refresh-manifest.json:232:  \"generator\": \"scripts/atlas/write-graph-refresh-manifest.mjs\",",`
+`.\docs\reports\phase16-runtime-artifact-locator.json:73:        ".\\reports\\parent-atlas-open-lanes-todo.md:55:| Graph refresh invalidation / promotion wiring (Lane 4) | `promote-to-postgres.mjs` calls `write-graph-refresh-manifest.mjs` as post-promote hook |\r",`
+`.\docs\reports\phase16-runtime-artifact-locator.json:74:        ".\\scripts\\opencode\\smoke-opencode-commands.mjs:131:assertFile('memory/exports/graph-refresh-manifest.json', 'npm run graph:manifest');",`
+`.\docs\reports\phase16-runtime-artifact-locator.json:75:        ".\\scripts\\opencode\\smoke-opencode-commands.mjs:163:const manifest = readJson('memory/exports/graph-refresh-manifest.json');",`
+`.\docs\reports\phase16-runtime-artifact-locator.json:76:        ".\\scripts\\opencode\\smoke-opencode-commands.mjs:166:  // and the legacy nested shape { \"graph-refresh-manifest\": { status, ... } }",`
+`.\docs\reports\phase16-runtime-artifact-locator.json:77:        ".\\scripts\\opencode\\smoke-opencode-commands.mjs:169:    : (manifest['graph-refresh-manifest'] || null);",`
+`.\docs\reports\phase16-runtime-artifact-locator.json:78:        ".\\scripts\\opencode\\smoke-opencode-commands.mjs:172:    fail('graph-refresh-manifest: unrecognised shape (no status/generatedAt at root or nested key)',",`
+`.\docs\reports\phase16-runtime-artifact-locator.json:79:        ".\\scripts\\opencode\\smoke-opencode-commands.mjs:176:      fail('graph-refresh-manifest: missing generatedAt', '', 'npm run graph:manifest');",`
+`.\docs\reports\phase16-runtime-artifact-locator.json:80:        ".\\scripts\\opencode\\smoke-opencode-commands.mjs:178:      pass('graph-refresh-manifest: has generatedAt');",`
+`.\docs\reports\phase16-runtime-artifact-locator.json:81:        ".\\scripts\\opencode\\smoke-opencode-commands.mjs:179:      assertFreshTimestamp(flat.generatedAt, 72, 'graph-refresh-manifest.generatedAt');",`
+`.\docs\reports\phase16-runtime-artifact-locator.json:82:        ".\\scripts\\opencode\\smoke-opencode-commands.mjs:182:      fail('graph-refresh-manifest: nodeCount must be a number');",`
+`.\docs\reports\phase16-runtime-artifact-locator.json:83:        ".\\scripts\\opencode\\smoke-opencode-commands.mjs:184:      pass(`graph-refresh-manifest: nodeCount=${flat.nodeCount}`);",`
+`.\docs\reports\phase16-runtime-artifact-locator.json:84:        ".\\scripts\\opencode\\smoke-opencode-commands.mjs:187:      fail('graph-refresh-manifest: edgeCount must be a number');",`
+`.\docs\reports\phase16-runtime-artifact-locator.json:85:        ".\\scripts\\opencode\\smoke-opencode-commands.mjs:189:      pass(`graph-refresh-manifest: edgeCount=${flat.edgeCount}`);",`
+`.\docs\reports\phase16-runtime-artifact-locator.json:86:        ".\\scripts\\opencode\\smoke-opencode-commands.mjs:192:      fail('graph-refresh-manifest: missing status field', '', 'npm run graph:manifest');",`
+`.\docs\reports\phase16-runtime-artifact-locator.json:87:        ".\\scripts\\opencode\\smoke-opencode-commands.mjs:194:      fail('graph-refresh-manifest: status is \"stub\" — manifest not yet populated',",`
+`.\docs\reports\phase16-runtime-artifact-locator.json:88:        ".\\scripts\\opencode\\smoke-opencode-commands.mjs:197:      pass(`graph-refresh-manifest: status=${flat.status}`);",`
+`.\docs\reports\phase16-runtime-artifact-locator.json:89:        ".\\scripts\\atlas\\write-graph-refresh-manifest.mjs:3: * write-graph-refresh-manifest.mjs",`
+`.\docs\reports\phase16-runtime-artifact-locator.json:90:        ".\\scripts\\atlas\\write-graph-refresh-manifest.mjs:5: * Creates memory/exports/graph-refresh-manifest.json with a real shape.",`
+`.\docs\reports\phase16-runtime-artifact-locator.json:91:        ".\\scripts\\atlas\\write-graph-refresh-manifest.mjs:18:const MANIFEST_PATH = path.join(EXPORT_DIR, 'graph-refresh-manifest.json');",`
+`.\docs\reports\phase16-runtime-artifact-locator.json:92:        ".\\scripts\\atlas\\write-graph-refresh-manifest.mjs:70:      if (e === 'graph-refresh-manifest.json') continue;",`
+`.\docs\reports\phase16-runtime-artifact-locator.json:93:        ".\\scripts\\atlas\\write-graph-refresh-manifest.mjs:128:    generator: 'scripts/atlas/write-graph-refresh-manifest.mjs',",`
+`.\docs\reports\phase16-runtime-artifact-locator.json:94:        ".\\scripts\\atlas\\write-graph-refresh-manifest.mjs:135:  console.log('[write-graph-refresh-manifest] wrote:', path.relative(root, MANIFEST_PATH));",`
+`.\docs\reports\phase16-runtime-artifact-locator.json:95:        ".\\scripts\\atlas\\promote-to-postgres.mjs:291:    execFileSync('node', [resolve(ROOT, 'scripts/atlas/write-graph-refresh-manifest.mjs')], { stdio: 'inherit' });\r",`
+`.\docs\reports\phase16-runtime-artifact-locator.json:96:        ".\\scripts\\atlas\\phase-19c-knowledge-consolidation.mjs:13: *   - memory/exports/graph-refresh-manifest.json (graphify output)",`
+`.\docs\reports\phase16-runtime-artifact-locator.json:97:        ".\\scripts\\atlas\\phase-19c-knowledge-consolidation.mjs:56:const MANIFEST_PATH = path.join(ROOT, 'memory', 'exports', 'graph-refresh-manifest.json');",`
+`.\docs\reports\phase16-runtime-artifact-locator.json:98:        ".\\scripts\\atlas\\locate-phase16-runtime-artifacts.mjs:7: * Answers: Are graph-refresh-manifest.json, invalidation code, and promotion wiring",`
+`.\docs\reports\phase16-runtime-artifact-locator.json:99:        ".\\scripts\\atlas\\locate-phase16-runtime-artifacts.mjs:20:  'graph-refresh-manifest',",`
+`.\docs\reports\phase16-runtime-artifact-locator.json:100:        ".\\scripts\\atlas\\locate-phase16-runtime-artifacts.mjs:97:  const hasManifest = allHits.some((h) => h.includes('graph-refresh-manifest.json'));",`
+`.\docs\reports\phase16-runtime-artifact-locator.json:101:        ".\\scripts\\atlas\\locate-phase16-runtime-artifacts.mjs:137:| graph-refresh-manifest.json | ${results.findings.summary.graph_refresh_manifest ? '✅ YES' : '❌ NO'} |",`
+`.\docs\reports\phase16-runtime-artifact-locator.json:102:        ".\\scripts\\atlas\\locate-phase16-runtime-artifacts.mjs:169:1. Bind \\`graph-refresh-manifest.json\\`",`
+`.\docs\reports\phase16-runtime-artifact-locator.json:103:        ".\\scripts\\atlas\\locate-phase16-runtime-artifacts.mjs:200:  console.log(`graph-refresh-manifest.json: ${results.findings.summary.graph_refresh_manifest ? '✅' : '❌'}`);",`
+`.\docs\reports\phase16-runtime-artifact-locator.json:104:        ".\\scripts\\atlas\\generate-graph-exports.mjs:6: * - memory/exports/graph-refresh-manifest.json\r",`
+`.\docs\reports\phase16-runtime-artifact-locator.json:105:        ".\\scripts\\atlas\\generate-graph-exports.mjs:33:const MANIFEST_PATH = path.join(EXPORT_DIR, 'graph-refresh-manifest.json');\r",`
+`.\docs\reports\phase16-runtime-artifact-locator.json:106:        ".\\next_steps\\active\\2026-05-30_PHASE_19B_UNIFIED_PIPELINE_READY.md:252:- Status: Missing graph-refresh-manifest.json",`
+`.\docs\reports\phase16-runtime-artifact-locator.json:107:        ".\\sveltekit-frontend\\docs\\graph\\deep-import-graph.json:1794472:      \"rel\": \"memory/exports/graph-refresh-manifest.json\",",`
+`.\docs\reports\phase16-runtime-artifact-locator.json:108:        ".\\sveltekit-frontend\\docs\\graph\\deep-import-graph.json:1877612:      \"rel\": \"scripts/atlas/write-graph-refresh-manifest.mjs\",",`
+`.\docs\reports\phase16-runtime-artifact-locator.json:109:        ".\\sveltekit-frontend\\docs\\graph\\deep-import-graph.json:1877618:        \"write-graph-refresh-manifest.mjs\",",`
+`.\docs\reports\phase16-runtime-artifact-locator.json:110:        ".\\sveltekit-frontend\\docs\\graph\\deep-import-graph.json:1877621:      \"summary\": \"write-graph-refresh-manifest.mjs\",",`
+`.\docs\reports\phase16-runtime-artifact-locator.json:111:        ".\\sveltekit-frontend\\docs\\graph\\deep-import-graph.json:1950380:      \"rel\": \"sveltekit-frontend/memory/exports/graph-refresh-manifest.json\",",`
+`.\docs\reports\phase16-runtime-artifact-locator.json:112:        ".\\sveltekit-frontend\\docs\\graph\\deep-import-graph.json:2381020:      \"rel\": \"scripts/atlas/write-graph-refresh-manifest.mjs\",",`
+`.\docs\reports\phase16-runtime-artifact-locator.json:113:        ".\\sveltekit-frontend\\docs\\graph\\deep-import-graph.json:2381026:        \"write-graph-refresh-manifest.mjs\",",`
+`.\docs\reports\phase16-runtime-artifact-locator.json:114:        ".\\sveltekit-frontend\\docs\\graph\\deep-import-graph.json:2381029:      \"summary\": \"write-graph-refresh-manifest.mjs\",",`
+`.\docs\reports\phase16-runtime-artifact-locator.json:115:        ".\\sveltekit-frontend\\docs\\graph\\deep-audit-ast.json:55725:          \"file\": \"scripts/atlas/write-graph-refresh-manifest.mjs\",",`
+`.\docs\reports\phase16-runtime-artifact-locator.json:116:        ".\\sveltekit-frontend\\docs\\graph\\deep-audit-ast.json:66055:          \"file\": \"scripts/atlas/write-graph-refresh-manifest.mjs\",",`
+`.\docs\reports\phase16-runtime-artifact-locator.json:117:        ".\\sveltekit-frontend\\docs\\todo\\bitfrost_turboquant_turbovec_production_todo.md:114:- The `duckdb\\smoke-duckdb.ps1` wrapper delegates to `scripts\\duckdb\\smoke-duckdb.ps1`, which reads `memory/exports/graph-refresh-manifest.json`, `cluster-cards.jsonl`, and `pathway-cards.jsonl`.\r",`
+`.\docs\reports\phase16-runtime-artifact-locator.json:118:        ".\\sveltekit-frontend\\next_steps\\plans\\bitfrost_turboquant_turbovec_production_todo.md:109:- The `duckdb\\smoke-duckdb.ps1` wrapper delegates to `scripts\\duckdb\\smoke-duckdb.ps1`, which reads `memory/exports/graph-refresh-manifest.json`, `cluster-cards.jsonl`, and `pathway-cards.jsonl`.\r",`
+`.\docs\reports\phase16-runtime-artifact-locator.json:119:        ".\\sveltekit-frontend\\memory\\agent-runs\\latest-recovery.json:13:    \"memory/exports/graph-refresh-manifest.json\",\r",`
+`.\docs\reports\phase16-runtime-artifact-locator.json:120:        ".\\sveltekit-frontend\\memory\\agent-runs\\latest-recovery.json:24:    \"Inspect graph-refresh-manifest.json promotionState\",\r",`
+`.\docs\reports\phase16-runtime-artifact-locator.json:121:        ".\\sveltekit-frontend\\memory\\agent-runs\\latest-recovery.json:29:    \"manifestPath\": \"C:\\\\Users\\\\james\\\\Videos\\\\deeds-web-app\\\\sveltekit-frontend\\\\memory\\\\exports\\\\graph-refresh-manifest.json\",\r",`
+`.\docs\reports\phase16-runtime-artifact-locator.json:122:        ".\\sveltekit-frontend\\memory\\agent-runs\\latest-recovery.json:62:      \"stdout\": \"[graph-exports] wrote: memory\\\\exports\\\\graph-refresh-manifest.json\\n[graph-exports] wrote: memory\\\\exports\\\\cluster-cards.jsonl 0 rows\\n[graph-exports] wrote: memory\\\\exports\\\\pathway-cards.jsonl 12 rows\\n[graph-exports] status: generated, promotionState: unpromoted\",\r",`
+`.\docs\reports\phase16-runtime-artifact-locator.json:123:        ".\\sveltekit-frontend\\memory\\graphify\\deep\\unresolved-imports.json:270:    \"scripts/atlas/write-graph-refresh-manifest.mjs\",",`
+`.\docs\reports\phase16-runtime-artifact-locator.json:124:        ".\\sveltekit-frontend\\memory\\graphify\\deep\\unresolved-imports.json:1017:    \"scripts/atlas/write-graph-refresh-manifest.mjs\",",`
+`.\docs\reports\phase16-runtime-artifact-locator.json:125:        ".\\sveltekit-frontend\\memory\\graphify\\gds\\2539fec52b3e.json:32840:      \"filePath\": \"scripts/atlas/write-graph-refresh-manifest.mjs\",",`
+`.\docs\reports\phase16-runtime-artifact-locator.json:126:        ".\\sveltekit-frontend\\memory\\graphify\\gds\\2539fec52b3e.json:65496:    \"scripts/atlas/write-graph-refresh-manifest.mjs\": {",`
+`.\docs\reports\phase16-runtime-artifact-locator.json:127:        ".\\sveltekit-frontend\\memory\\graphify\\gds\\2539fec52b3e.json:65497:      \"filePath\": \"scripts/atlas/write-graph-refresh-manifest.mjs\",",`
+`.\docs\reports\phase16-runtime-artifact-locator.json:128:        ".\\sveltekit-frontend\\memory\\graphify\\gds\\39dea0098dd2.json:32840:      \"filePath\": \"scripts/atlas/write-graph-refresh-manifest.mjs\",",`
+`.\docs\reports\phase16-runtime-artifact-locator.json:129:        ".\\sveltekit-frontend\\memory\\graphify\\gds\\39dea0098dd2.json:65496:    \"scripts/atlas/write-graph-refresh-manifest.mjs\": {",`
+`.\docs\reports\phase16-runtime-artifact-locator.json:130:        ".\\sveltekit-frontend\\memory\\graphify\\gds\\39dea0098dd2.json:65497:      \"filePath\": \"scripts/atlas/write-graph-refresh-manifest.mjs\",",`
+`.\docs\reports\phase16-runtime-artifact-locator.json:131:        ".\\sveltekit-frontend\\scripts\\bifrost\\smoke-card-context.mjs:115:      manifest: readJson('memory/exports/graph-refresh-manifest.json'),\r",`
+`.\docs\reports\phase16-runtime-artifact-locator.json:132:        ".\\sveltekit-frontend\\scripts\\cards\\build-json-cards.mjs:364:      graphRefreshManifest: 'memory/exports/graph-refresh-manifest.json',\r",`
+`.\docs\reports\phase16-runtime-artifact-locator.json:133:        ".\\sveltekit-frontend\\scripts\\cards\\build-json-cards.mjs:418:writeJson('memory/exports/graph-refresh-manifest.json', manifest);\r",`
+`.\docs\reports\phase16-runtime-artifact-locator.json:134:        ".\\sveltekit-frontend\\scripts\\duckdb\\smoke-duckdb.ps1:26:$manifest = Join-Path $root 'memory/exports/graph-refresh-manifest.json'\r",`
+`.\docs\reports\phase16-runtime-artifact-locator.json:135:        ".\\sveltekit-frontend\\scripts\\atlas\\generate-graph-exports.mjs:6: * - memory/exports/graph-refresh-manifest.json\r",`
+`.\docs\reports\phase16-runtime-artifact-locator.json:136:        ".\\sveltekit-frontend\\scripts\\atlas\\generate-graph-exports.mjs:51:const MANIFEST_PATH = path.join(EXPORT_DIR, 'graph-refresh-manifest.json');\r",`
+`.\docs\reports\phase16-runtime-artifact-locator.json:137:        ".\\sveltekit-frontend\\scripts\\dev\\recover-graph.mjs:77:const manifestPath = path.join(root, 'memory', 'exports', 'graph-refresh-manifest.json');\r",`
+`.\docs\reports\phase16-runtime-artifact-locator.json:138:        ".\\sveltekit-frontend\\scripts\\dev\\recover-graph.mjs:87:    'memory/exports/graph-refresh-manifest.json',\r",`
+`.\docs\reports\phase16-runtime-artifact-locator.json:139:        ".\\sveltekit-frontend\\scripts\\dev\\recover-graph.mjs:98:    'Inspect graph-refresh-manifest.json promotionState',\r",`
+`.\docs\reports\phase16-runtime-artifact-locator.json:140:        ".\\sveltekit-frontend\\memory\\graphify\\gds\\latest.json:32840:      \"filePath\": \"scripts/atlas/write-graph-refresh-manifest.mjs\",",`
+`.\docs\reports\phase16-runtime-artifact-locator.json:141:        ".\\sveltekit-frontend\\memory\\graphify\\gds\\latest.json:65496:    \"scripts/atlas/write-graph-refresh-manifest.mjs\": {",`
+`.\docs\reports\phase16-runtime-artifact-locator.json:142:        ".\\sveltekit-frontend\\memory\\graphify\\gds\\latest.json:65497:      \"filePath\": \"scripts/atlas/write-graph-refresh-manifest.mjs\",",`
+`.\docs\reports\phase16-runtime-artifact-locator.json:143:        ".\\sveltekit-frontend\\memory\\graphify\\gds\\fe5bac8318f4.json:32840:      \"filePath\": \"scripts/atlas/write-graph-refresh-manifest.mjs\",",`
+`.\docs\reports\phase16-runtime-artifact-locator.json:144:        ".\\sveltekit-frontend\\memory\\graphify\\gds\\fe5bac8318f4.json:65496:    \"scripts/atlas/write-graph-refresh-manifest.mjs\": {",`
+`.\docs\reports\phase16-runtime-artifact-locator.json:145:        ".\\sveltekit-frontend\\memory\\graphify\\gds\\fe5bac8318f4.json:65497:      \"filePath\": \"scripts/atlas/write-graph-refresh-manifest.mjs\",",`
+`.\docs\reports\phase16-runtime-artifact-locator.json:146:        ".\\sveltekit-frontend\\memory\\graphify\\gds\\de92f1995482.json:32840:      \"filePath\": \"scripts/atlas/write-graph-refresh-manifest.mjs\",",`
+`.\docs\reports\phase16-runtime-artifact-locator.json:147:        ".\\sveltekit-frontend\\memory\\graphify\\gds\\de92f1995482.json:65496:    \"scripts/atlas/write-graph-refresh-manifest.mjs\": {",`
+`.\docs\reports\phase16-runtime-artifact-locator.json:148:        ".\\sveltekit-frontend\\memory\\graphify\\gds\\de92f1995482.json:65497:      \"filePath\": \"scripts/atlas/write-graph-refresh-manifest.mjs\",",`
+`.\docs\reports\phase16-runtime-artifact-locator.json:149:        ".\\sveltekit-frontend\\memory\\graphify\\gds\\9f88ba87130f.json:32840:      \"filePath\": \"scripts/atlas/write-graph-refresh-manifest.mjs\",",`
+`.\docs\reports\phase16-runtime-artifact-locator.json:150:        ".\\sveltekit-frontend\\memory\\graphify\\gds\\9f88ba87130f.json:65496:    \"scripts/atlas/write-graph-refresh-manifest.mjs\": {",`
+`.\docs\reports\phase16-runtime-artifact-locator.json:151:        ".\\sveltekit-frontend\\memory\\graphify\\gds\\9f88ba87130f.json:65497:      \"filePath\": \"scripts/atlas/write-graph-refresh-manifest.mjs\",",`
+`.\docs\reports\phase16-runtime-artifact-locator.json:152:        ".\\sveltekit-frontend\\memory\\graphify\\gds\\87ce8522450e.json:32840:      \"filePath\": \"scripts/atlas/write-graph-refresh-manifest.mjs\",",`
+`.\docs\reports\phase16-runtime-artifact-locator.json:153:        ".\\sveltekit-frontend\\memory\\graphify\\gds\\87ce8522450e.json:65496:    \"scripts/atlas/write-graph-refresh-manifest.mjs\": {",`
+`.\docs\reports\phase16-runtime-artifact-locator.json:154:        ".\\sveltekit-frontend\\memory\\graphify\\gds\\87ce8522450e.json:65497:      \"filePath\": \"scripts/atlas/write-graph-refresh-manifest.mjs\",",`
+`.\docs\reports\phase16-runtime-artifact-locator.json:155:        ".\\sveltekit-frontend\\memory\\graphify\\gds\\79718ea5b812.json:32840:      \"filePath\": \"scripts/atlas/write-graph-refresh-manifest.mjs\",",`
+`.\docs\reports\phase16-runtime-artifact-locator.json:156:        ".\\sveltekit-frontend\\memory\\graphify\\gds\\79718ea5b812.json:65496:    \"scripts/atlas/write-graph-refresh-manifest.mjs\": {",`
+`.\docs\reports\phase16-runtime-artifact-locator.json:157:        ".\\sveltekit-frontend\\memory\\graphify\\gds\\79718ea5b812.json:65497:      \"filePath\": \"scripts/atlas/write-graph-refresh-manifest.mjs\","`
+`.\docs\reports\neschrom97-card-taxonomy.json:8070:      "path": "sveltekit-frontend/../scripts/atlas/write-graph-refresh-manifest.mjs",`
+`.\docs\reports\neschrom97-card-taxonomy.json:8078:        "write-graph-refresh-manifest",`
+`.\docs\reports\neschrom97-card-registry.json:12537:        "nes:scripts/atlas/write-graph-refresh-manifest_mjs:968f45b7"`
+`.\docs\reports\neschrom97-card-registry.json:12542:      "source_ref": "../scripts/atlas/write-graph-refresh-manifest.mjs",`
+`.\docs\reports\neschrom97-card-registry.json:12544:        "feat:scripts/atlas/write-graph-refresh-manifest_mjs"`
+`.\docs\reports\neschrom97-card-registry.json:12546:      "feature_id": "feat:scripts/atlas/write-graph-refresh-manifest_mjs",`
+`.\docs\reports\neschrom97-card-registry.json:12553:        "write-graph-refresh-manifest",`
+`.\docs\reports\neschrom97-card-registry.json:12559:      "title": "write-graph-refresh-manifest.mjs",`
+`.\docs\reports\index-gap-memory-report.json:3098:      "title": "memory/exports/graph-refresh-manifest.json",`
+`.\docs\reports\index-gap-memory-report.json:3099:      "summary": "modified tracked file not represented in the local atlas overlay | M | graph-refresh-manifest.json",`
+`.\docs\reports\index-gap-memory-report.json:3101:        "local:memory/exports/graph-refresh-manifest.json",`
+`.\docs\reports\index-gap-memory-report.json:3102:        "memory/exports/graph-refresh-manifest.json"`
+`.\docs\reports\index-gap-memory-report.json:3105:        "memory/exports/graph-refresh-manifest.json",`
+`.\docs\reports\index-gap-memory-report.json:3110:        "memory/exports/graph-refresh-manifest.json"`
+`.\docs\reports\index-gap-memory-report.json:3124:        "graph-refresh-manifest.json"`
+`.\docs\reports\index-gap-memory-report.json:3129:          "memory/exports/graph-refresh-manifest.js"`
+`.\docs\reports\index-gap-memory-report.json:3168:        "git status --porcelain --untracked-files=all | Select-String \"memory/exports/graph-refresh-manifest\\.json\"",`
+`.\docs\reports\index-gap-memory-report.json:3169:        "rg --files -uu | rg \"memory/exports/graph-refresh-manifest\\.json\"",`
+`.\docs\reports\index-gap-memory-report.json:3170:        "rg -n -uu \"graph-refresh-manifest\\.json\" sveltekit-frontend/src sveltekit-frontend/scripts docs scripts"`
+`.\docs\reports\index-gap-memory-report.json:6587:          "sveltekit-frontend/memory/exports/graph-refresh-manifest.js",`
+`.\docs\reports\doc-feature-crosswalk-2026-06-01.json:611:        "memory/exports/graph-refresh-manifest.json",`
+`.\docs\reports\directory-topology-map.json:22080:      "source_ref": "scripts/atlas/write-graph-refresh-manifest.mjs",`
+`.\memory\graphify\deep\deep-import-graph.json:488163:      "path": "memory/exports/graph-refresh-manifest.json",`
+`.\memory\graphify\deep\deep-import-graph.json:488164:      "rel": "memory/exports/graph-refresh-manifest.json",`
+`.\memory\graphify\deep\deep-import-graph.json:511275:      "path": "scripts/atlas/write-graph-refresh-manifest.mjs",`
+`.\memory\graphify\deep\deep-import-graph.json:511276:      "rel": "scripts/atlas/write-graph-refresh-manifest.mjs",`
+`.\memory\graphify\deep\deep-import-graph.json:511282:        "write-graph-refresh-manifest.mjs",`
+`.\memory\graphify\deep\deep-import-graph.json:511285:      "summary": "write-graph-refresh-manifest.mjs",`
+`.\memory\graphify\deep\deep-import-graph.json:531275:      "path": "sveltekit-frontend/memory/exports/graph-refresh-manifest.json",`
+`.\memory\graphify\deep\deep-import-graph.json:531276:      "rel": "sveltekit-frontend/memory/exports/graph-refresh-manifest.json",`
+`.\memory\graphify\deep\deep-import-graph.json:652521:      "path": "scripts/atlas/write-graph-refresh-manifest.mjs",`
+`.\memory\graphify\deep\deep-import-graph.json:652522:      "rel": "scripts/atlas/write-graph-refresh-manifest.mjs",`
+`.\memory\graphify\deep\deep-import-graph.json:652528:        "write-graph-refresh-manifest.mjs",`
+`.\memory\graphify\deep\deep-import-graph.json:652531:      "summary": "write-graph-refresh-manifest.mjs",`
+`.\next_steps\active\2026-05-30_PHASE_19B_UNIFIED_PIPELINE_READY.md:252:- Status: Missing graph-refresh-manifest.json`
+`.\memory\exports\graph-refresh-manifest.json:232:  "generator": "scripts/atlas/write-graph-refresh-manifest.mjs",`
+`.\scripts\atlas\write-graph-refresh-manifest.mjs:3: * write-graph-refresh-manifest.mjs`
+`.\scripts\atlas\write-graph-refresh-manifest.mjs:5: * Creates memory/exports/graph-refresh-manifest.json with a real shape.`
+`.\scripts\atlas\write-graph-refresh-manifest.mjs:18:const MANIFEST_PATH = path.join(EXPORT_DIR, 'graph-refresh-manifest.json');`
+`.\scripts\atlas\write-graph-refresh-manifest.mjs:70:      if (e === 'graph-refresh-manifest.json') continue;`
+`.\scripts\atlas\write-graph-refresh-manifest.mjs:128:    generator: 'scripts/atlas/write-graph-refresh-manifest.mjs',`
+`.\scripts\atlas\write-graph-refresh-manifest.mjs:135:  console.log('[write-graph-refresh-manifest] wrote:', path.relative(root, MANIFEST_PATH));`
+`.\scripts\atlas\promote-to-postgres.mjs:291:    execFileSync('node', [resolve(ROOT, 'scripts/atlas/write-graph-refresh-manifest.mjs')], { stdio: 'inherit' });`
+`.\scripts\atlas\promote-to-postgres.mjs:294:    const manifestPath = resolve(ROOT, 'memory/exports/graph-refresh-manifest.json');`
+`.\scripts\atlas\phase-19c-knowledge-consolidation.mjs:13: *   - memory/exports/graph-refresh-manifest.json (graphify output)`
+`.\scripts\atlas\phase-19c-knowledge-consolidation.mjs:56:const MANIFEST_PATH = path.join(ROOT, 'memory', 'exports', 'graph-refresh-manifest.json');`
+`.\scripts\atlas\locate-phase16-runtime-artifacts.mjs:7: * Answers: Are graph-refresh-manifest.json, invalidation code, and promotion wiring`
+`.\scripts\atlas\locate-phase16-runtime-artifacts.mjs:20:  'graph-refresh-manifest',`
+`.\scripts\atlas\locate-phase16-runtime-artifacts.mjs:97:  const hasManifest = allHits.some((h) => h.includes('graph-refresh-manifest.json'));`
+`.\scripts\atlas\locate-phase16-runtime-artifacts.mjs:137:| graph-refresh-manifest.json | ${results.findings.summary.graph_refresh_manifest ? '✅ YES' : '❌ NO'} |`
+`.\scripts\atlas\locate-phase16-runtime-artifacts.mjs:169:1. Bind \`graph-refresh-manifest.json\``
+`.\scripts\atlas\locate-phase16-runtime-artifacts.mjs:200:  console.log(`graph-refresh-manifest.json: ${results.findings.summary.graph_refresh_manifest ? '✅' : '❌'}`);`
+`.\scripts\atlas\generate-graph-exports.mjs:6: * - memory/exports/graph-refresh-manifest.json`
+`.\scripts\atlas\generate-graph-exports.mjs:33:const MANIFEST_PATH = path.join(EXPORT_DIR, 'graph-refresh-manifest.json');`
+`.\reports\parent-atlas-open-lanes-todo.md:55:| Graph refresh invalidation / promotion wiring (Lane 4) | `promote-to-postgres.mjs` calls `write-graph-refresh-manifest.mjs` as post-promote hook |`
+`.\sveltekit-frontend\docs\todo\bitfrost_turboquant_turbovec_production_todo.md:114:- The `duckdb\smoke-duckdb.ps1` wrapper delegates to `scripts\duckdb\smoke-duckdb.ps1`, which reads `memory/exports/graph-refresh-manifest.json`, `cluster-cards.jsonl`, and `pathway-cards.jsonl`.`
+`.\scripts\opencode\smoke-opencode-commands.mjs:131:assertFile('memory/exports/graph-refresh-manifest.json', 'npm run graph:manifest');`
+`.\scripts\opencode\smoke-opencode-commands.mjs:163:const manifest = readJson('memory/exports/graph-refresh-manifest.json');`
+`.\scripts\opencode\smoke-opencode-commands.mjs:166:  // and the legacy nested shape { "graph-refresh-manifest": { status, ... } }`
+`.\scripts\opencode\smoke-opencode-commands.mjs:169:    : (manifest['graph-refresh-manifest'] || null);`
+`.\scripts\opencode\smoke-opencode-commands.mjs:172:    fail('graph-refresh-manifest: unrecognised shape (no status/generatedAt at root or nested key)',`
+`.\scripts\opencode\smoke-opencode-commands.mjs:176:      fail('graph-refresh-manifest: missing generatedAt', '', 'npm run graph:manifest');`
+`.\scripts\opencode\smoke-opencode-commands.mjs:178:      pass('graph-refresh-manifest: has generatedAt');`
+`.\scripts\opencode\smoke-opencode-commands.mjs:179:      assertFreshTimestamp(flat.generatedAt, 72, 'graph-refresh-manifest.generatedAt');`
+`.\scripts\opencode\smoke-opencode-commands.mjs:182:      fail('graph-refresh-manifest: nodeCount must be a number');`
+`.\scripts\opencode\smoke-opencode-commands.mjs:184:      pass(`graph-refresh-manifest: nodeCount=${flat.nodeCount}`);`
+`.\scripts\opencode\smoke-opencode-commands.mjs:187:      fail('graph-refresh-manifest: edgeCount must be a number');`
+`.\scripts\opencode\smoke-opencode-commands.mjs:189:      pass(`graph-refresh-manifest: edgeCount=${flat.edgeCount}`);`
+`.\scripts\opencode\smoke-opencode-commands.mjs:192:      fail('graph-refresh-manifest: missing status field', '', 'npm run graph:manifest');`
+`.\scripts\opencode\smoke-opencode-commands.mjs:194:      fail('graph-refresh-manifest: status is "stub" — manifest not yet populated',`
+`.\scripts\opencode\smoke-opencode-commands.mjs:197:      pass(`graph-refresh-manifest: status=${flat.status}`);`
+`.\sveltekit-frontend\next_steps\plans\bitfrost_turboquant_turbovec_production_todo.md:109:- The `duckdb\smoke-duckdb.ps1` wrapper delegates to `scripts\duckdb\smoke-duckdb.ps1`, which reads `memory/exports/graph-refresh-manifest.json`, `cluster-cards.jsonl`, and `pathway-cards.jsonl`.`
+`.\sveltekit-frontend\memory\graphify\gds\latest.json:32840:      "filePath": "scripts/atlas/write-graph-refresh-manifest.mjs",`
+`.\sveltekit-frontend\memory\graphify\gds\latest.json:65496:    "scripts/atlas/write-graph-refresh-manifest.mjs": {`
+`.\sveltekit-frontend\memory\graphify\gds\latest.json:65497:      "filePath": "scripts/atlas/write-graph-refresh-manifest.mjs",`
+`.\sveltekit-frontend\memory\graphify\gds\fe5bac8318f4.json:32840:      "filePath": "scripts/atlas/write-graph-refresh-manifest.mjs",`
+`.\sveltekit-frontend\memory\graphify\gds\fe5bac8318f4.json:65496:    "scripts/atlas/write-graph-refresh-manifest.mjs": {`
+`.\sveltekit-frontend\memory\graphify\gds\fe5bac8318f4.json:65497:      "filePath": "scripts/atlas/write-graph-refresh-manifest.mjs",`
+`.\sveltekit-frontend\memory\graphify\gds\de92f1995482.json:32840:      "filePath": "scripts/atlas/write-graph-refresh-manifest.mjs",`
+`.\sveltekit-frontend\memory\graphify\gds\de92f1995482.json:65496:    "scripts/atlas/write-graph-refresh-manifest.mjs": {`
+`.\sveltekit-frontend\memory\graphify\gds\de92f1995482.json:65497:      "filePath": "scripts/atlas/write-graph-refresh-manifest.mjs",`
+`.\sveltekit-frontend\memory\graphify\gds\9f88ba87130f.json:32840:      "filePath": "scripts/atlas/write-graph-refresh-manifest.mjs",`
+`.\sveltekit-frontend\memory\graphify\gds\9f88ba87130f.json:65496:    "scripts/atlas/write-graph-refresh-manifest.mjs": {`
+`.\sveltekit-frontend\memory\graphify\gds\9f88ba87130f.json:65497:      "filePath": "scripts/atlas/write-graph-refresh-manifest.mjs",`
+`.\sveltekit-frontend\memory\graphify\gds\87ce8522450e.json:32840:      "filePath": "scripts/atlas/write-graph-refresh-manifest.mjs",`
+`.\sveltekit-frontend\memory\graphify\gds\87ce8522450e.json:65496:    "scripts/atlas/write-graph-refresh-manifest.mjs": {`
+`.\sveltekit-frontend\memory\graphify\gds\87ce8522450e.json:65497:      "filePath": "scripts/atlas/write-graph-refresh-manifest.mjs",`
+`.\sveltekit-frontend\memory\graphify\gds\79718ea5b812.json:32840:      "filePath": "scripts/atlas/write-graph-refresh-manifest.mjs",`
+`.\sveltekit-frontend\memory\graphify\gds\79718ea5b812.json:65496:    "scripts/atlas/write-graph-refresh-manifest.mjs": {`
+`.\sveltekit-frontend\memory\graphify\gds\79718ea5b812.json:65497:      "filePath": "scripts/atlas/write-graph-refresh-manifest.mjs",`
+`.\sveltekit-frontend\memory\graphify\gds\39dea0098dd2.json:32840:      "filePath": "scripts/atlas/write-graph-refresh-manifest.mjs",`
+`.\sveltekit-frontend\memory\graphify\gds\39dea0098dd2.json:65496:    "scripts/atlas/write-graph-refresh-manifest.mjs": {`
+`.\sveltekit-frontend\memory\graphify\gds\39dea0098dd2.json:65497:      "filePath": "scripts/atlas/write-graph-refresh-manifest.mjs",`
+`.\sveltekit-frontend\memory\graphify\gds\2539fec52b3e.json:32840:      "filePath": "scripts/atlas/write-graph-refresh-manifest.mjs",`
+`.\sveltekit-frontend\memory\graphify\gds\2539fec52b3e.json:65496:    "scripts/atlas/write-graph-refresh-manifest.mjs": {`
+`.\sveltekit-frontend\memory\graphify\gds\2539fec52b3e.json:65497:      "filePath": "scripts/atlas/write-graph-refresh-manifest.mjs",`
+`.\sveltekit-frontend\memory\graphify\deep\unresolved-imports.json:270:    "scripts/atlas/write-graph-refresh-manifest.mjs",`
+`.\sveltekit-frontend\memory\graphify\deep\unresolved-imports.json:1017:    "scripts/atlas/write-graph-refresh-manifest.mjs",`
+`.\sveltekit-frontend\docs\graph\deep-import-graph.json:1794472:      "rel": "memory/exports/graph-refresh-manifest.json",`
+`.\sveltekit-frontend\docs\graph\deep-import-graph.json:1877612:      "rel": "scripts/atlas/write-graph-refresh-manifest.mjs",`
+`.\sveltekit-frontend\docs\graph\deep-import-graph.json:1877618:        "write-graph-refresh-manifest.mjs",`
+`.\sveltekit-frontend\docs\graph\deep-import-graph.json:1877621:      "summary": "write-graph-refresh-manifest.mjs",`
+`.\sveltekit-frontend\docs\graph\deep-import-graph.json:1950380:      "rel": "sveltekit-frontend/memory/exports/graph-refresh-manifest.json",`
+`.\sveltekit-frontend\docs\graph\deep-import-graph.json:2381020:      "rel": "scripts/atlas/write-graph-refresh-manifest.mjs",`
+`.\sveltekit-frontend\docs\graph\deep-import-graph.json:2381026:        "write-graph-refresh-manifest.mjs",`
+`.\sveltekit-frontend\docs\graph\deep-import-graph.json:2381029:      "summary": "write-graph-refresh-manifest.mjs",`
+`.\sveltekit-frontend\docs\graph\deep-audit-ast.json:55725:          "file": "scripts/atlas/write-graph-refresh-manifest.mjs",`
+`.\sveltekit-frontend\docs\graph\deep-audit-ast.json:66055:          "file": "scripts/atlas/write-graph-refresh-manifest.mjs",`
+`.\sveltekit-frontend\memory\agent-runs\latest-recovery.json:13:    "memory/exports/graph-refresh-manifest.json",`
+`.\sveltekit-frontend\memory\agent-runs\latest-recovery.json:24:    "Inspect graph-refresh-manifest.json promotionState",`
+`.\sveltekit-frontend\memory\agent-runs\latest-recovery.json:29:    "manifestPath": "C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\memory\\exports\\graph-refresh-manifest.json",`
+`.\sveltekit-frontend\memory\agent-runs\latest-recovery.json:62:      "stdout": "[graph-exports] wrote: memory\\exports\\graph-refresh-manifest.json\n[graph-exports] wrote: memory\\exports\\cluster-cards.jsonl 0 rows\n[graph-exports] wrote: memory\\exports\\pathway-cards.jsonl 12 rows\n[graph-exports] status: generated, promotionState: unpromoted",`
+`.\sveltekit-frontend\scripts\atlas\generate-graph-exports.mjs:6: * - memory/exports/graph-refresh-manifest.json`
+`.\sveltekit-frontend\scripts\atlas\generate-graph-exports.mjs:51:const MANIFEST_PATH = path.join(EXPORT_DIR, 'graph-refresh-manifest.json');`
+`.\sveltekit-frontend\scripts\cards\build-json-cards.mjs:364:      graphRefreshManifest: 'memory/exports/graph-refresh-manifest.json',`
+`.\sveltekit-frontend\scripts\cards\build-json-cards.mjs:418:writeJson('memory/exports/graph-refresh-manifest.json', manifest);`
+`.\sveltekit-frontend\scripts\bifrost\smoke-card-context.mjs:115:      manifest: readJson('memory/exports/graph-refresh-manifest.json'),`
+`.\sveltekit-frontend\scripts\dev\recover-graph.mjs:77:const manifestPath = path.join(root, 'memory', 'exports', 'graph-refresh-manifest.json');`
+`.\sveltekit-frontend\scripts\dev\recover-graph.mjs:87:    'memory/exports/graph-refresh-manifest.json',`
+`.\sveltekit-frontend\scripts\dev\recover-graph.mjs:98:    'Inspect graph-refresh-manifest.json promotionState',`
+`.\sveltekit-frontend\scripts\duckdb\smoke-duckdb.ps1:26:$manifest = Join-Path $root 'memory/exports/graph-refresh-manifest.json'`
+
+#### "graph:refresh"
+`.\docs\opencode\SUB-MASTER-FEATURE-TODO-2026-05-27.md:82:  - Simple fix: write a manifest version hash to Redis `graph:refresh:version` on each export run`
+`.\docs\reports\phase16-runtime-artifact-locator.md:167:#### "graph:refresh"`
+`.\docs\reports\phase16-runtime-artifact-locator.md:168:`.\docs\opencode\SUB-MASTER-FEATURE-TODO-2026-05-27.md:82:  - Simple fix: write a manifest version hash to Redis `graph:refresh:version` on each export run``
+`.\docs\reports\phase16-runtime-artifact-locator.md:169:`.\sveltekit-frontend\docs\reports\temporal-task-registry-report.json:197:        "command": "npm run graph:refresh",``
+`.\docs\reports\phase16-runtime-artifact-locator.md:170:`.\sveltekit-frontend\docs\reports\temporal-task-registry-report.json:224:            "command": "npm run graph:refresh",``
+`.\docs\reports\phase16-runtime-artifact-locator.md:171:`.\sveltekit-frontend\docs\reports\temporal-task-registry-report.json:920:        "command": "npm run graph:refresh",``
+`.\docs\reports\phase16-runtime-artifact-locator.md:172:`.\scripts\atlas\generate-graph-exports.mjs:258:    await redis.set('graph:refresh:version', versionHash);``
+`.\docs\reports\phase16-runtime-artifact-locator.md:173:`.\scripts\atlas\generate-graph-exports.mjs:259:    console.log(`[graph-exports] Published version hash ${versionHash} to Redis 'graph:refresh:version'`);``
+`.\docs\reports\phase16-runtime-artifact-locator.md:174:`.\scripts\atlas\locate-phase16-runtime-artifacts.mjs:21:  'graph:refresh',``
+`.\docs\reports\phase16-runtime-artifact-locator.md:175:`.\scripts\atlas\record-fix-outcome.mjs:74:    graphVersion = (await redis.get('graph:refresh:version')) || 'unknown';``
+`.\docs\reports\phase16-runtime-artifact-locator.md:176:`.\sveltekit-frontend\package.json:308:    "graph:refresh": "node scripts/wiki/extract-code-relations.mjs && node scripts/graph/build-codebase-relationships.mjs",``
+`.\docs\reports\phase16-runtime-artifact-locator.md:177:`.\sveltekit-frontend\package.json:326:    "graph:full": "npm run graph:refresh && npm run graph:synthesize && npm run graph:wire-grpo",``
+`.\docs\reports\phase16-runtime-artifact-locator.md:178:`.\sveltekit-frontend\package.json:327:    "graph:full:authority": "npm run graphify:gds && npm run graphify:authority && npm run graph:refresh && npm run graph:synthesize && npm run wire:synthesis:grpo:dry",``
+`.\docs\reports\phase16-runtime-artifact-locator.md:179:`.\scripts\tests\smoke-runtime-packet-replay.mjs:257:      next_command: 'npm run graph:refresh',``
+`.\docs\reports\phase16-runtime-artifact-locator.md:180:`.\sveltekit-frontend\scripts\opencode\task-registry-helpers.mjs:272:      command: 'npm run graph:refresh',``
+`.\docs\reports\phase16-runtime-artifact-locator.md:181:`.\sveltekit-frontend\scripts\atlas\generate-graph-exports.mjs:261:    await redis.set('graph:refresh:version', versionHash);``
+`.\docs\reports\phase16-runtime-artifact-locator.md:182:`.\sveltekit-frontend\scripts\atlas\generate-graph-exports.mjs:262:    console.log(`[graph-exports] Published version hash ${versionHash} to Redis 'graph:refresh:version'`);``
+`.\docs\reports\phase16-runtime-artifact-locator.json:6:    "graph:refresh",`
+`.\docs\reports\phase16-runtime-artifact-locator.json:159:      "graph:refresh": [`
+`.\docs\reports\phase16-runtime-artifact-locator.json:160:        ".\\docs\\opencode\\SUB-MASTER-FEATURE-TODO-2026-05-27.md:82:  - Simple fix: write a manifest version hash to Redis `graph:refresh:version` on each export run",`
+`.\docs\reports\phase16-runtime-artifact-locator.json:161:        ".\\sveltekit-frontend\\docs\\reports\\temporal-task-registry-report.json:197:        \"command\": \"npm run graph:refresh\",",`
+`.\docs\reports\phase16-runtime-artifact-locator.json:162:        ".\\sveltekit-frontend\\docs\\reports\\temporal-task-registry-report.json:224:            \"command\": \"npm run graph:refresh\",",`
+`.\docs\reports\phase16-runtime-artifact-locator.json:163:        ".\\sveltekit-frontend\\docs\\reports\\temporal-task-registry-report.json:920:        \"command\": \"npm run graph:refresh\",",`
+`.\docs\reports\phase16-runtime-artifact-locator.json:164:        ".\\scripts\\atlas\\generate-graph-exports.mjs:258:    await redis.set('graph:refresh:version', versionHash);\r",`
+`.\docs\reports\phase16-runtime-artifact-locator.json:165:        ".\\scripts\\atlas\\generate-graph-exports.mjs:259:    console.log(`[graph-exports] Published version hash ${versionHash} to Redis 'graph:refresh:version'`);\r",`
+`.\docs\reports\phase16-runtime-artifact-locator.json:166:        ".\\scripts\\atlas\\locate-phase16-runtime-artifacts.mjs:21:  'graph:refresh',",`
+`.\docs\reports\phase16-runtime-artifact-locator.json:167:        ".\\scripts\\atlas\\record-fix-outcome.mjs:74:    graphVersion = (await redis.get('graph:refresh:version')) || 'unknown';",`
+`.\docs\reports\phase16-runtime-artifact-locator.json:168:        ".\\sveltekit-frontend\\package.json:308:    \"graph:refresh\": \"node scripts/wiki/extract-code-relations.mjs && node scripts/graph/build-codebase-relationships.mjs\",\r",`
+`.\docs\reports\phase16-runtime-artifact-locator.json:169:        ".\\sveltekit-frontend\\package.json:326:    \"graph:full\": \"npm run graph:refresh && npm run graph:synthesize && npm run graph:wire-grpo\",\r",`
+`.\docs\reports\phase16-runtime-artifact-locator.json:170:        ".\\sveltekit-frontend\\package.json:327:    \"graph:full:authority\": \"npm run graphify:gds && npm run graphify:authority && npm run graph:refresh && npm run graph:synthesize && npm run wire:synthesis:grpo:dry\",\r",`
+`.\docs\reports\phase16-runtime-artifact-locator.json:171:        ".\\scripts\\tests\\smoke-runtime-packet-replay.mjs:257:      next_command: 'npm run graph:refresh',",`
+`.\docs\reports\phase16-runtime-artifact-locator.json:172:        ".\\sveltekit-frontend\\scripts\\opencode\\task-registry-helpers.mjs:272:      command: 'npm run graph:refresh',\r",`
+`.\docs\reports\phase16-runtime-artifact-locator.json:173:        ".\\sveltekit-frontend\\scripts\\atlas\\generate-graph-exports.mjs:261:    await redis.set('graph:refresh:version', versionHash);\r",`
+`.\docs\reports\phase16-runtime-artifact-locator.json:174:        ".\\sveltekit-frontend\\scripts\\atlas\\generate-graph-exports.mjs:262:    console.log(`[graph-exports] Published version hash ${versionHash} to Redis 'graph:refresh:version'`);\r"`
+`.\scripts\atlas\generate-graph-exports.mjs:258:    await redis.set('graph:refresh:version', versionHash);`
+`.\scripts\atlas\generate-graph-exports.mjs:259:    console.log(`[graph-exports] Published version hash ${versionHash} to Redis 'graph:refresh:version'`);`
+`.\scripts\atlas\locate-phase16-runtime-artifacts.mjs:21:  'graph:refresh',`
+`.\scripts\atlas\record-fix-outcome.mjs:74:    graphVersion = (await redis.get('graph:refresh:version')) || 'unknown';`
+`.\scripts\tests\smoke-runtime-packet-replay.mjs:257:      next_command: 'npm run graph:refresh',`
+`.\sveltekit-frontend\package.json:308:    "graph:refresh": "node scripts/wiki/extract-code-relations.mjs && node scripts/graph/build-codebase-relationships.mjs",`
+`.\sveltekit-frontend\package.json:326:    "graph:full": "npm run graph:refresh && npm run graph:synthesize && npm run graph:wire-grpo",`
+`.\sveltekit-frontend\package.json:327:    "graph:full:authority": "npm run graphify:gds && npm run graphify:authority && npm run graph:refresh && npm run graph:synthesize && npm run wire:synthesis:grpo:dry",`
+`.\sveltekit-frontend\docs\reports\temporal-task-registry-report.json:197:        "command": "npm run graph:refresh",`
+`.\sveltekit-frontend\docs\reports\temporal-task-registry-report.json:224:            "command": "npm run graph:refresh",`
+`.\sveltekit-frontend\docs\reports\temporal-task-registry-report.json:920:        "command": "npm run graph:refresh",`
+`.\sveltekit-frontend\scripts\atlas\generate-graph-exports.mjs:261:    await redis.set('graph:refresh:version', versionHash);`
+`.\sveltekit-frontend\scripts\atlas\generate-graph-exports.mjs:262:    console.log(`[graph-exports] Published version hash ${versionHash} to Redis 'graph:refresh:version'`);`
+`.\sveltekit-frontend\scripts\opencode\task-registry-helpers.mjs:272:      command: 'npm run graph:refresh',`
+
+#### "refresh.*manifest"
+(no hits)
+
+#### "invalidation"
+(no hits)
+
+#### "promotion"
+(no hits)
+
+#### "graph-refresh"
+(no hits)
+
+#### "refresh-manifest"
+(no hits)
+
+### Artifact Files
+
+- `.tmp\typescript-promotion-bridge-audit.md`
+- `.tmp\typescript-promotion-bridge-audit.json`
+- `.tmp\postgres-promotion-schema-audit.md`
+- `.tmp\postgres-promotion-schema-audit.json`
+- `.tmp\drizzle-promotion-drift-audit.md`
+- `.tmp\drizzle-promotion-drift-audit.json`
+- `docker\langgraph-synthesis\.venv\Lib\site-packages\numpy\_core\tests\__pycache__\test_nep50_promotions.cpython-313.pyc`
+- `docker\langgraph-synthesis\.venv\Lib\site-packages\numpy\_core\tests\test_nep50_promotions.py`
+- `docker\langgraph-synthesis\.venv\Lib\site-packages\torch\onnx\_internal\fx\passes\__pycache__\type_promotion.cpython-313.pyc`
+- `docker\langgraph-synthesis\.venv\Lib\site-packages\torch\onnx\_internal\fx\passes\type_promotion.py`
+- `docs\reports\current-corpus-promotion-preflight.md`
+- `sveltekit-frontend\src\lib\server\cache-invalidation.ts`
+- `sveltekit-frontend\src\lib\server\cache\invalidation.ts`
+- `sveltekit-frontend\src\lib\server\cache\invalidation-registry.ts`
+- `sveltekit-frontend\src\lib\server\cache\cache-invalidation.ts`
+- `memory\exports\graph-refresh-manifest.json`
+- `memory\agent-runs\current-corpus-promotion-preflight.json`
+- `sveltekit-frontend\src\lib\server\ace\card-promotion-loader.ts`
+- `sveltekit-frontend\.venv_turbovec\Lib\site-packages\numpy\_core\tests\__pycache__\test_nep50_promotions.cpython-313.pyc`
+- `sveltekit-frontend\.venv_turbovec\Lib\site-packages\numpy\_core\tests\test_nep50_promotions.py`
+- `sveltekit-frontend\src\lib\cache\cache-invalidation.ts`
+- `sveltekit-frontend\drizzle\manual\20260601_promotion_indexes_validation.sql`
+- `sveltekit-frontend\drizzle\manual\20260530_phase19b_promotion_state.sql`
+- `scripts\atlas\write-graph-refresh-manifest.mjs`
+- `scripts\atlas\refresh-promotion-states.mjs`
+- `scripts\atlas\publish-bifrost-invalidation.mjs`
+- `sveltekit-frontend\docs\obsidian-vault\Files\src__lib__cache__cache-invalidation.md`
+- `sveltekit-frontend\docs\obsidian-vault\Files\src__lib__server__cache__invalidation.md`
+- `sveltekit-frontend\docs\obsidian-vault\Files\src__lib__server__cache-invalidation.md`
+- `scripts\test-cache-invalidation.sh`
+- `scripts\promotion\run-promotion-queue.mjs`
+- `scripts\promotion\report-promotion-status.mjs`
+- `scripts\promotion\promotion-queue.manifest.json`
+- `scripts\promotion\promote-verified-packets.mjs`
+- `scripts\promotion\audit-typescript-promotion-bridge.mjs`
+- `scripts\promotion\audit-postgres-promotion-schema.mjs`
+- `scripts\promotion\audit-drizzle-promotion-drift.mjs`
+- `sveltekit-frontend\scripts\atlas\current-corpus-promotion-preflight.mjs`
+- `sveltekit-frontend\.venv\Lib\site-packages\numpy\_core\tests\__pycache__\test_nep50_promotions.cpython-313.pyc`
+- `sveltekit-frontend\.venv\Lib\site-packages\numpy\_core\tests\test_nep50_promotions.py`
+- `sveltekit-frontend\memory\exports\graph-refresh-manifest.json`
+- `sveltekit-frontend\.venv\Lib\python3.9\site-packages\numpy\_core\tests\__pycache__\test_nep50_promotions.cpython-39.pyc`
+- `sveltekit-frontend\.venv\Lib\python3.9\site-packages\numpy\_core\tests\test_nep50_promotions.py`
+- `sveltekit-frontend\.tmp\promotion-status.md`
+- `sveltekit-frontend\.tmp\promotion-status.json`
+- `sveltekit-frontend\.tmp\promotion-queue-run.md`
+- `sveltekit-frontend\.tmp\promotion-queue-run.json`
+- `sveltekit-frontend\.tmp\bounded-promotion-queue-setup-report.md`
+- `sveltekit-frontend\.tmp\bounded-promotion-queue-setup-report.json`
+- `sveltekit-frontend\.svelte-kit\output\server\chunks\invalidation.js`
+
+## Next Actions
+
+### Phase 16 Runtime Patch Available
+1. Bind `graph-refresh-manifest.json`
+2. Verify invalidation implementation
+3. Verify promotion gate logic
+4. Re-run `npm run atlas:production-readiness`
+5. Target: Phase 16 → 85%
+
+---
+
+## Evidence Collected
+
+- Phase 16 board entry: ACTIVE, 65% complete
+- Docs: `sveltekit-frontend/docs/audit/phase16-refresh-promotion-report.md`
+- TOC link: Verified in Parent Atlas
+- Production readiness gate: Green (no runtime mutation)
+
+**Conclusion**: This audit determines whether Phase 16 can proceed to runtime patching in this checkout, or whether the critical path moves to Temporal Kanban consolidation.

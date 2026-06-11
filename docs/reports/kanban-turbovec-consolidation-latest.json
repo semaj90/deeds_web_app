@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-06-01T20:22:16.578Z",
+  "generatedAt": "2026-06-11T22:18:19.053Z",
   "inputs": {
     "boardPath": "C:\\Users\\james\\Videos\\deeds-web-app\\docs\\graph\\kanban-board.json",
     "featureLabelsPath": "C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\.tmp\\feature_labels.jsonl",
@@ -15,28 +15,28 @@
     "topClusters": 5
   },
   "summary": {
-    "boardTaskCount": 362,
-    "massInputCount": 2776,
-    "uniqueRecordCount": 2498,
-    "scopedRecordCount": 2478,
-    "embeddedCount": 2478,
-    "groupCount": 1009,
-    "consolidationCandidateGroups": 1004,
-    "highOverlapGroups": 3,
+    "boardTaskCount": 1801,
+    "massInputCount": 8566,
+    "uniqueRecordCount": 8282,
+    "scopedRecordCount": 8262,
+    "embeddedCount": 8262,
+    "groupCount": 6778,
+    "consolidationCandidateGroups": 400,
+    "highOverlapGroups": 168,
     "turbovecBackendCounts": {
-      "js": 2478
+      "offline": 8262
     },
     "libtorchAvailable": true,
-    "libtorchGroupsScored": 1001,
+    "libtorchGroupsScored": 400,
     "simdjson": {
-      "hits": 138,
-      "misses": 2277,
+      "hits": 141,
+      "misses": 6625,
       "nativeParses": 1,
-      "fallbackParses": 2276,
-      "totalBytesParsed": 2030748,
-      "nativeTimeMs": 6.125999999999976,
-      "cacheBytes": 3660324,
-      "cacheSize": 2277
+      "fallbackParses": 6624,
+      "totalBytesParsed": 7576435,
+      "nativeTimeMs": 25.766900000000078,
+      "cacheBytes": 13504338,
+      "cacheSize": 6625
     },
     "boardUpdated": true
   },
@@ -48,1763 +48,2806 @@
   ],
   "groups": [
     {
-      "groupId": "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md:cluster:none",
-      "recordCount": 264,
-      "openCount": 264,
-      "clusterIds": [],
+      "groupId": "temporal:cluster:111",
+      "recordCount": 16,
+      "openCount": 16,
+      "clusterIds": [
+        0,
+        14,
+        111
+      ],
       "featureFamilies": [
-        "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md"
+        "temporal"
       ],
       "sourceRefs": [
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:394",
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:753",
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:85",
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:757",
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:27",
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:521",
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:314",
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:291",
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:313",
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:242",
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:371",
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:233"
+        "dir:crates/turbovec-napi/target/release/.fingerprint/matrixmultiply-ae8979a91460a5d2",
+        "dir:crates/turbovec-napi/target/release/.fingerprint/nano-gemm-c32-0f5d9883d7f36480",
+        "dir:crates/turbovec-napi/target/release/.fingerprint/nano-gemm-c64-db17250b2957c77b",
+        "dir:crates/turbovec-napi/target/release/.fingerprint/rustc-hash-b5f66e3f21703a29",
+        "dir:crates/turbovec-napi/target/release/.fingerprint/typenum-b9d7d79f12ff421b",
+        "dir:crates/turbovec-napi/target/x86_64-pc-windows-msvc/release/.fingerprint/foldhash-4bf66b9c105971ca",
+        "dir:crates/turbovec-napi/target/x86_64-pc-windows-msvc/release/.fingerprint/rand_distr-aab671b051b7dc13",
+        "dir:crates/turbovec-napi/target/x86_64-pc-windows-msvc/release/.fingerprint/static_assertions-d1ffbd589bf476cf",
+        "dir:.github",
+        "dir:simd-bridge/rust-simdjson/target/release/.fingerprint/autocfg-6667eb056976dd86",
+        "dir:simd-bridge/rust-simdjson/target/release/.fingerprint/rayon-5d5b276d211bfaa4",
+        "dir:.svelte-error-fixes-backup/sveltekit-frontend/src/lib/components/yorha"
       ],
       "topTitles": [
-        "todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md",
-        "Option 2: ClusterCard schema + Redis/Qdrant wiring + API route",
-        "Warm workspace-start plans",
-        "Thread `alias_id` through the prompt listener log entries as a stable cross-store alias field",
-        "Track 1: .env audit + dead-config archival"
+        "Review hidden directory crates/turbovec-napi/target/release/.fingerprint/matrixmultiply-ae8979a91460a5d2",
+        "Review hidden directory crates/turbovec-napi/target/release/.fingerprint/nano-gemm-c32-0f5d9883d7f36480",
+        "Review hidden directory crates/turbovec-napi/target/release/.fingerprint/nano-gemm-c64-db17250b2957c77b",
+        "Review hidden directory crates/turbovec-napi/target/release/.fingerprint/rustc-hash-b5f66e3f21703a29",
+        "Review hidden directory crates/turbovec-napi/target/release/.fingerprint/typenum-b9d7d79f12ff421b"
       ],
       "topFeatureIds": [
-        "feature:todo:1f43005f66837277aa9561cb",
-        "feature:todo:744b000f6653275c4bdb2351",
-        "feature:todo:010af7f91e18b77fb07f1353",
-        "feature:todo:6ce1c20afd9a1c0b0ec43b28",
-        "feature:todo:6fa3a5755e51b8d38b1ccc12"
+        "temporal.hidden-dir.crates-turbovec-napi-target-release-fingerprint-matrixmultiply-ae8979a91460a5d2",
+        "temporal.hidden-dir.crates-turbovec-napi-target-release-fingerprint-nano-gemm-c32-0f5d9883d7f36480",
+        "temporal.hidden-dir.crates-turbovec-napi-target-release-fingerprint-nano-gemm-c64-db17250b2957c77b",
+        "temporal.hidden-dir.crates-turbovec-napi-target-release-fingerprint-rustc-hash-b5f66e3f21703a29",
+        "temporal.hidden-dir.crates-turbovec-napi-target-release-fingerprint-typenum-b9d7d79f12ff421b"
       ],
       "topSourceRefs": [
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:394",
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:753",
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:85",
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:757",
-        "todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:27"
+        "crates/turbovec-napi/target/release/.fingerprint/matrixmultiply-ae8979a91460a5d2",
+        "crates/turbovec-napi/target/release/.fingerprint/nano-gemm-c32-0f5d9883d7f36480",
+        "crates/turbovec-napi/target/release/.fingerprint/nano-gemm-c64-db17250b2957c77b",
+        "crates/turbovec-napi/target/release/.fingerprint/rustc-hash-b5f66e3f21703a29",
+        "crates/turbovec-napi/target/release/.fingerprint/typenum-b9d7d79f12ff421b"
       ],
       "statuses": {
-        "BACKLOG": 132,
-        "todo": 132
+        "BACKLOG": 15,
+        "REVIEW": 1
       },
       "backendCounts": {
-        "js": 264
+        "offline": 16
+      },
+      "priorityMax": 2,
+      "libtorch": {
+        "source": "cpu",
+        "cohesion": -0.0016,
+        "pairCount": 120
+      },
+      "recommendation": "Consolidate duplicate open work into one parent kanban item and keep the file-level labels as links."
+    },
+    {
+      "groupId": "temporal:cluster:34",
+      "recordCount": 14,
+      "openCount": 14,
+      "clusterIds": [
+        34,
+        51,
+        65
+      ],
+      "featureFamilies": [
+        "temporal"
+      ],
+      "sourceRefs": [
+        "dir:crates/turbovec-napi/target/release/.fingerprint/npyz-5cfa40c64e045237",
+        "dir:crates/turbovec-napi/target/release/.fingerprint/once_cell-9243a17aa006e9b6",
+        "dir:crates/turbovec-napi/target/release/.fingerprint/rmp-serde-3c6db9cf250eb071",
+        "dir:crates/turbovec-napi/target/release/.fingerprint/twox-hash-6de4088d3e82f249",
+        "dir:crates/turbovec-napi/target/x86_64-pc-windows-msvc/release/.fingerprint/py_literal-65632f0cd13a52d4",
+        "dir:simd-bridge/rust/graph-engine/target/x86_64-pc-windows-msvc/release/.fingerprint/napi-29b54e1d1f6d3a1d",
+        "dir:simd-bridge/rust-simdjson/target/release/.fingerprint/find-msvc-tools-576afd3839fa7226",
+        "dir:.svelte-error-fixes-backup/sveltekit-frontend/src/lib/components/legal",
+        "dir:sveltekit-frontend/.venv_turbovec/Lib/site-packages/numpy-2.4.4.dist-info/licenses/numpy/random/src/distributions",
+        "dir:.tmp/drizzle-introspect/meta",
+        "dir:turbovec/target/release/.fingerprint/equator-macro-ba12bccdb212396f",
+        "dir:turbovec/target/release/.fingerprint/gemm-c64-c146e3f8d3b8fa91"
+      ],
+      "topTitles": [
+        "Review hidden directory crates/turbovec-napi/target/release/.fingerprint/npyz-5cfa40c64e045237",
+        "Review hidden directory crates/turbovec-napi/target/release/.fingerprint/once_cell-9243a17aa006e9b6",
+        "Review hidden directory crates/turbovec-napi/target/release/.fingerprint/rmp-serde-3c6db9cf250eb071",
+        "Review hidden directory crates/turbovec-napi/target/release/.fingerprint/twox-hash-6de4088d3e82f249",
+        "Review hidden directory crates/turbovec-napi/target/x86_64-pc-windows-msvc/release/.fingerprint/py_literal-65632f0cd13a52d4"
+      ],
+      "topFeatureIds": [
+        "temporal.hidden-dir.crates-turbovec-napi-target-release-fingerprint-npyz-5cfa40c64e045237",
+        "temporal.hidden-dir.crates-turbovec-napi-target-release-fingerprint-once-cell-9243a17aa006e9b6",
+        "temporal.hidden-dir.crates-turbovec-napi-target-release-fingerprint-rmp-serde-3c6db9cf250eb071",
+        "temporal.hidden-dir.crates-turbovec-napi-target-release-fingerprint-twox-hash-6de4088d3e82f249",
+        "temporal.hidden-dir.crates-turbovec-napi-target-x86-64-pc-windows-msvc-release-fingerprint-py-litera"
+      ],
+      "topSourceRefs": [
+        "crates/turbovec-napi/target/release/.fingerprint/npyz-5cfa40c64e045237",
+        "crates/turbovec-napi/target/release/.fingerprint/once_cell-9243a17aa006e9b6",
+        "crates/turbovec-napi/target/release/.fingerprint/rmp-serde-3c6db9cf250eb071",
+        "crates/turbovec-napi/target/release/.fingerprint/twox-hash-6de4088d3e82f249",
+        "crates/turbovec-napi/target/x86_64-pc-windows-msvc/release/.fingerprint/py_literal-65632f0cd13a52d4"
+      ],
+      "statuses": {
+        "BACKLOG": 13,
+        "REVIEW": 1
+      },
+      "backendCounts": {
+        "offline": 14
+      },
+      "priorityMax": 2,
+      "libtorch": {
+        "source": "cpu",
+        "cohesion": -0.0036,
+        "pairCount": 91
+      },
+      "recommendation": "Consolidate duplicate open work into one parent kanban item and keep the file-level labels as links."
+    },
+    {
+      "groupId": "temporal:cluster:75",
+      "recordCount": 14,
+      "openCount": 14,
+      "clusterIds": [
+        75,
+        92,
+        106
+      ],
+      "featureFamilies": [
+        "temporal"
+      ],
+      "sourceRefs": [
+        "dir:claude-mem/.plan",
+        "dir:crates/turbovec-napi/target/release/.fingerprint/equator-macro-e3cf85aa697c5e47",
+        "dir:crates/turbovec-napi/target/release/.fingerprint/faer-c902b33e0e400892",
+        "dir:crates/turbovec-napi/target/x86_64-pc-windows-msvc/release/.fingerprint/num-traits-d75f2c301f517b53",
+        "dir:crates/turbovec-napi/target/x86_64-pc-windows-msvc/release/.fingerprint/tokio-1fdb6b9591600c73",
+        "dir:.python311/lib/Tix8.4.3/pref",
+        "dir:simd-bridge/rust/graph-engine/target/x86_64-pc-windows-msvc/release/.fingerprint/once_cell-00dc9394459c7900",
+        "dir:simd-bridge/rust/hmm-repair/target/x86_64-pc-windows-msvc/debug/.fingerprint/pin-project-lite-7ba47152859e5de1",
+        "dir:simd-bridge/rust/hmm-repair/target/x86_64-pc-windows-msvc/release/.fingerprint/serde_json-51478d2029fc9b17",
+        "dir:simd-bridge/rust-simdjson/target/release/.fingerprint/simd-json-8fef40791a2a4d7d",
+        "dir:simd-bridge/rust-simdjson/target/release/.fingerprint/zerocopy-1e6a41f2c52705f1",
+        "dir:turbovec/target/release/.fingerprint/memchr-eba751e9624c1164"
+      ],
+      "topTitles": [
+        "Review hidden directory claude-mem/.plan",
+        "Review hidden directory crates/turbovec-napi/target/release/.fingerprint/equator-macro-e3cf85aa697c5e47",
+        "Review hidden directory crates/turbovec-napi/target/release/.fingerprint/faer-c902b33e0e400892",
+        "Review hidden directory crates/turbovec-napi/target/x86_64-pc-windows-msvc/release/.fingerprint/num-traits-d75f2c301f517b53",
+        "Review hidden directory crates/turbovec-napi/target/x86_64-pc-windows-msvc/release/.fingerprint/tokio-1fdb6b9591600c73"
+      ],
+      "topFeatureIds": [
+        "temporal.hidden-dir.claude-mem-plan",
+        "temporal.hidden-dir.crates-turbovec-napi-target-release-fingerprint-equator-macro-e3cf85aa697c5e47",
+        "temporal.hidden-dir.crates-turbovec-napi-target-release-fingerprint-faer-c902b33e0e400892",
+        "temporal.hidden-dir.crates-turbovec-napi-target-x86-64-pc-windows-msvc-release-fingerprint-num-trait",
+        "temporal.hidden-dir.crates-turbovec-napi-target-x86-64-pc-windows-msvc-release-fingerprint-tokio-1fd"
+      ],
+      "topSourceRefs": [
+        "claude-mem/.plan",
+        "crates/turbovec-napi/target/release/.fingerprint/equator-macro-e3cf85aa697c5e47",
+        "crates/turbovec-napi/target/release/.fingerprint/faer-c902b33e0e400892",
+        "crates/turbovec-napi/target/x86_64-pc-windows-msvc/release/.fingerprint/num-traits-d75f2c301f517b53",
+        "crates/turbovec-napi/target/x86_64-pc-windows-msvc/release/.fingerprint/tokio-1fdb6b9591600c73"
+      ],
+      "statuses": {
+        "BACKLOG": 14
+      },
+      "backendCounts": {
+        "offline": 14
       },
       "priorityMax": 1,
       "libtorch": {
-        "source": "skipped",
-        "cohesion": 0,
-        "pairCount": 0
+        "source": "cpu",
+        "cohesion": -0.0017,
+        "pairCount": 91
       },
       "recommendation": "Consolidate duplicate open work into one parent kanban item and keep the file-level labels as links."
     },
     {
-      "groupId": "master-todo:cluster:none",
-      "recordCount": 106,
-      "openCount": 106,
-      "clusterIds": [],
+      "groupId": "temporal:cluster:79",
+      "recordCount": 13,
+      "openCount": 13,
+      "clusterIds": [
+        79,
+        96,
+        110
+      ],
       "featureFamilies": [
-        "master-todo"
+        "temporal"
       ],
       "sourceRefs": [
-        "MASTER-FEATURE-TODO-2026-05-20.md:277",
-        "MASTER-FEATURE-TODO-2026-05-20.md:813",
-        "MASTER-FEATURE-TODO-2026-05-20.md:181",
-        "MASTER-FEATURE-TODO-2026-05-20.md:393",
-        "MASTER-FEATURE-TODO-2026-05-20.md:337",
-        "MASTER-FEATURE-TODO-2026-05-20.md:467",
-        "MASTER-FEATURE-TODO-2026-05-20.md:62",
-        "MASTER-FEATURE-TODO-2026-05-20.md:738",
-        "MASTER-FEATURE-TODO-2026-05-20.md:338",
-        "MASTER-FEATURE-TODO-2026-05-20.md:241",
-        "MASTER-FEATURE-TODO-2026-05-20.md:242",
-        "MASTER-FEATURE-TODO-2026-05-20.md:725"
+        "dir:crates/turbovec-napi/target/release/.fingerprint/ndarray-75281020b226480a",
+        "dir:crates/turbovec-napi/target/release/.fingerprint/reborrow-5de3938cacff0e1f",
+        "dir:crates/turbovec-napi/target/release/.fingerprint/serde-4341e2cbab92d116",
+        "dir:crates/turbovec-napi/target/x86_64-pc-windows-msvc/release/.fingerprint/matrixmultiply-e2d18a20db4c71fa",
+        "dir:simd-bridge/rust/graph-engine/target/release/.fingerprint/memchr-8e05bccc52a9648b",
+        "dir:simd-bridge/rust/graph-engine/target/x86_64-pc-windows-msvc/release/.fingerprint/rayon-4d6a379b8b607cdc",
+        "dir:simd-bridge/rust/hmm-repair/target/release/.fingerprint/quote-01f9bb60f00190e6",
+        "dir:simd-bridge/rust/hmm-repair/target/release/.fingerprint/regex-syntax-91006f1627c764e2",
+        "dir:simd-bridge/rust-simdjson/target/release/.fingerprint/once_cell-5c36019c857d33c6",
+        "dir:simd-bridge/rust-simdjson/target/release/.fingerprint/version_check-b2764e2016cdcbac",
+        "dir:sveltekit-frontend/.tmp/ace",
+        "dir:sveltekit-frontend/.venv_turbovec/Lib/site-packages/numpy-2.4.4.dist-info/licenses/numpy/random/src/sfc64"
       ],
       "topTitles": [
-        "**Track C — Production Gap Remediation** (after DB audit)",
-        "**Remaining Lower-Priority**",
-        "Optional mirror only: export aliases to `.opencode/recommendations.json` + `.…",
-        "Stale feature detection (atlas entry exists, no recent git touch)",
-        "Duplicate system detection (two scripts/routes with overlapping sourceRefs)"
+        "Review hidden directory crates/turbovec-napi/target/release/.fingerprint/ndarray-75281020b226480a",
+        "Review hidden directory crates/turbovec-napi/target/release/.fingerprint/reborrow-5de3938cacff0e1f",
+        "Review hidden directory crates/turbovec-napi/target/release/.fingerprint/serde-4341e2cbab92d116",
+        "Review hidden directory crates/turbovec-napi/target/x86_64-pc-windows-msvc/release/.fingerprint/matrixmultiply-e2d18a20db4c71fa",
+        "Review hidden directory simd-bridge/rust/graph-engine/target/release/.fingerprint/memchr-8e05bccc52a9648b"
       ],
       "topFeatureIds": [
-        "master-todo.unknown"
+        "temporal.hidden-dir.crates-turbovec-napi-target-release-fingerprint-ndarray-75281020b226480a",
+        "temporal.hidden-dir.crates-turbovec-napi-target-release-fingerprint-reborrow-5de3938cacff0e1f",
+        "temporal.hidden-dir.crates-turbovec-napi-target-release-fingerprint-serde-4341e2cbab92d116",
+        "temporal.hidden-dir.crates-turbovec-napi-target-x86-64-pc-windows-msvc-release-fingerprint-matrixmul",
+        "temporal.hidden-dir.simd-bridge-rust-graph-engine-target-release-fingerprint-memchr-8e05bccc52a9648b"
       ],
       "topSourceRefs": [
-        "sveltekit-frontend/src/service-worker.ts",
-        "sveltekit-frontend/src/lib/workers/compute-worker.mjs",
-        "sveltekit-frontend/src/lib/server/features/ai/ace/context-assembler.ts",
-        "sveltekit-frontend/scripts/atlas/phase-lane-completion.mjs"
+        "crates/turbovec-napi/target/release/.fingerprint/ndarray-75281020b226480a",
+        "crates/turbovec-napi/target/release/.fingerprint/reborrow-5de3938cacff0e1f",
+        "crates/turbovec-napi/target/release/.fingerprint/serde-4341e2cbab92d116",
+        "crates/turbovec-napi/target/x86_64-pc-windows-msvc/release/.fingerprint/matrixmultiply-e2d18a20db4c71fa",
+        "simd-bridge/rust/graph-engine/target/release/.fingerprint/memchr-8e05bccc52a9648b"
       ],
       "statuses": {
-        "BACKLOG": 103,
-        "REVIEW": 3
+        "BACKLOG": 13
       },
       "backendCounts": {
-        "js": 106
+        "offline": 13
       },
-      "priorityMax": 2,
-      "libtorch": {
-        "source": "skipped",
-        "cohesion": 0,
-        "pairCount": 0
-      },
-      "recommendation": "Consolidate duplicate open work into one parent kanban item and keep the file-level labels as links."
-    },
-    {
-      "groupId": "lib:cluster:none",
-      "recordCount": 83,
-      "openCount": 83,
-      "clusterIds": [],
-      "featureFamilies": [
-        "lib"
-      ],
-      "sourceRefs": [],
-      "topTitles": [
-        "lib › webgpu",
-        "lib › client",
-        "lib › features",
-        "lib › state",
-        "lib › components"
-      ],
-      "topFeatureIds": [],
-      "topSourceRefs": [
-        "local:sveltekit-frontend/scripts/phase104-backups/src/lib/webgpu/graph-texture-layout.ts#L1",
-        "local:sveltekit-frontend/src/lib/webgpu/N64TextureLODSystem.ts#L1",
-        "local:sveltekit-frontend/src/lib/webgpu/compute-shader-engine.ts#L1",
-        "local:sveltekit-frontend/scripts/phase104-backups/src/lib/client/ocr-tensor-processor.ts#L1",
-        "local:sveltekit-frontend/src/lib/client/search-client.ts#L1"
-      ],
-      "statuses": {
-        "BACKLOG": 70,
-        "TODO": 13
-      },
-      "backendCounts": {
-        "js": 83
-      },
-      "priorityMax": 3,
-      "libtorch": {
-        "source": "skipped",
-        "cohesion": 0,
-        "pairCount": 0
-      },
-      "recommendation": "Consolidate duplicate open work into one parent kanban item and keep the file-level labels as links."
-    },
-    {
-      "groupId": "venv-lib-python3-9-site-packages-numpy-core-tests-data-umath-validation-set-arcc:cluster:none",
-      "recordCount": 4,
-      "openCount": 4,
-      "clusterIds": [],
-      "featureFamilies": [
-        "venv-lib-python3-9-site-packages-numpy-core-tests-data-umath-validation-set-arcc"
-      ],
-      "sourceRefs": [
-        "local:.venv/Lib/python3.9/site-packages/numpy/_core/tests/data/umath-validation-set-arccos.csv",
-        "local:.venv/Lib/python3.9/site-packages/numpy/_core/tests/data/umath-validation-set-arccosh.csv"
-      ],
-      "topTitles": [
-        "Label venv-lib-python3-9-site-packages-numpy-core-tests-data-umath-validation-set-arcc",
-        "venv-lib-python3-9-site-packages-numpy-core-tests-data-umath-validation-set-arcc"
-      ],
-      "topFeatureIds": [
-        "feature:file:79c848c36db5082af2b2d7fc",
-        "feature:file:8291dc574cf6fd6ea9b17bef"
-      ],
-      "topSourceRefs": [
-        "local:.venv/Lib/python3.9/site-packages/numpy/_core/tests/data/umath-validation-set-arccos.csv",
-        "local:.venv/Lib/python3.9/site-packages/numpy/_core/tests/data/umath-validation-set-arccosh.csv"
-      ],
-      "statuses": {
-        "todo": 4
-      },
-      "backendCounts": {
-        "js": 4
-      },
-      "priorityMax": 0,
+      "priorityMax": 1,
       "libtorch": {
         "source": "cpu",
-        "cohesion": -0.0101,
-        "pairCount": 6
+        "cohesion": 0.0094,
+        "pairCount": 78
       },
       "recommendation": "Consolidate duplicate open work into one parent kanban item and keep the file-level labels as links."
     },
     {
-      "groupId": "venv-lib-python3-9-site-packages-numpy-core-tests-data-umath-validation-set-arcs:cluster:none",
-      "recordCount": 4,
-      "openCount": 4,
-      "clusterIds": [],
+      "groupId": "temporal:cluster:103",
+      "recordCount": 12,
+      "openCount": 12,
+      "clusterIds": [
+        6,
+        103,
+        120
+      ],
       "featureFamilies": [
-        "venv-lib-python3-9-site-packages-numpy-core-tests-data-umath-validation-set-arcs"
+        "temporal"
       ],
       "sourceRefs": [
-        "local:.venv/Lib/python3.9/site-packages/numpy/_core/tests/data/umath-validation-set-arcsin.csv",
-        "local:.venv/Lib/python3.9/site-packages/numpy/_core/tests/data/umath-validation-set-arcsinh.csv"
+        "dir:.claude",
+        "dir:crates/turbovec-napi/target/release/.fingerprint/serde_core-086677698551b022",
+        "dir:simd-bridge/rust/hmm-repair/target/debug/.fingerprint/regex-automata-a2a688c216aae038",
+        "dir:simd-bridge/rust/hmm-repair/target/debug/.fingerprint/syn-a7a1c3f2d842868c",
+        "dir:simd-bridge/rust/hmm-repair/target/release/.fingerprint/once_cell-2afcbd1daf9e3394",
+        "dir:simd-bridge/rust/hmm-repair/target/x86_64-pc-windows-msvc/debug/.fingerprint/hmm-repair-f5a71ceb2aaace9c",
+        "dir:.svelte-error-fixes-backup/sveltekit-frontend/src/lib/components/ui/bits",
+        "dir:turbovec/target/release/.fingerprint/crossbeam-deque-09ca9c9c8a89693b",
+        "dir:turbovec/target/release/.fingerprint/pest_derive-cb1d3030b349fbc7",
+        "dir:turbovec/target/release/.fingerprint/statrs-7f59b067ac65043e",
+        "dir:turbovec/target/release/.fingerprint/zerocopy-0475cf28abcfb831",
+        "dir:scripts/unsloth-training"
       ],
       "topTitles": [
-        "Label venv-lib-python3-9-site-packages-numpy-core-tests-data-umath-validation-set-arcs",
-        "venv-lib-python3-9-site-packages-numpy-core-tests-data-umath-validation-set-arcs"
+        "Review hidden directory .claude",
+        "Review hidden directory crates/turbovec-napi/target/release/.fingerprint/serde_core-086677698551b022",
+        "Review hidden directory simd-bridge/rust/hmm-repair/target/debug/.fingerprint/regex-automata-a2a688c216aae038",
+        "Review hidden directory simd-bridge/rust/hmm-repair/target/debug/.fingerprint/syn-a7a1c3f2d842868c",
+        "Review hidden directory simd-bridge/rust/hmm-repair/target/release/.fingerprint/once_cell-2afcbd1daf9e3394"
       ],
       "topFeatureIds": [
-        "feature:file:6c5cb01883c78dbd94ef9af1",
-        "feature:file:d77b99797fe91fc8044ff343"
+        "temporal.hidden-dir.claude",
+        "temporal.hidden-dir.crates-turbovec-napi-target-release-fingerprint-serde-core-086677698551b022",
+        "temporal.hidden-dir.simd-bridge-rust-hmm-repair-target-debug-fingerprint-regex-automata-a2a688c216aa",
+        "temporal.hidden-dir.simd-bridge-rust-hmm-repair-target-debug-fingerprint-syn-a7a1c3f2d842868c",
+        "temporal.hidden-dir.simd-bridge-rust-hmm-repair-target-release-fingerprint-once-cell-2afcbd1daf9e339"
       ],
       "topSourceRefs": [
-        "local:.venv/Lib/python3.9/site-packages/numpy/_core/tests/data/umath-validation-set-arcsin.csv",
-        "local:.venv/Lib/python3.9/site-packages/numpy/_core/tests/data/umath-validation-set-arcsinh.csv"
+        ".claude",
+        "crates/turbovec-napi/target/release/.fingerprint/serde_core-086677698551b022",
+        "simd-bridge/rust/hmm-repair/target/debug/.fingerprint/regex-automata-a2a688c216aae038",
+        "simd-bridge/rust/hmm-repair/target/debug/.fingerprint/syn-a7a1c3f2d842868c",
+        "simd-bridge/rust/hmm-repair/target/release/.fingerprint/once_cell-2afcbd1daf9e3394"
       ],
       "statuses": {
-        "todo": 4
+        "BACKLOG": 11,
+        "REVIEW": 1
       },
       "backendCounts": {
-        "js": 4
-      },
-      "priorityMax": 0,
-      "libtorch": {
-        "source": "cpu",
-        "cohesion": -0.0112,
-        "pairCount": 6
-      },
-      "recommendation": "Consolidate duplicate open work into one parent kanban item and keep the file-level labels as links."
-    },
-    {
-      "groupId": "venv-lib-python3-9-site-packages-numpy-core-tests-data-umath-validation-set-arct:cluster:none",
-      "recordCount": 4,
-      "openCount": 4,
-      "clusterIds": [],
-      "featureFamilies": [
-        "venv-lib-python3-9-site-packages-numpy-core-tests-data-umath-validation-set-arct"
-      ],
-      "sourceRefs": [
-        "local:.venv/Lib/python3.9/site-packages/numpy/_core/tests/data/umath-validation-set-arctan.csv",
-        "local:.venv/Lib/python3.9/site-packages/numpy/_core/tests/data/umath-validation-set-arctanh.csv"
-      ],
-      "topTitles": [
-        "Label venv-lib-python3-9-site-packages-numpy-core-tests-data-umath-validation-set-arct",
-        "venv-lib-python3-9-site-packages-numpy-core-tests-data-umath-validation-set-arct"
-      ],
-      "topFeatureIds": [
-        "feature:file:56576ffd19c4a41b418fd8fa",
-        "feature:file:816b58b94018cf27349ffc59"
-      ],
-      "topSourceRefs": [
-        "local:.venv/Lib/python3.9/site-packages/numpy/_core/tests/data/umath-validation-set-arctan.csv",
-        "local:.venv/Lib/python3.9/site-packages/numpy/_core/tests/data/umath-validation-set-arctanh.csv"
-      ],
-      "statuses": {
-        "todo": 4
-      },
-      "backendCounts": {
-        "js": 4
-      },
-      "priorityMax": 0,
-      "libtorch": {
-        "source": "cpu",
-        "cohesion": 0.029,
-        "pairCount": 6
-      },
-      "recommendation": "Consolidate duplicate open work into one parent kanban item and keep the file-level labels as links."
-    },
-    {
-      "groupId": "venv-lib-python3-9-site-packages-numpy-core-tests-data-umath-validation-set-log1:cluster:none",
-      "recordCount": 4,
-      "openCount": 4,
-      "clusterIds": [],
-      "featureFamilies": [
-        "venv-lib-python3-9-site-packages-numpy-core-tests-data-umath-validation-set-log1"
-      ],
-      "sourceRefs": [
-        "local:.venv/Lib/python3.9/site-packages/numpy/_core/tests/data/umath-validation-set-log10.csv",
-        "local:.venv/Lib/python3.9/site-packages/numpy/_core/tests/data/umath-validation-set-log1p.csv"
-      ],
-      "topTitles": [
-        "Label venv-lib-python3-9-site-packages-numpy-core-tests-data-umath-validation-set-log1",
-        "venv-lib-python3-9-site-packages-numpy-core-tests-data-umath-validation-set-log1"
-      ],
-      "topFeatureIds": [
-        "feature:file:e8a330b841ae9877b8caaac0",
-        "feature:file:ce9933d259904fbef00f3dac"
-      ],
-      "topSourceRefs": [
-        "local:.venv/Lib/python3.9/site-packages/numpy/_core/tests/data/umath-validation-set-log10.csv",
-        "local:.venv/Lib/python3.9/site-packages/numpy/_core/tests/data/umath-validation-set-log1p.csv"
-      ],
-      "statuses": {
-        "todo": 4
-      },
-      "backendCounts": {
-        "js": 4
-      },
-      "priorityMax": 0,
-      "libtorch": {
-        "source": "cpu",
-        "cohesion": -0.0057,
-        "pairCount": 6
-      },
-      "recommendation": "Consolidate duplicate open work into one parent kanban item and keep the file-level labels as links."
-    },
-    {
-      "groupId": "venv-turbovec-lib-site-packages-numpy-core-tests-data-umath-validation-set-arcco:cluster:none",
-      "recordCount": 4,
-      "openCount": 4,
-      "clusterIds": [],
-      "featureFamilies": [
-        "venv-turbovec-lib-site-packages-numpy-core-tests-data-umath-validation-set-arcco"
-      ],
-      "sourceRefs": [
-        "local:.venv_turbovec/Lib/site-packages/numpy/_core/tests/data/umath-validation-set-arccos.csv",
-        "local:.venv_turbovec/Lib/site-packages/numpy/_core/tests/data/umath-validation-set-arccosh.csv"
-      ],
-      "topTitles": [
-        "Label venv-turbovec-lib-site-packages-numpy-core-tests-data-umath-validation-set-arcco",
-        "venv-turbovec-lib-site-packages-numpy-core-tests-data-umath-validation-set-arcco"
-      ],
-      "topFeatureIds": [
-        "feature:file:40979a760a107b22c769f58b",
-        "feature:file:78785bab1b1e3580f38ac981"
-      ],
-      "topSourceRefs": [
-        "local:.venv_turbovec/Lib/site-packages/numpy/_core/tests/data/umath-validation-set-arccos.csv",
-        "local:.venv_turbovec/Lib/site-packages/numpy/_core/tests/data/umath-validation-set-arccosh.csv"
-      ],
-      "statuses": {
-        "todo": 4
-      },
-      "backendCounts": {
-        "js": 4
-      },
-      "priorityMax": 0,
-      "libtorch": {
-        "source": "cpu",
-        "cohesion": 0.0012,
-        "pairCount": 6
-      },
-      "recommendation": "Consolidate duplicate open work into one parent kanban item and keep the file-level labels as links."
-    },
-    {
-      "groupId": "venv-turbovec-lib-site-packages-numpy-core-tests-data-umath-validation-set-arcsi:cluster:none",
-      "recordCount": 4,
-      "openCount": 4,
-      "clusterIds": [],
-      "featureFamilies": [
-        "venv-turbovec-lib-site-packages-numpy-core-tests-data-umath-validation-set-arcsi"
-      ],
-      "sourceRefs": [
-        "local:.venv_turbovec/Lib/site-packages/numpy/_core/tests/data/umath-validation-set-arcsin.csv",
-        "local:.venv_turbovec/Lib/site-packages/numpy/_core/tests/data/umath-validation-set-arcsinh.csv"
-      ],
-      "topTitles": [
-        "Label venv-turbovec-lib-site-packages-numpy-core-tests-data-umath-validation-set-arcsi",
-        "venv-turbovec-lib-site-packages-numpy-core-tests-data-umath-validation-set-arcsi"
-      ],
-      "topFeatureIds": [
-        "feature:file:7e2f897ff78f8caf3174a0fc",
-        "feature:file:7267810277ac5506fe2522bb"
-      ],
-      "topSourceRefs": [
-        "local:.venv_turbovec/Lib/site-packages/numpy/_core/tests/data/umath-validation-set-arcsin.csv",
-        "local:.venv_turbovec/Lib/site-packages/numpy/_core/tests/data/umath-validation-set-arcsinh.csv"
-      ],
-      "statuses": {
-        "todo": 4
-      },
-      "backendCounts": {
-        "js": 4
-      },
-      "priorityMax": 0,
-      "libtorch": {
-        "source": "cpu",
-        "cohesion": 0.0145,
-        "pairCount": 6
-      },
-      "recommendation": "Consolidate duplicate open work into one parent kanban item and keep the file-level labels as links."
-    },
-    {
-      "groupId": "venv-turbovec-lib-site-packages-numpy-core-tests-data-umath-validation-set-arcta:cluster:none",
-      "recordCount": 4,
-      "openCount": 4,
-      "clusterIds": [],
-      "featureFamilies": [
-        "venv-turbovec-lib-site-packages-numpy-core-tests-data-umath-validation-set-arcta"
-      ],
-      "sourceRefs": [
-        "local:.venv_turbovec/Lib/site-packages/numpy/_core/tests/data/umath-validation-set-arctan.csv",
-        "local:.venv_turbovec/Lib/site-packages/numpy/_core/tests/data/umath-validation-set-arctanh.csv"
-      ],
-      "topTitles": [
-        "Label venv-turbovec-lib-site-packages-numpy-core-tests-data-umath-validation-set-arcta",
-        "venv-turbovec-lib-site-packages-numpy-core-tests-data-umath-validation-set-arcta"
-      ],
-      "topFeatureIds": [
-        "feature:file:ad6628fea87df699477b5a71",
-        "feature:file:ba37550e9dcbba13ba81ec75"
-      ],
-      "topSourceRefs": [
-        "local:.venv_turbovec/Lib/site-packages/numpy/_core/tests/data/umath-validation-set-arctan.csv",
-        "local:.venv_turbovec/Lib/site-packages/numpy/_core/tests/data/umath-validation-set-arctanh.csv"
-      ],
-      "statuses": {
-        "todo": 4
-      },
-      "backendCounts": {
-        "js": 4
-      },
-      "priorityMax": 0,
-      "libtorch": {
-        "source": "cpu",
-        "cohesion": 0.0033,
-        "pairCount": 6
-      },
-      "recommendation": "Consolidate duplicate open work into one parent kanban item and keep the file-level labels as links."
-    },
-    {
-      "groupId": "docs-readme-deeds-labs-archive-svelte-check-output-json:cluster:none",
-      "recordCount": 4,
-      "openCount": 4,
-      "clusterIds": [],
-      "featureFamilies": [
-        "docs-readme-deeds-labs-archive-svelte-check-output-json"
-      ],
-      "sourceRefs": [
-        "local:docs_readme/deeds_labs_archive/.svelte-check-output.json",
-        "local:docs_readme/deeds_labs_archive/svelte-check-output.json"
-      ],
-      "topTitles": [
-        "Label docs-readme-deeds-labs-archive-svelte-check-output-json",
-        "docs-readme-deeds-labs-archive-svelte-check-output-json"
-      ],
-      "topFeatureIds": [
-        "feature:file:7650560c5e1e6cbf348dc3c1",
-        "feature:file:183b979e0121b220249efc60"
-      ],
-      "topSourceRefs": [
-        "local:docs_readme/deeds_labs_archive/.svelte-check-output.json",
-        "local:docs_readme/deeds_labs_archive/svelte-check-output.json"
-      ],
-      "statuses": {
-        "todo": 4
-      },
-      "backendCounts": {
-        "js": 4
-      },
-      "priorityMax": 0,
-      "libtorch": {
-        "source": "cpu",
-        "cohesion": -0.0218,
-        "pairCount": 6
-      },
-      "recommendation": "Consolidate duplicate open work into one parent kanban item and keep the file-level labels as links."
-    },
-    {
-      "groupId": "workspace:cluster:none",
-      "recordCount": 3,
-      "openCount": 3,
-      "clusterIds": [],
-      "featureFamilies": [
-        "workspace"
-      ],
-      "sourceRefs": [],
-      "topTitles": [
-        "workspace › sveltekit-frontend",
-        "workspace › vscode-extension",
-        "workspace › simd-bridge"
-      ],
-      "topFeatureIds": [],
-      "topSourceRefs": [
-        "local:sveltekit-frontend/scripts/__fixtures__/audit-fail.ts#L1",
-        "local:sveltekit-frontend/scripts/__tests__/powershell-scripts.test.ts#L1",
-        "local:sveltekit-frontend/scripts/_check-langextract-usage.mjs#L1",
-        "local:vscode-extension/media/topology-viewer.js#L1",
-        "local:vscode-extension/out/claudePlan.js#L1"
-      ],
-      "statuses": {
-        "TODO": 2,
-        "BACKLOG": 1
-      },
-      "backendCounts": {
-        "js": 3
+        "offline": 12
       },
       "priorityMax": 2,
       "libtorch": {
         "source": "cpu",
-        "cohesion": -0.0221,
-        "pairCount": 3
+        "cohesion": 0.002,
+        "pairCount": 66
       },
       "recommendation": "Consolidate duplicate open work into one parent kanban item and keep the file-level labels as links."
     },
     {
-      "groupId": "opencode-recommendations-json:cluster:none",
-      "recordCount": 3,
-      "openCount": 3,
-      "clusterIds": [],
+      "groupId": "temporal:cluster:9",
+      "recordCount": 12,
+      "openCount": 12,
+      "clusterIds": [
+        9,
+        26,
+        40
+      ],
       "featureFamilies": [
-        "opencode-recommendations-json"
+        "temporal"
       ],
       "sourceRefs": [
-        ".opencode/recommendations.json"
+        "dir:crates/turbovec-napi/target/release/.fingerprint/paste-f7a5b20b73b8d2b5",
+        "dir:simd-bridge/rust/graph-engine/target/release/.fingerprint/ctor-59f6cf590f49b3cb",
+        "dir:simd-bridge/rust/graph-engine/target/x86_64-pc-windows-msvc/release/.fingerprint/getrandom-2b02739b994db36d",
+        "dir:simd-bridge/rust/hmm-repair/target/debug/.fingerprint/semver-893696602b283328",
+        "dir:simd-bridge/rust/hmm-repair/target/x86_64-pc-windows-msvc/debug/.fingerprint/serde_json-633760802c7ebffa",
+        "dir:simd-bridge/rust/hmm-repair/target/x86_64-pc-windows-msvc/debug/.fingerprint/zmij-422e1e8262764b72",
+        "dir:simd-bridge/rust-simdjson/target/release/.fingerprint/simd_bridge_rs-0f1dff350235b4f0",
+        "dir:simd-bridge/rust-simdjson/target/release/.fingerprint/zerocopy-7ec9b1251c17fa75",
+        "dir:.svelte-error-fixes-backup/sveltekit-frontend/src/lib/components/notifications",
+        "dir:turbovec/target/release/.fingerprint/num-traits-5dce1b4d62c80677",
+        "dir:turbovec/target/release/.fingerprint/wide-3d5915fb4cef9e18",
+        "dir:next_steps/completed/session-history"
       ],
       "topTitles": [
-        "Optional mirror only: export aliases to `.opencode/recommendations.json` + `.opencode/recommendations-summary.md` if a flat compatibility surface is still requi",
-        "opencode-recommendations-json"
+        "Review hidden directory crates/turbovec-napi/target/release/.fingerprint/paste-f7a5b20b73b8d2b5",
+        "Review hidden directory simd-bridge/rust/graph-engine/target/release/.fingerprint/ctor-59f6cf590f49b3cb",
+        "Review hidden directory simd-bridge/rust/graph-engine/target/x86_64-pc-windows-msvc/release/.fingerprint/getrandom-2b02739b994db36d",
+        "Review hidden directory simd-bridge/rust/hmm-repair/target/debug/.fingerprint/semver-893696602b283328",
+        "Review hidden directory simd-bridge/rust/hmm-repair/target/x86_64-pc-windows-msvc/debug/.fingerprint/serde_json-633760802c7ebffa"
       ],
       "topFeatureIds": [
-        "feature:todo:fadfc0e985f4f0e151eaf542"
+        "temporal.hidden-dir.crates-turbovec-napi-target-release-fingerprint-paste-f7a5b20b73b8d2b5",
+        "temporal.hidden-dir.simd-bridge-rust-graph-engine-target-release-fingerprint-ctor-59f6cf590f49b3cb",
+        "temporal.hidden-dir.simd-bridge-rust-graph-engine-target-x86-64-pc-windows-msvc-release-fingerprint-",
+        "temporal.hidden-dir.simd-bridge-rust-hmm-repair-target-debug-fingerprint-semver-893696602b283328",
+        "temporal.hidden-dir.simd-bridge-rust-hmm-repair-target-x86-64-pc-windows-msvc-debug-fingerprint-serd"
       ],
       "topSourceRefs": [
-        ".opencode/recommendations.json",
-        ".opencode/recommendations-summary.md"
+        "crates/turbovec-napi/target/release/.fingerprint/paste-f7a5b20b73b8d2b5",
+        "simd-bridge/rust/graph-engine/target/release/.fingerprint/ctor-59f6cf590f49b3cb",
+        "simd-bridge/rust/graph-engine/target/x86_64-pc-windows-msvc/release/.fingerprint/getrandom-2b02739b994db36d",
+        "simd-bridge/rust/hmm-repair/target/debug/.fingerprint/semver-893696602b283328",
+        "simd-bridge/rust/hmm-repair/target/x86_64-pc-windows-msvc/debug/.fingerprint/serde_json-633760802c7ebffa"
       ],
       "statuses": {
-        "BACKLOG": 2,
-        "todo": 1
+        "BACKLOG": 11,
+        "REVIEW": 1
       },
       "backendCounts": {
-        "js": 3
+        "offline": 12
+      },
+      "priorityMax": 2,
+      "libtorch": {
+        "source": "cpu",
+        "cohesion": -0.0029,
+        "pairCount": 66
+      },
+      "recommendation": "Consolidate duplicate open work into one parent kanban item and keep the file-level labels as links."
+    },
+    {
+      "groupId": "temporal:cluster:29",
+      "recordCount": 12,
+      "openCount": 12,
+      "clusterIds": [
+        29,
+        46,
+        60
+      ],
+      "featureFamilies": [
+        "temporal"
+      ],
+      "sourceRefs": [
+        "dir:claude-mem/.github/ISSUE_TEMPLATE",
+        "dir:crates/turbovec-napi/target/x86_64-pc-windows-msvc/release/.fingerprint/nano-gemm-f32-e8ff342900b1630c",
+        "dir:crates/turbovec-napi/target/x86_64-pc-windows-msvc/release/.fingerprint/rand_core-a57efc2b9e0d28d0",
+        "dir:.opencode/summaries",
+        "dir:.pytest_cache",
+        "dir:simd-bridge/rust/graph-engine/target/x86_64-pc-windows-msvc/release/.fingerprint/napi-sys-59ebdee55fabf67a",
+        "dir:simd-bridge/rust-simdjson/target/release/.fingerprint/crossbeam-utils-c7a3b7678e4bc57d",
+        "dir:sveltekit-frontend/.venv_turbovec/Lib/site-packages/numpy-2.4.4.dist-info/licenses/numpy/_core/include/numpy/libdivide",
+        "dir:.tmp/test-triage",
+        "dir:turbovec/target/release/.fingerprint/ndarray-a79c0ed66c528fe0",
+        "dir:turbovec/target/release/.fingerprint/numpy-bcd497c006315341",
+        "dir:turbovec/target/release/.fingerprint/pulp-c69a4493ef5d84c0"
+      ],
+      "topTitles": [
+        "Review hidden directory claude-mem/.github/ISSUE_TEMPLATE",
+        "Review hidden directory crates/turbovec-napi/target/x86_64-pc-windows-msvc/release/.fingerprint/nano-gemm-f32-e8ff342900b1630c",
+        "Review hidden directory crates/turbovec-napi/target/x86_64-pc-windows-msvc/release/.fingerprint/rand_core-a57efc2b9e0d28d0",
+        "Review hidden directory .opencode/summaries",
+        "Review hidden directory .pytest_cache"
+      ],
+      "topFeatureIds": [
+        "temporal.hidden-dir.claude-mem-github-issue-template",
+        "temporal.hidden-dir.crates-turbovec-napi-target-x86-64-pc-windows-msvc-release-fingerprint-nano-gemm",
+        "temporal.hidden-dir.crates-turbovec-napi-target-x86-64-pc-windows-msvc-release-fingerprint-rand-core",
+        "temporal.hidden-dir.opencode-summaries",
+        "temporal.hidden-dir.pytest-cache"
+      ],
+      "topSourceRefs": [
+        "claude-mem/.github/ISSUE_TEMPLATE",
+        "crates/turbovec-napi/target/x86_64-pc-windows-msvc/release/.fingerprint/nano-gemm-f32-e8ff342900b1630c",
+        "crates/turbovec-napi/target/x86_64-pc-windows-msvc/release/.fingerprint/rand_core-a57efc2b9e0d28d0",
+        ".opencode/summaries",
+        ".pytest_cache"
+      ],
+      "statuses": {
+        "BACKLOG": 12
+      },
+      "backendCounts": {
+        "offline": 12
+      },
+      "priorityMax": 1,
+      "libtorch": {
+        "source": "cpu",
+        "cohesion": -0.0005,
+        "pairCount": 66
+      },
+      "recommendation": "Consolidate duplicate open work into one parent kanban item and keep the file-level labels as links."
+    },
+    {
+      "groupId": "temporal:cluster:125",
+      "recordCount": 12,
+      "openCount": 12,
+      "clusterIds": [
+        14,
+        28,
+        125
+      ],
+      "featureFamilies": [
+        "temporal"
+      ],
+      "sourceRefs": [
+        "dir:.claude/skills/bits-ui-svelte5",
+        "dir:crates/turbovec-napi/target/release/.fingerprint/bitflags-27a80a92b75ba5f1",
+        "dir:crates/turbovec-napi/target/release/.fingerprint/cfg-if-900737c10d127e7b",
+        "dir:crates/turbovec-napi/target/release/.fingerprint/nalgebra-macros-425eee70f8c44f8d",
+        "dir:crates/turbovec-napi/target/release/.fingerprint/serde-73fa5d0be132216c",
+        "dir:crates/turbovec-napi/target/x86_64-pc-windows-msvc/release/.fingerprint/simdutf8-81e8dad566a49a12",
+        "dir:simd-bridge/rust/graph-engine/target/release/.fingerprint/cfg-if-b7ab4ef2a53904cf",
+        "dir:sveltekit-frontend/sveltekit-frontend/.tmp",
+        "dir:.tmp/phase19c",
+        "dir:.tmp/repairs/unwrapped",
+        "dir:.tmp/test-triage-debug/20260520-190307",
+        "dir:turbovec/target/release/.fingerprint/num-traits-f7136919a2bbc52d"
+      ],
+      "topTitles": [
+        "Review hidden directory .claude/skills/bits-ui-svelte5",
+        "Review hidden directory crates/turbovec-napi/target/release/.fingerprint/bitflags-27a80a92b75ba5f1",
+        "Review hidden directory crates/turbovec-napi/target/release/.fingerprint/cfg-if-900737c10d127e7b",
+        "Review hidden directory crates/turbovec-napi/target/release/.fingerprint/nalgebra-macros-425eee70f8c44f8d",
+        "Review hidden directory crates/turbovec-napi/target/release/.fingerprint/serde-73fa5d0be132216c"
+      ],
+      "topFeatureIds": [
+        "temporal.hidden-dir.claude-skills-bits-ui-svelte5",
+        "temporal.hidden-dir.crates-turbovec-napi-target-release-fingerprint-bitflags-27a80a92b75ba5f1",
+        "temporal.hidden-dir.crates-turbovec-napi-target-release-fingerprint-cfg-if-900737c10d127e7b",
+        "temporal.hidden-dir.crates-turbovec-napi-target-release-fingerprint-nalgebra-macros-425eee70f8c44f8d",
+        "temporal.hidden-dir.crates-turbovec-napi-target-release-fingerprint-serde-73fa5d0be132216c"
+      ],
+      "topSourceRefs": [
+        ".claude/skills/bits-ui-svelte5",
+        "crates/turbovec-napi/target/release/.fingerprint/bitflags-27a80a92b75ba5f1",
+        "crates/turbovec-napi/target/release/.fingerprint/cfg-if-900737c10d127e7b",
+        "crates/turbovec-napi/target/release/.fingerprint/nalgebra-macros-425eee70f8c44f8d",
+        "crates/turbovec-napi/target/release/.fingerprint/serde-73fa5d0be132216c"
+      ],
+      "statuses": {
+        "BACKLOG": 12
+      },
+      "backendCounts": {
+        "offline": 12
+      },
+      "priorityMax": 1,
+      "libtorch": {
+        "source": "cpu",
+        "cohesion": -0.0049,
+        "pairCount": 66
+      },
+      "recommendation": "Consolidate duplicate open work into one parent kanban item and keep the file-level labels as links."
+    },
+    {
+      "groupId": "temporal:cluster:32",
+      "recordCount": 12,
+      "openCount": 12,
+      "clusterIds": [
+        32,
+        49,
+        63
+      ],
+      "featureFamilies": [
+        "temporal"
+      ],
+      "sourceRefs": [
+        "dir:crates/turbovec-napi/target/release/.fingerprint/nano-gemm-c64-d0db52066c31901d",
+        "dir:crates/turbovec-napi/target/release/.fingerprint/serde_core-077e03e29b01e414",
+        "dir:crates/turbovec-napi/target/x86_64-pc-windows-msvc/release/.fingerprint/itoa-c1a4dd915edf6778",
+        "dir:.opencode/recommendations",
+        "dir:.opencode/skills/context-budget",
+        "dir:simd-bridge/rust/graph-engine/target/x86_64-pc-windows-msvc/release/.fingerprint/rand_chacha-087cfd320b64ae5f",
+        "dir:simd-bridge/rust/hmm-repair/target/debug/.fingerprint/convert_case-67d070e1c97f9df5",
+        "dir:simd-bridge/rust/hmm-repair/target/release/.fingerprint/unicode-ident-4ee5db6783f06d49",
+        "dir:simd-bridge/rust-simdjson/target/release/.fingerprint/ref-cast-7ef59d69e960d790",
+        "dir:simd-bridge/rust-simdjson/target/release/.fingerprint/serde_json-5cc2261ccf2c852d",
+        "dir:.svelte-error-fixes-backup/sveltekit-frontend/src/lib/components/recommendations",
+        "dir:turbovec/target/release/.fingerprint/nalgebra-macros-2b6fde9a9a8e2213"
+      ],
+      "topTitles": [
+        "Review hidden directory crates/turbovec-napi/target/release/.fingerprint/nano-gemm-c64-d0db52066c31901d",
+        "Review hidden directory crates/turbovec-napi/target/release/.fingerprint/serde_core-077e03e29b01e414",
+        "Review hidden directory crates/turbovec-napi/target/x86_64-pc-windows-msvc/release/.fingerprint/itoa-c1a4dd915edf6778",
+        "Review hidden directory .opencode/recommendations",
+        "Review hidden directory .opencode/skills/context-budget"
+      ],
+      "topFeatureIds": [
+        "temporal.hidden-dir.crates-turbovec-napi-target-release-fingerprint-nano-gemm-c64-d0db52066c31901d",
+        "temporal.hidden-dir.crates-turbovec-napi-target-release-fingerprint-serde-core-077e03e29b01e414",
+        "temporal.hidden-dir.crates-turbovec-napi-target-x86-64-pc-windows-msvc-release-fingerprint-itoa-c1a4",
+        "temporal.hidden-dir.opencode-recommendations",
+        "temporal.hidden-dir.opencode-skills-context-budget"
+      ],
+      "topSourceRefs": [
+        "crates/turbovec-napi/target/release/.fingerprint/nano-gemm-c64-d0db52066c31901d",
+        "crates/turbovec-napi/target/release/.fingerprint/serde_core-077e03e29b01e414",
+        "crates/turbovec-napi/target/x86_64-pc-windows-msvc/release/.fingerprint/itoa-c1a4dd915edf6778",
+        ".opencode/recommendations",
+        ".opencode/skills/context-budget"
+      ],
+      "statuses": {
+        "BACKLOG": 12
+      },
+      "backendCounts": {
+        "offline": 12
+      },
+      "priorityMax": 1,
+      "libtorch": {
+        "source": "cpu",
+        "cohesion": -0.0096,
+        "pairCount": 66
+      },
+      "recommendation": "Consolidate duplicate open work into one parent kanban item and keep the file-level labels as links."
+    },
+    {
+      "groupId": "temporal:cluster:30",
+      "recordCount": 11,
+      "openCount": 11,
+      "clusterIds": [
+        30,
+        47,
+        61
+      ],
+      "featureFamilies": [
+        "temporal"
+      ],
+      "sourceRefs": [
+        "dir:.claude/skills/trace-mcp-tooling",
+        "dir:crates/turbovec-napi/target/release/.fingerprint/rand_core-18b0aa11d51ef0f8",
+        "dir:crates/turbovec-napi/target/x86_64-pc-windows-msvc/release/.fingerprint/matrixcompare-7c97f5d6dc029118",
+        "dir:crates/turbovec-napi/target/x86_64-pc-windows-msvc/release/.fingerprint/num-bigint-bdf67e1d1fee7f52",
+        "dir:crates/turbovec-napi/target/x86_64-pc-windows-msvc/release/.fingerprint/serde_core-c0eadfdee8638250",
+        "dir:crates/turbovec-napi/target/x86_64-pc-windows-msvc/release/.fingerprint/zerocopy-08bb3b4b61ae8791",
+        "dir:.gemini/antigravity/brain/a6e1254c-af9a-4552-8da8-334354c5959d/artifacts",
+        "dir:.opencode/feature-map",
+        "dir:simd-bridge/rust-simdjson/target/release/.fingerprint/serde_core-086677698551b022",
+        "dir:turbovec/target/release/.fingerprint/num-rational-931358828a6fdf0a",
+        "dir:.rag-metrics/chunks"
+      ],
+      "topTitles": [
+        "Review hidden directory .claude/skills/trace-mcp-tooling",
+        "Review hidden directory crates/turbovec-napi/target/release/.fingerprint/rand_core-18b0aa11d51ef0f8",
+        "Review hidden directory crates/turbovec-napi/target/x86_64-pc-windows-msvc/release/.fingerprint/matrixcompare-7c97f5d6dc029118",
+        "Review hidden directory crates/turbovec-napi/target/x86_64-pc-windows-msvc/release/.fingerprint/num-bigint-bdf67e1d1fee7f52",
+        "Review hidden directory crates/turbovec-napi/target/x86_64-pc-windows-msvc/release/.fingerprint/serde_core-c0eadfdee8638250"
+      ],
+      "topFeatureIds": [
+        "temporal.hidden-dir.claude-skills-trace-mcp-tooling",
+        "temporal.hidden-dir.crates-turbovec-napi-target-release-fingerprint-rand-core-18b0aa11d51ef0f8",
+        "temporal.hidden-dir.crates-turbovec-napi-target-x86-64-pc-windows-msvc-release-fingerprint-matrixcom",
+        "temporal.hidden-dir.crates-turbovec-napi-target-x86-64-pc-windows-msvc-release-fingerprint-num-bigin",
+        "temporal.hidden-dir.crates-turbovec-napi-target-x86-64-pc-windows-msvc-release-fingerprint-serde-cor"
+      ],
+      "topSourceRefs": [
+        ".claude/skills/trace-mcp-tooling",
+        "crates/turbovec-napi/target/release/.fingerprint/rand_core-18b0aa11d51ef0f8",
+        "crates/turbovec-napi/target/x86_64-pc-windows-msvc/release/.fingerprint/matrixcompare-7c97f5d6dc029118",
+        "crates/turbovec-napi/target/x86_64-pc-windows-msvc/release/.fingerprint/num-bigint-bdf67e1d1fee7f52",
+        "crates/turbovec-napi/target/x86_64-pc-windows-msvc/release/.fingerprint/serde_core-c0eadfdee8638250"
+      ],
+      "statuses": {
+        "BACKLOG": 10,
+        "REVIEW": 1
+      },
+      "backendCounts": {
+        "offline": 11
+      },
+      "priorityMax": 2,
+      "libtorch": {
+        "source": "cpu",
+        "cohesion": 0.0064,
+        "pairCount": 55
+      },
+      "recommendation": "Consolidate duplicate open work into one parent kanban item and keep the file-level labels as links."
+    },
+    {
+      "groupId": "temporal:cluster:116",
+      "recordCount": 11,
+      "openCount": 11,
+      "clusterIds": [
+        5,
+        19,
+        116
+      ],
+      "featureFamilies": [
+        "temporal"
+      ],
+      "sourceRefs": [
+        "dir:crates/turbovec-napi/target/release/.fingerprint/approx-259efd9ff025e261",
+        "dir:crates/turbovec-napi/target/release/.fingerprint/either-1c1276129fcb5d45",
+        "dir:crates/turbovec-napi/target/release/.fingerprint/simdutf8-6ae0693d7588c26e",
+        "dir:crates/turbovec-napi/target/x86_64-pc-windows-msvc/release/.fingerprint/statrs-4e96c0e4b77dae1b",
+        "dir:simd-bridge/rust/hmm-repair/target/x86_64-pc-windows-msvc/release/.fingerprint/serde-bb82cd6a2f1fecde",
+        "dir:simd-bridge/rust-simdjson/target/release/.fingerprint/serde-4341e2cbab92d116",
+        "dir:sveltekit-frontend/.cache/ace/top-retrieval",
+        "dir:turbovec/target/release/.fingerprint/crossbeam-utils-2669532e108f12ab",
+        "dir:turbovec/target/release/.fingerprint/either-b83aa1edafe692ba",
+        "dir:turbovec/target/release/.fingerprint/pyo3-build-config-ee4d3e922cf31857",
+        "dir:docs/graph"
+      ],
+      "topTitles": [
+        "Review hidden directory crates/turbovec-napi/target/release/.fingerprint/approx-259efd9ff025e261",
+        "Review hidden directory crates/turbovec-napi/target/release/.fingerprint/either-1c1276129fcb5d45",
+        "Review hidden directory crates/turbovec-napi/target/release/.fingerprint/simdutf8-6ae0693d7588c26e",
+        "Review hidden directory crates/turbovec-napi/target/x86_64-pc-windows-msvc/release/.fingerprint/statrs-4e96c0e4b77dae1b",
+        "Review hidden directory simd-bridge/rust/hmm-repair/target/x86_64-pc-windows-msvc/release/.fingerprint/serde-bb82cd6a2f1fecde"
+      ],
+      "topFeatureIds": [
+        "temporal.hidden-dir.crates-turbovec-napi-target-release-fingerprint-approx-259efd9ff025e261",
+        "temporal.hidden-dir.crates-turbovec-napi-target-release-fingerprint-either-1c1276129fcb5d45",
+        "temporal.hidden-dir.crates-turbovec-napi-target-release-fingerprint-simdutf8-6ae0693d7588c26e",
+        "temporal.hidden-dir.crates-turbovec-napi-target-x86-64-pc-windows-msvc-release-fingerprint-statrs-4e",
+        "temporal.hidden-dir.simd-bridge-rust-hmm-repair-target-x86-64-pc-windows-msvc-release-fingerprint-se"
+      ],
+      "topSourceRefs": [
+        "crates/turbovec-napi/target/release/.fingerprint/approx-259efd9ff025e261",
+        "crates/turbovec-napi/target/release/.fingerprint/either-1c1276129fcb5d45",
+        "crates/turbovec-napi/target/release/.fingerprint/simdutf8-6ae0693d7588c26e",
+        "crates/turbovec-napi/target/x86_64-pc-windows-msvc/release/.fingerprint/statrs-4e96c0e4b77dae1b",
+        "simd-bridge/rust/hmm-repair/target/x86_64-pc-windows-msvc/release/.fingerprint/serde-bb82cd6a2f1fecde"
+      ],
+      "statuses": {
+        "BACKLOG": 10,
+        "REVIEW": 1
+      },
+      "backendCounts": {
+        "offline": 11
+      },
+      "priorityMax": 2,
+      "libtorch": {
+        "source": "cpu",
+        "cohesion": -0.0023,
+        "pairCount": 55
+      },
+      "recommendation": "Consolidate duplicate open work into one parent kanban item and keep the file-level labels as links."
+    },
+    {
+      "groupId": "temporal:cluster:54",
+      "recordCount": 11,
+      "openCount": 11,
+      "clusterIds": [
+        54,
+        71,
+        85
+      ],
+      "featureFamilies": [
+        "temporal"
+      ],
+      "sourceRefs": [
+        "dir:crates/turbovec-napi/target/release/.fingerprint/equator-macro-cd65a907e3666605",
+        "dir:crates/turbovec-napi/target/release/.fingerprint/gemm-dd486ae83d68f4da",
+        "dir:crates/turbovec-napi/target/release/.fingerprint/gemm-f32-0dd960e1c36497d0",
+        "dir:crates/turbovec-napi/target/release/.fingerprint/turbovec-napi-d862288abddb2bff",
+        "dir:simd-bridge/rust/hmm-repair/target/x86_64-pc-windows-msvc/release/.fingerprint/zmij-466e75cfb7408e1e",
+        "dir:simd-bridge/rust-simdjson/target/release/.fingerprint/hashbrown-53c4bc8c4064f64c",
+        "dir:simd-bridge/rust-simdjson/target/release/.fingerprint/itoa-16f09a9b10377169",
+        "dir:.svelte-error-fixes-backup/sveltekit-frontend/src/lib/components/_archive/test-demo/dev",
+        "dir:turbovec/target/release/.fingerprint/serde-59c15d8a6da272ec",
+        "dir:turbovec/target/release/.fingerprint/zerocopy-dc90e2be6fd765ab",
+        "dir:next_steps"
+      ],
+      "topTitles": [
+        "Review hidden directory crates/turbovec-napi/target/release/.fingerprint/equator-macro-cd65a907e3666605",
+        "Review hidden directory crates/turbovec-napi/target/release/.fingerprint/gemm-dd486ae83d68f4da",
+        "Review hidden directory crates/turbovec-napi/target/release/.fingerprint/gemm-f32-0dd960e1c36497d0",
+        "Review hidden directory crates/turbovec-napi/target/release/.fingerprint/turbovec-napi-d862288abddb2bff",
+        "Review hidden directory simd-bridge/rust/hmm-repair/target/x86_64-pc-windows-msvc/release/.fingerprint/zmij-466e75cfb7408e1e"
+      ],
+      "topFeatureIds": [
+        "temporal.hidden-dir.crates-turbovec-napi-target-release-fingerprint-equator-macro-cd65a907e3666605",
+        "temporal.hidden-dir.crates-turbovec-napi-target-release-fingerprint-gemm-dd486ae83d68f4da",
+        "temporal.hidden-dir.crates-turbovec-napi-target-release-fingerprint-gemm-f32-0dd960e1c36497d0",
+        "temporal.hidden-dir.crates-turbovec-napi-target-release-fingerprint-turbovec-napi-d862288abddb2bff",
+        "temporal.hidden-dir.simd-bridge-rust-hmm-repair-target-x86-64-pc-windows-msvc-release-fingerprint-zm"
+      ],
+      "topSourceRefs": [
+        "crates/turbovec-napi/target/release/.fingerprint/equator-macro-cd65a907e3666605",
+        "crates/turbovec-napi/target/release/.fingerprint/gemm-dd486ae83d68f4da",
+        "crates/turbovec-napi/target/release/.fingerprint/gemm-f32-0dd960e1c36497d0",
+        "crates/turbovec-napi/target/release/.fingerprint/turbovec-napi-d862288abddb2bff",
+        "simd-bridge/rust/hmm-repair/target/x86_64-pc-windows-msvc/release/.fingerprint/zmij-466e75cfb7408e1e"
+      ],
+      "statuses": {
+        "BACKLOG": 10,
+        "REVIEW": 1
+      },
+      "backendCounts": {
+        "offline": 11
+      },
+      "priorityMax": 2,
+      "libtorch": {
+        "source": "cpu",
+        "cohesion": -0.0077,
+        "pairCount": 55
+      },
+      "recommendation": "Consolidate duplicate open work into one parent kanban item and keep the file-level labels as links."
+    },
+    {
+      "groupId": "temporal:cluster:19",
+      "recordCount": 11,
+      "openCount": 11,
+      "clusterIds": [
+        19,
+        36,
+        50
+      ],
+      "featureFamilies": [
+        "temporal"
+      ],
+      "sourceRefs": [
+        "dir:crates/turbovec-napi/target/release/.fingerprint/napi-sys-d124d5d706d2c5be",
+        "dir:crates/turbovec-napi/target/release/.fingerprint/ordered-float-cf18252323dd7438",
+        "dir:crates/turbovec-napi/target/release/.fingerprint/proc-macro2-7087a6754c818409",
+        "dir:simd-bridge/rust/hmm-repair/target/x86_64-pc-windows-msvc/release/.fingerprint/memchr-e22c304dfba6d7af",
+        "dir:simd-bridge/rust-simdjson/target/release/.fingerprint/convert_case-8b42eb7843eafe9a",
+        "dir:sveltekit-frontend/.venv_turbovec/Lib/site-packages/numpy-2.4.4.dist-info/licenses/numpy/random",
+        "dir:sveltekit-frontend/.venv_turbovec/Lib/site-packages/numpy-2.4.4.dist-info/licenses/numpy/random/src/mt19937",
+        "dir:.tmp/test-triage/20260520-190405",
+        "dir:turbovec/target/release/.fingerprint/matrixmultiply-26ba2c1da9accd98",
+        "dir:turbovec/target/release/.fingerprint/nano-gemm-f32-23c5fc0f75a49e6e",
+        "dir:turbovec/target/release/.fingerprint/pyo3-macros-backend-cfa1883b303d326b"
+      ],
+      "topTitles": [
+        "Review hidden directory crates/turbovec-napi/target/release/.fingerprint/napi-sys-d124d5d706d2c5be",
+        "Review hidden directory crates/turbovec-napi/target/release/.fingerprint/ordered-float-cf18252323dd7438",
+        "Review hidden directory crates/turbovec-napi/target/release/.fingerprint/proc-macro2-7087a6754c818409",
+        "Review hidden directory simd-bridge/rust/hmm-repair/target/x86_64-pc-windows-msvc/release/.fingerprint/memchr-e22c304dfba6d7af",
+        "Review hidden directory simd-bridge/rust-simdjson/target/release/.fingerprint/convert_case-8b42eb7843eafe9a"
+      ],
+      "topFeatureIds": [
+        "temporal.hidden-dir.sveltekit-frontend-venv-turbovec-lib-site-packages-numpy-2-4-4-dist-info-license",
+        "temporal.hidden-dir.crates-turbovec-napi-target-release-fingerprint-napi-sys-d124d5d706d2c5be",
+        "temporal.hidden-dir.crates-turbovec-napi-target-release-fingerprint-ordered-float-cf18252323dd7438",
+        "temporal.hidden-dir.crates-turbovec-napi-target-release-fingerprint-proc-macro2-7087a6754c818409",
+        "temporal.hidden-dir.simd-bridge-rust-hmm-repair-target-x86-64-pc-windows-msvc-release-fingerprint-me"
+      ],
+      "topSourceRefs": [
+        "crates/turbovec-napi/target/release/.fingerprint/napi-sys-d124d5d706d2c5be",
+        "crates/turbovec-napi/target/release/.fingerprint/ordered-float-cf18252323dd7438",
+        "crates/turbovec-napi/target/release/.fingerprint/proc-macro2-7087a6754c818409",
+        "simd-bridge/rust/hmm-repair/target/x86_64-pc-windows-msvc/release/.fingerprint/memchr-e22c304dfba6d7af",
+        "simd-bridge/rust-simdjson/target/release/.fingerprint/convert_case-8b42eb7843eafe9a"
+      ],
+      "statuses": {
+        "BACKLOG": 11
+      },
+      "backendCounts": {
+        "offline": 11
+      },
+      "priorityMax": 1,
+      "libtorch": {
+        "source": "cpu",
+        "cohesion": 0.0024,
+        "pairCount": 55
+      },
+      "recommendation": "Consolidate duplicate open work into one parent kanban item and keep the file-level labels as links."
+    },
+    {
+      "groupId": "temporal:cluster:58",
+      "recordCount": 11,
+      "openCount": 11,
+      "clusterIds": [
+        58,
+        75,
+        89
+      ],
+      "featureFamilies": [
+        "temporal"
+      ],
+      "sourceRefs": [
+        "dir:crates/turbovec-napi/target/release/.fingerprint/ref-cast-impl-f39661f7397c8b5c",
+        "dir:crates/turbovec-napi/target/x86_64-pc-windows-msvc/release/.fingerprint/either-fe10230c37eebb06",
+        "dir:simd-bridge/rust/graph-engine/target/release/.fingerprint/regex-772458687e9ca4ac",
+        "dir:simd-bridge/rust/hmm-repair/target/release/.fingerprint/proc-macro2-2acdf553701a53ad",
+        "dir:simd-bridge/rust-simdjson/target/release/.fingerprint/cfg-if-d9ca72ddb716fd34",
+        "dir:simd-bridge/rust-simdjson/target/release/.fingerprint/serde_derive-179fd9f019900e29",
+        "dir:simd-bridge/rust-simdjson/target/release/.fingerprint/zmij-e07937746db35f6f",
+        "dir:.svelte-error-fixes-backup/sveltekit-frontend/src/lib/components/ai",
+        "dir:.svelte-error-fixes-backup/sveltekit-frontend/src/lib/components/ui",
+        "dir:turbovec/target/release/.fingerprint/byteorder-6299ba8934c3abea",
+        "dir:turbovec/target/release/.fingerprint/matrixmultiply-7e6e63d3ecccef26"
+      ],
+      "topTitles": [
+        "Review hidden directory crates/turbovec-napi/target/release/.fingerprint/ref-cast-impl-f39661f7397c8b5c",
+        "Review hidden directory crates/turbovec-napi/target/x86_64-pc-windows-msvc/release/.fingerprint/either-fe10230c37eebb06",
+        "Review hidden directory simd-bridge/rust/graph-engine/target/release/.fingerprint/regex-772458687e9ca4ac",
+        "Review hidden directory simd-bridge/rust/hmm-repair/target/release/.fingerprint/proc-macro2-2acdf553701a53ad",
+        "Review hidden directory simd-bridge/rust-simdjson/target/release/.fingerprint/cfg-if-d9ca72ddb716fd34"
+      ],
+      "topFeatureIds": [
+        "temporal.hidden-dir.crates-turbovec-napi-target-release-fingerprint-ref-cast-impl-f39661f7397c8b5c",
+        "temporal.hidden-dir.crates-turbovec-napi-target-x86-64-pc-windows-msvc-release-fingerprint-either-fe",
+        "temporal.hidden-dir.simd-bridge-rust-graph-engine-target-release-fingerprint-regex-772458687e9ca4ac",
+        "temporal.hidden-dir.simd-bridge-rust-hmm-repair-target-release-fingerprint-proc-macro2-2acdf553701a5",
+        "temporal.hidden-dir.simd-bridge-rust-simdjson-target-release-fingerprint-cfg-if-d9ca72ddb716fd34"
+      ],
+      "topSourceRefs": [
+        "crates/turbovec-napi/target/release/.fingerprint/ref-cast-impl-f39661f7397c8b5c",
+        "crates/turbovec-napi/target/x86_64-pc-windows-msvc/release/.fingerprint/either-fe10230c37eebb06",
+        "simd-bridge/rust/graph-engine/target/release/.fingerprint/regex-772458687e9ca4ac",
+        "simd-bridge/rust/hmm-repair/target/release/.fingerprint/proc-macro2-2acdf553701a53ad",
+        "simd-bridge/rust-simdjson/target/release/.fingerprint/cfg-if-d9ca72ddb716fd34"
+      ],
+      "statuses": {
+        "BACKLOG": 11
+      },
+      "backendCounts": {
+        "offline": 11
       },
       "priorityMax": 1,
       "libtorch": {
         "source": "cpu",
         "cohesion": -0.0011,
-        "pairCount": 3
+        "pairCount": 55
       },
       "recommendation": "Consolidate duplicate open work into one parent kanban item and keep the file-level labels as links."
     },
     {
-      "groupId": "gpu:cluster:none",
-      "recordCount": 2,
-      "openCount": 2,
-      "clusterIds": [],
+      "groupId": "temporal:cluster:106",
+      "recordCount": 10,
+      "openCount": 10,
+      "clusterIds": [
+        9,
+        106,
+        123
+      ],
       "featureFamilies": [
-        "gpu"
+        "temporal"
       ],
-      "sourceRefs": [],
+      "sourceRefs": [
+        "dir:crates/turbovec-napi/target/release/.fingerprint/memchr-317fca8501f36841",
+        "dir:crates/turbovec-napi/target/release/.fingerprint/proc-macro2-6908b3d911923334",
+        "dir:crates/turbovec-napi/target/release/.fingerprint/rayon-d503ad71c000e71b",
+        "dir:simd-bridge/rust/graph-engine/target/release/.fingerprint/napi-derive-0473136a16a369ea",
+        "dir:simd-bridge/rust/graph-engine/target/x86_64-pc-windows-msvc/release/.fingerprint/petgraph-af08093d7cef9cd4",
+        "dir:.svelte-error-fixes-backup/sveltekit-frontend/src/lib/components/_archive/svelte4",
+        "dir:turbovec/target/release/.fingerprint/num-integer-f00038a8887dbd79",
+        "dir:turbovec/target/release/.fingerprint/paste-e11a995fc48b5999",
+        "dir:turbovec/target/release/.fingerprint/typenum-52cc376d42d41f81",
+        "dir:docs/reports"
+      ],
       "topTitles": [
-        "gpu › simd bridge",
-        "gpu › cuda compute"
+        "Review hidden directory crates/turbovec-napi/target/release/.fingerprint/memchr-317fca8501f36841",
+        "Review hidden directory crates/turbovec-napi/target/release/.fingerprint/proc-macro2-6908b3d911923334",
+        "Review hidden directory crates/turbovec-napi/target/release/.fingerprint/rayon-d503ad71c000e71b",
+        "Review hidden directory simd-bridge/rust/graph-engine/target/release/.fingerprint/napi-derive-0473136a16a369ea",
+        "Review hidden directory simd-bridge/rust/graph-engine/target/x86_64-pc-windows-msvc/release/.fingerprint/petgraph-af08093d7cef9cd4"
       ],
-      "topFeatureIds": [],
+      "topFeatureIds": [
+        "temporal.hidden-dir.crates-turbovec-napi-target-release-fingerprint-memchr-317fca8501f36841",
+        "temporal.hidden-dir.crates-turbovec-napi-target-release-fingerprint-proc-macro2-6908b3d911923334",
+        "temporal.hidden-dir.crates-turbovec-napi-target-release-fingerprint-rayon-d503ad71c000e71b",
+        "temporal.hidden-dir.simd-bridge-rust-graph-engine-target-release-fingerprint-napi-derive-0473136a16a",
+        "temporal.hidden-dir.simd-bridge-rust-graph-engine-target-x86-64-pc-windows-msvc-release-fingerprint-"
+      ],
       "topSourceRefs": [
-        "local:scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/bench/simd/hot/+server.ts#L1",
-        "local:scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/bench/simd/load/+server.ts#L1",
-        "local:scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/bench/simd/metrics/+server.ts#L1",
-        "local:scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/cuda/compute/+server.ts#L1",
-        "local:scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/cuda/health/+server.ts#L1"
+        "crates/turbovec-napi/target/release/.fingerprint/memchr-317fca8501f36841",
+        "crates/turbovec-napi/target/release/.fingerprint/proc-macro2-6908b3d911923334",
+        "crates/turbovec-napi/target/release/.fingerprint/rayon-d503ad71c000e71b",
+        "simd-bridge/rust/graph-engine/target/release/.fingerprint/napi-derive-0473136a16a369ea",
+        "simd-bridge/rust/graph-engine/target/x86_64-pc-windows-msvc/release/.fingerprint/petgraph-af08093d7cef9cd4"
       ],
       "statuses": {
-        "TODO": 2
+        "BACKLOG": 9,
+        "REVIEW": 1
       },
       "backendCounts": {
-        "js": 2
+        "offline": 10
       },
-      "priorityMax": 3,
+      "priorityMax": 2,
       "libtorch": {
         "source": "cpu",
-        "cohesion": -0.0157,
-        "pairCount": 1
+        "cohesion": -0.0023,
+        "pairCount": 45
       },
       "recommendation": "Consolidate duplicate open work into one parent kanban item and keep the file-level labels as links."
     },
     {
-      "groupId": "search:cluster:none",
-      "recordCount": 2,
-      "openCount": 2,
-      "clusterIds": [],
+      "groupId": "temporal:cluster:21",
+      "recordCount": 10,
+      "openCount": 10,
+      "clusterIds": [
+        21,
+        38,
+        52
+      ],
       "featureFamilies": [
-        "search"
+        "temporal"
       ],
-      "sourceRefs": [],
+      "sourceRefs": [
+        "dir:crates/turbovec-napi/target/release/.fingerprint/nano-gemm-codegen-d7a591a4cac832d9",
+        "dir:crates/turbovec-napi/target/release/.fingerprint/serde_json-5cc2261ccf2c852d",
+        "dir:crates/turbovec-napi/target/release/.fingerprint/statrs-8afe9fd3d6a8261f",
+        "dir:crates/turbovec-napi/target/x86_64-pc-windows-msvc/release/.fingerprint/once_cell-34c52986bf93b1e9",
+        "dir:simd-bridge/rust/hmm-repair/target/x86_64-pc-windows-msvc/debug/.fingerprint/once_cell-887becbc49b21234",
+        "dir:simd-bridge/rust/hmm-repair/target/x86_64-pc-windows-msvc/release/.fingerprint/serde_json-d9dd3638da0ae09e",
+        "dir:simd-bridge/rust-simdjson/target/release/.fingerprint/ahash-1642bdf538606d43",
+        "dir:sveltekit-frontend/.tmp/.tmp",
+        "dir:turbovec/target/release/.fingerprint/pyo3-macros-backend-1cc0e92a94a3fdeb",
+        "dir:docs/session-notes"
+      ],
       "topTitles": [
-        "search › hyperrag",
-        "search › qdrant vector"
+        "Review hidden directory crates/turbovec-napi/target/release/.fingerprint/nano-gemm-codegen-d7a591a4cac832d9",
+        "Review hidden directory crates/turbovec-napi/target/release/.fingerprint/serde_json-5cc2261ccf2c852d",
+        "Review hidden directory crates/turbovec-napi/target/release/.fingerprint/statrs-8afe9fd3d6a8261f",
+        "Review hidden directory crates/turbovec-napi/target/x86_64-pc-windows-msvc/release/.fingerprint/once_cell-34c52986bf93b1e9",
+        "Review hidden directory simd-bridge/rust/hmm-repair/target/x86_64-pc-windows-msvc/debug/.fingerprint/once_cell-887becbc49b21234"
       ],
-      "topFeatureIds": [],
+      "topFeatureIds": [
+        "temporal.hidden-dir.crates-turbovec-napi-target-release-fingerprint-nano-gemm-codegen-d7a591a4cac832",
+        "temporal.hidden-dir.crates-turbovec-napi-target-release-fingerprint-serde-json-5cc2261ccf2c852d",
+        "temporal.hidden-dir.crates-turbovec-napi-target-release-fingerprint-statrs-8afe9fd3d6a8261f",
+        "temporal.hidden-dir.crates-turbovec-napi-target-x86-64-pc-windows-msvc-release-fingerprint-once-cell",
+        "temporal.hidden-dir.simd-bridge-rust-hmm-repair-target-x86-64-pc-windows-msvc-debug-fingerprint-once"
+      ],
       "topSourceRefs": [
-        "local:sveltekit-frontend/scripts/smoke-hyperrag.mjs#L1",
-        "local:sveltekit-frontend/scripts/smoke/smoke-hyperrag.mjs#L1",
-        "local:sveltekit-frontend/src/routes/api/admin/atlas/hyperrag/+server.ts#L1",
-        "local:scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/dev/qdrant/+server.ts#L1",
-        "local:scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/qdrant/+server.ts#L1"
+        "crates/turbovec-napi/target/release/.fingerprint/nano-gemm-codegen-d7a591a4cac832d9",
+        "crates/turbovec-napi/target/release/.fingerprint/serde_json-5cc2261ccf2c852d",
+        "crates/turbovec-napi/target/release/.fingerprint/statrs-8afe9fd3d6a8261f",
+        "crates/turbovec-napi/target/x86_64-pc-windows-msvc/release/.fingerprint/once_cell-34c52986bf93b1e9",
+        "simd-bridge/rust/hmm-repair/target/x86_64-pc-windows-msvc/debug/.fingerprint/once_cell-887becbc49b21234"
       ],
       "statuses": {
-        "TODO": 2
+        "BACKLOG": 9,
+        "REVIEW": 1
       },
       "backendCounts": {
-        "js": 2
+        "offline": 10
       },
-      "priorityMax": 3,
+      "priorityMax": 2,
+      "libtorch": {
+        "source": "cpu",
+        "cohesion": -0.0069,
+        "pairCount": 45
+      },
+      "recommendation": "Consolidate duplicate open work into one parent kanban item and keep the file-level labels as links."
+    },
+    {
+      "groupId": "master-todo:cluster:95",
+      "recordCount": 10,
+      "openCount": 10,
+      "clusterIds": [
+        95,
+        112,
+        126
+      ],
+      "featureFamilies": [
+        "master-todo"
+      ],
+      "sourceRefs": [
+        "MASTER-FEATURE-TODO-2026-05-20.md:457",
+        "MASTER-FEATURE-TODO-2026-05-20.md:526",
+        "MASTER-FEATURE-TODO-2026-05-20.md:544",
+        "MASTER-FEATURE-TODO-2026-05-20.md:782",
+        "MASTER-FEATURE-TODO-2026-05-20.md:385",
+        "MASTER-FEATURE-TODO-2026-05-20.md:790",
+        "MASTER-FEATURE-TODO-2026-05-20.md:387",
+        "MASTER-FEATURE-TODO-2026-05-20.md:813",
+        "MASTER-FEATURE-TODO-2026-05-20.md:407",
+        "MASTER-FEATURE-TODO-2026-05-20.md:397"
+      ],
+      "topTitles": [
+        "Define the OpenCode-facing bridge so research queries can flow through TRACE …",
+        "**Track C — Production Gap Remediation** (after DB audit)",
+        "**Remaining Lower-Priority**",
+        "Run the full current-corpus offline ingest in bounded chunks until the full s…",
+        "Keep the lane offline-first and report-only until the join outputs are valida…"
+      ],
+      "topFeatureIds": [
+        "master-todo.nes-glyph-architecture-notes-sourceref-f",
+        "master-todo.unknown"
+      ],
+      "topSourceRefs": [],
+      "statuses": {
+        "BACKLOG": 10
+      },
+      "backendCounts": {
+        "offline": 10
+      },
+      "priorityMax": 1,
+      "libtorch": {
+        "source": "cpu",
+        "cohesion": -0.004,
+        "pairCount": 45
+      },
+      "recommendation": "Consolidate duplicate open work into one parent kanban item and keep the file-level labels as links."
+    },
+    {
+      "groupId": "temporal:cluster:118",
+      "recordCount": 10,
+      "openCount": 10,
+      "clusterIds": [
+        7,
+        21,
+        118
+      ],
+      "featureFamilies": [
+        "temporal"
+      ],
+      "sourceRefs": [
+        "dir:.cache/cards",
+        "dir:crates/turbovec-napi/target/release/.fingerprint/nano-gemm-f64-72b94277bfc23383",
+        "dir:crates/turbovec-napi/target/x86_64-pc-windows-msvc/release/.fingerprint/num-traits-f8f6796fb787a175",
+        "dir:crates/turbovec-napi/target/x86_64-pc-windows-msvc/release/.fingerprint/serde-4eef2f64c0570d7d",
+        "dir:.opencode/cache",
+        "dir:simd-bridge/rust/hmm-repair/target/release/.fingerprint/aho-corasick-db8016eb89c7c0fc",
+        "dir:simd-bridge/rust-simdjson/target/release/.fingerprint/simd_bridge_rs-d6d15508f9d9f829",
+        "dir:.svelte-error-fixes-backup/sveltekit-frontend/src/lib/components/evidence",
+        "dir:.tmp/test-triage/20260520-191055",
+        "dir:turbovec/target/release/.fingerprint/typenum-75ca51f44b7bb5f6"
+      ],
+      "topTitles": [
+        "Review hidden directory .cache/cards",
+        "Review hidden directory crates/turbovec-napi/target/release/.fingerprint/nano-gemm-f64-72b94277bfc23383",
+        "Review hidden directory crates/turbovec-napi/target/x86_64-pc-windows-msvc/release/.fingerprint/num-traits-f8f6796fb787a175",
+        "Review hidden directory crates/turbovec-napi/target/x86_64-pc-windows-msvc/release/.fingerprint/serde-4eef2f64c0570d7d",
+        "Review hidden directory .opencode/cache"
+      ],
+      "topFeatureIds": [
+        "temporal.hidden-dir.cache-cards",
+        "temporal.hidden-dir.crates-turbovec-napi-target-release-fingerprint-nano-gemm-f64-72b94277bfc23383",
+        "temporal.hidden-dir.crates-turbovec-napi-target-x86-64-pc-windows-msvc-release-fingerprint-num-trait",
+        "temporal.hidden-dir.crates-turbovec-napi-target-x86-64-pc-windows-msvc-release-fingerprint-serde-4ee",
+        "temporal.hidden-dir.opencode-cache"
+      ],
+      "topSourceRefs": [
+        ".cache/cards",
+        "crates/turbovec-napi/target/release/.fingerprint/nano-gemm-f64-72b94277bfc23383",
+        "crates/turbovec-napi/target/x86_64-pc-windows-msvc/release/.fingerprint/num-traits-f8f6796fb787a175",
+        "crates/turbovec-napi/target/x86_64-pc-windows-msvc/release/.fingerprint/serde-4eef2f64c0570d7d",
+        ".opencode/cache"
+      ],
+      "statuses": {
+        "BACKLOG": 10
+      },
+      "backendCounts": {
+        "offline": 10
+      },
+      "priorityMax": 1,
+      "libtorch": {
+        "source": "cpu",
+        "cohesion": 0.0056,
+        "pairCount": 45
+      },
+      "recommendation": "Consolidate duplicate open work into one parent kanban item and keep the file-level labels as links."
+    },
+    {
+      "groupId": "temporal:cluster:71",
+      "recordCount": 10,
+      "openCount": 10,
+      "clusterIds": [
+        71,
+        88,
+        102
+      ],
+      "featureFamilies": [
+        "temporal"
+      ],
+      "sourceRefs": [
+        "dir:.cache",
+        "dir:.claude/agents",
+        "dir:.github/instructions",
+        "dir:.opencode/jobs",
+        "dir:simd-bridge/rust/graph-engine/target/release/.fingerprint/regex-automata-030c1a71414bd09c",
+        "dir:simd-bridge/rust/graph-engine/target/x86_64-pc-windows-msvc/release/.fingerprint/rand-57f00801944be5e0",
+        "dir:simd-bridge/rust/graph-engine/target/x86_64-pc-windows-msvc/release/.fingerprint/bitflags-32a302481bef3be6",
+        "dir:simd-bridge/rust-simdjson/target/release/.fingerprint/equivalent-61bafbe931b425fd",
+        "dir:.svelte-error-fixes-backup/sveltekit-frontend/src/routes/(legal)",
+        "dir:turbovec/target/release/.fingerprint/target-lexicon-0df4da912a9a8f9b"
+      ],
+      "topTitles": [
+        "Review hidden directory .cache",
+        "Review hidden directory .claude/agents",
+        "Review hidden directory .github/instructions",
+        "Review hidden directory .opencode/jobs",
+        "Review hidden directory simd-bridge/rust/graph-engine/target/release/.fingerprint/regex-automata-030c1a71414bd09c"
+      ],
+      "topFeatureIds": [
+        "temporal.hidden-dir.simd-bridge-rust-graph-engine-target-x86-64-pc-windows-msvc-release-fingerprint-",
+        "temporal.hidden-dir.cache",
+        "temporal.hidden-dir.claude-agents",
+        "temporal.hidden-dir.github-instructions",
+        "temporal.hidden-dir.opencode-jobs"
+      ],
+      "topSourceRefs": [
+        ".cache",
+        ".claude/agents",
+        ".github/instructions",
+        ".opencode/jobs",
+        "simd-bridge/rust/graph-engine/target/release/.fingerprint/regex-automata-030c1a71414bd09c"
+      ],
+      "statuses": {
+        "BACKLOG": 10
+      },
+      "backendCounts": {
+        "offline": 10
+      },
+      "priorityMax": 1,
+      "libtorch": {
+        "source": "cpu",
+        "cohesion": 0.0008,
+        "pairCount": 45
+      },
+      "recommendation": "Consolidate duplicate open work into one parent kanban item and keep the file-level labels as links."
+    },
+    {
+      "groupId": "temporal:cluster:74",
+      "recordCount": 10,
+      "openCount": 10,
+      "clusterIds": [
+        74,
+        91,
+        105
+      ],
+      "featureFamilies": [
+        "temporal"
+      ],
+      "sourceRefs": [
+        "dir:claude-mem/.github",
+        "dir:crates/turbovec-napi/target/release/.fingerprint/regex-c9d621327b5e193c",
+        "dir:crates/turbovec-napi/target/x86_64-pc-windows-msvc/release/.fingerprint/generativity-a3585bee5bab541e",
+        "dir:crates/turbovec-napi/target/x86_64-pc-windows-msvc/release/.fingerprint/serde_json-86421e08f8a458d5",
+        "dir:simd-bridge/rust-simdjson/target/release/.fingerprint/cc-bbdae0ca011083c9",
+        "dir:simd-bridge/rust-simdjson/target/release/.fingerprint/crossbeam-epoch-32d0fe77e9cb5570",
+        "dir:simd-bridge/rust-simdjson/target/release/.fingerprint/napi-derive-3074a51b4bed1f14",
+        "dir:.svelte-error-fixes-backup/sveltekit-frontend/src/lib/components/chat",
+        "dir:turbovec/target/release/.fingerprint/rayon-be838baa1eee4e3a",
+        "dir:turbovec/target/release/.fingerprint/serde_core-7101a4eee71c63b3"
+      ],
+      "topTitles": [
+        "Review hidden directory claude-mem/.github",
+        "Review hidden directory crates/turbovec-napi/target/release/.fingerprint/regex-c9d621327b5e193c",
+        "Review hidden directory crates/turbovec-napi/target/x86_64-pc-windows-msvc/release/.fingerprint/generativity-a3585bee5bab541e",
+        "Review hidden directory crates/turbovec-napi/target/x86_64-pc-windows-msvc/release/.fingerprint/serde_json-86421e08f8a458d5",
+        "Review hidden directory simd-bridge/rust-simdjson/target/release/.fingerprint/cc-bbdae0ca011083c9"
+      ],
+      "topFeatureIds": [
+        "temporal.hidden-dir.claude-mem-github",
+        "temporal.hidden-dir.crates-turbovec-napi-target-release-fingerprint-regex-c9d621327b5e193c",
+        "temporal.hidden-dir.crates-turbovec-napi-target-x86-64-pc-windows-msvc-release-fingerprint-generativ",
+        "temporal.hidden-dir.crates-turbovec-napi-target-x86-64-pc-windows-msvc-release-fingerprint-serde-jso",
+        "temporal.hidden-dir.simd-bridge-rust-simdjson-target-release-fingerprint-cc-bbdae0ca011083c9"
+      ],
+      "topSourceRefs": [
+        "claude-mem/.github",
+        "crates/turbovec-napi/target/release/.fingerprint/regex-c9d621327b5e193c",
+        "crates/turbovec-napi/target/x86_64-pc-windows-msvc/release/.fingerprint/generativity-a3585bee5bab541e",
+        "crates/turbovec-napi/target/x86_64-pc-windows-msvc/release/.fingerprint/serde_json-86421e08f8a458d5",
+        "simd-bridge/rust-simdjson/target/release/.fingerprint/cc-bbdae0ca011083c9"
+      ],
+      "statuses": {
+        "BACKLOG": 10
+      },
+      "backendCounts": {
+        "offline": 10
+      },
+      "priorityMax": 1,
+      "libtorch": {
+        "source": "cpu",
+        "cohesion": -0.0121,
+        "pairCount": 45
+      },
+      "recommendation": "Consolidate duplicate open work into one parent kanban item and keep the file-level labels as links."
+    },
+    {
+      "groupId": "temporal:cluster:26",
+      "recordCount": 10,
+      "openCount": 10,
+      "clusterIds": [
+        26,
+        43,
+        57
+      ],
+      "featureFamilies": [
+        "temporal"
+      ],
+      "sourceRefs": [
+        "dir:.cline/memory",
+        "dir:crates/turbovec-napi/target/release/.fingerprint/pest_derive-8c1c70363e95be5a",
+        "dir:crates/turbovec-napi/target/x86_64-pc-windows-msvc/release/.fingerprint/byteorder-b66d91f4f8c32802",
+        "dir:crates/turbovec-napi/target/x86_64-pc-windows-msvc/release/.fingerprint/ref-cast-802e75cc050d9ff3",
+        "dir:simd-bridge/rust/hmm-repair/target/release/.fingerprint/napi-derive-0473136a16a369ea",
+        "dir:simd-bridge/rust-simdjson/target/release/.fingerprint/either-a345eadb6042362e",
+        "dir:.svelte-error-fixes-backup/sveltekit-frontend/src/lib/components/upload",
+        "dir:sveltekit-frontend/.venv_turbovec/Lib/site-packages/numpy-2.4.4.dist-info/licenses/numpy/linalg/lapack_lite",
+        "dir:turbovec/target/release/.fingerprint/approx-ef74cc1039c8f9e1",
+        "dir:turbovec/target/release/.fingerprint/nano-gemm-c32-53fca96c7274aa7a"
+      ],
+      "topTitles": [
+        "Review hidden directory .cline/memory",
+        "Review hidden directory crates/turbovec-napi/target/release/.fingerprint/pest_derive-8c1c70363e95be5a",
+        "Review hidden directory crates/turbovec-napi/target/x86_64-pc-windows-msvc/release/.fingerprint/byteorder-b66d91f4f8c32802",
+        "Review hidden directory crates/turbovec-napi/target/x86_64-pc-windows-msvc/release/.fingerprint/ref-cast-802e75cc050d9ff3",
+        "Review hidden directory simd-bridge/rust/hmm-repair/target/release/.fingerprint/napi-derive-0473136a16a369ea"
+      ],
+      "topFeatureIds": [
+        "temporal.hidden-dir.cline-memory",
+        "temporal.hidden-dir.crates-turbovec-napi-target-release-fingerprint-pest-derive-8c1c70363e95be5a",
+        "temporal.hidden-dir.crates-turbovec-napi-target-x86-64-pc-windows-msvc-release-fingerprint-byteorder",
+        "temporal.hidden-dir.crates-turbovec-napi-target-x86-64-pc-windows-msvc-release-fingerprint-ref-cast-",
+        "temporal.hidden-dir.simd-bridge-rust-hmm-repair-target-release-fingerprint-napi-derive-0473136a16a36"
+      ],
+      "topSourceRefs": [
+        ".cline/memory",
+        "crates/turbovec-napi/target/release/.fingerprint/pest_derive-8c1c70363e95be5a",
+        "crates/turbovec-napi/target/x86_64-pc-windows-msvc/release/.fingerprint/byteorder-b66d91f4f8c32802",
+        "crates/turbovec-napi/target/x86_64-pc-windows-msvc/release/.fingerprint/ref-cast-802e75cc050d9ff3",
+        "simd-bridge/rust/hmm-repair/target/release/.fingerprint/napi-derive-0473136a16a369ea"
+      ],
+      "statuses": {
+        "BACKLOG": 10
+      },
+      "backendCounts": {
+        "offline": 10
+      },
+      "priorityMax": 1,
+      "libtorch": {
+        "source": "cpu",
+        "cohesion": -0.0062,
+        "pairCount": 45
+      },
+      "recommendation": "Consolidate duplicate open work into one parent kanban item and keep the file-level labels as links."
+    },
+    {
+      "groupId": "temporal:cluster:88",
+      "recordCount": 10,
+      "openCount": 10,
+      "clusterIds": [
+        88,
+        105,
+        119
+      ],
+      "featureFamilies": [
+        "temporal"
+      ],
+      "sourceRefs": [
+        "dir:crates/turbovec-napi/target/release/.fingerprint/allocator-api2-5ce0e92036ca9324",
+        "dir:crates/turbovec-napi/target/release/.fingerprint/matrixmultiply-e9cae8cbab678422",
+        "dir:crates/turbovec-napi/target/release/.fingerprint/pin-project-lite-dd52106a9a9a45ce",
+        "dir:crates/turbovec-napi/target/x86_64-pc-windows-msvc/release/.fingerprint/gemm-f32-593374c270884f70",
+        "dir:.opencode/skills/rg-atlas",
+        "dir:simd-bridge/rust/graph-engine/target/x86_64-pc-windows-msvc/release/.fingerprint/zerocopy-8e7986c3801dfb51",
+        "dir:.svelte-error-fixes-backup/sveltekit-frontend/src/lib/components/_archive/test-demo/storybook",
+        "dir:.svelte-error-fixes-backup/sveltekit-frontend/src/lib/components/ui/gaming",
+        "dir:sveltekit-frontend/.venv_turbovec/Lib/site-packages/numpy/_core/include/numpy/random",
+        "dir:turbovec/target/release/.fingerprint/nano-gemm-f64-d5a0829d0a87649c"
+      ],
+      "topTitles": [
+        "Review hidden directory crates/turbovec-napi/target/release/.fingerprint/allocator-api2-5ce0e92036ca9324",
+        "Review hidden directory crates/turbovec-napi/target/release/.fingerprint/matrixmultiply-e9cae8cbab678422",
+        "Review hidden directory crates/turbovec-napi/target/release/.fingerprint/pin-project-lite-dd52106a9a9a45ce",
+        "Review hidden directory crates/turbovec-napi/target/x86_64-pc-windows-msvc/release/.fingerprint/gemm-f32-593374c270884f70",
+        "Review hidden directory .opencode/skills/rg-atlas"
+      ],
+      "topFeatureIds": [
+        "temporal.hidden-dir.crates-turbovec-napi-target-release-fingerprint-allocator-api2-5ce0e92036ca9324",
+        "temporal.hidden-dir.crates-turbovec-napi-target-release-fingerprint-matrixmultiply-e9cae8cbab678422",
+        "temporal.hidden-dir.crates-turbovec-napi-target-release-fingerprint-pin-project-lite-dd52106a9a9a45c",
+        "temporal.hidden-dir.crates-turbovec-napi-target-x86-64-pc-windows-msvc-release-fingerprint-gemm-f32-",
+        "temporal.hidden-dir.opencode-skills-rg-atlas"
+      ],
+      "topSourceRefs": [
+        "crates/turbovec-napi/target/release/.fingerprint/allocator-api2-5ce0e92036ca9324",
+        "crates/turbovec-napi/target/release/.fingerprint/matrixmultiply-e9cae8cbab678422",
+        "crates/turbovec-napi/target/release/.fingerprint/pin-project-lite-dd52106a9a9a45ce",
+        "crates/turbovec-napi/target/x86_64-pc-windows-msvc/release/.fingerprint/gemm-f32-593374c270884f70",
+        ".opencode/skills/rg-atlas"
+      ],
+      "statuses": {
+        "BACKLOG": 10
+      },
+      "backendCounts": {
+        "offline": 10
+      },
+      "priorityMax": 1,
+      "libtorch": {
+        "source": "cpu",
+        "cohesion": -0.0023,
+        "pairCount": 45
+      },
+      "recommendation": "Consolidate duplicate open work into one parent kanban item and keep the file-level labels as links."
+    },
+    {
+      "groupId": "temporal:cluster:15",
+      "recordCount": 10,
+      "openCount": 10,
+      "clusterIds": [
+        15,
+        32,
+        46
+      ],
+      "featureFamilies": [
+        "temporal"
+      ],
+      "sourceRefs": [
+        "dir:crates/turbovec-napi/target/release/.fingerprint/crossbeam-utils-c7a3b7678e4bc57d",
+        "dir:crates/turbovec-napi/target/release/.fingerprint/pest-7ec08ec89d9ee115",
+        "dir:crates/turbovec-napi/target/release/.fingerprint/semver-bf8ea6554afceaa6",
+        "dir:crates/turbovec-napi/target/x86_64-pc-windows-msvc/release/.fingerprint/libloading-4e488c4c56e27407",
+        "dir:.opencode/agents",
+        "dir:.opencode/skills/caveman-pipeline",
+        "dir:simd-bridge/rust/hmm-repair/target/debug/.fingerprint/napi-derive-backend-d7156d120ea0805c",
+        "dir:simd-bridge/rust/hmm-repair/target/debug/.fingerprint/quote-db0f38f22d40c808",
+        "dir:.svelte-error-fixes-backup/sveltekit-frontend/src/lib/components/detective",
+        "dir:turbovec/target/release/.fingerprint/unicode-ident-4e2f7ea2c1d68f1b"
+      ],
+      "topTitles": [
+        "Review hidden directory crates/turbovec-napi/target/release/.fingerprint/crossbeam-utils-c7a3b7678e4bc57d",
+        "Review hidden directory crates/turbovec-napi/target/release/.fingerprint/pest-7ec08ec89d9ee115",
+        "Review hidden directory crates/turbovec-napi/target/release/.fingerprint/semver-bf8ea6554afceaa6",
+        "Review hidden directory crates/turbovec-napi/target/x86_64-pc-windows-msvc/release/.fingerprint/libloading-4e488c4c56e27407",
+        "Review hidden directory .opencode/agents"
+      ],
+      "topFeatureIds": [
+        "temporal.hidden-dir.crates-turbovec-napi-target-release-fingerprint-crossbeam-utils-c7a3b7678e4bc57d",
+        "temporal.hidden-dir.crates-turbovec-napi-target-release-fingerprint-pest-7ec08ec89d9ee115",
+        "temporal.hidden-dir.crates-turbovec-napi-target-release-fingerprint-semver-bf8ea6554afceaa6",
+        "temporal.hidden-dir.crates-turbovec-napi-target-x86-64-pc-windows-msvc-release-fingerprint-libloadin",
+        "temporal.hidden-dir.opencode-agents"
+      ],
+      "topSourceRefs": [
+        "crates/turbovec-napi/target/release/.fingerprint/crossbeam-utils-c7a3b7678e4bc57d",
+        "crates/turbovec-napi/target/release/.fingerprint/pest-7ec08ec89d9ee115",
+        "crates/turbovec-napi/target/release/.fingerprint/semver-bf8ea6554afceaa6",
+        "crates/turbovec-napi/target/x86_64-pc-windows-msvc/release/.fingerprint/libloading-4e488c4c56e27407",
+        ".opencode/agents"
+      ],
+      "statuses": {
+        "BACKLOG": 10
+      },
+      "backendCounts": {
+        "offline": 10
+      },
+      "priorityMax": 1,
+      "libtorch": {
+        "source": "cpu",
+        "cohesion": 0.0038,
+        "pairCount": 45
+      },
+      "recommendation": "Consolidate duplicate open work into one parent kanban item and keep the file-level labels as links."
+    },
+    {
+      "groupId": "temporal:cluster:12",
+      "recordCount": 10,
+      "openCount": 10,
+      "clusterIds": [
+        12,
+        29,
+        43
+      ],
+      "featureFamilies": [
+        "temporal"
+      ],
+      "sourceRefs": [
+        "dir:crates/turbovec-napi/target/release/.fingerprint/equivalent-8985a98bc0b3cc21",
+        "dir:crates/turbovec-napi/target/x86_64-pc-windows-msvc/release/.fingerprint/nano-gemm-c64-4c72e5ef5cb84419",
+        "dir:.opencode/quarantine",
+        "dir:.opencode/skills/mcp-toolchain",
+        "dir:simd-bridge/rust/hmm-repair/target/x86_64-pc-windows-msvc/release/.fingerprint/serde_core-de6a92c612b5040a",
+        "dir:sveltekit-frontend/.vscode",
+        "dir:turbovec/target/release/.fingerprint/pest-d1bf94ad3e86685d",
+        "dir:turbovec/target/release/.fingerprint/proc-macro2-b570fb536f102c4d",
+        "dir:turbovec/target/release/.fingerprint/rand_distr-02989c992f449c38",
+        "dir:turbovec/target/release/.fingerprint/serde-afdece9cea7e822a"
+      ],
+      "topTitles": [
+        "Review hidden directory crates/turbovec-napi/target/release/.fingerprint/equivalent-8985a98bc0b3cc21",
+        "Review hidden directory crates/turbovec-napi/target/x86_64-pc-windows-msvc/release/.fingerprint/nano-gemm-c64-4c72e5ef5cb84419",
+        "Review hidden directory .opencode/quarantine",
+        "Review hidden directory .opencode/skills/mcp-toolchain",
+        "Review hidden directory simd-bridge/rust/hmm-repair/target/x86_64-pc-windows-msvc/release/.fingerprint/serde_core-de6a92c612b5040a"
+      ],
+      "topFeatureIds": [
+        "temporal.hidden-dir.crates-turbovec-napi-target-release-fingerprint-equivalent-8985a98bc0b3cc21",
+        "temporal.hidden-dir.crates-turbovec-napi-target-x86-64-pc-windows-msvc-release-fingerprint-nano-gemm",
+        "temporal.hidden-dir.opencode-quarantine",
+        "temporal.hidden-dir.opencode-skills-mcp-toolchain",
+        "temporal.hidden-dir.simd-bridge-rust-hmm-repair-target-x86-64-pc-windows-msvc-release-fingerprint-se"
+      ],
+      "topSourceRefs": [
+        "crates/turbovec-napi/target/release/.fingerprint/equivalent-8985a98bc0b3cc21",
+        "crates/turbovec-napi/target/x86_64-pc-windows-msvc/release/.fingerprint/nano-gemm-c64-4c72e5ef5cb84419",
+        ".opencode/quarantine",
+        ".opencode/skills/mcp-toolchain",
+        "simd-bridge/rust/hmm-repair/target/x86_64-pc-windows-msvc/release/.fingerprint/serde_core-de6a92c612b5040a"
+      ],
+      "statuses": {
+        "BACKLOG": 10
+      },
+      "backendCounts": {
+        "offline": 10
+      },
+      "priorityMax": 1,
+      "libtorch": {
+        "source": "cpu",
+        "cohesion": 0.0014,
+        "pairCount": 45
+      },
+      "recommendation": "Consolidate duplicate open work into one parent kanban item and keep the file-level labels as links."
+    },
+    {
+      "groupId": "temporal:cluster:51",
+      "recordCount": 10,
+      "openCount": 10,
+      "clusterIds": [
+        51,
+        68,
+        82
+      ],
+      "featureFamilies": [
+        "temporal"
+      ],
+      "sourceRefs": [
+        "dir:crates/turbovec-napi/target/release/.fingerprint/getrandom-37ed4a44137e16da",
+        "dir:crates/turbovec-napi/target/release/.fingerprint/nano-gemm-f64-bf695da03ba34d83",
+        "dir:crates/turbovec-napi/target/x86_64-pc-windows-msvc/release/.fingerprint/gemm-9627c051393aeebd",
+        "dir:crates/turbovec-napi/target/x86_64-pc-windows-msvc/release/.fingerprint/nano-gemm-f64-7c47134770a04739",
+        "dir:.opencode/skills/error-inference-research",
+        "dir:simd-bridge/rust/hmm-repair/target/release/.fingerprint/napi-derive-backend-80088bca173d0c30",
+        "dir:simd-bridge/rust-simdjson/target/release/.fingerprint/num-traits-6636bb40e70ea236",
+        "dir:simd-bridge/rust-simdjson/target/release/.fingerprint/unicode-ident-843302bae674673a",
+        "dir:.tmp/repairs",
+        "dir:turbovec/target/release/.fingerprint/serde-9d4239db6a298830"
+      ],
+      "topTitles": [
+        "Review hidden directory crates/turbovec-napi/target/release/.fingerprint/getrandom-37ed4a44137e16da",
+        "Review hidden directory crates/turbovec-napi/target/release/.fingerprint/nano-gemm-f64-bf695da03ba34d83",
+        "Review hidden directory crates/turbovec-napi/target/x86_64-pc-windows-msvc/release/.fingerprint/gemm-9627c051393aeebd",
+        "Review hidden directory crates/turbovec-napi/target/x86_64-pc-windows-msvc/release/.fingerprint/nano-gemm-f64-7c47134770a04739",
+        "Review hidden directory .opencode/skills/error-inference-research"
+      ],
+      "topFeatureIds": [
+        "temporal.hidden-dir.crates-turbovec-napi-target-release-fingerprint-getrandom-37ed4a44137e16da",
+        "temporal.hidden-dir.crates-turbovec-napi-target-release-fingerprint-nano-gemm-f64-bf695da03ba34d83",
+        "temporal.hidden-dir.crates-turbovec-napi-target-x86-64-pc-windows-msvc-release-fingerprint-gemm-9627",
+        "temporal.hidden-dir.crates-turbovec-napi-target-x86-64-pc-windows-msvc-release-fingerprint-nano-gemm",
+        "temporal.hidden-dir.opencode-skills-error-inference-research"
+      ],
+      "topSourceRefs": [
+        "crates/turbovec-napi/target/release/.fingerprint/getrandom-37ed4a44137e16da",
+        "crates/turbovec-napi/target/release/.fingerprint/nano-gemm-f64-bf695da03ba34d83",
+        "crates/turbovec-napi/target/x86_64-pc-windows-msvc/release/.fingerprint/gemm-9627c051393aeebd",
+        "crates/turbovec-napi/target/x86_64-pc-windows-msvc/release/.fingerprint/nano-gemm-f64-7c47134770a04739",
+        ".opencode/skills/error-inference-research"
+      ],
+      "statuses": {
+        "BACKLOG": 10
+      },
+      "backendCounts": {
+        "offline": 10
+      },
+      "priorityMax": 1,
+      "libtorch": {
+        "source": "cpu",
+        "cohesion": -0.0009,
+        "pairCount": 45
+      },
+      "recommendation": "Consolidate duplicate open work into one parent kanban item and keep the file-level labels as links."
+    },
+    {
+      "groupId": "temporal:cluster:78",
+      "recordCount": 10,
+      "openCount": 10,
+      "clusterIds": [
+        78,
+        95,
+        109
+      ],
+      "featureFamilies": [
+        "temporal"
+      ],
+      "sourceRefs": [
+        "dir:crates/turbovec-napi/target/release/.fingerprint/halfbrown-d5503f7715b4d817",
+        "dir:crates/turbovec-napi/target/release/.fingerprint/pulp-26fa804a6e12d1e1",
+        "dir:crates/turbovec-napi/target/release/.fingerprint/pulp-7ec889eeaae5ba4c",
+        "dir:crates/turbovec-napi/target/x86_64-pc-windows-msvc/release/.fingerprint/napi-sys-283b28b35d15a5c9",
+        "dir:.rag-metrics/embeddings",
+        "dir:simd-bridge/rust/graph-engine/target/x86_64-pc-windows-msvc/release/.fingerprint/indexmap-ab64d60fa95c8ac8",
+        "dir:simd-bridge/rust/hmm-repair/target/debug/.fingerprint/serde_core-5e9c360f096c1cc3",
+        "dir:simd-bridge/rust-simdjson/target/release/.fingerprint/crossbeam-utils-d39e9bd490d5b15c",
+        "dir:simd-bridge/rust-simdjson/target/release/.fingerprint/libloading-c85d0550b9c11bd3",
+        "dir:simd-bridge/rust-simdjson/target/release/.fingerprint/serde-080949b6170771c9"
+      ],
+      "topTitles": [
+        "Review hidden directory crates/turbovec-napi/target/release/.fingerprint/halfbrown-d5503f7715b4d817",
+        "Review hidden directory crates/turbovec-napi/target/release/.fingerprint/pulp-26fa804a6e12d1e1",
+        "Review hidden directory crates/turbovec-napi/target/release/.fingerprint/pulp-7ec889eeaae5ba4c",
+        "Review hidden directory crates/turbovec-napi/target/x86_64-pc-windows-msvc/release/.fingerprint/napi-sys-283b28b35d15a5c9",
+        "Review hidden directory .rag-metrics/embeddings"
+      ],
+      "topFeatureIds": [
+        "temporal.hidden-dir.crates-turbovec-napi-target-release-fingerprint-halfbrown-d5503f7715b4d817",
+        "temporal.hidden-dir.crates-turbovec-napi-target-release-fingerprint-pulp-26fa804a6e12d1e1",
+        "temporal.hidden-dir.crates-turbovec-napi-target-release-fingerprint-pulp-7ec889eeaae5ba4c",
+        "temporal.hidden-dir.crates-turbovec-napi-target-x86-64-pc-windows-msvc-release-fingerprint-napi-sys-",
+        "temporal.hidden-dir.rag-metrics-embeddings"
+      ],
+      "topSourceRefs": [
+        "crates/turbovec-napi/target/release/.fingerprint/halfbrown-d5503f7715b4d817",
+        "crates/turbovec-napi/target/release/.fingerprint/pulp-26fa804a6e12d1e1",
+        "crates/turbovec-napi/target/release/.fingerprint/pulp-7ec889eeaae5ba4c",
+        "crates/turbovec-napi/target/x86_64-pc-windows-msvc/release/.fingerprint/napi-sys-283b28b35d15a5c9",
+        ".rag-metrics/embeddings"
+      ],
+      "statuses": {
+        "BACKLOG": 10
+      },
+      "backendCounts": {
+        "offline": 10
+      },
+      "priorityMax": 1,
+      "libtorch": {
+        "source": "cpu",
+        "cohesion": 0.0015,
+        "pairCount": 45
+      },
+      "recommendation": "Consolidate duplicate open work into one parent kanban item and keep the file-level labels as links."
+    },
+    {
+      "groupId": "temporal:cluster:123",
+      "recordCount": 10,
+      "openCount": 10,
+      "clusterIds": [
+        12,
+        26,
+        123
+      ],
+      "featureFamilies": [
+        "temporal"
+      ],
+      "sourceRefs": [
+        "dir:crates/turbovec-napi/target/release/.fingerprint/num-traits-f38c48a4e7d0332c",
+        "dir:crates/turbovec-napi/target/release/.fingerprint/turbovec-a2bd91c64f44ff40",
+        "dir:crates/turbovec-napi/target/release/.fingerprint/windows-link-63e904a6b638423e",
+        "dir:crates/turbovec-napi/target/x86_64-pc-windows-msvc/release/.fingerprint/nano-gemm-a9ac94b333e0d740",
+        "dir:.opencode/skills/feature-labeling",
+        "dir:simd-bridge/rust/hmm-repair/target/release/.fingerprint/quote-d9ef1d8a31833ee2",
+        "dir:simd-bridge/rust-simdjson/target/release/.fingerprint/value-trait-395fc4f6bc1eb3df",
+        "dir:.svelte-error-fixes-backup/sveltekit-frontend/src/routes/(ai)",
+        "dir:turbovec/target/release/.fingerprint/dyn-stack-450e95f81c086a49",
+        "dir:turbovec/target/release/.fingerprint/memoffset-266e1cf153bae6f5"
+      ],
+      "topTitles": [
+        "Review hidden directory crates/turbovec-napi/target/release/.fingerprint/num-traits-f38c48a4e7d0332c",
+        "Review hidden directory crates/turbovec-napi/target/release/.fingerprint/turbovec-a2bd91c64f44ff40",
+        "Review hidden directory crates/turbovec-napi/target/release/.fingerprint/windows-link-63e904a6b638423e",
+        "Review hidden directory crates/turbovec-napi/target/x86_64-pc-windows-msvc/release/.fingerprint/nano-gemm-a9ac94b333e0d740",
+        "Review hidden directory .opencode/skills/feature-labeling"
+      ],
+      "topFeatureIds": [
+        "temporal.hidden-dir.crates-turbovec-napi-target-release-fingerprint-num-traits-f38c48a4e7d0332c",
+        "temporal.hidden-dir.crates-turbovec-napi-target-release-fingerprint-turbovec-a2bd91c64f44ff40",
+        "temporal.hidden-dir.crates-turbovec-napi-target-release-fingerprint-windows-link-63e904a6b638423e",
+        "temporal.hidden-dir.crates-turbovec-napi-target-x86-64-pc-windows-msvc-release-fingerprint-nano-gemm",
+        "temporal.hidden-dir.opencode-skills-feature-labeling"
+      ],
+      "topSourceRefs": [
+        "crates/turbovec-napi/target/release/.fingerprint/num-traits-f38c48a4e7d0332c",
+        "crates/turbovec-napi/target/release/.fingerprint/turbovec-a2bd91c64f44ff40",
+        "crates/turbovec-napi/target/release/.fingerprint/windows-link-63e904a6b638423e",
+        "crates/turbovec-napi/target/x86_64-pc-windows-msvc/release/.fingerprint/nano-gemm-a9ac94b333e0d740",
+        ".opencode/skills/feature-labeling"
+      ],
+      "statuses": {
+        "BACKLOG": 10
+      },
+      "backendCounts": {
+        "offline": 10
+      },
+      "priorityMax": 1,
+      "libtorch": {
+        "source": "cpu",
+        "cohesion": -0.0077,
+        "pairCount": 45
+      },
+      "recommendation": "Consolidate duplicate open work into one parent kanban item and keep the file-level labels as links."
+    },
+    {
+      "groupId": "temporal:cluster:94",
+      "recordCount": 10,
+      "openCount": 10,
+      "clusterIds": [
+        94,
+        111,
+        125
+      ],
+      "featureFamilies": [
+        "temporal"
+      ],
+      "sourceRefs": [
+        "dir:crates/turbovec-napi/target/x86_64-pc-windows-msvc/release/.fingerprint/equator-207cecd46d0e58a7",
+        "dir:crates/turbovec-napi/target/x86_64-pc-windows-msvc/release/.fingerprint/equator-650d1dcdfc94fe79",
+        "dir:crates/turbovec-napi/target/x86_64-pc-windows-msvc/release/.fingerprint/hashbrown-20b81ab1bab96fcc",
+        "dir:crates/turbovec-napi/target/x86_64-pc-windows-msvc/release/.fingerprint/raw-cpuid-d5c8e52a3304d6c4",
+        "dir:.python311/lib/python3.11/site-packages/pip-24.0.dist-info",
+        "dir:simd-bridge/rust/hmm-repair/target/release/.fingerprint/regex-automata-030c1a71414bd09c",
+        "dir:simd-bridge/rust/hmm-repair/target/release/.fingerprint/serde_derive-fa993eafe07be556",
+        "dir:.svelte-error-fixes-backup/sveltekit-frontend/src/lib/components/canvas",
+        "dir:.tmp/rg-search-dump-packets",
+        "dir:turbovec/target/release/.fingerprint/nano-gemm-codegen-210d8218d6b2ae09"
+      ],
+      "topTitles": [
+        "Review hidden directory crates/turbovec-napi/target/x86_64-pc-windows-msvc/release/.fingerprint/equator-207cecd46d0e58a7",
+        "Review hidden directory crates/turbovec-napi/target/x86_64-pc-windows-msvc/release/.fingerprint/equator-650d1dcdfc94fe79",
+        "Review hidden directory crates/turbovec-napi/target/x86_64-pc-windows-msvc/release/.fingerprint/hashbrown-20b81ab1bab96fcc",
+        "Review hidden directory crates/turbovec-napi/target/x86_64-pc-windows-msvc/release/.fingerprint/raw-cpuid-d5c8e52a3304d6c4",
+        "Review hidden directory .python311/lib/python3.11/site-packages/pip-24.0.dist-info"
+      ],
+      "topFeatureIds": [
+        "temporal.hidden-dir.crates-turbovec-napi-target-x86-64-pc-windows-msvc-release-fingerprint-equator-2",
+        "temporal.hidden-dir.crates-turbovec-napi-target-x86-64-pc-windows-msvc-release-fingerprint-equator-6",
+        "temporal.hidden-dir.crates-turbovec-napi-target-x86-64-pc-windows-msvc-release-fingerprint-hashbrown",
+        "temporal.hidden-dir.crates-turbovec-napi-target-x86-64-pc-windows-msvc-release-fingerprint-raw-cpuid",
+        "temporal.hidden-dir.python311-lib-python3-11-site-packages-pip-24-0-dist-info"
+      ],
+      "topSourceRefs": [
+        "crates/turbovec-napi/target/x86_64-pc-windows-msvc/release/.fingerprint/equator-207cecd46d0e58a7",
+        "crates/turbovec-napi/target/x86_64-pc-windows-msvc/release/.fingerprint/equator-650d1dcdfc94fe79",
+        "crates/turbovec-napi/target/x86_64-pc-windows-msvc/release/.fingerprint/hashbrown-20b81ab1bab96fcc",
+        "crates/turbovec-napi/target/x86_64-pc-windows-msvc/release/.fingerprint/raw-cpuid-d5c8e52a3304d6c4",
+        ".python311/lib/python3.11/site-packages/pip-24.0.dist-info"
+      ],
+      "statuses": {
+        "BACKLOG": 10
+      },
+      "backendCounts": {
+        "offline": 10
+      },
+      "priorityMax": 1,
+      "libtorch": {
+        "source": "cpu",
+        "cohesion": 0.0018,
+        "pairCount": 45
+      },
+      "recommendation": "Consolidate duplicate open work into one parent kanban item and keep the file-level labels as links."
+    },
+    {
+      "groupId": "temporal:cluster:68",
+      "recordCount": 9,
+      "openCount": 9,
+      "clusterIds": [
+        68,
+        85,
+        99
+      ],
+      "featureFamilies": [
+        "temporal"
+      ],
+      "sourceRefs": [
+        "dir:claude-mem/.claude/commands",
+        "dir:crates/turbovec-napi/target/release/.fingerprint/wide-69040ffb3d9ed97c",
+        "dir:crates/turbovec-napi/target/x86_64-pc-windows-msvc/release/.fingerprint/gemm-f64-5565b5de148b3132",
+        "dir:simd-bridge/rust/hmm-repair/target/debug/.fingerprint/serde_json-f2f0d07b853d9365",
+        "dir:simd-bridge/rust-simdjson/target/release/.fingerprint/hashbrown-505667eaba4ce956",
+        "dir:sveltekit-frontend/.claude",
+        "dir:turbovec/target/release/.fingerprint/bytemuck-3e31abd75e8c8005",
+        "dir:next_steps/completed",
+        "dir:.tmp"
+      ],
+      "topTitles": [
+        "Review hidden directory claude-mem/.claude/commands",
+        "Review hidden directory crates/turbovec-napi/target/release/.fingerprint/wide-69040ffb3d9ed97c",
+        "Review hidden directory crates/turbovec-napi/target/x86_64-pc-windows-msvc/release/.fingerprint/gemm-f64-5565b5de148b3132",
+        "Review hidden directory simd-bridge/rust/hmm-repair/target/debug/.fingerprint/serde_json-f2f0d07b853d9365",
+        "Review hidden directory simd-bridge/rust-simdjson/target/release/.fingerprint/hashbrown-505667eaba4ce956"
+      ],
+      "topFeatureIds": [
+        "temporal.hidden-dir.claude-mem-claude-commands",
+        "temporal.hidden-dir.crates-turbovec-napi-target-release-fingerprint-wide-69040ffb3d9ed97c",
+        "temporal.hidden-dir.crates-turbovec-napi-target-x86-64-pc-windows-msvc-release-fingerprint-gemm-f64-",
+        "temporal.hidden-dir.simd-bridge-rust-hmm-repair-target-debug-fingerprint-serde-json-f2f0d07b853d9365",
+        "temporal.hidden-dir.simd-bridge-rust-simdjson-target-release-fingerprint-hashbrown-505667eaba4ce956"
+      ],
+      "topSourceRefs": [
+        "claude-mem/.claude/commands",
+        "crates/turbovec-napi/target/release/.fingerprint/wide-69040ffb3d9ed97c",
+        "crates/turbovec-napi/target/x86_64-pc-windows-msvc/release/.fingerprint/gemm-f64-5565b5de148b3132",
+        "simd-bridge/rust/hmm-repair/target/debug/.fingerprint/serde_json-f2f0d07b853d9365",
+        "simd-bridge/rust-simdjson/target/release/.fingerprint/hashbrown-505667eaba4ce956"
+      ],
+      "statuses": {
+        "BACKLOG": 7,
+        "REVIEW": 2
+      },
+      "backendCounts": {
+        "offline": 9
+      },
+      "priorityMax": 2,
+      "libtorch": {
+        "source": "cpu",
+        "cohesion": 0.0075,
+        "pairCount": 36
+      },
+      "recommendation": "Consolidate duplicate open work into one parent kanban item and keep the file-level labels as links."
+    },
+    {
+      "groupId": "temporal:cluster:127",
+      "recordCount": 9,
+      "openCount": 9,
+      "clusterIds": [
+        16,
+        30,
+        127
+      ],
+      "featureFamilies": [
+        "temporal"
+      ],
+      "sourceRefs": [
+        "dir:crates/turbovec-napi/target/release/.fingerprint/bytemuck-95db94353fc275de",
+        "dir:crates/turbovec-napi/target/x86_64-pc-windows-msvc/release/.fingerprint/rand_chacha-8f59f85e784a451c",
+        "dir:.opencode/tasks",
+        "dir:simd-bridge/rust/hmm-repair/target/debug/.fingerprint/ctor-9cae0776433f9677",
+        "dir:simd-bridge/rust/hmm-repair/target/x86_64-pc-windows-msvc/debug/.fingerprint/zmij-8789da123a88652e",
+        "dir:.svelte-error-fixes-backup/sveltekit-frontend/src/lib/components/feedback",
+        "dir:sveltekit-frontend/.tmp/drizzle-introspect-v2/meta",
+        "dir:sveltekit-frontend/logs/task-output/pipeline-test",
+        "dir:sveltekit-frontend/.tmp"
+      ],
+      "topTitles": [
+        "Review hidden directory crates/turbovec-napi/target/release/.fingerprint/bytemuck-95db94353fc275de",
+        "Review hidden directory crates/turbovec-napi/target/x86_64-pc-windows-msvc/release/.fingerprint/rand_chacha-8f59f85e784a451c",
+        "Review hidden directory .opencode/tasks",
+        "Review hidden directory simd-bridge/rust/hmm-repair/target/debug/.fingerprint/ctor-9cae0776433f9677",
+        "Review hidden directory simd-bridge/rust/hmm-repair/target/x86_64-pc-windows-msvc/debug/.fingerprint/zmij-8789da123a88652e"
+      ],
+      "topFeatureIds": [
+        "temporal.hidden-dir.crates-turbovec-napi-target-release-fingerprint-bytemuck-95db94353fc275de",
+        "temporal.hidden-dir.crates-turbovec-napi-target-x86-64-pc-windows-msvc-release-fingerprint-rand-chac",
+        "temporal.hidden-dir.opencode-tasks",
+        "temporal.hidden-dir.simd-bridge-rust-hmm-repair-target-debug-fingerprint-ctor-9cae0776433f9677",
+        "temporal.hidden-dir.simd-bridge-rust-hmm-repair-target-x86-64-pc-windows-msvc-debug-fingerprint-zmij"
+      ],
+      "topSourceRefs": [
+        "crates/turbovec-napi/target/release/.fingerprint/bytemuck-95db94353fc275de",
+        "crates/turbovec-napi/target/x86_64-pc-windows-msvc/release/.fingerprint/rand_chacha-8f59f85e784a451c",
+        ".opencode/tasks",
+        "simd-bridge/rust/hmm-repair/target/debug/.fingerprint/ctor-9cae0776433f9677",
+        "simd-bridge/rust/hmm-repair/target/x86_64-pc-windows-msvc/debug/.fingerprint/zmij-8789da123a88652e"
+      ],
+      "statuses": {
+        "BACKLOG": 7,
+        "REVIEW": 2
+      },
+      "backendCounts": {
+        "offline": 9
+      },
+      "priorityMax": 2,
+      "libtorch": {
+        "source": "cpu",
+        "cohesion": 0.0024,
+        "pairCount": 36
+      },
+      "recommendation": "Consolidate duplicate open work into one parent kanban item and keep the file-level labels as links."
+    },
+    {
+      "groupId": "temporal:cluster:110",
+      "recordCount": 9,
+      "openCount": 9,
+      "clusterIds": [
+        13,
+        110,
+        127
+      ],
+      "featureFamilies": [
+        "temporal"
+      ],
+      "sourceRefs": [
+        "dir:crates/turbovec-napi/target/release/.fingerprint/nano-gemm-f32-5d9b651ac9b4d51c",
+        "dir:crates/turbovec-napi/target/release/.fingerprint/num-bigint-6117b63835c80887",
+        "dir:crates/turbovec-napi/target/x86_64-pc-windows-msvc/release/.fingerprint/faer-entity-6addeaa1cae6231c",
+        "dir:simd-bridge/rust/graph-engine/target/release/.fingerprint/zerocopy-83494a6de94c78c4",
+        "dir:simd-bridge/rust-simdjson/target/release/.fingerprint/once_cell-4ec8bd9483aed2a6",
+        "dir:turbovec/target/release/.fingerprint/dyn-stack-8dde547919d4c996",
+        "dir:turbovec/target/release/.fingerprint/nano-gemm-c32-a442629ab0c50ce7",
+        "dir:scripts/unsloth-training/COLAB_PACKAGE",
+        "dir:sveltekit-frontend/.opencode/recommendations"
+      ],
+      "topTitles": [
+        "Review hidden directory crates/turbovec-napi/target/release/.fingerprint/nano-gemm-f32-5d9b651ac9b4d51c",
+        "Review hidden directory crates/turbovec-napi/target/release/.fingerprint/num-bigint-6117b63835c80887",
+        "Review hidden directory crates/turbovec-napi/target/x86_64-pc-windows-msvc/release/.fingerprint/faer-entity-6addeaa1cae6231c",
+        "Review hidden directory simd-bridge/rust/graph-engine/target/release/.fingerprint/zerocopy-83494a6de94c78c4",
+        "Review hidden directory simd-bridge/rust-simdjson/target/release/.fingerprint/once_cell-4ec8bd9483aed2a6"
+      ],
+      "topFeatureIds": [
+        "temporal.hidden-dir.crates-turbovec-napi-target-release-fingerprint-nano-gemm-f32-5d9b651ac9b4d51c",
+        "temporal.hidden-dir.crates-turbovec-napi-target-release-fingerprint-num-bigint-6117b63835c80887",
+        "temporal.hidden-dir.crates-turbovec-napi-target-x86-64-pc-windows-msvc-release-fingerprint-faer-enti",
+        "temporal.hidden-dir.simd-bridge-rust-graph-engine-target-release-fingerprint-zerocopy-83494a6de94c78",
+        "temporal.hidden-dir.simd-bridge-rust-simdjson-target-release-fingerprint-once-cell-4ec8bd9483aed2a6"
+      ],
+      "topSourceRefs": [
+        "crates/turbovec-napi/target/release/.fingerprint/nano-gemm-f32-5d9b651ac9b4d51c",
+        "crates/turbovec-napi/target/release/.fingerprint/num-bigint-6117b63835c80887",
+        "crates/turbovec-napi/target/x86_64-pc-windows-msvc/release/.fingerprint/faer-entity-6addeaa1cae6231c",
+        "simd-bridge/rust/graph-engine/target/release/.fingerprint/zerocopy-83494a6de94c78c4",
+        "simd-bridge/rust-simdjson/target/release/.fingerprint/once_cell-4ec8bd9483aed2a6"
+      ],
+      "statuses": {
+        "BACKLOG": 7,
+        "REVIEW": 2
+      },
+      "backendCounts": {
+        "offline": 9
+      },
+      "priorityMax": 2,
+      "libtorch": {
+        "source": "cpu",
+        "cohesion": -0.0088,
+        "pairCount": 36
+      },
+      "recommendation": "Consolidate duplicate open work into one parent kanban item and keep the file-level labels as links."
+    },
+    {
+      "groupId": "temporal:cluster:56",
+      "recordCount": 9,
+      "openCount": 9,
+      "clusterIds": [
+        56,
+        73,
+        87
+      ],
+      "featureFamilies": [
+        "temporal"
+      ],
+      "sourceRefs": [
+        "dir:crates/turbovec-napi/target/release/.fingerprint/rand-5606990840a9769d",
+        "dir:crates/turbovec-napi/target/x86_64-pc-windows-msvc/release/.fingerprint/bitflags-a93c57b0437131ed",
+        "dir:crates/turbovec-napi/target/x86_64-pc-windows-msvc/release/.fingerprint/crossbeam-deque-575e2a35fdba1260",
+        "dir:crates/turbovec-napi/target/x86_64-pc-windows-msvc/release/.fingerprint/pulp-5a726ccfa551b12f",
+        "dir:.opencode/skills/project-manager",
+        "dir:simd-bridge/rust/hmm-repair/target/x86_64-pc-windows-msvc/debug/.fingerprint/libloading-2e25a406cbfc0b44",
+        "dir:turbovec/target/release/.fingerprint/num-traits-1aaec69ced5c576a",
+        "dir:turbovec/target/release/.fingerprint/proc-macro2-a988aa8e84bb265f",
+        "dir:docs/status"
+      ],
+      "topTitles": [
+        "Review hidden directory crates/turbovec-napi/target/release/.fingerprint/rand-5606990840a9769d",
+        "Review hidden directory crates/turbovec-napi/target/x86_64-pc-windows-msvc/release/.fingerprint/bitflags-a93c57b0437131ed",
+        "Review hidden directory crates/turbovec-napi/target/x86_64-pc-windows-msvc/release/.fingerprint/crossbeam-deque-575e2a35fdba1260",
+        "Review hidden directory crates/turbovec-napi/target/x86_64-pc-windows-msvc/release/.fingerprint/pulp-5a726ccfa551b12f",
+        "Review hidden directory .opencode/skills/project-manager"
+      ],
+      "topFeatureIds": [
+        "temporal.hidden-dir.crates-turbovec-napi-target-release-fingerprint-rand-5606990840a9769d",
+        "temporal.hidden-dir.crates-turbovec-napi-target-x86-64-pc-windows-msvc-release-fingerprint-bitflags-",
+        "temporal.hidden-dir.crates-turbovec-napi-target-x86-64-pc-windows-msvc-release-fingerprint-crossbeam",
+        "temporal.hidden-dir.crates-turbovec-napi-target-x86-64-pc-windows-msvc-release-fingerprint-pulp-5a72",
+        "temporal.hidden-dir.opencode-skills-project-manager"
+      ],
+      "topSourceRefs": [
+        "crates/turbovec-napi/target/release/.fingerprint/rand-5606990840a9769d",
+        "crates/turbovec-napi/target/x86_64-pc-windows-msvc/release/.fingerprint/bitflags-a93c57b0437131ed",
+        "crates/turbovec-napi/target/x86_64-pc-windows-msvc/release/.fingerprint/crossbeam-deque-575e2a35fdba1260",
+        "crates/turbovec-napi/target/x86_64-pc-windows-msvc/release/.fingerprint/pulp-5a726ccfa551b12f",
+        ".opencode/skills/project-manager"
+      ],
+      "statuses": {
+        "BACKLOG": 8,
+        "REVIEW": 1
+      },
+      "backendCounts": {
+        "offline": 9
+      },
+      "priorityMax": 2,
+      "libtorch": {
+        "source": "cpu",
+        "cohesion": -0.007,
+        "pairCount": 36
+      },
+      "recommendation": "Consolidate duplicate open work into one parent kanban item and keep the file-level labels as links."
+    },
+    {
+      "groupId": "temporal:cluster:38",
+      "recordCount": 9,
+      "openCount": 9,
+      "clusterIds": [
+        38,
+        55,
+        69
+      ],
+      "featureFamilies": [
+        "temporal"
+      ],
+      "sourceRefs": [
+        "dir:crates/turbovec-napi/target/release/.fingerprint/raw-cpuid-892f637003867ebc",
+        "dir:simd-bridge/rust/graph-engine/target/release/.fingerprint/syn-83bb9f2499dd793e",
+        "dir:simd-bridge/rust/hmm-repair/target/debug/.fingerprint/cfg-if-26ef73b6fc7ab60c",
+        "dir:.svelte-error-fixes-backup/sveltekit-frontend/src/lib/components/navigation",
+        "dir:sveltekit-frontend/.tmp/turbovec",
+        "dir:turbovec/target/release/.fingerprint/once_cell-855f65ca18ff7a84",
+        "dir:turbovec/target/release/.fingerprint/pest_meta-739ab3f622047a41",
+        "dir:turbovec/target/release/.fingerprint/pyo3-65020eca2d6fceb7",
+        "dir:sveltekit-frontend/next_steps/active"
+      ],
+      "topTitles": [
+        "Review hidden directory crates/turbovec-napi/target/release/.fingerprint/raw-cpuid-892f637003867ebc",
+        "Review hidden directory simd-bridge/rust/graph-engine/target/release/.fingerprint/syn-83bb9f2499dd793e",
+        "Review hidden directory simd-bridge/rust/hmm-repair/target/debug/.fingerprint/cfg-if-26ef73b6fc7ab60c",
+        "Review hidden directory .svelte-error-fixes-backup/sveltekit-frontend/src/lib/components/navigation",
+        "Review hidden directory sveltekit-frontend/.tmp/turbovec"
+      ],
+      "topFeatureIds": [
+        "temporal.hidden-dir.crates-turbovec-napi-target-release-fingerprint-raw-cpuid-892f637003867ebc",
+        "temporal.hidden-dir.simd-bridge-rust-graph-engine-target-release-fingerprint-syn-83bb9f2499dd793e",
+        "temporal.hidden-dir.simd-bridge-rust-hmm-repair-target-debug-fingerprint-cfg-if-26ef73b6fc7ab60c",
+        "temporal.hidden-dir.svelte-error-fixes-backup-sveltekit-frontend-src-lib-components-navigation",
+        "temporal.hidden-dir.sveltekit-frontend-tmp-turbovec"
+      ],
+      "topSourceRefs": [
+        "crates/turbovec-napi/target/release/.fingerprint/raw-cpuid-892f637003867ebc",
+        "simd-bridge/rust/graph-engine/target/release/.fingerprint/syn-83bb9f2499dd793e",
+        "simd-bridge/rust/hmm-repair/target/debug/.fingerprint/cfg-if-26ef73b6fc7ab60c",
+        ".svelte-error-fixes-backup/sveltekit-frontend/src/lib/components/navigation",
+        "sveltekit-frontend/.tmp/turbovec"
+      ],
+      "statuses": {
+        "BACKLOG": 8,
+        "REVIEW": 1
+      },
+      "backendCounts": {
+        "offline": 9
+      },
+      "priorityMax": 2,
+      "libtorch": {
+        "source": "cpu",
+        "cohesion": 0.0132,
+        "pairCount": 36
+      },
+      "recommendation": "Consolidate duplicate open work into one parent kanban item and keep the file-level labels as links."
+    },
+    {
+      "groupId": "temporal:cluster:119",
+      "recordCount": 9,
+      "openCount": 9,
+      "clusterIds": [
+        8,
+        22,
+        119
+      ],
+      "featureFamilies": [
+        "temporal"
+      ],
+      "sourceRefs": [
+        "dir:crates/turbovec-napi/target/release/.fingerprint/serde_core-bac6b1b0129b1021",
+        "dir:crates/turbovec-napi/target/release/.fingerprint/serde_derive-179fd9f019900e29",
+        "dir:crates/turbovec-napi/target/release/.fingerprint/unicode-ident-843302bae674673a",
+        "dir:crates/turbovec-napi/target/x86_64-pc-windows-msvc/release/.fingerprint/coe-rs-afac16d053aa9684",
+        "dir:simd-bridge/rust/graph-engine/target/x86_64-pc-windows-msvc/release/.fingerprint/rand_core-7a7e49a7de5056bc",
+        "dir:simd-bridge/rust/hmm-repair/target/release/.fingerprint/quote-c0c9534ab09bcc23",
+        "dir:simd-bridge/rust/hmm-repair/target/x86_64-pc-windows-msvc/release/.fingerprint/napi-sys-59ebdee55fabf67a",
+        "dir:turbovec/target/release/.fingerprint/pyo3-63041c50355f5552",
+        "dir:sveltekit-frontend/docs/atlas"
+      ],
+      "topTitles": [
+        "Review hidden directory crates/turbovec-napi/target/release/.fingerprint/serde_core-bac6b1b0129b1021",
+        "Review hidden directory crates/turbovec-napi/target/release/.fingerprint/serde_derive-179fd9f019900e29",
+        "Review hidden directory crates/turbovec-napi/target/release/.fingerprint/unicode-ident-843302bae674673a",
+        "Review hidden directory crates/turbovec-napi/target/x86_64-pc-windows-msvc/release/.fingerprint/coe-rs-afac16d053aa9684",
+        "Review hidden directory simd-bridge/rust/graph-engine/target/x86_64-pc-windows-msvc/release/.fingerprint/rand_core-7a7e49a7de5056bc"
+      ],
+      "topFeatureIds": [
+        "temporal.hidden-dir.crates-turbovec-napi-target-release-fingerprint-serde-core-bac6b1b0129b1021",
+        "temporal.hidden-dir.crates-turbovec-napi-target-release-fingerprint-serde-derive-179fd9f019900e29",
+        "temporal.hidden-dir.crates-turbovec-napi-target-release-fingerprint-unicode-ident-843302bae674673a",
+        "temporal.hidden-dir.crates-turbovec-napi-target-x86-64-pc-windows-msvc-release-fingerprint-coe-rs-af",
+        "temporal.hidden-dir.simd-bridge-rust-graph-engine-target-x86-64-pc-windows-msvc-release-fingerprint-"
+      ],
+      "topSourceRefs": [
+        "crates/turbovec-napi/target/release/.fingerprint/serde_core-bac6b1b0129b1021",
+        "crates/turbovec-napi/target/release/.fingerprint/serde_derive-179fd9f019900e29",
+        "crates/turbovec-napi/target/release/.fingerprint/unicode-ident-843302bae674673a",
+        "crates/turbovec-napi/target/x86_64-pc-windows-msvc/release/.fingerprint/coe-rs-afac16d053aa9684",
+        "simd-bridge/rust/graph-engine/target/x86_64-pc-windows-msvc/release/.fingerprint/rand_core-7a7e49a7de5056bc"
+      ],
+      "statuses": {
+        "BACKLOG": 8,
+        "REVIEW": 1
+      },
+      "backendCounts": {
+        "offline": 9
+      },
+      "priorityMax": 2,
+      "libtorch": {
+        "source": "cpu",
+        "cohesion": 0.0025,
+        "pairCount": 36
+      },
+      "recommendation": "Consolidate duplicate open work into one parent kanban item and keep the file-level labels as links."
+    },
+    {
+      "groupId": "temporal:cluster:109",
+      "recordCount": 9,
+      "openCount": 9,
+      "clusterIds": [
+        12,
+        109,
+        126
+      ],
+      "featureFamilies": [
+        "temporal"
+      ],
+      "sourceRefs": [
+        "dir:crates/turbovec-napi/target/x86_64-pc-windows-msvc/release/.fingerprint/allocator-api2-184daec59ed2815f",
+        "dir:crates/turbovec-napi/target/x86_64-pc-windows-msvc/release/.fingerprint/libm-39b8f2d096631c48",
+        "dir:crates/turbovec-napi/target/x86_64-pc-windows-msvc/release/.fingerprint/memchr-5719643c8f29be7d",
+        "dir:.opencode/skills/metadata-context-analysis",
+        "dir:simd-bridge/rust/hmm-repair/target/release/.fingerprint/zmij-7af9eed5a26f91c2",
+        "dir:simd-bridge/rust-simdjson/target/release/.fingerprint/zerocopy-9e37593f936f3696",
+        "dir:turbovec/target/release/.fingerprint/serde_core-a931422240004d95",
+        "dir:docs",
+        "dir:."
+      ],
+      "topTitles": [
+        "Review hidden directory crates/turbovec-napi/target/x86_64-pc-windows-msvc/release/.fingerprint/allocator-api2-184daec59ed2815f",
+        "Review hidden directory crates/turbovec-napi/target/x86_64-pc-windows-msvc/release/.fingerprint/libm-39b8f2d096631c48",
+        "Review hidden directory crates/turbovec-napi/target/x86_64-pc-windows-msvc/release/.fingerprint/memchr-5719643c8f29be7d",
+        "Review hidden directory .opencode/skills/metadata-context-analysis",
+        "Review hidden directory simd-bridge/rust/hmm-repair/target/release/.fingerprint/zmij-7af9eed5a26f91c2"
+      ],
+      "topFeatureIds": [
+        "temporal.hidden-dir.crates-turbovec-napi-target-x86-64-pc-windows-msvc-release-fingerprint-allocator",
+        "temporal.hidden-dir.crates-turbovec-napi-target-x86-64-pc-windows-msvc-release-fingerprint-libm-39b8",
+        "temporal.hidden-dir.crates-turbovec-napi-target-x86-64-pc-windows-msvc-release-fingerprint-memchr-57",
+        "temporal.hidden-dir.opencode-skills-metadata-context-analysis",
+        "temporal.hidden-dir.simd-bridge-rust-hmm-repair-target-release-fingerprint-zmij-7af9eed5a26f91c2"
+      ],
+      "topSourceRefs": [
+        "crates/turbovec-napi/target/x86_64-pc-windows-msvc/release/.fingerprint/allocator-api2-184daec59ed2815f",
+        "crates/turbovec-napi/target/x86_64-pc-windows-msvc/release/.fingerprint/libm-39b8f2d096631c48",
+        "crates/turbovec-napi/target/x86_64-pc-windows-msvc/release/.fingerprint/memchr-5719643c8f29be7d",
+        ".opencode/skills/metadata-context-analysis",
+        "simd-bridge/rust/hmm-repair/target/release/.fingerprint/zmij-7af9eed5a26f91c2"
+      ],
+      "statuses": {
+        "BACKLOG": 7,
+        "REVIEW": 2
+      },
+      "backendCounts": {
+        "offline": 9
+      },
+      "priorityMax": 2,
+      "libtorch": {
+        "source": "cpu",
+        "cohesion": 0.0009,
+        "pairCount": 36
+      },
+      "recommendation": "Consolidate duplicate open work into one parent kanban item and keep the file-level labels as links."
+    },
+    {
+      "groupId": "master-todo:cluster:96",
+      "recordCount": 9,
+      "openCount": 9,
+      "clusterIds": [
+        96,
+        113,
+        127
+      ],
+      "featureFamilies": [
+        "master-todo"
+      ],
+      "sourceRefs": [
+        "MASTER-FEATURE-TODO-2026-05-20.md:836",
+        "MASTER-FEATURE-TODO-2026-05-20.md:382",
+        "MASTER-FEATURE-TODO-2026-05-20.md:445",
+        "MASTER-FEATURE-TODO-2026-05-20.md:888",
+        "MASTER-FEATURE-TODO-2026-05-20.md:378",
+        "MASTER-FEATURE-TODO-2026-05-20.md:235",
+        "MASTER-FEATURE-TODO-2026-05-20.md:317",
+        "MASTER-FEATURE-TODO-2026-05-20.md:383",
+        "MASTER-FEATURE-TODO-2026-05-20.md:746"
+      ],
+      "topTitles": [
+        "Parent atlas refresh using only the production-ready feature list",
+        "Keep the Postgres 18 indexing tables, Qdrant multi-query tags, and JSONB card…",
+        "Add the export/import bridge that turns local SQLite research state into cano…",
+        "Do not treat the CUDA path as mandatory for the browser or startup lanes",
+        "Formalize the later compute lanes for PyTorch XGBoost reranking, SOM clusteri…"
+      ],
+      "topFeatureIds": [
+        "master-todo.nes-glyph-architecture-notes-sourceref-f",
+        "master-todo.unknown"
+      ],
+      "topSourceRefs": [],
+      "statuses": {
+        "BACKLOG": 9
+      },
+      "backendCounts": {
+        "offline": 9
+      },
+      "priorityMax": 1,
+      "libtorch": {
+        "source": "cpu",
+        "cohesion": -0.0007,
+        "pairCount": 36
+      },
+      "recommendation": "Consolidate duplicate open work into one parent kanban item and keep the file-level labels as links."
+    },
+    {
+      "groupId": "master-todo:cluster:58",
+      "recordCount": 9,
+      "openCount": 9,
+      "clusterIds": [
+        58,
+        75,
+        89
+      ],
+      "featureFamilies": [
+        "master-todo"
+      ],
+      "sourceRefs": [
+        "MASTER-FEATURE-TODO-2026-05-20.md:386",
+        "MASTER-FEATURE-TODO-2026-05-20.md:797",
+        "MASTER-FEATURE-TODO-2026-05-20.md:463",
+        "MASTER-FEATURE-TODO-2026-05-20.md:451",
+        "MASTER-FEATURE-TODO-2026-05-20.md:445",
+        "MASTER-FEATURE-TODO-2026-05-20.md:447",
+        "MASTER-FEATURE-TODO-2026-05-20.md:467",
+        "MASTER-FEATURE-TODO-2026-05-20.md:738",
+        "MASTER-FEATURE-TODO-2026-05-20.md:375"
+      ],
+      "topTitles": [
+        "Refresh the parent atlas using only the production-ready feature list after a…",
+        "Align `local-deep-research` to an OpenAI-compatible `llama-server` endpoint w…",
+        "Use the Parent Atlas feature command atlas as the container manifest for late…",
+        "Store docs and large artifacts in SeaweedFS, not in the research container's …",
+        "Promote each proposal run into the engram registry (`memory_registry` + `engr…"
+      ],
+      "topFeatureIds": [
+        "master-todo.nes-glyph-architecture-notes-sourceref-f",
+        "master-todo.unknown"
+      ],
+      "topSourceRefs": [],
+      "statuses": {
+        "BACKLOG": 9
+      },
+      "backendCounts": {
+        "offline": 9
+      },
+      "priorityMax": 1,
       "libtorch": {
         "source": "cpu",
         "cohesion": 0.005,
-        "pairCount": 1
+        "pairCount": 36
       },
       "recommendation": "Consolidate duplicate open work into one parent kanban item and keep the file-level labels as links."
     },
     {
-      "groupId": "docs-graph:cluster:none",
-      "recordCount": 2,
-      "openCount": 2,
-      "clusterIds": [],
+      "groupId": "master-todo:cluster:20",
+      "recordCount": 9,
+      "openCount": 9,
+      "clusterIds": [
+        20,
+        37,
+        51
+      ],
       "featureFamilies": [
-        "docs-graph"
+        "master-todo"
       ],
       "sourceRefs": [
-        "docs/graph/"
+        "MASTER-FEATURE-TODO-2026-05-20.md:449",
+        "MASTER-FEATURE-TODO-2026-05-20.md:467",
+        "MASTER-FEATURE-TODO-2026-05-20.md:791",
+        "MASTER-FEATURE-TODO-2026-05-20.md:593",
+        "MASTER-FEATURE-TODO-2026-05-20.md:436",
+        "MASTER-FEATURE-TODO-2026-05-20.md:828",
+        "MASTER-FEATURE-TODO-2026-05-20.md:319",
+        "MASTER-FEATURE-TODO-2026-05-20.md:745"
       ],
       "topTitles": [
-        "Keep this lane tied to the existing graph artifacts in `docs/graph/` rather than inventing a parallel source of truth.",
-        "docs-graph"
+        "Route agentic errors through a read-only proposal flow that launches parallel…",
+        "Document the WSL2 GPU override as optional deployment flavor only; default to…",
+        "Promote validated offline outputs into the durable stores only after validati…",
+        "**Phase 20 — Colab/A6000 training lane**",
+        "Promote each proposal run into the engram registry (`memory_registry` + `engr…"
       ],
       "topFeatureIds": [
-        "feature:todo:1e4c336ba1e2a42f2be25839"
+        "master-todo.nes-glyph-architecture-notes-sourceref-f",
+        "master-todo.unknown"
       ],
-      "topSourceRefs": [
-        "docs/graph/"
-      ],
+      "topSourceRefs": [],
       "statuses": {
-        "BACKLOG": 1,
-        "todo": 1
+        "BACKLOG": 9
       },
       "backendCounts": {
-        "js": 2
+        "offline": 9
       },
       "priorityMax": 1,
       "libtorch": {
         "source": "cpu",
-        "cohesion": 0.0433,
-        "pairCount": 1
+        "cohesion": -0.0029,
+        "pairCount": 36
       },
       "recommendation": "Consolidate duplicate open work into one parent kanban item and keep the file-level labels as links."
     },
     {
-      "groupId": "memory-agents-dag-cluster-0-4-json:cluster:none",
-      "recordCount": 2,
-      "openCount": 2,
-      "clusterIds": [],
+      "groupId": "temporal:cluster:8",
+      "recordCount": 9,
+      "openCount": 9,
+      "clusterIds": [
+        8,
+        25,
+        39
+      ],
       "featureFamilies": [
-        "memory-agents-dag-cluster-0-4-json"
+        "temporal"
       ],
       "sourceRefs": [
-        "local:memory/agents-dag/cluster-0-4.json"
+        "dir:.claude/commands",
+        "dir:crates/turbovec-napi/target/release/.fingerprint/matrixcompare-core-6683ee344dd52918",
+        "dir:.opencode/skills/trace-mcp-tooling",
+        "dir:simd-bridge/rust/graph-engine/target/release/.fingerprint/convert_case-1f8c2fba17613c17",
+        "dir:simd-bridge/rust/graph-engine/target/release/.fingerprint/semver-501a42469de523e3",
+        "dir:simd-bridge/rust/hmm-repair/target/release/.fingerprint/proc-macro2-b32490db0bdc7286",
+        "dir:.svelte-error-fixes-backup/sveltekit-frontend/src/routes/(tools)/search",
+        "dir:sveltekit-frontend/.venv_turbovec/Lib/site-packages/pip-25.1.1.dist-info/licenses",
+        "dir:turbovec/target/release/.fingerprint/crossbeam-utils-1d5d5e3c6b5a65c6"
       ],
       "topTitles": [
-        "Label memory-agents-dag-cluster-0-4-json",
-        "memory-agents-dag-cluster-0-4-json"
+        "Review hidden directory .claude/commands",
+        "Review hidden directory crates/turbovec-napi/target/release/.fingerprint/matrixcompare-core-6683ee344dd52918",
+        "Review hidden directory .opencode/skills/trace-mcp-tooling",
+        "Review hidden directory simd-bridge/rust/graph-engine/target/release/.fingerprint/convert_case-1f8c2fba17613c17",
+        "Review hidden directory simd-bridge/rust/graph-engine/target/release/.fingerprint/semver-501a42469de523e3"
       ],
       "topFeatureIds": [
-        "feature:file:7933cc823021551ccebeafa0"
+        "temporal.hidden-dir.claude-commands",
+        "temporal.hidden-dir.crates-turbovec-napi-target-release-fingerprint-matrixcompare-core-6683ee344dd52",
+        "temporal.hidden-dir.opencode-skills-trace-mcp-tooling",
+        "temporal.hidden-dir.simd-bridge-rust-graph-engine-target-release-fingerprint-convert-case-1f8c2fba17",
+        "temporal.hidden-dir.simd-bridge-rust-graph-engine-target-release-fingerprint-semver-501a42469de523e3"
       ],
       "topSourceRefs": [
-        "local:memory/agents-dag/cluster-0-4.json",
-        "local:.cache/ace/context-packs/ace_context_local-json-hit_v1.json",
-        "local:.cache/ace/context-packs/ace_context_smoke-context-pack_v1.json",
-        "local:.cache/ace/top-retrieval/ace_retrieval_topn_77245b8d5bd3442aa981670b_2.json",
-        "local:.cache/cards/7fa8a288f900d5f042365e405126cba1b373fc0f.meta.json"
+        ".claude/commands",
+        "crates/turbovec-napi/target/release/.fingerprint/matrixcompare-core-6683ee344dd52918",
+        ".opencode/skills/trace-mcp-tooling",
+        "simd-bridge/rust/graph-engine/target/release/.fingerprint/convert_case-1f8c2fba17613c17",
+        "simd-bridge/rust/graph-engine/target/release/.fingerprint/semver-501a42469de523e3"
       ],
       "statuses": {
-        "BACKLOG": 1,
-        "todo": 1
+        "BACKLOG": 9
       },
       "backendCounts": {
-        "js": 2
+        "offline": 9
       },
       "priorityMax": 1,
       "libtorch": {
         "source": "cpu",
-        "cohesion": 0.0229,
-        "pairCount": 1
+        "cohesion": -0.0012,
+        "pairCount": 36
       },
       "recommendation": "Consolidate duplicate open work into one parent kanban item and keep the file-level labels as links."
     },
     {
-      "groupId": "ranking:cluster:none",
-      "recordCount": 2,
-      "openCount": 2,
-      "clusterIds": [],
+      "groupId": "temporal:cluster:7",
+      "recordCount": 9,
+      "openCount": 9,
+      "clusterIds": [
+        7,
+        24,
+        38
+      ],
       "featureFamilies": [
-        "ranking"
+        "temporal"
       ],
-      "sourceRefs": [],
+      "sourceRefs": [
+        "dir:claude-mem/.claude/reports",
+        "dir:crates/turbovec-napi/target/release/.fingerprint/ref-cast-9861bbd616276afe",
+        "dir:crates/turbovec-napi/target/x86_64-pc-windows-msvc/release/.fingerprint/faer-e098e68fb2a618eb",
+        "dir:crates/turbovec-napi/target/x86_64-pc-windows-msvc/release/.fingerprint/npyz-2a824b9817810814",
+        "dir:simd-bridge/rust/hmm-repair/target/x86_64-pc-windows-msvc/debug/.fingerprint/memchr-f84a45dafcfced8a",
+        "dir:simd-bridge/rust/hmm-repair/target/x86_64-pc-windows-msvc/release/.fingerprint/zmij-a61ae4babc7bccb7",
+        "dir:.tmp/atlas-cards",
+        "dir:turbovec/target/release/.fingerprint/libc-e496e259a3ea1c23",
+        "dir:turbovec/target/release/.fingerprint/version_check-b2d2ed20f9c4f52f"
+      ],
       "topTitles": [
-        "ranking › authority score",
-        "ranking › karpathy blend"
+        "Review hidden directory claude-mem/.claude/reports",
+        "Review hidden directory crates/turbovec-napi/target/release/.fingerprint/ref-cast-9861bbd616276afe",
+        "Review hidden directory crates/turbovec-napi/target/x86_64-pc-windows-msvc/release/.fingerprint/faer-e098e68fb2a618eb",
+        "Review hidden directory crates/turbovec-napi/target/x86_64-pc-windows-msvc/release/.fingerprint/npyz-2a824b9817810814",
+        "Review hidden directory simd-bridge/rust/hmm-repair/target/x86_64-pc-windows-msvc/debug/.fingerprint/memchr-f84a45dafcfced8a"
       ],
-      "topFeatureIds": [],
+      "topFeatureIds": [
+        "temporal.hidden-dir.claude-mem-claude-reports",
+        "temporal.hidden-dir.crates-turbovec-napi-target-release-fingerprint-ref-cast-9861bbd616276afe",
+        "temporal.hidden-dir.crates-turbovec-napi-target-x86-64-pc-windows-msvc-release-fingerprint-faer-e098",
+        "temporal.hidden-dir.crates-turbovec-napi-target-x86-64-pc-windows-msvc-release-fingerprint-npyz-2a82",
+        "temporal.hidden-dir.simd-bridge-rust-hmm-repair-target-x86-64-pc-windows-msvc-debug-fingerprint-memc"
+      ],
       "topSourceRefs": [
-        "local:sveltekit-frontend/scripts/authority/build-authority-snapshot.mjs#L1",
-        "local:sveltekit-frontend/src/lib/server/scoring/authority-scorer.ts#L1",
-        "local:sveltekit-frontend/src/lib/server/agents/regen/loaders/karpathy.ts#L1"
+        "claude-mem/.claude/reports",
+        "crates/turbovec-napi/target/release/.fingerprint/ref-cast-9861bbd616276afe",
+        "crates/turbovec-napi/target/x86_64-pc-windows-msvc/release/.fingerprint/faer-e098e68fb2a618eb",
+        "crates/turbovec-napi/target/x86_64-pc-windows-msvc/release/.fingerprint/npyz-2a824b9817810814",
+        "simd-bridge/rust/hmm-repair/target/x86_64-pc-windows-msvc/debug/.fingerprint/memchr-f84a45dafcfced8a"
       ],
       "statuses": {
-        "BACKLOG": 2
+        "BACKLOG": 9
       },
       "backendCounts": {
-        "js": 2
+        "offline": 9
       },
       "priorityMax": 1,
       "libtorch": {
         "source": "cpu",
-        "cohesion": -0.0028,
-        "pairCount": 1
+        "cohesion": -0.0055,
+        "pairCount": 36
       },
       "recommendation": "Consolidate duplicate open work into one parent kanban item and keep the file-level labels as links."
     },
     {
-      "groupId": "scripts-atlas-phase-lane-completion-mjs:cluster:none",
-      "recordCount": 2,
-      "openCount": 2,
-      "clusterIds": [],
+      "groupId": "temporal:cluster:63",
+      "recordCount": 9,
+      "openCount": 9,
+      "clusterIds": [
+        63,
+        80,
+        94
+      ],
       "featureFamilies": [
-        "scripts-atlas-phase-lane-completion-mjs"
+        "temporal"
       ],
       "sourceRefs": [
-        "scripts/atlas/phase-lane-completion.mjs"
+        "dir:crates/turbovec-napi/target/release/.fingerprint/byteorder-3b03fdee001a456d",
+        "dir:crates/turbovec-napi/target/release/.fingerprint/nano-gemm-0d207fbb5bdad406",
+        "dir:crates/turbovec-napi/target/x86_64-pc-windows-msvc/release/.fingerprint/crossbeam-utils-be78a1cbba8c810a",
+        "dir:crates/turbovec-napi/target/x86_64-pc-windows-msvc/release/.fingerprint/reborrow-36e8a62a9b804040",
+        "dir:.opencode/skills/gemma4",
+        "dir:simd-bridge/rust/graph-engine/target/x86_64-pc-windows-msvc/release/.fingerprint/crossbeam-utils-daeb7fce2e944f64",
+        "dir:simd-bridge/rust/hmm-repair/target/x86_64-pc-windows-msvc/release/.fingerprint/regex-automata-80b0717878c463d1",
+        "dir:simd-bridge/rust-simdjson/target/release/.fingerprint/ref-cast-impl-f39661f7397c8b5c",
+        "dir:turbovec/target/release/.fingerprint/pulp-aa970da56c37b573"
       ],
       "topTitles": [
-        "Implement Phase 19 lane completion hook (`scripts/atlas/phase-lane-completion.mjs`)",
-        "scripts-atlas-phase-lane-completion-mjs"
+        "Review hidden directory crates/turbovec-napi/target/release/.fingerprint/byteorder-3b03fdee001a456d",
+        "Review hidden directory crates/turbovec-napi/target/release/.fingerprint/nano-gemm-0d207fbb5bdad406",
+        "Review hidden directory crates/turbovec-napi/target/x86_64-pc-windows-msvc/release/.fingerprint/crossbeam-utils-be78a1cbba8c810a",
+        "Review hidden directory crates/turbovec-napi/target/x86_64-pc-windows-msvc/release/.fingerprint/reborrow-36e8a62a9b804040",
+        "Review hidden directory .opencode/skills/gemma4"
       ],
       "topFeatureIds": [
-        "feature:todo:9776801fc047158c169943dd"
+        "temporal.hidden-dir.crates-turbovec-napi-target-release-fingerprint-byteorder-3b03fdee001a456d",
+        "temporal.hidden-dir.crates-turbovec-napi-target-release-fingerprint-nano-gemm-0d207fbb5bdad406",
+        "temporal.hidden-dir.crates-turbovec-napi-target-x86-64-pc-windows-msvc-release-fingerprint-crossbeam",
+        "temporal.hidden-dir.crates-turbovec-napi-target-x86-64-pc-windows-msvc-release-fingerprint-reborrow-",
+        "temporal.hidden-dir.opencode-skills-gemma4"
       ],
       "topSourceRefs": [
-        "scripts/atlas/phase-lane-completion.mjs"
+        "crates/turbovec-napi/target/release/.fingerprint/byteorder-3b03fdee001a456d",
+        "crates/turbovec-napi/target/release/.fingerprint/nano-gemm-0d207fbb5bdad406",
+        "crates/turbovec-napi/target/x86_64-pc-windows-msvc/release/.fingerprint/crossbeam-utils-be78a1cbba8c810a",
+        "crates/turbovec-napi/target/x86_64-pc-windows-msvc/release/.fingerprint/reborrow-36e8a62a9b804040",
+        ".opencode/skills/gemma4"
       ],
       "statuses": {
-        "BACKLOG": 1,
-        "todo": 1
+        "BACKLOG": 9
       },
       "backendCounts": {
-        "js": 2
+        "offline": 9
       },
       "priorityMax": 1,
       "libtorch": {
         "source": "cpu",
-        "cohesion": 0.0575,
-        "pairCount": 1
+        "cohesion": 0.0006,
+        "pairCount": 36
       },
       "recommendation": "Consolidate duplicate open work into one parent kanban item and keep the file-level labels as links."
     },
     {
-      "groupId": "src-lib-server-features-ai-ace-context-assembler-ts:cluster:none",
-      "recordCount": 2,
-      "openCount": 2,
-      "clusterIds": [],
+      "groupId": "temporal:cluster:99",
+      "recordCount": 9,
+      "openCount": 9,
+      "clusterIds": [
+        2,
+        99,
+        116
+      ],
       "featureFamilies": [
-        "src-lib-server-features-ai-ace-context-assembler-ts"
+        "temporal"
       ],
       "sourceRefs": [
-        "src/lib/server/features/ai/ace/context-assembler.ts"
+        "dir:crates/turbovec-napi/target/release/.fingerprint/dyn-stack-7cc66461125bbffc",
+        "dir:crates/turbovec-napi/target/release/.fingerprint/napi-build-1e06b05d195076dc",
+        "dir:crates/turbovec-napi/target/x86_64-pc-windows-msvc/release/.fingerprint/nano-gemm-f32-bdbad2e5fcd2994d",
+        "dir:crates/turbovec-napi/target/x86_64-pc-windows-msvc/release/.fingerprint/nano-gemm-f64-fe2a4fb8d3ecec93",
+        "dir:crates/turbovec-napi/target/x86_64-pc-windows-msvc/release/.fingerprint/pin-project-lite-8531e3c970c989cf",
+        "dir:simd-bridge/rust/graph-engine/target/release/.fingerprint/proc-macro2-7e9c9be0ebdfc812",
+        "dir:simd-bridge/rust/hmm-repair/target/x86_64-pc-windows-msvc/debug/.fingerprint/regex-7dbe70944745e1e8",
+        "dir:sveltekit-frontend/.venv_turbovec/Lib/site-packages/numpy-2.4.4.dist-info/licenses/numpy/_core/src/npysort/x86-simd-sort",
+        "dir:turbovec/target/release/.fingerprint/crossbeam-epoch-7882d493f3cfe3b5"
       ],
       "topTitles": [
-        "Preserve the existing router/cache path in `src/lib/server/features/ai/ace/context-assembler.ts`; this is an extension lane, not a rewrite.",
-        "src-lib-server-features-ai-ace-context-assembler-ts"
+        "Review hidden directory crates/turbovec-napi/target/release/.fingerprint/dyn-stack-7cc66461125bbffc",
+        "Review hidden directory crates/turbovec-napi/target/release/.fingerprint/napi-build-1e06b05d195076dc",
+        "Review hidden directory crates/turbovec-napi/target/x86_64-pc-windows-msvc/release/.fingerprint/nano-gemm-f32-bdbad2e5fcd2994d",
+        "Review hidden directory crates/turbovec-napi/target/x86_64-pc-windows-msvc/release/.fingerprint/nano-gemm-f64-fe2a4fb8d3ecec93",
+        "Review hidden directory crates/turbovec-napi/target/x86_64-pc-windows-msvc/release/.fingerprint/pin-project-lite-8531e3c970c989cf"
       ],
       "topFeatureIds": [
-        "feature:todo:783118149f85dbce6bf6dd2a"
+        "temporal.hidden-dir.crates-turbovec-napi-target-x86-64-pc-windows-msvc-release-fingerprint-nano-gemm",
+        "temporal.hidden-dir.crates-turbovec-napi-target-release-fingerprint-dyn-stack-7cc66461125bbffc",
+        "temporal.hidden-dir.crates-turbovec-napi-target-release-fingerprint-napi-build-1e06b05d195076dc",
+        "temporal.hidden-dir.crates-turbovec-napi-target-x86-64-pc-windows-msvc-release-fingerprint-pin-proje",
+        "temporal.hidden-dir.simd-bridge-rust-graph-engine-target-release-fingerprint-proc-macro2-7e9c9be0ebd"
       ],
       "topSourceRefs": [
-        "src/lib/server/features/ai/ace/context-assembler.ts"
+        "crates/turbovec-napi/target/release/.fingerprint/dyn-stack-7cc66461125bbffc",
+        "crates/turbovec-napi/target/release/.fingerprint/napi-build-1e06b05d195076dc",
+        "crates/turbovec-napi/target/x86_64-pc-windows-msvc/release/.fingerprint/nano-gemm-f32-bdbad2e5fcd2994d",
+        "crates/turbovec-napi/target/x86_64-pc-windows-msvc/release/.fingerprint/nano-gemm-f64-fe2a4fb8d3ecec93",
+        "crates/turbovec-napi/target/x86_64-pc-windows-msvc/release/.fingerprint/pin-project-lite-8531e3c970c989cf"
       ],
       "statuses": {
-        "BACKLOG": 1,
-        "todo": 1
+        "BACKLOG": 9
       },
       "backendCounts": {
-        "js": 2
+        "offline": 9
       },
       "priorityMax": 1,
       "libtorch": {
         "source": "cpu",
-        "cohesion": -0.0111,
-        "pairCount": 1
+        "cohesion": -0.0071,
+        "pairCount": 36
       },
       "recommendation": "Consolidate duplicate open work into one parent kanban item and keep the file-level labels as links."
     },
     {
-      "groupId": "src-service-worker-ts:cluster:none",
-      "recordCount": 2,
-      "openCount": 2,
-      "clusterIds": [],
+      "groupId": "temporal:cluster:6",
+      "recordCount": 9,
+      "openCount": 9,
+      "clusterIds": [
+        6,
+        23,
+        37
+      ],
       "featureFamilies": [
-        "src-service-worker-ts"
+        "temporal"
       ],
       "sourceRefs": [
-        "src/service-worker.ts"
+        "dir:crates/turbovec-napi/target/release/.fingerprint/gemm-c32-2ed12811ac6f23ec",
+        "dir:crates/turbovec-napi/target/release/.fingerprint/num-traits-771734b02300500c",
+        "dir:.opencode/skills/ace-recovery",
+        "dir:simd-bridge/rust/graph-engine/target/release/.fingerprint/crossbeam-utils-06a734ef505ffeaf",
+        "dir:simd-bridge/rust/hmm-repair/target/debug/.fingerprint/napi-derive-025558ed07a493c8",
+        "dir:simd-bridge/rust/hmm-repair/target/x86_64-pc-windows-msvc/release/.fingerprint/lazy_static-4ffe90688c9f1b57",
+        "dir:simd-bridge/rust-simdjson/target/release/.fingerprint/crossbeam-deque-b28cd78452d610a1",
+        "dir:simd-bridge/rust-simdjson/target/release/.fingerprint/quote-2c6c4bc7d605273b",
+        "dir:turbovec/target/release/.fingerprint/equator-macro-772724f18968d027"
       ],
       "topTitles": [
-        "Preserve the existing WebGPU/SW foundation in `src/service-worker.ts`, `src/lib/workers/compute-worker.mjs`, and related browser guards; this is a productizatio",
-        "src-service-worker-ts"
+        "Review hidden directory crates/turbovec-napi/target/release/.fingerprint/gemm-c32-2ed12811ac6f23ec",
+        "Review hidden directory crates/turbovec-napi/target/release/.fingerprint/num-traits-771734b02300500c",
+        "Review hidden directory .opencode/skills/ace-recovery",
+        "Review hidden directory simd-bridge/rust/graph-engine/target/release/.fingerprint/crossbeam-utils-06a734ef505ffeaf",
+        "Review hidden directory simd-bridge/rust/hmm-repair/target/debug/.fingerprint/napi-derive-025558ed07a493c8"
       ],
       "topFeatureIds": [
-        "feature:todo:c32b8055c5900f49a4919f9c"
+        "temporal.hidden-dir.crates-turbovec-napi-target-release-fingerprint-gemm-c32-2ed12811ac6f23ec",
+        "temporal.hidden-dir.crates-turbovec-napi-target-release-fingerprint-num-traits-771734b02300500c",
+        "temporal.hidden-dir.opencode-skills-ace-recovery",
+        "temporal.hidden-dir.simd-bridge-rust-graph-engine-target-release-fingerprint-crossbeam-utils-06a734e",
+        "temporal.hidden-dir.simd-bridge-rust-hmm-repair-target-debug-fingerprint-napi-derive-025558ed07a493c"
       ],
       "topSourceRefs": [
-        "src/service-worker.ts",
-        "src/lib/workers/compute-worker.mjs"
+        "crates/turbovec-napi/target/release/.fingerprint/gemm-c32-2ed12811ac6f23ec",
+        "crates/turbovec-napi/target/release/.fingerprint/num-traits-771734b02300500c",
+        ".opencode/skills/ace-recovery",
+        "simd-bridge/rust/graph-engine/target/release/.fingerprint/crossbeam-utils-06a734ef505ffeaf",
+        "simd-bridge/rust/hmm-repair/target/debug/.fingerprint/napi-derive-025558ed07a493c8"
       ],
       "statuses": {
-        "BACKLOG": 1,
-        "todo": 1
+        "BACKLOG": 9
       },
       "backendCounts": {
-        "js": 2
+        "offline": 9
       },
       "priorityMax": 1,
-      "libtorch": {
-        "source": "cpu",
-        "cohesion": -0.0214,
-        "pairCount": 1
-      },
-      "recommendation": "Consolidate duplicate open work into one parent kanban item and keep the file-level labels as links."
-    },
-    {
-      "groupId": "cache-ace-context-packs-ace-context-local-json-hit-v1-json:cluster:none",
-      "recordCount": 2,
-      "openCount": 2,
-      "clusterIds": [],
-      "featureFamilies": [
-        "cache-ace-context-packs-ace-context-local-json-hit-v1-json"
-      ],
-      "sourceRefs": [
-        "local:.cache/ace/context-packs/ace_context_local-json-hit_v1.json"
-      ],
-      "topTitles": [
-        "Label cache-ace-context-packs-ace-context-local-json-hit-v1-json",
-        "cache-ace-context-packs-ace-context-local-json-hit-v1-json"
-      ],
-      "topFeatureIds": [
-        "feature:file:4537c26965f6d4abfdcf05ab"
-      ],
-      "topSourceRefs": [
-        "local:.cache/ace/context-packs/ace_context_local-json-hit_v1.json"
-      ],
-      "statuses": {
-        "todo": 2
-      },
-      "backendCounts": {
-        "js": 2
-      },
-      "priorityMax": 0,
-      "libtorch": {
-        "source": "cpu",
-        "cohesion": -0.0298,
-        "pairCount": 1
-      },
-      "recommendation": "Consolidate duplicate open work into one parent kanban item and keep the file-level labels as links."
-    },
-    {
-      "groupId": "cache-ace-context-packs-ace-context-smoke-context-pack-v1-json:cluster:none",
-      "recordCount": 2,
-      "openCount": 2,
-      "clusterIds": [],
-      "featureFamilies": [
-        "cache-ace-context-packs-ace-context-smoke-context-pack-v1-json"
-      ],
-      "sourceRefs": [
-        "local:.cache/ace/context-packs/ace_context_smoke-context-pack_v1.json"
-      ],
-      "topTitles": [
-        "Label cache-ace-context-packs-ace-context-smoke-context-pack-v1-json",
-        "cache-ace-context-packs-ace-context-smoke-context-pack-v1-json"
-      ],
-      "topFeatureIds": [
-        "feature:file:8679708a6349443ae8066b3b"
-      ],
-      "topSourceRefs": [
-        "local:.cache/ace/context-packs/ace_context_smoke-context-pack_v1.json"
-      ],
-      "statuses": {
-        "todo": 2
-      },
-      "backendCounts": {
-        "js": 2
-      },
-      "priorityMax": 0,
-      "libtorch": {
-        "source": "cpu",
-        "cohesion": -0.0074,
-        "pairCount": 1
-      },
-      "recommendation": "Consolidate duplicate open work into one parent kanban item and keep the file-level labels as links."
-    },
-    {
-      "groupId": "cache-ace-top-retrieval-ace-retrieval-topn-77245b8d5bd3442aa981670b-2-json:cluster:none",
-      "recordCount": 2,
-      "openCount": 2,
-      "clusterIds": [],
-      "featureFamilies": [
-        "cache-ace-top-retrieval-ace-retrieval-topn-77245b8d5bd3442aa981670b-2-json"
-      ],
-      "sourceRefs": [
-        "local:.cache/ace/top-retrieval/ace_retrieval_topn_77245b8d5bd3442aa981670b_2.json"
-      ],
-      "topTitles": [
-        "Label cache-ace-top-retrieval-ace-retrieval-topn-77245b8d5bd3442aa981670b-2-json",
-        "cache-ace-top-retrieval-ace-retrieval-topn-77245b8d5bd3442aa981670b-2-json"
-      ],
-      "topFeatureIds": [
-        "feature:file:c01c9263f03bf00e10875001"
-      ],
-      "topSourceRefs": [
-        "local:.cache/ace/top-retrieval/ace_retrieval_topn_77245b8d5bd3442aa981670b_2.json"
-      ],
-      "statuses": {
-        "todo": 2
-      },
-      "backendCounts": {
-        "js": 2
-      },
-      "priorityMax": 0,
-      "libtorch": {
-        "source": "cpu",
-        "cohesion": 0.0169,
-        "pairCount": 1
-      },
-      "recommendation": "Consolidate duplicate open work into one parent kanban item and keep the file-level labels as links."
-    },
-    {
-      "groupId": "cache-cards-7fa8a288f900d5f042365e405126cba1b373fc0f-meta-json:cluster:none",
-      "recordCount": 2,
-      "openCount": 2,
-      "clusterIds": [],
-      "featureFamilies": [
-        "cache-cards-7fa8a288f900d5f042365e405126cba1b373fc0f-meta-json"
-      ],
-      "sourceRefs": [
-        "local:.cache/cards/7fa8a288f900d5f042365e405126cba1b373fc0f.meta.json"
-      ],
-      "topTitles": [
-        "Label cache-cards-7fa8a288f900d5f042365e405126cba1b373fc0f-meta-json",
-        "cache-cards-7fa8a288f900d5f042365e405126cba1b373fc0f-meta-json"
-      ],
-      "topFeatureIds": [
-        "feature:file:2c0015cb6265c9ee6c987434"
-      ],
-      "topSourceRefs": [
-        "local:.cache/cards/7fa8a288f900d5f042365e405126cba1b373fc0f.meta.json"
-      ],
-      "statuses": {
-        "todo": 2
-      },
-      "backendCounts": {
-        "js": 2
-      },
-      "priorityMax": 0,
-      "libtorch": {
-        "source": "cpu",
-        "cohesion": 0.0005,
-        "pairCount": 1
-      },
-      "recommendation": "Consolidate duplicate open work into one parent kanban item and keep the file-level labels as links."
-    },
-    {
-      "groupId": "cache-cards-87a3e2aa5036028f81632b720cdf195a73ce8a0e-meta-json:cluster:none",
-      "recordCount": 2,
-      "openCount": 2,
-      "clusterIds": [],
-      "featureFamilies": [
-        "cache-cards-87a3e2aa5036028f81632b720cdf195a73ce8a0e-meta-json"
-      ],
-      "sourceRefs": [
-        "local:.cache/cards/87a3e2aa5036028f81632b720cdf195a73ce8a0e.meta.json"
-      ],
-      "topTitles": [
-        "Label cache-cards-87a3e2aa5036028f81632b720cdf195a73ce8a0e-meta-json",
-        "cache-cards-87a3e2aa5036028f81632b720cdf195a73ce8a0e-meta-json"
-      ],
-      "topFeatureIds": [
-        "feature:file:2a83e073f935d0e05f13a2a7"
-      ],
-      "topSourceRefs": [
-        "local:.cache/cards/87a3e2aa5036028f81632b720cdf195a73ce8a0e.meta.json"
-      ],
-      "statuses": {
-        "todo": 2
-      },
-      "backendCounts": {
-        "js": 2
-      },
-      "priorityMax": 0,
-      "libtorch": {
-        "source": "cpu",
-        "cohesion": -0.0408,
-        "pairCount": 1
-      },
-      "recommendation": "Consolidate duplicate open work into one parent kanban item and keep the file-level labels as links."
-    },
-    {
-      "groupId": "cache-d9-verifier-0aefb06409d30bcc-json:cluster:none",
-      "recordCount": 2,
-      "openCount": 2,
-      "clusterIds": [],
-      "featureFamilies": [
-        "cache-d9-verifier-0aefb06409d30bcc-json"
-      ],
-      "sourceRefs": [
-        "local:.cache/d9-verifier/0aefb06409d30bcc.json"
-      ],
-      "topTitles": [
-        "Label cache-d9-verifier-0aefb06409d30bcc-json",
-        "cache-d9-verifier-0aefb06409d30bcc-json"
-      ],
-      "topFeatureIds": [
-        "feature:file:0fa5e4b1bd7b3ccac492b228"
-      ],
-      "topSourceRefs": [
-        "local:.cache/d9-verifier/0aefb06409d30bcc.json"
-      ],
-      "statuses": {
-        "todo": 2
-      },
-      "backendCounts": {
-        "js": 2
-      },
-      "priorityMax": 0,
-      "libtorch": {
-        "source": "cpu",
-        "cohesion": 0.0436,
-        "pairCount": 1
-      },
-      "recommendation": "Consolidate duplicate open work into one parent kanban item and keep the file-level labels as links."
-    },
-    {
-      "groupId": "cache-d9-verifier-18e924c96cf72a44-json:cluster:none",
-      "recordCount": 2,
-      "openCount": 2,
-      "clusterIds": [],
-      "featureFamilies": [
-        "cache-d9-verifier-18e924c96cf72a44-json"
-      ],
-      "sourceRefs": [
-        "local:.cache/d9-verifier/18e924c96cf72a44.json"
-      ],
-      "topTitles": [
-        "Label cache-d9-verifier-18e924c96cf72a44-json",
-        "cache-d9-verifier-18e924c96cf72a44-json"
-      ],
-      "topFeatureIds": [
-        "feature:file:8de80d749291e6c3e2aa2528"
-      ],
-      "topSourceRefs": [
-        "local:.cache/d9-verifier/18e924c96cf72a44.json"
-      ],
-      "statuses": {
-        "todo": 2
-      },
-      "backendCounts": {
-        "js": 2
-      },
-      "priorityMax": 0,
       "libtorch": {
         "source": "cpu",
         "cohesion": -0.002,
-        "pairCount": 1
+        "pairCount": 36
       },
       "recommendation": "Consolidate duplicate open work into one parent kanban item and keep the file-level labels as links."
     },
     {
-      "groupId": "cache-d9-verifier-1b1d36c14e179b86-json:cluster:none",
-      "recordCount": 2,
-      "openCount": 2,
-      "clusterIds": [],
+      "groupId": "temporal:cluster:60",
+      "recordCount": 9,
+      "openCount": 9,
+      "clusterIds": [
+        60,
+        77,
+        91
+      ],
       "featureFamilies": [
-        "cache-d9-verifier-1b1d36c14e179b86-json"
+        "temporal"
       ],
       "sourceRefs": [
-        "local:.cache/d9-verifier/1b1d36c14e179b86.json"
+        "dir:crates/turbovec-napi/target/release/.fingerprint/nano-gemm-c64-c643f477e8c72e63",
+        "dir:crates/turbovec-napi/target/x86_64-pc-windows-msvc/release/.fingerprint/rayon-7fd2abccafc58179",
+        "dir:simd-bridge/rust/graph-engine/target/release/.fingerprint/unicode-ident-4ee5db6783f06d49",
+        "dir:simd-bridge/rust/hmm-repair/target/x86_64-pc-windows-msvc/debug/.fingerprint/serde-af6a4b76173479b7",
+        "dir:simd-bridge/rust-simdjson/target/release/.fingerprint/rayon-core-1b8fde90c3e5eac1",
+        "dir:simd-bridge/rust-simdjson/target/release/.fingerprint/simd_bridge_rs-802e385971ef7d7a",
+        "dir:.svelte-error-fixes-backup/sveltekit-frontend/src/lib/components/ui/n64",
+        "dir:.svelte-error-fixes-backup/sveltekit-frontend/src/routes",
+        "dir:turbovec/target/release/.fingerprint/raw-cpuid-e45211d37b4a3bc4"
       ],
       "topTitles": [
-        "Label cache-d9-verifier-1b1d36c14e179b86-json",
-        "cache-d9-verifier-1b1d36c14e179b86-json"
+        "Review hidden directory crates/turbovec-napi/target/release/.fingerprint/nano-gemm-c64-c643f477e8c72e63",
+        "Review hidden directory crates/turbovec-napi/target/x86_64-pc-windows-msvc/release/.fingerprint/rayon-7fd2abccafc58179",
+        "Review hidden directory simd-bridge/rust/graph-engine/target/release/.fingerprint/unicode-ident-4ee5db6783f06d49",
+        "Review hidden directory simd-bridge/rust/hmm-repair/target/x86_64-pc-windows-msvc/debug/.fingerprint/serde-af6a4b76173479b7",
+        "Review hidden directory simd-bridge/rust-simdjson/target/release/.fingerprint/rayon-core-1b8fde90c3e5eac1"
       ],
       "topFeatureIds": [
-        "feature:file:2a28624f3ea31eca1ba4fa8c"
+        "temporal.hidden-dir.crates-turbovec-napi-target-release-fingerprint-nano-gemm-c64-c643f477e8c72e63",
+        "temporal.hidden-dir.crates-turbovec-napi-target-x86-64-pc-windows-msvc-release-fingerprint-rayon-7fd",
+        "temporal.hidden-dir.simd-bridge-rust-graph-engine-target-release-fingerprint-unicode-ident-4ee5db678",
+        "temporal.hidden-dir.simd-bridge-rust-hmm-repair-target-x86-64-pc-windows-msvc-debug-fingerprint-serd",
+        "temporal.hidden-dir.simd-bridge-rust-simdjson-target-release-fingerprint-rayon-core-1b8fde90c3e5eac1"
       ],
       "topSourceRefs": [
-        "local:.cache/d9-verifier/1b1d36c14e179b86.json"
+        "crates/turbovec-napi/target/release/.fingerprint/nano-gemm-c64-c643f477e8c72e63",
+        "crates/turbovec-napi/target/x86_64-pc-windows-msvc/release/.fingerprint/rayon-7fd2abccafc58179",
+        "simd-bridge/rust/graph-engine/target/release/.fingerprint/unicode-ident-4ee5db6783f06d49",
+        "simd-bridge/rust/hmm-repair/target/x86_64-pc-windows-msvc/debug/.fingerprint/serde-af6a4b76173479b7",
+        "simd-bridge/rust-simdjson/target/release/.fingerprint/rayon-core-1b8fde90c3e5eac1"
       ],
       "statuses": {
-        "todo": 2
+        "BACKLOG": 9
       },
       "backendCounts": {
-        "js": 2
+        "offline": 9
       },
-      "priorityMax": 0,
+      "priorityMax": 1,
       "libtorch": {
         "source": "cpu",
-        "cohesion": 0.0036,
-        "pairCount": 1
+        "cohesion": -0.002,
+        "pairCount": 36
       },
       "recommendation": "Consolidate duplicate open work into one parent kanban item and keep the file-level labels as links."
     },
     {
-      "groupId": "cache-d9-verifier-29367b26ad1e578a-json:cluster:none",
-      "recordCount": 2,
-      "openCount": 2,
-      "clusterIds": [],
+      "groupId": "temporal:cluster:31",
+      "recordCount": 9,
+      "openCount": 9,
+      "clusterIds": [
+        31,
+        48,
+        62
+      ],
       "featureFamilies": [
-        "cache-d9-verifier-29367b26ad1e578a-json"
+        "temporal"
       ],
       "sourceRefs": [
-        "local:.cache/d9-verifier/29367b26ad1e578a.json"
+        "dir:crates/turbovec-napi/target/release/.fingerprint/quote-2c6c4bc7d605273b",
+        "dir:crates/turbovec-napi/target/release/.fingerprint/ref-cast-c2468b2e862d9aff",
+        "dir:crates/turbovec-napi/target/x86_64-pc-windows-msvc/release/.fingerprint/napi-cd5bd18126f0170d",
+        "dir:.opencode/ace-packets",
+        "dir:simd-bridge/rust/hmm-repair/target/x86_64-pc-windows-msvc/debug/.fingerprint/serde-a1b3dac62196a1e5",
+        "dir:.svelte-error-fixes-backup/sveltekit-frontend/src/lib/components/gpu",
+        "dir:.tmp/offline-synthesis",
+        "dir:turbovec/target/release/.fingerprint/nano-gemm-f32-7dbab3fdd5f74b8e",
+        "dir:.woodpecker"
       ],
       "topTitles": [
-        "Label cache-d9-verifier-29367b26ad1e578a-json",
-        "cache-d9-verifier-29367b26ad1e578a-json"
+        "Review hidden directory crates/turbovec-napi/target/release/.fingerprint/quote-2c6c4bc7d605273b",
+        "Review hidden directory crates/turbovec-napi/target/release/.fingerprint/ref-cast-c2468b2e862d9aff",
+        "Review hidden directory crates/turbovec-napi/target/x86_64-pc-windows-msvc/release/.fingerprint/napi-cd5bd18126f0170d",
+        "Review hidden directory .opencode/ace-packets",
+        "Review hidden directory simd-bridge/rust/hmm-repair/target/x86_64-pc-windows-msvc/debug/.fingerprint/serde-a1b3dac62196a1e5"
       ],
       "topFeatureIds": [
-        "feature:file:7da56c5068c5094bf41dd26f"
+        "temporal.hidden-dir.crates-turbovec-napi-target-release-fingerprint-quote-2c6c4bc7d605273b",
+        "temporal.hidden-dir.crates-turbovec-napi-target-release-fingerprint-ref-cast-c2468b2e862d9aff",
+        "temporal.hidden-dir.crates-turbovec-napi-target-x86-64-pc-windows-msvc-release-fingerprint-napi-cd5b",
+        "temporal.hidden-dir.opencode-ace-packets",
+        "temporal.hidden-dir.simd-bridge-rust-hmm-repair-target-x86-64-pc-windows-msvc-debug-fingerprint-serd"
       ],
       "topSourceRefs": [
-        "local:.cache/d9-verifier/29367b26ad1e578a.json"
+        "crates/turbovec-napi/target/release/.fingerprint/quote-2c6c4bc7d605273b",
+        "crates/turbovec-napi/target/release/.fingerprint/ref-cast-c2468b2e862d9aff",
+        "crates/turbovec-napi/target/x86_64-pc-windows-msvc/release/.fingerprint/napi-cd5bd18126f0170d",
+        ".opencode/ace-packets",
+        "simd-bridge/rust/hmm-repair/target/x86_64-pc-windows-msvc/debug/.fingerprint/serde-a1b3dac62196a1e5"
       ],
       "statuses": {
-        "todo": 2
+        "BACKLOG": 9
       },
       "backendCounts": {
-        "js": 2
+        "offline": 9
       },
-      "priorityMax": 0,
+      "priorityMax": 1,
       "libtorch": {
         "source": "cpu",
-        "cohesion": -0.0286,
-        "pairCount": 1
+        "cohesion": 0.008,
+        "pairCount": 36
       },
       "recommendation": "Consolidate duplicate open work into one parent kanban item and keep the file-level labels as links."
     },
     {
-      "groupId": "cache-d9-verifier-294f7266e00b9379-json:cluster:none",
-      "recordCount": 2,
-      "openCount": 2,
-      "clusterIds": [],
+      "groupId": "temporal:cluster:13",
+      "recordCount": 9,
+      "openCount": 9,
+      "clusterIds": [
+        13,
+        30,
+        44
+      ],
       "featureFamilies": [
-        "cache-d9-verifier-294f7266e00b9379-json"
+        "temporal"
       ],
       "sourceRefs": [
-        "local:.cache/d9-verifier/294f7266e00b9379.json"
+        "dir:crates/turbovec-napi/target/release/.fingerprint/rand_chacha-d71ebaffa05a9a46",
+        "dir:crates/turbovec-napi/target/x86_64-pc-windows-msvc/release/.fingerprint/float-cmp-cb9e955a1ad7b1d9",
+        "dir:simd-bridge/rust/graph-engine/target/release/.fingerprint/quote-d9ef1d8a31833ee2",
+        "dir:simd-bridge/rust/graph-engine/target/x86_64-pc-windows-msvc/release/.fingerprint/rayon-core-477e7332572f7064",
+        "dir:simd-bridge/rust-simdjson/target/release/.fingerprint/regex-syntax-b4ea55b4904cd38e",
+        "dir:simd-bridge/rust-simdjson/target/release/.fingerprint/simdutf8-f08178b5995ea7a6",
+        "dir:turbovec/target/release/.fingerprint/indoc-78707e1fbd92de70",
+        "dir:turbovec/target/release/.fingerprint/simba-e147a42386f34a49",
+        "dir:turbovec/target/release/.fingerprint/typenum-a6e2bb4b38f066d8"
       ],
       "topTitles": [
-        "Label cache-d9-verifier-294f7266e00b9379-json",
-        "cache-d9-verifier-294f7266e00b9379-json"
+        "Review hidden directory crates/turbovec-napi/target/release/.fingerprint/rand_chacha-d71ebaffa05a9a46",
+        "Review hidden directory crates/turbovec-napi/target/x86_64-pc-windows-msvc/release/.fingerprint/float-cmp-cb9e955a1ad7b1d9",
+        "Review hidden directory simd-bridge/rust/graph-engine/target/release/.fingerprint/quote-d9ef1d8a31833ee2",
+        "Review hidden directory simd-bridge/rust/graph-engine/target/x86_64-pc-windows-msvc/release/.fingerprint/rayon-core-477e7332572f7064",
+        "Review hidden directory simd-bridge/rust-simdjson/target/release/.fingerprint/regex-syntax-b4ea55b4904cd38e"
       ],
       "topFeatureIds": [
-        "feature:file:82af50b4fd72f29850bc36f3"
+        "temporal.hidden-dir.crates-turbovec-napi-target-release-fingerprint-rand-chacha-d71ebaffa05a9a46",
+        "temporal.hidden-dir.crates-turbovec-napi-target-x86-64-pc-windows-msvc-release-fingerprint-float-cmp",
+        "temporal.hidden-dir.simd-bridge-rust-graph-engine-target-release-fingerprint-quote-d9ef1d8a31833ee2",
+        "temporal.hidden-dir.simd-bridge-rust-graph-engine-target-x86-64-pc-windows-msvc-release-fingerprint-",
+        "temporal.hidden-dir.simd-bridge-rust-simdjson-target-release-fingerprint-regex-syntax-b4ea55b4904cd3"
       ],
       "topSourceRefs": [
-        "local:.cache/d9-verifier/294f7266e00b9379.json"
+        "crates/turbovec-napi/target/release/.fingerprint/rand_chacha-d71ebaffa05a9a46",
+        "crates/turbovec-napi/target/x86_64-pc-windows-msvc/release/.fingerprint/float-cmp-cb9e955a1ad7b1d9",
+        "simd-bridge/rust/graph-engine/target/release/.fingerprint/quote-d9ef1d8a31833ee2",
+        "simd-bridge/rust/graph-engine/target/x86_64-pc-windows-msvc/release/.fingerprint/rayon-core-477e7332572f7064",
+        "simd-bridge/rust-simdjson/target/release/.fingerprint/regex-syntax-b4ea55b4904cd38e"
       ],
       "statuses": {
-        "todo": 2
+        "BACKLOG": 9
       },
       "backendCounts": {
-        "js": 2
+        "offline": 9
       },
-      "priorityMax": 0,
+      "priorityMax": 1,
       "libtorch": {
         "source": "cpu",
-        "cohesion": 0.019,
-        "pairCount": 1
+        "cohesion": -0.0017,
+        "pairCount": 36
       },
       "recommendation": "Consolidate duplicate open work into one parent kanban item and keep the file-level labels as links."
     },
     {
-      "groupId": "cache-d9-verifier-307279f5f1494c7e-json:cluster:none",
-      "recordCount": 2,
-      "openCount": 2,
-      "clusterIds": [],
+      "groupId": "master-todo:cluster:75",
+      "recordCount": 8,
+      "openCount": 8,
+      "clusterIds": [
+        75,
+        92,
+        106
+      ],
       "featureFamilies": [
-        "cache-d9-verifier-307279f5f1494c7e-json"
+        "master-todo"
       ],
       "sourceRefs": [
-        "local:.cache/d9-verifier/307279f5f1494c7e.json"
+        "MASTER-FEATURE-TODO-2026-05-20.md:396",
+        "MASTER-FEATURE-TODO-2026-05-20.md:812",
+        "MASTER-FEATURE-TODO-2026-05-20.md:821",
+        "MASTER-FEATURE-TODO-2026-05-20.md:427",
+        "MASTER-FEATURE-TODO-2026-05-20.md:260",
+        "MASTER-FEATURE-TODO-2026-05-20.md:314",
+        "MASTER-FEATURE-TODO-2026-05-20.md:340",
+        "MASTER-FEATURE-TODO-2026-05-20.md:393"
       ],
       "topTitles": [
-        "Label cache-d9-verifier-307279f5f1494c7e-json",
-        "cache-d9-verifier-307279f5f1494c7e-json"
+        "Add deep_research test coverage for the future LLM orchestration lane before …",
+        "Refresh the parent atlas using only the production-ready feature list after a…",
+        "Deep Drizzle audit after consolidation and archiving",
+        "Keep this lane tied to the existing graph artifacts in `docs/graph/` rather t…",
+        "Configure `gemma3-270m.gguf` draft-model support in TurboQuant for CPU-assist…"
       ],
       "topFeatureIds": [
-        "feature:file:6a2e9ec981582e7483ab3ade"
+        "master-todo.nes-glyph-architecture-notes-sourceref-f",
+        "master-todo.unknown"
       ],
-      "topSourceRefs": [
-        "local:.cache/d9-verifier/307279f5f1494c7e.json"
-      ],
+      "topSourceRefs": [],
       "statuses": {
-        "todo": 2
+        "BACKLOG": 8
       },
       "backendCounts": {
-        "js": 2
+        "offline": 8
       },
-      "priorityMax": 0,
+      "priorityMax": 2,
       "libtorch": {
         "source": "cpu",
-        "cohesion": 0.0359,
-        "pairCount": 1
+        "cohesion": 0.0018,
+        "pairCount": 28
       },
       "recommendation": "Consolidate duplicate open work into one parent kanban item and keep the file-level labels as links."
     },
     {
-      "groupId": "cache-d9-verifier-39a2eb1d8f1afd09-json:cluster:none",
-      "recordCount": 2,
-      "openCount": 2,
-      "clusterIds": [],
+      "groupId": "temporal:cluster:104",
+      "recordCount": 8,
+      "openCount": 8,
+      "clusterIds": [
+        7,
+        104,
+        121
+      ],
       "featureFamilies": [
-        "cache-d9-verifier-39a2eb1d8f1afd09-json"
+        "temporal"
       ],
       "sourceRefs": [
-        "local:.cache/d9-verifier/39a2eb1d8f1afd09.json"
+        "dir:claude-mem/.agent/rules",
+        "dir:crates/turbovec-napi/target/release/.fingerprint/dbgf-84c88019e0cb4531",
+        "dir:crates/turbovec-napi/target/release/.fingerprint/generativity-a921b63948b4f939",
+        "dir:crates/turbovec-napi/target/release/.fingerprint/simd-json-3f0ac4d093c8fc65",
+        "dir:simd-bridge/rust/graph-engine/target/release/.fingerprint/proc-macro2-b32490db0bdc7286",
+        "dir:simd-bridge/rust/hmm-repair/target/x86_64-pc-windows-msvc/release/.fingerprint/itoa-d5dd43c4cbff834d",
+        "dir:.svelte-error-fixes-backup/sveltekit-frontend/src/lib/components/forms",
+        "dir:.opencode/skills/graphrag-context-recovery"
       ],
       "topTitles": [
-        "Label cache-d9-verifier-39a2eb1d8f1afd09-json",
-        "cache-d9-verifier-39a2eb1d8f1afd09-json"
+        "Review hidden directory claude-mem/.agent/rules",
+        "Review hidden directory crates/turbovec-napi/target/release/.fingerprint/dbgf-84c88019e0cb4531",
+        "Review hidden directory crates/turbovec-napi/target/release/.fingerprint/generativity-a921b63948b4f939",
+        "Review hidden directory crates/turbovec-napi/target/release/.fingerprint/simd-json-3f0ac4d093c8fc65",
+        "Review hidden directory simd-bridge/rust/graph-engine/target/release/.fingerprint/proc-macro2-b32490db0bdc7286"
       ],
       "topFeatureIds": [
-        "feature:file:34a54184e7994745a3c84d10"
+        "temporal.hidden-dir.claude-mem-agent-rules",
+        "temporal.hidden-dir.crates-turbovec-napi-target-release-fingerprint-dbgf-84c88019e0cb4531",
+        "temporal.hidden-dir.crates-turbovec-napi-target-release-fingerprint-generativity-a921b63948b4f939",
+        "temporal.hidden-dir.crates-turbovec-napi-target-release-fingerprint-simd-json-3f0ac4d093c8fc65",
+        "temporal.hidden-dir.simd-bridge-rust-graph-engine-target-release-fingerprint-proc-macro2-b32490db0bd"
       ],
       "topSourceRefs": [
-        "local:.cache/d9-verifier/39a2eb1d8f1afd09.json"
+        "claude-mem/.agent/rules",
+        "crates/turbovec-napi/target/release/.fingerprint/dbgf-84c88019e0cb4531",
+        "crates/turbovec-napi/target/release/.fingerprint/generativity-a921b63948b4f939",
+        "crates/turbovec-napi/target/release/.fingerprint/simd-json-3f0ac4d093c8fc65",
+        "simd-bridge/rust/graph-engine/target/release/.fingerprint/proc-macro2-b32490db0bdc7286"
       ],
       "statuses": {
-        "todo": 2
+        "BACKLOG": 7,
+        "REVIEW": 1
       },
       "backendCounts": {
-        "js": 2
+        "offline": 8
       },
-      "priorityMax": 0,
+      "priorityMax": 2,
       "libtorch": {
         "source": "cpu",
-        "cohesion": 0.0047,
-        "pairCount": 1
-      },
-      "recommendation": "Consolidate duplicate open work into one parent kanban item and keep the file-level labels as links."
-    },
-    {
-      "groupId": "cache-d9-verifier-43b9fc4b89d78538-json:cluster:none",
-      "recordCount": 2,
-      "openCount": 2,
-      "clusterIds": [],
-      "featureFamilies": [
-        "cache-d9-verifier-43b9fc4b89d78538-json"
-      ],
-      "sourceRefs": [
-        "local:.cache/d9-verifier/43b9fc4b89d78538.json"
-      ],
-      "topTitles": [
-        "Label cache-d9-verifier-43b9fc4b89d78538-json",
-        "cache-d9-verifier-43b9fc4b89d78538-json"
-      ],
-      "topFeatureIds": [
-        "feature:file:c06c65f0962cca53168993c7"
-      ],
-      "topSourceRefs": [
-        "local:.cache/d9-verifier/43b9fc4b89d78538.json"
-      ],
-      "statuses": {
-        "todo": 2
-      },
-      "backendCounts": {
-        "js": 2
-      },
-      "priorityMax": 0,
-      "libtorch": {
-        "source": "cpu",
-        "cohesion": -0.0352,
-        "pairCount": 1
-      },
-      "recommendation": "Consolidate duplicate open work into one parent kanban item and keep the file-level labels as links."
-    },
-    {
-      "groupId": "cache-d9-verifier-441c62a1acf01e5d-json:cluster:none",
-      "recordCount": 2,
-      "openCount": 2,
-      "clusterIds": [],
-      "featureFamilies": [
-        "cache-d9-verifier-441c62a1acf01e5d-json"
-      ],
-      "sourceRefs": [
-        "local:.cache/d9-verifier/441c62a1acf01e5d.json"
-      ],
-      "topTitles": [
-        "Label cache-d9-verifier-441c62a1acf01e5d-json",
-        "cache-d9-verifier-441c62a1acf01e5d-json"
-      ],
-      "topFeatureIds": [
-        "feature:file:23390b9679b54ecd0d75b9e2"
-      ],
-      "topSourceRefs": [
-        "local:.cache/d9-verifier/441c62a1acf01e5d.json"
-      ],
-      "statuses": {
-        "todo": 2
-      },
-      "backendCounts": {
-        "js": 2
-      },
-      "priorityMax": 0,
-      "libtorch": {
-        "source": "cpu",
-        "cohesion": -0.0327,
-        "pairCount": 1
-      },
-      "recommendation": "Consolidate duplicate open work into one parent kanban item and keep the file-level labels as links."
-    },
-    {
-      "groupId": "cache-d9-verifier-53a4d51ab2e58a11-json:cluster:none",
-      "recordCount": 2,
-      "openCount": 2,
-      "clusterIds": [],
-      "featureFamilies": [
-        "cache-d9-verifier-53a4d51ab2e58a11-json"
-      ],
-      "sourceRefs": [
-        "local:.cache/d9-verifier/53a4d51ab2e58a11.json"
-      ],
-      "topTitles": [
-        "Label cache-d9-verifier-53a4d51ab2e58a11-json",
-        "cache-d9-verifier-53a4d51ab2e58a11-json"
-      ],
-      "topFeatureIds": [
-        "feature:file:8693c86d43c2b0d14c8d9dce"
-      ],
-      "topSourceRefs": [
-        "local:.cache/d9-verifier/53a4d51ab2e58a11.json"
-      ],
-      "statuses": {
-        "todo": 2
-      },
-      "backendCounts": {
-        "js": 2
-      },
-      "priorityMax": 0,
-      "libtorch": {
-        "source": "cpu",
-        "cohesion": -0.0503,
-        "pairCount": 1
-      },
-      "recommendation": "Consolidate duplicate open work into one parent kanban item and keep the file-level labels as links."
-    },
-    {
-      "groupId": "cache-d9-verifier-5628c7618811c4fd-json:cluster:none",
-      "recordCount": 2,
-      "openCount": 2,
-      "clusterIds": [],
-      "featureFamilies": [
-        "cache-d9-verifier-5628c7618811c4fd-json"
-      ],
-      "sourceRefs": [
-        "local:.cache/d9-verifier/5628c7618811c4fd.json"
-      ],
-      "topTitles": [
-        "Label cache-d9-verifier-5628c7618811c4fd-json",
-        "cache-d9-verifier-5628c7618811c4fd-json"
-      ],
-      "topFeatureIds": [
-        "feature:file:290a6da34f60b17a3804d70e"
-      ],
-      "topSourceRefs": [
-        "local:.cache/d9-verifier/5628c7618811c4fd.json"
-      ],
-      "statuses": {
-        "todo": 2
-      },
-      "backendCounts": {
-        "js": 2
-      },
-      "priorityMax": 0,
-      "libtorch": {
-        "source": "cpu",
-        "cohesion": -0.0078,
-        "pairCount": 1
-      },
-      "recommendation": "Consolidate duplicate open work into one parent kanban item and keep the file-level labels as links."
-    },
-    {
-      "groupId": "cache-d9-verifier-5e4a96bb345bd10e-json:cluster:none",
-      "recordCount": 2,
-      "openCount": 2,
-      "clusterIds": [],
-      "featureFamilies": [
-        "cache-d9-verifier-5e4a96bb345bd10e-json"
-      ],
-      "sourceRefs": [
-        "local:.cache/d9-verifier/5e4a96bb345bd10e.json"
-      ],
-      "topTitles": [
-        "Label cache-d9-verifier-5e4a96bb345bd10e-json",
-        "cache-d9-verifier-5e4a96bb345bd10e-json"
-      ],
-      "topFeatureIds": [
-        "feature:file:3521b74db7e778923fd00d16"
-      ],
-      "topSourceRefs": [
-        "local:.cache/d9-verifier/5e4a96bb345bd10e.json"
-      ],
-      "statuses": {
-        "todo": 2
-      },
-      "backendCounts": {
-        "js": 2
-      },
-      "priorityMax": 0,
-      "libtorch": {
-        "source": "cpu",
-        "cohesion": -0.0065,
-        "pairCount": 1
-      },
-      "recommendation": "Consolidate duplicate open work into one parent kanban item and keep the file-level labels as links."
-    },
-    {
-      "groupId": "cache-d9-verifier-7530781fb24e4c3a-json:cluster:none",
-      "recordCount": 2,
-      "openCount": 2,
-      "clusterIds": [],
-      "featureFamilies": [
-        "cache-d9-verifier-7530781fb24e4c3a-json"
-      ],
-      "sourceRefs": [
-        "local:.cache/d9-verifier/7530781fb24e4c3a.json"
-      ],
-      "topTitles": [
-        "Label cache-d9-verifier-7530781fb24e4c3a-json",
-        "cache-d9-verifier-7530781fb24e4c3a-json"
-      ],
-      "topFeatureIds": [
-        "feature:file:62e7d8c2f65aceb845d51713"
-      ],
-      "topSourceRefs": [
-        "local:.cache/d9-verifier/7530781fb24e4c3a.json"
-      ],
-      "statuses": {
-        "todo": 2
-      },
-      "backendCounts": {
-        "js": 2
-      },
-      "priorityMax": 0,
-      "libtorch": {
-        "source": "cpu",
-        "cohesion": -0.0327,
-        "pairCount": 1
-      },
-      "recommendation": "Consolidate duplicate open work into one parent kanban item and keep the file-level labels as links."
-    },
-    {
-      "groupId": "cache-d9-verifier-78b20ee42936e840-json:cluster:none",
-      "recordCount": 2,
-      "openCount": 2,
-      "clusterIds": [],
-      "featureFamilies": [
-        "cache-d9-verifier-78b20ee42936e840-json"
-      ],
-      "sourceRefs": [
-        "local:.cache/d9-verifier/78b20ee42936e840.json"
-      ],
-      "topTitles": [
-        "Label cache-d9-verifier-78b20ee42936e840-json",
-        "cache-d9-verifier-78b20ee42936e840-json"
-      ],
-      "topFeatureIds": [
-        "feature:file:a80b89d9a2df6e7c0b41afab"
-      ],
-      "topSourceRefs": [
-        "local:.cache/d9-verifier/78b20ee42936e840.json"
-      ],
-      "statuses": {
-        "todo": 2
-      },
-      "backendCounts": {
-        "js": 2
-      },
-      "priorityMax": 0,
-      "libtorch": {
-        "source": "cpu",
-        "cohesion": -0.0063,
-        "pairCount": 1
-      },
-      "recommendation": "Consolidate duplicate open work into one parent kanban item and keep the file-level labels as links."
-    },
-    {
-      "groupId": "cache-d9-verifier-79e2ba0f90ee5ebe-json:cluster:none",
-      "recordCount": 2,
-      "openCount": 2,
-      "clusterIds": [],
-      "featureFamilies": [
-        "cache-d9-verifier-79e2ba0f90ee5ebe-json"
-      ],
-      "sourceRefs": [
-        "local:.cache/d9-verifier/79e2ba0f90ee5ebe.json"
-      ],
-      "topTitles": [
-        "Label cache-d9-verifier-79e2ba0f90ee5ebe-json",
-        "cache-d9-verifier-79e2ba0f90ee5ebe-json"
-      ],
-      "topFeatureIds": [
-        "feature:file:19473fa5c8be3362f6bbefa0"
-      ],
-      "topSourceRefs": [
-        "local:.cache/d9-verifier/79e2ba0f90ee5ebe.json"
-      ],
-      "statuses": {
-        "todo": 2
-      },
-      "backendCounts": {
-        "js": 2
-      },
-      "priorityMax": 0,
-      "libtorch": {
-        "source": "cpu",
-        "cohesion": -0.1177,
-        "pairCount": 1
-      },
-      "recommendation": "Consolidate duplicate open work into one parent kanban item and keep the file-level labels as links."
-    },
-    {
-      "groupId": "cache-d9-verifier-87fe7ea09a599e3f-json:cluster:none",
-      "recordCount": 2,
-      "openCount": 2,
-      "clusterIds": [],
-      "featureFamilies": [
-        "cache-d9-verifier-87fe7ea09a599e3f-json"
-      ],
-      "sourceRefs": [
-        "local:.cache/d9-verifier/87fe7ea09a599e3f.json"
-      ],
-      "topTitles": [
-        "Label cache-d9-verifier-87fe7ea09a599e3f-json",
-        "cache-d9-verifier-87fe7ea09a599e3f-json"
-      ],
-      "topFeatureIds": [
-        "feature:file:055439abb00e133b9b96a16b"
-      ],
-      "topSourceRefs": [
-        "local:.cache/d9-verifier/87fe7ea09a599e3f.json"
-      ],
-      "statuses": {
-        "todo": 2
-      },
-      "backendCounts": {
-        "js": 2
-      },
-      "priorityMax": 0,
-      "libtorch": {
-        "source": "cpu",
-        "cohesion": 0.0037,
-        "pairCount": 1
-      },
-      "recommendation": "Consolidate duplicate open work into one parent kanban item and keep the file-level labels as links."
-    },
-    {
-      "groupId": "cache-d9-verifier-905270df680aabf7-json:cluster:none",
-      "recordCount": 2,
-      "openCount": 2,
-      "clusterIds": [],
-      "featureFamilies": [
-        "cache-d9-verifier-905270df680aabf7-json"
-      ],
-      "sourceRefs": [
-        "local:.cache/d9-verifier/905270df680aabf7.json"
-      ],
-      "topTitles": [
-        "Label cache-d9-verifier-905270df680aabf7-json",
-        "cache-d9-verifier-905270df680aabf7-json"
-      ],
-      "topFeatureIds": [
-        "feature:file:9a6b4693def4d4a4a1f4f79b"
-      ],
-      "topSourceRefs": [
-        "local:.cache/d9-verifier/905270df680aabf7.json"
-      ],
-      "statuses": {
-        "todo": 2
-      },
-      "backendCounts": {
-        "js": 2
-      },
-      "priorityMax": 0,
-      "libtorch": {
-        "source": "cpu",
-        "cohesion": -0.0454,
-        "pairCount": 1
-      },
-      "recommendation": "Consolidate duplicate open work into one parent kanban item and keep the file-level labels as links."
-    },
-    {
-      "groupId": "cache-d9-verifier-92f9dd3a09baf1d3-json:cluster:none",
-      "recordCount": 2,
-      "openCount": 2,
-      "clusterIds": [],
-      "featureFamilies": [
-        "cache-d9-verifier-92f9dd3a09baf1d3-json"
-      ],
-      "sourceRefs": [
-        "local:.cache/d9-verifier/92f9dd3a09baf1d3.json"
-      ],
-      "topTitles": [
-        "Label cache-d9-verifier-92f9dd3a09baf1d3-json",
-        "cache-d9-verifier-92f9dd3a09baf1d3-json"
-      ],
-      "topFeatureIds": [
-        "feature:file:8be9e583141b09f816d6d391"
-      ],
-      "topSourceRefs": [
-        "local:.cache/d9-verifier/92f9dd3a09baf1d3.json"
-      ],
-      "statuses": {
-        "todo": 2
-      },
-      "backendCounts": {
-        "js": 2
-      },
-      "priorityMax": 0,
-      "libtorch": {
-        "source": "cpu",
-        "cohesion": 0.0361,
-        "pairCount": 1
-      },
-      "recommendation": "Consolidate duplicate open work into one parent kanban item and keep the file-level labels as links."
-    },
-    {
-      "groupId": "cache-d9-verifier-9e81804cbb551132-json:cluster:none",
-      "recordCount": 2,
-      "openCount": 2,
-      "clusterIds": [],
-      "featureFamilies": [
-        "cache-d9-verifier-9e81804cbb551132-json"
-      ],
-      "sourceRefs": [
-        "local:.cache/d9-verifier/9e81804cbb551132.json"
-      ],
-      "topTitles": [
-        "Label cache-d9-verifier-9e81804cbb551132-json",
-        "cache-d9-verifier-9e81804cbb551132-json"
-      ],
-      "topFeatureIds": [
-        "feature:file:e6647dfab96642db88b2045a"
-      ],
-      "topSourceRefs": [
-        "local:.cache/d9-verifier/9e81804cbb551132.json"
-      ],
-      "statuses": {
-        "todo": 2
-      },
-      "backendCounts": {
-        "js": 2
-      },
-      "priorityMax": 0,
-      "libtorch": {
-        "source": "cpu",
-        "cohesion": 0.0237,
-        "pairCount": 1
-      },
-      "recommendation": "Consolidate duplicate open work into one parent kanban item and keep the file-level labels as links."
-    },
-    {
-      "groupId": "cache-d9-verifier-ae5f8718a6ccb862-json:cluster:none",
-      "recordCount": 2,
-      "openCount": 2,
-      "clusterIds": [],
-      "featureFamilies": [
-        "cache-d9-verifier-ae5f8718a6ccb862-json"
-      ],
-      "sourceRefs": [
-        "local:.cache/d9-verifier/ae5f8718a6ccb862.json"
-      ],
-      "topTitles": [
-        "Label cache-d9-verifier-ae5f8718a6ccb862-json",
-        "cache-d9-verifier-ae5f8718a6ccb862-json"
-      ],
-      "topFeatureIds": [
-        "feature:file:26902d9de0525a08833e78b4"
-      ],
-      "topSourceRefs": [
-        "local:.cache/d9-verifier/ae5f8718a6ccb862.json"
-      ],
-      "statuses": {
-        "todo": 2
-      },
-      "backendCounts": {
-        "js": 2
-      },
-      "priorityMax": 0,
-      "libtorch": {
-        "source": "cpu",
-        "cohesion": 0.0678,
-        "pairCount": 1
-      },
-      "recommendation": "Consolidate duplicate open work into one parent kanban item and keep the file-level labels as links."
-    },
-    {
-      "groupId": "cache-d9-verifier-aeba5bcc519138f2-json:cluster:none",
-      "recordCount": 2,
-      "openCount": 2,
-      "clusterIds": [],
-      "featureFamilies": [
-        "cache-d9-verifier-aeba5bcc519138f2-json"
-      ],
-      "sourceRefs": [
-        "local:.cache/d9-verifier/aeba5bcc519138f2.json"
-      ],
-      "topTitles": [
-        "Label cache-d9-verifier-aeba5bcc519138f2-json",
-        "cache-d9-verifier-aeba5bcc519138f2-json"
-      ],
-      "topFeatureIds": [
-        "feature:file:8681a70c0ea7b0c615409b20"
-      ],
-      "topSourceRefs": [
-        "local:.cache/d9-verifier/aeba5bcc519138f2.json"
-      ],
-      "statuses": {
-        "todo": 2
-      },
-      "backendCounts": {
-        "js": 2
-      },
-      "priorityMax": 0,
-      "libtorch": {
-        "source": "cpu",
-        "cohesion": 0.0251,
-        "pairCount": 1
-      },
-      "recommendation": "Consolidate duplicate open work into one parent kanban item and keep the file-level labels as links."
-    },
-    {
-      "groupId": "cache-d9-verifier-b222315b079d41a4-json:cluster:none",
-      "recordCount": 2,
-      "openCount": 2,
-      "clusterIds": [],
-      "featureFamilies": [
-        "cache-d9-verifier-b222315b079d41a4-json"
-      ],
-      "sourceRefs": [
-        "local:.cache/d9-verifier/b222315b079d41a4.json"
-      ],
-      "topTitles": [
-        "Label cache-d9-verifier-b222315b079d41a4-json",
-        "cache-d9-verifier-b222315b079d41a4-json"
-      ],
-      "topFeatureIds": [
-        "feature:file:764070b243f5d82aae1891a9"
-      ],
-      "topSourceRefs": [
-        "local:.cache/d9-verifier/b222315b079d41a4.json"
-      ],
-      "statuses": {
-        "todo": 2
-      },
-      "backendCounts": {
-        "js": 2
-      },
-      "priorityMax": 0,
-      "libtorch": {
-        "source": "cpu",
-        "cohesion": -0.0235,
-        "pairCount": 1
+        "cohesion": 0.0121,
+        "pairCount": 28
       },
       "recommendation": "Consolidate duplicate open work into one parent kanban item and keep the file-level labels as links."
     }

@@ -146,6 +146,89 @@ async function main() {
   console.log(`  ✓ Filtered codebase imports: ${importsToSync.length}`);
   console.log(`  ✓ Filtered codebase test covers: ${coversToSync.length}`);
 
+  // Helper for AST Import path resolution
+  const EXTS = [
+    '', '.ts', '.svelte', '.js', '.mjs',
+    '/index.ts', '/index.js',
+    '/+server.ts', '/+page.ts', '/+page.svelte', '/+layout.svelte',
+  ];
+
+  function resolveWithExts(base) {
+    for (const ext of EXTS) {
+      const c = base + ext;
+      if (codebaseFilesSet.has(c)) return c;
+      if (c.endsWith('.js')) {
+        const ts = c.slice(0, -3) + '.ts';
+        if (codebaseFilesSet.has(ts)) return ts;
+      }
+    }
+    return null;
+  }
+
+  function resolveImport(spec, fromRel) {
+    if (!spec) return null;
+    const s = spec.split('?')[0].split('#')[0];
+    if (s.startsWith('$lib/')) {
+      return resolveWithExts('src/lib/' + s.slice(5));
+    }
+    if (s.startsWith('$app/') || s.startsWith('$env/') || s.startsWith('$service-worker')) {
+      return null;
+    }
+    if (s.startsWith('.')) {
+      const parts = [];
+      const fromDirParts = fromRel.split('/').slice(0, -1);
+      for (const p of [...fromDirParts, ...s.split('/')]) {
+        if (p === '..') parts.pop();
+        else if (p !== '.' && p !== '') parts.push(p);
+      }
+      return resolveWithExts(parts.join('/'));
+    }
+    if (/^(src|tests|scripts)\//.test(s)) {
+      return resolveWithExts(s);
+    }
+    return null;
+  }
+
+  // ── 2b. Read AST-Grep Import Relations ─────────────────────────────────────
+  const astRelationsPath = path.join(ROOT, 'sveltekit-frontend', 'memory', 'index', 'ast-relations.jsonl');
+  let astEdgesCount = 0;
+  if (fs.existsSync(astRelationsPath)) {
+    console.log(`⏳ Reading AST relations from ${astRelationsPath}...`);
+    const lines = fs.readFileSync(astRelationsPath, 'utf8').split(/\r?\n/).filter(Boolean);
+    for (const line of lines) {
+      try {
+        const edge = JSON.parse(line);
+        if (edge.kind === 'route-handler') continue;
+        
+        const normFrom = normalizeNeo4jPath(edge.from);
+        const resolvedTo = resolveImport(edge.to, normFrom);
+        if (resolvedTo && codebaseFilesSet.has(normFrom) && codebaseFilesSet.has(resolvedTo)) {
+          const isDyn = (edge.kind === 'import-dynamic');
+          const edgeType = isDyn ? 'imports_dynamic' : 'imports_static';
+          
+          const alreadyExists = importsToSync.some(
+            existing => existing.from === normFrom && existing.to === resolvedTo
+          );
+          
+          if (!alreadyExists) {
+            importsToSync.push({
+              from: normFrom,
+              to: resolvedTo,
+              isDyn,
+              type: edgeType
+            });
+            astEdgesCount++;
+          }
+        }
+      } catch (err) {
+        // Skip malformed lines
+      }
+    }
+    console.log(`  ✓ Loaded and merged ${astEdgesCount} unique AST import edges`);
+  } else {
+    console.warn(`⚠️  ast-relations.jsonl not found at ${astRelationsPath}. Skipping AST imports.`);
+  }
+
   // ── 3. Build Similar Topology Edges ────────────────────────────────────────
   // Canonical edge costs (used in GDS projection + Dijkstra)
   const COSTS = {

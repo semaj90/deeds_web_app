@@ -1,15 +1,15 @@
-import {
-  invalidateGraphCaches,
-  invalidateDocumentsAtlasCaches,
-  invalidateBifrostPrefixCachesByModel,
-  invalidateBifrostSchemaCaches,
-  invalidateQdrantCollectionCaches
-} from '../../sveltekit-frontend/src/lib/server/cache/cache-invalidation.js';
-
-// Note: Ensure the compiled JS exists or run via tsx/node with loader
-
 async function runManualInvalidation() {
   console.log("🧹 Running manual cache invalidation checks...");
+  
+  const tsx = await import('tsx/esm/api').catch(() => null);
+  if (tsx?.register) tsx.register();
+  const {
+    invalidateGraphCaches,
+    invalidateDocumentsAtlasCaches,
+    invalidateBifrostPrefixCachesByModel,
+    invalidateBifrostSchemaCaches,
+    invalidateQdrantCollectionCaches
+  } = await import('../../sveltekit-frontend/src/lib/server/cache/cache-invalidation.ts');
   
   // Since this is a manual/cron wrapper, we'd normally fetch the latest digests
   // from our authoritative sources (e.g., hash the neo4j graph, hash the DB schema).

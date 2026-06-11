@@ -210,11 +210,12 @@ async function main() {
             commands,
             outcome,
             retrieval_strategy,
+            selected_concepts,
             score,
             trace_source,
             created_at
           )
-          VALUES ($1, $2, $3, $4::jsonb, $5::jsonb, $6::jsonb, $7, $8, $9, $10, now())
+          VALUES ($1, $2, $3, $4::jsonb, $5::jsonb, $6::jsonb, $7, $8, $9::jsonb, $10, $11, now())
           ON CONFLICT DO NOTHING
         `, [
           traceId,
@@ -225,6 +226,7 @@ async function main() {
           JSON.stringify(commands),
           outcome,
           'fusion',
+          JSON.stringify([featureId]),
           1.0,
           'manual'
         ]);
@@ -324,6 +326,18 @@ async function main() {
     console.log('  Phase 2: Agent Trace Distillation');
     console.log('  Filter: outcome=success AND score>=0.85');
     console.log('═'.repeat(60));
+
+    // Backfill selected_concepts from kanban_tasks for any existing traces
+    if (APPLY) {
+      console.log('[db] Backfilling missing selected_concepts from kanban_tasks...');
+      await pool.query(`
+        UPDATE agent_traces t
+        SET selected_concepts = jsonb_build_array(k.feature_id)
+        FROM kanban_tasks k
+        WHERE t.task_id = k.task_id
+          AND (t.selected_concepts IS NULL OR jsonb_array_length(t.selected_concepts) = 0)
+      `);
+    }
 
     // Pull ALL traces for counting
     const { rows: allTraces } = await pool.query(`

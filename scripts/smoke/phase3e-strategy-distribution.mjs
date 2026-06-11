@@ -44,7 +44,7 @@ async function main() {
     const conceptResult = await pool.query(`
       SELECT concept_id, strategy_distribution, concept_temperature
       FROM concept_records
-      WHERE strategy_distribution IS NOT NULL AND jsonb_object_keys(strategy_distribution) IS NOT NULL
+      WHERE strategy_distribution IS NOT NULL AND strategy_distribution != '{}'::jsonb
       LIMIT 5
     `);
 

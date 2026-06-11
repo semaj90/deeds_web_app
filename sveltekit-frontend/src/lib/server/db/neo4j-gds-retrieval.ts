@@ -14,8 +14,8 @@
  *   - Personalized PageRank: strategy-scoped authority
  */
 
-import { Session, Result } from 'neo4j-driver';
-import { Neo4jClient } from './neo4j-client';
+import { type Driver, type Session, type Result } from 'neo4j-driver';
+import { getNeo4jDriver } from '../neo4j-driver';
 
 const RETRIEVAL_PROJECTION_NAME = 'retrievalAnalysis';
 
@@ -30,7 +30,7 @@ export interface GdsProjectionConfig {
  * Creates or refreshes the GDS projection of Query → Concept → Packet → Feature graph.
  */
 export async function ensureRetrievalGdsProjection(
-  neo4j: Neo4jClient,
+  neo4j: Driver,
   force: boolean = false
 ): Promise<void> {
   const session = neo4j.session();
@@ -110,7 +110,7 @@ export async function ensureRetrievalGdsProjection(
  * Run PageRank on the retrieval projection.
  * Identifies most important concepts and strategies based on graph structure.
  */
-export async function runRetrievalPageRank(neo4j: Neo4jClient): Promise<void> {
+export async function runRetrievalPageRank(neo4j: Driver): Promise<void> {
   const session = neo4j.session();
 
   try {
@@ -140,7 +140,7 @@ export async function runRetrievalPageRank(neo4j: Neo4jClient): Promise<void> {
  * Run Louvain community detection on the retrieval projection.
  * Identifies emergent concept communities for task-scoped selection.
  */
-export async function runRetrievalCommunityDetection(neo4j: Neo4jClient): Promise<void> {
+export async function runRetrievalCommunityDetection(neo4j: Driver): Promise<void> {
   const session = neo4j.session();
 
   try {
@@ -169,7 +169,7 @@ export async function runRetrievalCommunityDetection(neo4j: Neo4jClient): Promis
  * Run Node Similarity to find concept/strategy cousins.
  * Writes SIMILAR_RETRIEVAL relationships.
  */
-export async function runRetrievalNodeSimilarity(neo4j: Neo4jClient): Promise<void> {
+export async function runRetrievalNodeSimilarity(neo4j: Driver): Promise<void> {
   const session = neo4j.session();
 
   try {
@@ -202,7 +202,7 @@ export async function runRetrievalNodeSimilarity(neo4j: Neo4jClient): Promise<vo
  * @returns Ranked list of concepts/strategies with personalized authority
  */
 export async function runRetrievalPersonalizedPageRank(
-  neo4j: Neo4jClient,
+  neo4j: Driver,
   sourceNodeId: string
 ): Promise<Array<{ id: string; score: number }>> {
   const session = neo4j.session();
@@ -254,7 +254,7 @@ export async function runRetrievalPersonalizedPageRank(
  * Get the current projection stats: node count, edge count, last algorithm run.
  */
 export async function getRetrievalProjectionStats(
-  neo4j: Neo4jClient
+  neo4j: Driver
 ): Promise<{
   graphName: string;
   nodeCount: number;
@@ -288,7 +288,7 @@ export async function getRetrievalProjectionStats(
  * Export top concepts by authority for planner context.
  */
 export async function getTopConceptsByAuthority(
-  neo4j: Neo4jClient,
+  neo4j: Driver,
   limit: number = 10
 ): Promise<
   Array<{
@@ -328,8 +328,8 @@ export async function getTopConceptsByAuthority(
 /**
  * Get concepts in a specific community (from Louvain).
  */
-export async function getConceptsByComm unity(
-  neo4j: Neo4jClient,
+export async function getConceptsByCommunity(
+  neo4j: Driver,
   communityId: number
 ): Promise<
   Array<{

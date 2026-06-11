@@ -36,6 +36,7 @@ import { db, pool } from '$lib/server/db/client';
 import { contextTimeline } from '$lib/server/db/schema-postgres.js';
 import { logInference } from '$lib/server/observability/inference-log.js';
 import { appendOutcomeLedger, computeAgentReward } from '$lib/server/observability/outcome-ledger.js';
+import { recordAgentTrace } from '$lib/server/observability/agent-trace-recorder.js';
 import { trackTokenUsage } from '$lib/server/ai/token-tracker.js';
 import { resolveRuntimeConfig } from '$lib/server/ai/inference-configs.js';
 import { canUseTurboQuant, gatePreferredBackend } from '$lib/server/ai/backend-runtime-guards.js';
@@ -1070,6 +1071,8 @@ async function dispatchTool(
     goRetrievalHits?: GoHit[];
     parentTaskId?: string;
     runId?: string;
+    selectedConcepts?: Set<string>;
+    selectedPackets?: Set<string>;
   }
 ): Promise<ToolResult> {
   try {
@@ -1119,6 +1122,23 @@ async function dispatchTool(
         queryEmbedding: emb,
         limit: topK,
       });
+
+      // Extract selected_concepts and selected_packets for Phase 3F trace recording
+      if (options?.selectedConcepts && options?.selectedPackets) {
+        hits.results.forEach((h) => {
+          if (h.payload?.['concept_id']) {
+            options.selectedConcepts!.add(String(h.payload['concept_id']));
+          }
+          if (h.payload?.['packet_key']) {
+            options.selectedPackets!.add(String(h.payload['packet_key']));
+          }
+          // Also extract from source field if it contains packet_key format
+          const source = h.payload?.['source'] as string | undefined;
+          if (source && source.includes('::')) {
+            options.selectedPackets!.add(source);
+          }
+        });
+      }
 
       return {
         tool: name,
@@ -1175,6 +1195,17 @@ async function dispatchTool(
         return { tool: name, result: [], errorMsg: 'Embedding unavailable (VRAM contention)' };
 
       const modules = await selectAdaptiveMemory(emb, topK);
+
+      // Extract selected_concepts for Phase 3F trace recording
+      if (options?.selectedConcepts) {
+        modules.forEach((m) => {
+          if (m.hyperedgeHash) {
+            // Hyperedges may contain concept references; track the hash as a pseudo-concept
+            options.selectedConcepts!.add(m.hyperedgeHash);
+          }
+        });
+      }
+
       return {
         tool: name,
         result: modules.map((m) => ({
@@ -1904,6 +1935,9 @@ export async function runGemma4Agent(
     path?: string;
     score?: number;
   }> = [];
+  // Track selected concepts and packets for agent trace recording (Phase 3F)
+  const selectedConcepts: Set<string> = new Set();
+  const selectedPackets: Set<string> = new Set();
   // Bypass cache when caller requests it, or when side-effect tools were used
   let hasSideEffect = false;
   let bypassCache = options?.bypassCache ?? false;
@@ -2186,6 +2220,8 @@ export async function runGemma4Agent(
         goRetrievalHits,
         parentTaskId: options?.metadata?.parentTaskId as string | undefined,
         runId: options?.metadata?.runId as string | undefined,
+        selectedConcepts,
+        selectedPackets,
       });
       if (Array.isArray(result.result)) sources.push(...result.result);
 
@@ -2484,6 +2520,35 @@ export async function runGemma4Agent(
       console.error('[agent] Memory encoding failed:', e);
       /* non-fatal */
     }
+  }
+
+  // ── Phase 3F: Record agent trace for QLoRA training dataset ────────────────────
+  // Fire-and-forget trace recording with selected_concepts and selected_packets
+  // Critical for QLoRA export: traces without selected_concepts are filtered out
+  {
+    const { reward: agentReward } = computeAgentReward({
+      finalAnswerFound: !!finalAnswer,
+      rounds: round,
+      maxRounds: MAX_ROUNDS,
+      toolsUsed,
+      hasSideEffect,
+      cacheHit: resultCacheTier != null,
+      toolError: false,
+    });
+
+    void recordAgentTrace({
+      query,
+      retrievalStrategy: 'fusion', // Default strategy — would be from ACE context if available
+      selectedConcepts: Array.from(selectedConcepts),
+      selectedPackets: Array.from(selectedPackets),
+      toolsCalled: toolsUsed,
+      outcome: finalAnswer ? 'success' : 'partial',
+      reward: agentReward,
+      taskId: undefined, // Would come from options.metadata.taskId if provided
+      traceSource: 'gemma4',
+    }).catch((err) => {
+      console.error('[Phase3F] Agent trace recording failed (non-blocking):', (err as Error)?.message);
+    });
   }
 
   return {

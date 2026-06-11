@@ -1,31 +1,35 @@
 {
-  "timestamp": "2026-06-11T17:53:30.571Z",
+  "timestamp": "2026-06-11T21:50:55.175Z",
   "mode": "APPLY",
   "filter": {
     "outcome": "success",
     "min_score": 0.85
   },
   "counters": {
-    "agent_traces_total": 110,
-    "eligible_success_traces": 110,
+    "agent_traces_total": 1134,
+    "eligible_success_traces": 991,
     "rejected_low_score": 0,
-    "rejected_non_success": 0,
+    "rejected_non_success": 143,
     "rejected_null_score": 0,
-    "missing_selected_concepts": 110,
+    "missing_selected_concepts": 0,
     "missing_selected_packets": 0,
     "missing_retrieval_strategy": 0,
-    "duplicate_skipped": 110,
-    "exported_qlora_examples": 0
+    "duplicate_skipped": 212,
+    "exported_qlora_examples": 779
   },
   "quality_distribution": {
-    "platinum": 110,
-    "gold": 0
+    "platinum": 490,
+    "gold": 501
   },
   "strategy_distribution": {
-    "fusion": 110
+    "fusion": 366,
+    "lexical_only": 161,
+    "vector_only": 157,
+    "structural_only": 160,
+    "cold_neschrom": 147
   },
   "trace_source_distribution": {
-    "manual": 68,
-    "gemma4": 42
+    "manual": 170,
+    "gemma4": 821
   }
 }

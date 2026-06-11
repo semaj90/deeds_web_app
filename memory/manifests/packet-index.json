@@ -1,0 +1,126 @@
+{
+  "artifact_path": "\\\\?\\C:\\Users\\james\\Videos\\deeds-web-app\\docs\\reports\\neschrom97-card-registry.json",
+  "total_rows": 30683,
+  "chunks": [
+    {
+      "chunk_path": "C:\\Users\\james\\Videos\\deeds-web-app\\memory\\packets\\chunk-0001.msgpack",
+      "row_count": 1270,
+      "byte_size": 43439
+    },
+    {
+      "chunk_path": "C:\\Users\\james\\Videos\\deeds-web-app\\memory\\packets\\chunk-0002.msgpack",
+      "row_count": 1294,
+      "byte_size": 41954
+    },
+    {
+      "chunk_path": "C:\\Users\\james\\Videos\\deeds-web-app\\memory\\packets\\chunk-0003.msgpack",
+      "row_count": 1295,
+      "byte_size": 44297
+    },
+    {
+      "chunk_path": "C:\\Users\\james\\Videos\\deeds-web-app\\memory\\packets\\chunk-0004.msgpack",
+      "row_count": 1291,
+      "byte_size": 44333
+    },
+    {
+      "chunk_path": "C:\\Users\\james\\Videos\\deeds-web-app\\memory\\packets\\chunk-0005.msgpack",
+      "row_count": 1304,
+      "byte_size": 43696
+    },
+    {
+      "chunk_path": "C:\\Users\\james\\Videos\\deeds-web-app\\memory\\packets\\chunk-0006.msgpack",
+      "row_count": 1306,
+      "byte_size": 43469
+    },
+    {
+      "chunk_path": "C:\\Users\\james\\Videos\\deeds-web-app\\memory\\packets\\chunk-0007.msgpack",
+      "row_count": 1284,
+      "byte_size": 43239
+    },
+    {
+      "chunk_path": "C:\\Users\\james\\Videos\\deeds-web-app\\memory\\packets\\chunk-0008.msgpack",
+      "row_count": 1306,
+      "byte_size": 43564
+    },
+    {
+      "chunk_path": "C:\\Users\\james\\Videos\\deeds-web-app\\memory\\packets\\chunk-0009.msgpack",
+      "row_count": 1284,
+      "byte_size": 43762
+    },
+    {
+      "chunk_path": "C:\\Users\\james\\Videos\\deeds-web-app\\memory\\packets\\chunk-0010.msgpack",
+      "row_count": 1307,
+      "byte_size": 44655
+    },
+    {
+      "chunk_path": "C:\\Users\\james\\Videos\\deeds-web-app\\memory\\packets\\chunk-0011.msgpack",
+      "row_count": 1287,
+      "byte_size": 43805
+    },
+    {
+      "chunk_path": "C:\\Users\\james\\Videos\\deeds-web-app\\memory\\packets\\chunk-0012.msgpack",
+      "row_count": 1300,
+      "byte_size": 42215
+    },
+    {
+      "chunk_path": "C:\\Users\\james\\Videos\\deeds-web-app\\memory\\packets\\chunk-0013.msgpack",
+      "row_count": 1301,
+      "byte_size": 45536
+    },
+    {
+      "chunk_path": "C:\\Users\\james\\Videos\\deeds-web-app\\memory\\packets\\chunk-0014.msgpack",
+      "row_count": 1287,
+      "byte_size": 42530
+    },
+    {
+      "chunk_path": "C:\\Users\\james\\Videos\\deeds-web-app\\memory\\packets\\chunk-0015.msgpack",
+      "row_count": 1295,
+      "byte_size": 42092
+    },
+    {
+      "chunk_path": "C:\\Users\\james\\Videos\\deeds-web-app\\memory\\packets\\chunk-0016.msgpack",
+      "row_count": 1281,
+      "byte_size": 43297
+    },
+    {
+      "chunk_path": "C:\\Users\\james\\Videos\\deeds-web-app\\memory\\packets\\chunk-0017.msgpack",
+      "row_count": 1295,
+      "byte_size": 44631
+    },
+    {
+      "chunk_path": "C:\\Users\\james\\Videos\\deeds-web-app\\memory\\packets\\chunk-0018.msgpack",
+      "row_count": 1302,
+      "byte_size": 42645
+    },
+    {
+      "chunk_path": "C:\\Users\\james\\Videos\\deeds-web-app\\memory\\packets\\chunk-0019.msgpack",
+      "row_count": 1289,
+      "byte_size": 43870
+    },
+    {
+      "chunk_path": "C:\\Users\\james\\Videos\\deeds-web-app\\memory\\packets\\chunk-0020.msgpack",
+      "row_count": 1263,
+      "byte_size": 41544
+    },
+    {
+      "chunk_path": "C:\\Users\\james\\Videos\\deeds-web-app\\memory\\packets\\chunk-0021.msgpack",
+      "row_count": 1306,
+      "byte_size": 41803
+    },
+    {
+      "chunk_path": "C:\\Users\\james\\Videos\\deeds-web-app\\memory\\packets\\chunk-0022.msgpack",
+      "row_count": 1286,
+      "byte_size": 43537
+    },
+    {
+      "chunk_path": "C:\\Users\\james\\Videos\\deeds-web-app\\memory\\packets\\chunk-0023.msgpack",
+      "row_count": 1292,
+      "byte_size": 42406
+    },
+    {
+      "chunk_path": "C:\\Users\\james\\Videos\\deeds-web-app\\memory\\packets\\chunk-0024.msgpack",
+      "row_count": 958,
+      "byte_size": 31387
+    }
+  ]
+}

@@ -192,5 +192,6 @@ export * from './schema/concept-records.js';
 export * from './schema/retrieval-telemetry.js';
 export * from './schema/kanban-tasks.js';
 export * from './schema/agent-traces.js';
+export * from './schema/atlas-packets.js';
 
 

@@ -111,6 +111,7 @@ export * from './concept-records.js';
 export * from './retrieval-telemetry.js';
 export * from './kanban-tasks.js';
 export * from './agent-traces.js';
+export * from './atlas-packets.js';
 
 
 

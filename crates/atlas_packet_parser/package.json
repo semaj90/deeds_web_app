@@ -1,0 +1,24 @@
+{
+  "name": "@deeds/atlas-packet-parser",
+  "version": "0.1.0",
+  "description": "N-API large JSON/NDJSON packet parser streaming to MessagePack chunks",
+  "main": "index.js",
+  "types": "index.d.ts",
+  "scripts": {
+    "build": "napi build --platform --release",
+    "build:debug": "napi build --platform"
+  },
+  "devDependencies": {
+    "@napi-rs/cli": "^2.18.4"
+  },
+  "napi": {
+    "name": "atlas-packet-parser",
+    "triples": {
+      "defaults": false,
+      "additional": [
+        "x86_64-pc-windows-msvc"
+      ]
+    }
+  },
+  "license": "MIT"
+}
