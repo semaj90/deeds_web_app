@@ -1,5 +1,5 @@
 # Codebase Map — 20-Gate Deep Audit
-> Generated: 2026-06-11T23:35:41.772Z
+> Generated: 2026-06-11T23:46:23.388Z
 > Mode: `fast-ast` · CPU-only · No GPU required
 > Regenerate: `npm run index:codebase:fast:plan`
 
@@ -8,8 +8,8 @@
 ## Summary
 | Metric | Count |
 |--------|-------|
-| Files scanned | 23489 |
-| Directories analysed | 776 |
+| Files scanned | 23493 |
+| Directories analysed | 777 |
 | Route files | 1092 |
 | Svelte components | 915 |
 | API handlers | 3219 |
@@ -31,20 +31,20 @@
 |------|-------|------|------|
 | G4  | Auth guard on API routes | 839 | 2 |
 | G5  | Zod validation on API routes | 586 | 1 |
-| G11 | No hardcoded localhost (excl env.server) | 22772 | 717 |
-| G14a | No `export let` (Svelte 4 props) | 23489 | 0 |
-| G14b | No `$:` reactive declarations | 23487 | 2 |
-| G14c | No `on:event=` directives | 23487 | 2 |
-| G14d | No `createEventDispatcher()` | 23489 | 0 |
-| G14e | No runes in plain `.ts` files | 23465 | 24 |
-| G15 | No SSR-unsafe globals (unguarded) | 23489 | 0 |
+| G11 | No hardcoded localhost (excl env.server) | 22776 | 717 |
+| G14a | No `export let` (Svelte 4 props) | 23493 | 0 |
+| G14b | No `$:` reactive declarations | 23491 | 2 |
+| G14c | No `on:event=` directives | 23491 | 2 |
+| G14d | No `createEventDispatcher()` | 23493 | 0 |
+| G14e | No runes in plain `.ts` files | 23469 | 24 |
+| G15 | No SSR-unsafe globals (unguarded) | 23493 | 0 |
 | G16 | Server routes have test pairing | 676 | 97 |
 | G17 | Server routes have error handling | 742 | 112 |
 | G20 | Cyclic import pairs | — | 1 |
 
 ---
 
-## Directory Scorecard (776 dirs · lowest score = most attention needed)
+## Directory Scorecard (777 dirs · lowest score = most attention needed)
 
 **Score factors**: Auth/API coverage 25pts · Zod coverage 15pts · Drizzle ref 10pts · No TODOs 15pts · SSR-safe 10pts · No Svelte4 10pts · No localhost 5pts · Error handling 5pts · Non-empty 5pts
 
@@ -235,6 +235,7 @@
 | ✅ | `packages/parent-atlas/src/pipelines` | 90 | 4 | 295 | 0 | 0/0 | 0 | — |
 | ✅ | `scratch/index-checkpoints` | 90 | 2 | 196384 | 0 | 0/0 | 0 | — |
 | ✅ | `scratch/obsidian_vault/.obsidian/plugins` | 90 | 2 | 59245 | 0 | 1/1 | 0 | — |
+| ✅ | `scripts/agentic` | 90 | 2 | 630 | 0 | 0/2 | 0 | — |
 | ✅ | `scripts/agents` | 90 | 4 | 234 | 0 | 0/2 | 0 | — |
 | ✅ | `scripts/ai-os` | 90 | 6 | 182 | 0 | 0/4 | 0 | — |
 | ✅ | `scripts/analysis` | 90 | 8 | 398 | 0 | 0/0 | 0 | — |
@@ -346,9 +347,9 @@
 | ✅ | `sveltekit-frontend/.venv/Lib/python3.9` | 90 | 5 | 2421 | 0 | 0/0 | 0 | — |
 | ✅ | `sveltekit-frontend/.venv_turbovec/Lib/site-packages` | 90 | 1 | 7857 | 0 | 0/0 | 0 | — |
 | ✅ | `sveltekit-frontend/config` | 90 | 1 | 140 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/docs` | 90 | 1 | 5173797 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/docs` | 90 | 1 | 5173877 | 0 | 0/0 | 0 | — |
 | ✅ | `sveltekit-frontend/docs/atlas-index` | 90 | 4 | 61520 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/docs/graph` | 90 | 19 | 5087796 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/docs/graph` | 90 | 19 | 5087876 | 0 | 0/0 | 0 | — |
 | ✅ | `sveltekit-frontend/docs/obsidian-vault` | 90 | 2 | 108 | 0 | 0/0 | 0 | — |
 | ✅ | `sveltekit-frontend/docs/profile-cards/data` | 90 | 20 | 1588 | 0 | 0/0 | 0 | — |
 | ✅ | `sveltekit-frontend/docs/reports` | 90 | 40 | 22723 | 0 | 0/0 | 0 | — |
@@ -1120,7 +1121,7 @@ _No unguarded SSR-unsafe globals. ✅_
 |--------|----------------|
 | `@sveltejs/kit` | 3343 |
 | `node:path` | 1316 |
-| `path` | 1172 |
+| `path` | 1174 |
 | `node:fs` | 1156 |
 | `node:url` | 959 |
 | `fs` | 946 |
@@ -1128,21 +1129,21 @@ _No unguarded SSR-unsafe globals. ✅_
 | `drizzle-orm` | 863 |
 | `zod` | 786 |
 | `$lib/types` | 616 |
-| `pg` | 584 |
+| `pg` | 586 |
 | `$lib/server/db/client` | 494 |
 | `$lib/server/env.server.js` | 461 |
 | `crypto` | 384 |
 | `node:crypto` | 383 |
-| `url` | 355 |
+| `url` | 357 |
 | `ioredis` | 342 |
 | `node:child_process` | 327 |
-| `fs/promises` | 285 |
+| `fs/promises` | 287 |
 | `dotenv` | 278 |
 | `$lib/server/db` | 267 |
 | `svelte` | 260 |
 | `$lib/components/ui/Icon.svelte` | 257 |
 | `$lib/server/redis.js` | 234 |
-| `child_process` | 226 |
+| `child_process` | 228 |
 | `$lib/server/db/schema-postgres` | 196 |
 | `node:fs/promises` | 182 |
 | `@playwright/test` | 171 |

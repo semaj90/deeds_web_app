@@ -1,0 +1,30 @@
+{
+  "timestamp": "2026-06-11T23:47:13.589Z",
+  "greeting": "Hello James.",
+  "sinceLastWorked": {
+    "tasksOpen": 0,
+    "tasksClosed": 0,
+    "newRecommendations": 0,
+    "productionReadiness": "PASS 0 / WARN 0 / FAIL 0"
+  },
+  "systems": {
+    "postgres": "offline",
+    "redis": "offline",
+    "qdrant": "offline (check coverage %)",
+    "neo4j": "unknown",
+    "turbovec": "unknown",
+    "ldjson": "unknown"
+  },
+  "coverage": {
+    "qdrant": "?%",
+    "som": "?%",
+    "parentAtlas": "?%"
+  },
+  "warnings": [
+    "⚠️ Redis offline: ACE cache using disk fallback only"
+  ],
+  "recommendations": [
+    "📍 Fix Redis preflight (cache offline)"
+  ],
+  "nextLane": "Infrastructure Repair"
+}
