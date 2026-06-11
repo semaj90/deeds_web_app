@@ -134,7 +134,7 @@ import {
   recordACERetrievalTelemetry,
   determineRetrievalStrategy,
   extractPacketAndFeatureIds,
-} from '../../telemetry/ace-telemetry-emitter.js';
+} from '../../../telemetry/ace-telemetry-emitter.js';
 
 import type { ACPKnowledgeSearchResult } from '$lib/server/services/knowledge-search/ACPToolRegistry.js';
 import {
@@ -3821,7 +3821,7 @@ export async function assembleACEContext(opts: {
       // Extract packet/feature IDs from top results
       const acePayloads = Array.isArray(finalContext.acePayloads) ? finalContext.acePayloads : [];
       const { selectedPacketKey, selectedFeatureId, featureIds: emittedFeatureIds } =
-        extractPacketAndFeatureIds(acePayloads.slice(0, 5));
+        extractPacketAndFeatureIds(acePayloads.slice(0, 5) as any);
 
       // Emit telemetry asynchronously
       recordACERetrievalTelemetry({

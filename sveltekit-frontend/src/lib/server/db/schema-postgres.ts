@@ -4792,41 +4792,7 @@ export type NewLlmSynthesisEvent = typeof llmSynthesisEvents.$inferInsert;
 export type GlyphRecord_DB = typeof glyphRecords.$inferSelect;
 export type NewGlyphRecord_DB = typeof glyphRecords.$inferInsert;
 
-// === PHASE 3D: RETRIEVAL TELEMETRY ===
 
-export const retrievalTelemetry = pgTable('retrieval_telemetry', {
-  id: bigint('id', { mode: 'bigint' }).notNull().primaryKey().generatedByDefaultAsIdentity(),
-  createdAt: timestamp('created_at', { withTimezone: true, mode: 'string' }).notNull().defaultNow(),
-  query: text('query').notNull(),
-  queryHash: text('query_hash').notNull(),
-  latencyMs: integer('latency_ms').notNull(),
-  vectorHits: integer('vector_hits').notNull().default(0),
-  trigramHits: integer('trigram_hits').notNull().default(0),
-  ftsHits: integer('fts_hits').notNull().default(0),
-  selectedPacketKey: text('selected_packet_key'),
-  selectedPacketKeys: jsonb('selected_packet_keys').notNull().default(sql`'[]'::jsonb`),
-  selectedFeatureId: text('selected_feature_id'),
-  featureIds: jsonb('feature_ids').notNull().default(sql`'[]'::jsonb`),
-  fusionScore: real('fusion_score'),
-  cacheHit: boolean('cache_hit').notNull().default(false),
-  surface: text('surface').notNull(),
-  environment: text('environment').notNull(),
-  retrievalStrategy: text('retrieval_strategy').notNull().default('hybrid'),
-}, (table) => ({
-  indexCreatedAt: index('idx_retrieval_telemetry_created_at').on(table.createdAt),
-  indexQueryHash: index('idx_retrieval_telemetry_query_hash').on(table.queryHash),
-  indexSurface: index('idx_retrieval_telemetry_surface').on(table.surface),
-  indexEnvironment: index('idx_retrieval_telemetry_environment').on(table.environment),
-  indexPacketKey: index('idx_retrieval_telemetry_packet_key').on(table.selectedPacketKey),
-  indexPacketKeys: index('idx_retrieval_telemetry_packet_keys_gin').using('gin', table.selectedPacketKeys),
-  indexFeatureId: index('idx_retrieval_telemetry_feature_id').on(table.selectedFeatureId),
-  indexFeatureIds: index('idx_retrieval_telemetry_feature_ids_gin').using('gin', table.featureIds),
-  indexLatency: index('idx_retrieval_telemetry_latency_ms').on(table.latencyMs),
-  indexRetrievalStrategy: index('idx_retrieval_telemetry_strategy').on(table.retrievalStrategy),
-}));
-
-export type RetrievalTelemetry = typeof retrievalTelemetry.$inferSelect;
-export type NewRetrievalTelemetry = typeof retrievalTelemetry.$inferInsert;
 
 export * from './schema/nes-chrom-packets.js';
 export * from './schema/atlas-feature-map.js';

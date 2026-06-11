@@ -142,6 +142,7 @@ export const qloraExamples = pgTable('qlora_examples', {
 	entityTags:     jsonb('entity_tags').notNull().default(sql`'[]'::jsonb`),  // extracted statute + case entity tags
 	modelVersion:   text('model_version'),  // e.g. 'gemma4-rotorquant:latest'
 	datasetSplit:   text('dataset_split'),   // 'train'|'eval'|'test' — frozen after first assignment
+	retrievalStrategy: text('retrieval_strategy').$type<'vector_only' | 'lexical_only' | 'structural_only' | 'fusion' | 'cold_neschrom'>().default('fusion'),
 	createdAt:      timestamp('created_at', { withTimezone: true }).notNull().default(sql`now()`),
 }, (t) => ({
 	queryHashIdx: index('qlora_examples_query_hash_idx').on(t.queryHash),

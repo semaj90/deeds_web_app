@@ -1,0 +1,115 @@
+{
+  "generatedAt": "2026-06-11T16:54:13.023Z",
+  "concepts": [
+    {
+      "conceptId": "emergent_topology",
+      "label": "Emergent Topology Clusters",
+      "retrievalStrategy": "fusion",
+      "evidenceCount": 44,
+      "featureCount": 1,
+      "retrievalCount": 0,
+      "repairSuccess": 0.95,
+      "lastRetrievedAt": null,
+      "conceptTemperature": 0.5
+    },
+    {
+      "conceptId": "database_orm",
+      "label": "Database & ORM (PostgreSQL & Drizzle)",
+      "retrievalStrategy": "fusion",
+      "evidenceCount": 273,
+      "featureCount": 9,
+      "retrievalCount": 0,
+      "repairSuccess": 0.8,
+      "lastRetrievedAt": null,
+      "conceptTemperature": 0.5
+    },
+    {
+      "conceptId": "general_abstractions",
+      "label": "General Codebase Abstractions",
+      "retrievalStrategy": "fusion",
+      "evidenceCount": 3543,
+      "featureCount": 117,
+      "retrievalCount": 12,
+      "repairSuccess": 0.95,
+      "lastRetrievedAt": "2026-06-11T16:45:01.029Z",
+      "conceptTemperature": 0.46249999999999997
+    },
+    {
+      "conceptId": "api_endpoints",
+      "label": "API Endpoints & Routing",
+      "retrievalStrategy": "fusion",
+      "evidenceCount": 2079,
+      "featureCount": 523,
+      "retrievalCount": 8,
+      "repairSuccess": 0.95,
+      "lastRetrievedAt": "2026-06-11T16:45:01.029Z",
+      "conceptTemperature": 0.46249999999999997
+    },
+    {
+      "conceptId": "infrastructure_config",
+      "label": "Infrastructure & Configuration (Docker)",
+      "retrievalStrategy": "fusion",
+      "evidenceCount": 83,
+      "featureCount": 5,
+      "retrievalCount": 8,
+      "repairSuccess": 0.95,
+      "lastRetrievedAt": "2026-06-11T16:45:01.029Z",
+      "conceptTemperature": 0.46249999999999997
+    },
+    {
+      "conceptId": "ui_components",
+      "label": "UI Components (Svelte & UX)",
+      "retrievalStrategy": "fusion",
+      "evidenceCount": 1074,
+      "featureCount": 275,
+      "retrievalCount": 8,
+      "repairSuccess": 0.95,
+      "lastRetrievedAt": "2026-06-11T16:45:01.029Z",
+      "conceptTemperature": 0.46249999999999997
+    },
+    {
+      "conceptId": "agent_intelligence",
+      "label": "Agent Intelligence & Self-Healing",
+      "retrievalStrategy": "fusion",
+      "evidenceCount": 156,
+      "featureCount": 22,
+      "retrievalCount": 8,
+      "repairSuccess": 0.95,
+      "lastRetrievedAt": "2026-06-11T16:45:01.029Z",
+      "conceptTemperature": 0.46249999999999997
+    },
+    {
+      "conceptId": "native_accelerators",
+      "label": "Native Accelerators & GPU (LibTorch/SIMD)",
+      "retrievalStrategy": "fusion",
+      "evidenceCount": 232,
+      "featureCount": 23,
+      "retrievalCount": 8,
+      "repairSuccess": 0.95,
+      "lastRetrievedAt": "2026-06-11T16:45:01.029Z",
+      "conceptTemperature": 0.46249999999999997
+    },
+    {
+      "conceptId": "observability_telemetry",
+      "label": "Observability & Retrieval Telemetry",
+      "retrievalStrategy": "fusion",
+      "evidenceCount": 139,
+      "featureCount": 19,
+      "retrievalCount": 0,
+      "repairSuccess": 0.95,
+      "lastRetrievedAt": "2026-06-11T16:45:01.029Z",
+      "conceptTemperature": 0.46249999999999997
+    },
+    {
+      "conceptId": "test_harness",
+      "label": "Testing Harness & Smoke Benchmarks",
+      "retrievalStrategy": "fusion",
+      "evidenceCount": 547,
+      "featureCount": 20,
+      "retrievalCount": 8,
+      "repairSuccess": 1,
+      "lastRetrievedAt": "2026-06-11T16:45:01.029Z",
+      "conceptTemperature": 0.45499999999999996
+    }
+  ]
+}

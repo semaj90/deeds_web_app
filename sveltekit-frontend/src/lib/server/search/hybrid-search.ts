@@ -19,6 +19,9 @@ import { buildRetrievalTrace, SCORE_WEIGHTS }     from './retrieval-explainer.js
 import { recordEvent }                            from '$lib/server/trace/trace-collector.js';
 import { createHash }                             from 'crypto';
 import { ENV } from '$lib/server/env.server.js';
+import { recordRetrievalTelemetry } from '../telemetry/retrieval-recorder.js';
+import { determineRetrievalStrategy } from '../telemetry/ace-telemetry-emitter.js';
+
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -126,10 +129,28 @@ export async function hybridSearch(
     if (cached) {
       try {
         recordEvent(null, 'cache_hit', { cacheKey, symbolName: 'hybridSearch' });
-        return JSON.parse(cached) as HybridSearchOutput;
+        const parsed = JSON.parse(cached) as HybridSearchOutput;
+        void recordRetrievalTelemetry({
+          query,
+          latencyMs: 0,
+          vectorHits: 0,
+          trigramHits: 0,
+          ftsHits: 0,
+          selectedPacketKey: parsed.results[0]?.stable_key ?? null,
+          selectedPacketKeys: parsed.results.map(r => r.stable_key),
+          selectedFeatureId: parsed.results[0]?.symbol_name ?? null,
+          featureIds: parsed.results.map(r => r.symbol_name).filter(Boolean) as string[],
+          fusionScore: parsed.results[0]?.final_score,
+          cacheHit: true,
+          surface: 'hybrid-search',
+          environment: ENV.NODE_ENV ?? 'development',
+          retrievalStrategy: parsed.mode as any ?? 'fusion',
+        }).catch(() => {});
+        return parsed;
       } catch { /* fall through */ }
     }
   }
+
 
   const t0 = Date.now();
   const weights = SCORE_WEIGHTS[mode];
@@ -275,7 +296,33 @@ export async function hybridSearch(
     metadata:   { resultCount: results.length, mode, gpuRerankUsed: useGpu },
   });
 
+  const vectorHitsCount = qdrantRows?.length ?? 0;
+  const pgHitsCount = pgRows?.length ?? 0;
+  const retrievalStrategy = determineRetrievalStrategy(
+    mode,
+    vectorHitsCount,
+    pgHitsCount
+  );
+
+  void recordRetrievalTelemetry({
+    query,
+    latencyMs: Date.now() - t0,
+    vectorHits: vectorHitsCount,
+    trigramHits: pgHitsCount,
+    ftsHits: 0,
+    selectedPacketKey: results[0]?.stable_key ?? null,
+    selectedPacketKeys: results.map((r) => r.stable_key),
+    selectedFeatureId: results[0]?.symbol_name ?? null,
+    featureIds: results.map((r) => r.symbol_name).filter(Boolean) as string[],
+    fusionScore: results[0]?.final_score,
+    cacheHit: false,
+    surface: 'hybrid-search',
+    environment: ENV.NODE_ENV ?? 'development',
+    retrievalStrategy,
+  }).catch(() => {});
+
   const output: HybridSearchOutput = { results, mode, traceKey };
+
   if (cacheResults) void tryRedisSet(cacheKey, JSON.stringify(output), 300);
 
   return output;

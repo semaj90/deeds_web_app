@@ -1,0 +1,31 @@
+{
+  "timestamp": "2026-06-11T17:53:30.571Z",
+  "mode": "APPLY",
+  "filter": {
+    "outcome": "success",
+    "min_score": 0.85
+  },
+  "counters": {
+    "agent_traces_total": 110,
+    "eligible_success_traces": 110,
+    "rejected_low_score": 0,
+    "rejected_non_success": 0,
+    "rejected_null_score": 0,
+    "missing_selected_concepts": 110,
+    "missing_selected_packets": 0,
+    "missing_retrieval_strategy": 0,
+    "duplicate_skipped": 110,
+    "exported_qlora_examples": 0
+  },
+  "quality_distribution": {
+    "platinum": 110,
+    "gold": 0
+  },
+  "strategy_distribution": {
+    "fusion": 110
+  },
+  "trace_source_distribution": {
+    "manual": 68,
+    "gemma4": 42
+  }
+}

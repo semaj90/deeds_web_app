@@ -24,12 +24,44 @@ export interface RetrievalTelemetrySignal {
   cacheHit?: boolean;
   surface: string;
   environment: string;
-  retrievalStrategy?: string;
+  retrievalStrategy?: 'vector_only' | 'lexical_only' | 'structural_only' | 'fusion' | 'cold_neschrom';
 }
 
 function cleanStringArray(values: unknown): string[] {
   if (!Array.isArray(values)) return [];
   return [...new Set(values.map((value) => String(value ?? '').trim()).filter(Boolean))];
+}
+
+function getConceptIdForFeatureOrPacket(id: string): string {
+  const clean = id.toLowerCase();
+  if (clean.includes('svelte') || clean.includes('component') || clean.includes('ui') || clean.includes('ux') || clean.includes('palette') || clean.includes('view') || clean.includes('dashboard')) {
+    return 'ui_components';
+  }
+  if (clean.includes('drizzle') || clean.includes('postgres') || clean.includes('database') || clean.includes('db') || clean.includes('migration') || clean.includes('orm') || clean.includes('client')) {
+    return 'database_orm';
+  }
+  if (clean.includes('route') || clean.includes('api') || clean.includes('endpoint') || clean.includes('server') || clean.includes('rpc')) {
+    return 'api_endpoints';
+  }
+  if (clean.includes('gpu') || clean.includes('simd') || clean.includes('cuda') || clean.includes('native') || clean.includes('accelerator') || clean.includes('bridge') || clean.includes('libtorch') || clean.includes('tensorrt')) {
+    return 'native_accelerators';
+  }
+  if (clean.includes('telemetry') || clean.includes('observability') || clean.includes('metrics') || clean.includes('log') || clean.includes('recorder') || clean.includes('signal') || clean.includes('trace')) {
+    return 'observability_telemetry';
+  }
+  if (clean.includes('test') || clean.includes('smoke') || clean.includes('check') || clean.includes('benchmark') || clean.includes('harness')) {
+    return 'test_harness';
+  }
+  if (clean.includes('agent') || clean.includes('reason') || clean.includes('fix') || clean.includes('gemma') || clean.includes('qlora') || clean.includes('llm') || clean.includes('unsloth')) {
+    return 'agent_intelligence';
+  }
+  if (clean.includes('docker') || clean.includes('env') || clean.includes('config') || clean.includes('settings') || clean.includes('infrastructure')) {
+    return 'infrastructure_config';
+  }
+  if (clean.includes('topology') || clean.includes('cluster') || clean.includes('som')) {
+    return 'emergent_topology';
+  }
+  return 'general_abstractions';
 }
 
 /**
@@ -38,7 +70,8 @@ function cleanStringArray(values: unknown): string[] {
  * This function:
  * 1. Hashes the query for deduplication
  * 2. Inserts the signal into Postgres (fire-and-forget)
- * 3. Logs errors but does not throw (telemetry should not block queries)
+ * 3. Updates concept_records metadata, query counts, and temperatures (Phase 3E.1)
+ * 4. Logs errors but does not throw (telemetry should not block queries)
  *
  * @param signal - Telemetry signal from retrieval pipeline
  */
@@ -88,9 +121,64 @@ export async function recordRetrievalTelemetry(signal: RetrievalTelemetrySignal)
         Boolean(signal.cacheHit),
         signal.surface,
         signal.environment,
-        signal.retrievalStrategy ?? 'hybrid',
+        signal.retrievalStrategy ?? 'fusion',
       ],
     );
+
+    // Concept Telemetry Integration (Phase 3E.1)
+    const featuresToMatch = [...featureIds];
+    if (signal.selectedFeatureId) {
+      featuresToMatch.push(signal.selectedFeatureId);
+    }
+    const packetsToMatch = [...selectedPacketKeys];
+    if (signal.selectedPacketKey) {
+      packetsToMatch.push(signal.selectedPacketKey);
+    }
+
+    const fallbackConceptId = getConceptIdForFeatureOrPacket(signal.query);
+    const conceptIdsToMatch = [fallbackConceptId];
+    for (const f of featuresToMatch) {
+      conceptIdsToMatch.push(getConceptIdForFeatureOrPacket(f));
+    }
+    for (const p of packetsToMatch) {
+      conceptIdsToMatch.push(getConceptIdForFeatureOrPacket(p));
+    }
+    const uniqueConceptIds = [...new Set(conceptIdsToMatch.filter(Boolean))];
+
+    const strategy = signal.retrievalStrategy ?? 'fusion';
+    await pool.query(
+      `
+        update concept_records
+        set
+          retrieval_count = retrieval_count + 1,
+          last_retrieved_at = now(),
+          retrieval_strategy = coalesce($1, retrieval_strategy),
+          strategy_distribution = jsonb_set(
+            coalesce(strategy_distribution, '{}'::jsonb),
+            array[$2],
+            (coalesce((strategy_distribution->$2)::integer, 0) + 1)::text::jsonb
+          ),
+          concept_temperature = least(1.0, greatest(0.0, concept_temperature * 0.85 + 0.15 * (1.2 - repair_success)))
+        where
+          concept_id = any($3::text[])
+          or exists (
+            select 1 from jsonb_array_elements_text(feature_ids) f
+            where f = any($4::text[])
+          )
+          or exists (
+            select 1 from jsonb_array_elements_text(packet_keys) p
+            where p = any($5::text[])
+          )
+      `,
+      [
+        strategy,
+        strategy,
+        uniqueConceptIds,
+        featuresToMatch,
+        packetsToMatch
+      ]
+    );
+
   } catch (err) {
     // Telemetry failure should not block queries
     console.error('[Telemetry] Failed to record retrieval signal:', {

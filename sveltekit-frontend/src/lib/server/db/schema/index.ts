@@ -108,5 +108,10 @@ export * from './embeddings.js';
 export * from './model-weights.js';
 export * from './route_runtime_packets.js';
 export * from './concept-records.js';
+export * from './retrieval-telemetry.js';
+export * from './kanban-tasks.js';
+export * from './agent-traces.js';
+
+
 
 

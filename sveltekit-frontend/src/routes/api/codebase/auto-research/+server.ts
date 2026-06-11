@@ -305,7 +305,58 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 				auto_research: true,
 			});
 
-			if (success) indexed++;
+			if (success) {
+				indexed++;
+
+				// Sync to PostgreSQL codebase_chunk_index
+				try {
+					const { db } = await import('$lib/server/db/client.js');
+					const { codebaseChunkIndex } = await import('$lib/server/db/schema/search-analytics.js');
+					
+					// Format vector as string literal for pgvector [v1,v2,...]
+					const vecLiteral = `[${vector.join(',')}]`;
+					
+					await db.insert(codebaseChunkIndex)
+						.values({
+							qdrantId: pointId,
+							relativePath: entry.path,
+							symbol: `wiki:${entry.path}`,
+							kind: 'wiki-entry',
+							content: wikiText,
+							summary: entry.wiki.summary,
+							summaryEmbedding: vecLiteral as any,
+							metadata: {
+								path: resolve(ROOT, entry.path),
+								purpose: entry.wiki.purpose,
+								api: entry.wiki.api,
+								dependencies: entry.wiki.dependencies,
+								topic: query,
+								indexed_at: new Date().toISOString(),
+								auto_research: true,
+							}
+						})
+						.onConflictDoUpdate({
+							target: codebaseChunkIndex.qdrantId,
+							set: {
+								content: wikiText,
+								summary: entry.wiki.summary,
+								summaryEmbedding: vecLiteral as any,
+								metadata: {
+									path: resolve(ROOT, entry.path),
+									purpose: entry.wiki.purpose,
+									api: entry.wiki.api,
+									dependencies: entry.wiki.dependencies,
+									topic: query,
+									indexed_at: new Date().toISOString(),
+									auto_research: true,
+								},
+								updatedAt: new Date()
+							}
+						});
+				} catch (dbErr) {
+					console.error('[auto-research] failed to sync to codebaseChunkIndex:', dbErr);
+				}
+			}
 		}
 
 		return json({

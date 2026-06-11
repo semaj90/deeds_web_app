@@ -18,7 +18,8 @@ export const retrievalTelemetry = pgTable('retrieval_telemetry', {
   cacheHit: boolean('cache_hit').notNull().default(false),
   surface: text('surface').notNull(),
   environment: text('environment').notNull(),
-  retrievalStrategy: text('retrieval_strategy').notNull().default('hybrid'),
+  retrievalStrategy: text('retrieval_strategy').$type<'vector_only' | 'lexical_only' | 'structural_only' | 'fusion' | 'cold_neschrom'>().notNull().default('fusion'),
+
 }, (table) => ({
   createdAtIdx: index('idx_retrieval_telemetry_created_at').on(table.createdAt),
   queryHashIdx: index('idx_retrieval_telemetry_query_hash').on(table.queryHash),
@@ -28,6 +29,7 @@ export const retrievalTelemetry = pgTable('retrieval_telemetry', {
   strategyIdx: index('idx_retrieval_telemetry_strategy').on(table.retrievalStrategy),
   surfaceIdx: index('idx_retrieval_telemetry_surface').on(table.surface),
   environmentIdx: index('idx_retrieval_telemetry_environment').on(table.environment),
+  strategyCreatedIdx: index('idx_retrieval_telemetry_strategy_created').on(table.retrievalStrategy, table.createdAt),
 }));
 
 export type RetrievalTelemetry = typeof retrievalTelemetry.$inferSelect;

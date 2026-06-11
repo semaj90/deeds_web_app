@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-06-04T14:03:42.452Z",
+  "generatedAt": "2026-06-11T16:42:48.204Z",
   "embeddingDim": 768,
   "allowedDims": [
     768,
@@ -14,10 +14,10 @@
     {
       "check": "extension_in_migrations",
       "pass": true,
-      "message": "CREATE EXTENSION vector found in 12 migration file(s).",
+      "message": "CREATE EXTENSION vector found in 13 migration file(s).",
       "files": [
-        "sveltekit-frontend\\drizzle\\0013_codeintel_indexes.sql",
         "sveltekit-frontend\\drizzle\\manual\\0009_hybrid_graph_indexes.sql",
+        "sveltekit-frontend\\drizzle\\manual\\0013_codeintel_indexes.sql",
         "sveltekit-frontend\\drizzle\\manual\\0016_cluster_centroids.sql",
         "sveltekit-frontend\\drizzle\\manual\\0099_ff1_engine.sql",
         "sveltekit-frontend\\drizzle\\manual\\2026-05-22_summary_cards.sql",
@@ -26,6 +26,7 @@
         "sveltekit-frontend\\drizzle\\manual\\20260506_code_retrieval_chunks.sql",
         "sveltekit-frontend\\drizzle\\manual\\20260510_evidence_columns.sql",
         "sveltekit-frontend\\drizzle\\manual\\20260521_summary_cards.sql",
+        "sveltekit-frontend\\drizzle\\manual\\20260606_round3_active_consumers.sql",
         "sveltekit-frontend\\drizzle\\manual\\rag_query_analytics.sql",
         "sveltekit-frontend\\drizzle\\manual\\screenshot_artifacts.sql"
       ],
@@ -72,6 +73,7 @@
         "feature_registry_vectors.feature_registry_vectors_embedding_hnsw",
         "fixer_patterns.fp_embedding_hnsw_idx",
         "legal_documents.legal_documents_hnsw_idx",
+        "nes_chrom_packets.nes_chrom_packets_embedding_hnsw",
         "parent_atlas_rg_vectors.idx_parent_atlas_rg_vectors_embedding_768",
         "parent_atlas_vectors.idx_parent_atlas_vectors_embedding_768",
         "rag_query_log.rag_query_log_embedding_hnsw",
@@ -83,7 +85,7 @@
         "warden_chunks.warden_chunks_hnsw_idx"
       ],
       "missingHnswOnExistingTables": [],
-      "message": "pgvector 0.8.2 installed. 22 HNSW index(es) found.",
+      "message": "pgvector 0.8.2 installed. 23 HNSW index(es) found.",
       "suggestedFix": null
     }
   ],

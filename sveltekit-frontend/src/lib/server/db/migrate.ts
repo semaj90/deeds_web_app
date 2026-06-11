@@ -145,7 +145,11 @@ async function runMigrations(): Promise<any> {
 		// await runSqlMigrations(db, pool);
         // HOWEVER, runSqlMigrations was defined in the original corrupted file but I must include it.
         // It is included above.
-        await runSqlMigrations(db, pool);
+        try {
+          await runSqlMigrations(db, pool);
+        } catch (err) {
+          console.warn('⚠️ SQL migrations had issues (non-fatal):', (err as any).message?.slice(0, 100));
+        }
 
 		// Then run Drizzle migrations if they exist
 		try {

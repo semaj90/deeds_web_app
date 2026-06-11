@@ -1136,3 +1136,172 @@ export async function runDijkstraContext({
     await session.close();
   }
 }
+
+// ── Retrieval Analysis GDS Projection & Algorithms ──────────────────────────
+
+export const RETRIEVAL_PROJECTION_NAME = 'retrievalAnalysis';
+
+export async function ensureRetrievalGdsProjection(force = false): Promise<{ created: boolean; nodeCount: number; relationshipCount: number }> {
+  const driver = getNeo4jDriver();
+  const session = driver.session();
+
+  try {
+    if (force) {
+      try {
+        await session.run(`CALL gds.graph.drop($name, false) YIELD graphName`, { name: RETRIEVAL_PROJECTION_NAME });
+      } catch { /* ignored */ }
+    }
+
+    const existsResult = await session.run(
+      `CALL gds.graph.exists($name) YIELD exists RETURN exists`,
+      { name: RETRIEVAL_PROJECTION_NAME }
+    );
+    const exists = existsResult.records[0]?.get('exists') ?? false;
+    if (exists && !force) {
+      const infoResult = await session.run(
+        `CALL gds.graph.list($name) YIELD nodeCount, relationshipCount RETURN nodeCount, relationshipCount`,
+        { name: RETRIEVAL_PROJECTION_NAME }
+      );
+      const rec = infoResult.records[0];
+      return {
+        created: false,
+        nodeCount: rec?.get('nodeCount') ?? 0,
+        relationshipCount: rec?.get('relationshipCount') ?? 0,
+      };
+    }
+
+    const result = await session.run(`
+      CALL gds.graph.project(
+        $name,
+        ['Query', 'Concept', 'Feature', 'Packet', 'Task', 'Directory', 'Community', 'Strategy'],
+        {
+          USED_STRATEGY:   { orientation: 'NATURAL' },
+          SELECTED_PACKET: { orientation: 'NATURAL' },
+          SUPPORTS:        { orientation: 'NATURAL' },
+          USED_CONCEPT:    { orientation: 'NATURAL' },
+          SUCCESSFUL_WITH: { orientation: 'NATURAL' },
+          IN_COMMUNITY:    { orientation: 'NATURAL' }
+        }
+      )
+      YIELD nodeCount, relationshipCount
+    `, { name: RETRIEVAL_PROJECTION_NAME });
+
+    const rec = result.records[0];
+    return {
+      created: true,
+      nodeCount: rec?.get('nodeCount') ?? 0,
+      relationshipCount: rec?.get('relationshipCount') ?? 0,
+    };
+  } finally {
+    await session.close();
+  }
+}
+
+export async function runRetrievalPageRank(): Promise<{ nodesUpdated: number; durationMs: number }> {
+  const driver = getNeo4jDriver();
+  const session = driver.session();
+  const t0 = Date.now();
+
+  try {
+    await session.run(`
+      CALL gds.pageRank.mutate($name, {
+        maxIterations: 20,
+        dampingFactor: 0.85,
+        mutateProperty: 'retrievalPageRank'
+      })
+    `, { name: RETRIEVAL_PROJECTION_NAME });
+
+    const writeResult = await session.run(`
+      CALL gds.graph.nodeProperties.write($name, ['retrievalPageRank'])
+      YIELD propertiesWritten
+      RETURN propertiesWritten
+    `, { name: RETRIEVAL_PROJECTION_NAME });
+
+    const nodesUpdated = writeResult.records[0]?.get('propertiesWritten') ?? 0;
+    return { nodesUpdated, durationMs: Date.now() - t0 };
+  } finally {
+    await session.close();
+  }
+}
+
+export async function runRetrievalCommunityDetection(): Promise<{ nodesUpdated: number; communities: number; durationMs: number }> {
+  const driver = getNeo4jDriver();
+  const session = driver.session();
+  const t0 = Date.now();
+
+  try {
+    await session.run(`
+      CALL gds.louvain.mutate($name, {
+        mutateProperty: 'retrievalCommunity'
+      })
+    `, { name: RETRIEVAL_PROJECTION_NAME });
+
+    const writeResult = await session.run(`
+      CALL gds.graph.nodeProperties.write($name, ['retrievalCommunity'])
+      YIELD propertiesWritten
+      RETURN propertiesWritten
+    `, { name: RETRIEVAL_PROJECTION_NAME });
+
+    const countResult = await session.run(`
+      MATCH (n) WHERE n.retrievalCommunity IS NOT NULL
+      RETURN count(DISTINCT n.retrievalCommunity) AS communities
+    `);
+
+    const nodesUpdated = writeResult.records[0]?.get('propertiesWritten') ?? 0;
+    const communities  = countResult.records[0]?.get('communities') ?? 0;
+    return { nodesUpdated, communities, durationMs: Date.now() - t0 };
+  } finally {
+    await session.close();
+  }
+}
+
+export async function runRetrievalNodeSimilarity(): Promise<{ relationshipsWritten: number; durationMs: number }> {
+  const driver = getNeo4jDriver();
+  const session = driver.session();
+  const t0 = Date.now();
+
+  try {
+    const simResult = await session.run(`
+      CALL gds.nodeSimilarity.write($name, {
+        writeRelationshipType: 'SIMILAR_RETRIEVAL',
+        writeProperty: 'similarityScore'
+      })
+      YIELD relationshipsWritten
+      RETURN relationshipsWritten
+    `, { name: RETRIEVAL_PROJECTION_NAME });
+
+    const relationshipsWritten = simResult.records[0]?.get('relationshipsWritten') ?? 0;
+    return { relationshipsWritten, durationMs: Date.now() - t0 };
+  } finally {
+    await session.close();
+  }
+}
+
+export async function runRetrievalPersonalizedPageRank(sourceNodeId: string): Promise<Array<{ nodeId: string; score: number }>> {
+  const driver = getNeo4jDriver();
+  const session = driver.session();
+
+  try {
+    const result = await session.run(`
+      MATCH (source {id: $sourceId})
+      WITH id(source) AS sourceNode
+      CALL gds.pageRank.stream($name, {
+        sourceNodes: [sourceNode],
+        maxIterations: 20,
+        dampingFactor: 0.85
+      })
+      YIELD nodeId, score
+      RETURN gds.util.asNode(nodeId).id AS id, score
+      ORDER BY score DESC
+      LIMIT 50
+    `, { name: RETRIEVAL_PROJECTION_NAME, sourceId: sourceNodeId });
+
+    return result.records.map(rec => ({
+      nodeId: rec.get('id') as string,
+      score: Number(rec.get('score'))
+    }));
+  } finally {
+    await session.close();
+  }
+}
+

@@ -3,6 +3,7 @@ import crypto from 'node:crypto';
 import { ENV } from '$lib/server/env.server.js';
 import type { FTSResult } from '$lib/server/search/postgres-fts.js';
 import { expandNeighbours } from '$lib/server/search/neo4j-rerank.js';
+import { recordRetrievalTelemetry } from '../telemetry/retrieval-recorder.js';
 
 export type HyperRagPacketRpcInput = {
   query: string;
@@ -117,45 +118,25 @@ async function recordPacketRpcTelemetry(params: {
   packets: HyperRagPacketRpcPacket[];
 }): Promise<void> {
   try {
-    const query = params.query.slice(0, 2000);
-    const queryHash = crypto.createHash('sha256').update(query).digest('hex');
     const packetKeys = params.packets.map((packet) => packet.packet_key).filter(Boolean);
     const featureIds = [...new Set(params.packets.map((packet) => packet.feature_id).filter((featureId): featureId is string => Boolean(featureId)))];
 
-    await getPacketRpcPool().query(
-      `
-        insert into retrieval_telemetry (
-          query,
-          query_hash,
-          latency_ms,
-          vector_hits,
-          trigram_hits,
-          fts_hits,
-          selected_packet_key,
-          selected_packet_keys,
-          selected_feature_id,
-          feature_ids,
-          fusion_score,
-          cache_hit,
-          surface,
-          environment,
-          retrieval_strategy
-        )
-        values ($1, $2, $3, $4, 0, $5, $6, $7::jsonb, $8, $9::jsonb, $10, false, 'hyperrag-packet-rpc', 'phase-3d-retrieval-telemetry', 'hyperrag_packet_rpc')
-      `,
-      [
-        query,
-        queryHash,
-        Math.max(0, Math.round(params.latencyMs)),
-        Math.max(0, Math.round(params.vectorHits)),
-        Math.max(0, Math.round(params.ftsHits)),
-        packetKeys[0] ?? null,
-        JSON.stringify(packetKeys),
-        featureIds[0] ?? null,
-        JSON.stringify(featureIds),
-        params.packets[0]?.retrieval_lanes.fts ?? null,
-      ],
-    );
+    await recordRetrievalTelemetry({
+      query: params.query,
+      latencyMs: params.latencyMs,
+      vectorHits: params.vectorHits,
+      trigramHits: 0,
+      ftsHits: params.ftsHits,
+      selectedPacketKey: packetKeys[0] ?? null,
+      selectedPacketKeys: packetKeys,
+      selectedFeatureId: featureIds[0] ?? null,
+      featureIds: featureIds,
+      fusionScore: params.packets[0]?.retrieval_lanes.fts ?? null,
+      cacheHit: false,
+      surface: 'hyperrag-packet-rpc',
+      environment: 'phase-3d-retrieval-telemetry',
+      retrievalStrategy: 'fusion',
+    });
   } catch (err) {
     console.warn('[hyperrag-packet-rpc] telemetry record failed:', err instanceof Error ? err.message : String(err));
   }
