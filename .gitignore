@@ -931,3 +931,7 @@ legal_ai_db_backup.dump
 
 # NES-CHROM97 offline card store (large, not tracked)
 neschrom97/
+
+# Large generated Atlas audit reports; keep on disk, never commit
+docs/reports/ignored-directory-audit.json
+docs/reports/ignored-directory-audit.md
