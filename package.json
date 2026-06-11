@@ -557,6 +557,7 @@
     "neschrom97:registry:build": "node scripts/atlas/build-neschrom97-registry.mjs",
     "neschrom97:registry:build:dry": "node scripts/atlas/build-neschrom97-registry.mjs --dry-run",
     "smoke:neschrom97-registry": "node scripts/atlas/smoke-neschrom97-registry.mjs",
+    "neschrom97:classify": "node scripts/atlas/classify-neschrom97-cards.mjs",
     "atlas:parent-atlas:overlay-crosswalk": "node sveltekit-frontend/scripts/atlas/audit-parent-atlas-overlay-crosswalk.mjs",
     "atlas:memory-address:seed": "node scripts/atlas/seed-memory-address-registry.mjs",
     "atlas:memory-address:seed:dry": "node scripts/atlas/seed-memory-address-registry.mjs --dry-run",
