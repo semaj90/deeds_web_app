@@ -130,6 +130,47 @@ Generated: 2026-06-11 (updated). Single authoritative finish list. Do not append
   - Timeline: 1 week (after cache policy)
   - Dependencies: REQUIRES Phase 3G cache policy, Phase 3D telemetry
 
+### ACTIVE SUBGRAPH: HyperRAG Packet RPC + NESCHROM97
+- **HyperRAG Packet RPC — Multi-Lane Semantic Exposure**
+  - Status: Architecture Ready (P0)
+  - Goal: Expose codebase semantic indexing as bounded, replayable RPC over NES/CHR packets
+  - Architecture:
+    - **Storage Tiers**: Postgres (canonical), Qdrant (dense ANN), Neo4j (graph), DuckDB (joins), SeaweedFS (cold), Redis (hot cache)
+    - **RPC Response Shape**: packets array with packet_key, source_ref, feature_id, feature_label, directory_path, qdrant_tags, neo4j_neighbors, retrieval_lanes (dense/fts/trigram/jsonb scores), gemma4_summary, rank
+    - **Trace Metadata**: qdrant_hits, postgres_hits, neo4j_expansions, duckdb_join_used, latency_ms
+  - Deliverables:
+    1. **NESCHROM97 Card Registry** (`neschrom97-card-registry.json`)
+       - Map: card_id → packet_key → source_ref → feature_id
+       - Source: `neschrom97/cards/*.json` + `memory/packets/nes-chrom-packets.jsonl`
+       - Status: Registry first (tagging/ingestion follow)
+    2. **Qdrant Payload Enrichment**
+       - Add tags: card_id, packet_key, source_ref, feature_id, directory_path, surface:neschrom97
+    3. **Neo4j Edge Mapping**
+       - `(:NesChromCard)-[:MATERIALIZES]->(:Packet)`
+       - `(:Packet)-[:DERIVED_FROM]->(:SourceRef)`
+    4. **Smoke Test**
+       - `npm run smoke:neschrom97-registry` (narrow: no broad Drizzle, no SvelteKit bootstrap, explicit pool.end())
+  - Timeline: 1 week (registry + tagging)
+  - Critical: Card store is cold/offline evidence, NOT canonical truth. Postgres + Neo4j are canonical.
+
+- **NESCHROM97 Surface Discovery** (RESOLVED)
+  - Status: Discovered & Mapped (P0)
+  - Live surfaces:
+    - `neschrom97/cards/*.json` — offline card evidence layer
+    - `memory/packets/nes-chrom-packets.jsonl` — packet NDJSON ledger
+    - `sveltekit-frontend/src/routes/api/atlas/nes-chrom/+server.ts` — API endpoint
+    - `sveltekit-frontend/src/lib/server/features/ai/ace/nes-chrom-packet-service.ts` — service layer
+    - `sveltekit-frontend/src/lib/server/db/schema/nes-chrom-packets.ts` — Drizzle schema
+    - `sveltekit-frontend/src/lib/server/ace/nes-chrom-card-store.ts` — card store
+    - `docs/reports/nes-chrom-*.json|md` — audit reports
+  - Rules:
+    - Do NOT commit full card store if large (keep locally only)
+    - Do NOT treat card JSON as canonical
+    - Use Postgres/NES packet tables as canonical
+    - Use neschrom97 as cold/offline evidence layer
+    - Preserve card hash and restore path
+  - Next: Build card registry from discovered surfaces
+
 ### QUEUED / PLANNED
 - **Parent Atlas overlay reconciliation**
   - Status: Queued (P1)
