@@ -107,5 +107,6 @@ export * from './atlas-feature-map-synthesized.js';
 export * from './embeddings.js';
 export * from './model-weights.js';
 export * from './route_runtime_packets.js';
+export * from './concept-records.js';
 
 

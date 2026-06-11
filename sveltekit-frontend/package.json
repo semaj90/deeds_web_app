@@ -265,6 +265,7 @@
     "smoke:multi-hop-traversal": "npx tsx ../scripts/tests/smoke-multi-hop-traversal.mjs",
     "smoke:runtime-packet:replay": "npx tsx ../scripts/tests/smoke-runtime-packet-replay.mjs",
     "test:ace:telemetry-fallback": "node --import tsx --test scripts/tests/telemetry-source-ref-fallback.test.mjs",
+    "test:telemetry:phase3d": "node ../scripts/phase-3d/test-retrieval-telemetry.mjs",
     "smoke:multihop-contextual-tree": "npx tsx ../scripts/atlas/smoke-multihop-contextual-tree.mjs --no-cache",
     "ci:all": "npm run check:ts7 && npm run ci:smoke:hypergraph && (npm run grpc:health:retrieval || true)",
     "audit:dirs": "node scripts/tests/deep-directory-audit.mjs lib/server --direct --no-graph",

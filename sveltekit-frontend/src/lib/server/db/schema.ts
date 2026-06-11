@@ -188,3 +188,4 @@ export * from './schema/parent-atlas-jobs.js';
 export * from './schema/parent-atlas-documents.js';
 export * from './schema/atlas-feature-map-synthesized.js';
 export * from './schema/route_runtime_packets.js';
+export * from './schema/concept-records.js';

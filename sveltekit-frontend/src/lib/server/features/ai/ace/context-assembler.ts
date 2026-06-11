@@ -130,6 +130,11 @@ import { recordContextCacheAccess } from '$lib/server/cache/ace-context-cache-me
 import { recallPastChats } from '../../../ace/chat-memory.js';
 import { getCommunityContext, getDirectoryKAGContext } from '$lib/server/graph/community-graph.js';
 import { getGraphIntelContext } from '$lib/server/graph/graph-intel.js';
+import {
+  recordACERetrievalTelemetry,
+  determineRetrievalStrategy,
+  extractPacketAndFeatureIds,
+} from '../../telemetry/ace-telemetry-emitter.js';
 
 import type { ACPKnowledgeSearchResult } from '$lib/server/services/knowledge-search/ACPToolRegistry.js';
 import {
@@ -3797,6 +3802,47 @@ export async function assembleACEContext(opts: {
       } catch (err) {
         console.error('[Telemetry Outer Error]', err);
       }
+
+      // Phase 3D: Retrieval Telemetry Emission (fire-and-forget, non-blocking)
+      const telemetryLatencyMs = Date.now() - policyStartedAt;
+      const ragChunkCount = finalContext.ragChunks?.length ?? 0;
+      const kbChunkCount = finalContext.kbChunks?.length ?? 0;
+      const kagNeighborCount = finalContext.kagNeighbors?.length ?? 0;
+      const codebaseContextCount = finalContext.codebaseContext?.length ?? 0;
+
+      // Determine retrieval strategy from context composition
+      const retrievalStrategy = determineRetrievalStrategy(
+        'hybrid', // Default mode; can be refined based on actual search paths
+        codebaseContextCount > 0 ? codebaseContextCount : 0, // Vector hits
+        ragChunkCount > 0 ? ragChunkCount : 0, // Lexical hits
+        kagNeighborCount > 0 ? kagNeighborCount : 0 // Graph hits
+      );
+
+      // Extract packet/feature IDs from top results
+      const acePayloads = Array.isArray(finalContext.acePayloads) ? finalContext.acePayloads : [];
+      const { selectedPacketKey, selectedFeatureId, featureIds: emittedFeatureIds } =
+        extractPacketAndFeatureIds(acePayloads.slice(0, 5));
+
+      // Emit telemetry asynchronously
+      recordACERetrievalTelemetry({
+        query,
+        vectorHits: codebaseContextCount,
+        trigramHits: ragChunkCount,
+        ftsHits: kbChunkCount,
+        selectedPacketKey,
+        selectedPacketKeys: selectedPacketKey ? [selectedPacketKey] : [],
+        selectedFeatureId,
+        featureIds: emittedFeatureIds,
+        fusionScore: undefined,
+        latencyMs: telemetryLatencyMs,
+        retrievalStrategy,
+        cacheHit: finalContext.cachePlanner?.hit ?? false,
+        userId: opts.userId,
+        surface: 'ace',
+        fromParentAtlas: opts.mode === 'parent_atlas',
+      }).catch(() => {
+        // Telemetry failure is non-fatal
+      });
 
       return finalContext;
     }
