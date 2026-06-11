@@ -1,394 +1,322 @@
 #!/usr/bin/env node
-/**
- * audit-parent-atlas-overlay-crosswalk.mjs
- *
- * READ-ONLY. Does NOT mutate Postgres, Qdrant, Neo4j, or any JSON file.
- *
- * Maps atlas_feature_map rows to:
- *   parent_atlas_documents  (via source_ref or feature_id)
- *   nes_chrom_packets       (via source_ref or feature_id)
- *   route_runtime_packets   (via source_ref or feature_id)
- *   app feature registry    (sveltekit-frontend/docs/atlas/feature-registry.json)
- *   root feature registry   (docs/atlas/feature-registry.json)
- *
- * Join classification per atlas_feature_map row:
- *   EXACT_SOURCE_REF_JOIN   — source_ref matched in both parent_atlas_documents AND registry
- *   FEATURE_ID_JOIN         — feature_id matched (source_ref miss)
- *   HEURISTIC_LABEL_JOIN    — normalized path/label match only
- *   ROOT_CONTRACT_ONLY      — found in root deployment registry, not in app catalog
- *   APP_INVENTORY_ONLY      — in app catalog, no live-table join found
- *   NO_JOIN                 — no match anywhere
- *
- * Outputs:
- *   sveltekit-frontend/docs/reports/parent-atlas-overlay-crosswalk-report.json
- *   sveltekit-frontend/docs/reports/parent-atlas-overlay-crosswalk-report.md
- *
- * Usage:
- *   node sveltekit-frontend/scripts/atlas/audit-parent-atlas-overlay-crosswalk.mjs
- *   npm run atlas:parent-atlas:overlay-crosswalk
- */
-
 import fs from 'node:fs/promises';
+import { existsSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import pg from 'pg';
-import dotenv from 'dotenv';
 
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const APP_ROOT  = path.resolve(__dirname, '..', '..');
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const APP_ROOT = path.resolve(__dirname, '..', '..');
 const REPO_ROOT = path.resolve(APP_ROOT, '..');
+const CANONICAL_DOC_ROOT = process.env.PARENT_ATLAS_DOC_ROOT
+  ? path.resolve(process.env.PARENT_ATLAS_DOC_ROOT)
+  : path.resolve('C:/Users/james/Documents/Codex/2026-05-12/ve-updated-the-local-quantization-notebook');
 
-dotenv.config({ path: path.join(APP_ROOT, '.env') });
+const INPUTS = {
+  canonical: path.join(CANONICAL_DOC_ROOT, 'docs', 'atlas', 'feature-registry.json'),
+  app: path.join(APP_ROOT, 'docs', 'atlas', 'feature-registry.json'),
+};
 
-// ── paths ──────────────────────────────────────────────────────────────────────
+const OUT_JSON = path.join(APP_ROOT, 'docs', 'reports', 'parent-atlas-overlay-crosswalk-report.json');
+const OUT_MD = path.join(APP_ROOT, 'docs', 'reports', 'parent-atlas-overlay-crosswalk-report.md');
 
-const APP_REGISTRY_PATH  = path.join(APP_ROOT,  'docs', 'atlas', 'feature-registry.json');
-const REPO_REGISTRY_PATH = path.join(REPO_ROOT, 'docs', 'atlas', 'feature-registry.json');
-const SYNC_REPORT_PATH   = path.join(APP_ROOT,  'docs', 'reports', 'parent-atlas-overlay-sync-report.json');
-
-const EXTERNAL_REGISTRY_PATH = path.resolve(
-  'C:\\Users\\james\\Documents\\Codex\\2026-05-12\\ve-updated-the-local-quantization-notebook',
-  'docs', 'atlas', 'feature-registry.json'
-);
-
-const OUT_DIR  = path.join(APP_ROOT, 'docs', 'reports');
-const OUT_JSON = path.join(OUT_DIR, 'parent-atlas-overlay-crosswalk-report.json');
-const OUT_MD   = path.join(OUT_DIR, 'parent-atlas-overlay-crosswalk-report.md');
-
-// ── helpers ────────────────────────────────────────────────────────────────────
-
-async function safeReadJson(p) {
-  try { return JSON.parse(await fs.readFile(p, 'utf8')); } catch { return null; }
+function normalizeText(value) {
+  return String(value ?? '')
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
 }
 
-function normalize(s) {
-  return String(s ?? '').toLowerCase().replace(/[^a-z0-9]+/g, '').trim();
+function normalizeId(value) {
+  return normalizeText(value).replace(/\s+/g, '_');
 }
 
-function normalizePath(s) {
-  return String(s ?? '')
-    .replace(/\\/g, '/')
-    .replace(/^sveltekit-frontend\//, '')
-    .toLowerCase();
+function asArray(value) {
+  if (Array.isArray(value)) return value.filter((item) => item != null);
+  if (value == null) return [];
+  return [value];
 }
 
-// ── db helpers ─────────────────────────────────────────────────────────────────
-
-async function tryDbQuery(client, sql, params = []) {
-  try { return (await client.query(sql, params)).rows; } catch { return null; }
+function featureId(row) {
+  return row.feature_id ?? row.featureId ?? row.featureKey ?? row.feature_key ?? row.id ?? null;
 }
 
-// ── main ───────────────────────────────────────────────────────────────────────
+function titleOf(row) {
+  return row.title ?? row.label ?? row.feature_label ?? row.featureLabel ?? featureId(row) ?? '';
+}
 
-async function main() {
-  process.stderr.write('[crosswalk] starting read-only audit\n');
+function sourceRefsOf(row) {
+  return [
+    ...asArray(row.sourceRefs),
+    ...asArray(row.source_refs),
+    ...asArray(row.source_ref),
+    ...asArray(row.sourceRef),
+    ...asArray(row.owner_file),
+    ...asArray(row.ownerFile),
+    ...asArray(row.path),
+    ...asArray(row.file_path),
+    ...asArray(row.filePath),
+  ].map(String);
+}
 
-  // 1. Load JSON sources
-  const [appRegistry, repoRegistry, externalRegistry, syncReport] = await Promise.all([
-    safeReadJson(APP_REGISTRY_PATH),
-    safeReadJson(REPO_REGISTRY_PATH),
-    safeReadJson(EXTERNAL_REGISTRY_PATH),
-    safeReadJson(SYNC_REPORT_PATH),
-  ]);
+function tagsOf(row) {
+  return [
+    ...asArray(row.qdrantTags),
+    ...asArray(row.qdrant_tags),
+    ...asArray(row.tags),
+    ...asArray(row.turbovecLabel),
+    ...asArray(row.turbovec_label),
+    ...asArray(row.retrieval_lane),
+    ...asArray(row.storage_lane),
+  ].map(String);
+}
 
-  const rootRegistry = repoRegistry ?? externalRegistry ?? [];
-
-  // Build lookup maps from registries
-  const appByFeatureKey = new Map();   // normalize(featureKey) → row
-  const appBySourceRef  = new Map();   // normalizePath(sourceRef) → row
-  for (const row of (appRegistry ?? [])) {
-    const k = normalize(row.featureKey ?? row.title);
-    if (k) appByFeatureKey.set(k, row);
-    for (const sr of (row.sourceRefs ?? [])) {
-      const np = normalizePath(sr.replace(/^local:/, '').split('#')[0]);
-      if (np) appBySourceRef.set(np, row);
+function tokenSet(...values) {
+  const tokens = new Set();
+  for (const value of values) {
+    for (const token of normalizeText(value).split(' ')) {
+      if (token.length >= 3) tokens.add(token);
     }
   }
+  return tokens;
+}
 
-  const rootByFeatureId = new Map();   // normalize(feature_id) → row
-  for (const row of rootRegistry) {
-    const k = normalize(row.feature_id ?? row.featureKey);
-    if (k) rootByFeatureId.set(k, row);
+function intersectCount(a, b) {
+  let count = 0;
+  for (const item of a) {
+    if (b.has(item)) count += 1;
+  }
+  return count;
+}
+
+async function readJson(filePath) {
+  return JSON.parse(await fs.readFile(filePath, 'utf8'));
+}
+
+function indexAppRows(appRows) {
+  const exact = new Map();
+  for (const row of appRows) {
+    const id = featureId(row);
+    if (!id) continue;
+    const key = normalizeId(id);
+    if (!exact.has(key)) exact.set(key, []);
+    exact.get(key).push(row);
+  }
+  return { exact };
+}
+
+function scoreMatch(rootRow, appRow) {
+  const rootId = normalizeId(featureId(rootRow));
+  const appId = normalizeId(featureId(appRow));
+  const reasons = [];
+  let score = 0;
+
+  if (rootId && appId && rootId === appId) {
+    score += 100;
+    reasons.push('feature_id exact match');
   }
 
-  // 2. Connect to Postgres (optional — degrade gracefully)
-  let client = null;
-  let dbAvailable = false;
-  try {
-    client = new pg.Client({ connectionString: process.env.DATABASE_URL });
-    await client.connect();
-    dbAvailable = true;
-    process.stderr.write('[crosswalk] Postgres connected\n');
-  } catch (e) {
-    process.stderr.write(`[crosswalk] Postgres unavailable: ${e.message} — running file-only mode\n`);
+  const rootRefs = new Set(sourceRefsOf(rootRow).map(normalizeText).filter(Boolean));
+  const appRefs = new Set(sourceRefsOf(appRow).map(normalizeText).filter(Boolean));
+  const sourceRefOverlap = intersectCount(rootRefs, appRefs);
+  if (sourceRefOverlap > 0) {
+    score += sourceRefOverlap * 20;
+    reasons.push(`sourceRefs overlap (${sourceRefOverlap})`);
   }
 
-  // 3. Load live-table indexes (read-only queries)
-  const padBySourceRef  = new Map();   // normalizePath(source_ref) → {id, feature_id, source_ref}
-  const padByFeatureId  = new Map();   // normalize(feature_id) → {id, feature_id, source_ref}
-  const ncpBySourceRef  = new Map();   // normalizePath(source_ref) → {id, feature_id}
-  const ncpByFeatureId  = new Map();
-  const rrpBySourceRef  = new Map();   // via source_refs array
-
-  if (dbAvailable) {
-    process.stderr.write('[crosswalk] loading parent_atlas_documents index\n');
-    const padRows = await tryDbQuery(
-      client,
-      'SELECT id, source_ref, feature_id FROM parent_atlas_documents WHERE source_ref IS NOT NULL LIMIT 10000'
-    ) ?? [];
-    for (const r of padRows) {
-      const np = normalizePath(r.source_ref);
-      if (np && !padBySourceRef.has(np)) padBySourceRef.set(np, r);
-      const fk = normalize(r.feature_id);
-      if (fk && !padByFeatureId.has(fk)) padByFeatureId.set(fk, r);
-    }
-    process.stderr.write(`[crosswalk] pad index: ${padBySourceRef.size} source_refs, ${padByFeatureId.size} feature_ids\n`);
-
-    process.stderr.write('[crosswalk] loading nes_chrom_packets index\n');
-    const ncpRows = await tryDbQuery(
-      client,
-      'SELECT id, source_ref, feature_id FROM nes_chrom_packets WHERE source_ref IS NOT NULL LIMIT 5000'
-    ) ?? [];
-    for (const r of ncpRows) {
-      const np = normalizePath(r.source_ref);
-      if (np && !ncpBySourceRef.has(np)) ncpBySourceRef.set(np, r);
-      const fk = normalize(r.feature_id);
-      if (fk && !ncpByFeatureId.has(fk)) ncpByFeatureId.set(fk, r);
-    }
-    process.stderr.write(`[crosswalk] ncp index: ${ncpBySourceRef.size} entries\n`);
-
-    process.stderr.write('[crosswalk] loading route_runtime_packets index\n');
-    const rrpRows = await tryDbQuery(
-      client,
-      'SELECT id, source_refs, feature_ids, cluster_id FROM route_runtime_packets LIMIT 1000'
-    ) ?? [];
-    for (const r of rrpRows) {
-      for (const sr of (r.source_refs ?? [])) {
-        const np = normalizePath(sr);
-        if (np && !rrpBySourceRef.has(np)) rrpBySourceRef.set(np, r);
-      }
-    }
-    process.stderr.write(`[crosswalk] rrp index: ${rrpBySourceRef.size} source_ref entries\n`);
+  const rootTags = new Set(tagsOf(rootRow).map(normalizeText).filter(Boolean));
+  const appTags = new Set(tagsOf(appRow).map(normalizeText).filter(Boolean));
+  const tagOverlap = intersectCount(rootTags, appTags);
+  if (tagOverlap > 0) {
+    score += tagOverlap * 10;
+    reasons.push(`tag/label overlap (${tagOverlap})`);
   }
 
-  // 4. Load atlas_feature_map sample for crosswalk (up to 500 rows to keep report readable)
-  let afmRows = [];
-  if (dbAvailable) {
-    process.stderr.write('[crosswalk] sampling atlas_feature_map\n');
-    afmRows = await tryDbQuery(
-      client,
-      `SELECT source_ref, feature_id, cluster_id, centroid_id, qdrant_point_id, som_cluster
-       FROM atlas_feature_map
-       WHERE source_ref IS NOT NULL
-       ORDER BY source_ref
-       LIMIT 500`
-    ) ?? [];
-    process.stderr.write(`[crosswalk] afm sample: ${afmRows.length} rows\n`);
+  const rootTokens = tokenSet(featureId(rootRow), titleOf(rootRow), rootRow.summary, rootRow.description, tagsOf(rootRow).join(' '));
+  const appTokens = tokenSet(featureId(appRow), titleOf(appRow), appRow.summary, appRow.description, tagsOf(appRow).join(' '));
+  const textOverlap = intersectCount(rootTokens, appTokens);
+  if (textOverlap > 0) {
+    score += Math.min(30, textOverlap * 3);
+    reasons.push(`label/description fuzzy overlap (${textOverlap})`);
   }
 
-  // 5. Classify each afm row
-  const rows = [];
-  const missingSourceRefs = [];
-  const missingFeatureIds = [];
-  const classCounts = {
-    EXACT_SOURCE_REF_JOIN: 0,
-    FEATURE_ID_JOIN: 0,
-    HEURISTIC_LABEL_JOIN: 0,
-    ROOT_CONTRACT_ONLY: 0,
-    APP_INVENTORY_ONLY: 0,
-    NO_JOIN: 0,
+  return { score, reasons };
+}
+
+function classifyRoot(rootRow, appRows, appIndex) {
+  const id = featureId(rootRow);
+  const exactMatches = appIndex.exact.get(normalizeId(id)) ?? [];
+  if (exactMatches.length > 0) {
+    return {
+      rootFeatureId: id,
+      rootTitle: titleOf(rootRow),
+      classification: 'MAPPED_EXACT',
+      matches: exactMatches.slice(0, 8).map((row) => ({
+        feature_id: featureId(row),
+        title: titleOf(row),
+        score: 100,
+        reasons: ['feature_id exact match'],
+        sourceRefs: sourceRefsOf(row).slice(0, 5),
+      })),
+    };
+  }
+
+  const scored = appRows
+    .map((row) => ({ row, ...scoreMatch(rootRow, row) }))
+    .filter((item) => item.score >= 12)
+    .sort((a, b) => b.score - a.score)
+    .slice(0, 8);
+
+  if (scored.length > 0) {
+    return {
+      rootFeatureId: id,
+      rootTitle: titleOf(rootRow),
+      classification: 'MAPPED_HEURISTIC',
+      matches: scored.map((item) => ({
+        feature_id: featureId(item.row),
+        title: titleOf(item.row),
+        score: item.score,
+        reasons: item.reasons,
+        sourceRefs: sourceRefsOf(item.row).slice(0, 5),
+      })),
+    };
+  }
+
+  const hasContractEvidence = sourceRefsOf(rootRow).length > 0 || tagsOf(rootRow).length > 0 || rootRow.status === 'implemented';
+  return {
+    rootFeatureId: id,
+    rootTitle: titleOf(rootRow),
+    classification: hasContractEvidence ? 'ROOT_CONTRACT_ONLY' : 'MISSING_APP_OVERLAY',
+    matches: [],
   };
+}
 
-  for (const afm of afmRows) {
-    const np         = normalizePath(afm.source_ref);
-    const fk         = normalize(afm.feature_id);
-
-    const padSrHit   = padBySourceRef.get(np) ?? null;
-    const padFkHit   = padByFeatureId.get(fk) ?? null;
-    const ncpSrHit   = ncpBySourceRef.get(np) ?? null;
-    const ncpFkHit   = ncpByFeatureId.get(fk) ?? null;
-    const rrpSrHit   = rrpBySourceRef.get(np) ?? null;
-    const appSrHit   = appBySourceRef.get(np) ?? null;
-    const appFkHit   = appByFeatureKey.get(normalize(afm.feature_id)) ?? null;
-    const rootFkHit  = rootByFeatureId.get(fk) ?? null;
-
-    let classification;
-    if ((padSrHit || ncpSrHit || rrpSrHit) && (appSrHit || appFkHit)) {
-      classification = 'EXACT_SOURCE_REF_JOIN';
-    } else if ((padFkHit || ncpFkHit) && fk) {
-      classification = 'FEATURE_ID_JOIN';
-    } else if (rootFkHit && !(appSrHit || appFkHit)) {
-      classification = 'ROOT_CONTRACT_ONLY';
-    } else if (appSrHit || appFkHit) {
-      classification = 'APP_INVENTORY_ONLY';
-    } else if (padSrHit || padFkHit || ncpSrHit) {
-      classification = 'HEURISTIC_LABEL_JOIN';
-    } else {
-      classification = 'NO_JOIN';
-    }
-
-    classCounts[classification]++;
-
-    if (classification === 'NO_JOIN') {
-      if (afm.source_ref) missingSourceRefs.push(afm.source_ref);
-      if (afm.feature_id) missingFeatureIds.push(afm.feature_id);
-    }
-
-    rows.push({
-      source_ref:     afm.source_ref,
-      feature_id:     afm.feature_id,
-      classification,
-      padJoin:        padSrHit ? 'source_ref' : padFkHit ? 'feature_id' : null,
-      ncpJoin:        ncpSrHit ? 'source_ref' : ncpFkHit ? 'feature_id' : null,
-      rrpJoin:        rrpSrHit ? 'source_ref' : null,
-      appJoin:        appSrHit ? 'source_ref' : appFkHit ? 'feature_key' : null,
-      rootJoin:       rootFkHit ? 'feature_id' : null,
-      qdrant_point_id: afm.qdrant_point_id ?? null,
-      som_cluster:    afm.som_cluster ?? null,
+function classifyAppOnly(appRows, mappedAppIds) {
+  return appRows
+    .filter((row) => !mappedAppIds.has(normalizeId(featureId(row))))
+    .map((row) => {
+      const refs = sourceRefsOf(row);
+      const tags = tagsOf(row);
+      const classification = refs.length > 0 || tags.length > 0
+        ? 'APP_CODEBASE_INVENTORY'
+        : 'CANDIDATE_CANONICAL_FEATURE';
+      return {
+        feature_id: featureId(row),
+        title: titleOf(row),
+        classification,
+        sourceRefs: refs.slice(0, 5),
+        tags: tags.slice(0, 8),
+      };
     });
-  }
-
-  // 6. Also classify app registry rows that have no afm counterpart
-  let appOnlyCount = 0;
-  if (appRegistry) {
-    for (const row of appRegistry) {
-      for (const sr of (row.sourceRefs ?? [])) {
-        const np = normalizePath(sr.replace(/^local:/, '').split('#')[0]);
-        if (np && !padBySourceRef.has(np) && !ncpBySourceRef.has(np)) {
-          appOnlyCount++;
-          break;
-        }
-      }
-    }
-  }
-
-  // 7. Proposed safe patch lane
-  const exactPct   = afmRows.length ? (classCounts.EXACT_SOURCE_REF_JOIN / afmRows.length * 100).toFixed(1) : '0.0';
-  const noJoinPct  = afmRows.length ? (classCounts.NO_JOIN / afmRows.length * 100).toFixed(1) : '0.0';
-  const patchRecommendation =
-    parseFloat(noJoinPct) < 10
-      ? 'PATCH_SAFE — majority of rows are deterministic joins; backfill via source_ref upsert'
-      : parseFloat(noJoinPct) < 30
-      ? 'PATCH_REVIEW — moderate no-join rate; manual spot-check recommended before backfill'
-      : 'PATCH_DEFERRED — high no-join rate; resolve source_ref gaps in atlas_feature_map first';
-
-  if (client) await client.end();
-
-  // 8. Build report
-  const report = {
-    generatedAt:   new Date().toISOString(),
-    mode:          'read-only',
-    dbAvailable,
-    afmSampleSize: afmRows.length,
-    appRegistryRows:  appRegistry?.length  ?? 0,
-    rootRegistryRows: rootRegistry?.length ?? 0,
-    classification: classCounts,
-    summary: {
-      joined:       afmRows.length - classCounts.NO_JOIN,
-      noJoin:       classCounts.NO_JOIN,
-      exactPct:     `${exactPct}%`,
-      noJoinPct:    `${noJoinPct}%`,
-      appOnlyRows:  appOnlyCount,
-      patchRecommendation,
-    },
-    topMissingSourceRefs: [...new Set(missingSourceRefs)].slice(0, 30),
-    topMissingFeatureIds: [...new Set(missingFeatureIds)].slice(0, 30),
-    sampleRows: rows.slice(0, 50),
-    sources: {
-      appRegistry:   APP_REGISTRY_PATH,
-      rootRegistry:  repoRegistry ? REPO_REGISTRY_PATH : EXTERNAL_REGISTRY_PATH,
-      syncReport:    SYNC_REPORT_PATH,
-    },
-  };
-
-  // 9. Write outputs
-  await fs.mkdir(OUT_DIR, { recursive: true });
-  await fs.writeFile(OUT_JSON, JSON.stringify(report, null, 2) + '\n', 'utf8');
-  await fs.writeFile(OUT_MD, renderMarkdown(report), 'utf8');
-
-  // 10. Machine-readable summary to stdout
-  console.log(JSON.stringify({
-    ok: true,
-    afmSampleSize:        report.afmSampleSize,
-    joined:               report.summary.joined,
-    noJoin:               report.summary.noJoin,
-    exactPct:             report.summary.exactPct,
-    noJoinPct:            report.summary.noJoinPct,
-    patchRecommendation:  report.summary.patchRecommendation,
-    classCounts:          report.classification,
-    dbAvailable,
-    outJson: OUT_JSON,
-    outMd:   OUT_MD,
-  }, null, 2));
 }
 
-// ── markdown renderer ──────────────────────────────────────────────────────────
-
-function renderMarkdown(r) {
+function renderMarkdown(report) {
   const lines = [];
-  lines.push('# Parent Atlas Overlay Crosswalk Report');
+  lines.push('# Parent Atlas Overlay Crosswalk');
   lines.push('');
-  lines.push(`Generated: ${r.generatedAt} | mode: ${r.mode} | db: ${r.dbAvailable ? 'connected' : 'offline'}`);
+  lines.push(`Generated: ${report.generatedAt}`);
   lines.push('');
   lines.push('## Summary');
   lines.push('');
-  lines.push(`| Metric | Value |`);
-  lines.push(`|--------|-------|`);
-  lines.push(`| atlas_feature_map sample | ${r.afmSampleSize} rows |`);
-  lines.push(`| app registry rows | ${r.appRegistryRows} |`);
-  lines.push(`| root registry rows | ${r.rootRegistryRows} |`);
-  lines.push(`| joined | ${r.summary.joined} |`);
-  lines.push(`| no-join | ${r.summary.noJoin} (${r.summary.noJoinPct}) |`);
-  lines.push(`| exact source_ref joins | ${r.classification.EXACT_SOURCE_REF_JOIN} (${r.summary.exactPct}) |`);
-  lines.push(`| app-inventory-only | ${r.classification.APP_INVENTORY_ONLY} |`);
-  lines.push(`| app-only (no live table) | ${r.summary.appOnlyRows} |`);
-  lines.push(`| **patch recommendation** | **${r.summary.patchRecommendation}** |`);
+  lines.push(`- canonical root rows: ${report.summary.canonicalRows}`);
+  lines.push(`- app inventory rows: ${report.summary.appRows}`);
+  lines.push(`- MAPPED_EXACT: ${report.summary.byRootClassification.MAPPED_EXACT ?? 0}`);
+  lines.push(`- MAPPED_HEURISTIC: ${report.summary.byRootClassification.MAPPED_HEURISTIC ?? 0}`);
+  lines.push(`- ROOT_CONTRACT_ONLY: ${report.summary.byRootClassification.ROOT_CONTRACT_ONLY ?? 0}`);
+  lines.push(`- MISSING_APP_OVERLAY: ${report.summary.byRootClassification.MISSING_APP_OVERLAY ?? 0}`);
+  lines.push(`- APP_CODEBASE_INVENTORY: ${report.summary.byAppClassification.APP_CODEBASE_INVENTORY ?? 0}`);
+  lines.push(`- CANDIDATE_CANONICAL_FEATURE: ${report.summary.byAppClassification.CANDIDATE_CANONICAL_FEATURE ?? 0}`);
   lines.push('');
-  lines.push('## Classification Breakdown');
+  lines.push('## Root Feature Mapping');
   lines.push('');
-  lines.push('| Classification | Count |');
-  lines.push('|---------------|-------|');
-  for (const [k, v] of Object.entries(r.classification)) {
-    lines.push(`| ${k} | ${v} |`);
+  for (const item of report.rootMappings) {
+    lines.push(`- ${item.rootFeatureId}: ${item.classification}`);
+    for (const match of item.matches.slice(0, 3)) {
+      lines.push(`  - ${match.feature_id} (${match.score}) - ${match.reasons.join('; ')}`);
+    }
   }
   lines.push('');
-  lines.push('## Top Missing source_refs (NO_JOIN rows)');
+  lines.push('## Decision Rule');
   lines.push('');
-  if (r.topMissingSourceRefs.length === 0) {
-    lines.push('None — all sampled rows have joins.');
-  } else {
-    for (const sr of r.topMissingSourceRefs) lines.push(`- \`${sr}\``);
-  }
-  lines.push('');
-  lines.push('## Top Missing feature_ids (NO_JOIN rows)');
-  lines.push('');
-  if (r.topMissingFeatureIds.length === 0) {
-    lines.push('None.');
-  } else {
-    for (const fid of r.topMissingFeatureIds) lines.push(`- \`${fid}\``);
-  }
-  lines.push('');
-  lines.push('## Sample Rows (first 20)');
-  lines.push('');
-  lines.push('| source_ref | classification | padJoin | appJoin |');
-  lines.push('|-----------|----------------|---------|---------|');
-  for (const row of r.sampleRows.slice(0, 20)) {
-    const sr = (row.source_ref ?? '').slice(-60);
-    lines.push(`| \`${sr}\` | ${row.classification} | ${row.padJoin ?? '—'} | ${row.appJoin ?? '—'} |`);
-  }
-  lines.push('');
-  lines.push('## Patch Recommendation');
-  lines.push('');
-  lines.push(r.summary.patchRecommendation);
-  lines.push('');
-  lines.push('After reviewing this report:');
-  lines.push('- If `PATCH_SAFE`: run `npm run atlas:parent-atlas:promote --dry-run` to preview upserts');
-  lines.push('- If `PATCH_REVIEW`: spot-check the NO_JOIN rows for broken source_refs before patching');
-  lines.push('- If `PATCH_DEFERRED`: fix source_ref population in `atlas_feature_map` first');
+  lines.push('- If most root features map heuristically, keep both registries and store this crosswalk.');
+  lines.push('- If root features are truly absent, add root feature IDs as canonical labels into the app overlay.');
+  lines.push('- If app rows are inventory rows, do not treat them as registry drift.');
   return lines.join('\n');
 }
 
-main().catch(err => {
-  process.stderr.write(`[crosswalk] fatal: ${err.message}\n`);
+async function main() {
+  const sourceStatus = {
+    canonical: existsSync(INPUTS.canonical) ? 'READY' : 'MISSING_SOURCE',
+    app: existsSync(INPUTS.app) ? 'READY' : 'MISSING_SOURCE',
+  };
+  if (sourceStatus.canonical !== 'READY' || sourceStatus.app !== 'READY') {
+    const report = {
+      generatedAt: new Date().toISOString(),
+      inputs: INPUTS,
+      sourceStatus,
+      summary: {
+        canonicalRows: 0,
+        appRows: 0,
+        byRootClassification: {},
+        byAppClassification: {},
+      },
+      rootMappings: [],
+      appOnlyRows: [],
+    };
+    await fs.mkdir(path.dirname(OUT_JSON), { recursive: true });
+    await fs.writeFile(OUT_JSON, JSON.stringify(report, null, 2) + '\n', 'utf8');
+    await fs.writeFile(OUT_MD, renderMarkdown(report), 'utf8');
+    console.log(JSON.stringify({ ok: false, sourceStatus, report: OUT_JSON }, null, 2));
+    return;
+  }
+
+  const canonicalRows = await readJson(INPUTS.canonical);
+  const appRows = await readJson(INPUTS.app);
+  const canonical = Array.isArray(canonicalRows) ? canonicalRows : [];
+  const app = Array.isArray(appRows) ? appRows : [];
+  const appIndex = indexAppRows(app);
+  const rootMappings = canonical.map((row) => classifyRoot(row, app, appIndex));
+  const mappedAppIds = new Set(
+    rootMappings.flatMap((mapping) => mapping.matches.map((match) => normalizeId(match.feature_id))),
+  );
+  const appOnlyRows = classifyAppOnly(app, mappedAppIds);
+
+  const countBy = (rows, key) => rows.reduce((acc, row) => {
+    const value = row[key] ?? 'UNKNOWN';
+    acc[value] = (acc[value] ?? 0) + 1;
+    return acc;
+  }, {});
+
+  const report = {
+    generatedAt: new Date().toISOString(),
+    inputs: INPUTS,
+    sourceStatus,
+    summary: {
+      canonicalRows: canonical.length,
+      appRows: app.length,
+      byRootClassification: countBy(rootMappings, 'classification'),
+      byAppClassification: countBy(appOnlyRows, 'classification'),
+    },
+    rootMappings,
+    appOnlyRows: appOnlyRows.slice(0, 250),
+  };
+
+  await fs.mkdir(path.dirname(OUT_JSON), { recursive: true });
+  await fs.writeFile(OUT_JSON, JSON.stringify(report, null, 2) + '\n', 'utf8');
+  await fs.writeFile(OUT_MD, renderMarkdown(report), 'utf8');
+
+  console.log(JSON.stringify({
+    ok: true,
+    canonicalRows: canonical.length,
+    appRows: app.length,
+    rootClassifications: report.summary.byRootClassification,
+    appClassifications: report.summary.byAppClassification,
+    report: OUT_JSON,
+  }, null, 2));
+}
+
+main().catch((err) => {
+  console.error(err);
   process.exit(1);
 });

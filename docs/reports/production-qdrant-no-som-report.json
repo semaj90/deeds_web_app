@@ -1,27 +1,27 @@
 {
-  "timestamp": "2026-06-05T00:06:50.837Z",
+  "timestamp": "2026-06-11T05:21:34.515Z",
   "limit": 50,
   "raw_inventory": {
-    "total": 14465,
-    "has_som": 10487,
-    "has_qdrant": 10997,
-    "qdrant_no_som": 1492
+    "total": 14487,
+    "has_som": 10512,
+    "has_qdrant": 11427,
+    "qdrant_no_som": 3012
   },
   "active_production": {
-    "total": 4808,
-    "has_som": 4808,
-    "has_qdrant": 4808,
+    "total": 4830,
+    "has_som": 4830,
+    "has_qdrant": 4788,
     "qdrant_no_som": 0,
     "som_pct": "100.0"
   },
   "coverage": {
-    "raw_total": 14465,
-    "raw_has_som": 10487,
-    "raw_has_qdrant": 10997,
-    "raw_qdrant_no_som": 1492,
-    "production_total": 4808,
-    "production_has_som": 4808,
-    "production_has_qdrant": 4808,
+    "raw_total": 14487,
+    "raw_has_som": 10512,
+    "raw_has_qdrant": 11427,
+    "raw_qdrant_no_som": 3012,
+    "production_total": 4830,
+    "production_has_som": 4830,
+    "production_has_qdrant": 4788,
     "production_qdrant_no_som": 0,
     "production_som_pct": "100.0"
   },

@@ -222,12 +222,12 @@ async function main() {
   console.log(`  Mode:  ${APPLY ? 'APPLY' : 'DRY-RUN'}`);
   console.log(`  Merge: ${MERGE ? 'yes' : 'no'}`);
 
-  if (!fs.existsSync(MASTER_TODO)) {
-    console.error(`  ❌ Missing ${MASTER_TODO}`);
-    process.exit(1);
+  const masterTodoExists = fs.existsSync(MASTER_TODO);
+  if (!masterTodoExists) {
+    console.warn(`  ⚠ Missing ${MASTER_TODO} — continuing with supplemental board inputs only`);
   }
 
-  const lines = fs.readFileSync(MASTER_TODO, 'utf8').split('\n');
+  const lines = masterTodoExists ? fs.readFileSync(MASTER_TODO, 'utf8').split('\n') : [];
   const pkg = JSON.parse(fs.readFileSync(SVELTEKIT_PKG, 'utf8'));
   const npmScripts = new Set(Object.keys(pkg.scripts || {}));
 
@@ -326,10 +326,13 @@ async function main() {
 
   const featureLabelTasksPath = path.join(FRONTEND_TMP, 'kanban_tasks.jsonl');
   const missingFeatureTodosPath = path.join(FRONTEND_TMP, 'missing_feature_todos.jsonl');
+  const hiddenDirectoryTasksPath = path.join(FRONTEND_TMP, 'hidden_directory_tasks.jsonl');
   const featureLabelTasks = readJsonl(featureLabelTasksPath);
   const missingFeatureTodos = readJsonl(missingFeatureTodosPath);
+  const hiddenDirectoryTasks = readJsonl(hiddenDirectoryTasksPath);
   const featureLabelBoardTasks = featureLabelTasks.map((task) => normalizeBoardTask(task, { status: 'todo', kanbanStatus: 'BACKLOG' }));
   const missingFeatureTodoBoardTasks = missingFeatureTodos.map((task) => normalizeBoardTask(task, { status: 'todo', kanbanStatus: 'BACKLOG' }));
+  const hiddenDirectoryBoardTasks = hiddenDirectoryTasks.map((task) => normalizeBoardTask(task, { status: 'todo', kanbanStatus: 'REVIEW' }));
 
   if (APPLY) {
     fs.mkdirSync(path.dirname(RECONCILE_OUT), { recursive: true });
@@ -344,6 +347,7 @@ async function main() {
         masterTodo: { added: 0, updated: 0 },
         featureLabel: { added: 0, updated: 0 },
         missingFeatureTodo: { added: 0, updated: 0 },
+        hiddenDirectory: { added: 0, updated: 0 },
       };
 
       for (const t of tasks) {
@@ -358,6 +362,10 @@ async function main() {
         const result = upsertTaskIntoBoard(board, t, 'missing-feature-todo');
         counts.missingFeatureTodo[result] += 1;
       }
+      for (const t of hiddenDirectoryBoardTasks) {
+        const result = upsertTaskIntoBoard(board, t, 'hidden-directory-audit');
+        counts.hiddenDirectory[result] += 1;
+      }
 
       normalizeBoard(board);
       sortBoardColumns(board);
@@ -369,9 +377,11 @@ async function main() {
         masterTodo: counts.masterTodo,
         featureLabel: counts.featureLabel,
         missingFeatureTodo: counts.missingFeatureTodo,
+        hiddenDirectory: counts.hiddenDirectory,
         sourceFiles: {
           featureLabelTasksPath: fs.existsSync(featureLabelTasksPath) ? path.relative(ROOT, featureLabelTasksPath).replace(/\\/g, '/') : null,
           missingFeatureTodosPath: fs.existsSync(missingFeatureTodosPath) ? path.relative(ROOT, missingFeatureTodosPath).replace(/\\/g, '/') : null,
+          hiddenDirectoryTasksPath: fs.existsSync(hiddenDirectoryTasksPath) ? path.relative(ROOT, hiddenDirectoryTasksPath).replace(/\\/g, '/') : null,
         },
       };
       fs.mkdirSync(path.dirname(KANBAN_TARGET), { recursive: true });
@@ -382,10 +392,12 @@ async function main() {
     const report = {
       timestamp: new Date().toISOString(),
       sourceDocument: 'MASTER-FEATURE-TODO-2026-05-20.md',
+      sourceDocumentExists: masterTodoExists,
       openItems: openItems.length,
       tasksGenerated: tasks.length,
       featureLabelTasks: featureLabelTasks.length,
       missingFeatureTodos: missingFeatureTodos.length,
+      hiddenDirectoryTasks: hiddenDirectoryTasks.length,
       byStatus: tasks.reduce((acc, t) => ({ ...acc, [t.kanbanStatus]: (acc[t.kanbanStatus] || 0) + 1 }), {}),
       byPriority: tasks.reduce((acc, t) => ({ ...acc, [t.priority]: (acc[t.priority] || 0) + 1 }), {}),
       fileResolution: {
@@ -396,6 +408,7 @@ async function main() {
       supplementalInputs: {
         featureLabelTasksPath: fs.existsSync(featureLabelTasksPath) ? path.relative(ROOT, featureLabelTasksPath).replace(/\\/g, '/') : null,
         missingFeatureTodosPath: fs.existsSync(missingFeatureTodosPath) ? path.relative(ROOT, missingFeatureTodosPath).replace(/\\/g, '/') : null,
+        hiddenDirectoryTasksPath: fs.existsSync(hiddenDirectoryTasksPath) ? path.relative(ROOT, hiddenDirectoryTasksPath).replace(/\\/g, '/') : null,
       },
     };
     fs.mkdirSync(path.dirname(REPORT), { recursive: true });

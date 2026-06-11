@@ -1,9 +1,9 @@
 {
-  "timestamp": "2026-06-08T21:28:12.582Z",
+  "timestamp": "2026-06-11T03:51:58.305Z",
   "mode": "apply",
   "lanes": {
     "card": {
-      "nodes": 117158,
+      "nodes": 8170,
       "edges": 0
     },
     "outcome": {
@@ -39,6 +39,6 @@
       "edges": 24
     }
   },
-  "totalNodes": 118529,
+  "totalNodes": 9541,
   "totalEdges": 9402
 }

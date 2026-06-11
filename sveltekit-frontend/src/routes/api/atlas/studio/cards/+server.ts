@@ -3,6 +3,8 @@ import type { RequestHandler } from './$types.js';
 import { withRetry, getDb } from '$lib/db/pool.js';
 import { sql } from 'drizzle-orm';
 
+import { requireUser } from '$lib/server/auth-utils.js';
+
 const DEFAULT_LIMIT = 50;
 const MAX_LIMIT = 200;
 
@@ -51,8 +53,9 @@ const SAMPLE_CARDS = [
   }
 ];
 
-export const GET: RequestHandler = async ({ url, locals }) => {
-  if (!locals.user) return json({ error: 'Unauthorized' }, { status: 401 });
+export const GET: RequestHandler = async (event) => {
+  requireUser(event);
+  const { url } = event;
   const kindParam = url.searchParams.get('kind');
   const q = url.searchParams.get('q') ?? '';
   const limit = clampLimit(url.searchParams.get('limit'));

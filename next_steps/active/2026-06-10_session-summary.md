@@ -72,7 +72,7 @@ After: Shared packet library, Docker atlas-runner service, ready for full pipeli
   - Canonical packet helpers: buildPacketKey, buildPacketPayload, validation
   - Used by both materializer and summarizer
   
-- `next_steps/active/2026-06-10_packet-materialization-alignment.md`
+- `reports/archive/phase-2a-packet-materialization-checklist.md` (partially superseded; active board is `reports/parent-atlas-open-lanes-todo.md`)
   - Implementation plan, blocked tasks, success criteria
 
 - `next_steps/active/2026-06-10_atlas-runner-deployment.md`
@@ -178,7 +178,8 @@ To run the full pipeline immediately in the next session:
 
 ## References
 
-- **Alignment Plan:** `next_steps/active/2026-06-10_packet-materialization-alignment.md`
+- **Historical Alignment Plan:** `reports/archive/phase-2a-packet-materialization-checklist.md` (partially superseded)
+- **Active Board:** `reports/parent-atlas-open-lanes-todo.md`
 - **Deployment Runbook:** `next_steps/active/2026-06-10_atlas-runner-deployment.md`
 - **Shared Library:** `scripts/atlas/packet-materializer-lib.mjs`
 - **Prior Session:** Docker atlas-runner security setup (see deployment runbook Phase 1-2)

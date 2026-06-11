@@ -1,99 +1,73 @@
-# Parent Atlas Overlay Crosswalk Report
+# Parent Atlas Overlay Crosswalk
 
-Generated: 2026-06-06T17:44:42.022Z | mode: read-only | db: connected
+Generated: 2026-06-11T05:19:10.950Z
 
 ## Summary
 
-| Metric | Value |
-|--------|-------|
-| atlas_feature_map sample | 500 rows |
-| app registry rows | 4209 |
-| root registry rows | 4209 |
-| joined | 261 |
-| no-join | 239 (47.8%) |
-| exact source_ref joins | 1 (0.2%) |
-| app-inventory-only | 0 |
-| app-only (no live table) | 4208 |
-| **patch recommendation** | **PATCH_DEFERRED — high no-join rate; resolve source_ref gaps in atlas_feature_map first** |
+- canonical root rows: 18
+- app inventory rows: 4209
+- MAPPED_EXACT: 0
+- MAPPED_HEURISTIC: 12
+- ROOT_CONTRACT_ONLY: 6
+- MISSING_APP_OVERLAY: 0
+- APP_CODEBASE_INVENTORY: 4170
+- CANDIDATE_CANONICAL_FEATURE: 0
 
-## Classification Breakdown
+## Root Feature Mapping
 
-| Classification | Count |
-|---------------|-------|
-| EXACT_SOURCE_REF_JOIN | 1 |
-| FEATURE_ID_JOIN | 197 |
-| HEURISTIC_LABEL_JOIN | 63 |
-| ROOT_CONTRACT_ONLY | 0 |
-| APP_INVENTORY_ONLY | 0 |
-| NO_JOIN | 239 |
+- retrieval_spine: MAPPED_HEURISTIC
+  - subgraph_instruction_programming_kag_ace_topology__overview (18) - label/description fuzzy overlap (6)
+  - the_4_layer_retrieval_stack (18) - label/description fuzzy overlap (6)
+  - retrieval_and_graph_layer (15) - label/description fuzzy overlap (5)
+- turbovec_prefilter: MAPPED_HEURISTIC
+  - the_4_layer_retrieval_stack (15) - label/description fuzzy overlap (5)
+  - inputs (12) - label/description fuzzy overlap (4)
+  - pipeline_fit (12) - label/description fuzzy overlap (4)
+- karpathy_authority_overlay: MAPPED_HEURISTIC
+  - where_each_technology_fits (12) - label/description fuzzy overlap (4)
+- karpathy_redis_hot_lane: MAPPED_HEURISTIC
+  - karpathy_llmwiki__ace_kag_retrieval (12) - label/description fuzzy overlap (4)
+- ace_context_pack_cache: MAPPED_HEURISTIC
+  - where_each_technology_fits (21) - label/description fuzzy overlap (7)
+  - resilience__2_aof_redis_persistence_hardening (18) - label/description fuzzy overlap (6)
+  - feature_checklist (18) - label/description fuzzy overlap (6)
+- intent_synthesis: ROOT_CONTRACT_ONLY
+- feature_label_registry: ROOT_CONTRACT_ONLY
+- pgvector_multi_table_lane: MAPPED_HEURISTIC
+  - layer_1_cold_tier_ground_truth_768d (15) - label/description fuzzy overlap (5)
+  - 3_high_performance_pgvector_hnsw_indexing (15) - label/description fuzzy overlap (5)
+  - 2_relational_vector_db_architecture (12) - label/description fuzzy overlap (4)
+- redis_agent_memory_server_eval: MAPPED_HEURISTIC
+  - diagnostic_explanation_of_self_learning_benefit (15) - label/description fuzzy overlap (5)
+  - 3_5_jsonl_append_only_log (12) - label/description fuzzy overlap (4)
+  - 3_state_management_cross_boundary_rules (12) - label/description fuzzy overlap (4)
+- claude_mem_opencode_reference: ROOT_CONTRACT_ONLY
+- feature_gap_registry: ROOT_CONTRACT_ONLY
+- codebase_semantic_index: MAPPED_HEURISTIC
+  - trace_karpathy_runtime_split (15) - label/description fuzzy overlap (5)
+  - 2_storage_caching_matrix (15) - label/description fuzzy overlap (5)
+  - critical_environment_matrix (15) - label/description fuzzy overlap (5)
+- semantic_cache_policy: MAPPED_HEURISTIC
+  - 3_3_redis_bitfrost_hot_cache (21) - label/description fuzzy overlap (7)
+  - where_each_technology_fits (21) - label/description fuzzy overlap (7)
+  - feature_checklist (21) - label/description fuzzy overlap (7)
+- memory_address_registry: ROOT_CONTRACT_ONLY
+- ace_packet_flow: MAPPED_HEURISTIC
+  - where_each_technology_fits (18) - label/description fuzzy overlap (6)
+  - 3_3_redis_bitfrost_hot_cache (15) - label/description fuzzy overlap (5)
+  - feature_checklist (15) - label/description fuzzy overlap (5)
+- cluster_card_flow: MAPPED_HEURISTIC
+  - layer_3_hot_tier_redis (15) - label/description fuzzy overlap (5)
+  - feature_checklist (15) - label/description fuzzy overlap (5)
+  - the_4_layer_retrieval_stack (15) - label/description fuzzy overlap (5)
+- feature_labeling_pipeline: MAPPED_HEURISTIC
+  - pipeline_fit (15) - label/description fuzzy overlap (5)
+  - cluster_breakdown (12) - label/description fuzzy overlap (4)
+  - updated_pipeline (12) - label/description fuzzy overlap (4)
+- duckdb_analytics_lane: ROOT_CONTRACT_ONLY
 
-## Top Missing source_refs (NO_JOIN rows)
+## Decision Rule
 
-- `.agent/workflows/error-fixing-strategy.md`
-- `.cache/ace/context-packs/ace_context_local-json-hit_v1.json`
-- `.cache/ace/context-packs/ace_context_smoke-context-pack_v1.json`
-- `.cache/ace/top-retrieval/ace_retrieval_topn_77245b8d5bd3442aa981670b_2.json`
-- `.cache/llm-synthesis/[object Promise].json`
-- `.claude/settings.local.json`
-- `.opencode/agents/atlas-context.md`
-- `.opencode/agents/hermes-ace.md`
-- `.opencode/agents/workspace-ready.md`
-- `.opencode/commands/ace-fallback-ladder.md`
-- `.opencode/commands/graph-export-recover.md`
-- `.opencode/commands/workspace-ready.md`
-- `.opencode/config-patches.json`
-- `.opencode/skills/ace-recovery/SKILL.md`
-- `.orphan-report.txt`
-- `.port-allocation.json`
-- `.scheck-latest.txt`
-- `../scripts/10-layer-audit-cli.mjs`
-- `../scripts/ace_batch_fix_set.py`
-- `../scripts/ace_batch_fix_set_v2.py`
-- `../scripts/ace-daily-todo-summary.mjs`
-- `../scripts/ace-diff-sniffer.mjs`
-- `../scripts/ace-startup-health.mjs`
-- `../scripts/agent/log-subagent.mjs`
-- `../scripts/agent/prompt-generator.mjs`
-- `../scripts/agents/generate-monorepo-agents.mjs`
-- `../scripts/agents/offline_passes.mjs`
-- `../scripts/agent/turbovec-search-memory.mjs`
-- `../scripts/aggregate-failures.js`
-- `../scripts/ai/cache_startup_prompt.mjs`
-
-## Top Missing feature_ids (NO_JOIN rows)
-
-- `utility`
-
-## Sample Rows (first 20)
-
-| source_ref | classification | padJoin | appJoin |
-|-----------|----------------|---------|---------|
-| `.agent/workflows/agentic-error-fixing.md` | FEATURE_ID_JOIN | feature_id | — |
-| `.agent/workflows/error-fixing-strategy.md` | NO_JOIN | — | — |
-| `.cache/ace/context-packs/ace_context_local-json-hit_v1.json` | NO_JOIN | — | — |
-| `che/ace/context-packs/ace_context_smoke-context-pack_v1.json` | NO_JOIN | — | — |
-| `retrieval/ace_retrieval_topn_77245b8d5bd3442aa981670b_2.json` | NO_JOIN | — | — |
-| `.cache/d9-verifier/LLMS.md` | FEATURE_ID_JOIN | feature_id | — |
-| `.cache/llm-synthesis/[object Promise].json` | NO_JOIN | — | — |
-| `.claude/settings.local.json` | NO_JOIN | — | — |
-| `docker/bifrost/config.json` | FEATURE_ID_JOIN | source_ref | — |
-| `ges/jiter-0.14.0.dist-info/sboms/jiter-python.cyclonedx.json` | FEATURE_ID_JOIN | source_ref | — |
-| `/langgraph-synthesis/.venv/Lib/site-packages/js/install.json` | FEATURE_ID_JOIN | source_ref | — |
-| `b/site-packages/opentelemetry/sdk/_configuration/schema.json` | EXACT_SOURCE_REF_JOIN | source_ref | feature_key |
-| `packages/orjson-3.11.8.dist-info/sboms/orjson.cyclonedx.json` | FEATURE_ID_JOIN | source_ref | — |
-| `sis/.venv/Lib/site-packages/plotly/labextension/package.json` | FEATURE_ID_JOIN | source_ref | — |
-| `ackages/plotly/labextension/static/1.9daa5160b7fc741623bf.js` | FEATURE_ID_JOIN | source_ref | — |
-| `otly/labextension/static/remoteEntry.b2077f01f9b03ba2c63d.js` | FEATURE_ID_JOIN | source_ref | — |
-| `/.venv/Lib/site-packages/plotly/labextension/static/style.js` | FEATURE_ID_JOIN | source_ref | — |
-| `ackages/plotly/labextension/static/third-party-licenses.json` | FEATURE_ID_JOIN | source_ref | — |
-| `is/.venv/Lib/site-packages/plotly/package_data/plotly.min.js` | FEATURE_ID_JOIN | source_ref | — |
-| `Lib/site-packages/plotly/package_data/templates/ggplot2.json` | FEATURE_ID_JOIN | source_ref | — |
-
-## Patch Recommendation
-
-PATCH_DEFERRED — high no-join rate; resolve source_ref gaps in atlas_feature_map first
-
-After reviewing this report:
-- If `PATCH_SAFE`: run `npm run atlas:parent-atlas:promote --dry-run` to preview upserts
-- If `PATCH_REVIEW`: spot-check the NO_JOIN rows for broken source_refs before patching
-- If `PATCH_DEFERRED`: fix source_ref population in `atlas_feature_map` first
+- If most root features map heuristically, keep both registries and store this crosswalk.
+- If root features are truly absent, add root feature IDs as canonical labels into the app overlay.
+- If app rows are inventory rows, do not treat them as registry drift.

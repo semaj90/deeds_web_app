@@ -82,7 +82,8 @@ npm run atlas:runner -- "cd sveltekit-frontend && npm run gemma4:summarize:missi
 
 ## Implementation Docs
 
-- **Architecture Plan:** `next_steps/active/2026-06-10_packet-materialization-alignment.md`
+- **Historical Architecture Plan:** `reports/archive/phase-2a-packet-materialization-checklist.md` (partially superseded)
+- **Active Board:** `reports/parent-atlas-open-lanes-todo.md`
 - **Deployment Runbook:** `next_steps/active/2026-06-10_atlas-runner-deployment.md` (7-phase guide)
 - **Session Summary:** `next_steps/active/2026-06-10_session-summary.md`
 

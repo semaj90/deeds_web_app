@@ -1,0 +1,389 @@
+{
+  "generatedAt": "2026-06-11T03:38:42.586Z",
+  "mode": "apply",
+  "inputReport": "docs\\reports\\som-coordinate-coverage-report.json",
+  "qdrantUrl": "http://127.0.0.1:6333",
+  "collection": "codebase_chunks_768",
+  "candidateRows": 29,
+  "written": 29,
+  "failed": 0,
+  "rows": [
+    {
+      "pointId": 18252079,
+      "sourceRef": "src/lib/server/ai/openai-facade.ts#chunk-6",
+      "classification": "RECOVERABLE_FROM_SOM_CLUSTER",
+      "derivedFrom": "centroid_map",
+      "payload": {
+        "somRow": 0,
+        "somCol": 0,
+        "som_cluster": 0,
+        "gpuCluster": 80
+      },
+      "status": "WRITTEN"
+    },
+    {
+      "pointId": 29818246,
+      "sourceRef": "src/routes/api/cache/rpc/+server.ts#chunk-2",
+      "classification": "RECOVERABLE_FROM_CENTROID_MAP",
+      "derivedFrom": "centroid_map",
+      "payload": {
+        "somRow": 0,
+        "somCol": 0,
+        "som_cluster": 0,
+        "gpuCluster": 80
+      },
+      "status": "WRITTEN"
+    },
+    {
+      "pointId": 30482062,
+      "sourceRef": "src/lib/server/features/ai/ai/gemma4-agent.ts#chunk-36",
+      "classification": "RECOVERABLE_FROM_SOM_CLUSTER",
+      "derivedFrom": "centroid_map",
+      "payload": {
+        "somRow": 0,
+        "somCol": 0,
+        "som_cluster": 0,
+        "gpuCluster": 80
+      },
+      "status": "WRITTEN"
+    },
+    {
+      "pointId": 31269843,
+      "sourceRef": "src/lib/server/features/ai/ai/gemma4-agent.ts#chunk-128",
+      "classification": "RECOVERABLE_FROM_SOM_CLUSTER",
+      "derivedFrom": "centroid_map",
+      "payload": {
+        "somRow": 0,
+        "somCol": 0,
+        "som_cluster": 0,
+        "gpuCluster": 80
+      },
+      "status": "WRITTEN"
+    },
+    {
+      "pointId": 31588753,
+      "sourceRef": "src/lib/server/features/ai/ai/gemma4-agent.ts#chunk-35",
+      "classification": "RECOVERABLE_FROM_SOM_CLUSTER",
+      "derivedFrom": "centroid_map",
+      "payload": {
+        "somRow": 0,
+        "somCol": 0,
+        "som_cluster": 0,
+        "gpuCluster": 80
+      },
+      "status": "WRITTEN"
+    },
+    {
+      "pointId": 34760782,
+      "sourceRef": "src/lib/server/tasks/semantic-packets.ts#chunk-50",
+      "classification": "RECOVERABLE_FROM_SOM_CLUSTER",
+      "derivedFrom": "centroid_map",
+      "payload": {
+        "somRow": 0,
+        "somCol": 0,
+        "som_cluster": 0,
+        "gpuCluster": 80
+      },
+      "status": "WRITTEN"
+    },
+    {
+      "pointId": 45659422,
+      "sourceRef": "src/lib/server/features/ai/ace/context-assembler.ts#chunk-104",
+      "classification": "RECOVERABLE_FROM_SOM_CLUSTER",
+      "derivedFrom": "centroid_map",
+      "payload": {
+        "somRow": 0,
+        "somCol": 0,
+        "som_cluster": 0,
+        "gpuCluster": 80
+      },
+      "status": "WRITTEN"
+    },
+    {
+      "pointId": 47614901,
+      "sourceRef": "src/lib/server/retrieval/hyperrag-fusion-service.ts#chunk-44",
+      "classification": "RECOVERABLE_FROM_SOM_CLUSTER",
+      "derivedFrom": "centroid_map",
+      "payload": {
+        "somRow": 0,
+        "somCol": 0,
+        "som_cluster": 0,
+        "gpuCluster": 80
+      },
+      "status": "WRITTEN"
+    },
+    {
+      "pointId": 59353505,
+      "sourceRef": "src/lib/server/tasks/semantic-packets.ts#chunk-3",
+      "classification": "RECOVERABLE_FROM_SOM_CLUSTER",
+      "derivedFrom": "centroid_map",
+      "payload": {
+        "somRow": 0,
+        "somCol": 0,
+        "som_cluster": 0,
+        "gpuCluster": 80
+      },
+      "status": "WRITTEN"
+    },
+    {
+      "pointId": 59731717,
+      "sourceRef": "src/lib/server/features/ai/ace/telemetry-source-ref-fallback.ts#chunk-4",
+      "classification": "RECOVERABLE_FROM_SOM_CLUSTER",
+      "derivedFrom": "centroid_map",
+      "payload": {
+        "somRow": 0,
+        "somCol": 0,
+        "som_cluster": 0,
+        "gpuCluster": 80
+      },
+      "status": "WRITTEN"
+    },
+    {
+      "pointId": 60313583,
+      "sourceRef": "src/lib/server/env.server.ts#chunk-33",
+      "classification": "RECOVERABLE_FROM_SOM_CLUSTER",
+      "derivedFrom": "centroid_map",
+      "payload": {
+        "somRow": 0,
+        "somCol": 0,
+        "som_cluster": 0,
+        "gpuCluster": 80
+      },
+      "status": "WRITTEN"
+    },
+    {
+      "pointId": 74092541,
+      "sourceRef": "src/lib/server/features/cases/external-research-agent.ts#chunk-5",
+      "classification": "RECOVERABLE_FROM_SOM_CLUSTER",
+      "derivedFrom": "centroid_map",
+      "payload": {
+        "somRow": 0,
+        "somCol": 0,
+        "som_cluster": 0,
+        "gpuCluster": 80
+      },
+      "status": "WRITTEN"
+    },
+    {
+      "pointId": 76174856,
+      "sourceRef": "src/lib/server/features/ai/ace/context-assembler.ts#chunk-191",
+      "classification": "RECOVERABLE_FROM_SOM_CLUSTER",
+      "derivedFrom": "centroid_map",
+      "payload": {
+        "somRow": 0,
+        "somCol": 0,
+        "som_cluster": 0,
+        "gpuCluster": 80
+      },
+      "status": "WRITTEN"
+    },
+    {
+      "pointId": 76433632,
+      "sourceRef": "src/lib/server/tasks/semantic-packets.ts#chunk-48",
+      "classification": "RECOVERABLE_FROM_SOM_CLUSTER",
+      "derivedFrom": "centroid_map",
+      "payload": {
+        "somRow": 0,
+        "somCol": 0,
+        "som_cluster": 0,
+        "gpuCluster": 80
+      },
+      "status": "WRITTEN"
+    },
+    {
+      "pointId": 79478765,
+      "sourceRef": "src/routes/api/atlas/cards/+server.ts#chunk-7",
+      "classification": "RECOVERABLE_FROM_SOM_CLUSTER",
+      "derivedFrom": "centroid_map",
+      "payload": {
+        "somRow": 0,
+        "somCol": 0,
+        "som_cluster": 0,
+        "gpuCluster": 80
+      },
+      "status": "WRITTEN"
+    },
+    {
+      "pointId": 99508500,
+      "sourceRef": "src/lib/server/tasks/semantic-packets.ts#chunk-45",
+      "classification": "RECOVERABLE_FROM_SOM_CLUSTER",
+      "derivedFrom": "centroid_map",
+      "payload": {
+        "somRow": 0,
+        "somCol": 0,
+        "som_cluster": 0,
+        "gpuCluster": 80
+      },
+      "status": "WRITTEN"
+    },
+    {
+      "pointId": 104083095,
+      "sourceRef": "src/lib/server/observability/outcome-ledger.ts#chunk-5",
+      "classification": "RECOVERABLE_FROM_SOM_CLUSTER",
+      "derivedFrom": "centroid_map",
+      "payload": {
+        "somRow": 0,
+        "somCol": 0,
+        "som_cluster": 0,
+        "gpuCluster": 80
+      },
+      "status": "WRITTEN"
+    },
+    {
+      "pointId": 110509056,
+      "sourceRef": "src/routes/api/memory/agent-observation/+server.ts#chunk-1",
+      "classification": "RECOVERABLE_FROM_SOM_CLUSTER",
+      "derivedFrom": "centroid_map",
+      "payload": {
+        "somRow": 0,
+        "somCol": 0,
+        "som_cluster": 0,
+        "gpuCluster": 80
+      },
+      "status": "WRITTEN"
+    },
+    {
+      "pointId": 117513255,
+      "sourceRef": "src/lib/server/features/ai/ace/context-assembler.ts#chunk-112",
+      "classification": "RECOVERABLE_FROM_SOM_CLUSTER",
+      "derivedFrom": "centroid_map",
+      "payload": {
+        "somRow": 0,
+        "somCol": 0,
+        "som_cluster": 0,
+        "gpuCluster": 80
+      },
+      "status": "WRITTEN"
+    },
+    {
+      "pointId": 133202654,
+      "sourceRef": "src/lib/server/features/ai/ace/context-assembler.ts#chunk-97",
+      "classification": "RECOVERABLE_FROM_SOM_CLUSTER",
+      "derivedFrom": "centroid_map",
+      "payload": {
+        "somRow": 0,
+        "somCol": 0,
+        "som_cluster": 0,
+        "gpuCluster": 80
+      },
+      "status": "WRITTEN"
+    },
+    {
+      "pointId": 140747936,
+      "sourceRef": "src/routes/api/indexing/queue/+server.ts#chunk-1",
+      "classification": "RECOVERABLE_FROM_CENTROID_MAP",
+      "derivedFrom": "centroid_map",
+      "payload": {
+        "somRow": 0,
+        "somCol": 0,
+        "som_cluster": 0,
+        "gpuCluster": 80
+      },
+      "status": "WRITTEN"
+    },
+    {
+      "pointId": 155200324,
+      "sourceRef": "src/lib/server/tasks/semantic-packets.ts#chunk-17",
+      "classification": "RECOVERABLE_FROM_SOM_CLUSTER",
+      "derivedFrom": "centroid_map",
+      "payload": {
+        "somRow": 0,
+        "somCol": 0,
+        "som_cluster": 0,
+        "gpuCluster": 80
+      },
+      "status": "WRITTEN"
+    },
+    {
+      "pointId": 155525257,
+      "sourceRef": "src/lib/server/features/ai/ace/gemma4-packet-compiler.ts#chunk-2",
+      "classification": "RECOVERABLE_FROM_CENTROID_MAP",
+      "derivedFrom": "centroid_map",
+      "payload": {
+        "somRow": 0,
+        "somCol": 0,
+        "som_cluster": 0,
+        "gpuCluster": 80
+      },
+      "status": "WRITTEN"
+    },
+    {
+      "pointId": 169406564,
+      "sourceRef": "src/lib/server/tasks/semantic-packets.ts#chunk-35",
+      "classification": "RECOVERABLE_FROM_SOM_CLUSTER",
+      "derivedFrom": "centroid_map",
+      "payload": {
+        "somRow": 0,
+        "somCol": 0,
+        "som_cluster": 0,
+        "gpuCluster": 80
+      },
+      "status": "WRITTEN"
+    },
+    {
+      "pointId": 169578677,
+      "sourceRef": "src/lib/server/tasks/semantic-packets.ts#chunk-7",
+      "classification": "RECOVERABLE_FROM_SOM_CLUSTER",
+      "derivedFrom": "centroid_map",
+      "payload": {
+        "somRow": 0,
+        "somCol": 0,
+        "som_cluster": 0,
+        "gpuCluster": 80
+      },
+      "status": "WRITTEN"
+    },
+    {
+      "pointId": 174237862,
+      "sourceRef": "src/lib/server/ai/openai-facade.ts#chunk-42",
+      "classification": "RECOVERABLE_FROM_SOM_CLUSTER",
+      "derivedFrom": "centroid_map",
+      "payload": {
+        "somRow": 0,
+        "somCol": 0,
+        "som_cluster": 0,
+        "gpuCluster": 80
+      },
+      "status": "WRITTEN"
+    },
+    {
+      "pointId": 179414966,
+      "sourceRef": "src/lib/server/features/ai/ace/context-assembler.ts#chunk-0",
+      "classification": "RECOVERABLE_FROM_SOM_CLUSTER",
+      "derivedFrom": "centroid_map",
+      "payload": {
+        "somRow": 0,
+        "somCol": 0,
+        "som_cluster": 0,
+        "gpuCluster": 80
+      },
+      "status": "WRITTEN"
+    },
+    {
+      "pointId": 186338671,
+      "sourceRef": "src/lib/server/ai/ldr/deep-research.ts#chunk-3",
+      "classification": "RECOVERABLE_FROM_CENTROID_MAP",
+      "derivedFrom": "centroid_map",
+      "payload": {
+        "somRow": 0,
+        "somCol": 0,
+        "som_cluster": 0,
+        "gpuCluster": 80
+      },
+      "status": "WRITTEN"
+    },
+    {
+      "pointId": 187650555,
+      "sourceRef": "src/lib/server/tasks/semantic-packets.ts#chunk-28",
+      "classification": "RECOVERABLE_FROM_SOM_CLUSTER",
+      "derivedFrom": "centroid_map",
+      "payload": {
+        "somRow": 0,
+        "somCol": 0,
+        "som_cluster": 0,
+        "gpuCluster": 80
+      },
+      "status": "WRITTEN"
+    }
+  ]
+}

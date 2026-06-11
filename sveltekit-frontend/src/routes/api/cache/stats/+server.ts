@@ -18,6 +18,7 @@ import { getRedis } from '$lib/server/redis.js';
 import { ENV } from '$lib/server/env.server.js';
 import { getTemplateCacheStats } from '$lib/server/cache/report-template-cache.js';
 import { getExportCacheStats } from '$lib/server/cache/pdf-export-cache.js';
+import { requireUser } from '$lib/server/auth-utils.js';
 // redis-metrics module removed — inline fallback below
 
 /** Count keys matching a pattern using SCAN (non-blocking, unlike KEYS) */
@@ -32,8 +33,9 @@ async function scanCount(redis: Redis, pattern: string): Promise<number> {
 	return count;
 }
 
-export const GET: RequestHandler = async ({ locals, request, url }) => {
-	if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
+export const GET: RequestHandler = async (event) => {
+	requireUser(event);
+	const { request, url } = event;
 
 	// Pattern-count fast path — `?pattern=turbo:*` returns just { count, pattern }
 	// Allowed prefixes match the invalidation cascade so the admin pipeline panel

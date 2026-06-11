@@ -212,8 +212,9 @@ const EXCLUDE_DIRS = new Set([
 
 function* walk(dir) {
   for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
-    if (EXCLUDE_DIRS.has(entry.name)) continue;
     const full = path.join(dir, entry.name);
+    const relFromRoot = path.relative(ROOT, full).replace(/\\/g, '/');
+    if (EXCLUDE_DIRS.has(entry.name) || relFromRoot === 'src') continue;
     if (entry.isDirectory()) {
       yield* walk(full);
     } else if (EXTENSIONS.has(path.extname(entry.name))) {
@@ -238,7 +239,7 @@ const RE_REEXPORT    = /export\s+(?:\*|\{[^}]*\})\s+from\s+['"]([^'"]+)['"]/g;
 // "Auth" here is broader than locals.user — it includes any access gate that
 // blocks the handler from running in production. `if (!dev) return 403` is a
 // valid gate (route is dev-only, returns 403 in prod) so we accept it.
-const RE_AUTH        = /locals\.user|requireAuth|getSession|DEV_BYPASS_AUTH|\(locals\s+as\s+\{|if\s*\(\s*!\s*dev\s*\)|process\.env\.\w*AUTH_TOKEN|MCP_AUTH_TOKEN/;
+const RE_AUTH        = /locals\.user|requireAuth|requireUser|requireUserOrService|getSession|DEV_BYPASS_AUTH|\(locals\s+as\s+\{|if\s*\(\s*!\s*dev\s*\)|process\.env\.\w*AUTH_TOKEN|MCP_AUTH_TOKEN/;
 function isLayoutGuarded(relInSvelteKit) {
   // Routes under (app)/ are protected by +layout.server.ts auth redirect
   return relInSvelteKit.includes('/routes/(app)/') || relInSvelteKit.includes('/routes/(admin)/');
@@ -496,8 +497,7 @@ let apiCount       = 0;
 let dbTableCount   = 0;
 let todoCount      = 0;
 
-// Cache schema version — bump when extractMeta gate logic changes (invalidates all cached metas)
-const META_CACHE_VERSION = 'v22'; // bumped 2026-05-13 — fix ESM import extraction bug (preserved strings)
+const META_CACHE_VERSION = 'v23'; // bumped 2026-06-11 — invalidate cache for requireUser updates
 
 let processed = 0;
 for (const filePath of walk(scanRoot)) {
@@ -999,7 +999,19 @@ console.log(`📄 Graph JSON → ${path.relative(ROOT, graphJsonPath)}`);
 // Only files at SvelteKit route paths (+server.ts, +page.server.ts) are real API endpoints.
 // Library files in lib/server/ may contain "export const POST" inside JSDoc comments — exclude them.
 const apiFiles   = files.filter(f => f.isServerRoute && f.routeHandlers.length > 0);
-const noAuthApis = apiFiles.filter(f => !f.hasAuth);
+const noAuthApis = apiFiles.filter(f => {
+  if (f.hasAuth) return false;
+  // Exclude naturally public routes:
+  const rel = f.rel.replace(/\\/g, '/');
+  if (rel.includes('/.well-known/')) return false;
+  if (rel.includes('/api/auth/login')) return false;
+  if (rel.includes('/api/auth/logout')) return false;
+  if (rel.includes('/api/auth/register')) return false;
+  if (rel.includes('/api/auth/reset-password')) return false;
+  if (rel.includes('/api/auth/session')) return false;
+  if (rel.includes('/api/health')) return false;
+  return true;
+});
 const noZodApis  = apiFiles.filter(f => !f.hasZod && f.parsesBody);
 const ssrUnsafeFiles = files.filter(f => f.ssrUnsafe && !f.isTest && f.rel.startsWith('src/'));
 const sv4Files   = files.filter(f => f.sv4Props || f.sv4Reactive || f.sv4Events || f.sv4Dispatch);

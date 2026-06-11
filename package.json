@@ -142,6 +142,7 @@
     "atlas:archive:cold:dry": "node scripts/atlas/archive-cold-originals.mjs",
     "atlas:archive:cold:generated": "node scripts/atlas/archive-cold-originals.mjs --bucket generated_artifact --commit",
     "atlas:archive:cold:generated:dry": "node scripts/atlas/archive-cold-originals.mjs --bucket generated_artifact",
+    "atlas:hidden-directories:audit": "node scripts/atlas/audit-ignored-directories.mjs",
     "kanban:phase101": "node scripts/opencode/materialize-kanban-tasks.mjs",
     "kanban:phase101:status": "node scripts/opencode/materialize-kanban-tasks.mjs --status",
     "atlas:backfill:source-refs": "node scripts/atlas/backfill-qdrant-source-refs.mjs --commit",

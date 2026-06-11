@@ -111,6 +111,10 @@ console.log(`\nUnified Atlas Sync [WRITE=${WRITE}] [LIMIT=${LIMIT ?? 'all'}]`);
   if (!WRITE) console.log('  (dry-run — pass --write to push to Qdrant/Redis/Bitfrost)\n');
 
 try {
+  // ── Step 0: hidden-directory / stale-doc audit ───────────────────────────
+  runNodeScript('scripts/atlas/audit-ignored-directories.mjs', []);
+  mark('audit-ignored-directories', 'ok');
+
   if (SOURCE_REF_FIRST_ONLY) {
     // Lean lane: sourceRef-first refresh only, no full codebase graphify pass.
     const refreshArgs = WRITE ? ['--apply'] : ['--dry-run'];

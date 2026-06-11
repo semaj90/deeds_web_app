@@ -1713,3 +1713,89 @@ export function cudaStreamCount(): number {
   const native = getAddonInternal();
   return native?.cudaStreamCount?.() ?? 4;
 }
+
+export interface MatmulResult {
+  matrix: number[][];
+  rows: number;
+  cols: number;
+  source: 'gpu' | 'cpu';
+}
+
+/**
+ * Generic float32 matrix multiplication (matmul).
+ * Computes A × B where A is an [M × K] matrix and B is a [K × N] matrix.
+ * Returns the resulting [M × N] matrix.
+ * CPU: Blocked L2 cache-friendly implementation, unrolled 8×.
+ */
+export async function matmul(
+  a: number[][],
+  b: number[][]
+): Promise<MatmulResult> {
+  const m = a.length;
+  if (m === 0) {
+    return { matrix: [], rows: 0, cols: 0, source: 'cpu' };
+  }
+  const k = a[0].length;
+  const n = b[0]?.length ?? 0;
+  if (k === 0 || n === 0) {
+    return { matrix: Array.from({ length: m }, () => []), rows: m, cols: 0, source: 'cpu' };
+  }
+
+  if (b.length !== k) {
+    throw new RangeError(
+      `[libtorch-bridge] matmul: dimension mismatch. A columns (${k}) must equal B rows (${b.length}).`
+    );
+  }
+
+  const cpuBytes = m * n * 4;
+  if (!heapHasRoom(cpuBytes)) {
+    throw new RangeError(
+      `[libtorch-bridge] matmul: insufficient heap for ${m}×${n} matrix (need ~${(cpuBytes / 1e6).toFixed(2)} MB)`
+    );
+  }
+
+  const flatOut = new Float32Array(m * n);
+  const BLOCK_SIZE = 64;
+
+  for (let sj = 0; sj < n; sj += BLOCK_SIZE) {
+    const ej = Math.min(sj + BLOCK_SIZE, n);
+    for (let sk = 0; sk < k; sk += BLOCK_SIZE) {
+      const ek = Math.min(sk + BLOCK_SIZE, k);
+      for (let si = 0; si < m; si += BLOCK_SIZE) {
+        const ei = Math.min(si + BLOCK_SIZE, m);
+
+        for (let i = si; i < ei; i++) {
+          const rowA = a[i];
+          const offset = i * n;
+          for (let kIdx = sk; kIdx < ek; kIdx++) {
+            const valA = rowA[kIdx];
+            if (valA === 0) continue;
+            const rowB = b[kIdx];
+
+            let j = sj;
+            for (; j <= ej - 8; j += 8) {
+              flatOut[offset + j]     += valA * rowB[j];
+              flatOut[offset + j + 1] += valA * rowB[j + 1];
+              flatOut[offset + j + 2] += valA * rowB[j + 2];
+              flatOut[offset + j + 3] += valA * rowB[j + 3];
+              flatOut[offset + j + 4] += valA * rowB[j + 4];
+              flatOut[offset + j + 5] += valA * rowB[j + 5];
+              flatOut[offset + j + 6] += valA * rowB[j + 6];
+              flatOut[offset + j + 7] += valA * rowB[j + 7];
+            }
+            for (; j < ej; j++) {
+              flatOut[offset + j] += valA * rowB[j];
+            }
+          }
+        }
+      }
+    }
+  }
+
+  const matrix: number[][] = [];
+  for (let i = 0; i < m; i++) {
+    matrix.push(Array.from(flatOut.subarray(i * n, (i + 1) * n)));
+  }
+
+  return { matrix, rows: m, cols: n, source: 'cpu' };
+}

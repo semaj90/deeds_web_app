@@ -8,6 +8,7 @@ import {
   renderTaskStateMarkdown,
   summarizeTaskState,
   writeJson,
+  writeStartupContext,
   writeText,
   writeTemporalTaskRegistryReport,
 } from './task-registry-helpers.mjs';
@@ -153,6 +154,7 @@ async function main() {
         recommendationSnapshot: path.relative(ROOT, PATHS.recommendationSnapshotJson),
       },
     });
+    await writeStartupContext(state);
   }
 
   const summary = summarizeTaskState(state);

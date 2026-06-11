@@ -1,7 +1,7 @@
-# NPM Library Doc-Fetch Plan — 2026-06-02
+# NPM Library Doc-Fetch Plan — 2026-06-11
 
 **Total deps**: 204 across 5 package.json files
-**Usage**: SERVER=46, UNUSED=107, SHARED=47, TEST=2, CLIENT=2
+**Usage**: SERVER=46, UNUSED=107, SHARED=48, CLIENT=2, TEST=1
 
 ## Fetch order for production hardening
 
@@ -173,7 +173,7 @@
 - `@babel/traverse` (SHARED)
 - `@grpc/grpc-js` (SHARED)
 - `@grpc/proto-loader` (SHARED)
-- `@huggingface/transformers` (TEST)
+- `@huggingface/transformers` (SHARED)
 - `@iconify-json/lucide` (SERVER)
 - `@langchain/community` (SERVER)
 - `@langchain/core` (SERVER)

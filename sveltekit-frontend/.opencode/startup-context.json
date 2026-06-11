@@ -1,0 +1,40 @@
+{
+  "generatedAt": "2026-06-11T05:39:28.739Z",
+  "repo": "sveltekit-frontend",
+  "evidenceFirst": true,
+  "roles": {
+    "kanban": "persistent repo task registry",
+    "recommendations": "append-only recommendation inbox",
+    "gemma4": "local repo-audit orchestration after evidence retrieval",
+    "parentAtlas": "semantic index and provenance ledger",
+    "graphify": "graph traversal and codebase neighborhood utility"
+  },
+  "recommendations": {
+    "snapshotJson": ".opencode\\recommendations\\recommendations.json",
+    "snapshotMd": ".opencode\\recommendations\\recommendations.md",
+    "eventsJsonl": ".opencode\\recommendations\\recommendation-events.jsonl",
+    "currentCount": 199
+  },
+  "tasks": {
+    "stateJson": ".opencode\\tasks\\task-state.json",
+    "stateMd": ".opencode\\tasks\\task-state.md",
+    "eventsJsonl": ".opencode\\tasks\\task-events.jsonl",
+    "currentCount": 12,
+    "openCount": 4
+  },
+  "activeLane": {
+    "taskId": "task_4_circular_dependency_chains_of_3_files",
+    "title": "4 circular dependency chains of 3+ files",
+    "priority": "HIGH",
+    "status": "TODO",
+    "command": null,
+    "sourceRecommendationKey": "4_circular_dependency_chains_of_3_files"
+  },
+  "openLanesTodo": "reports\\parent-atlas-open-lanes-todo.md",
+  "reports": {
+    "temporalTaskRegistry": "docs\\reports\\temporal-task-registry-report.md",
+    "agentEnvironment": "docs\\reports\\opencode-agent-environment-report.md",
+    "engramAdapterDecision": "docs/reports/engram-adapter-decision-report.md",
+    "parentAtlasOverlay": "docs/reports/parent-atlas-overlay-sync-report.md"
+  }
+}

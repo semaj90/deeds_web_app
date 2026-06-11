@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-06-02T01:59:55.061Z",
+  "timestamp": "2026-06-11T03:51:58.197Z",
   "totalDeps": 204,
   "packageJsonsScanned": [
     "package.json",
@@ -11,9 +11,9 @@
   "usageStats": {
     "SERVER": 46,
     "UNUSED": 107,
-    "SHARED": 47,
-    "TEST": 2,
-    "CLIENT": 2
+    "SHARED": 48,
+    "CLIENT": 2,
+    "TEST": 1
   },
   "byTag": {
     "ai": [
@@ -805,7 +805,7 @@
       "sections": [
         "dependencies"
       ],
-      "usage": "TEST",
+      "usage": "SHARED",
       "tag": null
     },
     {
@@ -2961,7 +2961,6 @@
     {
       "name": "typescript",
       "versions": [
-        "^5.0.0",
         "5.9.3",
         "^5.9.3"
       ],

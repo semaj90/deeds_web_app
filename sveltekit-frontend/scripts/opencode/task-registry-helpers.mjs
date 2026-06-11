@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 import crypto from 'node:crypto';
 import fs from 'node:fs/promises';
-import { existsSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -24,7 +24,11 @@ export const PATHS = {
   graphRecommendationsMd: path.join(ROOT, 'docs', 'graph', 'recommendations.md'),
   temporalReportJson: path.join(ROOT, 'docs', 'reports', 'temporal-task-registry-report.json'),
   temporalReportMd: path.join(ROOT, 'docs', 'reports', 'temporal-task-registry-report.md'),
+  agentEnvironmentJson: path.join(ROOT, 'docs', 'reports', 'opencode-agent-environment-report.json'),
+  agentEnvironmentMd: path.join(ROOT, 'docs', 'reports', 'opencode-agent-environment-report.md'),
 };
+
+const ACTIVE_LANE_RECOMMENDATION_KEY = '27_api_route_handlers_lack_auth_guards';
 
 function removeDiacritics(value) {
   return String(value ?? '').normalize('NFKD').replace(/[\u0300-\u036f]/g, '');
@@ -200,7 +204,65 @@ export function normalizeSnapshotRecommendations(payload, sourceFile) {
   return uniqRecommendations([...rows, ...seedRecommendations()]);
 }
 
+function readOptionalJson(relativePath) {
+  const filePath = path.join(ROOT, relativePath);
+  if (!existsSync(filePath)) return null;
+  try {
+    return JSON.parse(readFileSync(filePath, 'utf8'));
+  } catch {
+    return null;
+  }
+}
+
+function pctNumber(value) {
+  if (typeof value === 'number') return value;
+  const parsed = Number(String(value ?? '').replace('%', ''));
+  return Number.isFinite(parsed) ? parsed : 0;
+}
+
+function seedGates() {
+  const runtimeDensity = readOptionalJson(path.join('docs', 'reports', 'runtime-packet-density-report.json'));
+  const featureLineage = readOptionalJson(path.join('docs', 'reports', 'feature-lineage-report.json'));
+  const somCoverage = readOptionalJson(path.join('docs', 'reports', 'som-coordinate-coverage-report.json'));
+  const productionNoSom = readOptionalJson(path.join('..', 'docs', 'reports', 'production-qdrant-no-som-report.json'));
+  const postgresMirrors = readOptionalJson(path.join('docs', 'reports', 'postgres-contract-mirrors-report.json'));
+  const overlayCrosswalk = readOptionalJson(path.join('docs', 'reports', 'parent-atlas-overlay-crosswalk-report.json'));
+  const graphStats = readOptionalJson(path.join('memory', 'graphify', 'deep', 'graph-stats.json'));
+  const codeRelations = readOptionalJson(path.join('logs', 'task-output', 'code-relations-latest.json'));
+
+  const runtimeSummary = runtimeDensity?.summary ?? {};
+  const lineageSummary = featureLineage?.summary ?? {};
+  const lineageHigher = lineageSummary.higherHopCoverage ?? {};
+  const somSummary = somCoverage?.summary ?? {};
+  const productionNoSomSummary = productionNoSom?.active_production ?? productionNoSom?.coverage ?? {};
+  const mirrorCounts = postgresMirrors?.summary?.classificationCounts ?? {};
+  const overlayCounts = overlayCrosswalk?.summary?.byRootClassification ?? {};
+
+  const featureSpineReady =
+    pctNumber(lineageSummary.sourceRefCoveragePct) >= 95 &&
+    pctNumber(lineageSummary.featureIdCoveragePct) >= 95 &&
+    pctNumber(lineageSummary.featureLabelCoveragePct) >= 95;
+
+  const graphReady =
+    Number(graphStats?.neighborhoodsComputed ?? 0) > 0 &&
+    Number(graphStats?.nodeCount ?? 0) > 0 &&
+    Array.isArray(codeRelations?.errors) &&
+    codeRelations.errors.length === 0 &&
+    Number(codeRelations?.totalEdges ?? 0) > 0;
+
+  return {
+    graphMissingNeighborhood: !graphReady,
+    retrievalLowContextDensity: Number(runtimeSummary.lowDensityCount ?? 0) > 0,
+    featureIdDerivation: !featureSpineReady,
+    somCoordinateCoverage: Number(somSummary.missingCoordinatePoints ?? 0) > 0,
+    activeProductionTopology: Number(productionNoSomSummary.qdrant_no_som ?? productionNoSomSummary.production_qdrant_no_som ?? 0) > 0,
+    taskSemanticPacketsDrift: Number(mirrorCounts.LIVE_DB_ALIGNED ?? 0) < Number(postgresMirrors?.summary?.tables ?? 0),
+    parentAtlasOverlayMismatch: Number(overlayCounts.ROOT_CONTRACT_ONLY ?? 0) > 0,
+  };
+}
+
 export function seedRecommendations() {
+  const gates = seedGates();
   return [
     {
       recommendation_key: 'graph:missing-neighborhood',
@@ -255,6 +317,19 @@ export function seedRecommendations() {
       status: 'NEW',
     },
     {
+      recommendation_key: 'active-production-topology-mirror',
+      severity: 'MEDIUM',
+      title: 'Active production topology mirror',
+      description: 'Active Postgres rows have Qdrant point IDs but no mirrored som_cluster value.',
+      command: 'npm run atlas:coverage:qdrant-no-som',
+      source: 'report:production-qdrant-no-som',
+      cluster: 'SOM Materialization',
+      feature_id: 'som',
+      source_refs: ['../docs/reports/production-qdrant-no-som-report.json'],
+      evidence_refs: ['../docs/reports/production-qdrant-no-som-report.json'],
+      status: 'NEW',
+    },
+    {
       recommendation_key: 'task-semantic-packets-drift',
       severity: 'MEDIUM',
       title: 'task_semantic_packets manual SQL mirror drift',
@@ -306,7 +381,16 @@ export function seedRecommendations() {
       evidence_refs: ['reports/parent-atlas-open-lanes-todo.md', 'docs/reports/temporal-task-registry-report.md'],
       status: 'NEW',
     },
-  ];
+  ].filter((row) => {
+    if (row.recommendation_key === 'graph:missing-neighborhood') return gates.graphMissingNeighborhood;
+    if (row.recommendation_key === 'retrieval:low-context-density') return gates.retrievalLowContextDensity;
+    if (row.recommendation_key === 'feature-id-derivation') return gates.featureIdDerivation;
+    if (row.recommendation_key === 'som-coordinate-coverage') return gates.somCoordinateCoverage;
+    if (row.recommendation_key === 'active-production-topology-mirror') return gates.activeProductionTopology;
+    if (row.recommendation_key === 'task-semantic-packets-drift') return gates.taskSemanticPacketsDrift;
+    if (row.recommendation_key === 'parent-atlas-overlay-mismatch') return gates.parentAtlasOverlayMismatch;
+    return true;
+  });
 }
 
 export function uniqRecommendations(rows) {
@@ -355,6 +439,7 @@ export function shouldPromoteRecommendation(rec) {
     /retrieval low context density/.test(t) ||
     /feature id derivation/.test(t) ||
     /som coordinate coverage/.test(t) ||
+    /active production topology mirror/.test(t) ||
     /task semantic packets/.test(t) ||
     /parent atlas overlay mismatch/.test(t) ||
     /command mapping mcp allowlist/.test(t) ||
@@ -418,11 +503,16 @@ export function summarizeTaskState(state) {
   const tasks = Array.isArray(state.tasks) ? state.tasks : [];
   const openTasks = tasks.filter((task) => !['DONE', 'ARCHIVED'].includes(String(task.status ?? '').toUpperCase()));
   const archivedTasks = tasks.filter((task) => String(task.status ?? '').toUpperCase() === 'ARCHIVED');
+  const activeLane =
+    openTasks.find((task) => task.source_recommendation_key === ACTIVE_LANE_RECOMMENDATION_KEY) ??
+    openTasks[0] ??
+    null;
   return {
     taskCount: tasks.length,
     openTaskCount: openTasks.length,
     archivedTaskCount: archivedTasks.length,
-    topTasks: [...tasks]
+    activeLane,
+    topTasks: [...openTasks]
       .sort((a, b) => {
         const priorityWeight = { HIGH: 3, MEDIUM: 2, LOW: 1 };
         const pa = priorityWeight[String(a.priority ?? '').toUpperCase()] ?? 0;
@@ -436,6 +526,15 @@ export function summarizeTaskState(state) {
 
 export function renderTaskStateMarkdown(state) {
   const summary = summarizeTaskState(state);
+  const openTasks = [...(state.tasks ?? [])]
+    .filter((task) => !['DONE', 'ARCHIVED'].includes(String(task.status ?? '').toUpperCase()))
+    .sort((a, b) => {
+      const priorityWeight = { HIGH: 3, MEDIUM: 2, LOW: 1 };
+      const pa = priorityWeight[String(a.priority ?? '').toUpperCase()] ?? 0;
+      const pb = priorityWeight[String(b.priority ?? '').toUpperCase()] ?? 0;
+      if (pa !== pb) return pb - pa;
+      return String(b.last_seen ?? b.updated_at ?? '').localeCompare(String(a.last_seen ?? a.updated_at ?? ''));
+    });
   const lines = [];
   lines.push('# OpenCode Task State');
   lines.push('');
@@ -448,9 +547,19 @@ export function renderTaskStateMarkdown(state) {
   lines.push(`- openTaskCount: ${summary.openTaskCount}`);
   lines.push(`- archivedTaskCount: ${summary.archivedTaskCount}`);
   lines.push('');
+  lines.push('## Active Lane');
+  lines.push('');
+  if (summary.activeLane) {
+    lines.push(`- [${String(summary.activeLane.priority ?? 'MEDIUM').toUpperCase()}] ${summary.activeLane.title} (${summary.activeLane.status})`);
+    if (summary.activeLane.command) lines.push(`  - command: \`${summary.activeLane.command}\``);
+    if (summary.activeLane.source_recommendation_key) lines.push(`  - source: \`${summary.activeLane.source_recommendation_key}\``);
+  } else {
+    lines.push('- none');
+  }
+  lines.push('');
   lines.push('## Open Tasks');
   lines.push('');
-  for (const task of summary.topTasks.filter((task) => !['DONE', 'ARCHIVED'].includes(String(task.status ?? '').toUpperCase()))) {
+  for (const task of openTasks) {
     lines.push(`- [${String(task.priority ?? 'MEDIUM').toUpperCase()}] ${task.title} (${task.status})`);
     if (task.command) lines.push(`  - command: \`${task.command}\``);
     if (task.source_recommendation_key) lines.push(`  - source: \`${task.source_recommendation_key}\``);
@@ -484,6 +593,14 @@ export async function writeTemporalTaskRegistryReport(state, extra = {}) {
       taskCount: summary.taskCount,
       historyCount: state.taskEventsCount ?? 0,
       promotedRecommendations: state.promotedRecommendationsCount ?? 0,
+      activeLane: summary.activeLane ? {
+        taskId: summary.activeLane.task_id,
+        title: summary.activeLane.title,
+        priority: summary.activeLane.priority,
+        status: summary.activeLane.status,
+        command: summary.activeLane.command,
+        sourceRecommendationKey: summary.activeLane.source_recommendation_key,
+      } : null,
     },
     taskState: state,
   };
@@ -499,6 +616,11 @@ export async function writeTemporalTaskRegistryReport(state, extra = {}) {
     '',
     '## Top Tasks',
     '',
+    ...(summary.activeLane ? [
+      `- activeLane: [${String(summary.activeLane.priority ?? 'MEDIUM').toUpperCase()}] ${summary.activeLane.title} (${summary.activeLane.status})`,
+      summary.activeLane.command ? `  - command: \`${summary.activeLane.command}\`` : null,
+      '',
+    ].filter(Boolean) : []),
     ...summary.topTasks.map((task) => `- [${String(task.priority ?? 'MEDIUM').toUpperCase()}] ${task.title} (${task.status})`),
     '',
   ].join('\n'));
@@ -510,6 +632,13 @@ export async function writeStartupContext(state, extra = {}) {
     generatedAt: state.generatedAt ?? nowIso(),
     repo: 'sveltekit-frontend',
     evidenceFirst: true,
+    roles: {
+      kanban: 'persistent repo task registry',
+      recommendations: 'append-only recommendation inbox',
+      gemma4: 'local repo-audit orchestration after evidence retrieval',
+      parentAtlas: 'semantic index and provenance ledger',
+      graphify: 'graph traversal and codebase neighborhood utility',
+    },
     recommendations: {
       snapshotJson: path.relative(ROOT, PATHS.recommendationSnapshotJson),
       snapshotMd: path.relative(ROOT, PATHS.recommendationSnapshotMd),
@@ -523,9 +652,18 @@ export async function writeStartupContext(state, extra = {}) {
       currentCount: state.tasks?.length ?? 0,
       openCount: state.tasks?.filter((task) => !['DONE', 'ARCHIVED'].includes(String(task.status ?? '').toUpperCase())).length ?? 0,
     },
+    activeLane: summarizeTaskState(state).activeLane ? {
+      taskId: summarizeTaskState(state).activeLane.task_id,
+      title: summarizeTaskState(state).activeLane.title,
+      priority: summarizeTaskState(state).activeLane.priority,
+      status: summarizeTaskState(state).activeLane.status,
+      command: summarizeTaskState(state).activeLane.command,
+      sourceRecommendationKey: summarizeTaskState(state).activeLane.source_recommendation_key,
+    } : null,
     openLanesTodo: path.relative(ROOT, extra.openLanesTodo ?? path.join(ROOT, 'reports', 'parent-atlas-open-lanes-todo.md')),
     reports: {
       temporalTaskRegistry: path.relative(ROOT, PATHS.temporalReportMd),
+      agentEnvironment: path.relative(ROOT, PATHS.agentEnvironmentMd),
       engramAdapterDecision: 'docs/reports/engram-adapter-decision-report.md',
       parentAtlasOverlay: 'docs/reports/parent-atlas-overlay-sync-report.md',
     },

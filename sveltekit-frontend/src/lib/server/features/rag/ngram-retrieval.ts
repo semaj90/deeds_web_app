@@ -1,7 +1,7 @@
 import type { Pool } from 'pg';
 
 export interface NgramHit {
-	source: 'chunk' | 'error_fingerprint' | 'research_summary' | 'wiki_note';
+	source: 'chunk' | 'packet_chunk' | 'error_fingerprint' | 'research_summary' | 'wiki_note';
 	id: string;
 	text: string;
 	filePath?: string;
@@ -32,6 +32,29 @@ export async function ngramRecall(
 					id: row.id,
 					text: row.text.slice(0, 300),
 					filePath: row.file_path ?? undefined,
+					similarity: Number(row.sim)
+				})
+			)
+		)
+		.catch((): NgramHit[] => []);
+
+	const packetChunkQuery = pool
+		.query<{ id: string; text: string; packet_key: string; sim: number }>(
+			`SELECT id::text, markdown_content AS text, packet_key,
+			        similarity(markdown_content, $1) AS sim
+			 FROM packet_markdown_chunks
+			 WHERE similarity(markdown_content, $1) > 0.15
+			 ORDER BY sim DESC
+			 LIMIT $2`,
+			[query, limit]
+		)
+		.then((r) =>
+			r.rows.map(
+				(row): NgramHit => ({
+					source: 'packet_chunk',
+					id: row.id,
+					text: row.text.slice(0, 300),
+					filePath: row.packet_key,
 					similarity: Number(row.sim)
 				})
 			)
@@ -113,7 +136,7 @@ export async function ngramRecall(
 		)
 		.catch((): NgramHit[] => []);
 
-	const results = await Promise.allSettled([chunkQuery, errorQuery, researchQuery, wikiQuery]);
+	const results = await Promise.allSettled([chunkQuery, packetChunkQuery, errorQuery, researchQuery, wikiQuery]);
 
 	const merged: NgramHit[] = [];
 	for (const result of results) {
@@ -140,23 +163,21 @@ export async function fullTextRecall(
 	query: string,
 	limit = 8
 ): Promise<NgramHit[]> {
-	try {
-		const result = await pool.query<{
-			id: string;
-			text: string;
-			file_path: string | null;
-			rank: number;
-		}>(
-			`SELECT id::text, content AS text, source_path AS file_path,
-			        ts_rank(to_tsvector('english', content), plainto_tsquery('english', $1)) AS rank
-			 FROM document_chunks
-			 WHERE to_tsvector('english', content) @@ plainto_tsquery('english', $1)
-			 ORDER BY rank DESC
-			 LIMIT $2`,
-			[query, limit]
-		);
-
-		return result.rows.map(
+	const documentFts = pool.query<{
+		id: string;
+		text: string;
+		file_path: string | null;
+		rank: number;
+	}>(
+		`SELECT id::text, content AS text, source_path AS file_path,
+		        ts_rank(to_tsvector('english', content), plainto_tsquery('english', $1)) AS rank
+		 FROM document_chunks
+		 WHERE to_tsvector('english', content) @@ plainto_tsquery('english', $1)
+		 ORDER BY rank DESC
+		 LIMIT $2`,
+		[query, limit]
+	).then((res) =>
+		res.rows.map(
 			(row): NgramHit => ({
 				source: 'chunk',
 				id: row.id,
@@ -164,10 +185,43 @@ export async function fullTextRecall(
 				filePath: row.file_path ?? undefined,
 				similarity: Number(row.rank)
 			})
-		);
-	} catch {
-		return [];
+		)
+	).catch((): NgramHit[] => []);
+
+	const packetFts = pool.query<{
+		id: string;
+		text: string;
+		packet_key: string;
+		rank: number;
+	}>(
+		`SELECT id::text, markdown_content AS text, packet_key,
+		        ts_rank(ts_vector, plainto_tsquery('english', $1)) AS rank
+		 FROM packet_markdown_chunks
+		 WHERE ts_vector @@ plainto_tsquery('english', $1)
+		 ORDER BY rank DESC
+		 LIMIT $2`,
+		[query, limit]
+	).then((res) =>
+		res.rows.map(
+			(row): NgramHit => ({
+				source: 'packet_chunk',
+				id: row.id,
+				text: row.text.slice(0, 300),
+				filePath: row.packet_key,
+				similarity: Number(row.rank)
+			})
+		)
+	).catch((): NgramHit[] => []);
+
+	const settled = await Promise.allSettled([documentFts, packetFts]);
+	const merged: NgramHit[] = [];
+	for (const s of settled) {
+		if (s.status === 'fulfilled') {
+			merged.push(...s.value);
+		}
 	}
+
+	return merged.sort((a, b) => b.similarity - a.similarity).slice(0, limit);
 }
 
 export async function multiTextRecall(

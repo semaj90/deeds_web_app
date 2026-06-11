@@ -9,6 +9,7 @@ import {
   readJson,
   writeStartupContext,
 } from './task-registry-helpers.mjs';
+import { writeAgentEnvironmentReport } from './environment-detector.mjs';
 
 const EXTRA_ARGS = process.argv.slice(2);
 const refreshStartupTruth = EXTRA_ARGS.includes('--refresh-startup-truth');
@@ -33,6 +34,10 @@ async function main() {
   runStep('opencode:tasks:refresh', [path.join(ROOT, 'scripts', 'opencode', 'append-recommendation-events.mjs')]);
   runStep('opencode:tasks:promote', [path.join(ROOT, 'scripts', 'opencode', 'promote-recommendations-to-tasks.mjs')]);
   runStep('opencode:tasks:state', [path.join(ROOT, 'scripts', 'opencode', 'rebuild-task-state.mjs')]);
+  await writeAgentEnvironmentReport({
+    json: PATHS.agentEnvironmentJson,
+    md: PATHS.agentEnvironmentMd,
+  });
 
   const state = await readJson(PATHS.taskStateJson);
   if (!state) throw new Error('task state not found after refresh');

@@ -32,6 +32,7 @@ This page is the navigation entry for the Parent Atlas workstream. It links the 
 - [Offline synthesis mapreduce DuckDB](</C:/Users/james/Videos/deeds-web-app/docs/reports/offline-synthesis-mapreduce-duckdb-report.md>)
 - [Compressed semantic geometry report](</C:/Users/james/Videos/deeds-web-app/docs/reports/compressed-semantic-geometry-report.md>)
 - [Hidden packet pathmap report](</C:/Users/james/Videos/deeds-web-app/docs/reports/hidden-packet-pathmap-report.md>)
+- [Ignored directory audit](</C:/Users/james/Videos/deeds-web-app/docs/reports/ignored-directory-audit.md>)
 - [Hidden packet pathmap DuckDB report](</C:/Users/james/Videos/deeds-web-app/docs/reports/hidden-packet-pathmap-duckdb-report.md>)
 - [Live service env report](</C:/Users/james/Videos/deeds-web-app/docs/reports/live-service-env-report.md>)
 - [Doc-feature crosswalk](</C:/Users/james/Videos/deeds-web-app/docs/reports/doc-feature-crosswalk-2026-06-01.md>)

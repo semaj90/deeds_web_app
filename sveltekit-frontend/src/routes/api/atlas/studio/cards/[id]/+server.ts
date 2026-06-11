@@ -18,6 +18,8 @@ const SAMPLE_DETAIL = {
   similar: []
 };
 
+import { requireUser } from '$lib/server/auth-utils.js';
+
 function normalizeRowToCard(row: any, kindHint?: 'rag' | 'cluster') {
   const kind = kindHint ?? (row.kind ?? (row.cluster_id ? 'cluster' : 'rag'));
   return {
@@ -34,8 +36,9 @@ function normalizeRowToCard(row: any, kindHint?: 'rag' | 'cluster') {
   };
 }
 
-export const GET: RequestHandler = async ({ params, locals}) => {
-  if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
+export const GET: RequestHandler = async (event) => {
+  requireUser(event);
+  const { params } = event;
   const id = params.id;
   if (!id) return json({ ok: false, error: 'missing id' }, { status: 400 });
 

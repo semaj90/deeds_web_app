@@ -1,0 +1,43 @@
+{
+  "timestamp": "2026-06-11T05:38:25.986Z",
+  "classification_rules": {
+    "HOT": "Accessed in last 7 days, feature_count > 5, cached in Redis",
+    "WARM": "Accessed 7-30 days ago, in Postgres only",
+    "COLD": "Last accessed > 30 days ago, candidate for SeaweedFS archival"
+  },
+  "packet_temperatures": [
+    {
+      "temperature": "HOT",
+      "packet_count": "9484",
+      "unique_features": "101",
+      "avg_payload_size": "1.38",
+      "last_updated": "2026-06-10T16:18:46.689Z",
+      "criteria": "accessed in last 7 days, feature_count > 5",
+      "storage_location": "Redis hot cache + Postgres"
+    },
+    {
+      "temperature": "WARM",
+      "packet_count": "427",
+      "unique_features": "370",
+      "avg_payload_size": "0.00",
+      "last_updated": "2026-06-04T05:05:34.357Z",
+      "criteria": "accessed 7-30 days ago",
+      "storage_location": "Postgres only"
+    },
+    {
+      "temperature": "COLD",
+      "packet_count": "0",
+      "unique_features": "0",
+      "avg_payload_size": "0.00",
+      "last_updated": null,
+      "criteria": "last accessed > 30 days ago",
+      "storage_location": "DuckDB / SeaweedFS (planned)"
+    }
+  ],
+  "total_packets": "094844270",
+  "distribution": {
+    "hot_pct": "0.0",
+    "warm_pct": "0.0",
+    "cold_pct": "0.0"
+  }
+}

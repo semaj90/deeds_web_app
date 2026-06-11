@@ -1,666 +1,3143 @@
 {
-  "generatedAt": "2026-06-06T17:44:42.022Z",
-  "mode": "read-only",
-  "dbAvailable": true,
-  "afmSampleSize": 500,
-  "appRegistryRows": 4209,
-  "rootRegistryRows": 4209,
-  "classification": {
-    "EXACT_SOURCE_REF_JOIN": 1,
-    "FEATURE_ID_JOIN": 197,
-    "HEURISTIC_LABEL_JOIN": 63,
-    "ROOT_CONTRACT_ONLY": 0,
-    "APP_INVENTORY_ONLY": 0,
-    "NO_JOIN": 239
+  "generatedAt": "2026-06-11T05:19:10.950Z",
+  "inputs": {
+    "canonical": "C:\\Users\\james\\Documents\\Codex\\2026-05-12\\ve-updated-the-local-quantization-notebook\\docs\\atlas\\feature-registry.json",
+    "app": "C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\docs\\atlas\\feature-registry.json"
+  },
+  "sourceStatus": {
+    "canonical": "READY",
+    "app": "READY"
   },
   "summary": {
-    "joined": 261,
-    "noJoin": 239,
-    "exactPct": "0.2%",
-    "noJoinPct": "47.8%",
-    "appOnlyRows": 4208,
-    "patchRecommendation": "PATCH_DEFERRED — high no-join rate; resolve source_ref gaps in atlas_feature_map first"
+    "canonicalRows": 18,
+    "appRows": 4209,
+    "byRootClassification": {
+      "MAPPED_HEURISTIC": 12,
+      "ROOT_CONTRACT_ONLY": 6
+    },
+    "byAppClassification": {
+      "APP_CODEBASE_INVENTORY": 4170
+    }
   },
-  "topMissingSourceRefs": [
-    ".agent/workflows/error-fixing-strategy.md",
-    ".cache/ace/context-packs/ace_context_local-json-hit_v1.json",
-    ".cache/ace/context-packs/ace_context_smoke-context-pack_v1.json",
-    ".cache/ace/top-retrieval/ace_retrieval_topn_77245b8d5bd3442aa981670b_2.json",
-    ".cache/llm-synthesis/[object Promise].json",
-    ".claude/settings.local.json",
-    ".opencode/agents/atlas-context.md",
-    ".opencode/agents/hermes-ace.md",
-    ".opencode/agents/workspace-ready.md",
-    ".opencode/commands/ace-fallback-ladder.md",
-    ".opencode/commands/graph-export-recover.md",
-    ".opencode/commands/workspace-ready.md",
-    ".opencode/config-patches.json",
-    ".opencode/skills/ace-recovery/SKILL.md",
-    ".orphan-report.txt",
-    ".port-allocation.json",
-    ".scheck-latest.txt",
-    "../scripts/10-layer-audit-cli.mjs",
-    "../scripts/ace_batch_fix_set.py",
-    "../scripts/ace_batch_fix_set_v2.py",
-    "../scripts/ace-daily-todo-summary.mjs",
-    "../scripts/ace-diff-sniffer.mjs",
-    "../scripts/ace-startup-health.mjs",
-    "../scripts/agent/log-subagent.mjs",
-    "../scripts/agent/prompt-generator.mjs",
-    "../scripts/agents/generate-monorepo-agents.mjs",
-    "../scripts/agents/offline_passes.mjs",
-    "../scripts/agent/turbovec-search-memory.mjs",
-    "../scripts/aggregate-failures.js",
-    "../scripts/ai/cache_startup_prompt.mjs"
-  ],
-  "topMissingFeatureIds": [
-    "utility"
-  ],
-  "sampleRows": [
+  "rootMappings": [
     {
-      "source_ref": ".agent/workflows/agentic-error-fixing.md",
-      "feature_id": "scripts",
-      "classification": "FEATURE_ID_JOIN",
-      "padJoin": "feature_id",
-      "ncpJoin": null,
-      "rrpJoin": null,
-      "appJoin": null,
-      "rootJoin": null,
-      "qdrant_point_id": "378715471",
-      "som_cluster": "65"
+      "rootFeatureId": "retrieval_spine",
+      "rootTitle": "retrieval_spine",
+      "classification": "MAPPED_HEURISTIC",
+      "matches": [
+        {
+          "feature_id": "subgraph_instruction_programming_kag_ace_topology__overview",
+          "title": "Overview",
+          "score": 18,
+          "reasons": [
+            "label/description fuzzy overlap (6)"
+          ],
+          "sourceRefs": [
+            "local:docs/architecture/subgraph-instruction-programming-kag-ace-topology.md#L3"
+          ]
+        },
+        {
+          "feature_id": "the_4_layer_retrieval_stack",
+          "title": "The 4-Layer Retrieval Stack:",
+          "score": 18,
+          "reasons": [
+            "label/description fuzzy overlap (6)"
+          ],
+          "sourceRefs": [
+            "local:docs/reports/turbovec-evaluation-plan.md#L8"
+          ]
+        },
+        {
+          "feature_id": "retrieval_and_graph_layer",
+          "title": "Retrieval and Graph Layer",
+          "score": 15,
+          "reasons": [
+            "label/description fuzzy overlap (5)"
+          ],
+          "sourceRefs": [
+            "local:docs/architecture/subgraph-instruction-programming-kag-ace-topology.md#L85"
+          ]
+        },
+        {
+          "feature_id": "1_architectural_principles",
+          "title": "1. Architectural Principles",
+          "score": 15,
+          "reasons": [
+            "label/description fuzzy overlap (5)"
+          ],
+          "sourceRefs": [
+            "local:docs/architecture/vram-hygiene-policy.md#L7"
+          ]
+        },
+        {
+          "feature_id": "server_surface",
+          "title": "Server surface",
+          "score": 15,
+          "reasons": [
+            "label/description fuzzy overlap (5)"
+          ],
+          "sourceRefs": [
+            "local:docs/codebase_atlas/feature_map.md#L11"
+          ]
+        },
+        {
+          "feature_id": "subgraph_instruction_programming_kag_ace_topology_todo__goal",
+          "title": "Goal",
+          "score": 15,
+          "reasons": [
+            "label/description fuzzy overlap (5)"
+          ],
+          "sourceRefs": [
+            "local:docs/design/subgraph-instruction-programming-kag-ace-topology-todo.md#L3"
+          ]
+        },
+        {
+          "feature_id": "4_ace_kag_layers",
+          "title": "4. ACE / KAG layers",
+          "score": 15,
+          "reasons": [
+            "label/description fuzzy overlap (5)"
+          ],
+          "sourceRefs": [
+            "local:docs/design/subgraph-instruction-programming-kag-ace-topology-todo.md#L32"
+          ]
+        },
+        {
+          "feature_id": "where_each_technology_fits",
+          "title": "Where each technology fits",
+          "score": 15,
+          "reasons": [
+            "label/description fuzzy overlap (5)"
+          ],
+          "sourceRefs": [
+            "local:docs/reports/audit-summary-report.md#L38"
+          ]
+        }
+      ]
     },
     {
-      "source_ref": ".agent/workflows/error-fixing-strategy.md",
-      "feature_id": "utility",
-      "classification": "NO_JOIN",
-      "padJoin": null,
-      "ncpJoin": null,
-      "rrpJoin": null,
-      "appJoin": null,
-      "rootJoin": null,
-      "qdrant_point_id": "45771661",
-      "som_cluster": "30"
+      "rootFeatureId": "turbovec_prefilter",
+      "rootTitle": "turbovec_prefilter",
+      "classification": "MAPPED_HEURISTIC",
+      "matches": [
+        {
+          "feature_id": "the_4_layer_retrieval_stack",
+          "title": "The 4-Layer Retrieval Stack:",
+          "score": 15,
+          "reasons": [
+            "label/description fuzzy overlap (5)"
+          ],
+          "sourceRefs": [
+            "local:docs/reports/turbovec-evaluation-plan.md#L8"
+          ]
+        },
+        {
+          "feature_id": "inputs",
+          "title": "Inputs",
+          "score": 12,
+          "reasons": [
+            "label/description fuzzy overlap (4)"
+          ],
+          "sourceRefs": [
+            "local:docs/architecture/deepseek-engram-architecture-search.md#L18"
+          ]
+        },
+        {
+          "feature_id": "pipeline_fit",
+          "title": "Pipeline Fit",
+          "score": 12,
+          "reasons": [
+            "label/description fuzzy overlap (4)"
+          ],
+          "sourceRefs": [
+            "local:docs/architecture/engram-plugin-memory-support.md#L61"
+          ]
+        }
+      ]
     },
     {
-      "source_ref": ".cache/ace/context-packs/ace_context_local-json-hit_v1.json",
-      "feature_id": "utility",
-      "classification": "NO_JOIN",
-      "padJoin": null,
-      "ncpJoin": null,
-      "rrpJoin": null,
-      "appJoin": null,
-      "rootJoin": null,
-      "qdrant_point_id": "11915146",
-      "som_cluster": "30"
+      "rootFeatureId": "karpathy_authority_overlay",
+      "rootTitle": "karpathy_authority_overlay",
+      "classification": "MAPPED_HEURISTIC",
+      "matches": [
+        {
+          "feature_id": "where_each_technology_fits",
+          "title": "Where each technology fits",
+          "score": 12,
+          "reasons": [
+            "label/description fuzzy overlap (4)"
+          ],
+          "sourceRefs": [
+            "local:docs/reports/audit-summary-report.md#L38"
+          ]
+        }
+      ]
     },
     {
-      "source_ref": ".cache/ace/context-packs/ace_context_smoke-context-pack_v1.json",
-      "feature_id": "utility",
-      "classification": "NO_JOIN",
-      "padJoin": null,
-      "ncpJoin": null,
-      "rrpJoin": null,
-      "appJoin": null,
-      "rootJoin": null,
-      "qdrant_point_id": "120863127",
-      "som_cluster": "30"
+      "rootFeatureId": "karpathy_redis_hot_lane",
+      "rootTitle": "karpathy_redis_hot_lane",
+      "classification": "MAPPED_HEURISTIC",
+      "matches": [
+        {
+          "feature_id": "karpathy_llmwiki__ace_kag_retrieval",
+          "title": "ACE / KAG / Retrieval",
+          "score": 12,
+          "reasons": [
+            "label/description fuzzy overlap (4)"
+          ],
+          "sourceRefs": [
+            "local:llm/karpathy_llmwiki.md#L40"
+          ]
+        }
+      ]
     },
     {
-      "source_ref": ".cache/ace/top-retrieval/ace_retrieval_topn_77245b8d5bd3442aa981670b_2.json",
-      "feature_id": "utility",
-      "classification": "NO_JOIN",
-      "padJoin": null,
-      "ncpJoin": null,
-      "rrpJoin": null,
-      "appJoin": null,
-      "rootJoin": null,
-      "qdrant_point_id": "1186016974",
-      "som_cluster": "61"
+      "rootFeatureId": "ace_context_pack_cache",
+      "rootTitle": "ace_context_pack_cache",
+      "classification": "MAPPED_HEURISTIC",
+      "matches": [
+        {
+          "feature_id": "where_each_technology_fits",
+          "title": "Where each technology fits",
+          "score": 21,
+          "reasons": [
+            "label/description fuzzy overlap (7)"
+          ],
+          "sourceRefs": [
+            "local:docs/reports/audit-summary-report.md#L38"
+          ]
+        },
+        {
+          "feature_id": "resilience__2_aof_redis_persistence_hardening",
+          "title": "2. AOF Redis Persistence Hardening",
+          "score": 18,
+          "reasons": [
+            "label/description fuzzy overlap (6)"
+          ],
+          "sourceRefs": [
+            "local:docs/operator/RESILIENCE.md#L113"
+          ]
+        },
+        {
+          "feature_id": "feature_checklist",
+          "title": "Feature checklist",
+          "score": 18,
+          "reasons": [
+            "label/description fuzzy overlap (6)"
+          ],
+          "sourceRefs": [
+            "local:docs/reports/audit-summary-report.md#L158"
+          ]
+        },
+        {
+          "feature_id": "1_architectural_principles",
+          "title": "1. Architectural Principles",
+          "score": 15,
+          "reasons": [
+            "label/description fuzzy overlap (5)"
+          ],
+          "sourceRefs": [
+            "local:docs/architecture/vram-hygiene-policy.md#L7"
+          ]
+        },
+        {
+          "feature_id": "missing_tables",
+          "title": "Missing Tables",
+          "score": 15,
+          "reasons": [
+            "label/description fuzzy overlap (5)"
+          ],
+          "sourceRefs": [
+            "local:docs/audits/db-schema-drift-2026-05-10.md#L11"
+          ]
+        },
+        {
+          "feature_id": "restores_a_specific_snapshot_folder",
+          "title": "Restores a specific snapshot folder",
+          "score": 15,
+          "reasons": [
+            "label/description fuzzy overlap (5)"
+          ],
+          "sourceRefs": [
+            "local:docs/operator/DEPLOYMENT.md#L107"
+          ]
+        },
+        {
+          "feature_id": "2_aof_redis_persistence_hardening",
+          "title": "2. AOF Redis Persistence Hardening",
+          "score": 15,
+          "reasons": [
+            "label/description fuzzy overlap (5)"
+          ],
+          "sourceRefs": [
+            "local:docs/operator/OPERATOR_RUNBOOK.md#L147"
+          ]
+        },
+        {
+          "feature_id": "2_hot_context_preservation_redis_bitfrost",
+          "title": "2. Hot Context Preservation (Redis BitFrost)",
+          "score": 15,
+          "reasons": [
+            "label/description fuzzy overlap (5)"
+          ],
+          "sourceRefs": [
+            "local:docs/operator/RESILIENCE.md#L63"
+          ]
+        }
+      ]
     },
     {
-      "source_ref": ".cache/d9-verifier/LLMS.md",
-      "feature_id": "scripts",
-      "classification": "FEATURE_ID_JOIN",
-      "padJoin": "feature_id",
-      "ncpJoin": null,
-      "rrpJoin": null,
-      "appJoin": null,
-      "rootJoin": null,
-      "qdrant_point_id": "126735712",
-      "som_cluster": "84"
+      "rootFeatureId": "intent_synthesis",
+      "rootTitle": "intent_synthesis",
+      "classification": "ROOT_CONTRACT_ONLY",
+      "matches": []
     },
     {
-      "source_ref": ".cache/llm-synthesis/[object Promise].json",
-      "feature_id": "utility",
-      "classification": "NO_JOIN",
-      "padJoin": null,
-      "ncpJoin": null,
-      "rrpJoin": null,
-      "appJoin": null,
-      "rootJoin": null,
-      "qdrant_point_id": "102636680",
-      "som_cluster": "30"
+      "rootFeatureId": "feature_label_registry",
+      "rootTitle": "feature_label_registry",
+      "classification": "ROOT_CONTRACT_ONLY",
+      "matches": []
     },
     {
-      "source_ref": ".claude/settings.local.json",
-      "feature_id": "utility",
-      "classification": "NO_JOIN",
-      "padJoin": null,
-      "ncpJoin": null,
-      "rrpJoin": null,
-      "appJoin": null,
-      "rootJoin": null,
-      "qdrant_point_id": "116762750",
-      "som_cluster": "30"
+      "rootFeatureId": "pgvector_multi_table_lane",
+      "rootTitle": "pgvector_multi_table_lane",
+      "classification": "MAPPED_HEURISTIC",
+      "matches": [
+        {
+          "feature_id": "layer_1_cold_tier_ground_truth_768d",
+          "title": "Layer 1: Cold Tier — Ground Truth 768d",
+          "score": 15,
+          "reasons": [
+            "label/description fuzzy overlap (5)"
+          ],
+          "sourceRefs": [
+            "local:docs/architecture/storage-tier-schema.md#L61"
+          ]
+        },
+        {
+          "feature_id": "3_high_performance_pgvector_hnsw_indexing",
+          "title": "3. High-Performance pgvector HNSW Indexing",
+          "score": 15,
+          "reasons": [
+            "label/description fuzzy overlap (5)"
+          ],
+          "sourceRefs": [
+            "local:docs/llms/generated/postgres.llms-full.txt#L58"
+          ]
+        },
+        {
+          "feature_id": "2_relational_vector_db_architecture",
+          "title": "2. Relational & Vector DB Architecture",
+          "score": 12,
+          "reasons": [
+            "label/description fuzzy overlap (4)"
+          ],
+          "sourceRefs": [
+            "local:llm/claude.md#L15"
+          ]
+        }
+      ]
     },
     {
-      "source_ref": "docker/bifrost/config.json",
-      "feature_id": "bifrost",
-      "classification": "FEATURE_ID_JOIN",
-      "padJoin": "source_ref",
-      "ncpJoin": null,
-      "rrpJoin": null,
-      "appJoin": null,
-      "rootJoin": null,
-      "qdrant_point_id": null,
-      "som_cluster": null
+      "rootFeatureId": "redis_agent_memory_server_eval",
+      "rootTitle": "redis_agent_memory_server_eval",
+      "classification": "MAPPED_HEURISTIC",
+      "matches": [
+        {
+          "feature_id": "diagnostic_explanation_of_self_learning_benefit",
+          "title": "🧠 Diagnostic Explanation of self-learning benefit",
+          "score": 15,
+          "reasons": [
+            "label/description fuzzy overlap (5)"
+          ],
+          "sourceRefs": [
+            "local:docs/reports/lane-routing-eval.md#L27"
+          ]
+        },
+        {
+          "feature_id": "3_5_jsonl_append_only_log",
+          "title": "3.5 JSONL Append-Only Log",
+          "score": 12,
+          "reasons": [
+            "label/description fuzzy overlap (4)"
+          ],
+          "sourceRefs": [
+            "local:docs/architecture/llm-synthesis-memory-policy.md#L72"
+          ]
+        },
+        {
+          "feature_id": "3_state_management_cross_boundary_rules",
+          "title": "3. State Management Cross-Boundary Rules",
+          "score": 12,
+          "reasons": [
+            "label/description fuzzy overlap (4)"
+          ],
+          "sourceRefs": [
+            "local:docs/ARCHITECTURE_GUIDE_V1.md#L25"
+          ]
+        },
+        {
+          "feature_id": "three_development_model_lanes_opencode_local_dev",
+          "title": "Three Development Model Lanes (OpenCode / local dev)",
+          "score": 12,
+          "reasons": [
+            "label/description fuzzy overlap (4)"
+          ],
+          "sourceRefs": [
+            "local:docs/llms/gguf-model-lanes.md#L86"
+          ]
+        }
+      ]
     },
     {
-      "source_ref": "docker/langgraph-synthesis/.venv/Lib/site-packages/jiter-0.14.0.dist-info/sboms/jiter-python.cyclonedx.json",
-      "feature_id": "sboms",
-      "classification": "FEATURE_ID_JOIN",
-      "padJoin": "source_ref",
-      "ncpJoin": null,
-      "rrpJoin": null,
-      "appJoin": null,
-      "rootJoin": null,
-      "qdrant_point_id": null,
-      "som_cluster": null
+      "rootFeatureId": "claude_mem_opencode_reference",
+      "rootTitle": "claude_mem_opencode_reference",
+      "classification": "ROOT_CONTRACT_ONLY",
+      "matches": []
     },
     {
-      "source_ref": "docker/langgraph-synthesis/.venv/Lib/site-packages/js/install.json",
-      "feature_id": "js",
-      "classification": "FEATURE_ID_JOIN",
-      "padJoin": "source_ref",
-      "ncpJoin": null,
-      "rrpJoin": null,
-      "appJoin": null,
-      "rootJoin": null,
-      "qdrant_point_id": null,
-      "som_cluster": null
+      "rootFeatureId": "feature_gap_registry",
+      "rootTitle": "feature_gap_registry",
+      "classification": "ROOT_CONTRACT_ONLY",
+      "matches": []
     },
     {
-      "source_ref": "docker/langgraph-synthesis/.venv/Lib/site-packages/opentelemetry/sdk/_configuration/schema.json",
-      "feature_id": "_configuration",
-      "classification": "EXACT_SOURCE_REF_JOIN",
-      "padJoin": "source_ref",
-      "ncpJoin": null,
-      "rrpJoin": null,
-      "appJoin": "feature_key",
-      "rootJoin": "feature_id",
-      "qdrant_point_id": null,
-      "som_cluster": null
+      "rootFeatureId": "codebase_semantic_index",
+      "rootTitle": "codebase_semantic_index",
+      "classification": "MAPPED_HEURISTIC",
+      "matches": [
+        {
+          "feature_id": "trace_karpathy_runtime_split",
+          "title": "TRACE/Karpathy Runtime Split",
+          "score": 15,
+          "reasons": [
+            "label/description fuzzy overlap (5)"
+          ],
+          "sourceRefs": [
+            "local:docs/architecture/trace-runtime-split.md#L17"
+          ]
+        },
+        {
+          "feature_id": "2_storage_caching_matrix",
+          "title": "2. Storage & Caching Matrix",
+          "score": 15,
+          "reasons": [
+            "label/description fuzzy overlap (5)"
+          ],
+          "sourceRefs": [
+            "local:docs/KARPATHY_PIPELINE_ARCHITECTURE.md#L33"
+          ]
+        },
+        {
+          "feature_id": "critical_environment_matrix",
+          "title": "Critical Environment Matrix",
+          "score": 15,
+          "reasons": [
+            "label/description fuzzy overlap (5)"
+          ],
+          "sourceRefs": [
+            "local:docs/operator/DEPLOYMENT.md#L37"
+          ]
+        },
+        {
+          "feature_id": "3_3_redis_bitfrost_hot_cache",
+          "title": "3.3 Redis / BitFrost Hot Cache",
+          "score": 12,
+          "reasons": [
+            "label/description fuzzy overlap (4)"
+          ],
+          "sourceRefs": [
+            "local:docs/architecture/llm-synthesis-memory-policy.md#L59"
+          ]
+        },
+        {
+          "feature_id": "retrieval_and_graph_layer",
+          "title": "Retrieval and Graph Layer",
+          "score": 12,
+          "reasons": [
+            "label/description fuzzy overlap (4)"
+          ],
+          "sourceRefs": [
+            "local:docs/architecture/subgraph-instruction-programming-kag-ace-topology.md#L85"
+          ]
+        },
+        {
+          "feature_id": "1_architectural_principles",
+          "title": "1. Architectural Principles",
+          "score": 12,
+          "reasons": [
+            "label/description fuzzy overlap (4)"
+          ],
+          "sourceRefs": [
+            "local:docs/architecture/vram-hygiene-policy.md#L7"
+          ]
+        },
+        {
+          "feature_id": "admin_visualization",
+          "title": "Admin Visualization",
+          "score": 12,
+          "reasons": [
+            "label/description fuzzy overlap (4)"
+          ],
+          "sourceRefs": [
+            "local:docs/CODEBASE_INDEXING_PIPELINE.md#L256"
+          ]
+        },
+        {
+          "feature_id": "where_each_technology_fits",
+          "title": "Where each technology fits",
+          "score": 12,
+          "reasons": [
+            "label/description fuzzy overlap (4)"
+          ],
+          "sourceRefs": [
+            "local:docs/reports/audit-summary-report.md#L38"
+          ]
+        }
+      ]
     },
     {
-      "source_ref": "docker/langgraph-synthesis/.venv/Lib/site-packages/orjson-3.11.8.dist-info/sboms/orjson.cyclonedx.json",
-      "feature_id": "sboms",
-      "classification": "FEATURE_ID_JOIN",
-      "padJoin": "source_ref",
-      "ncpJoin": null,
-      "rrpJoin": null,
-      "appJoin": null,
-      "rootJoin": null,
-      "qdrant_point_id": null,
-      "som_cluster": null
+      "rootFeatureId": "semantic_cache_policy",
+      "rootTitle": "semantic_cache_policy",
+      "classification": "MAPPED_HEURISTIC",
+      "matches": [
+        {
+          "feature_id": "3_3_redis_bitfrost_hot_cache",
+          "title": "3.3 Redis / BitFrost Hot Cache",
+          "score": 21,
+          "reasons": [
+            "label/description fuzzy overlap (7)"
+          ],
+          "sourceRefs": [
+            "local:docs/architecture/llm-synthesis-memory-policy.md#L59"
+          ]
+        },
+        {
+          "feature_id": "where_each_technology_fits",
+          "title": "Where each technology fits",
+          "score": 21,
+          "reasons": [
+            "label/description fuzzy overlap (7)"
+          ],
+          "sourceRefs": [
+            "local:docs/reports/audit-summary-report.md#L38"
+          ]
+        },
+        {
+          "feature_id": "feature_checklist",
+          "title": "Feature checklist",
+          "score": 21,
+          "reasons": [
+            "label/description fuzzy overlap (7)"
+          ],
+          "sourceRefs": [
+            "local:docs/reports/audit-summary-report.md#L158"
+          ]
+        },
+        {
+          "feature_id": "retrieval_order_contract",
+          "title": "Retrieval Order Contract",
+          "score": 15,
+          "reasons": [
+            "label/description fuzzy overlap (5)"
+          ],
+          "sourceRefs": [
+            "local:docs/error-analysis-architecture.md#L281"
+          ]
+        },
+        {
+          "feature_id": "integration_features_to_look_for",
+          "title": "Integration features to look for",
+          "score": 15,
+          "reasons": [
+            "label/description fuzzy overlap (5)"
+          ],
+          "sourceRefs": [
+            "local:docs/reports/audit-summary-report.md#L151"
+          ]
+        },
+        {
+          "feature_id": "1_architectural_principles",
+          "title": "1. Architectural Principles",
+          "score": 12,
+          "reasons": [
+            "label/description fuzzy overlap (4)"
+          ],
+          "sourceRefs": [
+            "local:docs/architecture/vram-hygiene-policy.md#L7"
+          ]
+        },
+        {
+          "feature_id": "l1_exact_match_cache",
+          "title": "L1: Exact-Match Cache",
+          "score": 12,
+          "reasons": [
+            "label/description fuzzy overlap (4)"
+          ],
+          "sourceRefs": [
+            "local:docs/error-analysis-architecture.md#L94"
+          ]
+        },
+        {
+          "feature_id": "2_storage_caching_matrix",
+          "title": "2. Storage & Caching Matrix",
+          "score": 12,
+          "reasons": [
+            "label/description fuzzy overlap (4)"
+          ],
+          "sourceRefs": [
+            "local:docs/KARPATHY_PIPELINE_ARCHITECTURE.md#L33"
+          ]
+        }
+      ]
     },
     {
-      "source_ref": "docker/langgraph-synthesis/.venv/Lib/site-packages/plotly/labextension/package.json",
-      "feature_id": "labextension",
-      "classification": "FEATURE_ID_JOIN",
-      "padJoin": "source_ref",
-      "ncpJoin": null,
-      "rrpJoin": null,
-      "appJoin": null,
-      "rootJoin": null,
-      "qdrant_point_id": null,
-      "som_cluster": null
+      "rootFeatureId": "memory_address_registry",
+      "rootTitle": "memory_address_registry",
+      "classification": "ROOT_CONTRACT_ONLY",
+      "matches": []
     },
     {
-      "source_ref": "docker/langgraph-synthesis/.venv/Lib/site-packages/plotly/labextension/static/1.9daa5160b7fc741623bf.js",
-      "feature_id": "static",
-      "classification": "FEATURE_ID_JOIN",
-      "padJoin": "source_ref",
-      "ncpJoin": null,
-      "rrpJoin": null,
-      "appJoin": null,
-      "rootJoin": null,
-      "qdrant_point_id": null,
-      "som_cluster": null
+      "rootFeatureId": "ace_packet_flow",
+      "rootTitle": "ace_packet_flow",
+      "classification": "MAPPED_HEURISTIC",
+      "matches": [
+        {
+          "feature_id": "where_each_technology_fits",
+          "title": "Where each technology fits",
+          "score": 18,
+          "reasons": [
+            "label/description fuzzy overlap (6)"
+          ],
+          "sourceRefs": [
+            "local:docs/reports/audit-summary-report.md#L38"
+          ]
+        },
+        {
+          "feature_id": "3_3_redis_bitfrost_hot_cache",
+          "title": "3.3 Redis / BitFrost Hot Cache",
+          "score": 15,
+          "reasons": [
+            "label/description fuzzy overlap (5)"
+          ],
+          "sourceRefs": [
+            "local:docs/architecture/llm-synthesis-memory-policy.md#L59"
+          ]
+        },
+        {
+          "feature_id": "feature_checklist",
+          "title": "Feature checklist",
+          "score": 15,
+          "reasons": [
+            "label/description fuzzy overlap (5)"
+          ],
+          "sourceRefs": [
+            "local:docs/reports/audit-summary-report.md#L158"
+          ]
+        },
+        {
+          "feature_id": "retrieval_and_graph_layer",
+          "title": "Retrieval and Graph Layer",
+          "score": 12,
+          "reasons": [
+            "label/description fuzzy overlap (4)"
+          ],
+          "sourceRefs": [
+            "local:docs/architecture/subgraph-instruction-programming-kag-ace-topology.md#L85"
+          ]
+        },
+        {
+          "feature_id": "1_architectural_principles",
+          "title": "1. Architectural Principles",
+          "score": 12,
+          "reasons": [
+            "label/description fuzzy overlap (4)"
+          ],
+          "sourceRefs": [
+            "local:docs/architecture/vram-hygiene-policy.md#L7"
+          ]
+        },
+        {
+          "feature_id": "4_ace_kag_layers",
+          "title": "4. ACE / KAG layers",
+          "score": 12,
+          "reasons": [
+            "label/description fuzzy overlap (4)"
+          ],
+          "sourceRefs": [
+            "local:docs/design/subgraph-instruction-programming-kag-ace-topology-todo.md#L32"
+          ]
+        },
+        {
+          "feature_id": "2_aof_redis_persistence_hardening",
+          "title": "2. AOF Redis Persistence Hardening",
+          "score": 12,
+          "reasons": [
+            "label/description fuzzy overlap (4)"
+          ],
+          "sourceRefs": [
+            "local:docs/operator/OPERATOR_RUNBOOK.md#L147"
+          ]
+        },
+        {
+          "feature_id": "resilience__2_aof_redis_persistence_hardening",
+          "title": "2. AOF Redis Persistence Hardening",
+          "score": 12,
+          "reasons": [
+            "label/description fuzzy overlap (4)"
+          ],
+          "sourceRefs": [
+            "local:docs/operator/RESILIENCE.md#L113"
+          ]
+        }
+      ]
     },
     {
-      "source_ref": "docker/langgraph-synthesis/.venv/Lib/site-packages/plotly/labextension/static/remoteEntry.b2077f01f9b03ba2c63d.js",
-      "feature_id": "static",
-      "classification": "FEATURE_ID_JOIN",
-      "padJoin": "source_ref",
-      "ncpJoin": null,
-      "rrpJoin": null,
-      "appJoin": null,
-      "rootJoin": null,
-      "qdrant_point_id": null,
-      "som_cluster": null
+      "rootFeatureId": "cluster_card_flow",
+      "rootTitle": "cluster_card_flow",
+      "classification": "MAPPED_HEURISTIC",
+      "matches": [
+        {
+          "feature_id": "layer_3_hot_tier_redis",
+          "title": "Layer 3: Hot Tier — Redis",
+          "score": 15,
+          "reasons": [
+            "label/description fuzzy overlap (5)"
+          ],
+          "sourceRefs": [
+            "local:docs/architecture/storage-tier-schema.md#L131"
+          ]
+        },
+        {
+          "feature_id": "feature_checklist",
+          "title": "Feature checklist",
+          "score": 15,
+          "reasons": [
+            "label/description fuzzy overlap (5)"
+          ],
+          "sourceRefs": [
+            "local:docs/reports/audit-summary-report.md#L158"
+          ]
+        },
+        {
+          "feature_id": "the_4_layer_retrieval_stack",
+          "title": "The 4-Layer Retrieval Stack:",
+          "score": 15,
+          "reasons": [
+            "label/description fuzzy overlap (5)"
+          ],
+          "sourceRefs": [
+            "local:docs/reports/turbovec-evaluation-plan.md#L8"
+          ]
+        },
+        {
+          "feature_id": "inputs",
+          "title": "Inputs",
+          "score": 12,
+          "reasons": [
+            "label/description fuzzy overlap (4)"
+          ],
+          "sourceRefs": [
+            "local:docs/architecture/deepseek-engram-architecture-search.md#L18"
+          ]
+        },
+        {
+          "feature_id": "pipeline_fit",
+          "title": "Pipeline Fit",
+          "score": 12,
+          "reasons": [
+            "label/description fuzzy overlap (4)"
+          ],
+          "sourceRefs": [
+            "local:docs/architecture/engram-plugin-memory-support.md#L61"
+          ]
+        },
+        {
+          "feature_id": "16_topological_path_mapping_manifold_synthesis",
+          "title": "16. Topological Path Mapping & Manifold Synthesis",
+          "score": 12,
+          "reasons": [
+            "label/description fuzzy overlap (4)"
+          ],
+          "sourceRefs": [
+            "local:docs/architecture/trace-kag-web-development-guide.md#L73"
+          ]
+        },
+        {
+          "feature_id": "topological_db_backends_summary",
+          "title": "Topological DB Backends (summary)",
+          "score": 12,
+          "reasons": [
+            "label/description fuzzy overlap (4)"
+          ],
+          "sourceRefs": [
+            "local:docs/CODEBASE_INDEXING_PIPELINE.md#L242"
+          ]
+        },
+        {
+          "feature_id": "unified_context_tree",
+          "title": "Unified context tree",
+          "score": 12,
+          "reasons": [
+            "label/description fuzzy overlap (4)"
+          ],
+          "sourceRefs": [
+            "local:docs/reports/audit-summary-report.md#L32"
+          ]
+        }
+      ]
     },
     {
-      "source_ref": "docker/langgraph-synthesis/.venv/Lib/site-packages/plotly/labextension/static/style.js",
-      "feature_id": "static",
-      "classification": "FEATURE_ID_JOIN",
-      "padJoin": "source_ref",
-      "ncpJoin": null,
-      "rrpJoin": null,
-      "appJoin": null,
-      "rootJoin": null,
-      "qdrant_point_id": null,
-      "som_cluster": null
+      "rootFeatureId": "feature_labeling_pipeline",
+      "rootTitle": "feature_labeling_pipeline",
+      "classification": "MAPPED_HEURISTIC",
+      "matches": [
+        {
+          "feature_id": "pipeline_fit",
+          "title": "Pipeline Fit",
+          "score": 15,
+          "reasons": [
+            "label/description fuzzy overlap (5)"
+          ],
+          "sourceRefs": [
+            "local:docs/architecture/engram-plugin-memory-support.md#L61"
+          ]
+        },
+        {
+          "feature_id": "cluster_breakdown",
+          "title": "Cluster Breakdown",
+          "score": 12,
+          "reasons": [
+            "label/description fuzzy overlap (4)"
+          ],
+          "sourceRefs": [
+            "local:docs/graph/qdrant-cluster-tag-audit.md#L43"
+          ]
+        },
+        {
+          "feature_id": "updated_pipeline",
+          "title": "Updated pipeline",
+          "score": 12,
+          "reasons": [
+            "label/description fuzzy overlap (4)"
+          ],
+          "sourceRefs": [
+            "local:docs/reports/audit-summary-report.md#L72"
+          ]
+        },
+        {
+          "feature_id": "feature_checklist",
+          "title": "Feature checklist",
+          "score": 12,
+          "reasons": [
+            "label/description fuzzy overlap (4)"
+          ],
+          "sourceRefs": [
+            "local:docs/reports/audit-summary-report.md#L158"
+          ]
+        },
+        {
+          "feature_id": "karpathy_wiki_pipeline",
+          "title": "Karpathy Wiki Pipeline",
+          "score": 12,
+          "reasons": [
+            "label/description fuzzy overlap (4)"
+          ],
+          "sourceRefs": [
+            "local:sveltekit-frontend/scripts/docs/startup-guide.md#L118"
+          ]
+        }
+      ]
     },
     {
-      "source_ref": "docker/langgraph-synthesis/.venv/Lib/site-packages/plotly/labextension/static/third-party-licenses.json",
-      "feature_id": "static",
-      "classification": "FEATURE_ID_JOIN",
-      "padJoin": "source_ref",
-      "ncpJoin": null,
-      "rrpJoin": null,
-      "appJoin": null,
-      "rootJoin": null,
-      "qdrant_point_id": null,
-      "som_cluster": null
-    },
-    {
-      "source_ref": "docker/langgraph-synthesis/.venv/Lib/site-packages/plotly/package_data/plotly.min.js",
-      "feature_id": "package_data",
-      "classification": "FEATURE_ID_JOIN",
-      "padJoin": "source_ref",
-      "ncpJoin": null,
-      "rrpJoin": null,
-      "appJoin": null,
-      "rootJoin": null,
-      "qdrant_point_id": null,
-      "som_cluster": null
-    },
-    {
-      "source_ref": "docker/langgraph-synthesis/.venv/Lib/site-packages/plotly/package_data/templates/ggplot2.json",
-      "feature_id": "templates",
-      "classification": "FEATURE_ID_JOIN",
-      "padJoin": "source_ref",
-      "ncpJoin": null,
-      "rrpJoin": null,
-      "appJoin": null,
-      "rootJoin": null,
-      "qdrant_point_id": null,
-      "som_cluster": null
-    },
-    {
-      "source_ref": "docker/langgraph-synthesis/.venv/Lib/site-packages/plotly/package_data/templates/gridon.json",
-      "feature_id": "templates",
-      "classification": "FEATURE_ID_JOIN",
-      "padJoin": "source_ref",
-      "ncpJoin": null,
-      "rrpJoin": null,
-      "appJoin": null,
-      "rootJoin": null,
-      "qdrant_point_id": null,
-      "som_cluster": null
-    },
-    {
-      "source_ref": "docker/langgraph-synthesis/.venv/Lib/site-packages/plotly/package_data/templates/plotly_dark.json",
-      "feature_id": "templates",
-      "classification": "FEATURE_ID_JOIN",
-      "padJoin": "source_ref",
-      "ncpJoin": null,
-      "rrpJoin": null,
-      "appJoin": null,
-      "rootJoin": null,
-      "qdrant_point_id": null,
-      "som_cluster": null
-    },
-    {
-      "source_ref": "docker/langgraph-synthesis/.venv/Lib/site-packages/plotly/package_data/templates/plotly.json",
-      "feature_id": "templates",
-      "classification": "FEATURE_ID_JOIN",
-      "padJoin": "source_ref",
-      "ncpJoin": null,
-      "rrpJoin": null,
-      "appJoin": null,
-      "rootJoin": null,
-      "qdrant_point_id": null,
-      "som_cluster": null
-    },
-    {
-      "source_ref": "docker/langgraph-synthesis/.venv/Lib/site-packages/plotly/package_data/templates/plotly_white.json",
-      "feature_id": "templates",
-      "classification": "FEATURE_ID_JOIN",
-      "padJoin": "source_ref",
-      "ncpJoin": null,
-      "rrpJoin": null,
-      "appJoin": null,
-      "rootJoin": null,
-      "qdrant_point_id": null,
-      "som_cluster": null
-    },
-    {
-      "source_ref": "docker/langgraph-synthesis/.venv/Lib/site-packages/plotly/package_data/templates/presentation.json",
-      "feature_id": "templates",
-      "classification": "FEATURE_ID_JOIN",
-      "padJoin": "source_ref",
-      "ncpJoin": null,
-      "rrpJoin": null,
-      "appJoin": null,
-      "rootJoin": null,
-      "qdrant_point_id": null,
-      "som_cluster": null
-    },
-    {
-      "source_ref": "docker/langgraph-synthesis/.venv/Lib/site-packages/plotly/package_data/templates/seaborn.json",
-      "feature_id": "templates",
-      "classification": "FEATURE_ID_JOIN",
-      "padJoin": "source_ref",
-      "ncpJoin": null,
-      "rrpJoin": null,
-      "appJoin": null,
-      "rootJoin": null,
-      "qdrant_point_id": null,
-      "som_cluster": null
-    },
-    {
-      "source_ref": "docker/langgraph-synthesis/.venv/Lib/site-packages/plotly/package_data/templates/simple_white.json",
-      "feature_id": "templates",
-      "classification": "FEATURE_ID_JOIN",
-      "padJoin": "source_ref",
-      "ncpJoin": null,
-      "rrpJoin": null,
-      "appJoin": null,
-      "rootJoin": null,
-      "qdrant_point_id": null,
-      "som_cluster": null
-    },
-    {
-      "source_ref": "docker/langgraph-synthesis/.venv/Lib/site-packages/plotly/package_data/templates/xgridoff.json",
-      "feature_id": "templates",
-      "classification": "FEATURE_ID_JOIN",
-      "padJoin": "source_ref",
-      "ncpJoin": null,
-      "rrpJoin": null,
-      "appJoin": null,
-      "rootJoin": null,
-      "qdrant_point_id": null,
-      "som_cluster": null
-    },
-    {
-      "source_ref": "docker/langgraph-synthesis/.venv/Lib/site-packages/plotly/package_data/templates/ygridoff.json",
-      "feature_id": "templates",
-      "classification": "FEATURE_ID_JOIN",
-      "padJoin": "source_ref",
-      "ncpJoin": null,
-      "rrpJoin": null,
-      "appJoin": null,
-      "rootJoin": null,
-      "qdrant_point_id": null,
-      "som_cluster": null
-    },
-    {
-      "source_ref": "docker/langgraph-synthesis/.venv/Lib/site-packages/plotly/package_data/widgetbundle.js",
-      "feature_id": "package_data",
-      "classification": "FEATURE_ID_JOIN",
-      "padJoin": "source_ref",
-      "ncpJoin": null,
-      "rrpJoin": null,
-      "appJoin": null,
-      "rootJoin": null,
-      "qdrant_point_id": null,
-      "som_cluster": null
-    },
-    {
-      "source_ref": "docker/langgraph-synthesis/.venv/Lib/site-packages/plotly/validators/_validators.json",
-      "feature_id": "validators",
-      "classification": "FEATURE_ID_JOIN",
-      "padJoin": "source_ref",
-      "ncpJoin": null,
-      "rrpJoin": null,
-      "appJoin": null,
-      "rootJoin": null,
-      "qdrant_point_id": null,
-      "som_cluster": null
-    },
-    {
-      "source_ref": "docker/langgraph-synthesis/.venv/Lib/site-packages/scipy/stats/tests/data/studentized_range_mpmath_ref.json",
-      "feature_id": "data",
-      "classification": "FEATURE_ID_JOIN",
-      "padJoin": "source_ref",
-      "ncpJoin": null,
-      "rrpJoin": null,
-      "appJoin": null,
-      "rootJoin": null,
-      "qdrant_point_id": null,
-      "som_cluster": null
-    },
-    {
-      "source_ref": "docker/langgraph-synthesis/.venv/Lib/site-packages/sklearn/utils/_repr_html/estimator.js",
-      "feature_id": "_repr_html",
-      "classification": "FEATURE_ID_JOIN",
-      "padJoin": "source_ref",
-      "ncpJoin": null,
-      "rrpJoin": null,
-      "appJoin": null,
-      "rootJoin": null,
-      "qdrant_point_id": null,
-      "som_cluster": null
-    },
-    {
-      "source_ref": "docker/langgraph-synthesis/.venv/Lib/site-packages/torch/utils/model_dump/code.js",
-      "feature_id": "model_dump",
-      "classification": "FEATURE_ID_JOIN",
-      "padJoin": "source_ref",
-      "ncpJoin": null,
-      "rrpJoin": null,
-      "appJoin": null,
-      "rootJoin": null,
-      "qdrant_point_id": null,
-      "som_cluster": null
-    },
-    {
-      "source_ref": "docker/langgraph-synthesis/.venv/Lib/site-packages/torch/utils/model_dump/htm.mjs",
-      "feature_id": "model_dump",
-      "classification": "FEATURE_ID_JOIN",
-      "padJoin": "source_ref",
-      "ncpJoin": null,
-      "rrpJoin": null,
-      "appJoin": null,
-      "rootJoin": null,
-      "qdrant_point_id": null,
-      "som_cluster": null
-    },
-    {
-      "source_ref": "docker/langgraph-synthesis/.venv/Lib/site-packages/torch/utils/model_dump/preact.mjs",
-      "feature_id": "model_dump",
-      "classification": "FEATURE_ID_JOIN",
-      "padJoin": "source_ref",
-      "ncpJoin": null,
-      "rrpJoin": null,
-      "appJoin": null,
-      "rootJoin": null,
-      "qdrant_point_id": null,
-      "som_cluster": null
-    },
-    {
-      "source_ref": "docker/langgraph-synthesis/.venv/Lib/site-packages/urllib3/contrib/emscripten/emscripten_fetch_worker.js",
-      "feature_id": "emscripten",
-      "classification": "FEATURE_ID_JOIN",
-      "padJoin": "source_ref",
-      "ncpJoin": null,
-      "rrpJoin": null,
-      "appJoin": null,
-      "rootJoin": null,
-      "qdrant_point_id": null,
-      "som_cluster": null
-    },
-    {
-      "source_ref": "docker/langgraph-synthesis/.venv/Lib/site-packages/uuid_utils-0.14.1.dist-info/sboms/uuid-utils.cyclonedx.json",
-      "feature_id": "sboms",
-      "classification": "FEATURE_ID_JOIN",
-      "padJoin": "source_ref",
-      "ncpJoin": null,
-      "rrpJoin": null,
-      "appJoin": null,
-      "rootJoin": null,
-      "qdrant_point_id": null,
-      "som_cluster": null
-    },
-    {
-      "source_ref": "docker/langgraph-synthesis/.venv/Lib/site-packages/win32com/test/testPyScriptlet.js",
-      "feature_id": "test",
-      "classification": "FEATURE_ID_JOIN",
-      "padJoin": "source_ref",
-      "ncpJoin": null,
-      "rrpJoin": null,
-      "appJoin": null,
-      "rootJoin": null,
-      "qdrant_point_id": null,
-      "som_cluster": null
-    },
-    {
-      "source_ref": "docker/langgraph-synthesis/.venv/Lib/site-packages/win32com/test/testxslt.js",
-      "feature_id": "test",
-      "classification": "FEATURE_ID_JOIN",
-      "padJoin": "source_ref",
-      "ncpJoin": null,
-      "rrpJoin": null,
-      "appJoin": null,
-      "rootJoin": null,
-      "qdrant_point_id": null,
-      "som_cluster": null
-    },
-    {
-      "source_ref": "docker/seaweedfs/s3.json",
-      "feature_id": "seaweedfs",
-      "classification": "FEATURE_ID_JOIN",
-      "padJoin": "source_ref",
-      "ncpJoin": null,
-      "rrpJoin": null,
-      "appJoin": null,
-      "rootJoin": null,
-      "qdrant_point_id": null,
-      "som_cluster": null
-    },
-    {
-      "source_ref": "drizzle/meta/0000_snapshot.json",
-      "feature_id": "meta",
-      "classification": "FEATURE_ID_JOIN",
-      "padJoin": "source_ref",
-      "ncpJoin": null,
-      "rrpJoin": null,
-      "appJoin": null,
-      "rootJoin": null,
-      "qdrant_point_id": null,
-      "som_cluster": null
-    },
-    {
-      "source_ref": "drizzle/meta/_journal.json",
-      "feature_id": "meta",
-      "classification": "FEATURE_ID_JOIN",
-      "padJoin": "source_ref",
-      "ncpJoin": null,
-      "rrpJoin": null,
-      "appJoin": null,
-      "rootJoin": null,
-      "qdrant_point_id": null,
-      "som_cluster": null
-    },
-    {
-      "source_ref": "drizzle/schema.ts",
-      "feature_id": "utility",
-      "classification": "HEURISTIC_LABEL_JOIN",
-      "padJoin": "source_ref",
-      "ncpJoin": null,
-      "rrpJoin": null,
-      "appJoin": null,
-      "rootJoin": null,
-      "qdrant_point_id": "693d32f1-e51f-762d-117a-d79a0b8abae9",
-      "som_cluster": "30"
-    },
-    {
-      "source_ref": "next_steps/active/SCHEMA_MANIFEST.json",
-      "feature_id": "active",
-      "classification": "FEATURE_ID_JOIN",
-      "padJoin": "source_ref",
-      "ncpJoin": null,
-      "rrpJoin": null,
-      "appJoin": null,
-      "rootJoin": null,
-      "qdrant_point_id": null,
-      "som_cluster": null
-    },
-    {
-      "source_ref": ".opencode/agents/atlas-context.md",
-      "feature_id": "utility",
-      "classification": "NO_JOIN",
-      "padJoin": null,
-      "ncpJoin": null,
-      "rrpJoin": null,
-      "appJoin": null,
-      "rootJoin": null,
-      "qdrant_point_id": "800174965",
-      "som_cluster": "61"
-    },
-    {
-      "source_ref": ".opencode/agents/hermes-ace.md",
-      "feature_id": "utility",
-      "classification": "NO_JOIN",
-      "padJoin": null,
-      "ncpJoin": null,
-      "rrpJoin": null,
-      "appJoin": null,
-      "rootJoin": null,
-      "qdrant_point_id": "469121334",
-      "som_cluster": "61"
-    },
-    {
-      "source_ref": ".opencode/agents/workspace-ready.md",
-      "feature_id": "utility",
-      "classification": "NO_JOIN",
-      "padJoin": null,
-      "ncpJoin": null,
-      "rrpJoin": null,
-      "appJoin": null,
-      "rootJoin": null,
-      "qdrant_point_id": "340955279",
-      "som_cluster": "30"
-    },
-    {
-      "source_ref": ".opencode/commands/ace-fallback-ladder.md",
-      "feature_id": "utility",
-      "classification": "NO_JOIN",
-      "padJoin": null,
-      "ncpJoin": null,
-      "rrpJoin": null,
-      "appJoin": null,
-      "rootJoin": null,
-      "qdrant_point_id": "1535629124",
-      "som_cluster": "61"
-    },
-    {
-      "source_ref": ".opencode/commands/graph-export-recover.md",
-      "feature_id": "utility",
-      "classification": "NO_JOIN",
-      "padJoin": null,
-      "ncpJoin": null,
-      "rrpJoin": null,
-      "appJoin": null,
-      "rootJoin": null,
-      "qdrant_point_id": "753110038",
-      "som_cluster": "30"
+      "rootFeatureId": "duckdb_analytics_lane",
+      "rootTitle": "duckdb_analytics_lane",
+      "classification": "ROOT_CONTRACT_ONLY",
+      "matches": []
     }
   ],
-  "sources": {
-    "appRegistry": "C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\docs\\atlas\\feature-registry.json",
-    "rootRegistry": "C:\\Users\\james\\Videos\\deeds-web-app\\docs\\atlas\\feature-registry.json",
-    "syncReport": "C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\docs\\reports\\parent-atlas-overlay-sync-report.json"
-  }
+  "appOnlyRows": [
+    {
+      "feature_id": "opencode_mcp_atlas__root",
+      "title": "opencode-mcp-atlas",
+      "classification": "APP_CODEBASE_INVENTORY",
+      "sourceRefs": [
+        "local:docs/ai-os/opencode-mcp-atlas.md#L1"
+      ],
+      "tags": []
+    },
+    {
+      "feature_id": "yorha_legal_ai_agentic_progress_log",
+      "title": "YoRHa Legal AI Agentic Progress Log",
+      "classification": "APP_CODEBASE_INVENTORY",
+      "sourceRefs": [
+        "local:docs/ai-os/progress-log.md#L1"
+      ],
+      "tags": []
+    },
+    {
+      "feature_id": "2026_05_22t20_15_00_000z_cache_trace_failed",
+      "title": "2026-05-22T20:15:00.000Z — cache_trace — failed",
+      "classification": "APP_CODEBASE_INVENTORY",
+      "sourceRefs": [
+        "local:docs/ai-os/progress-log.md#L5"
+      ],
+      "tags": []
+    },
+    {
+      "feature_id": "2026_05_22t20_16_00_000z_toon_packet_shape_partial",
+      "title": "2026-05-22T20:16:00.000Z — toon_packet_shape — partial",
+      "classification": "APP_CODEBASE_INVENTORY",
+      "sourceRefs": [
+        "local:docs/ai-os/progress-log.md#L13"
+      ],
+      "tags": []
+    },
+    {
+      "feature_id": "2026_05_22t20_17_00_000z_qdrant_payload_parity_partial",
+      "title": "2026-05-22T20:17:00.000Z — qdrant_payload_parity — partial",
+      "classification": "APP_CODEBASE_INVENTORY",
+      "sourceRefs": [
+        "local:docs/ai-os/progress-log.md#L21"
+      ],
+      "tags": []
+    },
+    {
+      "feature_id": "2026_05_22t20_18_00_000z_bifrost_cards_smoke_solved",
+      "title": "2026-05-22T20:18:00.000Z — bifrost_cards_smoke — solved",
+      "classification": "APP_CODEBASE_INVENTORY",
+      "sourceRefs": [
+        "local:docs/ai-os/progress-log.md#L29"
+      ],
+      "tags": []
+    },
+    {
+      "feature_id": "2026_05_22t20_19_00_000z_check_script_blocked",
+      "title": "2026-05-22T20:19:00.000Z — check_script — blocked",
+      "classification": "APP_CODEBASE_INVENTORY",
+      "sourceRefs": [
+        "local:docs/ai-os/progress-log.md#L37"
+      ],
+      "tags": []
+    },
+    {
+      "feature_id": "2026_05_22t20_20_00_000z_atlas_build_partial",
+      "title": "2026-05-22T20:20:00.000Z — atlas_build — partial",
+      "classification": "APP_CODEBASE_INVENTORY",
+      "sourceRefs": [
+        "local:docs/ai-os/progress-log.md#L45"
+      ],
+      "tags": []
+    },
+    {
+      "feature_id": "2026_05_23t03_28_26_412z_unknown_partial",
+      "title": "2026-05-23T03:28:26.412Z — unknown — partial",
+      "classification": "APP_CODEBASE_INVENTORY",
+      "sourceRefs": [
+        "local:docs/ai-os/progress-log.md#L53"
+      ],
+      "tags": []
+    },
+    {
+      "feature_id": "2026_05_23t03_29_33_989z_type_check_chat_stream_solved",
+      "title": "2026-05-23T03:29:33.989Z — type_check_chat_stream — solved",
+      "classification": "APP_CODEBASE_INVENTORY",
+      "sourceRefs": [
+        "local:docs/ai-os/progress-log.md#L61"
+      ],
+      "tags": []
+    },
+    {
+      "feature_id": "couchdb_mapreduce_atlas_ingestion__root",
+      "title": "couchdb-mapreduce-atlas-ingestion",
+      "classification": "APP_CODEBASE_INVENTORY",
+      "sourceRefs": [
+        "local:docs/architecture/couchdb-mapreduce-atlas-ingestion.md#L1"
+      ],
+      "tags": []
+    },
+    {
+      "feature_id": "couchdb_mapreduce_atlas_ingestion",
+      "title": "CouchDB MapReduce Atlas Ingestion",
+      "classification": "APP_CODEBASE_INVENTORY",
+      "sourceRefs": [
+        "local:docs/architecture/couchdb-mapreduce-atlas-ingestion.md#L11"
+      ],
+      "tags": []
+    },
+    {
+      "feature_id": "doc_types",
+      "title": "Doc Types",
+      "classification": "APP_CODEBASE_INVENTORY",
+      "sourceRefs": [
+        "local:docs/architecture/couchdb-mapreduce-atlas-ingestion.md#L15"
+      ],
+      "tags": []
+    },
+    {
+      "feature_id": "views",
+      "title": "Views",
+      "classification": "APP_CODEBASE_INVENTORY",
+      "sourceRefs": [
+        "local:docs/architecture/couchdb-mapreduce-atlas-ingestion.md#L23"
+      ],
+      "tags": []
+    },
+    {
+      "feature_id": "deepseek_engram_architecture_search__root",
+      "title": "deepseek-engram-architecture-search",
+      "classification": "APP_CODEBASE_INVENTORY",
+      "sourceRefs": [
+        "local:docs/architecture/deepseek-engram-architecture-search.md#L1"
+      ],
+      "tags": []
+    },
+    {
+      "feature_id": "deepseek_engram_architecture_search",
+      "title": "DeepSeek Engram Architecture Search",
+      "classification": "APP_CODEBASE_INVENTORY",
+      "sourceRefs": [
+        "local:docs/architecture/deepseek-engram-architecture-search.md#L14"
+      ],
+      "tags": []
+    },
+    {
+      "feature_id": "candidate_roles",
+      "title": "Candidate Roles",
+      "classification": "APP_CODEBASE_INVENTORY",
+      "sourceRefs": [
+        "local:docs/architecture/deepseek-engram-architecture-search.md#L27"
+      ],
+      "tags": []
+    },
+    {
+      "feature_id": "search_questions",
+      "title": "Search Questions",
+      "classification": "APP_CODEBASE_INVENTORY",
+      "sourceRefs": [
+        "local:docs/architecture/deepseek-engram-architecture-search.md#L35"
+      ],
+      "tags": []
+    },
+    {
+      "feature_id": "code_anchors_verified",
+      "title": "Code Anchors (Verified)",
+      "classification": "APP_CODEBASE_INVENTORY",
+      "sourceRefs": [
+        "local:docs/architecture/deepseek-engram-architecture-search.md#L42"
+      ],
+      "tags": []
+    },
+    {
+      "feature_id": "rule",
+      "title": "Rule",
+      "classification": "APP_CODEBASE_INVENTORY",
+      "sourceRefs": [
+        "local:docs/architecture/deepseek-engram-architecture-search.md#L48"
+      ],
+      "tags": []
+    },
+    {
+      "feature_id": "engram_plugin_memory_support__root",
+      "title": "engram-plugin-memory-support",
+      "classification": "APP_CODEBASE_INVENTORY",
+      "sourceRefs": [
+        "local:docs/architecture/engram-plugin-memory-support.md#L1"
+      ],
+      "tags": []
+    },
+    {
+      "feature_id": "engram_plugin_memory_support",
+      "title": "Engram Plugin Memory Support",
+      "classification": "APP_CODEBASE_INVENTORY",
+      "sourceRefs": [
+        "local:docs/architecture/engram-plugin-memory-support.md#L11"
+      ],
+      "tags": []
+    },
+    {
+      "feature_id": "intent",
+      "title": "Intent",
+      "classification": "APP_CODEBASE_INVENTORY",
+      "sourceRefs": [
+        "local:docs/architecture/engram-plugin-memory-support.md#L15"
+      ],
+      "tags": []
+    },
+    {
+      "feature_id": "research_stack",
+      "title": "Research Stack",
+      "classification": "APP_CODEBASE_INVENTORY",
+      "sourceRefs": [
+        "local:docs/architecture/engram-plugin-memory-support.md#L21"
+      ],
+      "tags": []
+    },
+    {
+      "feature_id": "existing_code_surface",
+      "title": "Existing Code Surface",
+      "classification": "APP_CODEBASE_INVENTORY",
+      "sourceRefs": [
+        "local:docs/architecture/engram-plugin-memory-support.md#L30"
+      ],
+      "tags": []
+    },
+    {
+      "feature_id": "adapter_shape",
+      "title": "Adapter Shape",
+      "classification": "APP_CODEBASE_INVENTORY",
+      "sourceRefs": [
+        "local:docs/architecture/engram-plugin-memory-support.md#L45"
+      ],
+      "tags": []
+    },
+    {
+      "feature_id": "rules",
+      "title": "Rules",
+      "classification": "APP_CODEBASE_INVENTORY",
+      "sourceRefs": [
+        "local:docs/architecture/engram-plugin-memory-support.md#L51"
+      ],
+      "tags": []
+    },
+    {
+      "feature_id": "legal_ai_parent_atlas_product_integration",
+      "title": "Legal-AI Parent Atlas Product Integration",
+      "classification": "APP_CODEBASE_INVENTORY",
+      "sourceRefs": [
+        "local:docs/architecture/legal-ai-parent-atlas-product-integration.md#L1"
+      ],
+      "tags": []
+    },
+    {
+      "feature_id": "legal_ai_parent_atlas_product_integration__overview",
+      "title": "Overview",
+      "classification": "APP_CODEBASE_INVENTORY",
+      "sourceRefs": [
+        "local:docs/architecture/legal-ai-parent-atlas-product-integration.md#L3"
+      ],
+      "tags": []
+    },
+    {
+      "feature_id": "retrieval_provenance_admin_copilot",
+      "title": "Retrieval Provenance (Admin Copilot)",
+      "classification": "APP_CODEBASE_INVENTORY",
+      "sourceRefs": [
+        "local:docs/architecture/legal-ai-parent-atlas-product-integration.md#L6"
+      ],
+      "tags": []
+    },
+    {
+      "feature_id": "surfaced_metadata",
+      "title": "Surfaced Metadata:",
+      "classification": "APP_CODEBASE_INVENTORY",
+      "sourceRefs": [
+        "local:docs/architecture/legal-ai-parent-atlas-product-integration.md#L9"
+      ],
+      "tags": []
+    },
+    {
+      "feature_id": "crimeanalysisservice_plan_only_mode",
+      "title": "CrimeAnalysisService: Plan-Only Mode",
+      "classification": "APP_CODEBASE_INVENTORY",
+      "sourceRefs": [
+        "local:docs/architecture/legal-ai-parent-atlas-product-integration.md#L21"
+      ],
+      "tags": []
+    },
+    {
+      "feature_id": "investigative_plan_structure",
+      "title": "Investigative Plan Structure:",
+      "classification": "APP_CODEBASE_INVENTORY",
+      "sourceRefs": [
+        "local:docs/architecture/legal-ai-parent-atlas-product-integration.md#L24"
+      ],
+      "tags": []
+    },
+    {
+      "feature_id": "implementation_status",
+      "title": "Implementation Status",
+      "classification": "APP_CODEBASE_INVENTORY",
+      "sourceRefs": [
+        "local:docs/architecture/legal-ai-parent-atlas-product-integration.md#L31",
+        "local:docs/architecture/legal-ai-parent-atlas-product-integration.md#L31-sha256:99833be093975bb4",
+        "local:docs/architecture/legal-ai-parent-atlas-product-integration.md#L32-sha256:fb1b10dae54d1e9b",
+        "local:docs/architecture/legal-ai-parent-atlas-product-integration.md#L33-sha256:2535658d5e00e39e",
+        "local:docs/architecture/legal-ai-parent-atlas-product-integration.md#L34-sha256:ea444a987c75de88"
+      ],
+      "tags": []
+    },
+    {
+      "feature_id": "llm_synthesis_ace_kag_memory_policy",
+      "title": "LLM Synthesis & ACE-KAG Memory Policy",
+      "classification": "APP_CODEBASE_INVENTORY",
+      "sourceRefs": [
+        "local:docs/architecture/llm-synthesis-memory-policy.md#L1"
+      ],
+      "tags": []
+    },
+    {
+      "feature_id": "1_executive_summary",
+      "title": "1. Executive Summary",
+      "classification": "APP_CODEBASE_INVENTORY",
+      "sourceRefs": [
+        "local:docs/architecture/llm-synthesis-memory-policy.md#L4"
+      ],
+      "tags": []
+    },
+    {
+      "feature_id": "2_storage_boundaries_hygiene",
+      "title": "2. Storage Boundaries & Hygiene",
+      "classification": "APP_CODEBASE_INVENTORY",
+      "sourceRefs": [
+        "local:docs/architecture/llm-synthesis-memory-policy.md#L10"
+      ],
+      "tags": []
+    },
+    {
+      "feature_id": "2_1_forbidden_data_classes",
+      "title": "2.1 Forbidden Data Classes",
+      "classification": "APP_CODEBASE_INVENTORY",
+      "sourceRefs": [
+        "local:docs/architecture/llm-synthesis-memory-policy.md#L14"
+      ],
+      "tags": []
+    },
+    {
+      "feature_id": "2_2_authorized_data_classes",
+      "title": "2.2 Authorized Data Classes",
+      "classification": "APP_CODEBASE_INVENTORY",
+      "sourceRefs": [
+        "local:docs/architecture/llm-synthesis-memory-policy.md#L21"
+      ],
+      "tags": []
+    },
+    {
+      "feature_id": "3_poly_storage_layer_mapping",
+      "title": "3. Poly-Storage Layer Mapping",
+      "classification": "APP_CODEBASE_INVENTORY",
+      "sourceRefs": [
+        "local:docs/architecture/llm-synthesis-memory-policy.md#L35"
+      ],
+      "tags": []
+    },
+    {
+      "feature_id": "3_1_qdrant_vector_databases",
+      "title": "3.1 Qdrant Vector Databases",
+      "classification": "APP_CODEBASE_INVENTORY",
+      "sourceRefs": [
+        "local:docs/architecture/llm-synthesis-memory-policy.md#L52"
+      ],
+      "tags": []
+    },
+    {
+      "feature_id": "3_2_neo4j_graph_database",
+      "title": "3.2 Neo4j Graph Database",
+      "classification": "APP_CODEBASE_INVENTORY",
+      "sourceRefs": [
+        "local:docs/architecture/llm-synthesis-memory-policy.md#L56"
+      ],
+      "tags": []
+    },
+    {
+      "feature_id": "3_4_postgresql_durable_audit_store",
+      "title": "3.4 PostgreSQL Durable Audit Store",
+      "classification": "APP_CODEBASE_INVENTORY",
+      "sourceRefs": [
+        "local:docs/architecture/llm-synthesis-memory-policy.md#L68"
+      ],
+      "tags": []
+    },
+    {
+      "feature_id": "4_libtorch_boundaries",
+      "title": "4. LibTorch Boundaries",
+      "classification": "APP_CODEBASE_INVENTORY",
+      "sourceRefs": [
+        "local:docs/architecture/llm-synthesis-memory-policy.md#L78"
+      ],
+      "tags": []
+    },
+    {
+      "feature_id": "5_telemetry_tele_tracing_pipeline",
+      "title": "5. Telemetry & Tele-Tracing Pipeline",
+      "classification": "APP_CODEBASE_INVENTORY",
+      "sourceRefs": [
+        "local:docs/architecture/llm-synthesis-memory-policy.md#L88"
+      ],
+      "tags": []
+    },
+    {
+      "feature_id": "neo4j_graphrag_parent_atlas__root",
+      "title": "neo4j-graphrag-parent-atlas",
+      "classification": "APP_CODEBASE_INVENTORY",
+      "sourceRefs": [
+        "local:docs/architecture/neo4j-graphrag-parent-atlas.md#L1"
+      ],
+      "tags": []
+    },
+    {
+      "feature_id": "neo4j_graphrag_parent_atlas",
+      "title": "Neo4j GraphRAG Parent Atlas",
+      "classification": "APP_CODEBASE_INVENTORY",
+      "sourceRefs": [
+        "local:docs/architecture/neo4j-graphrag-parent-atlas.md#L11"
+      ],
+      "tags": []
+    },
+    {
+      "feature_id": "owns",
+      "title": "Owns",
+      "classification": "APP_CODEBASE_INVENTORY",
+      "sourceRefs": [
+        "local:docs/architecture/neo4j-graphrag-parent-atlas.md#L15"
+      ],
+      "tags": []
+    },
+    {
+      "feature_id": "does_not_own",
+      "title": "Does Not Own",
+      "classification": "APP_CODEBASE_INVENTORY",
+      "sourceRefs": [
+        "local:docs/architecture/neo4j-graphrag-parent-atlas.md#L22"
+      ],
+      "tags": []
+    },
+    {
+      "feature_id": "parent_atlas_karpathy_pipeline__root",
+      "title": "parent-atlas-karpathy-pipeline",
+      "classification": "APP_CODEBASE_INVENTORY",
+      "sourceRefs": [
+        "local:docs/architecture/parent-atlas-karpathy-pipeline.md#L1"
+      ],
+      "tags": []
+    },
+    {
+      "feature_id": "parent_atlas_karpathy_pipeline",
+      "title": "Parent Atlas Karpathy Pipeline",
+      "classification": "APP_CODEBASE_INVENTORY",
+      "sourceRefs": [
+        "local:docs/architecture/parent-atlas-karpathy-pipeline.md#L14"
+      ],
+      "tags": []
+    },
+    {
+      "feature_id": "root_flow",
+      "title": "Root Flow",
+      "classification": "APP_CODEBASE_INVENTORY",
+      "sourceRefs": [
+        "local:docs/architecture/parent-atlas-karpathy-pipeline.md#L18"
+      ],
+      "tags": []
+    },
+    {
+      "feature_id": "staged_write_safety",
+      "title": "Staged Write Safety",
+      "classification": "APP_CODEBASE_INVENTORY",
+      "sourceRefs": [
+        "local:docs/architecture/parent-atlas-karpathy-pipeline.md#L30"
+      ],
+      "tags": []
+    },
+    {
+      "feature_id": "command_surface",
+      "title": "Command Surface",
+      "classification": "APP_CODEBASE_INVENTORY",
+      "sourceRefs": [
+        "local:docs/architecture/parent-atlas-karpathy-pipeline.md#L42"
+      ],
+      "tags": []
+    },
+    {
+      "feature_id": "parent_atlas_karpathy_pipeline__rule",
+      "title": "Rule",
+      "classification": "APP_CODEBASE_INVENTORY",
+      "sourceRefs": [
+        "local:docs/architecture/parent-atlas-karpathy-pipeline.md#L57"
+      ],
+      "tags": []
+    },
+    {
+      "feature_id": "pathway_cards_spec__root",
+      "title": "pathway-cards-spec",
+      "classification": "APP_CODEBASE_INVENTORY",
+      "sourceRefs": [
+        "local:docs/architecture/pathway-cards-spec.md#L1"
+      ],
+      "tags": []
+    },
+    {
+      "feature_id": "pathway_cards_architectural_specification",
+      "title": "Pathway Cards: Architectural Specification",
+      "classification": "APP_CODEBASE_INVENTORY",
+      "sourceRefs": [
+        "local:docs/architecture/pathway-cards-spec.md#L2"
+      ],
+      "tags": []
+    },
+    {
+      "feature_id": "pathway_cards_spec__overview",
+      "title": "Overview",
+      "classification": "APP_CODEBASE_INVENTORY",
+      "sourceRefs": [
+        "local:docs/architecture/pathway-cards-spec.md#L4"
+      ],
+      "tags": []
+    },
+    {
+      "feature_id": "data_structure",
+      "title": "Data Structure",
+      "classification": "APP_CODEBASE_INVENTORY",
+      "sourceRefs": [
+        "local:docs/architecture/pathway-cards-spec.md#L9"
+      ],
+      "tags": []
+    },
+    {
+      "feature_id": "lifecycle",
+      "title": "Lifecycle",
+      "classification": "APP_CODEBASE_INVENTORY",
+      "sourceRefs": [
+        "local:docs/architecture/pathway-cards-spec.md#L22"
+      ],
+      "tags": []
+    },
+    {
+      "feature_id": "integration_in_staged_retrieval",
+      "title": "Integration in Staged Retrieval",
+      "classification": "APP_CODEBASE_INVENTORY",
+      "sourceRefs": [
+        "local:docs/architecture/pathway-cards-spec.md#L27"
+      ],
+      "tags": []
+    },
+    {
+      "feature_id": "implementation_directives",
+      "title": "Implementation Directives",
+      "classification": "APP_CODEBASE_INVENTORY",
+      "sourceRefs": [
+        "local:docs/architecture/pathway-cards-spec.md#L36"
+      ],
+      "tags": []
+    },
+    {
+      "feature_id": "qdrant_search_contract__root",
+      "title": "qdrant-search-contract",
+      "classification": "APP_CODEBASE_INVENTORY",
+      "sourceRefs": [
+        "local:docs/architecture/qdrant-search-contract.md#L1"
+      ],
+      "tags": []
+    },
+    {
+      "feature_id": "rabbitmq_workflow_fabric",
+      "title": "RabbitMQ Workflow Fabric",
+      "classification": "APP_CODEBASE_INVENTORY",
+      "sourceRefs": [
+        "local:docs/architecture/rabbitmq-workflow-fabric.md#L1"
+      ],
+      "tags": []
+    },
+    {
+      "feature_id": "goal",
+      "title": "Goal",
+      "classification": "APP_CODEBASE_INVENTORY",
+      "sourceRefs": [
+        "local:docs/architecture/rabbitmq-workflow-fabric.md#L3"
+      ],
+      "tags": []
+    },
+    {
+      "feature_id": "runtime_lane",
+      "title": "Runtime Lane",
+      "classification": "APP_CODEBASE_INVENTORY",
+      "sourceRefs": [
+        "local:docs/architecture/rabbitmq-workflow-fabric.md#L7"
+      ],
+      "tags": []
+    },
+    {
+      "feature_id": "schema_proposal",
+      "title": "Schema Proposal",
+      "classification": "APP_CODEBASE_INVENTORY",
+      "sourceRefs": [
+        "local:docs/architecture/rabbitmq-workflow-fabric.md#L15"
+      ],
+      "tags": []
+    },
+    {
+      "feature_id": "workflow_runs",
+      "title": "`workflow_runs`",
+      "classification": "APP_CODEBASE_INVENTORY",
+      "sourceRefs": [
+        "local:docs/architecture/rabbitmq-workflow-fabric.md#L19"
+      ],
+      "tags": []
+    },
+    {
+      "feature_id": "workflow_steps",
+      "title": "`workflow_steps`",
+      "classification": "APP_CODEBASE_INVENTORY",
+      "sourceRefs": [
+        "local:docs/architecture/rabbitmq-workflow-fabric.md#L30"
+      ],
+      "tags": []
+    },
+    {
+      "feature_id": "fail_open_rule",
+      "title": "Fail-Open Rule",
+      "classification": "APP_CODEBASE_INVENTORY",
+      "sourceRefs": [
+        "local:docs/architecture/rabbitmq-workflow-fabric.md#L40"
+      ],
+      "tags": []
+    },
+    {
+      "feature_id": "non_goals",
+      "title": "Non-Goals",
+      "classification": "APP_CODEBASE_INVENTORY",
+      "sourceRefs": [
+        "local:docs/architecture/rabbitmq-workflow-fabric.md#L46"
+      ],
+      "tags": []
+    },
+    {
+      "feature_id": "retrieval_architecture",
+      "title": "Retrieval Architecture",
+      "classification": "APP_CODEBASE_INVENTORY",
+      "sourceRefs": [
+        "local:docs/architecture/retrieval-architecture.md#L1"
+      ],
+      "tags": []
+    },
+    {
+      "feature_id": "1_retrieval_stages",
+      "title": "1. Retrieval Stages",
+      "classification": "APP_CODEBASE_INVENTORY",
+      "sourceRefs": [
+        "local:docs/architecture/retrieval-architecture.md#L6"
+      ],
+      "tags": []
+    },
+    {
+      "feature_id": "sparse_gate",
+      "title": "Sparse gate",
+      "classification": "APP_CODEBASE_INVENTORY",
+      "sourceRefs": [
+        "local:docs/architecture/retrieval-architecture.md#L8"
+      ],
+      "tags": []
+    },
+    {
+      "feature_id": "dense_recall",
+      "title": "Dense recall",
+      "classification": "APP_CODEBASE_INVENTORY",
+      "sourceRefs": [
+        "local:docs/architecture/retrieval-architecture.md#L42"
+      ],
+      "tags": []
+    },
+    {
+      "feature_id": "graph_and_kag_expansion",
+      "title": "Graph and KAG expansion",
+      "classification": "APP_CODEBASE_INVENTORY",
+      "sourceRefs": [
+        "local:docs/architecture/retrieval-architecture.md#L61"
+      ],
+      "tags": []
+    },
+    {
+      "feature_id": "llm_synthesis",
+      "title": "LLM synthesis",
+      "classification": "APP_CODEBASE_INVENTORY",
+      "sourceRefs": [
+        "local:docs/architecture/retrieval-architecture.md#L78"
+      ],
+      "tags": []
+    },
+    {
+      "feature_id": "2_mcp_tool_selection",
+      "title": "2. MCP Tool Selection",
+      "classification": "APP_CODEBASE_INVENTORY",
+      "sourceRefs": [
+        "local:docs/architecture/retrieval-architecture.md#L95"
+      ],
+      "tags": []
+    },
+    {
+      "feature_id": "3_caching",
+      "title": "3. Caching",
+      "classification": "APP_CODEBASE_INVENTORY",
+      "sourceRefs": [
+        "local:docs/architecture/retrieval-architecture.md#L113"
+      ],
+      "tags": []
+    },
+    {
+      "feature_id": "4_pathways",
+      "title": "4. Pathways",
+      "classification": "APP_CODEBASE_INVENTORY",
+      "sourceRefs": [
+        "local:docs/architecture/retrieval-architecture.md#L127"
+      ],
+      "tags": []
+    },
+    {
+      "feature_id": "5_gpu_vs_metaphor",
+      "title": "5. GPU vs Metaphor",
+      "classification": "APP_CODEBASE_INVENTORY",
+      "sourceRefs": [
+        "local:docs/architecture/retrieval-architecture.md#L139"
+      ],
+      "tags": []
+    },
+    {
+      "feature_id": "6_operational_rule",
+      "title": "6. Operational Rule",
+      "classification": "APP_CODEBASE_INVENTORY",
+      "sourceRefs": [
+        "local:docs/architecture/retrieval-architecture.md#L172"
+      ],
+      "tags": []
+    },
+    {
+      "feature_id": "7_mental_model",
+      "title": "7. Mental Model",
+      "classification": "APP_CODEBASE_INVENTORY",
+      "sourceRefs": [
+        "local:docs/architecture/retrieval-architecture.md#L187"
+      ],
+      "tags": []
+    },
+    {
+      "feature_id": "8_action_tracker",
+      "title": "8. Action Tracker",
+      "classification": "APP_CODEBASE_INVENTORY",
+      "sourceRefs": [
+        "local:docs/architecture/retrieval-architecture.md#L197"
+      ],
+      "tags": []
+    },
+    {
+      "feature_id": "storage_tier_architecture_vector_retrieval_stack",
+      "title": "Storage Tier Architecture — Vector Retrieval Stack",
+      "classification": "APP_CODEBASE_INVENTORY",
+      "sourceRefs": [
+        "local:docs/architecture/storage-tier-schema.md#L1"
+      ],
+      "tags": []
+    },
+    {
+      "feature_id": "overview_4_layer_retrieval_stack",
+      "title": "Overview: 4-Layer Retrieval Stack",
+      "classification": "APP_CODEBASE_INVENTORY",
+      "sourceRefs": [
+        "local:docs/architecture/storage-tier-schema.md#L5"
+      ],
+      "tags": []
+    },
+    {
+      "feature_id": "scale_math_10m_legal_chunks",
+      "title": "Scale math (10M legal chunks)",
+      "classification": "APP_CODEBASE_INVENTORY",
+      "sourceRefs": [
+        "local:docs/architecture/storage-tier-schema.md#L48"
+      ],
+      "tags": []
+    },
+    {
+      "feature_id": "layer_2_warm_tier_compressed_64d_routing",
+      "title": "Layer 2: Warm Tier — Compressed 64d Routing",
+      "classification": "APP_CODEBASE_INVENTORY",
+      "sourceRefs": [
+        "local:docs/architecture/storage-tier-schema.md#L83"
+      ],
+      "tags": []
+    },
+    {
+      "feature_id": "new_tables_migration_drizzle_manual_20260516_storage_tier_routing_sql",
+      "title": "New tables (migration: `drizzle/manual/20260516_storage_tier_routing.sql`)",
+      "classification": "APP_CODEBASE_INVENTORY",
+      "sourceRefs": [
+        "local:docs/architecture/storage-tier-schema.md#L87"
+      ],
+      "tags": []
+    },
+    {
+      "feature_id": "new_columns_on_codebase_chunk_index",
+      "title": "New columns on `codebase_chunk_index`",
+      "classification": "APP_CODEBASE_INVENTORY",
+      "sourceRefs": [
+        "local:docs/architecture/storage-tier-schema.md#L111"
+      ],
+      "tags": []
+    },
+    {
+      "feature_id": "qdrant_payload_additions_per_point",
+      "title": "Qdrant payload additions (per point)",
+      "classification": "APP_CODEBASE_INVENTORY",
+      "sourceRefs": [
+        "local:docs/architecture/storage-tier-schema.md#L119"
+      ],
+      "tags": []
+    },
+    {
+      "feature_id": "layer_4_graph_tier_neo4j_couchdb",
+      "title": "Layer 4: Graph Tier — Neo4j / CouchDB",
+      "classification": "APP_CODEBASE_INVENTORY",
+      "sourceRefs": [
+        "local:docs/architecture/storage-tier-schema.md#L148"
+      ],
+      "tags": []
+    },
+    {
+      "feature_id": "existing_edges_used",
+      "title": "Existing edges used",
+      "classification": "APP_CODEBASE_INVENTORY",
+      "sourceRefs": [
+        "local:docs/architecture/storage-tier-schema.md#L152"
+      ],
+      "tags": []
+    },
+    {
+      "feature_id": "new_edge_belongs_to_centroid",
+      "title": "New edge: `BELONGS_TO_CENTROID`",
+      "classification": "APP_CODEBASE_INVENTORY",
+      "sourceRefs": [
+        "local:docs/architecture/storage-tier-schema.md#L158"
+      ],
+      "tags": []
+    },
+    {
+      "feature_id": "data_ingestion_pipeline",
+      "title": "Data Ingestion Pipeline",
+      "classification": "APP_CODEBASE_INVENTORY",
+      "sourceRefs": [
+        "local:docs/architecture/storage-tier-schema.md#L171"
+      ],
+      "tags": []
+    },
+    {
+      "feature_id": "query_retrieval_pipeline",
+      "title": "Query Retrieval Pipeline",
+      "classification": "APP_CODEBASE_INVENTORY",
+      "sourceRefs": [
+        "local:docs/architecture/storage-tier-schema.md#L199"
+      ],
+      "tags": []
+    },
+    {
+      "feature_id": "autoencoder_status",
+      "title": "Autoencoder Status",
+      "classification": "APP_CODEBASE_INVENTORY",
+      "sourceRefs": [
+        "local:docs/architecture/storage-tier-schema.md#L233"
+      ],
+      "tags": []
+    },
+    {
+      "feature_id": "related_files",
+      "title": "Related Files",
+      "classification": "APP_CODEBASE_INVENTORY",
+      "sourceRefs": [
+        "local:docs/architecture/storage-tier-schema.md#L244"
+      ],
+      "tags": []
+    },
+    {
+      "feature_id": "subgraph_instruction_programming_kag_ace_topology",
+      "title": "Subgraph Instruction Programming + KAG/ACE Topology",
+      "classification": "APP_CODEBASE_INVENTORY",
+      "sourceRefs": [
+        "local:docs/architecture/subgraph-instruction-programming-kag-ace-topology.md#L1"
+      ],
+      "tags": []
+    },
+    {
+      "feature_id": "system_boundary",
+      "title": "System Boundary",
+      "classification": "APP_CODEBASE_INVENTORY",
+      "sourceRefs": [
+        "local:docs/architecture/subgraph-instruction-programming-kag-ace-topology.md#L6"
+      ],
+      "tags": []
+    },
+    {
+      "feature_id": "rendering_language_and_state_model",
+      "title": "Rendering, Language, and State Model",
+      "classification": "APP_CODEBASE_INVENTORY",
+      "sourceRefs": [
+        "local:docs/architecture/subgraph-instruction-programming-kag-ace-topology.md#L13"
+      ],
+      "tags": []
+    },
+    {
+      "feature_id": "presentation_layer",
+      "title": "Presentation Layer",
+      "classification": "APP_CODEBASE_INVENTORY",
+      "sourceRefs": [
+        "local:docs/architecture/subgraph-instruction-programming-kag-ace-topology.md#L62"
+      ],
+      "tags": []
+    },
+    {
+      "feature_id": "language_and_ui_stack",
+      "title": "Language and UI Stack",
+      "classification": "APP_CODEBASE_INVENTORY",
+      "sourceRefs": [
+        "local:docs/architecture/subgraph-instruction-programming-kag-ace-topology.md#L68"
+      ],
+      "tags": []
+    },
+    {
+      "feature_id": "form_and_validation_layer",
+      "title": "Form and Validation Layer",
+      "classification": "APP_CODEBASE_INVENTORY",
+      "sourceRefs": [
+        "local:docs/architecture/subgraph-instruction-programming-kag-ace-topology.md#L75"
+      ],
+      "tags": []
+    },
+    {
+      "feature_id": "truth_layer",
+      "title": "Truth Layer",
+      "classification": "APP_CODEBASE_INVENTORY",
+      "sourceRefs": [
+        "local:docs/architecture/subgraph-instruction-programming-kag-ace-topology.md#L80"
+      ],
+      "tags": []
+    },
+    {
+      "feature_id": "feature_map_context",
+      "title": "Feature Map Context",
+      "classification": "APP_CODEBASE_INVENTORY",
+      "sourceRefs": [
+        "local:docs/architecture/subgraph-instruction-programming-kag-ace-topology.md#L91"
+      ],
+      "tags": []
+    },
+    {
+      "feature_id": "subgraph_rendering_rules",
+      "title": "Subgraph Rendering Rules",
+      "classification": "APP_CODEBASE_INVENTORY",
+      "sourceRefs": [
+        "local:docs/architecture/subgraph-instruction-programming-kag-ace-topology.md#L100"
+      ],
+      "tags": []
+    },
+    {
+      "feature_id": "sidecar_layer",
+      "title": "Sidecar Layer",
+      "classification": "APP_CODEBASE_INVENTORY",
+      "sourceRefs": [
+        "local:docs/architecture/subgraph-instruction-programming-kag-ace-topology.md#L129"
+      ],
+      "tags": []
+    },
+    {
+      "feature_id": "core_workflows",
+      "title": "Core Workflows",
+      "classification": "APP_CODEBASE_INVENTORY",
+      "sourceRefs": [
+        "local:docs/architecture/subgraph-instruction-programming-kag-ace-topology.md#L134"
+      ],
+      "tags": []
+    },
+    {
+      "feature_id": "data_roles",
+      "title": "Data Roles",
+      "classification": "APP_CODEBASE_INVENTORY",
+      "sourceRefs": [
+        "local:docs/architecture/subgraph-instruction-programming-kag-ace-topology.md#L142"
+      ],
+      "tags": []
+    },
+    {
+      "feature_id": "subgraph_instruction_programming_kag_ace_topology__non_goals",
+      "title": "Non-Goals",
+      "classification": "APP_CODEBASE_INVENTORY",
+      "sourceRefs": [
+        "local:docs/architecture/subgraph-instruction-programming-kag-ace-topology.md#L150"
+      ],
+      "tags": []
+    },
+    {
+      "feature_id": "implementation_guidance",
+      "title": "Implementation Guidance",
+      "classification": "APP_CODEBASE_INVENTORY",
+      "sourceRefs": [
+        "local:docs/architecture/subgraph-instruction-programming-kag-ace-topology.md#L156"
+      ],
+      "tags": []
+    },
+    {
+      "feature_id": "verification_criteria",
+      "title": "Verification Criteria",
+      "classification": "APP_CODEBASE_INVENTORY",
+      "sourceRefs": [
+        "local:docs/architecture/subgraph-instruction-programming-kag-ace-topology.md#L163"
+      ],
+      "tags": []
+    },
+    {
+      "feature_id": "companion_artifact",
+      "title": "Companion Artifact",
+      "classification": "APP_CODEBASE_INVENTORY",
+      "sourceRefs": [
+        "local:docs/architecture/subgraph-instruction-programming-kag-ace-topology.md#L190"
+      ],
+      "tags": []
+    },
+    {
+      "feature_id": "trace_karpathy_web_development_guide",
+      "title": "TRACE/Karpathy Web Development Guide",
+      "classification": "APP_CODEBASE_INVENTORY",
+      "sourceRefs": [
+        "local:docs/architecture/trace-kag-web-development-guide.md#L1"
+      ],
+      "tags": []
+    },
+    {
+      "feature_id": "1_goals",
+      "title": "1. Goals",
+      "classification": "APP_CODEBASE_INVENTORY",
+      "sourceRefs": [
+        "local:docs/architecture/trace-kag-web-development-guide.md#L3"
+      ],
+      "tags": []
+    },
+    {
+      "feature_id": "2_runtime_split",
+      "title": "2. Runtime Split",
+      "classification": "APP_CODEBASE_INVENTORY",
+      "sourceRefs": [
+        "local:docs/architecture/trace-kag-web-development-guide.md#L6"
+      ],
+      "tags": []
+    },
+    {
+      "feature_id": "3_rag_hyperrag_kag_dag_trace",
+      "title": "3. RAG / HyperRAG / KAG / DAG / TRACE",
+      "classification": "APP_CODEBASE_INVENTORY",
+      "sourceRefs": [
+        "local:docs/architecture/trace-kag-web-development-guide.md#L9"
+      ],
+      "tags": []
+    },
+    {
+      "feature_id": "4_sveltekit_route_pattern",
+      "title": "4. SvelteKit Route Pattern",
+      "classification": "APP_CODEBASE_INVENTORY",
+      "sourceRefs": [
+        "local:docs/architecture/trace-kag-web-development-guide.md#L16"
+      ],
+      "tags": []
+    },
+    {
+      "feature_id": "5_drizzle_postgres",
+      "title": "5. Drizzle + Postgres",
+      "classification": "APP_CODEBASE_INVENTORY",
+      "sourceRefs": [
+        "local:docs/architecture/trace-kag-web-development-guide.md#L23"
+      ],
+      "tags": []
+    },
+    {
+      "feature_id": "6_object_storage",
+      "title": "6. Object Storage",
+      "classification": "APP_CODEBASE_INVENTORY",
+      "sourceRefs": [
+        "local:docs/architecture/trace-kag-web-development-guide.md#L26"
+      ],
+      "tags": []
+    },
+    {
+      "feature_id": "7_qdrant_collections",
+      "title": "7. Qdrant Collections",
+      "classification": "APP_CODEBASE_INVENTORY",
+      "sourceRefs": [
+        "local:docs/architecture/trace-kag-web-development-guide.md#L29"
+      ],
+      "tags": []
+    },
+    {
+      "feature_id": "8_neo4j_graph_model",
+      "title": "8. Neo4j Graph Model",
+      "classification": "APP_CODEBASE_INVENTORY",
+      "sourceRefs": [
+        "local:docs/architecture/trace-kag-web-development-guide.md#L37"
+      ],
+      "tags": []
+    },
+    {
+      "feature_id": "9_redis_cache_keys",
+      "title": "9. Redis Cache Keys",
+      "classification": "APP_CODEBASE_INVENTORY",
+      "sourceRefs": [
+        "local:docs/architecture/trace-kag-web-development-guide.md#L43"
+      ],
+      "tags": []
+    },
+    {
+      "feature_id": "10_mcp_tool_boundary",
+      "title": "10. MCP Tool Boundary",
+      "classification": "APP_CODEBASE_INVENTORY",
+      "sourceRefs": [
+        "local:docs/architecture/trace-kag-web-development-guide.md#L51"
+      ],
+      "tags": []
+    },
+    {
+      "feature_id": "11_worker_threads",
+      "title": "11. Worker Threads",
+      "classification": "APP_CODEBASE_INVENTORY",
+      "sourceRefs": [
+        "local:docs/architecture/trace-kag-web-development-guide.md#L54"
+      ],
+      "tags": []
+    },
+    {
+      "feature_id": "12_gpu_rules",
+      "title": "12. GPU Rules",
+      "classification": "APP_CODEBASE_INVENTORY",
+      "sourceRefs": [
+        "local:docs/architecture/trace-kag-web-development-guide.md#L57"
+      ],
+      "tags": []
+    },
+    {
+      "feature_id": "13_gemma4_rules",
+      "title": "13. Gemma4 Rules",
+      "classification": "APP_CODEBASE_INVENTORY",
+      "sourceRefs": [
+        "local:docs/architecture/trace-kag-web-development-guide.md#L60"
+      ],
+      "tags": []
+    },
+    {
+      "feature_id": "14_obsidian_karpathy_memory",
+      "title": "14. Obsidian/Karpathy Memory",
+      "classification": "APP_CODEBASE_INVENTORY",
+      "sourceRefs": [
+        "local:docs/architecture/trace-kag-web-development-guide.md#L63"
+      ],
+      "tags": []
+    },
+    {
+      "feature_id": "15_testing",
+      "title": "15. Testing",
+      "classification": "APP_CODEBASE_INVENTORY",
+      "sourceRefs": [
+        "local:docs/architecture/trace-kag-web-development-guide.md#L66"
+      ],
+      "tags": []
+    },
+    {
+      "feature_id": "trace_runtime_split__root",
+      "title": "trace-runtime-split",
+      "classification": "APP_CODEBASE_INVENTORY",
+      "sourceRefs": [
+        "local:docs/architecture/trace-runtime-split.md#L1"
+      ],
+      "tags": []
+    },
+    {
+      "feature_id": "boundary_rule",
+      "title": "Boundary Rule",
+      "classification": "APP_CODEBASE_INVENTORY",
+      "sourceRefs": [
+        "local:docs/architecture/trace-runtime-split.md#L31"
+      ],
+      "tags": []
+    },
+    {
+      "feature_id": "how_to_add_a_new_llm_tool",
+      "title": "How to Add a New LLM Tool",
+      "classification": "APP_CODEBASE_INVENTORY",
+      "sourceRefs": [
+        "local:docs/architecture/trace-runtime-split.md#L53"
+      ],
+      "tags": []
+    },
+    {
+      "feature_id": "vram_hygiene_workstation_gpu_memory_policy",
+      "title": "VRAM Hygiene & Workstation GPU Memory Policy",
+      "classification": "APP_CODEBASE_INVENTORY",
+      "sourceRefs": [
+        "local:docs/architecture/vram-hygiene-policy.md#L1"
+      ],
+      "tags": []
+    },
+    {
+      "feature_id": "2_rtx_3060_ti_8gb_memory_allocation_budget",
+      "title": "2. RTX 3060 Ti 8GB Memory Allocation Budget",
+      "classification": "APP_CODEBASE_INVENTORY",
+      "sourceRefs": [
+        "local:docs/architecture/vram-hygiene-policy.md#L16"
+      ],
+      "tags": []
+    },
+    {
+      "feature_id": "3_concurrency_governance_thread_locks",
+      "title": "3. Concurrency Governance & Thread Locks",
+      "classification": "APP_CODEBASE_INVENTORY",
+      "sourceRefs": [
+        "local:docs/architecture/vram-hygiene-policy.md#L31"
+      ],
+      "tags": []
+    },
+    {
+      "feature_id": "4_in_situ_cpu_fallback_policy",
+      "title": "4. In-Situ CPU Fallback Policy",
+      "classification": "APP_CODEBASE_INVENTORY",
+      "sourceRefs": [
+        "local:docs/architecture/vram-hygiene-policy.md#L41"
+      ],
+      "tags": []
+    },
+    {
+      "feature_id": "architecture_integration_guide_component_data_and_state_flow",
+      "title": "Architecture Integration Guide: Component, Data, and State Flow",
+      "classification": "APP_CODEBASE_INVENTORY",
+      "sourceRefs": [
+        "local:docs/ARCHITECTURE_GUIDE_V1.md#L1"
+      ],
+      "tags": []
+    },
+    {
+      "feature_id": "1_component_layer_rules_svelte_5_bits_ui",
+      "title": "1. Component Layer Rules (Svelte 5 & Bits UI)",
+      "classification": "APP_CODEBASE_INVENTORY",
+      "sourceRefs": [
+        "local:docs/ARCHITECTURE_GUIDE_V1.md#L7"
+      ],
+      "tags": []
+    },
+    {
+      "feature_id": "2_data_access_rules_mcp_to_gemma4_trace",
+      "title": "2. Data Access Rules (MCP $\\to$ Gemma4/Trace)",
+      "classification": "APP_CODEBASE_INVENTORY",
+      "sourceRefs": [
+        "local:docs/ARCHITECTURE_GUIDE_V1.md#L17"
+      ],
+      "tags": []
+    },
+    {
+      "feature_id": "4_tooling_integration_pattern_example",
+      "title": "4. Tooling Integration Pattern Example",
+      "classification": "APP_CODEBASE_INVENTORY",
+      "sourceRefs": [
+        "local:docs/ARCHITECTURE_GUIDE_V1.md#L33"
+      ],
+      "tags": []
+    },
+    {
+      "feature_id": "enhanced_bits_integration_analysis_report",
+      "title": "Enhanced Bits Integration Analysis Report",
+      "classification": "APP_CODEBASE_INVENTORY",
+      "sourceRefs": [
+        "local:docs/ARCHITECTURE_GUIDE_V2_ENHANCED_BITS_INTEGRATION.md#L1"
+      ],
+      "tags": []
+    },
+    {
+      "feature_id": "1_architectural_status",
+      "title": "1. Architectural Status",
+      "classification": "APP_CODEBASE_INVENTORY",
+      "sourceRefs": [
+        "local:docs/ARCHITECTURE_GUIDE_V2_ENHANCED_BITS_INTEGRATION.md#L5"
+      ],
+      "tags": []
+    },
+    {
+      "feature_id": "2_cross_reference_mappings",
+      "title": "2. Cross-Reference Mappings",
+      "classification": "APP_CODEBASE_INVENTORY",
+      "sourceRefs": [
+        "local:docs/ARCHITECTURE_GUIDE_V2_ENHANCED_BITS_INTEGRATION.md#L14"
+      ],
+      "tags": []
+    },
+    {
+      "feature_id": "3_actionable_recommendations_build_mode",
+      "title": "3. Actionable Recommendations (Build Mode)",
+      "classification": "APP_CODEBASE_INVENTORY",
+      "sourceRefs": [
+        "local:docs/ARCHITECTURE_GUIDE_V2_ENHANCED_BITS_INTEGRATION.md#L23"
+      ],
+      "tags": []
+    },
+    {
+      "feature_id": "crud_operations_audit_april_9_2026",
+      "title": "CRUD Operations Audit (April 9, 2026)",
+      "classification": "APP_CODEBASE_INVENTORY",
+      "sourceRefs": [
+        "local:docs/archive/CRUD_OPERATIONS_AUDIT.md#L1"
+      ],
+      "tags": []
+    },
+    {
+      "feature_id": "executive_summary_all_crud_routes_verified",
+      "title": "Executive Summary: All CRUD Routes Verified",
+      "classification": "APP_CODEBASE_INVENTORY",
+      "sourceRefs": [
+        "local:docs/archive/CRUD_OPERATIONS_AUDIT.md#L3"
+      ],
+      "tags": []
+    },
+    {
+      "feature_id": "critical_bug_found_poi_photo_upload_not_saving",
+      "title": "🐛 Critical Bug Found: POI Photo Upload Not Saving",
+      "classification": "APP_CODEBASE_INVENTORY",
+      "sourceRefs": [
+        "local:docs/archive/CRUD_OPERATIONS_AUDIT.md#L11"
+      ],
+      "tags": []
+    },
+    {
+      "feature_id": "location_api_persons_of_interest_id_photos_server_ts",
+      "title": "Location: `/api/persons-of-interest/[id]/photos/+server.ts`",
+      "classification": "APP_CODEBASE_INVENTORY",
+      "sourceRefs": [
+        "local:docs/archive/CRUD_OPERATIONS_AUDIT.md#L13"
+      ],
+      "tags": []
+    },
+    {
+      "feature_id": "complete_crud_audit_by_feature",
+      "title": "📋 Complete CRUD Audit by Feature",
+      "classification": "APP_CODEBASE_INVENTORY",
+      "sourceRefs": [
+        "local:docs/archive/CRUD_OPERATIONS_AUDIT.md#L57"
+      ],
+      "tags": []
+    },
+    {
+      "feature_id": "1_evidence_upload_pipeline",
+      "title": "1. Evidence Upload Pipeline",
+      "classification": "APP_CODEBASE_INVENTORY",
+      "sourceRefs": [
+        "local:docs/archive/CRUD_OPERATIONS_AUDIT.md#L59"
+      ],
+      "tags": []
+    },
+    {
+      "feature_id": "2_poi_photos_pipeline_broken",
+      "title": "2. POI Photos Pipeline ❌ **BROKEN**",
+      "classification": "APP_CODEBASE_INVENTORY",
+      "sourceRefs": [
+        "local:docs/archive/CRUD_OPERATIONS_AUDIT.md#L86"
+      ],
+      "tags": []
+    },
+    {
+      "feature_id": "3_persons_of_interest_crud",
+      "title": "3. Persons of Interest CRUD",
+      "classification": "APP_CODEBASE_INVENTORY",
+      "sourceRefs": [
+        "local:docs/archive/CRUD_OPERATIONS_AUDIT.md#L116"
+      ],
+      "tags": []
+    },
+    {
+      "feature_id": "4_cases_crud",
+      "title": "4. Cases CRUD",
+      "classification": "APP_CODEBASE_INVENTORY",
+      "sourceRefs": [
+        "local:docs/archive/CRUD_OPERATIONS_AUDIT.md#L135"
+      ],
+      "tags": []
+    },
+    {
+      "feature_id": "5_gpu_audit_operations_new",
+      "title": "5. GPU Audit Operations (NEW)",
+      "classification": "APP_CODEBASE_INVENTORY",
+      "sourceRefs": [
+        "local:docs/archive/CRUD_OPERATIONS_AUDIT.md#L151"
+      ],
+      "tags": []
+    },
+    {
+      "feature_id": "6_citation_collections_crud",
+      "title": "6. Citation Collections CRUD",
+      "classification": "APP_CODEBASE_INVENTORY",
+      "sourceRefs": [
+        "local:docs/archive/CRUD_OPERATIONS_AUDIT.md#L164"
+      ],
+      "tags": []
+    },
+    {
+      "feature_id": "7_knowledge_base_operations",
+      "title": "7. Knowledge Base Operations",
+      "classification": "APP_CODEBASE_INVENTORY",
+      "sourceRefs": [
+        "local:docs/archive/CRUD_OPERATIONS_AUDIT.md#L179"
+      ],
+      "tags": []
+    },
+    {
+      "feature_id": "bug_fix_plan",
+      "title": "🔧 Bug Fix Plan",
+      "classification": "APP_CODEBASE_INVENTORY",
+      "sourceRefs": [
+        "local:docs/archive/CRUD_OPERATIONS_AUDIT.md#L193"
+      ],
+      "tags": []
+    },
+    {
+      "feature_id": "priority_1_poi_photo_upload_30_minutes",
+      "title": "Priority 1: POI Photo Upload (30 minutes)",
+      "classification": "APP_CODEBASE_INVENTORY",
+      "sourceRefs": [
+        "local:docs/archive/CRUD_OPERATIONS_AUDIT.md#L195"
+      ],
+      "tags": []
+    },
+    {
+      "feature_id": "priority_2_evidence_upload_ui_1_hour",
+      "title": "Priority 2: Evidence Upload UI (1 hour)",
+      "classification": "APP_CODEBASE_INVENTORY",
+      "sourceRefs": [
+        "local:docs/archive/CRUD_OPERATIONS_AUDIT.md#L234"
+      ],
+      "tags": []
+    },
+    {
+      "feature_id": "priority_3_list_reports_endpoint_15_minutes",
+      "title": "Priority 3: List Reports Endpoint (15 minutes)",
+      "classification": "APP_CODEBASE_INVENTORY",
+      "sourceRefs": [
+        "local:docs/archive/CRUD_OPERATIONS_AUDIT.md#L250"
+      ],
+      "tags": []
+    },
+    {
+      "feature_id": "crud_health_matrix",
+      "title": "📊 CRUD Health Matrix",
+      "classification": "APP_CODEBASE_INVENTORY",
+      "sourceRefs": [
+        "local:docs/archive/CRUD_OPERATIONS_AUDIT.md#L277"
+      ],
+      "tags": []
+    },
+    {
+      "feature_id": "by_feature",
+      "title": "By Feature",
+      "classification": "APP_CODEBASE_INVENTORY",
+      "sourceRefs": [
+        "local:docs/archive/CRUD_OPERATIONS_AUDIT.md#L279"
+      ],
+      "tags": []
+    },
+    {
+      "feature_id": "by_http_method_all_386_routes",
+      "title": "By HTTP Method (All 386 Routes)",
+      "classification": "APP_CODEBASE_INVENTORY",
+      "sourceRefs": [
+        "local:docs/archive/CRUD_OPERATIONS_AUDIT.md#L292"
+      ],
+      "tags": []
+    },
+    {
+      "feature_id": "test_commands",
+      "title": "🧪 Test Commands",
+      "classification": "APP_CODEBASE_INVENTORY",
+      "sourceRefs": [
+        "local:docs/archive/CRUD_OPERATIONS_AUDIT.md#L305"
+      ],
+      "tags": []
+    },
+    {
+      "feature_id": "poi_photo_upload_currently_broken",
+      "title": "POI Photo Upload (Currently Broken)",
+      "classification": "APP_CODEBASE_INVENTORY",
+      "sourceRefs": [
+        "local:docs/archive/CRUD_OPERATIONS_AUDIT.md#L307"
+      ],
+      "tags": []
+    },
+    {
+      "feature_id": "1_create_poi",
+      "title": "1. Create POI",
+      "classification": "APP_CODEBASE_INVENTORY",
+      "sourceRefs": [
+        "local:docs/archive/CRUD_OPERATIONS_AUDIT.md#L310"
+      ],
+      "tags": []
+    },
+    {
+      "feature_id": "returns_id_uuid_name_john_doe",
+      "title": "Returns: { id: \"uuid\", name: \"John Doe\" }",
+      "classification": "APP_CODEBASE_INVENTORY",
+      "sourceRefs": [
+        "local:docs/archive/CRUD_OPERATIONS_AUDIT.md#L315"
+      ],
+      "tags": []
+    },
+    {
+      "feature_id": "2_upload_photo",
+      "title": "2. Upload photo",
+      "classification": "APP_CODEBASE_INVENTORY",
+      "sourceRefs": [
+        "local:docs/archive/CRUD_OPERATIONS_AUDIT.md#L317"
+      ],
+      "tags": []
+    },
+    {
+      "feature_id": "returns_success_true_photo",
+      "title": "Returns: { success: true, photo: {...} }",
+      "classification": "APP_CODEBASE_INVENTORY",
+      "sourceRefs": [
+        "local:docs/archive/CRUD_OPERATIONS_AUDIT.md#L321"
+      ],
+      "tags": []
+    },
+    {
+      "feature_id": "3_check_qdrant_poi_profiles_currently_fails_with_vector_error",
+      "title": "3. Check Qdrant poi_profiles (CURRENTLY FAILS with vector error)",
+      "classification": "APP_CODEBASE_INVENTORY",
+      "sourceRefs": [
+        "local:docs/archive/CRUD_OPERATIONS_AUDIT.md#L323"
+      ],
+      "tags": []
+    },
+    {
+      "feature_id": "expected_photo_embedding_stored_in_poi_profiles_collection",
+      "title": "Expected: Photo embedding stored in poi_profiles collection",
+      "classification": "APP_CODEBASE_INVENTORY",
+      "sourceRefs": [
+        "local:docs/archive/CRUD_OPERATIONS_AUDIT.md#L324"
+      ],
+      "tags": []
+    },
+    {
+      "feature_id": "actual_error_due_to_vector_format_bug",
+      "title": "Actual: Error due to vector format bug",
+      "classification": "APP_CODEBASE_INVENTORY",
+      "sourceRefs": [
+        "local:docs/archive/CRUD_OPERATIONS_AUDIT.md#L325"
+      ],
+      "tags": []
+    },
+    {
+      "feature_id": "after_fix_verify",
+      "title": "After fix, verify:",
+      "classification": "APP_CODEBASE_INVENTORY",
+      "sourceRefs": [
+        "local:docs/archive/CRUD_OPERATIONS_AUDIT.md#L327"
+      ],
+      "tags": []
+    },
+    {
+      "feature_id": "should_return_the_photo_caption_embedding",
+      "title": "Should return the photo caption embedding",
+      "classification": "APP_CODEBASE_INVENTORY",
+      "sourceRefs": [
+        "local:docs/archive/CRUD_OPERATIONS_AUDIT.md#L334"
+      ],
+      "tags": []
+    },
+    {
+      "feature_id": "evidence_upload_working_but_ui_missing",
+      "title": "Evidence Upload (Working but UI missing)",
+      "classification": "APP_CODEBASE_INVENTORY",
+      "sourceRefs": [
+        "local:docs/archive/CRUD_OPERATIONS_AUDIT.md#L337"
+      ],
+      "tags": []
+    },
+    {
+      "feature_id": "1_create_case",
+      "title": "1. Create case",
+      "classification": "APP_CODEBASE_INVENTORY",
+      "sourceRefs": [
+        "local:docs/archive/CRUD_OPERATIONS_AUDIT.md#L340"
+      ],
+      "tags": []
+    },
+    {
+      "feature_id": "2_upload_evidence",
+      "title": "2. Upload evidence",
+      "classification": "APP_CODEBASE_INVENTORY",
+      "sourceRefs": [
+        "local:docs/archive/CRUD_OPERATIONS_AUDIT.md#L350"
+      ],
+      "tags": []
+    },
+    {
+      "feature_id": "returns_evidenceid_extracted_text_chunks",
+      "title": "Returns: { evidenceId, extracted_text, chunks }",
+      "classification": "APP_CODEBASE_INVENTORY",
+      "sourceRefs": [
+        "local:docs/archive/CRUD_OPERATIONS_AUDIT.md#L355"
+      ],
+      "tags": []
+    },
+    {
+      "feature_id": "3_check_qdrant_evidence_items_works",
+      "title": "3. Check Qdrant evidence_items (WORKS)",
+      "classification": "APP_CODEBASE_INVENTORY",
+      "sourceRefs": [
+        "local:docs/archive/CRUD_OPERATIONS_AUDIT.md#L357"
+      ],
+      "tags": []
+    },
+    {
+      "feature_id": "returns_evidence_chunks_found",
+      "title": "Returns: Evidence chunks found ✅",
+      "classification": "APP_CODEBASE_INVENTORY",
+      "sourceRefs": [
+        "local:docs/archive/CRUD_OPERATIONS_AUDIT.md#L361"
+      ],
+      "tags": []
+    },
+    {
+      "feature_id": "4_check_postgresql_pgvector_works",
+      "title": "4. Check PostgreSQL pgvector (WORKS)",
+      "classification": "APP_CODEBASE_INVENTORY",
+      "sourceRefs": [
+        "local:docs/archive/CRUD_OPERATIONS_AUDIT.md#L363"
+      ],
+      "tags": []
+    },
+    {
+      "feature_id": "returns_evidence_record_with_vector",
+      "title": "Returns: evidence record with vector ✅",
+      "classification": "APP_CODEBASE_INVENTORY",
+      "sourceRefs": [
+        "local:docs/archive/CRUD_OPERATIONS_AUDIT.md#L366"
+      ],
+      "tags": []
+    },
+    {
+      "feature_id": "gpu_audit_fully_working",
+      "title": "GPU Audit (Fully Working)",
+      "classification": "APP_CODEBASE_INVENTORY",
+      "sourceRefs": [
+        "local:docs/archive/CRUD_OPERATIONS_AUDIT.md#L369"
+      ],
+      "tags": []
+    },
+    {
+      "feature_id": "returns_success_true_report_reportid_uuid",
+      "title": "Returns: { success: true, report: {...}, reportId: \"uuid\" }",
+      "classification": "APP_CODEBASE_INVENTORY",
+      "sourceRefs": [
+        "local:docs/archive/CRUD_OPERATIONS_AUDIT.md#L380"
+      ],
+      "tags": []
+    },
+    {
+      "feature_id": "retrieve",
+      "title": "Retrieve",
+      "classification": "APP_CODEBASE_INVENTORY",
+      "sourceRefs": [
+        "local:docs/archive/CRUD_OPERATIONS_AUDIT.md#L382"
+      ],
+      "tags": []
+    },
+    {
+      "feature_id": "returns_success_true_report",
+      "title": "Returns: { success: true, report: {...} }",
+      "classification": "APP_CODEBASE_INVENTORY",
+      "sourceRefs": [
+        "local:docs/archive/CRUD_OPERATIONS_AUDIT.md#L385"
+      ],
+      "tags": []
+    },
+    {
+      "feature_id": "final_verification_checklist",
+      "title": "✅ Final Verification Checklist",
+      "classification": "APP_CODEBASE_INVENTORY",
+      "sourceRefs": [
+        "local:docs/archive/CRUD_OPERATIONS_AUDIT.md#L390"
+      ],
+      "tags": []
+    },
+    {
+      "feature_id": "production_readiness",
+      "title": "Production Readiness",
+      "classification": "APP_CODEBASE_INVENTORY",
+      "sourceRefs": [
+        "local:docs/archive/CRUD_OPERATIONS_AUDIT.md#L392",
+        "local:docs/archive/CRUD_OPERATIONS_AUDIT.md#L393-sha256:35cb34c4a2c90a19",
+        "local:docs/archive/CRUD_OPERATIONS_AUDIT.md#L394-sha256:60998b1c21ba28cb",
+        "local:docs/archive/CRUD_OPERATIONS_AUDIT.md#L395-sha256:5d9a82081560f8da",
+        "local:docs/archive/CRUD_OPERATIONS_AUDIT.md#L396-sha256:c1dfcac8a38e2cdb"
+      ],
+      "tags": []
+    },
+    {
+      "feature_id": "blockers_for_production",
+      "title": "Blockers for Production",
+      "classification": "APP_CODEBASE_INVENTORY",
+      "sourceRefs": [
+        "local:docs/archive/CRUD_OPERATIONS_AUDIT.md#L405"
+      ],
+      "tags": []
+    },
+    {
+      "feature_id": "metrics_summary",
+      "title": "📈 Metrics Summary",
+      "classification": "APP_CODEBASE_INVENTORY",
+      "sourceRefs": [
+        "local:docs/archive/CRUD_OPERATIONS_AUDIT.md#L415"
+      ],
+      "tags": []
+    },
+    {
+      "feature_id": "session_summary_april_9_2026",
+      "title": "Session Summary — April 9, 2026",
+      "classification": "APP_CODEBASE_INVENTORY",
+      "sourceRefs": [
+        "local:docs/archive/sessions/SESSION_SUMMARY_APRIL_9_2026.md#L1"
+      ],
+      "tags": []
+    },
+    {
+      "feature_id": "objectives_completed",
+      "title": "🎯 Objectives Completed",
+      "classification": "APP_CODEBASE_INVENTORY",
+      "sourceRefs": [
+        "local:docs/archive/sessions/SESSION_SUMMARY_APRIL_9_2026.md#L3"
+      ],
+      "tags": []
+    },
+    {
+      "feature_id": "primary_gpu_audit_orchestrator_implementation",
+      "title": "Primary: GPU Audit Orchestrator Implementation ✅",
+      "classification": "APP_CODEBASE_INVENTORY",
+      "sourceRefs": [
+        "local:docs/archive/sessions/SESSION_SUMMARY_APRIL_9_2026.md#L5"
+      ],
+      "tags": []
+    },
+    {
+      "feature_id": "secondary_infrastructure_documentation",
+      "title": "Secondary: Infrastructure Documentation 📚",
+      "classification": "APP_CODEBASE_INVENTORY",
+      "sourceRefs": [
+        "local:docs/archive/sessions/SESSION_SUMMARY_APRIL_9_2026.md#L32"
+      ],
+      "tags": []
+    },
+    {
+      "feature_id": "tertiary_bug_discovery_fixes",
+      "title": "Tertiary: Bug Discovery & Fixes 🐛",
+      "classification": "APP_CODEBASE_INVENTORY",
+      "sourceRefs": [
+        "local:docs/archive/sessions/SESSION_SUMMARY_APRIL_9_2026.md#L54"
+      ],
+      "tags": []
+    },
+    {
+      "feature_id": "metrics",
+      "title": "📊 Metrics",
+      "classification": "APP_CODEBASE_INVENTORY",
+      "sourceRefs": [
+        "local:docs/archive/sessions/SESSION_SUMMARY_APRIL_9_2026.md#L87"
+      ],
+      "tags": []
+    },
+    {
+      "feature_id": "code_changes",
+      "title": "Code Changes",
+      "classification": "APP_CODEBASE_INVENTORY",
+      "sourceRefs": [
+        "local:docs/archive/sessions/SESSION_SUMMARY_APRIL_9_2026.md#L89"
+      ],
+      "tags": []
+    },
+    {
+      "feature_id": "quality",
+      "title": "Quality",
+      "classification": "APP_CODEBASE_INVENTORY",
+      "sourceRefs": [
+        "local:docs/archive/sessions/SESSION_SUMMARY_APRIL_9_2026.md#L98"
+      ],
+      "tags": []
+    },
+    {
+      "feature_id": "session_duration",
+      "title": "Session Duration",
+      "classification": "APP_CODEBASE_INVENTORY",
+      "sourceRefs": [
+        "local:docs/archive/sessions/SESSION_SUMMARY_APRIL_9_2026.md#L107"
+      ],
+      "tags": []
+    },
+    {
+      "feature_id": "deliverables",
+      "title": "📁 Deliverables",
+      "classification": "APP_CODEBASE_INVENTORY",
+      "sourceRefs": [
+        "local:docs/archive/sessions/SESSION_SUMMARY_APRIL_9_2026.md#L118"
+      ],
+      "tags": []
+    },
+    {
+      "feature_id": "new_files",
+      "title": "New Files",
+      "classification": "APP_CODEBASE_INVENTORY",
+      "sourceRefs": [
+        "local:docs/archive/sessions/SESSION_SUMMARY_APRIL_9_2026.md#L120"
+      ],
+      "tags": []
+    },
+    {
+      "feature_id": "modified_files",
+      "title": "Modified Files",
+      "classification": "APP_CODEBASE_INVENTORY",
+      "sourceRefs": [
+        "local:docs/archive/sessions/SESSION_SUMMARY_APRIL_9_2026.md#L133"
+      ],
+      "tags": []
+    },
+    {
+      "feature_id": "current_status_production_ready",
+      "title": "🚀 Current Status: Production Ready",
+      "classification": "APP_CODEBASE_INVENTORY",
+      "sourceRefs": [
+        "local:docs/archive/sessions/SESSION_SUMMARY_APRIL_9_2026.md#L152"
+      ],
+      "tags": []
+    },
+    {
+      "feature_id": "what_works",
+      "title": "What Works ✅",
+      "classification": "APP_CODEBASE_INVENTORY",
+      "sourceRefs": [
+        "local:docs/archive/sessions/SESSION_SUMMARY_APRIL_9_2026.md#L154"
+      ],
+      "tags": []
+    },
+    {
+      "feature_id": "what_s_partially_done",
+      "title": "What's Partially Done 🟡",
+      "classification": "APP_CODEBASE_INVENTORY",
+      "sourceRefs": [
+        "local:docs/archive/sessions/SESSION_SUMMARY_APRIL_9_2026.md#L169"
+      ],
+      "tags": []
+    },
+    {
+      "feature_id": "next_steps_future_sessions",
+      "title": "🎯 Next Steps (Future Sessions)",
+      "classification": "APP_CODEBASE_INVENTORY",
+      "sourceRefs": [
+        "local:docs/archive/sessions/SESSION_SUMMARY_APRIL_9_2026.md#L180"
+      ],
+      "tags": []
+    },
+    {
+      "feature_id": "priority_1_evidence_upload_ui_1_hour",
+      "title": "Priority 1: Evidence Upload UI (1 hour)",
+      "classification": "APP_CODEBASE_INVENTORY",
+      "sourceRefs": [
+        "local:docs/archive/sessions/SESSION_SUMMARY_APRIL_9_2026.md#L182",
+        "local:docs/archive/sessions/SESSION_SUMMARY_APRIL_9_2026.md#L182-sha256:7be7ad8876bb2e87",
+        "local:docs/archive/sessions/SESSION_SUMMARY_APRIL_9_2026.md#L183-sha256:5cbdd99bbe6d3b5e",
+        "local:docs/archive/sessions/SESSION_SUMMARY_APRIL_9_2026.md#L184-sha256:737f6d5c9a1b0c26",
+        "local:docs/archive/sessions/SESSION_SUMMARY_APRIL_9_2026.md#L185-sha256:02f2198427a00e7a"
+      ],
+      "tags": []
+    },
+    {
+      "feature_id": "priority_2_vlm_poi_integration_90_min",
+      "title": "Priority 2: VLM POI Integration (90 min)",
+      "classification": "APP_CODEBASE_INVENTORY",
+      "sourceRefs": [
+        "local:docs/archive/sessions/SESSION_SUMMARY_APRIL_9_2026.md#L188",
+        "local:docs/archive/sessions/SESSION_SUMMARY_APRIL_9_2026.md#L188-sha256:1beb2bafd995d027",
+        "local:docs/archive/sessions/SESSION_SUMMARY_APRIL_9_2026.md#L189-sha256:fae9153a3f646612",
+        "local:docs/archive/sessions/SESSION_SUMMARY_APRIL_9_2026.md#L190-sha256:9630d388460ed864",
+        "local:docs/archive/sessions/SESSION_SUMMARY_APRIL_9_2026.md#L191-sha256:c96e768ad65de911"
+      ],
+      "tags": []
+    },
+    {
+      "feature_id": "priority_3_audit_dashboard_web_ui_3_4_hours",
+      "title": "Priority 3: Audit Dashboard Web UI (3-4 hours)",
+      "classification": "APP_CODEBASE_INVENTORY",
+      "sourceRefs": [
+        "local:docs/archive/sessions/SESSION_SUMMARY_APRIL_9_2026.md#L194",
+        "local:docs/archive/sessions/SESSION_SUMMARY_APRIL_9_2026.md#L194-sha256:edac081bfdfc25f5",
+        "local:docs/archive/sessions/SESSION_SUMMARY_APRIL_9_2026.md#L195-sha256:dc267930aa528213",
+        "local:docs/archive/sessions/SESSION_SUMMARY_APRIL_9_2026.md#L196-sha256:1925abbd01ee5401",
+        "local:docs/archive/sessions/SESSION_SUMMARY_APRIL_9_2026.md#L197-sha256:56137d408d764185"
+      ],
+      "tags": []
+    },
+    {
+      "feature_id": "priority_4_auto_fix_orchestrator_6_8_hours",
+      "title": "Priority 4: Auto-Fix Orchestrator (6-8 hours)",
+      "classification": "APP_CODEBASE_INVENTORY",
+      "sourceRefs": [
+        "local:docs/archive/sessions/SESSION_SUMMARY_APRIL_9_2026.md#L201",
+        "local:docs/archive/sessions/SESSION_SUMMARY_APRIL_9_2026.md#L201-sha256:182f3833f8ffce5b",
+        "local:docs/archive/sessions/SESSION_SUMMARY_APRIL_9_2026.md#L202-sha256:6fdac75e7c934fd0",
+        "local:docs/archive/sessions/SESSION_SUMMARY_APRIL_9_2026.md#L203-sha256:d7bad899cd85ca8e",
+        "local:docs/archive/sessions/SESSION_SUMMARY_APRIL_9_2026.md#L204-sha256:cd47037d90a19d4e"
+      ],
+      "tags": []
+    },
+    {
+      "feature_id": "knowledge_base_updates",
+      "title": "🔍 Knowledge Base Updates",
+      "classification": "APP_CODEBASE_INVENTORY",
+      "sourceRefs": [
+        "local:docs/archive/sessions/SESSION_SUMMARY_APRIL_9_2026.md#L209"
+      ],
+      "tags": []
+    },
+    {
+      "feature_id": "new_memory_files_created",
+      "title": "New Memory Files Created",
+      "classification": "APP_CODEBASE_INVENTORY",
+      "sourceRefs": [
+        "local:docs/archive/sessions/SESSION_SUMMARY_APRIL_9_2026.md#L211"
+      ],
+      "tags": []
+    },
+    {
+      "feature_id": "memory_md_updates_needed",
+      "title": "Memory.md Updates Needed",
+      "classification": "APP_CODEBASE_INVENTORY",
+      "sourceRefs": [
+        "local:docs/archive/sessions/SESSION_SUMMARY_APRIL_9_2026.md#L222",
+        "local:docs/archive/sessions/SESSION_SUMMARY_APRIL_9_2026.md#L222-sha256:b7f4a921a81d802b",
+        "local:docs/archive/sessions/SESSION_SUMMARY_APRIL_9_2026.md#L223-sha256:351e435278c6abeb",
+        "local:docs/archive/sessions/SESSION_SUMMARY_APRIL_9_2026.md#L224-sha256:ab02c2a3fa323241",
+        "local:docs/archive/sessions/SESSION_SUMMARY_APRIL_9_2026.md#L225-sha256:dc645804f5cd08ba"
+      ],
+      "tags": []
+    },
+    {
+      "feature_id": "critical_decisions_made",
+      "title": "⚠️ Critical Decisions Made",
+      "classification": "APP_CODEBASE_INVENTORY",
+      "sourceRefs": [
+        "local:docs/archive/sessions/SESSION_SUMMARY_APRIL_9_2026.md#L231"
+      ],
+      "tags": []
+    },
+    {
+      "feature_id": "1_postgresql_port_architecture_verified",
+      "title": "1. PostgreSQL Port Architecture Verified",
+      "classification": "APP_CODEBASE_INVENTORY",
+      "sourceRefs": [
+        "local:docs/archive/sessions/SESSION_SUMMARY_APRIL_9_2026.md#L233"
+      ],
+      "tags": []
+    },
+    {
+      "feature_id": "2_gpu_audit_storage_postgresql_jsonb_chosen",
+      "title": "2. GPU Audit Storage: PostgreSQL JSONB Chosen",
+      "classification": "APP_CODEBASE_INVENTORY",
+      "sourceRefs": [
+        "local:docs/archive/sessions/SESSION_SUMMARY_APRIL_9_2026.md#L238"
+      ],
+      "tags": []
+    },
+    {
+      "feature_id": "3_vector_format_standard_single_vector_not_named",
+      "title": "3. Vector Format: Standard Single Vector (Not Named)",
+      "classification": "APP_CODEBASE_INVENTORY",
+      "sourceRefs": [
+        "local:docs/archive/sessions/SESSION_SUMMARY_APRIL_9_2026.md#L243"
+      ],
+      "tags": []
+    },
+    {
+      "feature_id": "bugs_fixed_this_session",
+      "title": "📝 Bugs Fixed This Session",
+      "classification": "APP_CODEBASE_INVENTORY",
+      "sourceRefs": [
+        "local:docs/archive/sessions/SESSION_SUMMARY_APRIL_9_2026.md#L250"
+      ],
+      "tags": []
+    },
+    {
+      "feature_id": "session_checklist",
+      "title": "✅ Session Checklist",
+      "classification": "APP_CODEBASE_INVENTORY",
+      "sourceRefs": [
+        "local:docs/archive/sessions/SESSION_SUMMARY_APRIL_9_2026.md#L262",
+        "local:docs/archive/sessions/SESSION_SUMMARY_APRIL_9_2026.md#L263-sha256:c30b90dcec071c23",
+        "local:docs/archive/sessions/SESSION_SUMMARY_APRIL_9_2026.md#L264-sha256:181bc3c0eb21d292",
+        "local:docs/archive/sessions/SESSION_SUMMARY_APRIL_9_2026.md#L265-sha256:9a83fb57182ce7b0",
+        "local:docs/archive/sessions/SESSION_SUMMARY_APRIL_9_2026.md#L266-sha256:2b2cc556724f6452"
+      ],
+      "tags": []
+    },
+    {
+      "feature_id": "lessons_learned",
+      "title": "🎓 Lessons Learned",
+      "classification": "APP_CODEBASE_INVENTORY",
+      "sourceRefs": [
+        "local:docs/archive/sessions/SESSION_SUMMARY_APRIL_9_2026.md#L277"
+      ],
+      "tags": []
+    },
+    {
+      "feature_id": "qdrant",
+      "title": "Qdrant",
+      "classification": "APP_CODEBASE_INVENTORY",
+      "sourceRefs": [
+        "local:docs/archive/sessions/SESSION_SUMMARY_APRIL_9_2026.md#L279"
+      ],
+      "tags": []
+    },
+    {
+      "feature_id": "postgresql",
+      "title": "PostgreSQL",
+      "classification": "APP_CODEBASE_INVENTORY",
+      "sourceRefs": [
+        "local:docs/archive/sessions/SESSION_SUMMARY_APRIL_9_2026.md#L284"
+      ],
+      "tags": []
+    },
+    {
+      "feature_id": "drizzle_orm",
+      "title": "Drizzle ORM",
+      "classification": "APP_CODEBASE_INVENTORY",
+      "sourceRefs": [
+        "local:docs/archive/sessions/SESSION_SUMMARY_APRIL_9_2026.md#L289"
+      ],
+      "tags": []
+    },
+    {
+      "feature_id": "vlm_pipelines",
+      "title": "VLM Pipelines",
+      "classification": "APP_CODEBASE_INVENTORY",
+      "sourceRefs": [
+        "local:docs/archive/sessions/SESSION_SUMMARY_APRIL_9_2026.md#L294"
+      ],
+      "tags": []
+    },
+    {
+      "feature_id": "recommendation_for_next_session",
+      "title": "📞 Recommendation for Next Session",
+      "classification": "APP_CODEBASE_INVENTORY",
+      "sourceRefs": [
+        "local:docs/archive/sessions/SESSION_SUMMARY_APRIL_9_2026.md#L301"
+      ],
+      "tags": []
+    },
+    {
+      "feature_id": "session_completed",
+      "title": "🎬 Session Completed",
+      "classification": "APP_CODEBASE_INVENTORY",
+      "sourceRefs": [
+        "local:docs/archive/sessions/SESSION_SUMMARY_APRIL_9_2026.md#L316"
+      ],
+      "tags": []
+    },
+    {
+      "feature_id": "native_bridge_verification_audit_2026_05_12",
+      "title": "Native Bridge Verification Audit — 2026-05-12",
+      "classification": "APP_CODEBASE_INVENTORY",
+      "sourceRefs": [
+        "local:docs/audit/2026-05-12_native-bridge-verification.md#L1"
+      ],
+      "tags": []
+    },
+    {
+      "feature_id": "hmm_rust_bridge",
+      "title": "HMM Rust Bridge",
+      "classification": "APP_CODEBASE_INVENTORY",
+      "sourceRefs": [
+        "local:docs/audit/2026-05-12_native-bridge-verification.md#L3"
+      ],
+      "tags": []
+    },
+    {
+      "feature_id": "turbovec_graph_synthesis",
+      "title": "TurboVec Graph Synthesis",
+      "classification": "APP_CODEBASE_INVENTORY",
+      "sourceRefs": [
+        "local:docs/audit/2026-05-12_native-bridge-verification.md#L11"
+      ],
+      "tags": []
+    },
+    {
+      "feature_id": "featuremap_compiler",
+      "title": "FeatureMap Compiler",
+      "classification": "APP_CODEBASE_INVENTORY",
+      "sourceRefs": [
+        "local:docs/audit/2026-05-12_native-bridge-verification.md#L19"
+      ],
+      "tags": []
+    },
+    {
+      "feature_id": "2026_05_12_native_bridge_verification__next_steps",
+      "title": "Next Steps",
+      "classification": "APP_CODEBASE_INVENTORY",
+      "sourceRefs": [
+        "local:docs/audit/2026-05-12_native-bridge-verification.md#L25"
+      ],
+      "tags": []
+    },
+    {
+      "feature_id": "db_schema_drift_audit_2026_05_10",
+      "title": "DB Schema Drift Audit - 2026-05-10",
+      "classification": "APP_CODEBASE_INVENTORY",
+      "sourceRefs": [
+        "local:docs/audits/db-schema-drift-2026-05-10.md#L1"
+      ],
+      "tags": []
+    },
+    {
+      "feature_id": "db_schema_drift_2026_05_10__summary",
+      "title": "Summary",
+      "classification": "APP_CODEBASE_INVENTORY",
+      "sourceRefs": [
+        "local:docs/audits/db-schema-drift-2026-05-10.md#L5"
+      ],
+      "tags": []
+    },
+    {
+      "feature_id": "real_column_drift",
+      "title": "Real Column Drift",
+      "classification": "APP_CODEBASE_INVENTORY",
+      "sourceRefs": [
+        "local:docs/audits/db-schema-drift-2026-05-10.md#L18"
+      ],
+      "tags": []
+    },
+    {
+      "feature_id": "missing_indexes",
+      "title": "Missing Indexes",
+      "classification": "APP_CODEBASE_INVENTORY",
+      "sourceRefs": [
+        "local:docs/audits/db-schema-drift-2026-05-10.md#L27"
+      ],
+      "tags": []
+    },
+    {
+      "feature_id": "recommendations",
+      "title": "Recommendations",
+      "classification": "APP_CODEBASE_INVENTORY",
+      "sourceRefs": [
+        "local:docs/audits/db-schema-drift-2026-05-10.md#L31"
+      ],
+      "tags": []
+    },
+    {
+      "feature_id": "feature_parity_audit_2026_05_10",
+      "title": "Feature Parity Audit - 2026-05-10",
+      "classification": "APP_CODEBASE_INVENTORY",
+      "sourceRefs": [
+        "local:docs/audits/feature-parity-2026-05-10.md#L1"
+      ],
+      "tags": []
+    },
+    {
+      "feature_id": "feature_parity_2026_05_10__summary",
+      "title": "Summary",
+      "classification": "APP_CODEBASE_INVENTORY",
+      "sourceRefs": [
+        "local:docs/audits/feature-parity-2026-05-10.md#L5"
+      ],
+      "tags": []
+    },
+    {
+      "feature_id": "atlas_status",
+      "title": "Atlas Status",
+      "classification": "APP_CODEBASE_INVENTORY",
+      "sourceRefs": [
+        "local:docs/audits/feature-parity-2026-05-10.md#L11"
+      ],
+      "tags": []
+    },
+    {
+      "feature_id": "feature_parity_2026_05_10__notes",
+      "title": "Notes",
+      "classification": "APP_CODEBASE_INVENTORY",
+      "sourceRefs": [
+        "local:docs/audits/feature-parity-2026-05-10.md#L33"
+      ],
+      "tags": []
+    },
+    {
+      "feature_id": "feature_map",
+      "title": "feature map",
+      "classification": "APP_CODEBASE_INVENTORY",
+      "sourceRefs": [
+        "local:docs/codebase_atlas/feature_map.md#L1"
+      ],
+      "tags": []
+    },
+    {
+      "feature_id": "app_surface",
+      "title": "App surface",
+      "classification": "APP_CODEBASE_INVENTORY",
+      "sourceRefs": [
+        "local:docs/codebase_atlas/feature_map.md#L5"
+      ],
+      "tags": []
+    },
+    {
+      "feature_id": "infrastructure_surface",
+      "title": "Infrastructure surface",
+      "classification": "APP_CODEBASE_INVENTORY",
+      "sourceRefs": [
+        "local:docs/codebase_atlas/feature_map.md#L18"
+      ],
+      "tags": []
+    },
+    {
+      "feature_id": "atlas_surface",
+      "title": "Atlas surface",
+      "classification": "APP_CODEBASE_INVENTORY",
+      "sourceRefs": [
+        "local:docs/codebase_atlas/feature_map.md#L24"
+      ],
+      "tags": []
+    },
+    {
+      "feature_id": "codebase_atlas_index",
+      "title": "codebase atlas index",
+      "classification": "APP_CODEBASE_INVENTORY",
+      "sourceRefs": [
+        "local:docs/codebase_atlas/index.md#L1"
+      ],
+      "tags": []
+    },
+    {
+      "feature_id": "start_here",
+      "title": "Start here",
+      "classification": "APP_CODEBASE_INVENTORY",
+      "sourceRefs": [
+        "local:docs/codebase_atlas/index.md#L5"
+      ],
+      "tags": []
+    },
+    {
+      "feature_id": "canonical_source",
+      "title": "Canonical source",
+      "classification": "APP_CODEBASE_INVENTORY",
+      "sourceRefs": [
+        "local:docs/codebase_atlas/index.md#L14"
+      ],
+      "tags": []
+    },
+    {
+      "feature_id": "index__rule",
+      "title": "Rule",
+      "classification": "APP_CODEBASE_INVENTORY",
+      "sourceRefs": [
+        "local:docs/codebase_atlas/index.md#L18"
+      ],
+      "tags": []
+    },
+    {
+      "feature_id": "karpathy_llm_wiki",
+      "title": "karpathy llm wiki",
+      "classification": "APP_CODEBASE_INVENTORY",
+      "sourceRefs": [
+        "local:docs/codebase_atlas/karpathy_llmwiki.md#L1"
+      ],
+      "tags": []
+    }
+  ]
 }

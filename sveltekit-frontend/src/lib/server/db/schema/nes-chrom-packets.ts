@@ -1,4 +1,4 @@
-import { customType, index, integer, jsonb, pgTable, real, smallint, text, timestamp, uniqueIndex, uuid, vector } from 'drizzle-orm/pg-core';
+import { customType, index, integer, jsonb, pgTable, real, serial, smallint, text, timestamp, uniqueIndex, uuid, vector } from 'drizzle-orm/pg-core';
 import { sql } from 'drizzle-orm';
 import { kagDagRuns } from './kag-dag.js';
 
@@ -101,3 +101,25 @@ export type NesChromPacket = typeof nesChromPackets.$inferSelect;
 export type NewNesChromPacket = typeof nesChromPackets.$inferInsert;
 export type NesChromKagDagHit = typeof nesChromKagDagHits.$inferSelect;
 export type NewNesChromKagDagHit = typeof nesChromKagDagHits.$inferInsert;
+
+export const packetMarkdownChunks = pgTable('packet_markdown_chunks', {
+  id: serial('id').primaryKey(),
+  packetKey: text('packet_key').notNull(),
+  chunkIndex: integer('chunk_index').notNull(),
+  markdownContent: text('markdown_content').notNull(),
+  tsVector: customType<{ data: string }>({
+    dataType() {
+      return 'tsvector';
+    },
+  })('ts_vector'),
+  createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),
+}, (table) => ({
+  packetKeyIdx: index('packet_markdown_chunks_packet_key_idx').on(table.packetKey),
+  keyChunkIdx: uniqueIndex('packet_markdown_chunks_key_chunk_idx').on(table.packetKey, table.chunkIndex),
+  tsVectorIdx: index('packet_markdown_chunks_ts_vector_idx').using('gin', table.tsVector),
+  markdownContentTrgmIdx: index('packet_markdown_chunks_markdown_content_trgm_idx').using('gin', table.markdownContent),
+}));
+
+export type PacketMarkdownChunk = typeof packetMarkdownChunks.$inferSelect;
+export type NewPacketMarkdownChunk = typeof packetMarkdownChunks.$inferInsert;
+

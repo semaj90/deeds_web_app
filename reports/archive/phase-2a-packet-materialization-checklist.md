@@ -1,6 +1,64 @@
 # Packet Materialization Alignment & Atlas-Runner Setup
+
+**Status:** PARTIALLY SUPERSEDED  
+**Active checklist:** `reports/parent-atlas-open-lanes-todo.md`  
+**Archived from:** `next_steps/active/2026-06-10_packet-materialization-alignment.md`
+
+This checklist remains useful as a historical Phase 2A / packet-materialization reference, but it is no longer the canonical active board.
+
+Completed since this document:
+- packet key alignment
+- SOM coordinate coverage
+- graph refresh
+- feature-id derivation review
+- Postgres contract drift review
+- task registry consolidation
+- hidden packet surface discovery
+- Parent Atlas overlay crosswalk
+
+Still relevant for:
+- packet identity audits
+- atlas-runner safety
+- Gemma4 enrichment order
+- Neo4j sync ordering
+- final HyperRAG smoke tests
+
+No longer canonical for:
+- production-readiness status
+- directory-level mapping
+- neschrom97 hidden surface scan
+- SeaweedFS cold-storage manifests
+- temporal task registry
+
+Current follow-up order:
+1. active-production-topology-mirror
+2. Parent Atlas overlay reconciliation
+3. sourceRef topology verification
+4. MCP allowlist mapping
+5. auth guard coverage
+6. circular dependency cleanup
+7. synthetic evidence concept cards
+8. provenance parity
+9. trust-tier editing
+
+Core invariant preserved here:
+
+```text
+directory_path
+  -> source_ref
+  -> feature_id
+  -> packet_id
+  -> packet_key
+  -> Redis
+  -> Neo4j
+  -> HyperRAG
+  -> cold_storage_manifest
+```
+
+---
+
 **Date:** 2026-06-10  
-**Status:** READY FOR IMPLEMENTATION  
+**Original status:** READY FOR IMPLEMENTATION  
 **Priority:** P1 (blocks full Atlas pipeline)
 
 ## Problem Statement
@@ -53,10 +111,31 @@ The codebase semantic indexing pipeline is 85-90% complete, but the execution pa
 - ✅ 14,471 rows in atlas_feature_map ready for materialization
 - ✅ 27 existing packets (seed) in nes_chrom_packets
 
-## What's NOT Done Yet (Critical Path)
+## Current Active Critical Path
+
+This document no longer defines the active critical path. The active board is `reports/parent-atlas-open-lanes-todo.md`, with task state mirrored through `.opencode/tasks/task-state.md`.
+
+### Phase A
+- active-production-topology-mirror
+- Parent Atlas overlay reconciliation
+- sourceRef topology verification
+
+### Phase B
+- MCP allowlist mapping
+- auth guard coverage
+- circular dependency cleanup
+
+### Phase C
+- synthetic evidence concept cards
+- provenance parity
+- trust-tier editing
+
+## Historical Critical Path
+
+The following sections are retained for packet identity and atlas-runner reference. They are no longer the current blocker for production readiness.
 
 ### 1. Atlas-Runner Security Setup
-**Status:** BLOCKED (needs .env configuration)
+**Historical status:** BLOCKED (needed .env configuration)
 
 The atlas-runner service in docker-compose.yml references:
 ```yaml
@@ -89,7 +168,7 @@ POSTGRES_PASSWORD=<admin-password>
 ```
 
 ### 2. Test Materializer via atlas-runner
-**Status:** BLOCKED (waiting for .env setup)
+**Historical status:** BLOCKED (waiting for .env setup)
 
 ```bash
 # Once .env is in place:
@@ -100,7 +179,7 @@ npm run atlas:runner -- "cd sveltekit-frontend && npm run atlas:materialize-pack
 ```
 
 ### 3. Test Summarizer via atlas-runner
-**Status:** BLOCKED (materializer must run first)
+**Historical status:** BLOCKED (materializer had to run first)
 
 ```bash
 # Once materializer completes:
@@ -111,7 +190,7 @@ npm run atlas:runner -- "cd sveltekit-frontend && npm run gemma4:summarize:missi
 ```
 
 ### 4. Verify Identity Chain
-**Status:** BLOCKED (depends on steps 2-3)
+**Historical status:** BLOCKED (depended on steps 2-3)
 
 ```bash
 # After both materializer and summarizer complete:
@@ -137,7 +216,7 @@ SQL
 ```
 
 ### 5. Full Pipeline Dry-Run
-**Status:** BLOCKED (depends on steps 2-4)
+**Historical status:** BLOCKED (depended on steps 2-4)
 
 ```bash
 # Dry-run the entire index:full-loop:docker
@@ -155,12 +234,19 @@ npm run atlas:runner -- "cd sveltekit-frontend && npm run index:full-loop:docker
 | Whole-codebase indexing | 85% | None (independent) |
 | Atlas feature mapping | 90% | None (independent) |
 | Qdrant payload normalization | 85% | Docker connection |
-| NES packet materialization | 70% | Docker connection + .env |
-| Gemma4 enrichment | 70% | Docker connection + .env + Gemma4 runtime |
+| NES packet materialization | COMPLETE | Historical invariant retained |
+| Gemma4 packet enrichment | OPERATIONAL | Use evidence-first bounded scripts |
+| Identity chain | VERIFIED | Use packet audit for regression checks |
+| SOM coordinate coverage | VERIFIED | Qdrant somRow/somCol gap closed |
+| Graph neighborhood refresh | VERIFIED | graph refresh ran and task closed |
+| Topology mirror alignment | WARN | Active production rows still need Postgres mirror alignment |
+| Overlay crosswalk | WARN | Root-contract-only lanes need reconciliation |
+| Command allowlist mapping | OPEN | OpenCode/MCP routing contract still needs allowlist |
+| Auth guard coverage | OPEN | API auth guard gaps remain |
 | Repair-loop integration | 80% | packet_id chain verification |
-| **Deterministic identity chain** | **90%** | **Docker .env setup** |
+| **Deterministic identity chain** | **VERIFIED** | **Keep bounded validation** |
 
-**Critical Path Blocker:** Docker atlas-runner security setup (30 min) + credential management
+**Current blocker:** topology mirror and overlay reconciliation, not packet generation.
 
 ## Implementation Order (Recommended)
 

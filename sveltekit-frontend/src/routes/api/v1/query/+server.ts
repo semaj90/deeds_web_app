@@ -11,7 +11,8 @@ const queryRequestSchema = z.object({
   conversationId: z.string().uuid().optional(),
 });
 
-export const POST: RequestHandler = async ({ request }) => {
+export const POST: RequestHandler = async ({ request, locals }) => {
+  if (!locals.user) return json({ error: 'Unauthorized' }, { status: 401 });
   const startedAt = performance.now();
   try {
     const body = await request.json().catch(() => ({}));

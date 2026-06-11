@@ -261,50 +261,60 @@ async function extractSymbols(featureMapDb) {
 // ============================================================================
 
 async function upsertSymbols(db, symbols) {
-  console.log(`📝 Upserting ${symbols.length} symbols to atlas_symbol_map...\n`);
+  console.log(`📝 Upserting ${symbols.length} symbols to atlas_symbol_map (batch mode)...\n`);
 
+  const BATCH_SIZE = 500;
   let inserted = 0;
-  let skipped = 0;
   let errors = 0;
 
-  for (const sym of symbols) {
+  // Process in batches of 500
+  for (let i = 0; i < symbols.length; i += BATCH_SIZE) {
+    const batch = symbols.slice(i, i + BATCH_SIZE);
+
     try {
-      await db.query(
+      // Build multi-row INSERT with ON CONFLICT
+      const values = batch.map((sym, idx) => {
+        const baseIdx = idx * 6;
+        return `($${baseIdx + 1}, $${baseIdx + 2}, $${baseIdx + 3}, $${baseIdx + 4}, $${baseIdx + 5}, $${baseIdx + 6})`;
+      }).join(',');
+
+      const params = batch.flatMap(sym => [
+        sym.sourceRef,
+        sym.symbolName,
+        sym.symbolKind,
+        sym.lineStart || null,
+        sym.lineEnd || null,
+        JSON.stringify({
+          ...sym.payload,
+          feature_id: sym.featureId || null,
+          packet_key: sym.packetKey || null,
+          export_kind: sym.exportKind || null,
+        }),
+      ]);
+
+      const result = await db.query(
         `INSERT INTO atlas_symbol_map (
-          source_ref, feature_id, packet_key, symbol_name, symbol_kind,
-          export_kind, line_start, line_end, payload
-        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+          source_ref, symbol_name, symbol_kind,
+          line_start, line_end, payload
+        ) VALUES ${values}
         ON CONFLICT (source_ref, symbol_name, symbol_kind, COALESCE(line_start, 0))
         DO UPDATE SET
-          feature_id = EXCLUDED.feature_id,
-          packet_key = EXCLUDED.packet_key,
           payload = EXCLUDED.payload,
-          updated_at = now()`,
-        [
-          sym.sourceRef,
-          sym.featureId,
-          sym.packetKey,
-          sym.symbolName,
-          sym.symbolKind,
-          sym.exportKind,
-          sym.lineStart,
-          sym.lineEnd,
-          JSON.stringify(sym.payload),
-        ]
+          updated_at = now()
+        RETURNING id`,
+        params
       );
-      inserted++;
-    } catch (err) {
-      console.error(`  ❌ ${sym.sourceRef}::${sym.symbolName}: ${err.message}`);
-      errors++;
-    }
 
-    if ((inserted + errors) % 100 === 0) {
-      process.stdout.write(`  ✓ ${inserted + errors} processed\r`);
+      inserted += result.rows.length;
+      process.stdout.write(`  ✓ ${Math.min(i + BATCH_SIZE, symbols.length)}/${symbols.length} processed\r`);
+    } catch (err) {
+      console.error(`  ❌ Batch ${Math.floor(i / BATCH_SIZE) + 1}: ${err.message}`);
+      errors += batch.length;
     }
   }
 
-  console.log(`✓ ${inserted} inserted/updated, ${errors} errors\n`);
-  return { inserted, skipped, errors };
+  console.log(`\n✓ ${inserted} inserted/updated (${errors} errors)\n`);
+  return { inserted, errors };
 }
 
 // ============================================================================
@@ -319,8 +329,8 @@ async function auditSymbols(db) {
       COUNT(*) as total,
       COUNT(DISTINCT source_ref) as unique_files,
       COUNT(DISTINCT symbol_kind) as kind_count,
-      COUNT(feature_id) FILTER (WHERE feature_id IS NOT NULL) as with_feature,
-      COUNT(packet_key) FILTER (WHERE packet_key IS NOT NULL) as with_packet
+      COUNT(payload->'feature_id') FILTER (WHERE payload->>'feature_id' IS NOT NULL) as with_feature,
+      COUNT(payload->'packet_key') FILTER (WHERE payload->>'packet_key' IS NOT NULL) as with_packet
     FROM atlas_symbol_map`
   );
 

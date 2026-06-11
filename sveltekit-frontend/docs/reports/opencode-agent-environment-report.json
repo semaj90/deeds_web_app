@@ -1,0 +1,83 @@
+{
+  "generatedAt": "2026-06-11T03:54:55.242Z",
+  "surface": "opencode",
+  "workspace": {
+    "appRoot": "C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend",
+    "repoRoot": "C:\\Users\\james\\Videos\\deeds-web-app",
+    "cwd": "C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend",
+    "platform": "win32",
+    "arch": "x64",
+    "hostname": "DESKTOP-Q18MPHM",
+    "shell": "powershell",
+    "envFilesLoaded": [
+      ".env.local",
+      ".env",
+      ".env.development.local",
+      ".env.development",
+      "..\\.env.local",
+      "..\\.env"
+    ]
+  },
+  "vscode": {
+    "detected": true,
+    "workspaceFile": "..\\deeds-web-app.code-workspace",
+    "tasksFiles": [
+      ".vscode\\tasks.json",
+      "..\\.vscode\\tasks.json"
+    ],
+    "env": {
+      "VSCODE_PID": null,
+      "TERM_PROGRAM": null
+    }
+  },
+  "opencode": {
+    "detected": true,
+    "config": "opencode.json",
+    "startupContext": ".opencode/startup-context.json",
+    "taskState": ".opencode/tasks/task-state.json"
+  },
+  "codex": {
+    "detected": false,
+    "env": {
+      "CODEX_SANDBOX": null,
+      "CODEX_HOME": null,
+      "OPENAI_WORKSPACE_ID": null
+    }
+  },
+  "services": {
+    "postgres": {
+      "url": "configured",
+      "defaultPort": 5434
+    },
+    "qdrant": {
+      "url": "http://127.0.0.1:6333",
+      "codebaseCollection": "codebase_chunks_768",
+      "envCollection": "legal_documents"
+    },
+    "redis": {
+      "url": "configured",
+      "passwordConfigured": true
+    },
+    "gemma4": {
+      "provider": "turboquant",
+      "baseUrl": "http://127.0.0.1:8090",
+      "role": "repo-audit-only-after-evidence"
+    }
+  },
+  "guardrails": [
+    "repo-evidence-first",
+    "regular-opencode-in-vscode-is-the-primary-agent-surface",
+    "opencode-bootstrap-is-an-optional-context-refresh-not-the-entrypoint",
+    "kanban-is-persistent-task-registry",
+    "recommendations-are-append-only-inbox",
+    "gemma4-is-local-orchestration-synthesis-only",
+    "do-not-use-gemma4-for-generic-model-advice",
+    "prefer-sse-browser-edge-until-transport-proof-changes"
+  ],
+  "nextCommands": {
+    "refreshTasks": "npm run opencode:tasks:refresh",
+    "optionalContextRefresh": "npm run opencode:bootstrap",
+    "productionReadiness": "npm run atlas:production-readiness",
+    "liveServiceEnv": "npm run atlas:live-service-env"
+  }
+}

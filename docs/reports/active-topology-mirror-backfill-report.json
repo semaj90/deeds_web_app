@@ -1,0 +1,15 @@
+{
+  "timestamp": "2026-06-11T05:21:41.417Z",
+  "dryRun": true,
+  "collectionUsed": "codebase_chunks_768",
+  "collectionUsedProof": "Collection is codebase_chunks_768 (defaulted) since no explicit --collection flag was parsed from process.argv",
+  "usedQdrantCollectionEnv": false,
+  "beforeMissing": 0,
+  "directMirrors": 0,
+  "derivedFromSomCoords": 0,
+  "unresolved": 0,
+  "wouldWrite": 0,
+  "written": 0,
+  "afterMissing": 0,
+  "repairs": []
+}

@@ -5,6 +5,8 @@ import path from 'path';
 import { z } from 'zod';
 import { safeValidateRequest } from '$lib/server/utils/validateRequest';
 
+import { requireUser } from '$lib/server/auth-utils.js';
+
 const execAsync = promisify(exec);
 
 const AceAskSchema = z.object({
@@ -15,8 +17,9 @@ const AceAskSchema = z.object({
   stream: z.boolean().optional(),
 });
 
-export const POST = async ({ request, locals }) => {
-  if (!locals.user && !import.meta.env.DEV_BYPASS_AUTH) return json({ error: 'Unauthorized' }, { status: 401 });
+export const POST = async (event) => {
+  requireUser(event);
+  const { request } = event;
   const body = (await safeValidateRequest(request, AceAskSchema, async (error) => {
     throw new Error(JSON.stringify(error));
   })) as any;

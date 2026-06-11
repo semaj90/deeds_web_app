@@ -1,0 +1,80 @@
+{
+  "timestamp": "2026-06-11T05:37:58.756Z",
+  "version": "3.0",
+  "description": "Inventory of canonical and non-canonical storage surfaces",
+  "surfaces": [
+    {
+      "surface": "atlas",
+      "backend": "postgres",
+      "tables": [
+        {
+          "name": "atlas_feature_map",
+          "rows": "14487",
+          "with_labels": "10951",
+          "with_qdrant": "11427",
+          "with_som": "10512"
+        },
+        {
+          "name": "atlas_directory_manifest",
+          "rows": "1941",
+          "with_labels": "0",
+          "with_qdrant": "0",
+          "with_som": "0"
+        }
+      ]
+    },
+    {
+      "surface": "neschrom97",
+      "backend": "filesystem",
+      "locations": [
+        {
+          "location": ".opencode/ndjson/",
+          "type": "card_export",
+          "files": 7,
+          "lines": 3240,
+          "description": "Exported NES/CHROM97 cards (read-only archive)"
+        },
+        {
+          "location": ".opencode/cards/",
+          "type": "card_json",
+          "files": 117158,
+          "description": "Individual card JSON objects"
+        }
+      ]
+    },
+    {
+      "surface": "duckdb",
+      "backend": "filesystem",
+      "analytics_snapshots": {
+        "parquet_files": 6,
+        "csv_exports": 45,
+        "total_files": 51,
+        "description": "Offline analytics and batch reconciliation artifacts"
+      }
+    },
+    {
+      "surface": "engram",
+      "backend": "filesystem",
+      "status": "not_found",
+      "location": ".tmp/engram-cache/"
+    },
+    {
+      "surface": "seaweedfs",
+      "backend": "object_storage",
+      "status": "planned",
+      "description": "Cold storage for manifests, summaries, centroids (not raw code)",
+      "buckets": {
+        "legal-evidence": "evidence manifests and metadata",
+        "atlas-cold": "atlas directory manifests and cold storage metadata",
+        "archive": "archive snapshots and backups"
+      }
+    }
+  ],
+  "preservation_rules": {
+    "atlas": "Canonical PostgreSQL source of truth — never mutate without explicit backfill",
+    "neschrom97": "Archived card exports — read-only, evidence only",
+    "duckdb": "Offline analytics snapshots — generated, not canonical",
+    "engram": "Runtime memory cache — ephemeral, regenerated on startup",
+    "seaweedfs": "Cold object storage — future, for manifests and summaries only (NOT raw code)"
+  }
+}

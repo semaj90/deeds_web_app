@@ -1,0 +1,29 @@
+{
+  "timestamp": "2026-06-11T05:38:31.538Z",
+  "version": "1.0",
+  "description": "Cold-storage manifest for SeaweedFS archival",
+  "archival_strategy": {
+    "what_to_archive": [
+      "Directory summaries",
+      "Feature centroids",
+      "Packet metadata"
+    ],
+    "what_NOT_to_archive": [
+      "Raw code",
+      "Full embedding vectors",
+      "Source files"
+    ],
+    "target_storage": "s3://atlas-cold/ (SeaweedFS S3 gateway)",
+    "ttl": "2555 days (~7 years)",
+    "restore_capability": "Full: can reconstruct topology from manifests"
+  },
+  "buckets": {
+    "atlas-cold": "Directory manifests, feature summaries, metadata",
+    "atlas-evidence": "Evidence object references (metadata only)",
+    "atlas-archive": "Legacy archived packets (read-only)"
+  },
+  "total_entries": 0,
+  "total_content_size_estimate": "0 KB",
+  "manifests": [],
+  "manifests_total_count": 0
+}

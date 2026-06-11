@@ -1,6 +1,6 @@
 {
   "schema": "parent_atlas_production_readiness.v1",
-  "generatedAt": "2026-06-10T04:06:19.202Z",
+  "generatedAt": "2026-06-11T05:40:56.879Z",
   "readOnly": true,
   "sections": {
     "summary-batch": [
@@ -60,7 +60,7 @@
         "message": "sveltekit-frontend/src/lib/server/gpu/libtorch-bridge.ts exists",
         "details": {
           "exists": true,
-          "bytes": 62082,
+          "bytes": 64801,
           "relPath": "sveltekit-frontend/src/lib/server/gpu/libtorch-bridge.ts"
         }
       },
@@ -120,7 +120,7 @@
         "message": "scripts/atlas/pytorch-qdrant-redis-som-index.mjs exists",
         "details": {
           "exists": true,
-          "bytes": 35532,
+          "bytes": 35567,
           "relPath": "scripts/atlas/pytorch-qdrant-redis-som-index.mjs"
         }
       },
@@ -208,7 +208,7 @@
             "bytes": 1009,
             "relPath": "simd-bridge/cpp/cuvs_bridge.cc"
           },
-          "hasMatmulExport": false,
+          "hasMatmulExport": true,
           "hasDotProduct": true,
           "hasBatchCosine": true,
           "hasKMeans": true,
@@ -221,10 +221,10 @@
       },
       {
         "id": "bridge:matmul-export",
-        "status": "warn",
+        "status": "pass",
         "message": "No generic public matmul_f32 native bridge export is exposed yet; this is a public API gap, not evidence that GEMM is absent. Keep the canonical 768→256→64 autoencoder lane valid.",
         "details": {
-          "hasMatmulExport": false,
+          "hasMatmulExport": true,
           "hasDotProduct": true,
           "hasBatchCosine": true,
           "hasKMeans": true,
@@ -297,7 +297,7 @@
         "message": "sveltekit-frontend/src/lib/server/db/schema/nes-chrom-packets.ts exists",
         "details": {
           "exists": true,
-          "bytes": 5118,
+          "bytes": 6145,
           "relPath": "sveltekit-frontend/src/lib/server/db/schema/nes-chrom-packets.ts"
         }
       },
@@ -526,34 +526,34 @@
       {
         "id": "rg-uu:ndjson-inventory",
         "status": "pass",
-        "message": "rg -uuu found 125 NDJSON files",
+        "message": "rg -uuu found 124 NDJSON files",
         "details": {
           "sample": [
+            ".opencode\\ndjson\\parents-atlas-test\\ledger.ndjson",
+            ".opencode\\ndjson\\parents-atlas-test\\2026-05-30-test-1780159729769.ndjson",
+            ".opencode\\ndjson\\minified-ace-index.ndjson",
+            ".opencode\\ndjson\\graph-edges.ndjson",
+            ".opencode\\ndjson\\enriched-ledger.ndjson",
+            ".opencode\\ndjson\\enriched-candidates.ndjson",
+            ".opencode\\ndjson\\cluster-summary.ndjson",
+            ".opencode\\ingest\\nodes.ndjson",
+            ".opencode\\ingest\\edges.ndjson",
+            ".opencode\\gemma4_candidates.ndjson",
+            ".opencode\\fixes\\fixes.ndjson",
+            ".opencode\\recommendations\\tasks.ndjson",
+            ".opencode\\recommendations\\tasks-with-improved-titles.ndjson",
+            ".opencode\\recommendations\\agentic-fix-queue.ndjson",
+            ".opencode\\quarantine\\invalid-cards.ndjson",
+            ".opencode\\outcome-ledger.ndjson",
+            ".opencode\\outcome-ledger-with-cardIds.ndjson",
+            ".opencode\\ace-packets_stale\\index.ndjson",
+            ".opencode\\ace-packets\\index.ndjson",
             "docs\\packets\\session-features.ndjson",
             "docs\\packets\\rg-knowledge-packets.ndjson",
             "docs\\ai-os\\agentic-progress-log.ndjson",
-            "sveltekit-frontend\\tmp\\qdrant-embeddings-test.ndjson",
-            "sveltekit-frontend\\tmp\\hypergraph-assignments.ndjson",
-            "sveltekit-frontend\\tmp\\hypergraph\\codebase_chunks_768-embeddings.ndjson",
-            "sveltekit-frontend\\tmp\\hypergraph\\codebase_chunks_768-assignments.ndjson",
-            "sveltekit-frontend\\tmp\\embeddings-smoke.ndjson",
-            "sveltekit-frontend\\tmp\\codebase_chunks_768-embeddings.ndjson",
-            "sveltekit-frontend\\tmp\\chunks\\parents-corpus-rg.ndjson",
-            "sveltekit-frontend\\tmp\\chunks\\parents-corpus-expanded.ndjson",
-            "sveltekit-frontend\\tmp\\chunks\\parents-corpus-all.ndjson",
-            "sveltekit-frontend\\tmp\\chunks\\parents-corpus-4d.ndjson",
-            "sveltekit-frontend\\tmp\\assignments.ndjson",
-            "sveltekit-frontend\\tmp\\assignments-test.ndjson",
-            "sveltekit-frontend\\tmp\\assignments-ci.ndjson",
-            ".tmp\\superseded-score-candidates.ndjson",
-            ".tmp\\source-ref-repair-candidates.ndjson",
-            ".tmp\\retrieval-pass-dry-run.ndjson",
-            ".tmp\\path-map.ndjson",
-            ".tmp\\parent_atlas_packets\\rg-dumps\\rg-dump-packets.ndjson",
-            "sveltekit-frontend\\sveltekit-frontend\\tmp\\embeddings-smoke.ndjson",
-            ".tmp\\offline-synthesis\\hidden-packet-pathmap.ndjson",
-            ".tmp\\offline-synthesis\\consolidated-index.ndjson",
-            ".tmp\\missing-sourceref.ndjson"
+            "tmp\\llm-wiki-chunks\\_combined.ndjson",
+            "tmp\\llm-wiki-chunks\\tokenization.ndjson",
+            "tmp\\llm-wiki-chunks\\tokenization-rg.ndjson"
           ]
         }
       }
@@ -570,9 +570,9 @@
       {
         "id": "table:atlas_feature_map",
         "status": "pass",
-        "message": "atlas_feature_map exists with 14471 rows",
+        "message": "atlas_feature_map exists with 14487 rows",
         "details": {
-          "count": 14471
+          "count": 14487
         }
       },
       {
@@ -586,9 +586,9 @@
       {
         "id": "table:nes_chrom_packets",
         "status": "pass",
-        "message": "nes_chrom_packets exists with 27 rows",
+        "message": "nes_chrom_packets exists with 14515 rows",
         "details": {
-          "count": 27
+          "count": 14515
         }
       },
       {
@@ -602,17 +602,17 @@
       {
         "id": "table:route_runtime_packets",
         "status": "pass",
-        "message": "route_runtime_packets exists with 48 rows",
+        "message": "route_runtime_packets exists with 61 rows",
         "details": {
-          "count": 48
+          "count": 61
         }
       },
       {
         "id": "table:task_semantic_packets",
         "status": "pass",
-        "message": "task_semantic_packets exists with 302 rows",
+        "message": "task_semantic_packets exists with 314 rows",
         "details": {
-          "count": 302
+          "count": 314
         }
       },
       {
@@ -626,9 +626,9 @@
       {
         "id": "table:agent_pickup_queue",
         "status": "pass",
-        "message": "agent_pickup_queue exists with 123 rows",
+        "message": "agent_pickup_queue exists with 135 rows",
         "details": {
-          "count": 123
+          "count": 135
         }
       },
       {
@@ -645,28 +645,28 @@
       },
       {
         "id": "active-production:topology",
-        "status": "warn",
-        "message": "Active production qdrant-without-SOM rows: 2",
+        "status": "pass",
+        "message": "Active production qdrant-without-SOM rows: 0",
         "details": {
-          "raw_total": 14471,
-          "raw_with_som": 10494,
-          "raw_with_qdrant": 13064,
-          "active_total": 4814,
-          "active_with_som": 4812,
-          "active_with_qdrant": 4814,
-          "active_qdrant_no_som": 2
+          "raw_total": 14487,
+          "raw_with_som": 10512,
+          "raw_with_qdrant": 11427,
+          "active_total": 4830,
+          "active_with_som": 4830,
+          "active_with_qdrant": 4788,
+          "active_qdrant_no_som": 0
         }
       },
       {
         "id": "nes-chrom:sourceRef-parent-join",
         "status": "pass",
-        "message": "NES/CHROM packets matching Parent Atlas: 22/27",
+        "message": "NES/CHROM packets matching Parent Atlas: 10032/14515",
         "details": {}
       },
       {
         "id": "route-runtime:sourceRefs",
         "status": "pass",
-        "message": "Runtime packets with sourceRefs: 29/48",
+        "message": "Runtime packets with sourceRefs: 42/61",
         "details": {}
       }
     ],
@@ -674,7 +674,7 @@
       {
         "id": "lod0:route-runtime",
         "status": "pass",
-        "message": "Redis LOD0 runtime packets: 3/48",
+        "message": "Redis LOD0 runtime packets: 13/50",
         "details": {}
       }
     ],
@@ -682,7 +682,7 @@
       {
         "id": "collection:codebase_chunks_768",
         "status": "pass",
-        "message": "Qdrant codebase_chunks_768 points: 54231",
+        "message": "Qdrant codebase_chunks_768 points: 54331",
         "details": {}
       }
     ],
@@ -690,7 +690,7 @@
       {
         "id": "contextual-tree",
         "status": "pass",
-        "message": "Neo4j CodebaseFile=25461, ParentAtlasFeature=1701",
+        "message": "Neo4j CodebaseFile=31551, ParentAtlasFeature=1701",
         "details": {}
       }
     ]
@@ -756,7 +756,7 @@
       "message": "sveltekit-frontend/src/lib/server/gpu/libtorch-bridge.ts exists",
       "details": {
         "exists": true,
-        "bytes": 62082,
+        "bytes": 64801,
         "relPath": "sveltekit-frontend/src/lib/server/gpu/libtorch-bridge.ts"
       }
     },
@@ -822,7 +822,7 @@
       "message": "scripts/atlas/pytorch-qdrant-redis-som-index.mjs exists",
       "details": {
         "exists": true,
-        "bytes": 35532,
+        "bytes": 35567,
         "relPath": "scripts/atlas/pytorch-qdrant-redis-som-index.mjs"
       }
     },
@@ -917,7 +917,7 @@
           "bytes": 1009,
           "relPath": "simd-bridge/cpp/cuvs_bridge.cc"
         },
-        "hasMatmulExport": false,
+        "hasMatmulExport": true,
         "hasDotProduct": true,
         "hasBatchCosine": true,
         "hasKMeans": true,
@@ -931,10 +931,10 @@
     {
       "section": "gpu",
       "id": "bridge:matmul-export",
-      "status": "warn",
+      "status": "pass",
       "message": "No generic public matmul_f32 native bridge export is exposed yet; this is a public API gap, not evidence that GEMM is absent. Keep the canonical 768→256→64 autoencoder lane valid.",
       "details": {
-        "hasMatmulExport": false,
+        "hasMatmulExport": true,
         "hasDotProduct": true,
         "hasBatchCosine": true,
         "hasKMeans": true,
@@ -1009,7 +1009,7 @@
       "message": "sveltekit-frontend/src/lib/server/db/schema/nes-chrom-packets.ts exists",
       "details": {
         "exists": true,
-        "bytes": 5118,
+        "bytes": 6145,
         "relPath": "sveltekit-frontend/src/lib/server/db/schema/nes-chrom-packets.ts"
       }
     },
@@ -1259,34 +1259,34 @@
       "section": "offline",
       "id": "rg-uu:ndjson-inventory",
       "status": "pass",
-      "message": "rg -uuu found 125 NDJSON files",
+      "message": "rg -uuu found 124 NDJSON files",
       "details": {
         "sample": [
+          ".opencode\\ndjson\\parents-atlas-test\\ledger.ndjson",
+          ".opencode\\ndjson\\parents-atlas-test\\2026-05-30-test-1780159729769.ndjson",
+          ".opencode\\ndjson\\minified-ace-index.ndjson",
+          ".opencode\\ndjson\\graph-edges.ndjson",
+          ".opencode\\ndjson\\enriched-ledger.ndjson",
+          ".opencode\\ndjson\\enriched-candidates.ndjson",
+          ".opencode\\ndjson\\cluster-summary.ndjson",
+          ".opencode\\ingest\\nodes.ndjson",
+          ".opencode\\ingest\\edges.ndjson",
+          ".opencode\\gemma4_candidates.ndjson",
+          ".opencode\\fixes\\fixes.ndjson",
+          ".opencode\\recommendations\\tasks.ndjson",
+          ".opencode\\recommendations\\tasks-with-improved-titles.ndjson",
+          ".opencode\\recommendations\\agentic-fix-queue.ndjson",
+          ".opencode\\quarantine\\invalid-cards.ndjson",
+          ".opencode\\outcome-ledger.ndjson",
+          ".opencode\\outcome-ledger-with-cardIds.ndjson",
+          ".opencode\\ace-packets_stale\\index.ndjson",
+          ".opencode\\ace-packets\\index.ndjson",
           "docs\\packets\\session-features.ndjson",
           "docs\\packets\\rg-knowledge-packets.ndjson",
           "docs\\ai-os\\agentic-progress-log.ndjson",
-          "sveltekit-frontend\\tmp\\qdrant-embeddings-test.ndjson",
-          "sveltekit-frontend\\tmp\\hypergraph-assignments.ndjson",
-          "sveltekit-frontend\\tmp\\hypergraph\\codebase_chunks_768-embeddings.ndjson",
-          "sveltekit-frontend\\tmp\\hypergraph\\codebase_chunks_768-assignments.ndjson",
-          "sveltekit-frontend\\tmp\\embeddings-smoke.ndjson",
-          "sveltekit-frontend\\tmp\\codebase_chunks_768-embeddings.ndjson",
-          "sveltekit-frontend\\tmp\\chunks\\parents-corpus-rg.ndjson",
-          "sveltekit-frontend\\tmp\\chunks\\parents-corpus-expanded.ndjson",
-          "sveltekit-frontend\\tmp\\chunks\\parents-corpus-all.ndjson",
-          "sveltekit-frontend\\tmp\\chunks\\parents-corpus-4d.ndjson",
-          "sveltekit-frontend\\tmp\\assignments.ndjson",
-          "sveltekit-frontend\\tmp\\assignments-test.ndjson",
-          "sveltekit-frontend\\tmp\\assignments-ci.ndjson",
-          ".tmp\\superseded-score-candidates.ndjson",
-          ".tmp\\source-ref-repair-candidates.ndjson",
-          ".tmp\\retrieval-pass-dry-run.ndjson",
-          ".tmp\\path-map.ndjson",
-          ".tmp\\parent_atlas_packets\\rg-dumps\\rg-dump-packets.ndjson",
-          "sveltekit-frontend\\sveltekit-frontend\\tmp\\embeddings-smoke.ndjson",
-          ".tmp\\offline-synthesis\\hidden-packet-pathmap.ndjson",
-          ".tmp\\offline-synthesis\\consolidated-index.ndjson",
-          ".tmp\\missing-sourceref.ndjson"
+          "tmp\\llm-wiki-chunks\\_combined.ndjson",
+          "tmp\\llm-wiki-chunks\\tokenization.ndjson",
+          "tmp\\llm-wiki-chunks\\tokenization-rg.ndjson"
         ]
       }
     },
@@ -1303,9 +1303,9 @@
       "section": "postgres",
       "id": "table:atlas_feature_map",
       "status": "pass",
-      "message": "atlas_feature_map exists with 14471 rows",
+      "message": "atlas_feature_map exists with 14487 rows",
       "details": {
-        "count": 14471
+        "count": 14487
       }
     },
     {
@@ -1321,9 +1321,9 @@
       "section": "postgres",
       "id": "table:nes_chrom_packets",
       "status": "pass",
-      "message": "nes_chrom_packets exists with 27 rows",
+      "message": "nes_chrom_packets exists with 14515 rows",
       "details": {
-        "count": 27
+        "count": 14515
       }
     },
     {
@@ -1339,18 +1339,18 @@
       "section": "postgres",
       "id": "table:route_runtime_packets",
       "status": "pass",
-      "message": "route_runtime_packets exists with 48 rows",
+      "message": "route_runtime_packets exists with 61 rows",
       "details": {
-        "count": 48
+        "count": 61
       }
     },
     {
       "section": "postgres",
       "id": "table:task_semantic_packets",
       "status": "pass",
-      "message": "task_semantic_packets exists with 302 rows",
+      "message": "task_semantic_packets exists with 314 rows",
       "details": {
-        "count": 302
+        "count": 314
       }
     },
     {
@@ -1366,9 +1366,9 @@
       "section": "postgres",
       "id": "table:agent_pickup_queue",
       "status": "pass",
-      "message": "agent_pickup_queue exists with 123 rows",
+      "message": "agent_pickup_queue exists with 135 rows",
       "details": {
-        "count": 123
+        "count": 135
       }
     },
     {
@@ -1388,65 +1388,65 @@
     {
       "section": "postgres",
       "id": "active-production:topology",
-      "status": "warn",
-      "message": "Active production qdrant-without-SOM rows: 2",
+      "status": "pass",
+      "message": "Active production qdrant-without-SOM rows: 0",
       "details": {
-        "raw_total": 14471,
-        "raw_with_som": 10494,
-        "raw_with_qdrant": 13064,
-        "active_total": 4814,
-        "active_with_som": 4812,
-        "active_with_qdrant": 4814,
-        "active_qdrant_no_som": 2
+        "raw_total": 14487,
+        "raw_with_som": 10512,
+        "raw_with_qdrant": 11427,
+        "active_total": 4830,
+        "active_with_som": 4830,
+        "active_with_qdrant": 4788,
+        "active_qdrant_no_som": 0
       }
     },
     {
       "section": "postgres",
       "id": "nes-chrom:sourceRef-parent-join",
       "status": "pass",
-      "message": "NES/CHROM packets matching Parent Atlas: 22/27",
+      "message": "NES/CHROM packets matching Parent Atlas: 10032/14515",
       "details": {}
     },
     {
       "section": "postgres",
       "id": "route-runtime:sourceRefs",
       "status": "pass",
-      "message": "Runtime packets with sourceRefs: 29/48",
+      "message": "Runtime packets with sourceRefs: 42/61",
       "details": {}
     },
     {
       "section": "redis",
       "id": "lod0:route-runtime",
       "status": "pass",
-      "message": "Redis LOD0 runtime packets: 3/48",
+      "message": "Redis LOD0 runtime packets: 13/50",
       "details": {}
     },
     {
       "section": "qdrant",
       "id": "collection:codebase_chunks_768",
       "status": "pass",
-      "message": "Qdrant codebase_chunks_768 points: 54231",
+      "message": "Qdrant codebase_chunks_768 points: 54331",
       "details": {}
     },
     {
       "section": "neo4j",
       "id": "contextual-tree",
       "status": "pass",
-      "message": "Neo4j CodebaseFile=25461, ParentAtlasFeature=1701",
+      "message": "Neo4j CodebaseFile=31551, ParentAtlasFeature=1701",
       "details": {}
     }
   ],
   "postgres": {
     "tableCounts": {
       "parent_atlas_documents": 5253,
-      "atlas_feature_map": 14471,
+      "atlas_feature_map": 14487,
       "atlas_feature_map_synthesized": 14465,
-      "nes_chrom_packets": 27,
+      "nes_chrom_packets": 14515,
       "nes_chrom_kag_dag_hits": 32,
-      "route_runtime_packets": 48,
-      "task_semantic_packets": 302,
+      "route_runtime_packets": 61,
+      "task_semantic_packets": 314,
       "codebase_chunk_index": 40754,
-      "agent_pickup_queue": 123
+      "agent_pickup_queue": 135
     },
     "parentAtlasDocuments": {
       "total": 3799,
@@ -1455,58 +1455,58 @@
       "with_summary": 3794
     },
     "topologyCoverage": {
-      "raw_total": 14471,
-      "raw_with_som": 10494,
-      "raw_with_qdrant": 13064,
-      "active_total": 4814,
-      "active_with_som": 4812,
-      "active_with_qdrant": 4814,
-      "active_qdrant_no_som": 2
+      "raw_total": 14487,
+      "raw_with_som": 10512,
+      "raw_with_qdrant": 11427,
+      "active_total": 4830,
+      "active_with_som": 4830,
+      "active_with_qdrant": 4788,
+      "active_qdrant_no_som": 0
     },
     "nesChromPackets": {
-      "total": 27,
-      "parent_atlas_matches": 22,
-      "with_source_ref": 27,
-      "with_feature_id": 27,
+      "total": 14515,
+      "parent_atlas_matches": 10032,
+      "with_source_ref": 14515,
+      "with_feature_id": 14515,
       "with_qdrant_point": 20,
       "with_som_cluster": 16
     },
     "routeRuntimePackets": {
-      "total": 48,
-      "with_source_refs": 29,
+      "total": 61,
+      "with_source_refs": 42,
       "with_feature_ids": 22,
-      "with_qdrant_hits": 43,
+      "with_qdrant_hits": 56,
       "with_cluster": 16
     }
   },
   "redis": {
     "available": true,
-    "latestRuntimePacketsChecked": 48,
-    "lod0Found": 3,
-    "lod0Missing": 45
+    "latestRuntimePacketsChecked": 50,
+    "lod0Found": 13,
+    "lod0Missing": 37
   },
   "qdrant": {
     "available": true,
     "url": "http://127.0.0.1:6333",
     "collection": "codebase_chunks_768",
-    "pointsCount": 54231,
-    "indexedVectorsCount": 111850,
+    "pointsCount": 54331,
+    "indexedVectorsCount": 166220,
     "status": "green"
   },
   "neo4j": {
     "available": true,
     "uri": "bolt://127.0.0.1:7687",
-    "totalNodes": 163265,
-    "codebaseFiles": 25461,
+    "totalNodes": 169400,
+    "codebaseFiles": 31551,
     "parentAtlasFeatures": 1701,
-    "totalRelationships": 502297,
+    "totalRelationships": 519638,
     "belongsToFeature": 10506,
-    "similarTopology": 166013
+    "similarTopology": 170809
   },
   "drizzle": {
     "nesChromSchema": {
       "exists": true,
-      "bytes": 5118,
+      "bytes": 6145,
       "relPath": "sveltekit-frontend/src/lib/server/db/schema/nes-chrom-packets.ts"
     },
     "routeRuntimeSchema": {
@@ -1624,39 +1624,39 @@
   ],
   "ndjsonInventory": {
     "status": "pass",
-    "total": 125,
+    "total": 124,
     "sample": [
+      ".opencode\\ndjson\\parents-atlas-test\\ledger.ndjson",
+      ".opencode\\ndjson\\parents-atlas-test\\2026-05-30-test-1780159729769.ndjson",
+      ".opencode\\ndjson\\minified-ace-index.ndjson",
+      ".opencode\\ndjson\\graph-edges.ndjson",
+      ".opencode\\ndjson\\enriched-ledger.ndjson",
+      ".opencode\\ndjson\\enriched-candidates.ndjson",
+      ".opencode\\ndjson\\cluster-summary.ndjson",
+      ".opencode\\ingest\\nodes.ndjson",
+      ".opencode\\ingest\\edges.ndjson",
+      ".opencode\\gemma4_candidates.ndjson",
+      ".opencode\\fixes\\fixes.ndjson",
+      ".opencode\\recommendations\\tasks.ndjson",
+      ".opencode\\recommendations\\tasks-with-improved-titles.ndjson",
+      ".opencode\\recommendations\\agentic-fix-queue.ndjson",
+      ".opencode\\quarantine\\invalid-cards.ndjson",
+      ".opencode\\outcome-ledger.ndjson",
+      ".opencode\\outcome-ledger-with-cardIds.ndjson",
+      ".opencode\\ace-packets_stale\\index.ndjson",
+      ".opencode\\ace-packets\\index.ndjson",
       "docs\\packets\\session-features.ndjson",
       "docs\\packets\\rg-knowledge-packets.ndjson",
       "docs\\ai-os\\agentic-progress-log.ndjson",
-      "sveltekit-frontend\\tmp\\qdrant-embeddings-test.ndjson",
-      "sveltekit-frontend\\tmp\\hypergraph-assignments.ndjson",
-      "sveltekit-frontend\\tmp\\hypergraph\\codebase_chunks_768-embeddings.ndjson",
-      "sveltekit-frontend\\tmp\\hypergraph\\codebase_chunks_768-assignments.ndjson",
-      "sveltekit-frontend\\tmp\\embeddings-smoke.ndjson",
-      "sveltekit-frontend\\tmp\\codebase_chunks_768-embeddings.ndjson",
-      "sveltekit-frontend\\tmp\\chunks\\parents-corpus-rg.ndjson",
-      "sveltekit-frontend\\tmp\\chunks\\parents-corpus-expanded.ndjson",
-      "sveltekit-frontend\\tmp\\chunks\\parents-corpus-all.ndjson",
-      "sveltekit-frontend\\tmp\\chunks\\parents-corpus-4d.ndjson",
-      "sveltekit-frontend\\tmp\\assignments.ndjson",
-      "sveltekit-frontend\\tmp\\assignments-test.ndjson",
-      "sveltekit-frontend\\tmp\\assignments-ci.ndjson",
-      ".tmp\\superseded-score-candidates.ndjson",
-      ".tmp\\source-ref-repair-candidates.ndjson",
-      ".tmp\\retrieval-pass-dry-run.ndjson",
-      ".tmp\\path-map.ndjson",
-      ".tmp\\parent_atlas_packets\\rg-dumps\\rg-dump-packets.ndjson",
-      "sveltekit-frontend\\sveltekit-frontend\\tmp\\embeddings-smoke.ndjson",
-      ".tmp\\offline-synthesis\\hidden-packet-pathmap.ndjson",
-      ".tmp\\offline-synthesis\\consolidated-index.ndjson",
-      ".tmp\\missing-sourceref.ndjson"
+      "tmp\\llm-wiki-chunks\\_combined.ndjson",
+      "tmp\\llm-wiki-chunks\\tokenization.ndjson",
+      "tmp\\llm-wiki-chunks\\tokenization-rg.ndjson"
     ]
   },
   "summary": {
     "counts": {
-      "pass": 64,
-      "warn": 2,
+      "pass": 66,
+      "warn": 0,
       "fail": 0
     }
   },
@@ -1923,7 +1923,7 @@
     "files": {
       "libtorchBridge": {
         "exists": true,
-        "bytes": 62082,
+        "bytes": 64801,
         "relPath": "sveltekit-frontend/src/lib/server/gpu/libtorch-bridge.ts"
       },
       "pytorchGraph": {
@@ -1953,7 +1953,7 @@
       },
       "somPipeline": {
         "exists": true,
-        "bytes": 35532,
+        "bytes": 35567,
         "relPath": "scripts/atlas/pytorch-qdrant-redis-som-index.mjs"
       },
       "libtorchGraphImpl": {
@@ -1989,7 +1989,7 @@
       "mjsArchitecture": "Encoder: Linear(768→256) → ReLU → Linear(256→64)"
     },
     "capabilities": {
-      "hasMatmulExport": false,
+      "hasMatmulExport": true,
       "hasDotProduct": true,
       "hasBatchCosine": true,
       "hasKMeans": true,

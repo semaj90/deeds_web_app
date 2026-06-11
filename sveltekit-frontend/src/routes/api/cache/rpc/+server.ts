@@ -22,6 +22,7 @@
 import { json } from "@sveltejs/kit";
 import type { RequestHandler } from "./$types";
 import { getRedis } from "$lib/server/redis.js";
+import { requireUser } from "$lib/server/auth-utils.js";
 
 interface JsonRpcRequest {
   jsonrpc: "2.0";
@@ -52,20 +53,29 @@ function requireParams(params: Record<string, unknown> | undefined, ...keys: str
   return null;
 }
 
-export const POST: RequestHandler = async ({ request, locals }) => {
-  if (!locals.user) {
-    return json(err(null, -32001, "Unauthorized"), { status: 401 });
-  }
+import { z } from 'zod';
 
-  let body: JsonRpcRequest;
+const JsonRpcRequestSchema = z.object({
+  jsonrpc: z.literal('2.0'),
+  method: z.string().min(1),
+  params: z.any().optional(),
+  id: z.any().optional(),
+});
+
+export const POST: RequestHandler = async (event) => {
+  requireUser(event);
+  const { request } = event;
+
+  let body: any;
   try {
     body = await request.json();
   } catch {
-    return json(err(null, -32700, "Parse error"), { status: 400 });
+    return json(err(null, -32700, "Parse error", "Malformed JSON"), { status: 400 });
   }
 
-  if (body.jsonrpc !== "2.0" || !body.method) {
-    return json(err(body.id ?? null, -32600, "Invalid Request"), { status: 400 });
+  const parsed = JsonRpcRequestSchema.safeParse(body);
+  if (!parsed.success) {
+    return json(err(body?.id ?? null, -32600, "Invalid Request", parsed.error.format()), { status: 400 });
   }
 
   const id     = body.id ?? null;

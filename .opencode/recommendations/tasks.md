@@ -1,4 +1,4 @@
-# Executable Task Cards — 2026-06-10T18:58:47.367Z
+# Executable Task Cards — 2026-06-11T03:05:45.585Z
 
 **12 tasks** across **4 clusters**
 
@@ -26,35 +26,35 @@
 - **Action**: Audit barrel re-exports; remove or fix dangling import paths
 - **Run**: `node scripts/atlas/debug-import-resolve.mjs <import> 'src/lib/components/ui/index.ts'`
 - **sourceRefs**: src/lib/components/ui/index.ts
-- **task_id**: `task_97c63560`
+- **task_id**: `task_617f67f9`
 #### [HIGH] src/lib/components/ui/gaming/n64/index.ts — 29 unresolved imports
 - **Type**: `developer_recommendation`  **Status**: `todo`  **TTL**: 7d
 - **Why**: Feature "ui" barrel/index has 29 dangling import refs (mapreduce v4 scan)
 - **Action**: Audit barrel re-exports; remove or fix dangling import paths
 - **Run**: `node scripts/atlas/debug-import-resolve.mjs <import> 'src/lib/components/ui/gaming/n64/index.ts'`
 - **sourceRefs**: src/lib/components/ui/gaming/n64/index.ts
-- **task_id**: `task_671f6862`
+- **task_id**: `task_adc8c3bf`
 #### [HIGH] src/lib/components/ui/gaming/index.ts — 18 unresolved imports
 - **Type**: `developer_recommendation`  **Status**: `todo`  **TTL**: 7d
 - **Why**: Feature "ui" barrel/index has 18 dangling import refs (mapreduce v4 scan)
 - **Action**: Audit barrel re-exports; remove or fix dangling import paths
 - **Run**: `node scripts/atlas/debug-import-resolve.mjs <import> 'src/lib/components/ui/gaming/index.ts'`
 - **sourceRefs**: src/lib/components/ui/gaming/index.ts
-- **task_id**: `task_9a2ea253`
+- **task_id**: `task_449cfd4f`
 #### [HIGH] src/lib/components/ui/alert-dialog/index.js — 12 unresolved imports
 - **Type**: `developer_recommendation`  **Status**: `todo`  **TTL**: 7d
 - **Why**: Feature "ui" barrel/index has 12 dangling import refs (mapreduce v4 scan)
 - **Action**: Audit barrel re-exports; remove or fix dangling import paths
 - **Run**: `node scripts/atlas/debug-import-resolve.mjs <import> 'src/lib/components/ui/alert-dialog/index.js'`
 - **sourceRefs**: src/lib/components/ui/alert-dialog/index.js
-- **task_id**: `task_f2c676a1`
+- **task_id**: `task_4f8fd2d4`
 #### [HIGH] src/lib/components/ui/dialog/index.ts — 11 unresolved imports
 - **Type**: `developer_recommendation`  **Status**: `todo`  **TTL**: 7d
 - **Why**: Feature "ui" barrel/index has 11 dangling import refs (mapreduce v4 scan)
 - **Action**: Audit barrel re-exports; remove or fix dangling import paths
 - **Run**: `node scripts/atlas/debug-import-resolve.mjs <import> 'src/lib/components/ui/dialog/index.ts'`
 - **sourceRefs**: src/lib/components/ui/dialog/index.ts
-- **task_id**: `task_1d5d9bfa`
+- **task_id**: `task_1518d974`
 
 ### General
 #### [HIGH] src/lib/icons/yorha/index.ts — 12 unresolved imports
@@ -63,31 +63,31 @@
 - **Action**: Audit barrel re-exports; remove or fix dangling import paths
 - **Run**: `node scripts/atlas/debug-import-resolve.mjs <import> 'src/lib/icons/yorha/index.ts'`
 - **sourceRefs**: src/lib/icons/yorha/index.ts
-- **task_id**: `task_3475721d`
+- **task_id**: `task_3bd33bca`
 #### [LOW] Feature not implemented: Priority 2: VLM POI Integration (90 min)
 - **Type**: `missing_feature`  **Status**: `todo`  **TTL**: 7d
 - **Why**: feature not yet implemented
 - **Action**: rg "Wire photo VLM analysis to UI" src docs tests
 - **sourceRefs**: local:docs/archive/sessions/SESSION_SUMMARY_APRIL_9_2026.md#L188
-- **task_id**: `task_e9351f29`
+- **task_id**: `task_1678a9e3`
 #### [LOW] Feature not implemented: Priority 3: Audit Dashboard Web UI (3-4 hours)
 - **Type**: `missing_feature`  **Status**: `todo`  **TTL**: 7d
 - **Why**: feature not yet implemented
 - **Action**: rg "Real-time GPU metrics (VRAM, temperature, utilization)" src docs tests
 - **sourceRefs**: local:docs/archive/sessions/SESSION_SUMMARY_APRIL_9_2026.md#L194
-- **task_id**: `task_c87febba`
+- **task_id**: `task_2defac81`
 #### [LOW] Feature not implemented: Priority 4: Auto-Fix Orchestrator (6-8 hours)
 - **Type**: `missing_feature`  **Status**: `todo`  **TTL**: 7d
 - **Why**: feature not yet implemented
 - **Action**: rg "Identify duplicates from GPU audit" src docs tests
 - **sourceRefs**: local:docs/archive/sessions/SESSION_SUMMARY_APRIL_9_2026.md#L201
-- **task_id**: `task_1ddd6145`
+- **task_id**: `task_fc588a3d`
 #### [LOW] Feature not implemented: Phase 3: Post-Synthesis Quality Review (RunID: `stage-2c-500`)
 - **Type**: `missing_feature`  **Status**: `todo`  **TTL**: 7d
 - **Why**: feature not yet implemented
 - **Action**: rg "**Authority Audit**: Verify PageRank scores in Neo4j align with perceived file importance." src docs tests
 - **sourceRefs**: local:docs/operator/atlas-production-roadmap.md#L5
-- **task_id**: `task_ecee4f9f`
+- **task_id**: `task_60b88f55`
 
 ### Agent Workflow
 #### [MEDIUM] 4 files unclassified with >10 imports
@@ -96,7 +96,7 @@
 - **Action**: Add feature labels to mapreduce classification rules
 - **Run**: `node scripts/atlas/mapreduce-consolidated-index.mjs "--output=.tmp/mapreduce-full-v4.ndjson"`
 - **sourceRefs**: src/hooks.server.ts, src/lib/icons/yorha/index.ts, src/lib/index.ts
-- **task_id**: `task_82f913e9`
+- **task_id**: `task_0cec65c8`
 
 ### Legal Workspace
 #### [LOW] Feature not implemented: Priority 1: Evidence Upload UI (1 hour)
@@ -104,4 +104,4 @@
 - **Why**: feature not yet implemented
 - **Action**: rg "Display extracted text preview" src docs tests
 - **sourceRefs**: local:docs/archive/sessions/SESSION_SUMMARY_APRIL_9_2026.md#L182
-- **task_id**: `task_47a869cc`
+- **task_id**: `task_4a257403`

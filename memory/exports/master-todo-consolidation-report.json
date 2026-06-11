@@ -1,25 +1,22 @@
 {
-  "timestamp": "2026-06-02T01:56:28.711Z",
+  "timestamp": "2026-06-11T03:53:16.023Z",
   "sourceDocument": "MASTER-FEATURE-TODO-2026-05-20.md",
-  "openItems": 102,
-  "tasksGenerated": 102,
+  "sourceDocumentExists": false,
+  "openItems": 0,
+  "tasksGenerated": 0,
   "featureLabelTasks": 3312,
   "missingFeatureTodos": 141,
-  "byStatus": {
-    "BACKLOG": 96,
-    "REVIEW": 6
-  },
-  "byPriority": {
-    "LOW": 100,
-    "MEDIUM": 2
-  },
+  "hiddenDirectoryTasks": 943,
+  "byStatus": {},
+  "byPriority": {},
   "fileResolution": {
-    "allRefsResolved": 6,
+    "allRefsResolved": 0,
     "someRefsMissing": 0,
-    "noFileRefs": 96
+    "noFileRefs": 0
   },
   "supplementalInputs": {
     "featureLabelTasksPath": "sveltekit-frontend/.tmp/kanban_tasks.jsonl",
-    "missingFeatureTodosPath": "sveltekit-frontend/.tmp/missing_feature_todos.jsonl"
+    "missingFeatureTodosPath": "sveltekit-frontend/.tmp/missing_feature_todos.jsonl",
+    "hiddenDirectoryTasksPath": "sveltekit-frontend/.tmp/hidden_directory_tasks.jsonl"
   }
 }

@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-06-06T06:21:32.816Z",
+  "generatedAt": "2026-06-11T05:39:28.739Z",
   "sourceFiles": {
     "recommendationEvents": ".opencode\\recommendations\\recommendation-events.jsonl",
     "taskEvents": ".opencode\\tasks\\task-events.jsonl",
@@ -7,24 +7,190 @@
   },
   "counts": {
     "findings": 0,
-    "recommendations": 26,
-    "tasks": 10,
-    "historyPackets": 10
+    "recommendations": 199,
+    "tasks": 12,
+    "historyPackets": 20
   },
   "summary": {
-    "runId": "2026-06-06T06:21:32.816Z",
+    "runId": "2026-06-11T05:39:28.739Z",
     "findingCount": 0,
-    "recommendationCount": 26,
-    "taskCount": 10,
-    "historyCount": 10,
-    "promotedRecommendations": 10
+    "recommendationCount": 199,
+    "taskCount": 12,
+    "historyCount": 20,
+    "promotedRecommendations": 12,
+    "activeLane": {
+      "taskId": "task_4_circular_dependency_chains_of_3_files",
+      "title": "4 circular dependency chains of 3+ files",
+      "priority": "HIGH",
+      "status": "TODO",
+      "command": null,
+      "sourceRecommendationKey": "4_circular_dependency_chains_of_3_files"
+    }
   },
   "taskState": {
-    "generatedAt": "2026-06-06T06:21:32.816Z",
-    "recommendationEventsCount": 26,
-    "taskEventsCount": 10,
-    "promotedRecommendationsCount": 10,
+    "generatedAt": "2026-06-11T05:39:28.739Z",
+    "recommendationEventsCount": 199,
+    "taskEventsCount": 20,
+    "promotedRecommendationsCount": 12,
     "tasks": [
+      {
+        "task_id": "task_27_api_route_handlers_lack_auth_guards",
+        "title": "27 API route handlers lack auth guards",
+        "description": "Every non-public +server.ts should check locals.user or call requireAuth(). Reference: G18 in the 47-gate audit system.",
+        "priority": "HIGH",
+        "status": "DONE",
+        "source_recommendation_key": "27_api_route_handlers_lack_auth_guards",
+        "command": null,
+        "feature_id": "general",
+        "source_refs": [
+          "src/routes/api/ace/ask/+server.ts",
+          "src/routes/api/atlas/studio/cards/+server.ts",
+          "src/routes/api/atlas/studio/cards/[id]/+server.ts",
+          "src/routes/api/atlas/studio/redis/+server.ts",
+          "src/routes/api/atlas/studio/search/+server.ts",
+          "src/routes/api/chat/stream/+server.ts",
+          "sveltekit-frontend/src/routes/.well-known/agent.json/+server.ts",
+          "sveltekit-frontend/src/routes/.well-known/appspecific/com.chrome.devtools.json/+server.ts",
+          "sveltekit-frontend/src/routes/.well-known/llms-full.txt/+server.ts",
+          "sveltekit-frontend/src/routes/.well-known/llms.txt/+server.ts",
+          "sveltekit-frontend/src/routes/api/ace/ask/+server.ts",
+          "sveltekit-frontend/src/routes/api/admin/parents-atlas/actions/+server.ts",
+          "sveltekit-frontend/src/routes/api/ai/scenario/+server.ts",
+          "sveltekit-frontend/src/routes/api/atlas/cards/+server.ts",
+          "sveltekit-frontend/src/routes/api/atlas/cards/[id]/+server.ts",
+          "sveltekit-frontend/src/routes/api/atlas/studio/cards/+server.ts",
+          "sveltekit-frontend/src/routes/api/atlas/studio/cards/[id]/+server.ts",
+          "sveltekit-frontend/src/routes/api/atlas/studio/redis/+server.ts",
+          "sveltekit-frontend/src/routes/api/debug/retrieval-comparison/+server.ts",
+          "sveltekit-frontend/src/routes/api/graphify/stream/+server.ts"
+        ],
+        "evidence_refs": [
+          "docs\\graph\\recommendations.json"
+        ],
+        "first_seen": "2026-06-11T03:18:47.473Z",
+        "last_seen": "2026-06-11T05:19:00.000Z",
+        "created_at": "2026-06-11T03:18:47.473Z",
+        "updated_at": "2026-06-11T05:19:00.000Z",
+        "history": [
+          {
+            "event_id": "task_f5a9e198f984",
+            "event_type": "TASK_CREATED",
+            "created_at": "2026-06-11T03:18:47.473Z",
+            "run_id": "2026-06-06T06:21:32.559Z",
+            "task_id": "task_27_api_route_handlers_lack_auth_guards",
+            "source_recommendation_key": "27_api_route_handlers_lack_auth_guards",
+            "title": "27 API route handlers lack auth guards",
+            "description": "Every non-public +server.ts should check locals.user or call requireAuth(). Reference: G18 in the 47-gate audit system.",
+            "priority": "HIGH",
+            "status": "TODO",
+            "parent_task_id": null,
+            "command": null,
+            "feature_id": "general",
+            "source_refs": [
+              "src/routes/api/ace/ask/+server.ts",
+              "src/routes/api/atlas/studio/cards/+server.ts",
+              "src/routes/api/atlas/studio/cards/[id]/+server.ts",
+              "src/routes/api/atlas/studio/redis/+server.ts",
+              "src/routes/api/atlas/studio/search/+server.ts",
+              "src/routes/api/chat/stream/+server.ts",
+              "sveltekit-frontend/src/routes/.well-known/agent.json/+server.ts",
+              "sveltekit-frontend/src/routes/.well-known/appspecific/com.chrome.devtools.json/+server.ts",
+              "sveltekit-frontend/src/routes/.well-known/llms-full.txt/+server.ts",
+              "sveltekit-frontend/src/routes/.well-known/llms.txt/+server.ts",
+              "sveltekit-frontend/src/routes/api/ace/ask/+server.ts",
+              "sveltekit-frontend/src/routes/api/admin/parents-atlas/actions/+server.ts",
+              "sveltekit-frontend/src/routes/api/ai/scenario/+server.ts",
+              "sveltekit-frontend/src/routes/api/atlas/cards/+server.ts",
+              "sveltekit-frontend/src/routes/api/atlas/cards/[id]/+server.ts",
+              "sveltekit-frontend/src/routes/api/atlas/studio/cards/+server.ts",
+              "sveltekit-frontend/src/routes/api/atlas/studio/cards/[id]/+server.ts",
+              "sveltekit-frontend/src/routes/api/atlas/studio/redis/+server.ts",
+              "sveltekit-frontend/src/routes/api/debug/retrieval-comparison/+server.ts",
+              "sveltekit-frontend/src/routes/api/graphify/stream/+server.ts"
+            ],
+            "evidence_refs": [
+              "docs\\graph\\recommendations.json"
+            ]
+          },
+          {
+            "event_id": "task_close_auth_guards_20260611",
+            "event_type": "TASK_STATUS_CHANGED",
+            "created_at": "2026-06-11T05:19:00.000Z",
+            "run_id": "close-auth-guards-20260611",
+            "task_id": "task_27_api_route_handlers_lack_auth_guards",
+            "previous_state": "TODO",
+            "new_state": "DONE",
+            "reason": "Every active non-public API route in sveltekit-frontend/src has been secured using requireUser or properly classified. fast-index-codebase has validated 0 auth gaps and 0 zod gaps.",
+            "evidence_refs": [
+              "sveltekit-frontend/scripts/index-codebase-fast.mjs",
+              "docs/reports/parent-atlas-production-readiness-report.json"
+            ]
+          }
+        ],
+        "seen_count": 16
+      },
+      {
+        "task_id": "task_graph_missing_neighborhood",
+        "title": "Disconnected graph neighborhood",
+        "description": "Neo4j traversal is missing neighborhood coverage for current seeds.",
+        "priority": "HIGH",
+        "status": "DONE",
+        "source_recommendation_key": "graph:missing-neighborhood",
+        "command": "npm run graph:refresh",
+        "feature_id": "graphify",
+        "source_refs": [
+          "reports/parent-atlas-open-lanes-todo.md",
+          "docs/graph/recommendations.md"
+        ],
+        "evidence_refs": [
+          "reports/parent-atlas-open-lanes-todo.md",
+          "docs/graph/recommendations.md"
+        ],
+        "first_seen": "2026-06-11T03:18:47.473Z",
+        "last_seen": "2026-06-11T03:33:00.000Z",
+        "created_at": "2026-06-11T03:18:47.473Z",
+        "updated_at": "2026-06-11T03:33:00.000Z",
+        "history": [
+          {
+            "event_id": "task_93ed27c4165e",
+            "event_type": "TASK_CREATED",
+            "created_at": "2026-06-11T03:18:47.473Z",
+            "run_id": "2026-06-06T06:21:32.559Z",
+            "task_id": "task_graph_missing_neighborhood",
+            "source_recommendation_key": "graph:missing-neighborhood",
+            "title": "Disconnected graph neighborhood",
+            "description": "Neo4j traversal is missing neighborhood coverage for current seeds.",
+            "priority": "HIGH",
+            "status": "TODO",
+            "parent_task_id": null,
+            "command": "npm run graph:refresh",
+            "feature_id": "graphify",
+            "source_refs": [
+              "reports/parent-atlas-open-lanes-todo.md",
+              "docs/graph/recommendations.md"
+            ],
+            "evidence_refs": [
+              "reports/parent-atlas-open-lanes-todo.md",
+              "docs/graph/recommendations.md"
+            ]
+          },
+          {
+            "event_id": "task_close_graph_missing_neighborhood_20260611",
+            "event_type": "TASK_STATUS_CHANGED",
+            "created_at": "2026-06-11T03:33:00.000Z",
+            "run_id": "manual-review-20260611",
+            "task_id": "task_graph_missing_neighborhood",
+            "previous_state": "TODO",
+            "new_state": "DONE",
+            "reason": "graph refresh completed; graph-stats.json has neighborhoodsComputed > 0 and code-relations-latest.json has totalEdges > 0 with no errors",
+            "evidence_refs": [
+              "memory/graphify/deep/graph-stats.json",
+              "logs/task-output/code-relations-latest.json"
+            ]
+          }
+        ],
+        "seen_count": 3
+      },
       {
         "task_id": "task_4_circular_dependency_chains_of_3_files",
         "title": "4 circular dependency chains of 3+ files",
@@ -59,15 +225,15 @@
         "evidence_refs": [
           "docs\\graph\\recommendations.json"
         ],
-        "first_seen": "2026-06-06T06:21:32.739Z",
-        "last_seen": "2026-06-06T06:21:32.739Z",
-        "created_at": "2026-06-06T06:21:32.739Z",
-        "updated_at": "2026-06-06T06:21:32.739Z",
+        "first_seen": "2026-06-11T03:18:47.472Z",
+        "last_seen": "2026-06-11T03:18:47.472Z",
+        "created_at": "2026-06-11T03:18:47.472Z",
+        "updated_at": "2026-06-11T03:18:47.472Z",
         "history": [
           {
             "event_id": "task_413aab6f5e07",
             "event_type": "TASK_CREATED",
-            "created_at": "2026-06-06T06:21:32.739Z",
+            "created_at": "2026-06-11T03:18:47.472Z",
             "run_id": "2026-06-06T06:21:32.559Z",
             "task_id": "task_4_circular_dependency_chains_of_3_files",
             "source_recommendation_key": "4_circular_dependency_chains_of_3_files",
@@ -105,137 +271,342 @@
             ]
           }
         ],
-        "seen_count": 1
+        "seen_count": 16
       },
       {
-        "task_id": "task_27_api_route_handlers_lack_auth_guards",
-        "title": "27 API route handlers lack auth guards",
-        "description": "Every non-public +server.ts should check locals.user or call requireAuth(). Reference: G18 in the 47-gate audit system.",
-        "priority": "HIGH",
-        "status": "TODO",
-        "source_recommendation_key": "27_api_route_handlers_lack_auth_guards",
-        "command": null,
-        "feature_id": "general",
+        "task_id": "task_active_production_topology_mirror",
+        "title": "Active production topology mirror",
+        "description": "Active Postgres rows have Qdrant point IDs but no mirrored som_cluster value.",
+        "priority": "MEDIUM",
+        "status": "DONE",
+        "source_recommendation_key": "active-production-topology-mirror",
+        "command": "npm run atlas:coverage:qdrant-no-som",
+        "feature_id": "som",
         "source_refs": [
-          "src/routes/api/ace/ask/+server.ts",
-          "src/routes/api/atlas/studio/cards/+server.ts",
-          "src/routes/api/atlas/studio/cards/[id]/+server.ts",
-          "src/routes/api/atlas/studio/redis/+server.ts",
-          "src/routes/api/atlas/studio/search/+server.ts",
-          "src/routes/api/chat/stream/+server.ts",
-          "sveltekit-frontend/src/routes/.well-known/agent.json/+server.ts",
-          "sveltekit-frontend/src/routes/.well-known/appspecific/com.chrome.devtools.json/+server.ts",
-          "sveltekit-frontend/src/routes/.well-known/llms-full.txt/+server.ts",
-          "sveltekit-frontend/src/routes/.well-known/llms.txt/+server.ts",
-          "sveltekit-frontend/src/routes/api/ace/ask/+server.ts",
-          "sveltekit-frontend/src/routes/api/admin/parents-atlas/actions/+server.ts",
-          "sveltekit-frontend/src/routes/api/ai/scenario/+server.ts",
-          "sveltekit-frontend/src/routes/api/atlas/cards/+server.ts",
-          "sveltekit-frontend/src/routes/api/atlas/cards/[id]/+server.ts",
-          "sveltekit-frontend/src/routes/api/atlas/studio/cards/+server.ts",
-          "sveltekit-frontend/src/routes/api/atlas/studio/cards/[id]/+server.ts",
-          "sveltekit-frontend/src/routes/api/atlas/studio/redis/+server.ts",
-          "sveltekit-frontend/src/routes/api/debug/retrieval-comparison/+server.ts",
-          "sveltekit-frontend/src/routes/api/graphify/stream/+server.ts"
+          "../docs/reports/production-qdrant-no-som-report.json"
         ],
         "evidence_refs": [
-          "docs\\graph\\recommendations.json"
+          "../docs/reports/production-qdrant-no-som-report.json"
         ],
-        "first_seen": "2026-06-06T06:21:32.739Z",
-        "last_seen": "2026-06-06T06:21:32.739Z",
-        "created_at": "2026-06-06T06:21:32.739Z",
-        "updated_at": "2026-06-06T06:21:32.739Z",
+        "first_seen": "2026-06-10T21:13:46.599Z",
+        "last_seen": "2026-06-11T03:39:58.279Z",
+        "created_at": "2026-06-11T03:39:58.279Z",
+        "updated_at": "2026-06-10T21:13:46.599Z",
         "history": [
           {
-            "event_id": "task_f5a9e198f984",
+            "event_id": "task_9258e3d68e86",
             "event_type": "TASK_CREATED",
-            "created_at": "2026-06-06T06:21:32.739Z",
-            "run_id": "2026-06-06T06:21:32.559Z",
-            "task_id": "task_27_api_route_handlers_lack_auth_guards",
-            "source_recommendation_key": "27_api_route_handlers_lack_auth_guards",
-            "title": "27 API route handlers lack auth guards",
-            "description": "Every non-public +server.ts should check locals.user or call requireAuth(). Reference: G18 in the 47-gate audit system.",
-            "priority": "HIGH",
+            "created_at": "2026-06-11T03:39:58.279Z",
+            "run_id": "2026-06-11T03:39:58.088Z",
+            "task_id": "task_active_production_topology_mirror",
+            "source_recommendation_key": "active-production-topology-mirror",
+            "title": "Active production topology mirror",
+            "description": "Active Postgres rows have Qdrant point IDs but no mirrored som_cluster value.",
+            "priority": "MEDIUM",
             "status": "TODO",
             "parent_task_id": null,
-            "command": null,
-            "feature_id": "general",
+            "command": "npm run atlas:coverage:qdrant-no-som",
+            "feature_id": "som",
             "source_refs": [
-              "src/routes/api/ace/ask/+server.ts",
-              "src/routes/api/atlas/studio/cards/+server.ts",
-              "src/routes/api/atlas/studio/cards/[id]/+server.ts",
-              "src/routes/api/atlas/studio/redis/+server.ts",
-              "src/routes/api/atlas/studio/search/+server.ts",
-              "src/routes/api/chat/stream/+server.ts",
-              "sveltekit-frontend/src/routes/.well-known/agent.json/+server.ts",
-              "sveltekit-frontend/src/routes/.well-known/appspecific/com.chrome.devtools.json/+server.ts",
-              "sveltekit-frontend/src/routes/.well-known/llms-full.txt/+server.ts",
-              "sveltekit-frontend/src/routes/.well-known/llms.txt/+server.ts",
-              "sveltekit-frontend/src/routes/api/ace/ask/+server.ts",
-              "sveltekit-frontend/src/routes/api/admin/parents-atlas/actions/+server.ts",
-              "sveltekit-frontend/src/routes/api/ai/scenario/+server.ts",
-              "sveltekit-frontend/src/routes/api/atlas/cards/+server.ts",
-              "sveltekit-frontend/src/routes/api/atlas/cards/[id]/+server.ts",
-              "sveltekit-frontend/src/routes/api/atlas/studio/cards/+server.ts",
-              "sveltekit-frontend/src/routes/api/atlas/studio/cards/[id]/+server.ts",
-              "sveltekit-frontend/src/routes/api/atlas/studio/redis/+server.ts",
-              "sveltekit-frontend/src/routes/api/debug/retrieval-comparison/+server.ts",
-              "sveltekit-frontend/src/routes/api/graphify/stream/+server.ts"
+              "../docs/reports/production-qdrant-no-som-report.json"
             ],
             "evidence_refs": [
-              "docs\\graph\\recommendations.json"
+              "../docs/reports/production-qdrant-no-som-report.json"
+            ]
+          },
+          {
+            "previous_state": "TODO",
+            "new_state": "DONE",
+            "task_id": "task_active_production_topology_mirror",
+            "event_type": "TASK_STATUS_CHANGED",
+            "created_at": "2026-06-10T21:13:46.599Z",
+            "event_id": "task_close_topology_mirror_20260611",
+            "evidence_refs": [
+              "../docs/reports/topology-mirror-repair-report.json",
+              "../docs/reports/production-qdrant-no-som-report.json"
+            ],
+            "run_id": "repair-topology-mirror-20260611",
+            "reason": "repair-topology-mirror.mjs --apply resolved all 9 gap rows: 4 from Qdrant payload, 5 from Postgres directory-sibling lookup. production-readiness now PASS 65 / WARN 1 / FAIL 0. active_qdrant_no_som=0, som_pct=100.0%"
+          }
+        ],
+        "seen_count": 6
+      },
+      {
+        "task_id": "task_som_coordinate_coverage",
+        "title": "SOM coordinate coverage",
+        "description": "Older Qdrant points are missing SOM row/col coordinates but still have cluster anchors.",
+        "priority": "MEDIUM",
+        "status": "DONE",
+        "source_recommendation_key": "som-coordinate-coverage",
+        "command": "npm run atlas:som-coordinate:coverage",
+        "feature_id": "som",
+        "source_refs": [
+          "docs/reports/som-coordinate-coverage-report.json"
+        ],
+        "evidence_refs": [
+          "docs/reports/som-coordinate-coverage-report.json"
+        ],
+        "first_seen": "2026-06-11T03:18:47.474Z",
+        "last_seen": "2026-06-11T03:39:00.000Z",
+        "created_at": "2026-06-11T03:18:47.474Z",
+        "updated_at": "2026-06-11T03:39:00.000Z",
+        "history": [
+          {
+            "event_id": "task_c97d6ec51e12",
+            "event_type": "TASK_CREATED",
+            "created_at": "2026-06-11T03:18:47.474Z",
+            "run_id": "2026-06-06T06:21:32.559Z",
+            "task_id": "task_som_coordinate_coverage",
+            "source_recommendation_key": "som-coordinate-coverage",
+            "title": "SOM coordinate coverage",
+            "description": "Older Qdrant points are missing SOM row/col coordinates but still have cluster anchors.",
+            "priority": "MEDIUM",
+            "status": "TODO",
+            "parent_task_id": null,
+            "command": "npm run atlas:som-coordinate:coverage",
+            "feature_id": "som",
+            "source_refs": [
+              "docs/reports/som-coordinate-coverage-report.json"
+            ],
+            "evidence_refs": [
+              "docs/reports/som-coordinate-coverage-report.json"
+            ]
+          },
+          {
+            "event_id": "task_close_som_coordinate_coverage_20260611",
+            "event_type": "TASK_STATUS_CHANGED",
+            "created_at": "2026-06-11T03:39:00.000Z",
+            "run_id": "manual-review-20260611",
+            "task_id": "task_som_coordinate_coverage",
+            "previous_state": "TODO",
+            "new_state": "DONE",
+            "reason": "som-coordinate-coverage-report.json now shows 0 missing somRow/somCol after bounded Qdrant payload backfill",
+            "evidence_refs": [
+              "docs/reports/som-coordinate-coverage-report.json",
+              "docs/reports/som-coordinate-backfill-report.json"
             ]
           }
         ],
-        "seen_count": 1
+        "seen_count": 5
       },
       {
-        "task_id": "task_graph_missing_neighborhood",
-        "title": "Disconnected graph neighborhood",
-        "description": "Neo4j traversal is missing neighborhood coverage for current seeds.",
-        "priority": "HIGH",
-        "status": "TODO",
-        "source_recommendation_key": "graph:missing-neighborhood",
-        "command": "npm run graph:refresh",
-        "feature_id": "graphify",
+        "task_id": "task_feature_id_derivation",
+        "title": "Feature ID derivation",
+        "description": "Canonical feature IDs should derive from the sourceRef spine and overlay crosswalk.",
+        "priority": "MEDIUM",
+        "status": "DONE",
+        "source_recommendation_key": "feature-id-derivation",
+        "command": "npm run atlas:feature-lineage:fast",
+        "feature_id": "feature-lineage",
         "source_refs": [
-          "reports/parent-atlas-open-lanes-todo.md",
-          "docs/graph/recommendations.md"
+          "docs/reports/feature-lineage-report.json"
         ],
         "evidence_refs": [
-          "reports/parent-atlas-open-lanes-todo.md",
-          "docs/graph/recommendations.md"
+          "docs/reports/feature-lineage-report.json"
         ],
-        "first_seen": "2026-06-06T06:21:25.531Z",
-        "last_seen": "2026-06-06T06:21:25.531Z",
-        "created_at": "2026-06-06T06:21:25.531Z",
-        "updated_at": "2026-06-06T06:21:25.531Z",
+        "first_seen": "2026-06-11T03:18:47.474Z",
+        "last_seen": "2026-06-11T03:33:02.000Z",
+        "created_at": "2026-06-11T03:18:47.474Z",
+        "updated_at": "2026-06-11T03:33:02.000Z",
         "history": [
           {
-            "event_id": "task_f51406e62a78",
+            "event_id": "task_29e68acc289e",
             "event_type": "TASK_CREATED",
-            "created_at": "2026-06-06T06:21:25.531Z",
-            "run_id": "2026-06-05T15:37:44.742Z",
-            "task_id": "task_graph_missing_neighborhood",
-            "source_recommendation_key": "graph:missing-neighborhood",
-            "title": "Disconnected graph neighborhood",
-            "description": "Neo4j traversal is missing neighborhood coverage for current seeds.",
-            "priority": "HIGH",
+            "created_at": "2026-06-11T03:18:47.474Z",
+            "run_id": "2026-06-06T06:21:32.559Z",
+            "task_id": "task_feature_id_derivation",
+            "source_recommendation_key": "feature-id-derivation",
+            "title": "Feature ID derivation",
+            "description": "Canonical feature IDs should derive from the sourceRef spine and overlay crosswalk.",
+            "priority": "MEDIUM",
             "status": "TODO",
             "parent_task_id": null,
-            "command": "npm run graph:refresh",
-            "feature_id": "graphify",
+            "command": "npm run atlas:feature-lineage:fast",
+            "feature_id": "feature-lineage",
             "source_refs": [
-              "reports/parent-atlas-open-lanes-todo.md",
-              "docs/graph/recommendations.md"
+              "docs/reports/feature-lineage-report.json"
             ],
             "evidence_refs": [
-              "reports/parent-atlas-open-lanes-todo.md",
-              "docs/graph/recommendations.md"
+              "docs/reports/feature-lineage-report.json"
+            ]
+          },
+          {
+            "event_id": "task_close_feature_id_derivation_20260611",
+            "event_type": "TASK_STATUS_CHANGED",
+            "created_at": "2026-06-11T03:33:02.000Z",
+            "run_id": "manual-review-20260611",
+            "task_id": "task_feature_id_derivation",
+            "previous_state": "TODO",
+            "new_state": "DONE",
+            "reason": "feature-lineage-report.json shows 100% sourceRef, featureId, and featureLabel coverage in bounded sample",
+            "evidence_refs": [
+              "docs/reports/feature-lineage-report.json"
             ]
           }
         ],
         "seen_count": 3
+      },
+      {
+        "task_id": "task_retrieval_low_context_density",
+        "title": "Low context density retrieved",
+        "description": "Queries are assembling too few codebase references for stable retrieval.",
+        "priority": "MEDIUM",
+        "status": "DONE",
+        "source_recommendation_key": "retrieval:low-context-density",
+        "command": "npm run graphify:semantic",
+        "feature_id": "retrieval",
+        "source_refs": [
+          "reports/parent-atlas-open-lanes-todo.md",
+          "docs/graph/recommendations.md"
+        ],
+        "evidence_refs": [
+          "reports/parent-atlas-open-lanes-todo.md",
+          "docs/graph/recommendations.md"
+        ],
+        "first_seen": "2026-06-11T03:18:47.474Z",
+        "last_seen": "2026-06-11T03:33:01.000Z",
+        "created_at": "2026-06-11T03:18:47.474Z",
+        "updated_at": "2026-06-11T03:33:01.000Z",
+        "history": [
+          {
+            "event_id": "task_3d1624d1ad95",
+            "event_type": "TASK_CREATED",
+            "created_at": "2026-06-11T03:18:47.474Z",
+            "run_id": "2026-06-06T06:21:32.559Z",
+            "task_id": "task_retrieval_low_context_density",
+            "source_recommendation_key": "retrieval:low-context-density",
+            "title": "Low context density retrieved",
+            "description": "Queries are assembling too few codebase references for stable retrieval.",
+            "priority": "MEDIUM",
+            "status": "TODO",
+            "parent_task_id": null,
+            "command": "npm run graphify:semantic",
+            "feature_id": "retrieval",
+            "source_refs": [
+              "reports/parent-atlas-open-lanes-todo.md",
+              "docs/graph/recommendations.md"
+            ],
+            "evidence_refs": [
+              "reports/parent-atlas-open-lanes-todo.md",
+              "docs/graph/recommendations.md"
+            ]
+          },
+          {
+            "event_id": "task_close_retrieval_low_context_density_20260611",
+            "event_type": "TASK_STATUS_CHANGED",
+            "created_at": "2026-06-11T03:33:01.000Z",
+            "run_id": "manual-review-20260611",
+            "task_id": "task_retrieval_low_context_density",
+            "previous_state": "TODO",
+            "new_state": "DONE",
+            "reason": "runtime-packet-density-report.json shows lowDensityCount=0; remaining missing fields belong to higher-hop materialization lanes",
+            "evidence_refs": [
+              "docs/reports/runtime-packet-density-report.json"
+            ]
+          }
+        ],
+        "seen_count": 3
+      },
+      {
+        "task_id": "task_task_semantic_packets_drift",
+        "title": "task_semantic_packets manual SQL mirror drift",
+        "description": "Manual SQL mirror drift should stay in sync with the live Postgres contract mirror.",
+        "priority": "MEDIUM",
+        "status": "DONE",
+        "source_recommendation_key": "task-semantic-packets-drift",
+        "command": "npm run atlas:postgres-contract-mirrors",
+        "feature_id": "postgres-contract",
+        "source_refs": [
+          "docs/reports/postgres-contract-mirrors-report.json"
+        ],
+        "evidence_refs": [
+          "docs/reports/postgres-contract-mirrors-report.json"
+        ],
+        "first_seen": "2026-06-11T03:18:47.474Z",
+        "last_seen": "2026-06-11T03:23:00.000Z",
+        "created_at": "2026-06-11T03:18:47.474Z",
+        "updated_at": "2026-06-11T03:23:00.000Z",
+        "history": [
+          {
+            "event_id": "task_439d2da63411",
+            "event_type": "TASK_CREATED",
+            "created_at": "2026-06-11T03:18:47.474Z",
+            "run_id": "2026-06-06T06:21:32.559Z",
+            "task_id": "task_task_semantic_packets_drift",
+            "source_recommendation_key": "task-semantic-packets-drift",
+            "title": "task_semantic_packets manual SQL mirror drift",
+            "description": "Manual SQL mirror drift should stay in sync with the live Postgres contract mirror.",
+            "priority": "MEDIUM",
+            "status": "TODO",
+            "parent_task_id": null,
+            "command": "npm run atlas:postgres-contract-mirrors",
+            "feature_id": "postgres-contract",
+            "source_refs": [
+              "docs/reports/postgres-contract-mirrors-report.json"
+            ],
+            "evidence_refs": [
+              "docs/reports/postgres-contract-mirrors-report.json"
+            ]
+          },
+          {
+            "event_id": "task_close_postgres_contract_20260611",
+            "event_type": "TASK_STATUS_CHANGED",
+            "created_at": "2026-06-11T03:23:00.000Z",
+            "run_id": "manual-review-20260611",
+            "task_id": "task_task_semantic_packets_drift",
+            "previous_state": "TODO",
+            "new_state": "DONE",
+            "reason": "postgres-contract-mirrors-report.json shows LIVE_DB_ALIGNED for all 8 tracked tables, including task_semantic_packets",
+            "evidence_refs": [
+              "docs/reports/postgres-contract-mirrors-report.json"
+            ]
+          }
+        ],
+        "seen_count": 3
+      },
+      {
+        "task_id": "task_parent_atlas_overlay_mismatch",
+        "title": "Parent Atlas overlay mismatch",
+        "description": "Root registry and app overlay are taxonomy-mismatched and need an explicit crosswalk.",
+        "priority": "MEDIUM",
+        "status": "TODO",
+        "source_recommendation_key": "parent-atlas-overlay-mismatch",
+        "command": "npm run atlas:parent-atlas:overlay-crosswalk",
+        "feature_id": "parent-atlas",
+        "source_refs": [
+          "docs/reports/parent-atlas-overlay-sync-report.json"
+        ],
+        "evidence_refs": [
+          "docs/reports/parent-atlas-overlay-sync-report.json"
+        ],
+        "first_seen": "2026-06-11T03:18:47.474Z",
+        "last_seen": "2026-06-11T03:18:47.474Z",
+        "created_at": "2026-06-11T03:18:47.474Z",
+        "updated_at": "2026-06-11T03:18:47.474Z",
+        "history": [
+          {
+            "event_id": "task_5af7a6699fe0",
+            "event_type": "TASK_CREATED",
+            "created_at": "2026-06-11T03:18:47.474Z",
+            "run_id": "2026-06-06T06:21:32.559Z",
+            "task_id": "task_parent_atlas_overlay_mismatch",
+            "source_recommendation_key": "parent-atlas-overlay-mismatch",
+            "title": "Parent Atlas overlay mismatch",
+            "description": "Root registry and app overlay are taxonomy-mismatched and need an explicit crosswalk.",
+            "priority": "MEDIUM",
+            "status": "TODO",
+            "parent_task_id": null,
+            "command": "npm run atlas:parent-atlas:overlay-crosswalk",
+            "feature_id": "parent-atlas",
+            "source_refs": [
+              "docs/reports/parent-atlas-overlay-sync-report.json"
+            ],
+            "evidence_refs": [
+              "docs/reports/parent-atlas-overlay-sync-report.json"
+            ]
+          }
+        ],
+        "seen_count": 16
       },
       {
         "task_id": "task_command_mapping_mcp_allowlist",
@@ -254,16 +625,16 @@
           "reports/parent-atlas-open-lanes-todo.md",
           "opencode.json"
         ],
-        "first_seen": "2026-06-06T06:21:25.532Z",
-        "last_seen": "2026-06-06T06:21:25.532Z",
-        "created_at": "2026-06-06T06:21:25.532Z",
-        "updated_at": "2026-06-06T06:21:25.532Z",
+        "first_seen": "2026-06-11T03:18:47.474Z",
+        "last_seen": "2026-06-11T03:18:47.474Z",
+        "created_at": "2026-06-11T03:18:47.474Z",
+        "updated_at": "2026-06-11T03:18:47.474Z",
         "history": [
           {
-            "event_id": "task_53d460d5d186",
+            "event_id": "task_92601428449b",
             "event_type": "TASK_CREATED",
-            "created_at": "2026-06-06T06:21:25.532Z",
-            "run_id": "2026-06-05T15:37:44.742Z",
+            "created_at": "2026-06-11T03:18:47.474Z",
+            "run_id": "2026-06-06T06:21:32.559Z",
             "task_id": "task_command_mapping_mcp_allowlist",
             "source_recommendation_key": "command-mapping-mcp-allowlist",
             "title": "Command Mapping -> MCP allowlist",
@@ -283,231 +654,65 @@
             ]
           }
         ],
-        "seen_count": 2
+        "seen_count": 16
       },
       {
-        "task_id": "task_retrieval_low_context_density",
-        "title": "Low context density retrieved",
-        "description": "Queries are assembling too few codebase references for stable retrieval.",
-        "priority": "MEDIUM",
-        "status": "TODO",
-        "source_recommendation_key": "retrieval:low-context-density",
-        "command": "npm run graphify:semantic",
-        "feature_id": "retrieval",
-        "source_refs": [
-          "reports/parent-atlas-open-lanes-todo.md",
-          "docs/graph/recommendations.md"
-        ],
-        "evidence_refs": [
-          "reports/parent-atlas-open-lanes-todo.md",
-          "docs/graph/recommendations.md"
-        ],
-        "first_seen": "2026-06-06T06:21:25.531Z",
-        "last_seen": "2026-06-06T06:21:25.531Z",
-        "created_at": "2026-06-06T06:21:25.531Z",
-        "updated_at": "2026-06-06T06:21:25.531Z",
-        "history": [
-          {
-            "event_id": "task_3d61e474a24e",
-            "event_type": "TASK_CREATED",
-            "created_at": "2026-06-06T06:21:25.531Z",
-            "run_id": "2026-06-05T15:37:44.742Z",
-            "task_id": "task_retrieval_low_context_density",
-            "source_recommendation_key": "retrieval:low-context-density",
-            "title": "Low context density retrieved",
-            "description": "Queries are assembling too few codebase references for stable retrieval.",
-            "priority": "MEDIUM",
-            "status": "TODO",
-            "parent_task_id": null,
-            "command": "npm run graphify:semantic",
-            "feature_id": "retrieval",
-            "source_refs": [
-              "reports/parent-atlas-open-lanes-todo.md",
-              "docs/graph/recommendations.md"
-            ],
-            "evidence_refs": [
-              "reports/parent-atlas-open-lanes-todo.md",
-              "docs/graph/recommendations.md"
-            ]
-          }
-        ],
-        "seen_count": 3
-      },
-      {
-        "task_id": "task_feature_id_derivation",
-        "title": "Feature ID derivation",
-        "description": "Canonical feature IDs should derive from the sourceRef spine and overlay crosswalk.",
-        "priority": "MEDIUM",
-        "status": "TODO",
-        "source_recommendation_key": "feature-id-derivation",
-        "command": "npm run atlas:feature-lineage:fast",
-        "feature_id": "feature-lineage",
-        "source_refs": [
-          "docs/reports/feature-lineage-report.json"
-        ],
-        "evidence_refs": [
-          "docs/reports/feature-lineage-report.json"
-        ],
-        "first_seen": "2026-06-06T06:21:25.531Z",
-        "last_seen": "2026-06-06T06:21:25.531Z",
-        "created_at": "2026-06-06T06:21:25.531Z",
-        "updated_at": "2026-06-06T06:21:25.531Z",
-        "history": [
-          {
-            "event_id": "task_37f08fff8687",
-            "event_type": "TASK_CREATED",
-            "created_at": "2026-06-06T06:21:25.531Z",
-            "run_id": "2026-06-05T15:37:44.742Z",
-            "task_id": "task_feature_id_derivation",
-            "source_recommendation_key": "feature-id-derivation",
-            "title": "Feature ID derivation",
-            "description": "Canonical feature IDs should derive from the sourceRef spine and overlay crosswalk.",
-            "priority": "MEDIUM",
-            "status": "TODO",
-            "parent_task_id": null,
-            "command": "npm run atlas:feature-lineage:fast",
-            "feature_id": "feature-lineage",
-            "source_refs": [
-              "docs/reports/feature-lineage-report.json"
-            ],
-            "evidence_refs": [
-              "docs/reports/feature-lineage-report.json"
-            ]
-          }
-        ],
-        "seen_count": 2
-      },
-      {
-        "task_id": "task_som_coordinate_coverage",
-        "title": "SOM coordinate coverage",
-        "description": "Older Qdrant points are missing SOM row/col coordinates but still have cluster anchors.",
-        "priority": "MEDIUM",
-        "status": "TODO",
-        "source_recommendation_key": "som-coordinate-coverage",
-        "command": "npm run atlas:som-coordinate:coverage",
+        "task_id": "task_atlas_topology_mirror_infer_siblings",
+        "title": "atlas:topology-mirror:infer-siblings",
+        "description": "Resolve the 5 remaining topology mirror gaps via directory sibling inference.",
+        "priority": "LOW",
+        "status": "DONE",
+        "source_recommendation_key": "atlas-topology-mirror-infer-siblings",
+        "command": "npm run atlas:topology-mirror:infer-siblings",
         "feature_id": "som",
         "source_refs": [
-          "docs/reports/som-coordinate-coverage-report.json"
+          "docs/reports/active-topology-mirror-backfill-report.json"
         ],
         "evidence_refs": [
-          "docs/reports/som-coordinate-coverage-report.json"
+          "docs/reports/active-topology-mirror-backfill-report.json"
         ],
-        "first_seen": "2026-06-06T06:21:25.531Z",
-        "last_seen": "2026-06-06T06:21:25.531Z",
-        "created_at": "2026-06-06T06:21:25.531Z",
-        "updated_at": "2026-06-06T06:21:25.531Z",
+        "first_seen": "2026-06-11T04:21:10.000Z",
+        "last_seen": "2026-06-11T04:22:30.000Z",
+        "created_at": "2026-06-11T04:21:10.000Z",
+        "updated_at": "2026-06-11T04:22:30.000Z",
         "history": [
           {
-            "event_id": "task_8c65a620d707",
+            "event_id": "task_infer_siblings_20260611",
             "event_type": "TASK_CREATED",
-            "created_at": "2026-06-06T06:21:25.531Z",
-            "run_id": "2026-06-05T15:37:44.742Z",
-            "task_id": "task_som_coordinate_coverage",
-            "source_recommendation_key": "som-coordinate-coverage",
-            "title": "SOM coordinate coverage",
-            "description": "Older Qdrant points are missing SOM row/col coordinates but still have cluster anchors.",
-            "priority": "MEDIUM",
+            "created_at": "2026-06-11T04:21:10.000Z",
+            "run_id": "backfill-topology-mirror-20260611",
+            "task_id": "task_atlas_topology_mirror_infer_siblings",
+            "source_recommendation_key": "atlas-topology-mirror-infer-siblings",
+            "title": "atlas:topology-mirror:infer-siblings",
+            "description": "Resolve the 5 remaining topology mirror gaps via directory sibling inference.",
+            "priority": "LOW",
             "status": "TODO",
             "parent_task_id": null,
-            "command": "npm run atlas:som-coordinate:coverage",
+            "command": "npm run atlas:topology-mirror:infer-siblings",
             "feature_id": "som",
             "source_refs": [
-              "docs/reports/som-coordinate-coverage-report.json"
+              "docs/reports/active-topology-mirror-backfill-report.json"
             ],
             "evidence_refs": [
-              "docs/reports/som-coordinate-coverage-report.json"
+              "docs/reports/active-topology-mirror-backfill-report.json"
             ]
-          }
-        ],
-        "seen_count": 2
-      },
-      {
-        "task_id": "task_task_semantic_packets_drift",
-        "title": "task_semantic_packets manual SQL mirror drift",
-        "description": "Manual SQL mirror drift should stay in sync with the live Postgres contract mirror.",
-        "priority": "MEDIUM",
-        "status": "TODO",
-        "source_recommendation_key": "task-semantic-packets-drift",
-        "command": "npm run atlas:postgres-contract-mirrors",
-        "feature_id": "postgres-contract",
-        "source_refs": [
-          "docs/reports/postgres-contract-mirrors-report.json"
-        ],
-        "evidence_refs": [
-          "docs/reports/postgres-contract-mirrors-report.json"
-        ],
-        "first_seen": "2026-06-06T06:21:25.531Z",
-        "last_seen": "2026-06-06T06:21:25.531Z",
-        "created_at": "2026-06-06T06:21:25.531Z",
-        "updated_at": "2026-06-06T06:21:25.531Z",
-        "history": [
+          },
           {
-            "event_id": "task_135c0b57d5d5",
-            "event_type": "TASK_CREATED",
-            "created_at": "2026-06-06T06:21:25.531Z",
-            "run_id": "2026-06-05T15:37:44.742Z",
-            "task_id": "task_task_semantic_packets_drift",
-            "source_recommendation_key": "task-semantic-packets-drift",
-            "title": "task_semantic_packets manual SQL mirror drift",
-            "description": "Manual SQL mirror drift should stay in sync with the live Postgres contract mirror.",
-            "priority": "MEDIUM",
-            "status": "TODO",
-            "parent_task_id": null,
-            "command": "npm run atlas:postgres-contract-mirrors",
-            "feature_id": "postgres-contract",
-            "source_refs": [
-              "docs/reports/postgres-contract-mirrors-report.json"
-            ],
+            "event_id": "task_close_infer_siblings_20260611",
+            "event_type": "TASK_STATUS_CHANGED",
+            "created_at": "2026-06-11T04:22:30.000Z",
+            "run_id": "repair-topology-mirror-sibling-20260611",
+            "task_id": "task_atlas_topology_mirror_infer_siblings",
+            "previous_state": "TODO",
+            "new_state": "DONE",
+            "reason": "repair-topology-mirror.mjs --apply --allow-sibling-fallback successfully resolved the 5 remaining gaps with 0.55 confidence and saved sibling provenance in Qdrant payloads and Postgres. production-readiness now PASS 65 / WARN 1 / FAIL 0.",
             "evidence_refs": [
-              "docs/reports/postgres-contract-mirrors-report.json"
+              "docs/reports/active-topology-mirror-backfill-report.json",
+              "docs/reports/production-qdrant-no-som-report.json"
             ]
           }
         ],
-        "seen_count": 2
-      },
-      {
-        "task_id": "task_parent_atlas_overlay_mismatch",
-        "title": "Parent Atlas overlay mismatch",
-        "description": "Root registry and app overlay are taxonomy-mismatched and need an explicit crosswalk.",
-        "priority": "MEDIUM",
-        "status": "TODO",
-        "source_recommendation_key": "parent-atlas-overlay-mismatch",
-        "command": "npm run atlas:parent-atlas:overlay-crosswalk",
-        "feature_id": "parent-atlas",
-        "source_refs": [
-          "docs/reports/parent-atlas-overlay-sync-report.json"
-        ],
-        "evidence_refs": [
-          "docs/reports/parent-atlas-overlay-sync-report.json"
-        ],
-        "first_seen": "2026-06-06T06:21:25.531Z",
-        "last_seen": "2026-06-06T06:21:25.531Z",
-        "created_at": "2026-06-06T06:21:25.531Z",
-        "updated_at": "2026-06-06T06:21:25.531Z",
-        "history": [
-          {
-            "event_id": "task_f4a77cc765b0",
-            "event_type": "TASK_CREATED",
-            "created_at": "2026-06-06T06:21:25.531Z",
-            "run_id": "2026-06-05T15:37:44.742Z",
-            "task_id": "task_parent_atlas_overlay_mismatch",
-            "source_recommendation_key": "parent-atlas-overlay-mismatch",
-            "title": "Parent Atlas overlay mismatch",
-            "description": "Root registry and app overlay are taxonomy-mismatched and need an explicit crosswalk.",
-            "priority": "MEDIUM",
-            "status": "TODO",
-            "parent_task_id": null,
-            "command": "npm run atlas:parent-atlas:overlay-crosswalk",
-            "feature_id": "parent-atlas",
-            "source_refs": [
-              "docs/reports/parent-atlas-overlay-sync-report.json"
-            ],
-            "evidence_refs": [
-              "docs/reports/parent-atlas-overlay-sync-report.json"
-            ]
-          }
-        ],
-        "seen_count": 2
+        "seen_count": 0
       },
       {
         "task_id": "task_synthetic_evidence_concept_cards",
@@ -526,16 +731,16 @@
           "reports/parent-atlas-open-lanes-todo.md",
           "docs/reports/temporal-task-registry-report.md"
         ],
-        "first_seen": "2026-06-06T06:21:25.532Z",
-        "last_seen": "2026-06-06T06:21:25.532Z",
-        "created_at": "2026-06-06T06:21:25.532Z",
-        "updated_at": "2026-06-06T06:21:25.532Z",
+        "first_seen": "2026-06-11T03:18:47.474Z",
+        "last_seen": "2026-06-11T03:18:47.474Z",
+        "created_at": "2026-06-11T03:18:47.474Z",
+        "updated_at": "2026-06-11T03:18:47.474Z",
         "history": [
           {
-            "event_id": "task_18d23c1d85fd",
+            "event_id": "task_e5b9a5ddf483",
             "event_type": "TASK_CREATED",
-            "created_at": "2026-06-06T06:21:25.532Z",
-            "run_id": "2026-06-05T15:37:44.742Z",
+            "created_at": "2026-06-11T03:18:47.474Z",
+            "run_id": "2026-06-06T06:21:32.559Z",
             "task_id": "task_synthetic_evidence_concept_cards",
             "source_recommendation_key": "synthetic-evidence-concept-cards",
             "title": "Synthetic Evidence concept cards",
@@ -555,15 +760,103 @@
             ]
           }
         ],
-        "seen_count": 2
+        "seen_count": 16
       }
     ],
     "recommendationSummary": [
       {
+        "recommendation_key": "4_circular_dependency_chains_of_3_files",
+        "count": 16,
+        "first_seen": "2026-06-11T03:18:47.299Z",
+        "last_seen": "2026-06-11T05:39:21.747Z",
+        "title": "4 circular dependency chains of 3+ files",
+        "severity": "HIGH",
+        "command": null,
+        "source": ".opencode\\recommendations\\recommendations.json",
+        "feature_id": "general"
+      },
+      {
+        "recommendation_key": "27_api_route_handlers_lack_auth_guards",
+        "count": 16,
+        "first_seen": "2026-06-11T03:18:47.300Z",
+        "last_seen": "2026-06-11T05:39:21.748Z",
+        "title": "27 API route handlers lack auth guards",
+        "severity": "HIGH",
+        "command": null,
+        "source": ".opencode\\recommendations\\recommendations.json",
+        "feature_id": "general"
+      },
+      {
+        "recommendation_key": "25_files_have_0_importers_and_are_not_entrypoints",
+        "count": 16,
+        "first_seen": "2026-06-11T03:18:47.300Z",
+        "last_seen": "2026-06-11T05:39:21.748Z",
+        "title": "25 files have 0 importers and are not entrypoints",
+        "severity": "MEDIUM",
+        "command": null,
+        "source": ".opencode\\recommendations\\recommendations.json",
+        "feature_id": "general"
+      },
+      {
+        "recommendation_key": "30_files_each_depended_on_by_50_files_transitively",
+        "count": 16,
+        "first_seen": "2026-06-11T03:18:47.300Z",
+        "last_seen": "2026-06-11T05:39:21.748Z",
+        "title": "30 files each depended on by >50 files transitively",
+        "severity": "MEDIUM",
+        "command": null,
+        "source": ".opencode\\recommendations\\recommendations.json",
+        "feature_id": "general"
+      },
+      {
+        "recommendation_key": "157_api_routes_lack_zod_input_validation",
+        "count": 16,
+        "first_seen": "2026-06-11T03:18:47.300Z",
+        "last_seen": "2026-06-11T05:39:21.748Z",
+        "title": "157 API routes lack Zod input validation",
+        "severity": "MEDIUM",
+        "command": null,
+        "source": ".opencode\\recommendations\\recommendations.json",
+        "feature_id": "general"
+      },
+      {
+        "recommendation_key": "35_files_in_circular_dependency_chains_have_no_paired_test",
+        "count": 16,
+        "first_seen": "2026-06-11T03:18:47.300Z",
+        "last_seen": "2026-06-11T05:39:21.748Z",
+        "title": "35 files in circular dependency chains have no paired test",
+        "severity": "MEDIUM",
+        "command": null,
+        "source": ".opencode\\recommendations\\recommendations.json",
+        "feature_id": "general"
+      },
+      {
+        "recommendation_key": "243_substantial_files_import_libraries_but_have_0_consumers",
+        "count": 16,
+        "first_seen": "2026-06-11T03:18:47.300Z",
+        "last_seen": "2026-06-11T05:39:21.748Z",
+        "title": "243 substantial files import libraries but have 0 consumers",
+        "severity": "MEDIUM",
+        "command": null,
+        "source": ".opencode\\recommendations\\recommendations.json",
+        "feature_id": "general"
+      },
+      {
+        "recommendation_key": "11_2_file_circular_dependency_pairs",
+        "count": 16,
+        "first_seen": "2026-06-11T03:18:47.300Z",
+        "last_seen": "2026-06-11T05:39:21.748Z",
+        "title": "11 2-file circular dependency pairs",
+        "severity": "LOW",
+        "command": null,
+        "source": ".opencode\\recommendations\\recommendations.json",
+        "feature_id": "general"
+      },
+      {
         "recommendation_key": "graph:missing-neighborhood",
         "count": 3,
-        "first_seen": "2026-06-06T06:21:25.455Z",
-        "last_seen": "2026-06-06T06:21:32.654Z",
+        "first_seen": "2026-06-11T03:18:47.300Z",
+        "last_seen": "2026-06-11T03:28:06.864Z",
         "title": "Disconnected graph neighborhood",
         "severity": "HIGH",
         "command": "npm run graph:refresh",
@@ -573,8 +866,8 @@
       {
         "recommendation_key": "retrieval:low-context-density",
         "count": 3,
-        "first_seen": "2026-06-06T06:21:25.456Z",
-        "last_seen": "2026-06-06T06:21:32.654Z",
+        "first_seen": "2026-06-11T03:18:47.301Z",
+        "last_seen": "2026-06-11T03:28:06.864Z",
         "title": "Low context density retrieved",
         "severity": "MEDIUM",
         "command": "npm run graphify:semantic",
@@ -583,9 +876,9 @@
       },
       {
         "recommendation_key": "feature-id-derivation",
-        "count": 2,
-        "first_seen": "2026-06-06T06:21:25.456Z",
-        "last_seen": "2026-06-06T06:21:32.654Z",
+        "count": 3,
+        "first_seen": "2026-06-11T03:18:47.301Z",
+        "last_seen": "2026-06-11T03:28:06.864Z",
         "title": "Feature ID derivation",
         "severity": "MEDIUM",
         "command": "npm run atlas:feature-lineage:fast",
@@ -594,9 +887,9 @@
       },
       {
         "recommendation_key": "som-coordinate-coverage",
-        "count": 2,
-        "first_seen": "2026-06-06T06:21:25.456Z",
-        "last_seen": "2026-06-06T06:21:32.654Z",
+        "count": 5,
+        "first_seen": "2026-06-11T03:18:47.301Z",
+        "last_seen": "2026-06-11T03:33:53.041Z",
         "title": "SOM coordinate coverage",
         "severity": "MEDIUM",
         "command": "npm run atlas:som-coordinate:coverage",
@@ -605,9 +898,9 @@
       },
       {
         "recommendation_key": "task-semantic-packets-drift",
-        "count": 2,
-        "first_seen": "2026-06-06T06:21:25.456Z",
-        "last_seen": "2026-06-06T06:21:32.654Z",
+        "count": 3,
+        "first_seen": "2026-06-11T03:18:47.301Z",
+        "last_seen": "2026-06-11T03:28:06.864Z",
         "title": "task_semantic_packets manual SQL mirror drift",
         "severity": "MEDIUM",
         "command": "npm run atlas:postgres-contract-mirrors",
@@ -616,9 +909,9 @@
       },
       {
         "recommendation_key": "parent-atlas-overlay-mismatch",
-        "count": 2,
-        "first_seen": "2026-06-06T06:21:25.456Z",
-        "last_seen": "2026-06-06T06:21:32.654Z",
+        "count": 16,
+        "first_seen": "2026-06-11T03:18:47.301Z",
+        "last_seen": "2026-06-11T05:39:21.748Z",
         "title": "Parent Atlas overlay mismatch",
         "severity": "MEDIUM",
         "command": "npm run atlas:parent-atlas:overlay-crosswalk",
@@ -627,9 +920,9 @@
       },
       {
         "recommendation_key": "command-mapping-mcp-allowlist",
-        "count": 2,
-        "first_seen": "2026-06-06T06:21:25.456Z",
-        "last_seen": "2026-06-06T06:21:32.654Z",
+        "count": 16,
+        "first_seen": "2026-06-11T03:18:47.301Z",
+        "last_seen": "2026-06-11T05:39:21.748Z",
         "title": "Command Mapping -> MCP allowlist",
         "severity": "MEDIUM",
         "command": "npm run opencode:tasks:refresh",
@@ -638,9 +931,9 @@
       },
       {
         "recommendation_key": "synthetic-evidence-concept-cards",
-        "count": 2,
-        "first_seen": "2026-06-06T06:21:25.456Z",
-        "last_seen": "2026-06-06T06:21:32.654Z",
+        "count": 16,
+        "first_seen": "2026-06-11T03:18:47.301Z",
+        "last_seen": "2026-06-11T05:39:21.748Z",
         "title": "Synthetic Evidence concept cards",
         "severity": "LOW",
         "command": "npm run opencode:tasks:refresh",
@@ -648,92 +941,15 @@
         "feature_id": "evidence"
       },
       {
-        "recommendation_key": "4_circular_dependency_chains_of_3_files",
-        "count": 1,
-        "first_seen": "2026-06-06T06:21:32.653Z",
-        "last_seen": "2026-06-06T06:21:32.653Z",
-        "title": "4 circular dependency chains of 3+ files",
-        "severity": "HIGH",
-        "command": null,
-        "source": "docs\\graph\\recommendations.json",
-        "feature_id": "general"
-      },
-      {
-        "recommendation_key": "27_api_route_handlers_lack_auth_guards",
-        "count": 1,
-        "first_seen": "2026-06-06T06:21:32.654Z",
-        "last_seen": "2026-06-06T06:21:32.654Z",
-        "title": "27 API route handlers lack auth guards",
-        "severity": "HIGH",
-        "command": null,
-        "source": "docs\\graph\\recommendations.json",
-        "feature_id": "general"
-      },
-      {
-        "recommendation_key": "25_files_have_0_importers_and_are_not_entrypoints",
-        "count": 1,
-        "first_seen": "2026-06-06T06:21:32.654Z",
-        "last_seen": "2026-06-06T06:21:32.654Z",
-        "title": "25 files have 0 importers and are not entrypoints",
+        "recommendation_key": "active-production-topology-mirror",
+        "count": 6,
+        "first_seen": "2026-06-11T03:39:58.186Z",
+        "last_seen": "2026-06-11T03:55:03.766Z",
+        "title": "Active production topology mirror",
         "severity": "MEDIUM",
-        "command": null,
-        "source": "docs\\graph\\recommendations.json",
-        "feature_id": "general"
-      },
-      {
-        "recommendation_key": "30_files_each_depended_on_by_50_files_transitively",
-        "count": 1,
-        "first_seen": "2026-06-06T06:21:32.654Z",
-        "last_seen": "2026-06-06T06:21:32.654Z",
-        "title": "30 files each depended on by >50 files transitively",
-        "severity": "MEDIUM",
-        "command": null,
-        "source": "docs\\graph\\recommendations.json",
-        "feature_id": "general"
-      },
-      {
-        "recommendation_key": "157_api_routes_lack_zod_input_validation",
-        "count": 1,
-        "first_seen": "2026-06-06T06:21:32.654Z",
-        "last_seen": "2026-06-06T06:21:32.654Z",
-        "title": "157 API routes lack Zod input validation",
-        "severity": "MEDIUM",
-        "command": null,
-        "source": "docs\\graph\\recommendations.json",
-        "feature_id": "general"
-      },
-      {
-        "recommendation_key": "35_files_in_circular_dependency_chains_have_no_paired_test",
-        "count": 1,
-        "first_seen": "2026-06-06T06:21:32.654Z",
-        "last_seen": "2026-06-06T06:21:32.654Z",
-        "title": "35 files in circular dependency chains have no paired test",
-        "severity": "MEDIUM",
-        "command": null,
-        "source": "docs\\graph\\recommendations.json",
-        "feature_id": "general"
-      },
-      {
-        "recommendation_key": "243_substantial_files_import_libraries_but_have_0_consumers",
-        "count": 1,
-        "first_seen": "2026-06-06T06:21:32.654Z",
-        "last_seen": "2026-06-06T06:21:32.654Z",
-        "title": "243 substantial files import libraries but have 0 consumers",
-        "severity": "MEDIUM",
-        "command": null,
-        "source": "docs\\graph\\recommendations.json",
-        "feature_id": "general"
-      },
-      {
-        "recommendation_key": "11_2_file_circular_dependency_pairs",
-        "count": 1,
-        "first_seen": "2026-06-06T06:21:32.654Z",
-        "last_seen": "2026-06-06T06:21:32.654Z",
-        "title": "11 2-file circular dependency pairs",
-        "severity": "LOW",
-        "command": null,
-        "source": "docs\\graph\\recommendations.json",
-        "feature_id": "general"
+        "command": "npm run atlas:coverage:qdrant-no-som",
+        "source": "report:production-qdrant-no-som",
+        "feature_id": "som"
       }
     ]
   }

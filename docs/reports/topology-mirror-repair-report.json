@@ -1,0 +1,74 @@
+{
+  "timestamp": "2026-06-11T04:22:13.298Z",
+  "mode": "APPLY",
+  "collection": "codebase_chunks_768",
+  "flags": {
+    "apply": true,
+    "allowSiblingFallback": true
+  },
+  "before": {
+    "active_total": 4830,
+    "active_has_som": 4825,
+    "active_has_qdrant": 4788,
+    "active_qdrant_no_som": 5,
+    "active_som_pct": 99.9
+  },
+  "after": {
+    "active_total": 4830,
+    "active_has_som": 4830,
+    "active_has_qdrant": 4788,
+    "active_qdrant_no_som": 0,
+    "active_som_pct": 100
+  },
+  "directMirrors": 0,
+  "siblingFallbackCandidates": 5,
+  "written": 5,
+  "unresolved": 0,
+  "repairs": [
+    {
+      "source_ref": "src/lib/server/ai/ldr/db-schema-tools.ts",
+      "clean_ref": "src/lib/server/ai/ldr/db-schema-tools.ts",
+      "qdrant_point_id": "1507045522",
+      "assigned_cluster": "0",
+      "confidence": 0.55,
+      "source": "pg_dir_sibling",
+      "resolved_sibling_source_ref": "src/lib/server/ai/ldr/deep-research.ts"
+    },
+    {
+      "source_ref": "src/lib/server/features/ai/ace/packet-reward-writer.ts",
+      "clean_ref": "src/lib/server/features/ai/ace/packet-reward-writer.ts",
+      "qdrant_point_id": "252716957",
+      "assigned_cluster": "0",
+      "confidence": 0.55,
+      "source": "pg_dir_sibling",
+      "resolved_sibling_source_ref": "src/lib/server/features/ai/ace/gemma4-packet-compiler.ts"
+    },
+    {
+      "source_ref": "src/routes/api/ace/packets/+server.ts",
+      "clean_ref": "src/routes/api/ace/packets/+server.ts",
+      "qdrant_point_id": "448083683",
+      "assigned_cluster": "17",
+      "confidence": 0.55,
+      "source": "pg_parent_sibling",
+      "resolved_sibling_source_ref": "src/routes/api/ace/rank/+server.ts"
+    },
+    {
+      "source_ref": "src/routes/api/ai/bifrost/+server.ts",
+      "clean_ref": "src/routes/api/ai/bifrost/+server.ts",
+      "qdrant_point_id": "700370629",
+      "assigned_cluster": "17",
+      "confidence": 0.55,
+      "source": "pg_parent_sibling",
+      "resolved_sibling_source_ref": "src/routes/api/ai/ask/+server.ts"
+    },
+    {
+      "source_ref": "src/routes/api/atlas/memory-address/[source_ref_id]/+server.ts",
+      "clean_ref": "src/routes/api/atlas/memory-address/[source_ref_id]/+server.ts",
+      "qdrant_point_id": "1169058971",
+      "assigned_cluster": "7",
+      "confidence": 0.55,
+      "source": "pg_grandparent_sibling",
+      "resolved_sibling_source_ref": "src/routes/api/atlas/nes-chrom/+server.ts"
+    }
+  ]
+}

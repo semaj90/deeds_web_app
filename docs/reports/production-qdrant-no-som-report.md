@@ -1,21 +1,21 @@
 # Production Qdrant Without SOM Report
 
-Generated: 2026-06-05T00:06:50.837Z
+Generated: 2026-06-11T05:21:34.515Z
 
 ## Coverage
 
 ### Raw Inventory Coverage
 
-- raw total: 14465
-- raw has SOM: 10487
-- raw has Qdrant: 10997
-- raw Qdrant without SOM: 1492
+- raw total: 14487
+- raw has SOM: 10512
+- raw has Qdrant: 11427
+- raw Qdrant without SOM: 3012
 
 ### Active Production Coverage
 
-- active total: 4808
-- active has SOM: 4808
-- active has Qdrant: 4808
+- active total: 4830
+- active has SOM: 4830
+- active has Qdrant: 4788
 - active Qdrant without SOM: 0
 - active SOM coverage: 100.0%
 
