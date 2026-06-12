@@ -26,9 +26,11 @@ const DATABASE_URL =
 const JSON_MODE = process.argv.includes('--json');
 const STRICT_MODE = process.argv.includes('--strict');
 
-const GATE_SOURCE_REF = 90;
-const GATE_FEATURE_ID = 50;
-const GATE_PACKET_KEY = 95;
+const GATE_TOTAL_PACKETS = 2000;
+const GATE_SOURCE_REF_KEY = 95;
+const GATE_FEATURE_ID = 80;
+const GATE_CONCEPT_IDS = 50;
+const GATE_PACKET_KEY = 100;
 
 async function main() {
   const pool = new Pool({ connectionString: DATABASE_URL });
@@ -56,6 +58,7 @@ async function main() {
     const hasSourceKind = cols.has('source_kind');
     const hasRewardPrior = cols.has('reward_prior');
     const hasSourcePath = cols.has('source_path');
+    const hasSourceRefKey = cols.has('source_ref_key');
 
     // 3. Core metrics
     const coreRes = await pool.query(`
@@ -63,6 +66,8 @@ async function main() {
         COUNT(*)::int                                              AS total_packets,
         COUNT(*) FILTER (WHERE source_ref IS NOT NULL
           AND source_ref <> '')::int                              AS source_ref_count,
+        COUNT(*) FILTER (WHERE source_ref_key IS NOT NULL
+          AND source_ref_key <> '')::int                          AS source_ref_key_count,
         COUNT(*) FILTER (WHERE feature_id IS NOT NULL
           AND feature_id <> '')::int                             AS feature_id_count,
         COUNT(*) FILTER (WHERE summary IS NOT NULL
@@ -81,7 +86,7 @@ async function main() {
     const total = core.total_packets;
 
     if (total === 0) {
-      fatal('atlas_packets is empty — run ingest-msgpack-to-atlas-packets.mjs first');
+      fatal('atlas_packets is empty');
     }
 
     // 4. Optional columns
@@ -113,6 +118,10 @@ async function main() {
         GROUP BY sha256 HAVING COUNT(*) > 1
       ) s
     `);
+    const dupKeyRes = await pool.query(`
+      SELECT COUNT(*) - COUNT(DISTINCT packet_key) AS dup_keys FROM atlas_packets WHERE packet_key IS NOT NULL AND packet_key <> ''
+    `);
+    const duplicatePacketKeys = parseInt(dupKeyRes.rows[0].dup_keys, 10);
 
     // 6. Source ref quality: detect artifact paths vs real code paths
     const artifactPathRes = await pool.query(`
@@ -136,50 +145,59 @@ async function main() {
         source_kind: hasSourceKind,
         reward_prior: hasRewardPrior,
         source_path: hasSourcePath,
+        source_ref_key: hasSourceRefKey,
       },
       coverage: {
         packet_key: hasPacketKey ? { count: packetKeyCount, pct: pct(packetKeyCount), gate: GATE_PACKET_KEY } : null,
-        source_ref: { count: core.source_ref_count, pct: pct(core.source_ref_count), gate: GATE_SOURCE_REF },
+        source_ref: { count: core.source_ref_count, pct: pct(core.source_ref_count) },
+        source_ref_key: hasSourceRefKey ? { count: core.source_ref_key_count, pct: pct(core.source_ref_key_count), gate: GATE_SOURCE_REF_KEY } : null,
         source_ref_real_code: { count: realCodePaths, pct: realCodePct, note: 'Non-artifact code paths' },
         feature_id: { count: core.feature_id_count, pct: pct(core.feature_id_count), gate: GATE_FEATURE_ID },
         summary: { count: core.summary_count, pct: pct(core.summary_count) },
         embedding: { count: core.embedding_count, pct: pct(core.embedding_count) },
         payload: { count: core.payload_count, pct: pct(core.payload_count) },
-        concept_ids: { count: core.concept_id_count, pct: pct(core.concept_id_count) },
+        concept_ids: { count: core.concept_id_count, pct: pct(core.concept_id_count), gate: GATE_CONCEPT_IDS },
         community_id: { count: core.community_id_count, pct: pct(core.community_id_count) },
         source_kind: hasSourceKind ? { count: sourceKindCount, pct: pct(sourceKindCount) } : null,
       },
       duplicates: {
         duplicate_packet_ids: parseInt(dupIdRes.rows[0].dup_ids, 10),
         duplicate_sha256_groups: parseInt(dupShaRes.rows[0].dup_sha256_groups, 10),
+        duplicate_packet_keys: duplicatePacketKeys,
       },
       missing_reward_prior: hasRewardPrior ? rewardPriorCount : null,
       artifact_source_refs: artifactPaths,
     };
 
     // 8. Gate evaluation
-    const sourceRefGatePasses = realCodePct >= GATE_SOURCE_REF;
+    const totalPacketsPasses = total >= GATE_TOTAL_PACKETS;
+    const sourceRefKeyPasses = pct(core.source_ref_key_count) >= GATE_SOURCE_REF_KEY;
     const featureIdGatePasses = pct(core.feature_id_count) >= GATE_FEATURE_ID;
-    const packetKeyGatePasses = !hasPacketKey || pct(packetKeyCount) >= GATE_PACKET_KEY;
-    const phase4a_ready = sourceRefGatePasses && featureIdGatePasses;
+    const conceptIdsGatePasses = pct(core.concept_id_count) >= GATE_CONCEPT_IDS;
+    const packetKeyGatePasses = hasPacketKey && pct(packetKeyCount) >= GATE_PACKET_KEY;
+    const duplicatePacketKeysPasses = duplicatePacketKeys === 0;
+
+    const phase4a_ready = totalPacketsPasses && sourceRefKeyPasses && featureIdGatePasses && conceptIdsGatePasses && packetKeyGatePasses && duplicatePacketKeysPasses;
 
     const gateDetails = {
-      source_ref_gate: { required: `${GATE_SOURCE_REF}%`, actual: `${realCodePct}%`, pass: sourceRefGatePasses },
+      total_packets_gate: { required: `>= ${GATE_TOTAL_PACKETS}`, actual: `${total}`, pass: totalPacketsPasses },
+      source_ref_key_gate: { required: `${GATE_SOURCE_REF_KEY}%`, actual: `${pct(core.source_ref_key_count)}%`, pass: sourceRefKeyPasses },
       feature_id_gate: { required: `${GATE_FEATURE_ID}%`, actual: `${pct(core.feature_id_count)}%`, pass: featureIdGatePasses },
-      packet_key_gate: hasPacketKey ? { required: `${GATE_PACKET_KEY}%`, actual: `${pct(packetKeyCount)}%`, pass: packetKeyGatePasses } : { note: 'column missing — add packet_key column' },
+      concept_ids_gate: { required: `${GATE_CONCEPT_IDS}%`, actual: `${pct(core.concept_id_count)}%`, pass: conceptIdsGatePasses },
+      packet_key_gate: { required: `${GATE_PACKET_KEY}%`, actual: `${pct(packetKeyCount)}%`, pass: packetKeyGatePasses },
+      duplicate_packet_keys: { required: `0`, actual: `${duplicatePacketKeys}`, pass: duplicatePacketKeysPasses }
     };
 
     const blockers = [];
-    const artifactPct = total > 0 ? (artifactPaths / total) * 100 : 0;
-    if (artifactPct > 1) blockers.push(`${artifactPaths} artifact source_refs (${artifactPct.toFixed(1)}% > 1% threshold — run backfill-atlas-source-refs.mjs)`);
-    if (!hasPacketKey) blockers.push(`packet_key column missing (run migration)`);
-    if (!hasSourceKind) blockers.push(`source_kind column missing (run migration)`);
-    if (!sourceRefGatePasses) blockers.push(`source_ref real-code coverage ${realCodePct}% < ${GATE_SOURCE_REF}%`);
+    if (!totalPacketsPasses) blockers.push(`total packets count ${total} < ${GATE_TOTAL_PACKETS}`);
+    if (!sourceRefKeyPasses) blockers.push(`source_ref_key coverage ${pct(core.source_ref_key_count)}% < ${GATE_SOURCE_REF_KEY}%`);
     if (!featureIdGatePasses) blockers.push(`feature_id coverage ${pct(core.feature_id_count)}% < ${GATE_FEATURE_ID}%`);
-    if (core.concept_id_count === 0) blockers.push(`concept_ids is 0% — run populate-selected-concepts.mjs`);
+    if (!conceptIdsGatePasses) blockers.push(`concept_ids coverage ${pct(core.concept_id_count)}% < ${GATE_CONCEPT_IDS}%`);
+    if (!packetKeyGatePasses) blockers.push(`packet_key coverage ${pct(packetKeyCount)}% < ${GATE_PACKET_KEY}%`);
+    if (!duplicatePacketKeysPasses) blockers.push(`duplicate packet_keys count is ${duplicatePacketKeys}`);
 
     const next_action = phase4a_ready && blockers.length === 0
-      ? 'Phase 3I gate PASSED — Phase 4A RRF ranking can start'
+      ? 'Phase 3I / 4A gate PASSED — Phase 4A RRF ranking can start'
       : `Fix blockers: ${blockers.join('; ')}`;
 
     const result = {
@@ -201,17 +219,19 @@ async function main() {
     const warn = (b) => (b ? '⚠️ ' : '✅');
 
     console.log('\n╔══════════════════════════════════════════════════════════╗');
-    console.log('║         Phase 3I Atlas Packets Verification Gate        ║');
+    console.log('║         Phase 3I/4A Atlas Packets Verification Gate     ║');
     console.log('╚══════════════════════════════════════════════════════════╝\n');
 
     console.log(`  Total packets:   ${total}`);
     console.log(`  Duplicate IDs:   ${metrics.duplicates.duplicate_packet_ids}`);
+    console.log(`  Duplicate Keys:  ${metrics.duplicates.duplicate_packet_keys}`);
     console.log(`  Duplicate SHA256 groups: ${metrics.duplicates.duplicate_sha256_groups}`);
     console.log('');
     console.log('  Coverage:');
     console.log(`    source_ref (any):      ${core.source_ref_count}/${total} (${pct(core.source_ref_count)}%)`);
-    console.log(`    source_ref (real code): ${realCodePaths}/${total} (${realCodePct}%) ← gate metric`);
-    console.log(`    artifact source_refs:  ${artifactPaths} ${warn(artifactPaths > 0)} (need backfill)`);
+    if (hasSourceRefKey) console.log(`    source_ref_key:       ${core.source_ref_key_count}/${total} (${pct(core.source_ref_key_count)}%)`);
+    console.log(`    source_ref (real code): ${realCodePaths}/${total} (${realCodePct}%)`);
+    console.log(`    artifact source_refs:  ${artifactPaths} ${warn(artifactPaths > 0)}`);
     if (hasPacketKey) console.log(`    packet_key:           ${packetKeyCount}/${total} (${pct(packetKeyCount)}%)`);
     else               console.log(`    packet_key:           COLUMN MISSING ❌`);
     console.log(`    feature_id:           ${core.feature_id_count}/${total} (${pct(core.feature_id_count)}%)`);
@@ -235,21 +255,14 @@ async function main() {
 
     console.log('');
     if (phase4a_ready && blockers.length === 0) {
-      console.log('  ✅ Phase 3I gate PASSED — Phase 4A RRF ranking can start\n');
+      console.log('  ✅ Phase 3I/4A gate PASSED — Phase 4A RRF ranking can start\n');
     } else {
-      console.log('  ❌ Phase 3I gate NOT PASSED');
+      console.log('  ❌ Phase 3I/4A gate NOT PASSED');
       console.log('');
       console.log('  Blockers:');
       for (const b of blockers) {
         console.log(`    • ${b}`);
       }
-      console.log('');
-      console.log('  Fix sequence:');
-      console.log('    1. node scripts/atlas/add-atlas-packets-columns.mjs   (adds packet_key, source_kind, reward_prior)');
-      console.log('    2. node scripts/atlas/backfill-atlas-source-refs.mjs  (replaces .tmp/ paths with real code paths)');
-      console.log('    3. node scripts/atlas/backfill-atlas-feature-ids.mjs  (fills feature_id from source_ref)');
-      console.log('    4. node scripts/atlas/populate-selected-concepts.mjs  (fills concept_ids from agent traces)');
-      console.log('    5. node scripts/atlas/verify-atlas-packets.mjs        (re-run this gate check)');
       console.log('');
     }
 

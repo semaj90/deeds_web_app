@@ -1,0 +1,95 @@
+{
+  "generatedAt": "2026-06-12T12:15:47.157Z",
+  "featureLineage": {
+    "totalLineages": 100,
+    "sourceRefCoveragePct": 100,
+    "featureIdCoveragePct": 100,
+    "featureLabelCoveragePct": 100,
+    "missingHigherHopRows": 100
+  },
+  "runtime": {
+    "selectedConceptCoveragePct": 100,
+    "retrievedPacketCoveragePct": 100,
+    "toolCallCoveragePct": 100,
+    "routeRuntimePackets": {
+      "total": 33,
+      "lowDensityCount": 0,
+      "emptyPointersCount": 1,
+      "avgHydrationRatio": "88.38%"
+    }
+  },
+  "rrf": {
+    "avgNdcg": 0.544,
+    "avgMrr": 0.593,
+    "avgRecall": 0.717
+  },
+  "hops": {
+    "somCluster": {
+      "name": "somCluster",
+      "coveragePct": 0,
+      "missingRows": 100,
+      "state": "MISSING"
+    },
+    "glyphRecord": {
+      "name": "glyphRecord",
+      "coveragePct": 0,
+      "missingRows": 100,
+      "state": "MISSING"
+    },
+    "qdrantHit": {
+      "name": "qdrantHit",
+      "coveragePct": 0,
+      "missingRows": 100,
+      "state": "MISSING"
+    },
+    "redisHotKey": {
+      "name": "redisHotKey",
+      "coveragePct": 0,
+      "missingRows": 100,
+      "state": "MISSING"
+    },
+    "neo4jNode": {
+      "name": "neo4jNode",
+      "coveragePct": 0,
+      "missingRows": 100,
+      "state": "MISSING"
+    }
+  },
+  "recommendations": [
+    {
+      "hop": "somCluster",
+      "state": "MISSING",
+      "missingRows": 100,
+      "coveragePct": 0,
+      "recommendation": "Re-derive som_cluster from topology / cluster join"
+    },
+    {
+      "hop": "glyphRecord",
+      "state": "MISSING",
+      "missingRows": 100,
+      "coveragePct": 0,
+      "recommendation": "Materialize glyph_record from SOM / glyph lane"
+    },
+    {
+      "hop": "qdrantHit",
+      "state": "MISSING",
+      "missingRows": 100,
+      "coveragePct": 0,
+      "recommendation": "Backfill qdrant_point_id / Qdrant payload join"
+    },
+    {
+      "hop": "redisHotKey",
+      "state": "MISSING",
+      "missingRows": 100,
+      "coveragePct": 0,
+      "recommendation": "Replay runtime packets and restore Redis hot keys"
+    },
+    {
+      "hop": "neo4jNode",
+      "state": "MISSING",
+      "missingRows": 100,
+      "coveragePct": 0,
+      "recommendation": "Relink or materialize Neo4j node mapping"
+    }
+  ]
+}

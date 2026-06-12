@@ -12,6 +12,7 @@ import { createReadStream, existsSync } from 'fs';
 import readline from 'readline';
 import path from 'path';
 import crypto from 'crypto';
+import { normalizeSharedLabel, sharedLabelRegistrySignature } from '../atlas/shared-label-registry.mjs';
 
 const ROOT     = process.cwd();
 const DRY_RUN  = process.argv.includes('--dry-run');
@@ -62,6 +63,10 @@ function assignFeatureLabel(text) {
   return 'general';
 }
 
+function assignSharedLabel(featureLabel, domain, ownerArea, src) {
+  return normalizeSharedLabel([featureLabel, domain, ownerArea, src].filter(Boolean).join(' '));
+}
+
 function ownerArea(src) {
   const s = (src || '').replace(/\\/g, '/');
   if (/^src\/routes\/api/.test(s))     return 'api';
@@ -110,12 +115,18 @@ async function main() {
   const labels = [];
   for (const src of sourceRefs) {
     const combined = src;
+    const feature_label = assignFeatureLabel(combined);
+    const domain = assignDomain(combined);
+    const owner_area = ownerArea(src);
+    const shared_label = assignSharedLabel(feature_label, domain, owner_area, src);
     labels.push({
       sourceRef:     src,
-      domain:        assignDomain(combined),
-      feature_label: assignFeatureLabel(combined),
-      owner_area:    ownerArea(src),
+      domain,
+      feature_label,
+      shared_label,
+      owner_area,
       label_hash:    crypto.createHash('sha256').update(src).digest('hex').slice(0, 16),
+      shared_label_sig: sharedLabelRegistrySignature(),
       createdAt,
     });
   }

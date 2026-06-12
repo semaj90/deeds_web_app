@@ -1,0 +1,25 @@
+{
+  "generated_at": "2026-06-12T15:27:52.441Z",
+  "mode": "apply",
+  "packets_needing_summary": 6151,
+  "processed": 6151,
+  "found": 5268,
+  "not_found": 721,
+  "too_short": 154,
+  "skipped_binary": 8,
+  "updates_planned": 5268,
+  "baseline_coverage": {
+    "total": 7753,
+    "useful_before": 1602,
+    "pct_before": "20.7"
+  },
+  "applied": 5268,
+  "gate_result": {
+    "total": 7753,
+    "useful_before": 1602,
+    "useful_after": 6869,
+    "filesystem_count": 6868,
+    "coverage_pct": "88.6",
+    "gate_pass": true
+  }
+}

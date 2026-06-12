@@ -3,6 +3,7 @@ import fs from 'fs'
 import readline from 'readline'
 import { createHash } from 'crypto'
 import path from 'path'
+import { normalizeSharedLabel, sharedLabelRegistrySignature } from './shared-label-registry.mjs'
 
 const FRONTEND_ROOT = 'sveltekit-frontend'
 const tmp = '.tmp'
@@ -53,6 +54,10 @@ function addFeature(file, feat, example){
   if(!entry.examples.has(feat)) entry.examples.set(feat, example)
 }
 
+function deriveSharedLabel(featureLabel, file) {
+  return normalizeSharedLabel([featureLabel, file].filter(Boolean).join(' '))
+}
+
 for(const call of calls){
   const srcId = call.sourceRefId || call.sourceRef || null
   const srcFile = fileById.get(srcId) || call.sourceRef || '<unknown>'
@@ -83,9 +88,25 @@ for(const [file,meta] of fileFeatures.entries()){
   const counts = Array.from(meta.counts.entries()).map(([name,count])=>({name,count})).sort((a,b)=>b.count-a.count)
   const top = counts[0]?.name || 'other'
   const id = sha256hex(file)
-  featureLines.push(JSON.stringify({file, id, features:counts, topFeature: top}))
+  const shared_label = deriveSharedLabel(top, file)
+  featureLines.push(JSON.stringify({
+    file,
+    id,
+    features:counts,
+    topFeature: top,
+    shared_label,
+    shared_label_sig: sharedLabelRegistrySignature(),
+  }))
   // Create a simple Kanban task for top feature
-  kanbanLines.push(JSON.stringify({title:`Label: ${top} — Review ${path.basename(file)}`, file, id, feature:top, notes:`Review ${file} for feature '${top}'. Example: ${JSON.stringify(meta.examples.get(top)||{})}`}))
+  kanbanLines.push(JSON.stringify({
+    title:`Label: ${top} — Review ${path.basename(file)}`,
+    file,
+    id,
+    feature:top,
+    shared_label,
+    shared_label_sig: sharedLabelRegistrySignature(),
+    notes:`Review ${file} for feature '${top}'. Example: ${JSON.stringify(meta.examples.get(top)||{})}`
+  }))
 }
 
 // ── Integrate Schema Drift & Gaps into Feature Labeling and Kanban Tasks ─────
@@ -115,6 +136,8 @@ if (fs.existsSync(temporalAuditPath)) {
             id: sha256hex(gapRecord.feature_id),
             features: [{name: 'database', count: 1}],
             topFeature: 'database',
+            shared_label: 'database',
+            shared_label_sig: sharedLabelRegistrySignature(),
             schema_gap: gapRecord
           }))
           
@@ -123,6 +146,8 @@ if (fs.existsSync(temporalAuditPath)) {
             file: gapRecord.source_ref,
             id: sha256hex(gapRecord.feature_id),
             feature: 'database',
+            shared_label: 'database',
+            shared_label_sig: sharedLabelRegistrySignature(),
             workspace_task_id: taskId,
             notes: `Drift Type: ${drift.driftType}. Details: ${drift.details}. Table: ${c.tableName}. Column: ${drift.column}`
           }))
@@ -148,6 +173,8 @@ if (fs.existsSync(temporalAuditPath)) {
           id: sha256hex(gapRecord.feature_id),
           features: [{name: 'database', count: 1}],
           topFeature: 'database',
+          shared_label: 'database',
+          shared_label_sig: sharedLabelRegistrySignature(),
           schema_gap: gapRecord
         }))
         
@@ -156,6 +183,8 @@ if (fs.existsSync(temporalAuditPath)) {
           file: gapRecord.source_ref,
           id: sha256hex(gapRecord.feature_id),
           feature: 'database',
+          shared_label: 'database',
+          shared_label_sig: sharedLabelRegistrySignature(),
           workspace_task_id: taskId,
           notes: `Table: ${c.tableName} is ${c.classification} with row count ${c.rowCount}. Risk: ${risk}`
         }))

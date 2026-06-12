@@ -454,7 +454,12 @@
       "PowerShell(Get-Volume | Where-Object {$_.DriveLetter -eq 'C'} | Select-Object DriveLetter, Size, SizeRemaining | Format-Table -AutoSize)",
       "PowerShell(\\(Get-Item \"C:\\\\Users\\\\james\\\\AppData\\\\Local\\\\Docker\\\\wsl\\\\disk\\\\docker_data.vhdx\" -ErrorAction SilentlyContinue | Select-Object @{Name=\"Size \\(GB\\)\"; Expression={[math]::Round\\($_.Length / 1GB, 2\\)}}, @{Name=\"Path\"; Expression={$_.FullName}}\\))",
       "PowerShell(Stop-Process -Force)",
-      "PowerShell(wsl --shutdown)"
+      "PowerShell(wsl --shutdown)",
+      "PowerShell(docker exec legal-ai-neo4j ls /import/neo4j-import/)",
+      "PowerShell(docker exec legal-ai-neo4j cypher-shell -u neo4j -p neo4j123 \"STOP DATABASE neo4j\" 2>&1)",
+      "PowerShell(docker start legal-ai-neo4j 2>&1)",
+      "PowerShell(docker exec legal-ai-neo4j cypher-shell -u neo4j -p neo4j123 \"MATCH \\(n\\) RETURN labels\\(n\\)[0] AS label, count\\(n\\) AS cnt ORDER BY cnt DESC\" 2>&1)",
+      "PowerShell(docker exec legal-ai-neo4j cypher-shell -u neo4j -p neo4j123 \"MATCH \\(\\)-[r]->\\(\\) RETURN type\\(r\\) AS rel, count\\(r\\) AS cnt ORDER BY cnt DESC\" 2>&1)"
     ],
     "deny": [],
     "ask": []

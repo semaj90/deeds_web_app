@@ -1,8 +1,8 @@
 {
-  "generatedAt": "2026-06-12T01:25:10.402Z",
+  "generatedAt": "2026-06-12T12:06:31.499Z",
   "nodeCount": 0,
   "edgeCount": 0,
-  "exportCount": 501,
+  "exportCount": 16807,
   "exports": [
     {
       "file": "memory/exports/cluster-cards.jsonl",
@@ -55,6 +55,10 @@
     {
       "file": "memory/exports/cluster-summary.json",
       "rows": 1
+    },
+    {
+      "file": "memory/exports/directory-source-map.jsonl",
+      "rows": 16305
     },
     {
       "file": "memory/exports/drizzle-drift-audit.json",
@@ -166,6 +170,10 @@
     },
     {
       "file": "memory/exports/replay-validation.json",
+      "rows": 1
+    },
+    {
+      "file": "memory/exports/reports.manifest.json",
       "rows": 1
     },
     {

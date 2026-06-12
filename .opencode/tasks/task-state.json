@@ -1,58 +1,46 @@
 {
-  "generatedAt": "2026-06-12T03:27:05.175Z",
+  "generatedAt": "2026-06-12T13:04:20.554Z",
   "workspace_id": "deeds-web-app",
   "version": 1,
-  "total_tasks": 7,
+  "total_tasks": 5,
   "counts": {
-    "todo": 7,
+    "todo": 5,
     "doing": 0,
     "blocked": 0,
     "done": 0,
-    "open": 7,
-    "total": 7
+    "open": 5,
+    "total": 5
   },
-  "next_ready_task_id": "task_f4c003c3",
+  "next_ready_task_id": "task_b4c7695a",
   "feature_label_count": 13,
   "tasks_by_status": {
     "todo": [
       {
-        "id": "task_f4c003c3",
-        "title": "claude-mem/src/ui/viewer/App.tsx — 5 unresolved imports",
-        "feature_id": "ai-retrieval",
-        "priority": "high"
-      },
-      {
-        "id": "task_cdf3b195",
-        "title": "4 files unclassified with >10 imports",
-        "feature_id": "ai-retrieval",
-        "priority": "medium"
-      },
-      {
-        "id": "task_1a6426f7",
+        "id": "task_b4c7695a",
         "title": "Feature not implemented: Priority 1: Evidence Upload UI (1 hour)",
         "feature_id": "ai-retrieval",
         "priority": "low"
       },
       {
-        "id": "task_5757fd9d",
+        "id": "task_5a8234c2",
         "title": "Feature not implemented: Priority 2: VLM POI Integration (90 min)",
         "feature_id": "platform",
         "priority": "low"
       },
       {
-        "id": "task_48c83507",
+        "id": "task_579e06fe",
         "title": "Feature not implemented: Priority 3: Audit Dashboard Web UI (3-4 hours)",
         "feature_id": "ai-inference",
         "priority": "low"
       },
       {
-        "id": "task_3d427f8b",
+        "id": "task_b9d0c565",
         "title": "Feature not implemented: Priority 4: Auto-Fix Orchestrator (6-8 hours)",
         "feature_id": "ai-inference",
         "priority": "low"
       },
       {
-        "id": "task_9296148d",
+        "id": "task_604cc0a6",
         "title": "Feature not implemented: Phase 3: Post-Synthesis Quality Review (RunID: `stage-2c-500`)",
         "feature_id": "vector-graph",
         "priority": "low"

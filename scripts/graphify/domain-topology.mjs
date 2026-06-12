@@ -49,14 +49,16 @@ async function main() {
     sourceRef:     l.sourceRef,
     domain:        l.domain,
     feature_label: l.feature_label,
+    shared_label:  l.shared_label ?? l.feature_label,
     owner_area:    l.owner_area,
   }));
 
-  // Build edges: connect nodes that share the same feature_label
+  // Build edges: connect nodes that share the same shared_label
   const byLabel = new Map();
   for (const l of labels) {
-    if (!byLabel.has(l.feature_label)) byLabel.set(l.feature_label, []);
-    byLabel.get(l.feature_label).push(l.label_hash);
+    const label = l.shared_label ?? l.feature_label;
+    if (!byLabel.has(label)) byLabel.set(label, []);
+    byLabel.get(label).push(l.label_hash);
   }
 
   const edges = [];
@@ -90,6 +92,7 @@ async function main() {
     ),
     nodes,
     edges,
+    sharedLabelSignature: labels[0]?.shared_label_sig ?? null,
   };
 
   console.log(`  nodes: ${nodes.length}  edges: ${edges.length}`);

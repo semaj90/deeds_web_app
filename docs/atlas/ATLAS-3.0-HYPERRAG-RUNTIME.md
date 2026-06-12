@@ -208,27 +208,91 @@ Synthesize an answer using the code context above.
 
 ## Implementation Roadmap
 
-### Phase 3A: Qdrant + Community (1-2 days)
+> **Reordered 2026-06-12** — original roadmap bundled three independent decisions
+> (storage tiering, native GEMM bindings, HyperRAG pipeline) that should not be
+> implemented simultaneously. The bottleneck is retrieval signal quality, not
+> matrix multiplication speed. Stages reordered by evidence-backed priority.
+
+---
+
+### Architectural Decisions (Separated)
+
+#### Decision 1 — Storage Tiering ✅ AGREED, IMPLEMENT NOW
+
+```
+Hot   → Redis / Valkey / Bifrost
+Warm  → Postgres + Qdrant + Neo4j
+Cold  → SeaweedFS / NDJSON / MessagePack / historical artifacts
+```
+
+No change to existing infrastructure. Aligns with current atlas_packets architecture.
+NDJSON payloads stay in cold store; Postgres holds packet registry + truth tables only.
+
+#### Decision 2 — Memory: spectra-g/engram over Tiny-Engram ✅ AGREED, IMPLEMENT NEXT
+
+Use `spectra-g/engram` MCP for temporal + validation + knowledge graph memory.
+Do NOT use Tiny-Engram PEFT (model modification, adapter memory, training complexity).
+
+Reason: workstation-scale Atlas needs persistent notes + blast-radius tracking + validation graph
+without modifying Gemma at all. The MCP approach gives all three without touching model weights.
+
+#### Decision 3 — Native GEMM bindings ⏳ DEFERRED
+
+Native `torch::mm()` / pybind11 / custom CUDA extension is technically correct but the wrong
+bottleneck to attack now. Current NDCG@10 = 0.772. The gap is not matrix multiply speed.
+
+**Defer native GEMM until all of these are active:**
+- BM25 lane contributing signal
+- Concept lane contributing signal (community_confidence backfill applied)
+- XGBoost formal reranker trained and evaluated
+
+Revisit at Stage 5 below.
+
+---
+
+### Stage 1 — Ranking Signal Activation (ACTIVE)
+
+**Status**: BM25 ✅ active | Concept lane ✅ gated on community_confidence | Community backfill ✅ applied
+
+- [x] BM25 text backfill (88.6% coverage, gate PASS)
+- [x] Concept extraction + taxonomy mapping (feature_id labels)
+- [x] Community provenance backfill (Layer A — community_source + community_confidence)
+- [ ] Qdrant payload enrichment — run `atlas:4b:qdrant-payload` (Layer C)
+- [ ] Re-run 20-query benchmark after concept lane activates (target: NDCG@10 ≥ 0.80)
+
+### Stage 2 — Memory + Formal Reranker
+
+- [ ] spectra-g/engram MCP integration (temporal graph + validation graph + knowledge graph)
+- [ ] XGBoost formal reranker prerequisites:
+  - [ ] Extract (query, doc, label) triples from agent_traces (≥ 500 success rows)
+  - [ ] Train LambdaMART ranker (`scripts/atlas/train-xgboost-ranker.mjs`)
+  - [ ] Gate: NDCG@10 ≥ 0.80 before replacing RRF
+- [ ] Wire XGBoost into retrieval/orchestrator.ts after Neo4j expansion
+
+### Stage 3 — Neo4j Contextual Trees + HyperRAG Packet RPC
+
 - [ ] Fix Gate 2: neo4j-graph-enrich Qdrant payload writes
-- [ ] Validate all 54,331 Qdrant points have `community_id`
-- [ ] Implement Stage 2 community expansion queries
+- [ ] Validate all Qdrant points have `community_id` (95%+ coverage)
+- [ ] Wire Neo4j community expansion (Stage 2 above) into retrieval cascade
+- [ ] HyperRAG packet RPC: Qdrant → retrieves packets, Neo4j → explains hierarchy, combined
+- [ ] Benchmark path traversal times (Dijkstra 5-hop ceiling)
 
-### Phase 3B: Graph Expansion (2-3 days)
-- [ ] Wire Neo4j GDS shortest-path to SvelteKit `/api/graph/expand`
-- [ ] Test Dijkstra on codebase_topology projection
-- [ ] Benchmark path traversal times
+### Stage 4 — Latent Topology
 
-### Phase 3C: Reranking + Hydration (2 days)
-- [ ] Implement authority reranking formula
-- [ ] Wire packet hydration from Redis/Postgres
-- [ ] Add cache monitoring
+- [ ] Autoencoder 768 → 64 (requires ≥ 65 Qdrant hits via graphify:semantic)
+- [ ] SOM 20×20 taxonomy (full 76,878-point re-run after Stage 1 signals stable)
+- [ ] Wire 64-dim encoded representations to `gpu:karpathy:encoded` cache
+- [ ] Validate SOM cluster quality (20–100 communities, entropy audit)
 
-### Phase 3D: ACE Assembly + Synthesis (2 days)
-- [ ] Build ACE context structure
-- [ ] Wire Gemma4 synthesis route
-- [ ] Add retrieval tracing for observability
+### Stage 5 — Native GEMM / RL Policy (DEFERRED)
 
-**Total**: ~1-1.5 weeks for full Phase 3 runtime
+Only activate after Stage 1–3 are verified and NDCG@10 ≥ 0.85:
+- [ ] Native `torch::mm()` GEMM bindings (pybind11 / custom CUDA extension)
+- [ ] RL tool policy (reward function wired to agent_traces outcomes)
+- [ ] Gemma4 QLoRA adapter (≥ 813 training examples confirmed, fine-tune on verified traces)
+
+**Total for Stages 1–3**: ~1–2 weeks  
+**Stage 4–5**: after benchmark validation confirms signal saturation from earlier stages
 
 ---
 

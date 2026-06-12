@@ -1,44 +1,24 @@
-# Executable Task Cards — 2026-06-12T03:26:55.995Z
+# Executable Task Cards — 2026-06-12T12:43:34.620Z
 
-**7 tasks** across **4 clusters**
+**5 tasks** across **2 clusters**
 
 ## Task Summary
 | # | Risk | Cluster | Title | Command |
 |---|------|---------|-------|---------|
-| 1 | HIGH | UI Components | claude-mem/src/ui/viewer/App.tsx — 5 unresolved imports | `node scripts/atlas/debug-import-resolve.mjs <import> 'claude-mem/src/ui/viewer/App.tsx'` |
-| 2 | MEDIUM | Agent Workflow | 4 files unclassified with >10 imports | `node scripts/atlas/mapreduce-consolidated-index.mjs "--output=.tmp/mapreduce-full-v4.ndjson"` |
-| 3 | LOW | Legal Workspace | Feature not implemented: Priority 1: Evidence Upload UI (1 h | — |
-| 4 | LOW | General | Feature not implemented: Priority 2: VLM POI Integration (90 | — |
-| 5 | LOW | General | Feature not implemented: Priority 3: Audit Dashboard Web UI  | — |
-| 6 | LOW | General | Feature not implemented: Priority 4: Auto-Fix Orchestrator ( | — |
-| 7 | LOW | General | Feature not implemented: Phase 3: Post-Synthesis Quality Rev | — |
+| 1 | LOW | Legal Workspace | Feature not implemented: Priority 1: Evidence Upload UI (1 h | — |
+| 2 | LOW | General | Feature not implemented: Priority 2: VLM POI Integration (90 | — |
+| 3 | LOW | General | Feature not implemented: Priority 3: Audit Dashboard Web UI  | — |
+| 4 | LOW | General | Feature not implemented: Priority 4: Auto-Fix Orchestrator ( | — |
+| 5 | LOW | General | Feature not implemented: Phase 3: Post-Synthesis Quality Rev | — |
 
 ## By Cluster
-### UI Components
-#### [HIGH] claude-mem/src/ui/viewer/App.tsx — 5 unresolved imports
-- **Type**: `developer_recommendation`  **Status**: `todo`  **TTL**: 7d
-- **Why**: Feature "ui" barrel/index has 5 dangling import refs (mapreduce v4 scan)
-- **Action**: Audit barrel re-exports; remove or fix dangling import paths
-- **Run**: `node scripts/atlas/debug-import-resolve.mjs <import> 'claude-mem/src/ui/viewer/App.tsx'`
-- **sourceRefs**: claude-mem/src/ui/viewer/App.tsx
-- **task_id**: `task_f4c003c3`
-
-### Agent Workflow
-#### [MEDIUM] 4 files unclassified with >10 imports
-- **Type**: `feature:unclassified`  **Status**: `todo`  **TTL**: 7d
-- **Why**: Files with many imports but no feature label degrade ACE context quality
-- **Action**: Add feature labels to mapreduce classification rules
-- **Run**: `node scripts/atlas/mapreduce-consolidated-index.mjs "--output=.tmp/mapreduce-full-v4.ndjson"`
-- **sourceRefs**: claude-mem/src/cli/handlers/session-init.ts, claude-mem/src/npx-cli/commands/install.ts, claude-mem/src/server/generation/ProviderObservationGenerator.ts
-- **task_id**: `task_cdf3b195`
-
 ### Legal Workspace
 #### [LOW] Feature not implemented: Priority 1: Evidence Upload UI (1 hour)
 - **Type**: `missing_feature`  **Status**: `todo`  **TTL**: 7d
 - **Why**: feature not yet implemented
 - **Action**: rg "Display extracted text preview" src docs tests
 - **sourceRefs**: local:docs/archive/sessions/SESSION_SUMMARY_APRIL_9_2026.md#L182
-- **task_id**: `task_1a6426f7`
+- **task_id**: `task_b4c7695a`
 
 ### General
 #### [LOW] Feature not implemented: Priority 2: VLM POI Integration (90 min)
@@ -46,22 +26,22 @@
 - **Why**: feature not yet implemented
 - **Action**: rg "Wire photo VLM analysis to UI" src docs tests
 - **sourceRefs**: local:docs/archive/sessions/SESSION_SUMMARY_APRIL_9_2026.md#L188
-- **task_id**: `task_5757fd9d`
+- **task_id**: `task_5a8234c2`
 #### [LOW] Feature not implemented: Priority 3: Audit Dashboard Web UI (3-4 hours)
 - **Type**: `missing_feature`  **Status**: `todo`  **TTL**: 7d
 - **Why**: feature not yet implemented
 - **Action**: rg "Real-time GPU metrics (VRAM, temperature, utilization)" src docs tests
 - **sourceRefs**: local:docs/archive/sessions/SESSION_SUMMARY_APRIL_9_2026.md#L194
-- **task_id**: `task_48c83507`
+- **task_id**: `task_579e06fe`
 #### [LOW] Feature not implemented: Priority 4: Auto-Fix Orchestrator (6-8 hours)
 - **Type**: `missing_feature`  **Status**: `todo`  **TTL**: 7d
 - **Why**: feature not yet implemented
 - **Action**: rg "Identify duplicates from GPU audit" src docs tests
 - **sourceRefs**: local:docs/archive/sessions/SESSION_SUMMARY_APRIL_9_2026.md#L201
-- **task_id**: `task_3d427f8b`
+- **task_id**: `task_b9d0c565`
 #### [LOW] Feature not implemented: Phase 3: Post-Synthesis Quality Review (RunID: `stage-2c-500`)
 - **Type**: `missing_feature`  **Status**: `todo`  **TTL**: 7d
 - **Why**: feature not yet implemented
 - **Action**: rg "**Authority Audit**: Verify PageRank scores in Neo4j align with perceived file importance." src docs tests
 - **sourceRefs**: local:docs/operator/atlas-production-roadmap.md#L5
-- **task_id**: `task_9296148d`
+- **task_id**: `task_604cc0a6`

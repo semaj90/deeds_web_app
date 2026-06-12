@@ -28,6 +28,7 @@ const outputFile = outputIndex >= 0
   ? args[outputIndex + 1] ?? 'consolidated-index.ndjson'
   : args.find(a => a.startsWith('--output='))?.split('=')[1] ?? 'consolidated-index.ndjson';
 const verbose = args.includes('--verbose');
+const slim = args.includes('--slim');
 
 const REPO_ROOT = resolve('.');
 const SKIP_DIRS = new Set(['.git', 'node_modules', 'target', 'dist', 'coverage', '.venv', '.venv-py313-backup', '.python311', '.cache', '.vs', 'deeds_labs', '.opencode']);
@@ -229,6 +230,25 @@ const consolidatedDocs = mapResults.map(doc => {
     ...resolvedDynamicImports.filter(i => !i.exists && !i.external),
   ];
 
+  if (slim) {
+    return {
+      stableKey: doc.stableKey,
+      filePath: doc.filePath,
+      fileName: doc.fileName,
+      extension: doc.extension,
+      size: doc.size,
+      lines: doc.lines,
+      feature: doc.feature,
+      directory: doc.directory,
+      staticImports: doc.staticImports ? doc.staticImports.slice(0, 12) : [],
+      resolvedStaticImports: resolvedStaticImports.slice(0, 12),
+      dynamicImports: doc.dynamicImports ? doc.dynamicImports.slice(0, 12) : [],
+      resolvedDynamicImports: resolvedDynamicImports.slice(0, 12),
+      importErrorCount: importErrors.length,
+      contentHash: doc.contentHash
+    };
+  }
+
   return {
     ...doc,
     resolvedStaticImports,
@@ -397,16 +417,36 @@ function extractKeywords(content) {
 }
 
 function classifyFeature(filePath) {
-  if (filePath.includes('auth')) return 'auth';
-  if (filePath.includes('rag') || filePath.includes('retrieval')) return 'rag';
-  if (filePath.includes('graph') || filePath.includes('neo4j')) return 'graph';
-  if (filePath.includes('vector') || filePath.includes('qdrant')) return 'vector';
-  if (filePath.includes('llm') || filePath.includes('ollama')) return 'llm';
-  if (filePath.includes('components') || filePath.includes('ui')) return 'ui';
-  if (filePath.includes('cache') || filePath.includes('redis')) return 'cache';
-  if (filePath.includes('admin')) return 'admin';
-  if (filePath.includes('routes') || filePath.includes('api')) return 'routes';
-  if (filePath.includes('drizzle') || filePath.includes('schema')) return 'database';
+  const p = String(filePath || '').replace(/\\/g, '/').toLowerCase();
+  if (p.includes('auth')) return 'auth';
+  if (p.includes('rag') || p.includes('retrieval')) return 'rag';
+  if (p.includes('graph') || p.includes('neo4j')) return 'graph';
+  if (p.includes('vector') || p.includes('qdrant')) return 'vector';
+  if (p.includes('llm') || p.includes('ollama')) return 'llm';
+  if (p.includes('components') || p.includes('ui')) return 'ui';
+  if (p.includes('cache') || p.includes('redis')) return 'cache';
+  if (p.includes('sqlite')) return 'database';
+  if (
+    p.includes('/cli/') ||
+    p.includes('/npx-cli/') ||
+    p.includes('/server-beta/') ||
+    p.includes('/server/generation/') ||
+    p.includes('/server/runtime/') ||
+    p.includes('/server/services/') ||
+    p.includes('/servers/') ||
+    p.includes('/services/') ||
+    p.includes('/hooks/') ||
+    p.includes('/integrations/') ||
+    p.includes('/worker/') ||
+    p.includes('/workers/') ||
+    p.includes('/queue/') ||
+    p.includes('/compat/') ||
+    p.includes('/transcripts/') ||
+    p.includes('/infrastructure/')
+  ) return 'agent';
+  if (p.includes('admin')) return 'admin';
+  if (p.includes('routes') || p.includes('api')) return 'routes';
+  if (p.includes('drizzle') || p.includes('schema')) return 'database';
   return 'unclassified';
 }
 
@@ -424,7 +464,7 @@ function normalizeImportPath(importPath, fromFile) {
   if (importPath.startsWith('$lib')) {
     rawAbs = join(REPO_ROOT, 'sveltekit-frontend', 'src', 'lib', importPath.slice('$lib/'.length));
   } else if (importPath.startsWith('.')) {
-    const base = dirname(join(REPO_ROOT, 'sveltekit-frontend', fromFile));
+    const base = dirname(join(REPO_ROOT, fromFile));
     rawAbs = join(base, importPath);
   } else if (importPath.startsWith('src/')) {
     rawAbs = join(REPO_ROOT, 'sveltekit-frontend', importPath);

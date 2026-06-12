@@ -1,0 +1,58 @@
+{
+  "timestamp": "2026-06-12T05:14:04.256Z",
+  "totalPackets": 2009,
+  "queries": 20,
+  "summary": {
+    "rrf_default": {
+      "avgNdcg": 0.544,
+      "avgMrr": 0.593,
+      "avgRecall": 0.717
+    },
+    "bm25_heavy": {
+      "avgNdcg": 0.548,
+      "avgMrr": 0.588,
+      "avgRecall": 0.717
+    },
+    "concept_heavy": {
+      "avgNdcg": 0.535,
+      "avgMrr": 0.584,
+      "avgRecall": 0.717
+    },
+    "vector_heavy": {
+      "avgNdcg": 0.544,
+      "avgMrr": 0.593,
+      "avgRecall": 0.717
+    }
+  },
+  "byCategory": {
+    "Retrieval": {
+      "avgNdcg": 0.523,
+      "avgMrr": 0.44,
+      "avgRecall": 0.8,
+      "queries": 5
+    },
+    "Embedding": {
+      "avgNdcg": 0.584,
+      "avgMrr": 0.7,
+      "avgRecall": 0.7,
+      "queries": 5
+    },
+    "Graph": {
+      "avgNdcg": 0.475,
+      "avgMrr": 0.433,
+      "avgRecall": 0.8,
+      "queries": 5
+    },
+    "Schema/Cache": {
+      "avgNdcg": 0.592,
+      "avgMrr": 0.8,
+      "avgRecall": 0.567,
+      "queries": 5
+    }
+  },
+  "gate": {
+    "ndcg_threshold": 0.4,
+    "rrf_default_ndcg": 0.544,
+    "passes": true
+  }
+}

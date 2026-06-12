@@ -1,0 +1,58 @@
+{
+  "generatedAt": "2026-06-12T12:13:04.367Z",
+  "featureLineage": {
+    "sourceRefCoveragePct": 100,
+    "featureIdCoveragePct": 100,
+    "featureLabelCoveragePct": 100,
+    "missingHigherHopRows": 100
+  },
+  "routeRuntimePackets": {
+    "total": 33,
+    "lowDensityCount": 0,
+    "emptyPointersCount": 1,
+    "avgHydrationRatio": "88.38%"
+  },
+  "agentTraces": {
+    "total": 1134,
+    "selectedConcepts": 1134,
+    "retrievedPackets": 1134,
+    "toolCalls": 1134,
+    "emptySelectedConcepts": 0,
+    "emptyRetrievedPackets": 0,
+    "emptyToolCalls": 0,
+    "selectedConceptCoveragePct": 100,
+    "retrievedPacketCoveragePct": 100,
+    "toolCallCoveragePct": 100,
+    "topRetrievalStrategies": [
+      {
+        "retrieval_strategy": "fusion",
+        "hits": 396
+      },
+      {
+        "retrieval_strategy": "lexical_only",
+        "hits": 185
+      },
+      {
+        "retrieval_strategy": "vector_only",
+        "hits": 185
+      },
+      {
+        "retrieval_strategy": "cold_neschrom",
+        "hits": 184
+      },
+      {
+        "retrieval_strategy": "structural_only",
+        "hits": 184
+      }
+    ],
+    "outcomeCounts": {
+      "success": 991,
+      "partial": 102,
+      "failure": 41
+    }
+  },
+  "recommendations": [
+    "selected_concepts coverage is acceptable",
+    "runtime packet density is acceptable"
+  ]
+}

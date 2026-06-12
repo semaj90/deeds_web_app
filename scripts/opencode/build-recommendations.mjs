@@ -278,7 +278,7 @@ function detectImportErrors(todoQueue, pathMap) {
   const recs = [];
   if (!todoQueue?.length) return recs;
   const high = todoQueue.filter(t => t.priority === 'high' && (t.type || t.todo_type) === 'missing_imports').slice(0, 6);
-  const featureToCluster = { ui: 'UI Components', rag: 'Retrieval', cache: 'Infrastructure', database: 'Infrastructure', graph: 'Retrieval', llm: 'Retrieval', admin: 'Agent Workflow', auth: 'Infrastructure', vector: 'Retrieval', routes: 'Agent Workflow' };
+  const featureToCluster = { ui: 'UI Components', rag: 'Retrieval', cache: 'Infrastructure', database: 'Infrastructure', graph: 'Retrieval', llm: 'Retrieval', admin: 'Agent Workflow', auth: 'Infrastructure', vector: 'Retrieval', routes: 'Agent Workflow', agent: 'Agent Workflow' };
   for (const item of high) {
     const pm = pathMap?.[item.stableKey];
     recs.push({

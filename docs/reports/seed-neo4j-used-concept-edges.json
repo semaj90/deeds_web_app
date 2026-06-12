@@ -1,0 +1,29 @@
+{
+  "generated_at": "2026-06-12T13:29:19.712Z",
+  "mode": "apply",
+  "total_traces_in_db": 1134,
+  "traces_processed": 1134,
+  "edges_planned": 1134,
+  "unique_concepts": [
+    "agent_intelligence",
+    "api_endpoints",
+    "database_orm",
+    "emergent_topology",
+    "general_abstractions",
+    "infrastructure_config",
+    "native_accelerators",
+    "observability_telemetry",
+    "test_harness",
+    "ui_components"
+  ],
+  "gate_result": {
+    "neo4j_trace_total": 2310,
+    "pg_trace_total": 1134,
+    "tracesWithEdges": 1134,
+    "edgeCount": 1134,
+    "coveragePct": 1,
+    "coverageGate": true
+  },
+  "applied": 1134,
+  "errors": 0
+}

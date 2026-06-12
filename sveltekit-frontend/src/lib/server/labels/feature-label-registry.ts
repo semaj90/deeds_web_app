@@ -1,4 +1,5 @@
 import { createHash } from 'node:crypto';
+import registryData from './feature-label-registry.shared.json';
 
 export const FEATURE_LABEL_KEYS = [
   'api-route',
@@ -23,68 +24,20 @@ export interface FeatureLabelDefinition {
   description: string;
 }
 
-export const FEATURE_LABEL_REGISTRY: FeatureLabelDefinition[] = [
-  {
-    key: 'api-route',
-    aliases: ['route', 'api', 'handler', 'endpoint', 'server-route', 'http-route'],
-    description: 'HTTP route handlers and API endpoints',
-  },
-  {
-    key: 'ui-component',
-    aliases: ['ui', 'component', 'page', 'view', 'svelte', 'screen'],
-    description: 'User-facing UI components and pages',
-  },
-  {
-    key: 'svelte-inspector',
-    aliases: ['inspector', 'inspecter', 'route-inspector', 'memory-inspector', 'admin-inspector'],
-    description: 'Inspector surfaces, route lenses, and admin debugging panes',
-  },
-  {
-    key: 'svelte-realtime',
-    aliases: ['realtime', 'real-time', 'sse', 'live-update', 'streaming', 'progress-stream'],
-    description: 'Realtime SSE, streaming progress, and live update lanes',
-  },
-  {
-    key: 'evidence',
-    aliases: ['evidence', 'document', 'pdf', 'citation', 'case'],
-    description: 'Evidence, legal documents, and case material',
-  },
-  {
-    key: 'graph',
-    aliases: ['graph', 'neo4j', 'cluster', 'topology', 'som', 'pagerank', 'graphrag'],
-    description: 'Graph, cluster, topology, and authority flows',
-  },
-  {
-    key: 'database',
-    aliases: ['db', 'sql', 'drizzle', 'postgres', 'postgresql', 'qdrant-jsonb'],
-    description: 'Database schemas, queries, and persistence layers',
-  },
-  {
-    key: 'retrieval',
-    aliases: ['search', 'rag', 'query', 'semantic', 'retrieval'],
-    description: 'Search, RAG, and retrieval orchestration',
-  },
-  {
-    key: 'agent',
-    aliases: ['mcp', 'tool', 'agent', 'workflow', 'orchestration'],
-    description: 'Agentic orchestration, MCP tools, and workflow control',
-  },
-  {
-    key: 'cache',
-    aliases: ['redis', 'cache', 'semantic-cache', 'prompt-cache'],
-    description: 'Hot cache and semantic cache lanes',
-  },
-  {
-    key: 'symbol',
-    aliases: ['symbol', 'function', 'method', 'class'],
-    description: 'Symbol-level references and anchors',
-  },
-  {
-    key: 'general',
-    aliases: [],
-    description: 'Fallback label when no stronger classification is available',
-  },
-];
+export interface SharedFeatureLabelRecord {
+  sourceRef: string;
+  domain: string;
+  feature_label: string;
+  shared_label: FeatureLabelKey;
+  owner_area: string;
+  label_hash: string;
+  shared_label_sig: string;
+  createdAt: string;
+}
+
+export interface SharedFeatureLabelNdjsonRow extends SharedFeatureLabelRecord {}
+
+export const FEATURE_LABEL_REGISTRY: FeatureLabelDefinition[] = registryData as FeatureLabelDefinition[];
 
 const registryMap = new Map<string, FeatureLabelKey>();
 for (const entry of FEATURE_LABEL_REGISTRY) {
@@ -104,6 +57,10 @@ function normalizeText(value: string): string {
     .replace(/^-+|-+$/g, '');
 }
 
+function hasToken(value: string, token: string): boolean {
+  return new RegExp(`(^|-)${token}(-|$)`).test(value);
+}
+
 export function normalizeFeatureLabel(value: string | null | undefined): FeatureLabelKey {
   const raw = (value ?? 'general').trim().toLowerCase();
   if (!raw) return 'general';
@@ -113,36 +70,36 @@ export function normalizeFeatureLabel(value: string | null | undefined): Feature
   if (direct) return direct;
 
   for (const entry of FEATURE_LABEL_REGISTRY) {
-    if (entry.aliases.some((alias) => normalized === alias || normalized.includes(alias))) {
+    if (entry.aliases.some((alias) => normalized === alias || hasToken(normalized, alias))) {
       return entry.key;
     }
   }
 
-  if (normalized.includes('route') || normalized.includes('api')) return 'api-route';
-  if (normalized.includes('ui') || normalized.includes('component') || normalized.includes('page') || normalized.includes('view')) {
+  if (hasToken(normalized, 'route') || hasToken(normalized, 'api')) return 'api-route';
+  if (hasToken(normalized, 'ui') || hasToken(normalized, 'component') || hasToken(normalized, 'page') || hasToken(normalized, 'view')) {
     return 'ui-component';
   }
-  if (normalized.includes('inspector') || normalized.includes('inspecter')) return 'svelte-inspector';
-  if (normalized.includes('realtime') || normalized.includes('real-time') || normalized.includes('sse') || normalized.includes('stream')) {
+  if (hasToken(normalized, 'inspector') || hasToken(normalized, 'inspecter')) return 'svelte-inspector';
+  if (hasToken(normalized, 'realtime') || hasToken(normalized, 'real-time') || hasToken(normalized, 'sse') || hasToken(normalized, 'stream')) {
     return 'svelte-realtime';
   }
-  if (normalized.includes('evidence') || normalized.includes('document') || normalized.includes('pdf') || normalized.includes('case')) {
+  if (hasToken(normalized, 'evidence') || hasToken(normalized, 'document') || hasToken(normalized, 'pdf') || hasToken(normalized, 'case')) {
     return 'evidence';
   }
-  if (normalized.includes('graph') || normalized.includes('cluster') || normalized.includes('topolog') || normalized.includes('som')) {
+  if (hasToken(normalized, 'graph') || hasToken(normalized, 'cluster') || hasToken(normalized, 'topology') || hasToken(normalized, 'som')) {
     return 'graph';
   }
-  if (normalized.includes('db') || normalized.includes('sql') || normalized.includes('drizzle') || normalized.includes('postgres')) {
+  if (hasToken(normalized, 'db') || hasToken(normalized, 'sql') || hasToken(normalized, 'drizzle') || hasToken(normalized, 'postgres')) {
     return 'database';
   }
-  if (normalized.includes('search') || normalized.includes('retrieval') || normalized.includes('rag') || normalized.includes('semantic')) {
+  if (hasToken(normalized, 'search') || hasToken(normalized, 'retrieval') || hasToken(normalized, 'rag') || hasToken(normalized, 'semantic')) {
     return 'retrieval';
   }
-  if (normalized.includes('mcp') || normalized.includes('tool') || normalized.includes('agent') || normalized.includes('workflow')) {
+  if (hasToken(normalized, 'mcp') || hasToken(normalized, 'tool') || hasToken(normalized, 'agent') || hasToken(normalized, 'workflow')) {
     return 'agent';
   }
-  if (normalized.includes('cache') || normalized.includes('redis')) return 'cache';
-  if (normalized.includes('symbol') || normalized.includes('function') || normalized.includes('method')) return 'symbol';
+  if (hasToken(normalized, 'cache') || hasToken(normalized, 'redis')) return 'cache';
+  if (hasToken(normalized, 'symbol') || hasToken(normalized, 'function') || hasToken(normalized, 'method')) return 'symbol';
   return 'general';
 }
 

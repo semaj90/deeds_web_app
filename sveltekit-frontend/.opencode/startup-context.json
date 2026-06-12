@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-06-12T02:30:10.404Z",
+  "generatedAt": "2026-06-12T13:00:13.166Z",
   "repo": "sveltekit-frontend",
   "evidenceFirst": true,
   "roles": {
@@ -13,22 +13,22 @@
     "snapshotJson": ".opencode\\recommendations\\recommendations.json",
     "snapshotMd": ".opencode\\recommendations\\recommendations.md",
     "eventsJsonl": ".opencode\\recommendations\\recommendation-events.jsonl",
-    "currentCount": 235
+    "currentCount": 286
   },
   "tasks": {
     "stateJson": ".opencode\\tasks\\task-state.json",
     "stateMd": ".opencode\\tasks\\task-state.md",
     "eventsJsonl": ".opencode\\tasks\\task-events.jsonl",
-    "currentCount": 13,
-    "openCount": 4
+    "currentCount": 17,
+    "openCount": 8
   },
   "activeLane": {
-    "taskId": "task_phase_3d_retrieval_telemetry",
-    "title": "Phase 3D retrieval telemetry",
+    "taskId": "task_concept_evidence_spine_backfill",
+    "title": "Historical concept evidence spine backfill",
     "priority": "HIGH",
-    "status": "IN_PROGRESS",
-    "command": "npm run atlas:phase3d:telemetry-summary",
-    "sourceRecommendationKey": "phase-3d-retrieval-telemetry"
+    "status": "TODO",
+    "command": "npm run atlas:concept-evidence:backfill",
+    "sourceRecommendationKey": "concept-evidence-spine-backfill"
   },
   "openLanesTodo": "reports\\parent-atlas-open-lanes-todo.md",
   "reports": {

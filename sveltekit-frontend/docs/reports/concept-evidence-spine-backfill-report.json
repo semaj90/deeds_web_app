@@ -1,0 +1,19 @@
+{
+  "generatedAt": "2026-06-12T13:16:16.861Z",
+  "mode": "dry-run",
+  "limit": 25,
+  "backupPath": "docs\\reports\\concept-evidence-spine-backfill-backup.json",
+  "totalRows": 10,
+  "samples": [],
+  "summary": {
+    "totalRows": 10,
+    "eligibleRows": 0,
+    "updatedRows": 0,
+    "skippedRows": 10,
+    "missingSpineRows": 0,
+    "staleLegacyRows": 0,
+    "packetKeysCoveragePct": 100,
+    "featureIdsCoveragePct": 100,
+    "staleLegacyCoveragePct": 0
+  }
+}

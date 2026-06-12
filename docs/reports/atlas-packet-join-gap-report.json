@@ -1,0 +1,511 @@
+{
+  "generated_at": "2026-06-12T13:53:49.249Z",
+  "total_gap_rows": 465,
+  "counts": {
+    "duplicate_source_ref": 465
+  },
+  "duplicate_source_ref_pct": 100,
+  "decision": "P1_PASS_DUPLICATE_SOURCE_REF_GAP",
+  "sample": [
+    {
+      "packet_id": "import:source:sveltekit-frontend/src/hooks.server.ts",
+      "source_ref": "sveltekit-frontend/src/hooks.server.ts",
+      "feature_id": "utility",
+      "community_id": 43,
+      "concept_ids": "{emergent_topology}",
+      "source_ref_has_afm": true,
+      "packets_for_source_ref": 1,
+      "bucket": "duplicate_source_ref"
+    },
+    {
+      "packet_id": "parent_atlas:sourceRef_first:cluster:19067cadf0:fb3aec99cf9cad58",
+      "source_ref": "sveltekit-frontend/src/lib/ai/citation-cache.ts",
+      "feature_id": "cluster:19067cadf0",
+      "community_id": 12,
+      "concept_ids": "{general_abstractions}",
+      "source_ref_has_afm": true,
+      "packets_for_source_ref": 1,
+      "bucket": "duplicate_source_ref"
+    },
+    {
+      "packet_id": "TASK-cluster-prune-14",
+      "source_ref": "sveltekit-frontend/src/lib/ai/client-embed.ts",
+      "feature_id": "codebase-structure",
+      "community_id": 3,
+      "concept_ids": "{general_abstractions}",
+      "source_ref_has_afm": true,
+      "packets_for_source_ref": 1,
+      "bucket": "duplicate_source_ref"
+    },
+    {
+      "packet_id": "parent_atlas:sourceRef_first:feature:cache:71db4b96c7f2c392",
+      "source_ref": "sveltekit-frontend/src/lib/cache/cache-service.svelte.ts",
+      "feature_id": "feature:cache",
+      "community_id": 4,
+      "concept_ids": "{ui_components}",
+      "source_ref_has_afm": true,
+      "packets_for_source_ref": 1,
+      "bucket": "duplicate_source_ref"
+    },
+    {
+      "packet_id": "TASK-cluster-prune-30",
+      "source_ref": "sveltekit-frontend/src/lib/components/ui/gaming/types/gaming-types-minimal.ts",
+      "feature_id": "codebase-structure",
+      "community_id": 9,
+      "concept_ids": "{ui_components}",
+      "source_ref_has_afm": true,
+      "packets_for_source_ref": 1,
+      "bucket": "duplicate_source_ref"
+    },
+    {
+      "packet_id": "import:source:sveltekit-frontend/src/lib/server/ace/context-assembler.ts",
+      "source_ref": "sveltekit-frontend/src/lib/server/ace/context-assembler.ts",
+      "feature_id": "ace",
+      "community_id": null,
+      "concept_ids": "{agent_intelligence,api_endpoints,general_abstractions,observability_telemetry,test_harness}",
+      "source_ref_has_afm": true,
+      "packets_for_source_ref": 1,
+      "bucket": "duplicate_source_ref"
+    },
+    {
+      "packet_id": "import:source:sveltekit-frontend/src/lib/server/agent/autonomous-agent.ts",
+      "source_ref": "sveltekit-frontend/src/lib/server/agent/autonomous-agent.ts",
+      "feature_id": "utility",
+      "community_id": 3,
+      "concept_ids": "{agent_intelligence}",
+      "source_ref_has_afm": true,
+      "packets_for_source_ref": 1,
+      "bucket": "duplicate_source_ref"
+    },
+    {
+      "packet_id": "import:source:sveltekit-frontend/src/lib/server/ai/gemma4-agent.ts",
+      "source_ref": "sveltekit-frontend/src/lib/server/ai/gemma4-agent.ts",
+      "feature_id": "utility",
+      "community_id": 3,
+      "concept_ids": "{agent_intelligence}",
+      "source_ref_has_afm": true,
+      "packets_for_source_ref": 1,
+      "bucket": "duplicate_source_ref"
+    },
+    {
+      "packet_id": "audit:failure:2026-05-30T20-02-16:G11:src_lib_server_ai_scenario-cache.ts",
+      "source_ref": "sveltekit-frontend/src/lib/server/ai/scenario-cache.ts",
+      "feature_id": "utility",
+      "community_id": 3,
+      "concept_ids": "{general_abstractions}",
+      "source_ref_has_afm": true,
+      "packets_for_source_ref": 1,
+      "bucket": "duplicate_source_ref"
+    },
+    {
+      "packet_id": "d705bfd010c76907",
+      "source_ref": "sveltekit-frontend/src/lib/server/cache/cache-config.ts",
+      "feature_id": "utility",
+      "community_id": 3,
+      "concept_ids": "{infrastructure_config}",
+      "source_ref_has_afm": true,
+      "packets_for_source_ref": 1,
+      "bucket": "duplicate_source_ref"
+    },
+    {
+      "packet_id": "TASK-cluster-prune-49",
+      "source_ref": "sveltekit-frontend/src/lib/server/cache/cartridge-tensor-bridge.ts",
+      "feature_id": "codebase-structure",
+      "community_id": 3,
+      "concept_ids": "{native_accelerators}",
+      "source_ref_has_afm": true,
+      "packets_for_source_ref": 1,
+      "bucket": "duplicate_source_ref"
+    },
+    {
+      "packet_id": "ed547f14a39f17d096eff8eed171646a6d2417bcf04ee85a6c6f5ffe45552149",
+      "source_ref": "sveltekit-frontend/src/lib/server/db/schema/ace_retrieval_hits.ts",
+      "feature_id": "database_orm",
+      "community_id": null,
+      "concept_ids": "{database_orm}",
+      "source_ref_has_afm": true,
+      "packets_for_source_ref": 2,
+      "bucket": "duplicate_source_ref"
+    },
+    {
+      "packet_id": "cd426b180f24fbb9dddefd86046cb78a439051e25dbe4e6b379869498f9314f8",
+      "source_ref": "sveltekit-frontend/src/lib/server/db/schema/ace_retrieval_hits.ts",
+      "feature_id": "database_orm",
+      "community_id": null,
+      "concept_ids": "{database_orm}",
+      "source_ref_has_afm": true,
+      "packets_for_source_ref": 2,
+      "bucket": "duplicate_source_ref"
+    },
+    {
+      "packet_id": "f77ceac122995358611a973596d007bff946aece5427deb9bc6a8d2ce7ffe443",
+      "source_ref": "sveltekit-frontend/src/lib/server/db/schema/admin_ai_chat_messages.ts",
+      "feature_id": "database_orm",
+      "community_id": null,
+      "concept_ids": "{database_orm}",
+      "source_ref_has_afm": true,
+      "packets_for_source_ref": 1,
+      "bucket": "duplicate_source_ref"
+    },
+    {
+      "packet_id": "fb1beb759d711dbc4b36c6cec511cb876e5d048403682b30cbb99d6128e1cd4b",
+      "source_ref": "sveltekit-frontend/src/lib/server/db/schema/admin_ai_skills.ts",
+      "feature_id": "database_orm",
+      "community_id": null,
+      "concept_ids": "{database_orm}",
+      "source_ref_has_afm": true,
+      "packets_for_source_ref": 1,
+      "bucket": "duplicate_source_ref"
+    },
+    {
+      "packet_id": "e70c18a59bbe60424a939f54fb11df89ff3cadcea16d3c50282487dc58a92d0a",
+      "source_ref": "sveltekit-frontend/src/lib/server/db/schema/admin_ai_subagent_runs.ts",
+      "feature_id": "database_orm",
+      "community_id": null,
+      "concept_ids": "{database_orm}",
+      "source_ref_has_afm": true,
+      "packets_for_source_ref": 3,
+      "bucket": "duplicate_source_ref"
+    },
+    {
+      "packet_id": "876ef427faae368de2e98e9426e5996a636c1bc25aeeb33c086d58357f1cdf1b",
+      "source_ref": "sveltekit-frontend/src/lib/server/db/schema/admin_ai_subagent_runs.ts",
+      "feature_id": "database_orm",
+      "community_id": null,
+      "concept_ids": "{database_orm}",
+      "source_ref_has_afm": true,
+      "packets_for_source_ref": 3,
+      "bucket": "duplicate_source_ref"
+    },
+    {
+      "packet_id": "c3599158252659e2c7841c26a795202e77757e3090b1b8e2ef00b4203c275ed3",
+      "source_ref": "sveltekit-frontend/src/lib/server/db/schema/admin_ai_subagent_runs.ts",
+      "feature_id": "database_orm",
+      "community_id": null,
+      "concept_ids": "{database_orm}",
+      "source_ref_has_afm": true,
+      "packets_for_source_ref": 3,
+      "bucket": "duplicate_source_ref"
+    },
+    {
+      "packet_id": "cbe8689d05975cedb2b33da97cd3905df46c313f096892f7a0e5402ce285f8bc",
+      "source_ref": "sveltekit-frontend/src/lib/server/db/schema/agent_memory_observations.ts",
+      "feature_id": "database_orm",
+      "community_id": null,
+      "concept_ids": "{database_orm}",
+      "source_ref_has_afm": true,
+      "packets_for_source_ref": 4,
+      "bucket": "duplicate_source_ref"
+    },
+    {
+      "packet_id": "1857873434a84cff65efcd59a8d9c3ae1e5e605a220b7872ae11a09fbbe7c2f4",
+      "source_ref": "sveltekit-frontend/src/lib/server/db/schema/agent_memory_observations.ts",
+      "feature_id": "database_orm",
+      "community_id": null,
+      "concept_ids": "{database_orm}",
+      "source_ref_has_afm": true,
+      "packets_for_source_ref": 4,
+      "bucket": "duplicate_source_ref"
+    },
+    {
+      "packet_id": "5a7ad3534be7dbd607ec5f2173d8a1d512ea8b1dede9baa58035372ddeaecf84",
+      "source_ref": "sveltekit-frontend/src/lib/server/db/schema/agent_memory_observations.ts",
+      "feature_id": "database_orm",
+      "community_id": null,
+      "concept_ids": "{database_orm}",
+      "source_ref_has_afm": true,
+      "packets_for_source_ref": 4,
+      "bucket": "duplicate_source_ref"
+    },
+    {
+      "packet_id": "f633e40f6aefd1a75b078cb38c98c6357a4fb5d036cd2974509c171d8e157e48",
+      "source_ref": "sveltekit-frontend/src/lib/server/db/schema/agent_memory_observations.ts",
+      "feature_id": "database_orm",
+      "community_id": null,
+      "concept_ids": "{database_orm}",
+      "source_ref_has_afm": true,
+      "packets_for_source_ref": 4,
+      "bucket": "duplicate_source_ref"
+    },
+    {
+      "packet_id": "7e0ebac65b8f2ad4ed570958eda4d8d4e04357bf29322fe91bbdd98fd81216d7",
+      "source_ref": "sveltekit-frontend/src/lib/server/db/schema/agent_progress_log.ts",
+      "feature_id": "database_orm",
+      "community_id": null,
+      "concept_ids": "{database_orm}",
+      "source_ref_has_afm": true,
+      "packets_for_source_ref": 1,
+      "bucket": "duplicate_source_ref"
+    },
+    {
+      "packet_id": "52630f6a5e5f6ff03a734f97267dce42604643bf27067dfd99d5d93982bc341e",
+      "source_ref": "sveltekit-frontend/src/lib/server/db/schema/agent_sessions.ts",
+      "feature_id": "database_orm",
+      "community_id": null,
+      "concept_ids": "{database_orm}",
+      "source_ref_has_afm": true,
+      "packets_for_source_ref": 2,
+      "bucket": "duplicate_source_ref"
+    },
+    {
+      "packet_id": "e059d54c800d1f430798ef6c296d81b338258e28d6999955c33886ddc00f58b9",
+      "source_ref": "sveltekit-frontend/src/lib/server/db/schema/agent_sessions.ts",
+      "feature_id": "database_orm",
+      "community_id": null,
+      "concept_ids": "{database_orm}",
+      "source_ref_has_afm": true,
+      "packets_for_source_ref": 2,
+      "bucket": "duplicate_source_ref"
+    },
+    {
+      "packet_id": "970e96e2d5e2545188b641402f0c80173ca6fcca9c54234a53a7c2df116b81fb",
+      "source_ref": "sveltekit-frontend/src/lib/server/db/schema/ai_reports.ts",
+      "feature_id": "database_orm",
+      "community_id": null,
+      "concept_ids": "{database_orm}",
+      "source_ref_has_afm": true,
+      "packets_for_source_ref": 3,
+      "bucket": "duplicate_source_ref"
+    },
+    {
+      "packet_id": "d22d05e13a69c9e8ed18cbdc9d901f5f69392eb63f914c235d43666aaed65469",
+      "source_ref": "sveltekit-frontend/src/lib/server/db/schema/ai_reports.ts",
+      "feature_id": "database_orm",
+      "community_id": null,
+      "concept_ids": "{database_orm}",
+      "source_ref_has_afm": true,
+      "packets_for_source_ref": 3,
+      "bucket": "duplicate_source_ref"
+    },
+    {
+      "packet_id": "5c509498578a77fc48097c764594366f5b2f409fee61c5dc7fc14d59c09db7b1",
+      "source_ref": "sveltekit-frontend/src/lib/server/db/schema/ai_reports.ts",
+      "feature_id": "database_orm",
+      "community_id": null,
+      "concept_ids": "{database_orm}",
+      "source_ref_has_afm": true,
+      "packets_for_source_ref": 3,
+      "bucket": "duplicate_source_ref"
+    },
+    {
+      "packet_id": "897c60f61fb1827da2dcd764f07ee712248b9fdfe9a3703e7efce0ae7a294d1a",
+      "source_ref": "sveltekit-frontend/src/lib/server/db/schema/ai_usage_log.ts",
+      "feature_id": "database_orm",
+      "community_id": null,
+      "concept_ids": "{database_orm}",
+      "source_ref_has_afm": true,
+      "packets_for_source_ref": 2,
+      "bucket": "duplicate_source_ref"
+    },
+    {
+      "packet_id": "cf3f8587d9f678cd547631570b1045490884bd1514f99bce0ab0c4f36181ead1",
+      "source_ref": "sveltekit-frontend/src/lib/server/db/schema/ai_usage_log.ts",
+      "feature_id": "database_orm",
+      "community_id": null,
+      "concept_ids": "{database_orm}",
+      "source_ref_has_afm": true,
+      "packets_for_source_ref": 2,
+      "bucket": "duplicate_source_ref"
+    },
+    {
+      "packet_id": "f261c4ecd541086132c0eb4731826fe18568309db29dacf72e254759df5a5d58",
+      "source_ref": "sveltekit-frontend/src/lib/server/db/schema/analysis_jobs.ts",
+      "feature_id": "database_orm",
+      "community_id": null,
+      "concept_ids": "{database_orm}",
+      "source_ref_has_afm": true,
+      "packets_for_source_ref": 1,
+      "bucket": "duplicate_source_ref"
+    },
+    {
+      "packet_id": "5e16533d778e86d78389afaf8b5a202d4a794ab49986b8a9bbeca7a3eb8d991a",
+      "source_ref": "sveltekit-frontend/src/lib/server/db/schema/analytics_events.ts",
+      "feature_id": "database_orm",
+      "community_id": null,
+      "concept_ids": "{database_orm}",
+      "source_ref_has_afm": true,
+      "packets_for_source_ref": 1,
+      "bucket": "duplicate_source_ref"
+    },
+    {
+      "packet_id": "6e5b0f75139c43a8d227508909c65bf868e0ae4f36ac6dd8b0b89a941914bfdb",
+      "source_ref": "sveltekit-frontend/src/lib/server/db/schema/api_audit_log.ts",
+      "feature_id": "database_orm",
+      "community_id": null,
+      "concept_ids": "{database_orm}",
+      "source_ref_has_afm": true,
+      "packets_for_source_ref": 2,
+      "bucket": "duplicate_source_ref"
+    },
+    {
+      "packet_id": "e5623523daa945fa322846ee1f0b338f6c645653a6ad4a1e7ed19c63e2e4636c",
+      "source_ref": "sveltekit-frontend/src/lib/server/db/schema/api_audit_log.ts",
+      "feature_id": "database_orm",
+      "community_id": null,
+      "concept_ids": "{database_orm}",
+      "source_ref_has_afm": true,
+      "packets_for_source_ref": 2,
+      "bucket": "duplicate_source_ref"
+    },
+    {
+      "packet_id": "c04c630f383506214b69cca9a56397a26c942d25bafcdf5ef198ecd71a8ff9c7",
+      "source_ref": "sveltekit-frontend/src/lib/server/db/schema/audio_transcripts.ts",
+      "feature_id": "database_orm",
+      "community_id": null,
+      "concept_ids": "{database_orm}",
+      "source_ref_has_afm": true,
+      "packets_for_source_ref": 2,
+      "bucket": "duplicate_source_ref"
+    },
+    {
+      "packet_id": "624d458f83147f2f483fcc6c5316579ada6a39bca43000db47cf1bdda55a6ec6",
+      "source_ref": "sveltekit-frontend/src/lib/server/db/schema/audio_transcripts.ts",
+      "feature_id": "database_orm",
+      "community_id": null,
+      "concept_ids": "{database_orm}",
+      "source_ref_has_afm": true,
+      "packets_for_source_ref": 2,
+      "bucket": "duplicate_source_ref"
+    },
+    {
+      "packet_id": "1cd1e57d3867d5b2253d01f3d5941c470e756aa70a1b19f6eed4b9ca3cfeb9ea",
+      "source_ref": "sveltekit-frontend/src/lib/server/db/schema/auto_tags.ts",
+      "feature_id": "database_orm",
+      "community_id": null,
+      "concept_ids": "{database_orm}",
+      "source_ref_has_afm": true,
+      "packets_for_source_ref": 1,
+      "bucket": "duplicate_source_ref"
+    },
+    {
+      "packet_id": "db1093d93507f4aa236c5e9c550b4d34a00111f4d891f8fe070c5e5fffff65a5",
+      "source_ref": "sveltekit-frontend/src/lib/server/db/schema/canonical_chunks.ts",
+      "feature_id": "database_orm",
+      "community_id": null,
+      "concept_ids": "{database_orm}",
+      "source_ref_has_afm": true,
+      "packets_for_source_ref": 1,
+      "bucket": "duplicate_source_ref"
+    },
+    {
+      "packet_id": "89e63175db8e9521202349112ef2d7ceeef6b33676338ef7725320746108dd27",
+      "source_ref": "sveltekit-frontend/src/lib/server/db/schema/canonical_documents.ts",
+      "feature_id": "database_orm",
+      "community_id": null,
+      "concept_ids": "{database_orm}",
+      "source_ref_has_afm": true,
+      "packets_for_source_ref": 2,
+      "bucket": "duplicate_source_ref"
+    },
+    {
+      "packet_id": "d68d1a69cb975182d02ffc13f4e26a1ac204f68a9cf75ca6ac3550e850db73b9",
+      "source_ref": "sveltekit-frontend/src/lib/server/db/schema/canonical_documents.ts",
+      "feature_id": "database_orm",
+      "community_id": null,
+      "concept_ids": "{database_orm}",
+      "source_ref_has_afm": true,
+      "packets_for_source_ref": 2,
+      "bucket": "duplicate_source_ref"
+    },
+    {
+      "packet_id": "e0c5e6731fca583b393d63ca8b885fce66fccbd60858556b7c261d4867d0e60a",
+      "source_ref": "sveltekit-frontend/src/lib/server/db/schema/canvas_annotations.ts",
+      "feature_id": "database_orm",
+      "community_id": null,
+      "concept_ids": "{database_orm}",
+      "source_ref_has_afm": true,
+      "packets_for_source_ref": 1,
+      "bucket": "duplicate_source_ref"
+    },
+    {
+      "packet_id": "e5929ab4d04b7a713641eca990cc44d648ec2e851244503886e98d94c8ca9f4f",
+      "source_ref": "sveltekit-frontend/src/lib/server/db/schema/canvas_states.ts",
+      "feature_id": "database_orm",
+      "community_id": null,
+      "concept_ids": "{database_orm}",
+      "source_ref_has_afm": true,
+      "packets_for_source_ref": 1,
+      "bucket": "duplicate_source_ref"
+    },
+    {
+      "packet_id": "56b1b1bd0cf9fad5cc1a8a3cf3e972802f332c6d8ec410cdf32e2fae61f2dfe5",
+      "source_ref": "sveltekit-frontend/src/lib/server/db/schema/case_library_links.ts",
+      "feature_id": "database_orm",
+      "community_id": null,
+      "concept_ids": "{database_orm}",
+      "source_ref_has_afm": true,
+      "packets_for_source_ref": 3,
+      "bucket": "duplicate_source_ref"
+    },
+    {
+      "packet_id": "5ee543045ee4e3094ba670a731aeacb9a596018babae90c1519ca16af9c42f5d",
+      "source_ref": "sveltekit-frontend/src/lib/server/db/schema/case_library_links.ts",
+      "feature_id": "database_orm",
+      "community_id": null,
+      "concept_ids": "{database_orm}",
+      "source_ref_has_afm": true,
+      "packets_for_source_ref": 3,
+      "bucket": "duplicate_source_ref"
+    },
+    {
+      "packet_id": "5ee197f22cf49c5ecd153240a7e92281151fdafeee9c1126f7335329a9a2bc6a",
+      "source_ref": "sveltekit-frontend/src/lib/server/db/schema/case_library_links.ts",
+      "feature_id": "database_orm",
+      "community_id": null,
+      "concept_ids": "{database_orm}",
+      "source_ref_has_afm": true,
+      "packets_for_source_ref": 3,
+      "bucket": "duplicate_source_ref"
+    },
+    {
+      "packet_id": "07e1eb6816676d3101001f15d3d3d6ddfe5fea28dfd5bb016d37b8f37df97ac8",
+      "source_ref": "sveltekit-frontend/src/lib/server/db/schema/case_notes.ts",
+      "feature_id": "database_orm",
+      "community_id": null,
+      "concept_ids": "{database_orm}",
+      "source_ref_has_afm": true,
+      "packets_for_source_ref": 1,
+      "bucket": "duplicate_source_ref"
+    },
+    {
+      "packet_id": "fc6064786a7414330e28a028aad5730eb19e8c19b187c4eacda4ecc490b4c0fa",
+      "source_ref": "sveltekit-frontend/src/lib/server/db/schema/case_note_versions.ts",
+      "feature_id": "database_orm",
+      "community_id": null,
+      "concept_ids": "{database_orm}",
+      "source_ref_has_afm": true,
+      "packets_for_source_ref": 1,
+      "bucket": "duplicate_source_ref"
+    },
+    {
+      "packet_id": "23fa155fabb852e1fea49c52f5a3d2ca3735a5dbfffe5f39692665c3823c4447",
+      "source_ref": "sveltekit-frontend/src/lib/server/db/schema/case_reports.ts",
+      "feature_id": "database_orm",
+      "community_id": null,
+      "concept_ids": "{database_orm}",
+      "source_ref_has_afm": true,
+      "packets_for_source_ref": 1,
+      "bucket": "duplicate_source_ref"
+    },
+    {
+      "packet_id": "7b17380830df5b65de3b21591634c7c85af9dbdb999f41c4fbdc10b89a1a7827",
+      "source_ref": "sveltekit-frontend/src/lib/server/db/schema/case_statute_links.ts",
+      "feature_id": "database_orm",
+      "community_id": null,
+      "concept_ids": "{database_orm}",
+      "source_ref_has_afm": true,
+      "packets_for_source_ref": 2,
+      "bucket": "duplicate_source_ref"
+    },
+    {
+      "packet_id": "ccb9e138463f3b00e5598610ad3d5dc09cc97764a3fe92ef94ca1f81a4c5fb00",
+      "source_ref": "sveltekit-frontend/src/lib/server/db/schema/case_statute_links.ts",
+      "feature_id": "database_orm",
+      "community_id": null,
+      "concept_ids": "{database_orm}",
+      "source_ref_has_afm": true,
+      "packets_for_source_ref": 2,
+      "bucket": "duplicate_source_ref"
+    }
+  ]
+}

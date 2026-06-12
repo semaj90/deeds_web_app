@@ -24,7 +24,8 @@ const { Pool } = pg;
 const DATABASE_URL =
   process.env.DATABASE_URL || 'postgresql://legal_admin:123456@127.0.0.1:5434/legal_ai_db';
 const QDRANT_URL = process.env.QDRANT_URL || 'http://localhost:6333';
-const OLLAMA_URL = (process.env.OLLAMA_HOST || 'http://127.0.0.1:11434').replace(/^0\.0\.0\.0/, '127.0.0.1');
+const _ollamaRaw = (process.env.OLLAMA_HOST || 'http://127.0.0.1:11434').replace(/^0\.0\.0\.0/, '127.0.0.1');
+const OLLAMA_URL = _ollamaRaw.startsWith('http') ? _ollamaRaw : `http://${_ollamaRaw}:11434`;
 
 const JSON_MODE = process.argv.includes('--json');
 const SAVE_BASELINE = process.argv.includes('--save-baseline');
@@ -118,11 +119,19 @@ async function bm25Search(pool, query, limit = 20) {
   try {
     const res = await pool.query(
       `SELECT packet_id AS id,
-              ts_rank_cd(to_tsvector('english', coalesce(summary,'')),
-                         websearch_to_tsquery('english', $1)) AS score,
+              ts_rank_cd(
+                to_tsvector('english', regexp_replace(
+                  coalesce(source_ref,'') || ' ' ||
+                  coalesce(packet_key,'') || ' ' ||
+                  coalesce(summary,''), '[/\\.\\-]', ' ', 'g')),
+                websearch_to_tsquery('english', $1)) AS score,
               source_ref
        FROM atlas_packets
-       WHERE to_tsvector('english', coalesce(summary,'')) @@ websearch_to_tsquery('english', $1)
+       WHERE to_tsvector('english', regexp_replace(
+               coalesce(source_ref,'') || ' ' ||
+               coalesce(packet_key,'') || ' ' ||
+               coalesce(summary,''), '[/\\.\\-]', ' ', 'g'))
+             @@ websearch_to_tsquery('english', $1)
        ORDER BY score DESC
        LIMIT $2`,
       [query, limit]
@@ -131,21 +140,38 @@ async function bm25Search(pool, query, limit = 20) {
   } catch (err) { console.error('BM25 error:', err.message); return []; }
 }
 
-async function conceptOverlapSearch(pool, concepts, limit = 20) {
+// Gate: cap=8, require community_confidence >= 0.65, require feature_id OR community_id alignment.
+// queryCtx = { featureId, communityId } derived from top Qdrant hit.
+async function conceptOverlapSearch(pool, concepts, queryCtx = {}, limit = 8) {
   if (!concepts.length) return [];
+  const { featureId = null, communityId = null } = queryCtx;
   try {
-    const res = await pool.query(
-      `SELECT packet_id AS id,
-              source_ref,
-              (SELECT COUNT(*) FROM unnest(concept_ids) c WHERE c = ANY($1::text[])) AS overlap,
-              (array_length(concept_ids, 1) + $2 -
-               (SELECT COUNT(*) FROM unnest(concept_ids) c WHERE c = ANY($1::text[]))) AS union_size
-       FROM atlas_packets
-       WHERE concept_ids && $1::text[]
-       ORDER BY overlap DESC
-       LIMIT $3`,
-      [concepts, concepts.length, limit]
-    );
+    // Require feature_id OR community_id alignment AND community_confidence >= 0.65
+    const alignFilter = (featureId || communityId !== null)
+      ? `AND (
+           ${featureId      ? `feature_id = $4`              : 'FALSE'}
+           ${featureId && communityId !== null ? 'OR' : ''}
+           ${communityId !== null ? `community_id = $5::int`  : 'FALSE'}
+         )`
+      : '';
+    const params = [concepts, concepts.length, limit];
+    if (featureId)          params.push(featureId);
+    if (communityId !== null) params.push(communityId);
+
+    const sql = `
+      SELECT packet_id AS id,
+             source_ref,
+             (SELECT COUNT(*) FROM unnest(concept_ids) c WHERE c = ANY($1::text[])) AS overlap,
+             (array_length(concept_ids, 1) + $2 -
+              (SELECT COUNT(*) FROM unnest(concept_ids) c WHERE c = ANY($1::text[]))) AS union_size
+      FROM atlas_packets
+      WHERE concept_ids && $1::text[]
+        AND COALESCE(community_confidence, 0) >= 0.65
+        ${alignFilter}
+      ORDER BY overlap DESC
+      LIMIT $3`;
+
+    const res = await pool.query(sql, params);
     return res.rows.map((r) => ({
       id: r.source_ref || r.id,
       score: r.union_size > 0 ? Number(r.overlap) / Number(r.union_size) : 0,
@@ -189,13 +215,30 @@ async function getEmbedding(query) {
   } catch { return null; }
 }
 
-async function extractConcepts(query) {
-  // Simple keyword-based concept extraction (no LLM needed for benchmark)
-  const keywords = query.toLowerCase()
-    .replace(/[^a-z0-9\s]/g, '')
-    .split(/\s+/)
-    .filter((w) => w.length > 3);
-  return [...new Set(keywords)].slice(0, 5);
+// Maps query terms to the concept_ids taxonomy used in atlas_packets
+const CONCEPT_KEYWORD_MAP = [
+  { concept: 'database_orm',             keywords: ['drizzle', 'postgres', 'schema', 'table', 'migration', 'query', 'sql', 'db', 'database', 'orm', 'insert', 'select', 'update', 'delete', 'column', 'index'] },
+  { concept: 'api_endpoints',            keywords: ['api', 'route', 'endpoint', 'server', 'request', 'response', 'http', 'rest', 'handler', 'params', 'json', 'fetch', 'post', 'get', 'put', 'patch', 'delete'] },
+  { concept: 'ui_components',            keywords: ['component', 'svelte', 'ui', 'button', 'modal', 'form', 'input', 'layout', 'page', 'render', 'style', 'css', 'class', 'slot', 'snippet', 'props'] },
+  { concept: 'agent_intelligence',       keywords: ['agent', 'llm', 'gemma', 'ollama', 'chat', 'prompt', 'ai', 'inference', 'completion', 'token', 'embedding', 'rag', 'retrieval', 'context', 'ace'] },
+  { concept: 'observability_telemetry',  keywords: ['log', 'trace', 'metric', 'monitor', 'analytics', 'event', 'track', 'telemetry', 'observ', 'langfuse', 'report', 'audit'] },
+  { concept: 'infrastructure_config',    keywords: ['docker', 'redis', 'config', 'env', 'deploy', 'rabbitmq', 'queue', 'worker', 'health', 'startup', 'port', 'container', 'service'] },
+  { concept: 'test_harness',             keywords: ['test', 'spec', 'vitest', 'playwright', 'e2e', 'unit', 'mock', 'fixture', 'assert', 'expect', 'check'] },
+  { concept: 'native_accelerators',      keywords: ['gpu', 'cuda', 'napi', 'wasm', 'onnx', 'libtorch', 'tensor', 'native', 'cpp', 'binding', 'simd', 'webgpu'] },
+  { concept: 'emergent_topology',        keywords: ['graph', 'neo4j', 'topology', 'pagerank', 'cluster', 'community', 'som', 'hypergraph', 'edge', 'node', 'vector'] },
+  { concept: 'general_abstractions',     keywords: ['util', 'helper', 'lib', 'type', 'interface', 'class', 'function', 'module', 'export', 'import', 'store', 'state'] },
+];
+
+function extractConcepts(query) {
+  const lower = query.toLowerCase().replace(/[^a-z0-9\s]/g, ' ');
+  const words = new Set(lower.split(/\s+/).filter(w => w.length > 2));
+  const matched = [];
+  for (const { concept, keywords } of CONCEPT_KEYWORD_MAP) {
+    if (keywords.some(kw => words.has(kw) || lower.includes(kw))) {
+      matched.push(concept);
+    }
+  }
+  return matched.slice(0, 4); // top 4 concepts max
 }
 
 // ── RRF combiner ─────────────────────────────────────────────────────────────
@@ -215,6 +258,27 @@ function combineRRF(lanes, weights, k = K) {
   return [...scores.entries()]
     .sort((a, b) => b[1] - a[1])
     .map(([id, score]) => ({ id, score }));
+}
+
+// Apply community_confidence boost: packets with high-confidence SOM community
+// assignment get a small multiplicative boost (max +10% for qdrant-sourced).
+async function applyCommunityBoost(pool, combined) {
+  if (!combined.length) return combined;
+  const ids = combined.map(r => r.id);
+  try {
+    const res = await pool.query(
+      `SELECT source_ref, community_confidence, community_source
+       FROM atlas_packets
+       WHERE source_ref = ANY($1::text[]) AND community_confidence IS NOT NULL`,
+      [ids]
+    );
+    const confMap = new Map(res.rows.map(r => [r.source_ref, r.community_confidence ?? 0.25]));
+    return combined.map(r => {
+      const conf = confMap.get(r.id) ?? 0.25;
+      // communityBoost = conf * 0.1 (max +10% for qdrant conf=1.0)
+      return { ...r, score: r.score * (1 + conf * 0.1) };
+    }).sort((a, b) => b.score - a.score);
+  } catch { return combined; }
 }
 
 // ── Main ──────────────────────────────────────────────────────────────────────
@@ -244,38 +308,58 @@ async function main() {
     }
 
     const PRESETS = [
-      { name: 'bm25_only',     bm25: 1.0, concept: 0.0, qdrant: 0.0 },
-      { name: 'concept_only',  bm25: 0.0, concept: 1.0, qdrant: 0.0 },
-      { name: 'qdrant_only',   bm25: 0.0, concept: 0.0, qdrant: 1.0 },
-      { name: 'rrf_default',   bm25: 1.0, concept: 1.2, qdrant: 1.0 },
-      { name: 'rrf_bm25_heavy',bm25: 2.0, concept: 1.0, qdrant: 0.8 },
-      { name: 'rrf_vec_heavy', bm25: 0.8, concept: 1.0, qdrant: 2.0 },
+      { name: 'bm25_only',      bm25: 1.0,  concept: 0.0,  qdrant: 0.0  },
+      { name: 'concept_only',   bm25: 0.0,  concept: 1.0,  qdrant: 0.0  },
+      { name: 'qdrant_only',    bm25: 0.0,  concept: 0.0,  qdrant: 1.0  },
+      { name: 'rrf_default',    bm25: 0.75, concept: 0.25, qdrant: 1.0  },
+      { name: 'rrf_bm25_heavy', bm25: 1.5,  concept: 0.2,  qdrant: 0.8  },
+      { name: 'rrf_vec_heavy',  bm25: 0.6,  concept: 0.2,  qdrant: 2.0  },
     ];
 
     for (const test of TEST_QUERIES) {
       if (!JSON_MODE) console.log(`  Query: "${test.query.slice(0, 60)}"`);
 
-      // Shared setup: embedding + concepts (computed once per query)
       const embedding = await getEmbedding(test.query);
-      const concepts = await extractConcepts(test.query);
+      const concepts  = extractConcepts(test.query);
 
-      // Run all lanes once
-      const [bm25Hits, conceptHits, qdrantHits] = await Promise.all([
-        bm25Search(pool, test.query, 25),
-        conceptOverlapSearch(pool, concepts, 25),
-        qdrantSearch(test.query, embedding, 25),
+      // Run Qdrant first to get queryCtx (feature_id/community_id of top hit)
+      const qdrantHits = await qdrantSearch(test.query, embedding, 25);
+
+      // Derive query context from top Qdrant hit for concept alignment gate
+      let queryCtx = {};
+      if (qdrantHits.length > 0) {
+        const topId = qdrantHits[0].id;
+        try {
+          const ctxRes = await pool.query(
+            `SELECT feature_id, community_id FROM atlas_packets WHERE source_ref = $1 LIMIT 1`,
+            [topId]
+          );
+          if (ctxRes.rows[0]) {
+            queryCtx = {
+              featureId:   ctxRes.rows[0].feature_id   ?? null,
+              communityId: ctxRes.rows[0].community_id != null ? Number(ctxRes.rows[0].community_id) : null,
+            };
+          }
+        } catch { /* ignore */ }
+      }
+
+      // BM25: top 15; Concept: capped at 8 with alignment gate
+      const [bm25Hits, conceptHits] = await Promise.all([
+        bm25Search(pool, test.query, 15),
+        conceptOverlapSearch(pool, concepts, queryCtx, 8),
       ]);
 
       if (!JSON_MODE) {
-        console.log(`    BM25: ${bm25Hits.length} | Concept: ${conceptHits.length} | Qdrant: ${qdrantHits.length} | Concepts: [${concepts.slice(0,3).join(',')}]`);
+        console.log(`    BM25: ${bm25Hits.length} | Concept: ${conceptHits.length} | Qdrant: ${qdrantHits.length} | Concepts: [${concepts.slice(0,3).join(',')}] ctx:{${queryCtx.featureId ?? '?'},${queryCtx.communityId ?? '?'}}`);
       }
 
       for (const preset of PRESETS) {
-        const combined = combineRRF([
+        let combined = combineRRF([
           { hits: bm25Hits, weight: preset.bm25 },
           { hits: conceptHits, weight: preset.concept },
           { hits: qdrantHits, weight: preset.qdrant },
         ]);
+        combined = await applyCommunityBoost(pool, combined);
 
         const resultIds = combined.map((r) => r.id);
         const metrics = computeMetrics(resultIds, test.relevantPaths);

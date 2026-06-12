@@ -1,0 +1,142 @@
+{
+  "generatedAt": "2026-06-12T13:16:16.858Z",
+  "mode": "sample",
+  "limit": 100,
+  "summary": {
+    "totalConcepts": 10,
+    "packetKeyConcepts": 10,
+    "featureIdConcepts": 10,
+    "evidenceCardConcepts": 0,
+    "packetKeyValueCount": 24675,
+    "featureIdValueCount": 5439,
+    "evidenceCardValueCount": 0,
+    "packetKeyJoinHits": 24040,
+    "featureIdJoinHits": 5122,
+    "evidenceCardJoinHits": 0,
+    "packetKeyJoinCoveragePct": 97.43,
+    "featureIdJoinCoveragePct": 94.17,
+    "evidenceCardJoinCoveragePct": 0,
+    "classifications": {
+      "PACKET_KEYS_AUTHORITATIVE": 10,
+      "FEATURE_IDS_AUTHORITATIVE": 0,
+      "EVIDENCE_CARDS_AUTHORITATIVE": 0,
+      "MIXED_SPINE": 0,
+      "STALE_ONLY": 0,
+      "NO_SPINE": 0
+    },
+    "canonicalSpine": "packet_keys",
+    "recommendedAction": "Backfill evidence_cards from packet_keys; keep packet_keys as the authoritative live spine."
+  },
+  "samples": [
+    {
+      "conceptId": "ui_components",
+      "label": "UI Components (Svelte & UX)",
+      "spine": "packet_keys",
+      "packetKeyCount": 2004,
+      "featureIdCount": 286,
+      "evidenceCardCount": 0,
+      "packetKeyHits": 2004,
+      "featureIdHits": 202,
+      "evidenceCardHits": 0
+    },
+    {
+      "conceptId": "test_harness",
+      "label": "Testing Harness & Smoke Benchmarks",
+      "spine": "packet_keys",
+      "packetKeyCount": 2412,
+      "featureIdCount": 867,
+      "evidenceCardCount": 0,
+      "packetKeyHits": 2412,
+      "featureIdHits": 864,
+      "evidenceCardHits": 0
+    },
+    {
+      "conceptId": "observability_telemetry",
+      "label": "Observability & Retrieval Telemetry",
+      "spine": "packet_keys",
+      "packetKeyCount": 2413,
+      "featureIdCount": 683,
+      "evidenceCardCount": 0,
+      "packetKeyHits": 2413,
+      "featureIdHits": 682,
+      "evidenceCardHits": 0
+    },
+    {
+      "conceptId": "native_accelerators",
+      "label": "Native Accelerators & GPU (LibTorch/SIMD)",
+      "spine": "packet_keys",
+      "packetKeyCount": 1798,
+      "featureIdCount": 168,
+      "evidenceCardCount": 0,
+      "packetKeyHits": 1798,
+      "featureIdHits": 168,
+      "evidenceCardHits": 0
+    },
+    {
+      "conceptId": "infrastructure_config",
+      "label": "Infrastructure & Configuration (Docker)",
+      "spine": "packet_keys",
+      "packetKeyCount": 3778,
+      "featureIdCount": 687,
+      "evidenceCardCount": 0,
+      "packetKeyHits": 3188,
+      "featureIdHits": 686,
+      "evidenceCardHits": 0
+    },
+    {
+      "conceptId": "general_abstractions",
+      "label": "General Codebase Abstractions",
+      "spine": "packet_keys",
+      "packetKeyCount": 2878,
+      "featureIdCount": 383,
+      "evidenceCardCount": 0,
+      "packetKeyHits": 2871,
+      "featureIdHits": 343,
+      "evidenceCardHits": 0
+    },
+    {
+      "conceptId": "emergent_topology",
+      "label": "Emergent Topology Clusters",
+      "spine": "packet_keys",
+      "packetKeyCount": 2607,
+      "featureIdCount": 981,
+      "evidenceCardCount": 0,
+      "packetKeyHits": 2607,
+      "featureIdHits": 981,
+      "evidenceCardHits": 0
+    },
+    {
+      "conceptId": "database_orm",
+      "label": "Database & ORM (PostgreSQL & Drizzle)",
+      "spine": "packet_keys",
+      "packetKeyCount": 2685,
+      "featureIdCount": 473,
+      "evidenceCardCount": 0,
+      "packetKeyHits": 2654,
+      "featureIdHits": 472,
+      "evidenceCardHits": 0
+    },
+    {
+      "conceptId": "api_endpoints",
+      "label": "API Endpoints & Routing",
+      "spine": "packet_keys",
+      "packetKeyCount": 2178,
+      "featureIdCount": 533,
+      "evidenceCardCount": 0,
+      "packetKeyHits": 2171,
+      "featureIdHits": 348,
+      "evidenceCardHits": 0
+    },
+    {
+      "conceptId": "agent_intelligence",
+      "label": "Agent Intelligence & Self-Healing",
+      "spine": "packet_keys",
+      "packetKeyCount": 1922,
+      "featureIdCount": 378,
+      "evidenceCardCount": 0,
+      "packetKeyHits": 1922,
+      "featureIdHits": 376,
+      "evidenceCardHits": 0
+    }
+  ]
+}

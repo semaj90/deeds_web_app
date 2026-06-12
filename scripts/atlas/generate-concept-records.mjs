@@ -111,6 +111,16 @@ function getConceptId(card) {
   return 'general_abstractions';
 }
 
+function getEvidenceCardsForConcept(concept) {
+  if (Array.isArray(concept.packet_keys) && concept.packet_keys.length > 0) {
+    return concept.packet_keys;
+  }
+  if (concept.feature_ids instanceof Set && concept.feature_ids.size > 0) {
+    return Array.from(concept.feature_ids);
+  }
+  return concept.evidence ?? [];
+}
+
 async function main() {
   const pool = new pg.Pool({ connectionString: DATABASE_URL });
   
@@ -346,7 +356,7 @@ async function main() {
       `, [
         concept.concept_id,
         concept.name,
-        JSON.stringify(concept.evidence), // evidence_cards
+        JSON.stringify(getEvidenceCardsForConcept(concept)),
         JSON.stringify(Array.from(concept.feature_ids)),
         JSON.stringify(concept.packet_keys || []),
         concept.success_count,

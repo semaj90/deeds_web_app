@@ -1,0 +1,28 @@
+{
+  "generated_at": "2026-06-12T16:10:46.800Z",
+  "mode": "apply",
+  "total_missing_provenance": 7753,
+  "code_eligible": 3847,
+  "non_code": 3906,
+  "qdrant_hits": 2347,
+  "qdrant_misses": 1032,
+  "source_distribution": {
+    "qdrant": 1792,
+    "feature_bucket": 750,
+    "feature_mode": 5211,
+    "global_fallback": 0
+  },
+  "gate_result": {
+    "total": 7753,
+    "covered": 7753,
+    "coverage_pct": "100.0",
+    "avg_confidence": "0.635",
+    "source_distribution": {
+      "qdrant": 1792,
+      "feature_bucket": 750,
+      "feature_mode": 5211,
+      "global_fallback": 0
+    },
+    "gate_pass": true
+  }
+}

@@ -186,8 +186,10 @@ export function deriveFeatureId(title, type) {
   const text = normalizeText(`${type ?? ''} ${title ?? ''}`);
   if (/graph missing neighborhood/.test(text)) return 'graphify';
   if (/retrieval low context density/.test(text)) return 'retrieval';
+  if (/higher hop|higher-hop|semantic ace traversals|bitfrost/.test(text)) return 'retrieval';
   if (/feature registry reconciliation|overlay mismatch|overlay sync/.test(text)) return 'feature-registry';
   if (/task semantic packets|postgres contract|sql mirror/.test(text)) return 'postgres-contract';
+  if (/concept evidence spine|evidence spine/.test(text)) return 'evidence';
   if (/command mapping|mcp allowlist/.test(text)) return 'mcp';
   if (/synthetic evidence/.test(text)) return 'evidence';
   if (/cluster visualization|4d manifold/.test(text)) return 'graphify';
@@ -223,9 +225,11 @@ function pctNumber(value) {
 function seedGates() {
   const runtimeDensity = readOptionalJson(path.join('docs', 'reports', 'runtime-packet-density-report.json'));
   const featureLineage = readOptionalJson(path.join('docs', 'reports', 'feature-lineage-report.json'));
+  const higherHop = readOptionalJson(path.join('docs', 'reports', 'higher-hop-enrichment-report.json'));
   const somCoverage = readOptionalJson(path.join('docs', 'reports', 'som-coordinate-coverage-report.json'));
   const productionNoSom = readOptionalJson(path.join('..', 'docs', 'reports', 'production-qdrant-no-som-report.json'));
   const postgresMirrors = readOptionalJson(path.join('docs', 'reports', 'postgres-contract-mirrors-report.json'));
+  const conceptEvidenceSpine = readOptionalJson(path.join('docs', 'reports', 'concept-evidence-spine-backfill-report.json'));
   const overlayCrosswalk = readOptionalJson(path.join('docs', 'reports', 'parent-atlas-overlay-crosswalk-report.json'));
   const graphStats = readOptionalJson(path.join('memory', 'graphify', 'deep', 'graph-stats.json'));
   const codeRelations = readOptionalJson(path.join('logs', 'task-output', 'code-relations-latest.json'));
@@ -236,12 +240,21 @@ function seedGates() {
   const somSummary = somCoverage?.summary ?? {};
   const productionNoSomSummary = productionNoSom?.active_production ?? productionNoSom?.coverage ?? {};
   const mirrorCounts = postgresMirrors?.summary?.classificationCounts ?? {};
+  const conceptEvidenceSummary = conceptEvidenceSpine?.summary ?? {};
   const overlayCounts = overlayCrosswalk?.summary?.byRootClassification ?? {};
 
   const featureSpineReady =
     pctNumber(lineageSummary.sourceRefCoveragePct) >= 95 &&
     pctNumber(lineageSummary.featureIdCoveragePct) >= 95 &&
     pctNumber(lineageSummary.featureLabelCoveragePct) >= 95;
+
+  const higherHopReady =
+    Number(higherHop?.summary?.missingHigherHopRows ?? higherHop?.summary?.missing_rows ?? 0) === 0 &&
+    Number(higherHop?.summary?.higherHopCoverage?.somClusterRows ?? 0) > 0 &&
+    Number(higherHop?.summary?.higherHopCoverage?.glyphRecordRows ?? 0) > 0 &&
+    Number(higherHop?.summary?.higherHopCoverage?.qdrantHitRows ?? 0) > 0 &&
+    Number(higherHop?.summary?.higherHopCoverage?.redisHotKeyRows ?? 0) > 0 &&
+    Number(higherHop?.summary?.higherHopCoverage?.neo4jNodeRows ?? 0) > 0;
 
   const graphReady =
     Number(graphStats?.neighborhoodsComputed ?? 0) > 0 &&
@@ -250,14 +263,19 @@ function seedGates() {
     codeRelations.errors.length === 0 &&
     Number(codeRelations?.totalEdges ?? 0) > 0;
 
+  const conceptEvidenceBackfill = Number(conceptEvidenceSummary.staleLegacyRows ?? 0) > 0 ||
+    Number(conceptEvidenceSummary.eligibleRows ?? 0) > 0;
+
   return {
     graphMissingNeighborhood: !graphReady,
     retrievalLowContextDensity: Number(runtimeSummary.lowDensityCount ?? 0) > 0,
     featureIdDerivation: !featureSpineReady,
+    higherHopEnrichment: !higherHopReady,
     somCoordinateCoverage: Number(somSummary.missingCoordinatePoints ?? 0) > 0,
     activeProductionTopology: Number(productionNoSomSummary.qdrant_no_som ?? productionNoSomSummary.production_qdrant_no_som ?? 0) > 0,
     taskSemanticPacketsDrift: Number(mirrorCounts.LIVE_DB_ALIGNED ?? 0) < Number(postgresMirrors?.summary?.tables ?? 0),
     parentAtlasOverlayMismatch: Number(overlayCounts.MISSING_APP_OVERLAY ?? 0) > 0,
+    conceptEvidenceSpineBackfill: conceptEvidenceBackfill,
   };
 }
 
@@ -288,6 +306,45 @@ export function seedRecommendations() {
       feature_id: 'retrieval',
       source_refs: ['reports/parent-atlas-open-lanes-todo.md', 'docs/graph/recommendations.md'],
       evidence_refs: ['reports/parent-atlas-open-lanes-todo.md', 'docs/graph/recommendations.md'],
+      status: 'NEW',
+    },
+    {
+      recommendation_key: 'higher-hop-coverage-repair',
+      severity: 'HIGH',
+      title: 'Higher-hop coverage repair',
+      description: 'Backfill somCluster, glyphRecord, qdrantHit, redisHotKey, and neo4jNode so semantic ACE traversals can move from report-only coverage to materialized data.',
+      command: 'npm run atlas:higher-hop:coverage',
+      source: 'report:higher-hop-enrichment',
+      cluster: 'Semantic ACE Traversals',
+      feature_id: 'retrieval',
+      source_refs: ['reports/parent-atlas-open-lanes-todo.md', 'docs/reports/higher-hop-enrichment-report.json'],
+      evidence_refs: ['reports/parent-atlas-open-lanes-todo.md', 'docs/reports/higher-hop-enrichment-report.json'],
+      status: 'NEW',
+    },
+    {
+      recommendation_key: 'feature-parent-join-repair',
+      severity: 'HIGH',
+      title: 'atlas_feature_map parent join repair',
+      description: 'Repair the atlas_feature_map ↔ parent_atlas_documents join using the existing normalized path audit and lineage spine.',
+      command: 'npm run atlas:feature-parent-join',
+      source: 'report:atlas-feature-parent-join',
+      cluster: 'Parent Atlas',
+      feature_id: 'parent-atlas',
+      source_refs: ['docs/reports/atlas-feature-parent-join-gap.json', 'reports/parent-atlas-open-lanes-todo.md'],
+      evidence_refs: ['docs/reports/atlas-feature-parent-join-gap.json', 'reports/parent-atlas-open-lanes-todo.md'],
+      status: 'NEW',
+    },
+    {
+      recommendation_key: 'route-runtime-packets-materialization',
+      severity: 'HIGH',
+      title: 'route_runtime_packets materialization',
+      description: 'Materialize route_runtime_packets from packet facts, telemetry, and source-ref joins so higher-hop evidence is replayable.',
+      command: 'npm run atlas:route-runtime-packets:materialize:apply',
+      source: 'report:runtime-packet-backfill-plan',
+      cluster: 'Runtime Packets',
+      feature_id: 'retrieval',
+      source_refs: ['docs/reports/runtime-packet-backfill-plan.json', 'reports/parent-atlas-open-lanes-todo.md'],
+      evidence_refs: ['docs/reports/runtime-packet-backfill-plan.json', 'reports/parent-atlas-open-lanes-todo.md'],
       status: 'NEW',
     },
     {
@@ -356,6 +413,19 @@ export function seedRecommendations() {
       status: 'NEW',
     },
     {
+      recommendation_key: 'concept-evidence-spine-backfill',
+      severity: 'HIGH',
+      title: 'Historical concept evidence spine backfill',
+      description: 'Rewrite concept_records.evidence_cards from stale legacy card IDs to the live packet spine using packet_keys and feature_ids.',
+      command: 'npm run atlas:concept-evidence:backfill',
+      source: 'report:concept-evidence-spine',
+      cluster: 'Evidence',
+      feature_id: 'evidence',
+      source_refs: ['docs/reports/concept-evidence-spine-backfill-report.json', 'reports/parent-atlas-open-lanes-todo.md'],
+      evidence_refs: ['docs/reports/concept-evidence-spine-backfill-report.json', 'reports/parent-atlas-open-lanes-todo.md'],
+      status: 'NEW',
+    },
+    {
       recommendation_key: 'command-mapping-mcp-allowlist',
       severity: 'MEDIUM',
       title: 'Command Mapping -> MCP allowlist',
@@ -372,7 +442,7 @@ export function seedRecommendations() {
       recommendation_key: 'synthetic-evidence-concept-cards',
       severity: 'LOW',
       title: 'Synthetic Evidence concept cards',
-      description: 'Turn the open reports into durable concept cards so the evidence trail stays searchable.',
+      description: 'Remap concept_records.evidence_cards to the live packet spine (packet_keys / feature_ids) so the evidence trail stays searchable.',
       command: 'npm run opencode:tasks:refresh',
       source: 'report:open-lanes',
       cluster: 'Evidence',
@@ -389,6 +459,7 @@ export function seedRecommendations() {
     if (row.recommendation_key === 'active-production-topology-mirror') return gates.activeProductionTopology;
     if (row.recommendation_key === 'task-semantic-packets-drift') return gates.taskSemanticPacketsDrift;
     if (row.recommendation_key === 'parent-atlas-overlay-mismatch') return gates.parentAtlasOverlayMismatch;
+    if (row.recommendation_key === 'concept-evidence-spine-backfill') return gates.conceptEvidenceSpineBackfill;
     return true;
   });
 }
@@ -441,6 +512,7 @@ export function shouldPromoteRecommendation(rec) {
     /som coordinate coverage/.test(t) ||
     /active production topology mirror/.test(t) ||
     /task semantic packets/.test(t) ||
+    /concept evidence spine/.test(t) ||
     /parent atlas overlay mismatch/.test(t) ||
     /command mapping mcp allowlist/.test(t) ||
     /synthetic evidence concept cards/.test(t) ||

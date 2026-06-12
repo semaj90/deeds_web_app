@@ -4,6 +4,8 @@ import { sql } from 'drizzle-orm';
 export const conceptRecords = pgTable('concept_records', {
   conceptId: text('concept_id').primaryKey(),
   label: text('label'),
+  // Current evidence spine for the concept. This should track live packet keys
+  // and not legacy card IDs that no longer resolve in the active DB.
   evidenceCards: jsonb('evidence_cards').$type<string[]>().notNull().default(sql`'[]'::jsonb`),
   featureIds: jsonb('feature_ids').$type<string[]>().notNull().default(sql`'[]'::jsonb`),
   packetKeys: jsonb('packet_keys').$type<string[]>().notNull().default(sql`'[]'::jsonb`),

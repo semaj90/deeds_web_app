@@ -4,11 +4,16 @@
  *
  * Rebuilds the atlas_packets table with canonical lineage and full metadata:
  * 1. Reads distinct parent_atlas_records joined with parent_atlas_vectors.
- * 2. Normalizes source_refs using canonicalPath.
- * 3. Maps feature_id, community_id, and cluster_id using atlas_feature_map in-memory lookup.
- * 4. Maps concept_ids using concept_records in-memory lookup.
- * 5. Generates packet_key and source_kind.
- * 6. Truncates atlas_packets and bulk inserts the canonical packets (~2,100 rows).
+ * 2. Loads neschrom97-card-registry.json for ground-truth mappings.
+ * 3. Resolves source_refs using the 5-tier priority fallback logic:
+ *    - Tier 1: Exact registry ID match (using computed SHA-256 or card ID)
+ *    - Tier 2: Exact source_ref match
+ *    - Tier 3: Normalized source_ref match
+ *    - Tier 4: Feature ID fallback
+ *    - Tier 5: Semantic fallback (Qdrant ANN) - marked as inferred
+ * 4. Maps feature_id, community_id, and cluster_id using atlas_feature_map.
+ * 5. Maps concept_ids using concept_records.
+ * 6. Truncates atlas_packets and bulk inserts the canonical packets.
  *
  * Usage:
  *   node scripts/atlas/enrich_atlas_packets.mjs --dry-run
@@ -48,8 +53,9 @@ function loadEnv() {
 const env = loadEnv();
 const DATABASE_URL = env.DATABASE_URL
   ?? `postgresql://${env.DB_USER ?? 'legal_admin'}:${env.DB_PASSWORD ?? '123456'}@${env.DB_HOST ?? '127.0.0.1'}:${env.DB_PORT ?? '5434'}/${env.DB_NAME ?? 'legal_ai_db'}`;
+const QDRANT_URL = env.QDRANT_URL || 'http://127.0.0.1:6333';
 
-function canonicalPath(input) {
+function canonicalPath(input, lowercase = false) {
   if (!input || typeof input !== 'string') return '';
   
   let s = input
@@ -60,7 +66,6 @@ function canonicalPath(input) {
     .replace(/^deeds-web-app\//i, '')
     .replace(/^\.?\//, '');
     
-  // Resolve relative segment traversals if present
   if (s.includes('..') || s.startsWith('.')) {
     try {
       const abs = path.resolve(ROOT, s);
@@ -73,7 +78,7 @@ function canonicalPath(input) {
   if (s.startsWith('src/')) {
     s = 'sveltekit-frontend/' + s;
   }
-  return s.toLowerCase();
+  return lowercase ? s.toLowerCase() : s;
 }
 
 function inferSourceKind(sourceRef, payload) {
@@ -99,15 +104,101 @@ function buildPacketKey(sourceRef, packetId) {
   return `${ref}:${hash}`;
 }
 
+async function queryQdrantSemanticFallback(embeddingText, qdrantUrl) {
+  if (!embeddingText || !qdrantUrl) return null;
+  try {
+    const embedding = JSON.parse(embeddingText);
+    if (!Array.isArray(embedding) || embedding.length === 0) return null;
+    
+    const body = {
+      vector: { name: 'content', vector: embedding },
+      limit: 1,
+      with_payload: true,
+      score_threshold: 0.60
+    };
+    
+    const res = await fetch(`${qdrantUrl}/collections/codebase_chunks_768/points/search`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+      signal: AbortSignal.timeout(5000),
+    });
+    
+    if (res.ok) {
+      const data = await res.json();
+      const hits = data.result || [];
+      if (hits.length > 0) {
+        const top = hits[0];
+        const rawPath = top.payload?.file_path || top.payload?.sourceRef || top.payload?.source_ref || top.payload?.path;
+        if (rawPath) {
+          return {
+            sourceRef: String(rawPath).split('#')[0],
+            score: top.score
+          };
+        }
+      }
+    }
+  } catch (e) {
+    console.warn(`    [semantic-fallback] Qdrant lookup failed: ${e.message}`);
+  }
+  return null;
+}
+
 async function main() {
-  console.log('══ Rebuilding atlas_packets with Canonical Lineage ════════════════');
+  console.log('══ Rebuilding atlas_packets with Registry-first Lineage ════════════════');
   console.log(`  Mode: ${DRY_RUN ? 'DRY-RUN (Run with --apply to execute)' : 'APPLY (Writing to database)'}`);
   console.log(`  Database: ${DATABASE_URL.replace(/:[^:@/]+@/, ':****@')}`);
+  console.log(`  Qdrant URL: ${QDRANT_URL}`);
 
   const pool = new pg.Pool({ connectionString: DATABASE_URL });
 
   try {
-    // 1. Load Feature Registry map (atlas_feature_map)
+    // 1. Load neschrom97-card-registry.json
+    console.log('\n[Registry] Loading card registry...');
+    const registryPath = path.join(ROOT, 'docs/reports/neschrom97-card-registry.json');
+    const registryIdToSourceRef = new Map();
+    const registryCardToSourceRef = new Map();
+    const registryFeatureToSourceRef = new Map();
+    const registryNormalizedToSourceRef = new Map();
+
+    if (fs.existsSync(registryPath)) {
+      try {
+        const registryData = JSON.parse(fs.readFileSync(registryPath, 'utf8'));
+        const mappings = registryData.mappings || [];
+        for (const item of mappings) {
+          if (item.source_ref) {
+            const sRef = item.source_ref;
+            const canon = canonicalPath(sRef, true);
+            
+            registryNormalizedToSourceRef.set(canon, sRef);
+            
+            if (item.card_id) {
+              registryCardToSourceRef.set(item.card_id, sRef);
+              registryIdToSourceRef.set(item.card_id, sRef);
+            }
+            
+            // Map calculated SHA-256 of the path relative to the sub-project
+            let relPath = sRef;
+            if (sRef.startsWith('sveltekit-frontend/')) {
+              relPath = sRef.substring('sveltekit-frontend/'.length);
+            }
+            const hash = createHash('sha256').update(relPath).digest('hex');
+            registryIdToSourceRef.set(hash, sRef);
+            
+            if (item.feature_id && !registryFeatureToSourceRef.has(item.feature_id)) {
+              registryFeatureToSourceRef.set(item.feature_id, sRef);
+            }
+          }
+        }
+        console.log(`  Loaded ${registryIdToSourceRef.size} registry path references.`);
+      } catch (e) {
+        console.warn('  Failed to load card registry:', e.message);
+      }
+    } else {
+      console.warn(`  Registry file not found at ${registryPath}`);
+    }
+
+    // 2. Load Feature Registry map (atlas_feature_map)
     console.log('\n[Features] Loading atlas_feature_map...');
     const { rows: featureMapRows } = await pool.query(`
       SELECT normalized_path, feature_id, som_cluster
@@ -115,10 +206,9 @@ async function main() {
       WHERE normalized_path IS NOT NULL AND normalized_path != ''
     `);
 
-    // Lookup Map: canonicalPath -> { feature_id, som_cluster }
     const featureLookup = new Map();
     for (const row of featureMapRows) {
-      const canon = canonicalPath(row.normalized_path);
+      const canon = canonicalPath(row.normalized_path, true);
       featureLookup.set(canon, {
         feature_id: row.feature_id,
         som_cluster: row.som_cluster
@@ -126,39 +216,28 @@ async function main() {
     }
     console.log(`  Loaded ${featureLookup.size} features from registry.`);
 
-    // 2. Load Concept mapping (concept_records & parent_atlas_records)
-    console.log('\n[Concepts] Loading concept maps...');
-    const { rows: parentRecords } = await pool.query(`
-      SELECT id, source_ref, payload
-      FROM parent_atlas_records
-      WHERE (source_ref IS NOT NULL AND source_ref != '') OR (payload->>'source_ref' IS NOT NULL)
-    `);
-
-    const cardIdToSourceRef = new Map();
-    for (const r of parentRecords) {
-      let ref = r.source_ref || r.payload?.source_ref || '';
-      if (ref) {
-        cardIdToSourceRef.set(r.id, ref);
-      }
-    }
-
+    // 3. Load Concept mapping
+    console.log('\n[Concepts] Loading concept records...');
     const { rows: conceptRecs } = await pool.query(`
       SELECT concept_id, evidence_cards, feature_ids FROM concept_records
     `);
 
-    // Map: canonicalPath -> Set of concept_ids
     const pathToConcepts = new Map();
-    // Map: featureId -> Set of concept_ids
     const featureToConcepts = new Map();
+    const cardIdToConcepts = new Map();
 
     for (const crec of conceptRecs) {
       const cid = crec.concept_id;
       
       const cards = Array.isArray(crec.evidence_cards) ? crec.evidence_cards : [];
       for (const cardId of cards) {
-        const rawPath = cardIdToSourceRef.get(cardId);
+        if (!cardIdToConcepts.has(cardId)) cardIdToConcepts.set(cardId, new Set());
+        cardIdToConcepts.get(cardId).add(cid);
+
+        // Map path via card registry
+        const rawPath = registryCardToSourceRef.get(cardId);
         if (rawPath) {
-          const canon = canonicalPath(rawPath);
+          const canon = canonicalPath(rawPath, true);
           if (!pathToConcepts.has(canon)) pathToConcepts.set(canon, new Set());
           pathToConcepts.get(canon).add(cid);
         }
@@ -172,9 +251,24 @@ async function main() {
         }
       }
     }
-    console.log(`  Mapped ${pathToConcepts.size} paths and ${featureToConcepts.size} features to concepts.`);
+    console.log(`  Mapped ${pathToConcepts.size} paths, ${featureToConcepts.size} features, and ${cardIdToConcepts.size} cards to concepts.`);
 
-    // 3. Query all distinct parent records that have vectors
+    // 3b. Load parent_atlas_documents summaries
+    console.log('\n[Database] Loading parent_atlas_documents summaries...');
+    const { rows: docSummaryRows } = await pool.query(`
+      SELECT source_ref, summary
+      FROM parent_atlas_documents
+      WHERE summary IS NOT NULL AND summary != ''
+    `);
+    const docSummaryMap = new Map();
+    for (const row of docSummaryRows) {
+      if (row.source_ref) {
+        docSummaryMap.set(canonicalPath(row.source_ref, true), row.summary);
+      }
+    }
+    console.log(`  Loaded ${docSummaryMap.size} document summaries.`);
+
+    // 4. Query all distinct parent records that have vectors
     console.log('\n[Postgres] Loading parent records and vectors...');
     const sql = `
       SELECT DISTINCT ON (r.id)
@@ -185,13 +279,13 @@ async function main() {
              r.payload,
              v.embedding::text AS embedding_text
       FROM parent_atlas_records r
-      INNER JOIN parent_atlas_vectors v ON r.id = v.record_id
+      LEFT JOIN parent_atlas_vectors v ON r.id = v.record_id
       ORDER BY r.id, v.created_at DESC
     `;
     const { rows: records } = await pool.query(sql);
     console.log(`  Loaded ${records.length} distinct rows from Parent Atlas.`);
 
-    // 4. Ingest/Rebuild
+    // 5. Ingest/Rebuild
     if (APPLY) {
       console.log('\n[Database] Truncating atlas_packets table...');
       await pool.query('TRUNCATE TABLE atlas_packets CASCADE');
@@ -207,27 +301,143 @@ async function main() {
     try {
       for (const row of records) {
         const payload = row.payload || {};
+        const recordId = row.record_id;
+        const lane = row.lane;
         
-        // Canonical paths
-        const origSourceRef = row.source_ref || payload.source_ref || '';
-        const canonSourceRef = origSourceRef ? canonicalPath(origSourceRef) : null;
+        let resolvedSourceRef = null;
+        let sourceKind = 'graphify';
+        let conceptResolution = null;
+
+        // ── 5-Tier Fallback Lineage Resolution ──
         
-        // Infer feature_id and community_id from atlas_feature_map lookup
-        let featureId = null;
-        let communityId = null;
-        let clusterId = null;
+        // Tier 1: Exact registry ID match (64-char sha256 or 16-char hex)
+        if (registryIdToSourceRef.has(recordId)) {
+          resolvedSourceRef = registryIdToSourceRef.get(recordId);
+          sourceKind = 'neschrom97';
+          let subRef = resolvedSourceRef;
+          if (subRef && subRef.startsWith('sveltekit-frontend/')) {
+            subRef = subRef.substring('sveltekit-frontend/'.length);
+          }
+          conceptResolution = {
+            method: 'neschrom97-card-registry',
+            lane: lane || 'features',
+            confidence: 1.0,
+            registry_id: recordId,
+            source_ref: subRef
+          };
+        }
         
-        if (canonSourceRef) {
-          const featMatch = featureLookup.get(canonSourceRef);
-          if (featMatch) {
-            featureId = featMatch.feature_id || null;
-            if (featMatch.som_cluster) {
-              communityId = parseInt(featMatch.som_cluster, 10);
-              clusterId = communityId;
+        // Tier 2: Exact source_ref match
+        if (!resolvedSourceRef) {
+          const rawRef = row.source_ref || payload.source_ref;
+          if (rawRef) {
+            resolvedSourceRef = rawRef;
+            sourceKind = inferSourceKind(resolvedSourceRef, payload);
+            let subRef = resolvedSourceRef;
+            if (subRef && subRef.startsWith('sveltekit-frontend/')) {
+              subRef = subRef.substring('sveltekit-frontend/'.length);
+            }
+            conceptResolution = {
+              method: 'exact-source-ref',
+              lane: lane || 'features',
+              confidence: 1.0,
+              source_ref: subRef
+            };
+          }
+        }
+
+        // Tier 3: Normalized source_ref match
+        if (!resolvedSourceRef) {
+          const rawRef = row.source_ref || payload.source_ref;
+          if (rawRef) {
+            const canon = canonicalPath(rawRef, true);
+            if (registryNormalizedToSourceRef.has(canon)) {
+              resolvedSourceRef = registryNormalizedToSourceRef.get(canon);
+              sourceKind = 'neschrom97';
+              let subRef = resolvedSourceRef;
+              if (subRef && subRef.startsWith('sveltekit-frontend/')) {
+                subRef = subRef.substring('sveltekit-frontend/'.length);
+              }
+              conceptResolution = {
+                method: 'normalized-source-ref',
+                lane: lane || 'features',
+                confidence: 0.9,
+                source_ref: subRef
+              };
             }
           }
         }
+
+        // Tier 4: Feature ID fallback
+        let featureId = payload.feature_id || payload.featureId || null;
+        if (!resolvedSourceRef && featureId) {
+          if (registryFeatureToSourceRef.has(featureId)) {
+            resolvedSourceRef = registryFeatureToSourceRef.get(featureId);
+            sourceKind = 'neschrom97';
+            let subRef = resolvedSourceRef;
+            if (subRef && subRef.startsWith('sveltekit-frontend/')) {
+              subRef = subRef.substring('sveltekit-frontend/'.length);
+            }
+            conceptResolution = {
+              method: 'feature-id-fallback',
+              lane: lane || 'features',
+              confidence: 0.7,
+              feature_id: featureId,
+              source_ref: subRef
+            };
+          }
+        }
+
+        // Tier 5: Semantic fallback (Qdrant ANN)
+        const isFeatures64Char = (lane === 'features' && /^[0-9a-f]{64}$/i.test(recordId));
+        if (!resolvedSourceRef && !isFeatures64Char) {
+          const semantic = await queryQdrantSemanticFallback(row.embedding_text, QDRANT_URL);
+          if (semantic) {
+            resolvedSourceRef = semantic.sourceRef;
+            sourceKind = 'graphify';
+            let subRef = resolvedSourceRef;
+            if (subRef && subRef.startsWith('sveltekit-frontend/')) {
+              subRef = subRef.substring('sveltekit-frontend/'.length);
+            }
+            conceptResolution = {
+              method: 'semantic-fallback',
+              lane: lane || 'features',
+              confidence: parseFloat(semantic.score.toFixed(3)),
+              source_ref: subRef,
+              inferred: true
+            };
+          }
+        }
+
+        // Default: If no resolution worked, preserve original stub
+        if (!resolvedSourceRef) {
+          resolvedSourceRef = row.source_ref || payload.source_ref || '';
+          sourceKind = inferSourceKind(resolvedSourceRef, payload);
+        }
+
+        // Final Paths
+        const canonSourceRef = resolvedSourceRef ? canonicalPath(resolvedSourceRef, false) : null;
+        const canonSourceRefKey = resolvedSourceRef ? canonicalPath(resolvedSourceRef, true) : null;
+        const origSourceRef = resolvedSourceRef || null;
+
+        // Map feature_id, community_id, and cluster_id from atlas_feature_map lookup
+        let communityId = null;
+        let clusterId = null;
         
+        if (canonSourceRefKey) {
+          const featMatch = featureLookup.get(canonSourceRefKey);
+          if (featMatch) {
+            if (!featureId) featureId = featMatch.feature_id || null;
+            if (featMatch.som_cluster) {
+              const parsed = parseInt(featMatch.som_cluster, 10);
+              if (!isNaN(parsed)) {
+                communityId = parsed;
+                clusterId = communityId;
+              }
+            }
+          }
+        }
+
         // Fallbacks from payload if registry didn't match
         if (!featureId) {
           featureId = payload.feature_id || payload.featureId || null;
@@ -235,51 +445,61 @@ async function main() {
         if (communityId === null) {
           const rawCluster = payload.cluster_id ?? payload.clusterId ?? payload.som_cluster ?? payload.somCluster ?? payload.som_bmu_index ?? payload.somBmuIndex;
           if (rawCluster !== undefined && rawCluster !== null) {
-            communityId = parseInt(rawCluster, 10);
-            clusterId = communityId;
+            const parsed = parseInt(rawCluster, 10);
+            if (!isNaN(parsed)) {
+              communityId = parsed;
+              clusterId = communityId;
+            }
           }
         }
 
         // Concepts mapping
         const conceptIdsSet = new Set();
-        if (canonSourceRef) {
-          const matched = pathToConcepts.get(canonSourceRef);
-          if (matched) {
-            for (const c of matched) conceptIdsSet.add(c);
-          }
+        if (cardIdToConcepts.has(recordId)) {
+          for (const c of cardIdToConcepts.get(recordId)) conceptIdsSet.add(c);
         }
-        if (featureId) {
-          const matched = featureToConcepts.get(featureId);
-          if (matched) {
-            for (const c of matched) conceptIdsSet.add(c);
-          }
+        if (canonSourceRefKey && pathToConcepts.has(canonSourceRefKey)) {
+          for (const c of pathToConcepts.get(canonSourceRefKey)) conceptIdsSet.add(c);
         }
-        const conceptIds = conceptIdsSet.size > 0 ? [...conceptIdsSet] : null;
+        if (featureId && featureToConcepts.has(featureId)) {
+          for (const c of featureToConcepts.get(featureId)) conceptIdsSet.add(c);
+        }
+        const conceptIds = conceptIdsSet.size > 0 ? [...conceptIdsSet].sort() : null;
 
         // Keys and metadata
-        const packetId = row.record_id;
-        const artifactId = payload.artifact_id || payload.artifactId || row.record_id;
-        const sourceKind = inferSourceKind(canonSourceRef || origSourceRef, payload);
-        const packetKey = canonSourceRef ? buildPacketKey(canonSourceRef, packetId) : null;
+        const packetKey = canonSourceRef ? buildPacketKey(canonSourceRef, recordId) : null;
+        const artifactId = payload.artifact_id || payload.artifactId || recordId;
 
         // Embeddings and summary
         const embedding = row.embedding_text ? `[${JSON.parse(row.embedding_text).join(',')}]` : null;
         const summary = payload.summary || row.title || payload.description || null;
-        const byteStart = payload.byte_start !== undefined ? Number(payload.byte_start) : (payload.byteStart !== undefined ? Number(payload.byteStart) : null);
-        const byteEnd = payload.byte_end !== undefined ? Number(payload.byte_end) : (payload.byteEnd !== undefined ? Number(payload.byteEnd) : null);
+        
+        let byteStart = payload.byte_start !== undefined ? Number(payload.byte_start) : (payload.byteStart !== undefined ? Number(payload.byteStart) : null);
+        if (byteStart !== null && isNaN(byteStart)) byteStart = null;
+        
+        let byteEnd = payload.byte_end !== undefined ? Number(payload.byte_end) : (payload.byteEnd !== undefined ? Number(payload.byteEnd) : null);
+        if (byteEnd !== null && isNaN(byteEnd)) byteEnd = null;
+        
         const sha256 = payload.sha256 || payload.packet_hash || payload.source_hash || null;
-        const rewardPrior = parseFloat(payload.reward_prior || payload.rewardPrior || 0.0);
+        
+        let rewardPrior = parseFloat(payload.reward_prior || payload.rewardPrior || 0.0);
+        if (isNaN(rewardPrior)) rewardPrior = 0.0;
+
+        // Inject concept_resolution block into payload
+        if (conceptResolution) {
+          payload.concept_resolution = conceptResolution;
+        }
 
         if (DRY_RUN) {
           if (inserted < 5) {
             console.log(`  [dry-run] Sample Packet:`);
-            console.log(`    packet_id:    ${packetId}`);
-            console.log(`    source_ref:   ${canonSourceRef} (orig: ${origSourceRef})`);
-            console.log(`    feature_id:   ${featureId}`);
-            console.log(`    community_id: ${communityId}`);
-            console.log(`    concept_ids:  `, conceptIds);
-            console.log(`    packet_key:   ${packetKey}`);
-            console.log(`    source_kind:  ${sourceKind}`);
+            console.log(`    packet_id:      ${recordId}`);
+            console.log(`    source_ref:     ${canonSourceRef} (key: ${canonSourceRefKey}, orig: ${origSourceRef})`);
+            console.log(`    feature_id:     ${featureId}`);
+            console.log(`    concept_ids:    `, conceptIds);
+            console.log(`    packet_key:     ${packetKey}`);
+            console.log(`    source_kind:    ${sourceKind}`);
+            console.log(`    resolution:     `, conceptResolution);
           }
           inserted++;
           continue;
@@ -287,17 +507,17 @@ async function main() {
 
         const insertSql = `
           INSERT INTO atlas_packets (
-            packet_id, artifact_id, source_ref, feature_id, community_id,
+            packet_id, artifact_id, source_ref, source_ref_key, feature_id, community_id,
             concept_ids, cluster_id, embedding, payload, summary,
             byte_start, byte_end, sha256, packet_key, source_kind,
             reward_prior, source_path, updated_at
           ) VALUES (
-            $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, now()
+            $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, now()
           )
         `;
 
         await client.query(insertSql, [
-          packetId, artifactId, canonSourceRef, featureId, communityId,
+          recordId, artifactId, canonSourceRef, canonSourceRefKey, featureId, communityId,
           conceptIds, clusterId, embedding, JSON.stringify(payload), summary,
           byteStart, byteEnd, sha256, packetKey, sourceKind,
           rewardPrior, origSourceRef

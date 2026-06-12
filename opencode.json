@@ -132,6 +132,13 @@
       "enabled": true,
       "timeout": 60000
     },
+    "ldr-research": {
+      "type": "local",
+      "description": "Local Deep Research MCP for async research, history lookup, and quick summaries.",
+      "command": ["node", "./sveltekit-frontend/scripts/mcp/ldr-mcp.mjs"],
+      "enabled": true,
+      "timeout": 120000
+    },
     "gemma4-offload": {
       "type": "local",
       "command": ["node", "./sveltekit-frontend/scripts/mcp/gemma4-offload-mcp.mjs"],
@@ -152,11 +159,12 @@
       "model": "ollama/gemma4-rotorquant:latest",
       "temperature": 0,
       "steps": 10,
-      "prompt": "Use exact registry names only. Do not derive tool names from namespaces,Repo evidence first. Inspect .opencode/recommendations/recommendations.md, the latest ACE hits, and the relevant Parent Atlas evidence before answering. Use MCP tools in this priority order: Default order: trace_trace_kag_search, trace_context_build_kv_packet, trace_ace_compact_search  context.build_kv_packet, ace.compact_search, then Bitfrost cache evidence for repeated or semantic retrieval, then turbovec for cosine ranking and chunk-id scoring, then engram for memory, then langextract for citation and entity extraction. Include chunk_ids and cluster_labels only when present in the evidence. Do not edit files without explicit approval.",
+      "prompt": "Use exact registry names only. Do not derive tool names from namespaces. Repo evidence first. Inspect .opencode/recommendations/recommendations.md, the latest ACE hits, and the relevant Parent Atlas evidence before answering. Use MCP tools in this priority order: trace_trace_kag_search, trace_context_build_kv_packet, trace_ace_compact_search, context.build_kv_packet, ace.compact_search, then Bitfrost cache evidence for repeated or semantic retrieval, then turbovec for cosine ranking and chunk-id scoring, then engram for memory, then langextract for citation and entity extraction, then ldr.search_history or ldr.quick_summary for local deep research, then ldr.start_research / ldr.poll_status for longer research. Include chunk_ids and cluster_labels only when present in the evidence. Do not edit files without explicit approval.",
       "tools": {
         "trace": true,
         "atlas-tools": true,
         "engram-embed": true,
+        "ldr-research": true,
         "gemma4-offload": true,
         "turbovec": false
       },

@@ -7,7 +7,8 @@
  * to produce:
  *
  *   .tmp/path-map.json           — compact {stableKey → {filePath, feature, importErrorCount}} index
- *   .tmp/path-map.ndjson         — full enriched records (one per mapreduce entry)
+ *   .tmp/path-map.ndjson         — slim enriched records (one per mapreduce entry)
+ *   .tmp/mapreduce-path-index.ndjson — same slim projection, explicit path index output
  *   .tmp/missing-sourceref.ndjson — atlas entries with empty sourceRef that now have a match
  *   .tmp/feature-todo-queue.ndjson — deduped list of missing/partial features for RabbitMQ
  *   .tmp/path-join-report.md     — human-readable summary
@@ -48,11 +49,46 @@ if (!existsSync(MR_PATH)) {
   process.exit(1);
 }
 
+function classifySourceRef(ref) {
+  const s = String(ref ?? '').replace(/\\/g, '/');
+
+  if (s.includes('#chunk-')) return 'doc_chunk';
+  if (s.startsWith('src/') || s.startsWith('$lib/') || s.startsWith('sveltekit-frontend/src/')) return 'code_file';
+  if (s.startsWith('docs/reports/') || s.startsWith('reports/')) return 'generated_report';
+  if (s.startsWith('memory/exports/')) return 'memory_export';
+  if (s.startsWith('neschrom97/cards/')) return 'neschrom_card';
+  return 'unknown';
+}
+
 const ACTIONABLE_EXTENSIONS = new Set(['.ts', '.tsx', '.js', '.mjs', '.jsx', '.mts', '.cts', '.svelte']);
 function isActionable(doc) {
   const filePath = String(doc.filePath || '').replace(/\\/g, '/');
   if (filePath.startsWith('.opencode/')) return false;
   return ACTIONABLE_EXTENSIONS.has(doc.extension || '');
+}
+
+function classifyFallbackFeature(filePath) {
+  const p = String(filePath || '').replace(/\\/g, '/').toLowerCase();
+  if (p.includes('sqlite')) return 'database';
+  if (
+    p.includes('/cli/') ||
+    p.includes('/npx-cli/') ||
+    p.includes('/server-beta/') ||
+    p.includes('/server/generation/') ||
+    p.includes('/server/runtime/') ||
+    p.includes('/server/services/') ||
+    p.includes('/servers/') ||
+    p.includes('/services/') ||
+    p.includes('/hooks/') ||
+    p.includes('/integrations/') ||
+    p.includes('/worker/') ||
+    p.includes('/workers/') ||
+    p.includes('/queue/') ||
+    p.includes('/compat/') ||
+    p.includes('/transcripts/') ||
+    p.includes('/infrastructure/')
+  ) return 'agent';
+  return 'unclassified';
 }
 
 const mrDocs = [];
@@ -86,10 +122,12 @@ for await (const line of mrStream) {
 mrStream.close();
 console.log(`Mapreduce entries: ${mrDocs.length}`);
 
+const codeFileDocs = mrDocs.filter((doc) => classifySourceRef(doc.filePath) === 'code_file');
+
 // Build path → doc index using canonical variants
 const pathIndex = new Map(); // variant → doc
 const stableIndex = new Map(); // stableKey → doc
-for (const doc of mrDocs) {
+for (const doc of codeFileDocs) {
   const variants = sourceRefVariants(doc.filePath);
   for (const variant of variants) {
     pathIndex.set(variant, doc);
@@ -124,6 +162,28 @@ if (existsSync(ATLAS_INDEX)) {
   console.log(`Parent atlas entries: ${atlasEntries.length}`);
 }
 
+const atlasKindCounts = {
+  code_file: 0,
+  doc_chunk: 0,
+  generated_report: 0,
+  memory_export: 0,
+  neschrom_card: 0,
+  unknown: 0,
+};
+for (const entry of atlasEntries) {
+  const raw =
+    entry.sourceRef ||
+    entry.source_ref ||
+    entry.sourceRefs?.[0] ||
+    entry.source_refs?.[0] ||
+    (entry.payload && (entry.payload.sourceRef || entry.payload.source_ref || entry.payload.path)) ||
+    entry.path ||
+    entry.file ||
+    '';
+  const kind = classifySourceRef(raw);
+  atlasKindCounts[kind] = (atlasKindCounts[kind] ?? 0) + 1;
+}
+
 console.log("\nmapreduce sample", [...pathIndex.keys()].slice(0, 10));
 console.log(
   "atlas sample",
@@ -132,15 +192,22 @@ console.log(
     .filter(Boolean)
     .slice(0, 10)
 );
+console.log("atlas source kinds", JSON.stringify(atlasKindCounts));
 
 // ── 4. Build path map ─────────────────────────────────────────────────────────
 
 const pathMap = {};
 const enrichedRecords = [];
+const slimPathIndex = [];
 const featureCounts = {};
 
-for (const doc of mrDocs) {
+for (const doc of codeFileDocs) {
   const norm = doc.filePath.replace(/\\/g, '/');
+  const canonicalRef = normalizeSourceRef(norm);
+  const slimImports = (doc.staticImports ?? [])
+    .map((imp) => String(imp ?? '').trim())
+    .filter(Boolean)
+    .slice(0, 12);
   const entry = {
     stableKey: doc.stableKey,
     filePath: norm,
@@ -154,11 +221,21 @@ for (const doc of mrDocs) {
   };
   pathMap[doc.stableKey] = entry;
   enrichedRecords.push(entry);
+  slimPathIndex.push({
+    source_ref: norm,
+    canonical_ref: canonicalRef,
+    imports: slimImports,
+    feature_id: doc.feature,
+    extension: doc.extension,
+    size_bytes: doc.lines ? Number(doc.size ?? 0) : Number(doc.size ?? 0),
+    hash: stableIndex.get(doc.stableKey)?.contentHash ?? doc.contentHash ?? null,
+  });
   featureCounts[doc.feature] = (featureCounts[doc.feature] || 0) + 1;
 }
 
 console.log(`\nPath map built: ${Object.keys(pathMap).length} entries`);
 console.log('Feature distribution:', JSON.stringify(featureCounts));
+console.log(`Atlas source kinds: ${JSON.stringify(atlasKindCounts)}`);
 
 // ── 5. Match atlas entries to mapreduce paths ─────────────────────────────────
 
@@ -166,10 +243,23 @@ let matchedCount = 0;
 const missingSourceRef = [];
 const matchReasonCounts = {};
 const uniqueDocs = [...new Set(pathIndex.values())];
+const atlasCodeEntries = [];
 
 for (const entry of atlasEntries) {
-  const raw = entry.sourceRef || (entry.payload && entry.payload.sourceRef) || entry.path || entry.file || '';
+  const raw =
+    entry.sourceRef ||
+    entry.source_ref ||
+    entry.sourceRefs?.[0] ||
+    entry.source_refs?.[0] ||
+    (entry.payload && (entry.payload.sourceRef || entry.payload.source_ref || entry.payload.path)) ||
+    entry.path ||
+    entry.file ||
+    '';
   if (!raw) continue;
+
+  const kind = classifySourceRef(raw);
+  if (kind === 'code_file') atlasCodeEntries.push(entry);
+  if (kind !== 'code_file') continue;
 
   const best = bestSourceRefMatch(raw, uniqueDocs.map((doc) => doc.filePath));
   const direct = best
@@ -195,7 +285,33 @@ for (const entry of atlasEntries) {
   }
 }
 
-console.log(`Atlas → mapreduce matches: ${matchedCount} / ${atlasEntries.length}`);
+const atlasTotal = atlasEntries.length;
+const atlasCodeFileTotal = atlasCodeEntries.length;
+const atlasDocChunkTotal = atlasEntries.filter((entry) => classifySourceRef(
+  entry.sourceRef ||
+  entry.source_ref ||
+  entry.sourceRefs?.[0] ||
+  entry.source_refs?.[0] ||
+  entry.path ||
+  entry.file ||
+  entry.payload?.sourceRef ||
+  entry.payload?.source_ref
+) === 'doc_chunk').length;
+const atlasGeneratedReportTotal = atlasEntries.filter((entry) => classifySourceRef(
+  entry.sourceRef ||
+  entry.source_ref ||
+  entry.sourceRefs?.[0] ||
+  entry.source_refs?.[0] ||
+  entry.path ||
+  entry.file ||
+  entry.payload?.sourceRef ||
+  entry.payload?.source_ref
+) === 'generated_report').length;
+const atlasNonCodeSkipped = atlasTotal - atlasCodeFileTotal;
+const codeFileMatchPct = atlasCodeFileTotal > 0 ? matchedCount / atlasCodeFileTotal : 0;
+
+console.log(`Atlas → code-file mapreduce matches: ${matchedCount} / ${atlasCodeFileTotal}`);
+console.log(`Skipped non-code atlas rows: ${atlasNonCodeSkipped}`);
 
 // ── 6. Build feature TODO queue ───────────────────────────────────────────────
 
@@ -219,7 +335,11 @@ for (const doc of mrDocs) {
 }
 
 // Add unclassified files with imports (likely need feature labeling)
-const unclassified = mrDocs.filter(d => d.feature === 'unclassified' && d.staticImports?.length > 3 && isActionable(d));
+const unclassified = mrDocs.filter(d => {
+  if (d.feature !== 'unclassified') return false;
+  if (classifyFallbackFeature(d.filePath) !== 'unclassified') return false;
+  return d.staticImports?.length > 3 && isActionable(d);
+});
 for (const doc of unclassified.slice(0, 100)) {
   todoQueue.push({
     type: 'unclassified_feature',
@@ -267,14 +387,28 @@ if (RABBITMQ_URL && !DRY_RUN && todoQueue.length > 0) {
 
 if (!DRY_RUN) {
   writeFileSync(resolve(TMP, 'path-map.json'), JSON.stringify(pathMap, null, 2), 'utf8');
-  writeFileSync(resolve(TMP, 'path-map.ndjson'), enrichedRecords.map(r => JSON.stringify(r)).join('\n') + '\n', 'utf8');
+  const slimNdjson = slimPathIndex.map((r) => JSON.stringify(r)).join('\n') + '\n';
+  writeFileSync(resolve(TMP, 'path-map.ndjson'), slimNdjson, 'utf8');
+  writeFileSync(resolve(TMP, 'mapreduce-path-index.ndjson'), slimNdjson, 'utf8');
   writeFileSync(resolve(TMP, 'missing-sourceref.ndjson'), missingSourceRef.map(r => JSON.stringify(r)).join('\n') + '\n', 'utf8');
   writeFileSync(resolve(TMP, 'feature-todo-queue.ndjson'), todoQueue.map(r => JSON.stringify(r)).join('\n') + '\n', 'utf8');
+  const jsonReport = {
+    atlas_total: atlasTotal,
+    atlas_code_file_total: atlasCodeFileTotal,
+    atlas_doc_chunk_total: atlasDocChunkTotal,
+    atlas_generated_report_total: atlasGeneratedReportTotal,
+    code_file_matches: matchedCount,
+    code_file_match_pct: codeFileMatchPct,
+    non_code_skipped: atlasNonCodeSkipped
+  };
+  writeFileSync(resolve(TMP, 'path-join-report.json'), JSON.stringify(jsonReport, null, 2), 'utf8');
   console.log('\n✅ Outputs written:');
   console.log('   .tmp/path-map.json              —', Object.keys(pathMap).length, 'entries');
-  console.log('   .tmp/path-map.ndjson            —', enrichedRecords.length, 'rows');
+  console.log('   .tmp/path-map.ndjson            —', slimPathIndex.length, 'slim rows');
+  console.log('   .tmp/mapreduce-path-index.ndjson —', slimPathIndex.length, 'slim rows');
   console.log('   .tmp/missing-sourceref.ndjson   —', missingSourceRef.length, 'matched atlas entries');
   console.log('   .tmp/feature-todo-queue.ndjson  —', todoQueue.length, 'todo items');
+  console.log('   .tmp/path-join-report.json      — json summary report');
 }
 
 // ── 9. DuckDB update: patch sourceRef in card_enriched ───────────────────────
@@ -315,11 +449,21 @@ const report = [
   '',
   '## Path Map Summary',
   '',
+  `- Atlas total rows: **${atlasTotal}**`,
+  `- Atlas code-file rows: **${atlasCodeFileTotal}**`,
+  `- Atlas doc-chunk rows: **${atlasDocChunkTotal}**`,
+  `- Atlas generated-report rows: **${atlasGeneratedReportTotal}**`,
+  `- Code-file matches: **${matchedCount}** / ${atlasCodeFileTotal}`,
+  `- Code-file match pct: **${(codeFileMatchPct * 100).toFixed(2)}%**`,
+  `- Non-code atlas rows skipped: **${atlasNonCodeSkipped}**`,
   `- Total files mapped: **${Object.keys(pathMap).length}**`,
-  `- Atlas entries matched: **${matchedCount}** / ${atlasEntries.length}`,
   `- DuckDB sourceRef patches: **${missingSourceRef.length}**`,
   `- Match reasons: **${JSON.stringify(matchReasonCounts)}**`,
   `- Feature TODO queue items: **${todoQueue.length}**`,
+  '',
+  '## Atlas Source Kind Distribution',
+  '',
+  ...Object.entries(atlasKindCounts).map(([k, v]) => `- ${k}: ${v}`),
   '',
   '## Feature Distribution',
   '',

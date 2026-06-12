@@ -1,45 +1,10 @@
 {
-  "generatedAt": "2026-06-12T03:26:55.910Z",
-  "totalCount": 7,
+  "generatedAt": "2026-06-12T12:43:29.207Z",
+  "totalCount": 5,
   "clusters": {
-    "UI Components": [
-      {
-        "id": "import_error_5578769b",
-        "type": "developer_recommendation",
-        "cluster": "UI Components",
-        "title": "claude-mem/src/ui/viewer/App.tsx — 5 unresolved imports",
-        "why": "Feature \"ui\" barrel/index has 5 dangling import refs (mapreduce v4 scan)",
-        "sourceRefs": [
-          "claude-mem/src/ui/viewer/App.tsx"
-        ],
-        "action": "Audit barrel re-exports; remove or fix dangling import paths",
-        "next_command": "node scripts/atlas/debug-import-resolve.mjs <import> 'claude-mem/src/ui/viewer/App.tsx'",
-        "priority": "high",
-        "featureStatus": "degraded"
-      }
-    ],
-    "Agent Workflow": [
-      {
-        "id": "unclassified_85af9a66",
-        "type": "feature:unclassified",
-        "cluster": "Agent Workflow",
-        "title": "4 files unclassified with >10 imports",
-        "why": "Files with many imports but no feature label degrade ACE context quality",
-        "sourceRefs": [
-          "claude-mem/src/cli/handlers/session-init.ts",
-          "claude-mem/src/npx-cli/commands/install.ts",
-          "claude-mem/src/server/generation/ProviderObservationGenerator.ts",
-          "claude-mem/src/server/runtime/create-server-beta-service.ts"
-        ],
-        "action": "Add feature labels to mapreduce classification rules",
-        "next_command": "node scripts/atlas/mapreduce-consolidated-index.mjs \"--output=.tmp/mapreduce-full-v4.ndjson\"",
-        "priority": "medium",
-        "featureStatus": "degraded"
-      }
-    ],
     "Legal Workspace": [
       {
-        "id": "stale_feature_ff3b4feb",
+        "id": "stale_feature_eb391900",
         "type": "missing_feature",
         "cluster": "Legal Workspace",
         "title": "Feature not implemented: Priority 1: Evidence Upload UI (1 hour)",
@@ -55,7 +20,7 @@
     ],
     "General": [
       {
-        "id": "stale_feature_bd43ec11",
+        "id": "stale_feature_aa2f1c0f",
         "type": "missing_feature",
         "cluster": "General",
         "title": "Feature not implemented: Priority 2: VLM POI Integration (90 min)",
@@ -69,7 +34,7 @@
         "featureStatus": "missing"
       },
       {
-        "id": "stale_feature_cd1d82a6",
+        "id": "stale_feature_e2360bf5",
         "type": "missing_feature",
         "cluster": "General",
         "title": "Feature not implemented: Priority 3: Audit Dashboard Web UI (3-4 hours)",
@@ -83,7 +48,7 @@
         "featureStatus": "missing"
       },
       {
-        "id": "stale_feature_cbbf3471",
+        "id": "stale_feature_e7996eac",
         "type": "missing_feature",
         "cluster": "General",
         "title": "Feature not implemented: Priority 4: Auto-Fix Orchestrator (6-8 hours)",
@@ -97,7 +62,7 @@
         "featureStatus": "missing"
       },
       {
-        "id": "stale_feature_46d6a0ec",
+        "id": "stale_feature_f4cdd1c3",
         "type": "missing_feature",
         "cluster": "General",
         "title": "Feature not implemented: Phase 3: Post-Synthesis Quality Review (RunID: `stage-2c-500`)",
@@ -114,38 +79,7 @@
   },
   "top10": [
     {
-      "id": "import_error_5578769b",
-      "type": "developer_recommendation",
-      "cluster": "UI Components",
-      "title": "claude-mem/src/ui/viewer/App.tsx — 5 unresolved imports",
-      "why": "Feature \"ui\" barrel/index has 5 dangling import refs (mapreduce v4 scan)",
-      "sourceRefs": [
-        "claude-mem/src/ui/viewer/App.tsx"
-      ],
-      "action": "Audit barrel re-exports; remove or fix dangling import paths",
-      "next_command": "node scripts/atlas/debug-import-resolve.mjs <import> 'claude-mem/src/ui/viewer/App.tsx'",
-      "priority": "high",
-      "featureStatus": "degraded"
-    },
-    {
-      "id": "unclassified_85af9a66",
-      "type": "feature:unclassified",
-      "cluster": "Agent Workflow",
-      "title": "4 files unclassified with >10 imports",
-      "why": "Files with many imports but no feature label degrade ACE context quality",
-      "sourceRefs": [
-        "claude-mem/src/cli/handlers/session-init.ts",
-        "claude-mem/src/npx-cli/commands/install.ts",
-        "claude-mem/src/server/generation/ProviderObservationGenerator.ts",
-        "claude-mem/src/server/runtime/create-server-beta-service.ts"
-      ],
-      "action": "Add feature labels to mapreduce classification rules",
-      "next_command": "node scripts/atlas/mapreduce-consolidated-index.mjs \"--output=.tmp/mapreduce-full-v4.ndjson\"",
-      "priority": "medium",
-      "featureStatus": "degraded"
-    },
-    {
-      "id": "stale_feature_ff3b4feb",
+      "id": "stale_feature_eb391900",
       "type": "missing_feature",
       "cluster": "Legal Workspace",
       "title": "Feature not implemented: Priority 1: Evidence Upload UI (1 hour)",
@@ -159,7 +93,7 @@
       "featureStatus": "missing"
     },
     {
-      "id": "stale_feature_bd43ec11",
+      "id": "stale_feature_aa2f1c0f",
       "type": "missing_feature",
       "cluster": "General",
       "title": "Feature not implemented: Priority 2: VLM POI Integration (90 min)",
@@ -173,7 +107,7 @@
       "featureStatus": "missing"
     },
     {
-      "id": "stale_feature_cd1d82a6",
+      "id": "stale_feature_e2360bf5",
       "type": "missing_feature",
       "cluster": "General",
       "title": "Feature not implemented: Priority 3: Audit Dashboard Web UI (3-4 hours)",
@@ -187,7 +121,7 @@
       "featureStatus": "missing"
     },
     {
-      "id": "stale_feature_cbbf3471",
+      "id": "stale_feature_e7996eac",
       "type": "missing_feature",
       "cluster": "General",
       "title": "Feature not implemented: Priority 4: Auto-Fix Orchestrator (6-8 hours)",
@@ -201,7 +135,7 @@
       "featureStatus": "missing"
     },
     {
-      "id": "stale_feature_46d6a0ec",
+      "id": "stale_feature_f4cdd1c3",
       "type": "missing_feature",
       "cluster": "General",
       "title": "Feature not implemented: Phase 3: Post-Synthesis Quality Review (RunID: `stage-2c-500`)",
@@ -220,8 +154,8 @@
     "atlasSeeds": 4173,
     "mergedCards": 1961,
     "rankEntries": 500,
-    "todoQueueItems": 104,
-    "pathMapEntries": 10000,
+    "todoQueueItems": 48,
+    "pathMapEntries": 5000,
     "traversalReport": 1
   }
 }

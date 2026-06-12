@@ -148,25 +148,52 @@ export async function recordRetrievalTelemetry(signal: RetrievalTelemetrySignal)
     const strategy = signal.retrievalStrategy ?? 'fusion';
     await pool.query(
       `
-        update concept_records
+        update concept_records cr
         set
-          retrieval_count = retrieval_count + 1,
+          retrieval_count = cr.retrieval_count + 1,
           last_retrieved_at = now(),
-          retrieval_strategy = coalesce($1, retrieval_strategy),
+          retrieval_strategy = coalesce($1, cr.retrieval_strategy),
           strategy_distribution = jsonb_set(
-            coalesce(strategy_distribution, '{}'::jsonb),
+            coalesce(cr.strategy_distribution, '{}'::jsonb),
             array[$2],
-            (coalesce((strategy_distribution->$2)::integer, 0) + 1)::text::jsonb
+            (coalesce((cr.strategy_distribution->$2)::integer, 0) + 1)::text::jsonb
           ),
-          concept_temperature = least(1.0, greatest(0.0, concept_temperature * 0.85 + 0.15 * (1.2 - repair_success)))
+          concept_temperature = least(1.0, greatest(0.0, cr.concept_temperature * 0.85 + 0.15 * (1.2 - cr.repair_success))),
+          feature_ids = (
+            select coalesce(jsonb_agg(distinct merged.value), '[]'::jsonb)
+            from (
+              select value
+              from jsonb_array_elements_text(coalesce(cr.feature_ids, '[]'::jsonb)) as value
+              union
+              select unnest($6::text[]) as value
+            ) merged
+          ),
+          packet_keys = (
+            select coalesce(jsonb_agg(distinct merged.value), '[]'::jsonb)
+            from (
+              select value
+              from jsonb_array_elements_text(coalesce(cr.packet_keys, '[]'::jsonb)) as value
+              union
+              select unnest($7::text[]) as value
+            ) merged
+          ),
+          evidence_cards = (
+            select coalesce(jsonb_agg(distinct merged.value), '[]'::jsonb)
+            from (
+              select value
+              from jsonb_array_elements_text(coalesce(cr.evidence_cards, '[]'::jsonb)) as value
+              union
+              select unnest($7::text[]) as value
+            ) merged
+          )
         where
-          concept_id = any($3::text[])
+          cr.concept_id = any($3::text[])
           or exists (
-            select 1 from jsonb_array_elements_text(feature_ids) f
+            select 1 from jsonb_array_elements_text(cr.feature_ids) f
             where f = any($4::text[])
           )
           or exists (
-            select 1 from jsonb_array_elements_text(packet_keys) p
+            select 1 from jsonb_array_elements_text(cr.packet_keys) p
             where p = any($5::text[])
           )
       `,
@@ -175,7 +202,9 @@ export async function recordRetrievalTelemetry(signal: RetrievalTelemetrySignal)
         strategy,
         uniqueConceptIds,
         featuresToMatch,
-        packetsToMatch
+        packetsToMatch,
+        featureIds,
+        selectedPacketKeys,
       ]
     );
 

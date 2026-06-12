@@ -1,66 +1,673 @@
 {
-  "timestamp": "2026-06-12T02:21:58.056Z",
-  "greeting": "Hello James.",
-  "sinceLastWorked": {
-    "tasksOpen": 18,
-    "tasksClosed": 0,
-    "newRecommendations": 6,
-    "taskRegistryOpen": 12,
-    "taskRegistryDone": 0,
-    "productionReadiness": "PASS 66 / WARN 0 / FAIL 0"
-  },
-  "systems": {
-    "postgres": "READY",
-    "redis": "READY",
-    "qdrant": "READY",
-    "neo4j": "READY",
-    "turbovec": "SKIPPED",
-    "engramEmbed": "OK",
-    "ldjson": "100%"
-  },
-  "coverage": {
-    "qdrant": "33%",
-    "som": "29%",
-    "parentAtlas": "29%"
-  },
-  "sidecars": [
-    {
-      "name": "turbovec",
-      "transport": "http",
-      "status": "SKIPPED",
-      "detail": "Disabled in opencode.json",
-      "enabled": true
+  "generatedAt": "2026-06-12T13:43:46.921Z",
+  "appRoot": "C:/Users/james/Videos/deeds-web-app",
+  "readOnly": true,
+  "summary": {
+    "productionReadiness": {
+      "exists": true,
+      "generatedAt": "2026-06-12T13:03:33.481Z",
+      "counts": {
+        "pass": 66,
+        "warn": 0,
+        "fail": 0
+      },
+      "summary": "PASS 66 / WARN 0 / FAIL 0",
+      "keySignals": {
+        "parentAtlasDocuments": null,
+        "atlasFeatureMap": null,
+        "nesChromPackets": null,
+        "routeRuntimePackets": null,
+        "qdrantPoints": 54331,
+        "neo4jCodebaseFiles": 31551
+      }
     },
-    {
-      "name": "turbovec-sidecar",
-      "transport": "http",
-      "status": "SKIPPED",
-      "detail": "Disabled in opencode.json",
-      "enabled": true
+    "temporalTaskRegistry": {
+      "exists": true,
+      "generatedAt": "2026-06-12T13:00:13.166Z",
+      "recommendationCount": 286,
+      "taskCount": 17,
+      "openTaskCount": 8,
+      "promotedRecommendations": 17,
+      "activeLane": {
+        "taskId": "task_concept_evidence_spine_backfill",
+        "title": "Historical concept evidence spine backfill",
+        "priority": "HIGH",
+        "status": "TODO",
+        "command": "npm run atlas:concept-evidence:backfill",
+        "sourceRecommendationKey": "concept-evidence-spine-backfill"
+      },
+      "topTasks": [
+        {
+          "taskId": "task_concept_evidence_spine_backfill",
+          "title": "Historical concept evidence spine backfill",
+          "status": "TODO",
+          "priority": "HIGH",
+          "command": "npm run atlas:concept-evidence:backfill"
+        },
+        {
+          "taskId": "task_route_runtime_packets_materialization",
+          "title": "route_runtime_packets materialization",
+          "status": "TODO",
+          "priority": "HIGH",
+          "command": "npm run atlas:route-runtime-packets:materialize:apply"
+        },
+        {
+          "taskId": "task_feature_parent_join_repair",
+          "title": "atlas_feature_map parent join repair",
+          "status": "TODO",
+          "priority": "HIGH",
+          "command": "npm run atlas:feature-parent-join"
+        }
+      ]
     },
-    {
-      "name": "engram-embed",
-      "transport": "stdio",
-      "status": "OK",
-      "detail": "stdio transport responding with valid JSON-RPC",
-      "enabled": true
+    "runtimeCoverage": {
+      "exists": true,
+      "generatedAt": "2026-06-12T13:36:20.742Z",
+      "status": "USED_CONCEPT_EDGE_GAP",
+      "nextLane": "Neo4j USED_CONCEPT edges",
+      "selectedConceptCoveragePct": 100,
+      "usedConceptEdgeCoveragePct": 0,
+      "joinCoveragePct": 0,
+      "somCoveragePct": 0,
+      "cacheHitPct": 96.2,
+      "higherHopStatus": "HIGHER_HOP_GAP",
+      "higherHopNeo4jNodeCoveragePct": 0
+    },
+    "higherHopEnrichment": {
+      "exists": true,
+      "generatedAt": "2026-06-12T13:36:20.630Z",
+      "status": "HIGHER_HOP_GAP",
+      "totalRows": 21,
+      "somClusterCoveragePct": 0,
+      "glyphRecordCoveragePct": 0,
+      "qdrantHitCoveragePct": 0,
+      "redisHotKeyCoveragePct": 9.52,
+      "neo4jNodeCoveragePct": 0,
+      "nextSafeAction": "Create a bounded higher-hop backfill that writes somCluster, glyphRecord, qdrantHit, redisHotKey, and neo4jNode from the stable sourceRef -> feature_id -> featureLabel spine."
+    },
+    "postgresMirrors": {
+      "exists": true,
+      "generatedAt": "2026-06-12T13:41:21.395Z",
+      "liveProbe": {
+        "reachable": true,
+        "reason": null,
+        "databaseUrlPresent": true,
+        "normalizedHost": "127.0.0.1",
+        "normalizedPort": "5434"
+      },
+      "summary": {
+        "tableCount": 8,
+        "statusCounts": {
+          "COLUMN_MISMATCH": 2,
+          "LIVE_DB_ALIGNED": 4,
+          "INDEX_MISMATCH": 2
+        },
+        "repairCounts": {
+          "ADD_MANUAL_SQL": 2,
+          "IGNORE_IMPLICIT_INDEX": 4,
+          "ADD_DRIZZLE_MIRROR": 2
+        },
+        "manualOnlyCount": 0,
+        "drizzleOnlyCount": 0,
+        "columnMismatchCount": 2,
+        "indexMismatchCount": 2,
+        "liveAlignedCount": 4,
+        "liveUnavailableCount": 0,
+        "liveMismatchCount": 4
+      }
+    },
+    "agentTraceMaturity": {
+      "exists": true,
+      "generatedAt": "2026-06-12T13:41:35.764Z",
+      "status": "READY_FOR_PLANNER_LEARNING",
+      "completionEstimatePct": 100,
+      "agentTracesTotal": 1134,
+      "selectedConceptCoveragePct": 100,
+      "selectedPacketCoveragePct": 100,
+      "retrievalStrategyCoveragePct": 100,
+      "rewardCoveragePct": 100,
+      "exportedQlorAExamples": 779
+    },
+    "parentAtlasDocIndex": {
+      "featureRegistry": {
+        "total": 18,
+        "implemented": 9,
+        "partial": 6,
+        "missing": 3,
+        "storageLanes": {
+          "redis-hot + qdrant + postgres": 1,
+          "redis-hot + qdrant": 1,
+          "redis-hot + json artifact": 1,
+          "redis-hot": 1,
+          "redis-hot + postgres + file snapshot": 1,
+          "postgres + redis-hot": 1,
+          "contract-doc + planned registry": 1,
+          "postgres pgvector": 1,
+          "evaluation-only": 1,
+          "reference-only": 1,
+          "postgres + docs bootstrap": 1,
+          "qdrant + pgvector + redis-hot": 1,
+          "redis exact + redis semantic + bifrost prefix + ace packet": 1,
+          "postgres-first": 1,
+          "redis-hot + ace packet cache": 1,
+          "postgres + qdrant + redis-hot": 1,
+          "redis + qdrant + docs": 1,
+          "duckdb analytical only": 1
+        }
+      },
+      "bootstrapRegistry": {
+        "total": 18,
+        "implemented": 9,
+        "partial": 6,
+        "missing": 3,
+        "storageLanes": {
+          "redis-hot + qdrant + postgres": 1,
+          "redis-hot + qdrant": 1,
+          "redis-hot + json artifact": 1,
+          "redis-hot": 1,
+          "redis-hot + postgres + file snapshot": 1,
+          "postgres + redis-hot": 1,
+          "contract-doc + planned registry": 1,
+          "postgres pgvector": 1,
+          "evaluation-only": 1,
+          "reference-only": 1,
+          "postgres + docs bootstrap": 1,
+          "qdrant + pgvector + redis-hot": 1,
+          "redis exact + redis semantic + bifrost prefix + ace packet": 1,
+          "postgres-first": 1,
+          "redis-hot + ace packet cache": 1,
+          "postgres + qdrant + redis-hot": 1,
+          "redis + qdrant + docs": 1,
+          "duckdb analytical only": 1
+        }
+      },
+      "dirtyTree": null,
+      "archivePlan": null,
+      "crosswalk": null,
+      "packetSurfaceAudit": {
+        "totalFiles": 3,
+        "invalidFiles": 0,
+        "invalidRows": 0,
+        "validRows": 0,
+        "categories": {
+          "runtime-packet": 3
+        }
+      },
+      "hiddenPacketPathmap": {
+        "packetFiles": 0,
+        "invalidRows": 0,
+        "sourceRefRows": 6765,
+        "featureIdRows": 6765,
+        "parentAtlasDocJoins": 0
+      },
+      "hiddenPacketPathmapDuckdb": {
+        "inputRows": 6353,
+        "normalizedRows": 6353,
+        "duckdbRows": 6353,
+        "joinedRows": 6353,
+        "stableIdJoins": 6353,
+        "sourceRefJoins": 6353,
+        "todoSourceRefRows": 135
+      },
+      "featureLineage": {
+        "totalRows": 100,
+        "totalArtifacts": 100,
+        "sourceRefRows": 100,
+        "featureIdRows": 100,
+        "featureLabelRows": 100,
+        "parentAtlasDocRows": 0,
+        "somRows": 0,
+        "qdrantRows": 0,
+        "redisRows": 0,
+        "neo4jRows": 0,
+        "averageLineageScorePct": 36.36,
+        "maxLineageScorePct": 36.36,
+        "sampleCount": 100,
+        "sampleMode": true,
+        "sampleLimit": 100,
+        "maxFiles": 25,
+        "warning": "bounded sample; coverage is directional, not exhaustive"
+      },
+      "temporalTaskRegistry": {
+        "findingCount": 0,
+        "recommendationCount": 286,
+        "taskCount": 17,
+        "openTaskCount": 8,
+        "archivedTaskCount": 0,
+        "historyPacketsCount": 27,
+        "promotedRecommendations": 17,
+        "runId": "2026-06-12T13:00:13.166Z"
+      },
+      "runtimePacketDensity": {
+        "totalAnalyzed": 33,
+        "lowDensityCount": 0,
+        "optimalCount": 32,
+        "emptyPointersCount": 1,
+        "avgHydrationRatio": "88.38%"
+      },
+      "postgresContractMirrors": {
+        "tableCount": 8,
+        "statusCounts": {
+          "COLUMN_MISMATCH": 2,
+          "LIVE_DB_ALIGNED": 4,
+          "INDEX_MISMATCH": 2
+        },
+        "columnMismatchCount": 2,
+        "indexMismatchCount": 2,
+        "liveAlignedCount": 4,
+        "liveUnavailableCount": 0
+      },
+      "contextualTreeReadiness": null,
+      "liveServiceEnv": null,
+      "workstationTodoLines": 164,
+      "packetSurfaces": {
+        "total": 3,
+        "byRoot": {
+          ".tmp": 3
+        },
+        "sampleFiles": [
+          ".tmp/feature_labels.jsonl",
+          ".tmp/kanban_tasks.jsonl",
+          ".tmp/missing_feature_todos.jsonl"
+        ],
+        "files": [
+          {
+            "path": ".tmp/feature_labels.jsonl",
+            "ext": ".jsonl",
+            "size": 0,
+            "mtime": "2026-06-02T01:13:19.468Z",
+            "lane": "runtime-packet"
+          },
+          {
+            "path": ".tmp/kanban_tasks.jsonl",
+            "ext": ".jsonl",
+            "size": 0,
+            "mtime": "2026-06-02T01:13:19.468Z",
+            "lane": "runtime-packet"
+          },
+          {
+            "path": ".tmp/missing_feature_todos.jsonl",
+            "ext": ".jsonl",
+            "size": 0,
+            "mtime": "2026-06-02T01:13:19.470Z",
+            "lane": "runtime-packet"
+          }
+        ]
+      },
+      "termScan": [
+        {
+          "key": "sourceRef_pathmap",
+          "label": "sourceRef / pathmap spine",
+          "terms": [
+            "sourceRef",
+            "pathmap"
+          ],
+          "totalFiles": 95,
+          "termMatches": [
+            {
+              "term": "sourceRef",
+              "count": 91
+            },
+            {
+              "term": "pathmap",
+              "count": 28
+            }
+          ],
+          "sampleFiles": [
+            "./DOC-STATUS-AND-CONSOLIDATION-2026-05-20.md",
+            "./FEATURE-GOAL-LINE-CONSOLIDATION-2026-05-22.md",
+            "./package.json",
+            "./next_steps/DAILY-TODO-2026-05-20-phased-execution.md",
+            "./docs/architecture/llama-server-summary-cache-lane.md",
+            "./MASTER-FEATURE-TODO-2026-05-20.md",
+            "./docs/atlas/feature-registry.json",
+            "./reports/parent-atlas-open-lanes-todo.md",
+            "./scripts/feature-gap-registry-bootstrap.mjs",
+            "./scripts/packets/score-superseded-originals.mjs",
+            "./reports/parent-atlas-workstation-todo.md",
+            "./scripts/atlas/audit-runtime-coverage.mjs"
+          ]
+        },
+        {
+          "key": "parent_atlas",
+          "label": "parent atlas / packet flow",
+          "terms": [
+            "parent atlas",
+            "parent-atlas",
+            "packet flow"
+          ],
+          "totalFiles": 60,
+          "termMatches": [
+            {
+              "term": "parent atlas",
+              "count": 21
+            },
+            {
+              "term": "parent-atlas",
+              "count": 56
+            },
+            {
+              "term": "packet flow",
+              "count": 11
+            }
+          ],
+          "sampleFiles": [
+            "./docs/atlas/parent-atlas-table-of-contents.md",
+            "./MASTER-FEATURE-TODO-2026-05-20.md",
+            "./docs/reports/feature-lineage-report.md",
+            "./reports/parent-atlas-workstation-todo.md",
+            "./reports/parent-atlas-open-lanes-todo.md",
+            "./docs/reports/parent-atlas-doc-indexing-2026-06-01.json",
+            "./docs/reports/parent-atlas-doc-indexing-2026-06-01.md",
+            "./scripts/atlas/audit-feature-lineage.mjs",
+            "./docs/reports/phase101-parent-atlas-packetize-dry-run.json",
+            "./docs/reports/phase101-parent-atlas-packetize-dry-run.md",
+            "./docs/reports/phase16-runtime-artifact-locator.json",
+            "./docs/reports/phase16-runtime-artifact-locator.md"
+          ]
+        },
+        {
+          "key": "llama_server_summary_cache",
+          "label": "llama-server summary cache / embeddings lane",
+          "terms": [
+            "llama-server",
+            "embeddinggemma",
+            "prompt cache",
+            "KV cache"
+          ],
+          "totalFiles": 63,
+          "termMatches": [
+            {
+              "term": "llama-server",
+              "count": 45
+            },
+            {
+              "term": "embeddinggemma",
+              "count": 30
+            },
+            {
+              "term": "prompt cache",
+              "count": 33
+            },
+            {
+              "term": "KV cache",
+              "count": 20
+            }
+          ],
+          "sampleFiles": [
+            "./CONTEXT-WINDOW-ALIGNMENT-ollama-turboquant-opencode-2026-05-20.md",
+            "./DOC-INDEX-runtime-graphrag-subgraphs-2026-05-19.md",
+            "./FEATURE-GOAL-LINE-CONSOLIDATION-2026-05-22.md",
+            "./docs/architecture/llama-server-summary-cache-lane.md",
+            "./EXECUTION-CHECKLIST-2026-05-19.md",
+            "./docs/atlas/parent-atlas-table-of-contents.md",
+            "./DOC-STATUS-AND-CONSOLIDATION-2026-05-20.md",
+            "./PATCH-CONTEXT-64K-REPO-FILES-2026-05-20.md",
+            "./MASTER-ROADMAP-codebase-runtime-graphrag-2026-05-19.md",
+            "./REPO-CONSOLIDATED-TODOS-feature-labels-clusters-2026-05-19.md",
+            "./reference/REF-runtime-and-validation-2026-05-20.md",
+            "./MASTER-IMPLEMENTATION-LEDGER-runtime-graphrag-subgraphs-2026-05-19.md"
+          ]
+        },
+        {
+          "key": "neo4j_contextual_trees",
+          "label": "Neo4j contextual trees / multi-hop traversal",
+          "terms": [
+            "neo4j",
+            "contextual tree",
+            "multi-hop"
+          ],
+          "totalFiles": 60,
+          "termMatches": [
+            {
+              "term": "neo4j",
+              "count": 55
+            },
+            {
+              "term": "contextual tree",
+              "count": 12
+            },
+            {
+              "term": "multi-hop",
+              "count": 21
+            }
+          ],
+          "sampleFiles": [
+            "./CODEBASE-MAP-docker-plugins-api-paths-2026-05-19.md",
+            "./CONTRACT-graph-refresh-manifest-schema-2026-05-19.md",
+            "./docs/reports/concept-evidence-spine-backfill-report.json",
+            "./FEATURE-GOAL-LINE-CONSOLIDATION-2026-05-22.md",
+            "./EXISTING-CODEBASE-MAPPING-AND-SUBGRAPH-VERSIONS-2026-05-19.md",
+            "./JSON-MAPPING-service-mcp-api-paths-2026-05-19.json",
+            "./MASTER-ROADMAP-codebase-runtime-graphrag-2026-05-19.md",
+            "./package.json",
+            "./MASTER-FEATURE-TODO-2026-05-20.md",
+            "./JSON-MAPPING-runtime-retrieval-master-2026-05-19.json",
+            "./JSON-MAPPING-drizzle-postgres-qdrant-summaries-2026-05-19.json",
+            "./docs/reports/feature-lineage-report.md"
+          ]
+        },
+        {
+          "key": "qdrant_semantic_analysis",
+          "label": "Qdrant semantic analysis / clustering",
+          "terms": [
+            "qdrant",
+            "semantic",
+            "cluster"
+          ],
+          "totalFiles": 171,
+          "termMatches": [
+            {
+              "term": "qdrant",
+              "count": 93
+            },
+            {
+              "term": "semantic",
+              "count": 102
+            },
+            {
+              "term": "cluster",
+              "count": 124
+            }
+          ],
+          "sampleFiles": [
+            "./CODEBASE-DIRECTORY-MAP-major-features-and-docs-2026-05-19.md",
+            "./CODEBASE-MAP-docker-plugins-api-paths-2026-05-19.md",
+            "./CONTRACT-codebase-to-glyph-adapter-2026-05-19.md",
+            "./CONTRACT-graph-refresh-manifest-schema-2026-05-19.md",
+            "./DOC-STATUS-AND-CONSOLIDATION-2026-05-20.md",
+            "./FEATURE-GOAL-LINE-CONSOLIDATION-2026-05-22.md",
+            "./GAP-ANALYSIS-vs-next_steps-2026-05-19.md",
+            "./JSON-MAPPING-drizzle-postgres-qdrant-summaries-2026-05-19.json",
+            "./JSON-MAPPING-autoencoder-som-libtorch-engram-2026-05-19.json",
+            "./docs/architecture/llama-server-summary-cache-lane.md",
+            "./docs/atlas/feature-registry.json",
+            "./IMPLEMENTATION-SPEC-mapreduce-duckdb-multihop-2026-05-19.md"
+          ]
+        },
+        {
+          "key": "redis_cache",
+          "label": "Redis / Bitfrost cache lane",
+          "terms": [
+            "redis",
+            "bitfrost",
+            "cache"
+          ],
+          "totalFiles": 167,
+          "termMatches": [
+            {
+              "term": "redis",
+              "count": 86
+            },
+            {
+              "term": "bitfrost",
+              "count": 10
+            },
+            {
+              "term": "cache",
+              "count": 154
+            }
+          ],
+          "sampleFiles": [
+            "./CODEBASE-DIRECTORY-MAP-major-features-and-docs-2026-05-19.md",
+            "./CODEBASE-MAP-docker-plugins-api-paths-2026-05-19.md",
+            "./CONTRACT-graph-refresh-manifest-schema-2026-05-19.md",
+            "./CONTRACT-retrieval-synthesis-config-2026-05-19.md",
+            "./DOC-INDEX-runtime-graphrag-subgraphs-2026-05-19.md",
+            "./JSON-MAPPING-drizzle-postgres-qdrant-summaries-2026-05-19.json",
+            "./JSON-MAPPING-runtime-retrieval-master-2026-05-19.json",
+            "./JSON-MAPPING-feature-labels-hyperparams-search-files-2026-05-19.json",
+            "./JSON-MAPPING-autoencoder-som-libtorch-engram-2026-05-19.json",
+            "./JSON-MAPPING-service-mcp-api-paths-2026-05-19.json",
+            "./MASTER-FEATURE-TODO-2026-05-20.md",
+            "./MASTER-IMPLEMENTATION-LEDGER-runtime-graphrag-subgraphs-2026-05-19.md"
+          ]
+        },
+        {
+          "key": "ae_centroids",
+          "label": "AE centroids / TurboVec / SOM",
+          "terms": [
+            "turbovec",
+            "som",
+            "centroid"
+          ],
+          "totalFiles": 114,
+          "termMatches": [
+            {
+              "term": "turbovec",
+              "count": 53
+            },
+            {
+              "term": "som",
+              "count": 67
+            },
+            {
+              "term": "centroid",
+              "count": 46
+            }
+          ],
+          "sampleFiles": [
+            "./CODEBASE-MAP-docker-plugins-api-paths-2026-05-19.md",
+            "./FEATURE-GOAL-LINE-CONSOLIDATION-2026-05-22.md",
+            "./DOC-STATUS-AND-CONSOLIDATION-2026-05-20.md",
+            "./docs/atlas/feature-registry.json",
+            "./docs/reports/archive-raw-search-dumps-completion-2026-06-01.json",
+            "./docs/reports/archive-raw-search-dumps-completion-2026-06-01.md",
+            "./JSON-MAPPING-search-engine-language-stack-2026-05-19.json",
+            "./JSON-MAPPING-runtime-retrieval-master-2026-05-19.json",
+            "./JSON-MAPPING-autoencoder-som-libtorch-engram-2026-05-19.json",
+            "./docs/reports/concept-evidence-spine-backfill-report.json",
+            "./JSON-MAPPING-feature-labels-hyperparams-search-files-2026-05-19.json",
+            "./MASTER-FEATURE-TODO-2026-05-20.md"
+          ]
+        },
+        {
+          "key": "offline_processing",
+          "label": "offline processing / mapreduce / DuckDB",
+          "terms": [
+            "duckdb",
+            "mapreduce",
+            "offline"
+          ],
+          "totalFiles": 66,
+          "termMatches": [
+            {
+              "term": "duckdb",
+              "count": 45
+            },
+            {
+              "term": "mapreduce",
+              "count": 28
+            },
+            {
+              "term": "offline",
+              "count": 48
+            }
+          ],
+          "sampleFiles": [
+            "./CONTRACT-DuckDB-subgraph-schema-2026-05-19.md",
+            "./DOC-INDEX-runtime-graphrag-subgraphs-2026-05-19.md",
+            "./EXISTING-CODEBASE-MAPPING-AND-SUBGRAPH-VERSIONS-2026-05-19.md",
+            "./duckdb/smoke-duckdb.ps1",
+            "./IMPLEMENTATION-SPEC-mapreduce-duckdb-multihop-2026-05-19.md",
+            "./duckdb/install-duckdb-cli.ps1",
+            "./MASTER-FEATURE-TODO-2026-05-20.md",
+            "./JSON-MAPPING-runtime-retrieval-master-2026-05-19.json",
+            "./docs/atlas/parent-atlas-table-of-contents.md",
+            "./docs/atlas/feature-registry.json",
+            "./docs/reports/concept-evidence-spine-backfill-report.json",
+            "./REPO-CONSOLIDATED-TODOS-feature-labels-clusters-2026-05-19.md"
+          ]
+        }
+      ]
+    },
+    "sourceFiles": {
+      "productionReadiness": {
+        "exists": true,
+        "path": "C:\\Users\\james\\Videos\\deeds-web-app\\docs\\reports\\parent-atlas-production-readiness-report.json"
+      },
+      "temporalTaskRegistry": {
+        "exists": true,
+        "path": "C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\docs\\reports\\temporal-task-registry-report.json"
+      },
+      "runtimeCoverage": {
+        "exists": true,
+        "path": "C:\\Users\\james\\Documents\\Codex\\2026-05-12\\ve-updated-the-local-quantization-notebook\\docs\\reports\\runtime-coverage-audit.json"
+      },
+      "higherHopEnrichment": {
+        "exists": true,
+        "path": "C:\\Users\\james\\Documents\\Codex\\2026-05-12\\ve-updated-the-local-quantization-notebook\\docs\\reports\\higher-hop-enrichment-report.json"
+      },
+      "postgresMirrors": {
+        "exists": true,
+        "path": "C:\\Users\\james\\Documents\\Codex\\2026-05-12\\ve-updated-the-local-quantization-notebook\\docs\\reports\\postgres-contract-mirrors-report.json"
+      },
+      "agentTraceMaturity": {
+        "exists": true,
+        "path": "C:\\Users\\james\\Documents\\Codex\\2026-05-12\\ve-updated-the-local-quantization-notebook\\docs\\reports\\agent-trace-data-maturity-report.json"
+      },
+      "board": {
+        "exists": true,
+        "path": "C:\\Users\\james\\Documents\\Codex\\2026-05-12\\ve-updated-the-local-quantization-notebook\\reports\\parent-atlas-open-lanes-todo.md"
+      },
+      "workstationTodo": {
+        "exists": true,
+        "path": "C:\\Users\\james\\Documents\\Codex\\2026-05-12\\ve-updated-the-local-quantization-notebook\\reports\\parent-atlas-workstation-todo.md"
+      },
+      "parentAtlasDocIndex": {
+        "exists": true,
+        "path": "C:\\Users\\james\\Documents\\Codex\\2026-05-12\\ve-updated-the-local-quantization-notebook\\docs\\reports\\parent-atlas-doc-indexing-2026-06-01.json"
+      }
     }
-  ],
-  "progress": {
-    "taskRegistryCompletionPct": 0,
-    "productionReadinessPct": 100,
-    "memoryExportsCompletionPct": 100
   },
-  "warnings": [
-    "Engram embed is stdio-only; TCP probes to 8792 are not the contract."
-  ],
-  "recommendations": [
-    "Qdrant coverage: 33% (3539 files unembedded)",
-    "SOM cluster coverage: 29% (3744 files unclassified)",
-    "atlas_feature_synthesis has only 12 rows — feature rollups incomplete",
-    "2201 atlas_feature_map rows not joined to parent_atlas_documents",
-    "SOM cluster on atlas_feature_map: 31% (3941 missing)",
-    "route_runtime_packets is empty — hot-path scoring unavailable"
-  ],
-  "nextLane": "Runtime Coverage Repair"
+  "briefing": {
+    "greeting": "Hello James.",
+    "sinceLastWorked": {
+      "tasksOpen": 8,
+      "tasksClosed": 9,
+      "newRecommendations": 17,
+      "productionReadiness": "PASS 66 / WARN 0 / FAIL 0"
+    },
+    "systems": {
+      "postgres": "healthy",
+      "redis": "healthy",
+      "qdrant": "healthy",
+      "neo4j": "healthy",
+      "turbovec": "deferred",
+      "ldjson": "96.2%"
+    },
+    "recommendations": [
+      "Seed Neo4j USED_CONCEPT edges from bounded trace evidence.",
+      "Repair the atlas_feature_map ↔ parent_atlas_documents join.",
+      "Backfill higher-hop enrichment fields before graph expansion.",
+      "Audit or backfill SOM coverage from existing topology.",
+      "Clean up the remaining Postgres/Drizzle column mirror mismatches."
+    ],
+    "nextLane": "Neo4j USED_CONCEPT edges",
+    "notes": {
+      "runtimeCoverageStatus": "USED_CONCEPT_EDGE_GAP",
+      "higherHopStatus": "HIGHER_HOP_GAP",
+      "temporalTaskRegistry": "Historical concept evidence spine backfill"
+    }
+  }
 }
