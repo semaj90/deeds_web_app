@@ -4,6 +4,7 @@ import { z } from 'zod';
 import { multiLaneRetrievalWithRRF, type RRFIntegrationOptions } from '$lib/server/retrieval/rrf-integration.js';
 import { pool } from '$lib/server/db/client.js';
 import { getRedis } from '$lib/server/redis.js';
+import crypto from 'crypto';
 
 const querySchema = z.object({
   query: z.string().min(1).max(4000),
@@ -65,7 +66,7 @@ export const POST: RequestHandler = async (event) => {
     // Log query to Redis for analytics (fire-and-forget)
     const redis = getRedis();
     if (redis) {
-      const queryHash = require('crypto')
+      const queryHash = crypto
         .createHash('sha256')
         .update(query)
         .digest('hex')

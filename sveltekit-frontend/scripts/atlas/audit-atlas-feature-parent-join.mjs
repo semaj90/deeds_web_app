@@ -6,6 +6,7 @@ import { fileURLToPath } from 'node:url';
 import pg from 'pg';
 import { loadAtlasEnv } from './load-atlas-env.mjs';
 import { resolveDatabaseUrl } from '../../../scripts/atlas/connection-config.mjs';
+import { bestSourceRefMatch, normalizeSourceRef } from '../../../scripts/atlas/lib/normalize-source-ref.mjs';
 
 const { Pool } = pg;
 
@@ -14,24 +15,9 @@ const REPO_ROOT = path.resolve(__dirname, '../..');
 const OUT_JSON = path.join(REPO_ROOT, 'docs', 'reports', 'atlas-feature-parent-join-gap.json');
 const OUT_MD = path.join(REPO_ROOT, 'docs', 'reports', 'atlas-feature-parent-join-gap.md');
 
-function normalizeJoinRef(value) {
-  if (value === null || value === undefined) return null;
-  let text = String(value).trim();
-  if (!text) return null;
-  text = text.replace(/\\/g, '/');
-  text = text.replace(/^file:\/+/i, '');
-  text = text.replace(/^[A-Za-z]:\/+/i, '');
-  text = text.replace(/^\.?\//, '');
-  while (text.startsWith('../')) text = text.slice(3);
-  text = text.replace(/^.*?(?:deeds-web-app|sveltekit-frontend)\//i, '');
-  text = text.replace(/\/+/g, '/');
-  text = text.replace(/^\/+/, '');
-  return text.toLowerCase();
-}
-
 function firstPresent(...values) {
   for (const value of values) {
-    const normalized = normalizeJoinRef(value);
+    const normalized = normalizeSourceRef(value);
     if (normalized) return normalized;
   }
   return null;
@@ -98,13 +84,18 @@ async function main() {
 
     const joined = [];
     const gaps = [];
+    const matchReasonCounts = {};
+    const parentKeys = [...parentIndex.keys()];
 
     for (const row of featureMapRows.rows) {
       const candidateKeys = [firstPresent(row.source_ref, row.normalized_path)].filter(Boolean);
-      const matchedKey = candidateKeys.find((key) => parentIndex.has(key)) ?? null;
+      const best = bestSourceRefMatch(row.source_ref ?? row.normalized_path ?? null, parentKeys);
+      const matchedKey = candidateKeys.find((key) => parentIndex.has(key)) ?? (best?.target ?? null);
       const match = matchedKey ? parentIndex.get(matchedKey) : null;
 
       if (match) {
+        const reason = best?.reason ?? (candidateKeys.includes(matchedKey) ? 'normalized' : 'unmatched');
+        matchReasonCounts[reason] = (matchReasonCounts[reason] || 0) + 1;
         joined.push({
           source_ref: row.source_ref ?? null,
           feature_id: row.feature_id ?? null,
@@ -112,6 +103,7 @@ async function main() {
           parent_source_ref: match.source_ref ?? null,
           parent_rel_path: match.rel_path ?? null,
           workspace_id: match.workspace_id ?? null,
+          match_reason: reason,
         });
       } else {
         gaps.push({
@@ -119,6 +111,7 @@ async function main() {
           feature_id: row.feature_id ?? null,
           normalized_path: row.normalized_path ?? null,
           candidate_keys: candidateKeys,
+          match_reason: 'unmatched',
         });
       }
     }
@@ -131,6 +124,7 @@ async function main() {
       joinedRows: joined.length,
       gapRows: gaps.length,
       gapCoveragePct: featureMapRows.rows.length > 0 ? Number(((joined.length / featureMapRows.rows.length) * 100).toFixed(2)) : 0,
+      matchReasonCounts,
       sampleGaps: gaps.slice(0, 50),
       notes: [
         'Read-only join audit.',
@@ -148,6 +142,7 @@ async function main() {
       joinedRows: 0,
       gapRows: 0,
       gapCoveragePct: 0,
+      matchReasonCounts: {},
       sampleGaps: [],
       notes: ['Postgres unavailable or query failed.'],
     };

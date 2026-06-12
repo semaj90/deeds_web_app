@@ -1,80 +1,50 @@
 {
   "workspace_id": "deeds-web-app",
   "version": 1,
-  "updated_at": "2026-06-12T03:01:24.178Z",
-  "total_tasks": 12,
+  "updated_at": "2026-06-12T03:27:01.720Z",
+  "total_tasks": 7,
   "tasks_by_status": {
     "todo": [
       {
-        "id": "task_5de39ae5",
-        "title": ".opencode/embeddings/0df8ccbfa45eb9af.json — 110 unresolved imports",
-        "feature_id": "platform",
+        "id": "task_f4c003c3",
+        "title": "claude-mem/src/ui/viewer/App.tsx — 5 unresolved imports",
+        "feature_id": "ai-retrieval",
         "priority": "high"
       },
       {
-        "id": "task_b65b6b99",
-        "title": ".opencode/embeddings/10f58deb9e9aa745.json — 13 unresolved imports",
-        "feature_id": "platform",
-        "priority": "high"
-      },
-      {
-        "id": "task_ce62f338",
-        "title": ".opencode/embeddings/08b904f5e6799cd8.json — 11 unresolved imports",
-        "feature_id": "platform",
-        "priority": "high"
-      },
-      {
-        "id": "task_9cda7ae1",
-        "title": ".opencode/embeddings/0386cc07e33a0e7a.json — 5 unresolved imports",
-        "feature_id": "platform",
-        "priority": "high"
-      },
-      {
-        "id": "task_fa2b0c59",
-        "title": ".opencode/embeddings/087a761800ae6a56.json — 5 unresolved imports",
-        "feature_id": "platform",
-        "priority": "high"
-      },
-      {
-        "id": "task_fd687419",
-        "title": ".opencode/embeddings/1131d9aedada5fec.json — 5 unresolved imports",
-        "feature_id": "platform",
-        "priority": "high"
-      },
-      {
-        "id": "task_bdf763da",
-        "title": "3 files unclassified with >10 imports",
-        "feature_id": "ai-inference",
+        "id": "task_cdf3b195",
+        "title": "4 files unclassified with >10 imports",
+        "feature_id": "ai-retrieval",
         "priority": "medium"
       },
       {
-        "id": "task_87139808",
+        "id": "task_1a6426f7",
+        "title": "Feature not implemented: Priority 1: Evidence Upload UI (1 hour)",
+        "feature_id": "ai-retrieval",
+        "priority": "low"
+      },
+      {
+        "id": "task_5757fd9d",
         "title": "Feature not implemented: Priority 2: VLM POI Integration (90 min)",
         "feature_id": "platform",
         "priority": "low"
       },
       {
-        "id": "task_c853ac06",
+        "id": "task_48c83507",
         "title": "Feature not implemented: Priority 3: Audit Dashboard Web UI (3-4 hours)",
         "feature_id": "ai-inference",
         "priority": "low"
       },
       {
-        "id": "task_5a5b92cb",
+        "id": "task_3d427f8b",
         "title": "Feature not implemented: Priority 4: Auto-Fix Orchestrator (6-8 hours)",
         "feature_id": "ai-inference",
         "priority": "low"
       },
       {
-        "id": "task_3bf927db",
+        "id": "task_9296148d",
         "title": "Feature not implemented: Phase 3: Post-Synthesis Quality Review (RunID: `stage-2c-500`)",
         "feature_id": "vector-graph",
-        "priority": "low"
-      },
-      {
-        "id": "task_d7053a55",
-        "title": "Feature not implemented: Priority 1: Evidence Upload UI (1 hour)",
-        "feature_id": "ai-retrieval",
         "priority": "low"
       }
     ],
@@ -82,23 +52,23 @@
     "blocked": [],
     "done": []
   },
-  "next_ready_task_id": "task_5de39ae5",
+  "next_ready_task_id": "task_f4c003c3",
   "feature_label_count": 13,
   "statistics": {
     "by_status": {
-      "todo": 12,
+      "todo": 7,
       "doing": 0,
       "blocked": 0,
       "done": 0
     },
     "by_feature": {
-      "platform": 7,
-      "ai-inference": 3,
-      "vector-graph": 1,
-      "ai-retrieval": 1
+      "ai-retrieval": 3,
+      "platform": 1,
+      "ai-inference": 2,
+      "vector-graph": 1
     },
     "by_priority": {
-      "high": 6,
+      "high": 1,
       "medium": 1,
       "low": 5,
       "critical": 0

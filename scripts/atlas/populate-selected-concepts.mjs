@@ -3,9 +3,11 @@
  * populate-selected-concepts.mjs
  *
  * Pipeline:
- * 1. Read agent_traces from Postgres
- * 2. Sync selected_concepts from retrieved_packets if missing
- * 3. Seed Trace nodes and USED_CONCEPT relationships in Neo4j
+ * 1. Read agent_traces from Postgres.
+ * 2. Extract and sync selected_concepts from retrieved_packets in Postgres.
+ * 3. Seed Trace nodes and USED_CONCEPT relationships in Neo4j.
+ * 4. Build a canonical mapping from concept_id to source_refs using concept_records, card registry, & parent_atlas_records.
+ * 5. Backfill the concept_ids column in the atlas_packets table based on source_ref and feature_id matches.
  *
  * Usage:
  *   node scripts/atlas/populate-selected-concepts.mjs --dry-run
@@ -44,9 +46,27 @@ const NEO4J_URI  = process.env.NEO4J_URI || process.env.NEO4J_URL || 'bolt://127
 const NEO4J_USER = process.env.NEO4J_USER || 'neo4j';
 const NEO4J_PASS = process.env.NEO4J_PASSWORD || process.env.NEO4J_PASS || 'neo4j123';
 
+function canonicalPath(input) {
+  if (!input || typeof input !== 'string') return '';
+  let s = input
+    .replace(/\\/g, '/')
+    .replace(/^file:\/+/i, '')
+    .replace(/^\/?c:\//i, '')
+    .replace(/^Users\/james\/Videos\/deeds-web-app\//i, '')
+    .replace(/^deeds-web-app\//i, '')
+    .replace(/^\.?\//, '')
+    .toLowerCase();
+  
+  if (s.startsWith('src/')) {
+    s = 'sveltekit-frontend/' + s;
+  }
+  return s;
+}
+
 async function main() {
-  console.log('══ Populate Selected Concepts (Trace Seeding) ════════════════');
+  console.log('══ Populate Selected Concepts & Backfill Packets ════════════════');
   console.log(`  Mode: ${APPLY ? 'APPLY' : 'DRY-RUN'}`);
+  console.log(`  Database: ${DATABASE_URL.replace(/:[^:@/]+@/, ':****@')}`);
   console.log(`  Neo4j: ${NEO4J_URI}`);
 
   const pool = new pg.Pool({ connectionString: DATABASE_URL, max: 3 });
@@ -54,17 +74,21 @@ async function main() {
   const session = driver.session({ database: 'neo4j' });
 
   try {
-    // 1. Fetch traces from Postgres
+    // ----------------------------------------------------
+    // Step 1: Trace Concepts Sync & Neo4j USED_CONCEPT Seeding
+    // ----------------------------------------------------
+    console.log('\n--- Step 1: Seeding Neo4j USED_CONCEPT edges from traces ---');
     const { rows: traces } = await pool.query(`
       SELECT trace_id, task_id, prompt, retrieved_packets, selected_concepts, outcome, score
       FROM agent_traces
       ORDER BY created_at ASC
     `);
 
-    console.log(`\n  Loaded ${traces.length} traces from Postgres.`);
+    console.log(`  Loaded ${traces.length} traces from Postgres.`);
 
     let traceCount = 0;
     let edgeCount = 0;
+    const activeConceptNames = new Set();
 
     for (const trace of traces) {
       const traceId = trace.trace_id;
@@ -73,10 +97,9 @@ async function main() {
       const outcome = trace.outcome;
       const score = parseFloat(trace.score) || 1.0;
       
-      // Determine selected concepts
       let concepts = Array.isArray(trace.selected_concepts) ? trace.selected_concepts : [];
       
-      // If empty, derive from retrieved_packets
+      // Derive from retrieved_packets if selected_concepts is empty
       if (concepts.length === 0 && Array.isArray(trace.retrieved_packets)) {
         const derived = [];
         for (const p of trace.retrieved_packets) {
@@ -84,7 +107,6 @@ async function main() {
             if (p.startsWith('concept:')) {
               derived.push(p.replace(/^concept:/, ''));
             } else if (p.startsWith('packet:')) {
-              // Extract potential concept name from packet name (e.g. packet:agent_intelligence:13 -> agent_intelligence)
               const parts = p.split(':');
               if (parts.length >= 2) {
                 derived.push(parts[1]);
@@ -102,12 +124,15 @@ async function main() {
         }
       }
 
+      for (const c of concepts) {
+        activeConceptNames.add(c);
+      }
+
       if (concepts.length === 0) continue;
 
       traceCount++;
 
       if (APPLY) {
-        // Write to Neo4j
         // A. Merge Trace node
         await session.run(`
           MERGE (t:Trace { id: $traceId })
@@ -130,22 +155,162 @@ async function main() {
       } else {
         edgeCount += concepts.length;
       }
+    }
 
-      if (traceCount % 100 === 0) {
-        process.stdout.write(`\r  Processed: ${traceCount}/${traces.length} traces`);
+    console.log(`  Trace nodes: ${APPLY ? 'Synced' : 'Dry-run preview'} (${traceCount})`);
+    console.log(`  USED_CONCEPT edges: ${APPLY ? 'Created' : 'Dry-run preview'} (${edgeCount})`);
+    console.log(`  Unique concepts extracted from traces: ${activeConceptNames.size} (${[...activeConceptNames].join(', ')})`);
+
+    if (APPLY) {
+      const verifyResult = await session.run(`
+        MATCH ()-[r:USED_CONCEPT]->() RETURN count(r) as usedConceptEdges
+      `);
+      const verifiedCount = verifyResult.records[0]?.get('usedConceptEdges')?.toNumber() ?? 0;
+      console.log(`  Neo4j verified USED_CONCEPT edges in DB: ${verifiedCount}`);
+    }
+
+    // ----------------------------------------------------
+    // Step 2: Build concept-to-file mapping
+    // ----------------------------------------------------
+    console.log('\n--- Step 2: Building concept-to-file mapping ---');
+    
+    // Load card IDs to source_refs mapping from neschrom97-card-registry.json
+    const cardIdToSourceRef = new Map();
+    const registryPath = path.join(ROOT, 'docs/reports/neschrom97-card-registry.json');
+    if (fs.existsSync(registryPath)) {
+      try {
+        console.log(`  Loading card registry from ${registryPath}...`);
+        const registryData = JSON.parse(fs.readFileSync(registryPath, 'utf8'));
+        const mappings = registryData.mappings || [];
+        for (const item of mappings) {
+          if (item.card_id && item.source_ref) {
+            cardIdToSourceRef.set(item.card_id, item.source_ref);
+          }
+        }
+        console.log(`  Loaded ${cardIdToSourceRef.size} card path references from registry.`);
+      } catch (e) {
+        console.warn('  Failed to load card registry:', e.message);
       }
     }
 
-    console.log(`\r  Processed: ${traceCount}/${traces.length} traces successfully.`);
-    console.log(`  Trace nodes: ${APPLY ? 'Synced' : 'Dry-run preview'} (${traceCount})`);
-    console.log(`  USED_CONCEPT edges: ${APPLY ? 'Created' : 'Dry-run preview'} (${edgeCount})`);
+    if (cardIdToSourceRef.size === 0) {
+      // Fallback to parent records if registry load failed
+      const { rows: parentRecords } = await pool.query(`
+        SELECT id, source_ref, payload
+        FROM parent_atlas_records
+        WHERE (source_ref IS NOT NULL AND source_ref != '') OR (payload->>'source_ref' IS NOT NULL)
+      `);
+      for (const r of parentRecords) {
+        let ref = r.source_ref || r.payload?.source_ref || '';
+        if (ref) {
+          cardIdToSourceRef.set(r.id, ref);
+        }
+      }
+      console.log(`  Loaded ${cardIdToSourceRef.size} parent record path references (fallback).`);
+    }
 
-    // Verification check in Neo4j
-    const verifyResult = await session.run(`
-      MATCH ()-[r:USED_CONCEPT]->() RETURN count(r) as usedConceptEdges
+    // Fetch all concepts
+    const { rows: conceptRecs } = await pool.query(`
+      SELECT concept_id, evidence_cards, feature_ids FROM concept_records
     `);
-    const verifiedCount = verifyResult.records[0]?.get('usedConceptEdges')?.toNumber() ?? 0;
-    console.log(`\n  Neo4j verified USED_CONCEPT edges in DB: ${verifiedCount}`);
+
+    // Map: canonicalPath -> Set of concept_ids
+    const pathToConcepts = new Map();
+    // Map: featureId -> Set of concept_ids
+    const featureToConcepts = new Map();
+
+    for (const crec of conceptRecs) {
+      const cid = crec.concept_id;
+      
+      // A. Map via evidence cards (source files)
+      const cards = Array.isArray(crec.evidence_cards) ? crec.evidence_cards : [];
+      for (const cardId of cards) {
+        const rawPath = cardIdToSourceRef.get(cardId);
+        if (rawPath) {
+          const canon = canonicalPath(rawPath);
+          if (!pathToConcepts.has(canon)) {
+            pathToConcepts.set(canon, new Set());
+          }
+          pathToConcepts.get(canon).add(cid);
+        }
+      }
+
+      // B. Map via feature IDs
+      const fids = Array.isArray(crec.feature_ids) ? crec.feature_ids : [];
+      for (const fid of fids) {
+        if (fid) {
+          if (!featureToConcepts.has(fid)) {
+            featureToConcepts.set(fid, new Set());
+          }
+          featureToConcepts.get(fid).add(cid);
+        }
+      }
+    }
+
+    console.log(`  Mapped ${pathToConcepts.size} paths and ${featureToConcepts.size} features to concepts.`);
+
+    // ----------------------------------------------------
+    // Step 3: Backfill atlas_packets concept_ids
+    // ----------------------------------------------------
+    console.log('\n--- Step 3: Backfilling concept_ids in atlas_packets ---');
+    
+    const { rows: packets } = await pool.query(`
+      SELECT packet_id, source_ref, feature_id, concept_ids FROM atlas_packets
+    `);
+
+    console.log(`  Scanning ${packets.length} packets in atlas_packets...`);
+
+    let updatedCount = 0;
+    
+    for (const pkt of packets) {
+      const pid = pkt.packet_id;
+      const rawRef = pkt.source_ref;
+      const fid = pkt.feature_id;
+      
+      const pktConcepts = new Set();
+      
+      // 1. Check path matches
+      if (rawRef) {
+        const canon = canonicalPath(rawRef);
+        const matched = pathToConcepts.get(canon);
+        if (matched) {
+          for (const c of matched) pktConcepts.add(c);
+        }
+      }
+
+      // 2. Check feature matches
+      if (fid) {
+        const matched = featureToConcepts.get(fid);
+        if (matched) {
+          for (const c of matched) pktConcepts.add(c);
+        }
+      }
+
+      // If we found concepts, update the row if it changed
+      if (pktConcepts.size > 0) {
+        const conceptIdsArray = [...pktConcepts].sort();
+        const existing = Array.isArray(pkt.concept_ids) ? pkt.concept_ids.sort() : [];
+        
+        const changed = JSON.stringify(conceptIdsArray) !== JSON.stringify(existing);
+        
+        if (changed) {
+          updatedCount++;
+          if (APPLY) {
+            await pool.query(
+              'UPDATE atlas_packets SET concept_ids = $1::text[] WHERE packet_id = $2',
+              [conceptIdsArray, pid]
+            );
+          }
+        }
+      }
+    }
+
+    console.log(`  Packets requiring backfill/update: ${updatedCount}`);
+    if (APPLY) {
+      console.log(`  Successfully updated ${updatedCount} packets.`);
+    } else {
+      console.log('  Dry-run: no packets updated in database.');
+    }
 
   } catch (err) {
     console.error('Error during selected concepts population:', err);
@@ -153,7 +318,7 @@ async function main() {
     await session.close();
     await driver.close();
     await pool.end();
-    console.log('\n  Done.\n');
+    console.log('\n══ Process Finished ════════════════════════════════\n');
   }
 }
 

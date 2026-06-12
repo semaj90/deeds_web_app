@@ -549,6 +549,36 @@ export function setupToolHandlers() {
         },
       },
       {
+        name: 'atlas.packet_search',
+        description:
+          'Query the canonical atlas_packets table by source_ref path (variants tried automatically), ' +
+          'feature_id, concept_id, or free-text summary. Returns packet_id, source_ref, feature_id, ' +
+          'concept_ids, summary, reward_prior. Use before querying Qdrant to find which packets map to a file.',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            source_ref: { type: 'string', description: 'File path in any form — canonicalized automatically' },
+            feature_id: { type: 'string', description: 'Filter by exact feature_id' },
+            concept_id: { type: 'string', description: 'Filter to packets whose concept_ids contains this' },
+            summary_query: { type: 'string', description: 'Full-text search against packet summaries' },
+            limit: { type: 'number', description: 'Max results (default 20, max 50)' },
+          },
+        },
+      },
+      {
+        name: 'atlas.coverage',
+        description:
+          'Phase 3I verification gate: reports coverage metrics for atlas_packets. ' +
+          'Returns source_ref%, feature_id%, summary%, embedding% coverage and duplicate sha256 count. ' +
+          'Gate: source_ref ≥ 90% required before Phase 4A RRF ranking can start.',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            verbose: { type: 'boolean', description: 'Include per-artifact_id breakdown' },
+          },
+        },
+      },
+      {
         name: 'LLMS.md',
         description:
           'Resolve the nearest applicable LLMS.md instructions for a file or directory. Prefers Redis-rendered mirrors and falls back to on-disk LLMS.md walk-up.',
@@ -2057,6 +2087,47 @@ export function setupToolHandlers() {
               text: JSON.stringify({ error: 'Could not load startup briefing. Run npm run agent:hello first.' })
             }]
           };
+        }
+      }
+
+      case 'atlas.packet_search': {
+        // Proxy to TRACE MCP server which has direct pg.Pool access
+        const { source_ref, feature_id, concept_id, summary_query, limit } =
+          args as { source_ref?: string; feature_id?: string; concept_id?: string; summary_query?: string; limit?: number };
+        try {
+          const res = await fetch('http://127.0.0.1:8788/mcp', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              jsonrpc: '2.0', id: 1, method: 'tools/call',
+              params: { name: 'atlas.packet_search', arguments: { source_ref, feature_id, concept_id, summary_query, limit } },
+            }),
+            signal: AbortSignal.timeout(8000),
+          });
+          const data = await res.json() as { result?: { content?: unknown[] } };
+          return { content: data.result?.content ?? [{ type: 'text', text: JSON.stringify({ error: 'No content from TRACE' }) }] };
+        } catch (err) {
+          return { content: [{ type: 'text', text: JSON.stringify({ error: String(err), hint: 'Is TRACE MCP server running on :8788?' }) }] };
+        }
+      }
+
+      case 'atlas.coverage': {
+        // Proxy to TRACE MCP server for Phase 3I gate check
+        const { verbose } = args as { verbose?: boolean };
+        try {
+          const res = await fetch('http://127.0.0.1:8788/mcp', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              jsonrpc: '2.0', id: 1, method: 'tools/call',
+              params: { name: 'atlas.coverage', arguments: { verbose } },
+            }),
+            signal: AbortSignal.timeout(8000),
+          });
+          const data = await res.json() as { result?: { content?: unknown[] } };
+          return { content: data.result?.content ?? [{ type: 'text', text: JSON.stringify({ error: 'No content from TRACE' }) }] };
+        } catch (err) {
+          return { content: [{ type: 'text', text: JSON.stringify({ error: String(err), hint: 'Is TRACE MCP server running on :8788?' }) }] };
         }
       }
 

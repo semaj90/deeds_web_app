@@ -1,6 +1,6 @@
 {
   "schema": "parent_atlas_production_readiness.v1",
-  "generatedAt": "2026-06-12T02:32:28.085Z",
+  "generatedAt": "2026-06-12T03:58:54.004Z",
   "readOnly": true,
   "sections": {
     "summary-batch": [
@@ -529,22 +529,14 @@
         "message": "rg -uuu found 127 NDJSON files",
         "details": {
           "sample": [
-            "neschrom97\\packets\\cards.ndjson",
+            ".opencode\\gemma4_candidates.ndjson",
             ".opencode\\recommendations\\tasks.ndjson",
             ".opencode\\recommendations\\tasks-with-improved-titles.ndjson",
             ".opencode\\recommendations\\agentic-fix-queue.ndjson",
             ".opencode\\quarantine\\invalid-cards.ndjson",
             ".opencode\\outcome-ledger.ndjson",
             ".opencode\\outcome-ledger-with-cardIds.ndjson",
-            "docs\\packets\\session-features.ndjson",
-            "docs\\packets\\rg-knowledge-packets.ndjson",
-            "docs\\ai-os\\agentic-progress-log.ndjson",
-            "memory\\exports\\reports.ndjson",
-            "scripts\\atlas\\out\\tool-usage-edges.ndjson",
-            "scripts\\atlas\\out\\synthetic-traces.ndjson",
-            "scripts\\atlas\\out\\db-usage-edges.ndjson",
-            "scripts\\atlas\\out\\calls-edges-2026-05-29.ndjson",
-            "scripts\\atlas\\out\\cache-usage-edges.ndjson",
+            ".opencode\\fixes\\fixes.ndjson",
             "tmp\\llm-wiki-chunks\\_combined.ndjson",
             "tmp\\llm-wiki-chunks\\tokenization.ndjson",
             "tmp\\llm-wiki-chunks\\tokenization-rg.ndjson",
@@ -553,7 +545,15 @@
             "tmp\\llm-wiki-chunks\\retrieval-augmented-generation.ndjson",
             "tmp\\llm-wiki-chunks\\retrieval-augmented-generation-rg.ndjson",
             "tmp\\llm-wiki-chunks\\quantization.ndjson",
-            "tmp\\llm-wiki-chunks\\quantization-rg.ndjson"
+            "tmp\\llm-wiki-chunks\\quantization-rg.ndjson",
+            "tmp\\llm-wiki-chunks\\kv-cache.ndjson",
+            "tmp\\llm-wiki-chunks\\kv-cache-rg.ndjson",
+            "tmp\\llm-wiki-chunks\\graph-rag.ndjson",
+            "tmp\\llm-wiki-chunks\\graph-rag-rg.ndjson",
+            "tmp\\llm-wiki-chunks\\fine-tuning.ndjson",
+            "tmp\\llm-wiki-chunks\\fine-tuning-rg.ndjson",
+            "tmp\\llm-wiki-chunks\\embedding-vectors.ndjson",
+            "tmp\\llm-wiki-chunks\\embedding-vectors-rg.ndjson"
           ]
         }
       }
@@ -1262,22 +1262,14 @@
       "message": "rg -uuu found 127 NDJSON files",
       "details": {
         "sample": [
-          "neschrom97\\packets\\cards.ndjson",
+          ".opencode\\gemma4_candidates.ndjson",
           ".opencode\\recommendations\\tasks.ndjson",
           ".opencode\\recommendations\\tasks-with-improved-titles.ndjson",
           ".opencode\\recommendations\\agentic-fix-queue.ndjson",
           ".opencode\\quarantine\\invalid-cards.ndjson",
           ".opencode\\outcome-ledger.ndjson",
           ".opencode\\outcome-ledger-with-cardIds.ndjson",
-          "docs\\packets\\session-features.ndjson",
-          "docs\\packets\\rg-knowledge-packets.ndjson",
-          "docs\\ai-os\\agentic-progress-log.ndjson",
-          "memory\\exports\\reports.ndjson",
-          "scripts\\atlas\\out\\tool-usage-edges.ndjson",
-          "scripts\\atlas\\out\\synthetic-traces.ndjson",
-          "scripts\\atlas\\out\\db-usage-edges.ndjson",
-          "scripts\\atlas\\out\\calls-edges-2026-05-29.ndjson",
-          "scripts\\atlas\\out\\cache-usage-edges.ndjson",
+          ".opencode\\fixes\\fixes.ndjson",
           "tmp\\llm-wiki-chunks\\_combined.ndjson",
           "tmp\\llm-wiki-chunks\\tokenization.ndjson",
           "tmp\\llm-wiki-chunks\\tokenization-rg.ndjson",
@@ -1286,7 +1278,15 @@
           "tmp\\llm-wiki-chunks\\retrieval-augmented-generation.ndjson",
           "tmp\\llm-wiki-chunks\\retrieval-augmented-generation-rg.ndjson",
           "tmp\\llm-wiki-chunks\\quantization.ndjson",
-          "tmp\\llm-wiki-chunks\\quantization-rg.ndjson"
+          "tmp\\llm-wiki-chunks\\quantization-rg.ndjson",
+          "tmp\\llm-wiki-chunks\\kv-cache.ndjson",
+          "tmp\\llm-wiki-chunks\\kv-cache-rg.ndjson",
+          "tmp\\llm-wiki-chunks\\graph-rag.ndjson",
+          "tmp\\llm-wiki-chunks\\graph-rag-rg.ndjson",
+          "tmp\\llm-wiki-chunks\\fine-tuning.ndjson",
+          "tmp\\llm-wiki-chunks\\fine-tuning-rg.ndjson",
+          "tmp\\llm-wiki-chunks\\embedding-vectors.ndjson",
+          "tmp\\llm-wiki-chunks\\embedding-vectors-rg.ndjson"
         ]
       }
     },
@@ -1496,10 +1496,10 @@
   "neo4j": {
     "available": true,
     "uri": "bolt://127.0.0.1:7687",
-    "totalNodes": 173294,
+    "totalNodes": 174428,
     "codebaseFiles": 31551,
     "parentAtlasFeatures": 1701,
-    "totalRelationships": 606548,
+    "totalRelationships": 607682,
     "belongsToFeature": 10506,
     "similarTopology": 170809
   },
@@ -1626,22 +1626,14 @@
     "status": "pass",
     "total": 127,
     "sample": [
-      "neschrom97\\packets\\cards.ndjson",
+      ".opencode\\gemma4_candidates.ndjson",
       ".opencode\\recommendations\\tasks.ndjson",
       ".opencode\\recommendations\\tasks-with-improved-titles.ndjson",
       ".opencode\\recommendations\\agentic-fix-queue.ndjson",
       ".opencode\\quarantine\\invalid-cards.ndjson",
       ".opencode\\outcome-ledger.ndjson",
       ".opencode\\outcome-ledger-with-cardIds.ndjson",
-      "docs\\packets\\session-features.ndjson",
-      "docs\\packets\\rg-knowledge-packets.ndjson",
-      "docs\\ai-os\\agentic-progress-log.ndjson",
-      "memory\\exports\\reports.ndjson",
-      "scripts\\atlas\\out\\tool-usage-edges.ndjson",
-      "scripts\\atlas\\out\\synthetic-traces.ndjson",
-      "scripts\\atlas\\out\\db-usage-edges.ndjson",
-      "scripts\\atlas\\out\\calls-edges-2026-05-29.ndjson",
-      "scripts\\atlas\\out\\cache-usage-edges.ndjson",
+      ".opencode\\fixes\\fixes.ndjson",
       "tmp\\llm-wiki-chunks\\_combined.ndjson",
       "tmp\\llm-wiki-chunks\\tokenization.ndjson",
       "tmp\\llm-wiki-chunks\\tokenization-rg.ndjson",
@@ -1650,7 +1642,15 @@
       "tmp\\llm-wiki-chunks\\retrieval-augmented-generation.ndjson",
       "tmp\\llm-wiki-chunks\\retrieval-augmented-generation-rg.ndjson",
       "tmp\\llm-wiki-chunks\\quantization.ndjson",
-      "tmp\\llm-wiki-chunks\\quantization-rg.ndjson"
+      "tmp\\llm-wiki-chunks\\quantization-rg.ndjson",
+      "tmp\\llm-wiki-chunks\\kv-cache.ndjson",
+      "tmp\\llm-wiki-chunks\\kv-cache-rg.ndjson",
+      "tmp\\llm-wiki-chunks\\graph-rag.ndjson",
+      "tmp\\llm-wiki-chunks\\graph-rag-rg.ndjson",
+      "tmp\\llm-wiki-chunks\\fine-tuning.ndjson",
+      "tmp\\llm-wiki-chunks\\fine-tuning-rg.ndjson",
+      "tmp\\llm-wiki-chunks\\embedding-vectors.ndjson",
+      "tmp\\llm-wiki-chunks\\embedding-vectors-rg.ndjson"
     ]
   },
   "summary": {

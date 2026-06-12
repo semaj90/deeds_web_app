@@ -1,10 +1,10 @@
 {
-  "generatedAt": "2026-06-12T03:20:48.745Z",
+  "generatedAt": "2026-06-12T03:26:55.910Z",
   "totalCount": 7,
   "clusters": {
     "UI Components": [
       {
-        "id": "import_error_c9091edc",
+        "id": "import_error_5578769b",
         "type": "developer_recommendation",
         "cluster": "UI Components",
         "title": "claude-mem/src/ui/viewer/App.tsx — 5 unresolved imports",
@@ -20,7 +20,7 @@
     ],
     "Agent Workflow": [
       {
-        "id": "unclassified_76799e87",
+        "id": "unclassified_85af9a66",
         "type": "feature:unclassified",
         "cluster": "Agent Workflow",
         "title": "4 files unclassified with >10 imports",
@@ -39,7 +39,7 @@
     ],
     "Legal Workspace": [
       {
-        "id": "stale_feature_dd4cfd87",
+        "id": "stale_feature_ff3b4feb",
         "type": "missing_feature",
         "cluster": "Legal Workspace",
         "title": "Feature not implemented: Priority 1: Evidence Upload UI (1 hour)",
@@ -55,7 +55,7 @@
     ],
     "General": [
       {
-        "id": "stale_feature_8f0296ff",
+        "id": "stale_feature_bd43ec11",
         "type": "missing_feature",
         "cluster": "General",
         "title": "Feature not implemented: Priority 2: VLM POI Integration (90 min)",
@@ -69,7 +69,7 @@
         "featureStatus": "missing"
       },
       {
-        "id": "stale_feature_c2715954",
+        "id": "stale_feature_cd1d82a6",
         "type": "missing_feature",
         "cluster": "General",
         "title": "Feature not implemented: Priority 3: Audit Dashboard Web UI (3-4 hours)",
@@ -83,7 +83,7 @@
         "featureStatus": "missing"
       },
       {
-        "id": "stale_feature_48fb82c7",
+        "id": "stale_feature_cbbf3471",
         "type": "missing_feature",
         "cluster": "General",
         "title": "Feature not implemented: Priority 4: Auto-Fix Orchestrator (6-8 hours)",
@@ -97,7 +97,7 @@
         "featureStatus": "missing"
       },
       {
-        "id": "stale_feature_caba05d9",
+        "id": "stale_feature_46d6a0ec",
         "type": "missing_feature",
         "cluster": "General",
         "title": "Feature not implemented: Phase 3: Post-Synthesis Quality Review (RunID: `stage-2c-500`)",
@@ -114,7 +114,7 @@
   },
   "top10": [
     {
-      "id": "import_error_c9091edc",
+      "id": "import_error_5578769b",
       "type": "developer_recommendation",
       "cluster": "UI Components",
       "title": "claude-mem/src/ui/viewer/App.tsx — 5 unresolved imports",
@@ -128,7 +128,7 @@
       "featureStatus": "degraded"
     },
     {
-      "id": "unclassified_76799e87",
+      "id": "unclassified_85af9a66",
       "type": "feature:unclassified",
       "cluster": "Agent Workflow",
       "title": "4 files unclassified with >10 imports",
@@ -145,7 +145,7 @@
       "featureStatus": "degraded"
     },
     {
-      "id": "stale_feature_dd4cfd87",
+      "id": "stale_feature_ff3b4feb",
       "type": "missing_feature",
       "cluster": "Legal Workspace",
       "title": "Feature not implemented: Priority 1: Evidence Upload UI (1 hour)",
@@ -159,7 +159,7 @@
       "featureStatus": "missing"
     },
     {
-      "id": "stale_feature_8f0296ff",
+      "id": "stale_feature_bd43ec11",
       "type": "missing_feature",
       "cluster": "General",
       "title": "Feature not implemented: Priority 2: VLM POI Integration (90 min)",
@@ -173,7 +173,7 @@
       "featureStatus": "missing"
     },
     {
-      "id": "stale_feature_c2715954",
+      "id": "stale_feature_cd1d82a6",
       "type": "missing_feature",
       "cluster": "General",
       "title": "Feature not implemented: Priority 3: Audit Dashboard Web UI (3-4 hours)",
@@ -187,7 +187,7 @@
       "featureStatus": "missing"
     },
     {
-      "id": "stale_feature_48fb82c7",
+      "id": "stale_feature_cbbf3471",
       "type": "missing_feature",
       "cluster": "General",
       "title": "Feature not implemented: Priority 4: Auto-Fix Orchestrator (6-8 hours)",
@@ -201,7 +201,7 @@
       "featureStatus": "missing"
     },
     {
-      "id": "stale_feature_caba05d9",
+      "id": "stale_feature_46d6a0ec",
       "type": "missing_feature",
       "cluster": "General",
       "title": "Feature not implemented: Phase 3: Post-Synthesis Quality Review (RunID: `stage-2c-500`)",

@@ -4,7 +4,7 @@
  */
 
 import { initializeLegalSearchSchema, checkLegalSearchHealth } from '../db/legal-db-init.js';
-import { ensureBucket, checkHealth as checkMinioHealth } from '../minio-client.js';
+import { ensureSeaweedBucket as ensureBucket, checkSeaweedHealth as checkMinioHealth } from '../seaweed-client.js';
 
 const LIBRARY_BUCKET = process.env.MINIO_LIBRARY_BUCKET ?? 'legal-library';
 

@@ -85,7 +85,7 @@ export interface TimingTrace {
   bifrostMs: number;
   turboquantMs: number;
   totalMs: number;
-  selectedLane: 'redis' | 'turboquant' | 'bifrost';
+  selectedLane: 'redis' | 'turboquant' | 'bifrost' | 'ldr';
   fallbackReason: string | null;
 }
 
@@ -148,7 +148,7 @@ export interface OpenAIChatCompletionResponse {
     modelName?: string;
     backend?: string;
     kvQuant?: string;
-    selectedLane?: 'redis' | 'turboquant' | 'bifrost';
+    selectedLane?: 'redis' | 'turboquant' | 'bifrost' | 'ldr';
     fallbackReason?: string | null;
     timingTrace?: TimingTrace;
   };

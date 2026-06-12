@@ -24,6 +24,7 @@ import { resolve, dirname } from 'path';
 import { fileURLToPath } from 'url';
 import { execSync } from 'child_process';
 import { createHash } from 'crypto';
+import { bestSourceRefMatch, normalizeSourceRef, sourceRefVariants } from './lib/normalize-source-ref.mjs';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = resolve(__dirname, '..', '..');
@@ -49,6 +50,8 @@ if (!existsSync(MR_PATH)) {
 
 const ACTIONABLE_EXTENSIONS = new Set(['.ts', '.tsx', '.js', '.mjs', '.jsx', '.mts', '.cts', '.svelte']);
 function isActionable(doc) {
+  const filePath = String(doc.filePath || '').replace(/\\/g, '/');
+  if (filePath.startsWith('.opencode/')) return false;
   return ACTIONABLE_EXTENSIONS.has(doc.extension || '');
 }
 
@@ -83,34 +86,11 @@ for await (const line of mrStream) {
 mrStream.close();
 console.log(`Mapreduce entries: ${mrDocs.length}`);
 
-function canonicalPath(input) {
-  if (!input) return "";
-
-  return String(input)
-    .replaceAll("\\", "/")
-    .replace(/^file:\/+/, "")
-    .replace(/^\/?c:\//i, "")
-    .replace(/^Users\/james\/Videos\/deeds-web-app\//i, "")
-    .replace(/^deeds-web-app\//i, "")
-    .replace(/^\.?\//, "")
-    .toLowerCase();
-}
-
-function pathVariants(input) {
-  const p = canonicalPath(input);
-
-  return new Set([
-    p,
-    p.replace(/^sveltekit-frontend\//, ""),
-    `sveltekit-frontend/${p.replace(/^sveltekit-frontend\//, "")}`
-  ]);
-}
-
 // Build path → doc index using canonical variants
 const pathIndex = new Map(); // variant → doc
 const stableIndex = new Map(); // stableKey → doc
 for (const doc of mrDocs) {
-  const variants = pathVariants(doc.filePath);
+  const variants = sourceRefVariants(doc.filePath);
   for (const variant of variants) {
     pathIndex.set(variant, doc);
   }
@@ -184,27 +164,31 @@ console.log('Feature distribution:', JSON.stringify(featureCounts));
 
 let matchedCount = 0;
 const missingSourceRef = [];
+const matchReasonCounts = {};
+const uniqueDocs = [...new Set(pathIndex.values())];
 
 for (const entry of atlasEntries) {
   const raw = entry.sourceRef || (entry.payload && entry.payload.sourceRef) || entry.path || entry.file || '';
   if (!raw) continue;
 
-  const variants = pathVariants(raw);
-  let direct = null;
-  for (const variant of variants) {
-    direct = pathIndex.get(variant);
-    if (direct) break;
-  }
+  const best = bestSourceRefMatch(raw, uniqueDocs.map((doc) => doc.filePath));
+  const direct = best
+    ? uniqueDocs.find((doc) => normalizeSourceRef(doc.filePath) === normalizeSourceRef(best.target)) ?? null
+    : null;
 
   if (direct) {
     matchedCount++;
+    const reason = best?.reason ?? 'unmatched';
+    matchReasonCounts[reason] = (matchReasonCounts[reason] || 0) + 1;
     missingSourceRef.push({
       atlas_id: entry.card_id || entry.id,
       sourceRef: raw,
+      normalized_sourceRef: normalizeSourceRef(raw),
       matched_filePath: direct.filePath.replace(/\\/g, '/'),
       feature: direct.feature,
       stableKey: direct.stableKey,
       importErrorCount: direct.importErrorCount,
+      match_reason: reason,
       som_bmu_row: entry.som_bmu_row || entry.som_row,
       som_bmu_col: entry.som_bmu_col || entry.som_col,
     });
@@ -334,6 +318,7 @@ const report = [
   `- Total files mapped: **${Object.keys(pathMap).length}**`,
   `- Atlas entries matched: **${matchedCount}** / ${atlasEntries.length}`,
   `- DuckDB sourceRef patches: **${missingSourceRef.length}**`,
+  `- Match reasons: **${JSON.stringify(matchReasonCounts)}**`,
   `- Feature TODO queue items: **${todoQueue.length}**`,
   '',
   '## Feature Distribution',

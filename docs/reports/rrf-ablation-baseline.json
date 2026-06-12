@@ -1,0 +1,44 @@
+{
+  "timestamp": "2026-06-12T04:46:33.701Z",
+  "totalPackets": 2009,
+  "queries": 5,
+  "summary": {
+    "bm25_only": {
+      "avgNdcg": 0.492,
+      "avgMrr": 0.622,
+      "avgRecall": 0.567
+    },
+    "concept_only": {
+      "avgNdcg": 0.505,
+      "avgMrr": 0.667,
+      "avgRecall": 0.633
+    },
+    "qdrant_only": {
+      "avgNdcg": 0.492,
+      "avgMrr": 0.622,
+      "avgRecall": 0.567
+    },
+    "rrf_default": {
+      "avgNdcg": 0.505,
+      "avgMrr": 0.667,
+      "avgRecall": 0.633
+    },
+    "rrf_bm25_heavy": {
+      "avgNdcg": 0.433,
+      "avgMrr": 0.533,
+      "avgRecall": 0.567
+    },
+    "rrf_vec_heavy": {
+      "avgNdcg": 0.505,
+      "avgMrr": 0.667,
+      "avgRecall": 0.633
+    }
+  },
+  "gate": {
+    "ndcg_threshold": 0.3,
+    "rrf_default_ndcg": 0.505,
+    "passes": true,
+    "rrf_beats_bm25": true,
+    "rrf_beats_qdrant": true
+  }
+}

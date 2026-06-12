@@ -1,5 +1,5 @@
 import neo4j, { type Driver } from 'neo4j-driver';
-import { ENV } from '$lib/server/env.server.js';
+import { ENV } from './env.server.js';
 
 let cachedDriver: Driver | null = null;
 
@@ -12,6 +12,8 @@ export function getNeo4jDriver(): Driver {
 
     cachedDriver = neo4j.driver(uri, neo4j.auth.basic(user, password), {
         disableLosslessIntegers: true,
+        connectionTimeout: 5000,
+        maxTransactionRetryTime: 0,
     });
 
     return cachedDriver;

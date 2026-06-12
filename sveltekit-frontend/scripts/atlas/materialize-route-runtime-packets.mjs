@@ -6,6 +6,7 @@ import { fileURLToPath } from 'node:url';
 import pg from 'pg';
 import { loadAtlasEnv } from './load-atlas-env.mjs';
 import { resolveDatabaseUrl } from '../../../scripts/atlas/connection-config.mjs';
+import { normalizeSourceRef } from '../../../scripts/atlas/lib/normalize-source-ref.mjs';
 
 const { Pool } = pg;
 
@@ -19,6 +20,18 @@ function tryArray(value) {
   if (Array.isArray(value)) return value.filter(Boolean);
   if (value === null || value === undefined) return [];
   return [value].filter(Boolean);
+}
+
+function normalizeUniqueSourceRefs(values) {
+  const seen = new Set();
+  const normalized = [];
+  for (const value of tryArray(values)) {
+    const ref = normalizeSourceRef(value);
+    if (!ref || seen.has(ref)) continue;
+    seen.add(ref);
+    normalized.push(ref);
+  }
+  return normalized;
 }
 
 function clamp01(value) {
@@ -169,7 +182,7 @@ async function main() {
       const facts = factsByPacket.get(packetUuid) ?? [];
       const edges = edgesByPacket.get(packetUuid) ?? [];
       const refEntries = refsByPacket.get(packetUuid) ?? [];
-      const sourceRefs = refEntries.map((entry) => entry?.source_ref ?? entry?.sourceRef ?? null).filter(Boolean).map(String);
+      const sourceRefs = normalizeUniqueSourceRefs(refEntries.map((entry) => entry?.source_ref ?? entry?.sourceRef ?? null));
       const featureIds = refEntries.map((entry) => entry?.feature_id ?? entry?.featureId ?? null).filter(Boolean).map(String);
       const telemetry = telemetryByPacket.get(packetUuid) ?? null;
       const score = computeScore(telemetry, sourceRefs, featureIds, edges, row.state_key);

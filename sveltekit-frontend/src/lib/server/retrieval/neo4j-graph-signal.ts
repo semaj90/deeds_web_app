@@ -7,7 +7,7 @@
  */
 
 import { z } from 'zod';
-import { getNeo4jDriver } from '$lib/server/neo4j-driver.js';
+import { getNeo4jDriver } from '../neo4j-driver.js';
 
 export interface GraphSignalRequest {
   conceptIds: string[];
@@ -37,6 +37,72 @@ const GraphSignalRequestSchema = z.object({
   relationshipTypes: z.array(z.string()).optional(),
 });
 
+function createEmptyResponse(error?: string): GraphSignalResponse {
+  const empty = [] as GraphSignalResponse;
+  if (error) empty.error = error;
+  return empty;
+}
+
+function toNumberLike(value: unknown, fallback = 0): number {
+  if (value === null || value === undefined) return fallback;
+  if (typeof value === 'number') return Number.isFinite(value) ? value : fallback;
+  const numeric = (value as { toNumber?: () => number }).toNumber?.();
+  if (typeof numeric === 'number' && Number.isFinite(numeric)) return numeric;
+  const parsed = Number(value);
+  return Number.isFinite(parsed) ? parsed : fallback;
+}
+
+function isNeo4jSyntaxError(err: unknown): boolean {
+  const text = err instanceof Error ? `${err.name}: ${err.message} ${(err as { code?: string }).code ?? ''}` : String(err);
+  return /Neo\.ClientError\.Statement\.SyntaxError|SyntaxError|invalid input/i.test(text);
+}
+
+function withTimeout<T>(promise: Promise<T>, timeoutMs: number, label: string): Promise<T> {
+  return new Promise<T>((resolve, reject) => {
+    const timer = setTimeout(() => reject(new Error(`${label} timed out after ${timeoutMs}ms`)), timeoutMs);
+    promise.then(
+      (value) => {
+        clearTimeout(timer);
+        resolve(value);
+      },
+      (error) => {
+        clearTimeout(timer);
+        reject(error);
+      }
+    );
+  });
+}
+
+async function runGraphSignalQuery(
+  query: string,
+  params: Record<string, unknown>,
+  label: string
+): Promise<GraphSignalResponse> {
+  try {
+    const driver = getNeo4jDriver();
+    const session = driver.session({ database: 'neo4j' });
+
+    try {
+      const result = await withTimeout(session.run(query, params), 8000, `Neo4j graph signal query (${label})`);
+      return result.records.map((record) => ({
+        id: String(record.get('id') ?? ''),
+        score: Math.max(0, Math.min(1, toNumberLike(record.get('score'), 0))),
+        text: record.get('text') as string | undefined,
+        paths: toNumberLike(record.get('paths'), 1),
+      })) as GraphSignalResponse;
+    } finally {
+      void session.close().catch(() => {});
+    }
+  } catch (err) {
+    if (isNeo4jSyntaxError(err)) {
+      console.error(`Neo4j graph signal query syntax error (${label}):`, err);
+      return createEmptyResponse(String(err));
+    }
+    console.warn(`Neo4j graph signal unavailable (${label}):`, err);
+    return createEmptyResponse();
+  }
+}
+
 /**
  * Check if Neo4j is available and has edges.
  * Safe to call repeatedly (driver is cached).
@@ -47,9 +113,13 @@ export async function checkNeo4jHealth(): Promise<GraphSignalHealth> {
     const session = driver.session({ database: 'neo4j' });
 
     try {
-      // Test connection: count SUPPORTS and SIMILAR_TOPOLOGY edges
-      const result = await session.run(
-        'MATCH ()-[r:SUPPORTS|SIMILAR_TOPOLOGY]->() RETURN count(r) as edgeCount LIMIT 1'
+      // Test connection: count the graph-signal edge families.
+      const result = await withTimeout(
+        session.run(
+          'MATCH ()-[r:SUPPORTS|SIMILAR_TOPOLOGY|USED_CONCEPT]->() RETURN count(r) as edgeCount LIMIT 1'
+        ),
+        8000,
+        'Neo4j health check'
       );
 
       const edgeCount = result.records[0]?.get('edgeCount')?.toNumber?.() ?? 0;
@@ -60,7 +130,7 @@ export async function checkNeo4jHealth(): Promise<GraphSignalHealth> {
         edgeCount,
       };
     } finally {
-      await session.close();
+      void session.close().catch(() => {});
     }
   } catch (err) {
     return {
@@ -89,69 +159,48 @@ export async function queryNeoJsGraphSignal(
   try {
     const validated = GraphSignalRequestSchema.parse(request);
     const { conceptIds, topK } = validated;
+    const relationshipTypes = validated.relationshipTypes?.length
+      ? validated.relationshipTypes
+      : ['USED_CONCEPT', 'SUPPORTS', 'SIMILAR_TOPOLOGY'];
 
     if (!conceptIds?.length) {
-      const empty = [] as any;
-      return empty;
+      return createEmptyResponse();
     }
 
-    const driver = getNeo4jDriver();
-    const session = driver.session({ database: 'neo4j' });
+    const query = `
+      MATCH (c:Concept)-[r]->(p:Packet)
+      WHERE type(r) IN $relationshipTypes
+        AND (
+          c.id IN $conceptIds
+          OR c.concept_id IN $conceptIds
+          OR c.name IN $conceptIds
+          OR toLower(c.name) IN $conceptIds
+        )
+      WITH
+        p,
+        count(DISTINCT c) AS paths,
+        max(toFloat(coalesce(r.weight, 0.5))) AS score
+      RETURN
+        coalesce(p.id, p.packet_id, p.packet_key) AS id,
+        coalesce(p.summary, p.title, '') AS text,
+        paths,
+        score
+      ORDER BY score DESC
+      LIMIT toInteger($topK)
+    `;
 
-    try {
-      // Two-part query:
-      // 1. Direct SUPPORTS edges from concept seeds (score 1.0)
-      // 2. 1-2 hop SIMILAR_TOPOLOGY neighbors of directly-supported packets (score 0.6)
-      const query = `
-        MATCH (c:Concept)
-        WHERE c.id IN $conceptIds
-        CALL {
-          WITH c
-          OPTIONAL MATCH (c)<-[r:SUPPORTS]-(p:Packet)
-          RETURN p, 1.0 as directScore, 'direct' as pathType
-
-          UNION
-
-          WITH c
-          OPTIONAL MATCH (c)<-[:SUPPORTS]-(p1:Packet)
-          WITH c, p1 WHERE p1 IS NOT NULL
-          OPTIONAL MATCH (p1)-[r:SIMILAR_TOPOLOGY*1..2]-(p2)
-          WHERE p2 <> p1
-          RETURN p2 as p, 0.6 as directScore, 'topology' as pathType
-        }
-        WITH p, collect(DISTINCT c.id) AS matched_concepts, MAX(directScore) as score
-        WHERE p IS NOT NULL
-        RETURN
-          p.key as id,
-          score,
-          coalesce(p.summary, '') as text,
-          size(matched_concepts) as pathCount
-        ORDER BY score DESC
-        LIMIT toInteger($topK)
-      `;
-
-      const result = await session.run(query, {
-        conceptIds,
-        topK,
-      });
-
-      const mapped = result.records.map((record) => ({
-        id: record.get('id') as string,
-        score: Math.min(1.0, Math.max(0.0, record.get('score') as number)), // Clamp to [0, 1]
-        text: record.get('text') as string | undefined,
-        paths: record.get('pathCount')?.toNumber?.() ?? 1,
-      })) as GraphSignalResponse;
-
-      return mapped;
-    } finally {
-      await session.close();
-    }
+    return runGraphSignalQuery(query, {
+      conceptIds: conceptIds.map((value) => String(value)),
+      relationshipTypes,
+      topK,
+    }, 'by-id');
   } catch (err) {
-    // Graceful degradation: log error, return empty with error attached
-    console.error('Neo4j graph signal error:', err);
-    const empty = [] as any;
-    empty.error = String(err);
-    return empty;
+    if (isNeo4jSyntaxError(err)) {
+      console.error('Neo4j graph signal error:', err);
+      return createEmptyResponse(String(err));
+    }
+    console.warn('Neo4j graph signal unavailable:', err);
+    return createEmptyResponse();
   }
 }
 
@@ -164,63 +213,43 @@ export async function queryNeoJsGraphSignalByNames(
 ): Promise<GraphSignalResponse> {
   try {
     if (!conceptNames?.length) {
-      const empty = [] as any;
-      return empty;
+      return createEmptyResponse();
     }
 
-    const driver = getNeo4jDriver();
-    const session = driver.session({ database: 'neo4j' });
+    const query = `
+      MATCH (c:Concept)-[r]->(p:Packet)
+      WHERE type(r) IN $relationshipTypes
+        AND (
+          c.id IN $conceptIds
+          OR c.concept_id IN $conceptIds
+          OR c.name IN $conceptIds
+          OR toLower(c.name) IN $conceptIds
+        )
+      WITH
+        p,
+        count(DISTINCT c) AS paths,
+        max(toFloat(coalesce(r.weight, 0.5))) AS score
+      RETURN
+        coalesce(p.id, p.packet_id, p.packet_key) AS id,
+        coalesce(p.summary, p.title, '') AS text,
+        paths,
+        score
+      ORDER BY score DESC
+      LIMIT toInteger($topK)
+    `;
 
-    try {
-      const query = `
-        MATCH (c:Concept)
-        WHERE toLower(c.name) IN $conceptNames
-        CALL {
-          WITH c
-          OPTIONAL MATCH (c)<-[r:SUPPORTS]-(p:Packet)
-          RETURN p, 1.0 as directScore, 'direct' as pathType
-
-          UNION
-
-          WITH c
-          OPTIONAL MATCH (c)<-[:SUPPORTS]-(p1:Packet)
-          WITH c, p1 WHERE p1 IS NOT NULL
-          OPTIONAL MATCH (p1)-[r:SIMILAR_TOPOLOGY*1..2]-(p2)
-          WHERE p2 <> p1
-          RETURN p2 as p, 0.6 as directScore, 'topology' as pathType
-        }
-        WITH p, collect(DISTINCT c.id) AS matched_concepts, MAX(directScore) as score
-        WHERE p IS NOT NULL
-        RETURN
-          p.key as id,
-          score,
-          coalesce(p.summary, '') as text,
-          size(matched_concepts) as pathCount
-        ORDER BY score DESC
-        LIMIT toInteger($topK)
-      `;
-
-      const result = await session.run(query, {
-        conceptNames: conceptNames.map((name) => name.toLowerCase()),
-        topK,
-      });
-
-      const mapped = result.records.map((record) => ({
-        id: record.get('id') as string,
-        score: Math.min(1.0, Math.max(0.0, record.get('score') as number)),
-        text: record.get('text') as string | undefined,
-        paths: record.get('pathCount')?.toNumber?.() ?? 1,
-      })) as GraphSignalResponse;
-
-      return mapped;
-    } finally {
-      await session.close();
-    }
+    return runGraphSignalQuery(query, {
+      conceptIds: conceptNames.map((name) => name.toLowerCase()),
+      relationshipTypes: ['USED_CONCEPT', 'SUPPORTS', 'SIMILAR_TOPOLOGY'],
+      topK,
+    }, 'by-name');
   } catch (err) {
-    console.error('Neo4j graph signal (by names) error:', err);
-    const empty = [] as any;
-    empty.error = String(err);
-    return empty;
+    if (isNeo4jSyntaxError(err)) {
+      console.error('Neo4j graph signal (by names) error:', err);
+      return createEmptyResponse(String(err));
+    }
+    console.warn('Neo4j graph signal (by names) unavailable:', err);
+    return createEmptyResponse();
   }
 }
 
@@ -241,6 +270,8 @@ export async function getNeo4jGraphStats(): Promise<Record<string, number | stri
         MATCH ()-[r:SUPPORTS]->() RETURN 'supportsEdges' as metric, count(r) as value
         UNION ALL
         MATCH ()-[r:SIMILAR_TOPOLOGY]->() RETURN 'topologyEdges' as metric, count(r) as value
+        UNION ALL
+        MATCH ()-[r:USED_CONCEPT]->() RETURN 'usedConceptEdges' as metric, count(r) as value
       `);
 
       const stats: Record<string, number | string | boolean> = {
@@ -255,7 +286,7 @@ export async function getNeo4jGraphStats(): Promise<Record<string, number | stri
 
       return stats;
     } finally {
-      await session.close();
+      void session.close().catch(() => {});
     }
   } catch (err) {
     return {

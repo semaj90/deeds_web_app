@@ -105,7 +105,8 @@ interface RunOpts {
 function resolveInternalModel(requested: string): string {
   // Drop any trailing `:latest` to normalise comparisons
   const m = requested.toLowerCase().replace(/:latest$/, '');
-  if (m === 'yorha-ldr' || m === 'gemma4-rotorquant:latest') return 'gemma4-rotorquant:latest';
+  if (m === 'yorha-ldr') return 'yorha-ldr';
+  if (m === 'gemma4-rotorquant:latest') return 'gemma4-rotorquant:latest';
   if (m.startsWith('yorha') || m.startsWith('legal') || m.includes('vlm')) {
     return 'gemma4-rotorquant:latest';
   }
@@ -1401,9 +1402,12 @@ export async function runChatCompletion(
     hasSpecializedRetrieval,
     canUseTurboQuantNow,
   });
-  let selectedLane: AceSelectedLane = laneDecision.selectedLane;
+  let selectedLane: AceSelectedLane | 'ldr' = laneDecision.selectedLane;
   let fallbackReason: string | null = laneDecision.fallbackReason;
-  let inferenceLane: InferenceLane = selectedLane;
+  if (internalModel === 'yorha-ldr') {
+    selectedLane = 'ldr';
+  }
+  let inferenceLane: InferenceLane = selectedLane as InferenceLane;
 
   const runtimeLog = {
     stage: 'llm_request_budget_check',
@@ -1558,7 +1562,13 @@ export async function runChatCompletion(
     return extractAssistantText(result);
   };
 
-  if (selectedLane === 'turboquant') {
+  if (selectedLane === 'ldr') {
+    const ldrStartedMs = Date.now();
+    text = await runLdrChat(messages, requestedMaxTokens, req.temperature);
+    bifrostMs = Date.now() - ldrStartedMs;
+    selectedLane = 'ldr';
+    inferenceLane = 'ldr';
+  } else if (selectedLane === 'turboquant') {
     try {
       text = await runTurboquant();
     } catch (err) {
@@ -1851,7 +1861,7 @@ function wrapResponse(args: {
   modelName?: string;
   backend?: string;
   kvQuant?: string;
-  selectedLane?: 'redis' | 'turboquant' | 'bifrost';
+  selectedLane?: 'redis' | 'turboquant' | 'bifrost' | 'ldr';
   fallbackReason?: string | null;
   contextPackKey?: string;
   sourceRefs?: string[];
@@ -1962,7 +1972,7 @@ export const ADVERTISED_MODELS = [
   { id: 'gemma4-raw',     owned_by: 'local' },  // → gemma4-rotorquant:latest (direct, no ACE)
   { id: 'yorha-legal',    owned_by: 'yorha' },   // → gemma4-rotorquant:latest (alias)
   { id: 'yorha-fast',     owned_by: 'yorha' },   // → gemma3:270m
-  { id: 'yorha-ldr',      owned_by: 'yorha' },   // → local-deep-research (LDR_BASE_URL → gemma4-hermes-64k:latest)
+  { id: 'yorha-ldr',      owned_by: 'yorha' },   // → local-deep-research (LDR_BASE_URL)
   { id: 'gemma4-rotorquant:latest',   owned_by: 'yorha' },   // → gemma4-rotorquant:latest explicit
   { id: 'gemma3-legal',   owned_by: 'yorha' },   // → gemma3-legal
   { id: 'gemma3:270m',    owned_by: 'ollama' },
