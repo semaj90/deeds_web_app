@@ -1,6 +1,6 @@
 # Parent Atlas Production Readiness Audit
 
-Generated: 2026-06-11T20:18:38.043Z
+Generated: 2026-06-12T02:32:28.085Z
 
 ## Summary
 
@@ -18,7 +18,7 @@ Generated: 2026-06-11T20:18:38.043Z
 - Neo4j CodebaseFile nodes: 31551
 - Redis LOD0 latest packet coverage: 1/1
 - Native JSON parser: native addon path present; fallback present
-- NDJSON files discovered with rg -uuu: 126
+- NDJSON files discovered with rg -uuu: 127
 - Phase 101 batch summaries: 35 succeeded / 0 failed
 - Autoencoder dims: 768→256→64
 
@@ -82,7 +82,7 @@ Generated: 2026-06-11T20:18:38.043Z
 - PASS [offline] scripts/atlas/report-compressed-semantic-geometry.mjs: scripts/atlas/report-compressed-semantic-geometry.mjs exists
 - PASS [offline] scripts/atlas/audit-hidden-packet-pathmap.mjs: scripts/atlas/audit-hidden-packet-pathmap.mjs exists
 - PASS [offline] scripts/atlas/materialize-hidden-packet-pathmap-duckdb.mjs: scripts/atlas/materialize-hidden-packet-pathmap-duckdb.mjs exists
-- PASS [offline] rg-uu:ndjson-inventory: rg -uuu found 126 NDJSON files
+- PASS [offline] rg-uu:ndjson-inventory: rg -uuu found 127 NDJSON files
 - PASS [postgres] table:parent_atlas_documents: parent_atlas_documents exists with 5253 rows
 - PASS [postgres] table:atlas_feature_map: atlas_feature_map exists with 14487 rows
 - PASS [postgres] table:atlas_feature_map_synthesized: atlas_feature_map_synthesized exists with 14465 rows

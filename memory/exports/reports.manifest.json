@@ -1,0 +1,19 @@
+{
+  "schema": "memory_exports_reports_manifest.v1",
+  "generatedAt": "2026-06-12T01:41:31.551Z",
+  "input_count": 50,
+  "written_count": 50,
+  "skipped_invalid_json": 0,
+  "duplicate_report_ids": [],
+  "duplicate_report_count": 0,
+  "output_sha256": "7505c30fb2af5415e4a914d840e50abd4bad548e4719c863026ba11684fe9d6d",
+  "ordered_by": "source_path asc",
+  "source_dir": "memory/exports",
+  "ndjson_path": "memory/exports/reports.ndjson",
+  "created_at": "2026-06-12T01:41:31.553Z",
+  "report_types": {
+    "atlas_completion_report.v1": 1,
+    "parent_atlas_final_completion.v1": 1,
+    "unknown": 48
+  }
+}

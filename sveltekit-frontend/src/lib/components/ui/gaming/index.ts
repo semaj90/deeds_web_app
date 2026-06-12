@@ -28,6 +28,8 @@ export { default as N643DContainer } from './n64/N643DContainer.svelte';
 export { default as N643DDialog } from './n64/N643DDialog.svelte';
 export { default as N643DPanel } from './n64/N643DPanel.svelte';
 export { default as N643DInput } from './n64/N643DInput.svelte';
+export { default as N64ProgressBar } from './n64/ProgressBar.svelte';
+export { default as ProgressBar } from './n64/ProgressBar.svelte';
 
 // Progressive Enhancement Utilities
 export { default as ProgressiveGamingProvider } from './core/ProgressiveGamingProvider.svelte';

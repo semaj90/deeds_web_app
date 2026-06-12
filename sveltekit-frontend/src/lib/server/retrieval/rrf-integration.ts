@@ -12,7 +12,7 @@ import type { Pool } from 'pg';
 import type { Redis } from 'ioredis';
 import { bm25SearchIndexed } from './bm25-search.js';
 import { conceptOverlapSearch } from './concept-overlap-search.js';
-import { combineViaRRF, type ContextHit, type RRFResult } from './rrf-combiner.js';
+import { combineViaRRF, type ContextHit, type RRFResult, type RetrievalLaneName } from './rrf-combiner.js';
 import { extractQueryConceptsViaGemma } from './concept-extraction-tool.js';
 import { queryNeoJsGraphSignal } from './neo4j-graph-signal.js';
 
@@ -47,18 +47,21 @@ async function queryQdrantVectorSignal(
 
   try {
     const { qdrant } = await import('$lib/server/vector/qdrant-manager.js');
-    const results = await qdrant.search({
-      collection: 'codebase_chunks_768', // or atlas_packets if Qdrant collection exists
-      query: embedding,
+    const response = await qdrant._denseSearch({
+      query,
+      queryEmbedding: embedding,
+      collection: 'codebase_chunks_768',
       limit: topK,
+      scoreThreshold: 0.001,
     });
 
-    return results.map((r) => ({
+    return response.results.map((r) => ({
       id: String(r.id),
       score: r.score,
       text: String(r.payload?.content ?? r.payload?.summary ?? ''),
     }));
-  } catch {
+  } catch (err) {
+    console.error('Qdrant search failed:', err);
     return [];
   }
 }
@@ -167,7 +170,7 @@ export async function multiLaneRetrievalWithRRF(
 
     // Combine via RRF
     const lanes = [bm25Hits, conceptHits, qdrantHits, neoHits];
-    const laneNames = ['postgres_trigram', 'concept_overlap', 'qdrant_vector', 'neo4j_graph'];
+    const laneNames: RetrievalLaneName[] = ['postgres_trigram', 'concept_overlap', 'qdrant_vector', 'neo4j_graph'];
 
     const rrfResults = combineViaRRF(lanes, laneNames, {
       k,

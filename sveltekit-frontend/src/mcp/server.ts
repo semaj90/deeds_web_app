@@ -540,6 +540,15 @@ export function setupToolHandlers() {
         },
       },
       {
+        name: 'startup:briefing',
+        description:
+          'Read-only access to the startup briefing state artifact. Returns system status (Postgres, Redis, Qdrant, Neo4j), coverage metrics (Qdrant %, SOM %, Parent Atlas %), task progress, warnings, and top recommendations. Refreshed by npm run agent:hello or manually via scripts/agentic/startup-briefing.mjs.',
+        inputSchema: {
+          type: 'object',
+          properties: {},
+        },
+      },
+      {
         name: 'LLMS.md',
         description:
           'Resolve the nearest applicable LLMS.md instructions for a file or directory. Prefers Redis-rendered mirrors and falls back to on-disk LLMS.md walk-up.',
@@ -2030,6 +2039,25 @@ export function setupToolHandlers() {
             }),
           }],
         };
+      }
+
+      case 'startup:briefing': {
+        // Read-only access to .opencode/startup-briefing.json
+        // Maintained by scripts/agentic/startup-briefing.mjs (npm run agent:hello)
+        try {
+          const { readFileSync } = await import('node:fs');
+          const path = require('node:path');
+          const briefingPath = path.join(process.cwd(), '.opencode', 'startup-briefing.json');
+          const briefing = JSON.parse(readFileSync(briefingPath, 'utf-8'));
+          return { content: [{ type: 'text', text: JSON.stringify(briefing) }] };
+        } catch (error) {
+          return {
+            content: [{
+              type: 'text',
+              text: JSON.stringify({ error: 'Could not load startup briefing. Run npm run agent:hello first.' })
+            }]
+          };
+        }
       }
 
       case 'cases:load': {

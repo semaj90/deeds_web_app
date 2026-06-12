@@ -1,10 +1,10 @@
 {
-  "generatedAt": "2026-06-11T03:38:52.396Z",
-  "limit": 5000,
+  "generatedAt": "2026-06-12T02:06:38.398Z",
+  "limit": 10,
   "services": {
     "qdrant": {
       "ok": true,
-      "message": "scanned 5000 points"
+      "message": "scanned 10 points"
     },
     "postgres": {
       "ok": true,
@@ -16,8 +16,8 @@
     }
   },
   "summary": {
-    "scannedPoints": 5000,
-    "directCoordinatePoints": 5000,
+    "scannedPoints": 10,
+    "directCoordinatePoints": 10,
     "missingCoordinatePoints": 0,
     "missingSomRow": 0,
     "missingSomCol": 0,
@@ -27,7 +27,7 @@
     "centroidCoveragePct": "0.0%",
     "classificationCounts": {},
     "clusterTopologyCount": 100,
-    "centroidMapCount": 20,
+    "centroidMapCount": 7,
     "pgEvidenceRows": 0,
     "anchorBearingMissingPoints": 0,
     "legacyNoTopologyPoints": 0,

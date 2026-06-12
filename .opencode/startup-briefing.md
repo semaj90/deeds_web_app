@@ -1,41 +1,55 @@
-# Startup Briefing — 6/11/2026, 4:47:13 PM
+# Startup Briefing — 6/11/2026, 7:21:58 PM
 
 Hello James.
 
 ## Since We Last Worked
 
-- **Tasks Open**: 0
-- **Tasks Closed**: 0
-- **New Recommendations**: 0
-- **Production Readiness**: PASS 0 / WARN 0 / FAIL 0
+- **Recommendations Open**: 18
+- **Parent Atlas Coverage Gaps**: 6
+- **Task Registry Open**: 12
+- **Task Registry Done**: 0
+- **Production Readiness**: PASS 66 / WARN 0 / FAIL 0
 
-## System Health
+## Systems
 
 | System | Status |
 |--------|--------|
-| PostgreSQL | offline |
-| Redis | offline |
-| Qdrant | offline (check coverage %) |
-| Neo4j | unknown |
-| TurboVec | unknown |
+| PostgreSQL | READY |
+| Redis | READY |
+| Qdrant | READY |
+| Neo4j | READY |
+| TurboVec | SKIPPED |
+| Engram Embed | OK |
+| LD-JSON | 100% |
 
 ## Coverage
 
-- **Qdrant Coverage**: ?%
-- **SOM Coverage**: ?%
-- **Parent Atlas Coverage**: ?%
+- **Qdrant Coverage**: 33%
+- **SOM Coverage**: 29%
+- **Parent Atlas Coverage**: 29%
+
+## Completion
+
+- **Task Registry Completion**: 0%
+- **Production Readiness Completion**: 100%
+- **Memory Exports Completion**: 100%
 
 ## Warnings
 
-- ⚠️ Redis offline: ACE cache using disk fallback only
+- Engram embed is stdio-only; TCP probes to 8792 are not the contract.
 
 ## Top Recommendations
 
-1. 📍 Fix Redis preflight (cache offline)
+1. Qdrant coverage: 33% (3539 files unembedded)
+2. SOM cluster coverage: 29% (3744 files unclassified)
+3. atlas_feature_synthesis has only 12 rows — feature rollups incomplete
+4. 2201 atlas_feature_map rows not joined to parent_atlas_documents
+5. SOM cluster on atlas_feature_map: 31% (3941 missing)
+6. route_runtime_packets is empty — hot-path scoring unavailable
 
 ## Recommended Next Lane
 
-**Infrastructure Repair**
+**Runtime Coverage Repair**
 
 ---
 

@@ -1,0 +1,378 @@
+{
+  "schema": "transport_pressure_audit.v1",
+  "generatedAt": "2026-06-12T02:02:29.148Z",
+  "readOnly": true,
+  "recommendedLevel": "LEVEL_2_BINARY_TRANSPORT",
+  "recommendedLevelReason": "RabbitMQ/NATS is reachable, so bounded binary transport is justified",
+  "summary": {
+    "packetFileCount": 9952,
+    "totalDelimitedRows": 788925,
+    "totalArtifactBytes": 2793278544,
+    "largestArtifactPath": ".tmp/simd-adaptive-parser.json",
+    "largestArtifactBytes": 392469908,
+    "largestDelimitedBytes": 181165748
+  },
+  "packetCounts": {
+    "json": {
+      "fileCount": 9521,
+      "bytes": 1694780231
+    },
+    "ndjson": {
+      "fileCount": 90,
+      "rows": 383137,
+      "bytes": 626682480
+    },
+    "jsonl": {
+      "fileCount": 316,
+      "rows": 405788,
+      "bytes": 470781240
+    },
+    "messagePack": {
+      "fileCount": 25,
+      "bytes": 1034593
+    }
+  },
+  "largest": {
+    "json": [
+      {
+        "path": ".tmp/simd-adaptive-parser.json",
+        "sizeBytes": 392469908,
+        "sizeMb": 374.288,
+        "rows": null
+      },
+      {
+        "path": ".tmp/gpu-som-checkpoint/scroll_vectors.json",
+        "sizeBytes": 236169216,
+        "sizeMb": 225.229,
+        "rows": null
+      },
+      {
+        "path": "docs/reports/ignored-directory-audit.json",
+        "sizeBytes": 159867453,
+        "sizeMb": 152.461,
+        "rows": null
+      },
+      {
+        "path": ".tmp/gpu-som-checkpoint/scroll_meta.json",
+        "sizeBytes": 155936878,
+        "sizeMb": 148.713,
+        "rows": null
+      },
+      {
+        "path": "docs/reports/ignored-directory-audit.min.json",
+        "sizeBytes": 139932740,
+        "sizeMb": 133.45,
+        "rows": null
+      },
+      {
+        "path": "sveltekit-frontend/.tmp/offline-analysis/fe-graph-deep-import-graph.json",
+        "sizeBytes": 59693820,
+        "sizeMb": 56.928,
+        "rows": null
+      },
+      {
+        "path": "sveltekit-frontend/docs/graph/deep-import-graph.json",
+        "sizeBytes": 59693820,
+        "sizeMb": 56.928,
+        "rows": null
+      },
+      {
+        "path": "sveltekit-frontend/.tmp/offline-analysis/fe-graph-codebase-graph.json",
+        "sizeBytes": 51924185,
+        "sizeMb": 49.519,
+        "rows": null
+      },
+      {
+        "path": ".tmp/calls-neo4j-dryrun.json",
+        "sizeBytes": 35604733,
+        "sizeMb": 33.955,
+        "rows": null
+      },
+      {
+        "path": "docs/graph/repo-root-atlas.json",
+        "sizeBytes": 29856151,
+        "sizeMb": 28.473,
+        "rows": null
+      },
+      {
+        "path": "sveltekit-frontend/.tmp/offline-analysis/docs-graph-repo-root-atlas.json",
+        "sizeBytes": 29853005,
+        "sizeMb": 28.47,
+        "rows": null
+      },
+      {
+        "path": "sveltekit-frontend/.tmp/offline-analysis/fe-graph-sveltekit-route-gap-atlas.json",
+        "sizeBytes": 28842907,
+        "sizeMb": 27.507,
+        "rows": null
+      }
+    ],
+    "ndjson": [
+      {
+        "path": ".tmp/mapreduce-full-v4.ndjson",
+        "sizeBytes": 115502185,
+        "sizeMb": 110.151,
+        "rows": 3270
+      },
+      {
+        "path": ".tmp/mapreduce-full-v3.ndjson",
+        "sizeBytes": 110158457,
+        "sizeMb": 105.055,
+        "rows": 3213
+      },
+      {
+        "path": ".tmp/mapreduce-full-v2.ndjson",
+        "sizeBytes": 109973137,
+        "sizeMb": 104.879,
+        "rows": 3213
+      },
+      {
+        "path": ".tmp/mapreduce-full.ndjson",
+        "sizeBytes": 109665232,
+        "sizeMb": 104.585,
+        "rows": 3213
+      },
+      {
+        "path": ".tmp/ingest/nodes.ndjson",
+        "sizeBytes": 93922291,
+        "sizeMb": 89.571,
+        "rows": 9372
+      },
+      {
+        "path": ".tmp/calls-edges-clean.ndjson",
+        "sizeBytes": 26998129,
+        "sizeMb": 25.747,
+        "rows": 164909
+      },
+      {
+        "path": "scripts/atlas/out/calls-edges-2026-05-29.ndjson",
+        "sizeBytes": 24588845,
+        "sizeMb": 23.45,
+        "rows": 106515
+      },
+      {
+        "path": ".tmp/chunks/feature-chunks.ndjson",
+        "sizeBytes": 4954181,
+        "sizeMb": 4.725,
+        "rows": 13722
+      },
+      {
+        "path": ".tmp/ingest/parent_atlas_gpu.ndjson",
+        "sizeBytes": 4613664,
+        "sizeMb": 4.4,
+        "rows": 10751
+      },
+      {
+        "path": "neschrom97/packets/cards.ndjson",
+        "sizeBytes": 3991808,
+        "sizeMb": 3.807,
+        "rows": 8170
+      },
+      {
+        "path": ".tmp/offline-synthesis/hidden-packet-pathmap.ndjson",
+        "sizeBytes": 3729009,
+        "sizeMb": 3.556,
+        "rows": 6353
+      },
+      {
+        "path": "memory/exports/reports.ndjson",
+        "sizeBytes": 2663091,
+        "sizeMb": 2.54,
+        "rows": 50
+      }
+    ],
+    "jsonl": [
+      {
+        "path": "scripts/court_data/coastalcph__lex_glue__train.jsonl",
+        "sizeBytes": 181165748,
+        "sizeMb": 172.773,
+        "rows": 5000
+      },
+      {
+        "path": "scripts/court_data/coastalcph__lex_glue__test.jsonl",
+        "sizeBytes": 77204789,
+        "sizeMb": 73.628,
+        "rows": 1400
+      },
+      {
+        "path": "scripts/court_data/coastalcph__lex_glue__validation.jsonl",
+        "sizeBytes": 76536125,
+        "sizeMb": 72.991,
+        "rows": 1400
+      },
+      {
+        "path": "memory/graphify/deep/deep-import-edges.jsonl",
+        "sizeBytes": 17961405,
+        "sizeMb": 17.129,
+        "rows": 81136
+      },
+      {
+        "path": ".tmp/calls-edges.jsonl",
+        "sizeBytes": 15797967,
+        "sizeMb": 15.066,
+        "rows": 111945
+      },
+      {
+        "path": ".tmp/calls.jsonl",
+        "sizeBytes": 8890734,
+        "sizeMb": 8.479,
+        "rows": 19734
+      },
+      {
+        "path": ".tmp/calls-unresolved.jsonl",
+        "sizeBytes": 8854614,
+        "sizeMb": 8.444,
+        "rows": 19656
+      },
+      {
+        "path": "sveltekit-frontend/.tmp/ingest/parent-atlas-hypergraph.with-clusters.jsonl",
+        "sizeBytes": 6011491,
+        "sizeMb": 5.733,
+        "rows": 8277
+      },
+      {
+        "path": "sveltekit-frontend/.tmp/ingest/parent-atlas-hypergraph.jsonl",
+        "sizeBytes": 6010201,
+        "sizeMb": 5.732,
+        "rows": 8277
+      },
+      {
+        "path": ".tmp/ast-import-edges-resolved.jsonl",
+        "sizeBytes": 5996715,
+        "sizeMb": 5.719,
+        "rows": 17463
+      },
+      {
+        "path": "sveltekit-frontend/.tmp/offline-analysis/module-cartridges.jsonl",
+        "sizeBytes": 3620066,
+        "sizeMb": 3.452,
+        "rows": 5540
+      },
+      {
+        "path": ".tmp/atlas-cartridge-seeds.jsonl",
+        "sizeBytes": 2794908,
+        "sizeMb": 2.665,
+        "rows": 4173
+      }
+    ],
+    "messagePack": [
+      {
+        "path": "memory/packets/chunk-0013.msgpack",
+        "sizeBytes": 45536,
+        "sizeMb": 0.043,
+        "rows": null
+      },
+      {
+        "path": "memory/packets/chunk-0010.msgpack",
+        "sizeBytes": 44655,
+        "sizeMb": 0.043,
+        "rows": null
+      },
+      {
+        "path": "memory/packets/chunk-0017.msgpack",
+        "sizeBytes": 44631,
+        "sizeMb": 0.043,
+        "rows": null
+      },
+      {
+        "path": "memory/packets/chunk-0004.msgpack",
+        "sizeBytes": 44333,
+        "sizeMb": 0.042,
+        "rows": null
+      },
+      {
+        "path": "memory/packets/chunk-0003.msgpack",
+        "sizeBytes": 44297,
+        "sizeMb": 0.042,
+        "rows": null
+      },
+      {
+        "path": "memory/packets/chunk-0019.msgpack",
+        "sizeBytes": 43870,
+        "sizeMb": 0.042,
+        "rows": null
+      },
+      {
+        "path": "memory/packets/chunk-0011.msgpack",
+        "sizeBytes": 43805,
+        "sizeMb": 0.042,
+        "rows": null
+      },
+      {
+        "path": "memory/packets/chunk-0009.msgpack",
+        "sizeBytes": 43762,
+        "sizeMb": 0.042,
+        "rows": null
+      },
+      {
+        "path": "memory/packets/chunk-0005.msgpack",
+        "sizeBytes": 43696,
+        "sizeMb": 0.042,
+        "rows": null
+      },
+      {
+        "path": "memory/packets/chunk-0008.msgpack",
+        "sizeBytes": 43564,
+        "sizeMb": 0.042,
+        "rows": null
+      },
+      {
+        "path": "memory/packets/chunk-0022.msgpack",
+        "sizeBytes": 43537,
+        "sizeMb": 0.042,
+        "rows": null
+      },
+      {
+        "path": "memory/packets/chunk-0006.msgpack",
+        "sizeBytes": 43469,
+        "sizeMb": 0.041,
+        "rows": null
+      }
+    ]
+  },
+  "services": {
+    "rabbitmq": {
+      "configured": true,
+      "host": "localhost",
+      "port": 5672,
+      "reachable": true,
+      "detail": "TCP reachable in 4ms"
+    },
+    "nats": {
+      "configured": true,
+      "host": "127.0.0.1",
+      "port": 4222,
+      "reachable": true,
+      "detail": "TCP reachable in 1ms"
+    },
+    "turbovec": {
+      "configured": true,
+      "enabled": false,
+      "host": "127.0.0.1",
+      "port": 8791,
+      "reachable": true,
+      "detail": "disabled in opencode; MCP ok (4 tools); health ok (200)"
+    }
+  },
+  "nodeParseRisk": {
+    "score": 100,
+    "label": "HIGH",
+    "rationale": [
+      "large-json-files-present",
+      "large-ndjson-jsonl-files-present",
+      "aggregate-text-footprint-high",
+      "packet-row-count-high"
+    ]
+  },
+  "activationRules": [
+    "LEVEL_1_CPU_STREAMING is the default.",
+    "LEVEL_2_BINARY_TRANSPORT is justified if RabbitMQ/NATS is active or stable binary contracts are needed.",
+    "LEVEL_3_GPU_STRUCTURAL is justified if artifacts exceed roughly 5-10GB or structural scans saturate CPU parsing."
+  ],
+  "notes": [
+    "Read-only audit only; no transport runtime is mutated.",
+    "Large JSON/NDJSON/JSONL files are the pressure surface.",
+    "MessagePack chunks are counted separately because they already represent binary transport.",
+    "TurboVec is reported from existing OpenCode routing config and health probes."
+  ]
+}

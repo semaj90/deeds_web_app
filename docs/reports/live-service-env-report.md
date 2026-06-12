@@ -1,6 +1,6 @@
 # Live Service Env Report
 
-Generated: 2026-06-05T21:32:48.527Z
+Generated: 2026-06-12T02:21:55.453Z
 
 ## Summary
 
@@ -15,7 +15,7 @@ Generated: 2026-06-05T21:32:48.527Z
 
 | service | status | env | probe | detail |
 |---|---|---|---|---|
-| Postgres 18 | READY | 127.0.0.1:5434 | 3ms | DATABASE_URL=postgresql://legal_admin:123456@127.0.0.1:5434/legal_ai_db |
+| Postgres 18 | READY | 127.0.0.1:5434 | 2ms | DATABASE_URL=postgresql://legal_admin:123456@127.0.0.1:5434/legal_ai_db |
 | Qdrant | READY | 127.0.0.1:6333 | 1ms | QDRANT_URL=http://127.0.0.1:6333 |
 | Neo4j | READY | 127.0.0.1:7687 | 1ms | NEO4J_URI=bolt://127.0.0.1:7687 |
 | Redis | READY | 127.0.0.1:6379 | 0ms | REDIS_URL=redis://127.0.0.1:6379 |

@@ -4,7 +4,7 @@
  * Verifies authentication + graph data availability
  */
 
-import { queryNeoJsGraphSignal, checkNeo4jHealth, getNeo4jGraphStats } from '../sveltekit-frontend/src/lib/server/retrieval/neo4j-graph-signal';
+import { queryNeoJsGraphSignal, queryNeoJsGraphSignalByNames, checkNeo4jHealth, getNeo4jGraphStats } from '../sveltekit-frontend/src/lib/server/retrieval/neo4j-graph-signal';
 
 async function main() {
   console.log('🔍 Testing Neo4j Graph Signal Module');
@@ -28,10 +28,13 @@ async function main() {
     // Test 2: Graph stats
     console.log('[2] Checking graph data...');
     const stats = await getNeo4jGraphStats();
-    console.log(`    Concept nodes: ${stats.conceptCount ?? '?'}`);
-    console.log(`    Packet nodes: ${stats.packetCount ?? '?'}`);
-    console.log(`    USED_CONCEPT edges: ${stats.usedConceptEdges ?? 0}`);
-    console.log(`    SIMILAR edges: ${stats.similarEdges ?? 0}`);
+    if (stats.error || stats.connected === false) {
+      throw new Error(`Neo4j graph stats failed: ${stats.error}`);
+    }
+    console.log(`    Concept nodes: ${stats.conceptCount ?? 0}`);
+    console.log(`    Packet nodes: ${stats.packetCount ?? 0}`);
+    console.log(`    SUPPORTS edges: ${stats.supportsEdges ?? 0}`);
+    console.log(`    SIMILAR_TOPOLOGY edges: ${stats.topologyEdges ?? 0}`);
     console.log('    ✅ Graph data readable\n');
 
     // Test 3: Query with sample concepts
@@ -41,6 +44,12 @@ async function main() {
       conceptIds: sampleConcepts,
       topK: 10,
     });
+
+    // Check for query errors (syntax, connection, etc.)
+    if (results.error) {
+      throw new Error(`Neo4j graph signal query failed: ${results.error}`);
+    }
+
     console.log(`    Query returned: ${results.length} results`);
     if (results.length > 0) {
       console.log(`    First result: id=${results[0].id}, score=${results[0].score.toFixed(3)}`);
@@ -48,6 +57,15 @@ async function main() {
       console.log('    (No results for sample concepts - expected if edges not yet created)');
     }
     console.log('    ✅ Query function works\n');
+
+    // Test 4: Query by names
+    console.log('[4] Testing graph signal query by names...');
+    const resultsByNames = await queryNeoJsGraphSignalByNames(['concept-1', 'concept-2'], 10);
+    if (resultsByNames.error) {
+      throw new Error(`Neo4j graph signal by names query failed: ${resultsByNames.error}`);
+    }
+    console.log(`    Query by names returned: ${resultsByNames.length} results`);
+    console.log('    ✅ Query by names function works\n');
 
     // Summary
     console.log('═══════════════════════════════════════════════════════════════');

@@ -18,6 +18,8 @@ export {
     AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogOverlay, AlertDialogPortal, AlertDialogRoot, AlertDialogTitle, AlertDialogTrigger
 };
 
+export { AlertDialog as Dialog };
+
 // Aliased exports for compound pattern
     export {
         AlertDialogAction as Action,

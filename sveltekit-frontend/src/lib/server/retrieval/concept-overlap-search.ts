@@ -27,7 +27,7 @@ export async function conceptOverlapSearch(
     const results = await db.execute(
       sql`
         SELECT
-          ${atlasPackets.id},
+          ${atlasPackets.packetId},
           (
             CARDINALITY(
               ${atlasPackets.conceptIds} && ${queryConceptIds}::text[]

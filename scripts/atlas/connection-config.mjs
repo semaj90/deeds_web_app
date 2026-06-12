@@ -99,6 +99,31 @@ export function resolveRedisConfig(env = process.env) {
   };
 }
 
+export function resolveRedisUrl(env = process.env, defaults = DEFAULT_REDIS) {
+  const config = resolveRedisConfig(env);
+  const rawUrl = String(env.REDIS_URL ?? '').trim();
+
+  if (rawUrl) {
+    try {
+      const parsed = new URL(rawUrl);
+      if (parsed.protocol === 'redis:' || parsed.protocol === 'rediss:') {
+        if ((!parsed.password || parsed.password.length === 0) && config.password) {
+          parsed.password = config.password;
+        }
+        if (!parsed.hostname) parsed.hostname = config.host || defaults.host;
+        if (!parsed.port) parsed.port = String(config.port || defaults.port);
+        return parsed.toString();
+      }
+    } catch {
+      // fall back to synthesized URL below
+    }
+  }
+
+  const password = config.password ? encodeURIComponent(config.password) : '';
+  const auth = password ? `:${password}@` : '';
+  return `redis://${auth}${config.host || defaults.host}:${config.port || defaults.port}`;
+}
+
 export function resolveDatabaseUrl(env = process.env, defaults = DEFAULT_POSTGRES) {
   const raw = String(env.DATABASE_URL ?? env.ADMIN_DATABASE_URL ?? '').trim();
   if (raw) {
@@ -117,4 +142,3 @@ export function resolveDatabaseUrl(env = process.env, defaults = DEFAULT_POSTGRE
   const database = String(env.DB_NAME ?? env.POSTGRES_DB ?? defaults.database).trim() || defaults.database;
   return `postgresql://${encodeURIComponent(user)}:${encodeURIComponent(password)}@${host}:${port}/${database}`;
 }
-

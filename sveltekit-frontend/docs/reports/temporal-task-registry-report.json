@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-06-11T19:28:35.280Z",
+  "generatedAt": "2026-06-12T02:30:10.404Z",
   "sourceFiles": {
     "recommendationEvents": ".opencode\\recommendations\\recommendation-events.jsonl",
     "taskEvents": ".opencode\\tasks\\task-events.jsonl",
@@ -9,14 +9,14 @@
     "findings": 0,
     "recommendations": 235,
     "tasks": 13,
-    "historyPackets": 22
+    "historyPackets": 23
   },
   "summary": {
-    "runId": "2026-06-11T19:28:35.280Z",
+    "runId": "2026-06-12T02:30:10.404Z",
     "findingCount": 0,
     "recommendationCount": 235,
     "taskCount": 13,
-    "historyCount": 22,
+    "historyCount": 23,
     "promotedRecommendations": 13,
     "activeLane": {
       "taskId": "task_phase_3d_retrieval_telemetry",
@@ -28,9 +28,9 @@
     }
   },
   "taskState": {
-    "generatedAt": "2026-06-11T19:28:35.280Z",
+    "generatedAt": "2026-06-12T02:30:10.404Z",
     "recommendationEventsCount": 235,
-    "taskEventsCount": 22,
+    "taskEventsCount": 23,
     "promotedRecommendationsCount": 13,
     "tasks": [
       {
@@ -332,6 +332,60 @@
         "seen_count": 19
       },
       {
+        "task_id": "task_parent_atlas_overlay_mismatch",
+        "title": "Parent Atlas overlay mismatch",
+        "description": "Root registry and app overlay are taxonomy-mismatched and need an explicit crosswalk.",
+        "priority": "MEDIUM",
+        "status": "DONE",
+        "source_recommendation_key": "parent-atlas-overlay-mismatch",
+        "command": "npm run atlas:parent-atlas:overlay-crosswalk",
+        "feature_id": "parent-atlas",
+        "source_refs": [
+          "docs/reports/parent-atlas-overlay-sync-report.json"
+        ],
+        "evidence_refs": [
+          "docs/reports/parent-atlas-overlay-sync-report.json"
+        ],
+        "first_seen": "2026-06-11T03:18:47.474Z",
+        "last_seen": "2026-06-12T02:30:10.342Z",
+        "created_at": "2026-06-11T03:18:47.474Z",
+        "updated_at": "2026-06-12T02:30:10.342Z",
+        "history": [
+          {
+            "event_id": "task_5af7a6699fe0",
+            "event_type": "TASK_CREATED",
+            "created_at": "2026-06-11T03:18:47.474Z",
+            "run_id": "2026-06-06T06:21:32.559Z",
+            "task_id": "task_parent_atlas_overlay_mismatch",
+            "source_recommendation_key": "parent-atlas-overlay-mismatch",
+            "title": "Parent Atlas overlay mismatch",
+            "description": "Root registry and app overlay are taxonomy-mismatched and need an explicit crosswalk.",
+            "priority": "MEDIUM",
+            "status": "TODO",
+            "parent_task_id": null,
+            "command": "npm run atlas:parent-atlas:overlay-crosswalk",
+            "feature_id": "parent-atlas",
+            "source_refs": [
+              "docs/reports/parent-atlas-overlay-sync-report.json"
+            ],
+            "evidence_refs": [
+              "docs/reports/parent-atlas-overlay-sync-report.json"
+            ]
+          },
+          {
+            "event_id": "task_43750d0731eb",
+            "event_type": "TASK_STATUS_CHANGED",
+            "created_at": "2026-06-12T02:30:10.342Z",
+            "run_id": "parent-atlas-overlay-close-20260612",
+            "task_id": "task_parent_atlas_overlay_mismatch",
+            "previous_state": "TODO",
+            "new_state": "DONE",
+            "reason": "parent-atlas overlay sync is aligned; crosswalk shows 6 ROOT_CONTRACT_ONLY rows and 0 missing app overlay rows"
+          }
+        ],
+        "seen_count": 19
+      },
+      {
         "task_id": "task_active_production_topology_mirror",
         "title": "Active production topology mirror",
         "description": "Active Postgres rows have Qdrant point IDs but no mirrored som_cluster value.",
@@ -621,50 +675,6 @@
           }
         ],
         "seen_count": 3
-      },
-      {
-        "task_id": "task_parent_atlas_overlay_mismatch",
-        "title": "Parent Atlas overlay mismatch",
-        "description": "Root registry and app overlay are taxonomy-mismatched and need an explicit crosswalk.",
-        "priority": "MEDIUM",
-        "status": "TODO",
-        "source_recommendation_key": "parent-atlas-overlay-mismatch",
-        "command": "npm run atlas:parent-atlas:overlay-crosswalk",
-        "feature_id": "parent-atlas",
-        "source_refs": [
-          "docs/reports/parent-atlas-overlay-sync-report.json"
-        ],
-        "evidence_refs": [
-          "docs/reports/parent-atlas-overlay-sync-report.json"
-        ],
-        "first_seen": "2026-06-11T03:18:47.474Z",
-        "last_seen": "2026-06-11T03:18:47.474Z",
-        "created_at": "2026-06-11T03:18:47.474Z",
-        "updated_at": "2026-06-11T03:18:47.474Z",
-        "history": [
-          {
-            "event_id": "task_5af7a6699fe0",
-            "event_type": "TASK_CREATED",
-            "created_at": "2026-06-11T03:18:47.474Z",
-            "run_id": "2026-06-06T06:21:32.559Z",
-            "task_id": "task_parent_atlas_overlay_mismatch",
-            "source_recommendation_key": "parent-atlas-overlay-mismatch",
-            "title": "Parent Atlas overlay mismatch",
-            "description": "Root registry and app overlay are taxonomy-mismatched and need an explicit crosswalk.",
-            "priority": "MEDIUM",
-            "status": "TODO",
-            "parent_task_id": null,
-            "command": "npm run atlas:parent-atlas:overlay-crosswalk",
-            "feature_id": "parent-atlas",
-            "source_refs": [
-              "docs/reports/parent-atlas-overlay-sync-report.json"
-            ],
-            "evidence_refs": [
-              "docs/reports/parent-atlas-overlay-sync-report.json"
-            ]
-          }
-        ],
-        "seen_count": 19
       },
       {
         "task_id": "task_command_mapping_mcp_allowlist",

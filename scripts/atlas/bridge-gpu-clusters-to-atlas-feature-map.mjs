@@ -60,9 +60,16 @@ function readParquet(parquetPath) {
     '-c',
     `COPY (SELECT node_id, gpu_kmeans_cluster, gpu_pagerank, gpu_reward FROM read_parquet('${pq}')) TO '${tj}' (FORMAT JSON, ARRAY TRUE);`,
   ], { encoding: 'utf8' });
-  if (r.status !== 0) throw new Error(`duckdb read failed: ${r.stderr || r.stdout}`);
-  const data = JSON.parse(fs.readFileSync(tmp, 'utf8'));
-  fs.unlinkSync(tmp);
+  let data = [];
+  try {
+    const text = fs.readFileSync(tmp, 'utf8').trim();
+    data = text ? JSON.parse(text) : [];
+  } catch (err) {
+    console.warn(`DuckDB read failed for ${tmp}: ${err.message}`);
+  }
+  if (fs.existsSync(tmp)) {
+    fs.unlinkSync(tmp);
+  }
   return data;
 }
 

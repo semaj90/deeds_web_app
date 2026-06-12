@@ -2,7 +2,7 @@ import { json, error } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { z } from 'zod';
 import { multiLaneRetrievalWithRRF, type RRFIntegrationOptions } from '$lib/server/retrieval/rrf-integration.js';
-import { db } from '$lib/server/db/client.js';
+import { pool } from '$lib/server/db/client.js';
 import { getRedis } from '$lib/server/redis.js';
 
 const querySchema = z.object({
@@ -51,7 +51,6 @@ export const POST: RequestHandler = async (event) => {
     const parsed = querySchema.parse(await event.request.json());
     const { query, k, topK, minScore, useWeights } = parsed;
 
-    const pool = db;
     const weights = WEIGHT_PRESETS[useWeights];
 
     const opts: RRFIntegrationOptions = {

@@ -47,6 +47,16 @@ export const TOOL_MANIFEST = [
     },
   },
   {
+    name: 'startup.briefing',
+    description:
+      'Read the current read-only startup briefing generated from Graphify/readiness passes. Returns a short human briefing, recommendations, warnings, and system status only.',
+    input_schema: {
+      type: 'object',
+      properties: {},
+      required: [],
+    },
+  },
+  {
     name: 'concept.stats',
     description: 'Get aggregate statistics on concept frequency, retrieval strategy distribution, and community tags.',
     input_schema: {

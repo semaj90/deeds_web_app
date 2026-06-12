@@ -2,8 +2,9 @@
 import { createClient } from 'redis';
 import fetch from 'node-fetch';
 import { setTimeout as wait } from 'timers/promises';
+import { resolveRedisUrl } from '../lib/redis-url.mjs';
 
-const REDIS_URL = process.env.REDIS_URL || `redis://${process.env.REDIS_HOST||'localhost'}:${process.env.REDIS_PORT||'6379'}`;
+const REDIS_URL = resolveRedisUrl(process.env);
 const BIFROST_URL = process.env.BIFROST_URL || process.env.BIFROST_ENDPOINT || 'http://localhost:3040';
 const BIFROST_PATH = '/v1/chat/completions';
 const BATCH_DELAY_MS = Number(process.env.WARMUP_BATCH_DELAY_MS || 150);

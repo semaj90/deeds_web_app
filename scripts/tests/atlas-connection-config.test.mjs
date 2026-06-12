@@ -5,6 +5,7 @@ import {
   normalizeRedisUrl,
   resolveDatabaseUrl,
   resolveRedisConfig,
+  resolveRedisUrl,
 } from '../atlas/connection-config.mjs';
 
 test('normalizeConnectionHost keeps real hosts and rewrites 0.0.0.0', () => {
@@ -33,6 +34,16 @@ test('resolveRedisConfig prefers env password and host normalization', () => {
   assert.equal(config.url, 'redis://127.0.0.1:6379');
 });
 
+test('resolveRedisUrl merges REDIS_PASSWORD into a bare REDIS_URL', () => {
+  assert.equal(
+    resolveRedisUrl({
+      REDIS_URL: 'redis://127.0.0.1:6379',
+      REDIS_PASSWORD: 'redis',
+    }),
+    'redis://:redis@127.0.0.1:6379',
+  );
+});
+
 test('resolveDatabaseUrl defaults to the documented host/port/user tuple', () => {
   assert.equal(
     resolveDatabaseUrl({}),
@@ -52,4 +63,3 @@ test('resolveDatabaseUrl normalizes a host override and keeps env credentials', 
     'postgresql://legal_admin:123456@127.0.0.1:5434/legal_ai_db',
   );
 });
-

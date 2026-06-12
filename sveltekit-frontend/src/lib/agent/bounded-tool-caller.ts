@@ -55,6 +55,7 @@ function isBoundedTool(name: string): boolean {
   const boundedToolNames = [
     'topology.status',
     'packet.search',
+    'startup.briefing',
     'concept.stats',
     'graph.nearest',
     'cache.peek',

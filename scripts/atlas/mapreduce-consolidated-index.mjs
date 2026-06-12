@@ -30,9 +30,17 @@ const outputFile = outputIndex >= 0
 const verbose = args.includes('--verbose');
 
 const REPO_ROOT = resolve('.');
-const SKIP_DIRS = new Set(['.git', 'node_modules', 'target', 'dist', 'coverage', '.venv', '.venv-py313-backup', '.python311', '.cache', '.vs', 'deeds_labs']);
-const ALLOW_HIDDEN_DIRS = new Set(['.opencode', '.tmp', '.cache', '.github', '.vscode', '.svelte-kit', '.docker-build']);
+const SKIP_DIRS = new Set(['.git', 'node_modules', 'target', 'dist', 'coverage', '.venv', '.venv-py313-backup', '.python311', '.cache', '.vs', 'deeds_labs', '.opencode']);
+const ALLOW_HIDDEN_DIRS = new Set(['.tmp', '.cache', '.github', '.vscode', '.svelte-kit', '.docker-build']);
 const ALLOWED_EXTENSIONS = new Set(['.ts', '.tsx', '.js', '.mjs', '.json', '.sql', '.md', '.svelte']);
+const SKIP_RELATIVE_PREFIXES = [
+  '.opencode/cards/',
+  '.opencode/embeddings/',
+  '.opencode/ace-packets/',
+  '.opencode/recommendations/',
+  '.opencode/tasks/',
+];
+const MAX_ANALYZE_BYTES = 2 * 1024 * 1024;
 
 function getAnalysisRoots() {
   const entries = readdirSync(REPO_ROOT, { withFileTypes: true });
@@ -70,6 +78,11 @@ function scanDirectory(dir, rel = '') {
   for (const file of files) {
     const fullPath = join(dir, file.name);
     const relPath = join(rel, file.name);
+    const relPosix = relPath.replace(/\\/g, '/');
+
+    if (SKIP_RELATIVE_PREFIXES.some((prefix) => relPosix.startsWith(prefix))) {
+      continue;
+    }
 
     // Skip VCS / dependency dirs, but allow selected gitignored workspace roots.
     if (file.isDirectory() && (SKIP_DIRS.has(file.name) || (file.name.startsWith('.') && !ALLOW_HIDDEN_DIRS.has(file.name)))) {
@@ -79,7 +92,8 @@ function scanDirectory(dir, rel = '') {
     if (file.isDirectory()) {
       results.push(...scanDirectory(fullPath, relPath));
     } else if (
-      ALLOWED_EXTENSIONS.has(extname(file.name))
+      ALLOWED_EXTENSIONS.has(extname(file.name)) &&
+      statSync(fullPath).size <= MAX_ANALYZE_BYTES
     ) {
       results.push({ fullPath, relPath, name: file.name });
     }

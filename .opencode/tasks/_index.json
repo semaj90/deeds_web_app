@@ -1,78 +1,78 @@
 {
   "workspace_id": "deeds-web-app",
   "version": 1,
-  "updated_at": "2026-06-10T16:19:31.576Z",
+  "updated_at": "2026-06-12T03:01:24.178Z",
   "total_tasks": 12,
   "tasks_by_status": {
     "todo": [
       {
-        "id": "task_82210189",
-        "title": "src/lib/components/ui/index.ts — 42 unresolved imports",
-        "feature_id": "ai-retrieval",
+        "id": "task_5de39ae5",
+        "title": ".opencode/embeddings/0df8ccbfa45eb9af.json — 110 unresolved imports",
+        "feature_id": "platform",
         "priority": "high"
       },
       {
-        "id": "task_348ab1ed",
-        "title": "src/lib/components/ui/gaming/n64/index.ts — 29 unresolved imports",
-        "feature_id": "ai-retrieval",
+        "id": "task_b65b6b99",
+        "title": ".opencode/embeddings/10f58deb9e9aa745.json — 13 unresolved imports",
+        "feature_id": "platform",
         "priority": "high"
       },
       {
-        "id": "task_34a0d25f",
-        "title": "src/lib/components/ui/gaming/index.ts — 18 unresolved imports",
-        "feature_id": "ai-retrieval",
+        "id": "task_ce62f338",
+        "title": ".opencode/embeddings/08b904f5e6799cd8.json — 11 unresolved imports",
+        "feature_id": "platform",
         "priority": "high"
       },
       {
-        "id": "task_f312ec90",
-        "title": "src/lib/components/ui/alert-dialog/index.js — 12 unresolved imports",
-        "feature_id": "ai-retrieval",
+        "id": "task_9cda7ae1",
+        "title": ".opencode/embeddings/0386cc07e33a0e7a.json — 5 unresolved imports",
+        "feature_id": "platform",
         "priority": "high"
       },
       {
-        "id": "task_df3bffa1",
-        "title": "src/lib/components/ui/dialog/index.ts — 11 unresolved imports",
-        "feature_id": "ai-retrieval",
+        "id": "task_fa2b0c59",
+        "title": ".opencode/embeddings/087a761800ae6a56.json — 5 unresolved imports",
+        "feature_id": "platform",
         "priority": "high"
       },
       {
-        "id": "task_0fc0beeb",
-        "title": "src/lib/icons/yorha/index.ts — 12 unresolved imports",
-        "feature_id": "ai-retrieval",
+        "id": "task_fd687419",
+        "title": ".opencode/embeddings/1131d9aedada5fec.json — 5 unresolved imports",
+        "feature_id": "platform",
         "priority": "high"
       },
       {
-        "id": "task_a20b4389",
-        "title": "4 files unclassified with >10 imports",
-        "feature_id": "ai-retrieval",
+        "id": "task_bdf763da",
+        "title": "3 files unclassified with >10 imports",
+        "feature_id": "ai-inference",
         "priority": "medium"
       },
       {
-        "id": "task_eb422812",
+        "id": "task_87139808",
         "title": "Feature not implemented: Priority 2: VLM POI Integration (90 min)",
         "feature_id": "platform",
         "priority": "low"
       },
       {
-        "id": "task_ed2d17fb",
+        "id": "task_c853ac06",
         "title": "Feature not implemented: Priority 3: Audit Dashboard Web UI (3-4 hours)",
         "feature_id": "ai-inference",
         "priority": "low"
       },
       {
-        "id": "task_16a139e2",
+        "id": "task_5a5b92cb",
         "title": "Feature not implemented: Priority 4: Auto-Fix Orchestrator (6-8 hours)",
         "feature_id": "ai-inference",
         "priority": "low"
       },
       {
-        "id": "task_772fcddb",
+        "id": "task_3bf927db",
         "title": "Feature not implemented: Phase 3: Post-Synthesis Quality Review (RunID: `stage-2c-500`)",
         "feature_id": "vector-graph",
         "priority": "low"
       },
       {
-        "id": "task_05e14062",
+        "id": "task_d7053a55",
         "title": "Feature not implemented: Priority 1: Evidence Upload UI (1 hour)",
         "feature_id": "ai-retrieval",
         "priority": "low"
@@ -82,7 +82,7 @@
     "blocked": [],
     "done": []
   },
-  "next_ready_task_id": "task_82210189",
+  "next_ready_task_id": "task_5de39ae5",
   "feature_label_count": 13,
   "statistics": {
     "by_status": {
@@ -92,10 +92,10 @@
       "done": 0
     },
     "by_feature": {
-      "ai-retrieval": 8,
-      "platform": 1,
-      "ai-inference": 2,
-      "vector-graph": 1
+      "platform": 7,
+      "ai-inference": 3,
+      "vector-graph": 1,
+      "ai-retrieval": 1
     },
     "by_priority": {
       "high": 6,

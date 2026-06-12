@@ -18,7 +18,7 @@ export { default as N64LoadingRing } from './N64LoadingRing.svelte';
 export { default as N64Modal } from './N64Modal.svelte';
 export { default as N64Panel } from './N64Panel.svelte';
 export { default as N64Progress } from './N64Progress.svelte';
-export { default as N64ProgressBar } from './N64ProgressBar.svelte';
+export { default as N64ProgressBar } from './ProgressBar.svelte';
 export { default as N64Screen } from './N64Screen.svelte';
 export { default as N64Select } from './N64Select.svelte';
 export { default as N64Slider } from './N64Slider.svelte';

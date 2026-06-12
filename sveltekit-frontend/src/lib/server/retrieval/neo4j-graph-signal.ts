@@ -29,6 +29,8 @@ export interface GraphSignalHealth {
   error?: string;
 }
 
+export type GraphSignalResponse = GraphSignalResult[] & { error?: string };
+
 const GraphSignalRequestSchema = z.object({
   conceptIds: z.array(z.string()).min(1).max(20),
   topK: z.number().int().min(1).max(100).default(20),
@@ -83,12 +85,15 @@ export async function checkNeo4jHealth(): Promise<GraphSignalHealth> {
  */
 export async function queryNeoJsGraphSignal(
   request: GraphSignalRequest
-): Promise<GraphSignalResult[]> {
+): Promise<GraphSignalResponse> {
   try {
     const validated = GraphSignalRequestSchema.parse(request);
     const { conceptIds, topK } = validated;
 
-    if (!conceptIds?.length) return [];
+    if (!conceptIds?.length) {
+      const empty = [] as any;
+      return empty;
+    }
 
     const driver = getNeo4jDriver();
     const session = driver.session({ database: 'neo4j' });
@@ -114,14 +119,15 @@ export async function queryNeoJsGraphSignal(
           WHERE p2 <> p1
           RETURN p2 as p, 0.6 as directScore, 'topology' as pathType
         }
+        WITH p, collect(DISTINCT c.id) AS matched_concepts, MAX(directScore) as score
         WHERE p IS NOT NULL
         RETURN
-          p.id as id,
-          MAX(directScore) as score,
-          COALESCE(p.summary, '')::text as text,
-          COUNT(DISTINCT c) as pathCount
+          p.key as id,
+          score,
+          coalesce(p.summary, '') as text,
+          size(matched_concepts) as pathCount
         ORDER BY score DESC
-        LIMIT $topK
+        LIMIT toInteger($topK)
       `;
 
       const result = await session.run(query, {
@@ -129,19 +135,23 @@ export async function queryNeoJsGraphSignal(
         topK,
       });
 
-      return result.records.map((record) => ({
+      const mapped = result.records.map((record) => ({
         id: record.get('id') as string,
         score: Math.min(1.0, Math.max(0.0, record.get('score') as number)), // Clamp to [0, 1]
         text: record.get('text') as string | undefined,
         paths: record.get('pathCount')?.toNumber?.() ?? 1,
-      }));
+      })) as GraphSignalResponse;
+
+      return mapped;
     } finally {
       await session.close();
     }
   } catch (err) {
-    // Graceful degradation: log error, return empty
+    // Graceful degradation: log error, return empty with error attached
     console.error('Neo4j graph signal error:', err);
-    return [];
+    const empty = [] as any;
+    empty.error = String(err);
+    return empty;
   }
 }
 
@@ -151,9 +161,12 @@ export async function queryNeoJsGraphSignal(
 export async function queryNeoJsGraphSignalByNames(
   conceptNames: string[],
   topK: number = 20
-): Promise<GraphSignalResult[]> {
+): Promise<GraphSignalResponse> {
   try {
-    if (!conceptNames?.length) return [];
+    if (!conceptNames?.length) {
+      const empty = [] as any;
+      return empty;
+    }
 
     const driver = getNeo4jDriver();
     const session = driver.session({ database: 'neo4j' });
@@ -176,14 +189,15 @@ export async function queryNeoJsGraphSignalByNames(
           WHERE p2 <> p1
           RETURN p2 as p, 0.6 as directScore, 'topology' as pathType
         }
+        WITH p, collect(DISTINCT c.id) AS matched_concepts, MAX(directScore) as score
         WHERE p IS NOT NULL
         RETURN
-          p.id as id,
-          MAX(directScore) as score,
-          COALESCE(p.summary, '')::text as text,
-          COUNT(DISTINCT c) as pathCount
+          p.key as id,
+          score,
+          coalesce(p.summary, '') as text,
+          size(matched_concepts) as pathCount
         ORDER BY score DESC
-        LIMIT $topK
+        LIMIT toInteger($topK)
       `;
 
       const result = await session.run(query, {
@@ -191,49 +205,52 @@ export async function queryNeoJsGraphSignalByNames(
         topK,
       });
 
-      return result.records.map((record) => ({
+      const mapped = result.records.map((record) => ({
         id: record.get('id') as string,
         score: Math.min(1.0, Math.max(0.0, record.get('score') as number)),
         text: record.get('text') as string | undefined,
         paths: record.get('pathCount')?.toNumber?.() ?? 1,
-      }));
+      })) as GraphSignalResponse;
+
+      return mapped;
     } finally {
       await session.close();
     }
   } catch (err) {
     console.error('Neo4j graph signal (by names) error:', err);
-    return [];
+    const empty = [] as any;
+    empty.error = String(err);
+    return empty;
   }
 }
 
 /**
  * Get stats on Neo4j graph (for debugging/monitoring).
  */
-export async function getNeo4jGraphStats(): Promise<Record<string, number | string>> {
+export async function getNeo4jGraphStats(): Promise<Record<string, number | string | boolean>> {
   try {
     const driver = getNeo4jDriver();
     const session = driver.session({ database: 'neo4j' });
 
     try {
       const result = await session.run(`
-        MATCH (c:Concept) RETURN count(c) as conceptCount
+        MATCH (c:Concept) RETURN 'conceptCount' as metric, count(c) as value
         UNION ALL
-        MATCH (p:Packet) RETURN count(p) as packetCount
+        MATCH (p:Packet) RETURN 'packetCount' as metric, count(p) as value
         UNION ALL
-        MATCH ()-[r:SUPPORTS]->() RETURN count(r) as supportsEdges
+        MATCH ()-[r:SUPPORTS]->() RETURN 'supportsEdges' as metric, count(r) as value
         UNION ALL
-        MATCH ()-[r:SIMILAR_TOPOLOGY]->() RETURN count(r) as topologyEdges
+        MATCH ()-[r:SIMILAR_TOPOLOGY]->() RETURN 'topologyEdges' as metric, count(r) as value
       `);
 
-      const stats: Record<string, number | string> = {
+      const stats: Record<string, number | string | boolean> = {
         connected: true,
-        nodeTypes: 0,
       };
 
       for (const record of result.records) {
-        const key = Object.keys(record.toObject())[0];
-        const value = record.get(key);
-        stats[key] = value?.toNumber?.() ?? value ?? 0;
+        const metric = record.get('metric') as string;
+        const value = record.get('value');
+        stats[metric] = value?.toNumber?.() ?? value ?? 0;
       }
 
       return stats;

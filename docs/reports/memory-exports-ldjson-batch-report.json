@@ -1,0 +1,79 @@
+{
+  "generatedAt": "2026-06-12T01:41:31.551Z",
+  "sourceDir": "memory/exports",
+  "applyRequested": true,
+  "applied": true,
+  "inputCount": 50,
+  "writtenCount": 50,
+  "skippedInvalidJson": 0,
+  "duplicateReportIds": [],
+  "outputSha256": "7505c30fb2af5415e4a914d840e50abd4bad548e4719c863026ba11684fe9d6d",
+  "outputNdjsonPath": "memory/exports/reports.ndjson",
+  "outputManifestPath": "memory/exports/reports.manifest.json",
+  "orderedBy": "source_path asc",
+  "completionEstimatePct": 100,
+  "reportTypeCounts": {
+    "atlas_completion_report.v1": 1,
+    "parent_atlas_final_completion.v1": 1,
+    "unknown": 48
+  },
+  "sampleRows": [
+    {
+      "report_id": "ace-packet-ingest-report",
+      "source_path": "memory/exports/ace-packet-ingest-report.json",
+      "report_type": null,
+      "status": null,
+      "summary": "count=396 | generatedAt=2026-06-04T04:44:00.929Z"
+    },
+    {
+      "report_id": "all-lanes-parent-atlas-report",
+      "source_path": "memory/exports/all-lanes-parent-atlas-report.json",
+      "report_type": null,
+      "status": null,
+      "summary": "generatedAt=2026-06-11T03:51:58.305Z"
+    },
+    {
+      "report_id": "atlas-completion-report",
+      "source_path": "memory/exports/atlas-completion-report.json",
+      "report_type": "atlas_completion_report.v1",
+      "status": "PASS",
+      "summary": "status=PASS | generatedAt=2026-06-10T03:55:36.488Z"
+    },
+    {
+      "report_id": "backfill-code-cards-report",
+      "source_path": "memory/exports/backfill-code-cards-report.json",
+      "report_type": null,
+      "status": null,
+      "summary": "generatedAt=2026-05-30T04:43:54.171Z"
+    },
+    {
+      "report_id": "chr97-eval-report",
+      "source_path": "memory/exports/chr97-eval-report.json",
+      "report_type": null,
+      "status": null,
+      "summary": "generatedAt=2026-05-31T08:50:34.713Z"
+    },
+    {
+      "report_id": "chr97-grpo-export-report",
+      "source_path": "memory/exports/chr97-grpo-export-report.json",
+      "report_type": null,
+      "status": null,
+      "summary": "generatedAt=2026-05-31T08:58:12.100Z"
+    },
+    {
+      "report_id": "chr97-inject-engram-ace-report",
+      "source_path": "memory/exports/chr97-inject-engram-ace-report.json",
+      "report_type": null,
+      "status": null,
+      "summary": "generatedAt=2026-05-31T08:41:22.428Z"
+    },
+    {
+      "report_id": "chr97-k-sweep-report",
+      "source_path": "memory/exports/chr97-k-sweep-report.json",
+      "report_type": null,
+      "status": null,
+      "summary": "generatedAt=2026-05-31T08:50:34.727Z"
+    }
+  ],
+  "note": "Deterministic report batch materialized as LD-JSON."
+}

@@ -159,6 +159,8 @@ const loadedArtifacts = {
 };
 
 const loadedReports = Array.from(new Set([
+  path.join(repoRoot, '.opencode', 'startup-briefing.md'),
+  path.join(repoRoot, '.opencode', 'startup-briefing.json'),
   path.join(repoRoot, 'reports', 'ace-daily-todo-summary.md'),
   path.join(repoRoot, 'reports', 'claude-mem-startup.md'),
   path.join(repoRoot, 'reports', 'opencode-bootstrap.md'),
@@ -223,6 +225,8 @@ fs.writeFileSync(path.join(opencodeDir, 'startup-context.json'), JSON.stringify(
   loadedReports,
   // Store paths only — full blobs are too large for VS Code session serialization
   loadedArtifactPaths: {
+    startupBriefingMd: path.join(opencodeDir, 'startup-briefing.md'),
+    startupBriefingJson: path.join(opencodeDir, 'startup-briefing.json'),
     aceContext: path.join(opencodeDir, 'ace-context.json'),
     featureFiles: path.join(opencodeDir, 'feature-files.json'),
     claudeMem: path.join(repoRoot, '.tmp', 'claude-mem-ensure.json'),
@@ -231,6 +235,7 @@ fs.writeFileSync(path.join(opencodeDir, 'startup-context.json'), JSON.stringify(
     mcpHealth: path.join(repoRoot, '.tmp', 'mcp-health-status.json'),
   },
   loadedArtifacts: {
+    startupBriefing: readJsonIfExists(path.join(opencodeDir, 'startup-briefing.json'), null),
     claudeMem: summary.loadedArtifacts.claudeMem,
     mcpHealth: summary.loadedArtifacts.mcpHealth,
     recommendations: summary.loadedArtifacts.recommendations,

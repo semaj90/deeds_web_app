@@ -15,18 +15,34 @@ const LOOPBACK_IP = ['127', '0', '0', '1'].join('.');
 function normalizeRedisUrl(rawValue?: string): string {
   const fallbackHost = LOOPBACK_IP;
   const fallbackPort = '6379';
+  const redisPassword = privateEnv.REDIS_PASSWORD ?? privateEnv.REDIS_PASS ?? '';
   const raw = rawValue?.trim();
   if (!raw) return `redis://${fallbackHost}:${fallbackPort}`;
-  if (/^rediss?:\/\//i.test(raw)) return raw;
+  if (/^rediss?:\/\//i.test(raw)) {
+    try {
+      const parsed = new URL(raw);
+      if ((!parsed.password || parsed.password.length === 0) && redisPassword) {
+        parsed.password = redisPassword;
+      }
+      if (!parsed.hostname) parsed.hostname = fallbackHost;
+      if (!parsed.port) parsed.port = fallbackPort;
+      return parsed.toString();
+    } catch {
+      return raw;
+    }
+  }
   if (/^[^:/?#]+:\d+(?:\/\d+)?$/.test(raw)) {
     const [hostPort, dbPart] = raw.split('/', 2);
     const [host, port] = hostPort.split(':', 2);
-    return `redis://${host || fallbackHost}:${port || fallbackPort}${dbPart ? `/${dbPart}` : ''}`;
+    const auth = redisPassword ? `:${encodeURIComponent(redisPassword)}@` : '';
+    return `redis://${auth}${host || fallbackHost}:${port || fallbackPort}${dbPart ? `/${dbPart}` : ''}`;
   }
   if (/^[^:/?#]+$/.test(raw)) {
-    return `redis://${raw}:${fallbackPort}`;
+    const auth = redisPassword ? `:${encodeURIComponent(redisPassword)}@` : '';
+    return `redis://${auth}${raw}:${fallbackPort}`;
   }
-  return `redis://${fallbackHost}:${fallbackPort}`;
+  const auth = redisPassword ? `:${encodeURIComponent(redisPassword)}@` : '';
+  return `redis://${auth}${fallbackHost}:${fallbackPort}`;
 }
 const DEV = {
   // Port 5434 = deeds-postgres-prod-proxy (alpine/socat) → legal-ai-postgres container.

@@ -30,22 +30,20 @@ async function main() {
   const sampleIndex = args.indexOf('--sample');
   const sampleN = sampleIndex !== -1 && args[sampleIndex+1] ? parseInt(args[sampleIndex+1],10) : 20;
   const apply = args.includes('--apply');
-  if (!await exists(summariesPath)) {
-    if (await exists(backupPath)) {
-      console.log('Primary summaries file missing — using backup', backupPath);
-      await fs.copyFile(backupPath, summariesPath);
-    } else {
-      console.error('No summaries.merged.jsonl or backup found at', summariesPath);
-      process.exit(1);
-    }
+
+  if (await exists(backupPath)) {
+    console.log('Restoring from backup summaries file:', backupPath);
+    await fs.copyFile(backupPath, summariesPath);
+  } else if (!await exists(summariesPath)) {
+    console.error('No summaries.merged.jsonl or backup found at', summariesPath);
+    process.exit(1);
   }
 
   const lines = await readLines(summariesPath);
   const objs = lines.map(l=>{ try { return JSON.parse(l); } catch(e){ return null }}).filter(Boolean);
   const empty = objs.filter(o => {
-    const payload = o.payload || o.points?.[0]?.payload || {};
-    const s = payload.summary;
-    return !(typeof s === 'string' && s.trim().length>0);
+    const s = o.summary;
+    return !(typeof s === 'string' && s.trim().length > 0);
   });
 
   console.log('Total records:', objs.length, 'Empty summaries:', empty.length);
@@ -54,8 +52,7 @@ async function main() {
   const sample = empty.slice(0, sampleN);
   console.log('Sample empty-summary cards:');
   for (const e of sample) {
-    const payload = e.payload || e.points?.[0]?.payload || {};
-    console.log('-', payload.card_id || e.id, 'sourceRef=', payload.sourceRef || null);
+    console.log('-', e.card_id || e.id, 'sourceRef=', e.sourceRef || null);
   }
 
   if (!apply) {
@@ -67,24 +64,29 @@ async function main() {
   const out = [];
   const invalid = [];
   for (const o of objs) {
-    const payload = o.payload || o.points?.[0]?.payload || {};
-    const s = payload.summary;
-    if (typeof s === 'string' && s.trim().length>0) {
-      out.push(o); continue;
+    const s = o.summary;
+    if (typeof s === 'string' && s.trim().length > 0) {
+      if (!o.sourceRef && o.card_id && o.card_id.startsWith('file:')) {
+        o.sourceRef = o.card_id.replace(/^file:/, '');
+      }
+      out.push(o);
+      continue;
     }
-    const cardId = payload.card_id || o.id || '';
+    const cardId = o.card_id || o.id || '';
     if (cardId.startsWith('file:')) {
       const rel = cardId.replace(/^file:/,'');
-      const full = path.join(workspace, rel);
+      let full = path.join(workspace, rel);
+      if (!await exists(full)) {
+        full = path.join(workspace, 'sveltekit-frontend', rel);
+      }
       try {
         const txt = await fs.readFile(full, 'utf8');
         const summary = makeSummaryFromText(txt, 300);
         if (summary) {
-          payload.summary = summary;
-          payload._summary_filled = { method: 'file_truncate', from: rel };
-          // assign back into original shape
-          if (o.payload) o.payload = payload;
-          else if (o.points && o.points[0]) o.points[0].payload = payload;
+          o.summary = summary;
+          o.sourceRef = rel;
+          o.file = rel;
+          o._summary_filled = { method: 'file_truncate', from: rel };
           out.push(o);
           continue;
         }
@@ -93,7 +95,7 @@ async function main() {
       }
     }
     // cannot fill
-    if (o.payload) o.payload._valid = false; else if (o.points && o.points[0]) o.points[0].payload._valid = false;
+    o._valid = false;
     invalid.push(o);
   }
 

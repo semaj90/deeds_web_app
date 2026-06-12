@@ -21,7 +21,7 @@ export async function bm25SearchIndexed(
     const results = await db.execute(
       sql`
         SELECT
-          ${atlasPackets.id},
+          ${atlasPackets.packetId},
           similarity(${atlasPackets.summary}, ${query}) as similarity,
           ${atlasPackets.summary}
         FROM ${atlasPackets}
@@ -54,7 +54,7 @@ export async function bm25SearchUnindexed(
   try {
     const results = await db
       .select({
-        id: atlasPackets.id,
+        id: atlasPackets.packetId,
         similarity: sql<number>`similarity(${atlasPackets.summary}, ${query})`,
       })
       .from(atlasPackets)

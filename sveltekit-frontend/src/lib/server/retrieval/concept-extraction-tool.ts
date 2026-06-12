@@ -94,7 +94,7 @@ export async function extractQueryConceptsViaGemma(
   } catch (err) {
     // Log error but don't throw — graceful degradation
     if (err instanceof z.ZodError) {
-      console.error('[concept-extraction] Validation error:', err.errors);
+      console.error('[concept-extraction] Validation error:', err.issues);
     } else {
       console.error('[concept-extraction] Error:', err);
     }
@@ -117,7 +117,7 @@ async function streamConceptsFromGemma(
   // Use bifrostChat for streaming (with L1 + L2 cache automatic)
   const response = await bifrostChat(
     [{ role: 'user', content: prompt }],
-    ENV.GEMMA_MODEL || 'gemma3-legal:latest',
+    ENV.GEMMA4_MODEL || 'gemma3-legal:latest',
     {
       temperature: 0.3,
       maxTokens: 500,

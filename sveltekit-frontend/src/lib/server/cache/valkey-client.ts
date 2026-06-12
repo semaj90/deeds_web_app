@@ -22,14 +22,26 @@ function resolveUrl(): string {
     // dynamic require keeps Vite happy (tree-shaken in client bundles)
     // eslint-disable-next-line @typescript-eslint/no-require-imports
     const { ENV } = require('$lib/server/env.server.js');
-    if (ENV?.REDIS_URL) return ENV.REDIS_URL;
+    if (ENV?.REDIS_URL) {
+      const raw = String(ENV.REDIS_URL).trim();
+      const password = String(ENV?.REDIS_PASSWORD ?? process.env.REDIS_PASSWORD ?? process.env.REDIS_PASS ?? '').trim();
+      if (raw && password) {
+        try {
+          const parsed = new URL(raw);
+          if ((!parsed.password || parsed.password.length === 0) && password) {
+            parsed.password = password;
+            return parsed.toString();
+          }
+        } catch {
+          // fall through
+        }
+      }
+      return ENV.REDIS_URL;
+    }
   } catch {
     // not in SvelteKit context — fall through to process.env
   }
-  return (
-    process.env.REDIS_URL ??
-    buildUrlFromParts()
-  );
+  return mergePasswordIntoUrl(process.env.REDIS_URL ?? buildUrlFromParts(), resolvePassword());
 }
 
 function resolvePassword(): string {
@@ -51,6 +63,31 @@ function buildUrlFromParts(): string {
   const host = process.env.REDIS_HOST ?? '127.0.0.1';
   const port = process.env.REDIS_PORT ?? '6379';
   return `redis://${host}:${port}`;
+}
+
+function mergePasswordIntoUrl(url: string, password: string): string {
+  const raw = String(url ?? '').trim();
+  if (!raw) {
+    const host = process.env.REDIS_HOST ?? '127.0.0.1';
+    const port = process.env.REDIS_PORT ?? '6379';
+    return password ? `redis://:${encodeURIComponent(password)}@${host}:${port}` : `redis://${host}:${port}`;
+  }
+  if (!password) return raw;
+  try {
+    const parsed = new URL(raw);
+    if ((parsed.protocol === 'redis:' || parsed.protocol === 'rediss:') && (!parsed.password || parsed.password.length === 0)) {
+      parsed.password = password;
+      return parsed.toString();
+    }
+  } catch {
+    // fall through to synthesized URL below
+  }
+  if (raw.startsWith('redis://') || raw.startsWith('rediss://')) {
+    return raw;
+  }
+  const host = process.env.REDIS_HOST ?? '127.0.0.1';
+  const port = process.env.REDIS_PORT ?? '6379';
+  return `redis://:${encodeURIComponent(password)}@${host}:${port}`;
 }
 
 // ── singleton ─────────────────────────────────────────────────────────────────

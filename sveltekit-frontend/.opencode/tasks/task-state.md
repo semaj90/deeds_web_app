@@ -2,11 +2,11 @@
 
 ## Summary
 
-- generatedAt: 2026-06-11T19:28:35.280Z
+- generatedAt: 2026-06-12T02:30:10.404Z
 - recommendationEvents: 235
-- taskEvents: 22
+- taskEvents: 23
 - taskCount: 13
-- openTaskCount: 5
+- openTaskCount: 4
 - archivedTaskCount: 0
 
 ## Active Lane
@@ -23,10 +23,6 @@
   - seen_count: 3
 - [HIGH] 4 circular dependency chains of 3+ files (TODO)
   - source: `4_circular_dependency_chains_of_3_files`
-  - seen_count: 19
-- [MEDIUM] Parent Atlas overlay mismatch (TODO)
-  - command: `npm run atlas:parent-atlas:overlay-crosswalk`
-  - source: `parent-atlas-overlay-mismatch`
   - seen_count: 19
 - [MEDIUM] Command Mapping -> MCP allowlist (TODO)
   - command: `npm run opencode:tasks:refresh`

@@ -70,21 +70,34 @@ function normalizeMinioUrl(rawValue?: string): string {
 function normalizeRedisUrl(rawValue?: string): string {
   const fallbackHost = isDocker ? 'redis' : LOOPBACK_IP;
   const fallbackPort = '6379';
+  const redisPassword = env?.REDIS_PASSWORD ?? env?.REDIS_PASS ?? 'redis';
   const raw = rawValue?.trim();
 
   if (!raw) {
-    return `redis://${fallbackHost}:${fallbackPort}/0`;
+    return `redis://${encodeURIComponent(redisPassword)}@${fallbackHost}:${fallbackPort}/0`;
   }
-  if (/^rediss?:\/\//i.test(raw)) return raw;
+  if (/^rediss?:\/\//i.test(raw)) {
+    try {
+      const parsed = new URL(raw);
+      if ((!parsed.password || parsed.password.length === 0) && redisPassword) {
+        parsed.password = redisPassword;
+      }
+      if (!parsed.hostname) parsed.hostname = fallbackHost;
+      if (!parsed.port) parsed.port = fallbackPort;
+      return parsed.toString();
+    } catch {
+      return raw;
+    }
+  }
   if (/^[^:/?#]+:\d+(?:\/\d+)?$/.test(raw)) {
     const [hostPort, dbPart] = raw.split('/', 2);
     const [host, port] = hostPort.split(':', 2);
-    return `redis://${host || fallbackHost}:${port || fallbackPort}${dbPart ? `/${dbPart}` : ''}`;
+    return `redis://${encodeURIComponent(redisPassword)}@${host || fallbackHost}:${port || fallbackPort}${dbPart ? `/${dbPart}` : ''}`;
   }
   if (/^[^:/?#]+$/.test(raw)) {
-    return `redis://${raw}:${fallbackPort}/0`;
+    return `redis://${encodeURIComponent(redisPassword)}@${raw}:${fallbackPort}/0`;
   }
-  return `redis://${fallbackHost}:${fallbackPort}/0`;
+  return `redis://${encodeURIComponent(redisPassword)}@${fallbackHost}:${fallbackPort}/0`;
 }
 
 export function getDatabaseUrl(): string {

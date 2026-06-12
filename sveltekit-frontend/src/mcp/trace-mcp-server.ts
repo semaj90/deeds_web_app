@@ -7987,6 +7987,200 @@ server.registerTool(
   }
 );
 
+// ── atlas.packet_search ───────────────────────────────────────────────────────
+// Query atlas_packets table by source_ref prefix, feature_id, or free-text
+// summary search. Returns packet metadata without embeddings (safe for context).
+// Path variants are tried automatically so callers don't need to canonicalize.
+server.registerTool(
+  'atlas.packet_search',
+  {
+    description:
+      'Query the canonical atlas_packets table. Search by source_ref path (variants tried automatically), ' +
+      'feature_id, concept_id membership, or free-text summary match. ' +
+      'Returns packet_id, source_ref, feature_id, concept_ids, summary, reward_prior. ' +
+      'Use this to find which packets are associated with a file or feature before querying Qdrant.',
+    inputSchema: z.object({
+      source_ref: z.string().optional().describe(
+        'File path (any form: absolute, repo-relative, with/without sveltekit-frontend/ prefix). ' +
+        'Variants are tried automatically via canonicalization.'
+      ),
+      feature_id: z.string().optional().describe('Exact feature_id to filter on.'),
+      concept_id: z.string().optional().describe('Filter to packets whose concept_ids array contains this value.'),
+      summary_query: z.string().optional().describe('Full-text search against packet summaries.'),
+      limit: z.number().int().min(1).max(50).default(20).optional(),
+    }),
+  },
+  async ({ source_ref, feature_id, concept_id, summary_query, limit = 20 }) => {
+    try {
+      // Canonical path normalization — matches any representation of the same file
+      function canonicalPath(input: string): string {
+        return input
+          .replaceAll('\\', '/')
+          .replace(/^file:\/+/i, '')
+          .replace(/^\/?c:\//i, '')
+          .replace(/^Users\/james\/Videos\/deeds-web-app\//i, '')
+          .replace(/^deeds-web-app\//i, '')
+          .replace(/^\.?\//, '')
+          .toLowerCase();
+      }
+
+      const conditions: string[] = [];
+      const params: unknown[] = [];
+      let p = 1;
+
+      if (source_ref) {
+        const canon = canonicalPath(source_ref);
+        const withPrefix = canon.startsWith('sveltekit-frontend/')
+          ? canon
+          : `sveltekit-frontend/${canon}`;
+        const withoutPrefix = canon.replace(/^sveltekit-frontend\//, '');
+        conditions.push(
+          `(lower(source_ref) = ANY($${p}::text[]) OR lower(source_ref) LIKE $${p + 1} OR source_ref LIKE $${p + 2})`
+        );
+        params.push([canon, withPrefix, withoutPrefix]);
+        params.push(`%${withoutPrefix}`);
+        params.push(`%.tmp/parent_atlas_packets/%`);
+        p += 3;
+      }
+
+      if (feature_id) {
+        conditions.push(`feature_id = $${p}`);
+        params.push(feature_id);
+        p++;
+      }
+
+      if (concept_id) {
+        conditions.push(`$${p} = ANY(concept_ids)`);
+        params.push(concept_id);
+        p++;
+      }
+
+      if (summary_query) {
+        conditions.push(`to_tsvector('english', coalesce(summary, '')) @@ plainto_tsquery('english', $${p})`);
+        params.push(summary_query);
+        p++;
+      }
+
+      const where = conditions.length > 0 ? `WHERE ${conditions.join(' AND ')}` : '';
+      const sql = `
+        SELECT packet_id, artifact_id, source_ref, feature_id, community_id,
+               concept_ids, cluster_id, summary,
+               byte_start, byte_end, sha256, created_at
+        FROM atlas_packets
+        ${where}
+        ORDER BY created_at DESC
+        LIMIT $${p}
+      `;
+      params.push(limit ?? 20);
+
+      const result = await pool.query(sql, params);
+      return {
+        content: [{
+          type: 'text' as const,
+          text: JSON.stringify({
+            count: result.rowCount,
+            packets: result.rows,
+            filters: { source_ref, feature_id, concept_id, summary_query },
+          }, null, 2),
+        }],
+      };
+    } catch (err) {
+      return {
+        content: [{ type: 'text' as const, text: JSON.stringify({ ok: false, error: String(err).slice(0, 500) }) }],
+        isError: true,
+      };
+    }
+  }
+);
+
+// ── atlas.coverage ────────────────────────────────────────────────────────────
+// Phase 3I verification gate: reports coverage metrics for atlas_packets.
+// Gate: packet_key >= 95%, source_ref >= 90% before Phase 4A RRF can start.
+server.registerTool(
+  'atlas.coverage',
+  {
+    description:
+      'Phase 3I verification gate. Reports coverage metrics for the atlas_packets canonical warehouse: ' +
+      'total packets, source_ref coverage %, feature_id coverage %, concept_ids coverage %, ' +
+      'summary coverage %, embedding coverage %, and duplicate sha256 count. ' +
+      'Gate: source_ref >= 90% required before Phase 4A RRF ranking can start.',
+    inputSchema: z.object({
+      verbose: z.boolean().default(false).optional().describe('Include per-artifact_id breakdown'),
+    }),
+  },
+  async ({ verbose = false }) => {
+    try {
+      const metrics = await pool.query(`
+        SELECT
+          COUNT(*)                                                    AS total,
+          COUNT(source_ref)                                           AS has_source_ref,
+          COUNT(feature_id)                                           AS has_feature_id,
+          COUNT(NULLIF(array_length(concept_ids, 1), 0))             AS has_concepts,
+          COUNT(summary)                                              AS has_summary,
+          COUNT(embedding)                                            AS has_embedding,
+          COUNT(sha256)                                               AS has_sha256,
+          ROUND(COUNT(source_ref)::numeric / NULLIF(COUNT(*), 0) * 100, 1) AS source_ref_pct,
+          ROUND(COUNT(feature_id)::numeric / NULLIF(COUNT(*), 0) * 100, 1) AS feature_id_pct,
+          ROUND(COUNT(summary)::numeric / NULLIF(COUNT(*), 0) * 100, 1)    AS summary_pct,
+          ROUND(COUNT(embedding)::numeric / NULLIF(COUNT(*), 0) * 100, 1)  AS embedding_pct
+        FROM atlas_packets
+      `);
+
+      const dupes = await pool.query(`
+        SELECT COUNT(*) AS dupe_count
+        FROM (
+          SELECT sha256 FROM atlas_packets WHERE sha256 IS NOT NULL GROUP BY sha256 HAVING COUNT(*) > 1
+        ) d
+      `);
+
+      const row = metrics.rows[0];
+      const gate = {
+        source_ref_ok: parseFloat(row.source_ref_pct) >= 90,
+        feature_id_ok: parseFloat(row.feature_id_pct) >= 50,
+        summary_ok: parseFloat(row.summary_pct) >= 50,
+        phase4a_ready: parseFloat(row.source_ref_pct) >= 90,
+      };
+
+      const result: Record<string, unknown> = {
+        total_packets: parseInt(row.total),
+        coverage: {
+          source_ref:  { count: parseInt(row.has_source_ref),  pct: parseFloat(row.source_ref_pct),  gate: '≥90%', ok: gate.source_ref_ok },
+          feature_id:  { count: parseInt(row.has_feature_id),  pct: parseFloat(row.feature_id_pct),  gate: '≥50%', ok: gate.feature_id_ok },
+          concept_ids: { count: parseInt(row.has_concepts) },
+          summary:     { count: parseInt(row.has_summary),     pct: parseFloat(row.summary_pct),     gate: '≥50%', ok: gate.summary_ok },
+          embedding:   { count: parseInt(row.has_embedding),   pct: parseFloat(row.embedding_pct) },
+          sha256:      { count: parseInt(row.has_sha256) },
+        },
+        duplicate_sha256: parseInt(dupes.rows[0].dupe_count),
+        gates: gate,
+        phase4a_ready: gate.phase4a_ready,
+        next_action: gate.phase4a_ready
+          ? 'Coverage gate PASSED — Phase 4A RRF ranking can start'
+          : `Coverage gate FAILED — need source_ref ≥ 90% (current: ${row.source_ref_pct}%). Run: node scripts/atlas/backfill-atlas-source-refs.mjs`,
+      };
+
+      if (verbose) {
+        const breakdown = await pool.query(`
+          SELECT artifact_id, COUNT(*) as cnt,
+                 COUNT(source_ref) as has_src, COUNT(feature_id) as has_feat
+          FROM atlas_packets
+          GROUP BY artifact_id ORDER BY cnt DESC LIMIT 20
+        `);
+        result.artifact_breakdown = breakdown.rows;
+      }
+
+      return {
+        content: [{ type: 'text' as const, text: JSON.stringify(result, null, 2) }],
+      };
+    } catch (err) {
+      return {
+        content: [{ type: 'text' as const, text: JSON.stringify({ ok: false, error: String(err).slice(0, 500) }) }],
+        isError: true,
+      };
+    }
+  }
+);
+
 nodeServer.listen(PORT, HOST, () => {
   console.log(`TRACE MCP server listening on http://${HOST}:${PORT}`);
   console.log('Tools: graph.expand_neighborhood, graph.shortest_path, graph.community_for_node,');

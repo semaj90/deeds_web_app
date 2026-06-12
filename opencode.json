@@ -29,9 +29,7 @@
               "<think>",
               "</think>",
               "Thinking:",
-              "Self-Correction",
-              "_gemma3",
-              "gemma3.5-27"
+              "Self-Correction"
             ]
           }
         }
@@ -60,9 +58,7 @@
               "<think>",
               "</think>",
               "Thinking:",
-              "Self-Correction",
-              "_gemma3",
-              "gemma3.5-27"
+              "Self-Correction"
             ]
           }
         }
@@ -79,8 +75,8 @@
       "description": "Refresh ACE hits, local health, and report artifacts before starting OpenCode work",
       "agent": "antigravity",
       "subtask": false,
-      "prompt": "Run npm run opencode:bootstrap from repo root. The bootstrap must first ensure Claude-Mem is launched detached when available, then load the local ACE hits, Parent Atlas recommendations, daily TODO summary, startup truth, MCP health, Bitfrost cache health, and codebase semantic-index report. Return sourceRefs, loaded docs/reports, cache hits, bash tools, and the next safe action. Do not edit files.",
-      "template": "npm run opencode:bootstrap"
+      "prompt": "Run npm run agent:hello first, then run npm run opencode:bootstrap from repo root. The bootstrap must first ensure Claude-Mem is launched detached when available, then load the local ACE hits, Parent Atlas recommendations, daily TODO summary, startup truth, MCP health, Bitfrost cache health, startup briefing, and codebase semantic-index report. Return sourceRefs, loaded docs/reports, cache hits, bash tools, and the next safe action. Do not edit files.",
+      "template": "npm run agent:hello && npm run opencode:bootstrap"
     }
   },
 

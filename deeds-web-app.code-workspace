@@ -52,6 +52,8 @@
         "github.copilot.chat.responsesApi.toolSearchTool.enabled": true,
         "github.copilot.chat.anthropic.cacheBreakpoints.lastTwoMessages": true,
         "github.copilot.chat.skillTool.enabled": true,
-        "editor.codeActions.triggerOnFocusChange": true
+        "editor.codeActions.triggerOnFocusChange": true,
+        "chat.mcp.assisted.nuget.enabled": false,
+        "chat.tools.compressOutput.enabled": true
     }
 }

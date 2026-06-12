@@ -22,6 +22,7 @@ import { join, resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import dotenv from 'dotenv';
 import Redis from 'ioredis';
+import { resolveRedisConfig } from '../lib/redis-url.mjs';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = resolve(__dirname, '..', '..');
@@ -35,11 +36,9 @@ const DRY_RUN = process.argv.includes('--dry-run');
 dotenv.config({ path: resolve(ROOT, '.env'), override: false });
 dotenv.config({ path: resolve(ROOT, '.env.local'), override: false });
 
-const REDIS_URL = process.env.REDIS_URL ?? 'redis://127.0.0.1:6379';
-const REDIS_PASSWORD = process.env.REDIS_PASSWORD || process.env.REDIS_PASS || undefined;
 function redisOpts(extra = {}) {
-  const u = new URL(REDIS_URL);
-  return { host: u.hostname || '127.0.0.1', port: Number(u.port) || 6379, password: REDIS_PASSWORD, ...extra };
+  const redis = resolveRedisConfig(process.env);
+  return { host: redis.host, port: redis.port, password: redis.password, ...extra };
 }
 const COUCHDB_URL = process.env.COUCHDB_URL ?? 'http://admin:deeds123@localhost:5984';
 const TTL = 6 * 3600; // 6 hours

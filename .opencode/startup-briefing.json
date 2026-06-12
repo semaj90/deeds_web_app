@@ -1,30 +1,66 @@
 {
-  "timestamp": "2026-06-11T23:47:13.589Z",
+  "timestamp": "2026-06-12T02:21:58.056Z",
   "greeting": "Hello James.",
   "sinceLastWorked": {
-    "tasksOpen": 0,
+    "tasksOpen": 18,
     "tasksClosed": 0,
-    "newRecommendations": 0,
-    "productionReadiness": "PASS 0 / WARN 0 / FAIL 0"
+    "newRecommendations": 6,
+    "taskRegistryOpen": 12,
+    "taskRegistryDone": 0,
+    "productionReadiness": "PASS 66 / WARN 0 / FAIL 0"
   },
   "systems": {
-    "postgres": "offline",
-    "redis": "offline",
-    "qdrant": "offline (check coverage %)",
-    "neo4j": "unknown",
-    "turbovec": "unknown",
-    "ldjson": "unknown"
+    "postgres": "READY",
+    "redis": "READY",
+    "qdrant": "READY",
+    "neo4j": "READY",
+    "turbovec": "SKIPPED",
+    "engramEmbed": "OK",
+    "ldjson": "100%"
   },
   "coverage": {
-    "qdrant": "?%",
-    "som": "?%",
-    "parentAtlas": "?%"
+    "qdrant": "33%",
+    "som": "29%",
+    "parentAtlas": "29%"
+  },
+  "sidecars": [
+    {
+      "name": "turbovec",
+      "transport": "http",
+      "status": "SKIPPED",
+      "detail": "Disabled in opencode.json",
+      "enabled": true
+    },
+    {
+      "name": "turbovec-sidecar",
+      "transport": "http",
+      "status": "SKIPPED",
+      "detail": "Disabled in opencode.json",
+      "enabled": true
+    },
+    {
+      "name": "engram-embed",
+      "transport": "stdio",
+      "status": "OK",
+      "detail": "stdio transport responding with valid JSON-RPC",
+      "enabled": true
+    }
+  ],
+  "progress": {
+    "taskRegistryCompletionPct": 0,
+    "productionReadinessPct": 100,
+    "memoryExportsCompletionPct": 100
   },
   "warnings": [
-    "⚠️ Redis offline: ACE cache using disk fallback only"
+    "Engram embed is stdio-only; TCP probes to 8792 are not the contract."
   ],
   "recommendations": [
-    "📍 Fix Redis preflight (cache offline)"
+    "Qdrant coverage: 33% (3539 files unembedded)",
+    "SOM cluster coverage: 29% (3744 files unclassified)",
+    "atlas_feature_synthesis has only 12 rows — feature rollups incomplete",
+    "2201 atlas_feature_map rows not joined to parent_atlas_documents",
+    "SOM cluster on atlas_feature_map: 31% (3941 missing)",
+    "route_runtime_packets is empty — hot-path scoring unavailable"
   ],
-  "nextLane": "Infrastructure Repair"
+  "nextLane": "Runtime Coverage Repair"
 }

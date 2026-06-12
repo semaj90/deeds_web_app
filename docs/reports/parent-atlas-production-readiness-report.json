@@ -1,6 +1,6 @@
 {
   "schema": "parent_atlas_production_readiness.v1",
-  "generatedAt": "2026-06-11T20:18:38.043Z",
+  "generatedAt": "2026-06-12T02:32:28.085Z",
   "readOnly": true,
   "sections": {
     "summary-batch": [
@@ -317,7 +317,7 @@
         "message": "sveltekit-frontend/src/lib/server/db/schema/index.ts exists",
         "details": {
           "exists": true,
-          "bytes": 4304,
+          "bytes": 4341,
           "relPath": "sveltekit-frontend/src/lib/server/db/schema/index.ts"
         }
       },
@@ -327,7 +327,7 @@
         "message": "sveltekit-frontend/src/lib/server/db/schema-postgres.ts exists",
         "details": {
           "exists": true,
-          "bytes": 217152,
+          "bytes": 217198,
           "relPath": "sveltekit-frontend/src/lib/server/db/schema-postgres.ts"
         }
       },
@@ -526,34 +526,34 @@
       {
         "id": "rg-uu:ndjson-inventory",
         "status": "pass",
-        "message": "rg -uuu found 126 NDJSON files",
+        "message": "rg -uuu found 127 NDJSON files",
         "details": {
           "sample": [
-            "scripts\\atlas\\out\\tool-usage-edges.ndjson",
-            "docs\\packets\\session-features.ndjson",
-            "scripts\\atlas\\out\\synthetic-traces.ndjson",
-            "scripts\\atlas\\out\\db-usage-edges.ndjson",
-            "scripts\\atlas\\out\\calls-edges-2026-05-29.ndjson",
-            "scripts\\atlas\\out\\cache-usage-edges.ndjson",
-            "docs\\packets\\rg-knowledge-packets.ndjson",
-            "docs\\ai-os\\agentic-progress-log.ndjson",
-            ".opencode\\gemma4_candidates.ndjson",
-            ".opencode\\fixes\\fixes.ndjson",
-            ".tmp\\superseded-score-candidates.ndjson",
-            ".tmp\\source-ref-repair-candidates.ndjson",
-            ".tmp\\retrieval-pass-dry-run.ndjson",
+            "neschrom97\\packets\\cards.ndjson",
             ".opencode\\recommendations\\tasks.ndjson",
             ".opencode\\recommendations\\tasks-with-improved-titles.ndjson",
             ".opencode\\recommendations\\agentic-fix-queue.ndjson",
             ".opencode\\quarantine\\invalid-cards.ndjson",
             ".opencode\\outcome-ledger.ndjson",
             ".opencode\\outcome-ledger-with-cardIds.ndjson",
-            ".tmp\\feature-todo-queue.ndjson",
-            ".tmp\\feature-labels.ndjson",
-            ".tmp\\path-map.ndjson",
-            ".tmp\\dependency-graph.ndjson",
-            ".tmp\\compressed-packets.ndjson",
-            ".tmp\\chunks\\feature-chunks.ndjson"
+            "docs\\packets\\session-features.ndjson",
+            "docs\\packets\\rg-knowledge-packets.ndjson",
+            "docs\\ai-os\\agentic-progress-log.ndjson",
+            "memory\\exports\\reports.ndjson",
+            "scripts\\atlas\\out\\tool-usage-edges.ndjson",
+            "scripts\\atlas\\out\\synthetic-traces.ndjson",
+            "scripts\\atlas\\out\\db-usage-edges.ndjson",
+            "scripts\\atlas\\out\\calls-edges-2026-05-29.ndjson",
+            "scripts\\atlas\\out\\cache-usage-edges.ndjson",
+            "tmp\\llm-wiki-chunks\\_combined.ndjson",
+            "tmp\\llm-wiki-chunks\\tokenization.ndjson",
+            "tmp\\llm-wiki-chunks\\tokenization-rg.ndjson",
+            "tmp\\llm-wiki-chunks\\som-clustering.ndjson",
+            "tmp\\llm-wiki-chunks\\som-clustering-rg.ndjson",
+            "tmp\\llm-wiki-chunks\\retrieval-augmented-generation.ndjson",
+            "tmp\\llm-wiki-chunks\\retrieval-augmented-generation-rg.ndjson",
+            "tmp\\llm-wiki-chunks\\quantization.ndjson",
+            "tmp\\llm-wiki-chunks\\quantization-rg.ndjson"
           ]
         }
       }
@@ -1031,7 +1031,7 @@
       "message": "sveltekit-frontend/src/lib/server/db/schema/index.ts exists",
       "details": {
         "exists": true,
-        "bytes": 4304,
+        "bytes": 4341,
         "relPath": "sveltekit-frontend/src/lib/server/db/schema/index.ts"
       }
     },
@@ -1042,7 +1042,7 @@
       "message": "sveltekit-frontend/src/lib/server/db/schema-postgres.ts exists",
       "details": {
         "exists": true,
-        "bytes": 217152,
+        "bytes": 217198,
         "relPath": "sveltekit-frontend/src/lib/server/db/schema-postgres.ts"
       }
     },
@@ -1259,34 +1259,34 @@
       "section": "offline",
       "id": "rg-uu:ndjson-inventory",
       "status": "pass",
-      "message": "rg -uuu found 126 NDJSON files",
+      "message": "rg -uuu found 127 NDJSON files",
       "details": {
         "sample": [
-          "scripts\\atlas\\out\\tool-usage-edges.ndjson",
-          "docs\\packets\\session-features.ndjson",
-          "scripts\\atlas\\out\\synthetic-traces.ndjson",
-          "scripts\\atlas\\out\\db-usage-edges.ndjson",
-          "scripts\\atlas\\out\\calls-edges-2026-05-29.ndjson",
-          "scripts\\atlas\\out\\cache-usage-edges.ndjson",
-          "docs\\packets\\rg-knowledge-packets.ndjson",
-          "docs\\ai-os\\agentic-progress-log.ndjson",
-          ".opencode\\gemma4_candidates.ndjson",
-          ".opencode\\fixes\\fixes.ndjson",
-          ".tmp\\superseded-score-candidates.ndjson",
-          ".tmp\\source-ref-repair-candidates.ndjson",
-          ".tmp\\retrieval-pass-dry-run.ndjson",
+          "neschrom97\\packets\\cards.ndjson",
           ".opencode\\recommendations\\tasks.ndjson",
           ".opencode\\recommendations\\tasks-with-improved-titles.ndjson",
           ".opencode\\recommendations\\agentic-fix-queue.ndjson",
           ".opencode\\quarantine\\invalid-cards.ndjson",
           ".opencode\\outcome-ledger.ndjson",
           ".opencode\\outcome-ledger-with-cardIds.ndjson",
-          ".tmp\\feature-todo-queue.ndjson",
-          ".tmp\\feature-labels.ndjson",
-          ".tmp\\path-map.ndjson",
-          ".tmp\\dependency-graph.ndjson",
-          ".tmp\\compressed-packets.ndjson",
-          ".tmp\\chunks\\feature-chunks.ndjson"
+          "docs\\packets\\session-features.ndjson",
+          "docs\\packets\\rg-knowledge-packets.ndjson",
+          "docs\\ai-os\\agentic-progress-log.ndjson",
+          "memory\\exports\\reports.ndjson",
+          "scripts\\atlas\\out\\tool-usage-edges.ndjson",
+          "scripts\\atlas\\out\\synthetic-traces.ndjson",
+          "scripts\\atlas\\out\\db-usage-edges.ndjson",
+          "scripts\\atlas\\out\\calls-edges-2026-05-29.ndjson",
+          "scripts\\atlas\\out\\cache-usage-edges.ndjson",
+          "tmp\\llm-wiki-chunks\\_combined.ndjson",
+          "tmp\\llm-wiki-chunks\\tokenization.ndjson",
+          "tmp\\llm-wiki-chunks\\tokenization-rg.ndjson",
+          "tmp\\llm-wiki-chunks\\som-clustering.ndjson",
+          "tmp\\llm-wiki-chunks\\som-clustering-rg.ndjson",
+          "tmp\\llm-wiki-chunks\\retrieval-augmented-generation.ndjson",
+          "tmp\\llm-wiki-chunks\\retrieval-augmented-generation-rg.ndjson",
+          "tmp\\llm-wiki-chunks\\quantization.ndjson",
+          "tmp\\llm-wiki-chunks\\quantization-rg.ndjson"
         ]
       }
     },
@@ -1499,7 +1499,7 @@
     "totalNodes": 173294,
     "codebaseFiles": 31551,
     "parentAtlasFeatures": 1701,
-    "totalRelationships": 605930,
+    "totalRelationships": 606548,
     "belongsToFeature": 10506,
     "similarTopology": 170809
   },
@@ -1516,12 +1516,12 @@
     },
     "schemaIndex": {
       "exists": true,
-      "bytes": 4304,
+      "bytes": 4341,
       "relPath": "sveltekit-frontend/src/lib/server/db/schema/index.ts"
     },
     "schemaPostgres": {
       "exists": true,
-      "bytes": 217152,
+      "bytes": 217198,
       "relPath": "sveltekit-frontend/src/lib/server/db/schema-postgres.ts"
     },
     "mirrors": {
@@ -1624,33 +1624,33 @@
   ],
   "ndjsonInventory": {
     "status": "pass",
-    "total": 126,
+    "total": 127,
     "sample": [
-      "scripts\\atlas\\out\\tool-usage-edges.ndjson",
-      "docs\\packets\\session-features.ndjson",
-      "scripts\\atlas\\out\\synthetic-traces.ndjson",
-      "scripts\\atlas\\out\\db-usage-edges.ndjson",
-      "scripts\\atlas\\out\\calls-edges-2026-05-29.ndjson",
-      "scripts\\atlas\\out\\cache-usage-edges.ndjson",
-      "docs\\packets\\rg-knowledge-packets.ndjson",
-      "docs\\ai-os\\agentic-progress-log.ndjson",
-      ".opencode\\gemma4_candidates.ndjson",
-      ".opencode\\fixes\\fixes.ndjson",
-      ".tmp\\superseded-score-candidates.ndjson",
-      ".tmp\\source-ref-repair-candidates.ndjson",
-      ".tmp\\retrieval-pass-dry-run.ndjson",
+      "neschrom97\\packets\\cards.ndjson",
       ".opencode\\recommendations\\tasks.ndjson",
       ".opencode\\recommendations\\tasks-with-improved-titles.ndjson",
       ".opencode\\recommendations\\agentic-fix-queue.ndjson",
       ".opencode\\quarantine\\invalid-cards.ndjson",
       ".opencode\\outcome-ledger.ndjson",
       ".opencode\\outcome-ledger-with-cardIds.ndjson",
-      ".tmp\\feature-todo-queue.ndjson",
-      ".tmp\\feature-labels.ndjson",
-      ".tmp\\path-map.ndjson",
-      ".tmp\\dependency-graph.ndjson",
-      ".tmp\\compressed-packets.ndjson",
-      ".tmp\\chunks\\feature-chunks.ndjson"
+      "docs\\packets\\session-features.ndjson",
+      "docs\\packets\\rg-knowledge-packets.ndjson",
+      "docs\\ai-os\\agentic-progress-log.ndjson",
+      "memory\\exports\\reports.ndjson",
+      "scripts\\atlas\\out\\tool-usage-edges.ndjson",
+      "scripts\\atlas\\out\\synthetic-traces.ndjson",
+      "scripts\\atlas\\out\\db-usage-edges.ndjson",
+      "scripts\\atlas\\out\\calls-edges-2026-05-29.ndjson",
+      "scripts\\atlas\\out\\cache-usage-edges.ndjson",
+      "tmp\\llm-wiki-chunks\\_combined.ndjson",
+      "tmp\\llm-wiki-chunks\\tokenization.ndjson",
+      "tmp\\llm-wiki-chunks\\tokenization-rg.ndjson",
+      "tmp\\llm-wiki-chunks\\som-clustering.ndjson",
+      "tmp\\llm-wiki-chunks\\som-clustering-rg.ndjson",
+      "tmp\\llm-wiki-chunks\\retrieval-augmented-generation.ndjson",
+      "tmp\\llm-wiki-chunks\\retrieval-augmented-generation-rg.ndjson",
+      "tmp\\llm-wiki-chunks\\quantization.ndjson",
+      "tmp\\llm-wiki-chunks\\quantization-rg.ndjson"
     ]
   },
   "summary": {

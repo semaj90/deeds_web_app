@@ -1,6 +1,6 @@
 {
   "schema": "live_service_env.v1",
-  "generatedAt": "2026-06-05T21:32:48.527Z",
+  "generatedAt": "2026-06-12T02:21:55.453Z",
   "readOnly": true,
   "services": [
     {
@@ -10,7 +10,7 @@
         "port": 5434
       },
       "envDisplay": "127.0.0.1:5434",
-      "probeDisplay": "3ms",
+      "probeDisplay": "2ms",
       "detail": "DATABASE_URL=postgresql://legal_admin:123456@127.0.0.1:5434/legal_ai_db",
       "status": "READY"
     },

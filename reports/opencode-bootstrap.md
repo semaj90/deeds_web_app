@@ -1,15 +1,14 @@
 # OpenCode Workspace Bootstrap
 
-Generated: 2026-06-06T07:47:23.117Z
+Generated: 2026-06-12T02:23:11.351Z
 Repo: C:\Users\james\Videos\deeds-web-app
 
 ## Steps
 - claude-mem-ensure: ok (status 0)
 - mcp-health: ok (status 0)
-- startup-truth: fail (status 1)
-- ace-daily-todo-summary: fail (status 3221226091)
-- recommendations-graph-truth: fail (status 3221226091)
-- bifrost-cache-verify: fail (status 3221226091)
+- ace-daily-todo-summary: ok (status 0)
+- recommendations-graph-truth: ok (status 0)
+- bifrost-cache-verify: ok (status 0)
 
 ## Outputs
 - C:\Users\james\Videos\deeds-web-app\.opencode\ace-context.json
@@ -21,6 +20,7 @@ Repo: C:\Users\james\Videos\deeds-web-app
 ## Loaded Docs
 - docs\atlas-calls-extractor-implementation.md
 - docs\atlas-graph-plan-update.md
+- docs\ATLAS-PHASE-0-COMPLETION.md
 - docs\ATLAS-PHASES-ROADMAP-INDEX.md
 - docs\atlas-runtime-intent-graph-architecture.md
 - docs\atlas-uses-db-extractor-implementation.md
@@ -30,9 +30,15 @@ Repo: C:\Users\james\Videos\deeds-web-app
 - docs\documents-atlas-index.md
 - docs\feature-pillar-barrel-migration.md
 - docs\parent-atlas-100pct-next-steps.md
+- docs\phase-3d-implementation-summary.md
+- docs\phase-3e-concept-memory-guide.md
+- docs\PHASE-3F-4B-ARCHITECTURE-SUMMARY.md
+- docs\PHASE-4A-COMPLETE-SUMMARY.md
 - docs\REDIS-CACHE-CONSOLIDATION-2026-05-29.md
 - docs\REDIS-SHARED-UTILITIES-API.md
+- docs\SESSION-JUNE-11-2026-SUMMARY.md
 - docs\SESSION_2026-05-29_COMPLETE_SUMMARY.md
+- docs\STARTUP-BRIEFING-CONTRACT.md
 - docs\status\feature-tracking-roadmap.md
 - docs\status\GPU_SEMANTIC_WIKI_SUMMARY.md
 - docs\status\GPU_UTILIZATION_REPORT_2026-04-11.md
@@ -60,10 +66,14 @@ Repo: C:\Users\james\Videos\deeds-web-app
 - docs\session-notes\trace_response.txt
 - docs\reports\ace-packet-smoke-report.json
 - docs\reports\ace-packet-smoke-report.md
+- docs\reports\active-topology-mirror-backfill-report.json
+- docs\reports\active-topology-mirror-backfill-report.md
 - docs\reports\atlas-feature-map-duckdb-report.json
 - docs\reports\atlas-feature-map-duckdb-report.md
+- docs\reports\ATLAS-PHASE-3-TO-4-TRANSITION.md
 - docs\reports\audit-summary-report.md
 - docs\reports\autoencoder-som-map.md
+- docs\reports\board-state-2026-06-11.md
 - docs\reports\cache-effectiveness-report.json
 - docs\reports\cache-effectiveness.json
 - docs\reports\codebase-semantics-neo4j-report.json
@@ -71,10 +81,15 @@ Repo: C:\Users\james\Videos\deeds-web-app
 - docs\reports\cold-archive-manifest-2026-06-02.json
 - docs\reports\cold-archive-manifest-2026-06-03.json
 - docs\reports\cold-archive-manifest-2026-06-05.json
+- docs\reports\cold-archive-manifest-2026-06-10.json
 - docs\reports\compact-cache-prewarm-report.json
 - docs\reports\compact-cache-prewarm-report.md
 - docs\reports\compressed-semantic-geometry-report.json
 - docs\reports\compressed-semantic-geometry-report.md
+- docs\reports\concept-records.json
+- docs\reports\concept-temperature-report.json
+- docs\reports\concept-temperature-report.md
+- docs\reports\concept-temperatures.json
 - docs\reports\contextual-tree-readiness-report.json
 - docs\reports\contextual-tree-readiness-report.md
 - docs\reports\context_summary_report.md
@@ -83,22 +98,6 @@ Repo: C:\Users\james\Videos\deeds-web-app
 - docs\reports\couchdb-ingest-report.json
 - docs\reports\couchdb-ingest-report.md
 - docs\reports\cross-domain-routing-eval.json
-- docs\reports\cross-domain-routing-eval.md
-- docs\reports\current-corpus-promotion-preflight.md
-- docs\reports\deep-graph-relations-report.md
-- docs\reports\dev-service-health-report.json
-- docs\reports\directory-analysis-report.md
-- docs\reports\doc-feature-crosswalk-2026-06-01.json
-- docs\reports\doc-feature-crosswalk-2026-06-01.md
-- docs\reports\drizzle-audit-cleaned-utf8.json
-- docs\reports\drizzle-audit-cleaned.json
-- docs\reports\drizzle-audit-current-utf8.json
-- docs\reports\drizzle-audit-current.json
-- docs\reports\drizzle-postgres-contract-report.json
-- docs\reports\drizzle-postgres-contract-report.md
-- docs\reports\drizzle-schema-validation-report.md
-- docs\reports\drizzle-shadow-tables-v2.txt
-- docs\reports\drizzle-shadow-tables-v3.txt
 
 ## Bash Tools
 - agents:write:workspace => node sveltekit-frontend/scripts/generate-agents-md.mjs
@@ -114,6 +113,10 @@ Repo: C:\Users\james\Videos\deeds-web-app
 - atlas:manifest:validate => node scripts/atlas/validate-atlas-write-manifest.mjs
 - atlas:routes => node scripts/atlas/ingest-sveltekit-route-map.mjs
 - atlas:routes:import => node scripts/atlas/ingest-sveltekit-route-map.mjs
+- atlas:memory-exports:batch-ldjson => node scripts/atlas/batch-memory-exports-to-ldjson.mjs
+- atlas:memory-exports:batch-ldjson:apply => node scripts/atlas/batch-memory-exports-to-ldjson.mjs --apply
+- redis:wait => node scripts/ingest/wait-for-redis.mjs
+- redis:wait:offline => node scripts/ingest/wait-for-redis.mjs --allow-offline
 - atlas:qdrant:tag => node scripts/atlas/tag-qdrant-codebase-payloads.mjs
 - atlas:qdrant:cluster-audit => node scripts/atlas/qdrant-cluster-tag-audit.mjs
 - atlas:qdrant:cluster-audit:dry => node scripts/atlas/qdrant-cluster-tag-audit.mjs --dry-run
@@ -124,6 +127,9 @@ Repo: C:\Users\james\Videos\deeds-web-app
 - atlas:engram:sync => node scripts/atlas/sync-engram-memory.mjs
 - atlas:engram:sync:write => node scripts/atlas/sync-engram-memory.mjs --write
 - atlas:ingest-glyphs => node scripts/atlas/ingest-ace-cards-to-glyphs.mjs
+- atlas:smoke-native => node scripts/atlas/smoke-native-parser-inventory.mjs
+- atlas:materialize-glyphs => node scripts/atlas/materialize-glyph-records.mjs
+- atlas:audit-glyphs => node scripts/atlas/audit-glyph-records.mjs
 - atlas:compute-rewards => node scripts/atlas/compute-glyph-rewards.mjs
 - atlas:compute-rewards:embed => node scripts/atlas/compute-glyph-rewards.mjs --embed --apply
 - atlas:sample-training => node scripts/atlas/sample-glyphs-for-training.mjs
@@ -132,6 +138,7 @@ Repo: C:\Users\james\Videos\deeds-web-app
 - atlas:train => node scripts/atlas/sample-glyphs-for-training.mjs && python scripts/train_lora_adapter.py --dataset scripts/training-datasets/active-sample-latest.jsonl
 - atlas:record-checkpoint => node scripts/atlas/record-lora-checkpoint.mjs
 - opencode:post-memory => node scripts/opencode/post-memory.mjs
+- opencode:tasks:state => node scripts/opencode/rebuild-task-state.mjs
 - opencode:bootstrap => node scripts/opencode/bootstrap-workspace.mjs
 - atlas:feature-gap => npm --prefix sveltekit-frontend run feature-gap:registry:report
 - atlas:kanban:turbovec-consolidation => npm --prefix sveltekit-frontend run atlas:kanban:consolidate:turbovec
@@ -173,17 +180,9 @@ Repo: C:\Users\james\Videos\deeds-web-app
 - atlas:phase101:packetize => node scripts/atlas/phase101-parent-atlas-packetize.mjs --dry-run
 - atlas:rg-dumps:index => node scripts/atlas/chunk-rg-search-dumps.mjs
 - atlas:rg-dumps:index:dry => node scripts/atlas/chunk-rg-search-dumps.mjs --dry-run
-- atlas:rg-dumps:extract => node scripts/atlas/extract-rg-dump-packets.mjs
-- atlas:rg-dumps:extract:dry => node scripts/atlas/extract-rg-dump-packets.mjs --dry-run
-- atlas:qdrant:payload-indexes => node scripts/atlas/create-qdrant-payload-indexes.mjs
-- atlas:qdrant:payload-indexes:dry => node scripts/atlas/create-qdrant-payload-indexes.mjs --dry-run
-- atlas:rg-dumps:project => node scripts/atlas/project-parent-atlas-rg-dump-packets.mjs
-- atlas:rg-dumps:project:write => node scripts/atlas/project-parent-atlas-rg-dump-packets.mjs --write-postgres --write-qdrant --write-cypher
-- atlas:rg-dumps:project:dry => node scripts/atlas/project-parent-atlas-rg-dump-packets.mjs --dry-run
-- atlas:dirty-tree:classify => node scripts/atlas/classify-dirty-tree.mjs
 
 ## Warnings
-- startup-truth-blockers-present
+- None
 
 ## Overall
-- degraded
+- ok

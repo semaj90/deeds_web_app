@@ -103,6 +103,8 @@ Generated: 2026-06-11 (updated). Single authoritative finish list. Do not append
 | Recommendation materialization (legacy Gemma4 hook) | `npm run atlas:engram-adapter:decision` → `HINT_ONLY_ADAPTER`; `gemma4_chat` deprecated |
 | Temporal registry | `atlas_task_registry` table wired; time-indexed event anchoring active in atlas spine |
 | Graphify startup health cache | warm graph state restored from Redis on folder open without full rebuild |
+| Memory exports report batching | `memory/exports/reports.ndjson`, `memory/exports/reports.manifest.json`, `docs/reports/memory-exports-ldjson-batch-report.{json,md}` |
+| Redis preflight / ACE startup gating | `scripts/ingest/wait-for-redis.mjs`; `ace:startup` and `ace:startup:offline` now gate on Redis readiness |
 | Parent Atlas / feature lineage / runtime packet / PostgreSQL mirror audits | audit scripts in place; `atlas:production-readiness` returns PASS 66 / WARN 0 / FAIL 0 |
 | Traversal smoke | `npm run atlas:smoke:traversal` — 75/75 pass |
 | Engram adapter decision (Lane 1) | `HINT_ONLY_ADAPTER` locked; `repo_report_answer` is the canonical repo-audit path |
@@ -197,6 +199,11 @@ Generated: 2026-06-11 (updated). Single authoritative finish list. Do not append
   - Next: bounded Qdrant tag plan generated from `docs/reports/neschrom97-card-registry.json`
 
 ### QUEUED / PLANNED
+- **Phase 17I — Binary Transport & GPU Structural Parsing**
+  - Status: Ready / Spec
+  - Goal: Measure transport pressure before adding gRPC, FlatBuffers, CUDA JSONPath, or GpJSON.
+  - Audit: `npm run atlas:audit:transport-pressure`
+  - Outputs: `docs/reports/transport-pressure-audit.{json,md}`
 - **Parent Atlas overlay reconciliation**
   - Status: Queued (P1)
   - Goal: Resolve overlay mismatch.

@@ -5,6 +5,7 @@ import { resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import dotenv from 'dotenv';
 import Redis from 'ioredis';
+import { resolveRedisConfig } from '../lib/redis-url.mjs';
 
 const __dirname = resolve(fileURLToPath(import.meta.url), '..');
 const ROOT = resolve(__dirname, '..', '..');
@@ -25,12 +26,12 @@ mkdirSync(LOG_DIR, { recursive: true });
 mkdirSync(TMP_DIR, { recursive: true });
 
 function resolveRedisConnection() {
-  const rawUrl = process.env.REDIS_URL || 'redis://127.0.0.1:6379';
-  const parsed = new URL(rawUrl);
-  const host = (parsed.hostname || '127.0.0.1') === '0.0.0.0' ? '127.0.0.1' : (parsed.hostname || '127.0.0.1');
-  const port = Number(parsed.port || 6379) || 6379;
-  const password = process.env.REDIS_PASSWORD || process.env.REDIS_PASS || parsed.password || undefined;
-  return { host, port, password };
+  const config = resolveRedisConfig(process.env);
+  return {
+    host: config.host,
+    port: config.port,
+    password: config.password,
+  };
 }
 
 function writeValidationCache(payload) {

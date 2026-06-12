@@ -257,7 +257,7 @@ function seedGates() {
     somCoordinateCoverage: Number(somSummary.missingCoordinatePoints ?? 0) > 0,
     activeProductionTopology: Number(productionNoSomSummary.qdrant_no_som ?? productionNoSomSummary.production_qdrant_no_som ?? 0) > 0,
     taskSemanticPacketsDrift: Number(mirrorCounts.LIVE_DB_ALIGNED ?? 0) < Number(postgresMirrors?.summary?.tables ?? 0),
-    parentAtlasOverlayMismatch: Number(overlayCounts.ROOT_CONTRACT_ONLY ?? 0) > 0,
+    parentAtlasOverlayMismatch: Number(overlayCounts.MISSING_APP_OVERLAY ?? 0) > 0,
   };
 }
 

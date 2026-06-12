@@ -163,7 +163,7 @@
       "description": "Refresh ACE context, local health, and report artifacts from the main repo",
       "agent": "atlas-context",
       "subtask": false,
-      "template": "Run `npm --prefix .. run opencode:bootstrap` from the repo root to refresh ACE context, TODO summary, MCP health, semantic index, recommendations, and Bitfrost verification. Do not modify files. Prefer ACE hits and recommendations before any model-only response."
+      "template": "Run `npm --prefix .. run agent:hello && npm --prefix .. run opencode:bootstrap` from the repo root to refresh ACE context, TODO summary, MCP health, semantic index, recommendations, startup briefing, and Bitfrost verification. Do not modify files. Prefer ACE hits and recommendations before any model-only response."
     },
     "graph-export-recover": {
       "description": "Recover graph export artifacts without task delegation",

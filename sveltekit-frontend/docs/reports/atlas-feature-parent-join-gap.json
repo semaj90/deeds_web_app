@@ -1,0 +1,416 @@
+{
+  "generatedAt": "2026-06-12T02:08:45.753Z",
+  "dbReachable": true,
+  "totalAtlasFeatureMapRows": 14487,
+  "totalParentAtlasDocumentRows": 5253,
+  "joinedRows": 10009,
+  "gapRows": 4478,
+  "gapCoveragePct": 69.09,
+  "sampleGaps": [
+    {
+      "source_ref": "../scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/ai/suggestions/health/LLMS.md",
+      "feature_id": null,
+      "normalized_path": "../scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/ai/suggestions/health/LLMS.md",
+      "candidate_keys": [
+        "scripts/api-cleanup/reports/backup-2025-12-14t20-51-26-276z/ai/suggestions/health/llms.md"
+      ]
+    },
+    {
+      "source_ref": "../scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/ai/rerank/LLMS.md",
+      "feature_id": null,
+      "normalized_path": "../scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/ai/rerank/LLMS.md",
+      "candidate_keys": [
+        "scripts/api-cleanup/reports/backup-2025-12-14t20-51-26-276z/ai/rerank/llms.md"
+      ]
+    },
+    {
+      "source_ref": "../scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/ai/recommendations/LLMS.md",
+      "feature_id": null,
+      "normalized_path": "../scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/ai/recommendations/LLMS.md",
+      "candidate_keys": [
+        "scripts/api-cleanup/reports/backup-2025-12-14t20-51-26-276z/ai/recommendations/llms.md"
+      ]
+    },
+    {
+      "source_ref": "../scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/ai/redis-optimized-analyze/LLMS.md",
+      "feature_id": null,
+      "normalized_path": "../scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/ai/redis-optimized-analyze/LLMS.md",
+      "candidate_keys": [
+        "scripts/api-cleanup/reports/backup-2025-12-14t20-51-26-276z/ai/redis-optimized-analyze/llms.md"
+      ]
+    },
+    {
+      "source_ref": "../scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/ai/suggestions/rate/LLMS.md",
+      "feature_id": null,
+      "normalized_path": "../scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/ai/suggestions/rate/LLMS.md",
+      "candidate_keys": [
+        "scripts/api-cleanup/reports/backup-2025-12-14t20-51-26-276z/ai/suggestions/rate/llms.md"
+      ]
+    },
+    {
+      "source_ref": "../scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/ai/suggestions/LLMS.md",
+      "feature_id": null,
+      "normalized_path": "../scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/ai/suggestions/LLMS.md",
+      "candidate_keys": [
+        "scripts/api-cleanup/reports/backup-2025-12-14t20-51-26-276z/ai/suggestions/llms.md"
+      ]
+    },
+    {
+      "source_ref": "../scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/cases/[id]/laws/[statute_code]/LLMS.md",
+      "feature_id": null,
+      "normalized_path": "../scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/cases/[id]/laws/[statute_code]/LLMS.md",
+      "candidate_keys": [
+        "scripts/api-cleanup/reports/backup-2025-12-14t20-51-26-276z/cases/[id]/laws/[statute_code]/llms.md"
+      ]
+    },
+    {
+      "source_ref": "../scripts/api-cleanup/reports/backup-2025-12-14T21-11-49-641Z/ai/suggestions/stream/LLMS.md",
+      "feature_id": null,
+      "normalized_path": "../scripts/api-cleanup/reports/backup-2025-12-14T21-11-49-641Z/ai/suggestions/stream/LLMS.md",
+      "candidate_keys": [
+        "scripts/api-cleanup/reports/backup-2025-12-14t21-11-49-641z/ai/suggestions/stream/llms.md"
+      ]
+    },
+    {
+      "source_ref": "../scripts/api-cleanup/reports/backup-2025-12-14T21-11-49-641Z/cache/redis/get-recent/LLMS.md",
+      "feature_id": null,
+      "normalized_path": "../scripts/api-cleanup/reports/backup-2025-12-14T21-11-49-641Z/cache/redis/get-recent/LLMS.md",
+      "candidate_keys": [
+        "scripts/api-cleanup/reports/backup-2025-12-14t21-11-49-641z/cache/redis/get-recent/llms.md"
+      ]
+    },
+    {
+      "source_ref": "../scripts/atlas/audit-feature-registry.mjs",
+      "feature_id": null,
+      "normalized_path": "../scripts/atlas/audit-feature-registry.mjs",
+      "candidate_keys": [
+        "scripts/atlas/audit-feature-registry.mjs"
+      ]
+    },
+    {
+      "source_ref": "../scripts/atlas/resolve-kanban-gaps.mjs",
+      "feature_id": null,
+      "normalized_path": "../scripts/atlas/resolve-kanban-gaps.mjs",
+      "candidate_keys": [
+        "scripts/atlas/resolve-kanban-gaps.mjs"
+      ]
+    },
+    {
+      "source_ref": "../scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/enhanced-semantic/intelligent-todos/LLMS.md",
+      "feature_id": null,
+      "normalized_path": "../scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/enhanced-semantic/intelligent-todos/LLMS.md",
+      "candidate_keys": [
+        "scripts/api-cleanup/reports/backup-2025-12-14t20-51-26-276z/enhanced-semantic/intelligent-todos/llms.md"
+      ]
+    },
+    {
+      "source_ref": ".opencode/agents/hermes-ace.md",
+      "feature_id": "routes",
+      "normalized_path": ".opencode/agents/hermes-ace.md",
+      "candidate_keys": [
+        ".opencode/agents/hermes-ace.md"
+      ]
+    },
+    {
+      "source_ref": ".opencode/commands/ace-fallback-ladder.md",
+      "feature_id": "routes",
+      "normalized_path": ".opencode/commands/ace-fallback-ladder.md",
+      "candidate_keys": [
+        ".opencode/commands/ace-fallback-ladder.md"
+      ]
+    },
+    {
+      "source_ref": "../scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/v1/webgpu/embedding-benchmark/LLMS.md",
+      "feature_id": null,
+      "normalized_path": "../scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/v1/webgpu/embedding-benchmark/LLMS.md",
+      "candidate_keys": [
+        "scripts/api-cleanup/reports/backup-2025-12-14t20-51-26-276z/v1/webgpu/embedding-benchmark/llms.md"
+      ]
+    },
+    {
+      "source_ref": ".opencode/skills/ace-recovery/SKILL.md",
+      "feature_id": "routes",
+      "normalized_path": ".opencode/skills/ace-recovery/SKILL.md",
+      "candidate_keys": [
+        ".opencode/skills/ace-recovery/skill.md"
+      ]
+    },
+    {
+      "source_ref": "../scripts/ace_batch_fix_set.py",
+      "feature_id": null,
+      "normalized_path": "../scripts/ace_batch_fix_set.py",
+      "candidate_keys": [
+        "scripts/ace_batch_fix_set.py"
+      ]
+    },
+    {
+      "source_ref": "../scripts/ace_batch_fix_set_v2.py",
+      "feature_id": null,
+      "normalized_path": "../scripts/ace_batch_fix_set_v2.py",
+      "candidate_keys": [
+        "scripts/ace_batch_fix_set_v2.py"
+      ]
+    },
+    {
+      "source_ref": ".scheck-latest.txt",
+      "feature_id": "utility",
+      "normalized_path": ".scheck-latest.txt",
+      "candidate_keys": [
+        ".scheck-latest.txt"
+      ]
+    },
+    {
+      "source_ref": "../scripts/atlas/create-qdrant-feature-maps.mjs",
+      "feature_id": null,
+      "normalized_path": "../scripts/atlas/create-qdrant-feature-maps.mjs",
+      "candidate_keys": [
+        "scripts/atlas/create-qdrant-feature-maps.mjs"
+      ]
+    },
+    {
+      "source_ref": "../scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/v1/storage/audits/LLMS.md",
+      "feature_id": null,
+      "normalized_path": "../scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/v1/storage/audits/LLMS.md",
+      "candidate_keys": [
+        "scripts/api-cleanup/reports/backup-2025-12-14t20-51-26-276z/v1/storage/audits/llms.md"
+      ]
+    },
+    {
+      "source_ref": "../scripts/analysis/check-dirs.mjs",
+      "feature_id": null,
+      "normalized_path": "../scripts/analysis/check-dirs.mjs",
+      "candidate_keys": [
+        "scripts/analysis/check-dirs.mjs"
+      ]
+    },
+    {
+      "source_ref": "../scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/copilot/optimize/LLMS.md",
+      "feature_id": null,
+      "normalized_path": "../scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/copilot/optimize/LLMS.md",
+      "candidate_keys": [
+        "scripts/api-cleanup/reports/backup-2025-12-14t20-51-26-276z/copilot/optimize/llms.md"
+      ]
+    },
+    {
+      "source_ref": "../scripts/analysis/key-dirs.mjs",
+      "feature_id": null,
+      "normalized_path": "../scripts/analysis/key-dirs.mjs",
+      "candidate_keys": [
+        "scripts/analysis/key-dirs.mjs"
+      ]
+    },
+    {
+      "source_ref": "../scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/embed/ingest/LLMS.md",
+      "feature_id": null,
+      "normalized_path": "../scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/embed/ingest/LLMS.md",
+      "candidate_keys": [
+        "scripts/api-cleanup/reports/backup-2025-12-14t20-51-26-276z/embed/ingest/llms.md"
+      ]
+    },
+    {
+      "source_ref": "../scripts/analysis_reports/LLMS.md",
+      "feature_id": null,
+      "normalized_path": "../scripts/analysis_reports/LLMS.md",
+      "candidate_keys": [
+        "scripts/analysis_reports/llms.md"
+      ]
+    },
+    {
+      "source_ref": "../scripts/analysis/top-others.mjs",
+      "feature_id": null,
+      "normalized_path": "../scripts/analysis/top-others.mjs",
+      "candidate_keys": [
+        "scripts/analysis/top-others.mjs"
+      ]
+    },
+    {
+      "source_ref": "../scripts/analyze_legal_concepts.py",
+      "feature_id": null,
+      "normalized_path": "../scripts/analyze_legal_concepts.py",
+      "candidate_keys": [
+        "scripts/analyze_legal_concepts.py"
+      ]
+    },
+    {
+      "source_ref": "../scripts/api-cleanup/LLMS.md",
+      "feature_id": null,
+      "normalized_path": "../scripts/api-cleanup/LLMS.md",
+      "candidate_keys": [
+        "scripts/api-cleanup/llms.md"
+      ]
+    },
+    {
+      "source_ref": "../scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/ace/llm-analyze/LLMS.md",
+      "feature_id": null,
+      "normalized_path": "../scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/ace/llm-analyze/LLMS.md",
+      "candidate_keys": [
+        "scripts/api-cleanup/reports/backup-2025-12-14t20-51-26-276z/ace/llm-analyze/llms.md"
+      ]
+    },
+    {
+      "source_ref": "../scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/v1/services/[serviceId]/LLMS.md",
+      "feature_id": null,
+      "normalized_path": "../scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/v1/services/[serviceId]/LLMS.md",
+      "candidate_keys": [
+        "scripts/api-cleanup/reports/backup-2025-12-14t20-51-26-276z/v1/services/[serviceid]/llms.md"
+      ]
+    },
+    {
+      "source_ref": "../scripts/atlas/ingester/README.md",
+      "feature_id": null,
+      "normalized_path": "../scripts/atlas/ingester/README.md",
+      "candidate_keys": [
+        "scripts/atlas/ingester/readme.md"
+      ]
+    },
+    {
+      "source_ref": "../scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/ace/vlm-process/LLMS.md",
+      "feature_id": null,
+      "normalized_path": "../scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/ace/vlm-process/LLMS.md",
+      "candidate_keys": [
+        "scripts/api-cleanup/reports/backup-2025-12-14t20-51-26-276z/ace/vlm-process/llms.md"
+      ]
+    },
+    {
+      "source_ref": "../scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/activities/[activityId]/LLMS.md",
+      "feature_id": null,
+      "normalized_path": "../scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/activities/[activityId]/LLMS.md",
+      "candidate_keys": [
+        "scripts/api-cleanup/reports/backup-2025-12-14t20-51-26-276z/activities/[activityid]/llms.md"
+      ]
+    },
+    {
+      "source_ref": "../scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/admin/cache-dashboard/LLMS.md",
+      "feature_id": null,
+      "normalized_path": "../scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/admin/cache-dashboard/LLMS.md",
+      "candidate_keys": [
+        "scripts/api-cleanup/reports/backup-2025-12-14t20-51-26-276z/admin/cache-dashboard/llms.md"
+      ]
+    },
+    {
+      "source_ref": "../scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/ai/enhanced-grpo/LLMS.md",
+      "feature_id": null,
+      "normalized_path": "../scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/ai/enhanced-grpo/LLMS.md",
+      "candidate_keys": [
+        "scripts/api-cleanup/reports/backup-2025-12-14t20-51-26-276z/ai/enhanced-grpo/llms.md"
+      ]
+    },
+    {
+      "source_ref": "../scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/ai/enhanced-legal-search/LLMS.md",
+      "feature_id": null,
+      "normalized_path": "../scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/ai/enhanced-legal-search/LLMS.md",
+      "candidate_keys": [
+        "scripts/api-cleanup/reports/backup-2025-12-14t20-51-26-276z/ai/enhanced-legal-search/llms.md"
+      ]
+    },
+    {
+      "source_ref": "../scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/admin/cache/stats/LLMS.md",
+      "feature_id": null,
+      "normalized_path": "../scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/admin/cache/stats/LLMS.md",
+      "candidate_keys": [
+        "scripts/api-cleanup/reports/backup-2025-12-14t20-51-26-276z/admin/cache/stats/llms.md"
+      ]
+    },
+    {
+      "source_ref": "../scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/ai/enhanced-microservice/LLMS.md",
+      "feature_id": null,
+      "normalized_path": "../scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/ai/enhanced-microservice/LLMS.md",
+      "candidate_keys": [
+        "scripts/api-cleanup/reports/backup-2025-12-14t20-51-26-276z/ai/enhanced-microservice/llms.md"
+      ]
+    },
+    {
+      "source_ref": "../scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/ai/enhanced-rag-vlm/LLMS.md",
+      "feature_id": null,
+      "normalized_path": "../scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/ai/enhanced-rag-vlm/LLMS.md",
+      "candidate_keys": [
+        "scripts/api-cleanup/reports/backup-2025-12-14t20-51-26-276z/ai/enhanced-rag-vlm/llms.md"
+      ]
+    },
+    {
+      "source_ref": "../scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/ai/evidence-recommendations/LLMS.md",
+      "feature_id": null,
+      "normalized_path": "../scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/ai/evidence-recommendations/LLMS.md",
+      "candidate_keys": [
+        "scripts/api-cleanup/reports/backup-2025-12-14t20-51-26-276z/ai/evidence-recommendations/llms.md"
+      ]
+    },
+    {
+      "source_ref": "../scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/v1/vector/LLMS.md",
+      "feature_id": null,
+      "normalized_path": "../scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/v1/vector/LLMS.md",
+      "candidate_keys": [
+        "scripts/api-cleanup/reports/backup-2025-12-14t20-51-26-276z/v1/vector/llms.md"
+      ]
+    },
+    {
+      "source_ref": "../scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/ai/generate-report/LLMS.md",
+      "feature_id": null,
+      "normalized_path": "../scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/ai/generate-report/LLMS.md",
+      "candidate_keys": [
+        "scripts/api-cleanup/reports/backup-2025-12-14t20-51-26-276z/ai/generate-report/llms.md"
+      ]
+    },
+    {
+      "source_ref": "../scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/ai/explain-statute/LLMS.md",
+      "feature_id": null,
+      "normalized_path": "../scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/ai/explain-statute/LLMS.md",
+      "candidate_keys": [
+        "scripts/api-cleanup/reports/backup-2025-12-14t20-51-26-276z/ai/explain-statute/llms.md"
+      ]
+    },
+    {
+      "source_ref": "../scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/ai/generate/LLMS.md",
+      "feature_id": null,
+      "normalized_path": "../scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/ai/generate/LLMS.md",
+      "candidate_keys": [
+        "scripts/api-cleanup/reports/backup-2025-12-14t20-51-26-276z/ai/generate/llms.md"
+      ]
+    },
+    {
+      "source_ref": "../scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/ai/extract-languages/LLMS.md",
+      "feature_id": null,
+      "normalized_path": "../scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/ai/extract-languages/LLMS.md",
+      "candidate_keys": [
+        "scripts/api-cleanup/reports/backup-2025-12-14t20-51-26-276z/ai/extract-languages/llms.md"
+      ]
+    },
+    {
+      "source_ref": "../scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/ai/health/cloud/LLMS.md",
+      "feature_id": null,
+      "normalized_path": "../scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/ai/health/cloud/LLMS.md",
+      "candidate_keys": [
+        "scripts/api-cleanup/reports/backup-2025-12-14t20-51-26-276z/ai/health/cloud/llms.md"
+      ]
+    },
+    {
+      "source_ref": "../scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/ai/gpu-pipeline/LLMS.md",
+      "feature_id": null,
+      "normalized_path": "../scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/ai/gpu-pipeline/LLMS.md",
+      "candidate_keys": [
+        "scripts/api-cleanup/reports/backup-2025-12-14t20-51-26-276z/ai/gpu-pipeline/llms.md"
+      ]
+    },
+    {
+      "source_ref": "../scripts/api-cleanup/reports/backup-2025-12-14T21-11-49-641Z/phase82/status/LLMS.md",
+      "feature_id": null,
+      "normalized_path": "../scripts/api-cleanup/reports/backup-2025-12-14T21-11-49-641Z/phase82/status/LLMS.md",
+      "candidate_keys": [
+        "scripts/api-cleanup/reports/backup-2025-12-14t21-11-49-641z/phase82/status/llms.md"
+      ]
+    },
+    {
+      "source_ref": "../scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/ai/health-mock/LLMS.md",
+      "feature_id": null,
+      "normalized_path": "../scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/ai/health-mock/LLMS.md",
+      "candidate_keys": [
+        "scripts/api-cleanup/reports/backup-2025-12-14t20-51-26-276z/ai/health-mock/llms.md"
+      ]
+    }
+  ],
+  "notes": [
+    "Read-only join audit.",
+    "Normalization handles backslashes, leading ./ and ../ segments, and repo-root prefixes.",
+    "No inserts or updates were performed."
+  ]
+}

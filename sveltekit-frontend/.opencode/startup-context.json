@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-06-11T19:28:35.280Z",
+  "generatedAt": "2026-06-12T02:30:10.404Z",
   "repo": "sveltekit-frontend",
   "evidenceFirst": true,
   "roles": {
@@ -20,7 +20,7 @@
     "stateMd": ".opencode\\tasks\\task-state.md",
     "eventsJsonl": ".opencode\\tasks\\task-events.jsonl",
     "currentCount": 13,
-    "openCount": 5
+    "openCount": 4
   },
   "activeLane": {
     "taskId": "task_phase_3d_retrieval_telemetry",

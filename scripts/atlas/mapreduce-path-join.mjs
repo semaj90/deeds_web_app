@@ -18,7 +18,8 @@
  *   node scripts/atlas/mapreduce-path-join.mjs [--dry-run] [--limit=500]
  */
 
-import { readFileSync, writeFileSync, existsSync, mkdirSync } from 'fs';
+import { readFileSync, writeFileSync, existsSync, mkdirSync, createReadStream } from 'fs';
+import readline from 'readline';
 import { resolve, dirname } from 'path';
 import { fileURLToPath } from 'url';
 import { execSync } from 'child_process';
@@ -46,17 +47,73 @@ if (!existsSync(MR_PATH)) {
   process.exit(1);
 }
 
-const mrLines = readFileSync(MR_PATH, 'utf8').split('\n').filter(Boolean).slice(0, LIMIT);
-const mrDocs = mrLines.map(l => JSON.parse(l));
+const ACTIONABLE_EXTENSIONS = new Set(['.ts', '.tsx', '.js', '.mjs', '.jsx', '.mts', '.cts', '.svelte']);
+function isActionable(doc) {
+  return ACTIONABLE_EXTENSIONS.has(doc.extension || '');
+}
+
+const mrDocs = [];
+const mrStream = readline.createInterface({
+  input: createReadStream(MR_PATH, { encoding: 'utf8' }),
+  crlfDelay: Infinity,
+});
+
+let mrLineCount = 0;
+for await (const line of mrStream) {
+  if (!line.trim()) continue;
+  if (mrLineCount >= LIMIT) break;
+  mrLineCount++;
+  try {
+    const doc = JSON.parse(line);
+    mrDocs.push({
+      stableKey: doc.stableKey,
+      filePath: doc.filePath,
+      feature: doc.feature,
+      importErrorCount: doc.importErrorCount ?? 0,
+      lines: doc.lines,
+      extension: doc.extension,
+      directory: doc.directory,
+      staticImports: Array.isArray(doc.staticImports) ? doc.staticImports : [],
+      resolvedStaticImports: Array.isArray(doc.resolvedStaticImports) ? doc.resolvedStaticImports : [],
+    });
+  } catch (e) {
+    console.warn(`Skipping invalid NDJSON row ${mrLineCount}: ${e.message}`);
+  }
+}
+mrStream.close();
 console.log(`Mapreduce entries: ${mrDocs.length}`);
 
-// Build path → doc index (normalise to forward slashes, lowercase for lookup)
-const pathIndex = new Map(); // normalised path → doc
+function canonicalPath(input) {
+  if (!input) return "";
+
+  return String(input)
+    .replaceAll("\\", "/")
+    .replace(/^file:\/+/, "")
+    .replace(/^\/?c:\//i, "")
+    .replace(/^Users\/james\/Videos\/deeds-web-app\//i, "")
+    .replace(/^deeds-web-app\//i, "")
+    .replace(/^\.?\//, "")
+    .toLowerCase();
+}
+
+function pathVariants(input) {
+  const p = canonicalPath(input);
+
+  return new Set([
+    p,
+    p.replace(/^sveltekit-frontend\//, ""),
+    `sveltekit-frontend/${p.replace(/^sveltekit-frontend\//, "")}`
+  ]);
+}
+
+// Build path → doc index using canonical variants
+const pathIndex = new Map(); // variant → doc
 const stableIndex = new Map(); // stableKey → doc
 for (const doc of mrDocs) {
-  const norm = doc.filePath.replace(/\\/g, '/').toLowerCase();
-  pathIndex.set(norm, doc);
-  pathIndex.set(doc.filePath.replace(/\\/g, '/'), doc); // also case-sensitive
+  const variants = pathVariants(doc.filePath);
+  for (const variant of variants) {
+    pathIndex.set(variant, doc);
+  }
   if (doc.stableKey) stableIndex.set(doc.stableKey, doc);
 }
 
@@ -67,8 +124,8 @@ let cardEnriched = [];
 if (existsSync(DUCKDB)) {
   try {
     const sql = `COPY (SELECT card_id, title, sourceRef, som_row, som_col, som_index, reward_avg, reward_count FROM card_enriched) TO '/dev/stdout' (FORMAT JSON, ARRAY true)`;
-    const out = execSync(`duckdb "${DUCKDB}" "${sql.replace(/"/g, '\\"')}"`, { timeout: 15000, maxBuffer: 50*1024*1024 }).toString();
-    cardEnriched = JSON.parse(out);
+    const out = execSync(`duckdb "${DUCKDB}" "${sql.replace(/"/g, '\\"')}"`, { timeout: 15000, maxBuffer: 50*1024*1024 }).toString().trim();
+    cardEnriched = out ? JSON.parse(out) : [];
     console.log(`DuckDB card_enriched rows: ${cardEnriched.length}`);
   } catch (e) {
     console.warn('DuckDB read failed (continuing without it):', e.message?.slice(0, 100));
@@ -86,6 +143,15 @@ if (existsSync(ATLAS_INDEX)) {
   atlasEntries = atlas.entries || [];
   console.log(`Parent atlas entries: ${atlasEntries.length}`);
 }
+
+console.log("\nmapreduce sample", [...pathIndex.keys()].slice(0, 10));
+console.log(
+  "atlas sample",
+  atlasEntries
+    .map(x => x.sourceRef ?? x.path ?? x.file ?? x.payload?.sourceRef)
+    .filter(Boolean)
+    .slice(0, 10)
+);
 
 // ── 4. Build path map ─────────────────────────────────────────────────────────
 
@@ -120,12 +186,16 @@ let matchedCount = 0;
 const missingSourceRef = [];
 
 for (const entry of atlasEntries) {
-  const raw = entry.sourceRef || (entry.payload && entry.payload.source) || '';
+  const raw = entry.sourceRef || (entry.payload && entry.payload.sourceRef) || entry.path || entry.file || '';
   if (!raw) continue;
 
-  // Normalise the atlas sourceRef to a comparable path
-  const norm = raw.replace(/\\/g, '/').replace(/^sveltekit-frontend\//, '').replace(/^src\//, '').toLowerCase();
-  const direct = pathIndex.get(norm) || pathIndex.get(raw.replace(/\\/g, '/'));
+  const variants = pathVariants(raw);
+  let direct = null;
+  for (const variant of variants) {
+    direct = pathIndex.get(variant);
+    if (direct) break;
+  }
+
   if (direct) {
     matchedCount++;
     missingSourceRef.push({
@@ -135,8 +205,8 @@ for (const entry of atlasEntries) {
       feature: direct.feature,
       stableKey: direct.stableKey,
       importErrorCount: direct.importErrorCount,
-      som_bmu_row: entry.som_bmu_row,
-      som_bmu_col: entry.som_bmu_col,
+      som_bmu_row: entry.som_bmu_row || entry.som_row,
+      som_bmu_col: entry.som_bmu_col || entry.som_col,
     });
   }
 }
@@ -150,6 +220,7 @@ const todoQueue = [];
 const seenFeaturePaths = new Set();
 
 for (const doc of mrDocs) {
+  if (!isActionable(doc)) continue;
   if (doc.importErrorCount >= 2 && !seenFeaturePaths.has(doc.filePath)) {
     seenFeaturePaths.add(doc.filePath);
     todoQueue.push({
@@ -164,7 +235,7 @@ for (const doc of mrDocs) {
 }
 
 // Add unclassified files with imports (likely need feature labeling)
-const unclassified = mrDocs.filter(d => d.feature === 'unclassified' && d.staticImports?.length > 3);
+const unclassified = mrDocs.filter(d => d.feature === 'unclassified' && d.staticImports?.length > 3 && isActionable(d));
 for (const doc of unclassified.slice(0, 100)) {
   todoQueue.push({
     type: 'unclassified_feature',
@@ -247,7 +318,10 @@ if (existsSync(DUCKDB) && missingSourceRef.length > 0 && !DRY_RUN) {
 
 // ── 10. Report ────────────────────────────────────────────────────────────────
 
-const topErrors = mrDocs.filter(d => d.importErrorCount > 0).sort((a, b) => b.importErrorCount - a.importErrorCount).slice(0, 10);
+const topErrors = mrDocs
+  .filter(d => isActionable(d) && d.importErrorCount > 0)
+  .sort((a, b) => b.importErrorCount - a.importErrorCount)
+  .slice(0, 10);
 
 const report = [
   '# Mapreduce Path Join Report',

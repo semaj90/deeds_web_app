@@ -1,0 +1,79 @@
+{
+  "timestamp": "2026-06-12T02:31:56.463Z",
+  "summary": {
+    "total": 11,
+    "passed": 11,
+    "failed": 0,
+    "warnings": 1,
+    "success": true
+  },
+  "gates": [
+    {
+      "name": "G1: All directories have required fields",
+      "passed": true,
+      "message": "0 entries missing required fields"
+    },
+    {
+      "name": "G2: feature_id uniqueness",
+      "passed": true,
+      "message": "0 feature_ids appear multiple times"
+    },
+    {
+      "name": "G3: source_ref non-empty",
+      "passed": true,
+      "message": "0 directories have empty source_ref"
+    },
+    {
+      "name": "G4: feature_id format (12-char hex)",
+      "passed": true,
+      "message": "0 feature_ids are not 12-char hex"
+    },
+    {
+      "name": "G5: feature_label descriptiveness",
+      "passed": true,
+      "message": "0 feature_labels are empty or too short"
+    },
+    {
+      "name": "G6: qdrant_collection validity",
+      "passed": true,
+      "message": "0 entries have unknown Qdrant collections"
+    },
+    {
+      "name": "G7: Redis centroid key format",
+      "passed": true,
+      "message": "0 Redis keys have wrong format"
+    },
+    {
+      "name": "G8: Hidden directory classification",
+      "passed": true,
+      "message": "0 hidden dirs not properly classified"
+    },
+    {
+      "name": "G9: Directory path ↔ source_ref alignment",
+      "passed": true,
+      "message": "0 directories have misaligned source_refs"
+    },
+    {
+      "name": "G10: Packet count non-negativity",
+      "passed": true,
+      "message": "0 entries have negative packet_count"
+    },
+    {
+      "name": "G11: cold_storage_status validity",
+      "passed": true,
+      "message": "0 entries have unknown storage status"
+    }
+  ],
+  "statistics": {
+    "total_directories": 16305,
+    "hidden_directories": 707,
+    "feature_ids_unique": 16305,
+    "source_refs_mapped": 16305,
+    "collections_used": [
+      "general",
+      "legal_documents",
+      "codebase_chunks",
+      "semantic_cards"
+    ]
+  }
+}

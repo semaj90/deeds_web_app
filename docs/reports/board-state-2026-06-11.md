@@ -52,6 +52,26 @@
 
 **Completion**: ~65-70% (runtime gates ready, execution pending)
 
+### Memory Export Reports — COMPLETE ✅
+
+| Artifact | Path | Status |
+|---|---|---|
+| LD-JSON batch | `memory/exports/reports.ndjson` | ✅ Present |
+| Batch manifest | `memory/exports/reports.manifest.json` | ✅ Present |
+| Batch report | `docs/reports/memory-exports-ldjson-batch-report.{json,md}` | ✅ Present |
+
+**Completion**: 100% for the top-level `memory/exports/*.json` report surface
+
+### Redis Preflight — COMPLETE ✅
+
+| Artifact | Path | Status |
+|---|---|---|
+| Redis wait gate | `scripts/ingest/wait-for-redis.mjs` | ✅ Present |
+| Startup alias | `ace:startup` | ✅ Gated |
+| Offline startup alias | `ace:startup:offline` | ✅ Gated |
+
+**Completion**: 100% for Redis startup preflight and ACE startup gating
+
 ---
 
 ## Critical Design Decision: GPU JSON Tensor Mapping
@@ -154,6 +174,13 @@ Docker
    - Candidate for Qdrant HNSW replacement
    - **Status**: Deferred to Phase 17+
 
+4. **Phase 17I: Binary Transport & GPU Structural Parsing**
+   - Spec/audit lane only
+   - Audit command: `npm run atlas:audit:transport-pressure`
+   - Reports: `docs/reports/transport-pressure-audit.{json,md}`
+   - **Why deferred**: measure pressure before adding binary RPC or GPU structural parsing
+   - **Why safe**: read-only, bounded, no transport/runtime mutation
+
 ---
 
 ## Why This Matters
@@ -213,6 +240,8 @@ Docker
 - ✅ `package.json` — Added `smoke:neschrom97-ldjson`, `atlas:lod-nes-memory-ldjson`, `atlas:phase16-*` aliases
 - ✅ `scripts/postgres18-verify-optimizations.mjs` — Fixed AIO detection, temporal constraints query
 - ✅ `sveltekit-frontend/drizzle/manual/20260611_postgres18_skip_scan_indexes.sql` — Applied
+- ✅ `scripts/atlas/batch-memory-exports-to-ldjson.mjs` — Batched top-level `memory/exports/*.json`
+- ✅ `scripts/ingest/wait-for-redis.mjs` — Redis startup preflight
 - ✅ `docs/architecture/phase-17g-gpu-json-tensor-mapping.md` — Deferred GPU lane specification
 - ✅ `docs/reports/board-state-2026-06-11.md` — This summary
 

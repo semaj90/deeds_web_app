@@ -1,0 +1,36 @@
+{
+  "id": "task_e9253eee",
+  "workspace_id": "deeds-web-app",
+  "title": ".opencode/cards/10f58deb9e9aa745.json — 13 unresolved imports",
+  "description": ".opencode/cards/10f58deb9e9aa745.json — 13 unresolved imports\n\nWhy: Feature \"unclassified\" barrel/index has 13 dangling import refs (mapreduce v4 scan)\n\nAction: Audit barrel re-exports; remove or fix dangling import paths",
+  "status": "todo",
+  "priority": "high",
+  "risk": "high",
+  "feature_id": "platform",
+  "feature_confidence": 0,
+  "semantic_path": [
+    "env",
+    "config",
+    "startup",
+    "utils"
+  ],
+  "source": "opencode",
+  "source_ref": "import_error_dde9d4af",
+  "related_file_paths": [
+    ".opencode/cards/10f58deb9e9aa745.json"
+  ],
+  "qdrant_point_id": null,
+  "summary_llm": null,
+  "summary_model": null,
+  "cluster_id": "General",
+  "centroid_id": null,
+  "agent_pickup_ready": false,
+  "created_at": "2026-06-12T02:55:14.690Z",
+  "updated_at": "2026-06-12T02:57:13.458Z",
+  "mirror": {
+    "postgres_id": null,
+    "qdrant_point_id": null,
+    "redis_queue_key": null,
+    "langfuse_trace_id": null
+  }
+}
