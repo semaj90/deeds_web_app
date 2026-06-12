@@ -1,27 +1,27 @@
 {
-  "generated_at": "2026-06-12T16:10:46.800Z",
+  "generated_at": "2026-06-12T20:39:38.335Z",
   "mode": "apply",
-  "total_missing_provenance": 7753,
-  "code_eligible": 3847,
-  "non_code": 3906,
-  "qdrant_hits": 2347,
-  "qdrant_misses": 1032,
+  "total_missing_provenance": 0,
+  "code_eligible": 0,
+  "non_code": 0,
+  "qdrant_hits": 0,
+  "qdrant_misses": 0,
   "source_distribution": {
-    "qdrant": 1792,
-    "feature_bucket": 750,
-    "feature_mode": 5211,
+    "qdrant": 0,
+    "feature_bucket": 0,
+    "feature_mode": 0,
     "global_fallback": 0
   },
   "gate_result": {
-    "total": 7753,
-    "covered": 7753,
+    "total": 17020,
+    "covered": 17020,
     "coverage_pct": "100.0",
-    "avg_confidence": "0.635",
+    "avg_confidence": "0.497",
     "source_distribution": {
-      "qdrant": 1792,
+      "qdrant": 1804,
       "feature_bucket": 750,
-      "feature_mode": 5211,
-      "global_fallback": 0
+      "feature_mode": 10061,
+      "global_fallback": 4405
     },
     "gate_pass": true
   }

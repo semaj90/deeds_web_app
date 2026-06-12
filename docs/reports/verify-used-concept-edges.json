@@ -1,0 +1,114 @@
+{
+  "generated_at": "2026-06-12T21:37:51.907Z",
+  "postgres": {
+    "packets_with_concepts": 8367,
+    "total_concept_refs": 138550
+  },
+  "neo4j": {
+    "total_edges": 26972,
+    "packets_with_edges": 5299,
+    "concepts_reached": 10,
+    "atlas_edges": 26972,
+    "atlas_packets": 5299,
+    "atlas_concepts": 10,
+    "duplicate_pairs": 0
+  },
+  "degree_distribution": {
+    "singleton": 0,
+    "low": 0,
+    "mid": 0,
+    "high": 10
+  },
+  "top_concepts": [
+    {
+      "concept": "emergent_topology",
+      "degree": 3158
+    },
+    {
+      "concept": "infrastructure_config",
+      "degree": 2986
+    },
+    {
+      "concept": "observability_telemetry",
+      "degree": 2958
+    },
+    {
+      "concept": "test_harness",
+      "degree": 2903
+    },
+    {
+      "concept": "general_abstractions",
+      "degree": 2790
+    },
+    {
+      "concept": "database_orm",
+      "degree": 2772
+    },
+    {
+      "concept": "api_endpoints",
+      "degree": 2588
+    },
+    {
+      "concept": "agent_intelligence",
+      "degree": 2494
+    },
+    {
+      "concept": "native_accelerators",
+      "degree": 2394
+    },
+    {
+      "concept": "ui_components",
+      "degree": 1929
+    }
+  ],
+  "supernodes": [
+    {
+      "concept": "emergent_topology",
+      "degree": 3158
+    },
+    {
+      "concept": "infrastructure_config",
+      "degree": 2986
+    },
+    {
+      "concept": "observability_telemetry",
+      "degree": 2958
+    },
+    {
+      "concept": "test_harness",
+      "degree": 2903
+    },
+    {
+      "concept": "general_abstractions",
+      "degree": 2790
+    },
+    {
+      "concept": "database_orm",
+      "degree": 2772
+    },
+    {
+      "concept": "api_endpoints",
+      "degree": 2588
+    },
+    {
+      "concept": "agent_intelligence",
+      "degree": 2494
+    },
+    {
+      "concept": "native_accelerators",
+      "degree": 2394
+    },
+    {
+      "concept": "ui_components",
+      "degree": 1929
+    }
+  ],
+  "coverage_pct": 0.6333213816182622,
+  "gate": {
+    "edges": true,
+    "duplicates": true,
+    "coverage": true,
+    "supernodes": false,
+    "pass": true
+  }
+}

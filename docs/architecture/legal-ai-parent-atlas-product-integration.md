@@ -3,6 +3,10 @@
 ## Overview
 The Parent Atlas provides the topological and graph-based foundation for retrieval-augmented generation (RAG) within the Deeds Web App. This document outlines how the infrastructure layers integrate into the user-facing product.
 
+The current working contract is storage tiering first, then the optional
+spectra-g / Engram adapter, retrieval telemetry, the formal XGBoost reranker,
+Neo4j contextual trees, and higher-hop repair. Native GEMM stays deferred.
+
 ## Retrieval Provenance (Admin Copilot)
 When a user performs a search in the Admin Copilot, the retrieval system surfaces "Provenance Metadata" to explain why a specific piece of evidence was selected.
 

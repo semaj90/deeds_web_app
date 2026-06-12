@@ -15,6 +15,19 @@ tags:
 
 This pipeline treats `graphify:karpathy-batch` as the synthesis lane, not the whole system.
 
+Keep the runtime order aligned with the current operator contract:
+BM25 + concept activation -> spectra-g / Engram optional adapter ->
+XGBoost formal reranker -> Neo4j contextual trees + HyperRAG packet RPC ->
+Autoencoder / SOM latent topology -> native GEMM deferred.
+
+Decision docs:
+- `docs/atlas/xgboost-reranker-contract.md`
+- `docs/atlas/native-gemm-deferral.md`
+
+See also:
+- `docs/atlas/xgboost-reranker-contract.md`
+- `docs/atlas/native-gemm-deferral.md`
+
 ## Root Flow
 
 1. Workspace discovery

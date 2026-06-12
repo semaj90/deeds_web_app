@@ -6,6 +6,19 @@ This repo uses two lanes and one rule:
 2. Warm packets stay compact and indexed.
 3. Hot cache only holds active work.
 
+That storage split supports the corrected working order:
+BM25 + concept activation -> spectra-g / Engram optional adapter ->
+XGBoost formal reranker -> Neo4j contextual trees + HyperRAG packet RPC ->
+Autoencoder / SOM latent topology -> native GEMM deferred.
+
+Decision docs:
+- `docs/atlas/xgboost-reranker-contract.md`
+- `docs/atlas/native-gemm-deferral.md`
+
+See also:
+- `docs/atlas/xgboost-reranker-contract.md`
+- `docs/atlas/native-gemm-deferral.md`
+
 ## Lanes
 
 ### Cold lane

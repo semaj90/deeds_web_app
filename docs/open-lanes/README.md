@@ -4,6 +4,15 @@
 **Scope**: Parent Atlas Phase 3D/3E + Neo4j GDS + Gemma4 Orchestration  
 **Coordination**: No blocking dependencies; run in parallel
 
+Current working order:
+BM25 + concept activation -> spectra-g / Engram optional adapter ->
+XGBoost formal reranker -> Neo4j contextual trees + HyperRAG packet RPC ->
+Autoencoder / SOM latent topology -> native GEMM deferred.
+
+Split contracts:
+- `docs/atlas/xgboost-reranker-contract.md`
+- `docs/atlas/native-gemm-deferral.md`
+
 ---
 
 ## Current Active Lanes

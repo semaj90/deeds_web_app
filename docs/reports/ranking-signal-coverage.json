@@ -1,0 +1,35 @@
+{
+  "generated_at": "2026-06-12T19:50:27.283Z",
+  "total_packets": 17020,
+  "total_traces": 1134,
+  "signals": {
+    "bm25_text": 0.22508813160987073,
+    "bm25_summary_only": 0.22508813160987073,
+    "bm25_payload_only": 0,
+    "community_source": 1,
+    "community_conf_any": 1,
+    "community_conf_high": 0.15005875440658048,
+    "concept_ids": 0.34259694477085784,
+    "reward_payload": 0,
+    "selected_concepts": 1,
+    "trace_score": 1,
+    "trace_success": 0.8738977072310405
+  },
+  "thresholds": {
+    "bm25_text": 0.85,
+    "community_conf": 0.95,
+    "concept_ids": 0.6,
+    "reward_history": 0.2
+  },
+  "gate_checks": {
+    "bm25_text": false,
+    "community_conf": true,
+    "concept_ids": false,
+    "reward_history": false
+  },
+  "gate": "FAIL_UNTIL_SIGNAL_DENSITY",
+  "blockers": [
+    "bm25_text",
+    "concept_ids"
+  ]
+}

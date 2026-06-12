@@ -1,52 +1,62 @@
-# Atlas Production Roadmap: Parent & Programming Docs
+# Atlas Production Roadmap: Corrected Stage Order
 
-This document serves as the durable operator guide for scaling, validating, and integrating the Legal-AI Atlas knowledge layers.
+This is the current operator-facing roadmap for the parent atlas stack. It replaces the older Phase 3-9 ordering as the working sequence for storage, memory, ranking, and graph enrichment.
 
-## Phase 3: Post-Synthesis Quality Review (RunID: `stage-2c-500`)
-- [ ] **Authority Audit**: Verify PageRank scores in Neo4j align with perceived file importance.
-- [ ] **Summary Verification**: Inspect `docs/graph/repo-neo4j-graphrag-report.json` for synthesis drift.
-- [ ] **Embedding Parity**: Ensure Qdrant `codebase_chunks_768` payloads contain accurate `sourceRefs`.
+## Corrected Stage Order
 
-## Phase 4: Admin Copilot UI Integration
-- [ ] **Provenance Display**: Show Qdrant `sourceRefs` and Neo4j graph paths in search results.
-- [ ] **Cluster Visualization**: Integrate 4D manifold cluster aliases into the UI.
-- [ ] **Direct Edit**: Enable operators to promote/demote synthesis trust tiers.
+Decision docs:
+- `docs/atlas/parent-atlas-storage-decision.md`
+- `docs/atlas/xgboost-reranker-contract.md`
+- `docs/atlas/native-gemm-deferral.md`
 
-## Phase 5: Neo4j Enhanced Synthesis + Feature Command Atlas
-- [ ] **Feature Registry**: Reconcile core architectural features with code-based evidence.
-- [ ] **Command Mapping**: Bridge features to safe, allowlisted MCP commands.
-- [ ] **Synthetic Evidence**: Generate concept cards for undocumented local patterns.
-- [ ] **Feature Labeling**: Add app-file labels for `svelte-inspector` and `svelte-realtime` consolidation lanes and keep the feature registry aligned with file-family upgrades.
-- [ ] **Dependency Chains**: Map shared static and dynamic import chains for app-file family upgrades before the later graph analysis pass.
+### 1. BM25 + concept activation
+- Postgres stays the source of truth for rows, joins, and task state.
+- Redis / Valkey / Bitfrost stays hot-cache only.
+- Qdrant stays the semantic ANN layer.
+- Neo4j stays the traversal / planning graph.
+- DuckDB / MapReduce stays the offline scan and recomputation lane.
+- SeaweedFS stays the cold blob store.
+- Canonical keys: `source_ref`, `source_ref_key`, `feature_id`, `packet_key`, `qdrant_point_id`, `neo4j_node_id`, `redis_hot_key`, `seaweed_object_key`.
 
-## Phase 6: Programming Docs Atlas (External Lane)
-### Governance & Guardrails
-- **Official First**: Prioritize `*.llms.txt` from official domains.
-- **Firecrawl Adapter**: Use structured scraping to prevent unbounded crawls.
-- **Versioning**: All docs must be timestamped and versioned (e.g., SvelteKit 2.x).
-- **Isolation**: Never mix external doc vectors into `codebase_chunks_768`.
+### 2. spectra-g / Engram optional adapter boundary
+- spectra-g / Engram is the preferred optional adapter surface for query transitions, hot context, and replay hints.
+- Tiny-Engram is not the canonical contract; keep it as an experimental fallback only.
+- The adapter must fail open and must not override provenance, source code, or audit data.
+- TurboQuant / RotorQuant stay research labels, not correctness dependencies.
 
-### Execution (Stage 6A–H)
-- [x] **6A: SvelteKit 2 Canary**: (COMPLETE) Normalization, manifest, and chunking verified.
-- [ ] **6B: Tier 1 Expansion**: Drizzle, Svelte 5, TypeScript, Node.js, PostgreSQL.
-- [ ] **6C: Tier 2 Systems**: CUDA, WebGPU, gRPC, QUIC.
-- [ ] **6D: Qdrant Indexing**: Upsert chunks to `external_programming_docs_768`.
-- [ ] **6E: Neo4j Projection**: Map `DocSource` -> `DocChunk` -> `API` concept graph.
-- [ ] **6F: Gap Analysis**: Run `compare-external-docs-to-features.mjs`.
-- [ ] **6G: MCP Integration**: Enable `trace.docs_search` and `trace.docs_compare_feature`.
-- [ ] **6H: Web Fallback**: Implement `external_unverified` lane for search misses.
+### 3. Retrieval telemetry and lineage
+- Maintain read-only telemetry for retrieval strategy, packet selection, selected concepts, and reward.
+- Preserve sourceRef -> feature_id -> feature_label lineage before adding more graph automation.
+- Repair joins before adding more transport or GPU complexity.
 
-## Phase 7: Knowledge-Base Retrieval Flow
-- [ ] **Multi-Lane Retrieval**: Combine Parent Atlas (Local) + Docs Atlas (External) + Web (Unverified).
-- [ ] **Reranking**: Use PageRank and Feature Authority to boost canonical sources.
-- [ ] **Synthesis**: Gemma4 generates answers only after `sourceRefs` are collected.
+### 4. XGBoost formal reranker
+- XGBoost is the formal reranker input, not a side-channel scorer.
+- The reranker sits after Qdrant ANN + Neo4j expansion and before final context assembly.
+- Activation remains gated by the contract in `docs/atlas/xgboost-reranker-contract.md`.
+- Cross-encoder ranking remains optional and later.
 
-## Phase 8: Immediate Next Steps
-1. **Validate Infrastructure**: `node scripts/atlas/validate-model-endpoints.mjs`.
-2. **Neo4j Commit**: Run the write-enabled projection for SvelteKit canary data.
-3. **Drizzle Crawl**: Start Tier 1 expansion with Drizzle ORM docs.
-4. **Missing Links Audit**: Run `npm run audit:neo4j-missing-links` to surface orphaned graph nodes, unlabeled routes, and dynamic-import consolidation candidates.
-5. **Label Upgrade**: Run the semantics report after the label registry refresh so `svelte-inspector` and `svelte-realtime` rows are visible in the atlas outputs.
+### 5. Neo4j contextual trees + HyperRAG packet RPC
+- Seed `USED_CONCEPT` and `USED_PACKET` edges from agent traces.
+- Add reward-bearing trace edges before running broader GDS ranking.
+- Build from bounded packet keys and trace IDs, not from supernode-first traversals.
 
-## Phase 9: Codex Implementation Prompt
-> "Implement the Programming Docs Atlas ingestion lane using Firecrawl-style scraping, llms.txt generation, Qdrant indexing, and Neo4j projection. Enforce trust tiers and sourceRefs requirements. Maintain strict isolation between codebase and external documentation vectors."
+### 6. Autoencoder / SOM latent topology
+- Maintain 768d -> latent -> centroid representations.
+- Keep this layer offline until coverage is measurable and stable.
+
+### 7. Native GEMM / pybind11 deferred
+- Do not promote native GEMM / pybind11 / GPU JSON parsing ahead of the measured pressure gates.
+- Keep MessagePack / gRPC / FlatBuffers / Arrow / cuDF as future lanes only if packet volume and parse pressure justify them.
+- Phase 17I remains a spec lane until the audit says the existing CPU / DuckDB stack is insufficient.
+
+## Working Priorities
+
+1. Keep the storage tier boundaries stable.
+2. Keep spectra-g / Engram optional and fail-open.
+3. Keep XGBoost formalized as the reranker contract.
+4. Keep graph learning behind trace and edge coverage.
+5. Defer native GEMM / pybind11 until the rest of the contract is proven.
+
+## Legacy Notes
+
+The older Phase 3-9 roadmap in prior operator docs is historical context only. Use the corrected stage order above for current work planning.

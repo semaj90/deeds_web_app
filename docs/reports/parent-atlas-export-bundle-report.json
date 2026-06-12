@@ -1,0 +1,31 @@
+{
+  "generatedAt": "2026-06-12T19:35:06.489Z",
+  "dryRun": true,
+  "active": false,
+  "lanes": "open",
+  "fileCount": 12905,
+  "totalBytes": 242272391,
+  "kindCounts": {
+    "json": 8248,
+    "md": 493,
+    "jsonl": 5,
+    "parent-atlas": 56,
+    "drizzle-schema-map": 2,
+    "ndjson": 7,
+    "mjs": 510,
+    "postgres-contract": 3,
+    "hidden-packet-pathmap": 4,
+    "live-service-env": 3,
+    "all-lanes-parent-atlas": 1,
+    "ts": 2584,
+    "sql": 41,
+    "cjs": 1,
+    "feature-lineage": 3,
+    "ps1": 1,
+    "js": 32,
+    "runtime-packet-density": 2,
+    "svelte": 908,
+    "txt": 1
+  },
+  "missingPrereqs": []
+}

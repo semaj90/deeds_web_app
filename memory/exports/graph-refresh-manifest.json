@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-06-12T12:06:31.499Z",
+  "generatedAt": "2026-06-12T19:34:50.066Z",
   "nodeCount": 0,
   "edgeCount": 0,
   "exportCount": 16807,
@@ -228,8 +228,10 @@
   "domains": [
     "Agent",
     "General",
+    "Graph",
     "Infra",
     "Legal",
+    "Performance",
     "Retrieval",
     "UI"
   ],
@@ -237,6 +239,14 @@
   "source": "docs/graph/codebase-graph.json",
   "status": "ok",
   "promotionState": "generated",
+  "atlasGate": {
+    "total": 17020,
+    "withSourceRef": 8367,
+    "packetKeyCoverage": 1,
+    "featureIdCoverage": 0.7699294848810805,
+    "highConfidenceCount": 2554,
+    "promoted": false
+  },
   "generator": "scripts/atlas/write-graph-refresh-manifest.mjs",
   "notes": "Read from docs/graph/codebase-graph.json"
 }

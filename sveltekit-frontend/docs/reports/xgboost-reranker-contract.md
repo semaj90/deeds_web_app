@@ -1,7 +1,7 @@
 # XGBoost Reranker Contract
 
 Generated: 2026-06-06  
-Updated: 2026-06-12 — promoted to formal reranker input (Phase 5)
+Updated: 2026-06-12 — promoted to formal reranker input (Phase 18)
 
 ## Decision
 
@@ -66,7 +66,7 @@ XGBoost reranker replaces RRF combiner when:
   - Offline eval: NDCG@10 ≥ 0.80 (vs 0.772 current rrf_default)
 ```
 
-## Implementation Path (Phase 5)
+## Implementation Path (Phase 18)
 
 1. `scripts/atlas/generate-xgboost-training-set.mjs` — extract (query, doc, label) triples from agent_traces
 2. `scripts/atlas/train-xgboost-ranker.mjs` — train LambdaMART objective, serialize to `models/xgboost-ranker.json`
@@ -75,6 +75,6 @@ XGBoost reranker replaces RRF combiner when:
 
 ## Current Status
 
-Stage: **prerequisites phase** — community backfill applied (Layer A complete), 1,134 agent traces collected, reward labels pending extraction.
+Stage: **formal reranker lane** — community backfill applied (Layer A complete), 1,134 agent traces collected, reward labels pending extraction.
 
 The side-channel hotness scorer (`scripts/atlas/xgboost-hotness-score.mjs`, `ace:cluster:hot` Redis key) remains active as a parallel signal until the formal reranker clears the activation gate. Do not remove it — the hotness scorer trains on cluster-level signals while the formal reranker trains on query-level relevance labels; they are complementary.

@@ -1,0 +1,25 @@
+{
+  "generated_at": "2026-06-12T22:21:57.663Z",
+  "mode": "apply",
+  "collection": "codebase_chunks_768",
+  "total_qdrant_points": 54331,
+  "scanned": 1100,
+  "usable_points": 500,
+  "skipped_points": 505,
+  "upserted": {
+    "inserted": 500,
+    "updated": 0,
+    "errors": 0
+  },
+  "turbovec": {
+    "pre_indexed": 1,
+    "post_indexed": 501,
+    "backend": "js-centroid-fallback"
+  },
+  "gate": {
+    "indexed": true,
+    "inserted": true,
+    "errors": true,
+    "pass": true
+  }
+}

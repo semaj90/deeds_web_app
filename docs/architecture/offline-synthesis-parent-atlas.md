@@ -17,6 +17,19 @@ tags:
 
 This lane turns the current corpus into structured offline artifacts before promotion. It is intentionally separate from live retrieval, but it uses the same storage spine and naming conventions.
 
+Use the corrected working order when promoting outputs:
+BM25 + concept activation -> spectra-g / Engram optional adapter ->
+XGBoost formal reranker -> Neo4j contextual trees + HyperRAG packet RPC ->
+Autoencoder / SOM latent topology -> native GEMM deferred.
+
+Decision docs:
+- `docs/atlas/xgboost-reranker-contract.md`
+- `docs/atlas/native-gemm-deferral.md`
+
+See also:
+- `docs/atlas/xgboost-reranker-contract.md`
+- `docs/atlas/native-gemm-deferral.md`
+
 ## Canonical flow
 
 ```mermaid
@@ -123,6 +136,8 @@ Use this order when consuming the artifacts:
 2. Qdrant semantic collections
 3. Postgres durable tables
 4. Neo4j / SOM topology lanes
+
+The offline synthesis lane is an input surface to those contracts, not a competing retrieval stack.
 
 ## Outputs
 

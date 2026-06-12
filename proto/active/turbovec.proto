@@ -1,0 +1,88 @@
+syntax = "proto3";
+
+package turbovec;
+
+// ANN index + optional linear transform. CPU/SIMD, no LibTorch dependency.
+service TurboVecService {
+  // Liveness + readiness check
+  rpc Health (HealthRequest) returns (HealthResponse);
+
+  // ANN top-K search over the quantized vector index
+  rpc Search (TurboSearchRequest) returns (TurboSearchResponse);
+
+  // Project vectors through a stored orthogonal transform (768→64 or identity)
+  rpc Transform (TransformRequest) returns (TransformResponse);
+
+  // Bulk upsert vectors into the ANN index. Each vector must carry an id string
+  // (use Qdrant point UUID or packet_key). Enriched payload metadata (feature_id,
+  // community_id, tags) is stored alongside for pre-filter cascade in Search.
+  rpc Upsert (UpsertRequest) returns (UpsertResponse);
+}
+
+// ── Health ────────────────────────────────────────────────────────────────────
+
+message HealthRequest {}
+
+message HealthResponse {
+  bool ok = 1;
+  int32 indexed = 2;
+  int32 dim = 3;
+  int32 bits = 4;
+  string backend = 5;
+}
+
+// ── Search ────────────────────────────────────────────────────────────────────
+
+message TurboSearchRequest {
+  repeated float query_vector = 1;     // 768-dim query
+  int32 top_k = 2;
+  string transform_id = 3;             // optional: apply stored rotation before scoring
+}
+
+message TurboSearchResponse {
+  message Candidate {
+    string id = 1;
+    float score = 2;
+    int32 cluster_id = 3;
+  }
+  repeated Candidate candidates = 1;
+  string backend = 2;
+  int32 indexed = 3;
+}
+
+// ── Upsert ────────────────────────────────────────────────────────────────────
+
+message UpsertRecord {
+  string id = 1;                  // stable identifier (Qdrant UUID or packet_key)
+  repeated float vector = 2;      // 768-dim embedding
+  string feature_id = 3;          // optional: enriched payload field
+  int32 community_id = 4;         // optional: 0 = not set
+  repeated string tags = 5;       // optional: concept_ids / tag labels
+}
+
+message UpsertRequest {
+  repeated UpsertRecord records = 1;
+}
+
+message UpsertResponse {
+  int32 indexed = 1;    // total vectors in index after upsert
+  int32 inserted = 2;   // new vectors added this call
+  int32 updated = 3;    // existing vectors overwritten
+  string backend = 4;
+}
+
+// ── Transform ─────────────────────────────────────────────────────────────────
+
+message TransformRequest {
+  repeated float vectors = 1;     // flattened N x in_dim
+  int32 count = 2;                // N
+  int32 in_dim = 3;               // input dimension (default 768)
+  int32 out_dim = 4;              // output dimension (default 64)
+  string transform_id = 5;        // optional: reference a stored orthogonal matrix
+}
+
+message TransformResponse {
+  repeated float projected_vectors = 1;  // flattened N x out_dim
+  int32 count = 2;
+  int32 out_dim = 3;
+}

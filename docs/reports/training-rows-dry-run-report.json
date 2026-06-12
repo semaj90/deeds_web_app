@@ -1,0 +1,19 @@
+{
+  "generatedAt": "2026-06-12T19:35:08.007Z",
+  "rows": 112,
+  "schemaRows": 91,
+  "sourceRefRows": 42,
+  "relevantSourceRefRows": 21,
+  "skippedSourceRefRows": 21,
+  "relevantOnly": true,
+  "maxRows": 250,
+  "matchedRows": 21,
+  "unmatchedRows": 0,
+  "auditMatchedRows": 41,
+  "auditUnmatchedRows": 1,
+  "ambiguousRows": 0,
+  "sampleTaskKinds": [
+    "schema_projection",
+    "source_ref_alignment"
+  ]
+}

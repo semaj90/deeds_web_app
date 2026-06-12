@@ -55,6 +55,15 @@ This page is the navigation entry for the Parent Atlas workstream. It links the 
 
 ## Lane Index
 
+### Canonical working order
+1. BM25 + concept activation
+2. spectra-g / Engram optional adapter
+3. Retrieval telemetry and lineage
+4. XGBoost formal reranker
+5. Neo4j contextual tree enrichment + HyperRAG packet RPC
+6. Autoencoder / SOM latent topology
+7. Native GEMM / pybind11 deferred
+
 ### Two-lane storage model
 - Cold originals stay in the repo, SeaweedFS, or other archive stores
 - Warm index packets stay small and point back to cold originals
@@ -100,9 +109,9 @@ This page is the navigation entry for the Parent Atlas workstream. It links the 
 - offline synthesis
 
 ### Remaining todo focus
-- finish P3 provenance parity and quality review
-- finish P4 provenance UI and trust-tier editing
-- finish P5 feature registry reconciliation and command mapping
+- finish provenance parity and quality review
+- finish provenance UI and trust-tier editing
+- finish feature registry reconciliation and command mapping
 - run live-service env audit before qdrant backfill applies
 - keep offline mirrors downstream-only
 

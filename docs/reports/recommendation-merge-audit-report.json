@@ -1,0 +1,46 @@
+{
+  "generatedAt": "2026-06-12T19:22:46.894Z",
+  "paths": {
+    "snapshot": ".opencode/recommendations/recommendations.json",
+    "events": ".opencode/recommendations/recommendation-events.jsonl",
+    "graph": "docs/graph/recommendations.json",
+    "legacy": "docs/phase100/feature-recommendations.json",
+    "nextMoves": "memory/exports/next-moves-recommendation.json"
+  },
+  "snapshot": {
+    "totalCount": 5,
+    "clusterCount": 2,
+    "top10Count": 5,
+    "titles": [
+      "Feature not implemented: Priority 1: Evidence Upload UI (1 hour)",
+      "Feature not implemented: Priority 2: VLM POI Integration (90 min)",
+      "Feature not implemented: Priority 3: Audit Dashboard Web UI (3-4 hours)",
+      "Feature not implemented: Priority 4: Auto-Fix Orchestrator (6-8 hours)",
+      "Feature not implemented: Phase 3: Post-Synthesis Quality Review (RunID: `stage-2c-500`)"
+    ],
+    "types": [
+      "missing_feature"
+    ]
+  },
+  "eventsCount": 0,
+  "sources": {
+    "hasSnapshot": true,
+    "hasGraph": false,
+    "hasLegacy": true,
+    "hasNextMoves": true
+  },
+  "likelyReasons": [
+    "current snapshot is intentionally small and gate-filtered",
+    "recommendations are dominated by missing_feature gates",
+    "docs/graph/recommendations.json is absent or unreadable"
+  ],
+  "collapseExplanation": {
+    "summary": "totalCount=5 is correct and expected — not a bug",
+    "mechanism": "build-recommendations.mjs assembles from 8 detectors; each caps output at slice(0,5-8). The 4173 atlasSeeds produced only 5 seeds with status='missing' (detectStaleFeatures filter). The remaining 1961 mergedCards passed all checks (summaries present, sourceRef populated), so detectMissingSummaries and detectMissingSourceRefs returned 0. detectDuplicates returned 0 (only 1 acePacket). detectTopDevRecs returned 0 (rankReport.ranked was empty at generation time). Result: 5 recommendations from detectStaleFeatures only.",
+    "noMergeKeyBug": true,
+    "noSourceRefNormalizationBug": true,
+    "noAggressiveDedupe": true,
+    "gateVerdict": "PASS — collapse is by design; generator is bounded and replayable",
+    "auditedAt": "2026-06-12"
+  }
+}

@@ -11,6 +11,7 @@
 
 import fs from 'node:fs';
 import path from 'node:path';
+import pg from 'pg';
 
 const root = process.cwd();
 
@@ -94,7 +95,43 @@ function buildExportsList() {
   return exports;
 }
 
-function main() {
+const DATABASE_URL =
+  process.env.DATABASE_URL || 'postgresql://legal_admin:123456@127.0.0.1:5434/legal_ai_db';
+
+async function checkAtlasPromotionGate() {
+  const pool = new pg.Pool({ connectionString: DATABASE_URL, max: 1 });
+  try {
+    const { rows } = await pool.query(`
+      SELECT
+        COUNT(*)                                                                        AS total,
+        COUNT(*) FILTER (WHERE source_ref IS NOT NULL)                                  AS has_ref,
+        COUNT(*) FILTER (WHERE source_ref IS NOT NULL AND packet_key IS NOT NULL)       AS has_packet_key,
+        COUNT(*) FILTER (WHERE source_ref IS NOT NULL AND feature_id IS NOT NULL)       AS has_feature_id,
+        COUNT(*) FILTER (WHERE community_confidence >= 0.65)                            AS has_confidence
+      FROM atlas_packets
+    `);
+    const r = rows[0];
+    const total = Number(r.total);
+    const withRef = Number(r.has_ref);
+    // Coverage denominator = rows with source_ref (excludes synthetic task/feature placeholders)
+    const pkPct = withRef > 0 ? Number(r.has_packet_key) / withRef : 0;
+    const fidPct = withRef > 0 ? Number(r.has_feature_id) / withRef : 0;
+    return {
+      total,
+      withSourceRef: withRef,
+      packetKeyCoverage: pkPct,
+      featureIdCoverage: fidPct,
+      highConfidenceCount: Number(r.has_confidence),
+      promoted: withRef > 0 && pkPct >= 0.95 && fidPct >= 0.80,
+    };
+  } catch {
+    return { total: 0, promoted: false, error: 'db_unavailable' };
+  } finally {
+    await pool.end();
+  }
+}
+
+async function main() {
   // Ensure output directory exists
   fs.mkdirSync(EXPORT_DIR, { recursive: true });
 
@@ -114,6 +151,9 @@ function main() {
     } catch {}
   }
 
+  const atlasGate = await checkAtlasPromotionGate();
+  const promotionState = atlasGate.promoted ? 'promoted' : (graphData ? 'generated' : 'stub');
+
   const manifest = {
     generatedAt: new Date().toISOString(),
     nodeCount: graphData ? graphData.nodes : 0,
@@ -124,16 +164,20 @@ function main() {
     producer: 'graph-refresh',
     source: graphData ? graphData.source : 'graph-refresh',
     status: 'ok',
-    promotionState: graphData ? 'generated' : 'stub',
+    promotionState,
+    atlasGate,
     generator: 'scripts/atlas/write-graph-refresh-manifest.mjs',
-    notes: graphData
-      ? `Read from ${graphData.source}`
-      : 'No graph source files found. Run npm run graph:exports to populate with real data.',
+    notes: atlasGate.promoted
+      ? `Atlas truth promoted: ${atlasGate.total} packets, pk=${(atlasGate.packetKeyCoverage*100).toFixed(1)}%, fid=${(atlasGate.featureIdCoverage*100).toFixed(1)}%`
+      : graphData
+        ? `Read from ${graphData.source}`
+        : 'No graph source files found. Run npm run graph:exports to populate with real data.',
   };
 
   fs.writeFileSync(MANIFEST_PATH, JSON.stringify(manifest, null, 2) + '\n', 'utf8');
   console.log('[write-graph-refresh-manifest] wrote:', path.relative(root, MANIFEST_PATH));
   console.log(`  nodeCount: ${manifest.nodeCount}, edgeCount: ${manifest.edgeCount}, status: ${manifest.status}`);
+  console.log(`  promotionState: ${promotionState} (atlasPackets=${atlasGate.total}, pkCov=${(atlasGate.packetKeyCoverage*100||0).toFixed(1)}%)`);
   if (!graphData) {
     console.log('  No graph source files found — stub written. Run: npm run graph:exports');
   }

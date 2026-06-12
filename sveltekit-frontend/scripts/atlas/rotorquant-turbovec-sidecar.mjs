@@ -24,9 +24,21 @@
 import { createServer } from 'node:http';
 import { spawn }        from 'node:child_process';
 import Redis            from 'ioredis';
+import dotenv           from 'dotenv';
+import path             from 'node:path';
+import { fileURLToPath } from 'node:url';
+import grpc             from '@grpc/grpc-js';
+import protoLoader      from '@grpc/proto-loader';
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+dotenv.config({ path: path.resolve(__dirname, '../../.env') });
+dotenv.config({ path: path.resolve(__dirname, '../../.env.local') });
+dotenv.config({ path: path.resolve(__dirname, '../../../.env') });
+dotenv.config({ path: path.resolve(__dirname, '../../../.env.local') });
 
 // ── Config ─────────────────────────────────────────────────────────────────────
 const PORT         = Number(process.env.TURBOVEC_PORT ?? 8792);
+const GRPC_PORT    = Number(process.env.TURBOVEC_GRPC_PORT ?? 50062);
 const REDIS_URL    = process.env.REDIS_URL            ?? 'redis://127.0.0.1:6379';
 const PYTHON_EXE   = process.env.PYTHON_EXE           ?? 'python';
 const PYTHON_SIDE  = new URL('../turbovec-sidecar.py', import.meta.url).pathname.replace(/^\/([A-Z]:)/, '$1');
@@ -35,6 +47,19 @@ const CENTROIDS_KEY = 'gpu:autoencoder:centroids_64';
 const WEIGHTS_KEY   = 'ace:autoencoder:weights';
 const CLUSTER_PFX   = 'ace:cluster:';
 const TOP_K_DEFAULT = 200;
+
+// Check if already running to prevent EADDRINUSE
+try {
+  const checkRes = await fetch(`http://127.0.0.1:${PORT}/health`, {
+    signal: AbortSignal.timeout(1000)
+  });
+  if (checkRes.ok) {
+    console.log(`[sidecar] TurboVec ANN sidecar is already running on http://127.0.0.1:${PORT}. Don't start another one.`);
+    process.exit(0);
+  }
+} catch (e) {
+  // Not running, proceed with starting the sidecar
+}
 
 // ── Redis (cold-start safe) ────────────────────────────────────────────────────
 const redis = new Redis(REDIS_URL, {
@@ -59,6 +84,10 @@ let centroids   = [];   // [{id: number, vec: Float32Array}]
 let clusterMap  = {};   // clusterId → [source_ref, …]
 let weights     = null; // {W1, b1, W2, b2} for 768→64 projection
 let indexSize   = 0;
+
+// Upserted 768-dim vectors loaded from Qdrant — [{id: string, vec: Float32Array, featureId, communityId, tags}]
+let upsertedVecs = [];
+const upsertedIds = new Map(); // id → index in upsertedVecs (for dedup)
 
 async function loadIndex() {
   if (!redisReady) return;
@@ -97,7 +126,7 @@ async function loadIndex() {
     console.log('[sidecar] Autoencoder weights loaded');
   }
 
-  indexSize = centroids.length;
+  indexSize = centroids.length + upsertedVecs.length;
 }
 
 await loadIndex();
@@ -188,14 +217,35 @@ async function handleSearch(body) {
       const r = await fetch(`${PYTHON_URL}/search`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ vector, top_k: topK }),
+        body: JSON.stringify({ vector, k: topK, top_k: topK }),
         signal: AbortSignal.timeout(5000),
       });
       if (r.ok) {
         const d = await r.json();
-        return { ...d, backend: 'turbovec-python' };
+        const candidates = (d.ids ?? []).map((id, index) => ({
+          id,
+          score: d.scores?.[index] ?? 0,
+          cluster: 0
+        }));
+        return { candidates, backend: 'turbovec-python', indexed: d.indexed };
       }
     } catch { pythonOnline = false; }
+  }
+
+  // If Qdrant-loaded 768d vectors are present, score directly against them
+  if (upsertedVecs.length > 0) {
+    const qv = new Float32Array(vector);
+    const scored = upsertedVecs.map(entry => ({
+      id: entry.id,
+      score: cosineSim(qv, entry.vec),
+      clusterId: entry.communityId ?? 0,
+    }));
+    scored.sort((a, b) => b.score - a.score);
+    return {
+      candidates: scored.slice(0, topK),
+      backend: 'js-upserted-768d',
+      indexed: upsertedVecs.length,
+    };
   }
 
   // JS fallback: project to 64d, find nearest clusters, expand to chunk IDs
@@ -272,5 +322,190 @@ server.listen(PORT, '127.0.0.1', () => {
   console.log(`[sidecar] Index: ${indexSize} centroids, ${Object.keys(clusterMap).length} clusters`);
 });
 
-process.on('SIGINT',  () => { pythonProc?.kill(); server.close(); process.exit(0); });
-process.on('SIGTERM', () => { pythonProc?.kill(); server.close(); process.exit(0); });
+// ── gRPC handlers ─────────────────────────────────────────────────────────────
+
+function healthGrpc(_call, callback) {
+  callback(null, {
+    ok: true,
+    indexed: indexSize,
+    dim: 768,
+    bits: 4,
+    backend: pythonOnline ? 'turbovec-python' : 'js-centroid-fallback',
+  });
+}
+
+async function searchGrpc(call, callback) {
+  try {
+    const { queryVector, topK } = call.request;
+    const res = await handleSearch({ vector: queryVector, topK });
+    const candidates = (res.candidates ?? []).map(c => ({
+      id: String(c.id),
+      score: c.score,
+      clusterId: c.cluster ?? 0,
+    }));
+    callback(null, { candidates, backend: res.backend, indexed: indexSize });
+  } catch (err) {
+    callback(err);
+  }
+}
+
+function batchCosineGrpc(call, callback) {
+  try {
+    const { queryVector, candidateVectors, candidateCount, dim = 768 } = call.request;
+    const scores = [];
+    let qNorm = 0;
+    for (let i = 0; i < queryVector.length; i++) qNorm += queryVector[i] * queryVector[i];
+    qNorm = Math.sqrt(qNorm) || 1;
+
+    for (let n = 0; n < candidateCount; n++) {
+      const offset = n * dim;
+      let dot = 0, cNorm = 0;
+      for (let i = 0; i < dim; i++) {
+        const cv = candidateVectors[offset + i] ?? 0;
+        dot += queryVector[i] * cv;
+        cNorm += cv * cv;
+      }
+      scores.push(dot / (qNorm * (Math.sqrt(cNorm) || 1)));
+    }
+    callback(null, { scores, count: scores.length });
+  } catch (err) {
+    callback(err);
+  }
+}
+
+function encodeLatentGrpc(call, callback) {
+  try {
+    const { vectors, count, inDim = 768, outDim = 64 } = call.request;
+    const encoded = [];
+    for (let n = 0; n < count; n++) {
+      const vec = Array.from(vectors.slice(n * inDim, (n + 1) * inDim));
+      const projected = projectTo64(vec);
+      // Trim or pad to outDim
+      for (let i = 0; i < outDim; i++) encoded.push(projected[i] ?? 0);
+    }
+    callback(null, { encoded, count, outDim });
+  } catch (err) {
+    callback(err);
+  }
+}
+
+function assignSomGrpc(call, callback) {
+  try {
+    const { vectors, count } = call.request;
+    const clusterIds = [];
+    const bmuScores = [];
+    for (let n = 0; n < count; n++) {
+      const vec64 = projectTo64(Array.from(vectors.slice(n * 768, (n + 1) * 768)));
+      const nearest = findNearestCentroids(vec64, 1);
+      clusterIds.push(nearest[0]?.id ?? 0);
+      bmuScores.push(nearest[0]?.score ?? 0);
+    }
+    callback(null, { clusterIds, bmuScores });
+  } catch (err) {
+    callback(err);
+  }
+}
+
+function upsertGrpc(call, callback) {
+  try {
+    const { records } = call.request;
+    let inserted = 0;
+    let updated  = 0;
+
+    for (const rec of records ?? []) {
+      if (!rec.id || !rec.vector?.length) continue;
+      const vec = new Float32Array(rec.vector);
+      if (upsertedIds.has(rec.id)) {
+        const idx = upsertedIds.get(rec.id);
+        upsertedVecs[idx] = { id: rec.id, vec, featureId: rec.featureId ?? '', communityId: rec.communityId ?? 0, tags: rec.tags ?? [] };
+        updated++;
+      } else {
+        upsertedIds.set(rec.id, upsertedVecs.length);
+        upsertedVecs.push({ id: rec.id, vec, featureId: rec.featureId ?? '', communityId: rec.communityId ?? 0, tags: rec.tags ?? [] });
+        inserted++;
+      }
+    }
+
+    indexSize = centroids.length + upsertedVecs.length;
+    callback(null, { indexed: indexSize, inserted, updated, backend: 'js-upserted-768d' });
+  } catch (err) {
+    callback(err);
+  }
+}
+
+function transformGrpc(call, callback) {
+  try {
+    const { vectors } = call.request;
+    const numVectors = Math.floor(vectors.length / 768);
+    const projected = [];
+    for (let i = 0; i < numVectors; i++) {
+      const vec768 = Array.from(vectors.slice(i * 768, (i + 1) * 768));
+      const vec64 = projectTo64(vec768);
+      for (const val of vec64) projected.push(val);
+    }
+    callback(null, { projectedVectors: projected });
+  } catch (err) {
+    callback(err);
+  }
+}
+
+let grpcServer = null;
+
+function startGrpcServer() {
+  try {
+    const protoRoot = path.resolve(__dirname, '../../../proto/active');
+
+    // Legacy combined proto — keeps existing TurboVecCudaService clients working
+    const legacyDef = protoLoader.loadSync(path.join(protoRoot, 'turbovec_cuda.proto'), {
+      keepCase: false, longs: Number, enums: String, defaults: true, oneofs: true,
+    });
+    // Split GPU bridge proto — new boundary
+    const gpuDef = protoLoader.loadSync(path.join(protoRoot, 'gpu_bridge.proto'), {
+      keepCase: false, longs: Number, enums: String, defaults: true, oneofs: true,
+    });
+
+    const legacyDesc   = grpc.loadPackageDefinition(legacyDef);
+    const gpuDesc      = grpc.loadPackageDefinition(gpuDef);
+    const turbovecProto = legacyDesc.turbovec;
+    const gpuProto      = gpuDesc.gpubridge;
+
+    grpcServer = new grpc.Server();
+
+    // TurboVecCudaService — ANN + compat shim (all methods for backward compat)
+    grpcServer.addService(turbovecProto.TurboVecCudaService.service, {
+      health:       healthGrpc,
+      search:       searchGrpc,
+      batchCosine:  batchCosineGrpc,
+      encodeLatent: encodeLatentGrpc,
+      assignSom:    assignSomGrpc,
+      transform:    transformGrpc,
+      upsert:       upsertGrpc,
+    });
+
+    // GpuBridgeService — GPU tensor ops at correct boundary
+    grpcServer.addService(gpuProto.GpuBridgeService.service, {
+      batchCosine:  batchCosineGrpc,
+      encodeLatent: encodeLatentGrpc,
+      assignSom:    assignSomGrpc,
+    });
+
+    grpcServer.bindAsync(
+      `127.0.0.1:${GRPC_PORT}`,
+      grpc.ServerCredentials.createInsecure(),
+      (err, boundPort) => {
+        if (err) {
+          console.error(`[sidecar] Failed to bind gRPC server: ${err.message}`);
+          return;
+        }
+        console.log(`[sidecar] TurboVec + GpuBridge gRPC server listening on 127.0.0.1:${boundPort}`);
+      }
+    );
+  } catch (err) {
+    console.error(`[sidecar] Failed to initialize gRPC server: ${err.message}`);
+  }
+}
+
+startGrpcServer();
+
+process.on('SIGINT',  () => { pythonProc?.kill(); server.close(); grpcServer?.forceShutdown(); process.exit(0); });
+process.on('SIGTERM', () => { pythonProc?.kill(); server.close(); grpcServer?.forceShutdown(); process.exit(0); });

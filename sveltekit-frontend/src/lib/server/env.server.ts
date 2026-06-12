@@ -167,6 +167,9 @@ export const ENV = {
   /** GenerationService gRPC (orphaned — zero consumers; port 50052 reserved) */
   GENERATION_GRPC_URL: privateEnv.GENERATION_GRPC_URL ?? `http://${LOOPBACK_IP}:50052`,
   GENERATION_SERVICE_URL: privateEnv.GENERATION_SERVICE_URL ?? `http://${LOOPBACK_IP}:50052`,
+  // TurboVec gRPC
+  TURBOVEC_SIDECAR_GRPC_URL: privateEnv.TURBOVEC_SIDECAR_GRPC_URL ?? privateEnv.TURBOVEC_GRPC_URL ?? `${LOOPBACK_IP}:50062`,
+  TURBOVEC_SIDECAR_GRPC_ENABLED: (privateEnv.TURBOVEC_SIDECAR_GRPC_ENABLED ?? privateEnv.TURBOVEC_GRPC_ENABLED ?? 'false') === 'true',
   // LangExtract — pure-TS native extractor (langextract/native.ts) is now the default.
   // The Python FastAPI service (phase66-langextract :8095) is DECOMMISSIONED:
   //   - 11/11 native tests pass (citations, statutes, case names, money, dates, persons, etc.)
@@ -227,7 +230,8 @@ export const ENV = {
   TURBOQUANT_BASE_URL: privateEnv.TURBOQUANT_BASE_URL ?? `http://${LOOPBACK_IP}:8090`,
   // Alias — admin/inference-lane route references ENV.TURBOQUANT_URL; mirror BASE_URL.
   TURBOQUANT_URL: privateEnv.TURBOQUANT_URL ?? privateEnv.TURBOQUANT_BASE_URL ?? `http://${LOOPBACK_IP}:8090`,
-  TURBOVEC_SIDECAR: privateEnv.TURBOVEC_SIDECAR ?? `http://${LOOPBACK_IP}:8099`,
+  TURBOVEC_SIDECAR_JSONRPC_URL: privateEnv.TURBOVEC_SIDECAR_JSONRPC_URL ?? privateEnv.TURBOVEC_SIDECAR ?? `http://${LOOPBACK_IP}:8792`,
+  TURBOVEC_SIDECAR: privateEnv.TURBOVEC_SIDECAR ?? privateEnv.TURBOVEC_SIDECAR_JSONRPC_URL ?? `http://${LOOPBACK_IP}:8792`,
   RERANK_BASE_URL: privateEnv.RERANK_BASE_URL ?? privateEnv.RERANK_URL ?? `http://${LOOPBACK_IP}:8090`,
   RERANK_URL: privateEnv.RERANK_URL ?? privateEnv.RERANK_BASE_URL ?? `http://${LOOPBACK_IP}:8090`,
   VLM_BASE_URL: privateEnv.VLM_BASE_URL ?? `http://${LOOPBACK_IP}:8085`,

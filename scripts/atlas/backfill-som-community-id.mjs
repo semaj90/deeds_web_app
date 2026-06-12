@@ -84,31 +84,47 @@ function isCodeFile(sourceRef) {
   return true;
 }
 
-async function qdrantSomCluster(canonicalRef) {
+async function loadAllQdrantSomClusters() {
+  const canonicalMap = new Map();
+  let nextOffset = null;
+  let fetchedCount = 0;
+  
   try {
-    const res = await fetch(`${QDRANT_URL}/collections/codebase_chunks_768/points/scroll`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        limit: 100,
-        with_payload: true,
-        with_vector: false,
-        filter: { must: [{ key: 'canonicalSourceRef', match: { value: canonicalRef } }] },
-      }),
-    });
-    if (!res.ok) return null;
-    const data = await res.json();
-    const points = data.result?.points ?? [];
-    if (points.length === 0) return null;
-
-    const votes = {};
-    for (const pt of points) {
-      const c = pt.payload?.som_cluster;
-      if (c != null) votes[c] = (votes[c] ?? 0) + 1;
-    }
-    const best = Object.entries(votes).sort((a, b) => b[1] - a[1])[0];
-    return best ? Number(best[0]) : null;
-  } catch {
+    do {
+      const body = {
+        limit: 1000,
+        with_payload: ['canonicalSourceRef', 'som_cluster'],
+        with_vector: false
+      };
+      if (nextOffset) {
+        body.offset = nextOffset;
+      }
+      const res = await fetch(`${QDRANT_URL}/collections/codebase_chunks_768/points/scroll`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+      });
+      if (!res.ok) break;
+      const data = await res.json();
+      const result = data.result || {};
+      const points = result.points || [];
+      
+      for (const p of points) {
+        const payload = p.payload || {};
+        const ref = payload.canonicalSourceRef;
+        const cluster = payload.som_cluster;
+        if (ref && cluster != null) {
+          canonicalMap.set(ref, Number(cluster));
+        }
+      }
+      fetchedCount += points.length;
+      nextOffset = result.next_page_offset || null;
+      if (points.length === 0) break;
+    } while (nextOffset);
+    console.log(`  Scrolled ${fetchedCount} points from Qdrant, mapped ${canonicalMap.size} unique canonical references.`);
+    return canonicalMap;
+  } catch (err) {
+    console.warn('  Qdrant scroll failed, falling back:', err.message);
     return null;
   }
 }
@@ -158,25 +174,22 @@ async function main() {
   console.log(`  Non-code (fallback only):       ${nonCodePackets.length}`);
   console.log(`Processing code files:           ${codeLimit}`);
 
-  // ── 2. Qdrant lookup for code files ──────────────────────────────────────
-  const canonicalMap = new Map(); // canonical_ref → som_cluster
+  console.log('\nQuerying Qdrant for all canonicalSourceRef mappings...');
+  const qdrantMap = await loadAllQdrantSomClusters();
+  const canonicalMap = qdrantMap || new Map();
+
+  let qdrantHits = 0, qdrantMiss = 0;
   const uniqueRefs = [...new Set(
     codePackets.slice(0, codeLimit).map(p => canonicalize(p.source_ref)).filter(Boolean)
   )];
-  console.log(`\nUnique canonical refs to query: ${uniqueRefs.length}`);
-
-  let qdrantHits = 0, qdrantMiss = 0;
-  for (let i = 0; i < uniqueRefs.length; i++) {
-    const ref = uniqueRefs[i];
-    const cluster = await qdrantSomCluster(ref);
-    if (cluster != null) { canonicalMap.set(ref, cluster); qdrantHits++; }
-    else { qdrantMiss++; }
-    if (VERBOSE || (i + 1) % 100 === 0) {
-      process.stdout.write(`\r  Queried ${i + 1}/${uniqueRefs.length} refs (hits: ${qdrantHits}, miss: ${qdrantMiss})`);
+  for (const ref of uniqueRefs) {
+    if (canonicalMap.has(ref)) {
+      qdrantHits++;
+    } else {
+      qdrantMiss++;
     }
   }
-  if (!VERBOSE) process.stdout.write('\n');
-  console.log(`\nQdrant hits:   ${qdrantHits}`);
+  console.log(`Qdrant hits:   ${qdrantHits}`);
   console.log(`Qdrant misses: ${qdrantMiss}`);
 
   // ── 3. Build full update plan with provenance ─────────────────────────────

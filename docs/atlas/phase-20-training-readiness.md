@@ -5,6 +5,15 @@ Summary
 -------
 This report assesses readiness for Phase 20 (training and GPU sidecar readiness) and maps the stack cleanly across three layers: durable storage & analytics (Postgres / DuckDB), retrieval & vector memory (Qdrant / Neo4j / Redis), and GPU tensor compute (CUDA / TensorRT / PyTorch). It also recommends partitioning, text-indexing (`pg_trgm`) fields, LoRA target modules, and deployment choices (llama-server / vLLM / TensorRT-LLM).
 
+Training is downstream of the current live contract:
+BM25 + concept activation -> spectra-g / Engram optional adapter ->
+XGBoost formal reranker -> Neo4j contextual trees + HyperRAG packet RPC ->
+Autoencoder / SOM latent topology -> native GEMM deferred.
+
+Decision docs live separately:
+- `docs/atlas/xgboost-reranker-contract.md`
+- `docs/atlas/native-gemm-deferral.md`
+
 Inputs considered
 ---------------
 - `.opencode/outcome-ledger.ndjson` — canonical outcome trace ledger (append-only). (expected)

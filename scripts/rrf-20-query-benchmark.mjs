@@ -314,7 +314,7 @@ async function getEmbedding(query) {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ model: 'embeddinggemma:latest', prompt: query }),
-      signal: AbortSignal.timeout(15_000),
+      signal: AbortSignal.timeout(60_000),
     });
     const data = await res.json();
     return data.embedding ?? null;

@@ -164,6 +164,7 @@ function mergeTokens(existing, qdrantTags, featureIds, agentArea, content, maxLe
 // Qdrant scroll — fetch all points for given source_ref
 // ---------------------------------------------------------------------------
 async function qdrantScrollByFile(sourceRef) {
+  const cleanRef = sourceRef.replace(/^sveltekit-frontend\//, '');
   const points = [];
   let offset = null;
 
@@ -173,7 +174,7 @@ async function qdrantScrollByFile(sourceRef) {
       with_payload: true,
       with_vector: false,
       filter: {
-        must: [{ key: 'canonicalSourceRef', match: { value: sourceRef } }],
+        must: [{ key: 'canonicalSourceRef', match: { value: cleanRef } }],
       },
     };
     if (offset !== null) body.offset = offset;
@@ -220,6 +221,11 @@ async function main() {
       const pkt = packets[i];
       const { packet_id, source_ref, concept_ids: existing } = pkt;
 
+      if (!source_ref || source_ref.trim() === '') {
+        skipped++;
+        continue;
+      }
+
       if (VERBOSE) process.stdout.write(`[${i + 1}/${total}] ${source_ref} ... `);
 
       // Fetch all Qdrant chunks for this file
@@ -232,17 +238,22 @@ async function main() {
         continue;
       }
 
-      if (points.length === 0) {
-        if (VERBOSE) console.log('no Qdrant points found, skipping');
-        skipped++;
-        continue;
-      }
-
-      // Aggregate payload fields across all chunks
+      // Aggregate payload fields across all chunks (empty if no Qdrant points)
       const allTags      = [];
       const allFeatureIds = [];
       const agentAreas   = new Set();
       const allContent   = [];
+
+      if (points.length === 0) {
+        // No Qdrant points — skip only if already has concepts; otherwise do path-only enrichment
+        if (existing && existing.length >= 5) {
+          if (VERBOSE) console.log('no Qdrant points, already has concepts — skip');
+          skipped++;
+          continue;
+        }
+        if (VERBOSE) console.log('no Qdrant points — applying path-derived tokens only');
+        // Path tokens extracted below via mergeTokens with empty qdrant fields
+      }
 
       for (const pt of points) {
         const p = pt.payload ?? {};
@@ -252,10 +263,13 @@ async function main() {
         if (p.content)                    allContent.push(p.content);
       }
 
-      // Merge tokens
+      // Path-derived tokens: split source_ref segments and stems
+      const pathSegments = source_ref.split(/[/\\]/).flatMap(seg => processTag(seg));
+
+      // Merge tokens (path segments added to qdrantTags as fallback signal)
       const enriched = mergeTokens(
         existing ?? [],
-        allTags,
+        [...allTags, ...pathSegments],
         allFeatureIds,
         [...agentAreas].join(' '),
         allContent.join('\n').slice(0, 6000),
@@ -285,7 +299,7 @@ async function main() {
     avgDelta = updated > 0 ? (avgDelta / updated).toFixed(1) : 0;
     console.log(`\nDone.`);
     console.log(`  Updated:  ${updated}`);
-    console.log(`  Skipped:  ${skipped} (no Qdrant points)`);
+    console.log(`  Skipped:  ${skipped} (already has ≥5 concepts, no Qdrant points)`);
     console.log(`  Errors:   ${errors}`);
     console.log(`  Avg token delta: +${avgDelta} per packet`);
     if (DRY_RUN) console.log(`  (dry-run — no DB writes)`);

@@ -5,6 +5,19 @@ _Date: 2026-06-05_
 This note names the retrieval model used by Parent Atlas, Qdrant, TurboVec,
 Redis LOD packets, and optional GPU rerank lanes:
 
+Canonical order for the live stack:
+BM25 + concept activation -> spectra-g / Engram optional adapter ->
+XGBoost formal reranker -> Neo4j contextual trees + HyperRAG packet RPC ->
+Autoencoder / SOM latent topology -> native GEMM deferred.
+
+Decision docs:
+- `docs/atlas/xgboost-reranker-contract.md`
+- `docs/atlas/native-gemm-deferral.md`
+
+See also:
+- `docs/atlas/xgboost-reranker-contract.md`
+- `docs/atlas/native-gemm-deferral.md`
+
 ```txt
 compressed approximate semantic geometry with optional exact rescore
 ```
@@ -126,4 +139,3 @@ Keep this model behind existing boundaries:
 - route runtime packets remain JSONB telemetry and replay indexes
 - exact rescore must report whether it used approximate-only or approximate plus
   rescore
-

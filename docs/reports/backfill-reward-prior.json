@@ -1,0 +1,71 @@
+{
+  "generated_at": "2026-06-12T22:51:55.816Z",
+  "mode": "dry-run",
+  "traces_loaded": 1093,
+  "packet_refs_canonical": 1093,
+  "packet_refs_noise": 0,
+  "labels_with_signal": 10,
+  "packets_to_update": 29772,
+  "label_updates": [
+    {
+      "label": "observability_telemetry",
+      "avgScore": 0.8717583439357187,
+      "hitCount": 107,
+      "rewardIncrement": 0.1307637515903578
+    },
+    {
+      "label": "database_orm",
+      "avgScore": 0.8824940778121342,
+      "hitCount": 128,
+      "rewardIncrement": 0.13237411167182012
+    },
+    {
+      "label": "agent_intelligence",
+      "avgScore": 0.9431656275123615,
+      "hitCount": 212,
+      "rewardIncrement": 0.14147484412685424
+    },
+    {
+      "label": "ui_components",
+      "avgScore": 0.9001856275602719,
+      "hitCount": 111,
+      "rewardIncrement": 0.1350278441340408
+    },
+    {
+      "label": "emergent_topology",
+      "avgScore": 0.8622441743921384,
+      "hitCount": 92,
+      "rewardIncrement": 0.12933662615882074
+    },
+    {
+      "label": "test_harness",
+      "avgScore": 0.8819176149530111,
+      "hitCount": 92,
+      "rewardIncrement": 0.13228764224295167
+    },
+    {
+      "label": "native_accelerators",
+      "avgScore": 0.7786433108737797,
+      "hitCount": 89,
+      "rewardIncrement": 0.11679649663106695
+    },
+    {
+      "label": "general_abstractions",
+      "avgScore": 0.8789424426380091,
+      "hitCount": 88,
+      "rewardIncrement": 0.13184136639570138
+    },
+    {
+      "label": "api_endpoints",
+      "avgScore": 0.8254617757341164,
+      "hitCount": 87,
+      "rewardIncrement": 0.12381926636011745
+    },
+    {
+      "label": "infrastructure_config",
+      "avgScore": 0.8587827473539511,
+      "hitCount": 87,
+      "rewardIncrement": 0.12881741210309267
+    }
+  ]
+}

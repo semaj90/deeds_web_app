@@ -1,24 +1,24 @@
 # Parent Atlas Production Readiness Audit
 
-Generated: 2026-06-12T13:03:33.481Z
+Generated: 2026-06-12T20:33:09.886Z
 
 ## Summary
 
-- PASS: 66
-- WARN: 0
+- PASS: 65
+- WARN: 1
 - FAIL: 0
 
 ## Key Signals
 
-- Parent Atlas documents: 5253
-- Atlas feature map rows: 14487
+- Parent Atlas documents: 5395
+- Atlas feature map rows: 19611
 - NES/CHROM packets: 14911
 - Route runtime packets: 1
 - Qdrant points: 54331
-- Neo4j CodebaseFile nodes: 31551
+- Neo4j CodebaseFile nodes: 0
 - Redis LOD0 latest packet coverage: 1/1
 - Native JSON parser: native addon path present; fallback present
-- NDJSON files discovered with rg -uuu: 128
+- NDJSON files discovered with rg -uuu: 129
 - Phase 101 batch summaries: 35 succeeded / 0 failed
 - Autoencoder dims: 768→256→64
 
@@ -82,9 +82,9 @@ Generated: 2026-06-12T13:03:33.481Z
 - PASS [offline] scripts/atlas/report-compressed-semantic-geometry.mjs: scripts/atlas/report-compressed-semantic-geometry.mjs exists
 - PASS [offline] scripts/atlas/audit-hidden-packet-pathmap.mjs: scripts/atlas/audit-hidden-packet-pathmap.mjs exists
 - PASS [offline] scripts/atlas/materialize-hidden-packet-pathmap-duckdb.mjs: scripts/atlas/materialize-hidden-packet-pathmap-duckdb.mjs exists
-- PASS [offline] rg-uu:ndjson-inventory: rg -uuu found 128 NDJSON files
-- PASS [postgres] table:parent_atlas_documents: parent_atlas_documents exists with 5253 rows
-- PASS [postgres] table:atlas_feature_map: atlas_feature_map exists with 14487 rows
+- PASS [offline] rg-uu:ndjson-inventory: rg -uuu found 129 NDJSON files
+- PASS [postgres] table:parent_atlas_documents: parent_atlas_documents exists with 5395 rows
+- PASS [postgres] table:atlas_feature_map: atlas_feature_map exists with 19611 rows
 - PASS [postgres] table:atlas_feature_map_synthesized: atlas_feature_map_synthesized exists with 14465 rows
 - PASS [postgres] table:nes_chrom_packets: nes_chrom_packets exists with 14911 rows
 - PASS [postgres] table:nes_chrom_kag_dag_hits: nes_chrom_kag_dag_hits exists with 32 rows
@@ -92,14 +92,14 @@ Generated: 2026-06-12T13:03:33.481Z
 - PASS [postgres] table:task_semantic_packets: task_semantic_packets exists with 314 rows
 - PASS [postgres] table:codebase_chunk_index: codebase_chunk_index exists with 40754 rows
 - PASS [postgres] table:agent_pickup_queue: agent_pickup_queue exists with 135 rows
-- PASS [postgres] parent_atlas_documents:sourceRef: Parent Atlas sourceRefs: 3799/3799
-- PASS [postgres] parent_atlas_documents:summaries: Parent Atlas summaries: 3794/3799
+- PASS [postgres] parent_atlas_documents:sourceRef: Parent Atlas sourceRefs: 3941/3941
+- PASS [postgres] parent_atlas_documents:summaries: Parent Atlas summaries: 3794/3941
 - PASS [postgres] active-production:topology: Active production qdrant-without-SOM rows: 0
-- PASS [postgres] nes-chrom:sourceRef-parent-join: NES/CHROM packets matching Parent Atlas: 10032/14911
+- PASS [postgres] nes-chrom:sourceRef-parent-join: NES/CHROM packets matching Parent Atlas: 10042/14911
 - PASS [postgres] route-runtime:sourceRefs: Runtime packets with sourceRefs: 1/1
 - PASS [redis] lod0:route-runtime: Redis LOD0 runtime packets: 1/1
 - PASS [qdrant] collection:codebase_chunks_768: Qdrant codebase_chunks_768 points: 54331
-- PASS [neo4j] contextual-tree: Neo4j CodebaseFile=31551, ParentAtlasFeature=1701
+- WARN [neo4j] contextual-tree: Neo4j CodebaseFile=0, ParentAtlasFeature=0
 
 ## Audit Guardrails
 

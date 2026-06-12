@@ -1,0 +1,121 @@
+{
+  "generated_at": "2026-06-12T21:45:28.488Z",
+  "total_packets": 17020,
+  "addressable_packets": 8367,
+  "identity_coverage": {
+    "packet_key": {
+      "count": 8367,
+      "pct": 0.49159811985898944
+    },
+    "source_ref": {
+      "count": 8367,
+      "pct": 0.49159811985898944
+    },
+    "feature_id": {
+      "count": 6442,
+      "pct": 0.37849588719153937
+    },
+    "community_id": {
+      "count": 17020,
+      "pct": 1
+    }
+  },
+  "missing_identity": {
+    "packet_key": 8653,
+    "source_ref": 8653,
+    "feature_id": 10578,
+    "community_id": 0
+  },
+  "metadata_coverage": {
+    "payload_path": 3171,
+    "payload_file_url": 0,
+    "payload_repo_url": 0,
+    "payload_source_url": 0,
+    "payload_mtime": 0,
+    "payload_hash": 0,
+    "payload_bm25_text": 7293,
+    "payload_tags": 3171
+  },
+  "noise_source_refs": 34,
+  "duplicate_packet_keys": 0,
+  "indexes": {
+    "required": [
+      {
+        "name": "idx_atlas_packets_packet_key",
+        "match": "packet_key",
+        "present": true
+      },
+      {
+        "name": "idx_atlas_packets_source_ref",
+        "match": "source_ref",
+        "present": true
+      },
+      {
+        "name": "idx_atlas_packets_feature_id",
+        "match": "feature_id",
+        "present": true
+      },
+      {
+        "name": "idx_atlas_packets_community_id",
+        "match": "community_id",
+        "present": true
+      },
+      {
+        "name": "atlas_packets_payload_gin",
+        "match": "gin (payload)",
+        "present": true
+      },
+      {
+        "name": "idx_atlas_packets_concept_ids",
+        "match": "gin (concept_ids)",
+        "present": true
+      },
+      {
+        "name": "idx_atlas_packets_summary_fts",
+        "match": "to_tsvector",
+        "present": true
+      }
+    ],
+    "missing": [],
+    "has_payload_path_expression_index": true,
+    "total_indexes": 13
+  },
+  "gates": {
+    "packet_key_coverage": {
+      "value": 0.49159811985898944,
+      "threshold": 0.4,
+      "pass": true
+    },
+    "source_ref_coverage": {
+      "value": 0.49159811985898944,
+      "threshold": 0.4,
+      "pass": true
+    },
+    "feature_id_coverage": {
+      "value": 0.37849588719153937,
+      "threshold": 0.3,
+      "pass": true
+    },
+    "community_id_coverage": {
+      "value": 1,
+      "threshold": 0.9,
+      "pass": true
+    },
+    "no_duplicate_keys": {
+      "value": 0,
+      "threshold": 0,
+      "pass": true
+    },
+    "no_noise_refs": {
+      "value": 34,
+      "threshold": 50,
+      "pass": true
+    },
+    "required_indexes": {
+      "value": 0,
+      "threshold": 0,
+      "pass": true
+    }
+  },
+  "pass": true
+}

@@ -12,6 +12,12 @@ This document records storage roles, recommended services, tooling, and quick ru
 - LanceDB as an offline/experiment vector lake.
 - Langfuse for LLM & tool observability.
 - LangGraph for durable agent orchestration.
+- spectra-g / Engram is the preferred optional memory adapter lane.
+- Tiny-Engram stays experimental only and is not the canonical contract.
+
+Related decisions now live in separate docs:
+- XGBoost formal reranker contract: `docs/atlas/xgboost-reranker-contract.md`
+- Native GEMM / pybind11 deferral: `docs/atlas/native-gemm-deferral.md`
 
 Two-lane model
 --------------
@@ -144,6 +150,7 @@ Runtime:
 - Neo4j (GraphRAG / explicit relationships)
 - Gemma4 llama-server(s) behind facades (Ollama, YorHA)
 - MCP tools/service layer for DB access and business logic
+- spectra-g / Engram (optional low-trust memory adapter)
 
 Analytics / Audit:
 - DuckDB + Arrow/Parquet for exports and fast joins
@@ -163,6 +170,8 @@ Practical Recommendations & Next Steps
 - Use Arrow/Parquet as the canonical export format for DuckDB analytic passes and for training ingestion.
 - Add Langfuse instrumentation around Gemma4 calls to capture prompt versions, tokens, and outcomes for reward aggregation.
 - Use LangGraph to orchestrate workflows but route storage calls through MCP/HTTP services to centralize DB logic.
+- Keep native GEMM / pybind11 deferred until signal quality and reranker gates justify it.
+- Keep the XGBoost formal reranker contract separate from this storage note; storage owns the tiers, not the ranking decision.
 
 Commands: quick checks you can run locally
 -----------------------------------------

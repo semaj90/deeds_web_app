@@ -3,6 +3,10 @@
 This note connects feature-task generation to parent atlas indexing so task
 tracking and repository indexing share one dependency map.
 
+Use the current canonical open-work order when ranking tasks:
+packet contract -> packet enrichment -> contextual tree -> retrieval ranking
+-> memory -> policy/orchestration. Do not create a second taskboard.
+
 ## Order of operations
 
 1. Derive open tasks from `MASTER-FEATURE-TODO-2026-05-20.md`.
@@ -28,6 +32,7 @@ Current state:
 - LangExtract should summarize the active source files, parent-atlas packets, and selected mirror summaries into short completion notes before any archive move; the parent atlas keeps the durable joins, while the mirror tree remains an input surface only.
 - The ranked board is written to `docs/graph/kanban-board.json` and mirrored into the ranking report.
 - Parent atlas indexing now ingests the current card set and validation passes after the kanban sync.
+- The ranked open lanes are the canonical board; stale prompts remain evidence links only.
 - The optional semantic refresh lane is now wired through a single orchestrator and has been validated with the graphify/Karpathy path.
 - The graphify/Karpathy lane feeds the same Qdrant, Redis, and Bitfrost-aligned signals that the feature graph consumes.
 

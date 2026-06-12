@@ -472,7 +472,10 @@ async function main() {
 
         // Embeddings and summary
         const embedding = row.embedding_text ? `[${JSON.parse(row.embedding_text).join(',')}]` : null;
-        const summary = payload.summary || row.title || payload.description || null;
+        let summary = payload.summary || row.title || payload.description || null;
+        if (!summary && canonSourceRef) {
+          summary = docSummaryMap.get(canonicalPath(canonSourceRef, true)) || null;
+        }
         
         let byteStart = payload.byte_start !== undefined ? Number(payload.byte_start) : (payload.byteStart !== undefined ? Number(payload.byteStart) : null);
         if (byteStart !== null && isNaN(byteStart)) byteStart = null;

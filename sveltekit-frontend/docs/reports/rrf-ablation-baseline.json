@@ -1,42 +1,42 @@
 {
-  "timestamp": "2026-06-12T15:42:24.068Z",
-  "totalPackets": 7753,
+  "timestamp": "2026-06-12T19:49:38.996Z",
+  "totalPackets": 17020,
   "queries": 5,
   "summary": {
     "bm25_only": {
-      "avgNdcg": 0.514,
-      "avgMrr": 0.667,
-      "avgRecall": 0.6
+      "avgNdcg": 0.336,
+      "avgMrr": 0.442,
+      "avgRecall": 0.433
     },
     "concept_only": {
-      "avgNdcg": 0.514,
-      "avgMrr": 0.667,
-      "avgRecall": 0.6
+      "avgNdcg": 0.25,
+      "avgMrr": 0.264,
+      "avgRecall": 0.433
     },
     "qdrant_only": {
-      "avgNdcg": 0.639,
-      "avgMrr": 0.8,
-      "avgRecall": 0.7
+      "avgNdcg": 0.667,
+      "avgMrr": 0.822,
+      "avgRecall": 0.767
     },
     "rrf_default": {
-      "avgNdcg": 0.645,
-      "avgMrr": 0.8,
-      "avgRecall": 0.7
+      "avgNdcg": 0.671,
+      "avgMrr": 0.822,
+      "avgRecall": 0.767
     },
     "rrf_bm25_heavy": {
-      "avgNdcg": 0.661,
+      "avgNdcg": 0.664,
       "avgMrr": 0.8,
       "avgRecall": 0.7
     },
     "rrf_vec_heavy": {
-      "avgNdcg": 0.639,
-      "avgMrr": 0.8,
-      "avgRecall": 0.7
+      "avgNdcg": 0.667,
+      "avgMrr": 0.822,
+      "avgRecall": 0.767
     }
   },
   "gate": {
     "ndcg_threshold": 0.3,
-    "rrf_default_ndcg": 0.645,
+    "rrf_default_ndcg": 0.671,
     "passes": true,
     "rrf_beats_bm25": true,
     "rrf_beats_qdrant": true

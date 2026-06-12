@@ -12,6 +12,10 @@ tags:
 
 Neo4j is the traversal authority for the parent atlas.
 
+It sits after storage tiering, optional spectra-g / Engram memory hints,
+retrieval telemetry, and the formal XGBoost reranker. It does not replace
+those layers.
+
 ## Owns
 
 - File to file import edges
@@ -24,3 +28,4 @@ Neo4j is the traversal authority for the parent atlas.
 - Raw code bodies
 - Hidden reasoning
 - Hot cache records
+- Ranking contract selection

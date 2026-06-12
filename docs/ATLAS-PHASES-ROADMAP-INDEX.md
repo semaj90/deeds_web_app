@@ -1,5 +1,9 @@
 # Atlas Phases Roadmap — Complete Index (May 29, 2026)
 
+> Historical index. The current working order is the corrected Parent Atlas
+> stage order documented in `docs/operator/atlas-production-roadmap.md` and
+> `docs/atlas/parent-atlas-table-of-contents.md`.
+
 **Status:** Phase 2 complete, Phase 3-6 + Runtime Intent Graph planned
 **Total Architecture Scope:** Static graph → Runtime intent tracking
 **Implementation Horizon:** 3-4 weeks (Phases 3-6) + 1-4 weeks (Runtime intent graph)

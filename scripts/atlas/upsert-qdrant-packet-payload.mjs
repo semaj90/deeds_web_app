@@ -41,8 +41,8 @@ const LIMIT_ARG = process.argv.find(a => a.startsWith('--limit='));
 const MAX_ROWS  = LIMIT_ARG ? parseInt(LIMIT_ARG.split('=')[1], 10) : Infinity;
 const VERBOSE   = process.argv.includes('--verbose');
 
-// Batch size for Qdrant set_payload calls
-const QDRANT_BATCH = 100;
+// Concurrency for Qdrant scroll + payload calls (keep low to avoid overwhelming Qdrant)
+const QDRANT_CONCURRENCY = 8;
 
 function canonicalize(sourceRef) {
   if (!sourceRef) return null;
@@ -94,7 +94,7 @@ async function getQdrantPointIds(canonicalRef) {
         with_vector: false,
         filter: { must: [{ key: 'canonicalSourceRef', match: { value: canonicalRef } }] },
       }),
-      signal: AbortSignal.timeout(8_000),
+      signal: AbortSignal.timeout(20_000),
     });
     if (!res.ok) return [];
     const data = await res.json();
@@ -108,7 +108,7 @@ async function setQdrantPayload(pointIds, payload) {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ payload, points: pointIds }),
-      signal: AbortSignal.timeout(10_000),
+      signal: AbortSignal.timeout(20_000),
     });
     return res.ok;
   } catch { return false; }
@@ -120,7 +120,8 @@ async function main() {
   console.log(`\n═══ Upsert Qdrant Packet Payload ${DRY_RUN ? '(dry-run)' : '(APPLY)'} ═══`);
   console.log(`Collection: ${COLLECTION} @ ${QDRANT_URL}`);
 
-  // Load all packets with metadata
+  // Load packets with metadata — prioritize code files likely to exist in Qdrant
+  // (sveltekit-frontend/src/ first, then scripts/, then others)
   const { rows: packets } = await pool.query(`
     SELECT packet_id, source_ref, feature_id, community_id,
            community_source, community_confidence,
@@ -128,7 +129,14 @@ async function main() {
            payload->>'cluster_id' AS cluster_id
     FROM atlas_packets
     WHERE source_ref IS NOT NULL
-    ORDER BY feature_id, source_ref
+    ORDER BY
+      CASE
+        WHEN source_ref LIKE 'sveltekit-frontend/src/%' THEN 0
+        WHEN source_ref LIKE 'scripts/%' THEN 1
+        WHEN source_ref LIKE 'src/%' THEN 2
+        ELSE 3
+      END,
+      source_ref
   `);
 
   const toProcess = packets.slice(0, MAX_ROWS);
@@ -161,12 +169,14 @@ async function main() {
     return;
   }
 
-  // Apply: fetch Qdrant point IDs, set payload in batches
+  // Apply: fetch Qdrant point IDs, set payload with bounded concurrency
   let processed = 0, updated = 0, notFound = 0, errors = 0;
   const refsArray = [...refGroups.entries()];
+  const enrichedAt = new Date().toISOString();
 
-  for (let i = 0; i < refsArray.length; i += QDRANT_BATCH) {
-    const batch = refsArray.slice(i, i + QDRANT_BATCH);
+  // Process with limited concurrency to avoid overwhelming Qdrant
+  for (let i = 0; i < refsArray.length; i += QDRANT_CONCURRENCY) {
+    const batch = refsArray.slice(i, i + QDRANT_CONCURRENCY);
 
     await Promise.all(batch.map(async ([canonical, pkt]) => {
       const pointIds = await getQdrantPointIds(canonical);
@@ -186,7 +196,7 @@ async function main() {
         cluster_id:         pkt.cluster_id ? parseInt(pkt.cluster_id, 10) : null,
         packet_key:         pkt.packet_key ?? null,
         atlas_enriched:     true,
-        atlas_enriched_at:  new Date().toISOString(),
+        atlas_enriched_at:  enrichedAt,
       };
 
       const ok = await setQdrantPayload(pointIds, payload);

@@ -1,58 +1,58 @@
 {
-  "timestamp": "2026-06-12T15:42:03.853Z",
-  "totalPackets": 7753,
+  "timestamp": "2026-06-12T19:49:47.387Z",
+  "totalPackets": 17020,
   "queries": 20,
   "summary": {
     "rrf_default": {
-      "avgNdcg": 0.772,
-      "avgMrr": 0.735,
-      "avgRecall": 0.992
+      "avgNdcg": 0.711,
+      "avgMrr": 0.734,
+      "avgRecall": 0.867
     },
     "bm25_heavy": {
-      "avgNdcg": 0.786,
-      "avgMrr": 0.7,
-      "avgRecall": 1.042
+      "avgNdcg": 0.715,
+      "avgMrr": 0.734,
+      "avgRecall": 0.867
     },
     "concept_heavy": {
-      "avgNdcg": 0.802,
-      "avgMrr": 0.728,
-      "avgRecall": 1.092
+      "avgNdcg": 0.712,
+      "avgMrr": 0.734,
+      "avgRecall": 0.867
     },
     "vector_heavy": {
-      "avgNdcg": 0.755,
-      "avgMrr": 0.735,
-      "avgRecall": 0.992
+      "avgNdcg": 0.71,
+      "avgMrr": 0.734,
+      "avgRecall": 0.867
     }
   },
   "byCategory": {
     "Retrieval": {
-      "avgNdcg": 0.667,
+      "avgNdcg": 0.724,
       "avgMrr": 0.54,
-      "avgRecall": 0.9,
-      "queries": 5
-    },
-    "Embedding": {
-      "avgNdcg": 0.692,
-      "avgMrr": 0.733,
-      "avgRecall": 0.9,
-      "queries": 5
-    },
-    "Graph": {
-      "avgNdcg": 0.716,
-      "avgMrr": 0.667,
       "avgRecall": 1,
       "queries": 5
     },
+    "Embedding": {
+      "avgNdcg": 0.612,
+      "avgMrr": 0.729,
+      "avgRecall": 0.7,
+      "queries": 5
+    },
+    "Graph": {
+      "avgNdcg": 0.63,
+      "avgMrr": 0.667,
+      "avgRecall": 0.8,
+      "queries": 5
+    },
     "Schema/Cache": {
-      "avgNdcg": 1.013,
+      "avgNdcg": 0.879,
       "avgMrr": 1,
-      "avgRecall": 1.167,
+      "avgRecall": 0.967,
       "queries": 5
     }
   },
   "gate": {
     "ndcg_threshold": 0.4,
-    "rrf_default_ndcg": 0.772,
+    "rrf_default_ndcg": 0.711,
     "passes": true
   }
 }

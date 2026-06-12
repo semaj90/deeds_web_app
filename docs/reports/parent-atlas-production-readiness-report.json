@@ -1,6 +1,6 @@
 {
   "schema": "parent_atlas_production_readiness.v1",
-  "generatedAt": "2026-06-12T13:03:33.481Z",
+  "generatedAt": "2026-06-12T20:33:09.886Z",
   "readOnly": true,
   "sections": {
     "summary-batch": [
@@ -526,7 +526,7 @@
       {
         "id": "rg-uu:ndjson-inventory",
         "status": "pass",
-        "message": "rg -uuu found 128 NDJSON files",
+        "message": "rg -uuu found 129 NDJSON files",
         "details": {
           "sample": [
             "docs\\packets\\session-features.ndjson",
@@ -536,24 +536,24 @@
             ".tmp\\source-ref-repair-candidates.ndjson",
             ".tmp\\retrieval-pass-dry-run.ndjson",
             ".tmp\\path-map.ndjson",
-            ".tmp\\feature-todo-queue.ndjson",
-            ".tmp\\feature-labels.ndjson",
-            ".tmp\\dependency-graph.ndjson",
-            ".tmp\\compressed-packets.ndjson",
-            ".tmp\\chunks\\feature-chunks.ndjson",
-            ".tmp\\calls-edges-clean.ndjson",
-            ".tmp\\parent_atlas_packets\\rg-dumps\\rg-dump-packets.ndjson",
-            ".tmp\\parent_atlas_packets\\parent-atlas-packets.ndjson",
-            ".tmp\\offline-synthesis\\hidden-packet-pathmap.ndjson",
-            ".tmp\\offline-synthesis\\consolidated-index.ndjson",
-            ".tmp\\analysis\\backfill-proposals.ndjson",
-            ".tmp\\mapreduce-full-v4.ndjson",
-            ".tmp\\mapreduce-full-v3.ndjson",
-            ".tmp\\mapreduce-full-v2.ndjson",
-            ".tmp\\missing-sourceref.ndjson",
-            ".tmp\\mapreduce-test.ndjson",
-            ".tmp\\mapreduce-full.ndjson",
-            ".tmp\\mapreduce-full-v5.ndjson"
+            "tmp\\llm-wiki-chunks\\_combined.ndjson",
+            "tmp\\llm-wiki-chunks\\tokenization.ndjson",
+            "tmp\\llm-wiki-chunks\\tokenization-rg.ndjson",
+            "tmp\\llm-wiki-chunks\\som-clustering.ndjson",
+            "tmp\\llm-wiki-chunks\\som-clustering-rg.ndjson",
+            "tmp\\llm-wiki-chunks\\retrieval-augmented-generation.ndjson",
+            "tmp\\llm-wiki-chunks\\retrieval-augmented-generation-rg.ndjson",
+            "tmp\\llm-wiki-chunks\\quantization.ndjson",
+            "tmp\\llm-wiki-chunks\\quantization-rg.ndjson",
+            "tmp\\llm-wiki-chunks\\kv-cache.ndjson",
+            "tmp\\llm-wiki-chunks\\kv-cache-rg.ndjson",
+            "tmp\\llm-wiki-chunks\\graph-rag.ndjson",
+            "tmp\\llm-wiki-chunks\\graph-rag-rg.ndjson",
+            "tmp\\llm-wiki-chunks\\fine-tuning.ndjson",
+            "tmp\\llm-wiki-chunks\\fine-tuning-rg.ndjson",
+            "tmp\\llm-wiki-chunks\\embedding-vectors.ndjson",
+            "tmp\\llm-wiki-chunks\\embedding-vectors-rg.ndjson",
+            "tmp\\llm-wiki-chunks\\backpropagation.ndjson"
           ]
         }
       }
@@ -562,17 +562,17 @@
       {
         "id": "table:parent_atlas_documents",
         "status": "pass",
-        "message": "parent_atlas_documents exists with 5253 rows",
+        "message": "parent_atlas_documents exists with 5395 rows",
         "details": {
-          "count": 5253
+          "count": 5395
         }
       },
       {
         "id": "table:atlas_feature_map",
         "status": "pass",
-        "message": "atlas_feature_map exists with 14487 rows",
+        "message": "atlas_feature_map exists with 19611 rows",
         "details": {
-          "count": 14487
+          "count": 19611
         }
       },
       {
@@ -634,13 +634,13 @@
       {
         "id": "parent_atlas_documents:sourceRef",
         "status": "pass",
-        "message": "Parent Atlas sourceRefs: 3799/3799",
+        "message": "Parent Atlas sourceRefs: 3941/3941",
         "details": {}
       },
       {
         "id": "parent_atlas_documents:summaries",
         "status": "pass",
-        "message": "Parent Atlas summaries: 3794/3799",
+        "message": "Parent Atlas summaries: 3794/3941",
         "details": {}
       },
       {
@@ -648,10 +648,10 @@
         "status": "pass",
         "message": "Active production qdrant-without-SOM rows: 0",
         "details": {
-          "raw_total": 14487,
+          "raw_total": 19611,
           "raw_with_som": 10512,
           "raw_with_qdrant": 11427,
-          "active_total": 4830,
+          "active_total": 9599,
           "active_with_som": 4830,
           "active_with_qdrant": 4788,
           "active_qdrant_no_som": 0
@@ -660,7 +660,7 @@
       {
         "id": "nes-chrom:sourceRef-parent-join",
         "status": "pass",
-        "message": "NES/CHROM packets matching Parent Atlas: 10032/14911",
+        "message": "NES/CHROM packets matching Parent Atlas: 10042/14911",
         "details": {}
       },
       {
@@ -689,8 +689,8 @@
     "neo4j": [
       {
         "id": "contextual-tree",
-        "status": "pass",
-        "message": "Neo4j CodebaseFile=31551, ParentAtlasFeature=1701",
+        "status": "warn",
+        "message": "Neo4j CodebaseFile=0, ParentAtlasFeature=0",
         "details": {}
       }
     ]
@@ -1259,7 +1259,7 @@
       "section": "offline",
       "id": "rg-uu:ndjson-inventory",
       "status": "pass",
-      "message": "rg -uuu found 128 NDJSON files",
+      "message": "rg -uuu found 129 NDJSON files",
       "details": {
         "sample": [
           "docs\\packets\\session-features.ndjson",
@@ -1269,24 +1269,24 @@
           ".tmp\\source-ref-repair-candidates.ndjson",
           ".tmp\\retrieval-pass-dry-run.ndjson",
           ".tmp\\path-map.ndjson",
-          ".tmp\\feature-todo-queue.ndjson",
-          ".tmp\\feature-labels.ndjson",
-          ".tmp\\dependency-graph.ndjson",
-          ".tmp\\compressed-packets.ndjson",
-          ".tmp\\chunks\\feature-chunks.ndjson",
-          ".tmp\\calls-edges-clean.ndjson",
-          ".tmp\\parent_atlas_packets\\rg-dumps\\rg-dump-packets.ndjson",
-          ".tmp\\parent_atlas_packets\\parent-atlas-packets.ndjson",
-          ".tmp\\offline-synthesis\\hidden-packet-pathmap.ndjson",
-          ".tmp\\offline-synthesis\\consolidated-index.ndjson",
-          ".tmp\\analysis\\backfill-proposals.ndjson",
-          ".tmp\\mapreduce-full-v4.ndjson",
-          ".tmp\\mapreduce-full-v3.ndjson",
-          ".tmp\\mapreduce-full-v2.ndjson",
-          ".tmp\\missing-sourceref.ndjson",
-          ".tmp\\mapreduce-test.ndjson",
-          ".tmp\\mapreduce-full.ndjson",
-          ".tmp\\mapreduce-full-v5.ndjson"
+          "tmp\\llm-wiki-chunks\\_combined.ndjson",
+          "tmp\\llm-wiki-chunks\\tokenization.ndjson",
+          "tmp\\llm-wiki-chunks\\tokenization-rg.ndjson",
+          "tmp\\llm-wiki-chunks\\som-clustering.ndjson",
+          "tmp\\llm-wiki-chunks\\som-clustering-rg.ndjson",
+          "tmp\\llm-wiki-chunks\\retrieval-augmented-generation.ndjson",
+          "tmp\\llm-wiki-chunks\\retrieval-augmented-generation-rg.ndjson",
+          "tmp\\llm-wiki-chunks\\quantization.ndjson",
+          "tmp\\llm-wiki-chunks\\quantization-rg.ndjson",
+          "tmp\\llm-wiki-chunks\\kv-cache.ndjson",
+          "tmp\\llm-wiki-chunks\\kv-cache-rg.ndjson",
+          "tmp\\llm-wiki-chunks\\graph-rag.ndjson",
+          "tmp\\llm-wiki-chunks\\graph-rag-rg.ndjson",
+          "tmp\\llm-wiki-chunks\\fine-tuning.ndjson",
+          "tmp\\llm-wiki-chunks\\fine-tuning-rg.ndjson",
+          "tmp\\llm-wiki-chunks\\embedding-vectors.ndjson",
+          "tmp\\llm-wiki-chunks\\embedding-vectors-rg.ndjson",
+          "tmp\\llm-wiki-chunks\\backpropagation.ndjson"
         ]
       }
     },
@@ -1294,18 +1294,18 @@
       "section": "postgres",
       "id": "table:parent_atlas_documents",
       "status": "pass",
-      "message": "parent_atlas_documents exists with 5253 rows",
+      "message": "parent_atlas_documents exists with 5395 rows",
       "details": {
-        "count": 5253
+        "count": 5395
       }
     },
     {
       "section": "postgres",
       "id": "table:atlas_feature_map",
       "status": "pass",
-      "message": "atlas_feature_map exists with 14487 rows",
+      "message": "atlas_feature_map exists with 19611 rows",
       "details": {
-        "count": 14487
+        "count": 19611
       }
     },
     {
@@ -1375,14 +1375,14 @@
       "section": "postgres",
       "id": "parent_atlas_documents:sourceRef",
       "status": "pass",
-      "message": "Parent Atlas sourceRefs: 3799/3799",
+      "message": "Parent Atlas sourceRefs: 3941/3941",
       "details": {}
     },
     {
       "section": "postgres",
       "id": "parent_atlas_documents:summaries",
       "status": "pass",
-      "message": "Parent Atlas summaries: 3794/3799",
+      "message": "Parent Atlas summaries: 3794/3941",
       "details": {}
     },
     {
@@ -1391,10 +1391,10 @@
       "status": "pass",
       "message": "Active production qdrant-without-SOM rows: 0",
       "details": {
-        "raw_total": 14487,
+        "raw_total": 19611,
         "raw_with_som": 10512,
         "raw_with_qdrant": 11427,
-        "active_total": 4830,
+        "active_total": 9599,
         "active_with_som": 4830,
         "active_with_qdrant": 4788,
         "active_qdrant_no_som": 0
@@ -1404,7 +1404,7 @@
       "section": "postgres",
       "id": "nes-chrom:sourceRef-parent-join",
       "status": "pass",
-      "message": "NES/CHROM packets matching Parent Atlas: 10032/14911",
+      "message": "NES/CHROM packets matching Parent Atlas: 10042/14911",
       "details": {}
     },
     {
@@ -1431,15 +1431,15 @@
     {
       "section": "neo4j",
       "id": "contextual-tree",
-      "status": "pass",
-      "message": "Neo4j CodebaseFile=31551, ParentAtlasFeature=1701",
+      "status": "warn",
+      "message": "Neo4j CodebaseFile=0, ParentAtlasFeature=0",
       "details": {}
     }
   ],
   "postgres": {
     "tableCounts": {
-      "parent_atlas_documents": 5253,
-      "atlas_feature_map": 14487,
+      "parent_atlas_documents": 5395,
+      "atlas_feature_map": 19611,
       "atlas_feature_map_synthesized": 14465,
       "nes_chrom_packets": 14911,
       "nes_chrom_kag_dag_hits": 32,
@@ -1449,23 +1449,23 @@
       "agent_pickup_queue": 135
     },
     "parentAtlasDocuments": {
-      "total": 3799,
-      "with_source_ref": 3799,
-      "with_feature_id": 3799,
+      "total": 3941,
+      "with_source_ref": 3941,
+      "with_feature_id": 3941,
       "with_summary": 3794
     },
     "topologyCoverage": {
-      "raw_total": 14487,
+      "raw_total": 19611,
       "raw_with_som": 10512,
       "raw_with_qdrant": 11427,
-      "active_total": 4830,
+      "active_total": 9599,
       "active_with_som": 4830,
       "active_with_qdrant": 4788,
       "active_qdrant_no_som": 0
     },
     "nesChromPackets": {
       "total": 14911,
-      "parent_atlas_matches": 10032,
+      "parent_atlas_matches": 10042,
       "with_source_ref": 14911,
       "with_feature_id": 14911,
       "with_qdrant_point": 20,
@@ -1490,18 +1490,18 @@
     "url": "http://127.0.0.1:6333",
     "collection": "codebase_chunks_768",
     "pointsCount": 54331,
-    "indexedVectorsCount": 166220,
+    "indexedVectorsCount": 178459,
     "status": "green"
   },
   "neo4j": {
     "available": true,
     "uri": "bolt://127.0.0.1:7687",
-    "totalNodes": 174430,
-    "codebaseFiles": 31551,
-    "parentAtlasFeatures": 1701,
-    "totalRelationships": 607683,
-    "belongsToFeature": 10506,
-    "similarTopology": 170809
+    "totalNodes": 16851,
+    "codebaseFiles": 0,
+    "parentAtlasFeatures": 0,
+    "totalRelationships": 18584,
+    "belongsToFeature": 0,
+    "similarTopology": 0
   },
   "drizzle": {
     "nesChromSchema": {
@@ -1624,7 +1624,7 @@
   ],
   "ndjsonInventory": {
     "status": "pass",
-    "total": 128,
+    "total": 129,
     "sample": [
       "docs\\packets\\session-features.ndjson",
       "docs\\packets\\rg-knowledge-packets.ndjson",
@@ -1633,30 +1633,30 @@
       ".tmp\\source-ref-repair-candidates.ndjson",
       ".tmp\\retrieval-pass-dry-run.ndjson",
       ".tmp\\path-map.ndjson",
-      ".tmp\\feature-todo-queue.ndjson",
-      ".tmp\\feature-labels.ndjson",
-      ".tmp\\dependency-graph.ndjson",
-      ".tmp\\compressed-packets.ndjson",
-      ".tmp\\chunks\\feature-chunks.ndjson",
-      ".tmp\\calls-edges-clean.ndjson",
-      ".tmp\\parent_atlas_packets\\rg-dumps\\rg-dump-packets.ndjson",
-      ".tmp\\parent_atlas_packets\\parent-atlas-packets.ndjson",
-      ".tmp\\offline-synthesis\\hidden-packet-pathmap.ndjson",
-      ".tmp\\offline-synthesis\\consolidated-index.ndjson",
-      ".tmp\\analysis\\backfill-proposals.ndjson",
-      ".tmp\\mapreduce-full-v4.ndjson",
-      ".tmp\\mapreduce-full-v3.ndjson",
-      ".tmp\\mapreduce-full-v2.ndjson",
-      ".tmp\\missing-sourceref.ndjson",
-      ".tmp\\mapreduce-test.ndjson",
-      ".tmp\\mapreduce-full.ndjson",
-      ".tmp\\mapreduce-full-v5.ndjson"
+      "tmp\\llm-wiki-chunks\\_combined.ndjson",
+      "tmp\\llm-wiki-chunks\\tokenization.ndjson",
+      "tmp\\llm-wiki-chunks\\tokenization-rg.ndjson",
+      "tmp\\llm-wiki-chunks\\som-clustering.ndjson",
+      "tmp\\llm-wiki-chunks\\som-clustering-rg.ndjson",
+      "tmp\\llm-wiki-chunks\\retrieval-augmented-generation.ndjson",
+      "tmp\\llm-wiki-chunks\\retrieval-augmented-generation-rg.ndjson",
+      "tmp\\llm-wiki-chunks\\quantization.ndjson",
+      "tmp\\llm-wiki-chunks\\quantization-rg.ndjson",
+      "tmp\\llm-wiki-chunks\\kv-cache.ndjson",
+      "tmp\\llm-wiki-chunks\\kv-cache-rg.ndjson",
+      "tmp\\llm-wiki-chunks\\graph-rag.ndjson",
+      "tmp\\llm-wiki-chunks\\graph-rag-rg.ndjson",
+      "tmp\\llm-wiki-chunks\\fine-tuning.ndjson",
+      "tmp\\llm-wiki-chunks\\fine-tuning-rg.ndjson",
+      "tmp\\llm-wiki-chunks\\embedding-vectors.ndjson",
+      "tmp\\llm-wiki-chunks\\embedding-vectors-rg.ndjson",
+      "tmp\\llm-wiki-chunks\\backpropagation.ndjson"
     ]
   },
   "summary": {
     "counts": {
-      "pass": 66,
-      "warn": 0,
+      "pass": 65,
+      "warn": 1,
       "fail": 0
     }
   },

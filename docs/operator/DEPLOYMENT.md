@@ -1,6 +1,17 @@
 # DEEDS SYSTEM OPERATIONAL MANUAL: DEPLOYMENT & STATE SECURITY
 > **YoRHa Security Clearance Required. Target Environment: Local GPU-Accelerated Workstation.**
 > *Ref: Phase 17 — Production Packaging & State Resilience Protocols*
+>
+> This is a runtime/deployment guide, not the planning roadmap. For feature
+> work, use the split decision docs and the corrected operator order:
+> BM25 + concept activation -> spectra-g / Engram optional adapter ->
+> XGBoost formal reranker -> Neo4j contextual trees + HyperRAG packet RPC ->
+> Autoencoder / SOM latent topology -> native GEMM deferred.
+>
+> Decision docs:
+> - `docs/atlas/parent-atlas-storage-decision.md`
+> - `docs/atlas/xgboost-reranker-contract.md`
+> - `docs/atlas/native-gemm-deferral.md`
 
 ---
 

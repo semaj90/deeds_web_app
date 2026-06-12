@@ -1,14 +1,17 @@
 # HyperRAG 4D Topology Knowledge Layer (Stages 8–11)
 > **Platform Subsystem**: Deeds Web App Multi-Lane Retrieval Engine & Spatial Context Mapping
+>
+> Phase 18 messy-query routing is an evaluation lane only. It does not replace
+> the formal XGBoost reranker contract or the storage / memory / traversal order.
 
 ---
 
 ## 💎 The 11-Stage HyperRAG Architecture
-The Parents Atlas has been successfully hardened and augmented with a high-fidelity 4D spatial topological network without destabilizing any existing baseline lanes. The full pipeline contains:
+The Parent Atlas has been successfully hardened and augmented with a high-fidelity 4D spatial topological network without destabilizing any existing baseline lanes. The full pipeline contains:
 
 ```mermaid
 graph TD
-    subgraph Parents Atlas: Spine
+    subgraph Parent Atlas: Spine
         S1[Stage 1: chunk-text-notes.mjs] -->|NDJSON Segment Chunks| S2[Stage 2: build-rg-search-matrix.mjs]
         S2 -->|Ripgrep codebase refs| S3[Stage 3: embed-chunks.mjs]
         S3 -->|Dense Qdrant Upserts| S4[Stage 4: qdrant-tag-backfill.mjs]
@@ -50,7 +53,7 @@ Chunks closer to the query's spatial signature are pushed to the top of the cont
 All pipeline stages have been seamlessly registered at the root workspace for easy execution:
 
 ```bash
-# 1. Segment & compile the complete parents-atlas test corpus (Karpathy + LLM Wiki + Code Notes)
+# 1. Segment & compile the complete Parent Atlas test corpus (Karpathy + LLM Wiki + Code Notes)
 npm run atlas:parents:chunk
 
 # 2. Build the reverse ripgrep codebase symbol reference matrix

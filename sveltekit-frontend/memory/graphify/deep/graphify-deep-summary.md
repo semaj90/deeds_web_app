@@ -1,33 +1,33 @@
 # Deep Import Graph - Phase A
-Generated: 2026-06-12T16:20:46.010Z
+Generated: 2026-06-12T21:16:00.143Z
 
 ## Stats
 | Metric | Value |
 |--------|-------|
-| Nodes | 23609 |
-| Total edges | 37397 |
-| Resolved edges | 5214 |
+| Nodes | 23653 |
+| Total edges | 37512 |
+| Resolved edges | 5231 |
 | Unresolved (local) | 3025 |
-| External refs | 28843 |
+| External refs | 28941 |
 | Neighborhoods computed | 100 |
 | Test-covered files | 896 |
 
 ## Zone Breakdown
 | Zone | Count |
 |------|-------|
-| shared | 16939 |
-| script | 5202 |
+| shared | 16955 |
+| script | 5225 |
 | test | 1238 |
-| types | 210 |
+| types | 215 |
 | config | 20 |
 
 ## Edge Type Breakdown
 | Type | Count |
 |------|-------|
-| imports_static | 27844 |
+| imports_static | 27956 |
 | test_covers_file | 3937 |
 | redis_dependency | 1627 |
-| imports_dynamic | 1218 |
+| imports_dynamic | 1221 |
 | qdrant_dependency | 899 |
 | exports_from | 507 |
 | neo4j_dependency | 419 |
@@ -40,13 +40,13 @@ Generated: 2026-06-12T16:20:46.010Z
 | Rank | File | Zone | FanIn | FanOut |
 |------|------|------|-------|--------|
 | 1 | `claude-mem/src/utils/logger.ts` | shared | 178 | 1 |
-| 2 | `scripts/atlas/_atlas-utils.mjs` | script | 90 | 0 |
-| 3 | `scripts/atlas/_atlas-utils.mjs` | script | 90 | 0 |
+| 2 | `scripts/atlas/_atlas-utils.mjs` | script | 98 | 0 |
+| 3 | `scripts/atlas/_atlas-utils.mjs` | script | 98 | 0 |
 | 4 | `sveltekit-frontend/tests/helpers/env-ports.ts` | shared | 78 | 0 |
 | 5 | `sveltekit-frontend/src/lib/server/db/client.ts` | shared | 77 | 5 |
 | 6 | `claude-mem/src/shared/paths.ts` | shared | 57 | 2 |
-| 7 | `scripts/atlas/connection-config.mjs` | script | 45 | 0 |
-| 8 | `scripts/atlas/connection-config.mjs` | script | 45 | 0 |
+| 7 | `scripts/atlas/connection-config.mjs` | script | 47 | 0 |
+| 8 | `scripts/atlas/connection-config.mjs` | script | 47 | 0 |
 | 9 | `sveltekit-frontend/src/lib/server/redis.js` | shared | 42 | 2 |
 | 10 | `sveltekit-frontend/src/lib/server/env.server.ts` | shared | 40 | 0 |
 | 11 | `claude-mem/src/shared/SettingsDefaultsManager.ts` | shared | 37 | 0 |

@@ -5,6 +5,7 @@
  */
 
 import { ENV } from '$lib/server/env.server.js';
+import { turbovecGrpcSearch } from '$lib/server/grpc/turbovec-cuda-client.js';
 
 export interface TurboVecPrefilterResult {
   clusterIds: number[];
@@ -78,6 +79,27 @@ export async function turbovecSearch(
   opts: { topK?: number; timeoutMs?: number } = {}
 ): Promise<TurboVecSearchResult> {
   const t0 = Date.now();
+  const topK = opts.topK ?? 200;
+
+  if (ENV.TURBOVEC_SIDECAR_GRPC_ENABLED) {
+    try {
+      const grpcResult = await turbovecGrpcSearch(embedding, topK);
+      if (grpcResult) {
+        return {
+          candidates: (grpcResult.candidates ?? []).map(c => ({
+            id: c.id,
+            score: c.score,
+            cluster: c.clusterId,
+          })),
+          backend: (grpcResult.backend ?? 'grpc') as any,
+          durationMs: Date.now() - t0,
+        };
+      }
+    } catch (err) {
+      console.warn('[turbovec-prefilter] gRPC search failed, falling back to HTTP:', err);
+    }
+  }
+
   const timeoutMs = opts.timeoutMs ?? 300;
   try {
     const res = await fetch(`${sidecarUrl()}/search`, {
@@ -85,7 +107,7 @@ export async function turbovecSearch(
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         vector: Array.from(embedding),
-        topK: opts.topK ?? 200,
+        topK,
       }),
       signal: AbortSignal.timeout(timeoutMs),
     });

@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-06-12T13:29:19.712Z",
+  "generated_at": "2026-06-12T19:28:01.515Z",
   "mode": "apply",
   "total_traces_in_db": 1134,
   "traces_processed": 1134,
@@ -17,11 +17,11 @@
     "ui_components"
   ],
   "gate_result": {
-    "neo4j_trace_total": 2310,
+    "neo4j_trace_total": 2268,
     "pg_trace_total": 1134,
-    "tracesWithEdges": 1134,
-    "edgeCount": 1134,
-    "coveragePct": 1,
+    "tracesWithEdges": 2268,
+    "edgeCount": 2268,
+    "coveragePct": 2,
     "coverageGate": true
   },
   "applied": 1134,

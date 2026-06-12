@@ -19,13 +19,13 @@ export const engramPackets = pgTable('engram_packets', {
   // The full, serialized context blob (e.g., compressed JSON structure)
   contextBlob: text('context_blob').notNull(),
 
-  // --- NEW PARENT ATLAS METADATA FIELDS ---
+  // --- PARENT ATLAS METADATA FIELDS (L1 Contract) ---
   featureId: text('feature_id').notNull().index('idx_feature'), // New required field for feature tracking
   communityId: integer('community_id').notNull().index('idx_community'), // New required field for community grouping
   metadataJsonb: jsonb('metadata_jsonb').default(jsonb('{}')).notNull(), // General metadata payload
 
   // --- EXISTING/RELATED FIELDS ---
-  embeddingDimensions: integer('embedding_dimensions').default(768),
+  embeddingDimensions: integer('embedding_dimensions').default(768'),
 
   // Timestamp of when the packet was created or last updated
   createdAt: timestamp('created_at').defaultNow().notNull(),

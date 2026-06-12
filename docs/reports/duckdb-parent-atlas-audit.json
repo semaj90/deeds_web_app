@@ -1,0 +1,30 @@
+{
+  "generatedAt": "2026-06-12T19:35:07.263Z",
+  "bundleFiles": 12905,
+  "schemaTables": 91,
+  "sourceRefRows": 42,
+  "matchedRows": 41,
+  "unmatchedRows": 1,
+  "ambiguousRows": 0,
+  "relevantKinds": [
+    "code_file",
+    "doc_chunk",
+    "generated_report",
+    "memory_export",
+    "neschrom_card"
+  ],
+  "relevantRows": 21,
+  "relevantMatchedRows": 21,
+  "relevantUnmatchedRows": 0,
+  "relevantMatchRate": 100,
+  "kindCounts": {
+    "unknown": 21,
+    "code_file": 21
+  },
+  "topUnmatchedSuffixes": [
+    {
+      "suffix": "Audit Report: [unsafe_drizzle_update_delete] warning detected",
+      "count": 1
+    }
+  ]
+}

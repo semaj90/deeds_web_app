@@ -1,0 +1,129 @@
+{
+  "generatedAt": "2026-06-12T18:42:19.987Z",
+  "schemaDir": "sveltekit-frontend/src/lib/server/db/schema",
+  "tableCount": 91,
+  "columnCount": 2006,
+  "indexCount": 266,
+  "tables": [
+    {
+      "table": "admin_ai_chat_sessions",
+      "file": "sveltekit-frontend/src/lib/server/db/schema/admin-chat.ts",
+      "columns": 22,
+      "indexes": 0
+    },
+    {
+      "table": "admin_ai_skills",
+      "file": "sveltekit-frontend/src/lib/server/db/schema/admin-ai-skills.ts",
+      "columns": 20,
+      "indexes": 0
+    },
+    {
+      "table": "admin_model_weights",
+      "file": "sveltekit-frontend/src/lib/server/db/schema/admin-model-weights.ts",
+      "columns": 8,
+      "indexes": 0
+    },
+    {
+      "table": "admin_raptor_summaries",
+      "file": "sveltekit-frontend/src/lib/server/db/schema/admin-raptor-summaries.ts",
+      "columns": 6,
+      "indexes": 0
+    },
+    {
+      "table": "agent_traces",
+      "file": "sveltekit-frontend/src/lib/server/db/schema/agent-traces.ts",
+      "columns": 15,
+      "indexes": 3
+    },
+    {
+      "table": "atlas_cards",
+      "file": "sveltekit-frontend/src/lib/server/db/schema/atlas-cards.ts",
+      "columns": 4,
+      "indexes": 0
+    },
+    {
+      "table": "atlas_chunks",
+      "file": "sveltekit-frontend/src/lib/server/db/schema/atlas-chunks.ts",
+      "columns": 11,
+      "indexes": 0
+    },
+    {
+      "table": "atlas_feature_map",
+      "file": "sveltekit-frontend/src/lib/server/db/schema/atlas-feature-map.ts",
+      "columns": 19,
+      "indexes": 5
+    },
+    {
+      "table": "atlas_feature_map_synthesized",
+      "file": "sveltekit-frontend/src/lib/server/db/schema/atlas-feature-map-synthesized.ts",
+      "columns": 24,
+      "indexes": 4
+    },
+    {
+      "table": "atlas_memory_address_registry",
+      "file": "sveltekit-frontend/src/lib/server/db/schema/atlas-memory-address-registry.ts",
+      "columns": 21,
+      "indexes": 6
+    },
+    {
+      "table": "atlas_packets",
+      "file": "sveltekit-frontend/src/lib/server/db/schema/atlas-packets.ts",
+      "columns": 24,
+      "indexes": 5
+    },
+    {
+      "table": "atlas_profile_cards",
+      "file": "sveltekit-frontend/src/lib/server/db/schema/atlas-profile-store.ts",
+      "columns": 56,
+      "indexes": 5
+    },
+    {
+      "table": "atlas_source_ref_dict",
+      "file": "sveltekit-frontend/src/lib/server/db/schema/atlas-dict.ts",
+      "columns": 49,
+      "indexes": 4
+    },
+    {
+      "table": "case_library_links",
+      "file": "sveltekit-frontend/src/lib/server/db/schema/case-library-links.ts",
+      "columns": 13,
+      "indexes": 3
+    },
+    {
+      "table": "case_note_evidence_refs",
+      "file": "sveltekit-frontend/src/lib/server/db/schema/case-note-evidence-refs.ts",
+      "columns": 3,
+      "indexes": 0
+    },
+    {
+      "table": "case_note_versions",
+      "file": "sveltekit-frontend/src/lib/server/db/schema/case-note-versions.ts",
+      "columns": 4,
+      "indexes": 0
+    },
+    {
+      "table": "case_notes",
+      "file": "sveltekit-frontend/src/lib/server/db/schema/case-notes.ts",
+      "columns": 6,
+      "indexes": 0
+    },
+    {
+      "table": "case_persons",
+      "file": "sveltekit-frontend/src/lib/server/db/schema/persons.ts",
+      "columns": 6,
+      "indexes": 0
+    },
+    {
+      "table": "case_statute_links",
+      "file": "sveltekit-frontend/src/lib/server/db/schema/case-statute-links.ts",
+      "columns": 6,
+      "indexes": 0
+    },
+    {
+      "table": "cases",
+      "file": "sveltekit-frontend/src/lib/server/db/schema/legal-cases.ts",
+      "columns": 40,
+      "indexes": 0
+    }
+  ]
+}

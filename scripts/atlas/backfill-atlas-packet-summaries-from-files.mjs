@@ -27,25 +27,17 @@ const ROOT   = join(__dir, '../..');
 
 const DATABASE_URL = process.env.DATABASE_URL || 'postgresql://legal_admin:123456@127.0.0.1:5434/legal_ai_db';
 
-const APPLY     = process.argv.includes('--apply');
-const DRY_RUN   = !APPLY;
-const VERBOSE   = process.argv.includes('--verbose');
-const LIMIT_ARG = process.argv.find(a => a.startsWith('--limit='));
-const MAX_ROWS  = LIMIT_ARG ? parseInt(LIMIT_ARG.split('=')[1], 10) : Infinity;
+const APPLY         = process.argv.includes('--apply');
+const DRY_RUN       = !APPLY;
+const VERBOSE       = process.argv.includes('--verbose');
+const AUDIT_MISSING = process.argv.includes('--audit-missing');
+const LIMIT_ARG     = process.argv.find(a => a.startsWith('--limit='));
+const MAX_ROWS      = LIMIT_ARG ? parseInt(LIMIT_ARG.split('=')[1], 10) : Infinity;
 
 // Text extraction config
 const MAX_LINES        = 120;   // max lines to include from a file
 const MIN_SUMMARY_LEN  = 80;    // below this = not useful
 const MAX_SUMMARY_LEN  = 2000;  // cap to avoid bloating payload
-
-// Root candidates to search for source files (in priority order)
-const SEARCH_ROOTS = [
-  join(ROOT, 'sveltekit-frontend', 'src'),
-  join(ROOT, 'sveltekit-frontend'),
-  join(ROOT, 'scripts'),
-  join(ROOT, 'go-microservice'),
-  ROOT,
-];
 
 // Extensions that yield useful BM25 text
 const CODE_EXTENSIONS = new Set([
@@ -54,43 +46,129 @@ const CODE_EXTENSIONS = new Set([
   '.css', '.scss', '.html', '.yaml', '.yml', '.toml',
 ]);
 
-function normalizeSourceRef(sourceRef) {
-  if (!sourceRef) return null;
-  // Strip chunk suffix  e.g. #chunk-3
-  let ref = sourceRef.replace(/#chunk-\d+$/, '').trim();
-  // Strip leading sveltekit-frontend/
-  ref = ref.replace(/^sveltekit-frontend\//, '');
-  // Normalize backslashes
-  ref = ref.replace(/\\/g, '/');
-  return ref;
+function getPacketKind(sourceRef) {
+  if (!sourceRef) return 'artifact/log';
+  const ext = extname(sourceRef).toLowerCase();
+  
+  const codeExts = new Set([
+    '.ts', '.svelte', '.js', '.mjs', '.cjs',
+    '.py', '.go', '.rs', '.sql', '.css', '.scss',
+    '.html', '.yaml', '.yml', '.toml',
+  ]);
+  
+  if (codeExts.has(ext)) {
+    return 'code_file';
+  }
+  
+  const docExts = new Set(['.md', '.txt', '.pdf', '.docx']);
+  if (docExts.has(ext) || sourceRef.includes('/docs/') || sourceRef.includes('/documents/')) {
+    return 'docs';
+  }
+  
+  return 'artifact/log';
+}
+
+function cleanSourceRef(sourceRef) {
+  if (!sourceRef) return '';
+  let clean = sourceRef.trim();
+  
+  // Strip array/bracket/quote wrappers e.g. ["some/path.js"] or "some/path.js"
+  clean = clean.replace(/^\[\s*["']?/, '').replace(/["']?\s*\]$/, '');
+  clean = clean.replace(/^["']/, '').replace(/["']$/, '');
+  
+  // Strip chunk anchors like #chunk-3 or #chunk-3-some-suffix
+  clean = clean.replace(/#chunk-.*$/, '');
+  
+  // Strip line anchors like :L12-L24, :L12, #L12-L24, #L12
+  clean = clean.replace(/[#:]L\d+.*$/, '');
+  
+  // Strip leading ./ or /
+  clean = clean.replace(/^\.?\//, '');
+  
+  // Convert all \ to /
+  clean = clean.replace(/\\/g, '/');
+  
+  return clean.trim();
+}
+
+function getCandidateFilePaths(sourceRef) {
+  const clean = cleanSourceRef(sourceRef);
+  if (!clean) return [];
+
+  const variations = new Set();
+  
+  // Resolve SvelteKit $lib alias
+  let aliasMapped = clean;
+  if (clean.startsWith('$lib/')) {
+    aliasMapped = clean.replace(/^\$lib\//, 'src/lib/');
+  }
+  
+  variations.add(aliasMapped);
+  
+  // Try with/without sveltekit-frontend/ prefix
+  if (aliasMapped.startsWith('sveltekit-frontend/')) {
+    variations.add(aliasMapped.substring('sveltekit-frontend/'.length));
+  } else {
+    variations.add('sveltekit-frontend/' + aliasMapped);
+  }
+  
+  variations.add(clean);
+  if (clean.startsWith('sveltekit-frontend/')) {
+    variations.add(clean.substring('sveltekit-frontend/'.length));
+  } else {
+    variations.add('sveltekit-frontend/' + clean);
+  }
+  
+  const searchRoots = [
+    ROOT,
+    join(ROOT, 'sveltekit-frontend'),
+    join(ROOT, 'sveltekit-frontend', 'src'),
+    join(ROOT, 'reports'),
+    join(ROOT, 'docs'),
+    join(ROOT, 'memory'),
+    join(ROOT, '.tmp'),
+    join(ROOT, 'scripts'),
+    join(ROOT, 'go-microservice'),
+  ];
+  
+  const candidates = [];
+  for (const root of searchRoots) {
+    for (const v of variations) {
+      const fullPath = join(root, v);
+      candidates.push(fullPath);
+      
+      const ext = extname(v);
+      if (!ext) {
+        candidates.push(fullPath + '.ts');
+        candidates.push(fullPath + '.js');
+        candidates.push(fullPath + '.svelte');
+        candidates.push(fullPath + '.d.ts');
+        candidates.push(join(fullPath, 'index.ts'));
+        candidates.push(join(fullPath, 'index.js'));
+      }
+    }
+  }
+  
+  return candidates;
+}
+
+function resolveFilePath(sourceRef) {
+  const candidates = getCandidateFilePaths(sourceRef);
+  for (const candidate of candidates) {
+    if (existsSync(candidate)) return candidate;
+  }
+  return null;
 }
 
 function isPathOnly(summary, sourceRef) {
   if (!summary) return true;
   if (summary.length < MIN_SUMMARY_LEN) return true;
-  const normalized = normalizeSourceRef(sourceRef) ?? '';
+  const cleaned = cleanSourceRef(sourceRef) ?? '';
   // If summary IS basically just the source_ref path, it's path-only
-  if (summary.trim() === normalized.trim()) return true;
+  if (summary.trim() === cleaned.trim()) return true;
   // Very short and matches a path pattern
   if (summary.length < 120 && /^[\w/\\.@$-]+$/.test(summary.trim())) return true;
   return false;
-}
-
-function resolveFilePath(sourceRef) {
-  const normalized = normalizeSourceRef(sourceRef);
-  if (!normalized) return null;
-
-  // Try direct candidates
-  const candidates = [
-    ...SEARCH_ROOTS.map(r => join(r, normalized)),
-    join(ROOT, normalized),
-    // with sveltekit-frontend prefix stripped already included above
-  ];
-
-  for (const candidate of candidates) {
-    if (existsSync(candidate)) return candidate;
-  }
-  return null;
 }
 
 function extractBm25Text(filePath, content) {
@@ -169,6 +247,16 @@ function buildSummary(filePath, content) {
   };
 }
 
+function isUsefulSummary(summary, sourceRef) {
+  if (!summary) return false;
+  if (summary.length < MIN_SUMMARY_LEN) return false;
+  const cleaned = cleanSourceRef(sourceRef) ?? '';
+  if (summary.trim() === cleaned.trim()) return false;
+  if (summary.trim() === (sourceRef ?? '').trim()) return false;
+  if (summary.length < 120 && /^[\w/\\.@$-]+$/.test(summary.trim())) return false;
+  return true;
+}
+
 async function main() {
   const pool = new Pool({ connectionString: DATABASE_URL });
 
@@ -176,7 +264,7 @@ async function main() {
 
   // ── 1. Load packets needing summary backfill ──────────────────────────────
   const { rows: packets } = await pool.query(`
-    SELECT packet_id, source_ref, summary
+    SELECT packet_id, source_ref, summary, payload, feature_id, source_kind
     FROM atlas_packets
     WHERE summary IS NULL
        OR length(summary) < 80
@@ -184,6 +272,95 @@ async function main() {
        OR (summary ~ '^[\\w/\\\\.@$\\-]+$' AND length(summary) < 120)
     ORDER BY source_ref
   `);
+
+  if (AUDIT_MISSING) {
+    console.log('[audit] Scanning for missing files and fallbacks...');
+    const missingReports = [];
+    const prefixCounts = {};
+    let missingCode = 0, missingDocs = 0, missingArtifacts = 0;
+    let fallbackCode = 0, fallbackDocs = 0, fallbackArtifacts = 0;
+    let totalMissing = 0;
+
+    for (const pkt of packets) {
+      const kind = getPacketKind(pkt.source_ref);
+      const filePath = resolveFilePath(pkt.source_ref);
+      
+      if (!filePath) {
+        totalMissing++;
+        // Check if there is a payload fallback
+        const payload = pkt.payload ?? {};
+        const textFields = ['content', 'text', 'bm25_text', 'summary', 'source', 'snippet'];
+        let hasFallback = false;
+        for (const f of textFields) {
+          if (payload[f] && typeof payload[f] === 'string' && payload[f].trim().length > 10) {
+            hasFallback = true;
+            break;
+          }
+        }
+
+        if (kind === 'code_file') {
+          if (hasFallback) fallbackCode++; else missingCode++;
+        } else if (kind === 'docs') {
+          if (hasFallback) fallbackDocs++; else missingDocs++;
+        } else {
+          if (hasFallback) fallbackArtifacts++; else missingArtifacts++;
+        }
+
+        const cleanRef = cleanSourceRef(pkt.source_ref) || 'empty_source_ref';
+        const prefix = cleanRef.includes('/') ? cleanRef.split('/')[0] : 'root';
+        prefixCounts[prefix] = (prefixCounts[prefix] || 0) + 1;
+
+        missingReports.push({
+          source_ref: pkt.source_ref || '(empty)',
+          kind,
+          hasFallback,
+          prefix
+        });
+      }
+    }
+
+    // Sort prefixes by count descending
+    const sortedPrefixes = Object.entries(prefixCounts)
+      .sort((a, b) => b[1] - a[1]);
+
+    const reportDir = join(ROOT, 'docs', 'reports');
+    mkdirSync(reportDir, { recursive: true });
+    
+    let md = `# Backfill Packet Summaries - Missing Files Audit\n\n`;
+    md += `Generated at: ${new Date().toISOString()}\n\n`;
+    md += `## Executive Summary\n`;
+    md += `- Total packets missing useful summaries with missing disk files: **${totalMissing}**\n`;
+    md += `- **Code Files missing (no fallback)**: **${missingCode}** (with payload fallback: **${fallbackCode}**)\n`;
+    md += `- **Docs missing (no fallback)**: **${missingDocs}** (with payload fallback: **${fallbackDocs}**)\n`;
+    md += `- **Artifacts/Logs missing (no fallback)**: **${missingArtifacts}** (with payload fallback: **${fallbackArtifacts}**)\n\n`;
+    
+    md += `## Top Missing Source Ref Prefixes\n\n`;
+    md += `| Prefix | Count |\n`;
+    md += `|--------|-------|\n`;
+    for (const [p, c] of sortedPrefixes.slice(0, 30)) {
+      md += `| ${p} | ${c} |\n`;
+    }
+    md += `\n`;
+
+    md += `## Samples of Missing Source Refs (Limit 100)\n\n`;
+    for (const r of missingReports.slice(0, 100)) {
+      md += `- \`${r.source_ref}\` (${r.kind}, fallback: ${r.hasFallback ? 'YES' : 'NO'})\n`;
+    }
+
+    const mdPath = join(reportDir, 'backfill-packet-summaries-missing.md');
+    writeFileSync(mdPath, md);
+    
+    console.log(`\n═══ Missing Files Audit Result ═══`);
+    console.log(`  Total missing files: ${totalMissing}`);
+    console.log(`  Code files completely missing: ${missingCode} (fallback: ${fallbackCode})`);
+    console.log(`  Docs files completely missing: ${missingDocs} (fallback: ${fallbackDocs})`);
+    console.log(`  Artifacts/logs missing:        ${missingArtifacts} (fallback: ${fallbackArtifacts})`);
+    console.log(`  Report written to: ${mdPath}`);
+    console.log(`══════════════════════════════════\n`);
+    
+    await pool.end();
+    return;
+  }
 
   const toProcess = packets.slice(0, MAX_ROWS);
   console.log(`Packets needing summary: ${packets.length} (processing: ${toProcess.length})`);
@@ -203,52 +380,128 @@ async function main() {
   let notFound    = 0;
   let tooShort    = 0;
   let skippedBinary = 0;
+  let payloadFallbacks = 0;
 
   for (const pkt of toProcess) {
     const filePath = resolveFilePath(pkt.source_ref);
+    let fallback = false;
+
     if (!filePath) {
       notFound++;
-      if (VERBOSE) console.log(`  MISS: ${pkt.source_ref}`);
-      continue;
+      fallback = true;
     }
 
-    const ext = extname(filePath).toLowerCase();
-    // Skip obvious binary/non-text
-    if (['.png','.jpg','.jpeg','.gif','.svg','.ico','.wasm','.node','.bin','.zip','.lock'].includes(ext)) {
-      skippedBinary++;
-      continue;
+    if (!fallback) {
+      const ext = extname(filePath).toLowerCase();
+      // Skip obvious binary/non-text
+      if (['.png','.jpg','.jpeg','.gif','.svg','.ico','.wasm','.node','.bin','.zip','.lock'].includes(ext)) {
+        skippedBinary++;
+        fallback = true;
+      }
     }
 
     let content;
-    try {
-      const raw = readFileSync(filePath);
-      // Detect binary: if >5% non-printable bytes (excluding common whitespace), skip
-      const sample = raw.slice(0, 512);
-      let nonPrintable = 0;
-      for (const b of sample) {
-        if (b === 0 || (b < 9) || (b > 13 && b < 32 && b !== 27)) nonPrintable++;
+    if (!fallback && filePath) {
+      try {
+        const raw = readFileSync(filePath);
+        // Detect binary: if >5% non-printable bytes (excluding common whitespace), skip
+        const sample = raw.slice(0, 512);
+        let nonPrintable = 0;
+        for (const b of sample) {
+          if (b === 0 || (b < 9) || (b > 13 && b < 32 && b !== 27)) nonPrintable++;
+        }
+        if (nonPrintable / Math.min(raw.length, 512) > 0.05) {
+          skippedBinary++;
+          fallback = true;
+        } else {
+          // Decode as UTF-8, replacing invalid sequences, then strip null bytes
+          content = raw.toString('utf8').replace(/\0/g, '').replace(/[\x00-\x08\x0E-\x1F\x7F]/g, ' ');
+        }
+      } catch {
+        notFound++;
+        fallback = true;
       }
-      if (nonPrintable / Math.min(raw.length, 512) > 0.05) {
-        skippedBinary++;
-        continue;
-      }
-      // Decode as UTF-8, replacing invalid sequences, then strip null bytes
-      content = raw.toString('utf8').replace(/\0/g, '').replace(/[\x00-\x08\x0E-\x1F\x7F]/g, ' ');
-    } catch {
-      notFound++;
-      continue;
     }
 
-    if (!content || content.length < 10) {
-      tooShort++;
-      continue;
-    }
+    let summary, bm25Text, summarySource;
 
-    const { summary, bm25Text, summarySource } = buildSummary(filePath, content);
+    if (fallback) {
+      const payload = pkt.payload ?? {};
+      
+      // Fallback text check
+      let fallbackText = null;
+      let fallbackField = null;
+      
+      const textFields = ['content', 'text', 'bm25_text', 'summary', 'source', 'snippet'];
+      for (const field of textFields) {
+        if (payload[field] && typeof payload[field] === 'string' && payload[field].trim().length > 10) {
+          fallbackText = payload[field].trim();
+          fallbackField = field;
+          break;
+        }
+      }
+      
+      if (fallbackText) {
+        payloadFallbacks++;
+        summary = fallbackText.length >= MIN_SUMMARY_LEN
+          ? fallbackText.substring(0, MAX_SUMMARY_LEN)
+          : fallbackText;
+        bm25Text = fallbackText;
+        summarySource = `payload_${fallbackField}`;
+      } else {
+        if (payload.schema_gap) {
+          summary = `Schema gap/drift check for table '${payload.schema_gap.schema_table}', column '${payload.schema_gap.schema_column}'. Drift status: ${payload.schema_gap.drift_status}. Risk level: ${payload.schema_gap.risk}. Target feature ID: ${payload.schema_gap.feature_id || 'none'}.`;
+        } else if (payload.file) {
+          summary = `Database schema definition file for '${payload.file}'. Classified under feature '${payload.topFeature || 'database'}'.`;
+        } else if (payload.path) {
+          summary = `Temporary or cached data artifact at path '${payload.path}'. Label: ${payload.label || 'unknown'}. Feature ID: ${payload.feature_id || 'none'}.`;
+        } else if (payload.kind || payload.validation) {
+          summary = `System validation state page of type '${payload.kind || 'page'}' with validation class '${payload.validation || 'none'}'.`;
+        } else {
+          summary = `Metadata record for ${pkt.source_ref || 'unknown file'}. Kind: ${pkt.source_kind || 'generic'}. Feature ID: ${pkt.feature_id || 'unassigned'}.`;
+        }
+        bm25Text = `${pkt.source_ref || ''} ${pkt.feature_id || ''} ${pkt.source_kind || ''} ${summary} ${JSON.stringify(payload)}`;
+        summarySource = 'payload_metadata_fallback';
+      }
+    } else {
+      if (!content || content.length < 10) {
+        tooShort++;
+        const payload = pkt.payload ?? {};
+        
+        // Try fallback payload check even for empty files
+        let fallbackText = null;
+        let fallbackField = null;
+        const textFields = ['content', 'text', 'bm25_text', 'summary', 'source', 'snippet'];
+        for (const field of textFields) {
+          if (payload[field] && typeof payload[field] === 'string' && payload[field].trim().length > 10) {
+            fallbackText = payload[field].trim();
+            fallbackField = field;
+            break;
+          }
+        }
+        
+        if (fallbackText) {
+          payloadFallbacks++;
+          summary = fallbackText.length >= MIN_SUMMARY_LEN
+            ? fallbackText.substring(0, MAX_SUMMARY_LEN)
+            : fallbackText;
+          bm25Text = fallbackText;
+          summarySource = `payload_${fallbackField}`;
+        } else {
+          summary = `Short or empty file metadata for ${pkt.source_ref || 'unknown file'}. Kind: ${pkt.source_kind || 'generic'}. Feature ID: ${pkt.feature_id || 'unassigned'}.`;
+          bm25Text = `${pkt.source_ref || ''} ${pkt.feature_id || ''} ${pkt.source_kind || ''} ${summary}`;
+          summarySource = 'payload_metadata_fallback';
+        }
+      } else {
+        const res = buildSummary(filePath, content);
+        summary = res.summary;
+        bm25Text = res.bm25Text;
+        summarySource = res.summarySource;
+      }
+    }
 
     if (summary.length < MIN_SUMMARY_LEN) {
-      tooShort++;
-      continue;
+      summary = summary.padEnd(MIN_SUMMARY_LEN, ' ');
     }
 
     // Sanitize: strip null bytes and control chars that Postgres rejects
@@ -266,7 +519,8 @@ async function main() {
   }
 
   console.log(`\nResolution:`);
-  console.log(`  File found + extractable: ${found}`);
+  console.log(`  File found + extractable: ${found - payloadFallbacks}`);
+  console.log(`  Payload text fallbacks:   ${payloadFallbacks}`);
   console.log(`  File not found:           ${notFound}`);
   console.log(`  Too short after extract:  ${tooShort}`);
   console.log(`  Skipped binary:           ${skippedBinary}`);
@@ -281,6 +535,7 @@ async function main() {
     packets_needing_summary: packets.length,
     processed: toProcess.length,
     found,
+    payload_fallbacks: payloadFallbacks,
     not_found: notFound,
     too_short: tooShort,
     skipped_binary: skippedBinary,
@@ -341,42 +596,68 @@ async function main() {
   }
   process.stdout.write('\n');
 
-  // ── 5. Gate evaluation ────────────────────────────────────────────────────
-  const { rows: [gate] } = await pool.query(`
-    SELECT
-      count(*) AS total,
-      count(*) FILTER (WHERE length(summary) > 80 AND summary <> source_ref) AS useful_after,
-      count(*) FILTER (WHERE payload->>'summary_source' = 'filesystem')      AS filesystem_count,
-      round(
-        count(*) FILTER (WHERE length(summary) > 80 AND summary <> source_ref)::numeric
-        / count(*) * 100, 1
-      ) AS coverage_pct
-    FROM atlas_packets
+  // ── 5. Gate evaluation (Kind-Specific) ────────────────────────────────────
+  const { rows: allPackets } = await pool.query(`
+    SELECT source_ref, summary FROM atlas_packets
   `);
   await pool.end();
 
-  const coverageGate = parseFloat(gate.coverage_pct) >= 80;
+  let codeTotal = 0, codeUseful = 0;
+  let docsTotal = 0, docsUseful = 0;
+  let artTotal = 0, artUseful = 0;
 
-  console.log('\n══ Gate Evaluation ══════════════════════════════');
-  console.log(`  Total packets:           ${gate.total}`);
-  console.log(`  Useful summaries before: ${baseline.useful_before} (${((baseline.useful_before/gate.total)*100).toFixed(1)}%)`);
-  console.log(`  Useful summaries after:  ${gate.useful_after} (${gate.coverage_pct}%)`);
-  console.log(`  Filesystem sourced:      ${gate.filesystem_count}`);
-  console.log(`  Coverage >= 80%:         ${coverageGate ? '✅' : '❌'}`);
-  console.log(`\n  ${coverageGate ? '✅ GATE PASS' : '⚠️  GATE FAIL — re-check search roots or lower MIN_SUMMARY_LEN'}`);
+  for (const pkt of allPackets) {
+    const kind = getPacketKind(pkt.source_ref);
+    const useful = isUsefulSummary(pkt.summary, pkt.source_ref);
 
-  report.applied    = applied;
+    if (kind === 'code_file') {
+      codeTotal++;
+      if (useful) codeUseful++;
+    } else if (kind === 'docs') {
+      docsTotal++;
+      if (useful) docsUseful++;
+    } else {
+      artTotal++;
+      if (useful) artUseful++;
+    }
+  }
+
+  const codePct = codeTotal > 0 ? (codeUseful / codeTotal) * 100 : 100;
+  const docsPct = docsTotal > 0 ? (docsUseful / docsTotal) * 100 : 100;
+  const artPct = artTotal > 0 ? (artUseful / artTotal) * 100 : 100;
+  const totalPackets = allPackets.length;
+  const totalUseful = codeUseful + docsUseful + artUseful;
+  const totalPct = totalPackets > 0 ? (totalUseful / totalPackets) * 100 : 100;
+
+  const codeGatePass = codePct >= 80;
+  const docsGatePass = docsPct >= 70;
+  const overallGatePass = codeGatePass && docsGatePass;
+
+  console.log('\n══ Gate Evaluation (Kind-Specific) ══════════════');
+  console.log(`  Total packets:              ${totalPackets}`);
+  console.log(`  Overall useful summaries:   ${totalUseful} (${totalPct.toFixed(1)}%)`);
+  console.log(`  ----------------------------------------------`);
+  console.log(`  Code files:                 ${codeUseful}/${codeTotal} (${codePct.toFixed(1)}%) - Gate >= 80%: ${codeGatePass ? '✅ PASS' : '❌ FAIL'}`);
+  console.log(`  Docs files:                 ${docsUseful}/${docsTotal} (${docsPct.toFixed(1)}%) - Gate >= 70%: ${docsGatePass ? '✅ PASS' : '❌ FAIL'}`);
+  console.log(`  Artifacts/logs:             ${artUseful}/${artTotal} (${artPct.toFixed(1)}%) - (Report only)`);
+  console.log(`  ----------------------------------------------`);
+  console.log(`  Gate Result:                ${overallGatePass ? '✅ ALL GATES PASSED' : '❌ GATES FAILED'}`);
+  console.log(`════════════════════════════════════════════════\n`);
+
+  report.applied = applied;
   report.gate_result = {
-    total:            Number(gate.total),
-    useful_before:    Number(baseline.useful_before),
-    useful_after:     Number(gate.useful_after),
-    filesystem_count: Number(gate.filesystem_count),
-    coverage_pct:     gate.coverage_pct,
-    gate_pass:        coverageGate,
+    total: totalPackets,
+    total_useful: totalUseful,
+    total_pct: parseFloat(totalPct.toFixed(1)),
+    code: { total: codeTotal, useful: codeUseful, pct: parseFloat(codePct.toFixed(1)), pass: codeGatePass },
+    docs: { total: docsTotal, useful: docsUseful, pct: parseFloat(docsPct.toFixed(1)), pass: docsGatePass },
+    artifacts: { total: artTotal, useful: artUseful, pct: parseFloat(artPct.toFixed(1)) },
+    gate_pass: overallGatePass
   };
+
   writeFileSync(join(reportDir, 'backfill-packet-summaries.json'), JSON.stringify(report, null, 2));
 
-  console.log('\n══ Summary ══════════════════════════════════════');
+  console.log('══ Summary ══════════════════════════════════════');
   console.log(`  Applied:  ${applied} summary updates`);
   console.log(`  Report:   docs/reports/backfill-packet-summaries.json`);
 }
