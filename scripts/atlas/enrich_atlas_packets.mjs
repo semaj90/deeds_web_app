@@ -104,6 +104,73 @@ function buildPacketKey(sourceRef, packetId) {
   return `${ref}:${hash}`;
 }
 
+const SEARCH_ROOTS = [
+  path.join(ROOT, 'sveltekit-frontend'),
+  ROOT,
+  path.join(ROOT, 'sveltekit-frontend', 'src'),
+];
+
+function normalizePath(p) {
+  if (!p) return null;
+  return p.replace(/\\/g, '/').replace(/^[/\\]+/, '');
+}
+
+function resolveFile(sourcePath) {
+  const norm = normalizePath(sourcePath);
+  if (!norm) return null;
+  const base = norm.replace(/#.*$/, '');
+  for (const root of SEARCH_ROOTS) {
+    const abs = path.join(root, base);
+    if (fs.existsSync(abs)) return { abs, norm: base };
+  }
+  return null;
+}
+
+function buildMetadata(sourcePath) {
+  const norm = normalizePath(sourcePath)?.replace(/#.*$/, '') ?? null;
+  const resolved = resolveFile(sourcePath);
+
+  if (!resolved) {
+    return {
+      path: norm,
+      file_url: null,
+      repo_url: null,
+      source_url: null,
+      mtime: null,
+      hash: null,
+      directory_path: norm ? norm.split('/').slice(0, -1).join('/') || null : null,
+      indexed_at: new Date().toISOString(),
+    };
+  }
+
+  const { abs, norm: resolvedNorm } = resolved;
+  let stat = null;
+  let hash = null;
+
+  try {
+    stat = fs.statSync(abs);
+  } catch { /* non-fatal */ }
+
+  try {
+    const buf = fs.readFileSync(abs);
+    hash = `sha256:${createHash('sha256').update(buf).digest('hex')}`;
+  } catch { /* non-fatal */ }
+
+  const fileUrl = `file:///${abs.replace(/\\/g, '/')}`;
+  const dirPath = resolvedNorm.split('/').slice(0, -1).join('/') || null;
+
+  return {
+    path: resolvedNorm,
+    file_url: fileUrl,
+    repo_url: null,
+    source_url: null,
+    mtime: stat?.mtime.toISOString() ?? null,
+    hash,
+    directory_path: dirPath,
+    indexed_at: new Date().toISOString(),
+  };
+}
+
 async function queryQdrantSemanticFallback(embeddingText, qdrantUrl) {
   if (!embeddingText || !qdrantUrl) return null;
   try {
@@ -488,6 +555,10 @@ async function main() {
         let rewardPrior = parseFloat(payload.reward_prior || payload.rewardPrior || 0.0);
         if (isNaN(rewardPrior)) rewardPrior = 0.0;
 
+        // Build metadata and merge into payload
+        const metadata = buildMetadata(origSourceRef || canonSourceRef);
+        Object.assign(payload, metadata);
+
         // Inject concept_resolution block into payload
         if (conceptResolution) {
           payload.concept_resolution = conceptResolution;
@@ -503,6 +574,7 @@ async function main() {
             console.log(`    packet_key:     ${packetKey}`);
             console.log(`    source_kind:    ${sourceKind}`);
             console.log(`    resolution:     `, conceptResolution);
+            console.log(`    metadata:       path=${metadata.path}, hash=${metadata.hash ? '✓' : '—'}`);
           }
           inserted++;
           continue;
@@ -513,9 +585,9 @@ async function main() {
             packet_id, artifact_id, source_ref, source_ref_key, feature_id, community_id,
             concept_ids, cluster_id, embedding, payload, summary,
             byte_start, byte_end, sha256, packet_key, source_kind,
-            reward_prior, source_path, updated_at
+            reward_prior, source_path, metadata, updated_at
           ) VALUES (
-            $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, now()
+            $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, now()
           )
         `;
 
@@ -523,7 +595,7 @@ async function main() {
           recordId, artifactId, canonSourceRef, canonSourceRefKey, featureId, communityId,
           conceptIds, clusterId, embedding, JSON.stringify(payload), summary,
           byteStart, byteEnd, sha256, packetKey, sourceKind,
-          rewardPrior, origSourceRef
+          rewardPrior, origSourceRef, JSON.stringify(metadata)
         ]);
         inserted++;
       }

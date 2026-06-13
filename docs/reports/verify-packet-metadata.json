@@ -1,0 +1,48 @@
+{
+  "generated_at": "2026-06-13T00:50:16.235Z",
+  "total_packets": 17020,
+  "coverage": {
+    "payload_path_pct": 49.2,
+    "payload_hash_pct": 44.7,
+    "src_hash_pct": 91,
+    "payload_mtime_pct": 44.8
+  },
+  "gates": [
+    {
+      "name": "packet_key_unique",
+      "pass": true,
+      "detail": "0 duplicate keys"
+    },
+    {
+      "name": "payload_path_30pct",
+      "pass": true,
+      "detail": "49.2%"
+    },
+    {
+      "name": "payload_hash_60pct_src",
+      "pass": true,
+      "detail": "91.0% of 8367 src rows"
+    },
+    {
+      "name": "no_new_packet_model",
+      "pass": true,
+      "detail": "none found"
+    },
+    {
+      "name": "metadata_gin_index",
+      "pass": true,
+      "detail": "present"
+    },
+    {
+      "name": "identity_compound_index",
+      "pass": true,
+      "detail": "present"
+    },
+    {
+      "name": "payload_mtime_coverage",
+      "pass": true,
+      "detail": "44.8% (informational)"
+    }
+  ],
+  "pass": true
+}

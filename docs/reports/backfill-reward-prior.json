@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-06-12T22:51:55.816Z",
-  "mode": "dry-run",
+  "generated_at": "2026-06-13T02:46:47.685Z",
+  "mode": "apply",
   "traces_loaded": 1093,
   "packet_refs_canonical": 1093,
   "packet_refs_noise": 0,
@@ -67,5 +67,14 @@
       "hitCount": 87,
       "rewardIncrement": 0.12881741210309267
     }
-  ]
+  ],
+  "applied": true,
+  "total_updated": 29772,
+  "coverage_pct": 34,
+  "avg_reward_prior": 0.45256161119495414,
+  "max_reward_prior": 2.605078722829648,
+  "packets_with_reward_score": 5831,
+  "gate": {
+    "pass": true
+  }
 }

@@ -2076,8 +2076,40 @@ export async function runGemma4Agent(
 
   // coding/openai-facade pipelines use MCP tool surface (LLAMA_TOOL_DEFINITIONS);
   // legal pipelines use in-process Ollama tools (AGENT_TOOLS).
+  // When use_mcp_selector=true (or pipeline='coding'), the static list is narrowed
+  // to top-K tools most relevant to this query via Qdrant manifest packet search.
   const isCodingPipeline = pipeline === 'openai-facade' || pipeline === 'coding';
-  const activeTools = isCodingPipeline ? LLAMA_TOOL_DEFINITIONS : AGENT_TOOLS;
+  let activeTools: typeof LLAMA_TOOL_DEFINITIONS | typeof AGENT_TOOLS = isCodingPipeline
+    ? LLAMA_TOOL_DEFINITIONS
+    : AGENT_TOOLS;
+
+  // Dynamic tool selection — narrows LLAMA_TOOL_DEFINITIONS to query-relevant subset.
+  // Falls back to the full static list silently if the selector is unavailable.
+  if (isCodingPipeline && (options?.metadata?.use_mcp_selector !== false)) {
+    try {
+      const selRes = await fetch(
+        `${typeof process !== 'undefined' ? 'http://localhost:5173' : ''}/api/mcp/select-tools`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ query: query.slice(0, 800), top_k: 12 }),
+          signal: AbortSignal.timeout(8_000),
+        }
+      );
+      if (selRes.ok) {
+        const sel = await selRes.json() as { llama_names?: string[]; source?: string };
+        if (sel.llama_names && sel.llama_names.length > 0) {
+          const selSet = new Set(sel.llama_names);
+          const filtered = (LLAMA_TOOL_DEFINITIONS as typeof LLAMA_TOOL_DEFINITIONS).filter(
+            (t: { function: { name: string } }) => selSet.has(t.function.name)
+          );
+          if (filtered.length > 0) activeTools = filtered as typeof LLAMA_TOOL_DEFINITIONS;
+        }
+      }
+    } catch {
+      // non-fatal — fall back to full static LLAMA_TOOL_DEFINITIONS
+    }
+  }
 
   const runPreferredToolCall = async (currentMessages: OllamaMessage[]) => {
     if (requestedBackend !== 'turboquant' || !canUseTurboQuant(runtime)) {

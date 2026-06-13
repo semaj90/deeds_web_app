@@ -1,0 +1,135 @@
+{
+  "generated": "2026-06-13T05:37:36.740Z",
+  "scan_ms": 851,
+  "postgres": {
+    "ok": true,
+    "total_packets": 17136,
+    "addressable_packets": 8483,
+    "with_summary": 17128,
+    "with_concepts_addressable": 8367,
+    "with_concepts_all": 8367,
+    "community_conf_any": 17020,
+    "high_conf_community": 2554,
+    "with_domain": 8483,
+    "distinct_features": 3678,
+    "bm25_pct": 100,
+    "concept_pct": 99,
+    "concept_pct_all": 49,
+    "community_pct": 99,
+    "domain_pct": 100,
+    "total_traces": 1134,
+    "success_traces": 991,
+    "total_concepts": 0,
+    "with_reward": 5831
+  },
+  "qdrant": {
+    "ok": true,
+    "points_count": 54448,
+    "has_content_vector": true
+  },
+  "neo4j": {
+    "ok": true,
+    "source": "live",
+    "used_concept_edges": 32012,
+    "from_source_edges": 8484,
+    "similar_topology_edges": 0
+  },
+  "redis": {
+    "ok": true,
+    "karpathy_files": 179,
+    "temporal_packets": 8483,
+    "domain_keys": 1,
+    "reward_top_set": 0
+  },
+  "reports": {
+    "domain_ontology": {
+      "exists": true,
+      "age_hours": 0,
+      "stale": false
+    },
+    "temporal_index": {
+      "exists": true,
+      "age_hours": 1.9,
+      "stale": false
+    },
+    "xgboost_meta": {
+      "exists": true,
+      "age_hours": 1.6,
+      "stale": false,
+      "total_rows": 101708
+    },
+    "xgboost_training": {
+      "exists": false,
+      "age_hours": null,
+      "stale": false
+    },
+    "ranking_signals": {
+      "exists": true,
+      "age_hours": 2.4,
+      "stale": false
+    }
+  },
+  "proto": {
+    "active_services": 17
+  },
+  "gates": {
+    "bm25_coverage": {
+      "label": "BM25 summary coverage ≥85%",
+      "threshold": 85,
+      "unit": "%",
+      "value": 100,
+      "pass": true
+    },
+    "concept_coverage_addressable": {
+      "label": "concept_ids (addressable pkts) ≥60%",
+      "threshold": 60,
+      "unit": "%",
+      "value": 99,
+      "detail": "99% of 8483 addressable pkts (all: 49%)",
+      "pass": true
+    },
+    "community_conf": {
+      "label": "community_conf (col+JSONB) ≥95%",
+      "threshold": 95,
+      "unit": "%",
+      "value": 99,
+      "detail": "99% have community_confidence>0 (col+JSONB combined)",
+      "pass": true
+    },
+    "qdrant_packets": {
+      "label": "Qdrant codebase_chunks_768 ≥7000",
+      "threshold": 7000,
+      "unit": "pts",
+      "value": 54448,
+      "pass": true
+    },
+    "neo4j_edges": {
+      "label": "Neo4j USED_CONCEPT ≥10000",
+      "threshold": 10000,
+      "unit": "edges",
+      "value": 32012,
+      "source": "live",
+      "pass": true
+    },
+    "xgboost_features": {
+      "label": "XGBoost feature rows ≥50000",
+      "threshold": 50000,
+      "unit": "rows",
+      "value": 101708,
+      "pass": true
+    },
+    "domain_coverage": {
+      "label": "Domain classification (addressable pkts) ≥95%",
+      "threshold": 95,
+      "unit": "%",
+      "value": 100,
+      "detail": "100% of 8,483 addressable pkts (all: 50%)",
+      "pass": true
+    }
+  },
+  "gate_summary": {
+    "pass": 7,
+    "total": 7,
+    "pct": 100
+  }
+}

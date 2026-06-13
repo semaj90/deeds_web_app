@@ -126,7 +126,8 @@ async function main() {
     SELECT packet_id, source_ref, feature_id, community_id,
            community_source, community_confidence,
            concept_ids, packet_key, summary,
-           payload->>'cluster_id' AS cluster_id
+           payload->>'cluster_id' AS cluster_id,
+           metadata
     FROM atlas_packets
     WHERE source_ref IS NOT NULL
     ORDER BY
@@ -195,6 +196,9 @@ async function main() {
         tags,
         cluster_id:         pkt.cluster_id ? parseInt(pkt.cluster_id, 10) : null,
         packet_key:         pkt.packet_key ?? null,
+        path:               pkt.metadata?.path ?? null,
+        hash:               pkt.metadata?.hash ?? null,
+        mtime:              pkt.metadata?.mtime ?? null,
         atlas_enriched:     true,
         atlas_enriched_at:  enrichedAt,
       };

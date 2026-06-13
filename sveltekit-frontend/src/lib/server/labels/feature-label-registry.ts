@@ -1,5 +1,5 @@
 import { createHash } from 'node:crypto';
-import registryData from './feature-label-registry.shared.json';
+import registryData from './feature-label-registry.shared.json' with { type: 'json' };
 
 export const FEATURE_LABEL_KEYS = [
   'api-route',

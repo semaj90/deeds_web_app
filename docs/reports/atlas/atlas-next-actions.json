@@ -1,0 +1,12 @@
+{
+  "generated": "2026-06-13T05:37:36.740Z",
+  "architecture": {
+    "active_lane": "XGBoost supervised reranker (Stage 4) — tabular, fast, explainable",
+    "next_lane": "PyTorch policy network (Stage 5) — agent action selector with SOM+CUDA",
+    "future_lane": "QLoRA/RL (Stage 6) — after reward signals are stable",
+    "som_role": "SOM 20×20 is topology routing stored in payload — NOT retrieval. EmbeddingGemma768→AE64→SOM→som_row/col/index. Policy (Stage 5) reads it.",
+    "xgboost_role": "Stage 4: supervised ranking only — BM25, ANN, TurboVec, community_conf, concept_overlap, reward_prior, som_cache_hit (binary), provenance_git_age. som_cell_id (int) excluded — tree splits on SOM topology indices are meaningless."
+  },
+  "recommended": [],
+  "quick_wins": []
+}

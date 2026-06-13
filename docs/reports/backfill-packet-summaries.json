@@ -1,41 +1,17 @@
 {
-  "generated_at": "2026-06-12T20:51:02.626Z",
-  "mode": "apply",
-  "packets_needing_summary": 9546,
-  "processed": 9546,
-  "found": 9546,
+  "generated_at": "2026-06-13T02:20:34.029Z",
+  "mode": "dry-run",
+  "packets_needing_summary": 0,
+  "processed": 0,
+  "found": 0,
   "payload_fallbacks": 0,
-  "not_found": 9385,
-  "too_short": 24,
-  "skipped_binary": 8,
-  "updates_planned": 9546,
+  "not_found": 0,
+  "too_short": 0,
+  "skipped_binary": 0,
+  "updates_planned": 0,
   "baseline_coverage": {
     "total": 17020,
-    "useful_before": 7459,
-    "pct_before": "43.8"
-  },
-  "applied": 9546,
-  "gate_result": {
-    "total": 17020,
-    "total_useful": 17020,
-    "total_pct": 100,
-    "code": {
-      "total": 3151,
-      "useful": 3151,
-      "pct": 100,
-      "pass": true
-    },
-    "docs": {
-      "total": 0,
-      "useful": 0,
-      "pct": 100,
-      "pass": true
-    },
-    "artifacts": {
-      "total": 13869,
-      "useful": 13869,
-      "pct": 100
-    },
-    "gate_pass": true
+    "useful_before": 8211,
+    "pct_before": "48.2"
   }
 }

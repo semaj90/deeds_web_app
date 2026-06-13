@@ -8065,7 +8065,7 @@ server.registerTool(
       const sql = `
         SELECT packet_id, artifact_id, source_ref, feature_id, community_id,
                concept_ids, cluster_id, summary,
-               byte_start, byte_end, sha256, created_at
+               byte_start, byte_end, sha256, metadata, created_at
         FROM atlas_packets
         ${where}
         ORDER BY created_at DESC

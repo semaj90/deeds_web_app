@@ -1,0 +1,118 @@
+{
+  "generated_at": "2026-06-13T02:59:43.899Z",
+  "dry_run": false,
+  "total_tools": 116,
+  "by_domain": {
+    "search": 2,
+    "codebase": 11,
+    "graph": 6,
+    "topology": 3,
+    "clusters": 2,
+    "trace": 2,
+    "context": 2,
+    "kb": 7,
+    "cases": 4,
+    "rag": 2,
+    "memory": 1,
+    "playwright": 1,
+    "general": 21,
+    "evidence": 5,
+    "citations": 3,
+    "reports": 6,
+    "embedding": 1,
+    "gpu": 1,
+    "inference": 1,
+    "startup": 1,
+    "atlas": 2,
+    "langextract": 4,
+    "compose": 1,
+    "analytics": 6,
+    "face": 1,
+    "poi": 1,
+    "codeintel": 3,
+    "cluster": 2,
+    "chunk": 1,
+    "ace": 1,
+    "research": 3,
+    "ast": 1,
+    "wiki": 4,
+    "vlm": 1,
+    "llm_synthesis": 1,
+    "vault": 2
+  },
+  "description_pct": 93.1,
+  "ontology_pct": 100,
+  "postgres_inserted": 116,
+  "qdrant_upserted": 116,
+  "neo4j_written": 116,
+  "sample_packets": [
+    {
+      "packet_key": "17902193a93d2674",
+      "source_ref": "mcp-tools/src-lib-server-ai-llama-tool-definitions.ts#search.dev_context",
+      "tool_name": "search.dev_context",
+      "domain": "search",
+      "ontology": [
+        "retrieval",
+        "semantic_search",
+        "rag",
+        "reranking"
+      ],
+      "description": "Search the codebase for context relevant to a coding or debugging query. Returns ranked file chunks "
+    },
+    {
+      "packet_key": "f0279d074e596caf",
+      "source_ref": "mcp-tools/src-lib-server-ai-llama-tool-definitions.ts#codebase.rg_search",
+      "tool_name": "codebase.rg_search",
+      "domain": "codebase",
+      "ontology": [
+        "retrieval",
+        "code_intel",
+        "ast"
+      ],
+      "description": "Controlled ripgrep search over the codebase. Returns line hits from relative repo paths and is safe "
+    },
+    {
+      "packet_key": "3bad7a908ea13468",
+      "source_ref": "mcp-tools/src-lib-server-ai-llama-tool-definitions.ts#graph.expand_neighborhood",
+      "tool_name": "graph.expand_neighborhood",
+      "domain": "graph",
+      "ontology": [
+        "graph",
+        "neo4j",
+        "topology"
+      ],
+      "description": "Expand graph neighborhood from sourceRefs. Returns nodes/edges/sourceRefs/confidence and compatibili"
+    },
+    {
+      "packet_key": "d34e8d973938d4e9",
+      "source_ref": "mcp-tools/src-lib-server-ai-llama-tool-definitions.ts#graph.shortest_path",
+      "tool_name": "graph.shortest_path",
+      "domain": "graph",
+      "ontology": [
+        "graph",
+        "neo4j",
+        "topology",
+        "retrieval"
+      ],
+      "description": "Find the shortest dependency path between two files or symbols in Neo4j."
+    },
+    {
+      "packet_key": "658ad9ac00155a97",
+      "source_ref": "mcp-tools/src-lib-server-ai-llama-tool-definitions.ts#graph.community_for_node",
+      "tool_name": "graph.community_for_node",
+      "domain": "graph",
+      "ontology": [
+        "graph",
+        "neo4j",
+        "topology"
+      ],
+      "description": "Get the GPU cluster, SOM cluster, and community membership for a node."
+    }
+  ],
+  "gates": {
+    "tools_discovered_ge80": true,
+    "description_coverage_80pct": true,
+    "ontology_coverage_80pct": true,
+    "postgres_insert_count": true
+  }
+}

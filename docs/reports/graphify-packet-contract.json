@@ -1,0 +1,16 @@
+{
+  "generated_at": "2026-06-13T00:58:11.247Z",
+  "mode": "apply",
+  "eligible_packets": 8367,
+  "edges_written": {
+    "FROM_SOURCE": 0,
+    "IMPLEMENTS_FEATURE": 0,
+    "IN_COMMUNITY": 0
+  },
+  "batch_errors": 0,
+  "gate": {
+    "edges_written": false,
+    "error_rate_ok": true,
+    "pass": false
+  }
+}

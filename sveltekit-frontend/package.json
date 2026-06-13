@@ -858,7 +858,7 @@
     "atlas:neschrom97:qdrant-tag-apply": "node ../scripts/atlas/patch-neschrom97-qdrant-tags.mjs --apply",
     "atlas:neschrom97:qdrant-tag-apply:dry": "node ../scripts/atlas/patch-neschrom97-qdrant-tags.mjs",
     "smoke:hyperrag": "node scripts/smoke/smoke-hyperrag.mjs",
-    "smoke:hyperrag-packet-rpc": "node scripts/smoke/smoke-hyperrag-packet-rpc.mjs",
+    "smoke:hyperrag-packet-rpc": "node ../scripts/atlas/smoke-hyperrag-packet-rpc.mjs",
     "smoke:error-agent": "node scripts/smoke/smoke-error-agent.mjs",
     "smoke:upload": "node scripts/smoke/smoke-upload.mjs",
     "smoke:hyperrag:strict": "node scripts/smoke/smoke-hyperrag.mjs --strict",
@@ -1738,7 +1738,13 @@
     "atlas:backfill-reward:apply": "node ../scripts/atlas/backfill-reward-prior.mjs --apply",
     "atlas:backfill-reward:verbose": "node ../scripts/atlas/backfill-reward-prior.mjs --apply --verbose",
     "atlas:seed-reward-sets": "node ../scripts/atlas/seed-redis-reward-sets.mjs",
-    "atlas:seed-reward-sets:apply": "node ../scripts/atlas/seed-redis-reward-sets.mjs --apply"
+    "atlas:seed-reward-sets:apply": "node ../scripts/atlas/seed-redis-reward-sets.mjs --apply",
+    "atlas:packet-metadata:backfill:dry": "node ../scripts/atlas/backfill-packet-metadata.mjs",
+    "atlas:packet-metadata:backfill:apply": "node ../scripts/atlas/backfill-packet-metadata.mjs --apply",
+    "atlas:packet-metadata:verify": "node ../scripts/atlas/verify-packet-metadata.mjs",
+    "atlas:packet-contract:audit": "node ../scripts/atlas/validate-packet-contract.mjs && node ../scripts/atlas/verify-packet-metadata.mjs",
+    "atlas:graphify:packet-contract:dry": "node ../scripts/atlas/graphify-packet-contract.mjs",
+    "atlas:graphify:packet-contract:apply": "node ../scripts/atlas/graphify-packet-contract.mjs --apply"
   },
   "devDependencies": {
     "@ai-sdk/openai": "3.0.65",

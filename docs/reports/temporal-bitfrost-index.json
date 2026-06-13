@@ -1,0 +1,18 @@
+{
+  "generated": "2026-06-13T03:45:24.319Z",
+  "mode": "apply",
+  "total": 8483,
+  "cohorts": 1,
+  "avgFreshness": 0.9990136744074893,
+  "withReward": 5831,
+  "warmTotal": 0,
+  "bifrostProbeLimit": 200,
+  "ndjsonPath": "C:\\Users\\james\\Videos\\deeds-web-app\\.opencode\\ndjson\\temporal-index.ndjson",
+  "redisWritten": true,
+  "cohortList": [
+    {
+      "month": "2026-06",
+      "count": 8483
+    }
+  ]
+}

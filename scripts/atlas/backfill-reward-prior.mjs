@@ -175,24 +175,28 @@ async function main() {
             jsonb_set(
               jsonb_set(
                 jsonb_set(
-                  COALESCE(payload, '{}'),
-                  '{reward_score}',
-                  to_jsonb(LEAST(COALESCE((payload->>'reward_score')::float, 0) + $2, 1.0))
+                  jsonb_set(
+                    COALESCE(payload, '{}'),
+                    '{reward_score}',
+                    to_jsonb(LEAST(COALESCE((payload->>'reward_score')::float, 0) + $2, 1.0))
+                  ),
+                  '{reward_source}',
+                  $3::jsonb
                 ),
-                '{reward_source}',
-                $3::jsonb
+                '{reward_timestamp}',
+                $4::jsonb
               ),
-              '{reward_timestamp}',
-              $4::jsonb
+              '{reward_hit_count}',
+              to_jsonb(COALESCE((payload->>'reward_hit_count')::int, 0) + $5)
             ),
-            '{reward_hit_count}',
-            to_jsonb(COALESCE((payload->>'reward_hit_count')::int, 0) + $5)
+            '{reward_count}',
+            to_jsonb(COALESCE((payload->>'reward_count')::int, 0) + $5)
           )
         WHERE concept_ids @> ARRAY[$1::text]
       `, [
         label,
         rewardIncrement,
-        JSON.stringify('agent_trace_success'),
+        JSON.stringify('karpathy_gpu'),
         JSON.stringify(now),
         hitCount,
       ]);

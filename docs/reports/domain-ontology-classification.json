@@ -1,0 +1,48 @@
+{
+  "generated": "2026-06-13T05:36:00.058Z",
+  "mode": "apply",
+  "total_scanned": 8483,
+  "already_tagged": 2161,
+  "to_classify": 6322,
+  "known_domain": 6152,
+  "unknown": 170,
+  "coverage_pct": 97.3,
+  "domain_distribution": {
+    "mcp": 46,
+    "search": 357,
+    "knowledge": 94,
+    "repair": 25,
+    "graph": 1579,
+    "rank": 37,
+    "cache": 831,
+    "agent": 186,
+    "code": 512,
+    "atlas": 147,
+    "cluster": 49,
+    "legal": 617,
+    "embed": 225,
+    "memory": 1342,
+    "unknown": 170,
+    "trace": 105
+  },
+  "db_updated": 6322,
+  "qdrant_updated": "skipped",
+  "redis_entries": 6322,
+  "gates": [
+    {
+      "name": "domain_coverage",
+      "pass": true,
+      "detail": "97.3% known (gate ≥60%)"
+    },
+    {
+      "name": "db_write_success",
+      "pass": true,
+      "detail": "6322 rows updated"
+    },
+    {
+      "name": "unknown_below_40",
+      "pass": true,
+      "detail": "2.7% unknown"
+    }
+  ]
+}

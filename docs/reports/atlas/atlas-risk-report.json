@@ -1,0 +1,15 @@
+{
+  "generated": "2026-06-13T05:37:36.740Z",
+  "xgboost_training_blocked": false,
+  "xgboost_gate_pass": false,
+  "xgboost_ndcg": null,
+  "cascade_stage4": "gemma4_fallback_only",
+  "blockers": [],
+  "warnings": [],
+  "service_health": {
+    "postgres": true,
+    "qdrant": true,
+    "neo4j": true,
+    "redis": true
+  }
+}

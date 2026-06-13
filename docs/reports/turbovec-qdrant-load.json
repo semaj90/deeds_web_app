@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-06-12T22:21:57.663Z",
+  "generated_at": "2026-06-13T02:06:38.989Z",
   "mode": "apply",
   "collection": "codebase_chunks_768",
   "total_qdrant_points": 54331,
@@ -12,9 +12,9 @@
     "errors": 0
   },
   "turbovec": {
-    "pre_indexed": 1,
-    "post_indexed": 501,
-    "backend": "js-centroid-fallback"
+    "pre_indexed": 0,
+    "post_indexed": 500,
+    "backend": "turbovec-python"
   },
   "gate": {
     "indexed": true,

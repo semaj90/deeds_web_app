@@ -217,6 +217,15 @@
       "appliedAt": "2026-06-11",
       "requiresJournalEntry": false,
       "validationCommand": "docker exec legal-ai-postgres psql -U legal_admin -d legal_ai_db -c \"SELECT table_name FROM information_schema.tables WHERE table_name='atlas_packets';\""
+    },
+    {
+      "file": "20260612_packet_payload_expression_indexes.sql",
+      "status": "manual_sidecar",
+      "reason": "Creates expression indexes on payload->>'path' and payload->>'feature_id' for faster packet lookup.",
+      "appliedBy": "antigravity",
+      "appliedAt": "2026-06-12",
+      "requiresJournalEntry": false,
+      "validationCommand": "docker exec legal-ai-postgres psql -U legal_admin -d legal_ai_db -c \"SELECT indexname FROM pg_indexes WHERE indexname IN ('idx_packet_payload_path', 'idx_packet_payload_feature');\""
     }
   ]
 }

@@ -54,7 +54,7 @@ async function main() {
   const pool = new Pool({ connectionString: DATABASE_URL });
 
   try {
-    // ── 1. Identity field coverage ───────────────────────────────────────────
+    // ── 1. Identity and metadata field coverage ───────────────────────────────────────────
     const { rows: [counts] } = await pool.query(`
       SELECT
         COUNT(*)                                           AS total,
@@ -62,6 +62,12 @@ async function main() {
         COUNT(source_ref)                                  AS has_source_ref,
         COUNT(feature_id)                                  AS has_feature_id,
         COUNT(community_id)                                AS has_community_id,
+        COUNT(community_source)                            AS has_community_source,
+        COUNT(community_confidence)                        AS has_community_confidence,
+        COUNT(concept_ids)                                 AS has_concept_ids,
+        COUNT(summary)                                     AS has_summary,
+        COUNT(payload->>'path')                            AS has_payload_path,
+        COUNT(payload->>'bm25_text')                       AS has_payload_bm25_text,
         COUNT(CASE WHEN packet_key  IS NULL THEN 1 END)    AS missing_packet_key,
         COUNT(CASE WHEN source_ref  IS NULL THEN 1 END)    AS missing_source_ref,
         COUNT(CASE WHEN feature_id  IS NULL THEN 1 END)    AS missing_feature_id,
@@ -147,6 +153,12 @@ async function main() {
     const srCoverage  = total > 0 ? Number(counts.has_source_ref) / total : 0;
     const fidCoverage = total > 0 ? Number(counts.has_feature_id) / total : 0;
     const cidCoverage = total > 0 ? Number(counts.has_community_id) / total : 0;
+    const csCoverage  = total > 0 ? Number(counts.has_community_source) / total : 0;
+    const ccCoverage  = total > 0 ? Number(counts.has_community_confidence) / total : 0;
+    const coCoverage  = total > 0 ? Number(counts.has_concept_ids) / total : 0;
+    const smCoverage  = total > 0 ? Number(counts.has_summary) / total : 0;
+    const ppathCoverage = total > 0 ? Number(counts.has_payload_path) / total : 0;
+    const pbmCoverage = total > 0 ? Number(counts.has_payload_bm25_text) / total : 0;
 
     // Gate thresholds
     const gates = {
@@ -205,7 +217,22 @@ async function main() {
 
     // ── Print ─────────────────────────────────────────────────────────────────
     if (JSON_OUT) {
-      process.stdout.write(JSON.stringify(report, null, 2) + '\n');
+      const stableJson = {
+        contract_pass: overallPass,
+        coverage: {
+          source_ref: Number(srCoverage.toFixed(2)),
+          feature_id: Number(fidCoverage.toFixed(2)),
+          community_id: Number(cidCoverage.toFixed(2)),
+          community_source: Number(csCoverage.toFixed(2)),
+          community_confidence: Number(ccCoverage.toFixed(2)),
+          packet_key: Number(pkCoverage.toFixed(2)),
+          concept_ids: Number(coCoverage.toFixed(2)),
+          summary: Number(smCoverage.toFixed(2)),
+          "payload.path": Number(ppathCoverage.toFixed(2)),
+          "payload.bm25_text": Number(pbmCoverage.toFixed(2))
+        }
+      };
+      process.stdout.write(JSON.stringify(stableJson, null, 2) + '\n');
     } else {
       const pct = (n) => `${(n * 100).toFixed(1)}%`;
       console.log('\n═══ Packet Contract Validation ═══════════════════════════════');

@@ -1,0 +1,47 @@
+{
+  "generated": "2026-06-13T03:58:46.744Z",
+  "mode": "apply",
+  "traces_loaded": 1134,
+  "total_rows": 101708,
+  "positive_rows": 98355,
+  "zero_label_rows": 3353,
+  "distinct_features": 8,
+  "completeness_pct": 100,
+  "karpathy_scores_loaded": 179,
+  "gates": [
+    {
+      "name": "positive_rows_500",
+      "pass": true,
+      "detail": "98355 positive rows (gate ≥500)"
+    },
+    {
+      "name": "distinct_features_8",
+      "pass": true,
+      "detail": "8 distinct features (gate ≥8; ≥20 for production training)"
+    },
+    {
+      "name": "completeness_80pct",
+      "pass": true,
+      "detail": "100.0% complete rows (gate ≥80%)"
+    }
+  ],
+  "feature_schema": [
+    "trace_id",
+    "packet_key",
+    "cosine_score",
+    "bm25_rank_norm",
+    "concept_overlap",
+    "same_feature",
+    "community_conf",
+    "reward_prior",
+    "domain_class_match",
+    "freshness_score",
+    "pagerank_score",
+    "packet_hit_count",
+    "n_retrieved",
+    "n_concepts",
+    "trace_score",
+    "label"
+  ],
+  "training_command_example": "xgboost --data=docs/reports/xgboost-features.csv --label-col=label --num-round=100 --objective=reg:squarederror --eta=0.1 --max-depth=6"
+}
