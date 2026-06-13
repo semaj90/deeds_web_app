@@ -162,6 +162,12 @@ export async function turbovecGrpcSearch(
   );
 }
 
+/**
+ * Upsert vectors into the live TurboVec sidecar index.
+ * NOTE: The gRPC bridge stub is read-only — returns {indexed:0, backend:'bridge:read-only'}.
+ * New packets reach TurboVec by being written to Qdrant first; the sidecar rebuilds
+ * from Qdrant on next restart. This method is wired for future direct-ingest support.
+ */
 export async function turbovecGrpcUpsert(
   records: TurboVecGrpcUpsertRecord[],
   deadlineMs = 30_000

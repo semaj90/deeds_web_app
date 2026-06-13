@@ -26,6 +26,7 @@ import argparse
 import json
 import math
 import os
+import subprocess
 import sys
 from pathlib import Path
 from collections import defaultdict
@@ -343,8 +344,37 @@ def main():
         json.dump(report, f, indent=2)
     print(f'\nReport: {REPORT_PATH}')
 
-    if not gate_pass:
+    if gate_pass:
+        _invalidate_graph_manifest('xgboost gate-pass: NDCG@10=' + str(round(avg_ndcg, 4)))
+    else:
         sys.exit(1)
+
+
+def _invalidate_graph_manifest(reason: str) -> None:
+    """
+    Fire graph-refresh-manifest invalidation after a successful training run.
+    The graph manifest is stale once a new reranker model is available —
+    the next graphify:daily run should regenerate with updated ranking signals.
+    Non-fatal: if Node.js is unavailable the manifest simply stays stale.
+    """
+    manifest_script = ROOT / 'scripts' / 'atlas' / 'write-graph-refresh-manifest.mjs'
+    if not manifest_script.exists():
+        print(f'[train-xgboost] warning: manifest script not found at {manifest_script}')
+        return
+    node_exe = os.environ.get('NODE_PATH', 'node')
+    try:
+        subprocess.run(
+            [node_exe, str(manifest_script), '--invalidate', '--reason', reason],
+            cwd=str(ROOT),
+            check=True,
+            timeout=30,
+        )
+    except FileNotFoundError:
+        print('[train-xgboost] warning: node not found — manifest invalidation skipped')
+    except subprocess.CalledProcessError as e:
+        print(f'[train-xgboost] warning: manifest invalidation exited {e.returncode}')
+    except subprocess.TimeoutExpired:
+        print('[train-xgboost] warning: manifest invalidation timed out')
 
 
 if __name__ == '__main__':

@@ -55,6 +55,8 @@
     "atlas:cascade:smoke:verbose": "node scripts/atlas/smoke-atlas-ann-cascade.mjs --verbose",
     "atlas:xgboost:serve": "cross-env PYTHONIOENCODING=utf-8 python scripts/atlas/serve-xgboost-reranker.py",
     "atlas:xgboost:serve:lgbm": "cross-env PYTHONIOENCODING=utf-8 python scripts/atlas/serve-xgboost-reranker.py --lightgbm",
+    "sidecars:turbovec-grpc": "node scripts/sidecars/turbovec-grpc-bridge.mjs",
+    "sidecars:turbovec-grpc:health": "node sveltekit-frontend/scripts/atlas/turbovec-grpc-health.mjs",
     "atlas:xgboost:train": "cross-env PYTHONIOENCODING=utf-8 python scripts/atlas/train-xgboost-reranker.py",
     "atlas:xgboost:train:dry": "cross-env PYTHONIOENCODING=utf-8 python scripts/atlas/train-xgboost-reranker.py --dry-run",
     "atlas:xgboost:train:lgbm": "cross-env PYTHONIOENCODING=utf-8 python scripts/atlas/train-xgboost-reranker.py --lightgbm",

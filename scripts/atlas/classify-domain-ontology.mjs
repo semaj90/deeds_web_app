@@ -42,6 +42,7 @@ import Redis     from 'ioredis';
 import { writeFileSync, mkdirSync } from 'node:fs';
 import path      from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { execFileSync } from 'node:child_process';
 
 const __dir = path.dirname(fileURLToPath(import.meta.url));
 const ROOT  = path.resolve(__dir, '../..');
@@ -496,4 +497,26 @@ function writeReport(data) {
   );
 }
 
-main().catch(e => { console.error(e); process.exit(1); });
+/**
+ * After an --apply run that changes domain_class / ontology_tags, the graph
+ * refresh manifest is stale.  Fire invalidation so the next graphify run
+ * knows to regenerate.
+ */
+function invalidateManifestAfterApply() {
+  if (!APPLY) return;
+  try {
+    const manifestScript = path.resolve(__dir, 'write-graph-refresh-manifest.mjs');
+    execFileSync(
+      process.execPath,
+      [manifestScript, '--invalidate', '--reason', 'classify-domain-ontology --apply completed'],
+      { cwd: ROOT, stdio: 'inherit' }
+    );
+  } catch (e) {
+    // Non-fatal — manifest invalidation is best-effort
+    console.warn('[classify-domain-ontology] manifest invalidation skipped:', e.message);
+  }
+}
+
+main()
+  .then(invalidateManifestAfterApply)
+  .catch(e => { console.error(e); process.exit(1); });

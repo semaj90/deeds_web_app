@@ -190,6 +190,7 @@ function ensureLibtorchInPath(): void {
 	const libDirs = [
     resolve(process.cwd(), '../libtorch-win-shared-with-deps-2.9.0+cu130/libtorch/lib'),
     'C:/libtorch-win-shared-with-deps-2.9.0+cu130/libtorch/lib',
+    '/c/libtorch-win-shared-with-deps-2.9.0+cu130/libtorch/lib',
     '/mnt/c/libtorch-win-shared-with-deps-2.9.0+cu130/libtorch/lib',
     '/mnt/c/libtorch/lib',
     '/usr/local/libtorch/lib',
@@ -198,13 +199,26 @@ function ensureLibtorchInPath(): void {
   ];
 	const cudnnDirs = [
     'C:/Program Files/NVIDIA/CUDNN/v9.16/bin/13.0',
+    '/c/Program Files/NVIDIA/CUDNN/v9.16/bin/13.0',
     'C:/Program Files/NVIDIA/CUDNN/v9.8/bin/12.8',
+    '/c/Program Files/NVIDIA/CUDNN/v9.8/bin/12.8',
     '/mnt/c/Program Files/NVIDIA/CUDNN/v9.16/bin/13.0',
     '/mnt/c/Program Files/NVIDIA/CUDNN/v9.8/bin/12.8',
     '/usr/local/cuda-13.0/lib64',
     '/usr/local/cuda-12.8/lib64',
     '/usr/local/cuda/lib64',
     '/usr/lib/x86_64-linux-gnu',
+  ];
+	// CUDA Toolkit bin (where cudart64*.dll / cublas64*.dll live).
+	// Without these on PATH the addon loads but checkCudaAvailable() returns 0.
+	const cudaBinDirs = [
+    'C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v13.0/bin',
+    '/c/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v13.0/bin',
+    'C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.8/bin',
+    '/c/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.8/bin',
+    'C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.1/bin',
+    '/mnt/c/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v13.0/bin',
+    '/mnt/c/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.8/bin',
   ];
 	const sep = process.platform === 'win32' ? ';' : ':';
 	let currentPath = process.env.PATH ?? '';
@@ -223,6 +237,13 @@ function ensureLibtorchInPath(): void {
       break;
     }
   }
+	for (const dir of cudaBinDirs) {
+    if (existsSync(dir) && !currentPath.includes(dir)) {
+      currentPath = dir + sep + currentPath;
+      console.log(`[libtorch-bridge] Added CUDA bin to PATH: ${dir}`);
+      break;
+    }
+  }
 	process.env.PATH = currentPath;
 }
 
@@ -232,11 +253,17 @@ export function getAddonInternal(): NativeAddon | null {
 
 	ensureLibtorchInPath();
 
+	// Allow operator override via env var (closes load-path issues in detached
+	// dev processes where process.cwd() differs from the workspace root).
+	const envOverride = process.env.TENSORRT_BRIDGE_NODE_PATH?.trim();
 	const paths = [
+		envOverride,
 		resolve(process.cwd(), '../simd-bridge/cpp/build/Release/tensorrt_bridge.node'),
 		resolve(process.cwd(), '../simd-bridge/cpp/build/tensorrt_bridge.node'),
 		resolve(process.cwd(), '../simd-bridge/build/Release/tensorrt_bridge.node'),
-	];
+		resolve(process.cwd(), 'simd-bridge/cpp/build/Release/tensorrt_bridge.node'),
+		'C:/Users/james/Videos/deeds-web-app/simd-bridge/cpp/build/Release/tensorrt_bridge.node',
+	].filter(Boolean) as string[];
 
 	for (const p of paths) {
 		try {

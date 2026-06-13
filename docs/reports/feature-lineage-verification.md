@@ -1,18 +1,38 @@
 # Feature Lineage Verification Report
 
-**Generated**: 2026-06-13T03:26:54.413Z
-**Status**: ✅ PASSED
+**Generated**: 2026-06-13T15:04:07.055Z
+**Status**: ❌ FAILED
 
 ## Summary
 
 | Metric | Value |
 |--------|-------|
-| Total Gates | 11 |
-| Passed | 11 |
-| Failed | 0 |
+| Total Gates | 16 |
+| Passed | 12 |
+| Failed | 4 |
 | Warnings | 1 |
 
 ## Gate Results
+
+### ✅ G0a: Postgres atlas_packets reachable
+
+17475 packets in atlas_packets
+
+### ❌ G0b: No missing source_ref
+
+8653 packets missing source_ref (of 17475)
+
+### ❌ G0c: No missing feature_id
+
+10078 packets missing feature_id (of 17475)
+
+### ❌ G0d: feature_label in payload
+
+17397/17475 packets missing payload.feature_label (warn if >50%)
+
+### ❌ G0e: No missing packet_key
+
+8653 packets missing packet_key (of 17475)
 
 ### ✅ G1: All directories have required fields
 

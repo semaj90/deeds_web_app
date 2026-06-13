@@ -31,9 +31,15 @@ import crypto from 'crypto';
 // ============================================================================
 
 const VERBOSE = process.argv.includes('--verbose');
-const STRICT = process.argv.includes('--strict');
+const STRICT  = process.argv.includes('--strict');
+const EMOJI   = process.argv.includes('--emoji');
 const OUTPUT_DIR = 'docs/reports';
 const EXPORTS_DIR = 'memory/exports';
+
+// ASCII-safe icons (same pattern as atlas-startup-intelligence.mjs)
+const IC = EMOJI
+  ? { pass: '✅', fail: '❌', warn: '⚠️ ', search: '🔍', data: '📂', doc: '📄', chart: '📊' }
+  : { pass: '[PASS]', fail: '[FAIL]', warn: '[WARN]', search: '[SCAN]', data: '[DATA]', doc: '[FILE]', chart: '[STAT]' };
 
 const REQUIRED_FIELDS = [
   'directory_path',
@@ -57,7 +63,7 @@ class LineageValidator {
   }
 
   addGate(name, passed, message) {
-    const status = passed ? '✅' : '❌';
+    const status = passed ? IC.pass : IC.fail;
     const gate = { name, passed, message, status };
     this.gates.push(gate);
 
@@ -72,7 +78,7 @@ class LineageValidator {
 
   addWarning(name, message) {
     this.warnings++;
-    console.warn(`⚠️  ${name}: ${message}`);
+    console.warn(`${IC.warn} ${name}: ${message}`);
   }
 
   summary() {
@@ -90,10 +96,57 @@ class LineageValidator {
 // MAIN VALIDATION
 // ============================================================================
 
+async function livePostgresCheck(validator) {
+  const DATABASE_URL = process.env.DATABASE_URL ?? 'postgresql://legal_admin:123456@127.0.0.1:5434/legal_ai_db';
+  try {
+    const { default: pg } = await import('pg');
+    const pool = new pg.Pool({ connectionString: DATABASE_URL, max: 2, connectionTimeoutMillis: 5000 });
+    try {
+      // feature_label lives in payload JSONB (not a top-level column)
+      const r = await pool.query(`SELECT
+        COUNT(*)                                                                          AS total,
+        COUNT(*) FILTER (WHERE source_ref IS NULL OR source_ref = '')                    AS missing_source_ref,
+        COUNT(*) FILTER (WHERE feature_id  IS NULL OR feature_id  = '')                  AS missing_feature_id,
+        COUNT(*) FILTER (WHERE (payload->>'feature_label') IS NULL
+                          OR (payload->>'feature_label') = '')                           AS missing_feature_label,
+        COUNT(*) FILTER (WHERE packet_key IS NULL OR packet_key = '')                    AS missing_packet_key,
+        COUNT(*) FILTER (WHERE summary IS NOT NULL AND LENGTH(summary) > 20)             AS with_summary,
+        COUNT(DISTINCT feature_id)                                                        AS distinct_features
+        FROM atlas_packets`);
+      const row = r.rows[0];
+      const total = Number(row.total) || 0;
+
+      validator.addGate('G0a: Postgres atlas_packets reachable', total > 0,
+        `${total} packets in atlas_packets`);
+      validator.addGate('G0b: No missing source_ref', Number(row.missing_source_ref) === 0,
+        `${row.missing_source_ref} packets missing source_ref (of ${total})`);
+      validator.addGate('G0c: No missing feature_id', Number(row.missing_feature_id) === 0,
+        `${row.missing_feature_id} packets missing feature_id (of ${total})`);
+      validator.addGate('G0d: feature_label in payload', Number(row.missing_feature_label) < total * 0.5,
+        `${row.missing_feature_label}/${total} packets missing payload.feature_label (warn if >50%)`);
+      validator.addGate('G0e: No missing packet_key', Number(row.missing_packet_key) === 0,
+        `${row.missing_packet_key} packets missing packet_key (of ${total})`);
+
+      if (VERBOSE) {
+        console.log(`  Postgres summary: ${total} total, ${row.distinct_features} distinct feature_ids`);
+        console.log(`  Summaries >20 chars: ${row.with_summary}/${total}`);
+      }
+    } finally {
+      await pool.end().catch(() => {});
+    }
+  } catch (e) {
+    validator.addGate('G0: Postgres live check', false, `Connection failed: ${e.message}`);
+  }
+}
+
 async function validateLineage() {
   const validator = new LineageValidator();
 
-  console.log('🔍 Verifying feature lineage chain...\n');
+  console.log(`${IC.search} Verifying feature lineage chain...\n`);
+
+  // G0: Live Postgres check (canonical source of truth)
+  console.log('  Running live Postgres check (G0)...');
+  await livePostgresCheck(validator);
 
   // Load directory-source-map
   let directoryMap = [];
@@ -114,7 +167,7 @@ async function validateLineage() {
       })
       .filter(Boolean);
 
-    console.log(`📂 Loaded ${directoryMap.length} directory entries from directory-source-map.jsonl\n`);
+    console.log(`${IC.data} Loaded ${directoryMap.length} directory entries from directory-source-map.jsonl\n`);
   } catch (e) {
     validator.addGate('Load directory-source-map', false, `Cannot read: ${e.message}`);
     return validator;
@@ -346,21 +399,21 @@ async function validateLineage() {
 
   const summary = validator.summary();
 
-  console.log(`\n${'═'.repeat(70)}`);
-  console.log(`📊 LINEAGE VERIFICATION SUMMARY`);
-  console.log(`${'═'.repeat(70)}`);
+  console.log(`\n${'='.repeat(70)}`);
+  console.log(`${IC.chart} LINEAGE VERIFICATION SUMMARY`);
+  console.log(`${'='.repeat(70)}`);
   console.log(`Total Gates: ${summary.total}`);
-  console.log(`Passed: ${summary.passed} ✅`);
-  console.log(`Failed: ${summary.failed} ❌`);
-  console.log(`Warnings: ${summary.warnings} ⚠️`);
-  console.log(`${'═'.repeat(70)}\n`);
+  console.log(`Passed: ${summary.passed} ${IC.pass}`);
+  console.log(`Failed: ${summary.failed} ${IC.fail}`);
+  console.log(`Warnings: ${summary.warnings} ${IC.warn}`);
+  console.log(`${'='.repeat(70)}\n`);
 
   if (summary.success) {
-    console.log(`✅ LINEAGE VERIFICATION PASSED`);
+    console.log(`${IC.pass} LINEAGE VERIFICATION PASSED`);
   } else {
-    console.log(`❌ LINEAGE VERIFICATION FAILED`);
+    console.log(`${IC.fail} LINEAGE VERIFICATION FAILED`);
     if (!STRICT) {
-      console.log(`💡 Tip: Run with --strict flag to enable extra validation gates`);
+      console.log(`Tip: Run with --strict flag to enable extra validation gates`);
     }
   }
 
@@ -390,7 +443,7 @@ async function validateLineage() {
 
   const jsonPath = path.join(OUTPUT_DIR, 'feature-lineage-verification.json');
   fs.writeFileSync(jsonPath, JSON.stringify(jsonReport, null, 2));
-  console.log(`📄 Wrote ${jsonPath}`);
+  console.log(`${IC.doc} Wrote ${jsonPath}`);
 
   // Markdown report
   let mdContent = `# Feature Lineage Verification Report
@@ -412,7 +465,7 @@ async function validateLineage() {
 `;
 
   validator.gates.forEach(gate => {
-    const symbol = gate.passed ? '✅' : '❌';
+    const symbol = gate.passed ? '✅' : '❌'; // emoji ok in markdown output files
     mdContent += `### ${symbol} ${gate.name}\n\n`;
     mdContent += `${gate.message}\n\n`;
   });
@@ -431,7 +484,7 @@ async function validateLineage() {
 
   const mdPath = path.join(OUTPUT_DIR, 'feature-lineage-verification.md');
   fs.writeFileSync(mdPath, mdContent);
-  console.log(`📄 Wrote ${mdPath}`);
+  console.log(`${IC.doc} Wrote ${mdPath}`);
 
   return validator;
 }
@@ -444,6 +497,6 @@ try {
   await validateLineage();
   process.exit(0);
 } catch (err) {
-  console.error('❌ Error:', err);
+  console.error('[FAIL] Error:', err);
   process.exit(1);
 }

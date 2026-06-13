@@ -29,10 +29,38 @@ Only `Read` a file if `rg` confirms it contains what you need. Never load an ent
 - **Port 8888**: Reserved for SeaweedFS Filer. Do NOT bind SearXNG to 8888; use 8889.
 - **No hidden thoughts**: Do not persist `hiddenThoughts`, `chainOfThought`, `kv_cache`, or `tensor` to any store.
 
-## Repo map
+## OpenCode Skill Contract (Mandatory Addendum)
+Every skill/subagent must conclude its execution by providing these structured fields:
+*   **`likely_cause`**: A one-sentence summary of the root cause or primary trigger for the task.
+...
+## OpenCode Skill Contract (Mandatory Addendum)
+Every skill/subagent must conclude its execution by providing these structured fields:
+*   **`likely_cause`**: A one-sentence summary of the root cause or primary trigger for the task.
+*   **`evidence`**: The specific data points, file paths, or concepts that informed the solution (e.g., `src/lib/foo.ts`, "User requested feature X").
+*   **`patch_targets`**: A list of relative file paths that were modified or should be reviewed for changes.
+*   **`safe_next_command`**: The recommended, non-destructive command to run next (e.g., a dry-run audit).
+*   **`smoke_command`**: The final validation command to confirm the fix/feature works in a controlled environment.
+*   **`report_path`**: A path where the detailed report of this skill's execution should be stored.
+*   **`do_not_do`**: An explicit list of files, functions, or modules that must not be touched by future changes related to this feature.
 
+Example:
+```yaml
+likely_cause: The existing context building process lacked a centralized, versioned contract for defining new features and their associated data sources.
+evidence: [intent:qdrant_payload_enrichment, file:scripts/atlas/build-implementation-intent-aliases.mjs]
+patch_targets: ["src/lib/server/db/qdrant-sync.ts"]
+safe_next_command: "npm run atlas:concept-evidence:backfill:dry"
+smoke_command: "npm run atlas:concept-evidence:audit"
+report_path: "docs/reports/atlas_context_build_run_{timestamp}.json"
+do_not_do: ["src/lib/server/db/qdrant-sync.ts"]
+```
+
+## Repo map
 - `sveltekit-frontend/` — main app root
-- `simd-bridge/` — native N-API bridge (LibTorch/simdjson)
+...
+
+## Repo map
+- `sveltekit-frontend/` — main app root
+...
 - `services/` — standalone Go/Python services
 - `docker/` — compose/runtime stacks
 - `drizzle/` — migrations and schema assets

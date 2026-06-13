@@ -2837,6 +2837,12 @@
     "serverDeps": 0,
     "dbDeps": 0
   },
+  "sveltekit-frontend/src/routes/api/atlas/index-doc/+server.ts": {
+    "zone": "shared",
+    "directDeps": 0,
+    "serverDeps": 0,
+    "dbDeps": 0
+  },
   "sveltekit-frontend/src/routes/api/atlas/memory-address/[source_ref_id]/+server.ts": {
     "zone": "shared",
     "directDeps": 0,

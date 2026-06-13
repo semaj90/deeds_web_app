@@ -681,6 +681,35 @@ export const POST: RequestHandler = async ({ request }) => {
     stats.turbovec_source    = 'payload:stored';
   }
 
+  // ── Stage 1.7: GPU BatchCosine exact rerank ────────────────────────────────
+  // LibTorch CUDA cosine over the inline `content` named vector returned by
+  // Qdrant (with_vector: ['content']). Additive signal — does NOT overwrite
+  // ann_turbovec_score. Skipped when CUDA is unavailable.
+  const t17 = Date.now();
+  if (isCudaAvailable()) {
+    const gpuMap = await gpuBatchCosineRerank(vector, hits, Math.max(top_k * 3, 60));
+    if (gpuMap) {
+      let gpuHits = 0;
+      for (const h of hits) {
+        const s = gpuMap.get(String(h.id));
+        if (s !== undefined) {
+          (h.payload ??= {} as Record<string, unknown>);
+          (h.payload as Record<string, unknown>).gpu_cosine_score = s;
+          gpuHits++;
+        }
+      }
+      stats.gpu_cosine_hits   = gpuHits;
+      stats.gpu_cosine_source = (gpuMap as unknown as { __source?: string }).__source ?? 'gpu';
+    } else {
+      stats.gpu_cosine_hits   = 0;
+      stats.gpu_cosine_source = 'no-vectors';
+    }
+  } else {
+    stats.gpu_cosine_hits   = 0;
+    stats.gpu_cosine_source = 'skipped';
+  }
+  stats.gpu_cosine_ms = Date.now() - t17;
+
   // ── Stage 2: Neo4j concept expansion ───────────────────────────────────────
   const topPacketKeys  = hits.slice(0, 20).map(h => String(h.payload?.packet_key ?? ''));
   const topConceptIds  = Array.from(new Set(

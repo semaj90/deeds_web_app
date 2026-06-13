@@ -464,7 +464,9 @@
       "Bash(REDIS_PASSWORD=redis cd c:/Users/james/Videos/deeds-web-app)",
       "Bash(ls scripts/atlas/ae_encoder* models/ae_encoder*)",
       "Bash(ls models/*.pt models/*.plan)",
-      "Bash(ls docs/reports/packet-latents* docs/reports/som-20x20* docs/reports/atlas-centroids*)"
+      "Bash(ls docs/reports/packet-latents* docs/reports/som-20x20* docs/reports/atlas-centroids*)",
+      "Bash(mkdir -p models logs/atlas)",
+      "Bash(npm run *)"
     ],
     "deny": [],
     "ask": []

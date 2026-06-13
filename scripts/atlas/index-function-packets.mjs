@@ -391,7 +391,7 @@ function buildPacket(fn, lines, filePathRel) {
 
 // ── Main ─────────────────────────────────────────────────────────────────────
 async function main() {
-  console.log(`\n═══ Function Packets — ${DRY_RUN ? 'DRY RUN' : 'APPLY'} ═══\n`);
+  console.log(`\n=== Function Packets -- ${DRY_RUN ? 'DRY RUN' : 'APPLY'} ===\n`);
 
   if (!existsSync(TARGET_FILE)) {
     console.error(`✗ Target file does not exist: ${TARGET_FILE}`);
@@ -537,6 +537,10 @@ async function main() {
             community_id:    p.community_id,
             concept_ids:     p.concept_ids,
             calls:           p.calls,
+            // Stage 1.5 / 1.7 live signals — sentinel 0 (overwritten by cascade route at query time)
+            ann_turbovec_score: 0,
+            gpu_cosine_score:   0,
+            som_cache_hit:      0,
             // Atlas indexing flags
             atlas_enriched:     true,
             canonicalSourceRef: p.source_ref,
@@ -564,7 +568,7 @@ async function main() {
       const redis = new Redis({
         host:               process.env.REDIS_HOST ?? '127.0.0.1',
         port:               Number(process.env.REDIS_PORT ?? 6379),
-        password:           process.env.REDIS_PASSWORD,
+        password:           process.env.REDIS_PASSWORD ?? process.env.REDIS_PASS ?? 'redis',
         lazyConnect:        true,
         maxRetriesPerRequest: 1,
         enableOfflineQueue: false,

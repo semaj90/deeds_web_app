@@ -1,80 +1,17 @@
 {
-  "generated_at": "2026-06-13T02:46:47.685Z",
+  "generated_at": "2026-06-13T15:02:54.904Z",
   "mode": "apply",
-  "traces_loaded": 1093,
-  "packet_refs_canonical": 1093,
-  "packet_refs_noise": 0,
-  "labels_with_signal": 10,
-  "packets_to_update": 29772,
-  "label_updates": [
-    {
-      "label": "observability_telemetry",
-      "avgScore": 0.8717583439357187,
-      "hitCount": 107,
-      "rewardIncrement": 0.1307637515903578
-    },
-    {
-      "label": "database_orm",
-      "avgScore": 0.8824940778121342,
-      "hitCount": 128,
-      "rewardIncrement": 0.13237411167182012
-    },
-    {
-      "label": "agent_intelligence",
-      "avgScore": 0.9431656275123615,
-      "hitCount": 212,
-      "rewardIncrement": 0.14147484412685424
-    },
-    {
-      "label": "ui_components",
-      "avgScore": 0.9001856275602719,
-      "hitCount": 111,
-      "rewardIncrement": 0.1350278441340408
-    },
-    {
-      "label": "emergent_topology",
-      "avgScore": 0.8622441743921384,
-      "hitCount": 92,
-      "rewardIncrement": 0.12933662615882074
-    },
-    {
-      "label": "test_harness",
-      "avgScore": 0.8819176149530111,
-      "hitCount": 92,
-      "rewardIncrement": 0.13228764224295167
-    },
-    {
-      "label": "native_accelerators",
-      "avgScore": 0.7786433108737797,
-      "hitCount": 89,
-      "rewardIncrement": 0.11679649663106695
-    },
-    {
-      "label": "general_abstractions",
-      "avgScore": 0.8789424426380091,
-      "hitCount": 88,
-      "rewardIncrement": 0.13184136639570138
-    },
-    {
-      "label": "api_endpoints",
-      "avgScore": 0.8254617757341164,
-      "hitCount": 87,
-      "rewardIncrement": 0.12381926636011745
-    },
-    {
-      "label": "infrastructure_config",
-      "avgScore": 0.8587827473539511,
-      "hitCount": 87,
-      "rewardIncrement": 0.12881741210309267
-    }
-  ],
-  "applied": true,
-  "total_updated": 29772,
-  "coverage_pct": 34,
-  "avg_reward_prior": 0.45256161119495414,
-  "max_reward_prior": 2.605078722829648,
-  "packets_with_reward_score": 5831,
-  "gate": {
-    "pass": true
+  "packets_processed": 11644,
+  "trace_backed": 0,
+  "heuristic": 11644,
+  "trace_feature_refs": 10,
+  "new_high_reward": 11629,
+  "post_apply": {
+    "total": 17475,
+    "has_reward": 17461,
+    "high_reward": 17460,
+    "still_zero": 14,
+    "avg_reward": 0.7794,
+    "gate_pass": true
   }
 }

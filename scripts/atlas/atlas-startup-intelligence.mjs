@@ -41,6 +41,13 @@ const REPORT_DIR = path.join(ROOT, 'docs', 'reports', 'atlas');
 const APPLY   = process.argv.includes('--apply');
 const VERBOSE = process.argv.includes('--verbose');
 const JSON_OUT = process.argv.includes('--json');
+const EMOJI   = process.argv.includes('--emoji');
+
+// ── Icon set: ASCII-safe by default, emoji with --emoji flag ───────────────────
+// Windows cmd/PowerShell without chcp 65001 garbles multi-byte emoji to Γ£à/Γ¥î etc.
+const IC = EMOJI
+  ? { pass: '✅', fail: '❌', warn: '⚠️ ', block: '⛔', wait: '⏳', write: '✅' }
+  : { pass: '[PASS]', fail: '[FAIL]', warn: '[WARN]', block: '[BLOK]', wait: '[WAIT]', write: '[DONE]' };
 
 // ── Helpers ────────────────────────────────────────────────────────────────────
 
@@ -152,7 +159,7 @@ const GATES = {
 
 async function main() {
   const t0 = Date.now();
-  log('\n═══ Atlas Startup Intelligence ═══\n');
+  log('\n=== Atlas Startup Intelligence ===\n');
 
   const board = {
     generated:    new Date().toISOString(),
@@ -545,10 +552,10 @@ async function main() {
 
   // ── Print summary ──────────────────────────────────────────────────────────
   if (!JSON_OUT) {
-    console.log('\n══ Gate Results ══════════════════════════════════');
+    console.log('\n== Gate Results ==================================================');
     for (const [k, g] of Object.entries(board.gates)) {
-      const icon = g.pass ? '✅' : '❌';
-      const detail = g.detail ? `  ← ${g.detail}` : '';
+      const icon = g.pass ? IC.pass : IC.fail;
+      const detail = g.detail ? `  <- ${g.detail}` : '';
       console.log(`  ${icon} ${g.label.padEnd(45)} ${g.value}${g.unit ?? ''}${detail}`);
     }
     console.log(`\n  Gates: ${board.gate_summary.pass}/${board.gate_summary.total} (${board.gate_summary.pct}%)`);
@@ -561,27 +568,27 @@ async function main() {
       console.log(`    domain_class (addressable):   ${pg.domain_pct ?? 0}% of ${(pg.addressable_packets ?? 0).toLocaleString()} pkts (all: ${Math.round((pg.with_domain ?? 0) / Math.max(1, pg.total_packets ?? 1) * 100)}%)`);
     }
 
-    console.log('\n══ Service Health ═══════════════════════════════');
+    console.log('\n== Service Health ================================================');
     const svc = risk.service_health;
-    console.log(`  ${svc.postgres ? '✅' : '❌'} PostgreSQL  ${pg.total_packets ?? '–'} packets`);
-    console.log(`  ${svc.qdrant   ? '✅' : '❌'} Qdrant      ${qd.points_count ?? '–'} points`);
-    console.log(`  ${svc.neo4j    ? '✅' : '❌'} Neo4j       ${n4.used_concept_edges ?? '–'} USED_CONCEPT edges  [source: ${n4.source ?? 'none'}]`);
-    console.log(`  ${svc.redis    ? '✅' : '❌'} Redis       ${board.redis.karpathy_files ?? '–'} karpathy files`);
+    console.log(`  ${svc.postgres ? IC.pass : IC.fail} PostgreSQL  ${pg.total_packets ?? '-'} packets`);
+    console.log(`  ${svc.qdrant   ? IC.pass : IC.fail} Qdrant      ${qd.points_count ?? '-'} points`);
+    console.log(`  ${svc.neo4j    ? IC.pass : IC.fail} Neo4j       ${n4.used_concept_edges ?? '-'} USED_CONCEPT edges  [source: ${n4.source ?? 'none'}]`);
+    console.log(`  ${svc.redis    ? IC.pass : IC.fail} Redis       ${board.redis.karpathy_files ?? '-'} karpathy files`);
 
-    console.log('\n══ XGBoost Status ════════════════════════════════');
+    console.log('\n== XGBoost Status ================================================');
     if (risk.xgboost_training_blocked) {
-      console.log(`  ⛔ Training blocked — P0 gates not met`);
+      console.log(`  ${IC.block} Training blocked -- P0 gates not met`);
     } else if (!board.reports.xgboost_training?.exists) {
-      console.log(`  ⏳ Feature CSV ready — run: npm run atlas:xgboost:train`);
+      console.log(`  ${IC.wait} Feature CSV ready -- run: npm run atlas:xgboost:train`);
     } else if (!risk.xgboost_gate_pass) {
-      console.log(`  ⚠️  Model trained — NDCG@10=${risk.xgboost_ndcg ?? '?'} (gate ≥0.70 NOT met)`);
+      console.log(`  ${IC.warn} Model trained -- NDCG@10=${risk.xgboost_ndcg ?? '?'} (gate >=0.70 NOT met)`);
     } else {
-      console.log(`  ✅ Model gate PASS — NDCG@10=${risk.xgboost_ndcg}`);
-      console.log(`  ✅ Stage 4: ${risk.cascade_stage4}`);
+      console.log(`  ${IC.pass} Model gate PASS -- NDCG@10=${risk.xgboost_ndcg}`);
+      console.log(`  ${IC.pass} Stage 4: ${risk.cascade_stage4}`);
     }
 
     if (nextActions.recommended.length > 0) {
-      console.log('\n══ Next Actions ══════════════════════════════════');
+      console.log('\n== Next Actions ==================================================');
       for (const a of nextActions.recommended) {
         console.log(`  [${a.priority}] ${a.title}`);
         console.log(`       ${a.command}`);
@@ -598,7 +605,7 @@ async function main() {
     writeFileSync(path.join(REPORT_DIR, 'atlas-kanban-tasks.json'),  JSON.stringify(kanban, null, 2));
     writeFileSync(path.join(REPORT_DIR, 'atlas-risk-report.json'),   JSON.stringify(risk, null, 2));
     writeFileSync(path.join(REPORT_DIR, 'atlas-next-actions.json'),  JSON.stringify(nextActions, null, 2));
-    log(`\n  ✅ Wrote to ${REPORT_DIR}/`);
+    log(`\n  ${IC.write} Wrote to ${REPORT_DIR}/`);
     log('    atlas-board-state.json');
     log('    atlas-kanban-tasks.json');
     log('    atlas-risk-report.json');

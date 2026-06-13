@@ -1,18 +1,18 @@
 {
-  "generated_at": "2026-06-13T08:01:55.514Z",
+  "generated_at": "2026-06-13T14:51:28.764Z",
   "dry_run": false,
   "target_file": "sveltekit-frontend/src/routes/api/atlas/search/+server.ts",
   "feature_id": "atlas.search",
   "feature_label": "Atlas Search Cascade",
-  "total_functions": 14,
+  "total_functions": 16,
   "by_domain": {
-    "rag_retrieval": 14
+    "rag_retrieval": 16
   },
-  "postgres_inserted": 14,
-  "qdrant_upserted": 14,
-  "neo4j_nodes": 14,
+  "postgres_inserted": 16,
+  "qdrant_upserted": 16,
+  "neo4j_nodes": 16,
   "neo4j_calls_edges": 10,
-  "redis_cached": 0,
+  "redis_cached": 16,
   "packets": [
     {
       "packet_key": "d50d8ddeacd50105",
@@ -126,6 +126,19 @@
       "summary": "Live SIMD/CPU rerank over the TurboVec in-memory index."
     },
     {
+      "packet_key": "05f26c6dc1b51a12",
+      "function_id": "atlas.search.gpuBatchCosineRerank",
+      "function_symbol": "gpuBatchCosineRerank",
+      "source_ref": "sveltekit-frontend/src/routes/api/atlas/search/+server.ts#gpuBatchCosineRerank",
+      "concept_ids": [
+        "rerank",
+        "cuda",
+        "cosine"
+      ],
+      "calls": [],
+      "summary": "Live exact-cosine rerank via LibTorch N-API (CUDA cuBLAS)."
+    },
+    {
       "packet_key": "56e0294665e0a2c5",
       "function_id": "atlas.search.neo4jExpand",
       "function_symbol": "neo4jExpand",
@@ -139,6 +152,15 @@
         "neo4j:USED_CONCEPT"
       ],
       "summary": "Lazy-import neo4j-driver to avoid SSR bundling issues"
+    },
+    {
+      "packet_key": "336aca4482baff82",
+      "function_id": "atlas.search.fetchBifrostRecency",
+      "function_symbol": "fetchBifrostRecency",
+      "source_ref": "sveltekit-frontend/src/routes/api/atlas/search/+server.ts#fetchBifrostRecency",
+      "concept_ids": [],
+      "calls": [],
+      "summary": "Batch-fetch `bitfrost:temporal:file:{sha256(source_ref)}` for the top-K hits."
     },
     {
       "packet_key": "d25da399c9ba0075",

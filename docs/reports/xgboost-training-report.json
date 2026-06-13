@@ -1,0 +1,23 @@
+{
+  "generated": "2026-06-13T14:32:39.830607Z",
+  "model_type": "xgboost",
+  "objective": "reg:squarederror",
+  "model_path": "C:\\Users\\james\\Videos\\deeds-web-app\\models\\xgboost-reranker.ubj",
+  "train_rows": 84866,
+  "val_rows": 16842,
+  "val_traces": 186,
+  "ndcg_at_10": 0.9731,
+  "mrr_at_10": 0.9731,
+  "ndcg_gate": 0.7,
+  "gate_pass": true,
+  "feature_importance": {
+    "trace_score": 27.08184242248535,
+    "freshness_score": 5.961418151855469,
+    "reward_prior": 0.06210767477750778,
+    "community_conf": 0.06005859375,
+    "packet_hit_count": 0.027649322524666786,
+    "concept_overlap": 0.02527163363993168,
+    "domain_class_match": 0.004642571322619915
+  },
+  "promotion_cmd": "Set XGBOOST_RERANKER_PATH env var to model_path and restart the dev server to activate Stage 4 cross-encoder replacement."
+}

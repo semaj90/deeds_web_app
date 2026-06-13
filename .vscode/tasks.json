@@ -46,6 +46,48 @@
       "detail": "Runs the GPU bridge probe on folder open and writes the summary log to logs/task-output/startup-gpu-bridge-probe.log."
     },
     {
+      "label": "🚀 TurboVec gRPC Bridge :50062 (detached)",
+      "type": "shell",
+      "command": "pwsh -NoProfile -Command \"$p = Get-NetTCPConnection -LocalPort 50062 -State Listen -ErrorAction SilentlyContinue; if ($p) { Write-Host '⚡ TurboVec gRPC bridge already listening on :50062'; exit 0 }; New-Item -ItemType Directory -Force -Path logs/sidecars | Out-Null; Start-Process node -ArgumentList 'scripts/sidecars/turbovec-grpc-bridge.mjs' -WorkingDirectory '${workspaceFolder}' -WindowStyle Hidden -RedirectStandardOutput 'logs/sidecars/turbovec-grpc-bridge.out.log' -RedirectStandardError 'logs/sidecars/turbovec-grpc-bridge.err.log'; Start-Sleep 2; if (Get-NetTCPConnection -LocalPort 50062 -State Listen -ErrorAction SilentlyContinue) { Write-Host '⚡ TurboVec gRPC bridge :50062 started' } else { Write-Host '⚠️ TurboVec gRPC bridge did not bind :50062 — see logs/sidecars/turbovec-grpc-bridge.err.log' }\"",
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "runOptions": {
+        "runOn": "folderOpen"
+      },
+      "problemMatcher": [],
+      "presentation": {
+        "echo": true,
+        "reveal": "never",
+        "focus": false,
+        "panel": "dedicated",
+        "showReuseMessage": false,
+        "clear": false
+      },
+      "detail": "Idempotent detached start: wraps tensorrt_bridge.node (CUDA BatchCosine/EncodeLatent/AssignSom) + Python sidecar (:8791 Search/Health) as the TurboVecCudaService gRPC contract on :50062. Cascade Stage 1.5 flips from 'payload:stored' to 'grpc:live' once bound. Skips if port already held."
+    },
+    {
+      "label": "🌲 XGBoost Reranker Sidecar :8765 (detached)",
+      "type": "shell",
+      "command": "pwsh -NoProfile -Command \"$p = Get-NetTCPConnection -LocalPort 8765 -State Listen -ErrorAction SilentlyContinue; if ($p) { Write-Host '⚡ XGBoost reranker already listening on :8765'; exit 0 }; if (-not (Test-Path 'models/xgboost-reranker.ubj')) { Write-Host '⚠️ models/xgboost-reranker.ubj missing — run: npm run atlas:xgboost:train'; exit 0 }; New-Item -ItemType Directory -Force -Path logs/sidecars | Out-Null; Start-Process python -ArgumentList 'scripts/atlas/serve-xgboost-reranker.py' -WorkingDirectory '${workspaceFolder}' -WindowStyle Hidden -Environment @{PYTHONIOENCODING='utf-8'} -RedirectStandardOutput 'logs/sidecars/xgboost-reranker.out.log' -RedirectStandardError 'logs/sidecars/xgboost-reranker.err.log'; Start-Sleep 3; $h = Invoke-RestMethod http://127.0.0.1:8765/health -ErrorAction SilentlyContinue; if ($h.model_loaded) { Write-Host \\\"⚡ XGBoost reranker :8765 started (model_type=$($h.model_type))\\\" } else { Write-Host '⚠️ XGBoost reranker did not respond — see logs/sidecars/xgboost-reranker.err.log' }\"",
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "runOptions": {
+        "runOn": "folderOpen"
+      },
+      "problemMatcher": [],
+      "presentation": {
+        "echo": true,
+        "reveal": "never",
+        "focus": false,
+        "panel": "dedicated",
+        "showReuseMessage": false,
+        "clear": false
+      },
+      "detail": "Idempotent detached start: serves models/xgboost-reranker.ubj (NDCG@10 = 0.9731) on :8765. Cascade Stage 4 flips rerank_source from 'gemma4' to 'xgboost' once /health returns model_loaded=true."
+    },
+    {
       "label": "Dev Server",
       "type": "shell",
       "command": "npm run dev",

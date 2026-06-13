@@ -238,15 +238,20 @@
   "producer": "graph-refresh",
   "source": "docs/graph/codebase-graph.json",
   "status": "ok",
-  "promotionState": "generated",
+  "promotionState": "promoted",
   "atlasGate": {
-    "total": 17020,
-    "withSourceRef": 8367,
+    "total": 17414,
+    "withSourceRef": 8761,
     "packetKeyCoverage": 1,
-    "featureIdCoverage": 0.7699294848810805,
+    "featureIdCoverage": 0.8373473347791348,
     "highConfidenceCount": 2554,
-    "promoted": false
+    "gateThresholds": {
+      "packetKey": 0.95,
+      "featureId": 0.8
+    },
+    "promoted": true
   },
   "generator": "scripts/atlas/write-graph-refresh-manifest.mjs",
-  "notes": "Read from docs/graph/codebase-graph.json"
+  "notes": "Read from docs/graph/codebase-graph.json",
+  "promoted_at": "2026-06-13T15:01:22.366Z"
 }
