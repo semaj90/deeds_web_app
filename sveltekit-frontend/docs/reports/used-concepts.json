@@ -1,0 +1,116 @@
+{
+  "generatedAt": "2026-06-13T22:28:11.802Z",
+  "totalTraces": 1134,
+  "samples": [
+    {
+      "trace_id": "3e734d65-348e-4019-8436-d325ae7d1bff",
+      "task_id": "2f548566ddb686fb",
+      "selected_concepts": [
+        "observability_telemetry"
+      ],
+      "retrieved_packets": [
+        "packet:observability_telemetry",
+        "concept:observability_telemetry"
+      ]
+    },
+    {
+      "trace_id": "8bc1f19f-6ebe-42a9-aeac-b268e339d4f1",
+      "task_id": "ea52c56ab248ba09",
+      "selected_concepts": [
+        "observability_telemetry"
+      ],
+      "retrieved_packets": [
+        "packet:observability_telemetry",
+        "concept:observability_telemetry"
+      ]
+    },
+    {
+      "trace_id": "53c3499f-e18d-4576-90bf-40a06bbfa86f",
+      "task_id": "951726b9c9a04691",
+      "selected_concepts": [
+        "database_orm"
+      ],
+      "retrieved_packets": [
+        "packet:database_orm",
+        "concept:database_orm"
+      ]
+    },
+    {
+      "trace_id": "5afbd8e2-acd8-429b-886b-45cffdef60e5",
+      "task_id": "c202bd49379e2c58",
+      "selected_concepts": [
+        "database_orm"
+      ],
+      "retrieved_packets": [
+        "packet:database_orm",
+        "concept:database_orm"
+      ]
+    },
+    {
+      "trace_id": "8d9eee13-c1d5-4e74-a6b6-8548cec5cdc9",
+      "task_id": "a152c707e6f52410",
+      "selected_concepts": [
+        "database_orm"
+      ],
+      "retrieved_packets": [
+        "packet:database_orm",
+        "concept:database_orm"
+      ]
+    },
+    {
+      "trace_id": "5407f049-f90a-47ab-a768-2e2e5ccc4b9a",
+      "task_id": "b4beca11886092f6",
+      "selected_concepts": [
+        "agent_intelligence"
+      ],
+      "retrieved_packets": [
+        "packet:agent_intelligence",
+        "concept:agent_intelligence"
+      ]
+    },
+    {
+      "trace_id": "61a188ed-ff04-4582-af06-f359cd6ac9ba",
+      "task_id": "65294ba71f897fae",
+      "selected_concepts": [
+        "agent_intelligence"
+      ],
+      "retrieved_packets": [
+        "packet:agent_intelligence",
+        "concept:agent_intelligence"
+      ]
+    },
+    {
+      "trace_id": "b47d209e-466c-451a-a0ce-e44e79178e16",
+      "task_id": "098a8d95fe83a972",
+      "selected_concepts": [
+        "agent_intelligence"
+      ],
+      "retrieved_packets": [
+        "packet:agent_intelligence",
+        "concept:agent_intelligence"
+      ]
+    },
+    {
+      "trace_id": "b335902f-835b-4ca2-b08a-9dab3fcc9465",
+      "task_id": "e2b2a982590abcdc",
+      "selected_concepts": [
+        "agent_intelligence"
+      ],
+      "retrieved_packets": [
+        "packet:agent_intelligence",
+        "concept:agent_intelligence"
+      ]
+    },
+    {
+      "trace_id": "ef6eb102-bd60-4bec-a6e0-99e3a3e13385",
+      "task_id": "e1a8a1dd7ed8a477",
+      "selected_concepts": [
+        "agent_intelligence"
+      ],
+      "retrieved_packets": [
+        "packet:agent_intelligence",
+        "concept:agent_intelligence"
+      ]
+    }
+  ]
+}

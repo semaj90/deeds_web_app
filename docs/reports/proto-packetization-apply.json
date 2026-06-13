@@ -1,0 +1,15 @@
+{
+  "timestamp": "2026-06-13T21:51:16.988Z",
+  "mode": "apply",
+  "services": 12,
+  "methods": 61,
+  "postgres_inserted": 61,
+  "qdrant_upserted": 61,
+  "redis_cached": 61,
+  "gates": {
+    "services": true,
+    "methods": true,
+    "contract": true,
+    "qdrant_embedding": true
+  }
+}

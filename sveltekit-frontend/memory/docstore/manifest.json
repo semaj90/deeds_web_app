@@ -1,34 +1,22 @@
 {
-  "runId": "2026-06-11T03-27-27",
-  "indexedAt": "2026-06-13T15:37:04.114Z",
-  "clusterCount": 92,
-  "relTypeCount": 5,
-  "totalCards": 99,
+  "runId": "2026-06-13T21-48-06",
+  "indexedAt": "2026-06-13T22:33:41.869Z",
+  "clusterCount": 0,
+  "relTypeCount": 0,
+  "totalCards": 2,
   "sinks": {
     "couchdb": {
       "ok": true,
-      "written": 99,
+      "written": 2,
       "db": "wiki_cards"
     },
     "redis": {
       "ok": true,
-      "written": 192,
+      "written": 3,
       "ttlSeconds": 21600
     }
   },
-  "sampleClusterKeys": [
-    "cluster:gpu:75",
-    "cluster:gpu:92",
-    "cluster:gpu:34",
-    "cluster:gpu:88",
-    "cluster:gpu:57"
-  ],
-  "sampleRelTypes": [
-    "READS_REDIS_KEY",
-    "WRITES_REDIS_KEY",
-    "QUERIES_TABLE",
-    "QUERIES_QDRANT_COLLECTION",
-    "QUERIES_NEO4J_LABEL"
-  ],
+  "sampleClusterKeys": [],
+  "sampleRelTypes": [],
   "gaps": []
 }

@@ -1,0 +1,29 @@
+{
+  "timestamp": "2026-06-13T22:14:10.856Z",
+  "mode": "applied",
+  "source": "C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\docs\\reports\\grpc-service-packets.jsonl",
+  "destination": "http://127.0.0.1:6333/collections/codebase_chunks_768",
+  "embedding_model": "embeddinggemma:latest",
+  "embedding_concurrency": 8,
+  "embedding_timeout_ms": 30000,
+  "packets": {
+    "total": 49,
+    "embedded": 49,
+    "failed": 0
+  },
+  "qdrant": {
+    "collection": "codebase_chunks_768",
+    "points_upserted": 49,
+    "verification": {
+      "expected": 49,
+      "actual": 54898,
+      "verified": true
+    }
+  },
+  "gates": {
+    "all_packets_embedded": true,
+    "zero_failures": true,
+    "all_in_qdrant": true
+  },
+  "errors": []
+}

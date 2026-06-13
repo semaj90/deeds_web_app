@@ -1,0 +1,129 @@
+{
+  "generated_at": "2026-06-13T21:36:46.311Z",
+  "canonical_concepts_total": 10,
+  "concepts_found": 0,
+  "concepts_with_feature_coverage": 0,
+  "concepts_with_evidence": 0,
+  "evidence_cards_valid": 0,
+  "gates": {
+    "all_10_defined": false,
+    "feature_id_coverage_95": false,
+    "evidence_valid_100": false,
+    "evidence_present": false
+  },
+  "gates_pass": false,
+  "concepts": {
+    "database_orm": {
+      "concept_id": "database_orm",
+      "found": false,
+      "label": "",
+      "feature_id_count": 0,
+      "total_packets": 0,
+      "coverage_pct": 0,
+      "evidence_cards": [],
+      "evidence_valid": true
+    },
+    "api_endpoints": {
+      "concept_id": "api_endpoints",
+      "found": false,
+      "label": "",
+      "feature_id_count": 0,
+      "total_packets": 0,
+      "coverage_pct": 0,
+      "evidence_cards": [],
+      "evidence_valid": true
+    },
+    "authentication": {
+      "concept_id": "authentication",
+      "found": false,
+      "label": "",
+      "feature_id_count": 0,
+      "total_packets": 0,
+      "coverage_pct": 0,
+      "evidence_cards": [],
+      "evidence_valid": true
+    },
+    "caching_strategy": {
+      "concept_id": "caching_strategy",
+      "found": false,
+      "label": "",
+      "feature_id_count": 0,
+      "total_packets": 0,
+      "coverage_pct": 0,
+      "evidence_cards": [],
+      "evidence_valid": true
+    },
+    "error_handling": {
+      "concept_id": "error_handling",
+      "found": false,
+      "label": "",
+      "feature_id_count": 0,
+      "total_packets": 0,
+      "coverage_pct": 0,
+      "evidence_cards": [],
+      "evidence_valid": true
+    },
+    "state_management": {
+      "concept_id": "state_management",
+      "found": false,
+      "label": "",
+      "feature_id_count": 0,
+      "total_packets": 0,
+      "coverage_pct": 0,
+      "evidence_cards": [],
+      "evidence_valid": true
+    },
+    "file_processing": {
+      "concept_id": "file_processing",
+      "found": false,
+      "label": "",
+      "feature_id_count": 0,
+      "total_packets": 0,
+      "coverage_pct": 0,
+      "evidence_cards": [],
+      "evidence_valid": true
+    },
+    "vector_search": {
+      "concept_id": "vector_search",
+      "found": false,
+      "label": "",
+      "feature_id_count": 0,
+      "total_packets": 0,
+      "coverage_pct": 0,
+      "evidence_cards": [],
+      "evidence_valid": true
+    },
+    "async_operations": {
+      "concept_id": "async_operations",
+      "found": false,
+      "label": "",
+      "feature_id_count": 0,
+      "total_packets": 0,
+      "coverage_pct": 0,
+      "evidence_cards": [],
+      "evidence_valid": true
+    },
+    "type_safety": {
+      "concept_id": "type_safety",
+      "found": false,
+      "label": "",
+      "feature_id_count": 0,
+      "total_packets": 0,
+      "coverage_pct": 0,
+      "evidence_cards": [],
+      "evidence_valid": true
+    }
+  },
+  "errors": [
+    "Error querying database_orm: relation \"atlas_concept_labels\" does not exist",
+    "Error querying api_endpoints: relation \"atlas_concept_labels\" does not exist",
+    "Error querying authentication: relation \"atlas_concept_labels\" does not exist",
+    "Error querying caching_strategy: relation \"atlas_concept_labels\" does not exist",
+    "Error querying error_handling: relation \"atlas_concept_labels\" does not exist",
+    "Error querying state_management: relation \"atlas_concept_labels\" does not exist",
+    "Error querying file_processing: relation \"atlas_concept_labels\" does not exist",
+    "Error querying vector_search: relation \"atlas_concept_labels\" does not exist",
+    "Error querying async_operations: relation \"atlas_concept_labels\" does not exist",
+    "Error querying type_safety: relation \"atlas_concept_labels\" does not exist"
+  ]
+}

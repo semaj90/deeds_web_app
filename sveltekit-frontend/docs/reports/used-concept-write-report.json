@@ -1,0 +1,20 @@
+{
+  "generatedAt": "2026-06-13T22:28:11.802Z",
+  "mode": "dry-run",
+  "summary": {
+    "totalTraces": 1134,
+    "edgesCreated": 451,
+    "edgesSkipped": 683,
+    "edgesTotal": 32012,
+    "traceCount": 2268,
+    "conceptCount": 3192,
+    "deterministic": false,
+    "replayable": true
+  },
+  "examples": [],
+  "exitCondition": {
+    "usedConceptEdges": 32012,
+    "pass": true
+  },
+  "timestamp": "2026-06-13T22:28:11.802Z"
+}

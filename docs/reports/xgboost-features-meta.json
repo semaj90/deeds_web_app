@@ -1,6 +1,6 @@
 {
-  "generated": "2026-06-13T03:58:46.744Z",
-  "mode": "apply",
+  "generated": "2026-06-13T21:44:52.097Z",
+  "mode": "dry-run",
   "traces_loaded": 1134,
   "total_rows": 101708,
   "positive_rows": 98355,
@@ -30,6 +30,7 @@
     "packet_key",
     "cosine_score",
     "bm25_rank_norm",
+    "ann_turbovec_score",
     "concept_overlap",
     "same_feature",
     "community_conf",
@@ -37,11 +38,21 @@
     "domain_class_match",
     "freshness_score",
     "pagerank_score",
+    "som_cell_id",
+    "som_cache_hit",
+    "provenance_git_age",
     "packet_hit_count",
     "n_retrieved",
     "n_concepts",
     "trace_score",
     "label"
   ],
-  "training_command_example": "xgboost --data=docs/reports/xgboost-features.csv --label-col=label --num-round=100 --objective=reg:squarederror --eta=0.1 --max-depth=6"
+  "training_command_policy": "python scripts/atlas/train-policy-reranker.py",
+  "training_command_xgboost": "python scripts/atlas/train-xgboost-reranker.py  # legacy, use policy reranker",
+  "new_features": [
+    "ann_turbovec_score",
+    "som_cell_id",
+    "som_cache_hit",
+    "provenance_git_age"
+  ]
 }

@@ -1,0 +1,38 @@
+{
+  "timestamp": "2026-06-13T19:50:06.144Z",
+  "skills_validated": 5,
+  "skills": [
+    {
+      "name": "atlas-run-indexing-gate",
+      "description": "Parent Atlas indexing harness (env-contract triple)",
+      "status": "VALIDATED"
+    },
+    {
+      "name": "atlas-concept-evidence",
+      "description": "Concept evidence spine audit",
+      "status": "VALIDATED"
+    },
+    {
+      "name": "atlas-higher-hop-enrichment",
+      "description": "Higher-hop enrichment supernode pressure measurement",
+      "status": "VALIDATED"
+    },
+    {
+      "name": "atlas-recommendation-merge",
+      "description": "Recommendation merge audit (root cause investigation)",
+      "status": "VALIDATED"
+    },
+    {
+      "name": "atlas-karpathy-gpu-enrich",
+      "description": "GPU Karpathy + NES Chrom enrichment audit",
+      "status": "VALIDATED"
+    }
+  ],
+  "gates": {
+    "preflight": "PASS",
+    "dry_run": "PASS",
+    "schema_validation": "PASS"
+  },
+  "ready_for_apply": true,
+  "next_step": "Run agent tasks for lanes 1, 1B, 2, 4 with --apply only if this report shows ready_for_apply=true"
+}

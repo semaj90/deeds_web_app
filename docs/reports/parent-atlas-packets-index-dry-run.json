@@ -1,0 +1,58 @@
+{
+  "ok": true,
+  "mode": "dry-run",
+  "generated_at": "2026-06-13T20:31:58.717Z",
+  "next_step": "node C:\\Users\\james\\Videos\\deeds-web-app\\scripts\\atlas\\index-parent-atlas-packets.mjs --apply",
+  "packet_count": 9,
+  "would_write": {
+    "postgres": "atlas_packets",
+    "count": 9
+  },
+  "sample_packets": [
+    {
+      "packet_kind": "foundation",
+      "packet_key": "foundation:c80bf84ecc516207",
+      "source_ref": "sveltekit-frontend/src/lib/server/auth",
+      "feature_id": "auth_lucia_sessions",
+      "description": "Lucia session management and auth flow",
+      "summary": "Lucia session management and auth flow",
+      "community_id": null,
+      "metadata": {
+        "stage": "foundation",
+        "stage_description": "Core infrastructure packets (auth, DB, cache)",
+        "manifest_version": "1.0",
+        "generated_at": "2026-06-13T20:31:58.577Z"
+      }
+    },
+    {
+      "packet_kind": "foundation",
+      "packet_key": "foundation:9469e575df721f7e",
+      "source_ref": "sveltekit-frontend/src/lib/server/db",
+      "feature_id": "database_orm_drizzle",
+      "description": "Drizzle ORM schema and database client",
+      "summary": "Drizzle ORM schema and database client",
+      "community_id": null,
+      "metadata": {
+        "stage": "foundation",
+        "stage_description": "Core infrastructure packets (auth, DB, cache)",
+        "manifest_version": "1.0",
+        "generated_at": "2026-06-13T20:31:58.577Z"
+      }
+    },
+    {
+      "packet_kind": "foundation",
+      "packet_key": "foundation:99b7aad4c3287efa",
+      "source_ref": "sveltekit-frontend/src/lib/server/redis.ts",
+      "feature_id": "cache_redis_valkey",
+      "description": "Redis/Valkey caching layer and TTL policies",
+      "summary": "Redis/Valkey caching layer and TTL policies",
+      "community_id": null,
+      "metadata": {
+        "stage": "foundation",
+        "stage_description": "Core infrastructure packets (auth, DB, cache)",
+        "manifest_version": "1.0",
+        "generated_at": "2026-06-13T20:31:58.577Z"
+      }
+    }
+  ]
+}

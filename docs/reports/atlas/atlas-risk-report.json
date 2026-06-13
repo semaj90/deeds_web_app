@@ -1,9 +1,9 @@
 {
-  "generated": "2026-06-13T05:37:36.740Z",
+  "generated": "2026-06-13T21:14:10.180Z",
   "xgboost_training_blocked": false,
-  "xgboost_gate_pass": false,
-  "xgboost_ndcg": null,
-  "cascade_stage4": "gemma4_fallback_only",
+  "xgboost_gate_pass": true,
+  "xgboost_ndcg": 0.9731,
+  "cascade_stage4": "xgboost_sidecar_ready",
   "blockers": [],
   "warnings": [],
   "service_health": {

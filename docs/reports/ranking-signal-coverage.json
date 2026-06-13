@@ -1,43 +1,43 @@
 {
-  "generated": "2026-06-13T03:12:30.225Z",
-  "addressable": 8483,
+  "generated": "2026-06-13T20:40:11.498Z",
+  "addressable": 8823,
   "bm25": {
-    "count": 7909,
-    "pct": "93.2"
+    "count": 8670,
+    "pct": "98.3"
   },
   "concepts": {
     "count": 8367,
-    "pct": "98.6"
+    "pct": "94.8"
   },
   "highConf": {
     "count": 2554,
-    "pct": "30.1"
+    "pct": "28.9"
   },
   "qdrant": {
-    "count": 54448,
-    "pct": "641.8"
+    "count": 54788,
+    "pct": "621.0"
   },
   "gates": [
     {
       "name": "bm25_coverage_85pct",
       "pass": true,
-      "detail": "93.2% (7909/8483)"
+      "detail": "98.3% (8670/8823)"
     },
     {
       "name": "concept_coverage_60pct",
       "pass": true,
-      "detail": "98.6% (8367/8483)"
+      "detail": "94.8% (8367/8823)"
     },
     {
       "name": "community_conf_95pct",
-      "pass": true,
-      "detail": "98.6% (8367/8483)"
+      "pass": false,
+      "detail": "94.8% (8367/8823)"
     },
     {
       "name": "qdrant_coverage_50pct",
       "pass": true,
-      "detail": "641.8% (~54448/8483)"
+      "detail": "621.0% (~54788/8823)"
     }
   ],
-  "xgboostUnblocked": true
+  "xgboostUnblocked": false
 }

@@ -1,5 +1,5 @@
 {
-  "generated": "2026-06-13T05:37:36.740Z",
+  "generated": "2026-06-13T21:14:10.180Z",
   "architecture": {
     "active_lane": "XGBoost supervised reranker (Stage 4) — tabular, fast, explainable",
     "next_lane": "PyTorch policy network (Stage 5) — agent action selector with SOM+CUDA",
@@ -8,5 +8,10 @@
     "xgboost_role": "Stage 4: supervised ranking only — BM25, ANN, TurboVec, community_conf, concept_overlap, reward_prior, som_cache_hit (binary), provenance_git_age. som_cell_id (int) excluded — tree splits on SOM topology indices are meaningless."
   },
   "recommended": [],
-  "quick_wins": []
+  "quick_wins": [
+    {
+      "title": "Start XGBoost sidecar (port 8765)",
+      "command": "npm run atlas:xgboost:serve"
+    }
+  ]
 }

@@ -103,6 +103,7 @@ async function livePostgresCheck(validator) {
     const pool = new pg.Pool({ connectionString: DATABASE_URL, max: 2, connectionTimeoutMillis: 5000 });
     try {
       // feature_label lives in payload JSONB (not a top-level column)
+      // Filter out source_kind='unknown' (SOM topology slots, not real packets)
       const r = await pool.query(`SELECT
         COUNT(*)                                                                          AS total,
         COUNT(*) FILTER (WHERE source_ref IS NULL OR source_ref = '')                    AS missing_source_ref,
@@ -112,7 +113,8 @@ async function livePostgresCheck(validator) {
         COUNT(*) FILTER (WHERE packet_key IS NULL OR packet_key = '')                    AS missing_packet_key,
         COUNT(*) FILTER (WHERE summary IS NOT NULL AND LENGTH(summary) > 20)             AS with_summary,
         COUNT(DISTINCT feature_id)                                                        AS distinct_features
-        FROM atlas_packets`);
+        FROM atlas_packets
+        WHERE source_kind != 'unknown'`);
       const row = r.rows[0];
       const total = Number(row.total) || 0;
 

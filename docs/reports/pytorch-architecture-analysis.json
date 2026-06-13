@@ -1,0 +1,25 @@
+{
+  "components": {
+    "som": "configured",
+    "libtorch": "available",
+    "gpuGraph": "available",
+    "autoencoder": {
+      "sveltekit-frontend/src/lib/server/gpu/autoencoder-bridge.ts": {
+        "hasEncoder": true,
+        "exists": true,
+        "lines": 116,
+        "hasWeights": true,
+        "hasDecoder": true
+      },
+      "sveltekit-frontend/src/lib/server/gpu/autoencoder-session.ts": {
+        "hasEncoder": true,
+        "exists": true,
+        "lines": 115,
+        "hasWeights": false,
+        "hasDecoder": true
+      }
+    }
+  },
+  "timestamp": "2026-06-13T15:00:00.6873476-07:00",
+  "status": "READY FOR AE TRAINING"
+}

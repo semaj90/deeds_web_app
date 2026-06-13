@@ -1,0 +1,52 @@
+{
+  "ok": true,
+  "mode": "dry-run",
+  "generated_at": "2026-06-13T20:31:58.951Z",
+  "next_step": "node C:\\Users\\james\\Videos\\deeds-web-app\\scripts\\atlas\\index-ace-cache.mjs --apply",
+  "cache_config": {
+    "timestamp": "2026-06-13T20:31:58.944Z",
+    "version": "1.0",
+    "cache_strategy": {
+      "l0_redis_exact": {
+        "description": "Exact-match L1 cache (query hash)",
+        "ttl_seconds": 3600,
+        "estimated_entries": 1000
+      },
+      "l1_redis_semantic": {
+        "description": "Semantic L2 cache (Bifrost vector similarity)",
+        "ttl_seconds": 7200,
+        "estimated_entries": 500
+      },
+      "l2_bifrost": {
+        "description": "Bifrost semantic cache (cross-service)",
+        "ttl_seconds": 14400,
+        "threshold": 0.8
+      }
+    },
+    "packets_to_cache": 5,
+    "total_memory_estimate_kb": 15360,
+    "implementation_plan": {
+      "l0_redis": {
+        "strategy": "L0 Redis exact-match cache",
+        "key_pattern": "bifrost:packet:{packet_key}",
+        "ttl_seconds": 3600
+      },
+      "l1_redis_semantic": {
+        "strategy": "L1 Redis semantic cache via Bifrost",
+        "key_pattern": "bifrost:semantic:{hash}",
+        "ttl_seconds": 7200
+      },
+      "l2_bifrost": {
+        "strategy": "L2 Bifrost cross-service semantic cache",
+        "threshold": 0.8,
+        "ttl_seconds": 14400
+      }
+    }
+  },
+  "would_write": {
+    "redis": "ace:packet:* keys per cache_strategy",
+    "bifrost": "semantic cache for bifrost_eligible packets",
+    "postgres": "optional cache_metadata table",
+    "count": 5
+  }
+}

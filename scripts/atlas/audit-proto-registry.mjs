@@ -634,7 +634,43 @@ async function main() {
     }
   }
 
-  // ── 9. Final summary ───────────────────────────────────────────────────────
+  // ── 9. Write audit report (for packetization consumer) ──────────────────────
+  const auditReport = {
+    timestamp: new Date().toISOString(),
+    mode: APPLY ? 'apply' : 'dry-run',
+    proto_files_scanned: protoFiles.length,
+    services_found: uniqueServices.length,
+    rpc_methods: totalMethods,
+    postgres_written: pgInserted,
+    qdrant_written: qdrantOk,
+    redis_written: redisOk,
+    packets: packets.map(p => ({
+      service_name: p.service_name,
+      function_symbol: p.function_symbol,
+      summary: p.summary,
+      concept_ids: p.concept_ids,
+      directory_path: p.directory_path,
+      file_path: p.file_path,
+      source_ref: p.source_ref,
+      packet_key: p.packet_key,
+      qdrant_point_id: p.qdrant_point_id,
+      proto_package: p.proto_package,
+      input_type: p.input_type,
+      output_type: p.output_type,
+      rpc_kind: p.rpc_kind,
+      proto_file: p.proto_file,
+    })),
+  };
+
+  const { mkdirSync, writeFileSync } = await import('node:fs');
+  const reportDir = __dir + '/../../docs/reports';
+  mkdirSync(reportDir, { recursive: true });
+  writeFileSync(
+    reportDir + '/proto-registry-audit.json',
+    JSON.stringify(auditReport, null, 2)
+  );
+
+  // ── 10. Final summary ──────────────────────────────────────────────────────
   console.log('');
   console.log('--- Summary ---');
   console.log('  proto files scanned : ' + protoFiles.length);
@@ -643,6 +679,7 @@ async function main() {
   console.log('  postgres written    : ' + pgInserted);
   if (!NO_QDRANT) console.log('  qdrant written      : ' + qdrantOk);
   if (!NO_REDIS)  console.log('  redis written       : ' + redisOk);
+  console.log('  audit report        : docs/reports/proto-registry-audit.json');
   console.log('  DONE');
 }
 

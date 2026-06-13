@@ -15,14 +15,19 @@
  *   node scripts/atlas/seed-neo4j-used-concept-edges.mjs --dry-run --limit=25
  *   node scripts/atlas/seed-neo4j-used-concept-edges.mjs --apply
  *   node scripts/atlas/seed-neo4j-used-concept-edges.mjs --apply --limit=100
+ *   node scripts/atlas/seed-neo4j-used-concept-edges.mjs --safe-only --dry-run
+ *   node scripts/atlas/seed-neo4j-used-concept-edges.mjs --safe-only --apply
  *
  * Gate (USED_CONCEPT coverage):
  *   traces_with_edges / total_traces >= 0.95
+ *
+ * Lane 1B Extension:
+ *   --safe-only: Only seed concepts classified as "safe" by classify-supernode-pressure.mjs
  */
 
 import pg from 'pg';
 import neo4j from 'neo4j-driver';
-import { writeFileSync, mkdirSync } from 'node:fs';
+import { writeFileSync, mkdirSync, readFileSync, existsSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -37,17 +42,45 @@ const NEO4J_URI      = process.env.NEO4J_URI      || 'bolt://127.0.0.1:7687';
 const NEO4J_USER     = process.env.NEO4J_USER     || 'neo4j';
 const NEO4J_PASSWORD = process.env.NEO4J_PASSWORD || 'neo4j123';
 
-const APPLY     = process.argv.includes('--apply');
-const DRY_RUN   = !APPLY;
-const LIMIT_ARG = process.argv.find(a => a.startsWith('--limit='));
-const MAX_ROWS  = LIMIT_ARG ? parseInt(LIMIT_ARG.split('=')[1], 10) : Infinity;
-const VERBOSE   = process.argv.includes('--verbose');
+const APPLY      = process.argv.includes('--apply');
+const DRY_RUN    = !APPLY;
+const SAFE_ONLY  = process.argv.includes('--safe-only');
+const LIMIT_ARG  = process.argv.find(a => a.startsWith('--limit='));
+const MAX_ROWS   = LIMIT_ARG ? parseInt(LIMIT_ARG.split('=')[1], 10) : Infinity;
+const VERBOSE    = process.argv.includes('--verbose');
 const BATCH_SIZE = 50;
+
+// ── Load safe concepts list (Lane 1B) ──────────────────────────────────────
+
+function loadSafeConceptsList() {
+  if (!SAFE_ONLY) return null;
+
+  const classificationPath = join(ROOT, 'docs', 'reports', 'higher-hop-enrichment-classified.json');
+
+  if (!existsSync(classificationPath)) {
+    console.error(`\n❌ --safe-only requested but classification not found: ${classificationPath}`);
+    console.error(`   Run 'npm run atlas:classify-supernode-pressure --save' first.`);
+    process.exit(1);
+  }
+
+  try {
+    const content = readFileSync(classificationPath, 'utf-8');
+    const classification = JSON.parse(content);
+    const safeIds = new Set(
+      classification.classification.safe.concepts.map(c => c.concept_id)
+    );
+    return safeIds;
+  } catch (err) {
+    console.error(`\n❌ Cannot load classification: ${err.message}`);
+    process.exit(1);
+  }
+}
 
 // ── Main ─────────────────────────────────────────────────────────────────────
 
 async function main() {
   const pool = new Pool({ connectionString: DATABASE_URL });
+  const safeConceptsSet = loadSafeConceptsList();
 
   // ── 1. Load traces from Postgres ─────────────────────────────────────────
   const { rows: traces } = await pool.query(`
@@ -64,14 +97,27 @@ async function main() {
   await pool.end();
 
   const total = Math.min(traces.length, MAX_ROWS);
-  console.log(`\n═══ Seed Neo4j USED_CONCEPT Edges ${DRY_RUN ? '(dry-run)' : '(APPLY)'} ═══`);
+  const modeLabel = SAFE_ONLY ? '(safe-only)' : '';
+  console.log(`\n═══ Seed Neo4j USED_CONCEPT Edges ${DRY_RUN ? '(dry-run)' : '(APPLY)'} ${modeLabel} ═══`);
   console.log(`Traces with selected_concepts: ${traces.length}`);
   console.log(`Processing: ${total}`);
 
-  // Compute edge inventory for report
+  // Compute edge inventory for report (apply safe-only filter if needed)
   let totalEdges = 0;
   const conceptSet = new Set();
-  const traceRows = traces.slice(0, total);
+  let traceRows = traces.slice(0, total);
+
+  // Lane 1B: Filter to safe concepts only if requested
+  if (SAFE_ONLY && safeConceptsSet) {
+    console.log(`\nFiltering to safe concepts only: ${safeConceptsSet.size} concepts`);
+    for (const t of traceRows) {
+      const concepts = Array.isArray(t.selected_concepts) ? t.selected_concepts : [];
+      // Filter to only safe concepts
+      t.selected_concepts = concepts.filter(c => safeConceptsSet.has(c));
+    }
+    // Filter out traces with no remaining concepts after safe-only filter
+    traceRows = traceRows.filter(t => Array.isArray(t.selected_concepts) && t.selected_concepts.length > 0);
+  }
 
   for (const t of traceRows) {
     const concepts = t.selected_concepts;
@@ -88,8 +134,10 @@ async function main() {
   const report = {
     generated_at: new Date().toISOString(),
     mode: APPLY ? 'apply' : 'dry-run',
+    safe_only: SAFE_ONLY,
     total_traces_in_db: traces.length,
     traces_processed: total,
+    traces_after_safe_filter: traceRows.length,
     edges_planned: totalEdges,
     unique_concepts: [...conceptSet].sort(),
   };

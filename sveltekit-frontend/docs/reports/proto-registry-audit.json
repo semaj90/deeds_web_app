@@ -1,0 +1,198 @@
+{
+  "timestamp": "2026-06-13T21:53:24.168Z",
+  "total_files": 16,
+  "total_services": 10,
+  "total_methods": 69,
+  "services": [
+    {
+      "name": "AceRetrievalService",
+      "methods": [
+        "RecordRun",
+        "RecordHit"
+      ],
+      "file": "proto\\generated\\yorha_metadata.proto",
+      "package": "yorha.metadata.v1"
+    },
+    {
+      "name": "Analyzer",
+      "methods": [
+        "PushJSON",
+        "PushJSONStream",
+        "GetStatus"
+      ],
+      "file": "proto\\analyzer.proto",
+      "package": "analyzer"
+    },
+    {
+      "name": "CodeIntelService",
+      "methods": [
+        "BatchEnrich",
+        "BatchEnrichStream",
+        "UpsertChunks",
+        "Health"
+      ],
+      "file": "proto\\codeintel.proto",
+      "package": "codeintel.v1"
+    },
+    {
+      "name": "EmbeddingService",
+      "methods": [
+        "GenerateEmbeddings",
+        "StreamEmbeddings",
+        "Health",
+        "GetStats"
+      ],
+      "file": "proto\\embedding.proto",
+      "package": "embedding"
+    },
+    {
+      "name": "LegalAI",
+      "methods": [
+        "AnalyzeDocument",
+        "ExtractEntities",
+        "QueryCaselaw"
+      ],
+      "file": "proto\\legal.proto",
+      "package": "legal"
+    },
+    {
+      "name": "LibrarySearchService",
+      "methods": [
+        "SearchLibrary",
+        "StreamLibrary",
+        "GetDocumentToc",
+        "GetNodeContext",
+        "ResolveCitation",
+        "Health"
+      ],
+      "file": "proto\\active\\library_search.proto",
+      "package": "library.search"
+    },
+    {
+      "name": "LibrarySearchService",
+      "methods": [
+        "SearchLibrary",
+        "StreamLibrary",
+        "GetDocumentToc",
+        "GetNodeContext",
+        "ResolveCitation",
+        "Health"
+      ],
+      "file": "proto\\active\\library_search.proto",
+      "package": "library.search"
+    },
+    {
+      "name": "MetadataIndexService",
+      "methods": [
+        "UpsertEnvelope",
+        "UpsertRelation"
+      ],
+      "file": "proto\\generated\\yorha_metadata.proto",
+      "package": "yorha.metadata.v1"
+    },
+    {
+      "name": "RetrievalService",
+      "methods": [
+        "SearchEvidence",
+        "StreamEvidence",
+        "SearchCodebase",
+        "StreamCodebase",
+        "SearchChunks",
+        "GetClusterSummary",
+        "ExpandAstNeighbors",
+        "GetTopologyContext",
+        "GetResearchContext",
+        "Health"
+      ],
+      "file": "proto\\active\\retrieval.proto",
+      "package": "yorha.retrieval"
+    },
+    {
+      "name": "RetrievalService",
+      "methods": [
+        "SearchEvidence",
+        "StreamEvidence",
+        "SearchCodebase",
+        "StreamCodebase",
+        "SearchChunks",
+        "GetClusterSummary",
+        "ExpandAstNeighbors",
+        "GetTopologyContext",
+        "GetResearchContext",
+        "Health"
+      ],
+      "file": "proto\\retrieval.proto",
+      "package": "yorha.retrieval"
+    },
+    {
+      "name": "RetrievalService",
+      "methods": [
+        "SearchEvidence",
+        "StreamEvidence",
+        "SearchCodebase",
+        "StreamCodebase",
+        "SearchChunks",
+        "GetClusterSummary",
+        "ExpandAstNeighbors",
+        "GetTopologyContext",
+        "GetResearchContext",
+        "Health"
+      ],
+      "file": "proto\\active\\retrieval.proto",
+      "package": "yorha.retrieval"
+    },
+    {
+      "name": "TestService",
+      "methods": [
+        "Call"
+      ],
+      "file": "proto\\test-service.proto"
+    },
+    {
+      "name": "ToolRouter",
+      "methods": [
+        "CallTool",
+        "CallToolBatch",
+        "CallToolStream",
+        "ListTools"
+      ],
+      "file": "proto\\active\\tool_router.proto",
+      "package": "legal.agent.v1"
+    },
+    {
+      "name": "ToolRouter",
+      "methods": [
+        "CallTool",
+        "CallToolBatch",
+        "CallToolStream",
+        "ListTools"
+      ],
+      "file": "proto\\active\\tool_router.proto",
+      "package": "legal.agent.v1"
+    }
+  ],
+  "stats": {
+    "active_proto_count": 4,
+    "archived_proto_count": 12,
+    "active_files": [
+      "proto\\active\\evidence_metadata.proto",
+      "proto\\active\\library_search.proto",
+      "proto\\active\\retrieval.proto",
+      "proto\\active\\tool_router.proto"
+    ],
+    "archived_files": [
+      "proto\\active\\evidence_metadata.proto",
+      "proto\\active\\library_search.proto",
+      "proto\\active\\retrieval.proto",
+      "proto\\active\\tool_router.proto",
+      "proto\\analyzer.proto",
+      "proto\\codeintel.proto",
+      "proto\\embedding.proto",
+      "proto\\generated\\yorha_metadata.proto",
+      "proto\\legal.proto",
+      "proto\\legal_api.proto",
+      "proto\\retrieval.proto",
+      "proto\\test-service.proto"
+    ]
+  }
+}

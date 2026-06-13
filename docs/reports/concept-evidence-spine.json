@@ -1,0 +1,198 @@
+{
+  "version": "1.0",
+  "generated_at": "2026-06-13T20:31:59.086Z",
+  "concept_taxonomy": [
+    {
+      "concept_id": "infrastructure_foundation",
+      "label": "Infrastructure & Foundation",
+      "description": "Core infra: auth, DB, caching, storage",
+      "domains": [
+        "auth_lucia_sessions",
+        "database_orm_drizzle",
+        "cache_redis_valkey"
+      ],
+      "confidence": 1
+    },
+    {
+      "concept_id": "retrieval_search",
+      "label": "Retrieval & Search",
+      "description": "Vector search, RAG, semantic indexing",
+      "domains": [
+        "qdrant_vector_search",
+        "rag_context_assembly",
+        "bm25_full_text_search"
+      ],
+      "confidence": 1
+    },
+    {
+      "concept_id": "inference_generation",
+      "label": "Inference & Generation",
+      "description": "LLM inference, embeddings, text generation",
+      "domains": [
+        "ollama_gemma4_generation",
+        "embedding_pipeline_gemma",
+        "bifrost_semantic_cache"
+      ],
+      "confidence": 1
+    },
+    {
+      "concept_id": "gpu_acceleration",
+      "label": "GPU & Acceleration",
+      "description": "CUDA, LibTorch, tensor operations",
+      "domains": [
+        "gpu_batch_cosine_libtorch",
+        "gpu_som_clustering",
+        "gpu_pagerank"
+      ],
+      "confidence": 1
+    },
+    {
+      "concept_id": "graph_topology",
+      "label": "Graph & Topology",
+      "description": "Neo4j graph, topology analysis, relationships",
+      "domains": [
+        "neo4j_context_graph",
+        "graph_pagerank_scoring",
+        "topology_analysis"
+      ],
+      "confidence": 1
+    },
+    {
+      "concept_id": "api_routes",
+      "label": "API Routes",
+      "description": "SvelteKit API endpoints, request handling",
+      "domains": [
+        "api_health_check",
+        "api_search_routes",
+        "api_embedding_routes"
+      ],
+      "confidence": 0.95
+    },
+    {
+      "concept_id": "ui_components",
+      "label": "UI & Components",
+      "description": "Svelte 5 components, frontend logic",
+      "domains": [
+        "ui_components_shared",
+        "ui_forms_validation",
+        "ui_modals_dialogs"
+      ],
+      "confidence": 0.95
+    },
+    {
+      "concept_id": "testing_validation",
+      "label": "Testing & Validation",
+      "description": "Tests, gates, smoke validation",
+      "domains": [
+        "tests_smoke_harness",
+        "tests_unit_routes",
+        "tests_e2e_playwright"
+      ],
+      "confidence": 0.9
+    },
+    {
+      "concept_id": "admin_observability",
+      "label": "Admin & Observability",
+      "description": "Logging, monitoring, telemetry",
+      "domains": [
+        "admin_observability",
+        "langfuse_tracing",
+        "redis_analytics"
+      ],
+      "confidence": 0.9
+    },
+    {
+      "concept_id": "legal_domain",
+      "label": "Legal Domain Logic",
+      "description": "Case management, evidence, legal-specific features",
+      "domains": [
+        "case_management",
+        "evidence_processing",
+        "legal_reports"
+      ],
+      "confidence": 0.85
+    }
+  ],
+  "evidence_mapping": [
+    {
+      "concept_id": "infrastructure_foundation",
+      "evidence_packets": [
+        "foundation:c80bf84ecc516207",
+        "foundation:9469e575df721f7e",
+        "foundation:99b7aad4c3287efa"
+      ],
+      "evidence_count": 3,
+      "coverage": 1
+    },
+    {
+      "concept_id": "retrieval_search",
+      "evidence_packets": [
+        "retrieval:f8bd12c26ee39b43",
+        "retrieval:e753dd46b333bbe9"
+      ],
+      "evidence_count": 2,
+      "coverage": 1
+    },
+    {
+      "concept_id": "inference_generation",
+      "evidence_packets": [
+        "inference:41f06d7980644f77",
+        "inference:592a6e65983e7269"
+      ],
+      "evidence_count": 2,
+      "coverage": 1
+    },
+    {
+      "concept_id": "gpu_acceleration",
+      "evidence_packets": [
+        "gpu_acceleration:728c077fe1f6f7ce",
+        "gpu_acceleration:81a73a0a730ee4cd"
+      ],
+      "evidence_count": 2,
+      "coverage": 1
+    },
+    {
+      "concept_id": "graph_topology",
+      "evidence_packets": [],
+      "evidence_count": 0,
+      "coverage": 0
+    },
+    {
+      "concept_id": "api_routes",
+      "evidence_packets": [],
+      "evidence_count": 0,
+      "coverage": 0
+    },
+    {
+      "concept_id": "ui_components",
+      "evidence_packets": [],
+      "evidence_count": 0,
+      "coverage": 0
+    },
+    {
+      "concept_id": "testing_validation",
+      "evidence_packets": [],
+      "evidence_count": 0,
+      "coverage": 0
+    },
+    {
+      "concept_id": "admin_observability",
+      "evidence_packets": [],
+      "evidence_count": 0,
+      "coverage": 0
+    },
+    {
+      "concept_id": "legal_domain",
+      "evidence_packets": [],
+      "evidence_count": 0,
+      "coverage": 0
+    }
+  ],
+  "total_concepts": 10,
+  "total_evidence_packets": 9,
+  "ace_kag_dag_evidence": {
+    "ace_concepts": 10,
+    "kag_domains_covered": 10,
+    "dag_acyclic": true
+  }
+}

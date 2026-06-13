@@ -1,0 +1,94 @@
+{
+  "metadata": {
+    "generated_at": "2026-06-13T20:31:58.281Z",
+    "source_files": [
+      ".env",
+      ".env.local",
+      "sveltekit-frontend/.env",
+      "sveltekit-frontend/.env.local"
+    ],
+    "server_keys_found": 11,
+    "server_keys_required": 17,
+    "server_keys_missing": [
+      "POSTGRES_HOST",
+      "POSTGRES_PORT",
+      "QDRANT_API_KEY",
+      "LLAMA_SERVER_URL",
+      "TURBOVEC_GRPC_URL",
+      "XGBOOST_URL"
+    ],
+    "client_keys_found": 0,
+    "secrets_redacted": true
+  },
+  "payload": {
+    "keys": {
+      "DATABASE_URL": {
+        "present": true,
+        "scope": "server",
+        "is_secret": false,
+        "redacted_value": "postgresql:***@127.0.0.1:5434/legal_ai_db"
+      },
+      "POSTGRES_DB": {
+        "present": true,
+        "scope": "server",
+        "is_secret": false,
+        "redacted_value": "legal_ai_db"
+      },
+      "POSTGRES_USER": {
+        "present": true,
+        "scope": "server",
+        "is_secret": false,
+        "redacted_value": "legal_admin"
+      },
+      "POSTGRES_PASSWORD": {
+        "present": true,
+        "scope": "server",
+        "is_secret": true,
+        "redacted_value": "[REDACTED]"
+      },
+      "REDIS_HOST": {
+        "present": true,
+        "scope": "server",
+        "is_secret": false,
+        "redacted_value": "127.0.0.1"
+      },
+      "REDIS_PORT": {
+        "present": true,
+        "scope": "server",
+        "is_secret": false,
+        "redacted_value": "6379"
+      },
+      "REDIS_PASSWORD": {
+        "present": true,
+        "scope": "server",
+        "is_secret": true,
+        "redacted_value": "[REDACTED]"
+      },
+      "QDRANT_URL": {
+        "present": true,
+        "scope": "server",
+        "is_secret": false,
+        "redacted_value": "http://127.0.0.1:6333"
+      },
+      "TRACE_MCP_URL": {
+        "present": true,
+        "scope": "server",
+        "is_secret": false,
+        "redacted_value": "http://127.0.0.1:8788"
+      },
+      "TENSORRT_BRIDGE_NODE_PATH": {
+        "present": true,
+        "scope": "server",
+        "is_secret": false,
+        "redacted_value": "C:/Users/james/Videos/deeds-web-app/simd-bridge/cpp/build/Release/tensorrt_bridge.node"
+      },
+      "CUDA_VISIBLE_DEVICES": {
+        "present": true,
+        "scope": "server",
+        "is_secret": false,
+        "redacted_value": "0"
+      }
+    }
+  },
+  "ace_kag_dag_hits": []
+}

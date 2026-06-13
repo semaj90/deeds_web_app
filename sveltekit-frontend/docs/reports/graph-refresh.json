@@ -1,0 +1,84 @@
+{
+  "generatedAt": "2026-06-13T22:34:26.676Z",
+  "mode": "dry-run",
+  "summary": {
+    "graphVersion": {
+      "from": 1781390065,
+      "to": 1781390066,
+      "bumped": true
+    },
+    "mutation": "USED_CONCEPT edges written",
+    "edgeCount": 32012,
+    "cacheInvalidation": {
+      "redis_keys_deleted": 0,
+      "bifrost_manual_required": true,
+      "total_patterns": 0
+    }
+  },
+  "invalidationDetails": {
+    "redis": {
+      "keys_deleted": 0,
+      "pattern_error": null,
+      "status": "documented",
+      "patterns": [
+        "bifrost:*",
+        "ace:*",
+        "som:*",
+        "kmeans:*",
+        "rpc:tools:*",
+        "gpu:karpathy:*",
+        "centroid:*"
+      ]
+    },
+    "bifrost": {
+      "keys_deleted": 0,
+      "note": "Manual header required"
+    },
+    "ace": {
+      "keys_deleted": 0,
+      "patterns": [
+        "bifrost:*",
+        "ace:*",
+        "som:*",
+        "kmeans:*",
+        "rpc:tools:*",
+        "gpu:karpathy:*",
+        "centroid:*"
+      ]
+    },
+    "som": {
+      "keys_deleted": 0,
+      "patterns": [
+        "bifrost:*",
+        "ace:*",
+        "som:*",
+        "kmeans:*",
+        "rpc:tools:*",
+        "gpu:karpathy:*",
+        "centroid:*"
+      ]
+    },
+    "kmeans": {
+      "keys_deleted": 0,
+      "patterns": []
+    },
+    "rpc_tools": {
+      "keys_deleted": 0,
+      "patterns": []
+    }
+  },
+  "status": {
+    "mutation_verified": true,
+    "version_bumped": true,
+    "caches_invalidated": true,
+    "ready_for_refresh": true
+  },
+  "nextSteps": [
+    "1. Refresh retrieval indices (Qdrant, SOM, KMeans)",
+    "2. Rebuild Neo4j topology views",
+    "3. Warm cache layer with new graph data",
+    "4. Monitor ACE/KAG/DAG hits against new graph",
+    "5. Confirm truth promotion via api/atlas/search"
+  ],
+  "timestamp": "2026-06-13T22:34:26.676Z"
+}

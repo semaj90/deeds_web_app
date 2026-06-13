@@ -238,7 +238,7 @@
   "producer": "graph-refresh",
   "source": "docs/graph/codebase-graph.json",
   "status": "ok",
-  "promotionState": "promoted",
+  "promotionState": "generated",
   "atlasGate": {
     "total": 17414,
     "withSourceRef": 8761,
@@ -253,5 +253,6 @@
   },
   "generator": "scripts/atlas/write-graph-refresh-manifest.mjs",
   "notes": "Read from docs/graph/codebase-graph.json",
-  "promoted_at": "2026-06-13T15:01:22.366Z"
+  "invalidated_at": "2026-06-13T21:45:10.445Z",
+  "invalidation_reason": "xgboost gate-pass: NDCG@10=0.957"
 }

@@ -1,0 +1,40 @@
+{
+  "timestamp": "2026-06-13T22:03:11.296Z",
+  "inventory": {
+    "timestamp": "2026-06-13T22:03:11.299Z",
+    "summary": {
+      "ts_js_files": 0,
+      "python_files": 0,
+      "cpp_files": 0,
+      "model_checkpoints": 3,
+      "native_bindings": 0,
+      "errors": 0
+    },
+    "sourceCodeRefs": {},
+    "categories": {
+      "docker\\langgraph-synthesis\\.venv\\Lib\\site-packages\\distutils-precedence.pth": {
+        "type": "model_checkpoint",
+        "size": 151,
+        "mtime": 1776361363568.2227
+      },
+      "docker\\langgraph-synthesis\\.venv\\Lib\\site-packages\\pywin32.pth": {
+        "type": "model_checkpoint",
+        "size": 185,
+        "mtime": 1776368314030.5835
+      },
+      "docker\\docling-vlm\\models\\yolov8x.pt": {
+        "type": "model_checkpoint",
+        "size": 136890692,
+        "mtime": 1776373067730.758
+      }
+    },
+    "errors": []
+  },
+  "gates": {
+    "ts_js_files_found": false,
+    "cpp_files_found": false,
+    "source_refs_found": false,
+    "no_critical_errors": true
+  },
+  "ready_for_analysis": false
+}

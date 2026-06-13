@@ -1,0 +1,76 @@
+{
+  "ok": true,
+  "mode": "dry-run",
+  "generated_at": "2026-06-13T20:31:59.160Z",
+  "next_step": "node C:\\Users\\james\\Videos\\deeds-web-app\\scripts\\atlas\\index-concept-evidence-spine.mjs --apply",
+  "index_plan": {
+    "concepts_to_index": 10,
+    "evidence_packets_to_link": 9,
+    "verification_gates": {
+      "concept_count": "PASS",
+      "evidence_coverage": "PASS",
+      "ace_consistency": "PASS"
+    }
+  },
+  "would_write": {
+    "postgres": [
+      "concept_taxonomy (10 rows)",
+      "concept_evidence_mapping (10 rows)",
+      "packet_concept_links (variable)"
+    ],
+    "neo4j": "USED_CONCEPT edges (already seeded)",
+    "count": 10
+  },
+  "concepts_by_coverage": [
+    {
+      "concept_id": "infrastructure_foundation",
+      "evidence_count": 3,
+      "coverage": 1
+    },
+    {
+      "concept_id": "retrieval_search",
+      "evidence_count": 2,
+      "coverage": 1
+    },
+    {
+      "concept_id": "inference_generation",
+      "evidence_count": 2,
+      "coverage": 1
+    },
+    {
+      "concept_id": "gpu_acceleration",
+      "evidence_count": 2,
+      "coverage": 1
+    },
+    {
+      "concept_id": "graph_topology",
+      "evidence_count": 0,
+      "coverage": 0
+    },
+    {
+      "concept_id": "api_routes",
+      "evidence_count": 0,
+      "coverage": 0
+    },
+    {
+      "concept_id": "ui_components",
+      "evidence_count": 0,
+      "coverage": 0
+    },
+    {
+      "concept_id": "testing_validation",
+      "evidence_count": 0,
+      "coverage": 0
+    },
+    {
+      "concept_id": "admin_observability",
+      "evidence_count": 0,
+      "coverage": 0
+    },
+    {
+      "concept_id": "legal_domain",
+      "evidence_count": 0,
+      "coverage": 0
+    }
+  ]
+}

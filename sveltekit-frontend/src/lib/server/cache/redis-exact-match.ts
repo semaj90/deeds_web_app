@@ -41,6 +41,34 @@ export interface CachedLLMResponse {
 	hyperedgeGrade?: string;       // A/B/C/D from run-hypergraph.ts
 }
 
+/**
+ * Provenance tuple metadata exposed on exact-match cache hits.
+ * Allows Gemma4/OpenCode to consume compact packets without re-summarizing.
+ * Immutable and stored alongside cached content.
+ */
+export interface CacheProvenanceTuple {
+	// Identity
+	packet_key: string;            // Stable packet identity
+	feature_id: string;            // Domain classification
+	source_ref: string;            // Code location (file/function)
+
+	// Retrieval context
+	retrieved_at: string;          // ISO timestamp of original retrieval
+	retrieved_from: string;        // 'redis' | 'qdrant' | 'postgres' | 'hyperrag'
+	retrieval_confidence: number;  // 0.95 (redis) → 0.2 (rg)
+	retrieval_latency_ms: number;  // Time to fetch original packet
+
+	// Graph/topology metadata
+	community_id?: string;         // Cluster membership
+	som_cluster?: number;          // Self-organizing map position
+	graph_neighbors?: string[];    // Neo4j relationships
+
+	// Quality signals (no re-computation needed)
+	ace_confidence?: number;       // ACE context scoring
+	kag_aligned?: boolean;         // Knowledge-augmented generation fit
+	dag_reachable?: boolean;       // Reachable via task DAG
+}
+
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
 /** Per-call parser injection — simdjson when bulk threshold trips, else V8. */
@@ -222,6 +250,115 @@ export async function setExactMatchCacheBatch(
 		console.log(`[Redis Exact-Match] pipeline SET ${entries.length} keys ttl=${ttlSeconds}s`);
 	} catch (err) {
 		console.error('[Redis Exact-Match] pipeline SET error (non-fatal):', (err as Error)?.message ?? err);
+	}
+}
+
+// ── Exact-Match with Provenance (for Gemma4/OpenCode compact consumption) ──────
+
+/**
+ * Get exact-match cache response WITH immutable provenance tuple.
+ * Allows Gemma4/OpenCode agents to consume compact packets without re-summarizing.
+ *
+ * Use case: OpenCode needs packet_key + feature_id + source_ref without rerunning
+ * full retrieval pipeline.  The provenance tuple carries all necessary metadata.
+ *
+ * @returns {response, provenance} or null if cache miss
+ */
+export async function getExactMatchCacheWithProvenance(
+	cacheKey: string,
+	provenanceKey?: string  // Optional separate provenance key (default: cacheKey + ':prov')
+): Promise<{
+	response: CachedLLMResponse;
+	provenance: CacheProvenanceTuple;
+} | null> {
+	try {
+		const redis = getRedis();
+		const actualProvenanceKey = provenanceKey || `${cacheKey}:prov`;
+
+		// Single pipelined fetch for response + provenance
+		const pipeline = redis.pipeline();
+		pipeline.get(cacheKey);
+		pipeline.get(actualProvenanceKey);
+		const results = await pipeline.exec();
+
+		const [responseErr, responseStr] = results?.[0] ?? [];
+		const [provenanceErr, provenanceStr] = results?.[1] ?? [];
+
+		if (responseErr || !responseStr) return null;
+
+		const response = parseEntry(responseStr, cacheKey);
+		if (!response) return null;
+
+		// Provenance is optional (graceful if missing)
+		let provenance: CacheProvenanceTuple | null = null;
+		if (provenanceStr && !provenanceErr) {
+			try {
+				provenance = JSON.parse(provenanceStr) as CacheProvenanceTuple;
+			} catch {
+				console.warn(`[Redis Exact-Match] Failed to parse provenance for ${cacheKey}`);
+			}
+		}
+
+		// Return response + provenance (provenance may be null, that's OK)
+		if (provenance) {
+			return { response, provenance };
+		}
+
+		// Graceful degradation: response without provenance
+		return {
+			response,
+			provenance: {
+				packet_key: 'unknown',
+				feature_id: 'unknown',
+				source_ref: 'unknown',
+				retrieved_at: response.cachedAt,
+				retrieved_from: 'redis',
+				retrieval_confidence: 0.95,
+				retrieval_latency_ms: 2
+			}
+		};
+	} catch (err) {
+		console.error('[Redis Exact-Match] getWithProvenance error:', (err as Error)?.message ?? err);
+		return null;
+	}
+}
+
+/**
+ * Store LLM response WITH provenance tuple (immutable).
+ * Fire-and-forget, errors logged but not thrown.
+ */
+export async function setExactMatchCacheWithProvenance(
+	cacheKey: string,
+	response: Omit<CachedLLMResponse, 'cachedAt'>,
+	provenance: CacheProvenanceTuple,
+	ttlSeconds = DEFAULT_TTL_SECONDS,
+	provenanceKey?: string
+): Promise<void> {
+	try {
+		const redis = getRedis();
+		const actualProvenanceKey = provenanceKey || `${cacheKey}:prov`;
+		const now = new Date().toISOString();
+
+		// Pipelined SET for response + provenance in one round-trip
+		const pipeline = redis.pipeline();
+
+		// Response with cachedAt
+		const payload: CachedLLMResponse = { ...response, cachedAt: now };
+		pipeline.set(cacheKey, JSON.stringify(payload), 'EX', ttlSeconds);
+
+		// Provenance with same TTL (immutable, never expires before response)
+		const provenanceWithTimestamp = { ...provenance, cached_at: now };
+		pipeline.set(actualProvenanceKey, JSON.stringify(provenanceWithTimestamp), 'EX', ttlSeconds);
+
+		await pipeline.exec();
+
+		console.log(
+			`[Redis Exact-Match] SET+PROV key=${cacheKey.slice(-8)} ` +
+			`packet=${provenance.packet_key} feature=${provenance.feature_id} ttl=${ttlSeconds}s`
+		);
+	} catch (err) {
+		console.error('[Redis Exact-Match] setWithProvenance error (non-fatal):', (err as Error)?.message ?? err);
+		// Don't throw — cache write failures should not break inference
 	}
 }
 

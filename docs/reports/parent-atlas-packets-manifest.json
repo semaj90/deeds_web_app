@@ -1,0 +1,95 @@
+{
+  "version": "1.0",
+  "generated_at": "2026-06-13T20:31:58.577Z",
+  "total_packets_planned": 9,
+  "stages": [
+    {
+      "name": "foundation",
+      "description": "Core infrastructure packets (auth, DB, cache)",
+      "packets": [
+        {
+          "packet_kind": "foundation",
+          "feature_id": "auth_lucia_sessions",
+          "source_ref": "sveltekit-frontend/src/lib/server/auth",
+          "description": "Lucia session management and auth flow",
+          "packet_key": "foundation:c80bf84ecc516207"
+        },
+        {
+          "packet_kind": "foundation",
+          "feature_id": "database_orm_drizzle",
+          "source_ref": "sveltekit-frontend/src/lib/server/db",
+          "description": "Drizzle ORM schema and database client",
+          "packet_key": "foundation:9469e575df721f7e"
+        },
+        {
+          "packet_kind": "foundation",
+          "feature_id": "cache_redis_valkey",
+          "source_ref": "sveltekit-frontend/src/lib/server/redis.ts",
+          "description": "Redis/Valkey caching layer and TTL policies",
+          "packet_key": "foundation:99b7aad4c3287efa"
+        }
+      ]
+    },
+    {
+      "name": "retrieval",
+      "description": "Vector search and RAG pipeline packets",
+      "packets": [
+        {
+          "packet_kind": "retrieval",
+          "feature_id": "qdrant_vector_search",
+          "source_ref": "sveltekit-frontend/src/lib/server/vector",
+          "description": "Qdrant ANN search and payload enrichment",
+          "packet_key": "retrieval:f8bd12c26ee39b43"
+        },
+        {
+          "packet_kind": "retrieval",
+          "feature_id": "rag_context_assembly",
+          "source_ref": "sveltekit-frontend/src/lib/server/ace",
+          "description": "ACE/KAG context assembly and ranking",
+          "packet_key": "retrieval:e753dd46b333bbe9"
+        }
+      ]
+    },
+    {
+      "name": "inference",
+      "description": "LLM and embedding inference packets",
+      "packets": [
+        {
+          "packet_kind": "inference",
+          "feature_id": "ollama_gemma4_generation",
+          "source_ref": "sveltekit-frontend/src/lib/server/ollama.ts",
+          "description": "Ollama Gemma4 text generation with Bifrost cache",
+          "packet_key": "inference:41f06d7980644f77"
+        },
+        {
+          "packet_kind": "inference",
+          "feature_id": "embedding_pipeline_gemma",
+          "source_ref": "sveltekit-frontend/src/lib/server/embeddings",
+          "description": "Embedding generation with fallback cascade",
+          "packet_key": "inference:592a6e65983e7269"
+        }
+      ]
+    },
+    {
+      "name": "gpu_acceleration",
+      "description": "CUDA and GPU-accelerated compute packets",
+      "packets": [
+        {
+          "packet_kind": "gpu_acceleration",
+          "feature_id": "gpu_batch_cosine_libtorch",
+          "source_ref": "sveltekit-frontend/src/lib/server/gpu/libtorch-bridge.ts",
+          "description": "LibTorch CUDA batch cosine similarity",
+          "packet_key": "gpu_acceleration:728c077fe1f6f7ce"
+        },
+        {
+          "packet_kind": "gpu_acceleration",
+          "feature_id": "gpu_som_clustering",
+          "source_ref": "sveltekit-frontend/src/lib/server/gpu/som-topology.ts",
+          "description": "Self-Organizing Map clustering on GPU",
+          "packet_key": "gpu_acceleration:81a73a0a730ee4cd"
+        }
+      ]
+    }
+  ],
+  "ace_kag_dag_evidence": []
+}

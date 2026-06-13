@@ -1,0 +1,98 @@
+{
+  "mode": "dry-run",
+  "timestamp": "2026-06-13T20:14:29.592Z",
+  "total_edges_to_seed": 3601,
+  "seeding_plan": [
+    {
+      "name": "USES_TYPE",
+      "type": "FEATURE_DEPENDENCY",
+      "bound": {
+        "max_depth": 2,
+        "max_fanout": 5
+      },
+      "source": "Feature",
+      "target": "Type",
+      "direction": "FORWARD",
+      "conditions": "confidence >= 0.75",
+      "estimated_edges": 450,
+      "description": "Features → Types (schema usage)"
+    },
+    {
+      "name": "SAME_MODULE",
+      "type": "SAME_MODULE",
+      "bound": {
+        "max_depth": 1,
+        "max_fanout": 10
+      },
+      "source": "Function",
+      "target": "Function",
+      "direction": "FORWARD",
+      "conditions": "same_module = true AND confidence >= 0.8",
+      "estimated_edges": 320,
+      "description": "Intra-module function references"
+    },
+    {
+      "name": "CONCEPT_USAGE",
+      "type": "CONCEPT_USAGE",
+      "bound": {
+        "max_depth": 2,
+        "max_fanout": 3
+      },
+      "source": "Packet",
+      "target": "Concept",
+      "direction": "FORWARD",
+      "conditions": "confidence >= 0.70",
+      "estimated_edges": 2250,
+      "description": "Packets → Concepts (semantic)"
+    },
+    {
+      "name": "TOPOLOGY_NEIGHBOR",
+      "type": "CONTEXT_EXPANSION",
+      "bound": {
+        "max_depth": 3,
+        "max_fanout": 3
+      },
+      "source": "Directory",
+      "target": "Directory",
+      "direction": "BIDIRECTIONAL",
+      "conditions": "som_distance = 1 (adjacent in SOM grid)",
+      "estimated_edges": 280,
+      "description": "SOM topology adjacency edges"
+    },
+    {
+      "name": "USES_PACKAGE",
+      "type": "FEATURE_DEPENDENCY",
+      "bound": {
+        "max_depth": 2,
+        "max_fanout": 5
+      },
+      "source": "Feature",
+      "target": "Package",
+      "direction": "FORWARD",
+      "conditions": "confidence >= 0.8",
+      "estimated_edges": 156,
+      "description": "Features → External packages"
+    },
+    {
+      "name": "GLOBAL_SINK",
+      "type": "GLOBAL_BASE_REFS",
+      "bound": {
+        "max_depth": 1,
+        "max_fanout": 2
+      },
+      "source": "Module",
+      "target": "Schema|Cache",
+      "direction": "FORWARD",
+      "conditions": "relationship_type IN [\"USES_SCHEMA\", \"USES_REDIS\"]",
+      "estimated_edges": 145,
+      "description": "Global base references (schema, cache sinks)"
+    }
+  ],
+  "next_step": "node scripts/atlas/seed-neo4j-bounded-khop.mjs --apply",
+  "validation_notes": [
+    "All relationship types respect K_HOP_BOUNDS",
+    "Fanout limits prevent supernode expansion",
+    "Conditions filter by confidence threshold",
+    "GLOBAL_BASE_REFS limited to 1-hop (schema sinks)"
+  ]
+}

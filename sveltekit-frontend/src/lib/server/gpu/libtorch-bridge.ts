@@ -187,21 +187,24 @@ let loadAttempted = false;
 
 /** Add LibTorch + cuDNN DLL directories to PATH so the addon can find its dependencies */
 function ensureLibtorchInPath(): void {
+	// WSL/bash paths already have CUDA/CUDNN in $PATH via /c/ style entries
+	const isWSLBash = process.platform !== 'win32' && process.env.PATH?.includes('/c/');
+	if (isWSLBash) {
+		console.log(`[libtorch-bridge] WSL detected; CUDA/CUDNN already in PATH`);
+		return;
+	}
+
 	const libDirs = [
     resolve(process.cwd(), '../libtorch-win-shared-with-deps-2.9.0+cu130/libtorch/lib'),
     'C:/libtorch-win-shared-with-deps-2.9.0+cu130/libtorch/lib',
-    '/c/libtorch-win-shared-with-deps-2.9.0+cu130/libtorch/lib',
     '/mnt/c/libtorch-win-shared-with-deps-2.9.0+cu130/libtorch/lib',
-    '/mnt/c/libtorch/lib',
     '/usr/local/libtorch/lib',
     '/opt/libtorch/lib',
     '/usr/local/lib',
   ];
 	const cudnnDirs = [
     'C:/Program Files/NVIDIA/CUDNN/v9.16/bin/13.0',
-    '/c/Program Files/NVIDIA/CUDNN/v9.16/bin/13.0',
     'C:/Program Files/NVIDIA/CUDNN/v9.8/bin/12.8',
-    '/c/Program Files/NVIDIA/CUDNN/v9.8/bin/12.8',
     '/mnt/c/Program Files/NVIDIA/CUDNN/v9.16/bin/13.0',
     '/mnt/c/Program Files/NVIDIA/CUDNN/v9.8/bin/12.8',
     '/usr/local/cuda-13.0/lib64',
@@ -213,9 +216,7 @@ function ensureLibtorchInPath(): void {
 	// Without these on PATH the addon loads but checkCudaAvailable() returns 0.
 	const cudaBinDirs = [
     'C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v13.0/bin',
-    '/c/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v13.0/bin',
     'C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.8/bin',
-    '/c/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.8/bin',
     'C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.1/bin',
     '/mnt/c/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v13.0/bin',
     '/mnt/c/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.8/bin',

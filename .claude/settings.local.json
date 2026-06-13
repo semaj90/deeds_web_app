@@ -466,7 +466,10 @@
       "Bash(ls models/*.pt models/*.plan)",
       "Bash(ls docs/reports/packet-latents* docs/reports/som-20x20* docs/reports/atlas-centroids*)",
       "Bash(mkdir -p models logs/atlas)",
-      "Bash(npm run *)"
+      "Bash(npm run *)",
+      "PowerShell($started = $false; for \\($i = 0; $i -lt 30; $i++\\) { Start-Sleep 1; try { $res = Invoke-WebRequest http://localhost:5173 -ErrorAction SilentlyContinue; if \\($res.StatusCode -eq 200\\) { $started = $true; break } } catch {} }; if \\($started\\) { \"✅ Dev server ready at localhost:5173\" } else { \"❌ Dev server did not start within 30s\" })",
+      "Read(//c/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/server/hyperrag//**)",
+      "Read(//c/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/server/hyperrag/**)"
     ],
     "deny": [],
     "ask": []

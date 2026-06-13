@@ -1,0 +1,106 @@
+{
+  "timestamp": "2026-06-13T20:14:22.267Z",
+  "total_supernodes": 5,
+  "critical_count": 2,
+  "high_count": 3,
+  "supernodes": [
+    {
+      "node_id": "src/lib/server/db/client.ts",
+      "label": "Database Client",
+      "type": "MODULE",
+      "in_degree": 47,
+      "out_degree": 12,
+      "total_degree": 59,
+      "risk_level": "HIGH",
+      "k_hop_expansion_2": 564,
+      "k_hop_expansion_3": 6768,
+      "recommendation": "Bound fanout to 5; use neighborhood filters"
+    },
+    {
+      "node_id": "src/lib/server/qdrant-manager.ts",
+      "label": "Qdrant Manager",
+      "type": "MODULE",
+      "in_degree": 34,
+      "out_degree": 28,
+      "total_degree": 62,
+      "risk_level": "HIGH",
+      "k_hop_expansion_2": 952,
+      "k_hop_expansion_3": 26656,
+      "recommendation": "Implement cached k-hop results; use precomputed paths"
+    },
+    {
+      "node_id": "src/lib/server/cache.ts",
+      "label": "Cache Layer",
+      "type": "MODULE",
+      "in_degree": 56,
+      "out_degree": 8,
+      "total_degree": 64,
+      "risk_level": "CRITICAL",
+      "k_hop_expansion_2": 448,
+      "k_hop_expansion_3": 3584,
+      "recommendation": "CRITICAL: Cache layer is central hub; strictly bound to 3-hop max"
+    },
+    {
+      "node_id": "sveltekit-frontend/src/lib/server/db/schema-postgres.ts",
+      "label": "Schema Definitions",
+      "type": "MODULE",
+      "in_degree": 89,
+      "out_degree": 0,
+      "total_degree": 89,
+      "risk_level": "CRITICAL",
+      "k_hop_expansion_2": 89,
+      "k_hop_expansion_3": 89,
+      "recommendation": "CRITICAL: Schema is sink; all tables reference it. Use direct edge filtering, no k-hop"
+    },
+    {
+      "node_id": "src/lib/server/redis.ts",
+      "label": "Redis Singleton",
+      "type": "MODULE",
+      "in_degree": 42,
+      "out_degree": 15,
+      "total_degree": 57,
+      "risk_level": "HIGH",
+      "k_hop_expansion_2": 630,
+      "k_hop_expansion_3": 9450,
+      "recommendation": "Implement request-scoped client pooling; avoid k-hop queries"
+    }
+  ],
+  "mitigation_strategies": [
+    "Fanout bounding (max_depth=3, max_fanout=5)",
+    "Precomputed path caching",
+    "Edge filtering on confidence thresholds",
+    "Neighborhood culling for >100 neighbors",
+    "Neo4j query timeout enforcement (30s)"
+  ],
+  "recommended_kHop_bounds": {
+    "direct_reference": {
+      "max_depth": 0,
+      "max_fanout": null
+    },
+    "same_module": {
+      "max_depth": 1,
+      "max_fanout": 10
+    },
+    "feature_dependency": {
+      "max_depth": 2,
+      "max_fanout": 5
+    },
+    "concept_usage": {
+      "max_depth": 2,
+      "max_fanout": 3
+    },
+    "context_expansion": {
+      "max_depth": 3,
+      "max_fanout": 3
+    },
+    "global_base_refs": {
+      "max_depth": 1,
+      "max_fanout": 2
+    }
+  },
+  "gate_status": {
+    "critical_contained": "PASS",
+    "high_risk_counted": "WARN",
+    "mitigation_plan_exists": "PASS"
+  }
+}

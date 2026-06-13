@@ -1,0 +1,99 @@
+{
+  "generated_at": "2026-06-13T21:35:48.682Z",
+  "checks": {
+    "turbovec_http": {
+      "available": false,
+      "error": "fetch failed"
+    },
+    "qdrant_http": {
+      "available": false,
+      "status": 404,
+      "statusText": "Not Found"
+    },
+    "tensorrt_bridge": {
+      "exists": false,
+      "error": "ENOENT: no such file or directory, stat 'C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\simd-bridge\\cpp\\build\\Release\\tensorrt_bridge.node'"
+    },
+    "cuvs_library": {
+      "available": false,
+      "path": "/usr/local/cuda/lib64/libcuvs.so",
+      "note": "cuVS may not be installed or not in expected location"
+    },
+    "qdrant_collection": {
+      "available": true,
+      "points_count": 54788,
+      "vectors_count": 0,
+      "config": {
+        "params": {
+          "vectors": {
+            "content": {
+              "size": 768,
+              "distance": "Cosine"
+            },
+            "encoded_64": {
+              "size": 64,
+              "distance": "Cosine"
+            },
+            "error": {
+              "size": 768,
+              "distance": "Cosine"
+            },
+            "signature": {
+              "size": 768,
+              "distance": "Cosine"
+            }
+          },
+          "shard_number": 1,
+          "replication_factor": 1,
+          "write_consistency_factor": 1,
+          "on_disk_payload": true
+        },
+        "hnsw_config": {
+          "m": 16,
+          "ef_construct": 100,
+          "full_scan_threshold": 10000,
+          "max_indexing_threads": 0,
+          "on_disk": false
+        },
+        "optimizer_config": {
+          "deleted_threshold": 0.2,
+          "vacuum_min_vector_number": 1000,
+          "default_segment_number": 0,
+          "max_segment_size": null,
+          "memmap_threshold": null,
+          "indexing_threshold": 20000,
+          "flush_interval_sec": 5,
+          "max_optimization_threads": null
+        },
+        "wal_config": {
+          "wal_capacity_mb": 32,
+          "wal_segments_ahead": 0,
+          "wal_retain_closed": 1
+        },
+        "quantization_config": {
+          "scalar": {
+            "type": "int8",
+            "always_ram": true
+          }
+        },
+        "strict_mode_config": {
+          "enabled": false
+        }
+      }
+    },
+    "payload_structure": {
+      "available": false
+    }
+  },
+  "blockers": [
+    "TurboVec sidecar not available at :50062",
+    "Qdrant not available at :6333"
+  ],
+  "warnings": [
+    "tensorrt_bridge.node addon not found (optional)",
+    "cuVS library not found (optional, for GPU compression)",
+    "Could not verify payload structure (collection may be empty)"
+  ],
+  "readiness_score": 15,
+  "gates_pass": false
+}

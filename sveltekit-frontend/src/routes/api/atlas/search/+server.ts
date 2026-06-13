@@ -451,7 +451,7 @@ function buildCascadeScore(
   const conceptOverlap = jaccard(queryConceptIds, packetConcepts);
   const sameFeature    = queryConceptIds.includes(String(p.feature_id ?? '')) ? 1 : 0;
   const pagerank       = karpathyScores.get(String(p.source_ref ?? '')) ?? 0;
-  const rewardNorm     = Math.min(1.0, Number(p.reward_prior ?? 0) / 10);
+  const rewardNorm     = Number(p.reward_prior ?? 0);
 
   // GAP 2: composite freshness from payload (stored) + Redis (Bifrost temporal)
   //        + reward + git decay. Stays neutral (0.5) when parts are missing so

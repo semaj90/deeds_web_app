@@ -1,61 +1,64 @@
 # Deep Import Graph - Phase A
-Generated: 2026-06-13T15:36:58.392Z
+Generated: 2026-06-13T22:33:37.621Z
 
 ## Stats
 | Metric | Value |
 |--------|-------|
-| Nodes | 23740 |
-| Total edges | 37809 |
-| Resolved edges | 5232 |
-| Unresolved (local) | 3028 |
-| External refs | 29234 |
-| Neighborhoods computed | 100 |
-| Test-covered files | 896 |
+| Nodes | 40553 |
+| Total edges | 83455 |
+| Resolved edges | 10095 |
+| Unresolved (local) | 7978 |
+| External refs | 64595 |
+| Neighborhoods computed | 99 |
+| Test-covered files | 987 |
 
 ## Zone Breakdown
 | Zone | Count |
 |------|-------|
-| shared | 16982 |
-| script | 5285 |
-| test | 1238 |
-| types | 215 |
-| config | 20 |
+| shared | 30147 |
+| script | 6315 |
+| test | 3364 |
+| types | 595 |
+| config | 60 |
+| server | 52 |
+| route | 14 |
+| client | 6 |
 
 ## Edge Type Breakdown
 | Type | Count |
 |------|-------|
-| imports_static | 28169 |
-| test_covers_file | 3937 |
-| redis_dependency | 1659 |
-| imports_dynamic | 1242 |
-| qdrant_dependency | 917 |
-| exports_from | 507 |
-| neo4j_dependency | 426 |
-| mcp_tool_calls | 363 |
-| env_dependency | 357 |
-| db_dependency | 231 |
-| svelte_route_uses_loader | 1 |
+| imports_static | 59204 |
+| test_covers_file | 10260 |
+| redis_dependency | 3743 |
+| imports_dynamic | 3348 |
+| qdrant_dependency | 2167 |
+| exports_from | 1337 |
+| neo4j_dependency | 1032 |
+| mcp_tool_calls | 915 |
+| env_dependency | 887 |
+| db_dependency | 559 |
+| svelte_route_uses_loader | 3 |
 
 ## Top 20 Coupling Hotspots (directFanIn)
 | Rank | File | Zone | FanIn | FanOut |
 |------|------|------|-------|--------|
 | 1 | `claude-mem/src/utils/logger.ts` | shared | 178 | 1 |
-| 2 | `scripts/atlas/_atlas-utils.mjs` | script | 98 | 0 |
-| 3 | `scripts/atlas/_atlas-utils.mjs` | script | 98 | 0 |
-| 4 | `sveltekit-frontend/tests/helpers/env-ports.ts` | shared | 78 | 0 |
-| 5 | `sveltekit-frontend/src/lib/server/db/client.ts` | shared | 77 | 5 |
-| 6 | `claude-mem/src/shared/paths.ts` | shared | 57 | 2 |
-| 7 | `scripts/atlas/connection-config.mjs` | script | 47 | 0 |
-| 8 | `scripts/atlas/connection-config.mjs` | script | 47 | 0 |
-| 9 | `sveltekit-frontend/src/lib/server/redis.js` | shared | 42 | 2 |
-| 10 | `sveltekit-frontend/src/lib/server/env.server.ts` | shared | 40 | 0 |
-| 11 | `claude-mem/src/shared/SettingsDefaultsManager.ts` | shared | 37 | 0 |
-| 12 | `scripts/atlas/_neschrom-paths.mjs` | script | 36 | 0 |
-| 13 | `scripts/atlas/_neschrom-paths.mjs` | script | 36 | 0 |
-| 14 | `sveltekit-frontend/src/lib/server/db/schema-postgres.ts` | shared | 28 | 5 |
-| 15 | `sveltekit-frontend/tests/e2e/route-forensic/_helpers.ts` | shared | 27 | 1 |
-| 16 | `scripts/error-resolution/types.ts` | script | 24 | 0 |
-| 17 | `scripts/error-resolution/types.ts` | script | 24 | 0 |
-| 18 | `claude-mem/src/services/worker-types.ts` | types | 22 | 1 |
-| 19 | `sveltekit-frontend/.docker-build/scripts/qdrant-client.mjs` | shared | 22 | 0 |
-| 20 | `sveltekit-frontend/src/lib/server/vector/qdrant-manager.ts` | shared | 22 | 9 |
+| 2 | `sveltekit-frontend/src/lib/server/db/client.ts` | shared | 156 | 15 |
+| 3 | `sveltekit-frontend/src/lib/server/db/client.ts` | shared | 156 | 15 |
+| 4 | `sveltekit-frontend/src/lib/server/db/client.ts` | shared | 156 | 15 |
+| 5 | `.claude/worktrees/agent-a7203461/sveltekit-frontend/tests/helpers/env-ports.ts` | shared | 126 | 0 |
+| 6 | `.claude/worktrees/agent-a7203461/sveltekit-frontend/tests/helpers/env-ports.ts` | shared | 126 | 0 |
+| 7 | `src/lib/server/ace/context-assembler.ts` | server | 113 | 0 |
+| 8 | `src/lib/server/ace/context-assembler.ts` | server | 113 | 0 |
+| 9 | `scripts/atlas/_atlas-utils.mjs` | script | 112 | 0 |
+| 10 | `scripts/atlas/_atlas-utils.mjs` | script | 112 | 0 |
+| 11 | `sveltekit-frontend/tests/helpers/env-ports.ts` | shared | 108 | 0 |
+| 12 | `sveltekit-frontend/src/lib/server/redis.js` | shared | 95 | 6 |
+| 13 | `sveltekit-frontend/src/lib/server/redis.js` | shared | 95 | 6 |
+| 14 | `sveltekit-frontend/src/lib/server/redis.js` | shared | 95 | 6 |
+| 15 | `sveltekit-frontend/src/lib/server/env.server.ts` | shared | 94 | 0 |
+| 16 | `sveltekit-frontend/src/lib/server/env.server.ts` | shared | 94 | 0 |
+| 17 | `sveltekit-frontend/src/lib/server/env.server.ts` | shared | 94 | 0 |
+| 18 | `.claude/worktrees/agent-a7203461/scripts/atlas/_atlas-utils.mjs` | shared | 84 | 0 |
+| 19 | `.claude/worktrees/agent-a7203461/scripts/atlas/_atlas-utils.mjs` | shared | 84 | 0 |
+| 20 | `sveltekit-frontend/src/lib/server/db/schema-postgres.ts` | shared | 75 | 15 |

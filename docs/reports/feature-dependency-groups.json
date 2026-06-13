@@ -1,6 +1,6 @@
 {
   "ok": true,
-  "generated_at": "2026-06-13T18:21:40.991Z",
+  "generated_at": "2026-06-13T18:30:24.024Z",
   "dry_run": false,
   "apply": true,
   "inputs": {
@@ -20,6 +20,11 @@
       "path": "docs/reports/implementation-intent-aliases.json",
       "exists": false
     }
+  },
+  "env": {
+    "postgres_host": "127.0.0.1",
+    "postgres_port": "5434",
+    "postgres_password": ""
   },
   "validation": {
     "ok": true,

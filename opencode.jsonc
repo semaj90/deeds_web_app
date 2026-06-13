@@ -123,6 +123,7 @@
   },
   "instructions": [
     ".opencode/system.md",
+    "sveltekit-frontend/.opencode/skills/no-placeholder-policy.md",
     "AGENTS.md"
   ],
   "watcher": {
