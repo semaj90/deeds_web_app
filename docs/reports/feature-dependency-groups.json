@@ -1,191 +1,35 @@
 {
   "ok": true,
-  "generated_at": "2026-06-13T17:35:13.512Z",
+  "generated_at": "2026-06-13T18:21:40.991Z",
   "dry_run": false,
   "apply": true,
+  "inputs": {
+    "graph": {
+      "path": "sveltekit-frontend/docs/graph/codebase-graph.json",
+      "exists": true
+    },
+    "atlas": {
+      "path": "sveltekit-frontend/docs/atlas-index/codebase-atlas.json",
+      "exists": true
+    },
+    "dirs": {
+      "path": "sveltekit-frontend/memory/atlas/codebase-atlas.dirs.json",
+      "exists": true
+    },
+    "intentAliases": {
+      "path": "docs/reports/implementation-intent-aliases.json",
+      "exists": false
+    }
+  },
   "validation": {
     "ok": true,
     "failures": [],
+    "warnings": [],
     "gates": {
-      "packets_total": 5,
-      "duplicate_packet_keys": 0
+      "groups_total": 0,
+      "duplicate_packet_keys": 0,
+      "low_confidence": 0
     }
   },
-  "intents": [
-    {
-      "packet_kind": "implementation_intent_alias",
-      "packet_key": "intent_alias:8b100f135caa3cbb",
-      "source_ref": "intent:qdrant_payload_writer",
-      "feature_id": "qdrant_payload_enrichment",
-      "feature_label": "Qdrant Payload Enrichment",
-      "community_id": null,
-      "domain": "qdrant_vector_index",
-      "intent": "qdrant_payload_writer",
-      "aliases": [
-        "payload construction metadata aggregation",
-        "qdrant payload enrichment",
-        "vector payload mirror",
-        "points upsert",
-        "set payload",
-        "with payload",
-        "source reference payload",
-        "source_ref feature_id packet_key"
-      ],
-      "implementation_tokens": [
-        "upsert",
-        "setPayload",
-        "points",
-        "payload:",
-        "with_payload",
-        "qdrant_point_id",
-        "source_ref",
-        "feature_id",
-        "packet_key"
-      ],
-      "likely_files": [
-        "scripts/atlas/build-mcp-tool-manifest-packets.js",
-        "scripts/atlas/audit-proto-registry.js",
-        "scripts/atlas/index-function-packets.js",
-        "sveltekit-frontend/src/routes/api/atlas/index-doc/+server.js",
-        "sveltekit-frontend/src/routes/api/atlas/search/+server.js",
-        "sveltekit-frontend/src/lib/server/db/qdrant-sync.js",
-        "sveltekit-frontend/src/lib/server/db/qdrant-integration.js"
-      ],
-      "summary": "Implementation intent alias for Qdrant Payload Enrichment. Maps conceptual queries to implementation tokens and likely files.",
-      "confidence": 1
-    },
-    {
-      "packet_kind": "implementation_intent_alias",
-      "packet_key": "intent_alias:b3d7d3ad5a03afec",
-      "source_ref": "intent:packet_contract_writer",
-      "feature_id": "packet_contract_lane",
-      "feature_label": "Packet Contract Lane",
-      "community_id": null,
-      "domain": "packet_contract",
-      "intent": "packet_contract_writer",
-      "aliases": [
-        "packet contract",
-        "stable packet identity",
-        "metadata jsonb",
-        "atlas_packets payload",
-        "source_ref feature_id community_id"
-      ],
-      "implementation_tokens": [
-        "atlas_packets",
-        "packet_key",
-        "source_ref",
-        "feature_id",
-        "community_id",
-        "metadata",
-        "jsonb",
-        "INSERT INTO atlas_packets"
-      ],
-      "likely_files": [
-        "scripts/atlas/audit-postgres-contract-mirrors.js",
-        "scripts/atlas/index-function-packets.js",
-        "scripts/atlas/build-mcp-tool-manifest-packets.js",
-        "sveltekit-frontend/src/routes/api/atlas/index-doc/+server.js"
-      ],
-      "summary": "Implementation intent alias for Packet Contract Lane. Maps conceptual queries to implementation tokens and likely files.",
-      "confidence": 1
-    },
-    {
-      "packet_kind": "implementation_intent_alias",
-      "packet_key": "intent_alias:1eeafc661819ab0f",
-      "source_ref": "intent:mcp_tool_manifest_writer",
-      "feature_id": "mcp_tool_manifest_packets",
-      "feature_label": "MCP Tool Manifest Packets",
-      "community_id": null,
-      "domain": "mcp_agents",
-      "intent": "mcp_tool_manifest_writer",
-      "aliases": [
-        "tool manifest packets",
-        "mcp tool selection",
-        "tools array forwarding",
-        "tool schema indexing",
-        "llama server tool calls"
-      ],
-      "implementation_tokens": [
-        "tool_manifest",
-        "tools",
-        "tool_calls",
-        "ALLOWED_MCP_TOOLS",
-        "use_mcp",
-        "selectToolsForQuery"
-      ],
-      "likely_files": [
-        "scripts/atlas/build-mcp-tool-manifest-packets.js",
-        "scripts/atlas/runtime-mcp-tool-selector.js",
-        "sveltekit-frontend/src/routes/api/mcp/select-tools/+server.js",
-        "sveltekit-frontend/src/lib/server/ai/gemma4-agent.js",
-        "sveltekit-frontend/src/lib/server/ai/gemma4-tool-controller.js"
-      ],
-      "summary": "Implementation intent alias for MCP Tool Manifest Packets. Maps conceptual queries to implementation tokens and likely files.",
-      "confidence": 1
-    },
-    {
-      "packet_kind": "implementation_intent_alias",
-      "packet_key": "intent_alias:39237c6ebbd796c7",
-      "source_ref": "intent:gpu_rerank_writer",
-      "feature_id": "gpu_batch_cosine_rerank",
-      "feature_label": "GPU BatchCosine Rerank",
-      "community_id": null,
-      "domain": "gpu_turbovec_libtorch",
-      "intent": "gpu_rerank_writer",
-      "aliases": [
-        "gpu batch cosine",
-        "tensorrt bridge",
-        "libtorch bridge",
-        "cuda rerank",
-        "gpu cosine score"
-      ],
-      "implementation_tokens": [
-        "gpu_cosine_score",
-        "batchCosineSimilarity",
-        "tensorrt_bridge",
-        "libtorch",
-        "isCudaAvailable",
-        "CUDA_VISIBLE_DEVICES"
-      ],
-      "likely_files": [
-        "sveltekit-frontend/src/lib/server/gpu/libtorch-bridge.js",
-        "sveltekit-frontend/src/routes/api/atlas/search/+server.js",
-        "simd-bridge/cpp/binding.cc"
-      ],
-      "summary": "Implementation intent alias for GPU BatchCosine Rerank. Maps conceptual queries to implementation tokens and likely files.",
-      "confidence": 1
-    },
-    {
-      "packet_kind": "implementation_intent_alias",
-      "packet_key": "intent_alias:defd5914cd147b4f",
-      "source_ref": "intent:feature_dependency_group_writer",
-      "feature_id": "feature_dependency_groups",
-      "feature_label": "Feature Dependency Groups",
-      "community_id": null,
-      "domain": "code_intelligence",
-      "intent": "feature_dependency_group_writer",
-      "aliases": [
-        "feature dependency group",
-        "implementation cluster",
-        "related files by feature",
-        "dependency group packet",
-        "implementation context group"
-      ],
-      "implementation_tokens": [
-        "feature_dependency_group",
-        "feature_label",
-        "dependency_files",
-        "root_files",
-        "route_files",
-        "test_files"
-      ],
-      "likely_files": [
-        "scripts/atlas/build-feature-dependency-groups.js",
-        "sveltekit-frontend/docs/graph/codebase-graph.json",
-        "sveltekit-frontend/docs/atlas-index/codebase-atlas.json"
-      ],
-      "summary": "Implementation intent alias for Feature Dependency Groups. Maps conceptual queries to implementation tokens and likely files.",
-      "confidence": 1
-    }
-  ]
+  "groups": []
 }

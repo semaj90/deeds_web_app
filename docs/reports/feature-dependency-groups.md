@@ -1,16 +1,15 @@
-# Implementation Intent Aliases
+# Feature Dependency Groups
 
-Generated: 2026-06-13T17:35:13.512Z
-Packets: 5
+Generated: 2026-06-13T18:21:40.991Z
+Groups: 0
 Status: PASS
 
-## Intents
+## Top groups
 
-- **qdrant_payload_writer** → Qdrant Payload Enrichment (7 likely files)
-- **packet_contract_writer** → Packet Contract Lane (4 likely files)
-- **mcp_tool_manifest_writer** → MCP Tool Manifest Packets (5 likely files)
-- **gpu_rerank_writer** → GPU BatchCosine Rerank (3 likely files)
-- **feature_dependency_group_writer** → Feature Dependency Groups (3 likely files)
+
+## Warnings
+
+- none
 
 ## Failures
 
