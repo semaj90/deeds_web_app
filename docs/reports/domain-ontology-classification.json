@@ -1,48 +1,46 @@
 {
-  "generated": "2026-06-13T04:00:00.074Z",
+  "generated": "2026-06-13T06:53:53.934Z",
   "mode": "apply",
-  "total_scanned": 8483,
-  "already_tagged": 2161,
-  "to_classify": 6322,
-  "known_domain": 6152,
-  "unknown": 170,
-  "coverage_pct": 97.3,
+  "total_scanned": 8554,
+  "already_tagged": 2662,
+  "to_classify": 5892,
+  "known_domain": 5892,
+  "unknown": 0,
+  "coverage_pct": 100,
   "domain_distribution": {
-    "mcp": 46,
-    "search": 357,
-    "knowledge": 94,
-    "repair": 25,
-    "graph": 1579,
-    "rank": 37,
-    "cache": 831,
-    "agent": 186,
-    "code": 512,
-    "atlas": 147,
-    "cluster": 49,
-    "legal": 617,
-    "embed": 225,
-    "memory": 1342,
-    "trace": 105,
-    "unknown": 170
+    "mcp_agents": 407,
+    "rag_retrieval": 404,
+    "evidence_upload_storage": 311,
+    "citation_engine": 74,
+    "document_processing": 199,
+    "qdrant_vector_index": 393,
+    "gpu_turbovec_libtorch": 102,
+    "admin_observability": 977,
+    "auth_login_register": 114,
+    "legal_reports": 798,
+    "neo4j_context_graph": 775,
+    "case_management": 274,
+    "redis_bitfrost_cache": 796,
+    "tests_smoke_harness": 268
   },
-  "db_updated": 6322,
-  "qdrant_updated": 6319,
-  "redis_entries": 6322,
+  "db_updated": 5892,
+  "qdrant_updated": 5892,
+  "redis_entries": 5892,
   "gates": [
     {
       "name": "domain_coverage",
       "pass": true,
-      "detail": "97.3% known (gate ≥60%)"
+      "detail": "100.0% known (gate ≥95%)"
     },
     {
       "name": "db_write_success",
       "pass": true,
-      "detail": "6322 rows updated"
+      "detail": "5892 rows updated"
     },
     {
-      "name": "unknown_below_40",
+      "name": "unknown_below_5",
       "pass": true,
-      "detail": "2.7% unknown"
+      "detail": "0.0% unknown"
     }
   ]
 }
