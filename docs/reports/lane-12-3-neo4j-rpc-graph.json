@@ -1,0 +1,29 @@
+{
+  "timestamp": "2026-06-13T22:41:48.936Z",
+  "mode": "dry-run",
+  "input_file": "C:\\Users\\james\\Videos\\deeds-web-app\\docs\\reports\\grpc-service-packets.jsonl",
+  "input_packets": 50,
+  "statistics": {
+    "service_count": 50,
+    "method_count": 100,
+    "edge_count": 100
+  },
+  "gates": {
+    "GATE_SERVICE_COUNT": {
+      "threshold": 49,
+      "pass": true,
+      "actual": 50
+    },
+    "GATE_METHOD_COUNT": {
+      "threshold": 49,
+      "pass": true,
+      "actual": 100
+    },
+    "GATE_EDGE_COUNT": {
+      "threshold": 49,
+      "pass": true,
+      "actual": 100
+    }
+  },
+  "gates_pass": true
+}

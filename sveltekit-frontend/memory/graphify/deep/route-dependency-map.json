@@ -13,9 +13,9 @@
   },
   "src/routes/api/atlas/studio/cards/[id]/+server.ts": {
     "zone": "route",
-    "directDeps": 6,
+    "directDeps": 9,
     "serverDeps": 0,
-    "dbDeps": 2
+    "dbDeps": 3
   },
   "src/routes/api/atlas/studio/redis/+server.ts": {
     "zone": "route",
@@ -25,9 +25,9 @@
   },
   "src/routes/api/atlas/studio/search/+server.ts": {
     "zone": "route",
-    "directDeps": 6,
+    "directDeps": 9,
     "serverDeps": 0,
-    "dbDeps": 2
+    "dbDeps": 3
   },
   "src/routes/api/chat/stream/+server.ts": {
     "zone": "route",
@@ -241,7 +241,7 @@
   },
   "sveltekit-frontend/src/routes/(app)/admin/document-search/+page.svelte": {
     "zone": "shared",
-    "directDeps": 3,
+    "directDeps": 4,
     "serverDeps": 0,
     "dbDeps": 0
   },
@@ -265,7 +265,7 @@
   },
   "sveltekit-frontend/src/routes/(app)/admin/error-brain/+page.svelte": {
     "zone": "shared",
-    "directDeps": 3,
+    "directDeps": 4,
     "serverDeps": 0,
     "dbDeps": 0
   },
@@ -475,9 +475,9 @@
   },
   "sveltekit-frontend/src/routes/(app)/analysis-center/+page.server.ts": {
     "zone": "shared",
-    "directDeps": 3,
+    "directDeps": 4,
     "serverDeps": 0,
-    "dbDeps": 3
+    "dbDeps": 4
   },
   "sveltekit-frontend/src/routes/(app)/analysis-center/+page.svelte": {
     "zone": "shared",
@@ -505,9 +505,9 @@
   },
   "sveltekit-frontend/src/routes/(app)/cases/+page.server.ts": {
     "zone": "shared",
-    "directDeps": 3,
+    "directDeps": 4,
     "serverDeps": 0,
-    "dbDeps": 3
+    "dbDeps": 4
   },
   "sveltekit-frontend/src/routes/(app)/cases/+page.svelte": {
     "zone": "shared",
@@ -517,15 +517,15 @@
   },
   "sveltekit-frontend/src/routes/(app)/cases/new/+page.server.ts": {
     "zone": "shared",
-    "directDeps": 3,
+    "directDeps": 4,
     "serverDeps": 0,
-    "dbDeps": 3
+    "dbDeps": 4
   },
   "sveltekit-frontend/src/routes/(app)/cases/new/+page.svelte": {
     "zone": "shared",
-    "directDeps": 3,
+    "directDeps": 4,
     "serverDeps": 0,
-    "dbDeps": 3
+    "dbDeps": 4
   },
   "sveltekit-frontend/src/routes/(app)/cases/[id]/+layout.svelte": {
     "zone": "shared",
@@ -763,7 +763,7 @@
   },
   "sveltekit-frontend/src/routes/(app)/codebase-graph/+page.svelte": {
     "zone": "shared",
-    "directDeps": 6,
+    "directDeps": 8,
     "serverDeps": 0,
     "dbDeps": 0
   },
@@ -775,7 +775,7 @@
   },
   "sveltekit-frontend/src/routes/(app)/codebase-graph/fast-ast/+page.svelte": {
     "zone": "shared",
-    "directDeps": 3,
+    "directDeps": 4,
     "serverDeps": 0,
     "dbDeps": 0
   },
@@ -835,7 +835,7 @@
   },
   "sveltekit-frontend/src/routes/(app)/couchdb-analytics/+page.svelte": {
     "zone": "shared",
-    "directDeps": 12,
+    "directDeps": 16,
     "serverDeps": 0,
     "dbDeps": 0
   },
@@ -1177,13 +1177,13 @@
   },
   "sveltekit-frontend/src/routes/(app)/demos/nes-graph/+page.svelte": {
     "zone": "shared",
-    "directDeps": 3,
+    "directDeps": 4,
     "serverDeps": 0,
     "dbDeps": 0
   },
   "sveltekit-frontend/src/routes/(app)/demos/nes-routes/+page.server.ts": {
     "zone": "shared",
-    "directDeps": 3,
+    "directDeps": 4,
     "serverDeps": 0,
     "dbDeps": 0
   },
@@ -1399,9 +1399,9 @@
   },
   "sveltekit-frontend/src/routes/(app)/evidence/+page.server.ts": {
     "zone": "shared",
-    "directDeps": 3,
+    "directDeps": 4,
     "serverDeps": 0,
-    "dbDeps": 3
+    "dbDeps": 4
   },
   "sveltekit-frontend/src/routes/(app)/evidence/+page.svelte": {
     "zone": "shared",
@@ -1849,8 +1849,8 @@
   },
   "sveltekit-frontend/src/routes/api/ace/ask/+server.ts": {
     "zone": "shared",
-    "directDeps": 3,
-    "serverDeps": 3,
+    "directDeps": 4,
+    "serverDeps": 4,
     "dbDeps": 0
   },
   "sveltekit-frontend/src/routes/api/ace/context/+server.ts": {
@@ -1915,8 +1915,8 @@
   },
   "sveltekit-frontend/src/routes/api/ace/summarize/+server.ts": {
     "zone": "shared",
-    "directDeps": 3,
-    "serverDeps": 3,
+    "directDeps": 4,
+    "serverDeps": 4,
     "dbDeps": 0
   },
   "sveltekit-frontend/src/routes/api/acp/execute/+server.ts": {
@@ -2035,7 +2035,7 @@
   },
   "sveltekit-frontend/src/routes/api/admin/atlas/query/+server.ts": {
     "zone": "shared",
-    "directDeps": 3,
+    "directDeps": 4,
     "serverDeps": 0,
     "dbDeps": 0
   },
@@ -2587,14 +2587,14 @@
   },
   "sveltekit-frontend/src/routes/api/atlas/studio/cards/+server.ts": {
     "zone": "shared",
-    "directDeps": 3,
-    "serverDeps": 3,
+    "directDeps": 4,
+    "serverDeps": 4,
     "dbDeps": 0
   },
   "sveltekit-frontend/src/routes/api/atlas/studio/cards/[id]/+server.ts": {
     "zone": "shared",
-    "directDeps": 3,
-    "serverDeps": 3,
+    "directDeps": 4,
+    "serverDeps": 4,
     "dbDeps": 0
   },
   "sveltekit-frontend/src/routes/api/audio/progress/[evidenceId]/+server.ts": {
@@ -2755,8 +2755,8 @@
   },
   "sveltekit-frontend/src/routes/api/cache/stats/+server.ts": {
     "zone": "shared",
-    "directDeps": 3,
-    "serverDeps": 3,
+    "directDeps": 4,
+    "serverDeps": 4,
     "dbDeps": 0
   },
   "sveltekit-frontend/src/routes/api/cache/warm-up/+server.ts": {
@@ -3139,8 +3139,8 @@
   },
   "sveltekit-frontend/src/routes/api/code-intel/search/+server.ts": {
     "zone": "shared",
-    "directDeps": 3,
-    "serverDeps": 3,
+    "directDeps": 4,
+    "serverDeps": 4,
     "dbDeps": 0
   },
   "sveltekit-frontend/src/routes/api/code-intel/smoke/health/+server.ts": {
@@ -4135,8 +4135,8 @@
   },
   "sveltekit-frontend/src/routes/api/graphify/stream/+server.ts": {
     "zone": "shared",
-    "directDeps": 3,
-    "serverDeps": 3,
+    "directDeps": 4,
+    "serverDeps": 4,
     "dbDeps": 0
   },
   "sveltekit-frontend/src/routes/api/health/capabilities/+server.ts": {
@@ -4285,8 +4285,8 @@
   },
   "sveltekit-frontend/src/routes/api/ingestion/stream/+server.ts": {
     "zone": "shared",
-    "directDeps": 3,
-    "serverDeps": 3,
+    "directDeps": 4,
+    "serverDeps": 4,
     "dbDeps": 0
   },
   "sveltekit-frontend/src/routes/api/internal/error-brain/runs/+server.ts": {
@@ -4471,7 +4471,7 @@
   },
   "sveltekit-frontend/src/routes/api/mcp/+server.ts": {
     "zone": "shared",
-    "directDeps": 3,
+    "directDeps": 4,
     "serverDeps": 0,
     "dbDeps": 0
   },
@@ -4483,7 +4483,7 @@
   },
   "sveltekit-frontend/src/routes/api/memory/claude-mem/+server.ts": {
     "zone": "shared",
-    "directDeps": 3,
+    "directDeps": 4,
     "serverDeps": 0,
     "dbDeps": 0
   },
@@ -4915,8 +4915,8 @@
   },
   "sveltekit-frontend/src/routes/api/rag/search/+server.ts": {
     "zone": "shared",
-    "directDeps": 3,
-    "serverDeps": 3,
+    "directDeps": 4,
+    "serverDeps": 4,
     "dbDeps": 0
   },
   "sveltekit-frontend/src/routes/api/rag/search-fused/+server.ts": {
@@ -4975,8 +4975,8 @@
   },
   "sveltekit-frontend/src/routes/api/reconstruction/scene-intent/+server.ts": {
     "zone": "shared",
-    "directDeps": 3,
-    "serverDeps": 3,
+    "directDeps": 4,
+    "serverDeps": 4,
     "dbDeps": 0
   },
   "sveltekit-frontend/src/routes/api/reports/+server.ts": {
@@ -5179,7 +5179,7 @@
   },
   "sveltekit-frontend/src/routes/api/simulation/[sessionId]/+server.ts": {
     "zone": "shared",
-    "directDeps": 3,
+    "directDeps": 4,
     "serverDeps": 0,
     "dbDeps": 0
   },
@@ -5245,8 +5245,8 @@
   },
   "sveltekit-frontend/src/routes/api/synthesis/generate/+server.ts": {
     "zone": "shared",
-    "directDeps": 3,
-    "serverDeps": 3,
+    "directDeps": 4,
+    "serverDeps": 4,
     "dbDeps": 0
   },
   "sveltekit-frontend/src/routes/api/synthesis/prompt-feedback/+server.ts": {
@@ -5437,8 +5437,8 @@
   },
   "sveltekit-frontend/src/routes/api/v1/agentic/tool-loop/+server.ts": {
     "zone": "shared",
-    "directDeps": 3,
-    "serverDeps": 3,
+    "directDeps": 4,
+    "serverDeps": 4,
     "dbDeps": 0
   },
   "sveltekit-frontend/src/routes/api/v1/ai/cache-result/+server.ts": {
@@ -5461,8 +5461,8 @@
   },
   "sveltekit-frontend/src/routes/api/v1/ai/summarize-async/+server.ts": {
     "zone": "shared",
-    "directDeps": 3,
-    "serverDeps": 3,
+    "directDeps": 4,
+    "serverDeps": 4,
     "dbDeps": 0
   },
   "sveltekit-frontend/src/routes/api/v1/ai/summary-cache/+server.ts": {
@@ -5473,8 +5473,8 @@
   },
   "sveltekit-frontend/src/routes/api/v1/chat/completions/+server.ts": {
     "zone": "shared",
-    "directDeps": 3,
-    "serverDeps": 3,
+    "directDeps": 4,
+    "serverDeps": 4,
     "dbDeps": 0
   },
   "sveltekit-frontend/src/routes/api/v1/chat/messages/+server.ts": {
@@ -5503,8 +5503,8 @@
   },
   "sveltekit-frontend/src/routes/api/v1/evidence/analyze/+server.ts": {
     "zone": "shared",
-    "directDeps": 3,
-    "serverDeps": 3,
+    "directDeps": 4,
+    "serverDeps": 4,
     "dbDeps": 0
   },
   "sveltekit-frontend/src/routes/api/v1/evidence/canvas/+server.ts": {
@@ -5521,8 +5521,8 @@
   },
   "sveltekit-frontend/src/routes/api/v1/query/+server.ts": {
     "zone": "shared",
-    "directDeps": 3,
-    "serverDeps": 3,
+    "directDeps": 4,
+    "serverDeps": 4,
     "dbDeps": 0
   },
   "sveltekit-frontend/src/routes/api/v1/redis/cache/+server.ts": {
@@ -5671,15 +5671,15 @@
   },
   "sveltekit-frontend/src/routes/login/+page.server.ts": {
     "zone": "shared",
-    "directDeps": 3,
+    "directDeps": 4,
     "serverDeps": 0,
-    "dbDeps": 3
+    "dbDeps": 4
   },
   "sveltekit-frontend/src/routes/login/+page.svelte": {
     "zone": "shared",
-    "directDeps": 3,
+    "directDeps": 4,
     "serverDeps": 0,
-    "dbDeps": 3
+    "dbDeps": 4
   },
   "sveltekit-frontend/src/routes/minio/[...path]/+server.ts": {
     "zone": "shared",
@@ -5689,15 +5689,15 @@
   },
   "sveltekit-frontend/src/routes/register/+page.server.ts": {
     "zone": "shared",
-    "directDeps": 3,
+    "directDeps": 4,
     "serverDeps": 0,
-    "dbDeps": 3
+    "dbDeps": 4
   },
   "sveltekit-frontend/src/routes/register/+page.svelte": {
     "zone": "shared",
-    "directDeps": 3,
+    "directDeps": 4,
     "serverDeps": 0,
-    "dbDeps": 3
+    "dbDeps": 4
   },
   "sveltekit-frontend/src/routes/seaweed/[...path]/+server.ts": {
     "zone": "shared",

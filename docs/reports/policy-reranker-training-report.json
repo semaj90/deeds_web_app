@@ -1,0 +1,52 @@
+{
+  "generated": "2026-06-13T22:57:45.076277Z",
+  "model_type": "pytorch_policy_feedforward",
+  "architecture": "Linear(80\u2192128\u219264\u219232\u21921) + BatchNorm + Dropout + SOM_Embed(400,64)",
+  "model_path": "C:\\Users\\james\\Videos\\deeds-web-app\\models\\policy-reranker.pt",
+  "device": "cuda",
+  "n_params": 46721,
+  "features": [
+    "cosine_score",
+    "bm25_rank_norm",
+    "ann_turbovec_score",
+    "concept_overlap",
+    "same_feature",
+    "community_conf",
+    "reward_prior",
+    "domain_class_match",
+    "freshness_score",
+    "pagerank_score",
+    "som_cache_hit",
+    "packet_hit_count_norm",
+    "n_retrieved_norm",
+    "n_concepts_norm",
+    "trace_score",
+    "provenance_git_age"
+  ],
+  "som_grid": 400,
+  "use_som": true,
+  "train_rows": 78881,
+  "val_rows": 22827,
+  "val_traces": 186,
+  "best_epoch": 5,
+  "ndcg_at_10": 0.9194,
+  "mrr_at_10": 0.9194,
+  "ndcg_gate": 0.7,
+  "gate_pass": true,
+  "training_history": [
+    {
+      "epoch": 5,
+      "loss": 0.717257,
+      "ndcg": 0.9194,
+      "mrr": 0.9194
+    },
+    {
+      "epoch": 10,
+      "loss": 0.717835,
+      "ndcg": 0.9194,
+      "mrr": 0.9194
+    }
+  ],
+  "why_not_xgboost": "XGBoost overfits sparse [0,1] binary features (same_feature, som_cache_hit, domain_class_match) via arbitrarily fine splits with zero support. Feedforward + BatchNorm learns smooth relevance manifolds over sparse inputs. SOM 20\u00d720 cell embeddings are dense continuous signals unsuitable for tree splits. Policy framing extends naturally to GRPO reward shaping.",
+  "promotion_cmd": "Start sidecar: python scripts/atlas/serve-policy-reranker.py && set POLICY_RERANKER_PATH env var, restart dev server"
+}

@@ -7,9 +7,14 @@
     "scripts/api-cleanup/build-validator.test.ts",
     "scripts/api-cleanup/reporter.test.ts",
     "scripts/api-cleanup/build-validator.test.ts",
+    "scripts/api-cleanup/reporter.test.ts",
+    "scripts/api-cleanup/build-validator.test.ts",
     "scripts/api-cleanup/reporter.test.ts"
   ],
   "scripts/api-cleanup/categorizer.ts": [
+    "scripts/api-cleanup/categorizer.test.ts",
+    "scripts/api-cleanup/recovery.test.ts",
+    "scripts/api-cleanup/reporter.test.ts",
     "scripts/api-cleanup/categorizer.test.ts",
     "scripts/api-cleanup/recovery.test.ts",
     "scripts/api-cleanup/reporter.test.ts",
@@ -43,9 +48,16 @@
     "scripts/api-cleanup/disabler.test.ts",
     "scripts/api-cleanup/fixer.test.ts",
     "scripts/api-cleanup/reporter.test.ts",
+    "scripts/api-cleanup/scanner.test.ts",
+    "scripts/api-cleanup/categorizer.test.ts",
+    "scripts/api-cleanup/disabler.test.ts",
+    "scripts/api-cleanup/fixer.test.ts",
+    "scripts/api-cleanup/reporter.test.ts",
     "scripts/api-cleanup/scanner.test.ts"
   ],
   "scripts/api-cleanup/disabler.ts": [
+    "scripts/api-cleanup/disabler.test.ts",
+    "scripts/api-cleanup/reporter.test.ts",
     "scripts/api-cleanup/disabler.test.ts",
     "scripts/api-cleanup/reporter.test.ts",
     "scripts/api-cleanup/disabler.test.ts",
@@ -63,9 +75,13 @@
     "scripts/api-cleanup/fixer.test.ts",
     "scripts/api-cleanup/reporter.test.ts",
     "scripts/api-cleanup/fixer.test.ts",
+    "scripts/api-cleanup/reporter.test.ts",
+    "scripts/api-cleanup/fixer.test.ts",
     "scripts/api-cleanup/reporter.test.ts"
   ],
   "scripts/api-cleanup/recovery.ts": [
+    "scripts/api-cleanup/recovery.test.ts",
+    "scripts/api-cleanup/reporter.test.ts",
     "scripts/api-cleanup/recovery.test.ts",
     "scripts/api-cleanup/reporter.test.ts",
     "scripts/api-cleanup/recovery.test.ts",
@@ -79,9 +95,11 @@
     "scripts/api-cleanup/reporter.test.ts",
     "scripts/api-cleanup/reporter.test.ts",
     "scripts/api-cleanup/reporter.test.ts",
+    "scripts/api-cleanup/reporter.test.ts",
     "scripts/api-cleanup/reporter.test.ts"
   ],
   "scripts/error-resolution/services/error-scanner.ts": [
+    "scripts/error-resolution/tests/error-scanner.test.ts",
     "scripts/error-resolution/tests/error-scanner.test.ts",
     "scripts/error-resolution/tests/error-scanner.test.ts",
     "scripts/error-resolution/tests/error-scanner.test.ts",
@@ -103,9 +121,14 @@
     "scripts/error-resolution/tests/error-scanner.test.ts",
     "scripts/error-resolution/tests/import-fixer.test.ts",
     "scripts/error-resolution/tests/type-fixer.test.ts",
+    "scripts/error-resolution/tests/validation-service.test.ts",
+    "scripts/error-resolution/tests/error-scanner.test.ts",
+    "scripts/error-resolution/tests/import-fixer.test.ts",
+    "scripts/error-resolution/tests/type-fixer.test.ts",
     "scripts/error-resolution/tests/validation-service.test.ts"
   ],
   "scripts/error-resolution/services/import-fixer.ts": [
+    "scripts/error-resolution/tests/import-fixer.test.ts",
     "scripts/error-resolution/tests/import-fixer.test.ts",
     "scripts/error-resolution/tests/import-fixer.test.ts",
     "scripts/error-resolution/tests/import-fixer.test.ts",
@@ -115,9 +138,11 @@
     "scripts/error-resolution/tests/runes-fixer.test.ts",
     "scripts/error-resolution/tests/runes-fixer.test.ts",
     "scripts/error-resolution/tests/runes-fixer.test.ts",
+    "scripts/error-resolution/tests/runes-fixer.test.ts",
     "scripts/error-resolution/tests/runes-fixer.test.ts"
   ],
   "scripts/error-resolution/services/transition-fixer.ts": [
+    "scripts/error-resolution/tests/transition-fixer.test.ts",
     "scripts/error-resolution/tests/transition-fixer.test.ts",
     "scripts/error-resolution/tests/transition-fixer.test.ts",
     "scripts/error-resolution/tests/transition-fixer.test.ts",
@@ -127,9 +152,11 @@
     "scripts/error-resolution/tests/type-fixer.test.ts",
     "scripts/error-resolution/tests/type-fixer.test.ts",
     "scripts/error-resolution/tests/type-fixer.test.ts",
+    "scripts/error-resolution/tests/type-fixer.test.ts",
     "scripts/error-resolution/tests/type-fixer.test.ts"
   ],
   "scripts/error-resolution/services/validation-service.ts": [
+    "scripts/error-resolution/tests/validation-service.test.ts",
     "scripts/error-resolution/tests/validation-service.test.ts",
     "scripts/error-resolution/tests/validation-service.test.ts",
     "scripts/error-resolution/tests/validation-service.test.ts",
@@ -137,13 +164,17 @@
   ],
   ".claude/worktrees/agent-a7203461/scripts/atlas/connection-config.mjs": [
     ".claude/worktrees/agent-a7203461/scripts/tests/atlas-connection-config.test.mjs",
+    ".claude/worktrees/agent-a7203461/scripts/tests/atlas-connection-config.test.mjs",
     ".claude/worktrees/agent-a7203461/scripts/tests/atlas-connection-config.test.mjs"
   ],
   ".claude/worktrees/agent-a7203461/sveltekit-frontend/src/lib/server/features/ai/ace/telemetry-source-ref-fallback.ts": [
     ".claude/worktrees/agent-a7203461/sveltekit-frontend/scripts/tests/telemetry-source-ref-fallback.test.mjs",
+    ".claude/worktrees/agent-a7203461/sveltekit-frontend/scripts/tests/telemetry-source-ref-fallback.test.mjs",
     ".claude/worktrees/agent-a7203461/sveltekit-frontend/scripts/tests/telemetry-source-ref-fallback.test.mjs"
   ],
   "sveltekit-frontend/src/lib/server/ace/hot-cluster-reader.ts": [
+    "sveltekit-frontend/src/lib/server/ace/hot-cluster-reader.spec.ts",
+    "sveltekit-frontend/src/lib/server/ace/merge-cluster-candidates.spec.ts",
     "sveltekit-frontend/src/lib/server/ace/hot-cluster-reader.spec.ts",
     "sveltekit-frontend/src/lib/server/ace/merge-cluster-candidates.spec.ts",
     "sveltekit-frontend/src/lib/server/ace/hot-cluster-reader.spec.ts",
@@ -154,9 +185,11 @@
   "sveltekit-frontend/src/lib/server/ace/kag-dag-runner.ts": [
     "sveltekit-frontend/src/lib/server/ace/kag-dag-runner.test.ts",
     "sveltekit-frontend/src/lib/server/ace/kag-dag-runner.test.ts",
+    "sveltekit-frontend/src/lib/server/ace/kag-dag-runner.test.ts",
     "sveltekit-frontend/src/lib/server/ace/kag-dag-runner.test.ts"
   ],
   "sveltekit-frontend/src/lib/server/ace/karpathy-publish-split.ts": [
+    "sveltekit-frontend/src/lib/server/ace/karpathy-publish-split.test.ts",
     "sveltekit-frontend/src/lib/server/ace/karpathy-publish-split.test.ts",
     "sveltekit-frontend/src/lib/server/ace/karpathy-publish-split.test.ts",
     "sveltekit-frontend/src/lib/server/ace/karpathy-publish-split.test.ts"
@@ -164,9 +197,11 @@
   "sveltekit-frontend/src/lib/server/ace/llm-context-cache.ts": [
     "sveltekit-frontend/src/lib/server/ace/llm-context-cache.test.ts",
     "sveltekit-frontend/src/lib/server/ace/llm-context-cache.test.ts",
+    "sveltekit-frontend/src/lib/server/ace/llm-context-cache.test.ts",
     "sveltekit-frontend/src/lib/server/ace/llm-context-cache.test.ts"
   ],
   "sveltekit-frontend/src/lib/server/ace/merge-cluster-candidates.ts": [
+    "sveltekit-frontend/src/lib/server/ace/merge-cluster-candidates.spec.ts",
     "sveltekit-frontend/src/lib/server/ace/merge-cluster-candidates.spec.ts",
     "sveltekit-frontend/src/lib/server/ace/merge-cluster-candidates.spec.ts",
     "sveltekit-frontend/src/lib/server/ace/merge-cluster-candidates.spec.ts"
@@ -174,9 +209,11 @@
   "sveltekit-frontend/src/lib/server/ace/tool-description.ts": [
     "sveltekit-frontend/src/lib/server/ace/tool-description.test.ts",
     "sveltekit-frontend/src/lib/server/ace/tool-description.test.ts",
+    "sveltekit-frontend/src/lib/server/ace/tool-description.test.ts",
     "sveltekit-frontend/src/lib/server/ace/tool-description.test.ts"
   ],
   "sveltekit-frontend/src/lib/server/ace/variance-recovery.js": [
+    "sveltekit-frontend/src/lib/server/ace/variance-recovery.test.ts",
     "sveltekit-frontend/src/lib/server/ace/variance-recovery.test.ts",
     "sveltekit-frontend/src/lib/server/ace/variance-recovery.test.ts",
     "sveltekit-frontend/src/lib/server/ace/variance-recovery.test.ts"
@@ -188,9 +225,12 @@
     "sveltekit-frontend/src/lib/server/agents/regen/writers/couchdb-writer.test.ts",
     "sveltekit-frontend/src/lib/server/agents/regen/writers/couchdb-writer.test.ts",
     "sveltekit-frontend/src/lib/server/agents/regen/writers/couchdb-writer.test.ts",
+    "sveltekit-frontend/src/lib/server/agents/regen/writers/couchdb-writer.test.ts",
+    "sveltekit-frontend/src/lib/server/agents/regen/writers/couchdb-writer.test.ts",
     "sveltekit-frontend/tests/agents-regen-writers.spec.ts"
   ],
   "sveltekit-frontend/src/lib/server/ai/draft-model-policy.ts": [
+    "sveltekit-frontend/src/lib/server/ai/draft-model-policy.test.ts",
     "sveltekit-frontend/src/lib/server/ai/draft-model-policy.test.ts",
     "sveltekit-frontend/src/lib/server/ai/draft-model-policy.test.ts",
     "sveltekit-frontend/src/lib/server/ai/draft-model-policy.test.ts"
@@ -207,14 +247,20 @@
     "sveltekit-frontend/src/lib/server/ai/engram-registry.spec.ts",
     "sveltekit-frontend/src/lib/server/ai/engram-registry.spec.ts",
     "sveltekit-frontend/src/lib/server/ai/engram-registry.spec.ts",
+    "sveltekit-frontend/src/lib/server/analysis/agentic-proposal-join-spine.spec.ts",
+    "sveltekit-frontend/src/lib/server/ai/engram-registry.spec.ts",
+    "sveltekit-frontend/src/lib/server/ai/engram-registry.spec.ts",
+    "sveltekit-frontend/src/lib/server/ai/engram-registry.spec.ts",
     "sveltekit-frontend/src/lib/server/analysis/agentic-proposal-join-spine.spec.ts"
   ],
   "sveltekit-frontend/src/lib/server/ai/error-agent/workflow-loop.ts": [
     "sveltekit-frontend/src/lib/server/ai/error-agent/workflow-loop.test.ts",
     "sveltekit-frontend/src/lib/server/ai/error-agent/workflow-loop.test.ts",
+    "sveltekit-frontend/src/lib/server/ai/error-agent/workflow-loop.test.ts",
     "sveltekit-frontend/src/lib/server/ai/error-agent/workflow-loop.test.ts"
   ],
   "sveltekit-frontend/src/lib/server/ai/error-agent/workflow-loop-langgraph.ts": [
+    "sveltekit-frontend/src/lib/server/ai/error-agent/workflow-loop.test.ts",
     "sveltekit-frontend/src/lib/server/ai/error-agent/workflow-loop.test.ts",
     "sveltekit-frontend/src/lib/server/ai/error-agent/workflow-loop.test.ts",
     "sveltekit-frontend/src/lib/server/ai/error-agent/workflow-loop.test.ts"
@@ -228,14 +274,19 @@
     "sveltekit-frontend/tests/opencode-skill.spec.ts",
     "sveltekit-frontend/src/lib/server/ai/mcp-tool-dispatch.graph-expand.test.ts",
     "sveltekit-frontend/src/lib/server/ai/mcp-tool-dispatch.graph-expand.test.ts",
+    "sveltekit-frontend/tests/opencode-skill.spec.ts",
+    "sveltekit-frontend/src/lib/server/ai/mcp-tool-dispatch.graph-expand.test.ts",
+    "sveltekit-frontend/src/lib/server/ai/mcp-tool-dispatch.graph-expand.test.ts",
     "sveltekit-frontend/tests/opencode-skill.spec.ts"
   ],
   "sveltekit-frontend/src/lib/server/ai/request-classifiers.ts": [
     "sveltekit-frontend/src/lib/server/ai/request-classifiers.test.ts",
     "sveltekit-frontend/src/lib/server/ai/request-classifiers.test.ts",
+    "sveltekit-frontend/src/lib/server/ai/request-classifiers.test.ts",
     "sveltekit-frontend/src/lib/server/ai/request-classifiers.test.ts"
   ],
   "sveltekit-frontend/src/lib/server/analysis/agentic-proposal-timeline.ts": [
+    "sveltekit-frontend/src/lib/server/analysis/agentic-proposal-join-spine.spec.ts",
     "sveltekit-frontend/src/lib/server/analysis/agentic-proposal-join-spine.spec.ts",
     "sveltekit-frontend/src/lib/server/analysis/agentic-proposal-join-spine.spec.ts",
     "sveltekit-frontend/src/lib/server/analysis/agentic-proposal-join-spine.spec.ts"
@@ -244,9 +295,11 @@
     "sveltekit-frontend/src/lib/server/analysis/agentic-proposal-join-spine.spec.ts",
     "sveltekit-frontend/src/lib/server/analysis/agentic-proposal-join-spine.spec.ts",
     "sveltekit-frontend/src/lib/server/analysis/agentic-proposal-join-spine.spec.ts",
+    "sveltekit-frontend/src/lib/server/analysis/agentic-proposal-join-spine.spec.ts",
     "sveltekit-frontend/tests/routes/auto/api/v1/agentic.test.ts"
   ],
   "sveltekit-frontend/src/lib/server/analytics/web-research-crawler.ts": [
+    "sveltekit-frontend/src/lib/server/analytics/web-research-crawler.test.ts",
     "sveltekit-frontend/src/lib/server/analytics/web-research-crawler.test.ts",
     "sveltekit-frontend/src/lib/server/analytics/web-research-crawler.test.ts",
     "sveltekit-frontend/src/lib/server/analytics/web-research-crawler.test.ts"
@@ -254,9 +307,11 @@
   "sveltekit-frontend/src/lib/server/atlas/master-feature-map.ts": [
     "sveltekit-frontend/src/lib/server/atlas/master-feature-map.test.ts",
     "sveltekit-frontend/src/lib/server/atlas/master-feature-map.test.ts",
+    "sveltekit-frontend/src/lib/server/atlas/master-feature-map.test.ts",
     "sveltekit-frontend/src/lib/server/atlas/master-feature-map.test.ts"
   ],
   "sveltekit-frontend/scripts/cards/master-feature-cards.mjs": [
+    "sveltekit-frontend/src/lib/server/atlas/master-feature-map.test.ts",
     "sveltekit-frontend/src/lib/server/atlas/master-feature-map.test.ts",
     "sveltekit-frontend/src/lib/server/atlas/master-feature-map.test.ts",
     "sveltekit-frontend/src/lib/server/atlas/master-feature-map.test.ts"
@@ -264,9 +319,12 @@
   "sveltekit-frontend/src/lib/server/evidence/docling-structure.ts": [
     "sveltekit-frontend/src/lib/server/evidence/docling-structure.test.ts",
     "sveltekit-frontend/src/lib/server/evidence/docling-structure.test.ts",
+    "sveltekit-frontend/src/lib/server/evidence/docling-structure.test.ts",
     "sveltekit-frontend/src/lib/server/evidence/docling-structure.test.ts"
   ],
   "sveltekit-frontend/src/lib/server/gpu/autoencoder-weights.ts": [
+    "sveltekit-frontend/src/lib/server/gpu/autoencoder-scripts.test.ts",
+    "sveltekit-frontend/src/lib/server/gpu/autoencoder.test.ts",
     "sveltekit-frontend/src/lib/server/gpu/autoencoder-scripts.test.ts",
     "sveltekit-frontend/src/lib/server/gpu/autoencoder.test.ts",
     "sveltekit-frontend/src/lib/server/gpu/autoencoder-scripts.test.ts",
@@ -283,9 +341,14 @@
     "sveltekit-frontend/src/lib/server/retrieval/prefilter.test.ts",
     "sveltekit-frontend/src/lib/server/gpu/autoencoder-scripts.test.ts",
     "sveltekit-frontend/src/lib/server/gpu/autoencoder.test.ts",
+    "sveltekit-frontend/src/lib/server/retrieval/prefilter.test.ts",
+    "sveltekit-frontend/src/lib/server/gpu/autoencoder-scripts.test.ts",
+    "sveltekit-frontend/src/lib/server/gpu/autoencoder.test.ts",
     "sveltekit-frontend/src/lib/server/retrieval/prefilter.test.ts"
   ],
   "sveltekit-frontend/src/lib/server/grpc/retrieval-client.ts": [
+    "sveltekit-frontend/src/lib/server/grpc/retrieval-client.test.ts",
+    "sveltekit-frontend/src/lib/server/grpc/retrieval-client.test.ts",
     "sveltekit-frontend/src/lib/server/grpc/retrieval-client.test.ts",
     "sveltekit-frontend/src/lib/server/grpc/retrieval-client.test.ts",
     "sveltekit-frontend/src/lib/server/grpc/retrieval-client.test.ts",
@@ -296,14 +359,26 @@
   "sveltekit-frontend/src/lib/server/indexer/legal-chunker.ts": [
     "sveltekit-frontend/src/lib/server/indexer/legal-chunker.test.ts",
     "sveltekit-frontend/src/lib/server/indexer/legal-chunker.test.ts",
+    "sveltekit-frontend/src/lib/server/indexer/legal-chunker.test.ts",
     "sveltekit-frontend/src/lib/server/indexer/legal-chunker.test.ts"
   ],
   "sveltekit-frontend/src/lib/server/labels/feature-label-registry.ts": [
     "sveltekit-frontend/src/lib/server/labels/feature-label-registry.test.ts",
     "sveltekit-frontend/src/lib/server/labels/feature-label-registry.test.ts",
+    "sveltekit-frontend/src/lib/server/labels/feature-label-registry.test.ts",
     "sveltekit-frontend/src/lib/server/labels/feature-label-registry.test.ts"
   ],
   "sveltekit-frontend/src/lib/server/queue/rabbitmq-manager-fixed.ts": [
+    "sveltekit-frontend/src/lib/server/queue/rabbitmq-manager-fixed.test.ts",
+    "sveltekit-frontend/src/lib/server/queue/rabbitmq-manager-fixed.test.ts",
+    "sveltekit-frontend/tests/codebase-index-rabbitmq-channel.spec.ts",
+    "sveltekit-frontend/tests/codebase-index-rabbitmq-channel.spec.ts",
+    "sveltekit-frontend/tests/codebase-index-rabbitmq-channel.spec.ts",
+    "sveltekit-frontend/tests/codebase-index-rabbitmq-channel.spec.ts",
+    "sveltekit-frontend/tests/codebase-index-rabbitmq-channel.spec.ts",
+    "sveltekit-frontend/tests/codebase-index-rabbitmq-channel.spec.ts",
+    "sveltekit-frontend/tests/codebase-index-rabbitmq-channel.spec.ts",
+    "sveltekit-frontend/tests/codebase-index-rabbitmq-channel.spec.ts",
     "sveltekit-frontend/src/lib/server/queue/rabbitmq-manager-fixed.test.ts",
     "sveltekit-frontend/src/lib/server/queue/rabbitmq-manager-fixed.test.ts",
     "sveltekit-frontend/tests/codebase-index-rabbitmq-channel.spec.ts",
@@ -341,9 +416,12 @@
     "sveltekit-frontend/src/lib/server/retrieval/context-buffer.test.ts",
     "sveltekit-frontend/src/lib/server/retrieval/context-buffer.test.ts",
     "sveltekit-frontend/src/lib/server/retrieval/context-buffer.test.ts",
+    "sveltekit-frontend/src/lib/server/retrieval/context-buffer.test.ts",
+    "sveltekit-frontend/src/lib/server/retrieval/context-buffer.test.ts",
     "sveltekit-frontend/src/lib/server/retrieval/context-buffer.test.ts"
   ],
   "sveltekit-frontend/src/lib/server/retrieval/graphrag-stage-plan.ts": [
+    "sveltekit-frontend/src/lib/server/retrieval/graphrag-stage-plan.spec.ts",
     "sveltekit-frontend/src/lib/server/retrieval/graphrag-stage-plan.spec.ts",
     "sveltekit-frontend/src/lib/server/retrieval/graphrag-stage-plan.spec.ts",
     "sveltekit-frontend/src/lib/server/retrieval/graphrag-stage-plan.spec.ts"
@@ -354,14 +432,18 @@
     "sveltekit-frontend/src/lib/server/retrieval/hyperrag-fusion-service.test.ts",
     "sveltekit-frontend/src/lib/server/retrieval/hyperrag-fusion-service.test.ts",
     "sveltekit-frontend/src/lib/server/retrieval/hyperrag-fusion-service.test.ts",
+    "sveltekit-frontend/src/lib/server/retrieval/hyperrag-fusion-service.test.ts",
+    "sveltekit-frontend/src/lib/server/retrieval/hyperrag-fusion-service.test.ts",
     "sveltekit-frontend/src/lib/server/retrieval/hyperrag-fusion-service.test.ts"
   ],
   "sveltekit-frontend/src/lib/server/retrieval/encoded-cluster-prefilter.ts": [
     "sveltekit-frontend/src/lib/server/retrieval/prefilter.test.ts",
     "sveltekit-frontend/src/lib/server/retrieval/prefilter.test.ts",
+    "sveltekit-frontend/src/lib/server/retrieval/prefilter.test.ts",
     "sveltekit-frontend/src/lib/server/retrieval/prefilter.test.ts"
   ],
   "sveltekit-frontend/src/lib/server/retrieval/query-profile-router.ts": [
+    "sveltekit-frontend/src/lib/server/retrieval/query-profile-router.test.ts",
     "sveltekit-frontend/src/lib/server/retrieval/query-profile-router.test.ts",
     "sveltekit-frontend/src/lib/server/retrieval/query-profile-router.test.ts",
     "sveltekit-frontend/src/lib/server/retrieval/query-profile-router.test.ts",
@@ -371,9 +453,11 @@
     "sveltekit-frontend/src/lib/server/retrieval/routing-explanation.test.ts",
     "sveltekit-frontend/src/lib/server/retrieval/routing-explanation.test.ts",
     "sveltekit-frontend/src/lib/server/retrieval/routing-explanation.test.ts",
+    "sveltekit-frontend/src/lib/server/retrieval/routing-explanation.test.ts",
     "sveltekit-frontend/tests/unit/routing-explanation.test.ts"
   ],
   "sveltekit-frontend/src/lib/server/retrieval/subgraph-seed-neighborhood.ts": [
+    "sveltekit-frontend/src/lib/server/retrieval/subgraph-seed-neighborhood.test.ts",
     "sveltekit-frontend/src/lib/server/retrieval/subgraph-seed-neighborhood.test.ts",
     "sveltekit-frontend/src/lib/server/retrieval/subgraph-seed-neighborhood.test.ts",
     "sveltekit-frontend/src/lib/server/retrieval/subgraph-seed-neighborhood.test.ts"
@@ -387,9 +471,13 @@
     "sveltekit-frontend/src/lib/server/retrieval/subgraph-structural-multihop.test.ts",
     "sveltekit-frontend/src/lib/server/retrieval/subgraph-structural-multihop.test.ts",
     "sveltekit-frontend/src/lib/server/retrieval/subgraph-structural-multihop.test.ts",
+    "sveltekit-frontend/src/lib/server/retrieval/subgraph-structural-multihop.test.ts",
+    "sveltekit-frontend/src/lib/server/retrieval/subgraph-structural-multihop.test.ts",
+    "sveltekit-frontend/src/lib/server/retrieval/subgraph-structural-multihop.test.ts",
     "sveltekit-frontend/src/lib/server/retrieval/subgraph-structural-multihop.test.ts"
   ],
   "sveltekit-frontend/src/lib/server/retrieval/summary-card-retrieval.ts": [
+    "sveltekit-frontend/src/lib/server/retrieval/summary-card-retrieval.test.ts",
     "sveltekit-frontend/src/lib/server/retrieval/summary-card-retrieval.test.ts",
     "sveltekit-frontend/src/lib/server/retrieval/summary-card-retrieval.test.ts",
     "sveltekit-frontend/src/lib/server/retrieval/summary-card-retrieval.test.ts"
@@ -400,9 +488,12 @@
     "sveltekit-frontend/src/lib/server/routes/clusters-cards-route.spec.ts",
     "sveltekit-frontend/src/lib/server/routes/clusters-cards-route.spec.ts",
     "sveltekit-frontend/src/lib/server/routes/clusters-cards-route.spec.ts",
+    "sveltekit-frontend/src/lib/server/routes/clusters-cards-route.spec.ts",
+    "sveltekit-frontend/src/lib/server/routes/clusters-cards-route.spec.ts",
     "sveltekit-frontend/src/lib/server/routes/clusters-cards-route.spec.ts"
   ],
   "sveltekit-frontend/src/lib/server/token-map/token-map-mapper.ts": [
+    "sveltekit-frontend/src/lib/server/token-map/token-map-mapper.test.ts",
     "sveltekit-frontend/src/lib/server/token-map/token-map-mapper.test.ts",
     "sveltekit-frontend/src/lib/server/token-map/token-map-mapper.test.ts",
     "sveltekit-frontend/src/lib/server/token-map/token-map-mapper.test.ts"
@@ -410,9 +501,11 @@
   "sveltekit-frontend/src/lib/server/token-map/token-map-service.ts": [
     "sveltekit-frontend/src/lib/server/token-map/token-map-service.test.ts",
     "sveltekit-frontend/src/lib/server/token-map/token-map-service.test.ts",
+    "sveltekit-frontend/src/lib/server/token-map/token-map-service.test.ts",
     "sveltekit-frontend/src/lib/server/token-map/token-map-service.test.ts"
   ],
   "sveltekit-frontend/src/lib/server/token-map/token-map-types.ts": [
+    "sveltekit-frontend/src/lib/server/token-map/token-map-types.test.ts",
     "sveltekit-frontend/src/lib/server/token-map/token-map-types.test.ts",
     "sveltekit-frontend/src/lib/server/token-map/token-map-types.test.ts",
     "sveltekit-frontend/src/lib/server/token-map/token-map-types.test.ts"
@@ -420,9 +513,11 @@
   "sveltekit-frontend/src/lib/server/types/retrieval.ts": [
     "sveltekit-frontend/src/lib/server/types/retrieval-gpu-cluster.spec.ts",
     "sveltekit-frontend/src/lib/server/types/retrieval-gpu-cluster.spec.ts",
+    "sveltekit-frontend/src/lib/server/types/retrieval-gpu-cluster.spec.ts",
     "sveltekit-frontend/src/lib/server/types/retrieval-gpu-cluster.spec.ts"
   ],
   "sveltekit-frontend/src/lib/server/vector/embedding-dimension-guard.ts": [
+    "sveltekit-frontend/src/lib/server/vector/embedding-dimension-guard.test.ts",
     "sveltekit-frontend/src/lib/server/vector/embedding-dimension-guard.test.ts",
     "sveltekit-frontend/src/lib/server/vector/embedding-dimension-guard.test.ts",
     "sveltekit-frontend/src/lib/server/vector/embedding-dimension-guard.test.ts"
@@ -430,14 +525,19 @@
   "sveltekit-frontend/src/lib/server/vector/turbovec-contract.ts": [
     "sveltekit-frontend/src/lib/server/vector/turbovec-contract.test.ts",
     "sveltekit-frontend/src/lib/server/vector/turbovec-contract.test.ts",
+    "sveltekit-frontend/src/lib/server/vector/turbovec-contract.test.ts",
     "sveltekit-frontend/src/lib/server/vector/turbovec-contract.test.ts"
   ],
   "sveltekit-frontend/src/lib/server/workflows/pdf-ocr-workflow.ts": [
     "sveltekit-frontend/src/lib/server/workflows/pdf-ocr-workflow.test.ts",
     "sveltekit-frontend/src/lib/server/workflows/pdf-ocr-workflow.test.ts",
+    "sveltekit-frontend/src/lib/server/workflows/pdf-ocr-workflow.test.ts",
     "sveltekit-frontend/src/lib/server/workflows/pdf-ocr-workflow.test.ts"
   ],
   "sveltekit-frontend/src/routes/api/codebase-index/deep-research/+server.ts": [
+    "sveltekit-frontend/src/routes/api/codebase-index/deep-research/server.route.test.ts",
+    "sveltekit-frontend/src/routes/api/codebase-index/deep-research/server.route.test.ts",
+    "sveltekit-frontend/src/routes/api/codebase-index/deep-research/server.route.test.ts",
     "sveltekit-frontend/src/routes/api/codebase-index/deep-research/server.route.test.ts",
     "sveltekit-frontend/src/routes/api/codebase-index/deep-research/server.route.test.ts",
     "sveltekit-frontend/src/routes/api/codebase-index/deep-research/server.route.test.ts",
@@ -456,9 +556,16 @@
     "sveltekit-frontend/src/routes/api/rag/hyperrag/server.route.test.ts",
     "sveltekit-frontend/src/routes/api/rag/hyperrag/server.route.test.ts",
     "sveltekit-frontend/src/routes/api/rag/hyperrag/server.route.test.ts",
+    "sveltekit-frontend/src/routes/api/rag/hyperrag/server.route.test.ts",
+    "sveltekit-frontend/src/routes/api/rag/hyperrag/server.route.test.ts",
     "sveltekit-frontend/src/routes/api/rag/hyperrag/server.route.test.ts"
   ],
   "sveltekit-frontend/src/routes/api/rag/search/+server.ts": [
+    "sveltekit-frontend/src/routes/api/rag/search/server.route.test.ts",
+    "sveltekit-frontend/tests/rag-search-ace-route.spec.ts",
+    "sveltekit-frontend/tests/rag-search-ace-route.spec.ts",
+    "sveltekit-frontend/tests/rag-search-ace-route.spec.ts",
+    "sveltekit-frontend/tests/rag-search-ace-route.spec.ts",
     "sveltekit-frontend/src/routes/api/rag/search/server.route.test.ts",
     "sveltekit-frontend/tests/rag-search-ace-route.spec.ts",
     "sveltekit-frontend/tests/rag-search-ace-route.spec.ts",
@@ -485,6 +592,9 @@
     "sveltekit-frontend/src/routes/api/search/ace/server.route.test.ts",
     "sveltekit-frontend/src/routes/api/search/ace/server.route.test.ts",
     "sveltekit-frontend/src/routes/api/search/ace/server.route.test.ts",
+    "sveltekit-frontend/src/routes/api/search/ace/server.route.test.ts",
+    "sveltekit-frontend/src/routes/api/search/ace/server.route.test.ts",
+    "sveltekit-frontend/src/routes/api/search/ace/server.route.test.ts",
     "sveltekit-frontend/src/routes/api/search/ace/server.route.test.ts"
   ],
   "sveltekit-frontend/src/routes/api/search/hyperrag/+server.ts": [
@@ -499,9 +609,36 @@
     "sveltekit-frontend/src/routes/api/search/hyperrag/server.route.test.ts",
     "sveltekit-frontend/src/routes/api/search/hyperrag/server.route.test.ts",
     "sveltekit-frontend/src/routes/api/search/hyperrag/server.route.test.ts",
+    "sveltekit-frontend/src/routes/api/search/hyperrag/server.route.test.ts",
+    "sveltekit-frontend/src/routes/api/search/hyperrag/server.route.test.ts",
+    "sveltekit-frontend/src/routes/api/search/hyperrag/server.route.test.ts",
+    "sveltekit-frontend/src/routes/api/search/hyperrag/server.route.test.ts",
     "sveltekit-frontend/src/routes/api/search/hyperrag/server.route.test.ts"
   ],
   "src/lib/server/ace/context-assembler.ts": [
+    ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/ace-code-cache.spec.ts",
+    ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/ace-code-cache.spec.ts",
+    ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/ace-code-cache.spec.ts",
+    ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/ace-context-glossary.spec.ts",
+    ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/ace-context-glossary.spec.ts",
+    "sveltekit-frontend/tests/ace-pipeline-wiring.spec.ts",
+    "sveltekit-frontend/tests/ace-pipeline-wiring.spec.ts",
+    "sveltekit-frontend/tests/ace-pipeline-wiring.spec.ts",
+    "sveltekit-frontend/tests/ace-pipeline-wiring.spec.ts",
+    "sveltekit-frontend/tests/ace-pipeline-wiring.spec.ts",
+    "sveltekit-frontend/tests/ace-pipeline-wiring.spec.ts",
+    "sveltekit-frontend/tests/ace-pipeline-wiring.spec.ts",
+    "sveltekit-frontend/tests/ace-pipeline-wiring.spec.ts",
+    "sveltekit-frontend/tests/ace-pipeline-wiring.spec.ts",
+    ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/ace-rerank-spine.spec.ts",
+    ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/postgres-fts-fallback.spec.ts",
+    ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/postgres-fts-fallback.spec.ts",
+    ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/postgres-fts-fallback.spec.ts",
+    ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/postgres-fts-fallback.spec.ts",
+    ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/postgres-fts-fallback.spec.ts",
+    ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/postgres-fts-fallback.spec.ts",
+    "sveltekit-frontend/tests/retrieval-path-wiring.spec.ts",
+    "sveltekit-frontend/tests/retrieval-path-wiring.spec.ts",
     ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/ace-code-cache.spec.ts",
     ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/ace-code-cache.spec.ts",
     ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/ace-code-cache.spec.ts",
@@ -597,9 +734,22 @@
     "sveltekit-frontend/tests/ace-ingest-route.spec.ts",
     "sveltekit-frontend/tests/ace-ingest-route.spec.ts",
     "sveltekit-frontend/tests/ace-ingest-route.spec.ts",
+    "sveltekit-frontend/tests/ace-ingest-route.spec.ts",
+    "sveltekit-frontend/tests/ace-ingest-route.spec.ts",
+    "sveltekit-frontend/tests/ace-ingest-route.spec.ts",
+    "sveltekit-frontend/tests/ace-ingest-route.spec.ts",
+    "sveltekit-frontend/tests/ace-ingest-route.spec.ts",
+    "sveltekit-frontend/tests/ace-ingest-route.spec.ts",
+    "sveltekit-frontend/tests/ace-ingest-route.spec.ts",
+    "sveltekit-frontend/tests/ace-ingest-route.spec.ts",
     "sveltekit-frontend/tests/routes/auto/api/ace/ingest.test.ts"
   ],
   "sveltekit-frontend/src/routes/api/ace/status/+server.ts": [
+    "sveltekit-frontend/tests/ace-status-route.spec.ts",
+    "sveltekit-frontend/tests/ace-status-route.spec.ts",
+    "sveltekit-frontend/tests/ace-status-route.spec.ts",
+    "sveltekit-frontend/tests/ace-status-route.spec.ts",
+    "sveltekit-frontend/tests/ace-status-route.spec.ts",
     "sveltekit-frontend/tests/ace-status-route.spec.ts",
     "sveltekit-frontend/tests/ace-status-route.spec.ts",
     "sveltekit-frontend/tests/ace-status-route.spec.ts",
@@ -630,9 +780,16 @@
     "sveltekit-frontend/tests/ace-summarize-route.spec.ts",
     "sveltekit-frontend/tests/ace-summarize-route.spec.ts",
     "sveltekit-frontend/tests/ace-summarize-route.spec.ts",
+    "sveltekit-frontend/tests/ace-summarize-route.spec.ts",
+    "sveltekit-frontend/tests/ace-summarize-route.spec.ts",
+    "sveltekit-frontend/tests/ace-summarize-route.spec.ts",
+    "sveltekit-frontend/tests/ace-summarize-route.spec.ts",
     "sveltekit-frontend/tests/routes/auto/api/ace/summarize.test.ts"
   ],
   ".claude/worktrees/agent-a7203461/sveltekit-frontend/src/lib/server/agents/agents-card-store.ts": [
+    ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/agents-index.spec.ts",
+    ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/agents-regen-markdown.spec.ts",
+    ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/agents-regen-writers.spec.ts",
     ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/agents-index.spec.ts",
     ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/agents-regen-markdown.spec.ts",
     ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/agents-regen-writers.spec.ts",
@@ -642,17 +799,22 @@
   ],
   ".claude/worktrees/agent-a7203461/sveltekit-frontend/src/lib/server/ace/agents-context-source.ts": [
     ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/agents-index.spec.ts",
+    ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/agents-index.spec.ts",
     ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/agents-index.spec.ts"
   ],
   ".claude/worktrees/agent-a7203461/sveltekit-frontend/src/lib/server/agents/regen/writers/markdown-writer.ts": [
+    ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/agents-regen-markdown.spec.ts",
     ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/agents-regen-markdown.spec.ts",
     ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/agents-regen-markdown.spec.ts"
   ],
   ".claude/worktrees/agent-a7203461/sveltekit-frontend/src/lib/server/agents/regen/telemetry.ts": [
     ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/agents-regen-telemetry.spec.ts",
+    ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/agents-regen-telemetry.spec.ts",
     ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/agents-regen-telemetry.spec.ts"
   ],
   "sveltekit-frontend/tests/utils/seed-cases.ts": [
+    "sveltekit-frontend/tests/ai-analysis-pipeline.spec.ts",
+    "sveltekit-frontend/tests/chat-attachment-floating-modal.spec.ts",
     "sveltekit-frontend/tests/ai-analysis-pipeline.spec.ts",
     "sveltekit-frontend/tests/chat-attachment-floating-modal.spec.ts",
     "sveltekit-frontend/tests/ai-analysis-pipeline.spec.ts",
@@ -669,6 +831,19 @@
     "sveltekit-frontend/tests/vector-search-rag.spec.ts"
   ],
   "sveltekit-frontend/tests/helpers/env-ports.ts": [
+    "sveltekit-frontend/tests/ai-analysis-pipeline.spec.ts",
+    "sveltekit-frontend/tests/ai-chat-functionality.spec.ts",
+    "sveltekit-frontend/tests/api-integration.spec.ts",
+    "sveltekit-frontend/tests/app-routes-health.spec.ts",
+    "sveltekit-frontend/tests/auth-api.spec.ts",
+    "sveltekit-frontend/tests/auth-ui-flow.spec.ts",
+    "sveltekit-frontend/tests/barrel-store-integration.spec.ts",
+    "sveltekit-frontend/tests/cache-system.spec.ts",
+    "sveltekit-frontend/tests/e2e/chat-rag-sse.spec.ts",
+    "sveltekit-frontend/tests/e2e/contract-network.spec.ts",
+    "sveltekit-frontend/tests/langextract-service.spec.ts",
+    "sveltekit-frontend/tests/phase99-production.spec.ts",
+    "sveltekit-frontend/tests/sprint3-infrastructure.spec.ts",
     "sveltekit-frontend/tests/ai-analysis-pipeline.spec.ts",
     "sveltekit-frontend/tests/ai-chat-functionality.spec.ts",
     "sveltekit-frontend/tests/api-integration.spec.ts",
@@ -774,9 +949,16 @@
     "sveltekit-frontend/tests/ai-canon-routes.spec.ts",
     "sveltekit-frontend/tests/ai-canon-routes.spec.ts",
     "sveltekit-frontend/tests/ai-canon-routes.spec.ts",
+    "sveltekit-frontend/tests/ai-canon-routes.spec.ts",
+    "sveltekit-frontend/tests/ai-canon-routes.spec.ts",
     "sveltekit-frontend/tests/routes/auto/api/ai/personas.test.ts"
   ],
   "sveltekit-frontend/src/routes/api/ai/stats/+server.ts": [
+    "sveltekit-frontend/tests/ai-canon-routes.spec.ts",
+    "sveltekit-frontend/tests/ai-canon-routes.spec.ts",
+    "sveltekit-frontend/tests/ai-canon-routes.spec.ts",
+    "sveltekit-frontend/tests/routes/get-degraded-shape-pass-a.test.ts",
+    "sveltekit-frontend/tests/routes/get-degraded-shape-pass-a.test.ts",
     "sveltekit-frontend/tests/ai-canon-routes.spec.ts",
     "sveltekit-frontend/tests/ai-canon-routes.spec.ts",
     "sveltekit-frontend/tests/ai-canon-routes.spec.ts",
@@ -804,9 +986,70 @@
     "sveltekit-frontend/tests/ai-canon-routes.spec.ts",
     "sveltekit-frontend/tests/ai-canon-routes.spec.ts",
     "sveltekit-frontend/tests/ai-routes-comprehensive.spec.ts",
+    "sveltekit-frontend/tests/ai-canon-routes.spec.ts",
+    "sveltekit-frontend/tests/ai-canon-routes.spec.ts",
+    "sveltekit-frontend/tests/ai-routes-comprehensive.spec.ts",
     "sveltekit-frontend/tests/routes/auto/api/ai/suggestions.test.ts"
   ],
   ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/helpers/env-ports.ts": [
+    ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/ai-chat.spec.ts",
+    ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/all-routes-screenshot.spec.ts",
+    ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/analysis-routes.spec.ts",
+    ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/case-notes-lifecycle.spec.ts",
+    ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/cases-page.spec.ts",
+    ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/codebase-viewer.spec.ts",
+    ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/e2e/auth-login-db.spec.ts",
+    ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/e2e/chat-inference-routing.spec.ts",
+    ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/e2e/chat.spec.ts",
+    ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/e2e/demo-seed.spec.ts",
+    ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/e2e/evidence-analyze-stream.spec.ts",
+    ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/e2e/evidence-case-scoping.spec.ts",
+    ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/e2e/evidence-viewer-route.spec.ts",
+    ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/e2e/intent-dispatch.spec.ts",
+    ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/e2e/rag-search-fused.spec.ts",
+    ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/e2e/rag-search-rrf-canary.spec.ts",
+    ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/e2e/rag-sync.spec.ts",
+    ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/e2e/route-forensic/legal-corpus-api.contract.spec.ts",
+    ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/e2e/route-forensic/library-api.contract.spec.ts",
+    ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/e2e/service-health-probe.spec.ts",
+    ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/e2e/upload-button-diagnostic.spec.ts",
+    ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/e2e/vlm-inference-vision.spec.ts",
+    ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/e2e-workflow.spec.ts",
+    ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/error-brain-complete.spec.ts",
+    ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/evidence-pipeline-e2e.spec.ts",
+    ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/evidence-rag-simple.spec.ts",
+    ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/evidence-simple.spec.ts",
+    ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/evidence-upload-modal.spec.ts",
+    ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/evidence-upload-rag.spec.ts",
+    ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/full-user-workflow-screenshots.spec.ts",
+    ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/gamification-poi-timeline.spec.ts",
+    ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/infrastructure-overhaul.spec.ts",
+    ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/lane-latency-integration.spec.ts",
+    ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/legal-workflow.spec.ts",
+    ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/mcp-routes.spec.ts",
+    ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/nes-architecture.spec.ts",
+    ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/phase96-all-routes-mcp.spec.ts",
+    ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/phase97-authenticated-streaming.spec.ts",
+    ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/phase97-streaming-test.spec.ts",
+    ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/phase99-routes-validation.spec.ts",
+    ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/poi-creation-timeline.spec.ts",
+    ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/poi-photo-lifecycle.spec.ts",
+    ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/poi-photo-upload.spec.ts",
+    ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/quick-routes-test.spec.ts",
+    ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/research-evidence-e2e.spec.ts",
+    ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/research-graph-rl.spec.ts",
+    ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/seeded-cases-e2e.spec.ts",
+    ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/simple-ux-test.spec.ts",
+    ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/sprint1-critical-fixes.spec.ts",
+    ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/sprint1-critical-fixes.spec.ts",
+    ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/sprint2-embedding-consolidation.spec.ts",
+    ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/sprint4-production-readiness.spec.ts",
+    ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/sprint5-6-monitoring.spec.ts",
+    ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/stores-smoke-test.spec.ts",
+    ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/ui-ux-walkthrough.spec.ts",
+    ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/uuid-validation-audit.spec.ts",
+    ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/ux-layout-tests.spec.ts",
+    ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/vector-search-rag.spec.ts",
     ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/ai-chat.spec.ts",
     ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/all-routes-screenshot.spec.ts",
     ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/analysis-routes.spec.ts",
@@ -940,9 +1183,18 @@
     "sveltekit-frontend/tests/ai-routes-comprehensive.spec.ts",
     "sveltekit-frontend/tests/ai-routes-comprehensive.spec.ts",
     "sveltekit-frontend/tests/ai-routes-comprehensive.spec.ts",
+    "sveltekit-frontend/tests/ai-routes-comprehensive.spec.ts",
+    "sveltekit-frontend/tests/ai-routes-comprehensive.spec.ts",
+    "sveltekit-frontend/tests/ai-routes-comprehensive.spec.ts",
+    "sveltekit-frontend/tests/ai-routes-comprehensive.spec.ts",
+    "sveltekit-frontend/tests/ai-routes-comprehensive.spec.ts",
     "sveltekit-frontend/tests/routes/auto/api/ai/ask.test.ts"
   ],
   "sveltekit-frontend/src/routes/api/ai/summarize/+server.ts": [
+    "sveltekit-frontend/tests/ai-routes-comprehensive.spec.ts",
+    "sveltekit-frontend/tests/ai-routes-comprehensive.spec.ts",
+    "sveltekit-frontend/tests/ai-routes-comprehensive.spec.ts",
+    "sveltekit-frontend/tests/ai-routes-comprehensive.spec.ts",
     "sveltekit-frontend/tests/ai-routes-comprehensive.spec.ts",
     "sveltekit-frontend/tests/ai-routes-comprehensive.spec.ts",
     "sveltekit-frontend/tests/ai-routes-comprehensive.spec.ts",
@@ -961,9 +1213,12 @@
     "sveltekit-frontend/tests/analytics-tags-nlp-prefs-routes.spec.ts",
     "sveltekit-frontend/tests/analytics-tags-nlp-prefs-routes.spec.ts",
     "sveltekit-frontend/tests/analytics-tags-nlp-prefs-routes.spec.ts",
+    "sveltekit-frontend/tests/analytics-tags-nlp-prefs-routes.spec.ts",
     "sveltekit-frontend/tests/routes/auto/api/ping.test.ts"
   ],
   "sveltekit-frontend/src/routes/api/analytics/events/+server.ts": [
+    "sveltekit-frontend/tests/analytics-tags-nlp-prefs-routes.spec.ts",
+    "sveltekit-frontend/tests/analytics-tags-nlp-prefs-routes.spec.ts",
     "sveltekit-frontend/tests/analytics-tags-nlp-prefs-routes.spec.ts",
     "sveltekit-frontend/tests/analytics-tags-nlp-prefs-routes.spec.ts",
     "sveltekit-frontend/tests/analytics-tags-nlp-prefs-routes.spec.ts",
@@ -977,9 +1232,11 @@
     "sveltekit-frontend/tests/analytics-tags-nlp-prefs-routes.spec.ts",
     "sveltekit-frontend/tests/analytics-tags-nlp-prefs-routes.spec.ts",
     "sveltekit-frontend/tests/analytics-tags-nlp-prefs-routes.spec.ts",
+    "sveltekit-frontend/tests/analytics-tags-nlp-prefs-routes.spec.ts",
     "sveltekit-frontend/tests/routes/auto/api/analytics/patterns.test.ts"
   ],
   "sveltekit-frontend/src/routes/api/analytics/summary/+server.ts": [
+    "sveltekit-frontend/tests/analytics-tags-nlp-prefs-routes.spec.ts",
     "sveltekit-frontend/tests/analytics-tags-nlp-prefs-routes.spec.ts",
     "sveltekit-frontend/tests/analytics-tags-nlp-prefs-routes.spec.ts",
     "sveltekit-frontend/tests/analytics-tags-nlp-prefs-routes.spec.ts",
@@ -989,9 +1246,11 @@
     "sveltekit-frontend/tests/analytics-tags-nlp-prefs-routes.spec.ts",
     "sveltekit-frontend/tests/analytics-tags-nlp-prefs-routes.spec.ts",
     "sveltekit-frontend/tests/analytics-tags-nlp-prefs-routes.spec.ts",
+    "sveltekit-frontend/tests/analytics-tags-nlp-prefs-routes.spec.ts",
     "sveltekit-frontend/tests/routes/auto/api/analytics/search.test.ts"
   ],
   "sveltekit-frontend/src/routes/api/analytics/token-usage/+server.ts": [
+    "sveltekit-frontend/tests/analytics-tags-nlp-prefs-routes.spec.ts",
     "sveltekit-frontend/tests/analytics-tags-nlp-prefs-routes.spec.ts",
     "sveltekit-frontend/tests/analytics-tags-nlp-prefs-routes.spec.ts",
     "sveltekit-frontend/tests/analytics-tags-nlp-prefs-routes.spec.ts",
@@ -1001,15 +1260,18 @@
     "sveltekit-frontend/tests/analytics-tags-nlp-prefs-routes.spec.ts",
     "sveltekit-frontend/tests/analytics-tags-nlp-prefs-routes.spec.ts",
     "sveltekit-frontend/tests/analytics-tags-nlp-prefs-routes.spec.ts",
+    "sveltekit-frontend/tests/analytics-tags-nlp-prefs-routes.spec.ts",
     "sveltekit-frontend/tests/routes/auto/api/tags.test.ts"
   ],
   "sveltekit-frontend/src/routes/api/tags/[tagId]/+server.ts": [
     "sveltekit-frontend/tests/analytics-tags-nlp-prefs-routes.spec.ts",
     "sveltekit-frontend/tests/analytics-tags-nlp-prefs-routes.spec.ts",
     "sveltekit-frontend/tests/analytics-tags-nlp-prefs-routes.spec.ts",
+    "sveltekit-frontend/tests/analytics-tags-nlp-prefs-routes.spec.ts",
     "sveltekit-frontend/tests/routes/auto/api/tags/__tagId.test.ts"
   ],
   "sveltekit-frontend/src/routes/api/codebase-index/claude-assist/defaults/+server.ts": [
+    "sveltekit-frontend/tests/assist-defaults.spec.ts",
     "sveltekit-frontend/tests/assist-defaults.spec.ts",
     "sveltekit-frontend/tests/assist-defaults.spec.ts",
     "sveltekit-frontend/tests/assist-defaults.spec.ts",
@@ -1020,9 +1282,11 @@
     "sveltekit-frontend/tests/assist-feedback-analysis.spec.ts",
     "sveltekit-frontend/tests/assist-feedback-analysis.spec.ts",
     "sveltekit-frontend/tests/assist-feedback-analysis.spec.ts",
+    "sveltekit-frontend/tests/assist-feedback-analysis.spec.ts",
     "sveltekit-frontend/tests/routes/auto/api/codebase-index/claude-assist/feedback/analysis.test.ts"
   ],
   "sveltekit-frontend/src/routes/api/codebase-index/claude-assist/feedback/+server.ts": [
+    "sveltekit-frontend/tests/assist-feedback.spec.ts",
     "sveltekit-frontend/tests/assist-feedback.spec.ts",
     "sveltekit-frontend/tests/assist-feedback.spec.ts",
     "sveltekit-frontend/tests/assist-feedback.spec.ts",
@@ -1030,6 +1294,11 @@
     "sveltekit-frontend/tests/routes/auto/api/codebase-index/claude-assist/feedback.test.ts"
   ],
   "sveltekit-frontend/tests/fixtures/test-cases.ts": [
+    "sveltekit-frontend/tests/auth-api.spec.ts",
+    "sveltekit-frontend/tests/e2e/evidence-case-link-canvas.spec.ts",
+    "sveltekit-frontend/tests/e2e/user-flows.spec.ts",
+    "sveltekit-frontend/tests/full_user_flow.spec.ts",
+    "sveltekit-frontend/tests/user-case-creation.spec.ts",
     "sveltekit-frontend/tests/auth-api.spec.ts",
     "sveltekit-frontend/tests/e2e/evidence-case-link-canvas.spec.ts",
     "sveltekit-frontend/tests/e2e/user-flows.spec.ts",
@@ -1052,9 +1321,21 @@
     ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/build-codebase-relationships.spec.ts",
     ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/unit/normalize-repo-path.test.ts",
     ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/build-codebase-relationships.spec.ts",
+    ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/unit/normalize-repo-path.test.ts",
+    ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/build-codebase-relationships.spec.ts",
     ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/unit/normalize-repo-path.test.ts"
   ],
   "sveltekit-frontend/src/routes/api/cache/+server.ts": [
+    "sveltekit-frontend/tests/cache-recommendations-ml-sys-routes.spec.ts",
+    "sveltekit-frontend/tests/cache-recommendations-ml-sys-routes.spec.ts",
+    "sveltekit-frontend/tests/cache-recommendations-ml-sys-routes.spec.ts",
+    "sveltekit-frontend/tests/cache-recommendations-ml-sys-routes.spec.ts",
+    "sveltekit-frontend/tests/cache-recommendations-ml-sys-routes.spec.ts",
+    "sveltekit-frontend/tests/cache-recommendations-ml-sys-routes.spec.ts",
+    "sveltekit-frontend/tests/cache-recommendations-ml-sys-routes.spec.ts",
+    "sveltekit-frontend/tests/cache-recommendations-ml-sys-routes.spec.ts",
+    "sveltekit-frontend/tests/cache-recommendations-ml-sys-routes.spec.ts",
+    "sveltekit-frontend/tests/cache-recommendations-ml-sys-routes.spec.ts",
     "sveltekit-frontend/tests/cache-recommendations-ml-sys-routes.spec.ts",
     "sveltekit-frontend/tests/cache-recommendations-ml-sys-routes.spec.ts",
     "sveltekit-frontend/tests/cache-recommendations-ml-sys-routes.spec.ts",
@@ -1095,14 +1376,25 @@
     "sveltekit-frontend/tests/cartridge-stage-a0.spec.ts",
     "sveltekit-frontend/tests/cartridge-stage-a0.spec.ts",
     "sveltekit-frontend/tests/cartridge-stage-a0.spec.ts",
+    "sveltekit-frontend/tests/cartridge-stage-a0.spec.ts",
+    "sveltekit-frontend/tests/cartridge-stage-a0.spec.ts",
     "sveltekit-frontend/tests/cartridge-stage-a0.spec.ts"
   ],
   "sveltekit-frontend/src/lib/server/cartridge/chr97-builder.ts": [
     "sveltekit-frontend/tests/cartridge-stage-a0.spec.ts",
     "sveltekit-frontend/tests/cartridge-stage-a0.spec.ts",
+    "sveltekit-frontend/tests/cartridge-stage-a0.spec.ts",
     "sveltekit-frontend/tests/cartridge-stage-a0.spec.ts"
   ],
   ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/utils/seed-cases.ts": [
+    ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/case-notes-lifecycle.spec.ts",
+    ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/e2e/chat.spec.ts",
+    ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/e2e/evidence-case-scoping.spec.ts",
+    ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/evidence-pipeline-e2e.spec.ts",
+    ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/poi-photo-lifecycle.spec.ts",
+    ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/seeded-cases-e2e.spec.ts",
+    ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/uuid-validation-audit.spec.ts",
+    ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/vector-search-rag.spec.ts",
     ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/case-notes-lifecycle.spec.ts",
     ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/e2e/chat.spec.ts",
     ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/e2e/evidence-case-scoping.spec.ts",
@@ -1124,9 +1416,11 @@
     "sveltekit-frontend/tests/cases-auth-evidence-routes.spec.ts",
     "sveltekit-frontend/tests/cases-auth-evidence-routes.spec.ts",
     "sveltekit-frontend/tests/cases-auth-evidence-routes.spec.ts",
+    "sveltekit-frontend/tests/cases-auth-evidence-routes.spec.ts",
     "sveltekit-frontend/tests/routes/auto/api/auth/me.test.ts"
   ],
   "sveltekit-frontend/src/routes/api/auth/login/+server.ts": [
+    "sveltekit-frontend/tests/cases-auth-evidence-routes.spec.ts",
     "sveltekit-frontend/tests/cases-auth-evidence-routes.spec.ts",
     "sveltekit-frontend/tests/cases-auth-evidence-routes.spec.ts",
     "sveltekit-frontend/tests/cases-auth-evidence-routes.spec.ts",
@@ -1136,9 +1430,14 @@
     "sveltekit-frontend/tests/cases-auth-evidence-routes.spec.ts",
     "sveltekit-frontend/tests/cases-auth-evidence-routes.spec.ts",
     "sveltekit-frontend/tests/cases-auth-evidence-routes.spec.ts",
+    "sveltekit-frontend/tests/cases-auth-evidence-routes.spec.ts",
     "sveltekit-frontend/tests/routes/auto/api/auth/register.test.ts"
   ],
   "sveltekit-frontend/src/routes/api/cases/+server.ts": [
+    "sveltekit-frontend/tests/cases-auth-evidence-routes.spec.ts",
+    "sveltekit-frontend/tests/cases-auth-evidence-routes.spec.ts",
+    "sveltekit-frontend/tests/cases-auth-evidence-routes.spec.ts",
+    "sveltekit-frontend/tests/routes/get-degraded-shape-pass-a.test.ts",
     "sveltekit-frontend/tests/cases-auth-evidence-routes.spec.ts",
     "sveltekit-frontend/tests/cases-auth-evidence-routes.spec.ts",
     "sveltekit-frontend/tests/cases-auth-evidence-routes.spec.ts",
@@ -1160,9 +1459,14 @@
     "sveltekit-frontend/tests/cases-auth-evidence-routes.spec.ts",
     "sveltekit-frontend/tests/cases-auth-evidence-routes.spec.ts",
     "sveltekit-frontend/tests/cases-auth-evidence-routes.spec.ts",
+    "sveltekit-frontend/tests/cases-auth-evidence-routes.spec.ts",
     "sveltekit-frontend/tests/routes/auto/api/evidence.test.ts"
   ],
   "sveltekit-frontend/src/routes/api/cases/[id]/overview/+server.ts": [
+    "sveltekit-frontend/tests/cases-sub-routes.spec.ts",
+    "sveltekit-frontend/tests/cases-sub-routes.spec.ts",
+    "sveltekit-frontend/tests/cases-sub-routes.spec.ts",
+    "sveltekit-frontend/tests/cases-sub-routes.spec.ts",
     "sveltekit-frontend/tests/cases-sub-routes.spec.ts",
     "sveltekit-frontend/tests/cases-sub-routes.spec.ts",
     "sveltekit-frontend/tests/cases-sub-routes.spec.ts",
@@ -1193,9 +1497,15 @@
     "sveltekit-frontend/tests/cases-sub-routes.spec.ts",
     "sveltekit-frontend/tests/cases-sub-routes.spec.ts",
     "sveltekit-frontend/tests/cases-sub-routes.spec.ts",
+    "sveltekit-frontend/tests/cases-sub-routes.spec.ts",
+    "sveltekit-frontend/tests/cases-sub-routes.spec.ts",
+    "sveltekit-frontend/tests/cases-sub-routes.spec.ts",
+    "sveltekit-frontend/tests/cases-sub-routes.spec.ts",
+    "sveltekit-frontend/tests/cases-sub-routes.spec.ts",
     "sveltekit-frontend/tests/routes/auto/api/cases/__id/connections.test.ts"
   ],
   "sveltekit-frontend/src/routes/api/cases/[id]/persons/+server.ts": [
+    "sveltekit-frontend/tests/cases-sub-routes.spec.ts",
     "sveltekit-frontend/tests/cases-sub-routes.spec.ts",
     "sveltekit-frontend/tests/cases-sub-routes.spec.ts",
     "sveltekit-frontend/tests/cases-sub-routes.spec.ts",
@@ -1206,9 +1516,12 @@
   "sveltekit-frontend/src/lib/server/indexer/dual-embedder.ts": [
     "sveltekit-frontend/tests/codebase-index-cache-reuse.spec.ts",
     "sveltekit-frontend/tests/codebase-index-cache-reuse.spec.ts",
+    "sveltekit-frontend/tests/codebase-index-cache-reuse.spec.ts",
     "sveltekit-frontend/tests/codebase-index-cache-reuse.spec.ts"
   ],
   "sveltekit-frontend/src/lib/server/retrieval/codebase-context.ts": [
+    "sveltekit-frontend/tests/codebase-index-cache-reuse.spec.ts",
+    "sveltekit-frontend/tests/codebase-index-postgres-fallback.spec.ts",
     "sveltekit-frontend/tests/codebase-index-cache-reuse.spec.ts",
     "sveltekit-frontend/tests/codebase-index-postgres-fallback.spec.ts",
     "sveltekit-frontend/tests/codebase-index-cache-reuse.spec.ts",
@@ -1219,9 +1532,19 @@
   "sveltekit-frontend/src/lib/server/indexer/cluster-summary.ts": [
     "sveltekit-frontend/tests/codebase-index-postgres-fallback.spec.ts",
     "sveltekit-frontend/tests/codebase-index-postgres-fallback.spec.ts",
+    "sveltekit-frontend/tests/codebase-index-postgres-fallback.spec.ts",
     "sveltekit-frontend/tests/codebase-index-postgres-fallback.spec.ts"
   ],
   "sveltekit-frontend/src/routes/api/codebase-index/+server.ts": [
+    "sveltekit-frontend/tests/codebase-indexer.spec.ts",
+    "sveltekit-frontend/tests/codebase-indexer.spec.ts",
+    "sveltekit-frontend/tests/codebase-indexer.spec.ts",
+    "sveltekit-frontend/tests/codebase-indexer.spec.ts",
+    "sveltekit-frontend/tests/codebase-indexer.spec.ts",
+    "sveltekit-frontend/tests/codebase-indexer.spec.ts",
+    "sveltekit-frontend/tests/codebase-indexer.spec.ts",
+    "sveltekit-frontend/tests/codebase-indexer.spec.ts",
+    "sveltekit-frontend/tests/codebase-indexer.spec.ts",
     "sveltekit-frontend/tests/codebase-indexer.spec.ts",
     "sveltekit-frontend/tests/codebase-indexer.spec.ts",
     "sveltekit-frontend/tests/codebase-indexer.spec.ts",
@@ -1271,9 +1594,18 @@
     "sveltekit-frontend/tests/contextual-knowledge-web-routes.spec.ts",
     "sveltekit-frontend/tests/contextual-knowledge-web-routes.spec.ts",
     "sveltekit-frontend/tests/contextual-knowledge-web-routes.spec.ts",
+    "sveltekit-frontend/tests/contextual-knowledge-web-routes.spec.ts",
+    "sveltekit-frontend/tests/contextual-knowledge-web-routes.spec.ts",
+    "sveltekit-frontend/tests/contextual-knowledge-web-routes.spec.ts",
+    "sveltekit-frontend/tests/contextual-knowledge-web-routes.spec.ts",
+    "sveltekit-frontend/tests/contextual-knowledge-web-routes.spec.ts",
     "sveltekit-frontend/tests/routes/auto/api/contextual/chat.test.ts"
   ],
   "sveltekit-frontend/src/routes/api/contextual/predictions/+server.ts": [
+    "sveltekit-frontend/tests/contextual-knowledge-web-routes.spec.ts",
+    "sveltekit-frontend/tests/contextual-knowledge-web-routes.spec.ts",
+    "sveltekit-frontend/tests/contextual-knowledge-web-routes.spec.ts",
+    "sveltekit-frontend/tests/contextual-knowledge-web-routes.spec.ts",
     "sveltekit-frontend/tests/contextual-knowledge-web-routes.spec.ts",
     "sveltekit-frontend/tests/contextual-knowledge-web-routes.spec.ts",
     "sveltekit-frontend/tests/contextual-knowledge-web-routes.spec.ts",
@@ -1292,10 +1624,19 @@
     "sveltekit-frontend/tests/contextual-knowledge-web-routes.spec.ts",
     "sveltekit-frontend/tests/contextual-knowledge-web-routes.spec.ts",
     "sveltekit-frontend/tests/contextual-knowledge-web-routes.spec.ts",
+    "sveltekit-frontend/tests/contextual-knowledge-web-routes.spec.ts",
     "sveltekit-frontend/tests/routes/auto/api/contextual/state.test.ts",
     "sveltekit-frontend/tests/routes/auto/api/contextual/state.test.ts"
   ],
   "sveltekit-frontend/src/routes/api/documents/[id]/+server.ts": [
+    "sveltekit-frontend/tests/docs-sync-cartridge-system-routes.spec.ts",
+    "sveltekit-frontend/tests/docs-sync-cartridge-system-routes.spec.ts",
+    "sveltekit-frontend/tests/docs-sync-cartridge-system-routes.spec.ts",
+    "sveltekit-frontend/tests/docs-sync-cartridge-system-routes.spec.ts",
+    "sveltekit-frontend/tests/docs-sync-cartridge-system-routes.spec.ts",
+    "sveltekit-frontend/tests/docs-sync-cartridge-system-routes.spec.ts",
+    "sveltekit-frontend/tests/docs-sync-cartridge-system-routes.spec.ts",
+    "sveltekit-frontend/tests/docs-sync-cartridge-system-routes.spec.ts",
     "sveltekit-frontend/tests/docs-sync-cartridge-system-routes.spec.ts",
     "sveltekit-frontend/tests/docs-sync-cartridge-system-routes.spec.ts",
     "sveltekit-frontend/tests/docs-sync-cartridge-system-routes.spec.ts",
@@ -1330,9 +1671,16 @@
     "sveltekit-frontend/tests/docs-sync-cartridge-system-routes.spec.ts",
     "sveltekit-frontend/tests/docs-sync-cartridge-system-routes.spec.ts",
     "sveltekit-frontend/tests/docs-sync-cartridge-system-routes.spec.ts",
+    "sveltekit-frontend/tests/docs-sync-cartridge-system-routes.spec.ts",
+    "sveltekit-frontend/tests/docs-sync-cartridge-system-routes.spec.ts",
     "sveltekit-frontend/tests/routes/auto/api/documents/__id/auto-save.test.ts"
   ],
   "sveltekit-frontend/tests/e2e/utils/screenshot-utils.ts": [
+    "sveltekit-frontend/tests/e2e/client-inference.spec.ts",
+    "sveltekit-frontend/tests/e2e/homepage-screenshot.spec.ts",
+    "sveltekit-frontend/tests/e2e/route-verification.spec.ts",
+    "sveltekit-frontend/tests/e2e/ui-screenshots.spec.ts",
+    "sveltekit-frontend/tests/e2e/user-flows.spec.ts",
     "sveltekit-frontend/tests/e2e/client-inference.spec.ts",
     "sveltekit-frontend/tests/e2e/homepage-screenshot.spec.ts",
     "sveltekit-frontend/tests/e2e/route-verification.spec.ts",
@@ -1353,9 +1701,37 @@
   ],
   ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/fixtures/demo-auth.ts": [
     ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/e2e/demo-seed.spec.ts",
+    ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/e2e/demo-seed.spec.ts",
     ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/e2e/demo-seed.spec.ts"
   ],
   ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/e2e/route-forensic/_helpers.ts": [
+    ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/e2e/route-forensic/active-cases.diagnostic.spec.ts",
+    ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/e2e/route-forensic/analysis-center.diagnostic.spec.ts",
+    ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/e2e/route-forensic/analytics.diagnostic.spec.ts",
+    ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/e2e/route-forensic/case-detail.diagnostic.spec.ts",
+    ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/e2e/route-forensic/case-evidence-upload.diagnostic.spec.ts",
+    ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/e2e/route-forensic/case-evidence.diagnostic.spec.ts",
+    ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/e2e/route-forensic/cases-list.diagnostic.spec.ts",
+    ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/e2e/route-forensic/cases-new.diagnostic.spec.ts",
+    ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/e2e/route-forensic/chat.diagnostic.spec.ts",
+    ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/e2e/route-forensic/citations.diagnostic.spec.ts",
+    ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/e2e/route-forensic/command-center.diagnostic.spec.ts",
+    ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/e2e/route-forensic/dashboard.diagnostic.spec.ts",
+    ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/e2e/route-forensic/evidence-library.diagnostic.spec.ts",
+    ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/e2e/route-forensic/evidence-list.diagnostic.spec.ts",
+    ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/e2e/route-forensic/evidence-view.diagnostic.spec.ts",
+    ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/e2e/route-forensic/global-search.diagnostic.spec.ts",
+    ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/e2e/route-forensic/homepage.diagnostic.spec.ts",
+    ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/e2e/route-forensic/legal-corpus-detail.diagnostic.spec.ts",
+    ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/e2e/route-forensic/legal-corpus.diagnostic.spec.ts",
+    ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/e2e/route-forensic/library-detail.diagnostic.spec.ts",
+    ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/e2e/route-forensic/library.diagnostic.spec.ts",
+    ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/e2e/route-forensic/login.diagnostic.spec.ts",
+    ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/e2e/route-forensic/persons-of-interest.diagnostic.spec.ts",
+    ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/e2e/route-forensic/poi-detail.diagnostic.spec.ts",
+    ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/e2e/route-forensic/rag-search.diagnostic.spec.ts",
+    ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/e2e/route-forensic/register.diagnostic.spec.ts",
+    ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/e2e/route-forensic/reports.diagnostic.spec.ts",
     ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/e2e/route-forensic/active-cases.diagnostic.spec.ts",
     ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/e2e/route-forensic/analysis-center.diagnostic.spec.ts",
     ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/e2e/route-forensic/analytics.diagnostic.spec.ts",
@@ -1418,6 +1794,9 @@
     "sveltekit-frontend/tests/e2e/route-verification.spec.ts",
     "sveltekit-frontend/tests/e2e/ui-screenshots.spec.ts",
     "sveltekit-frontend/tests/e2e/user-flows.spec.ts",
+    "sveltekit-frontend/tests/e2e/route-verification.spec.ts",
+    "sveltekit-frontend/tests/e2e/ui-screenshots.spec.ts",
+    "sveltekit-frontend/tests/e2e/user-flows.spec.ts",
     "sveltekit-frontend/tests/e2e/auth-login-db.spec.ts",
     "sveltekit-frontend/tests/e2e/route-verification.spec.ts",
     "sveltekit-frontend/tests/e2e/ui-screenshots.spec.ts",
@@ -1427,9 +1806,14 @@
     "sveltekit-frontend/tests/error-brain-routes.spec.ts",
     "sveltekit-frontend/tests/error-brain-routes.spec.ts",
     "sveltekit-frontend/tests/error-brain-routes.spec.ts",
+    "sveltekit-frontend/tests/error-brain-routes.spec.ts",
     "sveltekit-frontend/tests/routes/auto/api/error-brain/generate-fix.test.ts"
   ],
   "sveltekit-frontend/src/routes/api/error-brain/diagnosis-history/+server.ts": [
+    "sveltekit-frontend/tests/error-brain-routes.spec.ts",
+    "sveltekit-frontend/tests/error-brain-routes.spec.ts",
+    "sveltekit-frontend/tests/error-brain-routes.spec.ts",
+    "sveltekit-frontend/tests/error-brain-routes.spec.ts",
     "sveltekit-frontend/tests/error-brain-routes.spec.ts",
     "sveltekit-frontend/tests/error-brain-routes.spec.ts",
     "sveltekit-frontend/tests/error-brain-routes.spec.ts",
@@ -1451,9 +1835,11 @@
     "sveltekit-frontend/tests/error-brain-routes.spec.ts",
     "sveltekit-frontend/tests/error-brain-routes.spec.ts",
     "sveltekit-frontend/tests/error-brain-routes.spec.ts",
+    "sveltekit-frontend/tests/error-brain-routes.spec.ts",
     "sveltekit-frontend/tests/routes/auto/api/error-brain/search.test.ts"
   ],
   "sveltekit-frontend/src/routes/api/error-brain/diagnose/+server.ts": [
+    "sveltekit-frontend/tests/error-brain-routes.spec.ts",
     "sveltekit-frontend/tests/error-brain-routes.spec.ts",
     "sveltekit-frontend/tests/error-brain-routes.spec.ts",
     "sveltekit-frontend/tests/error-brain-routes.spec.ts",
@@ -1463,9 +1849,11 @@
     "sveltekit-frontend/tests/error-brain-routes.spec.ts",
     "sveltekit-frontend/tests/error-brain-routes.spec.ts",
     "sveltekit-frontend/tests/error-brain-routes.spec.ts",
+    "sveltekit-frontend/tests/error-brain-routes.spec.ts",
     "sveltekit-frontend/tests/routes/auto/api/error-brain/diagnosis-history/similar.test.ts"
   ],
   "sveltekit-frontend/src/routes/api/error-brain/diagnosis-history/backfill/+server.ts": [
+    "sveltekit-frontend/tests/error-brain-routes.spec.ts",
     "sveltekit-frontend/tests/error-brain-routes.spec.ts",
     "sveltekit-frontend/tests/error-brain-routes.spec.ts",
     "sveltekit-frontend/tests/error-brain-routes.spec.ts",
@@ -1475,9 +1863,11 @@
     "sveltekit-frontend/tests/errors-feedback-fictional-routes.spec.ts",
     "sveltekit-frontend/tests/errors-feedback-fictional-routes.spec.ts",
     "sveltekit-frontend/tests/errors-feedback-fictional-routes.spec.ts",
+    "sveltekit-frontend/tests/errors-feedback-fictional-routes.spec.ts",
     "sveltekit-frontend/tests/routes/auto/api/errors/client-report.test.ts"
   ],
   "sveltekit-frontend/src/routes/api/errors/route-errors/+server.ts": [
+    "sveltekit-frontend/tests/errors-feedback-fictional-routes.spec.ts",
     "sveltekit-frontend/tests/errors-feedback-fictional-routes.spec.ts",
     "sveltekit-frontend/tests/errors-feedback-fictional-routes.spec.ts",
     "sveltekit-frontend/tests/errors-feedback-fictional-routes.spec.ts",
@@ -1487,9 +1877,11 @@
     "sveltekit-frontend/tests/errors-feedback-fictional-routes.spec.ts",
     "sveltekit-frontend/tests/errors-feedback-fictional-routes.spec.ts",
     "sveltekit-frontend/tests/errors-feedback-fictional-routes.spec.ts",
+    "sveltekit-frontend/tests/errors-feedback-fictional-routes.spec.ts",
     "sveltekit-frontend/tests/routes/auto/api/errors/summary.test.ts"
   ],
   "sveltekit-frontend/src/routes/api/feedback/+server.ts": [
+    "sveltekit-frontend/tests/errors-feedback-fictional-routes.spec.ts",
     "sveltekit-frontend/tests/errors-feedback-fictional-routes.spec.ts",
     "sveltekit-frontend/tests/errors-feedback-fictional-routes.spec.ts",
     "sveltekit-frontend/tests/errors-feedback-fictional-routes.spec.ts",
@@ -1499,9 +1891,11 @@
     "sveltekit-frontend/tests/errors-feedback-fictional-routes.spec.ts",
     "sveltekit-frontend/tests/errors-feedback-fictional-routes.spec.ts",
     "sveltekit-frontend/tests/errors-feedback-fictional-routes.spec.ts",
+    "sveltekit-frontend/tests/errors-feedback-fictional-routes.spec.ts",
     "sveltekit-frontend/tests/routes/auto/api/fictional-cases.test.ts"
   ],
   "sveltekit-frontend/src/routes/api/fictional-cases/[id]/+server.ts": [
+    "sveltekit-frontend/tests/errors-feedback-fictional-routes.spec.ts",
     "sveltekit-frontend/tests/errors-feedback-fictional-routes.spec.ts",
     "sveltekit-frontend/tests/errors-feedback-fictional-routes.spec.ts",
     "sveltekit-frontend/tests/errors-feedback-fictional-routes.spec.ts",
@@ -1519,11 +1913,15 @@
     "sveltekit-frontend/tests/evidence-detail-route.test.ts",
     "sveltekit-frontend/tests/evidence-detail-route.test.ts",
     "sveltekit-frontend/tests/evidence-detail-route.test.ts",
+    "sveltekit-frontend/tests/evidence-detail-route.test.ts",
+    "sveltekit-frontend/tests/evidence-detail-route.test.ts",
+    "sveltekit-frontend/tests/evidence-detail-route.test.ts",
     "sveltekit-frontend/tests/routes/auto/api/evidence/__id.test.ts",
     "sveltekit-frontend/tests/routes/auto/api/evidence/__id.test.ts",
     "sveltekit-frontend/tests/routes/auto/api/evidence/__id.test.ts"
   ],
   "sveltekit-frontend/src/lib/machines/evidence-processing-machine.ts": [
+    "sveltekit-frontend/tests/evidence-workflow-integration.test.ts",
     "sveltekit-frontend/tests/evidence-workflow-integration.test.ts",
     "sveltekit-frontend/tests/evidence-workflow-integration.test.ts",
     "sveltekit-frontend/tests/evidence-workflow-integration.test.ts"
@@ -1532,9 +1930,11 @@
     "sveltekit-frontend/tests/glossary-health-routes.spec.ts",
     "sveltekit-frontend/tests/glossary-health-routes.spec.ts",
     "sveltekit-frontend/tests/glossary-health-routes.spec.ts",
+    "sveltekit-frontend/tests/glossary-health-routes.spec.ts",
     "sveltekit-frontend/tests/routes/auto/api/glossary/search.test.ts"
   ],
   "sveltekit-frontend/src/routes/api/glossary/terms/+server.ts": [
+    "sveltekit-frontend/tests/glossary-health-routes.spec.ts",
     "sveltekit-frontend/tests/glossary-health-routes.spec.ts",
     "sveltekit-frontend/tests/glossary-health-routes.spec.ts",
     "sveltekit-frontend/tests/glossary-health-routes.spec.ts",
@@ -1546,10 +1946,16 @@
     "sveltekit-frontend/tests/glossary-health-routes.spec.ts",
     "sveltekit-frontend/tests/runtime-connection-contract.spec.ts",
     "sveltekit-frontend/tests/glossary-health-routes.spec.ts",
+    "sveltekit-frontend/tests/runtime-connection-contract.spec.ts",
+    "sveltekit-frontend/tests/glossary-health-routes.spec.ts",
     "sveltekit-frontend/tests/routes/auto/api/health.test.ts",
     "sveltekit-frontend/tests/runtime-connection-contract.spec.ts"
   ],
   "sveltekit-frontend/src/routes/api/graph/connections/+server.ts": [
+    "sveltekit-frontend/tests/graph-detective-search-routes.spec.ts",
+    "sveltekit-frontend/tests/graph-detective-search-routes.spec.ts",
+    "sveltekit-frontend/tests/graph-detective-search-routes.spec.ts",
+    "sveltekit-frontend/tests/graph-detective-search-routes.spec.ts",
     "sveltekit-frontend/tests/graph-detective-search-routes.spec.ts",
     "sveltekit-frontend/tests/graph-detective-search-routes.spec.ts",
     "sveltekit-frontend/tests/graph-detective-search-routes.spec.ts",
@@ -1574,9 +1980,15 @@
     "sveltekit-frontend/tests/graph-detective-search-routes.spec.ts",
     "sveltekit-frontend/tests/graph-detective-search-routes.spec.ts",
     "sveltekit-frontend/tests/graph-detective-search-routes.spec.ts",
+    "sveltekit-frontend/tests/graph-detective-search-routes.spec.ts",
+    "sveltekit-frontend/tests/graph-detective-search-routes.spec.ts",
+    "sveltekit-frontend/tests/graph-detective-search-routes.spec.ts",
     "sveltekit-frontend/tests/routes/auto/api/graph/relationships.test.ts"
   ],
   "sveltekit-frontend/src/routes/api/graph/sync/+server.ts": [
+    "sveltekit-frontend/tests/graph-detective-search-routes.spec.ts",
+    "sveltekit-frontend/tests/graph-detective-search-routes.spec.ts",
+    "sveltekit-frontend/tests/graph-detective-search-routes.spec.ts",
     "sveltekit-frontend/tests/graph-detective-search-routes.spec.ts",
     "sveltekit-frontend/tests/graph-detective-search-routes.spec.ts",
     "sveltekit-frontend/tests/graph-detective-search-routes.spec.ts",
@@ -1590,9 +2002,12 @@
   ],
   ".claude/worktrees/agent-a7203461/sveltekit-frontend/src/lib/server/hypergraph/hypergraph-types.ts": [
     ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/hypergraph-traversal.spec.ts",
+    ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/hypergraph-traversal.spec.ts",
     ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/hypergraph-traversal.spec.ts"
   ],
   "sveltekit-frontend/src/routes/api/infrastructure/status/+server.ts": [
+    "sveltekit-frontend/tests/infra-ollama-cache-routes.spec.ts",
+    "sveltekit-frontend/tests/runtime-connection-contract.spec.ts",
     "sveltekit-frontend/tests/infra-ollama-cache-routes.spec.ts",
     "sveltekit-frontend/tests/runtime-connection-contract.spec.ts",
     "sveltekit-frontend/tests/infra-ollama-cache-routes.spec.ts",
@@ -1605,9 +2020,11 @@
     "sveltekit-frontend/tests/infra-ollama-cache-routes.spec.ts",
     "sveltekit-frontend/tests/infra-ollama-cache-routes.spec.ts",
     "sveltekit-frontend/tests/infra-ollama-cache-routes.spec.ts",
+    "sveltekit-frontend/tests/infra-ollama-cache-routes.spec.ts",
     "sveltekit-frontend/tests/routes/auto/api/dashboard/stats.test.ts"
   ],
   "sveltekit-frontend/src/routes/api/ollama/pull/+server.ts": [
+    "sveltekit-frontend/tests/infra-ollama-cache-routes.spec.ts",
     "sveltekit-frontend/tests/infra-ollama-cache-routes.spec.ts",
     "sveltekit-frontend/tests/infra-ollama-cache-routes.spec.ts",
     "sveltekit-frontend/tests/infra-ollama-cache-routes.spec.ts",
@@ -1618,9 +2035,13 @@
     "sveltekit-frontend/tests/infra-ollama-cache-routes.spec.ts",
     "sveltekit-frontend/tests/infra-ollama-cache-routes.spec.ts",
     "sveltekit-frontend/tests/infra-ollama-cache-routes.spec.ts",
+    "sveltekit-frontend/tests/infra-ollama-cache-routes.spec.ts",
     "sveltekit-frontend/tests/routes/auto/api/ollama/generate.test.ts"
   ],
   "sveltekit-frontend/src/routes/api/cache/stats/+server.ts": [
+    "sveltekit-frontend/tests/infra-ollama-cache-routes.spec.ts",
+    "sveltekit-frontend/tests/routes/get-degraded-shape-pass-a.test.ts",
+    "sveltekit-frontend/tests/routes/get-degraded-shape-pass-a.test.ts",
     "sveltekit-frontend/tests/infra-ollama-cache-routes.spec.ts",
     "sveltekit-frontend/tests/routes/get-degraded-shape-pass-a.test.ts",
     "sveltekit-frontend/tests/routes/get-degraded-shape-pass-a.test.ts",
@@ -1636,9 +2057,11 @@
     "sveltekit-frontend/tests/infra-ollama-cache-routes.spec.ts",
     "sveltekit-frontend/tests/infra-ollama-cache-routes.spec.ts",
     "sveltekit-frontend/tests/infra-ollama-cache-routes.spec.ts",
+    "sveltekit-frontend/tests/infra-ollama-cache-routes.spec.ts",
     "sveltekit-frontend/tests/routes/auto/api/vector-search.test.ts"
   ],
   "sveltekit-frontend/src/routes/api/case-theory/+server.ts": [
+    "sveltekit-frontend/tests/infra-ollama-cache-routes.spec.ts",
     "sveltekit-frontend/tests/infra-ollama-cache-routes.spec.ts",
     "sveltekit-frontend/tests/infra-ollama-cache-routes.spec.ts",
     "sveltekit-frontend/tests/infra-ollama-cache-routes.spec.ts",
@@ -1647,9 +2070,11 @@
   "sveltekit-frontend/src/lib/server/ai/intent-ranker.ts": [
     "sveltekit-frontend/tests/intent-ranker.spec.ts",
     "sveltekit-frontend/tests/intent-ranker.spec.ts",
+    "sveltekit-frontend/tests/intent-ranker.spec.ts",
     "sveltekit-frontend/tests/intent-ranker.spec.ts"
   ],
   "sveltekit-frontend/src/lib/server/memory/local-engram-memory-adapter.ts": [
+    "sveltekit-frontend/tests/intent-ranker.spec.ts",
     "sveltekit-frontend/tests/intent-ranker.spec.ts",
     "sveltekit-frontend/tests/intent-ranker.spec.ts",
     "sveltekit-frontend/tests/intent-ranker.spec.ts",
@@ -1665,14 +2090,23 @@
     ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/library-upload-ingest.spec.ts",
     ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/library-upload-ingest.spec.ts",
     ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/library-upload-ingest.spec.ts",
+    ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/library/ingest/__jobId.test.ts",
+    ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/library-upload-ingest.spec.ts",
+    ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/library-upload-ingest.spec.ts",
+    ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/library-upload-ingest.spec.ts",
+    ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/library-upload-ingest.spec.ts",
     ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/library/ingest/__jobId.test.ts"
   ],
   "sveltekit-frontend/src/lib/server/ai/llama-tool-definitions.ts": [
     "sveltekit-frontend/tests/llama-tool-definitions.spec.ts",
     "sveltekit-frontend/tests/llama-tool-definitions.spec.ts",
+    "sveltekit-frontend/tests/llama-tool-definitions.spec.ts",
     "sveltekit-frontend/tests/llama-tool-definitions.spec.ts"
   ],
   ".claude/worktrees/agent-a7203461/sveltekit-frontend/src/lib/server/ace/multi-lane-retrieval.ts": [
+    ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/multi-lane-retrieval.spec.ts",
+    ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/multi-lane-retrieval.spec.ts",
+    ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/multi-lane-rrf-and-rerank.spec.ts",
     ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/multi-lane-retrieval.spec.ts",
     ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/multi-lane-retrieval.spec.ts",
     ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/multi-lane-rrf-and-rerank.spec.ts",
@@ -1710,14 +2144,26 @@
     "sveltekit-frontend/tests/openai-facade.spec.ts",
     "sveltekit-frontend/tests/openai-facade.spec.ts",
     "sveltekit-frontend/tests/openai-facade.spec.ts",
+    "sveltekit-frontend/tests/openai-facade.spec.ts",
+    "sveltekit-frontend/tests/openai-facade.spec.ts",
+    "sveltekit-frontend/tests/openai-facade.spec.ts",
+    "sveltekit-frontend/tests/openai-facade.spec.ts",
+    "sveltekit-frontend/tests/openai-facade.spec.ts",
+    "sveltekit-frontend/tests/openai-facade.spec.ts",
+    "sveltekit-frontend/tests/openai-facade.spec.ts",
+    "sveltekit-frontend/tests/openai-facade.spec.ts",
+    "sveltekit-frontend/tests/openai-facade.spec.ts",
+    "sveltekit-frontend/tests/openai-facade.spec.ts",
     "sveltekit-frontend/tests/openai-facade.spec.ts"
   ],
   "sveltekit-frontend/src/lib/server/ai/opencode-skill.ts": [
     "sveltekit-frontend/tests/opencode-skill.spec.ts",
     "sveltekit-frontend/tests/opencode-skill.spec.ts",
+    "sveltekit-frontend/tests/opencode-skill.spec.ts",
     "sveltekit-frontend/tests/opencode-skill.spec.ts"
   ],
   "sveltekit-frontend/src/lib/server/kb/search-logic.ts": [
+    "sveltekit-frontend/tests/opencode-skill.spec.ts",
     "sveltekit-frontend/tests/opencode-skill.spec.ts",
     "sveltekit-frontend/tests/opencode-skill.spec.ts",
     "sveltekit-frontend/tests/opencode-skill.spec.ts"
@@ -1726,10 +2172,12 @@
     "sveltekit-frontend/tests/poi-citations-conversations-routes.spec.ts",
     "sveltekit-frontend/tests/poi-citations-conversations-routes.spec.ts",
     "sveltekit-frontend/tests/poi-citations-conversations-routes.spec.ts",
+    "sveltekit-frontend/tests/poi-citations-conversations-routes.spec.ts",
     "sveltekit-frontend/tests/routes/auto/api/persons-of-interest.test.ts",
     "sveltekit-frontend/tests/routes/auto/api/persons-of-interest.test.ts"
   ],
   "sveltekit-frontend/src/routes/api/persons-of-interest/[id]/+server.ts": [
+    "sveltekit-frontend/tests/poi-citations-conversations-routes.spec.ts",
     "sveltekit-frontend/tests/poi-citations-conversations-routes.spec.ts",
     "sveltekit-frontend/tests/poi-citations-conversations-routes.spec.ts",
     "sveltekit-frontend/tests/poi-citations-conversations-routes.spec.ts",
@@ -1747,9 +2195,13 @@
     "sveltekit-frontend/tests/relation-extractor.spec.ts",
     "sveltekit-frontend/tests/relation-extractor.spec.ts",
     "sveltekit-frontend/tests/relation-extractor.spec.ts",
+    "sveltekit-frontend/tests/relation-extractor.spec.ts",
+    "sveltekit-frontend/tests/relation-extractor.spec.ts",
+    "sveltekit-frontend/tests/relation-extractor.spec.ts",
     "sveltekit-frontend/tests/relationship-extractor.spec.ts"
   ],
   "sveltekit-frontend/src/routes/api/reports/+server.ts": [
+    "sveltekit-frontend/tests/reports-embed-chat-routes.spec.ts",
     "sveltekit-frontend/tests/reports-embed-chat-routes.spec.ts",
     "sveltekit-frontend/tests/reports-embed-chat-routes.spec.ts",
     "sveltekit-frontend/tests/reports-embed-chat-routes.spec.ts",
@@ -1761,34 +2213,42 @@
   "sveltekit-frontend/src/routes/api/ai/context/compact-search/+server.ts": [
     "sveltekit-frontend/tests/routes/api/ai/context-compact-search.test.ts",
     "sveltekit-frontend/tests/routes/api/ai/context-compact-search.test.ts",
+    "sveltekit-frontend/tests/routes/api/ai/context-compact-search.test.ts",
     "sveltekit-frontend/tests/routes/api/ai/context-compact-search.test.ts"
   ],
   ".claude/worktrees/agent-a7203461/sveltekit-frontend/src/routes/api/ai/contextual-chat/+server.ts": [
+    ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/api/ai/contextual-chat.spec.ts",
     ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/api/ai/contextual-chat.spec.ts",
     ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/api/ai/contextual-chat.spec.ts"
   ],
   "sveltekit-frontend/src/routes/api/ace/error-kag/+server.ts": [
     "sveltekit-frontend/tests/routes/auto/api/ace/error-kag.test.ts",
     "sveltekit-frontend/tests/routes/auto/api/ace/error-kag.test.ts",
+    "sveltekit-frontend/tests/routes/auto/api/ace/error-kag.test.ts",
     "sveltekit-frontend/tests/routes/auto/api/ace/error-kag.test.ts"
   ],
   ".claude/worktrees/agent-a7203461/sveltekit-frontend/src/routes/api/admin/ai-chat/[sessionId]/+server.ts": [
+    ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/admin/ai-chat/__sessionId.test.ts",
     ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/admin/ai-chat/__sessionId.test.ts",
     ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/admin/ai-chat/__sessionId.test.ts"
   ],
   ".claude/worktrees/agent-a7203461/sveltekit-frontend/src/routes/api/agents/chat/+server.ts": [
     ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/agents/chat.test.ts",
+    ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/agents/chat.test.ts",
     ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/agents/chat.test.ts"
   ],
   ".claude/worktrees/agent-a7203461/sveltekit-frontend/src/routes/api/ai/agent/+server.ts": [
+    ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/ai/agent.test.ts",
     ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/ai/agent.test.ts",
     ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/ai/agent.test.ts"
   ],
   ".claude/worktrees/agent-a7203461/sveltekit-frontend/src/routes/api/ai/chat/stream/+server.ts": [
     ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/ai/chat/stream.test.ts",
+    ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/ai/chat/stream.test.ts",
     ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/ai/chat/stream.test.ts"
   ],
   "sveltekit-frontend/src/routes/api/analytics/panel-activity/+server.ts": [
+    "sveltekit-frontend/tests/routes/auto/api/analytics/panel-activity.test.ts",
     "sveltekit-frontend/tests/routes/auto/api/analytics/panel-activity.test.ts",
     "sveltekit-frontend/tests/routes/auto/api/analytics/panel-activity.test.ts",
     "sveltekit-frontend/tests/routes/auto/api/analytics/panel-activity.test.ts"
@@ -1797,9 +2257,12 @@
     ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/analytics/research-summaries/__id.test.ts",
     ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/analytics/research-summaries/__id.test.ts",
     ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/analytics/research-summaries/__id.test.ts",
+    ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/analytics/research-summaries/__id.test.ts",
+    ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/analytics/research-summaries/__id.test.ts",
     ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/analytics/research-summaries/__id.test.ts"
   ],
   ".claude/worktrees/agent-a7203461/sveltekit-frontend/src/routes/api/audio/analysis/[evidenceId]/+server.ts": [
+    ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/audio/analysis/__evidenceId.test.ts",
     ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/audio/analysis/__evidenceId.test.ts",
     ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/audio/analysis/__evidenceId.test.ts"
   ],
@@ -1809,13 +2272,19 @@
     "sveltekit-frontend/tests/routes/auto/api/auth/logout.test.ts",
     "sveltekit-frontend/tests/routes/auto/api/auth/logout.test.ts",
     "sveltekit-frontend/tests/routes/auto/api/auth/logout.test.ts",
+    "sveltekit-frontend/tests/routes/auto/api/auth/logout.test.ts",
+    "sveltekit-frontend/tests/routes/auto/api/auth/logout.test.ts",
     "sveltekit-frontend/tests/routes/auto/api/auth/logout.test.ts"
   ],
   ".claude/worktrees/agent-a7203461/sveltekit-frontend/src/routes/api/canon/chunks/[chunkId]/+server.ts": [
     ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/canon/chunks/__chunkId.test.ts",
+    ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/canon/chunks/__chunkId.test.ts",
     ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/canon/chunks/__chunkId.test.ts"
   ],
   ".claude/worktrees/agent-a7203461/sveltekit-frontend/src/routes/api/cases/[id]/authorities/+server.ts": [
+    ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/cases/__id/authorities.test.ts",
+    ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/cases/__id/authorities.test.ts",
+    ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/cases/__id/authorities.test.ts",
     ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/cases/__id/authorities.test.ts",
     ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/cases/__id/authorities.test.ts",
     ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/cases/__id/authorities.test.ts",
@@ -1847,9 +2316,23 @@
     ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/cases-canvas.test.ts",
     ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/cases-canvas.test.ts",
     ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/cases-canvas.test.ts",
+    ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/cases-canvas.test.ts",
+    ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/cases/__id/canvas.test.ts",
+    ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/cases/__id/canvas.test.ts",
+    ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/cases-canvas.test.ts",
+    ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/cases-canvas.test.ts",
+    ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/cases-canvas.test.ts",
+    ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/cases-canvas.test.ts",
+    ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/cases-canvas.test.ts",
+    ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/cases-canvas.test.ts",
+    ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/cases-canvas.test.ts",
+    ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/cases-canvas.test.ts",
+    ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/cases-canvas.test.ts",
     ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/cases-canvas.test.ts"
   ],
   ".claude/worktrees/agent-a7203461/sveltekit-frontend/src/routes/api/cases/[id]/chat/+server.ts": [
+    ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/cases/__id/chat.test.ts",
+    ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/cases/__id/chat.test.ts",
     ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/cases/__id/chat.test.ts",
     ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/cases/__id/chat.test.ts",
     ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/cases/__id/chat.test.ts",
@@ -1857,9 +2340,13 @@
   ],
   ".claude/worktrees/agent-a7203461/sveltekit-frontend/src/routes/api/cases/[id]/notes/[noteId]/versions/+server.ts": [
     ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/cases/__id/notes/__noteId/versions.test.ts",
+    ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/cases/__id/notes/__noteId/versions.test.ts",
     ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/cases/__id/notes/__noteId/versions.test.ts"
   ],
   ".claude/worktrees/agent-a7203461/sveltekit-frontend/src/routes/api/cases/[id]/notes/[noteId]/+server.ts": [
+    ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/cases/__id/notes/__noteId.test.ts",
+    ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/cases/__id/notes/__noteId.test.ts",
+    ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/cases/__id/notes/__noteId.test.ts",
     ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/cases/__id/notes/__noteId.test.ts",
     ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/cases/__id/notes/__noteId.test.ts",
     ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/cases/__id/notes/__noteId.test.ts",
@@ -1873,9 +2360,13 @@
     ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/cases/__id/persons.test.ts",
     ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/cases/__id/persons.test.ts",
     ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/cases/__id/persons.test.ts",
+    ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/cases/__id/persons.test.ts",
+    ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/cases/__id/persons.test.ts",
+    ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/cases/__id/persons.test.ts",
     ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/cases/__id/persons.test.ts"
   ],
   ".claude/worktrees/agent-a7203461/sveltekit-frontend/src/routes/api/cases/[id]/similar/+server.ts": [
+    ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/cases/__id/similar.test.ts",
     ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/cases/__id/similar.test.ts",
     ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/cases/__id/similar.test.ts"
   ],
@@ -1885,9 +2376,15 @@
     "sveltekit-frontend/tests/routes/auto/api/chat/stream.cache-hit.test.ts",
     "sveltekit-frontend/tests/routes/auto/api/chat/stream.retrieval-chain.test.ts",
     "sveltekit-frontend/tests/routes/auto/api/chat/stream.cache-hit.test.ts",
+    "sveltekit-frontend/tests/routes/auto/api/chat/stream.retrieval-chain.test.ts",
+    "sveltekit-frontend/tests/routes/auto/api/chat/stream.cache-hit.test.ts",
     "sveltekit-frontend/tests/routes/auto/api/chat/stream.retrieval-chain.test.ts"
   ],
   "sveltekit-frontend/src/routes/api/chat/stream/+server.ts": [
+    "sveltekit-frontend/tests/routes/auto/api/chat/stream.cache-hit.test.ts",
+    "sveltekit-frontend/tests/routes/auto/api/chat/stream.cache-hit.test.ts",
+    "sveltekit-frontend/tests/routes/auto/api/chat/stream.retrieval-chain.test.ts",
+    "sveltekit-frontend/tests/routes/auto/api/chat/stream.retrieval-chain.test.ts",
     "sveltekit-frontend/tests/routes/auto/api/chat/stream.cache-hit.test.ts",
     "sveltekit-frontend/tests/routes/auto/api/chat/stream.cache-hit.test.ts",
     "sveltekit-frontend/tests/routes/auto/api/chat/stream.retrieval-chain.test.ts",
@@ -1909,9 +2406,14 @@
     "sveltekit-frontend/tests/routes/auto/api/citations/annotations.test.ts",
     "sveltekit-frontend/tests/routes/auto/api/citations/annotations.test.ts",
     "sveltekit-frontend/tests/routes/auto/api/citations/annotations.test.ts",
+    "sveltekit-frontend/tests/routes/auto/api/citations/annotations.test.ts",
+    "sveltekit-frontend/tests/routes/auto/api/citations/annotations.test.ts",
     "sveltekit-frontend/tests/routes/auto/api/citations/annotations.test.ts"
   ],
   ".claude/worktrees/agent-a7203461/sveltekit-frontend/src/routes/api/citations/[citationId]/tags/+server.ts": [
+    ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/citations/__citationId/tags.test.ts",
+    ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/citations/__citationId/tags.test.ts",
+    ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/citations/__citationId/tags.test.ts",
     ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/citations/__citationId/tags.test.ts",
     ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/citations/__citationId/tags.test.ts",
     ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/citations/__citationId/tags.test.ts",
@@ -1921,29 +2423,36 @@
   ],
   ".claude/worktrees/agent-a7203461/sveltekit-frontend/src/routes/api/code-intel/clusters/[clusterKey]/lenses/+server.ts": [
     ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/code-intel/clusters/__clusterKey/lenses.test.ts",
+    ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/code-intel/clusters/__clusterKey/lenses.test.ts",
     ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/code-intel/clusters/__clusterKey/lenses.test.ts"
   ],
   ".claude/worktrees/agent-a7203461/sveltekit-frontend/src/routes/api/code-intel/clusters/[clusterKey]/+server.ts": [
+    ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/code-intel/clusters/__clusterKey.test.ts",
     ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/code-intel/clusters/__clusterKey.test.ts",
     ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/code-intel/clusters/__clusterKey.test.ts"
   ],
   ".claude/worktrees/agent-a7203461/sveltekit-frontend/src/routes/api/code-intel/research-provenance/[id]/+server.ts": [
     ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/code-intel/research-provenance/__id.test.ts",
+    ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/code-intel/research-provenance/__id.test.ts",
     ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/code-intel/research-provenance/__id.test.ts"
   ],
   ".claude/worktrees/agent-a7203461/sveltekit-frontend/src/routes/api/code-intel/retrieval-runs/[id]/+server.ts": [
+    ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/code-intel/retrieval-runs/__id.test.ts",
     ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/code-intel/retrieval-runs/__id.test.ts",
     ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/code-intel/retrieval-runs/__id.test.ts"
   ],
   ".claude/worktrees/agent-a7203461/sveltekit-frontend/src/routes/api/code-intel/topology/node/[stableKey]/+server.ts": [
     ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/code-intel/topology/node/__stableKey.test.ts",
+    ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/code-intel/topology/node/__stableKey.test.ts",
     ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/code-intel/topology/node/__stableKey.test.ts"
   ],
   ".claude/worktrees/agent-a7203461/sveltekit-frontend/src/routes/api/codebase/rerank/+server.ts": [
     ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/codebase/rerank.test.ts",
+    ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/codebase/rerank.test.ts",
     ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/codebase/rerank.test.ts"
   ],
   ".claude/worktrees/agent-a7203461/sveltekit-frontend/src/routes/api/codebase-graph/agents-freshness/+server.ts": [
+    ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/codebase-graph/agents-freshness.test.ts",
     ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/codebase-graph/agents-freshness.test.ts",
     ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/codebase-graph/agents-freshness.test.ts"
   ],
@@ -1951,9 +2460,12 @@
     ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/codebase-index/agents-write.test.ts",
     ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/codebase-index/agents-write.test.ts",
     ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/codebase-index/agents-write.test.ts",
+    ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/codebase-index/agents-write.test.ts",
+    ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/codebase-index/agents-write.test.ts",
     ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/codebase-index/agents-write.test.ts"
   ],
   ".claude/worktrees/agent-a7203461/sveltekit-frontend/src/routes/api/codebase-index/claude-assist/+server.ts": [
+    ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/codebase-index/claude-assist.test.ts",
     ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/codebase-index/claude-assist.test.ts",
     ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/codebase-index/claude-assist.test.ts"
   ],
@@ -1961,25 +2473,33 @@
     ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/codebase-index/wiki.test.ts",
     ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/codebase-index/wiki.test.ts",
     ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/codebase-index/wiki.test.ts",
+    ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/codebase-index/wiki.test.ts",
+    ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/codebase-index/wiki.test.ts",
     ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/codebase-index/wiki.test.ts"
   ],
   ".claude/worktrees/agent-a7203461/sveltekit-frontend/src/routes/api/document/analysis/[evidenceId]/+server.ts": [
+    ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/document/analysis/__evidenceId.test.ts",
     ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/document/analysis/__evidenceId.test.ts",
     ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/document/analysis/__evidenceId.test.ts"
   ],
   ".claude/worktrees/agent-a7203461/sveltekit-frontend/src/routes/api/evidence/tags/[id]/+server.ts": [
     ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/evidence/tags/__id.test.ts",
+    ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/evidence/tags/__id.test.ts",
     ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/evidence/tags/__id.test.ts"
   ],
   ".claude/worktrees/agent-a7203461/sveltekit-frontend/src/routes/api/evidence/upload/+server.ts": [
+    ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/evidence/upload.test.ts",
     ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/evidence/upload.test.ts",
     ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/evidence/upload.test.ts"
   ],
   ".claude/worktrees/agent-a7203461/sveltekit-frontend/src/routes/api/evidence/[docId]/status/+server.ts": [
     ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/evidence/__docId/status.test.ts",
+    ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/evidence/__docId/status.test.ts",
     ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/evidence/__docId/status.test.ts"
   ],
   ".claude/worktrees/agent-a7203461/sveltekit-frontend/src/routes/api/evidence/[id]/versions/+server.ts": [
+    ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/evidence/__id/versions.test.ts",
+    ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/evidence/__id/versions.test.ts",
     ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/evidence/__id/versions.test.ts",
     ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/evidence/__id/versions.test.ts",
     ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/evidence/__id/versions.test.ts",
@@ -1991,29 +2511,38 @@
     ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/fictional-cases/__id.test.ts",
     ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/fictional-cases/__id.test.ts",
     ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/fictional-cases/__id.test.ts",
+    ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/fictional-cases/__id.test.ts",
+    ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/fictional-cases/__id.test.ts",
+    ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/fictional-cases/__id.test.ts",
     ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/fictional-cases/__id.test.ts"
   ],
   ".claude/worktrees/agent-a7203461/sveltekit-frontend/src/routes/api/files/[id]/+server.ts": [
+    ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/files.test.ts",
     ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/files.test.ts",
     ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/files.test.ts"
   ],
   ".claude/worktrees/agent-a7203461/sveltekit-frontend/src/routes/api/health/+server.ts": [
     ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/health.test.ts",
+    ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/health.test.ts",
     ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/health.test.ts"
   ],
   ".claude/worktrees/agent-a7203461/sveltekit-frontend/src/routes/api/hypergraph/edge/[id]/+server.ts": [
+    ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/hypergraph/edge/__id.test.ts",
     ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/hypergraph/edge/__id.test.ts",
     ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/hypergraph/edge/__id.test.ts"
   ],
   ".claude/worktrees/agent-a7203461/sveltekit-frontend/src/routes/api/knowledge/document/[id]/+server.ts": [
     ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/knowledge/document/__id.test.ts",
+    ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/knowledge/document/__id.test.ts",
     ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/knowledge/document/__id.test.ts"
   ],
   ".claude/worktrees/agent-a7203461/sveltekit-frontend/src/routes/api/library/document/[id]/node/[nodeId]/+server.ts": [
     ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/library/document/__id/node/__nodeId.test.ts",
+    ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/library/document/__id/node/__nodeId.test.ts",
     ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/library/document/__id/node/__nodeId.test.ts"
   ],
   ".claude/worktrees/agent-a7203461/sveltekit-frontend/src/routes/api/library/document/[id]/toc/+server.ts": [
+    ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/library/document/__id/toc.test.ts",
     ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/library/document/__id/toc.test.ts",
     ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/library/document/__id/toc.test.ts"
   ],
@@ -2023,21 +2552,28 @@
     ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/library/documents/__documentId.test.ts",
     ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/library/documents/__documentId.test.ts",
     ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/library/documents/__documentId.test.ts",
+    ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/library/documents/__documentId.test.ts",
+    ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/library/documents/__documentId.test.ts",
+    ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/library/documents/__documentId.test.ts",
     ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/library/documents/__documentId.test.ts"
   ],
   ".claude/worktrees/agent-a7203461/sveltekit-frontend/src/routes/api/persons-of-interest/[id]/associates/[associateId]/+server.ts": [
+    ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/persons-of-interest/__id/associates/__associateId.test.ts",
     ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/persons-of-interest/__id/associates/__associateId.test.ts",
     ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/persons-of-interest/__id/associates/__associateId.test.ts"
   ],
   ".claude/worktrees/agent-a7203461/sveltekit-frontend/src/routes/api/persons-of-interest/[id]/associates/+server.ts": [
     ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/persons-of-interest/__id/associates.test.ts",
+    ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/persons-of-interest/__id/associates.test.ts",
     ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/persons-of-interest/__id/associates.test.ts"
   ],
   ".claude/worktrees/agent-a7203461/sveltekit-frontend/src/routes/api/persons-of-interest/[id]/face-match/+server.ts": [
     ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/persons-of-interest/__id/face-match.test.ts",
+    ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/persons-of-interest/__id/face-match.test.ts",
     ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/persons-of-interest/__id/face-match.test.ts"
   ],
   ".claude/worktrees/agent-a7203461/sveltekit-frontend/src/routes/api/persons-of-interest/[id]/gpu-analyze/+server.ts": [
+    ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/persons-of-interest/__id/gpu-analyze.test.ts",
     ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/persons-of-interest/__id/gpu-analyze.test.ts",
     ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/persons-of-interest/__id/gpu-analyze.test.ts"
   ],
@@ -2045,13 +2581,18 @@
     ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/persons-of-interest/__id/risk.test.ts",
     ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/persons-of-interest/__id/risk.test.ts",
     ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/persons-of-interest/__id/risk.test.ts",
+    ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/persons-of-interest/__id/risk.test.ts",
+    ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/persons-of-interest/__id/risk.test.ts",
     ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/persons-of-interest/__id/risk.test.ts"
   ],
   ".claude/worktrees/agent-a7203461/sveltekit-frontend/src/routes/api/persons-of-interest/[id]/similar/+server.ts": [
     ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/persons-of-interest/__id/similar.test.ts",
+    ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/persons-of-interest/__id/similar.test.ts",
     ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/persons-of-interest/__id/similar.test.ts"
   ],
   ".claude/worktrees/agent-a7203461/sveltekit-frontend/src/routes/api/persons-of-interest/[id]/summary/+server.ts": [
+    ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/persons-of-interest/__id/summary.test.ts",
+    ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/persons-of-interest/__id/summary.test.ts",
     ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/persons-of-interest/__id/summary.test.ts",
     ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/persons-of-interest/__id/summary.test.ts",
     ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/persons-of-interest/__id/summary.test.ts",
@@ -2063,29 +2604,39 @@
     ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/persons-of-interest/__id.test.ts",
     ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/persons-of-interest/__id.test.ts",
     ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/persons-of-interest/__id.test.ts",
+    ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/persons-of-interest/__id.test.ts",
+    ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/persons-of-interest/__id.test.ts",
+    ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/persons-of-interest/__id.test.ts",
     ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/persons-of-interest/__id.test.ts"
   ],
   ".claude/worktrees/agent-a7203461/sveltekit-frontend/src/routes/api/phase89/node/[id]/docs/+server.ts": [
+    ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/phase89/node/__id/docs.test.ts",
     ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/phase89/node/__id/docs.test.ts",
     ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/phase89/node/__id/docs.test.ts"
   ],
   ".claude/worktrees/agent-a7203461/sveltekit-frontend/src/routes/api/phase89/node/[id]/similar/+server.ts": [
     ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/phase89/node/__id/similar.test.ts",
+    ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/phase89/node/__id/similar.test.ts",
     ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/phase89/node/__id/similar.test.ts"
   ],
   ".claude/worktrees/agent-a7203461/sveltekit-frontend/src/routes/api/phase89/related/[id]/+server.ts": [
+    ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/phase89/related/__id.test.ts",
     ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/phase89/related/__id.test.ts",
     ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/phase89/related/__id.test.ts"
   ],
   ".claude/worktrees/agent-a7203461/sveltekit-frontend/src/routes/api/pipeline/status/[jobId]/+server.ts": [
     ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/pipeline/status/__jobId.test.ts",
+    ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/pipeline/status/__jobId.test.ts",
     ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/pipeline/status/__jobId.test.ts"
   ],
   ".claude/worktrees/agent-a7203461/sveltekit-frontend/src/routes/api/recommendations/jobs/[jobId]/+server.ts": [
     ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/recommendations/jobs/__jobId.test.ts",
+    ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/recommendations/jobs/__jobId.test.ts",
     ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/recommendations/jobs/__jobId.test.ts"
   ],
   ".claude/worktrees/agent-a7203461/sveltekit-frontend/src/routes/api/recommendations/[userId]/+server.ts": [
+    ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/recommendations/__userId.test.ts",
+    ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/recommendations/__userId.test.ts",
     ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/recommendations/__userId.test.ts",
     ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/recommendations/__userId.test.ts",
     ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/recommendations/__userId.test.ts",
@@ -2095,9 +2646,13 @@
     ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/reports/preview/__id.test.ts",
     ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/reports/preview/__id.test.ts",
     ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/reports/preview/__id.test.ts",
+    ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/reports/preview/__id.test.ts",
+    ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/reports/preview/__id.test.ts",
     ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/reports/preview/__id.test.ts"
   ],
   ".claude/worktrees/agent-a7203461/sveltekit-frontend/src/routes/api/reports/[id]/export/+server.ts": [
+    ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/reports/__id/export.test.ts",
+    ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/reports/__id/export.test.ts",
     ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/reports/__id/export.test.ts",
     ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/reports/__id/export.test.ts",
     ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/reports/__id/export.test.ts",
@@ -2107,14 +2662,19 @@
     ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/reports/__id/publish.test.ts",
     ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/reports/__id/publish.test.ts",
     ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/reports/__id/publish.test.ts",
+    ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/reports/__id/publish.test.ts",
+    ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/reports/__id/publish.test.ts",
     ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/reports/__id/publish.test.ts"
   ],
   "sveltekit-frontend/src/routes/api/research/topological-encyclopedia/+server.ts": [
     "sveltekit-frontend/tests/routes/auto/api/research/topological-encyclopedia.test.ts",
     "sveltekit-frontend/tests/routes/auto/api/research/topological-encyclopedia.test.ts",
+    "sveltekit-frontend/tests/routes/auto/api/research/topological-encyclopedia.test.ts",
     "sveltekit-frontend/tests/routes/auto/api/research/topological-encyclopedia.test.ts"
   ],
   ".claude/worktrees/agent-a7203461/sveltekit-frontend/src/routes/api/routes/[routeId]/errors/+server.ts": [
+    ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/routes/__routeId/errors.test.ts",
+    ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/routes/__routeId/errors.test.ts",
     ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/routes/__routeId/errors.test.ts",
     ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/routes/__routeId/errors.test.ts",
     ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/routes/__routeId/errors.test.ts",
@@ -2124,9 +2684,13 @@
     ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/routes/__routeId/health-event.test.ts",
     ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/routes/__routeId/health-event.test.ts",
     ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/routes/__routeId/health-event.test.ts",
+    ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/routes/__routeId/health-event.test.ts",
+    ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/routes/__routeId/health-event.test.ts",
     ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/routes/__routeId/health-event.test.ts"
   ],
   ".claude/worktrees/agent-a7203461/sveltekit-frontend/src/routes/api/routes/[routeId]/interactions/+server.ts": [
+    ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/routes/__routeId/interactions.test.ts",
+    ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/routes/__routeId/interactions.test.ts",
     ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/routes/__routeId/interactions.test.ts",
     ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/routes/__routeId/interactions.test.ts",
     ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/routes/__routeId/interactions.test.ts",
@@ -2136,25 +2700,32 @@
     ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/simulation/__sessionId/keyframes.test.ts",
     ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/simulation/__sessionId/keyframes.test.ts",
     ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/simulation/__sessionId/keyframes.test.ts",
+    ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/simulation/__sessionId/keyframes.test.ts",
+    ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/simulation/__sessionId/keyframes.test.ts",
     ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/simulation/__sessionId/keyframes.test.ts"
   ],
   ".claude/worktrees/agent-a7203461/sveltekit-frontend/src/routes/api/simulation/[sessionId]/strategy/+server.ts": [
+    ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/simulation/__sessionId/strategy.test.ts",
     ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/simulation/__sessionId/strategy.test.ts",
     ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/simulation/__sessionId/strategy.test.ts"
   ],
   ".claude/worktrees/agent-a7203461/sveltekit-frontend/src/routes/api/sse/chat/+server.ts": [
     ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/sse/chat.test.ts",
+    ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/sse/chat.test.ts",
     ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/sse/chat.test.ts"
   ],
   ".claude/worktrees/agent-a7203461/sveltekit-frontend/src/routes/api/sse/[id]/+server.ts": [
+    ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/sse/__id.test.ts",
     ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/sse/__id.test.ts",
     ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/sse/__id.test.ts"
   ],
   ".claude/worktrees/agent-a7203461/sveltekit-frontend/src/routes/api/summarize/synthesize/+server.ts": [
     ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/summarize/synthesize.test.ts",
+    ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/summarize/synthesize.test.ts",
     ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/summarize/synthesize.test.ts"
   ],
   ".claude/worktrees/agent-a7203461/sveltekit-frontend/src/routes/api/tags/[tagId]/+server.ts": [
+    ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/tags/__tagId.test.ts",
     ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/tags/__tagId.test.ts",
     ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/tags/__tagId.test.ts"
   ],
@@ -2162,9 +2733,12 @@
     ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/tasks/__id.test.ts",
     ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/tasks/__id.test.ts",
     ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/tasks/__id.test.ts",
+    ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/tasks/__id.test.ts",
+    ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/tasks/__id.test.ts",
     ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/tasks/__id.test.ts"
   ],
   ".claude/worktrees/agent-a7203461/sveltekit-frontend/src/routes/api/v1/agentic/+server.ts": [
+    ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/v1/agentic.test.ts",
     ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/v1/agentic.test.ts",
     ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/v1/agentic.test.ts"
   ],
@@ -2174,25 +2748,39 @@
     "sveltekit-frontend/tests/routes/auto/api/v1/chat/completions.test.ts",
     "sveltekit-frontend/tests/routes/auto/api/v1/chat/completions.test.ts",
     "sveltekit-frontend/tests/routes/auto/api/v1/chat/completions.test.ts",
+    "sveltekit-frontend/tests/routes/auto/api/v1/chat/completions.test.ts",
+    "sveltekit-frontend/tests/routes/auto/api/v1/chat/completions.test.ts",
     "sveltekit-frontend/tests/routes/auto/api/v1/chat/completions.test.ts"
   ],
   ".claude/worktrees/agent-a7203461/sveltekit-frontend/src/routes/api/video/analysis/[evidenceId]/+server.ts": [
+    ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/video/analysis/__evidenceId.test.ts",
     ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/video/analysis/__evidenceId.test.ts",
     ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/video/analysis/__evidenceId.test.ts"
   ],
   ".claude/worktrees/agent-a7203461/sveltekit-frontend/src/routes/api/wiki/moc/+server.ts": [
     ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/wiki/moc.test.ts",
+    ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/wiki/moc.test.ts",
     ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/wiki/moc.test.ts"
   ],
   ".claude/worktrees/agent-a7203461/sveltekit-frontend/src/routes/api/wiki/page/[id]/+server.ts": [
+    ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/wiki/page/__id.test.ts",
     ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/wiki/page/__id.test.ts",
     ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/wiki/page/__id.test.ts"
   ],
   ".claude/worktrees/agent-a7203461/sveltekit-frontend/src/routes/api/wiki/sync-to-obsidian/+server.ts": [
     ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/wiki/sync-to-obsidian.test.ts",
+    ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/wiki/sync-to-obsidian.test.ts",
     ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/auto/api/wiki/sync-to-obsidian.test.ts"
   ],
   ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/helpers/route-test-utils.ts": [
+    ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/cache-stats.test.ts",
+    ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/cases-canvas.test.ts",
+    ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/chat-memory-backfill.test.ts",
+    ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/chat-memory-search.test.ts",
+    ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/chat-memory-settings.test.ts",
+    ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/codebase-index-tags-delete.test.ts",
+    ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/codebase-tags-rename.test.ts",
+    ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/phase109-tag-chunks.test.ts",
     ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/cache-stats.test.ts",
     ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/cases-canvas.test.ts",
     ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/routes/chat-memory-backfill.test.ts",
@@ -2219,6 +2807,10 @@
     "sveltekit-frontend/tests/routes/codebase-index-summarize-dirs.test.ts",
     "sveltekit-frontend/tests/routes/deep-research-task-provider.test.ts",
     "sveltekit-frontend/tests/routes/kag-ingest-notebook-contract.test.ts",
+    "sveltekit-frontend/tests/routes/codebase-index-directory-summaries.test.ts",
+    "sveltekit-frontend/tests/routes/codebase-index-summarize-dirs.test.ts",
+    "sveltekit-frontend/tests/routes/deep-research-task-provider.test.ts",
+    "sveltekit-frontend/tests/routes/kag-ingest-notebook-contract.test.ts",
     "sveltekit-frontend/tests/routes/cache-stats.test.ts",
     "sveltekit-frontend/tests/routes/cases-canvas.test.ts",
     "sveltekit-frontend/tests/routes/chat-memory-backfill.test.ts",
@@ -2237,11 +2829,22 @@
     "sveltekit-frontend/tests/routes/codebase-index-directory-summaries.test.ts",
     "sveltekit-frontend/tests/routes/codebase-index-directory-summaries.test.ts",
     "sveltekit-frontend/tests/routes/codebase-index-directory-summaries.test.ts",
+    "sveltekit-frontend/tests/routes/codebase-index-directory-summaries.test.ts",
+    "sveltekit-frontend/tests/routes/codebase-index-directory-summaries.test.ts",
     "sveltekit-frontend/tests/routes/auto/api/codebase-index/directory-summaries.test.ts",
     "sveltekit-frontend/tests/routes/codebase-index-directory-summaries.test.ts",
     "sveltekit-frontend/tests/routes/codebase-index-directory-summaries.test.ts"
   ],
   "sveltekit-frontend/src/routes/api/codebase-index/export/bundle/+server.ts": [
+    "sveltekit-frontend/tests/routes/codebase-index-export-bundle.test.ts",
+    "sveltekit-frontend/tests/routes/codebase-index-export-bundle.test.ts",
+    "sveltekit-frontend/tests/routes/codebase-index-export-bundle.test.ts",
+    "sveltekit-frontend/tests/routes/codebase-index-export-bundle.test.ts",
+    "sveltekit-frontend/tests/routes/codebase-index-export-bundle.test.ts",
+    "sveltekit-frontend/tests/routes/codebase-index-export-bundle.test.ts",
+    "sveltekit-frontend/tests/routes/codebase-index-export-bundle.test.ts",
+    "sveltekit-frontend/tests/routes/codebase-index-export-bundle.test.ts",
+    "sveltekit-frontend/tests/routes/codebase-index-export-bundle.test.ts",
     "sveltekit-frontend/tests/routes/codebase-index-export-bundle.test.ts",
     "sveltekit-frontend/tests/routes/codebase-index-export-bundle.test.ts",
     "sveltekit-frontend/tests/routes/codebase-index-export-bundle.test.ts",
@@ -2280,6 +2883,10 @@
     "sveltekit-frontend/tests/routes/codebase-index-orchestrate.test.ts",
     "sveltekit-frontend/tests/routes/codebase-index-orchestrate.test.ts",
     "sveltekit-frontend/tests/routes/codebase-index-orchestrate.test.ts",
+    "sveltekit-frontend/tests/routes/codebase-index-orchestrate.test.ts",
+    "sveltekit-frontend/tests/routes/codebase-index-orchestrate.test.ts",
+    "sveltekit-frontend/tests/routes/codebase-index-orchestrate.test.ts",
+    "sveltekit-frontend/tests/routes/codebase-index-orchestrate.test.ts",
     "sveltekit-frontend/tests/routes/auto/api/codebase-index/orchestrate.test.ts",
     "sveltekit-frontend/tests/routes/auto/api/codebase-index/orchestrate.test.ts",
     "sveltekit-frontend/tests/routes/codebase-index-orchestrate.test.ts",
@@ -2288,6 +2895,9 @@
     "sveltekit-frontend/tests/routes/codebase-index-orchestrate.test.ts"
   ],
   "sveltekit-frontend/src/routes/api/codebase-index/summarize-dirs/+server.ts": [
+    "sveltekit-frontend/tests/routes/codebase-index-summarize-dirs.test.ts",
+    "sveltekit-frontend/tests/routes/codebase-index-summarize-dirs.test.ts",
+    "sveltekit-frontend/tests/routes/codebase-index-summarize-dirs.test.ts",
     "sveltekit-frontend/tests/routes/codebase-index-summarize-dirs.test.ts",
     "sveltekit-frontend/tests/routes/codebase-index-summarize-dirs.test.ts",
     "sveltekit-frontend/tests/routes/codebase-index-summarize-dirs.test.ts",
@@ -2306,11 +2916,16 @@
   "sveltekit-frontend/src/routes/api/codeintel/clusters/[id]/+server.ts": [
     "sveltekit-frontend/tests/routes/codeintel-clusters-post.test.ts",
     "sveltekit-frontend/tests/routes/codeintel-clusters-post.test.ts",
+    "sveltekit-frontend/tests/routes/codeintel-clusters-post.test.ts",
     "sveltekit-frontend/tests/routes/auto/api/codeintel/clusters/__id.test.ts",
     "sveltekit-frontend/tests/routes/auto/api/codeintel/clusters/__id.test.ts",
     "sveltekit-frontend/tests/routes/codeintel-clusters-post.test.ts"
   ],
   "sveltekit-frontend/src/lib/server/codeintel/fix-recommender.ts": [
+    "sveltekit-frontend/tests/routes/codeintel-fix-recommender.test.ts",
+    "sveltekit-frontend/tests/routes/codeintel-fix-recommender.test.ts",
+    "sveltekit-frontend/tests/routes/codeintel-fix-recommender.test.ts",
+    "sveltekit-frontend/tests/routes/codeintel-fix-recommender.test.ts",
     "sveltekit-frontend/tests/routes/codeintel-fix-recommender.test.ts",
     "sveltekit-frontend/tests/routes/codeintel-fix-recommender.test.ts",
     "sveltekit-frontend/tests/routes/codeintel-fix-recommender.test.ts",
@@ -2329,11 +2944,16 @@
     "sveltekit-frontend/tests/routes/codeintel-fix-recommender.test.ts",
     "sveltekit-frontend/tests/routes/codeintel-fix-recommender.test.ts",
     "sveltekit-frontend/tests/routes/codeintel-fix-recommender.test.ts",
+    "sveltekit-frontend/tests/routes/codeintel-fix-recommender.test.ts",
+    "sveltekit-frontend/tests/routes/codeintel-fix-recommender.test.ts",
     "sveltekit-frontend/tests/routes/auto/api/codeintel/fix.test.ts",
     "sveltekit-frontend/tests/routes/codeintel-fix-recommender.test.ts",
     "sveltekit-frontend/tests/routes/codeintel-fix-recommender.test.ts"
   ],
   "sveltekit-frontend/src/routes/api/tasks/+server.ts": [
+    "sveltekit-frontend/tests/routes/deep-research-task-provider.test.ts",
+    "sveltekit-frontend/tests/routes/deep-research-task-provider.test.ts",
+    "sveltekit-frontend/tests/routes/deep-research-task-provider.test.ts",
     "sveltekit-frontend/tests/routes/deep-research-task-provider.test.ts",
     "sveltekit-frontend/tests/routes/deep-research-task-provider.test.ts",
     "sveltekit-frontend/tests/routes/deep-research-task-provider.test.ts",
@@ -2349,6 +2969,7 @@
   "sveltekit-frontend/src/routes/api/tasks/[id]/+server.ts": [
     "sveltekit-frontend/tests/routes/deep-research-task-provider.test.ts",
     "sveltekit-frontend/tests/routes/deep-research-task-provider.test.ts",
+    "sveltekit-frontend/tests/routes/deep-research-task-provider.test.ts",
     "sveltekit-frontend/tests/routes/auto/api/tasks/__id.test.ts",
     "sveltekit-frontend/tests/routes/auto/api/tasks/__id.test.ts",
     "sveltekit-frontend/tests/routes/deep-research-task-provider.test.ts"
@@ -2358,11 +2979,15 @@
     "sveltekit-frontend/tests/routes/get-degraded-shape-pass-a.test.ts",
     "sveltekit-frontend/tests/routes/get-degraded-shape-pass-a.test.ts",
     "sveltekit-frontend/tests/routes/get-degraded-shape-pass-a.test.ts",
+    "sveltekit-frontend/tests/routes/get-degraded-shape-pass-a.test.ts",
+    "sveltekit-frontend/tests/routes/get-degraded-shape-pass-a.test.ts",
     "sveltekit-frontend/tests/routes/auto/api/cache/exact-match/stats.test.ts",
     "sveltekit-frontend/tests/routes/get-degraded-shape-pass-a.test.ts",
     "sveltekit-frontend/tests/routes/get-degraded-shape-pass-a.test.ts"
   ],
   "sveltekit-frontend/src/routes/api/citations/+server.ts": [
+    "sveltekit-frontend/tests/routes/get-degraded-shape-pass-a.test.ts",
+    "sveltekit-frontend/tests/routes/get-degraded-shape-pass-a.test.ts",
     "sveltekit-frontend/tests/routes/get-degraded-shape-pass-a.test.ts",
     "sveltekit-frontend/tests/routes/get-degraded-shape-pass-a.test.ts",
     "sveltekit-frontend/tests/routes/get-degraded-shape-pass-a.test.ts",
@@ -2379,6 +3004,8 @@
     "sveltekit-frontend/tests/routes/kag-ingest-notebook-contract.test.ts",
     "sveltekit-frontend/tests/routes/kag-ingest-notebook-contract.test.ts",
     "sveltekit-frontend/tests/routes/kag-ingest-notebook-contract.test.ts",
+    "sveltekit-frontend/tests/routes/kag-ingest-notebook-contract.test.ts",
+    "sveltekit-frontend/tests/routes/kag-ingest-notebook-contract.test.ts",
     "sveltekit-frontend/tests/routes/auto/api/codebase-index/ingest-errors.test.ts",
     "sveltekit-frontend/tests/routes/auto/api/codebase-index/ingest-errors.test.ts",
     "sveltekit-frontend/tests/routes/kag-ingest-notebook-contract.test.ts",
@@ -2387,11 +3014,13 @@
   "sveltekit-frontend/src/routes/api/codebase-index/kag-notebook/+server.ts": [
     "sveltekit-frontend/tests/routes/kag-ingest-notebook-contract.test.ts",
     "sveltekit-frontend/tests/routes/kag-ingest-notebook-contract.test.ts",
+    "sveltekit-frontend/tests/routes/kag-ingest-notebook-contract.test.ts",
     "sveltekit-frontend/tests/routes/auto/api/codebase-index/kag-notebook.test.ts",
     "sveltekit-frontend/tests/routes/auto/api/codebase-index/kag-notebook.test.ts",
     "sveltekit-frontend/tests/routes/kag-ingest-notebook-contract.test.ts"
   ],
   "sveltekit-frontend/src/routes/api/phase109/kag/+server.ts": [
+    "sveltekit-frontend/tests/routes/kag-ingest-notebook-contract.test.ts",
     "sveltekit-frontend/tests/routes/kag-ingest-notebook-contract.test.ts",
     "sveltekit-frontend/tests/routes/kag-ingest-notebook-contract.test.ts",
     "sveltekit-frontend/tests/routes/auto/api/phase109/kag.test.ts",
@@ -2405,6 +3034,9 @@
     "sveltekit-frontend/tests/routes/web-research-job-contract.test.ts",
     "sveltekit-frontend/tests/routes/web-research-job-contract.test.ts",
     "sveltekit-frontend/tests/routes/web-research-job-contract.test.ts",
+    "sveltekit-frontend/tests/routes/web-research-job-contract.test.ts",
+    "sveltekit-frontend/tests/routes/web-research-job-contract.test.ts",
+    "sveltekit-frontend/tests/routes/web-research-job-contract.test.ts",
     "sveltekit-frontend/tests/routes/auto/api/analytics/web-research.test.ts",
     "sveltekit-frontend/tests/routes/auto/api/analytics/web-research.test.ts",
     "sveltekit-frontend/tests/routes/web-research-job-contract.test.ts",
@@ -2412,6 +3044,26 @@
     "sveltekit-frontend/tests/routes/web-research-job-contract.test.ts"
   ],
   "sveltekit-frontend/src/routes/api/sse/chat/+server.ts": [
+    "sveltekit-frontend/tests/sse-chat-attachment-metadata.spec.ts",
+    "sveltekit-frontend/tests/sse-chat-attachment-metadata.spec.ts",
+    "sveltekit-frontend/tests/sse-chat-attachment-metadata.spec.ts",
+    "sveltekit-frontend/tests/sse-chat-attachment-metadata.spec.ts",
+    "sveltekit-frontend/tests/sse-chat-attachment-metadata.spec.ts",
+    "sveltekit-frontend/tests/sse-chat-attachment-metadata.spec.ts",
+    "sveltekit-frontend/tests/sse-chat-attachment-metadata.spec.ts",
+    "sveltekit-frontend/tests/sse-chat-attachment-metadata.spec.ts",
+    "sveltekit-frontend/tests/sse-chat-attachment-metadata.spec.ts",
+    "sveltekit-frontend/tests/sse-chat-attachment-metadata.spec.ts",
+    "sveltekit-frontend/tests/sse-chat-glossary-metadata.spec.ts",
+    "sveltekit-frontend/tests/sse-chat-glossary-metadata.spec.ts",
+    "sveltekit-frontend/tests/sse-chat-glossary-metadata.spec.ts",
+    "sveltekit-frontend/tests/sse-chat-glossary-metadata.spec.ts",
+    "sveltekit-frontend/tests/sse-chat-glossary-metadata.spec.ts",
+    "sveltekit-frontend/tests/sse-chat-glossary-metadata.spec.ts",
+    "sveltekit-frontend/tests/sse-chat-glossary-metadata.spec.ts",
+    "sveltekit-frontend/tests/sse-chat-glossary-metadata.spec.ts",
+    "sveltekit-frontend/tests/sse-chat-glossary-metadata.spec.ts",
+    "sveltekit-frontend/tests/sse-chat-glossary-metadata.spec.ts",
     "sveltekit-frontend/tests/sse-chat-attachment-metadata.spec.ts",
     "sveltekit-frontend/tests/sse-chat-attachment-metadata.spec.ts",
     "sveltekit-frontend/tests/sse-chat-attachment-metadata.spec.ts",
@@ -2487,6 +3139,12 @@
     "sveltekit-frontend/tests/topology-projection-pipeline.spec.ts",
     "sveltekit-frontend/tests/topology-projection-pipeline.spec.ts",
     "sveltekit-frontend/tests/topology-projection-pipeline.spec.ts",
+    "sveltekit-frontend/tests/topology-projection-pipeline.spec.ts",
+    "sveltekit-frontend/tests/topology-projection-pipeline.spec.ts",
+    "sveltekit-frontend/tests/topology-projection-pipeline.spec.ts",
+    "sveltekit-frontend/tests/topology-projection-pipeline.spec.ts",
+    "sveltekit-frontend/tests/topology-projection-pipeline.spec.ts",
+    "sveltekit-frontend/tests/topology-projection-pipeline.spec.ts",
     "sveltekit-frontend/tests/topology-ae2l-smoke.spec.ts",
     "sveltekit-frontend/tests/topology-ae2l-smoke.spec.ts",
     "sveltekit-frontend/tests/topology-projection-pipeline.spec.ts",
@@ -2505,13 +3163,23 @@
     "sveltekit-frontend/tests/unit/agents-md-quick-hit.test.ts",
     "sveltekit-frontend/tests/unit/agents-md-quick-hit.test.ts",
     "sveltekit-frontend/tests/unit/agents-md-quick-hit.test.ts",
+    "sveltekit-frontend/tests/unit/agents-md-quick-hit.test.ts",
+    "sveltekit-frontend/tests/unit/agents-md-quick-hit.test.ts",
+    "sveltekit-frontend/tests/unit/agents-md-quick-hit.test.ts",
     "sveltekit-frontend/tests/unit/agents-md-quick-hit.test.ts"
   ],
   ".claude/worktrees/agent-a7203461/sveltekit-frontend/src/lib/server/memory/local-engram-memory-adapter.ts": [
     ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/unit/local-engram-memory-adapter.test.ts",
+    ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/unit/local-engram-memory-adapter.test.ts",
     ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/unit/local-engram-memory-adapter.test.ts"
   ],
   "sveltekit-frontend/src/routes/api/gpu/compute/+server.ts": [
+    "sveltekit-frontend/tests/vision-gpu-tools-topology-routes.spec.ts",
+    "sveltekit-frontend/tests/vision-gpu-tools-topology-routes.spec.ts",
+    "sveltekit-frontend/tests/vision-gpu-tools-topology-routes.spec.ts",
+    "sveltekit-frontend/tests/vision-gpu-tools-topology-routes.spec.ts",
+    "sveltekit-frontend/tests/vision-gpu-tools-topology-routes.spec.ts",
+    "sveltekit-frontend/tests/vision-gpu-tools-topology-routes.spec.ts",
     "sveltekit-frontend/tests/vision-gpu-tools-topology-routes.spec.ts",
     "sveltekit-frontend/tests/vision-gpu-tools-topology-routes.spec.ts",
     "sveltekit-frontend/tests/vision-gpu-tools-topology-routes.spec.ts",
@@ -2534,9 +3202,13 @@
   ],
   ".claude/worktrees/agent-a7203461/sveltekit-frontend/src/lib/server/obsidian/markdown-wiki-note.ts": [
     ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/wiki-vault-watcher.spec.ts",
+    ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/wiki-vault-watcher.spec.ts",
     ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/wiki-vault-watcher.spec.ts"
   ],
   "sveltekit-frontend/src/routes/api/yorha/search/+server.ts": [
+    "sveltekit-frontend/tests/yorha-v1-routes.spec.ts",
+    "sveltekit-frontend/tests/yorha-v1-routes.spec.ts",
+    "sveltekit-frontend/tests/yorha-v1-routes.spec.ts",
     "sveltekit-frontend/tests/yorha-v1-routes.spec.ts",
     "sveltekit-frontend/tests/yorha-v1-routes.spec.ts",
     "sveltekit-frontend/tests/yorha-v1-routes.spec.ts",
@@ -2553,11 +3225,18 @@
     "sveltekit-frontend/tests/yorha-v1-routes.spec.ts",
     "sveltekit-frontend/tests/yorha-v1-routes.spec.ts",
     "sveltekit-frontend/tests/yorha-v1-routes.spec.ts",
+    "sveltekit-frontend/tests/yorha-v1-routes.spec.ts",
+    "sveltekit-frontend/tests/yorha-v1-routes.spec.ts",
     "sveltekit-frontend/tests/routes/auto/api/yorha/cluster-health.test.ts",
     "sveltekit-frontend/tests/yorha-v1-routes.spec.ts",
     "sveltekit-frontend/tests/yorha-v1-routes.spec.ts"
   ],
   "sveltekit-frontend/src/routes/api/yorha/cases/+server.ts": [
+    "sveltekit-frontend/tests/yorha-v1-routes.spec.ts",
+    "sveltekit-frontend/tests/yorha-v1-routes.spec.ts",
+    "sveltekit-frontend/tests/yorha-v1-routes.spec.ts",
+    "sveltekit-frontend/tests/yorha-v1-routes.spec.ts",
+    "sveltekit-frontend/tests/yorha-v1-routes.spec.ts",
     "sveltekit-frontend/tests/yorha-v1-routes.spec.ts",
     "sveltekit-frontend/tests/yorha-v1-routes.spec.ts",
     "sveltekit-frontend/tests/yorha-v1-routes.spec.ts",

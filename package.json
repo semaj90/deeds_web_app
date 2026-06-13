@@ -53,6 +53,8 @@
     "atlas:seed-neo4j-used-concept:safe-only:dry": "node scripts/atlas/seed-neo4j-used-concept-edges.mjs --safe-only --save",
     "atlas:seed-neo4j-used-concept:safe-only:apply": "node scripts/atlas/seed-neo4j-used-concept-edges.mjs --safe-only --apply --save",
     "atlas:seed-neo4j-used-concept": "node scripts/atlas/seed-neo4j-used-concept-edges.mjs",
+    "atlas:lane-12-3": "node scripts/atlas/seed-neo4j-rpc-graph.mjs",
+    "atlas:lane-12-3:apply": "node scripts/atlas/seed-neo4j-rpc-graph.mjs --apply",
     "atlas:graph:density:check": "echo 'TODO: Graph density verification script'",
     "atlas:concept:reachability:check": "echo 'TODO: Concept reachability verification script'",
     "atlas:turbovec:load": "node scripts/atlas/load-turbovec-index-from-qdrant.mjs --apply",
