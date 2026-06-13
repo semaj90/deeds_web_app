@@ -214,7 +214,7 @@ Synthesize an answer using the code context above.
 > matrix multiplication speed. Stages reordered by evidence-backed priority.
 >
 > Canonical order:
-> BM25 + concept activation -> spectra-g / Engram optional adapter ->
+> BM25 + concept activation -> deeds/engram optional adapter ->
 > XGBoost formal reranker -> Neo4j contextual trees + HyperRAG packet RPC ->
 > Autoencoder / SOM latent topology -> native GEMM deferred.
 
@@ -247,9 +247,9 @@ Cold  → SeaweedFS / NDJSON / MessagePack / historical artifacts
 No change to existing infrastructure. Aligns with current `atlas_packets` architecture.
 NDJSON payloads stay in cold store; Postgres holds packet registry + truth tables only.
 
-#### Decision 2 — Memory: spectra-g/engram over Tiny-Engram ✅ AGREED, IMPLEMENT NEXT
+#### Decision 2 — Memory: deeds/engram over Tiny-Engram ✅ AGREED, IMPLEMENT NEXT
 
-Use `spectra-g/engram` MCP for temporal + validation + knowledge graph memory.
+Use `deeds/engram` MCP for temporal + validation + knowledge graph memory.
 - Do NOT use `Tiny-Engram` PEFT (model modification, adapter memory, training complexity).
 - Do NOT use `claude-mem-opencode` session memory (retired due to poor stability and session leaks).
 
@@ -283,7 +283,7 @@ Revisit after the corrected stage order above has been verified and the formal r
 - [ ] additive sidecar alignment for `task_semantic_packets` and `route_runtime_packets` (ADD_DRIZZLE_MIRROR gaps)
 
 ### Stage 2 — Memory & Reranker (Engram MCP & XGBoost)
-- [ ] spectra-g/engram MCP integration
+- [ ] deeds/engram MCP integration
 - [ ] XGBoost formal reranker (extract triples, train LambdaMART, wire to orchestrator)
 - [ ] MARCO optional reranker
 - [ ] reward score

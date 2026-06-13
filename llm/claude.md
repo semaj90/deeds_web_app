@@ -59,17 +59,20 @@ Sub-commands for independent pipeline steps:
 ---
 ## 5. Redis/Valkey Connection Policy
 
-- **Valkey/Redis Config Object Pattern (The "Redis Trick"):** When initializing Redis (`ioredis` or SvelteKit client) inside standalone Node scripts/smoke tests, do not parse/interpolate `REDIS_URL` strings with inline passwords (which fail if the password contains special characters like `@` or `:`). Use constructor objects configured with parsed `.env` credentials to prevent URL parsing failures:
+- **Valkey/Redis Config Object Pattern (The "Redis Trick"):** When initializing Redis (`ioredis` or SvelteKit client) inside standalone Node scripts/smoke tests, do not parse/interpolate `REDIS_URL` strings with inline passwords (which fail if the password contains special characters like `@` or `:`).
+- **CRITICAL HARD RULE:** You **must** utilize the parsed `.env` credentials, official environment helper variables, or parsed configuration objects to ensure the password (defaulting to `'redis'` if unset but required) is supplied to the `ioredis` constructor.
+- **Mandatory Error Event Listeners:** You must attach `redis.on('error', () => {})` immediately after constructing any Redis instance. This prevents crashes due to unhandled `NOAUTH` or offline connection errors.
   ```javascript
   const redis = new Redis({
     host: env.REDIS_HOST || '127.0.0.1',
     port: parseInt(env.REDIS_PORT || '6379', 10),
-    password: env.REDIS_PASSWORD || undefined,
+    password: env.REDIS_PASSWORD || env.REDIS_PASS || 'redis',
     lazyConnect: true,
     maxRetriesPerRequest: 1,
     enableOfflineQueue: false,
     retryStrategy: () => null,
   });
+  redis.on('error', (err) => {});
   ```
 
 ---

@@ -6,7 +6,7 @@ This note names the retrieval model used by Parent Atlas, Qdrant, TurboVec,
 Redis LOD packets, and optional GPU rerank lanes:
 
 Canonical order for the live stack:
-BM25 + concept activation -> spectra-g / Engram optional adapter ->
+BM25 + concept activation -> deeds/engram optional adapter ->
 XGBoost formal reranker -> Neo4j contextual trees + HyperRAG packet RPC ->
 Autoencoder / SOM latent topology -> native GEMM deferred.
 

@@ -253,7 +253,7 @@ Approx completion: ~30%
 ### Stage 4 - Agent Memory & Scoring Pipeline
 Approx completion: ~49%
 - workspace kanban and discovery scanners: partial
-- custom engram nes chrom claude-mem-opencode like spectra-g/engram integration: partial/optional
+- custom engram nes chrom claude-mem-opencode like deeds/engram integration: partial/optional
 - XGBoost formal reranking: partial
 - agentic startup briefing: partial
 ### Merged Packet Lanes

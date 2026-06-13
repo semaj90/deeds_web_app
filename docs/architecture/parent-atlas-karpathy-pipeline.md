@@ -16,7 +16,7 @@ tags:
 This pipeline treats `graphify:karpathy-batch` as the synthesis lane, not the whole system.
 
 Keep the runtime order aligned with the current operator contract:
-BM25 + concept activation -> spectra-g / Engram optional adapter ->
+BM25 + concept activation -> deeds/engram optional adapter ->
 XGBoost formal reranker -> Neo4j contextual trees + HyperRAG packet RPC ->
 Autoencoder / SOM latent topology -> native GEMM deferred.
 

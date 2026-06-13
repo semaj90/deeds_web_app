@@ -37,17 +37,20 @@ Active query benchmark profiles comparing canonical `768d` against compressed `6
 
 ## 4. Redis/Valkey Password Configuration Pattern (The "Redis Trick")
 
-- **Constructor Config Over URL Strings:** Standalone scripts (smoke tests, offline indexers) must avoid manually constructing `REDIS_URL` connection strings with password interpolation (which frequently breaks on special characters like `:` or `@`). Instead, read variables from `.env` and pass them as a configuration object to the `ioredis` constructor:
+- **CRITICAL HARD RULE — Constructor Config & Env Helpers:** Any standalone script, smoke test, or database indexer that connects to Redis/Valkey **must** use parsed `.env` credentials or official environment helpers (like SvelteKit's `$lib/server/env.server.js` or `.env` parsing options). It is strictly forbidden to manually construct URL strings with interpolated passwords, or to instantiate `ioredis` connections without passing the password parameter.
+- **Mandatory Error Event Handling:** Always attach an error listener `redis.on('error', () => {})` immediately upon construction. This is required to prevent unhandled rejection/exception crashes on offline startup or connection reset events.
+- **Example Pattern:**
   ```javascript
   const redis = new Redis({
     host: env.REDIS_HOST || '127.0.0.1',
     port: parseInt(env.REDIS_PORT || '6379', 10),
-    password: env.REDIS_PASSWORD || undefined,
+    password: env.REDIS_PASSWORD || env.REDIS_PASS || 'redis',
     lazyConnect: true,
     maxRetriesPerRequest: 1,
     enableOfflineQueue: false,
     retryStrategy: () => null,
   });
+  redis.on('error', (err) => { /* handle or suppress console spam */ });
   ```
 
 ---

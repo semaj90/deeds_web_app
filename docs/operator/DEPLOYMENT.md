@@ -4,7 +4,7 @@
 >
 > This is a runtime/deployment guide, not the planning roadmap. For feature
 > work, use the split decision docs and the corrected operator order:
-> BM25 + concept activation -> spectra-g / Engram optional adapter ->
+> BM25 + concept activation -> deeds/engram optional adapter ->
 > XGBoost formal reranker -> Neo4j contextual trees + HyperRAG packet RPC ->
 > Autoencoder / SOM latent topology -> native GEMM deferred.
 >

@@ -2321,6 +2321,79 @@ Use `limit.context` / `limit.output` (not `contextLength`) and match the exact s
   - `scripts/memory/import-claude-mem-observations.mjs`
 - Important caveat: the local `claude-mem` plugin cache patch is cache-only. If the plugin is reinstalled or upgraded, recheck the local bundle for the `zod/v3` compatibility fix before trusting the hooks.
 
+## Canonical Lineage Contract (June 13, 2026)
+
+**One contract. Every store agrees. No partial joins.** Postgres rows, Qdrant payloads, Redis keys, Neo4j nodes, cold-storage manifests, and the Rust N-API parser use the SAME field names with the SAME meaning. Stops the historical drift of `packet_id` vs `qdrant_point_id` vs `redis_centroid`.
+
+### The chain (every packet, every store)
+
+```
+directory_path → source_ref → file_path → function_symbol → feature_id → feature_label
+   → packet_key → summary → qdrant_point_id → redis_key → cold_storage_manifest
+```
+
+### Canonical packet shape
+
+```json
+{
+  "directory_path": "src/lib/server",
+  "source_ref": "src/lib/server/auth.ts",
+  "file_path": "src/lib/server/auth.ts",
+  "function_symbol": "validateSession",
+  "feature_id": "auth.sessions",
+  "feature_label": "Authentication Sessions",
+  "packet_key": "ace:packet:auth:001",
+  "summary": "Handles Lucia session validation.",
+  "embedding":    { "model": "embeddinggemma", "dim": 768, "qdrant_point_id": "qdrant:auth:001" },
+  "cache":        { "redis_key": "bifrost:packet:auth:001", "centroid_key": "centroid:feature:auth.sessions" },
+  "cold_storage": { "manifest_id": "manifest:auth:001", "uri": null, "restore_verified": false }
+}
+```
+
+### Hard gate
+`node scripts/atlas/verify-feature-lineage.mjs` — must return `pass: true` with all `missing_*`/`orphan_*`/`mismatched_*` counters at 0.
+
+### Mirror tables (Postgres 18 = canonical truth)
+- `atlas_directories` — directory_path metadata
+- `atlas_source_refs` — source_ref → file_path, function_symbol, feature_id
+- `atlas_feature_labels` — feature_id → feature_label, community_id, domain_class
+- `atlas_packets` — packet_key + every field above
+- `atlas_cold_storage_manifest` — manifest_id → seaweedfs_uri, restore_verified
+
+### Qdrant payload (must include)
+`directory_path`, `source_ref`, `file_path`, `feature_id`, `feature_label`, `packet_key`, `packet_type`, `cold_storage_uri`.
+
+### Redis / Bifrost key pattern
+```
+bifrost:packet:{packet_key}
+centroid:directory:{hash}
+centroid:feature:{feature_id}
+centroid:packet:{packet_key}
+```
+
+### Cold-storage rule
+No delete, no archive, no move until `restore_verified == true`.
+
+### Canonical operator order
+```
+Storage & Lineage → BM25 → Concept extraction → Qdrant payload filter →
+Qdrant HNSW ANN → TurboVec.Search (Stage 1.5) → Neo4j USED_CONCEPT →
+XGBoost Stage 4 → Redis/Bifrost → HyperRAG Packet RPC → QLoRA export
+```
+
+**Deferred** (do NOT block the contract): AE 768→64, SOM 20×20 (routing only — NOT search), Native GEMM, RL policy/GAN, Gemma4 planner training, GpJSON, RAPIDS, ClickHouse.
+
+### `.pt` model boundary
+A `.pt` is a learned transform, NOT a language model and NOT the database. SvelteKit calls a Python worker over HTTP; the `.pt` stays in Python/WSL/CUDA. The `.pt` produces values; Postgres indexes those values (`latent_64 vector(64)`, `som_cell_x int`, `cluster_id int`, `rerank_score real`, `policy_hint jsonb`).
+
+Four useful kinds — keep them straight:
+- `packet_autoencoder.pt` — 768 → 64 latent compression (build this first)
+- `reranker.pt` — query↔packet relevance
+- `policy.pt` — next tool/action selector (Stage 5)
+- `graph_model.pt` — traversal edge prediction
+
+**XGBoost is NOT a `.pt`** — it serializes to `.ubj` / `.json` / `.pkl`. Don't conflate.
+
 ## Parent Atlas Lineage & Synthesis Rules
 - **Task Joins**: `task_semantic_packets` currently joins safely by `feature_id`.
 - **Mixed Source Refs**: `source_ref` values are mixed and can represent:

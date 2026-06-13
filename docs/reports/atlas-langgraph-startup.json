@@ -1,0 +1,56 @@
+{
+  "scan_time": "2026-06-13T06:41:16.153Z",
+  "postgres": {
+    "status": "healthy",
+    "packet_count": 17136,
+    "kind_distribution": {
+      "chr97": 2,
+      "graphify": 8330,
+      "pruned": 35,
+      "tool_manifest": 116,
+      "unknown": 8653
+    },
+    "avg_reward": 0.4526
+  },
+  "qdrant": {
+    "status": "healthy",
+    "points_count": 54448
+  },
+  "redis": {
+    "status": "healthy",
+    "centroid_count": 0,
+    "temporal_count": 0,
+    "karpathy_scores_count": 1
+  },
+  "neo4j": {
+    "status": "healthy",
+    "packet_nodes": 8484,
+    "concept_nodes": 3186,
+    "community_nodes": 321,
+    "feature_nodes": 3658,
+    "edges": 72237
+  },
+  "reports": {
+    "status": "healthy",
+    "files_scanned": 143,
+    "gate_status": {
+      "feature_lineage_verification": "FAIL",
+      "ranking_signals": "FAIL",
+      "recommendation_merge": "PASS",
+      "packet_contract_validation": "FAIL"
+    }
+  },
+  "todo": {
+    "status": "healthy",
+    "total_tasks": 29,
+    "completed_tasks": 12,
+    "open_tasks": 29
+  },
+  "lanes": {
+    "lineage_mapping_p0": "IN_PROGRESS",
+    "packet_contract_p0": "IN_PROGRESS",
+    "ranking_signal_p2": "IN_PROGRESS",
+    "mcp_tooling_p0": "COMPLETE",
+    "contextual_graph_p1": "COMPLETE"
+  }
+}

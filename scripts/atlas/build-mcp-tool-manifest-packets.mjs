@@ -27,7 +27,7 @@
 
 import pg        from 'pg';
 import { createHash }  from 'node:crypto';
-import { readFileSync, writeFileSync, mkdirSync, existsSync } from 'node:fs';
+import { readFileSync, writeFileSync, mkdirSync, existsSync, readdirSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -51,58 +51,82 @@ const OLLAMA_URL   = _ollamaRaw.startsWith('http') ? _ollamaRaw : `http://${_oll
 const COLLECTION   = 'codebase_chunks_768';
 
 // ── Domain ontology map ────────────────────────────────────────────────────────
-// Maps domain prefix → ontology tags for retrieval classification
 const DOMAIN_ONTOLOGY = {
-  search:     ['retrieval', 'semantic_search', 'rag'],
-  codebase:   ['retrieval', 'code_intel', 'ast'],
-  kb:         ['retrieval', 'knowledge_base', 'notecard'],
-  graph:      ['graph', 'neo4j', 'topology'],
-  topology:   ['graph', 'topology', 'som'],
-  clusters:   ['graph', 'clustering', 'som'],
-  context:    ['retrieval', 'ace', 'context_assembly'],
-  trace:      ['retrieval', 'kag', 'trace_memory'],
-  atlas:      ['retrieval', 'atlas', 'feature_lookup'],
-  cases:      ['legal', 'case_management', 'crud'],
-  evidence:   ['legal', 'evidence', 'multimodal'],
-  citations:  ['legal', 'citation', 'research'],
-  reports:    ['legal', 'reporting', 'export'],
-  rag:        ['retrieval', 'rag', 'indexing'],
-  analytics:  ['analytics', 'research', 'metrics'],
-  ast:        ['code_intel', 'ast', 'symbol'],
-  agent:      ['agent', 'planning', 'reasoning'],
-  langextract:['extraction', 'nlp', 'legal'],
-  embedding:  ['embedding', 'vector', 'inference'],
-  inference:  ['inference', 'routing', 'llm'],
-  gpu:        ['gpu', 'compute', 'similarity'],
-  memory:     ['memory', 'cache', 'prior_answer'],
-  vault:      ['knowledge_base', 'vault', 'obsidian'],
-  wiki:       ['knowledge_base', 'wiki', 'encyclopedia'],
-  ace:        ['retrieval', 'ace', 'context_assembly'],
-  hmm:        ['repair', 'inference', 'sequence'],
-  marco:      ['retrieval', 'reranking', 'cross_encoder'],
-  hypergraph: ['graph', 'hypergraph', 'multi_hop'],
-  startup:    ['agent', 'planning', 'briefing'],
-  compose:    ['agent', 'pipeline', 'orchestration'],
-  postgres:   ['database', 'sql', 'inspection'],
-  redis:      ['cache', 'inspection', 'ops'],
-  research:   ['research', 'web', 'github'],
-  poi:        ['legal', 'person_of_interest', 'face'],
-  codeintel:  ['code_intel', 'diagnostics', 'repair'],
-  chunk:      ['retrieval', 'chunking', 'vector'],
-  llm_synthesis: ['agent', 'synthesis', 'telemetry'],
+  auth_login_register:     ['auth', 'login', 'security'],
+  case_management:         ['legal', 'cases', 'workflow'],
+  evidence_upload_storage: ['evidence', 'storage', 'seaweedfs'],
+  document_processing:     ['document', 'pdf', 'parser'],
+  legal_reports:           ['reporting', 'pdf', 'summary'],
+  citation_engine:         ['citations', 'research', 'sources'],
+  rag_retrieval:           ['retrieval', 'rag', 'search'],
+  qdrant_vector_index:     ['vector', 'qdrant', 'embedding'],
+  neo4j_context_graph:     ['graph', 'neo4j', 'relationship'],
+  redis_bitfrost_cache:    ['cache', 'redis', 'temporal'],
+  gpu_turbovec_libtorch:   ['gpu', 'turbovec', 'libtorch'],
+  admin_observability:     ['observability', 'telemetry', 'trace'],
+  mcp_agents:              ['mcp', 'agent', 'tooling'],
+  tests_smoke_harness:     ['test', 'smoke', 'validation'],
 };
 
 function domainOf(toolName) {
-  // Try colon-separated namespace first (cases:load → cases)
-  const colonPart = toolName.split(':')[0];
-  // Then try dot-separated (graph.expand_neighborhood → graph)
-  const dotPart = toolName.split('.')[0];
-  // Then try double-underscore (search__dev_context → search)
-  const usPart = toolName.split('__')[0];
-  return colonPart !== toolName ? colonPart
-       : dotPart   !== toolName ? dotPart
-       : usPart    !== toolName ? usPart
-       : 'general';
+  const name = toolName.toLowerCase();
+  
+  if (name.includes('auth') || name.includes('login') || name.includes('register')) {
+    return 'auth_login_register';
+  }
+  if (name.includes('case') || name.includes('cases')) {
+    return 'case_management';
+  }
+  if (name.includes('evidence')) {
+    return 'evidence_upload_storage';
+  }
+  if (name.includes('doc') || name.includes('document') || name.includes('pdf')) {
+    return 'document_processing';
+  }
+  if (name.includes('report') || name.includes('reports')) {
+    return 'legal_reports';
+  }
+  if (name.includes('citation') || name.includes('citations')) {
+    return 'citation_engine';
+  }
+  if (name.includes('qdrant') || name.includes('vector_index')) {
+    return 'qdrant_vector_index';
+  }
+  if (name.includes('neo4j') || name.includes('graph') || name.includes('topology')) {
+    return 'neo4j_context_graph';
+  }
+  if (name.includes('redis') || name.includes('cache') || name.includes('bitfrost')) {
+    return 'redis_bitfrost_cache';
+  }
+  if (name.includes('gpu') || name.includes('turbovec') || name.includes('torch') || name.includes('simd')) {
+    return 'gpu_turbovec_libtorch';
+  }
+  if (name.includes('admin') || name.includes('trace') || name.includes('observability')) {
+    return 'admin_observability';
+  }
+  if (name.includes('mcp') || name.includes('agent') || name.includes('orchestration')) {
+    return 'mcp_agents';
+  }
+  if (name.includes('test') || name.includes('smoke')) {
+    return 'tests_smoke_harness';
+  }
+  if (name.includes('search') || name.includes('kb') || name.includes('retrieval') || name.includes('find')) {
+    return 'rag_retrieval';
+  }
+
+  // Fallbacks by prefix
+  const dotPart = name.split('.')[0];
+  const colonPart = name.split(':')[0];
+  const usPart = name.split('__')[0];
+  const prefix = dotPart !== name ? dotPart : (colonPart !== name ? colonPart : usPart);
+
+  if (prefix === 'search' || prefix === 'kb' || prefix === 'retrieval') return 'rag_retrieval';
+  if (prefix === 'graph' || prefix === 'topology') return 'neo4j_context_graph';
+  if (prefix === 'redis' || prefix === 'cache') return 'redis_bitfrost_cache';
+  if (prefix === 'gpu' || prefix === 'turbovec') return 'gpu_turbovec_libtorch';
+  if (prefix === 'mcp' || prefix === 'agent') return 'mcp_agents';
+
+  return 'mcp_agents'; // general fallback
 }
 
 function ontologyFor(toolName, description = '') {
@@ -146,6 +170,134 @@ function packetKeyFor(sourceRef) {
 }
 
 // ── Tool discovery from static source files ────────────────────────────────────
+
+// ── Proto file parsing for gRPC services ───────────────────────────────────────
+
+// Per-service domain classification for gRPC RPC methods (Phase 4B / GAP 3 spec).
+const SERVICE_DOMAIN = {
+  TurboVecService:         'qdrant_vector_index',
+  VectorsService:          'qdrant_vector_index',
+  GpuBridgeService:        'gpu_turbovec_libtorch',
+  EmbeddingService:        'rag_retrieval',
+  RetrievalService:        'rag_retrieval',
+  LibrarySearchService:    'rag_retrieval',
+  ToolCallingService:      'mcp_agents',
+  Chr97AgentService:       'mcp_agents',
+  CodeIntelService:        'mcp_agents',
+  ChatAssistantService:    'mcp_agents',
+  EvidenceMetadataService: 'evidence_upload_storage',
+};
+
+function domainForRpc(serviceName) {
+  // Exact match first
+  if (SERVICE_DOMAIN[serviceName]) return SERVICE_DOMAIN[serviceName];
+  // Prefix fallback (e.g. CodeIntelEnrichmentService → CodeIntelService bucket)
+  for (const [svc, dom] of Object.entries(SERVICE_DOMAIN)) {
+    const stem = svc.replace(/Service$/, '');
+    if (serviceName.startsWith(stem)) return dom;
+  }
+  return 'mcp_agents';
+}
+
+// Proto3 field declaration. Captures field name only.
+// Matches:   string foo = 1;   repeated float bar = 2;   map<string,int32> baz = 3;   optional bytes qux = 4;
+// Skips:     option, reserved, oneof header, syntax, package, import, service/message/rpc declarations.
+function extractMessageFields(msgBody) {
+  const fields = [];
+  // Strip nested oneof/message blocks to avoid double-counting their inner fields here
+  // (we still get fields from the top level; nested message types are referenced by name elsewhere).
+  const lines = msgBody.split('\n');
+  for (const rawLine of lines) {
+    const line = rawLine.trim();
+    if (!line || line.startsWith('//')) continue;
+    if (/^(option|reserved|oneof|extensions|extend|message|enum)\b/.test(line)) continue;
+    // proto3 field:  [repeated|optional] <type> <name> = <num>;
+    // type can be:   scalar | qualified.Identifier | map<K,V>
+    const m = line.match(/^(?:repeated\s+|optional\s+)?(?:map<[^>]+>|[\w.]+)\s+(\w+)\s*=\s*\d+\s*[;\[]/);
+    if (m) fields.push(m[1]);
+  }
+  return fields;
+}
+
+function parseProtoFile(src, relPath) {
+  // Strip comments
+  const cleanSrc = src.replace(/\/\/.*$/gm, '').replace(/\/\*[\s\S]*?\*\//g, '');
+
+  // Extract all message fields
+  const messageFields = new Map();
+  const msgRe = /message\s+(\w+)\s*\{([\s\S]*?)\n\}/g;
+  let m;
+  while ((m = msgRe.exec(cleanSrc)) !== null) {
+    const msgName = m[1];
+    const msgBody = m[2];
+    messageFields.set(msgName, extractMessageFields(msgBody));
+  }
+
+  // Extract all services and their RPC methods
+  const rpcs = [];
+  const serviceRe = /service\s+(\w+)\s*\{([\s\S]*?)\n\}/g;
+  let sm;
+  while ((sm = serviceRe.exec(cleanSrc)) !== null) {
+    const serviceName = sm[1];
+    const serviceBody = sm[2];
+    // proto3 rpc: rpc Name (Input) returns (Output);
+    // Allow stream keyword on either side.
+    const rpcRe = /rpc\s+(\w+)\s*\(\s*(?:stream\s+)?(\w+)\s*\)\s*returns\s*\(\s*(?:stream\s+)?(\w+)\s*\)/g;
+    let rm;
+    while ((rm = rpcRe.exec(serviceBody)) !== null) {
+      const rpcName   = rm[1];
+      const inputType = rm[2];
+      const outputType = rm[3];
+
+      rpcs.push({
+        serviceName,
+        rpcName,
+        inputType,
+        outputType,
+        requires: messageFields.get(inputType) || [],
+        returns:  messageFields.get(outputType) || [],
+        file: relPath,
+      });
+    }
+  }
+
+  return rpcs;
+}
+
+// Files we deliberately skip (deprecated, superseded, or marker-only).
+const PROTO_SKIPLIST = new Set([
+  'turbovec_cuda.proto',
+]);
+
+function discoverFromProtoFiles() {
+  const dirs = [
+    { dir: join(ROOT, 'proto/active'), prefix: 'proto/active' },
+    { dir: join(FE, 'proto/active'), prefix: 'sveltekit-frontend/proto/active' }
+  ];
+
+  const results = [];
+
+  for (const { dir, prefix } of dirs) {
+    if (!existsSync(dir)) continue;
+
+    const files = readdirSync(dir).filter(f => f.endsWith('.proto'));
+    for (const file of files) {
+      if (PROTO_SKIPLIST.has(file)) continue;
+      const fullPath = join(dir, file);
+      const src = readFileSync(fullPath, 'utf8');
+
+      // Also skip if file body declares itself DEPRECATED in the first 5 lines.
+      const head = src.split('\n').slice(0, 5).join('\n');
+      if (/DEPRECATED/i.test(head)) continue;
+
+      const relPath = `${prefix}/${file}`;
+      const rpcs = parseProtoFile(src, relPath);
+      results.push(...rpcs);
+    }
+  }
+
+  return results;
+}
 
 function discoverFromLlamaDefinitions() {
   const defPath = join(FE, 'src/lib/server/ai/llama-tool-definitions.ts');
@@ -321,17 +473,65 @@ async function main() {
 
   const llamaTools = discoverFromLlamaDefinitions();
   const mcpTools   = await discoverFromMcpFiles();
+  const rpcMethods = discoverFromProtoFiles();
 
-  // Merge: llama definitions take priority (richer schema), mcp fills gaps
+  // Convert RPC methods to tool-like structures.
+  // Source ref MUST follow `${proto_file}#${service}.${method}` per Phase 4B / GAP 3 spec
+  // — virtual source ref, NOT a mangled path. Lineage contract treats this shape as proto.
+  const rpcTools = rpcMethods.map(rpc => {
+    const toolName = `${rpc.serviceName}.${rpc.rpcName}`;
+    const domain   = domainForRpc(rpc.serviceName);
+    return {
+      tool_name:   toolName,
+      llama_name:  null,
+      domain,
+      description: `gRPC RPC ${rpc.serviceName}.${rpc.rpcName}: ${rpc.inputType} → ${rpc.outputType} (declared in ${rpc.file}).`,
+      ontology:    ontologyFor(toolName, `gRPC ${rpc.serviceName} ${rpc.rpcName} ${rpc.inputType} ${rpc.outputType}`),
+      examples:    [`call ${rpc.serviceName}.${rpc.rpcName} with ${rpc.inputType}`],
+      requires:    rpc.requires,
+      returns:     rpc.returns,
+      service:     rpc.serviceName,
+      method:      rpc.rpcName,
+      input_type:  rpc.inputType,
+      output_type: rpc.outputType,
+      transport:   'grpc',
+      file:        rpc.file,
+      source_ref:  `${rpc.file}#${toolName}`,
+      packet_kind: 'rpc_method',
+    };
+  });
+
+  // Merge: llama definitions take priority (richer schema), mcp fills gaps, rpcs appended
   const llamaNames = new Set(llamaTools.map(t => t.tool_name));
   const merged     = [
     ...llamaTools,
     ...mcpTools.filter(t => !llamaNames.has(t.tool_name)),
+    ...rpcTools,
   ];
 
   console.log(`  llama-tool-definitions: ${llamaTools.length} tools`);
   console.log(`  mcp source files:       ${mcpTools.length} tools (${mcpTools.filter(t => !llamaNames.has(t.tool_name)).length} unique)`);
-  console.log(`  total merged:           ${merged.length} tools`);
+  console.log(`  grpc proto active files: ${rpcTools.length} methods`);
+  console.log(`  total merged:           ${merged.length} tools/methods`);
+
+  // Per-service + per-file RPC summary (visibility in dry-run before --apply).
+  const rpcByService = {};
+  const rpcByFile    = {};
+  const rpcByTransport = { grpc: rpcTools.length };
+  for (const r of rpcTools) {
+    rpcByService[r.service] = (rpcByService[r.service] ?? 0) + 1;
+    rpcByFile[r.file]       = (rpcByFile[r.file] ?? 0) + 1;
+  }
+  if (rpcTools.length) {
+    console.log(`\nRPC methods per proto file:`);
+    for (const [f, n] of Object.entries(rpcByFile).sort((a, b) => b[1] - a[1])) {
+      console.log(`  ${n.toString().padStart(3)}  ${f}`);
+    }
+    console.log(`\nRPC methods per service:`);
+    for (const [s, n] of Object.entries(rpcByService).sort((a, b) => b[1] - a[1])) {
+      console.log(`  ${n.toString().padStart(3)}  ${s}`);
+    }
+  }
 
   if (VERBOSE) {
     for (const t of merged.slice(0, 10)) {
@@ -358,33 +558,53 @@ async function main() {
   const packets  = merged.map(t => {
     const domain     = t.domain;
     const featureId  = featureIdFor(domain, t.tool_name);
-    const sourceRef  = `mcp-tools/${t.file.replace(/\//g, '-')}#${t.tool_name}`;
-    const packetKey  = packetKeyFor(sourceRef);
+    const packetKind = t.packet_kind || 'tool_manifest';
+
+    // Preserve the proto-virtual source_ref for rpc_method packets; mangle only for TS tools.
+    // Stable packet_key: for rpc_method, hash includes packet_kind:proto_file:Service.Method
+    // (per Phase 4B / GAP 3 spec). For tool_manifest, keep the existing mangled-path hash.
+    const sourceRef  = packetKind === 'rpc_method'
+      ? t.source_ref
+      : (t.source_ref || `mcp-tools/${t.file.replace(/\//g, '-')}#${t.tool_name}`);
+    const packetKey  = packetKind === 'rpc_method'
+      ? createHash('sha256').update(`${packetKind}:${t.file}:${t.tool_name}`).digest('hex').slice(0, 16)
+      : packetKeyFor(sourceRef);
+
     const summary    = t.description || `MCP tool: ${t.tool_name}`;
     const bm25Text   = [t.tool_name, t.description, ...t.ontology, ...t.examples].join(' ');
 
+    const payload = {
+      packet_kind:  packetKind,
+      tool_name:    t.tool_name,
+      llama_name:   t.llama_name,
+      domain,
+      ontology:     t.ontology,
+      description:  t.description,
+      examples:     t.examples,
+      requires:     t.requires,
+      transport:    t.transport,
+      file:         t.file,
+      bm25_text:    bm25Text,
+      created_at:   now,
+    };
+
+    // rpc_method-specific payload fields per Phase 4B / GAP 3 spec.
+    if (packetKind === 'rpc_method') {
+      payload.service     = t.service;
+      payload.method      = t.method;
+      payload.proto_file  = t.file;
+      payload.input_type  = t.input_type;
+      payload.output_type = t.output_type;
+      payload.returns     = t.returns || [];
+    }
+
     return {
-      // Atlas packet identity
       packet_key:   packetKey,
       source_ref:   sourceRef,
       feature_id:   featureId,
       community_id: 0,
       summary,
-      // Payload envelope
-      payload: {
-        packet_kind:  'tool_manifest',
-        tool_name:    t.tool_name,
-        llama_name:   t.llama_name,
-        domain,
-        ontology:     t.ontology,
-        description:  t.description,
-        examples:     t.examples,
-        requires:     t.requires,
-        transport:    t.transport,
-        file:         t.file,
-        bm25_text:    bm25Text,
-        created_at:   now,
-      },
+      payload,
     };
   });
 
@@ -401,9 +621,16 @@ async function main() {
     }
   }
 
+  const rpcStats = {
+    rpc_methods_total: rpcTools.length,
+    rpc_by_service:    rpcByService,
+    rpc_by_file:       rpcByFile,
+    rpc_by_transport:  rpcByTransport,
+  };
+
   if (DRY_RUN) {
     console.log(`\n(dry-run) Would write ${packets.length} packets to Postgres/Qdrant/Neo4j`);
-    writeReport(packets, merged, { inserted: 0, qdrant: 0, neo4j: 0 }, true);
+    writeReport(packets, merged, { inserted: 0, qdrant: 0, neo4j: 0 }, true, rpcStats);
     return;
   }
 
@@ -423,15 +650,16 @@ async function main() {
           INSERT INTO atlas_packets
             (packet_id, artifact_id, packet_key, source_ref, feature_id, community_id,
              summary, payload, source_kind, created_at, updated_at)
-          VALUES ($1, $2, $3, $4, $5, $6, $7, $8::jsonb, 'tool_manifest', NOW(), NOW())
+          VALUES ($1, $2, $3, $4, $5, $6, $7, $8::jsonb, $9, NOW(), NOW())
           ON CONFLICT (packet_id) DO UPDATE SET
             summary    = EXCLUDED.summary,
             payload    = EXCLUDED.payload,
             feature_id = EXCLUDED.feature_id,
             packet_key = EXCLUDED.packet_key,
+            source_kind = EXCLUDED.source_kind,
             updated_at = NOW()
         `, [p.packet_key, p.source_ref, p.packet_key, p.source_ref,
-            p.feature_id, p.community_id, p.summary, JSON.stringify(p.payload)]);
+            p.feature_id, p.community_id, p.summary, JSON.stringify(p.payload), p.payload.packet_kind || 'tool_manifest']);
         inserted++;
       } catch (err) {
         if (VERBOSE) console.warn(`  skip ${p.packet_key}: ${err.message}`);
@@ -517,9 +745,9 @@ async function main() {
         const result = await neo4j(`
           MERGE (pk:Packet { packet_key: $pk })
             ON CREATE SET pk.source_ref = $sr, pk.feature_id = $fid,
-                          pk.community_id = $cid, pk.packet_kind = 'tool_manifest',
+                          pk.community_id = $cid, pk.packet_kind = $pkKind,
                           pk.tool_name = $tn, pk.domain = $dom, pk.created_at = $ts
-            ON MATCH  SET pk.tool_name = $tn, pk.domain = $dom
+            ON MATCH  SET pk.tool_name = $tn, pk.domain = $dom, pk.packet_kind = $pkKind
           MERGE (src:SourceRef { source_ref: $sr })
           MERGE (pk)-[:FROM_SOURCE]->(src)
           MERGE (dom:ToolDomain { name: $dom })
@@ -532,6 +760,7 @@ async function main() {
           cid: p.community_id,
           tn:  p.payload.tool_name,
           dom: domain,
+          pkKind: p.payload.packet_kind || 'tool_manifest',
           ts:  now,
         });
         if (!result.error) neo4jOk++;
@@ -545,7 +774,7 @@ async function main() {
   await pool.end();
 
   const stats = { inserted, qdrant: qdrantOk, neo4j: neo4jOk };
-  writeReport(packets, merged, stats, false);
+  writeReport(packets, merged, stats, false, rpcStats);
 
   console.log('\n══ Gate Results ══════════════════════════════════');
   const g1 = { name: 'tools_discovered_ge80',    pass: merged.length >= 80,
@@ -556,35 +785,64 @@ async function main() {
     detail: `${ontoPct}% (${withOntology}/${merged.length})` };
   const g4 = { name: 'postgres_insert_count',      pass: inserted >= merged.length * 0.9,
     detail: `${inserted}/${merged.length}` };
+  // GAP 3 gate: ≥40 RPC methods discovered (11 active proto files × ~4 rpcs ≈ 44).
+  const g5 = { name: 'rpc_methods_ge40',           pass: rpcTools.length >= 40,
+    detail: `${rpcTools.length} rpc methods` };
 
-  for (const g of [g1, g2, g3, g4]) {
+  for (const g of [g1, g2, g3, g4, g5]) {
     console.log(`  ${g.pass ? '✅' : '❌'} ${g.name.padEnd(34)} ${g.detail}`);
   }
-  const allPass = [g1, g2, g3, g4].every(g => g.pass);
+  const allPass = [g1, g2, g3, g4, g5].every(g => g.pass);
   console.log(`\n  ${allPass ? '✅ GATE PASS' : '⚠️  GATE FAIL'}`);
   console.log('\nReport: docs/reports/mcp-tool-manifest-packets.json');
 
   if (!allPass) process.exitCode = 1;
 }
 
-function writeReport(packets, merged, stats, dryRun) {
+function writeReport(packets, merged, stats, dryRun, rpcStats = null) {
   const byDomain = {};
+  const byPacketKind = {};
   for (const t of merged) {
     byDomain[t.domain] = (byDomain[t.domain] ?? 0) + 1;
+    const kind = t.packet_kind || 'tool_manifest';
+    byPacketKind[kind] = (byPacketKind[kind] ?? 0) + 1;
   }
   const withDesc     = merged.filter(t => t.description.length > 10).length;
   const withOntology = merged.filter(t => t.ontology.length > 0).length;
+
+  const sampleRpc = packets
+    .filter(p => p.payload.packet_kind === 'rpc_method')
+    .slice(0, 3)
+    .map(p => ({
+      packet_key:  p.packet_key,
+      source_ref:  p.source_ref,
+      tool_name:   p.payload.tool_name,
+      service:     p.payload.service,
+      method:      p.payload.method,
+      input_type:  p.payload.input_type,
+      output_type: p.payload.output_type,
+      requires:    p.payload.requires,
+      returns:     p.payload.returns,
+      domain:      p.payload.domain,
+      proto_file:  p.payload.proto_file,
+    }));
 
   const report = {
     generated_at:    new Date().toISOString(),
     dry_run:         dryRun,
     total_tools:     merged.length,
     by_domain:       byDomain,
+    by_packet_kind:  byPacketKind,
     description_pct: +(withDesc / merged.length * 100).toFixed(1),
     ontology_pct:    +(withOntology / merged.length * 100).toFixed(1),
     postgres_inserted: stats.inserted,
     qdrant_upserted:   stats.qdrant,
     neo4j_written:     stats.neo4j,
+    // GAP 3 — proto/grpc aggregates
+    rpc_methods_total: rpcStats?.rpc_methods_total ?? 0,
+    rpc_by_service:    rpcStats?.rpc_by_service    ?? {},
+    rpc_by_file:       rpcStats?.rpc_by_file       ?? {},
+    rpc_by_transport:  rpcStats?.rpc_by_transport  ?? {},
     sample_packets:    packets.slice(0, 5).map(p => ({
       packet_key: p.packet_key,
       source_ref: p.source_ref,
@@ -593,11 +851,13 @@ function writeReport(packets, merged, stats, dryRun) {
       ontology:   p.payload.ontology,
       description: p.summary.slice(0, 100),
     })),
+    sample_rpc_packets: sampleRpc,
     gates: {
       tools_discovered_ge80:      merged.length >= 80,
       description_coverage_80pct: withDesc / merged.length >= 0.8,
       ontology_coverage_80pct:    withOntology / merged.length >= 0.8,
       postgres_insert_count:      !dryRun ? stats.inserted >= merged.length * 0.9 : null,
+      rpc_methods_ge40:           (rpcStats?.rpc_methods_total ?? 0) >= 40,
     },
   };
 

@@ -461,7 +461,10 @@
       "PowerShell(docker exec legal-ai-neo4j cypher-shell -u neo4j -p neo4j123 \"MATCH \\(n\\) RETURN labels\\(n\\)[0] AS label, count\\(n\\) AS cnt ORDER BY cnt DESC\" 2>&1)",
       "PowerShell(docker exec legal-ai-neo4j cypher-shell -u neo4j -p neo4j123 \"MATCH \\(\\)-[r]->\\(\\) RETURN type\\(r\\) AS rel, count\\(r\\) AS cnt ORDER BY cnt DESC\" 2>&1)",
       "PowerShell($ports = @\\(8792, 50062\\); foreach \\($port in $ports\\) { $conn = netstat -ano | Select-String \":$port\\\\s\" | Select-Object -First 1; if \\($conn\\) { $pid = \\($conn -split '\\\\s+'\\)[-1]; Write-Host \"Port $port -> PID $pid\"; Stop-Process -Id $pid -Force -ErrorAction SilentlyContinue } })",
-      "Bash(REDIS_PASSWORD=redis cd c:/Users/james/Videos/deeds-web-app)"
+      "Bash(REDIS_PASSWORD=redis cd c:/Users/james/Videos/deeds-web-app)",
+      "Bash(ls scripts/atlas/ae_encoder* models/ae_encoder*)",
+      "Bash(ls models/*.pt models/*.plan)",
+      "Bash(ls docs/reports/packet-latents* docs/reports/som-20x20* docs/reports/atlas-centroids*)"
     ],
     "deny": [],
     "ask": []

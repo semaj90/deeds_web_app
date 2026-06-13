@@ -6,7 +6,7 @@ Purpose
 Concrete, implementation-ready plan that turns TypeScript/Drizzle schema + AST exports + outcome ledger into a deterministic Parent Atlas export, ready for DuckDB MapReduce audits and training-row generation for LoRA/tool-routing adapters.
 
 Current contract order:
-BM25 + concept activation -> spectra-g / Engram optional adapter ->
+BM25 + concept activation -> deeds/engram optional adapter ->
 XGBoost formal reranker -> Neo4j contextual trees + HyperRAG packet RPC ->
 Autoencoder / SOM latent topology -> native GEMM deferred.
 
@@ -147,7 +147,7 @@ Postgres / Qdrant / Neo4j responsibilities
 - Postgres: durable truth, partitioned tables (`outcome_ledger`, `chunk_hit_log`, `summary_cards`). Write via controlled migration or `--write` path.
 - Qdrant: 768d retrieval store (collection: `codebase_chunks_768`). Seeded from `vectors64.jsonl`/`qdrant-export.jsonl` via separate command — do not write from these scripts.
 - Neo4j: graph path proofs; export `edges.jsonl` for manual/controlled import.
-- spectra-g / Engram remains optional and fail-open; it is an adapter surface, not canonical storage.
+- deeds/engram remains optional and fail-open; it is an adapter surface, not canonical storage.
 - XGBoost is the formal reranker contract for retrieval ordering; keep side-channel hotness scoring parallel only.
 - Native GEMM stays deferred until the reranker and signal-quality gates justify activation.
 - Adapter boundary note: TurboVec, LlamaIndex, LangChain, and LangGraph remain adapters only; durable writes must go through promotion queues and bounded apply gates.

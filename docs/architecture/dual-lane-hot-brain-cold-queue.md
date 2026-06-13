@@ -7,7 +7,7 @@ This repo uses two lanes and one rule:
 3. Hot cache only holds active work.
 
 That storage split supports the corrected working order:
-BM25 + concept activation -> spectra-g / Engram optional adapter ->
+BM25 + concept activation -> deeds/engram optional adapter ->
 XGBoost formal reranker -> Neo4j contextual trees + HyperRAG packet RPC ->
 Autoencoder / SOM latent topology -> native GEMM deferred.
 

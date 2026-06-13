@@ -18,8 +18,8 @@ Decision docs:
 - SeaweedFS stays the cold blob store.
 - Canonical keys: `source_ref`, `source_ref_key`, `feature_id`, `packet_key`, `qdrant_point_id`, `neo4j_node_id`, `redis_hot_key`, `seaweed_object_key`.
 
-### 2. spectra-g / Engram optional adapter boundary
-- spectra-g / Engram is the preferred optional adapter surface for query transitions, hot context, and replay hints.
+### 2. deeds/engram optional adapter boundary
+- deeds/engram is the preferred optional adapter surface for query transitions, hot context, and replay hints.
 - Tiny-Engram is not the canonical contract; keep it as an experimental fallback only.
 - The adapter must fail open and must not override provenance, source code, or audit data.
 - TurboQuant / RotorQuant stay research labels, not correctness dependencies.
@@ -52,7 +52,7 @@ Decision docs:
 ## Working Priorities
 
 1. Keep the storage tier boundaries stable.
-2. Keep spectra-g / Engram optional and fail-open.
+2. Keep deeds/engram optional and fail-open.
 3. Keep XGBoost formalized as the reranker contract.
 4. Keep graph learning behind trace and edge coverage.
 5. Defer native GEMM / pybind11 until the rest of the contract is proven.

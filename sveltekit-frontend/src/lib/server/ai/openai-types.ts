@@ -40,7 +40,7 @@ export const openAIChatCompletionRequestSchema = z.object({
   /** Disable ACE retrieval entirely (raw passthrough to bifrostChat) */
   raw: z.boolean().optional().default(false),
   /** Opt into MCP-powered ACE compact search before building the ACE prompt */
-  use_mcp: z.boolean().optional().default(false),
+  use_mcp: z.boolean().optional().default(true),
 });
 
 export type OpenAIMessage = z.infer<typeof openAIMessageSchema>;

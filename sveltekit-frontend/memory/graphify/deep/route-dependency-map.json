@@ -2849,6 +2849,12 @@
     "serverDeps": 0,
     "dbDeps": 0
   },
+  "sveltekit-frontend/src/routes/api/atlas/search/+server.ts": {
+    "zone": "shared",
+    "directDeps": 0,
+    "serverDeps": 0,
+    "dbDeps": 0
+  },
   "sveltekit-frontend/src/routes/api/atlas/studio/cards/+server.ts": {
     "zone": "shared",
     "directDeps": 0,
@@ -4970,6 +4976,12 @@
   "sveltekit-frontend/src/routes/api/mcp/+server.ts": {
     "zone": "shared",
     "directDeps": 1,
+    "serverDeps": 0,
+    "dbDeps": 0
+  },
+  "sveltekit-frontend/src/routes/api/mcp/select-tools/+server.ts": {
+    "zone": "shared",
+    "directDeps": 0,
     "serverDeps": 0,
     "dbDeps": 0
   },

@@ -24,7 +24,7 @@ This document defines the optional memory plugin boundary for the parent atlas p
 - DeepSeek: candidate model family for architecture search and plan synthesis when Gemma4 needs a second opinion.
 - TurboQuant: low-latency inference path for repeated summarization and hot-path scoring.
 - RotorQuant: quantized compression / rerank research lane for memory payloads and n-gram style hints.
-- spectra-g / Engram: the preferred optional memory adapter lane for query transitions, directory-level hot context, and replay hints.
+- deeds/engram: the preferred optional memory adapter lane for query transitions, directory-level hot context, and replay hints.
 - Tiny-Engram: fallback-sized experiments only; not the canonical memory boundary.
 - ngram Engram: lightweight sequence memory for query transitions and directory-level hot context.
 - Gemma4: default local synthesizer for summaries, cards, and report text.
@@ -57,7 +57,7 @@ This document defines the optional memory plugin boundary for the parent atlas p
 - Engram writes should be adapter-only to ensure strict validation.
 - Git context should be read through a library-backed adapter (e.g. `simple-git`), not ad hoc shell output.
 - The existing Redis bigram and n-gram code paths are the current implementation base; the plugin adapter should wrap them, not replace them.
-- spectra-g / Engram is the preferred adapter surface for the optional memory lane; Tiny-Engram remains an experimental fallback, not the target contract.
+- deeds/engram is the preferred adapter surface for the optional memory lane; Tiny-Engram remains an experimental fallback, not the target contract.
 - **DeepSeek/TurboQuant/RotorQuant** are research labels for the memory search stack, not currently verified repo dependencies.
 - **NO THINKING TOKENS**: Storing raw internal LLM chain-of-thought or <thought> tags is strictly forbidden.
 
@@ -65,6 +65,6 @@ This document defines the optional memory plugin boundary for the parent atlas p
 
 - `atlas:engram:sync` builds adapter-friendly memory candidates from workspace, cluster, and feature hot spots.
 - The adapter can later point at Redis, Qdrant, or a dedicated Engram service without changing the atlas stage.
-- Keep the adapter fail-open. If spectra-g / Engram is unavailable, return empty results and continue the parent atlas flow.
+- Keep the adapter fail-open. If deeds/engram is unavailable, return empty results and continue the parent atlas flow.
 - **DeepSeek/TurboQuant/RotorQuant** are research accelerators, not correctness dependencies.
 - Integration into `HyperRagFusionService` is limited to low-trust `routingExplanation` hints and a minor rerank boost (0.05) for specific debug/workflow profiles.

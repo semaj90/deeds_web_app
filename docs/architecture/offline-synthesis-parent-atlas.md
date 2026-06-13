@@ -18,7 +18,7 @@ tags:
 This lane turns the current corpus into structured offline artifacts before promotion. It is intentionally separate from live retrieval, but it uses the same storage spine and naming conventions.
 
 Use the corrected working order when promoting outputs:
-BM25 + concept activation -> spectra-g / Engram optional adapter ->
+BM25 + concept activation -> deeds/engram optional adapter ->
 XGBoost formal reranker -> Neo4j contextual trees + HyperRAG packet RPC ->
 Autoencoder / SOM latent topology -> native GEMM deferred.
 

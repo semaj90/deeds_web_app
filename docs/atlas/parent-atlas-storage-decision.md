@@ -12,7 +12,7 @@ This document records storage roles, recommended services, tooling, and quick ru
 - LanceDB as an offline/experiment vector lake.
 - Langfuse for LLM & tool observability.
 - LangGraph for durable agent orchestration.
-- spectra-g / Engram is the preferred optional memory adapter lane.
+- deeds/engram is the preferred optional memory adapter lane.
 - Tiny-Engram stays experimental only and is not the canonical contract.
 
 Related decisions now live in separate docs:
@@ -150,7 +150,7 @@ Runtime:
 - Neo4j (GraphRAG / explicit relationships)
 - Gemma4 llama-server(s) behind facades (Ollama, YorHA)
 - MCP tools/service layer for DB access and business logic
-- spectra-g / Engram (optional low-trust memory adapter)
+- deeds/engram (optional low-trust memory adapter)
 
 Analytics / Audit:
 - DuckDB + Arrow/Parquet for exports and fast joins

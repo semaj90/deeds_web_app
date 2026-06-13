@@ -1,0 +1,226 @@
+{
+  "generated_at": "2026-06-13T08:01:55.514Z",
+  "dry_run": false,
+  "target_file": "sveltekit-frontend/src/routes/api/atlas/search/+server.ts",
+  "feature_id": "atlas.search",
+  "feature_label": "Atlas Search Cascade",
+  "total_functions": 14,
+  "by_domain": {
+    "rag_retrieval": 14
+  },
+  "postgres_inserted": 14,
+  "qdrant_upserted": 14,
+  "neo4j_nodes": 14,
+  "neo4j_calls_edges": 10,
+  "redis_cached": 0,
+  "packets": [
+    {
+      "packet_key": "d50d8ddeacd50105",
+      "function_id": "atlas.search.clamp01",
+      "function_symbol": "clamp01",
+      "source_ref": "sveltekit-frontend/src/routes/api/atlas/search/+server.ts#clamp01",
+      "concept_ids": [],
+      "calls": [],
+      "summary": "Function clamp01 in sveltekit-frontend/src/routes/api/atlas/search/+server.ts."
+    },
+    {
+      "packet_key": "3cd0dae1ba99edd6",
+      "function_id": "atlas.search.gitAgeYears",
+      "function_symbol": "gitAgeYears",
+      "source_ref": "sveltekit-frontend/src/routes/api/atlas/search/+server.ts#gitAgeYears",
+      "concept_ids": [],
+      "calls": [],
+      "summary": "Git age in years from a created_at ISO timestamp."
+    },
+    {
+      "packet_key": "6aaa22eced7d82bc",
+      "function_id": "atlas.search.freshnessScore",
+      "function_symbol": "freshnessScore",
+      "source_ref": "sveltekit-frontend/src/routes/api/atlas/search/+server.ts#freshnessScore",
+      "concept_ids": [
+        "freshness",
+        "scoring"
+      ],
+      "calls": [],
+      "summary": "Legacy single-signal freshness — kept for callers that don't yet plumb the composite parts."
+    },
+    {
+      "packet_key": "2cc646bc512baf66",
+      "function_id": "atlas.search.composeFreshness",
+      "function_symbol": "composeFreshness",
+      "source_ref": "sveltekit-frontend/src/routes/api/atlas/search/+server.ts#composeFreshness",
+      "concept_ids": [
+        "freshness"
+      ],
+      "calls": [],
+      "summary": "GAP 2 composite freshness — pure function, no I/O."
+    },
+    {
+      "packet_key": "789f57b31a3aeb12",
+      "function_id": "atlas.search.jaccard",
+      "function_symbol": "jaccard",
+      "source_ref": "sveltekit-frontend/src/routes/api/atlas/search/+server.ts#jaccard",
+      "concept_ids": [
+        "concept_overlap",
+        "scoring"
+      ],
+      "calls": [],
+      "summary": "Function jaccard in sveltekit-frontend/src/routes/api/atlas/search/+server.ts."
+    },
+    {
+      "packet_key": "3cf4cb1a20f6b4de",
+      "function_id": "atlas.search.rrfScore",
+      "function_symbol": "rrfScore",
+      "source_ref": "sveltekit-frontend/src/routes/api/atlas/search/+server.ts#rrfScore",
+      "concept_ids": [
+        "rrf",
+        "scoring"
+      ],
+      "calls": [],
+      "summary": "Function rrfScore in sveltekit-frontend/src/routes/api/atlas/search/+server.ts."
+    },
+    {
+      "packet_key": "2991154207842c29",
+      "function_id": "atlas.search.embedQuery",
+      "function_symbol": "embedQuery",
+      "source_ref": "sveltekit-frontend/src/routes/api/atlas/search/+server.ts#embedQuery",
+      "concept_ids": [
+        "embedding",
+        "gemma",
+        "llm"
+      ],
+      "calls": [
+        "ollama:/api/embeddings"
+      ],
+      "summary": "Function embedQuery in sveltekit-frontend/src/routes/api/atlas/search/+server.ts."
+    },
+    {
+      "packet_key": "c5d3789b03d2842d",
+      "function_id": "atlas.search.qdrantSearch",
+      "function_symbol": "qdrantSearch",
+      "source_ref": "sveltekit-frontend/src/routes/api/atlas/search/+server.ts#qdrantSearch",
+      "concept_ids": [
+        "ann",
+        "retrieval",
+        "qdrant"
+      ],
+      "calls": [
+        "qdrant:codebase_chunks_768"
+      ],
+      "summary": "Function qdrantSearch in sveltekit-frontend/src/routes/api/atlas/search/+server.ts."
+    },
+    {
+      "packet_key": "fde53ba872a2dcdc",
+      "function_id": "atlas.search.turbovecRerank",
+      "function_symbol": "turbovecRerank",
+      "source_ref": "sveltekit-frontend/src/routes/api/atlas/search/+server.ts#turbovecRerank",
+      "concept_ids": [
+        "rerank",
+        "turbovec",
+        "simd",
+        "cosine"
+      ],
+      "calls": [
+        "TurboVecService.Search"
+      ],
+      "summary": "Live SIMD/CPU rerank over the TurboVec in-memory index."
+    },
+    {
+      "packet_key": "56e0294665e0a2c5",
+      "function_id": "atlas.search.neo4jExpand",
+      "function_symbol": "neo4jExpand",
+      "source_ref": "sveltekit-frontend/src/routes/api/atlas/search/+server.ts#neo4jExpand",
+      "concept_ids": [
+        "neo4j",
+        "graph",
+        "expansion"
+      ],
+      "calls": [
+        "neo4j:USED_CONCEPT"
+      ],
+      "summary": "Lazy-import neo4j-driver to avoid SSR bundling issues"
+    },
+    {
+      "packet_key": "d25da399c9ba0075",
+      "function_id": "atlas.search.buildCascadeScore",
+      "function_symbol": "buildCascadeScore",
+      "source_ref": "sveltekit-frontend/src/routes/api/atlas/search/+server.ts#buildCascadeScore",
+      "concept_ids": [
+        "rrf",
+        "scoring",
+        "pagerank",
+        "concept_overlap",
+        "freshness"
+      ],
+      "calls": [
+        "jaccard",
+        "freshnessScore"
+      ],
+      "summary": "Function buildCascadeScore in sveltekit-frontend/src/routes/api/atlas/search/+server.ts."
+    },
+    {
+      "packet_key": "4b6c2a8267660eb3",
+      "function_id": "atlas.search.xgboostRerank",
+      "function_symbol": "xgboostRerank",
+      "source_ref": "sveltekit-frontend/src/routes/api/atlas/search/+server.ts#xgboostRerank",
+      "concept_ids": [
+        "rerank",
+        "xgboost",
+        "scoring"
+      ],
+      "calls": [
+        "xgboost-sidecar:/health",
+        "xgboost-sidecar:/score"
+      ],
+      "summary": "Function xgboostRerank in sveltekit-frontend/src/routes/api/atlas/search/+server.ts."
+    },
+    {
+      "packet_key": "f7e8d62f9ff00ec4",
+      "function_id": "atlas.search.crossEncoderRerank",
+      "function_symbol": "crossEncoderRerank",
+      "source_ref": "sveltekit-frontend/src/routes/api/atlas/search/+server.ts#crossEncoderRerank",
+      "concept_ids": [
+        "rerank",
+        "cross_encoder",
+        "gemma",
+        "llm"
+      ],
+      "calls": [
+        "gemma4:/v1/chat/completions"
+      ],
+      "summary": "Score each candidate as a query-document pair via Gemma4 chat completion"
+    },
+    {
+      "packet_key": "8b301c9008cbca21",
+      "function_id": "atlas.search.POST",
+      "function_symbol": "POST",
+      "source_ref": "sveltekit-frontend/src/routes/api/atlas/search/+server.ts#POST",
+      "concept_ids": [
+        "retrieval",
+        "ann",
+        "qdrant",
+        "neo4j",
+        "rerank",
+        "rrf"
+      ],
+      "calls": [
+        "embedQuery",
+        "qdrantSearch",
+        "turbovecRerank",
+        "neo4jExpand",
+        "buildCascadeScore",
+        "jaccard",
+        "xgboostRerank",
+        "crossEncoderRerank",
+        "redis:gpu:karpathy:scores"
+      ],
+      "summary": "Function POST in sveltekit-frontend/src/routes/api/atlas/search/+server.ts."
+    }
+  ],
+  "gates": {
+    "functions_discovered_ge10": true,
+    "contract_fields_filled": true,
+    "no_empty_summaries": true,
+    "postgres_insert_count": true
+  }
+}

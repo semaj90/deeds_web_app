@@ -3,7 +3,7 @@
 _Goal: minimize the repo surface without losing provenance, traversal, or replay._
 
 Use the current contract order when interpreting the lifecycle:
-BM25 + concept activation -> spectra-g / Engram optional adapter ->
+BM25 + concept activation -> deeds/engram optional adapter ->
 XGBoost formal reranker -> Neo4j contextual trees + HyperRAG packet RPC ->
 Autoencoder / SOM latent topology -> native GEMM deferred.
 

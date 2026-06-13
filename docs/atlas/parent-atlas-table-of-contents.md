@@ -57,7 +57,7 @@ This page is the navigation entry for the Parent Atlas workstream. It links the 
 
 ### Canonical working order
 1. BM25 + concept activation
-2. spectra-g / Engram optional adapter
+2. deeds/engram optional adapter
 3. Retrieval telemetry and lineage
 4. XGBoost formal reranker
 5. Neo4j contextual tree enrichment + HyperRAG packet RPC

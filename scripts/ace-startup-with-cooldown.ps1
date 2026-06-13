@@ -9,7 +9,7 @@ if ((Test-Path $stamp) -and ((Get-Date) - (Get-Item $stamp).LastWriteTime).Total
     exit 0
 }
 
-npm run ace:startup 2>&1 | Tee-Object logs/task-output/ace-startup-latest.log
+npm run atlas:startup 2>&1 | Tee-Object logs/task-output/ace-startup-latest.log
 if ($LASTEXITCODE -eq 0) {
     Set-Content -Path $stamp -Value (Get-Date -Format o)
     Write-Host 'ACE startup pipeline green'

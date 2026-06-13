@@ -17,7 +17,7 @@ It runs after Qdrant ANN and Neo4j expansion, and before final ACE context assem
 ## Position in the pipeline
 
 1. BM25 + concept activation
-2. spectra-g / Engram optional adapter boundary
+2. deeds/engram optional adapter boundary
 3. XGBoost reranking
 4. Neo4j contextual tree enrichment
 5. Higher-hop coverage repair

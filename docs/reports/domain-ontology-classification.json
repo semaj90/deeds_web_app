@@ -1,5 +1,5 @@
 {
-  "generated": "2026-06-13T05:36:00.058Z",
+  "generated": "2026-06-13T04:00:00.074Z",
   "mode": "apply",
   "total_scanned": 8483,
   "already_tagged": 2161,
@@ -22,11 +22,11 @@
     "legal": 617,
     "embed": 225,
     "memory": 1342,
-    "unknown": 170,
-    "trace": 105
+    "trace": 105,
+    "unknown": 170
   },
   "db_updated": 6322,
-  "qdrant_updated": "skipped",
+  "qdrant_updated": 6319,
   "redis_entries": 6322,
   "gates": [
     {

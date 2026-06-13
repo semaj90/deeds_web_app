@@ -1,118 +1,213 @@
 {
-  "generated_at": "2026-06-13T02:59:43.899Z",
+  "generated_at": "2026-06-13T08:00:22.901Z",
   "dry_run": false,
-  "total_tools": 116,
+  "total_tools": 190,
   "by_domain": {
-    "search": 2,
-    "codebase": 11,
-    "graph": 6,
-    "topology": 3,
-    "clusters": 2,
-    "trace": 2,
-    "context": 2,
-    "kb": 7,
-    "cases": 4,
-    "rag": 2,
-    "memory": 1,
-    "playwright": 1,
-    "general": 21,
-    "evidence": 5,
-    "citations": 3,
-    "reports": 6,
-    "embedding": 1,
-    "gpu": 1,
-    "inference": 1,
-    "startup": 1,
-    "atlas": 2,
-    "langextract": 4,
-    "compose": 1,
-    "analytics": 6,
-    "face": 1,
-    "poi": 1,
-    "codeintel": 3,
-    "cluster": 2,
-    "chunk": 1,
-    "ace": 1,
-    "research": 3,
-    "ast": 1,
-    "wiki": 4,
-    "vlm": 1,
-    "llm_synthesis": 1,
-    "vault": 2
+    "rag_retrieval": 62,
+    "neo4j_context_graph": 14,
+    "mcp_agents": 84,
+    "admin_observability": 2,
+    "case_management": 6,
+    "evidence_upload_storage": 6,
+    "citation_engine": 1,
+    "legal_reports": 6,
+    "gpu_turbovec_libtorch": 4,
+    "redis_bitfrost_cache": 1,
+    "qdrant_vector_index": 4
   },
-  "description_pct": 93.1,
+  "by_packet_kind": {
+    "tool_manifest": 116,
+    "rpc_method": 74
+  },
+  "description_pct": 95.8,
   "ontology_pct": 100,
-  "postgres_inserted": 116,
-  "qdrant_upserted": 116,
-  "neo4j_written": 116,
+  "postgres_inserted": 190,
+  "qdrant_upserted": 190,
+  "neo4j_written": 190,
+  "rpc_methods_total": 74,
+  "rpc_by_service": {
+    "ChatAssistantService": 6,
+    "Chr97Agent": 3,
+    "CodeIntelService": 5,
+    "EnrichmentService": 2,
+    "EmbeddingService": 4,
+    "GpuBridgeService": 3,
+    "LibrarySearchService": 12,
+    "RetrievalService": 20,
+    "ToolCallingService": 4,
+    "TurboVecService": 4,
+    "CyberElephantService": 7,
+    "ToolRouter": 4
+  },
+  "rpc_by_file": {
+    "proto/active/chat_assistant.proto": 6,
+    "proto/active/chr97_agent.proto": 3,
+    "proto/active/codeintel.proto": 5,
+    "proto/active/codeintel_enrichment.proto": 2,
+    "proto/active/embedding.proto": 4,
+    "proto/active/gpu_bridge.proto": 3,
+    "proto/active/library_search.proto": 6,
+    "proto/active/retrieval.proto": 10,
+    "proto/active/tool_calling.proto": 4,
+    "proto/active/turbovec.proto": 4,
+    "proto/active/vectors.proto": 7,
+    "sveltekit-frontend/proto/active/library_search.proto": 6,
+    "sveltekit-frontend/proto/active/retrieval.proto": 10,
+    "sveltekit-frontend/proto/active/tool_router.proto": 4
+  },
+  "rpc_by_transport": {
+    "grpc": 74
+  },
   "sample_packets": [
     {
-      "packet_key": "17902193a93d2674",
-      "source_ref": "mcp-tools/src-lib-server-ai-llama-tool-definitions.ts#search.dev_context",
+      "packet_key": "13039d77318546e0",
+      "source_ref": "src/lib/server/ai/llama-tool-definitions.ts#search__dev_context",
       "tool_name": "search.dev_context",
-      "domain": "search",
+      "domain": "rag_retrieval",
       "ontology": [
         "retrieval",
-        "semantic_search",
         "rag",
+        "search",
         "reranking"
       ],
       "description": "Search the codebase for context relevant to a coding or debugging query. Returns ranked file chunks "
     },
     {
-      "packet_key": "f0279d074e596caf",
-      "source_ref": "mcp-tools/src-lib-server-ai-llama-tool-definitions.ts#codebase.rg_search",
+      "packet_key": "363ce8194f9a4a29",
+      "source_ref": "src/lib/server/ai/llama-tool-definitions.ts#codebase__rg_search",
       "tool_name": "codebase.rg_search",
-      "domain": "codebase",
+      "domain": "rag_retrieval",
       "ontology": [
         "retrieval",
-        "code_intel",
-        "ast"
+        "rag",
+        "search"
       ],
       "description": "Controlled ripgrep search over the codebase. Returns line hits from relative repo paths and is safe "
     },
     {
-      "packet_key": "3bad7a908ea13468",
-      "source_ref": "mcp-tools/src-lib-server-ai-llama-tool-definitions.ts#graph.expand_neighborhood",
+      "packet_key": "41d1f107918aa2b7",
+      "source_ref": "src/lib/server/ai/llama-tool-definitions.ts#graph__expand_neighborhood",
       "tool_name": "graph.expand_neighborhood",
-      "domain": "graph",
+      "domain": "neo4j_context_graph",
       "ontology": [
         "graph",
         "neo4j",
-        "topology"
+        "relationship"
       ],
       "description": "Expand graph neighborhood from sourceRefs. Returns nodes/edges/sourceRefs/confidence and compatibili"
     },
     {
-      "packet_key": "d34e8d973938d4e9",
-      "source_ref": "mcp-tools/src-lib-server-ai-llama-tool-definitions.ts#graph.shortest_path",
+      "packet_key": "af67225fd3f4d8df",
+      "source_ref": "src/lib/server/ai/llama-tool-definitions.ts#graph__shortest_path",
       "tool_name": "graph.shortest_path",
-      "domain": "graph",
+      "domain": "neo4j_context_graph",
       "ontology": [
         "graph",
         "neo4j",
-        "topology",
+        "relationship",
         "retrieval"
       ],
       "description": "Find the shortest dependency path between two files or symbols in Neo4j."
     },
     {
-      "packet_key": "658ad9ac00155a97",
-      "source_ref": "mcp-tools/src-lib-server-ai-llama-tool-definitions.ts#graph.community_for_node",
+      "packet_key": "8da50389eff06d73",
+      "source_ref": "src/lib/server/ai/llama-tool-definitions.ts#graph__community_for_node",
       "tool_name": "graph.community_for_node",
-      "domain": "graph",
+      "domain": "neo4j_context_graph",
       "ontology": [
         "graph",
         "neo4j",
-        "topology"
+        "relationship"
       ],
       "description": "Get the GPU cluster, SOM cluster, and community membership for a node."
+    }
+  ],
+  "sample_rpc_packets": [
+    {
+      "packet_key": "f978ba0a861ca27f",
+      "source_ref": "proto/active/chat_assistant.proto#ChatAssistantService.SendMessage",
+      "tool_name": "ChatAssistantService.SendMessage",
+      "service": "ChatAssistantService",
+      "method": "SendMessage",
+      "input_type": "ChatRequest",
+      "output_type": "ChatResponse",
+      "requires": [
+        "session_id",
+        "message",
+        "user_id",
+        "case_id",
+        "options",
+        "attachments"
+      ],
+      "returns": [
+        "message_id",
+        "session_id",
+        "content",
+        "summary",
+        "citations",
+        "actions",
+        "metrics",
+        "ace",
+        "model",
+        "timestamp"
+      ],
+      "domain": "mcp_agents",
+      "proto_file": "proto/active/chat_assistant.proto"
+    },
+    {
+      "packet_key": "751b32299d89f3d5",
+      "source_ref": "proto/active/chat_assistant.proto#ChatAssistantService.StreamMessage",
+      "tool_name": "ChatAssistantService.StreamMessage",
+      "service": "ChatAssistantService",
+      "method": "StreamMessage",
+      "input_type": "ChatRequest",
+      "output_type": "ChatToken",
+      "requires": [
+        "session_id",
+        "message",
+        "user_id",
+        "case_id",
+        "options",
+        "attachments"
+      ],
+      "returns": [
+        "token",
+        "index",
+        "done",
+        "message_id",
+        "metrics",
+        "citations"
+      ],
+      "domain": "mcp_agents",
+      "proto_file": "proto/active/chat_assistant.proto"
+    },
+    {
+      "packet_key": "2a3c259326c1544f",
+      "source_ref": "proto/active/chat_assistant.proto#ChatAssistantService.GetHistory",
+      "tool_name": "ChatAssistantService.GetHistory",
+      "service": "ChatAssistantService",
+      "method": "GetHistory",
+      "input_type": "HistoryRequest",
+      "output_type": "HistoryResponse",
+      "requires": [
+        "session_id",
+        "limit",
+        "offset"
+      ],
+      "returns": [
+        "messages",
+        "total_count",
+        "session"
+      ],
+      "domain": "mcp_agents",
+      "proto_file": "proto/active/chat_assistant.proto"
     }
   ],
   "gates": {
     "tools_discovered_ge80": true,
     "description_coverage_80pct": true,
     "ontology_coverage_80pct": true,
-    "postgres_insert_count": true
+    "postgres_insert_count": true,
+    "rpc_methods_ge40": true
   }
 }

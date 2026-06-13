@@ -5,7 +5,7 @@ The system has transitioned from a structural graph traversal model to an author
 
 ### Canonical Operator Order
 1. BM25 + concept activation
-2. spectra-g / Engram optional adapter boundary
+2. deeds/engram optional adapter boundary
 3. XGBoost formal reranker
 4. Neo4j contextual tree enrichment + HyperRAG packet RPC
 5. Autoencoder / SOM latent topology
@@ -34,7 +34,7 @@ The system has transitioned from a structural graph traversal model to an author
    - Finalize `graph_pathway_cards` DB migration.
    - Implement `kb.search_notecards` FTS (Full Text Search).
    - Validate PageRank authority scores across the full codebase graph.
-   - Keep spectra-g / Engram optional and fail-open; Tiny-Engram stays experimental only.
+   - Keep deeds/engram optional and fail-open; Tiny-Engram stays experimental only.
 
 2. **Phase 2: Memory Adapter + Formal Reranker**
    - Wire `AgentOrchestrator` to prefer materialized pathways over raw synthesis.

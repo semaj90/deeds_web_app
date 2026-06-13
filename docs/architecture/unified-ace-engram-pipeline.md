@@ -5,7 +5,7 @@ This document ties together the current codebase semantic indexing, ACE packet g
 Offline batch promotion is documented separately in `docs/architecture/offline-synthesis-parent-atlas.md`.
 
 Use the current working order as the contract boundary:
-BM25 + concept activation -> spectra-g / Engram optional adapter ->
+BM25 + concept activation -> deeds/engram optional adapter ->
 XGBoost formal reranker -> Neo4j contextual trees + HyperRAG packet RPC ->
 Autoencoder / SOM latent topology -> native GEMM deferred.
 

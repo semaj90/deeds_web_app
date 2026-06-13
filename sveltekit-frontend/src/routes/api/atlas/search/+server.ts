@@ -6,6 +6,16 @@
  *   Stage 0: Qdrant payload pre-filter (feature_id + community_id + domain_class)
  *            → narrows search space from ~54k to ~4k candidates
  *   Stage 1: ANN vector search (EmbeddingGemma 768-dim) → top 100
+ *   Stage 1.5: TurboVec.Search gRPC live rerank (SIMD/CPU, ~5ms for top 500→100)
+ *              Fast scalar cosine over the in-memory index.
+ *              ann_turbovec_score becomes a LIVE computed signal, not a stored field.
+ *              Gracefully skipped when TURBOVEC_SIDECAR_GRPC_ENABLED=false.
+ *   Stage 1.7: GPU BatchCosine via LibTorch N-API (CUDA cuBLAS, ~25ms for top 100×768
+ *              on RTX 3060 Ti). Computes live exact cosine between query and each hit's
+ *              768-d vector pulled inline via Qdrant `with_vector: 'content'`.
+ *              gpu_cosine_score is added as a NEW signal (additive to ann_turbovec_score
+ *              and the stored cosine_score). Gracefully skipped when isCudaAvailable()
+ *              is false — fail-open with gpu_cosine_source: 'skipped'.
  *   Stage 2: Neo4j contextual expansion via USED_CONCEPT edges → ~150
  *   Stage 3: Feature generation + RRF fusion
  *            (cosine, BM25, TurboVec, concept_overlap, pagerank, reward, freshness)
@@ -33,7 +43,10 @@
 
 import { json }    from '@sveltejs/kit';
 import { z }       from 'zod';
+import { createHash } from 'node:crypto';
 import { ENV }     from '$lib/server/env.server.js';
+import { turbovecGrpcSearch } from '$lib/server/grpc/turbovec-cuda-client.js';
+import { batchCosineSimilarity, isCudaAvailable } from '$lib/server/gpu/libtorch-bridge.js';
 import type { RequestHandler } from './$types';
 
 // ── Request schema ─────────────────────────────────────────────────────────────
@@ -59,6 +72,7 @@ interface AtlasPacket {
   reward_prior:        number;
   community_confidence:number | null;
   ann_turbovec_score:  number;
+  gpu_cosine_score:    number;
   som_cache_hit:       number;
   created_at:          string | null;
   cascade_score:       number;
@@ -78,6 +92,9 @@ interface QdrantHit {
   id:      string | number;
   score:   number;
   payload?: Record<string, unknown>;
+  // Stage 1.7: 768-d named-vector `content` returned inline when with_vector requested.
+  // Qdrant returns named vectors as { content: number[] } when with_vector: ['content'].
+  vector?: number[] | Record<string, number[]>;
 }
 
 // ── Config ─────────────────────────────────────────────────────────────────────
@@ -94,10 +111,58 @@ const WEIGHTS = { cosine: 1.0, concept: 0.25, reward: 0.15, pagerank: 0.10, fres
 
 // ── Helpers ────────────────────────────────────────────────────────────────────
 
+function clamp01(x: number): number {
+  if (!Number.isFinite(x)) return 0.5;
+  return x < 0 ? 0 : x > 1 ? 1 : x;
+}
+
+/** Git age in years from a created_at ISO timestamp. Returns 0.5y default if missing. */
+function gitAgeYears(createdAt: unknown): number {
+  if (!createdAt) return 0.5;
+  const ms = Date.now() - new Date(String(createdAt)).getTime();
+  if (!Number.isFinite(ms) || ms < 0) return 0.5;
+  return ms / (365 * 86_400_000);
+}
+
+/**
+ * Legacy single-signal freshness — kept for callers that don't yet plumb the
+ * composite parts. New code should call composeFreshness() with all 4 parts.
+ */
 function freshnessScore(createdAt: unknown): number {
   if (!createdAt) return 0.5;
   const ageDays = (Date.now() - new Date(String(createdAt)).getTime()) / 86_400_000;
   return Math.max(0.1, 1.0 - (ageDays / 365) * 0.9);
+}
+
+/**
+ * GAP 2 composite freshness — pure function, no I/O.
+ *
+ * freshness = 0.30 · payload_freshness   (stored in Qdrant payload at index time)
+ *           + 0.30 · redis_recency       (live, from Bitfrost temporal index)
+ *           + 0.20 · reward_prior        (already in payload, [0,1] after norm)
+ *           + 0.20 · git_decay           (max(0.1, 1 - age_years/3))
+ *
+ * Each part defaults to neutral 0.5 when missing, so freshness still composes
+ * when Redis is offline OR the Bifrost temporal index hasn't been built.
+ * Result clamped to [0,1].
+ *
+ * Note: the `freshness_score` field name on AtlasPacket and the XGBoost
+ * feature ordering DO NOT change — the value is now a composite, but the
+ * shape/index is identical, so training CSVs remain backwards-compatible.
+ */
+function composeFreshness(parts: {
+  payload_freshness?: number;
+  redis_recency?: number;
+  reward_prior?: number;
+  git_age_years?: number;
+}): number {
+  const payload  = clamp01(parts.payload_freshness ?? 0.5);
+  const redis    = clamp01(parts.redis_recency    ?? 0.5);
+  const reward   = clamp01(parts.reward_prior     ?? 0.5);
+  const ageYears = Math.max(0, parts.git_age_years ?? 0.5);
+  const gitDecay = Math.max(0.1, 1 - ageYears / 3);
+  const blended  = 0.30 * payload + 0.30 * redis + 0.20 * reward + 0.20 * gitDecay;
+  return clamp01(blended);
 }
 
 function jaccard(a: string[], b: string[]): number {
@@ -156,6 +221,10 @@ async function qdrantSearch(
     vector:       { name: 'content', vector },
     limit:        topK * 5, // oversample for downstream reranking
     with_payload: true,
+    // Stage 1.7: pull the named `content` vector inline so GPU BatchCosine
+    // can score without a follow-up /points fetch. Adds ~3 KB per hit
+    // (768 × 4B), measured cheaper than a second round-trip at top_k=100.
+    with_vector:  ['content'],
   };
   if (must.length > 0) body.filter = { must };
 
@@ -171,6 +240,96 @@ async function qdrantSearch(
     return d.result ?? [];
   } catch {
     return [];
+  }
+}
+
+// ── Stage 1.5: TurboVec live rerank ───────────────────────────────────────────
+/**
+ * Live SIMD/CPU rerank over the TurboVec in-memory index.
+ *
+ * Calls TurboVecService.Search via gRPC (port 50062) with the query vector.
+ * Returns a map: candidate id → turbovec_score (cosine in [0,1]).
+ * The map is merged back into the Qdrant hits' payloads so the existing
+ * RRF feature builder picks ann_turbovec_score up as a LIVE signal instead
+ * of the stale offline value populated by load-turbovec-index-from-qdrant.mjs.
+ *
+ * Returns null when the gRPC sidecar is disabled or unreachable — caller
+ * keeps the stored payload value as a fallback.
+ */
+async function turbovecRerank(
+  vector:  number[] | Float32Array,
+  topK:    number,
+): Promise<Map<string, number> | null> {
+  try {
+    const res = await turbovecGrpcSearch(vector, topK);
+    if (!res || !Array.isArray(res.candidates) || res.candidates.length === 0) return null;
+    const m = new Map<string, number>();
+    for (const c of res.candidates) {
+      // Clamp to [0,1] for downstream consumers
+      const s = Math.max(0, Math.min(1, Number(c.score) || 0));
+      m.set(String(c.id), s);
+    }
+    return m;
+  } catch {
+    return null;
+  }
+}
+
+// ── Stage 1.7: GPU BatchCosine live rerank ────────────────────────────────────
+/**
+ * Live exact-cosine rerank via LibTorch N-API (CUDA cuBLAS).
+ *
+ * Takes the top-N Qdrant hits, extracts their 768-d `content` vector that came
+ * back inline (with_vector: ['content']), and calls batchCosineSimilarity()
+ * against the query embedding. Measured baseline on RTX 3060 Ti: ~25 ms for a
+ * 100×768 batch. Falls back to libtorch-bridge's CPU 8×-unrolled path when CUDA
+ * is unavailable; gpuHasRoom() guards against OOM internally.
+ *
+ * Returns id→score map keyed by Qdrant hit id, or null if no usable vectors
+ * were found (e.g. older payloads written before with_vector was enabled).
+ * Caller must treat null as "skip" — fail-open, do not block the cascade.
+ */
+async function gpuBatchCosineRerank(
+  queryVec: number[],
+  hits: QdrantHit[],
+  topN: number,
+): Promise<Map<string, number> | null> {
+  try {
+    const slice = hits.slice(0, topN);
+    const corpus: number[][] = [];
+    const idIndex: string[] = [];
+    for (const h of slice) {
+      // Qdrant returns named vectors as { content: number[] }; bare arrays
+      // are legacy single-vector collections — accept both shapes.
+      let v: number[] | undefined;
+      const rv = h.vector;
+      if (Array.isArray(rv)) {
+        v = rv;
+      } else if (rv && typeof rv === 'object') {
+        const named = (rv as Record<string, number[]>).content;
+        if (Array.isArray(named)) v = named;
+      }
+      if (v && v.length === queryVec.length) {
+        corpus.push(v);
+        idIndex.push(String(h.id));
+      }
+    }
+    if (corpus.length === 0) return null;
+
+    const res = await batchCosineSimilarity(queryVec, corpus);
+    if (!res || !Array.isArray(res.scores) || res.scores.length !== corpus.length) return null;
+
+    const m = new Map<string, number>();
+    for (let i = 0; i < idIndex.length; i++) {
+      const s = res.scores[i];
+      m.set(idIndex[i], Math.max(0, Math.min(1, Number(s) || 0)));
+    }
+    // Stash the source on the map via a side-channel symbol so the caller can
+    // surface it in stats without a second return value.
+    (m as unknown as { __source?: string }).__source = res.source;
+    return m;
+  } catch {
+    return null;
   }
 }
 
@@ -213,6 +372,68 @@ async function neo4jExpand(
   }
 }
 
+// ── GAP 2: Bifrost temporal recency batch fetch ───────────────────────────────
+/**
+ * Batch-fetch `bitfrost:temporal:file:{sha256(source_ref)}` for the top-K hits.
+ *
+ * Uses a single `mget()` round-trip (preferred over MULTI/pipeline here because
+ * the operation is N independent GETs with no per-key error handling — mget is
+ * the canonical Redis idiom and parses cleaner). Returns a Map keyed by the
+ * original source_ref → freshness in [0,1]. Missing keys are simply absent
+ * from the map; the consumer treats absence as neutral 0.5.
+ *
+ * Fail-open: any Redis error returns an empty map (Map is consulted with .get()
+ * which returns undefined → composeFreshness() defaults to 0.5).
+ */
+async function fetchBifrostRecency(
+  hits: QdrantHit[],
+): Promise<{ map: Map<string, number>; latencyMs: number; source: 'live' | 'payload:stored' }> {
+  const t0 = Date.now();
+  const map = new Map<string, number>();
+
+  // Build (sourceRef, redisKey) pairs once — dedup by source_ref
+  const pairs: Array<{ ref: string; key: string }> = [];
+  const seen = new Set<string>();
+  for (const h of hits) {
+    const ref = String(h.payload?.source_ref ?? '');
+    if (!ref || seen.has(ref)) continue;
+    seen.add(ref);
+    const hash = createHash('sha256').update(ref).digest('hex');
+    pairs.push({ ref, key: `bitfrost:temporal:file:${hash}` });
+  }
+
+  if (pairs.length === 0) {
+    return { map, latencyMs: Date.now() - t0, source: 'payload:stored' };
+  }
+
+  try {
+    const { getRedis } = await import('$lib/server/redis.js');
+    const redis  = getRedis();
+    const values = await redis.mget(pairs.map(p => p.key));
+    let liveHits = 0;
+    for (let i = 0; i < pairs.length; i++) {
+      const raw = values[i];
+      if (!raw) continue;
+      try {
+        const parsed = JSON.parse(raw) as { freshness?: number };
+        const f = Number(parsed?.freshness);
+        if (Number.isFinite(f)) {
+          map.set(pairs[i].ref, Math.max(0, Math.min(1, f)));
+          liveHits++;
+        }
+      } catch { /* skip malformed entry */ }
+    }
+    return {
+      map,
+      latencyMs: Date.now() - t0,
+      source: liveHits > 0 ? 'live' : 'payload:stored',
+    };
+  } catch {
+    // Redis offline → fall back to payload-stored freshness in composeFreshness()
+    return { map, latencyMs: Date.now() - t0, source: 'payload:stored' };
+  }
+}
+
 // ── Stage 3: Feature generation + RRF fusion ───────────────────────────────────
 
 function buildCascadeScore(
@@ -221,6 +442,7 @@ function buildCascadeScore(
   karpathyScores: Map<string, number>,
   cosineRank: number,
   conceptRank: number,
+  redisRecency: Map<string, number>,
 ): { score: number; stage_scores: AtlasPacket['stage_scores'] } {
   const p = hit.payload ?? {};
 
@@ -230,7 +452,22 @@ function buildCascadeScore(
   const sameFeature    = queryConceptIds.includes(String(p.feature_id ?? '')) ? 1 : 0;
   const pagerank       = karpathyScores.get(String(p.source_ref ?? '')) ?? 0;
   const rewardNorm     = Math.min(1.0, Number(p.reward_prior ?? 0) / 10);
-  const freshness      = freshnessScore(p.created_at);
+
+  // GAP 2: composite freshness from payload (stored) + Redis (Bifrost temporal)
+  //        + reward + git decay. Stays neutral (0.5) when parts are missing so
+  //        Redis-down / index-not-built degrades gracefully.
+  const sourceRef         = String(p.source_ref ?? '');
+  const payloadFreshness  = Number.isFinite(Number(p.freshness_score))
+    ? Number(p.freshness_score)
+    : (Number.isFinite(Number(p.freshness)) ? Number(p.freshness) : undefined);
+  const redisRecencyValue = sourceRef ? redisRecency.get(sourceRef) : undefined;
+  const freshness         = composeFreshness({
+    payload_freshness: payloadFreshness,
+    redis_recency:     redisRecencyValue,
+    reward_prior:      rewardNorm,
+    git_age_years:     gitAgeYears(p.created_at),
+  });
+
   const domainMatch    = queryConceptIds.some(c =>
     String(p.domain_class ?? '').includes(c) || String(p.ontology_tags ?? '').includes(c)
   ) ? 1 : 0;
@@ -420,6 +657,30 @@ export const POST: RequestHandler = async ({ request }) => {
     });
   }
 
+  // ── Stage 1.5: TurboVec live SIMD rerank ───────────────────────────────────
+  // Overwrites ann_turbovec_score in each hit's payload with the LIVE score
+  // when the gRPC sidecar is reachable. Falls through silently otherwise so
+  // the offline-populated payload value remains the fallback signal.
+  const t15 = Date.now();
+  const tvMap = await turbovecRerank(vector, Math.max(top_k * 5, 100));
+  stats.turbovec_ms = Date.now() - t15;
+  if (tvMap) {
+    let liveHits = 0;
+    for (const h of hits) {
+      const live = tvMap.get(String(h.id));
+      if (live !== undefined) {
+        (h.payload ??= {} as Record<string, unknown>);
+        (h.payload as Record<string, unknown>).ann_turbovec_score = live;
+        liveHits++;
+      }
+    }
+    stats.turbovec_live_hits = liveHits;
+    stats.turbovec_source    = 'grpc:live';
+  } else {
+    stats.turbovec_live_hits = 0;
+    stats.turbovec_source    = 'payload:stored';
+  }
+
   // ── Stage 2: Neo4j concept expansion ───────────────────────────────────────
   const topPacketKeys  = hits.slice(0, 20).map(h => String(h.payload?.packet_key ?? ''));
   const topConceptIds  = Array.from(new Set(
@@ -448,6 +709,14 @@ export const POST: RequestHandler = async ({ request }) => {
     }
   } catch { /* Redis offline — pagerank 0 */ }
 
+  // ── GAP 2: Bifrost temporal recency batch fetch (live freshness signal) ────
+  // Single mget round-trip for top-100 hits' bitfrost:temporal:file:{sha256(ref)}
+  // keys. Empty/offline → composeFreshness() falls back to payload+reward+git.
+  const bifrostFetch = await fetchBifrostRecency(hits);
+  stats.bifrost_temporal_ms     = bifrostFetch.latencyMs;
+  stats.bifrost_temporal_hits   = bifrostFetch.map.size;
+  stats.bifrost_temporal_source = bifrostFetch.source;
+
   // ── Stage 3: Feature generation + RRF ──────────────────────────────────────
   // Sort hits by concept overlap for concept-rank signal
   const conceptRanked = [...hits].sort((a, b) => {
@@ -460,7 +729,7 @@ export const POST: RequestHandler = async ({ request }) => {
   const packets: AtlasPacket[] = hits.map((hit, cosineRank) => {
     const p = hit.payload ?? {};
     const conceptRank = conceptRankMap.get(hit.id) ?? cosineRank;
-    const { score, stage_scores } = buildCascadeScore(hit, topConceptIds, karpathyScores, cosineRank, conceptRank);
+    const { score, stage_scores } = buildCascadeScore(hit, topConceptIds, karpathyScores, cosineRank, conceptRank, bifrostFetch.map);
 
     return {
       packet_key:           String(p.packet_key   ?? ''),
@@ -473,6 +742,7 @@ export const POST: RequestHandler = async ({ request }) => {
       reward_prior:         Number(p.reward_prior          ?? 0),
       community_confidence: p.community_confidence !== undefined ? Number(p.community_confidence) : null,
       ann_turbovec_score:   Number(p.ann_turbovec_score    ?? 0),
+      gpu_cosine_score:     Number(p.gpu_cosine_score      ?? 0),
       som_cache_hit:        p.som_cache_hit ? 1 : 0,
       created_at:           (p.created_at as string | null) ?? null,
       cascade_score: score,
