@@ -20,12 +20,12 @@ import pg from 'pg';
 import { writeFileSync, mkdirSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { loadRepoEnv, resolveDatabaseUrl } from '../../../scripts/atlas/connection-config.mjs';
 
 const { Pool } = pg;
 const __dir = dirname(fileURLToPath(import.meta.url));
 const ROOT = join(__dir, '../..');
-
-const DATABASE_URL = process.env.DATABASE_URL || 'postgresql://legal_admin:123456@127.0.0.1:5434/legal_ai_db';
+const DATABASE_URL = resolveDatabaseUrl(loadRepoEnv(process.env));
 
 const CANONICAL_FIELDS = [
   'feature_id',

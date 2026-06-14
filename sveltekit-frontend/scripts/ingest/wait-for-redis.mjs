@@ -5,7 +5,7 @@ import { setTimeout as delay } from 'node:timers/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { loadAtlasEnv } from '../atlas/load-atlas-env.mjs';
-import { resolveRedisUrl } from '../../../scripts/atlas/connection-config.mjs';
+import { resolveRedisConfig, resolveRedisUrl } from '../../../scripts/atlas/connection-config.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, '../..');
@@ -32,6 +32,7 @@ function redactUrl(url) {
 async function main() {
   loadAtlasEnv(ROOT);
 
+  const redisConfig = resolveRedisConfig(process.env);
   const redisUrl = buildRedisUrl();
   const startedAt = Date.now();
   const client = createClient({
@@ -67,9 +68,9 @@ async function main() {
             allowOffline: false,
             redisUrl: redactUrl(redisUrl),
             waitedMs: Date.now() - startedAt,
-            host: process.env.REDIS_HOST ?? null,
-            port: process.env.REDIS_PORT ?? null,
-            passwordSet: Boolean(process.env.REDIS_PASSWORD || process.env.VALKEY_PASSWORD || process.env.REDIS_URL),
+            host: redisConfig.host,
+            port: String(redisConfig.port),
+            passwordSet: Boolean(redisConfig.password),
           }, null, 2));
           return;
         }
@@ -87,9 +88,9 @@ async function main() {
       waitedMs: Date.now() - startedAt,
       timeoutMs: TIMEOUT_MS,
       lastError,
-      host: process.env.REDIS_HOST ?? null,
-      port: process.env.REDIS_PORT ?? null,
-      passwordSet: Boolean(process.env.REDIS_PASSWORD || process.env.VALKEY_PASSWORD || process.env.REDIS_URL),
+      host: redisConfig.host,
+      port: String(redisConfig.port),
+      passwordSet: Boolean(redisConfig.password),
     }, null, 2));
 
     if (!ALLOW_OFFLINE) {

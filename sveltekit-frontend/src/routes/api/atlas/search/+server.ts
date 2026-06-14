@@ -73,12 +73,23 @@ interface AtlasPacket {
   packet_key:          string;
   source_ref:          string;
   feature_id:          string | null;
+  feature_label?:      string | null;
   community_id:        string | null;
   domain_class:        string | null;
+  domain?:             string | null;
+  ontology?:           string[] | null;
   concept_ids:         string[];
   summary:             string | null;
+  metadata?:           Record<string, unknown> | null;
   reward_prior:        number;
   community_confidence:number | null;
+  qdrant_tag_id?:      string | null;
+  cluster_id?:         string | number | null;
+  som_cluster?:        string | number | null;
+  karpathy_score?:     number | null;
+  redis_hot_key?:      string | null;
+  redis_hot_keys?:     string[];
+  neo4j_node?:         string | null;
   ann_turbovec_score:  number;
   gpu_cosine_score:    number;
   som_cache_hit:       number;
@@ -831,19 +842,33 @@ export const POST: RequestHandler = async ({ request }) => {
 
   const packets: AtlasPacket[] = hits.map((hit, cosineRank) => {
     const p = hit.payload ?? {};
+    const redisHotKeys = Array.isArray((p as Record<string, unknown>).redis_hot_keys)
+      ? (p as Record<string, unknown>).redis_hot_keys.map((value) => String(value))
+      : [];
+    const sourceRef = String(p.source_ref ?? '');
     const conceptRank = conceptRankMap.get(hit.id) ?? cosineRank;
     const { score, stage_scores } = buildCascadeScore(hit, topConceptIds, karpathyScores, cosineRank, conceptRank, bifrostFetch.map);
 
     return {
       packet_key:           String(p.packet_key   ?? ''),
-      source_ref:           String(p.source_ref    ?? ''),
+      source_ref:           sourceRef,
       feature_id:           (p.feature_id   as string | null) ?? null,
       community_id:         (p.community_id as string | null) ?? null,
       domain_class:         (p.domain_class as string | null) ?? null,
+      domain:               (p.domain as string | null) ?? null,
+      ontology:             (Array.isArray(p.ontology) ? p.ontology.map((value) => String(value)) : null),
       concept_ids:          (p.concept_ids  as string[] | undefined) ?? [],
       summary:              (p.summary      as string | null) ?? null,
+      metadata:             (p.metadata && typeof p.metadata === 'object') ? (p.metadata as Record<string, unknown>) : null,
       reward_prior:         Number(p.reward_prior          ?? 0),
       community_confidence: p.community_confidence !== undefined ? Number(p.community_confidence) : null,
+      qdrant_tag_id:        (p.qdrant_tag_id as string | null) ?? (p.qdrantTagId as string | null) ?? String(hit.id),
+      cluster_id:           (p.cluster_id as string | number | null) ?? (p.clusterId as string | number | null) ?? null,
+      som_cluster:          (p.som_cluster as string | number | null) ?? (p.somCluster as string | number | null) ?? null,
+      karpathy_score:       karpathyScores.get(sourceRef) ?? null,
+      redis_hot_key:        redisHotKeys[0] ?? (p.redis_hot_key as string | null) ?? (p.hot_key as string | null) ?? null,
+      redis_hot_keys:       redisHotKeys,
+      neo4j_node:           (p.neo4j_node as string | null) ?? (p.neo4jNode as string | null) ?? (p.node_id as string | null) ?? (p.nodeId as string | null) ?? null,
       ann_turbovec_score:   Number(p.ann_turbovec_score    ?? 0),
       gpu_cosine_score:     Number(p.gpu_cosine_score      ?? 0),
       som_cache_hit:        p.som_cache_hit ? 1 : 0,
