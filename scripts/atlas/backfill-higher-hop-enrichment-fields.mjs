@@ -144,31 +144,43 @@ async function backfillEnrichmentFields() {
     logger.log('\nStep 3: Backfill glyphRecord field...');
 
     let glyphBackfilled = 0;
-    for (const packet of packets) {
-      const glyphRes = await pool.query(
-        `SELECT glyph_id FROM atlas_svg_glyphs WHERE packet_key = $1 LIMIT 1`,
-        [packet.packet_key]
-      );
+    let glyphTableMissing = false;
 
-      if (glyphRes.rows.length > 0) {
-        if (!dryRun) {
-          // Would link glyph_id to packet
-          // await pool.query(
-          //   `UPDATE atlas_codebase_packets SET glyph_id = $1 WHERE packet_key = $2`,
-          //   [glyphRes.rows[0].glyph_id, packet.packet_key]
-          // );
+    try {
+      for (const packet of packets) {
+        const glyphRes = await pool.query(
+          `SELECT glyph_id FROM atlas_svg_glyphs WHERE packet_key = $1 LIMIT 1`,
+          [packet.packet_key]
+        );
+
+        if (glyphRes.rows.length > 0) {
+          if (!dryRun) {
+            // Would link glyph_id to packet
+            // await pool.query(
+            //   `UPDATE atlas_codebase_packets SET glyph_id = $1 WHERE packet_key = $2`,
+            //   [glyphRes.rows[0].glyph_id, packet.packet_key]
+            // );
+          }
+          glyphBackfilled++;
         }
-        glyphBackfilled++;
+      }
+    } catch (err) {
+      if (err.message.includes('does not exist')) {
+        glyphTableMissing = true;
+        logger.warn(`  atlas_svg_glyphs table does not exist (expected — higher-hop enrichment table)`);
+      } else {
+        throw err;
       }
     }
 
     report.statistics.glyph_record_backfilled = glyphBackfilled;
-    logger.ok(`  Glyph record backfill ready: ${glyphBackfilled} packets`);
+    logger.ok(`  Glyph record backfill ready: ${glyphBackfilled} packets${glyphTableMissing ? ' [table missing]' : ''}`);
 
     report.steps.push({
       step: 'backfill_glyph_record',
-      status: 'ok',
+      status: glyphTableMissing ? 'table_missing' : 'ok',
       count: glyphBackfilled,
+      table_missing: glyphTableMissing,
     });
 
     // Step 4: Backfill qdrantHit

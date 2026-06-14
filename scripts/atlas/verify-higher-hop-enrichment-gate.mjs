@@ -109,17 +109,27 @@ async function verifyEnrichmentGate() {
 
     // Gate 2: glyphRecord coverage
     let glyphCount = 0;
-    for (const packet of packets) {
-      const glyphRes = await pool.query(
-        `SELECT id FROM atlas_svg_glyphs WHERE packet_key = $1 LIMIT 1`,
-        [packet.packet_key]
-      );
-      if (glyphRes.rows.length > 0) glyphCount++;
+    let glyphTableExists = true;
+    try {
+      for (const packet of packets) {
+        const glyphRes = await pool.query(
+          `SELECT id FROM atlas_svg_glyphs WHERE packet_key = $1 LIMIT 1`,
+          [packet.packet_key]
+        );
+        if (glyphRes.rows.length > 0) glyphCount++;
+      }
+    } catch (err) {
+      if (err.message.includes('does not exist')) {
+        glyphTableExists = false;
+        logger.warn(`  atlas_svg_glyphs table does not exist (expected — higher-hop enrichment table)`);
+      } else {
+        throw err;
+      }
     }
-    const glyphPercent = (glyphCount / packets.length * 100);
+    const glyphPercent = glyphTableExists ? (glyphCount / packets.length * 100) : 0;
     const glyphPass = glyphPercent >= GATES.glyph_record.threshold;
-    report.gates.glyph_record = { coverage: glyphPercent.toFixed(1), pass: glyphPass };
-    logger.info(`Gate 2 (glyphRecord): ${glyphPercent.toFixed(1)}% ${glyphPass ? '✅' : '❌'} (threshold ${GATES.glyph_record.threshold}%)`);
+    report.gates.glyph_record = { coverage: glyphPercent.toFixed(1), pass: glyphPass, table_missing: !glyphTableExists };
+    logger.info(`Gate 2 (glyphRecord): ${glyphPercent.toFixed(1)}% ${glyphPass ? '✅' : '❌'} (threshold ${GATES.glyph_record.threshold}%)${!glyphTableExists ? ' [table missing]' : ''}`);
 
     // Gate 3: qdrantHit coverage
     let qdrantCount = 0;
