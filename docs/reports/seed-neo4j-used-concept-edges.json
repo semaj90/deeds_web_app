@@ -1,11 +1,11 @@
 {
-  "generated_at": "2026-06-14T01:52:33.794Z",
+  "generated_at": "2026-06-14T02:46:18.760Z",
   "mode": "apply",
   "safe_only": false,
   "total_traces_in_db": 1134,
-  "traces_processed": 250,
-  "traces_after_safe_filter": 250,
-  "edges_planned": 250,
+  "traces_processed": 1134,
+  "traces_after_safe_filter": 1134,
+  "edges_planned": 1134,
   "unique_concepts": [
     "agent_intelligence",
     "api_endpoints",
@@ -19,13 +19,13 @@
     "ui_components"
   ],
   "gate_result": {
-    "neo4j_trace_total": 2268,
+    "neo4j_trace_total": 2403,
     "pg_trace_total": 1134,
-    "tracesWithEdges": 2268,
-    "edgeCount": 2268,
-    "coveragePct": 2,
+    "tracesWithEdges": 2293,
+    "edgeCount": 2293,
+    "coveragePct": 2.0220458553791887,
     "coverageGate": true
   },
-  "applied": 250,
+  "applied": 1134,
   "errors": 0
 }

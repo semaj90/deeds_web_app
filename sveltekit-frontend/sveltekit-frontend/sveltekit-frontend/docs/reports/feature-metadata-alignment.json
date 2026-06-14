@@ -1,0 +1,76 @@
+{
+  "generatedAt": "2026-06-14T02:50:52.251Z",
+  "postgres": {
+    "atlas_packets": {
+      "total": 17476,
+      "feature_id": {
+        "count": 8823,
+        "coverage": "50.5"
+      },
+      "source_ref": {
+        "count": 8823,
+        "coverage": "50.5"
+      },
+      "metadata": {
+        "count": 17476,
+        "coverage": "100.0"
+      }
+    },
+    "nes_chrom_packets": {
+      "total": 14911,
+      "feature_id": {
+        "count": 14911,
+        "coverage": "100.0"
+      },
+      "source_ref": {
+        "count": 14911,
+        "coverage": "100.0"
+      },
+      "metadata": {
+        "count": 14911,
+        "coverage": "100.0"
+      }
+    },
+    "glyph_records": {
+      "total": 14515,
+      "feature_id": {
+        "count": 0,
+        "coverage": "0.0"
+      },
+      "source_ref": {
+        "count": 0,
+        "coverage": "0.0"
+      },
+      "metadata": {
+        "count": 14515,
+        "coverage": "100.0"
+      }
+    },
+    "codebase_chunk_index": {
+      "total": 40754,
+      "feature_id": {
+        "count": 0,
+        "coverage": "0.0"
+      },
+      "source_ref": {
+        "count": 0,
+        "coverage": "0.0"
+      },
+      "metadata": {
+        "count": 40754,
+        "coverage": "100.0"
+      }
+    }
+  },
+  "redis": {
+    "connected": false
+  },
+  "qdrant": {
+    "status": "not-checked"
+  },
+  "summary": {
+    "postgresPass": false,
+    "redisConnected": false,
+    "gate": "PARTIAL"
+  }
+}
