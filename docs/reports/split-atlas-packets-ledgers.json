@@ -1,0 +1,13 @@
+{
+  "timestamp": "2026-06-14T19:23:15.657Z",
+  "mode": "APPLY",
+  "total_packets": 17485,
+  "codebase_packets": 3251,
+  "feature_packets": 14234,
+  "distribution": {
+    "feature": 8653,
+    "codebase": 3251,
+    "other": 5547,
+    "cache": 34
+  }
+}

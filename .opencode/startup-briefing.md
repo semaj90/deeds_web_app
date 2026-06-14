@@ -20,11 +20,11 @@ Hello James.
 
 ## Recommended Next Lane
 
-1. Neo4j USED_CONCEPT edges
-2. Seed Neo4j USED_CONCEPT edges from bounded trace evidence.
-3. Repair the atlas_feature_map ↔ parent_atlas_documents join.
-4. Backfill higher-hop enrichment fields before graph expansion.
-5. Audit or backfill SOM coverage from existing topology.
+1. Phase 1 higher-hop schema repair
+2. Phase 1 higher-hop schema repair: backfill file_path, tree_node_id, and som_cluster before any optional table creation.
+3. Seed Neo4j USED_CONCEPT edges from bounded trace evidence.
+4. Repair the atlas_feature_map ↔ parent_atlas_documents join.
+5. Backfill higher-hop enrichment fields before graph expansion.
 
 ## Notes
 

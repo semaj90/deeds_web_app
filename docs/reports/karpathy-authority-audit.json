@@ -1,0 +1,94 @@
+{
+  "timestamp": "2026-06-14T18:56:35.633Z",
+  "summary": {
+    "total_scores": 179,
+    "valid_scores": 179,
+    "corrupted_scores": 0,
+    "postgres_alignment_sample": 0,
+    "postgres_alignment_pct": "0.0"
+  },
+  "score_ranges": {
+    "pagerank": {
+      "min": "1.24",
+      "max": "7.06",
+      "avg": "1.58"
+    },
+    "blend": {
+      "min": "0.00",
+      "max": "0.70",
+      "avg": "0.03"
+    }
+  },
+  "sample_scores": [
+    {
+      "file": "src/lib/components/poi/POIPhotoGrid.svelte",
+      "pr": 1.3017008336345406,
+      "attn": 0,
+      "authority": 0,
+      "blend": 0.00590404951214141
+    },
+    {
+      "file": "src/lib/server/embeddings/ollama.ts",
+      "pr": 1.6751651851381948,
+      "attn": 0,
+      "authority": 11.166666666666668,
+      "blend": 0.03187658596712443
+    },
+    {
+      "file": "src/lib/components/ui/gaming/n64/N64EvolutionLoader.svelte",
+      "pr": 1.3204768239496039,
+      "attn": 0,
+      "authority": 0,
+      "blend": 0.007196375824770945
+    },
+    {
+      "file": "src/routes/(app)/demos/yorha/components/evidence/EvidenceFilters.svelte",
+      "pr": 1.334774794959256,
+      "attn": 0,
+      "authority": 0,
+      "blend": 0.00650332807419397
+    },
+    {
+      "file": "src/lib/server/research/research-utils.ts",
+      "pr": 1.4041803700520836,
+      "attn": 0,
+      "authority": 0,
+      "blend": 0.012948519838426405
+    },
+    {
+      "file": "src/lib/components/ui/alert-dialog/types.ts",
+      "pr": 1.387909090909091,
+      "attn": 0,
+      "authority": 0,
+      "blend": 0.011830572938051377
+    },
+    {
+      "file": "src/routes/api/library/document/[id]/+server.ts",
+      "pr": 1.2558229504031495,
+      "attn": 0,
+      "authority": 0,
+      "blend": 0.0027542175351059615
+    },
+    {
+      "file": "src/lib/icons/yorha/IconWarningFlag.svelte",
+      "pr": 1.3512457656283061,
+      "attn": 0,
+      "authority": 0,
+      "blend": 0.0093126989901066
+    },
+    {
+      "file": "src/routes/api/admin/audit/+server.ts",
+      "pr": 1.2716346184862168,
+      "attn": 0,
+      "authority": 0,
+      "blend": 0.0038405860478627762
+    },
+    {
+      "file": "src/lib/server/indexer/ast-ingest-logger.ts",
+      "pr": 1.3435380437827227,
+      "attn": 0,
+      "authority": 0,
+      "blend": 0.00877969315364737
+    }
+  ]
+}

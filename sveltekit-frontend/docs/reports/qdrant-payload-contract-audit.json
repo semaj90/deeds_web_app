@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-06-14T04:15:22.687Z",
+  "generatedAt": "2026-06-14T15:42:00.719Z",
   "collection": "codebase_chunks_768",
   "url": "http://localhost:6333",
   "mode": "sample",
@@ -77,6 +77,6 @@
     }
   },
   "pointsScanned": 500,
-  "totalPoints": 54965,
+  "totalPoints": 54898,
   "gate": "FAIL"
 }

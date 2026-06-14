@@ -1,0 +1,53 @@
+{
+  "timestamp": "2026-06-14T18:25:37.602Z",
+  "durationMs": 146,
+  "indexCoverage": [
+    {
+      "table": "atlas_cards",
+      "totalIndexes": "1",
+      "ginIndexes": "0",
+      "ftsIndexes": "0",
+      "btreeIndexes": "1"
+    },
+    {
+      "table": "atlas_feature_map",
+      "totalIndexes": "13",
+      "ginIndexes": "3",
+      "ftsIndexes": "0",
+      "btreeIndexes": "10"
+    },
+    {
+      "table": "atlas_packets",
+      "totalIndexes": "46",
+      "ginIndexes": "4",
+      "ftsIndexes": "1",
+      "btreeIndexes": "41"
+    }
+  ],
+  "somTopology": {
+    "cellsCovered": 0,
+    "totalCells": 400
+  },
+  "clusteringDensity": {
+    "featureCount": 50,
+    "avgPacketsPerFeature": 1.8672170604604083e+114
+  },
+  "qdrantReadiness": {
+    "totalPackets": "17485",
+    "withEmbedding": "10753",
+    "embeddingCoveragePct": 61.5,
+    "withSummary": "17476",
+    "summaryCoveragePct": 99.9,
+    "withTags": "0",
+    "tagsCoveragePct": 0
+  },
+  "karpathyHealth": {
+    "totalPackets": "17485",
+    "withSourceRef": "17485",
+    "sourceRefCoveragePct": 100,
+    "withFeatureId": "17485",
+    "featureIdCoveragePct": 100,
+    "withCommunityId": "17397",
+    "communityIdCoveragePct": 99.5
+  }
+}

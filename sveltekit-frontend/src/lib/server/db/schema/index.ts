@@ -99,6 +99,7 @@ export * from './feature-cards.js';
 export * from './codebase-relationship-reports.js';
 export * from './vector-smoke.js';
 export * from './atlas-feature-map-synthesized.js';
+export * from './atlas-feature-packets.js';
 
 // Round 3 (Tier-D promotions from real-gap-classification.md):
 // `embeddings` is FK-referenced by case_chunks.chunk_embedding_id.

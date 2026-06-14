@@ -8,6 +8,7 @@ This page is the navigation entry for the Parent Atlas workstream. It links the 
 - [Compressed Semantic Geometry](</C:/Users/james/Videos/deeds-web-app/docs/architecture/compressed-semantic-geometry.md>) — Qdrant/TurboVec/Redis LOD as approximate search geometry with optional exact rescore.
 - [Parent Atlas - Storage & Runtime Decision](</C:/Users/james/Videos/deeds-web-app/docs/atlas/parent-atlas-storage-decision.md>)
 - [Parent Atlas - Data Spine](</C:/Users/james/Videos/deeds-web-app/docs/atlas/parent-atlas-data-spine.md>)
+- [Parent Atlas - Packet Identity Operating System](</C:/Users/james/Videos/deeds-web-app/docs/PARENT-ATLAS-PACKET-IDENTITY-OS.md>)
 - [Parent Atlas Karpathy Pipeline](</C:/Users/james/Videos/deeds-web-app/docs/architecture/parent-atlas-karpathy-pipeline.md>)
 - [Cold / Warm / Hot Packet Lifecycle](</C:/Users/james/Videos/deeds-web-app/docs/architecture/cold-warm-hot-packet-lifecycle.md>)
 - [Dual-Lane Hot Brain, Cold Queue](</C:/Users/james/Videos/deeds-web-app/docs/architecture/dual-lane-hot-brain-cold-queue.md>)
@@ -52,6 +53,24 @@ This page is the navigation entry for the Parent Atlas workstream. It links the 
 - [SourceRef parent join archive plan](</C:/Users/james/Videos/deeds-web-app/docs/reports/sourceRef-parent-join-archive-plan.md>)
 - [SourceRef parent join move list](</C:/Users/james/Videos/deeds-web-app/docs/reports/sourceRef-parent-join-archive-move-list.md>)
 - [All-lanes parent atlas report](</C:/Users/james/Videos/deeds-web-app/memory/exports/all-lanes-parent-atlas-report.json>)
+
+## Identity Contract Freeze
+
+The packet identity spine is frozen at the canonical contract:
+
+- `packet_key` is immutable identity.
+- `source_ref` remains canonical source provenance.
+- `feature_id` may be enriched, but not repurposed as an identity rewrite.
+- `feature_label` remains the human-readable owner.
+- `metadata` may grow.
+- `file_path` and `file_url` are secondary location hints.
+- `community_id` stays a derived grouping field.
+
+The next derived surfaces are compare-only until the live contract exists:
+
+- `atlas_tree_nodes`
+- `atlas_topology_index`
+- `atlas_svg_glyphs`
 
 ## Lane Index
 

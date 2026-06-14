@@ -15,6 +15,9 @@ Current live spine:
 - `packet_keys` joins to live `atlas_packets.packet_key` at high coverage.
 - `feature_ids` also join cleanly enough to stay authoritative for the current concept-memory lane.
 - `evidence_cards` is now a compatibility/backfill field, not the primary live spine.
+- `packet_key` is immutable identity; `feature_id` may be enriched; `metadata` may grow.
+- compare-only future surfaces: `atlas_tree_nodes`, `atlas_topology_index`, `atlas_svg_glyphs`.
+- higher-hop schema repair is now applied to `atlas_feature_packets`: `file_path` is backfilled on 277 rows, `som_cluster` is backfilled on 7 rows, and `tree_node_id` is present as a nullable forward link with no safe live join path yet.
 
 ## Consolidated Action Plan And Roadmap
 
@@ -27,6 +30,8 @@ Approx completion: ~80%
 - hidden surface registry reconstruction: complete, compare-only
 - artifact bloat audit complete: 7,781 files / 15,052.68 MB / 463 duplicates, no single 6 GB file present; TurboVec tiering open
 - packet contract mirror audit complete: read-only validator covers all 6 packet tables; repairs are additive sidecar alignments, not new packet models
+- identity contract freeze: packet_key stays immutable; do not add new packet fields until the derived compare-only tables exist
+- higher-hop repair: `atlas_feature_packets.file_path` + `som_cluster` now have additive coverage; `tree_node_id` remains a pending forward-link field until a safe join is proven
 - recommendation merge deduplication audit: complete — collapse by design (detectStaleFeatures caps at 5; no normalization bug)
 - overlay sync: complete — 18/18 root rows matched, 4,209 app rows aligned
 - domain ontology: complete — 97.3% of addressable packets classified; 100% gate pass (addressable denominator)

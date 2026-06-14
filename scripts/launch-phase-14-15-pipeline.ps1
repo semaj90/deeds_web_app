@@ -109,10 +109,17 @@ if (-not $env:QDRANT_URL) {
 
 # Navigate to project root
 $scriptPath = Split-Path -Resolve $PSCommandPath
-$repoRoot = Split-Path -Parent (Split-Path -Parent (Split-Path -Parent $scriptPath))
+$repoRoot = Split-Path -Parent (Split-Path -Parent $scriptPath)
 $svelteKitPath = Join-Path $repoRoot 'sveltekit-frontend'
 
+Write-Info "Repo root: $repoRoot"
 Write-Info "Working directory: $svelteKitPath"
+
+if (-not (Test-Path $svelteKitPath)) {
+  Write-Error "SvelteKit directory not found: $svelteKitPath"
+  exit 1
+}
+
 Push-Location $svelteKitPath
 
 try {

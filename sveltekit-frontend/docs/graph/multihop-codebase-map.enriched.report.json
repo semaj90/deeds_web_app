@@ -1,0 +1,25 @@
+{
+  "generatedAt": "2026-06-14T18:11:20.824Z",
+  "durationMs": 686,
+  "stats": {
+    "totalNodes": 17485,
+    "canonicalNodes": 17485,
+    "qdrantMatchedNodes": 0,
+    "redisKarpathyMatches": 0,
+    "redisEncodedMatches": 0,
+    "legacyQdrantOnlyNodes": 0,
+    "missingPacketKey": 0,
+    "missingSourceRef": 0,
+    "missingFeatureId": 0,
+    "missingQdrantPointId": 17485,
+    "readyForHigherHop": true
+  },
+  "gates": {
+    "packetKeyCoverage": "100.0%",
+    "sourceRefCoverage": "100.0%",
+    "featureIdCoverage": "100.0%",
+    "qdrantMatchRate": "0.0%",
+    "karpathyEnrichRate": "0.0%",
+    "readyForHigherHop": true
+  }
+}

@@ -1,0 +1,58 @@
+{
+  "timestamp": "2026-06-14T19:24:20.237Z",
+  "postgres_table": "atlas_codebase_packets",
+  "qdrant_collection": "codebase_chunks_768",
+  "postgres_total": 3251,
+  "qdrant_sampled": 100,
+  "matched": 91,
+  "mismatched": 9,
+  "agreement_pct": 91,
+  "status": "GOOD",
+  "mismatches": [
+    {
+      "qdrant_id": 2316000,
+      "source_ref": "mcp-tools/src-mcp-server.ts#research:reddit_search",
+      "reason": "no_postgres_match"
+    },
+    {
+      "qdrant_id": 3771092,
+      "source_ref": "src/lib/server/services/error-analysis/decisionengine.ts",
+      "reason": "no_postgres_match"
+    },
+    {
+      "qdrant_id": 4240220,
+      "source_ref": "src/lib/gpu/webgpu-palace-core.ts",
+      "reason": "no_postgres_match"
+    },
+    {
+      "qdrant_id": 4329068,
+      "source_ref": "src/lib/components/editor/wysiwygeditor.svelte",
+      "reason": "no_postgres_match"
+    },
+    {
+      "qdrant_id": 5162655,
+      "source_ref": "src/lib/server/retrieval/hyperrag-fusion-service.test.ts",
+      "reason": "no_postgres_match"
+    },
+    {
+      "qdrant_id": 5336064,
+      "source_ref": "src/lib/server/errors.ts",
+      "reason": "no_postgres_match"
+    },
+    {
+      "qdrant_id": 5548223,
+      "source_ref": "src/lib/data/report-templates.ts",
+      "reason": "no_postgres_match"
+    },
+    {
+      "qdrant_id": 5613622,
+      "source_ref": "src/lib/server/retrieval/context-buffer.test.ts",
+      "reason": "no_postgres_match"
+    },
+    {
+      "qdrant_id": 5889962,
+      "source_ref": "src/lib/server/atlas/types.ts",
+      "reason": "no_postgres_match"
+    }
+  ]
+}

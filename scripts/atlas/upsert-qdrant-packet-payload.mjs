@@ -123,7 +123,7 @@ async function main() {
   // Load packets with metadata — prioritize code files likely to exist in Qdrant
   // (sveltekit-frontend/src/ first, then scripts/, then others)
   const { rows: packets } = await pool.query(`
-    SELECT packet_id, source_ref, feature_id, community_id,
+    SELECT packet_id, source_ref, feature_id, feature_label, community_id,
            community_source, community_confidence,
            concept_ids, packet_key, summary,
            payload->>'cluster_id' AS cluster_id,

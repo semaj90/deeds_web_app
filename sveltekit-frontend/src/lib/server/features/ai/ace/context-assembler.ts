@@ -2,6 +2,7 @@ import { resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { pgRows, db } from '$lib/server/db/client';
 import { syncTokenMap } from './packet-reward-writer.js';
+import { enrichRetrievalChunksPhase5 } from './phase-e-enrichment-bridge.js';
 /**
  * ACE Context Assembler — Central Orchestration Module
  *
@@ -2731,6 +2732,31 @@ export async function assembleACEContext(opts: {
             ? { ...chunk, score: Math.min((chunk.score ?? 0) + MULTILANE_BOOST, 1.0) }
             : chunk
         );
+        // Phase E enrichment: Apply domain-aware community provenance + Karpathy authority boosts
+        try {
+          const { detectQueryDomain } = await import('$lib/server/ace/phase-e-enrichment-bridge.js');
+          const queryDomain = detectQueryDomain(query);
+
+          const enrichedChunks = await enrichRetrievalChunksPhase5(
+            baseContext.ragChunks.map((c) => ({
+              source_ref: c.filePath || c.sourceId || '',
+              score: c.score ?? 0,
+            })),
+            {
+              queryClusterId: codebaseContext?.[0]?.gpuCluster || undefined,
+              userCommunityId: (userProfile as any)?.communityId || undefined,
+              domain: queryDomain,
+            }
+          );
+
+          baseContext.ragChunks = baseContext.ragChunks.map((chunk, idx) => ({
+            ...chunk,
+            score: enrichedChunks[idx]?.score ?? chunk.score,
+          }));
+        } catch (enrichErr) {
+          console.warn('[Phase E] Enrichment failed, continuing with base scores:', enrichErr);
+        }
+
         baseContext.ragChunks = assignRanks(sortByBestScore(baseContext.ragChunks));
       }
 

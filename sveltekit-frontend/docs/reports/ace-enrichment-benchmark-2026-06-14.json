@@ -1,0 +1,438 @@
+{
+  "timestamp": "2026-06-14T17:17:47.256Z",
+  "benchmark_type": "NDCG@10 with/without Phase E enrichment",
+  "gate_threshold": {
+    "ndcg_improvement_percent": 15
+  },
+  "summary": {
+    "queries_evaluated": 20,
+    "avg_baseline_ndcg_10": 0.656,
+    "avg_enriched_ndcg_10": 0.647,
+    "overall_improvement_percent": -1.5,
+    "gate_pass": false
+  },
+  "per_domain": {
+    "auth": {
+      "baseline": 0,
+      "enriched": 0,
+      "count": 1
+    },
+    "database": {
+      "baseline": 0.737,
+      "enriched": 1,
+      "count": 1
+    },
+    "retrieval": {
+      "baseline": 0,
+      "enriched": 0,
+      "count": 1
+    },
+    "error": {
+      "baseline": 1,
+      "enriched": 0.737,
+      "count": 1
+    },
+    "api": {
+      "baseline": 1,
+      "enriched": 0,
+      "count": 1
+    },
+    "cache": {
+      "baseline": 0,
+      "enriched": 0,
+      "count": 1
+    },
+    "types": {
+      "baseline": 0.8,
+      "enriched": 1,
+      "count": 1
+    },
+    "forms": {
+      "baseline": 0.553,
+      "enriched": 0.484,
+      "count": 1
+    },
+    "ui": {
+      "baseline": 0.768,
+      "enriched": 0.737,
+      "count": 1
+    },
+    "graph": {
+      "baseline": 0.579,
+      "enriched": 0.663,
+      "count": 1
+    },
+    "features": {
+      "baseline": 0.88,
+      "enriched": 1,
+      "count": 1
+    },
+    "packets": {
+      "baseline": 0.779,
+      "enriched": 0.575,
+      "count": 1
+    },
+    "infra": {
+      "baseline": 0,
+      "enriched": 0,
+      "count": 1
+    },
+    "llm": {
+      "baseline": 0.699,
+      "enriched": 1,
+      "count": 1
+    },
+    "validation": {
+      "baseline": 1,
+      "enriched": 1,
+      "count": 1
+    },
+    "events": {
+      "baseline": 0.691,
+      "enriched": 0.737,
+      "count": 1
+    },
+    "perf": {
+      "baseline": 1,
+      "enriched": 1,
+      "count": 1
+    },
+    "security": {
+      "baseline": 0.86,
+      "enriched": 1,
+      "count": 1
+    },
+    "monitoring": {
+      "baseline": 0.784,
+      "enriched": 1,
+      "count": 1
+    },
+    "testing": {
+      "baseline": 1,
+      "enriched": 1,
+      "count": 1
+    }
+  },
+  "per_query": [
+    {
+      "query_id": 1,
+      "query": "authentication and session management",
+      "domain": "auth",
+      "baseline": {
+        "ndcg_10": 0,
+        "mrr_10": 0,
+        "recall_10": null
+      },
+      "enriched": {
+        "ndcg_10": 0,
+        "mrr_10": 0,
+        "recall_10": null
+      },
+      "improvement_percent": 0
+    },
+    {
+      "query_id": 2,
+      "query": "database schema and migrations",
+      "domain": "database",
+      "baseline": {
+        "ndcg_10": 0.737,
+        "mrr_10": 0.125,
+        "recall_10": 0.3
+      },
+      "enriched": {
+        "ndcg_10": 1,
+        "mrr_10": 1,
+        "recall_10": 1
+      },
+      "improvement_percent": 35.7
+    },
+    {
+      "query_id": 3,
+      "query": "vector search and embeddings",
+      "domain": "retrieval",
+      "baseline": {
+        "ndcg_10": 0,
+        "mrr_10": 0,
+        "recall_10": 0
+      },
+      "enriched": {
+        "ndcg_10": 0,
+        "mrr_10": 0,
+        "recall_10": 0
+      },
+      "improvement_percent": 0
+    },
+    {
+      "query_id": 4,
+      "query": "error handling and logging",
+      "domain": "error",
+      "baseline": {
+        "ndcg_10": 1,
+        "mrr_10": 0,
+        "recall_10": 0
+      },
+      "enriched": {
+        "ndcg_10": 0.737,
+        "mrr_10": 0.333,
+        "recall_10": 0.8
+      },
+      "improvement_percent": -26.3
+    },
+    {
+      "query_id": 5,
+      "query": "API route definitions",
+      "domain": "api",
+      "baseline": {
+        "ndcg_10": 1,
+        "mrr_10": 0,
+        "recall_10": 0
+      },
+      "enriched": {
+        "ndcg_10": 0,
+        "mrr_10": 0,
+        "recall_10": 0
+      },
+      "improvement_percent": -100
+    },
+    {
+      "query_id": 6,
+      "query": "caching strategies and redis",
+      "domain": "cache",
+      "baseline": {
+        "ndcg_10": 0,
+        "mrr_10": 0,
+        "recall_10": null
+      },
+      "enriched": {
+        "ndcg_10": 0,
+        "mrr_10": 0,
+        "recall_10": null
+      },
+      "improvement_percent": 0
+    },
+    {
+      "query_id": 7,
+      "query": "type definitions and inference",
+      "domain": "types",
+      "baseline": {
+        "ndcg_10": 0.8,
+        "mrr_10": 0.5,
+        "recall_10": 0.9
+      },
+      "enriched": {
+        "ndcg_10": 1,
+        "mrr_10": 1,
+        "recall_10": 1
+      },
+      "improvement_percent": 25
+    },
+    {
+      "query_id": 8,
+      "query": "form validation and superforms",
+      "domain": "forms",
+      "baseline": {
+        "ndcg_10": 0.553,
+        "mrr_10": 0.333,
+        "recall_10": 0.4
+      },
+      "enriched": {
+        "ndcg_10": 0.484,
+        "mrr_10": 0.143,
+        "recall_10": 0.4
+      },
+      "improvement_percent": -12.5
+    },
+    {
+      "query_id": 9,
+      "query": "component rendering and svelte",
+      "domain": "ui",
+      "baseline": {
+        "ndcg_10": 0.768,
+        "mrr_10": 0.25,
+        "recall_10": 0.7
+      },
+      "enriched": {
+        "ndcg_10": 0.737,
+        "mrr_10": 0.333,
+        "recall_10": 0.8
+      },
+      "improvement_percent": -4
+    },
+    {
+      "query_id": 10,
+      "query": "neo4j graph relationships",
+      "domain": "graph",
+      "baseline": {
+        "ndcg_10": 0.579,
+        "mrr_10": 0.143,
+        "recall_10": 0.4
+      },
+      "enriched": {
+        "ndcg_10": 0.663,
+        "mrr_10": 0.25,
+        "recall_10": 0.7
+      },
+      "improvement_percent": 14.6
+    },
+    {
+      "query_id": 11,
+      "query": "feature extraction and indexing",
+      "domain": "features",
+      "baseline": {
+        "ndcg_10": 0.88,
+        "mrr_10": 0.143,
+        "recall_10": 0.1
+      },
+      "enriched": {
+        "ndcg_10": 1,
+        "mrr_10": 1,
+        "recall_10": 1
+      },
+      "improvement_percent": 13.7
+    },
+    {
+      "query_id": 12,
+      "query": "packet identity and canonicalization",
+      "domain": "packets",
+      "baseline": {
+        "ndcg_10": 0.779,
+        "mrr_10": 1,
+        "recall_10": 0.5
+      },
+      "enriched": {
+        "ndcg_10": 0.575,
+        "mrr_10": 0.2,
+        "recall_10": 0.6
+      },
+      "improvement_percent": -26.2
+    },
+    {
+      "query_id": 13,
+      "query": "kubernetes deployment and scaling",
+      "domain": "infra",
+      "baseline": {
+        "ndcg_10": 0,
+        "mrr_10": 0,
+        "recall_10": null
+      },
+      "enriched": {
+        "ndcg_10": 0,
+        "mrr_10": 0,
+        "recall_10": null
+      },
+      "improvement_percent": 0
+    },
+    {
+      "query_id": 14,
+      "query": "model inference and ollama",
+      "domain": "llm",
+      "baseline": {
+        "ndcg_10": 0.699,
+        "mrr_10": 0.2,
+        "recall_10": 0.5
+      },
+      "enriched": {
+        "ndcg_10": 1,
+        "mrr_10": 1,
+        "recall_10": 1
+      },
+      "improvement_percent": 43
+    },
+    {
+      "query_id": 15,
+      "query": "zod schema validation",
+      "domain": "validation",
+      "baseline": {
+        "ndcg_10": 1,
+        "mrr_10": 1,
+        "recall_10": 1
+      },
+      "enriched": {
+        "ndcg_10": 1,
+        "mrr_10": 1,
+        "recall_10": 1
+      },
+      "improvement_percent": 0
+    },
+    {
+      "query_id": 16,
+      "query": "event handling and callbacks",
+      "domain": "events",
+      "baseline": {
+        "ndcg_10": 0.691,
+        "mrr_10": 0.25,
+        "recall_10": 0.7
+      },
+      "enriched": {
+        "ndcg_10": 0.737,
+        "mrr_10": 0.333,
+        "recall_10": 0.8
+      },
+      "improvement_percent": 6.6
+    },
+    {
+      "query_id": 17,
+      "query": "performance optimization",
+      "domain": "perf",
+      "baseline": {
+        "ndcg_10": 1,
+        "mrr_10": 1,
+        "recall_10": 1
+      },
+      "enriched": {
+        "ndcg_10": 1,
+        "mrr_10": 1,
+        "recall_10": 1
+      },
+      "improvement_percent": 0
+    },
+    {
+      "query_id": 18,
+      "query": "security and access control",
+      "domain": "security",
+      "baseline": {
+        "ndcg_10": 0.86,
+        "mrr_10": 1,
+        "recall_10": 1
+      },
+      "enriched": {
+        "ndcg_10": 1,
+        "mrr_10": 1,
+        "recall_10": 1
+      },
+      "improvement_percent": 16.3
+    },
+    {
+      "query_id": 19,
+      "query": "monitoring and observability",
+      "domain": "monitoring",
+      "baseline": {
+        "ndcg_10": 0.784,
+        "mrr_10": 0.5,
+        "recall_10": 0.833
+      },
+      "enriched": {
+        "ndcg_10": 1,
+        "mrr_10": 1,
+        "recall_10": 0.833
+      },
+      "improvement_percent": 27.5
+    },
+    {
+      "query_id": 20,
+      "query": "testing and quality assurance",
+      "domain": "testing",
+      "baseline": {
+        "ndcg_10": 1,
+        "mrr_10": 1,
+        "recall_10": 1
+      },
+      "enriched": {
+        "ndcg_10": 1,
+        "mrr_10": 1,
+        "recall_10": 1
+      },
+      "improvement_percent": 0
+    }
+  ]
+}

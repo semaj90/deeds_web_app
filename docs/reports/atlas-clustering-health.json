@@ -1,0 +1,115 @@
+{
+  "timestamp": "2026-06-14T19:47:06.410Z",
+  "durationMs": 396,
+  "postgres": {
+    "tables": {
+      "atlas_codebase_packets": 3251,
+      "atlas_feature_map": 19611,
+      "atlas_cards": 0
+    },
+    "indexes": {
+      "btree": 14,
+      "gin": 3,
+      "gist": 0,
+      "hash": 0,
+      "brin": 1,
+      "total": 18
+    },
+    "coverage": {},
+    "issues": [
+      "Could not check coverage for packet_key",
+      "Could not check coverage for source_ref",
+      "Could not check coverage for feature_id",
+      "Could not check coverage for feature_label",
+      "Could not check coverage for file_path",
+      "Could not check coverage for community_id"
+    ],
+    "optionalTables": {
+      "atlas_tree_nodes": "exists",
+      "atlas_svg_glyphs": "missing",
+      "atlas_topology_index": "missing",
+      "atlas_summary_layers": "missing",
+      "atlas_feature_cards": "missing",
+      "atlas_feature_edges": "missing",
+      "atlas_dependency_edges": "missing",
+      "atlas_qdrant_mirror": "missing",
+      "atlas_redis_mirror": "missing"
+    }
+  },
+  "qdrant": {
+    "collections": {
+      "codebase_chunks_768": 52606,
+      "feature_cards_768": 0,
+      "summary_layers_768": 0,
+      "memory_cards_768": 0,
+      "glyph_vectors_768": 0
+    },
+    "payloadCoverage": {
+      "packet_key": {
+        "count": 92,
+        "percentage": 92
+      },
+      "source_ref": {
+        "count": 100,
+        "percentage": 100
+      },
+      "feature_id": {
+        "count": 100,
+        "percentage": 100
+      },
+      "feature_label": {
+        "count": 100,
+        "percentage": 100
+      },
+      "file_path": {
+        "count": 100,
+        "percentage": 100
+      },
+      "tags": {
+        "count": 100,
+        "percentage": 100
+      },
+      "som_cluster": {
+        "count": 83,
+        "percentage": 83
+      },
+      "community_id": {
+        "count": 72,
+        "percentage": 72
+      },
+      "lineage_version": {
+        "count": 100,
+        "percentage": 100
+      }
+    },
+    "issues": []
+  },
+  "redis": {
+    "connected": true,
+    "keyCounts": {
+      "gpu:karpathy:scores": 179,
+      "gpu:karpathy:encoded": 217,
+      "bifrost:*": 79,
+      "centroid:*": 0,
+      "som:*": 0
+    },
+    "issues": []
+  },
+  "recommendations": [
+    {
+      "priority": "medium",
+      "area": "schema",
+      "tables": [
+        "atlas_svg_glyphs",
+        "atlas_topology_index",
+        "atlas_summary_layers",
+        "atlas_feature_cards",
+        "atlas_feature_edges",
+        "atlas_dependency_edges",
+        "atlas_qdrant_mirror",
+        "atlas_redis_mirror"
+      ],
+      "action": "Create missing tables in recommended order: atlas_svg_glyphs, atlas_topology_index, atlas_summary_layers, atlas_feature_cards, atlas_feature_edges, atlas_dependency_edges, atlas_qdrant_mirror, atlas_redis_mirror"
+    }
+  ]
+}

@@ -1,0 +1,1367 @@
+{
+  "timestamp": "2026-06-14T18:55:27.727Z",
+  "qdrant": {
+    "host": "localhost",
+    "port": 6333,
+    "collection": "codebase_chunks_768",
+    "points_sampled": 50
+  },
+  "postgres": {
+    "host": "127.0.0.1:5434/legal_ai_db",
+    "packets_found": 50
+  },
+  "reconciliation": {
+    "total_points": 50,
+    "agreements": 48,
+    "mismatches": 2,
+    "agreement_percent": 96,
+    "gate_pass": true
+  },
+  "results": [
+    {
+      "qdrant_point_id": 86694,
+      "source_ref": "sveltekit-frontend/src/routes/api/research/concurrent-deep/stream/+server.ts",
+      "qdrant": {
+        "packet_key": "src/routes/api/research/concurrent-deep/stream/+server.ts:d391b7e92c36906b",
+        "source_ref": "sveltekit-frontend/src/routes/api/research/concurrent-deep/stream/+server.ts",
+        "feature_id": "routes",
+        "feature_label": "Routes",
+        "metadata_keys": []
+      },
+      "postgres": {
+        "packet_key": "src/routes/api/research/concurrent-deep/stream/+server.ts:d391b7e92c36906b",
+        "source_ref": "sveltekit-frontend/src/routes/api/research/concurrent-deep/stream/+server.ts",
+        "feature_id": "routes",
+        "feature_label": "Routes"
+      },
+      "normalized_source_ref": "sveltekit-frontend/src/routes/api/research/concurrent-deep/stream/+server.ts",
+      "mismatch_fields": [],
+      "agreement": true
+    },
+    {
+      "qdrant_point_id": 138065,
+      "source_ref": "sveltekit-frontend/src/routes/api/recommendations/+server.ts",
+      "qdrant": {
+        "packet_key": "src/routes/api/recommendations/+server.ts:d5397aa82be3284c",
+        "source_ref": "sveltekit-frontend/src/routes/api/recommendations/+server.ts",
+        "feature_id": "routes",
+        "feature_label": "Routes",
+        "metadata_keys": []
+      },
+      "postgres": {
+        "packet_key": "src/routes/api/recommendations/+server.ts:d5397aa82be3284c",
+        "source_ref": "sveltekit-frontend/src/routes/api/recommendations/+server.ts",
+        "feature_id": "routes",
+        "feature_label": "Routes"
+      },
+      "normalized_source_ref": "sveltekit-frontend/src/routes/api/recommendations/+server.ts",
+      "mismatch_fields": [],
+      "agreement": true
+    },
+    {
+      "qdrant_point_id": 174637,
+      "source_ref": "src/lib/server/ai/contextual-tools.ts",
+      "qdrant": {
+        "packet_key": "src/lib/server/ai/contextual-tools.ts:b65c6a4d",
+        "source_ref": "src/lib/server/ai/contextual-tools.ts",
+        "feature_id": "ai",
+        "feature_label": "lib",
+        "metadata_keys": [
+          "fanIn",
+          "todos",
+          "isTest",
+          "reExports",
+          "ssrUnsafe",
+          "sv4Legacy",
+          "components",
+          "dynImports",
+          "routeDepth",
+          "routeParams"
+        ]
+      },
+      "postgres": {
+        "packet_key": "src/lib/server/ai/contextual-tools.ts:b65c6a4d",
+        "source_ref": "src/lib/server/ai/contextual-tools.ts",
+        "feature_id": "ai",
+        "feature_label": "lib"
+      },
+      "normalized_source_ref": "src/lib/server/ai/contextual-tools.ts",
+      "mismatch_fields": [],
+      "agreement": true
+    },
+    {
+      "qdrant_point_id": 188608,
+      "source_ref": "src/lib/server/research/reddit-harvester.ts",
+      "qdrant": {
+        "packet_key": "src/lib/server/research/reddit-harvester.ts:78eef6c1",
+        "source_ref": "src/lib/server/research/reddit-harvester.ts",
+        "feature_id": "research",
+        "feature_label": "lib",
+        "metadata_keys": [
+          "fanIn",
+          "todos",
+          "isTest",
+          "reExports",
+          "ssrUnsafe",
+          "sv4Legacy",
+          "components",
+          "dynImports",
+          "routeDepth",
+          "routeParams"
+        ]
+      },
+      "postgres": {
+        "packet_key": "src/lib/server/research/reddit-harvester.ts:78eef6c1",
+        "source_ref": "src/lib/server/research/reddit-harvester.ts",
+        "feature_id": "research",
+        "feature_label": "lib"
+      },
+      "normalized_source_ref": "src/lib/server/research/reddit-harvester.ts",
+      "mismatch_fields": [],
+      "agreement": true
+    },
+    {
+      "qdrant_point_id": 194586,
+      "source_ref": "sveltekit-frontend/src/lib/server/gpu/libtorch-bridge.ts",
+      "qdrant": {
+        "packet_key": "src/lib/server/gpu/libtorch-bridge.ts:44dd86e0eace5c71",
+        "source_ref": "sveltekit-frontend/src/lib/server/gpu/libtorch-bridge.ts",
+        "feature_id": "utility",
+        "feature_label": "Utility",
+        "metadata_keys": [
+          "fanIn",
+          "todos",
+          "isTest",
+          "reExports",
+          "ssrUnsafe",
+          "sv4Legacy",
+          "components",
+          "dynImports",
+          "routeDepth",
+          "routeParams"
+        ]
+      },
+      "postgres": {
+        "packet_key": "src/lib/server/gpu/libtorch-bridge.ts:44dd86e0eace5c71",
+        "source_ref": "sveltekit-frontend/src/lib/server/gpu/libtorch-bridge.ts",
+        "feature_id": "utility",
+        "feature_label": "Utility"
+      },
+      "normalized_source_ref": "sveltekit-frontend/src/lib/server/gpu/libtorch-bridge.ts",
+      "mismatch_fields": [],
+      "agreement": true
+    },
+    {
+      "qdrant_point_id": 227675,
+      "source_ref": "src/lib/server/couchdb/mango-indexes.ts",
+      "qdrant": {
+        "packet_key": "src/lib/server/couchdb/mango-indexes.ts:dff1fbc9",
+        "source_ref": "src/lib/server/couchdb/mango-indexes.ts",
+        "feature_id": "couchdb",
+        "feature_label": "lib",
+        "metadata_keys": [
+          "fanIn",
+          "todos",
+          "isTest",
+          "reExports",
+          "ssrUnsafe",
+          "sv4Legacy",
+          "components",
+          "dynImports",
+          "routeDepth",
+          "routeParams"
+        ]
+      },
+      "postgres": {
+        "packet_key": "src/lib/server/couchdb/mango-indexes.ts:dff1fbc9",
+        "source_ref": "src/lib/server/couchdb/mango-indexes.ts",
+        "feature_id": "couchdb",
+        "feature_label": "lib"
+      },
+      "normalized_source_ref": "src/lib/server/couchdb/mango-indexes.ts",
+      "mismatch_fields": [],
+      "agreement": true
+    },
+    {
+      "qdrant_point_id": 292522,
+      "source_ref": "sveltekit-frontend/src/lib/components/monitoring/CacheMonitoringWidget.svelte",
+      "qdrant": {
+        "packet_key": "src/lib/components/monitoring/CacheMonitoringWidget.svelte:f9470fb28e6f344a",
+        "source_ref": "sveltekit-frontend/src/lib/components/monitoring/CacheMonitoringWidget.svelte",
+        "feature_id": "monitoring",
+        "feature_label": "Monitoring",
+        "metadata_keys": [
+          "fanIn",
+          "todos",
+          "isTest",
+          "reExports",
+          "ssrUnsafe",
+          "sv4Legacy",
+          "components",
+          "dynImports",
+          "routeDepth",
+          "routeParams"
+        ]
+      },
+      "postgres": {
+        "packet_key": "src/lib/components/monitoring/CacheMonitoringWidget.svelte:f9470fb28e6f344a",
+        "source_ref": "sveltekit-frontend/src/lib/components/monitoring/CacheMonitoringWidget.svelte",
+        "feature_id": "monitoring",
+        "feature_label": "Monitoring"
+      },
+      "normalized_source_ref": "sveltekit-frontend/src/lib/components/monitoring/cachemonitoringwidget.svelte",
+      "mismatch_fields": [],
+      "agreement": true
+    },
+    {
+      "qdrant_point_id": 404803,
+      "source_ref": "src/lib/server/data/legal-seed-data.ts",
+      "qdrant": {
+        "packet_key": "src/lib/server/data/legal-seed-data.ts:1ec45097",
+        "source_ref": "src/lib/server/data/legal-seed-data.ts",
+        "feature_id": "data",
+        "feature_label": "lib",
+        "metadata_keys": [
+          "fanIn",
+          "todos",
+          "isTest",
+          "reExports",
+          "ssrUnsafe",
+          "sv4Legacy",
+          "components",
+          "dynImports",
+          "routeDepth",
+          "routeParams"
+        ]
+      },
+      "postgres": {
+        "packet_key": "src/lib/server/data/legal-seed-data.ts:1ec45097",
+        "source_ref": "src/lib/server/data/legal-seed-data.ts",
+        "feature_id": "data",
+        "feature_label": "lib"
+      },
+      "normalized_source_ref": "src/lib/server/data/legal-seed-data.ts",
+      "mismatch_fields": [],
+      "agreement": true
+    },
+    {
+      "qdrant_point_id": 436451,
+      "source_ref": "src/lib/components/citations/citationsaveform.svelte",
+      "qdrant": {
+        "packet_key": "src/lib/components/citations/citationsaveform.svelte:77b10257",
+        "source_ref": "src/lib/components/citations/citationsaveform.svelte",
+        "feature_id": "citations",
+        "feature_label": "lib",
+        "metadata_keys": [
+          "fanIn",
+          "todos",
+          "isTest",
+          "reExports",
+          "ssrUnsafe",
+          "sv4Legacy",
+          "components",
+          "dynImports",
+          "routeDepth",
+          "routeParams"
+        ]
+      },
+      "postgres": {
+        "packet_key": "src/lib/components/citations/citationsaveform.svelte:77b10257",
+        "source_ref": "src/lib/components/citations/citationsaveform.svelte",
+        "feature_id": "citations",
+        "feature_label": "lib"
+      },
+      "normalized_source_ref": "src/lib/components/citations/citationsaveform.svelte",
+      "mismatch_fields": [],
+      "agreement": true
+    },
+    {
+      "qdrant_point_id": 614211,
+      "source_ref": "sveltekit-frontend/src/routes/(app)/admin/atlas/+page.server.ts",
+      "qdrant": {
+        "packet_key": "src/routes/(app)/admin/atlas/+page.server.ts:8ac8a88cbd487045",
+        "source_ref": "sveltekit-frontend/src/routes/(app)/admin/atlas/+page.server.ts",
+        "feature_id": "routes",
+        "feature_label": "Routes",
+        "metadata_keys": []
+      },
+      "postgres": {
+        "packet_key": "src/routes/(app)/admin/atlas/+page.server.ts:8ac8a88cbd487045",
+        "source_ref": "sveltekit-frontend/src/routes/(app)/admin/atlas/+page.server.ts",
+        "feature_id": "routes",
+        "feature_label": "Routes"
+      },
+      "normalized_source_ref": "sveltekit-frontend/src/routes/(app)/admin/atlas/+page.server.ts",
+      "mismatch_fields": [],
+      "agreement": true
+    },
+    {
+      "qdrant_point_id": 639944,
+      "source_ref": "sveltekit-frontend/src/routes/admin/parents-atlas/+page.svelte",
+      "qdrant": {
+        "packet_key": "src/routes/admin/parents-atlas/+page.svelte:e6c919084ef1be4a",
+        "source_ref": "sveltekit-frontend/src/routes/admin/parents-atlas/+page.svelte",
+        "feature_id": "routes",
+        "feature_label": "Routes",
+        "metadata_keys": []
+      },
+      "postgres": {
+        "packet_key": "src/routes/admin/parents-atlas/+page.svelte:e6c919084ef1be4a",
+        "source_ref": "sveltekit-frontend/src/routes/admin/parents-atlas/+page.svelte",
+        "feature_id": "routes",
+        "feature_label": "Routes"
+      },
+      "normalized_source_ref": "sveltekit-frontend/src/routes/admin/parents-atlas/+page.svelte",
+      "mismatch_fields": [],
+      "agreement": true
+    },
+    {
+      "qdrant_point_id": 727645,
+      "source_ref": "sveltekit-frontend/src/lib/server/ai/mcp-tool-dispatch.ts",
+      "qdrant": {
+        "packet_key": "src/lib/server/ai/mcp-tool-dispatch.ts:d962195ef653d759",
+        "source_ref": "sveltekit-frontend/src/lib/server/ai/mcp-tool-dispatch.ts",
+        "feature_id": "ai",
+        "feature_label": "Ai",
+        "metadata_keys": [
+          "fanIn",
+          "todos",
+          "isTest",
+          "reExports",
+          "ssrUnsafe",
+          "sv4Legacy",
+          "components",
+          "dynImports",
+          "routeDepth",
+          "routeParams"
+        ]
+      },
+      "postgres": {
+        "packet_key": "src/lib/server/ai/mcp-tool-dispatch.ts:d962195ef653d759",
+        "source_ref": "sveltekit-frontend/src/lib/server/ai/mcp-tool-dispatch.ts",
+        "feature_id": "ai",
+        "feature_label": "Ai"
+      },
+      "normalized_source_ref": "sveltekit-frontend/src/lib/server/ai/mcp-tool-dispatch.ts",
+      "mismatch_fields": [],
+      "agreement": true
+    },
+    {
+      "qdrant_point_id": 761314,
+      "source_ref": "sveltekit-frontend/src/lib/components/ai/CachePerformanceDashboard.svelte",
+      "qdrant": {
+        "packet_key": "src/lib/components/ai/CachePerformanceDashboard.svelte:2865def3ade42484",
+        "source_ref": "sveltekit-frontend/src/lib/components/ai/CachePerformanceDashboard.svelte",
+        "feature_id": "atlas-context",
+        "feature_label": "Atlas Context",
+        "metadata_keys": [
+          "fanIn",
+          "todos",
+          "isTest",
+          "reExports",
+          "ssrUnsafe",
+          "sv4Legacy",
+          "components",
+          "dynImports",
+          "routeDepth",
+          "routeParams"
+        ]
+      },
+      "postgres": {
+        "packet_key": "src/lib/components/ai/CachePerformanceDashboard.svelte:2865def3ade42484",
+        "source_ref": "sveltekit-frontend/src/lib/components/ai/CachePerformanceDashboard.svelte",
+        "feature_id": "atlas-context",
+        "feature_label": "Atlas Context"
+      },
+      "normalized_source_ref": "sveltekit-frontend/src/lib/components/ai/cacheperformancedashboard.svelte",
+      "mismatch_fields": [],
+      "agreement": true
+    },
+    {
+      "qdrant_point_id": 909958,
+      "source_ref": "sveltekit-frontend/src/lib/server/retrieval/centroid-cache.ts",
+      "qdrant": {
+        "packet_key": "src/lib/server/retrieval/centroid-cache.ts:cfcce45038fad33b",
+        "source_ref": "sveltekit-frontend/src/lib/server/retrieval/centroid-cache.ts",
+        "feature_id": "utility",
+        "feature_label": "Utility",
+        "metadata_keys": [
+          "fanIn",
+          "todos",
+          "isTest",
+          "reExports",
+          "ssrUnsafe",
+          "sv4Legacy",
+          "components",
+          "dynImports",
+          "routeDepth",
+          "routeParams"
+        ]
+      },
+      "postgres": {
+        "packet_key": "src/lib/server/retrieval/centroid-cache.ts:cfcce45038fad33b",
+        "source_ref": "sveltekit-frontend/src/lib/server/retrieval/centroid-cache.ts",
+        "feature_id": "utility",
+        "feature_label": "Utility"
+      },
+      "normalized_source_ref": "sveltekit-frontend/src/lib/server/retrieval/centroid-cache.ts",
+      "mismatch_fields": [],
+      "agreement": true
+    },
+    {
+      "qdrant_point_id": 1080785,
+      "source_ref": "sveltekit-frontend/src/lib/components/admin/AdminMonitoringDashboard.svelte",
+      "qdrant": {
+        "packet_key": "src/lib/components/admin/AdminMonitoringDashboard.svelte:50e282945262eca8",
+        "source_ref": "sveltekit-frontend/src/lib/components/admin/AdminMonitoringDashboard.svelte",
+        "feature_id": "admin",
+        "feature_label": "Admin",
+        "metadata_keys": [
+          "fanIn",
+          "todos",
+          "isTest",
+          "reExports",
+          "ssrUnsafe",
+          "sv4Legacy",
+          "components",
+          "dynImports",
+          "routeDepth",
+          "routeParams"
+        ]
+      },
+      "postgres": {
+        "packet_key": "src/lib/components/admin/AdminMonitoringDashboard.svelte:50e282945262eca8",
+        "source_ref": "sveltekit-frontend/src/lib/components/admin/AdminMonitoringDashboard.svelte",
+        "feature_id": "admin",
+        "feature_label": "Admin"
+      },
+      "normalized_source_ref": "sveltekit-frontend/src/lib/components/admin/adminmonitoringdashboard.svelte",
+      "mismatch_fields": [],
+      "agreement": true
+    },
+    {
+      "qdrant_point_id": 1103029,
+      "source_ref": "sveltekit-frontend/src/lib/components/graph/GraphifyViewer.svelte",
+      "qdrant": {
+        "packet_key": "src/lib/components/graph/GraphifyViewer.svelte:81f6bc913c8bb05b",
+        "source_ref": "sveltekit-frontend/src/lib/components/graph/GraphifyViewer.svelte",
+        "feature_id": "atlas-context",
+        "feature_label": "Atlas Context",
+        "metadata_keys": [
+          "fanIn",
+          "todos",
+          "isTest",
+          "reExports",
+          "ssrUnsafe",
+          "sv4Legacy",
+          "components",
+          "dynImports",
+          "routeDepth",
+          "routeParams"
+        ]
+      },
+      "postgres": {
+        "packet_key": "src/lib/components/graph/GraphifyViewer.svelte:81f6bc913c8bb05b",
+        "source_ref": "sveltekit-frontend/src/lib/components/graph/GraphifyViewer.svelte",
+        "feature_id": "atlas-context",
+        "feature_label": "Atlas Context"
+      },
+      "normalized_source_ref": "sveltekit-frontend/src/lib/components/graph/graphifyviewer.svelte",
+      "mismatch_fields": [],
+      "agreement": true
+    },
+    {
+      "qdrant_point_id": 1116368,
+      "source_ref": "src/lib/server/retrieval/cluster-aware-reranker.ts",
+      "qdrant": {
+        "packet_key": "src/lib/server/retrieval/cluster-aware-reranker.ts:95647aa7",
+        "source_ref": "src/lib/server/retrieval/cluster-aware-reranker.ts",
+        "feature_id": "retrieval",
+        "feature_label": "lib",
+        "metadata_keys": [
+          "fanIn",
+          "todos",
+          "isTest",
+          "reExports",
+          "ssrUnsafe",
+          "sv4Legacy",
+          "components",
+          "dynImports",
+          "routeDepth",
+          "routeParams"
+        ]
+      },
+      "postgres": {
+        "packet_key": "src/lib/server/retrieval/cluster-aware-reranker.ts:95647aa7",
+        "source_ref": "src/lib/server/retrieval/cluster-aware-reranker.ts",
+        "feature_id": "retrieval",
+        "feature_label": "lib"
+      },
+      "normalized_source_ref": "src/lib/server/retrieval/cluster-aware-reranker.ts",
+      "mismatch_fields": [],
+      "agreement": true
+    },
+    {
+      "qdrant_point_id": 1146202,
+      "source_ref": "src/lib/server/admin/retrieval-analytics-service.ts",
+      "qdrant": {
+        "packet_key": "src/lib/server/admin/retrieval-analytics-service.ts:8f0ca91b",
+        "source_ref": "src/lib/server/admin/retrieval-analytics-service.ts",
+        "feature_id": "admin",
+        "feature_label": "lib",
+        "metadata_keys": [
+          "fanIn",
+          "todos",
+          "isTest",
+          "reExports",
+          "ssrUnsafe",
+          "sv4Legacy",
+          "components",
+          "dynImports",
+          "routeDepth",
+          "routeParams"
+        ]
+      },
+      "postgres": {
+        "packet_key": "src/lib/server/admin/retrieval-analytics-service.ts:8f0ca91b",
+        "source_ref": "src/lib/server/admin/retrieval-analytics-service.ts",
+        "feature_id": "admin",
+        "feature_label": "lib"
+      },
+      "normalized_source_ref": "src/lib/server/admin/retrieval-analytics-service.ts",
+      "mismatch_fields": [],
+      "agreement": true
+    },
+    {
+      "qdrant_point_id": 1249835,
+      "source_ref": "sveltekit-frontend/src/lib/webgpu/gaussian-splat-renderer.ts",
+      "qdrant": {
+        "packet_key": "src/lib/webgpu/gaussian-splat-renderer.ts:43c70c0a3ba7ff2c",
+        "source_ref": "sveltekit-frontend/src/lib/webgpu/gaussian-splat-renderer.ts",
+        "feature_id": "webgpu",
+        "feature_label": "Webgpu",
+        "metadata_keys": []
+      },
+      "postgres": {
+        "packet_key": "src/lib/webgpu/gaussian-splat-renderer.ts:43c70c0a3ba7ff2c",
+        "source_ref": "sveltekit-frontend/src/lib/webgpu/gaussian-splat-renderer.ts",
+        "feature_id": "webgpu",
+        "feature_label": "Webgpu"
+      },
+      "normalized_source_ref": "sveltekit-frontend/src/lib/webgpu/gaussian-splat-renderer.ts",
+      "mismatch_fields": [],
+      "agreement": true
+    },
+    {
+      "qdrant_point_id": 1354889,
+      "source_ref": "sveltekit-frontend/src/lib/components/legal/EvidenceReportSummary.svelte",
+      "qdrant": {
+        "packet_key": "src/lib/components/legal/EvidenceReportSummary.svelte:cd9b26086bb1ba11",
+        "source_ref": "sveltekit-frontend/src/lib/components/legal/EvidenceReportSummary.svelte",
+        "feature_id": "legal",
+        "feature_label": "Legal",
+        "metadata_keys": [
+          "fanIn",
+          "todos",
+          "isTest",
+          "reExports",
+          "ssrUnsafe",
+          "sv4Legacy",
+          "components",
+          "dynImports",
+          "routeDepth",
+          "routeParams"
+        ]
+      },
+      "postgres": {
+        "packet_key": "src/lib/components/legal/EvidenceReportSummary.svelte:cd9b26086bb1ba11",
+        "source_ref": "sveltekit-frontend/src/lib/components/legal/EvidenceReportSummary.svelte",
+        "feature_id": "legal",
+        "feature_label": "Legal"
+      },
+      "normalized_source_ref": "sveltekit-frontend/src/lib/components/legal/evidencereportsummary.svelte",
+      "mismatch_fields": [],
+      "agreement": true
+    },
+    {
+      "qdrant_point_id": 1401737,
+      "source_ref": "sveltekit-frontend/src/lib/db/schema/evidence.ts",
+      "qdrant": {
+        "packet_key": "src/lib/db/schema/evidence.ts:bf52bff981024088",
+        "source_ref": "sveltekit-frontend/src/lib/db/schema/evidence.ts",
+        "feature_id": "schema",
+        "feature_label": "Schema",
+        "metadata_keys": [
+          "fanIn",
+          "todos",
+          "isTest",
+          "reExports",
+          "ssrUnsafe",
+          "sv4Legacy",
+          "components",
+          "dynImports",
+          "routeDepth",
+          "routeParams"
+        ]
+      },
+      "postgres": {
+        "packet_key": "src/lib/db/schema/evidence.ts:bf52bff981024088",
+        "source_ref": "sveltekit-frontend/src/lib/db/schema/evidence.ts",
+        "feature_id": "schema",
+        "feature_label": "Schema"
+      },
+      "normalized_source_ref": "sveltekit-frontend/src/lib/db/schema/evidence.ts",
+      "mismatch_fields": [],
+      "agreement": true
+    },
+    {
+      "qdrant_point_id": 1536417,
+      "source_ref": "sveltekit-frontend/src/mcp/tools/legal-skills.tool.ts",
+      "qdrant": {
+        "packet_key": "src/mcp/tools/legal-skills.tool.ts:898b0571049c27e5",
+        "source_ref": "sveltekit-frontend/src/mcp/tools/legal-skills.tool.ts",
+        "feature_id": "tools",
+        "feature_label": "Tools",
+        "metadata_keys": []
+      },
+      "postgres": {
+        "packet_key": "src/mcp/tools/legal-skills.tool.ts:898b0571049c27e5",
+        "source_ref": "sveltekit-frontend/src/mcp/tools/legal-skills.tool.ts",
+        "feature_id": "tools",
+        "feature_label": "Tools"
+      },
+      "normalized_source_ref": "sveltekit-frontend/src/mcp/tools/legal-skills.tool.ts",
+      "mismatch_fields": [],
+      "agreement": true
+    },
+    {
+      "qdrant_point_id": 1604171,
+      "source_ref": "sveltekit-frontend/src/lib/components/admin/ContextualAssistantModal.svelte",
+      "qdrant": {
+        "packet_key": "src/lib/components/admin/ContextualAssistantModal.svelte:0947370c5e85da9a",
+        "source_ref": "sveltekit-frontend/src/lib/components/admin/ContextualAssistantModal.svelte",
+        "feature_id": "atlas-context",
+        "feature_label": "Atlas Context",
+        "metadata_keys": [
+          "fanIn",
+          "todos",
+          "isTest",
+          "reExports",
+          "ssrUnsafe",
+          "sv4Legacy",
+          "components",
+          "dynImports",
+          "routeDepth",
+          "routeParams"
+        ]
+      },
+      "postgres": {
+        "packet_key": "src/lib/components/admin/ContextualAssistantModal.svelte:0947370c5e85da9a",
+        "source_ref": "sveltekit-frontend/src/lib/components/admin/ContextualAssistantModal.svelte",
+        "feature_id": "atlas-context",
+        "feature_label": "Atlas Context"
+      },
+      "normalized_source_ref": "sveltekit-frontend/src/lib/components/admin/contextualassistantmodal.svelte",
+      "mismatch_fields": [],
+      "agreement": true
+    },
+    {
+      "qdrant_point_id": 1612494,
+      "source_ref": "sveltekit-frontend/src/lib/components/legal-ai/CaseDocumentWriter.svelte",
+      "qdrant": {
+        "packet_key": "src/lib/components/legal-ai/CaseDocumentWriter.svelte:61aa58a3a843005c",
+        "source_ref": "sveltekit-frontend/src/lib/components/legal-ai/CaseDocumentWriter.svelte",
+        "feature_id": "legal-ai",
+        "feature_label": "Legal Ai",
+        "metadata_keys": [
+          "fanIn",
+          "todos",
+          "isTest",
+          "reExports",
+          "ssrUnsafe",
+          "sv4Legacy",
+          "components",
+          "dynImports",
+          "routeDepth",
+          "routeParams"
+        ]
+      },
+      "postgres": {
+        "packet_key": "src/lib/components/legal-ai/CaseDocumentWriter.svelte:61aa58a3a843005c",
+        "source_ref": "sveltekit-frontend/src/lib/components/legal-ai/CaseDocumentWriter.svelte",
+        "feature_id": "legal-ai",
+        "feature_label": "Legal Ai"
+      },
+      "normalized_source_ref": "sveltekit-frontend/src/lib/components/legal-ai/casedocumentwriter.svelte",
+      "mismatch_fields": [],
+      "agreement": true
+    },
+    {
+      "qdrant_point_id": 1631859,
+      "source_ref": "sveltekit-frontend/src/lib/server/indexer/directory-summarizer.ts",
+      "qdrant": {
+        "packet_key": "src/lib/server/indexer/directory-summarizer.ts:2de96f9c31988cc2",
+        "source_ref": "sveltekit-frontend/src/lib/server/indexer/directory-summarizer.ts",
+        "feature_id": "indexer",
+        "feature_label": "Indexer",
+        "metadata_keys": [
+          "fanIn",
+          "todos",
+          "isTest",
+          "reExports",
+          "ssrUnsafe",
+          "sv4Legacy",
+          "components",
+          "dynImports",
+          "routeDepth",
+          "routeParams"
+        ]
+      },
+      "postgres": {
+        "packet_key": "src/lib/server/indexer/directory-summarizer.ts:2de96f9c31988cc2",
+        "source_ref": "sveltekit-frontend/src/lib/server/indexer/directory-summarizer.ts",
+        "feature_id": "indexer",
+        "feature_label": "Indexer"
+      },
+      "normalized_source_ref": "sveltekit-frontend/src/lib/server/indexer/directory-summarizer.ts",
+      "mismatch_fields": [],
+      "agreement": true
+    },
+    {
+      "qdrant_point_id": 1672448,
+      "source_ref": "sveltekit-frontend/src/lib/components/analysis/KeyboardShortcutsHelp.svelte",
+      "qdrant": {
+        "packet_key": "src/lib/components/analysis/KeyboardShortcutsHelp.svelte:a1d0e5ef8170d74f",
+        "source_ref": "sveltekit-frontend/src/lib/components/analysis/KeyboardShortcutsHelp.svelte",
+        "feature_id": "atlas-context",
+        "feature_label": "Atlas Context",
+        "metadata_keys": [
+          "fanIn",
+          "todos",
+          "isTest",
+          "reExports",
+          "ssrUnsafe",
+          "sv4Legacy",
+          "components",
+          "dynImports",
+          "routeDepth",
+          "routeParams"
+        ]
+      },
+      "postgres": {
+        "packet_key": "src/lib/components/analysis/KeyboardShortcutsHelp.svelte:a1d0e5ef8170d74f",
+        "source_ref": "sveltekit-frontend/src/lib/components/analysis/KeyboardShortcutsHelp.svelte",
+        "feature_id": "atlas-context",
+        "feature_label": "Atlas Context"
+      },
+      "normalized_source_ref": "sveltekit-frontend/src/lib/components/analysis/keyboardshortcutshelp.svelte",
+      "mismatch_fields": [],
+      "agreement": true
+    },
+    {
+      "qdrant_point_id": 1864541,
+      "source_ref": "sveltekit-frontend/src/lib/server/services/qdrant-client.ts",
+      "qdrant": {
+        "packet_key": "src/lib/server/services/qdrant-client.ts:b7bcd570ecf70b0b",
+        "source_ref": "sveltekit-frontend/src/lib/server/services/qdrant-client.ts",
+        "feature_id": "services",
+        "feature_label": "Services",
+        "metadata_keys": [
+          "fanIn",
+          "todos",
+          "isTest",
+          "reExports",
+          "ssrUnsafe",
+          "sv4Legacy",
+          "components",
+          "dynImports",
+          "routeDepth",
+          "routeParams"
+        ]
+      },
+      "postgres": {
+        "packet_key": "src/lib/server/services/qdrant-client.ts:b7bcd570ecf70b0b",
+        "source_ref": "sveltekit-frontend/src/lib/server/services/qdrant-client.ts",
+        "feature_id": "services",
+        "feature_label": "Services"
+      },
+      "normalized_source_ref": "sveltekit-frontend/src/lib/server/services/qdrant-client.ts",
+      "mismatch_fields": [],
+      "agreement": true
+    },
+    {
+      "qdrant_point_id": 1893957,
+      "source_ref": "sveltekit-frontend/src/routes/api/chat/migrate/+server.ts",
+      "qdrant": {
+        "packet_key": "src/routes/api/chat/migrate/+server.ts:02d2a9f5aff2d2d0",
+        "source_ref": "sveltekit-frontend/src/routes/api/chat/migrate/+server.ts",
+        "feature_id": "migrate",
+        "feature_label": "Migrate",
+        "metadata_keys": []
+      },
+      "postgres": {
+        "packet_key": "src/routes/api/chat/migrate/+server.ts:02d2a9f5aff2d2d0",
+        "source_ref": "sveltekit-frontend/src/routes/api/chat/migrate/+server.ts",
+        "feature_id": "migrate",
+        "feature_label": "Migrate"
+      },
+      "normalized_source_ref": "sveltekit-frontend/src/routes/api/chat/migrate/+server.ts",
+      "mismatch_fields": [],
+      "agreement": true
+    },
+    {
+      "qdrant_point_id": 1924507,
+      "source_ref": "sveltekit-frontend/src/routes/api/summarize/analyze/+server.ts",
+      "qdrant": {
+        "packet_key": "src/routes/api/summarize/analyze/+server.ts:1baf5b5e0112dd9d",
+        "source_ref": "sveltekit-frontend/src/routes/api/summarize/analyze/+server.ts",
+        "feature_id": "analyze",
+        "feature_label": "Analyze",
+        "metadata_keys": []
+      },
+      "postgres": {
+        "packet_key": "src/routes/api/summarize/analyze/+server.ts:1baf5b5e0112dd9d",
+        "source_ref": "sveltekit-frontend/src/routes/api/summarize/analyze/+server.ts",
+        "feature_id": "analyze",
+        "feature_label": "Analyze"
+      },
+      "normalized_source_ref": "sveltekit-frontend/src/routes/api/summarize/analyze/+server.ts",
+      "mismatch_fields": [],
+      "agreement": true
+    },
+    {
+      "qdrant_point_id": 1937330,
+      "source_ref": "sveltekit-frontend/src/routes/api/synthesis/generate/+server.ts",
+      "qdrant": {
+        "packet_key": "src/routes/api/synthesis/generate/+server.ts:ba186352af72d6fd",
+        "source_ref": "sveltekit-frontend/src/routes/api/synthesis/generate/+server.ts",
+        "feature_id": "routes",
+        "feature_label": "Routes",
+        "metadata_keys": []
+      },
+      "postgres": {
+        "packet_key": "src/routes/api/synthesis/generate/+server.ts:35137e1faf8e161f",
+        "source_ref": "sveltekit-frontend/src/routes/api/synthesis/generate/+server.ts",
+        "feature_id": "routes",
+        "feature_label": "Routes"
+      },
+      "normalized_source_ref": "sveltekit-frontend/src/routes/api/synthesis/generate/+server.ts",
+      "mismatch_fields": [
+        "packet_key"
+      ],
+      "agreement": false
+    },
+    {
+      "qdrant_point_id": 2121189,
+      "source_ref": "sveltekit-frontend/src/lib/components/ui/CommandPalette.svelte",
+      "qdrant": {
+        "packet_key": "src/lib/components/ui/CommandPalette.svelte:7cf7b9740ce75754",
+        "source_ref": "sveltekit-frontend/src/lib/components/ui/CommandPalette.svelte",
+        "feature_id": "ui",
+        "feature_label": "Ui",
+        "metadata_keys": [
+          "fanIn",
+          "todos",
+          "isTest",
+          "reExports",
+          "ssrUnsafe",
+          "sv4Legacy",
+          "components",
+          "dynImports",
+          "routeDepth",
+          "routeParams"
+        ]
+      },
+      "postgres": {
+        "packet_key": "src/lib/components/ui/CommandPalette.svelte:7cf7b9740ce75754",
+        "source_ref": "sveltekit-frontend/src/lib/components/ui/CommandPalette.svelte",
+        "feature_id": "ui",
+        "feature_label": "Ui"
+      },
+      "normalized_source_ref": "sveltekit-frontend/src/lib/components/ui/commandpalette.svelte",
+      "mismatch_fields": [],
+      "agreement": true
+    },
+    {
+      "qdrant_point_id": 2211723,
+      "source_ref": "src/lib/components/graph/glyphatlasviewer.svelte",
+      "qdrant": {
+        "packet_key": "src/lib/components/graph/glyphatlasviewer.svelte:c590fca2",
+        "source_ref": "src/lib/components/graph/glyphatlasviewer.svelte",
+        "feature_id": "graph",
+        "feature_label": "lib",
+        "metadata_keys": [
+          "fanIn",
+          "todos",
+          "isTest",
+          "reExports",
+          "ssrUnsafe",
+          "sv4Legacy",
+          "components",
+          "dynImports",
+          "routeDepth",
+          "routeParams"
+        ]
+      },
+      "postgres": {
+        "packet_key": "src/lib/components/graph/glyphatlasviewer.svelte:c590fca2",
+        "source_ref": "src/lib/components/graph/glyphatlasviewer.svelte",
+        "feature_id": "graph",
+        "feature_label": "lib"
+      },
+      "normalized_source_ref": "src/lib/components/graph/glyphatlasviewer.svelte",
+      "mismatch_fields": [],
+      "agreement": true
+    },
+    {
+      "qdrant_point_id": 2216567,
+      "source_ref": "sveltekit-frontend/src/routes/api/sse/chat/+server.ts",
+      "qdrant": {
+        "packet_key": "src/routes/api/sse/chat/+server.ts:4697545054664a70",
+        "source_ref": "sveltekit-frontend/src/routes/api/sse/chat/+server.ts",
+        "feature_id": "chat",
+        "feature_label": "Chat",
+        "metadata_keys": []
+      },
+      "postgres": {
+        "packet_key": "src/routes/api/sse/chat/+server.ts:d33bf81bce04d644",
+        "source_ref": "sveltekit-frontend/src/routes/api/sse/chat/+server.ts",
+        "feature_id": "chat",
+        "feature_label": "Chat"
+      },
+      "normalized_source_ref": "sveltekit-frontend/src/routes/api/sse/chat/+server.ts",
+      "mismatch_fields": [
+        "packet_key"
+      ],
+      "agreement": false
+    },
+    {
+      "qdrant_point_id": 2246294,
+      "source_ref": "sveltekit-frontend/src/routes/(app)/admin/atlas/+page.svelte",
+      "qdrant": {
+        "packet_key": "src/routes/(app)/admin/atlas/+page.svelte:020405996efc7763",
+        "source_ref": "sveltekit-frontend/src/routes/(app)/admin/atlas/+page.svelte",
+        "feature_id": "atlas",
+        "feature_label": "Atlas",
+        "metadata_keys": []
+      },
+      "postgres": {
+        "packet_key": "src/routes/(app)/admin/atlas/+page.svelte:020405996efc7763",
+        "source_ref": "sveltekit-frontend/src/routes/(app)/admin/atlas/+page.svelte",
+        "feature_id": "atlas",
+        "feature_label": "Atlas"
+      },
+      "normalized_source_ref": "sveltekit-frontend/src/routes/(app)/admin/atlas/+page.svelte",
+      "mismatch_fields": [],
+      "agreement": true
+    },
+    {
+      "qdrant_point_id": 2253151,
+      "source_ref": "sveltekit-frontend/src/lib/server/ai/legal-reasoning-chain.ts",
+      "qdrant": {
+        "packet_key": "src/lib/server/ai/legal-reasoning-chain.ts:03206cafb9398238",
+        "source_ref": "sveltekit-frontend/src/lib/server/ai/legal-reasoning-chain.ts",
+        "feature_id": "ai",
+        "feature_label": "Ai",
+        "metadata_keys": [
+          "fanIn",
+          "todos",
+          "isTest",
+          "reExports",
+          "ssrUnsafe",
+          "sv4Legacy",
+          "components",
+          "dynImports",
+          "routeDepth",
+          "routeParams"
+        ]
+      },
+      "postgres": {
+        "packet_key": "src/lib/server/ai/legal-reasoning-chain.ts:03206cafb9398238",
+        "source_ref": "sveltekit-frontend/src/lib/server/ai/legal-reasoning-chain.ts",
+        "feature_id": "ai",
+        "feature_label": "Ai"
+      },
+      "normalized_source_ref": "sveltekit-frontend/src/lib/server/ai/legal-reasoning-chain.ts",
+      "mismatch_fields": [],
+      "agreement": true
+    },
+    {
+      "qdrant_point_id": 2306238,
+      "source_ref": "sveltekit-frontend/src/routes/api/admin/atlas/cache/+server.ts",
+      "qdrant": {
+        "packet_key": "src/routes/api/admin/atlas/cache/+server.ts:5c2d38234450acc0",
+        "source_ref": "sveltekit-frontend/src/routes/api/admin/atlas/cache/+server.ts",
+        "feature_id": "scripts",
+        "feature_label": "Scripts",
+        "metadata_keys": []
+      },
+      "postgres": {
+        "packet_key": "src/routes/api/admin/atlas/cache/+server.ts:5c2d38234450acc0",
+        "source_ref": "sveltekit-frontend/src/routes/api/admin/atlas/cache/+server.ts",
+        "feature_id": "scripts",
+        "feature_label": "Scripts"
+      },
+      "normalized_source_ref": "sveltekit-frontend/src/routes/api/admin/atlas/cache/+server.ts",
+      "mismatch_fields": [],
+      "agreement": true
+    },
+    {
+      "qdrant_point_id": 2316000,
+      "source_ref": "mcp-tools/src-mcp-server.ts#research:reddit_search",
+      "qdrant": {
+        "packet_key": "002356e08cd7e23f",
+        "source_ref": "mcp-tools/src-mcp-server.ts#research:reddit_search",
+        "feature_id": "a06042c0be12e4ca",
+        "feature_label": "A06042c0be12e4ca",
+        "metadata_keys": []
+      },
+      "postgres": {
+        "packet_key": "002356e08cd7e23f",
+        "source_ref": "mcp-tools/src-mcp-server.ts#research:reddit_search",
+        "feature_id": "a06042c0be12e4ca",
+        "feature_label": "A06042c0be12e4ca"
+      },
+      "normalized_source_ref": "mcp-tools/src-mcp-server.ts#research:reddit_search",
+      "mismatch_fields": [],
+      "agreement": true
+    },
+    {
+      "qdrant_point_id": 2367821,
+      "source_ref": "sveltekit-frontend/src/lib/server/ff1/storage/redis-cache.ts",
+      "qdrant": {
+        "packet_key": "src/lib/server/ff1/storage/redis-cache.ts:84c01e8b5238be34",
+        "source_ref": "sveltekit-frontend/src/lib/server/ff1/storage/redis-cache.ts",
+        "feature_id": "storage",
+        "feature_label": "Storage",
+        "metadata_keys": [
+          "fanIn",
+          "todos",
+          "isTest",
+          "reExports",
+          "ssrUnsafe",
+          "sv4Legacy",
+          "components",
+          "dynImports",
+          "routeDepth",
+          "routeParams"
+        ]
+      },
+      "postgres": {
+        "packet_key": "src/lib/server/ff1/storage/redis-cache.ts:84c01e8b5238be34",
+        "source_ref": "sveltekit-frontend/src/lib/server/ff1/storage/redis-cache.ts",
+        "feature_id": "storage",
+        "feature_label": "Storage"
+      },
+      "normalized_source_ref": "sveltekit-frontend/src/lib/server/ff1/storage/redis-cache.ts",
+      "mismatch_fields": [],
+      "agreement": true
+    },
+    {
+      "qdrant_point_id": 2437269,
+      "source_ref": "src/lib/server/kb/rerank-weight-loader.ts",
+      "qdrant": {
+        "packet_key": "src/lib/server/kb/rerank-weight-loader.ts:72809bdc",
+        "source_ref": "src/lib/server/kb/rerank-weight-loader.ts",
+        "feature_id": "kb",
+        "feature_label": "lib",
+        "metadata_keys": [
+          "fanIn",
+          "todos",
+          "isTest",
+          "reExports",
+          "ssrUnsafe",
+          "sv4Legacy",
+          "components",
+          "dynImports",
+          "routeDepth",
+          "routeParams"
+        ]
+      },
+      "postgres": {
+        "packet_key": "src/lib/server/kb/rerank-weight-loader.ts:72809bdc",
+        "source_ref": "src/lib/server/kb/rerank-weight-loader.ts",
+        "feature_id": "kb",
+        "feature_label": "lib"
+      },
+      "normalized_source_ref": "src/lib/server/kb/rerank-weight-loader.ts",
+      "mismatch_fields": [],
+      "agreement": true
+    },
+    {
+      "qdrant_point_id": 2761508,
+      "source_ref": "sveltekit-frontend/src/routes/(app)/evidence-library/+page.svelte",
+      "qdrant": {
+        "packet_key": "src/routes/(app)/evidence-library/+page.svelte:d05178e69a1197b5",
+        "source_ref": "sveltekit-frontend/src/routes/(app)/evidence-library/+page.svelte",
+        "feature_id": "scripts",
+        "feature_label": "Scripts",
+        "metadata_keys": []
+      },
+      "postgres": {
+        "packet_key": "src/routes/(app)/evidence-library/+page.svelte:d05178e69a1197b5",
+        "source_ref": "sveltekit-frontend/src/routes/(app)/evidence-library/+page.svelte",
+        "feature_id": "scripts",
+        "feature_label": "Scripts"
+      },
+      "normalized_source_ref": "sveltekit-frontend/src/routes/(app)/evidence-library/+page.svelte",
+      "mismatch_fields": [],
+      "agreement": true
+    },
+    {
+      "qdrant_point_id": 2777429,
+      "source_ref": "sveltekit-frontend/src/lib/server/agents/regen/run.ts",
+      "qdrant": {
+        "packet_key": "src/lib/server/agents/regen/run.ts:ad3d1ef1d7dc67d9",
+        "source_ref": "sveltekit-frontend/src/lib/server/agents/regen/run.ts",
+        "feature_id": "regen",
+        "feature_label": "Regen",
+        "metadata_keys": [
+          "fanIn",
+          "todos",
+          "isTest",
+          "reExports",
+          "ssrUnsafe",
+          "sv4Legacy",
+          "components",
+          "dynImports",
+          "routeDepth",
+          "routeParams"
+        ]
+      },
+      "postgres": {
+        "packet_key": "src/lib/server/agents/regen/run.ts:ad3d1ef1d7dc67d9",
+        "source_ref": "sveltekit-frontend/src/lib/server/agents/regen/run.ts",
+        "feature_id": "regen",
+        "feature_label": "Regen"
+      },
+      "normalized_source_ref": "sveltekit-frontend/src/lib/server/agents/regen/run.ts",
+      "mismatch_fields": [],
+      "agreement": true
+    },
+    {
+      "qdrant_point_id": 2811861,
+      "source_ref": "sveltekit-frontend/src/routes/api/rag/todo-suggestions/+server.ts",
+      "qdrant": {
+        "packet_key": "src/routes/api/rag/todo-suggestions/+server.ts:1217d42889c0ca4b",
+        "source_ref": "sveltekit-frontend/src/routes/api/rag/todo-suggestions/+server.ts",
+        "feature_id": "atlas-context",
+        "feature_label": "Atlas Context",
+        "metadata_keys": []
+      },
+      "postgres": {
+        "packet_key": "src/routes/api/rag/todo-suggestions/+server.ts:1217d42889c0ca4b",
+        "source_ref": "sveltekit-frontend/src/routes/api/rag/todo-suggestions/+server.ts",
+        "feature_id": "atlas-context",
+        "feature_label": "Atlas Context"
+      },
+      "normalized_source_ref": "sveltekit-frontend/src/routes/api/rag/todo-suggestions/+server.ts",
+      "mismatch_fields": [],
+      "agreement": true
+    },
+    {
+      "qdrant_point_id": 2968749,
+      "source_ref": "sveltekit-frontend/src/lib/components/citations/CitationList.svelte",
+      "qdrant": {
+        "packet_key": "src/lib/components/citations/CitationList.svelte:83d95f5952f96093",
+        "source_ref": "sveltekit-frontend/src/lib/components/citations/CitationList.svelte",
+        "feature_id": "atlas-context",
+        "feature_label": "Atlas Context",
+        "metadata_keys": []
+      },
+      "postgres": {
+        "packet_key": "src/lib/components/citations/CitationList.svelte:83d95f5952f96093",
+        "source_ref": "sveltekit-frontend/src/lib/components/citations/CitationList.svelte",
+        "feature_id": "atlas-context",
+        "feature_label": "Atlas Context"
+      },
+      "normalized_source_ref": "sveltekit-frontend/src/lib/components/citations/citationlist.svelte",
+      "mismatch_fields": [],
+      "agreement": true
+    },
+    {
+      "qdrant_point_id": 3020277,
+      "source_ref": "sveltekit-frontend/src/routes/(app)/admin/search-intelligence/+page.svelte",
+      "qdrant": {
+        "packet_key": "src/routes/(app)/admin/search-intelligence/+page.svelte:ef7c867733249e79",
+        "source_ref": "sveltekit-frontend/src/routes/(app)/admin/search-intelligence/+page.svelte",
+        "feature_id": "search-intelligence",
+        "feature_label": "Search Intelligence",
+        "metadata_keys": []
+      },
+      "postgres": {
+        "packet_key": "src/routes/(app)/admin/search-intelligence/+page.svelte:ef7c867733249e79",
+        "source_ref": "sveltekit-frontend/src/routes/(app)/admin/search-intelligence/+page.svelte",
+        "feature_id": "search-intelligence",
+        "feature_label": "Search Intelligence"
+      },
+      "normalized_source_ref": "sveltekit-frontend/src/routes/(app)/admin/search-intelligence/+page.svelte",
+      "mismatch_fields": [],
+      "agreement": true
+    },
+    {
+      "qdrant_point_id": 3102142,
+      "source_ref": "sveltekit-frontend/src/lib/server/ace/rg-cluster-pivot.ts",
+      "qdrant": {
+        "packet_key": "src/lib/server/ace/rg-cluster-pivot.ts:6bd6c51be12791f7",
+        "source_ref": "sveltekit-frontend/src/lib/server/ace/rg-cluster-pivot.ts",
+        "feature_id": "utility",
+        "feature_label": "Utility",
+        "metadata_keys": [
+          "fanIn",
+          "todos",
+          "isTest",
+          "reExports",
+          "ssrUnsafe",
+          "sv4Legacy",
+          "components",
+          "dynImports",
+          "routeDepth",
+          "routeParams"
+        ]
+      },
+      "postgres": {
+        "packet_key": "src/lib/server/ace/rg-cluster-pivot.ts:6bd6c51be12791f7",
+        "source_ref": "sveltekit-frontend/src/lib/server/ace/rg-cluster-pivot.ts",
+        "feature_id": "utility",
+        "feature_label": "Utility"
+      },
+      "normalized_source_ref": "sveltekit-frontend/src/lib/server/ace/rg-cluster-pivot.ts",
+      "mismatch_fields": [],
+      "agreement": true
+    },
+    {
+      "qdrant_point_id": 3185039,
+      "source_ref": "sveltekit-frontend/src/lib/components/evidence/EvidenceBoard.svelte",
+      "qdrant": {
+        "packet_key": "src/lib/components/evidence/EvidenceBoard.svelte:e963eac71a565b6a",
+        "source_ref": "sveltekit-frontend/src/lib/components/evidence/EvidenceBoard.svelte",
+        "feature_id": "evidence",
+        "feature_label": "Evidence",
+        "metadata_keys": [
+          "fanIn",
+          "todos",
+          "isTest",
+          "reExports",
+          "ssrUnsafe",
+          "sv4Legacy",
+          "components",
+          "dynImports",
+          "routeDepth",
+          "routeParams"
+        ]
+      },
+      "postgres": {
+        "packet_key": "src/lib/components/evidence/EvidenceBoard.svelte:e963eac71a565b6a",
+        "source_ref": "sveltekit-frontend/src/lib/components/evidence/EvidenceBoard.svelte",
+        "feature_id": "evidence",
+        "feature_label": "Evidence"
+      },
+      "normalized_source_ref": "sveltekit-frontend/src/lib/components/evidence/evidenceboard.svelte",
+      "mismatch_fields": [],
+      "agreement": true
+    },
+    {
+      "qdrant_point_id": 3215075,
+      "source_ref": "sveltekit-frontend/src/lib/server/audit/gpu-audit-orchestrator.ts",
+      "qdrant": {
+        "packet_key": "src/lib/server/audit/gpu-audit-orchestrator.ts:52c95c5c098fb34d",
+        "source_ref": "sveltekit-frontend/src/lib/server/audit/gpu-audit-orchestrator.ts",
+        "feature_id": "audit",
+        "feature_label": "Audit",
+        "metadata_keys": [
+          "fanIn",
+          "todos",
+          "isTest",
+          "reExports",
+          "ssrUnsafe",
+          "sv4Legacy",
+          "components",
+          "dynImports",
+          "routeDepth",
+          "routeParams"
+        ]
+      },
+      "postgres": {
+        "packet_key": "src/lib/server/audit/gpu-audit-orchestrator.ts:52c95c5c098fb34d",
+        "source_ref": "sveltekit-frontend/src/lib/server/audit/gpu-audit-orchestrator.ts",
+        "feature_id": "audit",
+        "feature_label": "Audit"
+      },
+      "normalized_source_ref": "sveltekit-frontend/src/lib/server/audit/gpu-audit-orchestrator.ts",
+      "mismatch_fields": [],
+      "agreement": true
+    },
+    {
+      "qdrant_point_id": 3305298,
+      "source_ref": "sveltekit-frontend/src/lib/server/cache/entity-extractor-unified.ts",
+      "qdrant": {
+        "packet_key": "src/lib/server/cache/entity-extractor-unified.ts:3fe70e9f5c2b940c",
+        "source_ref": "sveltekit-frontend/src/lib/server/cache/entity-extractor-unified.ts",
+        "feature_id": "utility",
+        "feature_label": "Utility",
+        "metadata_keys": []
+      },
+      "postgres": {
+        "packet_key": "src/lib/server/cache/entity-extractor-unified.ts:3fe70e9f5c2b940c",
+        "source_ref": "sveltekit-frontend/src/lib/server/cache/entity-extractor-unified.ts",
+        "feature_id": "utility",
+        "feature_label": "Utility"
+      },
+      "normalized_source_ref": "sveltekit-frontend/src/lib/server/cache/entity-extractor-unified.ts",
+      "mismatch_fields": [],
+      "agreement": true
+    },
+    {
+      "qdrant_point_id": 3312593,
+      "source_ref": "sveltekit-frontend/src/lib/server/vector/hypergraph-service.ts",
+      "qdrant": {
+        "packet_key": "src/lib/server/vector/hypergraph-service.ts:23a63bc0fe8d2f14",
+        "source_ref": "sveltekit-frontend/src/lib/server/vector/hypergraph-service.ts",
+        "feature_id": "vector",
+        "feature_label": "Vector",
+        "metadata_keys": [
+          "fanIn",
+          "todos",
+          "isTest",
+          "reExports",
+          "ssrUnsafe",
+          "sv4Legacy",
+          "components",
+          "dynImports",
+          "routeDepth",
+          "routeParams"
+        ]
+      },
+      "postgres": {
+        "packet_key": "src/lib/server/vector/hypergraph-service.ts:23a63bc0fe8d2f14",
+        "source_ref": "sveltekit-frontend/src/lib/server/vector/hypergraph-service.ts",
+        "feature_id": "vector",
+        "feature_label": "Vector"
+      },
+      "normalized_source_ref": "sveltekit-frontend/src/lib/server/vector/hypergraph-service.ts",
+      "mismatch_fields": [],
+      "agreement": true
+    },
+    {
+      "qdrant_point_id": 3331244,
+      "source_ref": "sveltekit-frontend/src/routes/api/persons-of-interest/[id]/+server.ts",
+      "qdrant": {
+        "packet_key": "src/routes/api/persons-of-interest/[id]/+server.ts:03d9a891c25d5630",
+        "source_ref": "sveltekit-frontend/src/routes/api/persons-of-interest/[id]/+server.ts",
+        "feature_id": "scripts",
+        "feature_label": "Scripts",
+        "metadata_keys": []
+      },
+      "postgres": {
+        "packet_key": "src/routes/api/persons-of-interest/[id]/+server.ts:03d9a891c25d5630",
+        "source_ref": "sveltekit-frontend/src/routes/api/persons-of-interest/[id]/+server.ts",
+        "feature_id": "scripts",
+        "feature_label": "Scripts"
+      },
+      "normalized_source_ref": "sveltekit-frontend/src/routes/api/persons-of-interest/[id]/+server.ts",
+      "mismatch_fields": [],
+      "agreement": true
+    }
+  ]
+}
