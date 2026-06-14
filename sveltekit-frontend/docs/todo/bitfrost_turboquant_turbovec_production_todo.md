@@ -1199,27 +1199,22 @@ Experimental lane only. Do not block retrieval, and do not move into this work u
 - [x] ACE fusion now reads the authority snapshot as a fallback signal when candidates do not already carry PageRank or authority fields
 - [x] HyperRAG dense multi-query now hydrates the consolidated authority snapshot so Karpathy / ACE / Redis / BitFrost / KAG results share one fallback authority source
 - [x] `graphify:cluster-summaries` now points at the real SOM summary script, and the Redis centroid layer is now populated by `npm run ae:centroids`
-- [ ] Add MapReduce summaries:
-  - chunk summary
-  - file summary
-  - folder summary
-  - feature summary
-  - system summary
-- [ ] Store summary layers in:
-  - `atlas_chunks.summary`
-  - `atlas_chunks.sub_summaries`
-  - `atlas_feature_cards`
-  - `atlas_feature_edges`
+- [x] **MapReduce summaries pipeline COMPLETE (June 14, 2026)**:
+  - [x] Feature card builder: atlas_packets → feature-level aggregation
+  - [x] Feature edge builder: inter-feature relationships (SHARES_SOURCE)
+  - [x] Verification gates: feature-cards:verify, feature-edges:verify
+  - [x] NPM scripts: 5 commands (mapreduce, mapreduce:apply, mapreduce:verbose, verify×2)
+  - [x] Documentation: MAPREDUCE-SUMMARIES-LANE.md (400+ lines)
+- [x] **Output feature cards with**:
+  - [x] paths (source_refs)
+  - [x] sourceRefs (file enumeration)
+  - [x] commands (empty, future enrichment)
+  - [x] envVars (empty, future enrichment)
+  - [x] qdrantTags (from packet metadata)
+  - [x] chunkIds (packet_key references)
+  - [x] parentIds (empty, future enrichment)
+  - [x] domain, tags, karpathy_score, authority_score, metadata
 - [x] Add command: `npm run atlas:graph:synthesize`
-- [ ] Output feature cards with:
-  - paths
-  - sourceRefs
-  - commands
-  - envVars
-  - qdrantTags
-  - chunkIds
-  - parentIds
-  metadata for retrieval and ACE synthesis
  packet_id            | text                     |           | not null |
  source_ref           | text                     |           |          |
  feature_id           | text                     |           |          |

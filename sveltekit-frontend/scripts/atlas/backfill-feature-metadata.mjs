@@ -345,13 +345,24 @@ async function backfillTable(tableName, limit = null, apply = false) {
       const inferredFeatureLabel = currentFeatureLabel || identity.featureLabel;
       const updatedMetadata = currentMetadata ? { ...currentMetadata } : {};
 
+      // Track provenance — separate from workspace/runtime/ranking junk
       if (inferredFeatureId && !currentFeatureId) {
         updatedMetadata.feature_id_inferred = true;
         updatedMetadata.feature_id_source = sourceRef ? 'source_ref_hash' : 'file_path_hash';
       }
       if (inferredFeatureLabel && !currentFeatureLabel) {
         updatedMetadata.feature_label_inferred = true;
-        updatedMetadata.feature_label_source = identity.source || 'derived';
+      }
+
+      // Set packet_universe (identity)
+      updatedMetadata.packet_universe = 'atlas';
+      updatedMetadata.lineage_version = 'packet-identity-v1';
+      updatedMetadata.updated_at = new Date().toISOString();
+      updatedMetadata.updated_by = 'backfill-feature-metadata';
+
+      // File path is workspace evidence, not identity
+      if (filePath) {
+        updatedMetadata.file_path = filePath;
       }
 
       const shouldSetFeatureId = cols.feature_id && inferredFeatureId && inferredFeatureId !== currentFeatureId;

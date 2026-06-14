@@ -4,7 +4,7 @@
  * L1 Redis LRU → L2 Bitfrost semantic → L3 Qdrant multi-vector → Neo4j expansion → XGBoost rerank
  */
 
-import { getRedisClient } from '$lib/server/redis.js';
+import { getRedis } from '$lib/server/redis.js';
 import { ENV } from '$lib/server/env.server.js';
 import {
 	AtlasRedisEnvelope,
@@ -22,26 +22,39 @@ const BITFROST_TTL = 3600; // 1 hour
 
 /**
  * Get current cache versions
+ * Fails open if Redis is unavailable; returns default version 0 for all keys
  */
 export async function getAtlasCacheVersions(): Promise<AtlasCacheVersions> {
-	const redis = await getRedisClient();
-	const versions = await Promise.all([
-		redis.get('atlas:graph_version').then((v) => parseInt(v || '0')),
-		redis.get('atlas:qdrant_version').then((v) => parseInt(v || '0')),
-		redis.get('atlas:rpc_version').then((v) => parseInt(v || '0')),
-		redis.get('atlas:som_version').then((v) => parseInt(v || '0')),
-		redis.get('atlas:kmeans_version').then((v) => parseInt(v || '0')),
-		redis.get('atlas:cache_epoch').then((v) => parseInt(v || '0')),
-	]);
+	try {
+		const redis = getRedis();
+		const versions = await Promise.allSettled([
+			redis.get('atlas:graph_version').then((v) => parseInt(v || '0')),
+			redis.get('atlas:qdrant_version').then((v) => parseInt(v || '0')),
+			redis.get('atlas:rpc_version').then((v) => parseInt(v || '0')),
+			redis.get('atlas:som_version').then((v) => parseInt(v || '0')),
+			redis.get('atlas:kmeans_version').then((v) => parseInt(v || '0')),
+			redis.get('atlas:cache_epoch').then((v) => parseInt(v || '0')),
+		]);
 
-	return {
-		graph_version: versions[0],
-		qdrant_version: versions[1],
-		rpc_version: versions[2],
-		som_version: versions[3],
-		kmeans_version: versions[4],
-		cache_epoch: versions[5],
-	};
+		return {
+			graph_version: versions[0].status === 'fulfilled' ? versions[0].value : 0,
+			qdrant_version: versions[1].status === 'fulfilled' ? versions[1].value : 0,
+			rpc_version: versions[2].status === 'fulfilled' ? versions[2].value : 0,
+			som_version: versions[3].status === 'fulfilled' ? versions[3].value : 0,
+			kmeans_version: versions[4].status === 'fulfilled' ? versions[4].value : 0,
+			cache_epoch: versions[5].status === 'fulfilled' ? versions[5].value : 0,
+		};
+	} catch {
+		// Redis completely unavailable; return default neutral versions
+		return {
+			graph_version: 0,
+			qdrant_version: 0,
+			rpc_version: 0,
+			som_version: 0,
+			kmeans_version: 0,
+			cache_epoch: 0,
+		};
+	}
 }
 
 /**
@@ -49,7 +62,7 @@ export async function getAtlasCacheVersions(): Promise<AtlasCacheVersions> {
  */
 export async function checkRedisLRU(query: string): Promise<AtlasCacheHit | null> {
 	try {
-		const redis = await getRedisClient();
+		const redis = getRedis();
 		const key = atlasRedisKey('query', hashQuery(query));
 		const t0 = Date.now();
 
@@ -77,7 +90,7 @@ export async function checkBitfrostSemantic(
 	embedding: number[]
 ): Promise<AtlasCacheHit | null> {
 	try {
-		const redis = await getRedisClient();
+		const redis = getRedis();
 		const key = atlasBifrostKey('query', hashEmbedding(embedding));
 		const t0 = Date.now();
 
@@ -141,7 +154,20 @@ export async function queryQdrantCascade(
 
 		if (results.length === 0) return null;
 
-		const versions = await getAtlasCacheVersions();
+		let versions: AtlasCacheVersions = {
+			graph_version: 0,
+			qdrant_version: 0,
+			rpc_version: 0,
+			som_version: 0,
+			kmeans_version: 0,
+			cache_epoch: 0,
+		};
+		try {
+			versions = await getAtlasCacheVersions();
+		} catch {
+			// Redis unavailable or version keys missing. Fail open: the Qdrant
+			// hit set is still useful, and cache versioning can be neutral.
+		}
 
 		// Extract packet keys and metadata
 		const packet_keys = results.map((r) => r.payload?.packet_key).filter(Boolean);
@@ -190,7 +216,7 @@ export async function writeRedisLRU(
 	ttl: number = REDIS_LRU_TTL
 ): Promise<boolean> {
 	try {
-		const redis = await getRedisClient();
+		const redis = getRedis();
 		const key = atlasRedisKey('query', hashQuery(query));
 		await redis.setex(key, ttl, JSON.stringify(envelope));
 		return true;
@@ -203,7 +229,7 @@ export async function writeRedisLRU(
  * Invalidate cache at epoch
  */
 export async function invalidateAtlasCacheEpoch(): Promise<void> {
-	const redis = await getRedisClient();
+	const redis = getRedis();
 	const versions = await getAtlasCacheVersions();
 
 	// Increment versions

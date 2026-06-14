@@ -1,0 +1,82 @@
+{
+  "generatedAt": "2026-06-14T04:15:22.687Z",
+  "collection": "codebase_chunks_768",
+  "url": "http://localhost:6333",
+  "mode": "sample",
+  "sampleSize": 500,
+  "fields": {
+    "feature_id": {
+      "present": 477,
+      "missing": 0,
+      "null": 23,
+      "total": 500,
+      "percent": 95.4,
+      "required": true,
+      "threshold": 100,
+      "pass": false
+    },
+    "source_ref": {
+      "present": 480,
+      "missing": 0,
+      "null": 20,
+      "total": 500,
+      "percent": 96,
+      "required": true,
+      "threshold": 100,
+      "pass": false
+    },
+    "packet_key": {
+      "present": 244,
+      "missing": 0,
+      "null": 256,
+      "total": 500,
+      "percent": 48.8,
+      "required": true,
+      "threshold": 100,
+      "pass": false
+    },
+    "feature_label": {
+      "present": 231,
+      "missing": 0,
+      "null": 269,
+      "total": 500,
+      "percent": 46.2,
+      "required": false,
+      "threshold": 80,
+      "pass": false
+    },
+    "file_path": {
+      "present": 479,
+      "missing": 0,
+      "null": 21,
+      "total": 500,
+      "percent": 95.8,
+      "required": false,
+      "threshold": 80,
+      "pass": true
+    },
+    "cluster_id": {
+      "present": 254,
+      "missing": 0,
+      "null": 246,
+      "total": 500,
+      "percent": 50.8,
+      "required": false,
+      "threshold": 80,
+      "pass": false
+    },
+    "domain_class": {
+      "present": 1,
+      "missing": 0,
+      "null": 499,
+      "total": 500,
+      "percent": 0.2,
+      "required": false,
+      "threshold": 80,
+      "pass": false
+    }
+  },
+  "pointsScanned": 500,
+  "totalPoints": 54965,
+  "gate": "FAIL"
+}

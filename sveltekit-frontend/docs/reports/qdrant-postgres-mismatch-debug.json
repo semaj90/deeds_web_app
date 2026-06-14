@@ -1,0 +1,719 @@
+{
+  "generatedAt": "2026-06-14T04:05:01.758Z",
+  "qdrantUrl": "http://127.0.0.1:6333",
+  "sampleSize": 50,
+  "points": [
+    {
+      "qdrant_point_id": 86694,
+      "qdrant": {
+        "source_ref": "src/routes/api/research/concurrent-deep/stream/+server.ts",
+        "packet_key": "src/routes/api/research/concurrent-deep/stream/+server.ts:d391b7e92c36906b",
+        "feature_id": "routes",
+        "feature_label": "routes",
+        "community_id": 2,
+        "domain_class": "rag_retrieval"
+      },
+      "postgres": null,
+      "mismatches": null,
+      "postgresFound": false
+    },
+    {
+      "qdrant_point_id": 138065,
+      "qdrant": {
+        "source_ref": "src/routes/api/recommendations/+server.ts",
+        "packet_key": "src/routes/api/recommendations/+server.ts:d5397aa82be3284c",
+        "feature_id": "routes",
+        "feature_label": "routes",
+        "community_id": 6,
+        "domain_class": "case_management"
+      },
+      "postgres": null,
+      "mismatches": null,
+      "postgresFound": false
+    },
+    {
+      "qdrant_point_id": 174637,
+      "qdrant": {
+        "source_ref": "src/lib/server/ai/contextual-tools.ts",
+        "packet_key": null,
+        "feature_id": "ai",
+        "feature_label": "lib",
+        "community_id": "community:1305",
+        "domain_class": "source"
+      },
+      "postgres": null,
+      "mismatches": null,
+      "postgresFound": false
+    },
+    {
+      "qdrant_point_id": 188608,
+      "qdrant": {
+        "source_ref": "src/lib/server/research/reddit-harvester.ts",
+        "packet_key": null,
+        "feature_id": "research",
+        "feature_label": "lib",
+        "community_id": "community:14020",
+        "domain_class": "source"
+      },
+      "postgres": null,
+      "mismatches": null,
+      "postgresFound": false
+    },
+    {
+      "qdrant_point_id": 194586,
+      "qdrant": {
+        "source_ref": "src/lib/server/gpu/libtorch-bridge.ts",
+        "packet_key": "src/lib/server/gpu/libtorch-bridge.ts:44dd86e0eace5c71",
+        "feature_id": "utility",
+        "feature_label": "lib",
+        "community_id": 3,
+        "domain_class": "gpu_turbovec_libtorch"
+      },
+      "postgres": null,
+      "mismatches": null,
+      "postgresFound": false
+    },
+    {
+      "qdrant_point_id": 227675,
+      "qdrant": {
+        "source_ref": "src/lib/server/couchdb/mango-indexes.ts",
+        "packet_key": null,
+        "feature_id": "couchdb",
+        "feature_label": "lib",
+        "community_id": null,
+        "domain_class": "source"
+      },
+      "postgres": null,
+      "mismatches": null,
+      "postgresFound": false
+    },
+    {
+      "qdrant_point_id": 292522,
+      "qdrant": {
+        "source_ref": "src/lib/components/monitoring/cachemonitoringwidget.svelte",
+        "packet_key": "src/lib/components/monitoring/CacheMonitoringWidget.svelte:f9470fb28e6f344a",
+        "feature_id": "monitoring",
+        "feature_label": "lib",
+        "community_id": 92,
+        "domain_class": "cache"
+      },
+      "postgres": null,
+      "mismatches": null,
+      "postgresFound": false
+    },
+    {
+      "qdrant_point_id": 346920,
+      "qdrant": {
+        "source_ref": "src/lib/server/features/codebase-intel/indexer/directory-summarizer.ts",
+        "packet_key": null,
+        "feature_id": "lib",
+        "feature_label": "lib",
+        "community_id": "community:17885",
+        "domain_class": "utility"
+      },
+      "postgres": null,
+      "mismatches": null,
+      "postgresFound": false
+    },
+    {
+      "qdrant_point_id": 404803,
+      "qdrant": {
+        "source_ref": "src/lib/server/data/legal-seed-data.ts",
+        "packet_key": null,
+        "feature_id": "data",
+        "feature_label": "lib",
+        "community_id": "community:1305",
+        "domain_class": "source"
+      },
+      "postgres": null,
+      "mismatches": null,
+      "postgresFound": false
+    },
+    {
+      "qdrant_point_id": 436451,
+      "qdrant": {
+        "source_ref": "src/lib/components/citations/citationsaveform.svelte",
+        "packet_key": null,
+        "feature_id": "citations",
+        "feature_label": "lib",
+        "community_id": "community:1442",
+        "domain_class": "source"
+      },
+      "postgres": null,
+      "mismatches": null,
+      "postgresFound": false
+    },
+    {
+      "qdrant_point_id": 446442,
+      "qdrant": {
+        "source_ref": "scripts/opencode/get-ace-context.mjs",
+        "packet_key": null,
+        "feature_id": "atlas-context",
+        "feature_label": "scripts",
+        "community_id": null,
+        "domain_class": "utility"
+      },
+      "postgres": null,
+      "mismatches": null,
+      "postgresFound": false
+    },
+    {
+      "qdrant_point_id": 614211,
+      "qdrant": {
+        "source_ref": "src/routes/(app)/admin/atlas/+page.server.ts",
+        "packet_key": "src/routes/(app)/admin/atlas/+page.server.ts:8ac8a88cbd487045",
+        "feature_id": "routes",
+        "feature_label": "routes",
+        "community_id": 4,
+        "domain_class": "admin_observability"
+      },
+      "postgres": null,
+      "mismatches": null,
+      "postgresFound": false
+    },
+    {
+      "qdrant_point_id": 639944,
+      "qdrant": {
+        "source_ref": "src/routes/admin/parents-atlas/+page.svelte",
+        "packet_key": "src/routes/admin/parents-atlas/+page.svelte:e6c919084ef1be4a",
+        "feature_id": "routes",
+        "feature_label": "routes",
+        "community_id": 58,
+        "domain_class": "admin_observability"
+      },
+      "postgres": null,
+      "mismatches": null,
+      "postgresFound": false
+    },
+    {
+      "qdrant_point_id": 671194,
+      "qdrant": {
+        "source_ref": "scripts/memory/graphify/gds/5565949d4470.json",
+        "packet_key": null,
+        "feature_id": "utility",
+        "feature_label": "scripts",
+        "community_id": null,
+        "domain_class": "utility"
+      },
+      "postgres": null,
+      "mismatches": null,
+      "postgresFound": false
+    },
+    {
+      "qdrant_point_id": 727645,
+      "qdrant": {
+        "source_ref": "src/lib/server/ai/mcp-tool-dispatch.ts",
+        "packet_key": "src/lib/server/ai/mcp-tool-dispatch.ts:d962195ef653d759",
+        "feature_id": "ai",
+        "feature_label": "lib",
+        "community_id": 46,
+        "domain_class": "mcp"
+      },
+      "postgres": null,
+      "mismatches": null,
+      "postgresFound": false
+    },
+    {
+      "qdrant_point_id": 761314,
+      "qdrant": {
+        "source_ref": "src/lib/components/ai/cacheperformancedashboard.svelte",
+        "packet_key": "src/lib/components/ai/CachePerformanceDashboard.svelte:2865def3ade42484",
+        "feature_id": "atlas-context",
+        "feature_label": "lib",
+        "community_id": "community:1442",
+        "domain_class": "redis_bitfrost_cache"
+      },
+      "postgres": null,
+      "mismatches": null,
+      "postgresFound": false
+    },
+    {
+      "qdrant_point_id": 834200,
+      "qdrant": {
+        "source_ref": "scripts/atlas/synthesize-context-chunks.mjs",
+        "packet_key": null,
+        "feature_id": "utility",
+        "feature_label": "scripts",
+        "community_id": null,
+        "domain_class": "utility"
+      },
+      "postgres": null,
+      "mismatches": null,
+      "postgresFound": false
+    },
+    {
+      "qdrant_point_id": 909958,
+      "qdrant": {
+        "source_ref": "src/lib/server/retrieval/centroid-cache.ts",
+        "packet_key": "src/lib/server/retrieval/centroid-cache.ts:cfcce45038fad33b",
+        "feature_id": "utility",
+        "feature_label": "lib",
+        "community_id": 3,
+        "domain_class": "cache"
+      },
+      "postgres": null,
+      "mismatches": null,
+      "postgresFound": false
+    },
+    {
+      "qdrant_point_id": 950202,
+      "qdrant": {
+        "source_ref": "scripts/atlas/test-langextract-turbovec.mjs",
+        "packet_key": null,
+        "feature_id": "scripts",
+        "feature_label": "scripts",
+        "community_id": null,
+        "domain_class": "utility"
+      },
+      "postgres": null,
+      "mismatches": null,
+      "postgresFound": false
+    },
+    {
+      "qdrant_point_id": 990761,
+      "qdrant": {
+        "source_ref": null,
+        "packet_key": null,
+        "feature_id": null,
+        "feature_label": null,
+        "community_id": null,
+        "domain_class": null
+      },
+      "postgres": null,
+      "mismatches": null,
+      "postgresFound": false
+    },
+    {
+      "qdrant_point_id": 1019909,
+      "qdrant": {
+        "source_ref": "scripts/case_data/_cache/wire_fraud_04a40c94.json",
+        "packet_key": null,
+        "feature_id": "atlas-context",
+        "feature_label": "scripts",
+        "community_id": null,
+        "domain_class": "utility"
+      },
+      "postgres": null,
+      "mismatches": null,
+      "postgresFound": false
+    },
+    {
+      "qdrant_point_id": 1074131,
+      "qdrant": {
+        "source_ref": "scripts/packets/score-superseded-originals.mjs",
+        "packet_key": null,
+        "feature_id": "scripts",
+        "feature_label": "scripts",
+        "community_id": null,
+        "domain_class": "utility"
+      },
+      "postgres": null,
+      "mismatches": null,
+      "postgresFound": false
+    },
+    {
+      "qdrant_point_id": 1080785,
+      "qdrant": {
+        "source_ref": "src/lib/components/admin/adminmonitoringdashboard.svelte",
+        "packet_key": "src/lib/components/admin/AdminMonitoringDashboard.svelte:50e282945262eca8",
+        "feature_id": "admin",
+        "feature_label": "lib",
+        "community_id": 7,
+        "domain_class": "code"
+      },
+      "postgres": null,
+      "mismatches": null,
+      "postgresFound": false
+    },
+    {
+      "qdrant_point_id": 1103029,
+      "qdrant": {
+        "source_ref": "src/lib/components/graph/graphifyviewer.svelte",
+        "packet_key": "src/lib/components/graph/GraphifyViewer.svelte:81f6bc913c8bb05b",
+        "feature_id": "atlas-context",
+        "feature_label": "lib",
+        "community_id": 57,
+        "domain_class": "graph"
+      },
+      "postgres": null,
+      "mismatches": null,
+      "postgresFound": false
+    },
+    {
+      "qdrant_point_id": 1116368,
+      "qdrant": {
+        "source_ref": "src/lib/server/retrieval/cluster-aware-reranker.ts",
+        "packet_key": null,
+        "feature_id": "retrieval",
+        "feature_label": "lib",
+        "community_id": "community:2520",
+        "domain_class": "source"
+      },
+      "postgres": null,
+      "mismatches": null,
+      "postgresFound": false
+    },
+    {
+      "qdrant_point_id": 1136095,
+      "qdrant": {
+        "source_ref": "scripts/tests/vlm-tests/infra_status.json",
+        "packet_key": null,
+        "feature_id": "scripts",
+        "feature_label": "scripts",
+        "community_id": null,
+        "domain_class": "utility"
+      },
+      "postgres": null,
+      "mismatches": null,
+      "postgresFound": false
+    },
+    {
+      "qdrant_point_id": 1146202,
+      "qdrant": {
+        "source_ref": "src/lib/server/admin/retrieval-analytics-service.ts",
+        "packet_key": null,
+        "feature_id": "admin",
+        "feature_label": "lib",
+        "community_id": "community:14401",
+        "domain_class": "source"
+      },
+      "postgres": null,
+      "mismatches": null,
+      "postgresFound": false
+    },
+    {
+      "qdrant_point_id": 1249835,
+      "qdrant": {
+        "source_ref": "src/lib/webgpu/gaussian-splat-renderer.ts",
+        "packet_key": "src/lib/webgpu/gaussian-splat-renderer.ts:43c70c0a3ba7ff2c",
+        "feature_id": "webgpu",
+        "feature_label": "lib",
+        "community_id": 20,
+        "domain_class": "gpu_turbovec_libtorch"
+      },
+      "postgres": null,
+      "mismatches": null,
+      "postgresFound": false
+    },
+    {
+      "qdrant_point_id": 1344589,
+      "qdrant": {
+        "source_ref": "scripts/analyze-current-errors.mjs",
+        "packet_key": null,
+        "feature_id": "routes",
+        "feature_label": "scripts",
+        "community_id": null,
+        "domain_class": "utility"
+      },
+      "postgres": null,
+      "mismatches": null,
+      "postgresFound": false
+    },
+    {
+      "qdrant_point_id": 1354889,
+      "qdrant": {
+        "source_ref": "src/lib/components/legal/evidencereportsummary.svelte",
+        "packet_key": "src/lib/components/legal/EvidenceReportSummary.svelte:cd9b26086bb1ba11",
+        "feature_id": "legal",
+        "feature_label": "lib",
+        "community_id": 21,
+        "domain_class": "source"
+      },
+      "postgres": null,
+      "mismatches": null,
+      "postgresFound": false
+    },
+    {
+      "qdrant_point_id": 1401737,
+      "qdrant": {
+        "source_ref": "src/lib/db/schema/evidence.ts",
+        "packet_key": "src/lib/db/schema/evidence.ts:bf52bff981024088",
+        "feature_id": "schema",
+        "feature_label": "lib",
+        "community_id": 95,
+        "domain_class": "evidence_upload_storage"
+      },
+      "postgres": null,
+      "mismatches": null,
+      "postgresFound": false
+    },
+    {
+      "qdrant_point_id": 1409685,
+      "qdrant": {
+        "source_ref": "src/routes/(app)/acp/+page.svelte",
+        "packet_key": null,
+        "feature_id": "mcp",
+        "feature_label": "routes",
+        "community_id": "community:1928",
+        "domain_class": "utility"
+      },
+      "postgres": null,
+      "mismatches": null,
+      "postgresFound": false
+    },
+    {
+      "qdrant_point_id": 1536417,
+      "qdrant": {
+        "source_ref": "src/mcp/tools/legal-skills.tool.ts",
+        "packet_key": "src/mcp/tools/legal-skills.tool.ts:898b0571049c27e5",
+        "feature_id": "tools",
+        "feature_label": "mcp",
+        "community_id": "community:14380",
+        "domain_class": "legal"
+      },
+      "postgres": null,
+      "mismatches": null,
+      "postgresFound": false
+    },
+    {
+      "qdrant_point_id": 1604171,
+      "qdrant": {
+        "source_ref": "src/lib/components/admin/contextualassistantmodal.svelte",
+        "packet_key": "src/lib/components/admin/ContextualAssistantModal.svelte:0947370c5e85da9a",
+        "feature_id": "atlas-context",
+        "feature_label": "lib",
+        "community_id": 58,
+        "domain_class": "admin_observability"
+      },
+      "postgres": null,
+      "mismatches": null,
+      "postgresFound": false
+    },
+    {
+      "qdrant_point_id": 1612494,
+      "qdrant": {
+        "source_ref": "src/lib/components/legal-ai/casedocumentwriter.svelte",
+        "packet_key": "src/lib/components/legal-ai/CaseDocumentWriter.svelte:61aa58a3a843005c",
+        "feature_id": "legal-ai",
+        "feature_label": "lib",
+        "community_id": 35,
+        "domain_class": "source"
+      },
+      "postgres": null,
+      "mismatches": null,
+      "postgresFound": false
+    },
+    {
+      "qdrant_point_id": 1631859,
+      "qdrant": {
+        "source_ref": "src/lib/server/indexer/directory-summarizer.ts",
+        "packet_key": "src/lib/server/indexer/directory-summarizer.ts:2de96f9c31988cc2",
+        "feature_id": "indexer",
+        "feature_label": "lib",
+        "community_id": 58,
+        "domain_class": "qdrant_vector_index"
+      },
+      "postgres": null,
+      "mismatches": null,
+      "postgresFound": false
+    },
+    {
+      "qdrant_point_id": 1636755,
+      "qdrant": {
+        "source_ref": null,
+        "packet_key": null,
+        "feature_id": null,
+        "feature_label": null,
+        "community_id": null,
+        "domain_class": null
+      },
+      "postgres": null,
+      "mismatches": null,
+      "postgresFound": false
+    },
+    {
+      "qdrant_point_id": 1672448,
+      "qdrant": {
+        "source_ref": "src/lib/components/analysis/keyboardshortcutshelp.svelte",
+        "packet_key": "src/lib/components/analysis/KeyboardShortcutsHelp.svelte:a1d0e5ef8170d74f",
+        "feature_id": "atlas-context",
+        "feature_label": "lib",
+        "community_id": "community:1390",
+        "domain_class": "legal_reports"
+      },
+      "postgres": null,
+      "mismatches": null,
+      "postgresFound": false
+    },
+    {
+      "qdrant_point_id": 1705498,
+      "qdrant": {
+        "source_ref": "src/lib/server/grpc/graph_ml.proto",
+        "packet_key": null,
+        "feature_id": "utility",
+        "feature_label": "lib",
+        "community_id": null,
+        "domain_class": "utility"
+      },
+      "postgres": null,
+      "mismatches": null,
+      "postgresFound": false
+    },
+    {
+      "qdrant_point_id": 1731762,
+      "qdrant": {
+        "source_ref": "scripts/atlas/audit-parent-atlas-consistency.mjs",
+        "packet_key": null,
+        "feature_id": "scripts",
+        "feature_label": "scripts",
+        "community_id": null,
+        "domain_class": "utility"
+      },
+      "postgres": null,
+      "mismatches": null,
+      "postgresFound": false
+    },
+    {
+      "qdrant_point_id": 1820925,
+      "qdrant": {
+        "source_ref": null,
+        "packet_key": null,
+        "feature_id": null,
+        "feature_label": null,
+        "community_id": null,
+        "domain_class": null
+      },
+      "postgres": null,
+      "mismatches": null,
+      "postgresFound": false
+    },
+    {
+      "qdrant_point_id": 1864541,
+      "qdrant": {
+        "source_ref": "src/lib/server/services/qdrant-client.ts",
+        "packet_key": "src/lib/server/services/qdrant-client.ts:b7bcd570ecf70b0b",
+        "feature_id": "services",
+        "feature_label": "lib",
+        "community_id": 32,
+        "domain_class": "search"
+      },
+      "postgres": null,
+      "mismatches": null,
+      "postgresFound": false
+    },
+    {
+      "qdrant_point_id": 1893957,
+      "qdrant": {
+        "source_ref": "src/routes/api/chat/migrate/+server.ts",
+        "packet_key": "src/routes/api/chat/migrate/+server.ts:02d2a9f5aff2d2d0",
+        "feature_id": "migrate",
+        "feature_label": "routes",
+        "community_id": 17,
+        "domain_class": "case_management"
+      },
+      "postgres": null,
+      "mismatches": null,
+      "postgresFound": false
+    },
+    {
+      "qdrant_point_id": 1895079,
+      "qdrant": {
+        "source_ref": "scripts/content_ops/fictional_case_generator.py",
+        "packet_key": null,
+        "feature_id": "scripts",
+        "feature_label": "scripts",
+        "community_id": null,
+        "domain_class": "utility"
+      },
+      "postgres": null,
+      "mismatches": null,
+      "postgresFound": false
+    },
+    {
+      "qdrant_point_id": 1895475,
+      "qdrant": {
+        "source_ref": "scripts/ingest/intent-cache.mjs",
+        "packet_key": null,
+        "feature_id": "routes",
+        "feature_label": "scripts",
+        "community_id": null,
+        "domain_class": "utility"
+      },
+      "postgres": null,
+      "mismatches": null,
+      "postgresFound": false
+    },
+    {
+      "qdrant_point_id": 1924507,
+      "qdrant": {
+        "source_ref": "src/routes/api/summarize/analyze/+server.ts",
+        "packet_key": "src/routes/api/summarize/analyze/+server.ts:1baf5b5e0112dd9d",
+        "feature_id": "analyze",
+        "feature_label": "routes",
+        "community_id": 2,
+        "domain_class": "mcp_agents"
+      },
+      "postgres": null,
+      "mismatches": null,
+      "postgresFound": false
+    },
+    {
+      "qdrant_point_id": 1928696,
+      "qdrant": {
+        "source_ref": "src/lib/server/features/ai/ai/gemma4-agent.ts",
+        "packet_key": null,
+        "feature_id": "routes",
+        "feature_label": "lib",
+        "community_id": "community:17872",
+        "domain_class": "utility"
+      },
+      "postgres": null,
+      "mismatches": null,
+      "postgresFound": false
+    },
+    {
+      "qdrant_point_id": 1937330,
+      "qdrant": {
+        "source_ref": "src/routes/api/synthesis/generate/+server.ts",
+        "packet_key": "src/routes/api/synthesis/generate/+server.ts:ba186352af72d6fd",
+        "feature_id": "routes",
+        "feature_label": "routes",
+        "community_id": 17,
+        "domain_class": "redis_bitfrost_cache"
+      },
+      "postgres": null,
+      "mismatches": null,
+      "postgresFound": false
+    },
+    {
+      "qdrant_point_id": 2021966,
+      "qdrant": {
+        "source_ref": null,
+        "packet_key": null,
+        "feature_id": null,
+        "feature_label": null,
+        "community_id": null,
+        "domain_class": null
+      },
+      "postgres": null,
+      "mismatches": null,
+      "postgresFound": false
+    },
+    {
+      "qdrant_point_id": 2039034,
+      "qdrant": {
+        "source_ref": "scripts/error-resolution/tests/type-fixer.test.ts",
+        "packet_key": null,
+        "feature_id": "scripts",
+        "feature_label": "scripts",
+        "community_id": null,
+        "domain_class": "utility"
+      },
+      "postgres": null,
+      "mismatches": null,
+      "postgresFound": false
+    }
+  ],
+  "histogram": {
+    "total_sampled": 50,
+    "agreement": 0,
+    "source_ref_mismatch": 0,
+    "packet_key_mismatch": 0,
+    "feature_id_mismatch": 0,
+    "feature_label_mismatch": 0,
+    "community_id_mismatch": 0,
+    "domain_class_mismatch": 0,
+    "missing_postgres_row": 50
+  },
+  "agreementRate": 0
+}

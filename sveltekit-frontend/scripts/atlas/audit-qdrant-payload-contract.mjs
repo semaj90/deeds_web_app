@@ -93,9 +93,38 @@ async function auditPayloadContract() {
       for (const point of result.points) {
         const payload = point.payload || {};
 
-        // Check each field
+        // Helper to resolve field with aliases
+        const resolveField = (fieldName) => {
+          // Try canonical name first
+          let value = payload[fieldName];
+          if (value !== null && value !== undefined && value !== '' && !(Array.isArray(value) && value.length === 0)) {
+            return value;
+          }
+
+          // Try common aliases
+          const aliases = {
+            source_ref: ['sourceRef', 'canonical_source_ref', 'canonicalSourceRef'],
+            packet_key: ['packetKey'],
+            file_path: ['filePath', 'path'],
+            feature_id: ['featureId'],
+            feature_label: ['featureLabel']
+          };
+
+          if (aliases[fieldName]) {
+            for (const alias of aliases[fieldName]) {
+              value = payload[alias];
+              if (value !== null && value !== undefined && value !== '' && !(Array.isArray(value) && value.length === 0)) {
+                return value;
+              }
+            }
+          }
+
+          return null;
+        };
+
+        // Check each field with alias resolution
         [...REQUIRED_FIELDS, ...RECOMMENDED_FIELDS].forEach(field => {
-          const value = payload[field];
+          const value = resolveField(field);
 
           if (value === null || value === undefined) {
             fieldCounts[field].null++;

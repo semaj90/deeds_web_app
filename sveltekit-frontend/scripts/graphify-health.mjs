@@ -21,12 +21,15 @@ import { readFileSync, writeFileSync, existsSync, readdirSync } from 'fs';
 import { join, resolve } from 'path';
 import { execSync } from 'child_process';
 import { fileURLToPath } from 'url';
+import { loadRepoEnv, resolveRedisUrl } from '../../scripts/atlas/connection-config.mjs';
 
 const __dirname = fileURLToPath(new URL('.', import.meta.url));
 const ROOT = resolve(__dirname, '..');
+const ENV = loadRepoEnv(process.env);
 
-const REDIS_URL   = process.env.REDIS_URL   ?? 'redis://localhost:6379';
-const QDRANT_URL  = process.env.QDRANT_URL  ?? 'http://localhost:6333';
+const REDIS_URL   = resolveRedisUrl(ENV);
+const REDIS_PASSWORD = String(ENV.REDIS_PASSWORD ?? ENV.VALKEY_PASSWORD ?? '').trim() || undefined;
+const QDRANT_URL  = ENV.QDRANT_URL  ?? 'http://localhost:6333';
 const QUIET       = process.argv.includes('--quiet');
 const JSON_ONLY   = process.argv.includes('--json');
 
@@ -320,7 +323,7 @@ try {
   const redisMod = await import('redis');
   const createClient = redisMod.createClient ?? redisMod.default?.createClient;
   if (typeof createClient === 'function') {
-    redis = createClient({ url: REDIS_URL });
+    redis = createClient({ url: REDIS_URL, password: REDIS_PASSWORD });
     await redis.connect();
   } else if (!QUIET && !JSON_ONLY) {
     console.error('Redis client module unavailable — some metrics will be 0');

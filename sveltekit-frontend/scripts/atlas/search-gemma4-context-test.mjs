@@ -16,6 +16,11 @@ const REPORT_MD = path.join(REPO_ROOT, 'docs', 'reports', 'gemma4-context-test.m
 const env = loadRepoEnv(process.env);
 const APP_URL = String(env.PUBLIC_APP_URL ?? env.SVELTEKIT_URL ?? 'http://127.0.0.1:5173').trim();
 const DATABASE_URL = resolveDatabaseUrl(env);
+const FALLBACK_QUERY_SEEDS = [
+  path.join(REPO_ROOT, 'docs', 'reports', 'qdrant-packet-payload-verify.json'),
+  path.join(REPO_ROOT, 'docs', 'reports', 'packet-metadata-verify.json'),
+  path.join(REPO_ROOT, 'docs', 'reports', 'feature-lineage-report.json'),
+];
 
 const REQUIRED_FIELDS = [
   'feature_id',
@@ -53,12 +58,84 @@ function pickPacketField(packet, key) {
   return null;
 }
 
+async function probeAppUrl(candidateUrl) {
+  try {
+    const response = await fetch(`${candidateUrl}/api/atlas/search`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ query: 'grpc service', top_k: 1 }),
+      signal: AbortSignal.timeout(10_000),
+    });
+    if (!response.ok) return null;
+    const body = await response.json().catch(() => null);
+    const results = Array.isArray(body?.results) ? body.results : Array.isArray(body?.packets) ? body.packets : [];
+    if (results.length > 0) return candidateUrl;
+  } catch {
+    return null;
+  }
+  return null;
+}
+
+async function resolveAppUrl() {
+  const candidates = [
+    APP_URL,
+    'http://127.0.0.1:5178',
+    'http://localhost:5178',
+    'http://127.0.0.1:5173',
+    'http://localhost:5173',
+  ].filter((value, index, array) => value && array.indexOf(value) === index);
+
+  for (const candidate of candidates) {
+    const probed = await probeAppUrl(candidate);
+    if (probed) return probed;
+  }
+
+  return APP_URL;
+}
+
+async function loadFallbackSeed() {
+  for (const reportPath of FALLBACK_QUERY_SEEDS) {
+    try {
+      const raw = await fs.readFile(reportPath, 'utf8');
+      const report = JSON.parse(raw);
+      const sample = Array.isArray(report?.samples) ? report.samples.find((row) => row?.source_ref) : null;
+      if (!sample) continue;
+      const sourceRef = String(sample.source_ref ?? '').trim();
+      const featureId = String(sample.feature_id ?? '').trim();
+      const featureLabel = String(sample.feature_label ?? '').trim();
+      const query = [featureLabel, featureId, sourceRef].filter(Boolean).join(' ').trim();
+      if (!query) continue;
+      return {
+        sourceRef,
+        featureId,
+        featureLabel,
+        query,
+        source: path.relative(REPO_ROOT, reportPath),
+      };
+    } catch {
+      continue;
+    }
+  }
+
+  return {
+    sourceRef: 'proto:CyberElephantService.HealthCheck',
+    featureId: 'grpc_service',
+    featureLabel: 'Grpc Service',
+    query: 'grpc service proto cyberelephantservice healthcheck',
+    source: 'built-in-fallback',
+  };
+}
+
 async function main() {
   const pool = new Pool({ connectionString: DATABASE_URL, max: 1 });
   const startedAt = new Date().toISOString();
+  const smokeNonce = startedAt.replace(/[-:TZ.]/g, '').slice(0, 14);
+  let resolvedAppUrl = APP_URL;
 
   let report;
   try {
+    resolvedAppUrl = await resolveAppUrl();
+    let seedSource = 'atlas_packets';
     const atlasColumns = await pool.query(`
       select column_name
       from information_schema.columns
@@ -88,30 +165,48 @@ async function main() {
       atlasColumnSet.has('som_cluster') ? 'som_cluster' : 'NULL::text as som_cluster',
       atlasColumnSet.has('domain_class') ? 'domain_class' : 'NULL::text as domain_class',
     ];
+    const scoreParts = [
+      atlasColumnSet.has('feature_label') ? `CASE WHEN feature_label IS NOT NULL THEN 1 ELSE 0 END` : '0',
+      atlasColumnSet.has('metadata') ? `CASE WHEN metadata IS NOT NULL THEN 1 ELSE 0 END` : '0',
+      atlasColumnSet.has('qdrant_tag_id') ? `CASE WHEN qdrant_tag_id IS NOT NULL THEN 1 ELSE 0 END` : '0',
+      atlasColumnSet.has('cluster_id') ? `CASE WHEN cluster_id IS NOT NULL THEN 1 ELSE 0 END` : '0',
+      atlasColumnSet.has('community_id') ? `CASE WHEN community_id IS NOT NULL THEN 1 ELSE 0 END` : '0',
+      atlasColumnSet.has('som_cluster') ? `CASE WHEN som_cluster IS NOT NULL THEN 1 ELSE 0 END` : '0',
+      atlasColumnSet.has('domain_class') ? `CASE WHEN domain_class IS NOT NULL THEN 1 ELSE 0 END` : '0',
+    ];
 
-    const { rows } = await pool.query(
-      `
-        select ${selectParts.join(', ')}
-        from atlas_packets
-        where ${atlasColumnSet.has('source_ref') ? 'source_ref is not null' : 'true'}
-          and ${atlasColumnSet.has('feature_id') ? 'feature_id is not null' : 'true'}
-        order by updated_at desc nulls last, ${idColumn} desc
-        limit 1
-      `,
-    );
-
-    if (rows.length === 0) {
-      throw new Error('No atlas_packets candidate rows with source_ref + feature_id found');
+    let seed = null;
+    try {
+      const { rows } = await pool.query(
+        `
+          select ${selectParts.join(', ')}
+          from atlas_packets
+          where ${atlasColumnSet.has('source_ref') ? 'source_ref is not null' : 'true'}
+            and ${atlasColumnSet.has('feature_id') ? 'feature_id is not null' : 'true'}
+          order by (${scoreParts.join(' + ')}) desc, updated_at desc nulls last, ${idColumn} desc
+          limit 1
+        `,
+      );
+      if (rows.length > 0) {
+        seed = firstRow(rows[0]);
+      }
+    } catch (error) {
+      seedSource = `postgres_unavailable:${error instanceof Error ? error.message : String(error)}`;
     }
 
-    const seed = firstRow(rows[0]);
-    const query = [
+    if (!seed) {
+      seed = await loadFallbackSeed();
+      seedSource = seed.source;
+    }
+
+    const queryBase = seed.query ?? [
       seed.feature_label,
       seed.feature_id,
       seed.source_ref,
     ].filter(Boolean).join(' ').slice(0, 240);
+    const query = `${queryBase} visibility ${smokeNonce}`.trim().slice(0, 240);
 
-    const res = await fetch(`${APP_URL}/api/atlas/search`, {
+    const res = await fetch(`${resolvedAppUrl}/api/atlas/search`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -160,8 +255,9 @@ async function main() {
     report = {
       generatedAt: new Date().toISOString(),
       startedAt,
-      appUrl: APP_URL,
+      appUrl: resolvedAppUrl,
       seed,
+      seedSource,
       query,
       status: res.status,
       ok: res.ok,
@@ -186,18 +282,19 @@ async function main() {
     report = {
       generatedAt: new Date().toISOString(),
       startedAt,
-      appUrl: APP_URL,
+      appUrl: resolvedAppUrl,
       error: error instanceof Error ? error.message : String(error),
-      seed: null,
-      query: null,
-      status: null,
+      seed: report?.seed ?? null,
+      seedSource: report?.seedSource ?? null,
+      query: report?.query ?? null,
+      status: report?.status ?? null,
       ok: false,
-      resultCount: 0,
-      fieldCoverage: Object.fromEntries(REQUIRED_FIELDS.map((field) => [field, 0])),
-      allRequiredVisible: false,
-      packetShapes: [],
-      visibleSamples: [],
-      responsePreview: null,
+      resultCount: report?.resultCount ?? 0,
+      fieldCoverage: report?.fieldCoverage ?? Object.fromEntries(REQUIRED_FIELDS.map((field) => [field, 0])),
+      allRequiredVisible: report?.allRequiredVisible ?? false,
+      packetShapes: report?.packetShapes ?? [],
+      visibleSamples: report?.visibleSamples ?? [],
+      responsePreview: report?.responsePreview ?? null,
     };
   } finally {
     await pool.end().catch(() => {});
@@ -212,6 +309,7 @@ async function main() {
       '',
       `Generated: ${report.generatedAt}`,
       `App URL: ${report.appUrl}`,
+      `Seed source: ${report.seedSource ?? 'n/a'}`,
       `Query: ${report.query ?? 'n/a'}`,
       '',
       '## Summary',

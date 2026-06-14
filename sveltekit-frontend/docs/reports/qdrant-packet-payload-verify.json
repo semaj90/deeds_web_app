@@ -1,6 +1,6 @@
 {
-  "generatedAt": "2026-06-14T03:15:36.703Z",
-  "startedAt": "2026-06-14T03:15:35.663Z",
+  "generatedAt": "2026-06-14T03:43:39.033Z",
+  "startedAt": "2026-06-14T03:43:37.815Z",
   "databaseUrl": "postgresql://legal_admin:***@127.0.0.1:5434/legal_ai_db",
   "qdrantUrl": "http://127.0.0.1:6333",
   "collection": "codebase_chunks_768",

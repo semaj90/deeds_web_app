@@ -26,15 +26,16 @@ class RedisConnectionPool {
 
 	/**
 	 * Get a connection from the pool (round-robin)
-	 * Creates new connections up to maxConnections limit
+	 * Creates new connections up to maxConnections limit.
+	 * Checks client status and recreates if closed.
 	 */
 	getConnection(): Redis {
 		if (this.isShuttingDown) {
 			throw new Error('Redis pool is shutting down');
 		}
 
-		// Create new connection if pool not at capacity
-		if (this.pool.length < this.maxConnections) {
+		// Helper to create a new client with proper error handling
+		const createNewClient = (): Redis => {
 			const client = new Redis(REDIS_URL, {
 				password: REDIS_PASSWORD || undefined,
 				maxRetriesPerRequest: 1,
@@ -61,13 +62,26 @@ class RedisConnectionPool {
 				console.error(`[Redis Pool] Connection error (systemic): ${msg} — further pool errors suppressed.`);
 			});
 
-			this.pool.push(client);
 			return client;
+		};
+
+		// Create new connection if pool not at capacity
+		if (this.pool.length < this.maxConnections) {
+			this.pool.push(createNewClient());
+			return this.pool[this.pool.length - 1];
 		}
 
 		// Round-robin existing connections
-		const connection = this.pool[this.currentIndex];
+		let connection = this.pool[this.currentIndex];
 		this.currentIndex = (this.currentIndex + 1) % this.pool.length;
+
+		// Health check: if client is closed, recreate it
+		if (connection.status === 'close' || connection.status === 'end') {
+			connection.quit().catch(() => {}); // Try to clean up quietly
+			connection = createNewClient();
+			this.pool[this.currentIndex - 1] = connection; // Replace in pool
+		}
+
 		return connection;
 	}
 

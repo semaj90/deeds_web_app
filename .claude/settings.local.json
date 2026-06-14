@@ -470,7 +470,12 @@
       "PowerShell($started = $false; for \\($i = 0; $i -lt 30; $i++\\) { Start-Sleep 1; try { $res = Invoke-WebRequest http://localhost:5173 -ErrorAction SilentlyContinue; if \\($res.StatusCode -eq 200\\) { $started = $true; break } } catch {} }; if \\($started\\) { \"✅ Dev server ready at localhost:5173\" } else { \"❌ Dev server did not start within 30s\" })",
       "Read(//c/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/server/hyperrag//**)",
       "Read(//c/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/server/hyperrag/**)",
-      "Bash(PYTHONIOENCODING=utf-8 python scripts/atlas/train-policy-reranker.py --epochs=10 --batch=512)"
+      "Bash(PYTHONIOENCODING=utf-8 python scripts/atlas/train-policy-reranker.py --epochs=10 --batch=512)",
+      "Bash(/tmp/phase-c-gate.sh)",
+      "Bash(DATABASE_URL=\"postgresql://legal_admin:legal_password@127.0.0.1:5432/legal_ai_db\" QDRANT_URL=\"http://127.0.0.1:6333\" node scripts/atlas/phase-c-canonical-gate.mjs)",
+      "Bash(DATABASE_URL=\"postgresql://legal_admin:legal_password@127.0.0.1:5432/legal_ai_db\" node -e \"const pg = require\\('pg'\\); const url = new URL\\(process.env.DATABASE_URL\\); console.log\\('Host:', url.hostname, 'Port:', url.port, 'DB:', url.pathname.slice\\(1\\)\\);\")",
+      "Bash(npm list *)",
+      "Bash(QDRANT_URL=\"http://127.0.0.1:6333\" node scripts/atlas/classify-qdrant-orphans.mjs)"
     ],
     "deny": [],
     "ask": []

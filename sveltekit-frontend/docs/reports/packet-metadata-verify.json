@@ -1,6 +1,6 @@
 {
-  "generatedAt": "2026-06-14T03:12:44.045Z",
-  "startedAt": "2026-06-14T03:12:43.875Z",
+  "generatedAt": "2026-06-14T03:42:13.725Z",
+  "startedAt": "2026-06-14T03:42:13.477Z",
   "databaseUrl": "postgresql://legal_admin:***@127.0.0.1:5434/legal_ai_db",
   "tables": [
     {

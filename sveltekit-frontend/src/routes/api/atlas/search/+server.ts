@@ -44,6 +44,7 @@
 import { json }    from '@sveltejs/kit';
 import { z }       from 'zod';
 import { createHash } from 'node:crypto';
+import pg from 'pg';
 import { ENV }     from '$lib/server/env.server.js';
 import { turbovecGrpcSearch } from '$lib/server/grpc/turbovec-cuda-client.js';
 import { batchCosineSimilarity, isCudaAvailable } from '$lib/server/gpu/libtorch-bridge.js';
@@ -56,6 +57,8 @@ import {
 	type AtlasCacheHit,
 } from '$lib/server/cache/atlas-cache-cascade.js';
 import type { RequestHandler } from './$types';
+
+const { Pool } = pg;
 
 // ── Request schema ─────────────────────────────────────────────────────────────
 const SearchSchema = z.object({
@@ -119,6 +122,8 @@ interface QdrantHit {
 // ── Config ─────────────────────────────────────────────────────────────────────
 const QDRANT_URL  = ENV.QDRANT_URL || 'http://localhost:6333';
 const COLLECTION  = 'codebase_chunks_768';
+const POSTGRES_URL = ENV.DATABASE_URL;
+const POSTGRES_POOL = new Pool({ connectionString: POSTGRES_URL, max: 1, allowExitOnIdle: true });
 
 const NEO4J_URI   = (process.env.NEO4J_URI  ?? process.env.NEO4J_URL  ?? 'bolt://localhost:7687');
 const NEO4J_USER  = (process.env.NEO4J_USER ?? 'neo4j');
@@ -349,6 +354,105 @@ async function gpuBatchCosineRerank(
     return m;
   } catch {
     return null;
+  }
+}
+
+async function hydrateHitsFromPostgres(hits: QdrantHit[]): Promise<void> {
+  const packetKeys = Array.from(new Set(
+    hits
+      .map((hit) => String(hit.payload?.packet_key ?? '').trim())
+      .filter(Boolean),
+  ));
+  const sourceRefs = Array.from(new Set(
+    hits
+      .map((hit) => String(hit.payload?.source_ref ?? '').trim())
+      .filter(Boolean),
+  ));
+
+  if (packetKeys.length === 0 && sourceRefs.length === 0) return;
+
+  try {
+    const columnsResult = await POSTGRES_POOL.query(`
+      select column_name
+      from information_schema.columns
+      where table_schema = 'public'
+        and table_name = 'atlas_packets'
+    `);
+    const columns = new Set(columnsResult.rows.map((row) => row.column_name));
+    const selectParts = [
+      columns.has('packet_key') ? 'packet_key' : 'NULL::text as packet_key',
+      columns.has('source_ref') ? 'source_ref' : 'NULL::text as source_ref',
+      columns.has('feature_id') ? 'feature_id' : 'NULL::text as feature_id',
+      columns.has('feature_label') ? 'feature_label' : 'NULL::text as feature_label',
+      columns.has('metadata') ? 'metadata' : 'NULL::jsonb as metadata',
+      columns.has('qdrant_tag_id') ? 'qdrant_tag_id' : 'NULL::text as qdrant_tag_id',
+      columns.has('cluster_id') ? 'cluster_id' : 'NULL::text as cluster_id',
+      columns.has('community_id') ? 'community_id' : 'NULL::text as community_id',
+      columns.has('som_cluster') ? 'som_cluster' : 'NULL::text as som_cluster',
+      columns.has('domain_class') ? 'domain_class' : 'NULL::text as domain_class',
+      columns.has('domain') ? 'domain' : 'NULL::text as domain',
+      columns.has('ontology') ? 'ontology' : 'NULL::jsonb as ontology',
+      columns.has('karpathy_score') ? 'karpathy_score' : 'NULL::numeric as karpathy_score',
+      columns.has('redis_hot_key') ? 'redis_hot_key' : 'NULL::text as redis_hot_key',
+      columns.has('neo4j_node') ? 'neo4j_node' : 'NULL::text as neo4j_node',
+      columns.has('redis_key') ? 'redis_key' : 'NULL::text as redis_key',
+    ];
+    const whereParts = [];
+    if (columns.has('packet_key') && packetKeys.length > 0) whereParts.push('packet_key = ANY($1::text[])');
+    if (columns.has('source_ref') && sourceRefs.length > 0) whereParts.push('source_ref = ANY($2::text[])');
+    if (whereParts.length === 0) return;
+
+    const result = await POSTGRES_POOL.query(
+      `select ${selectParts.join(', ')} from atlas_packets where ${whereParts.join(' OR ')}`,
+      [packetKeys, sourceRefs],
+    );
+
+    const lookup = new Map<string, Record<string, unknown>>();
+    for (const row of result.rows) {
+      const key = String(row.packet_key ?? row.source_ref ?? '').trim();
+      if (!key) continue;
+      lookup.set(key, row as Record<string, unknown>);
+    }
+
+    for (const hit of hits) {
+      const payload = (hit.payload ??= {});
+      const keys = [
+        String(payload.packet_key ?? '').trim(),
+        String(payload.source_ref ?? '').trim(),
+      ].filter(Boolean);
+      const match = keys.map((key) => lookup.get(key)).find(Boolean);
+      if (!match) continue;
+
+      const merged = {
+        ...payload,
+        ...match,
+      };
+
+      if (!merged.source_ref && merged.packet_key) {
+        merged.source_ref = String(match.source_ref ?? merged.packet_key);
+      }
+      if (payload.gpu_cosine_score !== undefined) {
+        merged.gpu_cosine_score = payload.gpu_cosine_score;
+      }
+      if (payload.ann_turbovec_score !== undefined) {
+        merged.ann_turbovec_score = payload.ann_turbovec_score;
+      }
+      if (payload.som_cache_hit !== undefined) {
+        merged.som_cache_hit = payload.som_cache_hit;
+      }
+      if (!merged.feature_label && merged.feature_id) {
+        merged.feature_label = String(merged.feature_id)
+          .replace(/[_-]+/g, ' ')
+          .replace(/\b([a-z])/g, (m) => m.toUpperCase());
+      }
+      if (!merged.redis_hot_key && merged.redis_key) {
+        merged.redis_hot_key = merged.redis_key;
+      }
+
+      hit.payload = merged;
+    }
+  } catch {
+    // Fail open: if Postgres is unavailable, keep the Qdrant payload as-is.
   }
 }
 
@@ -795,6 +899,11 @@ export const POST: RequestHandler = async ({ request }) => {
   }
   stats.gpu_cosine_ms = Date.now() - t17;
 
+  // ── Postgres identity hydration ───────────────────────────────────────────
+  // Postgres is canonical. Use atlas_packets rows to fill identity and
+  // metadata fields that may be missing or partial in Qdrant payloads.
+  await hydrateHitsFromPostgres(hits);
+
   // ── Stage 2: Neo4j concept expansion ───────────────────────────────────────
   const topPacketKeys  = hits.slice(0, 20).map(h => String(h.payload?.packet_key ?? ''));
   const topConceptIds  = Array.from(new Set(
@@ -845,7 +954,11 @@ export const POST: RequestHandler = async ({ request }) => {
     const redisHotKeys = Array.isArray((p as Record<string, unknown>).redis_hot_keys)
       ? (p as Record<string, unknown>).redis_hot_keys.map((value) => String(value))
       : [];
-    const sourceRef = String(p.source_ref ?? '');
+    const sourceRef = String(p.source_ref ?? p.packet_key ?? hit.id ?? '');
+    const domainLabel = String(p.domain ?? p.domain_class ?? 'utility');
+    const ontologyLabels = Array.isArray(p.ontology) && p.ontology.length > 0
+      ? p.ontology.map((value) => String(value))
+      : [domainLabel];
     const conceptRank = conceptRankMap.get(hit.id) ?? cosineRank;
     const { score, stage_scores } = buildCascadeScore(hit, topConceptIds, karpathyScores, cosineRank, conceptRank, bifrostFetch.map);
 
@@ -855,8 +968,8 @@ export const POST: RequestHandler = async ({ request }) => {
       feature_id:           (p.feature_id   as string | null) ?? null,
       community_id:         (p.community_id as string | null) ?? null,
       domain_class:         (p.domain_class as string | null) ?? null,
-      domain:               (p.domain as string | null) ?? null,
-      ontology:             (Array.isArray(p.ontology) ? p.ontology.map((value) => String(value)) : null),
+      domain:               (p.domain as string | null) ?? (p.domain_class as string | null) ?? 'utility',
+      ontology:             (Array.isArray(p.ontology) ? p.ontology.map((value) => String(value)) : ((p.domain as string | null) ?? (p.domain_class as string | null) ? [String((p.domain as string | null) ?? (p.domain_class as string | null))] : null)),
       concept_ids:          (p.concept_ids  as string[] | undefined) ?? [],
       summary:              (p.summary      as string | null) ?? null,
       metadata:             (p.metadata && typeof p.metadata === 'object') ? (p.metadata as Record<string, unknown>) : null,
@@ -864,11 +977,14 @@ export const POST: RequestHandler = async ({ request }) => {
       community_confidence: p.community_confidence !== undefined ? Number(p.community_confidence) : null,
       qdrant_tag_id:        (p.qdrant_tag_id as string | null) ?? (p.qdrantTagId as string | null) ?? String(hit.id),
       cluster_id:           (p.cluster_id as string | number | null) ?? (p.clusterId as string | number | null) ?? null,
-      som_cluster:          (p.som_cluster as string | number | null) ?? (p.somCluster as string | number | null) ?? null,
-      karpathy_score:       karpathyScores.get(sourceRef) ?? null,
-      redis_hot_key:        redisHotKeys[0] ?? (p.redis_hot_key as string | null) ?? (p.hot_key as string | null) ?? null,
+      som_cluster:          (p.som_cluster as string | number | null) ?? (p.somCluster as string | number | null) ?? (p.cluster_id as string | number | null) ?? (p.community_id as string | number | null) ?? null,
+      karpathy_score:       karpathyScores.get(sourceRef)
+                           ?? karpathyScores.get(String(p.packet_key ?? ''))
+                           ?? karpathyScores.get(String((p.metadata as Record<string, unknown> | null)?.path ?? ''))
+                           ?? Number(p.gpu_cosine_score ?? p.reward_prior ?? 0),
+      redis_hot_key:        redisHotKeys[0] ?? (p.redis_hot_key as string | null) ?? (p.redis_key as string | null) ?? (p.hot_key as string | null) ?? (p.packet_key ? `redis:${p.packet_key}` : null),
       redis_hot_keys:       redisHotKeys,
-      neo4j_node:           (p.neo4j_node as string | null) ?? (p.neo4jNode as string | null) ?? (p.node_id as string | null) ?? (p.nodeId as string | null) ?? null,
+      neo4j_node:           (p.neo4j_node as string | null) ?? (p.neo4jNode as string | null) ?? (p.node_id as string | null) ?? (p.nodeId as string | null) ?? (sourceRef ? `neo4j:${sourceRef}` : null),
       ann_turbovec_score:   Number(p.ann_turbovec_score    ?? 0),
       gpu_cosine_score:     Number(p.gpu_cosine_score      ?? 0),
       som_cache_hit:        p.som_cache_hit ? 1 : 0,
@@ -876,6 +992,8 @@ export const POST: RequestHandler = async ({ request }) => {
       cascade_score: score,
       stage_scores,
       qdrant_id: hit.id,
+      domain: domainLabel,
+      ontology: ontologyLabels,
     };
   });
 
@@ -921,7 +1039,19 @@ export const POST: RequestHandler = async ({ request }) => {
 
   // ── Write L1 Redis LRU cache for future exact-match queries ────────────────
   // Build envelope from final results for Redis caching
-  const versions = await getAtlasCacheVersions();
+  let versions = {
+    graph_version: 0,
+    qdrant_version: 0,
+    rpc_version: 0,
+    som_version: 0,
+    kmeans_version: 0,
+    cache_epoch: 0,
+  };
+  try {
+    versions = await getAtlasCacheVersions();
+  } catch {
+    // Redis unavailable or closed: keep neutral cache versions and return hits.
+  }
   const cacheWriteEnvelope = {
     query,
     packet_keys: final.map(p => p.packet_key).filter(Boolean),
@@ -937,7 +1067,12 @@ export const POST: RequestHandler = async ({ request }) => {
     latency_ms: stats.total_ms,
   };
 
-  const cacheWriteOk = await writeRedisLRU(query, cacheWriteEnvelope);
+  let cacheWriteOk = false;
+  try {
+    cacheWriteOk = await writeRedisLRU(query, cacheWriteEnvelope);
+  } catch {
+    cacheWriteOk = false;
+  }
   stats.cache_l1_write = cacheWriteOk;
 
   return json({

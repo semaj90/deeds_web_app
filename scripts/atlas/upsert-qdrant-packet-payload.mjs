@@ -188,17 +188,60 @@ async function main() {
 
       const tags = deriveTags(pkt.feature_id, pkt.concept_ids, pkt.packet_key, pkt.summary);
 
+      // Canonical source_ref with fallbacks
+      const sourceRef =
+        pkt.source_ref ??
+        pkt.sourceRef ??
+        pkt.canonical_source_ref ??
+        (pkt.metadata?.source_ref) ??
+        (pkt.metadata?.path) ??
+        null;
+
+      // Canonical file_path with fallbacks
+      const filePath =
+        pkt.file_path ??
+        pkt.source_path ??
+        (pkt.metadata?.file_path) ??
+        (pkt.metadata?.path) ??
+        sourceRef ??
+        null;
+
       const payload = {
+        // Canonical fields (required for Phase D)
         feature_id:         pkt.feature_id ?? null,
+        feature_label:      pkt.feature_label ?? null,
+
+        // Source identity (all aliases for backward compat)
+        source_ref:         sourceRef,
+        sourceRef:          sourceRef,
+        canonical_source_ref: sourceRef,
+        sourceRefs:         sourceRef ? [sourceRef] : [],
+
+        // File path (all aliases)
+        file_path:          filePath,
+        filePath:           filePath,
+        path:               filePath,
+
+        // Packet identity
+        packet_key:         pkt.packet_key ?? null,
+        packetKey:          pkt.packet_key ?? null,
+
+        // Community & enrichment
         community_id:       pkt.community_id ?? null,
         community_conf:     pkt.community_confidence ?? 0.25,
         concept_ids:        Array.isArray(pkt.concept_ids) ? pkt.concept_ids : [],
+
+        // Semantic enrichment
         tags,
         cluster_id:         pkt.cluster_id ? parseInt(pkt.cluster_id, 10) : null,
-        packet_key:         pkt.packet_key ?? null,
-        path:               pkt.metadata?.path ?? null,
+        domain_class:       pkt.domain_class ?? (pkt.metadata?.domain_class) ?? null,
+
+        // Metadata
         hash:               pkt.metadata?.hash ?? null,
         mtime:              pkt.metadata?.mtime ?? null,
+
+        // Lineage tracking
+        lineage_version:    'packet-identity-v1',
         atlas_enriched:     true,
         atlas_enriched_at:  enrichedAt,
       };

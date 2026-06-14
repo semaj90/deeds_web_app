@@ -1,24 +1,25 @@
 # Graphify Health Report
 
-*Generated: 2026-05-31T00:09:05.428Z*
+*Generated: 2026-06-14T03:45:23.372Z*
 
 ## Summary
 
 | Metric | Value | Status |
 |--------|-------|--------|
-| Redis wiki notes | 1547 | ✅ |
-| Gemma4 summaries | 0 / 1547 (0%) | ❌ |
+| Redis wiki notes | 840 | ✅ |
+| Gemma4 summaries | 0 / 840 (0%) | ❌ |
 | BoW chunk tiles | 0 | ⚠️ |
-| BoW cluster tiles | 100 | ⚠️ |
+| BoW cluster tiles | 0 | ⚠️ |
 | Qdrant glyph_atlas | 1336 pts | ✅ |
 | Graph JSON nodes | 0 | ⚠️ |
 | Graph JSON edges | 0 | ⚠️ |
 | AGENTS.md mirrors | 2 | ✅ |
-| Manifold clusters | 20 | ✅ |
-| SOM Weights | ✅ | ✅ |
-| Autoencoder weights | weightsType=hash, encodedType=none, centroids=yes | ⚠️ |
-| Atlas seed count | 2 | ❌ |
+| Manifold clusters | 0 | ⚠️ |
+| SOM Weights | ❌ | ❌ |
+| Autoencoder weights | weightsType=none, encodedType=hash, centroids=yes | ⚠️ |
+| Atlas seed count | 3 | ❌ |
 | Atlas seed status | ok | - |
+| Graphify daily | complete (unknown) | ✅ |
 
 
 ## Graphify Tiers
