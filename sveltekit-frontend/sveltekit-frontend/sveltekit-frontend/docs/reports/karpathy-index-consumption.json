@@ -1,0 +1,22 @@
+{
+  "generatedAt": "2026-06-14T02:26:05.148Z",
+  "postgres": {
+    "packetCount": 17476
+  },
+  "redis": {
+    "connected": false,
+    "karpathyScoresCount": 0,
+    "signalCoverage": {
+      "pagerank": 0,
+      "attention": 0,
+      "authority": 0,
+      "blend": 0
+    },
+    "sampleScores": {}
+  },
+  "postgres_projection": {
+    "columnsExist": true,
+    "rankingIndexCount": "11"
+  },
+  "gate": "PASS"
+}

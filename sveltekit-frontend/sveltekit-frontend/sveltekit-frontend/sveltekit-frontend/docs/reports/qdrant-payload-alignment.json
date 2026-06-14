@@ -1,0 +1,54 @@
+{
+  "generatedAt": "2026-06-14T02:31:51.536Z",
+  "collection": "codebase_chunks_768",
+  "totalPoints": 54898,
+  "sampledPoints": 1000,
+  "fieldCoverage": {
+    "packet_key": "49.6",
+    "source_ref": "0.5",
+    "feature_id": "94.6",
+    "feature_label": "92.3",
+    "domain_class": "46.9",
+    "community_id": "49.4",
+    "tags": "95.1"
+  },
+  "sampleErrors": [
+    {
+      "pointId": 86694,
+      "missingFields": [
+        "source_ref"
+      ]
+    },
+    {
+      "pointId": 138065,
+      "missingFields": [
+        "source_ref"
+      ]
+    },
+    {
+      "pointId": 174637,
+      "missingFields": [
+        "packet_key",
+        "source_ref",
+        "domain_class",
+        "community_id"
+      ]
+    },
+    {
+      "pointId": 188608,
+      "missingFields": [
+        "packet_key",
+        "source_ref",
+        "domain_class",
+        "community_id"
+      ]
+    },
+    {
+      "pointId": 194586,
+      "missingFields": [
+        "source_ref"
+      ]
+    }
+  ],
+  "gate": "FAIL"
+}

@@ -5473,8 +5473,8 @@
   },
   "sveltekit-frontend/src/routes/api/v1/chat/completions/+server.ts": {
     "zone": "shared",
-    "directDeps": 5,
-    "serverDeps": 5,
+    "directDeps": 4,
+    "serverDeps": 4,
     "dbDeps": 0
   },
   "sveltekit-frontend/src/routes/api/v1/chat/messages/+server.ts": {
@@ -5964,6 +5964,12 @@
     "dbDeps": 0
   },
   "sveltekit-frontend/src/routes/api/ai/error-agent/+server.ts": {
+    "zone": "shared",
+    "directDeps": 0,
+    "serverDeps": 0,
+    "dbDeps": 0
+  },
+  "sveltekit-frontend/src/routes/api/ai/policy/+server.ts": {
     "zone": "shared",
     "directDeps": 0,
     "serverDeps": 0,

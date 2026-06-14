@@ -1,21 +1,12 @@
 /**
  * OpenAI-compatible chat completions endpoint.
  * POST /api/v1/chat/completions
- *
- * Routes requests through:
- *   1. Extract replayTrace from request
- *   2. Call /api/opencode for narrowed tools
- *   3. Pass narrowed tools to Gemma4 if use_mcp=true
- *   4. Stream tool_calls → trace-mcp
- *   5. Return OpenAI-shape response
  */
 
 import type { RequestHandler } from './$types';
 import { json, error } from '@sveltejs/kit';
 import { z } from 'zod';
 import { bifrostChat } from '$lib/server/ollama.js';
-import { canUseTurboQuant } from '$lib/server/ai/backend-runtime-guards.js';
-import { resolveRuntimeConfig } from '$lib/server/ai/inference-configs.js';
 
 const requestSchema = z.object({
   model: z.string(),
@@ -41,13 +32,13 @@ export const POST: RequestHandler = async ({ request, locals }) => {
     const { model, messages, temperature, use_mcp, stream } = requestSchema.parse(body);
     const startMs = performance.now();
 
-    // Stage 1: Extract last user message
+    // Extract last user message
     const lastMsg = messages.filter((m) => m.role === 'user').pop();
     if (!lastMsg?.content) {
       return error(400, 'No user message found');
     }
 
-    // Stage 2: Call /api/opencode if use_mcp
+    // Call /api/opencode if use_mcp
     let toolContext: any = { tools: [], replayTrace: {} };
     if (use_mcp) {
       try {
@@ -63,17 +54,17 @@ export const POST: RequestHandler = async ({ request, locals }) => {
           toolContext = await openRes.json();
         }
       } catch (e) {
-        console.warn('[v1/completions] OpenCode failed, proceeding without tools');
+        console.warn('[v1/completions] OpenCode failed');
       }
     }
 
-    // Stage 3: Build prompt
+    // Build prompt
     const systemPrompt = messages.find((m) => m.role === 'system')?.content || 'You are a helpful assistant.';
     const messagesForModel = messages
       .filter((m) => m.role !== 'system')
       .map((m) => ({ role: m.role, content: m.content || '' }));
 
-    // Append tool context to last user message if tools available
+    // Append tool context if available
     if (toolContext.tools?.length > 0) {
       const lastUserIdx = messagesForModel.findIndex((m) => m.role === 'user');
       if (lastUserIdx >= 0) {
@@ -81,7 +72,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
       }
     }
 
-    // Stage 4: Call Gemma4 via bifrostChat
+    // Call Gemma4
     const modelName = model === 'yorha-legal' ? 'gemma4-rotorquant:latest' : model;
     const response = await bifrostChat(
       [{ role: 'system', content: systemPrompt }, ...messagesForModel],
@@ -89,7 +80,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
       { temperature }
     );
 
-    // Stage 5: Build OpenAI response
+    // Return OpenAI response
     return json({
       object: 'chat.completion',
       id: `chatcmpl-${Date.now()}`,

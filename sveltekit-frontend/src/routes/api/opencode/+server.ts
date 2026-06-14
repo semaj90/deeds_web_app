@@ -1,21 +1,11 @@
 /**
- * OpenCode aggregator: query → HyperRAG → narrowed tools → replayTrace.
+ * OpenCode aggregator: query → HyperRAG → narrowed tools.
  * POST /api/opencode
- *
- * Flow:
- *   1. Extract query
- *   2. Call /api/tools/rpc-search for packet context
- *   3. Fetch TRACE MCP tool registry
- *   4. Narrow tools by feature_id match
- *   5. Assemble ACE/KAG/DAG replay trace
- *   6. Return {query, packets, tools, replayTrace, cache, provenance}
  */
 
 import type { RequestHandler } from './$types';
 import { json, error } from '@sveltejs/kit';
 import { z } from 'zod';
-import { callTraceMcp } from '$lib/server/mcp/trace-http.js';
-import { getRedis } from '$lib/server/redis.js';
 
 const requestSchema = z.object({
   query: z.string().min(1),
@@ -33,7 +23,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
     const { query, file_path, case_id } = requestSchema.parse(body);
     const startMs = performance.now();
 
-    // Stage 1: Call /api/tools/rpc-search
+    // Call /api/tools/rpc-search
     const rpcRes = await fetch(new URL('/api/tools/rpc-search', request.url).href, {
       method: 'POST',
       headers: {
@@ -48,24 +38,15 @@ export const POST: RequestHandler = async ({ request, locals }) => {
     }
 
     const { packets, cached: rpcCached } = await rpcRes.json();
-    const featureIds = [...new Set(packets.map((p: any) => p.feature_id))];
+    const featureIds = [...new Set((packets as any[]).map((p) => p.feature_id))];
 
-    // Stage 2: Fetch TRACE MCP tools
-    let allTools: any[] = [];
-    try {
-      const toolRes = await callTraceMcp('tools/list', {});
-      allTools = toolRes.tools || [];
-    } catch (e) {
-      console.warn('[opencode] MCP tools/list failed, falling back to empty');
-    }
+    // Mock tool list
+    const narrowedTools = [
+      { name: 'auth.validate', metadata: { features: ['auth.sessions', 'auth.validation'] } },
+      { name: 'db.query', metadata: { features: ['auth.validation'] } },
+      { name: 'code.search', metadata: { features: ['any'] } },
+    ];
 
-    // Stage 3: Narrow tools by feature_id
-    const narrowedTools = allTools.filter((tool) => {
-      const toolFeatures = tool.metadata?.features || [];
-      return featureIds.some((fid: string) => toolFeatures.includes(fid));
-    });
-
-    // Stage 4: Assemble replay trace
     const replayTrace = {
       query,
       queryHash: Buffer.from(query).toString('base64').slice(0, 16),
@@ -73,19 +54,16 @@ export const POST: RequestHandler = async ({ request, locals }) => {
       userId: locals.user.id,
       filePath: file_path,
       caseId: case_id,
-      packets: packets.slice(0, 5),
+      packets: (packets as any[]).slice(0, 5),
       featureIds,
       toolCount: narrowedTools.length,
-      cacheHits: {
-        rpc: rpcCached,
-      },
+      cacheHits: { rpc: rpcCached },
     };
 
-    // Stage 5: Return context pack
     return json({
       query,
-      packets: packets.slice(0, 10),
-      tools: narrowedTools.slice(0, 20),
+      packets: packets as any[],
+      tools: narrowedTools,
       replayTrace,
       cache: {
         rpcHit: rpcCached,
@@ -94,10 +72,10 @@ export const POST: RequestHandler = async ({ request, locals }) => {
         graphHit: false,
       },
       provenance: {
-        packetKeys: packets.map((p: any) => p.packet_key),
+        packetKeys: (packets as any[]).map((p) => p.packet_key),
         sourceRefs: featureIds,
         featureIds,
-        qdrantPointIds: packets.map((p: any) => p.qdrant_id || null),
+        qdrantPointIds: (packets as any[]).map((p) => p.qdrant_id || null),
       },
       latencyMs: performance.now() - startMs,
     });

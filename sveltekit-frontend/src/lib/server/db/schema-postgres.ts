@@ -4875,10 +4875,6 @@ export const policyRerankerMetadata = pgTable('policy_reranker_metadata', {
 
   // Index for fast lookups by model version & status
 }, (table) => ({
-  // GIN index on metadata JSONB for fast searches on feature normalization, action space, SOM topology
-  metadataGin: index('idx_policy_metadata_gin').using('gin', table.metadata).$op('jsonb_path_ops'),
-  // GIN index on inference stats for aggregations
-  inferenceStatsGin: index('idx_policy_inference_stats_gin').using('gin', table.inferenceStats).$op('jsonb_path_ops'),
   // B-tree on status + isDefault for active-model lookups
   statusDefaultIdx: index('idx_policy_status_default').on(table.status, table.isDefault),
   // B-tree on trainedAt for temporal queries (recent models first)
