@@ -19,15 +19,20 @@
 import { Client } from 'pg';
 import * as fs from 'fs';
 import * as path from 'path';
+import { fileURLToPath } from 'node:url';
 import { loadRepoEnv, resolveDatabaseUrl } from '../../../scripts/atlas/connection-config.mjs';
+import { normalizeSourceRef } from '../../../scripts/atlas/lib/normalize-source-ref.mjs';
+
 const env = loadRepoEnv(process.env);
 const POSTGRES_URL = resolveDatabaseUrl(env);
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const REPO_ROOT = path.resolve(__dirname, '../..');
 
 const TIER_1_TABLES = [
   'atlas_packets',
   'nes_chrom_packets',
-  // 'glyph_records',      // Defer to Tier 2 (no feature_id column)
-  // 'codebase_chunk_index', // Defer to Tier 2 (different schema structure)
+  'glyph_records',
+  'codebase_chunk_index',
 ];
 
 const FEATURE_MAP = {
@@ -43,8 +48,75 @@ const FEATURE_MAP = {
   'tests/': 'test_harness',
 };
 
+let featureIdBySourceRef = new Map();
+let featureLabelByFeatureId = new Map();
+
 let client = null;
-let reportPath = 'docs/reports/backfill-feature-metadata.json';
+let reportPath = path.join(REPO_ROOT, 'docs', 'reports', 'backfill-feature-metadata.json');
+
+function humanizeFeatureLabel(featureId) {
+  const raw = String(featureId ?? '').trim();
+  if (!raw) return null;
+  return raw
+    .replace(/[_-]+/g, ' ')
+    .replace(/\s+/g, ' ')
+    .replace(/\b([a-z])/g, (match) => match.toUpperCase());
+}
+
+async function loadFeatureLookups() {
+  featureIdBySourceRef = new Map();
+  featureLabelByFeatureId = new Map();
+
+  const columnResult = await client.query(`
+    SELECT column_name
+    FROM information_schema.columns
+    WHERE table_schema = 'public'
+      AND table_name = 'atlas_feature_map'
+  `);
+  const columns = new Set(columnResult.rows.map((row) => row.column_name));
+  const hasFeatureId = columns.has('feature_id');
+  const hasFeatureLabel = columns.has('feature_label');
+  const hasSourceRef = columns.has('source_ref');
+  const hasNormalizedPath = columns.has('normalized_path');
+  const hasFilePath = columns.has('file_path');
+  const selectParts = [
+    hasSourceRef ? 'source_ref' : 'NULL::text AS source_ref',
+    hasNormalizedPath ? 'normalized_path' : 'NULL::text AS normalized_path',
+    hasFilePath ? 'file_path' : 'NULL::text AS file_path',
+    hasFeatureId ? 'feature_id' : 'NULL::text AS feature_id',
+    hasFeatureLabel ? 'feature_label' : 'NULL::text AS feature_label',
+  ];
+  const predicates = [
+    hasSourceRef ? 'source_ref IS NOT NULL' : null,
+    hasNormalizedPath ? 'normalized_path IS NOT NULL' : null,
+    hasFilePath ? 'file_path IS NOT NULL' : null,
+    hasFeatureId ? 'feature_id IS NOT NULL' : null,
+  ].filter(Boolean);
+
+  if (predicates.length === 0) return;
+
+  const rows = await client.query(`
+    SELECT ${selectParts.join(', ')}
+    FROM atlas_feature_map
+    WHERE ${predicates.join(' OR ')}
+  `);
+
+  for (const row of rows.rows) {
+    const featureId = row.feature_id ? String(row.feature_id).trim() : null;
+    const featureLabel = row.feature_label ? String(row.feature_label).trim() : humanizeFeatureLabel(featureId);
+
+    if (featureId && featureLabel && !featureLabelByFeatureId.has(featureId)) {
+      featureLabelByFeatureId.set(featureId, featureLabel);
+    }
+
+    for (const candidate of [row.source_ref, row.normalized_path, row.file_path]) {
+      const normalized = normalizeSourceRef(candidate);
+      if (normalized && featureId && !featureIdBySourceRef.has(normalized)) {
+        featureIdBySourceRef.set(normalized, featureId);
+      }
+    }
+  }
+}
 
 async function connectDb() {
   client = new Client({
@@ -58,20 +130,69 @@ async function closeDb() {
   if (client) await client.end();
 }
 
-function inferFeatureId(sourceRef, filePath) {
-  if (!sourceRef && !filePath) return null;
-  const searchPath = sourceRef || filePath;
-  for (const [prefix, featureId] of Object.entries(FEATURE_MAP)) {
-    if (searchPath.startsWith(prefix)) return featureId;
+function inferFeatureIdentity(sourceRef, filePath) {
+  const candidates = [sourceRef, filePath]
+    .map((value) => normalizeSourceRef(value))
+    .filter(Boolean);
+
+  for (const candidate of candidates) {
+    const featureId = featureIdBySourceRef.get(candidate);
+    if (featureId) {
+      return {
+        featureId,
+        featureLabel: featureLabelByFeatureId.get(featureId) || humanizeFeatureLabel(featureId),
+        source: 'atlas_feature_map',
+      };
+    }
   }
-  return null;
+
+  const searchPath = sourceRef || filePath;
+  if (!searchPath) {
+    // Orphaned records with no source ref → assign to unclassified_packet
+    return {
+      featureId: 'unclassified_packet',
+      featureLabel: 'Unclassified Packet',
+      source: 'orphan_fallback',
+    };
+  }
+
+  for (const [prefix, featureId] of Object.entries(FEATURE_MAP)) {
+    if (String(searchPath).startsWith(prefix)) {
+      return {
+        featureId,
+        featureLabel: featureLabelByFeatureId.get(featureId) || humanizeFeatureLabel(featureId),
+        source: 'feature-prefix',
+      };
+    }
+  }
+
+  // Fallback for paths that don't match any prefix
+  return {
+    featureId: 'general_other',
+    featureLabel: 'General Other',
+    source: 'no-prefix-match',
+  };
 }
 
 // Map table names to actual column names
 // Only Tier 1 tables with feature_id/metadata bacKfill need
 const TABLE_COLUMN_MAP = {
-  'atlas_packets': { feature_id: 'feature_id', source_ref: 'source_ref', metadata: 'metadata', file_path: 'file_path', id: 'id' },
-  'nes_chrom_packets': { feature_id: 'feature_id', source_ref: 'source_ref', metadata: 'metadata', file_path: 'file_path', id: 'id' },
+  'atlas_packets': {
+    feature_id: 'feature_id',
+    feature_label: 'feature_label',
+    source_ref: 'source_ref',
+    metadata: 'metadata',
+    file_path: null,
+    id: 'packet_id',
+  },
+  'nes_chrom_packets': {
+    feature_id: 'feature_id',
+    feature_label: 'feature_label',
+    source_ref: 'source_ref',
+    metadata: 'metadata',
+    file_path: null,
+    id: 'id',
+  },
   'glyph_records': { feature_id: null, source_ref: 'source_ref', metadata: 'record_json', file_path: null, id: 'id' },
   // codebase_chunk_index has no feature_id/metadata — defer to Tier 2
   'codebase_chunk_index': { feature_id: null, source_ref: 'relative_path', metadata: 'cluster_summary', file_path: null, id: 'id' },
@@ -90,6 +211,7 @@ async function verifyTable(tableName) {
   ];
 
   if (cols.feature_id) selectParts.push(`COUNT(CASE WHEN ${cols.feature_id} IS NOT NULL THEN 1 END) as has_feature_id`);
+  if (cols.feature_label) selectParts.push(`COUNT(CASE WHEN ${cols.feature_label} IS NOT NULL THEN 1 END) as has_feature_label`);
   if (cols.source_ref) selectParts.push(`COUNT(CASE WHEN ${cols.source_ref} IS NOT NULL THEN 1 END) as has_source_ref`);
   if (cols.metadata) selectParts.push(`COUNT(CASE WHEN ${cols.metadata} IS NOT NULL THEN 1 END) as has_metadata`);
   if (cols.file_path) selectParts.push(`COUNT(CASE WHEN ${cols.file_path} IS NOT NULL THEN 1 END) as has_file_path`);
@@ -103,6 +225,7 @@ async function verifyTable(tableName) {
   const total = parseInt(row.total, 10);
   const missing = {
     feature_id: cols.feature_id ? (total - parseInt(row.has_feature_id || 0, 10)) : null,
+    feature_label: cols.feature_label ? (total - parseInt(row.has_feature_label || 0, 10)) : null,
     source_ref: cols.source_ref ? (total - parseInt(row.has_source_ref || 0, 10)) : null,
     metadata: cols.metadata ? (total - parseInt(row.has_metadata || 0, 10)) : null,
     file_path: cols.file_path ? (total - parseInt(row.has_file_path || 0, 10)) : null,
@@ -153,26 +276,32 @@ async function backfillTable(tableName, limit = null, apply = false) {
   selectList.push(cols.id);
 
   if (cols.source_ref) {
-    selectList.push(`COALESCE(${cols.source_ref}, '') as source_ref`);
+    selectList.push(`${cols.source_ref} as source_ref`);
   }
   if (cols.file_path) {
-    selectList.push(`COALESCE(${cols.file_path}, '') as file_path`);
+    selectList.push(`${cols.file_path} as file_path`);
   } else {
-    selectList.push(`'' as file_path`); // Placeholder for missing column
+    selectList.push(`NULL::text as file_path`);
   }
   if (cols.feature_id) {
     selectList.push(`${cols.feature_id}`);
   } else {
-    selectList.push(`NULL as feature_id`); // Placeholder for missing column
+    selectList.push(`NULL::text as feature_id`);
+  }
+  if (cols.feature_label) {
+    selectList.push(`${cols.feature_label}`);
+  } else {
+    selectList.push(`NULL::text as feature_label`);
   }
   if (cols.metadata) {
     selectList.push(`${cols.metadata}`);
   } else {
-    selectList.push(`'{}'::jsonb as metadata`); // Placeholder
+    selectList.push(`NULL::jsonb as metadata`);
   }
 
   const whereClauses = [];
   if (cols.feature_id) whereClauses.push(`${cols.feature_id} IS NULL`);
+  if (cols.feature_label) whereClauses.push(`${cols.feature_label} IS NULL`);
   if (cols.metadata) whereClauses.push(`${cols.metadata} IS NULL`);
 
   if (whereClauses.length === 0) {
@@ -208,28 +337,47 @@ async function backfillTable(tableName, limit = null, apply = false) {
       const sourceRef = row.source_ref || null;
       const filePath = row.file_path || null;
       const currentFeatureId = row.feature_id || null;
-      const currentMetadata = row.metadata && typeof row.metadata === 'object' ? row.metadata : {};
+      const currentFeatureLabel = row.feature_label || null;
+      const currentMetadata = row.metadata && typeof row.metadata === 'object' ? row.metadata : null;
 
-      const inferredFeatureId = currentFeatureId || inferFeatureId(sourceRef, filePath);
-      const updatedMetadata = { ...currentMetadata };
+      const identity = inferFeatureIdentity(sourceRef, filePath);
+      const inferredFeatureId = currentFeatureId || identity.featureId;
+      const inferredFeatureLabel = currentFeatureLabel || identity.featureLabel;
+      const updatedMetadata = currentMetadata ? { ...currentMetadata } : {};
 
       if (inferredFeatureId && !currentFeatureId) {
         updatedMetadata.feature_id_inferred = true;
         updatedMetadata.feature_id_source = sourceRef ? 'source_ref_hash' : 'file_path_hash';
       }
+      if (inferredFeatureLabel && !currentFeatureLabel) {
+        updatedMetadata.feature_label_inferred = true;
+        updatedMetadata.feature_label_source = identity.source || 'derived';
+      }
 
-      if (apply && cols.feature_id) {
-        // Build UPDATE based on what's available
+      const shouldSetFeatureId = cols.feature_id && inferredFeatureId && inferredFeatureId !== currentFeatureId;
+      const shouldSetFeatureLabel = cols.feature_label && inferredFeatureLabel && inferredFeatureLabel !== currentFeatureLabel;
+      const shouldSetMetadata = cols.metadata && JSON.stringify(updatedMetadata) !== JSON.stringify(currentMetadata ?? {});
+
+      if (!(shouldSetFeatureId || shouldSetFeatureLabel || shouldSetMetadata)) {
+        continue;
+      }
+
+      if (apply) {
         const updateParts = [];
         const params = [];
         let paramCount = 1;
 
-        if (inferredFeatureId !== currentFeatureId) {
+        if (shouldSetFeatureId) {
           updateParts.push(`${cols.feature_id} = $${paramCount++}`);
           params.push(inferredFeatureId);
         }
 
-        if (cols.metadata && JSON.stringify(updatedMetadata) !== JSON.stringify(currentMetadata)) {
+        if (shouldSetFeatureLabel) {
+          updateParts.push(`${cols.feature_label} = $${paramCount++}`);
+          params.push(inferredFeatureLabel);
+        }
+
+        if (shouldSetMetadata) {
           updateParts.push(`${cols.metadata} = $${paramCount++}`);
           params.push(JSON.stringify(updatedMetadata));
         }
@@ -281,9 +429,17 @@ async function generateReport(verifyResults, backfillResults) {
 }
 
 async function main() {
-  const isApply = process.argv.includes('--apply');
-  const isVerifyOnly = process.argv.includes('--verify');
-  const argv = process.argv.slice(2);
+  const npmArgv = (() => {
+    try {
+      return JSON.parse(process.env.npm_config_argv ?? '{}');
+    } catch {
+      return {};
+    }
+  })();
+  const forwardedArgv = Array.isArray(npmArgv.original) ? npmArgv.original.slice(2) : [];
+  const argv = [...process.argv.slice(2), ...forwardedArgv];
+  const isApply = argv.includes('--apply') || process.env.npm_config_apply === 'true';
+  const isVerifyOnly = argv.includes('--verify');
   const readArgValue = (flag) => {
     const idx = argv.findIndex((arg) => arg === flag || arg.startsWith(`${flag}=`));
     if (idx < 0) return null;
@@ -300,6 +456,7 @@ async function main() {
 
   try {
     await connectDb();
+    await loadFeatureLookups();
 
     // Verification phase
     console.log('📊 Verifying tables...\n');
@@ -315,7 +472,7 @@ async function main() {
       console.log(`    B-tree index: ${verification.hasBtreeIndex ? '✅' : '❌'}`);
     }
 
-    // Backfill phase
+    // Backfill phase (skip only if --verify flag is explicitly set)
     if (!isVerifyOnly) {
       console.log('\n📝 Backfilling...\n');
       const backfillResults = [];
@@ -333,6 +490,7 @@ async function main() {
         console.log('\n✅ Backfill complete. Verification recommended.\n');
       }
     } else {
+      // Only verify, don't backfill
       await generateReport(verifyResults, null);
     }
 

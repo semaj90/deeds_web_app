@@ -5,7 +5,7 @@
  */
 
 import { getRedisClient } from '$lib/server/redis.js';
-import { qdrant } from '$lib/server/vector/qdrant-manager.js';
+import { ENV } from '$lib/server/env.server.js';
 import {
 	AtlasRedisEnvelope,
 	AtlasBifrostEnvelope,
@@ -123,16 +123,21 @@ export async function queryQdrantCascade(
 		const qdrantFilter = mustFilters.length > 0 ? { must: mustFilters } : undefined;
 
 		// Search Qdrant with named vector 'content'
-		const results = (await qdrant.client.search('codebase_chunks_768', {
-			vector: {
-				name: 'content',
-				vector: queryEmbedding,
-			},
-			limit,
-			score_threshold: 0.3,
-			filter: qdrantFilter,
-			with_payload: true,
-		} as any)) as any[];
+		const res = await fetch(`${ENV.QDRANT_URL}/collections/codebase_chunks_768/points/search`, {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({
+				vector: { name: 'content', vector: queryEmbedding },
+				limit,
+				score_threshold: 0.3,
+				filter: qdrantFilter,
+				with_payload: true,
+			}),
+			signal: AbortSignal.timeout(10_000),
+		});
+		if (!res.ok) return null;
+		const parsed = (await res.json().catch(() => null)) as { result?: any[] } | null;
+		const results = parsed?.result ?? [];
 
 		if (results.length === 0) return null;
 

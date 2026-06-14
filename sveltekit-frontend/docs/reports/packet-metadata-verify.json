@@ -1,0 +1,247 @@
+{
+  "generatedAt": "2026-06-14T03:12:44.045Z",
+  "startedAt": "2026-06-14T03:12:43.875Z",
+  "databaseUrl": "postgresql://legal_admin:***@127.0.0.1:5434/legal_ai_db",
+  "tables": [
+    {
+      "tableName": "atlas_packets",
+      "exists": true,
+      "rowCount": 17476,
+      "presentColumns": [
+        "packet_key",
+        "source_ref",
+        "feature_id",
+        "feature_label",
+        "metadata",
+        "cluster_id",
+        "community_id",
+        "domain_class"
+      ],
+      "coverage": {
+        "packet_key": {
+          "count": 17476,
+          "pct": 100
+        },
+        "source_ref": {
+          "count": 8823,
+          "pct": 50.49
+        },
+        "feature_id": {
+          "count": 17476,
+          "pct": 100
+        },
+        "feature_label": {
+          "count": 17476,
+          "pct": 100
+        },
+        "metadata": {
+          "count": 17476,
+          "pct": 100
+        },
+        "cluster_id": {
+          "count": 11463,
+          "pct": 65.59
+        },
+        "community_id": {
+          "count": 17397,
+          "pct": 99.55
+        },
+        "domain_class": {
+          "count": 0,
+          "pct": 0
+        }
+      },
+      "notes": []
+    },
+    {
+      "tableName": "nes_chrom_packets",
+      "exists": true,
+      "rowCount": 14911,
+      "presentColumns": [
+        "packet_key",
+        "source_ref",
+        "feature_id",
+        "feature_label",
+        "metadata",
+        "community_id",
+        "som_cluster",
+        "domain_class"
+      ],
+      "coverage": {
+        "packet_key": {
+          "count": 14911,
+          "pct": 100
+        },
+        "source_ref": {
+          "count": 14911,
+          "pct": 100
+        },
+        "feature_id": {
+          "count": 14911,
+          "pct": 100
+        },
+        "feature_label": {
+          "count": 14911,
+          "pct": 100
+        },
+        "metadata": {
+          "count": 14911,
+          "pct": 100
+        },
+        "community_id": {
+          "count": 0,
+          "pct": 0
+        },
+        "som_cluster": {
+          "count": 16,
+          "pct": 0.11
+        },
+        "domain_class": {
+          "count": 0,
+          "pct": 0
+        }
+      },
+      "notes": []
+    },
+    {
+      "tableName": "route_runtime_packets",
+      "exists": true,
+      "rowCount": 1,
+      "presentColumns": [
+        "packet_key",
+        "source_ref",
+        "feature_id",
+        "feature_label",
+        "metadata",
+        "cluster_id",
+        "community_id",
+        "som_cluster",
+        "domain_class"
+      ],
+      "coverage": {
+        "packet_key": {
+          "count": 1,
+          "pct": 100
+        },
+        "source_ref": {
+          "count": 1,
+          "pct": 100
+        },
+        "feature_id": {
+          "count": 1,
+          "pct": 100
+        },
+        "feature_label": {
+          "count": 1,
+          "pct": 100
+        },
+        "metadata": {
+          "count": 1,
+          "pct": 100
+        },
+        "cluster_id": {
+          "count": 1,
+          "pct": 100
+        },
+        "community_id": {
+          "count": 0,
+          "pct": 0
+        },
+        "som_cluster": {
+          "count": 1,
+          "pct": 100
+        },
+        "domain_class": {
+          "count": 0,
+          "pct": 0
+        }
+      },
+      "notes": []
+    },
+    {
+      "tableName": "task_semantic_packets",
+      "exists": true,
+      "rowCount": 314,
+      "presentColumns": [
+        "packet_key",
+        "source_ref",
+        "feature_id",
+        "feature_label",
+        "metadata",
+        "cluster_id",
+        "community_id",
+        "domain_class"
+      ],
+      "coverage": {
+        "packet_key": {
+          "count": 314,
+          "pct": 100
+        },
+        "source_ref": {
+          "count": 314,
+          "pct": 100
+        },
+        "feature_id": {
+          "count": 309,
+          "pct": 98.41
+        },
+        "feature_label": {
+          "count": 309,
+          "pct": 98.41
+        },
+        "metadata": {
+          "count": 314,
+          "pct": 100
+        },
+        "cluster_id": {
+          "count": 0,
+          "pct": 0
+        },
+        "community_id": {
+          "count": 0,
+          "pct": 0
+        },
+        "domain_class": {
+          "count": 0,
+          "pct": 0
+        }
+      },
+      "notes": []
+    },
+    {
+      "tableName": "concept_records",
+      "exists": true,
+      "rowCount": 10,
+      "presentColumns": [
+        "metadata"
+      ],
+      "coverage": {
+        "metadata": {
+          "count": 10,
+          "pct": 100
+        }
+      },
+      "notes": []
+    }
+  ],
+  "missingTables": [],
+  "packetTables": [
+    "atlas_packets",
+    "nes_chrom_packets",
+    "route_runtime_packets",
+    "task_semantic_packets",
+    "concept_records"
+  ],
+  "summary": {
+    "packetTablesChecked": 5,
+    "rowTotal": 32712,
+    "featureIdCoverage": 32697,
+    "sourceRefCoverage": 24049,
+    "metadataCoverage": 32712,
+    "coveragePct": {
+      "feature_id": 99.95,
+      "source_ref": 73.52,
+      "metadata": 100
+    }
+  }
+}

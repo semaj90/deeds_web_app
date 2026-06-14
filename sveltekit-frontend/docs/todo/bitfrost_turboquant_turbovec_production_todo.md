@@ -1219,7 +1219,41 @@ Experimental lane only. Do not block retrieval, and do not move into this work u
   - qdrantTags
   - chunkIds
   - parentIds
-
+  metadata for retrieval and ACE synthesis
+ packet_id            | text                     |           | not null |
+ source_ref           | text                     |           |          |
+ feature_id           | text                     |           |          |
+ source_kind          | text                     |           |          |
+ source_path          | text                     |           |          |
+ source_ref_key       | text                     |           |          |
+ community_source     | text                     |           |          |
+ metadata             | jsonb                    |           |          | '{}'::jsonb
+    "atlas_packets_pkey" PRIMARY KEY, btree (packet_id)
+    "atlas_packets_feature_idx" btree (feature_id, community_id, cluster_id)
+    "atlas_packets_identity_idx" btree (packet_key, source_ref, feature_id, community_id) WHERE packet_key IS NOT NULL
+    "atlas_packets_metadata_gin_idx" gin (payload jsonb_path_ops)
+    "atlas_packets_metadata_hash_idx" btree ((metadata ->> 'hash'::text))
+    "atlas_packets_metadata_path_idx" btree ((metadata ->> 'path'::text))
+    "idx_atlas_packets_feature_id" btree (feature_id)
+    "idx_atlas_packets_feature_id_composite" btree (feature_id, community_id, cluster_id) WHERE feature_id IS NOT NULL
+    "idx_atlas_packets_feature_id_idx" btree (feature_id)
+    "idx_atlas_packets_metadata_domain" gin ((metadata -> 'domain'::text))
+    "idx_atlas_packets_metadata_feature_id" gin ((metadata -> 'feature_id'::text))
+    "idx_atlas_packets_metadata_gin" gin (metadata)
+    "idx_atlas_packets_metadata_som" gin ((metadata -> 'som'::text))
+    "idx_atlas_packets_source_kind" btree (source_kind)
+    "idx_atlas_packets_source_ref" btree (source_ref)
+    "idx_atlas_packets_source_ref_idx" btree (source_ref)
+    "idx_atlas_packets_source_ref_key" btree (source_ref_key)
+    "idx_packet_payload_feature" btree ((payload ->> 'feature_id'::text))
+    "idx_packets_agentic_grouping" btree ((payload ->> 'domain_class'::text), feature_id, source_ref) WHERE payload IS NOT NULL AND feature_id IS NOT NULL
+    "idx_packets_centroid_cache" btree (source_ref, feature_id, updated_at DESC) WHERE source_ref IS NOT NULL AND feature_id IS NOT NULL
+    "idx_packets_community_feature" btree (community_id, feature_id) WHERE community_id IS NOT NULL AND feature_id IS NOT NULL
+    "idx_packets_export_alignment" btree (source_ref, feature_id, created_at DESC) WHERE source_ref IS NOT NULL AND feature_id IS NOT NULL
+    "idx_packets_feature_count" btree (feature_id) WHERE feature_id IS NOT NULL
+    "idx_packets_qdrant_prefilter" btree (feature_id, (payload ->> 'domain_class'::text)) WHERE feature_id IS NOT NULL AND payload IS NOT NULL
+    "idx_packets_som_feature_grouping" gin ((payload -> 'som_cluster'::text), (payload -> 'feature_id'::text)) WHERE payload IS NOT NULL
+    "idx_packets_source_feature_multi_hop" btree (source_ref, feature_id) WHERE source_ref IS NOT NULL AND feature_id IS NOT NULL
 ---
 
 ### Phase 14 — DuckDB + LangGraph + Langfuse

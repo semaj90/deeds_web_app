@@ -53,6 +53,8 @@
     "atlas:feature-metadata:verify": "node sveltekit-frontend/scripts/atlas/backfill-feature-metadata.mjs --verify",
     "atlas:feature-metadata:backfill": "node sveltekit-frontend/scripts/atlas/backfill-feature-metadata.mjs",
     "atlas:feature-metadata:backfill:apply": "node sveltekit-frontend/scripts/atlas/backfill-feature-metadata.mjs --apply",
+    "atlas:qdrant-payload:sync:dry": "node sveltekit-frontend/scripts/atlas/sync-qdrant-packet-payload.mjs --dry",
+    "atlas:qdrant-payload:sync:apply": "node sveltekit-frontend/scripts/atlas/sync-qdrant-packet-payload.mjs --apply",
     "atlas:supernode:pressure:audit": "node scripts/atlas/audit-higher-hop-enrichment.mjs --save",
     "atlas:classify-supernode-pressure": "node scripts/atlas/classify-supernode-pressure.mjs --save",
     "atlas:seed-neo4j-used-concept:safe-only:dry": "node scripts/atlas/seed-neo4j-used-concept-edges.mjs --safe-only --save",

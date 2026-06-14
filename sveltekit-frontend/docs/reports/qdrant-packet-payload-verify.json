@@ -1,0 +1,3364 @@
+{
+  "generatedAt": "2026-06-14T03:15:36.703Z",
+  "startedAt": "2026-06-14T03:15:35.663Z",
+  "databaseUrl": "postgresql://legal_admin:***@127.0.0.1:5434/legal_ai_db",
+  "qdrantUrl": "http://127.0.0.1:6333",
+  "collection": "codebase_chunks_768",
+  "sampleLimit": 50,
+  "total": 50,
+  "pointFoundCount": 50,
+  "agreementCount": 0,
+  "mismatchCount": 50,
+  "missingCount": 0,
+  "agreementPct": 0,
+  "pointFoundPct": 100,
+  "fieldCoverage": {
+    "source_ref": {
+      "count": 50,
+      "pct": 100
+    },
+    "feature_id": {
+      "count": 20,
+      "pct": 40
+    },
+    "feature_label": {
+      "count": 0,
+      "pct": 0
+    },
+    "qdrant_tag_id": {
+      "count": 0,
+      "pct": 0
+    },
+    "cluster_id": {
+      "count": 0,
+      "pct": 0
+    },
+    "community_id": {
+      "count": 0,
+      "pct": 0
+    },
+    "som_cluster": {
+      "count": 0,
+      "pct": 0
+    },
+    "domain_class": {
+      "count": 0,
+      "pct": 0
+    },
+    "domain": {
+      "count": 0,
+      "pct": 0
+    },
+    "neo4j_node": {
+      "count": 0,
+      "pct": 0
+    },
+    "metadata": {
+      "count": 0,
+      "pct": 0
+    }
+  },
+  "samples": [
+    {
+      "id": "e0226ded9d79084d",
+      "source_ref": "proto:CyberElephantService.HealthCheck",
+      "packet_key": "e0226ded9d79084d",
+      "qdrant_point_id": 3410190877,
+      "comparable": 4,
+      "matched": 1,
+      "allComparableMatch": false,
+      "comparison": {
+        "source_ref": {
+          "pg": "proto:CyberElephantService.HealthCheck",
+          "qdrant": "proto:CyberElephantService.HealthCheck",
+          "match": true
+        },
+        "feature_id": {
+          "pg": "grpc_service",
+          "qdrant": "grpc_cyberelephantservice",
+          "match": false
+        },
+        "feature_label": {
+          "pg": "Grpc Service",
+          "qdrant": "CyberElephantService.HealthCheck",
+          "match": false
+        },
+        "qdrant_tag_id": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "cluster_id": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "community_id": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "som_cluster": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "domain_class": {
+          "pg": null,
+          "qdrant": "mcp_agents",
+          "match": false
+        },
+        "domain": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "neo4j_node": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "metadata": {
+          "pg": {},
+          "qdrant": null,
+          "match": false
+        }
+      }
+    },
+    {
+      "id": "cbd1423a7a39317f",
+      "source_ref": "proto:CyberElephantService.GetStatus",
+      "packet_key": "cbd1423a7a39317f",
+      "qdrant_point_id": 3075341653,
+      "comparable": 4,
+      "matched": 1,
+      "allComparableMatch": false,
+      "comparison": {
+        "source_ref": {
+          "pg": "proto:CyberElephantService.GetStatus",
+          "qdrant": "proto:CyberElephantService.GetStatus",
+          "match": true
+        },
+        "feature_id": {
+          "pg": "grpc_service",
+          "qdrant": "grpc_cyberelephantservice",
+          "match": false
+        },
+        "feature_label": {
+          "pg": "Grpc Service",
+          "qdrant": "CyberElephantService.GetStatus",
+          "match": false
+        },
+        "qdrant_tag_id": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "cluster_id": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "community_id": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "som_cluster": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "domain_class": {
+          "pg": null,
+          "qdrant": "mcp_agents",
+          "match": false
+        },
+        "domain": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "neo4j_node": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "metadata": {
+          "pg": {},
+          "qdrant": null,
+          "match": false
+        }
+      }
+    },
+    {
+      "id": "4439c492e016f9d3",
+      "source_ref": "proto:CyberElephantService.UpdateClusters",
+      "packet_key": "4439c492e016f9d3",
+      "qdrant_point_id": 1144636562,
+      "comparable": 4,
+      "matched": 2,
+      "allComparableMatch": false,
+      "comparison": {
+        "source_ref": {
+          "pg": "proto:CyberElephantService.UpdateClusters",
+          "qdrant": "proto:CyberElephantService.UpdateClusters",
+          "match": true
+        },
+        "feature_id": {
+          "pg": "grpc_service",
+          "qdrant": "grpc_service",
+          "match": true
+        },
+        "feature_label": {
+          "pg": "Grpc Service",
+          "qdrant": "gRPC Proto Services",
+          "match": false
+        },
+        "qdrant_tag_id": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "cluster_id": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "community_id": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "som_cluster": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "domain_class": {
+          "pg": null,
+          "qdrant": "mcp_agents",
+          "match": false
+        },
+        "domain": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "neo4j_node": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "metadata": {
+          "pg": {},
+          "qdrant": null,
+          "match": false
+        }
+      }
+    },
+    {
+      "id": "271b5446f6a86a48",
+      "source_ref": "proto:CyberElephantService.GetClusters",
+      "packet_key": "271b5446f6a86a48",
+      "qdrant_point_id": 656102470,
+      "comparable": 4,
+      "matched": 2,
+      "allComparableMatch": false,
+      "comparison": {
+        "source_ref": {
+          "pg": "proto:CyberElephantService.GetClusters",
+          "qdrant": "proto:CyberElephantService.GetClusters",
+          "match": true
+        },
+        "feature_id": {
+          "pg": "grpc_service",
+          "qdrant": "grpc_service",
+          "match": true
+        },
+        "feature_label": {
+          "pg": "Grpc Service",
+          "qdrant": "gRPC Proto Services",
+          "match": false
+        },
+        "qdrant_tag_id": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "cluster_id": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "community_id": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "som_cluster": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "domain_class": {
+          "pg": null,
+          "qdrant": "mcp_agents",
+          "match": false
+        },
+        "domain": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "neo4j_node": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "metadata": {
+          "pg": {},
+          "qdrant": null,
+          "match": false
+        }
+      }
+    },
+    {
+      "id": "bb446aa53705f58d",
+      "source_ref": "proto:CyberElephantService.GetDocumentById",
+      "packet_key": "bb446aa53705f58d",
+      "qdrant_point_id": 3141823141,
+      "comparable": 4,
+      "matched": 2,
+      "allComparableMatch": false,
+      "comparison": {
+        "source_ref": {
+          "pg": "proto:CyberElephantService.GetDocumentById",
+          "qdrant": "proto:CyberElephantService.GetDocumentById",
+          "match": true
+        },
+        "feature_id": {
+          "pg": "grpc_service",
+          "qdrant": "grpc_service",
+          "match": true
+        },
+        "feature_label": {
+          "pg": "Grpc Service",
+          "qdrant": "gRPC Proto Services",
+          "match": false
+        },
+        "qdrant_tag_id": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "cluster_id": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "community_id": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "som_cluster": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "domain_class": {
+          "pg": null,
+          "qdrant": "mcp_agents",
+          "match": false
+        },
+        "domain": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "neo4j_node": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "metadata": {
+          "pg": {},
+          "qdrant": null,
+          "match": false
+        }
+      }
+    },
+    {
+      "id": "aae4f83738c25068",
+      "source_ref": "proto:CyberElephantService.SearchSimilar",
+      "packet_key": "aae4f83738c25068",
+      "qdrant_point_id": 732735606,
+      "comparable": 4,
+      "matched": 1,
+      "allComparableMatch": false,
+      "comparison": {
+        "source_ref": {
+          "pg": "proto:CyberElephantService.SearchSimilar",
+          "qdrant": "proto:CyberElephantService.SearchSimilar",
+          "match": true
+        },
+        "feature_id": {
+          "pg": "grpc_service",
+          "qdrant": "grpc_cyberelephantservice",
+          "match": false
+        },
+        "feature_label": {
+          "pg": "Grpc Service",
+          "qdrant": "CyberElephantService.SearchSimilar",
+          "match": false
+        },
+        "qdrant_tag_id": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "cluster_id": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "community_id": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "som_cluster": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "domain_class": {
+          "pg": null,
+          "qdrant": "mcp_agents",
+          "match": false
+        },
+        "domain": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "neo4j_node": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "metadata": {
+          "pg": {},
+          "qdrant": null,
+          "match": false
+        }
+      }
+    },
+    {
+      "id": "885c6c04322f6095",
+      "source_ref": "proto:CyberElephantService.ProcessDocuments",
+      "packet_key": "885c6c04322f6095",
+      "qdrant_point_id": 2163229800,
+      "comparable": 4,
+      "matched": 1,
+      "allComparableMatch": false,
+      "comparison": {
+        "source_ref": {
+          "pg": "proto:CyberElephantService.ProcessDocuments",
+          "qdrant": "proto:CyberElephantService.ProcessDocuments",
+          "match": true
+        },
+        "feature_id": {
+          "pg": "grpc_service",
+          "qdrant": "grpc_cyberelephantservice",
+          "match": false
+        },
+        "feature_label": {
+          "pg": "Grpc Service",
+          "qdrant": "CyberElephantService.ProcessDocuments",
+          "match": false
+        },
+        "qdrant_tag_id": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "cluster_id": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "community_id": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "som_cluster": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "domain_class": {
+          "pg": null,
+          "qdrant": "mcp_agents",
+          "match": false
+        },
+        "domain": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "neo4j_node": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "metadata": {
+          "pg": {},
+          "qdrant": null,
+          "match": false
+        }
+      }
+    },
+    {
+      "id": "e0575029cec50639",
+      "source_ref": "proto:TurboVecCudaService.Upsert",
+      "packet_key": "e0575029cec50639",
+      "qdrant_point_id": 3420072431,
+      "comparable": 4,
+      "matched": 1,
+      "allComparableMatch": false,
+      "comparison": {
+        "source_ref": {
+          "pg": "proto:TurboVecCudaService.Upsert",
+          "qdrant": "proto:TurboVecCudaService.Upsert",
+          "match": true
+        },
+        "feature_id": {
+          "pg": "grpc_service",
+          "qdrant": "grpc_turboveccudaservice",
+          "match": false
+        },
+        "feature_label": {
+          "pg": "Grpc Service",
+          "qdrant": "TurboVecCudaService.Upsert",
+          "match": false
+        },
+        "qdrant_tag_id": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "cluster_id": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "community_id": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "som_cluster": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "domain_class": {
+          "pg": null,
+          "qdrant": "mcp_agents",
+          "match": false
+        },
+        "domain": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "neo4j_node": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "metadata": {
+          "pg": {},
+          "qdrant": null,
+          "match": false
+        }
+      }
+    },
+    {
+      "id": "0ee918abc8c53e8d",
+      "source_ref": "proto:TurboVecCudaService.Transform",
+      "packet_key": "0ee918abc8c53e8d",
+      "qdrant_point_id": 250157227,
+      "comparable": 4,
+      "matched": 2,
+      "allComparableMatch": false,
+      "comparison": {
+        "source_ref": {
+          "pg": "proto:TurboVecCudaService.Transform",
+          "qdrant": "proto:TurboVecCudaService.Transform",
+          "match": true
+        },
+        "feature_id": {
+          "pg": "grpc_service",
+          "qdrant": "grpc_service",
+          "match": true
+        },
+        "feature_label": {
+          "pg": "Grpc Service",
+          "qdrant": "gRPC Proto Services",
+          "match": false
+        },
+        "qdrant_tag_id": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "cluster_id": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "community_id": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "som_cluster": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "domain_class": {
+          "pg": null,
+          "qdrant": "mcp_agents",
+          "match": false
+        },
+        "domain": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "neo4j_node": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "metadata": {
+          "pg": {},
+          "qdrant": null,
+          "match": false
+        }
+      }
+    },
+    {
+      "id": "e172f5aebbfe0f3e",
+      "source_ref": "proto:TurboVecCudaService.AssignSom",
+      "packet_key": "e172f5aebbfe0f3e",
+      "qdrant_point_id": 3782407598,
+      "comparable": 4,
+      "matched": 2,
+      "allComparableMatch": false,
+      "comparison": {
+        "source_ref": {
+          "pg": "proto:TurboVecCudaService.AssignSom",
+          "qdrant": "proto:TurboVecCudaService.AssignSom",
+          "match": true
+        },
+        "feature_id": {
+          "pg": "grpc_service",
+          "qdrant": "grpc_service",
+          "match": true
+        },
+        "feature_label": {
+          "pg": "Grpc Service",
+          "qdrant": "gRPC Proto Services",
+          "match": false
+        },
+        "qdrant_tag_id": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "cluster_id": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "community_id": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "som_cluster": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "domain_class": {
+          "pg": null,
+          "qdrant": "mcp_agents",
+          "match": false
+        },
+        "domain": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "neo4j_node": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "metadata": {
+          "pg": {},
+          "qdrant": null,
+          "match": false
+        }
+      }
+    },
+    {
+      "id": "613f572a65b1ffcc",
+      "source_ref": "proto:TurboVecCudaService.EncodeLatent",
+      "packet_key": "613f572a65b1ffcc",
+      "qdrant_point_id": 1631541034,
+      "comparable": 4,
+      "matched": 2,
+      "allComparableMatch": false,
+      "comparison": {
+        "source_ref": {
+          "pg": "proto:TurboVecCudaService.EncodeLatent",
+          "qdrant": "proto:TurboVecCudaService.EncodeLatent",
+          "match": true
+        },
+        "feature_id": {
+          "pg": "grpc_service",
+          "qdrant": "grpc_service",
+          "match": true
+        },
+        "feature_label": {
+          "pg": "Grpc Service",
+          "qdrant": "gRPC Proto Services",
+          "match": false
+        },
+        "qdrant_tag_id": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "cluster_id": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "community_id": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "som_cluster": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "domain_class": {
+          "pg": null,
+          "qdrant": "mcp_agents",
+          "match": false
+        },
+        "domain": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "neo4j_node": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "metadata": {
+          "pg": {},
+          "qdrant": null,
+          "match": false
+        }
+      }
+    },
+    {
+      "id": "c91eb4c9cb71b033",
+      "source_ref": "proto:TurboVecCudaService.BatchCosine",
+      "packet_key": "c91eb4c9cb71b033",
+      "qdrant_point_id": 192089017,
+      "comparable": 4,
+      "matched": 1,
+      "allComparableMatch": false,
+      "comparison": {
+        "source_ref": {
+          "pg": "proto:TurboVecCudaService.BatchCosine",
+          "qdrant": "proto:TurboVecCudaService.BatchCosine",
+          "match": true
+        },
+        "feature_id": {
+          "pg": "grpc_service",
+          "qdrant": "grpc_turboveccudaservice",
+          "match": false
+        },
+        "feature_label": {
+          "pg": "Grpc Service",
+          "qdrant": "TurboVecCudaService.BatchCosine",
+          "match": false
+        },
+        "qdrant_tag_id": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "cluster_id": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "community_id": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "som_cluster": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "domain_class": {
+          "pg": null,
+          "qdrant": "mcp_agents",
+          "match": false
+        },
+        "domain": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "neo4j_node": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "metadata": {
+          "pg": {},
+          "qdrant": null,
+          "match": false
+        }
+      }
+    },
+    {
+      "id": "35afe6ea3fdb17b8",
+      "source_ref": "proto:TurboVecCudaService.Search",
+      "packet_key": "35afe6ea3fdb17b8",
+      "qdrant_point_id": 900720362,
+      "comparable": 4,
+      "matched": 2,
+      "allComparableMatch": false,
+      "comparison": {
+        "source_ref": {
+          "pg": "proto:TurboVecCudaService.Search",
+          "qdrant": "proto:TurboVecCudaService.Search",
+          "match": true
+        },
+        "feature_id": {
+          "pg": "grpc_service",
+          "qdrant": "grpc_service",
+          "match": true
+        },
+        "feature_label": {
+          "pg": "Grpc Service",
+          "qdrant": "gRPC Proto Services",
+          "match": false
+        },
+        "qdrant_tag_id": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "cluster_id": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "community_id": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "som_cluster": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "domain_class": {
+          "pg": null,
+          "qdrant": "mcp_agents",
+          "match": false
+        },
+        "domain": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "neo4j_node": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "metadata": {
+          "pg": {},
+          "qdrant": null,
+          "match": false
+        }
+      }
+    },
+    {
+      "id": "ea68da38382c1b3e",
+      "source_ref": "proto:TurboVecCudaService.Health",
+      "packet_key": "ea68da38382c1b3e",
+      "qdrant_point_id": 14544441,
+      "comparable": 4,
+      "matched": 1,
+      "allComparableMatch": false,
+      "comparison": {
+        "source_ref": {
+          "pg": "proto:TurboVecCudaService.Health",
+          "qdrant": "proto:TurboVecCudaService.Health",
+          "match": true
+        },
+        "feature_id": {
+          "pg": "grpc_service",
+          "qdrant": "grpc_turboveccudaservice",
+          "match": false
+        },
+        "feature_label": {
+          "pg": "Grpc Service",
+          "qdrant": "TurboVecCudaService.Health",
+          "match": false
+        },
+        "qdrant_tag_id": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "cluster_id": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "community_id": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "som_cluster": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "domain_class": {
+          "pg": null,
+          "qdrant": "mcp_agents",
+          "match": false
+        },
+        "domain": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "neo4j_node": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "metadata": {
+          "pg": {},
+          "qdrant": null,
+          "match": false
+        }
+      }
+    },
+    {
+      "id": "43f38d7b75868c7c",
+      "source_ref": "proto:TurboVecService.Upsert",
+      "packet_key": "43f38d7b75868c7c",
+      "qdrant_point_id": 1140034939,
+      "comparable": 4,
+      "matched": 2,
+      "allComparableMatch": false,
+      "comparison": {
+        "source_ref": {
+          "pg": "proto:TurboVecService.Upsert",
+          "qdrant": "proto:TurboVecService.Upsert",
+          "match": true
+        },
+        "feature_id": {
+          "pg": "grpc_service",
+          "qdrant": "grpc_service",
+          "match": true
+        },
+        "feature_label": {
+          "pg": "Grpc Service",
+          "qdrant": "gRPC Proto Services",
+          "match": false
+        },
+        "qdrant_tag_id": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "cluster_id": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "community_id": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "som_cluster": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "domain_class": {
+          "pg": null,
+          "qdrant": "mcp_agents",
+          "match": false
+        },
+        "domain": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "neo4j_node": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "metadata": {
+          "pg": {},
+          "qdrant": null,
+          "match": false
+        }
+      }
+    },
+    {
+      "id": "175066b8a4ceee3c",
+      "source_ref": "proto:TurboVecService.Transform",
+      "packet_key": "175066b8a4ceee3c",
+      "qdrant_point_id": 391145144,
+      "comparable": 4,
+      "matched": 2,
+      "allComparableMatch": false,
+      "comparison": {
+        "source_ref": {
+          "pg": "proto:TurboVecService.Transform",
+          "qdrant": "proto:TurboVecService.Transform",
+          "match": true
+        },
+        "feature_id": {
+          "pg": "grpc_service",
+          "qdrant": "grpc_service",
+          "match": true
+        },
+        "feature_label": {
+          "pg": "Grpc Service",
+          "qdrant": "gRPC Proto Services",
+          "match": false
+        },
+        "qdrant_tag_id": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "cluster_id": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "community_id": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "som_cluster": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "domain_class": {
+          "pg": null,
+          "qdrant": "mcp_agents",
+          "match": false
+        },
+        "domain": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "neo4j_node": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "metadata": {
+          "pg": {},
+          "qdrant": null,
+          "match": false
+        }
+      }
+    },
+    {
+      "id": "e005fe879bb41ec6",
+      "source_ref": "proto:TurboVecService.Search",
+      "packet_key": "e005fe879bb41ec6",
+      "qdrant_point_id": 3080899280,
+      "comparable": 4,
+      "matched": 1,
+      "allComparableMatch": false,
+      "comparison": {
+        "source_ref": {
+          "pg": "proto:TurboVecService.Search",
+          "qdrant": "proto:TurboVecService.Search",
+          "match": true
+        },
+        "feature_id": {
+          "pg": "grpc_service",
+          "qdrant": "grpc_turbovecservice",
+          "match": false
+        },
+        "feature_label": {
+          "pg": "Grpc Service",
+          "qdrant": "TurboVecService.Search",
+          "match": false
+        },
+        "qdrant_tag_id": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "cluster_id": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "community_id": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "som_cluster": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "domain_class": {
+          "pg": null,
+          "qdrant": "mcp_agents",
+          "match": false
+        },
+        "domain": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "neo4j_node": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "metadata": {
+          "pg": {},
+          "qdrant": null,
+          "match": false
+        }
+      }
+    },
+    {
+      "id": "54fb19b574528f1a",
+      "source_ref": "proto:TurboVecService.Health",
+      "packet_key": "54fb19b574528f1a",
+      "qdrant_point_id": 1425742261,
+      "comparable": 4,
+      "matched": 2,
+      "allComparableMatch": false,
+      "comparison": {
+        "source_ref": {
+          "pg": "proto:TurboVecService.Health",
+          "qdrant": "proto:TurboVecService.Health",
+          "match": true
+        },
+        "feature_id": {
+          "pg": "grpc_service",
+          "qdrant": "grpc_service",
+          "match": true
+        },
+        "feature_label": {
+          "pg": "Grpc Service",
+          "qdrant": "gRPC Proto Services",
+          "match": false
+        },
+        "qdrant_tag_id": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "cluster_id": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "community_id": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "som_cluster": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "domain_class": {
+          "pg": null,
+          "qdrant": "mcp_agents",
+          "match": false
+        },
+        "domain": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "neo4j_node": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "metadata": {
+          "pg": {},
+          "qdrant": null,
+          "match": false
+        }
+      }
+    },
+    {
+      "id": "ba2929dea127c94b",
+      "source_ref": "proto:ToolCallingService.ListTools",
+      "packet_key": "ba2929dea127c94b",
+      "qdrant_point_id": 112241639,
+      "comparable": 4,
+      "matched": 1,
+      "allComparableMatch": false,
+      "comparison": {
+        "source_ref": {
+          "pg": "proto:ToolCallingService.ListTools",
+          "qdrant": "proto:ToolCallingService.ListTools",
+          "match": true
+        },
+        "feature_id": {
+          "pg": "grpc_service",
+          "qdrant": "grpc_toolcallingservice",
+          "match": false
+        },
+        "feature_label": {
+          "pg": "Grpc Service",
+          "qdrant": "ToolCallingService.ListTools",
+          "match": false
+        },
+        "qdrant_tag_id": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "cluster_id": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "community_id": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "som_cluster": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "domain_class": {
+          "pg": null,
+          "qdrant": "mcp_agents",
+          "match": false
+        },
+        "domain": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "neo4j_node": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "metadata": {
+          "pg": {},
+          "qdrant": null,
+          "match": false
+        }
+      }
+    },
+    {
+      "id": "53f30b2bfd5e68b9",
+      "source_ref": "proto:ToolCallingService.ExecuteToolStream",
+      "packet_key": "53f30b2bfd5e68b9",
+      "qdrant_point_id": 1408437035,
+      "comparable": 4,
+      "matched": 2,
+      "allComparableMatch": false,
+      "comparison": {
+        "source_ref": {
+          "pg": "proto:ToolCallingService.ExecuteToolStream",
+          "qdrant": "proto:ToolCallingService.ExecuteToolStream",
+          "match": true
+        },
+        "feature_id": {
+          "pg": "grpc_service",
+          "qdrant": "grpc_service",
+          "match": true
+        },
+        "feature_label": {
+          "pg": "Grpc Service",
+          "qdrant": "gRPC Proto Services",
+          "match": false
+        },
+        "qdrant_tag_id": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "cluster_id": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "community_id": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "som_cluster": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "domain_class": {
+          "pg": null,
+          "qdrant": "mcp_agents",
+          "match": false
+        },
+        "domain": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "neo4j_node": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "metadata": {
+          "pg": {},
+          "qdrant": null,
+          "match": false
+        }
+      }
+    },
+    {
+      "id": "0bffe0382a0d44bb",
+      "source_ref": "proto:ToolCallingService.ExecuteToolBatch",
+      "packet_key": "0bffe0382a0d44bb",
+      "qdrant_point_id": 201318456,
+      "comparable": 4,
+      "matched": 2,
+      "allComparableMatch": false,
+      "comparison": {
+        "source_ref": {
+          "pg": "proto:ToolCallingService.ExecuteToolBatch",
+          "qdrant": "proto:ToolCallingService.ExecuteToolBatch",
+          "match": true
+        },
+        "feature_id": {
+          "pg": "grpc_service",
+          "qdrant": "grpc_service",
+          "match": true
+        },
+        "feature_label": {
+          "pg": "Grpc Service",
+          "qdrant": "gRPC Proto Services",
+          "match": false
+        },
+        "qdrant_tag_id": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "cluster_id": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "community_id": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "som_cluster": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "domain_class": {
+          "pg": null,
+          "qdrant": "mcp_agents",
+          "match": false
+        },
+        "domain": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "neo4j_node": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "metadata": {
+          "pg": {},
+          "qdrant": null,
+          "match": false
+        }
+      }
+    },
+    {
+      "id": "40ce2356b07edded",
+      "source_ref": "proto:ToolCallingService.ExecuteTool",
+      "packet_key": "40ce2356b07edded",
+      "qdrant_point_id": 874010683,
+      "comparable": 4,
+      "matched": 1,
+      "allComparableMatch": false,
+      "comparison": {
+        "source_ref": {
+          "pg": "proto:ToolCallingService.ExecuteTool",
+          "qdrant": "proto:ToolCallingService.ExecuteTool",
+          "match": true
+        },
+        "feature_id": {
+          "pg": "grpc_service",
+          "qdrant": "grpc_toolcallingservice",
+          "match": false
+        },
+        "feature_label": {
+          "pg": "Grpc Service",
+          "qdrant": "ToolCallingService.ExecuteTool",
+          "match": false
+        },
+        "qdrant_tag_id": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "cluster_id": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "community_id": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "som_cluster": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "domain_class": {
+          "pg": null,
+          "qdrant": "mcp_agents",
+          "match": false
+        },
+        "domain": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "neo4j_node": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "metadata": {
+          "pg": {},
+          "qdrant": null,
+          "match": false
+        }
+      }
+    },
+    {
+      "id": "0ba2345cd9c542fa",
+      "source_ref": "proto:RetrievalService.Health",
+      "packet_key": "0ba2345cd9c542fa",
+      "qdrant_point_id": 195179612,
+      "comparable": 4,
+      "matched": 2,
+      "allComparableMatch": false,
+      "comparison": {
+        "source_ref": {
+          "pg": "proto:RetrievalService.Health",
+          "qdrant": "proto:RetrievalService.Health",
+          "match": true
+        },
+        "feature_id": {
+          "pg": "grpc_service",
+          "qdrant": "grpc_service",
+          "match": true
+        },
+        "feature_label": {
+          "pg": "Grpc Service",
+          "qdrant": "gRPC Proto Services",
+          "match": false
+        },
+        "qdrant_tag_id": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "cluster_id": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "community_id": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "som_cluster": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "domain_class": {
+          "pg": null,
+          "qdrant": "mcp_agents",
+          "match": false
+        },
+        "domain": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "neo4j_node": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "metadata": {
+          "pg": {},
+          "qdrant": null,
+          "match": false
+        }
+      }
+    },
+    {
+      "id": "dd3e87c085ff1b69",
+      "source_ref": "proto:RetrievalService.GetResearchContext",
+      "packet_key": "dd3e87c085ff1b69",
+      "qdrant_point_id": 1493930449,
+      "comparable": 4,
+      "matched": 1,
+      "allComparableMatch": false,
+      "comparison": {
+        "source_ref": {
+          "pg": "proto:RetrievalService.GetResearchContext",
+          "qdrant": "proto:RetrievalService.GetResearchContext",
+          "match": true
+        },
+        "feature_id": {
+          "pg": "grpc_service",
+          "qdrant": "grpc_method_getresearchcontext",
+          "match": false
+        },
+        "feature_label": {
+          "pg": "Grpc Service",
+          "qdrant": "RetrievalService.GetResearchContext",
+          "match": false
+        },
+        "qdrant_tag_id": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "cluster_id": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "community_id": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "som_cluster": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "domain_class": {
+          "pg": null,
+          "qdrant": "mcp_agents",
+          "match": false
+        },
+        "domain": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "neo4j_node": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "metadata": {
+          "pg": {},
+          "qdrant": null,
+          "match": false
+        }
+      }
+    },
+    {
+      "id": "322b9cf893125f07",
+      "source_ref": "proto:RetrievalService.GetTopologyContext",
+      "packet_key": "322b9cf893125f07",
+      "qdrant_point_id": 841719032,
+      "comparable": 4,
+      "matched": 2,
+      "allComparableMatch": false,
+      "comparison": {
+        "source_ref": {
+          "pg": "proto:RetrievalService.GetTopologyContext",
+          "qdrant": "proto:RetrievalService.GetTopologyContext",
+          "match": true
+        },
+        "feature_id": {
+          "pg": "grpc_service",
+          "qdrant": "grpc_service",
+          "match": true
+        },
+        "feature_label": {
+          "pg": "Grpc Service",
+          "qdrant": "gRPC Proto Services",
+          "match": false
+        },
+        "qdrant_tag_id": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "cluster_id": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "community_id": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "som_cluster": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "domain_class": {
+          "pg": null,
+          "qdrant": "mcp_agents",
+          "match": false
+        },
+        "domain": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "neo4j_node": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "metadata": {
+          "pg": {},
+          "qdrant": null,
+          "match": false
+        }
+      }
+    },
+    {
+      "id": "d1ae3babc408287b",
+      "source_ref": "proto:RetrievalService.ExpandAstNeighbors",
+      "packet_key": "d1ae3babc408287b",
+      "qdrant_point_id": 412707819,
+      "comparable": 4,
+      "matched": 1,
+      "allComparableMatch": false,
+      "comparison": {
+        "source_ref": {
+          "pg": "proto:RetrievalService.ExpandAstNeighbors",
+          "qdrant": "proto:RetrievalService.ExpandAstNeighbors",
+          "match": true
+        },
+        "feature_id": {
+          "pg": "grpc_service",
+          "qdrant": "grpc_retrievalservice",
+          "match": false
+        },
+        "feature_label": {
+          "pg": "Grpc Service",
+          "qdrant": "RetrievalService.ExpandAstNeighbors",
+          "match": false
+        },
+        "qdrant_tag_id": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "cluster_id": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "community_id": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "som_cluster": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "domain_class": {
+          "pg": null,
+          "qdrant": "mcp_agents",
+          "match": false
+        },
+        "domain": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "neo4j_node": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "metadata": {
+          "pg": {},
+          "qdrant": null,
+          "match": false
+        }
+      }
+    },
+    {
+      "id": "c6e9ace45ef36e52",
+      "source_ref": "proto:RetrievalService.GetClusterSummary",
+      "packet_key": "c6e9ace45ef36e52",
+      "qdrant_point_id": 1942828463,
+      "comparable": 4,
+      "matched": 1,
+      "allComparableMatch": false,
+      "comparison": {
+        "source_ref": {
+          "pg": "proto:RetrievalService.GetClusterSummary",
+          "qdrant": "proto:RetrievalService.GetClusterSummary",
+          "match": true
+        },
+        "feature_id": {
+          "pg": "grpc_service",
+          "qdrant": "grpc_method_getclustersummary",
+          "match": false
+        },
+        "feature_label": {
+          "pg": "Grpc Service",
+          "qdrant": "RetrievalService.GetClusterSummary",
+          "match": false
+        },
+        "qdrant_tag_id": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "cluster_id": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "community_id": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "som_cluster": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "domain_class": {
+          "pg": null,
+          "qdrant": "mcp_agents",
+          "match": false
+        },
+        "domain": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "neo4j_node": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "metadata": {
+          "pg": {},
+          "qdrant": null,
+          "match": false
+        }
+      }
+    },
+    {
+      "id": "3d0da82598d9064a",
+      "source_ref": "proto:RetrievalService.SearchChunks",
+      "packet_key": "3d0da82598d9064a",
+      "qdrant_point_id": 992455425,
+      "comparable": 4,
+      "matched": 1,
+      "allComparableMatch": false,
+      "comparison": {
+        "source_ref": {
+          "pg": "proto:RetrievalService.SearchChunks",
+          "qdrant": "proto:RetrievalService.SearchChunks",
+          "match": true
+        },
+        "feature_id": {
+          "pg": "grpc_service",
+          "qdrant": "grpc_method_searchchunks",
+          "match": false
+        },
+        "feature_label": {
+          "pg": "Grpc Service",
+          "qdrant": "RetrievalService.SearchChunks",
+          "match": false
+        },
+        "qdrant_tag_id": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "cluster_id": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "community_id": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "som_cluster": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "domain_class": {
+          "pg": null,
+          "qdrant": "mcp_agents",
+          "match": false
+        },
+        "domain": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "neo4j_node": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "metadata": {
+          "pg": {},
+          "qdrant": null,
+          "match": false
+        }
+      }
+    },
+    {
+      "id": "368c71501e9385c5",
+      "source_ref": "proto:RetrievalService.StreamCodebase",
+      "packet_key": "368c71501e9385c5",
+      "qdrant_point_id": 779927343,
+      "comparable": 4,
+      "matched": 1,
+      "allComparableMatch": false,
+      "comparison": {
+        "source_ref": {
+          "pg": "proto:RetrievalService.StreamCodebase",
+          "qdrant": "proto:RetrievalService.StreamCodebase",
+          "match": true
+        },
+        "feature_id": {
+          "pg": "grpc_service",
+          "qdrant": "grpc_method_streamcodebase",
+          "match": false
+        },
+        "feature_label": {
+          "pg": "Grpc Service",
+          "qdrant": "RetrievalService.StreamCodebase",
+          "match": false
+        },
+        "qdrant_tag_id": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "cluster_id": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "community_id": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "som_cluster": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "domain_class": {
+          "pg": null,
+          "qdrant": "mcp_agents",
+          "match": false
+        },
+        "domain": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "neo4j_node": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "metadata": {
+          "pg": {},
+          "qdrant": null,
+          "match": false
+        }
+      }
+    },
+    {
+      "id": "32c7446a769f9c86",
+      "source_ref": "proto:RetrievalService.SearchCodebase",
+      "packet_key": "32c7446a769f9c86",
+      "qdrant_point_id": 851919978,
+      "comparable": 4,
+      "matched": 2,
+      "allComparableMatch": false,
+      "comparison": {
+        "source_ref": {
+          "pg": "proto:RetrievalService.SearchCodebase",
+          "qdrant": "proto:RetrievalService.SearchCodebase",
+          "match": true
+        },
+        "feature_id": {
+          "pg": "grpc_service",
+          "qdrant": "grpc_service",
+          "match": true
+        },
+        "feature_label": {
+          "pg": "Grpc Service",
+          "qdrant": "gRPC Proto Services",
+          "match": false
+        },
+        "qdrant_tag_id": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "cluster_id": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "community_id": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "som_cluster": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "domain_class": {
+          "pg": null,
+          "qdrant": "mcp_agents",
+          "match": false
+        },
+        "domain": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "neo4j_node": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "metadata": {
+          "pg": {},
+          "qdrant": null,
+          "match": false
+        }
+      }
+    },
+    {
+      "id": "c6cd8b39d33db2aa",
+      "source_ref": "proto:RetrievalService.StreamEvidence",
+      "packet_key": "c6cd8b39d33db2aa",
+      "qdrant_point_id": 2030462792,
+      "comparable": 4,
+      "matched": 1,
+      "allComparableMatch": false,
+      "comparison": {
+        "source_ref": {
+          "pg": "proto:RetrievalService.StreamEvidence",
+          "qdrant": "proto:RetrievalService.StreamEvidence",
+          "match": true
+        },
+        "feature_id": {
+          "pg": "grpc_service",
+          "qdrant": "grpc_method_streamevidence",
+          "match": false
+        },
+        "feature_label": {
+          "pg": "Grpc Service",
+          "qdrant": "RetrievalService.StreamEvidence",
+          "match": false
+        },
+        "qdrant_tag_id": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "cluster_id": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "community_id": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "som_cluster": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "domain_class": {
+          "pg": null,
+          "qdrant": "mcp_agents",
+          "match": false
+        },
+        "domain": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "neo4j_node": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "metadata": {
+          "pg": {},
+          "qdrant": null,
+          "match": false
+        }
+      }
+    },
+    {
+      "id": "38da098bc2c36c22",
+      "source_ref": "proto:RetrievalService.SearchEvidence",
+      "packet_key": "38da098bc2c36c22",
+      "qdrant_point_id": 699997601,
+      "comparable": 4,
+      "matched": 1,
+      "allComparableMatch": false,
+      "comparison": {
+        "source_ref": {
+          "pg": "proto:RetrievalService.SearchEvidence",
+          "qdrant": "proto:RetrievalService.SearchEvidence",
+          "match": true
+        },
+        "feature_id": {
+          "pg": "grpc_service",
+          "qdrant": "grpc_retrievalservice",
+          "match": false
+        },
+        "feature_label": {
+          "pg": "Grpc Service",
+          "qdrant": "RetrievalService.SearchEvidence",
+          "match": false
+        },
+        "qdrant_tag_id": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "cluster_id": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "community_id": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "som_cluster": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "domain_class": {
+          "pg": null,
+          "qdrant": "mcp_agents",
+          "match": false
+        },
+        "domain": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "neo4j_node": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "metadata": {
+          "pg": {},
+          "qdrant": null,
+          "match": false
+        }
+      }
+    },
+    {
+      "id": "1703d9c005252a62",
+      "source_ref": "proto:LibrarySearchService.Health",
+      "packet_key": "1703d9c005252a62",
+      "qdrant_point_id": 386128320,
+      "comparable": 4,
+      "matched": 2,
+      "allComparableMatch": false,
+      "comparison": {
+        "source_ref": {
+          "pg": "proto:LibrarySearchService.Health",
+          "qdrant": "proto:LibrarySearchService.Health",
+          "match": true
+        },
+        "feature_id": {
+          "pg": "grpc_service",
+          "qdrant": "grpc_service",
+          "match": true
+        },
+        "feature_label": {
+          "pg": "Grpc Service",
+          "qdrant": "gRPC Proto Services",
+          "match": false
+        },
+        "qdrant_tag_id": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "cluster_id": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "community_id": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "som_cluster": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "domain_class": {
+          "pg": null,
+          "qdrant": "mcp_agents",
+          "match": false
+        },
+        "domain": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "neo4j_node": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "metadata": {
+          "pg": {},
+          "qdrant": null,
+          "match": false
+        }
+      }
+    },
+    {
+      "id": "d758d75b06bec790",
+      "source_ref": "proto:LibrarySearchService.ResolveCitation",
+      "packet_key": "d758d75b06bec790",
+      "qdrant_point_id": 1757316051,
+      "comparable": 4,
+      "matched": 1,
+      "allComparableMatch": false,
+      "comparison": {
+        "source_ref": {
+          "pg": "proto:LibrarySearchService.ResolveCitation",
+          "qdrant": "proto:LibrarySearchService.ResolveCitation",
+          "match": true
+        },
+        "feature_id": {
+          "pg": "grpc_service",
+          "qdrant": "grpc_method_resolvecitation",
+          "match": false
+        },
+        "feature_label": {
+          "pg": "Grpc Service",
+          "qdrant": "LibrarySearchService.ResolveCitation",
+          "match": false
+        },
+        "qdrant_tag_id": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "cluster_id": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "community_id": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "som_cluster": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "domain_class": {
+          "pg": null,
+          "qdrant": "mcp_agents",
+          "match": false
+        },
+        "domain": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "neo4j_node": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "metadata": {
+          "pg": {},
+          "qdrant": null,
+          "match": false
+        }
+      }
+    },
+    {
+      "id": "a318d009a88a31fb",
+      "source_ref": "proto:LibrarySearchService.GetNodeContext",
+      "packet_key": "a318d009a88a31fb",
+      "qdrant_point_id": 1626512073,
+      "comparable": 4,
+      "matched": 1,
+      "allComparableMatch": false,
+      "comparison": {
+        "source_ref": {
+          "pg": "proto:LibrarySearchService.GetNodeContext",
+          "qdrant": "proto:LibrarySearchService.GetNodeContext",
+          "match": true
+        },
+        "feature_id": {
+          "pg": "grpc_service",
+          "qdrant": "grpc_method_getnodecontext",
+          "match": false
+        },
+        "feature_label": {
+          "pg": "Grpc Service",
+          "qdrant": "LibrarySearchService.GetNodeContext",
+          "match": false
+        },
+        "qdrant_tag_id": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "cluster_id": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "community_id": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "som_cluster": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "domain_class": {
+          "pg": null,
+          "qdrant": "mcp_agents",
+          "match": false
+        },
+        "domain": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "neo4j_node": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "metadata": {
+          "pg": {},
+          "qdrant": null,
+          "match": false
+        }
+      }
+    },
+    {
+      "id": "3bf3bc0c64d433c0",
+      "source_ref": "proto:LibrarySearchService.GetDocumentToc",
+      "packet_key": "3bf3bc0c64d433c0",
+      "qdrant_point_id": 1005829132,
+      "comparable": 4,
+      "matched": 2,
+      "allComparableMatch": false,
+      "comparison": {
+        "source_ref": {
+          "pg": "proto:LibrarySearchService.GetDocumentToc",
+          "qdrant": "proto:LibrarySearchService.GetDocumentToc",
+          "match": true
+        },
+        "feature_id": {
+          "pg": "grpc_service",
+          "qdrant": "grpc_service",
+          "match": true
+        },
+        "feature_label": {
+          "pg": "Grpc Service",
+          "qdrant": "gRPC Proto Services",
+          "match": false
+        },
+        "qdrant_tag_id": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "cluster_id": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "community_id": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "som_cluster": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "domain_class": {
+          "pg": null,
+          "qdrant": "mcp_agents",
+          "match": false
+        },
+        "domain": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "neo4j_node": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "metadata": {
+          "pg": {},
+          "qdrant": null,
+          "match": false
+        }
+      }
+    },
+    {
+      "id": "1dc5ac2b3cd9bfe8",
+      "source_ref": "proto:LibrarySearchService.StreamLibrary",
+      "packet_key": "1dc5ac2b3cd9bfe8",
+      "qdrant_point_id": 273773563,
+      "comparable": 4,
+      "matched": 1,
+      "allComparableMatch": false,
+      "comparison": {
+        "source_ref": {
+          "pg": "proto:LibrarySearchService.StreamLibrary",
+          "qdrant": "proto:LibrarySearchService.StreamLibrary",
+          "match": true
+        },
+        "feature_id": {
+          "pg": "grpc_service",
+          "qdrant": "grpc_method_streamlibrary",
+          "match": false
+        },
+        "feature_label": {
+          "pg": "Grpc Service",
+          "qdrant": "LibrarySearchService.StreamLibrary",
+          "match": false
+        },
+        "qdrant_tag_id": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "cluster_id": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "community_id": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "som_cluster": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "domain_class": {
+          "pg": null,
+          "qdrant": "mcp_agents",
+          "match": false
+        },
+        "domain": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "neo4j_node": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "metadata": {
+          "pg": {},
+          "qdrant": null,
+          "match": false
+        }
+      }
+    },
+    {
+      "id": "69af5ffe1b3af354",
+      "source_ref": "proto:LibrarySearchService.SearchLibrary",
+      "packet_key": "69af5ffe1b3af354",
+      "qdrant_point_id": 1117167827,
+      "comparable": 4,
+      "matched": 1,
+      "allComparableMatch": false,
+      "comparison": {
+        "source_ref": {
+          "pg": "proto:LibrarySearchService.SearchLibrary",
+          "qdrant": "proto:LibrarySearchService.SearchLibrary",
+          "match": true
+        },
+        "feature_id": {
+          "pg": "grpc_service",
+          "qdrant": "grpc_method_searchlibrary",
+          "match": false
+        },
+        "feature_label": {
+          "pg": "Grpc Service",
+          "qdrant": "LibrarySearchService.SearchLibrary",
+          "match": false
+        },
+        "qdrant_tag_id": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "cluster_id": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "community_id": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "som_cluster": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "domain_class": {
+          "pg": null,
+          "qdrant": "mcp_agents",
+          "match": false
+        },
+        "domain": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "neo4j_node": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "metadata": {
+          "pg": {},
+          "qdrant": null,
+          "match": false
+        }
+      }
+    },
+    {
+      "id": "482abc5766b6f8ed",
+      "source_ref": "proto:GpuBridgeService.AssignSom",
+      "packet_key": "482abc5766b6f8ed",
+      "qdrant_point_id": 1210760279,
+      "comparable": 4,
+      "matched": 2,
+      "allComparableMatch": false,
+      "comparison": {
+        "source_ref": {
+          "pg": "proto:GpuBridgeService.AssignSom",
+          "qdrant": "proto:GpuBridgeService.AssignSom",
+          "match": true
+        },
+        "feature_id": {
+          "pg": "grpc_service",
+          "qdrant": "grpc_service",
+          "match": true
+        },
+        "feature_label": {
+          "pg": "Grpc Service",
+          "qdrant": "gRPC Proto Services",
+          "match": false
+        },
+        "qdrant_tag_id": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "cluster_id": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "community_id": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "som_cluster": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "domain_class": {
+          "pg": null,
+          "qdrant": "mcp_agents",
+          "match": false
+        },
+        "domain": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "neo4j_node": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "metadata": {
+          "pg": {},
+          "qdrant": null,
+          "match": false
+        }
+      }
+    },
+    {
+      "id": "d15cb3849bdef3b8",
+      "source_ref": "proto:GpuBridgeService.EncodeLatent",
+      "packet_key": "d15cb3849bdef3b8",
+      "qdrant_point_id": 2327917333,
+      "comparable": 4,
+      "matched": 1,
+      "allComparableMatch": false,
+      "comparison": {
+        "source_ref": {
+          "pg": "proto:GpuBridgeService.EncodeLatent",
+          "qdrant": "proto:GpuBridgeService.EncodeLatent",
+          "match": true
+        },
+        "feature_id": {
+          "pg": "grpc_service",
+          "qdrant": "grpc_gpubridgeservice",
+          "match": false
+        },
+        "feature_label": {
+          "pg": "Grpc Service",
+          "qdrant": "GpuBridgeService.EncodeLatent",
+          "match": false
+        },
+        "qdrant_tag_id": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "cluster_id": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "community_id": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "som_cluster": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "domain_class": {
+          "pg": null,
+          "qdrant": "mcp_agents",
+          "match": false
+        },
+        "domain": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "neo4j_node": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "metadata": {
+          "pg": {},
+          "qdrant": null,
+          "match": false
+        }
+      }
+    },
+    {
+      "id": "cdc6075da031b7ac",
+      "source_ref": "proto:GpuBridgeService.BatchCosine",
+      "packet_key": "cdc6075da031b7ac",
+      "qdrant_point_id": 2337014382,
+      "comparable": 4,
+      "matched": 1,
+      "allComparableMatch": false,
+      "comparison": {
+        "source_ref": {
+          "pg": "proto:GpuBridgeService.BatchCosine",
+          "qdrant": "proto:GpuBridgeService.BatchCosine",
+          "match": true
+        },
+        "feature_id": {
+          "pg": "grpc_service",
+          "qdrant": "grpc_gpubridgeservice",
+          "match": false
+        },
+        "feature_label": {
+          "pg": "Grpc Service",
+          "qdrant": "GpuBridgeService.BatchCosine",
+          "match": false
+        },
+        "qdrant_tag_id": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "cluster_id": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "community_id": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "som_cluster": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "domain_class": {
+          "pg": null,
+          "qdrant": "mcp_agents",
+          "match": false
+        },
+        "domain": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "neo4j_node": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "metadata": {
+          "pg": {},
+          "qdrant": null,
+          "match": false
+        }
+      }
+    },
+    {
+      "id": "dacc099376a3c299",
+      "source_ref": "proto:EmbeddingService.GetStats",
+      "packet_key": "dacc099376a3c299",
+      "qdrant_point_id": 100690717,
+      "comparable": 4,
+      "matched": 1,
+      "allComparableMatch": false,
+      "comparison": {
+        "source_ref": {
+          "pg": "proto:EmbeddingService.GetStats",
+          "qdrant": "proto:EmbeddingService.GetStats",
+          "match": true
+        },
+        "feature_id": {
+          "pg": "grpc_service",
+          "qdrant": "grpc_method_getstats",
+          "match": false
+        },
+        "feature_label": {
+          "pg": "Grpc Service",
+          "qdrant": "EmbeddingService.GetStats",
+          "match": false
+        },
+        "qdrant_tag_id": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "cluster_id": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "community_id": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "som_cluster": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "domain_class": {
+          "pg": null,
+          "qdrant": "mcp_agents",
+          "match": false
+        },
+        "domain": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "neo4j_node": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "metadata": {
+          "pg": {},
+          "qdrant": null,
+          "match": false
+        }
+      }
+    },
+    {
+      "id": "748e8cfa0abd4e6a",
+      "source_ref": "proto:EmbeddingService.Health",
+      "packet_key": "748e8cfa0abd4e6a",
+      "qdrant_point_id": 515342224,
+      "comparable": 4,
+      "matched": 1,
+      "allComparableMatch": false,
+      "comparison": {
+        "source_ref": {
+          "pg": "proto:EmbeddingService.Health",
+          "qdrant": "proto:EmbeddingService.Health",
+          "match": true
+        },
+        "feature_id": {
+          "pg": "grpc_service",
+          "qdrant": "grpc_method_health",
+          "match": false
+        },
+        "feature_label": {
+          "pg": "Grpc Service",
+          "qdrant": "EmbeddingService.Health",
+          "match": false
+        },
+        "qdrant_tag_id": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "cluster_id": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "community_id": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "som_cluster": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "domain_class": {
+          "pg": null,
+          "qdrant": "mcp_agents",
+          "match": false
+        },
+        "domain": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "neo4j_node": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "metadata": {
+          "pg": {},
+          "qdrant": null,
+          "match": false
+        }
+      }
+    },
+    {
+      "id": "bbbe630740c5d753",
+      "source_ref": "proto:EmbeddingService.StreamEmbeddings",
+      "packet_key": "bbbe630740c5d753",
+      "qdrant_point_id": 1390085168,
+      "comparable": 4,
+      "matched": 1,
+      "allComparableMatch": false,
+      "comparison": {
+        "source_ref": {
+          "pg": "proto:EmbeddingService.StreamEmbeddings",
+          "qdrant": "proto:EmbeddingService.StreamEmbeddings",
+          "match": true
+        },
+        "feature_id": {
+          "pg": "grpc_service",
+          "qdrant": "grpc_method_streamembeddings",
+          "match": false
+        },
+        "feature_label": {
+          "pg": "Grpc Service",
+          "qdrant": "EmbeddingService.StreamEmbeddings",
+          "match": false
+        },
+        "qdrant_tag_id": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "cluster_id": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "community_id": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "som_cluster": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "domain_class": {
+          "pg": null,
+          "qdrant": "mcp_agents",
+          "match": false
+        },
+        "domain": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "neo4j_node": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "metadata": {
+          "pg": {},
+          "qdrant": null,
+          "match": false
+        }
+      }
+    },
+    {
+      "id": "25c824811a2efd81",
+      "source_ref": "proto:EmbeddingService.GenerateEmbeddings",
+      "packet_key": "25c824811a2efd81",
+      "qdrant_point_id": 118542061,
+      "comparable": 4,
+      "matched": 1,
+      "allComparableMatch": false,
+      "comparison": {
+        "source_ref": {
+          "pg": "proto:EmbeddingService.GenerateEmbeddings",
+          "qdrant": "proto:EmbeddingService.GenerateEmbeddings",
+          "match": true
+        },
+        "feature_id": {
+          "pg": "grpc_service",
+          "qdrant": "grpc_embeddingservice",
+          "match": false
+        },
+        "feature_label": {
+          "pg": "Grpc Service",
+          "qdrant": "EmbeddingService.GenerateEmbeddings",
+          "match": false
+        },
+        "qdrant_tag_id": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "cluster_id": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "community_id": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "som_cluster": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "domain_class": {
+          "pg": null,
+          "qdrant": "mcp_agents",
+          "match": false
+        },
+        "domain": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "neo4j_node": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "metadata": {
+          "pg": {},
+          "qdrant": null,
+          "match": false
+        }
+      }
+    },
+    {
+      "id": "de3c1300921c8d5d",
+      "source_ref": "proto:EnrichmentService.SummarizeCluster",
+      "packet_key": "de3c1300921c8d5d",
+      "qdrant_point_id": 1490460569,
+      "comparable": 4,
+      "matched": 1,
+      "allComparableMatch": false,
+      "comparison": {
+        "source_ref": {
+          "pg": "proto:EnrichmentService.SummarizeCluster",
+          "qdrant": "proto:EnrichmentService.SummarizeCluster",
+          "match": true
+        },
+        "feature_id": {
+          "pg": "grpc_service",
+          "qdrant": "grpc_enrichmentservice",
+          "match": false
+        },
+        "feature_label": {
+          "pg": "Grpc Service",
+          "qdrant": "EnrichmentService.SummarizeCluster",
+          "match": false
+        },
+        "qdrant_tag_id": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "cluster_id": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "community_id": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "som_cluster": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "domain_class": {
+          "pg": null,
+          "qdrant": "mcp_agents",
+          "match": false
+        },
+        "domain": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "neo4j_node": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "metadata": {
+          "pg": {},
+          "qdrant": null,
+          "match": false
+        }
+      }
+    },
+    {
+      "id": "58e6adafde74465d",
+      "source_ref": "proto:EnrichmentService.BatchEnrich",
+      "packet_key": "58e6adafde74465d",
+      "qdrant_point_id": 1370380491,
+      "comparable": 4,
+      "matched": 1,
+      "allComparableMatch": false,
+      "comparison": {
+        "source_ref": {
+          "pg": "proto:EnrichmentService.BatchEnrich",
+          "qdrant": "proto:EnrichmentService.BatchEnrich",
+          "match": true
+        },
+        "feature_id": {
+          "pg": "grpc_service",
+          "qdrant": "grpc_enrichmentservice",
+          "match": false
+        },
+        "feature_label": {
+          "pg": "Grpc Service",
+          "qdrant": "EnrichmentService.BatchEnrich",
+          "match": false
+        },
+        "qdrant_tag_id": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "cluster_id": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "community_id": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "som_cluster": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "domain_class": {
+          "pg": null,
+          "qdrant": "mcp_agents",
+          "match": false
+        },
+        "domain": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "neo4j_node": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "metadata": {
+          "pg": {},
+          "qdrant": null,
+          "match": false
+        }
+      }
+    },
+    {
+      "id": "28e942decdcdb342",
+      "source_ref": "proto:CodeIntelService.LookupChunk",
+      "packet_key": "28e942decdcdb342",
+      "qdrant_point_id": 54252682,
+      "comparable": 4,
+      "matched": 1,
+      "allComparableMatch": false,
+      "comparison": {
+        "source_ref": {
+          "pg": "proto:CodeIntelService.LookupChunk",
+          "qdrant": "proto:CodeIntelService.LookupChunk",
+          "match": true
+        },
+        "feature_id": {
+          "pg": "grpc_service",
+          "qdrant": "grpc_codeintelservice",
+          "match": false
+        },
+        "feature_label": {
+          "pg": "Grpc Service",
+          "qdrant": "CodeIntelService.LookupChunk",
+          "match": false
+        },
+        "qdrant_tag_id": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "cluster_id": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "community_id": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "som_cluster": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "domain_class": {
+          "pg": null,
+          "qdrant": "mcp_agents",
+          "match": false
+        },
+        "domain": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "neo4j_node": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "metadata": {
+          "pg": {},
+          "qdrant": null,
+          "match": false
+        }
+      }
+    },
+    {
+      "id": "17dc1fe9f5f8a021",
+      "source_ref": "proto:CodeIntelService.GetJobStatus",
+      "packet_key": "17dc1fe9f5f8a021",
+      "qdrant_point_id": 400302057,
+      "comparable": 4,
+      "matched": 2,
+      "allComparableMatch": false,
+      "comparison": {
+        "source_ref": {
+          "pg": "proto:CodeIntelService.GetJobStatus",
+          "qdrant": "proto:CodeIntelService.GetJobStatus",
+          "match": true
+        },
+        "feature_id": {
+          "pg": "grpc_service",
+          "qdrant": "grpc_service",
+          "match": true
+        },
+        "feature_label": {
+          "pg": "Grpc Service",
+          "qdrant": "gRPC Proto Services",
+          "match": false
+        },
+        "qdrant_tag_id": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "cluster_id": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "community_id": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "som_cluster": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "domain_class": {
+          "pg": null,
+          "qdrant": "mcp_agents",
+          "match": false
+        },
+        "domain": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "neo4j_node": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "metadata": {
+          "pg": {},
+          "qdrant": null,
+          "match": false
+        }
+      }
+    },
+    {
+      "id": "313d57f685058b60",
+      "source_ref": "proto:CodeIntelService.SummarizeCluster",
+      "packet_key": "313d57f685058b60",
+      "qdrant_point_id": 826103798,
+      "comparable": 4,
+      "matched": 2,
+      "allComparableMatch": false,
+      "comparison": {
+        "source_ref": {
+          "pg": "proto:CodeIntelService.SummarizeCluster",
+          "qdrant": "proto:CodeIntelService.SummarizeCluster",
+          "match": true
+        },
+        "feature_id": {
+          "pg": "grpc_service",
+          "qdrant": "grpc_service",
+          "match": true
+        },
+        "feature_label": {
+          "pg": "Grpc Service",
+          "qdrant": "gRPC Proto Services",
+          "match": false
+        },
+        "qdrant_tag_id": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "cluster_id": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "community_id": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "som_cluster": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "domain_class": {
+          "pg": null,
+          "qdrant": "mcp_agents",
+          "match": false
+        },
+        "domain": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "neo4j_node": {
+          "pg": null,
+          "qdrant": null,
+          "match": false
+        },
+        "metadata": {
+          "pg": {},
+          "qdrant": null,
+          "match": false
+        }
+      }
+    }
+  ],
+  "warning": "Coverage below 95% on sampled atlas packets"
+}

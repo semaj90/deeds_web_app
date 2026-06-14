@@ -1,13 +1,13 @@
 {
-  "timestamp": "2026-06-14T03:12:19.188Z",
+  "timestamp": "2026-06-14T03:21:00.897Z",
   "mode": "backfill",
   "verification": [
     {
       "table": "atlas_packets",
       "total": 17476,
       "missing": {
-        "feature_id": 8653,
-        "feature_label": 8653,
+        "feature_id": 0,
+        "feature_label": 0,
         "source_ref": 8653,
         "metadata": 0,
         "file_path": null
@@ -58,8 +58,9 @@
   "backfill": [
     {
       "table": "atlas_packets",
-      "updated": 8653,
-      "errors": 0
+      "updated": 0,
+      "errors": 0,
+      "reason": "No rows need backfill"
     },
     {
       "table": "nes_chrom_packets",
@@ -83,9 +84,9 @@
   "summary": {
     "tablesChecked": 4,
     "totalRows": 87656,
-    "totalMissingFeatureId": 8653,
+    "totalMissingFeatureId": 0,
     "totalMissingMetadata": 0,
-    "totalUpdated": 8653,
+    "totalUpdated": 0,
     "totalErrors": 0
   }
 }

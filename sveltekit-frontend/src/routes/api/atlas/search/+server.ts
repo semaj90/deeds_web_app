@@ -203,7 +203,7 @@ async function embedQuery(query: string): Promise<number[] | null> {
   const _raw = (process.env.OLLAMA_HOST ?? '127.0.0.1:11434').replace(/^0\.0\.0\.0/, '127.0.0.1');
   const ollamaBase = _raw.startsWith('http') ? _raw : `http://${_raw.includes(':') ? _raw : `${_raw}:11434`}`;
 
-  for (const model of ['nomic-embed-text:latest', 'embeddinggemma:latest']) {
+  for (const model of ['embeddinggemma:latest', 'nomic-embed-text:latest']) {
     try {
       const res = await fetch(`${ollamaBase}/api/embeddings`, {
         method:  'POST',
