@@ -1,0 +1,25 @@
+{
+  "generated_at": "2026-06-14T01:53:28.827Z",
+  "total_seeds": 4173,
+  "missing_seeds_total": 26,
+  "missing_seeds_after_slice": 5,
+  "slice_cap": 5,
+  "merge_key_groups": 0,
+  "skip_no_feature_id": 5,
+  "total_collisions": 0,
+  "final_recommendation_count": 0,
+  "merge_summary": [],
+  "root_causes": [
+    "detectStaleFeatures() caps missing features at .slice(0, 5) (26 total → 5 after slice)",
+    "5 seed(s) skipped due to missing feature_id"
+  ],
+  "gates": {
+    "audit": "FAIL",
+    "root_cause_identified": "PASS"
+  },
+  "evidence": [
+    "scripts/atlas/audit-recommendation-merge.mjs",
+    ".tmp/atlas-cartridge-seeds.jsonl",
+    "scripts/opencode/build-recommendations.mjs (detectStaleFeatures slice cap)"
+  ]
+}

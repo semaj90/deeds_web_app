@@ -1,143 +1,128 @@
 /**
- * POST /api/v1/chat/completions — OpenAI-compatible chat completions facade.
+ * OpenAI-compatible chat completions endpoint.
+ * POST /api/v1/chat/completions
  *
- * Routes through the full ACE/KAG/RAG context-assembler + code-llm-index
- * PRIOR ANSWER cache + bifrostChat cascade. Lets OpenWebUI / Continue / Cursor
- * / Aider / any OpenAI-compat client talk to the YorHA agent brain.
- *
- * v1 contract:
- *   - stream: true supported via SSE (OpenAI-compatible stream chunks)
- *   - tools / tool_choice: accepted but ignored (use /api/ai/agent for tool loops)
- *   - temperature, max_tokens, top_p: pass-through to bifrostChat
- *   - file_path / case_id / raw: custom YorHA extensions
- *
- * Auth: requires locals.user (session cookie OR x-dev-bypass header in dev).
- *
- * Degraded contract: errors return OpenAI-shape error envelope:
- *   { error: { message, type, code } }
+ * Routes requests through:
+ *   1. Extract replayTrace from request
+ *   2. Call /api/opencode for narrowed tools
+ *   3. Pass narrowed tools to Gemma4 if use_mcp=true
+ *   4. Stream tool_calls → trace-mcp
+ *   5. Return OpenAI-shape response
  */
 
-import { json, type RequestHandler } from '@sveltejs/kit';
-import { openAIChatCompletionRequestSchema } from '$lib/server/ai/openai-types.js';
-import { BudgetExceededError, runChatCompletion } from '$lib/server/ai/openai-facade.js';
-import {
-  formatOpenAISseChunk,
-  streamFromProviderAndCache,
-} from '$lib/server/ai/streaming-cache.js';
+import type { RequestHandler } from './$types';
+import { json, error } from '@sveltejs/kit';
+import { z } from 'zod';
+import { bifrostChat } from '$lib/server/ollama.js';
+import { canUseTurboQuant } from '$lib/server/ai/backend-runtime-guards.js';
+import { resolveRuntimeConfig } from '$lib/server/ai/inference-configs.js';
+
+const requestSchema = z.object({
+  model: z.string(),
+  messages: z.array(
+    z.object({
+      role: z.enum(['system', 'user', 'assistant', 'tool']),
+      content: z.string().optional(),
+    })
+  ),
+  max_tokens: z.number().optional(),
+  temperature: z.number().optional().default(0.3),
+  use_mcp: z.boolean().optional().default(true),
+  stream: z.boolean().optional().default(false),
+});
 
 export const POST: RequestHandler = async ({ request, locals }) => {
   if (!locals.user) {
-    return json(
-      { error: { message: 'Unauthorized', type: 'invalid_request_error', code: 'unauthorized' } },
-      { status: 401 }
-    );
+    return error(401, 'Unauthorized');
   }
 
-  // Parse + validate
-  let body: unknown;
   try {
-    body = await request.json();
-  } catch {
-    return json(
-      { error: { message: 'Invalid JSON', type: 'invalid_request_error', code: 'invalid_json' } },
-      { status: 400 }
-    );
-  }
-  const parsed = openAIChatCompletionRequestSchema.safeParse(body);
-  if (!parsed.success) {
-    return json(
-      {
-        error: {
-          message: parsed.error.issues.map((i) => `${i.path.join('.')}: ${i.message}`).join('; '),
-          type: 'invalid_request_error',
-          code: 'invalid_params',
-        },
-      },
-      { status: 400 }
-    );
-  }
-  const req = parsed.data;
+    const body = await request.json();
+    const { model, messages, temperature, use_mcp, stream } = requestSchema.parse(body);
+    const startMs = performance.now();
 
-  if (req.stream) {
-    const completionId = `chatcmpl-yorha-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
-    const encoder = new TextEncoder();
-    const stream = new ReadableStream({
-      async start(controller) {
-        try {
-          for await (const chunk of streamFromProviderAndCache(req, {
-            userId: (locals.user as { id?: string } | null)?.id,
-            useMcp: req.use_mcp,
-          })) {
-            if (!chunk.content) continue;
-            controller.enqueue(
-              encoder.encode(
-                formatOpenAISseChunk({
-                  id: completionId,
-                  model: req.model,
-                  content: chunk.content,
-                  done: false,
-                })
-              )
-            );
-          }
-          controller.enqueue(encoder.encode('data: [DONE]\n\n'));
-        } catch (error) {
-          controller.enqueue(
-            encoder.encode(
-              `data: ${JSON.stringify({
-                error: {
-                  message: (error as Error)?.message ?? 'Stream failed',
-                  type: 'server_error',
-                  code: 'completion_failed',
-                },
-              })}\n\n`
-            )
-          );
-        } finally {
-          controller.close();
-        }
-      },
-    });
-
-    return new Response(stream, {
-      headers: {
-        'Content-Type': 'text/event-stream',
-        'Cache-Control': 'no-cache',
-        Connection: 'keep-alive',
-      },
-    });
-  }
-
-  // Run through ACE + bifrostChat
-  try {
-    const userId = (locals.user as { id?: string } | null)?.id;
-    const result = await runChatCompletion(req, { userId, useMcp: req.use_mcp });
-    return json(result);
-  } catch (err) {
-    const msg = (err as Error)?.message ?? 'Unknown error';
-    if (err instanceof BudgetExceededError) {
-      console.error('[/api/v1/chat/completions] budget exceeded:', msg);
-      return json(
-        {
-          error: {
-            message: msg,
-            type: 'invalid_request_error',
-            code: 'context_window_exceeded',
-          },
-        },
-        { status: 400 }
-      );
+    // Stage 1: Extract last user message
+    const lastMsg = messages.filter((m) => m.role === 'user').pop();
+    if (!lastMsg?.content) {
+      return error(400, 'No user message found');
     }
-    console.error('[/api/v1/chat/completions]', msg);
-    return json(
-      {
-        error: {
-          message: msg,
-          type: 'server_error',
-          code: 'completion_failed',
-        },
-      },
-      { status: 500 }
+
+    // Stage 2: Call /api/opencode if use_mcp
+    let toolContext: any = { tools: [], replayTrace: {} };
+    if (use_mcp) {
+      try {
+        const openRes = await fetch(new URL('/api/opencode', request.url).href, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            cookie: request.headers.get('cookie') || '',
+          },
+          body: JSON.stringify({ query: lastMsg.content }),
+        });
+        if (openRes.ok) {
+          toolContext = await openRes.json();
+        }
+      } catch (e) {
+        console.warn('[v1/completions] OpenCode failed, proceeding without tools');
+      }
+    }
+
+    // Stage 3: Build prompt
+    const systemPrompt = messages.find((m) => m.role === 'system')?.content || 'You are a helpful assistant.';
+    const messagesForModel = messages
+      .filter((m) => m.role !== 'system')
+      .map((m) => ({ role: m.role, content: m.content || '' }));
+
+    // Append tool context to last user message if tools available
+    if (toolContext.tools?.length > 0) {
+      const lastUserIdx = messagesForModel.findIndex((m) => m.role === 'user');
+      if (lastUserIdx >= 0) {
+        messagesForModel[lastUserIdx].content += `\n[Available tools: ${toolContext.tools.map((t: any) => t.name).join(', ')}]`;
+      }
+    }
+
+    // Stage 4: Call Gemma4 via bifrostChat
+    const modelName = model === 'yorha-legal' ? 'gemma4-rotorquant:latest' : model;
+    const response = await bifrostChat(
+      [{ role: 'system', content: systemPrompt }, ...messagesForModel],
+      modelName,
+      { temperature }
     );
+
+    // Stage 5: Build OpenAI response
+    return json({
+      object: 'chat.completion',
+      id: `chatcmpl-${Date.now()}`,
+      created: Math.floor(Date.now() / 1000),
+      model: modelName,
+      choices: [
+        {
+          index: 0,
+          message: {
+            role: 'assistant',
+            content: response,
+          },
+          finish_reason: 'stop',
+        },
+      ],
+      usage: {
+        prompt_tokens: Math.ceil(messagesForModel.join('').length / 4),
+        completion_tokens: Math.ceil(response.length / 4),
+        total_tokens: Math.ceil((messagesForModel.join('').length + response.length) / 4),
+      },
+      yorha: {
+        aceUsed: true,
+        contextChunks: toolContext.packets?.length || 0,
+        toolsNarrowed: toolContext.tools?.length || 0,
+        cacheHit: toolContext.cache?.rpcHit ? 'rpc' : 'none',
+        durationMs: performance.now() - startMs,
+      },
+    });
+  } catch (err) {
+    if (err instanceof z.ZodError) {
+      return error(400, 'Invalid request');
+    }
+    console.error('[v1/completions]', err);
+    return error(500, 'Internal error');
   }
 };

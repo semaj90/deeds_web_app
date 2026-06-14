@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-06-12T19:35:06.489Z",
+  "generatedAt": "2026-06-14T01:16:52.717Z",
   "dryRun": true,
   "active": false,
   "lanes": "open",
@@ -82,15 +82,15 @@
     {
       "path": "docs/architecture/cold-warm-hot-packet-lifecycle.md",
       "normalizedPath": "docs/architecture/cold-warm-hot-packet-lifecycle.md",
-      "bytes": 8192,
-      "modifiedAt": "2026-06-12T18:23:47.110Z",
+      "bytes": 8510,
+      "modifiedAt": "2026-06-13T08:08:01.666Z",
       "kind": "md"
     },
     {
       "path": "docs/architecture/compressed-semantic-geometry.md",
       "normalizedPath": "docs/architecture/compressed-semantic-geometry.md",
-      "bytes": 5015,
-      "modifiedAt": "2026-06-12T18:23:44.302Z",
+      "bytes": 5150,
+      "modifiedAt": "2026-06-13T08:08:01.667Z",
       "kind": "md"
     },
     {
@@ -124,15 +124,15 @@
     {
       "path": "docs/architecture/dual-lane-hot-brain-cold-queue.md",
       "normalizedPath": "docs/architecture/dual-lane-hot-brain-cold-queue.md",
-      "bytes": 3098,
-      "modifiedAt": "2026-06-12T18:23:49.691Z",
+      "bytes": 3183,
+      "modifiedAt": "2026-06-13T08:08:01.669Z",
       "kind": "md"
     },
     {
       "path": "docs/architecture/engram-plugin-memory-support.md",
       "normalizedPath": "docs/architecture/engram-plugin-memory-support.md",
-      "bytes": 3676,
-      "modifiedAt": "2026-06-12T17:18:47.142Z",
+      "bytes": 3728,
+      "modifiedAt": "2026-06-13T08:08:01.670Z",
       "kind": "md"
     },
     {
@@ -166,8 +166,8 @@
     {
       "path": "docs/architecture/legal-ai-parent-atlas-product-integration.md",
       "normalizedPath": "docs/architecture/legal-ai-parent-atlas-product-integration.md",
-      "bytes": 2398,
-      "modifiedAt": "2026-06-12T18:08:35.166Z",
+      "bytes": 2431,
+      "modifiedAt": "2026-06-13T08:08:01.671Z",
       "kind": "parent-atlas"
     },
     {
@@ -187,15 +187,15 @@
     {
       "path": "docs/architecture/neo4j-graphrag-parent-atlas.md",
       "normalizedPath": "docs/architecture/neo4j-graphrag-parent-atlas.md",
-      "bytes": 675,
-      "modifiedAt": "2026-06-12T18:01:54.905Z",
+      "bytes": 700,
+      "modifiedAt": "2026-06-13T08:08:01.673Z",
       "kind": "parent-atlas"
     },
     {
       "path": "docs/architecture/offline-synthesis-parent-atlas.md",
       "normalizedPath": "docs/architecture/offline-synthesis-parent-atlas.md",
-      "bytes": 5412,
-      "modifiedAt": "2026-06-12T18:23:52.212Z",
+      "bytes": 5581,
+      "modifiedAt": "2026-06-13T08:08:01.674Z",
       "kind": "parent-atlas"
     },
     {
@@ -208,8 +208,8 @@
     {
       "path": "docs/architecture/parent-atlas-karpathy-pipeline.md",
       "normalizedPath": "docs/architecture/parent-atlas-karpathy-pipeline.md",
-      "bytes": 2283,
-      "modifiedAt": "2026-06-12T18:23:54.578Z",
+      "bytes": 2351,
+      "modifiedAt": "2026-06-13T08:08:01.675Z",
       "kind": "parent-atlas"
     },
     {
@@ -313,8 +313,8 @@
     {
       "path": "docs/architecture/unified-ace-engram-pipeline.md",
       "normalizedPath": "docs/architecture/unified-ace-engram-pipeline.md",
-      "bytes": 4829,
-      "modifiedAt": "2026-06-12T18:16:28.494Z",
+      "bytes": 4967,
+      "modifiedAt": "2026-06-13T08:08:01.677Z",
       "kind": "md"
     },
     {
@@ -322,6 +322,55 @@
       "normalizedPath": "docs/architecture/vram-hygiene-policy.md",
       "bytes": 3691,
       "modifiedAt": "2026-05-17T01:59:34.163Z",
+      "kind": "md"
+    },
+    {
+      "path": "docs/atlas/AGENT-2-LANE-1B-EXECUTION-CHECKLIST.md",
+      "normalizedPath": "docs/atlas/AGENT-2-LANE-1B-EXECUTION-CHECKLIST.md",
+      "bytes": 10132,
+      "modifiedAt": "2026-06-13T20:08:53.193Z",
+      "kind": "md"
+    },
+    {
+      "path": "docs/atlas/AGENT-3-LANE-2-EXECUTION-SUMMARY.md",
+      "normalizedPath": "docs/atlas/AGENT-3-LANE-2-EXECUTION-SUMMARY.md",
+      "bytes": 8848,
+      "modifiedAt": "2026-06-13T20:19:45.667Z",
+      "kind": "md"
+    },
+    {
+      "path": "docs/atlas/AGENT-3-LANE-2-READY-FOR-EXECUTION.md",
+      "normalizedPath": "docs/atlas/AGENT-3-LANE-2-READY-FOR-EXECUTION.md",
+      "bytes": 8322,
+      "modifiedAt": "2026-06-13T20:20:19.331Z",
+      "kind": "md"
+    },
+    {
+      "path": "docs/atlas/AGENT-4-LANE-4-CHECKLIST.md",
+      "normalizedPath": "docs/atlas/AGENT-4-LANE-4-CHECKLIST.md",
+      "bytes": 7235,
+      "modifiedAt": "2026-06-13T20:34:57.818Z",
+      "kind": "md"
+    },
+    {
+      "path": "docs/atlas/AGENT-4-LANE-4-COMPLETION-SUMMARY.md",
+      "normalizedPath": "docs/atlas/AGENT-4-LANE-4-COMPLETION-SUMMARY.md",
+      "bytes": 13976,
+      "modifiedAt": "2026-06-13T20:35:48.882Z",
+      "kind": "md"
+    },
+    {
+      "path": "docs/atlas/AGENT-4-LANE-4-EXECUTION-GUIDE.md",
+      "normalizedPath": "docs/atlas/AGENT-4-LANE-4-EXECUTION-GUIDE.md",
+      "bytes": 11835,
+      "modifiedAt": "2026-06-13T20:34:33.456Z",
+      "kind": "md"
+    },
+    {
+      "path": "docs/atlas/AGENT-TASK-PACKAGES-2026-06-13.md",
+      "normalizedPath": "docs/atlas/AGENT-TASK-PACKAGES-2026-06-13.md",
+      "bytes": 12637,
+      "modifiedAt": "2026-06-13T19:51:03.576Z",
       "kind": "md"
     },
     {
@@ -341,8 +390,8 @@
     {
       "path": "docs/atlas/ATLAS-3.0-HYPERRAG-RUNTIME.md",
       "normalizedPath": "docs/atlas/ATLAS-3.0-HYPERRAG-RUNTIME.md",
-      "bytes": 14040,
-      "modifiedAt": "2026-06-12T18:24:35.476Z",
+      "bytes": 13827,
+      "modifiedAt": "2026-06-13T08:08:01.678Z",
       "kind": "md"
     },
     {
@@ -416,6 +465,34 @@
       "kind": "md"
     },
     {
+      "path": "docs/atlas/HARNESS-STANDARDIZATION-ROLLOUT.md",
+      "normalizedPath": "docs/atlas/HARNESS-STANDARDIZATION-ROLLOUT.md",
+      "bytes": 10383,
+      "modifiedAt": "2026-06-13T19:43:41.628Z",
+      "kind": "md"
+    },
+    {
+      "path": "docs/atlas/LANE-1B-HIGHER-HOP-ENRICHMENT.md",
+      "normalizedPath": "docs/atlas/LANE-1B-HIGHER-HOP-ENRICHMENT.md",
+      "bytes": 11356,
+      "modifiedAt": "2026-06-13T20:07:42.109Z",
+      "kind": "md"
+    },
+    {
+      "path": "docs/atlas/LANE-3-VALIDATION-STATUS.md",
+      "normalizedPath": "docs/atlas/LANE-3-VALIDATION-STATUS.md",
+      "bytes": 4820,
+      "modifiedAt": "2026-06-13T19:50:24.229Z",
+      "kind": "md"
+    },
+    {
+      "path": "docs/atlas/LANE-QUICK-REFERENCE.md",
+      "normalizedPath": "docs/atlas/LANE-QUICK-REFERENCE.md",
+      "bytes": 14327,
+      "modifiedAt": "2026-06-13T19:45:20.629Z",
+      "kind": "md"
+    },
+    {
       "path": "docs/atlas/native-gemm-deferral.md",
       "normalizedPath": "docs/atlas/native-gemm-deferral.md",
       "bytes": 655,
@@ -423,24 +500,66 @@
       "kind": "md"
     },
     {
+      "path": "docs/atlas/OPEN-LANES-NEXT-STEPS-2026-06-13.md",
+      "normalizedPath": "docs/atlas/OPEN-LANES-NEXT-STEPS-2026-06-13.md",
+      "bytes": 19114,
+      "modifiedAt": "2026-06-13T19:40:17.584Z",
+      "kind": "md"
+    },
+    {
+      "path": "docs/atlas/OPENCODE-HOOK-WIRING-PLAN-TURBOVEC.md",
+      "normalizedPath": "docs/atlas/OPENCODE-HOOK-WIRING-PLAN-TURBOVEC.md",
+      "bytes": 17695,
+      "modifiedAt": "2026-06-13T21:00:31.626Z",
+      "kind": "md"
+    },
+    {
+      "path": "docs/atlas/OPENCODE-IMPLEMENTATION-CHECKLIST.md",
+      "normalizedPath": "docs/atlas/OPENCODE-IMPLEMENTATION-CHECKLIST.md",
+      "bytes": 13774,
+      "modifiedAt": "2026-06-13T20:48:26.314Z",
+      "kind": "md"
+    },
+    {
+      "path": "docs/atlas/OPENCODE-INTEGRATION-EXAMPLE.md",
+      "normalizedPath": "docs/atlas/OPENCODE-INTEGRATION-EXAMPLE.md",
+      "bytes": 14986,
+      "modifiedAt": "2026-06-13T20:47:46.047Z",
+      "kind": "md"
+    },
+    {
+      "path": "docs/atlas/OPENCODE-INTEGRATION-GUIDE.md",
+      "normalizedPath": "docs/atlas/OPENCODE-INTEGRATION-GUIDE.md",
+      "bytes": 10846,
+      "modifiedAt": "2026-06-13T20:47:11.695Z",
+      "kind": "md"
+    },
+    {
+      "path": "docs/atlas/OPENCODE-SKILL-ENFORCEMENT-PATTERN.md",
+      "normalizedPath": "docs/atlas/OPENCODE-SKILL-ENFORCEMENT-PATTERN.md",
+      "bytes": 11260,
+      "modifiedAt": "2026-06-13T20:41:38.874Z",
+      "kind": "md"
+    },
+    {
       "path": "docs/atlas/parent-atlas-data-spine.md",
       "normalizedPath": "docs/atlas/parent-atlas-data-spine.md",
-      "bytes": 9370,
-      "modifiedAt": "2026-06-12T18:25:11.461Z",
+      "bytes": 9404,
+      "modifiedAt": "2026-06-13T08:08:01.680Z",
       "kind": "parent-atlas"
     },
     {
       "path": "docs/atlas/parent-atlas-storage-decision.md",
       "normalizedPath": "docs/atlas/parent-atlas-storage-decision.md",
-      "bytes": 9022,
-      "modifiedAt": "2026-06-12T18:25:23.389Z",
+      "bytes": 9076,
+      "modifiedAt": "2026-06-13T08:08:01.681Z",
       "kind": "parent-atlas"
     },
     {
       "path": "docs/atlas/parent-atlas-table-of-contents.md",
       "normalizedPath": "docs/atlas/parent-atlas-table-of-contents.md",
-      "bytes": 9767,
-      "modifiedAt": "2026-06-12T18:17:21.366Z",
+      "bytes": 10214,
+      "modifiedAt": "2026-06-14T01:07:29.362Z",
       "kind": "parent-atlas"
     },
     {
@@ -460,8 +579,8 @@
     {
       "path": "docs/atlas/phase-20-training-readiness.md",
       "normalizedPath": "docs/atlas/phase-20-training-readiness.md",
-      "bytes": 8161,
-      "modifiedAt": "2026-06-12T18:25:13.862Z",
+      "bytes": 8170,
+      "modifiedAt": "2026-06-13T08:08:01.684Z",
       "kind": "md"
     },
     {
@@ -486,6 +605,13 @@
       "kind": "json"
     },
     {
+      "path": "docs/atlas/SESSION-DELIVERABLES-2026-06-13.txt",
+      "normalizedPath": "docs/atlas/SESSION-DELIVERABLES-2026-06-13.txt",
+      "bytes": 7038,
+      "modifiedAt": "2026-06-13T19:44:12.201Z",
+      "kind": "txt"
+    },
+    {
       "path": "docs/atlas/token-card-weight-updater.md",
       "normalizedPath": "docs/atlas/token-card-weight-updater.md",
       "bytes": 2431,
@@ -495,8 +621,8 @@
     {
       "path": "docs/atlas/xgboost-reranker-contract.md",
       "normalizedPath": "docs/atlas/xgboost-reranker-contract.md",
-      "bytes": 1078,
-      "modifiedAt": "2026-06-12T18:06:03.146Z",
+      "bytes": 1113,
+      "modifiedAt": "2026-06-13T08:08:01.685Z",
       "kind": "md"
     },
     {
@@ -516,22 +642,22 @@
     {
       "path": "memory/exports/atlas/duckdb-parent-atlas-audit-findings.jsonl",
       "normalizedPath": "memory/exports/atlas/duckdb-parent-atlas-audit-findings.jsonl",
-      "bytes": 9239,
-      "modifiedAt": "2026-06-12T19:34:05.426Z",
+      "bytes": 201,
+      "modifiedAt": "2026-06-14T01:16:51.659Z",
       "kind": "parent-atlas"
     },
     {
       "path": "memory/exports/atlas/parent-atlas-export-bundle-manifest.json",
       "normalizedPath": "memory/exports/atlas/parent-atlas-export-bundle-manifest.json",
-      "bytes": 2151861,
-      "modifiedAt": "2026-06-12T19:34:04.187Z",
+      "bytes": 3031038,
+      "modifiedAt": "2026-06-14T01:15:48.441Z",
       "kind": "parent-atlas"
     },
     {
       "path": "memory/exports/atlas/parent-atlas-export-bundle.jsonl",
       "normalizedPath": "memory/exports/atlas/parent-atlas-export-bundle.jsonl",
-      "bytes": 1675868,
-      "modifiedAt": "2026-06-12T19:34:04.202Z",
+      "bytes": 2378595,
+      "modifiedAt": "2026-06-14T01:15:48.458Z",
       "kind": "parent-atlas"
     },
     {
@@ -544,8 +670,8 @@
     {
       "path": "memory/exports/atlas/training-rows.jsonl",
       "normalizedPath": "memory/exports/atlas/training-rows.jsonl",
-      "bytes": 108597,
-      "modifiedAt": "2026-06-12T19:34:06.603Z",
+      "bytes": 109763,
+      "modifiedAt": "2026-06-14T01:16:51.695Z",
       "kind": "jsonl"
     },
     {
@@ -57895,8 +58021,8 @@
     {
       "path": "reports/parent-atlas-open-lanes-todo.md",
       "normalizedPath": "reports/parent-atlas-open-lanes-todo.md",
-      "bytes": 20055,
-      "modifiedAt": "2026-06-12T13:12:43.315Z",
+      "bytes": 38230,
+      "modifiedAt": "2026-06-14T01:07:24.680Z",
       "kind": "parent-atlas"
     },
     {
@@ -58005,6 +58131,13 @@
       "kind": "mjs"
     },
     {
+      "path": "scripts/atlas/activate-xgboost-stage4.sh",
+      "normalizedPath": "scripts/atlas/activate-xgboost-stage4.sh",
+      "bytes": 1548,
+      "modifiedAt": "2026-06-13T21:45:09.991Z",
+      "kind": "sh"
+    },
+    {
       "path": "scripts/atlas/add-atlas-packets-columns.mjs",
       "normalizedPath": "scripts/atlas/add-atlas-packets-columns.mjs",
       "bytes": 4217,
@@ -58103,6 +58236,13 @@
       "kind": "mjs"
     },
     {
+      "path": "scripts/atlas/atlas-startup-intelligence.mjs",
+      "normalizedPath": "scripts/atlas/atlas-startup-intelligence.mjs",
+      "bytes": 29498,
+      "modifiedAt": "2026-06-13T14:32:19.970Z",
+      "kind": "mjs"
+    },
+    {
       "path": "scripts/atlas/atlas-to-cartridge-seed.mjs",
       "normalizedPath": "scripts/atlas/atlas-to-cartridge-seed.mjs",
       "bytes": 12179,
@@ -58121,6 +58261,13 @@
       "normalizedPath": "scripts/atlas/audit-atlas-packet-join-gaps.mjs",
       "bytes": 3297,
       "modifiedAt": "2026-06-12T13:52:25.289Z",
+      "kind": "mjs"
+    },
+    {
+      "path": "scripts/atlas/audit-concept-evidence-spine.mjs",
+      "normalizedPath": "scripts/atlas/audit-concept-evidence-spine.mjs",
+      "bytes": 6901,
+      "modifiedAt": "2026-06-13T19:55:13.740Z",
       "kind": "mjs"
     },
     {
@@ -58159,6 +58306,13 @@
       "kind": "postgres-contract"
     },
     {
+      "path": "scripts/atlas/audit-env-contract.mjs",
+      "normalizedPath": "scripts/atlas/audit-env-contract.mjs",
+      "bytes": 5302,
+      "modifiedAt": "2026-06-13T19:42:32.513Z",
+      "kind": "mjs"
+    },
+    {
       "path": "scripts/atlas/audit-feature-registry.mjs",
       "normalizedPath": "scripts/atlas/audit-feature-registry.mjs",
       "bytes": 7191,
@@ -58187,6 +58341,13 @@
       "kind": "mjs"
     },
     {
+      "path": "scripts/atlas/audit-gpu-enrichment.mjs",
+      "normalizedPath": "scripts/atlas/audit-gpu-enrichment.mjs",
+      "bytes": 6910,
+      "modifiedAt": "2026-06-13T20:21:49.860Z",
+      "kind": "mjs"
+    },
+    {
       "path": "scripts/atlas/audit-hidden-directory-kanban.mjs",
       "normalizedPath": "scripts/atlas/audit-hidden-directory-kanban.mjs",
       "bytes": 8311,
@@ -58199,6 +58360,20 @@
       "bytes": 13510,
       "modifiedAt": "2026-06-05T14:52:56.724Z",
       "kind": "hidden-packet-pathmap"
+    },
+    {
+      "path": "scripts/atlas/audit-hidden-surfaces.mjs",
+      "normalizedPath": "scripts/atlas/audit-hidden-surfaces.mjs",
+      "bytes": 7995,
+      "modifiedAt": "2026-06-13T22:44:24.230Z",
+      "kind": "mjs"
+    },
+    {
+      "path": "scripts/atlas/audit-higher-hop-enrichment.mjs",
+      "normalizedPath": "scripts/atlas/audit-higher-hop-enrichment.mjs",
+      "bytes": 6832,
+      "modifiedAt": "2026-06-13T20:02:43.094Z",
+      "kind": "mjs"
     },
     {
       "path": "scripts/atlas/audit-identity-completion-gate.mjs",
@@ -58292,6 +58467,27 @@
       "kind": "mjs"
     },
     {
+      "path": "scripts/atlas/audit-postgres-contract-mirrors.mjs",
+      "normalizedPath": "scripts/atlas/audit-postgres-contract-mirrors.mjs",
+      "bytes": 22782,
+      "modifiedAt": "2026-06-12T19:38:33.386Z",
+      "kind": "postgres-contract"
+    },
+    {
+      "path": "scripts/atlas/audit-proto-registry.mjs",
+      "normalizedPath": "scripts/atlas/audit-proto-registry.mjs",
+      "bytes": 27647,
+      "modifiedAt": "2026-06-13T21:52:53.513Z",
+      "kind": "mjs"
+    },
+    {
+      "path": "scripts/atlas/audit-pytorch-libtorch-inventory.mjs",
+      "normalizedPath": "scripts/atlas/audit-pytorch-libtorch-inventory.mjs",
+      "bytes": 10379,
+      "modifiedAt": "2026-06-13T22:03:02.949Z",
+      "kind": "mjs"
+    },
+    {
       "path": "scripts/atlas/audit-qdrant-noise.mjs",
       "normalizedPath": "scripts/atlas/audit-qdrant-noise.mjs",
       "bytes": 12346,
@@ -58299,10 +58495,31 @@
       "kind": "mjs"
     },
     {
+      "path": "scripts/atlas/audit-ranking-signal-coverage.mjs",
+      "normalizedPath": "scripts/atlas/audit-ranking-signal-coverage.mjs",
+      "bytes": 8263,
+      "modifiedAt": "2026-06-12T21:12:33.783Z",
+      "kind": "mjs"
+    },
+    {
+      "path": "scripts/atlas/audit-recommendation-collapse.mjs",
+      "normalizedPath": "scripts/atlas/audit-recommendation-collapse.mjs",
+      "bytes": 10418,
+      "modifiedAt": "2026-06-13T22:26:08.704Z",
+      "kind": "mjs"
+    },
+    {
       "path": "scripts/atlas/audit-recommendation-merge.mjs",
       "normalizedPath": "scripts/atlas/audit-recommendation-merge.mjs",
-      "bytes": 5873,
-      "modifiedAt": "2026-06-12T18:35:44.623Z",
+      "bytes": 7513,
+      "modifiedAt": "2026-06-13T20:11:34.073Z",
+      "kind": "mjs"
+    },
+    {
+      "path": "scripts/atlas/audit-recommendation-sourceref.mjs",
+      "normalizedPath": "scripts/atlas/audit-recommendation-sourceref.mjs",
+      "bytes": 6951,
+      "modifiedAt": "2026-06-13T20:13:12.066Z",
       "kind": "mjs"
     },
     {
@@ -58341,6 +58558,13 @@
       "kind": "mjs"
     },
     {
+      "path": "scripts/atlas/audit-supernode-pressure.mjs",
+      "normalizedPath": "scripts/atlas/audit-supernode-pressure.mjs",
+      "bytes": 9066,
+      "modifiedAt": "2026-06-13T20:10:20.947Z",
+      "kind": "mjs"
+    },
+    {
       "path": "scripts/atlas/audit-sveltekit-form-contracts.mjs",
       "normalizedPath": "scripts/atlas/audit-sveltekit-form-contracts.mjs",
       "bytes": 22238,
@@ -58352,6 +58576,13 @@
       "normalizedPath": "scripts/atlas/audit-transport-pressure.mjs",
       "bytes": 21596,
       "modifiedAt": "2026-06-12T02:01:12.102Z",
+      "kind": "mjs"
+    },
+    {
+      "path": "scripts/atlas/audit-turbovec-cuvs-readiness.mjs",
+      "normalizedPath": "scripts/atlas/audit-turbovec-cuvs-readiness.mjs",
+      "bytes": 2375,
+      "modifiedAt": "2026-06-13T21:05:29.641Z",
       "kind": "mjs"
     },
     {
@@ -58378,8 +58609,8 @@
     {
       "path": "scripts/atlas/backfill-atlas-packet-summaries-from-files.mjs",
       "normalizedPath": "scripts/atlas/backfill-atlas-packet-summaries-from-files.mjs",
-      "bytes": 14662,
-      "modifiedAt": "2026-06-12T15:27:19.435Z",
+      "bytes": 25896,
+      "modifiedAt": "2026-06-12T20:49:50.077Z",
       "kind": "mjs"
     },
     {
@@ -58420,8 +58651,22 @@
     {
       "path": "scripts/atlas/backfill-concept-evidence-spine.mjs",
       "normalizedPath": "scripts/atlas/backfill-concept-evidence-spine.mjs",
-      "bytes": 15027,
-      "modifiedAt": "2026-06-12T13:03:16.269Z",
+      "bytes": 5752,
+      "modifiedAt": "2026-06-13T19:59:08.744Z",
+      "kind": "mjs"
+    },
+    {
+      "path": "scripts/atlas/backfill-feature-label-payload.mjs",
+      "normalizedPath": "scripts/atlas/backfill-feature-label-payload.mjs",
+      "bytes": 3863,
+      "modifiedAt": "2026-06-13T19:39:26.851Z",
+      "kind": "mjs"
+    },
+    {
+      "path": "scripts/atlas/backfill-graphify-feature-id.mjs",
+      "normalizedPath": "scripts/atlas/backfill-graphify-feature-id.mjs",
+      "bytes": 5152,
+      "modifiedAt": "2026-06-13T19:34:18.075Z",
       "kind": "mjs"
     },
     {
@@ -58453,6 +58698,13 @@
       "kind": "mjs"
     },
     {
+      "path": "scripts/atlas/backfill-packet-metadata.mjs",
+      "normalizedPath": "scripts/atlas/backfill-packet-metadata.mjs",
+      "bytes": 11789,
+      "modifiedAt": "2026-06-13T00:46:22.285Z",
+      "kind": "mjs"
+    },
+    {
       "path": "scripts/atlas/backfill-qdrant-som-from-centroids.mjs",
       "normalizedPath": "scripts/atlas/backfill-qdrant-som-from-centroids.mjs",
       "bytes": 7589,
@@ -58471,6 +58723,13 @@
       "normalizedPath": "scripts/atlas/backfill-qdrant-source-refs.mjs",
       "bytes": 22831,
       "modifiedAt": "2026-06-03T19:19:18.050Z",
+      "kind": "mjs"
+    },
+    {
+      "path": "scripts/atlas/backfill-reward-prior.mjs",
+      "normalizedPath": "scripts/atlas/backfill-reward-prior.mjs",
+      "bytes": 16235,
+      "modifiedAt": "2026-06-13T14:59:51.422Z",
       "kind": "mjs"
     },
     {
@@ -58614,6 +58873,20 @@
       "kind": "mjs"
     },
     {
+      "path": "scripts/atlas/build-feature-dependency-groups.cjs",
+      "normalizedPath": "scripts/atlas/build-feature-dependency-groups.cjs",
+      "bytes": 0,
+      "modifiedAt": "2026-06-13T17:23:07.387Z",
+      "kind": "cjs"
+    },
+    {
+      "path": "scripts/atlas/build-feature-dependency-groups.mjs",
+      "normalizedPath": "scripts/atlas/build-feature-dependency-groups.mjs",
+      "bytes": 15154,
+      "modifiedAt": "2026-06-13T18:28:47.982Z",
+      "kind": "mjs"
+    },
+    {
       "path": "scripts/atlas/build-feature-graph.mjs",
       "normalizedPath": "scripts/atlas/build-feature-graph.mjs",
       "bytes": 17570,
@@ -58628,10 +58901,31 @@
       "kind": "mjs"
     },
     {
+      "path": "scripts/atlas/build-implementation-intent-aliases.cjs",
+      "normalizedPath": "scripts/atlas/build-implementation-intent-aliases.cjs",
+      "bytes": 0,
+      "modifiedAt": "2026-06-13T17:23:07.364Z",
+      "kind": "cjs"
+    },
+    {
+      "path": "scripts/atlas/build-implementation-intent-aliases.mjs",
+      "normalizedPath": "scripts/atlas/build-implementation-intent-aliases.mjs",
+      "bytes": 14555,
+      "modifiedAt": "2026-06-13T18:28:48.020Z",
+      "kind": "mjs"
+    },
+    {
       "path": "scripts/atlas/build-intent-graph.mjs",
       "normalizedPath": "scripts/atlas/build-intent-graph.mjs",
       "bytes": 5979,
       "modifiedAt": "2026-05-30T05:20:13.074Z",
+      "kind": "mjs"
+    },
+    {
+      "path": "scripts/atlas/build-mcp-tool-manifest-packets.mjs",
+      "normalizedPath": "scripts/atlas/build-mcp-tool-manifest-packets.mjs",
+      "bytes": 36935,
+      "modifiedAt": "2026-06-13T08:08:01.705Z",
       "kind": "mjs"
     },
     {
@@ -58658,8 +58952,8 @@
     {
       "path": "scripts/atlas/build-parent-atlas-export-bundle.mjs",
       "normalizedPath": "scripts/atlas/build-parent-atlas-export-bundle.mjs",
-      "bytes": 8590,
-      "modifiedAt": "2026-06-12T19:34:58.435Z",
+      "bytes": 8685,
+      "modifiedAt": "2026-06-14T01:16:47.028Z",
       "kind": "parent-atlas"
     },
     {
@@ -58705,6 +58999,20 @@
       "kind": "mjs"
     },
     {
+      "path": "scripts/atlas/build-temporal-bitfrost-index.mjs",
+      "normalizedPath": "scripts/atlas/build-temporal-bitfrost-index.mjs",
+      "bytes": 14429,
+      "modifiedAt": "2026-06-13T03:40:02.868Z",
+      "kind": "mjs"
+    },
+    {
+      "path": "scripts/atlas/build-temporal-entity-index.mjs",
+      "normalizedPath": "scripts/atlas/build-temporal-entity-index.mjs",
+      "bytes": 16169,
+      "modifiedAt": "2026-06-13T04:43:59.962Z",
+      "kind": "mjs"
+    },
+    {
       "path": "scripts/atlas/build-training-rows-dry-run.mjs",
       "normalizedPath": "scripts/atlas/build-training-rows-dry-run.mjs",
       "bytes": 7875,
@@ -58712,10 +59020,24 @@
       "kind": "mjs"
     },
     {
+      "path": "scripts/atlas/cache-ace-packet.mjs",
+      "normalizedPath": "scripts/atlas/cache-ace-packet.mjs",
+      "bytes": 4290,
+      "modifiedAt": "2026-06-13T19:53:41.069Z",
+      "kind": "mjs"
+    },
+    {
       "path": "scripts/atlas/cache-feature-cards.mjs",
       "normalizedPath": "scripts/atlas/cache-feature-cards.mjs",
       "bytes": 8008,
       "modifiedAt": "2026-05-26T20:22:18.463Z",
+      "kind": "mjs"
+    },
+    {
+      "path": "scripts/atlas/capture-git-mutation-provenance.mjs",
+      "normalizedPath": "scripts/atlas/capture-git-mutation-provenance.mjs",
+      "bytes": 7865,
+      "modifiedAt": "2026-06-13T21:05:49.482Z",
       "kind": "mjs"
     },
     {
@@ -58824,6 +59146,13 @@
       "kind": "mjs"
     },
     {
+      "path": "scripts/atlas/classify-domain-ontology.mjs",
+      "normalizedPath": "scripts/atlas/classify-domain-ontology.mjs",
+      "bytes": 21328,
+      "modifiedAt": "2026-06-13T14:59:16.097Z",
+      "kind": "mjs"
+    },
+    {
       "path": "scripts/atlas/classify-neschrom97-cards.mjs",
       "normalizedPath": "scripts/atlas/classify-neschrom97-cards.mjs",
       "bytes": 7700,
@@ -58835,6 +59164,13 @@
       "normalizedPath": "scripts/atlas/classify-packet-temperature.mjs",
       "bytes": 7948,
       "modifiedAt": "2026-06-11T05:38:19.574Z",
+      "kind": "mjs"
+    },
+    {
+      "path": "scripts/atlas/classify-supernode-pressure.mjs",
+      "normalizedPath": "scripts/atlas/classify-supernode-pressure.mjs",
+      "bytes": 4985,
+      "modifiedAt": "2026-06-13T20:04:27.269Z",
       "kind": "mjs"
     },
     {
@@ -59097,6 +59433,13 @@
       "kind": "ts"
     },
     {
+      "path": "scripts/atlas/enforce-source-ref-policy.mjs",
+      "normalizedPath": "scripts/atlas/enforce-source-ref-policy.mjs",
+      "bytes": 10457,
+      "modifiedAt": "2026-06-13T22:56:08.644Z",
+      "kind": "mjs"
+    },
+    {
       "path": "scripts/atlas/engram-plugin-adapter.mjs",
       "normalizedPath": "scripts/atlas/engram-plugin-adapter.mjs",
       "bytes": 1349,
@@ -59120,15 +59463,22 @@
     {
       "path": "scripts/atlas/enrich_atlas_packets.mjs",
       "normalizedPath": "scripts/atlas/enrich_atlas_packets.mjs",
-      "bytes": 21311,
-      "modifiedAt": "2026-06-12T18:26:37.078Z",
+      "bytes": 23274,
+      "modifiedAt": "2026-06-13T01:33:45.389Z",
       "kind": "mjs"
     },
     {
       "path": "scripts/atlas/enrich-atlas-concept-ids.mjs",
       "normalizedPath": "scripts/atlas/enrich-atlas-concept-ids.mjs",
-      "bytes": 10448,
-      "modifiedAt": "2026-06-12T12:11:36.684Z",
+      "bytes": 11250,
+      "modifiedAt": "2026-06-12T21:09:43.409Z",
+      "kind": "mjs"
+    },
+    {
+      "path": "scripts/atlas/enrich-domain-packet-payloads.mjs",
+      "normalizedPath": "scripts/atlas/enrich-domain-packet-payloads.mjs",
+      "bytes": 14968,
+      "modifiedAt": "2026-06-13T04:45:24.934Z",
       "kind": "mjs"
     },
     {
@@ -59167,6 +59517,13 @@
       "kind": "mjs"
     },
     {
+      "path": "scripts/atlas/expand-retrieval-topology.mjs",
+      "normalizedPath": "scripts/atlas/expand-retrieval-topology.mjs",
+      "bytes": 4968,
+      "modifiedAt": "2026-06-13T21:00:05.733Z",
+      "kind": "mjs"
+    },
+    {
       "path": "scripts/atlas/export-atlas-cards.mjs",
       "normalizedPath": "scripts/atlas/export-atlas-cards.mjs",
       "bytes": 2888,
@@ -59199,6 +59556,13 @@
       "normalizedPath": "scripts/atlas/export-postgres-nodes-edges.mjs",
       "bytes": 10762,
       "modifiedAt": "2026-06-12T14:49:26.933Z",
+      "kind": "mjs"
+    },
+    {
+      "path": "scripts/atlas/export-xgboost-features.mjs",
+      "normalizedPath": "scripts/atlas/export-xgboost-features.mjs",
+      "bytes": 20762,
+      "modifiedAt": "2026-06-13T04:54:09.650Z",
       "kind": "mjs"
     },
     {
@@ -59377,6 +59741,13 @@
       "kind": "mjs"
     },
     {
+      "path": "scripts/atlas/generate-concept-evidence-spine.mjs",
+      "normalizedPath": "scripts/atlas/generate-concept-evidence-spine.mjs",
+      "bytes": 7448,
+      "modifiedAt": "2026-06-13T20:06:02.194Z",
+      "kind": "mjs"
+    },
+    {
       "path": "scripts/atlas/generate-concept-records.mjs",
       "normalizedPath": "scripts/atlas/generate-concept-records.mjs",
       "bytes": 17631,
@@ -59466,6 +59837,13 @@
       "bytes": 8512,
       "modifiedAt": "2026-05-31T09:50:23.224Z",
       "kind": "mjs"
+    },
+    {
+      "path": "scripts/atlas/generate-parent-atlas-packets.mjs",
+      "normalizedPath": "scripts/atlas/generate-parent-atlas-packets.mjs",
+      "bytes": 6306,
+      "modifiedAt": "2026-06-13T19:51:21.186Z",
+      "kind": "parent-atlas"
     },
     {
       "path": "scripts/atlas/generate-parent-atlas-toc.mjs",
@@ -59573,6 +59951,20 @@
       "kind": "mjs"
     },
     {
+      "path": "scripts/atlas/graphify-langgraph-pipeline.mjs",
+      "normalizedPath": "scripts/atlas/graphify-langgraph-pipeline.mjs",
+      "bytes": 30340,
+      "modifiedAt": "2026-06-13T03:12:09.683Z",
+      "kind": "mjs"
+    },
+    {
+      "path": "scripts/atlas/graphify-packet-contract.mjs",
+      "normalizedPath": "scripts/atlas/graphify-packet-contract.mjs",
+      "bytes": 10699,
+      "modifiedAt": "2026-06-13T00:59:08.891Z",
+      "kind": "mjs"
+    },
+    {
       "path": "scripts/atlas/graphrag-cluster-recommendations.mjs",
       "normalizedPath": "scripts/atlas/graphrag-cluster-recommendations.mjs",
       "bytes": 6445,
@@ -59594,6 +59986,13 @@
       "kind": "mjs"
     },
     {
+      "path": "scripts/atlas/index-ace-cache.mjs",
+      "normalizedPath": "scripts/atlas/index-ace-cache.mjs",
+      "bytes": 5442,
+      "modifiedAt": "2026-06-13T20:02:01.399Z",
+      "kind": "mjs"
+    },
+    {
       "path": "scripts/atlas/index-atlas-card.mjs",
       "normalizedPath": "scripts/atlas/index-atlas-card.mjs",
       "bytes": 839,
@@ -59606,6 +60005,34 @@
       "bytes": 12399,
       "modifiedAt": "2026-05-28T04:08:00.262Z",
       "kind": "mjs"
+    },
+    {
+      "path": "scripts/atlas/index-concept-evidence-spine.mjs",
+      "normalizedPath": "scripts/atlas/index-concept-evidence-spine.mjs",
+      "bytes": 5195,
+      "modifiedAt": "2026-06-13T20:07:47.277Z",
+      "kind": "mjs"
+    },
+    {
+      "path": "scripts/atlas/index-env-contract.mjs",
+      "normalizedPath": "scripts/atlas/index-env-contract.mjs",
+      "bytes": 5369,
+      "modifiedAt": "2026-06-13T19:50:13.927Z",
+      "kind": "mjs"
+    },
+    {
+      "path": "scripts/atlas/index-function-packets.mjs",
+      "normalizedPath": "scripts/atlas/index-function-packets.mjs",
+      "bytes": 29541,
+      "modifiedAt": "2026-06-13T14:50:17.253Z",
+      "kind": "mjs"
+    },
+    {
+      "path": "scripts/atlas/index-parent-atlas-packets.mjs",
+      "normalizedPath": "scripts/atlas/index-parent-atlas-packets.mjs",
+      "bytes": 5077,
+      "modifiedAt": "2026-06-13T19:59:48.858Z",
+      "kind": "parent-atlas"
     },
     {
       "path": "scripts/atlas/index-repo-root.mjs",
@@ -59664,6 +60091,13 @@
       "kind": "mjs"
     },
     {
+      "path": "scripts/atlas/ingest-grpc-packets-to-qdrant.mjs",
+      "normalizedPath": "scripts/atlas/ingest-grpc-packets-to-qdrant.mjs",
+      "bytes": 4294,
+      "modifiedAt": "2026-06-13T22:06:43.183Z",
+      "kind": "mjs"
+    },
+    {
       "path": "scripts/atlas/ingest-llm-wiki.mjs",
       "normalizedPath": "scripts/atlas/ingest-llm-wiki.mjs",
       "bytes": 9531,
@@ -59703,6 +60137,13 @@
       "normalizedPath": "scripts/atlas/ingest-qdrant-to-atlas-packets.mjs",
       "bytes": 12038,
       "modifiedAt": "2026-06-12T04:22:45.923Z",
+      "kind": "mjs"
+    },
+    {
+      "path": "scripts/atlas/ingest-rpc-tools-to-qdrant.mjs",
+      "normalizedPath": "scripts/atlas/ingest-rpc-tools-to-qdrant.mjs",
+      "bytes": 16333,
+      "modifiedAt": "2026-06-13T22:11:21.669Z",
       "kind": "mjs"
     },
     {
@@ -59972,6 +60413,13 @@
       "kind": "mjs"
     },
     {
+      "path": "scripts/atlas/load-turbovec-index-from-qdrant.mjs",
+      "normalizedPath": "scripts/atlas/load-turbovec-index-from-qdrant.mjs",
+      "bytes": 12165,
+      "modifiedAt": "2026-06-12T22:12:43.817Z",
+      "kind": "mjs"
+    },
+    {
       "path": "scripts/atlas/locate-phase16-runtime-artifacts.mjs",
       "normalizedPath": "scripts/atlas/locate-phase16-runtime-artifacts.mjs",
       "bytes": 7098,
@@ -60056,6 +60504,13 @@
       "kind": "mjs"
     },
     {
+      "path": "scripts/atlas/materialize-recommendation-tasks.mjs",
+      "normalizedPath": "scripts/atlas/materialize-recommendation-tasks.mjs",
+      "bytes": 7372,
+      "modifiedAt": "2026-06-13T20:16:56.957Z",
+      "kind": "mjs"
+    },
+    {
       "path": "scripts/atlas/materialize-task-cards.mjs",
       "normalizedPath": "scripts/atlas/materialize-task-cards.mjs",
       "bytes": 21280,
@@ -60067,6 +60522,13 @@
       "normalizedPath": "scripts/atlas/mcp-opencode-health-probe.mjs",
       "bytes": 7017,
       "modifiedAt": "2026-05-30T21:50:11.288Z",
+      "kind": "mjs"
+    },
+    {
+      "path": "scripts/atlas/merge-gpu-enrichment.mjs",
+      "normalizedPath": "scripts/atlas/merge-gpu-enrichment.mjs",
+      "bytes": 8614,
+      "modifiedAt": "2026-06-13T20:27:22.252Z",
       "kind": "mjs"
     },
     {
@@ -60121,8 +60583,8 @@
     {
       "path": "scripts/atlas/normalize-source-ref-id.mjs",
       "normalizedPath": "scripts/atlas/normalize-source-ref-id.mjs",
-      "bytes": 12245,
-      "modifiedAt": "2026-06-12T19:33:51.655Z",
+      "bytes": 12945,
+      "modifiedAt": "2026-06-14T01:15:02.799Z",
       "kind": "mjs"
     },
     {
@@ -60138,6 +60600,13 @@
       "bytes": 9070,
       "modifiedAt": "2026-06-04T15:23:55.967Z",
       "kind": "parent-atlas"
+    },
+    {
+      "path": "scripts/atlas/orchestrate-gpu-lane.mjs",
+      "normalizedPath": "scripts/atlas/orchestrate-gpu-lane.mjs",
+      "bytes": 3184,
+      "modifiedAt": "2026-06-13T20:31:26.300Z",
+      "kind": "mjs"
     },
     {
       "path": "scripts/atlas/organize-rg-search-transcripts.mjs",
@@ -60238,6 +60707,13 @@
       "kind": "mjs"
     },
     {
+      "path": "scripts/atlas/packetize-proto-rpc-tools.mjs",
+      "normalizedPath": "scripts/atlas/packetize-proto-rpc-tools.mjs",
+      "bytes": 21674,
+      "modifiedAt": "2026-06-13T21:46:20.141Z",
+      "kind": "mjs"
+    },
+    {
       "path": "scripts/atlas/parent-atlas-completion-gate.mjs",
       "normalizedPath": "scripts/atlas/parent-atlas-completion-gate.mjs",
       "bytes": 13274,
@@ -60259,6 +60735,13 @@
       "kind": "parent-atlas"
     },
     {
+      "path": "scripts/atlas/parent-atlas-mutation-gate.mjs",
+      "normalizedPath": "scripts/atlas/parent-atlas-mutation-gate.mjs",
+      "bytes": 7247,
+      "modifiedAt": "2026-06-13T20:09:42.478Z",
+      "kind": "parent-atlas"
+    },
+    {
       "path": "scripts/atlas/parent-atlas-turbovec-compression-plan.mjs",
       "normalizedPath": "scripts/atlas/parent-atlas-turbovec-compression-plan.mjs",
       "bytes": 14046,
@@ -60270,6 +60753,13 @@
       "normalizedPath": "scripts/atlas/patch-neschrom97-qdrant-tags.mjs",
       "bytes": 16525,
       "modifiedAt": "2026-06-11T19:51:50.503Z",
+      "kind": "mjs"
+    },
+    {
+      "path": "scripts/atlas/persist-ace-kag-dag-hit.mjs",
+      "normalizedPath": "scripts/atlas/persist-ace-kag-dag-hit.mjs",
+      "bytes": 3300,
+      "modifiedAt": "2026-06-13T21:02:36.863Z",
       "kind": "mjs"
     },
     {
@@ -60413,6 +60903,13 @@
       "kind": "mjs"
     },
     {
+      "path": "scripts/atlas/populate-atlas-packets-aggressive.mjs",
+      "normalizedPath": "scripts/atlas/populate-atlas-packets-aggressive.mjs",
+      "bytes": 4789,
+      "modifiedAt": "2026-06-13T21:39:10.150Z",
+      "kind": "mjs"
+    },
+    {
       "path": "scripts/atlas/populate-route-packet-rewards.mjs",
       "normalizedPath": "scripts/atlas/populate-route-packet-rewards.mjs",
       "bytes": 8110,
@@ -60525,6 +61022,13 @@
       "kind": "mjs"
     },
     {
+      "path": "scripts/atlas/promote-atlas-truth.mjs",
+      "normalizedPath": "scripts/atlas/promote-atlas-truth.mjs",
+      "bytes": 8351,
+      "modifiedAt": "2026-06-13T22:34:19.017Z",
+      "kind": "mjs"
+    },
+    {
       "path": "scripts/atlas/promote-to-postgres.mjs",
       "normalizedPath": "scripts/atlas/promote-to-postgres.mjs",
       "bytes": 13378,
@@ -60567,10 +61071,24 @@
       "kind": "parent-atlas"
     },
     {
+      "path": "scripts/atlas/pytorch-architecture-report.ps1",
+      "normalizedPath": "scripts/atlas/pytorch-architecture-report.ps1",
+      "bytes": 8360,
+      "modifiedAt": "2026-06-13T21:59:49.419Z",
+      "kind": "ps1"
+    },
+    {
       "path": "scripts/atlas/pytorch-qdrant-redis-som-index.mjs",
       "normalizedPath": "scripts/atlas/pytorch-qdrant-redis-som-index.mjs",
       "bytes": 35567,
       "modifiedAt": "2026-06-10T13:36:23.254Z",
+      "kind": "mjs"
+    },
+    {
+      "path": "scripts/atlas/pytorch-training-pipeline.mjs",
+      "normalizedPath": "scripts/atlas/pytorch-training-pipeline.mjs",
+      "bytes": 9515,
+      "modifiedAt": "2026-06-13T22:00:26.475Z",
       "kind": "mjs"
     },
     {
@@ -60662,6 +61180,13 @@
       "normalizedPath": "scripts/atlas/record-fix-outcome.mjs",
       "bytes": 4328,
       "modifiedAt": "2026-05-30T08:53:08.425Z",
+      "kind": "mjs"
+    },
+    {
+      "path": "scripts/atlas/record-git-diff-provenance.mjs",
+      "normalizedPath": "scripts/atlas/record-git-diff-provenance.mjs",
+      "bytes": 3146,
+      "modifiedAt": "2026-06-13T21:00:58.214Z",
       "kind": "mjs"
     },
     {
@@ -60847,6 +61372,13 @@
       "kind": "mjs"
     },
     {
+      "path": "scripts/atlas/run-indexing-gate.mjs",
+      "normalizedPath": "scripts/atlas/run-indexing-gate.mjs",
+      "bytes": 4657,
+      "modifiedAt": "2026-06-13T19:57:33.650Z",
+      "kind": "mjs"
+    },
+    {
       "path": "scripts/atlas/run-offline-synthesis.mjs",
       "normalizedPath": "scripts/atlas/run-offline-synthesis.mjs",
       "bytes": 9529,
@@ -60866,6 +61398,13 @@
       "bytes": 13848,
       "modifiedAt": "2026-06-11T03:40:35.291Z",
       "kind": "parent-atlas"
+    },
+    {
+      "path": "scripts/atlas/runtime-mcp-tool-selector.mjs",
+      "normalizedPath": "scripts/atlas/runtime-mcp-tool-selector.mjs",
+      "bytes": 14456,
+      "modifiedAt": "2026-06-13T03:35:45.523Z",
+      "kind": "mjs"
     },
     {
       "path": "scripts/atlas/sample-glyphs-for-training.mjs",
@@ -60903,10 +61442,31 @@
       "kind": "mjs"
     },
     {
+      "path": "scripts/atlas/seed-neo4j-bounded-khop.mjs",
+      "normalizedPath": "scripts/atlas/seed-neo4j-bounded-khop.mjs",
+      "bytes": 6751,
+      "modifiedAt": "2026-06-13T20:12:31.562Z",
+      "kind": "mjs"
+    },
+    {
+      "path": "scripts/atlas/seed-neo4j-rpc-graph.mjs",
+      "normalizedPath": "scripts/atlas/seed-neo4j-rpc-graph.mjs",
+      "bytes": 22421,
+      "modifiedAt": "2026-06-13T22:34:37.894Z",
+      "kind": "mjs"
+    },
+    {
       "path": "scripts/atlas/seed-neo4j-used-concept-edges.mjs",
       "normalizedPath": "scripts/atlas/seed-neo4j-used-concept-edges.mjs",
-      "bytes": 8920,
-      "modifiedAt": "2026-06-12T13:29:13.219Z",
+      "bytes": 11063,
+      "modifiedAt": "2026-06-13T20:06:33.919Z",
+      "kind": "mjs"
+    },
+    {
+      "path": "scripts/atlas/seed-redis-reward-sets.mjs",
+      "normalizedPath": "scripts/atlas/seed-redis-reward-sets.mjs",
+      "bytes": 4781,
+      "modifiedAt": "2026-06-12T22:28:23.997Z",
       "kind": "mjs"
     },
     {
@@ -60945,6 +61505,13 @@
       "kind": "mjs"
     },
     {
+      "path": "scripts/atlas/smoke-atlas-ann-cascade.mjs",
+      "normalizedPath": "scripts/atlas/smoke-atlas-ann-cascade.mjs",
+      "bytes": 3956,
+      "modifiedAt": "2026-06-13T04:10:03.404Z",
+      "kind": "mjs"
+    },
+    {
       "path": "scripts/atlas/smoke-feature-registry.mjs",
       "normalizedPath": "scripts/atlas/smoke-feature-registry.mjs",
       "bytes": 4436,
@@ -60977,6 +61544,13 @@
       "normalizedPath": "scripts/atlas/smoke-gpu-job-queue.mjs",
       "bytes": 7203,
       "modifiedAt": "2026-05-17T02:02:14.413Z",
+      "kind": "mjs"
+    },
+    {
+      "path": "scripts/atlas/smoke-hyperrag-packet-rpc.mjs",
+      "normalizedPath": "scripts/atlas/smoke-hyperrag-packet-rpc.mjs",
+      "bytes": 6622,
+      "modifiedAt": "2026-06-13T21:22:19.013Z",
       "kind": "mjs"
     },
     {
@@ -61127,6 +61701,27 @@
       "kind": "mjs"
     },
     {
+      "path": "scripts/atlas/standardize-karpathy-gpu-packets.mjs",
+      "normalizedPath": "scripts/atlas/standardize-karpathy-gpu-packets.mjs",
+      "bytes": 5740,
+      "modifiedAt": "2026-06-13T20:23:42.005Z",
+      "kind": "mjs"
+    },
+    {
+      "path": "scripts/atlas/standardize-nes-chrom-packets.mjs",
+      "normalizedPath": "scripts/atlas/standardize-nes-chrom-packets.mjs",
+      "bytes": 4954,
+      "modifiedAt": "2026-06-13T20:25:23.411Z",
+      "kind": "mjs"
+    },
+    {
+      "path": "scripts/atlas/startup-retrieve-first.mjs",
+      "normalizedPath": "scripts/atlas/startup-retrieve-first.mjs",
+      "bytes": 15435,
+      "modifiedAt": "2026-06-13T07:30:59.641Z",
+      "kind": "mjs"
+    },
+    {
       "path": "scripts/atlas/suggest-card-source-refs.mjs",
       "normalizedPath": "scripts/atlas/suggest-card-source-refs.mjs",
       "bytes": 12176,
@@ -61253,6 +61848,13 @@
       "kind": "mjs"
     },
     {
+      "path": "scripts/atlas/test-contract-layer-integration.mjs",
+      "normalizedPath": "scripts/atlas/test-contract-layer-integration.mjs",
+      "bytes": 8647,
+      "modifiedAt": "2026-06-13T20:53:27.862Z",
+      "kind": "mjs"
+    },
+    {
       "path": "scripts/atlas/test-langextract-turbovec.mjs",
       "normalizedPath": "scripts/atlas/test-langextract-turbovec.mjs",
       "bytes": 3833,
@@ -61271,6 +61873,13 @@
       "normalizedPath": "scripts/atlas/test-rust-parser.mjs",
       "bytes": 1034,
       "modifiedAt": "2026-06-11T21:33:56.873Z",
+      "kind": "mjs"
+    },
+    {
+      "path": "scripts/atlas/test-turbovec-sidecar-contract.mjs",
+      "normalizedPath": "scripts/atlas/test-turbovec-sidecar-contract.mjs",
+      "bytes": 11434,
+      "modifiedAt": "2026-06-12T21:04:24.517Z",
       "kind": "mjs"
     },
     {
@@ -61302,6 +61911,13 @@
       "kind": "mjs"
     },
     {
+      "path": "scripts/atlas/turbovec-grpc-health.mjs",
+      "normalizedPath": "scripts/atlas/turbovec-grpc-health.mjs",
+      "bytes": 2907,
+      "modifiedAt": "2026-06-12T20:50:39.089Z",
+      "kind": "mjs"
+    },
+    {
       "path": "scripts/atlas/turbovec-sidecar-health.mjs",
       "normalizedPath": "scripts/atlas/turbovec-sidecar-health.mjs",
       "bytes": 1843,
@@ -61330,6 +61946,20 @@
       "kind": "mjs"
     },
     {
+      "path": "scripts/atlas/update-open-lanes.mjs",
+      "normalizedPath": "scripts/atlas/update-open-lanes.mjs",
+      "bytes": 5471,
+      "modifiedAt": "2026-06-13T03:28:49.706Z",
+      "kind": "mjs"
+    },
+    {
+      "path": "scripts/atlas/update-package-json.mjs",
+      "normalizedPath": "scripts/atlas/update-package-json.mjs",
+      "bytes": 2733,
+      "modifiedAt": "2026-06-13T21:07:46.914Z",
+      "kind": "mjs"
+    },
+    {
       "path": "scripts/atlas/update-parent-atlas.ts",
       "normalizedPath": "scripts/atlas/update-parent-atlas.ts",
       "bytes": 2072,
@@ -61339,8 +61969,8 @@
     {
       "path": "scripts/atlas/upsert-qdrant-packet-payload.mjs",
       "normalizedPath": "scripts/atlas/upsert-qdrant-packet-payload.mjs",
-      "bytes": 9000,
-      "modifiedAt": "2026-06-12T18:31:34.469Z",
+      "bytes": 9190,
+      "modifiedAt": "2026-06-13T01:34:45.497Z",
       "kind": "mjs"
     },
     {
@@ -61355,6 +61985,13 @@
       "normalizedPath": "scripts/atlas/validate-dev-services.mjs",
       "bytes": 8354,
       "modifiedAt": "2026-05-26T20:22:18.508Z",
+      "kind": "mjs"
+    },
+    {
+      "path": "scripts/atlas/validate-hyperrag-imports.mjs",
+      "normalizedPath": "scripts/atlas/validate-hyperrag-imports.mjs",
+      "bytes": 9211,
+      "modifiedAt": "2026-06-13T22:49:34.558Z",
       "kind": "mjs"
     },
     {
@@ -61376,6 +62013,13 @@
       "normalizedPath": "scripts/atlas/validate-model-endpoints.mjs",
       "bytes": 1577,
       "modifiedAt": "2026-05-16T06:21:17.416Z",
+      "kind": "mjs"
+    },
+    {
+      "path": "scripts/atlas/validate-packet-contract.mjs",
+      "normalizedPath": "scripts/atlas/validate-packet-contract.mjs",
+      "bytes": 16244,
+      "modifiedAt": "2026-06-13T02:48:32.949Z",
       "kind": "mjs"
     },
     {
@@ -61416,9 +62060,58 @@
     {
       "path": "scripts/atlas/verify-feature-lineage.mjs",
       "normalizedPath": "scripts/atlas/verify-feature-lineage.mjs",
-      "bytes": 15279,
-      "modifiedAt": "2026-06-12T02:24:48.064Z",
+      "bytes": 18632,
+      "modifiedAt": "2026-06-13T19:29:11.727Z",
       "kind": "feature-lineage"
+    },
+    {
+      "path": "scripts/atlas/verify-generated-skill.mjs",
+      "normalizedPath": "scripts/atlas/verify-generated-skill.mjs",
+      "bytes": 4048,
+      "modifiedAt": "2026-06-13T18:28:48.055Z",
+      "kind": "mjs"
+    },
+    {
+      "path": "scripts/atlas/verify-gpu-merge.mjs",
+      "normalizedPath": "scripts/atlas/verify-gpu-merge.mjs",
+      "bytes": 5910,
+      "modifiedAt": "2026-06-13T20:29:21.100Z",
+      "kind": "mjs"
+    },
+    {
+      "path": "scripts/atlas/verify-packet-metadata.mjs",
+      "normalizedPath": "scripts/atlas/verify-packet-metadata.mjs",
+      "bytes": 8565,
+      "modifiedAt": "2026-06-13T00:48:17.718Z",
+      "kind": "mjs"
+    },
+    {
+      "path": "scripts/atlas/verify-qdrant-packet-payload.mjs",
+      "normalizedPath": "scripts/atlas/verify-qdrant-packet-payload.mjs",
+      "bytes": 14673,
+      "modifiedAt": "2026-06-13T01:10:22.080Z",
+      "kind": "mjs"
+    },
+    {
+      "path": "scripts/atlas/verify-recommendation-count.mjs",
+      "normalizedPath": "scripts/atlas/verify-recommendation-count.mjs",
+      "bytes": 3834,
+      "modifiedAt": "2026-06-13T20:14:55.516Z",
+      "kind": "mjs"
+    },
+    {
+      "path": "scripts/atlas/verify-recommendation-merge-limit.mjs",
+      "normalizedPath": "scripts/atlas/verify-recommendation-merge-limit.mjs",
+      "bytes": 8418,
+      "modifiedAt": "2026-06-13T20:14:51.826Z",
+      "kind": "mjs"
+    },
+    {
+      "path": "scripts/atlas/verify-used-concept-edges.mjs",
+      "normalizedPath": "scripts/atlas/verify-used-concept-edges.mjs",
+      "bytes": 9527,
+      "modifiedAt": "2026-06-12T21:32:15.795Z",
+      "kind": "mjs"
     },
     {
       "path": "scripts/atlas/warm-feature-identity-cache.mjs",
@@ -61451,8 +62144,22 @@
     {
       "path": "scripts/atlas/write-graph-refresh-manifest.mjs",
       "normalizedPath": "scripts/atlas/write-graph-refresh-manifest.mjs",
-      "bytes": 6912,
-      "modifiedAt": "2026-06-12T19:34:39.437Z",
+      "bytes": 14062,
+      "modifiedAt": "2026-06-13T15:00:59.043Z",
+      "kind": "mjs"
+    },
+    {
+      "path": "scripts/atlas/write-used-concept-edges.mjs",
+      "normalizedPath": "scripts/atlas/write-used-concept-edges.mjs",
+      "bytes": 12011,
+      "modifiedAt": "2026-06-12T21:35:02.635Z",
+      "kind": "mjs"
+    },
+    {
+      "path": "scripts/atlas/write-used-concepts-live.mjs",
+      "normalizedPath": "scripts/atlas/write-used-concepts-live.mjs",
+      "bytes": 13347,
+      "modifiedAt": "2026-06-13T22:22:13.012Z",
       "kind": "mjs"
     },
     {
@@ -61946,6 +62653,342 @@
       "kind": "mjs"
     },
     {
+      "path": "src/lib/gpu/gpu-compute-pipeline.ts",
+      "normalizedPath": "lib/gpu/gpu-compute-pipeline.ts",
+      "bytes": 3026,
+      "modifiedAt": "2026-06-08T22:25:24.920Z",
+      "kind": "ts"
+    },
+    {
+      "path": "src/lib/schema/llm-stuck-events.ts",
+      "normalizedPath": "lib/schema/llm-stuck-events.ts",
+      "bytes": 712,
+      "modifiedAt": "2026-05-26T20:22:18.593Z",
+      "kind": "ts"
+    },
+    {
+      "path": "src/lib/server/ace/context-assembler.ts",
+      "normalizedPath": "lib/server/ace/context-assembler.ts",
+      "bytes": 1355,
+      "modifiedAt": "2026-05-26T20:22:18.595Z",
+      "kind": "ts"
+    },
+    {
+      "path": "src/lib/server/ace/index.ts",
+      "normalizedPath": "lib/server/ace/index.ts",
+      "bytes": 167,
+      "modifiedAt": "2026-05-26T20:22:18.596Z",
+      "kind": "ts"
+    },
+    {
+      "path": "src/lib/server/ace/variance-recovery-schema.ts",
+      "normalizedPath": "lib/server/ace/variance-recovery-schema.ts",
+      "bytes": 597,
+      "modifiedAt": "2026-05-26T20:32:38.178Z",
+      "kind": "ts"
+    },
+    {
+      "path": "src/lib/server/ai/feature-map/feature-mapping-graph-cli.ts",
+      "normalizedPath": "lib/server/ai/feature-map/feature-mapping-graph-cli.ts",
+      "bytes": 1331,
+      "modifiedAt": "2026-05-26T20:22:18.598Z",
+      "kind": "ts"
+    },
+    {
+      "path": "src/lib/server/ai/feature-map/feature-mapping-graph.ts",
+      "normalizedPath": "lib/server/ai/feature-map/feature-mapping-graph.ts",
+      "bytes": 1736,
+      "modifiedAt": "2026-05-26T20:22:18.599Z",
+      "kind": "ts"
+    },
+    {
+      "path": "src/lib/server/ai/feature-map/metadata-detection-node.ts",
+      "normalizedPath": "lib/server/ai/feature-map/metadata-detection-node.ts",
+      "bytes": 1509,
+      "modifiedAt": "2026-05-26T20:22:18.600Z",
+      "kind": "ts"
+    },
+    {
+      "path": "src/lib/server/ai/feature-map/rerank-node.ts",
+      "normalizedPath": "lib/server/ai/feature-map/rerank-node.ts",
+      "bytes": 992,
+      "modifiedAt": "2026-05-26T20:22:18.601Z",
+      "kind": "ts"
+    },
+    {
+      "path": "src/lib/server/ai/feature-map/scan-directory-node.ts",
+      "normalizedPath": "lib/server/ai/feature-map/scan-directory-node.ts",
+      "bytes": 2605,
+      "modifiedAt": "2026-05-26T20:22:18.601Z",
+      "kind": "ts"
+    },
+    {
+      "path": "src/lib/server/ai/feature-map/schema-usage-node.ts",
+      "normalizedPath": "lib/server/ai/feature-map/schema-usage-node.ts",
+      "bytes": 1941,
+      "modifiedAt": "2026-05-26T20:22:18.602Z",
+      "kind": "ts"
+    },
+    {
+      "path": "src/lib/server/ai/feature-map/subgraph-expand-node.ts",
+      "normalizedPath": "lib/server/ai/feature-map/subgraph-expand-node.ts",
+      "bytes": 930,
+      "modifiedAt": "2026-05-26T20:22:18.603Z",
+      "kind": "ts"
+    },
+    {
+      "path": "src/lib/server/ai/feature-map/toon-context-node.ts",
+      "normalizedPath": "lib/server/ai/feature-map/toon-context-node.ts",
+      "bytes": 827,
+      "modifiedAt": "2026-05-26T20:22:18.604Z",
+      "kind": "ts"
+    },
+    {
+      "path": "src/lib/server/ai/feature-map/write-feature-index-node.ts",
+      "normalizedPath": "lib/server/ai/feature-map/write-feature-index-node.ts",
+      "bytes": 1354,
+      "modifiedAt": "2026-05-26T20:22:18.605Z",
+      "kind": "ts"
+    },
+    {
+      "path": "src/lib/server/ai/learning-loop.ts",
+      "normalizedPath": "lib/server/ai/learning-loop.ts",
+      "bytes": 3634,
+      "modifiedAt": "2026-05-26T20:32:38.180Z",
+      "kind": "ts"
+    },
+    {
+      "path": "src/lib/server/ai/openai-facade.ts",
+      "normalizedPath": "lib/server/ai/openai-facade.ts",
+      "bytes": 1792,
+      "modifiedAt": "2026-05-26T20:22:18.606Z",
+      "kind": "ts"
+    },
+    {
+      "path": "src/lib/server/atlas/ace-kag-dag-evidence-schema.ts",
+      "normalizedPath": "lib/server/atlas/ace-kag-dag-evidence-schema.ts",
+      "bytes": 4765,
+      "modifiedAt": "2026-06-13T19:40:32.374Z",
+      "kind": "ts"
+    },
+    {
+      "path": "src/lib/server/auth-utils.ts",
+      "normalizedPath": "lib/server/auth-utils.ts",
+      "bytes": 2346,
+      "modifiedAt": "2026-05-26T20:22:18.606Z",
+      "kind": "ts"
+    },
+    {
+      "path": "src/lib/server/db/schema-engram.ts",
+      "normalizedPath": "lib/server/db/schema-engram.ts",
+      "bytes": 2486,
+      "modifiedAt": "2026-06-12T19:54:19.669Z",
+      "kind": "ts"
+    },
+    {
+      "path": "src/lib/server/db/schema/agent-memory.ts",
+      "normalizedPath": "lib/server/db/schema/agent-memory.ts",
+      "bytes": 1240,
+      "modifiedAt": "2026-05-28T01:48:53.435Z",
+      "kind": "ts"
+    },
+    {
+      "path": "src/lib/server/db/schema/synthesis-logs.ts",
+      "normalizedPath": "lib/server/db/schema/synthesis-logs.ts",
+      "bytes": 973,
+      "modifiedAt": "2026-05-28T01:48:55.979Z",
+      "kind": "ts"
+    },
+    {
+      "path": "src/lib/server/gateway/flow-enforcer.ts",
+      "normalizedPath": "lib/server/gateway/flow-enforcer.ts",
+      "bytes": 2272,
+      "modifiedAt": "2026-05-26T20:22:18.612Z",
+      "kind": "ts"
+    },
+    {
+      "path": "src/lib/server/gateway/state-manager.ts",
+      "normalizedPath": "lib/server/gateway/state-manager.ts",
+      "bytes": 1613,
+      "modifiedAt": "2026-05-26T20:22:18.613Z",
+      "kind": "ts"
+    },
+    {
+      "path": "src/lib/server/graph/deriveGraphAndClusters.ts",
+      "normalizedPath": "lib/server/graph/deriveGraphAndClusters.ts",
+      "bytes": 5252,
+      "modifiedAt": "2026-05-26T20:22:18.614Z",
+      "kind": "ts"
+    },
+    {
+      "path": "src/lib/server/graph/topology-ontology.ts",
+      "normalizedPath": "lib/server/graph/topology-ontology.ts",
+      "bytes": 530,
+      "modifiedAt": "2026-05-26T20:22:18.615Z",
+      "kind": "ts"
+    },
+    {
+      "path": "src/lib/server/labels/normalize-labels.ts",
+      "normalizedPath": "lib/server/labels/normalize-labels.ts",
+      "bytes": 9115,
+      "modifiedAt": "2026-05-28T01:41:08.441Z",
+      "kind": "ts"
+    },
+    {
+      "path": "src/lib/server/mcp/__tests__/engram-injector.test.ts",
+      "normalizedPath": "lib/server/mcp/__tests__/engram-injector.test.ts",
+      "bytes": 1137,
+      "modifiedAt": "2026-05-26T20:22:18.619Z",
+      "kind": "ts"
+    },
+    {
+      "path": "src/lib/server/mcp/advanced-tools.ts",
+      "normalizedPath": "lib/server/mcp/advanced-tools.ts",
+      "bytes": 2810,
+      "modifiedAt": "2026-05-26T20:22:18.620Z",
+      "kind": "ts"
+    },
+    {
+      "path": "src/lib/server/mcp/engram-mcp-tools.ts",
+      "normalizedPath": "lib/server/mcp/engram-mcp-tools.ts",
+      "bytes": 1798,
+      "modifiedAt": "2026-05-29T18:00:42.995Z",
+      "kind": "ts"
+    },
+    {
+      "path": "src/lib/server/observability/llm-stuck-logger.ts",
+      "normalizedPath": "lib/server/observability/llm-stuck-logger.ts",
+      "bytes": 1919,
+      "modifiedAt": "2026-05-26T20:22:18.623Z",
+      "kind": "ts"
+    },
+    {
+      "path": "src/lib/server/observability/synthesis-logger.ts",
+      "normalizedPath": "lib/server/observability/synthesis-logger.ts",
+      "bytes": 657,
+      "modifiedAt": "2026-05-26T20:22:18.624Z",
+      "kind": "ts"
+    },
+    {
+      "path": "src/lib/server/retrieval/opencode-retrieval-contract.ts",
+      "normalizedPath": "lib/server/retrieval/opencode-retrieval-contract.ts",
+      "bytes": 2483,
+      "modifiedAt": "2026-06-13T22:25:13.301Z",
+      "kind": "ts"
+    },
+    {
+      "path": "src/lib/server/utils/safe-json-post.ts",
+      "normalizedPath": "lib/server/utils/safe-json-post.ts",
+      "bytes": 3805,
+      "modifiedAt": "2026-05-28T01:54:19.615Z",
+      "kind": "ts"
+    },
+    {
+      "path": "src/lib/server/valkey.ts",
+      "normalizedPath": "lib/server/valkey.ts",
+      "bytes": 2430,
+      "modifiedAt": "2026-05-28T16:08:26.822Z",
+      "kind": "ts"
+    },
+    {
+      "path": "src/lib/services/context-recovery-service.ts",
+      "normalizedPath": "lib/services/context-recovery-service.ts",
+      "bytes": 2671,
+      "modifiedAt": "2026-05-28T01:38:31.188Z",
+      "kind": "ts"
+    },
+    {
+      "path": "src/lib/types/gpu-metrics.ts",
+      "normalizedPath": "lib/types/gpu-metrics.ts",
+      "bytes": 474,
+      "modifiedAt": "2026-06-08T22:21:52.181Z",
+      "kind": "ts"
+    },
+    {
+      "path": "src/routes/admin/cache/+page.svelte",
+      "normalizedPath": "routes/admin/cache/+page.svelte",
+      "bytes": 3217,
+      "modifiedAt": "2026-06-08T22:26:28.035Z",
+      "kind": "svelte"
+    },
+    {
+      "path": "src/routes/api/ace/ask/+server.ts",
+      "normalizedPath": "routes/api/ace/ask/+server.ts",
+      "bytes": 1262,
+      "modifiedAt": "2026-05-26T20:32:38.186Z",
+      "kind": "ts"
+    },
+    {
+      "path": "src/routes/api/atlas/index-doc/+server.ts",
+      "normalizedPath": "routes/api/atlas/index-doc/+server.ts",
+      "bytes": 1560,
+      "modifiedAt": "2026-06-13T08:29:12.151Z",
+      "kind": "ts"
+    },
+    {
+      "path": "src/routes/api/atlas/studio/cards/[id]/+server.ts",
+      "normalizedPath": "routes/api/atlas/studio/cards/[id]/+server.ts",
+      "bytes": 2480,
+      "modifiedAt": "2026-05-28T03:22:39.325Z",
+      "kind": "ts"
+    },
+    {
+      "path": "src/routes/api/atlas/studio/cards/+server.ts",
+      "normalizedPath": "routes/api/atlas/studio/cards/+server.ts",
+      "bytes": 1104,
+      "modifiedAt": "2026-05-28T02:41:18.163Z",
+      "kind": "ts"
+    },
+    {
+      "path": "src/routes/api/atlas/studio/redis/+server.ts",
+      "normalizedPath": "routes/api/atlas/studio/redis/+server.ts",
+      "bytes": 902,
+      "modifiedAt": "2026-05-28T02:41:18.161Z",
+      "kind": "ts"
+    },
+    {
+      "path": "src/routes/api/atlas/studio/search/+server.ts",
+      "normalizedPath": "routes/api/atlas/studio/search/+server.ts",
+      "bytes": 4451,
+      "modifiedAt": "2026-05-28T03:22:40.702Z",
+      "kind": "ts"
+    },
+    {
+      "path": "src/routes/api/cache/stats/+server.ts",
+      "normalizedPath": "routes/api/cache/stats/+server.ts",
+      "bytes": 1360,
+      "modifiedAt": "2026-06-08T22:22:37.258Z",
+      "kind": "ts"
+    },
+    {
+      "path": "src/routes/api/chat/stream/+server.ts",
+      "normalizedPath": "routes/api/chat/stream/+server.ts",
+      "bytes": 684,
+      "modifiedAt": "2026-05-29T18:00:43.019Z",
+      "kind": "ts"
+    },
+    {
+      "path": "src/routes/atlas/studio/+page.svelte",
+      "normalizedPath": "routes/atlas/studio/+page.svelte",
+      "bytes": 4362,
+      "modifiedAt": "2026-05-28T02:40:51.900Z",
+      "kind": "svelte"
+    },
+    {
+      "path": "src/tests/gateway/flow-enforcer.test.ts",
+      "normalizedPath": "tests/gateway/flow-enforcer.test.ts",
+      "bytes": 2560,
+      "modifiedAt": "2026-06-08T18:15:43.385Z",
+      "kind": "ts"
+    },
+    {
+      "path": "src/tests/mock-dependencies.ts",
+      "normalizedPath": "tests/mock-dependencies.ts",
+      "bytes": 596,
+      "modifiedAt": "2026-05-26T20:22:18.632Z",
+      "kind": "ts"
+    },
+    {
       "path": "sveltekit-frontend/docs/reports/atlas-coverage-report.json",
       "normalizedPath": "docs/reports/atlas-coverage-report.json",
       "bytes": 572,
@@ -61971,6 +63014,20 @@
       "normalizedPath": "docs/reports/atlas-feature-parent-join-gap.md",
       "bytes": 8226,
       "modifiedAt": "2026-06-12T02:08:46.137Z",
+      "kind": "md"
+    },
+    {
+      "path": "sveltekit-frontend/docs/reports/audit-turbovec-cuvs-readiness-report.json",
+      "normalizedPath": "docs/reports/audit-turbovec-cuvs-readiness-report.json",
+      "bytes": 2717,
+      "modifiedAt": "2026-06-13T21:35:48.917Z",
+      "kind": "json"
+    },
+    {
+      "path": "sveltekit-frontend/docs/reports/audit-turbovec-cuvs-readiness-report.md",
+      "normalizedPath": "docs/reports/audit-turbovec-cuvs-readiness-report.md",
+      "bytes": 1054,
+      "modifiedAt": "2026-06-13T21:35:48.918Z",
       "kind": "md"
     },
     {
@@ -62013,6 +63070,20 @@
       "normalizedPath": "docs/reports/compression-quality-report.md",
       "bytes": 1586,
       "modifiedAt": "2026-05-31T21:46:34.539Z",
+      "kind": "md"
+    },
+    {
+      "path": "sveltekit-frontend/docs/reports/concept-evidence-audit-report.json",
+      "normalizedPath": "docs/reports/concept-evidence-audit-report.json",
+      "bytes": 3752,
+      "modifiedAt": "2026-06-13T21:36:46.444Z",
+      "kind": "json"
+    },
+    {
+      "path": "sveltekit-frontend/docs/reports/concept-evidence-audit-report.md",
+      "normalizedPath": "docs/reports/concept-evidence-audit-report.md",
+      "bytes": 2557,
+      "modifiedAt": "2026-06-13T21:36:46.445Z",
       "kind": "md"
     },
     {
@@ -62212,6 +63283,20 @@
       "kind": "md"
     },
     {
+      "path": "sveltekit-frontend/docs/reports/graph-refresh.json",
+      "normalizedPath": "docs/reports/graph-refresh.json",
+      "bytes": 1818,
+      "modifiedAt": "2026-06-13T22:34:26.678Z",
+      "kind": "json"
+    },
+    {
+      "path": "sveltekit-frontend/docs/reports/grpc-service-packets.jsonl",
+      "normalizedPath": "docs/reports/grpc-service-packets.jsonl",
+      "bytes": 18261,
+      "modifiedAt": "2026-06-13T21:54:34.727Z",
+      "kind": "jsonl"
+    },
+    {
       "path": "sveltekit-frontend/docs/reports/hidden-packet-pathmap-report.json",
       "normalizedPath": "docs/reports/hidden-packet-pathmap-report.json",
       "bytes": 44086,
@@ -62345,6 +63430,13 @@
       "kind": "postgres-contract"
     },
     {
+      "path": "sveltekit-frontend/docs/reports/proto-registry-audit.json",
+      "normalizedPath": "docs/reports/proto-registry-audit.json",
+      "bytes": 4704,
+      "modifiedAt": "2026-06-13T21:53:24.170Z",
+      "kind": "json"
+    },
+    {
       "path": "sveltekit-frontend/docs/reports/qdrant-source-refs-backfill-latest.json",
       "normalizedPath": "docs/reports/qdrant-source-refs-backfill-latest.json",
       "bytes": 116335,
@@ -62356,6 +63448,20 @@
       "normalizedPath": "docs/reports/qdrant-source-refs-backfill-latest.md",
       "bytes": 194,
       "modifiedAt": "2026-06-06T00:55:38.159Z",
+      "kind": "md"
+    },
+    {
+      "path": "sveltekit-frontend/docs/reports/recommendation-collapse.json",
+      "normalizedPath": "docs/reports/recommendation-collapse.json",
+      "bytes": 1345,
+      "modifiedAt": "2026-06-13T22:29:31.107Z",
+      "kind": "json"
+    },
+    {
+      "path": "sveltekit-frontend/docs/reports/recommendation-collapse.md",
+      "normalizedPath": "docs/reports/recommendation-collapse.md",
+      "bytes": 1504,
+      "modifiedAt": "2026-06-13T22:29:31.109Z",
       "kind": "md"
     },
     {
@@ -62403,29 +63509,29 @@
     {
       "path": "sveltekit-frontend/docs/reports/rrf-20-query-benchmark.json",
       "normalizedPath": "docs/reports/rrf-20-query-benchmark.json",
-      "bytes": 1079,
-      "modifiedAt": "2026-06-12T19:21:33.358Z",
+      "bytes": 1080,
+      "modifiedAt": "2026-06-12T19:49:47.390Z",
       "kind": "json"
     },
     {
       "path": "sveltekit-frontend/docs/reports/rrf-ablation-baseline.json",
       "normalizedPath": "docs/reports/rrf-ablation-baseline.json",
       "bytes": 856,
-      "modifiedAt": "2026-06-12T19:21:24.571Z",
+      "modifiedAt": "2026-06-12T19:49:38.998Z",
       "kind": "json"
     },
     {
       "path": "sveltekit-frontend/docs/reports/runtime-coverage-report.json",
       "normalizedPath": "docs/reports/runtime-coverage-report.json",
       "bytes": 1334,
-      "modifiedAt": "2026-06-12T12:13:04.406Z",
+      "modifiedAt": "2026-06-13T15:07:22.774Z",
       "kind": "json"
     },
     {
       "path": "sveltekit-frontend/docs/reports/runtime-coverage-report.md",
       "normalizedPath": "docs/reports/runtime-coverage-report.md",
       "bytes": 788,
-      "modifiedAt": "2026-06-12T12:13:04.407Z",
+      "modifiedAt": "2026-06-13T15:07:22.774Z",
       "kind": "md"
     },
     {
@@ -62560,6 +63666,20 @@
       "bytes": 25424,
       "modifiedAt": "2026-05-26T20:22:19.162Z",
       "kind": "md"
+    },
+    {
+      "path": "sveltekit-frontend/docs/reports/used-concept-write-report.json",
+      "normalizedPath": "docs/reports/used-concept-write-report.json",
+      "bytes": 424,
+      "modifiedAt": "2026-06-13T22:28:11.805Z",
+      "kind": "json"
+    },
+    {
+      "path": "sveltekit-frontend/docs/reports/used-concepts.json",
+      "normalizedPath": "docs/reports/used-concepts.json",
+      "bytes": 2925,
+      "modifiedAt": "2026-06-13T22:28:11.804Z",
+      "kind": "json"
     },
     {
       "path": "sveltekit-frontend/docs/reports/xgboost-reranker-contract.md",
@@ -68456,6 +69576,76 @@
       "kind": "ts"
     },
     {
+      "path": "sveltekit-frontend/src/lib/generated/proto/chr97_agent_pb.d.ts",
+      "normalizedPath": "lib/generated/proto/chr97_agent_pb.d.ts",
+      "bytes": 34430,
+      "modifiedAt": "2026-06-12T20:19:10.970Z",
+      "kind": "ts"
+    },
+    {
+      "path": "sveltekit-frontend/src/lib/generated/proto/chr97_agent_pb.js",
+      "normalizedPath": "lib/generated/proto/chr97_agent_pb.js",
+      "bytes": 78355,
+      "modifiedAt": "2026-06-12T20:19:07.421Z",
+      "kind": "js"
+    },
+    {
+      "path": "sveltekit-frontend/src/lib/generated/proto/embedding_pb.d.ts",
+      "normalizedPath": "lib/generated/proto/embedding_pb.d.ts",
+      "bytes": 34099,
+      "modifiedAt": "2026-06-12T20:18:52.298Z",
+      "kind": "ts"
+    },
+    {
+      "path": "sveltekit-frontend/src/lib/generated/proto/embedding_pb.js",
+      "normalizedPath": "lib/generated/proto/embedding_pb.js",
+      "bytes": 84160,
+      "modifiedAt": "2026-06-12T20:18:47.522Z",
+      "kind": "js"
+    },
+    {
+      "path": "sveltekit-frontend/src/lib/generated/proto/retrieval_pb.d.ts",
+      "normalizedPath": "lib/generated/proto/retrieval_pb.d.ts",
+      "bytes": 168359,
+      "modifiedAt": "2026-06-12T20:18:59.687Z",
+      "kind": "ts"
+    },
+    {
+      "path": "sveltekit-frontend/src/lib/generated/proto/retrieval_pb.js",
+      "normalizedPath": "lib/generated/proto/retrieval_pb.js",
+      "bytes": 429432,
+      "modifiedAt": "2026-06-12T20:18:54.974Z",
+      "kind": "js"
+    },
+    {
+      "path": "sveltekit-frontend/src/lib/generated/proto/turbovec_cuda_pb.d.ts",
+      "normalizedPath": "lib/generated/proto/turbovec_cuda_pb.d.ts",
+      "bytes": 17359,
+      "modifiedAt": "2026-06-12T20:19:16.757Z",
+      "kind": "ts"
+    },
+    {
+      "path": "sveltekit-frontend/src/lib/generated/proto/turbovec_cuda_pb.js",
+      "normalizedPath": "lib/generated/proto/turbovec_cuda_pb.js",
+      "bytes": 41025,
+      "modifiedAt": "2026-06-12T20:19:12.764Z",
+      "kind": "js"
+    },
+    {
+      "path": "sveltekit-frontend/src/lib/generated/proto/vectors_pb.d.ts",
+      "normalizedPath": "lib/generated/proto/vectors_pb.d.ts",
+      "bytes": 61510,
+      "modifiedAt": "2026-06-12T20:19:05.592Z",
+      "kind": "ts"
+    },
+    {
+      "path": "sveltekit-frontend/src/lib/generated/proto/vectors_pb.js",
+      "normalizedPath": "lib/generated/proto/vectors_pb.js",
+      "bytes": 148306,
+      "modifiedAt": "2026-06-12T20:19:01.471Z",
+      "kind": "js"
+    },
+    {
       "path": "sveltekit-frontend/src/lib/gpu/global-gpu-manager.ts",
       "normalizedPath": "lib/gpu/global-gpu-manager.ts",
       "bytes": 5137,
@@ -70474,8 +71664,8 @@
     {
       "path": "sveltekit-frontend/src/lib/server/ai/openai-types.ts",
       "normalizedPath": "lib/server/ai/openai-types.ts",
-      "bytes": 6368,
-      "modifiedAt": "2026-06-12T04:29:38.420Z",
+      "bytes": 6367,
+      "modifiedAt": "2026-06-13T08:08:01.774Z",
       "kind": "ts"
     },
     {
@@ -71032,6 +72222,13 @@
       "kind": "ts"
     },
     {
+      "path": "sveltekit-frontend/src/lib/server/atlas-contract-layer.ts",
+      "normalizedPath": "lib/server/atlas-contract-layer.ts",
+      "bytes": 11635,
+      "modifiedAt": "2026-06-13T20:33:45.480Z",
+      "kind": "ts"
+    },
+    {
       "path": "sveltekit-frontend/src/lib/server/atlas/atlas-loader.ts",
       "normalizedPath": "lib/server/atlas/atlas-loader.ts",
       "bytes": 5137,
@@ -71298,6 +72495,27 @@
       "kind": "ts"
     },
     {
+      "path": "sveltekit-frontend/src/lib/server/cache/atlas-cache-cascade.ts",
+      "normalizedPath": "lib/server/cache/atlas-cache-cascade.ts",
+      "bytes": 6891,
+      "modifiedAt": "2026-06-14T01:12:39.662Z",
+      "kind": "ts"
+    },
+    {
+      "path": "sveltekit-frontend/src/lib/server/cache/atlas-cache-envelope.ts",
+      "normalizedPath": "lib/server/cache/atlas-cache-envelope.ts",
+      "bytes": 4206,
+      "modifiedAt": "2026-06-14T01:08:06.976Z",
+      "kind": "ts"
+    },
+    {
+      "path": "sveltekit-frontend/src/lib/server/cache/atlas-reward-cache.ts",
+      "normalizedPath": "lib/server/cache/atlas-reward-cache.ts",
+      "bytes": 9609,
+      "modifiedAt": "2026-06-12T22:23:21.669Z",
+      "kind": "ts"
+    },
+    {
       "path": "sveltekit-frontend/src/lib/server/cache/authority-scorer-unified.ts",
       "normalizedPath": "lib/server/cache/authority-scorer-unified.ts",
       "bytes": 8051,
@@ -71412,8 +72630,8 @@
     {
       "path": "sveltekit-frontend/src/lib/server/cache/redis-exact-match.ts",
       "normalizedPath": "lib/server/cache/redis-exact-match.ts",
-      "bytes": 10931,
-      "modifiedAt": "2026-05-15T03:37:57.126Z",
+      "bytes": 15839,
+      "modifiedAt": "2026-06-13T21:14:14.733Z",
       "kind": "ts"
     },
     {
@@ -72378,8 +73596,8 @@
     {
       "path": "sveltekit-frontend/src/lib/server/db/schema-postgres.ts",
       "normalizedPath": "lib/server/db/schema-postgres.ts",
-      "bytes": 217198,
-      "modifiedAt": "2026-06-12T02:11:14.052Z",
+      "bytes": 220769,
+      "modifiedAt": "2026-06-14T00:46:40.221Z",
       "kind": "ts"
     },
     {
@@ -72539,8 +73757,8 @@
     {
       "path": "sveltekit-frontend/src/lib/server/db/schema/atlas-packets.ts",
       "normalizedPath": "lib/server/db/schema/atlas-packets.ts",
-      "bytes": 1478,
-      "modifiedAt": "2026-06-12T04:31:14.207Z",
+      "bytes": 1658,
+      "modifiedAt": "2026-06-13T02:46:13.697Z",
       "kind": "ts"
     },
     {
@@ -73344,8 +74562,8 @@
     {
       "path": "sveltekit-frontend/src/lib/server/env.server.ts",
       "normalizedPath": "lib/server/env.server.ts",
-      "bytes": 25329,
-      "modifiedAt": "2026-06-12T02:17:52.281Z",
+      "bytes": 25825,
+      "modifiedAt": "2026-06-12T20:29:46.197Z",
       "kind": "ts"
     },
     {
@@ -73687,8 +74905,8 @@
     {
       "path": "sveltekit-frontend/src/lib/server/features/ai/ai/gemma4-agent.ts",
       "normalizedPath": "lib/server/features/ai/ai/gemma4-agent.ts",
-      "bytes": 95467,
-      "modifiedAt": "2026-06-11T18:34:45.449Z",
+      "bytes": 96961,
+      "modifiedAt": "2026-06-13T03:27:30.295Z",
       "kind": "ts"
     },
     {
@@ -74387,8 +75605,8 @@
     {
       "path": "sveltekit-frontend/src/lib/server/gpu/libtorch-bridge.ts",
       "normalizedPath": "lib/server/gpu/libtorch-bridge.ts",
-      "bytes": 64801,
-      "modifiedAt": "2026-06-11T05:04:35.223Z",
+      "bytes": 66252,
+      "modifiedAt": "2026-06-13T19:27:37.136Z",
       "kind": "ts"
     },
     {
@@ -74672,6 +75890,13 @@
       "kind": "ts"
     },
     {
+      "path": "sveltekit-frontend/src/lib/server/grpc/gpu-bridge-client.ts",
+      "normalizedPath": "lib/server/grpc/gpu-bridge-client.ts",
+      "bytes": 4860,
+      "modifiedAt": "2026-06-12T21:16:11.438Z",
+      "kind": "ts"
+    },
+    {
       "path": "sveltekit-frontend/src/lib/server/grpc/graph-ml-client.ts",
       "normalizedPath": "lib/server/grpc/graph-ml-client.ts",
       "bytes": 17153,
@@ -74711,6 +75936,13 @@
       "normalizedPath": "lib/server/grpc/tool-router-client.ts",
       "bytes": 8352,
       "modifiedAt": "2026-05-15T03:38:34.273Z",
+      "kind": "ts"
+    },
+    {
+      "path": "sveltekit-frontend/src/lib/server/grpc/turbovec-cuda-client.ts",
+      "normalizedPath": "lib/server/grpc/turbovec-cuda-client.ts",
+      "bytes": 5978,
+      "modifiedAt": "2026-06-13T14:39:15.322Z",
       "kind": "ts"
     },
     {
@@ -74775,6 +76007,13 @@
       "bytes": 3032,
       "modifiedAt": "2026-06-01T22:53:27.840Z",
       "kind": "md"
+    },
+    {
+      "path": "sveltekit-frontend/src/lib/server/hyperrag/replay-trace.ts",
+      "normalizedPath": "lib/server/hyperrag/replay-trace.ts",
+      "bytes": 4928,
+      "modifiedAt": "2026-06-13T21:23:40.997Z",
+      "kind": "ts"
     },
     {
       "path": "sveltekit-frontend/src/lib/server/image/resize-for-vlm.ts",
@@ -75150,8 +76389,8 @@
     {
       "path": "sveltekit-frontend/src/lib/server/labels/feature-label-registry.ts",
       "normalizedPath": "lib/server/labels/feature-label-registry.ts",
-      "bytes": 4067,
-      "modifiedAt": "2026-06-12T12:28:27.640Z",
+      "bytes": 4062,
+      "modifiedAt": "2026-06-13T01:14:34.976Z",
       "kind": "ts"
     },
     {
@@ -75855,6 +77094,13 @@
       "kind": "ts"
     },
     {
+      "path": "sveltekit-frontend/src/lib/server/opencode-atlas-bridge.ts",
+      "normalizedPath": "lib/server/opencode-atlas-bridge.ts",
+      "bytes": 23059,
+      "modifiedAt": "2026-06-13T21:03:27.220Z",
+      "kind": "ts"
+    },
+    {
       "path": "sveltekit-frontend/src/lib/server/optimize/benchmark.ts",
       "normalizedPath": "lib/server/optimize/benchmark.ts",
       "bytes": 6356,
@@ -75971,6 +77217,13 @@
       "normalizedPath": "lib/server/png-embed-extractor.ts",
       "bytes": 9469,
       "modifiedAt": "2026-05-15T03:37:49.547Z",
+      "kind": "ts"
+    },
+    {
+      "path": "sveltekit-frontend/src/lib/server/policy/inference.ts",
+      "normalizedPath": "lib/server/policy/inference.ts",
+      "bytes": 4280,
+      "modifiedAt": "2026-06-14T00:57:34.062Z",
       "kind": "ts"
     },
     {
@@ -76872,8 +78125,8 @@
     {
       "path": "sveltekit-frontend/src/lib/server/retrieval/turbovec-prefilter.ts",
       "normalizedPath": "lib/server/retrieval/turbovec-prefilter.ts",
-      "bytes": 3552,
-      "modifiedAt": "2026-05-26T20:32:58.151Z",
+      "bytes": 4232,
+      "modifiedAt": "2026-06-12T20:30:02.522Z",
       "kind": "ts"
     },
     {
@@ -79847,8 +81100,8 @@
     {
       "path": "sveltekit-frontend/src/mcp/trace-mcp-server.ts",
       "normalizedPath": "mcp/trace-mcp-server.ts",
-      "bytes": 310976,
-      "modifiedAt": "2026-06-12T03:34:40.046Z",
+      "bytes": 310986,
+      "modifiedAt": "2026-06-13T01:36:27.634Z",
       "kind": "ts"
     },
     {
@@ -85368,6 +86621,13 @@
       "kind": "ts"
     },
     {
+      "path": "sveltekit-frontend/src/routes/api/ai/policy/+server.ts",
+      "normalizedPath": "routes/api/ai/policy/+server.ts",
+      "bytes": 3485,
+      "modifiedAt": "2026-06-14T00:54:23.503Z",
+      "kind": "ts"
+    },
+    {
       "path": "sveltekit-frontend/src/routes/api/ai/route-intent/+server.ts",
       "normalizedPath": "routes/api/ai/route-intent/+server.ts",
       "bytes": 3684,
@@ -85704,6 +86964,13 @@
       "kind": "ts"
     },
     {
+      "path": "sveltekit-frontend/src/routes/api/atlas/index-doc/+server.ts",
+      "normalizedPath": "routes/api/atlas/index-doc/+server.ts",
+      "bytes": 15733,
+      "modifiedAt": "2026-06-13T08:19:50.045Z",
+      "kind": "ts"
+    },
+    {
       "path": "sveltekit-frontend/src/routes/api/atlas/memory-address/[source_ref_id]/+server.ts",
       "normalizedPath": "routes/api/atlas/memory-address/[source_ref_id]/+server.ts",
       "bytes": 1477,
@@ -85715,6 +86982,13 @@
       "normalizedPath": "routes/api/atlas/nes-chrom/+server.ts",
       "bytes": 10972,
       "modifiedAt": "2026-06-01T20:08:15.490Z",
+      "kind": "ts"
+    },
+    {
+      "path": "sveltekit-frontend/src/routes/api/atlas/search/+server.ts",
+      "normalizedPath": "routes/api/atlas/search/+server.ts",
+      "bytes": 35669,
+      "modifiedAt": "2026-06-13T22:13:06.283Z",
       "kind": "ts"
     },
     {
@@ -87190,8 +88464,8 @@
     {
       "path": "sveltekit-frontend/src/routes/api/embed/+server.ts",
       "normalizedPath": "routes/api/embed/+server.ts",
-      "bytes": 4228,
-      "modifiedAt": "2026-05-26T20:28:26.607Z",
+      "bytes": 4537,
+      "modifiedAt": "2026-06-14T00:56:43.356Z",
       "kind": "ts"
     },
     {
@@ -87944,6 +89218,13 @@
       "kind": "ts"
     },
     {
+      "path": "sveltekit-frontend/src/routes/api/hyperrag/packet-rpc/+server.ts",
+      "normalizedPath": "routes/api/hyperrag/packet-rpc/+server.ts",
+      "bytes": 7720,
+      "modifiedAt": "2026-06-13T21:30:07.068Z",
+      "kind": "ts"
+    },
+    {
       "path": "sveltekit-frontend/src/routes/api/indexing/+server.ts",
       "normalizedPath": "routes/api/indexing/+server.ts",
       "bytes": 18103,
@@ -88245,6 +89526,13 @@
       "kind": "ts"
     },
     {
+      "path": "sveltekit-frontend/src/routes/api/mcp/select-tools/+server.ts",
+      "normalizedPath": "routes/api/mcp/select-tools/+server.ts",
+      "bytes": 14395,
+      "modifiedAt": "2026-06-13T03:33:35.626Z",
+      "kind": "ts"
+    },
+    {
       "path": "sveltekit-frontend/src/routes/api/memory/agent-observation/+server.ts",
       "normalizedPath": "routes/api/memory/agent-observation/+server.ts",
       "bytes": 976,
@@ -88333,6 +89621,13 @@
       "normalizedPath": "routes/api/onboarding/+server.ts",
       "bytes": 4283,
       "modifiedAt": "2026-05-15T03:39:15.281Z",
+      "kind": "ts"
+    },
+    {
+      "path": "sveltekit-frontend/src/routes/api/opencode/+server.ts",
+      "normalizedPath": "routes/api/opencode/+server.ts",
+      "bytes": 4598,
+      "modifiedAt": "2026-06-13T20:44:44.654Z",
       "kind": "ts"
     },
     {
@@ -89614,6 +90909,13 @@
       "normalizedPath": "routes/api/tools/list/+server.ts",
       "bytes": 1731,
       "modifiedAt": "2026-05-15T03:39:22.537Z",
+      "kind": "ts"
+    },
+    {
+      "path": "sveltekit-frontend/src/routes/api/tools/rpc-search/+server.ts",
+      "normalizedPath": "routes/api/tools/rpc-search/+server.ts",
+      "bytes": 5754,
+      "modifiedAt": "2026-06-14T00:52:11.938Z",
       "kind": "ts"
     },
     {

@@ -7,14 +7,14 @@ Hello James.
 - tasks open: 8
 - tasks closed: 9
 - new recommendations: 17
-- production readiness: PASS 66 / WARN 0 / FAIL 0
+- production readiness: PASS 65 / WARN 1 / FAIL 0
 
 ## Systems
 
 - postgres: healthy
 - redis: healthy
 - qdrant: healthy
-- neo4j: healthy
+- neo4j: unknown
 - turbovec: deferred
 - ldjson coverage: 96.2%
 

@@ -9,6 +9,8 @@
     "test": "...",
     "lint": "...",
     "atlas:smoke:packet-contract": "ts-node --project tsconfig.json scripts/atlas/validate-packet-contract.mjs",
+    "atlas:packet-contract-mirrors": "node scripts/atlas/audit-packet-contract-mirrors.mjs",
+    "atlas:packet-contract-repair": "node scripts/atlas/repair-packet-contract-mirrors.mjs",
     "atlas:turbovec:grpc-health": "cd sveltekit-frontend && node ../scripts/atlas/turbovec-grpc-health.mjs",
     "atlas:turbovec:contract-test": "cd sveltekit-frontend && node ../scripts/atlas/test-turbovec-sidecar-contract.mjs",
     "atlas:packet-metadata:backfill:dry": "node scripts/atlas/backfill-packet-metadata.mjs",

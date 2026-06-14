@@ -1,19 +1,19 @@
 # Training Rows Dry Run Report
 
-Generated: 2026-06-12T19:35:08.007Z
+Generated: 2026-06-14T01:17:27.919Z
 
 ## Summary
 
-- Training rows: 112
+- Training rows: 113
 - Schema rows: 91
 - SourceRef rows: 42
-- Relevant sourceRef rows: 21
-- Skipped sourceRef rows: 21
+- Relevant sourceRef rows: 22
+- Skipped sourceRef rows: 20
 - SourceRef cap: 250
-- Matched rows: 21
+- Matched rows: 22
 - Unmatched rows: 0
-- Audit matched rows: 41
-- Audit unmatched rows: 1
+- Audit matched rows: 42
+- Audit unmatched rows: 0
 - Ambiguous rows: 0
 - Relevant only: yes
 

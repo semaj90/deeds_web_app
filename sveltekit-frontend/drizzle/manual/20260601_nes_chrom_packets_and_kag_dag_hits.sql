@@ -36,6 +36,14 @@ CREATE TABLE IF NOT EXISTS nes_chrom_packets (
   kag_dag_run_id uuid REFERENCES kag_dag_runs(id) ON DELETE SET NULL,
   kag_node_key text,
   token_budget integer,
+  feature_ids text[],
+  som_cluster text,
+  lane_ids text[],
+  source_ref_id integer,
+  feature_code integer,
+  som_code smallint,
+  confidence_score smallint,
+  packet_zstd bytea,
   created_at timestamptz DEFAULT now(),
   updated_at timestamptz DEFAULT now()
 );
@@ -51,6 +59,12 @@ CREATE INDEX IF NOT EXISTS nes_chrom_packets_source_refs_gin ON nes_chrom_packet
 CREATE INDEX IF NOT EXISTS nes_chrom_packets_payload_gin ON nes_chrom_packets USING gin (payload);
 CREATE INDEX IF NOT EXISTS nes_chrom_packets_embedding_hnsw
   ON nes_chrom_packets USING hnsw (embedding vector_cosine_ops);
+CREATE INDEX IF NOT EXISTS idx_nes_chrom_packets_feature_ids_gin ON nes_chrom_packets USING gin (feature_ids);
+CREATE INDEX IF NOT EXISTS idx_nes_chrom_packets_lane_ids_gin ON nes_chrom_packets USING gin (lane_ids);
+CREATE INDEX IF NOT EXISTS idx_nes_chrom_packets_som_cluster ON nes_chrom_packets (som_cluster);
+CREATE INDEX IF NOT EXISTS nes_chrom_packets_source_ref_id_idx ON nes_chrom_packets (source_ref_id);
+CREATE INDEX IF NOT EXISTS nes_chrom_packets_feature_code_idx ON nes_chrom_packets (feature_code);
+CREATE INDEX IF NOT EXISTS nes_chrom_packets_som_code_idx ON nes_chrom_packets (som_code);
 
 CREATE TABLE IF NOT EXISTS nes_chrom_kag_dag_hits (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),

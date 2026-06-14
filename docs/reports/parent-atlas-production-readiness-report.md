@@ -1,6 +1,6 @@
 # Parent Atlas Production Readiness Audit
 
-Generated: 2026-06-12T20:33:09.886Z
+Generated: 2026-06-14T01:32:51.675Z
 
 ## Summary
 
@@ -14,11 +14,11 @@ Generated: 2026-06-12T20:33:09.886Z
 - Atlas feature map rows: 19611
 - NES/CHROM packets: 14911
 - Route runtime packets: 1
-- Qdrant points: 54331
+- Qdrant points: 54898
 - Neo4j CodebaseFile nodes: 0
 - Redis LOD0 latest packet coverage: 1/1
 - Native JSON parser: native addon path present; fallback present
-- NDJSON files discovered with rg -uuu: 129
+- NDJSON files discovered with rg -uuu: 182
 - Phase 101 batch summaries: 35 succeeded / 0 failed
 - Autoencoder dims: 768→256→64
 
@@ -82,7 +82,7 @@ Generated: 2026-06-12T20:33:09.886Z
 - PASS [offline] scripts/atlas/report-compressed-semantic-geometry.mjs: scripts/atlas/report-compressed-semantic-geometry.mjs exists
 - PASS [offline] scripts/atlas/audit-hidden-packet-pathmap.mjs: scripts/atlas/audit-hidden-packet-pathmap.mjs exists
 - PASS [offline] scripts/atlas/materialize-hidden-packet-pathmap-duckdb.mjs: scripts/atlas/materialize-hidden-packet-pathmap-duckdb.mjs exists
-- PASS [offline] rg-uu:ndjson-inventory: rg -uuu found 129 NDJSON files
+- PASS [offline] rg-uu:ndjson-inventory: rg -uuu found 182 NDJSON files
 - PASS [postgres] table:parent_atlas_documents: parent_atlas_documents exists with 5395 rows
 - PASS [postgres] table:atlas_feature_map: atlas_feature_map exists with 19611 rows
 - PASS [postgres] table:atlas_feature_map_synthesized: atlas_feature_map_synthesized exists with 14465 rows
@@ -98,7 +98,7 @@ Generated: 2026-06-12T20:33:09.886Z
 - PASS [postgres] nes-chrom:sourceRef-parent-join: NES/CHROM packets matching Parent Atlas: 10042/14911
 - PASS [postgres] route-runtime:sourceRefs: Runtime packets with sourceRefs: 1/1
 - PASS [redis] lod0:route-runtime: Redis LOD0 runtime packets: 1/1
-- PASS [qdrant] collection:codebase_chunks_768: Qdrant codebase_chunks_768 points: 54331
+- PASS [qdrant] collection:codebase_chunks_768: Qdrant codebase_chunks_768 points: 54898
 - WARN [neo4j] contextual-tree: Neo4j CodebaseFile=0, ParentAtlasFeature=0
 
 ## Audit Guardrails

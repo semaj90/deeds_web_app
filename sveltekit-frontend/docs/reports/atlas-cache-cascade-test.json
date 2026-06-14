@@ -1,0 +1,46 @@
+{
+  "query": "authentication",
+  "timestamp": "2026-06-14T01:30:48.539Z",
+  "cascade_steps": [
+    {
+      "name": "L1 Redis LRU",
+      "hit": false,
+      "latency_ms": 0
+    },
+    {
+      "name": "L2 Bitfrost Semantic",
+      "hit": false,
+      "latency_ms": 0
+    },
+    {
+      "name": "L3 Qdrant Multi-Vector",
+      "hit": true,
+      "results": 2,
+      "latency_ms": 1
+    },
+    {
+      "name": "Neo4j USED_CONCEPT Expansion",
+      "expanded": 5,
+      "latency_ms": 0
+    },
+    {
+      "name": "XGBoost Stage 4 Rerank",
+      "reranked": 2,
+      "latency_ms": 0
+    },
+    {
+      "name": "Write L1 Redis LRU",
+      "success": true,
+      "latency_ms": 0
+    }
+  ],
+  "total_latency_ms": 1,
+  "success": true,
+  "smoke_contract": {
+    "redis_checked": true,
+    "bitfrost_checked": true,
+    "qdrant_hits": true,
+    "xgboost_reranked": true,
+    "cache_write": true
+  }
+}

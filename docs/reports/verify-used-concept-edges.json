@@ -1,15 +1,15 @@
 {
-  "generated_at": "2026-06-12T21:37:51.907Z",
+  "generated_at": "2026-06-14T01:32:39.014Z",
   "postgres": {
     "packets_with_concepts": 8367,
     "total_concept_refs": 138550
   },
   "neo4j": {
-    "total_edges": 26972,
-    "packets_with_edges": 5299,
+    "total_edges": 29744,
+    "packets_with_edges": 5824,
     "concepts_reached": 10,
-    "atlas_edges": 26972,
-    "atlas_packets": 5299,
+    "atlas_edges": 29744,
+    "atlas_packets": 5824,
     "atlas_concepts": 10,
     "duplicate_pairs": 0
   },
@@ -22,88 +22,88 @@
   "top_concepts": [
     {
       "concept": "emergent_topology",
-      "degree": 3158
+      "degree": 3358
     },
     {
       "concept": "infrastructure_config",
-      "degree": 2986
-    },
-    {
-      "concept": "observability_telemetry",
-      "degree": 2958
+      "degree": 3342
     },
     {
       "concept": "test_harness",
-      "degree": 2903
+      "degree": 3258
+    },
+    {
+      "concept": "observability_telemetry",
+      "degree": 3185
     },
     {
       "concept": "general_abstractions",
-      "degree": 2790
+      "degree": 3143
     },
     {
       "concept": "database_orm",
-      "degree": 2772
+      "degree": 3009
     },
     {
       "concept": "api_endpoints",
-      "degree": 2588
+      "degree": 2825
     },
     {
       "concept": "agent_intelligence",
-      "degree": 2494
+      "degree": 2732
     },
     {
       "concept": "native_accelerators",
-      "degree": 2394
+      "degree": 2628
     },
     {
       "concept": "ui_components",
-      "degree": 1929
+      "degree": 2264
     }
   ],
   "supernodes": [
     {
       "concept": "emergent_topology",
-      "degree": 3158
+      "degree": 3358
     },
     {
       "concept": "infrastructure_config",
-      "degree": 2986
-    },
-    {
-      "concept": "observability_telemetry",
-      "degree": 2958
+      "degree": 3342
     },
     {
       "concept": "test_harness",
-      "degree": 2903
+      "degree": 3258
+    },
+    {
+      "concept": "observability_telemetry",
+      "degree": 3185
     },
     {
       "concept": "general_abstractions",
-      "degree": 2790
+      "degree": 3143
     },
     {
       "concept": "database_orm",
-      "degree": 2772
+      "degree": 3009
     },
     {
       "concept": "api_endpoints",
-      "degree": 2588
+      "degree": 2825
     },
     {
       "concept": "agent_intelligence",
-      "degree": 2494
+      "degree": 2732
     },
     {
       "concept": "native_accelerators",
-      "degree": 2394
+      "degree": 2628
     },
     {
       "concept": "ui_components",
-      "degree": 1929
+      "degree": 2264
     }
   ],
-  "coverage_pct": 0.6333213816182622,
+  "coverage_pct": 0.6960678857416039,
   "gate": {
     "edges": true,
     "duplicates": true,

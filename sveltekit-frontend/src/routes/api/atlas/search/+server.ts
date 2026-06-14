@@ -47,6 +47,14 @@ import { createHash } from 'node:crypto';
 import { ENV }     from '$lib/server/env.server.js';
 import { turbovecGrpcSearch } from '$lib/server/grpc/turbovec-cuda-client.js';
 import { batchCosineSimilarity, isCudaAvailable } from '$lib/server/gpu/libtorch-bridge.js';
+import {
+	checkRedisLRU,
+	checkBitfrostSemantic,
+	queryQdrantCascade,
+	writeRedisLRU,
+	getAtlasCacheVersions,
+	type AtlasCacheHit,
+} from '$lib/server/cache/atlas-cache-cascade.js';
 import type { RequestHandler } from './$types';
 
 // ── Request schema ─────────────────────────────────────────────────────────────
@@ -629,20 +637,86 @@ export const POST: RequestHandler = async ({ request }) => {
   const t0 = Date.now();
 
   const stats: Record<string, number | string> = {};
+  let cacheEnvelope: AtlasCacheHit | null = null;
 
-  // ── Stage 0+1: Embed + Qdrant ANN ──────────────────────────────────────────
+  // ── Unified 3-tier cache cascade (L1 Redis → L2 Bifrost → L3 Qdrant) ────────
+  // L1: Check Redis LRU exact-match cache
+  const t_l1 = Date.now();
+  cacheEnvelope = await checkRedisLRU(query);
+  const l1_latency = Date.now() - t_l1;
+  stats.cache_l1_hit = cacheEnvelope !== null;
+  stats.cache_l1_latency_ms = l1_latency;
+
+  if (cacheEnvelope) {
+    // L1 hit — return immediately with cache metadata
+    return json({
+      results: [],  // Degraded: cache envelope only, no full packet retrieval
+      cascade_stats: {
+        ...stats,
+        cache_source: 'redis_lru',
+        cache_envelope: cacheEnvelope.envelope,
+        total_ms: Date.now() - t0,
+      },
+      embed_ok: true,
+      source: 'cache',
+      cache_hit: true,
+    });
+  }
+
+  // L2: Check Bifrost semantic cache (requires embedding)
   const vector = await embedQuery(query);
   stats.embed_ms = Date.now() - t0;
 
   if (!vector) {
     return json({
-      results:      [],
+      results: [],
       cascade_stats: { ...stats, error: 'embed_failed' },
-      embed_ok:     false,
-      source:       'fallback',
+      embed_ok: false,
+      source: 'fallback',
     });
   }
 
+  const t_l2 = Date.now();
+  cacheEnvelope = await checkBitfrostSemantic(query, vector);
+  const l2_latency = Date.now() - t_l2;
+  stats.cache_l2_hit = cacheEnvelope !== null;
+  stats.cache_l2_latency_ms = l2_latency;
+
+  if (cacheEnvelope) {
+    // L2 hit — return with Bifrost envelope
+    return json({
+      results: [],  // Degraded: cache envelope only
+      cascade_stats: {
+        ...stats,
+        cache_source: 'bifrost_semantic',
+        cache_envelope: cacheEnvelope.envelope,
+        total_ms: Date.now() - t0,
+      },
+      embed_ok: true,
+      source: 'cache',
+      cache_hit: true,
+    });
+  }
+
+  // L3: Query Qdrant multi-vector with payload filters
+  const t_l3 = Date.now();
+  cacheEnvelope = await queryQdrantCascade(vector, { feature_id, community_id, domain_class }, top_k * 5);
+  const l3_latency = Date.now() - t_l3;
+  stats.cache_l3_hit = cacheEnvelope !== null;
+  stats.cache_l3_latency_ms = l3_latency;
+
+  // If L3 (Qdrant) returned no results, fail gracefully
+  if (!cacheEnvelope) {
+    return json({
+      results: [],
+      cascade_stats: { ...stats, error: 'no_qdrant_hits', cache_source: 'none' },
+      embed_ok: true,
+      source: 'fallback',
+    });
+  }
+
+  // Extract Qdrant hits — re-fetch full payloads for downstream processing
+  // (cache envelope contains metadata but needs vector data for reranking)
   const t1   = Date.now();
   const hits = await qdrantSearch(vector, { topK: top_k * 5, featureId: feature_id, communityId: community_id, domainClass: domain_class });
   stats.qdrant_ms   = Date.now() - t1;
@@ -651,7 +725,7 @@ export const POST: RequestHandler = async ({ request }) => {
   if (hits.length === 0) {
     return json({
       results:      [],
-      cascade_stats: { ...stats, error: 'no_qdrant_hits' },
+      cascade_stats: { ...stats, error: 'no_qdrant_hits', cache_source: 'qdrant' },
       embed_ok:     true,
       source:       'fallback',
     });
@@ -820,9 +894,34 @@ export const POST: RequestHandler = async ({ request }) => {
   stats.total_ms    = Date.now() - t0;
   stats.final_count = final.length;
 
+  // ── Write L1 Redis LRU cache for future exact-match queries ────────────────
+  // Build envelope from final results for Redis caching
+  const versions = await getAtlasCacheVersions();
+  const cacheWriteEnvelope = {
+    query,
+    packet_keys: final.map(p => p.packet_key).filter(Boolean),
+    feature_ids: [...new Set(final.map(p => p.feature_id).filter(Boolean))],
+    source_refs: [...new Set(final.map(p => p.source_ref).filter(Boolean))],
+    qdrant_point_ids: final.map(p => p.qdrant_id).filter(Boolean),
+    redis_hit: false,
+    bitfrost_hit: false,
+    qdrant_hit: true,
+    graph_version: versions.graph_version,
+    cache_epoch: versions.cache_epoch,
+    ttl_seconds: 300,
+    latency_ms: stats.total_ms,
+  };
+
+  const cacheWriteOk = await writeRedisLRU(query, cacheWriteEnvelope);
+  stats.cache_l1_write = cacheWriteOk;
+
   return json({
     results:       final,
-    cascade_stats: stats,
+    cascade_stats: {
+      ...stats,
+      cache_source: 'qdrant_live',
+      cache_envelope: cacheWriteEnvelope,
+    },
     embed_ok:      true,
     source:        'cascade',
     top_k,

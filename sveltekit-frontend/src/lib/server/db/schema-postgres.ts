@@ -4797,6 +4797,97 @@ export type NewGlyphRecord_DB = typeof glyphRecords.$inferInsert;
 export * from './schema/nes-chrom-packets.js';
 export * from './schema/atlas-feature-map.js';
 export * from './schema/atlas-dict.js';
+// Policy Reranker Metadata — PyTorch Stage 5 Neural Policy Network
+export const policyRerankerMetadata = pgTable('policy_reranker_metadata', {
+  id: uuid('id').defaultRandom().primaryKey().notNull(),
+  modelVersion: varchar('model_version', { length: 50 }).notNull().default('1.0'),
+  trainedAt: timestamp('trained_at', { withTimezone: true }).notNull().default(sql`now()`),
+  updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().default(sql`now()`),
+
+  // Model architecture & training parameters (JSONB for flexibility across PyTorch versions)
+  metadata: jsonb('metadata').notNull().$type<{
+    // Input shape & normalization
+    inputShape: {
+      scalarFeatures: number;
+      somEmbeddingDim: number;
+      totalInputDim: number;
+    };
+    // Normalization statistics (per-feature min/max for inference rescaling)
+    featureNormalization: Record<string, {
+      min: number;
+      max: number;
+      mean: number;
+      std: number;
+    }>;
+    // Action space enum
+    actionSpace: {
+      actions: string[]; // ['repair_file', 'rerank', 'call_tool', 'rollback', 'run_tests', 'ask_gemma4', 'expand_graph']
+      actionCount: number;
+    };
+    // SOM topology metadata
+    somTopology: {
+      gridSize: number; // 20 for 20×20
+      cellCount: number; // 400
+      latentDim: number; // 64
+    };
+    // Training configuration
+    trainingConfig: {
+      epochs: number;
+      batchSize: number;
+      learningRate: number;
+      validationSplit: number; // 0.2
+      earlyStopping: {
+        patience: number;
+        metric: string; // 'ndcg_at_10'
+      };
+    };
+    // Validation metrics
+    validationMetrics: {
+      accuracy: number;
+      loss: number;
+      f1Score: number;
+      ndcgAt10: number;
+      inferenceLatencyMs: number;
+    };
+    // PyTorch serialization info
+    torchscriptExportPath?: string; // For TensorRT export
+    tensorrtEnginePath?: string; // For GPU inference
+  }>(),
+
+  // Git provenance
+  gitCommitHash: varchar('git_commit_hash', { length: 40 }),
+  gitBranch: varchar('git_branch', { length: 255 }),
+
+  // Status & inference routing
+  status: varchar('status', { length: 20 }).default('active').notNull(), // 'active', 'archived', 'testing'
+  isDefault: boolean('is_default').default(true),
+
+  // Inference performance telemetry
+  inferenceStats: jsonb('inference_stats').notNull().$type<{
+    totalCalls: number;
+    successfulCalls: number;
+    failedCalls: number;
+    averageLatencyMs: number;
+    p95LatencyMs: number;
+    p99LatencyMs: number;
+    lastUsedAt: string; // ISO timestamp
+  }>(),
+
+  // Index for fast lookups by model version & status
+}, (table) => ({
+  // GIN index on metadata JSONB for fast searches on feature normalization, action space, SOM topology
+  metadataGin: index('idx_policy_metadata_gin').using('gin', table.metadata).$op('jsonb_path_ops'),
+  // GIN index on inference stats for aggregations
+  inferenceStatsGin: index('idx_policy_inference_stats_gin').using('gin', table.inferenceStats).$op('jsonb_path_ops'),
+  // B-tree on status + isDefault for active-model lookups
+  statusDefaultIdx: index('idx_policy_status_default').on(table.status, table.isDefault),
+  // B-tree on trainedAt for temporal queries (recent models first)
+  trainedAtIdx: index('idx_policy_trained_at').on(table.trainedAt.desc()),
+}));
+
+export type PolicyRerankerMetadata = typeof policyRerankerMetadata.$inferSelect;
+export type NewPolicyRerankerMetadata = typeof policyRerankerMetadata.$inferInsert;
+
 export * from './schema/atlas-packets.js';
 
 

@@ -107,6 +107,23 @@ This page is the navigation entry for the Parent Atlas workstream. It links the 
 - sourceRef parent join move list
 - validation and consistency audits
 - offline synthesis
+- Graphify startup review and cache-hit validation
+- GPU parser lanes: libtorch, TensorRT bridge node, Rust n-api parser
+- TurboVec / LangExtract enrichment lanes
+- stale document grouping by `feature_label`, `function_id`, `method`, and `variable`
+- kanban task spec board consolidation from grouped stale-document hits
+
+### Graphify / Structural Discovery
+- Graphify is the structural discovery lane: file, import, call, and topology scanning for codebase shape.
+- Parent Atlas is the canonical join lane: `source_ref`, `feature_id`, `feature_label`, `packet_key`, and provenance contracts.
+- Graphify may classify and surface gaps, but it must not replace the canonical storage spine.
+
+### HyperRAG Dense Search
+- Qdrant dense ANN + payload tags for semantic recall
+- Redis / Bitfrost hot cache for recent packet hits and centroid shortcuts
+- Neo4j multi-hop expansion for neighborhood traversal
+- BM25 + FTS/trigram + RRF for bounded fusion
+- Gemma4 summaries only after repo evidence is retrieved
 
 ### Remaining todo focus
 - finish provenance parity and quality review

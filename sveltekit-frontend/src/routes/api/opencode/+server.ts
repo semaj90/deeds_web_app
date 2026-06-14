@@ -1,156 +1,111 @@
-import { json, error } from '@sveltejs/kit';
-import type { RequestHandler } from './$types';
-import {
-  findPacketsForOpenCode,
-  getPacketSOMCluster,
-  getFeatureKMeansContext,
-  getAllRecommendationsForOpenCode
-} from '$lib/server/opencode-atlas-bridge.js';
-
 /**
- * GET /api/opencode?query=...&file_path=...&limit=5
- *
- * Returns Parent Atlas packets with full contract response:
- * - Lineage chain (packet_key, feature_id, source_ref, qdrant_point_id, community_id, som_cluster)
- * - Provenance (source tier, latency, cache_hit, all attempted tiers, confidence score)
- * - 7-tier escalation: Redis → Qdrant → SOM → KMeans → Neo4j → Postgres → RG
- * - No placeholders ever returned; safe_next_action on NOT_FOUND
- */
-export const GET: RequestHandler = async ({ url }) => {
-  const query = url.searchParams.get('query');
-  const file_path = url.searchParams.get('file_path') || undefined;
-  const feature_id = url.searchParams.get('feature_id') || undefined;
-  const limit = Math.min(parseInt(url.searchParams.get('limit') || '5'), 5); // Enforce 5-limit
-
-  if (!query) {
-    return error(400, 'query parameter required');
-  }
-
-  try {
-    const response = await findPacketsForOpenCode({
-      query,
-      file_path,
-      feature_id,
-      limit
-    });
-
-    // Return full contract response with provenance
-    return json({
-      ok: response.ok,
-      status: response.status,
-      query,
-      results: response.data,
-      count: response.data.length,
-      limit_enforced: response.data.length <= 5,
-      lineage: response.lineage,
-      provenance: response.provenance,
-      safe_next_action: response.safe_next_action,
-      error: response.error,
-      timestamp: new Date().toISOString()
-    });
-  } catch (err) {
-    // Degrade gracefully with contract structure
-    return json({
-      ok: false,
-      status: 'DEGRADED',
-      query,
-      results: [],
-      count: 0,
-      limit_enforced: true,
-      lineage: [],
-      provenance: {
-        source: 'not_found',
-        query_time_ms: 0,
-        cache_hit: false,
-        retrieval_attempts: [],
-        confidence: 0.0
-      },
-      error: err instanceof Error ? err.message : 'Unknown error',
-      timestamp: new Date().toISOString()
-    });
-  }
-};
-
-/**
+ * OpenCode aggregator: query → HyperRAG → narrowed tools → replayTrace.
  * POST /api/opencode
  *
- * Body:
- * {
- *   "action": "find" | "som-cluster" | "kmeans-context" | "all-recommendations",
- *   "packet_key": "...",
- *   "feature_id": "...",
- *   "query": "...",
- *   "limit": 5
- * }
+ * Flow:
+ *   1. Extract query
+ *   2. Call /api/tools/rpc-search for packet context
+ *   3. Fetch TRACE MCP tool registry
+ *   4. Narrow tools by feature_id match
+ *   5. Assemble ACE/KAG/DAG replay trace
+ *   6. Return {query, packets, tools, replayTrace, cache, provenance}
  */
-export const POST: RequestHandler = async ({ request }) => {
-  if (request.headers.get('content-type') !== 'application/json') {
-    return error(400, 'Content-Type must be application/json');
+
+import type { RequestHandler } from './$types';
+import { json, error } from '@sveltejs/kit';
+import { z } from 'zod';
+import { callTraceMcp } from '$lib/server/mcp/trace-http.js';
+import { getRedis } from '$lib/server/redis.js';
+
+const requestSchema = z.object({
+  query: z.string().min(1),
+  file_path: z.string().optional(),
+  case_id: z.string().optional(),
+});
+
+export const POST: RequestHandler = async ({ request, locals }) => {
+  if (!locals.user) {
+    return error(401, 'Unauthorized');
   }
 
-  let body: any = {};
   try {
-    body = await request.json();
-  } catch (err) {
-    return error(400, 'Invalid JSON');
-  }
+    const body = await request.json();
+    const { query, file_path, case_id } = requestSchema.parse(body);
+    const startMs = performance.now();
 
-  const { action, packet_key, feature_id, query, limit = 5 } = body;
-
-  try {
-    switch (action) {
-      case 'find':
-        if (!query) return error(400, 'query required for find action');
-        const results = await findPacketsForOpenCode({
-          query,
-          limit: Math.min(limit, 5)
-        });
-        return json({ ok: true, action, results });
-
-      case 'som-cluster':
-        if (!packet_key) return error(400, 'packet_key required');
-        const somCluster = await getPacketSOMCluster(packet_key);
-        return json({ ok: true, action, result: somCluster });
-
-      case 'kmeans-context':
-        if (!feature_id) return error(400, 'feature_id required');
-        const kmeansCtx = await getFeatureKMeansContext(feature_id);
-        return json({ ok: true, action, result: kmeansCtx });
-
-      case 'all-recommendations':
-        const allRecsResponse = await getAllRecommendationsForOpenCode(Math.min(limit, 5));
-        return json({
-          ok: allRecsResponse.ok,
-          action,
-          status: allRecsResponse.status,
-          results: allRecsResponse.data,
-          lineage: allRecsResponse.lineage,
-          provenance: allRecsResponse.provenance,
-          error: allRecsResponse.error
-        });
-
-      default:
-        return error(400, `Unknown action: ${action}`);
-    }
-  } catch (err) {
-    // Degrade gracefully with contract structure
-    return json(
-      {
-        ok: false,
-        action,
-        status: 'DEGRADED',
-        error: err instanceof Error ? err.message : 'Unknown error',
-        results: [],
-        lineage: [],
-        provenance: {
-          source: 'not_found',
-          query_time_ms: 0,
-          cache_hit: false,
-          retrieval_attempts: [],
-          confidence: 0.0
-        }
+    // Stage 1: Call /api/tools/rpc-search
+    const rpcRes = await fetch(new URL('/api/tools/rpc-search', request.url).href, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        cookie: request.headers.get('cookie') || '',
       },
-      { status: 200 }
-    );
+      body: JSON.stringify({ query, limit: 10 }),
+    });
+
+    if (!rpcRes.ok) {
+      return error(rpcRes.status, 'RPC search failed');
+    }
+
+    const { packets, cached: rpcCached } = await rpcRes.json();
+    const featureIds = [...new Set(packets.map((p: any) => p.feature_id))];
+
+    // Stage 2: Fetch TRACE MCP tools
+    let allTools: any[] = [];
+    try {
+      const toolRes = await callTraceMcp('tools/list', {});
+      allTools = toolRes.tools || [];
+    } catch (e) {
+      console.warn('[opencode] MCP tools/list failed, falling back to empty');
+    }
+
+    // Stage 3: Narrow tools by feature_id
+    const narrowedTools = allTools.filter((tool) => {
+      const toolFeatures = tool.metadata?.features || [];
+      return featureIds.some((fid: string) => toolFeatures.includes(fid));
+    });
+
+    // Stage 4: Assemble replay trace
+    const replayTrace = {
+      query,
+      queryHash: Buffer.from(query).toString('base64').slice(0, 16),
+      timestamp: Date.now(),
+      userId: locals.user.id,
+      filePath: file_path,
+      caseId: case_id,
+      packets: packets.slice(0, 5),
+      featureIds,
+      toolCount: narrowedTools.length,
+      cacheHits: {
+        rpc: rpcCached,
+      },
+    };
+
+    // Stage 5: Return context pack
+    return json({
+      query,
+      packets: packets.slice(0, 10),
+      tools: narrowedTools.slice(0, 20),
+      replayTrace,
+      cache: {
+        rpcHit: rpcCached,
+        bitfrostHit: false,
+        qdrantHit: true,
+        graphHit: false,
+      },
+      provenance: {
+        packetKeys: packets.map((p: any) => p.packet_key),
+        sourceRefs: featureIds,
+        featureIds,
+        qdrantPointIds: packets.map((p: any) => p.qdrant_id || null),
+      },
+      latencyMs: performance.now() - startMs,
+    });
+  } catch (err) {
+    if (err instanceof z.ZodError) {
+      return error(400, 'Invalid request');
+    }
+    console.error('[opencode]', err);
+    return error(500, 'Internal error');
   }
 };

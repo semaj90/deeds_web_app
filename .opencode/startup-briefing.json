@@ -1,24 +1,24 @@
 {
-  "generatedAt": "2026-06-12T13:43:46.921Z",
+  "generatedAt": "2026-06-14T02:08:29.372Z",
   "appRoot": "C:/Users/james/Videos/deeds-web-app",
   "readOnly": true,
   "summary": {
     "productionReadiness": {
       "exists": true,
-      "generatedAt": "2026-06-12T13:03:33.481Z",
+      "generatedAt": "2026-06-14T01:32:51.675Z",
       "counts": {
-        "pass": 66,
-        "warn": 0,
+        "pass": 65,
+        "warn": 1,
         "fail": 0
       },
-      "summary": "PASS 66 / WARN 0 / FAIL 0",
+      "summary": "PASS 65 / WARN 1 / FAIL 0",
       "keySignals": {
         "parentAtlasDocuments": null,
         "atlasFeatureMap": null,
         "nesChromPackets": null,
         "routeRuntimePackets": null,
-        "qdrantPoints": 54331,
-        "neo4jCodebaseFiles": 31551
+        "qdrantPoints": 54898,
+        "neo4jCodebaseFiles": 0
       }
     },
     "temporalTaskRegistry": {
@@ -75,7 +75,7 @@
     },
     "higherHopEnrichment": {
       "exists": true,
-      "generatedAt": "2026-06-12T13:36:20.630Z",
+      "generatedAt": "2026-06-14T02:08:29.278Z",
       "status": "HIGHER_HOP_GAP",
       "totalRows": 21,
       "somClusterCoveragePct": 0,
@@ -87,7 +87,7 @@
     },
     "postgresMirrors": {
       "exists": true,
-      "generatedAt": "2026-06-12T13:41:21.395Z",
+      "generatedAt": "2026-06-12T18:01:30.810Z",
       "liveProbe": {
         "reachable": true,
         "reason": null,
@@ -118,7 +118,7 @@
     },
     "agentTraceMaturity": {
       "exists": true,
-      "generatedAt": "2026-06-12T13:41:35.764Z",
+      "generatedAt": "2026-06-12T18:01:51.454Z",
       "status": "READY_FOR_PLANNER_LEARNING",
       "completionEstimatePct": 100,
       "agentTracesTotal": 1134,
@@ -259,7 +259,7 @@
       },
       "contextualTreeReadiness": null,
       "liveServiceEnv": null,
-      "workstationTodoLines": 164,
+      "workstationTodoLines": 172,
       "packetSurfaces": {
         "total": 3,
         "byRoot": {
@@ -302,30 +302,30 @@
             "sourceRef",
             "pathmap"
           ],
-          "totalFiles": 95,
+          "totalFiles": 107,
           "termMatches": [
             {
               "term": "sourceRef",
-              "count": 91
+              "count": 103
             },
             {
               "term": "pathmap",
-              "count": 28
+              "count": 29
             }
           ],
           "sampleFiles": [
             "./DOC-STATUS-AND-CONSOLIDATION-2026-05-20.md",
-            "./FEATURE-GOAL-LINE-CONSOLIDATION-2026-05-22.md",
-            "./package.json",
-            "./next_steps/DAILY-TODO-2026-05-20-phased-execution.md",
-            "./docs/architecture/llama-server-summary-cache-lane.md",
-            "./MASTER-FEATURE-TODO-2026-05-20.md",
             "./docs/atlas/feature-registry.json",
-            "./reports/parent-atlas-open-lanes-todo.md",
-            "./scripts/feature-gap-registry-bootstrap.mjs",
-            "./scripts/packets/score-superseded-originals.mjs",
-            "./reports/parent-atlas-workstation-todo.md",
-            "./scripts/atlas/audit-runtime-coverage.mjs"
+            "./docs/architecture/llama-server-summary-cache-lane.md",
+            "./docs/reports/atlas-feature-map-codefile-backfill-report.json",
+            "./FEATURE-GOAL-LINE-CONSOLIDATION-2026-05-22.md",
+            "./docs/reports/atlas-feature-parent-codefile-backfill-plan.json",
+            "./docs/reports/atlas-feature-parent-codefile-repair-report.json",
+            "./docs/reports/atlas-feature-parent-codefile-backfill-plan.md",
+            "./docs/reports/atlas-feature-parent-join-gap-report.json",
+            "./docs/reports/feature-gap-registry-bootstrap-2026-05-25.json",
+            "./docs/reports/feature-gap-registry-bootstrap-2026-05-25.md",
+            "./docs/reports/feature-gap-registry-live-latest.json"
           ]
         },
         {
@@ -336,34 +336,34 @@
             "parent-atlas",
             "packet flow"
           ],
-          "totalFiles": 60,
+          "totalFiles": 64,
           "termMatches": [
             {
               "term": "parent atlas",
-              "count": 21
+              "count": 22
             },
             {
               "term": "parent-atlas",
-              "count": 56
+              "count": 60
             },
             {
               "term": "packet flow",
-              "count": 11
+              "count": 12
             }
           ],
           "sampleFiles": [
-            "./docs/atlas/parent-atlas-table-of-contents.md",
             "./MASTER-FEATURE-TODO-2026-05-20.md",
+            "./docs/atlas/parent-atlas-table-of-contents.md",
             "./docs/reports/feature-lineage-report.md",
             "./reports/parent-atlas-workstation-todo.md",
             "./reports/parent-atlas-open-lanes-todo.md",
+            "./scripts/atlas/audit-feature-lineage.mjs",
             "./docs/reports/parent-atlas-doc-indexing-2026-06-01.json",
             "./docs/reports/parent-atlas-doc-indexing-2026-06-01.md",
-            "./scripts/atlas/audit-feature-lineage.mjs",
+            "./scripts/atlas/audit-runtime-coverage.mjs",
             "./docs/reports/phase101-parent-atlas-packetize-dry-run.json",
             "./docs/reports/phase101-parent-atlas-packetize-dry-run.md",
-            "./docs/reports/phase16-runtime-artifact-locator.json",
-            "./docs/reports/phase16-runtime-artifact-locator.md"
+            "./scripts/atlas/chunk-rg-search-dumps.mjs"
           ]
         },
         {
@@ -375,38 +375,38 @@
             "prompt cache",
             "KV cache"
           ],
-          "totalFiles": 63,
+          "totalFiles": 64,
           "termMatches": [
             {
               "term": "llama-server",
-              "count": 45
+              "count": 46
             },
             {
               "term": "embeddinggemma",
-              "count": 30
+              "count": 31
             },
             {
               "term": "prompt cache",
-              "count": 33
+              "count": 34
             },
             {
               "term": "KV cache",
-              "count": 20
+              "count": 21
             }
           ],
           "sampleFiles": [
             "./CONTEXT-WINDOW-ALIGNMENT-ollama-turboquant-opencode-2026-05-20.md",
             "./DOC-INDEX-runtime-graphrag-subgraphs-2026-05-19.md",
-            "./FEATURE-GOAL-LINE-CONSOLIDATION-2026-05-22.md",
-            "./docs/architecture/llama-server-summary-cache-lane.md",
             "./EXECUTION-CHECKLIST-2026-05-19.md",
-            "./docs/atlas/parent-atlas-table-of-contents.md",
             "./DOC-STATUS-AND-CONSOLIDATION-2026-05-20.md",
+            "./FEATURE-GOAL-LINE-CONSOLIDATION-2026-05-22.md",
+            "./MASTER-FEATURE-TODO-2026-05-20.md",
+            "./JSON-MAPPING-runtime-retrieval-master-2026-05-19.json",
+            "./docs/architecture/llama-server-summary-cache-lane.md",
+            "./docs/atlas/parent-atlas-table-of-contents.md",
             "./PATCH-CONTEXT-64K-REPO-FILES-2026-05-20.md",
             "./MASTER-ROADMAP-codebase-runtime-graphrag-2026-05-19.md",
-            "./REPO-CONSOLIDATED-TODOS-feature-labels-clusters-2026-05-19.md",
-            "./reference/REF-runtime-and-validation-2026-05-20.md",
-            "./MASTER-IMPLEMENTATION-LEDGER-runtime-graphrag-subgraphs-2026-05-19.md"
+            "./REPO-CONSOLIDATED-TODOS-feature-labels-clusters-2026-05-19.md"
           ]
         },
         {
@@ -417,34 +417,34 @@
             "contextual tree",
             "multi-hop"
           ],
-          "totalFiles": 60,
+          "totalFiles": 64,
           "termMatches": [
             {
               "term": "neo4j",
-              "count": 55
+              "count": 59
             },
             {
               "term": "contextual tree",
-              "count": 12
+              "count": 13
             },
             {
               "term": "multi-hop",
-              "count": 21
+              "count": 22
             }
           ],
           "sampleFiles": [
             "./CODEBASE-MAP-docker-plugins-api-paths-2026-05-19.md",
             "./CONTRACT-graph-refresh-manifest-schema-2026-05-19.md",
-            "./docs/reports/concept-evidence-spine-backfill-report.json",
-            "./FEATURE-GOAL-LINE-CONSOLIDATION-2026-05-22.md",
             "./EXISTING-CODEBASE-MAPPING-AND-SUBGRAPH-VERSIONS-2026-05-19.md",
-            "./JSON-MAPPING-service-mcp-api-paths-2026-05-19.json",
+            "./FEATURE-GOAL-LINE-CONSOLIDATION-2026-05-22.md",
+            "./JSON-MAPPING-drizzle-postgres-qdrant-summaries-2026-05-19.json",
+            "./JSON-MAPPING-runtime-retrieval-master-2026-05-19.json",
+            "./MASTER-FEATURE-TODO-2026-05-20.md",
             "./MASTER-ROADMAP-codebase-runtime-graphrag-2026-05-19.md",
             "./package.json",
-            "./MASTER-FEATURE-TODO-2026-05-20.md",
-            "./JSON-MAPPING-runtime-retrieval-master-2026-05-19.json",
-            "./JSON-MAPPING-drizzle-postgres-qdrant-summaries-2026-05-19.json",
-            "./docs/reports/feature-lineage-report.md"
+            "./JSON-MAPPING-service-mcp-api-paths-2026-05-19.json",
+            "./docs/reports/concept-evidence-spine-backfill-report.json",
+            "./next_steps/apply-deterministic-index-lanes.mjs"
           ]
         },
         {
@@ -455,19 +455,19 @@
             "semantic",
             "cluster"
           ],
-          "totalFiles": 171,
+          "totalFiles": 187,
           "termMatches": [
             {
               "term": "qdrant",
-              "count": 93
-            },
-            {
-              "term": "semantic",
               "count": 102
             },
             {
+              "term": "semantic",
+              "count": 103
+            },
+            {
               "term": "cluster",
-              "count": 124
+              "count": 136
             }
           ],
           "sampleFiles": [
@@ -475,14 +475,14 @@
             "./CODEBASE-MAP-docker-plugins-api-paths-2026-05-19.md",
             "./CONTRACT-codebase-to-glyph-adapter-2026-05-19.md",
             "./CONTRACT-graph-refresh-manifest-schema-2026-05-19.md",
+            "./docs/reports/atlas-feature-parent-codefile-repair-report.json",
+            "./docs/reports/atlas-packet-community-coverage-report.json",
             "./DOC-STATUS-AND-CONSOLIDATION-2026-05-20.md",
-            "./FEATURE-GOAL-LINE-CONSOLIDATION-2026-05-22.md",
-            "./GAP-ANALYSIS-vs-next_steps-2026-05-19.md",
-            "./JSON-MAPPING-drizzle-postgres-qdrant-summaries-2026-05-19.json",
-            "./JSON-MAPPING-autoencoder-som-libtorch-engram-2026-05-19.json",
-            "./docs/architecture/llama-server-summary-cache-lane.md",
             "./docs/atlas/feature-registry.json",
-            "./IMPLEMENTATION-SPEC-mapreduce-duckdb-multihop-2026-05-19.md"
+            "./docs/reports/engram-integration-file-library-map-2026-05-20.md",
+            "./docs/reports/feature-gap-registry-live-latest.json",
+            "./docs/reports/atlas-packet-community-coverage-report.md",
+            "./docs/architecture/llama-server-summary-cache-lane.md"
           ]
         },
         {
@@ -493,19 +493,19 @@
             "bitfrost",
             "cache"
           ],
-          "totalFiles": 167,
+          "totalFiles": 180,
           "termMatches": [
             {
               "term": "redis",
-              "count": 86
+              "count": 89
             },
             {
               "term": "bitfrost",
-              "count": 10
+              "count": 11
             },
             {
               "term": "cache",
-              "count": 154
+              "count": 166
             }
           ],
           "sampleFiles": [
@@ -514,12 +514,12 @@
             "./CONTRACT-graph-refresh-manifest-schema-2026-05-19.md",
             "./CONTRACT-retrieval-synthesis-config-2026-05-19.md",
             "./DOC-INDEX-runtime-graphrag-subgraphs-2026-05-19.md",
-            "./JSON-MAPPING-drizzle-postgres-qdrant-summaries-2026-05-19.json",
-            "./JSON-MAPPING-runtime-retrieval-master-2026-05-19.json",
             "./JSON-MAPPING-feature-labels-hyperparams-search-files-2026-05-19.json",
-            "./JSON-MAPPING-autoencoder-som-libtorch-engram-2026-05-19.json",
+            "./docs/atlas/feature-registry.json",
+            "./JSON-MAPPING-drizzle-postgres-qdrant-summaries-2026-05-19.json",
             "./JSON-MAPPING-service-mcp-api-paths-2026-05-19.json",
             "./MASTER-FEATURE-TODO-2026-05-20.md",
+            "./JSON-MAPPING-autoencoder-som-libtorch-engram-2026-05-19.json",
             "./MASTER-IMPLEMENTATION-LEDGER-runtime-graphrag-subgraphs-2026-05-19.md"
           ]
         },
@@ -531,34 +531,34 @@
             "som",
             "centroid"
           ],
-          "totalFiles": 114,
+          "totalFiles": 121,
           "termMatches": [
             {
               "term": "turbovec",
-              "count": 53
+              "count": 56
             },
             {
               "term": "som",
-              "count": 67
+              "count": 70
             },
             {
               "term": "centroid",
-              "count": 46
+              "count": 51
             }
           ],
           "sampleFiles": [
             "./CODEBASE-MAP-docker-plugins-api-paths-2026-05-19.md",
-            "./FEATURE-GOAL-LINE-CONSOLIDATION-2026-05-22.md",
             "./DOC-STATUS-AND-CONSOLIDATION-2026-05-20.md",
-            "./docs/atlas/feature-registry.json",
-            "./docs/reports/archive-raw-search-dumps-completion-2026-06-01.json",
-            "./docs/reports/archive-raw-search-dumps-completion-2026-06-01.md",
-            "./JSON-MAPPING-search-engine-language-stack-2026-05-19.json",
             "./JSON-MAPPING-runtime-retrieval-master-2026-05-19.json",
             "./JSON-MAPPING-autoencoder-som-libtorch-engram-2026-05-19.json",
-            "./docs/reports/concept-evidence-spine-backfill-report.json",
+            "./FEATURE-GOAL-LINE-CONSOLIDATION-2026-05-22.md",
+            "./JSON-MAPPING-search-engine-language-stack-2026-05-19.json",
             "./JSON-MAPPING-feature-labels-hyperparams-search-files-2026-05-19.json",
-            "./MASTER-FEATURE-TODO-2026-05-20.md"
+            "./MASTER-FEATURE-TODO-2026-05-20.md",
+            "./docs/reports/archive-raw-search-dumps-completion-2026-06-01.json",
+            "./docs/atlas/feature-registry.json",
+            "./REPO-NOTE-autoencoder-som-libtorch-engram-2026-05-19.md",
+            "./docs/reports/archive-raw-search-dumps-completion-2026-06-01.md"
           ]
         },
         {
@@ -569,34 +569,34 @@
             "mapreduce",
             "offline"
           ],
-          "totalFiles": 66,
+          "totalFiles": 67,
           "termMatches": [
             {
               "term": "duckdb",
-              "count": 45
+              "count": 46
             },
             {
               "term": "mapreduce",
-              "count": 28
+              "count": 29
             },
             {
               "term": "offline",
-              "count": 48
+              "count": 49
             }
           ],
           "sampleFiles": [
             "./CONTRACT-DuckDB-subgraph-schema-2026-05-19.md",
             "./DOC-INDEX-runtime-graphrag-subgraphs-2026-05-19.md",
             "./EXISTING-CODEBASE-MAPPING-AND-SUBGRAPH-VERSIONS-2026-05-19.md",
-            "./duckdb/smoke-duckdb.ps1",
             "./IMPLEMENTATION-SPEC-mapreduce-duckdb-multihop-2026-05-19.md",
-            "./duckdb/install-duckdb-cli.ps1",
-            "./MASTER-FEATURE-TODO-2026-05-20.md",
             "./JSON-MAPPING-runtime-retrieval-master-2026-05-19.json",
-            "./docs/atlas/parent-atlas-table-of-contents.md",
+            "./MASTER-FEATURE-TODO-2026-05-20.md",
+            "./duckdb/smoke-duckdb.ps1",
+            "./duckdb/install-duckdb-cli.ps1",
             "./docs/atlas/feature-registry.json",
-            "./docs/reports/concept-evidence-spine-backfill-report.json",
-            "./REPO-CONSOLIDATED-TODOS-feature-labels-clusters-2026-05-19.md"
+            "./REPO-CONSOLIDATED-TODOS-feature-labels-clusters-2026-05-19.md",
+            "./docs/atlas/parent-atlas-table-of-contents.md",
+            "./next_steps/DAILY-TODO-2026-05-20-phased-execution.md"
           ]
         }
       ]
@@ -646,13 +646,13 @@
       "tasksOpen": 8,
       "tasksClosed": 9,
       "newRecommendations": 17,
-      "productionReadiness": "PASS 66 / WARN 0 / FAIL 0"
+      "productionReadiness": "PASS 65 / WARN 1 / FAIL 0"
     },
     "systems": {
       "postgres": "healthy",
       "redis": "healthy",
       "qdrant": "healthy",
-      "neo4j": "healthy",
+      "neo4j": "unknown",
       "turbovec": "deferred",
       "ldjson": "96.2%"
     },

@@ -119,6 +119,14 @@ export function normalizeRef(value, repoRoot = process.cwd()) {
   return s;
 }
 
+function isSyntheticAuditWarningRef(value) {
+  const s = String(value ?? '').trim();
+  return s === 'Audit Report: [unsafe_drizzle_update_delete] warning detected'
+    || /^Audit Report:/i.test(s)
+    || /\[unsafe_/i.test(s)
+    || / warning detected/i.test(s);
+}
+
 function isObject(value) {
   return Boolean(value) && typeof value === 'object' && !Array.isArray(value);
 }
@@ -181,7 +189,7 @@ function extractRefsFromValue(value, refs) {
   function visit(node, active = false) {
     if (node === null || node === undefined) return;
     if (typeof node === 'string') {
-      if (active) refs.add(node);
+      if (active && !isSyntheticAuditWarningRef(node)) refs.add(node);
       return;
     }
     if (Array.isArray(node)) {

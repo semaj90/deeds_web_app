@@ -64,6 +64,9 @@ export const nesChromPackets = pgTable('nes_chrom_packets', {
   sourceRefsGin: index('nes_chrom_packets_source_refs_gin').using('gin', table.sourceRefs),
   payloadGin: index('nes_chrom_packets_payload_gin').using('gin', table.payload),
   embeddingHnsw: index('nes_chrom_packets_embedding_hnsw').using('hnsw', table.embedding.op('vector_cosine_ops')),
+  sourceRefTrgmIdx: index('nes_chrom_packets_source_ref_trgm_idx').using('gin', sql`${table.sourceRef} gin_trgm_ops`),
+  normSourceRefTrgmIdx: index('nes_chrom_packets_norm_source_ref_trgm_idx').using('gin', sql`lower(${table.sourceRef}) gin_trgm_ops`),
+  summaryTrgmIdx: index('nes_chrom_packets_summary_trgm_idx').using('gin', sql`${table.summary} gin_trgm_ops`),
   featureIdsGin: index('idx_nes_chrom_packets_feature_ids_gin').using('gin', table.featureIds),
   somClusterIdx: index('idx_nes_chrom_packets_som_cluster').on(table.somCluster),
   laneIdsGin: index('idx_nes_chrom_packets_lane_ids_gin').using('gin', table.laneIds),
@@ -122,4 +125,3 @@ export const packetMarkdownChunks = pgTable('packet_markdown_chunks', {
 
 export type PacketMarkdownChunk = typeof packetMarkdownChunks.$inferSelect;
 export type NewPacketMarkdownChunk = typeof packetMarkdownChunks.$inferInsert;
-

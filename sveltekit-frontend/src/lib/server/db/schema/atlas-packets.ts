@@ -1,3 +1,4 @@
+import { sql } from 'drizzle-orm';
 import { pgTable, text, integer, doublePrecision, bigint, jsonb, timestamp, index } from 'drizzle-orm/pg-core';
 import { vector } from 'drizzle-orm/pg-core';
 
@@ -31,4 +32,18 @@ export const atlasPackets = pgTable('atlas_packets', {
   sourceRefIdx: index('idx_atlas_packets_source_ref').on(table.sourceRef),
   packetKeyIdx: index('idx_atlas_packets_packet_key').on(table.packetKey),
   sourceKindIdx: index('idx_atlas_packets_source_kind').on(table.sourceKind),
+  communityIdIdx: index('idx_atlas_packets_community_id').on(table.communityId),
+  featureIdIdx: index('idx_atlas_packets_feature_id').on(table.featureId),
+  sourceRefKeyIdx: index('idx_atlas_packets_source_ref_key').on(table.sourceRefKey),
+  conceptIdsIdx: index('idx_atlas_packets_concept_ids').using('gin', table.conceptIds),
+  summaryFtsIdx: index('idx_atlas_packets_summary_fts').using('gin', sql`to_tsvector('english', coalesce(${table.summary}, ''))`),
+  identityIdx: index('atlas_packets_identity_idx').on(table.packetKey, table.sourceRef, table.featureId, table.communityId),
+  metadataGinIdx: index('atlas_packets_metadata_gin_idx').using('gin', table.metadata),
+  metadataPathIdx: index('atlas_packets_metadata_path_idx').on(sql`(${table.metadata}->>'path')`),
+  metadataHashIdx: index('atlas_packets_metadata_hash_idx').on(sql`(${table.metadata}->>'hash')`),
+  payloadHashIdx: index('atlas_packets_payload_hash_idx').on(sql`(${table.payload}->>'hash')`),
+  payloadPathIdx: index('idx_atlas_packets_payload_path').on(sql`(${table.payload}->>'path')`),
+  payloadFileUrlIdx: index('idx_atlas_packets_payload_file_url').on(sql`(${table.payload}->>'file_url')`),
+  packetPayloadPathIdx: index('idx_packet_payload_path').on(sql`(${table.payload}->>'path')`),
+  packetPayloadFeatureIdx: index('idx_packet_payload_feature').on(sql`(${table.payload}->>'feature_id')`),
 }));

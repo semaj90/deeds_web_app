@@ -1,64 +1,64 @@
 # Deep Import Graph - Phase A
-Generated: 2026-06-13T22:39:40.495Z
+Generated: 2026-06-14T00:45:03.656Z
 
 ## Stats
 | Metric | Value |
 |--------|-------|
-| Nodes | 48891 |
-| Total edges | 106062 |
-| Resolved edges | 12480 |
-| Unresolved (local) | 10453 |
-| External refs | 82106 |
-| Neighborhoods computed | 95 |
+| Nodes | 57234 |
+| Total edges | 128685 |
+| Resolved edges | 14865 |
+| Unresolved (local) | 12928 |
+| External refs | 99633 |
+| Neighborhoods computed | 91 |
 | Test-covered files | 987 |
 
 ## Zone Breakdown
 | Zone | Count |
 |------|-------|
-| shared | 36707 |
-| script | 6786 |
-| test | 4425 |
-| types | 785 |
-| config | 80 |
-| server | 78 |
-| route | 21 |
-| client | 9 |
+| shared | 43268 |
+| script | 7261 |
+| test | 5486 |
+| types | 975 |
+| server | 104 |
+| config | 100 |
+| route | 28 |
+| client | 12 |
 
 ## Edge Type Breakdown
 | Type | Count |
 |------|-------|
-| imports_static | 74537 |
-| test_covers_file | 13411 |
-| redis_dependency | 4779 |
-| imports_dynamic | 4395 |
-| qdrant_dependency | 2782 |
-| exports_from | 1752 |
-| neo4j_dependency | 1337 |
-| mcp_tool_calls | 1191 |
-| env_dependency | 1152 |
-| db_dependency | 722 |
-| svelte_route_uses_loader | 4 |
+| imports_static | 89894 |
+| test_covers_file | 16562 |
+| redis_dependency | 5815 |
+| imports_dynamic | 5442 |
+| qdrant_dependency | 3397 |
+| exports_from | 2167 |
+| neo4j_dependency | 1634 |
+| mcp_tool_calls | 1467 |
+| env_dependency | 1417 |
+| db_dependency | 885 |
+| svelte_route_uses_loader | 5 |
 
 ## Top 20 Coupling Hotspots (directFanIn)
 | Rank | File | Zone | FanIn | FanOut |
 |------|------|------|-------|--------|
-| 1 | `sveltekit-frontend/src/lib/server/db/client.ts` | shared | 195 | 20 |
-| 2 | `sveltekit-frontend/src/lib/server/db/client.ts` | shared | 195 | 20 |
-| 3 | `sveltekit-frontend/src/lib/server/db/client.ts` | shared | 195 | 20 |
-| 4 | `sveltekit-frontend/src/lib/server/db/client.ts` | shared | 195 | 20 |
-| 5 | `.claude/worktrees/agent-a7203461/sveltekit-frontend/tests/helpers/env-ports.ts` | shared | 189 | 0 |
-| 6 | `.claude/worktrees/agent-a7203461/sveltekit-frontend/tests/helpers/env-ports.ts` | shared | 189 | 0 |
-| 7 | `.claude/worktrees/agent-a7203461/sveltekit-frontend/tests/helpers/env-ports.ts` | shared | 189 | 0 |
-| 8 | `claude-mem/src/utils/logger.ts` | shared | 178 | 1 |
-| 9 | `src/lib/server/ace/context-assembler.ts` | server | 151 | 0 |
-| 10 | `src/lib/server/ace/context-assembler.ts` | server | 151 | 0 |
-| 11 | `src/lib/server/ace/context-assembler.ts` | server | 151 | 0 |
-| 12 | `.claude/worktrees/agent-a7203461/scripts/atlas/_atlas-utils.mjs` | shared | 126 | 0 |
-| 13 | `.claude/worktrees/agent-a7203461/scripts/atlas/_atlas-utils.mjs` | shared | 126 | 0 |
-| 14 | `.claude/worktrees/agent-a7203461/scripts/atlas/_atlas-utils.mjs` | shared | 126 | 0 |
-| 15 | `sveltekit-frontend/tests/helpers/env-ports.ts` | shared | 123 | 0 |
-| 16 | `sveltekit-frontend/src/lib/server/env.server.ts` | shared | 121 | 0 |
-| 17 | `sveltekit-frontend/src/lib/server/redis.js` | shared | 121 | 8 |
-| 18 | `sveltekit-frontend/src/lib/server/env.server.ts` | shared | 121 | 0 |
-| 19 | `sveltekit-frontend/src/lib/server/redis.js` | shared | 121 | 8 |
-| 20 | `sveltekit-frontend/src/lib/server/env.server.ts` | shared | 121 | 0 |
+| 1 | `.claude/worktrees/agent-a7203461/sveltekit-frontend/tests/helpers/env-ports.ts` | shared | 252 | 0 |
+| 2 | `.claude/worktrees/agent-a7203461/sveltekit-frontend/tests/helpers/env-ports.ts` | shared | 252 | 0 |
+| 3 | `.claude/worktrees/agent-a7203461/sveltekit-frontend/tests/helpers/env-ports.ts` | shared | 252 | 0 |
+| 4 | `.claude/worktrees/agent-a7203461/sveltekit-frontend/tests/helpers/env-ports.ts` | shared | 252 | 0 |
+| 5 | `sveltekit-frontend/src/lib/server/db/client.ts` | shared | 234 | 25 |
+| 6 | `sveltekit-frontend/src/lib/server/db/client.ts` | shared | 234 | 25 |
+| 7 | `sveltekit-frontend/src/lib/server/db/client.ts` | shared | 234 | 25 |
+| 8 | `sveltekit-frontend/src/lib/server/db/client.ts` | shared | 234 | 25 |
+| 9 | `sveltekit-frontend/src/lib/server/db/client.ts` | shared | 234 | 25 |
+| 10 | `src/lib/server/ace/context-assembler.ts` | server | 189 | 0 |
+| 11 | `src/lib/server/ace/context-assembler.ts` | server | 189 | 0 |
+| 12 | `src/lib/server/ace/context-assembler.ts` | server | 189 | 0 |
+| 13 | `src/lib/server/ace/context-assembler.ts` | server | 189 | 0 |
+| 14 | `claude-mem/src/utils/logger.ts` | shared | 178 | 1 |
+| 15 | `.claude/worktrees/agent-a7203461/scripts/atlas/_atlas-utils.mjs` | shared | 168 | 0 |
+| 16 | `.claude/worktrees/agent-a7203461/scripts/atlas/_atlas-utils.mjs` | shared | 168 | 0 |
+| 17 | `.claude/worktrees/agent-a7203461/scripts/atlas/_atlas-utils.mjs` | shared | 168 | 0 |
+| 18 | `.claude/worktrees/agent-a7203461/scripts/atlas/_atlas-utils.mjs` | shared | 168 | 0 |
+| 19 | `sveltekit-frontend/src/lib/server/env.server.ts` | shared | 148 | 0 |
+| 20 | `sveltekit-frontend/src/lib/server/env.server.ts` | shared | 148 | 0 |

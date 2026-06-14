@@ -1,0 +1,47 @@
+{
+  "generatedAt": "2026-06-14T02:07:42.760Z",
+  "coverage": [
+    {
+      "proto": "Packet",
+      "table": "atlas_packets",
+      "columns": 23,
+      "columnsMissing": [],
+      "indexesTotal": 34,
+      "indexesMissing": [],
+      "indexesCoverage": "PASS",
+      "fieldsCoverage": "PASS"
+    },
+    {
+      "proto": "RouteRuntimePacket",
+      "table": "route_runtime_packets",
+      "columns": 32,
+      "columnsMissing": [],
+      "indexesTotal": 22,
+      "indexesMissing": [],
+      "indexesCoverage": "PASS",
+      "fieldsCoverage": "PASS"
+    },
+    {
+      "proto": "TaskSemanticPacket",
+      "table": "task_semantic_packets",
+      "columns": 32,
+      "columnsMissing": [],
+      "indexesTotal": 20,
+      "indexesMissing": [],
+      "indexesCoverage": "PASS",
+      "fieldsCoverage": "PASS"
+    },
+    {
+      "proto": "ConceptRecord",
+      "table": "concept_records",
+      "columns": 18,
+      "columnsMissing": [],
+      "indexesTotal": 5,
+      "indexesMissing": [],
+      "indexesCoverage": "PASS",
+      "fieldsCoverage": "PASS"
+    }
+  ],
+  "gate": "PASS",
+  "recommendations": []
+}

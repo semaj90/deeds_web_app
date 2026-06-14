@@ -1,6 +1,6 @@
 {
   "schema": "parent_atlas_production_readiness.v1",
-  "generatedAt": "2026-06-12T20:33:09.886Z",
+  "generatedAt": "2026-06-14T01:32:51.675Z",
   "readOnly": true,
   "sections": {
     "summary-batch": [
@@ -60,7 +60,7 @@
         "message": "sveltekit-frontend/src/lib/server/gpu/libtorch-bridge.ts exists",
         "details": {
           "exists": true,
-          "bytes": 64801,
+          "bytes": 66252,
           "relPath": "sveltekit-frontend/src/lib/server/gpu/libtorch-bridge.ts"
         }
       },
@@ -297,7 +297,7 @@
         "message": "sveltekit-frontend/src/lib/server/db/schema/nes-chrom-packets.ts exists",
         "details": {
           "exists": true,
-          "bytes": 6145,
+          "bytes": 6510,
           "relPath": "sveltekit-frontend/src/lib/server/db/schema/nes-chrom-packets.ts"
         }
       },
@@ -307,7 +307,7 @@
         "message": "sveltekit-frontend/src/lib/server/db/schema/route_runtime_packets.ts exists",
         "details": {
           "exists": true,
-          "bytes": 1799,
+          "bytes": 3188,
           "relPath": "sveltekit-frontend/src/lib/server/db/schema/route_runtime_packets.ts"
         }
       },
@@ -327,7 +327,7 @@
         "message": "sveltekit-frontend/src/lib/server/db/schema-postgres.ts exists",
         "details": {
           "exists": true,
-          "bytes": 217198,
+          "bytes": 220769,
           "relPath": "sveltekit-frontend/src/lib/server/db/schema-postgres.ts"
         }
       },
@@ -526,34 +526,34 @@
       {
         "id": "rg-uu:ndjson-inventory",
         "status": "pass",
-        "message": "rg -uuu found 129 NDJSON files",
+        "message": "rg -uuu found 182 NDJSON files",
         "details": {
           "sample": [
-            "docs\\packets\\session-features.ndjson",
-            "docs\\packets\\rg-knowledge-packets.ndjson",
-            "docs\\ai-os\\agentic-progress-log.ndjson",
-            ".tmp\\superseded-score-candidates.ndjson",
-            ".tmp\\source-ref-repair-candidates.ndjson",
-            ".tmp\\retrieval-pass-dry-run.ndjson",
-            ".tmp\\path-map.ndjson",
-            "tmp\\llm-wiki-chunks\\_combined.ndjson",
-            "tmp\\llm-wiki-chunks\\tokenization.ndjson",
-            "tmp\\llm-wiki-chunks\\tokenization-rg.ndjson",
-            "tmp\\llm-wiki-chunks\\som-clustering.ndjson",
-            "tmp\\llm-wiki-chunks\\som-clustering-rg.ndjson",
-            "tmp\\llm-wiki-chunks\\retrieval-augmented-generation.ndjson",
-            "tmp\\llm-wiki-chunks\\retrieval-augmented-generation-rg.ndjson",
-            "tmp\\llm-wiki-chunks\\quantization.ndjson",
-            "tmp\\llm-wiki-chunks\\quantization-rg.ndjson",
-            "tmp\\llm-wiki-chunks\\kv-cache.ndjson",
-            "tmp\\llm-wiki-chunks\\kv-cache-rg.ndjson",
-            "tmp\\llm-wiki-chunks\\graph-rag.ndjson",
-            "tmp\\llm-wiki-chunks\\graph-rag-rg.ndjson",
-            "tmp\\llm-wiki-chunks\\fine-tuning.ndjson",
-            "tmp\\llm-wiki-chunks\\fine-tuning-rg.ndjson",
-            "tmp\\llm-wiki-chunks\\embedding-vectors.ndjson",
-            "tmp\\llm-wiki-chunks\\embedding-vectors-rg.ndjson",
-            "tmp\\llm-wiki-chunks\\backpropagation.ndjson"
+            ".opencode\\recommendations\\tasks.ndjson",
+            ".opencode\\recommendations\\tasks-with-improved-titles.ndjson",
+            ".opencode\\recommendations\\agentic-fix-queue.ndjson",
+            ".opencode\\quarantine\\invalid-cards.ndjson",
+            ".opencode\\outcome-ledger.ndjson",
+            ".opencode\\outcome-ledger-with-cardIds.ndjson",
+            ".claude\\worktrees\\agent-a7203461\\memory\\exports\\reports.ndjson",
+            ".claude\\worktrees\\agent-a6ea9982\\.opencode\\recommendations\\tasks.ndjson",
+            ".claude\\worktrees\\agent-a6ea9982\\.opencode\\quarantine\\invalid-cards.ndjson",
+            ".claude\\worktrees\\agent-a6ea9982\\.opencode\\outcome-ledger.ndjson",
+            ".claude\\worktrees\\agent-a6ea9982\\.opencode\\ingest\\nodes.ndjson",
+            ".claude\\worktrees\\agent-a6ea9982\\.opencode\\ingest\\edges.ndjson",
+            ".claude\\worktrees\\agent-a6ea9982\\.opencode\\gemma4_candidates.ndjson",
+            ".claude\\worktrees\\agent-a6ea9982\\.opencode\\ace-packets_stale\\index.ndjson",
+            ".claude\\worktrees\\agent-a6ea9982\\.opencode\\ace-packets\\index.ndjson",
+            ".claude\\worktrees\\agent-a7203461\\.opencode\\recommendations\\tasks.ndjson",
+            ".claude\\worktrees\\agent-a7203461\\.opencode\\quarantine\\invalid-cards.ndjson",
+            ".claude\\worktrees\\agent-a7203461\\.opencode\\outcome-ledger.ndjson",
+            ".claude\\worktrees\\agent-a7203461\\.opencode\\ingest\\nodes.ndjson",
+            ".claude\\worktrees\\agent-a7203461\\.opencode\\ingest\\edges.ndjson",
+            ".claude\\worktrees\\agent-a7203461\\.opencode\\gemma4_candidates.ndjson",
+            ".claude\\worktrees\\agent-a7203461\\.opencode\\ace-packets_stale\\index.ndjson",
+            ".claude\\worktrees\\agent-a7203461\\.opencode\\ace-packets\\index.ndjson",
+            ".claude\\worktrees\\agent-a7203461\\docs\\packets\\session-features.ndjson",
+            ".claude\\worktrees\\agent-a7203461\\docs\\packets\\rg-knowledge-packets.ndjson"
           ]
         }
       }
@@ -682,7 +682,7 @@
       {
         "id": "collection:codebase_chunks_768",
         "status": "pass",
-        "message": "Qdrant codebase_chunks_768 points: 54331",
+        "message": "Qdrant codebase_chunks_768 points: 54898",
         "details": {}
       }
     ],
@@ -756,7 +756,7 @@
       "message": "sveltekit-frontend/src/lib/server/gpu/libtorch-bridge.ts exists",
       "details": {
         "exists": true,
-        "bytes": 64801,
+        "bytes": 66252,
         "relPath": "sveltekit-frontend/src/lib/server/gpu/libtorch-bridge.ts"
       }
     },
@@ -1009,7 +1009,7 @@
       "message": "sveltekit-frontend/src/lib/server/db/schema/nes-chrom-packets.ts exists",
       "details": {
         "exists": true,
-        "bytes": 6145,
+        "bytes": 6510,
         "relPath": "sveltekit-frontend/src/lib/server/db/schema/nes-chrom-packets.ts"
       }
     },
@@ -1020,7 +1020,7 @@
       "message": "sveltekit-frontend/src/lib/server/db/schema/route_runtime_packets.ts exists",
       "details": {
         "exists": true,
-        "bytes": 1799,
+        "bytes": 3188,
         "relPath": "sveltekit-frontend/src/lib/server/db/schema/route_runtime_packets.ts"
       }
     },
@@ -1042,7 +1042,7 @@
       "message": "sveltekit-frontend/src/lib/server/db/schema-postgres.ts exists",
       "details": {
         "exists": true,
-        "bytes": 217198,
+        "bytes": 220769,
         "relPath": "sveltekit-frontend/src/lib/server/db/schema-postgres.ts"
       }
     },
@@ -1259,34 +1259,34 @@
       "section": "offline",
       "id": "rg-uu:ndjson-inventory",
       "status": "pass",
-      "message": "rg -uuu found 129 NDJSON files",
+      "message": "rg -uuu found 182 NDJSON files",
       "details": {
         "sample": [
-          "docs\\packets\\session-features.ndjson",
-          "docs\\packets\\rg-knowledge-packets.ndjson",
-          "docs\\ai-os\\agentic-progress-log.ndjson",
-          ".tmp\\superseded-score-candidates.ndjson",
-          ".tmp\\source-ref-repair-candidates.ndjson",
-          ".tmp\\retrieval-pass-dry-run.ndjson",
-          ".tmp\\path-map.ndjson",
-          "tmp\\llm-wiki-chunks\\_combined.ndjson",
-          "tmp\\llm-wiki-chunks\\tokenization.ndjson",
-          "tmp\\llm-wiki-chunks\\tokenization-rg.ndjson",
-          "tmp\\llm-wiki-chunks\\som-clustering.ndjson",
-          "tmp\\llm-wiki-chunks\\som-clustering-rg.ndjson",
-          "tmp\\llm-wiki-chunks\\retrieval-augmented-generation.ndjson",
-          "tmp\\llm-wiki-chunks\\retrieval-augmented-generation-rg.ndjson",
-          "tmp\\llm-wiki-chunks\\quantization.ndjson",
-          "tmp\\llm-wiki-chunks\\quantization-rg.ndjson",
-          "tmp\\llm-wiki-chunks\\kv-cache.ndjson",
-          "tmp\\llm-wiki-chunks\\kv-cache-rg.ndjson",
-          "tmp\\llm-wiki-chunks\\graph-rag.ndjson",
-          "tmp\\llm-wiki-chunks\\graph-rag-rg.ndjson",
-          "tmp\\llm-wiki-chunks\\fine-tuning.ndjson",
-          "tmp\\llm-wiki-chunks\\fine-tuning-rg.ndjson",
-          "tmp\\llm-wiki-chunks\\embedding-vectors.ndjson",
-          "tmp\\llm-wiki-chunks\\embedding-vectors-rg.ndjson",
-          "tmp\\llm-wiki-chunks\\backpropagation.ndjson"
+          ".opencode\\recommendations\\tasks.ndjson",
+          ".opencode\\recommendations\\tasks-with-improved-titles.ndjson",
+          ".opencode\\recommendations\\agentic-fix-queue.ndjson",
+          ".opencode\\quarantine\\invalid-cards.ndjson",
+          ".opencode\\outcome-ledger.ndjson",
+          ".opencode\\outcome-ledger-with-cardIds.ndjson",
+          ".claude\\worktrees\\agent-a7203461\\memory\\exports\\reports.ndjson",
+          ".claude\\worktrees\\agent-a6ea9982\\.opencode\\recommendations\\tasks.ndjson",
+          ".claude\\worktrees\\agent-a6ea9982\\.opencode\\quarantine\\invalid-cards.ndjson",
+          ".claude\\worktrees\\agent-a6ea9982\\.opencode\\outcome-ledger.ndjson",
+          ".claude\\worktrees\\agent-a6ea9982\\.opencode\\ingest\\nodes.ndjson",
+          ".claude\\worktrees\\agent-a6ea9982\\.opencode\\ingest\\edges.ndjson",
+          ".claude\\worktrees\\agent-a6ea9982\\.opencode\\gemma4_candidates.ndjson",
+          ".claude\\worktrees\\agent-a6ea9982\\.opencode\\ace-packets_stale\\index.ndjson",
+          ".claude\\worktrees\\agent-a6ea9982\\.opencode\\ace-packets\\index.ndjson",
+          ".claude\\worktrees\\agent-a7203461\\.opencode\\recommendations\\tasks.ndjson",
+          ".claude\\worktrees\\agent-a7203461\\.opencode\\quarantine\\invalid-cards.ndjson",
+          ".claude\\worktrees\\agent-a7203461\\.opencode\\outcome-ledger.ndjson",
+          ".claude\\worktrees\\agent-a7203461\\.opencode\\ingest\\nodes.ndjson",
+          ".claude\\worktrees\\agent-a7203461\\.opencode\\ingest\\edges.ndjson",
+          ".claude\\worktrees\\agent-a7203461\\.opencode\\gemma4_candidates.ndjson",
+          ".claude\\worktrees\\agent-a7203461\\.opencode\\ace-packets_stale\\index.ndjson",
+          ".claude\\worktrees\\agent-a7203461\\.opencode\\ace-packets\\index.ndjson",
+          ".claude\\worktrees\\agent-a7203461\\docs\\packets\\session-features.ndjson",
+          ".claude\\worktrees\\agent-a7203461\\docs\\packets\\rg-knowledge-packets.ndjson"
         ]
       }
     },
@@ -1425,7 +1425,7 @@
       "section": "qdrant",
       "id": "collection:codebase_chunks_768",
       "status": "pass",
-      "message": "Qdrant codebase_chunks_768 points: 54331",
+      "message": "Qdrant codebase_chunks_768 points: 54898",
       "details": {}
     },
     {
@@ -1489,29 +1489,29 @@
     "available": true,
     "url": "http://127.0.0.1:6333",
     "collection": "codebase_chunks_768",
-    "pointsCount": 54331,
-    "indexedVectorsCount": 178459,
+    "pointsCount": 54898,
+    "indexedVectorsCount": 162601,
     "status": "green"
   },
   "neo4j": {
     "available": true,
     "uri": "bolt://127.0.0.1:7687",
-    "totalNodes": 16851,
+    "totalNodes": 25919,
     "codebaseFiles": 0,
     "parentAtlasFeatures": 0,
-    "totalRelationships": 18584,
+    "totalRelationships": 72901,
     "belongsToFeature": 0,
     "similarTopology": 0
   },
   "drizzle": {
     "nesChromSchema": {
       "exists": true,
-      "bytes": 6145,
+      "bytes": 6510,
       "relPath": "sveltekit-frontend/src/lib/server/db/schema/nes-chrom-packets.ts"
     },
     "routeRuntimeSchema": {
       "exists": true,
-      "bytes": 1799,
+      "bytes": 3188,
       "relPath": "sveltekit-frontend/src/lib/server/db/schema/route_runtime_packets.ts"
     },
     "schemaIndex": {
@@ -1521,7 +1521,7 @@
     },
     "schemaPostgres": {
       "exists": true,
-      "bytes": 217198,
+      "bytes": 220769,
       "relPath": "sveltekit-frontend/src/lib/server/db/schema-postgres.ts"
     },
     "mirrors": {
@@ -1624,33 +1624,33 @@
   ],
   "ndjsonInventory": {
     "status": "pass",
-    "total": 129,
+    "total": 182,
     "sample": [
-      "docs\\packets\\session-features.ndjson",
-      "docs\\packets\\rg-knowledge-packets.ndjson",
-      "docs\\ai-os\\agentic-progress-log.ndjson",
-      ".tmp\\superseded-score-candidates.ndjson",
-      ".tmp\\source-ref-repair-candidates.ndjson",
-      ".tmp\\retrieval-pass-dry-run.ndjson",
-      ".tmp\\path-map.ndjson",
-      "tmp\\llm-wiki-chunks\\_combined.ndjson",
-      "tmp\\llm-wiki-chunks\\tokenization.ndjson",
-      "tmp\\llm-wiki-chunks\\tokenization-rg.ndjson",
-      "tmp\\llm-wiki-chunks\\som-clustering.ndjson",
-      "tmp\\llm-wiki-chunks\\som-clustering-rg.ndjson",
-      "tmp\\llm-wiki-chunks\\retrieval-augmented-generation.ndjson",
-      "tmp\\llm-wiki-chunks\\retrieval-augmented-generation-rg.ndjson",
-      "tmp\\llm-wiki-chunks\\quantization.ndjson",
-      "tmp\\llm-wiki-chunks\\quantization-rg.ndjson",
-      "tmp\\llm-wiki-chunks\\kv-cache.ndjson",
-      "tmp\\llm-wiki-chunks\\kv-cache-rg.ndjson",
-      "tmp\\llm-wiki-chunks\\graph-rag.ndjson",
-      "tmp\\llm-wiki-chunks\\graph-rag-rg.ndjson",
-      "tmp\\llm-wiki-chunks\\fine-tuning.ndjson",
-      "tmp\\llm-wiki-chunks\\fine-tuning-rg.ndjson",
-      "tmp\\llm-wiki-chunks\\embedding-vectors.ndjson",
-      "tmp\\llm-wiki-chunks\\embedding-vectors-rg.ndjson",
-      "tmp\\llm-wiki-chunks\\backpropagation.ndjson"
+      ".opencode\\recommendations\\tasks.ndjson",
+      ".opencode\\recommendations\\tasks-with-improved-titles.ndjson",
+      ".opencode\\recommendations\\agentic-fix-queue.ndjson",
+      ".opencode\\quarantine\\invalid-cards.ndjson",
+      ".opencode\\outcome-ledger.ndjson",
+      ".opencode\\outcome-ledger-with-cardIds.ndjson",
+      ".claude\\worktrees\\agent-a7203461\\memory\\exports\\reports.ndjson",
+      ".claude\\worktrees\\agent-a6ea9982\\.opencode\\recommendations\\tasks.ndjson",
+      ".claude\\worktrees\\agent-a6ea9982\\.opencode\\quarantine\\invalid-cards.ndjson",
+      ".claude\\worktrees\\agent-a6ea9982\\.opencode\\outcome-ledger.ndjson",
+      ".claude\\worktrees\\agent-a6ea9982\\.opencode\\ingest\\nodes.ndjson",
+      ".claude\\worktrees\\agent-a6ea9982\\.opencode\\ingest\\edges.ndjson",
+      ".claude\\worktrees\\agent-a6ea9982\\.opencode\\gemma4_candidates.ndjson",
+      ".claude\\worktrees\\agent-a6ea9982\\.opencode\\ace-packets_stale\\index.ndjson",
+      ".claude\\worktrees\\agent-a6ea9982\\.opencode\\ace-packets\\index.ndjson",
+      ".claude\\worktrees\\agent-a7203461\\.opencode\\recommendations\\tasks.ndjson",
+      ".claude\\worktrees\\agent-a7203461\\.opencode\\quarantine\\invalid-cards.ndjson",
+      ".claude\\worktrees\\agent-a7203461\\.opencode\\outcome-ledger.ndjson",
+      ".claude\\worktrees\\agent-a7203461\\.opencode\\ingest\\nodes.ndjson",
+      ".claude\\worktrees\\agent-a7203461\\.opencode\\ingest\\edges.ndjson",
+      ".claude\\worktrees\\agent-a7203461\\.opencode\\gemma4_candidates.ndjson",
+      ".claude\\worktrees\\agent-a7203461\\.opencode\\ace-packets_stale\\index.ndjson",
+      ".claude\\worktrees\\agent-a7203461\\.opencode\\ace-packets\\index.ndjson",
+      ".claude\\worktrees\\agent-a7203461\\docs\\packets\\session-features.ndjson",
+      ".claude\\worktrees\\agent-a7203461\\docs\\packets\\rg-knowledge-packets.ndjson"
     ]
   },
   "summary": {
@@ -1923,7 +1923,7 @@
     "files": {
       "libtorchBridge": {
         "exists": true,
-        "bytes": 64801,
+        "bytes": 66252,
         "relPath": "sveltekit-frontend/src/lib/server/gpu/libtorch-bridge.ts"
       },
       "pytorchGraph": {

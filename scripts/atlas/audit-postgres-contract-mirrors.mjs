@@ -276,6 +276,13 @@ function isImplicitIndexName(indexName) {
   return /(_pkey|_key|_uq|^pg_|^sqlsmith_|^btree_)/i.test(name);
 }
 
+function filterImplicitLiveIndexes(indexDiff) {
+  return {
+    onlyInA: indexDiff.onlyInA,
+    onlyInB: indexDiff.onlyInB.filter((indexName) => !isImplicitIndexName(indexName)),
+  };
+}
+
 function repairClassForTable({ staticColumnDiff, staticIndexDiff, liveColumnDiff, liveIndexDiff }) {
   if (staticColumnDiff.onlyInA.length && !staticColumnDiff.onlyInB.length) {
     return 'APPLY_EXISTING_SQL';
@@ -362,11 +369,12 @@ function classifyTable({ schema, manual, live, tableName, staticIdentityFields }
     liveColumns = live.columns ?? [];
     liveIndexes = live.indexes ?? [];
     liveRowCount = live.rowCount ?? null;
+    const filteredLiveIndexDiff = filterImplicitLiveIndexes(diff(contractIndexes, liveIndexes));
     if (!tableExists) {
       liveClassification = 'COLUMN_MISMATCH';
     } else {
       const liveColumnDiff = diff(contractColumns, liveColumns);
-      const liveIndexDiff = diff(contractIndexes, liveIndexes);
+      const liveIndexDiff = filteredLiveIndexDiff;
       if (!liveColumnDiff.onlyInA.length && !liveColumnDiff.onlyInB.length && !liveIndexDiff.onlyInA.length && !liveIndexDiff.onlyInB.length) {
         liveClassification = 'LIVE_DB_ALIGNED';
       } else if (liveColumnDiff.onlyInA.length || liveColumnDiff.onlyInB.length) {
@@ -380,7 +388,7 @@ function classifyTable({ schema, manual, live, tableName, staticIdentityFields }
   }
 
   const liveColumnDiff = diff(contractColumns, liveColumns);
-  const liveIndexDiff = diff(contractIndexes, liveIndexes);
+  const liveIndexDiff = filterImplicitLiveIndexes(diff(contractIndexes, liveIndexes));
   const overallClassification = live?.reachable
     ? liveClassification
     : (staticClassification === 'SQL_AND_DRIZZLE_ALIGNED' ? 'LIVE_DB_UNAVAILABLE' : staticClassification);

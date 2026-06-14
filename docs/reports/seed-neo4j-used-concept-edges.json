@@ -1,9 +1,11 @@
 {
-  "generated_at": "2026-06-12T19:28:01.515Z",
+  "generated_at": "2026-06-14T01:52:33.794Z",
   "mode": "apply",
+  "safe_only": false,
   "total_traces_in_db": 1134,
-  "traces_processed": 1134,
-  "edges_planned": 1134,
+  "traces_processed": 250,
+  "traces_after_safe_filter": 250,
+  "edges_planned": 250,
   "unique_concepts": [
     "agent_intelligence",
     "api_endpoints",
@@ -24,6 +26,6 @@
     "coveragePct": 2,
     "coverageGate": true
   },
-  "applied": 1134,
+  "applied": 250,
   "errors": 0
 }

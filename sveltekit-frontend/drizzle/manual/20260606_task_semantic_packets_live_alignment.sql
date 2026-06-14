@@ -40,6 +40,12 @@ ALTER TABLE public.task_semantic_packets
   ADD COLUMN IF NOT EXISTS source_ref text;
 
 ALTER TABLE public.task_semantic_packets
+  ADD COLUMN IF NOT EXISTS canonical_source_ref text;
+
+ALTER TABLE public.task_semantic_packets
+  ADD COLUMN IF NOT EXISTS source_ref_hash text;
+
+ALTER TABLE public.task_semantic_packets
   ADD COLUMN IF NOT EXISTS summary_llm text;
 
 ALTER TABLE public.task_semantic_packets
@@ -50,6 +56,9 @@ ALTER TABLE public.task_semantic_packets
 
 ALTER TABLE public.task_semantic_packets
   ADD COLUMN IF NOT EXISTS workspace_id text;
+
+CREATE INDEX IF NOT EXISTS tsp_source_ref_hash_idx
+  ON public.task_semantic_packets (source_ref_hash);
 
 -- Indexes already exist in the canonical mirror sidecar:
 --   drizzle/manual/20260601_task_semantic_packets_v2.sql

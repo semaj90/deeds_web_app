@@ -1,23 +1,13 @@
 {
-  "generatedAt": "2026-06-12T19:38:38.737Z",
+  "generatedAt": "2026-06-14T01:31:58.397Z",
   "liveReachable": true,
   "liveError": null,
   "summary": {
     "tablesChecked": 6,
-    "staticAligned": 3,
-    "liveAligned": 0,
+    "staticAligned": 6,
+    "liveAligned": 6,
     "liveUnavailable": 0,
-    "blockers": [
-      "task_semantic_packets: live COLUMN_MISMATCH",
-      "atlas_packets: static COLUMN_MISMATCH",
-      "atlas_packets: live COLUMN_MISMATCH",
-      "nes_chrom_packets: static COLUMN_MISMATCH",
-      "nes_chrom_packets: live INDEX_MISMATCH",
-      "nes_chrom_kag_dag_hits: live INDEX_MISMATCH",
-      "parent_atlas_documents: live INDEX_MISMATCH",
-      "route_runtime_packets: static COLUMN_MISMATCH",
-      "route_runtime_packets: live COLUMN_MISMATCH"
-    ]
+    "blockers": []
   },
   "tables": [
     {
@@ -37,6 +27,7 @@
         "columns": [
           "agent_pickup_ready",
           "alias_id",
+          "canonical_source_ref",
           "centroid_id",
           "cluster_id",
           "confidence",
@@ -55,6 +46,7 @@
           "related_task_ids",
           "semantic_path",
           "source_ref",
+          "source_ref_hash",
           "status",
           "summary_hash",
           "summary_llm",
@@ -82,11 +74,13 @@
           "idx_task_semantic_packets_updated_at",
           "idx_task_semantic_packets_workspace_id",
           "idx_task_semantic_packets_workspace_task_id",
-          "task_semantic_packets_alias_id_idx"
+          "task_semantic_packets_alias_id_idx",
+          "tsp_source_ref_hash_idx"
         ],
         "schemaColumns": [
           "agent_pickup_ready",
           "alias_id",
+          "canonical_source_ref",
           "centroid_id",
           "cluster_id",
           "confidence",
@@ -105,6 +99,7 @@
           "related_task_ids",
           "semantic_path",
           "source_ref",
+          "source_ref_hash",
           "status",
           "summary_hash",
           "summary_llm",
@@ -118,6 +113,7 @@
         "manualColumns": [
           "agent_pickup_ready",
           "alias_id",
+          "canonical_source_ref",
           "centroid_id",
           "cluster_id",
           "confidence",
@@ -136,6 +132,7 @@
           "related_task_ids",
           "semantic_path",
           "source_ref",
+          "source_ref_hash",
           "status",
           "summary_hash",
           "summary_llm",
@@ -163,7 +160,8 @@
           "idx_task_semantic_packets_updated_at",
           "idx_task_semantic_packets_workspace_id",
           "idx_task_semantic_packets_workspace_task_id",
-          "task_semantic_packets_alias_id_idx"
+          "task_semantic_packets_alias_id_idx",
+          "tsp_source_ref_hash_idx"
         ],
         "manualIndexes": [
           "idx_task_semantic_packets_agent_pickup_ready",
@@ -182,7 +180,8 @@
           "idx_task_semantic_packets_updated_at",
           "idx_task_semantic_packets_workspace_id",
           "idx_task_semantic_packets_workspace_task_id",
-          "task_semantic_packets_alias_id_idx"
+          "task_semantic_packets_alias_id_idx",
+          "tsp_source_ref_hash_idx"
         ],
         "columnDiffs": {
           "onlyInA": [],
@@ -196,7 +195,7 @@
       "live": {
         "reachable": true,
         "tableExists": true,
-        "classification": "COLUMN_MISMATCH",
+        "classification": "LIVE_DB_ALIGNED",
         "error": null,
         "columns": [
           "id",
@@ -255,21 +254,15 @@
         "rowCount": 314,
         "columnDiffs": {
           "onlyInA": [],
-          "onlyInB": [
-            "canonical_source_ref",
-            "source_ref_hash"
-          ]
+          "onlyInB": []
         },
         "indexDiffs": {
           "onlyInA": [],
-          "onlyInB": [
-            "task_semantic_packets_pkey",
-            "tsp_source_ref_hash_idx"
-          ]
+          "onlyInB": []
         }
       },
-      "classification": "COLUMN_MISMATCH",
-      "repairClass": "ADD_DRIZZLE_MIRROR",
+      "classification": "LIVE_DB_ALIGNED",
+      "repairClass": null,
       "identityFields": [
         "packet_key",
         "source_ref",
@@ -283,20 +276,24 @@
         "C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\src\\lib\\server\\db\\schema\\atlas-packets.ts"
       ],
       "manualSource": [
-        "C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\drizzle\\manual\\20260611_atlas_packets_schema.sql"
+        "C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\drizzle\\manual\\20260611_atlas_packets_schema.sql",
+        "C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\drizzle\\manual\\20260612_packet_payload_expression_indexes.sql"
       ],
       "static": {
-        "classification": "COLUMN_MISMATCH",
+        "classification": "SQL_AND_DRIZZLE_ALIGNED",
         "columns": [
           "artifact_id",
           "byte_end",
           "byte_start",
           "cluster_id",
+          "community_confidence",
           "community_id",
+          "community_source",
           "concept_ids",
           "created_at",
           "embedding",
           "feature_id",
+          "metadata",
           "packet_id",
           "packet_key",
           "payload",
@@ -305,26 +302,44 @@
           "source_kind",
           "source_path",
           "source_ref",
+          "source_ref_key",
           "summary",
           "updated_at"
         ],
         "indexes": [
           "atlas_packets_feature_idx",
+          "atlas_packets_identity_idx",
+          "atlas_packets_metadata_gin_idx",
+          "atlas_packets_metadata_hash_idx",
+          "atlas_packets_metadata_path_idx",
           "atlas_packets_payload_gin",
+          "atlas_packets_payload_hash_idx",
+          "idx_atlas_packets_community_id",
+          "idx_atlas_packets_concept_ids",
+          "idx_atlas_packets_feature_id",
           "idx_atlas_packets_packet_key",
+          "idx_atlas_packets_payload_file_url",
+          "idx_atlas_packets_payload_path",
           "idx_atlas_packets_source_kind",
-          "idx_atlas_packets_source_ref"
+          "idx_atlas_packets_source_ref",
+          "idx_atlas_packets_source_ref_key",
+          "idx_atlas_packets_summary_fts",
+          "idx_packet_payload_feature",
+          "idx_packet_payload_path"
         ],
         "schemaColumns": [
           "artifact_id",
           "byte_end",
           "byte_start",
           "cluster_id",
+          "community_confidence",
           "community_id",
+          "community_source",
           "concept_ids",
           "created_at",
           "embedding",
           "feature_id",
+          "metadata",
           "packet_id",
           "packet_key",
           "payload",
@@ -333,6 +348,7 @@
           "source_kind",
           "source_path",
           "source_ref",
+          "source_ref_key",
           "summary",
           "updated_at"
         ],
@@ -341,51 +357,81 @@
           "byte_end",
           "byte_start",
           "cluster_id",
+          "community_confidence",
           "community_id",
+          "community_source",
           "concept_ids",
           "created_at",
           "embedding",
           "feature_id",
+          "metadata",
           "packet_id",
+          "packet_key",
           "payload",
+          "reward_prior",
           "sha256",
+          "source_kind",
+          "source_path",
           "source_ref",
-          "summary"
+          "source_ref_key",
+          "summary",
+          "updated_at"
         ],
         "schemaIndexes": [
           "atlas_packets_feature_idx",
+          "atlas_packets_identity_idx",
+          "atlas_packets_metadata_gin_idx",
+          "atlas_packets_metadata_hash_idx",
+          "atlas_packets_metadata_path_idx",
           "atlas_packets_payload_gin",
+          "atlas_packets_payload_hash_idx",
+          "idx_atlas_packets_community_id",
+          "idx_atlas_packets_concept_ids",
+          "idx_atlas_packets_feature_id",
           "idx_atlas_packets_packet_key",
+          "idx_atlas_packets_payload_file_url",
+          "idx_atlas_packets_payload_path",
           "idx_atlas_packets_source_kind",
-          "idx_atlas_packets_source_ref"
+          "idx_atlas_packets_source_ref",
+          "idx_atlas_packets_source_ref_key",
+          "idx_atlas_packets_summary_fts",
+          "idx_packet_payload_feature",
+          "idx_packet_payload_path"
         ],
         "manualIndexes": [
           "atlas_packets_feature_idx",
-          "atlas_packets_payload_gin"
+          "atlas_packets_identity_idx",
+          "atlas_packets_metadata_gin_idx",
+          "atlas_packets_metadata_hash_idx",
+          "atlas_packets_metadata_path_idx",
+          "atlas_packets_payload_gin",
+          "atlas_packets_payload_hash_idx",
+          "idx_atlas_packets_community_id",
+          "idx_atlas_packets_concept_ids",
+          "idx_atlas_packets_feature_id",
+          "idx_atlas_packets_packet_key",
+          "idx_atlas_packets_payload_file_url",
+          "idx_atlas_packets_payload_path",
+          "idx_atlas_packets_source_kind",
+          "idx_atlas_packets_source_ref",
+          "idx_atlas_packets_source_ref_key",
+          "idx_atlas_packets_summary_fts",
+          "idx_packet_payload_feature",
+          "idx_packet_payload_path"
         ],
         "columnDiffs": {
-          "onlyInA": [
-            "packet_key",
-            "reward_prior",
-            "source_kind",
-            "source_path",
-            "updated_at"
-          ],
+          "onlyInA": [],
           "onlyInB": []
         },
         "indexDiffs": {
-          "onlyInA": [
-            "idx_atlas_packets_packet_key",
-            "idx_atlas_packets_source_kind",
-            "idx_atlas_packets_source_ref"
-          ],
+          "onlyInA": [],
           "onlyInB": []
         }
       },
       "live": {
         "reachable": true,
         "tableExists": true,
-        "classification": "COLUMN_MISMATCH",
+        "classification": "LIVE_DB_ALIGNED",
         "error": null,
         "columns": [
           "packet_id",
@@ -409,44 +455,43 @@
           "updated_at",
           "source_ref_key",
           "community_source",
-          "community_confidence"
+          "community_confidence",
+          "metadata"
         ],
         "indexes": [
           "atlas_packets_feature_idx",
+          "atlas_packets_identity_idx",
+          "atlas_packets_metadata_gin_idx",
+          "atlas_packets_metadata_hash_idx",
+          "atlas_packets_metadata_path_idx",
           "atlas_packets_payload_gin",
+          "atlas_packets_payload_hash_idx",
           "atlas_packets_pkey",
           "idx_atlas_packets_community_id",
           "idx_atlas_packets_concept_ids",
           "idx_atlas_packets_feature_id",
           "idx_atlas_packets_packet_key",
+          "idx_atlas_packets_payload_file_url",
+          "idx_atlas_packets_payload_path",
           "idx_atlas_packets_source_kind",
           "idx_atlas_packets_source_ref",
           "idx_atlas_packets_source_ref_key",
-          "idx_atlas_packets_summary_fts"
+          "idx_atlas_packets_summary_fts",
+          "idx_packet_payload_feature",
+          "idx_packet_payload_path"
         ],
-        "rowCount": 17020,
+        "rowCount": 17476,
         "columnDiffs": {
           "onlyInA": [],
-          "onlyInB": [
-            "community_confidence",
-            "community_source",
-            "source_ref_key"
-          ]
+          "onlyInB": []
         },
         "indexDiffs": {
           "onlyInA": [],
-          "onlyInB": [
-            "atlas_packets_pkey",
-            "idx_atlas_packets_community_id",
-            "idx_atlas_packets_concept_ids",
-            "idx_atlas_packets_feature_id",
-            "idx_atlas_packets_source_ref_key",
-            "idx_atlas_packets_summary_fts"
-          ]
+          "onlyInB": []
         }
       },
-      "classification": "COLUMN_MISMATCH",
-      "repairClass": "APPLY_EXISTING_SQL",
+      "classification": "LIVE_DB_ALIGNED",
+      "repairClass": null,
       "identityFields": [
         "packet_id",
         "packet_key",
@@ -466,7 +511,7 @@
         "C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\drizzle\\manual\\atlas_dict_tables.sql"
       ],
       "static": {
-        "classification": "COLUMN_MISMATCH",
+        "classification": "SQL_AND_DRIZZLE_ALIGNED",
         "columns": [
           "chunk_id",
           "confidence_score",
@@ -505,6 +550,7 @@
           "nes_chrom_packets_feature_code_idx",
           "nes_chrom_packets_feature_id_idx",
           "nes_chrom_packets_kag_run_idx",
+          "nes_chrom_packets_norm_source_ref_trgm_idx",
           "nes_chrom_packets_packet_key_key",
           "nes_chrom_packets_payload_gin",
           "nes_chrom_packets_qdrant_point_idx",
@@ -512,7 +558,9 @@
           "nes_chrom_packets_som_code_idx",
           "nes_chrom_packets_source_ref_id_idx",
           "nes_chrom_packets_source_ref_idx",
-          "nes_chrom_packets_source_refs_gin"
+          "nes_chrom_packets_source_ref_trgm_idx",
+          "nes_chrom_packets_source_refs_gin",
+          "nes_chrom_packets_summary_trgm_idx"
         ],
         "schemaColumns": [
           "chunk_id",
@@ -550,10 +598,12 @@
           "embedding",
           "feature_code",
           "feature_id",
+          "feature_ids",
           "id",
           "kag_dag_run_id",
           "kag_node_key",
           "lane",
+          "lane_ids",
           "model",
           "packet_key",
           "packet_type",
@@ -561,6 +611,7 @@
           "payload",
           "qdrant_point_id",
           "query_hash",
+          "som_cluster",
           "som_code",
           "source_ref",
           "source_ref_id",
@@ -578,6 +629,7 @@
           "nes_chrom_packets_feature_code_idx",
           "nes_chrom_packets_feature_id_idx",
           "nes_chrom_packets_kag_run_idx",
+          "nes_chrom_packets_norm_source_ref_trgm_idx",
           "nes_chrom_packets_packet_key_key",
           "nes_chrom_packets_payload_gin",
           "nes_chrom_packets_qdrant_point_idx",
@@ -585,15 +637,20 @@
           "nes_chrom_packets_som_code_idx",
           "nes_chrom_packets_source_ref_id_idx",
           "nes_chrom_packets_source_ref_idx",
-          "nes_chrom_packets_source_refs_gin"
+          "nes_chrom_packets_source_ref_trgm_idx",
+          "nes_chrom_packets_source_refs_gin",
+          "nes_chrom_packets_summary_trgm_idx"
         ],
         "manualIndexes": [
+          "idx_nes_chrom_packets_feature_ids_gin",
           "idx_nes_chrom_packets_lane_ids_gin",
+          "idx_nes_chrom_packets_som_cluster",
           "nes_chrom_packets_chunk_id_idx",
           "nes_chrom_packets_embedding_hnsw",
           "nes_chrom_packets_feature_code_idx",
           "nes_chrom_packets_feature_id_idx",
           "nes_chrom_packets_kag_run_idx",
+          "nes_chrom_packets_norm_source_ref_trgm_idx",
           "nes_chrom_packets_packet_key_key",
           "nes_chrom_packets_payload_gin",
           "nes_chrom_packets_qdrant_point_idx",
@@ -601,28 +658,23 @@
           "nes_chrom_packets_som_code_idx",
           "nes_chrom_packets_source_ref_id_idx",
           "nes_chrom_packets_source_ref_idx",
-          "nes_chrom_packets_source_refs_gin"
+          "nes_chrom_packets_source_ref_trgm_idx",
+          "nes_chrom_packets_source_refs_gin",
+          "nes_chrom_packets_summary_trgm_idx"
         ],
         "columnDiffs": {
-          "onlyInA": [
-            "feature_ids",
-            "lane_ids",
-            "som_cluster"
-          ],
+          "onlyInA": [],
           "onlyInB": []
         },
         "indexDiffs": {
-          "onlyInA": [
-            "idx_nes_chrom_packets_feature_ids_gin",
-            "idx_nes_chrom_packets_som_cluster"
-          ],
+          "onlyInA": [],
           "onlyInB": []
         }
       },
       "live": {
         "reachable": true,
         "tableExists": true,
-        "classification": "INDEX_MISMATCH",
+        "classification": "LIVE_DB_ALIGNED",
         "error": null,
         "columns": [
           "id",
@@ -682,16 +734,11 @@
         },
         "indexDiffs": {
           "onlyInA": [],
-          "onlyInB": [
-            "nes_chrom_packets_norm_source_ref_trgm_idx",
-            "nes_chrom_packets_pkey",
-            "nes_chrom_packets_source_ref_trgm_idx",
-            "nes_chrom_packets_summary_trgm_idx"
-          ]
+          "onlyInB": []
         }
       },
-      "classification": "INDEX_MISMATCH",
-      "repairClass": "APPLY_EXISTING_SQL",
+      "classification": "LIVE_DB_ALIGNED",
+      "repairClass": null,
       "identityFields": [
         "packet_key",
         "source_ref",
@@ -788,7 +835,7 @@
       "live": {
         "reachable": true,
         "tableExists": true,
-        "classification": "INDEX_MISMATCH",
+        "classification": "LIVE_DB_ALIGNED",
         "error": null,
         "columns": [
           "id",
@@ -820,13 +867,11 @@
         },
         "indexDiffs": {
           "onlyInA": [],
-          "onlyInB": [
-            "nes_chrom_kag_dag_hits_pkey"
-          ]
+          "onlyInB": []
         }
       },
-      "classification": "INDEX_MISMATCH",
-      "repairClass": "IGNORE_IMPLICIT_INDEX",
+      "classification": "LIVE_DB_ALIGNED",
+      "repairClass": null,
       "identityFields": [
         "packet_id",
         "source_ref",
@@ -1008,7 +1053,7 @@
       "live": {
         "reachable": true,
         "tableExists": true,
-        "classification": "INDEX_MISMATCH",
+        "classification": "LIVE_DB_ALIGNED",
         "error": null,
         "columns": [
           "id",
@@ -1069,13 +1114,11 @@
         },
         "indexDiffs": {
           "onlyInA": [],
-          "onlyInB": [
-            "parent_atlas_documents_pkey"
-          ]
+          "onlyInB": []
         }
       },
-      "classification": "INDEX_MISMATCH",
-      "repairClass": "IGNORE_IMPLICIT_INDEX",
+      "classification": "LIVE_DB_ALIGNED",
+      "repairClass": null,
       "identityFields": [
         "source_ref",
         "feature_id",
@@ -1093,7 +1136,7 @@
         "C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\drizzle\\manual\\20260606_route_packet_tables.sql"
       ],
       "static": {
-        "classification": "COLUMN_MISMATCH",
+        "classification": "SQL_AND_DRIZZLE_ALIGNED",
         "columns": [
           "cache_hit",
           "cache_tier",
@@ -1101,28 +1144,47 @@
           "cluster_id",
           "feature_id",
           "feature_ids",
+          "git_diff_rank",
+          "git_sha",
           "id",
           "lane_ids",
           "latency_ms",
+          "packet_uuid",
+          "packet_version",
+          "prompt_hash",
           "qdrant_hits",
           "query_hash",
           "query_preview",
           "raw",
           "redis_hot_keys",
+          "repair_method",
+          "repair_reason",
           "response_tokens",
+          "reward",
           "route",
           "route_state",
           "session_id",
           "som_cluster",
+          "source_ref_quality",
           "source_refs",
+          "superseded_by",
+          "supersedes_packet_uuid",
           "user_id"
         ],
         "indexes": [
+          "idx_route_runtime_packets_feature_id",
+          "idx_route_runtime_packets_feature_ids_gin",
+          "idx_route_runtime_packets_raw_gin",
+          "idx_route_runtime_packets_source_refs_gin",
           "idx_rrp_captured_at",
           "idx_rrp_cluster_id",
           "idx_rrp_feature_ids_gin",
+          "idx_rrp_git_sha",
+          "idx_rrp_packet_version",
           "idx_rrp_route",
+          "idx_rrp_source_ref_quality",
           "idx_rrp_source_refs_gin",
+          "idx_rrp_superseded_by",
           "rrp_feature_idx",
           "rrp_packet_uuid_uidx",
           "rrp_raw_gin",
@@ -1133,19 +1195,33 @@
           "cache_tier",
           "captured_at",
           "cluster_id",
+          "feature_id",
           "feature_ids",
+          "git_diff_rank",
+          "git_sha",
           "id",
           "lane_ids",
           "latency_ms",
+          "packet_uuid",
+          "packet_version",
+          "prompt_hash",
           "qdrant_hits",
           "query_hash",
           "query_preview",
+          "raw",
           "redis_hot_keys",
+          "repair_method",
+          "repair_reason",
           "response_tokens",
+          "reward",
           "route",
+          "route_state",
           "session_id",
           "som_cluster",
+          "source_ref_quality",
           "source_refs",
+          "superseded_by",
+          "supersedes_packet_uuid",
           "user_id"
         ],
         "manualColumns": [
@@ -1155,35 +1231,66 @@
           "cluster_id",
           "feature_id",
           "feature_ids",
+          "git_diff_rank",
+          "git_sha",
           "id",
           "lane_ids",
           "latency_ms",
+          "packet_uuid",
+          "packet_version",
+          "prompt_hash",
           "qdrant_hits",
           "query_hash",
           "query_preview",
           "raw",
           "redis_hot_keys",
+          "repair_method",
+          "repair_reason",
           "response_tokens",
+          "reward",
           "route",
           "route_state",
           "session_id",
           "som_cluster",
+          "source_ref_quality",
           "source_refs",
+          "superseded_by",
+          "supersedes_packet_uuid",
           "user_id"
         ],
         "schemaIndexes": [
+          "idx_route_runtime_packets_feature_id",
+          "idx_route_runtime_packets_feature_ids_gin",
+          "idx_route_runtime_packets_raw_gin",
+          "idx_route_runtime_packets_source_refs_gin",
           "idx_rrp_captured_at",
           "idx_rrp_cluster_id",
           "idx_rrp_feature_ids_gin",
+          "idx_rrp_git_sha",
+          "idx_rrp_packet_version",
           "idx_rrp_route",
-          "idx_rrp_source_refs_gin"
+          "idx_rrp_source_ref_quality",
+          "idx_rrp_source_refs_gin",
+          "idx_rrp_superseded_by",
+          "rrp_feature_idx",
+          "rrp_packet_uuid_uidx",
+          "rrp_raw_gin",
+          "rrp_state_idx"
         ],
         "manualIndexes": [
+          "idx_route_runtime_packets_feature_id",
+          "idx_route_runtime_packets_feature_ids_gin",
+          "idx_route_runtime_packets_raw_gin",
+          "idx_route_runtime_packets_source_refs_gin",
           "idx_rrp_captured_at",
           "idx_rrp_cluster_id",
           "idx_rrp_feature_ids_gin",
+          "idx_rrp_git_sha",
+          "idx_rrp_packet_version",
           "idx_rrp_route",
+          "idx_rrp_source_ref_quality",
           "idx_rrp_source_refs_gin",
+          "idx_rrp_superseded_by",
           "rrp_feature_idx",
           "rrp_packet_uuid_uidx",
           "rrp_raw_gin",
@@ -1191,26 +1298,17 @@
         ],
         "columnDiffs": {
           "onlyInA": [],
-          "onlyInB": [
-            "feature_id",
-            "raw",
-            "route_state"
-          ]
+          "onlyInB": []
         },
         "indexDiffs": {
           "onlyInA": [],
-          "onlyInB": [
-            "rrp_feature_idx",
-            "rrp_packet_uuid_uidx",
-            "rrp_raw_gin",
-            "rrp_state_idx"
-          ]
+          "onlyInB": []
         }
       },
       "live": {
         "reachable": true,
         "tableExists": true,
-        "classification": "COLUMN_MISMATCH",
+        "classification": "LIVE_DB_ALIGNED",
         "error": null,
         "columns": [
           "id",
@@ -1261,6 +1359,7 @@
           "idx_rrp_source_refs_gin",
           "idx_rrp_superseded_by",
           "route_runtime_packets_pkey",
+          "rrp_feature_idx",
           "rrp_packet_uuid_uidx",
           "rrp_raw_gin",
           "rrp_state_idx"
@@ -1268,39 +1367,15 @@
         "rowCount": 1,
         "columnDiffs": {
           "onlyInA": [],
-          "onlyInB": [
-            "git_diff_rank",
-            "git_sha",
-            "packet_uuid",
-            "packet_version",
-            "prompt_hash",
-            "repair_method",
-            "repair_reason",
-            "reward",
-            "source_ref_quality",
-            "superseded_by",
-            "supersedes_packet_uuid"
-          ]
+          "onlyInB": []
         },
         "indexDiffs": {
-          "onlyInA": [
-            "rrp_feature_idx"
-          ],
-          "onlyInB": [
-            "idx_route_runtime_packets_feature_id",
-            "idx_route_runtime_packets_feature_ids_gin",
-            "idx_route_runtime_packets_raw_gin",
-            "idx_route_runtime_packets_source_refs_gin",
-            "idx_rrp_git_sha",
-            "idx_rrp_packet_version",
-            "idx_rrp_source_ref_quality",
-            "idx_rrp_superseded_by",
-            "route_runtime_packets_pkey"
-          ]
+          "onlyInA": [],
+          "onlyInB": []
         }
       },
-      "classification": "COLUMN_MISMATCH",
-      "repairClass": "ADD_DRIZZLE_MIRROR",
+      "classification": "LIVE_DB_ALIGNED",
+      "repairClass": null,
       "identityFields": [
         "packet_uuid",
         "source_ref",

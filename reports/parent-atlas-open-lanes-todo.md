@@ -77,12 +77,22 @@ The next work moves into:
 3. Reward prior backfill (reward_prior column on packets without traces),
 4. PyTorch policy sidecar scaffold (Stage 5, after XGBoost is proven),
 5. Graph refresh invalidation binding,
-7. semantic index mirroring,
-8. cold-storage restore verification,
-9. evaluation harnesses and agent-learning gates,
-10. high-ROI parser / embedding lanes,
-11. agentic startup briefing for read-only planning bootstraps,
-12. merged packet-lane implementation on the stable packet identity spine.
+6. semantic index mirroring,
+7. cold-storage restore verification,
+8. evaluation harnesses and agent-learning gates,
+9. high-ROI parser / embedding lanes,
+10. agentic startup briefing for read-only planning bootstraps,
+11. merged packet-lane implementation on the stable packet identity spine.
+
+### Active GPU / Parser Lanes
+
+These are acceleration and hygiene lanes, not the current blocker.
+
+- Graphify structural discovery: keep `atlas:startup` and `graphify:feature-labels` / `graphify:domain-topology` as the read-only startup signals for cache-hit quality. Graphify is the topology scanner; Parent Atlas remains the canonical join spine.
+- GPU bridge review: `libtorch`, `TensorRT` bridge node, and Rust `n-api` parser remain acceleration lanes behind the stable packet identity spine.
+- TurboVec / LangExtract: treat as downstream enrichment and ranking aids, not as the source of truth for stale-document grouping.
+- Stale document compaction: group by `feature_label`, `function_id`, `method`, and `variable` before assigning kanban tasks.
+- Kanban task spec board: use the grouped cache-hit candidates to consolidate task cards instead of emitting one card per raw stale file.
 
 ### P0 - Directory Readiness
 
@@ -712,7 +722,25 @@ Return a bounded packet response with query, strategy, ranked packets, Qdrant ta
 - [x] locate app-side graph refresh manifest and refresh writer
 - [ ] wire refresh-manifest invalidation to atlas truth promotion
 - [ ] prevent graph refresh drift
-- [ ] keep manifest promotion deterministic
+- [ ] keep manifest promotion deterministic 
+
+### 8. HyperRAG Dense Search / Cache Hit Lane
+- Status: active
+- Completion: ~70%
+- Finish line:
+  - keep Qdrant as dense recall only, with payload tags for `source_ref`, `feature_id`, `feature_label`, `directory_path`, `packet_key`, `som_cluster`, and `community_id`
+  - keep Redis / Bitfrost as hot packet cache and centroid shortcut layer
+  - fuse BM25 + FTS/trigram + Qdrant ANN + Neo4j expansion through the bounded retrieval orchestrator
+  - summarize with Gemma4 only after repo evidence is retrieved and bounded packets are assembled
+  - archive stale originals only after the new packet path is replayable
+- Useful evidence:
+  - `docs/atlas/parent-atlas-table-of-contents.md`
+  - `docs/architecture/compressed-semantic-geometry.md`
+  - `docs/architecture/cold-warm-hot-packet-lifecycle.md`
+  - `scripts/atlas/atlas-startup-intelligence.mjs`
+  - `scripts/atlas/validate-pg18-redis-bifrost-stack.mjs`
+  - `scripts/atlas/verify-qdrant-packet-payload.mjs`
+  - `scripts/atlas/write-used-concepts-live.mjs`
 
 ### 8. Neo4j USED_CONCEPT edge projection
 - [x] publish the read-only sourceRef context projection report
