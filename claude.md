@@ -1,7 +1,86 @@
 # Legal AI Platform — Claude Project Instructions
 
-## Last Updated: June 2, 2026 (Phase 101 completion plan + Valkey + Omni-Worker + git-diff cold archive)
-## Status: svelte-check 0 errors, 0 warnings | vite build PASSES | Playwright 20/20
+## Last Updated: June 14, 2026 (Parent Atlas P0–P7 Roadmap + Frozen Identity Contract)
+## Status: svelte-check 0 errors, 0 warnings | vite build PASSES | Playwright 20/20 | Codebase audit: 57K files, 3.3K API routes
+
+---
+
+## ⚡ PRIORITY: Parent Atlas P0–P7 Roadmap (Identity Frozen)
+
+**Authoritative Reference**: `memory/parent-atlas-frozen-identity-contract.md`
+
+### Core Rule: Do Not Optimize Broken Lineage
+
+**Canonical Identity Chain** (immutable):
+```
+directory_path → source_ref → file_path → function_symbol 
+→ feature_id → feature_label → packet_key
+```
+
+**Execution Order** (strict sequential):
+```
+P0  Freeze identity
+P0A Verify directory/source_ref stability
+P0B Cold storage manifest
+→ P1  Agentic error fixing (uses frozen identity)
+→ P2  Rust parser N-API
+→ P3  Qdrant payload v2 normalization
+→ P4  Higher-hop enrichment
+→ P5  GPU acceleration health
+→ P6  AE/SOM optimization
+→ P7  QLoRA/PPO export
+```
+
+### Hard Fail Conditions (Non-Negotiable)
+
+Scripts **MUST** fail (do not continue) if:
+- `missing source_ref`, `missing feature_id`, `missing feature_label`, `missing packet_key`
+- `duplicate source_ref`, `duplicate packet_key`
+- `orphaned qdrant payload`, `orphaned redis centroid`, `orphaned cold manifest`
+- `directory mismatch`, `packet missing postgres row`
+
+### Forbidden Identity Sources
+- Neo4j as truth (topology only, not identity)
+- Qdrant as truth (mirror only, not identity)
+- Redis as truth (cache only, not identity)
+- feature_id-only joins (always use source_ref + directory_path)
+- community_id-only joins
+- legacy pseudo-refs (sourceRef v1, stable_key, canonicalSourceRef)
+
+### Retrieval Contract (Strict Order for Error Fixing)
+```
+Redis BitFrost exact (L1)
+→ Postgres packet_key/source_ref (canonical)
+→ Qdrant dense + tags (mirror)
+→ Postgres FTS/trigram (fallback)
+→ Neo4j bounded k-hop neighbors (topology only)
+→ DuckDB offline reports (analytics only)
+→ Gemma4 synthesis (last resort)
+```
+
+### Storage Mirrors (All Synchronized)
+| Store | Role | Truth Authority |
+|-------|------|-----------------|
+| Postgres | Identity + lifecycle | **YES** — canonical |
+| Qdrant | Dense retrieval | Mirror (payload must match Postgres) |
+| Redis | L1/L2 cache | Cache only (may be stale) |
+| Neo4j | Topology + edges | Topology only (NOT identity) |
+| DuckDB | Offline analytics | Reports (non-blocking) |
+| CouchDB | Cold archive | Archive (immutable after written) |
+
+### Key Commands
+```bash
+npm run atlas:lineage:verify        # P0: Freeze identity
+npm run atlas:dir:verify            # P0A: Directory stability
+npm run atlas:cold:verify           # P0B: Cold manifest
+npm run atlas:error:audit           # P1: Error fixing audit
+npm run atlas:error:plan            # P1: Error fixing plan
+npm run atlas:error:apply --apply   # P1: Error fixing apply
+npm run atlas:qdrant:audit-v2       # P3: Qdrant v2 audit
+npm run atlas:qdrant:backfill-v2    # P3: Qdrant v2 backfill
+npm run atlas:qdrant:verify-v2      # P3: Qdrant v2 verify
+npm run atlas:gpu:health            # P5: GPU health audit
+```
 
 ---
 

@@ -1,0 +1,117 @@
+{
+  "generatedAt": "2026-06-14T20:19:09.143Z",
+  "mode": "dry-run",
+  "collection": "codebase_chunks_768",
+  "databaseUrl": "postgresql://legal_admin:***@127.0.0.1:5434/legal_ai_db",
+  "sourceTable": "atlas_codebase_packets",
+  "limits": {
+    "requested": 25
+  },
+  "postgres": {
+    "rowsScanned": 25,
+    "rowsMatched": 2,
+    "rowsUpdated": 0,
+    "rowsAlreadyCanonical": 2,
+    "rowsSkipped": 23,
+    "rowsAmbiguous": 18,
+    "rowsUnmatched": 5,
+    "rowsMissingPacketKey": 0,
+    "rowsMissingSourceRef": 0,
+    "rowsMissingFilePath": 0
+  },
+  "qdrant": {
+    "pointsScanned": 52606,
+    "pointsUpdated": 0,
+    "pointsAlreadyCanonical": 2,
+    "pointsMatched": 2,
+    "pointsAmbiguous": 18,
+    "pointsUnmatched": 5
+  },
+  "fieldCoverage": {
+    "packet_key": {
+      "total": 2,
+      "matched": 2,
+      "pct": 100
+    },
+    "source_ref": {
+      "total": 2,
+      "matched": 2,
+      "pct": 100
+    },
+    "file_path": {
+      "total": 2,
+      "matched": 2,
+      "pct": 100
+    },
+    "feature_id": {
+      "total": 2,
+      "matched": 2,
+      "pct": 100
+    },
+    "feature_label": {
+      "total": 2,
+      "matched": 2,
+      "pct": 100
+    },
+    "community_id": {
+      "total": 2,
+      "matched": 2,
+      "pct": 100
+    },
+    "community_confidence": {
+      "total": 2,
+      "matched": 1,
+      "pct": 50
+    },
+    "lineage_version": {
+      "total": 2,
+      "matched": 2,
+      "pct": 100
+    },
+    "ledger_type": {
+      "total": 2,
+      "matched": 2,
+      "pct": 100
+    },
+    "domain": {
+      "total": 2,
+      "matched": 2,
+      "pct": 100
+    },
+    "metadata": {
+      "total": 2,
+      "matched": 2,
+      "pct": 100
+    }
+  },
+  "samples": [
+    {
+      "packet_key": "src/lib/components/ui/gaming/n64/N64ToastStore.svelte.ts:f862ac872cbe1a1c",
+      "qdrant_point_id": 1573187133,
+      "match": "packet_key",
+      "status": "already-canonical"
+    },
+    {
+      "packet_key": "dc10d9a29ef4cfc8",
+      "qdrant_point_id": 3692091810,
+      "match": "packet_key",
+      "status": "already-canonical"
+    }
+  ],
+  "updates": [],
+  "summary": {
+    "rowsScanned": 25,
+    "rowsMatched": 2,
+    "rowsUpdated": 0,
+    "rowsAlreadyCanonical": 2,
+    "rowsSkipped": 23,
+    "rowsAmbiguous": 18,
+    "rowsUnmatched": 5,
+    "qdrantPointsScanned": 52606,
+    "qdrantPointsUpdated": 0,
+    "qdrantPointsAlreadyCanonical": 2,
+    "qdrantPointsMatched": 2,
+    "qdrantPointsAmbiguous": 18,
+    "qdrantPointsUnmatched": 5
+  }
+}

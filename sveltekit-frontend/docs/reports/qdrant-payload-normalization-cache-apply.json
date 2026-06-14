@@ -1,0 +1,16 @@
+{
+  "generatedAt": "2026-06-14T20:53:40.423Z",
+  "mode": "apply",
+  "reportPath": "docs/reports/qdrant-payload-complete-backfill.json",
+  "redisUrl": "redis://:redis@127.0.0.1:6379",
+  "redisHost": "127.0.0.1",
+  "redisPort": 6379,
+  "rowsSeen": 0,
+  "packetKeysWritten": 0,
+  "sourceRefKeysWritten": 0,
+  "filePathKeysWritten": 0,
+  "skipped": 0,
+  "errors": 0,
+  "samples": [],
+  "note": "Normalization report has no update rows; cache warm is a no-op."
+}

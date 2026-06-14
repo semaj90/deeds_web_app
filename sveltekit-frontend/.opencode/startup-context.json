@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-06-12T13:00:13.166Z",
+  "generatedAt": "2026-06-14T20:03:09.239Z",
   "repo": "sveltekit-frontend",
   "evidenceFirst": true,
   "roles": {
@@ -13,28 +13,31 @@
     "snapshotJson": ".opencode\\recommendations\\recommendations.json",
     "snapshotMd": ".opencode\\recommendations\\recommendations.md",
     "eventsJsonl": ".opencode\\recommendations\\recommendation-events.jsonl",
-    "currentCount": 286
+    "currentCount": 0
   },
   "tasks": {
     "stateJson": ".opencode\\tasks\\task-state.json",
     "stateMd": ".opencode\\tasks\\task-state.md",
     "eventsJsonl": ".opencode\\tasks\\task-events.jsonl",
-    "currentCount": 17,
-    "openCount": 8
+    "currentCount": 3,
+    "openCount": 3
   },
   "activeLane": {
-    "taskId": "task_concept_evidence_spine_backfill",
-    "title": "Historical concept evidence spine backfill",
     "priority": "HIGH",
-    "status": "TODO",
-    "command": "npm run atlas:concept-evidence:backfill",
-    "sourceRecommendationKey": "concept-evidence-spine-backfill"
+    "command": "node scripts/atlas/verify-feature-lineage.mjs"
   },
   "openLanesTodo": "reports\\parent-atlas-open-lanes-todo.md",
   "reports": {
     "temporalTaskRegistry": "docs\\reports\\temporal-task-registry-report.md",
     "agentEnvironment": "docs\\reports\\opencode-agent-environment-report.md",
+    "startupBriefing": ".opencode\\startup-briefing.md",
     "engramAdapterDecision": "docs/reports/engram-adapter-decision-report.md",
     "parentAtlasOverlay": "docs/reports/parent-atlas-overlay-sync-report.md"
+  },
+  "startupBriefing": {
+    "path": "..\\.opencode\\startup-briefing.json",
+    "nextLane": "Phase 1 higher-hop schema repair",
+    "tasksOpen": 8,
+    "productionReadiness": "PASS 65 / WARN 1 / FAIL 0"
   }
 }

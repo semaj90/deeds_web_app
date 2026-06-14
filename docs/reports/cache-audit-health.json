@@ -1,0 +1,39 @@
+{
+  "timestamp": "2026-06-14T21:01:39.611Z",
+  "phase": "1b",
+  "status": "PASS",
+  "l1_redis": {
+    "memory": {
+      "used_bytes": 98537544,
+      "used_human": "93.97M",
+      "peak_bytes": 100460392,
+      "peak_human": "95.81M"
+    },
+    "cache_entries": {
+      "cache:llm:*": 0,
+      "cache:embed:*": 0,
+      "bifrost:packet:*": 78,
+      "centroid:*": 0,
+      "ace:topo:*": 0,
+      "gpu:karpathy:*": 4
+    },
+    "estimated_hit_rate": "unknown%"
+  },
+  "l2_bifrost": {
+    "service_status": "healthy",
+    "version": "unknown"
+  },
+  "health_checks": {
+    "l1_operational": true,
+    "l1_has_entries": true,
+    "l2_operational": true,
+    "estimated_coverage": null
+  },
+  "recommendations": [
+    {
+      "priority": "info",
+      "issue": "Cache layers healthy",
+      "action": "No immediate action required; monitor hit rates"
+    }
+  ]
+}

@@ -20,6 +20,8 @@ export const PATHS = {
   taskStateJson: path.join(ROOT, '.opencode', 'tasks', 'task-state.json'),
   taskStateMd: path.join(ROOT, '.opencode', 'tasks', 'task-state.md'),
   startupContext: path.join(ROOT, '.opencode', 'startup-context.json'),
+  startupBriefingJson: path.join(ROOT, '.opencode', 'startup-briefing.json'),
+  startupBriefingMd: path.join(ROOT, '.opencode', 'startup-briefing.md'),
   graphRecommendationsJson: path.join(ROOT, 'docs', 'graph', 'recommendations.json'),
   graphRecommendationsMd: path.join(ROOT, 'docs', 'graph', 'recommendations.md'),
   temporalReportJson: path.join(ROOT, 'docs', 'reports', 'temporal-task-registry-report.json'),
@@ -736,9 +738,11 @@ export async function writeStartupContext(state, extra = {}) {
     reports: {
       temporalTaskRegistry: path.relative(ROOT, PATHS.temporalReportMd),
       agentEnvironment: path.relative(ROOT, PATHS.agentEnvironmentMd),
+      startupBriefing: path.relative(ROOT, extra.startupBriefingMd ?? PATHS.startupBriefingMd),
       engramAdapterDecision: 'docs/reports/engram-adapter-decision-report.md',
       parentAtlasOverlay: 'docs/reports/parent-atlas-overlay-sync-report.md',
     },
+    startupBriefing: extra.startupBriefing ?? null,
   };
   await writeJson(PATHS.startupContext, startupContext);
   return startupContext;

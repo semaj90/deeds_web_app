@@ -41,9 +41,23 @@ async function main() {
 
   const state = await readJson(PATHS.taskStateJson);
   if (!state) throw new Error('task state not found after refresh');
+  const startupBriefingPath = (await readJson(PATHS.startupBriefingJson)) ? PATHS.startupBriefingJson : path.join(ROOT, '..', '.opencode', 'startup-briefing.json');
+  const startupBriefingReport = await readJson(startupBriefingPath);
+  const startupBriefing = startupBriefingReport?.briefing ?? startupBriefingReport?.summary ?? startupBriefingReport ?? null;
 
   const startupContext = await writeStartupContext(state, {
     openLanesTodo: path.join(ROOT, 'reports', 'parent-atlas-open-lanes-todo.md'),
+    startupBriefing: startupBriefing
+      ? {
+          path: path.relative(ROOT, startupBriefingPath),
+          nextLane: startupBriefing.nextLane ?? null,
+          tasksOpen: startupBriefing.sinceLastWorked?.tasksOpen ?? null,
+          productionReadiness: startupBriefing.sinceLastWorked?.productionReadiness ?? null,
+        }
+      : null,
+    startupBriefingMd: startupBriefing
+      ? path.join(path.dirname(startupBriefingPath), 'startup-briefing.md')
+      : null,
   });
 
   if (refreshStartupTruth || deep) {

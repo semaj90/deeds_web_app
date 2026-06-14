@@ -1,0 +1,155 @@
+{
+  "generatedAt": "2026-06-14T21:08:33.026Z",
+  "sourceReports": {
+    "higherHop": "docs/reports/higher-hop-enrichment-report.json",
+    "featureLineage": "docs/reports/feature-lineage-report.json",
+    "runtimeCoverage": "docs/reports/runtime-coverage-report.json",
+    "rrf": "../docs/reports/rrf-20-query-benchmark.json"
+  },
+  "featureLineage": {
+    "totalLineages": 100,
+    "sourceRefCoveragePct": 100,
+    "featureIdCoveragePct": 100,
+    "featureLabelCoveragePct": 100,
+    "missingHigherHopRows": 100
+  },
+  "runtime": {
+    "selectedConceptCoveragePct": 100,
+    "retrievedPacketCoveragePct": 100,
+    "toolCallCoveragePct": 100,
+    "routeRuntimePackets": {
+      "total": 33,
+      "lowDensityCount": 0,
+      "emptyPointersCount": 1,
+      "avgHydrationRatio": "88.38%"
+    }
+  },
+  "higherHop": {
+    "somCluster": {
+      "name": "somCluster",
+      "coveragePct": 0,
+      "missingRows": 100,
+      "state": "MISSING"
+    },
+    "glyphRecord": {
+      "name": "glyphRecord",
+      "coveragePct": 0,
+      "missingRows": 100,
+      "state": "MISSING"
+    },
+    "qdrantHit": {
+      "name": "qdrantHit",
+      "coveragePct": 0,
+      "missingRows": 100,
+      "state": "MISSING"
+    },
+    "redisHotKey": {
+      "name": "redisHotKey",
+      "coveragePct": 0,
+      "missingRows": 100,
+      "state": "MISSING"
+    },
+    "neo4jNode": {
+      "name": "neo4jNode",
+      "coveragePct": 0,
+      "missingRows": 100,
+      "state": "MISSING"
+    }
+  },
+  "rrf": {
+    "avgNdcg": 0.544,
+    "avgMrr": 0.593,
+    "avgRecall": 0.717
+  },
+  "neo4j": {
+    "available": true,
+    "uri": "bolt://127.0.0.1:7687"
+  },
+  "safeStartNodes": [
+    "packet_key",
+    "source_ref_key",
+    "qdrant_point_id"
+  ],
+  "joinHintGuidance": [
+    "Anchor traversals on bounded roots: packet_key, source_ref_key, or qdrant_point_id.",
+    "Avoid starting from Concept / Feature / Community supernodes.",
+    "Use USING JOIN ON p when joining separate packet and concept branches.",
+    "Split fan-out traversals into subqueries when node degree is high.",
+    "Keep Neo4j for explanation and topology; keep Postgres/Qdrant for truth and recall."
+  ],
+  "supernodeThresholds": {
+    "concept": 500,
+    "feature": 1000,
+    "community": 2000
+  },
+  "supernodes": [
+    {
+      "label": "Concept",
+      "threshold": 500,
+      "countAboveThreshold": 14,
+      "topDegree": 3358,
+      "state": "SUPERNODE_RISK",
+      "examples": [
+        {
+          "id": "",
+          "degree": 3358
+        },
+        {
+          "id": "",
+          "degree": 3342
+        },
+        {
+          "id": "",
+          "degree": 3258
+        },
+        {
+          "id": "",
+          "degree": 3185
+        },
+        {
+          "id": "",
+          "degree": 3143
+        }
+      ]
+    },
+    {
+      "label": "Feature",
+      "threshold": 1000,
+      "countAboveThreshold": 2,
+      "topDegree": 1591,
+      "state": "SUPERNODE_RISK",
+      "examples": [
+        {
+          "id": "utility",
+          "degree": 1591
+        },
+        {
+          "id": "database_orm",
+          "degree": 1216
+        }
+      ]
+    },
+    {
+      "label": "Community",
+      "threshold": 2000,
+      "countAboveThreshold": 1,
+      "topDegree": 4621,
+      "state": "SUPERNODE_RISK",
+      "examples": [
+        {
+          "id": "0",
+          "degree": 4621
+        }
+      ]
+    }
+  ],
+  "queryErrors": {},
+  "recommendations": [
+    "Seed bounded USED_CONCEPT / USED_PACKET edges from the trace spine",
+    "Use packet_key / source_ref_key as join roots before expanding graph traversal"
+  ],
+  "coverageState": {
+    "featureLineage": "READY",
+    "runtime": "READY"
+  }
+}

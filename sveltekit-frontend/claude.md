@@ -1,4 +1,20 @@
-# Claude Tactical Error Fixing Guide - Phase 96
+# Claude Tactical Error Fixing Guide - Phase 96 + Parent Atlas P0–P7
+
+## ⚡ PRIORITY: Parent Atlas Frozen Identity Contract (June 14, 2026)
+
+**Read first**: `../memory/parent-atlas-frozen-identity-contract.md`
+
+This project now operates under the **Parent Atlas P0–P7 Roadmap**. All error fixing, packet retrieval, and GPU acceleration work must follow:
+
+1. **Frozen Identity** — no feature_id-only joins, always source_ref + directory_path
+2. **Postgres is Truth** — Qdrant/Redis/Neo4j are mirrors or cache only
+3. **Strict Retrieval Order** — BitFrost → Postgres → Qdrant → Neo4j (k-hop bounded)
+4. **Hard Fail Conditions** — no placeholder files, no silent fallbacks
+5. **No Unbounded Traversal** — all graph queries must bound k-hops
+
+See `Parent Atlas Frozen Identity Contract` section in root CLAUDE.md for P0–P7 roadmap + key commands.
+
+---
 
 ## Current Diagnostics Regression Checkpoint
 

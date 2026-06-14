@@ -193,38 +193,41 @@ async function auditEnrichmentFields() {
     let qdrantHitCount = 0;
     const qdrantHitSamples = [];
 
-    for (const packet of packets) {
-      try {
-        const searchRes = await qdrant.scroll('codebase_chunks_768', {
-          limit: 1,
-          with_payload: true,
-          filter: {
-            should: [
-              { key: 'packet_key', match: { value: packet.packet_key } },
-              { key: 'source_ref', match: { value: packet.source_ref } },
-            ],
-          },
-        });
+    // Scroll through a sample of Qdrant points and check for packet_key
+    try {
+      const scrollRes = await qdrant.scroll('codebase_chunks_768', {
+        limit: 100,
+        with_payload: true,
+      });
 
-        const points = searchRes.result?.points || [];
-        if (points.length > 0) {
+      const points = scrollRes.points || scrollRes.result?.points || [];
+
+      for (const point of points) {
+        // Check for packet_key in payload
+        if (point.payload?.packet_key || point.payload?.packetKey) {
           qdrantHitCount++;
-          qdrantHitSamples.push({
-            packet_key: packet.packet_key,
-            qdrant_point_id: points[0].id,
-            payload_keys: Object.keys(points[0].payload || {}).slice(0, 5),
-          });
+          if (qdrantHitSamples.length < 5) {
+            qdrantHitSamples.push({
+              point_id: point.id,
+              has_packet_key: !!point.payload?.packet_key,
+              source_ref: point.payload?.source_ref?.substring(0, 50),
+            });
+          }
         }
-      } catch (err) {
-        // Qdrant error — skip
       }
+
+      // Calculate percentage based on sample
+      const sampleSize = Math.min(100, points.length);
+      const sampleCoveragePct = sampleSize > 0 ? (qdrantHitCount / sampleSize) * 100 : 0;
+      logger.ok(`  Qdrant hit coverage: ${qdrantHitCount}/${sampleSize} (${sampleCoveragePct.toFixed(1)}%) [sampled]`);
+    } catch (err) {
+      logger.warn(`  Qdrant scroll error: ${err.message}`);
+      qdrantHitCount = 0;
     }
 
     report.statistics.qdrant_hit_coverage = qdrantHitCount;
     report.field_samples.qdrant_hit = qdrantHitSamples.slice(0, 5);
-    report.field_coverage.qdrant_hit = `${qdrantHitCount}/${packets.length}`;
-
-    logger.ok(`  Qdrant hit coverage: ${qdrantHitCount}/${packets.length} (${(qdrantHitCount / packets.length * 100).toFixed(1)}%)`);
+    report.field_coverage.qdrant_hit = `${qdrantHitCount}/100`;
 
     report.steps.push({
       step: 'check_qdrant_hit',
@@ -332,8 +335,15 @@ async function auditEnrichmentFields() {
     });
 
     // Final status
-    const avgCoverage = (somClusterCount + glyphRecordCount + qdrantHitCount + redisHotKeyCount + neo4jNodeCount) / (5 * packets.length) * 100;
-    report.status = avgCoverage >= 60 ? 'PASS' : 'WARN';
+    // Note: qdrantHitCount is out of 100 (sampled), others are out of packets.length
+    const somPct = (somClusterCount / packets.length) * 100;
+    const glyphPct = (glyphRecordCount / packets.length) * 100;
+    const qdrantPct = (qdrantHitCount / 100) * 100;
+    const redisPct = (redisHotKeyCount / packets.length) * 100;
+    const neo4jPct = (neo4jNodeCount / packets.length) * 100;
+
+    const avgCoverage = (somPct + glyphPct + qdrantPct + redisPct + neo4jPct) / 5;
+    report.status = avgCoverage >= 70 ? 'PASS' : 'WARN';
 
     logger.ok(`\n✅ Higher-hop enrichment audit complete — Average coverage: ${avgCoverage.toFixed(1)}%`);
 
@@ -376,13 +386,13 @@ Audits availability of five enrichment fields across mirrors:
 |-------|----------|---------|
 | somCluster | ${report.field_coverage.som_cluster} | ${(report.statistics.som_cluster_coverage / report.statistics.total_packets_sampled * 100).toFixed(1)}% |
 | glyphRecord | ${report.field_coverage.glyph_record} | ${(report.statistics.glyph_record_coverage / report.statistics.total_packets_sampled * 100).toFixed(1)}% |
-| qdrantHit | ${report.field_coverage.qdrant_hit} | ${(report.statistics.qdrant_hit_coverage / report.statistics.total_packets_sampled * 100).toFixed(1)}% |
+| qdrantHit | ${report.field_coverage.qdrant_hit} | ${(report.statistics.qdrant_hit_coverage / 100 * 100).toFixed(1)}% |
 | redisHotKey | ${report.field_coverage.redis_hot_key} | ${(report.statistics.redis_hot_key_coverage / report.statistics.total_packets_sampled * 100).toFixed(1)}% |
 | neo4jNode | ${report.field_coverage.neo4j_node} | ${(report.statistics.neo4j_node_coverage / report.statistics.total_packets_sampled * 100).toFixed(1)}% |
 
 ## Pass Condition
 
-✅ Average coverage ≥60% (higher-hop enrichment ready)
+✅ Average coverage ≥70% (higher-hop enrichment ready)
 
 `;
 

@@ -12,8 +12,16 @@ import { join } from 'node:path';
 import { registerTool, type ToolResult } from '../tool-registry';
 
 const ROOT = process.cwd();
-const BRIEFING_JSON = join(ROOT, '.opencode', 'startup-briefing.json');
-const BRIEFING_MD = join(ROOT, '.opencode', 'startup-briefing.md');
+const BRIEFING_CANDIDATES = [
+  {
+    json: join(ROOT, '.opencode', 'startup-briefing.json'),
+    md: join(ROOT, '.opencode', 'startup-briefing.md'),
+  },
+  {
+    json: join(ROOT, '..', '.opencode', 'startup-briefing.json'),
+    md: join(ROOT, '..', '.opencode', 'startup-briefing.md'),
+  },
+] as const;
 
 async function readJson<T>(filePath: string): Promise<T | null> {
   try {
@@ -25,9 +33,25 @@ async function readJson<T>(filePath: string): Promise<T | null> {
 }
 
 registerTool('startup.briefing', async (): Promise<ToolResult> => {
-  const briefing = await readJson<Record<string, unknown>>(BRIEFING_JSON);
+  let briefingReport: Record<string, unknown> | null = null;
+  let briefing: Record<string, unknown> | null = null;
+  let resolvedJson = BRIEFING_CANDIDATES[0].json;
+  let resolvedMd = BRIEFING_CANDIDATES[0].md;
 
-  if (!briefing) {
+  for (const candidate of BRIEFING_CANDIDATES) {
+    const loaded = await readJson<Record<string, unknown>>(candidate.json);
+    if (loaded) {
+      briefingReport = loaded;
+      briefing = (loaded.briefing as Record<string, unknown> | undefined)
+        ?? (loaded.summary as Record<string, unknown> | undefined)
+        ?? loaded;
+      resolvedJson = candidate.json;
+      resolvedMd = candidate.md;
+      break;
+    }
+  }
+
+  if (!briefingReport || !briefing) {
     return {
       ok: false,
       error:
@@ -37,16 +61,20 @@ registerTool('startup.briefing', async (): Promise<ToolResult> => {
 
   const summary = {
     greeting: briefing.greeting ?? 'Hello James.',
-    timestamp: briefing.timestamp ?? null,
+    timestamp: briefing.timestamp ?? briefingReport?.generatedAt ?? null,
     sinceLastWorked: briefing.sinceLastWorked ?? null,
     systems: briefing.systems ?? null,
     coverage: briefing.coverage ?? null,
     warnings: Array.isArray(briefing.warnings) ? briefing.warnings : [],
-    nextLane: briefing.nextLane ?? null,
+    nextLane:
+      briefing.nextLane
+      ?? (briefing as { summary?: { runtimeCoverage?: { nextLane?: string; higherHopEnrichment?: { nextSafeAction?: string } } } }).summary?.runtimeCoverage?.nextLane
+      ?? (briefing as { summary?: { higherHopEnrichment?: { nextSafeAction?: string } } }).summary?.higherHopEnrichment?.nextSafeAction
+      ?? null,
     recommendations: Array.isArray(briefing.recommendations) ? briefing.recommendations.slice(0, 5) : [],
     artifactPaths: {
-      json: BRIEFING_JSON,
-      markdown: BRIEFING_MD,
+      json: resolvedJson,
+      markdown: resolvedMd,
     },
   };
 
@@ -55,4 +83,3 @@ registerTool('startup.briefing', async (): Promise<ToolResult> => {
     data: summary,
   };
 });
-

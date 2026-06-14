@@ -1,115 +1,210 @@
 {
-  "timestamp": "2026-06-14T19:47:06.410Z",
-  "durationMs": 396,
+  "timestamp": "2026-06-14T21:01:34.289Z",
+  "phase": "1b",
   "postgres": {
-    "tables": {
-      "atlas_codebase_packets": 3251,
-      "atlas_feature_map": 19611,
-      "atlas_cards": 0
-    },
-    "indexes": {
-      "btree": 14,
-      "gin": 3,
-      "gist": 0,
-      "hash": 0,
-      "brin": 1,
-      "total": 18
-    },
-    "coverage": {},
-    "issues": [
-      "Could not check coverage for packet_key",
-      "Could not check coverage for source_ref",
-      "Could not check coverage for feature_id",
-      "Could not check coverage for feature_label",
-      "Could not check coverage for file_path",
-      "Could not check coverage for community_id"
-    ],
-    "optionalTables": {
-      "atlas_tree_nodes": "exists",
-      "atlas_svg_glyphs": "missing",
-      "atlas_topology_index": "missing",
-      "atlas_summary_layers": "missing",
-      "atlas_feature_cards": "missing",
-      "atlas_feature_edges": "missing",
-      "atlas_dependency_edges": "missing",
-      "atlas_qdrant_mirror": "missing",
-      "atlas_redis_mirror": "missing"
-    }
-  },
-  "qdrant": {
-    "collections": {
-      "codebase_chunks_768": 52606,
-      "feature_cards_768": 0,
-      "summary_layers_768": 0,
-      "memory_cards_768": 0,
-      "glyph_vectors_768": 0
-    },
-    "payloadCoverage": {
-      "packet_key": {
-        "count": 92,
-        "percentage": 92
+    "atlas_codebase_packets": {
+      "status": "present",
+      "total": "3251",
+      "coverage_source": "field_by_field_fallback",
+      "coverage_log": [
+        {
+          "query_type": "aggregate",
+          "status": "error",
+          "query_name": " SELECT COUNT(*) as total, COUNT(p",
+          "duration_ms": 28,
+          "fallback_used": false,
+          "data": null,
+          "error_message": "column \"summary\" does not exist"
+        },
+        {
+          "query_type": "field_by_field",
+          "field": "packet_key",
+          "status": "ok",
+          "query_name": " SELECT COUNT(*) as total, C",
+          "duration_ms": 19,
+          "fallback_used": false,
+          "data": [
+            {
+              "total": "3251",
+              "present": "3251"
+            }
+          ],
+          "error_message": null
+        },
+        {
+          "query_type": "field_by_field",
+          "field": "source_ref",
+          "status": "ok",
+          "query_name": " SELECT COUNT(*) as total, C",
+          "duration_ms": 2,
+          "fallback_used": false,
+          "data": [
+            {
+              "total": "3251",
+              "present": "3251"
+            }
+          ],
+          "error_message": null
+        },
+        {
+          "query_type": "field_by_field",
+          "field": "feature_id",
+          "status": "ok",
+          "query_name": " SELECT COUNT(*) as total, C",
+          "duration_ms": 3,
+          "fallback_used": false,
+          "data": [
+            {
+              "total": "3251",
+              "present": "3251"
+            }
+          ],
+          "error_message": null
+        },
+        {
+          "query_type": "field_by_field",
+          "field": "feature_label",
+          "status": "ok",
+          "query_name": " SELECT COUNT(*) as total, C",
+          "duration_ms": 3,
+          "fallback_used": false,
+          "data": [
+            {
+              "total": "3251",
+              "present": "3251"
+            }
+          ],
+          "error_message": null
+        },
+        {
+          "query_type": "field_by_field",
+          "field": "file_path",
+          "status": "ok",
+          "query_name": " SELECT COUNT(*) as total, C",
+          "duration_ms": 2,
+          "fallback_used": false,
+          "data": [
+            {
+              "total": "3251",
+              "present": "3251"
+            }
+          ],
+          "error_message": null
+        },
+        {
+          "query_type": "field_by_field",
+          "field": "community_id",
+          "status": "ok",
+          "query_name": " SELECT COUNT(*) as total, C",
+          "duration_ms": 3,
+          "fallback_used": false,
+          "data": [
+            {
+              "total": "3251",
+              "present": "3226"
+            }
+          ],
+          "error_message": null
+        },
+        {
+          "query_type": "field_by_field",
+          "field": "summary",
+          "status": "error",
+          "query_name": " SELECT COUNT(*) as total, C",
+          "duration_ms": 1,
+          "fallback_used": false,
+          "data": null,
+          "error_message": "column \"summary\" does not exist"
+        },
+        {
+          "query_type": "field_by_field",
+          "field": "som_cluster",
+          "status": "ok",
+          "query_name": " SELECT COUNT(*) as total, C",
+          "duration_ms": 18,
+          "fallback_used": false,
+          "data": [
+            {
+              "total": "3251",
+              "present": "3251"
+            }
+          ],
+          "error_message": null
+        },
+        {
+          "query_type": "field_by_field",
+          "field": "tree_node_id",
+          "status": "ok",
+          "query_name": " SELECT COUNT(*) as total, C",
+          "duration_ms": 4,
+          "fallback_used": false,
+          "data": [
+            {
+              "total": "3251",
+              "present": "0"
+            }
+          ],
+          "error_message": null
+        },
+        {
+          "query_type": "field_by_field",
+          "field": "lineage_version",
+          "status": "ok",
+          "query_name": " SELECT COUNT(*) as total, C",
+          "duration_ms": 2,
+          "fallback_used": false,
+          "data": [
+            {
+              "total": "3251",
+              "present": "3251"
+            }
+          ],
+          "error_message": null
+        }
+      ],
+      "fields": {
+        "packet_key": "3251",
+        "source_ref": "3251",
+        "feature_id": "3251",
+        "feature_label": "3251",
+        "file_path": "3251",
+        "community_id": "3226",
+        "summary": 0,
+        "som_cluster": "3251",
+        "tree_node_id": "0",
+        "lineage_version": "3251"
       },
-      "source_ref": {
-        "count": 100,
-        "percentage": 100
-      },
-      "feature_id": {
-        "count": 100,
-        "percentage": 100
-      },
-      "feature_label": {
-        "count": 100,
-        "percentage": 100
-      },
-      "file_path": {
-        "count": 100,
-        "percentage": 100
-      },
-      "tags": {
-        "count": 100,
-        "percentage": 100
-      },
-      "som_cluster": {
-        "count": 83,
-        "percentage": 83
-      },
-      "community_id": {
-        "count": 72,
-        "percentage": 72
-      },
-      "lineage_version": {
-        "count": 100,
-        "percentage": 100
+      "percentages": {
+        "packet_key": "100.0%",
+        "source_ref": "100.0%",
+        "feature_id": "100.0%",
+        "feature_label": "100.0%",
+        "file_path": "100.0%",
+        "community_id": "99.2%",
+        "summary": "0.0%",
+        "som_cluster": "100.0%",
+        "tree_node_id": "0.0%",
+        "lineage_version": "100.0%"
       }
     },
-    "issues": []
+    "atlas_feature_packets": {
+      "status": "present",
+      "total": "14234"
+    },
+    "atlas_packets_legacy": {
+      "status": "present",
+      "total": "17485",
+      "note": "archived mixed ledger"
+    }
   },
   "redis": {
-    "connected": true,
-    "keyCounts": {
-      "gpu:karpathy:scores": 179,
-      "gpu:karpathy:encoded": 217,
-      "bifrost:*": 79,
-      "centroid:*": 0,
-      "som:*": 0
-    },
-    "issues": []
-  },
-  "recommendations": [
-    {
-      "priority": "medium",
-      "area": "schema",
-      "tables": [
-        "atlas_svg_glyphs",
-        "atlas_topology_index",
-        "atlas_summary_layers",
-        "atlas_feature_cards",
-        "atlas_feature_edges",
-        "atlas_dependency_edges",
-        "atlas_qdrant_mirror",
-        "atlas_redis_mirror"
-      ],
-      "action": "Create missing tables in recommended order: atlas_svg_glyphs, atlas_topology_index, atlas_summary_layers, atlas_feature_cards, atlas_feature_edges, atlas_dependency_edges, atlas_qdrant_mirror, atlas_redis_mirror"
+    "redis": {
+      "status": "present",
+      "gpu_karpathy_scores": 179,
+      "gpu_karpathy_encoded": 217,
+      "bifrost_keys": 79,
+      "centroid_keys": 0,
+      "som_keys": 0
     }
-  ]
+  }
 }

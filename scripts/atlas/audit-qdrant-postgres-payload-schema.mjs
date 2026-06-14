@@ -13,6 +13,7 @@ import pg from 'pg';
 import { config } from 'dotenv';
 import { resolve } from 'path';
 import https from 'https';
+import http from 'http';
 
 config({ path: resolve('.', '.env') });
 
@@ -52,9 +53,7 @@ async function fetchQdrantPayloads() {
 
     req.on('error', (err) => {
       // HTTPS failed, try HTTP
-      const httpOptions = { ...options, method: 'GET' };
-      delete httpOptions.port;
-      const http = require('http');
+      const httpOptions = { ...options, method: 'GET', port: 6333 };
       const httpReq = http.request(httpOptions, (res) => {
         let data = '';
         res.on('data', (chunk) => { data += chunk; });

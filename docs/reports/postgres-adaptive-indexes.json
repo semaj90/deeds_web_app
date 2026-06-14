@@ -1,0 +1,284 @@
+{
+  "timestamp": "2026-06-14T21:01:35.208Z",
+  "table": "atlas_codebase_packets",
+  "indexes": {
+    "atlas_codebase_packets_pkey": {
+      "columns": [
+        "packet_key"
+      ],
+      "access_method": "btree",
+      "is_unique": true,
+      "is_primary": true,
+      "type": ""
+    },
+    "idx_atlas_codebase_community": {
+      "columns": [
+        "community_id"
+      ],
+      "access_method": "btree",
+      "is_unique": false,
+      "is_primary": false,
+      "type": ""
+    },
+    "idx_atlas_codebase_community_high_confidence": {
+      "columns": [
+        "community_id",
+        "community_confidence"
+      ],
+      "access_method": "btree",
+      "is_unique": false,
+      "is_primary": false,
+      "type": ""
+    },
+    "idx_atlas_codebase_created_at_brin": {
+      "columns": [
+        "created_at"
+      ],
+      "access_method": "brin",
+      "is_unique": false,
+      "is_primary": false,
+      "type": ""
+    },
+    "idx_atlas_codebase_embedding_model": {
+      "columns": [],
+      "access_method": "btree",
+      "is_unique": false,
+      "is_primary": false,
+      "type": ""
+    },
+    "idx_atlas_codebase_feature_community": {
+      "columns": [
+        "feature_id",
+        "community_id"
+      ],
+      "access_method": "btree",
+      "is_unique": false,
+      "is_primary": false,
+      "type": ""
+    },
+    "idx_atlas_codebase_feature_id": {
+      "columns": [
+        "feature_id"
+      ],
+      "access_method": "btree",
+      "is_unique": false,
+      "is_primary": false,
+      "type": ""
+    },
+    "idx_atlas_codebase_lineage": {
+      "columns": [
+        "lineage_version"
+      ],
+      "access_method": "btree",
+      "is_unique": false,
+      "is_primary": false,
+      "type": ""
+    },
+    "idx_atlas_codebase_metadata": {
+      "columns": [
+        "metadata"
+      ],
+      "access_method": "gin",
+      "is_unique": false,
+      "is_primary": false,
+      "type": ""
+    },
+    "idx_atlas_codebase_metadata_community_gin": {
+      "columns": [
+        "metadata"
+      ],
+      "access_method": "gin",
+      "is_unique": false,
+      "is_primary": false,
+      "type": ""
+    },
+    "idx_atlas_codebase_packets_summary_fts": {
+      "columns": [],
+      "access_method": "gin",
+      "is_unique": false,
+      "is_primary": false,
+      "type": ""
+    },
+    "idx_atlas_codebase_quality_filter": {
+      "columns": [
+        "packet_key",
+        "feature_id"
+      ],
+      "access_method": "btree",
+      "is_unique": false,
+      "is_primary": false,
+      "type": ""
+    },
+    "idx_atlas_codebase_som_cluster": {
+      "columns": [
+        "som_cluster"
+      ],
+      "access_method": "btree",
+      "is_unique": false,
+      "is_primary": false,
+      "type": ""
+    },
+    "idx_atlas_codebase_source_ref": {
+      "columns": [
+        "source_ref"
+      ],
+      "access_method": "btree",
+      "is_unique": false,
+      "is_primary": false,
+      "type": ""
+    },
+    "idx_atlas_codebase_topology": {
+      "columns": [
+        "tree_node_id",
+        "som_cluster"
+      ],
+      "access_method": "btree",
+      "is_unique": false,
+      "is_primary": false,
+      "type": ""
+    },
+    "idx_atlas_codebase_tree_node_id": {
+      "columns": [
+        "tree_node_id"
+      ],
+      "access_method": "btree",
+      "is_unique": false,
+      "is_primary": false,
+      "type": ""
+    },
+    "idx_atlas_packets_som_cluster": {
+      "columns": [
+        "som_cluster"
+      ],
+      "access_method": "btree",
+      "is_unique": false,
+      "is_primary": false,
+      "type": ""
+    },
+    "idx_atlas_packets_tree_node_som_cluster": {
+      "columns": [
+        "tree_node_id",
+        "som_cluster"
+      ],
+      "access_method": "btree",
+      "is_unique": false,
+      "is_primary": false,
+      "type": ""
+    }
+  },
+  "classification": {
+    "identity_indexed": [
+      "atlas_codebase_packets_pkey",
+      "idx_atlas_codebase_feature_community",
+      "idx_atlas_codebase_feature_id",
+      "idx_atlas_codebase_quality_filter",
+      "idx_atlas_codebase_source_ref"
+    ],
+    "topology_indexed": [
+      "idx_atlas_codebase_community",
+      "idx_atlas_codebase_community_high_confidence",
+      "idx_atlas_codebase_feature_community",
+      "idx_atlas_codebase_som_cluster",
+      "idx_atlas_codebase_topology",
+      "idx_atlas_codebase_tree_node_id",
+      "idx_atlas_packets_som_cluster",
+      "idx_atlas_packets_tree_node_som_cluster"
+    ],
+    "enrichment_indexed": [],
+    "jsonb_indexed": [
+      "idx_atlas_codebase_metadata",
+      "idx_atlas_codebase_metadata_community_gin"
+    ],
+    "temporal_indexed": [
+      "idx_atlas_codebase_created_at_brin"
+    ],
+    "fts_indexed": [
+      "idx_atlas_codebase_packets_summary_fts"
+    ]
+  },
+  "summary": {
+    "total_indexes": 18,
+    "btree_count": 19,
+    "gin_count": 3,
+    "brin_count": 1,
+    "vector_count": 0
+  },
+  "status": "WARN",
+  "columns": [
+    {
+      "name": "packet_key",
+      "type": "varchar",
+      "not_null": true
+    },
+    {
+      "name": "source_ref",
+      "type": "varchar",
+      "not_null": true
+    },
+    {
+      "name": "file_path",
+      "type": "varchar",
+      "not_null": true
+    },
+    {
+      "name": "feature_id",
+      "type": "varchar",
+      "not_null": true
+    },
+    {
+      "name": "feature_label",
+      "type": "varchar",
+      "not_null": false
+    },
+    {
+      "name": "community_id",
+      "type": "int4",
+      "not_null": false
+    },
+    {
+      "name": "community_source",
+      "type": "varchar",
+      "not_null": false
+    },
+    {
+      "name": "community_confidence",
+      "type": "numeric",
+      "not_null": false
+    },
+    {
+      "name": "metadata",
+      "type": "jsonb",
+      "not_null": false
+    },
+    {
+      "name": "lineage_version",
+      "type": "varchar",
+      "not_null": true
+    },
+    {
+      "name": "ledger_type",
+      "type": "varchar",
+      "not_null": true
+    },
+    {
+      "name": "created_at",
+      "type": "timestamptz",
+      "not_null": true
+    },
+    {
+      "name": "updated_at",
+      "type": "timestamptz",
+      "not_null": true
+    },
+    {
+      "name": "tree_node_id",
+      "type": "uuid",
+      "not_null": false
+    },
+    {
+      "name": "som_cluster",
+      "type": "int4",
+      "not_null": false
+    }
+  ]
+}

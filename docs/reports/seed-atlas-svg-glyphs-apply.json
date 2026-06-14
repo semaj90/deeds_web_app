@@ -1,0 +1,31 @@
+{
+  "timestamp": "2026-06-14T22:33:26.981Z",
+  "mode": "APPLY",
+  "steps": [
+    {
+      "step": "fetch_packets",
+      "status": "ok",
+      "packet_count": 3251
+    },
+    {
+      "step": "generate_glyphs",
+      "status": "ok",
+      "glyph_count": 3251
+    },
+    {
+      "step": "insert_glyphs",
+      "status": "ok",
+      "seeded": 3251,
+      "skipped": 0,
+      "failed": 0
+    }
+  ],
+  "seed_results": [],
+  "statistics": {
+    "total_packets_read": 3251,
+    "glyphs_seeded": 3251,
+    "glyphs_skipped": 0,
+    "seed_failed": 0
+  },
+  "status": "PASS"
+}

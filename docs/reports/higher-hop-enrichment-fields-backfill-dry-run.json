@@ -1,0 +1,47 @@
+{
+  "timestamp": "2026-06-14T21:59:23.027Z",
+  "mode": "DRY_RUN",
+  "steps": [
+    {
+      "step": "fetch_packets",
+      "status": "ok",
+      "packet_count": 100
+    },
+    {
+      "step": "backfill_som_cluster",
+      "status": "ok",
+      "count": 0
+    },
+    {
+      "step": "backfill_glyph_record",
+      "status": "table_missing",
+      "count": 0,
+      "table_missing": true
+    },
+    {
+      "step": "backfill_qdrant_hit",
+      "status": "ok",
+      "count": 0
+    },
+    {
+      "step": "backfill_redis_hot_key",
+      "status": "ok",
+      "count": 100
+    },
+    {
+      "step": "backfill_neo4j_node",
+      "status": "ok",
+      "count": 99
+    }
+  ],
+  "enrichment_results": [],
+  "statistics": {
+    "total_packets": 100,
+    "som_cluster_backfilled": 0,
+    "glyph_record_backfilled": 0,
+    "qdrant_hit_backfilled": 0,
+    "redis_hot_key_backfilled": 100,
+    "neo4j_node_backfilled": 99
+  },
+  "status": "PASS"
+}

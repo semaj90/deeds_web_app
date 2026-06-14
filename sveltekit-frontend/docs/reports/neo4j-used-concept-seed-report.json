@@ -1,0 +1,178 @@
+{
+  "generatedAt": "2026-06-14T21:08:32.413Z",
+  "apply": false,
+  "limit": 25,
+  "batchSize": 50,
+  "neo4j": {
+    "available": false,
+    "error": "dry-run",
+    "uri": "bolt://127.0.0.1:7687"
+  },
+  "packetLedger": {
+    "source": "atlas_feature_packets",
+    "matchedRows": 0,
+    "legacyOnlyCount": 8
+  },
+  "tracesScanned": 25,
+  "tracesEligible": 25,
+  "uniqueConcepts": 4,
+  "uniquePackets": 8,
+  "usedConceptEdgesPrepared": 25,
+  "usedPacketEdgesPrepared": 50,
+  "usedConceptEdgesWritten": 0,
+  "usedPacketEdgesWritten": 0,
+  "skippedConcepts": 0,
+  "skippedPackets": 0,
+  "unmatchedPacketRefs": 8,
+  "batches": [
+    {
+      "batchIndex": 1,
+      "traces": 25,
+      "concepts": 25,
+      "packets": 50
+    }
+  ],
+  "samples": [
+    {
+      "traceId": "3e734d65-348e-4019-8436-d325ae7d1bff",
+      "concepts": [
+        "observability_telemetry"
+      ],
+      "packets": [
+        {
+          "identityKey": "packet:observability_telemetry",
+          "matched": false,
+          "nodeProps": {
+            "id": "packet:observability_telemetry",
+            "ledger_type": "legacy_qdrant_only",
+            "lineage_version": "packet-identity-v1",
+            "canonical": false
+          }
+        },
+        {
+          "identityKey": "concept:observability_telemetry",
+          "matched": false,
+          "nodeProps": {
+            "id": "concept:observability_telemetry",
+            "ledger_type": "legacy_qdrant_only",
+            "lineage_version": "packet-identity-v1",
+            "canonical": false
+          }
+        }
+      ]
+    },
+    {
+      "traceId": "8bc1f19f-6ebe-42a9-aeac-b268e339d4f1",
+      "concepts": [
+        "observability_telemetry"
+      ],
+      "packets": [
+        {
+          "identityKey": "packet:observability_telemetry",
+          "matched": false,
+          "nodeProps": {
+            "id": "packet:observability_telemetry",
+            "ledger_type": "legacy_qdrant_only",
+            "lineage_version": "packet-identity-v1",
+            "canonical": false
+          }
+        },
+        {
+          "identityKey": "concept:observability_telemetry",
+          "matched": false,
+          "nodeProps": {
+            "id": "concept:observability_telemetry",
+            "ledger_type": "legacy_qdrant_only",
+            "lineage_version": "packet-identity-v1",
+            "canonical": false
+          }
+        }
+      ]
+    },
+    {
+      "traceId": "53c3499f-e18d-4576-90bf-40a06bbfa86f",
+      "concepts": [
+        "database_orm"
+      ],
+      "packets": [
+        {
+          "identityKey": "packet:database_orm",
+          "matched": false,
+          "nodeProps": {
+            "id": "packet:database_orm",
+            "ledger_type": "legacy_qdrant_only",
+            "lineage_version": "packet-identity-v1",
+            "canonical": false
+          }
+        },
+        {
+          "identityKey": "concept:database_orm",
+          "matched": false,
+          "nodeProps": {
+            "id": "concept:database_orm",
+            "ledger_type": "legacy_qdrant_only",
+            "lineage_version": "packet-identity-v1",
+            "canonical": false
+          }
+        }
+      ]
+    },
+    {
+      "traceId": "5afbd8e2-acd8-429b-886b-45cffdef60e5",
+      "concepts": [
+        "database_orm"
+      ],
+      "packets": [
+        {
+          "identityKey": "packet:database_orm",
+          "matched": false,
+          "nodeProps": {
+            "id": "packet:database_orm",
+            "ledger_type": "legacy_qdrant_only",
+            "lineage_version": "packet-identity-v1",
+            "canonical": false
+          }
+        },
+        {
+          "identityKey": "concept:database_orm",
+          "matched": false,
+          "nodeProps": {
+            "id": "concept:database_orm",
+            "ledger_type": "legacy_qdrant_only",
+            "lineage_version": "packet-identity-v1",
+            "canonical": false
+          }
+        }
+      ]
+    },
+    {
+      "traceId": "8d9eee13-c1d5-4e74-a6b6-8548cec5cdc9",
+      "concepts": [
+        "database_orm"
+      ],
+      "packets": [
+        {
+          "identityKey": "packet:database_orm",
+          "matched": false,
+          "nodeProps": {
+            "id": "packet:database_orm",
+            "ledger_type": "legacy_qdrant_only",
+            "lineage_version": "packet-identity-v1",
+            "canonical": false
+          }
+        },
+        {
+          "identityKey": "concept:database_orm",
+          "matched": false,
+          "nodeProps": {
+            "id": "concept:database_orm",
+            "ledger_type": "legacy_qdrant_only",
+            "lineage_version": "packet-identity-v1",
+            "canonical": false
+          }
+        }
+      ]
+    }
+  ],
+  "totalTraceRowsWithEdges": 25
+}

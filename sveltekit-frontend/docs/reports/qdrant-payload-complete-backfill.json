@@ -1,0 +1,223 @@
+{
+  "generatedAt": "2026-06-14T20:52:57.209Z",
+  "mode": "verify",
+  "collection": "codebase_chunks_768",
+  "databaseUrl": "postgresql://legal_admin:***@127.0.0.1:5434/legal_ai_db",
+  "availableLedgers": [
+    "atlas_feature_packets"
+  ],
+  "limits": {
+    "requested": null
+  },
+  "postgres": {
+    "rowsScanned": 14234,
+    "rowsMatched": 798,
+    "rowsUpdated": 51808,
+    "rowsAlreadyCanonical": 798,
+    "rowsSkipped": 51808,
+    "rowsAmbiguous": 0,
+    "rowsUnmatched": 51808,
+    "rowsMissingPacketKey": 0,
+    "rowsMissingSourceRef": 0,
+    "rowsMissingFilePath": 0,
+    "rowsFromFeaturePackets": 14234,
+    "rowsFromAtlasPackets": 0
+  },
+  "qdrant": {
+    "pointsScanned": 52606,
+    "pointsMatched": 798,
+    "pointsUpdated": 0,
+    "pointsAlreadyCanonical": 798,
+    "pointsLegacyOnly": 51808,
+    "pointsAmbiguous": 0,
+    "pointsUnmatched": 51808
+  },
+  "canonicalCoverage": {
+    "packet_key": {
+      "matched": 798,
+      "total": 798,
+      "pct": 100
+    },
+    "source_ref": {
+      "matched": 798,
+      "total": 798,
+      "pct": 100
+    },
+    "feature_id": {
+      "matched": 798,
+      "total": 798,
+      "pct": 100
+    }
+  },
+  "ledgerCounts": {
+    "atlas_feature_packets": 798,
+    "atlas_packets": 0,
+    "legacy_qdrant_only": 51808
+  },
+  "samples": [
+    {
+      "qdrant_point_id": "86694",
+      "status": "legacy-would-update",
+      "reason": "legacy_qdrant_only"
+    },
+    {
+      "qdrant_point_id": "138065",
+      "status": "legacy-would-update",
+      "reason": "legacy_qdrant_only"
+    },
+    {
+      "qdrant_point_id": "174637",
+      "status": "legacy-would-update",
+      "reason": "legacy_qdrant_only"
+    },
+    {
+      "qdrant_point_id": "188608",
+      "status": "legacy-would-update",
+      "reason": "legacy_qdrant_only"
+    },
+    {
+      "qdrant_point_id": "194586",
+      "status": "legacy-would-update",
+      "reason": "legacy_qdrant_only"
+    },
+    {
+      "qdrant_point_id": "227675",
+      "status": "legacy-would-update",
+      "reason": "legacy_qdrant_only"
+    },
+    {
+      "qdrant_point_id": "292522",
+      "status": "legacy-would-update",
+      "reason": "legacy_qdrant_only"
+    },
+    {
+      "qdrant_point_id": "404803",
+      "status": "legacy-would-update",
+      "reason": "legacy_qdrant_only"
+    },
+    {
+      "qdrant_point_id": "436451",
+      "status": "legacy-would-update",
+      "reason": "legacy_qdrant_only"
+    },
+    {
+      "qdrant_point_id": "614211",
+      "status": "legacy-would-update",
+      "reason": "legacy_qdrant_only"
+    },
+    {
+      "qdrant_point_id": "639944",
+      "status": "legacy-would-update",
+      "reason": "legacy_qdrant_only"
+    },
+    {
+      "qdrant_point_id": "727645",
+      "status": "legacy-would-update",
+      "reason": "legacy_qdrant_only"
+    },
+    {
+      "qdrant_point_id": "761314",
+      "status": "legacy-would-update",
+      "reason": "legacy_qdrant_only"
+    },
+    {
+      "qdrant_point_id": "909958",
+      "status": "legacy-would-update",
+      "reason": "legacy_qdrant_only"
+    },
+    {
+      "qdrant_point_id": "1080785",
+      "status": "legacy-would-update",
+      "reason": "legacy_qdrant_only"
+    },
+    {
+      "qdrant_point_id": "1103029",
+      "status": "legacy-would-update",
+      "reason": "legacy_qdrant_only"
+    },
+    {
+      "qdrant_point_id": "1116368",
+      "status": "legacy-would-update",
+      "reason": "legacy_qdrant_only"
+    },
+    {
+      "qdrant_point_id": "1146202",
+      "status": "legacy-would-update",
+      "reason": "legacy_qdrant_only"
+    },
+    {
+      "qdrant_point_id": "1249835",
+      "status": "legacy-would-update",
+      "reason": "legacy_qdrant_only"
+    },
+    {
+      "qdrant_point_id": "1354889",
+      "status": "legacy-would-update",
+      "reason": "legacy_qdrant_only"
+    },
+    {
+      "qdrant_point_id": "1401737",
+      "status": "legacy-would-update",
+      "reason": "legacy_qdrant_only"
+    },
+    {
+      "qdrant_point_id": "1536417",
+      "status": "legacy-would-update",
+      "reason": "legacy_qdrant_only"
+    },
+    {
+      "qdrant_point_id": "1604171",
+      "status": "legacy-would-update",
+      "reason": "legacy_qdrant_only"
+    },
+    {
+      "qdrant_point_id": "1612494",
+      "status": "legacy-would-update",
+      "reason": "legacy_qdrant_only"
+    },
+    {
+      "qdrant_point_id": "1631859",
+      "status": "legacy-would-update",
+      "reason": "legacy_qdrant_only"
+    }
+  ],
+  "updates": [],
+  "summary": {
+    "rowsScanned": 14234,
+    "rowsMatched": 798,
+    "rowsUpdated": 51808,
+    "rowsAlreadyCanonical": 798,
+    "rowsSkipped": 51808,
+    "rowsAmbiguous": 0,
+    "rowsUnmatched": 51808,
+    "qdrantPointsScanned": 52606,
+    "qdrantPointsMatched": 798,
+    "qdrantPointsUpdated": 0,
+    "qdrantPointsAlreadyCanonical": 798,
+    "qdrantPointsLegacyOnly": 51808,
+    "qdrantPointsAmbiguous": 0,
+    "qdrantPointsUnmatched": 51808,
+    "canonicalCoverage": {
+      "packet_key": {
+        "matched": 798,
+        "total": 798,
+        "pct": 100
+      },
+      "source_ref": {
+        "matched": 798,
+        "total": 798,
+        "pct": 100
+      },
+      "feature_id": {
+        "matched": 798,
+        "total": 798,
+        "pct": 100
+      }
+    },
+    "ledgerCounts": {
+      "atlas_feature_packets": 798,
+      "atlas_packets": 0,
+      "legacy_qdrant_only": 51808
+    }
+  }
+}

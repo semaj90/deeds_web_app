@@ -1,0 +1,22 @@
+{
+  "generatedAt": "2026-06-14T20:32:54.243Z",
+  "mode": "dry-run",
+  "reportPath": "docs/reports/qdrant-payload-complete-backfill.json",
+  "redisUrl": "redis://:redis@127.0.0.1:6379",
+  "redisHost": "127.0.0.1",
+  "redisPort": 6379,
+  "rowsSeen": 1,
+  "packetKeysWritten": 1,
+  "sourceRefKeysWritten": 1,
+  "filePathKeysWritten": 1,
+  "skipped": 0,
+  "errors": 0,
+  "samples": [
+    {
+      "packet_key": "002356e08cd7e23f",
+      "qdrant_point_id": "2316000",
+      "source_ref": "mcp-tools/src-mcp-server.ts#research:reddit_search",
+      "file_path": "src/mcp/server.ts#research:reddit_search"
+    }
+  ]
+}

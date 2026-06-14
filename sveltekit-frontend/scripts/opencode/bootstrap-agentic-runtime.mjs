@@ -9,7 +9,7 @@ import {
   appendJsonl,
   nowIso,
   readJson,
-  selectPreferredActiveTask,
+  summarizeTaskState,
   statusChangeEvent,
   writeStartupContext,
 } from './task-registry-helpers.mjs';
@@ -63,7 +63,13 @@ function buildServiceCheck() {
 
 async function main() {
   const envLoad = loadAtlasEnv(ROOT);
+  const startupBriefingJsonPath = (await readJson(PATHS.startupBriefingJson)) ? PATHS.startupBriefingJson : path.join(ROOT, '..', '.opencode', 'startup-briefing.json');
+  const startupBriefingReport = await readJson(startupBriefingJsonPath);
+  const startupBriefing = startupBriefingReport?.briefing ?? startupBriefingReport?.summary ?? startupBriefingReport ?? null;
   const runtime = detectRuntime(envLoad.loadedFiles.map((filePath) => path.relative(ROOT, filePath)));
+  runtime.startupBriefingPresent = Boolean(startupBriefingReport);
+  runtime.startupBriefingNextLane = startupBriefing?.nextLane ?? null;
+  runtime.startupBriefingTasksOpen = startupBriefing?.sinceLastWorked?.tasksOpen ?? null;
   const serviceCheck = buildServiceCheck();
 
   let state = await readJson(PATHS.taskStateJson);
@@ -75,7 +81,7 @@ async function main() {
   }
   if (!state) throw new Error('task state not found after refresh');
 
-  const selectedTask = selectPreferredActiveTask(state.tasks ?? []);
+  const selectedTask = summarizeTaskState(state).activeLane;
   runtime.activeTaskCount = Array.isArray(state.tasks)
     ? state.tasks.filter((task) => !['DONE', 'ARCHIVED'].includes(String(task?.status ?? '').toUpperCase())).length
     : 0;
@@ -103,10 +109,18 @@ async function main() {
     if (!state) throw new Error('task state not found after bootstrap refresh');
   }
 
-  const finalSelectedTask = selectPreferredActiveTask(state.tasks ?? []) ?? selectedTask;
+  const finalSelectedTask = summarizeTaskState(state).activeLane ?? selectedTask;
 
   await writeStartupContext(state, {
     runtime,
+    startupBriefing: startupBriefing
+      ? {
+          path: path.relative(ROOT, startupBriefingJsonPath),
+          nextLane: startupBriefing.nextLane ?? null,
+          tasksOpen: startupBriefing.sinceLastWorked?.tasksOpen ?? null,
+          productionReadiness: startupBriefing.sinceLastWorked?.productionReadiness ?? null,
+        }
+      : null,
     selectedTask: finalSelectedTask
       ? {
           taskId: finalSelectedTask.task_id,

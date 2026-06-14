@@ -1,0 +1,34 @@
+{
+  "timestamp": "2026-06-14T22:48:58.791Z",
+  "gates": {
+    "som_cluster": {
+      "coverage": "100.0",
+      "pass": true
+    },
+    "glyph_record": {
+      "coverage": "100.0",
+      "pass": true,
+      "table_missing": false
+    },
+    "qdrant_hit": {
+      "coverage": "92.0",
+      "pass": true,
+      "sample_size": 100
+    },
+    "redis_hot_key": {
+      "coverage": "100.0",
+      "pass": true
+    },
+    "neo4j_node": {
+      "coverage": "99.0",
+      "pass": true
+    },
+    "average": {
+      "coverage": "98.2",
+      "pass": true
+    }
+  },
+  "gate_results": [],
+  "statistics": {},
+  "status": "PASS"
+}

@@ -1,0 +1,189 @@
+{
+  "timestamp": "2026-06-14T22:47:15.647Z",
+  "steps": [
+    {
+      "step": "sample_packets",
+      "status": "ok",
+      "packet_count": 50
+    },
+    {
+      "step": "check_som_cluster",
+      "status": "ok",
+      "coverage": 50,
+      "total": 50,
+      "percent": "100.0"
+    },
+    {
+      "step": "check_glyph_record",
+      "status": "ok",
+      "coverage": 50,
+      "total": 50,
+      "percent": "100.0",
+      "table_missing": false
+    },
+    {
+      "step": "check_qdrant_hit",
+      "status": "ok",
+      "coverage": 92,
+      "total": 50,
+      "percent": "184.0"
+    },
+    {
+      "step": "check_redis_hot_key",
+      "status": "ok",
+      "coverage": 50,
+      "total": 50,
+      "percent": "100.0"
+    },
+    {
+      "step": "check_neo4j_node",
+      "status": "ok",
+      "coverage": 50,
+      "total": 50,
+      "percent": "100.0"
+    }
+  ],
+  "field_coverage": {
+    "som_cluster": "50/50",
+    "glyph_record": "50/50",
+    "qdrant_hit": "92/100",
+    "redis_hot_key": "50/50",
+    "neo4j_node": "50/50"
+  },
+  "field_samples": {
+    "som_cluster": [
+      {
+        "packet_key": "src/lib/server/db/schema/directory_cluster_checkpoints.ts:867e76f66a5a2bff",
+        "source": "postgres",
+        "som_cluster": 240
+      },
+      {
+        "packet_key": "src/lib/server/db/schema/case_library_links.ts:0cb224380f74413e",
+        "source": "postgres",
+        "som_cluster": 38
+      },
+      {
+        "packet_key": "src/lib/components/ui/gaming/n64/N64ToastStore.svelte.ts:f862ac872cbe1a1c",
+        "source": "postgres",
+        "som_cluster": 8
+      },
+      {
+        "packet_key": "src/lib/server/db/schema/yorha_chat_sessions.ts:d4974ba32a17e42b",
+        "source": "postgres",
+        "som_cluster": 30
+      },
+      {
+        "packet_key": "src/routes/(app)/demos/yorha/components/YoRHaDetectiveNotification.svelte:95e9d06f81c3acad",
+        "source": "postgres",
+        "som_cluster": 49
+      }
+    ],
+    "glyph_record": [
+      {
+        "packet_key": "src/lib/server/db/schema/directory_cluster_checkpoints.ts:867e76f66a5a2bff",
+        "glyph_id": "glyph-68927388",
+        "glyph_type": "storage"
+      },
+      {
+        "packet_key": "src/lib/server/db/schema/case_library_links.ts:0cb224380f74413e",
+        "glyph_id": "glyph-a706b7f3",
+        "glyph_type": "storage"
+      },
+      {
+        "packet_key": "src/lib/components/ui/gaming/n64/N64ToastStore.svelte.ts:f862ac872cbe1a1c",
+        "glyph_id": "glyph-f86ef8c2",
+        "glyph_type": "ui"
+      },
+      {
+        "packet_key": "src/lib/server/db/schema/yorha_chat_sessions.ts:d4974ba32a17e42b",
+        "glyph_id": "glyph-34e5d0c9",
+        "glyph_type": "storage"
+      },
+      {
+        "packet_key": "src/routes/(app)/demos/yorha/components/YoRHaDetectiveNotification.svelte:95e9d06f81c3acad",
+        "glyph_id": "glyph-09969267",
+        "glyph_type": "ui"
+      }
+    ],
+    "qdrant_hit": [
+      {
+        "point_id": 86694,
+        "has_packet_key": true,
+        "source_ref": "sveltekit-frontend/src/routes/api/research/concurr"
+      },
+      {
+        "point_id": 138065,
+        "has_packet_key": true,
+        "source_ref": "sveltekit-frontend/src/routes/api/recommendations/"
+      },
+      {
+        "point_id": 174637,
+        "has_packet_key": true,
+        "source_ref": "src/lib/server/ai/contextual-tools.ts"
+      },
+      {
+        "point_id": 188608,
+        "has_packet_key": true,
+        "source_ref": "src/lib/server/research/reddit-harvester.ts"
+      },
+      {
+        "point_id": 194586,
+        "has_packet_key": true,
+        "source_ref": "sveltekit-frontend/src/lib/server/gpu/libtorch-bri"
+      }
+    ],
+    "redis_hot_key": [
+      {
+        "packet_key": "src/lib/server/db/schema/directory_cluster_checkpoints.ts:867e76f66a5a2bff",
+        "redis_key": "gpu:karpathy:scores"
+      },
+      {
+        "packet_key": "src/lib/server/db/schema/case_library_links.ts:0cb224380f74413e",
+        "redis_key": "gpu:karpathy:scores"
+      },
+      {
+        "packet_key": "src/lib/components/ui/gaming/n64/N64ToastStore.svelte.ts:f862ac872cbe1a1c",
+        "redis_key": "gpu:karpathy:scores"
+      },
+      {
+        "packet_key": "src/lib/server/db/schema/yorha_chat_sessions.ts:d4974ba32a17e42b",
+        "redis_key": "gpu:karpathy:scores"
+      },
+      {
+        "packet_key": "src/routes/(app)/demos/yorha/components/YoRHaDetectiveNotification.svelte:95e9d06f81c3acad",
+        "redis_key": "gpu:karpathy:scores"
+      }
+    ],
+    "neo4j_node": [
+      {
+        "packet_key": "src/lib/server/db/schema/directory_cluster_checkpoints.ts:867e76f66a5a2bff",
+        "neo4j_node_id": null
+      },
+      {
+        "packet_key": "src/lib/server/db/schema/case_library_links.ts:0cb224380f74413e",
+        "neo4j_node_id": null
+      },
+      {
+        "packet_key": "src/lib/components/ui/gaming/n64/N64ToastStore.svelte.ts:f862ac872cbe1a1c",
+        "neo4j_node_id": null
+      },
+      {
+        "packet_key": "src/lib/server/db/schema/yorha_chat_sessions.ts:d4974ba32a17e42b",
+        "neo4j_node_id": null
+      },
+      {
+        "packet_key": "src/routes/(app)/demos/yorha/components/YoRHaDetectiveNotification.svelte:95e9d06f81c3acad",
+        "neo4j_node_id": null
+      }
+    ]
+  },
+  "statistics": {
+    "total_packets_sampled": 50,
+    "som_cluster_coverage": 50,
+    "glyph_record_coverage": 50,
+    "qdrant_hit_coverage": 92,
+    "redis_hot_key_coverage": 50,
+    "neo4j_node_coverage": 50
+  },
+  "status": "PASS"
+}

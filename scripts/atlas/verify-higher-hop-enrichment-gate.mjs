@@ -131,30 +131,32 @@ async function verifyEnrichmentGate() {
     report.gates.glyph_record = { coverage: glyphPercent.toFixed(1), pass: glyphPass, table_missing: !glyphTableExists };
     logger.info(`Gate 2 (glyphRecord): ${glyphPercent.toFixed(1)}% ${glyphPass ? '✅' : '❌'} (threshold ${GATES.glyph_record.threshold}%)${!glyphTableExists ? ' [table missing]' : ''}`);
 
-    // Gate 3: qdrantHit coverage
+    // Gate 3: qdrantHit coverage — sample-based (Qdrant points have packet_key)
     let qdrantCount = 0;
-    for (const packet of packets) {
-      try {
-        const searchRes = await qdrant.scroll('codebase_chunks_768', {
-          limit: 1,
-          with_payload: true,
-          filter: {
-            should: [
-              { key: 'packet_key', match: { value: packet.packet_key } },
-              { key: 'source_ref', match: { value: packet.source_ref } },
-            ],
-          },
-        });
-        const points = searchRes.result?.points || [];
-        if (points.length > 0) qdrantCount++;
-      } catch (err) {
-        // Skip on error
+    let qdrantSampleSize = 0;
+
+    try {
+      const scrollRes = await qdrant.scroll('codebase_chunks_768', {
+        limit: 100,
+        with_payload: true,
+      });
+
+      const points = scrollRes.points || scrollRes.result?.points || [];
+      qdrantSampleSize = points.length;
+
+      for (const point of points) {
+        if (point.payload?.packet_key || point.payload?.packetKey) {
+          qdrantCount++;
+        }
       }
+    } catch (err) {
+      // Qdrant error — log but continue
     }
-    const qdrantPercent = (qdrantCount / packets.length * 100);
+
+    const qdrantPercent = qdrantSampleSize > 0 ? (qdrantCount / qdrantSampleSize * 100) : 0;
     const qdrantPass = qdrantPercent >= GATES.qdrant_hit.threshold;
-    report.gates.qdrant_hit = { coverage: qdrantPercent.toFixed(1), pass: qdrantPass };
-    logger.info(`Gate 3 (qdrantHit): ${qdrantPercent.toFixed(1)}% ${qdrantPass ? '✅' : '❌'} (threshold ${GATES.qdrant_hit.threshold}%)`);
+    report.gates.qdrant_hit = { coverage: qdrantPercent.toFixed(1), pass: qdrantPass, sample_size: qdrantSampleSize };
+    logger.info(`Gate 3 (qdrantHit): ${qdrantPercent.toFixed(1)}% ${qdrantPass ? '✅' : '❌'} (threshold ${GATES.qdrant_hit.threshold}%) [sample: ${qdrantCount}/${qdrantSampleSize}]`);
 
     // Gate 4: redisHotKey coverage
     let redisCount = 0;

@@ -1,6 +1,6 @@
 # Parent Atlas Production Readiness Audit
 
-Generated: 2026-06-14T01:32:51.675Z
+Generated: 2026-06-14T21:08:40.439Z
 
 ## Summary
 
@@ -14,7 +14,7 @@ Generated: 2026-06-14T01:32:51.675Z
 - Atlas feature map rows: 19611
 - NES/CHROM packets: 14911
 - Route runtime packets: 1
-- Qdrant points: 54898
+- Qdrant points: 52606
 - Neo4j CodebaseFile nodes: 0
 - Redis LOD0 latest packet coverage: 1/1
 - Native JSON parser: native addon path present; fallback present
@@ -98,7 +98,7 @@ Generated: 2026-06-14T01:32:51.675Z
 - PASS [postgres] nes-chrom:sourceRef-parent-join: NES/CHROM packets matching Parent Atlas: 10042/14911
 - PASS [postgres] route-runtime:sourceRefs: Runtime packets with sourceRefs: 1/1
 - PASS [redis] lod0:route-runtime: Redis LOD0 runtime packets: 1/1
-- PASS [qdrant] collection:codebase_chunks_768: Qdrant codebase_chunks_768 points: 54898
+- PASS [qdrant] collection:codebase_chunks_768: Qdrant codebase_chunks_768 points: 52606
 - WARN [neo4j] contextual-tree: Neo4j CodebaseFile=0, ParentAtlasFeature=0
 
 ## Audit Guardrails

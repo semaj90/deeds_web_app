@@ -1,71 +1,42 @@
-# Atlas Clustering Health Baseline
+# Atlas Clustering Health — Phase 1B
 
-**Generated**: 6/14/2026, 12:47:06 PM
-**Duration**: 396ms
+**Timestamp**: 2026-06-14T21:01:34.289Z
 
-## PostgreSQL
+## Postgres Ledgers
 
-### Table Counts
+### atlas_codebase_packets
+- **Total**: 3251
+- **Coverage Source**: field_by_field_fallback
+- **Fields**:
+  - packet_key: 3251/3251 (100.0%)
+  - source_ref: 3251/3251 (100.0%)
+  - feature_id: 3251/3251 (100.0%)
+  - feature_label: 3251/3251 (100.0%)
+  - file_path: 3251/3251 (100.0%)
+  - community_id: 3226/3251 (99.2%)
+  - summary: 0/3251 (0.0%)
+  - som_cluster: 3251/3251 (100.0%)
+  - tree_node_id: 0/3251 (0.0%)
+  - lineage_version: 3251/3251 (100.0%)
 
-- atlas_codebase_packets: 3251 rows
-- atlas_feature_map: 19611 rows
-- atlas_cards: 0 rows
+### atlas_feature_packets
+- **Status**: present
+- **Total**: 14234
 
-### Field Coverage (atlas_codebase_packets)
+## Redis Cache
 
+- **gpu:karpathy:scores**: 179 entries
+- **gpu:karpathy:encoded**: 217 entries
+- **bifrost:*** keys: 79
 
-### Indexes
+## Status
 
-- B-tree: 14
-- GIN: 3
-- BRIN: 1
-- GIST: 0
-- HASH: 0
-- **Total**: 18
+✅ Postgres ledger split complete
+⚠️ Coverage queries using fallback
+✅ Redis cache operational
 
-## Qdrant
+## Next: Phase 1B Gates
 
-### Collections
-
-- codebase_chunks_768: 52606 points
-- feature_cards_768: 0 points
-- summary_layers_768: 0 points
-- memory_cards_768: 0 points
-- glyph_vectors_768: 0 points
-
-### Payload Coverage Sample
-
-- ⚠️ packet_key: 92%
-- ✅ source_ref: 100%
-- ✅ feature_id: 100%
-- ✅ feature_label: 100%
-- ✅ file_path: 100%
-- ✅ tags: 100%
-- ⚠️ som_cluster: 83%
-- ⚠️ community_id: 72%
-- ✅ lineage_version: 100%
-
-## Redis/Valkey
-
-**Connected**: ✅
-
-### Key Counts
-
-- gpu:karpathy:scores: 179
-- gpu:karpathy:encoded: 217
-- bifrost:*: 79
-- centroid:*: 0
-- som:*: 0
-
-## Recommendations
-
-- **MEDIUM**: Create missing tables in recommended order: atlas_svg_glyphs, atlas_topology_index, atlas_summary_layers, atlas_feature_cards, atlas_feature_edges, atlas_dependency_edges, atlas_qdrant_mirror, atlas_redis_mirror
-
-## Issues
-
-- ⚠️ Could not check coverage for packet_key
-- ⚠️ Could not check coverage for source_ref
-- ⚠️ Could not check coverage for feature_id
-- ⚠️ Could not check coverage for feature_label
-- ⚠️ Could not check coverage for file_path
-- ⚠️ Could not check coverage for community_id
+- [ ] Verify postgres adaptive indexes
+- [ ] Repair Qdrant payload contract
+- [ ] Audit Bitfrost semantic cache
