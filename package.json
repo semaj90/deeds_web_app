@@ -122,7 +122,14 @@
     "atlas:gpu:merge-all": "node scripts/atlas/merge-gpu-enrichment.mjs --apply --save",
     "atlas:gpu:verify-merge": "node scripts/atlas/verify-gpu-merge.mjs --save",
     "atlas:gpu:lane:orchestrate:dry": "node scripts/atlas/orchestrate-gpu-lane.mjs",
-    "atlas:gpu:lane:orchestrate": "node scripts/atlas/orchestrate-gpu-lane.mjs --apply"
+    "atlas:gpu:lane:orchestrate": "node scripts/atlas/orchestrate-gpu-lane.mjs --apply",
+    "atlas:1b:clustering-health": "node scripts/atlas/logger-analytics-clustering-health-patch-a.mjs",
+    "atlas:1b:postgres-indexes": "node scripts/atlas/verify-postgres-adaptive-indexes.mjs",
+    "atlas:1b:qdrant-payload:dry": "node scripts/atlas/qdrant-payload-contract-repair.mjs --dry-run",
+    "atlas:1b:qdrant-payload:apply": "node scripts/atlas/qdrant-payload-contract-repair.mjs --apply",
+    "atlas:1b:cache-audit": "node scripts/atlas/bitfrost-cache-audit.mjs",
+    "atlas:1b:all:dry": "echo '🔍 Phase 1B — Running all repairs (dry-run mode)' && npm run atlas:1b:clustering-health && npm run atlas:1b:postgres-indexes && npm run atlas:1b:qdrant-payload:dry && npm run atlas:1b:cache-audit",
+    "atlas:1b:all:apply": "echo '🔄 Phase 1B — Running all repairs (apply mode - REQUIRES CONFIRMATION)' && npm run atlas:1b:clustering-health && npm run atlas:1b:postgres-indexes && npm run atlas:1b:qdrant-payload:apply && npm run atlas:1b:cache-audit"
   },
   "devDependencies": {
     "@ast-grep/cli": "0.42.3",
