@@ -129,7 +129,12 @@
     "atlas:1b:qdrant-payload:apply": "node scripts/atlas/qdrant-payload-contract-repair.mjs --apply",
     "atlas:1b:cache-audit": "node scripts/atlas/bitfrost-cache-audit.mjs",
     "atlas:1b:all:dry": "echo '🔍 Phase 1B — Running all repairs (dry-run mode)' && npm run atlas:1b:clustering-health && npm run atlas:1b:postgres-indexes && npm run atlas:1b:qdrant-payload:dry && npm run atlas:1b:cache-audit",
-    "atlas:1b:all:apply": "echo '🔄 Phase 1B — Running all repairs (apply mode - REQUIRES CONFIRMATION)' && npm run atlas:1b:clustering-health && npm run atlas:1b:postgres-indexes && npm run atlas:1b:qdrant-payload:apply && npm run atlas:1b:cache-audit"
+    "atlas:1b:all:apply": "echo '🔄 Phase 1B — Running all repairs (apply mode - REQUIRES CONFIRMATION)' && npm run atlas:1b:clustering-health && npm run atlas:1b:postgres-indexes && npm run atlas:1b:qdrant-payload:apply && npm run atlas:1b:cache-audit",
+    "atlas:trace-packet-refs:audit": "node scripts/atlas/audit-trace-packet-ref-normalization.mjs",
+    "atlas:trace-packet-refs:dry": "node scripts/atlas/backfill-trace-packet-ref-normalization.mjs --dry-run",
+    "atlas:trace-packet-refs:apply": "node scripts/atlas/backfill-trace-packet-ref-normalization.mjs --apply",
+    "atlas:higher-hop:used-packet:normalized:dry": "node scripts/atlas/seed-neo4j-bounded-used-packet-edges-normalized.mjs --dry-run --limit=25",
+    "atlas:higher-hop:used-packet:normalized:apply": "node scripts/atlas/seed-neo4j-bounded-used-packet-edges-normalized.mjs --apply --limit=25"
   },
   "devDependencies": {
     "@ast-grep/cli": "0.42.3",
