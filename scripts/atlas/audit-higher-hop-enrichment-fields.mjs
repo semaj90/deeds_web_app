@@ -143,22 +143,32 @@ async function auditEnrichmentFields() {
 
     let glyphRecordCount = 0;
     const glyphRecordSamples = [];
+    let glyphTableMissing = false;
 
-    for (const packet of packets) {
-      const glyphRes = await pool.query(
-        `SELECT glyph_id, glyph_type FROM atlas_svg_glyphs
-         WHERE packet_key = $1 OR source_ref = $2
-         LIMIT 1`,
-        [packet.packet_key, packet.source_ref]
-      );
+    try {
+      for (const packet of packets) {
+        const glyphRes = await pool.query(
+          `SELECT glyph_id, glyph_type FROM atlas_svg_glyphs
+           WHERE packet_key = $1 OR source_ref = $2
+           LIMIT 1`,
+          [packet.packet_key, packet.source_ref]
+        );
 
-      if (glyphRes.rows.length > 0) {
-        glyphRecordCount++;
-        glyphRecordSamples.push({
-          packet_key: packet.packet_key,
-          glyph_id: glyphRes.rows[0].glyph_id,
-          glyph_type: glyphRes.rows[0].glyph_type,
-        });
+        if (glyphRes.rows.length > 0) {
+          glyphRecordCount++;
+          glyphRecordSamples.push({
+            packet_key: packet.packet_key,
+            glyph_id: glyphRes.rows[0].glyph_id,
+            glyph_type: glyphRes.rows[0].glyph_type,
+          });
+        }
+      }
+    } catch (err) {
+      if (err.message.includes('does not exist')) {
+        glyphTableMissing = true;
+        logger.warn(`  atlas_svg_glyphs table does not exist (expected — higher-hop enrichment table)`);
+      } else {
+        throw err;
       }
     }
 
@@ -166,14 +176,15 @@ async function auditEnrichmentFields() {
     report.field_samples.glyph_record = glyphRecordSamples.slice(0, 5);
     report.field_coverage.glyph_record = `${glyphRecordCount}/${packets.length}`;
 
-    logger.ok(`  Glyph record coverage: ${glyphRecordCount}/${packets.length} (${(glyphRecordCount / packets.length * 100).toFixed(1)}%)`);
+    logger.ok(`  Glyph record coverage: ${glyphRecordCount}/${packets.length} (${(glyphRecordCount / packets.length * 100).toFixed(1)}%)${glyphTableMissing ? ' [table missing]' : ''}`);
 
     report.steps.push({
       step: 'check_glyph_record',
-      status: 'ok',
+      status: glyphTableMissing ? 'table_missing' : 'ok',
       coverage: glyphRecordCount,
       total: packets.length,
       percent: (glyphRecordCount / packets.length * 100).toFixed(1),
+      table_missing: glyphTableMissing,
     });
 
     // Step 4: Check qdrantHit coverage
