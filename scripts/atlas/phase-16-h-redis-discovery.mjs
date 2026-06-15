@@ -24,10 +24,40 @@ const __dirname = dirname(__filename);
 dotenv.config({ path: `${__dirname}/../../.env` });
 
 const pool = new pg.Pool({ connectionString: process.env.DATABASE_URL });
+const argv = process.argv.slice(2);
+const hasFlag = (flag) => argv.includes(flag);
+const getArg = (name) => {
+  const eq = argv.find((arg) => arg.startsWith(`--${name}=`));
+  if (eq) return eq.split('=').slice(1).join('=');
+  const idx = argv.indexOf(`--${name}`);
+  if (idx >= 0 && argv[idx + 1] && !argv[idx + 1].startsWith('--')) return argv[idx + 1];
+  return null;
+};
 
-const REDIS_HOST = process.env.REDIS_HOST || 'localhost';
-const REDIS_PORT = process.env.REDIS_PORT || 6379;
-const REDIS_PASSWORD = process.env.REDIS_PASSWORD || undefined;
+function resolveRedisConfig() {
+  const rawUrl = process.env.REDIS_URL || '';
+  const rawPassword = process.env.REDIS_PASSWORD || process.env.VALKEY_PASSWORD || undefined;
+  if (rawUrl) {
+    try {
+      const url = new URL(rawUrl);
+      return {
+        host: url.hostname || 'localhost',
+        port: Number(url.port || 6379),
+        password: rawPassword || (url.password ? decodeURIComponent(url.password) : undefined),
+      };
+    } catch {
+      // Fall through to host/port envs.
+    }
+  }
+  return {
+    host: process.env.REDIS_HOST || 'localhost',
+    port: Number(process.env.REDIS_PORT || 6379),
+    password: rawPassword,
+  };
+}
+
+const REDIS = resolveRedisConfig();
+const LIMIT = parseInt(getArg('limit') || process.env.H6_LIMIT || '0', 10);
 
 const log = {
   info: (msg) => console.log(`[phase-16-h-6] ${msg}`),
@@ -35,6 +65,12 @@ const log = {
   error: (msg) => console.error(`❌ ${msg}`),
   progress: (msg) => console.log(`⏳ ${msg}`),
 };
+
+function timeoutAfter(ms, label) {
+  return new Promise((_, reject) => {
+    setTimeout(() => reject(new Error(`${label} timed out after ${ms}ms`)), ms).unref?.();
+  });
+}
 
 async function main() {
   const startTime = Date.now();
@@ -44,20 +80,48 @@ async function main() {
     log.info('');
 
     const redis = new Redis({
-      host: REDIS_HOST,
-      port: REDIS_PORT,
-      password: REDIS_PASSWORD,
+      host: REDIS.host,
+      port: REDIS.port,
+      password: REDIS.password,
       lazyConnect: true,
+      connectTimeout: 5000,
       maxRetriesPerRequest: 1,
       enableOfflineQueue: false,
+      retryStrategy: () => null,
     });
 
     try {
-      await redis.connect();
+      await Promise.race([redis.connect(), timeoutAfter(5000, 'Redis connect')]);
       log.ok('Connected to Redis');
     } catch (err) {
       log.error(`Failed to connect to Redis: ${err.message}`);
       log.info('Continuing with discovery (Redis is optional)');
+    }
+
+    if (redis.status !== 'ready') {
+      log.info('Redis not ready — skipping hot cache discovery');
+      await redis.disconnect().catch(() => {});
+      const client = await pool.connect();
+      try {
+        const auditResult = await client.query(`
+          SELECT
+            COUNT(CASE WHEN bifrost_key IS NOT NULL THEN 1 END) as bifrost_linked,
+            COUNT(CASE WHEN gpu_karpathy_key IS NOT NULL THEN 1 END) as karpathy_linked,
+            COUNT(*) as total
+          FROM atlas_higher_hop_index
+        `);
+        const audit = auditResult.rows[0];
+        log.ok(`Redis discovery audit:`);
+        log.ok(`  Bifrost cached: ${audit.bifrost_linked}/${audit.total}`);
+        log.ok(`  Karpathy ranked: ${audit.karpathy_linked}/${audit.total}`);
+        log.ok(`  Note: Redis unavailable — hot cache discovery skipped`);
+        log.ok('');
+        log.ok('========== Phase 16-H.6 COMPLETE ==========');
+        log.info(`Total time: ${((Date.now() - startTime) / 1000).toFixed(1)}s`);
+      } finally {
+        await client.release();
+      }
+      return;
     }
 
     const client = await pool.connect();
@@ -70,10 +134,18 @@ async function main() {
       log.progress('Discovering Bifrost semantic cache keys...');
 
       try {
-        const bifrostKeys = await redis.keys('bifrost:sem:packet:*');
-        log.ok(`Found ${bifrostKeys.length} Bifrost cache keys`);
+        const bifrostKeys = [];
+        let cursor = '0';
+        do {
+          const [nextCursor, keys] = await redis.scan(cursor, 'MATCH', 'bifrost:sem:packet:*', 'COUNT', 500);
+          cursor = nextCursor;
+          bifrostKeys.push(...keys);
+          if (LIMIT > 0 && bifrostKeys.length >= LIMIT) break;
+        } while (cursor !== '0');
+        const limitedBifrostKeys = LIMIT > 0 ? bifrostKeys.slice(0, LIMIT) : bifrostKeys;
+        log.ok(`Found ${limitedBifrostKeys.length} Bifrost cache keys${LIMIT > 0 ? ` (limited)` : ''}`);
 
-        for (const key of bifrostKeys) {
+        for (const key of limitedBifrostKeys) {
           const parts = key.split(':');
           const packetKey = parts.slice(3).join(':'); // Handle colons in packet_key
 
@@ -102,11 +174,21 @@ async function main() {
       log.progress('Discovering GPU Karpathy ranking keys...');
 
       try {
-        const karpathyScores = await redis.hgetall('gpu:karpathy:scores');
-        log.ok(`Found ${Object.keys(karpathyScores).length} Karpathy score entries`);
+        const karpathyEntries = [];
+        let cursor = '0';
+        do {
+          const [nextCursor, fields] = await redis.hscan('gpu:karpathy:scores', cursor, 'COUNT', 200);
+          cursor = nextCursor;
+          for (let i = 0; i < fields.length; i += 2) {
+            karpathyEntries.push([fields[i], fields[i + 1]]);
+            if (LIMIT > 0 && karpathyEntries.length >= LIMIT) break;
+          }
+          if (LIMIT > 0 && karpathyEntries.length >= LIMIT) break;
+        } while (cursor !== '0');
+        log.ok(`Found ${karpathyEntries.length} Karpathy score entries${LIMIT > 0 ? ` (limited)` : ''}`);
 
         let rank = 1;
-        for (const [fileKey, scoreJson] of Object.entries(karpathyScores)) {
+        for (const [fileKey, scoreJson] of karpathyEntries) {
           const scoreData = JSON.parse(scoreJson);
           const blend = scoreData.blend || 0;
 
@@ -133,6 +215,7 @@ async function main() {
           }
 
           rank++;
+          if (LIMIT > 0 && rank > LIMIT) break;
         }
 
         log.ok(`Linked ${karpathyDiscovered} Karpathy entries to bridge table`);

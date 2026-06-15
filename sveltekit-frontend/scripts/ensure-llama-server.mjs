@@ -106,6 +106,14 @@ const THREADS_BATCH = Math.max(
 );
 const CACHE_REUSE = process.env.LLAMA_CACHE_REUSE ?? '256';
 
+// Chat template: file-based override takes priority, then default to repo template.
+// Set TURBO_CHAT_TEMPLATE_FILE=none to skip (only if GGUF has a correct embedded template).
+const _defaultTemplateFile = path.resolve(workspaceRoot, 'configs', 'templates', 'gemma4-opencode.jinja');
+const CHAT_TEMPLATE_FILE =
+  process.env.TURBO_CHAT_TEMPLATE_FILE === 'none'
+    ? null
+    : (process.env.TURBO_CHAT_TEMPLATE_FILE ?? (existsSync(_defaultTemplateFile) ? _defaultTemplateFile : null));
+
 /** Returns true if something is already listening on HOST:PORT (even if not HTTP-healthy). */
 function isPortBound(host, port) {
   return new Promise((resolve) => {
@@ -172,14 +180,8 @@ export async function ensureLlamaServer() {
     '-ctv',
     CACHE_TYPE_V,
     '--jinja',
-    '--chat-template',
-    'gemma',
-    '--reasoning',
-    'auto',
     '--reasoning-format',
     'none',
-    '--reasoning-budget',
-    '0',
     '--cont-batching',
     '--cache-prompt',
     '--cache-reuse',
@@ -190,6 +192,12 @@ export async function ensureLlamaServer() {
   ];
 
   if (MMPROJ) args.push('--mmproj', MMPROJ);
+  if (CHAT_TEMPLATE_FILE) {
+    args.push('--chat-template-file', CHAT_TEMPLATE_FILE);
+    console.log(`[ensure-llama-server] Chat template: ${CHAT_TEMPLATE_FILE}`);
+  } else {
+    console.warn('[ensure-llama-server] No chat-template-file — using embedded GGUF template (may poison system role)');
+  }
 
   const child = spawn(LLAMA_EXE, args, {
     detached: true,

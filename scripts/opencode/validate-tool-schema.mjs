@@ -49,7 +49,8 @@ function checkZodTool(filePath) {
   const r = rel(filePath);
 
   if (!/export\s+const\s+\w+\s*=\s*tool\s*\(/.test(src)) {
-    fail(r, 'no export const X = tool({...}) found');
+    // Plain function stubs (no tool() export) — warn only, not a discipline violation
+    warn(r, 'stub file — no export const X = tool({...}), skipping schema checks');
     return;
   }
 

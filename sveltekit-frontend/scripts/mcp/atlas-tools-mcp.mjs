@@ -118,8 +118,8 @@ const TOOLS = [
         tool: { type: 'string', description: 'The tool choice that was made.' },
         sourceRefs: {
           type: 'array',
-          items: { type: 'string' },
           description: 'The source files or references involved in the selection.',
+          items: { type: 'string', description: 'A source file path or reference key.' },
         },
         recommendationAccepted: { type: 'boolean', description: 'Whether the suggestion was accepted.' },
         reward: { type: 'number', description: 'The calculated reward score (0.0 to 1.0).' },

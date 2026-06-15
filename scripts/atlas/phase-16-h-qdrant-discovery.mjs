@@ -224,12 +224,137 @@ async function auditDiscovery() {
 }
 
 /**
+ * --report-ambiguous: classify the 763 unmatched rows (no qdrant_point_id)
+ * into identity lanes without writing any data.
+ *
+ * Disambiguation chain (applied in priority order):
+ *   1. source_ref LIKE '%#%'        → mcp_tool_stub
+ *   2. packet_key LIKE '%:%'        → schema_stub  (file-level ref, not a chunk)
+ *   3. chunk_id IS NOT NULL         → ambiguous_qdrant_collision (should have matched but didn't)
+ *   4. content_hash IS NOT NULL     → ambiguous_qdrant_collision (has content but no Qdrant hit)
+ *   5. fallthrough                  → not_indexed_in_qdrant
+ *
+ * Prints a summary table and, with --verbose, the first 20 rows per category.
+ * Never writes to the database.
+ */
+async function reportAmbiguous(verbose = false) {
+  log.info('========== Phase 16-H: Ambiguous Row Classification ==========');
+  log.info('Mode: read-only. No data will be written.');
+  log.info('');
+
+  const client = await pool.connect();
+
+  try {
+    // Overall unmatched count
+    const { rows: [totals] } = await client.query(`
+      SELECT
+        COUNT(*) AS total_rows,
+        COUNT(CASE WHEN qdrant_point_id IS NOT NULL THEN 1 END) AS matched,
+        COUNT(CASE WHEN qdrant_point_id IS NULL THEN 1 END) AS unmatched
+      FROM atlas_higher_hop_index
+    `);
+
+    log.info(`Total rows in atlas_higher_hop_index: ${totals.total_rows}`);
+    log.info(`  Matched (qdrant_point_id set): ${totals.matched}`);
+    log.info(`  Unmatched (needs classification): ${totals.unmatched}`);
+    log.info('');
+
+    // Classify by disambiguation chain
+    const { rows: classified } = await client.query(`
+      SELECT
+        CASE
+          WHEN source_ref LIKE '%#%'  THEN 'mcp_tool_stub'
+          WHEN packet_key LIKE '%:%'  THEN 'schema_stub'
+          WHEN chunk_id IS NOT NULL   THEN 'ambiguous_qdrant_collision'
+          WHEN content_hash IS NOT NULL THEN 'ambiguous_qdrant_collision'
+          ELSE 'not_indexed_in_qdrant'
+        END AS identity_lane,
+        COUNT(*) AS count
+      FROM atlas_higher_hop_index
+      WHERE qdrant_point_id IS NULL
+      GROUP BY 1
+      ORDER BY 2 DESC
+    `);
+
+    log.ok('Classification results:');
+    for (const row of classified) {
+      const pct = ((100 * Number(row.count)) / Number(totals.unmatched)).toFixed(1);
+      const icon = row.identity_lane === 'mcp_tool_stub' ? '🔧'
+        : row.identity_lane === 'schema_stub' ? '📄'
+        : row.identity_lane === 'ambiguous_qdrant_collision' ? '⚠️'
+        : '❓';
+      console.log(`  ${icon}  ${row.identity_lane.padEnd(30)} ${String(row.count).padStart(5)}  (${pct}%)`);
+    }
+    log.info('');
+
+    // Verify: are there any true ambiguous_qdrant_collision rows?
+    const ambiguousCount = classified.find(r => r.identity_lane === 'ambiguous_qdrant_collision')?.count ?? 0;
+    if (Number(ambiguousCount) === 0) {
+      log.ok('✅ No ambiguous_qdrant_collision rows — all unmatched rows are clean identity lanes.');
+    } else {
+      log.error(`⚠️  ${ambiguousCount} rows have chunk_id or content_hash but no Qdrant match.`);
+      log.error('   These need investigation before the identity spine can be closed.');
+    }
+    log.info('');
+
+    // Verbose: print samples for each category
+    if (verbose) {
+      for (const row of classified) {
+        log.info(`--- ${row.identity_lane} (first 20 samples) ---`);
+        const { rows: samples } = await client.query(`
+          SELECT source_ref, packet_key, chunk_id, content_hash
+          FROM atlas_higher_hop_index
+          WHERE qdrant_point_id IS NULL
+            AND CASE
+              WHEN source_ref LIKE '%#%'    THEN 'mcp_tool_stub'
+              WHEN packet_key LIKE '%:%'    THEN 'schema_stub'
+              WHEN chunk_id IS NOT NULL     THEN 'ambiguous_qdrant_collision'
+              WHEN content_hash IS NOT NULL THEN 'ambiguous_qdrant_collision'
+              ELSE 'not_indexed_in_qdrant'
+            END = $1
+          ORDER BY source_ref
+          LIMIT 20
+        `, [row.identity_lane]);
+        for (const s of samples) {
+          console.log(`    source_ref: ${s.source_ref}`);
+          if (s.chunk_id) console.log(`    chunk_id:   ${s.chunk_id}`);
+          if (s.content_hash) console.log(`    hash:       ${s.content_hash}`);
+          console.log('');
+        }
+      }
+    }
+
+    // Identity lane recommendation
+    log.info('Recommended identity_lane assignments:');
+    log.info('  mcp_tool_stub            → identity_lane = "mcp_tool_stub", identity_confidence = 0.75');
+    log.info('  schema_stub              → identity_lane = "qdrant_chunk" (pending indexing), confidence = 0.50');
+    log.info('  ambiguous_qdrant_collision → investigate before assigning');
+    log.info('  not_indexed_in_qdrant    → identity_lane = "qdrant_chunk" (not yet indexed), confidence = 0.30');
+    log.info('');
+    log.info('Run with --apply to write identity_lane to atlas_higher_hop_index (future flag, not yet implemented).');
+
+  } finally {
+    client.release();
+  }
+}
+
+/**
  * Main execution
  */
 async function main() {
+  const args = process.argv.slice(2);
+  const reportAmbiguousMode = args.includes('--report-ambiguous');
+  const verbose = args.includes('--verbose');
+
   const startTime = Date.now();
 
   try {
+    if (reportAmbiguousMode) {
+      await reportAmbiguous(verbose);
+      log.info(`Total time: ${((Date.now() - startTime) / 1000).toFixed(1)}s`);
+      return;
+    }
+
     log.info('========== Phase 16-H.4: Qdrant Discovery ==========');
     log.info('');
 

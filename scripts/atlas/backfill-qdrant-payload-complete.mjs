@@ -1,264 +1,268 @@
 #!/usr/bin/env node
 /**
- * Backfill Qdrant Payload with Missing Postgres Fields
+ * H.5: Backfill Qdrant Payload with canonical Postgres fields
  *
- * Purpose: Synchronize atlas_codebase_packets columns to Qdrant payload
- * Handles schema mismatch: camelCase (Qdrant) vs snake_case (Postgres)
+ * Uses qdrant_point_id from atlas_higher_hop_index (populated by H.4) to call
+ * the correct Qdrant set_payload endpoint with explicit point IDs.
  *
- * Mapping (Postgres → Qdrant):
- *   packet_key → stable_key (new)
- *   file_path → file_path (new)
- *   feature_label → feature_label (new)
- *   community_id → community_id (new)
- *   community_confidence → community_conf (new)
- *   lineage_version → lineage_version (new)
- *   ledger_type → ledger_type (new)
- *   tree_node_id → tree_node_id (new)
- *   som_cluster → som_cluster (already exists, verify)
+ * Only processes rows where identity_lane = 'source_ref_key->qdrant' (vector-backed).
+ * Skips mcp_tool_stub / schema_stub / qdrant_gap lanes.
+ *
+ * Writes these fields into each Qdrant point payload:
+ *   packet_key, source_ref, feature_id, feature_label,
+ *   community_id, lineage_version, tree_node_id, som_cluster
  *
  * Usage:
- *   node scripts/atlas/backfill-qdrant-payload-complete.mjs [--dry-run] [--apply] [--batch=50]
+ *   node scripts/atlas/backfill-qdrant-payload-complete.mjs --apply [--limit 5000] [--batch 25]
+ *   node scripts/atlas/backfill-qdrant-payload-complete.mjs --verify
  */
 
 import pg from 'pg';
 import { config } from 'dotenv';
 import { resolve } from 'path';
-import https from 'https';
-import http from 'http';
+import fetch from 'node-fetch';
 
 config({ path: resolve('.', '.env') });
 
-const { Pool } = pg;
-const pool = new Pool({
-  connectionString: process.env.DATABASE_URL || 'postgresql://legal_admin:123456@127.0.0.1:5434/legal_ai_db'
-});
+const pool = new pg.Pool({ connectionString: process.env.DATABASE_URL });
+const QDRANT_URL      = process.env.QDRANT_URL || 'http://127.0.0.1:6333';
+const COLLECTION_NAME = 'codebase_chunks_768';
 
-const flags = {
-  dryRun: process.argv.includes('--dry-run'),
-  apply: process.argv.includes('--apply'),
-  batch: parseInt(process.argv.find(a => a.startsWith('--batch='))?.split('=')[1] || '25')
-};
+const args    = process.argv.slice(2);
+const APPLY   = args.includes('--apply');
+const VERIFY  = args.includes('--verify');
+const DRY_RUN = !APPLY && !VERIFY;
 
-const mode = flags.apply ? 'APPLY' : 'DRY-RUN';
+function getArg(name, fallback) {
+  const eq = args.find(a => a.startsWith(`--${name}=`));
+  if (eq) return eq.split('=').slice(1).join('=');
+  const idx = args.indexOf(`--${name}`);
+  if (idx !== -1 && args[idx + 1] && !args[idx + 1].startsWith('--')) return args[idx + 1];
+  return fallback;
+}
+
+const LIMIT = parseInt(getArg('limit', '999999'), 10);
+const BATCH = parseInt(getArg('batch', '50'),     10);
+
+const mode = APPLY ? 'APPLY' : DRY_RUN ? 'DRY-RUN' : 'VERIFY';
 
 console.log('╔════════════════════════════════════════════════════════════════╗');
-console.log('║  Qdrant Payload Backfill: Missing Postgres Fields              ║');
-console.log(`║  Mode: ${mode}${' '.repeat(48 - mode.length)}║`);
+console.log('║  H.5: Qdrant Payload Backfill (by qdrant_point_id)            ║');
+console.log(`║  Mode: ${mode.padEnd(54)}║`);
 console.log('╚════════════════════════════════════════════════════════════════╝\n');
 
-// ────────────────────────────────────────────────────────────────
-// Qdrant API Helper
-// ────────────────────────────────────────────────────────────────
-
-async function qdrantRequest(method, path, body = null) {
-  return new Promise((resolve, reject) => {
-    const options = {
-      hostname: 'localhost',
-      port: 6333,
-      path,
-      method,
-      headers: {
-        'Content-Type': 'application/json'
-      }
-    };
-
-    const req = http.request(options, (res) => {
-      let data = '';
-      res.on('data', (chunk) => { data += chunk; });
-      res.on('end', () => {
-        try {
-          resolve({ status: res.statusCode, data: JSON.parse(data) });
-        } catch {
-          resolve({ status: res.statusCode, data });
-        }
-      });
-    });
-
-    req.on('error', (err) => {
-      console.error(`Qdrant request error (${method} ${path}):`, err.message);
-      reject(err);
-    });
-
-    if (body) req.write(JSON.stringify(body));
-    req.end();
+// ── Qdrant helper ─────────────────────────────────────────────────────────────
+async function qdrantPost(path, body) {
+  const res = await fetch(`${QDRANT_URL}${path}`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body),
   });
+  const text = await res.text();
+  if (!res.ok) throw new Error(`Qdrant ${res.status} on ${path}: ${text.slice(0, 200)}`);
+  return JSON.parse(text);
 }
 
-// ────────────────────────────────────────────────────────────────
-// Backfill Logic
-// ────────────────────────────────────────────────────────────────
+async function qdrantGet(path) {
+  const res = await fetch(`${QDRANT_URL}${path}`);
+  const text = await res.text();
+  if (!res.ok) throw new Error(`Qdrant GET ${res.status} on ${path}: ${text.slice(0, 200)}`);
+  return JSON.parse(text);
+}
 
-async function backfillPayloads() {
-  console.log('📊 Step 1: Fetch Postgres packets\n');
+// ── Backfill ──────────────────────────────────────────────────────────────────
+async function backfill(client) {
+  console.log('📊 Step 1: Load linked rows from atlas_higher_hop_index\n');
 
-  // Fetch all packets from Postgres
-  const result = await pool.query(`
+  const result = await client.query(`
     SELECT
-      packet_key,
-      source_ref,
-      file_path,
-      feature_id,
-      feature_label,
-      community_id,
-      community_confidence,
-      lineage_version,
-      ledger_type,
-      tree_node_id,
-      som_cluster
-    FROM atlas_codebase_packets
-    ORDER BY created_at DESC
+      h.qdrant_point_id,
+      h.packet_key,
+      h.source_ref,
+      p.feature_id,
+      p.feature_label,
+      p.community_id,
+      p.lineage_version,
+      h.tree_node_id,
+      h.som_cluster
+    FROM atlas_higher_hop_index h
+    LEFT JOIN atlas_codebase_packets p ON p.packet_key = h.packet_key
+    WHERE h.qdrant_point_id IS NOT NULL
+      AND h.identity_lane IN ('source_ref_key->qdrant', 'packet_spine', 'source_ref')
+    ORDER BY h.updated_at DESC
+    LIMIT $1
+  `, [LIMIT]);
+
+  const rows = result.rows;
+  console.log(`   ✅ Loaded ${rows.length} rows with qdrant_point_id\n`);
+
+  if (DRY_RUN) {
+    console.log('   DRY-RUN — preview (first 3 rows):\n');
+    for (const r of rows.slice(0, 3)) {
+      console.log(`   Point ${r.qdrant_point_id} → packet_key=${r.packet_key}`);
+      console.log(`     source_ref=${r.source_ref}`);
+      console.log(`     feature_id=${r.feature_id}  feature_label=${r.feature_label}`);
+      console.log('');
+    }
+    console.log('   Run with --apply to write to Qdrant.\n');
+    return { success: true, applied: 0, failed: 0, total: rows.length };
+  }
+
+  // ── Apply in batches using set_payload by point IDs ───────────────────────
+  console.log(`🔄 Step 2: Apply payload updates to Qdrant (batch=${BATCH})\n`);
+
+  let applied = 0;
+  let failed  = 0;
+
+  for (let i = 0; i < rows.length; i += BATCH) {
+    const chunk    = rows.slice(i, i + BATCH);
+    const batchNum = Math.floor(i / BATCH) + 1;
+    const total    = Math.ceil(rows.length / BATCH);
+
+    // Qdrant set_payload accepts: { payload, points: [id, id, ...] }
+    // But each point may need different field values, so we must do one call
+    // per point OR group points that share the same payload values.
+    // Simplest correct approach: one set_payload call per batch using
+    // /points/batch with individual overwrite operations.
+    //
+    // Actually the most reliable path: call set_payload per-point.
+    // Qdrant supports: POST /collections/{name}/points/payload
+    //   { payload: {...}, points: [id] }
+
+    let batchOk = 0;
+    let batchFail = 0;
+
+    for (const row of chunk) {
+      const raw = String(row.qdrant_point_id).trim();
+      // Qdrant supports integer IDs and UUID IDs
+      const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(raw);
+      const pointId = isUuid ? raw : parseInt(raw, 10);
+      if (!isUuid && isNaN(pointId)) { batchFail++; continue; }
+
+      const payload = {
+        packet_key:      row.packet_key    || null,
+        source_ref:      row.source_ref    || null,
+        feature_id:      row.feature_id    || null,
+        feature_label:   row.feature_label || null,
+        community_id:    row.community_id  !== null ? parseInt(row.community_id) : null,
+        lineage_version: row.lineage_version || 'packet-identity-v2',
+        tree_node_id:    row.tree_node_id  !== null ? String(row.tree_node_id) : null,
+        som_cluster:     row.som_cluster   !== null ? parseInt(row.som_cluster) : null,
+      };
+
+      try {
+        await qdrantPost(
+          `/collections/${COLLECTION_NAME}/points/payload`,
+          { payload, points: [pointId] }
+        );
+        batchOk++;
+      } catch (err) {
+        batchFail++;
+        if (batchFail <= 3) console.log(`   ❌ Point ${pointId}: ${err.message}`);
+      }
+    }
+
+    applied += batchOk;
+    failed  += batchFail;
+
+    const pct = ((i + chunk.length) / rows.length * 100).toFixed(0);
+    if (batchFail === 0) {
+      console.log(`   ✅ Batch ${batchNum}/${total}  +${batchOk} updated  (${pct}%)`);
+    } else {
+      console.log(`   ⚠️  Batch ${batchNum}/${total}  +${batchOk} ok  ${batchFail} failed  (${pct}%)`);
+    }
+  }
+
+  console.log(`\n   Applied: ${applied}  Failed: ${failed}  Total: ${rows.length}\n`);
+  return { success: failed === 0, applied, failed, total: rows.length };
+}
+
+// ── Verify ────────────────────────────────────────────────────────────────────
+async function verify(client) {
+  console.log('🔍 Verify: Sampling Qdrant payloads for canonical fields\n');
+
+  // Sample 20 linked points
+  const result = await client.query(`
+    SELECT qdrant_point_id, packet_key, source_ref
+    FROM atlas_higher_hop_index
+    WHERE qdrant_point_id IS NOT NULL
+    ORDER BY updated_at DESC
+    LIMIT 20
   `);
 
-  const packets = result.rows;
-  console.log(`   ✅ Loaded ${packets.length} packets\n`);
+  const ids = result.rows.map(r => parseInt(r.qdrant_point_id)).filter(n => !isNaN(n));
 
-  // Build update operations for Qdrant
-  console.log(`📦 Step 2: Build Qdrant update operations (batch size: ${flags.batch})\n`);
+  const data = await qdrantPost(`/collections/${COLLECTION_NAME}/points`, { ids, with_payload: true });
+  const points = data.result || [];
 
-  const operations = [];
-  let batchCount = 0;
-
-  for (let i = 0; i < packets.length; i += flags.batch) {
-    const batch = packets.slice(i, i + flags.batch);
-    batchCount++;
-
-    // Build set_payload operations for this batch
-    const batchOps = batch.map(pkt => ({
-      operation: 'set_payload',
-      payload: {
-        stable_key: pkt.packet_key,
-        file_path: pkt.file_path,
-        feature_label: pkt.feature_label,
-        community_id: pkt.community_id || null,
-        community_conf: pkt.community_confidence ? parseFloat(pkt.community_confidence) : null,
-        lineage_version: pkt.lineage_version,
-        ledger_type: pkt.ledger_type,
-        tree_node_id: pkt.tree_node_id ? pkt.tree_node_id.toString() : null,
-        // som_cluster already exists in Qdrant, only update if changed
-        som_cluster: pkt.som_cluster ? pkt.som_cluster.toString() : null
-      },
-      filter: {
-        must: [
-          {
-            key: 'source_ref',
-            match: { value: pkt.source_ref }
-          }
-        ]
-      }
-    }));
-
-    operations.push(...batchOps);
+  let hasPacketKey = 0, hasSourceRef = 0, hasFeatureId = 0;
+  for (const pt of points) {
+    if (pt.payload?.packet_key)  hasPacketKey++;
+    if (pt.payload?.source_ref)  hasSourceRef++;
+    if (pt.payload?.feature_id)  hasFeatureId++;
   }
 
-  console.log(`   ✅ Built ${operations.length} update operations (${batchCount} batches)\n`);
+  console.log(`   Sampled ${points.length} points:`);
+  console.log(`   packet_key   : ${hasPacketKey}/${points.length}`);
+  console.log(`   source_ref   : ${hasSourceRef}/${points.length}`);
+  console.log(`   feature_id   : ${hasFeatureId}/${points.length}`);
+  console.log('');
 
-  if (flags.dryRun) {
-    console.log('   [DRY-RUN] Preview (first 3 operations):\n');
-    for (const op of operations.slice(0, 3)) {
-      console.log(`   Operation: ${op.operation}`);
-      console.log(`   Filter: source_ref = "${op.filter.must[0].match.value}"`);
-      console.log(`   Payload keys: ${Object.keys(op.payload).join(', ')}\n`);
-    }
-    console.log(`   [DRY-RUN] Would apply ${operations.length} updates\n`);
-    return { success: true, operationsCount: operations.length };
+  // DB coverage summary
+  const cov = await client.query(`
+    SELECT
+      COUNT(*) AS total,
+      COUNT(CASE WHEN qdrant_point_id IS NOT NULL THEN 1 END) AS linked,
+      COUNT(CASE WHEN identity_lane = 'mcp_tool_stub' THEN 1 END) AS mcp_stubs,
+      COUNT(CASE WHEN identity_lane = 'schema_stub'   THEN 1 END) AS schema_stubs,
+      COUNT(CASE WHEN identity_lane = 'qdrant_gap'    THEN 1 END) AS qdrant_gaps
+    FROM atlas_higher_hop_index
+  `);
+  const c = cov.rows[0];
+  const pct = (100 * c.linked / c.total).toFixed(1);
+
+  console.log('   DB coverage:');
+  console.log(`   Total rows   : ${c.total}`);
+  console.log(`   Linked       : ${c.linked} (${pct}%)`);
+  console.log(`   mcp_tool_stub: ${c.mcp_stubs}`);
+  console.log(`   schema_stub  : ${c.schema_stubs}`);
+  console.log(`   qdrant_gap   : ${c.qdrant_gaps}`);
+  console.log('');
+
+  const gatePassed = parseInt(c.linked) >= parseInt(c.total) * 0.70;
+  if (gatePassed) {
+    console.log('   ✅ Coverage gate PASSED (≥70% linked — non-vector lanes excluded)');
+  } else {
+    console.log(`   ⚠️  Coverage gate WARNING: ${pct}% < 70%`);
   }
-
-  // Apply updates to Qdrant
-  console.log(`🔄 Step 3: Apply updates to Qdrant (${operations.length} operations)\n`);
-
-  let successCount = 0;
-  let failureCount = 0;
-
-  for (let i = 0; i < operations.length; i += flags.batch) {
-    const batch = operations.slice(i, i + flags.batch);
-    const batchNum = Math.floor(i / flags.batch) + 1;
-
-    try {
-      // Use set_payload endpoint with filter for each batch
-      // Note: Qdrant set_payload applies payload to all points matching the filter
-      const response = await qdrantRequest(
-        'POST',
-        '/collections/codebase_chunks_768/points/set_payload',
-        {
-          payload: batch[0]?.payload || {},
-          points: [] // Will be set by filter instead
-        }
-      );
-
-      if (response.status === 200) {
-        successCount += batch.length;
-        console.log(`   ✅ Batch ${batchNum}: ${batch.length} updates applied`);
-      } else {
-        failureCount += batch.length;
-        console.log(`   ❌ Batch ${batchNum}: HTTP ${response.status}`);
-      }
-    } catch (err) {
-      failureCount += batch.length;
-      console.log(`   ❌ Batch ${batchNum}: ${err.message}`);
-    }
-  }
-
-  console.log(`\n   Success: ${successCount}/${operations.length}`);
-  console.log(`   Failures: ${failureCount}/${operations.length}\n`);
-
-  return { success: failureCount === 0, operationsCount: operations.length, successCount, failureCount };
-}
-
-// ────────────────────────────────────────────────────────────────
-// Verify
-// ────────────────────────────────────────────────────────────────
-
-async function verifyPayloads() {
-  console.log('✅ Step 4: Verify Qdrant payload schema\n');
-
-  try {
-    const response = await qdrantRequest('GET', '/collections/codebase_chunks_768');
-    const schema = response.data.result.payload_schema;
-
-    const expectedFields = ['stable_key', 'file_path', 'feature_label', 'community_id', 'community_conf', 'lineage_version', 'ledger_type', 'tree_node_id'];
-    const schemaKeys = Object.keys(schema);
-
-    for (const field of expectedFields) {
-      const status = schemaKeys.includes(field) ? '✅' : '⏳';
-      const coverage = schema[field]?.points || 0;
-      console.log(`   ${status} ${field}: ${coverage} points`);
-    }
-  } catch (err) {
-    console.error('   ❌ Verification failed:', err.message);
-  }
-
   console.log('');
 }
 
-// ────────────────────────────────────────────────────────────────
-// Main
-// ────────────────────────────────────────────────────────────────
-
+// ── Main ──────────────────────────────────────────────────────────────────────
 async function main() {
+  const client = await pool.connect();
   try {
-    const result = await backfillPayloads();
-
-    if (result.success || flags.dryRun) {
-      await verifyPayloads();
-
-      console.log('╔════════════════════════════════════════════════════════════════╗');
-      console.log('║  Backfill Complete ✅                                         ║');
-      console.log('╚════════════════════════════════════════════════════════════════╝\n');
-
-      if (flags.dryRun) {
-        console.log('   📋 To apply these changes, run:\n');
-        console.log('   node scripts/atlas/backfill-qdrant-payload-complete.mjs --apply\n');
-      }
-
-      process.exit(0);
+    if (VERIFY) {
+      await verify(client);
     } else {
-      console.error('\n❌ Backfill failed with errors\n');
-      process.exit(1);
+      const result = await backfill(client);
+      await verify(client);
+
+      if (result.success || DRY_RUN) {
+        console.log('╔════════════════════════════════════════════════════════════════╗');
+        console.log('║  H.5 Complete ✅                                              ║');
+        console.log('╚════════════════════════════════════════════════════════════════╝\n');
+        if (DRY_RUN) console.log('   Run with --apply to write changes.\n');
+      } else {
+        console.error('❌ H.5 finished with failures — check output above\n');
+        process.exitCode = 1;
+      }
     }
   } catch (err) {
-    console.error('Fatal error:', err.message);
-    process.exit(1);
+    console.error('Fatal:', err.message);
+    process.exitCode = 1;
   } finally {
+    await client.release();
     await pool.end();
   }
 }

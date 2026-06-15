@@ -13,6 +13,13 @@ generated_at: 2026-06-05T20:01:37.528Z
 - **hot_keyword_clusters**: missing — .tmp\hot-keyword-clusters.json
 - **retrieval_loop_log**: present — .tmp\atlas-retrieval-loop.jsonl
 
+## Workspace Roots
+
+- workspaceRoot: `C:\Users\james\Videos\deeds-web-app`
+- projectRoot: `C:\Users\james\Videos\deeds-web-app\sveltekit-frontend`
+- template: `C:\Users\james\Videos\deeds-web-app\configs\templates\gemma4-opencode.jinja`
+- template exists: `true`
+
 ## Phase 16 Refresh Promotion
 
 - marker: phase16_refresh_promotion
@@ -28,4 +35,4 @@ generated_at: 2026-06-05T20:01:37.528Z
 - **sourceRef atlas join inventory**: ALREADY_ACTIVE — C:\Users\james\Videos\deeds-web-app\docs\reports\sourceRef-atlas-join-inventory.md
 - **offline synthesis mapreduce duckdb report**: ALREADY_ACTIVE — C:\Users\james\Videos\deeds-web-app\docs\reports\offline-synthesis-mapreduce-duckdb-report.md
 
-Next steps: keep the Phase 12 overlay aligned in `docs/atlas/feature-registry.json`, keep Phase 16 refresh promotion pointed at the canonical sourceRef-first join artifacts, then run `npm run atlas:phase17` and `npm run atlas:phase18` only if their outputs need refresh.
+Next steps: keep the Phase 12 overlay aligned in `docs/atlas/feature-registry.json`, keep Phase 16 refresh promotion pointed at the canonical sourceRef-first join artifacts in the app workspace, then run `npm run atlas:phase17` and `npm run atlas:phase18` only if their outputs need refresh.

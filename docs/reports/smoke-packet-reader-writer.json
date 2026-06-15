@@ -1,0 +1,74 @@
+{
+  "generatedAt": "2026-06-15T20:29:29.103Z",
+  "gates": {
+    "postgres": {
+      "ok": true,
+      "rows": 3
+    },
+    "redis_karpathy": {
+      "ok": true,
+      "probed": 3,
+      "hits": 0
+    },
+    "redis_counters": {
+      "ok": true,
+      "graph_version": null,
+      "cache_epoch": null
+    },
+    "qdrant": {
+      "ok": true,
+      "collection": "legal_documents",
+      "points_count": 9840
+    },
+    "roundtrip": {
+      "ok": true,
+      "postgres_packets": 3,
+      "redis_karpathy_hits": 0,
+      "coherence": "cold_cache"
+    }
+  },
+  "errors": [],
+  "packets": [
+    {
+      "packet_key": "9abd8a459ca08545",
+      "source_ref": "src/mcp/tools/repair_tools.ts#sveltekit_import_boundary_check",
+      "feature_id": "da494f2ba39b756c",
+      "file_path": "src/mcp/tools/repair_tools.ts#sveltekit_import_boundary_check",
+      "tree_node_id": "324cdd66-82a0-445d-915b-8c190bcd0441",
+      "neo4j_node_id": "25731",
+      "glyph_record_id": "914c061d-efce-4fe2-9104-24b76093812e",
+      "som_cluster": 58,
+      "identity_lane": "mcp_tool_stub",
+      "evidence_mode": "native"
+    },
+    {
+      "packet_key": "bbae54b7349f74c8",
+      "source_ref": "src/lib/server/ai/llama-tool-definitions.ts#clusters__get_members",
+      "feature_id": "05efaae610671078",
+      "file_path": "src/lib/server/ai/llama-tool-definitions.ts#clusters__get_members",
+      "tree_node_id": "30510edb-6c8a-4b15-a06a-21435f119bf0",
+      "neo4j_node_id": "25533",
+      "glyph_record_id": "42146cc9-a5aa-4a22-92f9-2332a7ded689",
+      "som_cluster": 135,
+      "identity_lane": "mcp_tool_stub",
+      "evidence_mode": "native"
+    },
+    {
+      "packet_key": "146d03550b38f04f",
+      "source_ref": "src/mcp/trace-mcp-server.ts#postgres",
+      "feature_id": "aa8f2dffef6996ee",
+      "file_path": "src/mcp/trace-mcp-server.ts#postgres",
+      "tree_node_id": "945a5ba9-99fa-433d-a645-3dac8578b4df",
+      "neo4j_node_id": "25703",
+      "glyph_record_id": "1a024655-f076-4140-acf9-3dcebcb05db8",
+      "som_cluster": 131,
+      "identity_lane": "mcp_tool_stub",
+      "evidence_mode": "native"
+    }
+  ],
+  "summary": {
+    "status": "PASS",
+    "passes": 8,
+    "failures": 0
+  }
+}

@@ -79,7 +79,7 @@ The next derived surfaces are compare-only until the live contract exists:
 2. deeds/engram optional adapter
 3. Retrieval telemetry and lineage
 4. XGBoost formal reranker
-5. Neo4j contextual tree enrichment + HyperRAG packet RPC
+5. Neo4j GDS topology pass + contextual tree enrichment + HyperRAG packet RPC
 6. Autoencoder / SOM latent topology
 7. Native GEMM / pybind11 deferred
 

@@ -10,18 +10,19 @@
  * Matching strategy (fallback order):
  * 1. payload.packet_key (direct, fast)
  * 2. payload.source_ref / sourceRef / canonical_source_ref (normalized)
- * 3. payload.chunk_id (content-level)
  *
- * Time: ~30 min (for 635K+ points)
- * Blocker: Phase 16-H.1 (schema must exist)
+ * Env vars:
+ *   H4_JSON_PROGRESS=1   emit JSON lines to stdout for PowerShell wrapper
+ *   H4_DRY_RUN=1         skip DB writes (count matches only)
+ *   H4_BATCH_SIZE=100    Qdrant scroll batch size
  */
 
 import pg from 'pg';
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
 import dotenv from 'dotenv';
-import crypto from 'crypto';
 import fetch from 'node-fetch';
+import { normalizeSourceRef } from './lib/normalize-source-ref.mjs';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -29,96 +30,100 @@ const __dirname = dirname(__filename);
 dotenv.config({ path: `${__dirname}/../../.env` });
 
 const pool = new pg.Pool({ connectionString: process.env.DATABASE_URL });
-const QDRANT_URL = process.env.QDRANT_URL || 'http://127.0.0.1:6333';
+const QDRANT_URL      = process.env.QDRANT_URL || 'http://127.0.0.1:6333';
 const COLLECTION_NAME = 'codebase_chunks_768';
+const BATCH_SIZE      = parseInt(process.env.H4_BATCH_SIZE || '100', 10);
+const DRY_RUN         = process.env.H4_DRY_RUN === '1';
+const JSON_PROGRESS   = process.env.H4_JSON_PROGRESS === '1';
 
-const log = {
-  info: (msg) => console.log(`[phase-16-h-4-streaming] ${msg}`),
-  ok: (msg) => console.log(`✅ ${msg}`),
-  error: (msg) => console.error(`❌ ${msg}`),
-  progress: (msg) => console.log(`⏳ ${msg}`),
-};
-
-/**
- * Normalize source_ref for matching across different formats
- */
-function normSourceRef(s = '') {
-  return s
-    .replace(/\\/g, '/')
-    .replace(/^sveltekit-frontend\//, '')
-    .replace(/^\.?\//, '')
-    .trim();
-}
-
-/**
- * Stream-process Qdrant points batch by batch (no buffering)
- */
-async function* streamQdrantPoints(batchSize = 100) {
-  let offset = 0;
-
-  try {
-    while (true) {
-      const response = await fetch(
-        `${QDRANT_URL}/collections/${COLLECTION_NAME}/points/scroll?limit=${batchSize}&offset=${offset}`,
-        { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '{}' }
-      );
-
-      if (!response.ok) {
-        throw new Error(`Qdrant fetch failed: ${response.status} ${response.statusText}`);
+// Emit a structured line — JSON when PS1 wrapper is active, human text otherwise
+function emit(type, data) {
+  if (JSON_PROGRESS) {
+    process.stdout.write(JSON.stringify({ type, ...data }) + '\n');
+  } else {
+    if (type === 'progress') {
+      if (data.processed % 10000 === 0) {
+        process.stderr.write(
+          `⏳ ${data.processed.toLocaleString()} pts | matched=${data.matched} missing=${data.missing} notFound=${data.notFound}\n`
+        );
       }
-
-      const data = await response.json();
-      const batch = data.result?.points || [];
-
-      if (batch.length === 0) break;
-
-      offset += batch.length;
-      yield { batch, offset };
-
-      if (offset % 5000 === 0) {
-        log.progress(`  Fetched ${offset} points...`);
-      }
-    }
-
-    log.ok(`Fetched all ${offset} points`);
-
-  } catch (err) {
-    log.error(`Failed to fetch Qdrant points: ${err.message}`);
-    process.exit(1);
+    } else if (type === 'ok')    { process.stderr.write(`✅ ${data.msg}\n`); }
+    else if (type === 'error')   { process.stderr.write(`❌ ${data.msg}\n`); }
+    else if (type === 'done')    { process.stdout.write(JSON.stringify({ type, ...data }) + '\n'); }
   }
 }
 
-/**
- * Process a batch of Qdrant points, matching to bridge table
- */
-async function processBatch(batch, client) {
-  let matched = 0;
-  let missingKey = 0;
-  let notFound = 0;
+async function* streamQdrantPoints(batchSize) {
+  let offset = null;
+  while (true) {
+    const body = {
+      limit: batchSize,
+      with_payload: true,
+    };
+    if (offset !== null) {
+      body.offset = offset;
+    }
+
+    const response = await fetch(
+      `${QDRANT_URL}/collections/${COLLECTION_NAME}/points/scroll`,
+      { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) }
+    );
+    if (!response.ok) {
+      throw new Error(`Qdrant fetch failed: ${response.status} ${response.statusText}`);
+    }
+    const data  = await response.json();
+    const batch = data.result?.points || [];
+    if (batch.length === 0) break;
+    offset = data.result?.next_page_offset ?? null;
+    yield { batch, offset };
+    if (offset === null) break;
+  }
+}
+
+async function loadBridgeMaps(client) {
+  const result = await client.query(`
+    SELECT packet_key, source_ref
+    FROM atlas_higher_hop_index
+    WHERE packet_key IS NOT NULL
+  `);
+
+  const bySourceRef = new Map();
+  for (const row of result.rows) {
+    const packetKey = String(row.packet_key ?? '').trim();
+    const sourceRef = normalizeSourceRef(String(row.source_ref ?? ''));
+    if (!packetKey || !sourceRef) continue;
+    if (!bySourceRef.has(sourceRef)) bySourceRef.set(sourceRef, []);
+    bySourceRef.get(sourceRef).push(packetKey);
+  }
+
+  return { bySourceRef };
+}
+
+async function processBatch(batch, client, bridges) {
+  let matched = 0, missingKey = 0, notFound = 0;
 
   for (const point of batch) {
     const pointId = point.id;
     const payload = point.payload || {};
 
-    // Try to match by packet_key first (fastest)
-    let packetKey = payload.packet_key;
-    let matchKey = 'packet_key';
+    let packetKey = String(payload.packet_key || payload.packetKey || '').trim();
+    let matchKey  = 'packet_key';
 
     if (!packetKey) {
-      // Try source_ref variants (normalized)
-      const sourceRef = payload.source_ref || payload.sourceRef || payload.canonical_source_ref;
+      const sourceRef =
+        payload.source_ref ||
+        payload.sourceRef ||
+        payload.canonical_source_ref ||
+        payload.canonicalSourceRef ||
+        payload.file_path ||
+        payload.filePath ||
+        payload.path;
       if (sourceRef) {
-        const normRef = normSourceRef(sourceRef);
-        // Query bridge table by normalized source_ref
-        const result = await client.query(
-          `SELECT packet_key FROM atlas_higher_hop_index
-           WHERE LOWER(source_ref) = LOWER($1) OR LOWER(source_ref) = LOWER($2)
-           LIMIT 1`,
-          [sourceRef, normRef]
-        );
-        if (result.rows.length > 0) {
-          packetKey = result.rows[0].packet_key;
-          matchKey = 'source_ref';
+        const normRef = normalizeSourceRef(sourceRef);
+        const candidates = bridges.bySourceRef.get(normRef) || [];
+        if (candidates.length > 0) {
+          packetKey = candidates[0];
+          matchKey  = 'source_ref';
         } else {
           missingKey++;
           continue;
@@ -129,106 +134,89 @@ async function processBatch(batch, client) {
       }
     }
 
-    // Update bridge table with Qdrant discovery
-    const updateResult = await client.query(
-      `UPDATE atlas_higher_hop_index
-       SET
-         qdrant_point_id = $1,
-         qdrant_collection = $2,
-         qdrant_score = 1.0,
-         qdrant_payload_key = $3,
-         updated_at = NOW()
-       WHERE packet_key = $4 AND qdrant_point_id IS NULL`,
-      [String(pointId), COLLECTION_NAME, matchKey, packetKey]
-    );
-
-    if (updateResult.rowCount > 0) {
-      matched++;
+    if (!DRY_RUN) {
+      const updateResult = await client.query(
+        `UPDATE atlas_higher_hop_index
+         SET qdrant_point_id   = $1,
+             qdrant_collection  = $2,
+             qdrant_score       = 1.0,
+             qdrant_payload_key = $3,
+             updated_at         = NOW()
+         WHERE packet_key = $4 AND qdrant_point_id IS NULL`,
+        [String(pointId), COLLECTION_NAME, matchKey, packetKey]
+      );
+      if (updateResult.rowCount > 0) matched++; else notFound++; // notFound = already linked
     } else {
-      notFound++;
+      matched++; // dry-run: count as if matched
     }
   }
 
   return { matched, missingKey, notFound };
 }
 
-/**
- * Main execution
- */
 async function main() {
   const startTime = Date.now();
-  const client = await pool.connect();
+  const client    = await pool.connect();
+  const bridges = await loadBridgeMaps(client);
+
+  let totalMatched  = 0;
+  let totalMissing  = 0;
+  let totalNotFound = 0;
+  let batchCount    = 0;
+  let processed     = 0;
+
+  if (!JSON_PROGRESS) {
+    process.stderr.write(`\n========== Phase 16-H.4: Qdrant Discovery ==========\n`);
+    if (DRY_RUN) process.stderr.write(`DRY RUN — no DB writes\n`);
+    process.stderr.write(`\n`);
+  }
 
   try {
-    log.info('========== Phase 16-H.4: Qdrant Discovery (Streaming) ==========');
-    log.info('');
+    for await (const { batch, offset } of streamQdrantPoints(BATCH_SIZE)) {
+      const { matched, missingKey, notFound } = await processBatch(batch, client, bridges);
 
-    let totalMatched = 0;
-    let totalMissing = 0;
-    let totalNotFound = 0;
-    let batchCount = 0;
-
-    log.progress('Streaming Qdrant points and discovering packets...');
-
-    // Stream-process batches
-    for await (const { batch, offset } of streamQdrantPoints(100)) {
-      const { matched, missingKey, notFound } = await processBatch(batch, client);
-
-      totalMatched += matched;
-      totalMissing += missingKey;
+      totalMatched  += matched;
+      totalMissing  += missingKey;
       totalNotFound += notFound;
       batchCount++;
+      processed += batch.length;
 
-      if (offset % 10000 === 0) {
-        log.progress(`  Processed ${offset} points: matched=${totalMatched}, missing=${totalMissing}, not_found=${totalNotFound}`);
-      }
+      emit('progress', {
+        processed, batchCount,
+        matched:  totalMatched,
+        missing:  totalMissing,
+        notFound: totalNotFound,
+        elapsedMs: Date.now() - startTime,
+      });
     }
 
-    log.info('');
-    log.ok('Qdrant discovery complete:');
-    log.ok(`  Total batches: ${batchCount}`);
-    log.ok(`  Matched: ${totalMatched}`);
-    log.ok(`  Missing packet_key in payload: ${totalMissing}`);
-    log.ok(`  Not found in bridge table: ${totalNotFound}`);
-    log.info('');
-
-    // Audit
-    log.progress('Auditing Qdrant discovery...');
+    // Final audit
     const auditResult = await client.query(`
       SELECT
-        COUNT(*) total,
-        COUNT(CASE WHEN qdrant_point_id IS NOT NULL THEN 1 END) with_qdrant,
-        COUNT(CASE WHEN qdrant_collection = $1 THEN 1 END) with_collection,
-        COUNT(CASE WHEN qdrant_payload_key IS NOT NULL THEN 1 END) with_key
+        COUNT(*) AS total,
+        COUNT(CASE WHEN qdrant_point_id   IS NOT NULL THEN 1 END) AS with_qdrant,
+        COUNT(CASE WHEN qdrant_payload_key IS NOT NULL THEN 1 END) AS with_key
       FROM atlas_higher_hop_index
-    `, [COLLECTION_NAME]);
+    `);
+    const row = auditResult.rows[0];
 
-    const audit = auditResult.rows[0];
-    const qdrantCoverage = (100 * audit.with_qdrant / audit.total).toFixed(1);
-
-    log.ok(`Audit Results:`);
-    log.ok(`  Total rows: ${audit.total}`);
-    log.ok(`  With qdrant_point_id: ${audit.with_qdrant} (${qdrantCoverage}%)`);
-    log.ok(`  With qdrant_collection: ${audit.with_collection}`);
-    log.ok(`  With qdrant_payload_key: ${audit.with_key}`);
-
-    // Gate check
-    if (audit.with_qdrant >= audit.total * 0.95) {
-      log.ok('✅ Qdrant discovery gate PASSED (≥95% coverage)');
-    } else {
-      log.ok(`⚠️  Qdrant discovery gate WARNING: coverage ${qdrantCoverage}% < 95%`);
-      log.ok(`   (${audit.total - audit.with_qdrant} rows still missing)`);
-    }
-
-    log.info('');
-    log.ok('========== Phase 16-H.4 COMPLETE ==========');
-    log.info(`Total time: ${((Date.now() - startTime) / 1000).toFixed(1)}s`);
-    log.info('');
-    log.info('Next step: Run phase-16-h-qdrant-payload-sync.mjs');
-    log.info('(This will backfill packet_key into Qdrant payloads)');
+    emit('done', {
+      processed, batchCount,
+      matched:  totalMatched,
+      missing:  totalMissing,
+      notFound: totalNotFound,
+      elapsedMs: Date.now() - startTime,
+      dryRun: DRY_RUN,
+      audit: {
+        total:       parseInt(row.total),
+        with_qdrant: parseInt(row.with_qdrant),
+        with_key:    parseInt(row.with_key),
+      },
+      gatePassed: parseInt(row.with_qdrant) >= parseInt(row.total) * 0.95,
+    });
 
   } catch (err) {
-    log.error(`Execution failed: ${err.message}`);
+    emit('error', { msg: err.message });
     console.error(err);
     process.exit(1);
   } finally {

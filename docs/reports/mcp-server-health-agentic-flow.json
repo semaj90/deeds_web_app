@@ -1,0 +1,239 @@
+{
+  "generatedAt": "2026-06-15T00:00:00.000Z",
+  "trace_mcp_health": {
+    "ok": true,
+    "url": "http://127.0.0.1:8788",
+    "status": "healthy",
+    "version": "1.0.0",
+    "uptime_seconds": 964.0
+  },
+  "tools_found": 128,
+  "exact_tool_schemas": {
+    "atlas.source_refs": {
+      "description": "Return the top sourceRefs from the compact Atlas packet.",
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "type": "object",
+        "properties": {
+          "query": {
+            "type": "string",
+            "description": "What you are about to work on (code path, feature, question)"
+          },
+          "path": {
+            "description": "Optional file or directory path to keep the packet local",
+            "type": "string"
+          },
+          "limit": {
+            "default": 4,
+            "description": "Max context items per lane",
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 10
+          },
+          "activityLimit": {
+            "default": 24,
+            "description": "How many recent activity log lines to inspect",
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 100
+          },
+          "includeCommunity": {
+            "default": true,
+            "description": "Include community graph context",
+            "type": "boolean"
+          },
+          "includeNotecards": {
+            "default": true,
+            "description": "Include notecard search hits",
+            "type": "boolean"
+          },
+          "includeAgentsMd": {
+            "default": true,
+            "description": "Include nearest AGENTS.md quick hits",
+            "type": "boolean"
+          }
+        },
+        "required": ["query"]
+      }
+    },
+    "kag.feature_lookup": {
+      "description": "Look up which files implement a named feature. Queries the durable feature_implementations + feature_file_edges tables (HyperRAG L9). Returns file paths and entry-point exports for the matched feature.",
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "type": "object",
+        "properties": {
+          "featureName": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 500,
+            "description": "Natural-language feature name or description (e.g. \"hyperedge search\", \"ace context pack\")"
+          },
+          "role": {
+            "default": "all",
+            "description": "Filter by file role",
+            "type": "string",
+            "enum": ["primary", "consumer", "test", "type", "all"]
+          },
+          "limit": {
+            "default": 8,
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 20
+          }
+        },
+        "required": ["featureName"]
+      }
+    },
+    "atlas.packet_search": {
+      "description": "Query the canonical atlas_packets table. Search by source_ref path (variants tried automatically), feature_id, concept_id membership, or free-text summary match. Returns packet_id, source_ref, feature_id, concept_ids, summary, reward_prior. Use this to find which packets are associated with a file or feature before querying Qdrant.",
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "type": "object",
+        "properties": {
+          "source_ref": {
+            "description": "File path (any form: absolute, repo-relative, with/without sveltekit-frontend/ prefix). Variants are tried automatically via canonicalization.",
+            "type": "string"
+          },
+          "feature_id": {
+            "description": "Exact feature_id to filter on.",
+            "type": "string"
+          },
+          "concept_id": {
+            "description": "Filter to packets whose concept_ids array contains this value.",
+            "type": "string"
+          },
+          "summary_query": {
+            "description": "Full-text search against packet summaries.",
+            "type": "string"
+          },
+          "limit": {
+            "default": 20,
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 50
+          }
+        }
+      }
+    }
+  },
+  "test_queries": [
+    {
+      "tool": "atlas.source_refs",
+      "args": {
+        "query": "scripts/atlas/backfill-higher-hop-enrichment.mjs",
+        "limit": 3
+      },
+      "raw_response": {
+        "query": "scripts/atlas/backfill-higher-hop-enrichment.mjs",
+        "sourceRefs": [
+          "C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\logs\\activity\\user.activity.jsonl",
+          "sveltekit-frontend/AGENTS.md",
+          "scripts/wiki/backfill-error-fingerprints.mjs",
+          "scripts/atlas/build-error-fix-dag.mjs",
+          "scripts/atlas/build-rg-search-matrix.mjs"
+        ],
+        "confidence": 0.533,
+        "retrieval_path": [
+          "atlas.compact_context",
+          "context.prefetch_feature_context",
+          "directory-kag",
+          "notecards",
+          "source-refs"
+        ]
+      },
+      "hit_count": 5,
+      "note": "No exact hit for the queried source_ref. Results are fuzzy context neighbours via atlas.compact_context. The target file (scripts/atlas/backfill-higher-hop-enrichment.mjs) is NOT in the index."
+    },
+    {
+      "tool": "kag.feature_lookup",
+      "args": {
+        "featureName": "backfill-higher-hop-enrichment"
+      },
+      "raw_response": {
+        "ok": true,
+        "query": "backfill-higher-hop-enrichment",
+        "count": 0,
+        "trustTier": "T1",
+        "instructionAuthority": false,
+        "results": []
+      },
+      "hit_count": 0,
+      "note": "feature_implementations + feature_file_edges tables have no entry for this feature name. L9 lane is empty for scripts/atlas/* features."
+    },
+    {
+      "tool": "atlas.packet_search",
+      "args": {
+        "source_ref": "scripts/atlas/backfill-higher-hop-enrichment.mjs",
+        "limit": 3
+      },
+      "raw_response": {
+        "count": 0,
+        "packets": [],
+        "filters": {
+          "source_ref": "scripts/atlas/backfill-higher-hop-enrichment.mjs"
+        }
+      },
+      "hit_count": 0,
+      "note": "atlas_packets table is empty (0 rows). SQL fix was applied (artifact_id -> packet_key) and the tool now returns cleanly with no DB error, but there are no rows to return."
+    }
+  ],
+  "raw_l2_results": {
+    "source_ref_resolved": "sveltekit-frontend/AGENTS.md",
+    "feature_id_resolved": null,
+    "packet_key_resolved": null
+  },
+  "identity_hit_count": 0,
+  "identity_miss_count": 3,
+  "packet_search_error_fixed": true,
+  "packet_search_error_was": "column artifact_id does not exist",
+  "packet_search_fix_applied": "replaced artifact_id with packet_key, feature_label, identity_lane, qdrant_point_id, reward_prior in SELECT list at sveltekit-frontend/src/mcp/trace-mcp-server.ts line 8079",
+  "atlas_packets_row_count": 0,
+  "atlas_higher_hop_index_row_count": 3251,
+  "scripts_atlas_indexed": false,
+  "agentic_workflow_engine": {
+    "syntax_check": "PASS",
+    "verbose_flag": "PASS",
+    "l1_rg_hits": 0,
+    "l2_mcp_calls": 3,
+    "l2_source_ref_resolved": "sveltekit-frontend/AGENTS.md",
+    "l2_confidence": 0.533,
+    "retrieval_path": ["atlas.compact_context", "context.prefetch_feature_context", "directory-kag", "notecards", "source-refs"]
+  },
+  "smoke_atlas_tools_mcp": {
+    "checks_passed": 10,
+    "checks_failed": 0,
+    "result": "PASS"
+  },
+  "audit_mcp_tool_ontology": {
+    "tools_found": 128,
+    "namespaces": ["LLMS", "ace", "atlas", "clusters", "codebase", "context", "db", "engram", "evidence", "file", "graph", "hypergraph", "image", "kag", "kb", "knowledge", "legal", "ops", "runtime", "search", "skills", "taxonomy", "tools", "topology", "trace", "turbovec", "ui", "wiki"],
+    "layer_distribution": {
+      "unknown": 41,
+      "graph": 31,
+      "synthesis": 25,
+      "dense": 23,
+      "ops": 13,
+      "cache": 12,
+      "read": 10,
+      "rerank": 8,
+      "lexical": 7,
+      "identity": 5,
+      "memory": 3
+    }
+  },
+  "next_required_indexing_work": [
+    "Backfill atlas_packets from atlas_higher_hop_index (3,251 rows ready) — until this runs, atlas.packet_search always returns count:0",
+    "Index scripts/atlas/* source_refs into the atlas search index — none of the 3,251 higher_hop_index rows are from scripts/atlas/*",
+    "Populate feature_implementations + feature_file_edges for atlas pipeline scripts so kag.feature_lookup returns results",
+    "L2 identity hits will be 0% for all three tools until the backfill runs and scripts/atlas/* files are ingested"
+  ],
+  "summary": {
+    "status": "PASS_WITH_GAPS",
+    "workflow_engine": "PASS",
+    "mcp_tool_schema": "PASS",
+    "packet_transport": "PASS",
+    "retrieval_benchmark": "PASS_WITH_WARNINGS",
+    "smoke_tests": "PASS",
+    "l2_identity_blocker": "atlas_packets empty — needs backfill from atlas_higher_hop_index; scripts/atlas/* not in any search index"
+  }
+}

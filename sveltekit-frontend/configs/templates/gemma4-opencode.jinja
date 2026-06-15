@@ -1,0 +1,22 @@
+{%- set loop_messages = messages -%}
+{%- for message in loop_messages -%}
+{%- if message['role'] == 'system' -%}
+<start_of_turn>user
+{{ message['content'] }}<end_of_turn>
+<start_of_turn>model
+Understood.<end_of_turn>
+{%- elif message['role'] == 'user' -%}
+<start_of_turn>user
+{{ message['content'] }}<end_of_turn>
+<start_of_turn>model
+{%- elif message['role'] == 'assistant' -%}
+{{ message['content'] }}<end_of_turn>
+<start_of_turn>model
+{%- elif message['role'] == 'tool' -%}
+<start_of_turn>user
+```tool_response
+{{ message['content'] }}
+```<end_of_turn>
+<start_of_turn>model
+{%- endif -%}
+{%- endfor -%}

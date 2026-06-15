@@ -1,0 +1,2405 @@
+{
+  "generated_at": "2026-06-15T21:17:41.874Z",
+  "source_url": "http://127.0.0.1:8788/mcp",
+  "total_tools": 128,
+  "namespaces": [
+    "LLMS",
+    "ace",
+    "atlas",
+    "clusters",
+    "codebase",
+    "context",
+    "db",
+    "engram",
+    "evidence",
+    "file",
+    "graph",
+    "hypergraph",
+    "image",
+    "kag",
+    "kb",
+    "knowledge",
+    "legal",
+    "ops",
+    "runtime",
+    "search",
+    "skills",
+    "taxonomy",
+    "tools",
+    "topology",
+    "trace",
+    "turbovec",
+    "ui",
+    "wiki"
+  ],
+  "layer_counts": {
+    "unknown": 41,
+    "identity": 5,
+    "read": 10,
+    "synthesis": 25,
+    "graph": 31,
+    "ops": 13,
+    "dense": 23,
+    "lexical": 7,
+    "cache": 12,
+    "memory": 3,
+    "rerank": 8
+  },
+  "routing_table": {
+    "unknown": [
+      "kb.organize_messy_text",
+      "kb.extract_citations",
+      "kb.trace_search",
+      "atlas.suggest_files",
+      "ui.analyze_view",
+      "skills.list",
+      "skills.run_mission",
+      "legal.get_transcript",
+      "legal.find_precedents",
+      "legal.search_recordings",
+      "legal.score_case",
+      "legal.similar_cases",
+      "legal.write_obsidian_note",
+      "topology.hydration_status",
+      "topology.recompute_manifold_plan",
+      "topology.search_near",
+      "topology.same_som_cluster",
+      "kb.hybrid_search",
+      "kb.search_summary_tree",
+      "kb.search_notecards",
+      "trace.system_health",
+      "topology.search_4d",
+      "clusters.get_members",
+      "trace.explain_retrieval",
+      "trace.kag_search",
+      "context.build_kv_packet",
+      "context.get_compressed_card",
+      "context.explain_compression",
+      "context.refresh_task_toc",
+      "search.dev_context",
+      "kag.record_agent_run",
+      "kag.ingest_memory_directory",
+      "kag.ingest_error",
+      "kag.panel_context",
+      "taxonomy.children",
+      "trace.validate_ace_hit",
+      "knowledge.get_minified_map",
+      "tools.batch_call",
+      "codebase.context_for_file",
+      "runtime.simdjson_status",
+      "runtime.quic_status"
+    ],
+    "identity": [
+      "atlas.query",
+      "atlas.source_refs",
+      "kag.feature_lookup",
+      "atlas.packet_search",
+      "atlas:packet_search"
+    ],
+    "read": [
+      "kb.wiki_note_lookup",
+      "atlas.explain_trace",
+      "atlas.get_chunk",
+      "db.schema_overview",
+      "db.table_inspect",
+      "file.read_window",
+      "wiki.status",
+      "wiki.search",
+      "wiki.refresh_directory",
+      "wiki.explain_page"
+    ],
+    "synthesis": [
+      "kb.archive_synthesis",
+      "legal.cross_examine",
+      "legal.build_timeline",
+      "legal.issue_spotter",
+      "legal.mock_trial",
+      "engram.ace_packet_inject",
+      "graph.semantic_path_synthesis",
+      "kb.explain_context_pack",
+      "hypergraph.semantic_path_synthesis",
+      "kag.recall_similar_fix",
+      "kag.multi_lane_search",
+      "kag.web_search",
+      "LLMS.md.peers_via_relations",
+      "LLMS.md.coverage_chain",
+      "clusters.get_summary_lenses",
+      "LLMS.md.context_for_file",
+      "LLMS.md.peers_for_dir",
+      "LLMS.md.coverage",
+      "LLMS.md.shares_tags",
+      "LLMS.md.binding_chain",
+      "ops.update_LLMS.md",
+      "ops.fixer_semantic_recall",
+      "image.search_by_text",
+      "image.caption",
+      "image.enrich_tags"
+    ],
+    "graph": [
+      "context.prefetch_feature_context",
+      "atlas.compact_context",
+      "atlas.explain_trace",
+      "legal.check_services",
+      "wiki.status",
+      "wiki.search",
+      "wiki.refresh_directory",
+      "wiki.explain_page",
+      "graph.expand_neighborhood",
+      "graph.shortest_path",
+      "graph.semantic_path_synthesis",
+      "graph.community_for_node",
+      "graph.pagerank_top",
+      "topology.search_som_neighborhood",
+      "graph.materialize_pathway",
+      "kb.search_pathways",
+      "hypergraph.semantic_path_synthesis",
+      "trace.graphrag_search",
+      "kag.feature_lookup",
+      "taxonomy.path",
+      "hypergraph.search",
+      "hypergraph.get_edge",
+      "hypergraph.explain_activation",
+      "hypergraph.expand_members",
+      "evidence.link_image_graph",
+      "image.enrich_tags",
+      "ops.gpu_pagerank",
+      "runtime.sse_probe",
+      "ace.compact_search",
+      "atlas.packet_search",
+      "atlas:packet_search"
+    ],
+    "ops": [
+      "ops.execute_graphify",
+      "ops.trust_audit",
+      "ops.propose_patch",
+      "ops.run_targeted_test",
+      "ops.record_fix_attempt",
+      "ops.run_quality_gate",
+      "ops.update_LLMS.md",
+      "ops.fixer_semantic_recall",
+      "ops.fixer_pattern_store",
+      "ops.gpu_attention",
+      "ops.gpu_pagerank",
+      "ops.gpu_topk",
+      "ops.gpu_pipeline_stats"
+    ],
+    "dense": [
+      "legal.batch_ingest",
+      "legal.cross_reference_evidence",
+      "legal.find_similar_opinions",
+      "legal.transcribe_video",
+      "legal.check_services",
+      "wiki.status",
+      "wiki.search",
+      "wiki.explain_page",
+      "search.go_hybrid",
+      "ops.trust_audit",
+      "ops.fixer_semantic_recall",
+      "ops.fixer_pattern_store",
+      "evidence.search_by_image",
+      "evidence.image_feedback",
+      "image.search_by_text",
+      "image.caption",
+      "image.enrich_tags",
+      "atlas.prefilter",
+      "ace.compact_search",
+      "atlas.packet_search",
+      "atlas:packet_search",
+      "atlas.coverage",
+      "atlas:verify_coverage"
+    ],
+    "lexical": [
+      "legal.find_similar_opinions",
+      "search.postgres_fts",
+      "search.hybrid",
+      "search.go_hybrid",
+      "kag.recall_similar_fix",
+      "kag.multi_lane_search",
+      "ace.compact_search"
+    ],
+    "cache": [
+      "legal.transcribe_video",
+      "legal.check_services",
+      "engram.ace_packet_inject",
+      "engram.chat_memory_store",
+      "engram.redis_health",
+      "wiki.status",
+      "wiki.search",
+      "ops.update_LLMS.md",
+      "ops.fixer_semantic_recall",
+      "evidence.image_feedback",
+      "ops.gpu_attention",
+      "ace.compact_search"
+    ],
+    "memory": [
+      "engram.chat_memory_store",
+      "engram.chat_memory_recent",
+      "kag.recall_similar_fix"
+    ],
+    "rerank": [
+      "turbovec.rank_chunks",
+      "search.rerank",
+      "trace.graphrag_search",
+      "search.go_hybrid",
+      "ops.gpu_attention",
+      "atlas.prefilter",
+      "atlas.coverage",
+      "atlas:verify_coverage"
+    ]
+  },
+  "tools": [
+    {
+      "tool_name": "kb.organize_messy_text",
+      "namespace": "kb",
+      "description": "Organize messy text into structured entities and sections.",
+      "retrieval_layer": [
+        "unknown"
+      ],
+      "identity_fields": [],
+      "writes_to": [],
+      "required_permissions": "read_only",
+      "input_schema_keys": [
+        "text",
+        "query"
+      ]
+    },
+    {
+      "tool_name": "kb.extract_citations",
+      "namespace": "kb",
+      "description": "Extract legal citations and statutes from text.",
+      "retrieval_layer": [
+        "unknown"
+      ],
+      "identity_fields": [],
+      "writes_to": [],
+      "required_permissions": "read_only",
+      "input_schema_keys": [
+        "text"
+      ]
+    },
+    {
+      "tool_name": "kb.trace_search",
+      "namespace": "kb",
+      "description": "Search the hypergraph/KAG context for documents, cards, and relations matching a query.",
+      "retrieval_layer": [
+        "unknown"
+      ],
+      "identity_fields": [],
+      "writes_to": [],
+      "required_permissions": "read_only",
+      "input_schema_keys": [
+        "query",
+        "limit",
+        "intent"
+      ]
+    },
+    {
+      "tool_name": "atlas.query",
+      "namespace": "atlas",
+      "description": "Atlas alias for ranked technical search. Returns the same compact hit list as kb.trace_search for a query.",
+      "retrieval_layer": [
+        "identity"
+      ],
+      "identity_fields": [],
+      "writes_to": [],
+      "required_permissions": "read_only",
+      "input_schema_keys": [
+        "query",
+        "limit",
+        "intent"
+      ]
+    },
+    {
+      "tool_name": "kb.wiki_note_lookup",
+      "namespace": "kb",
+      "description": "Look up notes in the wiki.",
+      "retrieval_layer": [
+        "read"
+      ],
+      "identity_fields": [],
+      "writes_to": [],
+      "required_permissions": "read_only",
+      "input_schema_keys": [
+        "query",
+        "limit"
+      ]
+    },
+    {
+      "tool_name": "kb.archive_synthesis",
+      "namespace": "kb",
+      "description": "Archive a synthesis artifact.",
+      "retrieval_layer": [
+        "synthesis"
+      ],
+      "identity_fields": [],
+      "writes_to": [],
+      "required_permissions": "read_only",
+      "input_schema_keys": [
+        "title",
+        "content",
+        "source",
+        "tags"
+      ]
+    },
+    {
+      "tool_name": "context.prefetch_feature_context",
+      "namespace": "context",
+      "description": "Build a prefetch packet for the next feature edit using recent activity, directory KAG context, community graph context, AGENTS.md quick hits, and notecard search results.",
+      "retrieval_layer": [
+        "graph"
+      ],
+      "identity_fields": [],
+      "writes_to": [],
+      "required_permissions": "read_only",
+      "input_schema_keys": [
+        "path",
+        "query",
+        "limit",
+        "activityLimit",
+        "includeCommunity",
+        "includeNotecards",
+        "includeAgentsMd"
+      ]
+    },
+    {
+      "tool_name": "atlas.compact_context",
+      "namespace": "atlas",
+      "description": "Build a compact Atlas context packet with top chunks, sourceRefs, a compressed summary, confidence, and retrieval path.",
+      "retrieval_layer": [
+        "graph"
+      ],
+      "identity_fields": [],
+      "writes_to": [],
+      "required_permissions": "read_only",
+      "input_schema_keys": [
+        "query",
+        "path",
+        "limit",
+        "activityLimit",
+        "includeCommunity",
+        "includeNotecards",
+        "includeAgentsMd"
+      ]
+    },
+    {
+      "tool_name": "atlas.source_refs",
+      "namespace": "atlas",
+      "description": "Return the top sourceRefs from the compact Atlas packet.",
+      "retrieval_layer": [
+        "identity"
+      ],
+      "identity_fields": [
+        "source_ref"
+      ],
+      "writes_to": [],
+      "required_permissions": "read_only",
+      "input_schema_keys": [
+        "query",
+        "path",
+        "limit",
+        "activityLimit",
+        "includeCommunity",
+        "includeNotecards",
+        "includeAgentsMd"
+      ]
+    },
+    {
+      "tool_name": "atlas.suggest_files",
+      "namespace": "atlas",
+      "description": "Return the top suggested files from the compact Atlas packet.",
+      "retrieval_layer": [
+        "unknown"
+      ],
+      "identity_fields": [],
+      "writes_to": [],
+      "required_permissions": "read_only",
+      "input_schema_keys": [
+        "query",
+        "path",
+        "limit",
+        "activityLimit",
+        "includeCommunity",
+        "includeNotecards",
+        "includeAgentsMd"
+      ]
+    },
+    {
+      "tool_name": "atlas.explain_trace",
+      "namespace": "atlas",
+      "description": "Return the compact summary and retrieval path for the current Atlas packet.",
+      "retrieval_layer": [
+        "graph",
+        "read"
+      ],
+      "identity_fields": [],
+      "writes_to": [],
+      "required_permissions": "read_only",
+      "input_schema_keys": [
+        "query",
+        "path",
+        "limit",
+        "activityLimit",
+        "includeCommunity",
+        "includeNotecards",
+        "includeAgentsMd"
+      ]
+    },
+    {
+      "tool_name": "atlas.get_chunk",
+      "namespace": "atlas",
+      "description": "Return a chunk from the compact Atlas chunk index, optionally prioritizing a chunkId, chunkIndex, or sourceRef.",
+      "retrieval_layer": [
+        "read"
+      ],
+      "identity_fields": [],
+      "writes_to": [],
+      "required_permissions": "read_only",
+      "input_schema_keys": [
+        "query",
+        "path",
+        "limit",
+        "activityLimit",
+        "includeCommunity",
+        "includeNotecards",
+        "includeAgentsMd",
+        "chunkId",
+        "chunkIndex",
+        "sourceRef"
+      ]
+    },
+    {
+      "tool_name": "ui.analyze_view",
+      "namespace": "ui",
+      "description": "Analyzes the current UI state based on a provided snapshot.",
+      "retrieval_layer": [
+        "unknown"
+      ],
+      "identity_fields": [],
+      "writes_to": [],
+      "required_permissions": "read_only",
+      "input_schema_keys": [
+        "snapshot",
+        "focus"
+      ]
+    },
+    {
+      "tool_name": "ops.execute_graphify",
+      "namespace": "ops",
+      "description": "Executes an authorized graphify pipeline command.",
+      "retrieval_layer": [
+        "ops"
+      ],
+      "identity_fields": [],
+      "writes_to": [],
+      "required_permissions": "read_only",
+      "input_schema_keys": [
+        "command",
+        "confirm"
+      ]
+    },
+    {
+      "tool_name": "skills.list",
+      "namespace": "skills",
+      "description": "Filter skills by name or description.",
+      "retrieval_layer": [
+        "unknown"
+      ],
+      "identity_fields": [],
+      "writes_to": [],
+      "required_permissions": "read_only",
+      "input_schema_keys": [
+        "query"
+      ]
+    },
+    {
+      "tool_name": "skills.run_mission",
+      "namespace": "skills",
+      "description": "Execute a specialized autonomous skill mission.",
+      "retrieval_layer": [
+        "unknown"
+      ],
+      "identity_fields": [],
+      "writes_to": [],
+      "required_permissions": "read_only",
+      "input_schema_keys": [
+        "skillName",
+        "mission",
+        "input"
+      ]
+    },
+    {
+      "tool_name": "legal.get_transcript",
+      "namespace": "legal",
+      "description": "Retrieve the Whisper transcript for an audio/video evidence item that has already been processed. Returns the full text plus any extracted speaker segments. Use legal.search_recordings for timestamped search.",
+      "retrieval_layer": [
+        "unknown"
+      ],
+      "identity_fields": [],
+      "writes_to": [],
+      "required_permissions": "read_only",
+      "input_schema_keys": [
+        "evidenceId",
+        "includeSegments"
+      ]
+    },
+    {
+      "tool_name": "legal.find_precedents",
+      "namespace": "legal",
+      "description": "Semantic + full-text search across legal precedents, case opinions, and rulings. Returns ranked results with citation, court, and summary. Use for \"find cases about X\" or \"what precedents apply to Y\".",
+      "retrieval_layer": [
+        "unknown"
+      ],
+      "identity_fields": [],
+      "writes_to": [],
+      "required_permissions": "read_only",
+      "input_schema_keys": [
+        "query",
+        "court",
+        "caseId",
+        "limit"
+      ]
+    },
+    {
+      "tool_name": "legal.search_recordings",
+      "namespace": "legal",
+      "description": "Timestamp-aware semantic search across Whisper audio segments. Returns matching segments with start/end times so prosecutors can jump to the exact moment in a recording. Great for \"find when the witness said X\".",
+      "retrieval_layer": [
+        "unknown"
+      ],
+      "identity_fields": [],
+      "writes_to": [],
+      "required_permissions": "read_only",
+      "input_schema_keys": [
+        "query",
+        "caseId",
+        "evidenceId",
+        "limit"
+      ]
+    },
+    {
+      "tool_name": "legal.cross_examine",
+      "namespace": "legal",
+      "description": "Generate strategic cross-examination questions for a witness using Gemma4. Analyzes the witness statement and case context to surface inconsistencies and credibility challenges. Returns 5-10 questions with purpose and expected answers.",
+      "retrieval_layer": [
+        "synthesis"
+      ],
+      "identity_fields": [],
+      "writes_to": [],
+      "required_permissions": "read_only",
+      "input_schema_keys": [
+        "witnessName",
+        "witnessStatement",
+        "caseContext"
+      ]
+    },
+    {
+      "tool_name": "legal.score_case",
+      "namespace": "legal",
+      "description": "Compute an evidence-weighted case strength score (0-100) for a given case. Factors: evidence count (×10, max 40), witness count (×8, max 24), documentation quality (15), and active-status bonus (10). Use to prioritize which cases need more evidence.",
+      "retrieval_layer": [
+        "unknown"
+      ],
+      "identity_fields": [],
+      "writes_to": [],
+      "required_permissions": "read_only",
+      "input_schema_keys": [
+        "caseId"
+      ]
+    },
+    {
+      "tool_name": "legal.similar_cases",
+      "namespace": "legal",
+      "description": "Find cases similar to a given case using PostgreSQL full-text similarity on case title and description. Returns up to 20 similar cases with a similarity score. Use to cross-reference prior cases and find related judgements.",
+      "retrieval_layer": [
+        "unknown"
+      ],
+      "identity_fields": [],
+      "writes_to": [],
+      "required_permissions": "read_only",
+      "input_schema_keys": [
+        "caseId",
+        "limit"
+      ]
+    },
+    {
+      "tool_name": "legal.batch_ingest",
+      "namespace": "legal",
+      "description": "Publish one or more document URLs to the document.embed RabbitMQ queue for background embedding and indexing. Use to bulk-ingest case documents, transcripts, or external evidence without blocking the agent loop.",
+      "retrieval_layer": [
+        "dense"
+      ],
+      "identity_fields": [],
+      "writes_to": [],
+      "required_permissions": "read_only",
+      "input_schema_keys": [
+        "documentUrls",
+        "caseId",
+        "priority"
+      ]
+    },
+    {
+      "tool_name": "legal.build_timeline",
+      "namespace": "legal",
+      "description": "Extract a chronological timeline of events from all evidence associated with a case using Gemma4 NER. Returns TimelineEvent[] with time, who[], what, location, evidenceId, and confidence. Essential for prosecution theory of case and demonstrative exhibits.",
+      "retrieval_layer": [
+        "synthesis"
+      ],
+      "identity_fields": [],
+      "writes_to": [],
+      "required_permissions": "read_only",
+      "input_schema_keys": [
+        "caseId",
+        "maxEvents"
+      ]
+    },
+    {
+      "tool_name": "legal.cross_reference_evidence",
+      "namespace": "legal",
+      "description": "Semantic cross-reference: find evidence chunks similar to a reference evidence item across one or more cases using Qdrant ANN. Use for \"has this fingerprint/phrase/pattern appeared in another case?\" Returns top-K matches with case_id and similarity score.",
+      "retrieval_layer": [
+        "dense"
+      ],
+      "identity_fields": [],
+      "writes_to": [],
+      "required_permissions": "read_only",
+      "input_schema_keys": [
+        "evidenceId",
+        "caseIds",
+        "topK"
+      ]
+    },
+    {
+      "tool_name": "legal.issue_spotter",
+      "namespace": "legal",
+      "description": "Gemma4 legal issue analysis: identifies legal issues, applicable statutes, strengths, weaknesses, missing evidence, and recommended next steps for a case. Use at case intake or before trial prep.",
+      "retrieval_layer": [
+        "synthesis"
+      ],
+      "identity_fields": [],
+      "writes_to": [],
+      "required_permissions": "read_only",
+      "input_schema_keys": [
+        "caseId",
+        "additionalContext"
+      ]
+    },
+    {
+      "tool_name": "legal.find_similar_opinions",
+      "namespace": "legal",
+      "description": "Find similar case opinions, judgments, and rulings via Qdrant semantic search on the legal_documents collection filtered to doc_type opinion/judgment/ruling. Embeds the facts summary via /api/embed then runs ANN. Falls back to Postgres FTS on Qdrant error.",
+      "retrieval_layer": [
+        "lexical",
+        "dense"
+      ],
+      "identity_fields": [],
+      "writes_to": [],
+      "required_permissions": "read_only",
+      "input_schema_keys": [
+        "factsSummary",
+        "chargeCode",
+        "limit"
+      ]
+    },
+    {
+      "tool_name": "legal.transcribe_video",
+      "namespace": "legal",
+      "description": "Queue a video URL for non-blocking background processing via RabbitMQ: yt-dlp download → FFmpeg audio extraction → Whisper large-v3 transcription → timestamp-chunked embedding into Qdrant evidence_items. Returns a job_id. Poll Redis key hermes:job:{jobId} for progress. Supports YouTube, direct MP4, Vimeo.",
+      "retrieval_layer": [
+        "cache",
+        "dense"
+      ],
+      "identity_fields": [],
+      "writes_to": [],
+      "required_permissions": "read_only",
+      "input_schema_keys": [
+        "url",
+        "caseId",
+        "priority",
+        "timestampChunking"
+      ]
+    },
+    {
+      "tool_name": "legal.write_obsidian_note",
+      "namespace": "legal",
+      "description": "Write or append a markdown note to the Obsidian vault via the Local REST API plugin (requires Obsidian running at ENV.OBSIDIAN_URL with OBSIDIAN_API_KEY set). Creates parent folders automatically. Use to persist case summaries, timelines, mock trial reports, and cross-examination prep.",
+      "retrieval_layer": [
+        "unknown"
+      ],
+      "identity_fields": [],
+      "writes_to": [],
+      "required_permissions": "read_only",
+      "input_schema_keys": [
+        "path",
+        "content",
+        "tags",
+        "append"
+      ]
+    },
+    {
+      "tool_name": "legal.mock_trial",
+      "namespace": "legal",
+      "description": "Multi-role mock trial simulation using Gemma4. Prosecution makes an opening statement, defense counters, then a judge delivers a ruling with evidence admissibility analysis and verdict probability. Returns all statements plus prosecution/defense scores and key weaknesses. For pre-trial preparation only — not for evidentiary conclusions.",
+      "retrieval_layer": [
+        "synthesis"
+      ],
+      "identity_fields": [],
+      "writes_to": [],
+      "required_permissions": "read_only",
+      "input_schema_keys": [
+        "caseId",
+        "chargeDescription",
+        "defenseTheory"
+      ]
+    },
+    {
+      "tool_name": "legal.check_services",
+      "namespace": "legal",
+      "description": "Probe all 9 backing services (Postgres, Redis, Qdrant, Neo4j, Ollama, RabbitMQ, CouchDB, SeaweedFS, Obsidian) and report health status with latency. Use to diagnose why other tools are returning errors.",
+      "retrieval_layer": [
+        "cache",
+        "dense",
+        "graph"
+      ],
+      "identity_fields": [],
+      "writes_to": [],
+      "required_permissions": "read_only",
+      "input_schema_keys": []
+    },
+    {
+      "tool_name": "engram.ace_packet_inject",
+      "namespace": "engram",
+      "description": "Write ACE context packet to Redis with 1h TTL: ace:packet:{runId}.",
+      "retrieval_layer": [
+        "cache",
+        "synthesis"
+      ],
+      "identity_fields": [],
+      "writes_to": [
+        "engram"
+      ],
+      "required_permissions": "read_write",
+      "input_schema_keys": [
+        "run_id",
+        "context_blob",
+        "ttl_seconds"
+      ]
+    },
+    {
+      "tool_name": "engram.chat_memory_store",
+      "namespace": "engram",
+      "description": "Append a chat turn to user memory store (Redis sorted set + bounded trim).",
+      "retrieval_layer": [
+        "cache",
+        "memory"
+      ],
+      "identity_fields": [],
+      "writes_to": [
+        "engram"
+      ],
+      "required_permissions": "read_write",
+      "input_schema_keys": [
+        "user_id",
+        "turn",
+        "max_turns",
+        "ttl_seconds"
+      ]
+    },
+    {
+      "tool_name": "engram.redis_health",
+      "namespace": "engram",
+      "description": "Check Redis availability used by engram memory tools.",
+      "retrieval_layer": [
+        "cache"
+      ],
+      "identity_fields": [],
+      "writes_to": [
+        "redis"
+      ],
+      "required_permissions": "read_write",
+      "input_schema_keys": []
+    },
+    {
+      "tool_name": "topology.hydration_status",
+      "namespace": "topology",
+      "description": "Returns a diagnostic overview of topological hydration coverage.",
+      "retrieval_layer": [
+        "unknown"
+      ],
+      "identity_fields": [],
+      "writes_to": [],
+      "required_permissions": "read_only",
+      "input_schema_keys": []
+    },
+    {
+      "tool_name": "topology.recompute_manifold_plan",
+      "namespace": "topology",
+      "description": "Provides a recommended plan for restoring topological hydration.",
+      "retrieval_layer": [
+        "unknown"
+      ],
+      "identity_fields": [],
+      "writes_to": [],
+      "required_permissions": "read_only",
+      "input_schema_keys": []
+    },
+    {
+      "tool_name": "db.schema_overview",
+      "namespace": "db",
+      "description": "Lists every table in the public schema with row estimate + structural flags.",
+      "retrieval_layer": [
+        "read"
+      ],
+      "identity_fields": [],
+      "writes_to": [
+        "postgres"
+      ],
+      "required_permissions": "read_write",
+      "input_schema_keys": [
+        "include_row_estimates",
+        "schema"
+      ]
+    },
+    {
+      "tool_name": "db.table_inspect",
+      "namespace": "db",
+      "description": "Returns columns + indexes + foreign keys for one table. No row data.",
+      "retrieval_layer": [
+        "read"
+      ],
+      "identity_fields": [],
+      "writes_to": [
+        "postgres"
+      ],
+      "required_permissions": "read_write",
+      "input_schema_keys": [
+        "table",
+        "schema",
+        "include_columns",
+        "include_indexes",
+        "include_foreign_keys"
+      ]
+    },
+    {
+      "tool_name": "file.read_window",
+      "namespace": "file",
+      "description": "Reads a bounded window/range of lines from a file. Highly recommended for reading large markdown (.md) or JSON files to avoid context bloating.",
+      "retrieval_layer": [
+        "read"
+      ],
+      "identity_fields": [],
+      "writes_to": [],
+      "required_permissions": "read_only",
+      "input_schema_keys": [
+        "path",
+        "startLine",
+        "endLine",
+        "maxChars"
+      ]
+    },
+    {
+      "tool_name": "wiki.status",
+      "namespace": "wiki",
+      "description": "Returns Karpathy/AGENTS wiki status across Postgres, Redis, CouchDB, Qdrant, Neo4j, and graphify metadata.",
+      "retrieval_layer": [
+        "cache",
+        "dense",
+        "graph",
+        "read"
+      ],
+      "identity_fields": [],
+      "writes_to": [],
+      "required_permissions": "read_only",
+      "input_schema_keys": []
+    },
+    {
+      "tool_name": "wiki.search",
+      "namespace": "wiki",
+      "description": "Hybrid wiki search over rg/codebase-graph metadata, Redis Karpathy scores, Qdrant payloads, CouchDB wiki docs, and Postgres JSONB mappings.",
+      "retrieval_layer": [
+        "cache",
+        "dense",
+        "graph",
+        "read"
+      ],
+      "identity_fields": [],
+      "writes_to": [],
+      "required_permissions": "read_only",
+      "input_schema_keys": [
+        "query",
+        "limit"
+      ]
+    },
+    {
+      "tool_name": "wiki.refresh_directory",
+      "namespace": "wiki",
+      "description": "Refreshes one AGENTS/Karpathy directory card. Defaults to dryRun=true and does not start a full re-index.",
+      "retrieval_layer": [
+        "graph",
+        "read"
+      ],
+      "identity_fields": [],
+      "writes_to": [],
+      "required_permissions": "read_only",
+      "input_schema_keys": [
+        "path",
+        "dryRun"
+      ]
+    },
+    {
+      "tool_name": "wiki.explain_page",
+      "namespace": "wiki",
+      "description": "Explains one wiki page with source files, imports, path aliases, feature keys, Qdrant tags, graph links, activity score, recommendations, and related FeatureMaps.",
+      "retrieval_layer": [
+        "dense",
+        "graph",
+        "read"
+      ],
+      "identity_fields": [],
+      "writes_to": [],
+      "required_permissions": "read_only",
+      "input_schema_keys": [
+        "id"
+      ]
+    },
+    {
+      "tool_name": "graph.expand_neighborhood",
+      "namespace": "graph",
+      "description": "Expands graph neighborhood from sourceRefs (read-only). Supports legacy stableKey/depth args for backward compatibility.",
+      "retrieval_layer": [
+        "graph"
+      ],
+      "identity_fields": [],
+      "writes_to": [
+        "neo4j"
+      ],
+      "required_permissions": "read_write",
+      "input_schema_keys": [
+        "sourceRefs",
+        "stableKey",
+        "depth",
+        "maxHops",
+        "limit",
+        "query",
+        "route",
+        "symbol",
+        "filePath"
+      ]
+    },
+    {
+      "tool_name": "turbovec.rank_chunks",
+      "namespace": "turbovec",
+      "description": "Read-only RotorQuant blended rerank for sourceRefs. No writes.",
+      "retrieval_layer": [
+        "rerank"
+      ],
+      "identity_fields": [],
+      "writes_to": [],
+      "required_permissions": "read_only",
+      "input_schema_keys": [
+        "query",
+        "sourceRefs",
+        "limit",
+        "trustBuckets",
+        "trustTiers",
+        "recency",
+        "vectorScores",
+        "graphScores"
+      ]
+    },
+    {
+      "tool_name": "engram.chat_memory_recent",
+      "namespace": "engram",
+      "description": "Read-only recent chat memory lookup from engram_cards.",
+      "retrieval_layer": [
+        "memory"
+      ],
+      "identity_fields": [],
+      "writes_to": [],
+      "required_permissions": "read_only",
+      "input_schema_keys": [
+        "userId",
+        "sourceRefs",
+        "limit"
+      ]
+    },
+    {
+      "tool_name": "graph.shortest_path",
+      "namespace": "graph",
+      "description": "Finds the shortest path between two graph nodes.",
+      "retrieval_layer": [
+        "graph"
+      ],
+      "identity_fields": [],
+      "writes_to": [
+        "neo4j"
+      ],
+      "required_permissions": "read_write",
+      "input_schema_keys": [
+        "fromKey",
+        "toKey",
+        "maxHops"
+      ]
+    },
+    {
+      "tool_name": "graph.semantic_path_synthesis",
+      "namespace": "graph",
+      "description": "Synthesizes a semantic narrative along the shortest structural path between nodes.",
+      "retrieval_layer": [
+        "graph",
+        "synthesis"
+      ],
+      "identity_fields": [],
+      "writes_to": [],
+      "required_permissions": "read_only",
+      "input_schema_keys": [
+        "startKey",
+        "endKey",
+        "maxHops"
+      ]
+    },
+    {
+      "tool_name": "graph.community_for_node",
+      "namespace": "graph",
+      "description": "Returns the community/cluster membership for a specific node.",
+      "retrieval_layer": [
+        "graph"
+      ],
+      "identity_fields": [],
+      "writes_to": [
+        "neo4j"
+      ],
+      "required_permissions": "read_write",
+      "input_schema_keys": [
+        "stableKey"
+      ]
+    },
+    {
+      "tool_name": "graph.pagerank_top",
+      "namespace": "graph",
+      "description": "Lists the top authoritative nodes in the graph by PageRank score.",
+      "retrieval_layer": [
+        "graph"
+      ],
+      "identity_fields": [],
+      "writes_to": [],
+      "required_permissions": "read_only",
+      "input_schema_keys": [
+        "limit",
+        "nodeType"
+      ]
+    },
+    {
+      "tool_name": "topology.search_near",
+      "namespace": "topology",
+      "description": "Semantic search for nodes within a 4D topology radius.",
+      "retrieval_layer": [
+        "unknown"
+      ],
+      "identity_fields": [],
+      "writes_to": [],
+      "required_permissions": "read_only",
+      "input_schema_keys": [
+        "query",
+        "radius",
+        "limit",
+        "somCluster"
+      ]
+    },
+    {
+      "tool_name": "topology.same_som_cluster",
+      "namespace": "topology",
+      "description": "Returns other nodes in the same SOM cluster as the reference node.",
+      "retrieval_layer": [
+        "unknown"
+      ],
+      "identity_fields": [],
+      "writes_to": [],
+      "required_permissions": "read_only",
+      "input_schema_keys": [
+        "stableKey",
+        "limit"
+      ]
+    },
+    {
+      "tool_name": "topology.search_som_neighborhood",
+      "namespace": "topology",
+      "description": "Searches for nodes in the SOM grid neighborhood of an anchored query.",
+      "retrieval_layer": [
+        "graph"
+      ],
+      "identity_fields": [],
+      "writes_to": [],
+      "required_permissions": "read_only",
+      "input_schema_keys": [
+        "query",
+        "radius",
+        "limit",
+        "jsonFilter"
+      ]
+    },
+    {
+      "tool_name": "kb.hybrid_search",
+      "namespace": "kb",
+      "description": "Performs hybrid (lexical + semantic) search across KAG context.",
+      "retrieval_layer": [
+        "unknown"
+      ],
+      "identity_fields": [],
+      "writes_to": [],
+      "required_permissions": "read_only",
+      "input_schema_keys": [
+        "query",
+        "jsonFilter",
+        "limit"
+      ]
+    },
+    {
+      "tool_name": "graph.materialize_pathway",
+      "namespace": "graph",
+      "description": "Materializes a synthesized pathway into the persistent hypergraph context.",
+      "retrieval_layer": [
+        "graph"
+      ],
+      "identity_fields": [],
+      "writes_to": [],
+      "required_permissions": "read_only",
+      "input_schema_keys": [
+        "startKey",
+        "endKey",
+        "summary",
+        "pathSteps",
+        "citationSpans",
+        "pagerankScore"
+      ]
+    },
+    {
+      "tool_name": "kb.search_pathways",
+      "namespace": "kb",
+      "description": "Searches for previously synthesized and materialized pathways.",
+      "retrieval_layer": [
+        "graph"
+      ],
+      "identity_fields": [],
+      "writes_to": [],
+      "required_permissions": "read_only",
+      "input_schema_keys": [
+        "query",
+        "limit"
+      ]
+    },
+    {
+      "tool_name": "kb.search_summary_tree",
+      "namespace": "kb",
+      "description": "RAPTOR-style hierarchical search across per-chunk lens, cluster narrative, and directory-card summary tiers.",
+      "retrieval_layer": [
+        "unknown"
+      ],
+      "identity_fields": [],
+      "writes_to": [],
+      "required_permissions": "read_only",
+      "input_schema_keys": [
+        "query",
+        "lensTopK",
+        "clusterTopK",
+        "dirTopK",
+        "lensType"
+      ]
+    },
+    {
+      "tool_name": "kb.search_notecards",
+      "namespace": "kb",
+      "description": "Searches for identity-spine notecards matching a query.",
+      "retrieval_layer": [
+        "unknown"
+      ],
+      "identity_fields": [],
+      "writes_to": [],
+      "required_permissions": "read_only",
+      "input_schema_keys": [
+        "query",
+        "limit"
+      ]
+    },
+    {
+      "tool_name": "kb.explain_context_pack",
+      "namespace": "kb",
+      "description": "Explains the retrieval provenance and assembly logic for a generated context pack.",
+      "retrieval_layer": [
+        "synthesis"
+      ],
+      "identity_fields": [],
+      "writes_to": [],
+      "required_permissions": "read_only",
+      "input_schema_keys": [
+        "query",
+        "hybridSearch",
+        "pathwaySearch",
+        "notecardSearch",
+        "rerankResults",
+        "topologyNeighborhood"
+      ]
+    },
+    {
+      "tool_name": "trace.system_health",
+      "namespace": "trace",
+      "description": "Returns the health and latency status of all backend retrieval and inference services.",
+      "retrieval_layer": [
+        "unknown"
+      ],
+      "identity_fields": [],
+      "writes_to": [],
+      "required_permissions": "read_only",
+      "input_schema_keys": []
+    },
+    {
+      "tool_name": "search.rerank",
+      "namespace": "search",
+      "description": "Reranks a list of document snippets for relevance to a query using llama-server.",
+      "retrieval_layer": [
+        "rerank"
+      ],
+      "identity_fields": [],
+      "writes_to": [],
+      "required_permissions": "read_only",
+      "input_schema_keys": [
+        "query",
+        "documents",
+        "topN"
+      ]
+    },
+    {
+      "tool_name": "hypergraph.semantic_path_synthesis",
+      "namespace": "hypergraph",
+      "description": "Synthesizes a semantic narrative along a path in the hypergraph.",
+      "retrieval_layer": [
+        "graph",
+        "synthesis"
+      ],
+      "identity_fields": [],
+      "writes_to": [],
+      "required_permissions": "read_only",
+      "input_schema_keys": [
+        "startKey",
+        "endKey"
+      ]
+    },
+    {
+      "tool_name": "topology.search_4d",
+      "namespace": "topology",
+      "description": "Explicit 4D manifold coordinate search with optional JSONB payload filters.",
+      "retrieval_layer": [
+        "unknown"
+      ],
+      "identity_fields": [],
+      "writes_to": [],
+      "required_permissions": "read_only",
+      "input_schema_keys": [
+        "som_x",
+        "som_y",
+        "semantic_z",
+        "grpo_w",
+        "radius",
+        "limit",
+        "filters"
+      ]
+    },
+    {
+      "tool_name": "clusters.get_members",
+      "namespace": "clusters",
+      "description": "Returns the member nodes for a specific cluster.",
+      "retrieval_layer": [
+        "unknown"
+      ],
+      "identity_fields": [],
+      "writes_to": [],
+      "required_permissions": "read_only",
+      "input_schema_keys": [
+        "clusterKey",
+        "limit"
+      ]
+    },
+    {
+      "tool_name": "trace.explain_retrieval",
+      "namespace": "trace",
+      "description": "Explains the retrieval trace for a specific query.",
+      "retrieval_layer": [
+        "unknown"
+      ],
+      "identity_fields": [],
+      "writes_to": [],
+      "required_permissions": "read_only",
+      "input_schema_keys": [
+        "query"
+      ]
+    },
+    {
+      "tool_name": "search.postgres_fts",
+      "namespace": "search",
+      "description": "Code search using PostgreSQL Full Text Search.",
+      "retrieval_layer": [
+        "lexical"
+      ],
+      "identity_fields": [],
+      "writes_to": [],
+      "required_permissions": "read_only",
+      "input_schema_keys": [
+        "query",
+        "limit",
+        "topo_class"
+      ]
+    },
+    {
+      "tool_name": "search.hybrid",
+      "namespace": "search",
+      "description": "Performs hybrid (FTS + semantic) search across the codebase.",
+      "retrieval_layer": [
+        "lexical"
+      ],
+      "identity_fields": [],
+      "writes_to": [],
+      "required_permissions": "read_only",
+      "input_schema_keys": [
+        "query",
+        "limit",
+        "topo_class",
+        "mode"
+      ]
+    },
+    {
+      "tool_name": "trace.kag_search",
+      "namespace": "trace",
+      "description": "High-performance KAG-DAG retrieval: Go retrieval service → SvelteKit proxy → Postgres fallback.",
+      "retrieval_layer": [
+        "unknown"
+      ],
+      "identity_fields": [],
+      "writes_to": [],
+      "required_permissions": "read_only",
+      "input_schema_keys": [
+        "query",
+        "limit",
+        "topo_class"
+      ]
+    },
+    {
+      "tool_name": "trace.graphrag_search",
+      "namespace": "trace",
+      "description": "GraphRAG hybrid retrieval: dense+sparse RRF prefetch → Neo4j graph expansion → Karpathy blend rerank.",
+      "retrieval_layer": [
+        "graph",
+        "rerank"
+      ],
+      "identity_fields": [],
+      "writes_to": [],
+      "required_permissions": "read_only",
+      "input_schema_keys": [
+        "query",
+        "denseTopK",
+        "sparseTopK",
+        "graphDepth",
+        "finalTopK",
+        "topo_class"
+      ]
+    },
+    {
+      "tool_name": "search.go_hybrid",
+      "namespace": "search",
+      "description": "Go search service RRF fusion of FTS + pgvector + Qdrant.",
+      "retrieval_layer": [
+        "lexical",
+        "dense",
+        "rerank"
+      ],
+      "identity_fields": [],
+      "writes_to": [],
+      "required_permissions": "read_only",
+      "input_schema_keys": [
+        "query",
+        "limit",
+        "type",
+        "filters"
+      ]
+    },
+    {
+      "tool_name": "context.build_kv_packet",
+      "namespace": "context",
+      "description": "Assembles a context packet of compressed file cards for a specific task.",
+      "retrieval_layer": [
+        "unknown"
+      ],
+      "identity_fields": [],
+      "writes_to": [],
+      "required_permissions": "read_only",
+      "input_schema_keys": [
+        "taskId",
+        "query",
+        "hotFiles",
+        "hotSymbols",
+        "blockedAreas",
+        "maxInputTokens"
+      ]
+    },
+    {
+      "tool_name": "context.get_compressed_card",
+      "namespace": "context",
+      "description": "Returns a compressed context card for a specific file or trace.",
+      "retrieval_layer": [
+        "unknown"
+      ],
+      "identity_fields": [],
+      "writes_to": [],
+      "required_permissions": "read_only",
+      "input_schema_keys": [
+        "stableKey"
+      ]
+    },
+    {
+      "tool_name": "context.explain_compression",
+      "namespace": "context",
+      "description": "Explains the compression logic and token budget for a specific task packet.",
+      "retrieval_layer": [
+        "unknown"
+      ],
+      "identity_fields": [],
+      "writes_to": [],
+      "required_permissions": "read_only",
+      "input_schema_keys": [
+        "taskId"
+      ]
+    },
+    {
+      "tool_name": "context.refresh_task_toc",
+      "namespace": "context",
+      "description": "Refreshes the Table of Contents for a specific task context.",
+      "retrieval_layer": [
+        "unknown"
+      ],
+      "identity_fields": [],
+      "writes_to": [],
+      "required_permissions": "read_only",
+      "input_schema_keys": [
+        "taskId",
+        "hotFiles",
+        "hotSymbols",
+        "blockedAreas"
+      ]
+    },
+    {
+      "tool_name": "search.dev_context",
+      "namespace": "search",
+      "description": "Returns codebase chunks for coding and debugging prompts.",
+      "retrieval_layer": [
+        "unknown"
+      ],
+      "identity_fields": [],
+      "writes_to": [],
+      "required_permissions": "read_only",
+      "input_schema_keys": [
+        "query",
+        "filePath",
+        "limit",
+        "topo_class"
+      ]
+    },
+    {
+      "tool_name": "kag.record_agent_run",
+      "namespace": "kag",
+      "description": "Records an autonomous agent run artifact to memory.",
+      "retrieval_layer": [
+        "unknown"
+      ],
+      "identity_fields": [],
+      "writes_to": [],
+      "required_permissions": "read_only",
+      "input_schema_keys": [
+        "taskId",
+        "errorSummary",
+        "files",
+        "tags",
+        "confidence",
+        "patchResult",
+        "researchNotes",
+        "needsDeepResearch"
+      ]
+    },
+    {
+      "tool_name": "kag.ingest_memory_directory",
+      "namespace": "kag",
+      "description": "Ingests agent run records from the memory directory into the database.",
+      "retrieval_layer": [
+        "unknown"
+      ],
+      "identity_fields": [],
+      "writes_to": [],
+      "required_permissions": "read_only",
+      "input_schema_keys": [
+        "dir",
+        "dryRun",
+        "limit",
+        "moveProcessed"
+      ]
+    },
+    {
+      "tool_name": "kag.ingest_error",
+      "namespace": "kag",
+      "description": "Fingerprints and stores a raw error text for future retrieval.",
+      "retrieval_layer": [
+        "unknown"
+      ],
+      "identity_fields": [],
+      "writes_to": [],
+      "required_permissions": "read_only",
+      "input_schema_keys": [
+        "errorText",
+        "priorFix"
+      ]
+    },
+    {
+      "tool_name": "kag.recall_similar_fix",
+      "namespace": "kag",
+      "description": "Recalls prior fixes for an error via exact-hash + pg_trgm similarity over error_fingerprints.",
+      "retrieval_layer": [
+        "lexical",
+        "synthesis",
+        "memory"
+      ],
+      "identity_fields": [],
+      "writes_to": [],
+      "required_permissions": "read_only",
+      "input_schema_keys": [
+        "errorText",
+        "limit"
+      ]
+    },
+    {
+      "tool_name": "kag.multi_lane_search",
+      "namespace": "kag",
+      "description": "Performs 11-lane HyperRAG retrieval across hash, n-gram, graph, feature atlas, and activity prefetch lanes. Returns ranked hits + synthesisBlock with per-chunk trust tier metadata.",
+      "retrieval_layer": [
+        "lexical",
+        "synthesis"
+      ],
+      "identity_fields": [],
+      "writes_to": [],
+      "required_permissions": "read_only",
+      "input_schema_keys": [
+        "query",
+        "isError",
+        "topK",
+        "lanes"
+      ]
+    },
+    {
+      "tool_name": "kag.web_search",
+      "namespace": "kag",
+      "description": "L10 lane web search (T4 trust). Searches the web for information-seeking queries. Skips for code/error queries. Returns sanitized snippets for synthesis.",
+      "retrieval_layer": [
+        "synthesis"
+      ],
+      "identity_fields": [],
+      "writes_to": [],
+      "required_permissions": "read_only",
+      "input_schema_keys": [
+        "query",
+        "limit"
+      ]
+    },
+    {
+      "tool_name": "kag.feature_lookup",
+      "namespace": "kag",
+      "description": "Look up which files implement a named feature. Queries the durable feature_implementations + feature_file_edges tables (HyperRAG L9). Returns file paths and entry-point exports for the matched feature.",
+      "retrieval_layer": [
+        "graph",
+        "identity"
+      ],
+      "identity_fields": [],
+      "writes_to": [],
+      "required_permissions": "read_only",
+      "input_schema_keys": [
+        "featureName",
+        "role",
+        "limit"
+      ]
+    },
+    {
+      "tool_name": "kag.panel_context",
+      "namespace": "kag",
+      "description": "Return recently viewed files and tools from panel_activity_log for the active user session (HyperRAG L11 prefetch). Provides warm context about what the user is currently working on.",
+      "retrieval_layer": [
+        "unknown"
+      ],
+      "identity_fields": [],
+      "writes_to": [],
+      "required_permissions": "read_only",
+      "input_schema_keys": [
+        "userId",
+        "windowMin",
+        "limit"
+      ]
+    },
+    {
+      "tool_name": "ops.trust_audit",
+      "namespace": "ops",
+      "description": "Read-only audit of the trust-tier injection-detection system. Returns count of blocked content hashes and the most recently blocked entries. Use for diagnostics only — cannot clear the block list.",
+      "retrieval_layer": [
+        "dense",
+        "ops"
+      ],
+      "identity_fields": [],
+      "writes_to": [],
+      "required_permissions": "read_only",
+      "input_schema_keys": [
+        "limit"
+      ]
+    },
+    {
+      "tool_name": "taxonomy.children",
+      "namespace": "taxonomy",
+      "description": "Lists children of a specific ontological node in the topology.",
+      "retrieval_layer": [
+        "unknown"
+      ],
+      "identity_fields": [],
+      "writes_to": [],
+      "required_permissions": "read_only",
+      "input_schema_keys": [
+        "parent_key",
+        "limit"
+      ]
+    },
+    {
+      "tool_name": "taxonomy.path",
+      "namespace": "taxonomy",
+      "description": "Returns the full ontological path from a leaf node to root.",
+      "retrieval_layer": [
+        "graph"
+      ],
+      "identity_fields": [],
+      "writes_to": [],
+      "required_permissions": "read_only",
+      "input_schema_keys": [
+        "node_key"
+      ]
+    },
+    {
+      "tool_name": "LLMS.md.peers_via_relations",
+      "namespace": "LLMS",
+      "description": "Finds neighboring directories using the SHARES_TAGS hypergraph relation.",
+      "retrieval_layer": [
+        "synthesis"
+      ],
+      "identity_fields": [],
+      "writes_to": [],
+      "required_permissions": "read_only",
+      "input_schema_keys": [
+        "dirPath",
+        "limit"
+      ]
+    },
+    {
+      "tool_name": "LLMS.md.coverage_chain",
+      "namespace": "LLMS",
+      "description": "Returns the full LLMS.md inheritance chain for a file.",
+      "retrieval_layer": [
+        "synthesis"
+      ],
+      "identity_fields": [],
+      "writes_to": [],
+      "required_permissions": "read_only",
+      "input_schema_keys": [
+        "filePath"
+      ]
+    },
+    {
+      "tool_name": "clusters.get_summary_lenses",
+      "namespace": "clusters",
+      "description": "Returns wiki and LLMS.md context lenses for a GPU cluster.",
+      "retrieval_layer": [
+        "synthesis"
+      ],
+      "identity_fields": [],
+      "writes_to": [],
+      "required_permissions": "read_only",
+      "input_schema_keys": [
+        "clusterId",
+        "maxNotes"
+      ]
+    },
+    {
+      "tool_name": "trace.validate_ace_hit",
+      "namespace": "trace",
+      "description": "Validates a retrieved chunk against the ACE cache and graph contracts.",
+      "retrieval_layer": [
+        "unknown"
+      ],
+      "identity_fields": [],
+      "writes_to": [],
+      "required_permissions": "read_only",
+      "input_schema_keys": [
+        "filePath",
+        "chunkId",
+        "queryHash"
+      ]
+    },
+    {
+      "tool_name": "ops.propose_patch",
+      "namespace": "ops",
+      "description": "PROPOSES a patch for a file. READ-ONLY PREVIEW. Does NOT modify files.",
+      "retrieval_layer": [
+        "ops"
+      ],
+      "identity_fields": [],
+      "writes_to": [
+        "postgres",
+        "kanban"
+      ],
+      "required_permissions": "read_write",
+      "input_schema_keys": [
+        "operator_token",
+        "file_path",
+        "issue",
+        "context_lines"
+      ]
+    },
+    {
+      "tool_name": "ops.run_targeted_test",
+      "namespace": "ops",
+      "description": "Executes a single Vitest test file and returns the outcome.",
+      "retrieval_layer": [
+        "ops"
+      ],
+      "identity_fields": [],
+      "writes_to": [
+        "postgres"
+      ],
+      "required_permissions": "read_write",
+      "input_schema_keys": [
+        "operator_token",
+        "test_file",
+        "timeout_ms"
+      ]
+    },
+    {
+      "tool_name": "ops.record_fix_attempt",
+      "namespace": "ops",
+      "description": "Records a fix attempt and its outcome to the persistent audit log.",
+      "retrieval_layer": [
+        "ops"
+      ],
+      "identity_fields": [],
+      "writes_to": [
+        "postgres",
+        "kanban"
+      ],
+      "required_permissions": "read_write",
+      "input_schema_keys": [
+        "operator_token",
+        "fix_type",
+        "fix_description",
+        "fix_diff",
+        "files_affected",
+        "errors_resolved",
+        "success",
+        "metadata"
+      ]
+    },
+    {
+      "tool_name": "ops.run_quality_gate",
+      "namespace": "ops",
+      "description": "Executes a project-wide quality gate (tsc or vitest-all).",
+      "retrieval_layer": [
+        "ops"
+      ],
+      "identity_fields": [],
+      "writes_to": [
+        "postgres"
+      ],
+      "required_permissions": "read_write",
+      "input_schema_keys": [
+        "operator_token",
+        "gate",
+        "timeout_ms"
+      ]
+    },
+    {
+      "tool_name": "hypergraph.search",
+      "namespace": "hypergraph",
+      "description": "Semantic search across the hypergraph edges.",
+      "retrieval_layer": [
+        "graph"
+      ],
+      "identity_fields": [],
+      "writes_to": [],
+      "required_permissions": "read_only",
+      "input_schema_keys": [
+        "query",
+        "edge_types",
+        "limit",
+        "min_confidence"
+      ]
+    },
+    {
+      "tool_name": "hypergraph.get_edge",
+      "namespace": "hypergraph",
+      "description": "Returns full details for a specific hypergraph edge.",
+      "retrieval_layer": [
+        "graph"
+      ],
+      "identity_fields": [],
+      "writes_to": [],
+      "required_permissions": "read_only",
+      "input_schema_keys": [
+        "edge_hash",
+        "expand"
+      ]
+    },
+    {
+      "tool_name": "hypergraph.explain_activation",
+      "namespace": "hypergraph",
+      "description": "Explains why a specific hypergraph edge was activated for a set of query terms.",
+      "retrieval_layer": [
+        "graph"
+      ],
+      "identity_fields": [],
+      "writes_to": [],
+      "required_permissions": "read_only",
+      "input_schema_keys": [
+        "edge_hash",
+        "query_terms"
+      ]
+    },
+    {
+      "tool_name": "hypergraph.expand_members",
+      "namespace": "hypergraph",
+      "description": "Returns all related edges for a given edge hash by member overlap.",
+      "retrieval_layer": [
+        "graph"
+      ],
+      "identity_fields": [],
+      "writes_to": [
+        "neo4j"
+      ],
+      "required_permissions": "read_write",
+      "input_schema_keys": [
+        "edge_hash"
+      ]
+    },
+    {
+      "tool_name": "knowledge.get_minified_map",
+      "namespace": "knowledge",
+      "description": "Returns a minified architectural map for a specific directory.",
+      "retrieval_layer": [
+        "unknown"
+      ],
+      "identity_fields": [],
+      "writes_to": [],
+      "required_permissions": "read_only",
+      "input_schema_keys": [
+        "directory",
+        "max_edges",
+        "max_agents"
+      ]
+    },
+    {
+      "tool_name": "tools.batch_call",
+      "namespace": "tools",
+      "description": "Executes multiple tool calls in parallel to reduce total latency.",
+      "retrieval_layer": [
+        "unknown"
+      ],
+      "identity_fields": [],
+      "writes_to": [],
+      "required_permissions": "read_only",
+      "input_schema_keys": [
+        "calls",
+        "timeoutMs"
+      ]
+    },
+    {
+      "tool_name": "codebase.context_for_file",
+      "namespace": "codebase",
+      "description": "Returns the full atlas context packet for a specific file.",
+      "retrieval_layer": [
+        "unknown"
+      ],
+      "identity_fields": [],
+      "writes_to": [],
+      "required_permissions": "read_only",
+      "input_schema_keys": [
+        "filePath",
+        "maxCards",
+        "forceReload"
+      ]
+    },
+    {
+      "tool_name": "LLMS.md.context_for_file",
+      "namespace": "LLMS",
+      "description": "Returns only the AGENTS-related slice of the atlas context packet for a file.",
+      "retrieval_layer": [
+        "synthesis"
+      ],
+      "identity_fields": [],
+      "writes_to": [],
+      "required_permissions": "read_only",
+      "input_schema_keys": [
+        "filePath"
+      ]
+    },
+    {
+      "tool_name": "LLMS.md.peers_for_dir",
+      "namespace": "LLMS",
+      "description": "Returns the directory card directly from the atlas cache.",
+      "retrieval_layer": [
+        "synthesis"
+      ],
+      "identity_fields": [],
+      "writes_to": [],
+      "required_permissions": "read_only",
+      "input_schema_keys": [
+        "dirPath"
+      ]
+    },
+    {
+      "tool_name": "LLMS.md.coverage",
+      "namespace": "LLMS",
+      "description": "Reports the population status of the LLMS.md envelope for a file.",
+      "retrieval_layer": [
+        "synthesis"
+      ],
+      "identity_fields": [],
+      "writes_to": [],
+      "required_permissions": "read_only",
+      "input_schema_keys": [
+        "filePath"
+      ]
+    },
+    {
+      "tool_name": "LLMS.md.shares_tags",
+      "namespace": "LLMS",
+      "description": "Returns neighboring directories based on shared tags in their LLMS.md files.",
+      "retrieval_layer": [
+        "synthesis"
+      ],
+      "identity_fields": [],
+      "writes_to": [],
+      "required_permissions": "read_only",
+      "input_schema_keys": [
+        "dirPath",
+        "limit"
+      ]
+    },
+    {
+      "tool_name": "LLMS.md.binding_chain",
+      "namespace": "LLMS",
+      "description": "Walks the LLMS.md binding hierarchy for a file to determine the order of applying envelopes.",
+      "retrieval_layer": [
+        "synthesis"
+      ],
+      "identity_fields": [],
+      "writes_to": [],
+      "required_permissions": "read_only",
+      "input_schema_keys": [
+        "filePath"
+      ]
+    },
+    {
+      "tool_name": "ops.update_LLMS.md",
+      "namespace": "ops",
+      "description": "Append a new fact, rule, or tool note to a directory LLMS.md file and flush to Redis. Use this after discovering something useful that should survive future conversations. The fact appears in every future ACE context for that directory automatically (Lane L4).",
+      "retrieval_layer": [
+        "cache",
+        "synthesis",
+        "ops"
+      ],
+      "identity_fields": [],
+      "writes_to": [],
+      "required_permissions": "read_only",
+      "input_schema_keys": [
+        "operator_token",
+        "dir_path",
+        "section",
+        "fact",
+        "redis_only"
+      ]
+    },
+    {
+      "tool_name": "ops.fixer_semantic_recall",
+      "namespace": "ops",
+      "description": "Recalls known fix templates via Redis L1 → Postgres L2 → Qdrant semantic L3. Call before LLM analysis to skip redundant inference on known error patterns.",
+      "retrieval_layer": [
+        "cache",
+        "dense",
+        "synthesis",
+        "ops"
+      ],
+      "identity_fields": [],
+      "writes_to": [],
+      "required_permissions": "read_only",
+      "input_schema_keys": [
+        "errorHash",
+        "queryEmbedding",
+        "limit"
+      ]
+    },
+    {
+      "tool_name": "ops.fixer_pattern_store",
+      "namespace": "ops",
+      "description": "[OPERATOR-GATED] Stores a fix attempt outcome to the 3-layer fixer memory. Increments success/failure counts, upserts to Qdrant fixer_memory_768 (GPU-indexed) when embedding provided.",
+      "retrieval_layer": [
+        "dense",
+        "ops"
+      ],
+      "identity_fields": [],
+      "writes_to": [],
+      "required_permissions": "read_only",
+      "input_schema_keys": [
+        "errorHash",
+        "errorCode",
+        "fixTemplate",
+        "fixKind",
+        "outcome",
+        "runId",
+        "file",
+        "tags",
+        "topFiles",
+        "queryEmbedding",
+        "linesChanged",
+        "durationMs",
+        "langfuseTraceId"
+      ]
+    },
+    {
+      "tool_name": "evidence.search_by_image",
+      "namespace": "evidence",
+      "description": "Search evidence by uploading an image. The VLM describes the image, embeds it, and returns semantically similar evidence items from Qdrant. Use for \"find evidence similar to this photo/diagram/screenshot\".",
+      "retrieval_layer": [
+        "dense"
+      ],
+      "identity_fields": [],
+      "writes_to": [],
+      "required_permissions": "read_only",
+      "input_schema_keys": [
+        "image_path",
+        "collection",
+        "limit",
+        "score_threshold",
+        "case_id"
+      ]
+    },
+    {
+      "tool_name": "evidence.image_feedback",
+      "namespace": "evidence",
+      "description": "Record thumbs-up or thumbs-down on a visual search result. Votes accumulate in Redis; Qdrant payload (trust_score, user_approved/rejected) is updated after 3 votes. Fires GRPO rl-signal automatically.",
+      "retrieval_layer": [
+        "cache",
+        "dense"
+      ],
+      "identity_fields": [],
+      "writes_to": [],
+      "required_permissions": "read_only",
+      "input_schema_keys": [
+        "point_id",
+        "collection",
+        "approved",
+        "query"
+      ]
+    },
+    {
+      "tool_name": "evidence.link_image_graph",
+      "namespace": "evidence",
+      "description": "Create IMAGE_FOR edges in Neo4j from an evidence image node to CodebaseFile nodes. Normally fires automatically after search-by-image, but can be called manually to repair or backfill graph links for existing evidence. Returns { ok, edgesCreated }.",
+      "retrieval_layer": [
+        "graph"
+      ],
+      "identity_fields": [],
+      "writes_to": [
+        "qdrant"
+      ],
+      "required_permissions": "read_write",
+      "input_schema_keys": [
+        "evidence_id",
+        "caption",
+        "links"
+      ]
+    },
+    {
+      "tool_name": "image.search_by_text",
+      "namespace": "image",
+      "description": "Search the evidence image index using a text description. Embeds the query via embeddinggemma and searches Qdrant. No image upload needed — use for natural-language queries like \"find images showing property damage\" or \"photos of the red sedan\".",
+      "retrieval_layer": [
+        "dense",
+        "synthesis"
+      ],
+      "identity_fields": [],
+      "writes_to": [],
+      "required_permissions": "read_only",
+      "input_schema_keys": [
+        "query",
+        "collection",
+        "limit",
+        "score_threshold",
+        "case_id",
+        "tags"
+      ]
+    },
+    {
+      "tool_name": "image.caption",
+      "namespace": "image",
+      "description": "Get a VLM-generated caption and suggested tags for a local image file. Calls the Gemma4-VLM pipeline (Triton→TurboQuant→Ollama cascade). Does NOT search Qdrant — use evidence.search_by_image to also get ranked hits.",
+      "retrieval_layer": [
+        "dense",
+        "synthesis"
+      ],
+      "identity_fields": [],
+      "writes_to": [],
+      "required_permissions": "read_only",
+      "input_schema_keys": [
+        "image_path",
+        "prompt_override"
+      ]
+    },
+    {
+      "tool_name": "image.enrich_tags",
+      "namespace": "image",
+      "description": "VLM-enrich one Qdrant evidence point with auto-generated tags. Fetches the image (from payload file_path or MinIO), runs Gemma4-VLM, and PATCHes suggestedTags + vlm_summary back onto the Qdrant payload. Tags are merged with any existing tags (deduped). Use before indexing or to backfill stale points.",
+      "retrieval_layer": [
+        "dense",
+        "graph",
+        "synthesis"
+      ],
+      "identity_fields": [],
+      "writes_to": [],
+      "required_permissions": "read_only",
+      "input_schema_keys": [
+        "point_id",
+        "collection",
+        "image_path",
+        "merge",
+        "dry_run"
+      ]
+    },
+    {
+      "tool_name": "ops.gpu_attention",
+      "namespace": "ops",
+      "description": "GPU scaled dot-product attention over a flat key matrix. Returns softmax attention weights per key. Results are Redis-cached 300 s by shape+input hash (CUDA Graph replay emulation). Use for ACE chunk reranking, evidence scoring, or any query-vs-corpus weighting.",
+      "retrieval_layer": [
+        "cache",
+        "rerank",
+        "ops"
+      ],
+      "identity_fields": [],
+      "writes_to": [],
+      "required_permissions": "read_only",
+      "input_schema_keys": [
+        "query",
+        "keys",
+        "n",
+        "dim"
+      ]
+    },
+    {
+      "tool_name": "ops.gpu_pagerank",
+      "namespace": "ops",
+      "description": "GPU power-iteration PageRank on a flat adjacency matrix. Returns normalised rank scores (sum to 1.0). Cached 300 s by shape+input hash.",
+      "retrieval_layer": [
+        "graph",
+        "ops"
+      ],
+      "identity_fields": [],
+      "writes_to": [],
+      "required_permissions": "read_only",
+      "input_schema_keys": [
+        "adj",
+        "n",
+        "damping",
+        "iters"
+      ]
+    },
+    {
+      "tool_name": "ops.gpu_topk",
+      "namespace": "ops",
+      "description": "GPU top-k index selection. Returns k indices of highest-scoring candidates in descending order. Use after pipelineAttention to get the top chunk indices.",
+      "retrieval_layer": [
+        "ops"
+      ],
+      "identity_fields": [],
+      "writes_to": [],
+      "required_permissions": "read_only",
+      "input_schema_keys": [
+        "scores",
+        "k"
+      ]
+    },
+    {
+      "tool_name": "ops.gpu_pipeline_stats",
+      "namespace": "ops",
+      "description": "Returns GPU pipeline diagnostics: active stream slots, pending queue depth, cache hit rate over last 50 ops, and device config.",
+      "retrieval_layer": [
+        "ops"
+      ],
+      "identity_fields": [],
+      "writes_to": [],
+      "required_permissions": "read_only",
+      "input_schema_keys": []
+    },
+    {
+      "tool_name": "runtime.simdjson_status",
+      "namespace": "runtime",
+      "description": "Reports SIMD/AVX2 JSON parser availability, fallback mode, cache metrics, and safe usage notes.",
+      "retrieval_layer": [
+        "unknown"
+      ],
+      "identity_fields": [],
+      "writes_to": [],
+      "required_permissions": "read_only",
+      "input_schema_keys": []
+    },
+    {
+      "tool_name": "runtime.sse_probe",
+      "namespace": "runtime",
+      "description": "Verifies TRACE MCP Streamable HTTP/SSE path by calling tools/list with Accept: text/event-stream.",
+      "retrieval_layer": [
+        "graph"
+      ],
+      "identity_fields": [],
+      "writes_to": [],
+      "required_permissions": "read_only",
+      "input_schema_keys": []
+    },
+    {
+      "tool_name": "runtime.quic_status",
+      "namespace": "runtime",
+      "description": "Reports QUIC/HTTP3 dev-lane configuration and probes the local Caddy/Vite QUIC endpoint if present.",
+      "retrieval_layer": [
+        "unknown"
+      ],
+      "identity_fields": [],
+      "writes_to": [],
+      "required_permissions": "read_only",
+      "input_schema_keys": [
+        "url"
+      ]
+    },
+    {
+      "tool_name": "atlas.prefilter",
+      "namespace": "atlas",
+      "description": "TurboVec ANN cluster prefilter. Embeds the query and queries the TurboVec sidecar (:8099) to identify the top-N cluster IDs for injecting into a Qdrant should/must filter. Returns clusterIds, centroidScores, backend (python|js|offline), and latency.",
+      "retrieval_layer": [
+        "dense",
+        "rerank"
+      ],
+      "identity_fields": [],
+      "writes_to": [],
+      "required_permissions": "read_only",
+      "input_schema_keys": [
+        "query",
+        "topClusters"
+      ]
+    },
+    {
+      "tool_name": "ace.compact_search",
+      "namespace": "ace",
+      "description": "Token-budgeted semantic search returning a compact context tree. Use this instead of reading full files when you need focused retrieval within a token budget. Checks Redis cache first (TTL 300s), then runs hybrid FTS + vector search, applies Karpathy authority blend, and trims each snippet to fit tokenBudget.",
+      "retrieval_layer": [
+        "cache",
+        "lexical",
+        "dense",
+        "graph"
+      ],
+      "identity_fields": [],
+      "writes_to": [],
+      "required_permissions": "read_only",
+      "input_schema_keys": [
+        "query",
+        "limit",
+        "tokenBudget",
+        "includeFullText",
+        "useCache"
+      ]
+    },
+    {
+      "tool_name": "atlas.packet_search",
+      "namespace": "atlas",
+      "description": "Query the canonical atlas_packets table. Search by source_ref path (variants tried automatically), feature_id, concept_id membership, or free-text summary match. Returns packet_id, source_ref, feature_id, concept_ids, summary, reward_prior. Use this to find which packets are associated with a file or feature before querying Qdrant.",
+      "retrieval_layer": [
+        "dense",
+        "graph",
+        "identity"
+      ],
+      "identity_fields": [
+        "feature_id",
+        "source_ref"
+      ],
+      "writes_to": [],
+      "required_permissions": "read_only",
+      "input_schema_keys": [
+        "source_ref",
+        "feature_id",
+        "concept_id",
+        "summary_query",
+        "limit"
+      ]
+    },
+    {
+      "tool_name": "atlas:packet_search",
+      "namespace": "atlas",
+      "description": "Query the canonical atlas_packets table. Search by source_ref path (variants tried automatically), feature_id, concept_id membership, or free-text summary match. Returns packet_id, source_ref, feature_id, concept_ids, summary, reward_prior. Use this to find which packets are associated with a file or feature before querying Qdrant.",
+      "retrieval_layer": [
+        "dense",
+        "graph",
+        "identity"
+      ],
+      "identity_fields": [
+        "feature_id",
+        "source_ref"
+      ],
+      "writes_to": [],
+      "required_permissions": "read_only",
+      "input_schema_keys": [
+        "source_ref",
+        "feature_id",
+        "concept_id",
+        "summary_query",
+        "limit"
+      ]
+    },
+    {
+      "tool_name": "atlas.coverage",
+      "namespace": "atlas",
+      "description": "Phase 3I verification gate. Reports coverage metrics for the atlas_packets canonical warehouse: total packets, source_ref coverage %, feature_id coverage %, concept_ids coverage %, summary coverage %, embedding coverage %, and duplicate sha256 count. Gate: source_ref >= 90% required before Phase 4A RRF ranking can start.",
+      "retrieval_layer": [
+        "dense",
+        "rerank"
+      ],
+      "identity_fields": [
+        "feature_id",
+        "source_ref"
+      ],
+      "writes_to": [
+        "postgres"
+      ],
+      "required_permissions": "read_write",
+      "input_schema_keys": [
+        "verbose"
+      ]
+    },
+    {
+      "tool_name": "atlas:verify_coverage",
+      "namespace": "atlas",
+      "description": "Phase 3I verification gate. Reports coverage metrics for the atlas_packets canonical warehouse: total packets, source_ref coverage %, feature_id coverage %, concept_ids coverage %, summary coverage %, embedding coverage %, and duplicate sha256 count. Gate: source_ref >= 90% required before Phase 4A RRF ranking can start.",
+      "retrieval_layer": [
+        "dense",
+        "rerank"
+      ],
+      "identity_fields": [
+        "feature_id",
+        "source_ref"
+      ],
+      "writes_to": [],
+      "required_permissions": "read_only",
+      "input_schema_keys": [
+        "verbose"
+      ]
+    }
+  ]
+}

@@ -1,7 +1,10 @@
 {
-  "timestamp": "2026-06-14T01:31:28.862Z",
+  "timestamp": "2026-06-15T17:40:07.854Z",
   "mode": "dry-run",
-  "redis_url": "redis://:redis@localhost:6379",
+  "redis_config": {
+    "host": "localhost",
+    "port": 6379
+  },
   "operations": [
     {
       "name": "INCR atlas:graph_version",
@@ -13,68 +16,77 @@
     },
     {
       "name": "DEL atlas:lru:query:*",
-      "keys_deleted": 0
+      "keys_deleted": 0,
+      "applied": false
     },
     {
       "name": "DEL atlas:lru:packet:*",
-      "keys_deleted": 0
+      "keys_deleted": 0,
+      "applied": false
     },
     {
       "name": "DEL atlas:lru:tools:*",
-      "keys_deleted": 0
+      "keys_deleted": 0,
+      "applied": false
     },
     {
       "name": "DEL atlas:lru:kag:*",
-      "keys_deleted": 0
+      "keys_deleted": 0,
+      "applied": false
     },
     {
       "name": "DEL bifrost:sem:query:*",
-      "keys_deleted": 0
+      "keys_deleted": 0,
+      "applied": false
     },
     {
       "name": "DEL bifrost:sem:packet:*",
-      "keys_deleted": 0
+      "keys_deleted": 0,
+      "applied": false
     },
     {
       "name": "DEL bifrost:sem:feature:*",
-      "keys_deleted": 0
+      "keys_deleted": 0,
+      "applied": false
     },
     {
       "name": "DEL bifrost:sem:intent:*",
-      "keys_deleted": 0
+      "keys_deleted": 0,
+      "applied": false
     },
     {
       "name": "DEL ace:packet:*",
-      "keys_deleted": 0
+      "keys_deleted": 0,
+      "applied": false
     }
   ],
   "versions_before": {
-    "graph_version": 42,
-    "cache_epoch": 1,
+    "graph_version": 0,
+    "cache_epoch": 0,
     "qdrant_version": 1,
     "rpc_version": 1,
     "som_version": 0,
     "kmeans_version": 0
   },
   "versions_after": {
-    "graph_version": 43,
-    "cache_epoch": 2,
+    "graph_version": 1,
+    "cache_epoch": 1,
     "qdrant_version": 1,
     "rpc_version": 1,
     "som_version": 0,
     "kmeans_version": 0
   },
   "keys_deleted": {
-    "atlas:lru:query:*": 0,
-    "atlas:lru:packet:*": 0,
-    "atlas:lru:tools:*": 0,
-    "atlas:lru:kag:*": 0,
-    "bifrost:sem:query:*": 0,
-    "bifrost:sem:packet:*": 0,
-    "bifrost:sem:feature:*": 0,
-    "bifrost:sem:intent:*": 0,
-    "ace:packet:*": 0
+    "atlas:lru:query:*": "0 (dry-run, not deleted)",
+    "atlas:lru:packet:*": "0 (dry-run, not deleted)",
+    "atlas:lru:tools:*": "0 (dry-run, not deleted)",
+    "atlas:lru:kag:*": "0 (dry-run, not deleted)",
+    "bifrost:sem:query:*": "0 (dry-run, not deleted)",
+    "bifrost:sem:packet:*": "0 (dry-run, not deleted)",
+    "bifrost:sem:feature:*": "0 (dry-run, not deleted)",
+    "bifrost:sem:intent:*": "0 (dry-run, not deleted)",
+    "ace:packet:*": "0 (dry-run, not deleted)"
   },
-  "total_latency_ms": 1,
+  "total_latency_ms": 7059,
   "status": "dry_run_ok"
 }

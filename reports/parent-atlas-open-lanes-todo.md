@@ -10,6 +10,12 @@ Production-ready at the directory level.
 
 The directory-lineage foundation is healthy, the core topology chain is now working, and the remaining work now moves into higher-order graph, recommendation, and storage-tiering lanes.
 
+Workspace roots:
+
+- `workspaceRoot`: `C:\Users\james\Videos\deeds-web-app`
+- `projectRoot`: `C:\Users\james\Videos\deeds-web-app\sveltekit-frontend`
+- template: `C:\Users\james\Videos\deeds-web-app\configs\templates\gemma4-opencode.jinja` (exists)
+
 Current live spine:
 
 - `packet_keys` joins to live `atlas_packets.packet_key` at high coverage.
@@ -44,7 +50,7 @@ Approx completion: ~75%
 
 - native GEMM binding classification: partial, public export missing (deferred until Stages 1–3 complete per ATLAS-3.0 roadmap)
 - Neo4j USED_CONCEPT projection: **complete** — 32,012 edges written; planner graph separated from retrieval
-- Phase 16 cache invalidation binding: partial
+- Phase 16 cache invalidation binding: docs-backed partial in this checkout; runtime graph-refresh artifacts are absent here, so binding remains unproven until the app-repo files are present
 
 ### Stage 3 - Advanced Retrieval R&D
 
@@ -98,6 +104,7 @@ The next work moves into:
 These are acceleration and hygiene lanes, not the current blocker.
 
 - Graphify structural discovery: keep `atlas:startup` and `graphify:feature-labels` / `graphify:domain-topology` as the read-only startup signals for cache-hit quality. Graphify is the topology scanner; Parent Atlas remains the canonical join spine.
+- Neo4j GDS / GPU acceleration: run the graph topology pass before any further `libtorch` or `TensorRT` expansion so the ranking spine has a stable graph substrate.
 - GPU bridge review: `libtorch`, `TensorRT` bridge node, and Rust `n-api` parser remain acceleration lanes behind the stable packet identity spine.
 - TurboVec / LangExtract: treat as downstream enrichment and ranking aids, not as the source of truth for stale-document grouping.
 - Stale document compaction: group by `feature_label`, `function_id`, `method`, and `variable` before assigning kanban tasks.
@@ -316,16 +323,15 @@ P0 tasks #3 and #4 are now verified complete by `scripts/atlas/verify-feature-li
 
 ## Current Runtime Topology Order
 
-1. Redis preflight / wait-for-cache
-2. Concept evidence spine backfill from `packet_keys`
-3. Neo4j `USED_CONCEPT` edges
-4. `atlas_feature_map` ↔ `parent_atlas_documents` join audit
-5. `route_runtime_packets` materialization
-6. SOM coverage audit/backfill from existing topology
-7. Phase 4B benchmark
-8. AE train `768 -> 64`
-9. SOM `20x20` retrain
-10. PPO / QLoRA dataset export
+1. Neo4j / GDS topology pass on the already aligned bridge spine
+2. `atlas_feature_map` ↔ `parent_atlas_documents` join audit
+3. `route_runtime_packets` materialization
+4. Concept evidence spine backfill from `packet_keys`
+5. SOM coverage audit/backfill from existing topology
+6. Phase 4B benchmark
+7. AE train `768 -> 64`
+8. SOM `20x20` retrain
+9. PPO / QLoRA dataset export
 
 ## Runtime Coverage Audit
 
@@ -337,7 +343,7 @@ Read-only coverage measurement now lives in `docs/reports/runtime-coverage-audit
 - selected_concepts coverage: 100%
 - USED_CONCEPT / Neo4j projection coverage: 0%
 
-The highest-leverage next lane remains `Neo4j USED_CONCEPT` edges, because trace population is now complete and the graph projection spine still has no live write lane. The join repair lane now only needs the remaining code-file subset; 262 rows are backfill-ready and parent-doc coverage is no longer the blocker; the packet community lane is closed.
+The highest-leverage next lane is the Neo4j / GDS pass over the already aligned bridge spine, because trace population is complete, SOM coverage is complete, and the remaining work is graph-ranking topology rather than identity repair. Redis is optional and no longer the blocker. The join repair lane now only needs the remaining code-file subset; 262 rows are backfill-ready and parent-doc coverage is no longer the blocker; the packet community lane is closed.
 
 ## Active Data-Maturity Lane - 3F Trace Population
 

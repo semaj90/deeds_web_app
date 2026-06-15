@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+// Run with: node --max-old-space-size=512 scripts/atlas/phase-16-h-qdrant-payload-sync.mjs
 
 /**
  * Phase 16-H.5: Qdrant Payload Canonicalization
@@ -9,6 +10,8 @@
  *
  * This enables: Qdrant query response contains full packet identity
  * without extra Postgres lookup.
+ *
+ * Hard rule: uses set-payload (PATCH) — NOT vector upsert (PUT).
  *
  * Time: ~30 min
  * Blocker: Phase 16-H.4 (must know qdrant_point_id first)
@@ -28,6 +31,18 @@ dotenv.config({ path: `${__dirname}/../../.env` });
 const pool = new pg.Pool({ connectionString: process.env.DATABASE_URL });
 const QDRANT_URL = process.env.QDRANT_URL || 'http://127.0.0.1:6333';
 const COLLECTION_NAME = 'codebase_chunks_768';
+const argv = process.argv.slice(2);
+const hasFlag = (flag) => argv.includes(flag);
+const getArg = (name) => {
+  const match = argv.find((arg) => arg.startsWith(`--${name}=`));
+  if (match) return match.split('=').slice(1).join('=');
+  const idx = argv.indexOf(`--${name}`);
+  if (idx >= 0 && argv[idx + 1] && !argv[idx + 1].startsWith('--')) return argv[idx + 1];
+  return null;
+};
+const DRY_RUN = hasFlag('--dry-run') || process.env.H5_DRY_RUN === '1';
+const LIMIT = parseInt(getArg('limit') || process.env.H5_LIMIT || '0', 10);
+const BATCH_SIZE = parseInt(getArg('batch') || process.env.H5_BATCH_SIZE || '100', 10);
 
 const log = {
   info: (msg) => console.log(`[phase-16-h-5] ${msg}`),
@@ -42,40 +57,53 @@ const log = {
  * Note: Use with_vectors: true to include vectors in response
  */
 async function* streamQdrantPoints(batchSize = 100) {
-  let offset = 0;
+  // Cursor-based pagination via next_page_offset — avoids numeric offset drift.
+  // with_vectors: false is mandatory — 639K × 768-dim floats = OOM.
+  let nextOffset = null;
+  let total = 0;
 
   try {
     while (true) {
+      const body = {
+        limit: batchSize,
+        with_payload: true,
+        with_vectors: false,
+      };
+      if (nextOffset !== null) body.offset = nextOffset;
+
       const response = await fetch(
-        `${QDRANT_URL}/collections/${COLLECTION_NAME}/points/scroll?limit=${batchSize}&offset=${offset}`,
+        `${QDRANT_URL}/collections/${COLLECTION_NAME}/points/scroll`,
         {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ with_vectors: true })
+          body: JSON.stringify(body),
         }
       );
 
       if (!response.ok) {
-        throw new Error(`Qdrant fetch failed: ${response.status} ${response.statusText}`);
+        throw new Error(`Qdrant scroll failed: ${response.status} ${response.statusText}`);
       }
 
       const data = await response.json();
       const batch = data.result?.points || [];
+      nextOffset = data.result?.next_page_offset ?? null;
 
       if (batch.length === 0) break;
 
-      offset += batch.length;
-      yield { batch, offset };
+      total += batch.length;
+      yield { batch, total };
 
-      if (offset % 5000 === 0) {
-        log.progress(`  Fetched ${offset} points...`);
+      if (total % 5000 === 0) {
+        log.progress(`  Scrolled ${total} points...`);
       }
+
+      if (nextOffset === null) break;
     }
 
-    log.ok(`Fetched all ${offset} points`);
+    log.ok(`Scrolled all ${total} points`);
 
   } catch (err) {
-    log.error(`Failed to fetch Qdrant points: ${err.message}`);
+    log.error(`Failed to scroll Qdrant points: ${err.message}`);
     process.exit(1);
   }
 }
@@ -146,8 +174,7 @@ async function canonicalizeBatch(batch, client) {
 
     updatedPoints.push({
       id: pointId,
-      vector: point.vector,
-      payload: canonicalPayload,
+      payload: canonicalPayload,  // no vector — set-payload only
     });
   }
 
@@ -155,23 +182,32 @@ async function canonicalizeBatch(batch, client) {
 }
 
 /**
- * Upsert a batch of canonicalized payloads back to Qdrant
+ * Patch payloads for a batch of points using Qdrant set-payload.
+ * Hard rule: this is a PATCH, NOT a vector upsert (PUT /points).
+ * Vectors are never touched — only payload fields are written.
  */
-async function upsertBatch(batch, batchIndex) {
-  const response = await fetch(
-    `${QDRANT_URL}/collections/${COLLECTION_NAME}/points?wait=true`,
-    {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ points: batch }),
-    }
-  );
+async function setPayloadBatch(batch, batchIndex) {
+  // set-payload accepts: { payload: {...}, points: [id, ...] }
+  // Group points that share the exact same canonical payload to minimize requests.
+  // In practice each point has unique source_ref so we do one call per point in a
+  // per-batch single-request using the `points` filter form.
+  for (const point of batch) {
+    const response = await fetch(
+      `${QDRANT_URL}/collections/${COLLECTION_NAME}/points/payload?wait=false`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          payload: point.payload,
+          points: [point.id],
+        }),
+      }
+    );
 
-  if (!response.ok) {
-    const errorText = await response.text();
-    console.error(`Batch ${batchIndex} upsert failed. First point:`, JSON.stringify(batch[0], null, 2));
-    console.error(`Response: ${errorText}`);
-    throw new Error(`Qdrant upsert failed: ${response.status} ${response.statusText} - ${errorText}`);
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(`set-payload failed (batch ${batchIndex}, point ${point.id}): ${response.status} — ${errorText}`);
+    }
   }
 
   return batch.length;
@@ -186,8 +222,12 @@ async function verifyCanonical(originalCount) {
   // Sample a few points to verify
   try {
     const response = await fetch(
-      `${QDRANT_URL}/collections/${COLLECTION_NAME}/points?limit=10&offset=0`,
-      { method: 'GET', headers: { 'Content-Type': 'application/json' } }
+      `${QDRANT_URL}/collections/${COLLECTION_NAME}/points/scroll`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ limit: 20, with_payload: true, with_vectors: false }),
+      }
     );
 
     if (!response.ok) {
@@ -239,33 +279,43 @@ async function main() {
     let totalUpserted = 0;
     let batchIndex = 0;
 
-    // Stream process: fetch batch → canonicalize → upsert → repeat
-    log.progress('Fetching and canonicalizing Qdrant payloads in streaming mode...');
-    for await (const { batch, offset } of streamQdrantPoints(100)) {
-      // Canonicalize this batch
-      const { updatedPoints, missingPacketKey, notFoundInBridge } = await canonicalizeBatch(batch, client);
+    // Stream process: scroll batch → canonicalize → set-payload → repeat (no buffering)
+    log.progress('Streaming Qdrant points and patching payloads (no vector re-upsert)...');
+    for await (const { batch, total } of streamQdrantPoints(BATCH_SIZE)) {
+      const effectiveBatch = LIMIT > 0
+        ? batch.slice(0, Math.max(LIMIT - total + batch.length, 0))
+        : batch;
+      if (effectiveBatch.length === 0) break;
+      const { updatedPoints, missingPacketKey, notFoundInBridge } = await canonicalizeBatch(effectiveBatch, client);
 
-      totalProcessed += batch.length;
+      totalProcessed += effectiveBatch.length;
       totalMissing += missingPacketKey;
       totalNotFound += notFoundInBridge;
 
-      // Upsert this batch immediately (don't buffer)
-      if (updatedPoints.length > 0) {
-        await upsertBatch(updatedPoints, batchIndex);
+      // Patch payloads only — hard rule: no vector upsert
+      if (updatedPoints.length > 0 && !DRY_RUN) {
+        await setPayloadBatch(updatedPoints, batchIndex);
+        totalUpserted += updatedPoints.length;
+      } else if (updatedPoints.length > 0) {
         totalUpserted += updatedPoints.length;
       }
 
       batchIndex++;
 
-      if (offset % 50000 === 0) {
-        log.progress(`  Processed ${totalProcessed}, canonicalized ${totalUpserted}, missing ${totalMissing}...`);
+      if (total % 50000 === 0) {
+        log.progress(`  Processed ${totalProcessed}, patched ${totalUpserted}, missing ${totalMissing}...`);
+      }
+
+      if (LIMIT > 0 && totalProcessed >= LIMIT) {
+        log.info(`Limit reached: ${totalProcessed}/${LIMIT}`);
+        break;
       }
     }
 
     log.info('');
     log.ok('Canonicalization complete');
     log.ok(`  Total processed: ${totalProcessed}`);
-    log.ok(`  Upserted: ${totalUpserted}`);
+    log.ok(`  Upserted: ${totalUpserted}${DRY_RUN ? ' (dry-run)' : ''}`);
     log.ok(`  Missing packet_key: ${totalMissing}`);
     log.ok(`  Not found in bridge: ${totalNotFound}`);
     log.info('');

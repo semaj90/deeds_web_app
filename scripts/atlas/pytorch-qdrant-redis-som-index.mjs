@@ -32,6 +32,7 @@ import { createRequire } from 'node:module';
 import { resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { createHash } from 'node:crypto';
+import { normalizeSourceRef } from './lib/normalize-source-ref.mjs';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT      = resolve(__dirname, '../..');
@@ -54,6 +55,7 @@ const SOM_GRID  = parseInt(getArg('som-grid') ?? '8',   10);
 const BATCH_SZ  = parseInt(getArg('batch')    ?? '500', 10);
 const SOM_ITERS = parseInt(getArg('som-iters')?? '200', 10);
 const MAX_DOCS  = parseInt(getArg('max-docs') ?? '0',   10); // 0 = unlimited
+const PHASE16_CONTRACT = hasFlag('--phase16-contract') || process.env.PHASE16_CONTRACT === '1';
 
 // ── Paths ────────────────────────────────────────────────────────────────────
 const TMP       = resolve(ROOT, '.tmp');
@@ -127,6 +129,18 @@ async function qdrantSetPayloadBatch(updates) {
       signal: AbortSignal.timeout(10_000),
     }).catch(() => {});
   }
+}
+
+async function detectPhase16ContractTarget(pool) {
+  const result = await pool.query(`
+    SELECT table_name
+    FROM information_schema.tables
+    WHERE table_schema = 'public'
+      AND table_name IN ('atlas_higher_hop_index', 'parent_atlas_documents')
+    ORDER BY CASE WHEN table_name = 'atlas_higher_hop_index' THEN 0 ELSE 1 END
+    LIMIT 1
+  `);
+  return result.rows[0]?.table_name ?? null;
 }
 
 // ── Redis client (ioredis cold-start pattern) ─────────────────────────────────
@@ -574,6 +588,12 @@ async function run() {
       const pool = new pg.Pool({ connectionString: dbUrl, max: 3 });
       let updated = 0;
       const PG_BATCH = 500;
+      const phase16ContractTarget = await detectPhase16ContractTarget(pool);
+      const phase16Enabled = PHASE16_CONTRACT || phase16ContractTarget === 'atlas_higher_hop_index';
+      if (phase16Enabled) {
+        console.log(`  Phase 16 contract target: ${phase16ContractTarget || 'none'}`);
+      }
+
       for (let i = 0; i < N; i += PG_BATCH) {
         const batch = [];
         for (let j = i; j < Math.min(i + PG_BATCH, N); j++) {
@@ -600,6 +620,99 @@ async function run() {
         }
         process.stdout.write(`\r  updated ${Math.min(i+PG_BATCH,N)}/${N}...`);
       }
+
+      if (phase16Enabled) {
+        let linked = 0;
+        for (let i = 0; i < N; i += PG_BATCH) {
+          const matchKeys = [];
+          const pointIds = [];
+          const qdrantCollections = [];
+          const qdrantPayloadKeys = [];
+          const qdrantVectorDims = [];
+          const sourceRefKeys = [];
+          const featureIds = [];
+          const featureLabels = [];
+          const contentHashes = [];
+          const chunkIds = [];
+          const somClusters = [];
+          const identityConfidences = [];
+          const identityLanes = [];
+
+          for (let j = i; j < Math.min(i + PG_BATCH, N); j++) {
+            const payload = allPayloads[j] ?? {};
+            const packetKey = String(payload.packet_key ?? payload.packetKey ?? '').trim();
+            const sourceRefKey = normalizeSourceRef(
+              payload.source_ref ??
+              payload.sourceRef ??
+              payload.canonical_source_ref ??
+              payload.canonicalSourceRef ??
+              payload.file_path ??
+              payload.filePath ??
+              payload.path ??
+              ''
+            );
+            const matchKey = packetKey || sourceRefKey;
+            if (!matchKey) continue;
+
+            matchKeys.push(matchKey);
+            pointIds.push(String(allIds[j]));
+            qdrantCollections.push(COLLECTION);
+            qdrantPayloadKeys.push(packetKey ? 'packet_key' : 'source_ref');
+            qdrantVectorDims.push(DIM);
+            sourceRefKeys.push(sourceRefKey);
+            featureIds.push(String(payload.feature_id ?? payload.featureId ?? '').trim());
+            featureLabels.push(String(payload.feature_label ?? payload.featureLabel ?? '').trim());
+            contentHashes.push(String(payload.content_hash ?? payload.contentHash ?? '').trim());
+            chunkIds.push(String(payload.chunk_id ?? payload.chunkId ?? '').trim());
+            somClusters.push(String(somBmus[j] ?? '').trim());
+            identityConfidences.push('1.0');
+            identityLanes.push(packetKey ? 'packet_key->qdrant' : 'source_ref_key->qdrant');
+          }
+
+          if (matchKeys.length === 0) continue;
+          try {
+            const res = await pool.query(`
+              UPDATE atlas_higher_hop_index AS h
+              SET qdrant_point_id = v.qdrant_point_id,
+                  qdrant_collection = v.qdrant_collection,
+                  qdrant_payload_key = v.qdrant_payload_key,
+                  qdrant_vector_dim = v.qdrant_vector_dim,
+                  source_ref_key = COALESCE(NULLIF(v.source_ref_key, ''), h.source_ref_key),
+                  feature_id = COALESCE(NULLIF(v.feature_id, ''), h.feature_id),
+                  feature_label = COALESCE(NULLIF(v.feature_label, ''), h.feature_label),
+                  content_hash = COALESCE(NULLIF(v.content_hash, ''), h.content_hash),
+                  chunk_id = COALESCE(NULLIF(v.chunk_id, ''), h.chunk_id),
+                  som_cluster = COALESCE(NULLIF(v.som_cluster, '')::int, h.som_cluster),
+                  identity_confidence = COALESCE(NULLIF(v.identity_confidence, '')::numeric, h.identity_confidence),
+                  identity_lane = COALESCE(NULLIF(v.identity_lane, ''), h.identity_lane),
+                  updated_at = NOW()
+              FROM (
+                SELECT
+                  unnest($1::text[]) AS match_key,
+                  unnest($2::text[]) AS qdrant_point_id,
+                  unnest($3::text[]) AS qdrant_collection,
+                  unnest($4::text[]) AS qdrant_payload_key,
+                  unnest($5::int[]) AS qdrant_vector_dim,
+                  unnest($6::text[]) AS source_ref_key,
+                  unnest($7::text[]) AS feature_id,
+                  unnest($8::text[]) AS feature_label,
+                  unnest($9::text[]) AS content_hash,
+                  unnest($10::text[]) AS chunk_id,
+                  unnest($11::text[]) AS som_cluster,
+                  unnest($12::text[]) AS identity_confidence,
+                  unnest($13::text[]) AS identity_lane
+              ) AS v
+              WHERE (h.packet_key = v.match_key OR h.source_ref_key = v.match_key OR h.source_ref = v.match_key)
+                AND h.qdrant_point_id IS NULL
+            `, [matchKeys, pointIds, qdrantCollections, qdrantPayloadKeys, qdrantVectorDims, sourceRefKeys, featureIds, featureLabels, contentHashes, chunkIds, somClusters, identityConfidences, identityLanes]);
+            linked += res.rowCount ?? 0;
+          } catch (e) {
+            console.warn('  Phase 16 contract update batch error:', e.message);
+          }
+        }
+        console.log(`  Phase 16 contract: ${linked} atlas_higher_hop_index rows updated`);
+      }
+
       await pool.end();
       console.log(`\r  Postgres: ${updated} rows updated`);
     } else {

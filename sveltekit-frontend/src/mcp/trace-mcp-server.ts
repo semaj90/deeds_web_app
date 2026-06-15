@@ -7420,7 +7420,42 @@ const nodeServer = http.createServer(async (req, res) => {
   await myTurn;
 });
 
+function normalizeCompatAcceptHeader(req: http.IncomingMessage) {
+  const compatAccept = 'application/json, text/event-stream';
+  const rawHeaders = Array.isArray(req.rawHeaders) ? req.rawHeaders : [];
+  let acceptIndex = -1;
+
+  for (let i = 0; i < rawHeaders.length; i += 2) {
+    if (String(rawHeaders[i] ?? '').toLowerCase() === 'accept') {
+      acceptIndex = i + 1;
+      break;
+    }
+  }
+
+  const current = acceptIndex >= 0 ? String(rawHeaders[acceptIndex] ?? '') : '';
+  const hasJson = current.includes('application/json');
+  const hasEventStream = current.includes('text/event-stream');
+  const needsCompat = !hasJson || !hasEventStream;
+  if (!needsCompat) return;
+
+  if (acceptIndex >= 0) {
+    rawHeaders[acceptIndex] = compatAccept;
+  } else {
+    rawHeaders.push('Accept', compatAccept);
+  }
+
+  try {
+    if (req.headers && typeof req.headers === 'object') {
+      (req.headers as Record<string, string | string[] | undefined>).accept = compatAccept;
+    }
+  } catch {
+    // Best-effort only. The transport wrapper reads rawHeaders, which we mutated above.
+  }
+}
+
 async function handleMcp(req: http.IncomingMessage, res: http.ServerResponse) {
+  normalizeCompatAcceptHeader(req);
+
   // Lightweight request logging to help diagnose malformed probes (OpenCode, curl, PowerShell)
   try {
     const remote = (req.socket && (req.socket.remoteAddress || req.socket.remotePort)) || 'unknown';
@@ -7432,25 +7467,6 @@ async function handleMcp(req: http.IncomingMessage, res: http.ServerResponse) {
     }
   } catch (e) {
     console.warn('[MCP incoming] header-log failed', e?.message || e);
-  }
-
-  const acceptHeader = req.headers.accept;
-  const acceptValues = Array.isArray(acceptHeader)
-    ? acceptHeader
-    : acceptHeader
-      ? [acceptHeader]
-      : [];
-
-  const hasJson = acceptValues.some((value) => value.includes('application/json'));
-  const hasEventStream = acceptValues.some((value) => value.includes('text/event-stream'));
-
-  if (acceptValues.length === 0 || acceptValues.includes('*/*')) {
-    req.headers.accept = 'application/json, text/event-stream';
-  } else if (!hasJson || !hasEventStream) {
-    const missing = [];
-    if (!hasJson) missing.push('application/json');
-    if (!hasEventStream) missing.push('text/event-stream');
-    req.headers.accept = `${acceptValues.join(', ')}, ${missing.join(', ')}`;
   }
 
   const transport = new StreamableHTTPServerTransport({ sessionIdGenerator: undefined });
@@ -7496,9 +7512,6 @@ async function handleMcp(req: http.IncomingMessage, res: http.ServerResponse) {
     } catch {}
   }
 }
-
-// Pre-warm the Postgres pool so first FTS query doesn't eat into tool timeout
-pool.query('SELECT 1').catch(() => { /* non-fatal — pool will retry on first real query */ });
 
 // ── ops.gpu_attention ─────────────────────────────────────────────────────────
 // Scaled dot-product attention — pipeline-queued, Redis shape-cached.
@@ -8063,9 +8076,10 @@ server.registerTool(
 
       const where = conditions.length > 0 ? `WHERE ${conditions.join(' AND ')}` : '';
       const sql = `
-        SELECT packet_id, artifact_id, source_ref, feature_id, community_id,
-               concept_ids, cluster_id, summary,
-               byte_start, byte_end, sha256, metadata, created_at
+        SELECT packet_id, packet_key, source_ref, feature_id, feature_label,
+               community_id, concept_ids, cluster_id, summary,
+               byte_start, byte_end, sha256, metadata,
+               identity_lane, qdrant_point_id, reward_prior, created_at
         FROM atlas_packets
         ${where}
         ORDER BY created_at DESC
@@ -8216,36 +8230,45 @@ server.registerTool(
   toolRegistry.get('atlas.coverage') as any
 );
 
-nodeServer.listen(PORT, HOST, () => {
-  console.log(`TRACE MCP server listening on http://${HOST}:${PORT}`);
-  console.log('Tools: graph.expand_neighborhood, graph.shortest_path, graph.community_for_node,');
-  console.log('       graph.pagerank_top, graph.materialize_pathway, graph.semantic_path_synthesis,');
-  console.log('       topology.search_near, topology.same_som_cluster, topology.search_som_neighborhood,');
-  console.log('       kb.hybrid_search, kb.search_pathways, kb.search_notecards, kb.explain_context_pack,');
-  console.log('       search.rerank, clusters.get_members,');
-  console.log('       hypergraph.semantic_path_synthesis, clusters.get_summary_lenses,');
-  console.log('       trace.kag_search (go-retrieval→sveltekit→postgres cascade),');
-  console.log('       trace.explain_retrieval,');
-  console.log('       search.postgres_fts, search.hybrid, search.go_hybrid (RRF),');
-  console.log('       context.build_kv_packet, context.get_compressed_card,');
-  console.log('       context.explain_compression, context.refresh_task_toc,');
-  console.log('       kag.ingest_error, kag.multi_lane_search, trace.validate_ace_hit,');
-  console.log('       ops.propose_patch, ops.run_targeted_test, ops.record_fix_attempt, ops.run_quality_gate,');
-  console.log('       ops.update_LLMS.md [OPERATOR-GATED]');
-  console.log('       ops.recall_fixer_pattern, ops.store_fixer_pattern [OPERATOR-GATED]');
-  console.log('       context.prefetch_feature_context (TRACE+KB+Karpathy bridge)');
-  console.log(
-    '       atlas.query, atlas.get_chunk, atlas.explain_trace, atlas.suggest_files, atlas.source_refs, atlas.compact_context, atlas.prefilter (TurboVec cluster prefilter)'
-  );
-  console.log('       evidence.search_by_image (file path → VLM→embed→Qdrant),');
-  console.log('       evidence.image_feedback (thumbs up/down → Redis+Qdrant+GRPO),');
-  console.log('       evidence.link_image_graph (repair/backfill IMAGE_FOR Neo4j edges),');
-  console.log('       image.search_by_text (text→embed→Qdrant, no file upload),');
-  console.log('       image.caption (VLM describe only, no search),');
-  console.log('       image.enrich_tags (VLM→tags→setPayload PATCH, merge dedup)');
-  console.log('       ops.gpu_attention (stream-queued attn, Redis shape-cache),');
-  console.log('       ops.gpu_pagerank (stream-queued PageRank, Redis shape-cache),');
-  console.log('       ops.gpu_topk (GPU top-k index selection),');
-  console.log('       ops.gpu_pipeline_stats (device config, queue depth, cache hit rate)');
-  console.log('       ace.compact_search (token-budgeted hybrid search → compact context tree, Redis TTL 300s)');
-});
+const isDirectRun =
+  typeof process.argv[1] === 'string' &&
+  (process.argv[1].endsWith('trace-mcp-server.ts') || process.argv[1].endsWith('trace-mcp-server.js'));
+
+if (isDirectRun) {
+  // Pre-warm the Postgres pool so first FTS query doesn't eat into tool timeout
+  pool.query('SELECT 1').catch(() => { /* non-fatal — pool will retry on first real query */ });
+
+  nodeServer.listen(PORT, HOST, () => {
+    console.log(`TRACE MCP server listening on http://${HOST}:${PORT}`);
+    console.log('Tools: graph.expand_neighborhood, graph.shortest_path, graph.community_for_node,');
+    console.log('       graph.pagerank_top, graph.materialize_pathway, graph.semantic_path_synthesis,');
+    console.log('       topology.search_near, topology.same_som_cluster, topology.search_som_neighborhood,');
+    console.log('       kb.hybrid_search, kb.search_pathways, kb.search_notecards, kb.explain_context_pack,');
+    console.log('       search.rerank, clusters.get_members,');
+    console.log('       hypergraph.semantic_path_synthesis, clusters.get_summary_lenses,');
+    console.log('       trace.kag_search (go-retrieval→sveltekit→postgres cascade),');
+    console.log('       trace.explain_retrieval,');
+    console.log('       search.postgres_fts, search.hybrid, search.go_hybrid (RRF),');
+    console.log('       context.build_kv_packet, context.get_compressed_card,');
+    console.log('       context.explain_compression, context.refresh_task_toc,');
+    console.log('       kag.ingest_error, kag.multi_lane_search, trace.validate_ace_hit,');
+    console.log('       ops.propose_patch, ops.run_targeted_test, ops.record_fix_attempt, ops.run_quality_gate,');
+    console.log('       ops.update_LLMS.md [OPERATOR-GATED]');
+    console.log('       ops.recall_fixer_pattern, ops.store_fixer_pattern [OPERATOR-GATED]');
+    console.log('       context.prefetch_feature_context (TRACE+KB+Karpathy bridge)');
+    console.log(
+      '       atlas.query, atlas.get_chunk, atlas.explain_trace, atlas.suggest_files, atlas.source_refs, atlas.compact_context, atlas.prefilter (TurboVec cluster prefilter)'
+    );
+    console.log('       evidence.search_by_image (file path → VLM→embed→Qdrant),');
+    console.log('       evidence.image_feedback (thumbs up/down → Redis+Qdrant+GRPO),');
+    console.log('       evidence.link_image_graph (repair/backfill IMAGE_FOR Neo4j edges),');
+    console.log('       image.search_by_text (text→embed→Qdrant, no file upload),');
+    console.log('       image.caption (VLM describe only, no search),');
+    console.log('       image.enrich_tags (VLM→tags→setPayload PATCH, merge dedup)');
+    console.log('       ops.gpu_attention (stream-queued attn, Redis shape-cache),');
+    console.log('       ops.gpu_pagerank (stream-queued PageRank, Redis shape-cache),');
+    console.log('       ops.gpu_topk (GPU top-k index selection),');
+    console.log('       ops.gpu_pipeline_stats (device config, queue depth, cache hit rate)');
+    console.log('       ace.compact_search (token-budgeted hybrid search → compact context tree, Redis TTL 300s)');
+  });
+}

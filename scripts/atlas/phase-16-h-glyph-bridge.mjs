@@ -63,26 +63,26 @@ async function main() {
           UPDATE atlas_higher_hop_index h
           SET
             glyph_record_id = g.id,
-            glyph_render_type = g.render_type
+            glyph_render_type = g.glyph_type
           FROM atlas_svg_glyphs g
-          WHERE h.packet_key = g.source_key AND h.glyph_record_id IS NULL
+          WHERE h.packet_key = g.packet_key AND h.glyph_record_id IS NULL
         `);
 
         const linked1 = packetKeyResult.rowCount;
         log.ok(`Linked ${linked1} glyphs by packet_key`);
 
-        // Link by feature_id second
-        const featureIdResult = await client.query(`
+        // Link by source_ref second
+        const sourceRefResult = await client.query(`
           UPDATE atlas_higher_hop_index h
           SET
             glyph_record_id = g.id,
-            glyph_render_type = g.render_type
+            glyph_render_type = g.glyph_type
           FROM atlas_svg_glyphs g
-          WHERE h.feature_id = g.feature_id AND h.glyph_record_id IS NULL
+          WHERE h.source_ref = g.source_ref AND h.glyph_record_id IS NULL
         `);
 
-        const linked2 = featureIdResult.rowCount;
-        log.ok(`Linked ${linked2} glyphs by feature_id`);
+        const linked2 = sourceRefResult.rowCount;
+        log.ok(`Linked ${linked2} glyphs by source_ref`);
 
         log.info('');
 

@@ -25,6 +25,7 @@
     "atlas:seed-reward-sets": "node scripts/atlas/seed-redis-reward-sets.mjs",
     "atlas:seed-reward-sets:apply": "node scripts/atlas/seed-redis-reward-sets.mjs --apply",
     "smoke:hyperrag-packet-rpc": "node scripts/atlas/smoke-hyperrag-packet-rpc.mjs",
+    "smoke:packet-transport": "node scripts/atlas/smoke-packet-reader-writer.mjs",
     "atlas:mcp:tool-manifest": "node scripts/atlas/build-mcp-tool-manifest-packets.mjs --apply",
     "atlas:mcp:tool-manifest:dry": "node scripts/atlas/build-mcp-tool-manifest-packets.mjs",
     "atlas:mcp:tool-manifest:verbose": "node scripts/atlas/build-mcp-tool-manifest-packets.mjs --apply --verbose",
@@ -43,6 +44,7 @@
     "atlas:temporal:build:dry": "node scripts/atlas/build-temporal-bitfrost-index.mjs",
     "atlas:temporal:build:verbose": "node scripts/atlas/build-temporal-bitfrost-index.mjs --apply --verbose",
     "atlas:temporal:build:window": "node scripts/atlas/build-temporal-bitfrost-index.mjs --apply --window=30d",
+    "atlas:mcp:ontology": "node scripts/atlas/audit-mcp-tool-ontology.mjs",
     "atlas:ontology:classify": "node scripts/atlas/classify-domain-ontology.mjs --apply",
     "atlas:ontology:classify:dry": "node scripts/atlas/classify-domain-ontology.mjs",
     "atlas:ontology:classify:verbose": "node scripts/atlas/classify-domain-ontology.mjs --apply --verbose",
@@ -74,6 +76,7 @@
     "atlas:xgboost:export:verbose": "node scripts/atlas/export-xgboost-features.mjs --apply --verbose",
     "atlas:cascade:smoke": "node scripts/atlas/smoke-atlas-ann-cascade.mjs",
     "atlas:cascade:smoke:verbose": "node scripts/atlas/smoke-atlas-ann-cascade.mjs --verbose",
+    "atlas:retrieval:e2e": "node scripts/atlas/benchmark-retrieval-e2e.mjs",
     "atlas:xgboost:serve": "cross-env PYTHONIOENCODING=utf-8 python scripts/atlas/serve-xgboost-reranker.py",
     "atlas:xgboost:serve:lgbm": "cross-env PYTHONIOENCODING=utf-8 python scripts/atlas/serve-xgboost-reranker.py --lightgbm",
     "sidecars:turbovec-grpc": "node scripts/sidecars/turbovec-grpc-bridge.mjs",
@@ -139,6 +142,7 @@
     "atlas:phase-2-part-4:metadata:migrate:apply": "node sveltekit-frontend/scripts/atlas/migrate-metadata-v1-to-v2.mjs --apply",
     "atlas:phase-2-part-4:audit": "node sveltekit-frontend/scripts/atlas/audit-phase-2-part-4.mjs --save",
     "atlas:phase-2-part-4:verify": "node sveltekit-frontend/scripts/atlas/verify-phase-2-part-4.mjs --save"
+    ,"atlas:phase-16-h:qdrant-gap:classify": "node scripts/atlas/phase-16-h-qdrant-gap-classifier.mjs"
   },
   "devDependencies": {
     "@ast-grep/cli": "0.42.3",

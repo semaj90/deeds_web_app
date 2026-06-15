@@ -1,6 +1,28 @@
-import { customType, index, integer, jsonb, pgTable, real, serial, smallint, text, timestamp, uniqueIndex, uuid, vector } from 'drizzle-orm/pg-core';
+import {
+  pgTable,
+  text,
+  timestamp,
+  jsonb,
+  integer,
+  uuid,
+  real,
+  serial,
+  smallint,
+  index,
+  uniqueIndex,
+  customType,
+  vector,
+} from 'drizzle-orm/pg-core';
 import { sql } from 'drizzle-orm';
 import { kagDagRuns } from './kag-dag.js';
+
+// Inline boolean avoids ESM live-binding race under --experimental-loader
+// when this module is evaluated before drizzle-orm/pg-core finishes init.
+const pgBoolean = customType<{ data: boolean; driverData: boolean }>({
+  dataType() { return 'boolean'; },
+  fromDriver(value) { return Boolean(value); },
+  toDriver(value) { return value; },
+});
 
 const bytea = customType<{ data: Buffer; driverData: Buffer }>({
   dataType() {
@@ -47,7 +69,8 @@ export const nesChromPackets = pgTable('nes_chrom_packets', {
   lineageVersion: text('lineage_version'),
   metadata: jsonb('metadata').notNull().default(sql`'{}'::jsonb`),
   tags: jsonb('tags').$type<string[]>().notNull().default(sql`'[]'::jsonb`),
-  canonical: boolean('canonical').notNull().default(false),
+  canonical: pgBoolean('canonical').notNull().default(false),
+  identityLane: text('identity_lane').default('qdrant_chunk'),
   payloadBackfilledAt: timestamp('payload_backfilled_at', { withTimezone: true }),
   somRow: integer('som_row'),
   somCol: integer('som_col'),
