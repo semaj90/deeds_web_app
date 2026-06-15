@@ -1,5 +1,6 @@
-import { index, integer, jsonb, pgTable, text, timestamp } from 'drizzle-orm/pg-core';
+import { index, integer, jsonb, pgTable, text, timestamp, uuid } from 'drizzle-orm/pg-core';
 import { sql } from 'drizzle-orm';
+import { atlasTreeNodes } from './atlas-tree-nodes.js';
 
 /**
  * Canonical source_ref → feature lineage table.
@@ -13,6 +14,7 @@ export const atlasFeatureMap = pgTable('atlas_feature_map', {
   clusterId:          text('cluster_id'),
   centroidId:         text('centroid_id'),
   somCluster:         text('som_cluster'),
+  treeNodeId:         uuid('tree_node_id').references(() => atlasTreeNodes.nodeId, { onDelete: 'set null' }),
   qdrantPointId:      text('qdrant_point_id'),
   neo4jNodeId:        text('neo4j_node_id'),
   nesCardId:          text('nes_card_id'),
@@ -24,6 +26,7 @@ export const atlasFeatureMap = pgTable('atlas_feature_map', {
   featureIdIdx:       index('atlas_feature_map_feature_id_idx').on(table.featureId),
   somClusterIdx:      index('atlas_feature_map_som_cluster_idx').on(table.somCluster),
   clusterIdIdx:       index('atlas_feature_map_cluster_id_idx').on(table.clusterId),
+  treeNodeIdIdx:      index('atlas_feature_map_tree_node_id_idx').on(table.treeNodeId),
   relatedGin:         index('atlas_feature_map_related_gin').using('gin', table.relatedFeatureIds),
   laneIdsGin:         index('atlas_feature_map_lane_ids_gin').using('gin', table.laneIds),
 }));

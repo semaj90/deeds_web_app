@@ -9,6 +9,7 @@ CREATE TABLE IF NOT EXISTS atlas_feature_map (
     cluster_id            TEXT,
     centroid_id           TEXT,
     som_cluster           TEXT,
+    tree_node_id          UUID REFERENCES atlas_tree_nodes(node_id) ON DELETE SET NULL,
     qdrant_point_id       TEXT,
     neo4j_node_id         TEXT,
     nes_card_id           TEXT,
@@ -25,6 +26,9 @@ CREATE INDEX IF NOT EXISTS atlas_feature_map_som_cluster_idx
 
 CREATE INDEX IF NOT EXISTS atlas_feature_map_cluster_id_idx
     ON atlas_feature_map (cluster_id);
+
+CREATE INDEX IF NOT EXISTS atlas_feature_map_tree_node_id_idx
+    ON atlas_feature_map (tree_node_id);
 
 CREATE INDEX IF NOT EXISTS atlas_feature_map_related_gin
     ON atlas_feature_map USING gin (related_feature_ids);

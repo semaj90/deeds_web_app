@@ -9,6 +9,7 @@ import { cacheControl, checkETag, notModified } from '$lib/server/middleware/cac
 import { z } from 'zod';
 import { syncCaseToGraph } from '$lib/server/graph/pg-neo4j-sync.js';
 import { insertCaseSchema } from '$lib/server/db/zod-schemas.js';
+import { logError, categorizeError, categorizeSeverity } from '$lib/server/error-logging.js';
 
 const CASE_STATUS = ['open', 'in_progress', 'pending_review', 'closed', 'archived'] as const;
 const CASE_PRIORITY = ['low', 'medium', 'high', 'critical', 'urgent'] as const;
@@ -92,7 +93,24 @@ export const GET: RequestHandler = async (event) => {
 			{ headers: { ...cacheControl.private, ETag: etag } }
 		);
 	} catch (err) {
+		const category = categorizeError(err);
+		const severity = categorizeSeverity(category);
+
 		console.error('Error fetching cases:', err);
+
+		// Log error for P1 agentic error fixing
+		await logError({
+			category,
+			severity,
+			message: String(err),
+			stack: err instanceof Error ? err.stack : undefined,
+			routePath: '/api/cases',
+			filePath: 'src/routes/api/cases/+server.ts',
+			contextKey: 'cases-get',
+		}).catch((logErr) => {
+			console.error('[ERROR-LOGGING] Failed to log cases/get error:', logErr);
+		});
+
 		return json(
       {
         success: false,
@@ -150,7 +168,24 @@ export const POST: RequestHandler = async (event) => {
 			message: 'Case created successfully'
 		});
 	} catch (err) {
+		const category = categorizeError(err);
+		const severity = categorizeSeverity(category);
+
 		console.error('Error creating case:', err);
+
+		// Log error for P1 agentic error fixing
+		await logError({
+			category,
+			severity,
+			message: String(err),
+			stack: err instanceof Error ? err.stack : undefined,
+			routePath: '/api/cases',
+			filePath: 'src/routes/api/cases/+server.ts',
+			contextKey: 'cases-post',
+		}).catch((logErr) => {
+			console.error('[ERROR-LOGGING] Failed to log cases/post error:', logErr);
+		});
+
 		return apiResponses.serverError('Failed to create case');
 	}
 };

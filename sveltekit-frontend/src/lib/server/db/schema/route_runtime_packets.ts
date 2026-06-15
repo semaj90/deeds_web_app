@@ -1,5 +1,6 @@
 import { sql } from 'drizzle-orm';
 import { pgTable, bigserial, text, timestamp, integer, boolean, jsonb, index, numeric, uuid, uniqueIndex } from 'drizzle-orm/pg-core';
+import { atlasTreeNodes } from './atlas-tree-nodes.js';
 
 export const routeRuntimePackets = pgTable('route_runtime_packets', {
     id: bigserial('id', { mode: 'number' }).primaryKey(),
@@ -19,6 +20,7 @@ export const routeRuntimePackets = pgTable('route_runtime_packets', {
     qdrantHits: integer('qdrant_hits'),
     redisHotKeys: jsonb('redis_hot_keys').$type<string[]>().notNull().default(sql`'[]'::jsonb`),
     raw: jsonb('raw').notNull().default(sql`'{}'::jsonb`),
+    treeNodeId: uuid('tree_node_id').references(() => atlasTreeNodes.nodeId, { onDelete: 'set null' }),
     promptHash: text('prompt_hash'),
     reward: numeric('reward'),
     packetUuid: uuid('packet_uuid').defaultRandom(),
@@ -52,6 +54,7 @@ export const routeRuntimePackets = pgTable('route_runtime_packets', {
     index('idx_route_runtime_packets_feature_id').on(t.featureId),
     index('idx_route_runtime_packets_feature_ids_gin').using('gin', t.featureIds),
     index('idx_route_runtime_packets_source_refs_gin').using('gin', t.sourceRefs),
+    index('idx_route_runtime_packets_tree_node_id').on(t.treeNodeId),
     index('idx_route_runtime_packets_raw_gin').using('gin', t.raw),
     index('idx_rrp_git_sha').on(t.gitSha),
     index('idx_rrp_packet_version').on(t.packetVersion),

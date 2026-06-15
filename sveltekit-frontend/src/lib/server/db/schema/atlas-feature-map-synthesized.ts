@@ -1,5 +1,6 @@
-import { index, integer, jsonb, pgTable, real, text, timestamp } from 'drizzle-orm/pg-core';
+import { index, integer, jsonb, pgTable, real, text, timestamp, uuid } from 'drizzle-orm/pg-core';
 import { sql } from 'drizzle-orm';
+import { atlasTreeNodes } from './atlas-tree-nodes.js';
 
 /**
  * Derived working memory for Atlas promotion.
@@ -13,6 +14,7 @@ export const atlasFeatureMapSynthesized = pgTable('atlas_feature_map_synthesized
   relatedFeatureIds: jsonb('related_feature_ids').notNull().default(sql`'[]'::jsonb`),
 
   somCluster: text('som_cluster'),
+  treeNodeId: uuid('tree_node_id').references(() => atlasTreeNodes.nodeId, { onDelete: 'set null' }),
   centroidId: text('centroid_id'),
   qdrantPointId: text('qdrant_point_id'),
   clusterId: text('cluster_id'),
@@ -35,6 +37,7 @@ export const atlasFeatureMapSynthesized = pgTable('atlas_feature_map_synthesized
 }, (table) => ({
   featureIdIdx: index('idx_afms_feature_id').on(table.featureId),
   somClusterIdx: index('idx_afms_som_cluster').on(table.somCluster),
+  treeNodeIdIdx: index('idx_afms_tree_node_id').on(table.treeNodeId),
   routingScoreIdx: index('idx_afms_routing_score').on(table.routingScore.desc()),
   pickupStatusIdx: index('idx_afms_pickup_status').on(table.pickupStatus).where(sql`${table.pickupStatus} IS NOT NULL`),
 }));

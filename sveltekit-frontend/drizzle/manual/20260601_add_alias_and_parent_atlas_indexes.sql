@@ -45,6 +45,7 @@ CREATE TABLE IF NOT EXISTS public.parent_atlas_documents (
   cluster_id       text,
   centroid_id      text,
   qdrant_point_id  text,
+  tree_node_id     uuid REFERENCES atlas_tree_nodes(node_id) ON DELETE SET NULL,
   alias_id         text,
   related_feature_ids jsonb      NOT NULL DEFAULT '[]'::jsonb,
   source_kind      text         DEFAULT 'source',
@@ -92,6 +93,9 @@ CREATE INDEX IF NOT EXISTS idx_parent_atlas_documents_related_feature_ids_gin
 
 CREATE INDEX IF NOT EXISTS idx_pad_qdrant_point_id
   ON public.parent_atlas_documents (qdrant_point_id);
+
+CREATE INDEX IF NOT EXISTS idx_pad_tree_node_id
+  ON public.parent_atlas_documents (tree_node_id);
 
 CREATE INDEX IF NOT EXISTS idx_pad_tags_gin
   ON public.parent_atlas_documents USING gin (tags);

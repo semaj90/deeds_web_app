@@ -1,5 +1,6 @@
-import { boolean, index, integer, jsonb, pgTable, text, timestamp, uniqueIndex } from 'drizzle-orm/pg-core';
+import { boolean, index, integer, jsonb, pgTable, text, timestamp, uniqueIndex, uuid } from 'drizzle-orm/pg-core';
 import { sql } from 'drizzle-orm';
+import { atlasTreeNodes } from './atlas-tree-nodes.js';
 
 /**
  * Parent Atlas document mirror.
@@ -29,6 +30,7 @@ export const parentAtlasDocuments = pgTable('parent_atlas_documents', {
   clusterId: text('cluster_id'),
   centroidId: text('centroid_id'),
   qdrantPointId: text('qdrant_point_id'),
+  treeNodeId: uuid('tree_node_id').references(() => atlasTreeNodes.nodeId, { onDelete: 'set null' }),
   aliasId: text('alias_id'),
   relatedFeatureIds: jsonb('related_feature_ids').notNull().default(sql`'[]'::jsonb`),
   sourceKind: text('source_kind').default('source'),
@@ -54,6 +56,7 @@ export const parentAtlasDocuments = pgTable('parent_atlas_documents', {
   sourceRefIdIdx: index('idx_pad_source_ref_id').on(table.sourceRefId),
   relatedFeatureIdsGin: index('idx_parent_atlas_documents_related_feature_ids_gin').using('gin', table.relatedFeatureIds),
   qdrantPointIdIdx: index('idx_pad_qdrant_point_id').on(table.qdrantPointId),
+  treeNodeIdIdx: index('idx_pad_tree_node_id').on(table.treeNodeId),
   tagsGin: index('idx_pad_tags_gin').using('gin', table.tags),
   payloadGin: index('idx_pad_payload_gin').using('gin', table.payload),
 }));

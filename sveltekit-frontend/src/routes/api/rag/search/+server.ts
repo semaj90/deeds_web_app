@@ -10,6 +10,7 @@ import type {
 } from '$lib/types/rag-source-validation';
 import { productionLogger } from '$lib/server/production-logger.js';
 import { apiResponses } from '$lib/server/api/response-helper.js';
+import { logError, categorizeError, categorizeSeverity } from '$lib/server/error-logging.js';
 import { chatRateLimiter } from '$lib/server/middleware/rate-limiter.js';
 import { computeTFIDF } from '$lib/server/retrieval/tfidf-scorer.js';
 import { getVectorCache, setVectorCache, getEmbeddingCache, setEmbeddingCache } from '$lib/server/vector-cache.js';
@@ -1095,7 +1096,24 @@ export const POST: RequestHandler = async ({ request, url, locals }) => {
 
     return json(response);
   } catch (err) {
+    const category = categorizeError(err);
+    const severity = categorizeSeverity(category);
+
     console.error('[rag/search] Error:', err);
+
+    // Log error for P1 agentic error fixing
+    await logError({
+      category,
+      severity,
+      message: String(err),
+      stack: err instanceof Error ? err.stack : undefined,
+      routePath: '/api/rag/search',
+      filePath: 'src/routes/api/rag/search/+server.ts',
+      contextKey: 'rag-search',
+    }).catch((logErr) => {
+      console.error('[ERROR-LOGGING] Failed to log rag/search error:', logErr);
+    });
+
     return apiResponses.serverError('Search failed');
   }
 };

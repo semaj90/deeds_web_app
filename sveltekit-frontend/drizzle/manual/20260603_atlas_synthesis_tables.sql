@@ -18,6 +18,7 @@ CREATE TABLE IF NOT EXISTS atlas_feature_map_synthesized (
 
     -- Semantic cluster state (from atlas_feature_map)
     som_cluster             text,
+    tree_node_id            uuid REFERENCES atlas_tree_nodes(node_id) ON DELETE SET NULL,
     centroid_id             text,
     qdrant_point_id         text,
     cluster_id              text,
@@ -58,6 +59,9 @@ CREATE INDEX IF NOT EXISTS idx_afms_feature_id
 
 CREATE INDEX IF NOT EXISTS idx_afms_som_cluster
     ON atlas_feature_map_synthesized (som_cluster);
+
+CREATE INDEX IF NOT EXISTS idx_afms_tree_node_id
+    ON atlas_feature_map_synthesized (tree_node_id);
 
 CREATE INDEX IF NOT EXISTS idx_afms_routing_score
     ON atlas_feature_map_synthesized (routing_score DESC NULLS LAST);

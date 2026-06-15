@@ -1,6 +1,7 @@
 import { sql } from 'drizzle-orm';
-import { pgTable, text, integer, doublePrecision, bigint, jsonb, timestamp, index } from 'drizzle-orm/pg-core';
+import { pgTable, text, integer, doublePrecision, bigint, jsonb, timestamp, index, uuid } from 'drizzle-orm/pg-core';
 import { vector } from 'drizzle-orm/pg-core';
+import { atlasTreeNodes } from './atlas-tree-nodes.js';
 
 export const atlasPackets = pgTable('atlas_packets', {
   packetId: text('packet_id').primaryKey(),
@@ -10,6 +11,7 @@ export const atlasPackets = pgTable('atlas_packets', {
   sourcePath: text('source_path'),
   sourceKind: text('source_kind'),
   featureId: text('feature_id'),
+  treeNodeId: uuid('tree_node_id').references(() => atlasTreeNodes.nodeId, { onDelete: 'set null' }),
   communityId: integer('community_id'),
   conceptIds: text('concept_ids').array(),
   clusterId: integer('cluster_id'),
@@ -44,6 +46,7 @@ export const atlasPackets = pgTable('atlas_packets', {
   payloadHashIdx: index('atlas_packets_payload_hash_idx').on(sql`(${table.payload}->>'hash')`),
   payloadPathIdx: index('idx_atlas_packets_payload_path').on(sql`(${table.payload}->>'path')`),
   payloadFileUrlIdx: index('idx_atlas_packets_payload_file_url').on(sql`(${table.payload}->>'file_url')`),
+  treeNodeIdIdx: index('idx_atlas_packets_tree_node_id').on(table.treeNodeId),
   packetPayloadPathIdx: index('idx_packet_payload_path').on(sql`(${table.payload}->>'path')`),
   packetPayloadFeatureIdx: index('idx_packet_payload_feature').on(sql`(${table.payload}->>'feature_id')`),
 }));

@@ -19,6 +19,7 @@ ALTER TABLE route_runtime_packets ADD COLUMN IF NOT EXISTS git_diff_rank numeric
 ALTER TABLE route_runtime_packets ADD COLUMN IF NOT EXISTS source_ref_quality numeric;
 ALTER TABLE route_runtime_packets ADD COLUMN IF NOT EXISTS repair_reason text;
 ALTER TABLE route_runtime_packets ADD COLUMN IF NOT EXISTS repair_method text;
+ALTER TABLE route_runtime_packets ADD COLUMN IF NOT EXISTS tree_node_id uuid REFERENCES atlas_tree_nodes(node_id) ON DELETE SET NULL;
 
 CREATE UNIQUE INDEX IF NOT EXISTS rrp_packet_uuid_uidx ON route_runtime_packets (packet_uuid);
 
@@ -33,6 +34,7 @@ CREATE INDEX IF NOT EXISTS idx_rrp_git_sha ON route_runtime_packets (git_sha);
 CREATE INDEX IF NOT EXISTS idx_rrp_packet_version ON route_runtime_packets (packet_version);
 CREATE INDEX IF NOT EXISTS idx_rrp_source_ref_quality ON route_runtime_packets (source_ref_quality);
 CREATE INDEX IF NOT EXISTS idx_rrp_superseded_by ON route_runtime_packets (superseded_by);
+CREATE INDEX IF NOT EXISTS idx_route_runtime_packets_tree_node_id ON route_runtime_packets (tree_node_id);
 
 -- Facts table
 CREATE TABLE IF NOT EXISTS route_packet_facts (
