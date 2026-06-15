@@ -125,6 +125,24 @@ CREATE TABLE IF NOT EXISTS route_runtime_packets (
     route           text        NOT NULL,   -- e.g. '/api/sse/chat'
     query_hash      text,                   -- sha256 of query text
     query_preview   text,                   -- first 120 chars
+    packet_key      text,
+    source_ref      text,
+    feature_label   text,
+    community_id    integer,
+    community_confidence numeric,
+    community_source text,
+    domain_class    text,
+    ledger_type     text,
+    lineage_version text,
+    metadata        jsonb       NOT NULL DEFAULT '{}'::jsonb,
+    tags            jsonb       NOT NULL DEFAULT '[]'::jsonb,
+    canonical       boolean     NOT NULL DEFAULT false,
+    payload_backfilled_at timestamptz,
+    som_row         integer,
+    som_col         integer,
+    som_index       integer,
+    kmeans_cluster  integer,
+    summary         text,
 
     -- ACE packet fields (mirrors context-assembler injection at :1389-1396)
     source_refs     jsonb       NOT NULL DEFAULT '[]'::jsonb,
@@ -161,6 +179,57 @@ CREATE INDEX IF NOT EXISTS idx_rrp_source_refs_gin
 
 CREATE INDEX IF NOT EXISTS idx_rrp_feature_ids_gin
     ON route_runtime_packets USING gin (feature_ids);
+
+CREATE INDEX IF NOT EXISTS idx_route_runtime_packets_feature_id_idx
+    ON route_runtime_packets (feature_id);
+
+CREATE INDEX IF NOT EXISTS idx_route_runtime_packets_packet_key_idx
+    ON route_runtime_packets (packet_key);
+
+CREATE INDEX IF NOT EXISTS idx_route_runtime_packets_source_ref_idx
+    ON route_runtime_packets (source_ref);
+
+CREATE INDEX IF NOT EXISTS idx_route_runtime_packets_source_ref
+    ON route_runtime_packets (source_ref);
+
+CREATE INDEX IF NOT EXISTS idx_route_runtime_packets_feature_label_idx
+    ON route_runtime_packets (feature_label);
+
+CREATE INDEX IF NOT EXISTS idx_route_runtime_packets_community_id_idx
+    ON route_runtime_packets (community_id);
+
+CREATE INDEX IF NOT EXISTS idx_route_runtime_packets_community_confidence_idx
+    ON route_runtime_packets (community_confidence);
+
+CREATE INDEX IF NOT EXISTS idx_route_runtime_packets_community_source_idx
+    ON route_runtime_packets (community_source);
+
+CREATE INDEX IF NOT EXISTS idx_route_runtime_packets_domain_class_idx
+    ON route_runtime_packets (domain_class);
+
+CREATE INDEX IF NOT EXISTS idx_route_runtime_packets_ledger_type_idx
+    ON route_runtime_packets (ledger_type);
+
+CREATE INDEX IF NOT EXISTS idx_route_runtime_packets_lineage_version_idx
+    ON route_runtime_packets (lineage_version);
+
+CREATE INDEX IF NOT EXISTS idx_route_runtime_packets_metadata_gin
+    ON route_runtime_packets USING gin (metadata);
+
+CREATE INDEX IF NOT EXISTS idx_route_runtime_packets_tags_gin
+    ON route_runtime_packets USING gin (tags);
+
+CREATE INDEX IF NOT EXISTS idx_route_runtime_packets_som_row_idx
+    ON route_runtime_packets (som_row);
+
+CREATE INDEX IF NOT EXISTS idx_route_runtime_packets_som_col_idx
+    ON route_runtime_packets (som_col);
+
+CREATE INDEX IF NOT EXISTS idx_route_runtime_packets_som_index_idx
+    ON route_runtime_packets (som_index);
+
+CREATE INDEX IF NOT EXISTS idx_route_runtime_packets_kmeans_cluster_idx
+    ON route_runtime_packets (kmeans_cluster);
 
 COMMENT ON TABLE route_runtime_packets IS
     'ACE telemetry per chat request. Written by context-assembler after packet injection. '

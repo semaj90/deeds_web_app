@@ -1,5 +1,5 @@
 # Codebase Map — 20-Gate Deep Audit
-> Generated: 2026-06-15T03:05:15.872Z
+> Generated: 2026-06-15T03:09:33.021Z
 > Mode: `fast-ast` · CPU-only · No GPU required
 > Regenerate: `npm run index:codebase:fast:plan`
 
@@ -164,9 +164,9 @@
 | ✅ | `src/tests` | 90 | 4 | 340 | 0 | 0/0 | 0 | — |
 | ✅ | `src/tests/gateway` | 90 | 4 | 276 | 0 | 0/0 | 0 | — |
 | ✅ | `sveltekit-frontend/config` | 90 | 5 | 700 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/docs` | 90 | 5 | 13304779 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/docs` | 90 | 5 | 13304781 | 0 | 0/0 | 0 | — |
 | ✅ | `sveltekit-frontend/docs/atlas-index` | 90 | 16 | 62036 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/docs/graph` | 90 | 37 | 12439810 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/docs/graph` | 90 | 37 | 12439812 | 0 | 0/0 | 0 | — |
 | ✅ | `sveltekit-frontend/docs/reports` | 90 | 127 | 800927 | 0 | 0/0 | 0 | — |
 | ✅ | `sveltekit-frontend/drizzle/meta` | 90 | 80 | 1949905 | 0 | 0/0 | 0 | — |
 | ✅ | `sveltekit-frontend/memory/agent-runs` | 90 | 5 | 365 | 0 | 0/0 | 0 | — |
@@ -830,7 +830,7 @@
 | ✅ | `.claude/worktrees/agent-a7203461` | 100 | 24 | 60378108 | 408 | 3236/2684 | 32 | 🟡sv4 🟠lh |
 | ✅ | `.claude/worktrees/agent-a7203461/.claude` | 100 | 16 | 1296 | 0 | 0/8 | 0 | — |
 | ✅ | `.claude/worktrees/agent-a7203461/scripts` | 100 | 2560 | 1752004 | 8 | 8/1168 | 8 | 🟠lh |
-| ✅ | `scripts/atlas` | 100 | 1621 | 423989 | 15 | 0/894 | 2 | 🟠lh |
+| ✅ | `scripts/atlas` | 100 | 1621 | 424283 | 15 | 0/894 | 2 | 🟠lh |
 | ✅ | `scripts/atlas/lib` | 100 | 99 | 14434 | 11 | 0/36 | 0 | 🟠lh |
 | ✅ | `scripts/db-tests` | 100 | 20 | 1208 | 0 | 0/0 | 0 | — |
 | ✅ | `scripts/graphify` | 100 | 12 | 1220 | 0 | 0/4 | 0 | — |
@@ -1214,9 +1214,9 @@ _No unguarded SSR-unsafe globals. ✅_
 | `node:fs` | 4641 |
 | `vitest` | 4586 |
 | `node:url` | 3918 |
-| `path` | 3817 |
+| `path` | 3819 |
 | `zod` | 3290 |
-| `fs` | 2913 |
+| `fs` | 2915 |
 | `drizzle-orm` | 2802 |
 | `pg` | 2576 |
 | `$lib/server/db/client` | 2364 |

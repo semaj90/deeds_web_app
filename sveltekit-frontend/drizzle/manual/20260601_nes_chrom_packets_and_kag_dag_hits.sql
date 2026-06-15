@@ -26,10 +26,26 @@ CREATE TABLE IF NOT EXISTS nes_chrom_packets (
   source_ref text NOT NULL,
   source_refs jsonb NOT NULL DEFAULT '[]'::jsonb,
   feature_id text NOT NULL,
+  feature_label text,
   packet_type text NOT NULL DEFAULT 'nes_chrom',
   lane text NOT NULL DEFAULT 'semantic_packet',
   model text NOT NULL DEFAULT 'gemma4-rotorquant:latest',
   summary text,
+  file_path text,
+  community_id integer,
+  community_confidence numeric,
+  community_source text,
+  domain_class text,
+  ledger_type text,
+  lineage_version text,
+  metadata jsonb NOT NULL DEFAULT '{}'::jsonb,
+  tags jsonb NOT NULL DEFAULT '[]'::jsonb,
+  canonical boolean NOT NULL DEFAULT false,
+  payload_backfilled_at timestamptz,
+  som_row integer,
+  som_col integer,
+  som_index integer,
+  kmeans_cluster integer,
   payload jsonb NOT NULL DEFAULT '{}'::jsonb,
   embedding vector(768),
   qdrant_point_id text,
@@ -51,8 +67,24 @@ CREATE TABLE IF NOT EXISTS nes_chrom_packets (
 CREATE INDEX IF NOT EXISTS nes_chrom_packets_query_hash_idx ON nes_chrom_packets(query_hash);
 CREATE INDEX IF NOT EXISTS nes_chrom_packets_chunk_id_idx ON nes_chrom_packets(chunk_id);
 CREATE UNIQUE INDEX IF NOT EXISTS nes_chrom_packets_packet_key_key ON nes_chrom_packets(packet_key);
+CREATE INDEX IF NOT EXISTS idx_nes_chrom_packets_packet_key_idx ON nes_chrom_packets(packet_key);
 CREATE INDEX IF NOT EXISTS nes_chrom_packets_source_ref_idx ON nes_chrom_packets(source_ref);
+CREATE INDEX IF NOT EXISTS idx_nes_chrom_packets_source_ref ON nes_chrom_packets(source_ref);
+CREATE INDEX IF NOT EXISTS idx_nes_chrom_packets_source_ref_idx ON nes_chrom_packets(source_ref);
 CREATE INDEX IF NOT EXISTS nes_chrom_packets_feature_id_idx ON nes_chrom_packets(feature_id);
+CREATE INDEX IF NOT EXISTS idx_nes_chrom_packets_feature_id ON nes_chrom_packets(feature_id);
+CREATE INDEX IF NOT EXISTS idx_nes_chrom_packets_feature_source ON nes_chrom_packets(feature_id, source_ref);
+CREATE INDEX IF NOT EXISTS idx_nes_chrom_packets_feature_label_idx ON nes_chrom_packets(feature_label);
+CREATE INDEX IF NOT EXISTS idx_nes_chrom_packets_community_id_idx ON nes_chrom_packets(community_id);
+CREATE INDEX IF NOT EXISTS idx_nes_chrom_packets_community_confidence_idx ON nes_chrom_packets(community_confidence);
+CREATE INDEX IF NOT EXISTS idx_nes_chrom_packets_community_source_idx ON nes_chrom_packets(community_source);
+CREATE INDEX IF NOT EXISTS idx_nes_chrom_packets_domain_class_idx ON nes_chrom_packets(domain_class);
+CREATE INDEX IF NOT EXISTS idx_nes_chrom_packets_ledger_type_idx ON nes_chrom_packets(ledger_type);
+CREATE INDEX IF NOT EXISTS idx_nes_chrom_packets_lineage_version_idx ON nes_chrom_packets(lineage_version);
+CREATE INDEX IF NOT EXISTS idx_nes_chrom_packets_metadata_gin ON nes_chrom_packets USING gin (metadata);
+CREATE INDEX IF NOT EXISTS idx_nes_chrom_packets_tags_gin ON nes_chrom_packets USING gin (tags);
+CREATE INDEX IF NOT EXISTS idx_nes_chrom_packets_som_index_idx ON nes_chrom_packets(som_index);
+CREATE INDEX IF NOT EXISTS idx_nes_chrom_packets_kmeans_cluster_idx ON nes_chrom_packets(kmeans_cluster);
 CREATE INDEX IF NOT EXISTS nes_chrom_packets_qdrant_point_idx ON nes_chrom_packets(qdrant_point_id);
 CREATE INDEX IF NOT EXISTS nes_chrom_packets_kag_run_idx ON nes_chrom_packets(kag_dag_run_id);
 CREATE INDEX IF NOT EXISTS nes_chrom_packets_source_refs_gin ON nes_chrom_packets USING gin (source_refs);
@@ -65,6 +97,8 @@ CREATE INDEX IF NOT EXISTS idx_nes_chrom_packets_som_cluster ON nes_chrom_packet
 CREATE INDEX IF NOT EXISTS nes_chrom_packets_source_ref_id_idx ON nes_chrom_packets (source_ref_id);
 CREATE INDEX IF NOT EXISTS nes_chrom_packets_feature_code_idx ON nes_chrom_packets (feature_code);
 CREATE INDEX IF NOT EXISTS nes_chrom_packets_som_code_idx ON nes_chrom_packets (som_code);
+CREATE INDEX IF NOT EXISTS nes_chrom_packets_confidence_score_idx ON nes_chrom_packets (confidence_score);
+CREATE INDEX IF NOT EXISTS nes_chrom_packets_packet_zstd_idx ON nes_chrom_packets (packet_zstd);
 
 CREATE TABLE IF NOT EXISTS nes_chrom_kag_dag_hits (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),

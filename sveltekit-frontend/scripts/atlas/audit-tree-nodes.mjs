@@ -12,27 +12,77 @@
  */
 
 import pg from 'pg';
+import dotenv from 'dotenv';
+import { fileURLToPath } from 'url';
+import { dirname } from 'path';
 
 const { Pool } = pg;
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+dotenv.config({ path: `${__dirname}/../../.env` });
+
+const PACKET_TABLE_CANDIDATES = ['atlas_codebase_packets', 'atlas_packets'];
 
 const args = process.argv.slice(2);
 const verbose = args.includes('--verbose');
+
+async function detectPacketTable(pool) {
+  const res = await pool.query(
+    `
+      SELECT table_name,
+             EXISTS (
+               SELECT 1
+               FROM information_schema.columns c
+               WHERE c.table_schema = 'public'
+                 AND c.table_name = t.table_name
+                 AND c.column_name = 'tree_node_id'
+             ) AS has_tree_node_id
+      FROM unnest($1::text[]) AS t(table_name)
+      WHERE EXISTS (
+        SELECT 1
+        FROM information_schema.tables i
+        WHERE i.table_schema = 'public'
+          AND i.table_name = t.table_name
+      )
+      ORDER BY CASE table_name
+        WHEN 'atlas_codebase_packets' THEN 0
+        WHEN 'atlas_packets' THEN 1
+        ELSE 2
+      END
+      LIMIT 1
+    `,
+    [PACKET_TABLE_CANDIDATES]
+  );
+
+  if (res.rows.length === 0) {
+    throw new Error(`No packet ledger found. Expected one of: ${PACKET_TABLE_CANDIDATES.join(', ')}`);
+  }
+
+  return {
+    tableName: res.rows[0].table_name,
+    hasTreeNodeId: res.rows[0].has_tree_node_id === true,
+  };
+}
 
 /**
  * Run audit checks
  */
 async function auditTreeNodes(pool) {
   const results = {
+    packetLedger: null,
     checks: {},
     gate_pass: false,
     errors: [],
   };
 
   try {
+    const packetLedger = await detectPacketTable(pool);
+    results.packetLedger = packetLedger.tableName;
+
     // Check 1: Row count > 0
     console.log('[audit] Check 1: Row count > 0');
     const countRes = await pool.query('SELECT COUNT(*) as count FROM atlas_tree_nodes');
-    const rowCount = countRes.rows[0]?.count || 0;
+    const rowCount = Number(countRes.rows[0]?.count || 0);
 
     results.checks.row_count = rowCount;
     if (rowCount > 0) {
@@ -47,7 +97,7 @@ async function auditTreeNodes(pool) {
     const uniqueRes = await pool.query(`
       SELECT COUNT(DISTINCT node_id) as unique_count FROM atlas_tree_nodes;
     `);
-    const uniqueCount = uniqueRes.rows[0]?.unique_count || 0;
+    const uniqueCount = Number(uniqueRes.rows[0]?.unique_count || 0);
 
     results.checks.unique_node_ids = uniqueCount === rowCount;
     if (uniqueCount === rowCount) {
@@ -58,16 +108,31 @@ async function auditTreeNodes(pool) {
     }
 
     // Check 3: source_ref links to packets
-    console.log('\n[audit] Check 3: source_ref links to atlas_packets');
-    const linkRes = await pool.query(`
-      SELECT
-        COUNT(*) as with_source_ref,
-        COUNT(CASE WHEN packet_key IS NOT NULL THEN 1 END) as linked_to_packets
-      FROM atlas_tree_nodes
-      WHERE source_ref IS NOT NULL;
-    `);
-    const withSourceRef = linkRes.rows[0]?.with_source_ref || 0;
-    const linkedPackets = linkRes.rows[0]?.linked_to_packets || 0;
+    console.log(`\n[audit] Check 3: source_ref links to ${packetLedger.tableName}`);
+    let withSourceRef = 0;
+    let linkedPackets = 0;
+
+    if (packetLedger.hasTreeNodeId) {
+      const linkRes = await pool.query(`
+        SELECT
+          COUNT(*) as with_source_ref,
+          COUNT(CASE WHEN tree_node_id IS NOT NULL THEN 1 END) as linked_to_packets
+        FROM ${packetLedger.tableName}
+        WHERE source_ref IS NOT NULL;
+      `);
+      withSourceRef = Number(linkRes.rows[0]?.with_source_ref || 0);
+      linkedPackets = Number(linkRes.rows[0]?.linked_to_packets || 0);
+    } else {
+      const linkRes = await pool.query(`
+        SELECT
+          COUNT(*) as with_source_ref,
+          COUNT(CASE WHEN packet_key IS NOT NULL THEN 1 END) as linked_to_packets
+        FROM atlas_tree_nodes
+        WHERE source_ref IS NOT NULL;
+      `);
+      withSourceRef = Number(linkRes.rows[0]?.with_source_ref || 0);
+      linkedPackets = Number(linkRes.rows[0]?.linked_to_packets || 0);
+    }
 
     results.checks.source_ref_linkage = (linkedPackets / Math.max(withSourceRef, 1) * 100).toFixed(1) + '%';
     const linkagePercent = (linkedPackets / Math.max(withSourceRef, 1)) * 100;
@@ -81,7 +146,7 @@ async function auditTreeNodes(pool) {
       WHERE t.parent_id IS NOT NULL
       AND t.parent_id NOT IN (SELECT node_id FROM atlas_tree_nodes);
     `);
-    const orphanedCount = orphanRes.rows[0]?.orphaned_count || 0;
+    const orphanedCount = Number(orphanRes.rows[0]?.orphaned_count || 0);
 
     results.checks.orphaned_nodes = orphanedCount;
     if (orphanedCount === 0) {
@@ -106,7 +171,7 @@ async function auditTreeNodes(pool) {
       )
       SELECT MAX(depth) as max_depth, COUNT(*) as node_count FROM path;
     `);
-    const maxDepth = depthRes.rows[0]?.max_depth || 0;
+    const maxDepth = Number(depthRes.rows[0]?.max_depth || 0);
 
     results.checks.max_tree_depth = maxDepth;
     if (maxDepth > 0 && maxDepth <= 50) {
@@ -127,8 +192,8 @@ async function auditTreeNodes(pool) {
         COUNT(CASE WHEN feature_id IS NOT NULL THEN 1 END) as with_feature_id
       FROM atlas_tree_nodes;
     `);
-    const totalNodes = featureRes.rows[0]?.total || 0;
-    const withFeatureId = featureRes.rows[0]?.with_feature_id || 0;
+    const totalNodes = Number(featureRes.rows[0]?.total || 0);
+    const withFeatureId = Number(featureRes.rows[0]?.with_feature_id || 0);
     const featureCoverage = (withFeatureId / Math.max(totalNodes, 1) * 100).toFixed(1);
 
     results.checks.feature_id_coverage = featureCoverage + '%';
