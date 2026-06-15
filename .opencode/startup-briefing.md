@@ -28,6 +28,8 @@ Hello James.
 
 ## Notes
 
+- indexing mode: static-plus-temporal-refresh
+- static packet indexing: true
 - runtime coverage status: HIGHER_HOP_ENRICHMENT_PENDING
 - higher-hop status: HIGHER_HOP_GAP
 - higher-hop schema repair status: SCHEMA_REPAIR_REQUIRED

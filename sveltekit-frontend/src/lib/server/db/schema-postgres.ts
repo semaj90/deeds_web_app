@@ -4884,6 +4884,39 @@ export const policyRerankerMetadata = pgTable('policy_reranker_metadata', {
 export type PolicyRerankerMetadata = typeof policyRerankerMetadata.$inferSelect;
 export type NewPolicyRerankerMetadata = typeof policyRerankerMetadata.$inferInsert;
 
+export const errorLogs = pgTable('error_logs', {
+  id: uuid('id').defaultRandom().primaryKey().notNull(),
+  error_category: varchar('error_category', { length: 100 }).notNull(),
+  severity: varchar('severity', { length: 20 }).notNull(), // CRITICAL, ERROR, WARNING, INFO
+  message: text('message').notNull(),
+  stack: text('stack'),
+  context_key: varchar('context_key', { length: 255 }), // route, function, component
+  route_path: varchar('route_path', { length: 255 }), // API or page path
+  file_path: varchar('file_path', { length: 512 }), // source file
+  line_number: integer('line_number'),
+  packet_key: varchar('packet_key', { length: 255 }), // link to atlas_packets
+  source_ref: varchar('source_ref', { length: 255 }), // link to source_ref
+  created_at: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
+  fixed_at: timestamp('fixed_at', { withTimezone: true }),
+  resolved: boolean('resolved').default(false).notNull(),
+  fix_strategy: varchar('fix_strategy', { length: 50 }), // pattern, ast, semantic, manual
+  fix_confidence: numeric('fix_confidence', { precision: 5, scale: 2 }), // 0.0-1.0
+  fix_notes: text('fix_notes'),
+  audit_count: integer('audit_count').default(1).notNull(),
+  last_audit_at: timestamp('last_audit_at', { withTimezone: true }),
+}, (table) => ({
+  idx_category: index('idx_error_logs_category').on(table.error_category),
+  idx_severity: index('idx_error_logs_severity').on(table.severity),
+  idx_created: index('idx_error_logs_created').on(table.created_at),
+  idx_route: index('idx_error_logs_route').on(table.route_path),
+  idx_packet_key: index('idx_error_logs_packet_key').on(table.packet_key),
+  idx_resolved: index('idx_error_logs_resolved').on(table.resolved),
+  idx_fix_strategy: index('idx_error_logs_fix_strategy').on(table.fix_strategy),
+}));
+
+export type ErrorLog = typeof errorLogs.$inferSelect;
+export type NewErrorLog = typeof errorLogs.$inferInsert;
+
 export * from './schema/atlas-packets.js';
 
 

@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-06-15T00:41:02.289Z",
+  "generatedAt": "2026-06-15T02:39:03.904Z",
   "appRoot": "C:/Users/james/Videos/deeds-web-app",
   "readOnly": true,
   "summary": {
@@ -773,6 +773,8 @@
     ],
     "nextLane": "Higher-hop schema repair",
     "notes": {
+      "indexingMode": "static-plus-temporal-refresh",
+      "staticPacketIndexing": true,
       "runtimeCoverageStatus": "HIGHER_HOP_ENRICHMENT_PENDING",
       "higherHopStatus": "HIGHER_HOP_GAP",
       "higherHopSchemaRepairStatus": "SCHEMA_REPAIR_REQUIRED",

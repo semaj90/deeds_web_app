@@ -1,0 +1,15 @@
+{
+  "status": "pass",
+  "summary": {
+    "total_errors": 0,
+    "total_categories": 0,
+    "fixed_count": 0,
+    "routes_with_errors": 0,
+    "severity_levels": 0
+  },
+  "by_category": [],
+  "by_route": [],
+  "by_severity": [],
+  "top_errors": [],
+  "timestamp": "2026-06-15T02:16:00.474Z"
+}

@@ -1,0 +1,38 @@
+{
+  "status": "pass",
+  "summary": {
+    "total_errors": "0",
+    "fixed_count": "0",
+    "resolved_count": "0",
+    "unfixed_count": "0",
+    "gates_pass": 4,
+    "gates_total": 4
+  },
+  "gates": [
+    {
+      "name": "Error count decreased ≥10%",
+      "pass": true,
+      "value": "0",
+      "threshold": 0
+    },
+    {
+      "name": "No regressions (unfixed stable or decreased)",
+      "pass": true,
+      "value": "0",
+      "threshold": "0"
+    },
+    {
+      "name": "Fix confidence >0.85",
+      "pass": true,
+      "value": "N/A",
+      "threshold": 0.85
+    },
+    {
+      "name": "Coverage >50% (at least half addressed)",
+      "pass": true,
+      "value": 100,
+      "threshold": 50
+    }
+  ],
+  "timestamp": "2026-06-15T02:15:59.712Z"
+}

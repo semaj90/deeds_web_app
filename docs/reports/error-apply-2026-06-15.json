@@ -1,0 +1,14 @@
+{
+  "status": "pass",
+  "mode": "dry-run",
+  "summary": {
+    "total_errors": 0,
+    "fixed_count": 0,
+    "failed_count": 0,
+    "manual_count": 0,
+    "total_confidence": null,
+    "notes": "No errors in current scope"
+  },
+  "fixes": [],
+  "timestamp": "2026-06-15T02:15:59.037Z"
+}

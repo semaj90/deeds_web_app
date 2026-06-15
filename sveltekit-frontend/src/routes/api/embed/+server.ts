@@ -9,6 +9,7 @@ import { traceEmbedding } from '$lib/server/observability/langfuse.js';
 import { z } from 'zod';
 import { ollamaFetch } from '$lib/server/ollama.js';
 import { ENV } from '$lib/server/env.server.js';
+import { logError, categorizeError, categorizeSeverity } from '$lib/server/error-logging.js';
 
 const OLLAMA_URL = ENV.OLLAMA_BASE_URL;
 
@@ -119,7 +120,22 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 
 		return json(result);
 	} catch (err) {
+		const category = categorizeError(err);
+		const severity = categorizeSeverity(category);
+
 		console.error('Embedding error:', err);
+
+		// Log error for P1 agentic error fixing
+		await logError({
+			category,
+			severity,
+			message: String(err),
+			stack: err instanceof Error ? err.stack : undefined,
+			routePath: '/api/embed',
+			filePath: 'src/routes/api/embed/+server.ts',
+			contextKey: 'embed',
+		});
+
 		// Degraded response — return mock embedding instead of 500
 		return json({ embedding: new Array(768).fill(0), model: 'embeddinggemma:latest', dimensions: 768 });
 	}
