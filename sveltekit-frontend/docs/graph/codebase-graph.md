@@ -1,27 +1,27 @@
 # Codebase Graph Plan — Fast AST (20-Gate)
-> Generated: 2026-06-15T04:37:36.780Z
+> Generated: 2026-06-15T05:01:43.836Z
 > Mode: `fast-ast` (CPU only)
 
 ## Stats
 | Metric | Count |
 |--------|-------|
-| Files | 57569 |
-| Routes | 0 |
-| Components | 0 |
-| API handlers | 1230 |
-| TODOs | 363 |
-| Dirs | 823 |
+| Files | 58030 |
+| Routes | 4959 |
+| Components | 4801 |
+| API handlers | 6348 |
+| TODOs | 1037 |
+| Dirs | 836 |
 
 ## Gate Failures (action needed)
 | Gate | Fail Count |
 |------|-----------|
 | G4 No auth | 30 |
 | G5 No Zod  | 3 |
-| G11 Localhost | 2326 |
+| G11 Localhost | 2331 |
 | G14 Svelte4 | 28 |
 | G15 SSR unsafe | 0 |
 | G16 No test | 318 |
-| G20 Cyclic | 1 |
+| G20 Cyclic | 3 |
 
 ## Files with TODO/FIXME
 - `docker/langgraph-synthesis/.venv/Lib/site-packages/torch/utils/model_dump/code.js` — 14 marker(s)

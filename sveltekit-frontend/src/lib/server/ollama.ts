@@ -965,6 +965,52 @@ export async function bifrostChat(
   let tool_calls: any[] | undefined;
 
   const callDirectOllamaFallback = async () => {
+    // ── TurboQuant (llama-server :8090) Priority Gate ──────────────────────
+    // Prefer TurboQuant for Gemma4 models if available (KV cache compression benefit)
+    const isTurboQuantModel = model?.includes('gemma4') || model?.includes('gemma3');
+    const turboQuantUrl = ENV.TURBOQUANT_BASE_URL?.replace(/\/$/, '') ?? 'http://127.0.0.1:8090';
+    let usedBackend = 'ollama';
+
+    if (isTurboQuantModel) {
+      try {
+        // Gate: Check TurboQuant health via /v1/models probe (fast, ~10ms)
+        const modelsProbe = await fetch(`${turboQuantUrl}/v1/models`, {
+          signal: AbortSignal.timeout(2000),
+        });
+        if (modelsProbe.ok) {
+          // TurboQuant available — try it first
+          const turboquantRes = await fetch(`${turboQuantUrl}/v1/chat/completions`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              model: model, // llama-server accepts both ollama model names and .gguf paths
+              messages: normalizedMessages,
+              temperature: options?.temperature ?? 0.7,
+              max_tokens: options?.maxTokens ?? 2048,
+              stream: false,
+              ...(options?.tools ? { tools: options.tools } : {}),
+            }),
+            signal: AbortSignal.timeout(options?.timeoutMs ?? REQUEST_TIMEOUT_MS),
+          });
+
+          if (turboquantRes.ok) {
+            const turboquantData = (await turboquantRes.json()) as any;
+            content = turboquantData.choices?.[0]?.message?.content ?? '';
+            tool_calls = turboquantData.choices?.[0]?.message?.tool_calls;
+            t_l3 = performance.now() - bifrostStart;
+            usedBackend = 'turboquant';
+            console.log(`[bifrost] L3 TURBOQUANT OK (l3_ms=${Math.round(t_l3)})`);
+            return; // Success — don't fallback to Ollama
+          }
+        }
+      } catch (err) {
+        // TurboQuant probe/call failed — fall through to Ollama
+        console.warn(`[bifrost] TurboQuant probe failed (${isTurboQuantModel ? 'gate enabled' : 'not gemma4'}):`, (err as Error).message);
+      }
+    }
+
+    // ── Ollama Fallback ────────────────────────────────────────────────────
+    // Default fallback if TurboQuant unavailable, not gated, or fails
     const ollamaRes = await ollamaFetch(`${OLLAMA_BASE_URL}/api/chat`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -989,7 +1035,8 @@ export async function bifrostChat(
     content = ollamaData.message?.content ?? '';
     tool_calls = ollamaData.message?.tool_calls;
     t_l3 = performance.now() - bifrostStart;
-    console.log(`[bifrost] L3 DIRECT OLLAMA OK (l3_ms=${Math.round(t_l3)})`);
+    usedBackend = 'ollama';
+    console.log(`[bifrost] L3 OLLAMA FALLBACK OK (l3_ms=${Math.round(t_l3)})`);
   };
 
   try {
@@ -1013,7 +1060,7 @@ export async function bifrostChat(
             metadata: {
               source: 'bifrostChat',
               stage: 'gateway-skip',
-              fallback: 'ollama-direct',
+              fallback: model.includes('gemma4') ? 'turboquant-or-ollama' : 'ollama-direct',
               retryAt: new Date(bifrostGatewayUnavailableUntil).toISOString(),
             },
           });
