@@ -134,7 +134,11 @@
     "atlas:trace-packet-refs:dry": "node scripts/atlas/backfill-trace-packet-ref-normalization.mjs --dry-run",
     "atlas:trace-packet-refs:apply": "node scripts/atlas/backfill-trace-packet-ref-normalization.mjs --apply",
     "atlas:higher-hop:used-packet:normalized:dry": "node scripts/atlas/seed-neo4j-bounded-used-packet-edges-normalized.mjs --dry-run --limit=25",
-    "atlas:higher-hop:used-packet:normalized:apply": "node scripts/atlas/seed-neo4j-bounded-used-packet-edges-normalized.mjs --apply --limit=25"
+    "atlas:higher-hop:used-packet:normalized:apply": "node scripts/atlas/seed-neo4j-bounded-used-packet-edges-normalized.mjs --apply --limit=25",
+    "atlas:phase-2-part-4:metadata:migrate:dry": "node sveltekit-frontend/scripts/atlas/migrate-metadata-v1-to-v2.mjs --dry",
+    "atlas:phase-2-part-4:metadata:migrate:apply": "node sveltekit-frontend/scripts/atlas/migrate-metadata-v1-to-v2.mjs --apply",
+    "atlas:phase-2-part-4:audit": "node sveltekit-frontend/scripts/atlas/audit-phase-2-part-4.mjs --save",
+    "atlas:phase-2-part-4:verify": "node sveltekit-frontend/scripts/atlas/verify-phase-2-part-4.mjs --save"
   },
   "devDependencies": {
     "@ast-grep/cli": "0.42.3",

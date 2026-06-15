@@ -21,6 +21,6 @@
   },
   "failed_manifests": [],
   "connectivity_failures": [],
-  "timestamp": "2026-06-15T00:01:44.857Z",
+  "timestamp": "2026-06-15T00:23:16.408Z",
   "database_url": "postgresql://legal_admin:***@127.0.0.1:5434/legal_ai_db"
 }

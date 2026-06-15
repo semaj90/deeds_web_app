@@ -1,0 +1,53 @@
+{
+  "timestamp": "2026-06-15T00:34:37.367Z",
+  "phase": "2-part-4",
+  "checks": [
+    {
+      "gate": "G1",
+      "name": "AST Signature Extraction Module",
+      "pass": false,
+      "detail": "signature-vector.ts missing"
+    },
+    {
+      "gate": "G2",
+      "name": "Metadata v2 Schema Validation",
+      "pass": false,
+      "detail": "metadata-schema.ts exists with 0 validateQdrantMetadata ref(s)"
+    },
+    {
+      "gate": "G3",
+      "name": "Multi-Vector Search Endpoint",
+      "pass": false,
+      "detail": "+server.ts exists with auth (0) and Zod (0) refs"
+    },
+    {
+      "gate": "G4",
+      "name": "Redis Signature Cache",
+      "pass": false,
+      "detail": "Error: Command failed: grep -c \"getRedis\\|setex\\|cacheKey\" \"C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\sveltekit-frontend\\src\\lib\\server\\ast\\signature-vector.ts\"\ngrep: C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\sveltekit-frontend\\src\\lib\\server\\ast\\signature-vector.ts: No such file or directory\n"
+    },
+    {
+      "gate": "G5",
+      "name": "Qdrant Named Vectors (IPv4 Pinning)",
+      "pass": false,
+      "detail": "qdrant-client.mjs exists with family:4 (0 ref(s))"
+    },
+    {
+      "gate": "G6",
+      "name": "Gemma4 Summarization Readiness",
+      "pass": false,
+      "detail": "rag-pipeline.ts exists with 0 Gemma4/summarize ref(s)"
+    },
+    {
+      "gate": "G7",
+      "name": "Metadata v1→v2 Migration Script",
+      "pass": false,
+      "detail": "migrate-metadata-v1-to-v2.mjs exists with migration function (0 ref(s))"
+    }
+  ],
+  "summary": {
+    "pass": 0,
+    "total": 7,
+    "all_pass": false
+  }
+}

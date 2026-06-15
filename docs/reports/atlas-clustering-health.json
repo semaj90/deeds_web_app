@@ -1,210 +1,123 @@
 {
-  "timestamp": "2026-06-14T21:01:34.289Z",
-  "phase": "1b",
+  "timestamp": "2026-06-15T00:15:24.125Z",
   "postgres": {
-    "atlas_codebase_packets": {
+    "atlas_packets": {
       "status": "present",
-      "total": "3251",
-      "coverage_source": "field_by_field_fallback",
-      "coverage_log": [
-        {
-          "query_type": "aggregate",
-          "status": "error",
-          "query_name": " SELECT COUNT(*) as total, COUNT(p",
-          "duration_ms": 28,
-          "fallback_used": false,
-          "data": null,
-          "error_message": "column \"summary\" does not exist"
-        },
-        {
-          "query_type": "field_by_field",
-          "field": "packet_key",
-          "status": "ok",
-          "query_name": " SELECT COUNT(*) as total, C",
-          "duration_ms": 19,
-          "fallback_used": false,
-          "data": [
-            {
-              "total": "3251",
-              "present": "3251"
-            }
-          ],
-          "error_message": null
-        },
-        {
-          "query_type": "field_by_field",
-          "field": "source_ref",
-          "status": "ok",
-          "query_name": " SELECT COUNT(*) as total, C",
-          "duration_ms": 2,
-          "fallback_used": false,
-          "data": [
-            {
-              "total": "3251",
-              "present": "3251"
-            }
-          ],
-          "error_message": null
-        },
-        {
-          "query_type": "field_by_field",
-          "field": "feature_id",
-          "status": "ok",
-          "query_name": " SELECT COUNT(*) as total, C",
-          "duration_ms": 3,
-          "fallback_used": false,
-          "data": [
-            {
-              "total": "3251",
-              "present": "3251"
-            }
-          ],
-          "error_message": null
-        },
-        {
-          "query_type": "field_by_field",
-          "field": "feature_label",
-          "status": "ok",
-          "query_name": " SELECT COUNT(*) as total, C",
-          "duration_ms": 3,
-          "fallback_used": false,
-          "data": [
-            {
-              "total": "3251",
-              "present": "3251"
-            }
-          ],
-          "error_message": null
-        },
-        {
-          "query_type": "field_by_field",
-          "field": "file_path",
-          "status": "ok",
-          "query_name": " SELECT COUNT(*) as total, C",
-          "duration_ms": 2,
-          "fallback_used": false,
-          "data": [
-            {
-              "total": "3251",
-              "present": "3251"
-            }
-          ],
-          "error_message": null
-        },
-        {
-          "query_type": "field_by_field",
-          "field": "community_id",
-          "status": "ok",
-          "query_name": " SELECT COUNT(*) as total, C",
-          "duration_ms": 3,
-          "fallback_used": false,
-          "data": [
-            {
-              "total": "3251",
-              "present": "3226"
-            }
-          ],
-          "error_message": null
-        },
-        {
-          "query_type": "field_by_field",
-          "field": "summary",
-          "status": "error",
-          "query_name": " SELECT COUNT(*) as total, C",
-          "duration_ms": 1,
-          "fallback_used": false,
-          "data": null,
-          "error_message": "column \"summary\" does not exist"
-        },
-        {
-          "query_type": "field_by_field",
-          "field": "som_cluster",
-          "status": "ok",
-          "query_name": " SELECT COUNT(*) as total, C",
-          "duration_ms": 18,
-          "fallback_used": false,
-          "data": [
-            {
-              "total": "3251",
-              "present": "3251"
-            }
-          ],
-          "error_message": null
-        },
-        {
-          "query_type": "field_by_field",
-          "field": "tree_node_id",
-          "status": "ok",
-          "query_name": " SELECT COUNT(*) as total, C",
-          "duration_ms": 4,
-          "fallback_used": false,
-          "data": [
-            {
-              "total": "3251",
-              "present": "0"
-            }
-          ],
-          "error_message": null
-        },
-        {
-          "query_type": "field_by_field",
-          "field": "lineage_version",
-          "status": "ok",
-          "query_name": " SELECT COUNT(*) as total, C",
-          "duration_ms": 2,
-          "fallback_used": false,
-          "data": [
-            {
-              "total": "3251",
-              "present": "3251"
-            }
-          ],
-          "error_message": null
-        }
-      ],
-      "fields": {
-        "packet_key": "3251",
-        "source_ref": "3251",
-        "feature_id": "3251",
-        "feature_label": "3251",
-        "file_path": "3251",
-        "community_id": "3226",
-        "summary": 0,
-        "som_cluster": "3251",
-        "tree_node_id": "0",
-        "lineage_version": "3251"
+      "total": 0,
+      "with_packet_key": 0,
+      "with_source_ref": 0,
+      "with_feature_id": 0,
+      "coverage": {
+        "packet_key_pct": "NaN",
+        "source_ref_pct": "NaN",
+        "feature_id_pct": "NaN"
       },
-      "percentages": {
-        "packet_key": "100.0%",
-        "source_ref": "100.0%",
-        "feature_id": "100.0%",
-        "feature_label": "100.0%",
-        "file_path": "100.0%",
-        "community_id": "99.2%",
-        "summary": "0.0%",
-        "som_cluster": "100.0%",
-        "tree_node_id": "0.0%",
-        "lineage_version": "100.0%"
+      "duplicates": 0
+    },
+    "cardinality": {
+      "features": 0,
+      "communities": 0
+    },
+    "derived_tables": {
+      "atlas_feature_map": {
+        "status": "present",
+        "count": 19611
+      },
+      "atlas_cards": {
+        "status": "present",
+        "count": 0
+      },
+      "nes_chrom_packets": {
+        "status": "present",
+        "count": 14911
+      },
+      "atlas_tree_nodes": {
+        "status": "present",
+        "count": 0
+      },
+      "atlas_tree_edges": {
+        "status": "missing",
+        "count": 0
+      },
+      "atlas_svg_glyphs": {
+        "status": "present",
+        "count": 3251
+      },
+      "atlas_topology_index": {
+        "status": "missing",
+        "count": 0
+      },
+      "atlas_qdrant_mirror": {
+        "status": "missing",
+        "count": 0
+      },
+      "atlas_redis_mirror": {
+        "status": "missing",
+        "count": 0
+      },
+      "atlas_chunks": {
+        "status": "missing",
+        "count": 0
+      },
+      "atlas_summary_layers": {
+        "status": "missing",
+        "count": 0
+      },
+      "atlas_feature_cards": {
+        "status": "missing",
+        "count": 0
+      },
+      "atlas_feature_edges": {
+        "status": "missing",
+        "count": 0
+      },
+      "atlas_dependency_edges": {
+        "status": "missing",
+        "count": 0
+      }
+    }
+  },
+  "qdrant": {
+    "collections": {
+      "codebase_chunks_768": {
+        "status": "present",
+        "point_count": 52606
       }
     },
-    "atlas_feature_packets": {
-      "status": "present",
-      "total": "14234"
-    },
-    "atlas_packets_legacy": {
-      "status": "present",
-      "total": "17485",
-      "note": "archived mixed ledger"
+    "payload_coverage": {
+      "sampled": 100,
+      "packet_key": 92,
+      "source_ref": 100,
+      "feature_id": 100,
+      "feature_label": 100,
+      "file_path": 100,
+      "community_id": 72,
+      "som_cluster": 83,
+      "tags": 100
     }
   },
   "redis": {
     "redis": {
       "status": "present",
-      "gpu_karpathy_scores": 179,
-      "gpu_karpathy_encoded": 217,
-      "bifrost_keys": 79,
+      "karpathy_scores_keys": 1,
+      "karpathy_encoded_keys": 1,
       "centroid_keys": 0,
-      "som_keys": 0
+      "som_keys": 0,
+      "bifrost_keys": 79,
+      "total_keys": 81
     }
+  },
+  "recommendations": [
+    {
+      "priority": 2,
+      "action": "Create atlas_topology_index table",
+      "reason": "4D positioning (x_cosine, y_graph, z_som, w_authority) needed for ACE reranking",
+      "blocker": false
+    }
+  ],
+  "readiness": {
+    "identity_gate_pass": false,
+    "enrichment_mirrors_present": true,
+    "derived_tables_present": true
   }
 }

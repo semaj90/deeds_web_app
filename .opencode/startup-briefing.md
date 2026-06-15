@@ -20,15 +20,17 @@ Hello James.
 
 ## Recommended Next Lane
 
-1. Phase 1 higher-hop schema repair
+1. Higher-hop schema repair
 2. Phase 1 higher-hop schema repair: backfill file_path, tree_node_id, and som_cluster before any optional table creation.
-3. Seed Neo4j USED_CONCEPT edges from bounded trace evidence.
-4. Repair the atlas_feature_map ↔ parent_atlas_documents join.
-5. Backfill higher-hop enrichment fields before graph expansion.
+3. Backfill file_path, tree_node_id, and som_cluster first; keep joins anchored on packet_key, source_ref_key, and qdrant_point_id.
+4. Then backfill glyphRecord, qdrantHit, redisHotKey, and neo4jNode from the same stable spine.
+5. Repair the atlas_feature_map ↔ parent_atlas_documents join.
 
 ## Notes
 
-- runtime coverage status: USED_CONCEPT_EDGE_GAP
+- runtime coverage status: HIGHER_HOP_ENRICHMENT_PENDING
 - higher-hop status: HIGHER_HOP_GAP
+- higher-hop schema repair status: SCHEMA_REPAIR_REQUIRED
+- higher-hop schema repair blockers: tree_node_id
 - active temporal lane: Historical concept evidence spine backfill
 

@@ -1,0 +1,11 @@
+{
+  "status": "pass",
+  "summary": {
+    "total_errors": 0,
+    "error_categories": 0,
+    "plan_items": [],
+    "notes": "P1 error collection not yet active — no errors to plan"
+  },
+  "plan": [],
+  "timestamp": "2026-06-15T00:53:40.777Z"
+}

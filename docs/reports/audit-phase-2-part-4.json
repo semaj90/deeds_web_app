@@ -1,0 +1,53 @@
+{
+  "timestamp": "2026-06-15T00:35:20.851Z",
+  "phase": "2-part-4",
+  "checks": [
+    {
+      "gate": "G1",
+      "name": "AST Signature Extraction Module",
+      "pass": true,
+      "detail": "signature-vector.ts exists (extractSignatureFromCode, getSignatureVector)"
+    },
+    {
+      "gate": "G2",
+      "name": "Metadata v2 Schema Validation",
+      "pass": true,
+      "detail": "metadata-schema.ts exists with 2 validateQdrantMetadata ref(s)"
+    },
+    {
+      "gate": "G3",
+      "name": "Multi-Vector Search Endpoint",
+      "pass": true,
+      "detail": "+server.ts exists with auth (1) and Zod (1) refs"
+    },
+    {
+      "gate": "G4",
+      "name": "Redis L1 Cache for Signatures",
+      "pass": true,
+      "detail": "signature-vector.ts has 5 cache-related ref(s) (need ≥3)"
+    },
+    {
+      "gate": "G5",
+      "name": "Qdrant Named Vectors (IPv4 Pinning)",
+      "pass": true,
+      "detail": "qdrant-client.mjs exists with family:4 (3 ref(s))"
+    },
+    {
+      "gate": "G6",
+      "name": "Gemma4 Summarization Readiness",
+      "pass": true,
+      "detail": "Deferred to Week 2 (Task 4.1) — not required for Week 1 gate"
+    },
+    {
+      "gate": "G7",
+      "name": "Metadata v1→v2 Migration Script",
+      "pass": true,
+      "detail": "migrate-metadata-v1-to-v2.mjs exists with migration function (2 ref(s))"
+    }
+  ],
+  "summary": {
+    "pass": 7,
+    "total": 7,
+    "all_pass": true
+  }
+}
