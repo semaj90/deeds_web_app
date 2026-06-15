@@ -1,0 +1,26 @@
+{
+  "status": "pass",
+  "summary": {
+    "total_packets": 0,
+    "valid_lineage": 0,
+    "lineage_coverage": null,
+    "failures": {
+      "missing_source_ref": 0,
+      "missing_feature_id": 0,
+      "missing_feature_label": 0,
+      "missing_packet_key": 0,
+      "duplicate_source_ref": 0,
+      "duplicate_packet_key": 0,
+      "directory_mismatch": 0,
+      "postgres_row_missing": 0
+    }
+  },
+  "failed_packets": [],
+  "duplicates": {
+    "source_ref": [],
+    "packet_key": []
+  },
+  "remediation_sql": "-- Parent Atlas Lineage Verification Remediation\n-- Generated: 2026-06-14T23:44:14.408Z\n-- Run with: psql -U legal_admin -d legal_ai_db < remediation.sql\n\nBEGIN;\n\n-- Please review the comments above and uncomment the UPDATE statements you want to apply.\n-- COMMIT;\nROLLBACK;\n",
+  "timestamp": "2026-06-14T23:44:14.408Z",
+  "database_url": "127.0.0.1:5434/legal_ai_db"
+}

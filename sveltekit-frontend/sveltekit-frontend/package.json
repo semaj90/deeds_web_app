@@ -1,5 +1,8 @@
 {
   "dependencies": {
     "pg": "^8.21.0"
+  },
+  "devDependencies": {
+    "ignore": "^7.0.5"
   }
 }

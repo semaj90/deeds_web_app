@@ -1,0 +1,33 @@
+{
+  "timestamp": "2026-06-14T23:33:20.097Z",
+  "configuration": {
+    "restUrl": "http://127.0.0.1:6333",
+    "restHost": "127.0.0.1",
+    "restPort": 6333,
+    "grpcHost": "127.0.0.1",
+    "grpcPort": 6334,
+    "transportPreference": "auto"
+  },
+  "results": {
+    "rest": {
+      "ok": false,
+      "statusCode": 408,
+      "error": "Failed to parse JSON response"
+    },
+    "grpc": {
+      "ok": true,
+      "reachable": true
+    }
+  },
+  "recommendation": {
+    "transport": "gRPC",
+    "reason": "REST endpoint unreachable, but gRPC (6334) works",
+    "action": "Set QDRANT_TRANSPORT=grpc in env",
+    "envVars": {
+      "QDRANT_GRPC_HOST": "127.0.0.1",
+      "QDRANT_GRPC_PORT": 6334,
+      "QDRANT_TRANSPORT": "grpc"
+    }
+  },
+  "status": "WARN"
+}

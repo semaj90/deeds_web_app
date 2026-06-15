@@ -1,22 +1,22 @@
 # Deep Import Graph - Phase A
-Generated: 2026-06-14T21:51:21.821Z
+Generated: 2026-06-14T23:00:54.491Z
 
 ## Stats
 | Metric | Value |
 |--------|-------|
-| Nodes | 57476 |
-| Total edges | 129502 |
+| Nodes | 57495 |
+| Total edges | 129571 |
 | Resolved edges | 14894 |
 | Unresolved (local) | 12931 |
-| External refs | 100418 |
+| External refs | 100487 |
 | Neighborhoods computed | 91 |
 | Test-covered files | 987 |
 
 ## Zone Breakdown
 | Zone | Count |
 |------|-------|
-| shared | 43364 |
-| script | 7404 |
+| shared | 43371 |
+| script | 7416 |
 | test | 5489 |
 | types | 975 |
 | server | 104 |
@@ -27,13 +27,13 @@ Generated: 2026-06-14T21:51:21.821Z
 ## Edge Type Breakdown
 | Type | Count |
 |------|-------|
-| imports_static | 90412 |
+| imports_static | 90453 |
 | test_covers_file | 16567 |
-| redis_dependency | 5861 |
+| redis_dependency | 5863 |
 | imports_dynamic | 5449 |
-| qdrant_dependency | 3593 |
+| qdrant_dependency | 3617 |
 | exports_from | 2167 |
-| neo4j_dependency | 1678 |
+| neo4j_dependency | 1680 |
 | mcp_tool_calls | 1467 |
 | env_dependency | 1417 |
 | db_dependency | 886 |

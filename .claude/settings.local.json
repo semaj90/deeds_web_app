@@ -510,7 +510,12 @@
       "PowerShell(\\(Get-Content 'C:\\\\Users\\\\james\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\c--Users-james-Videos-deeds-web-app\\\\deb6af04-8cbe-49a2-bd8e-6cb74f0b6e3b\\\\tasks\\\\bsyx9e3xn.output'\\) | Select-Object -Last 50)",
       "PowerShell(docker exec legal-ai-qdrant curl -s http://localhost:6333/collections/codebase_chunks_768)",
       "PowerShell(head -200)",
-      "PowerShell(grep -i qdrant)"
+      "PowerShell(grep -i qdrant)",
+      "Bash(npm --prefix sveltekit-frontend run atlas:dir:verify)",
+      "Bash(npm --prefix sveltekit-frontend run atlas:lineage:verify)",
+      "Bash(pg_isready -h localhost -p 5432)",
+      "PowerShell($env:PGPASSWORD='123456'; psql -h 127.0.0.1 -p 5434 -U legal_admin -d legal_ai_db -c \"SELECT column_name, data_type FROM information_schema.columns WHERE table_name = 'atlas_cold_storage_manifest' ORDER BY column_name\")",
+      "Bash(npm --prefix sveltekit-frontend run atlas:cold:verify:test)"
     ],
     "deny": [],
     "ask": []
