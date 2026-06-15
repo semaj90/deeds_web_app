@@ -55,7 +55,7 @@ const NO_REDIS  = process.argv.includes('--no-redis');
 
 // ── Service config ────────────────────────────────────────────────────────────
 const DATABASE_URL = process.env.DATABASE_URL || 'postgresql://legal_admin:123456@127.0.0.1:5434/legal_ai_db';
-const QDRANT_URL   = process.env.QDRANT_URL   || 'http://localhost:6333';
+const QDRANT_URL   = process.env.QDRANT_URL   || 'http://127.0.0.1:6333';
 const EMBED_URL    = process.env.EMBED_URL    || 'http://127.0.0.1:5173/api/embed';
 const _ollamaRaw   = (process.env.OLLAMA_HOST ?? 'http://127.0.0.1:11434').replace(/^0\.0\.0\.0/, '127.0.0.1');
 const OLLAMA_URL   = _ollamaRaw.startsWith('http') ? _ollamaRaw : `http://${_ollamaRaw}:11434`;

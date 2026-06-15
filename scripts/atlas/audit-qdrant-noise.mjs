@@ -59,7 +59,7 @@ const args = process.argv.slice(2);
 const VERBOSE = args.includes('--verbose');
 const JSON_ONLY = args.includes('--json');
 
-const QDRANT_URL = process.env.QDRANT_URL ?? 'http://localhost:6333';
+const QDRANT_URL = process.env.QDRANT_URL ?? 'http://127.0.0.1:6333';
 const COLLECTION = 'codebase_chunks_768';
 
 // ── Noise pattern definitions ─────────────────────────────────────────────────

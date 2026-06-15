@@ -9,6 +9,14 @@ export interface AutoencoderWeights {
 	trainedAt: string;
 	/** Loss at end of training; used by health checks to detect untrained-state. */
 	bestLoss: number;
+	/** Optional metadata fields emitted alongside the Redis contract. */
+	schemaVersion?: string;
+	temporalVersion?: string;
+	sourceCollection?: string;
+	historyKey?: string;
+	saveMode?: string;
+	modelVersion?: string;
+	savedAt?: string;
 }
 
 let cachedWeights: AutoencoderWeights | null = null;
@@ -36,7 +44,14 @@ export async function loadAutoencoderWeights(): Promise<AutoencoderWeights> {
 		W2: parseWeights(weightsData.W2),
 		b2: parseWeights(weightsData.b2),
 		trainedAt: metaData.trainedAt,
-		bestLoss: Number(metaData.bestLoss || 0)
+		bestLoss: Number(metaData.bestLoss || 0),
+		schemaVersion: metaData.schemaVersion,
+		temporalVersion: metaData.temporalVersion,
+		sourceCollection: metaData.sourceCollection,
+		historyKey: metaData.historyKey,
+		saveMode: metaData.saveMode,
+		modelVersion: metaData.modelVersion,
+		savedAt: metaData.savedAt,
 	};
 
 	cachedWeights = weights;

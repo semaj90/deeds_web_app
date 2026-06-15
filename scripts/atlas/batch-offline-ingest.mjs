@@ -60,7 +60,7 @@ if (fs.existsSync(envPath)) {
 }
 
 // Config URLs with defaults matching deeds-web-app configuration
-const QDRANT_URL = process.env.QDRANT_URL || ENV.QDRANT_URL || 'http://localhost:6333';
+const QDRANT_URL = process.env.QDRANT_URL || ENV.QDRANT_URL || 'http://127.0.0.1:6333';
 const DATABASE_URL = process.env.DATABASE_URL || ENV.DATABASE_URL || 'postgres://legal_admin:123456@localhost:5434/legal_ai_db';
 const OLLAMA_BASE_URL = process.env.OLLAMA_BASE_URL || ENV.OLLAMA_BASE_URL || 'http://localhost:8090';
 const LANGEXTRACT_URL = process.env.LANGEXTRACT_URL || ENV.LANGEXTRACT_URL || 'http://localhost:8095';

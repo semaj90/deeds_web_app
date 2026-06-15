@@ -30,7 +30,7 @@ export function buildPointsFromCentroids(centroids, collectionName) {
 }
 import fetch from 'node-fetch';
 
-const DEFAULT_QDRANT = process.env.QDRANT_URL || 'http://localhost:6333';
+const DEFAULT_QDRANT = process.env.QDRANT_URL || 'http://127.0.0.1:6333';
 
 export function validateVectorDim(vec, expected=768) {
   if (!Array.isArray(vec)) return false;

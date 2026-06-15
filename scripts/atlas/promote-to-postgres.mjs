@@ -282,14 +282,15 @@ const report = {
 writeFileSync(resolve(ROOT, '.tmp/promote-to-postgres-apply.json'), JSON.stringify(report, null, 2));
 console.log('📋 Report: .tmp/promote-to-postgres-apply.json');
 
-// ── post-promote: invalidate + refresh graph manifest ─────────────────────────
+// ── post-promote: promote + invalidate graph manifest ────────────────────────
 // Wires Lane 4: after atlas truth is promoted, the graph refresh manifest is
-// regenerated so graphify runs stay aligned with the promoted truth.
+// promoted through the same gate, then graphify caches are invalidated so
+// subsequent runs rehydrate from the promoted truth.
 if (APPLY && (inserted - errors.length) > 0) {
   try {
     const { execFileSync } = await import('node:child_process');
-    execFileSync('node', [resolve(ROOT, 'scripts/atlas/write-graph-refresh-manifest.mjs')], { stdio: 'inherit' });
-    console.log('🔄 Graph refresh manifest invalidated after promotion.');
+    execFileSync('node', [resolve(ROOT, 'scripts/atlas/write-graph-refresh-manifest.mjs'), '--promote'], { stdio: 'inherit' });
+    console.log('🔄 Graph refresh manifest promoted after atlas truth promotion.');
 
     const manifestPath = resolve(ROOT, 'memory/exports/graph-refresh-manifest.json');
     const manifest = JSON.parse(readFileSync(manifestPath, 'utf8'));

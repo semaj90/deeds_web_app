@@ -59,6 +59,7 @@ COLLECTION  = "codebase_chunks_768"
 DIM_IN      = 768
 DIM_HIDDEN  = 256
 DIM_LATENT  = 64
+AUTOENCODER_HISTORY_STREAM = "ace:autoencoder:history"
 
 LOG_DIR = Path(__file__).parent.parent / "logs" / "task-output" / "pipeline-test"
 LOG_DIR.mkdir(parents=True, exist_ok=True)
@@ -248,10 +249,38 @@ meta = {
     "architecture": f"{DIM_IN}-{DIM_HIDDEN}-{DIM_LATENT}-{DIM_HIDDEN}-{DIM_IN}",
     "activation": "relu",
     "latentNorm": "l2",
+    "schemaVersion": "autoencoder-redis-v2",
+    "temporalVersion": "valkey-history-v1",
+    "sourceCollection": COLLECTION,
+    "historyKey": AUTOENCODER_HISTORY_STREAM,
+    "saveMode": "train-autoencoder.py",
 }
 r.delete("ace:autoencoder:meta")  # clear old string key if present
 r.hset("ace:autoencoder:meta", mapping={k: str(v) for k, v in meta.items() if v is not None})
 r.expire("ace:autoencoder:meta", 7 * 24 * 3600)
+
+try:
+    r.xadd(
+        AUTOENCODER_HISTORY_STREAM,
+        {
+            "event": "autoencoder_train",
+            "trainedAt": meta["trainedAt"],
+            "bestLoss": str(best_loss),
+            "vectorCount": str(len(data)),
+            "elapsedSec": str(round(elapsed, 1)),
+            "dimIn": str(DIM_IN),
+            "dimHidden": str(DIM_HIDDEN),
+            "dimLatent": str(DIM_LATENT),
+            "schemaVersion": meta["schemaVersion"],
+            "temporalVersion": meta["temporalVersion"],
+            "sourceCollection": COLLECTION,
+            "saveMode": meta["saveMode"],
+        },
+        maxlen=1000,
+        approximate=True,
+    )
+except Exception as stream_err:
+    print(f"[ae-train] WARNING: history append failed: {stream_err}")
 
 report = {"status": "PASS", **meta, "losses": losses}
 out    = json.dumps(report, indent=2)

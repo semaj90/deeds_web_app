@@ -186,7 +186,7 @@ try {
 console.log('\n🔌 Checking services...');
 const SERVICES = [
   { name: 'Redis', check: () => { try { const c = process.env.REDIS_CONTAINER ?? 'legal-ai-valkey'; const p = process.env.REDIS_PASSWORD ?? 'redis'; execSync(`docker exec ${c} redis-cli -a ${p} --no-auth-warning ping`, { timeout: 3000 }); return true; } catch { return false; } } },
-  { name: 'Qdrant', check: () => { try { execSync('curl -sf http://localhost:6333/healthz', { timeout: 3000 }); return true; } catch { return false; } } },
+  { name: 'Qdrant', check: () => { try { execSync('curl -sf http://127.0.0.1:6333/healthz', { timeout: 3000 }); return true; } catch { return false; } } },
   { name: 'Neo4j', check: () => { try { execSync('curl -sf http://localhost:7474/', { timeout: 3000 }); return true; } catch { return false; } } },
   { name: 'Postgres', check: () => liveTableCount !== null },
   { name: 'Ollama', check: () => { try { execSync('curl -sf http://localhost:11434/api/tags', { timeout: 3000 }); return true; } catch { return false; } } },

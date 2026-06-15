@@ -85,7 +85,7 @@ const limitIdx = args.indexOf('--limit');
 const LIMIT = limitIdx !== -1 ? parseInt(args[limitIdx + 1], 10) : 200;
 
 // ── Config ────────────────────────────────────────────────────────────────────
-const QDRANT_URL = process.env.QDRANT_URL ?? 'http://localhost:6333';
+const QDRANT_URL = process.env.QDRANT_URL ?? 'http://127.0.0.1:6333';
 const COLLECTION = 'codebase_chunks_768';
 const NEO4J_URL = process.env.NEO4J_HTTP_URL ?? (process.env.NEO4J_URL ?? process.env.NEO4J_URI ?? 'http://localhost:7474').replace(/^bolt:\/\/|^neo4j:\/\//, 'http://').replace(':7687', ':7474');
 const NEO4J_USER = process.env.NEO4J_USER ?? 'neo4j';

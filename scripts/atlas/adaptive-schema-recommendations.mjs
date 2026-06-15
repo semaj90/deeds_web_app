@@ -344,7 +344,7 @@ async function observeQdrantSchema() {
     recommendations.qdrant_schema_gaps.push({
       observation: 'Qdrant payload must include: directory_path, source_ref, file_path, feature_id, feature_label, packet_key, cold_storage_uri',
       gap: 'Check if all collections have these fields via Qdrant HTTP /collections endpoint',
-      recommendation: 'Run: curl -s http://localhost:6333/collections | jq .',
+      recommendation: 'Run: curl -s http://127.0.0.1:6333/collections | jq .',
     });
 
     console.log(`✓ Qdrant schema observations recorded`);

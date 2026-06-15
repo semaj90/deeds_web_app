@@ -27,7 +27,7 @@ const ROOT  = join(__dir, '../..');
 // ── Config ────────────────────────────────────────────────────────────────────
 const _ollamaRaw = (process.env.OLLAMA_HOST ?? '127.0.0.1:11434').replace(/^0\.0\.0\.0/, '127.0.0.1');
 const OLLAMA_URL = _ollamaRaw.startsWith('http') ? _ollamaRaw : `http://${_ollamaRaw.includes(':') ? _ollamaRaw : `${_ollamaRaw}:11434`}`;
-const QDRANT_URL = process.env.QDRANT_URL || 'http://localhost:6333';
+const QDRANT_URL = process.env.QDRANT_URL || 'http://127.0.0.1:6333';
 const COLLECTION = 'codebase_chunks_768';
 const DEFAULT_TOP_K = 12;
 

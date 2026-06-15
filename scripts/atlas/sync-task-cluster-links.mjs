@@ -33,7 +33,7 @@ const LIMIT = limitArg ? parseInt(limitArg.split('=')[1], 10) : 500;
 const DATABASE_URL = process.env.DATABASE_URL ?? 'postgresql://legal_admin:123456@localhost:5434/legal_ai_db';
 const REDIS_URL    = process.env.REDIS_URL ?? 'redis://127.0.0.1:6379';
 const REDIS_PASS   = process.env.REDIS_PASSWORD ?? process.env.REDIS_PASS ?? 'redis';
-const QDRANT_URL   = process.env.QDRANT_URL ?? 'http://localhost:6333';
+const QDRANT_URL   = process.env.QDRANT_URL ?? 'http://127.0.0.1:6333';
 const COLLECTION   = 'codebase_chunks_768';
 
 // ── Redis (cold-start pattern — ioredis) ──────────────────────────────────────

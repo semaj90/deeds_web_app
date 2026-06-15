@@ -1,27 +1,17 @@
 # Adaptive Schema Reconciliation Report
 
-**Generated**: 2026-06-15T04:38:09.764Z
+**Generated**: 2026-06-15T08:24:09.882Z
 
 ## Summary
 
 - **Extensions Missing**: 0
 - **Tables Missing**: 0
-- **Columns Missing**: 2
-- **Indexes Missing**: 4
+- **Columns Missing**: 0
+- **Indexes Missing**: 2
 - **Constraints Missing**: 3
-- **Safe Operations**: 6
+- **Safe Operations**: 2
 
 ## Recommendations
-
-### COLUMN: error_text
-- **Status**: missing
-- **Reason**: Missing resource
-- **Action**: `ALTER TABLE error_logs ADD COLUMN IF NOT EXISTS error_text text;`
-
-### COLUMN: error_embedding
-- **Status**: missing
-- **Reason**: Missing resource
-- **Action**: `ALTER TABLE error_logs ADD COLUMN IF NOT EXISTS error_embedding vector;`
 
 ### INDEX: idx_atlas_packets_packet_key
 - **Status**: missing
@@ -32,16 +22,6 @@
 - **Status**: missing
 - **Reason**: Missing resource
 - **Action**: `CREATE  INDEX IF NOT EXISTS idx_atlas_packets_source_ref ON atlas_packets (source_ref);`
-
-### INDEX: idx_atlas_topology_packet_key
-- **Status**: missing
-- **Reason**: Missing resource
-- **Action**: `CREATE UNIQUE INDEX IF NOT EXISTS idx_atlas_topology_packet_key ON atlas_topology_index (packet_key);`
-
-### INDEX: idx_atlas_topology_authority
-- **Status**: missing
-- **Reason**: Missing resource
-- **Action**: `CREATE  INDEX IF NOT EXISTS idx_atlas_topology_authority ON atlas_topology_index (w_authority);`
 
 ### CONSTRAINT: pk_atlas_packets
 - **Status**: missing

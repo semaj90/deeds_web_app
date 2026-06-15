@@ -37,7 +37,7 @@ if (!opts.write) {
 }
 
 // perform write to Qdrant
-const QDRANT_URL = process.env.QDRANT_URL || 'http://localhost:6333'
+const QDRANT_URL = process.env.QDRANT_URL || 'http://127.0.0.1:6333'
 const url = `${QDRANT_URL.replace(/\/$/,'')}/collections/${opts.collection}/points?wait=true`
 const body = { points }
 console.log('Writing to Qdrant at', url)

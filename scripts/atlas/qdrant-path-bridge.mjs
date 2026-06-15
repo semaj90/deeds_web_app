@@ -11,7 +11,7 @@ const REPORTS = resolve(ROOT, 'docs', 'reports');
 
 const PATH_MAP_PATH = join(TMP, 'path-map.json');
 const PARENT_ATLAS_PATH = join(ROOT, 'memory', 'exports', 'parent-atlas', 'parent_atlas_index.json');
-const QDRANT_URL = process.env.QDRANT_URL ?? 'http://localhost:6333';
+const QDRANT_URL = process.env.QDRANT_URL ?? 'http://127.0.0.1:6333';
 const QDRANT_COLLECTION = process.env.QDRANT_COLLECTION ?? 'codebase_chunks_768';
 const OUTPUT_JSON = join(REPORTS, 'qdrant-path-bridge-latest.json');
 const OUTPUT_MD = join(REPORTS, 'qdrant-path-bridge-latest.md');

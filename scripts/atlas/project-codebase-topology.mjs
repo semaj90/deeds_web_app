@@ -13,7 +13,7 @@
  *   --quiet     Write only summary lines to stdout (full output → log file)
  *
  * Live mode (default, no --dry-run):
- *   Requires Qdrant at QDRANT_URL (default http://localhost:6333) to fetch real
+ *   Requires Qdrant at QDRANT_URL (default http://127.0.0.1:6333) to fetch real
  *   embeddings, then runs GPU PCA projection via topology-projection bridge.
  *
  * Usage:

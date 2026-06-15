@@ -521,7 +521,16 @@
       "Bash(curl.exe -s http://127.0.0.1:8090/props)",
       "Bash(ConvertFrom-Json)",
       "Bash(Select-Object -ExpandProperty supports_system_role)",
-      "PowerShell(taskkill.exe /IM llama-server.exe /F 2>&1)"
+      "PowerShell(taskkill.exe /IM llama-server.exe /F 2>&1)",
+      "Bash(rm -rf '{schemas,adapters,memory}/')",
+      "Bash(mkdir -p schemas adapters memory)",
+      "Bash(Test-Path scripts/atlas/adaptive-schema-contract-reconciler.mjs)",
+      "Bash(Test-Path scripts/atlas/audit-adaptive-schema-reconciliation.mjs)",
+      "Bash(2>&1)",
+      "Read(//c/libtorch-win-shared-with-deps-2.9.0+cu130/**)",
+      "Read(//c/libtorch-win-shared-with-deps-2.9.0+cu130/libtorch/**)",
+      "Bash([ -d \"$path/include/cuvs\" ])",
+      "Read(//c/Users/james/Videos/deeds-web-app/**)"
     ],
     "deny": [],
     "ask": []

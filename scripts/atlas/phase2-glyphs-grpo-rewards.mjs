@@ -26,7 +26,7 @@ const projectRoot = path.resolve(__dirname, '../..');
 
 // Config
 const POSTGRES_URL = process.env.DATABASE_URL || 'postgresql://legal_admin:123456@localhost:5434/legal_ai_db';
-const QDRANT_ENDPOINT = process.env.QDRANT_ENDPOINT || 'http://localhost:6333';
+const QDRANT_ENDPOINT = process.env.QDRANT_ENDPOINT || 'http://127.0.0.1:6333';
 const QDRANT_COLLECTION = 'codebase_chunks_768';
 
 // GRPO Policy thresholds

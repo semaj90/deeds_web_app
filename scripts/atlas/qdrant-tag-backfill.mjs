@@ -27,7 +27,7 @@
  *     --scan --dry-run
  *
  * Env:
- *   QDRANT_URL    default http://localhost:6333
+ *   QDRANT_URL    default http://127.0.0.1:6333
  */
 
 import fs      from 'node:fs';
@@ -50,7 +50,7 @@ const COLLECTION  = collI  >= 0 ? argv[collI + 1]  : null;
 const NDJSON_PATH = ndI    >= 0 ? argv[ndI + 1]    : null;
 const EXTRA_TAGS  = tagsI  >= 0 ? argv[tagsI + 1].split(',').map(t => t.trim()).filter(Boolean) : [];
 
-const QDRANT_URL  = process.env.QDRANT_URL ?? 'http://localhost:6333';
+const QDRANT_URL  = process.env.QDRANT_URL ?? 'http://127.0.0.1:6333';
 const BATCH_SIZE  = 100;
 
 // ── Tag inference (mirrors chunk-text-notes.mjs) ─────────────────────────────

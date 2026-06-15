@@ -21,7 +21,7 @@
  *   node scripts/atlas/prune-junk-qdrant-chunks.mjs --prefix .venv  # one prefix
  *
  * Env:
- *   QDRANT_URL  default http://localhost:6333
+ *   QDRANT_URL  default http://127.0.0.1:6333
  */
 
 import { writeFileSync, mkdirSync } from 'node:fs';
@@ -45,7 +45,7 @@ const getFlag   = (n) => {
 };
 const PREFIX_FILTER = getFlag('prefix') ?? null;
 const COLLECTION    = getFlag('collection') ?? 'codebase_chunks_768';
-const QDRANT_URL    = (process.env.QDRANT_URL ?? 'http://localhost:6333').replace(/\/$/, '');
+const QDRANT_URL    = (process.env.QDRANT_URL ?? 'http://127.0.0.1:6333').replace(/\/$/, '');
 const TODAY         = new Date().toISOString().slice(0, 10);
 const TMP_DIR       = resolve(ROOT, '.tmp');
 const REPORT_OUT    = resolve(TMP_DIR, `prune-junk-qdrant-chunks-${TODAY}.json`);

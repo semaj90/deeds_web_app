@@ -388,6 +388,9 @@
     "sveltekit-frontend/src/lib/server/gpu/autoencoder-scripts.test.ts",
     "sveltekit-frontend/src/lib/server/gpu/autoencoder.test.ts",
     "sveltekit-frontend/src/lib/server/gpu/autoencoder-scripts.test.ts",
+    "sveltekit-frontend/src/lib/server/gpu/autoencoder.test.ts",
+    "sveltekit-frontend/src/lib/server/gpu/autoencoder.test.ts",
+    "sveltekit-frontend/src/lib/server/gpu/autoencoder-scripts.test.ts",
     "sveltekit-frontend/src/lib/server/gpu/autoencoder.test.ts"
   ],
   "sveltekit-frontend/src/lib/server/gpu/encode-768-to-64.ts": [
@@ -403,6 +406,9 @@
     "sveltekit-frontend/src/lib/server/gpu/autoencoder-scripts.test.ts",
     "sveltekit-frontend/src/lib/server/gpu/autoencoder.test.ts",
     "sveltekit-frontend/src/lib/server/retrieval/prefilter.test.ts",
+    "sveltekit-frontend/src/lib/server/gpu/autoencoder-scripts.test.ts",
+    "sveltekit-frontend/src/lib/server/gpu/autoencoder.test.ts",
+    "sveltekit-frontend/src/lib/server/gpu/autoencoder.test.ts",
     "sveltekit-frontend/src/lib/server/gpu/autoencoder-scripts.test.ts",
     "sveltekit-frontend/src/lib/server/gpu/autoencoder.test.ts",
     "sveltekit-frontend/src/lib/server/retrieval/prefilter.test.ts"
@@ -4513,6 +4519,21 @@
   ],
   "claude-mem/src/npx-cli/utils/paths.ts": [
     "claude-mem/tests/write-json-file-atomic.test.ts"
+  ],
+  "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/services/parameter-sync.service.ts": [
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/services/parameter-sync.service.spec.ts"
+  ],
+  "llama-cpp-turboquant-gemma4/tools/server/webui/tests/client/components/TestWrapper.svelte": [
+    "llama-cpp-turboquant-gemma4/tools/server/webui/tests/client/page.svelte.test.ts"
+  ],
+  "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/utils/uri-template.ts": [
+    "llama-cpp-turboquant-gemma4/tools/server/webui/tests/unit/uri-template.test.ts"
+  ],
+  "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/constants/uri-template.ts": [
+    "llama-cpp-turboquant-gemma4/tools/server/webui/tests/unit/uri-template.test.ts"
+  ],
+  "packages/parent-atlas-ingest/src/scanner/directory-scanner.ts": [
+    "packages/parent-atlas-ingest/src/scanner/directory-scanner.test.ts"
   ],
   "scripts/atlas/connection-config.mjs": [
     "scripts/tests/atlas-connection-config.test.mjs",

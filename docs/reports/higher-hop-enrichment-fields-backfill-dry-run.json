@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-06-14T21:59:23.027Z",
+  "timestamp": "2026-06-15T08:24:32.416Z",
   "mode": "DRY_RUN",
   "steps": [
     {
@@ -14,9 +14,9 @@
     },
     {
       "step": "backfill_glyph_record",
-      "status": "table_missing",
-      "count": 0,
-      "table_missing": true
+      "status": "ok",
+      "count": 100,
+      "table_missing": false
     },
     {
       "step": "backfill_qdrant_hit",
@@ -38,7 +38,7 @@
   "statistics": {
     "total_packets": 100,
     "som_cluster_backfilled": 0,
-    "glyph_record_backfilled": 0,
+    "glyph_record_backfilled": 100,
     "qdrant_hit_backfilled": 0,
     "redis_hot_key_backfilled": 100,
     "neo4j_node_backfilled": 99

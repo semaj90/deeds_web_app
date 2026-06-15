@@ -797,8 +797,11 @@
     "claude-mem/src/servers/mcp-server.ts",
     "claude-mem/src/services/smart-file-read/parser.ts",
     "claude-mem/src/services/worker/knowledge/CorpusStore.ts",
+    "llama-cpp-turboquant-gemma4/tools/server/chat.mjs",
     "packages/parent-atlas/src/adapters/duckdb.ts",
     "packages/parent-atlas/src/env.ts",
+    "packages/parent-atlas-ingest/src/scanner/directory-scanner.ts",
+    "sveltekit-frontend/src/lib/server/retrieval/bifrost-trace.ts",
     "scripts/ace-startup-health.mjs",
     "scripts/agentic/atlas-langgraph-startup.mjs",
     "scripts/agentic/startup-briefing.mjs",
@@ -1068,6 +1071,7 @@
     "scripts/atlas/temporal-append-agents-md.mjs",
     "scripts/atlas/test-langextract-turbovec.mjs",
     "scripts/atlas/test-turbovec-sidecar-contract.mjs",
+    "scripts/atlas/trace-error-fixes.mjs",
     "scripts/atlas/unified-codebase-ingester.mjs",
     "scripts/atlas/update-db-clusters-som.mjs",
     "scripts/atlas/update-open-lanes.mjs",
@@ -1351,7 +1355,6 @@
     "sveltekit-frontend/src/lib/server/features/rag/retrieval-lanes.ts",
     "sveltekit-frontend/src/lib/server/kb/wiki-logic.ts",
     "sveltekit-frontend/src/lib/server/retrieval/atlas-cartridge-seeds.ts",
-    "sveltekit-frontend/src/lib/server/retrieval/bifrost-trace.ts",
     "sveltekit-frontend/src/lib/server/search/turbovec-search.ts",
     "sveltekit-frontend/src/mcp/tools/repair_tools.ts",
     "sveltekit-frontend/src/mcp/trace-mcp-server.ts",
@@ -2316,6 +2319,8 @@
     "packages/parent-atlas/src/pipelines/hydrate-cache.ts",
     "packages/parent-atlas/src/pipelines/ingest.ts",
     "packages/parent-atlas/src/pipelines/mapreduce.ts",
+    "packages/parent-atlas-ingest/src/scanner/directory-scanner.ts",
+    "sveltekit-frontend/src/lib/server/retrieval/bifrost-trace.ts",
     "scripts/ace-startup-health.mjs",
     "scripts/agentic/atlas-langgraph-startup.mjs",
     "scripts/agentic/startup-briefing.mjs",
@@ -2619,6 +2624,7 @@
     "scripts/atlas/temporal-append-agents-md.mjs",
     "scripts/atlas/test-langextract-turbovec.mjs",
     "scripts/atlas/test-turbovec-sidecar-contract.mjs",
+    "scripts/atlas/trace-error-fixes.mjs",
     "scripts/atlas/turbovec-grpc-health.mjs",
     "scripts/atlas/unified-codebase-ingester.mjs",
     "scripts/atlas/update-db-clusters-som.mjs",
@@ -2985,7 +2991,6 @@
     "sveltekit-frontend/src/lib/server/mcp/atlas-tools-client.ts",
     "sveltekit-frontend/src/lib/server/obsidian/wiki-vault-watcher.ts",
     "sveltekit-frontend/src/lib/server/retrieval/atlas-cartridge-seeds.ts",
-    "sveltekit-frontend/src/lib/server/retrieval/bifrost-trace.ts",
     "sveltekit-frontend/src/mcp/kb-retrieval-server.ts",
     "sveltekit-frontend/src/mcp/tools/repair_tools.ts",
     "sveltekit-frontend/src/mcp/trace-mcp-server.ts",
@@ -3815,6 +3820,10 @@
     "claude-mem/tests/worker-spawn.test.ts",
     "claude-mem/tests/write-json-file-atomic.test.ts",
     "ingest-grpc-packets-to-qdrant.mjs",
+    "llama-cpp-turboquant-gemma4/tests/run-json-schema-to-grammar.mjs",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/vite.config.ts",
+    "packages/parent-atlas/src/pipelines/backfill-tree-nodes.ts",
+    "sveltekit-frontend/src/lib/server/ai/bifrost-cache-manager.ts",
     "scratch/build-triage-report.mjs",
     "scratch/inspect-atlas-sourcerefs.mjs",
     "scripts/agent/prompt-generator.mjs",
@@ -3842,11 +3851,14 @@
     "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/user/avatar/upload/+server.ts",
     "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/v1/observability/state/+server.ts",
     "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/v1/startup/+server.ts",
+    "scripts/atlas/adaptive-schema-contract-reconciler.mjs",
+    "scripts/atlas/adaptive-schema-recommendations.mjs",
     "scripts/atlas/append-llm-synthesis-jsonl.mjs",
     "scripts/atlas/atlas-startup-intelligence.mjs",
     "scripts/atlas/audit-filesystem.mjs",
     "scripts/atlas/audit-hidden-directory-kanban.mjs",
     "scripts/atlas/audit-higher-hop-enrichment-fields.mjs",
+    "scripts/atlas/audit-inference-sources.mjs",
     "scripts/atlas/audit-karpathy-mirror.mjs",
     "scripts/atlas/audit-multihop-map-schema.mjs",
     "scripts/atlas/audit-repo-hygiene.mjs",
@@ -3856,6 +3868,7 @@
     "scripts/atlas/backfill-higher-hop-enrichment-fields.mjs",
     "scripts/atlas/backfill-lineage-version.mjs",
     "scripts/atlas/backfill-trace-packet-ref-normalization.mjs",
+    "scripts/atlas/backfill-tree-nodes.mjs",
     "scripts/atlas/benchmark-retrieval-ndcg10.mjs",
     "scripts/atlas/bitfrost-cache-audit.mjs",
     "scripts/atlas/build-atlas-token-map.mjs",
@@ -3891,6 +3904,7 @@
     "scripts/atlas/ingest-rpc-tools-to-qdrant.mjs",
     "scripts/atlas/ingest-topology-batched.mjs",
     "scripts/atlas/ingest-topology-to-neo4j.mjs",
+    "scripts/atlas/ingest-tree-nodes.mjs",
     "scripts/atlas/locate-phase16-runtime-artifacts.mjs",
     "scripts/atlas/logger-analytics-clustering-health-patch-a.mjs",
     "scripts/atlas/logger-analytics-clustering-health.mjs",
@@ -3911,6 +3925,7 @@
     "scripts/atlas/phase4-neo4j-sync.mjs",
     "scripts/atlas/phase5-neo4j-sync.mjs",
     "scripts/atlas/profile-large-json.mjs",
+    "scripts/atlas/promote-inferred-enrichment.mjs",
     "scripts/atlas/promote-to-postgres.mjs",
     "scripts/atlas/qdrant-payload-contract-repair.mjs",
     "scripts/atlas/record-retrieval-outcome.mjs",
@@ -3932,6 +3947,7 @@
     "scripts/atlas/summarize-outcome-ledger.mjs",
     "scripts/atlas/summarize-retrieval-outcomes.mjs",
     "scripts/atlas/summarize-tool-usage-graph.mjs",
+    "scripts/atlas/test-backfill-readiness.mjs",
     "scripts/atlas/test-rust-parser.mjs",
     "scripts/atlas/track-graph-mutations.mjs",
     "scripts/atlas/train-autoencoder-768-64.mjs",
@@ -4050,7 +4066,6 @@
     "sveltekit-frontend/scripts/validate-demo-setup.mjs",
     "sveltekit-frontend/scripts/validate-llms-memory.mjs",
     "sveltekit-frontend/src/lib/server/ace/card-promotion-loader.ts",
-    "sveltekit-frontend/src/lib/server/ai/bifrost-cache-manager.ts",
     "sveltekit-frontend/src/lib/server/atlas/packet-parser.ts",
     "sveltekit-frontend/src/lib/server/embedding/onnx-embed.ts",
     "sveltekit-frontend/src/lib/server/observability/offline-pipeline.ts",
@@ -4243,6 +4258,8 @@
     ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/yorha-bw-theme.spec.ts",
     "tests/demos-showcase.spec.ts",
     "tests/langgraph-subagents.spec.ts",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/playwright.config.ts",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/tests/e2e/demo.test.ts",
     "playwright.config.js",
     "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/testing/generate-playwright/+server.ts",
     "sveltekit-frontend/playwright.config.ts",
@@ -4823,6 +4840,13 @@
     "claude-mem/src/shared/paths.ts",
     "claude-mem/tests/infrastructure/plugin-distribution.test.ts",
     "claude-mem/tests/infrastructure/version-consistency.test.ts",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/.storybook/main.ts",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/vite.config.ts",
+    "scripts/atlas/backfill-summary-stubs.mjs",
+    "scripts/atlas/backfill-topology-index.mjs",
+    "packages/parent-atlas/src/pipelines/backfill-tree-nodes.ts",
+    "scripts/atlas/verify-p1-lineage.mjs",
+    "sveltekit-frontend/src/lib/server/ai/bifrost-cache-manager.ts",
     "scratch/test-som-cache.mjs",
     "scratch/test-worker-pool.mjs",
     "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/admin/index-directory/+server.ts",
@@ -4844,6 +4868,7 @@
     "scripts/atlas/backfill-higher-hop-enrichment-fields.mjs",
     "scripts/atlas/backfill-lineage-version.mjs",
     "scripts/atlas/backfill-trace-packet-ref-normalization.mjs",
+    "scripts/atlas/backfill-tree-nodes.mjs",
     "scripts/atlas/bitfrost-cache-audit.mjs",
     "scripts/atlas/build-directory-manifest.mjs",
     "scripts/atlas/build-intent-graph.mjs",
@@ -4933,6 +4958,7 @@
     "scripts/tests/test-screenshots.mjs",
     "sveltekit-frontend/audit-proto-registry.mjs",
     "sveltekit-frontend/scripts/agent-diagnose.mjs",
+    "sveltekit-frontend/scripts/atlas/audit-tree-nodes.mjs",
     "sveltekit-frontend/scripts/atlas/phase-lane-completion.mjs",
     "sveltekit-frontend/scripts/atlas/phase17-pytorch-feature-extractor.mjs",
     "sveltekit-frontend/scripts/atlas/phase18-xgboost-reranker.mjs",
@@ -4972,7 +4998,6 @@
     "sveltekit-frontend/scripts/tests/test-evidence-upload-flow.mjs",
     "sveltekit-frontend/scripts/tests/test-evidence-uploads.mjs",
     "sveltekit-frontend/scripts/tests/test-screenshots.mjs",
-    "sveltekit-frontend/src/lib/server/ai/bifrost-cache-manager.ts",
     "sveltekit-frontend/src/lib/server/embedding/onnx-embed.ts",
     "sveltekit-frontend/src/lib/server/policy/inference.ts",
     "sveltekit-frontend/tests/e2e/vlm-inference-vision.spec.ts",
@@ -5745,6 +5770,13 @@
     "claude-mem/tests/worker-spawn.test.ts",
     "claude-mem/tests/write-json-file-atomic.test.ts",
     "ingest-grpc-packets-to-qdrant.mjs",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/.storybook/main.ts",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/vite.config.ts",
+    "scripts/atlas/backfill-summary-stubs.mjs",
+    "scripts/atlas/backfill-topology-index.mjs",
+    "packages/parent-atlas/src/pipelines/backfill-tree-nodes.ts",
+    "scripts/atlas/verify-p1-lineage.mjs",
+    "sveltekit-frontend/src/lib/server/ai/bifrost-cache-manager.ts",
     "scratch/build-triage-report.mjs",
     "scratch/inspect-atlas-sourcerefs.mjs",
     "scratch/test-redis.mjs",
@@ -5785,11 +5817,14 @@
     "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/v1/documents/upload/+server.ts",
     "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/v1/observability/state/+server.ts",
     "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/v1/startup/+server.ts",
+    "scripts/atlas/adaptive-schema-contract-reconciler.mjs",
+    "scripts/atlas/adaptive-schema-recommendations.mjs",
     "scripts/atlas/append-llm-synthesis-jsonl.mjs",
     "scripts/atlas/atlas-startup-intelligence.mjs",
     "scripts/atlas/audit-filesystem.mjs",
     "scripts/atlas/audit-hidden-directory-kanban.mjs",
     "scripts/atlas/audit-higher-hop-enrichment-fields.mjs",
+    "scripts/atlas/audit-inference-sources.mjs",
     "scripts/atlas/audit-karpathy-mirror.mjs",
     "scripts/atlas/audit-multihop-map-schema.mjs",
     "scripts/atlas/audit-pytorch-libtorch-inventory.mjs",
@@ -5807,6 +5842,7 @@
     "scripts/atlas/backfill-qdrant-payload-complete.mjs",
     "scripts/atlas/backfill-qdrant-payload-upsert.mjs",
     "scripts/atlas/backfill-trace-packet-ref-normalization.mjs",
+    "scripts/atlas/backfill-tree-nodes.mjs",
     "scripts/atlas/benchmark-ace-enrichment.mjs",
     "scripts/atlas/benchmark-retrieval-ndcg10.mjs",
     "scripts/atlas/bitfrost-cache-audit.mjs",
@@ -5887,6 +5923,7 @@
     "scripts/atlas/phase5-neo4j-sync.mjs",
     "scripts/atlas/populate-atlas-packets-aggressive.mjs",
     "scripts/atlas/profile-large-json.mjs",
+    "scripts/atlas/promote-inferred-enrichment.mjs",
     "scripts/atlas/promote-to-postgres.mjs",
     "scripts/atlas/pytorch-training-pipeline.mjs",
     "scripts/atlas/qdrant-payload-contract-repair.mjs",
@@ -5914,6 +5951,7 @@
     "scripts/atlas/summarize-retrieval-outcomes.mjs",
     "scripts/atlas/summarize-tool-usage-graph.mjs",
     "scripts/atlas/test-ace-enrichment-live.mjs",
+    "scripts/atlas/test-backfill-readiness.mjs",
     "scripts/atlas/test-rust-parser.mjs",
     "scripts/atlas/train-autoencoder-768-64.mjs",
     "scripts/atlas/train-som-20x20.mjs",
@@ -5988,6 +6026,7 @@
     "sveltekit-frontend/scripts/atlas/append-temporal-agent-note.mjs",
     "sveltekit-frontend/scripts/atlas/audit-dynamic-backend-contract.mjs",
     "sveltekit-frontend/scripts/atlas/audit-node-postgres-context.mjs",
+    "sveltekit-frontend/scripts/atlas/audit-tree-nodes.mjs",
     "sveltekit-frontend/scripts/atlas/backfill-feature-metadata.mjs",
     "sveltekit-frontend/scripts/atlas/build-parent-atlas-cards.mjs",
     "sveltekit-frontend/scripts/atlas/codebase-ingester-unified.mjs",
@@ -6066,7 +6105,6 @@
     "sveltekit-frontend/scripts/validate-llms-memory.mjs",
     "sveltekit-frontend/scripts/validate-qdrant-cluster-tags.mjs",
     "sveltekit-frontend/src/lib/server/ace/card-promotion-loader.ts",
-    "sveltekit-frontend/src/lib/server/ai/bifrost-cache-manager.ts",
     "sveltekit-frontend/src/lib/server/atlas/packet-parser.ts",
     "sveltekit-frontend/src/lib/server/embedding/onnx-embed.ts",
     "sveltekit-frontend/src/lib/server/grpc/gpu-bridge-client.ts",
@@ -7354,7 +7392,6 @@
     "scripts/atlas/expand-retrieval-topology.mjs",
     "scripts/atlas/export-turbovec-corpus.mjs",
     "scripts/atlas/ingest-svelte-check-errors.mjs",
-    "scripts/atlas/ingest-tree-nodes.mjs",
     "scripts/atlas/parent-atlas-coverage-recommendations.mjs",
     "scripts/atlas/persist-ace-kag-dag-hit.mjs",
     "scripts/atlas/phase-unified-validation.mjs",
@@ -7669,6 +7706,8 @@
     "claude-mem/tests/server/runtime/server-session-routes.test.ts",
     "claude-mem/tests/server/runtime/team-project-jobs-routes.test.ts",
     "claude-mem/tests/server/server-beta-service.test.ts",
+    "packages/parent-atlas/src/pipelines/backfill-tree-nodes.ts",
+    "sveltekit-frontend/src/lib/server/ai/bifrost-cache-manager.ts",
     "scripts/agent/prompt-generator.mjs",
     "scripts/agent/turbovec-search-memory.mjs",
     "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/agent-logs/+server.ts",
@@ -7706,6 +7745,7 @@
     "scripts/atlas/audit-turbovec-cuvs-readiness.mjs",
     "scripts/atlas/backfill-community-id.mjs",
     "scripts/atlas/backfill-graphify-feature-id.mjs",
+    "scripts/atlas/backfill-tree-nodes.mjs",
     "scripts/atlas/build-directory-manifest.mjs",
     "scripts/atlas/build-directory-source-map.mjs",
     "scripts/atlas/build-temporal-entity-index.mjs",
@@ -7775,7 +7815,6 @@
     "sveltekit-frontend/src/lib/server/ace/parent-atlas-packet-assembler.ts",
     "sveltekit-frontend/src/lib/server/ace/query-router.ts",
     "sveltekit-frontend/src/lib/server/ace/som-packet-store.ts",
-    "sveltekit-frontend/src/lib/server/ai/bifrost-cache-manager.ts",
     "sveltekit-frontend/src/lib/server/ai/scenario-cache.ts",
     "sveltekit-frontend/src/lib/server/analysis/entity-extractor-unified.ts",
     "sveltekit-frontend/src/lib/server/atlas/packet-parser.ts",
@@ -7855,6 +7894,7 @@
     "sveltekit-frontend/test-errors.svelte",
     "sveltekit-frontend/test-phase8-loop.mjs",
     "sveltekit-frontend/vite.config.ts",
+    "sveltekit-frontend/src/lib/server/ai/bifrost-cache-manager.ts",
     "scratch/test-som-cache.mjs",
     "scratch/test-worker-pool.mjs",
     "scripts/agent/prompt-generator.mjs",
@@ -7887,7 +7927,6 @@
     "sveltekit-frontend/scripts/tests/test-all-analysis-uis.mjs",
     "sveltekit-frontend/scripts/tests/test-audio-analysis-ui.mjs",
     "sveltekit-frontend/scripts/tests/trigger-audio-via-rabbitmq.mjs",
-    "sveltekit-frontend/src/lib/server/ai/bifrost-cache-manager.ts",
     "sveltekit-frontend/src/lib/server/packet-pipeline.ts",
     "sveltekit-frontend/sveltekit-frontend/sveltekit-frontend/scripts/seed-neo4j-used-concept-edges.mjs"
   ],
@@ -8550,9 +8589,12 @@
     ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/relationship-extractor.spec.ts",
     ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/runes/svelte5-rune-compliance.test.ts",
     "claude-mem/src/servers/mcp-server.ts",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/eslint.config.js",
     "packages/parent-atlas/src/env.ts",
     "scripts/agentic/atlas-langgraph-startup.mjs",
     "scripts/agentic/startup-briefing.mjs",
+    "scripts/atlas/adaptive-schema-contract-reconciler.mjs",
+    "scripts/atlas/adaptive-schema-recommendations.mjs",
     "scripts/atlas/alias-id-migration-preflight.mjs",
     "scripts/atlas/align-grpc-proto-to-postgres-indexes.mjs",
     "scripts/atlas/align-neo4j-canonical-source-refs.mjs",
@@ -8582,6 +8624,7 @@
     "scripts/atlas/audit-higher-hop-enrichment.mjs",
     "scripts/atlas/audit-identity-completion-gate.mjs",
     "scripts/atlas/audit-ignored-directories.mjs",
+    "scripts/atlas/audit-inference-sources.mjs",
     "scripts/atlas/audit-lineage-chr97-validation.mjs",
     "scripts/atlas/audit-lineage-validation.mjs",
     "scripts/atlas/audit-live-service-env.mjs",
@@ -8768,6 +8811,7 @@
     "scripts/atlas/project-parent-atlas-rg-dump-packets.mjs",
     "scripts/atlas/project-sourceRef-context-neo4j.mjs",
     "scripts/atlas/promote-atlas-truth.mjs",
+    "scripts/atlas/promote-inferred-enrichment.mjs",
     "scripts/atlas/promote-to-synthesis.mjs",
     "scripts/atlas/prune-junk-qdrant-chunks.mjs",
     "scripts/atlas/purge-qdrant-noise.mjs",
@@ -8834,8 +8878,10 @@
     "scripts/atlas/sync-qdrant-payload-tags.mjs",
     "scripts/atlas/sync-task-cluster-links.mjs",
     "scripts/atlas/temporal-append-agents-md.mjs",
+    "scripts/atlas/test-backfill-readiness.mjs",
     "scripts/atlas/test-langextract-turbovec.mjs",
     "scripts/atlas/test-turbovec-sidecar-contract.mjs",
+    "scripts/atlas/trace-error-fixes.mjs",
     "scripts/atlas/turbovec-grpc-health.mjs",
     "scripts/atlas/unified-codebase-ingester.mjs",
     "scripts/atlas/update-db-clusters-som.mjs",
@@ -9413,6 +9459,7 @@
     ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/agents-md-ingest.spec.ts",
     ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/bifrost-semantic-cache.spec.ts",
     ".claude/worktrees/agent-a7203461/sveltekit-frontend/update_pathway.cjs",
+    "sveltekit-frontend/tests/bifrost-semantic-cache.spec.ts",
     "scripts/agentic/atlas-langgraph-startup.mjs",
     "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/analyze/+server.ts",
     "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/canvas/+server.ts",
@@ -9594,7 +9641,6 @@
     "sveltekit-frontend/sveltekit-frontend/scripts/atlas/backfill-feature-metadata.mjs",
     "sveltekit-frontend/tests/ace-hits-cache.spec.ts",
     "sveltekit-frontend/tests/agents-md-ingest.spec.ts",
-    "sveltekit-frontend/tests/bifrost-semantic-cache.spec.ts",
     "sveltekit-frontend/update_pathway.cjs"
   ],
   "EXTERNAL:pg": [
@@ -10076,9 +10122,15 @@
     "claude-mem/tests/server/runtime/team-project-jobs-routes.test.ts",
     "claude-mem/tests/server/server-beta-service.test.ts",
     "packages/parent-atlas/src/adapters/postgres.ts",
+    "scripts/atlas/backfill-summary-stubs.mjs",
+    "scripts/atlas/backfill-topology-index.mjs",
+    "packages/parent-atlas/src/pipelines/backfill-tree-nodes.ts",
+    "scripts/atlas/verify-p1-lineage.mjs",
     "scratch/inspect-traces.mjs",
     "scripts/agentic/atlas-langgraph-startup.mjs",
     "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/phase72/similar/+server.ts",
+    "scripts/atlas/adaptive-schema-contract-reconciler.mjs",
+    "scripts/atlas/adaptive-schema-recommendations.mjs",
     "scripts/atlas/add-atlas-packets-columns.mjs",
     "scripts/atlas/align-grpc-proto-to-postgres-indexes.mjs",
     "scripts/atlas/apply-error-fixes.mjs",
@@ -10091,6 +10143,7 @@
     "scripts/atlas/audit-gpu-enrichment.mjs",
     "scripts/atlas/audit-higher-hop-enrichment-fields.mjs",
     "scripts/atlas/audit-higher-hop-enrichment.mjs",
+    "scripts/atlas/audit-inference-sources.mjs",
     "scripts/atlas/audit-karpathy-mirror.mjs",
     "scripts/atlas/audit-lineage-chr97-validation.mjs",
     "scripts/atlas/audit-lineage-validation.mjs",
@@ -10131,6 +10184,7 @@
     "scripts/atlas/backfill-som-community-id.mjs",
     "scripts/atlas/backfill-stub-summaries.mjs",
     "scripts/atlas/backfill-trace-packet-ref-normalization.mjs",
+    "scripts/atlas/backfill-tree-nodes.mjs",
     "scripts/atlas/benchmark-ace-enrichment.mjs",
     "scripts/atlas/benchmark-retrieval-ndcg10.mjs",
     "scripts/atlas/bridge-gpu-clusters-to-atlas-feature-map.mjs",
@@ -10254,6 +10308,7 @@
     "scripts/atlas/project-parent-atlas-rg-dump-packets.mjs",
     "scripts/atlas/project-sourceRef-context-neo4j.mjs",
     "scripts/atlas/promote-atlas-truth.mjs",
+    "scripts/atlas/promote-inferred-enrichment.mjs",
     "scripts/atlas/promote-to-postgres.mjs",
     "scripts/atlas/promote-to-synthesis.mjs",
     "scripts/atlas/qdrant-payload-contract-repair.mjs",
@@ -10300,6 +10355,8 @@
     "scripts/atlas/sync-retrieval-graph.mjs",
     "scripts/atlas/sync-task-cluster-links.mjs",
     "scripts/atlas/test-ace-enrichment-live.mjs",
+    "scripts/atlas/test-backfill-readiness.mjs",
+    "scripts/atlas/trace-error-fixes.mjs",
     "scripts/atlas/train-autoencoder-768-64.mjs",
     "scripts/atlas/train-som-20x20.mjs",
     "scripts/atlas/update-db-clusters-som.mjs",
@@ -10702,6 +10759,7 @@
     ".claude/worktrees/agent-a7203461/sveltekit-frontend/update_pathway.cjs",
     "claude-mem/src/servers/mcp-server.ts",
     "claude-mem/src/services/smart-file-read/search.ts",
+    "packages/parent-atlas-ingest/src/scanner/directory-scanner.ts",
     "scripts/agentic/startup-briefing.mjs",
     "scripts/atlas/audit-artifact-bloat.mjs",
     "scripts/atlas/audit-concept-evidence-spine.mjs",
@@ -10876,6 +10934,7 @@
     "sveltekit-frontend/src/qdrant-client.ts",
     ".claude/worktrees/agent-a7203461/sveltekit-frontend/test-couch.mjs",
     "sveltekit-frontend/tests/scripts/verify-routes-quick.mjs",
+    "llama-cpp-turboquant-gemma4/tools/server/public_legacy/json-schema-to-grammar.mjs",
     "scratch/sample-qdrant.js",
     "scratch/test-qdrant-search.js",
     "scratch/test-qdrant.js",
@@ -11805,6 +11864,18 @@
     ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/wiki-vault-watcher.spec.ts",
     "sveltekit-frontend/tests/yorha-v1-routes.spec.ts",
     "sveltekit-frontend/vitest.setup.ts",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/.storybook/vitest.setup.ts",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/services/parameter-sync.service.spec.ts",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/tests/client/page.svelte.test.ts",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/tests/unit/agentic-sections.test.ts",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/tests/unit/agentic-strip.test.ts",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/tests/unit/clipboard.test.ts",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/tests/unit/latex-protection.test.ts",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/tests/unit/model-id-parser.test.ts",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/tests/unit/model-names.test.ts",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/tests/unit/reasoning-context.test.ts",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/tests/unit/uri-template.test.ts",
+    "sveltekit-frontend/tests/bifrost-semantic-cache.spec.ts",
     "sveltekit-frontend/scripts/generate-route-test-stubs.mjs",
     "sveltekit-frontend/tests/ace-code-cache.spec.ts",
     "sveltekit-frontend/tests/ace-context-glossary.spec.ts",
@@ -11832,7 +11903,6 @@
     "sveltekit-frontend/tests/agents-smoke-all-cli.spec.ts",
     "sveltekit-frontend/tests/autoencoder-encoded64.spec.ts",
     "sveltekit-frontend/tests/autoencoder-projection-smoke.spec.ts",
-    "sveltekit-frontend/tests/bifrost-semantic-cache.spec.ts",
     "sveltekit-frontend/tests/build-codebase-relationships.spec.ts",
     "sveltekit-frontend/tests/cache-consolidation-smoke.spec.ts",
     "sveltekit-frontend/tests/centroid-cache-gpu.spec.ts",
@@ -13389,6 +13459,7 @@
     ".claude/worktrees/agent-a7203461/sveltekit-frontend/src/routes/dev/file-card/[...sourceRef]/+page.server.ts",
     "sveltekit-frontend/src/routes/login/+page.server.ts",
     "sveltekit-frontend/src/routes/register/+page.server.ts",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/utils/api-key-validation.ts",
     "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/ace/graph-build/+server.ts",
     "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/ace/llm-analyze/+server.ts",
     "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/ace/vector-index/+server.ts",
@@ -14269,6 +14340,7 @@
     "scripts/api-cleanup/reports/backup-2025-12-14T21-11-49-641Z/evidence/[caseId]_disabled/+server.ts",
     "scripts/api-cleanup/reports/backup-2025-12-14T21-11-49-641Z/v1/cases.disabled/+server.ts",
     "scripts/api-cleanup/reports/backup-2025-12-14T21-11-49-641Z/v1/cases.disabled/[id]/+server.ts",
+    "sveltekit-frontend/src/lib/server/error-logging-middleware.ts",
     "sveltekit-frontend/src/routes/(analysis)/audio-analysis/[evidenceId]/+page.server.ts",
     "sveltekit-frontend/src/routes/(analysis)/document-analysis/[evidenceId]/+page.server.ts",
     "sveltekit-frontend/src/routes/(analysis)/video-analysis/[evidenceId]/+page.server.ts",
@@ -14599,6 +14671,10 @@
     "sveltekit-frontend/src/lib/server/env.server.ts",
     "sveltekit-frontend/src/mcp/tools/vault-walker.tool.ts",
     "sveltekit-frontend/src/tests/setup.ts",
+    "scripts/atlas/backfill-summary-stubs.mjs",
+    "scripts/atlas/backfill-topology-index.mjs",
+    "packages/parent-atlas/src/pipelines/backfill-tree-nodes.ts",
+    "scripts/atlas/verify-p1-lineage.mjs",
     "scratch/check-pg-lineage.mjs",
     "scratch/debug-connections.js",
     "scratch/test-redis.mjs",
@@ -14621,6 +14697,7 @@
     "scripts/atlas/backfill-qdrant-source-ref-hash.mjs",
     "scripts/atlas/backfill-qdrant-source-refs.mjs",
     "scripts/atlas/backfill-trace-packet-ref-normalization.mjs",
+    "scripts/atlas/backfill-tree-nodes.mjs",
     "scripts/atlas/benchmark-ace-enrichment.mjs",
     "scripts/atlas/benchmark-retrieval-ndcg10.mjs",
     "scripts/atlas/bitfrost-cache-audit.mjs",
@@ -14642,6 +14719,7 @@
     "scripts/atlas/generate-task-summaries.mjs",
     "scripts/atlas/generate-task-summary-packets.mjs",
     "scripts/atlas/implement-domain-aware-enrichment.mjs",
+    "scripts/atlas/ingest-tree-nodes.mjs",
     "scripts/atlas/invalidate-atlas-cache-epoch.mjs",
     "scripts/atlas/karpathy-gpu-enrich.mjs",
     "scripts/atlas/logger-analytics-clustering-health-patch-a.mjs",
@@ -14731,6 +14809,7 @@
     "sveltekit-frontend/scratch/test-prefilter.mjs",
     "sveltekit-frontend/scripts/ae-encode-to-redis.mjs",
     "sveltekit-frontend/scripts/ae-train.mjs",
+    "sveltekit-frontend/scripts/atlas/audit-tree-nodes.mjs",
     "sveltekit-frontend/scripts/atlas/build-atlas-feature-map.mjs",
     "sveltekit-frontend/scripts/atlas-10q-demo.mjs",
     "sveltekit-frontend/scripts/backfill-llms-md-envelope.mjs",
@@ -15206,6 +15285,7 @@
     ".claude/worktrees/agent-a7203461/sveltekit-frontend/scripts/phase76-acp-cli.mjs",
     "sveltekit-frontend/src/lib/server/kb/search-logic.ts",
     ".claude/worktrees/agent-a7203461/sveltekit-frontend/src/lib/server/mcp/atlas-tools-client.ts",
+    "llama-cpp-turboquant-gemma4/tools/server/chat.mjs",
     "scripts/atlas/audit-lineage-chr97-validation.mjs",
     "scripts/atlas/audit-lineage-validation.mjs",
     "scripts/atlas/audit-recommendation-merge.mjs",
@@ -15498,6 +15578,7 @@
     ".claude/worktrees/agent-a7203461/sveltekit-frontend/scripts/tests/test-research-chat-runtime-smoke.mjs",
     ".claude/worktrees/agent-a7203461/sveltekit-frontend/scripts/topology-search-server.mjs",
     "sveltekit-frontend/scripts/with-node-memory.mjs",
+    "llama-cpp-turboquant-gemma4/tools/server/chat.mjs",
     "scripts/atlas/build-feature-dependency-groups.mjs",
     "scripts/atlas/build-implementation-intent-aliases.mjs",
     "scripts/atlas/karpathy-gpu-enrich.mjs",
@@ -15580,6 +15661,7 @@
     "claude-mem/src/services/server/Server.ts",
     "claude-mem/tests/infrastructure/graceful-shutdown.test.ts",
     "claude-mem/tests/worker/middleware/cors-restriction.test.ts",
+    "scripts/atlas/test-qdrant-connectivity.mjs",
     "scripts/atlas/audit-qdrant-postgres-payload-schema.mjs",
     "scripts/atlas/backfill-qdrant-payload-complete.mjs",
     "scripts/atlas/backfill-qdrant-payload-upsert.mjs",
@@ -16508,7 +16590,8 @@
     "sveltekit-frontend/scripts/smoke/smoke-mcp-tools-list-bisect.mjs"
   ],
   "EXTERNAL:remark": [
-    "scripts/atlas/ingest-markdown-cards.mjs"
+    "scripts/atlas/ingest-markdown-cards.mjs",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/content/MarkdownContent.svelte"
   ],
   "EXTERNAL:strip-markdown": [
     "scripts/atlas/ingest-markdown-cards.mjs"
@@ -16761,6 +16844,53 @@
     "sveltekit-frontend/src/routes/debug/upload/+page.svelte",
     "sveltekit-frontend/src/types/components.d.ts",
     "sveltekit-frontend/src/types/ui-components.d.ts",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/.storybook/ModeWatcherDecorator.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/actions/ActionIcon.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/badges/BadgeChatStatistic.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/badges/BadgeInfo.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatForm/ChatForm.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatForm/ChatFormPicker/ChatFormPickerItemHeader.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatForm/ChatFormPicker/ChatFormPickerList.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatForm/ChatFormPicker/ChatFormPickerListItem.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatForm/ChatFormPickerPopover.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatForm/ChatFormTextarea.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatMessages/ChatMessageAssistant.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatScreen/ChatScreen.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatScreen/ChatScreenForm.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatScreen/ChatScreenProcessingInfo.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatSettings/ChatSettings.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatSettings/ChatSettingsFields.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatSidebar/ChatSidebarConversationItem.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/content/CollapsibleContentBlock.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/content/MarkdownContent.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/dialogs/DialogConfirmation.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/mcp/McpServerCard/McpServerCard.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/misc/HorizontalScrollCarousel.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/navigation/DropdownMenuActions.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/navigation/DropdownMenuSearchable.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/dialog/dialog-content.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/dropdown-menu/dropdown-menu-checkbox-item.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/dropdown-menu/dropdown-menu-group-heading.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/popover/popover-content.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/select/select-content.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/select/select-group-heading.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/sheet/sheet-content.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/sidebar/context.svelte.ts",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/sidebar/sidebar-group-action.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/sidebar/sidebar-group-label.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/sidebar/sidebar-input.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/sidebar/sidebar-menu-action.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/sidebar/sidebar-menu-button.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/sidebar/sidebar-menu-sub-button.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/sidebar/sidebar-separator.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/sidebar/sidebar-trigger.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/constants/mcp.ts",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/contexts/chat-actions.context.ts",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/contexts/chat-settings-dialog.context.ts",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/contexts/message-edit.context.ts",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/utils/mcp.ts",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/routes/+layout.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/routes/+page.svelte",
     "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/phase82/svelte-upgrade/+server.ts",
     "sveltekit-frontend/ambient.d.ts",
     "sveltekit-frontend/src/routes/(app)/code-intel/clusters/[clusterKey]/+page.svelte",
@@ -17459,6 +17589,7 @@
     "claude-mem/src/server/runtime/ServerBetaService.ts",
     "claude-mem/src/services/infrastructure/HealthMonitor.ts",
     "claude-mem/tests/infrastructure/health-monitor.test.ts",
+    "scripts/atlas/test-qdrant-connectivity.mjs",
     "sveltekit-frontend/scripts/tests/generate-codebase-directory-map.mjs",
     "sveltekit-frontend/src/routes/api/health/+server.ts"
   ],
@@ -18614,8 +18745,8 @@
     ".claude/worktrees/agent-a7203461/sveltekit-frontend/src/lib/server/ai/local-llama-provider.ts",
     ".claude/worktrees/agent-a7203461/sveltekit-frontend/src/lib/server/ai/phase101-parent-atlas-packetizer.js",
     ".claude/worktrees/agent-a7203461/sveltekit-frontend/src/lib/server/atlas/phase101-parent-atlas-packetizer.mjs",
-    "scripts/smoke-all-gpu-lanes.mjs",
     "sveltekit-frontend/src/lib/server/ai/bifrost-provider.ts",
+    "scripts/smoke-all-gpu-lanes.mjs",
     "sveltekit-frontend/src/lib/server/ai/local-llama-provider.ts",
     "sveltekit-frontend/src/lib/server/ai/phase101-parent-atlas-packetizer.js",
     "sveltekit-frontend/src/lib/server/atlas/phase101-parent-atlas-packetizer.mjs"
@@ -18911,6 +19042,68 @@
     "sveltekit-frontend/src/routes/(app)/persons-of-interest/+page.svelte",
     "sveltekit-frontend/src/routes/(dev)/demo/bits-ui/+page.svelte",
     "sveltekit-frontend/src/routes/debug/upload/+page.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/dialogs/DialogCodePreview.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/alert-dialog/alert-dialog-action.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/alert-dialog/alert-dialog-cancel.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/alert-dialog/alert-dialog-content.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/alert-dialog/alert-dialog-description.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/alert-dialog/alert-dialog-overlay.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/alert-dialog/alert-dialog-title.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/alert-dialog/alert-dialog-trigger.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/alert-dialog/index.ts",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/checkbox/checkbox.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/collapsible/collapsible-content.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/collapsible/collapsible-trigger.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/collapsible/collapsible.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/dialog/dialog-close.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/dialog/dialog-content.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/dialog/dialog-description.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/dialog/dialog-overlay.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/dialog/dialog-title.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/dialog/dialog-trigger.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/dialog/index.ts",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/dropdown-menu/dropdown-menu-checkbox-item.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/dropdown-menu/dropdown-menu-content.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/dropdown-menu/dropdown-menu-group-heading.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/dropdown-menu/dropdown-menu-group.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/dropdown-menu/dropdown-menu-item.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/dropdown-menu/dropdown-menu-radio-group.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/dropdown-menu/dropdown-menu-radio-item.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/dropdown-menu/dropdown-menu-separator.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/dropdown-menu/dropdown-menu-sub-content.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/dropdown-menu/dropdown-menu-sub-trigger.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/dropdown-menu/dropdown-menu-trigger.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/dropdown-menu/index.ts",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/label/label.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/popover/popover-close.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/popover/popover-content.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/popover/popover-portal.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/popover/popover-trigger.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/popover/popover.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/scroll-area/scroll-area-scrollbar.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/scroll-area/scroll-area.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/select/index.ts",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/select/select-content.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/select/select-group-heading.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/select/select-group.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/select/select-item.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/select/select-scroll-down-button.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/select/select-scroll-up-button.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/select/select-separator.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/select/select-trigger.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/separator/separator.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/sheet/index.ts",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/sheet/sheet-close.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/sheet/sheet-content.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/sheet/sheet-description.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/sheet/sheet-overlay.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/sheet/sheet-title.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/sheet/sheet-trigger.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/sidebar/sidebar-menu-button.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/switch/switch.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/tooltip/index.ts",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/tooltip/tooltip-content.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/tooltip/tooltip-trigger.svelte",
     "sveltekit-frontend/src/routes/(app)/admin/atlas/+page.svelte",
     "sveltekit-frontend/src/routes/(app)/cases/[id]/reports/+page.svelte"
   ],
@@ -19782,6 +19975,7 @@
     "sveltekit-frontend/src/routes/register/+page.server.ts",
     "sveltekit-frontend/src/routes/register/+page.svelte",
     "sveltekit-frontend/temp.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/routes/+page.ts",
     "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/ace/graph-build/+server.ts",
     "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/ace/llm-analyze/+server.ts",
     "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/ace/vector-index/+server.ts",
@@ -20242,18 +20436,22 @@
   ],
   "EXTERNAL:@eslint/js": [
     ".claude/worktrees/agent-a7203461/sveltekit-frontend/eslint.config.js",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/eslint.config.js",
     "sveltekit-frontend/eslint.config.js"
   ],
   "EXTERNAL:typescript-eslint": [
     ".claude/worktrees/agent-a7203461/sveltekit-frontend/eslint.config.js",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/eslint.config.js",
     "sveltekit-frontend/eslint.config.js"
   ],
   "EXTERNAL:eslint-plugin-svelte": [
     ".claude/worktrees/agent-a7203461/sveltekit-frontend/eslint.config.js",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/eslint.config.js",
     "sveltekit-frontend/eslint.config.js"
   ],
   "EXTERNAL:eslint-config-prettier": [
     ".claude/worktrees/agent-a7203461/sveltekit-frontend/eslint.config.js",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/eslint.config.js",
     "sveltekit-frontend/eslint.config.js"
   ],
   "UNRESOLVED:./svelte.config.js": [
@@ -20664,6 +20862,52 @@
     "sveltekit-frontend/src/lib/server/db/queries.ts",
     "sveltekit-frontend/src/lib/utils/index.ts",
     "sveltekit-frontend/src/lib/utils/type-guards.ts",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/app.d.ts",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatAttachments/ChatAttachmentMcpPrompt.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatAttachments/ChatAttachmentMcpResource.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatAttachments/ChatAttachmentsList.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatForm/ChatForm.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatForm/ChatFormActions/ChatFormActionAttachmentsDropdown.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatForm/ChatFormPicker/ChatFormPickerItemHeader.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatForm/ChatFormPromptPicker/ChatFormPromptPicker.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatForm/ChatFormPromptPicker/ChatFormPromptPickerArgumentForm.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatForm/ChatFormPromptPicker/ChatFormPromptPickerArgumentInput.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatForm/ChatFormResourcePicker/ChatFormResourcePicker.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatMessages/ChatMessage.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatMessages/ChatMessageMcpPrompt.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatMessages/ChatMessageMcpPromptContent.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/dialogs/DialogMcpResourcePreview.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/dialogs/DialogMcpResources.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/dialogs/DialogModelInformation.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/forms/KeyValuePairs.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/mcp/McpCapabilitiesBadges.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/mcp/McpConnectionLogs.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/mcp/McpResourceBrowser/mcp-resource-browser.ts",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/mcp/McpResourceBrowser/McpResourceBrowser.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/mcp/McpResourceBrowser/McpResourceBrowserServerItem.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/mcp/McpResourcePreview.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/mcp/McpResourceTemplateForm.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/mcp/McpServerCard/McpServerCard.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/mcp/McpServerCard/McpServerCardHeader.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/mcp/McpServerForm.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/mcp/McpServersSelector.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/constants/binary-detection.ts",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/constants/mcp.ts",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/hooks/use-processing-state.svelte.ts",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/services/chat.service.ts",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/services/mcp.service.ts",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/services/parameter-sync.service.ts",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/stores/agentic.svelte.ts",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/stores/chat.svelte.ts",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/stores/mcp-resources.svelte.ts",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/stores/mcp.svelte.ts",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/utils/attachment-display.ts",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/utils/clipboard.ts",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/utils/conversation-utils.ts",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/utils/convert-files-to-extra.ts",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/utils/mcp.ts",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/utils/modality-file-validation.ts",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/utils/text-files.ts",
     "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/activities/+server.ts",
     "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/agent/tasks/+server.ts",
     "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/agent-orchestrate/+server.ts",
@@ -21170,6 +21414,7 @@
     "sveltekit-frontend/scripts/phase104-backups/src/lib/stores/_archive/old-stores/lokiStore.ts",
     "sveltekit-frontend/scripts/phase104-backups/src/lib/stores/_archive/old-stores/vector-search.ts",
     "sveltekit-frontend/temp.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/tests/stories/fixtures/ai-tutorial.ts",
     "sveltekit-frontend/scripts/phase104-backups/src/lib/services/gpu-cluster-acceleration.ts"
   ],
   "UNRESOLVED:../pool.js": [
@@ -22721,12 +22966,12 @@
     ".claude/worktrees/agent-a7203461/sveltekit-frontend/src/routes/atlas/library/+page.server.ts",
     ".claude/worktrees/agent-a7203461/sveltekit-frontend/tests/ace-rerank-spine.spec.ts",
     "sveltekit-frontend/tests/infra-ollama-cache-routes.spec.ts",
+    "sveltekit-frontend/src/lib/server/ai/bifrost-cache-manager.ts",
     "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/jsonb/legal/+server.ts",
     "scripts/atlas/train-autoencoder-768-64.mjs",
     "sveltekit-frontend/src/lib/server/ace/multihop-contextual-tree.ts",
     "sveltekit-frontend/src/lib/server/ace/phase-e-enrichment-bridge.ts",
     "sveltekit-frontend/src/lib/server/ace/rg-cluster-pivot.ts",
-    "sveltekit-frontend/src/lib/server/ai/bifrost-cache-manager.ts",
     "sveltekit-frontend/src/lib/server/ai/mcp-tool-dispatch.ts",
     "sveltekit-frontend/src/lib/server/ai/scenario-cache.ts",
     "sveltekit-frontend/src/lib/server/analysis/entity-extractor-unified.ts",
@@ -22972,6 +23217,12 @@
     "sveltekit-frontend/scripts/phase104-backups/src/lib/stores/_archive/old-stores/ai-agent.ts",
     "sveltekit-frontend/src/lib/components/cases/CaseStats.svelte",
     "sveltekit-frontend/src/lib/utils/ensure-error.ts",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/services/chat.service.ts",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/stores/agentic.svelte.ts",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/stores/chat.svelte.ts",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/types/models.d.ts",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/utils/agentic.ts",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/tests/unit/agentic-sections.test.ts",
     "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/v1/search/command/+server.ts"
   ],
   "EXTERNAL:$lib/services/real-ai-service": [
@@ -23082,13 +23333,21 @@
     "sveltekit-frontend/src/routes/(dev)/odin/+page.svelte",
     ".claude/worktrees/agent-a7203461/sveltekit-frontend/src/routes/dev/file-card/[...sourceRef]/+page.svelte",
     "sveltekit-frontend/src/routes/register/+page.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatForm/ChatFormPromptPicker/ChatFormPromptPickerArgumentInput.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatMessages/ChatMessageAssistant.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatScreen/ChatScreen.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/forms/InputWithSuggestions.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/server/ServerErrorSplash.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/server/ServerLoadingSplash.svelte",
     "sveltekit-frontend/src/lib/components/admin/CommandSuggestPanel.svelte",
     "sveltekit-frontend/src/routes/(app)/cases/[id]/reports/+page.svelte",
     "sveltekit-frontend/src/routes/dev/file-card/[...sourceRef]/+page.svelte"
   ],
   "EXTERNAL:vite": [
     "sveltekit-frontend/scripts/phase104-backups/src/lib/vite/vscode-error-logger.ts",
-    "sveltekit-frontend/vite.config.ts"
+    "sveltekit-frontend/vite.config.ts",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/tests/stories/fixtures/ai-tutorial.ts",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/vite.config.ts"
   ],
   "UNRESOLVED:./clustering-wasm.js": [
     "sveltekit-frontend/scripts/phase104-backups/src/lib/wasm/ultra-json-parser.ts"
@@ -23812,6 +24071,7 @@
   ],
   "EXTERNAL:socket.io": [
     "sveltekit-frontend/scripts/phase104-backups/src/routes_parked/api/ws/+server.ts",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/tests/stories/fixtures/ai-tutorial.ts",
     "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/ws/+server.ts"
   ],
   "EXTERNAL:$lib/server/redisPubSub": [
@@ -23876,7 +24136,8 @@
     "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/postgresql-first/test/+server.ts",
     "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/rag/documents/upload/+server.ts",
     "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/test-database-persistence/+server.ts",
-    "sveltekit-frontend/scripts/seed-ace-hits-for-synthesis.ts"
+    "sveltekit-frontend/scripts/seed-ace-hits-for-synthesis.ts",
+    "sveltekit-frontend/src/lib/server/error-logging.ts"
   ],
   "UNRESOLVED:../ensure-llama-server.mjs": [
     ".claude/worktrees/agent-a7203461/sveltekit-frontend/scripts/sidecars/llama-servers.mjs",
@@ -23912,6 +24173,7 @@
   ],
   "EXTERNAL:@modelcontextprotocol/sdk/client/streamableHttp.js": [
     ".claude/worktrees/agent-a7203461/sveltekit-frontend/scripts/smoke/smoke-graph-pathway-materialization.mjs",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/services/mcp.service.ts",
     "sveltekit-frontend/scripts/smoke/smoke-graph-pathway-materialization.mjs"
   ],
   "EXTERNAL:zod-to-json-schema": [
@@ -24596,9 +24858,9 @@
     "sveltekit-frontend/src/routes/api/wiki/watch/+server.ts",
     "sveltekit-frontend/src/routes/api/worker/autotag/trigger/+server.ts",
     "sveltekit-frontend/src/routes/api/yorha/analytics/+server.ts",
+    "sveltekit-frontend/src/lib/server/ai/bifrost-cache-manager.ts",
     "sveltekit-frontend/src/lib/server/ace/multihop-contextual-tree.ts",
     "sveltekit-frontend/src/lib/server/ace/query-router.ts",
-    "sveltekit-frontend/src/lib/server/ai/bifrost-cache-manager.ts",
     "sveltekit-frontend/src/lib/server/ai/ldr/deep-research.ts",
     "sveltekit-frontend/src/lib/server/ai/mcp-tool-bridge.ts",
     "sveltekit-frontend/src/lib/server/ai/mcp-tool-dispatch.ts",
@@ -25385,7 +25647,58 @@
     "sveltekit-frontend/src/lib/components/ui/bits/Button.svelte",
     "sveltekit-frontend/src/lib/components/ui/CommandPalette.svelte",
     "sveltekit-frontend/src/lib/components/ui/enhanced-bits.svelte",
-    "sveltekit-frontend/src/routes/(app)/global-search/+page.svelte"
+    "sveltekit-frontend/src/routes/(app)/global-search/+page.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/actions/ActionIconCopyToClipboard.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/badges/BadgeChatStatistic.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatAttachments/ChatAttachmentMcpResource.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatAttachments/ChatAttachmentPreview.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatAttachments/ChatAttachmentsList.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatAttachments/ChatAttachmentsViewAll.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatAttachments/ChatAttachmentThumbnailFile.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatForm/ChatForm.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatForm/ChatFormActions/ChatFormActions.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatForm/ChatFormPromptPicker/ChatFormPromptPicker.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatForm/ChatFormTextarea.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatMessages/ChatMessageAgenticContent.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatMessages/ChatMessageAssistant.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatMessages/ChatMessages.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatMessages/ChatMessageStatistics.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatMessages/ChatMessageSystem.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatScreen/ChatScreen.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatSettings/ChatSettingsImportExportTab.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatSidebar/ChatSidebar.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/content/MarkdownContent.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/dialogs/DialogChatAttachmentPreview.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/dialogs/DialogMcpResourcePreview.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/dialogs/DialogMcpResources.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/dialogs/DialogModelInformation.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/forms/KeyValuePairs.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/mcp/McpConnectionLogs.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/mcp/McpResourceBrowser/mcp-resource-browser.ts",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/mcp/McpResourceBrowser/McpResourceBrowser.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/mcp/McpResourceBrowser/McpResourceBrowserServerItem.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/mcp/McpResourcePreview.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/mcp/McpResourceTemplateForm.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/mcp/McpServerForm.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/mcp/McpServersSettings.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/services/database.service.ts",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/services/mcp.service.ts",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/services/models.service.ts",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/services/parameter-sync.service.ts",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/services/props.service.ts",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/stores/agentic.svelte.ts",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/stores/chat.svelte.ts",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/stores/conversations.svelte.ts",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/stores/mcp-resources.svelte.ts",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/stores/mcp.svelte.ts",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/stores/models.svelte.ts",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/stores/settings.svelte.ts",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/utils/attachment-display.ts",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/utils/attachment-type.ts",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/utils/convert-files-to-extra.ts",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/utils/modality-file-validation.ts",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/utils/process-uploaded-files.ts",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/routes/+page.ts"
   ],
   "EXTERNAL:$lib/stores/unified/ai-assistant-store.svelte.js": [
     "sveltekit-frontend/src/lib/components/ai/AIAssistantPanel.svelte",
@@ -25411,7 +25724,15 @@
     "sveltekit-frontend/src/lib/components/poi/PersonOfInterestDetailView.svelte",
     "sveltekit-frontend/src/lib/components/POIPhotoModal.svelte",
     "sveltekit-frontend/src/routes/(app)/admin/error-analysis/+page.svelte",
-    "sveltekit-frontend/src/routes/(app)/demos/agentic-errors/+page.svelte"
+    "sveltekit-frontend/src/routes/(app)/demos/agentic-errors/+page.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/dialogs/DialogChatAttachmentPreview.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/dialogs/DialogChatAttachmentsViewAll.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/dialogs/DialogChatSettings.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/dialogs/DialogConversationSelection.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/dialogs/DialogMcpResourcePreview.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/dialogs/DialogMcpResources.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/dialogs/DialogMcpServersSettings.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/dialogs/DialogModelInformation.svelte"
   ],
   "EXTERNAL:$lib/components/ui/Input.svelte": [
     "sveltekit-frontend/src/lib/components/ai/EnhancedAIChatTest.svelte",
@@ -25476,7 +25797,12 @@
     "sveltekit-frontend/src/routes/(app)/citations/[...label]/+page.svelte"
   ],
   "EXTERNAL:$lib/types/chat": [
-    "sveltekit-frontend/src/lib/components/ai/EnhancedAIChatTest.svelte"
+    "sveltekit-frontend/src/lib/components/ai/EnhancedAIChatTest.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatMessages/ChatMessageAgenticContent.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatMessages/ChatMessageStatistics.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/stores/agentic.svelte.ts",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/stores/chat.svelte.ts",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/types/database.d.ts"
   ],
   "EXTERNAL:$lib/components/ui/Progress.svelte": [
     "sveltekit-frontend/src/lib/components/ai/EnhancedDocumentUploader.svelte",
@@ -25545,7 +25871,9 @@
   ],
   "EXTERNAL:$lib/components/ui/label": [
     "sveltekit-frontend/src/lib/components/ai/LegalDocumentSummarizer.svelte",
-    "sveltekit-frontend/src/lib/components/editor/LegalDocumentEditor.svelte"
+    "sveltekit-frontend/src/lib/components/editor/LegalDocumentEditor.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatForm/ChatFormPromptPicker/ChatFormPromptPickerArgumentInput.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/forms/InputWithSuggestions.svelte"
   ],
   "EXTERNAL:$lib/components/ai/TypewriterResponse.svelte": [
     "sveltekit-frontend/src/lib/components/ai/SimpleWorkingChat.svelte",
@@ -25603,10 +25931,15 @@
     "sveltekit-frontend/src/lib/components/cache/CacheDemo.svelte",
     "sveltekit-frontend/src/lib/components/detective/DetectiveBoard.svelte",
     "sveltekit-frontend/src/lib/components/yorha/YoRHaAIChat.svelte",
-    "sveltekit-frontend/src/routes/(app)/demos/yorha/components/YoRHaAIChat.svelte"
+    "sveltekit-frontend/src/routes/(app)/demos/yorha/components/YoRHaAIChat.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/content/CollapsibleContentBlock.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/alert-dialog/alert-dialog-action.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/alert-dialog/alert-dialog-cancel.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/sidebar/sidebar-trigger.svelte"
   ],
   "EXTERNAL:$lib/components/ui/input/index.js": [
-    "sveltekit-frontend/src/lib/components/cache/CacheDemo.svelte"
+    "sveltekit-frontend/src/lib/components/cache/CacheDemo.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/sidebar/sidebar-input.svelte"
   ],
   "EXTERNAL:$lib/components/ui/progress/index.js": [
     "sveltekit-frontend/src/lib/components/cache/CacheDemo.svelte"
@@ -25650,7 +25983,16 @@
     "sveltekit-frontend/src/lib/components/cases/CaseFilters.svelte",
     "sveltekit-frontend/src/lib/components/editor/LegalDocumentEditor.svelte",
     "sveltekit-frontend/src/lib/components/RAGSearchComponent.svelte",
-    "sveltekit-frontend/temp_upload.svelte"
+    "sveltekit-frontend/temp_upload.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatForm/ChatFormPromptPicker/ChatFormPromptPickerArgumentInput.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatSettings/ChatSettingsFields.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatSidebar/ChatSidebarActions.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/forms/InputWithSuggestions.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/forms/KeyValuePairs.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/forms/SearchInput.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/mcp/McpServerForm.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/misc/ConversationSelection.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/server/ServerErrorSplash.svelte"
   ],
   "EXTERNAL:$lib/components/ai/LegalDocumentDrafting.svelte": [
     "sveltekit-frontend/src/lib/components/cases/CaseOverview.svelte"
@@ -25771,7 +26113,8 @@
   ],
   "EXTERNAL:$lib/components/ui/textarea": [
     "sveltekit-frontend/src/lib/components/editor/LegalDocumentEditor.svelte",
-    "sveltekit-frontend/src/lib/components/evidence/EvidenceAssistant.svelte"
+    "sveltekit-frontend/src/lib/components/evidence/EvidenceAssistant.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatSettings/ChatSettingsFields.svelte"
   ],
   "EXTERNAL:@tiptap/core": [
     "sveltekit-frontend/src/lib/components/editor/TipTapEditor.svelte",
@@ -25863,7 +26206,12 @@
     "sveltekit-frontend/src/lib/components/poi/POIThreatBadge.svelte",
     "sveltekit-frontend/src/lib/components/POIPhotoModal.svelte",
     "sveltekit-frontend/src/routes/(app)/admin/error-brain/+page.svelte",
-    "sveltekit-frontend/src/routes/(app)/admin/error-brain/runs/+page.svelte"
+    "sveltekit-frontend/src/routes/(app)/admin/error-brain/runs/+page.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatSettings/ChatSettingsParameterSourceIndicator.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/mcp/McpCapabilitiesBadges.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/mcp/McpServerCard/McpServerCardHeader.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/mcp/McpServerCard/McpServerCardToolsList.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/server/ServerStatus.svelte"
   ],
   "EXTERNAL:$lib/components/ui/dialog/DialogRoot.svelte": [
     "sveltekit-frontend/src/lib/components/evidence/EvidenceAssistant.svelte",
@@ -26044,6 +26392,7 @@
   ],
   "EXTERNAL:pdfjs-dist": [
     "sveltekit-frontend/src/lib/components/legal/PDFViewer.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/utils/pdf-processing.ts",
     "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/ocr/extract/+server.ts"
   ],
   "EXTERNAL:$lib/components/ui/progress/Progress.svelte": [
@@ -26132,7 +26481,15 @@
     "sveltekit-frontend/src/lib/components/poi/POIForm.svelte",
     "sveltekit-frontend/src/routes/(app)/cases/new/+page.svelte",
     "sveltekit-frontend/src/routes/(app)/reports/new/+page.svelte",
-    "sveltekit-frontend/src/routes/+layout.svelte"
+    "sveltekit-frontend/src/routes/+layout.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatSettings/ChatSettingsImportExportTab.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/dialogs/DialogMcpResources.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/stores/conversations.svelte.ts",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/stores/models.svelte.ts",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/utils/clipboard.ts",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/utils/convert-files-to-extra.ts",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/utils/process-uploaded-files.ts",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/routes/+layout.svelte"
   ],
   "EXTERNAL:$lib/features/poi/services/poi": [
     "sveltekit-frontend/src/lib/components/poi/POIStats.svelte",
@@ -26266,7 +26623,59 @@
     "sveltekit-frontend/src/lib/components/ui/Select.svelte",
     "sveltekit-frontend/src/lib/components/ui/textarea/Textarea.svelte",
     "sveltekit-frontend/src/lib/components/ui/Textarea.svelte",
-    "sveltekit-frontend/src/lib/components/ui/TooltipTrigger.svelte"
+    "sveltekit-frontend/src/lib/components/ui/TooltipTrigger.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/alert/alert-description.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/alert/alert-title.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/alert/alert.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/alert-dialog/alert-dialog-footer.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/alert-dialog/alert-dialog-header.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/badge/badge.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/button/button.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/card/card-action.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/card/card-content.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/card/card-description.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/card/card-footer.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/card/card-header.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/card/card-title.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/card/card.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/dialog/dialog-footer.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/dialog/dialog-header.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/dropdown-menu/dropdown-menu-label.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/dropdown-menu/dropdown-menu-shortcut.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/input/input.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/select/select-label.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/sheet/sheet-footer.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/sheet/sheet-header.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/sidebar/sidebar-content.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/sidebar/sidebar-footer.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/sidebar/sidebar-group-action.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/sidebar/sidebar-group-content.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/sidebar/sidebar-group-label.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/sidebar/sidebar-group.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/sidebar/sidebar-header.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/sidebar/sidebar-inset.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/sidebar/sidebar-menu-action.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/sidebar/sidebar-menu-badge.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/sidebar/sidebar-menu-button.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/sidebar/sidebar-menu-item.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/sidebar/sidebar-menu-skeleton.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/sidebar/sidebar-menu-sub-button.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/sidebar/sidebar-menu-sub-item.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/sidebar/sidebar-menu-sub.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/sidebar/sidebar-menu.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/sidebar/sidebar-provider.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/sidebar/sidebar-rail.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/sidebar/sidebar.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/skeleton/skeleton.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/table/table-body.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/table/table-caption.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/table/table-cell.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/table/table-footer.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/table/table-head.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/table/table-header.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/table/table-row.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/table/table.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/textarea/textarea.svelte"
   ],
   "UNRESOLVED:./Card/Card.svelte": [
     "sveltekit-frontend/src/lib/components/ui/Card.js"
@@ -26475,7 +26884,17 @@
     "sveltekit-frontend/src/lib/components/yorha/YoRHaAIChat.svelte"
   ],
   "EXTERNAL:$lib/types/database": [
-    "sveltekit-frontend/src/lib/components/yorha/YoRHaCommandCenter.svelte"
+    "sveltekit-frontend/src/lib/components/yorha/YoRHaCommandCenter.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatMessages/ChatMessageAgenticContent.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/content/MarkdownContent.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/markdown/resolve-attachment-images.ts",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/services/database.service.ts",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/stores/agentic.svelte.ts",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/stores/conversations.svelte.ts",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/stores/mcp.svelte.ts",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/utils/agentic.ts",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/utils/legacy-migration.ts",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/tests/unit/agentic-sections.test.ts"
   ],
   "EXTERNAL:$lib/types/yorha-interface": [
     "sveltekit-frontend/src/lib/components/yorha/YoRHaCommandCenter.svelte",
@@ -29045,7 +29464,8 @@
     "sveltekit-frontend/src/mcp/index.ts"
   ],
   "EXTERNAL:@modelcontextprotocol/sdk/client/sse.js": [
-    "sveltekit-frontend/src/lib/server/mcp-client.ts"
+    "sveltekit-frontend/src/lib/server/mcp-client.ts",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/services/mcp.service.ts"
   ],
   "EXTERNAL:$lib/server/redis-service.js": [
     "sveltekit-frontend/src/lib/server/memory/claude-mem-ingest.ts",
@@ -29379,7 +29799,8 @@
   "EXTERNAL:clsx": [
     "sveltekit-frontend/src/lib/utils/cn.ts",
     "sveltekit-frontend/src/lib/utils/index.ts",
-    "sveltekit-frontend/src/lib/utils.ts"
+    "sveltekit-frontend/src/lib/utils.ts",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/utils.ts"
   ],
   "EXTERNAL:$lib/components/detective/DetectiveBoard.svelte": [
     "sveltekit-frontend/src/lib/utils/dynamic-imports.ts"
@@ -29453,7 +29874,9 @@
   ],
   "EXTERNAL:@modelcontextprotocol/sdk/types.js": [
     "sveltekit-frontend/src/mcp/server.ts",
-    "claude-mem/src/servers/mcp-server.ts"
+    "claude-mem/src/servers/mcp-server.ts",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/services/mcp.service.ts",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/stores/mcp.svelte.ts"
   ],
   "EXTERNAL:$lib/server/rg-atlas/run.js": [
     "sveltekit-frontend/src/mcp/server.ts",
@@ -29874,7 +30297,8 @@
     "sveltekit-frontend/src/routes/(app)/admin/error-brain/+page.svelte"
   ],
   "EXTERNAL:$lib/components/ui/table": [
-    "sveltekit-frontend/src/routes/(app)/admin/error-brain/runs/+page.svelte"
+    "sveltekit-frontend/src/routes/(app)/admin/error-brain/runs/+page.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/dialogs/DialogModelInformation.svelte"
   ],
   "EXTERNAL:$lib/webgpu/legal-document-graph.js": [
     "sveltekit-frontend/src/routes/(app)/admin/gpu-evidence-graph/+page.svelte"
@@ -32132,7 +32556,8 @@
     "sveltekit-frontend/src/routes/api/search/+server.ts"
   ],
   "EXTERNAL:$lib/server/retrieval/gpu-reranker.js": [
-    "sveltekit-frontend/src/routes/api/search/+server.ts"
+    "sveltekit-frontend/src/routes/api/search/+server.ts",
+    "sveltekit-frontend/src/lib/server/features/ai/ace/context-assembler.ts"
   ],
   "EXTERNAL:$lib/server/db/schema/legal-cases.js": [
     "sveltekit-frontend/src/routes/api/search/cases/+server.ts",
@@ -32259,6 +32684,7 @@
   "EXTERNAL:@sveltejs/vite-plugin-svelte": [
     "sveltekit-frontend/svelte.config.js",
     ".claude/worktrees/agent-a7203461/sveltekit-frontend/vitest.config.integration.ts",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/svelte.config.js",
     "sveltekit-frontend/vitest.config.integration.ts"
   ],
   "EXTERNAL:$lib/command-center-manifest": [
@@ -32286,13 +32712,45 @@
     "sveltekit-frontend/test-lucide.ts"
   ],
   "EXTERNAL:$lib/components/ui/button": [
-    "sveltekit-frontend/temp_upload.svelte"
+    "sveltekit-frontend/temp_upload.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/actions/ActionIcon.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/actions/ActionIconRemove.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatAttachments/ChatAttachmentPreview.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatAttachments/ChatAttachmentsList.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatForm/ChatFormActions/ChatFormActionAttachmentsDropdown.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatForm/ChatFormActions/ChatFormActionAttachmentsSheet.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatForm/ChatFormActions/ChatFormActionRecord.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatForm/ChatFormActions/ChatFormActions.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatForm/ChatFormActions/ChatFormActionSubmit.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatForm/ChatFormPromptPicker/ChatFormPromptPickerArgumentForm.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatForm/ChatFormResourcePicker/ChatFormResourcePicker.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatMessages/ChatMessageAssistant.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatMessages/ChatMessageBranchingControls.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatMessages/ChatMessageEditForm.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatMessages/ChatMessageSystem.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatScreen/ChatScreenHeader.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatSettings/ChatSettingsFooter.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatSettings/ChatSettingsImportExportTab.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatSidebar/ChatSidebarActions.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/dialogs/DialogConversationTitleUpdate.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/dialogs/DialogMcpResourcePreview.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/dialogs/DialogMcpResources.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/mcp/McpResourceBrowser/McpResourceBrowserHeader.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/mcp/McpResourcePreview.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/mcp/McpResourceTemplateForm.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/mcp/McpServerCard/McpServerCardActions.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/mcp/McpServerCard/McpServerCardEditForm.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/mcp/McpServersSettings.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/misc/ConversationSelection.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/server/ServerErrorSplash.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/server/ServerStatus.svelte"
   ],
   "EXTERNAL:$lib/components/ui/modular/types.svelte": [
     "sveltekit-frontend/temp_upload.svelte"
   ],
   "EXTERNAL:$lib/components/ui/select": [
-    "sveltekit-frontend/temp_upload.svelte"
+    "sveltekit-frontend/temp_upload.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatSettings/ChatSettingsFields.svelte"
   ],
   "EXTERNAL:$lib/components/ui/switch/Switch.svelte": [
     "sveltekit-frontend/temp_upload.svelte"
@@ -34410,7 +34868,8 @@
   ],
   "EXTERNAL:@sveltejs/kit/vite": [
     "sveltekit-frontend/vite.config.ts",
-    "sveltekit-frontend/vitest.config.ts"
+    "sveltekit-frontend/vitest.config.ts",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/vite.config.ts"
   ],
   "EXTERNAL:unocss/vite": [
     "sveltekit-frontend/vite.config.ts"
@@ -34521,7 +34980,11 @@
     "claude-mem/scripts/strip-comments.ts"
   ],
   "EXTERNAL:unified": [
-    "claude-mem/scripts/strip-comments.ts"
+    "claude-mem/scripts/strip-comments.ts",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/markdown/enhance-code-blocks.ts",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/markdown/enhance-links.ts",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/markdown/literal-html.ts",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/markdown/table-html-restorer.ts"
   ],
   "EXTERNAL:remark-parse": [
     "claude-mem/scripts/strip-comments.ts"
@@ -34530,7 +34993,12 @@
     "claude-mem/scripts/strip-comments.ts"
   ],
   "EXTERNAL:unist-util-visit": [
-    "claude-mem/scripts/strip-comments.ts"
+    "claude-mem/scripts/strip-comments.ts",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/markdown/enhance-code-blocks.ts",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/markdown/enhance-links.ts",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/markdown/literal-html.ts",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/markdown/resolve-attachment-images.ts",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/markdown/table-html-restorer.ts"
   ],
   "EXTERNAL:parse5": [
     "claude-mem/scripts/strip-comments.ts"
@@ -34862,6 +35330,1069 @@
   ],
   "EXTERNAL:https://unpkg.com/htm?module": [
     "docker/langgraph-synthesis/.venv/Lib/site-packages/torch/utils/model_dump/code.js"
+  ],
+  "EXTERNAL:k6/x/sse": [
+    "llama-cpp-turboquant-gemma4/tools/server/bench/script.js"
+  ],
+  "EXTERNAL:k6": [
+    "llama-cpp-turboquant-gemma4/tools/server/bench/script.js"
+  ],
+  "EXTERNAL:k6/data": [
+    "llama-cpp-turboquant-gemma4/tools/server/bench/script.js"
+  ],
+  "EXTERNAL:k6/metrics": [
+    "llama-cpp-turboquant-gemma4/tools/server/bench/script.js"
+  ],
+  "EXTERNAL:k6/execution": [
+    "llama-cpp-turboquant-gemma4/tools/server/bench/script.js"
+  ],
+  "EXTERNAL:@storybook/sveltekit": [
+    "llama-cpp-turboquant-gemma4/tools/server/webui/.storybook/main.ts",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/.storybook/preview.ts",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/.storybook/vitest.setup.ts"
+  ],
+  "EXTERNAL:mode-watcher": [
+    "llama-cpp-turboquant-gemma4/tools/server/webui/.storybook/ModeWatcherDecorator.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatSettings/ChatSettings.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/content/MarkdownContent.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/content/SyntaxHighlightedCode.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/stores/mcp.svelte.ts",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/routes/+layout.svelte"
+  ],
+  "EXTERNAL:@storybook/addon-a11y/preview": [
+    "llama-cpp-turboquant-gemma4/tools/server/webui/.storybook/vitest.setup.ts"
+  ],
+  "EXTERNAL:eslint-plugin-storybook": [
+    "llama-cpp-turboquant-gemma4/tools/server/webui/eslint.config.js"
+  ],
+  "EXTERNAL:@eslint/compat": [
+    "llama-cpp-turboquant-gemma4/tools/server/webui/eslint.config.js"
+  ],
+  "EXTERNAL:globals": [
+    "llama-cpp-turboquant-gemma4/tools/server/webui/eslint.config.js"
+  ],
+  "EXTERNAL:$lib/enums": [
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/app.d.ts",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/actions/ActionIconsCodeBlock.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/badges/BadgeModality.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatAttachments/ChatAttachmentMcpPrompt.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatAttachments/ChatAttachmentsList.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatAttachments/ChatAttachmentThumbnailFile.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatForm/ChatForm.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatForm/ChatFormActions/ChatFormActionAttachmentsDropdown.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatForm/ChatFormActions/ChatFormActions.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatForm/ChatFormPromptPicker/ChatFormPromptPicker.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatForm/ChatFormResourcePicker/ChatFormResourcePicker.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatMessages/ChatMessage.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatMessages/ChatMessageActions.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatMessages/ChatMessageAgenticContent.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatMessages/ChatMessageAssistant.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatMessages/ChatMessageEditForm.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatMessages/ChatMessageMcpPrompt.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatMessages/ChatMessageMcpPromptContent.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatMessages/ChatMessages.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatMessages/ChatMessageStatistics.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatMessages/ChatMessageSystem.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatMessages/ChatMessageUser.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatScreen/ChatScreen.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/content/MarkdownContent.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/content/SyntaxHighlightedCode.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/dialogs/DialogChatError.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/dialogs/DialogConfirmation.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/dialogs/DialogMcpResourcePreview.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/mcp/McpActiveServersAvatars.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/mcp/McpResourcePreview.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/mcp/McpResourceTemplateForm.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/mcp/McpServerCard/McpServerCard.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/mcp/McpServerCard/McpServerCardHeader.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/mcp/McpServerForm.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/mcp/McpServersSelector.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/mcp/McpServersSettings.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/server/ServerErrorSplash.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/constants/icons.ts",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/constants/mcp-resource.ts",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/constants/mcp.ts",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/constants/supported-file-types.ts",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/markdown/resolve-attachment-images.ts",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/services/chat.service.ts",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/services/database.service.ts",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/services/mcp.service.ts",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/services/models.service.ts",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/services/parameter-sync.service.spec.ts",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/services/parameter-sync.service.ts",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/stores/agentic.svelte.ts",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/stores/chat.svelte.ts",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/stores/conversations.svelte.ts",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/stores/mcp-resources.svelte.ts",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/stores/mcp.svelte.ts",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/stores/models.svelte.ts",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/stores/server.svelte.ts",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/types/agentic.d.ts",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/types/api.d.ts",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/types/chat.d.ts",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/types/common.d.ts",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/types/database.d.ts",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/types/mcp.d.ts",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/types/settings.d.ts",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/utils/agentic.ts",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/utils/api-fetch.ts",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/utils/attachment-display.ts",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/utils/attachment-type.ts",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/utils/audio-recording.ts",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/utils/branching.ts",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/utils/clipboard.ts",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/utils/convert-files-to-extra.ts",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/utils/file-type.ts",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/utils/legacy-migration.ts",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/utils/mcp.ts",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/utils/modality-file-validation.ts",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/utils/pdf-processing.ts",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/utils/process-uploaded-files.ts",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/utils/svg-to-png.ts",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/utils/text-files.ts",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/utils/webp-to-png.ts",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/routes/+layout.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/tests/unit/agentic-sections.test.ts",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/tests/unit/clipboard.test.ts",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/tests/unit/reasoning-context.test.ts"
+  ],
+  "EXTERNAL:$lib/components/ui/tooltip": [
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/actions/ActionIcon.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/badges/BadgeChatStatistic.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatAttachments/ChatAttachmentMcpResource.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatForm/ChatFormActions/ChatFormActionAttachmentsDropdown.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatForm/ChatFormActions/ChatFormActionRecord.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatForm/ChatFormActions/ChatFormActionSubmit.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatMessages/ChatMessageBranchingControls.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatMessages/ChatMessageMcpPromptContent.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatMessages/ChatMessageStatistics.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatSidebar/ChatSidebarConversationItem.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/misc/TruncatedText.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/navigation/DropdownMenuActions.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/routes/+layout.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/tests/client/components/TestWrapper.svelte"
+  ],
+  "EXTERNAL:@lucide/svelte": [
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/actions/ActionIconCopyToClipboard.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/actions/ActionIconRemove.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/actions/ActionIconsCodeBlock.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatAttachments/ChatAttachmentMcpResource.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatAttachments/ChatAttachmentPreview.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatForm/ChatFormActions/ChatFormActionAttachmentsDropdown.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatForm/ChatFormActions/ChatFormActionAttachmentsSheet.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatForm/ChatFormActions/ChatFormActionRecord.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatForm/ChatFormActions/ChatFormActions.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatForm/ChatFormActions/ChatFormActionSubmit.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatForm/ChatFormResourcePicker/ChatFormResourcePicker.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatMessages/ChatMessageActions.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatMessages/ChatMessageAgenticContent.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatMessages/ChatMessageAssistant.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatMessages/ChatMessageBranchingControls.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatMessages/ChatMessageEditForm.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatMessages/ChatMessageStatistics.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatMessages/ChatMessageSystem.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatScreen/ChatScreen.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatScreen/ChatScreenDragOverlay.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatScreen/ChatScreenHeader.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatSettings/ChatSettings.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatSettings/ChatSettingsFields.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatSettings/ChatSettingsFooter.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatSettings/ChatSettingsImportExportTab.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatSettings/ChatSettingsParameterSourceIndicator.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatSidebar/ChatSidebar.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatSidebar/ChatSidebarActions.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatSidebar/ChatSidebarConversationItem.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/dialogs/DialogChatError.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/dialogs/DialogEmptyFileAlert.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/dialogs/DialogMcpResourcePreview.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/dialogs/DialogMcpResources.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/dialogs/DialogModelNotAvailable.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/forms/KeyValuePairs.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/forms/SearchInput.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/mcp/McpCapabilitiesBadges.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/mcp/McpConnectionLogs.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/mcp/McpResourceBrowser/McpResourceBrowserHeader.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/mcp/McpResourceBrowser/McpResourceBrowserServerItem.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/mcp/McpResourcePreview.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/mcp/McpServerCard/McpServerCardActions.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/mcp/McpServerCard/McpServerCardHeader.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/mcp/McpServerCard/McpServerCardToolsList.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/mcp/McpServerInfo.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/mcp/McpServersSelector.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/mcp/McpServersSettings.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/misc/ConversationSelection.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/misc/HorizontalScrollCarousel.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/misc/KeyboardShortcutInfo.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/server/ServerErrorSplash.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/server/ServerLoadingSplash.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/server/ServerStatus.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/constants/icons.ts",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/constants/mcp.ts",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/constants/settings-config.ts",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/types/settings.d.ts",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/utils/mcp.ts"
+  ],
+  "EXTERNAL:$lib/components/app": [
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/actions/ActionIconsCodeBlock.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/badges/BadgeChatStatistic.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatAttachments/ChatAttachmentMcpPrompt.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatAttachments/ChatAttachmentMcpResource.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatAttachments/ChatAttachmentMcpResources.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatAttachments/ChatAttachmentPreview.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatAttachments/ChatAttachmentsList.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatAttachments/ChatAttachmentsViewAll.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatAttachments/ChatAttachmentThumbnailFile.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatAttachments/ChatAttachmentThumbnailImage.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatForm/ChatForm.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatForm/ChatFormActions/ChatFormActionAttachmentsDropdown.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatForm/ChatFormActions/ChatFormActionAttachmentsSheet.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatForm/ChatFormActions/ChatFormActions.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatForm/ChatFormPicker/ChatFormPickerList.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatMessages/ChatMessageActions.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatMessages/ChatMessageAgenticContent.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatMessages/ChatMessageAssistant.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatMessages/ChatMessageEditForm.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatMessages/ChatMessageMcpPrompt.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatMessages/ChatMessages.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatMessages/ChatMessageStatistics.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatMessages/ChatMessageSystem.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatMessages/ChatMessageUser.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatScreen/ChatScreen.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatScreen/ChatScreenForm.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatSettings/ChatSettings.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatSettings/ChatSettingsFields.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatSettings/ChatSettingsImportExportTab.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatSidebar/ChatSidebar.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatSidebar/ChatSidebarActions.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatSidebar/ChatSidebarConversationItem.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatSidebar/ChatSidebarSearch.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/content/MarkdownContent.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/dialogs/DialogChatAttachmentPreview.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/dialogs/DialogChatAttachmentsViewAll.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/dialogs/DialogChatSettings.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/dialogs/DialogConversationSelection.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/dialogs/DialogMcpResourcePreview.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/dialogs/DialogMcpResources.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/dialogs/DialogMcpServersSettings.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/dialogs/DialogModelInformation.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/mcp/McpResourcePreview.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/mcp/McpResourceTemplateForm.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/mcp/McpServerForm.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/mcp/McpServersSelector.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/navigation/DropdownMenuActions.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/navigation/DropdownMenuSearchable.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/server/ServerLoadingSplash.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/routes/+error.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/routes/+layout.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/routes/+page.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/routes/chat/[id]/+page.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/tests/stories/ChatSettings.stories.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/tests/stories/MarkdownContent.stories.svelte"
+  ],
+  "EXTERNAL:$lib/components/ui/utils": [
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/badges/BadgeInfo.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/badges/BadgeModality.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatAttachments/ChatAttachmentMcpResource.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatForm/ChatFormActions/ChatFormActionSubmit.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/mcp/McpActiveServersAvatars.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/mcp/McpConnectionLogs.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/mcp/McpResourceBrowser/McpResourceBrowser.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/mcp/McpResourceBrowser/McpResourceBrowserServerItem.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/mcp/McpResourcePreview.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/badge/badge.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/button/button.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/card/card-action.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/card/card-content.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/card/card-description.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/card/card-footer.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/card/card-header.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/card/card-title.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/card/card.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/dialog/dialog-content.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/dialog/dialog-description.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/dialog/dialog-footer.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/dialog/dialog-header.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/dialog/dialog-overlay.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/dialog/dialog-title.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/input/input.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/scroll-area/scroll-area-scrollbar.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/scroll-area/scroll-area.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/textarea/textarea.svelte"
+  ],
+  "EXTERNAL:$lib/constants": [
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/badges/BadgeModality.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatForm/ChatForm.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatForm/ChatFormActions/ChatFormActionAttachmentsDropdown.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatForm/ChatFormActions/ChatFormActionAttachmentsSheet.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatForm/ChatFormActions/ChatFormActions.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatForm/ChatFormPicker/ChatFormPickerList.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatMessages/ChatMessage.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatMessages/ChatMessageAssistant.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatMessages/ChatMessageStatistics.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatMessages/ChatMessageSystem.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatScreen/ChatScreenProcessingInfo.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatSettings/ChatSettings.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatSettings/ChatSettingsFields.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatSettings/ChatSettingsImportExportTab.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatSidebar/ChatSidebarActions.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatSidebar/ChatSidebarConversationItem.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/content/MarkdownContent.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/dialogs/DialogChatSettings.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/dialogs/DialogMcpResourcePreview.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/forms/KeyValuePairs.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/mcp/McpActiveServersAvatars.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/mcp/McpResourceTemplateForm.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/mcp/McpServerCard/McpServerCardHeader.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/mcp/McpServerForm.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/mcp/McpServersSettings.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/card/card.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/sheet/sheet-content.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/contexts/chat-actions.context.ts",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/contexts/chat-settings-dialog.context.ts",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/contexts/message-edit.context.ts",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/hooks/is-mobile.svelte.ts",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/hooks/use-auto-scroll.svelte.ts",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/hooks/use-processing-state.svelte.ts",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/markdown/enhance-code-blocks.ts",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/markdown/literal-html.ts",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/markdown/table-html-restorer.ts",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/services/chat.service.ts",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/services/mcp.service.ts",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/services/models.service.ts",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/stores/agentic.svelte.ts",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/stores/chat.svelte.ts",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/stores/conversations.svelte.ts",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/stores/mcp-resources.svelte.ts",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/stores/mcp.svelte.ts",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/stores/models.svelte.ts",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/stores/settings.svelte.ts",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/types/settings.d.ts",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/utils/agentic.ts",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/utils/cache-ttl.ts",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/utils/code.ts",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/utils/cors-proxy.ts",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/utils/favicon.ts",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/utils/file-type.ts",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/utils/formatters.ts",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/utils/latex-protection.ts",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/utils/legacy-migration.ts",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/utils/mcp.ts",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/utils/precision.ts",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/utils/sanitize.ts",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/utils/text-files.ts",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/routes/+layout.svelte"
+  ],
+  "EXTERNAL:$lib/stores/mcp.svelte": [
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatAttachments/ChatAttachmentMcpResource.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatAttachments/ChatAttachmentMcpResources.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatForm/ChatForm.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatForm/ChatFormActions/ChatFormActionAttachmentsDropdown.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatForm/ChatFormActions/ChatFormActions.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatForm/ChatFormPicker/ChatFormPickerItemHeader.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatForm/ChatFormPromptPicker/ChatFormPromptPicker.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatForm/ChatFormResourcePicker/ChatFormResourcePicker.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatMessages/ChatMessageMcpPromptContent.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/dialogs/DialogMcpResourcePreview.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/dialogs/DialogMcpResources.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/mcp/McpActiveServersAvatars.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/mcp/McpResourceBrowser/McpResourceBrowser.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/mcp/McpResourceBrowser/McpResourceBrowserServerItem.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/mcp/McpResourcePreview.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/mcp/McpResourceTemplateForm.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/mcp/McpServerCard/McpServerCard.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/mcp/McpServerForm.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/mcp/McpServersSelector.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/mcp/McpServersSettings.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/stores/agentic.svelte.ts",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/stores/chat.svelte.ts",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/routes/+layout.svelte"
+  ],
+  "EXTERNAL:$lib/stores/mcp-resources.svelte": [
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatAttachments/ChatAttachmentMcpResources.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatForm/ChatForm.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatForm/ChatFormResourcePicker/ChatFormResourcePicker.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/dialogs/DialogMcpResources.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/mcp/McpResourceBrowser/McpResourceBrowser.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/stores/mcp.svelte.ts"
+  ],
+  "EXTERNAL:$lib/components/ui/alert": [
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatAttachments/ChatAttachmentPreview.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatScreen/ChatScreen.svelte"
+  ],
+  "EXTERNAL:$lib/utils/browser-only": [
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatAttachments/ChatAttachmentPreview.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatForm/ChatForm.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatMessages/ChatMessage.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatMessages/ChatMessageEditForm.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatScreen/ChatScreen.svelte"
+  ],
+  "EXTERNAL:$lib/stores/models.svelte": [
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatAttachments/ChatAttachmentPreview.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatForm/ChatForm.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatForm/ChatFormActions/ChatFormActions.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatMessages/ChatMessageAssistant.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatScreen/ChatScreen.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatSettings/ChatSettingsFields.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/dialogs/DialogModelInformation.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/server/ServerStatus.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/services/chat.service.ts",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/stores/agentic.svelte.ts",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/stores/chat.svelte.ts",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/utils/convert-files-to-extra.ts",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/utils/process-uploaded-files.ts",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/routes/+layout.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/routes/+page.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/routes/chat/[id]/+page.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/tests/stories/fixtures/storybook-mocks.ts"
+  ],
+  "EXTERNAL:$lib/components/app/dialogs": [
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatForm/ChatForm.svelte"
+  ],
+  "EXTERNAL:$lib/stores/settings.svelte": [
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatForm/ChatForm.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatForm/ChatFormActions/ChatFormActions.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatMessages/ChatMessageAgenticContent.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatMessages/ChatMessageAssistant.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatMessages/ChatMessages.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatMessages/ChatMessageSystem.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatMessages/ChatMessageUser.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatScreen/ChatScreen.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatScreen/ChatScreenProcessingInfo.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatSettings/ChatSettings.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatSettings/ChatSettingsFields.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatSettings/ChatSettingsFooter.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/content/MarkdownContent.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/server/ServerErrorSplash.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/hooks/use-processing-state.svelte.ts",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/stores/agentic.svelte.ts",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/stores/chat.svelte.ts",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/stores/conversations.svelte.ts",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/stores/mcp.svelte.ts",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/utils/api-headers.ts",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/utils/api-key-validation.ts",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/utils/convert-files-to-extra.ts",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/utils/process-uploaded-files.ts",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/routes/+layout.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/tests/stories/ChatMessage.stories.svelte"
+  ],
+  "EXTERNAL:$lib/stores/server.svelte": [
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatForm/ChatForm.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatForm/ChatFormActions/ChatFormActions.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatMessages/ChatMessageAssistant.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatScreen/ChatScreen.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatSettings/ChatSettingsFields.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/dialogs/DialogModelInformation.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/server/ServerErrorSplash.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/server/ServerStatus.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/stores/chat.svelte.ts",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/stores/models.svelte.ts",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/stores/settings.svelte.ts",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/routes/+layout.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/routes/+page.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/tests/stories/fixtures/storybook-mocks.ts"
+  ],
+  "EXTERNAL:$lib/stores/chat.svelte": [
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatForm/ChatForm.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatForm/ChatFormActions/ChatFormActions.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatMessages/ChatMessage.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatMessages/ChatMessageAssistant.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatMessages/ChatMessageEditForm.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatMessages/ChatMessages.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatScreen/ChatScreen.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatScreen/ChatScreenProcessingInfo.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatSidebar/ChatSidebar.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatSidebar/ChatSidebarConversationItem.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/hooks/use-processing-state.svelte.ts",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/routes/+layout.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/routes/+page.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/routes/chat/[id]/+page.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/tests/stories/ChatMessage.stories.svelte"
+  ],
+  "EXTERNAL:$lib/stores/conversations.svelte": [
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatForm/ChatForm.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatForm/ChatFormActions/ChatFormActionAttachmentsDropdown.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatForm/ChatFormActions/ChatFormActions.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatForm/ChatFormPromptPicker/ChatFormPromptPicker.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatForm/ChatFormResourcePicker/ChatFormResourcePicker.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatMessages/ChatMessage.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatMessages/ChatMessageActions.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatMessages/ChatMessages.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatScreen/ChatScreen.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatScreen/ChatScreenProcessingInfo.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatSettings/ChatSettingsImportExportTab.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatSidebar/ChatSidebar.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatSidebar/ChatSidebarConversationItem.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/dialogs/DialogMcpResources.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/mcp/McpActiveServersAvatars.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/mcp/McpServersSelector.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/mcp/McpServersSettings.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/stores/chat.svelte.ts",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/routes/+layout.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/routes/+page.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/routes/chat/[id]/+page.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/tests/stories/ChatSidebar.stories.svelte"
+  ],
+  "EXTERNAL:$lib/components/ui/dropdown-menu": [
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatForm/ChatFormActions/ChatFormActionAttachmentsDropdown.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/mcp/McpServersSelector.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/navigation/DropdownMenuActions.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/navigation/DropdownMenuSearchable.svelte"
+  ],
+  "EXTERNAL:$lib/components/ui/switch": [
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatForm/ChatFormActions/ChatFormActionAttachmentsDropdown.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatMessages/ChatMessageActions.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatMessages/ChatMessageEditForm.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/mcp/McpServerCard/McpServerCardHeader.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/mcp/McpServerForm.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/mcp/McpServersSelector.svelte"
+  ],
+  "EXTERNAL:$lib/components/ui/sheet": [
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatForm/ChatFormActions/ChatFormActionAttachmentsSheet.svelte"
+  ],
+  "EXTERNAL:$lib/contexts": [
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatForm/ChatFormActions/ChatFormActions.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatMessages/ChatMessage.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatMessages/ChatMessageAssistant.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatMessages/ChatMessageEditForm.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatMessages/ChatMessageMcpPrompt.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatMessages/ChatMessages.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatMessages/ChatMessageSystem.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatMessages/ChatMessageUser.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatScreen/ChatScreenHeader.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatSidebar/ChatSidebarActions.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/routes/+layout.svelte"
+  ],
+  "EXTERNAL:$lib/hooks/is-mobile.svelte": [
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatForm/ChatFormActions/ChatFormActions.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/routes/+layout.svelte"
+  ],
+  "EXTERNAL:$lib/components/ui/scroll-area/scroll-area.svelte": [
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatForm/ChatFormPicker/ChatFormPickerList.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatSidebar/ChatSidebar.svelte"
+  ],
+  "EXTERNAL:$lib/components/ui/popover": [
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatForm/ChatFormPickerPopover.svelte"
+  ],
+  "EXTERNAL:svelte/reactivity": [
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatForm/ChatFormPromptPicker/ChatFormPromptPicker.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatForm/ChatFormResourcePicker/ChatFormResourcePicker.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatMessages/ChatMessageMcpPromptContent.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/content/MarkdownContent.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/dialogs/DialogMcpResources.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/mcp/McpResourceBrowser/McpResourceBrowser.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/mcp/McpResourceBrowser/McpResourceBrowserServerItem.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/misc/ConversationSelection.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/hooks/is-mobile.svelte.ts",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/stores/chat.svelte.ts",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/stores/conversations.svelte.ts",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/stores/mcp-resources.svelte.ts",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/stores/models.svelte.ts"
+  ],
+  "EXTERNAL:$lib/components/ui/badge/badge.svelte": [
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatForm/ChatFormPromptPicker/ChatFormPromptPicker.svelte"
+  ],
+  "EXTERNAL:$lib/components/app/chat": [
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatForm/ChatFormPromptPicker/ChatFormPromptPicker.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatForm/ChatFormResourcePicker/ChatFormResourcePicker.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatMessages/ChatMessage.svelte"
+  ],
+  "EXTERNAL:$lib/services/database.service": [
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatMessages/ChatMessage.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/stores/chat.svelte.ts",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/stores/conversations.svelte.ts",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/utils/legacy-migration.ts"
+  ],
+  "EXTERNAL:$lib/components/ui/checkbox": [
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatMessages/ChatMessageActions.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatMessages/ChatMessageAssistant.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatSettings/ChatSettingsFields.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatSidebar/ChatSidebar.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/mcp/McpResourceBrowser/McpResourceBrowserServerItem.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/misc/ConversationSelection.svelte"
+  ],
+  "EXTERNAL:$lib/components/ui/input/input.svelte": [
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatMessages/ChatMessageActions.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatSidebar/ChatSidebar.svelte"
+  ],
+  "EXTERNAL:$lib/components/ui/label/label.svelte": [
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatMessages/ChatMessageActions.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatMessages/ChatMessageAssistant.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatSettings/ChatSettingsFields.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatSidebar/ChatSidebar.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/server/ServerErrorSplash.svelte"
+  ],
+  "EXTERNAL:$lib/hooks/use-processing-state.svelte": [
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatMessages/ChatMessageAssistant.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatScreen/ChatScreenProcessingInfo.svelte"
+  ],
+  "EXTERNAL:$lib/components/ui/card": [
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatMessages/ChatMessageMcpPromptContent.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatMessages/ChatMessageSystem.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatMessages/ChatMessageUser.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/content/CollapsibleContentBlock.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/mcp/McpServerCard/McpServerCard.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/mcp/McpServerCardSkeleton.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/mcp/McpServersSettings.svelte"
+  ],
+  "EXTERNAL:$lib/components/app/misc": [
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatMessages/ChatMessageMcpPromptContent.svelte"
+  ],
+  "EXTERNAL:$lib/actions/fade-in-view.svelte": [
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatMessages/ChatMessages.svelte"
+  ],
+  "EXTERNAL:$lib/components/ui/alert-dialog": [
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatScreen/ChatScreen.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatSettings/ChatSettingsFooter.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/dialogs/DialogChatError.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/dialogs/DialogConfirmation.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/dialogs/DialogConversationTitleUpdate.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/dialogs/DialogEmptyFileAlert.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/dialogs/DialogModelNotAvailable.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/mcp/McpServerCard/McpServerCardDeleteDialog.svelte"
+  ],
+  "EXTERNAL:$lib/hooks/use-auto-scroll.svelte": [
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatScreen/ChatScreen.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/content/CollapsibleContentBlock.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/content/MarkdownContent.svelte"
+  ],
+  "EXTERNAL:$lib/components/ui/sidebar": [
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatScreen/ChatScreenHeader.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatSidebar/ChatSidebar.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatSidebar/handle-mobile-sidebar-item-click.ts"
+  ],
+  "EXTERNAL:$lib/components/ui/scroll-area": [
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatSettings/ChatSettings.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/misc/ConversationSelection.svelte"
+  ],
+  "EXTERNAL:$lib/enums/ui": [
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatSettings/ChatSettings.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/constants/settings-config.ts"
+  ],
+  "EXTERNAL:$lib/enums/settings": [
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatSettings/ChatSettings.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatSettings/ChatSettingsFields.svelte"
+  ],
+  "EXTERNAL:$lib/utils/precision": [
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatSettings/ChatSettingsFields.svelte"
+  ],
+  "EXTERNAL:@lucide/svelte/icons/chevrons-up-down": [
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/content/CollapsibleContentBlock.svelte"
+  ],
+  "EXTERNAL:$lib/components/ui/collapsible/index.js": [
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/content/CollapsibleContentBlock.svelte"
+  ],
+  "EXTERNAL:remark-breaks": [
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/content/MarkdownContent.svelte"
+  ],
+  "EXTERNAL:remark-gfm": [
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/content/MarkdownContent.svelte"
+  ],
+  "EXTERNAL:remark-math": [
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/content/MarkdownContent.svelte"
+  ],
+  "EXTERNAL:rehype-highlight": [
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/content/MarkdownContent.svelte"
+  ],
+  "EXTERNAL:remark-rehype": [
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/content/MarkdownContent.svelte"
+  ],
+  "EXTERNAL:rehype-katex": [
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/content/MarkdownContent.svelte"
+  ],
+  "EXTERNAL:rehype-stringify": [
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/content/MarkdownContent.svelte"
+  ],
+  "EXTERNAL:hast": [
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/content/MarkdownContent.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/markdown/enhance-code-blocks.ts",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/markdown/enhance-links.ts",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/markdown/resolve-attachment-images.ts",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/markdown/table-html-restorer.ts"
+  ],
+  "EXTERNAL:mdast": [
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/content/MarkdownContent.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/markdown/literal-html.ts"
+  ],
+  "EXTERNAL:$lib/markdown/table-html-restorer": [
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/content/MarkdownContent.svelte"
+  ],
+  "EXTERNAL:$lib/markdown/enhance-links": [
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/content/MarkdownContent.svelte"
+  ],
+  "EXTERNAL:$lib/markdown/enhance-code-blocks": [
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/content/MarkdownContent.svelte"
+  ],
+  "EXTERNAL:$lib/markdown/resolve-attachment-images": [
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/content/MarkdownContent.svelte"
+  ],
+  "EXTERNAL:$lib/markdown/literal-html": [
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/content/MarkdownContent.svelte"
+  ],
+  "EXTERNAL:$lib/enums/files": [
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/content/MarkdownContent.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/constants/mcp.ts"
+  ],
+  "EXTERNAL:highlight.js/styles/github-dark.css?inline": [
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/content/MarkdownContent.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/content/SyntaxHighlightedCode.svelte"
+  ],
+  "EXTERNAL:highlight.js/styles/github.css?inline": [
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/content/MarkdownContent.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/content/SyntaxHighlightedCode.svelte"
+  ],
+  "EXTERNAL:highlight.js": [
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/content/SyntaxHighlightedCode.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/utils/code.ts"
+  ],
+  "EXTERNAL:@lucide/svelte/icons/x": [
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/dialogs/DialogCodePreview.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/dialog/dialog-content.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/sheet/sheet-content.svelte"
+  ],
+  "UNRESOLVED:./models": [
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/index.ts"
+  ],
+  "EXTERNAL:$lib/components/ui/collapsible": [
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/mcp/McpConnectionLogs.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/mcp/McpResourceBrowser/McpResourceBrowserServerItem.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/mcp/McpServerCard/McpServerCardToolsList.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/mcp/McpServerInfo.svelte"
+  ],
+  "EXTERNAL:$lib/components/app/forms": [
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/mcp/McpResourceBrowser/McpResourceBrowserHeader.svelte"
+  ],
+  "EXTERNAL:$lib/components/ui/skeleton": [
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/mcp/McpServerCard/McpServerCard.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/mcp/McpServerCardSkeleton.svelte"
+  ],
+  "EXTERNAL:$lib/components/app/mcp": [
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/mcp/McpServerCard/McpServerCard.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/mcp/McpServerCard/McpServerCardEditForm.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/mcp/McpServerCard/McpServerCardHeader.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/mcp/McpServersSettings.svelte"
+  ],
+  "EXTERNAL:$lib/components/ui/utils.js": [
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/alert/alert-description.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/alert/alert-title.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/alert/alert.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/alert-dialog/alert-dialog-action.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/alert-dialog/alert-dialog-cancel.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/alert-dialog/alert-dialog-content.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/alert-dialog/alert-dialog-description.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/alert-dialog/alert-dialog-footer.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/alert-dialog/alert-dialog-header.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/alert-dialog/alert-dialog-overlay.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/alert-dialog/alert-dialog-title.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/checkbox/checkbox.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/dropdown-menu/dropdown-menu-checkbox-item.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/dropdown-menu/dropdown-menu-content.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/dropdown-menu/dropdown-menu-group-heading.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/dropdown-menu/dropdown-menu-item.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/dropdown-menu/dropdown-menu-label.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/dropdown-menu/dropdown-menu-radio-item.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/dropdown-menu/dropdown-menu-separator.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/dropdown-menu/dropdown-menu-shortcut.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/dropdown-menu/dropdown-menu-sub-content.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/dropdown-menu/dropdown-menu-sub-trigger.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/label/label.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/popover/popover-content.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/popover/popover-trigger.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/select/select-content.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/select/select-group-heading.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/select/select-item.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/select/select-label.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/select/select-scroll-down-button.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/select/select-scroll-up-button.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/select/select-separator.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/select/select-trigger.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/separator/separator.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/sheet/sheet-content.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/sheet/sheet-description.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/sheet/sheet-footer.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/sheet/sheet-header.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/sheet/sheet-overlay.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/sheet/sheet-title.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/sidebar/sidebar-content.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/sidebar/sidebar-footer.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/sidebar/sidebar-group-action.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/sidebar/sidebar-group-content.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/sidebar/sidebar-group-label.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/sidebar/sidebar-group.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/sidebar/sidebar-header.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/sidebar/sidebar-input.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/sidebar/sidebar-inset.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/sidebar/sidebar-menu-action.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/sidebar/sidebar-menu-badge.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/sidebar/sidebar-menu-button.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/sidebar/sidebar-menu-item.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/sidebar/sidebar-menu-skeleton.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/sidebar/sidebar-menu-sub-button.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/sidebar/sidebar-menu-sub-item.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/sidebar/sidebar-menu-sub.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/sidebar/sidebar-menu.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/sidebar/sidebar-provider.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/sidebar/sidebar-rail.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/sidebar/sidebar-separator.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/sidebar/sidebar.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/skeleton/skeleton.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/switch/switch.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/table/table-body.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/table/table-caption.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/table/table-cell.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/table/table-footer.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/table/table-head.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/table/table-header.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/table/table-row.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/table/table.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/tooltip/tooltip-content.svelte"
+  ],
+  "EXTERNAL:tailwind-variants": [
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/alert/alert.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/badge/badge.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/button/button.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/sheet/sheet-content.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/sidebar/sidebar-menu-button.svelte"
+  ],
+  "EXTERNAL:@lucide/svelte/icons/check": [
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/checkbox/checkbox.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/dropdown-menu/dropdown-menu-checkbox-item.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/select/select-item.svelte"
+  ],
+  "EXTERNAL:@lucide/svelte/icons/minus": [
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/checkbox/checkbox.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/dropdown-menu/dropdown-menu-checkbox-item.svelte"
+  ],
+  "EXTERNAL:@lucide/svelte/icons/circle": [
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/dropdown-menu/dropdown-menu-radio-item.svelte"
+  ],
+  "EXTERNAL:@lucide/svelte/icons/chevron-right": [
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/dropdown-menu/dropdown-menu-sub-trigger.svelte"
+  ],
+  "EXTERNAL:@lucide/svelte/icons/chevron-down": [
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/select/select-scroll-down-button.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/select/select-trigger.svelte"
+  ],
+  "EXTERNAL:@lucide/svelte/icons/chevron-up": [
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/select/select-scroll-up-button.svelte"
+  ],
+  "EXTERNAL:$lib/components/ui/separator/index.js": [
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/select/select-separator.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/sidebar/sidebar-separator.svelte"
+  ],
+  "EXTERNAL:$lib/hooks/is-mobile.svelte.js": [
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/sidebar/context.svelte.ts"
+  ],
+  "EXTERNAL:$lib/components/ui/tooltip/index.js": [
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/sidebar/sidebar-menu-button.svelte"
+  ],
+  "EXTERNAL:$lib/components/ui/skeleton/index.js": [
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/sidebar/sidebar-menu-skeleton.svelte"
+  ],
+  "EXTERNAL:@lucide/svelte/icons/panel-left": [
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/sidebar/sidebar-trigger.svelte"
+  ],
+  "EXTERNAL:$lib/components/ui/sheet/index.js": [
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/sidebar/sidebar.svelte"
+  ],
+  "EXTERNAL:tailwind-merge": [
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/utils.ts"
+  ],
+  "EXTERNAL:$lib/types/agentic": [
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/constants/agentic.ts",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/stores/agentic.svelte.ts"
+  ],
+  "EXTERNAL:unist-util-visit-parents": [
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/markdown/table-html-restorer.ts"
+  ],
+  "EXTERNAL:$lib/utils/api-headers": [
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/services/chat.service.ts"
+  ],
+  "EXTERNAL:$lib/utils/formatters": [
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/services/chat.service.ts"
+  ],
+  "EXTERNAL:$lib/utils/abort": [
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/services/chat.service.ts"
+  ],
+  "EXTERNAL:@modelcontextprotocol/sdk/client": [
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/services/mcp.service.ts"
+  ],
+  "EXTERNAL:@modelcontextprotocol/sdk/client/websocket.js": [
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/services/mcp.service.ts"
+  ],
+  "EXTERNAL:@modelcontextprotocol/sdk/shared/transport.js": [
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/services/mcp.service.ts"
+  ],
+  "EXTERNAL:$lib/types/models": [
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/services/models.service.ts"
+  ],
+  "EXTERNAL:$lib/services": [
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/stores/agentic.svelte.ts",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/stores/models.svelte.ts"
+  ],
+  "EXTERNAL:$lib/services/chat.service": [
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/stores/chat.svelte.ts"
+  ],
+  "EXTERNAL:$lib/stores/agentic.svelte": [
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/stores/chat.svelte.ts"
+  ],
+  "EXTERNAL:$lib/services/mcp.service": [
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/stores/mcp.svelte.ts"
+  ],
+  "EXTERNAL:$lib/types/settings": [
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/stores/mcp.svelte.ts"
+  ],
+  "EXTERNAL:$lib/services/props.service": [
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/stores/server.svelte.ts"
+  ],
+  "EXTERNAL:$lib/services/parameter-sync.service": [
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/stores/settings.svelte.ts"
+  ],
+  "UNRESOLVED:./api": [
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/types/agentic.d.ts",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/types/chat.d.ts"
+  ],
+  "UNRESOLVED:./chat": [
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/types/agentic.d.ts",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/types/api.d.ts",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/types/settings.d.ts"
+  ],
+  "UNRESOLVED:./database": [
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/types/agentic.d.ts",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/types/chat.d.ts",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/types/settings.d.ts"
+  ],
+  "EXTERNAL:$lib/enums/mcp": [
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/types/mcp.d.ts"
+  ],
+  "EXTERNAL:@modelcontextprotocol/sdk": [
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/types/mcp.d.ts"
+  ],
+  "UNRESOLVED:./common": [
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/types/mcp.d.ts"
+  ],
+  "UNRESOLVED:./mcp": [
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/types/settings.d.ts"
+  ],
+  "EXTERNAL:$lib/types/common": [
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/utils/mcp.ts"
+  ],
+  "EXTERNAL:pdfjs-dist/build/pdf.worker.min.mjs?raw": [
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/utils/pdf-processing.ts"
+  ],
+  "EXTERNAL:$lib/components/ui/sidebar/index.js": [
+    "llama-cpp-turboquant-gemma4/tools/server/webui/src/routes/+layout.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/tests/client/components/TestWrapper.svelte"
+  ],
+  "EXTERNAL:mdsvex": [
+    "llama-cpp-turboquant-gemma4/tools/server/webui/svelte.config.js"
+  ],
+  "EXTERNAL:@sveltejs/adapter-static": [
+    "llama-cpp-turboquant-gemma4/tools/server/webui/svelte.config.js"
+  ],
+  "EXTERNAL:vitest-browser-svelte": [
+    "llama-cpp-turboquant-gemma4/tools/server/webui/tests/client/page.svelte.test.ts"
+  ],
+  "EXTERNAL:@storybook/addon-svelte-csf": [
+    "llama-cpp-turboquant-gemma4/tools/server/webui/tests/stories/ChatMessage.stories.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/tests/stories/ChatScreenForm.stories.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/tests/stories/ChatSettings.stories.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/tests/stories/ChatSidebar.stories.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/tests/stories/MarkdownContent.stories.svelte"
+  ],
+  "EXTERNAL:$lib/components/app/chat/ChatMessages/ChatMessage.svelte": [
+    "llama-cpp-turboquant-gemma4/tools/server/webui/tests/stories/ChatMessage.stories.svelte"
+  ],
+  "EXTERNAL:$lib/components/app/chat/ChatScreen/ChatScreenForm.svelte": [
+    "llama-cpp-turboquant-gemma4/tools/server/webui/tests/stories/ChatScreenForm.stories.svelte"
+  ],
+  "EXTERNAL:storybook/test": [
+    "llama-cpp-turboquant-gemma4/tools/server/webui/tests/stories/ChatScreenForm.stories.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/tests/stories/ChatSettings.stories.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/tests/stories/ChatSidebar.stories.svelte",
+    "llama-cpp-turboquant-gemma4/tools/server/webui/tests/stories/MarkdownContent.stories.svelte"
+  ],
+  "UNRESOLVED:./fixtures/assets/1.jpg?url": [
+    "llama-cpp-turboquant-gemma4/tools/server/webui/tests/stories/ChatScreenForm.stories.svelte"
+  ],
+  "UNRESOLVED:./fixtures/assets/hf-logo.svg?url": [
+    "llama-cpp-turboquant-gemma4/tools/server/webui/tests/stories/ChatScreenForm.stories.svelte"
+  ],
+  "UNRESOLVED:./fixtures/assets/example.pdf?raw": [
+    "llama-cpp-turboquant-gemma4/tools/server/webui/tests/stories/ChatScreenForm.stories.svelte"
+  ],
+  "EXTERNAL:$lib/components/app/chat/ChatSidebar/ChatSidebar.svelte": [
+    "llama-cpp-turboquant-gemma4/tools/server/webui/tests/stories/ChatSidebar.stories.svelte"
+  ],
+  "EXTERNAL:socket.io-client": [
+    "llama-cpp-turboquant-gemma4/tools/server/webui/tests/stories/fixtures/ai-tutorial.ts"
+  ],
+  "EXTERNAL:@example/api-sdk": [
+    "llama-cpp-turboquant-gemma4/tools/server/webui/tests/stories/fixtures/api-docs.ts"
+  ],
+  "EXTERNAL:awesome-framework": [
+    "llama-cpp-turboquant-gemma4/tools/server/webui/tests/stories/fixtures/readme.ts"
+  ],
+  "EXTERNAL:$lib/utils/agentic": [
+    "llama-cpp-turboquant-gemma4/tools/server/webui/tests/unit/agentic-sections.test.ts"
+  ],
+  "EXTERNAL:$lib/constants/agentic": [
+    "llama-cpp-turboquant-gemma4/tools/server/webui/tests/unit/agentic-strip.test.ts"
+  ],
+  "EXTERNAL:$lib/utils/clipboard": [
+    "llama-cpp-turboquant-gemma4/tools/server/webui/tests/unit/clipboard.test.ts"
+  ],
+  "EXTERNAL:$lib/utils/latex-protection": [
+    "llama-cpp-turboquant-gemma4/tools/server/webui/tests/unit/latex-protection.test.ts"
+  ],
+  "EXTERNAL:$lib/services/models.service": [
+    "llama-cpp-turboquant-gemma4/tools/server/webui/tests/unit/model-id-parser.test.ts"
+  ],
+  "EXTERNAL:$lib/utils/model-names": [
+    "llama-cpp-turboquant-gemma4/tools/server/webui/tests/unit/model-names.test.ts"
+  ],
+  "EXTERNAL:@tailwindcss/vite": [
+    "llama-cpp-turboquant-gemma4/tools/server/webui/vite.config.ts"
+  ],
+  "EXTERNAL:vite-plugin-devtools-json": [
+    "llama-cpp-turboquant-gemma4/tools/server/webui/vite.config.ts"
+  ],
+  "EXTERNAL:@storybook/addon-vitest/vitest-plugin": [
+    "llama-cpp-turboquant-gemma4/tools/server/webui/vite.config.ts"
+  ],
+  "EXTERNAL:https": [
+    "scripts/atlas/test-qdrant-connectivity.mjs",
+    "scripts/atlas/audit-qdrant-postgres-payload-schema.mjs",
+    "scripts/atlas/backfill-qdrant-payload-complete.mjs"
+  ],
+  "UNRESOLVED:./bifrost/bifrost-provider.js": [
+    "packages/parent-atlas-retrieval/src/index.ts"
+  ],
+  "UNRESOLVED:./bifrost/bifrost-cache-manager.js": [
+    "packages/parent-atlas-retrieval/src/index.ts"
+  ],
+  "UNRESOLVED:./bifrost/bifrost-trace.js": [
+    "packages/parent-atlas-retrieval/src/index.ts"
+  ],
+  "UNRESOLVED:./turbovec/turbovec-prefilter.js": [
+    "packages/parent-atlas-retrieval/src/index.ts"
+  ],
+  "UNRESOLVED:./turbovec/turbovec-rerank.js": [
+    "packages/parent-atlas-retrieval/src/index.ts"
+  ],
+  "UNRESOLVED:./turbovec/turbovec-search.js": [
+    "packages/parent-atlas-retrieval/src/index.ts"
+  ],
+  "UNRESOLVED:./turbovec/turbovec-cuda-client.js": [
+    "packages/parent-atlas-retrieval/src/index.ts"
+  ],
+  "UNRESOLVED:./gpu/libtorch-bridge.js": [
+    "packages/parent-atlas-retrieval/src/index.ts"
+  ],
+  "UNRESOLVED:./gpu/simdjson-bridge.js": [
+    "packages/parent-atlas-retrieval/src/index.ts"
+  ],
+  "UNRESOLVED:./gpu/gpu-pipeline.js": [
+    "packages/parent-atlas-retrieval/src/index.ts"
   ],
   "UNRESOLVED:./sveltekit-frontend/src/lib/server/vector/qdrant-manager.js": [
     "scratch/test-retrieval.js"
@@ -36774,10 +38305,6 @@
   "EXTERNAL:$lib/services/context7-multicore.js": [
     "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/yorha/system/status/+server.ts"
   ],
-  "EXTERNAL:https": [
-    "scripts/atlas/audit-qdrant-postgres-payload-schema.mjs",
-    "scripts/atlas/backfill-qdrant-payload-complete.mjs"
-  ],
   "EXTERNAL:json-schema-to-javascript": [
     "scripts/atlas/update-package-json.mjs"
   ],
@@ -36817,6 +38344,11 @@
   ],
   "EXTERNAL:$lib/server/cache/atlas-cache-cascade.js": [
     "sveltekit-frontend/src/routes/api/atlas/search/+server.ts"
+  ],
+  "EXTERNAL:$lib/server/error-logging.js": [
+    "sveltekit-frontend/src/routes/api/cases/+server.ts",
+    "sveltekit-frontend/src/routes/api/embed/+server.ts",
+    "sveltekit-frontend/src/routes/api/rag/search/+server.ts"
   ],
   "EXTERNAL:$lib/server/db/legacy-read-detector": [
     "sveltekit-frontend/src/routes/api/debug/retrieval-comparison/+server.ts"

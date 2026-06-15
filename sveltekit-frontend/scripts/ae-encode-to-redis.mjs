@@ -30,6 +30,7 @@ const CONTENT_DIM = 768;
 const HIDDEN_DIM  = 256;
 const ENCODED_DIM = 64;
 const REDIS_KEY    = 'gpu:karpathy:encoded';
+const HISTORY_KEY  = 'gpu:karpathy:encoded:history';
 const WEIGHTS_KEY  = 'ace:autoencoder:weights';
 const META_KEY     = 'ace:autoencoder:meta';
 const BATCH_SIZE   = 500;
@@ -239,6 +240,22 @@ async function main() {
   // Set TTL on the hash
   if (!FLAGS.dryRun && encoded > 0) {
     await redis.expire(REDIS_KEY, TTL_SECS);
+    await redis.xadd(
+      HISTORY_KEY,
+      '*',
+      'event', 'ae_encode_redis',
+      'trainedAt', weights.trainedAt,
+      'bestLoss', String(weights.bestLoss),
+      'encodedCount', String(encoded),
+      'scannedCount', String(scanned),
+      'missingCount', String(missing),
+      'limit', String(FLAGS.limit),
+      'collection', COLLECTION,
+      'schemaVersion', 'karpathy-encoded-v1',
+      'temporalVersion', 'valkey-history-v1',
+      'sourceCollection', COLLECTION,
+      'saveMode', 'ae-encode-to-redis.mjs',
+    ).catch(() => {});
   }
 
   const elapsed = ((Date.now() - t0) / 1000).toFixed(1);

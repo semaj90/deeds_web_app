@@ -64,7 +64,7 @@ const DRY_RUN   = argv.includes('--dry-run');
 const VERBOSE   = argv.includes('--verbose') || argv.includes('-v');
 
 // ── Service URLs ──────────────────────────────────────────────────────────────
-const QDRANT_URL  = process.env.QDRANT_URL    ?? 'http://localhost:6333';
+const QDRANT_URL  = process.env.QDRANT_URL    ?? 'http://127.0.0.1:6333';
 const OLLAMA_URL  = process.env.OLLAMA_URL    ?? 'http://localhost:11434';
 const REDIS_URL   = process.env.REDIS_URL     ?? 'redis://localhost:6379';
 const REDIS_PASS  = process.env.REDIS_PASSWORD ?? 'redis';

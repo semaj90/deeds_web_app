@@ -36,7 +36,7 @@ const LIMIT = LIMIT_ARG
   ? parseInt(LIMIT_ARG.includes('=') ? LIMIT_ARG.split('=')[1] : args[args.indexOf('--limit') + 1], 10) || 0
   : 0; // 0 = no limit
 
-const QDRANT_URL = process.env.QDRANT_URL ?? 'http://localhost:6333';
+const QDRANT_URL = process.env.QDRANT_URL ?? 'http://127.0.0.1:6333';
 const COLLECTION = 'codebase_chunks_768';
 const REDIS_URL = process.env.REDIS_URL ?? 'redis://127.0.0.1:6379';
 const REDIS_PASS = process.env.REDIS_PASSWORD ?? process.env.VALKEY_PASSWORD ?? '';

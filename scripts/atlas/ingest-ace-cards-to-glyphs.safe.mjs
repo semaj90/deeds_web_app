@@ -16,7 +16,7 @@ const acePacketPath = path.join(projectRoot, '.opencode/ace-packet.json');
 
 // Config (env-overridable)
 const POSTGRES_URL = process.env.DATABASE_URL || 'postgresql://legal_admin:postgres@localhost:5432/legal_ai_db';
-const QDRANT_ENDPOINT = process.env.QDRANT_ENDPOINT || 'http://localhost:6333';
+const QDRANT_ENDPOINT = process.env.QDRANT_ENDPOINT || 'http://127.0.0.1:6333';
 const QDRANT_COLLECTION = 'codebase_chunks_768';
 
 const args = process.argv.slice(2);

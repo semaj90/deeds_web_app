@@ -59,6 +59,7 @@ const COLLECTION   = 'codebase_chunks_768';
 const DIM_IN       = 768;
 const DIM_HIDDEN   = 256;
 const DIM_LATENT   = 64;
+const AUTOENCODER_HISTORY_STREAM = 'ace:autoencoder:history';
 
 // ── Load N-API addon ──────────────────────────────────────────────────────────
 const require = createRequire(import.meta.url);
@@ -469,8 +470,31 @@ try {
     architecture: `${DIM_IN}-${DIM_HIDDEN}-${DIM_LATENT}-${DIM_HIDDEN}-${DIM_IN}`,
     activation: 'relu',
     latentNorm: 'l2',
+    schemaVersion: 'autoencoder-redis-v2',
+    temporalVersion: 'valkey-history-v1',
+    sourceCollection: COLLECTION,
+    historyKey: AUTOENCODER_HISTORY_STREAM,
+    saveMode: 'train-autoencoder.mjs',
   });
   await redis.expire('ace:autoencoder:meta', 7 * 24 * 3600);
+  await redis.xadd(
+    AUTOENCODER_HISTORY_STREAM,
+    '*',
+    'event', 'autoencoder_train',
+    'trainedAt', new Date().toISOString(),
+    'bestLoss', String(bestLoss),
+    'vectorCount', String(all.length),
+    'epochs', String(EPOCHS),
+    'batch', String(BATCH),
+    'lr', String(LR),
+    'dimIn', String(DIM_IN),
+    'dimHidden', String(DIM_HIDDEN),
+    'dimLatent', String(DIM_LATENT),
+    'schemaVersion', 'autoencoder-redis-v2',
+    'temporalVersion', 'valkey-history-v1',
+    'sourceCollection', COLLECTION,
+    'saveMode', 'train-autoencoder.mjs',
+  ).catch(() => {});
 
   report.bestLoss = bestLoss;
   report.losses = losses;

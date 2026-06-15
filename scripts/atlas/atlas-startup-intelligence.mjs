@@ -93,7 +93,7 @@ async function tryRedis(fn) {
 
 async function tryQdrant(path_) {
   try {
-    const res = await fetch(`http://localhost:6333${path_}`, { signal: AbortSignal.timeout(5000) });
+    const res = await fetch(`http://127.0.0.1:6333${path_}`, { signal: AbortSignal.timeout(5000) });
     if (!res.ok) return null;
     return await res.json();
   } catch { return null; }

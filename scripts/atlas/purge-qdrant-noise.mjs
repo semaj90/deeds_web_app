@@ -36,7 +36,7 @@ const CONFIRMED = args.includes('--confirm-noise-purge');
 const batchArg = args.find(a => a.startsWith('--batch-size='));
 const BATCH_SIZE = batchArg ? parseInt(batchArg.split('=')[1], 10) : 100;
 
-const QDRANT_URL = process.env.QDRANT_URL ?? 'http://localhost:6333';
+const QDRANT_URL = process.env.QDRANT_URL ?? 'http://127.0.0.1:6333';
 const COLLECTION = 'codebase_chunks_768';
 
 // ── Safety gate: require both flags for live run ──────────────────────────────

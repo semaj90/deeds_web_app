@@ -24,7 +24,7 @@ const { normalizeSourceRef, sourceRefHash, isGeneratedPath } =
   await import(pathToFileURL(resolve(__dirname, '../lib/canonical-source-ref.mjs')).href);
 
 const APPLY = process.argv.includes('--apply');
-const QDRANT_URL = process.env.QDRANT_URL ?? 'http://localhost:6333';
+const QDRANT_URL = process.env.QDRANT_URL ?? 'http://127.0.0.1:6333';
 const COLLECTION = 'codebase_chunks_768';
 const BATCH = 50; // Qdrant set_payload batch size
 const SCROLL_LIMIT = 250;

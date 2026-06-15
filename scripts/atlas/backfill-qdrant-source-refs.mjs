@@ -38,7 +38,7 @@
  *   node scripts/atlas/backfill-qdrant-source-refs.mjs --scan-only  # Phase 4 only (audit without fixing)
  *
  * Env:
- *   QDRANT_URL    default http://localhost:6333
+ *   QDRANT_URL    default http://127.0.0.1:6333
  *   DATABASE_URL  Postgres connection string
  */
 
@@ -66,7 +66,7 @@ const SCAN_ONLY  = args.includes('--scan-only');
 const VERBOSE    = args.includes('--verbose');
 const LIMIT      = parseInt(getFlag('limit') ?? '2000', 10);
 const COLLECTION = getFlag('collection') ?? 'codebase_chunks_768';
-const QDRANT_URL = (process.env.QDRANT_URL ?? 'http://localhost:6333').replace(/\/$/, '');
+const QDRANT_URL = (process.env.QDRANT_URL ?? 'http://127.0.0.1:6333').replace(/\/$/, '');
 const DB_URL     = process.env.DATABASE_URL;
 const TODAY      = new Date().toISOString().slice(0, 10);
 const TMP_DIR    = resolve(ROOT, '.tmp');

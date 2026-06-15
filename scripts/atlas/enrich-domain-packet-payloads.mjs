@@ -51,7 +51,7 @@ const VERBOSE = process.argv.includes('--verbose');
 const QDRANT  = process.argv.includes('--qdrant');
 const BATCH   = parseInt(process.argv.find(a => a.startsWith('--batch='))?.split('=')[1] ?? '1000', 10);
 
-const QDRANT_URL = process.env.QDRANT_URL ?? 'http://localhost:6333';
+const QDRANT_URL = process.env.QDRANT_URL ?? 'http://127.0.0.1:6333';
 const COLLECTION = 'codebase_chunks_768';
 
 function log(...a)  { console.log(...a); }

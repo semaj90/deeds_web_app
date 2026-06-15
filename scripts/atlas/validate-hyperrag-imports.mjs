@@ -237,7 +237,7 @@ function verifyQdrantIndexes() {
   return {
     requiredIndexes,
     verified_live: true, // Assumed if Qdrant is running
-    note: 'Verify via curl http://localhost:6333/collections',
+    note: 'Verify via curl http://127.0.0.1:6333/collections',
   };
 }
 

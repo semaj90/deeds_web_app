@@ -41,7 +41,7 @@ const { normalizeSourceRef } = await import(pathToFileURL(_helperPath).href);
 const args = process.argv.slice(2);
 const JSON_ONLY = args.includes('--json');
 
-const QDRANT_URL = process.env.QDRANT_URL ?? 'http://localhost:6333';
+const QDRANT_URL = process.env.QDRANT_URL ?? 'http://127.0.0.1:6333';
 const COLLECTION = 'codebase_chunks_768';
 const NEO4J_URL = (process.env.NEO4J_HTTP_URL
   ?? (process.env.NEO4J_URL ?? 'http://localhost:7474')

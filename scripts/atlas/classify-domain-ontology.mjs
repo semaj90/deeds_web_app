@@ -59,7 +59,7 @@ const DATABASE_URL = process.env.DATABASE_URL || 'postgresql://legal_admin:12345
 const REDIS_HOST   = process.env.REDIS_HOST   || '127.0.0.1';
 const REDIS_PORT   = parseInt(process.env.REDIS_PORT || '6379', 10);
 const REDIS_PASS   = process.env.REDIS_PASSWORD || process.env.REDIS_PASS || 'redis';
-const QDRANT_URL   = process.env.QDRANT_URL    || 'http://localhost:6333';
+const QDRANT_URL   = process.env.QDRANT_URL    || 'http://127.0.0.1:6333';
 const COLLECTION   = 'codebase_chunks_768';
 
 const DB_BATCH   = 200;  // rows per UPDATE batch

@@ -27,6 +27,7 @@ const REDIS_URL      = process.env.REDIS_URL  ?? 'redis://localhost:6379';
 const COLLECTION     = 'codebase_chunks_768';
 const CENTROIDS_KEY  = 'gpu:autoencoder:centroids_64';
 const META_KEY       = 'gpu:autoencoder:centroids_64_meta';
+const HISTORY_STREAM = 'gpu:autoencoder:centroids_64:history';
 const CONTENT_DIM    = 768;
 const HIDDEN_DIM     = 256;
 const ENCODED_DIM    = 64;
@@ -255,9 +256,41 @@ async function main() {
             await redis.hset(META_KEY, {
                 trainedAt:    weights.trainedAt,
                 clusterCount: String(kept),
+                centroidCount: String(kept),
                 totalPoints:  String(totalScanned),
+                pointCount:   String(totalScanned),
                 computedAt:   new Date().toISOString(),
+                schemaVersion: 'autoencoder-centroids-v2',
+                temporalVersion: 'valkey-history-v1',
+                sourceCollection: COLLECTION,
+                vectorDim: String(ENCODED_DIM),
+                inputDim: String(CONTENT_DIM),
+                hiddenDim: String(HIDDEN_DIM),
+                historyKey: HISTORY_STREAM,
+                saveMode: 'autoencoder-centroids.mjs',
             });
+            await redis.xadd(
+                HISTORY_STREAM,
+                '*',
+                'event', 'centroids_refresh',
+                'trainedAt', weights.trainedAt,
+                'clusterCount', String(kept),
+                'centroidCount', String(kept),
+                'totalPoints', String(totalScanned),
+                'pointCount', String(totalScanned),
+                'primaryCount', String(primary),
+                'fallbackCount', String(fallback),
+                'noVectorCount', String(noVector),
+                'noClusterCount', String(noCluster),
+                'computedAt', new Date().toISOString(),
+                'schemaVersion', 'autoencoder-centroids-v2',
+                'temporalVersion', 'valkey-history-v1',
+                'sourceCollection', COLLECTION,
+                'vectorDim', String(ENCODED_DIM),
+                'inputDim', String(CONTENT_DIM),
+                'hiddenDim', String(HIDDEN_DIM),
+                'saveMode', 'autoencoder-centroids.mjs',
+            ).catch(() => {});
             log(`[redis] Wrote ${kept} centroids to '${CENTROIDS_KEY}'.`);
         } else {
             console.warn('[centroids] No clusters met minimum size — Redis not updated.');

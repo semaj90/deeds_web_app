@@ -32,7 +32,7 @@ const args = process.argv.slice(2);
 const SAMPLE_SIZE = parseInt(args.find(a => a.startsWith('--sample='))?.split('=')[1]
   ?? (args.includes('--sample') ? args[args.indexOf('--sample') + 1] : '100'), 10);
 
-const QDRANT_URL = process.env.QDRANT_URL ?? 'http://localhost:6333';
+const QDRANT_URL = process.env.QDRANT_URL ?? 'http://127.0.0.1:6333';
 const COLLECTION = 'codebase_chunks_768';
 const NEO4J_URL = (process.env.NEO4J_HTTP_URL
   ?? (process.env.NEO4J_URL ?? process.env.NEO4J_URI ?? 'http://localhost:7474')

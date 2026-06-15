@@ -21,7 +21,7 @@
  *
  * Env:
  *   DATABASE_URL  (not used here — Qdrant only)
- *   QDRANT_URL    default http://localhost:6333
+ *   QDRANT_URL    default http://127.0.0.1:6333
  *   OLLAMA_URL    default http://localhost:11434
  *   SVELTEKIT_URL default http://localhost:5173
  */
@@ -46,7 +46,7 @@ const INPUT_PATH   = inputI >= 0 ? argv[inputI + 1] : null;
 const COLLECTION   = collI  >= 0 ? argv[collI + 1]  : 'docs_chunks';
 const BATCH_SIZE   = batchI >= 0 ? Number(argv[batchI + 1]) : 20;
 
-const QDRANT_URL   = process.env.QDRANT_URL    ?? 'http://localhost:6333';
+const QDRANT_URL   = process.env.QDRANT_URL    ?? 'http://127.0.0.1:6333';
 const OLLAMA_URL   = process.env.OLLAMA_URL    ?? 'http://localhost:11434';
 const SK_URL       = process.env.SVELTEKIT_URL ?? 'http://localhost:5173';
 const EMBED_MODEL  = process.env.EMBED_MODEL   ?? 'embeddinggemma:latest';

@@ -40,6 +40,7 @@ const COLLECTION  = 'codebase_chunks_768';
 const CONTENT_DIM = 768;
 const HIDDEN_DIM  = 256;
 const ENCODED_DIM = 64;
+const AUTOENCODER_HISTORY_STREAM = 'ace:autoencoder:history';
 
 const args = process.argv.slice(2);
 function parseArg(flag, fallback) {
@@ -390,7 +391,7 @@ async function main() {
       'W2', Array.from(W.W2).join(','),
       'b2', Array.from(W.b2).join(','),
     );
-    await redis.hset('ace:autoencoder:meta',
+  await redis.hset('ace:autoencoder:meta',
       'trainedAt',   new Date().toISOString(),
       'epochs',      String(FLAGS.epochs),
       'batchSize',   String(FLAGS.batch),
@@ -398,7 +399,31 @@ async function main() {
       'bestLoss',    String(bestLoss),
       'vectorCount', String(vectors.length),
       'durationMs',  String(durationMs),
+      'schemaVersion', 'autoencoder-redis-v2',
+      'temporalVersion', 'valkey-history-v1',
+      'sourceCollection', COLLECTION,
+      'historyKey', AUTOENCODER_HISTORY_STREAM,
+      'saveMode', 'ae-train.mjs',
     );
+    await redis.xadd(
+      AUTOENCODER_HISTORY_STREAM,
+      '*',
+      'event', 'autoencoder_train',
+      'trainedAt', new Date().toISOString(),
+      'bestLoss', String(bestLoss),
+      'vectorCount', String(vectors.length),
+      'durationMs', String(durationMs),
+      'epochs', String(FLAGS.epochs),
+      'batchSize', String(FLAGS.batch),
+      'lr', String(FLAGS.lr),
+      'dimIn', String(CONTENT_DIM),
+      'dimHidden', String(HIDDEN_DIM),
+      'dimLatent', String(ENCODED_DIM),
+      'schemaVersion', 'autoencoder-redis-v2',
+      'temporalVersion', 'valkey-history-v1',
+      'sourceCollection', COLLECTION,
+      'saveMode', 'ae-train.mjs',
+    ).catch(() => {});
     log('[redis] Weights saved — ace:autoencoder:weights (W1/b1/W2/b2) + ace:autoencoder:meta');
   } catch (err) {
     console.error(`[redis] Failed to save weights: ${err.message}`);

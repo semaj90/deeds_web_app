@@ -27,7 +27,7 @@ const args = process.argv.slice(2);
 const APPLY = args.includes('--apply');
 const SCROLL_LIMIT = parseInt(args.find(a => a.startsWith('--limit='))?.split('=')[1] ?? '0', 10) || 0;
 
-const QDRANT_URL = process.env.QDRANT_URL ?? 'http://localhost:6333';
+const QDRANT_URL = process.env.QDRANT_URL ?? 'http://127.0.0.1:6333';
 const COLLECTION = 'codebase_chunks_768';
 const TTL = 24 * 3600; // 24h
 

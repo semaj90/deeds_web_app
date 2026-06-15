@@ -48,7 +48,7 @@ const getFlag   = (n) => {
 };
 const LIMIT      = parseInt(getFlag('limit') ?? '0', 10); // 0 = all dupes
 const COLLECTION = getFlag('collection') ?? 'codebase_chunks_768';
-const QDRANT_URL = (process.env.QDRANT_URL ?? 'http://localhost:6333').replace(/\/$/, '');
+const QDRANT_URL = (process.env.QDRANT_URL ?? 'http://127.0.0.1:6333').replace(/\/$/, '');
 const DB_URL     = process.env.DATABASE_URL;
 const TODAY      = new Date().toISOString().slice(0, 10);
 const TMP_DIR    = resolve(ROOT, '.tmp');

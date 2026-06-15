@@ -44,7 +44,7 @@ const LIMIT_ARG  = (() => { const a = argv.find(x => x.startsWith('--limit=')); 
 
 // ── Service URLs ──────────────────────────────────────────────────────────────
 const DATABASE_URL = process.env.DATABASE_URL || 'postgresql://legal_admin:123456@127.0.0.1:5434/legal_ai_db';
-const QDRANT_URL   = process.env.QDRANT_URL   || 'http://localhost:6333';
+const QDRANT_URL   = process.env.QDRANT_URL   || 'http://127.0.0.1:6333';
 const NEO4J_URL    = process.env.NEO4J_URL    || 'http://localhost:7474';
 const NEO4J_USER   = process.env.NEO4J_USER   || 'neo4j';
 const NEO4J_PASS   = process.env.NEO4J_PASS   || 'neo4j123';

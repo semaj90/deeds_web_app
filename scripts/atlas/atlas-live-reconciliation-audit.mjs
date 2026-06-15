@@ -63,7 +63,7 @@ const DB_CONFIG = {
     PG_CONN_STRING:    process.env.DATABASE_URL ?? 'postgresql://legal_admin:123456@127.0.0.1:5434/legal_ai_db',
     REDIS_HOST:        _redis.host,
     REDIS_PORT:        _redis.port,
-    QDRANT_URL:        process.env.QDRANT_URL   ?? 'http://localhost:6333',
+    QDRANT_URL:        process.env.QDRANT_URL   ?? 'http://127.0.0.1:6333',
     NEO4J_URI:         process.env.NEO4J_URI    ?? 'bolt://localhost:7687',
     OLLAMA_BASE_URL:   (() => {
         const raw = (process.env.OLLAMA_HOST ?? 'http://127.0.0.1:11434').replace(/^0\.0\.0\.0/, '127.0.0.1');

@@ -207,5 +207,11 @@
   },
   "overrides": {
     "zod-to-json-schema": "file:C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/mcp/zod-to-json-schema-bridge"
-  }
+  },
+  "workspaces": [
+    "packages/parent-atlas-core",
+    "packages/parent-atlas-retrieval",
+    "packages/parent-atlas-ingest",
+    "packages/parent-atlas-opencode"
+  ]
 }

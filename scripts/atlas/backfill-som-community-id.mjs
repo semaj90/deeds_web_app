@@ -39,7 +39,7 @@ const __dir = dirname(fileURLToPath(import.meta.url));
 const ROOT  = join(__dir, '../..');
 
 const DATABASE_URL = process.env.DATABASE_URL || 'postgresql://legal_admin:123456@127.0.0.1:5434/legal_ai_db';
-const QDRANT_URL   = process.env.QDRANT_URL   || 'http://localhost:6333';
+const QDRANT_URL   = process.env.QDRANT_URL   || 'http://127.0.0.1:6333';
 
 const APPLY     = process.argv.includes('--apply');
 const DRY_RUN   = !APPLY;
