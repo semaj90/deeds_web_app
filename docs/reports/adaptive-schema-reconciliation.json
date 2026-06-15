@@ -1,0 +1,241 @@
+{
+  "timestamp": "2026-06-15T04:38:09.656Z",
+  "checks": {
+    "tables": {
+      "atlas_packets": {
+        "exists": true,
+        "columns": []
+      },
+      "atlas_tree_nodes": {
+        "exists": true,
+        "columns": []
+      },
+      "atlas_topology_index": {
+        "exists": true,
+        "columns": []
+      },
+      "error_logs": {
+        "exists": true,
+        "columns": []
+      }
+    },
+    "columns": {
+      "atlas_packets.packet_key": {
+        "exists": true
+      },
+      "atlas_packets.source_ref": {
+        "exists": true
+      },
+      "atlas_packets.file_path": {
+        "exists": true
+      },
+      "atlas_packets.feature_id": {
+        "exists": true
+      },
+      "atlas_packets.feature_label": {
+        "exists": true
+      },
+      "atlas_packets.summary": {
+        "exists": true
+      },
+      "atlas_tree_nodes.node_id": {
+        "exists": true
+      },
+      "atlas_tree_nodes.packet_key": {
+        "exists": true
+      },
+      "atlas_tree_nodes.parent_id": {
+        "exists": true
+      },
+      "atlas_tree_nodes.tree_depth": {
+        "exists": true
+      },
+      "atlas_topology_index.packet_key": {
+        "exists": true
+      },
+      "atlas_topology_index.w_authority": {
+        "exists": true
+      },
+      "atlas_topology_index.community_id": {
+        "exists": true
+      },
+      "atlas_topology_index.y_graph": {
+        "exists": true
+      },
+      "error_logs.id": {
+        "exists": true
+      },
+      "error_logs.error_category": {
+        "exists": true
+      },
+      "error_logs.error_text": {
+        "exists": false
+      },
+      "error_logs.error_embedding": {
+        "exists": false
+      }
+    },
+    "indexes": {
+      "idx_atlas_packets_packet_key": {
+        "exists": false
+      },
+      "idx_atlas_packets_source_ref": {
+        "exists": false
+      },
+      "idx_atlas_tree_nodes_packet_key": {
+        "exists": true
+      },
+      "idx_atlas_topology_packet_key": {
+        "exists": false
+      },
+      "idx_atlas_topology_authority": {
+        "exists": false
+      },
+      "idx_error_logs_category": {
+        "exists": true
+      }
+    },
+    "extensions": {
+      "pgcrypto": {
+        "installed": true,
+        "version": "1.4"
+      },
+      "vector": {
+        "installed": true,
+        "version": "0.8.2"
+      },
+      "pg_trgm": {
+        "installed": true,
+        "version": "1.6"
+      },
+      "btree_gin": {
+        "installed": true,
+        "version": "1.3"
+      },
+      "unaccent": {
+        "installed": true,
+        "version": "1.1"
+      }
+    },
+    "constraints": {
+      "pk_atlas_packets": {
+        "exists": false
+      },
+      "pk_atlas_topology": {
+        "exists": false
+      },
+      "pk_error_logs": {
+        "exists": false
+      }
+    },
+    "rowCounts": {
+      "atlas_packets": "0",
+      "atlas_tree_nodes": "8823",
+      "atlas_topology_index": "3251",
+      "error_logs": "0"
+    }
+  },
+  "recommendations": [
+    {
+      "type": "column",
+      "table": "error_logs",
+      "name": "error_text",
+      "data_type": "text",
+      "status": "missing",
+      "action": "ALTER TABLE error_logs ADD COLUMN IF NOT EXISTS error_text text;"
+    },
+    {
+      "type": "column",
+      "table": "error_logs",
+      "name": "error_embedding",
+      "data_type": "vector",
+      "status": "missing",
+      "action": "ALTER TABLE error_logs ADD COLUMN IF NOT EXISTS error_embedding vector;"
+    },
+    {
+      "type": "index",
+      "table": "atlas_packets",
+      "name": "idx_atlas_packets_packet_key",
+      "columns": [
+        "packet_key"
+      ],
+      "unique": true,
+      "status": "missing",
+      "action": "CREATE UNIQUE INDEX IF NOT EXISTS idx_atlas_packets_packet_key ON atlas_packets (packet_key);"
+    },
+    {
+      "type": "index",
+      "table": "atlas_packets",
+      "name": "idx_atlas_packets_source_ref",
+      "columns": [
+        "source_ref"
+      ],
+      "unique": false,
+      "status": "missing",
+      "action": "CREATE  INDEX IF NOT EXISTS idx_atlas_packets_source_ref ON atlas_packets (source_ref);"
+    },
+    {
+      "type": "index",
+      "table": "atlas_topology_index",
+      "name": "idx_atlas_topology_packet_key",
+      "columns": [
+        "packet_key"
+      ],
+      "unique": true,
+      "status": "missing",
+      "action": "CREATE UNIQUE INDEX IF NOT EXISTS idx_atlas_topology_packet_key ON atlas_topology_index (packet_key);"
+    },
+    {
+      "type": "index",
+      "table": "atlas_topology_index",
+      "name": "idx_atlas_topology_authority",
+      "columns": [
+        "w_authority"
+      ],
+      "unique": false,
+      "status": "missing",
+      "action": "CREATE  INDEX IF NOT EXISTS idx_atlas_topology_authority ON atlas_topology_index (w_authority);"
+    },
+    {
+      "type": "constraint",
+      "table": "atlas_packets",
+      "name": "pk_atlas_packets",
+      "constraint_type": "PRIMARY KEY",
+      "status": "missing",
+      "reason": "Primary key missing on atlas_packets"
+    },
+    {
+      "type": "constraint",
+      "table": "atlas_topology_index",
+      "name": "pk_atlas_topology",
+      "constraint_type": "PRIMARY KEY",
+      "status": "missing",
+      "reason": "Primary key missing on atlas_topology_index"
+    },
+    {
+      "type": "constraint",
+      "table": "error_logs",
+      "name": "pk_error_logs",
+      "constraint_type": "PRIMARY KEY",
+      "status": "missing",
+      "reason": "Primary key missing on error_logs"
+    }
+  ],
+  "sql": [
+    "ALTER TABLE error_logs ADD COLUMN IF NOT EXISTS error_text text;",
+    "ALTER TABLE error_logs ADD COLUMN IF NOT EXISTS error_embedding vector;",
+    "CREATE UNIQUE INDEX IF NOT EXISTS idx_atlas_packets_packet_key ON atlas_packets (packet_key);",
+    "CREATE  INDEX IF NOT EXISTS idx_atlas_packets_source_ref ON atlas_packets (source_ref);",
+    "CREATE UNIQUE INDEX IF NOT EXISTS idx_atlas_topology_packet_key ON atlas_topology_index (packet_key);",
+    "CREATE  INDEX IF NOT EXISTS idx_atlas_topology_authority ON atlas_topology_index (w_authority);"
+  ],
+  "summary": {
+    "tables_missing": 0,
+    "columns_missing": 2,
+    "indexes_missing": 4,
+    "extensions_missing": 0,
+    "constraints_missing": 3,
+    "safe_operations": 6,
+    "total_recommendations": 9
+  }
+}

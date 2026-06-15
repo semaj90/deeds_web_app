@@ -1,0 +1,82 @@
+{
+  "timestamp": "2026-06-15T03:44:40.171Z",
+  "results": [
+    {
+      "name": "Table Existence & Row Counts",
+      "status": "pass",
+      "detail": "4/4 core tables exist: packets(3251), tree_nodes(8823), summary_layers(19506), topology_index(3251)",
+      "metrics": {
+        "atlas_codebase_packets": 3251,
+        "atlas_tree_nodes": 8823,
+        "atlas_summary_layers": 19506,
+        "atlas_topology_index": 3251
+      }
+    },
+    {
+      "name": "Identity Chain Integrity",
+      "status": "warn",
+      "detail": "3251 packets: 000 missing identity fields. 2786 unique source_refs (465 shared), 3251 unique packet_keys",
+      "metrics": {
+        "total_packets": "3251",
+        "missing_identity_fields": "000",
+        "unique_source_refs": "2786",
+        "unique_packet_keys": "3251",
+        "packets_per_source": "1.17"
+      }
+    },
+    {
+      "name": "Tree Hierarchy Structure",
+      "status": "pass",
+      "detail": "8823 nodes (5572 roots + 3251 children), max_depth=1",
+      "metrics": {
+        "total_nodes": "8823",
+        "root_nodes": "5572",
+        "child_nodes": "3251",
+        "max_depth": 1
+      }
+    },
+    {
+      "name": "Summary Layers Coverage",
+      "status": "pass",
+      "detail": "19506 summaries, 3251 packets covered (100.0%), 19506 with metadata",
+      "metrics": {
+        "total_summaries": "19506",
+        "packets_with_summaries": "3251",
+        "coverage_percent": "100.0",
+        "empty_summaries": "19506",
+        "with_metadata": "19506"
+      }
+    },
+    {
+      "name": "Topology Index (Scoring Cache)",
+      "status": "pass",
+      "detail": "3251 rows, SOM=3251, authority=0, karpathy=0",
+      "metrics": {
+        "total_rows": "3251",
+        "unique_packets": "3251",
+        "rows_with_som": "3251",
+        "rows_with_authority": "0",
+        "rows_with_karpathy": "0"
+      }
+    },
+    {
+      "name": "Error Logs (P1)",
+      "status": "pass",
+      "detail": "error_logs table exists: 0 errors across 0 categories",
+      "metrics": {
+        "table_exists": true,
+        "error_count": "0",
+        "categories": "0"
+      }
+    },
+    {
+      "name": "PostgreSQL Extensions",
+      "status": "pass",
+      "detail": "5/5 required extensions: btree_gin, pg_trgm, pgcrypto, unaccent, vector",
+      "metrics": {
+        "installed": "5",
+        "required": 5
+      }
+    }
+  ]
+}

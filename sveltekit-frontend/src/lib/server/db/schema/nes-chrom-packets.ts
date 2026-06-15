@@ -75,8 +75,10 @@ export const nesChromPackets = pgTable('nes_chrom_packets', {
   packetKeyUq: uniqueIndex('nes_chrom_packets_packet_key_key').on(table.packetKey),
   sourceRefIdx: index('nes_chrom_packets_source_ref_idx').on(table.sourceRef),
   sourceRefAliasIdx: index('idx_nes_chrom_packets_source_ref').on(table.sourceRef),
+  sourceRefMirrorIdx: index('idx_nes_chrom_packets_source_ref_idx').on(table.sourceRef),
   featureIdx: index('nes_chrom_packets_feature_id_idx').on(table.featureId),
   featureAliasIdx: index('idx_nes_chrom_packets_feature_id').on(table.featureId),
+  featureMirrorIdx: index('idx_nes_chrom_packets_feature_id_idx').on(table.featureId),
   featureSourceIdx: index('idx_nes_chrom_packets_feature_source').on(table.featureId, table.sourceRef),
   featureLabelIdx: index('idx_nes_chrom_packets_feature_label_idx').on(table.featureLabel),
   communityIdIdx: index('idx_nes_chrom_packets_community_id_idx').on(table.communityId),
@@ -104,6 +106,8 @@ export const nesChromPackets = pgTable('nes_chrom_packets', {
   sourceRefIdIdx: index('nes_chrom_packets_source_ref_id_idx').on(table.sourceRefId),
   featureCodeIdx: index('nes_chrom_packets_feature_code_idx').on(table.featureCode),
   somCodeIdx: index('nes_chrom_packets_som_code_idx').on(table.somCode),
+  confidenceScoreIdx: index('nes_chrom_packets_confidence_score_idx').on(table.confidenceScore),
+  packetZstdIdx: index('nes_chrom_packets_packet_zstd_idx').on(table.packetZstd),
 }));
 
 /**

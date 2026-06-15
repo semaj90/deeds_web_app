@@ -40,6 +40,7 @@ export const atlasFeatureMap = pgTable('atlas_feature_map', {
 }, (table) => ({
   featureIdIdx:       index('atlas_feature_map_feature_id_idx').on(table.featureId),
   featureIdAliasIdx:  index('idx_atlas_feature_map_feature_id').on(table.featureId),
+  liveFeatureIdIdx:   index('afm_feature_id_idx').on(table.featureId),
   communityIdIdx:     index('afm_community_id_idx').on(table.communityId),
   sourceRefIdx:       index('idx_atlas_feature_map_source_ref').on(table.sourceRef),
   packetIdIdx:        index('atlas_feature_map_packet_id_idx').on(table.packetId).where(sql`${table.packetId} IS NOT NULL`),

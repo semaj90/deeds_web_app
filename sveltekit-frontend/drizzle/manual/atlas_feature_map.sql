@@ -39,6 +39,9 @@ CREATE INDEX IF NOT EXISTS atlas_feature_map_feature_id_idx
 CREATE INDEX IF NOT EXISTS idx_atlas_feature_map_feature_id
     ON atlas_feature_map (feature_id);
 
+CREATE INDEX IF NOT EXISTS afm_feature_id_idx
+    ON atlas_feature_map (feature_id);
+
 CREATE INDEX IF NOT EXISTS afm_community_id_idx
     ON atlas_feature_map (community_id);
 

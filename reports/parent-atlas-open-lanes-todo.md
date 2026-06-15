@@ -18,6 +18,8 @@ Current live spine:
 - `packet_key` is immutable identity; `feature_id` may be enriched; `metadata` may grow.
 - compare-only future surfaces: `atlas_tree_nodes`, `atlas_topology_index`, `atlas_svg_glyphs`.
 - higher-hop schema repair is now applied to `atlas_feature_packets`: `file_path` is backfilled on 277 rows, `som_cluster` is backfilled on 7 rows, and `tree_node_id` is present as a nullable forward link with no safe live join path yet.
+- `packages/parent-atlas` now exists as a real scaffold with `src/index.ts`, `src/cli.ts`, gates, adapters, and pipeline ports; consolidation is now a wiring/refinement task, not a fresh package creation task.
+- The next blocker before the next backfill is live schema reconciliation: tree nodes, summary layers, and topology indexes still lag the package gate contract.
 
 ## Consolidated Action Plan And Roadmap
 
@@ -77,17 +79,19 @@ Current live spine: every packet has `packet_key`, `source_ref`, `feature_id`, `
 
 The next work moves into:
 
-1. XGBoost supervised reranker — train + smoke (`npm run atlas:xgboost:train` then `atlas:xgboost:serve`),
-2. Proto/RPC tool registry packetization,
-3. Reward prior backfill (reward_prior column on packets without traces),
-4. PyTorch policy sidecar scaffold (Stage 5, after XGBoost is proven),
-5. Graph refresh invalidation binding,
-6. semantic index mirroring,
-7. cold-storage restore verification,
-8. evaluation harnesses and agent-learning gates,
-9. high-ROI parser / embedding lanes,
-10. agentic startup briefing for read-only planning bootstraps,
-11. merged packet-lane implementation on the stable packet identity spine.
+1. Live schema reconciliation for tree nodes, summary layers, and topology indexes
+2. Parent Atlas package wiring / wrapper cleanup / OpenCode integration
+3. XGBoost supervised reranker — train + smoke (`npm run atlas:xgboost:train` then `atlas:xgboost:serve`)
+4. Proto/RPC tool registry packetization
+5. Reward prior backfill (reward_prior column on packets without traces)
+6. PyTorch policy sidecar scaffold (Stage 5, after XGBoost is proven)
+7. Graph refresh invalidation binding
+8. semantic index mirroring
+9. cold-storage restore verification
+10. evaluation harnesses and agent-learning gates
+11. high-ROI parser / embedding lanes
+12. agentic startup briefing for read-only planning bootstraps
+13. merged packet-lane implementation on the stable packet identity spine
 
 ### Active GPU / Parser Lanes
 

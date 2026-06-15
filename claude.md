@@ -1,7 +1,28 @@
 # Legal AI Platform — Claude Project Instructions
 
-## Last Updated: June 14, 2026 (Parent Atlas P0–P7 Roadmap + Frozen Identity Contract)
+## Last Updated: June 15, 2026 (Session 66 continuation — P1 COMPLETE | Parent Atlas Consolidation IN PROGRESS)
 ## Status: svelte-check 0 errors, 0 warnings | vite build PASSES | Playwright 20/20 | Codebase audit: 57K files, 3.3K API routes
+## P1 Verification: ✅ 8,823 tree nodes | ✅ 3,251/3,251 packets linked (100%) | ✅ Qdrant 58 collections live | ✅ All gates PASS
+
+---
+
+## ⚡ CURRENT MILESTONE: Parent Atlas Library Consolidation
+
+**Status**: P1 implementation complete. Now refactoring from loose `scripts/atlas/` into reusable monorepo plugin.
+
+**Pivot**: Parent Atlas becomes a **library**, not an app feature.
+
+```
+deeds-web-app/
+  packages/
+    parent-atlas-core/      (identity, schemas, adapters)
+    parent-atlas-ingest/    (repo scanning, AST, packets)
+    parent-atlas-opencode/  (OpenCode integration)
+    parent-atlas-sveltekit/ (API routes, UI)
+  sveltekit-frontend/       (consumes the packages)
+```
+
+**See**: `docs/P1-PACKAGE-CONSOLIDATION-IN-PROGRESS.md` for phase tracking.
 
 ---
 

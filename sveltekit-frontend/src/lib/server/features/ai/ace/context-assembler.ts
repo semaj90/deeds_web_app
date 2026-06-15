@@ -47,6 +47,7 @@ import { SYSTEM_YORHA_LEGAL } from '$lib/ai/prompts.js';
 import { sortByBestScore, assignRanks } from '$lib/server/types/retrieval.js';
 import { countTokens, enforceTokenBudget } from '$lib/server/llm/token-budget.js';
 import { normalizeLabels } from '$lib/server/labels/normalize-labels.js';
+import { gpuRerank } from '$lib/server/retrieval/gpu-reranker.js';
 import {
   traceGraph,
   traceCache,
@@ -987,7 +988,40 @@ async function fetchACPKnowledgeResults(
         }
       }
 
-      mapped.sort((a, b) => b.score - a.score);
+      // Stage A1: GPU-accelerated reranking for large candidate sets
+      // Blend GPU cosine similarity with original Qdrant scores for top-K refinement
+      if (mapped.length >= 20) {
+        try {
+          const gpuResult = await gpuRerank(
+            emb,
+            mapped.map(m => ({
+              documentId: m.id,
+              similarity: m.score,
+              content: m.content,
+              embedding: (m.metadata as any)?.embedding || emb, // Fallback to query embedding
+            })),
+            { gpuWeight: 0.6, minDocsForGpu: 20 }
+          );
+          if (gpuResult.source !== 'passthrough' && gpuResult.docs.length > 0) {
+            // Merge GPU scores back into mapped results
+            const gpuScoreMap = new Map(gpuResult.docs.map(d => [d.documentId, d.similarity]));
+            mapped = mapped
+              .map(m => ({
+                ...m,
+                score: gpuScoreMap.get(m.id) ?? m.score,
+              }))
+              .sort((a, b) => b.score - a.score);
+          } else {
+            mapped.sort((a, b) => b.score - a.score);
+          }
+        } catch (err) {
+          // GPU reranking non-fatal; fall back to CPU sort
+          console.warn('[ACP] GPU reranking failed, using CPU sort:', err);
+          mapped.sort((a, b) => b.score - a.score);
+        }
+      } else {
+        mapped.sort((a, b) => b.score - a.score);
+      }
 
       return {
         ok: true,

@@ -42,6 +42,7 @@ ALTER TABLE route_runtime_packets ADD COLUMN IF NOT EXISTS tree_node_id uuid REF
 CREATE UNIQUE INDEX IF NOT EXISTS rrp_packet_uuid_uidx ON route_runtime_packets (packet_uuid);
 
 CREATE INDEX IF NOT EXISTS rrp_raw_gin     ON route_runtime_packets USING gin (raw jsonb_path_ops);
+CREATE INDEX IF NOT EXISTS idx_rrp_raw_gin  ON route_runtime_packets USING gin (raw jsonb_path_ops);
 CREATE INDEX IF NOT EXISTS rrp_feature_idx ON route_runtime_packets (feature_id, captured_at DESC);
 CREATE INDEX IF NOT EXISTS rrp_state_idx   ON route_runtime_packets (route_state, captured_at DESC);
 CREATE INDEX IF NOT EXISTS idx_route_runtime_packets_packet_key_idx ON route_runtime_packets (packet_key);

@@ -145,6 +145,7 @@ The next derived surfaces are compare-only until the live contract exists:
 - Gemma4 summaries only after repo evidence is retrieved
 
 ### Remaining todo focus
+- reconcile the live tree / summary / topology schema before any fresh backfill or plugin promotion
 - finish provenance parity and quality review
 - finish provenance UI and trust-tier editing
 - finish feature registry reconciliation and command mapping

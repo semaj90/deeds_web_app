@@ -73,6 +73,7 @@ CREATE INDEX IF NOT EXISTS idx_nes_chrom_packets_source_ref ON nes_chrom_packets
 CREATE INDEX IF NOT EXISTS idx_nes_chrom_packets_source_ref_idx ON nes_chrom_packets(source_ref);
 CREATE INDEX IF NOT EXISTS nes_chrom_packets_feature_id_idx ON nes_chrom_packets(feature_id);
 CREATE INDEX IF NOT EXISTS idx_nes_chrom_packets_feature_id ON nes_chrom_packets(feature_id);
+CREATE INDEX IF NOT EXISTS idx_nes_chrom_packets_feature_id_idx ON nes_chrom_packets(feature_id);
 CREATE INDEX IF NOT EXISTS idx_nes_chrom_packets_feature_source ON nes_chrom_packets(feature_id, source_ref);
 CREATE INDEX IF NOT EXISTS idx_nes_chrom_packets_feature_label_idx ON nes_chrom_packets(feature_label);
 CREATE INDEX IF NOT EXISTS idx_nes_chrom_packets_community_id_idx ON nes_chrom_packets(community_id);

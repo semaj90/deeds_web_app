@@ -1,0 +1,4515 @@
+{
+  "timestamp": "2026-06-15T04:05:55.119Z",
+  "summary": {
+    "total_candidates": 500,
+    "promoted": 500,
+    "skipped": 0,
+    "by_field": {
+      "community_id": 500
+    },
+    "forbidden_mutations": 0
+  },
+  "promotions": [
+    {
+      "field": "community_id",
+      "packet_key": "05dbd8cc7c550bbe",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "08dce8e980d1e261",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "0e584542cbd3ec1f",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "106474ac880329aa",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "1125b964826d67d7",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "119403f1ca0164b4",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "13039d77318546e0",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "131a19548bb7040a",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "146d03550b38f04f",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "16b72d0723810d7a",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "18982b82320aec48",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "198fcc43949be3e5",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "19a452835e44976c",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "19a7449025ff8a6a",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "1c0cc407a6d76c46",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "1c82bb92173cf8fd",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "1dee28d8185baec1",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "21c7e3e332ebb53c",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "21ec8f45628c7ed6",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "2388da7a95b80d63",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "26d8eb819c841b3f",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "27d3b98350c51b3d",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "280dfae99b8989c8",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "2e756a27a7f09185",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "2ef2a6d8d7090673",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "30466339088a5d7c",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "30bd6d8a1f94b465",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "30f6c1a80378c41d",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "34103ce7348d4391",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "35c1357d9235a478",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "35cd420ea2723458",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "35f1b6ae72492901",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "360e8a8f2fe1760d",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "363ce8194f9a4a29",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "383644d670160faf",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "396e6c935ed44f39",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "3c0a1faf1ad3b018",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "3d3569007b471ce3",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "3da1912b66b2ba6c",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "3f20c73e6d55e064",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "41d1f107918aa2b7",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "4478ad1fc54186ed",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "460024692799c06b",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "4750a16c62b25b12",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "47540ba00d3ec10d",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "479fefd87c96fc81",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "48ec8757f9326a9f",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "4be745506c936434",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "4fb1dcc1cfeb729f",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "53c359cfdc9ff554",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "543dd3477eb89840",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "54fcecfbbcd844e6",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "55b8d0830ffd6225",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "5a0184afae07bbce",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "62f67d7c3a1cfff4",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "67d1f0764d866b27",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "686aede7a55ddc6d",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "6ba3c4f2b5eb8658",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "6eff1e76b2b3a26e",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "6f4bae20be8390d2",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "6f8d6f0304a8555d",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "725494300aeee013",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "740623a14eef3a13",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "7499bc52437b16aa",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "7c9f5c70f0b3e2c6",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "8635f17855b8b087",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "86755a622a123f00",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "888a05953bac995d",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "8a2d875d325d6b57",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "8c0921cbf2607acd",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "8da50389eff06d73",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "8f2d0d1255a28b58",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "90671a7c9849bb5a",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "93e7b2ee65d875b9",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "9668ba64b9654d5b",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "967b98cab78e77a1",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "97e339006b4b779d",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "987a32f7c1770755",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "9abd8a459ca08545",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "9e079ba2aebc6997",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "a19e30f9ba0719bf",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "a2f01329ad3fe8f3",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "a6d93103a2a9bc23",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "a7910e660f0f73fa",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "a9175e042bc259da",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "a9c34af22fadeb61",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "ab79a8d8daf848a4",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "adf4769d6a683ac9",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "af67225fd3f4d8df",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "b7d06889b56901e2",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "bb6767beb3c566ae",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "bbae54b7349f74c8",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "bfc2ace16bf28edb",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "bfc9cf922b5e07dc",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "c198c7ec091d7c9c",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "c85cec706d472e78",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "cadd493354a41341",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "cae69bcf600b90ee",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "d3f02a4d86fce148",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "d621c2f30cbe7b22",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "d90d0d726f6a4c1e",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "dc10d9a29ef4cfc8",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "dec4d16dfd222c3d",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "df457b3a642d0bd2",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "dfb48599dbaaf5ae",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "docs/+server.ts:1338fd23d575f6ba",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "docs/+server.ts:4c62f7025d50f175",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "11",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "docs/+server.ts:717234c88da91575",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "2",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "docs/+server.ts:9f94b258e88aeb5a",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "2",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "e5262153f1e15111",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "e62c053fa80caf7e",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "e80fafea78d85073",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "f0202938a78c782e",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "f0bd9bced9027651",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "f0db213531b2436b",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "f20fc0c15898750e",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "f67371851975505a",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "f8b8e51cf6f6da7a",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "f9875839a500b12c",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "fbd88560875d69bb",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "memory/agent-observation-ingest.ts:f3ff24456b408ca8",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "3",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "memory/agent-observation/+server.ts:4caa888cc18eb73e",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "3",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "memory/backfill/+server.ts:7e5b55aaad9d8f33",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "17",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "memory/claude-mem/import/+server.ts:7b45f3b258b16ac7",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "memory/claude-mem-ingest.ts:e217d08e4556aa97",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "memory/local-engram-memory-adapter.ts:e98786ed3098e3dc",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "3",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "memory/+page.server.ts:1542d2b1197bc398",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "memory/+page.server.ts:e9aabbfbf7dca10c",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "16",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "memory/+page.svelte:9a98345b5d839ce8",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "7",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "memory/+page.svelte:f56a861e2d4b0866",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "16",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "memory/search/+server.ts:0760cd189fefc283",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "6",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "memory/+server.ts:5cf934f68596f126",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "4",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "memory/+server.ts:750c98188b3cd68a",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "11",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "memory/settings/+server.ts:ba347e2b6a9356da",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "17",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "memory/status/+server.ts:bb0a13780fa4c128",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/auth-store.svelte.ts:488eae2aeee24789",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "10",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/hooks.server.ts:329f4d91067919af",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "2",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/hooks.server.ts:8716772c6f8478fd",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "2",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/ai/citation-cache.ts:1b7283296025bdf2",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "12",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/ai/citation-cache.ts:d6b54f5f4ceac032",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "12",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/ai/client-cache.ts:a385ab24795026bb",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "13",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/ai/client-embed.ts:964f99c42b1215d9",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "3",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/ai/client-embed.ts:a8cd323d951313d5",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "3",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/ai/client-llm-synthesis.ts:c9973598e7ec5115",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "5",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/ai/e2b/inference.ts:d30f9b525eee2b33",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "3",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/ai/e2b/session.ts:3a767bb5179609e3",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "11",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/ai/gemma4-e2b-client.ts:7d28600da88e13de",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "20",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/ai/hypergraph.ts:17f90cc4428dd2db",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "15",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/ai/model-ids.ts:01e41479c54f02d8",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "36",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/ai/onnx/inference.ts:a46db523f2cb3117",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "12",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/ai/onnx/session.ts:26d7d0d5c1561347",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "3",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/cache/cache-invalidation.ts:c826c376b761705c",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "94",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/cache/cache-service.svelte.ts:35fe58ec576b00bc",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "4",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/cache/cache-service.svelte.ts:9e2ba45a8096991b",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "4",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/cache/indexdb-cache.svelte.ts:72f580731c90fe89",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "94",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/cache/loki-cache.svelte.ts:2ab48a1962f78f40",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "94",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/cache/offline-fetch.ts:b9fba2093263369b",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "94",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/cache/__tests__/cache.test.ts:9f2e9c78b44ec580",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "4",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/canvas/webgpu-shader-cache.ts:b65a4b98144d1c94",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "26",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/client/db/loki-client.ts:fb2cadf77e67f889",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "57",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/client/subscribeEmbedding.svelte.ts:86595ba41cc1a6e2",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "3",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/client/timeline-client.ts:509f9eb9e800395e",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "1",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/client/ui/POIPhotoModal.svelte:c9640a6834b4a9c2",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "59",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/client/ui/POIPhotoUploader.svelte:28702d3d6db4ada8",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "58",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/ActionPopup.svelte:a30ab2b881be7601",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "59",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/admin/AdminChatAssistant.svelte:aaae23ac6ed7eeb3",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "58",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/admin/AdminMonitoringDashboard.svelte:50e282945262eca8",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "7",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/admin/BundlePreview.svelte:a0a6afc43fbf6e2c",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "7",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/admin/CommandSuggestPanel.svelte:d3739622d25b6619",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "58",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/admin/ContextualAssistantModal.svelte:0947370c5e85da9a",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "58",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/admin/EvidenceDataGrid.svelte:11982b9738f4f122",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "7",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/admin/EvidenceDrawer.svelte:2d223c3bad3dc135",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "7",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/admin/RoutingExplanationPanel.svelte:0d6c63c0e8a0033f",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "58",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/admin/SourceProvenancePanel.svelte:2394ba1b8a2834c5",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "58",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/admin/TagSelector.svelte:9f4b3bc231ff1e68",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "7",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/admin/TraceCopilotPanel.svelte:ea5d86024abb614b",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "7",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/agent/AutonomousInvestigator.svelte:f03c1d5c88bb1bd9",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "59",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/agentic/AgentChat.svelte:9367a5b14f6b19d8",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "51",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/agentic/AgenticController.svelte:e61732b75d3fd628",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "58",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/ai/ACEContextBubble.svelte:43a85337213f7c19",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/ai/AIAssistantButton.svelte:779d12706b49d5d5",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/ai/AIAssistantPanel.svelte:6942ac4300d3ba19",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/ai/AIChatWidget.svelte:f381f070fa70094b",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "5",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/ai/AIRecommendation.svelte:ed14a85bd21c1b0f",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/ai/AskAI.svelte:728f1d2b472efe83",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/ai/AuditResults.svelte:f60eabd7ae942e20",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/ai/AutomatedLegalResearch.svelte:8f612405693a4a04",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/ai/BifrostProgressCanvas.svelte:6743d34f250f2d61",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/ai/CachePerformanceDashboard.svelte:2865def3ade42484",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/ai/CaseScoringDashboard/CaseScoringDashboard.svelte:39a886bb541ce027",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/AIChatAssistant.svelte:a3bc1070d89669af",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "59",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/ai/ChatFeedback.svelte:9c7661a8801885bd",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/ai/ChatMessage.svelte:7eb83cc682ce7d6f",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "5",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/ai/ContextualChatDemo.svelte:0b29cb84990323af",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/ai/ContextualEvidenceChatModal.svelte:b70440fc7a22b3f6",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/ai/DocumentUploadSimulator.svelte:3fc65dd570b2bdd1",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "5",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/ai/EnhancedAIChatTest.svelte:432df3c34d59cf04",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/ai/EnhancedDocumentUploader.svelte:5fef1553d53e8811",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/ai/EnhancedFileUpload.svelte:0eff2c4bb4e17a84",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/ai/EnhancedInlineEditor.svelte:fd30b2e681906a97",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "5",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/ai/EnhancedLegalAIChatWithSynthesis.svelte:abdf57d86f7262fc",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/ai/FloatingChatModal.svelte:0aa4f6433454dc22",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/ai/GamingAIButton.svelte:fee70f2bf5ac1dbe",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/ai/Gemma270MWebAssembly.svelte:4b7c4a080e27e3b9",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/ai/GPUAIAssistant.svelte:04ecc093b85546ae",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/ai/index.ts:8cb04da36a806c7a",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/ai/IntelligentModelOrchestrator.svelte:fa542245aca0831d",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "5",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/ai/LegalDocumentDrafting.svelte:aa80f4e56391b672",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "5",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/ai/LegalDocumentSummarizer.svelte:51778a3e961ad223",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/ai/LLMSelector.svelte:a10e425046e66a31",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/ai/LocalImageGenerator.svelte:4451b1fc93f2196b",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/ai/QLoRAMonitoringDashboard.svelte:9ee4ea424b062076",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "5",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/ai/RAGAssistantChat.svelte:8472729d93b852a6",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "5",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/ai/RecommendationEngine.svelte:94c244b5e89c7b6e",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/ai/SimpleWorkingChat.svelte:87cb39c756fda9f7",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/ai/ThinkingStyleToggle.svelte:0c365f240cab9b8d",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "5",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/ai/TypewriterResponse.svelte:fb337c4b9cb27e6f",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "5",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/ai/VectorIntelligenceDemo.svelte:46556badcf0d89fc",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "5",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/ai/YorhaAIAssistant.svelte:9d1250ceebd263cd",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/analysis/AnalysisPanel.svelte:f4cb4b0cfcc28a25",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "92",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/analysis/KeyboardShortcutsHelp.svelte:a1d0e5ef8170d74f",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/analytics/LiveResearchPanel.svelte:89a95137518cdd64",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "92",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/analytics/ResearchSummariesBrowser.svelte:6e2bae7793c62ad0",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/ArchivedRoutesPanel.svelte:adafdad36476cd0b",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "57",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/atlas/AtlasGraphCanvas.svelte:1135205dd7216331",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "58",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/atlas/AtlasNodeInspector.svelte:095aed17372aa63c",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "58",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/atlas/AtlasQueryPanel.svelte:a75b09502c812a70",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "58",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/atlas/AtlasSourceRefs.svelte:ca3f7c52735d3157",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "58",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/atlas/AtlasTraceTimeline.svelte:5289f1178d064d0d",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "58",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/atlas/NesAtlasModal.svelte:c3684c9902468474",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "57",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/audio/AudioAnalysisView.svelte:8a36fc5f56dd5850",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "92",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/cache/CacheDemo.svelte:16a3a5d7f2ed70a9",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "92",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/cache/CacheMonitor.svelte:aae6e8b0d2b5a777",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "92",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/cache/OfflineIndicator.svelte:69a28e2f28be22bb",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "8",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/canvas/CollaborativeEvidenceCanvas.svelte:fa9ff17ea817fa67",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/canvas/EvidenceCanvasEditor.svelte:e00247138dbb1eeb",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "4",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/canvas/FabricCanvas.svelte:1c7fea4f609085cf",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "92",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/canvas/HybridBoard.svelte:ba9e92ae5bb3d288",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/canvas/RecursiveEvidenceVisualization.svelte:6f4b11a3bb230482",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/case/ErrorAlert.svelte:2ba34156fcd1dc32",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/CaseOutcomePrediction.svelte:2e11a68ab0916f99",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "59",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/cases/CaseCard.svelte:32cf507dd695323f",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/cases/CaseNotesEditor.svelte:00263c11d368a085",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/cases/CaseOverviewModal.svelte:010deee70f5deaef",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/cases/CaseOverview.svelte:97e2484e72980e2f",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/cases/CaseStats.svelte:9f24f83d168e7d27",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "2",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/cases/CaseViewModal.svelte:8fa1376f4169919e",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/cases/ContextualChatModal.svelte:7d2a1b8da914c3c7",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/cases/EvidenceCard.svelte:cec755b13fa41a38",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/case/SimilarCasesPanel.svelte:9858c3dc2eff03bf",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/cases/index.ts:e85ba463bf5aac81",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "18",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/cases/StreamingAnalysisPanel.svelte:4885070161705e21",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/charges/StatuteModal.svelte:7e833285b6ea3dcb",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/chat/AudioUploadWidget.svelte:cef1096ad667289d",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "92",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/chat/DocumentChip.svelte:1682780488029252",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/chat/FileUploadModal.svelte:a7e9a43d72a7f69f",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "92",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/ChatMessages.svelte:56f7386e82ee48a4",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "57",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/ChatPanel.svelte:82a943a245bbd143",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "58",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/citations/CitationCollections.svelte:e89a7b3a72ef5ccc",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/citations/CitationList.svelte:83d95f5952f96093",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/citations/CitationsSaveButton.svelte:60eb5981b1f4a0a3",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "92",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/citations/CitationViewModal.svelte:2f470698dde7f883",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/ClientGemmaDemo.svelte:3df5bcd32a1d72d0",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "57",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/ClientGemmaInference.svelte:a9c549da6fd2942a",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "58",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/codebase/CategoryFilter.svelte:2e6b5b691c5956b7",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/codebase/ClusterVisualization.svelte:1831f355bb482f03",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/codebase/CodebaseWikiDashboard.svelte:b69b14dca6c25617",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "92",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/codebase/CodeEvidenceBoard.svelte:dcbb1cae18657b74",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "92",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/codebase/GraphExport.svelte:ef2643ab8179953d",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/codebase/NodeDetailPanel.svelte:3046a2c6c93c28e3",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "92",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/codebase/RouteGraph.svelte:26efe726285681ab",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "92",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/CodebaseSearch.svelte:b4025b8f8d02b315",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "58",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/codebase/TagDeleteDialog.svelte:070651afc65a0b1e",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/codebase/TagDetailView.svelte:aa766be05de66d36",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/components-shims.d.ts:6b6b527e96375ccc",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "57",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/ContextConfirmModal.svelte:561b63362bbbebef",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "58",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/courtroom/CourtroomHUD.svelte:b6aa0b46710c26f5",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/courtroom/StrategyWizard.svelte:db2a00d57c6fc286",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/dashboard/AchievementBadge.svelte:69b420d1936cf6f6",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/dashboard/DetectiveRankBadge.svelte:079caf862116d5e0",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "92",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/dashboard/DocumentThumbnailTray.svelte:68b3d72cc06fdef9",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/dashboard/FallbackAlert.svelte:42259440919d69e1",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/dashboard/GamificationWidget.svelte:935914b8a2f59d5b",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/dashboard/PipelineOverview.svelte:7f3a802d8467467d",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "92",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/dashboard/ProgressCard.svelte:69924012b29a3a94",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "92",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/dashboard/StatsCard.svelte:df5668d6d4521ed4",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/dashboard/SystemStatus.svelte:69cfbe96c1ad031f",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/demos/TTSDemo.svelte:8028ce19c07f3326",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "92",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/detective/ContextualDetectiveBoard.svelte:6b59cdde5735779a",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/detective/EvidenceCard.svelte:9c1b5602a4f9e8f1",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/detective/EvidenceTheoryBoard.svelte:cadc8434007dbe7a",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "92",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/detective/UploadZone.svelte:7e1e3a57c29d7fb3",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/DevReviewPanel.svelte:e159bcabd5cecc04",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "59",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/document/DocumentAnalysisView.svelte:a38651e17a616705",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "8",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/DocumentUploadMachineIntegration.svelte:18d5c1cb6ce2ed87",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "58",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/editor/LegalDocumentEditor.svelte:f7448851cbecd483",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "8",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/editor/ReportToolbar.svelte:21bc2bf417214f17",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "8",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/editors/NierRichTextEditor.svelte:fc5e949695ed47c7",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "8",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/editor/TipTapEditor.svelte:49d7d13626a05da4",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "92",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/editor/TiptapWithAIAssistant.svelte:0d04f5e8f2d98efd",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "92",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/ErrorStreamMonitor.svelte:cd0814f42650c77e",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "92",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/evidence/board-history.svelte.ts:69c1341f3fe47e84",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "86",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/evidence/BoardMinimap.svelte:1e9a48f6a09ab179",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/evidence/board-persistence.svelte.ts:03500e4a7b93c6c7",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/evidence/BoardSearchOverlay.svelte:0d06897203857248",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "21",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/EvidenceCard.svelte:b9ad9035ecb49afb",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "59",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/evidence/CaseEvidenceOrganizer.svelte:c0d7087459b96b57",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/EvidenceConnections.svelte:e8a5a1b327778065",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "58",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/evidence/DoclingExtractionViewer.svelte:829b2e1dc94e665a",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/evidence/DraggableEvidenceNode.svelte:2dc5b3dcb3f17a94",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/evidence/EvidenceAdvancedToolsMenu.svelte:20b9c6e597d8c649",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/evidence/EvidenceAiAssistantDrawer.svelte:72737f984269d981",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/evidence/EvidenceAssistant.svelte:da7f4c9fa5fb93e3",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/evidence/EvidenceBoard.svelte:e963eac71a565b6a",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "59",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/evidence/EvidenceBoardToolbar.svelte:76aebe3af35808d1",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/evidence/EvidenceBulkUploadDialog.svelte:7db90c3db888cce6",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/evidence/EvidenceCanvas.svelte:eb0648cb59e84259",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/evidence/EvidenceCard.svelte:6ddc791419f6e6e4",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/evidence/EvidenceConnections.svelte:45dfda1ba38d0244",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "59",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/evidence/EvidenceFiltersDrawer.svelte:042eef4ef162413a",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "59",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/evidence/EvidenceImageSearch.svelte:c0ca83c9ed6e0bba",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/evidence/EvidenceList.svelte:cfcd5a1bbe2784e2",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/evidence/EvidenceManager.svelte:57164ff83c09d32b",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "59",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/evidence/EvidenceMediaViewer.svelte:1f4a316439d341d1",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "59",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/evidence/EvidencePageHeader.svelte:286322fdb5af1c8a",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/evidence/EvidencePrimaryUpload.svelte:34a413faba84fbd5",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/evidence/EvidenceStatsRow.svelte:45869eb87c1ddf31",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/evidence/EvidenceToolbar.svelte:5f367121282ac1da",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/evidence/EvidenceUploadButton.svelte:f7cba4aa79354592",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/evidence/EvidenceUploadModal.svelte:45f46f0992ca1f7b",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/evidence/EvidenceUploadProgress.svelte:db578bef69274fc4",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/evidence/EvidenceUploadResults.svelte:bfd60036adf0b5cf",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/evidence/EvidenceUpload.svelte:8f06b5c38116bbc9",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "59",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/evidence/evidence-utils.ts:aa953a286ad1b8fd",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "29",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/evidence/EvidenceViewModal.svelte:955d2164e1ba3879",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "59",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/evidence/LinkEvidenceToCaseDialog.svelte:b7d89c8c8b23b8a2",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/evidence/RelationshipInspector.svelte:68b1999a64f391a4",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "59",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/evidence/SummaryReviewPanel.svelte:8c60cbb40e2a0ce5",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/evidence/UploadProgressCard.svelte:ed0cc64e85836707",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "92",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/evidence/VisionImageAnalyzer.svelte:4a188526f091cab2",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/evidence/WebGPUParticleOverlay.svelte:78f9ca94952f17a0",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/evidence/WebGPUTextureStreamingDemo.svelte:3a6f5b44abf15e15",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "59",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/FileUploadSection.svelte:75b72702f949760f",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "58",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/forms/CaseForm.svelte:f78730e3434b9a10",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/forms/EnhancedCaseForm.svelte:e0f61c08d46e3f67",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/forms/EnhancedFileUpload.svelte:46b86b4dd1fb1d02",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/forms/EvidenceForm.svelte:4e909086e5920ed3",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/forms/LegalCaseForm.svelte:1313669c86534cb1",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/forms/ProgressiveForm.svelte:cfe0eda708d69b49",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/forms/SmartDocumentForm.svelte:dc95afcfd7cbbea2",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/glyph/GlyphAtlasPanel.svelte:5c960324543d7357",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "8",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/graph/BagOfWordsTexturePanel.svelte:36771c12acd41ddf",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "12",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/graph/GraphifyViewer.svelte:81f6bc913c8bb05b",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "57",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/HeadlessTypingListener.svelte:9bbe055829443568",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "58",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/KeyboardShortcutsPanel.svelte:53637ac53ce3da45",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "58",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/layout/YorhaSidebar.svelte:cd81362e857febc2",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "8",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/legal-ai/AttachToCaseModal.svelte:ba43f47859d120e5",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/legal-ai/CaseChatPanel.svelte:10ab5caf8e60ff5f",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/legal-ai/CaseDocumentWriter.svelte:61aa58a3a843005c",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "35",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/legal-ai/CaseStatuteLinks.svelte:101a951dffbc07c7",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/legal-ai/CitationCollections.svelte:1b75900915da8020",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/legal-ai/CitationDetail.svelte:625c81efa475814f",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/legal-ai/CitationHighlighter.svelte:a1edcede52d349ef",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/legal-ai/CitationLibraryPage.svelte:bd82f71e9d51d3d5",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/legal-ai/CitationSaveModal.svelte:9ab9ed346b41e855",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "35",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/legal-ai/CitationSearch.svelte:3b822d3fb6ae1e9d",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "35",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/legal-ai/CollectionDetail.svelte:920e670b31ff62be",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "35",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/legal-ai/LegalAILayout.svelte:94b5a700d4e9187f",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "35",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/legal-ai/LinkMetadataForm.svelte:ab77d4ded6d9c6b2",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/legal-ai/RelatedCasesPanel.svelte:2150d3ddd34eed55",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/legal-ai/StatuteDetail.svelte:5c7068eaff9fb9db",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "35",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/legal-ai/StatuteResultsList.svelte:3740805eca606a6b",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/legal-ai/StatuteSearchBar.svelte:a9dc233064dbd93e",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/legal/AISummaryMiniModal.svelte:91873c0f378e9f35",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/legal/AISummaryReader.svelte:190437f80f1a2bf3",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "21",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/legal/CaseTimeline.svelte:dfc57cda86d908ec",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/legal/ChainOfCustodyTracker.svelte:5f5999e5f1b0c48a",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "21",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/legal/CitationDrawer.svelte:79f6e113cdded7df",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/legal/CitationSaveTooltip.svelte:5c14483e2d309c18",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/legal/CitedSourcesOverlay.svelte:5f0d998f7ee14773",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/legal/CollaborationPanel.svelte:a40f152b649fdae0",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/legal/ContractAnalyzer.svelte:ad3d3c544a83ff76",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "21",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/legal-corpus/CitedSourcesDrawer.svelte:8b9675314a7782b6",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/legal-corpus/CorpusSidebar.svelte:9f5f6a1d464d3139",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/legal-corpus/LegalBreadcrumbs.svelte:04699213188302c0",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/legal-corpus/LegalCorpusClassicView.svelte:5cf31668e56ac0df",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "35",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/legal-corpus/LegalCorpusDemoView.svelte:b18e05a17d189249",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "35",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/legal-corpus/LegalDocumentHeader.svelte:bf80cba6652ef9c5",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "35",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/legal-corpus/LegalMetadataBar.svelte:f7bb371a680b5a8f",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/legal-corpus/LegalTabBar.svelte:43d01d77ec8efdd5",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/LegalCorpusSearch.svelte:58ca36cff543567a",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "59",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/legal/CorpusStatsBar.svelte:06deb269029e2fff",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/legal/CustodyTimeline.svelte:c8ddd94575a289ec",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/LegalDisclaimer.svelte:5708b73b60089091",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "59",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/legal/DocumentDetails.svelte:0f6f2222523d63b7",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/legal/EnhancedLegalProcessor.svelte:53e6d589ca3a2dfd",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/legal/EvidenceCustodyFlow.svelte:cf9bc11d62b2edcd",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "21",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/legal/EvidenceReportSummary.svelte:cd9b26086bb1ba11",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "21",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/legal/ExecutiveSummary.svelte:5fbeeb41598bac9d",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "21",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/legal/GlossaryTermCard.svelte:8c14377c1a4fb30e",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "35",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/legal/IngestionProgress.svelte:30f2e6d1fb740c69",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/legal/IntegrityVerification.svelte:f403f022c5de69de",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "21",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/legal/LegalImplications.svelte:c8063c7d8b0986fb",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/legal/LegalPrecedentCard.svelte:3ca6bc99c8a10600",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/legal/OfficialTextPane.svelte:27fe84082c32bd5b",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "21",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/legal/PDFViewer.svelte:070b6a8aba3e86c1",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "21",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/legal/SimilarCasesPanel.svelte:5659085b2ab22722",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "21",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/legal/StatuteActionPanel.svelte:4db5f2a66efce38f",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/legal/TocTree.svelte:9e0dcc900757ebea",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "21",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/legal/WorkflowProgress.svelte:b9c6f4cf6d15506a",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/library/reader/TocTree.svelte:9bce925628e4d614",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "8",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/modals/EvidenceCRUDModal.svelte:95d2b14d011ed355",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "8",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/modals/EvidenceModal.svelte:31fb83f1fddaa4bd",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "92",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/monitoring/CacheMonitoringWidget.svelte:f9470fb28e6f344a",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "92",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/monitoring/CacheWarmUpSimple.svelte:5120295c10ff69d0",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "92",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/NESGraphRenderer.svelte:79000f10002ddff6",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "58",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/nes/NesModal.svelte:0c8275cc8b9454cc",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "8",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/onboarding/SetupWizard.svelte:85683c0a95e6100a",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "8",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/PersonProfile.svelte:cecea31397340f94",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "59",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/Phase72ErrorBrain.svelte:d05ca565a378b643",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "92",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/phase78/ErrorEventsList.svelte:93df4c65e7da32a4",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "92",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/phase78/SuggestionsList.svelte:e74742ebcf96faa5",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "92",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/PhaseStatusPills.svelte:7d5f342369b67a2e",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "58",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/poi/PersonOfInterestDetailView.svelte:4d348a7fdd723ae8",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "92",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/poi/POIEditor.svelte:f5a5e8024ea0b39b",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "92",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/poi/POIFaceMatchDialog.svelte:113195f6ff2ac283",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "92",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/poi/POIForm.svelte:dcf951ab87168144",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "92",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/poi/PoiImageUpload.svelte:ba6ab1750e25a1a8",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "8",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/poi/POIPhotoGrid.svelte:41884717cc00f612",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "92",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/poi/POIStats.svelte:49a143bdaed21f2f",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "8",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/poi/POIThreatBadge.svelte:19fac65590d064e9",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "8",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/rag/AnswerWithCitations.svelte:6e1f9c5736c45906",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "92",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/rag/DocumentCard.svelte:901d0e794f0d3c9c",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "8",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/RAGSearchComponent.svelte:28dcb4c7fad0f7d4",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "59",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/rag/SourceValidator.svelte:e2bcae884ffaa046",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "8",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/recommendations/RecommendationWidget.svelte:5c10706fafe904d0",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/reports/ReportViewModal.svelte:a1a7710496425952",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/ResultDetail.svelte:f1f572e23c5dc0cb",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "57",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/RouteAPIExplorer.svelte:89ac02590bdbf9d5",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "58",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/RouteInspectorDetectiveBoard.svelte:a0aae763414ae3fe",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "92",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/RouteInspectorModal.svelte:f8bb1c706476b14a",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "58",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/RouteOperationsDashboard.svelte:12536a6c9c4e406a",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "58",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/RoutesList.svelte:be96a9674fccdc54",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "51",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/SearchBar.svelte:8e01d2ccba7faf4f",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "92",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/SearchBox.svelte:7a83aba8c8dec821",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "58",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/SearchResults.svelte:d1b71aeb86b79bf1",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "92",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/shells/BridgeActions.svelte:119e954815e1b526",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "8",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/shells/InvestigationShell.svelte:fec09e156c2c9af5",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "8",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/shells/ResearchShell.svelte:587fdaaa49a27630",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "8",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/source-validation/AnswerGenerator.svelte:84d40d4dc8a7ddb7",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/source-validation/ProvenanceGraph.svelte:7fac7fa002a486ce",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/source-validation/SourceValidator.svelte:d638d38c30075ca3",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/StreamingResponse.svelte:ba93e3a8165505c6",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "57",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/subcomponents/LoadingSpinner.svelte:0bef4476b5720c92",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "92",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/terminal/TerminalWindow.svelte:a26689c2414774c9",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "8",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/TipTapEditor.svelte:32683a311ed27575",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "58",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/types.ts:2442c4fe9a3a58a5",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "92",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/ui/AccessibilityPanel.svelte:fee31b5460eb815e",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/ui/AccessibilitySettings.svelte:242e7046d47c1f78",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/ui/AIDialog.svelte:65aba85d028d4ba4",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/ui/AIDropdown.svelte:e0aff1abc7218ada",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/ui/AIFileUpload.svelte:0e218aa60e1a3bf4",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/ui/AILoadingIndicator.svelte:54c5b8166aec1bb9",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/ui/alert-dialog/AlertDialogAction.svelte:cc01c53a8ac4f8f4",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "4",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/ui/alert-dialog/AlertDialogContent.svelte:b499e583c6e830f7",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "8",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/ui/alert-dialog/AlertDialogDescription.svelte:628282e9e7f99aab",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "8",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/ui/alert-dialog/AlertDialogFooter.svelte:8b5bdc1f99462133",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "8",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/ui/alert-dialog/AlertDialogHeader.svelte:9e32b752525fb799",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "4",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/ui/alert-dialog/AlertDialogOverlay.svelte:1544b31015281994",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "4",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/ui/alert-dialog/AlertDialogRoot.svelte:aea6bfaa90bd5c8d",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "4",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/ui/alert-dialog/AlertDialog.svelte:536003d63bf86c63",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "8",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/ui/alert-dialog/AlertDialogTitle.svelte:b194ec85808d4ec9",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "8",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/ui/alert-dialog/AlertDialogTrigger.svelte:a5efccfe654d41ca",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "8",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/ui/alert-dialog/types.ts:537bc28c235ded31",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "8",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/ui/AuthModal.svelte:8f5bf751e7147528",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/ui/AutoPopulatedCaseForm.svelte:10f60798e4fdf55d",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "34",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/ui/avatar/AvatarFallback.svelte:595f34adccb4d01d",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "34",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/ui/avatar/AvatarImage.svelte:be585ba53b5ae31f",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "8",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/ui/avatar/Svelte5Avatar.svelte:a146922a25c35950",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "8",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/ui/badge/Badge.svelte:7f20129061dedfa8",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "34",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/ui/badge/Svelte5Badge.svelte:bdd5ce246f71e1a5",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "34",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/ui/Badge.svelte:ce311a8d601d2108",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/ui/bits/Button.svelte:5ffbd15fa8df0537",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "8",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/ui/bits/index.ts:85a235d39876e189",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "34",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/ui/bits/Svelte5Button.svelte:91f3c08cd85acebe",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "8",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/ui/bits/Svelte5Dialog.svelte:08e7f4a2e8cbd194",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "34",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/ui/BitsUIDemo.svelte:f0eed29ddbbf27f1",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/ui/button/Button.svelte:7e8dbee6cb4f00d6",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "8",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/ui/button/index.ts:c052f1802e691f08",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "34",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/ui/Button.svelte:cf29b8981697c6ee",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/ui/button-variants.ts:e455cbf7c5606cbd",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "34",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/ui/CacheMonitoringWidget.svelte:51f5a772f274576c",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/ui/card/CardContent.svelte:20563e93c5946058",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/ui/card/CardDescription.svelte:ba084a76eeca93ac",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "34",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/ui/card/CardFooter.svelte:42d936eae6a03921",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/ui/card/CardTitle.svelte:7042db8b54e063ea",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/ui/CardContent.svelte:e9bc9e1c6da74158",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/ui/CardDescription.svelte:5ed438cf59b40301",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/ui/CardHeader.svelte:99538af0931812f6",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "34",
+      "safe": true
+    },
+    {
+      "field": "community_id",
+      "packet_key": "src/lib/components/ui/card/index.ts:069b23698ac4aeb7",
+      "feature_id": null,
+      "provenance": "GDS community detection",
+      "confidence": 0.8,
+      "value": "0",
+      "safe": true
+    }
+  ],
+  "mode": "dry-run"
+}
