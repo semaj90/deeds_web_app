@@ -1,14 +1,14 @@
 {
   "systemState": {
-    "timestamp": "2026-06-12T02:21:58.056Z",
+    "timestamp": "2026-06-16T17:02:01.890Z",
     "greeting": "Hello James.",
     "sinceLastWorked": {
-      "tasksOpen": 18,
+      "tasksOpen": 5,
       "tasksClosed": 0,
-      "newRecommendations": 6,
-      "taskRegistryOpen": 12,
+      "newRecommendations": 0,
+      "taskRegistryOpen": 5,
       "taskRegistryDone": 0,
-      "productionReadiness": "PASS 66 / WARN 0 / FAIL 0"
+      "productionReadiness": "PASS 65 / WARN 1 / FAIL 0"
     },
     "systems": {
       "postgres": "READY",
@@ -20,9 +20,9 @@
       "ldjson": "100%"
     },
     "coverage": {
-      "qdrant": "33%",
-      "som": "29%",
-      "parentAtlas": "29%"
+      "qdrant": "?%",
+      "som": "?%",
+      "parentAtlas": "?%"
     },
     "sidecars": [
       {
@@ -49,21 +49,356 @@
     ],
     "progress": {
       "taskRegistryCompletionPct": 0,
-      "productionReadinessPct": 100,
+      "productionReadinessPct": 98,
       "memoryExportsCompletionPct": 100
     },
     "warnings": [
       "Engram embed is stdio-only; TCP probes to 8792 are not the contract."
     ],
     "recommendations": [
-      "Qdrant coverage: 33% (3539 files unembedded)",
-      "SOM cluster coverage: 29% (3744 files unclassified)",
-      "atlas_feature_synthesis has only 12 rows — feature rollups incomplete",
-      "2201 atlas_feature_map rows not joined to parent_atlas_documents",
-      "SOM cluster on atlas_feature_map: 31% (3941 missing)",
-      "route_runtime_packets is empty — hot-path scoring unavailable"
+      "Concept evidence spine repair",
+      "Higher-hop enrichment audit / backfill",
+      "Recommendation merge audit",
+      "Feature not implemented: Priority 1: Evidence Upload UI (1 hour)",
+      "Feature not implemented: Priority 2: VLM POI Integration (90 min)",
+      "Feature not implemented: Priority 3: Audit Dashboard Web UI (3-4 hours)"
     ],
-    "nextLane": "Runtime Coverage Repair"
+    "openLaneOrder": [
+      "Concept evidence spine repair",
+      "Higher-hop enrichment audit / backfill",
+      "Recommendation merge audit",
+      "Artifact bloat audit",
+      "Engram / Gemma4 memory wiring",
+      "Parent Atlas overlay sync",
+      "Atlas / NESCHR97 directory mapping and cold storage",
+      "Feature-gap registry completion",
+      "Graph / KAG / DAG refresh manifest",
+      "PyTorch / LibTorch feature extraction lane"
+    ],
+    "toolRegistry": {
+      "path": "C:\\Users\\james\\Videos\\deeds-web-app\\docs\\reports\\mcp-tool-registry-index.json",
+      "totalTools": 128,
+      "activeLayers": [
+        "identity",
+        "memory",
+        "cache",
+        "lexical",
+        "dense",
+        "graph",
+        "rerank",
+        "synthesis",
+        "ops",
+        "read",
+        "unknown"
+      ],
+      "topLayers": [
+        {
+          "layer": "identity",
+          "count": 2,
+          "top": [
+            "atlas.source_refs",
+            "atlas.query"
+          ]
+        },
+        {
+          "layer": "memory",
+          "count": 1,
+          "top": [
+            "engram.chat_memory_recent"
+          ]
+        },
+        {
+          "layer": "cache",
+          "count": 12,
+          "top": [
+            "ace.compact_search",
+            "wiki.search",
+            "wiki.status"
+          ]
+        },
+        {
+          "layer": "lexical",
+          "count": 6,
+          "top": [
+            "search.go_hybrid",
+            "kag.recall_similar_fix",
+            "legal.find_similar_opinions"
+          ]
+        },
+        {
+          "layer": "dense",
+          "count": 14,
+          "top": [
+            "atlas:packet_search",
+            "atlas.packet_search",
+            "image.enrich_tags"
+          ]
+        },
+        {
+          "layer": "graph",
+          "count": 23,
+          "top": [
+            "kag.feature_lookup",
+            "trace.graphrag_search",
+            "graph.semantic_path_synthesis"
+          ]
+        },
+        {
+          "layer": "rerank",
+          "count": 2,
+          "top": [
+            "search.rerank",
+            "turbovec.rank_chunks"
+          ]
+        },
+        {
+          "layer": "synthesis",
+          "count": 15,
+          "top": [
+            "legal.build_timeline",
+            "legal.cross_examine",
+            "legal.issue_spotter"
+          ]
+        },
+        {
+          "layer": "ops",
+          "count": 7,
+          "top": [
+            "ops.gpu_pipeline_stats",
+            "ops.gpu_topk",
+            "ops.execute_graphify"
+          ]
+        },
+        {
+          "layer": "read",
+          "count": 5,
+          "top": [
+            "atlas.get_chunk",
+            "file.read_window",
+            "kb.wiki_note_lookup"
+          ]
+        }
+      ],
+      "canonicalPickup": [
+        {
+          "name": "ace",
+          "query": "ace bitfrost redis semantic cache dense retrieval",
+          "tools": [
+            {
+              "tool_name": "ace.compact_search",
+              "primary_layer": "cache",
+              "score": 430,
+              "source_ref": "ace.compact_search"
+            },
+            {
+              "tool_name": "wiki.search",
+              "primary_layer": "cache",
+              "score": 388,
+              "source_ref": "wiki.search"
+            },
+            {
+              "tool_name": "wiki.status",
+              "primary_layer": "cache",
+              "score": 388,
+              "source_ref": "wiki.status"
+            },
+            {
+              "tool_name": "ops.fixer_semantic_recall",
+              "primary_layer": "cache",
+              "score": 370,
+              "source_ref": "ops.fixer_semantic_recall"
+            },
+            {
+              "tool_name": "legal.check_services",
+              "primary_layer": "cache",
+              "score": 320,
+              "source_ref": "legal.check_services"
+            }
+          ]
+        },
+        {
+          "name": "kag",
+          "query": "kag source refs feature lookup lexical search",
+          "tools": [
+            {
+              "tool_name": "ace.compact_search",
+              "primary_layer": "cache",
+              "score": 372,
+              "source_ref": "ace.compact_search"
+            },
+            {
+              "tool_name": "wiki.search",
+              "primary_layer": "cache",
+              "score": 350,
+              "source_ref": "wiki.search"
+            },
+            {
+              "tool_name": "wiki.status",
+              "primary_layer": "cache",
+              "score": 350,
+              "source_ref": "wiki.status"
+            },
+            {
+              "tool_name": "atlas:packet_search",
+              "primary_layer": "dense",
+              "score": 324,
+              "source_ref": "atlas:packet_search"
+            },
+            {
+              "tool_name": "atlas.packet_search",
+              "primary_layer": "dense",
+              "score": 324,
+              "source_ref": "atlas.packet_search"
+            }
+          ]
+        },
+        {
+          "name": "dag",
+          "query": "dag graph topology neighborhood path expansion",
+          "tools": [
+            {
+              "tool_name": "ace.compact_search",
+              "primary_layer": "cache",
+              "score": 390,
+              "source_ref": "ace.compact_search"
+            },
+            {
+              "tool_name": "wiki.search",
+              "primary_layer": "cache",
+              "score": 378,
+              "source_ref": "wiki.search"
+            },
+            {
+              "tool_name": "wiki.status",
+              "primary_layer": "cache",
+              "score": 378,
+              "source_ref": "wiki.status"
+            },
+            {
+              "tool_name": "atlas:packet_search",
+              "primary_layer": "dense",
+              "score": 332,
+              "source_ref": "atlas:packet_search"
+            },
+            {
+              "tool_name": "atlas.packet_search",
+              "primary_layer": "dense",
+              "score": 332,
+              "source_ref": "atlas.packet_search"
+            }
+          ]
+        },
+        {
+          "name": "gemma4",
+          "query": "gemma4 summarize synthesis agent output",
+          "tools": [
+            {
+              "tool_name": "ace.compact_search",
+              "primary_layer": "cache",
+              "score": 350,
+              "source_ref": "ace.compact_search"
+            },
+            {
+              "tool_name": "ops.fixer_semantic_recall",
+              "primary_layer": "cache",
+              "score": 340,
+              "source_ref": "ops.fixer_semantic_recall"
+            },
+            {
+              "tool_name": "wiki.search",
+              "primary_layer": "cache",
+              "score": 338,
+              "source_ref": "wiki.search"
+            },
+            {
+              "tool_name": "wiki.status",
+              "primary_layer": "cache",
+              "score": 338,
+              "source_ref": "wiki.status"
+            },
+            {
+              "tool_name": "atlas:packet_search",
+              "primary_layer": "dense",
+              "score": 300,
+              "source_ref": "atlas:packet_search"
+            }
+          ]
+        },
+        {
+          "name": "opencode",
+          "query": "opencode startup tool routing agent bootstrap",
+          "tools": [
+            {
+              "tool_name": "ace.compact_search",
+              "primary_layer": "cache",
+              "score": 350,
+              "source_ref": "ace.compact_search"
+            },
+            {
+              "tool_name": "wiki.search",
+              "primary_layer": "cache",
+              "score": 350,
+              "source_ref": "wiki.search"
+            },
+            {
+              "tool_name": "wiki.status",
+              "primary_layer": "cache",
+              "score": 350,
+              "source_ref": "wiki.status"
+            },
+            {
+              "tool_name": "ops.fixer_semantic_recall",
+              "primary_layer": "cache",
+              "score": 322,
+              "source_ref": "ops.fixer_semantic_recall"
+            },
+            {
+              "tool_name": "atlas:packet_search",
+              "primary_layer": "dense",
+              "score": 304,
+              "source_ref": "atlas:packet_search"
+            }
+          ]
+        },
+        {
+          "name": "hyperrag",
+          "query": "hyperrag dense search bm25 rrf turbovec qdrant neo4j",
+          "tools": [
+            {
+              "tool_name": "wiki.status",
+              "primary_layer": "cache",
+              "score": 388,
+              "source_ref": "wiki.status"
+            },
+            {
+              "tool_name": "ace.compact_search",
+              "primary_layer": "cache",
+              "score": 380,
+              "source_ref": "ace.compact_search"
+            },
+            {
+              "tool_name": "wiki.search",
+              "primary_layer": "cache",
+              "score": 378,
+              "source_ref": "wiki.search"
+            },
+            {
+              "tool_name": "ops.fixer_semantic_recall",
+              "primary_layer": "cache",
+              "score": 342,
+              "source_ref": "ops.fixer_semantic_recall"
+            },
+            {
+              "tool_name": "atlas:packet_search",
+              "primary_layer": "dense",
+              "score": 332,
+              "source_ref": "atlas:packet_search"
+            }
+          ]
+        }
+      ]
+    },
+    "nextLane": "Concept evidence spine repair"
   },
   "safetyGates": {
     "allowRead": true,
@@ -72,8 +407,8 @@
     "mutationGate": "--apply flag required"
   },
   "nextActions": [
-    "Qdrant coverage: 33% (3539 files unembedded)",
-    "SOM cluster coverage: 29% (3744 files unclassified)",
-    "atlas_feature_synthesis has only 12 rows — feature rollups incomplete"
+    "Concept evidence spine repair",
+    "Higher-hop enrichment audit / backfill",
+    "Recommendation merge audit"
   ]
 }

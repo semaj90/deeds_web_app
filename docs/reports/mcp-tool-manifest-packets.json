@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-06-13T08:00:22.901Z",
-  "dry_run": false,
+  "generated_at": "2026-06-16T16:09:50.545Z",
+  "dry_run": true,
   "total_tools": 190,
   "by_domain": {
     "rag_retrieval": 62,
@@ -21,9 +21,9 @@
   },
   "description_pct": 95.8,
   "ontology_pct": 100,
-  "postgres_inserted": 190,
-  "qdrant_upserted": 190,
-  "neo4j_written": 190,
+  "postgres_inserted": 0,
+  "qdrant_upserted": 0,
+  "neo4j_written": 0,
   "rpc_methods_total": 74,
   "rpc_by_service": {
     "ChatAssistantService": 6,
@@ -203,11 +203,5502 @@
       "proto_file": "proto/active/chat_assistant.proto"
     }
   ],
+  "tools": [
+    {
+      "tool_name": "search.dev_context",
+      "llama_name": "search__dev_context",
+      "domain": "rag_retrieval",
+      "ontology": [
+        "retrieval",
+        "rag",
+        "search",
+        "reranking"
+      ],
+      "description": "Search the codebase for context relevant to a coding or debugging query. Returns ranked file chunks with stable keys. Call this first for any code question.",
+      "examples": [
+        "use search  dev context to search the codebase for context relevant to a coding or debugging query"
+      ],
+      "requires": [
+        "query"
+      ],
+      "returns": null,
+      "service": null,
+      "method": null,
+      "input_type": null,
+      "output_type": null,
+      "transport": "mcp+llama",
+      "file": "src/lib/server/ai/llama-tool-definitions.ts",
+      "source_ref": "src/lib/server/ai/llama-tool-definitions.ts#search__dev_context",
+      "packet_kind": "tool_manifest"
+    },
+    {
+      "tool_name": "codebase.rg_search",
+      "llama_name": "codebase__rg_search",
+      "domain": "rag_retrieval",
+      "ontology": [
+        "retrieval",
+        "rag",
+        "search"
+      ],
+      "description": "Controlled ripgrep search over the codebase. Returns line hits from relative repo paths and is safe for exact symbol or text lookup.",
+      "examples": [
+        "use codebase  rg search to controlled ripgrep search over the codebase"
+      ],
+      "requires": [
+        "query"
+      ],
+      "returns": null,
+      "service": null,
+      "method": null,
+      "input_type": null,
+      "output_type": null,
+      "transport": "mcp+llama",
+      "file": "src/lib/server/ai/llama-tool-definitions.ts",
+      "source_ref": "src/lib/server/ai/llama-tool-definitions.ts#codebase__rg_search",
+      "packet_kind": "tool_manifest"
+    },
+    {
+      "tool_name": "graph.expand_neighborhood",
+      "llama_name": "graph__expand_neighborhood",
+      "domain": "neo4j_context_graph",
+      "ontology": [
+        "graph",
+        "neo4j",
+        "relationship"
+      ],
+      "description": "Expand graph neighborhood from sourceRefs. Returns nodes/edges/sourceRefs/confidence and compatibility neighbors.",
+      "examples": [
+        "use graph  expand neighborhood to expand graph neighborhood from sourcerefs"
+      ],
+      "requires": [],
+      "returns": null,
+      "service": null,
+      "method": null,
+      "input_type": null,
+      "output_type": null,
+      "transport": "mcp+llama",
+      "file": "src/lib/server/ai/llama-tool-definitions.ts",
+      "source_ref": "src/lib/server/ai/llama-tool-definitions.ts#graph__expand_neighborhood",
+      "packet_kind": "tool_manifest"
+    },
+    {
+      "tool_name": "graph.shortest_path",
+      "llama_name": "graph__shortest_path",
+      "domain": "neo4j_context_graph",
+      "ontology": [
+        "graph",
+        "neo4j",
+        "relationship",
+        "retrieval"
+      ],
+      "description": "Find the shortest dependency path between two files or symbols in Neo4j.",
+      "examples": [
+        "use graph  shortest path to find the shortest dependency path between two files or symbols in neo4j"
+      ],
+      "requires": [
+        "fromKey",
+        "toKey"
+      ],
+      "returns": null,
+      "service": null,
+      "method": null,
+      "input_type": null,
+      "output_type": null,
+      "transport": "mcp+llama",
+      "file": "src/lib/server/ai/llama-tool-definitions.ts",
+      "source_ref": "src/lib/server/ai/llama-tool-definitions.ts#graph__shortest_path",
+      "packet_kind": "tool_manifest"
+    },
+    {
+      "tool_name": "graph.community_for_node",
+      "llama_name": "graph__community_for_node",
+      "domain": "neo4j_context_graph",
+      "ontology": [
+        "graph",
+        "neo4j",
+        "relationship"
+      ],
+      "description": "Get the GPU cluster, SOM cluster, and community membership for a node.",
+      "examples": [
+        "use graph  community for node to get the gpu cluster, som cluster, and community membership for a node"
+      ],
+      "requires": [
+        "stableKey"
+      ],
+      "returns": null,
+      "service": null,
+      "method": null,
+      "input_type": null,
+      "output_type": null,
+      "transport": "mcp+llama",
+      "file": "src/lib/server/ai/llama-tool-definitions.ts",
+      "source_ref": "src/lib/server/ai/llama-tool-definitions.ts#graph__community_for_node",
+      "packet_kind": "tool_manifest"
+    },
+    {
+      "tool_name": "graph.pagerank_top",
+      "llama_name": "graph__pagerank_top",
+      "domain": "neo4j_context_graph",
+      "ontology": [
+        "graph",
+        "neo4j",
+        "relationship",
+        "reranking"
+      ],
+      "description": "Return the top-N highest PageRank nodes (most architecturally central files).",
+      "examples": [
+        "use graph  pagerank top to return the top-n highest pagerank nodes (most architecturally central files)"
+      ],
+      "requires": [],
+      "returns": null,
+      "service": null,
+      "method": null,
+      "input_type": null,
+      "output_type": null,
+      "transport": "mcp+llama",
+      "file": "src/lib/server/ai/llama-tool-definitions.ts",
+      "source_ref": "src/lib/server/ai/llama-tool-definitions.ts#graph__pagerank_top",
+      "packet_kind": "tool_manifest"
+    },
+    {
+      "tool_name": "topology.search_near",
+      "llama_name": "topology__search_near",
+      "domain": "neo4j_context_graph",
+      "ontology": [
+        "graph",
+        "neo4j",
+        "relationship",
+        "retrieval"
+      ],
+      "description": "Search the 4D SOM manifold for files near a natural-language query. Useful for finding semantically similar code across clusters.",
+      "examples": [
+        "use topology  search near to search the 4d som manifold for files near a natural-language query"
+      ],
+      "requires": [
+        "query"
+      ],
+      "returns": null,
+      "service": null,
+      "method": null,
+      "input_type": null,
+      "output_type": null,
+      "transport": "mcp+llama",
+      "file": "src/lib/server/ai/llama-tool-definitions.ts",
+      "source_ref": "src/lib/server/ai/llama-tool-definitions.ts#topology__search_near",
+      "packet_kind": "tool_manifest"
+    },
+    {
+      "tool_name": "topology.same_som_cluster",
+      "llama_name": "topology__same_som_cluster",
+      "domain": "neo4j_context_graph",
+      "ontology": [
+        "graph",
+        "neo4j",
+        "relationship",
+        "retrieval"
+      ],
+      "description": "Find all files sharing the same SOM cluster as the given node. Good for finding related implementations.",
+      "examples": [
+        "use topology  same som cluster to find all files sharing the same som cluster as the given node"
+      ],
+      "requires": [
+        "stableKey"
+      ],
+      "returns": null,
+      "service": null,
+      "method": null,
+      "input_type": null,
+      "output_type": null,
+      "transport": "mcp+llama",
+      "file": "src/lib/server/ai/llama-tool-definitions.ts",
+      "source_ref": "src/lib/server/ai/llama-tool-definitions.ts#topology__same_som_cluster",
+      "packet_kind": "tool_manifest"
+    },
+    {
+      "tool_name": "topology.search_4d",
+      "llama_name": "topology__search_4d",
+      "domain": "neo4j_context_graph",
+      "ontology": [
+        "graph",
+        "neo4j",
+        "relationship"
+      ],
+      "description": "SOM X (BMU column)",
+      "examples": [
+        "use topology  search 4d to som x (bmu column)"
+      ],
+      "requires": [
+        "som_x",
+        "som_y"
+      ],
+      "returns": null,
+      "service": null,
+      "method": null,
+      "input_type": null,
+      "output_type": null,
+      "transport": "mcp+llama",
+      "file": "src/lib/server/ai/llama-tool-definitions.ts",
+      "source_ref": "src/lib/server/ai/llama-tool-definitions.ts#topology__search_4d",
+      "packet_kind": "tool_manifest"
+    },
+    {
+      "tool_name": "search.go_hybrid",
+      "llama_name": "search__go_hybrid",
+      "domain": "rag_retrieval",
+      "ontology": [
+        "retrieval",
+        "rag",
+        "search",
+        "embedding",
+        "reranking"
+      ],
+      "description": "Go search service RRF fusion: parallel FTS + pgvector + Qdrant with reciprocal rank fusion. Faster than in-process hybrid for large-scale recall.",
+      "examples": [
+        "use search  go hybrid to go search service rrf fusion: parallel fts + pgvector + qdrant with reciprocal rank fusion"
+      ],
+      "requires": [
+        "query"
+      ],
+      "returns": null,
+      "service": null,
+      "method": null,
+      "input_type": null,
+      "output_type": null,
+      "transport": "mcp+llama",
+      "file": "src/lib/server/ai/llama-tool-definitions.ts",
+      "source_ref": "src/lib/server/ai/llama-tool-definitions.ts#search__go_hybrid",
+      "packet_kind": "tool_manifest"
+    },
+    {
+      "tool_name": "clusters.get_members",
+      "llama_name": "clusters__get_members",
+      "domain": "mcp_agents",
+      "ontology": [
+        "mcp",
+        "agent",
+        "tooling",
+        "reranking"
+      ],
+      "description": "List files in a GPU or directory cluster, sorted by PageRank.",
+      "examples": [
+        "use clusters  get members to list files in a gpu or directory cluster, sorted by pagerank"
+      ],
+      "requires": [
+        "clusterKey"
+      ],
+      "returns": null,
+      "service": null,
+      "method": null,
+      "input_type": null,
+      "output_type": null,
+      "transport": "mcp+llama",
+      "file": "src/lib/server/ai/llama-tool-definitions.ts",
+      "source_ref": "src/lib/server/ai/llama-tool-definitions.ts#clusters__get_members",
+      "packet_kind": "tool_manifest"
+    },
+    {
+      "tool_name": "clusters.get_summary_lenses",
+      "llama_name": "clusters__get_summary_lenses",
+      "domain": "mcp_agents",
+      "ontology": [
+        "mcp",
+        "agent",
+        "tooling"
+      ],
+      "description": "Get the LLMS.md wiki summary and KAG notes for a cluster. Fastest way to understand what a cluster does.",
+      "examples": [
+        "use clusters  get summary lenses to get the llms"
+      ],
+      "requires": [
+        "clusterKey"
+      ],
+      "returns": null,
+      "service": null,
+      "method": null,
+      "input_type": null,
+      "output_type": null,
+      "transport": "mcp+llama",
+      "file": "src/lib/server/ai/llama-tool-definitions.ts",
+      "source_ref": "src/lib/server/ai/llama-tool-definitions.ts#clusters__get_summary_lenses",
+      "packet_kind": "tool_manifest"
+    },
+    {
+      "tool_name": "trace.kag_search",
+      "llama_name": "trace__kag_search",
+      "domain": "admin_observability",
+      "ontology": [
+        "observability",
+        "telemetry",
+        "trace",
+        "retrieval",
+        "graph",
+        "embedding"
+      ],
+      "description": "Full KAG-DAG retrieval: semantic vector search + knowledge graph expansion + LLMS.md context. Heavier than search__dev_context; use when you need deep context.",
+      "examples": [
+        "use trace  kag search to full kag-dag retrieval: semantic vector search + knowledge graph expansion + llms"
+      ],
+      "requires": [
+        "query"
+      ],
+      "returns": null,
+      "service": null,
+      "method": null,
+      "input_type": null,
+      "output_type": null,
+      "transport": "mcp+llama",
+      "file": "src/lib/server/ai/llama-tool-definitions.ts",
+      "source_ref": "src/lib/server/ai/llama-tool-definitions.ts#trace__kag_search",
+      "packet_kind": "tool_manifest"
+    },
+    {
+      "tool_name": "trace.explain_retrieval",
+      "llama_name": "trace__explain_retrieval",
+      "domain": "admin_observability",
+      "ontology": [
+        "observability",
+        "telemetry",
+        "trace"
+      ],
+      "description": "Inspect the cached retrieval trace for a previous query. Shows which sources contributed and why.",
+      "examples": [
+        "use trace  explain retrieval to inspect the cached retrieval trace for a previous query"
+      ],
+      "requires": [
+        "query"
+      ],
+      "returns": null,
+      "service": null,
+      "method": null,
+      "input_type": null,
+      "output_type": null,
+      "transport": "mcp+llama",
+      "file": "src/lib/server/ai/llama-tool-definitions.ts",
+      "source_ref": "src/lib/server/ai/llama-tool-definitions.ts#trace__explain_retrieval",
+      "packet_kind": "tool_manifest"
+    },
+    {
+      "tool_name": "context.get_compressed_card",
+      "llama_name": "context__get_compressed_card",
+      "domain": "mcp_agents",
+      "ontology": [
+        "mcp",
+        "agent",
+        "tooling"
+      ],
+      "description": "Fetch a compressed HCA card for a file or trace. Returns a 128-token summary: one-line description, key symbols, risks. Faster than reading the full file.",
+      "examples": [
+        "use context  get compressed card to fetch a compressed hca card for a file or trace"
+      ],
+      "requires": [
+        "stableKey"
+      ],
+      "returns": null,
+      "service": null,
+      "method": null,
+      "input_type": null,
+      "output_type": null,
+      "transport": "mcp+llama",
+      "file": "src/lib/server/ai/llama-tool-definitions.ts",
+      "source_ref": "src/lib/server/ai/llama-tool-definitions.ts#context__get_compressed_card",
+      "packet_kind": "tool_manifest"
+    },
+    {
+      "tool_name": "context.build_kv_packet",
+      "llama_name": "context__build_kv_packet",
+      "domain": "mcp_agents",
+      "ontology": [
+        "mcp",
+        "agent",
+        "tooling"
+      ],
+      "description": "Build a compressed KV context packet for a set of hot files. Returns an attention TOC + file card summaries. Use when you have identified 1–8 relevant files.",
+      "examples": [
+        "use context  build kv packet to build a compressed kv context packet for a set of hot files"
+      ],
+      "requires": [
+        "taskId",
+        "query"
+      ],
+      "returns": null,
+      "service": null,
+      "method": null,
+      "input_type": null,
+      "output_type": null,
+      "transport": "mcp+llama",
+      "file": "src/lib/server/ai/llama-tool-definitions.ts",
+      "source_ref": "src/lib/server/ai/llama-tool-definitions.ts#context__build_kv_packet",
+      "packet_kind": "tool_manifest"
+    },
+    {
+      "tool_name": "kb.search_cards",
+      "llama_name": "kb__search_cards",
+      "domain": "rag_retrieval",
+      "ontology": [
+        "retrieval",
+        "rag",
+        "search",
+        "reranking"
+      ],
+      "description": "Search the knowledge base for codebase \"cards\" (identity-spine chunks). Returns ranked cards with stable IDs (card:path:hash), content snippets, and topological metadata.",
+      "examples": [
+        "use kb  search cards to search the knowledge base for codebase \"cards\" (identity-spine chunks)"
+      ],
+      "requires": [
+        "query"
+      ],
+      "returns": null,
+      "service": null,
+      "method": null,
+      "input_type": null,
+      "output_type": null,
+      "transport": "mcp+llama",
+      "file": "src/lib/server/ai/llama-tool-definitions.ts",
+      "source_ref": "src/lib/server/ai/llama-tool-definitions.ts#kb__search_cards",
+      "packet_kind": "tool_manifest"
+    },
+    {
+      "tool_name": "kb.get_card",
+      "llama_name": "kb__get_card",
+      "domain": "rag_retrieval",
+      "ontology": [
+        "retrieval",
+        "rag",
+        "search"
+      ],
+      "description": "Retrieve the full content and high-fidelity metadata for a specific knowledge card by ID. Use this when you have a card ID from search_cards.",
+      "examples": [
+        "use kb  get card to retrieve the full content and high-fidelity metadata for a specific knowledge card by id"
+      ],
+      "requires": [
+        "id"
+      ],
+      "returns": null,
+      "service": null,
+      "method": null,
+      "input_type": null,
+      "output_type": null,
+      "transport": "mcp+llama",
+      "file": "src/lib/server/ai/llama-tool-definitions.ts",
+      "source_ref": "src/lib/server/ai/llama-tool-definitions.ts#kb__get_card",
+      "packet_kind": "tool_manifest"
+    },
+    {
+      "tool_name": "kb.expand_neighbors",
+      "llama_name": "kb__expand_neighbors",
+      "domain": "rag_retrieval",
+      "ontology": [
+        "retrieval",
+        "rag",
+        "search",
+        "graph"
+      ],
+      "description": "Expand the topological neighborhood of a card or file using graph relationships. Returns structurally-related cards based on imports, dependencies, and cluster proximity.",
+      "examples": [
+        "use kb  expand neighbors to expand the topological neighborhood of a card or file using graph relationships"
+      ],
+      "requires": [
+        "id"
+      ],
+      "returns": null,
+      "service": null,
+      "method": null,
+      "input_type": null,
+      "output_type": null,
+      "transport": "mcp+llama",
+      "file": "src/lib/server/ai/llama-tool-definitions.ts",
+      "source_ref": "src/lib/server/ai/llama-tool-definitions.ts#kb__expand_neighbors",
+      "packet_kind": "tool_manifest"
+    },
+    {
+      "tool_name": "kb.explain_retrieval",
+      "llama_name": "kb__explain_retrieval",
+      "domain": "rag_retrieval",
+      "ontology": [
+        "retrieval",
+        "rag",
+        "search"
+      ],
+      "description": "Provide an audit trace for why a specific card or search result was retrieved. Includes cluster dominance, community purpose, and grounding signals.",
+      "examples": [
+        "use kb  explain retrieval to provide an audit trace for why a specific card or search result was retrieved"
+      ],
+      "requires": [
+        "id"
+      ],
+      "returns": null,
+      "service": null,
+      "method": null,
+      "input_type": null,
+      "output_type": null,
+      "transport": "mcp+llama",
+      "file": "src/lib/server/ai/llama-tool-definitions.ts",
+      "source_ref": "src/lib/server/ai/llama-tool-definitions.ts#kb__explain_retrieval",
+      "packet_kind": "tool_manifest"
+    },
+    {
+      "tool_name": "cases:load",
+      "llama_name": null,
+      "domain": "case_management",
+      "ontology": [
+        "legal",
+        "cases",
+        "workflow"
+      ],
+      "description": "Load legal cases with optional filtering",
+      "examples": [
+        "use cases load to load legal cases with optional filtering"
+      ],
+      "requires": [],
+      "returns": null,
+      "service": null,
+      "method": null,
+      "input_type": null,
+      "output_type": null,
+      "transport": "mcp",
+      "file": "src/mcp/server.ts",
+      "source_ref": "src/mcp/server.ts#cases:load",
+      "packet_kind": "tool_manifest"
+    },
+    {
+      "tool_name": "rag:search",
+      "llama_name": null,
+      "domain": "rag_retrieval",
+      "ontology": [
+        "retrieval",
+        "rag",
+        "search",
+        "legal"
+      ],
+      "description": "Perform a semantic search across legal documents and web",
+      "examples": [
+        "use rag search to perform a semantic search across legal documents and web"
+      ],
+      "requires": [],
+      "returns": null,
+      "service": null,
+      "method": null,
+      "input_type": null,
+      "output_type": null,
+      "transport": "mcp",
+      "file": "src/mcp/server.ts",
+      "source_ref": "src/mcp/server.ts#rag:search",
+      "packet_kind": "tool_manifest"
+    },
+    {
+      "tool_name": "rag:index_page",
+      "llama_name": null,
+      "domain": "mcp_agents",
+      "ontology": [
+        "mcp",
+        "agent",
+        "tooling"
+      ],
+      "description": "Index a web page for RAG knowledge",
+      "examples": [
+        "use rag index page to index a web page for rag knowledge"
+      ],
+      "requires": [],
+      "returns": null,
+      "service": null,
+      "method": null,
+      "input_type": null,
+      "output_type": null,
+      "transport": "mcp",
+      "file": "src/mcp/server.ts",
+      "source_ref": "src/mcp/server.ts#rag:index_page",
+      "packet_kind": "tool_manifest"
+    },
+    {
+      "tool_name": "memory:prior_answer_lookup",
+      "llama_name": null,
+      "domain": "mcp_agents",
+      "ontology": [
+        "mcp",
+        "agent",
+        "tooling"
+      ],
+      "description": "Look up a prior LLM answer from the 3-tier cache (Redis L1 → Postgres L2 → Qdrant L3 semantic). Returns compressed CodeLlmOutputMeta envelope (summary, citations, confidence, grounding) suitable for ACE prompt preambles. Use BEFORE generating a new RAG answer to reuse compressed reasoning.",
+      "examples": [
+        "use memory prior answer lookup to look up a prior llm answer from the 3-tier cache (redis l1 → postgres l2 → qdrant l3 semantic)"
+      ],
+      "requires": [],
+      "returns": null,
+      "service": null,
+      "method": null,
+      "input_type": null,
+      "output_type": null,
+      "transport": "mcp",
+      "file": "src/mcp/server.ts",
+      "source_ref": "src/mcp/server.ts#memory:prior_answer_lookup",
+      "packet_kind": "tool_manifest"
+    },
+    {
+      "tool_name": "playwright:browser_action",
+      "llama_name": null,
+      "domain": "mcp_agents",
+      "ontology": [
+        "mcp",
+        "agent",
+        "tooling"
+      ],
+      "description": "Execute a browser action using Playwright",
+      "examples": [
+        "use playwright browser action to execute a browser action using playwright"
+      ],
+      "requires": [],
+      "returns": null,
+      "service": null,
+      "method": null,
+      "input_type": null,
+      "output_type": null,
+      "transport": "mcp",
+      "file": "src/mcp/server.ts",
+      "source_ref": "src/mcp/server.ts#playwright:browser_action",
+      "packet_kind": "tool_manifest"
+    },
+    {
+      "tool_name": "transcribe_audio",
+      "llama_name": null,
+      "domain": "mcp_agents",
+      "ontology": [
+        "mcp",
+        "agent",
+        "tooling",
+        "legal"
+      ],
+      "description": "Transcribe audio evidence files (WAV, MP3, M4A) using Docling ASR. Returns transcript text with word count and duration.",
+      "examples": [
+        "use transcribe audio to transcribe audio evidence files (wav, mp3, m4a) using docling asr"
+      ],
+      "requires": [],
+      "returns": null,
+      "service": null,
+      "method": null,
+      "input_type": null,
+      "output_type": null,
+      "transport": "mcp",
+      "file": "src/mcp/server.ts",
+      "source_ref": "src/mcp/server.ts#transcribe_audio",
+      "packet_kind": "tool_manifest"
+    },
+    {
+      "tool_name": "evidence:analyze",
+      "llama_name": null,
+      "domain": "evidence_upload_storage",
+      "ontology": [
+        "evidence",
+        "storage",
+        "seaweedfs",
+        "embedding",
+        "legal"
+      ],
+      "description": "Analyze evidence text: extract entities, detect forensic patterns, auto-tag with 3-store mirroring (pgvector + Qdrant + CouchDB)",
+      "examples": [
+        "use evidence analyze to analyze evidence text: extract entities, detect forensic patterns, auto-tag with 3-store mirroring (pgvector + qdrant + couchdb)"
+      ],
+      "requires": [],
+      "returns": null,
+      "service": null,
+      "method": null,
+      "input_type": null,
+      "output_type": null,
+      "transport": "mcp",
+      "file": "src/mcp/server.ts",
+      "source_ref": "src/mcp/server.ts#evidence:analyze",
+      "packet_kind": "tool_manifest"
+    },
+    {
+      "tool_name": "evidence:analyze_multimodal",
+      "llama_name": null,
+      "domain": "evidence_upload_storage",
+      "ontology": [
+        "evidence",
+        "storage",
+        "seaweedfs",
+        "retrieval",
+        "embedding",
+        "legal"
+      ],
+      "description": "GPU-accelerated multimodal evidence analysis (images/videos/audio): YOLO object detection, Whisper transcription, CLIP embeddings. Returns detected objects, transcript, and 512-dim embeddings for semantic search.",
+      "examples": [
+        "use evidence analyze multimodal to gpu-accelerated multimodal evidence analysis (images/videos/audio): yolo object detection, whisper transcription, clip embeddings"
+      ],
+      "requires": [],
+      "returns": null,
+      "service": null,
+      "method": null,
+      "input_type": null,
+      "output_type": null,
+      "transport": "mcp",
+      "file": "src/mcp/server.ts",
+      "source_ref": "src/mcp/server.ts#evidence:analyze_multimodal",
+      "packet_kind": "tool_manifest"
+    },
+    {
+      "tool_name": "evidence:detect_objects",
+      "llama_name": null,
+      "domain": "evidence_upload_storage",
+      "ontology": [
+        "evidence",
+        "storage",
+        "seaweedfs",
+        "legal"
+      ],
+      "description": "Detect objects in image evidence using the installed YOLO ONNX model. The live repo currently uses a restored yolov8n COCO fallback; document-layout mode still requires models/yolo-doc.onnx.",
+      "examples": [
+        "use evidence detect objects to detect objects in image evidence using the installed yolo onnx model"
+      ],
+      "requires": [],
+      "returns": null,
+      "service": null,
+      "method": null,
+      "input_type": null,
+      "output_type": null,
+      "transport": "mcp",
+      "file": "src/mcp/server.ts",
+      "source_ref": "src/mcp/server.ts#evidence:detect_objects",
+      "packet_kind": "tool_manifest"
+    },
+    {
+      "tool_name": "evidence:transcribe_gpu",
+      "llama_name": null,
+      "domain": "evidence_upload_storage",
+      "ontology": [
+        "evidence",
+        "storage",
+        "seaweedfs"
+      ],
+      "description": "GPU-accelerated audio/video transcription using Whisper. Faster than browser WASM for long recordings (>10s). Returns full transcript with word-level timestamps and language detection.",
+      "examples": [
+        "use evidence transcribe gpu to gpu-accelerated audio/video transcription using whisper"
+      ],
+      "requires": [],
+      "returns": null,
+      "service": null,
+      "method": null,
+      "input_type": null,
+      "output_type": null,
+      "transport": "mcp",
+      "file": "src/mcp/server.ts",
+      "source_ref": "src/mcp/server.ts#evidence:transcribe_gpu",
+      "packet_kind": "tool_manifest"
+    },
+    {
+      "tool_name": "evidence:search_similar",
+      "llama_name": null,
+      "domain": "evidence_upload_storage",
+      "ontology": [
+        "evidence",
+        "storage",
+        "seaweedfs",
+        "retrieval",
+        "embedding",
+        "legal"
+      ],
+      "description": "Cross-modal semantic search: find visually or acoustically similar evidence using CLIP/Whisper embeddings. Query with text, find matching images/audio.",
+      "examples": [
+        "use evidence search similar to cross-modal semantic search: find visually or acoustically similar evidence using clip/whisper embeddings"
+      ],
+      "requires": [],
+      "returns": null,
+      "service": null,
+      "method": null,
+      "input_type": null,
+      "output_type": null,
+      "transport": "mcp",
+      "file": "src/mcp/server.ts",
+      "source_ref": "src/mcp/server.ts#evidence:search_similar",
+      "packet_kind": "tool_manifest"
+    },
+    {
+      "tool_name": "cases:create",
+      "llama_name": null,
+      "domain": "case_management",
+      "ontology": [
+        "legal",
+        "cases",
+        "workflow"
+      ],
+      "description": "Create a new legal case. Returns the created case with ID.",
+      "examples": [
+        "use cases create to create a new legal case"
+      ],
+      "requires": [],
+      "returns": null,
+      "service": null,
+      "method": null,
+      "input_type": null,
+      "output_type": null,
+      "transport": "mcp",
+      "file": "src/mcp/server.ts",
+      "source_ref": "src/mcp/server.ts#cases:create",
+      "packet_kind": "tool_manifest"
+    },
+    {
+      "tool_name": "cases:update",
+      "llama_name": null,
+      "domain": "case_management",
+      "ontology": [
+        "legal",
+        "cases",
+        "workflow"
+      ],
+      "description": "Update an existing case",
+      "examples": [
+        "use cases update to update an existing case"
+      ],
+      "requires": [],
+      "returns": null,
+      "service": null,
+      "method": null,
+      "input_type": null,
+      "output_type": null,
+      "transport": "mcp",
+      "file": "src/mcp/server.ts",
+      "source_ref": "src/mcp/server.ts#cases:update",
+      "packet_kind": "tool_manifest"
+    },
+    {
+      "tool_name": "cases:delete",
+      "llama_name": null,
+      "domain": "case_management",
+      "ontology": [
+        "legal",
+        "cases",
+        "workflow"
+      ],
+      "description": "Delete a case and all associated data. Use with caution.",
+      "examples": [
+        "use cases delete to delete a case and all associated data"
+      ],
+      "requires": [],
+      "returns": null,
+      "service": null,
+      "method": null,
+      "input_type": null,
+      "output_type": null,
+      "transport": "mcp",
+      "file": "src/mcp/server.ts",
+      "source_ref": "src/mcp/server.ts#cases:delete",
+      "packet_kind": "tool_manifest"
+    },
+    {
+      "tool_name": "citations:search",
+      "llama_name": null,
+      "domain": "citation_engine",
+      "ontology": [
+        "citations",
+        "research",
+        "sources",
+        "retrieval",
+        "legal"
+      ],
+      "description": "Search legal citations across cases. Returns matching citations with source, page, and relevance.",
+      "examples": [
+        "use citations search to search legal citations across cases"
+      ],
+      "requires": [],
+      "returns": null,
+      "service": null,
+      "method": null,
+      "input_type": null,
+      "output_type": null,
+      "transport": "mcp",
+      "file": "src/mcp/server.ts",
+      "source_ref": "src/mcp/server.ts#citations:search",
+      "packet_kind": "tool_manifest"
+    },
+    {
+      "tool_name": "citations:list_by_case",
+      "llama_name": null,
+      "domain": "case_management",
+      "ontology": [
+        "legal",
+        "cases",
+        "workflow"
+      ],
+      "description": "List all citations linked to a specific case.",
+      "examples": [
+        "use citations list by case to list all citations linked to a specific case"
+      ],
+      "requires": [],
+      "returns": null,
+      "service": null,
+      "method": null,
+      "input_type": null,
+      "output_type": null,
+      "transport": "mcp",
+      "file": "src/mcp/server.ts",
+      "source_ref": "src/mcp/server.ts#citations:list_by_case",
+      "packet_kind": "tool_manifest"
+    },
+    {
+      "tool_name": "citations:add_to_case",
+      "llama_name": null,
+      "domain": "case_management",
+      "ontology": [
+        "legal",
+        "cases",
+        "workflow"
+      ],
+      "description": "Add a legal citation to a case. Stores citation text, source, and page reference.",
+      "examples": [
+        "use citations add to case to add a legal citation to a case"
+      ],
+      "requires": [],
+      "returns": null,
+      "service": null,
+      "method": null,
+      "input_type": null,
+      "output_type": null,
+      "transport": "mcp",
+      "file": "src/mcp/server.ts",
+      "source_ref": "src/mcp/server.ts#citations:add_to_case",
+      "packet_kind": "tool_manifest"
+    },
+    {
+      "tool_name": "reports:list",
+      "llama_name": null,
+      "domain": "legal_reports",
+      "ontology": [
+        "reporting",
+        "pdf",
+        "summary",
+        "legal"
+      ],
+      "description": "List reports with optional case filtering. Returns report metadata including title, status, creation date.",
+      "examples": [
+        "use reports list to list reports with optional case filtering"
+      ],
+      "requires": [],
+      "returns": null,
+      "service": null,
+      "method": null,
+      "input_type": null,
+      "output_type": null,
+      "transport": "mcp",
+      "file": "src/mcp/server.ts",
+      "source_ref": "src/mcp/server.ts#reports:list",
+      "packet_kind": "tool_manifest"
+    },
+    {
+      "tool_name": "reports:create",
+      "llama_name": null,
+      "domain": "legal_reports",
+      "ontology": [
+        "reporting",
+        "pdf",
+        "summary",
+        "legal"
+      ],
+      "description": "Create a new blank report for a case. Returns report ID and metadata.",
+      "examples": [
+        "use reports create to create a new blank report for a case"
+      ],
+      "requires": [],
+      "returns": null,
+      "service": null,
+      "method": null,
+      "input_type": null,
+      "output_type": null,
+      "transport": "mcp",
+      "file": "src/mcp/server.ts",
+      "source_ref": "src/mcp/server.ts#reports:create",
+      "packet_kind": "tool_manifest"
+    },
+    {
+      "tool_name": "reports:generate_from_template",
+      "llama_name": null,
+      "domain": "legal_reports",
+      "ontology": [
+        "reporting",
+        "pdf",
+        "summary",
+        "retrieval",
+        "legal"
+      ],
+      "description": "Generate a report from a legal template (charging memo, search warrant affidavit, case summary, evidence inventory, witness interview, plea agreement, motion to suppress, trial brief, sentencing memo, discovery index). Optionally use AI to fill in case-specific analysis.",
+      "examples": [
+        "use reports generate from template to generate a report from a legal template (charging memo, search warrant affidavit, case summary, evidence inventory, witness interview, plea agreement, motion to suppress, trial brief, sentencing memo, discovery index)"
+      ],
+      "requires": [],
+      "returns": null,
+      "service": null,
+      "method": null,
+      "input_type": null,
+      "output_type": null,
+      "transport": "mcp",
+      "file": "src/mcp/server.ts",
+      "source_ref": "src/mcp/server.ts#reports:generate_from_template",
+      "packet_kind": "tool_manifest"
+    },
+    {
+      "tool_name": "reports:update",
+      "llama_name": null,
+      "domain": "legal_reports",
+      "ontology": [
+        "reporting",
+        "pdf",
+        "summary"
+      ],
+      "description": "Update an existing report",
+      "examples": [
+        "use reports update to update an existing report"
+      ],
+      "requires": [],
+      "returns": null,
+      "service": null,
+      "method": null,
+      "input_type": null,
+      "output_type": null,
+      "transport": "mcp",
+      "file": "src/mcp/server.ts",
+      "source_ref": "src/mcp/server.ts#reports:update",
+      "packet_kind": "tool_manifest"
+    },
+    {
+      "tool_name": "reports:delete",
+      "llama_name": null,
+      "domain": "legal_reports",
+      "ontology": [
+        "reporting",
+        "pdf",
+        "summary",
+        "legal"
+      ],
+      "description": "Delete a report. Audit log entry will be created for legal compliance.",
+      "examples": [
+        "use reports delete to delete a report"
+      ],
+      "requires": [],
+      "returns": null,
+      "service": null,
+      "method": null,
+      "input_type": null,
+      "output_type": null,
+      "transport": "mcp",
+      "file": "src/mcp/server.ts",
+      "source_ref": "src/mcp/server.ts#reports:delete",
+      "packet_kind": "tool_manifest"
+    },
+    {
+      "tool_name": "reports:export",
+      "llama_name": null,
+      "domain": "legal_reports",
+      "ontology": [
+        "reporting",
+        "pdf",
+        "summary"
+      ],
+      "description": "Export a report to PDF, DOCX, or HTML format. Returns download URL.",
+      "examples": [
+        "use reports export to export a report to pdf, docx, or html format"
+      ],
+      "requires": [],
+      "returns": null,
+      "service": null,
+      "method": null,
+      "input_type": null,
+      "output_type": null,
+      "transport": "mcp",
+      "file": "src/mcp/server.ts",
+      "source_ref": "src/mcp/server.ts#reports:export",
+      "packet_kind": "tool_manifest"
+    },
+    {
+      "tool_name": "embedding:generate",
+      "llama_name": null,
+      "domain": "mcp_agents",
+      "ontology": [
+        "mcp",
+        "agent",
+        "tooling",
+        "embedding"
+      ],
+      "description": "Generate 768-dim embeddings via gRPC direct (bypasses HTTP, ~50ms vs ~180ms). Falls back to Ollama HTTP if gRPC unavailable.",
+      "examples": [
+        "use embedding generate to generate 768-dim embeddings via grpc direct (bypasses http, ~50ms vs ~180ms)"
+      ],
+      "requires": [],
+      "returns": null,
+      "service": null,
+      "method": null,
+      "input_type": null,
+      "output_type": null,
+      "transport": "mcp",
+      "file": "src/mcp/server.ts",
+      "source_ref": "src/mcp/server.ts#embedding:generate",
+      "packet_kind": "tool_manifest"
+    },
+    {
+      "tool_name": "gpu:similarity",
+      "llama_name": null,
+      "domain": "gpu_turbovec_libtorch",
+      "ontology": [
+        "gpu",
+        "turbovec",
+        "libtorch",
+        "embedding"
+      ],
+      "description": "Compute pairwise cosine similarity matrix on GPU via LibTorch CUDA (bypasses HTTP, ~5-20ms). Falls back to CPU if GPU unavailable.",
+      "examples": [
+        "use gpu similarity to compute pairwise cosine similarity matrix on gpu via libtorch cuda (bypasses http, ~5-20ms)"
+      ],
+      "requires": [],
+      "returns": null,
+      "service": null,
+      "method": null,
+      "input_type": null,
+      "output_type": null,
+      "transport": "mcp",
+      "file": "src/mcp/server.ts",
+      "source_ref": "src/mcp/server.ts#gpu:similarity",
+      "packet_kind": "tool_manifest"
+    },
+    {
+      "tool_name": "inference:route",
+      "llama_name": null,
+      "domain": "mcp_agents",
+      "ontology": [
+        "mcp",
+        "agent",
+        "tooling"
+      ],
+      "description": "Route an inference request through the optimal backend: TRT→Triton→Bifrost→Ollama cascade. Direct import bypasses HTTP layer.",
+      "examples": [
+        "use inference route to route an inference request through the optimal backend: trt→triton→bifrost→ollama cascade"
+      ],
+      "requires": [],
+      "returns": null,
+      "service": null,
+      "method": null,
+      "input_type": null,
+      "output_type": null,
+      "transport": "mcp",
+      "file": "src/mcp/server.ts",
+      "source_ref": "src/mcp/server.ts#inference:route",
+      "packet_kind": "tool_manifest"
+    },
+    {
+      "tool_name": "startup:briefing",
+      "llama_name": null,
+      "domain": "mcp_agents",
+      "ontology": [
+        "mcp",
+        "agent",
+        "tooling"
+      ],
+      "description": "Read-only access to the startup briefing state artifact. Returns system status (Postgres, Redis, Qdrant, Neo4j), coverage metrics (Qdrant %, SOM %, Parent Atlas %), task progress, warnings, and top recommendations. Refreshed by npm run agent:hello or manually via scripts/agentic/startup-briefing.mjs.",
+      "examples": [
+        "use startup briefing to read-only access to the startup briefing state artifact"
+      ],
+      "requires": [],
+      "returns": null,
+      "service": null,
+      "method": null,
+      "input_type": null,
+      "output_type": null,
+      "transport": "mcp",
+      "file": "src/mcp/server.ts",
+      "source_ref": "src/mcp/server.ts#startup:briefing",
+      "packet_kind": "tool_manifest"
+    },
+    {
+      "tool_name": "atlas.packet_search",
+      "llama_name": null,
+      "domain": "rag_retrieval",
+      "ontology": [
+        "retrieval",
+        "rag",
+        "search"
+      ],
+      "description": "Query the canonical atlas_packets table by source_ref path (variants tried automatically),",
+      "examples": [
+        "use atlas.packet search to query the canonical atlas_packets table by source_ref path (variants tried automatically),"
+      ],
+      "requires": [],
+      "returns": null,
+      "service": null,
+      "method": null,
+      "input_type": null,
+      "output_type": null,
+      "transport": "mcp",
+      "file": "src/mcp/server.ts",
+      "source_ref": "src/mcp/server.ts#atlas.packet_search",
+      "packet_kind": "tool_manifest"
+    },
+    {
+      "tool_name": "atlas.coverage",
+      "llama_name": null,
+      "domain": "mcp_agents",
+      "ontology": [
+        "mcp",
+        "agent",
+        "tooling"
+      ],
+      "description": "Phase 3I verification gate: reports coverage metrics for atlas_packets.",
+      "examples": [
+        "use atlas.coverage to phase 3i verification gate: reports coverage metrics for atlas_packets"
+      ],
+      "requires": [],
+      "returns": null,
+      "service": null,
+      "method": null,
+      "input_type": null,
+      "output_type": null,
+      "transport": "mcp",
+      "file": "src/mcp/server.ts",
+      "source_ref": "src/mcp/server.ts#atlas.coverage",
+      "packet_kind": "tool_manifest"
+    },
+    {
+      "tool_name": "codebase:search",
+      "llama_name": null,
+      "domain": "rag_retrieval",
+      "ontology": [
+        "retrieval",
+        "rag",
+        "search",
+        "embedding",
+        "reranking"
+      ],
+      "description": "Semantic code search using dual-vector (content + signature) embeddings in Qdrant. Uses 768-dim embeddinggemma vectors with configurable content/signature weighting. Returns ranked code chunks with file paths, line numbers, and relevance scores.",
+      "examples": [
+        "use codebase search to semantic code search using dual-vector (content + signature) embeddings in qdrant"
+      ],
+      "requires": [],
+      "returns": null,
+      "service": null,
+      "method": null,
+      "input_type": null,
+      "output_type": null,
+      "transport": "mcp",
+      "file": "src/mcp/server.ts",
+      "source_ref": "src/mcp/server.ts#codebase:search",
+      "packet_kind": "tool_manifest"
+    },
+    {
+      "tool_name": "codebase:ace_context",
+      "llama_name": null,
+      "domain": "mcp_agents",
+      "ontology": [
+        "mcp",
+        "agent",
+        "tooling",
+        "retrieval",
+        "graph",
+        "legal"
+      ],
+      "description": "Run full ACE (Agentic Contextual Engineering) synthesis with optional codebase/AST context. Assembles user profile, case context, RAG chunks, KAG graph, glossary, evidence, and codebase semantic search into a single LLM prompt, then generates and self-evaluates the response.",
+      "examples": [
+        "use codebase ace context to run full ace (agentic contextual engineering) synthesis with optional codebase/ast context"
+      ],
+      "requires": [],
+      "returns": null,
+      "service": null,
+      "method": null,
+      "input_type": null,
+      "output_type": null,
+      "transport": "mcp",
+      "file": "src/mcp/server.ts",
+      "source_ref": "src/mcp/server.ts#codebase:ace_context",
+      "packet_kind": "tool_manifest"
+    },
+    {
+      "tool_name": "codebase:explain_cluster",
+      "llama_name": null,
+      "domain": "mcp_agents",
+      "ontology": [
+        "mcp",
+        "agent",
+        "tooling"
+      ],
+      "description": "Return a VLM-synthesised narrative for a GPU k-means cluster in the codebase index.",
+      "examples": [
+        "use codebase explain cluster to return a vlm-synthesised narrative for a gpu k-means cluster in the codebase index"
+      ],
+      "requires": [],
+      "returns": null,
+      "service": null,
+      "method": null,
+      "input_type": null,
+      "output_type": null,
+      "transport": "mcp",
+      "file": "src/mcp/server.ts",
+      "source_ref": "src/mcp/server.ts#codebase:explain_cluster",
+      "packet_kind": "tool_manifest"
+    },
+    {
+      "tool_name": "codebase:get_buffer",
+      "llama_name": null,
+      "domain": "mcp_agents",
+      "ontology": [
+        "mcp",
+        "agent",
+        "tooling"
+      ],
+      "description": "Retrieve a pre-assembled context buffer containing high-token codebase insights (e.g. architecture overview).",
+      "examples": [
+        "use codebase get buffer to retrieve a pre-assembled context buffer containing high-token codebase insights (e"
+      ],
+      "requires": [],
+      "returns": null,
+      "service": null,
+      "method": null,
+      "input_type": null,
+      "output_type": null,
+      "transport": "mcp",
+      "file": "src/mcp/server.ts",
+      "source_ref": "src/mcp/server.ts#codebase:get_buffer",
+      "packet_kind": "tool_manifest"
+    },
+    {
+      "tool_name": "langextract:legal",
+      "llama_name": null,
+      "domain": "mcp_agents",
+      "ontology": [
+        "mcp",
+        "agent",
+        "tooling",
+        "legal"
+      ],
+      "description": "Extract structured legal entities from text using Google LangExtract + gemma4-rotorquant:latest. Returns parties (plaintiff/defendant), dates, citations, money amounts, statutes, obligations with exact text locations for source grounding.",
+      "examples": [
+        "use langextract legal to extract structured legal entities from text using google langextract + gemma4-rotorquant:latest"
+      ],
+      "requires": [],
+      "returns": null,
+      "service": null,
+      "method": null,
+      "input_type": null,
+      "output_type": null,
+      "transport": "mcp",
+      "file": "src/mcp/server.ts",
+      "source_ref": "src/mcp/server.ts#langextract:legal",
+      "packet_kind": "tool_manifest"
+    },
+    {
+      "tool_name": "langextract:evidence",
+      "llama_name": null,
+      "domain": "evidence_upload_storage",
+      "ontology": [
+        "evidence",
+        "storage",
+        "seaweedfs"
+      ],
+      "description": "Extract forensic/evidentiary entities from text: persons (witnesses, suspects), locations, phone numbers, emails, document references, quotes with attribution. Returns structured data with exact text positions.",
+      "examples": [
+        "use langextract evidence to extract forensic/evidentiary entities from text: persons (witnesses, suspects), locations, phone numbers, emails, document references, quotes with attribution"
+      ],
+      "requires": [],
+      "returns": null,
+      "service": null,
+      "method": null,
+      "input_type": null,
+      "output_type": null,
+      "transport": "mcp",
+      "file": "src/mcp/server.ts",
+      "source_ref": "src/mcp/server.ts#langextract:evidence",
+      "packet_kind": "tool_manifest"
+    },
+    {
+      "tool_name": "langextract:file",
+      "llama_name": null,
+      "domain": "mcp_agents",
+      "ontology": [
+        "mcp",
+        "agent",
+        "tooling"
+      ],
+      "description": "Extract structured information from a file path or URL. Supports PDF, TXT, and web pages. Uses LangExtract multi-pass processing for long documents.",
+      "examples": [
+        "use langextract file to extract structured information from a file path or url"
+      ],
+      "requires": [],
+      "returns": null,
+      "service": null,
+      "method": null,
+      "input_type": null,
+      "output_type": null,
+      "transport": "mcp",
+      "file": "src/mcp/server.ts",
+      "source_ref": "src/mcp/server.ts#langextract:file",
+      "packet_kind": "tool_manifest"
+    },
+    {
+      "tool_name": "langextract:custom",
+      "llama_name": null,
+      "domain": "mcp_agents",
+      "ontology": [
+        "mcp",
+        "agent",
+        "tooling",
+        "retrieval"
+      ],
+      "description": "Custom structured extraction with user-defined prompt and few-shot examples. Flexible for any domain (medical, financial, research papers).",
+      "examples": [
+        "use langextract custom to custom structured extraction with user-defined prompt and few-shot examples"
+      ],
+      "requires": [],
+      "returns": null,
+      "service": null,
+      "method": null,
+      "input_type": null,
+      "output_type": null,
+      "transport": "mcp",
+      "file": "src/mcp/server.ts",
+      "source_ref": "src/mcp/server.ts#langextract:custom",
+      "packet_kind": "tool_manifest"
+    },
+    {
+      "tool_name": "compose:pipeline",
+      "llama_name": null,
+      "domain": "mcp_agents",
+      "ontology": [
+        "mcp",
+        "agent",
+        "tooling",
+        "retrieval",
+        "legal"
+      ],
+      "description": "Chain multiple tools sequentially. Each step can reference previous results via {{stepN.field}} template syntax. Example: search codebase → analyze evidence → extract entities in one call.",
+      "examples": [
+        "use compose pipeline to chain multiple tools sequentially"
+      ],
+      "requires": [],
+      "returns": null,
+      "service": null,
+      "method": null,
+      "input_type": null,
+      "output_type": null,
+      "transport": "mcp",
+      "file": "src/mcp/server.ts",
+      "source_ref": "src/mcp/server.ts#compose:pipeline",
+      "packet_kind": "tool_manifest"
+    },
+    {
+      "tool_name": "codebase:file_intel",
+      "llama_name": null,
+      "domain": "mcp_agents",
+      "ontology": [
+        "mcp",
+        "agent",
+        "tooling",
+        "graph"
+      ],
+      "description": "Unified file intelligence: Neo4j AST metadata, IMPORTS graph edges (in+out), GPU cluster assignment, and missing-import recommendations from CouchDB. Use when you need deep context about a specific source file.",
+      "examples": [
+        "use codebase file intel to unified file intelligence: neo4j ast metadata, imports graph edges (in+out), gpu cluster assignment, and missing-import recommendations from couchdb"
+      ],
+      "requires": [],
+      "returns": null,
+      "service": null,
+      "method": null,
+      "input_type": null,
+      "output_type": null,
+      "transport": "mcp",
+      "file": "src/mcp/server.ts",
+      "source_ref": "src/mcp/server.ts#codebase:file_intel",
+      "packet_kind": "tool_manifest"
+    },
+    {
+      "tool_name": "codebase:graph_neighbors",
+      "llama_name": null,
+      "domain": "neo4j_context_graph",
+      "ontology": [
+        "graph",
+        "neo4j",
+        "relationship"
+      ],
+      "description": "Return immediate graph neighbors for a file: files it imports and files that import it. Useful for impact analysis and understanding module coupling.",
+      "examples": [
+        "use codebase graph neighbors to return immediate graph neighbors for a file: files it imports and files that import it"
+      ],
+      "requires": [],
+      "returns": null,
+      "service": null,
+      "method": null,
+      "input_type": null,
+      "output_type": null,
+      "transport": "mcp",
+      "file": "src/mcp/server.ts",
+      "source_ref": "src/mcp/server.ts#codebase:graph_neighbors",
+      "packet_kind": "tool_manifest"
+    },
+    {
+      "tool_name": "codebase:graph_traverse",
+      "llama_name": null,
+      "domain": "neo4j_context_graph",
+      "ontology": [
+        "graph",
+        "neo4j",
+        "relationship",
+        "reranking"
+      ],
+      "description": "Multi-hop graph traversal from a start file. Returns subgraph nodes and edges with LibTorch PageRank scores. Use mode=ego for immediate neighbors, mode=bfs for N-hop subgraph, mode=cluster for same GPU cluster. Results are limited to 50 nodes by default.",
+      "examples": [
+        "use codebase graph traverse to multi-hop graph traversal from a start file"
+      ],
+      "requires": [],
+      "returns": null,
+      "service": null,
+      "method": null,
+      "input_type": null,
+      "output_type": null,
+      "transport": "mcp",
+      "file": "src/mcp/server.ts",
+      "source_ref": "src/mcp/server.ts#codebase:graph_traverse",
+      "packet_kind": "tool_manifest"
+    },
+    {
+      "tool_name": "topology_search",
+      "llama_name": null,
+      "domain": "neo4j_context_graph",
+      "ontology": [
+        "graph",
+        "neo4j",
+        "relationship",
+        "retrieval"
+      ],
+      "description": "Search the 4D topology-indexed codebase using cosine prefilter (Qdrant 768-dim)",
+      "examples": [
+        "use topology search to search the 4d topology-indexed codebase using cosine prefilter (qdrant 768-dim)"
+      ],
+      "requires": [],
+      "returns": null,
+      "service": null,
+      "method": null,
+      "input_type": null,
+      "output_type": null,
+      "transport": "mcp",
+      "file": "src/mcp/server.ts",
+      "source_ref": "src/mcp/server.ts#topology_search",
+      "packet_kind": "tool_manifest"
+    },
+    {
+      "tool_name": "analytics:deep_research",
+      "llama_name": null,
+      "domain": "rag_retrieval",
+      "ontology": [
+        "retrieval",
+        "rag",
+        "search"
+      ],
+      "description": "Generate personalized deep research topics from RAG/KAG/DAG/ACE hit analytics,",
+      "examples": [
+        "use analytics deep research to generate personalized deep research topics from rag/kag/dag/ace hit analytics,"
+      ],
+      "requires": [],
+      "returns": null,
+      "service": null,
+      "method": null,
+      "input_type": null,
+      "output_type": null,
+      "transport": "mcp",
+      "file": "src/mcp/server.ts",
+      "source_ref": "src/mcp/server.ts#analytics:deep_research",
+      "packet_kind": "tool_manifest"
+    },
+    {
+      "tool_name": "analytics:research_topics",
+      "llama_name": null,
+      "domain": "rag_retrieval",
+      "ontology": [
+        "retrieval",
+        "rag",
+        "search"
+      ],
+      "description": "Query the Redis-cached JSONL research index: qlora_examples joined with response_feedback,",
+      "examples": [
+        "use analytics research topics to query the redis-cached jsonl research index: qlora_examples joined with response_feedback,"
+      ],
+      "requires": [],
+      "returns": null,
+      "service": null,
+      "method": null,
+      "input_type": null,
+      "output_type": null,
+      "transport": "mcp",
+      "file": "src/mcp/server.ts",
+      "source_ref": "src/mcp/server.ts#analytics:research_topics",
+      "packet_kind": "tool_manifest"
+    },
+    {
+      "tool_name": "codebase:rg_search",
+      "llama_name": null,
+      "domain": "rag_retrieval",
+      "ontology": [
+        "retrieval",
+        "rag",
+        "search"
+      ],
+      "description": "Fast ripgrep search over the SvelteKit codebase. Supports regex patterns and file-type",
+      "examples": [
+        "use codebase rg search to fast ripgrep search over the sveltekit codebase"
+      ],
+      "requires": [],
+      "returns": null,
+      "service": null,
+      "method": null,
+      "input_type": null,
+      "output_type": null,
+      "transport": "mcp",
+      "file": "src/mcp/server.ts",
+      "source_ref": "src/mcp/server.ts#codebase:rg_search",
+      "packet_kind": "tool_manifest"
+    },
+    {
+      "tool_name": "analytics:mapreduce_matrix",
+      "llama_name": null,
+      "domain": "mcp_agents",
+      "ontology": [
+        "mcp",
+        "agent",
+        "tooling"
+      ],
+      "description": "Execute MapReduce matrix analysis across RAG/KAG/DAG/ACE pipelines.",
+      "examples": [
+        "use analytics mapreduce matrix to execute mapreduce matrix analysis across rag/kag/dag/ace pipelines"
+      ],
+      "requires": [],
+      "returns": null,
+      "service": null,
+      "method": null,
+      "input_type": null,
+      "output_type": null,
+      "transport": "mcp",
+      "file": "src/mcp/server.ts",
+      "source_ref": "src/mcp/server.ts#analytics:mapreduce_matrix",
+      "packet_kind": "tool_manifest"
+    },
+    {
+      "tool_name": "analytics:unified_research",
+      "llama_name": null,
+      "domain": "rag_retrieval",
+      "ontology": [
+        "retrieval",
+        "rag",
+        "search"
+      ],
+      "description": "Unified research query orchestrating: research-cache (qlora × feedback),",
+      "examples": [
+        "use analytics unified research to unified research query orchestrating: research-cache (qlora × feedback),"
+      ],
+      "requires": [],
+      "returns": null,
+      "service": null,
+      "method": null,
+      "input_type": null,
+      "output_type": null,
+      "transport": "mcp",
+      "file": "src/mcp/server.ts",
+      "source_ref": "src/mcp/server.ts#analytics:unified_research",
+      "packet_kind": "tool_manifest"
+    },
+    {
+      "tool_name": "analytics:codebase_research",
+      "llama_name": null,
+      "domain": "rag_retrieval",
+      "ontology": [
+        "retrieval",
+        "rag",
+        "search"
+      ],
+      "description": "Deep research codebase scanner using ripgrep pattern analysis, pipeline hit distribution,",
+      "examples": [
+        "use analytics codebase research to deep research codebase scanner using ripgrep pattern analysis, pipeline hit distribution,"
+      ],
+      "requires": [],
+      "returns": null,
+      "service": null,
+      "method": null,
+      "input_type": null,
+      "output_type": null,
+      "transport": "mcp",
+      "file": "src/mcp/server.ts",
+      "source_ref": "src/mcp/server.ts#analytics:codebase_research",
+      "packet_kind": "tool_manifest"
+    },
+    {
+      "tool_name": "codebase:concurrent_research",
+      "llama_name": null,
+      "domain": "rag_retrieval",
+      "ontology": [
+        "retrieval",
+        "rag",
+        "search",
+        "graph"
+      ],
+      "description": "LangGraph-style concurrent deep research over codebase_chunks_768.",
+      "examples": [
+        "use codebase concurrent research to langgraph-style concurrent deep research over codebase_chunks_768"
+      ],
+      "requires": [],
+      "returns": null,
+      "service": null,
+      "method": null,
+      "input_type": null,
+      "output_type": null,
+      "transport": "mcp",
+      "file": "src/mcp/server.ts",
+      "source_ref": "src/mcp/server.ts#codebase:concurrent_research",
+      "packet_kind": "tool_manifest"
+    },
+    {
+      "tool_name": "analytics:web_research",
+      "llama_name": null,
+      "domain": "rag_retrieval",
+      "ontology": [
+        "retrieval",
+        "rag",
+        "search",
+        "embedding"
+      ],
+      "description": "Run web research for selfPrompt queries: SearXNG/Google/DDG search → 768-dim embedding →",
+      "examples": [
+        "use analytics web research to run web research for selfprompt queries: searxng/google/ddg search → 768-dim embedding →"
+      ],
+      "requires": [],
+      "returns": null,
+      "service": null,
+      "method": null,
+      "input_type": null,
+      "output_type": null,
+      "transport": "mcp",
+      "file": "src/mcp/server.ts",
+      "source_ref": "src/mcp/server.ts#analytics:web_research",
+      "packet_kind": "tool_manifest"
+    },
+    {
+      "tool_name": "face:identify",
+      "llama_name": null,
+      "domain": "mcp_agents",
+      "ontology": [
+        "mcp",
+        "agent",
+        "tooling"
+      ],
+      "description": "Multi-pass GRPO face matching for a reference POI using gemma4 VLM.",
+      "examples": [
+        "use face identify to multi-pass grpo face matching for a reference poi using gemma4 vlm"
+      ],
+      "requires": [],
+      "returns": null,
+      "service": null,
+      "method": null,
+      "input_type": null,
+      "output_type": null,
+      "transport": "mcp",
+      "file": "src/mcp/server.ts",
+      "source_ref": "src/mcp/server.ts#face:identify",
+      "packet_kind": "tool_manifest"
+    },
+    {
+      "tool_name": "poi:face_synth",
+      "llama_name": null,
+      "domain": "mcp_agents",
+      "ontology": [
+        "mcp",
+        "agent",
+        "tooling"
+      ],
+      "description": "Generate QLoRA synthetic training data (JSONL) for POI face identity fine-tuning.",
+      "examples": [
+        "use poi face synth to generate qlora synthetic training data (jsonl) for poi face identity fine-tuning"
+      ],
+      "requires": [],
+      "returns": null,
+      "service": null,
+      "method": null,
+      "input_type": null,
+      "output_type": null,
+      "transport": "mcp",
+      "file": "src/mcp/server.ts",
+      "source_ref": "src/mcp/server.ts#poi:face_synth",
+      "packet_kind": "tool_manifest"
+    },
+    {
+      "tool_name": "codeintel.health",
+      "llama_name": null,
+      "domain": "mcp_agents",
+      "ontology": [
+        "mcp",
+        "agent",
+        "tooling"
+      ],
+      "description": "Check CodeIntel pipeline health (cluster_summaries + chunk index + gRPC reachability).",
+      "examples": [
+        "use codeintel.health to check codeintel pipeline health (cluster_summaries + chunk index + grpc reachability)"
+      ],
+      "requires": [],
+      "returns": null,
+      "service": null,
+      "method": null,
+      "input_type": null,
+      "output_type": null,
+      "transport": "mcp",
+      "file": "src/mcp/server.ts",
+      "source_ref": "src/mcp/server.ts#codeintel.health",
+      "packet_kind": "tool_manifest"
+    },
+    {
+      "tool_name": "cluster.summary.get",
+      "llama_name": null,
+      "domain": "mcp_agents",
+      "ontology": [
+        "mcp",
+        "agent",
+        "tooling"
+      ],
+      "description": "Fetch the LLM-generated summary for a GPU cluster (purpose, patterns, warnings, tags).",
+      "examples": [
+        "use cluster.summary.get to fetch the llm-generated summary for a gpu cluster (purpose, patterns, warnings, tags)"
+      ],
+      "requires": [],
+      "returns": null,
+      "service": null,
+      "method": null,
+      "input_type": null,
+      "output_type": null,
+      "transport": "mcp",
+      "file": "src/mcp/server.ts",
+      "source_ref": "src/mcp/server.ts#cluster.summary.get",
+      "packet_kind": "tool_manifest"
+    },
+    {
+      "tool_name": "cluster.summary.refresh",
+      "llama_name": null,
+      "domain": "mcp_agents",
+      "ontology": [
+        "mcp",
+        "agent",
+        "tooling",
+        "embedding"
+      ],
+      "description": "Re-run LLM summarization for a cluster and store the new embedding. Use force=true to bypass cache.",
+      "examples": [
+        "use cluster.summary.refresh to re-run llm summarization for a cluster and store the new embedding"
+      ],
+      "requires": [],
+      "returns": null,
+      "service": null,
+      "method": null,
+      "input_type": null,
+      "output_type": null,
+      "transport": "mcp",
+      "file": "src/mcp/server.ts",
+      "source_ref": "src/mcp/server.ts#cluster.summary.refresh",
+      "packet_kind": "tool_manifest"
+    },
+    {
+      "tool_name": "chunk.lookup",
+      "llama_name": null,
+      "domain": "mcp_agents",
+      "ontology": [
+        "mcp",
+        "agent",
+        "tooling"
+      ],
+      "description": "Look up a single codebase chunk by its Qdrant ID. Returns path, kind, domain, cluster, semantic tags.",
+      "examples": [
+        "use chunk.lookup to look up a single codebase chunk by its qdrant id"
+      ],
+      "requires": [],
+      "returns": null,
+      "service": null,
+      "method": null,
+      "input_type": null,
+      "output_type": null,
+      "transport": "mcp",
+      "file": "src/mcp/server.ts",
+      "source_ref": "src/mcp/server.ts#chunk.lookup",
+      "packet_kind": "tool_manifest"
+    },
+    {
+      "tool_name": "codebase:export_bundle",
+      "llama_name": null,
+      "domain": "mcp_agents",
+      "ontology": [
+        "mcp",
+        "agent",
+        "tooling",
+        "graph",
+        "embedding"
+      ],
+      "description": "Return the unified codebase indexing export bundle: graph (nodes + edges), cluster summaries (purpose + patterns + warnings + embedding flag), Karpathy wiki feedback notes (playbook + cluster), 4D manifold coords, tile atlas stats, and live Redis cache key counts. Primary entry point for agentic tools that need the full state — far cheaper than calling 6 individual endpoints. Degrades per-part (meta.sources / meta.errors) so a failing backend never breaks the shape.",
+      "examples": [
+        "use codebase export bundle to return the unified codebase indexing export bundle: graph (nodes + edges), cluster summaries (purpose + patterns + warnings + embedding flag), karpathy wiki feedback notes (playbook + cluster), 4d manifold coords, tile atlas stats, and live redis cache key counts"
+      ],
+      "requires": [],
+      "returns": null,
+      "service": null,
+      "method": null,
+      "input_type": null,
+      "output_type": null,
+      "transport": "mcp",
+      "file": "src/mcp/server.ts",
+      "source_ref": "src/mcp/server.ts#codebase:export_bundle",
+      "packet_kind": "tool_manifest"
+    },
+    {
+      "tool_name": "codeintel.fix_recommend",
+      "llama_name": null,
+      "domain": "mcp_agents",
+      "ontology": [
+        "mcp",
+        "agent",
+        "tooling"
+      ],
+      "description": "Given a TypeScript/SvelteKit compiler error or runtime exception, retrieves semantically similar codebase chunks from the 16,626-row enriched index, fetches the GPU cluster narrative, and calls Gemma4 to return 1-6 concrete fix recommendations with reference files. Use this for any error-fixing workflow targeting this codebase.",
+      "examples": [
+        "use codeintel.fix recommend to given a typescript/sveltekit compiler error or runtime exception, retrieves semantically similar codebase chunks from the 16,626-row enriched index, fetches the gpu cluster narrative, and calls gemma4 to return 1-6 concrete fix recommendations with reference files"
+      ],
+      "requires": [],
+      "returns": null,
+      "service": null,
+      "method": null,
+      "input_type": null,
+      "output_type": null,
+      "transport": "mcp",
+      "file": "src/mcp/server.ts",
+      "source_ref": "src/mcp/server.ts#codeintel.fix_recommend",
+      "packet_kind": "tool_manifest"
+    },
+    {
+      "tool_name": "codeintel.ace.context",
+      "llama_name": null,
+      "domain": "mcp_agents",
+      "ontology": [
+        "mcp",
+        "agent",
+        "tooling"
+      ],
+      "description": "Assemble a normalized ACE CodeIntel context bundle from cluster summaries, chunk metadata, and health stats. Returns structured JSON ready for Gemma4 prompting or Claude Code fix recommendations. Specify clusterIds and/or chunkIds to focus context, or omit for a broad overview.",
+      "examples": [
+        "use codeintel.ace.context to assemble a normalized ace codeintel context bundle from cluster summaries, chunk metadata, and health stats"
+      ],
+      "requires": [],
+      "returns": null,
+      "service": null,
+      "method": null,
+      "input_type": null,
+      "output_type": null,
+      "transport": "mcp",
+      "file": "src/mcp/server.ts",
+      "source_ref": "src/mcp/server.ts#codeintel.ace.context",
+      "packet_kind": "tool_manifest"
+    },
+    {
+      "tool_name": "graph.index",
+      "llama_name": null,
+      "domain": "neo4j_context_graph",
+      "ontology": [
+        "graph",
+        "neo4j",
+        "relationship"
+      ],
+      "description": "Trigger graph indexing pipeline: Neo4j sync → SOM topology training → GPU graph analysis.",
+      "examples": [
+        "use graph.index to trigger graph indexing pipeline: neo4j sync → som topology training → gpu graph analysis"
+      ],
+      "requires": [],
+      "returns": null,
+      "service": null,
+      "method": null,
+      "input_type": null,
+      "output_type": null,
+      "transport": "mcp",
+      "file": "src/mcp/server.ts",
+      "source_ref": "src/mcp/server.ts#graph.index",
+      "packet_kind": "tool_manifest"
+    },
+    {
+      "tool_name": "graph.status",
+      "llama_name": null,
+      "domain": "neo4j_context_graph",
+      "ontology": [
+        "graph",
+        "neo4j",
+        "relationship",
+        "embedding"
+      ],
+      "description": "Report current graph indexing health: cluster count, chunk count, embedding coverage, Neo4j reachability.",
+      "examples": [
+        "use graph.status to report current graph indexing health: cluster count, chunk count, embedding coverage, neo4j reachability"
+      ],
+      "requires": [],
+      "returns": null,
+      "service": null,
+      "method": null,
+      "input_type": null,
+      "output_type": null,
+      "transport": "mcp",
+      "file": "src/mcp/server.ts",
+      "source_ref": "src/mcp/server.ts#graph.status",
+      "packet_kind": "tool_manifest"
+    },
+    {
+      "tool_name": "ace.wiki",
+      "llama_name": null,
+      "domain": "mcp_agents",
+      "ontology": [
+        "mcp",
+        "agent",
+        "tooling"
+      ],
+      "description": "Generate a structured wiki-style article about a query from ACE codebase context.",
+      "examples": [
+        "use ace.wiki to generate a structured wiki-style article about a query from ace codebase context"
+      ],
+      "requires": [],
+      "returns": null,
+      "service": null,
+      "method": null,
+      "input_type": null,
+      "output_type": null,
+      "transport": "mcp",
+      "file": "src/mcp/server.ts",
+      "source_ref": "src/mcp/server.ts#ace.wiki",
+      "packet_kind": "tool_manifest"
+    },
+    {
+      "tool_name": "research:github_search",
+      "llama_name": null,
+      "domain": "rag_retrieval",
+      "ontology": [
+        "retrieval",
+        "rag",
+        "search"
+      ],
+      "description": "Search GitHub issues, code, or repositories for deep research context.",
+      "examples": [
+        "use research github search to search github issues, code, or repositories for deep research context"
+      ],
+      "requires": [],
+      "returns": null,
+      "service": null,
+      "method": null,
+      "input_type": null,
+      "output_type": null,
+      "transport": "mcp",
+      "file": "src/mcp/server.ts",
+      "source_ref": "src/mcp/server.ts#research:github_search",
+      "packet_kind": "tool_manifest"
+    },
+    {
+      "tool_name": "research:reddit_search",
+      "llama_name": null,
+      "domain": "rag_retrieval",
+      "ontology": [
+        "retrieval",
+        "rag",
+        "search"
+      ],
+      "description": "Search Reddit posts for community knowledge. Always uses raw_json=1 to prevent",
+      "examples": [
+        "use research reddit search to search reddit posts for community knowledge"
+      ],
+      "requires": [],
+      "returns": null,
+      "service": null,
+      "method": null,
+      "input_type": null,
+      "output_type": null,
+      "transport": "mcp",
+      "file": "src/mcp/server.ts",
+      "source_ref": "src/mcp/server.ts#research:reddit_search",
+      "packet_kind": "tool_manifest"
+    },
+    {
+      "tool_name": "research:search_chunks",
+      "llama_name": null,
+      "domain": "rag_retrieval",
+      "ontology": [
+        "retrieval",
+        "rag",
+        "search",
+        "reranking"
+      ],
+      "description": "Semantic search over the chunks_web_search collection. Returns ranked results from",
+      "examples": [
+        "use research search chunks to semantic search over the chunks_web_search collection"
+      ],
+      "requires": [],
+      "returns": null,
+      "service": null,
+      "method": null,
+      "input_type": null,
+      "output_type": null,
+      "transport": "mcp",
+      "file": "src/mcp/server.ts",
+      "source_ref": "src/mcp/server.ts#research:search_chunks",
+      "packet_kind": "tool_manifest"
+    },
+    {
+      "tool_name": "kb.search_schema_contract",
+      "llama_name": null,
+      "domain": "rag_retrieval",
+      "ontology": [
+        "retrieval",
+        "rag",
+        "search"
+      ],
+      "description": "Semantic search across the standalone schema-indexer contract cards. Use for schema-focused prompt context engineering and MCP routing without touching workspace-gap cards.",
+      "examples": [
+        "use kb.search schema contract to semantic search across the standalone schema-indexer contract cards"
+      ],
+      "requires": [],
+      "returns": null,
+      "service": null,
+      "method": null,
+      "input_type": null,
+      "output_type": null,
+      "transport": "mcp",
+      "file": "src/mcp/server.ts",
+      "source_ref": "src/mcp/server.ts#kb.search_schema_contract",
+      "packet_kind": "tool_manifest"
+    },
+    {
+      "tool_name": "kb.rg_atlas_search",
+      "llama_name": null,
+      "domain": "rag_retrieval",
+      "ontology": [
+        "retrieval",
+        "rag",
+        "search"
+      ],
+      "description": "Full RG-Atlas search pipeline: rg lexical sweep → GPU Karpathy blend →",
+      "examples": [
+        "use kb.rg atlas search to full rg-atlas search pipeline: rg lexical sweep → gpu karpathy blend →"
+      ],
+      "requires": [],
+      "returns": null,
+      "service": null,
+      "method": null,
+      "input_type": null,
+      "output_type": null,
+      "transport": "mcp",
+      "file": "src/mcp/server.ts",
+      "source_ref": "src/mcp/server.ts#kb.rg_atlas_search",
+      "packet_kind": "tool_manifest"
+    },
+    {
+      "tool_name": "ast:cross_language",
+      "llama_name": null,
+      "domain": "mcp_agents",
+      "ontology": [
+        "mcp",
+        "agent",
+        "tooling"
+      ],
+      "description": "Synthesize cross-language equivalents for a TypeScript/JS function.",
+      "examples": [
+        "use ast cross language to synthesize cross-language equivalents for a typescript/js function"
+      ],
+      "requires": [],
+      "returns": null,
+      "service": null,
+      "method": null,
+      "input_type": null,
+      "output_type": null,
+      "transport": "mcp",
+      "file": "src/mcp/server.ts",
+      "source_ref": "src/mcp/server.ts#ast:cross_language",
+      "packet_kind": "tool_manifest"
+    },
+    {
+      "tool_name": "wiki.status",
+      "llama_name": null,
+      "domain": "mcp_agents",
+      "ontology": [
+        "mcp",
+        "agent",
+        "tooling"
+      ],
+      "description": "Returns high-level status of the codebase knowledge base (Karpathy/AGENTS). includes page count, last updated, and stale directories.",
+      "examples": [
+        "use wiki.status to returns high-level status of the codebase knowledge base (karpathy/agents)"
+      ],
+      "requires": [],
+      "returns": null,
+      "service": null,
+      "method": null,
+      "input_type": null,
+      "output_type": null,
+      "transport": "mcp",
+      "file": "src/mcp/server.ts",
+      "source_ref": "src/mcp/server.ts#wiki.status",
+      "packet_kind": "tool_manifest"
+    },
+    {
+      "tool_name": "wiki.search",
+      "llama_name": null,
+      "domain": "rag_retrieval",
+      "ontology": [
+        "retrieval",
+        "rag",
+        "search",
+        "graph",
+        "reranking"
+      ],
+      "description": "Searches the codebase wiki (Karpathy/AGENTS) using a hybrid approach: lexical ripgrep, graph metadata, and semantic Qdrant. Returns ranked pages with summaries and confidence.",
+      "examples": [
+        "use wiki.search to searches the codebase wiki (karpathy/agents) using a hybrid approach: lexical ripgrep, graph metadata, and semantic qdrant"
+      ],
+      "requires": [],
+      "returns": null,
+      "service": null,
+      "method": null,
+      "input_type": null,
+      "output_type": null,
+      "transport": "mcp",
+      "file": "src/mcp/server.ts",
+      "source_ref": "src/mcp/server.ts#wiki.search",
+      "packet_kind": "tool_manifest"
+    },
+    {
+      "tool_name": "wiki.explain_page",
+      "llama_name": null,
+      "domain": "mcp_agents",
+      "ontology": [
+        "mcp",
+        "agent",
+        "tooling"
+      ],
+      "description": "Returns a detailed explanation of a specific wiki page (directory or feature), including related files, imports, clusters, and activity scores.",
+      "examples": [
+        "use wiki.explain page to returns a detailed explanation of a specific wiki page (directory or feature), including related files, imports, clusters, and activity scores"
+      ],
+      "requires": [],
+      "returns": null,
+      "service": null,
+      "method": null,
+      "input_type": null,
+      "output_type": null,
+      "transport": "mcp",
+      "file": "src/mcp/server.ts",
+      "source_ref": "src/mcp/server.ts#wiki.explain_page",
+      "packet_kind": "tool_manifest"
+    },
+    {
+      "tool_name": "wiki.refresh_directory",
+      "llama_name": null,
+      "domain": "mcp_agents",
+      "ontology": [
+        "mcp",
+        "agent",
+        "tooling"
+      ],
+      "description": "Refreshes one directory card (LLMS.md mirror). Default dryRun=true.",
+      "examples": [
+        "use wiki.refresh directory to refreshes one directory card (llms"
+      ],
+      "requires": [],
+      "returns": null,
+      "service": null,
+      "method": null,
+      "input_type": null,
+      "output_type": null,
+      "transport": "mcp",
+      "file": "src/mcp/server.ts",
+      "source_ref": "src/mcp/server.ts#wiki.refresh_directory",
+      "packet_kind": "tool_manifest"
+    },
+    {
+      "tool_name": "vlm:switch_mode",
+      "llama_name": null,
+      "domain": "mcp_agents",
+      "ontology": [
+        "mcp",
+        "agent",
+        "tooling"
+      ],
+      "description": "Switch the VLM inference mode between TEXT (TurboQuant) and VISION (Ollama VLM). Use this to prevent VRAM OOM on 8GB cards when switching between text-heavy and image-heavy tasks.",
+      "examples": [
+        "use vlm switch mode to switch the vlm inference mode between text (turboquant) and vision (ollama vlm)"
+      ],
+      "requires": [],
+      "returns": null,
+      "service": null,
+      "method": null,
+      "input_type": null,
+      "output_type": null,
+      "transport": "mcp",
+      "file": "src/mcp/server.ts",
+      "source_ref": "src/mcp/server.ts#vlm:switch_mode",
+      "packet_kind": "tool_manifest"
+    },
+    {
+      "tool_name": "llm_synthesis.log_event",
+      "llama_name": null,
+      "domain": "mcp_agents",
+      "ontology": [
+        "mcp",
+        "agent",
+        "tooling"
+      ],
+      "description": "Durably log an LLM synthesis event: writes to Postgres llm_synthesis_events,",
+      "examples": [
+        "use llm synthesis.log event to durably log an llm synthesis event: writes to postgres llm_synthesis_events,"
+      ],
+      "requires": [],
+      "returns": null,
+      "service": null,
+      "method": null,
+      "input_type": null,
+      "output_type": null,
+      "transport": "mcp",
+      "file": "src/mcp/server.ts",
+      "source_ref": "src/mcp/server.ts#llm_synthesis.log_event",
+      "packet_kind": "tool_manifest"
+    },
+    {
+      "tool_name": "agents_md",
+      "llama_name": null,
+      "domain": "mcp_agents",
+      "ontology": [
+        "mcp",
+        "agent",
+        "tooling"
+      ],
+      "description": "Resolve the nearest AGENTS.md file for a given source path. Checks Redis first (agents:dir:<path>) then walks up the directory hierarchy on disk.",
+      "examples": [
+        "use agents md to resolve the nearest agents"
+      ],
+      "requires": [],
+      "returns": null,
+      "service": null,
+      "method": null,
+      "input_type": null,
+      "output_type": null,
+      "transport": "mcp",
+      "file": "src/mcp/server.ts",
+      "source_ref": "src/mcp/server.ts#agents_md",
+      "packet_kind": "tool_manifest"
+    },
+    {
+      "tool_name": "postgres",
+      "llama_name": null,
+      "domain": "mcp_agents",
+      "ontology": [
+        "mcp",
+        "agent",
+        "tooling"
+      ],
+      "description": "",
+      "examples": [
+        "use postgres to perform the operation"
+      ],
+      "requires": [],
+      "returns": null,
+      "service": null,
+      "method": null,
+      "input_type": null,
+      "output_type": null,
+      "transport": "mcp",
+      "file": "src/mcp/trace-mcp-server.ts",
+      "source_ref": "src/mcp/trace-mcp-server.ts#postgres",
+      "packet_kind": "tool_manifest"
+    },
+    {
+      "tool_name": "redis",
+      "llama_name": null,
+      "domain": "redis_bitfrost_cache",
+      "ontology": [
+        "cache",
+        "redis",
+        "temporal"
+      ],
+      "description": "",
+      "examples": [
+        "use redis to perform the operation"
+      ],
+      "requires": [],
+      "returns": null,
+      "service": null,
+      "method": null,
+      "input_type": null,
+      "output_type": null,
+      "transport": "mcp",
+      "file": "src/mcp/trace-mcp-server.ts",
+      "source_ref": "src/mcp/trace-mcp-server.ts#redis",
+      "packet_kind": "tool_manifest"
+    },
+    {
+      "tool_name": "summary",
+      "llama_name": null,
+      "domain": "mcp_agents",
+      "ontology": [
+        "mcp",
+        "agent",
+        "tooling"
+      ],
+      "description": "",
+      "examples": [
+        "use summary to perform the operation"
+      ],
+      "requires": [],
+      "returns": null,
+      "service": null,
+      "method": null,
+      "input_type": null,
+      "output_type": null,
+      "transport": "mcp",
+      "file": "src/mcp/trace-mcp-server.ts",
+      "source_ref": "src/mcp/trace-mcp-server.ts#summary",
+      "packet_kind": "tool_manifest"
+    },
+    {
+      "tool_name": "narrative",
+      "llama_name": null,
+      "domain": "mcp_agents",
+      "ontology": [
+        "mcp",
+        "agent",
+        "tooling"
+      ],
+      "description": "",
+      "examples": [
+        "use narrative to perform the operation"
+      ],
+      "requires": [],
+      "returns": null,
+      "service": null,
+      "method": null,
+      "input_type": null,
+      "output_type": null,
+      "transport": "mcp",
+      "file": "src/mcp/trace-mcp-server.ts",
+      "source_ref": "src/mcp/trace-mcp-server.ts#narrative",
+      "packet_kind": "tool_manifest"
+    },
+    {
+      "tool_name": "neo4j",
+      "llama_name": null,
+      "domain": "neo4j_context_graph",
+      "ontology": [
+        "graph",
+        "neo4j",
+        "relationship"
+      ],
+      "description": "",
+      "examples": [
+        "use neo4j to perform the operation"
+      ],
+      "requires": [],
+      "returns": null,
+      "service": null,
+      "method": null,
+      "input_type": null,
+      "output_type": null,
+      "transport": "mcp",
+      "file": "src/mcp/trace-mcp-server.ts",
+      "source_ref": "src/mcp/trace-mcp-server.ts#neo4j",
+      "packet_kind": "tool_manifest"
+    },
+    {
+      "tool_name": "unknown",
+      "llama_name": null,
+      "domain": "mcp_agents",
+      "ontology": [
+        "mcp",
+        "agent",
+        "tooling"
+      ],
+      "description": "",
+      "examples": [
+        "use unknown to perform the operation"
+      ],
+      "requires": [],
+      "returns": null,
+      "service": null,
+      "method": null,
+      "input_type": null,
+      "output_type": null,
+      "transport": "mcp",
+      "file": "src/mcp/trace-mcp-server.ts",
+      "source_ref": "src/mcp/trace-mcp-server.ts#unknown",
+      "packet_kind": "tool_manifest"
+    },
+    {
+      "tool_name": "content",
+      "llama_name": null,
+      "domain": "mcp_agents",
+      "ontology": [
+        "mcp",
+        "agent",
+        "tooling"
+      ],
+      "description": "",
+      "examples": [
+        "use content to perform the operation"
+      ],
+      "requires": [],
+      "returns": null,
+      "service": null,
+      "method": null,
+      "input_type": null,
+      "output_type": null,
+      "transport": "mcp",
+      "file": "src/mcp/trace-mcp-server.ts",
+      "source_ref": "src/mcp/trace-mcp-server.ts#content",
+      "packet_kind": "tool_manifest"
+    },
+    {
+      "tool_name": "kb.hybrid_search",
+      "llama_name": null,
+      "domain": "rag_retrieval",
+      "ontology": [
+        "retrieval",
+        "rag",
+        "search"
+      ],
+      "description": "",
+      "examples": [
+        "use kb.hybrid search to perform the operation"
+      ],
+      "requires": [],
+      "returns": null,
+      "service": null,
+      "method": null,
+      "input_type": null,
+      "output_type": null,
+      "transport": "mcp",
+      "file": "src/mcp/trace-mcp-server.ts",
+      "source_ref": "src/mcp/trace-mcp-server.ts#kb.hybrid_search",
+      "packet_kind": "tool_manifest"
+    },
+    {
+      "tool_name": "langextract_extract_error_facts",
+      "llama_name": null,
+      "domain": "mcp_agents",
+      "ontology": [
+        "mcp",
+        "agent",
+        "tooling"
+      ],
+      "description": "Extract structured error, feature, and docs facts from messy text.",
+      "examples": [
+        "use langextract extract error facts to extract structured error, feature, and docs facts from messy text"
+      ],
+      "requires": [],
+      "returns": null,
+      "service": null,
+      "method": null,
+      "input_type": null,
+      "output_type": null,
+      "transport": "mcp",
+      "file": "src/mcp/tools/repair_tools.ts",
+      "source_ref": "src/mcp/tools/repair_tools.ts#langextract_extract_error_facts",
+      "packet_kind": "tool_manifest"
+    },
+    {
+      "tool_name": "marco_rerank_chunks",
+      "llama_name": null,
+      "domain": "mcp_agents",
+      "ontology": [
+        "mcp",
+        "agent",
+        "tooling",
+        "reranking"
+      ],
+      "description": "Rerank chunks after retrieval using MarcoReranker logic.",
+      "examples": [
+        "use marco rerank chunks to rerank chunks after retrieval using marcoreranker logic"
+      ],
+      "requires": [],
+      "returns": null,
+      "service": null,
+      "method": null,
+      "input_type": null,
+      "output_type": null,
+      "transport": "mcp",
+      "file": "src/mcp/tools/repair_tools.ts",
+      "source_ref": "src/mcp/tools/repair_tools.ts#marco_rerank_chunks",
+      "packet_kind": "tool_manifest"
+    },
+    {
+      "tool_name": "graphrag_expand_context",
+      "llama_name": null,
+      "domain": "neo4j_context_graph",
+      "ontology": [
+        "graph",
+        "neo4j",
+        "relationship"
+      ],
+      "description": "Expand relationships and explain paths using GraphRAG (Neo4j, CouchDB).",
+      "examples": [
+        "use graphrag expand context to expand relationships and explain paths using graphrag (neo4j, couchdb)"
+      ],
+      "requires": [],
+      "returns": null,
+      "service": null,
+      "method": null,
+      "input_type": null,
+      "output_type": null,
+      "transport": "mcp",
+      "file": "src/mcp/tools/repair_tools.ts",
+      "source_ref": "src/mcp/tools/repair_tools.ts#graphrag_expand_context",
+      "packet_kind": "tool_manifest"
+    },
+    {
+      "tool_name": "hmm_infer_repair_states",
+      "llama_name": null,
+      "domain": "mcp_agents",
+      "ontology": [
+        "mcp",
+        "agent",
+        "tooling"
+      ],
+      "description": "Infer missing implementation states and repair order using HMM.",
+      "examples": [
+        "use hmm infer repair states to infer missing implementation states and repair order using hmm"
+      ],
+      "requires": [],
+      "returns": null,
+      "service": null,
+      "method": null,
+      "input_type": null,
+      "output_type": null,
+      "transport": "mcp",
+      "file": "src/mcp/tools/repair_tools.ts",
+      "source_ref": "src/mcp/tools/repair_tools.ts#hmm_infer_repair_states",
+      "packet_kind": "tool_manifest"
+    },
+    {
+      "tool_name": "toposort_repair_plan",
+      "llama_name": null,
+      "domain": "mcp_agents",
+      "ontology": [
+        "mcp",
+        "agent",
+        "tooling"
+      ],
+      "description": "Topological sort to order the repair plan based on HMM states.",
+      "examples": [
+        "use toposort repair plan to topological sort to order the repair plan based on hmm states"
+      ],
+      "requires": [],
+      "returns": null,
+      "service": null,
+      "method": null,
+      "input_type": null,
+      "output_type": null,
+      "transport": "mcp",
+      "file": "src/mcp/tools/repair_tools.ts",
+      "source_ref": "src/mcp/tools/repair_tools.ts#toposort_repair_plan",
+      "packet_kind": "tool_manifest"
+    },
+    {
+      "tool_name": "sveltekit_route_audit",
+      "llama_name": null,
+      "domain": "mcp_agents",
+      "ontology": [
+        "mcp",
+        "agent",
+        "tooling"
+      ],
+      "description": "Audit a SvelteKit 2 route for existence, Zod schema, and auth guards.",
+      "examples": [
+        "use sveltekit route audit to audit a sveltekit 2 route for existence, zod schema, and auth guards"
+      ],
+      "requires": [],
+      "returns": null,
+      "service": null,
+      "method": null,
+      "input_type": null,
+      "output_type": null,
+      "transport": "mcp",
+      "file": "src/mcp/tools/repair_tools.ts",
+      "source_ref": "src/mcp/tools/repair_tools.ts#sveltekit_route_audit",
+      "packet_kind": "tool_manifest"
+    },
+    {
+      "tool_name": "sveltekit_import_boundary_check",
+      "llama_name": null,
+      "domain": "mcp_agents",
+      "ontology": [
+        "mcp",
+        "agent",
+        "tooling"
+      ],
+      "description": "Check SvelteKit import boundaries (e.g., $lib/server leaked to client).",
+      "examples": [
+        "use sveltekit import boundary check to check sveltekit import boundaries (e"
+      ],
+      "requires": [],
+      "returns": null,
+      "service": null,
+      "method": null,
+      "input_type": null,
+      "output_type": null,
+      "transport": "mcp",
+      "file": "src/mcp/tools/repair_tools.ts",
+      "source_ref": "src/mcp/tools/repair_tools.ts#sveltekit_import_boundary_check",
+      "packet_kind": "tool_manifest"
+    },
+    {
+      "tool_name": "wiki_encyclopedia_search",
+      "llama_name": null,
+      "domain": "rag_retrieval",
+      "ontology": [
+        "retrieval",
+        "rag",
+        "search"
+      ],
+      "description": "Topological encyclopedia route that takes a query, searches Karpathy wiki + Qdrant + SOM clusters, returns did-you-mean suggestions.",
+      "examples": [
+        "use wiki encyclopedia search to topological encyclopedia route that takes a query, searches karpathy wiki + qdrant + som clusters, returns did-you-mean suggestions"
+      ],
+      "requires": [],
+      "returns": null,
+      "service": null,
+      "method": null,
+      "input_type": null,
+      "output_type": null,
+      "transport": "mcp",
+      "file": "src/mcp/tools/repair_tools.ts",
+      "source_ref": "src/mcp/tools/repair_tools.ts#wiki_encyclopedia_search",
+      "packet_kind": "tool_manifest"
+    },
+    {
+      "tool_name": "vault.search",
+      "llama_name": null,
+      "domain": "rag_retrieval",
+      "ontology": [
+        "retrieval",
+        "rag",
+        "search",
+        "legal"
+      ],
+      "description": "Search the Obsidian codebase vault by keyword (case-insensitive substring on title + frontmatter + body) with optional frontmatter filters.",
+      "examples": [
+        "use vault.search to search the obsidian codebase vault by keyword (case-insensitive substring on title + frontmatter + body) with optional frontmatter filters"
+      ],
+      "requires": [],
+      "returns": null,
+      "service": null,
+      "method": null,
+      "input_type": null,
+      "output_type": null,
+      "transport": "mcp",
+      "file": "src/mcp/tools/vault-walker.tool.ts",
+      "source_ref": "src/mcp/tools/vault-walker.tool.ts#vault.search",
+      "packet_kind": "tool_manifest"
+    },
+    {
+      "tool_name": "vault.read",
+      "llama_name": null,
+      "domain": "mcp_agents",
+      "ontology": [
+        "mcp",
+        "agent",
+        "tooling",
+        "embedding"
+      ],
+      "description": "Read one Obsidian note. Returns parsed frontmatter, full body, extracted typed edges (up/same/imports/contains), and embedding_id if present.",
+      "examples": [
+        "use vault.read to read one obsidian note"
+      ],
+      "requires": [],
+      "returns": null,
+      "service": null,
+      "method": null,
+      "input_type": null,
+      "output_type": null,
+      "transport": "mcp",
+      "file": "src/mcp/tools/vault-walker.tool.ts",
+      "source_ref": "src/mcp/tools/vault-walker.tool.ts#vault.read",
+      "packet_kind": "tool_manifest"
+    },
+    {
+      "tool_name": "video_to_frames",
+      "llama_name": null,
+      "domain": "mcp_agents",
+      "ontology": [
+        "mcp",
+        "agent",
+        "tooling",
+        "legal"
+      ],
+      "description": "Extract frames from video evidence (depositions, surveillance, courtroom recordings) for analysis",
+      "examples": [
+        "use video to frames to extract frames from video evidence (depositions, surveillance, courtroom recordings) for analysis"
+      ],
+      "requires": [],
+      "returns": null,
+      "service": null,
+      "method": null,
+      "input_type": null,
+      "output_type": null,
+      "transport": "mcp",
+      "file": "src/mcp/tools/video-analysis.ts",
+      "source_ref": "src/mcp/tools/video-analysis.ts#video_to_frames",
+      "packet_kind": "tool_manifest"
+    },
+    {
+      "tool_name": "stable_diffusion_generate",
+      "llama_name": null,
+      "domain": "mcp_agents",
+      "ontology": [
+        "mcp",
+        "agent",
+        "tooling",
+        "legal"
+      ],
+      "description": "Generate images from text prompts using Stable Diffusion (legal document visualization, crime scene reconstruction, etc.)",
+      "examples": [
+        "use stable diffusion generate to generate images from text prompts using stable diffusion (legal document visualization, crime scene reconstruction, etc"
+      ],
+      "requires": [],
+      "returns": null,
+      "service": null,
+      "method": null,
+      "input_type": null,
+      "output_type": null,
+      "transport": "mcp",
+      "file": "src/mcp/tools/video-analysis.ts",
+      "source_ref": "src/mcp/tools/video-analysis.ts#stable_diffusion_generate",
+      "packet_kind": "tool_manifest"
+    },
+    {
+      "tool_name": "facial_analysis",
+      "llama_name": null,
+      "domain": "mcp_agents",
+      "ontology": [
+        "mcp",
+        "agent",
+        "tooling"
+      ],
+      "description": "Detect and analyze faces in images or video frames (witness identification, security footage analysis)",
+      "examples": [
+        "use facial analysis to detect and analyze faces in images or video frames (witness identification, security footage analysis)"
+      ],
+      "requires": [],
+      "returns": null,
+      "service": null,
+      "method": null,
+      "input_type": null,
+      "output_type": null,
+      "transport": "mcp",
+      "file": "src/mcp/tools/video-analysis.ts",
+      "source_ref": "src/mcp/tools/video-analysis.ts#facial_analysis",
+      "packet_kind": "tool_manifest"
+    },
+    {
+      "tool_name": "ChatAssistantService.SendMessage",
+      "llama_name": null,
+      "domain": "mcp_agents",
+      "ontology": [
+        "mcp",
+        "agent",
+        "tooling"
+      ],
+      "description": "gRPC RPC ChatAssistantService.SendMessage: ChatRequest → ChatResponse (declared in proto/active/chat_assistant.proto).",
+      "examples": [
+        "call ChatAssistantService.SendMessage with ChatRequest"
+      ],
+      "requires": [
+        "session_id",
+        "message",
+        "user_id",
+        "case_id",
+        "options",
+        "attachments"
+      ],
+      "returns": [
+        "message_id",
+        "session_id",
+        "content",
+        "summary",
+        "citations",
+        "actions",
+        "metrics",
+        "ace",
+        "model",
+        "timestamp"
+      ],
+      "service": "ChatAssistantService",
+      "method": "SendMessage",
+      "input_type": "ChatRequest",
+      "output_type": "ChatResponse",
+      "transport": "grpc",
+      "file": "proto/active/chat_assistant.proto",
+      "source_ref": "proto/active/chat_assistant.proto#ChatAssistantService.SendMessage",
+      "packet_kind": "rpc_method"
+    },
+    {
+      "tool_name": "ChatAssistantService.StreamMessage",
+      "llama_name": null,
+      "domain": "mcp_agents",
+      "ontology": [
+        "mcp",
+        "agent",
+        "tooling"
+      ],
+      "description": "gRPC RPC ChatAssistantService.StreamMessage: ChatRequest → ChatToken (declared in proto/active/chat_assistant.proto).",
+      "examples": [
+        "call ChatAssistantService.StreamMessage with ChatRequest"
+      ],
+      "requires": [
+        "session_id",
+        "message",
+        "user_id",
+        "case_id",
+        "options",
+        "attachments"
+      ],
+      "returns": [
+        "token",
+        "index",
+        "done",
+        "message_id",
+        "metrics",
+        "citations"
+      ],
+      "service": "ChatAssistantService",
+      "method": "StreamMessage",
+      "input_type": "ChatRequest",
+      "output_type": "ChatToken",
+      "transport": "grpc",
+      "file": "proto/active/chat_assistant.proto",
+      "source_ref": "proto/active/chat_assistant.proto#ChatAssistantService.StreamMessage",
+      "packet_kind": "rpc_method"
+    },
+    {
+      "tool_name": "ChatAssistantService.GetHistory",
+      "llama_name": null,
+      "domain": "mcp_agents",
+      "ontology": [
+        "mcp",
+        "agent",
+        "tooling"
+      ],
+      "description": "gRPC RPC ChatAssistantService.GetHistory: HistoryRequest → HistoryResponse (declared in proto/active/chat_assistant.proto).",
+      "examples": [
+        "call ChatAssistantService.GetHistory with HistoryRequest"
+      ],
+      "requires": [
+        "session_id",
+        "limit",
+        "offset"
+      ],
+      "returns": [
+        "messages",
+        "total_count",
+        "session"
+      ],
+      "service": "ChatAssistantService",
+      "method": "GetHistory",
+      "input_type": "HistoryRequest",
+      "output_type": "HistoryResponse",
+      "transport": "grpc",
+      "file": "proto/active/chat_assistant.proto",
+      "source_ref": "proto/active/chat_assistant.proto#ChatAssistantService.GetHistory",
+      "packet_kind": "rpc_method"
+    },
+    {
+      "tool_name": "ChatAssistantService.CreateSession",
+      "llama_name": null,
+      "domain": "mcp_agents",
+      "ontology": [
+        "mcp",
+        "agent",
+        "tooling"
+      ],
+      "description": "gRPC RPC ChatAssistantService.CreateSession: CreateSessionRequest → SessionInfo (declared in proto/active/chat_assistant.proto).",
+      "examples": [
+        "call ChatAssistantService.CreateSession with CreateSessionRequest"
+      ],
+      "requires": [
+        "user_id",
+        "case_id",
+        "title"
+      ],
+      "returns": [
+        "session_id",
+        "title",
+        "case_id",
+        "created_at",
+        "message_count"
+      ],
+      "service": "ChatAssistantService",
+      "method": "CreateSession",
+      "input_type": "CreateSessionRequest",
+      "output_type": "SessionInfo",
+      "transport": "grpc",
+      "file": "proto/active/chat_assistant.proto",
+      "source_ref": "proto/active/chat_assistant.proto#ChatAssistantService.CreateSession",
+      "packet_kind": "rpc_method"
+    },
+    {
+      "tool_name": "ChatAssistantService.RAGQuery",
+      "llama_name": null,
+      "domain": "mcp_agents",
+      "ontology": [
+        "mcp",
+        "agent",
+        "tooling"
+      ],
+      "description": "gRPC RPC ChatAssistantService.RAGQuery: RAGQueryRequest → RAGQueryResponse (declared in proto/active/chat_assistant.proto).",
+      "examples": [
+        "call ChatAssistantService.RAGQuery with RAGQueryRequest"
+      ],
+      "requires": [
+        "query",
+        "case_id",
+        "user_id",
+        "top_k",
+        "min_score",
+        "use_hybrid",
+        "use_dag",
+        "use_corrective_rag",
+        "generation_options"
+      ],
+      "returns": [
+        "query_id",
+        "answer",
+        "chunks",
+        "rag_metrics"
+      ],
+      "service": "ChatAssistantService",
+      "method": "RAGQuery",
+      "input_type": "RAGQueryRequest",
+      "output_type": "RAGQueryResponse",
+      "transport": "grpc",
+      "file": "proto/active/chat_assistant.proto",
+      "source_ref": "proto/active/chat_assistant.proto#ChatAssistantService.RAGQuery",
+      "packet_kind": "rpc_method"
+    },
+    {
+      "tool_name": "ChatAssistantService.Health",
+      "llama_name": null,
+      "domain": "mcp_agents",
+      "ontology": [
+        "mcp",
+        "agent",
+        "tooling"
+      ],
+      "description": "gRPC RPC ChatAssistantService.Health: ChatHealthRequest → ChatHealthResponse (declared in proto/active/chat_assistant.proto).",
+      "examples": [
+        "call ChatAssistantService.Health with ChatHealthRequest"
+      ],
+      "requires": [
+        "deep"
+      ],
+      "returns": [
+        "status",
+        "active_sessions",
+        "uptime_seconds",
+        "dependencies",
+        "transport"
+      ],
+      "service": "ChatAssistantService",
+      "method": "Health",
+      "input_type": "ChatHealthRequest",
+      "output_type": "ChatHealthResponse",
+      "transport": "grpc",
+      "file": "proto/active/chat_assistant.proto",
+      "source_ref": "proto/active/chat_assistant.proto#ChatAssistantService.Health",
+      "packet_kind": "rpc_method"
+    },
+    {
+      "tool_name": "Chr97Agent.GetCartridge",
+      "llama_name": null,
+      "domain": "mcp_agents",
+      "ontology": [
+        "mcp",
+        "agent",
+        "tooling"
+      ],
+      "description": "gRPC RPC Chr97Agent.GetCartridge: GetCartridgeRequest → GetCartridgeResponse (declared in proto/active/chr97_agent.proto).",
+      "examples": [
+        "call Chr97Agent.GetCartridge with GetCartridgeRequest"
+      ],
+      "requires": [
+        "case_id"
+      ],
+      "returns": [
+        "runes",
+        "edges"
+      ],
+      "service": "Chr97Agent",
+      "method": "GetCartridge",
+      "input_type": "GetCartridgeRequest",
+      "output_type": "GetCartridgeResponse",
+      "transport": "grpc",
+      "file": "proto/active/chr97_agent.proto",
+      "source_ref": "proto/active/chr97_agent.proto#Chr97Agent.GetCartridge",
+      "packet_kind": "rpc_method"
+    },
+    {
+      "tool_name": "Chr97Agent.QueryTags",
+      "llama_name": null,
+      "domain": "mcp_agents",
+      "ontology": [
+        "mcp",
+        "agent",
+        "tooling"
+      ],
+      "description": "gRPC RPC Chr97Agent.QueryTags: TagQueryRequest → TagQueryResponse (declared in proto/active/chr97_agent.proto).",
+      "examples": [
+        "call Chr97Agent.QueryTags with TagQueryRequest"
+      ],
+      "requires": [
+        "query",
+        "limit"
+      ],
+      "returns": [
+        "hits"
+      ],
+      "service": "Chr97Agent",
+      "method": "QueryTags",
+      "input_type": "TagQueryRequest",
+      "output_type": "TagQueryResponse",
+      "transport": "grpc",
+      "file": "proto/active/chr97_agent.proto",
+      "source_ref": "proto/active/chr97_agent.proto#Chr97Agent.QueryTags",
+      "packet_kind": "rpc_method"
+    },
+    {
+      "tool_name": "Chr97Agent.GetTimeline",
+      "llama_name": null,
+      "domain": "mcp_agents",
+      "ontology": [
+        "mcp",
+        "agent",
+        "tooling"
+      ],
+      "description": "gRPC RPC Chr97Agent.GetTimeline: TimelineRequest → TimelineResponse (declared in proto/active/chr97_agent.proto).",
+      "examples": [
+        "call Chr97Agent.GetTimeline with TimelineRequest"
+      ],
+      "requires": [
+        "case_id",
+        "user_id"
+      ],
+      "returns": [
+        "events",
+        "ai_summary"
+      ],
+      "service": "Chr97Agent",
+      "method": "GetTimeline",
+      "input_type": "TimelineRequest",
+      "output_type": "TimelineResponse",
+      "transport": "grpc",
+      "file": "proto/active/chr97_agent.proto",
+      "source_ref": "proto/active/chr97_agent.proto#Chr97Agent.GetTimeline",
+      "packet_kind": "rpc_method"
+    },
+    {
+      "tool_name": "CodeIntelService.GetClusterSummary",
+      "llama_name": null,
+      "domain": "mcp_agents",
+      "ontology": [
+        "mcp",
+        "agent",
+        "tooling"
+      ],
+      "description": "gRPC RPC CodeIntelService.GetClusterSummary: GetClusterSummaryRequest → ClusterSummary (declared in proto/active/codeintel.proto).",
+      "examples": [
+        "call CodeIntelService.GetClusterSummary with GetClusterSummaryRequest"
+      ],
+      "requires": [
+        "repo_id",
+        "gpu_cluster"
+      ],
+      "returns": [
+        "id",
+        "repo_id",
+        "gpu_cluster",
+        "summary",
+        "purpose",
+        "patterns",
+        "warnings",
+        "tags",
+        "member_count",
+        "representative_chunk_ids",
+        "summary_model",
+        "has_summary_embedding",
+        "metadata_json",
+        "updated_at",
+        "centroid_distance_mean"
+      ],
+      "service": "CodeIntelService",
+      "method": "GetClusterSummary",
+      "input_type": "GetClusterSummaryRequest",
+      "output_type": "ClusterSummary",
+      "transport": "grpc",
+      "file": "proto/active/codeintel.proto",
+      "source_ref": "proto/active/codeintel.proto#CodeIntelService.GetClusterSummary",
+      "packet_kind": "rpc_method"
+    },
+    {
+      "tool_name": "CodeIntelService.ListClusterSummaries",
+      "llama_name": null,
+      "domain": "mcp_agents",
+      "ontology": [
+        "mcp",
+        "agent",
+        "tooling"
+      ],
+      "description": "gRPC RPC CodeIntelService.ListClusterSummaries: ListClusterSummariesRequest → ListClusterSummariesResponse (declared in proto/active/codeintel.proto).",
+      "examples": [
+        "call CodeIntelService.ListClusterSummaries with ListClusterSummariesRequest"
+      ],
+      "requires": [
+        "repo_id",
+        "gpu_clusters",
+        "limit",
+        "offset"
+      ],
+      "returns": [
+        "items",
+        "total"
+      ],
+      "service": "CodeIntelService",
+      "method": "ListClusterSummaries",
+      "input_type": "ListClusterSummariesRequest",
+      "output_type": "ListClusterSummariesResponse",
+      "transport": "grpc",
+      "file": "proto/active/codeintel.proto",
+      "source_ref": "proto/active/codeintel.proto#CodeIntelService.ListClusterSummaries",
+      "packet_kind": "rpc_method"
+    },
+    {
+      "tool_name": "CodeIntelService.SummarizeCluster",
+      "llama_name": null,
+      "domain": "mcp_agents",
+      "ontology": [
+        "mcp",
+        "agent",
+        "tooling"
+      ],
+      "description": "gRPC RPC CodeIntelService.SummarizeCluster: SummarizeClusterRequest → SummarizeClusterResponse (declared in proto/active/codeintel.proto).",
+      "examples": [
+        "call CodeIntelService.SummarizeCluster with SummarizeClusterRequest"
+      ],
+      "requires": [
+        "repo_id",
+        "gpu_cluster",
+        "model",
+        "force",
+        "use_cache"
+      ],
+      "returns": [
+        "ok",
+        "item",
+        "cache_hit",
+        "job_id",
+        "message"
+      ],
+      "service": "CodeIntelService",
+      "method": "SummarizeCluster",
+      "input_type": "SummarizeClusterRequest",
+      "output_type": "SummarizeClusterResponse",
+      "transport": "grpc",
+      "file": "proto/active/codeintel.proto",
+      "source_ref": "proto/active/codeintel.proto#CodeIntelService.SummarizeCluster",
+      "packet_kind": "rpc_method"
+    },
+    {
+      "tool_name": "CodeIntelService.GetJobStatus",
+      "llama_name": null,
+      "domain": "mcp_agents",
+      "ontology": [
+        "mcp",
+        "agent",
+        "tooling"
+      ],
+      "description": "gRPC RPC CodeIntelService.GetJobStatus: GetJobStatusRequest → JobStatus (declared in proto/active/codeintel.proto).",
+      "examples": [
+        "call CodeIntelService.GetJobStatus with GetJobStatusRequest"
+      ],
+      "requires": [
+        "job_id"
+      ],
+      "returns": [
+        "job_id",
+        "job_type",
+        "status",
+        "total_processed",
+        "total_upserted",
+        "total_failed",
+        "error_json",
+        "updated_at"
+      ],
+      "service": "CodeIntelService",
+      "method": "GetJobStatus",
+      "input_type": "GetJobStatusRequest",
+      "output_type": "JobStatus",
+      "transport": "grpc",
+      "file": "proto/active/codeintel.proto",
+      "source_ref": "proto/active/codeintel.proto#CodeIntelService.GetJobStatus",
+      "packet_kind": "rpc_method"
+    },
+    {
+      "tool_name": "CodeIntelService.LookupChunk",
+      "llama_name": null,
+      "domain": "mcp_agents",
+      "ontology": [
+        "mcp",
+        "agent",
+        "tooling",
+        "retrieval"
+      ],
+      "description": "gRPC RPC CodeIntelService.LookupChunk: ChunkLookupRequest → ChunkLookupResponse (declared in proto/active/codeintel.proto).",
+      "examples": [
+        "call CodeIntelService.LookupChunk with ChunkLookupRequest"
+      ],
+      "requires": [
+        "repo_id",
+        "chunk_id"
+      ],
+      "returns": [
+        "chunk_id",
+        "repo_id",
+        "relative_path",
+        "symbol",
+        "kind",
+        "domain",
+        "language",
+        "extension",
+        "gpu_cluster",
+        "som_cluster",
+        "semantic_tags",
+        "summary",
+        "metadata_json"
+      ],
+      "service": "CodeIntelService",
+      "method": "LookupChunk",
+      "input_type": "ChunkLookupRequest",
+      "output_type": "ChunkLookupResponse",
+      "transport": "grpc",
+      "file": "proto/active/codeintel.proto",
+      "source_ref": "proto/active/codeintel.proto#CodeIntelService.LookupChunk",
+      "packet_kind": "rpc_method"
+    },
+    {
+      "tool_name": "EnrichmentService.BatchEnrich",
+      "llama_name": null,
+      "domain": "mcp_agents",
+      "ontology": [
+        "mcp",
+        "agent",
+        "tooling"
+      ],
+      "description": "gRPC RPC EnrichmentService.BatchEnrich: BatchEnrichRequest → BatchEnrichResponse (declared in proto/active/codeintel_enrichment.proto).",
+      "examples": [
+        "call EnrichmentService.BatchEnrich with BatchEnrichRequest"
+      ],
+      "requires": [
+        "refs",
+        "compute_embeddings",
+        "compute_clusters",
+        "compute_summaries",
+        "preferred_model",
+        "batch_size"
+      ],
+      "returns": [
+        "items",
+        "processed_count",
+        "failed_count",
+        "warnings"
+      ],
+      "service": "EnrichmentService",
+      "method": "BatchEnrich",
+      "input_type": "BatchEnrichRequest",
+      "output_type": "BatchEnrichResponse",
+      "transport": "grpc",
+      "file": "proto/active/codeintel_enrichment.proto",
+      "source_ref": "proto/active/codeintel_enrichment.proto#EnrichmentService.BatchEnrich",
+      "packet_kind": "rpc_method"
+    },
+    {
+      "tool_name": "EnrichmentService.SummarizeCluster",
+      "llama_name": null,
+      "domain": "mcp_agents",
+      "ontology": [
+        "mcp",
+        "agent",
+        "tooling"
+      ],
+      "description": "gRPC RPC EnrichmentService.SummarizeCluster: ClusterSummaryRequest → ClusterSummaryResponse (declared in proto/active/codeintel_enrichment.proto).",
+      "examples": [
+        "call EnrichmentService.SummarizeCluster with ClusterSummaryRequest"
+      ],
+      "requires": [
+        "repo_id",
+        "gpu_cluster",
+        "chunk_ids",
+        "max_chunks",
+        "preferred_model"
+      ],
+      "returns": [
+        "repo_id",
+        "gpu_cluster",
+        "summary",
+        "representative_chunk_ids",
+        "tags",
+        "metadata_json"
+      ],
+      "service": "EnrichmentService",
+      "method": "SummarizeCluster",
+      "input_type": "ClusterSummaryRequest",
+      "output_type": "ClusterSummaryResponse",
+      "transport": "grpc",
+      "file": "proto/active/codeintel_enrichment.proto",
+      "source_ref": "proto/active/codeintel_enrichment.proto#EnrichmentService.SummarizeCluster",
+      "packet_kind": "rpc_method"
+    },
+    {
+      "tool_name": "EmbeddingService.GenerateEmbeddings",
+      "llama_name": null,
+      "domain": "rag_retrieval",
+      "ontology": [
+        "mcp",
+        "agent",
+        "tooling",
+        "embedding"
+      ],
+      "description": "gRPC RPC EmbeddingService.GenerateEmbeddings: EmbeddingRequest → EmbeddingResponse (declared in proto/active/embedding.proto).",
+      "examples": [
+        "call EmbeddingService.GenerateEmbeddings with EmbeddingRequest"
+      ],
+      "requires": [
+        "chunks",
+        "batch_size",
+        "normalize",
+        "max_length"
+      ],
+      "returns": [
+        "embeddings",
+        "total_time_ms",
+        "model_name",
+        "embedding_dimension",
+        "status"
+      ],
+      "service": "EmbeddingService",
+      "method": "GenerateEmbeddings",
+      "input_type": "EmbeddingRequest",
+      "output_type": "EmbeddingResponse",
+      "transport": "grpc",
+      "file": "proto/active/embedding.proto",
+      "source_ref": "proto/active/embedding.proto#EmbeddingService.GenerateEmbeddings",
+      "packet_kind": "rpc_method"
+    },
+    {
+      "tool_name": "EmbeddingService.StreamEmbeddings",
+      "llama_name": null,
+      "domain": "rag_retrieval",
+      "ontology": [
+        "mcp",
+        "agent",
+        "tooling",
+        "embedding"
+      ],
+      "description": "gRPC RPC EmbeddingService.StreamEmbeddings: EmbeddingChunk → EmbeddingResult (declared in proto/active/embedding.proto).",
+      "examples": [
+        "call EmbeddingService.StreamEmbeddings with EmbeddingChunk"
+      ],
+      "requires": [
+        "chunk_id",
+        "text",
+        "file_path",
+        "language",
+        "metadata"
+      ],
+      "returns": [
+        "chunk_id",
+        "vector",
+        "processing_time_ms",
+        "token_count",
+        "status",
+        "sequence_number"
+      ],
+      "service": "EmbeddingService",
+      "method": "StreamEmbeddings",
+      "input_type": "EmbeddingChunk",
+      "output_type": "EmbeddingResult",
+      "transport": "grpc",
+      "file": "proto/active/embedding.proto",
+      "source_ref": "proto/active/embedding.proto#EmbeddingService.StreamEmbeddings",
+      "packet_kind": "rpc_method"
+    },
+    {
+      "tool_name": "EmbeddingService.Health",
+      "llama_name": null,
+      "domain": "rag_retrieval",
+      "ontology": [
+        "mcp",
+        "agent",
+        "tooling",
+        "embedding"
+      ],
+      "description": "gRPC RPC EmbeddingService.Health: HealthRequest → HealthResponse (declared in proto/active/embedding.proto).",
+      "examples": [
+        "call EmbeddingService.Health with HealthRequest"
+      ],
+      "requires": [
+        "service"
+      ],
+      "returns": [
+        "status",
+        "model_loaded",
+        "gpu_memory_used_gb",
+        "gpu_memory_total_gb",
+        "device",
+        "timestamp"
+      ],
+      "service": "EmbeddingService",
+      "method": "Health",
+      "input_type": "HealthRequest",
+      "output_type": "HealthResponse",
+      "transport": "grpc",
+      "file": "proto/active/embedding.proto",
+      "source_ref": "proto/active/embedding.proto#EmbeddingService.Health",
+      "packet_kind": "rpc_method"
+    },
+    {
+      "tool_name": "EmbeddingService.GetStats",
+      "llama_name": null,
+      "domain": "rag_retrieval",
+      "ontology": [
+        "mcp",
+        "agent",
+        "tooling",
+        "embedding"
+      ],
+      "description": "gRPC RPC EmbeddingService.GetStats: StatsRequest → StatsResponse (declared in proto/active/embedding.proto).",
+      "examples": [
+        "call EmbeddingService.GetStats with StatsRequest"
+      ],
+      "requires": [
+        "include_memory"
+      ],
+      "returns": [
+        "model_name",
+        "device",
+        "is_loaded",
+        "embedding_dimension",
+        "batch_size",
+        "max_length",
+        "total_requests",
+        "total_processing_time_s",
+        "avg_processing_time_ms",
+        "gpu_available",
+        "gpu_memory_allocated_gb",
+        "gpu_memory_reserved_gb",
+        "uptime_seconds"
+      ],
+      "service": "EmbeddingService",
+      "method": "GetStats",
+      "input_type": "StatsRequest",
+      "output_type": "StatsResponse",
+      "transport": "grpc",
+      "file": "proto/active/embedding.proto",
+      "source_ref": "proto/active/embedding.proto#EmbeddingService.GetStats",
+      "packet_kind": "rpc_method"
+    },
+    {
+      "tool_name": "GpuBridgeService.BatchCosine",
+      "llama_name": null,
+      "domain": "gpu_turbovec_libtorch",
+      "ontology": [
+        "gpu",
+        "turbovec",
+        "libtorch"
+      ],
+      "description": "gRPC RPC GpuBridgeService.BatchCosine: BatchCosineRequest → BatchCosineResponse (declared in proto/active/gpu_bridge.proto).",
+      "examples": [
+        "call GpuBridgeService.BatchCosine with BatchCosineRequest"
+      ],
+      "requires": [
+        "query_vector",
+        "candidate_vectors",
+        "candidate_count",
+        "dim"
+      ],
+      "returns": [
+        "scores",
+        "count"
+      ],
+      "service": "GpuBridgeService",
+      "method": "BatchCosine",
+      "input_type": "BatchCosineRequest",
+      "output_type": "BatchCosineResponse",
+      "transport": "grpc",
+      "file": "proto/active/gpu_bridge.proto",
+      "source_ref": "proto/active/gpu_bridge.proto#GpuBridgeService.BatchCosine",
+      "packet_kind": "rpc_method"
+    },
+    {
+      "tool_name": "GpuBridgeService.EncodeLatent",
+      "llama_name": null,
+      "domain": "gpu_turbovec_libtorch",
+      "ontology": [
+        "gpu",
+        "turbovec",
+        "libtorch"
+      ],
+      "description": "gRPC RPC GpuBridgeService.EncodeLatent: EncodeLatentRequest → EncodeLatentResponse (declared in proto/active/gpu_bridge.proto).",
+      "examples": [
+        "call GpuBridgeService.EncodeLatent with EncodeLatentRequest"
+      ],
+      "requires": [
+        "vectors",
+        "count",
+        "in_dim",
+        "out_dim"
+      ],
+      "returns": [
+        "encoded",
+        "count",
+        "out_dim"
+      ],
+      "service": "GpuBridgeService",
+      "method": "EncodeLatent",
+      "input_type": "EncodeLatentRequest",
+      "output_type": "EncodeLatentResponse",
+      "transport": "grpc",
+      "file": "proto/active/gpu_bridge.proto",
+      "source_ref": "proto/active/gpu_bridge.proto#GpuBridgeService.EncodeLatent",
+      "packet_kind": "rpc_method"
+    },
+    {
+      "tool_name": "GpuBridgeService.AssignSom",
+      "llama_name": null,
+      "domain": "gpu_turbovec_libtorch",
+      "ontology": [
+        "gpu",
+        "turbovec",
+        "libtorch"
+      ],
+      "description": "gRPC RPC GpuBridgeService.AssignSom: AssignSomRequest → AssignSomResponse (declared in proto/active/gpu_bridge.proto).",
+      "examples": [
+        "call GpuBridgeService.AssignSom with AssignSomRequest"
+      ],
+      "requires": [
+        "vectors",
+        "count"
+      ],
+      "returns": [
+        "cluster_ids",
+        "bmu_scores"
+      ],
+      "service": "GpuBridgeService",
+      "method": "AssignSom",
+      "input_type": "AssignSomRequest",
+      "output_type": "AssignSomResponse",
+      "transport": "grpc",
+      "file": "proto/active/gpu_bridge.proto",
+      "source_ref": "proto/active/gpu_bridge.proto#GpuBridgeService.AssignSom",
+      "packet_kind": "rpc_method"
+    },
+    {
+      "tool_name": "LibrarySearchService.SearchLibrary",
+      "llama_name": null,
+      "domain": "rag_retrieval",
+      "ontology": [
+        "retrieval",
+        "rag",
+        "search"
+      ],
+      "description": "gRPC RPC LibrarySearchService.SearchLibrary: LibrarySearchRequest → LibrarySearchResponse (declared in proto/active/library_search.proto).",
+      "examples": [
+        "call LibrarySearchService.SearchLibrary with LibrarySearchRequest"
+      ],
+      "requires": [
+        "query",
+        "jurisdiction",
+        "corpus_type",
+        "limit",
+        "case_id",
+        "user_id",
+        "query_embedding",
+        "weights",
+        "include_debug"
+      ],
+      "returns": [
+        "hits",
+        "total",
+        "meta",
+        "debug_json"
+      ],
+      "service": "LibrarySearchService",
+      "method": "SearchLibrary",
+      "input_type": "LibrarySearchRequest",
+      "output_type": "LibrarySearchResponse",
+      "transport": "grpc",
+      "file": "proto/active/library_search.proto",
+      "source_ref": "proto/active/library_search.proto#LibrarySearchService.SearchLibrary",
+      "packet_kind": "rpc_method"
+    },
+    {
+      "tool_name": "LibrarySearchService.StreamLibrary",
+      "llama_name": null,
+      "domain": "rag_retrieval",
+      "ontology": [
+        "retrieval",
+        "rag",
+        "search"
+      ],
+      "description": "gRPC RPC LibrarySearchService.StreamLibrary: LibrarySearchRequest → LibrarySearchEvent (declared in proto/active/library_search.proto).",
+      "examples": [
+        "call LibrarySearchService.StreamLibrary with LibrarySearchRequest"
+      ],
+      "requires": [
+        "query",
+        "jurisdiction",
+        "corpus_type",
+        "limit",
+        "case_id",
+        "user_id",
+        "query_embedding",
+        "weights",
+        "include_debug"
+      ],
+      "returns": [
+        "hit",
+        "progress",
+        "error"
+      ],
+      "service": "LibrarySearchService",
+      "method": "StreamLibrary",
+      "input_type": "LibrarySearchRequest",
+      "output_type": "LibrarySearchEvent",
+      "transport": "grpc",
+      "file": "proto/active/library_search.proto",
+      "source_ref": "proto/active/library_search.proto#LibrarySearchService.StreamLibrary",
+      "packet_kind": "rpc_method"
+    },
+    {
+      "tool_name": "LibrarySearchService.GetDocumentToc",
+      "llama_name": null,
+      "domain": "rag_retrieval",
+      "ontology": [
+        "document",
+        "pdf",
+        "parser",
+        "retrieval"
+      ],
+      "description": "gRPC RPC LibrarySearchService.GetDocumentToc: TocRequest → TocResponse (declared in proto/active/library_search.proto).",
+      "examples": [
+        "call LibrarySearchService.GetDocumentToc with TocRequest"
+      ],
+      "requires": [
+        "document_id",
+        "max_depth"
+      ],
+      "returns": [
+        "nodes",
+        "document_title",
+        "corpus_type"
+      ],
+      "service": "LibrarySearchService",
+      "method": "GetDocumentToc",
+      "input_type": "TocRequest",
+      "output_type": "TocResponse",
+      "transport": "grpc",
+      "file": "proto/active/library_search.proto",
+      "source_ref": "proto/active/library_search.proto#LibrarySearchService.GetDocumentToc",
+      "packet_kind": "rpc_method"
+    },
+    {
+      "tool_name": "LibrarySearchService.GetNodeContext",
+      "llama_name": null,
+      "domain": "rag_retrieval",
+      "ontology": [
+        "retrieval",
+        "rag",
+        "search"
+      ],
+      "description": "gRPC RPC LibrarySearchService.GetNodeContext: NodeContextRequest → NodeContextResponse (declared in proto/active/library_search.proto).",
+      "examples": [
+        "call LibrarySearchService.GetNodeContext with NodeContextRequest"
+      ],
+      "requires": [
+        "node_id",
+        "include_children",
+        "include_chunks",
+        "max_children"
+      ],
+      "returns": [
+        "node",
+        "full_text",
+        "chunks",
+        "children",
+        "breadcrumb"
+      ],
+      "service": "LibrarySearchService",
+      "method": "GetNodeContext",
+      "input_type": "NodeContextRequest",
+      "output_type": "NodeContextResponse",
+      "transport": "grpc",
+      "file": "proto/active/library_search.proto",
+      "source_ref": "proto/active/library_search.proto#LibrarySearchService.GetNodeContext",
+      "packet_kind": "rpc_method"
+    },
+    {
+      "tool_name": "LibrarySearchService.ResolveCitation",
+      "llama_name": null,
+      "domain": "rag_retrieval",
+      "ontology": [
+        "citations",
+        "research",
+        "sources",
+        "retrieval"
+      ],
+      "description": "gRPC RPC LibrarySearchService.ResolveCitation: CitationRequest → CitationResponse (declared in proto/active/library_search.proto).",
+      "examples": [
+        "call LibrarySearchService.ResolveCitation with CitationRequest"
+      ],
+      "requires": [
+        "citation",
+        "jurisdiction"
+      ],
+      "returns": [
+        "matches",
+        "total"
+      ],
+      "service": "LibrarySearchService",
+      "method": "ResolveCitation",
+      "input_type": "CitationRequest",
+      "output_type": "CitationResponse",
+      "transport": "grpc",
+      "file": "proto/active/library_search.proto",
+      "source_ref": "proto/active/library_search.proto#LibrarySearchService.ResolveCitation",
+      "packet_kind": "rpc_method"
+    },
+    {
+      "tool_name": "LibrarySearchService.Health",
+      "llama_name": null,
+      "domain": "rag_retrieval",
+      "ontology": [
+        "retrieval",
+        "rag",
+        "search"
+      ],
+      "description": "gRPC RPC LibrarySearchService.Health: HealthRequest → HealthResponse (declared in proto/active/library_search.proto).",
+      "examples": [
+        "call LibrarySearchService.Health with HealthRequest"
+      ],
+      "requires": [
+        "service"
+      ],
+      "returns": [
+        "status",
+        "pgvector_connected",
+        "qdrant_connected",
+        "redis_connected",
+        "embedding_service_up",
+        "timestamp",
+        "indexed_documents",
+        "indexed_chunks"
+      ],
+      "service": "LibrarySearchService",
+      "method": "Health",
+      "input_type": "HealthRequest",
+      "output_type": "HealthResponse",
+      "transport": "grpc",
+      "file": "proto/active/library_search.proto",
+      "source_ref": "proto/active/library_search.proto#LibrarySearchService.Health",
+      "packet_kind": "rpc_method"
+    },
+    {
+      "tool_name": "RetrievalService.SearchEvidence",
+      "llama_name": null,
+      "domain": "rag_retrieval",
+      "ontology": [
+        "evidence",
+        "storage",
+        "seaweedfs",
+        "retrieval",
+        "legal"
+      ],
+      "description": "gRPC RPC RetrievalService.SearchEvidence: EvidenceSearchRequest → EvidenceSearchResponse (declared in proto/active/retrieval.proto).",
+      "examples": [
+        "call RetrievalService.SearchEvidence with EvidenceSearchRequest"
+      ],
+      "requires": [
+        "ids",
+        "query",
+        "case_id",
+        "limit",
+        "jurisdiction",
+        "hop",
+        "prefilter",
+        "rank",
+        "query_embedding",
+        "include_debug"
+      ],
+      "returns": [
+        "results",
+        "bundles",
+        "timing",
+        "cache_source",
+        "debug_json"
+      ],
+      "service": "RetrievalService",
+      "method": "SearchEvidence",
+      "input_type": "EvidenceSearchRequest",
+      "output_type": "EvidenceSearchResponse",
+      "transport": "grpc",
+      "file": "proto/active/retrieval.proto",
+      "source_ref": "proto/active/retrieval.proto#RetrievalService.SearchEvidence",
+      "packet_kind": "rpc_method"
+    },
+    {
+      "tool_name": "RetrievalService.StreamEvidence",
+      "llama_name": null,
+      "domain": "rag_retrieval",
+      "ontology": [
+        "evidence",
+        "storage",
+        "seaweedfs",
+        "retrieval",
+        "legal"
+      ],
+      "description": "gRPC RPC RetrievalService.StreamEvidence: EvidenceSearchRequest → EvidenceBundleEvent (declared in proto/active/retrieval.proto).",
+      "examples": [
+        "call RetrievalService.StreamEvidence with EvidenceSearchRequest"
+      ],
+      "requires": [
+        "ids",
+        "query",
+        "case_id",
+        "limit",
+        "jurisdiction",
+        "hop",
+        "prefilter",
+        "rank",
+        "query_embedding",
+        "include_debug"
+      ],
+      "returns": [
+        "bundle",
+        "progress",
+        "error"
+      ],
+      "service": "RetrievalService",
+      "method": "StreamEvidence",
+      "input_type": "EvidenceSearchRequest",
+      "output_type": "EvidenceBundleEvent",
+      "transport": "grpc",
+      "file": "proto/active/retrieval.proto",
+      "source_ref": "proto/active/retrieval.proto#RetrievalService.StreamEvidence",
+      "packet_kind": "rpc_method"
+    },
+    {
+      "tool_name": "RetrievalService.SearchCodebase",
+      "llama_name": null,
+      "domain": "rag_retrieval",
+      "ontology": [
+        "retrieval",
+        "rag",
+        "search"
+      ],
+      "description": "gRPC RPC RetrievalService.SearchCodebase: CodebaseSearchRequest → CodebaseSearchResponse (declared in proto/active/retrieval.proto).",
+      "examples": [
+        "call RetrievalService.SearchCodebase with CodebaseSearchRequest"
+      ],
+      "requires": [
+        "query",
+        "limit",
+        "content_weight",
+        "signature_weight",
+        "kinds",
+        "http_method",
+        "path_prefixes",
+        "include_debug"
+      ],
+      "returns": [
+        "chunks",
+        "total_ms",
+        "debug_json"
+      ],
+      "service": "RetrievalService",
+      "method": "SearchCodebase",
+      "input_type": "CodebaseSearchRequest",
+      "output_type": "CodebaseSearchResponse",
+      "transport": "grpc",
+      "file": "proto/active/retrieval.proto",
+      "source_ref": "proto/active/retrieval.proto#RetrievalService.SearchCodebase",
+      "packet_kind": "rpc_method"
+    },
+    {
+      "tool_name": "RetrievalService.StreamCodebase",
+      "llama_name": null,
+      "domain": "rag_retrieval",
+      "ontology": [
+        "retrieval",
+        "rag",
+        "search"
+      ],
+      "description": "gRPC RPC RetrievalService.StreamCodebase: CodebaseSearchRequest → CodebaseChunkEvent (declared in proto/active/retrieval.proto).",
+      "examples": [
+        "call RetrievalService.StreamCodebase with CodebaseSearchRequest"
+      ],
+      "requires": [
+        "query",
+        "limit",
+        "content_weight",
+        "signature_weight",
+        "kinds",
+        "http_method",
+        "path_prefixes",
+        "include_debug"
+      ],
+      "returns": [
+        "chunk",
+        "progress",
+        "error"
+      ],
+      "service": "RetrievalService",
+      "method": "StreamCodebase",
+      "input_type": "CodebaseSearchRequest",
+      "output_type": "CodebaseChunkEvent",
+      "transport": "grpc",
+      "file": "proto/active/retrieval.proto",
+      "source_ref": "proto/active/retrieval.proto#RetrievalService.StreamCodebase",
+      "packet_kind": "rpc_method"
+    },
+    {
+      "tool_name": "RetrievalService.SearchChunks",
+      "llama_name": null,
+      "domain": "rag_retrieval",
+      "ontology": [
+        "retrieval",
+        "rag",
+        "search"
+      ],
+      "description": "gRPC RPC RetrievalService.SearchChunks: SearchChunksRequest → SearchChunksResponse (declared in proto/active/retrieval.proto).",
+      "examples": [
+        "call RetrievalService.SearchChunks with SearchChunksRequest"
+      ],
+      "requires": [
+        "query",
+        "limit",
+        "collection",
+        "filters",
+        "ids",
+        "tags",
+        "source_filter",
+        "cluster_ids",
+        "som_clusters",
+        "created_after",
+        "updated_after"
+      ],
+      "returns": [
+        "results",
+        "total_ms"
+      ],
+      "service": "RetrievalService",
+      "method": "SearchChunks",
+      "input_type": "SearchChunksRequest",
+      "output_type": "SearchChunksResponse",
+      "transport": "grpc",
+      "file": "proto/active/retrieval.proto",
+      "source_ref": "proto/active/retrieval.proto#RetrievalService.SearchChunks",
+      "packet_kind": "rpc_method"
+    },
+    {
+      "tool_name": "RetrievalService.GetClusterSummary",
+      "llama_name": null,
+      "domain": "rag_retrieval",
+      "ontology": [
+        "retrieval",
+        "rag",
+        "search"
+      ],
+      "description": "gRPC RPC RetrievalService.GetClusterSummary: ClusterSummaryRequest → ClusterSummaryResponse (declared in proto/active/retrieval.proto).",
+      "examples": [
+        "call RetrievalService.GetClusterSummary with ClusterSummaryRequest"
+      ],
+      "requires": [
+        "cluster_id",
+        "cluster_type"
+      ],
+      "returns": [
+        "cluster_id",
+        "summary",
+        "patterns",
+        "keywords",
+        "metadata"
+      ],
+      "service": "RetrievalService",
+      "method": "GetClusterSummary",
+      "input_type": "ClusterSummaryRequest",
+      "output_type": "ClusterSummaryResponse",
+      "transport": "grpc",
+      "file": "proto/active/retrieval.proto",
+      "source_ref": "proto/active/retrieval.proto#RetrievalService.GetClusterSummary",
+      "packet_kind": "rpc_method"
+    },
+    {
+      "tool_name": "RetrievalService.ExpandAstNeighbors",
+      "llama_name": null,
+      "domain": "rag_retrieval",
+      "ontology": [
+        "retrieval",
+        "rag",
+        "search",
+        "graph"
+      ],
+      "description": "gRPC RPC RetrievalService.ExpandAstNeighbors: AstExpansionRequest → AstExpansionResponse (declared in proto/active/retrieval.proto).",
+      "examples": [
+        "call RetrievalService.ExpandAstNeighbors with AstExpansionRequest"
+      ],
+      "requires": [
+        "symbol",
+        "file_path",
+        "depth"
+      ],
+      "returns": [
+        "neighbors",
+        "edges"
+      ],
+      "service": "RetrievalService",
+      "method": "ExpandAstNeighbors",
+      "input_type": "AstExpansionRequest",
+      "output_type": "AstExpansionResponse",
+      "transport": "grpc",
+      "file": "proto/active/retrieval.proto",
+      "source_ref": "proto/active/retrieval.proto#RetrievalService.ExpandAstNeighbors",
+      "packet_kind": "rpc_method"
+    },
+    {
+      "tool_name": "RetrievalService.GetTopologyContext",
+      "llama_name": null,
+      "domain": "rag_retrieval",
+      "ontology": [
+        "graph",
+        "neo4j",
+        "relationship"
+      ],
+      "description": "gRPC RPC RetrievalService.GetTopologyContext: TopologyRequest → TopologyResponse (declared in proto/active/retrieval.proto).",
+      "examples": [
+        "call RetrievalService.GetTopologyContext with TopologyRequest"
+      ],
+      "requires": [
+        "query",
+        "bmu_row",
+        "bmu_col",
+        "radius",
+        "ids",
+        "tags",
+        "created_after",
+        "updated_after"
+      ],
+      "returns": [
+        "neighbors",
+        "som_metadata_json",
+        "cluster_metadata"
+      ],
+      "service": "RetrievalService",
+      "method": "GetTopologyContext",
+      "input_type": "TopologyRequest",
+      "output_type": "TopologyResponse",
+      "transport": "grpc",
+      "file": "proto/active/retrieval.proto",
+      "source_ref": "proto/active/retrieval.proto#RetrievalService.GetTopologyContext",
+      "packet_kind": "rpc_method"
+    },
+    {
+      "tool_name": "RetrievalService.GetResearchContext",
+      "llama_name": null,
+      "domain": "rag_retrieval",
+      "ontology": [
+        "retrieval",
+        "rag",
+        "search"
+      ],
+      "description": "gRPC RPC RetrievalService.GetResearchContext: ResearchContextRequest → ResearchContextResponse (declared in proto/active/retrieval.proto).",
+      "examples": [
+        "call RetrievalService.GetResearchContext with ResearchContextRequest"
+      ],
+      "requires": [
+        "query",
+        "limit",
+        "source_filter",
+        "score_threshold",
+        "query_embedding",
+        "ids",
+        "tags",
+        "cluster_ids",
+        "som_clusters",
+        "created_after",
+        "updated_after"
+      ],
+      "returns": [
+        "research",
+        "total_ms"
+      ],
+      "service": "RetrievalService",
+      "method": "GetResearchContext",
+      "input_type": "ResearchContextRequest",
+      "output_type": "ResearchContextResponse",
+      "transport": "grpc",
+      "file": "proto/active/retrieval.proto",
+      "source_ref": "proto/active/retrieval.proto#RetrievalService.GetResearchContext",
+      "packet_kind": "rpc_method"
+    },
+    {
+      "tool_name": "RetrievalService.Health",
+      "llama_name": null,
+      "domain": "rag_retrieval",
+      "ontology": [
+        "retrieval",
+        "rag",
+        "search"
+      ],
+      "description": "gRPC RPC RetrievalService.Health: HealthRequest → HealthResponse (declared in proto/active/retrieval.proto).",
+      "examples": [
+        "call RetrievalService.Health with HealthRequest"
+      ],
+      "requires": [
+        "service"
+      ],
+      "returns": [
+        "status",
+        "pgvector_connected",
+        "qdrant_connected",
+        "redis_connected",
+        "embedding_service_up",
+        "timestamp"
+      ],
+      "service": "RetrievalService",
+      "method": "Health",
+      "input_type": "HealthRequest",
+      "output_type": "HealthResponse",
+      "transport": "grpc",
+      "file": "proto/active/retrieval.proto",
+      "source_ref": "proto/active/retrieval.proto#RetrievalService.Health",
+      "packet_kind": "rpc_method"
+    },
+    {
+      "tool_name": "ToolCallingService.ExecuteTool",
+      "llama_name": null,
+      "domain": "mcp_agents",
+      "ontology": [
+        "mcp",
+        "agent",
+        "tooling"
+      ],
+      "description": "gRPC RPC ToolCallingService.ExecuteTool: ToolCallRequest → ToolCallResponse (declared in proto/active/tool_calling.proto).",
+      "examples": [
+        "call ToolCallingService.ExecuteTool with ToolCallRequest"
+      ],
+      "requires": [
+        "request_id",
+        "tool_name",
+        "arguments",
+        "case_id",
+        "user_id",
+        "retrieval_confidence",
+        "message"
+      ],
+      "returns": [
+        "request_id",
+        "ok",
+        "tool_name",
+        "result",
+        "duration_ms",
+        "result_count",
+        "scores",
+        "metadata",
+        "error"
+      ],
+      "service": "ToolCallingService",
+      "method": "ExecuteTool",
+      "input_type": "ToolCallRequest",
+      "output_type": "ToolCallResponse",
+      "transport": "grpc",
+      "file": "proto/active/tool_calling.proto",
+      "source_ref": "proto/active/tool_calling.proto#ToolCallingService.ExecuteTool",
+      "packet_kind": "rpc_method"
+    },
+    {
+      "tool_name": "ToolCallingService.ExecuteToolBatch",
+      "llama_name": null,
+      "domain": "mcp_agents",
+      "ontology": [
+        "mcp",
+        "agent",
+        "tooling"
+      ],
+      "description": "gRPC RPC ToolCallingService.ExecuteToolBatch: ToolCallBatchRequest → ToolCallBatchResponse (declared in proto/active/tool_calling.proto).",
+      "examples": [
+        "call ToolCallingService.ExecuteToolBatch with ToolCallBatchRequest"
+      ],
+      "requires": [
+        "calls",
+        "parallel"
+      ],
+      "returns": [
+        "results",
+        "total_duration_ms"
+      ],
+      "service": "ToolCallingService",
+      "method": "ExecuteToolBatch",
+      "input_type": "ToolCallBatchRequest",
+      "output_type": "ToolCallBatchResponse",
+      "transport": "grpc",
+      "file": "proto/active/tool_calling.proto",
+      "source_ref": "proto/active/tool_calling.proto#ToolCallingService.ExecuteToolBatch",
+      "packet_kind": "rpc_method"
+    },
+    {
+      "tool_name": "ToolCallingService.ExecuteToolStream",
+      "llama_name": null,
+      "domain": "mcp_agents",
+      "ontology": [
+        "mcp",
+        "agent",
+        "tooling"
+      ],
+      "description": "gRPC RPC ToolCallingService.ExecuteToolStream: ToolCallRequest → ToolCallEvent (declared in proto/active/tool_calling.proto).",
+      "examples": [
+        "call ToolCallingService.ExecuteToolStream with ToolCallRequest"
+      ],
+      "requires": [
+        "request_id",
+        "tool_name",
+        "arguments",
+        "case_id",
+        "user_id",
+        "retrieval_confidence",
+        "message"
+      ],
+      "returns": [
+        "request_id",
+        "event_type",
+        "tool_name",
+        "data",
+        "elapsed_ms"
+      ],
+      "service": "ToolCallingService",
+      "method": "ExecuteToolStream",
+      "input_type": "ToolCallRequest",
+      "output_type": "ToolCallEvent",
+      "transport": "grpc",
+      "file": "proto/active/tool_calling.proto",
+      "source_ref": "proto/active/tool_calling.proto#ToolCallingService.ExecuteToolStream",
+      "packet_kind": "rpc_method"
+    },
+    {
+      "tool_name": "ToolCallingService.ListTools",
+      "llama_name": null,
+      "domain": "mcp_agents",
+      "ontology": [
+        "mcp",
+        "agent",
+        "tooling"
+      ],
+      "description": "gRPC RPC ToolCallingService.ListTools: ListToolsRequest → ListToolsResponse (declared in proto/active/tool_calling.proto).",
+      "examples": [
+        "call ToolCallingService.ListTools with ListToolsRequest"
+      ],
+      "requires": [
+        "category"
+      ],
+      "returns": [
+        "tools",
+        "total"
+      ],
+      "service": "ToolCallingService",
+      "method": "ListTools",
+      "input_type": "ListToolsRequest",
+      "output_type": "ListToolsResponse",
+      "transport": "grpc",
+      "file": "proto/active/tool_calling.proto",
+      "source_ref": "proto/active/tool_calling.proto#ToolCallingService.ListTools",
+      "packet_kind": "rpc_method"
+    },
+    {
+      "tool_name": "TurboVecService.Health",
+      "llama_name": null,
+      "domain": "qdrant_vector_index",
+      "ontology": [
+        "gpu",
+        "turbovec",
+        "libtorch"
+      ],
+      "description": "gRPC RPC TurboVecService.Health: HealthRequest → HealthResponse (declared in proto/active/turbovec.proto).",
+      "examples": [
+        "call TurboVecService.Health with HealthRequest"
+      ],
+      "requires": [
+        "ok",
+        "indexed",
+        "dim",
+        "bits",
+        "backend"
+      ],
+      "returns": [],
+      "service": "TurboVecService",
+      "method": "Health",
+      "input_type": "HealthRequest",
+      "output_type": "HealthResponse",
+      "transport": "grpc",
+      "file": "proto/active/turbovec.proto",
+      "source_ref": "proto/active/turbovec.proto#TurboVecService.Health",
+      "packet_kind": "rpc_method"
+    },
+    {
+      "tool_name": "TurboVecService.Search",
+      "llama_name": null,
+      "domain": "qdrant_vector_index",
+      "ontology": [
+        "gpu",
+        "turbovec",
+        "libtorch",
+        "retrieval"
+      ],
+      "description": "gRPC RPC TurboVecService.Search: TurboSearchRequest → TurboSearchResponse (declared in proto/active/turbovec.proto).",
+      "examples": [
+        "call TurboVecService.Search with TurboSearchRequest"
+      ],
+      "requires": [
+        "query_vector",
+        "top_k",
+        "transform_id"
+      ],
+      "returns": [
+        "id",
+        "score",
+        "cluster_id",
+        "candidates",
+        "backend",
+        "indexed"
+      ],
+      "service": "TurboVecService",
+      "method": "Search",
+      "input_type": "TurboSearchRequest",
+      "output_type": "TurboSearchResponse",
+      "transport": "grpc",
+      "file": "proto/active/turbovec.proto",
+      "source_ref": "proto/active/turbovec.proto#TurboVecService.Search",
+      "packet_kind": "rpc_method"
+    },
+    {
+      "tool_name": "TurboVecService.Transform",
+      "llama_name": null,
+      "domain": "qdrant_vector_index",
+      "ontology": [
+        "gpu",
+        "turbovec",
+        "libtorch"
+      ],
+      "description": "gRPC RPC TurboVecService.Transform: TransformRequest → TransformResponse (declared in proto/active/turbovec.proto).",
+      "examples": [
+        "call TurboVecService.Transform with TransformRequest"
+      ],
+      "requires": [
+        "vectors",
+        "count",
+        "in_dim",
+        "out_dim",
+        "transform_id"
+      ],
+      "returns": [
+        "projected_vectors",
+        "count",
+        "out_dim"
+      ],
+      "service": "TurboVecService",
+      "method": "Transform",
+      "input_type": "TransformRequest",
+      "output_type": "TransformResponse",
+      "transport": "grpc",
+      "file": "proto/active/turbovec.proto",
+      "source_ref": "proto/active/turbovec.proto#TurboVecService.Transform",
+      "packet_kind": "rpc_method"
+    },
+    {
+      "tool_name": "TurboVecService.Upsert",
+      "llama_name": null,
+      "domain": "qdrant_vector_index",
+      "ontology": [
+        "gpu",
+        "turbovec",
+        "libtorch"
+      ],
+      "description": "gRPC RPC TurboVecService.Upsert: UpsertRequest → UpsertResponse (declared in proto/active/turbovec.proto).",
+      "examples": [
+        "call TurboVecService.Upsert with UpsertRequest"
+      ],
+      "requires": [
+        "records"
+      ],
+      "returns": [
+        "indexed",
+        "inserted",
+        "updated",
+        "backend"
+      ],
+      "service": "TurboVecService",
+      "method": "Upsert",
+      "input_type": "UpsertRequest",
+      "output_type": "UpsertResponse",
+      "transport": "grpc",
+      "file": "proto/active/turbovec.proto",
+      "source_ref": "proto/active/turbovec.proto#TurboVecService.Upsert",
+      "packet_kind": "rpc_method"
+    },
+    {
+      "tool_name": "CyberElephantService.ProcessDocuments",
+      "llama_name": null,
+      "domain": "mcp_agents",
+      "ontology": [
+        "document",
+        "pdf",
+        "parser",
+        "retrieval",
+        "embedding"
+      ],
+      "description": "gRPC RPC CyberElephantService.ProcessDocuments: DocumentBatch → VectorSearchResponse (declared in proto/active/vectors.proto).",
+      "examples": [
+        "call CyberElephantService.ProcessDocuments with DocumentBatch"
+      ],
+      "requires": [
+        "documents",
+        "batch_id",
+        "options"
+      ],
+      "returns": [
+        "documents",
+        "clusters",
+        "stats",
+        "session_id"
+      ],
+      "service": "CyberElephantService",
+      "method": "ProcessDocuments",
+      "input_type": "DocumentBatch",
+      "output_type": "VectorSearchResponse",
+      "transport": "grpc",
+      "file": "proto/active/vectors.proto",
+      "source_ref": "proto/active/vectors.proto#CyberElephantService.ProcessDocuments",
+      "packet_kind": "rpc_method"
+    },
+    {
+      "tool_name": "CyberElephantService.SearchSimilar",
+      "llama_name": null,
+      "domain": "mcp_agents",
+      "ontology": [
+        "retrieval",
+        "rag",
+        "search",
+        "embedding"
+      ],
+      "description": "gRPC RPC CyberElephantService.SearchSimilar: VectorQuery → VectorSearchResponse (declared in proto/active/vectors.proto).",
+      "examples": [
+        "call CyberElephantService.SearchSimilar with VectorQuery"
+      ],
+      "requires": [
+        "query_text",
+        "query_embedding",
+        "limit",
+        "threshold",
+        "document_types",
+        "filters"
+      ],
+      "returns": [
+        "documents",
+        "clusters",
+        "stats",
+        "session_id"
+      ],
+      "service": "CyberElephantService",
+      "method": "SearchSimilar",
+      "input_type": "VectorQuery",
+      "output_type": "VectorSearchResponse",
+      "transport": "grpc",
+      "file": "proto/active/vectors.proto",
+      "source_ref": "proto/active/vectors.proto#CyberElephantService.SearchSimilar",
+      "packet_kind": "rpc_method"
+    },
+    {
+      "tool_name": "CyberElephantService.GetDocumentById",
+      "llama_name": null,
+      "domain": "mcp_agents",
+      "ontology": [
+        "document",
+        "pdf",
+        "parser",
+        "embedding"
+      ],
+      "description": "gRPC RPC CyberElephantService.GetDocumentById: DocumentIdRequest → DocumentVector (declared in proto/active/vectors.proto).",
+      "examples": [
+        "call CyberElephantService.GetDocumentById with DocumentIdRequest"
+      ],
+      "requires": [
+        "id"
+      ],
+      "returns": [
+        "id",
+        "title",
+        "content_snippet",
+        "embedding",
+        "projected_3d",
+        "document_type",
+        "metadata"
+      ],
+      "service": "CyberElephantService",
+      "method": "GetDocumentById",
+      "input_type": "DocumentIdRequest",
+      "output_type": "DocumentVector",
+      "transport": "grpc",
+      "file": "proto/active/vectors.proto",
+      "source_ref": "proto/active/vectors.proto#CyberElephantService.GetDocumentById",
+      "packet_kind": "rpc_method"
+    },
+    {
+      "tool_name": "CyberElephantService.GetClusters",
+      "llama_name": null,
+      "domain": "mcp_agents",
+      "ontology": [
+        "mcp",
+        "agent",
+        "tooling"
+      ],
+      "description": "gRPC RPC CyberElephantService.GetClusters: ClusterRequest → ClusterResponse (declared in proto/active/vectors.proto).",
+      "examples": [
+        "call CyberElephantService.GetClusters with ClusterRequest"
+      ],
+      "requires": [
+        "cluster_id",
+        "include_documents"
+      ],
+      "returns": [
+        "clusters",
+        "stats"
+      ],
+      "service": "CyberElephantService",
+      "method": "GetClusters",
+      "input_type": "ClusterRequest",
+      "output_type": "ClusterResponse",
+      "transport": "grpc",
+      "file": "proto/active/vectors.proto",
+      "source_ref": "proto/active/vectors.proto#CyberElephantService.GetClusters",
+      "packet_kind": "rpc_method"
+    },
+    {
+      "tool_name": "CyberElephantService.UpdateClusters",
+      "llama_name": null,
+      "domain": "mcp_agents",
+      "ontology": [
+        "mcp",
+        "agent",
+        "tooling"
+      ],
+      "description": "gRPC RPC CyberElephantService.UpdateClusters: ClusterUpdateRequest → ClusterResponse (declared in proto/active/vectors.proto).",
+      "examples": [
+        "call CyberElephantService.UpdateClusters with ClusterUpdateRequest"
+      ],
+      "requires": [
+        "cluster_id",
+        "options"
+      ],
+      "returns": [
+        "clusters",
+        "stats"
+      ],
+      "service": "CyberElephantService",
+      "method": "UpdateClusters",
+      "input_type": "ClusterUpdateRequest",
+      "output_type": "ClusterResponse",
+      "transport": "grpc",
+      "file": "proto/active/vectors.proto",
+      "source_ref": "proto/active/vectors.proto#CyberElephantService.UpdateClusters",
+      "packet_kind": "rpc_method"
+    },
+    {
+      "tool_name": "CyberElephantService.GetStatus",
+      "llama_name": null,
+      "domain": "mcp_agents",
+      "ontology": [
+        "mcp",
+        "agent",
+        "tooling"
+      ],
+      "description": "gRPC RPC CyberElephantService.GetStatus: StatusRequest → SystemStatus (declared in proto/active/vectors.proto).",
+      "examples": [
+        "call CyberElephantService.GetStatus with StatusRequest"
+      ],
+      "requires": [
+        "include_metrics"
+      ],
+      "returns": [
+        "healthy",
+        "version",
+        "metrics",
+        "available_models",
+        "gpu_available"
+      ],
+      "service": "CyberElephantService",
+      "method": "GetStatus",
+      "input_type": "StatusRequest",
+      "output_type": "SystemStatus",
+      "transport": "grpc",
+      "file": "proto/active/vectors.proto",
+      "source_ref": "proto/active/vectors.proto#CyberElephantService.GetStatus",
+      "packet_kind": "rpc_method"
+    },
+    {
+      "tool_name": "CyberElephantService.HealthCheck",
+      "llama_name": null,
+      "domain": "mcp_agents",
+      "ontology": [
+        "mcp",
+        "agent",
+        "tooling"
+      ],
+      "description": "gRPC RPC CyberElephantService.HealthCheck: HealthRequest → HealthResponse (declared in proto/active/vectors.proto).",
+      "examples": [
+        "call CyberElephantService.HealthCheck with HealthRequest"
+      ],
+      "requires": [
+        "component"
+      ],
+      "returns": [
+        "healthy",
+        "status",
+        "details"
+      ],
+      "service": "CyberElephantService",
+      "method": "HealthCheck",
+      "input_type": "HealthRequest",
+      "output_type": "HealthResponse",
+      "transport": "grpc",
+      "file": "proto/active/vectors.proto",
+      "source_ref": "proto/active/vectors.proto#CyberElephantService.HealthCheck",
+      "packet_kind": "rpc_method"
+    },
+    {
+      "tool_name": "LibrarySearchService.SearchLibrary",
+      "llama_name": null,
+      "domain": "rag_retrieval",
+      "ontology": [
+        "retrieval",
+        "rag",
+        "search"
+      ],
+      "description": "gRPC RPC LibrarySearchService.SearchLibrary: LibrarySearchRequest → LibrarySearchResponse (declared in sveltekit-frontend/proto/active/library_search.proto).",
+      "examples": [
+        "call LibrarySearchService.SearchLibrary with LibrarySearchRequest"
+      ],
+      "requires": [
+        "query",
+        "jurisdiction",
+        "corpus_type",
+        "limit",
+        "case_id",
+        "user_id",
+        "query_embedding",
+        "weights",
+        "include_debug"
+      ],
+      "returns": [
+        "hits",
+        "total",
+        "meta",
+        "debug_json"
+      ],
+      "service": "LibrarySearchService",
+      "method": "SearchLibrary",
+      "input_type": "LibrarySearchRequest",
+      "output_type": "LibrarySearchResponse",
+      "transport": "grpc",
+      "file": "sveltekit-frontend/proto/active/library_search.proto",
+      "source_ref": "sveltekit-frontend/proto/active/library_search.proto#LibrarySearchService.SearchLibrary",
+      "packet_kind": "rpc_method"
+    },
+    {
+      "tool_name": "LibrarySearchService.StreamLibrary",
+      "llama_name": null,
+      "domain": "rag_retrieval",
+      "ontology": [
+        "retrieval",
+        "rag",
+        "search"
+      ],
+      "description": "gRPC RPC LibrarySearchService.StreamLibrary: LibrarySearchRequest → LibrarySearchEvent (declared in sveltekit-frontend/proto/active/library_search.proto).",
+      "examples": [
+        "call LibrarySearchService.StreamLibrary with LibrarySearchRequest"
+      ],
+      "requires": [
+        "query",
+        "jurisdiction",
+        "corpus_type",
+        "limit",
+        "case_id",
+        "user_id",
+        "query_embedding",
+        "weights",
+        "include_debug"
+      ],
+      "returns": [
+        "hit",
+        "progress",
+        "error"
+      ],
+      "service": "LibrarySearchService",
+      "method": "StreamLibrary",
+      "input_type": "LibrarySearchRequest",
+      "output_type": "LibrarySearchEvent",
+      "transport": "grpc",
+      "file": "sveltekit-frontend/proto/active/library_search.proto",
+      "source_ref": "sveltekit-frontend/proto/active/library_search.proto#LibrarySearchService.StreamLibrary",
+      "packet_kind": "rpc_method"
+    },
+    {
+      "tool_name": "LibrarySearchService.GetDocumentToc",
+      "llama_name": null,
+      "domain": "rag_retrieval",
+      "ontology": [
+        "document",
+        "pdf",
+        "parser",
+        "retrieval"
+      ],
+      "description": "gRPC RPC LibrarySearchService.GetDocumentToc: TocRequest → TocResponse (declared in sveltekit-frontend/proto/active/library_search.proto).",
+      "examples": [
+        "call LibrarySearchService.GetDocumentToc with TocRequest"
+      ],
+      "requires": [
+        "document_id",
+        "max_depth"
+      ],
+      "returns": [
+        "nodes",
+        "document_title",
+        "corpus_type"
+      ],
+      "service": "LibrarySearchService",
+      "method": "GetDocumentToc",
+      "input_type": "TocRequest",
+      "output_type": "TocResponse",
+      "transport": "grpc",
+      "file": "sveltekit-frontend/proto/active/library_search.proto",
+      "source_ref": "sveltekit-frontend/proto/active/library_search.proto#LibrarySearchService.GetDocumentToc",
+      "packet_kind": "rpc_method"
+    },
+    {
+      "tool_name": "LibrarySearchService.GetNodeContext",
+      "llama_name": null,
+      "domain": "rag_retrieval",
+      "ontology": [
+        "retrieval",
+        "rag",
+        "search"
+      ],
+      "description": "gRPC RPC LibrarySearchService.GetNodeContext: NodeContextRequest → NodeContextResponse (declared in sveltekit-frontend/proto/active/library_search.proto).",
+      "examples": [
+        "call LibrarySearchService.GetNodeContext with NodeContextRequest"
+      ],
+      "requires": [
+        "node_id",
+        "include_children",
+        "include_chunks",
+        "max_children"
+      ],
+      "returns": [
+        "node",
+        "full_text",
+        "chunks",
+        "children",
+        "breadcrumb"
+      ],
+      "service": "LibrarySearchService",
+      "method": "GetNodeContext",
+      "input_type": "NodeContextRequest",
+      "output_type": "NodeContextResponse",
+      "transport": "grpc",
+      "file": "sveltekit-frontend/proto/active/library_search.proto",
+      "source_ref": "sveltekit-frontend/proto/active/library_search.proto#LibrarySearchService.GetNodeContext",
+      "packet_kind": "rpc_method"
+    },
+    {
+      "tool_name": "LibrarySearchService.ResolveCitation",
+      "llama_name": null,
+      "domain": "rag_retrieval",
+      "ontology": [
+        "citations",
+        "research",
+        "sources",
+        "retrieval"
+      ],
+      "description": "gRPC RPC LibrarySearchService.ResolveCitation: CitationRequest → CitationResponse (declared in sveltekit-frontend/proto/active/library_search.proto).",
+      "examples": [
+        "call LibrarySearchService.ResolveCitation with CitationRequest"
+      ],
+      "requires": [
+        "citation",
+        "jurisdiction"
+      ],
+      "returns": [
+        "matches",
+        "total"
+      ],
+      "service": "LibrarySearchService",
+      "method": "ResolveCitation",
+      "input_type": "CitationRequest",
+      "output_type": "CitationResponse",
+      "transport": "grpc",
+      "file": "sveltekit-frontend/proto/active/library_search.proto",
+      "source_ref": "sveltekit-frontend/proto/active/library_search.proto#LibrarySearchService.ResolveCitation",
+      "packet_kind": "rpc_method"
+    },
+    {
+      "tool_name": "LibrarySearchService.Health",
+      "llama_name": null,
+      "domain": "rag_retrieval",
+      "ontology": [
+        "retrieval",
+        "rag",
+        "search"
+      ],
+      "description": "gRPC RPC LibrarySearchService.Health: HealthRequest → HealthResponse (declared in sveltekit-frontend/proto/active/library_search.proto).",
+      "examples": [
+        "call LibrarySearchService.Health with HealthRequest"
+      ],
+      "requires": [
+        "service"
+      ],
+      "returns": [
+        "status",
+        "pgvector_connected",
+        "qdrant_connected",
+        "redis_connected",
+        "embedding_service_up",
+        "timestamp",
+        "indexed_documents",
+        "indexed_chunks"
+      ],
+      "service": "LibrarySearchService",
+      "method": "Health",
+      "input_type": "HealthRequest",
+      "output_type": "HealthResponse",
+      "transport": "grpc",
+      "file": "sveltekit-frontend/proto/active/library_search.proto",
+      "source_ref": "sveltekit-frontend/proto/active/library_search.proto#LibrarySearchService.Health",
+      "packet_kind": "rpc_method"
+    },
+    {
+      "tool_name": "RetrievalService.SearchEvidence",
+      "llama_name": null,
+      "domain": "rag_retrieval",
+      "ontology": [
+        "evidence",
+        "storage",
+        "seaweedfs",
+        "retrieval",
+        "legal"
+      ],
+      "description": "gRPC RPC RetrievalService.SearchEvidence: EvidenceSearchRequest → EvidenceSearchResponse (declared in sveltekit-frontend/proto/active/retrieval.proto).",
+      "examples": [
+        "call RetrievalService.SearchEvidence with EvidenceSearchRequest"
+      ],
+      "requires": [
+        "query",
+        "case_id",
+        "limit",
+        "jurisdiction",
+        "hop",
+        "prefilter",
+        "rank",
+        "query_embedding",
+        "include_debug"
+      ],
+      "returns": [
+        "results",
+        "bundles",
+        "timing",
+        "cache_source",
+        "debug_json"
+      ],
+      "service": "RetrievalService",
+      "method": "SearchEvidence",
+      "input_type": "EvidenceSearchRequest",
+      "output_type": "EvidenceSearchResponse",
+      "transport": "grpc",
+      "file": "sveltekit-frontend/proto/active/retrieval.proto",
+      "source_ref": "sveltekit-frontend/proto/active/retrieval.proto#RetrievalService.SearchEvidence",
+      "packet_kind": "rpc_method"
+    },
+    {
+      "tool_name": "RetrievalService.StreamEvidence",
+      "llama_name": null,
+      "domain": "rag_retrieval",
+      "ontology": [
+        "evidence",
+        "storage",
+        "seaweedfs",
+        "retrieval",
+        "legal"
+      ],
+      "description": "gRPC RPC RetrievalService.StreamEvidence: EvidenceSearchRequest → EvidenceBundleEvent (declared in sveltekit-frontend/proto/active/retrieval.proto).",
+      "examples": [
+        "call RetrievalService.StreamEvidence with EvidenceSearchRequest"
+      ],
+      "requires": [
+        "query",
+        "case_id",
+        "limit",
+        "jurisdiction",
+        "hop",
+        "prefilter",
+        "rank",
+        "query_embedding",
+        "include_debug"
+      ],
+      "returns": [
+        "bundle",
+        "progress",
+        "error"
+      ],
+      "service": "RetrievalService",
+      "method": "StreamEvidence",
+      "input_type": "EvidenceSearchRequest",
+      "output_type": "EvidenceBundleEvent",
+      "transport": "grpc",
+      "file": "sveltekit-frontend/proto/active/retrieval.proto",
+      "source_ref": "sveltekit-frontend/proto/active/retrieval.proto#RetrievalService.StreamEvidence",
+      "packet_kind": "rpc_method"
+    },
+    {
+      "tool_name": "RetrievalService.SearchCodebase",
+      "llama_name": null,
+      "domain": "rag_retrieval",
+      "ontology": [
+        "retrieval",
+        "rag",
+        "search"
+      ],
+      "description": "gRPC RPC RetrievalService.SearchCodebase: CodebaseSearchRequest → CodebaseSearchResponse (declared in sveltekit-frontend/proto/active/retrieval.proto).",
+      "examples": [
+        "call RetrievalService.SearchCodebase with CodebaseSearchRequest"
+      ],
+      "requires": [
+        "query",
+        "limit",
+        "content_weight",
+        "signature_weight",
+        "kinds",
+        "http_method",
+        "path_prefixes",
+        "include_debug"
+      ],
+      "returns": [
+        "chunks",
+        "total_ms",
+        "debug_json"
+      ],
+      "service": "RetrievalService",
+      "method": "SearchCodebase",
+      "input_type": "CodebaseSearchRequest",
+      "output_type": "CodebaseSearchResponse",
+      "transport": "grpc",
+      "file": "sveltekit-frontend/proto/active/retrieval.proto",
+      "source_ref": "sveltekit-frontend/proto/active/retrieval.proto#RetrievalService.SearchCodebase",
+      "packet_kind": "rpc_method"
+    },
+    {
+      "tool_name": "RetrievalService.StreamCodebase",
+      "llama_name": null,
+      "domain": "rag_retrieval",
+      "ontology": [
+        "retrieval",
+        "rag",
+        "search"
+      ],
+      "description": "gRPC RPC RetrievalService.StreamCodebase: CodebaseSearchRequest → CodebaseChunkEvent (declared in sveltekit-frontend/proto/active/retrieval.proto).",
+      "examples": [
+        "call RetrievalService.StreamCodebase with CodebaseSearchRequest"
+      ],
+      "requires": [
+        "query",
+        "limit",
+        "content_weight",
+        "signature_weight",
+        "kinds",
+        "http_method",
+        "path_prefixes",
+        "include_debug"
+      ],
+      "returns": [
+        "chunk",
+        "progress",
+        "error"
+      ],
+      "service": "RetrievalService",
+      "method": "StreamCodebase",
+      "input_type": "CodebaseSearchRequest",
+      "output_type": "CodebaseChunkEvent",
+      "transport": "grpc",
+      "file": "sveltekit-frontend/proto/active/retrieval.proto",
+      "source_ref": "sveltekit-frontend/proto/active/retrieval.proto#RetrievalService.StreamCodebase",
+      "packet_kind": "rpc_method"
+    },
+    {
+      "tool_name": "RetrievalService.SearchChunks",
+      "llama_name": null,
+      "domain": "rag_retrieval",
+      "ontology": [
+        "retrieval",
+        "rag",
+        "search"
+      ],
+      "description": "gRPC RPC RetrievalService.SearchChunks: SearchChunksRequest → SearchChunksResponse (declared in sveltekit-frontend/proto/active/retrieval.proto).",
+      "examples": [
+        "call RetrievalService.SearchChunks with SearchChunksRequest"
+      ],
+      "requires": [
+        "query",
+        "limit",
+        "collection",
+        "filters",
+        "ids",
+        "tags",
+        "source_filter",
+        "cluster_ids",
+        "som_clusters",
+        "created_after",
+        "updated_after"
+      ],
+      "returns": [
+        "results",
+        "total_ms"
+      ],
+      "service": "RetrievalService",
+      "method": "SearchChunks",
+      "input_type": "SearchChunksRequest",
+      "output_type": "SearchChunksResponse",
+      "transport": "grpc",
+      "file": "sveltekit-frontend/proto/active/retrieval.proto",
+      "source_ref": "sveltekit-frontend/proto/active/retrieval.proto#RetrievalService.SearchChunks",
+      "packet_kind": "rpc_method"
+    },
+    {
+      "tool_name": "RetrievalService.GetClusterSummary",
+      "llama_name": null,
+      "domain": "rag_retrieval",
+      "ontology": [
+        "retrieval",
+        "rag",
+        "search"
+      ],
+      "description": "gRPC RPC RetrievalService.GetClusterSummary: ClusterSummaryRequest → ClusterSummaryResponse (declared in sveltekit-frontend/proto/active/retrieval.proto).",
+      "examples": [
+        "call RetrievalService.GetClusterSummary with ClusterSummaryRequest"
+      ],
+      "requires": [
+        "cluster_id",
+        "cluster_type"
+      ],
+      "returns": [
+        "cluster_id",
+        "summary",
+        "patterns",
+        "keywords",
+        "metadata"
+      ],
+      "service": "RetrievalService",
+      "method": "GetClusterSummary",
+      "input_type": "ClusterSummaryRequest",
+      "output_type": "ClusterSummaryResponse",
+      "transport": "grpc",
+      "file": "sveltekit-frontend/proto/active/retrieval.proto",
+      "source_ref": "sveltekit-frontend/proto/active/retrieval.proto#RetrievalService.GetClusterSummary",
+      "packet_kind": "rpc_method"
+    },
+    {
+      "tool_name": "RetrievalService.ExpandAstNeighbors",
+      "llama_name": null,
+      "domain": "rag_retrieval",
+      "ontology": [
+        "retrieval",
+        "rag",
+        "search",
+        "graph"
+      ],
+      "description": "gRPC RPC RetrievalService.ExpandAstNeighbors: AstExpansionRequest → AstExpansionResponse (declared in sveltekit-frontend/proto/active/retrieval.proto).",
+      "examples": [
+        "call RetrievalService.ExpandAstNeighbors with AstExpansionRequest"
+      ],
+      "requires": [
+        "symbol",
+        "file_path",
+        "depth"
+      ],
+      "returns": [
+        "neighbors",
+        "edges"
+      ],
+      "service": "RetrievalService",
+      "method": "ExpandAstNeighbors",
+      "input_type": "AstExpansionRequest",
+      "output_type": "AstExpansionResponse",
+      "transport": "grpc",
+      "file": "sveltekit-frontend/proto/active/retrieval.proto",
+      "source_ref": "sveltekit-frontend/proto/active/retrieval.proto#RetrievalService.ExpandAstNeighbors",
+      "packet_kind": "rpc_method"
+    },
+    {
+      "tool_name": "RetrievalService.GetTopologyContext",
+      "llama_name": null,
+      "domain": "rag_retrieval",
+      "ontology": [
+        "graph",
+        "neo4j",
+        "relationship"
+      ],
+      "description": "gRPC RPC RetrievalService.GetTopologyContext: TopologyRequest → TopologyResponse (declared in sveltekit-frontend/proto/active/retrieval.proto).",
+      "examples": [
+        "call RetrievalService.GetTopologyContext with TopologyRequest"
+      ],
+      "requires": [
+        "query",
+        "bmu_row",
+        "bmu_col",
+        "radius",
+        "ids",
+        "tags",
+        "created_after",
+        "updated_after"
+      ],
+      "returns": [
+        "neighbors",
+        "som_metadata_json",
+        "cluster_metadata"
+      ],
+      "service": "RetrievalService",
+      "method": "GetTopologyContext",
+      "input_type": "TopologyRequest",
+      "output_type": "TopologyResponse",
+      "transport": "grpc",
+      "file": "sveltekit-frontend/proto/active/retrieval.proto",
+      "source_ref": "sveltekit-frontend/proto/active/retrieval.proto#RetrievalService.GetTopologyContext",
+      "packet_kind": "rpc_method"
+    },
+    {
+      "tool_name": "RetrievalService.GetResearchContext",
+      "llama_name": null,
+      "domain": "rag_retrieval",
+      "ontology": [
+        "retrieval",
+        "rag",
+        "search"
+      ],
+      "description": "gRPC RPC RetrievalService.GetResearchContext: ResearchContextRequest → ResearchContextResponse (declared in sveltekit-frontend/proto/active/retrieval.proto).",
+      "examples": [
+        "call RetrievalService.GetResearchContext with ResearchContextRequest"
+      ],
+      "requires": [
+        "query",
+        "limit",
+        "source_filter",
+        "score_threshold",
+        "query_embedding",
+        "ids",
+        "tags",
+        "cluster_ids",
+        "som_clusters",
+        "created_after",
+        "updated_after"
+      ],
+      "returns": [
+        "research",
+        "total_ms"
+      ],
+      "service": "RetrievalService",
+      "method": "GetResearchContext",
+      "input_type": "ResearchContextRequest",
+      "output_type": "ResearchContextResponse",
+      "transport": "grpc",
+      "file": "sveltekit-frontend/proto/active/retrieval.proto",
+      "source_ref": "sveltekit-frontend/proto/active/retrieval.proto#RetrievalService.GetResearchContext",
+      "packet_kind": "rpc_method"
+    },
+    {
+      "tool_name": "RetrievalService.Health",
+      "llama_name": null,
+      "domain": "rag_retrieval",
+      "ontology": [
+        "retrieval",
+        "rag",
+        "search"
+      ],
+      "description": "gRPC RPC RetrievalService.Health: HealthRequest → HealthResponse (declared in sveltekit-frontend/proto/active/retrieval.proto).",
+      "examples": [
+        "call RetrievalService.Health with HealthRequest"
+      ],
+      "requires": [
+        "service"
+      ],
+      "returns": [
+        "status",
+        "pgvector_connected",
+        "qdrant_connected",
+        "redis_connected",
+        "embedding_service_up",
+        "timestamp"
+      ],
+      "service": "RetrievalService",
+      "method": "Health",
+      "input_type": "HealthRequest",
+      "output_type": "HealthResponse",
+      "transport": "grpc",
+      "file": "sveltekit-frontend/proto/active/retrieval.proto",
+      "source_ref": "sveltekit-frontend/proto/active/retrieval.proto#RetrievalService.Health",
+      "packet_kind": "rpc_method"
+    },
+    {
+      "tool_name": "ToolRouter.CallTool",
+      "llama_name": null,
+      "domain": "mcp_agents",
+      "ontology": [
+        "mcp",
+        "agent",
+        "tooling"
+      ],
+      "description": "gRPC RPC ToolRouter.CallTool: CallToolRequest → CallToolResponse (declared in sveltekit-frontend/proto/active/tool_router.proto).",
+      "examples": [
+        "call ToolRouter.CallTool with CallToolRequest"
+      ],
+      "requires": [
+        "request_id",
+        "tool_name",
+        "arguments_json",
+        "meta",
+        "actor_id",
+        "session_id",
+        "timeout_ms"
+      ],
+      "returns": [
+        "request_id",
+        "content_json",
+        "is_error",
+        "error_code",
+        "error_message",
+        "duration_ms",
+        "span"
+      ],
+      "service": "ToolRouter",
+      "method": "CallTool",
+      "input_type": "CallToolRequest",
+      "output_type": "CallToolResponse",
+      "transport": "grpc",
+      "file": "sveltekit-frontend/proto/active/tool_router.proto",
+      "source_ref": "sveltekit-frontend/proto/active/tool_router.proto#ToolRouter.CallTool",
+      "packet_kind": "rpc_method"
+    },
+    {
+      "tool_name": "ToolRouter.CallToolBatch",
+      "llama_name": null,
+      "domain": "mcp_agents",
+      "ontology": [
+        "mcp",
+        "agent",
+        "tooling"
+      ],
+      "description": "gRPC RPC ToolRouter.CallToolBatch: CallToolBatchRequest → CallToolBatchResponse (declared in sveltekit-frontend/proto/active/tool_router.proto).",
+      "examples": [
+        "call ToolRouter.CallToolBatch with CallToolBatchRequest"
+      ],
+      "requires": [
+        "calls",
+        "parallel"
+      ],
+      "returns": [
+        "results",
+        "total_duration_ms"
+      ],
+      "service": "ToolRouter",
+      "method": "CallToolBatch",
+      "input_type": "CallToolBatchRequest",
+      "output_type": "CallToolBatchResponse",
+      "transport": "grpc",
+      "file": "sveltekit-frontend/proto/active/tool_router.proto",
+      "source_ref": "sveltekit-frontend/proto/active/tool_router.proto#ToolRouter.CallToolBatch",
+      "packet_kind": "rpc_method"
+    },
+    {
+      "tool_name": "ToolRouter.CallToolStream",
+      "llama_name": null,
+      "domain": "mcp_agents",
+      "ontology": [
+        "mcp",
+        "agent",
+        "tooling"
+      ],
+      "description": "gRPC RPC ToolRouter.CallToolStream: CallToolRequest → CallToolEvent (declared in sveltekit-frontend/proto/active/tool_router.proto).",
+      "examples": [
+        "call ToolRouter.CallToolStream with CallToolRequest"
+      ],
+      "requires": [
+        "request_id",
+        "tool_name",
+        "arguments_json",
+        "meta",
+        "actor_id",
+        "session_id",
+        "timeout_ms"
+      ],
+      "returns": [
+        "request_id",
+        "tool_name",
+        "type",
+        "data",
+        "elapsed_ms",
+        "pass"
+      ],
+      "service": "ToolRouter",
+      "method": "CallToolStream",
+      "input_type": "CallToolRequest",
+      "output_type": "CallToolEvent",
+      "transport": "grpc",
+      "file": "sveltekit-frontend/proto/active/tool_router.proto",
+      "source_ref": "sveltekit-frontend/proto/active/tool_router.proto#ToolRouter.CallToolStream",
+      "packet_kind": "rpc_method"
+    },
+    {
+      "tool_name": "ToolRouter.ListTools",
+      "llama_name": null,
+      "domain": "mcp_agents",
+      "ontology": [
+        "mcp",
+        "agent",
+        "tooling"
+      ],
+      "description": "gRPC RPC ToolRouter.ListTools: ListToolsRequest → ListToolsResponse (declared in sveltekit-frontend/proto/active/tool_router.proto).",
+      "examples": [
+        "call ToolRouter.ListTools with ListToolsRequest"
+      ],
+      "requires": [
+        "cursor"
+      ],
+      "returns": [
+        "tools",
+        "next_cursor"
+      ],
+      "service": "ToolRouter",
+      "method": "ListTools",
+      "input_type": "ListToolsRequest",
+      "output_type": "ListToolsResponse",
+      "transport": "grpc",
+      "file": "sveltekit-frontend/proto/active/tool_router.proto",
+      "source_ref": "sveltekit-frontend/proto/active/tool_router.proto#ToolRouter.ListTools",
+      "packet_kind": "rpc_method"
+    }
+  ],
   "gates": {
     "tools_discovered_ge80": true,
     "description_coverage_80pct": true,
     "ontology_coverage_80pct": true,
-    "postgres_insert_count": true,
+    "postgres_insert_count": null,
     "rpc_methods_ge40": true
   }
 }

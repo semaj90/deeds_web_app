@@ -5005,7 +5005,16 @@
     {
       "label": "⚡ TurboQuant: Start (vision mode, port 8090)",
       "type": "shell",
-      "command": "npm run turbo:start:detached",
+      "command": "pwsh -NoProfile -ExecutionPolicy Bypass -File scripts/launch-turboquant.ps1 -Detached",
+      "options": {
+        "cwd": "${workspaceFolder}",
+        "env": {
+          "TURBO_PROFILE": "turboquant-safe",
+          "TURBO_CTX": "65536",
+          "LLM_CONTEXT_SIZE": "65536",
+          "LLAMA_SERVER_CTX": "65536"
+        }
+      },
       "group": "build",
       "presentation": {
         "reveal": "always",
@@ -7069,9 +7078,15 @@
     {
       "label": "🚀 Start TurboQuant",
       "type": "shell",
-      "command": "npm run turbo:start:detached",
+      "command": "pwsh -NoProfile -ExecutionPolicy Bypass -File scripts/launch-turboquant.ps1 -Detached",
       "options": {
-        "cwd": "${workspaceFolder}/sveltekit-frontend"
+        "cwd": "${workspaceFolder}",
+        "env": {
+          "TURBO_PROFILE": "turboquant-safe",
+          "TURBO_CTX": "65536",
+          "LLM_CONTEXT_SIZE": "65536",
+          "LLAMA_SERVER_CTX": "65536"
+        }
       },
       "runOptions": {
         "runOn": "folderOpen"
@@ -7304,12 +7319,21 @@
       }
     },
     {
-      "label": "⚡ TurboQuant: Start VLM (text + vision, :8090)",
+      "label": "⚡ TurboQuant: Start VLM (64K, detached, :8090)",
       "type": "shell",
-      "command": "C:/Users/james/Desktop/llama-server-cuda/llama-server.exe -m C:/Users/james/.ollama/blobs/sha256-d9c7875f43a312d99a17874d361bb37e03516c4466a26bdac722da5b26f045d7 --mmproj C:/Users/james/Downloads/gemma4-mmproj/mmproj-BF16.gguf --host 0.0.0.0 --port 8090 -ngl 99 --ctx-size 65536 --flash-attn --threads 6",
+      "command": "pwsh -NoProfile -ExecutionPolicy Bypass -File scripts/launch-turboquant.ps1 -Detached",
+      "options": {
+        "cwd": "${workspaceFolder}",
+        "env": {
+          "TURBO_PROFILE": "turboquant-safe",
+          "TURBO_CTX": "65536",
+          "LLM_CONTEXT_SIZE": "65536",
+          "LLAMA_SERVER_CTX": "65536"
+        }
+      },
       "isBackground": true,
       "group": "build",
-      "detail": "Launch TurboQuant llama-server with mmproj for unified text+vision inference (gemma4-rotorquant:latest Q4_K_M + SigLIP projector, ~6GB VRAM)",
+      "detail": "Launch TurboQuant llama-server via the launcher wrapper with explicit 64K ctx and detached startup",
       "problemMatcher": {
         "owner": "llama-server",
         "pattern": {
@@ -10021,8 +10045,16 @@
     {
       "label": "🦙 llama-server: Start Gemma4 VLM (TurboQuant :8090)",
       "type": "shell",
-      "command": "npm run turbo:start:detached",
-      "options": { "cwd": "${workspaceFolder}/sveltekit-frontend" },
+      "command": "pwsh -NoProfile -ExecutionPolicy Bypass -File scripts/launch-turboquant.ps1 -Detached",
+      "options": {
+        "cwd": "${workspaceFolder}",
+        "env": {
+          "TURBO_PROFILE": "turboquant-safe",
+          "TURBO_CTX": "65536",
+          "LLM_CONTEXT_SIZE": "65536",
+          "LLAMA_SERVER_CTX": "65536"
+        }
+      },
       "group": "build",
       "detail": "Start llama-server.exe with gemma4-rotorquant:latest GGUF + mmproj on :8090 (q8_0 KV, flash-attn, ngl 99). Detached — returns when /health responds.",
       "presentation": { "reveal": "always", "panel": "dedicated", "clear": true },

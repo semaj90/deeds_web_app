@@ -212,7 +212,7 @@ pbts -o generation.d.ts generation.js
 **Fix**: Add explicit instruction in system prompt
 
 **Issue**: Out of VRAM
-**Fix**: Reduce context: `{ numCtx: 16384 }` or unload other models
+**Fix**: Keep the 64k runtime contract: `{ numCtx: 65536 }` or unload other models
 
 **Issue**: Slow inference
 **Fix**: Check GPU utilization: `nvidia-smi` — should be >80% during inference

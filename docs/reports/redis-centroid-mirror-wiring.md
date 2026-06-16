@@ -1,39 +1,62 @@
-# Redis Centroid Mirroring Wiring
+# Redis Centroid Mirror Wiring
 
-## 🎯 Purpose
-This document outlines the process of creating a **read-only, hot mirror** for centroid data from the primary source of truth (Postgres) into Redis/Valkey. This is necessary to allow downstream services to query recent or frequently accessed centroid information without hitting the main Postgres database every time.
+Generated: 2026-06-15T23:40:01.137Z
+Mode: dry-run
+Status: PASS
 
-## 📜 Core Rule
-*   **Source of Truth**: `postgres` (`atlas_higher_hop_index`) is the single source of truth for all data.
-*   **Mirroring Layer**: Redis/Valkey acts only as a **hot cache**. Data written here must *never* be used to write back to Postgres, and no updates should occur on the primary database from this script.
-*   **Execution**: The mirroring process is initiated via `scripts/atlas/wire-redis-centroid-mirror.mjs`.
+## Summary
 
-## ⚙️ Source Table & Fields (Postgres)
-The data is read from: `public.atlas_higher_hop_index`
-Key fields used for mirroring:
-*   `packet_key`: The primary identifier for the record.
-*   `community_id`: Used as a key component and stored value.
-*   `som_cluster`: The SOM cluster ID.
-*   `centroid_label`: The descriptive label of the centroid.
-*   `karpathy_score`: The associated confidence score.
+- source table: atlas_higher_hop_index
+- qdrant-backed rows read: 1
+- community buckets: 1
+- som buckets: 1
+- planned writes: 4
+- applied writes: 0
+- failures: 0
 
-## 🔑 Redis Key Structure & Mapping
-The data is mirrored to the following key pattern:
-`redis:centroid:{community_id}`
+## Planned Keys
 
-The stored JSON payload contains:
-```json
-{
-    "som_cluster": "...",
-    "label": "...",
-    "score": 0.0,
-    "last_updated": "..."
-}
-```
+- `centroid:1` (centroid) -> 1 rows
+- `som:1` (som) -> 1 rows
+- `som:cell:1` (som_cell) -> 1 rows
+- `atlas:centroid:index` (index) -> 1 rows
 
-## ⚠️ Execution Notes
-1.  **Dry Run**: Always run the mirroring script with a dry-run flag or by inspecting the SQL query first to ensure no unintended data is read/written.
-2.  **Idempotency**: The current implementation assumes that running the script multiple times will simply overwrite the cache key, which is acceptable for hot caching but should be monitored.
+## Samples
 
----
-*Last updated: [Current Date]*
+- centroid | centroid:1 | {
+  "canonical_source_refs": [
+    "src/lib/client/timeline-client.ts"
+  ],
+  "chunk_ids": [
+    "card:src/lib/client/timeline-client.ts:3d6ecb4eaa1bb17d"
+  ],
+…
+- som | som:1 | {
+  "canonical_source_refs": [
+    "src/lib/client/timeline-client.ts"
+  ],
+  "chunk_ids": [
+    "card:src/lib/client/timeline-client.ts:3d6ecb4eaa1bb17d"
+  ],
+…
+- som_cell | som:cell:1 | {
+  "canonical_source_refs": [
+    "src/lib/client/timeline-client.ts"
+  ],
+  "chunk_ids": [
+    "card:src/lib/client/timeline-client.ts:3d6ecb4eaa1bb17d"
+  ],
+…
+- index | atlas:centroid:index | {
+  "centroid_keys": [
+    "centroid:1"
+  ],
+  "community_count": 1,
+  "generated_at": "2026-06-15T23:40:01.137Z",
+  "qdrant_backed_rows": 1,
+  "som_count": 1,
+…
+
+## Next Safe Action
+
+Use --apply to write the centroid and SOM mirrors into Redis/Valkey, then move to Bifrost mirror wiring.

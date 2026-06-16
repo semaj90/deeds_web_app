@@ -189,11 +189,17 @@ $mmproj = if ($env:TURBO_MMPROJ_PATH) {
     else { $null }  # no fallback - set TURBO_MMPROJ_PATH or place a mmproj file in one of the known locations
 }
 $port    = if ($env:TURBO_PORT)        { $env:TURBO_PORT }        else { '8090' }
-$ctxLen  = if ($env:LLM_CONTEXT_SIZE)  { $env:LLM_CONTEXT_SIZE }
-           elseif ($env:TURBO_CTX)     { $env:TURBO_CTX }
-           elseif ($env:LLAMA_SERVER_CTX) { $env:LLAMA_SERVER_CTX }
-           elseif ($env:OLLAMA_CONTEXT_LENGTH) { $env:OLLAMA_CONTEXT_LENGTH }
-           else { '65536' }
+$ctxLenRequested = if ($env:LLM_CONTEXT_SIZE)  { $env:LLM_CONTEXT_SIZE }
+                   elseif ($env:TURBO_CTX)     { $env:TURBO_CTX }
+                   elseif ($env:LLAMA_SERVER_CTX) { $env:LLAMA_SERVER_CTX }
+                   elseif ($env:OLLAMA_CONTEXT_LENGTH) { $env:OLLAMA_CONTEXT_LENGTH }
+                   else { '65536' }
+$ctxLen = [int]$ctxLenRequested
+$allowShortCtx = @('1','true','yes','on') -contains (($env:TURBO_CTX_ALLOW_SHORT_CONTEXT ?? '')).ToLower()
+if ($ctxLen -lt 65536 -and -not $allowShortCtx) {
+    Write-Warning "Requested TurboQuant context $ctxLen is below the repo default of 65536. Clamping to 65536. Set TURBO_CTX_ALLOW_SHORT_CONTEXT=true to opt in to a shorter context."
+    $ctxLen = 65536
+}
 $threads = if ($env:TURBO_THREADS)     { $env:TURBO_THREADS }     else { [System.Environment]::ProcessorCount.ToString() }
 $batchSize = if ($env:TURBO_BATCH_SIZE) { $env:TURBO_BATCH_SIZE } else { $null }
 $ubatchSize = if ($env:TURBO_UBATCH_SIZE) { $env:TURBO_UBATCH_SIZE } else { $null }

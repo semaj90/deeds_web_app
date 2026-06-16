@@ -11,6 +11,7 @@ import { existsSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { spawnSync } from 'node:child_process';
+import { loadRegistry, rankRegistryTools, canonicalPickupQueries } from '../atlas/lib/tool-registry.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, '../..');
@@ -97,6 +98,43 @@ function buildTopRecommendations(recommendations) {
   return [...new Set(selected)];
 }
 
+function parseOpenLaneOrder(markdown) {
+  if (!markdown) return [];
+  const lines = String(markdown).split(/\r?\n/);
+  const headingIndex = lines.findIndex((line) => /Open Lanes To Finish/i.test(line));
+  if (headingIndex === -1) return [];
+  const lanes = [];
+  for (let i = headingIndex + 1; i < lines.length; i += 1) {
+    const line = lines[i].trim();
+    if (!line) continue;
+    if (/^##\s+/.test(line) && !/Open Lanes To Finish/i.test(line)) break;
+    const match = line.match(/^###\s+\d+[A-Z]?\.\s+(.+?)(?:\s+—.*)?$/i);
+    if (match?.[1]) {
+      lanes.push(match[1].replace(/\*\*/g, '').trim());
+    }
+    if (lanes.length >= 10) break;
+  }
+  return [...new Set(lanes)];
+}
+
+function parseWorkstationOpenWork(markdown) {
+  if (!markdown) return [];
+  const lines = String(markdown).split(/\r?\n/);
+  const startIndex = lines.findIndex((line) => /\*\*Open — real remaining work\*\*/i.test(line));
+  if (startIndex === -1) return [];
+  const items = [];
+  for (let i = startIndex + 1; i < lines.length; i += 1) {
+    const line = lines[i].trim();
+    if (!line) continue;
+    if (/^\*\*/.test(line) || /^##\s+/.test(line)) break;
+    const match = line.match(/^- #?\d+\s+([^(:]+?)(?:\s*\(|:|—|~|$)/);
+    if (match?.[1]) {
+      items.push(match[1].replace(/\*\*/g, '').trim());
+    }
+  }
+  return [...new Set(items)];
+}
+
 const steps = [
   { label: 'opencode:tasks:state', command: 'npm', args: ['run', 'opencode:tasks:state'] },
   { label: 'recommendations:atlas-coverage', command: 'npm', args: ['run', 'recommendations:atlas-coverage'] },
@@ -133,6 +171,12 @@ const taskCounts =
   };
 
 const recommendations = readJson(path.join(OPENCODE_DIR, 'recommendations', 'recommendations.json'), null);
+const workstationBoardMarkdown = existsSync(path.join(ROOT, 'reports', 'parent-atlas-workstation-todo.md'))
+  ? readFileSync(path.join(ROOT, 'reports', 'parent-atlas-workstation-todo.md'), 'utf8')
+  : '';
+const openLanesMarkdown = existsSync(path.join(ROOT, 'reports', 'parent-atlas-open-lanes-todo.md'))
+  ? readFileSync(path.join(ROOT, 'reports', 'parent-atlas-open-lanes-todo.md'), 'utf8')
+  : '';
 const readiness = readJson(path.join(DOCS_DIR, 'parent-atlas-production-readiness-report.json'), null);
 const liveEnv = readJson(path.join(DOCS_DIR, 'live-service-env-report.json'), null);
 const memoryExports = readJson(path.join(DOCS_DIR, 'memory-exports-ldjson-batch-report.json'), null);
@@ -140,6 +184,8 @@ const sidecarAudit = readJsonFromFirst([
   path.join(TMP_DIR, 'mcp-sidecar-transport-audit.json'),
   path.join(FRONTEND_TMP_DIR, 'mcp-sidecar-transport-audit.json'),
 ], null);
+const registryLoad = await loadRegistry(ROOT);
+const registryIndex = registryLoad.registry;
 
 const readinessCounts = countStatuses(readiness);
 const liveServices = new Map((liveEnv?.services ?? []).map((svc) => [svc.name, svc]));
@@ -155,6 +201,27 @@ const sidecars = (sidecarAudit?.results ?? []).map((entry) => ({
   detail: entry.http?.detail ?? entry.stdio?.detail ?? null,
   enabled: entry.enabled !== false,
 }));
+
+const registryTools = Array.isArray(registryIndex?.tools) ? registryIndex.tools : [];
+const registryTopLayers = Object.entries(registryIndex?.by_layer ?? {})
+  .filter(([, items]) => Array.isArray(items) && items.length > 0)
+  .slice(0, 10)
+  .map(([layer, items]) => ({ layer, count: items.length, top: items.slice(0, 3).map((item) => item.tool_name) }));
+const canonicalToolPickup = canonicalPickupQueries().map((entry) => ({
+  ...entry,
+  tools: rankRegistryTools(entry.query, registryTools, 5).map((tool) => ({
+    tool_name: tool.tool_name,
+    primary_layer: tool.primary_layer ?? tool.layers?.[0] ?? 'unknown',
+    score: tool.pickup_score ?? tool.score ?? 0,
+    source_ref: tool.source_ref ?? null,
+  })),
+}));
+
+const workstationOpenOrder = parseWorkstationOpenWork(workstationBoardMarkdown);
+const openLaneOrder = parseOpenLaneOrder(openLanesMarkdown);
+const openLaneRecommendations = (workstationOpenOrder.length > 0 ? workstationOpenOrder : openLaneOrder).slice(0, 3);
+const rankedRecommendations = buildTopRecommendations(recommendations);
+const mergedRecommendations = [...new Set([...openLaneRecommendations, ...rankedRecommendations])].slice(0, 6);
 
 const briefing = {
   timestamp: new Date().toISOString(),
@@ -190,8 +257,16 @@ const briefing = {
     memoryExportsCompletionPct: Number(memoryExports?.completionEstimatePct ?? 0),
   },
   warnings: [],
-  recommendations: buildTopRecommendations(recommendations),
-  nextLane: 'Runtime Coverage Repair',
+  recommendations: mergedRecommendations,
+  openLaneOrder,
+  toolRegistry: {
+    path: registryLoad.registryPath,
+    totalTools: Number(registryIndex?.total_tools ?? 0),
+    activeLayers: Object.keys(registryIndex?.by_layer ?? {}).filter((key) => Array.isArray(registryIndex?.by_layer?.[key]) && registryIndex.by_layer[key].length > 0),
+    topLayers: registryTopLayers,
+    canonicalPickup: canonicalToolPickup,
+  },
+  nextLane: workstationOpenOrder[0] ?? openLaneOrder[0] ?? 'Runtime Coverage Repair',
 };
 
 if (briefing.systems.redis !== 'READY') {
@@ -241,6 +316,18 @@ ${briefing.greeting}
 - **Qdrant Coverage**: ${briefing.coverage.qdrant}
 - **SOM Coverage**: ${briefing.coverage.som}
 - **Parent Atlas Coverage**: ${briefing.coverage.parentAtlas}
+
+## Tool Registry Pickup
+
+- **Registry Index**: ${briefing.toolRegistry.path}
+- **Unique MCP Tools**: ${briefing.toolRegistry.totalTools}
+- **Active Layers**: ${briefing.toolRegistry.activeLayers.join(', ') || 'none'}
+
+${briefing.toolRegistry.topLayers.length > 0 ? briefing.toolRegistry.topLayers.map((layer) => `- ${layer.layer}: ${layer.count} tools; top ${layer.top.join(', ')}`).join('\n') : '- Registry unavailable'}
+
+### Canonical Pickup Sets
+
+${briefing.toolRegistry.canonicalPickup.map((entry) => `- **${entry.name}**: ${entry.tools.map((tool) => tool.tool_name).join(', ') || 'none'}`).join('\n')}
 
 ## Completion
 
@@ -302,6 +389,10 @@ console.log('Coverage:');
 console.log(`  • Qdrant: ${briefing.coverage.qdrant}`);
 console.log(`  • SOM: ${briefing.coverage.som}`);
 console.log(`  • Parent Atlas: ${briefing.coverage.parentAtlas}\n`);
+console.log('Tool Registry Pickup:');
+console.log(`  • Registry tools: ${briefing.toolRegistry.totalTools}`);
+console.log(`  • Active layers: ${briefing.toolRegistry.activeLayers.join(', ') || 'none'}`);
+console.log(`  • Canonical pickup sets: ${briefing.toolRegistry.canonicalPickup.map((entry) => entry.name).join(', ')}\n`);
 if (briefing.warnings.length > 0) {
   console.log('Warnings:');
   briefing.warnings.forEach((warning) => console.log(`  • ${warning}`));

@@ -20,6 +20,7 @@
 import { fileURLToPath } from 'node:url';
 import { dirname, join }  from 'node:path';
 import { writeFileSync, mkdirSync } from 'node:fs';
+import { loadRegistry, rankRegistryTools, tokenizeQuery, canonicalPickupQueries } from './lib/tool-registry.mjs';
 
 const __dir = dirname(fileURLToPath(import.meta.url));
 const ROOT  = join(__dir, '../..');
@@ -48,6 +49,12 @@ const DOMAIN_SIGNALS = {
   cluster:   ['clustering', 'som', 'topology'],
   repair:    ['repair', 'inference', 'sequence'],
   mcp:       ['mcp_tools', 'agent', 'planning'],
+  ace:       ['cache', 'memory', 'dense'],
+  kag:       ['lexical', 'dense', 'graph'],
+  dag:       ['graph', 'ops', 'read'],
+  gemma4:    ['synthesis', 'ops'],
+  bitfrost:  ['cache', 'memory'],
+  turbovec:  ['rerank', 'dense'],
 };
 
 /** Detect which ontology signals are relevant to a query string */
@@ -126,6 +133,29 @@ async function qdrantSearch(vector, { topK = DEFAULT_TOP_K, ontologyFilter = [] 
   }
 }
 
+async function registrySearch(query, topK = DEFAULT_TOP_K) {
+  const { registry } = await loadRegistry();
+  const tools = Array.isArray(registry?.tools) ? registry.tools : [];
+  if (tools.length === 0) return [];
+  return rankRegistryTools(query, tools, topK).map(tool => ({
+    id: tool.rank ?? tool.tool_name,
+    score: tool.pickup_score ?? tool.score ?? 0,
+    payload: {
+      tool_name: tool.tool_name,
+      llama_name: tool.llama_name ?? null,
+      ontology: tool.ontology ?? [],
+      description: tool.description ?? '',
+      examples: tool.examples ?? [],
+      domain: tool.domain ?? null,
+      source_ref: tool.source_ref ?? null,
+      layers: tool.layers ?? [],
+      permissions: tool.permissions ?? 'read_only',
+      primary_layer: tool.primary_layer ?? tool.layers?.[0] ?? 'unknown',
+      source: tool.sources ?? ['registry-index'],
+    },
+  }));
+}
+
 // ── Re-rank with ontology overlap boost ──────────────────────────────────────
 
 function rerank(hits, querySignals, topK) {
@@ -187,22 +217,77 @@ const MCP_TO_LLAMA = Object.fromEntries(
 export async function selectToolsForQuery(query, { topK = DEFAULT_TOP_K } = {}) {
   const signals = detectSignals(query);
   const vector  = await embed(query);
+  const queryText = String(query ?? '').toLowerCase();
 
   if (!vector) {
+    const registryHits = await registrySearch(queryText, topK);
+    if (registryHits.length > 0) {
+      const seen = new Set();
+      const mcp_names = [];
+      const llama_names = [];
+      for (const hit of registryHits) {
+        const toolName = hit.payload?.tool_name;
+        if (!toolName || seen.has(toolName)) continue;
+        seen.add(toolName);
+        const llamaName = hit.payload?.llama_name
+          ?? MCP_TO_LLAMA[toolName]
+          ?? toolName.replace(/\./g, '__');
+        mcp_names.push(toolName);
+        llama_names.push(llamaName);
+      }
+      return {
+        mcp_names,
+        llama_names,
+        hits: registryHits,
+        signals,
+        embed_ok: false,
+        registry_ok: true,
+      };
+    }
+
     // Fallback: return default read-only tool set
     const fallback = ['search.dev_context', 'codebase.rg_search', 'trace.kag_search',
-                      'graph.expand_neighborhood', 'kb.search_cards'];
+      'graph.expand_neighborhood', 'kb.search_cards'];
     return {
       mcp_names:   fallback.slice(0, topK),
       llama_names: fallback.slice(0, topK).map(n => MCP_TO_LLAMA[n] ?? n.replace(/\./g, '__')),
       hits:        [],
       signals,
       embed_ok:    false,
+      registry_ok: false,
     };
   }
 
-  const raw    = await qdrantSearch(vector, { topK });
-  const ranked = rerank(raw, signals, topK);
+  const raw = vector ? await qdrantSearch(vector, { topK }) : [];
+  let ranked = rerank(raw, signals, topK);
+
+  if (ranked.length === 0) {
+    ranked = await registrySearch(queryText, topK);
+  } else {
+    const registryHits = await registrySearch(queryText, topK);
+    const merged = new Map();
+    for (const hit of [...registryHits, ...ranked]) {
+      const toolName = hit.payload?.tool_name;
+      if (!toolName) continue;
+      const existing = merged.get(toolName);
+      const next = {
+        ...hit,
+        score: Number(hit.score ?? 0),
+        reranked_score: Number(hit.reranked_score ?? hit.score ?? 0),
+        payload: {
+          ...hit.payload,
+          tool_name: toolName,
+          primary_layer: hit.payload?.primary_layer ?? hit.payload?.layers?.[0] ?? 'unknown',
+        },
+      };
+      if (!existing || (next.reranked_score ?? 0) > (existing.reranked_score ?? existing.score ?? 0)) {
+        merged.set(toolName, next);
+      }
+    }
+    ranked = [...merged.values()]
+      .sort((a, b) => (b.reranked_score ?? b.score ?? 0) - (a.reranked_score ?? a.score ?? 0))
+      .slice(0, topK);
+  }
 
   // Extract tool names from payloads
   const seen       = new Set();
@@ -223,7 +308,7 @@ export async function selectToolsForQuery(query, { topK = DEFAULT_TOP_K } = {}) 
     llama_names.push(llamaName);
   }
 
-  return { mcp_names, llama_names, hits: ranked, signals, embed_ok: true };
+  return { mcp_names, llama_names, hits: ranked, signals, embed_ok: true, registry_ok: ranked.length > 0 };
 }
 
 // ── Audit mode ────────────────────────────────────────────────────────────────
@@ -284,9 +369,15 @@ async function runAudit() {
   for (const q of testQueries) {
     const sel = await selectToolsForQuery(q, { topK: 5 });
     console.log(`  "${q.slice(0, 50)}"`);
-    console.log(`    embed_ok: ${sel.embed_ok}  signals: ${sel.signals.slice(0, 3).join(', ')}`);
+    console.log(`    embed_ok: ${sel.embed_ok}  registry_ok: ${sel.registry_ok}  signals: ${sel.signals.slice(0, 3).join(', ')}`);
     console.log(`    tools: ${sel.mcp_names.join(', ')}`);
     results.push({ query: q, ...sel, hits: sel.hits.map(h => ({ tool: h.payload?.tool_name, score: h.reranked_score?.toFixed(3) })) });
+  }
+
+  console.log('\nCanonical pickup probes:');
+  for (const sample of canonicalPickupQueries()) {
+    const sel = await selectToolsForQuery(sample.query, { topK: 5 });
+    console.log(`  ${sample.name}: ${sel.mcp_names.join(', ')}`);
   }
 
   // Gate summary
@@ -294,6 +385,7 @@ async function runAudit() {
     { name: 'qdrant_manifest_coverage', pass: qdrantFound >= 16, detail: `${qdrantFound}/${allMcpNames.length}` },
     { name: 'embed_working',           pass: results.every(r => r.embed_ok), detail: 'nomic-embed-text or embeddinggemma' },
     { name: 'tool_selection_returns_results', pass: results.every(r => r.mcp_names.length > 0), detail: `all 5 test queries returned tools` },
+    { name: 'registry_pickup_paths', pass: (await loadRegistry()).registry != null, detail: 'docs/reports/mcp-tool-registry-index.json present' },
   ];
 
   console.log('\n══ Gate Results ═══════════════════════════');

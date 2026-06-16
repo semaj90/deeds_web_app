@@ -152,6 +152,7 @@ const loadedArtifacts = {
   aceContext: readJsonIfExists(path.join(repoRoot, '.opencode', 'ace-context.json'), null),
   featureFiles: readJsonIfExists(path.join(repoRoot, '.opencode', 'feature-files.json'), null),
   recommendations: readJsonIfExists(path.join(repoRoot, '.opencode', 'recommendations', 'recommendations.json'), null),
+  startupBriefing: readJsonIfExists(path.join(repoRoot, '.opencode', 'startup-briefing.json'), null),
   claudeMem: readJsonIfExists(path.join(repoRoot, '.tmp', 'claude-mem-ensure.json'), null),
   startupTruth: readJsonIfExists(path.join(repoRoot, '.tmp', 'startup-truth.json'), null),
   dailySummary: readJsonIfExists(path.join(repoRoot, '.tmp', 'ace-daily-todo-summary.json'), null),
@@ -176,6 +177,7 @@ const loadedReports = Array.from(new Set([
 const startupTruthArtifact = loadedArtifacts.startupTruth;
 const startupTruthDegraded = Boolean(startupTruthArtifact?.blockers?.length);
 const claudeMemArtifact = loadedArtifacts.claudeMem;
+const startupBriefingArtifact = loadedArtifacts.startupBriefing;
 const requiredStepsOk = results
   .filter((step) => step.label !== 'startup-truth' && step.label !== 'claude-mem-ensure')
   .every((step) => step.ok);
@@ -196,6 +198,7 @@ const summary = {
     featureFiles: loadedArtifacts.featureFiles,
     aceContext: loadedArtifacts.aceContext,
     recommendations: loadedArtifacts.recommendations,
+    startupBriefing: loadedArtifacts.startupBriefing,
     claudeMem: loadedArtifacts.claudeMem,
     startupTruth: loadedArtifacts.startupTruth,
     dailySummary: loadedArtifacts.dailySummary,
@@ -208,6 +211,16 @@ const summary = {
     ...(refreshStartupTruth && startupTruthDegraded ? ['startup-truth-blockers-present'] : []),
     ...(claudeMemArtifact && claudeMemArtifact.ok === false ? ['claude-mem-detached-not-ready'] : []),
   ],
+  startupBriefing: startupBriefingArtifact ? {
+    greeting: startupBriefingArtifact.greeting ?? null,
+    nextLane: startupBriefingArtifact.nextLane ?? null,
+    sinceLastWorked: startupBriefingArtifact.sinceLastWorked ?? null,
+    recommendations: Array.isArray(startupBriefingArtifact.recommendations) ? startupBriefingArtifact.recommendations.slice(0, 8) : [],
+    toolRegistry: startupBriefingArtifact.toolRegistry ? {
+      totalTools: startupBriefingArtifact.toolRegistry.totalTools ?? null,
+      activeLayers: startupBriefingArtifact.toolRegistry.activeLayers ?? [],
+    } : null,
+  } : null,
 };
 
 const tmpDir = path.join(repoRoot, '.tmp');
@@ -240,6 +253,7 @@ fs.writeFileSync(path.join(opencodeDir, 'startup-context.json'), JSON.stringify(
     mcpHealth: summary.loadedArtifacts.mcpHealth,
     recommendations: summary.loadedArtifacts.recommendations,
   },
+  startupBriefing: summary.startupBriefing,
   warnings: summary.warnings,
 }, null, 2));
 fs.writeFileSync(path.join(reportsDir, 'opencode-bootstrap.md'), [

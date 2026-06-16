@@ -17,6 +17,24 @@ HyperRAG, ACE packets, or service startup:
 5. Do **not** paste raw full files into context — reference them by path + line range only.
 6. If a required service is offline (MCP 404, Redis ECONNREFUSED, Qdrant timeout), stop and report the dependency with its port. Do not guess.
 
+## Tool calling rule
+
+- Never emit XML tool tags such as `<execute_bash>`.
+- Never emit pseudo tool syntax such as `<|tool_call>`.
+- When a shell command is needed, call the runtime shell tool directly.
+- If shell tools are unavailable, output only a plain fenced PowerShell block and stop.
+- Do not narrate that you will run a command unless you actually called the tool.
+
+## Preferred retrieval order
+
+1. TRACE MCP and Parent Atlas evidence.
+2. atlas-tools for compact intent/context/recommendation packets: `classify_intent`, `build_agentic_rag_context`, `build_recommendation`, `find_source_refs`, `find_feature`, `find_route`, `trace_database`, `trace_tool_chain`, `record_outcome`.
+3. Cache-backed ACE / BitFrost / Redis hits.
+4. Engram memory.
+5. LDR research for longer reads.
+6. Parent Atlas package/report evidence over generic chat memory.
+7. If a `packages/atlas` workspace exists, prefer it; otherwise stay with the current workspace evidence.
+
 ## Context budget (RTX 3060 Ti, 8 GB, 16k ctx-size)
 
 ```
@@ -68,6 +86,20 @@ cross-env DEV_BYPASS_AUTH=true ENABLE_GPU=true ROTORQUANT_URL=http://127.0.0.1:8
 ```
 
 Cline → OpenAI Compatible, Base URL: `http://127.0.0.1:8090/v1`, Model: `gemma4-rotorquant:latest`, Context Window: `16384`.
+
+## PowerShell-safe example
+
+```powershell
+Set-Location "C:\Users\james\Videos\deeds-web-app\sveltekit-frontend"
+
+npm run smoke:hyperrag-packet-rpc
+
+rg -n "rrf|bm25|turbovec|qdrant|batchCosine|attentionScore|gemma4|telemetry" `
+  "src\lib\server\retrieval\hyperrag-packet-rpc.ts" `
+  "src\lib\server\retrieval\rrf-integration.ts" `
+  "src\lib\server\retrieval\bm25-search.ts" `
+  "src\lib\server\retrieval\neo4j-graph-signal.ts"
+```
 
 ## What NOT to do
 

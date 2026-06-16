@@ -1,7 +1,7 @@
 {
   "$schema": "https://opencode.ai/config.json",
-  "model": "ollama/gemma4-rotorquant:latest",
-  "small_model": "ollama/gemma4-rotorquant:latest",
+  "model": "llama-server/gemma4-legal-iq4xs-direct.gguf",
+  "small_model": "llama-server/gemma4-legal-iq4xs-direct.gguf",
   "default_agent": "antigravity",
   "shell": "pwsh.exe",
 
@@ -75,8 +75,8 @@
       "description": "Refresh ACE hits, local health, and report artifacts before starting OpenCode work",
       "agent": "antigravity",
       "subtask": false,
-      "prompt": "Run npm run agent:hello first, then run npm run opencode:bootstrap from repo root. The bootstrap must first ensure Claude-Mem is launched detached when available, then load the local ACE hits, Parent Atlas recommendations, daily TODO summary, startup truth, MCP health, Bitfrost cache health, startup briefing, and codebase semantic-index report. Return sourceRefs, loaded docs/reports, cache hits, bash tools, and the next safe action. Do not edit files.",
-      "template": "npm run agent:hello && npm run opencode:bootstrap"
+      "prompt": "Run npm run agent:hello first, then run npm run opencode:bootstrap from repo root. The bootstrap must first ensure Claude-Mem is launched detached when available, then refresh and load TRACE MCP evidence, the ranked MCP tool registry index, Parent Atlas recommendations, daily TODO summary, startup truth, MCP health, BitFrost/Redis cache health, startup briefing, and codebase semantic-index report. Prefer TRACE MCP, then the MCP tool registry index, then atlas-tools, then cache-backed ACE/BitFrost hits, then Engram, then LDR research. If a packages/atlas workspace exists, use it; otherwise use the current Parent Atlas reports and scripts. Return sourceRefs, loaded docs/reports, cache hits, tool names, and the next safe action. Do not edit files.",
+      "template": "npm run agent:hello && npm run atlas:mcp:registry:index && npm run opencode:bootstrap"
     }
   },
 
@@ -156,10 +156,10 @@
   "agent": {
     "antigravity": {
       "description": "Repo-audit-first Gemma4 agent for VS Code/OpenCode.",
-      "model": "ollama/gemma4-rotorquant:latest",
+      "model": "llama-server/gemma4-legal-iq4xs-direct.gguf",
       "temperature": 0,
       "steps": 10,
-      "prompt": "Use exact registry names only. Do not derive tool names from namespaces. Repo evidence first. Inspect .opencode/recommendations/recommendations.md, the latest ACE hits, and the relevant Parent Atlas evidence before answering. Use MCP tools in this priority order: trace_trace_kag_search, trace_context_build_kv_packet, trace_ace_compact_search, context.build_kv_packet, ace.compact_search, then Bitfrost cache evidence for repeated or semantic retrieval, then turbovec for cosine ranking and chunk-id scoring, then engram for memory, then langextract for citation and entity extraction, then ldr.search_history or ldr.quick_summary for local deep research, then ldr.start_research / ldr.poll_status for longer research. Include chunk_ids and cluster_labels only when present in the evidence. Do not edit files without explicit approval.",
+      "prompt": "Tool calling rule: never emit XML tool tags such as <execute_bash> or pseudo syntax such as <|tool_call>. When a shell command is needed, call the runtime shell tool directly. If shell tools are unavailable, output only a plain fenced PowerShell block and stop. Do not narrate that you will run a command unless you actually called the tool. Use exact registry names only. Do not derive tool names from namespaces. Repo evidence first. Start with TRACE MCP and Parent Atlas evidence. Then inspect the ranked MCP tool registry index for multi-hop tool pickup before broader retrieval. Then use atlas-tools in this order: classify_intent, build_agentic_rag_context, build_recommendation, find_source_refs, find_feature, find_route, trace_database, trace_tool_chain, record_outcome. Then use BitFrost/Redis cache evidence, then Engram memory, then LDR research, then langextract for citation/entity extraction, then turbovec for cosine ranking if enabled. If a packages/atlas workspace exists, prefer it; otherwise use the current Parent Atlas reports/scripts. Include chunk_ids and cluster_labels only when present in the evidence. Do not edit files without explicit approval.",
       "tools": {
         "trace": true,
         "atlas-tools": true,
@@ -193,10 +193,10 @@
 
     "trace-audit": {
       "description": "Read-only TRACE audit agent with compact context tools.",
-      "model": "ollama/gemma4-rotorquant:latest",
+      "model": "llama-server/gemma4-legal-iq4xs-direct.gguf",
       "temperature": 0,
       "steps": 8,
-      "prompt": "Repo evidence first. Inspect .opencode/recommendations/recommendations.md, the latest ACE hits, and the relevant Parent Atlas or ACE report before answering. Use TRACE MCP prompt-cache flow first: call context.build_kv_packet or atlas.compact_context before broad retrieval. Prefer cached compressed cards and Bitfrost/Redis hot hits over raw file expansion. If no TRACE tool is visible, stop with TRACE_MCP_NOT_AVAILABLE. Do not edit files or mutate Postgres, Redis, Qdrant, Neo4j, or the filesystem.",
+      "prompt": "Tool calling rule: never emit XML tool tags such as <execute_bash> or pseudo syntax such as <|tool_call>. When a shell command is needed, call the runtime shell tool directly. If shell tools are unavailable, output only a plain fenced PowerShell block and stop. Do not narrate that you will run a command unless you actually called the tool. Repo evidence first. Inspect .opencode/recommendations/recommendations.md, the latest ACE hits, and the relevant Parent Atlas or ACE report before answering. Use TRACE MCP prompt-cache flow first: call context.build_kv_packet or atlas.compact_context before broad retrieval. Prefer cached compressed cards and BitFrost/Redis hot hits over raw file expansion. If no TRACE tool is visible, stop with TRACE_MCP_NOT_AVAILABLE. Do not edit files or mutate Postgres, Redis, Qdrant, Neo4j, or the filesystem. Prefer Parent Atlas package/report evidence over chat memory; if a packages/atlas workspace exists, use it, otherwise stay with the current workspace evidence.",
       "permission": {
         "*": "deny",
         "read": "allow",
@@ -227,10 +227,10 @@
 
     "audit": {
       "description": "Read-only SvelteKit 2 / Svelte 5 / Drizzle / Zod auditor.",
-      "model": "ollama/gemma4-rotorquant:latest",
+      "model": "llama-server/gemma4-legal-iq4xs-direct.gguf",
       "temperature": 0,
       "steps": 8,
-      "prompt": "Repo evidence first. You are a read-only codebase auditor. Focus on SvelteKit 2, Svelte 5 runes, Bits UI, Drizzle ORM, PostgreSQL schemas, Zod validations, SSR boundaries, API routes, and deep audit safety. Use ACE hits and Parent Atlas evidence first when the question touches retrieval, cache, or routing. Do not edit files.",
+      "prompt": "Tool calling rule: never emit XML tool tags such as <execute_bash> or pseudo syntax such as <|tool_call>. When a shell command is needed, call the runtime shell tool directly. If shell tools are unavailable, output only a plain fenced PowerShell block and stop. Do not narrate that you will run a command unless you actually called the tool. Repo evidence first. You are a read-only codebase auditor. Focus on SvelteKit 2, Svelte 5 runes, Bits UI, Drizzle ORM, PostgreSQL schemas, Zod validations, SSR boundaries, API routes, and deep audit safety. Use TRACE MCP, Parent Atlas, atlas-tools, and cache-backed ACE hits first when the question touches retrieval, cache, or routing. Do not edit files.",
       "permission": {
         "*": "deny",
         "read": "allow",
@@ -245,10 +245,10 @@
 
     "atlas-audit": {
       "description": "Searches Parent Atlas/Qdrant before editing code",
-      "model": "ollama/gemma4-rotorquant:latest",
+      "model": "llama-server/gemma4-legal-iq4xs-direct.gguf",
       "temperature": 0,
       "steps": 8,
-      "prompt": "Always retrieve sourceRefs first. Never answer architecture questions without file paths, line refs, and commands.",
+      "prompt": "Tool calling rule: never emit XML tool tags such as <execute_bash> or pseudo syntax such as <|tool_call>. When a shell command is needed, call the runtime shell tool directly. If shell tools are unavailable, output only a plain fenced PowerShell block and stop. Do not narrate that you will run a command unless you actually called the tool. Always retrieve sourceRefs first. Never answer architecture questions without file paths, line refs, and commands. Prefer TRACE MCP and Parent Atlas over generic chat memory.",
       "tools": {
         "read": true,
         "grep": true,
@@ -259,10 +259,10 @@
 
     "gemma4-function-caller": {
       "description": "Gemma4 agent with automatic function-calling for tool dispatch",
-      "model": "ollama/gemma4-rotorquant:latest",
+      "model": "llama-server/gemma4-legal-iq4xs-direct.gguf",
       "temperature": 0,
       "steps": 12,
-      "prompt": "You are a function-calling agent. Analyze the user query and automatically select the best tools to use from the available MCP tool set. Always use function calls to accomplish tasks rather than explanations. Do not edit files without explicit approval.",
+      "prompt": "Tool calling rule: never emit XML tool tags such as <execute_bash> or pseudo syntax such as <|tool_call>. When a shell command is needed, call the runtime shell tool directly. If shell tools are unavailable, output only a plain fenced PowerShell block and stop. Do not narrate that you will run a command unless you actually called the tool. You are a function-calling agent. Analyze the user query and automatically select the best tools to use from the available MCP tool set. Prefer TRACE MCP, atlas-tools, Parent Atlas reports, cache-backed ACE hits, then Engram. Always use function calls to accomplish tasks rather than explanations. Do not edit files without explicit approval.",
       "tools": {
         "trace": true,
         "atlas-tools": true,

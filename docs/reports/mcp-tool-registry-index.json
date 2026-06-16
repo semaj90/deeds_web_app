@@ -1,0 +1,6643 @@
+{
+  "generated_at": "2026-06-16T16:14:25.660Z",
+  "sources": [
+    "C:\\Users\\james\\Videos\\deeds-web-app\\docs\\reports\\mcp-tool-ontology.json",
+    "C:\\Users\\james\\Videos\\deeds-web-app\\docs\\reports\\mcp-tool-manifest-packets.json"
+  ],
+  "trace_tools": 128,
+  "manifest_tools": 0,
+  "rpc_methods": 74,
+  "total_tools": 128,
+  "by_layer": {
+    "identity": [
+      {
+        "tool_name": "atlas.source_refs",
+        "namespace": "atlas",
+        "description": "Return the top sourceRefs from the compact Atlas packet.",
+        "layers": [
+          "identity"
+        ],
+        "identity_fields": [
+          "source_ref"
+        ],
+        "writes_to": [],
+        "permissions": "read_only",
+        "packet_kind": "trace_tool",
+        "sources": [
+          "trace-mcp"
+        ],
+        "source_ref": "atlas.source_refs",
+        "examples": [],
+        "transport": null,
+        "domain": "unknown",
+        "ontology": [],
+        "service": null,
+        "method": null,
+        "primary_layer": "identity",
+        "score": 112,
+        "rank": 34
+      },
+      {
+        "tool_name": "atlas.query",
+        "namespace": "atlas",
+        "description": "Atlas alias for ranked technical search. Returns the same compact hit list as kb.trace_search for a query.",
+        "layers": [
+          "identity"
+        ],
+        "identity_fields": [],
+        "writes_to": [],
+        "permissions": "read_only",
+        "packet_kind": "trace_tool",
+        "sources": [
+          "trace-mcp"
+        ],
+        "source_ref": "atlas.query",
+        "examples": [],
+        "transport": null,
+        "domain": "unknown",
+        "ontology": [],
+        "service": null,
+        "method": null,
+        "primary_layer": "identity",
+        "score": 104,
+        "rank": 35
+      }
+    ],
+    "memory": [
+      {
+        "tool_name": "engram.chat_memory_recent",
+        "namespace": "engram",
+        "description": "Read-only recent chat memory lookup from engram_cards.",
+        "layers": [
+          "memory"
+        ],
+        "identity_fields": [],
+        "writes_to": [],
+        "permissions": "read_only",
+        "packet_kind": "trace_tool",
+        "sources": [
+          "trace-mcp"
+        ],
+        "source_ref": "engram.chat_memory_recent",
+        "examples": [],
+        "transport": null,
+        "domain": "unknown",
+        "ontology": [],
+        "service": null,
+        "method": null,
+        "primary_layer": "memory",
+        "score": 99,
+        "rank": 36
+      }
+    ],
+    "cache": [
+      {
+        "tool_name": "ace.compact_search",
+        "namespace": "ace",
+        "description": "Token-budgeted semantic search returning a compact context tree. Use this instead of reading full files when you need focused retrieval within a token budget. Checks Redis cache first (TTL 300s), then runs hybrid FTS + vector search, applies Karpathy authority blend, and trims each snippet to fit tokenBudget.",
+        "layers": [
+          "cache",
+          "lexical",
+          "dense",
+          "graph"
+        ],
+        "identity_fields": [],
+        "writes_to": [],
+        "permissions": "read_only",
+        "packet_kind": "trace_tool",
+        "sources": [
+          "trace-mcp"
+        ],
+        "source_ref": "ace.compact_search",
+        "examples": [],
+        "transport": null,
+        "domain": "unknown",
+        "ontology": [],
+        "service": null,
+        "method": null,
+        "primary_layer": "cache",
+        "score": 350,
+        "rank": 1
+      },
+      {
+        "tool_name": "wiki.search",
+        "namespace": "wiki",
+        "description": "Hybrid wiki search over rg/codebase-graph metadata, Redis Karpathy scores, Qdrant payloads, CouchDB wiki docs, and Postgres JSONB mappings.",
+        "layers": [
+          "cache",
+          "dense",
+          "graph",
+          "read"
+        ],
+        "identity_fields": [],
+        "writes_to": [],
+        "permissions": "read_only",
+        "packet_kind": "trace_tool",
+        "sources": [
+          "trace-mcp"
+        ],
+        "source_ref": "wiki.search",
+        "examples": [],
+        "transport": null,
+        "domain": "unknown",
+        "ontology": [],
+        "service": null,
+        "method": null,
+        "primary_layer": "cache",
+        "score": 338,
+        "rank": 2
+      },
+      {
+        "tool_name": "wiki.status",
+        "namespace": "wiki",
+        "description": "Returns Karpathy/AGENTS wiki status across Postgres, Redis, CouchDB, Qdrant, Neo4j, and graphify metadata.",
+        "layers": [
+          "cache",
+          "dense",
+          "graph",
+          "read"
+        ],
+        "identity_fields": [],
+        "writes_to": [],
+        "permissions": "read_only",
+        "packet_kind": "trace_tool",
+        "sources": [
+          "trace-mcp"
+        ],
+        "source_ref": "wiki.status",
+        "examples": [],
+        "transport": null,
+        "domain": "unknown",
+        "ontology": [],
+        "service": null,
+        "method": null,
+        "primary_layer": "cache",
+        "score": 338,
+        "rank": 3
+      },
+      {
+        "tool_name": "ops.fixer_semantic_recall",
+        "namespace": "ops",
+        "description": "Recalls known fix templates via Redis L1 → Postgres L2 → Qdrant semantic L3. Call before LLM analysis to skip redundant inference on known error patterns.",
+        "layers": [
+          "cache",
+          "dense",
+          "synthesis",
+          "ops"
+        ],
+        "identity_fields": [],
+        "writes_to": [],
+        "permissions": "read_only",
+        "packet_kind": "trace_tool",
+        "sources": [
+          "trace-mcp"
+        ],
+        "source_ref": "ops.fixer_semantic_recall",
+        "examples": [],
+        "transport": null,
+        "domain": "unknown",
+        "ontology": [],
+        "service": null,
+        "method": null,
+        "primary_layer": "cache",
+        "score": 310,
+        "rank": 4
+      },
+      {
+        "tool_name": "legal.check_services",
+        "namespace": "legal",
+        "description": "Probe all 9 backing services (Postgres, Redis, Qdrant, Neo4j, Ollama, RabbitMQ, CouchDB, SeaweedFS, Obsidian) and report health status with latency. Use to diagnose why other tools are returning errors.",
+        "layers": [
+          "cache",
+          "dense",
+          "graph"
+        ],
+        "identity_fields": [],
+        "writes_to": [],
+        "permissions": "read_only",
+        "packet_kind": "trace_tool",
+        "sources": [
+          "trace-mcp"
+        ],
+        "source_ref": "legal.check_services",
+        "examples": [],
+        "transport": null,
+        "domain": "unknown",
+        "ontology": [],
+        "service": null,
+        "method": null,
+        "primary_layer": "cache",
+        "score": 270,
+        "rank": 7
+      },
+      {
+        "tool_name": "ops.gpu_attention",
+        "namespace": "ops",
+        "description": "GPU scaled dot-product attention over a flat key matrix. Returns softmax attention weights per key. Results are Redis-cached 300 s by shape+input hash (CUDA Graph replay emulation). Use for ACE chunk reranking, evidence scoring, or any query-vs-corpus weighting.",
+        "layers": [
+          "cache",
+          "rerank",
+          "ops"
+        ],
+        "identity_fields": [],
+        "writes_to": [],
+        "permissions": "read_only",
+        "packet_kind": "trace_tool",
+        "sources": [
+          "trace-mcp"
+        ],
+        "source_ref": "ops.gpu_attention",
+        "examples": [],
+        "transport": null,
+        "domain": "unknown",
+        "ontology": [],
+        "service": null,
+        "method": null,
+        "primary_layer": "cache",
+        "score": 238,
+        "rank": 12
+      },
+      {
+        "tool_name": "ops.update_LLMS.md",
+        "namespace": "ops",
+        "description": "Append a new fact, rule, or tool note to a directory LLMS.md file and flush to Redis. Use this after discovering something useful that should survive future conversations. The fact appears in every future ACE context for that directory automatically (Lane L4).",
+        "layers": [
+          "cache",
+          "synthesis",
+          "ops"
+        ],
+        "identity_fields": [],
+        "writes_to": [],
+        "permissions": "read_only",
+        "packet_kind": "trace_tool",
+        "sources": [
+          "trace-mcp"
+        ],
+        "source_ref": "ops.update_LLMS.md",
+        "examples": [],
+        "transport": null,
+        "domain": "unknown",
+        "ontology": [],
+        "service": null,
+        "method": null,
+        "primary_layer": "cache",
+        "score": 226,
+        "rank": 13
+      },
+      {
+        "tool_name": "engram.chat_memory_store",
+        "namespace": "engram",
+        "description": "Append a chat turn to user memory store (Redis sorted set + bounded trim).",
+        "layers": [
+          "cache",
+          "memory"
+        ],
+        "identity_fields": [],
+        "writes_to": [
+          "engram"
+        ],
+        "permissions": "read_write",
+        "packet_kind": "trace_tool",
+        "sources": [
+          "trace-mcp"
+        ],
+        "source_ref": "engram.chat_memory_store",
+        "examples": [],
+        "transport": null,
+        "domain": "unknown",
+        "ontology": [],
+        "service": null,
+        "method": null,
+        "primary_layer": "cache",
+        "score": 181,
+        "rank": 17
+      },
+      {
+        "tool_name": "evidence.image_feedback",
+        "namespace": "evidence",
+        "description": "Record thumbs-up or thumbs-down on a visual search result. Votes accumulate in Redis; Qdrant payload (trust_score, user_approved/rejected) is updated after 3 votes. Fires GRPO rl-signal automatically.",
+        "layers": [
+          "cache",
+          "dense"
+        ],
+        "identity_fields": [],
+        "writes_to": [],
+        "permissions": "read_only",
+        "packet_kind": "trace_tool",
+        "sources": [
+          "trace-mcp"
+        ],
+        "source_ref": "evidence.image_feedback",
+        "examples": [],
+        "transport": null,
+        "domain": "unknown",
+        "ontology": [],
+        "service": null,
+        "method": null,
+        "primary_layer": "cache",
+        "score": 180,
+        "rank": 18
+      },
+      {
+        "tool_name": "legal.transcribe_video",
+        "namespace": "legal",
+        "description": "Queue a video URL for non-blocking background processing via RabbitMQ: yt-dlp download → FFmpeg audio extraction → Whisper large-v3 transcription → timestamp-chunked embedding into Qdrant evidence_items. Returns a job_id. Poll Redis key hermes:job:{jobId} for progress. Supports YouTube, direct MP4, Vimeo.",
+        "layers": [
+          "cache",
+          "dense"
+        ],
+        "identity_fields": [],
+        "writes_to": [],
+        "permissions": "read_only",
+        "packet_kind": "trace_tool",
+        "sources": [
+          "trace-mcp"
+        ],
+        "source_ref": "legal.transcribe_video",
+        "examples": [],
+        "transport": null,
+        "domain": "unknown",
+        "ontology": [],
+        "service": null,
+        "method": null,
+        "primary_layer": "cache",
+        "score": 180,
+        "rank": 19
+      },
+      {
+        "tool_name": "engram.ace_packet_inject",
+        "namespace": "engram",
+        "description": "Write ACE context packet to Redis with 1h TTL: ace:packet:{runId}.",
+        "layers": [
+          "cache",
+          "synthesis"
+        ],
+        "identity_fields": [],
+        "writes_to": [
+          "engram"
+        ],
+        "permissions": "read_write",
+        "packet_kind": "trace_tool",
+        "sources": [
+          "trace-mcp"
+        ],
+        "source_ref": "engram.ace_packet_inject",
+        "examples": [],
+        "transport": null,
+        "domain": "unknown",
+        "ontology": [],
+        "service": null,
+        "method": null,
+        "primary_layer": "cache",
+        "score": 162,
+        "rank": 28
+      },
+      {
+        "tool_name": "engram.redis_health",
+        "namespace": "engram",
+        "description": "Check Redis availability used by engram memory tools.",
+        "layers": [
+          "cache"
+        ],
+        "identity_fields": [],
+        "writes_to": [
+          "redis"
+        ],
+        "permissions": "read_write",
+        "packet_kind": "trace_tool",
+        "sources": [
+          "trace-mcp"
+        ],
+        "source_ref": "engram.redis_health",
+        "examples": [],
+        "transport": null,
+        "domain": "unknown",
+        "ontology": [],
+        "service": null,
+        "method": null,
+        "primary_layer": "cache",
+        "score": 86,
+        "rank": 53
+      }
+    ],
+    "lexical": [
+      {
+        "tool_name": "search.go_hybrid",
+        "namespace": "search",
+        "description": "Go search service RRF fusion of FTS + pgvector + Qdrant.",
+        "layers": [
+          "lexical",
+          "dense",
+          "rerank"
+        ],
+        "identity_fields": [],
+        "writes_to": [],
+        "permissions": "read_only",
+        "packet_kind": "trace_tool",
+        "sources": [
+          "trace-mcp"
+        ],
+        "source_ref": "search.go_hybrid",
+        "examples": [],
+        "transport": null,
+        "domain": "unknown",
+        "ontology": [],
+        "service": null,
+        "method": null,
+        "primary_layer": "lexical",
+        "score": 256,
+        "rank": 9
+      },
+      {
+        "tool_name": "kag.recall_similar_fix",
+        "namespace": "kag",
+        "description": "Recalls prior fixes for an error via exact-hash + pg_trgm similarity over error_fingerprints.",
+        "layers": [
+          "lexical",
+          "synthesis",
+          "memory"
+        ],
+        "identity_fields": [],
+        "writes_to": [],
+        "permissions": "read_only",
+        "packet_kind": "trace_tool",
+        "sources": [
+          "trace-mcp"
+        ],
+        "source_ref": "kag.recall_similar_fix",
+        "examples": [],
+        "transport": null,
+        "domain": "unknown",
+        "ontology": [],
+        "service": null,
+        "method": null,
+        "primary_layer": "lexical",
+        "score": 255,
+        "rank": 10
+      },
+      {
+        "tool_name": "legal.find_similar_opinions",
+        "namespace": "legal",
+        "description": "Find similar case opinions, judgments, and rulings via Qdrant semantic search on the legal_documents collection filtered to doc_type opinion/judgment/ruling. Embeds the facts summary via /api/embed then runs ANN. Falls back to Postgres FTS on Qdrant error.",
+        "layers": [
+          "lexical",
+          "dense"
+        ],
+        "identity_fields": [],
+        "writes_to": [],
+        "permissions": "read_only",
+        "packet_kind": "trace_tool",
+        "sources": [
+          "trace-mcp"
+        ],
+        "source_ref": "legal.find_similar_opinions",
+        "examples": [],
+        "transport": null,
+        "domain": "unknown",
+        "ontology": [],
+        "service": null,
+        "method": null,
+        "primary_layer": "lexical",
+        "score": 168,
+        "rank": 24
+      },
+      {
+        "tool_name": "kag.multi_lane_search",
+        "namespace": "kag",
+        "description": "Performs 11-lane HyperRAG retrieval across hash, n-gram, graph, feature atlas, and activity prefetch lanes. Returns ranked hits + synthesisBlock with per-chunk trust tier metadata.",
+        "layers": [
+          "lexical",
+          "synthesis"
+        ],
+        "identity_fields": [],
+        "writes_to": [],
+        "permissions": "read_only",
+        "packet_kind": "trace_tool",
+        "sources": [
+          "trace-mcp"
+        ],
+        "source_ref": "kag.multi_lane_search",
+        "examples": [],
+        "transport": null,
+        "domain": "unknown",
+        "ontology": [],
+        "service": null,
+        "method": null,
+        "primary_layer": "lexical",
+        "score": 160,
+        "rank": 30
+      },
+      {
+        "tool_name": "search.hybrid",
+        "namespace": "search",
+        "description": "Performs hybrid (FTS + semantic) search across the codebase.",
+        "layers": [
+          "lexical"
+        ],
+        "identity_fields": [],
+        "writes_to": [],
+        "permissions": "read_only",
+        "packet_kind": "trace_tool",
+        "sources": [
+          "trace-mcp"
+        ],
+        "source_ref": "search.hybrid",
+        "examples": [],
+        "transport": null,
+        "domain": "unknown",
+        "ontology": [],
+        "service": null,
+        "method": null,
+        "primary_layer": "lexical",
+        "score": 84,
+        "rank": 58
+      },
+      {
+        "tool_name": "search.postgres_fts",
+        "namespace": "search",
+        "description": "Code search using PostgreSQL Full Text Search.",
+        "layers": [
+          "lexical"
+        ],
+        "identity_fields": [],
+        "writes_to": [],
+        "permissions": "read_only",
+        "packet_kind": "trace_tool",
+        "sources": [
+          "trace-mcp"
+        ],
+        "source_ref": "search.postgres_fts",
+        "examples": [],
+        "transport": null,
+        "domain": "unknown",
+        "ontology": [],
+        "service": null,
+        "method": null,
+        "primary_layer": "lexical",
+        "score": 80,
+        "rank": 74
+      }
+    ],
+    "dense": [
+      {
+        "tool_name": "atlas:packet_search",
+        "namespace": "atlas",
+        "description": "Query the canonical atlas_packets table. Search by source_ref path (variants tried automatically), feature_id, concept_id membership, or free-text summary match. Returns packet_id, source_ref, feature_id, concept_ids, summary, reward_prior. Use this to find which packets are associated with a file or feature before querying Qdrant.",
+        "layers": [
+          "dense",
+          "graph",
+          "identity"
+        ],
+        "identity_fields": [
+          "feature_id",
+          "source_ref"
+        ],
+        "writes_to": [],
+        "permissions": "read_only",
+        "packet_kind": "trace_tool",
+        "sources": [
+          "trace-mcp"
+        ],
+        "source_ref": "atlas:packet_search",
+        "examples": [],
+        "transport": null,
+        "domain": "unknown",
+        "ontology": [],
+        "service": null,
+        "method": null,
+        "primary_layer": "dense",
+        "score": 286,
+        "rank": 5
+      },
+      {
+        "tool_name": "atlas.packet_search",
+        "namespace": "atlas",
+        "description": "Query the canonical atlas_packets table. Search by source_ref path (variants tried automatically), feature_id, concept_id membership, or free-text summary match. Returns packet_id, source_ref, feature_id, concept_ids, summary, reward_prior. Use this to find which packets are associated with a file or feature before querying Qdrant.",
+        "layers": [
+          "dense",
+          "graph",
+          "identity"
+        ],
+        "identity_fields": [
+          "feature_id",
+          "source_ref"
+        ],
+        "writes_to": [],
+        "permissions": "read_only",
+        "packet_kind": "trace_tool",
+        "sources": [
+          "trace-mcp"
+        ],
+        "source_ref": "atlas.packet_search",
+        "examples": [],
+        "transport": null,
+        "domain": "unknown",
+        "ontology": [],
+        "service": null,
+        "method": null,
+        "primary_layer": "dense",
+        "score": 286,
+        "rank": 6
+      },
+      {
+        "tool_name": "image.enrich_tags",
+        "namespace": "image",
+        "description": "VLM-enrich one Qdrant evidence point with auto-generated tags. Fetches the image (from payload file_path or MinIO), runs Gemma4-VLM, and PATCHes suggestedTags + vlm_summary back onto the Qdrant payload. Tags are merged with any existing tags (deduped). Use before indexing or to backfill stale points.",
+        "layers": [
+          "dense",
+          "graph",
+          "synthesis"
+        ],
+        "identity_fields": [],
+        "writes_to": [],
+        "permissions": "read_only",
+        "packet_kind": "trace_tool",
+        "sources": [
+          "trace-mcp"
+        ],
+        "source_ref": "image.enrich_tags",
+        "examples": [],
+        "transport": null,
+        "domain": "unknown",
+        "ontology": [],
+        "service": null,
+        "method": null,
+        "primary_layer": "dense",
+        "score": 256,
+        "rank": 8
+      },
+      {
+        "tool_name": "wiki.explain_page",
+        "namespace": "wiki",
+        "description": "Explains one wiki page with source files, imports, path aliases, feature keys, Qdrant tags, graph links, activity score, recommendations, and related FeatureMaps.",
+        "layers": [
+          "dense",
+          "graph",
+          "read"
+        ],
+        "identity_fields": [],
+        "writes_to": [],
+        "permissions": "read_only",
+        "packet_kind": "trace_tool",
+        "sources": [
+          "trace-mcp"
+        ],
+        "source_ref": "wiki.explain_page",
+        "examples": [],
+        "transport": null,
+        "domain": "unknown",
+        "ontology": [],
+        "service": null,
+        "method": null,
+        "primary_layer": "dense",
+        "score": 246,
+        "rank": 11
+      },
+      {
+        "tool_name": "atlas:verify_coverage",
+        "namespace": "atlas",
+        "description": "Phase 3I verification gate. Reports coverage metrics for the atlas_packets canonical warehouse: total packets, source_ref coverage %, feature_id coverage %, concept_ids coverage %, summary coverage %, embedding coverage %, and duplicate sha256 count. Gate: source_ref >= 90% required before Phase 4A RRF ranking can start.",
+        "layers": [
+          "dense",
+          "rerank"
+        ],
+        "identity_fields": [
+          "feature_id",
+          "source_ref"
+        ],
+        "writes_to": [],
+        "permissions": "read_only",
+        "packet_kind": "trace_tool",
+        "sources": [
+          "trace-mcp"
+        ],
+        "source_ref": "atlas:verify_coverage",
+        "examples": [],
+        "transport": null,
+        "domain": "unknown",
+        "ontology": [],
+        "service": null,
+        "method": null,
+        "primary_layer": "dense",
+        "score": 184,
+        "rank": 15
+      },
+      {
+        "tool_name": "atlas.prefilter",
+        "namespace": "atlas",
+        "description": "TurboVec ANN cluster prefilter. Embeds the query and queries the TurboVec sidecar (:8099) to identify the top-N cluster IDs for injecting into a Qdrant should/must filter. Returns clusterIds, centroidScores, backend (python|js|offline), and latency.",
+        "layers": [
+          "dense",
+          "rerank"
+        ],
+        "identity_fields": [],
+        "writes_to": [],
+        "permissions": "read_only",
+        "packet_kind": "trace_tool",
+        "sources": [
+          "trace-mcp"
+        ],
+        "source_ref": "atlas.prefilter",
+        "examples": [],
+        "transport": null,
+        "domain": "unknown",
+        "ontology": [],
+        "service": null,
+        "method": null,
+        "primary_layer": "dense",
+        "score": 176,
+        "rank": 20
+      },
+      {
+        "tool_name": "atlas.coverage",
+        "namespace": "atlas",
+        "description": "Phase 3I verification gate. Reports coverage metrics for the atlas_packets canonical warehouse: total packets, source_ref coverage %, feature_id coverage %, concept_ids coverage %, summary coverage %, embedding coverage %, and duplicate sha256 count. Gate: source_ref >= 90% required before Phase 4A RRF ranking can start.",
+        "layers": [
+          "dense",
+          "rerank"
+        ],
+        "identity_fields": [
+          "feature_id",
+          "source_ref"
+        ],
+        "writes_to": [
+          "postgres"
+        ],
+        "permissions": "read_write",
+        "packet_kind": "trace_tool",
+        "sources": [
+          "trace-mcp"
+        ],
+        "source_ref": "atlas.coverage",
+        "examples": [],
+        "transport": null,
+        "domain": "unknown",
+        "ontology": [],
+        "service": null,
+        "method": null,
+        "primary_layer": "dense",
+        "score": 174,
+        "rank": 21
+      },
+      {
+        "tool_name": "image.caption",
+        "namespace": "image",
+        "description": "Get a VLM-generated caption and suggested tags for a local image file. Calls the Gemma4-VLM pipeline (Triton→TurboQuant→Ollama cascade). Does NOT search Qdrant — use evidence.search_by_image to also get ranked hits.",
+        "layers": [
+          "dense",
+          "synthesis"
+        ],
+        "identity_fields": [],
+        "writes_to": [],
+        "permissions": "read_only",
+        "packet_kind": "trace_tool",
+        "sources": [
+          "trace-mcp"
+        ],
+        "source_ref": "image.caption",
+        "examples": [],
+        "transport": null,
+        "domain": "unknown",
+        "ontology": [],
+        "service": null,
+        "method": null,
+        "primary_layer": "dense",
+        "score": 166,
+        "rank": 25
+      },
+      {
+        "tool_name": "image.search_by_text",
+        "namespace": "image",
+        "description": "Search the evidence image index using a text description. Embeds the query via embeddinggemma and searches Qdrant. No image upload needed — use for natural-language queries like \"find images showing property damage\" or \"photos of the red sedan\".",
+        "layers": [
+          "dense",
+          "synthesis"
+        ],
+        "identity_fields": [],
+        "writes_to": [],
+        "permissions": "read_only",
+        "packet_kind": "trace_tool",
+        "sources": [
+          "trace-mcp"
+        ],
+        "source_ref": "image.search_by_text",
+        "examples": [],
+        "transport": null,
+        "domain": "unknown",
+        "ontology": [],
+        "service": null,
+        "method": null,
+        "primary_layer": "dense",
+        "score": 166,
+        "rank": 26
+      },
+      {
+        "tool_name": "ops.fixer_pattern_store",
+        "namespace": "ops",
+        "description": "[OPERATOR-GATED] Stores a fix attempt outcome to the 3-layer fixer memory. Increments success/failure counts, upserts to Qdrant fixer_memory_768 (GPU-indexed) when embedding provided.",
+        "layers": [
+          "dense",
+          "ops"
+        ],
+        "identity_fields": [],
+        "writes_to": [],
+        "permissions": "read_only",
+        "packet_kind": "trace_tool",
+        "sources": [
+          "trace-mcp"
+        ],
+        "source_ref": "ops.fixer_pattern_store",
+        "examples": [],
+        "transport": null,
+        "domain": "unknown",
+        "ontology": [],
+        "service": null,
+        "method": null,
+        "primary_layer": "dense",
+        "score": 142,
+        "rank": 32
+      },
+      {
+        "tool_name": "ops.trust_audit",
+        "namespace": "ops",
+        "description": "Read-only audit of the trust-tier injection-detection system. Returns count of blocked content hashes and the most recently blocked entries. Use for diagnostics only — cannot clear the block list.",
+        "layers": [
+          "dense",
+          "ops"
+        ],
+        "identity_fields": [],
+        "writes_to": [],
+        "permissions": "read_only",
+        "packet_kind": "trace_tool",
+        "sources": [
+          "trace-mcp"
+        ],
+        "source_ref": "ops.trust_audit",
+        "examples": [],
+        "transport": null,
+        "domain": "unknown",
+        "ontology": [],
+        "service": null,
+        "method": null,
+        "primary_layer": "dense",
+        "score": 142,
+        "rank": 33
+      },
+      {
+        "tool_name": "evidence.search_by_image",
+        "namespace": "evidence",
+        "description": "Search evidence by uploading an image. The VLM describes the image, embeds it, and returns semantically similar evidence items from Qdrant. Use for \"find evidence similar to this photo/diagram/screenshot\".",
+        "layers": [
+          "dense"
+        ],
+        "identity_fields": [],
+        "writes_to": [],
+        "permissions": "read_only",
+        "packet_kind": "trace_tool",
+        "sources": [
+          "trace-mcp"
+        ],
+        "source_ref": "evidence.search_by_image",
+        "examples": [],
+        "transport": null,
+        "domain": "unknown",
+        "ontology": [],
+        "service": null,
+        "method": null,
+        "primary_layer": "dense",
+        "score": 88,
+        "rank": 50
+      },
+      {
+        "tool_name": "legal.batch_ingest",
+        "namespace": "legal",
+        "description": "Publish one or more document URLs to the document.embed RabbitMQ queue for background embedding and indexing. Use to bulk-ingest case documents, transcripts, or external evidence without blocking the agent loop.",
+        "layers": [
+          "dense"
+        ],
+        "identity_fields": [],
+        "writes_to": [],
+        "permissions": "read_only",
+        "packet_kind": "trace_tool",
+        "sources": [
+          "trace-mcp"
+        ],
+        "source_ref": "legal.batch_ingest",
+        "examples": [],
+        "transport": null,
+        "domain": "unknown",
+        "ontology": [],
+        "service": null,
+        "method": null,
+        "primary_layer": "dense",
+        "score": 88,
+        "rank": 51
+      },
+      {
+        "tool_name": "legal.cross_reference_evidence",
+        "namespace": "legal",
+        "description": "Semantic cross-reference: find evidence chunks similar to a reference evidence item across one or more cases using Qdrant ANN. Use for \"has this fingerprint/phrase/pattern appeared in another case?\" Returns top-K matches with case_id and similarity score.",
+        "layers": [
+          "dense"
+        ],
+        "identity_fields": [],
+        "writes_to": [],
+        "permissions": "read_only",
+        "packet_kind": "trace_tool",
+        "sources": [
+          "trace-mcp"
+        ],
+        "source_ref": "legal.cross_reference_evidence",
+        "examples": [],
+        "transport": null,
+        "domain": "unknown",
+        "ontology": [],
+        "service": null,
+        "method": null,
+        "primary_layer": "dense",
+        "score": 88,
+        "rank": 52
+      }
+    ],
+    "graph": [
+      {
+        "tool_name": "kag.feature_lookup",
+        "namespace": "kag",
+        "description": "Look up which files implement a named feature. Queries the durable feature_implementations + feature_file_edges tables (HyperRAG L9). Returns file paths and entry-point exports for the matched feature.",
+        "layers": [
+          "graph",
+          "identity"
+        ],
+        "identity_fields": [],
+        "writes_to": [],
+        "permissions": "read_only",
+        "packet_kind": "trace_tool",
+        "sources": [
+          "trace-mcp"
+        ],
+        "source_ref": "kag.feature_lookup",
+        "examples": [],
+        "transport": null,
+        "domain": "unknown",
+        "ontology": [],
+        "service": null,
+        "method": null,
+        "primary_layer": "graph",
+        "score": 194,
+        "rank": 14
+      },
+      {
+        "tool_name": "trace.graphrag_search",
+        "namespace": "trace",
+        "description": "GraphRAG hybrid retrieval: dense+sparse RRF prefetch → Neo4j graph expansion → Karpathy blend rerank.",
+        "layers": [
+          "graph",
+          "rerank"
+        ],
+        "identity_fields": [],
+        "writes_to": [],
+        "permissions": "read_only",
+        "packet_kind": "trace_tool",
+        "sources": [
+          "trace-mcp"
+        ],
+        "source_ref": "trace.graphrag_search",
+        "examples": [],
+        "transport": null,
+        "domain": "unknown",
+        "ontology": [],
+        "service": null,
+        "method": null,
+        "primary_layer": "graph",
+        "score": 182,
+        "rank": 16
+      },
+      {
+        "tool_name": "graph.semantic_path_synthesis",
+        "namespace": "graph",
+        "description": "Synthesizes a semantic narrative along the shortest structural path between nodes.",
+        "layers": [
+          "graph",
+          "synthesis"
+        ],
+        "identity_fields": [],
+        "writes_to": [],
+        "permissions": "read_only",
+        "packet_kind": "trace_tool",
+        "sources": [
+          "trace-mcp"
+        ],
+        "source_ref": "graph.semantic_path_synthesis",
+        "examples": [],
+        "transport": null,
+        "domain": "unknown",
+        "ontology": [],
+        "service": null,
+        "method": null,
+        "primary_layer": "graph",
+        "score": 170,
+        "rank": 22
+      },
+      {
+        "tool_name": "hypergraph.semantic_path_synthesis",
+        "namespace": "hypergraph",
+        "description": "Synthesizes a semantic narrative along a path in the hypergraph.",
+        "layers": [
+          "graph",
+          "synthesis"
+        ],
+        "identity_fields": [],
+        "writes_to": [],
+        "permissions": "read_only",
+        "packet_kind": "trace_tool",
+        "sources": [
+          "trace-mcp"
+        ],
+        "source_ref": "hypergraph.semantic_path_synthesis",
+        "examples": [],
+        "transport": null,
+        "domain": "unknown",
+        "ontology": [],
+        "service": null,
+        "method": null,
+        "primary_layer": "graph",
+        "score": 170,
+        "rank": 23
+      },
+      {
+        "tool_name": "atlas.explain_trace",
+        "namespace": "atlas",
+        "description": "Return the compact summary and retrieval path for the current Atlas packet.",
+        "layers": [
+          "graph",
+          "read"
+        ],
+        "identity_fields": [],
+        "writes_to": [],
+        "permissions": "read_only",
+        "packet_kind": "trace_tool",
+        "sources": [
+          "trace-mcp"
+        ],
+        "source_ref": "atlas.explain_trace",
+        "examples": [],
+        "transport": null,
+        "domain": "unknown",
+        "ontology": [],
+        "service": null,
+        "method": null,
+        "primary_layer": "graph",
+        "score": 162,
+        "rank": 27
+      },
+      {
+        "tool_name": "wiki.refresh_directory",
+        "namespace": "wiki",
+        "description": "Refreshes one AGENTS/Karpathy directory card. Defaults to dryRun=true and does not start a full re-index.",
+        "layers": [
+          "graph",
+          "read"
+        ],
+        "identity_fields": [],
+        "writes_to": [],
+        "permissions": "read_only",
+        "packet_kind": "trace_tool",
+        "sources": [
+          "trace-mcp"
+        ],
+        "source_ref": "wiki.refresh_directory",
+        "examples": [],
+        "transport": null,
+        "domain": "unknown",
+        "ontology": [],
+        "service": null,
+        "method": null,
+        "primary_layer": "graph",
+        "score": 162,
+        "rank": 29
+      },
+      {
+        "tool_name": "ops.gpu_pagerank",
+        "namespace": "ops",
+        "description": "GPU power-iteration PageRank on a flat adjacency matrix. Returns normalised rank scores (sum to 1.0). Cached 300 s by shape+input hash.",
+        "layers": [
+          "graph",
+          "ops"
+        ],
+        "identity_fields": [],
+        "writes_to": [],
+        "permissions": "read_only",
+        "packet_kind": "trace_tool",
+        "sources": [
+          "trace-mcp"
+        ],
+        "source_ref": "ops.gpu_pagerank",
+        "examples": [],
+        "transport": null,
+        "domain": "unknown",
+        "ontology": [],
+        "service": null,
+        "method": null,
+        "primary_layer": "graph",
+        "score": 148,
+        "rank": 31
+      },
+      {
+        "tool_name": "atlas.compact_context",
+        "namespace": "atlas",
+        "description": "Build a compact Atlas context packet with top chunks, sourceRefs, a compressed summary, confidence, and retrieval path.",
+        "layers": [
+          "graph"
+        ],
+        "identity_fields": [],
+        "writes_to": [],
+        "permissions": "read_only",
+        "packet_kind": "trace_tool",
+        "sources": [
+          "trace-mcp"
+        ],
+        "source_ref": "atlas.compact_context",
+        "examples": [],
+        "transport": null,
+        "domain": "unknown",
+        "ontology": [],
+        "service": null,
+        "method": null,
+        "primary_layer": "graph",
+        "score": 94,
+        "rank": 37
+      },
+      {
+        "tool_name": "context.prefetch_feature_context",
+        "namespace": "context",
+        "description": "Build a prefetch packet for the next feature edit using recent activity, directory KAG context, community graph context, AGENTS.md quick hits, and notecard search results.",
+        "layers": [
+          "graph"
+        ],
+        "identity_fields": [],
+        "writes_to": [],
+        "permissions": "read_only",
+        "packet_kind": "trace_tool",
+        "sources": [
+          "trace-mcp"
+        ],
+        "source_ref": "context.prefetch_feature_context",
+        "examples": [],
+        "transport": null,
+        "domain": "unknown",
+        "ontology": [],
+        "service": null,
+        "method": null,
+        "primary_layer": "graph",
+        "score": 94,
+        "rank": 38
+      },
+      {
+        "tool_name": "graph.materialize_pathway",
+        "namespace": "graph",
+        "description": "Materializes a synthesized pathway into the persistent hypergraph context.",
+        "layers": [
+          "graph"
+        ],
+        "identity_fields": [],
+        "writes_to": [],
+        "permissions": "read_only",
+        "packet_kind": "trace_tool",
+        "sources": [
+          "trace-mcp"
+        ],
+        "source_ref": "graph.materialize_pathway",
+        "examples": [],
+        "transport": null,
+        "domain": "unknown",
+        "ontology": [],
+        "service": null,
+        "method": null,
+        "primary_layer": "graph",
+        "score": 94,
+        "rank": 39
+      },
+      {
+        "tool_name": "graph.pagerank_top",
+        "namespace": "graph",
+        "description": "Lists the top authoritative nodes in the graph by PageRank score.",
+        "layers": [
+          "graph"
+        ],
+        "identity_fields": [],
+        "writes_to": [],
+        "permissions": "read_only",
+        "packet_kind": "trace_tool",
+        "sources": [
+          "trace-mcp"
+        ],
+        "source_ref": "graph.pagerank_top",
+        "examples": [],
+        "transport": null,
+        "domain": "unknown",
+        "ontology": [],
+        "service": null,
+        "method": null,
+        "primary_layer": "graph",
+        "score": 94,
+        "rank": 40
+      },
+      {
+        "tool_name": "hypergraph.explain_activation",
+        "namespace": "hypergraph",
+        "description": "Explains why a specific hypergraph edge was activated for a set of query terms.",
+        "layers": [
+          "graph"
+        ],
+        "identity_fields": [],
+        "writes_to": [],
+        "permissions": "read_only",
+        "packet_kind": "trace_tool",
+        "sources": [
+          "trace-mcp"
+        ],
+        "source_ref": "hypergraph.explain_activation",
+        "examples": [],
+        "transport": null,
+        "domain": "unknown",
+        "ontology": [],
+        "service": null,
+        "method": null,
+        "primary_layer": "graph",
+        "score": 94,
+        "rank": 41
+      },
+      {
+        "tool_name": "hypergraph.get_edge",
+        "namespace": "hypergraph",
+        "description": "Returns full details for a specific hypergraph edge.",
+        "layers": [
+          "graph"
+        ],
+        "identity_fields": [],
+        "writes_to": [],
+        "permissions": "read_only",
+        "packet_kind": "trace_tool",
+        "sources": [
+          "trace-mcp"
+        ],
+        "source_ref": "hypergraph.get_edge",
+        "examples": [],
+        "transport": null,
+        "domain": "unknown",
+        "ontology": [],
+        "service": null,
+        "method": null,
+        "primary_layer": "graph",
+        "score": 94,
+        "rank": 42
+      },
+      {
+        "tool_name": "kb.search_pathways",
+        "namespace": "kb",
+        "description": "Searches for previously synthesized and materialized pathways.",
+        "layers": [
+          "graph"
+        ],
+        "identity_fields": [],
+        "writes_to": [],
+        "permissions": "read_only",
+        "packet_kind": "trace_tool",
+        "sources": [
+          "trace-mcp"
+        ],
+        "source_ref": "kb.search_pathways",
+        "examples": [],
+        "transport": null,
+        "domain": "unknown",
+        "ontology": [],
+        "service": null,
+        "method": null,
+        "primary_layer": "graph",
+        "score": 94,
+        "rank": 43
+      },
+      {
+        "tool_name": "runtime.sse_probe",
+        "namespace": "runtime",
+        "description": "Verifies TRACE MCP Streamable HTTP/SSE path by calling tools/list with Accept: text/event-stream.",
+        "layers": [
+          "graph"
+        ],
+        "identity_fields": [],
+        "writes_to": [],
+        "permissions": "read_only",
+        "packet_kind": "trace_tool",
+        "sources": [
+          "trace-mcp"
+        ],
+        "source_ref": "runtime.sse_probe",
+        "examples": [],
+        "transport": null,
+        "domain": "unknown",
+        "ontology": [],
+        "service": null,
+        "method": null,
+        "primary_layer": "graph",
+        "score": 94,
+        "rank": 44
+      },
+      {
+        "tool_name": "taxonomy.path",
+        "namespace": "taxonomy",
+        "description": "Returns the full ontological path from a leaf node to root.",
+        "layers": [
+          "graph"
+        ],
+        "identity_fields": [],
+        "writes_to": [],
+        "permissions": "read_only",
+        "packet_kind": "trace_tool",
+        "sources": [
+          "trace-mcp"
+        ],
+        "source_ref": "taxonomy.path",
+        "examples": [],
+        "transport": null,
+        "domain": "unknown",
+        "ontology": [],
+        "service": null,
+        "method": null,
+        "primary_layer": "graph",
+        "score": 94,
+        "rank": 45
+      },
+      {
+        "tool_name": "topology.search_som_neighborhood",
+        "namespace": "topology",
+        "description": "Searches for nodes in the SOM grid neighborhood of an anchored query.",
+        "layers": [
+          "graph"
+        ],
+        "identity_fields": [],
+        "writes_to": [],
+        "permissions": "read_only",
+        "packet_kind": "trace_tool",
+        "sources": [
+          "trace-mcp"
+        ],
+        "source_ref": "topology.search_som_neighborhood",
+        "examples": [],
+        "transport": null,
+        "domain": "unknown",
+        "ontology": [],
+        "service": null,
+        "method": null,
+        "primary_layer": "graph",
+        "score": 94,
+        "rank": 46
+      },
+      {
+        "tool_name": "hypergraph.search",
+        "namespace": "hypergraph",
+        "description": "Semantic search across the hypergraph edges.",
+        "layers": [
+          "graph"
+        ],
+        "identity_fields": [],
+        "writes_to": [],
+        "permissions": "read_only",
+        "packet_kind": "trace_tool",
+        "sources": [
+          "trace-mcp"
+        ],
+        "source_ref": "hypergraph.search",
+        "examples": [],
+        "transport": null,
+        "domain": "unknown",
+        "ontology": [],
+        "service": null,
+        "method": null,
+        "primary_layer": "graph",
+        "score": 90,
+        "rank": 49
+      },
+      {
+        "tool_name": "evidence.link_image_graph",
+        "namespace": "evidence",
+        "description": "Create IMAGE_FOR edges in Neo4j from an evidence image node to CodebaseFile nodes. Normally fires automatically after search-by-image, but can be called manually to repair or backfill graph links for existing evidence. Returns { ok, edgesCreated }.",
+        "layers": [
+          "graph"
+        ],
+        "identity_fields": [],
+        "writes_to": [
+          "qdrant"
+        ],
+        "permissions": "read_write",
+        "packet_kind": "trace_tool",
+        "sources": [
+          "trace-mcp"
+        ],
+        "source_ref": "evidence.link_image_graph",
+        "examples": [],
+        "transport": null,
+        "domain": "unknown",
+        "ontology": [],
+        "service": null,
+        "method": null,
+        "primary_layer": "graph",
+        "score": 84,
+        "rank": 54
+      },
+      {
+        "tool_name": "graph.community_for_node",
+        "namespace": "graph",
+        "description": "Returns the community/cluster membership for a specific node.",
+        "layers": [
+          "graph"
+        ],
+        "identity_fields": [],
+        "writes_to": [
+          "neo4j"
+        ],
+        "permissions": "read_write",
+        "packet_kind": "trace_tool",
+        "sources": [
+          "trace-mcp"
+        ],
+        "source_ref": "graph.community_for_node",
+        "examples": [],
+        "transport": null,
+        "domain": "unknown",
+        "ontology": [],
+        "service": null,
+        "method": null,
+        "primary_layer": "graph",
+        "score": 84,
+        "rank": 55
+      },
+      {
+        "tool_name": "graph.expand_neighborhood",
+        "namespace": "graph",
+        "description": "Expands graph neighborhood from sourceRefs (read-only). Supports legacy stableKey/depth args for backward compatibility.",
+        "layers": [
+          "graph"
+        ],
+        "identity_fields": [],
+        "writes_to": [
+          "neo4j"
+        ],
+        "permissions": "read_write",
+        "packet_kind": "trace_tool",
+        "sources": [
+          "trace-mcp"
+        ],
+        "source_ref": "graph.expand_neighborhood",
+        "examples": [],
+        "transport": null,
+        "domain": "unknown",
+        "ontology": [],
+        "service": null,
+        "method": null,
+        "primary_layer": "graph",
+        "score": 84,
+        "rank": 56
+      },
+      {
+        "tool_name": "hypergraph.expand_members",
+        "namespace": "hypergraph",
+        "description": "Returns all related edges for a given edge hash by member overlap.",
+        "layers": [
+          "graph"
+        ],
+        "identity_fields": [],
+        "writes_to": [
+          "neo4j"
+        ],
+        "permissions": "read_write",
+        "packet_kind": "trace_tool",
+        "sources": [
+          "trace-mcp"
+        ],
+        "source_ref": "hypergraph.expand_members",
+        "examples": [],
+        "transport": null,
+        "domain": "unknown",
+        "ontology": [],
+        "service": null,
+        "method": null,
+        "primary_layer": "graph",
+        "score": 84,
+        "rank": 57
+      },
+      {
+        "tool_name": "graph.shortest_path",
+        "namespace": "graph",
+        "description": "Finds the shortest path between two graph nodes.",
+        "layers": [
+          "graph"
+        ],
+        "identity_fields": [],
+        "writes_to": [
+          "neo4j"
+        ],
+        "permissions": "read_write",
+        "packet_kind": "trace_tool",
+        "sources": [
+          "trace-mcp"
+        ],
+        "source_ref": "graph.shortest_path",
+        "examples": [],
+        "transport": null,
+        "domain": "unknown",
+        "ontology": [],
+        "service": null,
+        "method": null,
+        "primary_layer": "graph",
+        "score": 80,
+        "rank": 64
+      }
+    ],
+    "rerank": [
+      {
+        "tool_name": "search.rerank",
+        "namespace": "search",
+        "description": "Reranks a list of document snippets for relevance to a query using llama-server.",
+        "layers": [
+          "rerank"
+        ],
+        "identity_fields": [],
+        "writes_to": [],
+        "permissions": "read_only",
+        "packet_kind": "trace_tool",
+        "sources": [
+          "trace-mcp"
+        ],
+        "source_ref": "search.rerank",
+        "examples": [],
+        "transport": null,
+        "domain": "unknown",
+        "ontology": [],
+        "service": null,
+        "method": null,
+        "primary_layer": "rerank",
+        "score": 92,
+        "rank": 47
+      },
+      {
+        "tool_name": "turbovec.rank_chunks",
+        "namespace": "turbovec",
+        "description": "Read-only RotorQuant blended rerank for sourceRefs. No writes.",
+        "layers": [
+          "rerank"
+        ],
+        "identity_fields": [],
+        "writes_to": [],
+        "permissions": "read_only",
+        "packet_kind": "trace_tool",
+        "sources": [
+          "trace-mcp"
+        ],
+        "source_ref": "turbovec.rank_chunks",
+        "examples": [],
+        "transport": null,
+        "domain": "unknown",
+        "ontology": [],
+        "service": null,
+        "method": null,
+        "primary_layer": "rerank",
+        "score": 92,
+        "rank": 48
+      }
+    ],
+    "synthesis": [
+      {
+        "tool_name": "legal.build_timeline",
+        "namespace": "legal",
+        "description": "Extract a chronological timeline of events from all evidence associated with a case using Gemma4 NER. Returns TimelineEvent[] with time, who[], what, location, evidenceId, and confidence. Essential for prosecution theory of case and demonstrative exhibits.",
+        "layers": [
+          "synthesis"
+        ],
+        "identity_fields": [],
+        "writes_to": [],
+        "permissions": "read_only",
+        "packet_kind": "trace_tool",
+        "sources": [
+          "trace-mcp"
+        ],
+        "source_ref": "legal.build_timeline",
+        "examples": [],
+        "transport": null,
+        "domain": "unknown",
+        "ontology": [],
+        "service": null,
+        "method": null,
+        "primary_layer": "synthesis",
+        "score": 82,
+        "rank": 59
+      },
+      {
+        "tool_name": "legal.cross_examine",
+        "namespace": "legal",
+        "description": "Generate strategic cross-examination questions for a witness using Gemma4. Analyzes the witness statement and case context to surface inconsistencies and credibility challenges. Returns 5-10 questions with purpose and expected answers.",
+        "layers": [
+          "synthesis"
+        ],
+        "identity_fields": [],
+        "writes_to": [],
+        "permissions": "read_only",
+        "packet_kind": "trace_tool",
+        "sources": [
+          "trace-mcp"
+        ],
+        "source_ref": "legal.cross_examine",
+        "examples": [],
+        "transport": null,
+        "domain": "unknown",
+        "ontology": [],
+        "service": null,
+        "method": null,
+        "primary_layer": "synthesis",
+        "score": 82,
+        "rank": 60
+      },
+      {
+        "tool_name": "legal.issue_spotter",
+        "namespace": "legal",
+        "description": "Gemma4 legal issue analysis: identifies legal issues, applicable statutes, strengths, weaknesses, missing evidence, and recommended next steps for a case. Use at case intake or before trial prep.",
+        "layers": [
+          "synthesis"
+        ],
+        "identity_fields": [],
+        "writes_to": [],
+        "permissions": "read_only",
+        "packet_kind": "trace_tool",
+        "sources": [
+          "trace-mcp"
+        ],
+        "source_ref": "legal.issue_spotter",
+        "examples": [],
+        "transport": null,
+        "domain": "unknown",
+        "ontology": [],
+        "service": null,
+        "method": null,
+        "primary_layer": "synthesis",
+        "score": 82,
+        "rank": 61
+      },
+      {
+        "tool_name": "legal.mock_trial",
+        "namespace": "legal",
+        "description": "Multi-role mock trial simulation using Gemma4. Prosecution makes an opening statement, defense counters, then a judge delivers a ruling with evidence admissibility analysis and verdict probability. Returns all statements plus prosecution/defense scores and key weaknesses. For pre-trial preparation only — not for evidentiary conclusions.",
+        "layers": [
+          "synthesis"
+        ],
+        "identity_fields": [],
+        "writes_to": [],
+        "permissions": "read_only",
+        "packet_kind": "trace_tool",
+        "sources": [
+          "trace-mcp"
+        ],
+        "source_ref": "legal.mock_trial",
+        "examples": [],
+        "transport": null,
+        "domain": "unknown",
+        "ontology": [],
+        "service": null,
+        "method": null,
+        "primary_layer": "synthesis",
+        "score": 82,
+        "rank": 62
+      },
+      {
+        "tool_name": "clusters.get_summary_lenses",
+        "namespace": "clusters",
+        "description": "Returns wiki and LLMS.md context lenses for a GPU cluster.",
+        "layers": [
+          "synthesis"
+        ],
+        "identity_fields": [],
+        "writes_to": [],
+        "permissions": "read_only",
+        "packet_kind": "trace_tool",
+        "sources": [
+          "trace-mcp"
+        ],
+        "source_ref": "clusters.get_summary_lenses",
+        "examples": [],
+        "transport": null,
+        "domain": "unknown",
+        "ontology": [],
+        "service": null,
+        "method": null,
+        "primary_layer": "synthesis",
+        "score": 80,
+        "rank": 63
+      },
+      {
+        "tool_name": "kag.web_search",
+        "namespace": "kag",
+        "description": "L10 lane web search (T4 trust). Searches the web for information-seeking queries. Skips for code/error queries. Returns sanitized snippets for synthesis.",
+        "layers": [
+          "synthesis"
+        ],
+        "identity_fields": [],
+        "writes_to": [],
+        "permissions": "read_only",
+        "packet_kind": "trace_tool",
+        "sources": [
+          "trace-mcp"
+        ],
+        "source_ref": "kag.web_search",
+        "examples": [],
+        "transport": null,
+        "domain": "unknown",
+        "ontology": [],
+        "service": null,
+        "method": null,
+        "primary_layer": "synthesis",
+        "score": 80,
+        "rank": 65
+      },
+      {
+        "tool_name": "kb.explain_context_pack",
+        "namespace": "kb",
+        "description": "Explains the retrieval provenance and assembly logic for a generated context pack.",
+        "layers": [
+          "synthesis"
+        ],
+        "identity_fields": [],
+        "writes_to": [],
+        "permissions": "read_only",
+        "packet_kind": "trace_tool",
+        "sources": [
+          "trace-mcp"
+        ],
+        "source_ref": "kb.explain_context_pack",
+        "examples": [],
+        "transport": null,
+        "domain": "unknown",
+        "ontology": [],
+        "service": null,
+        "method": null,
+        "primary_layer": "synthesis",
+        "score": 80,
+        "rank": 66
+      },
+      {
+        "tool_name": "LLMS.md.binding_chain",
+        "namespace": "LLMS",
+        "description": "Walks the LLMS.md binding hierarchy for a file to determine the order of applying envelopes.",
+        "layers": [
+          "synthesis"
+        ],
+        "identity_fields": [],
+        "writes_to": [],
+        "permissions": "read_only",
+        "packet_kind": "trace_tool",
+        "sources": [
+          "trace-mcp"
+        ],
+        "source_ref": "LLMS.md.binding_chain",
+        "examples": [],
+        "transport": null,
+        "domain": "unknown",
+        "ontology": [],
+        "service": null,
+        "method": null,
+        "primary_layer": "synthesis",
+        "score": 80,
+        "rank": 67
+      },
+      {
+        "tool_name": "LLMS.md.context_for_file",
+        "namespace": "LLMS",
+        "description": "Returns only the AGENTS-related slice of the atlas context packet for a file.",
+        "layers": [
+          "synthesis"
+        ],
+        "identity_fields": [],
+        "writes_to": [],
+        "permissions": "read_only",
+        "packet_kind": "trace_tool",
+        "sources": [
+          "trace-mcp"
+        ],
+        "source_ref": "LLMS.md.context_for_file",
+        "examples": [],
+        "transport": null,
+        "domain": "unknown",
+        "ontology": [],
+        "service": null,
+        "method": null,
+        "primary_layer": "synthesis",
+        "score": 80,
+        "rank": 68
+      },
+      {
+        "tool_name": "LLMS.md.coverage",
+        "namespace": "LLMS",
+        "description": "Reports the population status of the LLMS.md envelope for a file.",
+        "layers": [
+          "synthesis"
+        ],
+        "identity_fields": [],
+        "writes_to": [],
+        "permissions": "read_only",
+        "packet_kind": "trace_tool",
+        "sources": [
+          "trace-mcp"
+        ],
+        "source_ref": "LLMS.md.coverage",
+        "examples": [],
+        "transport": null,
+        "domain": "unknown",
+        "ontology": [],
+        "service": null,
+        "method": null,
+        "primary_layer": "synthesis",
+        "score": 80,
+        "rank": 69
+      },
+      {
+        "tool_name": "LLMS.md.coverage_chain",
+        "namespace": "LLMS",
+        "description": "Returns the full LLMS.md inheritance chain for a file.",
+        "layers": [
+          "synthesis"
+        ],
+        "identity_fields": [],
+        "writes_to": [],
+        "permissions": "read_only",
+        "packet_kind": "trace_tool",
+        "sources": [
+          "trace-mcp"
+        ],
+        "source_ref": "LLMS.md.coverage_chain",
+        "examples": [],
+        "transport": null,
+        "domain": "unknown",
+        "ontology": [],
+        "service": null,
+        "method": null,
+        "primary_layer": "synthesis",
+        "score": 80,
+        "rank": 70
+      },
+      {
+        "tool_name": "LLMS.md.peers_for_dir",
+        "namespace": "LLMS",
+        "description": "Returns the directory card directly from the atlas cache.",
+        "layers": [
+          "synthesis"
+        ],
+        "identity_fields": [],
+        "writes_to": [],
+        "permissions": "read_only",
+        "packet_kind": "trace_tool",
+        "sources": [
+          "trace-mcp"
+        ],
+        "source_ref": "LLMS.md.peers_for_dir",
+        "examples": [],
+        "transport": null,
+        "domain": "unknown",
+        "ontology": [],
+        "service": null,
+        "method": null,
+        "primary_layer": "synthesis",
+        "score": 80,
+        "rank": 71
+      },
+      {
+        "tool_name": "LLMS.md.peers_via_relations",
+        "namespace": "LLMS",
+        "description": "Finds neighboring directories using the SHARES_TAGS hypergraph relation.",
+        "layers": [
+          "synthesis"
+        ],
+        "identity_fields": [],
+        "writes_to": [],
+        "permissions": "read_only",
+        "packet_kind": "trace_tool",
+        "sources": [
+          "trace-mcp"
+        ],
+        "source_ref": "LLMS.md.peers_via_relations",
+        "examples": [],
+        "transport": null,
+        "domain": "unknown",
+        "ontology": [],
+        "service": null,
+        "method": null,
+        "primary_layer": "synthesis",
+        "score": 80,
+        "rank": 72
+      },
+      {
+        "tool_name": "LLMS.md.shares_tags",
+        "namespace": "LLMS",
+        "description": "Returns neighboring directories based on shared tags in their LLMS.md files.",
+        "layers": [
+          "synthesis"
+        ],
+        "identity_fields": [],
+        "writes_to": [],
+        "permissions": "read_only",
+        "packet_kind": "trace_tool",
+        "sources": [
+          "trace-mcp"
+        ],
+        "source_ref": "LLMS.md.shares_tags",
+        "examples": [],
+        "transport": null,
+        "domain": "unknown",
+        "ontology": [],
+        "service": null,
+        "method": null,
+        "primary_layer": "synthesis",
+        "score": 80,
+        "rank": 73
+      },
+      {
+        "tool_name": "kb.archive_synthesis",
+        "namespace": "kb",
+        "description": "Archive a synthesis artifact.",
+        "layers": [
+          "synthesis"
+        ],
+        "identity_fields": [],
+        "writes_to": [],
+        "permissions": "read_only",
+        "packet_kind": "trace_tool",
+        "sources": [
+          "trace-mcp"
+        ],
+        "source_ref": "kb.archive_synthesis",
+        "examples": [],
+        "transport": null,
+        "domain": "unknown",
+        "ontology": [],
+        "service": null,
+        "method": null,
+        "primary_layer": "synthesis",
+        "score": 76,
+        "rank": 75
+      }
+    ],
+    "ops": [
+      {
+        "tool_name": "ops.gpu_pipeline_stats",
+        "namespace": "ops",
+        "description": "Returns GPU pipeline diagnostics: active stream slots, pending queue depth, cache hit rate over last 50 ops, and device config.",
+        "layers": [
+          "ops"
+        ],
+        "identity_fields": [],
+        "writes_to": [],
+        "permissions": "read_only",
+        "packet_kind": "trace_tool",
+        "sources": [
+          "trace-mcp"
+        ],
+        "source_ref": "ops.gpu_pipeline_stats",
+        "examples": [],
+        "transport": null,
+        "domain": "unknown",
+        "ontology": [],
+        "service": null,
+        "method": null,
+        "primary_layer": "ops",
+        "score": 58,
+        "rank": 81
+      },
+      {
+        "tool_name": "ops.gpu_topk",
+        "namespace": "ops",
+        "description": "GPU top-k index selection. Returns k indices of highest-scoring candidates in descending order. Use after pipelineAttention to get the top chunk indices.",
+        "layers": [
+          "ops"
+        ],
+        "identity_fields": [],
+        "writes_to": [],
+        "permissions": "read_only",
+        "packet_kind": "trace_tool",
+        "sources": [
+          "trace-mcp"
+        ],
+        "source_ref": "ops.gpu_topk",
+        "examples": [],
+        "transport": null,
+        "domain": "unknown",
+        "ontology": [],
+        "service": null,
+        "method": null,
+        "primary_layer": "ops",
+        "score": 58,
+        "rank": 82
+      },
+      {
+        "tool_name": "ops.execute_graphify",
+        "namespace": "ops",
+        "description": "Executes an authorized graphify pipeline command.",
+        "layers": [
+          "ops"
+        ],
+        "identity_fields": [],
+        "writes_to": [],
+        "permissions": "read_only",
+        "packet_kind": "trace_tool",
+        "sources": [
+          "trace-mcp"
+        ],
+        "source_ref": "ops.execute_graphify",
+        "examples": [],
+        "transport": null,
+        "domain": "unknown",
+        "ontology": [],
+        "service": null,
+        "method": null,
+        "primary_layer": "ops",
+        "score": 54,
+        "rank": 83
+      },
+      {
+        "tool_name": "ops.propose_patch",
+        "namespace": "ops",
+        "description": "PROPOSES a patch for a file. READ-ONLY PREVIEW. Does NOT modify files.",
+        "layers": [
+          "ops"
+        ],
+        "identity_fields": [],
+        "writes_to": [
+          "postgres",
+          "kanban"
+        ],
+        "permissions": "read_write",
+        "packet_kind": "trace_tool",
+        "sources": [
+          "trace-mcp"
+        ],
+        "source_ref": "ops.propose_patch",
+        "examples": [],
+        "transport": null,
+        "domain": "unknown",
+        "ontology": [],
+        "service": null,
+        "method": null,
+        "primary_layer": "ops",
+        "score": 48,
+        "rank": 84
+      },
+      {
+        "tool_name": "ops.record_fix_attempt",
+        "namespace": "ops",
+        "description": "Records a fix attempt and its outcome to the persistent audit log.",
+        "layers": [
+          "ops"
+        ],
+        "identity_fields": [],
+        "writes_to": [
+          "postgres",
+          "kanban"
+        ],
+        "permissions": "read_write",
+        "packet_kind": "trace_tool",
+        "sources": [
+          "trace-mcp"
+        ],
+        "source_ref": "ops.record_fix_attempt",
+        "examples": [],
+        "transport": null,
+        "domain": "unknown",
+        "ontology": [],
+        "service": null,
+        "method": null,
+        "primary_layer": "ops",
+        "score": 48,
+        "rank": 85
+      },
+      {
+        "tool_name": "ops.run_quality_gate",
+        "namespace": "ops",
+        "description": "Executes a project-wide quality gate (tsc or vitest-all).",
+        "layers": [
+          "ops"
+        ],
+        "identity_fields": [],
+        "writes_to": [
+          "postgres"
+        ],
+        "permissions": "read_write",
+        "packet_kind": "trace_tool",
+        "sources": [
+          "trace-mcp"
+        ],
+        "source_ref": "ops.run_quality_gate",
+        "examples": [],
+        "transport": null,
+        "domain": "unknown",
+        "ontology": [],
+        "service": null,
+        "method": null,
+        "primary_layer": "ops",
+        "score": 48,
+        "rank": 86
+      },
+      {
+        "tool_name": "ops.run_targeted_test",
+        "namespace": "ops",
+        "description": "Executes a single Vitest test file and returns the outcome.",
+        "layers": [
+          "ops"
+        ],
+        "identity_fields": [],
+        "writes_to": [
+          "postgres"
+        ],
+        "permissions": "read_write",
+        "packet_kind": "trace_tool",
+        "sources": [
+          "trace-mcp"
+        ],
+        "source_ref": "ops.run_targeted_test",
+        "examples": [],
+        "transport": null,
+        "domain": "unknown",
+        "ontology": [],
+        "service": null,
+        "method": null,
+        "primary_layer": "ops",
+        "score": 48,
+        "rank": 87
+      }
+    ],
+    "read": [
+      {
+        "tool_name": "atlas.get_chunk",
+        "namespace": "atlas",
+        "description": "Return a chunk from the compact Atlas chunk index, optionally prioritizing a chunkId, chunkIndex, or sourceRef.",
+        "layers": [
+          "read"
+        ],
+        "identity_fields": [],
+        "writes_to": [],
+        "permissions": "read_only",
+        "packet_kind": "trace_tool",
+        "sources": [
+          "trace-mcp"
+        ],
+        "source_ref": "atlas.get_chunk",
+        "examples": [],
+        "transport": null,
+        "domain": "unknown",
+        "ontology": [],
+        "service": null,
+        "method": null,
+        "primary_layer": "read",
+        "score": 72,
+        "rank": 76
+      },
+      {
+        "tool_name": "file.read_window",
+        "namespace": "file",
+        "description": "Reads a bounded window/range of lines from a file. Highly recommended for reading large markdown (.md) or JSON files to avoid context bloating.",
+        "layers": [
+          "read"
+        ],
+        "identity_fields": [],
+        "writes_to": [],
+        "permissions": "read_only",
+        "packet_kind": "trace_tool",
+        "sources": [
+          "trace-mcp"
+        ],
+        "source_ref": "file.read_window",
+        "examples": [],
+        "transport": null,
+        "domain": "unknown",
+        "ontology": [],
+        "service": null,
+        "method": null,
+        "primary_layer": "read",
+        "score": 72,
+        "rank": 77
+      },
+      {
+        "tool_name": "kb.wiki_note_lookup",
+        "namespace": "kb",
+        "description": "Look up notes in the wiki.",
+        "layers": [
+          "read"
+        ],
+        "identity_fields": [],
+        "writes_to": [],
+        "permissions": "read_only",
+        "packet_kind": "trace_tool",
+        "sources": [
+          "trace-mcp"
+        ],
+        "source_ref": "kb.wiki_note_lookup",
+        "examples": [],
+        "transport": null,
+        "domain": "unknown",
+        "ontology": [],
+        "service": null,
+        "method": null,
+        "primary_layer": "read",
+        "score": 68,
+        "rank": 78
+      },
+      {
+        "tool_name": "db.schema_overview",
+        "namespace": "db",
+        "description": "Lists every table in the public schema with row estimate + structural flags.",
+        "layers": [
+          "read"
+        ],
+        "identity_fields": [],
+        "writes_to": [
+          "postgres"
+        ],
+        "permissions": "read_write",
+        "packet_kind": "trace_tool",
+        "sources": [
+          "trace-mcp"
+        ],
+        "source_ref": "db.schema_overview",
+        "examples": [],
+        "transport": null,
+        "domain": "unknown",
+        "ontology": [],
+        "service": null,
+        "method": null,
+        "primary_layer": "read",
+        "score": 62,
+        "rank": 79
+      },
+      {
+        "tool_name": "db.table_inspect",
+        "namespace": "db",
+        "description": "Returns columns + indexes + foreign keys for one table. No row data.",
+        "layers": [
+          "read"
+        ],
+        "identity_fields": [],
+        "writes_to": [
+          "postgres"
+        ],
+        "permissions": "read_write",
+        "packet_kind": "trace_tool",
+        "sources": [
+          "trace-mcp"
+        ],
+        "source_ref": "db.table_inspect",
+        "examples": [],
+        "transport": null,
+        "domain": "unknown",
+        "ontology": [],
+        "service": null,
+        "method": null,
+        "primary_layer": "read",
+        "score": 62,
+        "rank": 80
+      }
+    ],
+    "unknown": [
+      {
+        "tool_name": "atlas.suggest_files",
+        "namespace": "atlas",
+        "description": "Return the top suggested files from the compact Atlas packet.",
+        "layers": [
+          "unknown"
+        ],
+        "identity_fields": [],
+        "writes_to": [],
+        "permissions": "read_only",
+        "packet_kind": "trace_tool",
+        "sources": [
+          "trace-mcp"
+        ],
+        "source_ref": "atlas.suggest_files",
+        "examples": [],
+        "transport": null,
+        "domain": "unknown",
+        "ontology": [],
+        "service": null,
+        "method": null,
+        "primary_layer": "unknown",
+        "score": 44,
+        "rank": 88
+      },
+      {
+        "tool_name": "codebase.context_for_file",
+        "namespace": "codebase",
+        "description": "Returns the full atlas context packet for a specific file.",
+        "layers": [
+          "unknown"
+        ],
+        "identity_fields": [],
+        "writes_to": [],
+        "permissions": "read_only",
+        "packet_kind": "trace_tool",
+        "sources": [
+          "trace-mcp"
+        ],
+        "source_ref": "codebase.context_for_file",
+        "examples": [],
+        "transport": null,
+        "domain": "unknown",
+        "ontology": [],
+        "service": null,
+        "method": null,
+        "primary_layer": "unknown",
+        "score": 44,
+        "rank": 89
+      },
+      {
+        "tool_name": "context.build_kv_packet",
+        "namespace": "context",
+        "description": "Assembles a context packet of compressed file cards for a specific task.",
+        "layers": [
+          "unknown"
+        ],
+        "identity_fields": [],
+        "writes_to": [],
+        "permissions": "read_only",
+        "packet_kind": "trace_tool",
+        "sources": [
+          "trace-mcp"
+        ],
+        "source_ref": "context.build_kv_packet",
+        "examples": [],
+        "transport": null,
+        "domain": "unknown",
+        "ontology": [],
+        "service": null,
+        "method": null,
+        "primary_layer": "unknown",
+        "score": 44,
+        "rank": 90
+      },
+      {
+        "tool_name": "context.explain_compression",
+        "namespace": "context",
+        "description": "Explains the compression logic and token budget for a specific task packet.",
+        "layers": [
+          "unknown"
+        ],
+        "identity_fields": [],
+        "writes_to": [],
+        "permissions": "read_only",
+        "packet_kind": "trace_tool",
+        "sources": [
+          "trace-mcp"
+        ],
+        "source_ref": "context.explain_compression",
+        "examples": [],
+        "transport": null,
+        "domain": "unknown",
+        "ontology": [],
+        "service": null,
+        "method": null,
+        "primary_layer": "unknown",
+        "score": 44,
+        "rank": 91
+      },
+      {
+        "tool_name": "context.get_compressed_card",
+        "namespace": "context",
+        "description": "Returns a compressed context card for a specific file or trace.",
+        "layers": [
+          "unknown"
+        ],
+        "identity_fields": [],
+        "writes_to": [],
+        "permissions": "read_only",
+        "packet_kind": "trace_tool",
+        "sources": [
+          "trace-mcp"
+        ],
+        "source_ref": "context.get_compressed_card",
+        "examples": [],
+        "transport": null,
+        "domain": "unknown",
+        "ontology": [],
+        "service": null,
+        "method": null,
+        "primary_layer": "unknown",
+        "score": 44,
+        "rank": 92
+      },
+      {
+        "tool_name": "context.refresh_task_toc",
+        "namespace": "context",
+        "description": "Refreshes the Table of Contents for a specific task context.",
+        "layers": [
+          "unknown"
+        ],
+        "identity_fields": [],
+        "writes_to": [],
+        "permissions": "read_only",
+        "packet_kind": "trace_tool",
+        "sources": [
+          "trace-mcp"
+        ],
+        "source_ref": "context.refresh_task_toc",
+        "examples": [],
+        "transport": null,
+        "domain": "unknown",
+        "ontology": [],
+        "service": null,
+        "method": null,
+        "primary_layer": "unknown",
+        "score": 44,
+        "rank": 93
+      },
+      {
+        "tool_name": "kag.ingest_error",
+        "namespace": "kag",
+        "description": "Fingerprints and stores a raw error text for future retrieval.",
+        "layers": [
+          "unknown"
+        ],
+        "identity_fields": [],
+        "writes_to": [],
+        "permissions": "read_only",
+        "packet_kind": "trace_tool",
+        "sources": [
+          "trace-mcp"
+        ],
+        "source_ref": "kag.ingest_error",
+        "examples": [],
+        "transport": null,
+        "domain": "unknown",
+        "ontology": [],
+        "service": null,
+        "method": null,
+        "primary_layer": "unknown",
+        "score": 44,
+        "rank": 94
+      },
+      {
+        "tool_name": "kag.ingest_memory_directory",
+        "namespace": "kag",
+        "description": "Ingests agent run records from the memory directory into the database.",
+        "layers": [
+          "unknown"
+        ],
+        "identity_fields": [],
+        "writes_to": [],
+        "permissions": "read_only",
+        "packet_kind": "trace_tool",
+        "sources": [
+          "trace-mcp"
+        ],
+        "source_ref": "kag.ingest_memory_directory",
+        "examples": [],
+        "transport": null,
+        "domain": "unknown",
+        "ontology": [],
+        "service": null,
+        "method": null,
+        "primary_layer": "unknown",
+        "score": 44,
+        "rank": 95
+      },
+      {
+        "tool_name": "kag.panel_context",
+        "namespace": "kag",
+        "description": "Return recently viewed files and tools from panel_activity_log for the active user session (HyperRAG L11 prefetch). Provides warm context about what the user is currently working on.",
+        "layers": [
+          "unknown"
+        ],
+        "identity_fields": [],
+        "writes_to": [],
+        "permissions": "read_only",
+        "packet_kind": "trace_tool",
+        "sources": [
+          "trace-mcp"
+        ],
+        "source_ref": "kag.panel_context",
+        "examples": [],
+        "transport": null,
+        "domain": "unknown",
+        "ontology": [],
+        "service": null,
+        "method": null,
+        "primary_layer": "unknown",
+        "score": 44,
+        "rank": 96
+      },
+      {
+        "tool_name": "kag.record_agent_run",
+        "namespace": "kag",
+        "description": "Records an autonomous agent run artifact to memory.",
+        "layers": [
+          "unknown"
+        ],
+        "identity_fields": [],
+        "writes_to": [],
+        "permissions": "read_only",
+        "packet_kind": "trace_tool",
+        "sources": [
+          "trace-mcp"
+        ],
+        "source_ref": "kag.record_agent_run",
+        "examples": [],
+        "transport": null,
+        "domain": "unknown",
+        "ontology": [],
+        "service": null,
+        "method": null,
+        "primary_layer": "unknown",
+        "score": 44,
+        "rank": 97
+      },
+      {
+        "tool_name": "kb.hybrid_search",
+        "namespace": "kb",
+        "description": "Performs hybrid (lexical + semantic) search across KAG context.",
+        "layers": [
+          "unknown"
+        ],
+        "identity_fields": [],
+        "writes_to": [],
+        "permissions": "read_only",
+        "packet_kind": "trace_tool",
+        "sources": [
+          "trace-mcp"
+        ],
+        "source_ref": "kb.hybrid_search",
+        "examples": [],
+        "transport": null,
+        "domain": "unknown",
+        "ontology": [],
+        "service": null,
+        "method": null,
+        "primary_layer": "unknown",
+        "score": 44,
+        "rank": 98
+      },
+      {
+        "tool_name": "kb.organize_messy_text",
+        "namespace": "kb",
+        "description": "Organize messy text into structured entities and sections.",
+        "layers": [
+          "unknown"
+        ],
+        "identity_fields": [],
+        "writes_to": [],
+        "permissions": "read_only",
+        "packet_kind": "trace_tool",
+        "sources": [
+          "trace-mcp"
+        ],
+        "source_ref": "kb.organize_messy_text",
+        "examples": [],
+        "transport": null,
+        "domain": "unknown",
+        "ontology": [],
+        "service": null,
+        "method": null,
+        "primary_layer": "unknown",
+        "score": 44,
+        "rank": 99
+      },
+      {
+        "tool_name": "kb.search_notecards",
+        "namespace": "kb",
+        "description": "Searches for identity-spine notecards matching a query.",
+        "layers": [
+          "unknown"
+        ],
+        "identity_fields": [],
+        "writes_to": [],
+        "permissions": "read_only",
+        "packet_kind": "trace_tool",
+        "sources": [
+          "trace-mcp"
+        ],
+        "source_ref": "kb.search_notecards",
+        "examples": [],
+        "transport": null,
+        "domain": "unknown",
+        "ontology": [],
+        "service": null,
+        "method": null,
+        "primary_layer": "unknown",
+        "score": 44,
+        "rank": 100
+      },
+      {
+        "tool_name": "kb.search_summary_tree",
+        "namespace": "kb",
+        "description": "RAPTOR-style hierarchical search across per-chunk lens, cluster narrative, and directory-card summary tiers.",
+        "layers": [
+          "unknown"
+        ],
+        "identity_fields": [],
+        "writes_to": [],
+        "permissions": "read_only",
+        "packet_kind": "trace_tool",
+        "sources": [
+          "trace-mcp"
+        ],
+        "source_ref": "kb.search_summary_tree",
+        "examples": [],
+        "transport": null,
+        "domain": "unknown",
+        "ontology": [],
+        "service": null,
+        "method": null,
+        "primary_layer": "unknown",
+        "score": 44,
+        "rank": 101
+      },
+      {
+        "tool_name": "kb.trace_search",
+        "namespace": "kb",
+        "description": "Search the hypergraph/KAG context for documents, cards, and relations matching a query.",
+        "layers": [
+          "unknown"
+        ],
+        "identity_fields": [],
+        "writes_to": [],
+        "permissions": "read_only",
+        "packet_kind": "trace_tool",
+        "sources": [
+          "trace-mcp"
+        ],
+        "source_ref": "kb.trace_search",
+        "examples": [],
+        "transport": null,
+        "domain": "unknown",
+        "ontology": [],
+        "service": null,
+        "method": null,
+        "primary_layer": "unknown",
+        "score": 44,
+        "rank": 102
+      },
+      {
+        "tool_name": "knowledge.get_minified_map",
+        "namespace": "knowledge",
+        "description": "Returns a minified architectural map for a specific directory.",
+        "layers": [
+          "unknown"
+        ],
+        "identity_fields": [],
+        "writes_to": [],
+        "permissions": "read_only",
+        "packet_kind": "trace_tool",
+        "sources": [
+          "trace-mcp"
+        ],
+        "source_ref": "knowledge.get_minified_map",
+        "examples": [],
+        "transport": null,
+        "domain": "unknown",
+        "ontology": [],
+        "service": null,
+        "method": null,
+        "primary_layer": "unknown",
+        "score": 44,
+        "rank": 103
+      },
+      {
+        "tool_name": "legal.find_precedents",
+        "namespace": "legal",
+        "description": "Semantic + full-text search across legal precedents, case opinions, and rulings. Returns ranked results with citation, court, and summary. Use for \"find cases about X\" or \"what precedents apply to Y\".",
+        "layers": [
+          "unknown"
+        ],
+        "identity_fields": [],
+        "writes_to": [],
+        "permissions": "read_only",
+        "packet_kind": "trace_tool",
+        "sources": [
+          "trace-mcp"
+        ],
+        "source_ref": "legal.find_precedents",
+        "examples": [],
+        "transport": null,
+        "domain": "unknown",
+        "ontology": [],
+        "service": null,
+        "method": null,
+        "primary_layer": "unknown",
+        "score": 44,
+        "rank": 104
+      },
+      {
+        "tool_name": "legal.get_transcript",
+        "namespace": "legal",
+        "description": "Retrieve the Whisper transcript for an audio/video evidence item that has already been processed. Returns the full text plus any extracted speaker segments. Use legal.search_recordings for timestamped search.",
+        "layers": [
+          "unknown"
+        ],
+        "identity_fields": [],
+        "writes_to": [],
+        "permissions": "read_only",
+        "packet_kind": "trace_tool",
+        "sources": [
+          "trace-mcp"
+        ],
+        "source_ref": "legal.get_transcript",
+        "examples": [],
+        "transport": null,
+        "domain": "unknown",
+        "ontology": [],
+        "service": null,
+        "method": null,
+        "primary_layer": "unknown",
+        "score": 44,
+        "rank": 105
+      },
+      {
+        "tool_name": "legal.score_case",
+        "namespace": "legal",
+        "description": "Compute an evidence-weighted case strength score (0-100) for a given case. Factors: evidence count (×10, max 40), witness count (×8, max 24), documentation quality (15), and active-status bonus (10). Use to prioritize which cases need more evidence.",
+        "layers": [
+          "unknown"
+        ],
+        "identity_fields": [],
+        "writes_to": [],
+        "permissions": "read_only",
+        "packet_kind": "trace_tool",
+        "sources": [
+          "trace-mcp"
+        ],
+        "source_ref": "legal.score_case",
+        "examples": [],
+        "transport": null,
+        "domain": "unknown",
+        "ontology": [],
+        "service": null,
+        "method": null,
+        "primary_layer": "unknown",
+        "score": 44,
+        "rank": 106
+      },
+      {
+        "tool_name": "legal.search_recordings",
+        "namespace": "legal",
+        "description": "Timestamp-aware semantic search across Whisper audio segments. Returns matching segments with start/end times so prosecutors can jump to the exact moment in a recording. Great for \"find when the witness said X\".",
+        "layers": [
+          "unknown"
+        ],
+        "identity_fields": [],
+        "writes_to": [],
+        "permissions": "read_only",
+        "packet_kind": "trace_tool",
+        "sources": [
+          "trace-mcp"
+        ],
+        "source_ref": "legal.search_recordings",
+        "examples": [],
+        "transport": null,
+        "domain": "unknown",
+        "ontology": [],
+        "service": null,
+        "method": null,
+        "primary_layer": "unknown",
+        "score": 44,
+        "rank": 107
+      },
+      {
+        "tool_name": "legal.similar_cases",
+        "namespace": "legal",
+        "description": "Find cases similar to a given case using PostgreSQL full-text similarity on case title and description. Returns up to 20 similar cases with a similarity score. Use to cross-reference prior cases and find related judgements.",
+        "layers": [
+          "unknown"
+        ],
+        "identity_fields": [],
+        "writes_to": [],
+        "permissions": "read_only",
+        "packet_kind": "trace_tool",
+        "sources": [
+          "trace-mcp"
+        ],
+        "source_ref": "legal.similar_cases",
+        "examples": [],
+        "transport": null,
+        "domain": "unknown",
+        "ontology": [],
+        "service": null,
+        "method": null,
+        "primary_layer": "unknown",
+        "score": 44,
+        "rank": 108
+      },
+      {
+        "tool_name": "legal.write_obsidian_note",
+        "namespace": "legal",
+        "description": "Write or append a markdown note to the Obsidian vault via the Local REST API plugin (requires Obsidian running at ENV.OBSIDIAN_URL with OBSIDIAN_API_KEY set). Creates parent folders automatically. Use to persist case summaries, timelines, mock trial reports, and cross-examination prep.",
+        "layers": [
+          "unknown"
+        ],
+        "identity_fields": [],
+        "writes_to": [],
+        "permissions": "read_only",
+        "packet_kind": "trace_tool",
+        "sources": [
+          "trace-mcp"
+        ],
+        "source_ref": "legal.write_obsidian_note",
+        "examples": [],
+        "transport": null,
+        "domain": "unknown",
+        "ontology": [],
+        "service": null,
+        "method": null,
+        "primary_layer": "unknown",
+        "score": 44,
+        "rank": 109
+      },
+      {
+        "tool_name": "runtime.quic_status",
+        "namespace": "runtime",
+        "description": "Reports QUIC/HTTP3 dev-lane configuration and probes the local Caddy/Vite QUIC endpoint if present.",
+        "layers": [
+          "unknown"
+        ],
+        "identity_fields": [],
+        "writes_to": [],
+        "permissions": "read_only",
+        "packet_kind": "trace_tool",
+        "sources": [
+          "trace-mcp"
+        ],
+        "source_ref": "runtime.quic_status",
+        "examples": [],
+        "transport": null,
+        "domain": "unknown",
+        "ontology": [],
+        "service": null,
+        "method": null,
+        "primary_layer": "unknown",
+        "score": 44,
+        "rank": 110
+      },
+      {
+        "tool_name": "runtime.simdjson_status",
+        "namespace": "runtime",
+        "description": "Reports SIMD/AVX2 JSON parser availability, fallback mode, cache metrics, and safe usage notes.",
+        "layers": [
+          "unknown"
+        ],
+        "identity_fields": [],
+        "writes_to": [],
+        "permissions": "read_only",
+        "packet_kind": "trace_tool",
+        "sources": [
+          "trace-mcp"
+        ],
+        "source_ref": "runtime.simdjson_status",
+        "examples": [],
+        "transport": null,
+        "domain": "unknown",
+        "ontology": [],
+        "service": null,
+        "method": null,
+        "primary_layer": "unknown",
+        "score": 44,
+        "rank": 111
+      },
+      {
+        "tool_name": "search.dev_context",
+        "namespace": "search",
+        "description": "Returns codebase chunks for coding and debugging prompts.",
+        "layers": [
+          "unknown"
+        ],
+        "identity_fields": [],
+        "writes_to": [],
+        "permissions": "read_only",
+        "packet_kind": "trace_tool",
+        "sources": [
+          "trace-mcp"
+        ],
+        "source_ref": "search.dev_context",
+        "examples": [],
+        "transport": null,
+        "domain": "unknown",
+        "ontology": [],
+        "service": null,
+        "method": null,
+        "primary_layer": "unknown",
+        "score": 44,
+        "rank": 112
+      },
+      {
+        "tool_name": "taxonomy.children",
+        "namespace": "taxonomy",
+        "description": "Lists children of a specific ontological node in the topology.",
+        "layers": [
+          "unknown"
+        ],
+        "identity_fields": [],
+        "writes_to": [],
+        "permissions": "read_only",
+        "packet_kind": "trace_tool",
+        "sources": [
+          "trace-mcp"
+        ],
+        "source_ref": "taxonomy.children",
+        "examples": [],
+        "transport": null,
+        "domain": "unknown",
+        "ontology": [],
+        "service": null,
+        "method": null,
+        "primary_layer": "unknown",
+        "score": 44,
+        "rank": 113
+      },
+      {
+        "tool_name": "tools.batch_call",
+        "namespace": "tools",
+        "description": "Executes multiple tool calls in parallel to reduce total latency.",
+        "layers": [
+          "unknown"
+        ],
+        "identity_fields": [],
+        "writes_to": [],
+        "permissions": "read_only",
+        "packet_kind": "trace_tool",
+        "sources": [
+          "trace-mcp"
+        ],
+        "source_ref": "tools.batch_call",
+        "examples": [],
+        "transport": null,
+        "domain": "unknown",
+        "ontology": [],
+        "service": null,
+        "method": null,
+        "primary_layer": "unknown",
+        "score": 44,
+        "rank": 114
+      },
+      {
+        "tool_name": "topology.hydration_status",
+        "namespace": "topology",
+        "description": "Returns a diagnostic overview of topological hydration coverage.",
+        "layers": [
+          "unknown"
+        ],
+        "identity_fields": [],
+        "writes_to": [],
+        "permissions": "read_only",
+        "packet_kind": "trace_tool",
+        "sources": [
+          "trace-mcp"
+        ],
+        "source_ref": "topology.hydration_status",
+        "examples": [],
+        "transport": null,
+        "domain": "unknown",
+        "ontology": [],
+        "service": null,
+        "method": null,
+        "primary_layer": "unknown",
+        "score": 44,
+        "rank": 115
+      },
+      {
+        "tool_name": "topology.recompute_manifold_plan",
+        "namespace": "topology",
+        "description": "Provides a recommended plan for restoring topological hydration.",
+        "layers": [
+          "unknown"
+        ],
+        "identity_fields": [],
+        "writes_to": [],
+        "permissions": "read_only",
+        "packet_kind": "trace_tool",
+        "sources": [
+          "trace-mcp"
+        ],
+        "source_ref": "topology.recompute_manifold_plan",
+        "examples": [],
+        "transport": null,
+        "domain": "unknown",
+        "ontology": [],
+        "service": null,
+        "method": null,
+        "primary_layer": "unknown",
+        "score": 44,
+        "rank": 116
+      },
+      {
+        "tool_name": "topology.same_som_cluster",
+        "namespace": "topology",
+        "description": "Returns other nodes in the same SOM cluster as the reference node.",
+        "layers": [
+          "unknown"
+        ],
+        "identity_fields": [],
+        "writes_to": [],
+        "permissions": "read_only",
+        "packet_kind": "trace_tool",
+        "sources": [
+          "trace-mcp"
+        ],
+        "source_ref": "topology.same_som_cluster",
+        "examples": [],
+        "transport": null,
+        "domain": "unknown",
+        "ontology": [],
+        "service": null,
+        "method": null,
+        "primary_layer": "unknown",
+        "score": 44,
+        "rank": 117
+      },
+      {
+        "tool_name": "topology.search_4d",
+        "namespace": "topology",
+        "description": "Explicit 4D manifold coordinate search with optional JSONB payload filters.",
+        "layers": [
+          "unknown"
+        ],
+        "identity_fields": [],
+        "writes_to": [],
+        "permissions": "read_only",
+        "packet_kind": "trace_tool",
+        "sources": [
+          "trace-mcp"
+        ],
+        "source_ref": "topology.search_4d",
+        "examples": [],
+        "transport": null,
+        "domain": "unknown",
+        "ontology": [],
+        "service": null,
+        "method": null,
+        "primary_layer": "unknown",
+        "score": 44,
+        "rank": 118
+      },
+      {
+        "tool_name": "topology.search_near",
+        "namespace": "topology",
+        "description": "Semantic search for nodes within a 4D topology radius.",
+        "layers": [
+          "unknown"
+        ],
+        "identity_fields": [],
+        "writes_to": [],
+        "permissions": "read_only",
+        "packet_kind": "trace_tool",
+        "sources": [
+          "trace-mcp"
+        ],
+        "source_ref": "topology.search_near",
+        "examples": [],
+        "transport": null,
+        "domain": "unknown",
+        "ontology": [],
+        "service": null,
+        "method": null,
+        "primary_layer": "unknown",
+        "score": 44,
+        "rank": 119
+      },
+      {
+        "tool_name": "trace.kag_search",
+        "namespace": "trace",
+        "description": "High-performance KAG-DAG retrieval: Go retrieval service → SvelteKit proxy → Postgres fallback.",
+        "layers": [
+          "unknown"
+        ],
+        "identity_fields": [],
+        "writes_to": [],
+        "permissions": "read_only",
+        "packet_kind": "trace_tool",
+        "sources": [
+          "trace-mcp"
+        ],
+        "source_ref": "trace.kag_search",
+        "examples": [],
+        "transport": null,
+        "domain": "unknown",
+        "ontology": [],
+        "service": null,
+        "method": null,
+        "primary_layer": "unknown",
+        "score": 44,
+        "rank": 120
+      },
+      {
+        "tool_name": "trace.system_health",
+        "namespace": "trace",
+        "description": "Returns the health and latency status of all backend retrieval and inference services.",
+        "layers": [
+          "unknown"
+        ],
+        "identity_fields": [],
+        "writes_to": [],
+        "permissions": "read_only",
+        "packet_kind": "trace_tool",
+        "sources": [
+          "trace-mcp"
+        ],
+        "source_ref": "trace.system_health",
+        "examples": [],
+        "transport": null,
+        "domain": "unknown",
+        "ontology": [],
+        "service": null,
+        "method": null,
+        "primary_layer": "unknown",
+        "score": 44,
+        "rank": 121
+      },
+      {
+        "tool_name": "trace.validate_ace_hit",
+        "namespace": "trace",
+        "description": "Validates a retrieved chunk against the ACE cache and graph contracts.",
+        "layers": [
+          "unknown"
+        ],
+        "identity_fields": [],
+        "writes_to": [],
+        "permissions": "read_only",
+        "packet_kind": "trace_tool",
+        "sources": [
+          "trace-mcp"
+        ],
+        "source_ref": "trace.validate_ace_hit",
+        "examples": [],
+        "transport": null,
+        "domain": "unknown",
+        "ontology": [],
+        "service": null,
+        "method": null,
+        "primary_layer": "unknown",
+        "score": 44,
+        "rank": 122
+      },
+      {
+        "tool_name": "ui.analyze_view",
+        "namespace": "ui",
+        "description": "Analyzes the current UI state based on a provided snapshot.",
+        "layers": [
+          "unknown"
+        ],
+        "identity_fields": [],
+        "writes_to": [],
+        "permissions": "read_only",
+        "packet_kind": "trace_tool",
+        "sources": [
+          "trace-mcp"
+        ],
+        "source_ref": "ui.analyze_view",
+        "examples": [],
+        "transport": null,
+        "domain": "unknown",
+        "ontology": [],
+        "service": null,
+        "method": null,
+        "primary_layer": "unknown",
+        "score": 44,
+        "rank": 123
+      },
+      {
+        "tool_name": "clusters.get_members",
+        "namespace": "clusters",
+        "description": "Returns the member nodes for a specific cluster.",
+        "layers": [
+          "unknown"
+        ],
+        "identity_fields": [],
+        "writes_to": [],
+        "permissions": "read_only",
+        "packet_kind": "trace_tool",
+        "sources": [
+          "trace-mcp"
+        ],
+        "source_ref": "clusters.get_members",
+        "examples": [],
+        "transport": null,
+        "domain": "unknown",
+        "ontology": [],
+        "service": null,
+        "method": null,
+        "primary_layer": "unknown",
+        "score": 40,
+        "rank": 124
+      },
+      {
+        "tool_name": "kb.extract_citations",
+        "namespace": "kb",
+        "description": "Extract legal citations and statutes from text.",
+        "layers": [
+          "unknown"
+        ],
+        "identity_fields": [],
+        "writes_to": [],
+        "permissions": "read_only",
+        "packet_kind": "trace_tool",
+        "sources": [
+          "trace-mcp"
+        ],
+        "source_ref": "kb.extract_citations",
+        "examples": [],
+        "transport": null,
+        "domain": "unknown",
+        "ontology": [],
+        "service": null,
+        "method": null,
+        "primary_layer": "unknown",
+        "score": 40,
+        "rank": 125
+      },
+      {
+        "tool_name": "skills.list",
+        "namespace": "skills",
+        "description": "Filter skills by name or description.",
+        "layers": [
+          "unknown"
+        ],
+        "identity_fields": [],
+        "writes_to": [],
+        "permissions": "read_only",
+        "packet_kind": "trace_tool",
+        "sources": [
+          "trace-mcp"
+        ],
+        "source_ref": "skills.list",
+        "examples": [],
+        "transport": null,
+        "domain": "unknown",
+        "ontology": [],
+        "service": null,
+        "method": null,
+        "primary_layer": "unknown",
+        "score": 40,
+        "rank": 126
+      },
+      {
+        "tool_name": "skills.run_mission",
+        "namespace": "skills",
+        "description": "Execute a specialized autonomous skill mission.",
+        "layers": [
+          "unknown"
+        ],
+        "identity_fields": [],
+        "writes_to": [],
+        "permissions": "read_only",
+        "packet_kind": "trace_tool",
+        "sources": [
+          "trace-mcp"
+        ],
+        "source_ref": "skills.run_mission",
+        "examples": [],
+        "transport": null,
+        "domain": "unknown",
+        "ontology": [],
+        "service": null,
+        "method": null,
+        "primary_layer": "unknown",
+        "score": 40,
+        "rank": 127
+      },
+      {
+        "tool_name": "trace.explain_retrieval",
+        "namespace": "trace",
+        "description": "Explains the retrieval trace for a specific query.",
+        "layers": [
+          "unknown"
+        ],
+        "identity_fields": [],
+        "writes_to": [],
+        "permissions": "read_only",
+        "packet_kind": "trace_tool",
+        "sources": [
+          "trace-mcp"
+        ],
+        "source_ref": "trace.explain_retrieval",
+        "examples": [],
+        "transport": null,
+        "domain": "unknown",
+        "ontology": [],
+        "service": null,
+        "method": null,
+        "primary_layer": "unknown",
+        "score": 40,
+        "rank": 128
+      }
+    ]
+  },
+  "layer_summaries": {
+    "identity": "Layer identity contains 2 tools; top-ranked tools are atlas.source_refs, atlas.query.",
+    "memory": "I need repo report snippets or command output to answer.",
+    "cache": "Layer cache contains 12 tools; top-ranked tools are ace.compact_search, wiki.search, wiki.status, ops.fixer_semantic_recall, legal.check_services.",
+    "lexical": "Layer lexical contains 6 tools; top-ranked tools are search.go_hybrid, kag.recall_similar_fix, legal.find_similar_opinions, kag.multi_lane_search, search.hybrid.",
+    "dense": "Layer dense contains 14 tools; top-ranked tools are atlas:packet_search, atlas.packet_search, image.enrich_tags, wiki.explain_page, atlas:verify_coverage.",
+    "graph": "Layer graph contains 23 tools; top-ranked tools are kag.feature_lookup, trace.graphrag_search, graph.semantic_path_synthesis, hypergraph.semantic_path_synthesis, atlas.explain_trace.",
+    "rerank": "Layer rerank contains 2 tools; top-ranked tools are search.rerank, turbovec.rank_chunks.",
+    "synthesis": "Layer synthesis contains 15 tools; top-ranked tools are legal.build_timeline, legal.cross_examine, legal.issue_spotter, legal.mock_trial, clusters.get_summary_lenses.",
+    "ops": "Layer ops contains 7 tools; top-ranked tools are ops.gpu_pipeline_stats, ops.gpu_topk, ops.execute_graphify, ops.propose_patch, ops.record_fix_attempt.",
+    "read": "Layer read contains 5 tools; top-ranked tools are atlas.get_chunk, file.read_window, kb.wiki_note_lookup, db.schema_overview, db.table_inspect.",
+    "unknown": "Layer unknown contains 41 tools; top-ranked tools are atlas.suggest_files, codebase.context_for_file, context.build_kv_packet, context.explain_compression, context.get_compressed_card."
+  },
+  "overall_summary": "Parent Atlas tool registry spans 128 tools across 11 active layers. TRACE MCP covers the live surface; manifest packets cover the broader MCP / gRPC registry.",
+  "tools": [
+    {
+      "tool_name": "ace.compact_search",
+      "namespace": "ace",
+      "description": "Token-budgeted semantic search returning a compact context tree. Use this instead of reading full files when you need focused retrieval within a token budget. Checks Redis cache first (TTL 300s), then runs hybrid FTS + vector search, applies Karpathy authority blend, and trims each snippet to fit tokenBudget.",
+      "layers": [
+        "cache",
+        "lexical",
+        "dense",
+        "graph"
+      ],
+      "identity_fields": [],
+      "writes_to": [],
+      "permissions": "read_only",
+      "packet_kind": "trace_tool",
+      "sources": [
+        "trace-mcp"
+      ],
+      "source_ref": "ace.compact_search",
+      "examples": [],
+      "transport": null,
+      "domain": "unknown",
+      "ontology": [],
+      "service": null,
+      "method": null,
+      "primary_layer": "cache",
+      "score": 350,
+      "rank": 1
+    },
+    {
+      "tool_name": "wiki.search",
+      "namespace": "wiki",
+      "description": "Hybrid wiki search over rg/codebase-graph metadata, Redis Karpathy scores, Qdrant payloads, CouchDB wiki docs, and Postgres JSONB mappings.",
+      "layers": [
+        "cache",
+        "dense",
+        "graph",
+        "read"
+      ],
+      "identity_fields": [],
+      "writes_to": [],
+      "permissions": "read_only",
+      "packet_kind": "trace_tool",
+      "sources": [
+        "trace-mcp"
+      ],
+      "source_ref": "wiki.search",
+      "examples": [],
+      "transport": null,
+      "domain": "unknown",
+      "ontology": [],
+      "service": null,
+      "method": null,
+      "primary_layer": "cache",
+      "score": 338,
+      "rank": 2
+    },
+    {
+      "tool_name": "wiki.status",
+      "namespace": "wiki",
+      "description": "Returns Karpathy/AGENTS wiki status across Postgres, Redis, CouchDB, Qdrant, Neo4j, and graphify metadata.",
+      "layers": [
+        "cache",
+        "dense",
+        "graph",
+        "read"
+      ],
+      "identity_fields": [],
+      "writes_to": [],
+      "permissions": "read_only",
+      "packet_kind": "trace_tool",
+      "sources": [
+        "trace-mcp"
+      ],
+      "source_ref": "wiki.status",
+      "examples": [],
+      "transport": null,
+      "domain": "unknown",
+      "ontology": [],
+      "service": null,
+      "method": null,
+      "primary_layer": "cache",
+      "score": 338,
+      "rank": 3
+    },
+    {
+      "tool_name": "ops.fixer_semantic_recall",
+      "namespace": "ops",
+      "description": "Recalls known fix templates via Redis L1 → Postgres L2 → Qdrant semantic L3. Call before LLM analysis to skip redundant inference on known error patterns.",
+      "layers": [
+        "cache",
+        "dense",
+        "synthesis",
+        "ops"
+      ],
+      "identity_fields": [],
+      "writes_to": [],
+      "permissions": "read_only",
+      "packet_kind": "trace_tool",
+      "sources": [
+        "trace-mcp"
+      ],
+      "source_ref": "ops.fixer_semantic_recall",
+      "examples": [],
+      "transport": null,
+      "domain": "unknown",
+      "ontology": [],
+      "service": null,
+      "method": null,
+      "primary_layer": "cache",
+      "score": 310,
+      "rank": 4
+    },
+    {
+      "tool_name": "atlas:packet_search",
+      "namespace": "atlas",
+      "description": "Query the canonical atlas_packets table. Search by source_ref path (variants tried automatically), feature_id, concept_id membership, or free-text summary match. Returns packet_id, source_ref, feature_id, concept_ids, summary, reward_prior. Use this to find which packets are associated with a file or feature before querying Qdrant.",
+      "layers": [
+        "dense",
+        "graph",
+        "identity"
+      ],
+      "identity_fields": [
+        "feature_id",
+        "source_ref"
+      ],
+      "writes_to": [],
+      "permissions": "read_only",
+      "packet_kind": "trace_tool",
+      "sources": [
+        "trace-mcp"
+      ],
+      "source_ref": "atlas:packet_search",
+      "examples": [],
+      "transport": null,
+      "domain": "unknown",
+      "ontology": [],
+      "service": null,
+      "method": null,
+      "primary_layer": "dense",
+      "score": 286,
+      "rank": 5
+    },
+    {
+      "tool_name": "atlas.packet_search",
+      "namespace": "atlas",
+      "description": "Query the canonical atlas_packets table. Search by source_ref path (variants tried automatically), feature_id, concept_id membership, or free-text summary match. Returns packet_id, source_ref, feature_id, concept_ids, summary, reward_prior. Use this to find which packets are associated with a file or feature before querying Qdrant.",
+      "layers": [
+        "dense",
+        "graph",
+        "identity"
+      ],
+      "identity_fields": [
+        "feature_id",
+        "source_ref"
+      ],
+      "writes_to": [],
+      "permissions": "read_only",
+      "packet_kind": "trace_tool",
+      "sources": [
+        "trace-mcp"
+      ],
+      "source_ref": "atlas.packet_search",
+      "examples": [],
+      "transport": null,
+      "domain": "unknown",
+      "ontology": [],
+      "service": null,
+      "method": null,
+      "primary_layer": "dense",
+      "score": 286,
+      "rank": 6
+    },
+    {
+      "tool_name": "legal.check_services",
+      "namespace": "legal",
+      "description": "Probe all 9 backing services (Postgres, Redis, Qdrant, Neo4j, Ollama, RabbitMQ, CouchDB, SeaweedFS, Obsidian) and report health status with latency. Use to diagnose why other tools are returning errors.",
+      "layers": [
+        "cache",
+        "dense",
+        "graph"
+      ],
+      "identity_fields": [],
+      "writes_to": [],
+      "permissions": "read_only",
+      "packet_kind": "trace_tool",
+      "sources": [
+        "trace-mcp"
+      ],
+      "source_ref": "legal.check_services",
+      "examples": [],
+      "transport": null,
+      "domain": "unknown",
+      "ontology": [],
+      "service": null,
+      "method": null,
+      "primary_layer": "cache",
+      "score": 270,
+      "rank": 7
+    },
+    {
+      "tool_name": "image.enrich_tags",
+      "namespace": "image",
+      "description": "VLM-enrich one Qdrant evidence point with auto-generated tags. Fetches the image (from payload file_path or MinIO), runs Gemma4-VLM, and PATCHes suggestedTags + vlm_summary back onto the Qdrant payload. Tags are merged with any existing tags (deduped). Use before indexing or to backfill stale points.",
+      "layers": [
+        "dense",
+        "graph",
+        "synthesis"
+      ],
+      "identity_fields": [],
+      "writes_to": [],
+      "permissions": "read_only",
+      "packet_kind": "trace_tool",
+      "sources": [
+        "trace-mcp"
+      ],
+      "source_ref": "image.enrich_tags",
+      "examples": [],
+      "transport": null,
+      "domain": "unknown",
+      "ontology": [],
+      "service": null,
+      "method": null,
+      "primary_layer": "dense",
+      "score": 256,
+      "rank": 8
+    },
+    {
+      "tool_name": "search.go_hybrid",
+      "namespace": "search",
+      "description": "Go search service RRF fusion of FTS + pgvector + Qdrant.",
+      "layers": [
+        "lexical",
+        "dense",
+        "rerank"
+      ],
+      "identity_fields": [],
+      "writes_to": [],
+      "permissions": "read_only",
+      "packet_kind": "trace_tool",
+      "sources": [
+        "trace-mcp"
+      ],
+      "source_ref": "search.go_hybrid",
+      "examples": [],
+      "transport": null,
+      "domain": "unknown",
+      "ontology": [],
+      "service": null,
+      "method": null,
+      "primary_layer": "lexical",
+      "score": 256,
+      "rank": 9
+    },
+    {
+      "tool_name": "kag.recall_similar_fix",
+      "namespace": "kag",
+      "description": "Recalls prior fixes for an error via exact-hash + pg_trgm similarity over error_fingerprints.",
+      "layers": [
+        "lexical",
+        "synthesis",
+        "memory"
+      ],
+      "identity_fields": [],
+      "writes_to": [],
+      "permissions": "read_only",
+      "packet_kind": "trace_tool",
+      "sources": [
+        "trace-mcp"
+      ],
+      "source_ref": "kag.recall_similar_fix",
+      "examples": [],
+      "transport": null,
+      "domain": "unknown",
+      "ontology": [],
+      "service": null,
+      "method": null,
+      "primary_layer": "lexical",
+      "score": 255,
+      "rank": 10
+    },
+    {
+      "tool_name": "wiki.explain_page",
+      "namespace": "wiki",
+      "description": "Explains one wiki page with source files, imports, path aliases, feature keys, Qdrant tags, graph links, activity score, recommendations, and related FeatureMaps.",
+      "layers": [
+        "dense",
+        "graph",
+        "read"
+      ],
+      "identity_fields": [],
+      "writes_to": [],
+      "permissions": "read_only",
+      "packet_kind": "trace_tool",
+      "sources": [
+        "trace-mcp"
+      ],
+      "source_ref": "wiki.explain_page",
+      "examples": [],
+      "transport": null,
+      "domain": "unknown",
+      "ontology": [],
+      "service": null,
+      "method": null,
+      "primary_layer": "dense",
+      "score": 246,
+      "rank": 11
+    },
+    {
+      "tool_name": "ops.gpu_attention",
+      "namespace": "ops",
+      "description": "GPU scaled dot-product attention over a flat key matrix. Returns softmax attention weights per key. Results are Redis-cached 300 s by shape+input hash (CUDA Graph replay emulation). Use for ACE chunk reranking, evidence scoring, or any query-vs-corpus weighting.",
+      "layers": [
+        "cache",
+        "rerank",
+        "ops"
+      ],
+      "identity_fields": [],
+      "writes_to": [],
+      "permissions": "read_only",
+      "packet_kind": "trace_tool",
+      "sources": [
+        "trace-mcp"
+      ],
+      "source_ref": "ops.gpu_attention",
+      "examples": [],
+      "transport": null,
+      "domain": "unknown",
+      "ontology": [],
+      "service": null,
+      "method": null,
+      "primary_layer": "cache",
+      "score": 238,
+      "rank": 12
+    },
+    {
+      "tool_name": "ops.update_LLMS.md",
+      "namespace": "ops",
+      "description": "Append a new fact, rule, or tool note to a directory LLMS.md file and flush to Redis. Use this after discovering something useful that should survive future conversations. The fact appears in every future ACE context for that directory automatically (Lane L4).",
+      "layers": [
+        "cache",
+        "synthesis",
+        "ops"
+      ],
+      "identity_fields": [],
+      "writes_to": [],
+      "permissions": "read_only",
+      "packet_kind": "trace_tool",
+      "sources": [
+        "trace-mcp"
+      ],
+      "source_ref": "ops.update_LLMS.md",
+      "examples": [],
+      "transport": null,
+      "domain": "unknown",
+      "ontology": [],
+      "service": null,
+      "method": null,
+      "primary_layer": "cache",
+      "score": 226,
+      "rank": 13
+    },
+    {
+      "tool_name": "kag.feature_lookup",
+      "namespace": "kag",
+      "description": "Look up which files implement a named feature. Queries the durable feature_implementations + feature_file_edges tables (HyperRAG L9). Returns file paths and entry-point exports for the matched feature.",
+      "layers": [
+        "graph",
+        "identity"
+      ],
+      "identity_fields": [],
+      "writes_to": [],
+      "permissions": "read_only",
+      "packet_kind": "trace_tool",
+      "sources": [
+        "trace-mcp"
+      ],
+      "source_ref": "kag.feature_lookup",
+      "examples": [],
+      "transport": null,
+      "domain": "unknown",
+      "ontology": [],
+      "service": null,
+      "method": null,
+      "primary_layer": "graph",
+      "score": 194,
+      "rank": 14
+    },
+    {
+      "tool_name": "atlas:verify_coverage",
+      "namespace": "atlas",
+      "description": "Phase 3I verification gate. Reports coverage metrics for the atlas_packets canonical warehouse: total packets, source_ref coverage %, feature_id coverage %, concept_ids coverage %, summary coverage %, embedding coverage %, and duplicate sha256 count. Gate: source_ref >= 90% required before Phase 4A RRF ranking can start.",
+      "layers": [
+        "dense",
+        "rerank"
+      ],
+      "identity_fields": [
+        "feature_id",
+        "source_ref"
+      ],
+      "writes_to": [],
+      "permissions": "read_only",
+      "packet_kind": "trace_tool",
+      "sources": [
+        "trace-mcp"
+      ],
+      "source_ref": "atlas:verify_coverage",
+      "examples": [],
+      "transport": null,
+      "domain": "unknown",
+      "ontology": [],
+      "service": null,
+      "method": null,
+      "primary_layer": "dense",
+      "score": 184,
+      "rank": 15
+    },
+    {
+      "tool_name": "trace.graphrag_search",
+      "namespace": "trace",
+      "description": "GraphRAG hybrid retrieval: dense+sparse RRF prefetch → Neo4j graph expansion → Karpathy blend rerank.",
+      "layers": [
+        "graph",
+        "rerank"
+      ],
+      "identity_fields": [],
+      "writes_to": [],
+      "permissions": "read_only",
+      "packet_kind": "trace_tool",
+      "sources": [
+        "trace-mcp"
+      ],
+      "source_ref": "trace.graphrag_search",
+      "examples": [],
+      "transport": null,
+      "domain": "unknown",
+      "ontology": [],
+      "service": null,
+      "method": null,
+      "primary_layer": "graph",
+      "score": 182,
+      "rank": 16
+    },
+    {
+      "tool_name": "engram.chat_memory_store",
+      "namespace": "engram",
+      "description": "Append a chat turn to user memory store (Redis sorted set + bounded trim).",
+      "layers": [
+        "cache",
+        "memory"
+      ],
+      "identity_fields": [],
+      "writes_to": [
+        "engram"
+      ],
+      "permissions": "read_write",
+      "packet_kind": "trace_tool",
+      "sources": [
+        "trace-mcp"
+      ],
+      "source_ref": "engram.chat_memory_store",
+      "examples": [],
+      "transport": null,
+      "domain": "unknown",
+      "ontology": [],
+      "service": null,
+      "method": null,
+      "primary_layer": "cache",
+      "score": 181,
+      "rank": 17
+    },
+    {
+      "tool_name": "evidence.image_feedback",
+      "namespace": "evidence",
+      "description": "Record thumbs-up or thumbs-down on a visual search result. Votes accumulate in Redis; Qdrant payload (trust_score, user_approved/rejected) is updated after 3 votes. Fires GRPO rl-signal automatically.",
+      "layers": [
+        "cache",
+        "dense"
+      ],
+      "identity_fields": [],
+      "writes_to": [],
+      "permissions": "read_only",
+      "packet_kind": "trace_tool",
+      "sources": [
+        "trace-mcp"
+      ],
+      "source_ref": "evidence.image_feedback",
+      "examples": [],
+      "transport": null,
+      "domain": "unknown",
+      "ontology": [],
+      "service": null,
+      "method": null,
+      "primary_layer": "cache",
+      "score": 180,
+      "rank": 18
+    },
+    {
+      "tool_name": "legal.transcribe_video",
+      "namespace": "legal",
+      "description": "Queue a video URL for non-blocking background processing via RabbitMQ: yt-dlp download → FFmpeg audio extraction → Whisper large-v3 transcription → timestamp-chunked embedding into Qdrant evidence_items. Returns a job_id. Poll Redis key hermes:job:{jobId} for progress. Supports YouTube, direct MP4, Vimeo.",
+      "layers": [
+        "cache",
+        "dense"
+      ],
+      "identity_fields": [],
+      "writes_to": [],
+      "permissions": "read_only",
+      "packet_kind": "trace_tool",
+      "sources": [
+        "trace-mcp"
+      ],
+      "source_ref": "legal.transcribe_video",
+      "examples": [],
+      "transport": null,
+      "domain": "unknown",
+      "ontology": [],
+      "service": null,
+      "method": null,
+      "primary_layer": "cache",
+      "score": 180,
+      "rank": 19
+    },
+    {
+      "tool_name": "atlas.prefilter",
+      "namespace": "atlas",
+      "description": "TurboVec ANN cluster prefilter. Embeds the query and queries the TurboVec sidecar (:8099) to identify the top-N cluster IDs for injecting into a Qdrant should/must filter. Returns clusterIds, centroidScores, backend (python|js|offline), and latency.",
+      "layers": [
+        "dense",
+        "rerank"
+      ],
+      "identity_fields": [],
+      "writes_to": [],
+      "permissions": "read_only",
+      "packet_kind": "trace_tool",
+      "sources": [
+        "trace-mcp"
+      ],
+      "source_ref": "atlas.prefilter",
+      "examples": [],
+      "transport": null,
+      "domain": "unknown",
+      "ontology": [],
+      "service": null,
+      "method": null,
+      "primary_layer": "dense",
+      "score": 176,
+      "rank": 20
+    },
+    {
+      "tool_name": "atlas.coverage",
+      "namespace": "atlas",
+      "description": "Phase 3I verification gate. Reports coverage metrics for the atlas_packets canonical warehouse: total packets, source_ref coverage %, feature_id coverage %, concept_ids coverage %, summary coverage %, embedding coverage %, and duplicate sha256 count. Gate: source_ref >= 90% required before Phase 4A RRF ranking can start.",
+      "layers": [
+        "dense",
+        "rerank"
+      ],
+      "identity_fields": [
+        "feature_id",
+        "source_ref"
+      ],
+      "writes_to": [
+        "postgres"
+      ],
+      "permissions": "read_write",
+      "packet_kind": "trace_tool",
+      "sources": [
+        "trace-mcp"
+      ],
+      "source_ref": "atlas.coverage",
+      "examples": [],
+      "transport": null,
+      "domain": "unknown",
+      "ontology": [],
+      "service": null,
+      "method": null,
+      "primary_layer": "dense",
+      "score": 174,
+      "rank": 21
+    },
+    {
+      "tool_name": "graph.semantic_path_synthesis",
+      "namespace": "graph",
+      "description": "Synthesizes a semantic narrative along the shortest structural path between nodes.",
+      "layers": [
+        "graph",
+        "synthesis"
+      ],
+      "identity_fields": [],
+      "writes_to": [],
+      "permissions": "read_only",
+      "packet_kind": "trace_tool",
+      "sources": [
+        "trace-mcp"
+      ],
+      "source_ref": "graph.semantic_path_synthesis",
+      "examples": [],
+      "transport": null,
+      "domain": "unknown",
+      "ontology": [],
+      "service": null,
+      "method": null,
+      "primary_layer": "graph",
+      "score": 170,
+      "rank": 22
+    },
+    {
+      "tool_name": "hypergraph.semantic_path_synthesis",
+      "namespace": "hypergraph",
+      "description": "Synthesizes a semantic narrative along a path in the hypergraph.",
+      "layers": [
+        "graph",
+        "synthesis"
+      ],
+      "identity_fields": [],
+      "writes_to": [],
+      "permissions": "read_only",
+      "packet_kind": "trace_tool",
+      "sources": [
+        "trace-mcp"
+      ],
+      "source_ref": "hypergraph.semantic_path_synthesis",
+      "examples": [],
+      "transport": null,
+      "domain": "unknown",
+      "ontology": [],
+      "service": null,
+      "method": null,
+      "primary_layer": "graph",
+      "score": 170,
+      "rank": 23
+    },
+    {
+      "tool_name": "legal.find_similar_opinions",
+      "namespace": "legal",
+      "description": "Find similar case opinions, judgments, and rulings via Qdrant semantic search on the legal_documents collection filtered to doc_type opinion/judgment/ruling. Embeds the facts summary via /api/embed then runs ANN. Falls back to Postgres FTS on Qdrant error.",
+      "layers": [
+        "lexical",
+        "dense"
+      ],
+      "identity_fields": [],
+      "writes_to": [],
+      "permissions": "read_only",
+      "packet_kind": "trace_tool",
+      "sources": [
+        "trace-mcp"
+      ],
+      "source_ref": "legal.find_similar_opinions",
+      "examples": [],
+      "transport": null,
+      "domain": "unknown",
+      "ontology": [],
+      "service": null,
+      "method": null,
+      "primary_layer": "lexical",
+      "score": 168,
+      "rank": 24
+    },
+    {
+      "tool_name": "image.caption",
+      "namespace": "image",
+      "description": "Get a VLM-generated caption and suggested tags for a local image file. Calls the Gemma4-VLM pipeline (Triton→TurboQuant→Ollama cascade). Does NOT search Qdrant — use evidence.search_by_image to also get ranked hits.",
+      "layers": [
+        "dense",
+        "synthesis"
+      ],
+      "identity_fields": [],
+      "writes_to": [],
+      "permissions": "read_only",
+      "packet_kind": "trace_tool",
+      "sources": [
+        "trace-mcp"
+      ],
+      "source_ref": "image.caption",
+      "examples": [],
+      "transport": null,
+      "domain": "unknown",
+      "ontology": [],
+      "service": null,
+      "method": null,
+      "primary_layer": "dense",
+      "score": 166,
+      "rank": 25
+    },
+    {
+      "tool_name": "image.search_by_text",
+      "namespace": "image",
+      "description": "Search the evidence image index using a text description. Embeds the query via embeddinggemma and searches Qdrant. No image upload needed — use for natural-language queries like \"find images showing property damage\" or \"photos of the red sedan\".",
+      "layers": [
+        "dense",
+        "synthesis"
+      ],
+      "identity_fields": [],
+      "writes_to": [],
+      "permissions": "read_only",
+      "packet_kind": "trace_tool",
+      "sources": [
+        "trace-mcp"
+      ],
+      "source_ref": "image.search_by_text",
+      "examples": [],
+      "transport": null,
+      "domain": "unknown",
+      "ontology": [],
+      "service": null,
+      "method": null,
+      "primary_layer": "dense",
+      "score": 166,
+      "rank": 26
+    },
+    {
+      "tool_name": "atlas.explain_trace",
+      "namespace": "atlas",
+      "description": "Return the compact summary and retrieval path for the current Atlas packet.",
+      "layers": [
+        "graph",
+        "read"
+      ],
+      "identity_fields": [],
+      "writes_to": [],
+      "permissions": "read_only",
+      "packet_kind": "trace_tool",
+      "sources": [
+        "trace-mcp"
+      ],
+      "source_ref": "atlas.explain_trace",
+      "examples": [],
+      "transport": null,
+      "domain": "unknown",
+      "ontology": [],
+      "service": null,
+      "method": null,
+      "primary_layer": "graph",
+      "score": 162,
+      "rank": 27
+    },
+    {
+      "tool_name": "engram.ace_packet_inject",
+      "namespace": "engram",
+      "description": "Write ACE context packet to Redis with 1h TTL: ace:packet:{runId}.",
+      "layers": [
+        "cache",
+        "synthesis"
+      ],
+      "identity_fields": [],
+      "writes_to": [
+        "engram"
+      ],
+      "permissions": "read_write",
+      "packet_kind": "trace_tool",
+      "sources": [
+        "trace-mcp"
+      ],
+      "source_ref": "engram.ace_packet_inject",
+      "examples": [],
+      "transport": null,
+      "domain": "unknown",
+      "ontology": [],
+      "service": null,
+      "method": null,
+      "primary_layer": "cache",
+      "score": 162,
+      "rank": 28
+    },
+    {
+      "tool_name": "wiki.refresh_directory",
+      "namespace": "wiki",
+      "description": "Refreshes one AGENTS/Karpathy directory card. Defaults to dryRun=true and does not start a full re-index.",
+      "layers": [
+        "graph",
+        "read"
+      ],
+      "identity_fields": [],
+      "writes_to": [],
+      "permissions": "read_only",
+      "packet_kind": "trace_tool",
+      "sources": [
+        "trace-mcp"
+      ],
+      "source_ref": "wiki.refresh_directory",
+      "examples": [],
+      "transport": null,
+      "domain": "unknown",
+      "ontology": [],
+      "service": null,
+      "method": null,
+      "primary_layer": "graph",
+      "score": 162,
+      "rank": 29
+    },
+    {
+      "tool_name": "kag.multi_lane_search",
+      "namespace": "kag",
+      "description": "Performs 11-lane HyperRAG retrieval across hash, n-gram, graph, feature atlas, and activity prefetch lanes. Returns ranked hits + synthesisBlock with per-chunk trust tier metadata.",
+      "layers": [
+        "lexical",
+        "synthesis"
+      ],
+      "identity_fields": [],
+      "writes_to": [],
+      "permissions": "read_only",
+      "packet_kind": "trace_tool",
+      "sources": [
+        "trace-mcp"
+      ],
+      "source_ref": "kag.multi_lane_search",
+      "examples": [],
+      "transport": null,
+      "domain": "unknown",
+      "ontology": [],
+      "service": null,
+      "method": null,
+      "primary_layer": "lexical",
+      "score": 160,
+      "rank": 30
+    },
+    {
+      "tool_name": "ops.gpu_pagerank",
+      "namespace": "ops",
+      "description": "GPU power-iteration PageRank on a flat adjacency matrix. Returns normalised rank scores (sum to 1.0). Cached 300 s by shape+input hash.",
+      "layers": [
+        "graph",
+        "ops"
+      ],
+      "identity_fields": [],
+      "writes_to": [],
+      "permissions": "read_only",
+      "packet_kind": "trace_tool",
+      "sources": [
+        "trace-mcp"
+      ],
+      "source_ref": "ops.gpu_pagerank",
+      "examples": [],
+      "transport": null,
+      "domain": "unknown",
+      "ontology": [],
+      "service": null,
+      "method": null,
+      "primary_layer": "graph",
+      "score": 148,
+      "rank": 31
+    },
+    {
+      "tool_name": "ops.fixer_pattern_store",
+      "namespace": "ops",
+      "description": "[OPERATOR-GATED] Stores a fix attempt outcome to the 3-layer fixer memory. Increments success/failure counts, upserts to Qdrant fixer_memory_768 (GPU-indexed) when embedding provided.",
+      "layers": [
+        "dense",
+        "ops"
+      ],
+      "identity_fields": [],
+      "writes_to": [],
+      "permissions": "read_only",
+      "packet_kind": "trace_tool",
+      "sources": [
+        "trace-mcp"
+      ],
+      "source_ref": "ops.fixer_pattern_store",
+      "examples": [],
+      "transport": null,
+      "domain": "unknown",
+      "ontology": [],
+      "service": null,
+      "method": null,
+      "primary_layer": "dense",
+      "score": 142,
+      "rank": 32
+    },
+    {
+      "tool_name": "ops.trust_audit",
+      "namespace": "ops",
+      "description": "Read-only audit of the trust-tier injection-detection system. Returns count of blocked content hashes and the most recently blocked entries. Use for diagnostics only — cannot clear the block list.",
+      "layers": [
+        "dense",
+        "ops"
+      ],
+      "identity_fields": [],
+      "writes_to": [],
+      "permissions": "read_only",
+      "packet_kind": "trace_tool",
+      "sources": [
+        "trace-mcp"
+      ],
+      "source_ref": "ops.trust_audit",
+      "examples": [],
+      "transport": null,
+      "domain": "unknown",
+      "ontology": [],
+      "service": null,
+      "method": null,
+      "primary_layer": "dense",
+      "score": 142,
+      "rank": 33
+    },
+    {
+      "tool_name": "atlas.source_refs",
+      "namespace": "atlas",
+      "description": "Return the top sourceRefs from the compact Atlas packet.",
+      "layers": [
+        "identity"
+      ],
+      "identity_fields": [
+        "source_ref"
+      ],
+      "writes_to": [],
+      "permissions": "read_only",
+      "packet_kind": "trace_tool",
+      "sources": [
+        "trace-mcp"
+      ],
+      "source_ref": "atlas.source_refs",
+      "examples": [],
+      "transport": null,
+      "domain": "unknown",
+      "ontology": [],
+      "service": null,
+      "method": null,
+      "primary_layer": "identity",
+      "score": 112,
+      "rank": 34
+    },
+    {
+      "tool_name": "atlas.query",
+      "namespace": "atlas",
+      "description": "Atlas alias for ranked technical search. Returns the same compact hit list as kb.trace_search for a query.",
+      "layers": [
+        "identity"
+      ],
+      "identity_fields": [],
+      "writes_to": [],
+      "permissions": "read_only",
+      "packet_kind": "trace_tool",
+      "sources": [
+        "trace-mcp"
+      ],
+      "source_ref": "atlas.query",
+      "examples": [],
+      "transport": null,
+      "domain": "unknown",
+      "ontology": [],
+      "service": null,
+      "method": null,
+      "primary_layer": "identity",
+      "score": 104,
+      "rank": 35
+    },
+    {
+      "tool_name": "engram.chat_memory_recent",
+      "namespace": "engram",
+      "description": "Read-only recent chat memory lookup from engram_cards.",
+      "layers": [
+        "memory"
+      ],
+      "identity_fields": [],
+      "writes_to": [],
+      "permissions": "read_only",
+      "packet_kind": "trace_tool",
+      "sources": [
+        "trace-mcp"
+      ],
+      "source_ref": "engram.chat_memory_recent",
+      "examples": [],
+      "transport": null,
+      "domain": "unknown",
+      "ontology": [],
+      "service": null,
+      "method": null,
+      "primary_layer": "memory",
+      "score": 99,
+      "rank": 36
+    },
+    {
+      "tool_name": "atlas.compact_context",
+      "namespace": "atlas",
+      "description": "Build a compact Atlas context packet with top chunks, sourceRefs, a compressed summary, confidence, and retrieval path.",
+      "layers": [
+        "graph"
+      ],
+      "identity_fields": [],
+      "writes_to": [],
+      "permissions": "read_only",
+      "packet_kind": "trace_tool",
+      "sources": [
+        "trace-mcp"
+      ],
+      "source_ref": "atlas.compact_context",
+      "examples": [],
+      "transport": null,
+      "domain": "unknown",
+      "ontology": [],
+      "service": null,
+      "method": null,
+      "primary_layer": "graph",
+      "score": 94,
+      "rank": 37
+    },
+    {
+      "tool_name": "context.prefetch_feature_context",
+      "namespace": "context",
+      "description": "Build a prefetch packet for the next feature edit using recent activity, directory KAG context, community graph context, AGENTS.md quick hits, and notecard search results.",
+      "layers": [
+        "graph"
+      ],
+      "identity_fields": [],
+      "writes_to": [],
+      "permissions": "read_only",
+      "packet_kind": "trace_tool",
+      "sources": [
+        "trace-mcp"
+      ],
+      "source_ref": "context.prefetch_feature_context",
+      "examples": [],
+      "transport": null,
+      "domain": "unknown",
+      "ontology": [],
+      "service": null,
+      "method": null,
+      "primary_layer": "graph",
+      "score": 94,
+      "rank": 38
+    },
+    {
+      "tool_name": "graph.materialize_pathway",
+      "namespace": "graph",
+      "description": "Materializes a synthesized pathway into the persistent hypergraph context.",
+      "layers": [
+        "graph"
+      ],
+      "identity_fields": [],
+      "writes_to": [],
+      "permissions": "read_only",
+      "packet_kind": "trace_tool",
+      "sources": [
+        "trace-mcp"
+      ],
+      "source_ref": "graph.materialize_pathway",
+      "examples": [],
+      "transport": null,
+      "domain": "unknown",
+      "ontology": [],
+      "service": null,
+      "method": null,
+      "primary_layer": "graph",
+      "score": 94,
+      "rank": 39
+    },
+    {
+      "tool_name": "graph.pagerank_top",
+      "namespace": "graph",
+      "description": "Lists the top authoritative nodes in the graph by PageRank score.",
+      "layers": [
+        "graph"
+      ],
+      "identity_fields": [],
+      "writes_to": [],
+      "permissions": "read_only",
+      "packet_kind": "trace_tool",
+      "sources": [
+        "trace-mcp"
+      ],
+      "source_ref": "graph.pagerank_top",
+      "examples": [],
+      "transport": null,
+      "domain": "unknown",
+      "ontology": [],
+      "service": null,
+      "method": null,
+      "primary_layer": "graph",
+      "score": 94,
+      "rank": 40
+    },
+    {
+      "tool_name": "hypergraph.explain_activation",
+      "namespace": "hypergraph",
+      "description": "Explains why a specific hypergraph edge was activated for a set of query terms.",
+      "layers": [
+        "graph"
+      ],
+      "identity_fields": [],
+      "writes_to": [],
+      "permissions": "read_only",
+      "packet_kind": "trace_tool",
+      "sources": [
+        "trace-mcp"
+      ],
+      "source_ref": "hypergraph.explain_activation",
+      "examples": [],
+      "transport": null,
+      "domain": "unknown",
+      "ontology": [],
+      "service": null,
+      "method": null,
+      "primary_layer": "graph",
+      "score": 94,
+      "rank": 41
+    },
+    {
+      "tool_name": "hypergraph.get_edge",
+      "namespace": "hypergraph",
+      "description": "Returns full details for a specific hypergraph edge.",
+      "layers": [
+        "graph"
+      ],
+      "identity_fields": [],
+      "writes_to": [],
+      "permissions": "read_only",
+      "packet_kind": "trace_tool",
+      "sources": [
+        "trace-mcp"
+      ],
+      "source_ref": "hypergraph.get_edge",
+      "examples": [],
+      "transport": null,
+      "domain": "unknown",
+      "ontology": [],
+      "service": null,
+      "method": null,
+      "primary_layer": "graph",
+      "score": 94,
+      "rank": 42
+    },
+    {
+      "tool_name": "kb.search_pathways",
+      "namespace": "kb",
+      "description": "Searches for previously synthesized and materialized pathways.",
+      "layers": [
+        "graph"
+      ],
+      "identity_fields": [],
+      "writes_to": [],
+      "permissions": "read_only",
+      "packet_kind": "trace_tool",
+      "sources": [
+        "trace-mcp"
+      ],
+      "source_ref": "kb.search_pathways",
+      "examples": [],
+      "transport": null,
+      "domain": "unknown",
+      "ontology": [],
+      "service": null,
+      "method": null,
+      "primary_layer": "graph",
+      "score": 94,
+      "rank": 43
+    },
+    {
+      "tool_name": "runtime.sse_probe",
+      "namespace": "runtime",
+      "description": "Verifies TRACE MCP Streamable HTTP/SSE path by calling tools/list with Accept: text/event-stream.",
+      "layers": [
+        "graph"
+      ],
+      "identity_fields": [],
+      "writes_to": [],
+      "permissions": "read_only",
+      "packet_kind": "trace_tool",
+      "sources": [
+        "trace-mcp"
+      ],
+      "source_ref": "runtime.sse_probe",
+      "examples": [],
+      "transport": null,
+      "domain": "unknown",
+      "ontology": [],
+      "service": null,
+      "method": null,
+      "primary_layer": "graph",
+      "score": 94,
+      "rank": 44
+    },
+    {
+      "tool_name": "taxonomy.path",
+      "namespace": "taxonomy",
+      "description": "Returns the full ontological path from a leaf node to root.",
+      "layers": [
+        "graph"
+      ],
+      "identity_fields": [],
+      "writes_to": [],
+      "permissions": "read_only",
+      "packet_kind": "trace_tool",
+      "sources": [
+        "trace-mcp"
+      ],
+      "source_ref": "taxonomy.path",
+      "examples": [],
+      "transport": null,
+      "domain": "unknown",
+      "ontology": [],
+      "service": null,
+      "method": null,
+      "primary_layer": "graph",
+      "score": 94,
+      "rank": 45
+    },
+    {
+      "tool_name": "topology.search_som_neighborhood",
+      "namespace": "topology",
+      "description": "Searches for nodes in the SOM grid neighborhood of an anchored query.",
+      "layers": [
+        "graph"
+      ],
+      "identity_fields": [],
+      "writes_to": [],
+      "permissions": "read_only",
+      "packet_kind": "trace_tool",
+      "sources": [
+        "trace-mcp"
+      ],
+      "source_ref": "topology.search_som_neighborhood",
+      "examples": [],
+      "transport": null,
+      "domain": "unknown",
+      "ontology": [],
+      "service": null,
+      "method": null,
+      "primary_layer": "graph",
+      "score": 94,
+      "rank": 46
+    },
+    {
+      "tool_name": "search.rerank",
+      "namespace": "search",
+      "description": "Reranks a list of document snippets for relevance to a query using llama-server.",
+      "layers": [
+        "rerank"
+      ],
+      "identity_fields": [],
+      "writes_to": [],
+      "permissions": "read_only",
+      "packet_kind": "trace_tool",
+      "sources": [
+        "trace-mcp"
+      ],
+      "source_ref": "search.rerank",
+      "examples": [],
+      "transport": null,
+      "domain": "unknown",
+      "ontology": [],
+      "service": null,
+      "method": null,
+      "primary_layer": "rerank",
+      "score": 92,
+      "rank": 47
+    },
+    {
+      "tool_name": "turbovec.rank_chunks",
+      "namespace": "turbovec",
+      "description": "Read-only RotorQuant blended rerank for sourceRefs. No writes.",
+      "layers": [
+        "rerank"
+      ],
+      "identity_fields": [],
+      "writes_to": [],
+      "permissions": "read_only",
+      "packet_kind": "trace_tool",
+      "sources": [
+        "trace-mcp"
+      ],
+      "source_ref": "turbovec.rank_chunks",
+      "examples": [],
+      "transport": null,
+      "domain": "unknown",
+      "ontology": [],
+      "service": null,
+      "method": null,
+      "primary_layer": "rerank",
+      "score": 92,
+      "rank": 48
+    },
+    {
+      "tool_name": "hypergraph.search",
+      "namespace": "hypergraph",
+      "description": "Semantic search across the hypergraph edges.",
+      "layers": [
+        "graph"
+      ],
+      "identity_fields": [],
+      "writes_to": [],
+      "permissions": "read_only",
+      "packet_kind": "trace_tool",
+      "sources": [
+        "trace-mcp"
+      ],
+      "source_ref": "hypergraph.search",
+      "examples": [],
+      "transport": null,
+      "domain": "unknown",
+      "ontology": [],
+      "service": null,
+      "method": null,
+      "primary_layer": "graph",
+      "score": 90,
+      "rank": 49
+    },
+    {
+      "tool_name": "evidence.search_by_image",
+      "namespace": "evidence",
+      "description": "Search evidence by uploading an image. The VLM describes the image, embeds it, and returns semantically similar evidence items from Qdrant. Use for \"find evidence similar to this photo/diagram/screenshot\".",
+      "layers": [
+        "dense"
+      ],
+      "identity_fields": [],
+      "writes_to": [],
+      "permissions": "read_only",
+      "packet_kind": "trace_tool",
+      "sources": [
+        "trace-mcp"
+      ],
+      "source_ref": "evidence.search_by_image",
+      "examples": [],
+      "transport": null,
+      "domain": "unknown",
+      "ontology": [],
+      "service": null,
+      "method": null,
+      "primary_layer": "dense",
+      "score": 88,
+      "rank": 50
+    },
+    {
+      "tool_name": "legal.batch_ingest",
+      "namespace": "legal",
+      "description": "Publish one or more document URLs to the document.embed RabbitMQ queue for background embedding and indexing. Use to bulk-ingest case documents, transcripts, or external evidence without blocking the agent loop.",
+      "layers": [
+        "dense"
+      ],
+      "identity_fields": [],
+      "writes_to": [],
+      "permissions": "read_only",
+      "packet_kind": "trace_tool",
+      "sources": [
+        "trace-mcp"
+      ],
+      "source_ref": "legal.batch_ingest",
+      "examples": [],
+      "transport": null,
+      "domain": "unknown",
+      "ontology": [],
+      "service": null,
+      "method": null,
+      "primary_layer": "dense",
+      "score": 88,
+      "rank": 51
+    },
+    {
+      "tool_name": "legal.cross_reference_evidence",
+      "namespace": "legal",
+      "description": "Semantic cross-reference: find evidence chunks similar to a reference evidence item across one or more cases using Qdrant ANN. Use for \"has this fingerprint/phrase/pattern appeared in another case?\" Returns top-K matches with case_id and similarity score.",
+      "layers": [
+        "dense"
+      ],
+      "identity_fields": [],
+      "writes_to": [],
+      "permissions": "read_only",
+      "packet_kind": "trace_tool",
+      "sources": [
+        "trace-mcp"
+      ],
+      "source_ref": "legal.cross_reference_evidence",
+      "examples": [],
+      "transport": null,
+      "domain": "unknown",
+      "ontology": [],
+      "service": null,
+      "method": null,
+      "primary_layer": "dense",
+      "score": 88,
+      "rank": 52
+    },
+    {
+      "tool_name": "engram.redis_health",
+      "namespace": "engram",
+      "description": "Check Redis availability used by engram memory tools.",
+      "layers": [
+        "cache"
+      ],
+      "identity_fields": [],
+      "writes_to": [
+        "redis"
+      ],
+      "permissions": "read_write",
+      "packet_kind": "trace_tool",
+      "sources": [
+        "trace-mcp"
+      ],
+      "source_ref": "engram.redis_health",
+      "examples": [],
+      "transport": null,
+      "domain": "unknown",
+      "ontology": [],
+      "service": null,
+      "method": null,
+      "primary_layer": "cache",
+      "score": 86,
+      "rank": 53
+    },
+    {
+      "tool_name": "evidence.link_image_graph",
+      "namespace": "evidence",
+      "description": "Create IMAGE_FOR edges in Neo4j from an evidence image node to CodebaseFile nodes. Normally fires automatically after search-by-image, but can be called manually to repair or backfill graph links for existing evidence. Returns { ok, edgesCreated }.",
+      "layers": [
+        "graph"
+      ],
+      "identity_fields": [],
+      "writes_to": [
+        "qdrant"
+      ],
+      "permissions": "read_write",
+      "packet_kind": "trace_tool",
+      "sources": [
+        "trace-mcp"
+      ],
+      "source_ref": "evidence.link_image_graph",
+      "examples": [],
+      "transport": null,
+      "domain": "unknown",
+      "ontology": [],
+      "service": null,
+      "method": null,
+      "primary_layer": "graph",
+      "score": 84,
+      "rank": 54
+    },
+    {
+      "tool_name": "graph.community_for_node",
+      "namespace": "graph",
+      "description": "Returns the community/cluster membership for a specific node.",
+      "layers": [
+        "graph"
+      ],
+      "identity_fields": [],
+      "writes_to": [
+        "neo4j"
+      ],
+      "permissions": "read_write",
+      "packet_kind": "trace_tool",
+      "sources": [
+        "trace-mcp"
+      ],
+      "source_ref": "graph.community_for_node",
+      "examples": [],
+      "transport": null,
+      "domain": "unknown",
+      "ontology": [],
+      "service": null,
+      "method": null,
+      "primary_layer": "graph",
+      "score": 84,
+      "rank": 55
+    },
+    {
+      "tool_name": "graph.expand_neighborhood",
+      "namespace": "graph",
+      "description": "Expands graph neighborhood from sourceRefs (read-only). Supports legacy stableKey/depth args for backward compatibility.",
+      "layers": [
+        "graph"
+      ],
+      "identity_fields": [],
+      "writes_to": [
+        "neo4j"
+      ],
+      "permissions": "read_write",
+      "packet_kind": "trace_tool",
+      "sources": [
+        "trace-mcp"
+      ],
+      "source_ref": "graph.expand_neighborhood",
+      "examples": [],
+      "transport": null,
+      "domain": "unknown",
+      "ontology": [],
+      "service": null,
+      "method": null,
+      "primary_layer": "graph",
+      "score": 84,
+      "rank": 56
+    },
+    {
+      "tool_name": "hypergraph.expand_members",
+      "namespace": "hypergraph",
+      "description": "Returns all related edges for a given edge hash by member overlap.",
+      "layers": [
+        "graph"
+      ],
+      "identity_fields": [],
+      "writes_to": [
+        "neo4j"
+      ],
+      "permissions": "read_write",
+      "packet_kind": "trace_tool",
+      "sources": [
+        "trace-mcp"
+      ],
+      "source_ref": "hypergraph.expand_members",
+      "examples": [],
+      "transport": null,
+      "domain": "unknown",
+      "ontology": [],
+      "service": null,
+      "method": null,
+      "primary_layer": "graph",
+      "score": 84,
+      "rank": 57
+    },
+    {
+      "tool_name": "search.hybrid",
+      "namespace": "search",
+      "description": "Performs hybrid (FTS + semantic) search across the codebase.",
+      "layers": [
+        "lexical"
+      ],
+      "identity_fields": [],
+      "writes_to": [],
+      "permissions": "read_only",
+      "packet_kind": "trace_tool",
+      "sources": [
+        "trace-mcp"
+      ],
+      "source_ref": "search.hybrid",
+      "examples": [],
+      "transport": null,
+      "domain": "unknown",
+      "ontology": [],
+      "service": null,
+      "method": null,
+      "primary_layer": "lexical",
+      "score": 84,
+      "rank": 58
+    },
+    {
+      "tool_name": "legal.build_timeline",
+      "namespace": "legal",
+      "description": "Extract a chronological timeline of events from all evidence associated with a case using Gemma4 NER. Returns TimelineEvent[] with time, who[], what, location, evidenceId, and confidence. Essential for prosecution theory of case and demonstrative exhibits.",
+      "layers": [
+        "synthesis"
+      ],
+      "identity_fields": [],
+      "writes_to": [],
+      "permissions": "read_only",
+      "packet_kind": "trace_tool",
+      "sources": [
+        "trace-mcp"
+      ],
+      "source_ref": "legal.build_timeline",
+      "examples": [],
+      "transport": null,
+      "domain": "unknown",
+      "ontology": [],
+      "service": null,
+      "method": null,
+      "primary_layer": "synthesis",
+      "score": 82,
+      "rank": 59
+    },
+    {
+      "tool_name": "legal.cross_examine",
+      "namespace": "legal",
+      "description": "Generate strategic cross-examination questions for a witness using Gemma4. Analyzes the witness statement and case context to surface inconsistencies and credibility challenges. Returns 5-10 questions with purpose and expected answers.",
+      "layers": [
+        "synthesis"
+      ],
+      "identity_fields": [],
+      "writes_to": [],
+      "permissions": "read_only",
+      "packet_kind": "trace_tool",
+      "sources": [
+        "trace-mcp"
+      ],
+      "source_ref": "legal.cross_examine",
+      "examples": [],
+      "transport": null,
+      "domain": "unknown",
+      "ontology": [],
+      "service": null,
+      "method": null,
+      "primary_layer": "synthesis",
+      "score": 82,
+      "rank": 60
+    },
+    {
+      "tool_name": "legal.issue_spotter",
+      "namespace": "legal",
+      "description": "Gemma4 legal issue analysis: identifies legal issues, applicable statutes, strengths, weaknesses, missing evidence, and recommended next steps for a case. Use at case intake or before trial prep.",
+      "layers": [
+        "synthesis"
+      ],
+      "identity_fields": [],
+      "writes_to": [],
+      "permissions": "read_only",
+      "packet_kind": "trace_tool",
+      "sources": [
+        "trace-mcp"
+      ],
+      "source_ref": "legal.issue_spotter",
+      "examples": [],
+      "transport": null,
+      "domain": "unknown",
+      "ontology": [],
+      "service": null,
+      "method": null,
+      "primary_layer": "synthesis",
+      "score": 82,
+      "rank": 61
+    },
+    {
+      "tool_name": "legal.mock_trial",
+      "namespace": "legal",
+      "description": "Multi-role mock trial simulation using Gemma4. Prosecution makes an opening statement, defense counters, then a judge delivers a ruling with evidence admissibility analysis and verdict probability. Returns all statements plus prosecution/defense scores and key weaknesses. For pre-trial preparation only — not for evidentiary conclusions.",
+      "layers": [
+        "synthesis"
+      ],
+      "identity_fields": [],
+      "writes_to": [],
+      "permissions": "read_only",
+      "packet_kind": "trace_tool",
+      "sources": [
+        "trace-mcp"
+      ],
+      "source_ref": "legal.mock_trial",
+      "examples": [],
+      "transport": null,
+      "domain": "unknown",
+      "ontology": [],
+      "service": null,
+      "method": null,
+      "primary_layer": "synthesis",
+      "score": 82,
+      "rank": 62
+    },
+    {
+      "tool_name": "clusters.get_summary_lenses",
+      "namespace": "clusters",
+      "description": "Returns wiki and LLMS.md context lenses for a GPU cluster.",
+      "layers": [
+        "synthesis"
+      ],
+      "identity_fields": [],
+      "writes_to": [],
+      "permissions": "read_only",
+      "packet_kind": "trace_tool",
+      "sources": [
+        "trace-mcp"
+      ],
+      "source_ref": "clusters.get_summary_lenses",
+      "examples": [],
+      "transport": null,
+      "domain": "unknown",
+      "ontology": [],
+      "service": null,
+      "method": null,
+      "primary_layer": "synthesis",
+      "score": 80,
+      "rank": 63
+    },
+    {
+      "tool_name": "graph.shortest_path",
+      "namespace": "graph",
+      "description": "Finds the shortest path between two graph nodes.",
+      "layers": [
+        "graph"
+      ],
+      "identity_fields": [],
+      "writes_to": [
+        "neo4j"
+      ],
+      "permissions": "read_write",
+      "packet_kind": "trace_tool",
+      "sources": [
+        "trace-mcp"
+      ],
+      "source_ref": "graph.shortest_path",
+      "examples": [],
+      "transport": null,
+      "domain": "unknown",
+      "ontology": [],
+      "service": null,
+      "method": null,
+      "primary_layer": "graph",
+      "score": 80,
+      "rank": 64
+    },
+    {
+      "tool_name": "kag.web_search",
+      "namespace": "kag",
+      "description": "L10 lane web search (T4 trust). Searches the web for information-seeking queries. Skips for code/error queries. Returns sanitized snippets for synthesis.",
+      "layers": [
+        "synthesis"
+      ],
+      "identity_fields": [],
+      "writes_to": [],
+      "permissions": "read_only",
+      "packet_kind": "trace_tool",
+      "sources": [
+        "trace-mcp"
+      ],
+      "source_ref": "kag.web_search",
+      "examples": [],
+      "transport": null,
+      "domain": "unknown",
+      "ontology": [],
+      "service": null,
+      "method": null,
+      "primary_layer": "synthesis",
+      "score": 80,
+      "rank": 65
+    },
+    {
+      "tool_name": "kb.explain_context_pack",
+      "namespace": "kb",
+      "description": "Explains the retrieval provenance and assembly logic for a generated context pack.",
+      "layers": [
+        "synthesis"
+      ],
+      "identity_fields": [],
+      "writes_to": [],
+      "permissions": "read_only",
+      "packet_kind": "trace_tool",
+      "sources": [
+        "trace-mcp"
+      ],
+      "source_ref": "kb.explain_context_pack",
+      "examples": [],
+      "transport": null,
+      "domain": "unknown",
+      "ontology": [],
+      "service": null,
+      "method": null,
+      "primary_layer": "synthesis",
+      "score": 80,
+      "rank": 66
+    },
+    {
+      "tool_name": "LLMS.md.binding_chain",
+      "namespace": "LLMS",
+      "description": "Walks the LLMS.md binding hierarchy for a file to determine the order of applying envelopes.",
+      "layers": [
+        "synthesis"
+      ],
+      "identity_fields": [],
+      "writes_to": [],
+      "permissions": "read_only",
+      "packet_kind": "trace_tool",
+      "sources": [
+        "trace-mcp"
+      ],
+      "source_ref": "LLMS.md.binding_chain",
+      "examples": [],
+      "transport": null,
+      "domain": "unknown",
+      "ontology": [],
+      "service": null,
+      "method": null,
+      "primary_layer": "synthesis",
+      "score": 80,
+      "rank": 67
+    },
+    {
+      "tool_name": "LLMS.md.context_for_file",
+      "namespace": "LLMS",
+      "description": "Returns only the AGENTS-related slice of the atlas context packet for a file.",
+      "layers": [
+        "synthesis"
+      ],
+      "identity_fields": [],
+      "writes_to": [],
+      "permissions": "read_only",
+      "packet_kind": "trace_tool",
+      "sources": [
+        "trace-mcp"
+      ],
+      "source_ref": "LLMS.md.context_for_file",
+      "examples": [],
+      "transport": null,
+      "domain": "unknown",
+      "ontology": [],
+      "service": null,
+      "method": null,
+      "primary_layer": "synthesis",
+      "score": 80,
+      "rank": 68
+    },
+    {
+      "tool_name": "LLMS.md.coverage",
+      "namespace": "LLMS",
+      "description": "Reports the population status of the LLMS.md envelope for a file.",
+      "layers": [
+        "synthesis"
+      ],
+      "identity_fields": [],
+      "writes_to": [],
+      "permissions": "read_only",
+      "packet_kind": "trace_tool",
+      "sources": [
+        "trace-mcp"
+      ],
+      "source_ref": "LLMS.md.coverage",
+      "examples": [],
+      "transport": null,
+      "domain": "unknown",
+      "ontology": [],
+      "service": null,
+      "method": null,
+      "primary_layer": "synthesis",
+      "score": 80,
+      "rank": 69
+    },
+    {
+      "tool_name": "LLMS.md.coverage_chain",
+      "namespace": "LLMS",
+      "description": "Returns the full LLMS.md inheritance chain for a file.",
+      "layers": [
+        "synthesis"
+      ],
+      "identity_fields": [],
+      "writes_to": [],
+      "permissions": "read_only",
+      "packet_kind": "trace_tool",
+      "sources": [
+        "trace-mcp"
+      ],
+      "source_ref": "LLMS.md.coverage_chain",
+      "examples": [],
+      "transport": null,
+      "domain": "unknown",
+      "ontology": [],
+      "service": null,
+      "method": null,
+      "primary_layer": "synthesis",
+      "score": 80,
+      "rank": 70
+    },
+    {
+      "tool_name": "LLMS.md.peers_for_dir",
+      "namespace": "LLMS",
+      "description": "Returns the directory card directly from the atlas cache.",
+      "layers": [
+        "synthesis"
+      ],
+      "identity_fields": [],
+      "writes_to": [],
+      "permissions": "read_only",
+      "packet_kind": "trace_tool",
+      "sources": [
+        "trace-mcp"
+      ],
+      "source_ref": "LLMS.md.peers_for_dir",
+      "examples": [],
+      "transport": null,
+      "domain": "unknown",
+      "ontology": [],
+      "service": null,
+      "method": null,
+      "primary_layer": "synthesis",
+      "score": 80,
+      "rank": 71
+    },
+    {
+      "tool_name": "LLMS.md.peers_via_relations",
+      "namespace": "LLMS",
+      "description": "Finds neighboring directories using the SHARES_TAGS hypergraph relation.",
+      "layers": [
+        "synthesis"
+      ],
+      "identity_fields": [],
+      "writes_to": [],
+      "permissions": "read_only",
+      "packet_kind": "trace_tool",
+      "sources": [
+        "trace-mcp"
+      ],
+      "source_ref": "LLMS.md.peers_via_relations",
+      "examples": [],
+      "transport": null,
+      "domain": "unknown",
+      "ontology": [],
+      "service": null,
+      "method": null,
+      "primary_layer": "synthesis",
+      "score": 80,
+      "rank": 72
+    },
+    {
+      "tool_name": "LLMS.md.shares_tags",
+      "namespace": "LLMS",
+      "description": "Returns neighboring directories based on shared tags in their LLMS.md files.",
+      "layers": [
+        "synthesis"
+      ],
+      "identity_fields": [],
+      "writes_to": [],
+      "permissions": "read_only",
+      "packet_kind": "trace_tool",
+      "sources": [
+        "trace-mcp"
+      ],
+      "source_ref": "LLMS.md.shares_tags",
+      "examples": [],
+      "transport": null,
+      "domain": "unknown",
+      "ontology": [],
+      "service": null,
+      "method": null,
+      "primary_layer": "synthesis",
+      "score": 80,
+      "rank": 73
+    },
+    {
+      "tool_name": "search.postgres_fts",
+      "namespace": "search",
+      "description": "Code search using PostgreSQL Full Text Search.",
+      "layers": [
+        "lexical"
+      ],
+      "identity_fields": [],
+      "writes_to": [],
+      "permissions": "read_only",
+      "packet_kind": "trace_tool",
+      "sources": [
+        "trace-mcp"
+      ],
+      "source_ref": "search.postgres_fts",
+      "examples": [],
+      "transport": null,
+      "domain": "unknown",
+      "ontology": [],
+      "service": null,
+      "method": null,
+      "primary_layer": "lexical",
+      "score": 80,
+      "rank": 74
+    },
+    {
+      "tool_name": "kb.archive_synthesis",
+      "namespace": "kb",
+      "description": "Archive a synthesis artifact.",
+      "layers": [
+        "synthesis"
+      ],
+      "identity_fields": [],
+      "writes_to": [],
+      "permissions": "read_only",
+      "packet_kind": "trace_tool",
+      "sources": [
+        "trace-mcp"
+      ],
+      "source_ref": "kb.archive_synthesis",
+      "examples": [],
+      "transport": null,
+      "domain": "unknown",
+      "ontology": [],
+      "service": null,
+      "method": null,
+      "primary_layer": "synthesis",
+      "score": 76,
+      "rank": 75
+    },
+    {
+      "tool_name": "atlas.get_chunk",
+      "namespace": "atlas",
+      "description": "Return a chunk from the compact Atlas chunk index, optionally prioritizing a chunkId, chunkIndex, or sourceRef.",
+      "layers": [
+        "read"
+      ],
+      "identity_fields": [],
+      "writes_to": [],
+      "permissions": "read_only",
+      "packet_kind": "trace_tool",
+      "sources": [
+        "trace-mcp"
+      ],
+      "source_ref": "atlas.get_chunk",
+      "examples": [],
+      "transport": null,
+      "domain": "unknown",
+      "ontology": [],
+      "service": null,
+      "method": null,
+      "primary_layer": "read",
+      "score": 72,
+      "rank": 76
+    },
+    {
+      "tool_name": "file.read_window",
+      "namespace": "file",
+      "description": "Reads a bounded window/range of lines from a file. Highly recommended for reading large markdown (.md) or JSON files to avoid context bloating.",
+      "layers": [
+        "read"
+      ],
+      "identity_fields": [],
+      "writes_to": [],
+      "permissions": "read_only",
+      "packet_kind": "trace_tool",
+      "sources": [
+        "trace-mcp"
+      ],
+      "source_ref": "file.read_window",
+      "examples": [],
+      "transport": null,
+      "domain": "unknown",
+      "ontology": [],
+      "service": null,
+      "method": null,
+      "primary_layer": "read",
+      "score": 72,
+      "rank": 77
+    },
+    {
+      "tool_name": "kb.wiki_note_lookup",
+      "namespace": "kb",
+      "description": "Look up notes in the wiki.",
+      "layers": [
+        "read"
+      ],
+      "identity_fields": [],
+      "writes_to": [],
+      "permissions": "read_only",
+      "packet_kind": "trace_tool",
+      "sources": [
+        "trace-mcp"
+      ],
+      "source_ref": "kb.wiki_note_lookup",
+      "examples": [],
+      "transport": null,
+      "domain": "unknown",
+      "ontology": [],
+      "service": null,
+      "method": null,
+      "primary_layer": "read",
+      "score": 68,
+      "rank": 78
+    },
+    {
+      "tool_name": "db.schema_overview",
+      "namespace": "db",
+      "description": "Lists every table in the public schema with row estimate + structural flags.",
+      "layers": [
+        "read"
+      ],
+      "identity_fields": [],
+      "writes_to": [
+        "postgres"
+      ],
+      "permissions": "read_write",
+      "packet_kind": "trace_tool",
+      "sources": [
+        "trace-mcp"
+      ],
+      "source_ref": "db.schema_overview",
+      "examples": [],
+      "transport": null,
+      "domain": "unknown",
+      "ontology": [],
+      "service": null,
+      "method": null,
+      "primary_layer": "read",
+      "score": 62,
+      "rank": 79
+    },
+    {
+      "tool_name": "db.table_inspect",
+      "namespace": "db",
+      "description": "Returns columns + indexes + foreign keys for one table. No row data.",
+      "layers": [
+        "read"
+      ],
+      "identity_fields": [],
+      "writes_to": [
+        "postgres"
+      ],
+      "permissions": "read_write",
+      "packet_kind": "trace_tool",
+      "sources": [
+        "trace-mcp"
+      ],
+      "source_ref": "db.table_inspect",
+      "examples": [],
+      "transport": null,
+      "domain": "unknown",
+      "ontology": [],
+      "service": null,
+      "method": null,
+      "primary_layer": "read",
+      "score": 62,
+      "rank": 80
+    },
+    {
+      "tool_name": "ops.gpu_pipeline_stats",
+      "namespace": "ops",
+      "description": "Returns GPU pipeline diagnostics: active stream slots, pending queue depth, cache hit rate over last 50 ops, and device config.",
+      "layers": [
+        "ops"
+      ],
+      "identity_fields": [],
+      "writes_to": [],
+      "permissions": "read_only",
+      "packet_kind": "trace_tool",
+      "sources": [
+        "trace-mcp"
+      ],
+      "source_ref": "ops.gpu_pipeline_stats",
+      "examples": [],
+      "transport": null,
+      "domain": "unknown",
+      "ontology": [],
+      "service": null,
+      "method": null,
+      "primary_layer": "ops",
+      "score": 58,
+      "rank": 81
+    },
+    {
+      "tool_name": "ops.gpu_topk",
+      "namespace": "ops",
+      "description": "GPU top-k index selection. Returns k indices of highest-scoring candidates in descending order. Use after pipelineAttention to get the top chunk indices.",
+      "layers": [
+        "ops"
+      ],
+      "identity_fields": [],
+      "writes_to": [],
+      "permissions": "read_only",
+      "packet_kind": "trace_tool",
+      "sources": [
+        "trace-mcp"
+      ],
+      "source_ref": "ops.gpu_topk",
+      "examples": [],
+      "transport": null,
+      "domain": "unknown",
+      "ontology": [],
+      "service": null,
+      "method": null,
+      "primary_layer": "ops",
+      "score": 58,
+      "rank": 82
+    },
+    {
+      "tool_name": "ops.execute_graphify",
+      "namespace": "ops",
+      "description": "Executes an authorized graphify pipeline command.",
+      "layers": [
+        "ops"
+      ],
+      "identity_fields": [],
+      "writes_to": [],
+      "permissions": "read_only",
+      "packet_kind": "trace_tool",
+      "sources": [
+        "trace-mcp"
+      ],
+      "source_ref": "ops.execute_graphify",
+      "examples": [],
+      "transport": null,
+      "domain": "unknown",
+      "ontology": [],
+      "service": null,
+      "method": null,
+      "primary_layer": "ops",
+      "score": 54,
+      "rank": 83
+    },
+    {
+      "tool_name": "ops.propose_patch",
+      "namespace": "ops",
+      "description": "PROPOSES a patch for a file. READ-ONLY PREVIEW. Does NOT modify files.",
+      "layers": [
+        "ops"
+      ],
+      "identity_fields": [],
+      "writes_to": [
+        "postgres",
+        "kanban"
+      ],
+      "permissions": "read_write",
+      "packet_kind": "trace_tool",
+      "sources": [
+        "trace-mcp"
+      ],
+      "source_ref": "ops.propose_patch",
+      "examples": [],
+      "transport": null,
+      "domain": "unknown",
+      "ontology": [],
+      "service": null,
+      "method": null,
+      "primary_layer": "ops",
+      "score": 48,
+      "rank": 84
+    },
+    {
+      "tool_name": "ops.record_fix_attempt",
+      "namespace": "ops",
+      "description": "Records a fix attempt and its outcome to the persistent audit log.",
+      "layers": [
+        "ops"
+      ],
+      "identity_fields": [],
+      "writes_to": [
+        "postgres",
+        "kanban"
+      ],
+      "permissions": "read_write",
+      "packet_kind": "trace_tool",
+      "sources": [
+        "trace-mcp"
+      ],
+      "source_ref": "ops.record_fix_attempt",
+      "examples": [],
+      "transport": null,
+      "domain": "unknown",
+      "ontology": [],
+      "service": null,
+      "method": null,
+      "primary_layer": "ops",
+      "score": 48,
+      "rank": 85
+    },
+    {
+      "tool_name": "ops.run_quality_gate",
+      "namespace": "ops",
+      "description": "Executes a project-wide quality gate (tsc or vitest-all).",
+      "layers": [
+        "ops"
+      ],
+      "identity_fields": [],
+      "writes_to": [
+        "postgres"
+      ],
+      "permissions": "read_write",
+      "packet_kind": "trace_tool",
+      "sources": [
+        "trace-mcp"
+      ],
+      "source_ref": "ops.run_quality_gate",
+      "examples": [],
+      "transport": null,
+      "domain": "unknown",
+      "ontology": [],
+      "service": null,
+      "method": null,
+      "primary_layer": "ops",
+      "score": 48,
+      "rank": 86
+    },
+    {
+      "tool_name": "ops.run_targeted_test",
+      "namespace": "ops",
+      "description": "Executes a single Vitest test file and returns the outcome.",
+      "layers": [
+        "ops"
+      ],
+      "identity_fields": [],
+      "writes_to": [
+        "postgres"
+      ],
+      "permissions": "read_write",
+      "packet_kind": "trace_tool",
+      "sources": [
+        "trace-mcp"
+      ],
+      "source_ref": "ops.run_targeted_test",
+      "examples": [],
+      "transport": null,
+      "domain": "unknown",
+      "ontology": [],
+      "service": null,
+      "method": null,
+      "primary_layer": "ops",
+      "score": 48,
+      "rank": 87
+    },
+    {
+      "tool_name": "atlas.suggest_files",
+      "namespace": "atlas",
+      "description": "Return the top suggested files from the compact Atlas packet.",
+      "layers": [
+        "unknown"
+      ],
+      "identity_fields": [],
+      "writes_to": [],
+      "permissions": "read_only",
+      "packet_kind": "trace_tool",
+      "sources": [
+        "trace-mcp"
+      ],
+      "source_ref": "atlas.suggest_files",
+      "examples": [],
+      "transport": null,
+      "domain": "unknown",
+      "ontology": [],
+      "service": null,
+      "method": null,
+      "primary_layer": "unknown",
+      "score": 44,
+      "rank": 88
+    },
+    {
+      "tool_name": "codebase.context_for_file",
+      "namespace": "codebase",
+      "description": "Returns the full atlas context packet for a specific file.",
+      "layers": [
+        "unknown"
+      ],
+      "identity_fields": [],
+      "writes_to": [],
+      "permissions": "read_only",
+      "packet_kind": "trace_tool",
+      "sources": [
+        "trace-mcp"
+      ],
+      "source_ref": "codebase.context_for_file",
+      "examples": [],
+      "transport": null,
+      "domain": "unknown",
+      "ontology": [],
+      "service": null,
+      "method": null,
+      "primary_layer": "unknown",
+      "score": 44,
+      "rank": 89
+    },
+    {
+      "tool_name": "context.build_kv_packet",
+      "namespace": "context",
+      "description": "Assembles a context packet of compressed file cards for a specific task.",
+      "layers": [
+        "unknown"
+      ],
+      "identity_fields": [],
+      "writes_to": [],
+      "permissions": "read_only",
+      "packet_kind": "trace_tool",
+      "sources": [
+        "trace-mcp"
+      ],
+      "source_ref": "context.build_kv_packet",
+      "examples": [],
+      "transport": null,
+      "domain": "unknown",
+      "ontology": [],
+      "service": null,
+      "method": null,
+      "primary_layer": "unknown",
+      "score": 44,
+      "rank": 90
+    },
+    {
+      "tool_name": "context.explain_compression",
+      "namespace": "context",
+      "description": "Explains the compression logic and token budget for a specific task packet.",
+      "layers": [
+        "unknown"
+      ],
+      "identity_fields": [],
+      "writes_to": [],
+      "permissions": "read_only",
+      "packet_kind": "trace_tool",
+      "sources": [
+        "trace-mcp"
+      ],
+      "source_ref": "context.explain_compression",
+      "examples": [],
+      "transport": null,
+      "domain": "unknown",
+      "ontology": [],
+      "service": null,
+      "method": null,
+      "primary_layer": "unknown",
+      "score": 44,
+      "rank": 91
+    },
+    {
+      "tool_name": "context.get_compressed_card",
+      "namespace": "context",
+      "description": "Returns a compressed context card for a specific file or trace.",
+      "layers": [
+        "unknown"
+      ],
+      "identity_fields": [],
+      "writes_to": [],
+      "permissions": "read_only",
+      "packet_kind": "trace_tool",
+      "sources": [
+        "trace-mcp"
+      ],
+      "source_ref": "context.get_compressed_card",
+      "examples": [],
+      "transport": null,
+      "domain": "unknown",
+      "ontology": [],
+      "service": null,
+      "method": null,
+      "primary_layer": "unknown",
+      "score": 44,
+      "rank": 92
+    },
+    {
+      "tool_name": "context.refresh_task_toc",
+      "namespace": "context",
+      "description": "Refreshes the Table of Contents for a specific task context.",
+      "layers": [
+        "unknown"
+      ],
+      "identity_fields": [],
+      "writes_to": [],
+      "permissions": "read_only",
+      "packet_kind": "trace_tool",
+      "sources": [
+        "trace-mcp"
+      ],
+      "source_ref": "context.refresh_task_toc",
+      "examples": [],
+      "transport": null,
+      "domain": "unknown",
+      "ontology": [],
+      "service": null,
+      "method": null,
+      "primary_layer": "unknown",
+      "score": 44,
+      "rank": 93
+    },
+    {
+      "tool_name": "kag.ingest_error",
+      "namespace": "kag",
+      "description": "Fingerprints and stores a raw error text for future retrieval.",
+      "layers": [
+        "unknown"
+      ],
+      "identity_fields": [],
+      "writes_to": [],
+      "permissions": "read_only",
+      "packet_kind": "trace_tool",
+      "sources": [
+        "trace-mcp"
+      ],
+      "source_ref": "kag.ingest_error",
+      "examples": [],
+      "transport": null,
+      "domain": "unknown",
+      "ontology": [],
+      "service": null,
+      "method": null,
+      "primary_layer": "unknown",
+      "score": 44,
+      "rank": 94
+    },
+    {
+      "tool_name": "kag.ingest_memory_directory",
+      "namespace": "kag",
+      "description": "Ingests agent run records from the memory directory into the database.",
+      "layers": [
+        "unknown"
+      ],
+      "identity_fields": [],
+      "writes_to": [],
+      "permissions": "read_only",
+      "packet_kind": "trace_tool",
+      "sources": [
+        "trace-mcp"
+      ],
+      "source_ref": "kag.ingest_memory_directory",
+      "examples": [],
+      "transport": null,
+      "domain": "unknown",
+      "ontology": [],
+      "service": null,
+      "method": null,
+      "primary_layer": "unknown",
+      "score": 44,
+      "rank": 95
+    },
+    {
+      "tool_name": "kag.panel_context",
+      "namespace": "kag",
+      "description": "Return recently viewed files and tools from panel_activity_log for the active user session (HyperRAG L11 prefetch). Provides warm context about what the user is currently working on.",
+      "layers": [
+        "unknown"
+      ],
+      "identity_fields": [],
+      "writes_to": [],
+      "permissions": "read_only",
+      "packet_kind": "trace_tool",
+      "sources": [
+        "trace-mcp"
+      ],
+      "source_ref": "kag.panel_context",
+      "examples": [],
+      "transport": null,
+      "domain": "unknown",
+      "ontology": [],
+      "service": null,
+      "method": null,
+      "primary_layer": "unknown",
+      "score": 44,
+      "rank": 96
+    },
+    {
+      "tool_name": "kag.record_agent_run",
+      "namespace": "kag",
+      "description": "Records an autonomous agent run artifact to memory.",
+      "layers": [
+        "unknown"
+      ],
+      "identity_fields": [],
+      "writes_to": [],
+      "permissions": "read_only",
+      "packet_kind": "trace_tool",
+      "sources": [
+        "trace-mcp"
+      ],
+      "source_ref": "kag.record_agent_run",
+      "examples": [],
+      "transport": null,
+      "domain": "unknown",
+      "ontology": [],
+      "service": null,
+      "method": null,
+      "primary_layer": "unknown",
+      "score": 44,
+      "rank": 97
+    },
+    {
+      "tool_name": "kb.hybrid_search",
+      "namespace": "kb",
+      "description": "Performs hybrid (lexical + semantic) search across KAG context.",
+      "layers": [
+        "unknown"
+      ],
+      "identity_fields": [],
+      "writes_to": [],
+      "permissions": "read_only",
+      "packet_kind": "trace_tool",
+      "sources": [
+        "trace-mcp"
+      ],
+      "source_ref": "kb.hybrid_search",
+      "examples": [],
+      "transport": null,
+      "domain": "unknown",
+      "ontology": [],
+      "service": null,
+      "method": null,
+      "primary_layer": "unknown",
+      "score": 44,
+      "rank": 98
+    },
+    {
+      "tool_name": "kb.organize_messy_text",
+      "namespace": "kb",
+      "description": "Organize messy text into structured entities and sections.",
+      "layers": [
+        "unknown"
+      ],
+      "identity_fields": [],
+      "writes_to": [],
+      "permissions": "read_only",
+      "packet_kind": "trace_tool",
+      "sources": [
+        "trace-mcp"
+      ],
+      "source_ref": "kb.organize_messy_text",
+      "examples": [],
+      "transport": null,
+      "domain": "unknown",
+      "ontology": [],
+      "service": null,
+      "method": null,
+      "primary_layer": "unknown",
+      "score": 44,
+      "rank": 99
+    },
+    {
+      "tool_name": "kb.search_notecards",
+      "namespace": "kb",
+      "description": "Searches for identity-spine notecards matching a query.",
+      "layers": [
+        "unknown"
+      ],
+      "identity_fields": [],
+      "writes_to": [],
+      "permissions": "read_only",
+      "packet_kind": "trace_tool",
+      "sources": [
+        "trace-mcp"
+      ],
+      "source_ref": "kb.search_notecards",
+      "examples": [],
+      "transport": null,
+      "domain": "unknown",
+      "ontology": [],
+      "service": null,
+      "method": null,
+      "primary_layer": "unknown",
+      "score": 44,
+      "rank": 100
+    },
+    {
+      "tool_name": "kb.search_summary_tree",
+      "namespace": "kb",
+      "description": "RAPTOR-style hierarchical search across per-chunk lens, cluster narrative, and directory-card summary tiers.",
+      "layers": [
+        "unknown"
+      ],
+      "identity_fields": [],
+      "writes_to": [],
+      "permissions": "read_only",
+      "packet_kind": "trace_tool",
+      "sources": [
+        "trace-mcp"
+      ],
+      "source_ref": "kb.search_summary_tree",
+      "examples": [],
+      "transport": null,
+      "domain": "unknown",
+      "ontology": [],
+      "service": null,
+      "method": null,
+      "primary_layer": "unknown",
+      "score": 44,
+      "rank": 101
+    },
+    {
+      "tool_name": "kb.trace_search",
+      "namespace": "kb",
+      "description": "Search the hypergraph/KAG context for documents, cards, and relations matching a query.",
+      "layers": [
+        "unknown"
+      ],
+      "identity_fields": [],
+      "writes_to": [],
+      "permissions": "read_only",
+      "packet_kind": "trace_tool",
+      "sources": [
+        "trace-mcp"
+      ],
+      "source_ref": "kb.trace_search",
+      "examples": [],
+      "transport": null,
+      "domain": "unknown",
+      "ontology": [],
+      "service": null,
+      "method": null,
+      "primary_layer": "unknown",
+      "score": 44,
+      "rank": 102
+    },
+    {
+      "tool_name": "knowledge.get_minified_map",
+      "namespace": "knowledge",
+      "description": "Returns a minified architectural map for a specific directory.",
+      "layers": [
+        "unknown"
+      ],
+      "identity_fields": [],
+      "writes_to": [],
+      "permissions": "read_only",
+      "packet_kind": "trace_tool",
+      "sources": [
+        "trace-mcp"
+      ],
+      "source_ref": "knowledge.get_minified_map",
+      "examples": [],
+      "transport": null,
+      "domain": "unknown",
+      "ontology": [],
+      "service": null,
+      "method": null,
+      "primary_layer": "unknown",
+      "score": 44,
+      "rank": 103
+    },
+    {
+      "tool_name": "legal.find_precedents",
+      "namespace": "legal",
+      "description": "Semantic + full-text search across legal precedents, case opinions, and rulings. Returns ranked results with citation, court, and summary. Use for \"find cases about X\" or \"what precedents apply to Y\".",
+      "layers": [
+        "unknown"
+      ],
+      "identity_fields": [],
+      "writes_to": [],
+      "permissions": "read_only",
+      "packet_kind": "trace_tool",
+      "sources": [
+        "trace-mcp"
+      ],
+      "source_ref": "legal.find_precedents",
+      "examples": [],
+      "transport": null,
+      "domain": "unknown",
+      "ontology": [],
+      "service": null,
+      "method": null,
+      "primary_layer": "unknown",
+      "score": 44,
+      "rank": 104
+    },
+    {
+      "tool_name": "legal.get_transcript",
+      "namespace": "legal",
+      "description": "Retrieve the Whisper transcript for an audio/video evidence item that has already been processed. Returns the full text plus any extracted speaker segments. Use legal.search_recordings for timestamped search.",
+      "layers": [
+        "unknown"
+      ],
+      "identity_fields": [],
+      "writes_to": [],
+      "permissions": "read_only",
+      "packet_kind": "trace_tool",
+      "sources": [
+        "trace-mcp"
+      ],
+      "source_ref": "legal.get_transcript",
+      "examples": [],
+      "transport": null,
+      "domain": "unknown",
+      "ontology": [],
+      "service": null,
+      "method": null,
+      "primary_layer": "unknown",
+      "score": 44,
+      "rank": 105
+    },
+    {
+      "tool_name": "legal.score_case",
+      "namespace": "legal",
+      "description": "Compute an evidence-weighted case strength score (0-100) for a given case. Factors: evidence count (×10, max 40), witness count (×8, max 24), documentation quality (15), and active-status bonus (10). Use to prioritize which cases need more evidence.",
+      "layers": [
+        "unknown"
+      ],
+      "identity_fields": [],
+      "writes_to": [],
+      "permissions": "read_only",
+      "packet_kind": "trace_tool",
+      "sources": [
+        "trace-mcp"
+      ],
+      "source_ref": "legal.score_case",
+      "examples": [],
+      "transport": null,
+      "domain": "unknown",
+      "ontology": [],
+      "service": null,
+      "method": null,
+      "primary_layer": "unknown",
+      "score": 44,
+      "rank": 106
+    },
+    {
+      "tool_name": "legal.search_recordings",
+      "namespace": "legal",
+      "description": "Timestamp-aware semantic search across Whisper audio segments. Returns matching segments with start/end times so prosecutors can jump to the exact moment in a recording. Great for \"find when the witness said X\".",
+      "layers": [
+        "unknown"
+      ],
+      "identity_fields": [],
+      "writes_to": [],
+      "permissions": "read_only",
+      "packet_kind": "trace_tool",
+      "sources": [
+        "trace-mcp"
+      ],
+      "source_ref": "legal.search_recordings",
+      "examples": [],
+      "transport": null,
+      "domain": "unknown",
+      "ontology": [],
+      "service": null,
+      "method": null,
+      "primary_layer": "unknown",
+      "score": 44,
+      "rank": 107
+    },
+    {
+      "tool_name": "legal.similar_cases",
+      "namespace": "legal",
+      "description": "Find cases similar to a given case using PostgreSQL full-text similarity on case title and description. Returns up to 20 similar cases with a similarity score. Use to cross-reference prior cases and find related judgements.",
+      "layers": [
+        "unknown"
+      ],
+      "identity_fields": [],
+      "writes_to": [],
+      "permissions": "read_only",
+      "packet_kind": "trace_tool",
+      "sources": [
+        "trace-mcp"
+      ],
+      "source_ref": "legal.similar_cases",
+      "examples": [],
+      "transport": null,
+      "domain": "unknown",
+      "ontology": [],
+      "service": null,
+      "method": null,
+      "primary_layer": "unknown",
+      "score": 44,
+      "rank": 108
+    },
+    {
+      "tool_name": "legal.write_obsidian_note",
+      "namespace": "legal",
+      "description": "Write or append a markdown note to the Obsidian vault via the Local REST API plugin (requires Obsidian running at ENV.OBSIDIAN_URL with OBSIDIAN_API_KEY set). Creates parent folders automatically. Use to persist case summaries, timelines, mock trial reports, and cross-examination prep.",
+      "layers": [
+        "unknown"
+      ],
+      "identity_fields": [],
+      "writes_to": [],
+      "permissions": "read_only",
+      "packet_kind": "trace_tool",
+      "sources": [
+        "trace-mcp"
+      ],
+      "source_ref": "legal.write_obsidian_note",
+      "examples": [],
+      "transport": null,
+      "domain": "unknown",
+      "ontology": [],
+      "service": null,
+      "method": null,
+      "primary_layer": "unknown",
+      "score": 44,
+      "rank": 109
+    },
+    {
+      "tool_name": "runtime.quic_status",
+      "namespace": "runtime",
+      "description": "Reports QUIC/HTTP3 dev-lane configuration and probes the local Caddy/Vite QUIC endpoint if present.",
+      "layers": [
+        "unknown"
+      ],
+      "identity_fields": [],
+      "writes_to": [],
+      "permissions": "read_only",
+      "packet_kind": "trace_tool",
+      "sources": [
+        "trace-mcp"
+      ],
+      "source_ref": "runtime.quic_status",
+      "examples": [],
+      "transport": null,
+      "domain": "unknown",
+      "ontology": [],
+      "service": null,
+      "method": null,
+      "primary_layer": "unknown",
+      "score": 44,
+      "rank": 110
+    },
+    {
+      "tool_name": "runtime.simdjson_status",
+      "namespace": "runtime",
+      "description": "Reports SIMD/AVX2 JSON parser availability, fallback mode, cache metrics, and safe usage notes.",
+      "layers": [
+        "unknown"
+      ],
+      "identity_fields": [],
+      "writes_to": [],
+      "permissions": "read_only",
+      "packet_kind": "trace_tool",
+      "sources": [
+        "trace-mcp"
+      ],
+      "source_ref": "runtime.simdjson_status",
+      "examples": [],
+      "transport": null,
+      "domain": "unknown",
+      "ontology": [],
+      "service": null,
+      "method": null,
+      "primary_layer": "unknown",
+      "score": 44,
+      "rank": 111
+    },
+    {
+      "tool_name": "search.dev_context",
+      "namespace": "search",
+      "description": "Returns codebase chunks for coding and debugging prompts.",
+      "layers": [
+        "unknown"
+      ],
+      "identity_fields": [],
+      "writes_to": [],
+      "permissions": "read_only",
+      "packet_kind": "trace_tool",
+      "sources": [
+        "trace-mcp"
+      ],
+      "source_ref": "search.dev_context",
+      "examples": [],
+      "transport": null,
+      "domain": "unknown",
+      "ontology": [],
+      "service": null,
+      "method": null,
+      "primary_layer": "unknown",
+      "score": 44,
+      "rank": 112
+    },
+    {
+      "tool_name": "taxonomy.children",
+      "namespace": "taxonomy",
+      "description": "Lists children of a specific ontological node in the topology.",
+      "layers": [
+        "unknown"
+      ],
+      "identity_fields": [],
+      "writes_to": [],
+      "permissions": "read_only",
+      "packet_kind": "trace_tool",
+      "sources": [
+        "trace-mcp"
+      ],
+      "source_ref": "taxonomy.children",
+      "examples": [],
+      "transport": null,
+      "domain": "unknown",
+      "ontology": [],
+      "service": null,
+      "method": null,
+      "primary_layer": "unknown",
+      "score": 44,
+      "rank": 113
+    },
+    {
+      "tool_name": "tools.batch_call",
+      "namespace": "tools",
+      "description": "Executes multiple tool calls in parallel to reduce total latency.",
+      "layers": [
+        "unknown"
+      ],
+      "identity_fields": [],
+      "writes_to": [],
+      "permissions": "read_only",
+      "packet_kind": "trace_tool",
+      "sources": [
+        "trace-mcp"
+      ],
+      "source_ref": "tools.batch_call",
+      "examples": [],
+      "transport": null,
+      "domain": "unknown",
+      "ontology": [],
+      "service": null,
+      "method": null,
+      "primary_layer": "unknown",
+      "score": 44,
+      "rank": 114
+    },
+    {
+      "tool_name": "topology.hydration_status",
+      "namespace": "topology",
+      "description": "Returns a diagnostic overview of topological hydration coverage.",
+      "layers": [
+        "unknown"
+      ],
+      "identity_fields": [],
+      "writes_to": [],
+      "permissions": "read_only",
+      "packet_kind": "trace_tool",
+      "sources": [
+        "trace-mcp"
+      ],
+      "source_ref": "topology.hydration_status",
+      "examples": [],
+      "transport": null,
+      "domain": "unknown",
+      "ontology": [],
+      "service": null,
+      "method": null,
+      "primary_layer": "unknown",
+      "score": 44,
+      "rank": 115
+    },
+    {
+      "tool_name": "topology.recompute_manifold_plan",
+      "namespace": "topology",
+      "description": "Provides a recommended plan for restoring topological hydration.",
+      "layers": [
+        "unknown"
+      ],
+      "identity_fields": [],
+      "writes_to": [],
+      "permissions": "read_only",
+      "packet_kind": "trace_tool",
+      "sources": [
+        "trace-mcp"
+      ],
+      "source_ref": "topology.recompute_manifold_plan",
+      "examples": [],
+      "transport": null,
+      "domain": "unknown",
+      "ontology": [],
+      "service": null,
+      "method": null,
+      "primary_layer": "unknown",
+      "score": 44,
+      "rank": 116
+    },
+    {
+      "tool_name": "topology.same_som_cluster",
+      "namespace": "topology",
+      "description": "Returns other nodes in the same SOM cluster as the reference node.",
+      "layers": [
+        "unknown"
+      ],
+      "identity_fields": [],
+      "writes_to": [],
+      "permissions": "read_only",
+      "packet_kind": "trace_tool",
+      "sources": [
+        "trace-mcp"
+      ],
+      "source_ref": "topology.same_som_cluster",
+      "examples": [],
+      "transport": null,
+      "domain": "unknown",
+      "ontology": [],
+      "service": null,
+      "method": null,
+      "primary_layer": "unknown",
+      "score": 44,
+      "rank": 117
+    },
+    {
+      "tool_name": "topology.search_4d",
+      "namespace": "topology",
+      "description": "Explicit 4D manifold coordinate search with optional JSONB payload filters.",
+      "layers": [
+        "unknown"
+      ],
+      "identity_fields": [],
+      "writes_to": [],
+      "permissions": "read_only",
+      "packet_kind": "trace_tool",
+      "sources": [
+        "trace-mcp"
+      ],
+      "source_ref": "topology.search_4d",
+      "examples": [],
+      "transport": null,
+      "domain": "unknown",
+      "ontology": [],
+      "service": null,
+      "method": null,
+      "primary_layer": "unknown",
+      "score": 44,
+      "rank": 118
+    },
+    {
+      "tool_name": "topology.search_near",
+      "namespace": "topology",
+      "description": "Semantic search for nodes within a 4D topology radius.",
+      "layers": [
+        "unknown"
+      ],
+      "identity_fields": [],
+      "writes_to": [],
+      "permissions": "read_only",
+      "packet_kind": "trace_tool",
+      "sources": [
+        "trace-mcp"
+      ],
+      "source_ref": "topology.search_near",
+      "examples": [],
+      "transport": null,
+      "domain": "unknown",
+      "ontology": [],
+      "service": null,
+      "method": null,
+      "primary_layer": "unknown",
+      "score": 44,
+      "rank": 119
+    },
+    {
+      "tool_name": "trace.kag_search",
+      "namespace": "trace",
+      "description": "High-performance KAG-DAG retrieval: Go retrieval service → SvelteKit proxy → Postgres fallback.",
+      "layers": [
+        "unknown"
+      ],
+      "identity_fields": [],
+      "writes_to": [],
+      "permissions": "read_only",
+      "packet_kind": "trace_tool",
+      "sources": [
+        "trace-mcp"
+      ],
+      "source_ref": "trace.kag_search",
+      "examples": [],
+      "transport": null,
+      "domain": "unknown",
+      "ontology": [],
+      "service": null,
+      "method": null,
+      "primary_layer": "unknown",
+      "score": 44,
+      "rank": 120
+    },
+    {
+      "tool_name": "trace.system_health",
+      "namespace": "trace",
+      "description": "Returns the health and latency status of all backend retrieval and inference services.",
+      "layers": [
+        "unknown"
+      ],
+      "identity_fields": [],
+      "writes_to": [],
+      "permissions": "read_only",
+      "packet_kind": "trace_tool",
+      "sources": [
+        "trace-mcp"
+      ],
+      "source_ref": "trace.system_health",
+      "examples": [],
+      "transport": null,
+      "domain": "unknown",
+      "ontology": [],
+      "service": null,
+      "method": null,
+      "primary_layer": "unknown",
+      "score": 44,
+      "rank": 121
+    },
+    {
+      "tool_name": "trace.validate_ace_hit",
+      "namespace": "trace",
+      "description": "Validates a retrieved chunk against the ACE cache and graph contracts.",
+      "layers": [
+        "unknown"
+      ],
+      "identity_fields": [],
+      "writes_to": [],
+      "permissions": "read_only",
+      "packet_kind": "trace_tool",
+      "sources": [
+        "trace-mcp"
+      ],
+      "source_ref": "trace.validate_ace_hit",
+      "examples": [],
+      "transport": null,
+      "domain": "unknown",
+      "ontology": [],
+      "service": null,
+      "method": null,
+      "primary_layer": "unknown",
+      "score": 44,
+      "rank": 122
+    },
+    {
+      "tool_name": "ui.analyze_view",
+      "namespace": "ui",
+      "description": "Analyzes the current UI state based on a provided snapshot.",
+      "layers": [
+        "unknown"
+      ],
+      "identity_fields": [],
+      "writes_to": [],
+      "permissions": "read_only",
+      "packet_kind": "trace_tool",
+      "sources": [
+        "trace-mcp"
+      ],
+      "source_ref": "ui.analyze_view",
+      "examples": [],
+      "transport": null,
+      "domain": "unknown",
+      "ontology": [],
+      "service": null,
+      "method": null,
+      "primary_layer": "unknown",
+      "score": 44,
+      "rank": 123
+    },
+    {
+      "tool_name": "clusters.get_members",
+      "namespace": "clusters",
+      "description": "Returns the member nodes for a specific cluster.",
+      "layers": [
+        "unknown"
+      ],
+      "identity_fields": [],
+      "writes_to": [],
+      "permissions": "read_only",
+      "packet_kind": "trace_tool",
+      "sources": [
+        "trace-mcp"
+      ],
+      "source_ref": "clusters.get_members",
+      "examples": [],
+      "transport": null,
+      "domain": "unknown",
+      "ontology": [],
+      "service": null,
+      "method": null,
+      "primary_layer": "unknown",
+      "score": 40,
+      "rank": 124
+    },
+    {
+      "tool_name": "kb.extract_citations",
+      "namespace": "kb",
+      "description": "Extract legal citations and statutes from text.",
+      "layers": [
+        "unknown"
+      ],
+      "identity_fields": [],
+      "writes_to": [],
+      "permissions": "read_only",
+      "packet_kind": "trace_tool",
+      "sources": [
+        "trace-mcp"
+      ],
+      "source_ref": "kb.extract_citations",
+      "examples": [],
+      "transport": null,
+      "domain": "unknown",
+      "ontology": [],
+      "service": null,
+      "method": null,
+      "primary_layer": "unknown",
+      "score": 40,
+      "rank": 125
+    },
+    {
+      "tool_name": "skills.list",
+      "namespace": "skills",
+      "description": "Filter skills by name or description.",
+      "layers": [
+        "unknown"
+      ],
+      "identity_fields": [],
+      "writes_to": [],
+      "permissions": "read_only",
+      "packet_kind": "trace_tool",
+      "sources": [
+        "trace-mcp"
+      ],
+      "source_ref": "skills.list",
+      "examples": [],
+      "transport": null,
+      "domain": "unknown",
+      "ontology": [],
+      "service": null,
+      "method": null,
+      "primary_layer": "unknown",
+      "score": 40,
+      "rank": 126
+    },
+    {
+      "tool_name": "skills.run_mission",
+      "namespace": "skills",
+      "description": "Execute a specialized autonomous skill mission.",
+      "layers": [
+        "unknown"
+      ],
+      "identity_fields": [],
+      "writes_to": [],
+      "permissions": "read_only",
+      "packet_kind": "trace_tool",
+      "sources": [
+        "trace-mcp"
+      ],
+      "source_ref": "skills.run_mission",
+      "examples": [],
+      "transport": null,
+      "domain": "unknown",
+      "ontology": [],
+      "service": null,
+      "method": null,
+      "primary_layer": "unknown",
+      "score": 40,
+      "rank": 127
+    },
+    {
+      "tool_name": "trace.explain_retrieval",
+      "namespace": "trace",
+      "description": "Explains the retrieval trace for a specific query.",
+      "layers": [
+        "unknown"
+      ],
+      "identity_fields": [],
+      "writes_to": [],
+      "permissions": "read_only",
+      "packet_kind": "trace_tool",
+      "sources": [
+        "trace-mcp"
+      ],
+      "source_ref": "trace.explain_retrieval",
+      "examples": [],
+      "transport": null,
+      "domain": "unknown",
+      "ontology": [],
+      "service": null,
+      "method": null,
+      "primary_layer": "unknown",
+      "score": 40,
+      "rank": 128
+    }
+  ]
+}

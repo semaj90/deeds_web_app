@@ -433,12 +433,22 @@
 		{
 			"label": "⚡ TRACE: Start llama-server (TurboQuant)",
 			"type": "shell",
-			"command": "npm run llama:ensure",
-			"options": { "cwd": "${workspaceFolder}" },
+			"command": "npm run turbo:start:detached",
+			"options": {
+				"cwd": "${workspaceFolder}",
+				"env": {
+					"TURBO_CTX": "65536",
+					"LLM_CONTEXT_SIZE": "65536",
+					"LLAMA_SERVER_CTX": "65536",
+					"TURBO_PROFILE": "turboquant-safe"
+				}
+			},
 			"isBackground": true,
+			"runOptions": { "runOn": "folderOpen" },
+			"presentation": { "reveal": "silent", "panel": "dedicated", "clear": false, "showReuseMessage": false },
 			"group": "build",
 			"problemMatcher": [],
-			"detail": "Ensure llama-server is running on :8090 with IQ4_XS, 64K ctx, prompt-cache, cache-reuse, and env-driven KV types"
+			"detail": "Detached TurboQuant startup on :8090 with explicit 64K ctx, prompt-cache, cache-reuse, and env-pinned context settings"
 		},
 
         {

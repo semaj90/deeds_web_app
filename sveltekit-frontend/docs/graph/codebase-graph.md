@@ -1,11 +1,11 @@
 # Codebase Graph Plan — Fast AST (20-Gate)
-> Generated: 2026-06-15T20:59:12.516Z
+> Generated: 2026-06-16T00:54:09.964Z
 > Mode: `fast-ast` (CPU only)
 
 ## Stats
 | Metric | Count |
 |--------|-------|
-| Files | 58535 |
+| Files | 58550 |
 | Routes | 4959 |
 | Components | 4801 |
 | API handlers | 6348 |
@@ -17,7 +17,7 @@
 |------|-----------|
 | G4 No auth | 30 |
 | G5 No Zod  | 3 |
-| G11 Localhost | 2351 |
+| G11 Localhost | 2353 |
 | G14 Svelte4 | 28 |
 | G15 SSR unsafe | 0 |
 | G16 No test | 318 |

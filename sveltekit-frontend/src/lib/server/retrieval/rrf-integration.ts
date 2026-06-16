@@ -15,6 +15,7 @@ import { conceptOverlapSearch } from './concept-overlap-search.js';
 import { combineViaRRF, type ContextHit, type RRFResult, type RetrievalLaneName } from './rrf-combiner.js';
 import { extractQueryConceptsViaGemma } from './concept-extraction-tool.js';
 import { queryNeoJsGraphSignal } from './neo4j-graph-signal.js';
+import { turbovecSearch } from './turbovec-prefilter.js';
 
 export interface RRFIntegrationOptions {
   k?: number; // RRF constant (default 60)
@@ -30,6 +31,7 @@ export interface RRFIntegrationOutput {
     bm25Count: number;
     conceptCount: number;
     qdrantCount: number;
+    turbovecCount: number;
     neoCount: number;
   };
   durationMs: number;
@@ -42,7 +44,7 @@ async function queryQdrantVectorSignal(
   query: string,
   embedding: number[] | null,
   topK: number
-): Promise<Array<{ id: string; score: number; text?: string }>> {
+): Promise<Array<{ id: string; score: number; text?: string; metadata?: Record<string, unknown> }>> {
   if (!embedding) return [];
 
   try {
@@ -55,11 +57,28 @@ async function queryQdrantVectorSignal(
       scoreThreshold: 0.001,
     });
 
-    return response.results.map((r) => ({
-      id: String(r.id),
-      score: r.score,
-      text: String(r.payload?.content ?? r.payload?.summary ?? ''),
-    }));
+    return response.results.map((r) => {
+      const payload = (r.payload ?? {}) as Record<string, unknown>;
+      const packetKey = String(payload.packet_key ?? payload.packetKey ?? payload.qdrant_payload_key ?? r.id ?? '').trim();
+      const sourceRef = String(payload.source_ref ?? payload.sourceRef ?? payload.canonicalSourceRef ?? payload.file_path ?? payload.filePath ?? '').trim();
+      const featureId = String(payload.feature_id ?? payload.featureId ?? '').trim();
+      return {
+        id: String(r.id),
+        score: r.score,
+        text: String(payload.content ?? payload.summary ?? ''),
+        metadata: {
+          packet_key: packetKey || null,
+          source_ref: sourceRef || null,
+          feature_id: featureId || null,
+          file_path: String(payload.file_path ?? payload.filePath ?? null) || null,
+          qdrant_point_id: String(r.id),
+          qdrant_collection: 'codebase_chunks_768',
+          som_cluster: payload.som_cluster ?? payload.somCluster ?? null,
+          cluster_id: payload.cluster_id ?? payload.clusterId ?? null,
+          community_id: payload.community_id ?? payload.communityId ?? null,
+        },
+      };
+    });
   } catch (err) {
     console.error('Qdrant search failed:', err);
     return [];
@@ -97,6 +116,7 @@ export async function multiLaneRetrievalWithRRF(
     postgres_trigram: 1.0,
     concept_overlap: 1.2,
     qdrant_vector: 1.0,
+    turbovec_ann: 0.9,
     neo4j_graph: 0.8,
   };
 
@@ -115,10 +135,11 @@ export async function multiLaneRetrievalWithRRF(
     }).catch(() => ({ conceptIds: [], extracted: [], durationMs: 0 }));
 
     // Run all retrieval signals in parallel
-    const [bm25Results, conceptResults, qdrantResults, neoResults] = await Promise.allSettled([
+    const [bm25Results, conceptResults, qdrantResults, turbovecResults, neoResults] = await Promise.allSettled([
       bm25SearchIndexed(query, topK),
       conceptOverlapSearch(conceptExtractionResult.conceptIds, topK),
       queryQdrantVectorSignal(query, embedding, topK),
+      embedding ? turbovecSearch(embedding, { topK: topK * 2, timeoutMs: 300 }) : Promise.resolve({ candidates: [], backend: 'offline', durationMs: 0 }),
       queryNeoJsGraphSignal({ conceptIds: conceptExtractionResult.conceptIds, topK }).then((r) =>
         r.map((hit) => ({
           id: hit.id,
@@ -136,6 +157,12 @@ export async function multiLaneRetrievalWithRRF(
             source: 'postgres_trigram',
             score: hit.similarity,
             text: hit.summary,
+            metadata: {
+              stable_key: hit.stable_key,
+              file_path: hit.file_path,
+              source_ref: hit.file_path,
+              packet_key: hit.stable_key,
+            },
           }))
         : [];
 
@@ -155,6 +182,18 @@ export async function multiLaneRetrievalWithRRF(
             source: 'qdrant_vector',
             score: hit.score,
             text: hit.text,
+            metadata: hit.metadata,
+          }))
+        : [];
+
+    const turbovecHits: ContextHit[] =
+      turbovecResults.status === 'fulfilled'
+        ? turbovecResults.value.candidates.map((hit) => ({
+            id: hit.id,
+            source: 'turbovec_ann',
+            score: hit.score,
+            text: hit.id,
+            metadata: { turbovec_candidate_id: hit.id, turbovec_cluster: hit.cluster },
           }))
         : [];
 
@@ -165,12 +204,13 @@ export async function multiLaneRetrievalWithRRF(
             source: 'neo4j_graph',
             score: hit.score,
             text: hit.text,
+            metadata: { neo4j_paths: hit.paths ?? 0 },
           }))
         : [];
 
     // Combine via RRF
-    const lanes = [bm25Hits, conceptHits, qdrantHits, neoHits];
-    const laneNames: RetrievalLaneName[] = ['postgres_trigram', 'concept_overlap', 'qdrant_vector', 'neo4j_graph'];
+    const lanes = [bm25Hits, conceptHits, qdrantHits, turbovecHits, neoHits];
+    const laneNames: RetrievalLaneName[] = ['postgres_trigram', 'concept_overlap', 'qdrant_vector', 'turbovec_ann', 'neo4j_graph'];
 
     const rrfResults = combineViaRRF(lanes, laneNames, {
       k,
@@ -187,6 +227,7 @@ export async function multiLaneRetrievalWithRRF(
         bm25Count: bm25Hits.length,
         conceptCount: conceptHits.length,
         qdrantCount: qdrantHits.length,
+        turbovecCount: turbovecHits.length,
         neoCount: neoHits.length,
       },
       durationMs: Date.now() - t0,
@@ -195,7 +236,7 @@ export async function multiLaneRetrievalWithRRF(
     console.error('RRF integration error:', error);
     return {
       results: [],
-      breakdown: { bm25Count: 0, conceptCount: 0, qdrantCount: 0, neoCount: 0 },
+      breakdown: { bm25Count: 0, conceptCount: 0, qdrantCount: 0, turbovecCount: 0, neoCount: 0 },
       durationMs: Date.now() - t0,
     };
   }

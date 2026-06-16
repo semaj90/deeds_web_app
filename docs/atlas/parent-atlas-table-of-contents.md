@@ -48,6 +48,8 @@ This page is the navigation entry for the Parent Atlas workstream. It links the 
 - [Parent Atlas feature command atlas Qdrant projection](</C:/Users/james/Videos/deeds-web-app/docs/reports/parent-atlas-feature-command-atlas-qdrant.md>)
 - [Parent Atlas feature command atlas Postgres mirror](</C:/Users/james/Videos/deeds-web-app/docs/reports/parent-atlas-feature-command-atlas-postgres.md>)
 - [Parent Atlas Cypher apply report](</C:/Users/james/Videos/deeds-web-app/docs/reports/parent-atlas-cypher-apply-report.md>)
+- [MCP tool registry index](</C:/Users/james/Videos/deeds-web-app/docs/reports/mcp-tool-registry-index.md>)
+- [MCP tool ontology](</C:/Users/james/Videos/deeds-web-app/docs/reports/mcp-tool-ontology.md>)
 - [SourceRef context Neo4j projection](</C:/Users/james/Videos/deeds-web-app/docs/reports/sourceRef-context-neo4j-report.md>)
 - [SourceRef parent join dry-run](</C:/Users/james/Videos/deeds-web-app/docs/reports/sourceRef-parent-join-dry-run.md>)
 - [SourceRef parent join archive plan](</C:/Users/james/Videos/deeds-web-app/docs/reports/sourceRef-parent-join-archive-plan.md>)

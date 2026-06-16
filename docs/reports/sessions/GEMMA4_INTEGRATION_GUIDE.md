@@ -463,7 +463,7 @@ nvidia-smi
 
 # Reduce context window
 # In request options:
-{ numCtx: 16384 }  // Half of 32K
+{ numCtx: 65536 }  // 64K runtime contract
 
 # Or unload other models
 ollama stop gemma3-legal:latest

@@ -8,6 +8,7 @@
 export type RetrievalLaneName =
   | 'postgres_trigram'
   | 'qdrant_vector'
+  | 'turbovec_ann'
   | 'concept_overlap'
   | 'neo4j_graph'
   | 'redis_cache'
@@ -35,6 +36,7 @@ export interface RRFScore {
   laneRank: number;
   laneScore: number;
   rrfComponent: number;
+  metadata?: Record<string, unknown>;
 }
 
 export interface RRFResult {
@@ -88,6 +90,7 @@ export function combineViaRRF(
         laneRank: rank + 1,
         laneScore: hit.score,
         rrfComponent,
+        metadata: hit.metadata,
       });
     });
   });
@@ -97,6 +100,7 @@ export function combineViaRRF(
   for (const [hitKey, scores] of hitScores) {
     const combinedScore = scores.reduce((sum, s) => sum + s.rrfComponent, 0);
     const primaryHit = scores[0]; // Use metadata from first lane
+    const metadata = scores.find((score) => score.metadata && Object.keys(score.metadata).length > 0)?.metadata ?? primaryHit.metadata;
 
     results.push({
       id: primaryHit.hitId,
@@ -104,6 +108,7 @@ export function combineViaRRF(
       source: primaryHit.laneName,
       sources: [...new Set(scores.map((s) => s.laneName))],
       text: hitKey,
+      metadata,
       breakdown: scores,
     });
   }

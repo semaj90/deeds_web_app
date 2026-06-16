@@ -1,0 +1,451 @@
+{
+  "generatedAt": "2026-06-15T23:40:01.298Z",
+  "status": "PASS",
+  "redis": {
+    "container": "legal-ai-valkey",
+    "passwordConfigured": true
+  },
+  "summary": {
+    "gpuKarpathyScores": 1,
+    "gpuKarpathyEncoded": 1,
+    "bifrostKeys": 112,
+    "centroidKeys": 85,
+    "somKeys": 152
+  },
+  "patterns": [
+    {
+      "key": "gpu:karpathy:scores",
+      "pattern": "gpu:karpathy:scores",
+      "count": 1,
+      "sample": [
+        "gpu:karpathy:scores"
+      ],
+      "ttlSamples": [
+        {
+          "key": "gpu:karpathy:scores",
+          "ttl": 147461,
+          "ok": true
+        }
+      ],
+      "ok": true,
+      "error": null
+    },
+    {
+      "key": "gpu:karpathy:encoded",
+      "pattern": "gpu:karpathy:encoded",
+      "count": 1,
+      "sample": [
+        "gpu:karpathy:encoded"
+      ],
+      "ttlSamples": [
+        {
+          "key": "gpu:karpathy:encoded",
+          "ttl": 85389,
+          "ok": true
+        }
+      ],
+      "ok": true,
+      "error": null
+    },
+    {
+      "key": "bifrost:*",
+      "pattern": "bifrost:*",
+      "count": 112,
+      "sample": [
+        "bifrost:packet:64090fce409bb5c9",
+        "bifrost:packet:54fb19b574528f1a",
+        "bifrost:packet:6274b1cfbc90f2e1",
+        "bifrost:packet:3edd306a02055c3a",
+        "bifrost:sem:packet:src/lib/server/cache/timeline-builder-unified.ts:de2f77e03d5a511a"
+      ],
+      "ttlSamples": [
+        {
+          "key": "bifrost:packet:64090fce409bb5c9",
+          "ttl": 425581,
+          "ok": true
+        },
+        {
+          "key": "bifrost:packet:54fb19b574528f1a",
+          "ttl": 425581,
+          "ok": true
+        },
+        {
+          "key": "bifrost:packet:6274b1cfbc90f2e1",
+          "ttl": 425581,
+          "ok": true
+        },
+        {
+          "key": "bifrost:packet:3edd306a02055c3a",
+          "ttl": 425580,
+          "ok": true
+        },
+        {
+          "key": "bifrost:sem:packet:src/lib/server/cache/timeline-builder-unified.ts:de2f77e03d5a511a",
+          "ttl": 85207,
+          "ok": true
+        }
+      ],
+      "ok": true,
+      "error": null
+    },
+    {
+      "key": "centroid:*",
+      "pattern": "centroid:*",
+      "count": 85,
+      "sample": [
+        "centroid:54",
+        "centroid:74",
+        "centroid:36",
+        "centroid:69",
+        "centroid:27"
+      ],
+      "ttlSamples": [
+        {
+          "key": "centroid:54",
+          "ttl": -1,
+          "ok": true
+        },
+        {
+          "key": "centroid:74",
+          "ttl": -1,
+          "ok": true
+        },
+        {
+          "key": "centroid:36",
+          "ttl": -1,
+          "ok": true
+        },
+        {
+          "key": "centroid:69",
+          "ttl": -1,
+          "ok": true
+        },
+        {
+          "key": "centroid:27",
+          "ttl": -1,
+          "ok": true
+        }
+      ],
+      "ok": true,
+      "error": null
+    },
+    {
+      "key": "som:*",
+      "pattern": "som:*",
+      "count": 152,
+      "sample": [
+        "som:23",
+        "som:5",
+        "som:cell:76",
+        "som:cell:20",
+        "som:26"
+      ],
+      "ttlSamples": [
+        {
+          "key": "som:23",
+          "ttl": -1,
+          "ok": true
+        },
+        {
+          "key": "som:5",
+          "ttl": -1,
+          "ok": true
+        },
+        {
+          "key": "som:cell:76",
+          "ttl": -1,
+          "ok": true
+        },
+        {
+          "key": "som:cell:20",
+          "ttl": -1,
+          "ok": true
+        },
+        {
+          "key": "som:26",
+          "ttl": -1,
+          "ok": true
+        }
+      ],
+      "ok": true,
+      "error": null
+    },
+    {
+      "key": "bifrost:sem:packet:*",
+      "pattern": "bifrost:sem:packet:*",
+      "count": 25,
+      "sample": [
+        "bifrost:sem:packet:src/lib/server/cache/timeline-builder-unified.ts:de2f77e03d5a511a",
+        "bifrost:sem:packet:src/routes/api/search/citations/+server.ts:725481ffc5ba1902",
+        "bifrost:sem:packet:src/lib/server/cases/timeline-builder.ts:14672e8293b846cf",
+        "bifrost:sem:packet:src/routes/api/library/citations/[citation]/+server.ts:3ced7ebc8cc7dd60",
+        "bifrost:sem:packet:src/routes/api/library/resolve-citation/+server.ts:2ec02b34f1d14f27"
+      ],
+      "ttlSamples": [
+        {
+          "key": "bifrost:sem:packet:src/lib/server/cache/timeline-builder-unified.ts:de2f77e03d5a511a",
+          "ttl": 85202,
+          "ok": true
+        },
+        {
+          "key": "bifrost:sem:packet:src/routes/api/search/citations/+server.ts:725481ffc5ba1902",
+          "ttl": 85187,
+          "ok": true
+        },
+        {
+          "key": "bifrost:sem:packet:src/lib/server/cases/timeline-builder.ts:14672e8293b846cf",
+          "ttl": 85198,
+          "ok": true
+        },
+        {
+          "key": "bifrost:sem:packet:src/routes/api/library/citations/[citation]/+server.ts:3ced7ebc8cc7dd60",
+          "ttl": 85182,
+          "ok": true
+        },
+        {
+          "key": "bifrost:sem:packet:src/routes/api/library/resolve-citation/+server.ts:2ec02b34f1d14f27",
+          "ttl": 85185,
+          "ok": true
+        }
+      ],
+      "ok": true,
+      "error": null
+    },
+    {
+      "key": "bifrost:sem:feature:*",
+      "pattern": "bifrost:sem:feature:*",
+      "count": 8,
+      "sample": [
+        "bifrost:sem:feature:utils",
+        "bifrost:sem:feature:infrastructure_config",
+        "bifrost:sem:feature:saved",
+        "bifrost:sem:feature:couchdb-rollback",
+        "bifrost:sem:feature:routes"
+      ],
+      "ttlSamples": [
+        {
+          "key": "bifrost:sem:feature:utils",
+          "ttl": 85194,
+          "ok": true
+        },
+        {
+          "key": "bifrost:sem:feature:infrastructure_config",
+          "ttl": 85200,
+          "ok": true
+        },
+        {
+          "key": "bifrost:sem:feature:saved",
+          "ttl": 85176,
+          "ok": true
+        },
+        {
+          "key": "bifrost:sem:feature:couchdb-rollback",
+          "ttl": 85195,
+          "ok": true
+        },
+        {
+          "key": "bifrost:sem:feature:routes",
+          "ttl": 85183,
+          "ok": true
+        }
+      ],
+      "ok": true,
+      "error": null
+    },
+    {
+      "key": "bifrost:sem:intent:*",
+      "pattern": "bifrost:sem:intent:*",
+      "count": 0,
+      "sample": [],
+      "ttlSamples": [],
+      "ok": true,
+      "error": null
+    },
+    {
+      "key": "reward:zset",
+      "pattern": "reward:zset",
+      "count": 0,
+      "sample": [],
+      "ttlSamples": [],
+      "ok": true,
+      "error": null
+    },
+    {
+      "key": "ace:context:*",
+      "pattern": "ace:context:*",
+      "count": 25,
+      "sample": [
+        "ace:context:src/routes/api/citations/+server.ts:0e7594ca31b0e29d",
+        "ace:context:src/routes/api/citations/export/pdf/+server.ts:f1c68cfb3f94c652",
+        "ace:context:src/routes/api/citations/collections/+server.ts:b4192b86906c5810",
+        "ace:context:src/lib/utils/simd-markdown-parser.ts:cea9e616965162e5",
+        "ace:context:src/routes/api/citations/collections/[collectionId]/citations/+server.ts:02862f7dc2463cc1"
+      ],
+      "ttlSamples": [
+        {
+          "key": "ace:context:src/routes/api/citations/+server.ts:0e7594ca31b0e29d",
+          "ttl": 2375,
+          "ok": true
+        },
+        {
+          "key": "ace:context:src/routes/api/citations/export/pdf/+server.ts:f1c68cfb3f94c652",
+          "ttl": 2371,
+          "ok": true
+        },
+        {
+          "key": "ace:context:src/routes/api/citations/collections/+server.ts:b4192b86906c5810",
+          "ttl": 2368,
+          "ok": true
+        },
+        {
+          "key": "ace:context:src/lib/utils/simd-markdown-parser.ts:cea9e616965162e5",
+          "ttl": 2388,
+          "ok": true
+        },
+        {
+          "key": "ace:context:src/routes/api/citations/collections/[collectionId]/citations/+server.ts:02862f7dc2463cc1",
+          "ttl": 2363,
+          "ok": true
+        }
+      ],
+      "ok": true,
+      "error": null
+    },
+    {
+      "key": "ace:summary:*",
+      "pattern": "ace:summary:*",
+      "count": 25,
+      "sample": [
+        "ace:summary:src/routes/api/citations/collections/[collectionId]/export/+server.ts:1cee26022f349f30",
+        "ace:summary:src/routes/api/rabbitmq/health/+server.ts:194a44e50a22dbb6",
+        "ace:summary:src/routes/(app)/citations/+page.svelte:343fd1d01665a95f",
+        "ace:summary:src/routes/(app)/citations/+page.svelte:38b4868560607a00",
+        "ace:summary:src/routes/api/citations/export/pdf/+server.ts:f1c68cfb3f94c652"
+      ],
+      "ttlSamples": [
+        {
+          "key": "ace:summary:src/routes/api/citations/collections/[collectionId]/export/+server.ts:1cee26022f349f30",
+          "ttl": 2364,
+          "ok": true
+        },
+        {
+          "key": "ace:summary:src/routes/api/rabbitmq/health/+server.ts:194a44e50a22dbb6",
+          "ttl": 2386,
+          "ok": true
+        },
+        {
+          "key": "ace:summary:src/routes/(app)/citations/+page.svelte:343fd1d01665a95f",
+          "ttl": 2381,
+          "ok": true
+        },
+        {
+          "key": "ace:summary:src/routes/(app)/citations/+page.svelte:38b4868560607a00",
+          "ttl": 2383,
+          "ok": true
+        },
+        {
+          "key": "ace:summary:src/routes/api/citations/export/pdf/+server.ts:f1c68cfb3f94c652",
+          "ttl": 2369,
+          "ok": true
+        }
+      ],
+      "ok": true,
+      "error": null
+    },
+    {
+      "key": "ace:feature:*",
+      "pattern": "ace:feature:*",
+      "count": 8,
+      "sample": [
+        "ace:feature:search",
+        "ace:feature:scripts",
+        "ace:feature:infrastructure_config",
+        "ace:feature:citations",
+        "ace:feature:saved"
+      ],
+      "ttlSamples": [
+        {
+          "key": "ace:feature:search",
+          "ttl": 2371,
+          "ok": true
+        },
+        {
+          "key": "ace:feature:scripts",
+          "ttl": 2956,
+          "ok": true
+        },
+        {
+          "key": "ace:feature:infrastructure_config",
+          "ttl": 2392,
+          "ok": true
+        },
+        {
+          "key": "ace:feature:citations",
+          "ttl": 2381,
+          "ok": true
+        },
+        {
+          "key": "ace:feature:saved",
+          "ttl": 2369,
+          "ok": true
+        }
+      ],
+      "ok": true,
+      "error": null
+    },
+    {
+      "key": "ace:query:*",
+      "pattern": "ace:query:*",
+      "count": 0,
+      "sample": [],
+      "ttlSamples": [],
+      "ok": true,
+      "error": null
+    },
+    {
+      "key": "ace:tree:*",
+      "pattern": "ace:tree:*",
+      "count": 0,
+      "sample": [],
+      "ttlSamples": [],
+      "ok": true,
+      "error": null
+    },
+    {
+      "key": "ace:authority:*",
+      "pattern": "ace:authority:*",
+      "count": 1,
+      "sample": [
+        "ace:authority:top"
+      ],
+      "ttlSamples": [
+        {
+          "key": "ace:authority:top",
+          "ttl": 18365,
+          "ok": true
+        }
+      ],
+      "ok": true,
+      "error": null
+    },
+    {
+      "key": "ace:ontology:*",
+      "pattern": "ace:ontology:*",
+      "count": 0,
+      "sample": [],
+      "ttlSamples": [],
+      "ok": true,
+      "error": null
+    },
+    {
+      "key": "ace:memory:*",
+      "pattern": "ace:memory:*",
+      "count": 0,
+      "sample": [],
+      "ttlSamples": [],
+      "ok": true,
+      "error": null
+    }
+  ],
+  "nextSafeAction": "Use the warm planner to refresh the hot Bitfrost families from canonical Postgres rows."
+}

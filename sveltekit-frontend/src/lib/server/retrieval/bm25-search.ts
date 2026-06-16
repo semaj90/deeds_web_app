@@ -5,9 +5,7 @@
  * Not exact BM25 but highly correlated and production-ready.
  */
 
-import { sql } from 'drizzle-orm';
-import { db } from '$lib/server/db/client.js';
-import { atlasPackets } from '$lib/server/db/schema-postgres.js';
+import { searchCodeLexical } from '$lib/server/search/postgres-fts.js';
 
 /**
  * Search atlas_packets by text similarity using trigram matching.
@@ -16,28 +14,16 @@ import { atlasPackets } from '$lib/server/db/schema-postgres.js';
 export async function bm25SearchIndexed(
   query: string,
   limit: number = 20
-): Promise<Array<{ id: string; similarity: number; summary: string }>> {
+): Promise<Array<{ id: string; similarity: number; summary: string; stable_key: string; file_path: string }>> {
   try {
-    const results = await db.execute(
-      sql`
-        SELECT
-          ${atlasPackets.packetId},
-          similarity(${atlasPackets.summary}, ${query}) as similarity,
-          ${atlasPackets.summary}
-        FROM ${atlasPackets}
-        WHERE ${atlasPackets.summary} % ${query}
-        ORDER BY similarity DESC
-        LIMIT ${limit}
-      `
-    );
-
-    return (
-      results.rows?.map((row: any) => ({
-        id: row.id,
-        similarity: row.similarity || 0,
-        summary: row.summary || '',
-      })) || []
-    );
+    const results = await searchCodeLexical(query, { limit });
+    return results.map((row) => ({
+      id: row.stable_key,
+      similarity: row.lexical_score || 0,
+      summary: row.headline || row.content || '',
+      stable_key: row.stable_key,
+      file_path: row.file_path,
+    }));
   } catch (error) {
     console.error('BM25 search failed:', error);
     return [];
@@ -50,19 +36,15 @@ export async function bm25SearchIndexed(
 export async function bm25SearchUnindexed(
   query: string,
   limit: number = 20
-): Promise<Array<{ id: string; similarity: number }>> {
+): Promise<Array<{ id: string; similarity: number; stable_key: string; file_path: string }>> {
   try {
-    const results = await db
-      .select({
-        id: atlasPackets.packetId,
-        similarity: sql<number>`similarity(${atlasPackets.summary}, ${query})`,
-      })
-      .from(atlasPackets)
-      .where(sql`${atlasPackets.summary} % ${query}`)
-      .orderBy(sql`similarity DESC`)
-      .limit(limit);
-
-    return results;
+    const results = await searchCodeLexical(query, { limit });
+    return results.map((row) => ({
+      id: row.stable_key,
+      similarity: row.lexical_score || 0,
+      stable_key: row.stable_key,
+      file_path: row.file_path,
+    }));
   } catch (error) {
     console.error('BM25 fallback search failed:', error);
     return [];

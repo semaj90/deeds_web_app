@@ -4,6 +4,7 @@ import { ENV } from '$lib/server/env.server.js';
 import type { FTSResult } from '$lib/server/search/postgres-fts.js';
 import { expandNeighbours } from '$lib/server/search/neo4j-rerank.js';
 import { recordRetrievalTelemetry } from '../telemetry/retrieval-recorder.js';
+import { multiLaneRetrievalWithRRF } from './rrf-integration.js';
 
 export type HyperRagPacketRpcInput = {
   query: string;
@@ -28,6 +29,8 @@ export type HyperRagPacketRpcPacket = {
     trigram: number;
     jsonb: number;
   };
+  fusion_score: number;
+  fusion_sources: string[];
   gemma4_summary: string | null;
   rank: number;
 };
@@ -39,9 +42,11 @@ export type HyperRagPacketRpcResult = {
   trace: {
     qdrant_hits: number;
     postgres_hits: number;
+    rrf_hits: number;
     neo4j_expansions: number;
     duckdb_join_used: false;
     latency_ms: number;
+    fusion_used: boolean;
     collection_split: {
       runtime_legal: 'legal_documents';
       codebase_topology: 'codebase_chunks_768';
@@ -260,7 +265,12 @@ export async function hyperragPacketRpc(input: HyperRagPacketRpcInput): Promise<
     throw new Error('query is required');
   }
 
-  let ftsHits = useFts ? await searchCodeLexicalBounded(query, limit) : [];
+  const [rrfResult, initialFtsHits] = await Promise.all([
+    includeGraph ? multiLaneRetrievalWithRRF(query, getPacketRpcPool(), { topK: limit, minScore: 0.001 }).catch(() => null) : Promise.resolve(null),
+    useFts ? searchCodeLexicalBounded(query, limit) : Promise.resolve([]),
+  ]);
+
+  let ftsHits = initialFtsHits;
   if (!ftsHits.length) {
     ftsHits = await fallbackParentAtlas(query, limit);
   }
@@ -272,6 +282,27 @@ export async function hyperragPacketRpc(input: HyperRagPacketRpcInput): Promise<
   ]);
 
   let neo4jExpansions = 0;
+  const fusionLookup = new Map<string, { score: number; sources: string[] }>();
+  if (rrfResult?.results?.length) {
+    for (const row of rrfResult.results) {
+      const score = Number(row.combinedScore ?? 0);
+      const sources = Array.isArray(row.sources) ? row.sources.map((source) => String(source)) : [];
+      const metadata = (row.metadata ?? {}) as Record<string, unknown>;
+      const keys = [
+        String(row.id ?? '').trim(),
+        String(row.text ?? '').trim(),
+        String(metadata.packet_key ?? metadata.packetKey ?? '').trim(),
+        String(metadata.source_ref ?? metadata.sourceRef ?? metadata.canonicalSourceRef ?? '').trim(),
+        String(metadata.file_path ?? metadata.filePath ?? metadata.path ?? '').trim(),
+        String(metadata.qdrant_point_id ?? '').trim(),
+      ].filter(Boolean);
+      for (const key of keys) {
+        const normalized = key.toLowerCase();
+        if (!fusionLookup.has(key)) fusionLookup.set(key, { score, sources });
+        if (!fusionLookup.has(normalized)) fusionLookup.set(normalized, { score, sources });
+      }
+    }
+  }
   const packets: HyperRagPacketRpcPacket[] = [];
 
   for (const [index, hit] of ftsHits.slice(0, limit).entries()) {
@@ -283,6 +314,14 @@ export async function hyperragPacketRpc(input: HyperRagPacketRpcInput): Promise<
     const packetKey = nesRow?.packet_key ?? `hyperrag:${sourceRef || hit.stable_key}`;
     const neighbors = includeGraph ? await expandNeighbours(hit.stable_key, 1).catch(() => []) : [];
     neo4jExpansions += neighbors.length;
+    const fusionHit =
+      fusionLookup.get(packetKey) ??
+      fusionLookup.get(sourceRef) ??
+      fusionLookup.get(hit.stable_key) ??
+      fusionLookup.get(hit.file_path) ??
+      fusionLookup.get(hit.stable_key.toLowerCase()) ??
+      fusionLookup.get(hit.file_path.toLowerCase());
+    const fusionScore = fusionHit?.score ?? 0;
 
     packets.push({
       packet_key: packetKey,
@@ -298,10 +337,26 @@ export async function hyperragPacketRpc(input: HyperRagPacketRpcInput): Promise<
         trigram: 0,
         jsonb: atlasRow || nesRow ? 1 : 0,
       },
+      fusion_score: fusionScore,
+      fusion_sources: fusionHit?.sources ?? [],
       gemma4_summary: nesRow?.summary ?? atlasRow?.summary_lod0 ?? atlasRow?.summary_lod1 ?? atlasRow?.summary ?? hit.headline ?? null,
       rank: index + 1,
     });
   }
+
+  packets.sort((a, b) => {
+    const fusionDelta = (b.fusion_score ?? 0) - (a.fusion_score ?? 0);
+    if (fusionDelta !== 0) return fusionDelta;
+    const denseDelta = (b.retrieval_lanes.dense ?? 0) - (a.retrieval_lanes.dense ?? 0);
+    if (denseDelta !== 0) return denseDelta;
+    const lexicalDelta = (b.retrieval_lanes.fts ?? 0) - (a.retrieval_lanes.fts ?? 0);
+    if (lexicalDelta !== 0) return lexicalDelta;
+    return a.rank - b.rank;
+  });
+
+  packets.forEach((packet, rank) => {
+    packet.rank = rank + 1;
+  });
 
   const latencyMs = Date.now() - startedAt;
   const result: HyperRagPacketRpcResult = {
@@ -311,9 +366,11 @@ export async function hyperragPacketRpc(input: HyperRagPacketRpcInput): Promise<
     trace: {
       qdrant_hits: packets.filter((packet) => packet.qdrant_tags.length > 0).length,
       postgres_hits: ftsHits.length,
+      rrf_hits: rrfResult?.results?.length ?? 0,
       neo4j_expansions: neo4jExpansions,
       duckdb_join_used: false,
       latency_ms: latencyMs,
+      fusion_used: Boolean(rrfResult?.results?.length),
       collection_split: {
         runtime_legal: 'legal_documents',
         codebase_topology: 'codebase_chunks_768',

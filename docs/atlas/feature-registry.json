@@ -6436,7 +6436,7 @@
     "featureKey": "active_model_variables_env",
     "title": "Active Model Variables (.env)",
     "status": "implemented",
-    "summary": "TURBOMODELPATH=C:\\Users\\james\\Videos\\deeds-web-app\\vendor\\models\\gemma4-rotorquant:latest.gguf TURBOMMPROJPATH=C:\\Users\\james\\Videos\\deeds-web-app\\vendor\\models\\mmproj-gemma4.gguf LLAMASERVERPATH=C:\\Users\\james\\Desktop\\llama-server-cuda\\llama-server.exe TURBOPROFILE=stock TURBOCTX=16384",
+    "summary": "TURBOMODELPATH=C:\\Users\\james\\Videos\\deeds-web-app\\vendor\\models\\gemma4-rotorquant:latest.gguf TURBOMMPROJPATH=C:\\Users\\james\\Videos\\deeds-web-app\\vendor\\models\\mmproj-gemma4.gguf LLAMASERVERPATH=C:\\Users\\james\\Desktop\\llama-server-cuda\\llama-server.exe TURBOPROFILE=stock TURBOCTX=65536",
     "sourceRefs": [
       "local:docs/llms/gguf-model-lanes.md#L12"
     ],
@@ -6447,7 +6447,7 @@
     "featureKey": "component_breakdown",
     "title": "🧱 Component Breakdown",
     "status": "implemented",
-    "summary": "1. Model Core (gemma4-rotorquant:latest.gguf): A Gemma4 E4B (4.4B) base model merged with a specialized GRPO (Group Relative Policy Optimization) fine-tuned legal LoRA. Quantized in Q4KM (5.33 GB) format on disk. 2. Vision Tower (mmproj-gemma4.gguf): A multimodal projector file (991 MB) based on SigLIP enabling image inputs and OCR capabilities when the VLM projector tower is active. 3. Execution Context (llama-server-cuda): Runs with complete GPU offloading (--n-gpu-layers 99) and a 16k tokens context window (--ctx-size 16384). ---",
+    "summary": "1. Model Core (gemma4-rotorquant:latest.gguf): A Gemma4 E4B (4.4B) base model merged with a specialized GRPO (Group Relative Policy Optimization) fine-tuned legal LoRA. Quantized in Q4KM (5.33 GB) format on disk. 2. Vision Tower (mmproj-gemma4.gguf): A multimodal projector file (991 MB) based on SigLIP enabling image inputs and OCR capabilities when the VLM projector tower is active. 3. Execution Context (llama-server-cuda): Runs with complete GPU offloading (--n-gpu-layers 99) and a 64k tokens context window (--ctx-size 65536). ---",
     "sourceRefs": [
       "local:docs/llms/gguf-model-lanes.md#L21"
     ],
@@ -6612,7 +6612,7 @@
     "featureKey": "context_window_upgrade",
     "title": "Context window upgrade",
     "status": "implemented",
-    "summary": "Default TURBOCTX=16384. To extend for deep code audit:",
+    "summary": "Default TURBOCTX=65536. To extend for deep code audit:",
     "sourceRefs": [
       "local:docs/llms/gguf-model-lanes.md#L133"
     ],

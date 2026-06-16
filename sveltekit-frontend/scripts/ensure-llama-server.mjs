@@ -91,12 +91,27 @@ const PARALLEL = Math.max(
   1,
   parseInt(process.env.LLAMA_SERVER_PARALLEL ?? process.env.TURBO_PARALLEL ?? '1', 10)
 );
-const CTX =
+const CTX_REQUESTED =
   process.env.LLM_CONTEXT_SIZE ??
   process.env.TURBO_CTX ??
   process.env.LLAMA_SERVER_CTX ??
   process.env.OLLAMA_CONTEXT_LENGTH ??
   '65536';
+const SHORT_CTX_OK = /^(1|true|yes|on)$/i.test(
+  process.env.LLAMA_SERVER_ALLOW_SHORT_CONTEXT ??
+  process.env.TURBO_CTX_ALLOW_SHORT_CONTEXT ??
+  ''
+);
+const CTX_MIN = 65536;
+let CTX = parseInt(CTX_REQUESTED, 10);
+if (!Number.isFinite(CTX)) CTX = CTX_MIN;
+if (CTX < CTX_MIN && !SHORT_CTX_OK) {
+  console.warn(
+    `[ensure-llama-server] Requested context ${CTX} is below the repo default of ${CTX_MIN}. ` +
+      `Clamping to ${CTX_MIN}. Set TURBO_CTX_ALLOW_SHORT_CONTEXT=true to opt in to a shorter context.`
+  );
+  CTX = CTX_MIN;
+}
 const NGL = process.env.TURBO_NGL ?? process.env.LLAMA_SERVER_NGL ?? '99';
 const CACHE_TYPE_K = process.env.LLAMA_CACHE_TYPE_K ?? process.env.TURBO_KV_K ?? 'q8_0';
 const CACHE_TYPE_V = process.env.LLAMA_CACHE_TYPE_V ?? process.env.TURBO_KV_V ?? 'q8_0';
