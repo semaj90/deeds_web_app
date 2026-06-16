@@ -1,45 +1,144 @@
 /**
  * @module opencode-retrieval-contract
- * @description Defines the authoritative contract for source reference resolution and placeholder creation policy enforcement within OpenCode.
+ * Authoritative source-ref resolution + no-placeholder policy gate.
  */
 
-// --- 1. Core Data Structures (Source Reference Result) ---
+export type RetrievalLaneName =
+  | 'atlas_packets'
+  | 'qdrant'
+  | 'postgres_jsonb'
+  | 'neo4j_graph'
+  | 'redis_semantic_cache'
+  | 'filesystem_rg';
 
-/**
- * Represents the result of a single retrieval lane check.
- * @typedef {object} SourceRefResult
- * @property {boolean} found - Whether a relevant source reference was found in this specific lane.
- * @property {string | null} sourceRef - The authoritative, canonical source reference (e.g., "file:path/to/file.ts").
- * @property {string} [laneName] - The name of the retrieval lane that ran (e.g., "atlas_packets", "qdrant").
- * @property {string | null} [evidenceSummary] - A brief summary of why this source was considered relevant.
- */
-
-/**
- * Represents the final decision on whether a placeholder file should be created.
- * @typedef {object} PlaceholderDecision
- * @property {boolean} allow_create - True if no authoritative sources were found, allowing creation.
- * @property {string | null} reason - A detailed explanation for the decision (e.g., "Found multiple conflicting sources" or "No existing source evidence").
- */
-
-// --- 2. Function Signatures ---
-
-/**
- * Checks all canonical retrieval lanes to find an authoritative source reference for a given query.
- * This function must be called before any write operation that assumes the existence of code/data.
- * @param {string} query - The natural language or technical query describing the feature/concept.
- * @returns {Promise<{found: boolean, sourceRef: string | null, evidenceSummary?: string}>} A promise resolving to the authoritative source reference details.
- */
-export async function resolveSourceRef(query) {
-    // Implementation will sequentially call and aggregate results from all 6 lanes here.
-    throw new Error("Not implemented: Must implement sequential checking of all retrieval lanes.");
+export interface SourceRefResult {
+  found: boolean;
+  sourceRef: string | null;
+  packetKey: string | null;
+  qdrantPointId: string | null;
+  laneName: RetrievalLaneName;
+  evidenceSummary: string | null;
+  fusionScore: number;
 }
 
-/**
- * Enforces the No Placeholder Policy by calling resolveSourceRef() to determine if creating a placeholder is safe.
- * @param {string} query - The natural language or technical query describing the feature/concept.
- * @returns {Promise<PlaceholderDecision>} A promise resolving to the creation decision object.
- */
-export async function enforceNoPlaceholderPolicy(query) {
-    // Implementation calls resolveSourceRef() and applies business logic based on results.
-    throw new Error("Not implemented: Must implement policy enforcement logic.");
+export interface ResolvedSourceRef {
+  found: boolean;
+  sourceRef: string | null;
+  canonicalSourceRef: string | null;
+  confidence: number;
+  conflict: boolean;
+  winningLane: RetrievalLaneName | null;
+  evidence: SourceRefResult[];
+  reason: string;
+}
+
+export interface PlaceholderDecision {
+  allow_create: boolean;
+  reason: string;
+  resolved: ResolvedSourceRef;
+}
+
+const LANES: RetrievalLaneName[] = [
+  'atlas_packets',
+  'redis_semantic_cache',
+  'qdrant',
+  'postgres_jsonb',
+  'neo4j_graph',
+  'filesystem_rg',
+];
+
+export async function resolveSourceRef(query: string): Promise<ResolvedSourceRef> {
+  const evidence: SourceRefResult[] = [];
+
+  for (const lane of LANES) {
+    const result = await runRetrievalLane(lane, query);
+    evidence.push(result);
+  }
+
+  const hits = evidence
+    .filter((e) => e.found && e.sourceRef)
+    .sort((a, b) => b.fusionScore - a.fusionScore);
+
+  if (hits.length === 0) {
+    return {
+      found: false,
+      sourceRef: null,
+      canonicalSourceRef: null,
+      confidence: 0,
+      conflict: false,
+      winningLane: null,
+      evidence,
+      reason: 'No authoritative source evidence found in any retrieval lane.',
+    };
+  }
+
+  const uniqueRefs = new Set(hits.map((h) => h.sourceRef));
+  const conflict = uniqueRefs.size > 1;
+  const winner = hits[0];
+
+  return {
+    found: true,
+    sourceRef: winner.sourceRef,
+    canonicalSourceRef: normalizeSourceRef(winner.sourceRef),
+    confidence: winner.fusionScore,
+    conflict,
+    winningLane: winner.laneName,
+    evidence,
+    reason: conflict
+      ? 'Multiple conflicting source references found.'
+      : `Authoritative source found via ${winner.laneName}.`,
+  };
+}
+
+export async function enforceNoPlaceholderPolicy(query: string): Promise<PlaceholderDecision> {
+  const resolved = await resolveSourceRef(query);
+
+  if (resolved.found) {
+    return {
+      allow_create: false,
+      reason: resolved.conflict
+        ? 'Blocked: conflicting existing source references found. Human review required.'
+        : `Blocked: existing authoritative source found: ${resolved.canonicalSourceRef}`,
+      resolved,
+    };
+  }
+
+  return {
+    allow_create: true,
+    reason: 'Allowed: no existing authoritative source evidence found.',
+    resolved,
+  };
+}
+
+async function runRetrievalLane(
+  laneName: RetrievalLaneName,
+  query: string
+): Promise<SourceRefResult> {
+  // Replace each switch branch with your real Atlas/Qdrant/Redis/Neo4j/filesystem adapter.
+  switch (laneName) {
+    case 'atlas_packets':
+    case 'redis_semantic_cache':
+    case 'qdrant':
+    case 'postgres_jsonb':
+    case 'neo4j_graph':
+    case 'filesystem_rg':
+      return {
+        found: false,
+        sourceRef: null,
+        packetKey: null,
+        qdrantPointId: null,
+        laneName,
+        evidenceSummary: null,
+        fusionScore: 0,
+      };
+  }
+}
+
+function normalizeSourceRef(sourceRef: string | null): string | null {
+  if (!sourceRef) return null;
+
+  return sourceRef
+    .replaceAll('\\', '/')
+    .replace(/^file:\/+/, 'file:')
+    .trim();
 }

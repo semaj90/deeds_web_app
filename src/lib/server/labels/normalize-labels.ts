@@ -229,6 +229,10 @@ export async function writeToQdrant(
       hotness_bucket: labels.hotness_bucket,
       feature_family: labels.feature_family,
       label_signature: labelsSignature(labels),
+      // New fields for advanced retrieval tracking
+      packet_key: packetKey,
+      source_ref: sourceRef,
+      qdrant_point_id: qdrantPointId,
       label_payload_version: 1,
       label_updated_at: new Date().toISOString(),
     },
