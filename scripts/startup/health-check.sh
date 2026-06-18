@@ -72,6 +72,7 @@ echo ""
 echo "🛠️  Development Tools:"
 check_service "MCP TRACE" "8788" "/tools" || ((FAILED++))
 check_service "KB Retrieval" "8789" "/" || ((FAILED++))
+check_service "Go Retrieval (HTTP)" "8100" "/health" || ((FAILED++))
 echo ""
 
 # Summary

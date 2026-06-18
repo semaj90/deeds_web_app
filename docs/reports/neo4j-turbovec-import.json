@@ -1,0 +1,53 @@
+{
+  "generatedAt": "2026-06-18T15:46:10.021Z",
+  "mode": "dry-run",
+  "inputPath": ".tmp/turbovec-neighbors.ndjson",
+  "summary": {
+    "rowsRead": 20,
+    "rowsSelected": 5,
+    "rowsImported": 0,
+    "rowsSkipped": 15,
+    "qdrantReachable": null,
+    "neo4jReachable": true,
+    "failures": 0
+  },
+  "samples": [
+    {
+      "source_id": ".opencode/cards/000678ef52ca67b0.json:L1",
+      "neighbor_id": ".opencode/cards/0012bc7350ff2a70.json:L1",
+      "similarity": 0.2091340273618698,
+      "topk_rank": 1,
+      "source": "turbovec"
+    },
+    {
+      "source_id": ".opencode/cards/000678ef52ca67b0.json:L1",
+      "neighbor_id": ".opencode/cards/001f2d08e4459234.json:L1",
+      "similarity": 0.04002489522099495,
+      "topk_rank": 2,
+      "source": "turbovec"
+    },
+    {
+      "source_id": ".opencode/cards/000678ef52ca67b0.json:L1",
+      "neighbor_id": ".opencode/cards/001570455730d2d7.json:L1",
+      "similarity": -0.018151406198740005,
+      "topk_rank": 3,
+      "source": "turbovec"
+    },
+    {
+      "source_id": ".opencode/cards/000678ef52ca67b0.json:L1",
+      "neighbor_id": ".opencode/cards/00116e85cfe0456e.json:L1",
+      "similarity": -0.03316513076424599,
+      "topk_rank": 4,
+      "source": "turbovec"
+    },
+    {
+      "source_id": ".opencode/cards/00116e85cfe0456e.json:L1",
+      "neighbor_id": ".opencode/cards/001570455730d2d7.json:L1",
+      "similarity": 0.12139381468296051,
+      "topk_rank": 1,
+      "source": "turbovec"
+    }
+  ],
+  "status": "DRY_RUN_READY",
+  "nextSafeAction": "Review the dry-run edge plan, then rerun with --apply when the input lane is ready."
+}

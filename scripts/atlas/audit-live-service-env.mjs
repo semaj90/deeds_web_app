@@ -15,6 +15,7 @@ import fsp from 'node:fs/promises';
 import net from 'node:net';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import pg from 'pg';
 import {
   loadRepoEnv,
   normalizeConnectionHost,
@@ -29,12 +30,14 @@ const REPORT_JSON = path.join(ROOT, 'docs', 'reports', 'live-service-env-report.
 const REPORT_MD = path.join(ROOT, 'docs', 'reports', 'live-service-env-report.md');
 const JSON_OUT = process.argv.includes('--json');
 const STRICT = process.argv.includes('--strict');
+const { Pool } = pg;
 
 const EXPECTED = {
   postgres: { host: '127.0.0.1', port: 5434 },
   qdrant: { host: '127.0.0.1', port: 6333 },
   neo4j: { host: '127.0.0.1', port: 7687 },
   redis: { host: '127.0.0.1', port: 6379 },
+  goRetrieval: { host: '127.0.0.1', httpPort: 8100, grpcPort: 50053 },
 };
 
 function tcpProbe(host, port, timeoutMs = 2500) {
@@ -164,6 +167,27 @@ function parseRedisConfig(env) {
   };
 }
 
+function parseGoRetrievalConfig(env) {
+  const httpRaw = String(env.RETRIEVAL_HTTP_URL ?? env.GO_RETRIEVAL_HTTP_URL ?? '').trim();
+  const grpcRaw = String(env.RETRIEVAL_GRPC_URL ?? env.GO_RETRIEVAL_GRPC_URL ?? '').trim();
+  const httpParsed = parseUrlLike(httpRaw, 'http');
+  const grpcParsed = parseUrlLike(grpcRaw, 'http');
+  const host = normalizeConnectionHost(
+    httpParsed?.hostname ?? grpcParsed?.hostname ?? env.RETRIEVAL_HOST ?? EXPECTED.goRetrieval.host,
+    EXPECTED.goRetrieval.host,
+  );
+  return {
+    httpRaw,
+    grpcRaw,
+    configured: Boolean(httpRaw || grpcRaw || env.RETRIEVAL_HTTP_ENABLED || env.RETRIEVAL_GRPC_ENABLED),
+    host,
+    httpPort: Number(httpParsed?.port || env.RETRIEVAL_HTTP_PORT || EXPECTED.goRetrieval.httpPort),
+    grpcPort: Number(grpcParsed?.port || env.RETRIEVAL_GRPC_PORT || EXPECTED.goRetrieval.grpcPort),
+    httpEnabled: (env.RETRIEVAL_HTTP_ENABLED ?? 'false') === 'true',
+    grpcEnabled: (env.RETRIEVAL_GRPC_ENABLED ?? 'false') === 'true',
+  };
+}
+
 function provenanceSpine() {
   return [
     'source_ref',
@@ -172,6 +196,8 @@ function provenanceSpine() {
     'atlas_feature_map',
     'qdrant_point_id',
     'route_runtime_packets',
+    'retrieval_telemetry',
+    'go_retrieval_service',
     'neo4j contextual tree',
   ];
 }
@@ -218,6 +244,17 @@ function renderMarkdown(report) {
     `- qdrant_backfill_blockers: ${report.qdrantBackfill.blockers.length ? report.qdrantBackfill.blockers.join(', ') : 'none'}`,
     `- qdrant_backfill_notes: ${report.qdrantBackfill.notes}`,
     '',
+    '## Retrieval Telemetry',
+    '',
+    `- status: ${report.telemetry?.status ?? 'SOURCE_UNAVAILABLE'}`,
+    `- detail: ${report.telemetry?.detail ?? 'n/a'}`,
+    `- total rows: ${report.telemetry?.totalRows ?? 'n/a'}`,
+    `- recent 24h rows: ${report.telemetry?.recent24hRows ?? 'n/a'}`,
+    `- rows with selected_packet_keys: ${report.telemetry?.withSelectedPacketKeys ?? 'n/a'}`,
+    `- rows with feature_ids: ${report.telemetry?.withFeatureIds ?? 'n/a'}`,
+    `- rows with retrieval_strategy: ${report.telemetry?.withStrategy ?? 'n/a'}`,
+    `- latest at: ${report.telemetry?.latestAt ?? 'n/a'}`,
+    '',
     '## Notes',
     '',
     '- This report is read-only.',
@@ -238,12 +275,15 @@ async function main() {
   const qdrantConfig = parseQdrantConfig(env);
   const neo4jConfig = parseNeo4jConfig(env);
   const redisConfig = parseRedisConfig(env);
+  const goRetrievalConfig = parseGoRetrievalConfig(env);
 
   const probes = {
     postgres: await tcpProbe(postgresConfig.host ?? EXPECTED.postgres.host, postgresConfig.port ?? EXPECTED.postgres.port),
     qdrant: await tcpProbe(qdrantConfig.host ?? EXPECTED.qdrant.host, qdrantConfig.port ?? EXPECTED.qdrant.port),
     neo4j: await tcpProbe(neo4jConfig.host ?? EXPECTED.neo4j.host, neo4jConfig.port ?? EXPECTED.neo4j.port),
     redis: await tcpProbe(redisConfig.host ?? EXPECTED.redis.host, redisConfig.port ?? EXPECTED.redis.port),
+    goRetrievalHttp: await tcpProbe(goRetrievalConfig.host ?? EXPECTED.goRetrieval.host, goRetrievalConfig.httpPort ?? EXPECTED.goRetrieval.httpPort),
+    goRetrievalGrpc: await tcpProbe(goRetrievalConfig.host ?? EXPECTED.goRetrieval.host, goRetrievalConfig.grpcPort ?? EXPECTED.goRetrieval.grpcPort),
   };
 
   const services = [
@@ -299,6 +339,34 @@ async function main() {
         redisConfig.authConfigured,
       ),
     },
+    {
+      name: 'Go Retrieval (HTTP)',
+      expected: { host: EXPECTED.goRetrieval.host, port: EXPECTED.goRetrieval.httpPort },
+      envDisplay: `${goRetrievalConfig.host}:${goRetrievalConfig.httpPort}`,
+      probeDisplay: probes.goRetrievalHttp.ok ? `${probes.goRetrievalHttp.latencyMs}ms` : probes.goRetrievalHttp.error || 'refused',
+      detail: goRetrievalConfig.httpRaw
+        ? `RETRIEVAL_HTTP_URL=${goRetrievalConfig.httpRaw}`
+        : `RETRIEVAL_HOST=${env.RETRIEVAL_HOST ?? 'n/a'} RETRIEVAL_HTTP_PORT=${env.RETRIEVAL_HTTP_PORT ?? 'n/a'}`,
+      status: classifyTcpProbe(
+        probes.goRetrievalHttp,
+        EXPECTED.goRetrieval,
+        goRetrievalConfig.configured ? classifyHostPort({ host: goRetrievalConfig.host, port: goRetrievalConfig.httpPort }, { host: EXPECTED.goRetrieval.host, port: EXPECTED.goRetrieval.httpPort }) : 'SOURCE_UNAVAILABLE',
+      ),
+    },
+    {
+      name: 'Go Retrieval (gRPC)',
+      expected: { host: EXPECTED.goRetrieval.host, port: EXPECTED.goRetrieval.grpcPort },
+      envDisplay: `${goRetrievalConfig.host}:${goRetrievalConfig.grpcPort}`,
+      probeDisplay: probes.goRetrievalGrpc.ok ? `${probes.goRetrievalGrpc.latencyMs}ms` : probes.goRetrievalGrpc.error || 'refused',
+      detail: goRetrievalConfig.grpcRaw
+        ? `RETRIEVAL_GRPC_URL=${goRetrievalConfig.grpcRaw}`
+        : `RETRIEVAL_GRPC_PORT=${env.RETRIEVAL_GRPC_PORT ?? 'n/a'}`,
+      status: classifyTcpProbe(
+        probes.goRetrievalGrpc,
+        { host: EXPECTED.goRetrieval.host, port: EXPECTED.goRetrieval.grpcPort },
+        goRetrievalConfig.configured ? classifyHostPort({ host: goRetrievalConfig.host, port: goRetrievalConfig.grpcPort }, { host: EXPECTED.goRetrieval.host, port: EXPECTED.goRetrieval.grpcPort }) : 'SOURCE_UNAVAILABLE',
+      ),
+    },
   ].map((service) => ({
     ...service,
     status: service.status === 'READY' && service.name === 'Redis' && !redisConfig.authConfigured
@@ -306,11 +374,62 @@ async function main() {
       : service.status,
   }));
 
+  const telemetry = await (async () => {
+    try {
+      if (services.find((svc) => svc.name === 'Postgres 18')?.status !== 'READY') {
+        return {
+          status: 'SOURCE_UNAVAILABLE',
+          detail: 'retrieval_telemetry skipped because Postgres 18 is not READY',
+        };
+      }
+      const pool = new Pool({ connectionString: resolveDatabaseUrl(env), max: 1 });
+      try {
+        const { rows } = await pool.query(`
+          SELECT
+            COUNT(*)::bigint AS total_rows,
+            COUNT(*) FILTER (WHERE created_at >= now() - interval '24 hours')::bigint AS recent_24h_rows,
+            COUNT(*) FILTER (WHERE COALESCE(jsonb_array_length(selected_packet_keys), 0) > 0)::bigint AS with_selected_packet_keys,
+            COUNT(*) FILTER (WHERE COALESCE(jsonb_array_length(feature_ids), 0) > 0)::bigint AS with_feature_ids,
+            COUNT(*) FILTER (WHERE retrieval_strategy IS NOT NULL)::bigint AS with_strategy,
+            MAX(created_at) AS latest_at
+          FROM retrieval_telemetry
+        `);
+        const row = rows[0] ?? {};
+        const totalRows = Number(row.total_rows ?? 0);
+        const recent24hRows = Number(row.recent_24h_rows ?? 0);
+        const withSelectedPacketKeys = Number(row.with_selected_packet_keys ?? 0);
+        const withFeatureIds = Number(row.with_feature_ids ?? 0);
+        const withStrategy = Number(row.with_strategy ?? 0);
+        return {
+          status: totalRows > 0 && recent24hRows > 0 ? 'READY' : 'DEGRADED',
+          totalRows,
+          recent24hRows,
+          withSelectedPacketKeys,
+          withFeatureIds,
+          withStrategy,
+          latestAt: row.latest_at ?? null,
+          detail:
+            totalRows > 0
+              ? `retrieval_telemetry rows=${totalRows}, recent24h=${recent24hRows}`
+              : 'retrieval_telemetry is empty',
+        };
+      } finally {
+        await pool.end();
+      }
+    } catch (error) {
+      return {
+        status: 'SOURCE_UNAVAILABLE',
+        detail: error instanceof Error ? error.message : String(error),
+      };
+    }
+  })();
+
   const report = {
     schema: 'live_service_env.v1',
     generatedAt: new Date().toISOString(),
     readOnly: true,
     services,
+    telemetry,
     provenance: {
       spine: provenanceSpine(),
     },
@@ -327,6 +446,7 @@ async function main() {
         AUTH_REQUIRED: services.filter((svc) => svc.status === 'AUTH_REQUIRED').length,
         SOURCE_UNAVAILABLE: services.filter((svc) => svc.status === 'SOURCE_UNAVAILABLE').length,
       },
+      telemetryStatus: telemetry.status,
     },
   };
 
@@ -339,6 +459,7 @@ async function main() {
   } else {
     console.log('Live Service Env Audit');
     console.log(`READY ${report.summary.counts.READY} / ENV_MISMATCH ${report.summary.counts.ENV_MISMATCH} / PORT_MISMATCH ${report.summary.counts.PORT_MISMATCH} / SERVICE_STOPPED ${report.summary.counts.SERVICE_STOPPED} / AUTH_REQUIRED ${report.summary.counts.AUTH_REQUIRED} / SOURCE_UNAVAILABLE ${report.summary.counts.SOURCE_UNAVAILABLE}`);
+    console.log(`Telemetry ${report.telemetry.status}: ${report.telemetry.detail}`);
     console.log(`Wrote ${REPORT_JSON}`);
     console.log(`Wrote ${REPORT_MD}`);
   }

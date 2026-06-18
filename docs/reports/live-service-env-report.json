@@ -1,6 +1,6 @@
 {
   "schema": "live_service_env.v1",
-  "generatedAt": "2026-06-12T02:21:55.453Z",
+  "generatedAt": "2026-06-18T14:36:58.695Z",
   "readOnly": true,
   "services": [
     {
@@ -46,8 +46,40 @@
       "probeDisplay": "0ms",
       "detail": "REDIS_URL=redis://127.0.0.1:6379",
       "status": "READY"
+    },
+    {
+      "name": "Go Retrieval (HTTP)",
+      "expected": {
+        "host": "127.0.0.1",
+        "port": 8100
+      },
+      "envDisplay": "localhost:8100",
+      "probeDisplay": "4ms",
+      "detail": "RETRIEVAL_HTTP_URL=http://localhost:8100",
+      "status": "ENV_MISMATCH"
+    },
+    {
+      "name": "Go Retrieval (gRPC)",
+      "expected": {
+        "host": "127.0.0.1",
+        "port": 50053
+      },
+      "envDisplay": "localhost:50053",
+      "probeDisplay": "2ms",
+      "detail": "RETRIEVAL_GRPC_URL=127.0.0.1:50053",
+      "status": "ENV_MISMATCH"
     }
   ],
+  "telemetry": {
+    "status": "READY",
+    "totalRows": 179,
+    "recent24hRows": 25,
+    "withSelectedPacketKeys": 179,
+    "withFeatureIds": 179,
+    "withStrategy": 179,
+    "latestAt": "2026-06-18T01:12:39.547Z",
+    "detail": "retrieval_telemetry rows=179, recent24h=25"
+  },
   "provenance": {
     "spine": [
       "source_ref",
@@ -56,6 +88,8 @@
       "atlas_feature_map",
       "qdrant_point_id",
       "route_runtime_packets",
+      "retrieval_telemetry",
+      "go_retrieval_service",
       "neo4j contextual tree"
     ]
   },
@@ -67,11 +101,12 @@
   "summary": {
     "counts": {
       "READY": 4,
-      "ENV_MISMATCH": 0,
+      "ENV_MISMATCH": 2,
       "PORT_MISMATCH": 0,
       "SERVICE_STOPPED": 0,
       "AUTH_REQUIRED": 0,
       "SOURCE_UNAVAILABLE": 0
-    }
+    },
+    "telemetryStatus": "READY"
   }
 }

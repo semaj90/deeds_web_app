@@ -7,7 +7,7 @@
  * OpenAI-shaped response.
  *
  * This is what makes OpenWebUI (or any OpenAI-compat client) talk to your
- * full agent brain instead of raw llama-server.
+ * full agent brain instead of raw llama-server.exe.
  *
  * Flow:
  *   OpenAI request → extract last user query
@@ -1977,3 +1977,4 @@ export const ADVERTISED_MODELS = [
   { id: 'gemma3-legal',   owned_by: 'yorha' },   // → gemma3-legal
   { id: 'gemma3:270m',    owned_by: 'ollama' },
 ] as const;
+

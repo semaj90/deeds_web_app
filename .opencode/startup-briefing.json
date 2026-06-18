@@ -1,11 +1,11 @@
 {
-  "generatedAt": "2026-06-18T01:01:43.806Z",
+  "generatedAt": "2026-06-18T15:30:41.852Z",
   "appRoot": "C:/Users/james/Videos/deeds-web-app",
   "readOnly": true,
   "env": {
     "appRootResolvedFromEnv": false,
     "redisPasswordConfigured": true,
-    "valkeyPasswordConfigured": false
+    "valkeyPasswordConfigured": true
   },
   "summary": {
     "productionReadiness": {
@@ -25,6 +25,42 @@
         "qdrantPoints": 52606,
         "neo4jCodebaseFiles": 0
       }
+    },
+    "liveServiceEnv": {
+      "exists": true,
+      "generatedAt": "2026-06-18T15:06:44.774Z",
+      "readOnly": true,
+      "telemetryStatus": "READY",
+      "counts": {
+        "READY": 2,
+        "ENV_MISMATCH": 0,
+        "PORT_MISMATCH": 0,
+        "SERVICE_STOPPED": 0,
+        "AUTH_REQUIRED": 0,
+        "SOURCE_UNAVAILABLE": 0
+      },
+      "telemetry": {
+        "status": "READY",
+        "totalRows": 179,
+        "recent24hRows": 25,
+        "withSelectedPacketKeys": 179,
+        "withFeatureIds": 179,
+        "withStrategy": 179,
+        "latestAt": "2026-06-18T01:12:39.547Z"
+      },
+      "goRetrieval": {
+        "http": {
+          "status": "READY",
+          "envDisplay": "http://127.0.0.1:8100",
+          "detail": "HTTP listener present on :8100"
+        },
+        "grpc": {
+          "status": "READY",
+          "envDisplay": "127.0.0.1:50053",
+          "detail": "gRPC listener present on :50053"
+        }
+      },
+      "nextSafeAction": "Go Retrieval is aligned; move to the next retrieval lane."
     },
     "temporalTaskRegistry": {
       "exists": true,
@@ -99,6 +135,43 @@
       "failures": 0,
       "passwordConfigured": false
     },
+    "qdrantTagMirror": {
+      "exists": true,
+      "generatedAt": "2026-06-18T15:13:28.604Z",
+      "mode": "apply",
+      "inputRows": 3251,
+      "selectedRows": 3251,
+      "eligibleRows": 2488,
+      "patchedRows": 2488,
+      "skippedNoQdrantPointId": 763,
+      "qdrantReachable": false,
+      "patchRatePct": 100,
+      "nextSafeAction": "Run the materializer again only if the packet ledger changed; do not re-embed or recreate collections."
+    },
+    "sourceRefContextNeo4j": {
+      "exists": true,
+      "generatedAt": "2026-06-18T15:26:25.243Z",
+      "status": "APPLY_OK",
+      "totalSamples": 40,
+      "readyToProjectRows": 23,
+      "alreadyProjectedRows": 0,
+      "missingJoinRows": 0,
+      "applyAttempted": true,
+      "applyRowsMerged": 25,
+      "applyError": null,
+      "nextSafeAction": "Re-run the sourceRef projection dry-run and then move to SOM 20x20 / auto-clustering if the graph lane stays stable."
+    },
+    "usedPacketEdgeSeed": {
+      "exists": true,
+      "generatedAt": "2026-06-18T15:24:20.516Z",
+      "mode": "APPLY",
+      "status": "APPLY_OK",
+      "candidateEdges": 135,
+      "packetEvidenceRows": 135,
+      "uniqueTraceIds": 135,
+      "uniquePacketKeys": 45,
+      "applyStatus": "APPLIED_HTTP"
+    },
     "redisCentroidMirror": {
       "exists": true,
       "generatedAt": "2026-06-16T16:36:47.449Z",
@@ -141,9 +214,91 @@
         "runtimeCoverageStatus": "HIGHER_HOP_ENRICHMENT_PENDING"
       }
     },
+    "repoFunctionRegistry": {
+      "exists": true,
+      "generatedAt": "2026-06-18T14:59:44.423Z",
+      "totalRows": 1479,
+      "countsByKind": {
+        "function": 892,
+        "doc_topic": 371,
+        "cli_command": 125,
+        "mcp_tool": 91
+      },
+      "topKinds": [
+        {
+          "kind": "function",
+          "count": 892
+        },
+        {
+          "kind": "doc_topic",
+          "count": 371
+        },
+        {
+          "kind": "cli_command",
+          "count": 125
+        }
+      ],
+      "topRows": [
+        {
+          "featureId": "feature.agent.opencode",
+          "featureLabel": "OpenCode Agent",
+          "kind": "doc_topic",
+          "sourceRef": "CONTEXT-WINDOW-ALIGNMENT-ollama-turboquant-opencode-2026-05-20.md#1-treat-65536-as-the-canonical-long-context-target",
+          "symbol": "1-treat-65536-as-the-canonical-long-context-target"
+        },
+        {
+          "featureId": "feature.agent.opencode",
+          "featureLabel": "OpenCode Agent",
+          "kind": "doc_topic",
+          "sourceRef": "CONTEXT-WINDOW-ALIGNMENT-ollama-turboquant-opencode-2026-05-20.md#2-keep-a-smaller-fallback-lane-for-safety",
+          "symbol": "2-keep-a-smaller-fallback-lane-for-safety"
+        },
+        {
+          "featureId": "feature.agent.opencode",
+          "featureLabel": "OpenCode Agent",
+          "kind": "doc_topic",
+          "sourceRef": "CONTEXT-WINDOW-ALIGNMENT-ollama-turboquant-opencode-2026-05-20.md#a-turboquant-launcher-path",
+          "symbol": "a-turboquant-launcher-path"
+        },
+        {
+          "featureId": "feature.agent.opencode",
+          "featureLabel": "OpenCode Agent",
+          "kind": "doc_topic",
+          "sourceRef": "CONTEXT-WINDOW-ALIGNMENT-ollama-turboquant-opencode-2026-05-20.md#active-conclusion",
+          "symbol": "active-conclusion"
+        },
+        {
+          "featureId": "feature.agent.opencode",
+          "featureLabel": "OpenCode Agent",
+          "kind": "doc_topic",
+          "sourceRef": "CONTEXT-WINDOW-ALIGNMENT-ollama-turboquant-opencode-2026-05-20.md#b-app-layer-budget-guard",
+          "symbol": "b-app-layer-budget-guard"
+        }
+      ],
+      "topFeatureIds": [
+        "feature.agent.opencode"
+      ]
+    },
+    "mcpToolSummaryRegistry": {
+      "exists": true,
+      "generatedAt": "2026-06-18T15:05:00.545Z",
+      "mode": "grouped",
+      "totalInputRows": 1468,
+      "totalSummaries": 87,
+      "primaryFeatureId": "feature.synthesis.gemma4",
+      "primaryFeatureLabel": "Gemma4 Synthesis",
+      "primarySummary": "<|channel>thought\nThe user wants me to summarize indexed repository packets for `feature_id=feature.synthesis.gemma4`.\nI must:\n1.  Only summarize the provided rows.\n2.  Do not generalize beyond the provided rows.\n3.  Prefer `source_ref`, `feature_id`, `file_path`, and `copy_merge_use` in the output structure (though `copy_merge_use` is not provided, I will focus on the core operational summary).\n4.  Return concise operational summaries, keeping the focus on merging/synthesis.\n\nAnalyzing the rows:\n\n*   **Row 1:** `scripts/atlas/agentic-recommendation-workflow.mjs` - `normalizeSummaryText` (Synthesis/Recommendation workflow).\n*   **Row 2:** `scripts/atlas/agentic-recommendation-workflow.mjs` - `summarizeInputPresence` (Synthesis/Recommendation workflow).\n*   **Row 3:** `scripts/atlas/audit-agent-trace-data-maturity.mjs` - `classify` (Synthesis/Audit/Data Maturity).\n*   **Row 4:** `scripts/atlas/audit-agent-trace-data-maturity.mjs` - `summarizeQlorA` (Synthesis/Audit/Data Maturity).\n*   **Row 5:** `scripts/atlas/audit-agent-trace-data-maturity.mjs` - `summarizeTraceSmoke` (Synthesis/Audit/Data Maturity).\n\nI will structure the summary by file/module, detailing the functions and their purpose in a merge-focused way.<channel|>**Operational Summary for `feature.synthesis.gemma4`**\n\n**`scripts/atlas/agentic-recommendation-workflow.mjs`**\n*   **`normalizeSummaryText`**: Function for normalizing summary text within the agentic recommendation workflow.\n*   **`summarizeInputPresence`**: Function designed to summarize input presence within the agentic recommendation workflow.\n\n**`scripts/atlas/audit-agent-trace-data-maturity.mjs`**\n*   **`classify`**: Function used for classification within the audit agent trace data maturity process.\n*   **`summarizeQlorA`**: Function to summarize QlorA data within the audit agent trace data maturity process.\n*   **`summarizeTraceSmoke`**: Function to summarize trace data within the audit agent trace data maturity process.",
+      "primarySourceRefs": [
+        "scripts/atlas/agentic-recommendation-workflow.mjs#normalizeSummaryText",
+        "scripts/atlas/agentic-recommendation-workflow.mjs#summarizeInputPresence",
+        "scripts/atlas/audit-agent-trace-data-maturity.mjs#classify",
+        "scripts/atlas/audit-agent-trace-data-maturity.mjs#summarizeQlorA",
+        "scripts/atlas/audit-agent-trace-data-maturity.mjs#summarizeTraceSmoke"
+      ]
+    },
     "higherHopEnrichment": {
       "exists": true,
-      "generatedAt": "2026-06-14T20:55:53.232Z",
+      "generatedAt": "2026-06-18T15:22:21.344Z",
       "status": "HIGHER_HOP_GAP",
       "totalRows": 22,
       "somClusterCoveragePct": 0,
@@ -155,7 +310,7 @@
     },
     "higherHopSchemaRepair": {
       "exists": true,
-      "generatedAt": "2026-06-15T15:30:03.131Z",
+      "generatedAt": "2026-06-18T15:22:21.510Z",
       "status": "COMPLETE",
       "featureMetadata": {
         "rowsScanned": 32702,
@@ -180,8 +335,8 @@
         "totalRows": 22,
         "sourceRefRows": 23,
         "featureIdRows": 23,
-        "featureLabelRows": 23,
-        "averageLineageScorePct": 29,
+        "featureLabelRows": 32,
+        "averageLineageScorePct": 25.4,
         "rows": {
           "somCluster": 0,
           "glyphRecord": 0,
@@ -817,6 +972,10 @@
         "exists": true,
         "path": "C:\\Users\\james\\Videos\\deeds-web-app\\docs\\reports\\parent-atlas-production-readiness-report.json"
       },
+      "liveServiceEnv": {
+        "exists": true,
+        "path": "C:\\Users\\james\\Documents\\Codex\\2026-05-12\\ve-updated-the-local-quantization-notebook\\docs\\reports\\live-service-env-report.json"
+      },
       "temporalTaskRegistry": {
         "exists": true,
         "path": "C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\docs\\reports\\temporal-task-registry-report.json"
@@ -849,6 +1008,18 @@
         "exists": true,
         "path": "C:\\Users\\james\\Documents\\Codex\\2026-05-12\\ve-updated-the-local-quantization-notebook\\docs\\reports\\bitfrost-semantic-cache-warm.json"
       },
+      "qdrantTagMirror": {
+        "exists": true,
+        "path": "C:\\Users\\james\\Documents\\Codex\\2026-05-12\\ve-updated-the-local-quantization-notebook\\docs\\reports\\qdrant-tag-mirror-audit.json"
+      },
+      "sourceRefContextNeo4j": {
+        "exists": true,
+        "path": "C:\\Users\\james\\Documents\\Codex\\2026-05-12\\ve-updated-the-local-quantization-notebook\\docs\\reports\\sourceRef-context-neo4j-report.json"
+      },
+      "usedPacketEdgeSeed": {
+        "exists": true,
+        "path": "C:\\Users\\james\\Documents\\Codex\\2026-05-12\\ve-updated-the-local-quantization-notebook\\docs\\reports\\used-packet-edge-seed-report.json"
+      },
       "redisCentroidMirror": {
         "exists": true,
         "path": "C:\\Users\\james\\Documents\\Codex\\2026-05-12\\ve-updated-the-local-quantization-notebook\\docs\\reports\\redis-centroid-mirror-wiring.json"
@@ -856,6 +1027,14 @@
       "agenticRecommendationWorkflow": {
         "exists": true,
         "path": "C:\\Users\\james\\Documents\\Codex\\2026-05-12\\ve-updated-the-local-quantization-notebook\\docs\\reports\\agentic-recommendation-workflow.json"
+      },
+      "repoFunctionRegistry": {
+        "exists": true,
+        "path": "C:\\Users\\james\\Documents\\Codex\\2026-05-12\\ve-updated-the-local-quantization-notebook\\docs\\reports\\repo-function-registry.json"
+      },
+      "mcpToolSummaryRegistry": {
+        "exists": true,
+        "path": "C:\\Users\\james\\Documents\\Codex\\2026-05-12\\ve-updated-the-local-quantization-notebook\\docs\\reports\\mcp-tool-summary-registry.json"
       },
       "higherHopEnrichment": {
         "exists": true,
@@ -920,22 +1099,44 @@
       "redis": "healthy",
       "qdrant": "healthy",
       "neo4j": "unknown",
+      "goRetrievalHttp": "READY",
+      "goRetrievalGrpc": "READY",
+      "goRetrievalTelemetry": "READY",
       "packetContract": "wired",
       "turbovec": "deferred",
       "bitfrost": "PASS",
       "bitfrostWarm": "applied",
       "redisMirror": "PASS",
       "runtimeEvidence": "materialized",
-      "ldjson": "96.2%"
+      "ldjson": "96.2%",
+      "repoFunctionRegistry": "indexed (1479 rows)",
+      "mcpToolSummaryRegistry": "summarized (87 groups)",
+      "registryTopFeatureIds": [
+        "feature.agent.opencode"
+      ],
+      "registryTopKinds": [
+        {
+          "kind": "function",
+          "count": 892
+        },
+        {
+          "kind": "doc_topic",
+          "count": 371
+        },
+        {
+          "kind": "cli_command",
+          "count": 125
+        }
+      ]
     },
     "recommendations": [
+      "With the Qdrant tag mirror applied, move to the Neo4j / GDS topology pass until graph scores, community labels, and sourceRef projection are fully applied.",
+      "The Neo4j sourceRef projection is now applied; move to SOM 20x20 / auto-clustering once the graph lane is stable.",
       "Warm the Bitfrost semantic cache from canonical Postgres rows before treating mirrors as runtime truth.",
       "With Redis centroid and Bitfrost warm lanes applied, move retrieval work toward HyperRAG fusion rather than more cache mirroring.",
-      "Keep runtime evidence packetization on the admin-side path: turn Playwright, dev:gpu output, server logs, and cache events into chrom97 packets before Gemma4 synthesis.",
-      "Use the agentic recommendation workflow to pick the next lane and keep direct edits scoped to the selected target files.",
-      "Phase 1 higher-hop schema repair: backfill file_path, tree_node_id, and som_cluster before any optional table creation."
+      "Keep runtime evidence packetization on the admin-side path: turn Playwright, dev:gpu output, server logs, and cache events into chrom97 packets before Gemma4 synthesis."
     ],
-    "nextLane": "HyperRAG fusion wiring",
+    "nextLane": "SOM 20x20 / auto-clustering",
     "notes": {
       "indexingMode": "static-plus-temporal-refresh",
       "staticPacketIndexing": true,
@@ -949,6 +1150,17 @@
         "recommendedAction": true,
         "verificationCommand": true
       },
+      "liveServiceEnvStatus": "READY",
+      "goRetrievalHttpStatus": "READY",
+      "goRetrievalGrpcStatus": "READY",
+      "goRetrievalTelemetryCounts": {
+        "READY": 2,
+        "ENV_MISMATCH": 0,
+        "PORT_MISMATCH": 0,
+        "SERVICE_STOPPED": 0,
+        "AUTH_REQUIRED": 0,
+        "SOURCE_UNAVAILABLE": 0
+      },
       "higherHopSchemaRepairBlockingFields": [],
       "temporalTaskRegistry": "Historical concept evidence spine backfill",
       "bitfrostAuditStatus": "PASS",
@@ -956,6 +1168,31 @@
       "redisCentroidMirrorStatus": "PASS",
       "runtimeEvidencePacketizationStatus": "materialized",
       "runtimeEvidencePacketizationCoveragePct": 100,
+      "repoFunctionRegistryTotalRows": 1479,
+      "repoFunctionRegistryCountsByKind": {
+        "function": 892,
+        "doc_topic": 371,
+        "cli_command": 125,
+        "mcp_tool": 91
+      },
+      "repoFunctionRegistryPrimaryFeatureId": "feature.agent.opencode",
+      "repoFunctionRegistryTopKinds": [
+        {
+          "kind": "function",
+          "count": 892
+        },
+        {
+          "kind": "doc_topic",
+          "count": 371
+        },
+        {
+          "kind": "cli_command",
+          "count": 125
+        }
+      ],
+      "mcpToolSummaryRegistryTotalSummaries": 87,
+      "mcpToolSummaryRegistryPrimaryFeatureId": "feature.synthesis.gemma4",
+      "mcpToolSummaryRegistryPrimarySummary": "<|channel>thought\nThe user wants me to summarize indexed repository packets for `feature_id=feature.synthesis.gemma4`.\nI must:\n1.  Only summarize the provided rows.\n2.  Do not generalize beyond the provided rows.\n3.  Prefer `source_ref`, `feature_id`, `file_path`, and `copy_merge_use` in the output structure (though `copy_merge_use` is not provided, I will focus on the core operational summary).\n4.  Return concise operational summaries, keeping the focus on merging/synthesis.\n\nAnalyzing the rows:\n\n*   **Row 1:** `scripts/atlas/agentic-recommendation-workflow.mjs` - `normalizeSummaryText` (Synthesis/Recommendation workflow).\n*   **Row 2:** `scripts/atlas/agentic-recommendation-workflow.mjs` - `summarizeInputPresence` (Synthesis/Recommendation workflow).\n*   **Row 3:** `scripts/atlas/audit-agent-trace-data-maturity.mjs` - `classify` (Synthesis/Audit/Data Maturity).\n*   **Row 4:** `scripts/atlas/audit-agent-trace-data-maturity.mjs` - `summarizeQlorA` (Synthesis/Audit/Data Maturity).\n*   **Row 5:** `scripts/atlas/audit-agent-trace-data-maturity.mjs` - `summarizeTraceSmoke` (Synthesis/Audit/Data Maturity).\n\nI will structure the summary by file/module, detailing the functions and their purpose in a merge-focused way.<channel|>**Operational Summary for `feature.synthesis.gemma4`**\n\n**`scripts/atlas/agentic-recommendation-workflow.mjs`**\n*   **`normalizeSummaryText`**: Function for normalizing summary text within the agentic recommendation workflow.\n*   **`summarizeInputPresence`**: Function designed to summarize input presence within the agentic recommendation workflow.\n\n**`scripts/atlas/audit-agent-trace-data-maturity.mjs`**\n*   **`classify`**: Function used for classification within the audit agent trace data maturity process.\n*   **`summarizeQlorA`**: Function to summarize QlorA data within the audit agent trace data maturity process.\n*   **`summarizeTraceSmoke`**: Function to summarize trace data within the audit agent trace data maturity process.",
       "agenticRecommendationWorkflowStatus": "DRY_RUN_READY",
       "turbovecPlanStatus": "READY"
     }

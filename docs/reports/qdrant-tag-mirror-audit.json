@@ -1,0 +1,93 @@
+{
+  "generatedAt": "2026-06-18T15:31:54.264Z",
+  "mode": "apply",
+  "inputPath": ".tmp/addressable-packets.ndjson",
+  "summary": {
+    "inputRows": 100,
+    "selectedRows": 100,
+    "eligibleRows": 16,
+    "patchedRows": 16,
+    "skippedNoQdrantPointId": 84,
+    "skippedNoQdrantCollection": 0,
+    "skippedNoChanges": 0,
+    "failures": 0,
+    "qdrantReachable": false,
+    "patchRatePct": 100
+  },
+  "samples": [
+    {
+      "packet_key": "05f26c6dc1b51a12",
+      "qdrant_collection": "codebase_chunks_768",
+      "qdrant_point_id": "99773549",
+      "patch_keys": [
+        "packet_key",
+        "canonical_source_ref",
+        "source_ref",
+        "source_ref_key",
+        "feature_id",
+        "feature_label",
+        "lane_ids",
+        "tags",
+        "bm25_text",
+        "packet_kind",
+        "ledger_type",
+        "qdrant_payload_key",
+        "qdrant_vector_dim",
+        "tree_node_id",
+        "glyph_record_id",
+        "embedding_ref",
+        "payload_backfilled_at"
+      ]
+    },
+    {
+      "packet_key": "131a19548bb7040a",
+      "qdrant_collection": "codebase_chunks_768",
+      "qdrant_point_id": "225294562",
+      "patch_keys": [
+        "packet_key",
+        "canonical_source_ref",
+        "source_ref",
+        "source_ref_key",
+        "feature_id",
+        "feature_label",
+        "lane_ids",
+        "tags",
+        "bm25_text",
+        "packet_kind",
+        "ledger_type",
+        "qdrant_payload_key",
+        "tree_node_id",
+        "glyph_record_id",
+        "neo4j_node_id",
+        "embedding_ref",
+        "payload_backfilled_at"
+      ]
+    },
+    {
+      "packet_key": "16b72d0723810d7a",
+      "qdrant_collection": "codebase_chunks_768",
+      "qdrant_point_id": "430336446",
+      "patch_keys": [
+        "packet_key",
+        "canonical_source_ref",
+        "source_ref",
+        "source_ref_key",
+        "feature_id",
+        "feature_label",
+        "lane_ids",
+        "tags",
+        "bm25_text",
+        "packet_kind",
+        "ledger_type",
+        "qdrant_payload_key",
+        "tree_node_id",
+        "glyph_record_id",
+        "neo4j_node_id",
+        "embedding_ref",
+        "payload_backfilled_at"
+      ]
+    }
+  ],
+  "status": "APPLIED",
+  "nextSafeAction": "Run the materializer again only if the packet ledger changed; do not re-embed or recreate collections."
+}

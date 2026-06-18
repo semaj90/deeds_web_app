@@ -1,12 +1,50 @@
+import fs from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const REPO_ROOT = path.resolve(__dirname, '../../..');
+
+function loadNeo4jEnv() {
+  const envFiles = [
+    path.join(REPO_ROOT, '.env'),
+    path.join(REPO_ROOT, '.env.local'),
+    path.join(REPO_ROOT, 'sveltekit-frontend', '.env'),
+    path.join(REPO_ROOT, 'sveltekit-frontend', '.env.local'),
+  ];
+
+  for (const envFile of envFiles) {
+    if (!fs.existsSync(envFile)) continue;
+
+    const lines = fs.readFileSync(envFile, 'utf8').split(/\r?\n/);
+    for (const line of lines) {
+      const trimmed = line.trim();
+      if (!trimmed || trimmed.startsWith('#')) continue;
+      const eq = trimmed.indexOf('=');
+      if (eq <= 0) continue;
+      const key = trimmed.slice(0, eq).trim();
+      const value = trimmed.slice(eq + 1).trim();
+      if (process.env[key] === undefined || process.env[key] === '') {
+        process.env[key] = value;
+      }
+    }
+  }
+}
+
+loadNeo4jEnv();
+
 function buildNeo4jHttpUrl({
   neo4jHttpUrl = process.env.NEO4J_HTTP_URL ?? null,
   neo4jUri = process.env.NEO4J_URI ?? process.env.NEO4J_URL ?? 'bolt://localhost:7687',
 } = {}) {
-  if (neo4jHttpUrl) return neo4jHttpUrl;
-  if (!neo4jUri) return null;
   try {
-    const parsed = new URL(String(neo4jUri).replace(/^bolt(\+s)?:\/\//i, 'http://'));
-    if (!parsed.port || parsed.port === '7687') parsed.port = '7474';
+    const base = neo4jHttpUrl
+      ? String(neo4jHttpUrl)
+      : String(neo4jUri).replace(/^bolt(\+s)?:\/\//i, 'http://');
+    if (!base) return null;
+
+    const parsed = new URL(base);
+    if (!neo4jHttpUrl && (!parsed.port || parsed.port === '7687')) parsed.port = '7474';
     if (!parsed.pathname || parsed.pathname === '/') parsed.pathname = '/db/neo4j/tx/commit';
     if (!parsed.pathname.endsWith('/tx/commit')) parsed.pathname = '/db/neo4j/tx/commit';
     return parsed.toString();
@@ -19,11 +57,14 @@ async function queryNeo4jHttp({
   neo4jHttpUrl = null,
   neo4jUri = null,
   username = process.env.NEO4J_USER ?? 'neo4j',
-  password = process.env.NEO4J_PASSWORD ?? 'neo4j123',
+  password = process.env.NEO4J_PASSWORD ?? process.env.NEO4J_PASS ?? 'neo4j123',
   statement,
   parameters = {},
 } = {}) {
-  const httpUrl = buildNeo4jHttpUrl({ neo4jHttpUrl, neo4jUri });
+  const buildOpts = {};
+  if (neo4jHttpUrl !== null && neo4jHttpUrl !== undefined) buildOpts.neo4jHttpUrl = neo4jHttpUrl;
+  if (neo4jUri !== null && neo4jUri !== undefined) buildOpts.neo4jUri = neo4jUri;
+  const httpUrl = buildNeo4jHttpUrl(buildOpts);
   if (!httpUrl) {
     return { ok: false, error: 'missing_neo4j_http_url' };
   }
@@ -94,12 +135,14 @@ async function countNeo4jRelationship({
   neo4jHttpUrl = null,
   neo4jUri = null,
   username = process.env.NEO4J_USER ?? 'neo4j',
-  password = process.env.NEO4J_PASSWORD ?? 'neo4j123',
+  password = process.env.NEO4J_PASSWORD ?? process.env.NEO4J_PASS ?? 'neo4j123',
   relationshipType,
 } = {}) {
+  const buildOpts = {};
+  if (neo4jHttpUrl !== null && neo4jHttpUrl !== undefined) buildOpts.neo4jHttpUrl = neo4jHttpUrl;
+  if (neo4jUri !== null && neo4jUri !== undefined) buildOpts.neo4jUri = neo4jUri;
   const result = await queryNeo4jHttp({
-    neo4jHttpUrl,
-    neo4jUri,
+    ...buildOpts,
     username,
     password,
     statement: `MATCH ()-[r:${relationshipType}]->() RETURN count(r) AS count`,

@@ -49,6 +49,20 @@ const SERVICES = [
     required: false,
     envVar: 'LLAMA_SERVER_URL',
   },
+  {
+    name: 'Go Retrieval HTTP',
+    host: '127.0.0.1',
+    port: 8100,
+    required: false,
+    envVar: 'RETRIEVAL_HTTP_URL',
+  },
+  {
+    name: 'Go Retrieval gRPC',
+    host: '127.0.0.1',
+    port: 50053,
+    required: false,
+    envVar: 'RETRIEVAL_GRPC_URL',
+  },
   { name: 'Ollama', host: '127.0.0.1', port: 11434, required: false, envVar: 'OLLAMA_HOST' },
   { name: 'RabbitMQ', host: '127.0.0.1', port: 5672, required: false, envVar: null },
   {

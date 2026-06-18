@@ -1,6 +1,6 @@
 # Architecture: Next Phases & State Machine (2026-05-29)
 
-**Date**: 2026-05-29 9:40 AM PDT  
+**Date**: 2026-05-29 9:40 AM PDT
 **Context**: Phase 1 (semantic caching) complete. Analyzing remaining work: graph algorithms, DuckDB integration, synthesis architecture, JSON-to-JSONB encoding, Redis/Valkey/Bitfrost caching, NES memory, 6-degree feature expansion, CUDA kernel packing.
 
 ---
@@ -180,7 +180,7 @@ getNESMemory(region: string): Uint8Array {
 }
 ```
 
-**Intended Use Case**: 
+**Intended Use Case**:
 - Store compressed feature cards / glyphs in 6502-era addressable memory (8-bit CPU)
 - Simulate ROM cartridge for retrieval lookups (ultra-low latency, deterministic)
 - Chrome DevTools NES emulator integration for visual debugging
@@ -188,6 +188,7 @@ getNESMemory(region: string): Uint8Array {
 **Missing** (not in roadmap, research-only):
 - [ ] Actual NES ROM packing (glyph → cartridge bytecode)
 - [ ] 6502 CPU emulation for card decompression
+  [ ] gpu based ppu like nes 1983 bitmap texture lod streaming
 - [ ] Visual waveform debug UI
 
 **Alternative**: Just use `Uint8Array` as packed binary format (no emulation needed).
@@ -234,7 +235,7 @@ getNESMemory(region: string): Uint8Array {
 - [ ] **Probabilistic edge pruning**: Drop low-confidence edges at hops 4-6 (avoid combinatorial explosion)
 - [ ] **Feature correlation matrix**: Cache (sourceRef, sourceRef) → correlation_score
 
-**Use Case**: 
+**Use Case**:
 When user asks "what's related to auth middleware?", return:
 ```
 1. auth.ts (direct)
@@ -286,7 +287,7 @@ When user asks "what's related to auth middleware?", return:
 
 ### P0: Finish Phase 1 Semantic Caching (TODAY)
 **Status**: ✅ Complete, ready to deploy
-**Action**: 
+**Action**:
 ```bash
 npm run test:semantic-cache
 # Validates redis-semantic-cache-mcp operational
@@ -401,6 +402,6 @@ npm run test:semantic-cache
 
 ---
 
-**Status**: Production-ready for Phase 1, roadmap clear for Phases 2-4  
-**Prepared by**: Claude (Anthropic)  
+**Status**: Production-ready for Phase 1, roadmap clear for Phases 2-4
+**Prepared by**: Claude (Anthropic)
 **Date**: 2026-05-29 9:40 AM PDT

@@ -1,0 +1,113 @@
+{
+  "timestamp": "2026-06-18T15:46:16.813Z",
+  "config": {
+    "dim": null,
+    "topk": 8,
+    "limit": 5,
+    "input": ".tmp/vector64-preview.jsonl",
+    "output": ".tmp/turbovec-neighbors.ndjson",
+    "embeddingsDir": ".opencode/embeddings",
+    "checkNeo4j": true
+  },
+  "gpu": {
+    "cuda_available": true,
+    "memory_probe_trusted": false
+  },
+  "counts": {
+    "loaded_rows": 5,
+    "valid_embeddings": 5,
+    "missing_embeddings": 0,
+    "wrong_dim_embeddings": 0,
+    "edges": 20
+  },
+  "neo4j": {
+    "checked": true,
+    "reachable": true,
+    "gds_available": false,
+    "error": "Neo4j reachable but GDS unavailable: Unknown procedure output: `version` (line 1, column 26 (offset: 25))\n\"CALL gds.version() YIELD version RETURN version\"\n                          ^"
+  },
+  "gaps": [
+    {
+      "type": "neo4j_gds",
+      "label": "Neo4j reachable but GDS unavailable",
+      "fallback": "Use TurboVec SIMILAR_TO edges + Cypher traversal",
+      "error": "Neo4j reachable but GDS unavailable: Unknown procedure output: `version` (line 1, column 26 (offset: 25))\n\"CALL gds.version() YIELD version RETURN version\"\n                          ^"
+    }
+  ],
+  "samples": {
+    "missing": [],
+    "badDim": [],
+    "edges": [
+      {
+        "source_id": ".opencode/cards/000678ef52ca67b0.json:L1",
+        "neighbor_id": ".opencode/cards/0012bc7350ff2a70.json:L1",
+        "similarity": 0.2091340273618698,
+        "topk_rank": 1,
+        "source": "turbovec"
+      },
+      {
+        "source_id": ".opencode/cards/000678ef52ca67b0.json:L1",
+        "neighbor_id": ".opencode/cards/001f2d08e4459234.json:L1",
+        "similarity": 0.04002489522099495,
+        "topk_rank": 2,
+        "source": "turbovec"
+      },
+      {
+        "source_id": ".opencode/cards/000678ef52ca67b0.json:L1",
+        "neighbor_id": ".opencode/cards/001570455730d2d7.json:L1",
+        "similarity": -0.018151406198740005,
+        "topk_rank": 3,
+        "source": "turbovec"
+      },
+      {
+        "source_id": ".opencode/cards/000678ef52ca67b0.json:L1",
+        "neighbor_id": ".opencode/cards/00116e85cfe0456e.json:L1",
+        "similarity": -0.03316513076424599,
+        "topk_rank": 4,
+        "source": "turbovec"
+      },
+      {
+        "source_id": ".opencode/cards/00116e85cfe0456e.json:L1",
+        "neighbor_id": ".opencode/cards/001570455730d2d7.json:L1",
+        "similarity": 0.12139381468296051,
+        "topk_rank": 1,
+        "source": "turbovec"
+      },
+      {
+        "source_id": ".opencode/cards/00116e85cfe0456e.json:L1",
+        "neighbor_id": ".opencode/cards/0012bc7350ff2a70.json:L1",
+        "similarity": 0.04440927132964134,
+        "topk_rank": 2,
+        "source": "turbovec"
+      },
+      {
+        "source_id": ".opencode/cards/00116e85cfe0456e.json:L1",
+        "neighbor_id": ".opencode/cards/000678ef52ca67b0.json:L1",
+        "similarity": -0.03316513076424599,
+        "topk_rank": 3,
+        "source": "turbovec"
+      },
+      {
+        "source_id": ".opencode/cards/00116e85cfe0456e.json:L1",
+        "neighbor_id": ".opencode/cards/001f2d08e4459234.json:L1",
+        "similarity": -0.11420968919992447,
+        "topk_rank": 4,
+        "source": "turbovec"
+      },
+      {
+        "source_id": ".opencode/cards/0012bc7350ff2a70.json:L1",
+        "neighbor_id": ".opencode/cards/001570455730d2d7.json:L1",
+        "similarity": 0.2683585286140442,
+        "topk_rank": 1,
+        "source": "turbovec"
+      },
+      {
+        "source_id": ".opencode/cards/0012bc7350ff2a70.json:L1",
+        "neighbor_id": ".opencode/cards/000678ef52ca67b0.json:L1",
+        "similarity": 0.2091340273618698,
+        "topk_rank": 2,
+        "source": "turbovec"
+      }
+    ]
+  }
+}

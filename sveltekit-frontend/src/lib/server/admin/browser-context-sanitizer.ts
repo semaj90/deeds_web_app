@@ -28,6 +28,7 @@ import {
   type BrowserHistoryHit,
   type SanitizedBrowserContext,
 } from '$lib/types/browser-context.js';
+import { createSafeRegex } from '$lib/server/utils/re2.js';
 
 /** Build the case-insensitive secret-name regex once. Matches `name=value`
  *  in URL queries AND `name: value` (colon, optional space) in snippet bodies. */
@@ -36,16 +37,10 @@ const TOKEN_NAME_PATTERN = REDACTED_TOKEN_NAMES.map(n =>
 ).join('|');
 
 /** Matches `?…token=value…` or `&…token=value…` inside a URL query string. */
-const URL_QUERY_TOKEN_RE = new RegExp(
-  `([?&])(${TOKEN_NAME_PATTERN})=[^&#]*`,
-  'gi',
-);
+const URL_QUERY_TOKEN_RE = createSafeRegex(`([?&])(${TOKEN_NAME_PATTERN})=[^&#]*`, 'gi');
 
 /** Matches `name: value` or `name = value` lines inside snippet bodies. */
-const SNIPPET_TOKEN_LINE_RE = new RegExp(
-  `^(\\s*(?:${TOKEN_NAME_PATTERN}))\\s*[:=]\\s*\\S.*$`,
-  'gim',
-);
+const SNIPPET_TOKEN_LINE_RE = createSafeRegex(`^(\\s*(?:${TOKEN_NAME_PATTERN}))\\s*[:=]\\s*\\S.*$`, 'gim');
 
 /** Bearer / JWT-shaped tokens floating free in text. */
 const BEARER_PREFIX_RE = /\b(Bearer\s+)[A-Za-z0-9._\-+/=]{16,}/g;
@@ -253,3 +248,6 @@ export function emptyContext(): BrowserContextSnapshot {
     embed_device: 'unavailable',
   };
 }
+
+
+

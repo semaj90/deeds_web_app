@@ -13,6 +13,7 @@ import { memoryCache } from '$lib/server/cache.js';
 import { getRedis } from '$lib/server/redis.js';
 import { bumpCaseVersion } from '$lib/server/cache-keys.js';
 import { dispatchOrExecuteInline } from '$lib/server/queue/dispatch-inline.js';
+import { wildcardToSafeRegex } from '$lib/server/utils/re2.js';
 
 /**
  * Cache invalidation patterns for different entity types
@@ -141,7 +142,7 @@ function hashText(text: string): string {
  * Clear memory cache entries matching a pattern
  */
 function clearMemoryCacheByPattern(pattern: string): number {
-  const regex = new RegExp('^' + pattern.replace(/\*/g, '.*') + '$');
+  const regex = wildcardToSafeRegex(pattern);
   let cleared = 0;
 
   for (const key of memoryCache.keys()) {
@@ -480,3 +481,5 @@ export const flushAllCache = async (userId?: string) => {
 		{ type: 'manual', userId, immediate: true }
 	);
 };
+
+

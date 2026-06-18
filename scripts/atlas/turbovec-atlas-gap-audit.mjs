@@ -18,15 +18,24 @@ function flag(name) {
 const bridge = require(path.resolve('simd-bridge/cpp/build/Release/tensorrt_bridge.node'));
 
 const GPU_REQUIRED = String(process.env.GPU_REQUIRED ?? '').toLowerCase() === 'true';
-const DIM = Number(arg('dim', process.env.EMBED_DIM ?? '384'));
+const DIM_ARG = arg('dim', process.env.EMBED_DIM ?? '');
+const DIM = Number(DIM_ARG || 0) || null;
 const TOPK = Number(arg('topk', process.env.TOPK ?? '8'));
 const LIMIT = Number(arg('limit', '0'));
 
-const input = arg('input', '.tmp/ace-nes-packets.json');
+const INPUT_CANDIDATES = [
+  arg('input', ''),
+  '.tmp/vector64-preview.jsonl',
+  '.tmp/atlas-vector64-dataset.jsonl',
+  '.tmp/ace-nes-packets.json',
+  '.tmp/phase17-pytorch-features.jsonl',
+  '.opencode/embeddings',
+].filter(Boolean);
 const output = arg('out', '.tmp/turbovec-neighbors.ndjson');
 const auditOutput = arg('audit-out', 'docs/reports/turbovec-atlas-gap-audit.json');
 const embeddingsDir = arg('embeddings-dir', '.opencode/embeddings');
 const CHECK_NEO4J = flag('neo4j') || String(process.env.CHECK_NEO4J ?? '').toLowerCase() === 'true';
+let RESOLVED_INPUT = null;
 
 console.log('[gpu] cuda=', bridge.checkCudaAvailable());
 
@@ -74,6 +83,9 @@ function unwrapEmbedding(value) {
 function getEmbedding(row) {
   return (
     unwrapEmbedding(row.embedding) ??
+    unwrapEmbedding(row.vector64) ??
+    unwrapEmbedding(row.vector_64) ??
+    unwrapEmbedding(row.vector_64d) ??
     unwrapEmbedding(row.vector) ??
     unwrapEmbedding(row.embeddings) ??
     unwrapEmbedding(row.payload?.embedding) ??
@@ -87,6 +99,9 @@ function getEmbedding(row) {
 function getId(row, i) {
   return String(
     row.id ??
+      row.sourceRef ??
+      row.source_ref ??
+      row.canonical_source_ref ??
       row.packet_id ??
       row.packetId ??
       row.uuid ??
@@ -126,12 +141,30 @@ function loadFromEmbeddingDir(dir) {
   return rows;
 }
 
+function resolveInputPath() {
+  for (const candidate of INPUT_CANDIDATES) {
+    if (candidate && fs.existsSync(candidate)) return candidate;
+  }
+  return null;
+}
+
+function inferDim(rows) {
+  for (const row of rows) {
+    const emb = getEmbedding(row);
+    if (Array.isArray(emb) && emb.length > 0) return emb.length;
+  }
+  return DIM ?? 384;
+}
+
 function loadRows() {
   let rows;
 
-  if (fs.existsSync(input)) {
-    rows = readPackets(input);
-    console.log('[load] input=', input, rows.length, 'packets');
+  RESOLVED_INPUT = resolveInputPath();
+  if (RESOLVED_INPUT) {
+    rows = fs.lstatSync(RESOLVED_INPUT).isDirectory()
+      ? loadFromEmbeddingDir(RESOLVED_INPUT)
+      : readPackets(RESOLVED_INPUT);
+    console.log('[load] input=', RESOLVED_INPUT, rows.length, 'packets');
   } else {
     console.log('[load] input missing, falling back to', embeddingsDir);
     rows = loadFromEmbeddingDir(embeddingsDir);
@@ -142,12 +175,12 @@ function loadRows() {
   return rows;
 }
 
-function packEmbeddings(rows) {
+function packEmbeddings(rows, dim) {
   const ids = [];
   const kept = [];
   const missing = [];
   const badDim = [];
-  const vectors = new Float32Array(rows.length * DIM);
+  const vectors = new Float32Array(rows.length * dim);
 
   let k = 0;
 
@@ -160,12 +193,12 @@ function packEmbeddings(rows) {
       continue;
     }
 
-    if (emb.length !== DIM) {
-      badDim.push({ index: i, id, got: emb.length, expected: DIM });
+    if (emb.length !== dim) {
+      badDim.push({ index: i, id, got: emb.length, expected: dim });
       continue;
     }
 
-    vectors.set(Float32Array.from(emb), k * DIM);
+    vectors.set(Float32Array.from(emb), k * dim);
     ids.push(id);
     kept.push(rows[i]);
     k++;
@@ -176,7 +209,7 @@ function packEmbeddings(rows) {
     rows: kept,
     missing,
     badDim,
-    vectors: vectors.slice(0, k * DIM),
+    vectors: vectors.slice(0, k * dim),
   };
 }
 
@@ -219,7 +252,7 @@ async function checkNeo4j() {
       process.env.NEO4J_URI ?? 'bolt://127.0.0.1:7687',
       neo4j.default.auth.basic(
         process.env.NEO4J_USER ?? 'neo4j',
-        process.env.NEO4J_PASSWORD ?? 'password'
+        process.env.NEO4J_PASSWORD ?? process.env.NEO4J_PASS ?? 'neo4j123'
       )
     );
 
@@ -247,7 +280,8 @@ async function checkNeo4j() {
 }
 
 const rows = loadRows();
-const packed = packEmbeddings(rows);
+const inferredDim = inferDim(rows);
+const packed = packEmbeddings(rows, inferredDim);
 
 console.log(
   '[pack]',
@@ -263,7 +297,7 @@ const edges = [];
 
 if (packed.ids.length >= 2) {
   console.time('[gpu] graphSimilarity');
-  const sim = bridge.graphSimilarity(packed.vectors, packed.ids.length, DIM);
+  const sim = bridge.graphSimilarity(packed.vectors, packed.ids.length, inferredDim);
   console.timeEnd('[gpu] graphSimilarity');
 
   if (!(sim instanceof Float32Array)) throw new Error(`graphSimilarity returned ${typeof sim}`);
@@ -336,7 +370,7 @@ const audit = {
     dim: DIM,
     topk: TOPK,
     limit: LIMIT,
-    input,
+    input: RESOLVED_INPUT,
     output,
     embeddingsDir,
     checkNeo4j: CHECK_NEO4J,
