@@ -5,7 +5,7 @@
  * Enables deterministic replay of packet RPC calls without re-querying live systems.
  */
 
-import type { HyperRagPacketRpcInput, HyperRagPacketRpcResult } from './hyperrag-packet-rpc.js';
+import type { HyperRagPacketRpcInput, HyperRagPacketRpcResult } from '../retrieval/hyperrag-packet-rpc.js';
 import type Redis from 'ioredis';
 
 export interface ReplayTraceEntry {

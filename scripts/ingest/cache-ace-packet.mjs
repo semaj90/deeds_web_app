@@ -8,7 +8,7 @@
  * Cache policy (Phase 11E):
  *   - Active repair (errors/blocked): 1 day TTL
  *   - Hot sourceRefs / feature labels: 7 days TTL
- *   - Standard ACE packet: 1–7 days TTL (default 1 day)
+ *   - Standard ACE packet: 1–7 days TTL (default 7 days)
  *   - Weekly cold-storage summary: 30+ days TTL
  *
  * Cache keys:
@@ -28,6 +28,7 @@
 import fs from 'fs/promises';
 import path from 'path';
 import crypto from 'crypto';
+import { loadRepoEnv, resolveRedisUrl } from '../atlas/connection-config.mjs';
 
 // ioredis — same cold-start guard used in other pipeline scripts
 import Redis from 'ioredis';
@@ -40,11 +41,19 @@ const args       = process.argv.slice(2);
 const DRY_RUN    = args.includes('--dry-run');
 const AUDIT      = args.includes('--audit');
 const ttlIdx     = args.indexOf('--ttl');
-const TTL_SECS   = ttlIdx >= 0 ? parseInt(args[ttlIdx + 1], 10) : 86400; // default 1 day
+const TTL_SECS   = ttlIdx >= 0 ? parseInt(args[ttlIdx + 1], 10) : 604800; // default 7 days
 
-// Redis config — match sveltekit-frontend env defaults.
-const REDIS_URL = process.env.REDIS_URL || process.env.VALKEY_URL || 'redis://127.0.0.1:6379';
-const REDIS_PASSWORD = process.env.REDIS_PASSWORD || process.env.VALKEY_PASSWORD || 'redis';
+// Redis/Valkey config — use the shared repo env loader so .env / .env.local
+// and VALKEY_* aliases behave consistently with the rest of the Atlas stack.
+const repoEnv = loadRepoEnv(process.env);
+const REDIS_URL = resolveRedisUrl(repoEnv);
+const REDIS_PASSWORD = String(
+  repoEnv.REDIS_PASSWORD ??
+  repoEnv.REDIS_PASS ??
+  repoEnv.VALKEY_PASSWORD ??
+  repoEnv.VALKEY_PASS ??
+  'redis'
+).trim() || 'redis';
 
 function intentHash(query) {
   return crypto.createHash('sha1').update((query || '').toLowerCase().trim()).digest('hex').slice(0, 16);

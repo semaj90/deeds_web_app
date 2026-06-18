@@ -58,7 +58,7 @@
  * }
  */
 
-import { json, error } from '@sveltejs/kit';
+import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import {
 	hyperragPacketRpc,
@@ -72,7 +72,6 @@ import {
 	setExactMatchCacheWithProvenance,
 	type CacheProvenanceTuple,
 } from '$lib/server/cache/redis-exact-match.js';
-import { generateCacheKey } from '$lib/server/cache-keys.js';
 import { HyperRagReplayTrace } from '$lib/server/hyperrag/replay-trace.js';
 import { getRedis } from '$lib/server/redis.js';
 import crypto from 'crypto';
@@ -98,7 +97,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 
 		const query = body.query?.trim();
 		if (!query) {
-			return error(400, 'query is required');
+			return json({ error: 'query is required' }, { status: 400 });
 		}
 
 		const limit = Math.max(1, Math.min(body.limit ?? 10, 25));
@@ -110,7 +109,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 		}
 
 		// Try exact-match cache first
-		const cacheKey = generateCacheKey(query, { model: 'hyperrag', limit });
+		const cacheKey = `hyperrag:query:${hashQuery(query)}`;
 		let cacheHits = 0;
 		let cachedResponse: HyperRagPacketRpcResult | null = null;
 		const provenances: CacheProvenanceTuple[] = [];
@@ -258,3 +257,4 @@ if (typeof global !== 'undefined' && !global.hyperragPoolCleaned) {
 declare global {
 	var hyperragPoolCleaned: boolean | undefined;
 }
+

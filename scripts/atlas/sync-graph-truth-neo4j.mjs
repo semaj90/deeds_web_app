@@ -101,15 +101,6 @@ async function main() {
     return sourceRef.replace(/^sveltekit-frontend\//, '');
   }
 
-  // Set of valid codebase file paths (normalized)
-  const codebaseFilesSet = new Set(padRows.map((r) => normalizeNeo4jPath(r.source_ref)));
-
-  // Map of file mappings by normalized source_ref
-  const afmMap = new Map();
-  for (const row of afmRows) {
-    afmMap.set(normalizeNeo4jPath(row.source_ref), row);
-  }
-
   // ── 2. Read Deep Import Edges ──────────────────────────────────────────────
   const importEdgesPath = path.join(ROOT, 'sveltekit-frontend', 'memory', 'graphify', 'deep', 'deep-import-edges.jsonl');
   let rawEdges = [];
@@ -128,6 +119,24 @@ async function main() {
     console.warn(`⚠️  deep-import-edges.jsonl not found at ${importEdgesPath}. Skipping imports sync.`);
   }
 
+  // ── 2a. Build the graph seed set from all canonical paths we can resolve ───
+  const graphFilesSet = new Set();
+  const padRowsByPath = new Map();
+  for (const row of padRows) {
+    const norm = normalizeNeo4jPath(row.source_ref);
+    graphFilesSet.add(norm);
+    padRowsByPath.set(norm, row);
+  }
+
+  for (const e of rawEdges) {
+    const normFrom = e.from ? normalizeNeo4jPath(e.from) : null;
+    const normTo = e.to && !String(e.to).startsWith('EXTERNAL:') && !String(e.to).startsWith('UNRESOLVED:')
+      ? normalizeNeo4jPath(e.to)
+      : null;
+    if (normFrom) graphFilesSet.add(normFrom);
+    if (normTo) graphFilesSet.add(normTo);
+  }
+
   // Filter edges to only connect codebase files that exist in parent_atlas_documents
   const importsToSync = [];
   const coversToSync = [];
@@ -135,7 +144,7 @@ async function main() {
   for (const e of rawEdges) {
     const normFrom = e.from ? normalizeNeo4jPath(e.from) : null;
     const normTo = e.to ? normalizeNeo4jPath(e.to) : null;
-    if (normFrom && normTo && codebaseFilesSet.has(normFrom) && codebaseFilesSet.has(normTo)) {
+    if (normFrom && normTo && graphFilesSet.has(normFrom) && graphFilesSet.has(normTo)) {
       if (e.type === 'test_covers_file') {
         coversToSync.push({ from: normFrom, to: normTo });
       } else if (e.type === 'imports_static' || e.type === 'imports_dynamic') {
@@ -156,10 +165,10 @@ async function main() {
   function resolveWithExts(base) {
     for (const ext of EXTS) {
       const c = base + ext;
-      if (codebaseFilesSet.has(c)) return c;
+      if (graphFilesSet.has(c)) return c;
       if (c.endsWith('.js')) {
         const ts = c.slice(0, -3) + '.ts';
-        if (codebaseFilesSet.has(ts)) return ts;
+        if (graphFilesSet.has(ts)) return ts;
       }
     }
     return null;
@@ -202,7 +211,7 @@ async function main() {
         
         const normFrom = normalizeNeo4jPath(edge.from);
         const resolvedTo = resolveImport(edge.to, normFrom);
-        if (resolvedTo && codebaseFilesSet.has(normFrom) && codebaseFilesSet.has(resolvedTo)) {
+        if (resolvedTo && graphFilesSet.has(normFrom) && graphFilesSet.has(resolvedTo)) {
           const isDyn = (edge.kind === 'import-dynamic');
           const edgeType = isDyn ? 'imports_dynamic' : 'imports_static';
           
@@ -229,6 +238,31 @@ async function main() {
     console.warn(`⚠️  ast-relations.jsonl not found at ${astRelationsPath}. Skipping AST imports.`);
   }
 
+  // Graph files can come from deep import edges or AST relations even when they
+  // are not yet present in parent_atlas_documents. Keep the graph seed broad so
+  // GDS has a real import topology to work with.
+  const afmByPath = new Map();
+  for (const row of afmRows) {
+    afmByPath.set(normalizeNeo4jPath(row.source_ref), row);
+  }
+
+  const graphNodeRows = Array.from(graphFilesSet).map((normPath) => {
+    const docRow = padRowsByPath.get(normPath);
+    const afmRow = afmByPath.get(normPath);
+    return {
+      path: normPath,
+      sourceRef: docRow?.source_ref ?? normPath,
+      summary: docRow?.summary || '',
+      tags: docRow?.tags || [],
+      featureId: docRow?.feature_id || '',
+      communityId: afmRow?.community_id ?? null,
+      centroidId: afmRow?.centroid_id ?? null,
+      clusterId: afmRow?.cluster_id ?? null,
+      somRow: afmRow?.som_bmu_row ?? null,
+      somCol: afmRow?.som_bmu_col ?? null,
+    };
+  });
+
   // ── 3. Build Similar Topology Edges ────────────────────────────────────────
   // Canonical edge costs (used in GDS projection + Dijkstra)
   const COSTS = {
@@ -249,7 +283,7 @@ async function main() {
   const somCoordsByPath = new Map(); // normPath → { row, col }
   for (const file of afmRows) {
     const normPath = normalizeNeo4jPath(file.source_ref);
-    if (!codebaseFilesSet.has(normPath)) continue;
+    if (!graphFilesSet.has(normPath)) continue;
     const cluster = file.som_cluster || file.centroid_id || file.cluster_id;
     if (file.som_bmu_row != null && file.som_bmu_col != null) {
       somCoordsByPath.set(normPath, { row: Number(file.som_bmu_row), col: Number(file.som_bmu_col) });
@@ -290,7 +324,7 @@ async function main() {
   // ── 4. Neo4j Write Operations ──────────────────────────────────────────────
   if (DRY_RUN) {
     console.log('\n📝 [DRY-RUN] Graph projection summary:');
-    console.log(`   Nodes to merge (CodebaseFile):       ${padRows.length}`);
+    console.log(`   Nodes to merge (CodebaseFile):       ${graphNodeRows.length}`);
     const uniqueFeatures = new Set(padRows.map((r) => r.feature_id).filter(Boolean));
     console.log(`   Nodes to merge (ParentAtlasFeature): ${uniqueFeatures.size}`);
     console.log(`   Relationships (BELONGS_TO_FEATURE):  ${padRows.filter((r) => r.feature_id).length}`);
@@ -310,14 +344,19 @@ async function main() {
     const batchSize = 250;
 
     // A. Sync CodebaseFile Nodes — use 'path' property (graphify convention, short paths)
-    console.log(`⏳ Projecting ${padRows.length} CodebaseFile nodes...`);
-    for (let i = 0; i < padRows.length; i += batchSize) {
-      const chunk = padRows.slice(i, i + batchSize).map((r) => ({
-        path: normalizeNeo4jPath(r.source_ref),
-        sourceRef: r.source_ref,
+    console.log(`⏳ Projecting ${graphNodeRows.length} CodebaseFile nodes...`);
+    for (let i = 0; i < graphNodeRows.length; i += batchSize) {
+      const chunk = graphNodeRows.slice(i, i + batchSize).map((r) => ({
+        path: r.path,
+        sourceRef: r.sourceRef,
         summary: r.summary || '',
         tags: r.tags || [],
-        featureId: r.feature_id || '',
+        featureId: r.featureId || '',
+        communityId: r.communityId,
+        centroidId: r.centroidId,
+        clusterId: r.clusterId,
+        somRow: r.somRow,
+        somCol: r.somCol,
       }));
       await session.executeWrite((tx) =>
         tx.run(
@@ -328,6 +367,11 @@ async function main() {
                 c.summary = row.summary,
                 c.tags = row.tags,
                 c.featureId = row.featureId,
+                c.communityId = row.communityId,
+                c.centroidId = row.centroidId,
+                c.clusterId = row.clusterId,
+                c.somRow = row.somRow,
+                c.somCol = row.somCol,
                 c:ParentAtlasSource,
                 c.updatedAt = datetime()
           `,
@@ -356,9 +400,9 @@ async function main() {
     }
 
     // C. Sync BELONGS_TO_FEATURE relationships
-    const belongsTo = padRows
-      .filter((r) => r.feature_id)
-      .map((r) => ({ path: normalizeNeo4jPath(r.source_ref), featureId: r.feature_id }));
+    const belongsTo = graphNodeRows
+      .filter((r) => r.featureId)
+      .map((r) => ({ path: r.path, featureId: r.featureId }));
     console.log(`⏳ Projecting ${belongsTo.length} BELONGS_TO_FEATURE relationships...`);
     for (let i = 0; i < belongsTo.length; i += batchSize) {
       const chunk = belongsTo.slice(i, i + batchSize);

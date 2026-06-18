@@ -284,3 +284,5 @@ export async function syncQdrantPayloadEpoch(): Promise<{ updated: number; error
 
 	return { updated, errors };
 }
+
+export type { AtlasCacheHit } from './atlas-cache-envelope.js';

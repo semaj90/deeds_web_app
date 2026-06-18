@@ -31,12 +31,14 @@ Current live spine:
 - Phase 16-H identity spine is closed.
 - Higher-hop ledger validation is structurally PASS and enrichment WARN.
 - Redis/Bifrost mirrors are optional runtime cache, not a backfill blocker.
-- Neo4j / GDS topology pass is the next live graph lane.
+- Neo4j / GDS topology pass is complete. ✅ (GDS/SOM enrichment applied to 3,251 packets)
 - ACE context-pack smoke is green after Valkey auth handling was fixed; cache hit is verified in the smoke path, not the canonical identity lane.
 - ACE planner cache-hit validation is now green via `npm run ace:context-planner:smoke`; the proof run writes and rereads the same stable planner state, with `beforeHit: false` and `afterHit: true`, and the second read comes back from Redis. Proof artifact: `docs/reports/ace_cache_hit_2026-06-18T00-47-18-309Z.json`.
-- SOM / AE 20x20 work remains a follow-on lane after the graph pass, not a blocker to current retrieval work.
+- SOM 20x20 coordinates backfilled. ✅
 - The next move after the graph pass is to finish the packet reader/writer, RRF/Neo4j/HyperRAG wiring, Qdrant tag mirroring, and then consolidate the implementation into `packages/atlas`.
 - The served `/.well-known/llms.txt` and `/.well-known/llms-full.txt` contract now share a single Parent Atlas agent contract helper, and the packet RPC now emits ACE-ready packet metadata (`packet_type`, `canonical_source_ref`, `recommended_action`, `verification_command`) in addition to the identity spine.
+- HyperRAG fusion telemetry is fully operational and passes the smoke test suite. ✅
+
 
 ## Consolidated Action Plan And Roadmap
 
@@ -837,6 +839,8 @@ Completed lanes (no further action needed):
 - ✅ Concept evidence spine (10/10 concepts, pk=100%, fid=100%)
 - ✅ Qdrant payload enrichment (Layer C complete)
 - ✅ Engram decision (hint-only, fail-open, 0.05 boost max)
+- ✅ Neo4j / GDS / SOM Topology pass (3,251 packets enriched, 99.2% GDS, 100% SOM coordinates, 100% contract check pass)
+- ✅ HyperRAG fusion telemetry (smoke test pass, 191+ telemetry rows logged)
 
 ## Exit Criteria
 

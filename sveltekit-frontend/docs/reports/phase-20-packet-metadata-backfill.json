@@ -1,0 +1,19 @@
+{
+  "generatedAt": "2026-06-18T21:28:25.151Z",
+  "applyMode": true,
+  "inputFile": "C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\.tmp\\addressable-packets.ndjson",
+  "inputExists": true,
+  "totalRecords": 29145,
+  "updatedRows": 29145,
+  "skippedRows": 0,
+  "missingByTable": {
+    "atlas_packets": 0,
+    "nes_chrom_packets": 0,
+    "atlas_feature_packets": 0
+  },
+  "tableCounts": {
+    "atlas_packets": 0,
+    "nes_chrom_packets": 14911,
+    "atlas_feature_packets": 14234
+  }
+}

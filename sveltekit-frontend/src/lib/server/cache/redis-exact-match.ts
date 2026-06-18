@@ -286,14 +286,14 @@ export async function getExactMatchCacheWithProvenance(
 
 		if (responseErr || !responseStr) return null;
 
-		const response = parseEntry(responseStr, cacheKey);
+		const response = parseEntry(String(responseStr), cacheKey);
 		if (!response) return null;
 
 		// Provenance is optional (graceful if missing)
 		let provenance: CacheProvenanceTuple | null = null;
 		if (provenanceStr && !provenanceErr) {
 			try {
-				provenance = JSON.parse(provenanceStr) as CacheProvenanceTuple;
+				provenance = JSON.parse(String(provenanceStr)) as CacheProvenanceTuple;
 			} catch {
 				console.warn(`[Redis Exact-Match] Failed to parse provenance for ${cacheKey}`);
 			}

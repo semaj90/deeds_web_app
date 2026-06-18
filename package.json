@@ -164,8 +164,13 @@
     "atlas:phase-2-part-4:metadata:migrate:dry": "node sveltekit-frontend/scripts/atlas/migrate-metadata-v1-to-v2.mjs --dry",
     "atlas:phase-2-part-4:metadata:migrate:apply": "node sveltekit-frontend/scripts/atlas/migrate-metadata-v1-to-v2.mjs --apply",
     "atlas:phase-2-part-4:audit": "node sveltekit-frontend/scripts/atlas/audit-phase-2-part-4.mjs --save",
-    "atlas:phase-2-part-4:verify": "node sveltekit-frontend/scripts/atlas/verify-phase-2-part-4.mjs --save"
-    ,"atlas:phase-16-h:qdrant-gap:classify": "node scripts/atlas/phase-16-h-qdrant-gap-classifier.mjs"
+    "atlas:phase-2-part-4:verify": "node sveltekit-frontend/scripts/atlas/verify-phase-2-part-4.mjs --save",
+    "atlas:phase-16-h:qdrant-gap:classify": "node scripts/atlas/phase-16-h-qdrant-gap-classifier.mjs",
+    "atlas:packets:validate": "npx tsx scripts/atlas/validate-addressable-packets.mjs",
+    "atlas:packets:validate:apply": "npx tsx scripts/atlas/validate-addressable-packets.mjs --apply",
+    "atlas:packets:metadata:backfill": "npx tsx scripts/atlas/backfill-packet-metadata-to-postgres.mjs --dry-run",
+    "atlas:packets:metadata:backfill:apply": "npx tsx scripts/atlas/backfill-packet-metadata-to-postgres.mjs --apply",
+    "atlas:packets:metadata:report": "node scripts/atlas/validate-packet-contract.mjs --verbose"
   },
   "devDependencies": {
     "@ast-grep/cli": "0.42.3",

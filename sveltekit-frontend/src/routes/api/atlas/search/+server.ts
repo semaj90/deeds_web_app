@@ -751,7 +751,7 @@ export const POST: RequestHandler = async ({ request }) => {
   const { query, top_k, feature_id, community_id, domain_class, skip_neo4j, skip_rerank } = parsed.data;
   const t0 = Date.now();
 
-  const stats: Record<string, number | string> = {};
+  const stats: Record<string, number | string | boolean | null> = {};
   let cacheEnvelope: AtlasCacheHit | null = null;
 
   // ── Unified 3-tier cache cascade (L1 Redis → L2 Bifrost → L3 Qdrant) ────────
@@ -952,7 +952,7 @@ export const POST: RequestHandler = async ({ request }) => {
   const packets: AtlasPacket[] = hits.map((hit, cosineRank) => {
     const p = hit.payload ?? {};
     const redisHotKeys = Array.isArray((p as Record<string, unknown>).redis_hot_keys)
-      ? (p as Record<string, unknown>).redis_hot_keys.map((value) => String(value))
+      ? ((p as { redis_hot_keys?: unknown[] }).redis_hot_keys ?? []).map((value) => String(value))
       : [];
     const sourceRef = String(p.source_ref ?? p.packet_key ?? hit.id ?? '');
     const domainLabel = String(p.domain ?? p.domain_class ?? 'utility');
@@ -992,8 +992,6 @@ export const POST: RequestHandler = async ({ request }) => {
       cascade_score: score,
       stage_scores,
       qdrant_id: hit.id,
-      domain: domainLabel,
-      ontology: ontologyLabels,
     };
   });
 
@@ -1057,7 +1055,7 @@ export const POST: RequestHandler = async ({ request }) => {
     packet_keys: final.map(p => p.packet_key).filter(Boolean),
     feature_ids: [...new Set(final.map(p => p.feature_id).filter(Boolean))],
     source_refs: [...new Set(final.map(p => p.source_ref).filter(Boolean))],
-    qdrant_point_ids: final.map(p => p.qdrant_id).filter(Boolean),
+    qdrant_point_ids: final.map(p => String(p.qdrant_id)).filter(Boolean),
     redis_hit: false,
     bitfrost_hit: false,
     qdrant_hit: true,

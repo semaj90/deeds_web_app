@@ -112,12 +112,42 @@ async function loadFromPostgres() {
     const { default: pgPkg } = await import('pg');
     const Pool = pgPkg.Pool ?? pgPkg.default?.Pool;
     if (!Pool) return null;
-    pg = new Pool({ connectionString: PG_URL, max: 1 });
+    pg = new Pool({ connectionString: PG_URL, max: 1, statement_timeout: 5000 });
+
+    // Try atlas_packets first (has pagerank + community_id from Phase 20 topology pass)
+    try {
+      const res = await pg.query(`
+        SELECT DISTINCT ON (file_path)
+               file_path,
+               pagerank          AS ga,
+               community_id,
+               som_cluster       AS topo_class
+        FROM   atlas_packets
+        WHERE  pagerank IS NOT NULL
+           AND file_path IS NOT NULL
+        ORDER  BY file_path, pagerank DESC NULLS LAST
+        LIMIT  $1
+      `, [TOP_N]);
+      if (res.rows.length > 0) {
+        const entries = res.rows.map(r => ({
+          filePath:            normalisePath(r.file_path),
+          graphAuthorityScore: parseFloat(r.ga) || null,
+          communityId:         r.community_id ?? null,
+          pagerank:            parseFloat(r.ga) || null,
+          topoClass:           r.topo_class ?? null,
+        })).filter(e => e.filePath);
+        await pg.end();
+        return entries.length ? entries : null;
+      }
+    } catch {
+      // atlas_packets not available — fall through to code_retrieval_chunks
+    }
+
+    // Fallback: code_retrieval_chunks (no community_id column)
     const res = await pg.query(`
       SELECT file_path,
-             max(graph_authority_score)   AS ga,
-             max(community_id)            AS community_id,
-             max(topo_class)              AS topo_class
+             max(graph_authority_score) AS ga,
+             max(topo_class)            AS topo_class
       FROM   code_retrieval_chunks
       WHERE  graph_authority_score IS NOT NULL
       GROUP  BY file_path
@@ -127,7 +157,7 @@ async function loadFromPostgres() {
     const entries = res.rows.map(r => ({
       filePath:            normalisePath(r.file_path),
       graphAuthorityScore: parseFloat(r.ga) || null,
-      communityId:         r.community_id ?? null,
+      communityId:         null,
       pagerank:            null,
       topoClass:           r.topo_class ?? null,
     })).filter(e => e.filePath);

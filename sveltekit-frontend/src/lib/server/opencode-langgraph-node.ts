@@ -8,8 +8,7 @@
  */
 
 import type { BaseMessage } from '@langchain/core/messages';
-import { selectMutationAction, extractACEFeatures, fetchSOMEmbedding } from './ace/mutation-gate.js';
-import type { PolicyDecision } from './policy/inference.js';
+import { selectMutationAction, extractACEFeatures, fetchSOMEmbedding, type PolicyDecision } from './ace/mutation-gate.js';
 
 export interface OpenCodeAgentState {
   query: string;
@@ -33,6 +32,7 @@ export async function policyDecisionNode(state: OpenCodeAgentState): Promise<Par
       policyDecision: {
         action: 'ask_gemma4',
         confidence: 0.5,
+        logits: Array(7).fill(0),
         reasoning: 'No context packets available, escalating to Gemma4',
         latencyMs: 0,
         modelVersion: 'fallback',
@@ -85,9 +85,9 @@ export async function policyDecisionNode(state: OpenCodeAgentState): Promise<Par
 
     // Call mutation gate
     const decision = await selectMutationAction({
-      context: aceContext,
-      packetKey: state.replayTrace.packets[0]?.packet_key,
-      query: state.query,
+      aceFeatures: extractACEFeatures(aceContext),
+      somEmbedding: await fetchSOMEmbedding(String(state.replayTrace.packets[0]?.packet_key ?? state.query)),
+      packetKey: String(state.replayTrace.packets[0]?.packet_key ?? ''),
     });
 
     return {
@@ -100,6 +100,7 @@ export async function policyDecisionNode(state: OpenCodeAgentState): Promise<Par
       policyDecision: {
         action: 'ask_gemma4',
         confidence: 0.3,
+        logits: Array(7).fill(0),
         reasoning: 'Policy decision error, falling back to Gemma4',
         latencyMs: 0,
         modelVersion: 'error',
@@ -135,3 +136,5 @@ export function routeAfterPolicy(state: OpenCodeAgentState): string {
       return 'gemma4_reasoner';
   }
 }
+
+

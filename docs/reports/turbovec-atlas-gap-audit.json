@@ -1,9 +1,9 @@
 {
-  "timestamp": "2026-06-18T15:46:16.813Z",
+  "timestamp": "2026-06-18T21:32:00.734Z",
   "config": {
     "dim": null,
     "topk": 8,
-    "limit": 5,
+    "limit": 10,
     "input": ".tmp/vector64-preview.jsonl",
     "output": ".tmp/turbovec-neighbors.ndjson",
     "embeddingsDir": ".opencode/embeddings",
@@ -11,14 +11,15 @@
   },
   "gpu": {
     "cuda_available": true,
+    "backend": "gpu",
     "memory_probe_trusted": false
   },
   "counts": {
-    "loaded_rows": 5,
-    "valid_embeddings": 5,
+    "loaded_rows": 10,
+    "valid_embeddings": 10,
     "missing_embeddings": 0,
     "wrong_dim_embeddings": 0,
-    "edges": 20
+    "edges": 80
   },
   "neo4j": {
     "checked": true,
@@ -47,23 +48,51 @@
       },
       {
         "source_id": ".opencode/cards/000678ef52ca67b0.json:L1",
+        "neighbor_id": ".opencode/cards/00262e5f02b7c99d.json:L1",
+        "similarity": 0.07422097027301788,
+        "topk_rank": 2,
+        "source": "turbovec"
+      },
+      {
+        "source_id": ".opencode/cards/000678ef52ca67b0.json:L1",
         "neighbor_id": ".opencode/cards/001f2d08e4459234.json:L1",
         "similarity": 0.04002489522099495,
-        "topk_rank": 2,
+        "topk_rank": 3,
+        "source": "turbovec"
+      },
+      {
+        "source_id": ".opencode/cards/000678ef52ca67b0.json:L1",
+        "neighbor_id": ".opencode/cards/0024f386d46d7f23.json:L1",
+        "similarity": 0.01737850531935692,
+        "topk_rank": 4,
         "source": "turbovec"
       },
       {
         "source_id": ".opencode/cards/000678ef52ca67b0.json:L1",
         "neighbor_id": ".opencode/cards/001570455730d2d7.json:L1",
         "similarity": -0.018151406198740005,
-        "topk_rank": 3,
+        "topk_rank": 5,
+        "source": "turbovec"
+      },
+      {
+        "source_id": ".opencode/cards/000678ef52ca67b0.json:L1",
+        "neighbor_id": ".opencode/cards/002add0263b8e6c8.json:L1",
+        "similarity": -0.021039767190814018,
+        "topk_rank": 6,
         "source": "turbovec"
       },
       {
         "source_id": ".opencode/cards/000678ef52ca67b0.json:L1",
         "neighbor_id": ".opencode/cards/00116e85cfe0456e.json:L1",
         "similarity": -0.03316513076424599,
-        "topk_rank": 4,
+        "topk_rank": 7,
+        "source": "turbovec"
+      },
+      {
+        "source_id": ".opencode/cards/000678ef52ca67b0.json:L1",
+        "neighbor_id": ".opencode/cards/002aee21948f778f.json:L1",
+        "similarity": -0.05592932552099228,
+        "topk_rank": 8,
         "source": "turbovec"
       },
       {
@@ -75,36 +104,8 @@
       },
       {
         "source_id": ".opencode/cards/00116e85cfe0456e.json:L1",
-        "neighbor_id": ".opencode/cards/0012bc7350ff2a70.json:L1",
-        "similarity": 0.04440927132964134,
-        "topk_rank": 2,
-        "source": "turbovec"
-      },
-      {
-        "source_id": ".opencode/cards/00116e85cfe0456e.json:L1",
-        "neighbor_id": ".opencode/cards/000678ef52ca67b0.json:L1",
-        "similarity": -0.03316513076424599,
-        "topk_rank": 3,
-        "source": "turbovec"
-      },
-      {
-        "source_id": ".opencode/cards/00116e85cfe0456e.json:L1",
-        "neighbor_id": ".opencode/cards/001f2d08e4459234.json:L1",
-        "similarity": -0.11420968919992447,
-        "topk_rank": 4,
-        "source": "turbovec"
-      },
-      {
-        "source_id": ".opencode/cards/0012bc7350ff2a70.json:L1",
-        "neighbor_id": ".opencode/cards/001570455730d2d7.json:L1",
-        "similarity": 0.2683585286140442,
-        "topk_rank": 1,
-        "source": "turbovec"
-      },
-      {
-        "source_id": ".opencode/cards/0012bc7350ff2a70.json:L1",
-        "neighbor_id": ".opencode/cards/000678ef52ca67b0.json:L1",
-        "similarity": 0.2091340273618698,
+        "neighbor_id": ".opencode/cards/002add0263b8e6c8.json:L1",
+        "similarity": 0.04849589988589287,
         "topk_rank": 2,
         "source": "turbovec"
       }

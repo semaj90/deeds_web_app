@@ -1,0 +1,219 @@
+{
+  "generatedAt": "2026-06-18T22:08:44.760Z",
+  "mode": "apply",
+  "inputPath": ".tmp/addressable-packets.vectorized.ndjson",
+  "outputPath": ".tmp/addressable-packets.enriched.ndjson",
+  "summary": {
+    "inputRows": 10,
+    "selectedRows": 10,
+    "vectorRows": 5,
+    "termsRows": 10,
+    "pagerankRows": 10,
+    "cosineRows": 5,
+    "summaryRows": 0,
+    "summaryDeferredRows": 10,
+    "somRows": 10,
+    "missingVectorRows": 5,
+    "lanedRows": 10
+  },
+  "samples": [
+    {
+      "packet_key": "05dbd8cc7c550bbe",
+      "source_ref": "src/lib/server/ai/llama-tool-definitions.ts#kb__search_cards",
+      "lane_ids": [
+        "397",
+        "895884c03a86a386",
+        "mcp_tool_stub",
+        "packet_spine",
+        "langextract",
+        "som20x20",
+        "pagerank"
+      ],
+      "terms": [
+        "895884c03a86a386",
+        "src/lib/server/ai/llama-tool-definitions.ts",
+        "kb__search_cards",
+        "05dbd8cc7c550bbe",
+        "mcp_tool_stub",
+        "packet_spine",
+        "397"
+      ],
+      "neighbor_count": 0,
+      "summary_present": false
+    },
+    {
+      "packet_key": "05f26c6dc1b51a12",
+      "source_ref": "src/routes/api/atlas/search/+server.ts#gpubatchcosinererank",
+      "lane_ids": [
+        "117",
+        "atlas.search",
+        "codebase_chunks_768",
+        "mcp_tool_stub",
+        "source_ref",
+        "langextract",
+        "cosine_top10",
+        "som20x20",
+        "pagerank"
+      ],
+      "terms": [
+        "atlas.search",
+        "src/routes/api/atlas/search/",
+        "server.ts",
+        "gpubatchcosinererank",
+        "sveltekit-frontend/src/routes/api/atlas/search/",
+        "05f26c6dc1b51a12",
+        "codebase_chunks_768",
+        "mcp_tool_stub"
+      ],
+      "neighbor_count": 4,
+      "summary_present": false
+    },
+    {
+      "packet_key": "08dce8e980d1e261",
+      "source_ref": "src/mcp/server.ts#reports:update",
+      "lane_ids": [
+        "37",
+        "4a0c3649b58e6c1e",
+        "mcp_tool_stub",
+        "packet_spine",
+        "langextract",
+        "cosine_top10",
+        "som20x20",
+        "pagerank"
+      ],
+      "terms": [
+        "4a0c3649b58e6c1e",
+        "src/mcp/server.ts",
+        "reports:update",
+        "08dce8e980d1e261",
+        "mcp_tool_stub",
+        "packet_spine"
+      ],
+      "neighbor_count": 4,
+      "summary_present": false
+    },
+    {
+      "packet_key": "0e584542cbd3ec1f",
+      "source_ref": "src/mcp/server.ts#wiki.explain_page",
+      "lane_ids": [
+        "121b02dff31f995b",
+        "336",
+        "mcp_tool_stub",
+        "packet_spine",
+        "langextract",
+        "cosine_top10",
+        "som20x20",
+        "pagerank"
+      ],
+      "terms": [
+        "121b02dff31f995b",
+        "src/mcp/server.ts",
+        "wiki.explain_page",
+        "0e584542cbd3ec1f",
+        "mcp_tool_stub",
+        "packet_spine",
+        "336"
+      ],
+      "neighbor_count": 4,
+      "summary_present": false
+    },
+    {
+      "packet_key": "106474ac880329aa",
+      "source_ref": "src/lib/server/ai/llama-tool-definitions.ts#kb__explain_retrieval",
+      "lane_ids": [
+        "79",
+        "931687f31329e048",
+        "mcp_tool_stub",
+        "packet_spine",
+        "langextract",
+        "som20x20",
+        "pagerank"
+      ],
+      "terms": [
+        "931687f31329e048",
+        "src/lib/server/ai/llama-tool-definitions.ts",
+        "kb__explain_retrieval",
+        "106474ac880329aa",
+        "mcp_tool_stub",
+        "packet_spine"
+      ],
+      "neighbor_count": 0,
+      "summary_present": false
+    },
+    {
+      "packet_key": "1125b964826d67d7",
+      "source_ref": "src/mcp/server.ts#langextract:custom",
+      "lane_ids": [
+        "32",
+        "6a545f1e8ce22358",
+        "mcp_tool_stub",
+        "packet_spine",
+        "langextract",
+        "cosine_top10",
+        "som20x20",
+        "pagerank"
+      ],
+      "terms": [
+        "6a545f1e8ce22358",
+        "src/mcp/server.ts",
+        "langextract:custom",
+        "1125b964826d67d7",
+        "mcp_tool_stub",
+        "packet_spine"
+      ],
+      "neighbor_count": 4,
+      "summary_present": false
+    },
+    {
+      "packet_key": "119403f1ca0164b4",
+      "source_ref": "src/mcp/server.ts#reports:list",
+      "lane_ids": [
+        "322",
+        "5a8f718e6f8c271a",
+        "mcp_tool_stub",
+        "packet_spine",
+        "langextract",
+        "cosine_top10",
+        "som20x20",
+        "pagerank"
+      ],
+      "terms": [
+        "5a8f718e6f8c271a",
+        "src/mcp/server.ts",
+        "reports:list",
+        "119403f1ca0164b4",
+        "mcp_tool_stub",
+        "packet_spine",
+        "322"
+      ],
+      "neighbor_count": 4,
+      "summary_present": false
+    },
+    {
+      "packet_key": "13039d77318546e0",
+      "source_ref": "src/lib/server/ai/llama-tool-definitions.ts#search__dev_context",
+      "lane_ids": [
+        "378",
+        "4521761888863c86",
+        "mcp_tool_stub",
+        "packet_spine",
+        "langextract",
+        "som20x20",
+        "pagerank"
+      ],
+      "terms": [
+        "4521761888863c86",
+        "src/lib/server/ai/llama-tool-definitions.ts",
+        "search__dev_context",
+        "13039d77318546e0",
+        "mcp_tool_stub",
+        "packet_spine",
+        "378"
+      ],
+      "neighbor_count": 0,
+      "summary_present": false
+    }
+  ],
+  "status": "APPLIED",
+  "nextSafeAction": "Use the enriched file as the source for TurboVec, Neo4j, and HyperRAG downstream passes."
+}

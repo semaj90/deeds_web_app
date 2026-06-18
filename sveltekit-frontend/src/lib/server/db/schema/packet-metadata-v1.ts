@@ -95,6 +95,15 @@ export type PacketMemoryMetadata = {
   last_cached_at?: string; // ISO timestamp of last cache write
 };
 
+/** Access control — visibility, write/execute gates, provenance source */
+export type PacketPermission = {
+  visibility?: 'internal' | 'admin' | 'agent' | 'public';
+  can_write?: boolean;
+  can_execute?: boolean;
+  can_export?: boolean;
+  source?: 'repo_index' | 'runtime_capture' | 'agent_trace' | 'user_upload';
+};
+
 /** Provenance/tracking — versioning, inference flags, audit trail */
 export type PacketProvenanceMetadata = {
   lineage_version: 'packet-identity-v1'; // Schema version (always this)
@@ -116,6 +125,7 @@ export type PacketMetadataV1 = PacketIdentity &
   Partial<PacketRankingMetadata> &
   Partial<PacketGraphMetadata> &
   Partial<PacketMemoryMetadata> &
+  Partial<PacketPermission> &
   PacketProvenanceMetadata;
 
 /**
@@ -164,6 +174,11 @@ export class PacketMetadataBuilder {
 
   memory(mem: Partial<PacketMemoryMetadata>): this {
     Object.assign(this.data, mem);
+    return this;
+  }
+
+  permissions(perm: Partial<PacketPermission>): this {
+    Object.assign(this.data, perm);
     return this;
   }
 
@@ -253,6 +268,14 @@ export const packetMetadataSelectors = {
     redis_hot_key: m.redis_hot_key,
     bifrost_cache_key: m.bifrost_cache_key,
     engram_memory_id: m.engram_memory_id,
+  }),
+
+  permissions: (m: PacketMetadataV1): Partial<PacketPermission> => ({
+    visibility: m.visibility,
+    can_write: m.can_write,
+    can_execute: m.can_execute,
+    can_export: m.can_export,
+    source: m.source,
   }),
 
   provenance: (m: PacketMetadataV1): Partial<PacketProvenanceMetadata> => ({

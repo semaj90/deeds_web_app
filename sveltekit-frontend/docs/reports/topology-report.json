@@ -1,0 +1,61 @@
+{
+  "generated_at": "2026-06-18T22:55:12.769Z",
+  "qdrant_collection": "codebase_chunks_768",
+  "qdrant_url": "http://127.0.0.1:6333",
+  "structural": {
+    "gdsAvailable": false,
+    "apocAvailable": true,
+    "projectionExists": false,
+    "pageRankNodeCount": 0,
+    "louvainCommunityCount": 0,
+    "knnRelationshipCount": 0,
+    "unclassifiedFileCount": 0
+  },
+  "qdrant": {
+    "qdrantTopoByteCoverage": null,
+    "qdrantManifold4Coverage": null,
+    "qdrantAuthorityCoverage": null,
+    "somSampleSize": 10,
+    "somClusterRows": 10,
+    "topSomClusters": [
+      {
+        "cluster": "3",
+        "count": 4
+      },
+      {
+        "cluster": "2",
+        "count": 1
+      },
+      {
+        "cluster": "6",
+        "count": 1
+      },
+      {
+        "cluster": "8",
+        "count": 1
+      },
+      {
+        "cluster": "9",
+        "count": 1
+      },
+      {
+        "cluster": "0",
+        "count": 1
+      },
+      {
+        "cluster": "73",
+        "count": 1
+      }
+    ]
+  },
+  "authority": {
+    "topNodes": []
+  },
+  "telemetry": {
+    "totalRows": 192,
+    "cacheHits": 29,
+    "fusionRows": 141,
+    "coldRows": 10,
+    "avgLatencyMs": 1601.09375
+  }
+}

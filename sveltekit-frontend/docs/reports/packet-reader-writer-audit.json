@@ -1,0 +1,55 @@
+{
+  "generatedAt": "2026-06-18T21:27:12.560Z",
+  "applyMode": true,
+  "totalRows": 29145,
+  "tableStats": [
+    {
+      "table": "atlas_packets",
+      "rows": 0,
+      "addressableRows": 0
+    },
+    {
+      "table": "nes_chrom_packets",
+      "rows": 14911,
+      "addressableRows": 14911
+    },
+    {
+      "table": "atlas_feature_packets",
+      "rows": 14234,
+      "addressableRows": 14234
+    }
+  ],
+  "byTable": {
+    "atlas_packets": {
+      "table": "atlas_packets",
+      "rows": 0,
+      "addressableRows": 0
+    },
+    "nes_chrom_packets": {
+      "table": "nes_chrom_packets",
+      "rows": 14911,
+      "addressableRows": 14911
+    },
+    "atlas_feature_packets": {
+      "table": "atlas_feature_packets",
+      "rows": 14234,
+      "addressableRows": 14234
+    }
+  },
+  "coverage": {
+    "packet_key": 29145,
+    "source_ref": 29145,
+    "feature_id": 29145,
+    "feature_label": 29145,
+    "permissions": 29145,
+    "metadata": 29145,
+    "topology": 29145,
+    "vectors": 29145,
+    "qdrant_point_id": 13101,
+    "som_cluster": 9376
+  },
+  "outputFiles": {
+    "ndjson": "C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\.tmp\\addressable-packets.ndjson",
+    "manifest": "C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\.tmp\\addressable-packets.manifest.json"
+  }
+}

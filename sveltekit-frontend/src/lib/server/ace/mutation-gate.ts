@@ -349,7 +349,7 @@ export async function selectMutationAction(options: {
     const inferenceLatency = Date.now() - modelStartTime;
 
     // Build reasoning explanation
-    const reasoning = buildReasoningExplanation(selectedAction, options.aceFeatures, confidence);
+    const reasoning = buildReasoningExplanation(selectedAction as PolicyAction, options.aceFeatures, confidence);
 
     return {
       action: selectedAction as PolicyAction,

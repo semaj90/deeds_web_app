@@ -456,16 +456,72 @@ function normalizePacketRow(row, evidence) {
     (qdrantCollection && qdrantPointId ? `${qdrantCollection}:${qdrantPointId}` : '') ||
     qdrantPayloadKey,
   );
+  const permissions = {
+    visibility: row.permissions?.visibility || 'internal',
+    can_write: row.permissions?.can_write || false,
+    can_execute: row.permissions?.can_execute || false,
+    can_export: row.permissions?.can_export || false,
+    source: row.permissions?.source || 'repo_index',
+  };
+
+  const filePathVal = normalizeText(row.file_path || row.filePath || '');
+  const dirPathVal = normalizeText(row.directory_path || row.directoryPath || (filePathVal ? path.dirname(filePathVal) : ''));
+  const metadataEnv = {
+    repo_root: 'deeds-web-app',
+    app_root: 'sveltekit-frontend',
+    file_path: filePathVal,
+    directory_path: dirPathVal,
+    route_path: row.route_path || row.routePath || undefined,
+    component_name: row.component_name || row.componentName || undefined,
+    package_name: row.package_name || row.packageName || undefined,
+    runtime_surface: row.runtime_surface || row.runtimeSurface || undefined,
+    cache_context: row.metadata?.cache_context || row.metadata?.cacheContext || {},
+  };
+
+  const topology = {
+    community_id: communityId === '' ? undefined : communityId,
+    neo4j_node_id: neo4jNodeId || undefined,
+    pagerank: row.pagerank !== undefined && row.pagerank !== null ? Number(row.pagerank) : undefined,
+    betweenness: row.betweenness !== undefined && row.betweenness !== null ? Number(row.betweenness) : undefined,
+    eigenvector: row.eigenvector !== undefined && row.eigenvector !== null ? Number(row.eigenvector) : undefined,
+    som_cluster: somCluster ? String(somCluster) : undefined,
+    som_x: row.som_x !== undefined && row.som_x !== null ? Number(row.som_x) : (row.som_row !== undefined && row.som_row !== null ? Number(row.som_row) : undefined),
+    som_y: row.som_y !== undefined && row.som_y !== null ? Number(row.som_y) : (row.som_col !== undefined && row.som_col !== null ? Number(row.som_col) : undefined),
+    centroid_id: row.centroid_id || row.centroidId || undefined,
+    ae_latent64: row.ae_latent64 || undefined,
+    ae_distance: row.ae_distance !== undefined && row.ae_distance !== null ? Number(row.ae_distance) : undefined,
+    topology_version: row.topology_version || undefined,
+    topology_updated_at: row.topology_updated_at || undefined,
+  };
+
+  const vectors = {
+    qdrant_point_id: qdrantPointId || undefined,
+    qdrant_collection: qdrantCollection || undefined,
+    qdrant_vectors: row.qdrant_vectors || undefined,
+    vector_source: row.vector_source || undefined,
+    embedding_384: row.embedding_384 || undefined,
+    latent_64: row.latent_64 || undefined,
+  };
+
+  const enrichment = {
+    concepts: concepts,
+    langextract_terms: row.langextract_terms || [],
+    top10_neighbors: row.top10_neighbors || [],
+    summary_model: row.summary_model || undefined,
+    fusion_sources: row.fusion_sources || [],
+  };
+
   const addressable = Boolean(packetKey && canonicalSourceRef && featureId);
   const evidenceSources = uniqueStrings([evidence?.filePath, evidence?.sourceTable, row.source_table, row.sourceTable].filter(Boolean));
 
   return {
     source_table: normalizeText(row.source_table || row.sourceTable || evidence?.sourceTable || 'atlas_higher_hop_index'),
     packet_key: packetKey,
+    packet_type: row.packet_type || row.packetType || packetKind || 'atlas',
     source_ref: sourceRef,
     canonical_source_ref: canonicalSourceRef,
     source_ref_key: sourceRefKey,
-    file_path: normalizeText(row.file_path || row.filePath || ''),
+    file_path: filePathVal,
     feature_id: featureId,
     feature_label: featureLabel,
     identity_lane: identityLane || null,
@@ -490,7 +546,11 @@ function normalizePacketRow(row, evidence) {
     tree_node_id: treeNodeId || null,
     glyph_record_id: glyphRecordId || null,
     neo4j_node_id: neo4jNodeId || null,
-    metadata,
+    permissions,
+    metadata: metadataEnv,
+    topology,
+    vectors,
+    enrichment,
     evidence_sources: evidenceSources,
     addressable,
     source_evidence_hit: Boolean(evidence),
@@ -714,3 +774,4 @@ main().catch((error) => {
   console.error('[materialize-addressable-packets] failed:', error?.stack || error?.message || String(error));
   process.exit(1);
 });
+

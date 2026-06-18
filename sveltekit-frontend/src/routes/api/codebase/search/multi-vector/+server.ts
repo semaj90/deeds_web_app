@@ -1,4 +1,4 @@
-import { json, error } from '@sveltejs/kit';
+import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { z } from 'zod';
 import { db } from '$lib/server/db/client';
@@ -47,7 +47,10 @@ async function searchNamedVector(
       }
     );
 
-    return (response.result || []).map((hit: any) => ({
+    const responseAny = response as any;
+
+    const hits = Array.isArray(responseAny.result) ? responseAny.result : [];
+    return hits.map((hit: any) => ({
       id: hit.id,
       score: hit.score,
       sourceVectors: [vectorName],
@@ -104,7 +107,7 @@ async function fuseResults(
 export const POST: RequestHandler = async ({ request, locals }) => {
   // Auth guard
   if (!locals.user) {
-    throw error(401, 'Unauthorized');
+    return json({ error: 'Unauthorized' }, { status: 401 });
   }
 
   try {
@@ -134,9 +137,10 @@ export const POST: RequestHandler = async ({ request, locals }) => {
     });
   } catch (err) {
     if (err instanceof z.ZodError) {
-      throw error(400, `Validation error: ${err.errors[0].message}`);
+      return json({ error: `Validation error: ${err.issues[0]?.message ?? 'Invalid request'}` }, { status: 400 });
     }
     console.error('Multi-vector search error:', err);
     return json({ query: '', type: 'content', results: [], total: 0 });
   }
 };
+

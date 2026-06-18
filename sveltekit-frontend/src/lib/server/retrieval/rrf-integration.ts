@@ -39,6 +39,16 @@ export interface RRFIntegrationOutput {
     neoCount: number;
   };
   durationMs: number;
+  timings?: {
+    pgBm25Ms: number;
+    qdrantMs: number;
+    turbovecMs: number;
+    neo4jMs: number;
+    gemma4Ms: number;
+    rerankMs: number;
+    pgvectorMs?: number;
+    conceptOverlapMs?: number;
+  };
 }
 
 /**
@@ -361,22 +371,49 @@ export async function multiLaneRetrievalWithRRF(
   const finalWeights = { ...defaultWeights, ...weights };
 
   try {
+    let pgvectorMs = 0;
+    let gemma4Ms = 0;
+    let pgBm25Ms = 0;
+    let conceptOverlapMs = 0;
+    let qdrantMs = 0;
+    let turbovecMs = 0;
+    let neo4jMs = 0;
+
     // Generate embedding once for all vector lanes
+    const tEmbedStart = performance.now();
     const { generateSingleEmbedding } = await import('$lib/server/grpc/embedding-client.js');
     const embedding = await generateSingleEmbedding(query).catch(() => null);
+    pgvectorMs = performance.now() - tEmbedStart;
 
     // Extract concepts from query via Gemma4
+    const tGemmaStart = performance.now();
     const conceptExtractionResult = await extractQueryConceptsViaGemma({
       query,
       maxConcepts: 5,
       minConfidence: 0.7,
     }).catch(() => ({ conceptIds: [], extracted: [], durationMs: 0 }));
+    gemma4Ms = performance.now() - tGemmaStart;
+
     const graphConceptSeeds = deriveGraphConceptSeeds(query, conceptExtractionResult.extracted);
 
     // Run lexical + concept signals first so dense lanes can seed from them
+    const bm25Promise = (async () => {
+      const start = performance.now();
+      const res = await bm25SearchIndexed(query, topK);
+      pgBm25Ms = performance.now() - start;
+      return res;
+    })();
+
+    const conceptPromise = (async () => {
+      const start = performance.now();
+      const res = await conceptOverlapSearch(conceptExtractionResult.conceptIds, topK);
+      conceptOverlapMs = performance.now() - start;
+      return res;
+    })();
+
     const [bm25Results, conceptResults] = await Promise.allSettled([
-      bm25SearchIndexed(query, topK),
-      conceptOverlapSearch(conceptExtractionResult.conceptIds, topK),
+      bm25Promise,
+      conceptPromise,
     ]);
 
     const seedRefs =
@@ -388,10 +425,23 @@ export async function multiLaneRetrievalWithRRF(
     const qdrantSeedRefs = graphSeedRefs;
 
     // Run dense/graph signals in parallel
-    const [qdrantResults, turbovecResults, neoResults] = await Promise.allSettled([
-      queryQdrantVectorSignal(query, embedding, topK, qdrantSeedRefs),
-      embedding ? turbovecSearch(embedding, { topK: topK * 2, timeoutMs: 300 }) : Promise.resolve({ candidates: [], backend: 'offline', durationMs: 0 }),
-      Promise.allSettled([
+    const qdrantPromise = (async () => {
+      const start = performance.now();
+      const res = await queryQdrantVectorSignal(query, embedding, topK, qdrantSeedRefs);
+      qdrantMs = performance.now() - start;
+      return res;
+    })();
+
+    const turbovecPromise = (async () => {
+      const start = performance.now();
+      const res = embedding ? await turbovecSearch(embedding, { topK: topK * 2, timeoutMs: 300 }) : { candidates: [], backend: 'offline', durationMs: 0 };
+      turbovecMs = performance.now() - start;
+      return res;
+    })();
+
+    const neoPromise = (async () => {
+      const start = performance.now();
+      const res = await Promise.allSettled([
         conceptExtractionResult.conceptIds.length > 0
           ? queryNeoJsGraphSignal({ conceptIds: conceptExtractionResult.conceptIds, topK }).then((r) =>
               r.map((hit) => ({
@@ -424,7 +474,15 @@ export async function multiLaneRetrievalWithRRF(
           : Promise.resolve([]),
       ]).then((results) =>
         results.flatMap((settled) => (settled.status === 'fulfilled' ? settled.value : []))
-      ),
+      );
+      neo4jMs = performance.now() - start;
+      return res;
+    })();
+
+    const [qdrantResults, turbovecResults, neoResults] = await Promise.allSettled([
+      qdrantPromise,
+      turbovecPromise,
+      neoPromise,
     ]);
 
     // Convert results to ContextHit[] format for RRF
@@ -432,7 +490,7 @@ export async function multiLaneRetrievalWithRRF(
       bm25Results.status === 'fulfilled'
         ? bm25Results.value.map((hit) => ({
             id: hit.id,
-            source: 'postgres_trigram',
+            source: 'postgres_trigram' as const,
             score: hit.similarity,
             text: hit.summary,
             metadata: {
@@ -448,7 +506,7 @@ export async function multiLaneRetrievalWithRRF(
       conceptResults.status === 'fulfilled'
         ? conceptResults.value.map((hit) => ({
             id: hit.id,
-            source: 'concept_overlap',
+            source: 'concept_overlap' as const,
             score: hit.overlapScore,
           }))
         : [];
@@ -457,7 +515,7 @@ export async function multiLaneRetrievalWithRRF(
       qdrantResults.status === 'fulfilled'
         ? qdrantResults.value.map((hit) => ({
             id: hit.id,
-            source: 'qdrant_vector',
+            source: 'qdrant_vector' as const,
             score: hit.score,
             text: hit.text,
             metadata: hit.metadata,
@@ -468,7 +526,7 @@ export async function multiLaneRetrievalWithRRF(
       turbovecResults.status === 'fulfilled'
         ? turbovecResults.value.candidates.map((hit) => ({
             id: hit.id,
-            source: 'turbovec_ann',
+            source: 'turbovec_ann' as const,
             score: hit.score,
             text: hit.id,
             metadata: { turbovec_candidate_id: hit.id, turbovec_cluster: hit.cluster },
@@ -479,13 +537,14 @@ export async function multiLaneRetrievalWithRRF(
       neoResults.status === 'fulfilled'
         ? neoResults.value.map((hit) => ({
             id: hit.id,
-            source: 'neo4j_graph',
+            source: 'neo4j_graph' as const,
             score: hit.score,
             text: hit.text,
             metadata: { neo4j_paths: hit.paths ?? 0 },
           }))
         : [];
 
+    const tRerankStart = performance.now();
     // Combine via RRF
     const lanes = [bm25Hits, conceptHits, qdrantHits, turbovecHits, neoHits];
     const laneNames: RetrievalLaneName[] = ['postgres_trigram', 'concept_overlap', 'qdrant_vector', 'turbovec_ann', 'neo4j_graph'];
@@ -498,6 +557,7 @@ export async function multiLaneRetrievalWithRRF(
 
     // Filter and slice
     const filtered = rrfResults.filter((r) => r.combinedScore >= minScore).slice(0, topK);
+    const rerankMs = performance.now() - tRerankStart;
 
     return {
       results: filtered,
@@ -509,6 +569,16 @@ export async function multiLaneRetrievalWithRRF(
         neoCount: neoHits.length,
       },
       durationMs: Date.now() - t0,
+      timings: {
+        pgBm25Ms,
+        qdrantMs,
+        turbovecMs,
+        neo4jMs,
+        gemma4Ms,
+        rerankMs,
+        pgvectorMs,
+        conceptOverlapMs,
+      },
     };
   } catch (error) {
     console.error('RRF integration error:', error);
@@ -516,6 +586,16 @@ export async function multiLaneRetrievalWithRRF(
       results: [],
       breakdown: { bm25Count: 0, conceptCount: 0, qdrantCount: 0, turbovecCount: 0, neoCount: 0 },
       durationMs: Date.now() - t0,
+      timings: {
+        pgBm25Ms: 0,
+        qdrantMs: 0,
+        turbovecMs: 0,
+        neo4jMs: 0,
+        gemma4Ms: 0,
+        rerankMs: 0,
+        pgvectorMs: 0,
+        conceptOverlapMs: 0,
+      },
     };
   }
 }

@@ -70,7 +70,7 @@ function normalizeMinioUrl(rawValue?: string): string {
 function normalizeRedisUrl(rawValue?: string): string {
   const fallbackHost = isDocker ? 'redis' : LOOPBACK_IP;
   const fallbackPort = '6379';
-  const redisPassword = env?.REDIS_PASSWORD ?? env?.REDIS_PASS ?? 'redis';
+  const redisPassword = env?.REDIS_PASSWORD ?? env?.REDIS_PASS ?? env?.VALKEY_PASSWORD ?? env?.VALKEY_PASS ?? 'redis';
   const raw = rawValue?.trim();
 
   if (!raw) {
@@ -105,19 +105,19 @@ export function getDatabaseUrl(): string {
 }
 
 export function getRedisUrl(): string {
- return normalizeRedisUrl(env?.REDIS_URL);
+ return normalizeRedisUrl(env?.REDIS_URL ?? env?.VALKEY_URL);
 }
 
 export function getRedisHost(): string {
- return env?.REDIS_HOST ?? LOCALHOST;
+ return env?.REDIS_HOST ?? env?.VALKEY_HOST ?? LOCALHOST;
 }
 
 export function getRedisPort(): number {
- return parseInt(env?.REDIS_PORT ?? '6379', 10);
+ return parseInt(env?.REDIS_PORT ?? env?.VALKEY_PORT ?? '6379', 10);
 }
 
 export function getRedisPassword(): string {
- return env?.REDIS_PASSWORD ?? 'redis';
+ return env?.REDIS_PASSWORD ?? env?.REDIS_PASS ?? env?.VALKEY_PASSWORD ?? env?.VALKEY_PASS ?? 'redis';
 }
 
 export function getRabbitMQUrl(): string {

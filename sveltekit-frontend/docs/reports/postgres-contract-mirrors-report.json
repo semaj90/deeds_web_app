@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-06-15T03:26:19.773Z",
+  "generatedAt": "2026-06-18T21:27:18.700Z",
   "inputs": {
     "drizzleDir": "drizzle",
     "schemaDir": "src/lib/server/db",
@@ -10,7 +10,8 @@
   "summary": {
     "tables": 8,
     "classificationCounts": {
-      "LIVE_DB_ALIGNED": 8
+      "LIVE_DB_ALIGNED": 7,
+      "COLUMN_MISMATCH": 1
     },
     "liveReachable": true,
     "liveError": null
@@ -1175,8 +1176,8 @@
     },
     {
       "tableName": "nes_chrom_packets",
-      "classification": "LIVE_DB_ALIGNED",
-      "recommendedRepairClass": null,
+      "classification": "COLUMN_MISMATCH",
+      "recommendedRepairClass": "APPLY_EXISTING_SQL",
       "liveState": "PRESENT",
       "schemaPostgresMentioned": false,
       "schemaSources": [
@@ -1184,11 +1185,13 @@
       ],
       "sqlSources": [
         "drizzle/0030_atlas_synthesis_tables.sql",
+        "drizzle/manual/0035_phase_20_packet_metadata_topology.sql",
         "drizzle/manual/20260601_nes_chrom_packets_and_kag_dag_hits.sql",
         "drizzle/manual/20260606_nes_chrom_live_alignment.sql",
         "drizzle/manual/atlas_dict_tables.sql"
       ],
       "schemaColumns": [
+        "betweenness",
         "canonical",
         "chunk_id",
         "community_confidence",
@@ -1197,6 +1200,7 @@
         "confidence_score",
         "created_at",
         "domain_class",
+        "eigenvector",
         "embedding",
         "feature_code",
         "feature_id",
@@ -1204,6 +1208,7 @@
         "feature_label",
         "file_path",
         "id",
+        "identity_lane",
         "kag_dag_run_id",
         "kag_node_key",
         "kmeans_cluster",
@@ -1213,13 +1218,17 @@
         "lineage_version",
         "metadata",
         "model",
+        "neo4j_node_id",
         "packet_key",
         "packet_type",
         "packet_zstd",
+        "pagerank",
         "payload",
         "payload_backfilled_at",
+        "permissions",
         "qdrant_point_id",
         "query_hash",
+        "redis_centroid_key",
         "som_cluster",
         "som_code",
         "som_col",
@@ -1231,7 +1240,9 @@
         "summary",
         "tags",
         "token_budget",
-        "updated_at"
+        "topology",
+        "updated_at",
+        "vectors"
       ],
       "sqlColumns": [
         "canonical",
@@ -1263,6 +1274,7 @@
         "packet_zstd",
         "payload",
         "payload_backfilled_at",
+        "permissions",
         "qdrant_point_id",
         "query_hash",
         "som_cluster",
@@ -1279,6 +1291,7 @@
         "updated_at"
       ],
       "liveColumns": [
+        "betweenness",
         "canonical",
         "chunk_id",
         "community_confidence",
@@ -1287,6 +1300,7 @@
         "confidence_score",
         "created_at",
         "domain_class",
+        "eigenvector",
         "embedding",
         "feature_code",
         "feature_id",
@@ -1303,13 +1317,17 @@
         "lineage_version",
         "metadata",
         "model",
+        "neo4j_node_id",
         "packet_key",
         "packet_type",
         "packet_zstd",
+        "pagerank",
         "payload",
         "payload_backfilled_at",
+        "permissions",
         "qdrant_point_id",
         "query_hash",
+        "redis_centroid_key",
         "som_cluster",
         "som_code",
         "som_col",
@@ -1321,13 +1339,17 @@
         "summary",
         "tags",
         "token_budget",
-        "updated_at"
+        "topology",
+        "updated_at",
+        "vectors"
       ],
       "schemaIndexes": [
+        "idx_nes_chrom_packets_betweenness",
         "idx_nes_chrom_packets_community_confidence_idx",
         "idx_nes_chrom_packets_community_id_idx",
         "idx_nes_chrom_packets_community_source_idx",
         "idx_nes_chrom_packets_domain_class_idx",
+        "idx_nes_chrom_packets_eigenvector",
         "idx_nes_chrom_packets_feature_id",
         "idx_nes_chrom_packets_feature_id_idx",
         "idx_nes_chrom_packets_feature_ids_gin",
@@ -1338,12 +1360,18 @@
         "idx_nes_chrom_packets_ledger_type_idx",
         "idx_nes_chrom_packets_lineage_version_idx",
         "idx_nes_chrom_packets_metadata_gin",
+        "idx_nes_chrom_packets_neo4j_node_id",
         "idx_nes_chrom_packets_packet_key_idx",
+        "idx_nes_chrom_packets_pagerank",
+        "idx_nes_chrom_packets_permissions_gin",
+        "idx_nes_chrom_packets_redis_centroid_key",
         "idx_nes_chrom_packets_som_cluster",
         "idx_nes_chrom_packets_som_index_idx",
         "idx_nes_chrom_packets_source_ref",
         "idx_nes_chrom_packets_source_ref_idx",
         "idx_nes_chrom_packets_tags_gin",
+        "idx_nes_chrom_packets_topology_gin",
+        "idx_nes_chrom_packets_vectors_gin",
         "nes_chrom_packets_chunk_id_idx",
         "nes_chrom_packets_confidence_score_idx",
         "nes_chrom_packets_embedding_hnsw",
@@ -1364,10 +1392,12 @@
         "nes_chrom_packets_summary_trgm_idx"
       ],
       "sqlIndexes": [
+        "idx_nes_chrom_packets_betweenness",
         "idx_nes_chrom_packets_community_confidence_idx",
         "idx_nes_chrom_packets_community_id_idx",
         "idx_nes_chrom_packets_community_source_idx",
         "idx_nes_chrom_packets_domain_class_idx",
+        "idx_nes_chrom_packets_eigenvector",
         "idx_nes_chrom_packets_feature_id",
         "idx_nes_chrom_packets_feature_id_idx",
         "idx_nes_chrom_packets_feature_ids_gin",
@@ -1378,12 +1408,18 @@
         "idx_nes_chrom_packets_ledger_type_idx",
         "idx_nes_chrom_packets_lineage_version_idx",
         "idx_nes_chrom_packets_metadata_gin",
+        "idx_nes_chrom_packets_neo4j_node_id",
         "idx_nes_chrom_packets_packet_key_idx",
+        "idx_nes_chrom_packets_pagerank",
+        "idx_nes_chrom_packets_permissions_gin",
+        "idx_nes_chrom_packets_redis_centroid_key",
         "idx_nes_chrom_packets_som_cluster",
         "idx_nes_chrom_packets_som_index_idx",
         "idx_nes_chrom_packets_source_ref",
         "idx_nes_chrom_packets_source_ref_idx",
         "idx_nes_chrom_packets_tags_gin",
+        "idx_nes_chrom_packets_topology_gin",
+        "idx_nes_chrom_packets_vectors_gin",
         "nes_chrom_packets_chunk_id_idx",
         "nes_chrom_packets_confidence_score_idx",
         "nes_chrom_packets_embedding_hnsw",
@@ -1404,10 +1440,12 @@
         "nes_chrom_packets_summary_trgm_idx"
       ],
       "liveIndexes": [
+        "idx_nes_chrom_packets_betweenness",
         "idx_nes_chrom_packets_community_confidence_idx",
         "idx_nes_chrom_packets_community_id_idx",
         "idx_nes_chrom_packets_community_source_idx",
         "idx_nes_chrom_packets_domain_class_idx",
+        "idx_nes_chrom_packets_eigenvector",
         "idx_nes_chrom_packets_feature_id",
         "idx_nes_chrom_packets_feature_id_idx",
         "idx_nes_chrom_packets_feature_ids_gin",
@@ -1418,12 +1456,18 @@
         "idx_nes_chrom_packets_ledger_type_idx",
         "idx_nes_chrom_packets_lineage_version_idx",
         "idx_nes_chrom_packets_metadata_gin",
+        "idx_nes_chrom_packets_neo4j_node_id",
         "idx_nes_chrom_packets_packet_key_idx",
+        "idx_nes_chrom_packets_pagerank",
+        "idx_nes_chrom_packets_permissions_gin",
+        "idx_nes_chrom_packets_redis_centroid_key",
         "idx_nes_chrom_packets_som_cluster",
         "idx_nes_chrom_packets_som_index_idx",
         "idx_nes_chrom_packets_source_ref",
         "idx_nes_chrom_packets_source_ref_idx",
         "idx_nes_chrom_packets_tags_gin",
+        "idx_nes_chrom_packets_topology_gin",
+        "idx_nes_chrom_packets_vectors_gin",
         "nes_chrom_packets_chunk_id_idx",
         "nes_chrom_packets_confidence_score_idx",
         "nes_chrom_packets_embedding_hnsw",
@@ -1444,10 +1488,21 @@
         "nes_chrom_packets_summary_trgm_idx"
       ],
       "columnDiffs": {
-        "schemaOnly": [],
+        "schemaOnly": [
+          "betweenness",
+          "eigenvector",
+          "identity_lane",
+          "neo4j_node_id",
+          "pagerank",
+          "redis_centroid_key",
+          "topology",
+          "vectors"
+        ],
         "sqlOnly": [],
         "liveOnly": [],
-        "missingInLive": []
+        "missingInLive": [
+          "identity_lane"
+        ]
       },
       "indexDiffs": {
         "schemaOnly": [],

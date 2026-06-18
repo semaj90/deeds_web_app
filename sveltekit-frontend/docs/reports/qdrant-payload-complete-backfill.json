@@ -1,22 +1,23 @@
 {
-  "generatedAt": "2026-06-14T23:10:54.551Z",
-  "mode": "apply",
+  "generatedAt": "2026-06-18T21:29:14.809Z",
+  "mode": "verify",
   "collection": "codebase_chunks_768",
   "databaseUrl": "postgresql://legal_admin:***@127.0.0.1:5434/legal_ai_db",
   "availableLedgers": [
-    "atlas_feature_packets"
+    "atlas_feature_packets",
+    "atlas_packets"
   ],
   "limits": {
     "requested": null
   },
   "postgres": {
     "rowsScanned": 14234,
-    "rowsMatched": 798,
-    "rowsUpdated": 51809,
-    "rowsAlreadyCanonical": 797,
-    "rowsSkipped": 51808,
+    "rowsMatched": 803,
+    "rowsUpdated": 51827,
+    "rowsAlreadyCanonical": 779,
+    "rowsSkipped": 51803,
     "rowsAmbiguous": 0,
-    "rowsUnmatched": 51808,
+    "rowsUnmatched": 51803,
     "rowsMissingPacketKey": 0,
     "rowsMissingSourceRef": 0,
     "rowsMissingFilePath": 0,
@@ -25,209 +26,416 @@
   },
   "qdrant": {
     "pointsScanned": 52606,
-    "pointsMatched": 798,
-    "pointsUpdated": 51809,
-    "pointsAlreadyCanonical": 797,
-    "pointsLegacyOnly": 51808,
+    "pointsMatched": 803,
+    "pointsUpdated": 0,
+    "pointsAlreadyCanonical": 779,
+    "pointsLegacyOnly": 51803,
     "pointsAmbiguous": 0,
-    "pointsUnmatched": 51808
+    "pointsUnmatched": 51803
   },
   "canonicalCoverage": {
     "packet_key": {
-      "matched": 798,
-      "total": 798,
+      "matched": 803,
+      "total": 803,
       "pct": 100
     },
     "source_ref": {
-      "matched": 798,
-      "total": 798,
+      "matched": 803,
+      "total": 803,
       "pct": 100
     },
     "feature_id": {
-      "matched": 798,
-      "total": 798,
+      "matched": 803,
+      "total": 803,
       "pct": 100
     }
   },
   "ledgerCounts": {
-    "atlas_feature_packets": 798,
+    "atlas_feature_packets": 803,
     "atlas_packets": 0,
-    "legacy_qdrant_only": 51808
+    "legacy_qdrant_only": 51803
   },
   "samples": [
     {
       "qdrant_point_id": "86694",
-      "status": "legacy-updated-or-kept",
+      "status": "legacy-would-update",
       "reason": "legacy_qdrant_only"
     },
     {
       "qdrant_point_id": "138065",
-      "status": "legacy-updated-or-kept",
+      "status": "legacy-would-update",
       "reason": "legacy_qdrant_only"
     },
     {
       "qdrant_point_id": "174637",
-      "status": "legacy-updated-or-kept",
+      "status": "legacy-would-update",
       "reason": "legacy_qdrant_only"
     },
     {
       "qdrant_point_id": "188608",
-      "status": "legacy-updated-or-kept",
+      "status": "legacy-would-update",
       "reason": "legacy_qdrant_only"
     },
     {
       "qdrant_point_id": "194586",
-      "status": "legacy-updated-or-kept",
+      "status": "legacy-would-update",
       "reason": "legacy_qdrant_only"
     },
     {
       "qdrant_point_id": "227675",
-      "status": "legacy-updated-or-kept",
+      "status": "legacy-would-update",
       "reason": "legacy_qdrant_only"
     },
     {
       "qdrant_point_id": "292522",
-      "status": "legacy-updated-or-kept",
+      "status": "legacy-would-update",
       "reason": "legacy_qdrant_only"
     },
     {
       "qdrant_point_id": "404803",
-      "status": "legacy-updated-or-kept",
+      "status": "legacy-would-update",
       "reason": "legacy_qdrant_only"
     },
     {
       "qdrant_point_id": "436451",
-      "status": "legacy-updated-or-kept",
+      "status": "legacy-would-update",
       "reason": "legacy_qdrant_only"
     },
     {
       "qdrant_point_id": "614211",
-      "status": "legacy-updated-or-kept",
+      "status": "legacy-would-update",
       "reason": "legacy_qdrant_only"
     },
     {
       "qdrant_point_id": "639944",
-      "status": "legacy-updated-or-kept",
+      "status": "legacy-would-update",
       "reason": "legacy_qdrant_only"
     },
     {
       "qdrant_point_id": "727645",
-      "status": "legacy-updated-or-kept",
+      "status": "legacy-would-update",
       "reason": "legacy_qdrant_only"
     },
     {
       "qdrant_point_id": "761314",
-      "status": "legacy-updated-or-kept",
+      "status": "legacy-would-update",
       "reason": "legacy_qdrant_only"
     },
     {
       "qdrant_point_id": "909958",
-      "status": "legacy-updated-or-kept",
+      "status": "legacy-would-update",
       "reason": "legacy_qdrant_only"
     },
     {
       "qdrant_point_id": "1080785",
-      "status": "legacy-updated-or-kept",
+      "status": "legacy-would-update",
       "reason": "legacy_qdrant_only"
     },
     {
       "qdrant_point_id": "1103029",
-      "status": "legacy-updated-or-kept",
+      "status": "legacy-would-update",
       "reason": "legacy_qdrant_only"
     },
     {
       "qdrant_point_id": "1116368",
-      "status": "legacy-updated-or-kept",
+      "status": "legacy-would-update",
       "reason": "legacy_qdrant_only"
     },
     {
       "qdrant_point_id": "1146202",
-      "status": "legacy-updated-or-kept",
+      "status": "legacy-would-update",
       "reason": "legacy_qdrant_only"
     },
     {
       "qdrant_point_id": "1249835",
-      "status": "legacy-updated-or-kept",
+      "status": "legacy-would-update",
       "reason": "legacy_qdrant_only"
     },
     {
       "qdrant_point_id": "1354889",
-      "status": "legacy-updated-or-kept",
+      "status": "legacy-would-update",
       "reason": "legacy_qdrant_only"
     },
     {
       "qdrant_point_id": "1401737",
-      "status": "legacy-updated-or-kept",
+      "status": "legacy-would-update",
       "reason": "legacy_qdrant_only"
     },
     {
       "qdrant_point_id": "1536417",
-      "status": "legacy-updated-or-kept",
+      "status": "legacy-would-update",
       "reason": "legacy_qdrant_only"
     },
     {
       "qdrant_point_id": "1604171",
-      "status": "legacy-updated-or-kept",
+      "status": "legacy-would-update",
       "reason": "legacy_qdrant_only"
     },
     {
       "qdrant_point_id": "1612494",
-      "status": "legacy-updated-or-kept",
+      "status": "legacy-would-update",
       "reason": "legacy_qdrant_only"
     },
     {
       "qdrant_point_id": "1631859",
-      "status": "legacy-updated-or-kept",
+      "status": "legacy-would-update",
       "reason": "legacy_qdrant_only"
     }
   ],
   "updates": [
     {
-      "qdrant_point_id": "2316000",
-      "packet_key": "002356e08cd7e23f",
-      "source_ref": "mcp-tools/src-mcp-server.ts#research:reddit_search",
-      "file_path": "src/mcp/server.ts#research:reddit_search",
-      "feature_id": "a06042c0be12e4ca",
-      "feature_label": "A06042c0be12e4ca",
+      "qdrant_point_id": "11915146",
+      "packet_key": ".cache/ace/context-packs/ace_context_local-json-hit_v1.json:0cd8ec3cced8cc06",
+      "source_ref": ".cache/ace/context-packs/ace_context_local-json-hit_v1.json",
+      "file_path": ".cache/ace/context-packs/ace_context_local-json-hit_v1.json",
+      "feature_id": "c19d70fff6c17dc1acf1a52ce6d5a99f35745b7a",
+      "feature_label": "C19d70fff6c17dc1acf1a52ce6d5a99f35745b7a",
+      "ledger_type": "atlas_feature_packets"
+    },
+    {
+      "qdrant_point_id": "14544441",
+      "packet_key": "ea68da38382c1b3e",
+      "source_ref": "proto:TurboVecCudaService.Health",
+      "file_path": null,
+      "feature_id": "grpc_service",
+      "feature_label": "Grpc Service",
+      "ledger_type": "atlas_feature_packets"
+    },
+    {
+      "qdrant_point_id": "33502551",
+      "packet_key": "01ff3557ce929f39",
+      "source_ref": "mcp-tools/proto-active-vectors.proto#CyberElephantService.GetClusters",
+      "file_path": "mcp-tools/proto-active-vectors.proto#CyberElephantService.GetClusters",
+      "feature_id": "5ac4d700d2e1b7c5",
+      "feature_label": "5ac4d700d2e1b7c5",
+      "ledger_type": "atlas_feature_packets"
+    },
+    {
+      "qdrant_point_id": "41527903",
+      "packet_key": "0279aa5f4d28b843",
+      "source_ref": "mcp-tools/proto-active-turbovec.proto#TurboVecService.Health",
+      "file_path": "mcp-tools/proto-active-turbovec.proto#TurboVecService.Health",
+      "feature_id": "6e17b3569b7d862a",
+      "feature_label": "6e17b3569b7d862a",
+      "ledger_type": "atlas_feature_packets"
+    },
+    {
+      "qdrant_point_id": "54252682",
+      "packet_key": "28e942decdcdb342",
+      "source_ref": "proto:CodeIntelService.LookupChunk",
+      "file_path": null,
+      "feature_id": "grpc_service",
+      "feature_label": "Grpc Service",
+      "ledger_type": "atlas_feature_packets"
+    },
+    {
+      "qdrant_point_id": "58355667",
+      "packet_key": "037a6fd35a378119",
+      "source_ref": "mcp-tools/proto-active-turbovec_cuda.proto#TurboVecCudaService.Search",
+      "file_path": "mcp-tools/proto-active-turbovec_cuda.proto#TurboVecCudaService.Search",
+      "feature_id": "f955eaa0b877b1fa",
+      "feature_label": "F955eaa0b877b1fa",
+      "ledger_type": "atlas_feature_packets"
+    },
+    {
+      "qdrant_point_id": "100690717",
+      "packet_key": "dacc099376a3c299",
+      "source_ref": "proto:EmbeddingService.GetStats",
+      "file_path": null,
+      "feature_id": "grpc_service",
+      "feature_label": "Grpc Service",
+      "ledger_type": "atlas_feature_packets"
+    },
+    {
+      "qdrant_point_id": "100819638",
+      "packet_key": "060262b63f2017ff",
+      "source_ref": "mcp-tools/sveltekit-frontend-proto-active-library_search.proto#LibrarySearchService.GetDocumentToc",
+      "file_path": "mcp-tools/sveltekit-frontend-proto-active-library_search.proto#LibrarySearchService.GetDocumentToc",
+      "feature_id": "75de10d6a58dfb87",
+      "feature_label": "75de10d6a58dfb87",
+      "ledger_type": "atlas_feature_packets"
+    },
+    {
+      "qdrant_point_id": "102636680",
+      "packet_key": ".cache/llm-synthesis/[object Promise].json:e7d15ea6e22aab93",
+      "source_ref": ".cache/llm-synthesis/[object Promise].json",
+      "file_path": ".cache/llm-synthesis/[object Promise].json",
+      "feature_id": "823e7ec634e1ca4d8476999d619e562a1d0f65f3",
+      "feature_label": "823e7ec634e1ca4d8476999d619e562a1d0f65f3",
+      "ledger_type": "atlas_feature_packets"
+    },
+    {
+      "qdrant_point_id": "112241639",
+      "packet_key": "ba2929dea127c94b",
+      "source_ref": "proto:ToolCallingService.ListTools",
+      "file_path": null,
+      "feature_id": "grpc_service",
+      "feature_label": "Grpc Service",
+      "ledger_type": "atlas_feature_packets"
+    },
+    {
+      "qdrant_point_id": "112944027",
+      "packet_key": "06bb639b791c20ed",
+      "source_ref": "mcp-tools/proto-active-turbovec.proto#TurboVecService.Upsert",
+      "file_path": "mcp-tools/proto-active-turbovec.proto#TurboVecService.Upsert",
+      "feature_id": "cbca9c3905cc980d",
+      "feature_label": "Cbca9c3905cc980d",
+      "ledger_type": "atlas_feature_packets"
+    },
+    {
+      "qdrant_point_id": "116762750",
+      "packet_key": ".claude/settings.local.json:c2c7e75654a197a1",
+      "source_ref": ".claude/settings.local.json",
+      "file_path": ".claude/settings.local.json",
+      "feature_id": "a23e3cea9d4941696189029f83190a87b302fcdd",
+      "feature_label": "A23e3cea9d4941696189029f83190a87b302fcdd",
+      "ledger_type": "atlas_feature_packets"
+    },
+    {
+      "qdrant_point_id": "118542061",
+      "packet_key": "25c824811a2efd81",
+      "source_ref": "proto:EmbeddingService.GenerateEmbeddings",
+      "file_path": null,
+      "feature_id": "grpc_service",
+      "feature_label": "Grpc Service",
+      "ledger_type": "atlas_feature_packets"
+    },
+    {
+      "qdrant_point_id": "120863127",
+      "packet_key": ".cache/ace/context-packs/ace_context_smoke-context-pack_v1.json:bd969f62ad1c261d",
+      "source_ref": ".cache/ace/context-packs/ace_context_smoke-context-pack_v1.json",
+      "file_path": ".cache/ace/context-packs/ace_context_smoke-context-pack_v1.json",
+      "feature_id": "22d6336c5d58f51fabe00e658c381ba923fdf1d9",
+      "feature_label": "22d6336c5d58f51fabe00e658c381ba923fdf1d9",
+      "ledger_type": "atlas_feature_packets"
+    },
+    {
+      "qdrant_point_id": "187027347",
+      "packet_key": "0b25cf933c92e523",
+      "source_ref": "mcp-tools/proto-active-codeintel_enrichment.proto#EnrichmentService.BatchEnrich",
+      "file_path": "mcp-tools/proto-active-codeintel_enrichment.proto#EnrichmentService.BatchEnrich",
+      "feature_id": "95ff63f0d3271c90",
+      "feature_label": "95ff63f0d3271c90",
+      "ledger_type": "atlas_feature_packets"
+    },
+    {
+      "qdrant_point_id": "192089017",
+      "packet_key": "c91eb4c9cb71b033",
+      "source_ref": "proto:TurboVecCudaService.BatchCosine",
+      "file_path": null,
+      "feature_id": "grpc_service",
+      "feature_label": "Grpc Service",
+      "ledger_type": "atlas_feature_packets"
+    },
+    {
+      "qdrant_point_id": "195179612",
+      "packet_key": "0ba2345cd9c542fa",
+      "source_ref": "proto:RetrievalService.Health",
+      "file_path": "proto:RetrievalService.Health",
+      "feature_id": "grpc_service",
+      "feature_label": "Grpc Service",
+      "ledger_type": "atlas_feature_packets"
+    },
+    {
+      "qdrant_point_id": "201318456",
+      "packet_key": "0bffe0382a0d44bb",
+      "source_ref": "proto:ToolCallingService.ExecuteToolBatch",
+      "file_path": "proto:ToolCallingService.ExecuteToolBatch",
+      "feature_id": "grpc_service",
+      "feature_label": "Grpc Service",
+      "ledger_type": "atlas_feature_packets"
+    },
+    {
+      "qdrant_point_id": "205874054",
+      "packet_key": ".tmp/cuvs-benchmark/latest.json:778a62ce08b7aa95",
+      "source_ref": ".tmp/cuvs-benchmark/latest.json",
+      "file_path": ".tmp/cuvs-benchmark/latest.json",
+      "feature_id": "85c08f41f1af927a24b3ba7721e658163736cd36",
+      "feature_label": "85c08f41f1af927a24b3ba7721e658163736cd36",
+      "ledger_type": "atlas_feature_packets"
+    },
+    {
+      "qdrant_point_id": "225294562",
+      "packet_key": "86b1cf9cdb01cfb5",
+      "source_ref": "mcp-tools/src-mcp-trace-mcp-server.ts#unknown",
+      "file_path": "src/mcp/trace-mcp-server.ts#unknown",
+      "feature_id": "3ef194269002e593",
+      "feature_label": "3ef194269002e593",
+      "ledger_type": "atlas_feature_packets"
+    },
+    {
+      "qdrant_point_id": "277101643",
+      "packet_key": "bbf76be6e37686a4",
+      "source_ref": "mcp-tools/src-mcp-tools-vault-walker.tool.ts#vault.read",
+      "file_path": "src/mcp/tools/vault-walker.tool.ts#vault.read",
+      "feature_id": "20278142bd799fa4",
+      "feature_label": "20278142bd799fa4",
+      "ledger_type": "atlas_feature_packets"
+    },
+    {
+      "qdrant_point_id": "284391981",
+      "packet_key": "80819316fbaa2000",
+      "source_ref": "mcp-tools/src-mcp-tools-repair_tools.ts#hmm_infer_repair_states",
+      "file_path": "src/mcp/tools/repair_tools.ts#hmm_infer_repair_states",
+      "feature_id": "100471c58be199b6",
+      "feature_label": "100471c58be199b6",
+      "ledger_type": "atlas_feature_packets"
+    },
+    {
+      "qdrant_point_id": "363833610",
+      "packet_key": "b8b7a06d05c58efd",
+      "source_ref": "mcp-tools/src-mcp-tools-video-analysis.ts#video_to_frames",
+      "file_path": "src/mcp/tools/video-analysis.ts#video_to_frames",
+      "feature_id": "c38e499cfa494585",
+      "feature_label": "C38e499cfa494585",
+      "ledger_type": "atlas_feature_packets"
+    },
+    {
+      "qdrant_point_id": "430336446",
+      "packet_key": "d1229f6daf585b19",
+      "source_ref": "mcp-tools/src-mcp-server.ts#cases:update",
+      "file_path": "src/mcp/server.ts#cases:update",
+      "feature_id": "100d6798d7248af8",
+      "feature_label": "100d6798d7248af8",
       "ledger_type": "atlas_feature_packets"
     }
   ],
   "summary": {
     "rowsScanned": 14234,
-    "rowsMatched": 798,
-    "rowsUpdated": 51809,
-    "rowsAlreadyCanonical": 797,
-    "rowsSkipped": 51808,
+    "rowsMatched": 803,
+    "rowsUpdated": 51827,
+    "rowsAlreadyCanonical": 779,
+    "rowsSkipped": 51803,
     "rowsAmbiguous": 0,
-    "rowsUnmatched": 51808,
+    "rowsUnmatched": 51803,
     "qdrantPointsScanned": 52606,
-    "qdrantPointsMatched": 798,
-    "qdrantPointsUpdated": 51809,
-    "qdrantPointsAlreadyCanonical": 797,
-    "qdrantPointsLegacyOnly": 51808,
+    "qdrantPointsMatched": 803,
+    "qdrantPointsUpdated": 0,
+    "qdrantPointsAlreadyCanonical": 779,
+    "qdrantPointsLegacyOnly": 51803,
     "qdrantPointsAmbiguous": 0,
-    "qdrantPointsUnmatched": 51808,
+    "qdrantPointsUnmatched": 51803,
     "canonicalCoverage": {
       "packet_key": {
-        "matched": 798,
-        "total": 798,
+        "matched": 803,
+        "total": 803,
         "pct": 100
       },
       "source_ref": {
-        "matched": 798,
-        "total": 798,
+        "matched": 803,
+        "total": 803,
         "pct": 100
       },
       "feature_id": {
-        "matched": 798,
-        "total": 798,
+        "matched": 803,
+        "total": 803,
         "pct": 100
       }
     },
     "ledgerCounts": {
-      "atlas_feature_packets": 798,
+      "atlas_feature_packets": 803,
       "atlas_packets": 0,
-      "legacy_qdrant_only": 51808
+      "legacy_qdrant_only": 51803
     }
   }
 }

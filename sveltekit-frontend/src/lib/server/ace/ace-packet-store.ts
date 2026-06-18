@@ -57,8 +57,8 @@ export interface AceFullPacket {
   ttl_seconds: number;
 }
 
-const DEFAULT_TTL = 3_600;   // 1h
-const CLUSTER_TTL = 86_400;  // 24h for cluster-scoped packets
+const DEFAULT_TTL = 604_800;   // 7d
+const CLUSTER_TTL = 604_800;   // 7d for cluster-scoped packets
 
 function packetKey(id: string): string { return `ace:packet:${id}`; }
 function clusterPacketKey(row: number, col: number): string { return `ace:cluster:${row}:${col}`; }

@@ -20,6 +20,10 @@ export interface QdrantCodeResult {
   tags?: string;
   topo_class?: string;
   graph_authority_score?: number;
+  som_cluster?: number | string | null;
+  som_bmu_row?: number | null;
+  som_bmu_col?: number | null;
+  centroid_id?: string | number | null;
   semantic_score: number;
   qdrant_id: string;
 }
@@ -68,6 +72,7 @@ class QdrantSearchBackend implements SearchBackend<QdrantCodeResult> {
 
       return (res.results ?? []).map((r) => {
         const p = r.payload ?? {};
+        const somCluster = p.som_cluster ?? p.somCluster;
         return {
           stable_key: String(p.stable_key ?? p.chunk_id ?? r.id),
           file_path: String(p.file_path ?? ''),
@@ -79,6 +84,16 @@ class QdrantSearchBackend implements SearchBackend<QdrantCodeResult> {
           topo_class: p.topo_class ? String(p.topo_class) : undefined,
           graph_authority_score:
             typeof p.graph_authority_score === 'number' ? p.graph_authority_score : undefined,
+          som_cluster:
+            typeof somCluster === 'number' || typeof somCluster === 'string'
+              ? somCluster
+              : null,
+          som_bmu_row: typeof p.som_bmu_row === 'number' ? p.som_bmu_row : null,
+          som_bmu_col: typeof p.som_bmu_col === 'number' ? p.som_bmu_col : null,
+          centroid_id:
+            typeof p.centroid_id === 'number' || typeof p.centroid_id === 'string'
+              ? p.centroid_id
+              : null,
           semantic_score: r.score,
           qdrant_id: String(r.id),
         };
@@ -131,3 +146,4 @@ export async function searchQdrantCode(
 ): Promise<QdrantCodeResult[]> {
   return searchCodebaseAnn(embedding, limit, topoClass, collection);
 }
+

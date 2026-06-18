@@ -15,7 +15,7 @@ const LOOPBACK_IP = ['127', '0', '0', '1'].join('.');
 function normalizeRedisUrl(rawValue?: string): string {
   const fallbackHost = LOOPBACK_IP;
   const fallbackPort = '6379';
-  const redisPassword = privateEnv.REDIS_PASSWORD ?? privateEnv.REDIS_PASS ?? '';
+  const redisPassword = privateEnv.REDIS_PASSWORD ?? privateEnv.REDIS_PASS ?? privateEnv.VALKEY_PASSWORD ?? privateEnv.VALKEY_PASS ?? '';
   const raw = rawValue?.trim();
   if (!raw) return `redis://${fallbackHost}:${fallbackPort}`;
   if (/^rediss?:\/\//i.test(raw)) {
@@ -88,8 +88,8 @@ function qdrantUrlFromParts(): string | undefined {
 export const ENV = {
   DATABASE_URL: privateEnv.DATABASE_URL ?? privateEnv.POSTGRES_URL ?? DEV.DATABASE_URL,
   AGENT_TRACE_ENABLED: privateEnv.AGENT_TRACE_ENABLED ?? 'true',
-  REDIS_URL: normalizeRedisUrl(privateEnv.REDIS_URL ?? DEV.REDIS_URL),
-  REDIS_PASSWORD: privateEnv.REDIS_PASSWORD ?? privateEnv.REDIS_PASS ?? '',
+  REDIS_URL: normalizeRedisUrl(privateEnv.REDIS_URL ?? privateEnv.VALKEY_URL ?? DEV.REDIS_URL),
+  REDIS_PASSWORD: privateEnv.REDIS_PASSWORD ?? privateEnv.REDIS_PASS ?? privateEnv.VALKEY_PASSWORD ?? privateEnv.VALKEY_PASS ?? 'redis',
   QDRANT_URL: privateEnv.QDRANT_URL ?? qdrantUrlFromParts() ?? DEV.QDRANT_URL,
   QDRANT_API_KEY: privateEnv.QDRANT_API_KEY ?? '',
   RABBITMQ_URL: privateEnv.RABBITMQ_URL ?? DEV.RABBITMQ_URL,
@@ -146,6 +146,10 @@ export const ENV = {
   DOCLING_SERVICE_URL: privateEnv.DOCLING_SERVICE_URL ?? `http://${LOOPBACK_IP}:8085`,
   /** Go retrieval service HTTP REST API (port 8100) — lighter weight alternative to gRPC */
   RETRIEVAL_HTTP_URL: privateEnv.RETRIEVAL_HTTP_URL ?? `http://${LOOPBACK_IP}:8100`,
+  /** ACE concept extraction timeout in milliseconds */
+  ACE_CONCEPT_EXTRACTION_TIMEOUT_MS: privateEnv.ACE_CONCEPT_EXTRACTION_TIMEOUT_MS ?? '1500',
+  /** ACE concept extraction mode: gemma | heuristic */
+  ACE_CONCEPT_EXTRACTION_MODE: privateEnv.ACE_CONCEPT_EXTRACTION_MODE ?? 'gemma',
   SDXL_SERVICE_URL: privateEnv.SDXL_SERVICE_URL ?? `http://${LOCALHOST}:8100`,
   RETRIEVAL_HTTP_ENABLED: (privateEnv.RETRIEVAL_HTTP_ENABLED ?? 'false') === 'true',
   ENABLE_CUVS_SEARCH: (privateEnv.ENABLE_CUVS_SEARCH ?? 'false') === 'true',

@@ -11,17 +11,19 @@ import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import crypto from 'node:crypto';
 import pg from 'pg';
+import { loadRepoEnv, resolveDatabaseUrl, resolveRedisUrl } from '../atlas/connection-config.mjs';
 
 const __dir = dirname(fileURLToPath(import.meta.url));
 const ROOT = join(__dir, '../..');
 
+const env = loadRepoEnv(process.env);
 // Connection envs
-const DATABASE_URL = process.env.DATABASE_URL || 'postgresql://legal_admin:123456@127.0.0.1:5434/legal_ai_db';
-const QDRANT_URL   = process.env.QDRANT_URL   || 'http://localhost:6333';
-const NEO4J_URL    = process.env.NEO4J_URL    || 'http://localhost:7474';
-const NEO4J_USER   = process.env.NEO4J_USER   || 'neo4j';
-const NEO4J_PASS   = process.env.NEO4J_PASS   || 'neo4j123';
-const REDIS_URL    = process.env.REDIS_URL    || 'redis://127.0.0.1:6379';
+const DATABASE_URL = resolveDatabaseUrl(env);
+const QDRANT_URL   = env.QDRANT_URL   || 'http://localhost:6333';
+const NEO4J_URL    = env.NEO4J_URL    || 'http://localhost:7474';
+const NEO4J_USER   = env.NEO4J_USER   || 'neo4j';
+const NEO4J_PASS   = env.NEO4J_PASS   || 'neo4j123';
+const REDIS_URL    = resolveRedisUrl(env);
 
 const COLLECT_STATS = {
   scan_time: new Date().toISOString(),

@@ -22,7 +22,7 @@ import { existsSync, createReadStream } from 'fs';
 import path from 'path';
 import crypto from 'crypto';
 import readline from 'readline';
-import { createRequire } from 'module';
+import { loadRepoEnv, resolveRedisUrl } from '../atlas/connection-config.mjs';
 
 const ROOT    = process.cwd();
 const TMP_DIR = path.join(ROOT, '.tmp');
@@ -70,7 +70,8 @@ function intentHash(query) {
 }
 
 async function loadRedis() {
-  const require = createRequire(import.meta.url);
+  const env = loadRepoEnv(process.env);
+  const redisUrl = resolveRedisUrl(env);
   const candidates = [
     path.join(ROOT, 'sveltekit-frontend', 'node_modules', 'ioredis'),
     path.join(ROOT, 'node_modules', 'ioredis'),
@@ -78,7 +79,7 @@ async function loadRedis() {
   for (const p of candidates) {
     if (existsSync(p)) {
       const { default: Redis } = await import(p + '/built/index.js').catch(() => import(p));
-      const redis = new Redis('redis://127.0.0.1:6379', {
+      const redis = new Redis(redisUrl, {
         lazyConnect: true,
         maxRetriesPerRequest: 1,
         enableOfflineQueue: false,

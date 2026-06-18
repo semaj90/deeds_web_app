@@ -70,22 +70,31 @@ async function queryNeo4jHttp({
   }
 
   const auth = Buffer.from(`${username ?? ''}:${password ?? ''}`).toString('base64');
-  const response = await fetch(httpUrl, {
-    method: 'POST',
-    headers: {
-      authorization: `Basic ${auth}`,
-      'content-type': 'application/json',
-      accept: 'application/json',
-    },
-    body: JSON.stringify({
-      statements: [
-        {
-          statement,
-          parameters,
-        },
-      ],
-    }),
-  });
+  let response;
+  try {
+    response = await fetch(httpUrl, {
+      method: 'POST',
+      headers: {
+        authorization: `Basic ${auth}`,
+        'content-type': 'application/json',
+        accept: 'application/json',
+      },
+      body: JSON.stringify({
+        statements: [
+          {
+            statement,
+            parameters,
+          },
+        ],
+      }),
+    });
+  } catch (error) {
+    return {
+      ok: false,
+      error: error instanceof Error ? error.message : String(error),
+      httpUrl,
+    };
+  }
 
   const text = await response.text();
   let payload = null;

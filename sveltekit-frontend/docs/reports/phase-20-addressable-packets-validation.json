@@ -1,0 +1,76 @@
+{
+  "generatedAt": "2026-06-18T21:34:41.816Z",
+  "applyMode": false,
+  "structuralStatus": "PASS",
+  "enrichmentStatus": "WARN",
+  "overallStatus": "WARN",
+  "tables": [
+    {
+      "table": "atlas_packets",
+      "exists": true,
+      "totalRows": 0,
+      "requiredMissing": [],
+      "topologyMissing": [],
+      "packetCoverage": 0,
+      "sourceRefCoverage": 0,
+      "featureIdCoverage": 0,
+      "featureLabelCoverage": 0,
+      "permissionsCoverage": 0,
+      "metadataCoverage": 0,
+      "topologyCoverage": {
+        "pagerank": 0,
+        "betweenness": 0,
+        "eigenvector": 0,
+        "neo4j_node_id": 0,
+        "redis_centroid_key": 0
+      },
+      "vectorsCoverage": 0,
+      "status": "WARN"
+    },
+    {
+      "table": "nes_chrom_packets",
+      "exists": true,
+      "totalRows": 14911,
+      "requiredMissing": [],
+      "topologyMissing": [],
+      "packetCoverage": 1,
+      "sourceRefCoverage": 1,
+      "featureIdCoverage": 1,
+      "featureLabelCoverage": 1,
+      "permissionsCoverage": 1,
+      "metadataCoverage": 1,
+      "topologyCoverage": {
+        "pagerank": 0,
+        "betweenness": 0,
+        "eigenvector": 0,
+        "neo4j_node_id": 0,
+        "redis_centroid_key": 0
+      },
+      "vectorsCoverage": 1,
+      "status": "WARN"
+    },
+    {
+      "table": "atlas_feature_packets",
+      "exists": true,
+      "totalRows": 14234,
+      "requiredMissing": [],
+      "topologyMissing": [],
+      "packetCoverage": 1,
+      "sourceRefCoverage": 1,
+      "featureIdCoverage": 1,
+      "featureLabelCoverage": 1,
+      "permissionsCoverage": 1,
+      "metadataCoverage": 1,
+      "topologyCoverage": {
+        "pagerank": 0,
+        "betweenness": 0,
+        "eigenvector": 0,
+        "neo4j_node_id": 0,
+        "redis_centroid_key": 0
+      },
+      "vectorsCoverage": 1,
+      "status": "WARN"
+    }
+  ],
+  "addressableFile": true
+}

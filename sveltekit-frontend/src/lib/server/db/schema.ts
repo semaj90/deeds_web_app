@@ -190,6 +190,7 @@ export * from './schema/atlas-feature-map-synthesized.js';
 export * from './schema/route_runtime_packets.js';
 export * from './schema/concept-records.js';
 export * from './schema/retrieval-telemetry.js';
+export * from './schema/retrieval-eval-times.js';
 export * from './schema/kanban-tasks.js';
 export * from './schema/agent-traces.js';
 export * from './schema/atlas-packets.js';

@@ -15,7 +15,13 @@ function flag(name) {
   return process.argv.includes(`--${name}`);
 }
 
-const bridge = require(path.resolve('simd-bridge/cpp/build/Release/tensorrt_bridge.node'));
+let bridge = null;
+try {
+  bridge = require(path.resolve('simd-bridge/cpp/build/Release/tensorrt_bridge.node'));
+} catch (error) {
+  bridge = null;
+  console.warn('[gpu] bridge unavailable, using CPU fallback:', error?.message ?? String(error));
+}
 
 const GPU_REQUIRED = String(process.env.GPU_REQUIRED ?? '').toLowerCase() === 'true';
 const DIM_ARG = arg('dim', process.env.EMBED_DIM ?? '');
@@ -37,9 +43,13 @@ const embeddingsDir = arg('embeddings-dir', '.opencode/embeddings');
 const CHECK_NEO4J = flag('neo4j') || String(process.env.CHECK_NEO4J ?? '').toLowerCase() === 'true';
 let RESOLVED_INPUT = null;
 
-console.log('[gpu] cuda=', bridge.checkCudaAvailable());
+const cudaAvailable = bridge && typeof bridge.checkCudaAvailable === 'function'
+  ? bridge.checkCudaAvailable()
+  : 0;
 
-if (GPU_REQUIRED && bridge.checkCudaAvailable() !== 1) {
+console.log('[gpu] cuda=', cudaAvailable);
+
+if (GPU_REQUIRED && cudaAvailable !== 1) {
   throw new Error('CUDA required but unavailable');
 }
 
@@ -236,6 +246,39 @@ function topKNeighbors(sim, ids, row) {
     .map((e, i) => ({ ...e, topk_rank: i + 1, source: 'turbovec' }));
 }
 
+function graphSimilarityCpu(vectors, rows, dim) {
+  const out = new Float32Array(rows * rows);
+
+  const norms = new Float32Array(rows);
+  for (let row = 0; row < rows; row += 1) {
+    let sum = 0;
+    for (let col = 0; col < dim; col += 1) {
+      const value = vectors[row * dim + col];
+      sum += value * value;
+    }
+    norms[row] = Math.sqrt(sum);
+  }
+
+  for (let row = 0; row < rows; row += 1) {
+    for (let col = 0; col < rows; col += 1) {
+      if (row === col) {
+        out[row * rows + col] = 1;
+        continue;
+      }
+
+      let dot = 0;
+      for (let i = 0; i < dim; i += 1) {
+        dot += vectors[row * dim + i] * vectors[col * dim + i];
+      }
+
+      const denom = norms[row] * norms[col];
+      out[row * rows + col] = denom ? dot / denom : 0;
+    }
+  }
+
+  return out;
+}
+
 async function checkNeo4j() {
   const result = {
     checked: CHECK_NEO4J,
@@ -296,9 +339,12 @@ console.log(
 const edges = [];
 
 if (packed.ids.length >= 2) {
-  console.time('[gpu] graphSimilarity');
-  const sim = bridge.graphSimilarity(packed.vectors, packed.ids.length, inferredDim);
-  console.timeEnd('[gpu] graphSimilarity');
+  console.time(cudaAvailable === 1 && bridge && typeof bridge.graphSimilarity === 'function' ? '[gpu] graphSimilarity' : '[cpu] graphSimilarity');
+  const sim =
+    cudaAvailable === 1 && bridge && typeof bridge.graphSimilarity === 'function'
+      ? bridge.graphSimilarity(packed.vectors, packed.ids.length, inferredDim)
+      : graphSimilarityCpu(packed.vectors, packed.ids.length, inferredDim);
+  console.timeEnd(cudaAvailable === 1 && bridge && typeof bridge.graphSimilarity === 'function' ? '[gpu] graphSimilarity' : '[cpu] graphSimilarity');
 
   if (!(sim instanceof Float32Array)) throw new Error(`graphSimilarity returned ${typeof sim}`);
   if (sim.length !== packed.ids.length * packed.ids.length)
@@ -376,7 +422,8 @@ const audit = {
     checkNeo4j: CHECK_NEO4J,
   },
   gpu: {
-    cuda_available: bridge.checkCudaAvailable() === 1,
+    cuda_available: cudaAvailable === 1,
+    backend: cudaAvailable === 1 ? 'gpu' : 'cpu',
     memory_probe_trusted: false,
   },
   counts: {

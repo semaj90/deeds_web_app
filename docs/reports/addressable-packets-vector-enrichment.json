@@ -1,0 +1,41 @@
+{
+  "generatedAt": "2026-06-18T21:10:48.577Z",
+  "mode": "dry-run",
+  "inputPath": ".tmp/addressable-packets.ndjson",
+  "outputPath": ".tmp/addressable-packets.vectorized.ndjson",
+  "summary": {
+    "inputRows": 100,
+    "selectedRows": 10,
+    "rowsWithEmbedding": 5,
+    "qdrantVectors": 0,
+    "opencodeVectors": 5,
+    "localDumpVectors": 0,
+    "missingVectors": 5,
+    "qdrantReachable": false
+  },
+  "samples": [
+    {
+      "packet_key": "05dbd8cc7c550bbe",
+      "source_ref": "src/lib/server/ai/llama-tool-definitions.ts#kb__search_cards",
+      "vector_source": null,
+      "vector_key": null,
+      "embedding_dim": null
+    },
+    {
+      "packet_key": "05f26c6dc1b51a12",
+      "source_ref": "src/routes/api/atlas/search/+server.ts#gpubatchcosinererank",
+      "vector_source": "opencode",
+      "vector_key": "+server.ts",
+      "embedding_dim": 768
+    },
+    {
+      "packet_key": "08dce8e980d1e261",
+      "source_ref": "src/mcp/server.ts#reports:update",
+      "vector_source": "opencode",
+      "vector_key": "server",
+      "embedding_dim": 768
+    }
+  ],
+  "status": "DRY_RUN_READY",
+  "nextSafeAction": "Review the vector join preview, then rerun with --apply to write the vectorized packet file."
+}

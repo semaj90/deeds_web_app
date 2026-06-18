@@ -142,6 +142,26 @@ export class QdrantManager {
   }
 
   /**
+   * Compatibility helper for legacy callers that still expect a fetch-style
+   * Qdrant client surface.
+   */
+  async post(path: string, body: unknown): Promise<{ result?: unknown; status?: string }> {
+    const baseUrl = ENV.QDRANT_URL.replace(/\/+$/, '');
+    const response = await fetch(`${baseUrl}${path.startsWith('/') ? path : `/${path}`}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text().catch(() => '');
+      throw new Error(`Qdrant POST ${path} failed (${response.status}): ${errorText}`);
+    }
+
+    return (await response.json()) as { result?: unknown; status?: string };
+  }
+
+  /**
    * Build a canonical telemetry metadata object for Langfuse traces.
    * Ensures all expected fields exist (may be null) so downstream consumers
    * have a stable schema even when callers provide partial metadata.
@@ -1756,6 +1776,14 @@ export function adaptiveScalingDecision(
 }
 
 export const qdrant = new QdrantManager();
+
+export function getQdrantManager(): QdrantManager {
+  return qdrant;
+}
+
+export function getQdrantClient(): QdrantClient {
+  return qdrant.client;
+}
 
 
 

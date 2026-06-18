@@ -1,0 +1,44 @@
+{
+  "timestamp": "2026-06-18T22:22:40.788Z",
+  "mode": "apply",
+  "updated_count": 0,
+  "error_count": 0,
+  "collection": "codebase_chunks_768",
+  "synced_fields": [
+    "graph_version",
+    "cache_epoch",
+    "qdrant_tags"
+  ],
+  "payload_shape": {
+    "packet_key": "string",
+    "source_ref": "string",
+    "feature_id": "string",
+    "feature_label": "string",
+    "domain_class": "string",
+    "community_id": "string",
+    "concept_ids": "array<string>",
+    "som_row": "number | null",
+    "som_col": "number | null",
+    "som_index": "number | null",
+    "kmeans_cluster": "number | null",
+    "surface": "enum[code|doc|rpc|trace|tool]",
+    "graph_version": "number (current: TBD)",
+    "cache_epoch": "number (current: TBD)",
+    "qdrant_tags": "array<string>"
+  },
+  "contract": {
+    "total_points": 54849,
+    "points_to_sync": "~54849 (all)",
+    "batch_size": 100,
+    "batches": 549
+  },
+  "next_steps": [
+    "Fetch current redis graph_version and cache_epoch via atlas-cache-cascade.ts",
+    "Scroll Qdrant codebase_chunks_768 in batches of 100",
+    "For each point: upsert payload with new graph_version, cache_epoch, regenerated qdrant_tags",
+    "qdrant_tags = [surface, domain_class, ...concept_ids].filter(Boolean)",
+    "Log batch progress every 10 batches",
+    "Report final count and latency"
+  ],
+  "status": "contract_verified"
+}

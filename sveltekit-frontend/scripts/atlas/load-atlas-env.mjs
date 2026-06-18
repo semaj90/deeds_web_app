@@ -7,7 +7,7 @@ import { config as loadEnv } from 'dotenv';
 export function loadAtlasEnv(baseDir = process.cwd()) {
   const seen = new Set();
   const searchRoots = [baseDir, resolve(baseDir, '..')];
-  const envFiles = ['.env.local', '.env', '.env.development.local', '.env.development'];
+  const envFiles = ['.env', '.env.local', '.env.development', '.env.development.local'];
 
   for (const root of searchRoots) {
     for (const envFile of envFiles) {

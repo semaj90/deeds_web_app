@@ -10,6 +10,9 @@ const REPO_ROOT = path.resolve(__dirname, '../..');
 const INPUT_PATH = path.join(REPO_ROOT, '.tmp', 'turbovec-neighbors.ndjson');
 const REPORT_JSON = path.join(REPO_ROOT, 'docs', 'reports', 'neo4j-turbovec-import.json');
 const REPORT_MD = path.join(REPO_ROOT, 'docs', 'reports', 'neo4j-turbovec-import.md');
+const NEO4J_URI = process.env.NEO4J_URI ?? 'bolt://127.0.0.1:7687';
+const NEO4J_USER = process.env.NEO4J_USER ?? 'neo4j';
+const NEO4J_PASSWORD = process.env.NEO4J_PASSWORD ?? process.env.NEO4J_PASS ?? 'neo4j123';
 
 const argv = process.argv.slice(2);
 const APPLY_REQUESTED = argv.includes('--apply');
@@ -98,10 +101,9 @@ async function main() {
     return;
   }
 
-  const probe = await queryNeo4jHttp({
-    statement: 'RETURN 1 AS ok',
-  });
+  const probe = await probeNeo4j();
   report.summary.neo4jReachable = Boolean(probe.ok);
+  report.summary.transport = probe.transport;
   report.status = probe.ok ? (APPLY_REQUESTED ? 'APPLIED' : 'DRY_RUN_READY') : 'NEO4J_UNAVAILABLE';
   report.nextSafeAction = probe.ok
     ? (APPLY_REQUESTED
@@ -110,20 +112,7 @@ async function main() {
     : 'Fix Neo4j connectivity before trying to import turbovec edges.';
 
   if (APPLY_REQUESTED && probe.ok) {
-    const result = await queryNeo4jHttp({
-      statement: `
-        UNWIND $rows AS row
-        MERGE (a:Packet {id: row.source_id})
-        MERGE (b:Packet {id: row.neighbor_id})
-        MERGE (a)-[r:SIMILAR_TO {source: 'turbovec', topk_rank: row.topk_rank}]->(b)
-        SET r.similarity = row.similarity,
-            r.topk_rank = row.topk_rank,
-            r.source = 'turbovec',
-            r.updated_at = datetime()
-        RETURN count(r) AS count
-      `,
-      parameters: { rows: selected },
-    });
+    const result = await writeEdges(probe.transport, selected);
     if (!result.ok) {
       report.summary.failures += 1;
       report.status = 'APPLY_WITH_ERRORS';
@@ -144,6 +133,79 @@ async function main() {
     rowsImported: report.summary.rowsImported,
     neo4jReachable: report.summary.neo4jReachable,
   }, null, 2));
+}
+
+async function probeNeo4j() {
+  const httpProbe = await queryNeo4jHttp({ statement: 'RETURN 1 AS ok' });
+  if (httpProbe.ok) return { ok: true, transport: 'http', details: httpProbe };
+
+  try {
+    const neo4j = await import('neo4j-driver');
+    const driver = neo4j.default.driver(
+      NEO4J_URI,
+      neo4j.default.auth.basic(NEO4J_USER, NEO4J_PASSWORD),
+    );
+    const session = driver.session();
+    try {
+      await session.run('RETURN 1 AS ok');
+      return { ok: true, transport: 'bolt', driver };
+    } finally {
+      await session.close().catch(() => {});
+      await driver.close().catch(() => {});
+    }
+  } catch (error) {
+    return { ok: false, transport: 'unavailable', error: error instanceof Error ? error.message : String(error) };
+  }
+}
+
+async function writeEdges(transport, rows) {
+  if (transport === 'http') {
+    return queryNeo4jHttp({
+      statement: `
+        UNWIND $rows AS row
+        MERGE (a:Packet {id: row.source_id})
+        MERGE (b:Packet {id: row.neighbor_id})
+        MERGE (a)-[r:SIMILAR_TO {source: 'turbovec', topk_rank: row.topk_rank}]->(b)
+        SET r.similarity = row.similarity,
+            r.topk_rank = row.topk_rank,
+            r.source = 'turbovec',
+            r.updated_at = datetime()
+        RETURN count(r) AS count
+      `,
+      parameters: { rows },
+    });
+  }
+
+  const neo4j = await import('neo4j-driver');
+  const driver = neo4j.default.driver(NEO4J_URI, neo4j.default.auth.basic(NEO4J_USER, NEO4J_PASSWORD));
+  const session = driver.session();
+  try {
+    const result = await session.executeWrite((tx) =>
+      tx.run(
+        `
+          UNWIND $rows AS row
+          MERGE (a:Packet {id: row.source_id})
+          MERGE (b:Packet {id: row.neighbor_id})
+          MERGE (a)-[r:SIMILAR_TO {source: 'turbovec', topk_rank: row.topk_rank}]->(b)
+          SET r.similarity = row.similarity,
+              r.topk_rank = row.topk_rank,
+              r.source = 'turbovec',
+              r.updated_at = datetime()
+          RETURN count(r) AS count
+        `,
+        { rows },
+      )
+    );
+    return {
+      ok: true,
+      rows: result.records.map((record) => ({ count: record.get('count') })),
+    };
+  } catch (error) {
+    return { ok: false, error: error instanceof Error ? error.message : String(error) };
+  } finally {
+    await session.close().catch(() => {});
+    await driver.close().catch(() => {});
+  }
 }
 
 function renderMarkdown(report) {

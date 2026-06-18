@@ -109,9 +109,9 @@ export async function findPacketsForOpenCode(
         try {
           const results = await db
             .select({
-              packet_key: atlasPackets.packet_key,
-              feature_id: atlasPackets.feature_id,
-              source_ref: atlasPackets.source_ref,
+              packet_key: atlasPackets.packetKey,
+              feature_id: atlasPackets.featureId,
+              source_ref: atlasPackets.sourceRef,
               summary: atlasPackets.summary,
               metadata: atlasPackets.metadata
             })
@@ -151,9 +151,9 @@ export async function findPacketsForOpenCode(
         try {
           const results = await db
             .select({
-              packet_key: atlasPackets.packet_key,
-              feature_id: atlasPackets.feature_id,
-              source_ref: atlasPackets.source_ref,
+              packet_key: atlasPackets.packetKey,
+              feature_id: atlasPackets.featureId,
+              source_ref: atlasPackets.sourceRef,
               summary: atlasPackets.summary,
               metadata: atlasPackets.metadata
             })
@@ -198,14 +198,14 @@ export async function findPacketsForOpenCode(
           if (feature_id) {
             const results = await db
               .select({
-                packet_key: atlasPackets.packet_key,
-                feature_id: atlasPackets.feature_id,
-                source_ref: atlasPackets.source_ref,
+                packet_key: atlasPackets.packetKey,
+                feature_id: atlasPackets.featureId,
+                source_ref: atlasPackets.sourceRef,
                 summary: atlasPackets.summary,
                 metadata: atlasPackets.metadata
               })
               .from(atlasPackets)
-              .where(eq(atlasPackets.feature_id, feature_id))
+            .where(eq(atlasPackets.featureId, feature_id))
               .limit(10);
 
             return results.map((r) => ({
@@ -228,9 +228,9 @@ export async function findPacketsForOpenCode(
         try {
           const results = await db
             .select({
-              packet_key: atlasPackets.packet_key,
-              feature_id: atlasPackets.feature_id,
-              source_ref: atlasPackets.source_ref,
+              packet_key: atlasPackets.packetKey,
+              feature_id: atlasPackets.featureId,
+              source_ref: atlasPackets.sourceRef,
               summary: atlasPackets.summary,
               metadata: atlasPackets.metadata
             })
@@ -258,9 +258,9 @@ export async function findPacketsForOpenCode(
         try {
           const results = await db
             .select({
-              packet_key: atlasPackets.packet_key,
-              feature_id: atlasPackets.feature_id,
-              source_ref: atlasPackets.source_ref,
+              packet_key: atlasPackets.packetKey,
+              feature_id: atlasPackets.featureId,
+              source_ref: atlasPackets.sourceRef,
               summary: atlasPackets.summary,
               metadata: atlasPackets.metadata
             })
@@ -362,13 +362,13 @@ export async function getPacketSOMCluster(
     // Query Postgres for packet metadata
     const result = await db
       .select({
-        packet_key: atlasPackets.packet_key,
-        feature_id: atlasPackets.feature_id,
-        source_ref: atlasPackets.source_ref,
-        metadata: atlasPackets.metadata
+                packet_key: atlasPackets.packetKey,
+                feature_id: atlasPackets.featureId,
+                source_ref: atlasPackets.sourceRef,
+                metadata: atlasPackets.metadata
       })
       .from(atlasPackets)
-      .where(eq(atlasPackets.packet_key, packetKey))
+      .where(eq(atlasPackets.packetKey, packetKey))
       .limit(1);
 
     if (!result[0]?.metadata) {
@@ -449,13 +449,13 @@ export async function getFeatureKMeansContext(
     // Query all packets with this feature_id
     const packets = await db
       .select({
-        packet_key: atlasPackets.packet_key,
-        feature_id: atlasPackets.feature_id,
-        source_ref: atlasPackets.source_ref,
+        packet_key: atlasPackets.packetKey,
+        feature_id: atlasPackets.featureId,
+        source_ref: atlasPackets.sourceRef,
         metadata: atlasPackets.metadata
       })
       .from(atlasPackets)
-      .where(eq(atlasPackets.feature_id, featureId))
+      .where(eq(atlasPackets.featureId, featureId))
       .limit(1);
 
     if (!packets[0]) {
@@ -475,7 +475,7 @@ export async function getFeatureKMeansContext(
     // Get neighbors in same cluster
     const neighbors = await db
       .select({
-        feature_id: atlasPackets.feature_id
+        feature_id: atlasPackets.featureId
       })
       .from(atlasPackets)
       .limit(5);
@@ -549,9 +549,9 @@ async function expandTopology(
       // Query packets in adjacent SOM cells (radius = manhattan distance)
       const neighbors = await db
         .select({
-          packet_key: atlasPackets.packet_key,
-          feature_id: atlasPackets.feature_id,
-          source_ref: atlasPackets.source_ref,
+          packet_key: atlasPackets.packetKey,
+          feature_id: atlasPackets.featureId,
+          source_ref: atlasPackets.sourceRef,
           summary: atlasPackets.summary,
           metadata: atlasPackets.metadata
         })
@@ -661,9 +661,9 @@ export async function getAllRecommendationsForOpenCode(
     // Query Postgres for all recommendations
     const all = await db
       .select({
-        packet_key: atlasPackets.packet_key,
-        feature_id: atlasPackets.feature_id,
-        source_ref: atlasPackets.source_ref,
+        packet_key: atlasPackets.packetKey,
+        feature_id: atlasPackets.featureId,
+        source_ref: atlasPackets.sourceRef,
         summary: atlasPackets.summary,
         metadata: atlasPackets.metadata
       })

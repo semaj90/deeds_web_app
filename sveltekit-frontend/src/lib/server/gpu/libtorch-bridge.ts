@@ -24,6 +24,7 @@ import { fileURLToPath } from 'url';
 import { createRequire } from 'module';
 import { Worker } from 'worker_threads';
 import { createHash } from 'crypto';
+import { getRedis } from '$lib/server/redis.js';
 
 const esmRequire = createRequire(import.meta.url);
 

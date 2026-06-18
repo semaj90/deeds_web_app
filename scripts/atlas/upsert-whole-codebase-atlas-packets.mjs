@@ -43,6 +43,8 @@ const EXCLUDE_PATTERNS = [
   '.opencode',
   'deeds_labs',
   '.claude',
+  '.venv',
+  'venv',
 ];
 
 function sha256(str) {
@@ -67,7 +69,7 @@ async function extractWholeCodebasePackets() {
 
   try {
     const cmd = `rg --files -uuu ${excludeArgs}`;
-    const fileList = execSync(cmd, { cwd: REPO_ROOT, encoding: 'utf8' }).split('\n').filter(Boolean);
+    const fileList = execSync(cmd, { cwd: REPO_ROOT, encoding: 'utf8', maxBuffer: 1024 * 1024 * 50 }).split('\n').filter(Boolean);
 
     const packets = [];
 

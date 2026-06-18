@@ -5,12 +5,6 @@
     "serverDeps": 0,
     "dbDeps": 0
   },
-  "sveltekit-frontend/src/routes/api/codebase/auto-research/+server.ts": {
-    "zone": "shared",
-    "directDeps": 0,
-    "serverDeps": 0,
-    "dbDeps": 0
-  },
   "sveltekit-frontend/src/routes/(analysis)/audio-analysis/[evidenceId]/+page.server.ts": {
     "zone": "shared",
     "directDeps": 0,

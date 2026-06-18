@@ -23,7 +23,7 @@ import fs from 'fs/promises';
 import { existsSync } from 'fs';
 import path from 'path';
 import crypto from 'crypto';
-import { createRequire } from 'module';
+import { loadRepoEnv, resolveRedisUrl } from '../atlas/connection-config.mjs';
 
 const ROOT    = process.cwd();
 const DRY_RUN = process.argv.includes('--dry-run');
@@ -92,7 +92,8 @@ async function ollamaEmbed(text) {
 }
 
 async function loadRedis() {
-  const require = createRequire(import.meta.url);
+  const env = loadRepoEnv(process.env);
+  const redisUrl = resolveRedisUrl(env);
   const candidates = [
     path.join(ROOT, 'sveltekit-frontend', 'node_modules', 'ioredis'),
     path.join(ROOT, 'node_modules', 'ioredis'),
@@ -101,7 +102,7 @@ async function loadRedis() {
     if (existsSync(p)) {
       const mod = await import(p + '/built/index.js').catch(() => import(p));
       const Redis = mod.default ?? mod;
-      const redis = new Redis('redis://127.0.0.1:6379', {
+      const redis = new Redis(redisUrl, {
         lazyConnect: true,
         maxRetriesPerRequest: 1,
         enableOfflineQueue: false,

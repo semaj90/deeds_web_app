@@ -1,5 +1,5 @@
 # Codebase Map — 20-Gate Deep Audit
-> Generated: 2026-06-18T14:24:10.717Z
+> Generated: 2026-06-18T23:04:15.750Z
 > Mode: `fast-ast` · CPU-only · No GPU required
 > Regenerate: `npm run index:codebase:fast:plan`
 
@@ -8,19 +8,19 @@
 ## Summary
 | Metric | Count |
 |--------|-------|
-| Files scanned | 58570 |
-| Directories analysed | 728 |
-| Route files | 162 |
+| Files scanned | 58640 |
+| Directories analysed | 727 |
+| Route files | 157 |
 | Svelte components | 4801 |
 | API handlers | 6348 |
 | API routes without auth | 9 |
 | API routes without Zod | 2 |
 | SSR-unsafe files | 0 |
 | Svelte 4 legacy patterns | 23 |
-| Hardcoded localhost refs | 2353 |
+| Hardcoded localhost refs | 2358 |
 | Routes without test pairing | 55 |
 | Cyclic import pairs | 3 |
-| Drizzle table refs | 4777 |
+| Drizzle table refs | 4778 |
 | TODO/FIXME markers | 1037 |
 
 ---
@@ -29,22 +29,22 @@
 
 | Gate | Check | Pass | Fail |
 |------|-------|------|------|
-| G4  | Auth guard on API routes | 128 | 10 |
-| G5  | Zod validation on API routes | 90 | 2 |
-| G11 | No hardcoded localhost (excl env.server) | 56217 | 2353 |
-| G14a | No `export let` (Svelte 4 props) | 58566 | 4 |
-| G14b | No `$:` reactive declarations | 58560 | 10 |
-| G14c | No `on:event=` directives | 58556 | 14 |
-| G14d | No `createEventDispatcher()` | 58570 | 0 |
-| G14e | No runes in plain `.ts` files | 58505 | 65 |
-| G15 | No SSR-unsafe globals (unguarded) | 58570 | 0 |
-| G16 | Server routes have test pairing | 70 | 55 |
-| G17 | Server routes have error handling | 129 | 12 |
+| G4  | Auth guard on API routes | 123 | 10 |
+| G5  | Zod validation on API routes | 85 | 2 |
+| G11 | No hardcoded localhost (excl env.server) | 56282 | 2358 |
+| G14a | No `export let` (Svelte 4 props) | 58636 | 4 |
+| G14b | No `$:` reactive declarations | 58630 | 10 |
+| G14c | No `on:event=` directives | 58626 | 14 |
+| G14d | No `createEventDispatcher()` | 58640 | 0 |
+| G14e | No runes in plain `.ts` files | 58575 | 65 |
+| G15 | No SSR-unsafe globals (unguarded) | 58640 | 0 |
+| G16 | Server routes have test pairing | 65 | 55 |
+| G17 | Server routes have error handling | 124 | 12 |
 | G20 | Cyclic import pairs | — | 3 |
 
 ---
 
-## Directory Scorecard (728 dirs · lowest score = most attention needed)
+## Directory Scorecard (727 dirs · lowest score = most attention needed)
 
 **Score factors**: Auth/API coverage 25pts · Zod coverage 15pts · Drizzle ref 10pts · No TODOs 15pts · SSR-safe 10pts · No Svelte4 10pts · No localhost 5pts · Error handling 5pts · Non-empty 5pts
 
@@ -62,8 +62,8 @@
 | ✅ | `llama-cpp-turboquant-gemma4/tools/server` | 70 | 1 | 60689 | 0 | 2/24 | 3 | 🟠lh |
 | ✅ | `scripts/api-cleanup/reports/backup-2025-12-14T21-11-49-641Z` | 72 | 6 | 224 | 6 | 4/4 | 4 | — |
 | ✅ | `llama-cpp-turboquant-gemma4/tools/server/webui` | 78 | 435 | 57041 | 0 | 1/18 | 1 | 🟠lh |
-| ✅ | `sveltekit-frontend/src/lib/server` | 80 | 326 | 123788 | 0 | 17/101 | 3 | 🟠lh |
-| ✅ | `sveltekit-frontend/src/routes/api` | 81 | 118 | 28009 | 118 | 108/83 | 2 | 🟠lh ⬜notest |
+| ✅ | `sveltekit-frontend/src/lib/server` | 80 | 304 | 112554 | 0 | 17/99 | 3 | 🟠lh |
+| ✅ | `sveltekit-frontend/src/routes/api` | 81 | 113 | 26091 | 113 | 103/78 | 2 | 🟠lh ⬜notest |
 | ✅ | `llama-cpp-turboquant-gemma4/tools/server/public_legacy` | 83 | 5 | 1474 | 0 | 0/2 | 2 | — |
 | ✅ | `scripts/benchmark` | 83 | 2 | 774 | 0 | 0/2 | 2 | — |
 | ✅ | `.claude/worktrees/agent-a38668f2/tests` | 85 | 24 | 3612 | 0 | 0/6 | 0 | 🟠lh |
@@ -71,12 +71,12 @@
 | ✅ | `claude-mem/src/npx-cli/commands` | 85 | 6 | 2903 | 0 | 0/2 | 0 | 🟠lh |
 | ✅ | `llama-cpp-turboquant-gemma4/tools/server/bench` | 85 | 1 | 163 | 0 | 0/1 | 0 | 🟠lh |
 | ✅ | `llama-cpp-turboquant-gemma4/tools/server/public_simplechat` | 85 | 3 | 1409 | 0 | 0/1 | 0 | 🟠lh |
-| ✅ | `scripts/agent` | 85 | 4 | 1036 | 0 | 0/4 | 0 | 🟠lh |
-| ✅ | `scripts/agentic` | 85 | 4 | 1680 | 0 | 0/4 | 0 | 🟠lh |
+| ✅ | `scripts/agent` | 85 | 4 | 1044 | 0 | 0/4 | 0 | 🟠lh |
+| ✅ | `scripts/agentic` | 85 | 4 | 1684 | 0 | 0/4 | 0 | 🟠lh |
 | ✅ | `scripts/atlas/ingester` | 85 | 6 | 1534 | 0 | 0/4 | 0 | 🟠lh |
 | ✅ | `scripts/audit` | 85 | 2 | 860 | 0 | 0/2 | 0 | 🟠lh |
 | ✅ | `scripts/docs` | 85 | 2 | 830 | 0 | 0/0 | 0 | 🟠lh |
-| ✅ | `scripts/graph` | 85 | 2 | 620 | 0 | 0/2 | 0 | 🟠lh |
+| ✅ | `scripts/graph` | 85 | 4 | 1104 | 0 | 0/4 | 0 | 🟠lh |
 | ✅ | `scripts/operator` | 85 | 4 | 936 | 0 | 0/4 | 0 | 🟠lh |
 | ✅ | `scripts/smoke` | 85 | 18 | 2666 | 0 | 0/10 | 0 | 🟠lh |
 | ✅ | `sveltekit-frontend/drizzle` | 85 | 4 | 443108 | 0 | 0/0 | 4 | — |
@@ -92,21 +92,19 @@
 | ✅ | `sveltekit-frontend/sveltekit-frontend/sveltekit-frontend/sveltekit-frontend` | 85 | 2 | 262 | 0 | 0/0 | 0 | 🟠lh |
 | ✅ | `sveltekit-frontend/tests/helpers` | 85 | 3 | 374 | 0 | 1/1 | 0 | 🟠lh |
 | ✅ | `sveltekit-frontend/tmp` | 85 | 14 | 162199 | 0 | 0/0 | 0 | 🟠lh |
-| ✅ | `sveltekit-frontend/scripts/atlas` | 88 | 107 | 27641 | 0 | 1/48 | 1 | 🟠lh |
+| ✅ | `sveltekit-frontend/scripts/atlas` | 88 | 114 | 29087 | 0 | 1/51 | 1 | 🟠lh |
 | ✅ | `$lib/utils` | 90 | 5 | 75 | 0 | 0/0 | 0 | — |
 | ✅ | `.claude/worktrees/agent-a38668f2/.github` | 90 | 5 | 50 | 0 | 0/0 | 0 | — |
 | ✅ | `.claude/worktrees/agent-a38668f2/.vscode` | 90 | 10 | 35 | 0 | 0/0 | 0 | — |
 | ✅ | `.claude/worktrees/agent-a7203461/audit` | 90 | 4 | 52 | 0 | 0/0 | 0 | — |
 | ✅ | `.claude/worktrees/agent-a7203461/crates` | 90 | 32 | 3384 | 0 | 0/0 | 0 | — |
-| ✅ | `crates/atlas_packet_parser` | 90 | 4 | 774 | 0 | 0/0 | 0 | — |
-| ✅ | `crates/atlas_packet_parser/target` | 90 | 5 | 392 | 0 | 0/0 | 0 | — |
-| ✅ | `.claude/worktrees/agent-a38668f2/crates` | 90 | 5 | 5 | 0 | 0/0 | 0 | — |
+| ✅ | `.claude/worktrees/agent-a38668f2/crates` | 90 | 10 | 10 | 0 | 0/0 | 0 | — |
 | ✅ | `.claude/worktrees/agent-a7203461/data` | 90 | 4 | 28 | 0 | 0/0 | 0 | — |
 | ✅ | `.claude/worktrees/agent-a38668f2/docker` | 90 | 6 | 486 | 0 | 0/0 | 0 | — |
 | ✅ | `.claude/worktrees/agent-a7203461/docker` | 90 | 4 | 164 | 0 | 0/0 | 0 | — |
 | ✅ | `.claude/worktrees/agent-a38668f2/docs` | 90 | 149 | 756747 | 0 | 0/0 | 0 | — |
 | ✅ | `.claude/worktrees/agent-a7203461/docs` | 90 | 724 | 4927692 | 0 | 0/0 | 0 | — |
-| ✅ | `docs/reports` | 90 | 202 | 3550863 | 0 | 0/0 | 0 | — |
+| ✅ | `docs/reports` | 90 | 215 | 3551726 | 0 | 0/0 | 0 | — |
 | ✅ | `.claude/worktrees/agent-a7203461/memory` | 90 | 272 | 4998016 | 0 | 0/0 | 0 | — |
 | ✅ | `.claude/worktrees/agent-a38668f2/memory` | 90 | 37 | 487 | 0 | 0/0 | 0 | — |
 | ✅ | `.claude/worktrees/agent-a7203461/next_steps` | 90 | 4 | 928700 | 0 | 0/0 | 0 | — |
@@ -114,7 +112,6 @@
 | ✅ | `.claude/worktrees/agent-a7203461/simd-bridge` | 90 | 24 | 3000 | 0 | 0/4 | 0 | — |
 | ✅ | `sveltekit-frontend/docs/atlas-index` | 90 | 11 | 61401 | 0 | 0/0 | 0 | — |
 | ✅ | `sveltekit-frontend/memory/atlas` | 90 | 10 | 10 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/scripts/opencode` | 90 | 17 | 4059 | 0 | 0/3 | 0 | — |
 | ✅ | `.gemini/antigravity/scratch` | 90 | 3 | 132 | 0 | 0/0 | 0 | — |
 | ✅ | `.python311/lib/python3.11/site-packages` | 90 | 2 | 2 | 0 | 0/0 | 0 | — |
 | ✅ | `.vscode/tasks` | 90 | 1 | 11 | 0 | 0/0 | 0 | — |
@@ -219,6 +216,7 @@
 | ✅ | `claude-mem/tests/worker/http` | 90 | 4 | 749 | 0 | 3/0 | 0 | — |
 | ✅ | `claude-mem/tests/worker/middleware` | 90 | 1 | 185 | 0 | 0/0 | 0 | — |
 | ✅ | `claude-mem/tests/worker/search` | 90 | 5 | 1961 | 0 | 3/0 | 0 | — |
+| ✅ | `crates/atlas_packet_parser` | 90 | 4 | 769 | 0 | 0/0 | 0 | — |
 | ✅ | `crates/atlas_packet_parser/target/debug` | 90 | 220 | 220 | 0 | 0/0 | 0 | — |
 | ✅ | `crates/atlas_packet_parser/target/release` | 90 | 167 | 167 | 0 | 0/0 | 0 | — |
 | ✅ | `crates/omni-bridge/target/debug` | 90 | 10 | 10 | 0 | 0/0 | 0 | — |
@@ -245,7 +243,7 @@
 | ✅ | `memory/exports` | 90 | 51 | 387728 | 0 | 0/0 | 0 | — |
 | ✅ | `memory/exports/atlas` | 90 | 1 | 91651 | 0 | 0/0 | 0 | — |
 | ✅ | `memory/exports/parent-atlas` | 90 | 1 | 131565 | 0 | 0/0 | 0 | — |
-| ✅ | `memory/graph` | 90 | 1 | 782 | 0 | 0/0 | 0 | — |
+| ✅ | `memory/graph` | 90 | 1 | 4320 | 0 | 0/0 | 0 | — |
 | ✅ | `memory/graphify/deep` | 90 | 1 | 663970 | 0 | 0/0 | 0 | — |
 | ✅ | `memory/knowledge` | 90 | 5 | 1395 | 0 | 0/0 | 0 | — |
 | ✅ | `memory/manifests` | 90 | 3 | 140 | 0 | 0/0 | 0 | — |
@@ -268,9 +266,9 @@
 | ✅ | `packages/parent-atlas-ingest/src` | 90 | 1 | 318 | 0 | 0/0 | 0 | — |
 | ✅ | `packages/parent-atlas-ingest/src/scanner` | 90 | 2 | 304 | 0 | 0/0 | 0 | — |
 | ✅ | `packages/parent-atlas-opencode` | 90 | 1 | 47 | 0 | 0/0 | 0 | — |
-| ✅ | `packages/parent-atlas-retrieval` | 90 | 1 | 2740 | 0 | 0/2 | 0 | — |
-| ✅ | `packages/parent-atlas-retrieval/src` | 90 | 1 | 1610 | 0 | 0/2 | 0 | — |
-| ✅ | `packages/parent-atlas-retrieval/src/bifrost` | 90 | 7 | 634 | 0 | 0/2 | 0 | — |
+| ✅ | `packages/parent-atlas-retrieval` | 90 | 1 | 2726 | 0 | 0/2 | 0 | — |
+| ✅ | `packages/parent-atlas-retrieval/src` | 90 | 1 | 1596 | 0 | 0/2 | 0 | — |
+| ✅ | `packages/parent-atlas-retrieval/src/bifrost` | 90 | 6 | 620 | 0 | 0/2 | 0 | — |
 | ✅ | `packages/parent-atlas-retrieval/src/gpu` | 90 | 6 | 946 | 0 | 0/0 | 0 | — |
 | ✅ | `packages/parent-atlas-retrieval/tests/bifrost` | 90 | 3 | 1071 | 0 | 0/0 | 0 | — |
 | ✅ | `scratch/index-checkpoints` | 90 | 2 | 196384 | 0 | 0/0 | 0 | — |
@@ -368,10 +366,10 @@
 | ✅ | `sveltekit-frontend/.venv/Lib/python3.9` | 90 | 5 | 2421 | 0 | 0/0 | 0 | — |
 | ✅ | `sveltekit-frontend/.venv_turbovec/Lib/site-packages` | 90 | 1 | 7857 | 0 | 0/0 | 0 | — |
 | ✅ | `sveltekit-frontend/.vscode` | 90 | 4 | 4167 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/docs/graph` | 90 | 17 | 6188156 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/docs/graph` | 90 | 17 | 6174787 | 0 | 0/0 | 0 | — |
 | ✅ | `sveltekit-frontend/docs/obsidian-vault` | 90 | 2 | 108 | 0 | 0/0 | 0 | — |
 | ✅ | `sveltekit-frontend/docs/profile-cards/data` | 90 | 20 | 1588 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/docs/reports` | 90 | 70 | 781819 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/docs/reports` | 90 | 75 | 782340 | 0 | 0/0 | 0 | — |
 | ✅ | `sveltekit-frontend/docs_readme/deeds_labs_archive` | 90 | 84 | 2997942 | 0 | 0/0 | 0 | — |
 | ✅ | `sveltekit-frontend/docs_readme/deeds_labs_archive/components` | 90 | 1 | 445 | 0 | 0/0 | 0 | — |
 | ✅ | `sveltekit-frontend/drizzle/introspected/meta` | 90 | 2 | 17338 | 0 | 0/0 | 0 | — |
@@ -384,8 +382,8 @@
 | ✅ | `sveltekit-frontend/memory/exports/atlas` | 90 | 1 | 20 | 0 | 0/0 | 0 | — |
 | ✅ | `sveltekit-frontend/memory/exports/xgboost-hotness` | 90 | 1 | 393 | 0 | 0/0 | 0 | — |
 | ✅ | `sveltekit-frontend/memory/features` | 90 | 3 | 623 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/memory/graphify/deep` | 90 | 5 | 813690 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/memory/graphify/gds` | 90 | 90 | 2085312 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/memory/graphify/deep` | 90 | 5 | 808103 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/memory/graphify/gds` | 90 | 90 | 2014220 | 0 | 0/0 | 0 | — |
 | ✅ | `sveltekit-frontend/memory/kag-notes` | 90 | 1 | 16 | 0 | 0/0 | 0 | — |
 | ✅ | `sveltekit-frontend/memory/kb/cards` | 90 | 2 | 87451 | 0 | 0/0 | 0 | — |
 | ✅ | `sveltekit-frontend/memory/kb/notecards` | 90 | 1 | 203 | 0 | 0/0 | 0 | — |
@@ -687,6 +685,7 @@
 | ✅ | `sveltekit-frontend/scripts/ingest` | 90 | 1 | 108 | 0 | 0/0 | 0 | — |
 | ✅ | `sveltekit-frontend/scripts/knowledge` | 90 | 1 | 55 | 0 | 0/1 | 0 | — |
 | ✅ | `sveltekit-frontend/scripts/llms` | 90 | 3 | 714 | 0 | 0/2 | 0 | — |
+| ✅ | `sveltekit-frontend/scripts/opencode` | 90 | 12 | 3164 | 0 | 0/3 | 0 | — |
 | ✅ | `sveltekit-frontend/scripts/qdrant` | 90 | 3 | 384 | 0 | 0/2 | 0 | — |
 | ✅ | `sveltekit-frontend/scripts/reconstruction` | 90 | 4 | 439 | 0 | 0/1 | 0 | — |
 | ✅ | `sveltekit-frontend/scripts/rg-atlas` | 90 | 1 | 42 | 0 | 0/0 | 0 | — |
@@ -742,7 +741,7 @@
 | ✅ | `claude-mem/plugin` | 95 | 2 | 24717 | 0 | 2/10 | 0 | 🟠lh |
 | ✅ | `claude-mem/plugin/scripts` | 95 | 9 | 23096 | 0 | 2/8 | 0 | 🟠lh |
 | ✅ | `scripts/docs-atlas` | 95 | 20 | 2462 | 0 | 0/8 | 0 | 🟠lh |
-| ✅ | `scripts/ingest` | 95 | 24 | 5560 | 0 | 0/22 | 0 | 🟠lh |
+| ✅ | `scripts/ingest` | 95 | 24 | 5498 | 0 | 0/22 | 0 | 🟠lh |
 | ✅ | `scripts/qdrant` | 95 | 2 | 322 | 0 | 0/2 | 0 | 🟠lh |
 | ✅ | `scripts/tests` | 95 | 62 | 76768 | 0 | 4/14 | 0 | 🟠lh |
 | ✅ | `sveltekit-frontend/.docker-build` | 95 | 1 | 33663 | 0 | 2/21 | 0 | 🟠lh |
@@ -753,18 +752,18 @@
 | ✅ | `sveltekit-frontend/scripts/smoke` | 95 | 28 | 3717 | 0 | 0/9 | 0 | 🟠lh |
 | ✅ | `sveltekit-frontend/scripts/tests` | 95 | 52 | 9386 | 0 | 2/14 | 0 | 🟠lh |
 | ✅ | `sveltekit-frontend/src/routes/(app)` | 95 | 35 | 7667 | 0 | 35/3 | 0 | 🟠lh ⬜notest |
-| ✅ | `.claude/worktrees/agent-a38668f2/sveltekit-frontend` | 98 | 20758 | 12185052 | 3304 | 5405/6046 | 230 | 🟡sv4 🟠lh |
+| ✅ | `.claude/worktrees/agent-a38668f2/sveltekit-frontend` | 98 | 20794 | 12199730 | 3309 | 5410/6055 | 230 | 🟡sv4 🟠lh |
 | ✅ | `.claude/hooks` | 100 | 2 | 164 | 0 | 0/2 | 0 | — |
 | ✅ | `.claude/worktrees/agent-a7203461` | 100 | 24 | 60369856 | 408 | 3236/2683 | 32 | 🟡sv4 🟠lh |
 | ✅ | `.claude/worktrees/agent-a7203461/.claude` | 100 | 16 | 1296 | 0 | 0/8 | 0 | — |
-| ✅ | `.claude/worktrees/agent-a38668f2` | 100 | 234 | 13406382 | 3371 | 5405/7081 | 276 | 🟡sv4 🟠lh |
+| ✅ | `.claude/worktrees/agent-a38668f2` | 100 | 234 | 13421065 | 3376 | 5410/7090 | 276 | 🟡sv4 🟠lh |
 | ✅ | `.claude/worktrees/agent-a38668f2/drizzle` | 100 | 18 | 13944 | 0 | 0/0 | 0 | — |
 | ✅ | `.claude/worktrees/agent-a38668f2/scripts` | 100 | 2715 | 432981 | 47 | 0/998 | 30 | 🟠lh |
 | ✅ | `.claude/worktrees/agent-a7203461/scripts` | 100 | 2560 | 1752004 | 8 | 8/1168 | 8 | 🟠lh |
-| ✅ | `scripts/atlas` | 100 | 1304 | 349566 | 4 | 0/599 | 2 | 🟠lh |
+| ✅ | `scripts/atlas` | 100 | 1336 | 357950 | 4 | 0/615 | 2 | 🟠lh |
 | ✅ | `.claude/worktrees/agent-a7203461/sveltekit-frontend` | 100 | 10479 | 47752236 | 392 | 3224/1499 | 24 | 🟠lh |
-| ✅ | `sveltekit-frontend/scripts` | 100 | 218 | 115085 | 1 | 11/211 | 1 | 🟠lh |
-| ✅ | `scripts/atlas/lib` | 100 | 21 | 3158 | 0 | 0/9 | 0 | — |
+| ✅ | `sveltekit-frontend/scripts` | 100 | 218 | 115651 | 1 | 11/214 | 1 | 🟠lh |
+| ✅ | `scripts/atlas/lib` | 100 | 21 | 3262 | 0 | 0/9 | 0 | — |
 | ✅ | `scripts/db-tests` | 100 | 8 | 236 | 0 | 0/0 | 0 | — |
 | ✅ | `scripts/graphify` | 100 | 6 | 590 | 0 | 0/4 | 0 | — |
 | ✅ | `scripts/packets` | 100 | 40 | 8372 | 0 | 0/26 | 0 | — |
@@ -784,7 +783,7 @@
 
 ---
 
-## API Routes (120 total · top 60)
+## API Routes (115 total · top 60)
 
 | Route [params] | Methods | Auth | Zod | Error handling |
 |----------------|---------|------|-----|----------------|
@@ -822,13 +821,9 @@
 | `sveltekit-frontend/api/tasks/packets/workflow/+server.ts` | GET, POST | ✅ | ✅ | ✅ |
 | `sveltekit-frontend/api/tasks/[id]/+server.ts [id]` | PATCH, DELETE | ✅ | ✅ | ✅ |
 | `sveltekit-frontend/api/atlas/search/+server.ts` | POST | ❌ | ✅ | ✅ |
-| `sveltekit-frontend/api/codebase/auto-research/+server.ts` | POST | ✅ | ✅ | ✅ |
 | `sveltekit-frontend/api/atlas/search/+server.ts` | POST | ❌ | ✅ | ✅ |
-| `sveltekit-frontend/api/codebase/auto-research/+server.ts` | POST | ✅ | ✅ | ✅ |
 | `sveltekit-frontend/api/atlas/search/+server.ts` | POST | ❌ | ✅ | ✅ |
-| `sveltekit-frontend/api/codebase/auto-research/+server.ts` | POST | ✅ | ✅ | ✅ |
 | `sveltekit-frontend/api/atlas/search/+server.ts` | POST | ❌ | ✅ | ✅ |
-| `sveltekit-frontend/api/codebase/auto-research/+server.ts` | POST | ✅ | ✅ | ✅ |
 | `sveltekit-frontend/.well-known/llms-full.txt/+server.ts` | GET | ❌ | ✅ | ✅ |
 | `sveltekit-frontend/.well-known/llms.txt/+server.ts` | GET | ❌ | ✅ | ✅ |
 | `sveltekit-frontend/api/ace/stage-5-policy/+server.ts` | POST | ✅ | ✅ | ✅ |
@@ -848,8 +843,12 @@
 | `sveltekit-frontend/api/atlas/memory-address/[source_ref_id]/+server.ts [source_ref_id]` | GET | ✅ | ❌ | ✅ |
 | `sveltekit-frontend/api/atlas/nes-chrom/+server.ts` | GET | ✅ | ❌ | ✅ |
 | `sveltekit-frontend/api/atlas/phase-e/health/+server.ts` | GET | ❌ | ❌ | ✅ |
+| `sveltekit-frontend/api/atlas/search/+server.ts` | POST | ❌ | ✅ | ✅ |
+| `sveltekit-frontend/api/atlas/studio/redis/+server.ts` | GET | ✅ | ✅ | ✅ |
+| `sveltekit-frontend/api/audio/analysis/[evidenceId]/+server.ts [evidenceId]` | GET | ✅ | ✅ | ✅ |
+| `sveltekit-frontend/api/cache/rpc/+server.ts` | POST | ✅ | ✅ | ✅ |
 
-_…and 60 more. See `codebase-graph.json` for full list._
+_…and 55 more. See `codebase-graph.json` for full list._
 
 ---
 
@@ -935,7 +934,7 @@ _No unguarded SSR-unsafe globals. ✅_
 
 ---
 
-## G11 — Hardcoded Localhost References (2353 files)
+## G11 — Hardcoded Localhost References (2358 files)
 - `.claude/worktrees/agent-a38668f2/ecosystem.dev.config.cjs` · http://localhost:11434
 - `.claude/worktrees/agent-a38668f2/ecosystem.prod.config.cjs` · http://localhost:11434
 - `.claude/worktrees/agent-a7203461/playwright.config.js` · http://localhost:5173, http://localhost:5173
@@ -1001,7 +1000,7 @@ _No unguarded SSR-unsafe globals. ✅_
 |--------|-------------|
 | `$lib/server/db/client` | 3048 |
 | `$lib/server/env.server.js` | 2509 |
-| `$lib/server/redis.js` | 1643 |
+| `$lib/server/redis.js` | 1644 |
 | `$lib/types` | 1378 |
 | `$lib/components/ui/Icon.svelte` | 1285 |
 | `$lib/server/ollama.js` | 881 |
@@ -1099,31 +1098,31 @@ _No unguarded SSR-unsafe globals. ✅_
 | Module | Consumer Count |
 |--------|----------------|
 | `@sveltejs/kit` | 6816 |
-| `node:path` | 5488 |
-| `node:fs` | 4653 |
+| `node:path` | 5519 |
+| `node:fs` | 4677 |
 | `vitest` | 4602 |
-| `node:url` | 3952 |
+| `node:url` | 3981 |
 | `path` | 3880 |
-| `zod` | 3290 |
+| `zod` | 3291 |
 | `fs` | 2937 |
-| `drizzle-orm` | 2805 |
-| `pg` | 2630 |
+| `drizzle-orm` | 2806 |
+| `pg` | 2643 |
 | `$lib/server/db/client` | 2368 |
 | `$lib/server/env.server.js` | 2328 |
-| `node:crypto` | 1619 |
-| `ioredis` | 1426 |
+| `node:crypto` | 1621 |
+| `ioredis` | 1428 |
 | `$lib/types` | 1378 |
 | `crypto` | 1363 |
 | `url` | 1328 |
 | `svelte` | 1316 |
 | `$lib/components/ui/Icon.svelte` | 1285 |
-| `node:child_process` | 1256 |
+| `node:child_process` | 1258 |
 | `dotenv` | 1228 |
-| `$lib/server/redis.js` | 1168 |
+| `$lib/server/redis.js` | 1169 |
 | `fs/promises` | 979 |
-| `node:fs/promises` | 916 |
+| `node:fs/promises` | 931 |
 | `@playwright/test` | 837 |
-| `drizzle-orm/pg-core` | 796 |
+| `drizzle-orm/pg-core` | 797 |
 | `$lib/server/ollama.js` | 771 |
 | `$lib/server/db/schema-postgres.js` | 735 |
 | `child_process` | 700 |

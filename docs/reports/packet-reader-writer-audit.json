@@ -1,37 +1,37 @@
 {
   "schema": "addressable_packets_materialization_manifest.v1",
-  "generatedAt": "2026-06-18T15:28:24.394Z",
+  "generatedAt": "2026-06-18T21:30:40.587Z",
   "mode": "apply",
   "sourceTable": "atlas_higher_hop_index",
   "outputNdjson": ".tmp/addressable-packets.ndjson",
   "outputManifest": ".tmp/addressable-packets.manifest.json",
   "summary": {
     "sourceTable": "atlas_higher_hop_index",
-    "tableRows": 100,
-    "materializedRows": 100,
-    "addressableRows": 100,
-    "qdrantBackedRows": 16,
-    "qdrantCollectionRows": 16,
+    "tableRows": 3251,
+    "materializedRows": 3251,
+    "addressableRows": 3251,
+    "qdrantBackedRows": 2488,
+    "qdrantCollectionRows": 2488,
     "conceptsRows": 0,
-    "bm25Rows": 100,
-    "embeddingRefRows": 100,
-    "evidenceMatchedRows": 0,
+    "bm25Rows": 3251,
+    "embeddingRefRows": 3251,
+    "evidenceMatchedRows": 2500,
     "missingFeatureId": 0,
     "missingCanonicalSourceRef": 0,
-    "missingQdrantPointId": 84,
-    "missingQdrantCollection": 84,
+    "missingQdrantPointId": 763,
+    "missingQdrantCollection": 763,
     "classCounts": [
       {
         "key": "qdrant_chunk",
-        "count": 0
+        "count": 2454
       },
       {
         "key": "schema_stub",
-        "count": 0
+        "count": 597
       },
       {
         "key": "mcp_tool_stub",
-        "count": 100
+        "count": 145
       },
       {
         "key": "legacy_qdrant_only",
@@ -50,9 +50,14 @@
   "samplePacketKeys": [
     "05dbd8cc7c550bbe",
     "05f26c6dc1b51a12",
-    "08dce8e980d1e261"
+    "08dce8e980d1e261",
+    "0e584542cbd3ec1f",
+    "106474ac880329aa",
+    "1125b964826d67d7",
+    "119403f1ca0164b4",
+    "13039d77318546e0"
   ],
-  "outputSha256": "7cb3c38a8d7df0fc998ab27bac14e8f46848a581c1661969c2799be9af28d57b",
+  "outputSha256": "64dbb85e385020c64ca2e4945e2a91a4819722a53900eca4758a6b35d95f3df9",
   "status": "MATERIALIZED",
   "nextSafeAction": "Run qdrant-tag-mirror next, then resume the retrieval pipeline after the materialized packet count is positive.",
   "samples": [
@@ -98,6 +103,81 @@
       "concepts": [],
       "tags": [
         "4a0c3649b58e6c1e",
+        "mcp_tool_stub",
+        "packet_spine"
+      ]
+    },
+    {
+      "packet_key": "0e584542cbd3ec1f",
+      "source_ref": "src/mcp/server.ts#wiki.explain_page",
+      "feature_id": "121b02dff31f995b",
+      "packet_kind": "mcp_tool_stub",
+      "qdrant_collection": null,
+      "qdrant_point_id": null,
+      "bm25_text": "121b02dff31f995b src/mcp/server.ts#wiki.explain_page src/mcp/server.ts#wiki.explain_page",
+      "concepts": [],
+      "tags": [
+        "121b02dff31f995b",
+        "mcp_tool_stub",
+        "packet_spine"
+      ]
+    },
+    {
+      "packet_key": "106474ac880329aa",
+      "source_ref": "src/lib/server/ai/llama-tool-definitions.ts#kb__explain_retrieval",
+      "feature_id": "931687f31329e048",
+      "packet_kind": "mcp_tool_stub",
+      "qdrant_collection": null,
+      "qdrant_point_id": null,
+      "bm25_text": "931687f31329e048 src/lib/server/ai/llama-tool-definitions.ts#kb__explain_retrieval src/lib/server/ai/llama-tool-definitions.ts#kb__explain_retrieval",
+      "concepts": [],
+      "tags": [
+        "931687f31329e048",
+        "mcp_tool_stub",
+        "packet_spine"
+      ]
+    },
+    {
+      "packet_key": "1125b964826d67d7",
+      "source_ref": "src/mcp/server.ts#langextract:custom",
+      "feature_id": "6a545f1e8ce22358",
+      "packet_kind": "mcp_tool_stub",
+      "qdrant_collection": null,
+      "qdrant_point_id": null,
+      "bm25_text": "6a545f1e8ce22358 src/mcp/server.ts#langextract:custom src/mcp/server.ts#langextract:custom",
+      "concepts": [],
+      "tags": [
+        "6a545f1e8ce22358",
+        "mcp_tool_stub",
+        "packet_spine"
+      ]
+    },
+    {
+      "packet_key": "119403f1ca0164b4",
+      "source_ref": "src/mcp/server.ts#reports:list",
+      "feature_id": "5a8f718e6f8c271a",
+      "packet_kind": "mcp_tool_stub",
+      "qdrant_collection": null,
+      "qdrant_point_id": null,
+      "bm25_text": "5a8f718e6f8c271a src/mcp/server.ts#reports:list src/mcp/server.ts#reports:list",
+      "concepts": [],
+      "tags": [
+        "5a8f718e6f8c271a",
+        "mcp_tool_stub",
+        "packet_spine"
+      ]
+    },
+    {
+      "packet_key": "13039d77318546e0",
+      "source_ref": "src/lib/server/ai/llama-tool-definitions.ts#search__dev_context",
+      "feature_id": "4521761888863c86",
+      "packet_kind": "mcp_tool_stub",
+      "qdrant_collection": null,
+      "qdrant_point_id": null,
+      "bm25_text": "4521761888863c86 src/lib/server/ai/llama-tool-definitions.ts#search__dev_context src/lib/server/ai/llama-tool-definitions.ts#search__dev_context",
+      "concepts": [],
+      "tags": [
+        "4521761888863c86",
         "mcp_tool_stub",
         "packet_spine"
       ]

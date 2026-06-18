@@ -14,7 +14,7 @@
  * ALL data sourced from atlas_packets (canonical ledger) or Redis cache (for speed).
  */
 
-import { db } from '$lib/server/db/client.js';
+import { pool } from '$lib/server/db/client.js';
 import { getRedis } from '$lib/server/redis.js';
 
 // Domain enrichment policy — which domains benefit from community/karpathy boosts
@@ -100,18 +100,18 @@ export async function fetchEnrichedPackets(
   if (sourceRefs.length === 0) return new Map();
 
   try {
-    const placeholders = sourceRefs.map((_, i) => `$${i + 1}`).join(',');
-    const rows: any[] = await db.execute(
+    const queryResult = await pool.query(
       `SELECT packet_id, source_ref, feature_id, feature_label, community_id,
               community_confidence, community_source
        FROM atlas_packets
-       WHERE source_ref = ANY(ARRAY[${placeholders}])`,
+       WHERE source_ref = ANY($1::text[])`,
       sourceRefs
     );
+    const rows = queryResult.rows as any[];
 
-    const result = new Map<string, Phase5EnrichedPacket>();
+    const packetsBySourceRef = new Map<string, Phase5EnrichedPacket>();
     for (const row of rows) {
-      result.set(row.source_ref, {
+      packetsBySourceRef.set(row.source_ref, {
         packet_id: row.packet_id,
         source_ref: row.source_ref,
         feature_id: row.feature_id,
@@ -122,7 +122,7 @@ export async function fetchEnrichedPackets(
       });
     }
 
-    return result;
+    return packetsBySourceRef;
   } catch (err) {
     console.error('[Phase E] Fetch enriched packets failed:', err);
     return new Map();
@@ -225,6 +225,7 @@ export async function enrichRetrievalChunksPhase5(
   context: {
     queryClusterId?: string;
     userCommunityId?: string;
+    domain?: string;
   }
 ): Promise<Array<{ source_ref: string; score: number; enriched?: Phase5EnrichedPacket }>> {
   const sourceRefs = chunks.map((c) => c.source_ref);
@@ -272,10 +273,10 @@ export async function checkPhase5EnrichmentHealth(): Promise<{
 }> {
   try {
     // Check Postgres
-    const pgRes: any[] = await db.execute(
+    const pgRes = await pool.query(
       `SELECT COUNT(*) as count FROM atlas_packets WHERE community_id IS NOT NULL`
     );
-    const pgCount = parseInt(pgRes[0]?.count ?? '0', 10);
+    const pgCount = parseInt(String(pgRes.rows[0]?.count ?? '0'), 10);
 
     // Check Redis
     let redisCount = 0;
@@ -304,3 +305,4 @@ export async function checkPhase5EnrichmentHealth(): Promise<{
     };
   }
 }
+

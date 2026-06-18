@@ -1,9 +1,21 @@
 import { sql } from 'drizzle-orm';
 import {
   pgTable, text, integer, doublePrecision, bigint, jsonb,
-  timestamp, index, uuid, boolean,
+  timestamp, index, uuid, boolean, real, customType,
 } from 'drizzle-orm/pg-core';
 import { vector } from 'drizzle-orm/pg-core';
+
+const bytea = customType<{ data: Buffer; driverData: Buffer }>({
+  dataType() {
+    return 'bytea';
+  },
+  fromDriver(value) {
+    return value as Buffer;
+  },
+  toDriver(value) {
+    return value;
+  },
+});
 
 // identity_lane values (explicit set — not a DB enum to stay migration-free)
 export type AtlasIdentityLane =
@@ -36,8 +48,11 @@ export const atlasPackets = pgTable('atlas_packets', {
   embedding: vector('embedding', { dimensions: 768 }),
 
   // Content
+  permissions: jsonb('permissions').default(sql`'{}'::jsonb`).notNull(),
   payload: jsonb('payload').default(sql`'{}'::jsonb`),
   metadata: jsonb('metadata').default(sql`'{}'::jsonb`),
+  topology: jsonb('topology').default(sql`'{}'::jsonb`).notNull(),
+  vectors: jsonb('vectors').default(sql`'{}'::jsonb`).notNull(),
   summary: text('summary'),
   byteStart: bigint('byte_start', { mode: 'number' }),
   byteEnd: bigint('byte_end', { mode: 'number' }),
@@ -50,6 +65,11 @@ export const atlasPackets = pgTable('atlas_packets', {
 
   // Scoring
   rewardPrior: doublePrecision('reward_prior').default(0),
+  pagerank: real('pagerank'),
+  betweenness: real('betweenness'),
+  eigenvector: real('eigenvector'),
+  neo4jNodeId: text('neo4j_node_id'),
+  redisCentroidKey: text('redis_centroid_key'),
   domainClass: text('domain_class'),
   tags: text('tags').array().notNull().default(sql`'{}'::text[]`),
   lineageVersion: text('lineage_version'),
@@ -62,6 +82,7 @@ export const atlasPackets = pgTable('atlas_packets', {
   somCol: integer('som_col'),
   somIndex: integer('som_index'),
   kmeansCluster: integer('kmeans_cluster'),
+  latent64: bytea('latent_64'),
 
   // Identity lane — which topology this packet belongs to
   // qdrant_chunk: vector-backed, qdrant_point_id is set
@@ -80,10 +101,19 @@ export const atlasPackets = pgTable('atlas_packets', {
   sourceRefIdx: index('idx_atlas_packets_source_feature').on(table.sourceRef, table.featureId),
   directoryIdx: index('idx_atlas_packets_directory_path').on(table.directoryPath),
   directoryFeatureIdx: index('idx_atlas_packets_directory_feature').on(table.directoryPath, table.featureId),
-  featureIdIdx: index('idx_atlas_packets_cluster_id').on(table.clusterId),
+  clusterIdIdx: index('idx_atlas_packets_cluster_id').on(table.clusterId),
+  permissionsGin: index('idx_atlas_packets_permissions_gin').using('gin', table.permissions),
   payloadGin: index('idx_atlas_packets_payload_gin').using('gin', table.payload),
+  metadataGin: index('idx_atlas_packets_metadata_gin').using('gin', table.metadata),
+  topologyGin: index('idx_atlas_packets_topology_gin').using('gin', table.topology),
+  vectorsGin: index('idx_atlas_packets_vectors_gin').using('gin', table.vectors),
   identityLaneIdx: index('idx_atlas_packets_identity_lane').on(table.identityLane),
   qdrantPointIdIdx: index('idx_atlas_packets_qdrant_point_id').on(table.qdrantPointId),
+  pagerankIdx: index('idx_atlas_packets_pagerank').on(table.pagerank),
+  betweennessIdx: index('idx_atlas_packets_betweenness').on(table.betweenness),
+  eigenvectorIdx: index('idx_atlas_packets_eigenvector').on(table.eigenvector),
+  neo4jNodeIdIdx: index('idx_atlas_packets_neo4j_node_id').on(table.neo4jNodeId),
+  redisCentroidKeyIdx: index('idx_atlas_packets_redis_centroid_key').on(table.redisCentroidKey),
   rewardPriorIdx: index('idx_atlas_packets_reward_prior').on(sql`${table.rewardPrior} DESC`),
   communityConfIdx: index('idx_atlas_packets_community_confidence').on(sql`${table.communityConfidence} DESC`),
   updatedAtIdx: index('idx_atlas_packets_updated_at').on(sql`${table.updatedAt} DESC`),
@@ -92,3 +122,4 @@ export const atlasPackets = pgTable('atlas_packets', {
 
 export type AtlasPacket = typeof atlasPackets.$inferSelect;
 export type NewAtlasPacket = typeof atlasPackets.$inferInsert;
+

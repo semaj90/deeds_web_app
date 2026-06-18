@@ -277,6 +277,13 @@
     ".claude/worktrees/agent-a38668f2/sveltekit-frontend/src/lib/server/ai/engram-registry.spec.ts",
     ".claude/worktrees/agent-a38668f2/sveltekit-frontend/src/lib/server/analysis/agentic-proposal-join-spine.spec.ts"
   ],
+  ".claude/worktrees/agent-a38668f2/sveltekit-frontend/src/lib/server/ai/error-agent/workflow-loop.ts": [
+    ".claude/worktrees/agent-a38668f2/sveltekit-frontend/src/lib/server/ai/error-agent/workflow-loop.test.ts",
+    ".claude/worktrees/agent-a38668f2/sveltekit-frontend/src/lib/server/ai/error-agent/workflow-loop.test.ts",
+    ".claude/worktrees/agent-a38668f2/sveltekit-frontend/src/lib/server/ai/error-agent/workflow-loop.test.ts",
+    ".claude/worktrees/agent-a38668f2/sveltekit-frontend/src/lib/server/ai/error-agent/workflow-loop.test.ts",
+    ".claude/worktrees/agent-a38668f2/sveltekit-frontend/src/lib/server/ai/error-agent/workflow-loop.test.ts"
+  ],
   ".claude/worktrees/agent-a38668f2/sveltekit-frontend/src/lib/server/ai/error-agent/workflow-loop-langgraph.ts": [
     ".claude/worktrees/agent-a38668f2/sveltekit-frontend/src/lib/server/ai/error-agent/workflow-loop.test.ts",
     ".claude/worktrees/agent-a38668f2/sveltekit-frontend/src/lib/server/ai/error-agent/workflow-loop.test.ts",
@@ -3975,9 +3982,6 @@
   ],
   "sveltekit-frontend/src/routes/api/code-intel/topology/node/[stableKey]/+server.ts": [
     "sveltekit-frontend/tests/routes/auto/api/code-intel/topology/node/__stableKey.test.ts"
-  ],
-  "sveltekit-frontend/src/routes/api/codebase/auto-research/+server.ts": [
-    "sveltekit-frontend/tests/routes/auto/api/codebase/auto-research.test.ts"
   ],
   "sveltekit-frontend/src/routes/api/codebase/rerank/+server.ts": [
     "sveltekit-frontend/tests/routes/auto/api/codebase/rerank.test.ts"

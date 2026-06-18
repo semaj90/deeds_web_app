@@ -1,0 +1,22 @@
+{
+  "generated_at": "2026-06-18T22:12:30.461Z",
+  "mode": "apply",
+  "input_file": ".tmp/addressable-packets.validated.ndjson",
+  "statistics": {
+    "total_packets_processed": 3251,
+    "success_count": 3251,
+    "gds_enriched": 3226,
+    "som_enriched": 3251,
+    "error_count": 0
+  },
+  "neo4j": {
+    "reachable": true,
+    "total_scored": 8804,
+    "resolved_matches": 3226
+  },
+  "som": {
+    "loaded": true,
+    "total_assigned": 9372
+  },
+  "errors": []
+}

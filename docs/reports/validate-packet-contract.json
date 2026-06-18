@@ -1,30 +1,30 @@
 {
-  "generated_at": "2026-06-13T03:28:43.472Z",
-  "total_packets": 17136,
-  "addressable_packets": 8483,
+  "generated_at": "2026-06-18T22:38:50.048Z",
+  "total_packets": 17485,
+  "addressable_packets": 17485,
   "identity_coverage": {
     "packet_key": {
-      "count": 8483,
-      "pct": 0.49503968253968256
+      "count": 17485,
+      "pct": 1
     },
     "source_ref": {
-      "count": 8483,
-      "pct": 0.49503968253968256
+      "count": 17485,
+      "pct": 1
     },
     "feature_id": {
-      "count": 7058,
-      "pct": 0.4118814192343604
+      "count": 17485,
+      "pct": 1
     },
     "community_id": {
-      "count": 17136,
-      "pct": 1
+      "count": 17397,
+      "pct": 0.9949671146697169
     }
   },
   "missing_identity": {
-    "packet_key": 8653,
-    "source_ref": 8653,
-    "feature_id": 10078,
-    "community_id": 0
+    "packet_key": 0,
+    "source_ref": 0,
+    "feature_id": 0,
+    "community_id": 88
   },
   "metadata_coverage": {
     "payload_path": 8367,
@@ -33,7 +33,7 @@
     "payload_source_url": 0,
     "payload_mtime": 7617,
     "payload_hash": 7615,
-    "payload_bm25_text": 7909,
+    "payload_bm25_text": 17264,
     "payload_tags": 3171
   },
   "noise_source_refs": 34,
@@ -77,27 +77,27 @@
       }
     ],
     "missing": [],
-    "has_payload_path_expression_index": true,
-    "total_indexes": 20
+    "has_payload_path_expression_index": false,
+    "total_indexes": 41
   },
   "gates": {
     "packet_key_coverage": {
-      "value": 0.49503968253968256,
+      "value": 1,
       "threshold": 0.4,
       "pass": true
     },
     "source_ref_coverage": {
-      "value": 0.49503968253968256,
+      "value": 1,
       "threshold": 0.4,
       "pass": true
     },
     "feature_id_coverage": {
-      "value": 0.4118814192343604,
+      "value": 1,
       "threshold": 0.3,
       "pass": true
     },
     "community_id_coverage": {
-      "value": 1,
+      "value": 0.9949671146697169,
       "threshold": 0.9,
       "pass": true
     },
@@ -113,6 +113,26 @@
     },
     "required_indexes": {
       "value": 0,
+      "threshold": 0,
+      "pass": true
+    },
+    "permissions_coverage": {
+      "value": 1,
+      "threshold": 0,
+      "pass": true
+    },
+    "metadata_env_coverage": {
+      "value": 0.9815270231627109,
+      "threshold": 0,
+      "pass": true
+    },
+    "topology_coverage": {
+      "value": 1,
+      "threshold": 0,
+      "pass": true
+    },
+    "vectors_coverage": {
+      "value": 1,
       "threshold": 0,
       "pass": true
     }

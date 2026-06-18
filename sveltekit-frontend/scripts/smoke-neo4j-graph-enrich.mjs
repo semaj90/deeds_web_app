@@ -24,7 +24,22 @@ const JSON_OUT = process.argv.includes('--json');
 
 // ── Config ────────────────────────────────────────────────────────────────────
 
-const NEO4J_URL  = process.env.NEO4J_URL  ?? 'http://localhost:7474';
+function resolveNeo4jHttpUrl() {
+  const raw = String(process.env.NEO4J_HTTP ?? process.env.NEO4J_URI ?? process.env.NEO4J_URL ?? '').trim();
+  if (!raw) return 'http://127.0.0.1:7474';
+  try {
+    const parsed = new URL(raw);
+    if (parsed.protocol === 'http:' || parsed.protocol === 'https:') return parsed.toString().replace(/\/$/, '');
+    if (parsed.protocol === 'bolt:' || parsed.protocol === 'neo4j:') {
+      return `http://${parsed.hostname || '127.0.0.1'}:7474`;
+    }
+  } catch {
+    // fall through to the default browser endpoint
+  }
+  return 'http://127.0.0.1:7474';
+}
+
+const NEO4J_URL  = resolveNeo4jHttpUrl();
 const NEO4J_USER = process.env.NEO4J_USER ?? 'neo4j';
 const NEO4J_PASS = process.env.NEO4J_PASSWORD ?? process.env.NEO4J_PASS ?? 'neo4j123';
 

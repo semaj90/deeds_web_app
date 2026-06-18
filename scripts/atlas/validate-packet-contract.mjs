@@ -71,7 +71,11 @@ async function main() {
         COUNT(CASE WHEN packet_key  IS NULL THEN 1 END)    AS missing_packet_key,
         COUNT(CASE WHEN source_ref  IS NULL THEN 1 END)    AS missing_source_ref,
         COUNT(CASE WHEN feature_id  IS NULL THEN 1 END)    AS missing_feature_id,
-        COUNT(CASE WHEN community_id IS NULL THEN 1 END)   AS missing_community_id
+        COUNT(CASE WHEN community_id IS NULL THEN 1 END)   AS missing_community_id,
+        COUNT(CASE WHEN permissions IS NOT NULL AND permissions != '{}'::jsonb THEN 1 END) AS has_permissions,
+        COUNT(CASE WHEN metadata IS NOT NULL AND metadata != '{}'::jsonb THEN 1 END) AS has_metadata,
+        COUNT(CASE WHEN topology IS NOT NULL AND topology != '{}'::jsonb THEN 1 END) AS has_topology,
+        COUNT(CASE WHEN vectors IS NOT NULL AND vectors != '{}'::jsonb THEN 1 END) AS has_vectors
       FROM atlas_packets
     `);
 
@@ -159,6 +163,10 @@ async function main() {
     const smCoverage  = total > 0 ? Number(counts.has_summary) / total : 0;
     const ppathCoverage = total > 0 ? Number(counts.has_payload_path) / total : 0;
     const pbmCoverage = total > 0 ? Number(counts.has_payload_bm25_text) / total : 0;
+    const permCoverage = total > 0 ? Number(counts.has_permissions) / total : 0;
+    const metaEnvCoverage = total > 0 ? Number(counts.has_metadata) / total : 0;
+    const topoCoverage = total > 0 ? Number(counts.has_topology) / total : 0;
+    const vectCoverage = total > 0 ? Number(counts.has_vectors) / total : 0;
 
     // Gate thresholds
     const gates = {
@@ -169,6 +177,10 @@ async function main() {
       no_duplicate_keys:      { value: Number(dups.dup_count), threshold: 0, pass: Number(dups.dup_count) === 0 },
       no_noise_refs:          { value: Number(noise.noise_count), threshold: 50, pass: Number(noise.noise_count) < 50 },
       required_indexes:       { value: missingIndexes.length, threshold: 0, pass: missingIndexes.length === 0 },
+      permissions_coverage:   { value: permCoverage,    threshold: 0.0, pass: true }, // report-only
+      metadata_env_coverage:  { value: metaEnvCoverage, threshold: 0.0, pass: true }, // report-only
+      topology_coverage:      { value: topoCoverage,    threshold: 0.0, pass: true }, // report-only
+      vectors_coverage:       { value: vectCoverage,    threshold: 0.0, pass: true }, // report-only
     };
 
     const overallPass = Object.values(gates).every(g => g.pass);
@@ -243,6 +255,12 @@ async function main() {
       console.log(`  source_ref:   ${String(counts.has_source_ref).padStart(7)} / ${total}  ${pct(srCoverage)}  ${gates.source_ref_coverage.pass ? '✅' : '❌'} (gate ≥40%)`);
       console.log(`  feature_id:   ${String(counts.has_feature_id).padStart(7)} / ${total}  ${pct(fidCoverage)}  ${gates.feature_id_coverage.pass ? '✅' : '❌'} (gate ≥30%)`);
       console.log(`  community_id: ${String(counts.has_community_id).padStart(7)} / ${total}  ${pct(cidCoverage)}  ${gates.community_id_coverage.pass ? '✅' : '❌'} (gate ≥90%)`);
+
+      console.log('\nEnvelope coverage (of total):');
+      console.log(`  permissions:  ${String(counts.has_permissions).padStart(7)} / ${total}  ${pct(permCoverage)}  ✅ (report-only)`);
+      console.log(`  metadata env: ${String(counts.has_metadata).padStart(7)} / ${total}  ${pct(metaEnvCoverage)}  ✅ (report-only)`);
+      console.log(`  topology env: ${String(counts.has_topology).padStart(7)} / ${total}  ${pct(topoCoverage)}  ✅ (report-only)`);
+      console.log(`  vectors env:  ${String(counts.has_vectors).padStart(7)} / ${total}  ${pct(vectCoverage)}  ✅ (report-only)`);
 
       console.log('\nMetadata field coverage (of packets with packet_key):');
       const base = Number(counts.has_packet_key);

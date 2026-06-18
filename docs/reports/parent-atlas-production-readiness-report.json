@@ -1,6 +1,6 @@
 {
   "schema": "parent_atlas_production_readiness.v1",
-  "generatedAt": "2026-06-17T15:00:54.295Z",
+  "generatedAt": "2026-06-18T21:34:43.902Z",
   "readOnly": true,
   "sections": {
     "summary-batch": [
@@ -297,7 +297,7 @@
         "message": "sveltekit-frontend/src/lib/server/db/schema/nes-chrom-packets.ts exists",
         "details": {
           "exists": true,
-          "bytes": 9419,
+          "bytes": 10520,
           "relPath": "sveltekit-frontend/src/lib/server/db/schema/nes-chrom-packets.ts"
         }
       },
@@ -526,16 +526,17 @@
       {
         "id": "rg-uu:ndjson-inventory",
         "status": "pass",
-        "message": "rg -uuu found 184 NDJSON files",
+        "message": "rg -uuu found 189 NDJSON files",
         "details": {
           "sample": [
-            "sveltekit-frontend\\.tmp\\offline-analysis\\tool-usage-edges.ndjson",
-            "sveltekit-frontend\\.tmp\\offline-analysis\\db-usage-edges.ndjson",
-            "sveltekit-frontend\\.tmp\\jsonb_export.ndjson",
-            "neschrom97\\packets\\cards.ndjson",
+            ".claude\\worktrees\\agent-ae7221f6\\docs\\packets\\session-features.ndjson",
+            ".claude\\worktrees\\agent-ae7221f6\\docs\\packets\\rg-knowledge-packets.ndjson",
+            ".claude\\worktrees\\agent-ae7221f6\\docs\\ai-os\\agentic-progress-log.ndjson",
+            ".claude\\worktrees\\agent-ae7221f6\\memory\\exports\\reports.ndjson",
+            "docs\\packets\\session-features.ndjson",
+            "docs\\packets\\rg-knowledge-packets.ndjson",
             "sveltekit-frontend\\tmp\\qdrant-embeddings-test.ndjson",
             "sveltekit-frontend\\tmp\\hypergraph-assignments.ndjson",
-            "sveltekit-frontend\\.tmp\\ingest\\lanes\\test-lane.ndjson",
             "sveltekit-frontend\\tmp\\hypergraph\\codebase_chunks_768-embeddings.ndjson",
             "sveltekit-frontend\\tmp\\hypergraph\\codebase_chunks_768-assignments.ndjson",
             "sveltekit-frontend\\tmp\\embeddings-smoke.ndjson",
@@ -547,13 +548,12 @@
             "sveltekit-frontend\\tmp\\assignments.ndjson",
             "sveltekit-frontend\\tmp\\assignments-test.ndjson",
             "sveltekit-frontend\\tmp\\assignments-ci.ndjson",
-            "docs\\packets\\session-features.ndjson",
-            "docs\\packets\\rg-knowledge-packets.ndjson",
             "docs\\ai-os\\agentic-progress-log.ndjson",
-            "memory\\exports\\reports.ndjson",
-            "sveltekit-frontend\\sveltekit-frontend\\tmp\\embeddings-smoke.ndjson",
-            "sveltekit-frontend\\svelte-check-machine.ndjson",
-            "sveltekit-frontend\\static\\dev-graphs\\validation\\history.ndjson"
+            ".claude\\worktrees\\agent-ae7221f6\\.opencode\\recommendations\\tasks.ndjson",
+            ".claude\\worktrees\\agent-ae7221f6\\.opencode\\quarantine\\invalid-cards.ndjson",
+            ".claude\\worktrees\\agent-ae7221f6\\.opencode\\outcome-ledger.ndjson",
+            ".claude\\worktrees\\agent-ae7221f6\\.opencode\\ingest\\nodes.ndjson",
+            ".claude\\worktrees\\agent-ae7221f6\\.opencode\\ingest\\edges.ndjson"
           ]
         }
       }
@@ -690,7 +690,7 @@
       {
         "id": "contextual-tree",
         "status": "warn",
-        "message": "Neo4j CodebaseFile=0, ParentAtlasFeature=0",
+        "message": "Neo4j CodebaseFile=0, ParentAtlasFeature=20",
         "details": {}
       }
     ]
@@ -1009,7 +1009,7 @@
       "message": "sveltekit-frontend/src/lib/server/db/schema/nes-chrom-packets.ts exists",
       "details": {
         "exists": true,
-        "bytes": 9419,
+        "bytes": 10520,
         "relPath": "sveltekit-frontend/src/lib/server/db/schema/nes-chrom-packets.ts"
       }
     },
@@ -1259,16 +1259,17 @@
       "section": "offline",
       "id": "rg-uu:ndjson-inventory",
       "status": "pass",
-      "message": "rg -uuu found 184 NDJSON files",
+      "message": "rg -uuu found 189 NDJSON files",
       "details": {
         "sample": [
-          "sveltekit-frontend\\.tmp\\offline-analysis\\tool-usage-edges.ndjson",
-          "sveltekit-frontend\\.tmp\\offline-analysis\\db-usage-edges.ndjson",
-          "sveltekit-frontend\\.tmp\\jsonb_export.ndjson",
-          "neschrom97\\packets\\cards.ndjson",
+          ".claude\\worktrees\\agent-ae7221f6\\docs\\packets\\session-features.ndjson",
+          ".claude\\worktrees\\agent-ae7221f6\\docs\\packets\\rg-knowledge-packets.ndjson",
+          ".claude\\worktrees\\agent-ae7221f6\\docs\\ai-os\\agentic-progress-log.ndjson",
+          ".claude\\worktrees\\agent-ae7221f6\\memory\\exports\\reports.ndjson",
+          "docs\\packets\\session-features.ndjson",
+          "docs\\packets\\rg-knowledge-packets.ndjson",
           "sveltekit-frontend\\tmp\\qdrant-embeddings-test.ndjson",
           "sveltekit-frontend\\tmp\\hypergraph-assignments.ndjson",
-          "sveltekit-frontend\\.tmp\\ingest\\lanes\\test-lane.ndjson",
           "sveltekit-frontend\\tmp\\hypergraph\\codebase_chunks_768-embeddings.ndjson",
           "sveltekit-frontend\\tmp\\hypergraph\\codebase_chunks_768-assignments.ndjson",
           "sveltekit-frontend\\tmp\\embeddings-smoke.ndjson",
@@ -1280,13 +1281,12 @@
           "sveltekit-frontend\\tmp\\assignments.ndjson",
           "sveltekit-frontend\\tmp\\assignments-test.ndjson",
           "sveltekit-frontend\\tmp\\assignments-ci.ndjson",
-          "docs\\packets\\session-features.ndjson",
-          "docs\\packets\\rg-knowledge-packets.ndjson",
           "docs\\ai-os\\agentic-progress-log.ndjson",
-          "memory\\exports\\reports.ndjson",
-          "sveltekit-frontend\\sveltekit-frontend\\tmp\\embeddings-smoke.ndjson",
-          "sveltekit-frontend\\svelte-check-machine.ndjson",
-          "sveltekit-frontend\\static\\dev-graphs\\validation\\history.ndjson"
+          ".claude\\worktrees\\agent-ae7221f6\\.opencode\\recommendations\\tasks.ndjson",
+          ".claude\\worktrees\\agent-ae7221f6\\.opencode\\quarantine\\invalid-cards.ndjson",
+          ".claude\\worktrees\\agent-ae7221f6\\.opencode\\outcome-ledger.ndjson",
+          ".claude\\worktrees\\agent-ae7221f6\\.opencode\\ingest\\nodes.ndjson",
+          ".claude\\worktrees\\agent-ae7221f6\\.opencode\\ingest\\edges.ndjson"
         ]
       }
     },
@@ -1432,7 +1432,7 @@
       "section": "neo4j",
       "id": "contextual-tree",
       "status": "warn",
-      "message": "Neo4j CodebaseFile=0, ParentAtlasFeature=0",
+      "message": "Neo4j CodebaseFile=0, ParentAtlasFeature=20",
       "details": {}
     }
   ],
@@ -1496,17 +1496,17 @@
   "neo4j": {
     "available": true,
     "uri": "bolt://127.0.0.1:7687",
-    "totalNodes": 26206,
+    "totalNodes": 26332,
     "codebaseFiles": 0,
-    "parentAtlasFeatures": 0,
-    "totalRelationships": 73260,
-    "belongsToFeature": 0,
+    "parentAtlasFeatures": 20,
+    "totalRelationships": 73308,
+    "belongsToFeature": 20,
     "similarTopology": 0
   },
   "drizzle": {
     "nesChromSchema": {
       "exists": true,
-      "bytes": 9419,
+      "bytes": 10520,
       "relPath": "sveltekit-frontend/src/lib/server/db/schema/nes-chrom-packets.ts"
     },
     "routeRuntimeSchema": {
@@ -1624,15 +1624,16 @@
   ],
   "ndjsonInventory": {
     "status": "pass",
-    "total": 184,
+    "total": 189,
     "sample": [
-      "sveltekit-frontend\\.tmp\\offline-analysis\\tool-usage-edges.ndjson",
-      "sveltekit-frontend\\.tmp\\offline-analysis\\db-usage-edges.ndjson",
-      "sveltekit-frontend\\.tmp\\jsonb_export.ndjson",
-      "neschrom97\\packets\\cards.ndjson",
+      ".claude\\worktrees\\agent-ae7221f6\\docs\\packets\\session-features.ndjson",
+      ".claude\\worktrees\\agent-ae7221f6\\docs\\packets\\rg-knowledge-packets.ndjson",
+      ".claude\\worktrees\\agent-ae7221f6\\docs\\ai-os\\agentic-progress-log.ndjson",
+      ".claude\\worktrees\\agent-ae7221f6\\memory\\exports\\reports.ndjson",
+      "docs\\packets\\session-features.ndjson",
+      "docs\\packets\\rg-knowledge-packets.ndjson",
       "sveltekit-frontend\\tmp\\qdrant-embeddings-test.ndjson",
       "sveltekit-frontend\\tmp\\hypergraph-assignments.ndjson",
-      "sveltekit-frontend\\.tmp\\ingest\\lanes\\test-lane.ndjson",
       "sveltekit-frontend\\tmp\\hypergraph\\codebase_chunks_768-embeddings.ndjson",
       "sveltekit-frontend\\tmp\\hypergraph\\codebase_chunks_768-assignments.ndjson",
       "sveltekit-frontend\\tmp\\embeddings-smoke.ndjson",
@@ -1644,13 +1645,12 @@
       "sveltekit-frontend\\tmp\\assignments.ndjson",
       "sveltekit-frontend\\tmp\\assignments-test.ndjson",
       "sveltekit-frontend\\tmp\\assignments-ci.ndjson",
-      "docs\\packets\\session-features.ndjson",
-      "docs\\packets\\rg-knowledge-packets.ndjson",
       "docs\\ai-os\\agentic-progress-log.ndjson",
-      "memory\\exports\\reports.ndjson",
-      "sveltekit-frontend\\sveltekit-frontend\\tmp\\embeddings-smoke.ndjson",
-      "sveltekit-frontend\\svelte-check-machine.ndjson",
-      "sveltekit-frontend\\static\\dev-graphs\\validation\\history.ndjson"
+      ".claude\\worktrees\\agent-ae7221f6\\.opencode\\recommendations\\tasks.ndjson",
+      ".claude\\worktrees\\agent-ae7221f6\\.opencode\\quarantine\\invalid-cards.ndjson",
+      ".claude\\worktrees\\agent-ae7221f6\\.opencode\\outcome-ledger.ndjson",
+      ".claude\\worktrees\\agent-ae7221f6\\.opencode\\ingest\\nodes.ndjson",
+      ".claude\\worktrees\\agent-ae7221f6\\.opencode\\ingest\\edges.ndjson"
     ]
   },
   "summary": {

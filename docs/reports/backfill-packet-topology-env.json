@@ -1,0 +1,11 @@
+{
+  "generated_at": "2026-06-18T22:39:35.791Z",
+  "mode": "apply",
+  "stats": {
+    "total_scanned": 17485,
+    "success_count": 17485,
+    "error_count": 0,
+    "gds_enriched": 8744,
+    "som_enriched": 3150
+  }
+}

@@ -1,16 +1,16 @@
 {
-  "timestamp": "2026-06-01T22:31:55.149Z",
+  "timestamp": "2026-06-18T22:00:54.212Z",
   "dryRun": false,
   "force": false,
   "algorithms": {
     "louvain": {
       "success": true,
       "data": {
-        "communities": 15378,
-        "nodesProcessed": 17909
+        "communities": 18782,
+        "nodesProcessed": 20542
       },
-      "communities": 15378,
-      "nodesProcessed": 17909,
+      "communities": 18782,
+      "nodesProcessed": 20542,
       "records": [
         {
           "keys": [
@@ -20,11 +20,11 @@
           "length": 2,
           "_fields": [
             {
-              "low": 15378,
+              "low": 18782,
               "high": 0
             },
             {
-              "low": 17909,
+              "low": 20542,
               "high": 0
             }
           ],
@@ -38,11 +38,11 @@
     "betweenness": {
       "success": true,
       "data": {
-        "nodesScored": 17909,
-        "maxScore": 12749.399999999998
+        "nodesScored": 20542,
+        "maxScore": 1032
       },
-      "nodesScored": 17909,
-      "maxScore": 12749.399999999998,
+      "nodesScored": 20542,
+      "maxScore": 1032,
       "records": [
         {
           "keys": [
@@ -52,10 +52,10 @@
           "length": 2,
           "_fields": [
             {
-              "low": 17909,
+              "low": 20542,
               "high": 0
             },
-            12749.399999999998
+            1032
           ],
           "_fieldLookup": {
             "nodesScored": 0,
@@ -67,13 +67,13 @@
     "pagerank": {
       "success": true,
       "data": {
-        "nodesScored": 17909,
-        "maxScore": 54.80961950352407,
-        "avgScore": 0.1727253142350557
+        "nodesScored": 20542,
+        "maxScore": 19.295749596299945,
+        "avgScore": 0.1625306837384208
       },
-      "nodesScored": 17909,
-      "maxScore": 54.80961950352407,
-      "avgScore": 0.1727253142350557,
+      "nodesScored": 20542,
+      "maxScore": 19.295749596299945,
+      "avgScore": 0.1625306837384208,
       "records": [
         {
           "keys": [
@@ -84,11 +84,11 @@
           "length": 3,
           "_fields": [
             {
-              "low": 17909,
+              "low": 20542,
               "high": 0
             },
-            54.80961950352407,
-            0.1727253142350557
+            19.295749596299945,
+            0.1625306837384208
           ],
           "_fieldLookup": {
             "nodesScored": 0,
@@ -103,9 +103,9 @@
     "shares_cluster": {
       "success": true,
       "data": {
-        "edgesCreated": 44233
+        "edgesCreated": 3110
       },
-      "edgesCreated": 44233,
+      "edgesCreated": 3110,
       "records": [
         {
           "keys": [
@@ -114,7 +114,7 @@
           "length": 1,
           "_fields": [
             {
-              "low": 44233,
+              "low": 3110,
               "high": 0
             }
           ],
@@ -127,9 +127,9 @@
     "high_authority": {
       "success": true,
       "data": {
-        "edgesCreated": 4696
+        "edgesCreated": 2940
       },
-      "edgesCreated": 4696,
+      "edgesCreated": 2940,
       "records": [
         {
           "keys": [
@@ -138,7 +138,7 @@
           "length": 1,
           "_fields": [
             {
-              "low": 4696,
+              "low": 2940,
               "high": 0
             }
           ],
@@ -151,21 +151,21 @@
   },
   "errors": [],
   "stats": {
-    "totalFiles": 17909,
-    "withCommunity": 17867,
-    "withBetweenness": 17867,
-    "withPageRank": 17867
+    "totalFiles": 20542,
+    "withCommunity": 0,
+    "withBetweenness": 0,
+    "withPageRank": 0
   },
   "projection": {
     "success": true,
     "data": {
       "graphName": "codeGraph",
-      "nodeCount": 17909,
-      "relationshipCount": 4696
+      "nodeCount": 20542,
+      "relationshipCount": 2940
     },
     "graphName": "codeGraph",
-    "nodeCount": 17909,
-    "relationshipCount": 4696,
+    "nodeCount": 20542,
+    "relationshipCount": 2940,
     "records": [
       {
         "keys": [
@@ -177,11 +177,11 @@
         "_fields": [
           "codeGraph",
           {
-            "low": 17909,
+            "low": 20542,
             "high": 0
           },
           {
-            "low": 4696,
+            "low": 2940,
             "high": 0
           }
         ],
@@ -214,5 +214,5 @@
       }
     ]
   },
-  "duration_ms": 28200
+  "duration_ms": 20642
 }

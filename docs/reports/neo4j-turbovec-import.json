@@ -1,15 +1,16 @@
 {
-  "generatedAt": "2026-06-18T15:46:10.021Z",
-  "mode": "dry-run",
+  "generatedAt": "2026-06-18T22:06:17.339Z",
+  "mode": "apply",
   "inputPath": ".tmp/turbovec-neighbors.ndjson",
   "summary": {
-    "rowsRead": 20,
+    "rowsRead": 80,
     "rowsSelected": 5,
-    "rowsImported": 0,
-    "rowsSkipped": 15,
+    "rowsImported": 5,
+    "rowsSkipped": 75,
     "qdrantReachable": null,
     "neo4jReachable": true,
-    "failures": 0
+    "failures": 0,
+    "transport": "http"
   },
   "samples": [
     {
@@ -21,33 +22,33 @@
     },
     {
       "source_id": ".opencode/cards/000678ef52ca67b0.json:L1",
+      "neighbor_id": ".opencode/cards/00262e5f02b7c99d.json:L1",
+      "similarity": 0.07422097027301788,
+      "topk_rank": 2,
+      "source": "turbovec"
+    },
+    {
+      "source_id": ".opencode/cards/000678ef52ca67b0.json:L1",
       "neighbor_id": ".opencode/cards/001f2d08e4459234.json:L1",
       "similarity": 0.04002489522099495,
-      "topk_rank": 2,
+      "topk_rank": 3,
+      "source": "turbovec"
+    },
+    {
+      "source_id": ".opencode/cards/000678ef52ca67b0.json:L1",
+      "neighbor_id": ".opencode/cards/0024f386d46d7f23.json:L1",
+      "similarity": 0.01737850531935692,
+      "topk_rank": 4,
       "source": "turbovec"
     },
     {
       "source_id": ".opencode/cards/000678ef52ca67b0.json:L1",
       "neighbor_id": ".opencode/cards/001570455730d2d7.json:L1",
       "similarity": -0.018151406198740005,
-      "topk_rank": 3,
-      "source": "turbovec"
-    },
-    {
-      "source_id": ".opencode/cards/000678ef52ca67b0.json:L1",
-      "neighbor_id": ".opencode/cards/00116e85cfe0456e.json:L1",
-      "similarity": -0.03316513076424599,
-      "topk_rank": 4,
-      "source": "turbovec"
-    },
-    {
-      "source_id": ".opencode/cards/00116e85cfe0456e.json:L1",
-      "neighbor_id": ".opencode/cards/001570455730d2d7.json:L1",
-      "similarity": 0.12139381468296051,
-      "topk_rank": 1,
+      "topk_rank": 5,
       "source": "turbovec"
     }
   ],
-  "status": "DRY_RUN_READY",
-  "nextSafeAction": "Review the dry-run edge plan, then rerun with --apply when the input lane is ready."
+  "status": "APPLIED",
+  "nextSafeAction": "Review the imported relationship counts, then keep the Neo4j/GDS pass bounded."
 }

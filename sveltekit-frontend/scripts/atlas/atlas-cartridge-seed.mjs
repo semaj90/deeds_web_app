@@ -27,6 +27,7 @@ import { readFileSync, writeFileSync, existsSync, readdirSync } from 'node:fs';
 import { mkdirSync }                                             from 'node:fs';
 import { join, resolve }                                         from 'node:path';
 import { fileURLToPath }                                         from 'node:url';
+import { loadRepoEnv, resolveRedisUrl }                          from '../../../scripts/atlas/connection-config.mjs';
 // NOTE: redis is dynamically imported inside the --publish block only
 //       to avoid loading @redis/json on every run.
 
@@ -45,10 +46,16 @@ const MAX_SEEDS = RAW_LIMIT ? Math.max(1, parseInt(RAW_LIMIT.split('=')[1], 10))
 const TMP_DIR       = join(ROOT, '.tmp');
 const SEEDS_JSONL   = join(TMP_DIR, 'atlas-cartridge-seeds.jsonl');
 const SEED_META     = join(TMP_DIR, 'atlas-cartridge-seed-meta.json');
-const REDIS_URL     = process.env.REDIS_URL ?? 'redis://localhost:6379';
+
+const runtimeEnv    = loadRepoEnv(process.env);
+if (runtimeEnv.VALKEY_PASSWORD && !runtimeEnv.REDIS_PASSWORD) {
+  runtimeEnv.REDIS_PASSWORD = runtimeEnv.VALKEY_PASSWORD;
+}
+const REDIS_URL     = resolveRedisUrl(runtimeEnv);
 
 // Input locations — searched in priority order
 const INPUT_CANDIDATES = [
+
   join(TMP_DIR, 'parent-atlas-profile-cards.jsonl'),
   join(ROOT, 'docs', 'atlas', 'atlas-index.jsonl'),
   join(ROOT, 'docs', 'atlas', 'parent-atlas-profile-cards.jsonl'),
@@ -235,6 +242,7 @@ const meta = {
   clusterBreakdown,
   seedGenerated:    seeds.length > 0,
   seedWarning:      seeds.length === 0,
+  redis_published:  false,
 };
 
 if (DRY_RUN) {
@@ -281,26 +289,40 @@ if (seeds.length === 0) {
 
 let redis;
 try {
-  const { createClient } = await import('redis');
-  redis = createClient({ url: REDIS_URL });
+  const { default: Redis }   = await import('ioredis');
+  const { resolveRedisConfig } = await import('../../../scripts/atlas/connection-config.mjs');
+  const cfg = resolveRedisConfig(runtimeEnv);
+  redis = new Redis({
+    host:                 cfg.host,
+    port:                 cfg.port,
+    password:             cfg.password,
+    lazyConnect:          true,
+    maxRetriesPerRequest: 1,
+    enableOfflineQueue:   false,
+    retryStrategy:        () => null,
+  });
+  redis.on('error', () => {});
   await redis.connect();
+  await redis.ping();
 } catch (err) {
-  warn(`Cannot connect to Redis at ${REDIS_URL}: ${err.message}`);
+  warn(`Cannot connect to Redis: ${err.message}`);
   process.exit(0); // non-fatal
 }
 
 try {
-  const dateKey   = new Date().toISOString().slice(0, 10);
-  const redisKey  = `atlas:seeds:${dateKey}`;
-  const pipeline  = redis.pipeline();
+  const dateKey  = new Date().toISOString().slice(0, 10);
+  const redisKey = `atlas:seeds:${dateKey}`;
+  const pipe     = redis.pipeline();
 
   for (const seed of seeds) {
-    pipeline.hSet(redisKey, seed.id, JSON.stringify(seed));
+    pipe.hset(redisKey, seed.id, JSON.stringify(seed));
   }
-  pipeline.expire(redisKey, 24 * 60 * 60); // 24 h TTL
-  await pipeline.exec();
+  pipe.expire(redisKey, 24 * 60 * 60); // 24 h TTL
+  await pipe.exec();
 
   log(`✓ Published ${seeds.length} seeds to Redis key ${redisKey} (TTL 24h)`);
+  meta.redis_published = true;
+  try { writeFileSync(SEED_META, JSON.stringify(meta, null, 2), 'utf-8'); } catch { /* ignore */ }
 } catch (err) {
   warn(`Redis publish failed: ${err.message} — seeds file still written`);
 } finally {
@@ -308,3 +330,4 @@ try {
 }
 
 process.exit(0);
+
