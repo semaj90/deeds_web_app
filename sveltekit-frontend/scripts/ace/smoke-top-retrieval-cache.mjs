@@ -8,6 +8,7 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, '..', '..');
 const CACHE_DIR = path.resolve(ROOT, '.cache', 'ace', 'top-retrieval');
 const REDIS_CONTAINER = process.env.REDIS_CONTAINER ?? process.env.DEEDS_REDIS_CONTAINER ?? 'legal-ai-valkey';
+const REDIS_PASSWORD = process.env.REDIS_PASSWORD ?? process.env.VALKEY_PASSWORD ?? 'redis';
 
 function buildAceTopRetrievalCacheKey(queryHash, topN = 20) {
   return `ace:retrieval:topn:${queryHash}:${topN}`;
@@ -25,8 +26,12 @@ function runDocker(args) {
   return spawnSync('docker', args, { encoding: 'utf8', windowsHide: true });
 }
 
+function redisCliArgs(...command) {
+  return ['exec', REDIS_CONTAINER, 'redis-cli', '-a', REDIS_PASSWORD, ...command];
+}
+
 async function readRedisJson(key) {
-  const result = runDocker(['exec', REDIS_CONTAINER, 'redis-cli', 'GET', key]);
+  const result = runDocker(redisCliArgs('GET', key));
   if (result.status !== 0) return null;
   const raw = (result.stdout || '').trim();
   if (!raw || raw === '(nil)') return null;
@@ -38,7 +43,7 @@ async function readRedisJson(key) {
 }
 
 async function setRedisJson(key, value) {
-  const result = runDocker(['exec', '-i', REDIS_CONTAINER, 'redis-cli', 'SET', key, JSON.stringify(value)]);
+  const result = runDocker(['exec', '-i', REDIS_CONTAINER, 'redis-cli', '-a', REDIS_PASSWORD, 'SET', key, JSON.stringify(value)]);
   if (result.status !== 0) {
     throw new Error((result.stderr || result.stdout || '').trim() || `Failed to set ${key}`);
   }

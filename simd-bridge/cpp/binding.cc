@@ -123,8 +123,7 @@ extern "C" int graphSimilarity(const float* embeddings, int n, int dim, float* o
 extern "C" int clusterEmbeddings(const float* embeddings, int n, int dim, int k, int max_iters, int* assignments, int assignments_len, int* out_reseeded_count);
 extern "C" int computeCaseEmbedding(const float* weights, int n, const float* embeddings, int dim, float* output, int output_len);
 extern "C" int checkCudaAvailable();
-extern "C" int getCudaMemory(int64_t* free_bytes, int64_t* total_bytes);
-extern "C" int batchCosineSimilarity(const float* query, int dim, const float* corpus, int n, float* scores, int scores_len);
+extern "C" int getCudaMemory(int64_t *free_bytes, int64_t *total_bytes);
 extern "C" int graphSimilarityHalf(const float* embeddings, int n, int dim, float* output, int output_len);
 
 // LSTM bridge (lstm_bridge.cc → lstm_gpu.cu)
@@ -168,6 +167,7 @@ extern "C" napi_value RegisterSimdJsonBackend(napi_env env, napi_callback_info i
 // addresses within 64-byte regions), which matters for sm_86 GPU data prep.
 
 static constexpr size_t AB_POOL_MAX_PER_BUCKET = 8;
+static constexpr size_t L1_CACHE_LINE_BYTES = 64U;
 
 static thread_local std::unordered_map<size_t, std::vector<void*>> g_ab_pool;
 
@@ -189,10 +189,13 @@ static thread_local std::unordered_map<size_t, std::vector<void*>> g_ab_pool;
 
 // Round up n to the next power of 2, minimum 64 (one L1 cache line).
 static inline size_t ab_next_pow2(size_t n) {
-    if (n <= 64u) return 64u;
-    size_t p = 64u;
-    while (p < n) p <<= 1u;
-    return p;
+  if (n <= L1_CACHE_LINE_BYTES)
+    return L1_CACHE_LINE_BYTES;
+  size_t p = L1_CACHE_LINE_BYTES;
+  while (p < n) {
+    p <<= 1u;
+  }
+  return p;
 }
 
 // V8 GC finalizer — called when the JS ArrayBuffer becomes unreachable.

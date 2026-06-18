@@ -1,15 +1,15 @@
 # Atlas Diagnostic & Startup Report
 
-**Generated:** `2026-06-13T06:41:16.153Z`
+**Generated:** `2026-06-18T00:07:52.008Z`
 
 ## Database Integrity & Coverage
 
 | Store / Service | Connection | Details / Counts |
 | :--- | :--- | :--- |
-| **PostgreSQL** | `healthy` | 17136 packets (Avg reward: 0.4526) |
-| **Qdrant** | `healthy` | 54448 points |
-| **Redis (Valkey)** | `healthy` | Centroids: 0, Temporals: 0 |
-| **Neo4j** | `healthy` | Packets: 8484, Concepts: 3186, Edges: 72237 |
+| **PostgreSQL** | `healthy` | 0 packets (Avg reward: 0) |
+| **Qdrant** | `healthy` | 52606 points |
+| **Redis (Valkey)** | `healthy` | Centroids: 85, Temporals: 5 |
+| **Neo4j** | `healthy` | Packets: 8798, Concepts: 3208, Edges: 73263 |
 
 ## Lane Completion Status
 
@@ -23,5 +23,5 @@
 
 ## Taskboard Status
 
-- **Open Tasks:** 29
-- **Completed Tasks:** 12
+- **Open Tasks:** 105
+- **Completed Tasks:** 56

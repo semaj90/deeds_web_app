@@ -43,7 +43,21 @@ const ttlIdx     = args.indexOf('--ttl');
 const TTL_SECS   = ttlIdx >= 0 ? parseInt(args[ttlIdx + 1], 10) : 86400; // default 1 day
 
 // Redis config — match sveltekit-frontend env defaults
-const REDIS_URL  = process.env.REDIS_URL || 'redis://127.0.0.1:6379';
+const REDIS_URL = process.env.REDIS_URL || 'redis://127.0.0.1:6379';
+const REDIS_PASSWORD = process.env.REDIS_PASSWORD || process.env.VALKEY_PASSWORD || 'redis';
+
+// REMOVED: Duplicate definition of connectRedis to fix SyntaxError
+
+  redis.on('error', () => {});
+
+  try {
+    await redis.connect();
+    await redis.ping();
+    return redis;
+  } catch {
+    return null;
+  }
+}
 
 function intentHash(query) {
   return crypto.createHash('sha1').update((query || '').toLowerCase().trim()).digest('hex').slice(0, 16);
@@ -53,22 +67,54 @@ function fmt(n) {
   return Number.isFinite(Number(n)) ? Number(n).toFixed(4) : '0.0000';
 }
 
-// ── Redis cold-start safe connect ─────────────────────────────────────────────
+// Redis config — match sveltekit-frontend env defaults.
+
+// Valkey is Redis-compatible, so ioredis is fine.
+
+const REDIS_URL = process.env.REDIS_URL || process.env.VALKEY_URL || 'redis://127.0.0.1:6379';
+
+const REDIS_PASSWORD = process.env.REDIS_PASSWORD || process.env.VALKEY_PASSWORD || 'redis';
+
+
+// ── Redis/Valkey cold-start safe connect ─────────────────────────────────────
+
 async function connectRedis() {
+
   const redis = new Redis(REDIS_URL, {
-    lazyConnect:           true,
-    maxRetriesPerRequest:  1,
-    enableOfflineQueue:    false,
-    retryStrategy:         () => null,
+
+    password: REDIS_PASSWORD,
+
+    lazyConnect: true,
+
+    maxRetriesPerRequest: 1,
+
+    enableOfflineQueue: false,
+
+    retryStrategy: () => null,
+
   });
+
+
+
   redis.on('error', () => {});
+
+
+
   try {
+
     await redis.connect();
+
     await redis.ping();
+
     return redis;
+
   } catch {
+
     return null;
+
   }
+
+}
 }
 
 // ── Audit mode: read cached metadata ─────────────────────────────────────────

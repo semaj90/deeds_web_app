@@ -32,6 +32,7 @@ import { readFile } from 'node:fs/promises';
 import { existsSync } from 'node:fs';
 import path from 'node:path';
 import type { RequestHandler } from './$types';
+import { buildParentAtlasAgentContractLines } from '$lib/server/llms/parent-atlas-agent-contract.js';
 
 const GRAPH_JSON  = path.resolve('docs/graph/codebase-graph.json');
 const PKG_JSON    = path.resolve('package.json');
@@ -156,6 +157,8 @@ export const GET: RequestHandler = async () => {
   lines.push('> SvelteKit 2 + Svelte 5 (runes) legal AI platform with GPU-accelerated knowledge graph,');
   lines.push('> Qdrant vector search, Gemma4 legal VLM, 4D hyperedge memory, and A2A agent protocol.');
   lines.push('');
+
+  lines.push(...buildParentAtlasAgentContractLines());
 
   if (pkg) {
     lines.push(`Version: ${pkg.version}`);

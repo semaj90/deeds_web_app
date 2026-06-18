@@ -1,38 +1,37 @@
 {
-  "generatedAt": "2026-06-15T20:09:35.624Z",
+  "generatedAt": "2026-06-18T00:16:14.834Z",
   "repoRoot": "C:\\Users\\james\\Videos\\deeds-web-app",
   "projectRoot": "http://127.0.0.1:5173",
   "queries": [
     {
       "query": "find parent atlas identity spine",
       "query_hash": "bc955c9fc864673cb585490a702e7dbdac9198ec9f0274a23eb0349abdb1a358",
-      "qdrant_ms": 45,
+      "retrieval_strategy": "fusion",
+      "qdrant_ms": 11,
       "postgres_lookup_ms": 4,
       "neo4j_expand_ms": 0,
-      "redis_cache_ms": 14,
-      "gpu_rerank_ms": 316,
-      "answer_ms": 2703,
-      "total_ms": 8226,
+      "redis_cache_ms": 9,
+      "gpu_rerank_ms": 740,
+      "answer_ms": 2127,
+      "total_ms": 3177,
       "qdrant_hits": 12,
       "ledger_matches": 0,
       "tree_matches": 0,
       "glyph_matches": 0,
       "neo4j_matches": 0,
-      "rerank_count": 0,
-      "answer_length": 692,
-      "errors": [
-        "gpu_degraded: node:internal/fs/promises:636\r\n  path = getValidatedPath(path);\r\n         ^\r\n\r\nTypeError [ERR_INVALID_ARG_TYPE]: The \"path\" argument must be of type string or an instance of Buffer or URL. Received type number (0)\r\n    at open (node:internal/fs/promises:636:10)\r\n    at Object.readFile (node:internal/fs/promises:1243:20)\r\n    at file:///C:/Users/james/Videos/deeds-web-app/[eval1]:5:39\r\n    at ModuleJob.run (node:internal/modules/esm/module_job:329:25)\r\n    at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:268:26)\r\n    at async ModuleLoader.executeModuleJob (node:internal/modules/esm/loader:264:20)\r\n    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:117:5) {\r\n  code: 'ERR_INVALID_ARG_TYPE'\r\n}\r\n\r\nNode.js v22.17.1"
-      ],
-      "status": "degraded",
+      "rerank_count": 12,
+      "answer_length": 656,
+      "errors": [],
+      "status": "pass",
       "services": {
         "embedding": {
           "ok": true,
-          "latency_ms": 5142,
+          "latency_ms": 283,
           "model": "embeddinggemma:latest"
         },
         "qdrant": {
           "ok": true,
-          "latency_ms": 45,
+          "latency_ms": 11,
           "error": null
         },
         "postgres": {
@@ -41,8 +40,8 @@
         },
         "redis": {
           "ok": true,
-          "latency_ms": 14,
-          "hot_key_count": 179,
+          "latency_ms": 9,
+          "hot_key_count": 0,
           "cache_hits": 0,
           "source": "valkey"
         },
@@ -54,17 +53,29 @@
           "source": "skipped_no_context"
         },
         "gpu": {
-          "ok": false,
-          "latency_ms": 316,
-          "source": "unavailable",
-          "error": "node:internal/fs/promises:636\r\n  path = getValidatedPath(path);\r\n         ^\r\n\r\nTypeError [ERR_INVALID_ARG_TYPE]: The \"path\" argument must be of type string or an instance of Buffer or URL. Received type number (0)\r\n    at open (node:internal/fs/promises:636:10)\r\n    at Object.readFile (node:internal/fs/promises:1243:20)\r\n    at file:///C:/Users/james/Videos/deeds-web-app/[eval1]:5:39\r\n    at ModuleJob.run (node:internal/modules/esm/module_job:329:25)\r\n    at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:268:26)\r\n    at async ModuleLoader.executeModuleJob (node:internal/modules/esm/loader:264:20)\r\n    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:117:5) {\r\n  code: 'ERR_INVALID_ARG_TYPE'\r\n}\r\n\r\nNode.js v22.17.1",
-          "scores": []
+          "ok": true,
+          "latency_ms": 740,
+          "source": "cpu",
+          "scores": [
+            0.3266656994819641,
+            0.3266656994819641,
+            0.32570213079452515,
+            0.32570213079452515,
+            0.3224850594997406,
+            0.3224850594997406,
+            0.32031238079071045,
+            0.32031238079071045,
+            0.31595537066459656,
+            0.31595537066459656,
+            0.3138837218284607,
+            0.3138837218284607
+          ]
         },
         "answer": {
           "ok": true,
-          "latency_ms": 2703,
+          "latency_ms": 2127,
           "model": "local",
-          "answer": "<|channel>thought\nThinking Process:\n\n1.  **Analyze the Request:** The user wants to find the \"parent atlas identity spine\" using a provided context.\n2.  **Analyze the Context:** The context provided is \"No context returned.\"\n3.  **Determine the Action:** I must answer based *only* on the context. Since the context is empty, I cannot find the requested information.\n4.  **Formulate the Answer:** State clearly that the evidence is thin (or non-existent).\n5.  **Review Constraints:** The answer must be brief and concrete.\n\n*Self-Correction/Refinement:* The prompt explicitly states: \"If evidence is thin, say that it is thin.\"\n\n6.  **Final Output Generation.**<channel|>The evidence is thin.",
+          "answer": "<|channel>thought\nThinking Process:\n\n1.  **Analyze the Request:** The user is asking to \"find parent atlas identity spine.\"\n2.  **Analyze the Context:** The provided context is \"No context returned.\"\n3.  **Determine the Goal:** The persona is a \"concise retrieval benchmark assistant.\" The instruction is to answer briefly and concretely, and if evidence is thin, state that.\n4.  **Formulate the Answer:** Since there is no context, I cannot find the requested information. I must state that the evidence is thin.\n\n*Self-Correction/Refinement:* The answer must be extremely brief and direct.\n\n5.  **Final Output Generation.**<channel|>The evidence is thin.",
           "source": "turboquant"
         }
       },
@@ -73,192 +84,27 @@
     {
       "query": "phase 16 higher hop qdrant discovery",
       "query_hash": "c166f2aafc2d0f926b60ca1097e40cc228c812b442d4d207c626b7ac8faefad5",
-      "qdrant_ms": 9,
-      "postgres_lookup_ms": 1,
-      "neo4j_expand_ms": 0,
-      "redis_cache_ms": 7,
-      "gpu_rerank_ms": 236,
-      "answer_ms": 2173,
-      "total_ms": 2585,
-      "qdrant_hits": 12,
-      "ledger_matches": 0,
-      "tree_matches": 0,
-      "glyph_matches": 0,
-      "neo4j_matches": 0,
-      "rerank_count": 0,
-      "answer_length": 761,
-      "errors": [
-        "gpu_degraded: node:internal/fs/promises:636\r\n  path = getValidatedPath(path);\r\n         ^\r\n\r\nTypeError [ERR_INVALID_ARG_TYPE]: The \"path\" argument must be of type string or an instance of Buffer or URL. Received type number (0)\r\n    at open (node:internal/fs/promises:636:10)\r\n    at Object.readFile (node:internal/fs/promises:1243:20)\r\n    at file:///C:/Users/james/Videos/deeds-web-app/[eval1]:5:39\r\n    at ModuleJob.run (node:internal/modules/esm/module_job:329:25)\r\n    at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:268:26)\r\n    at async ModuleLoader.executeModuleJob (node:internal/modules/esm/loader:264:20)\r\n    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:117:5) {\r\n  code: 'ERR_INVALID_ARG_TYPE'\r\n}\r\n\r\nNode.js v22.17.1"
-      ],
-      "status": "degraded",
-      "services": {
-        "embedding": {
-          "ok": true,
-          "latency_ms": 159,
-          "model": "embeddinggemma:latest"
-        },
-        "qdrant": {
-          "ok": true,
-          "latency_ms": 9,
-          "error": null
-        },
-        "postgres": {
-          "ok": true,
-          "latency_ms": 1
-        },
-        "redis": {
-          "ok": true,
-          "latency_ms": 7,
-          "hot_key_count": 179,
-          "cache_hits": 0,
-          "source": "valkey"
-        },
-        "neo4j": {
-          "ok": true,
-          "latency_ms": 0,
-          "matches": 0,
-          "error": null,
-          "source": "skipped_no_context"
-        },
-        "gpu": {
-          "ok": false,
-          "latency_ms": 236,
-          "source": "unavailable",
-          "error": "node:internal/fs/promises:636\r\n  path = getValidatedPath(path);\r\n         ^\r\n\r\nTypeError [ERR_INVALID_ARG_TYPE]: The \"path\" argument must be of type string or an instance of Buffer or URL. Received type number (0)\r\n    at open (node:internal/fs/promises:636:10)\r\n    at Object.readFile (node:internal/fs/promises:1243:20)\r\n    at file:///C:/Users/james/Videos/deeds-web-app/[eval1]:5:39\r\n    at ModuleJob.run (node:internal/modules/esm/module_job:329:25)\r\n    at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:268:26)\r\n    at async ModuleLoader.executeModuleJob (node:internal/modules/esm/loader:264:20)\r\n    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:117:5) {\r\n  code: 'ERR_INVALID_ARG_TYPE'\r\n}\r\n\r\nNode.js v22.17.1",
-          "scores": []
-        },
-        "answer": {
-          "ok": true,
-          "latency_ms": 2173,
-          "model": "local",
-          "answer": "<|channel>thought\nThinking Process:\n\n1.  **Analyze the Request:** The user is asking a specific, technical query: \"phase 16 higher hop qdrant discovery.\"\n2.  **Analyze the Context:** The provided context is \"No context returned.\"\n3.  **Determine the Goal:** The persona is a \"concise retrieval benchmark assistant.\" The instruction is to answer briefly and concretely, and if evidence is thin, state that.\n4.  **Formulate the Answer:** Since there is no context to support the query, the answer must state that the evidence is thin.\n\n*Self-Correction/Refinement:* Do not try to guess the meaning of the query (which relates to networking/AI/data storage). Stick strictly to the evidence provided.\n\n5.  **Final Output Generation.**<channel|>The evidence is thin.",
-          "source": "turboquant"
-        }
-      },
-      "top_packets": []
-    },
-    {
-      "query": "trace mcp tool validation",
-      "query_hash": "d2055c7edad263407fed5d0ebe9fd7d7a0ac78e24e2c37ddcb149fec1e3e102e",
-      "qdrant_ms": 0,
-      "postgres_lookup_ms": 0,
-      "neo4j_expand_ms": 0,
-      "redis_cache_ms": 0,
-      "gpu_rerank_ms": 0,
-      "answer_ms": 0,
-      "total_ms": 40011,
-      "qdrant_hits": 0,
-      "ledger_matches": 0,
-      "tree_matches": 0,
-      "glyph_matches": 0,
-      "neo4j_matches": 0,
-      "rerank_count": 0,
-      "answer_length": 0,
-      "errors": [
-        "embedding_failed: no embedding model available"
-      ],
-      "status": "degraded",
-      "services": {
-        "embedding": {
-          "ok": false,
-          "latency_ms": 40011,
-          "model": null
-        }
-      },
-      "top_packets": []
-    },
-    {
-      "query": "nes chrom packet qdrant point id",
-      "query_hash": "b5e1d1a13050af29320d9f7110d3cee97dff89d9e6d25a548abb3a724343c851",
-      "qdrant_ms": 10,
-      "postgres_lookup_ms": 16,
-      "neo4j_expand_ms": 0,
-      "redis_cache_ms": 7,
-      "gpu_rerank_ms": 314,
-      "answer_ms": 2702,
-      "total_ms": 8301,
-      "qdrant_hits": 12,
-      "ledger_matches": 0,
-      "tree_matches": 0,
-      "glyph_matches": 0,
-      "neo4j_matches": 0,
-      "rerank_count": 0,
-      "answer_length": 788,
-      "errors": [
-        "gpu_degraded: node:internal/fs/promises:636\r\n  path = getValidatedPath(path);\r\n         ^\r\n\r\nTypeError [ERR_INVALID_ARG_TYPE]: The \"path\" argument must be of type string or an instance of Buffer or URL. Received type number (0)\r\n    at open (node:internal/fs/promises:636:10)\r\n    at Object.readFile (node:internal/fs/promises:1243:20)\r\n    at file:///C:/Users/james/Videos/deeds-web-app/[eval1]:5:39\r\n    at ModuleJob.run (node:internal/modules/esm/module_job:329:25)\r\n    at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:268:26)\r\n    at async ModuleLoader.executeModuleJob (node:internal/modules/esm/loader:264:20)\r\n    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:117:5) {\r\n  code: 'ERR_INVALID_ARG_TYPE'\r\n}\r\n\r\nNode.js v22.17.1"
-      ],
-      "status": "degraded",
-      "services": {
-        "embedding": {
-          "ok": true,
-          "latency_ms": 5252,
-          "model": "embeddinggemma:latest"
-        },
-        "qdrant": {
-          "ok": true,
-          "latency_ms": 10,
-          "error": null
-        },
-        "postgres": {
-          "ok": true,
-          "latency_ms": 16
-        },
-        "redis": {
-          "ok": true,
-          "latency_ms": 7,
-          "hot_key_count": 179,
-          "cache_hits": 0,
-          "source": "valkey"
-        },
-        "neo4j": {
-          "ok": true,
-          "latency_ms": 0,
-          "matches": 0,
-          "error": null,
-          "source": "skipped_no_context"
-        },
-        "gpu": {
-          "ok": false,
-          "latency_ms": 314,
-          "source": "unavailable",
-          "error": "node:internal/fs/promises:636\r\n  path = getValidatedPath(path);\r\n         ^\r\n\r\nTypeError [ERR_INVALID_ARG_TYPE]: The \"path\" argument must be of type string or an instance of Buffer or URL. Received type number (0)\r\n    at open (node:internal/fs/promises:636:10)\r\n    at Object.readFile (node:internal/fs/promises:1243:20)\r\n    at file:///C:/Users/james/Videos/deeds-web-app/[eval1]:5:39\r\n    at ModuleJob.run (node:internal/modules/esm/module_job:329:25)\r\n    at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:268:26)\r\n    at async ModuleLoader.executeModuleJob (node:internal/modules/esm/loader:264:20)\r\n    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:117:5) {\r\n  code: 'ERR_INVALID_ARG_TYPE'\r\n}\r\n\r\nNode.js v22.17.1",
-          "scores": []
-        },
-        "answer": {
-          "ok": true,
-          "latency_ms": 2702,
-          "model": "local",
-          "answer": "<|channel>thought\nThinking Process:\n\n1.  **Analyze the Request:** The user provided a query (\"nes chrom packet qdrant point id\") and a context (None: \"No context returned.\"). The goal is to act as a \"concise retrieval benchmark assistant\" and answer the query using the provided context.\n2.  **Analyze the Context:** The context is empty.\n3.  **Analyze the Query:** The query relates to technical concepts (NES, chrom, packet, qdrant, point id).\n4.  **Determine the Answer Strategy:** Since the instructions state: \"Use the grounded retrieval context below to answer briefly and concretely. If evidence is thin, say that it is thin.\"\n5.  **Formulate the Response:** The evidence is non-existent. Therefore, the response must state that the evidence is thin.<channel|>The evidence is thin.",
-          "source": "turboquant"
-        }
-      },
-      "top_packets": []
-    },
-    {
-      "query": "graph refresh manifest invalidation",
-      "query_hash": "9e1c4a0afd5ca8a92cce13712633cb9783e6f18361b5e6e43e16e52726b16d9b",
+      "retrieval_strategy": "fusion",
       "qdrant_ms": 11,
       "postgres_lookup_ms": 2,
       "neo4j_expand_ms": 0,
-      "redis_cache_ms": 7,
-      "gpu_rerank_ms": 279,
-      "answer_ms": 2500,
-      "total_ms": 3097,
+      "redis_cache_ms": 6,
+      "gpu_rerank_ms": 820,
+      "answer_ms": 2569,
+      "total_ms": 3536,
       "qdrant_hits": 12,
       "ledger_matches": 0,
       "tree_matches": 0,
       "glyph_matches": 0,
       "neo4j_matches": 0,
-      "rerank_count": 0,
-      "answer_length": 844,
-      "errors": [
-        "gpu_degraded: node:internal/fs/promises:636\r\n  path = getValidatedPath(path);\r\n         ^\r\n\r\nTypeError [ERR_INVALID_ARG_TYPE]: The \"path\" argument must be of type string or an instance of Buffer or URL. Received type number (0)\r\n    at open (node:internal/fs/promises:636:10)\r\n    at Object.readFile (node:internal/fs/promises:1243:20)\r\n    at file:///C:/Users/james/Videos/deeds-web-app/[eval1]:5:39\r\n    at ModuleJob.run (node:internal/modules/esm/module_job:329:25)\r\n    at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:268:26)\r\n    at async ModuleLoader.executeModuleJob (node:internal/modules/esm/loader:264:20)\r\n    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:117:5) {\r\n  code: 'ERR_INVALID_ARG_TYPE'\r\n}\r\n\r\nNode.js v22.17.1"
-      ],
-      "status": "degraded",
+      "rerank_count": 12,
+      "answer_length": 798,
+      "errors": [],
+      "status": "pass",
       "services": {
         "embedding": {
           "ok": true,
-          "latency_ms": 298,
+          "latency_ms": 128,
           "model": "embeddinggemma:latest"
         },
         "qdrant": {
@@ -272,8 +118,8 @@
         },
         "redis": {
           "ok": true,
-          "latency_ms": 7,
-          "hot_key_count": 179,
+          "latency_ms": 6,
+          "hot_key_count": 0,
           "cache_hits": 0,
           "source": "valkey"
         },
@@ -285,17 +131,263 @@
           "source": "skipped_no_context"
         },
         "gpu": {
-          "ok": false,
-          "latency_ms": 279,
-          "source": "unavailable",
-          "error": "node:internal/fs/promises:636\r\n  path = getValidatedPath(path);\r\n         ^\r\n\r\nTypeError [ERR_INVALID_ARG_TYPE]: The \"path\" argument must be of type string or an instance of Buffer or URL. Received type number (0)\r\n    at open (node:internal/fs/promises:636:10)\r\n    at Object.readFile (node:internal/fs/promises:1243:20)\r\n    at file:///C:/Users/james/Videos/deeds-web-app/[eval1]:5:39\r\n    at ModuleJob.run (node:internal/modules/esm/module_job:329:25)\r\n    at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:268:26)\r\n    at async ModuleLoader.executeModuleJob (node:internal/modules/esm/loader:264:20)\r\n    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:117:5) {\r\n  code: 'ERR_INVALID_ARG_TYPE'\r\n}\r\n\r\nNode.js v22.17.1",
-          "scores": []
+          "ok": true,
+          "latency_ms": 820,
+          "source": "cpu",
+          "scores": [
+            0.4033297896385193,
+            0.4033297896385193,
+            0.4014587998390198,
+            0.4014587998390198,
+            0.372043251991272,
+            0.372043251991272,
+            0.3607235252857208,
+            0.3607235252857208,
+            0.3565521538257599,
+            0.3565521538257599,
+            0.35142990946769714,
+            0.35142990946769714
+          ]
         },
         "answer": {
           "ok": true,
-          "latency_ms": 2500,
+          "latency_ms": 2569,
           "model": "local",
-          "answer": "<|channel>thought\nThinking Process:\n\n1.  **Analyze the Request:** The user is asking a specific technical query: \"graph refresh manifest invalidation.\"\n2.  **Analyze the Context:** The provided context is \"No context returned.\"\n3.  **Determine the Goal:** The persona is a \"concise retrieval benchmark assistant.\" The instruction is to answer *briefly and concretely* and state that evidence is thin if necessary.\n4.  **Formulate the Answer:** Since there is no context, I cannot provide an answer or evidence regarding \"graph refresh manifest invalidation.\" I must state that the evidence is thin.\n\n*Self-Correction/Refinement:* Do not just say \"No context.\" State *why* I cannot answer.\n\n5.  **Final Output Generation.**<channel|>The evidence is thin. No context was provided to answer the query regarding graph refresh manifest invalidation.",
+          "answer": "<|channel>thought\nThinking Process:\n\n1.  **Analyze the Request:** The user is asking a highly specific, technical query: \"phase 16 higher hop qdrant discovery.\"\n2.  **Analyze the Context:** The provided context is \"No context returned.\"\n3.  **Determine the Goal:** The role is a \"concise retrieval benchmark assistant.\" The instruction is to answer *briefly and concretely* and state that evidence is thin if necessary.\n4.  **Formulate the Answer:** Since there is no information provided in the context to address the query, the answer must state that the evidence is thin.\n\n*Self-Correction/Refinement:* Do not try to guess the meaning of \"phase 16,\" \"higher hop,\" \"qdrant,\" or \"discovery.\" Stick strictly to the evidence provided.\n\n5.  **Final Output Generation.**<channel|>The evidence is thin.",
+          "source": "turboquant"
+        }
+      },
+      "top_packets": []
+    },
+    {
+      "query": "trace mcp tool validation",
+      "query_hash": "d2055c7edad263407fed5d0ebe9fd7d7a0ac78e24e2c37ddcb149fec1e3e102e",
+      "retrieval_strategy": "fusion",
+      "qdrant_ms": 20,
+      "postgres_lookup_ms": 3,
+      "neo4j_expand_ms": 0,
+      "redis_cache_ms": 6,
+      "gpu_rerank_ms": 890,
+      "answer_ms": 2350,
+      "total_ms": 3407,
+      "qdrant_hits": 12,
+      "ledger_matches": 0,
+      "tree_matches": 0,
+      "glyph_matches": 0,
+      "neo4j_matches": 0,
+      "rerank_count": 12,
+      "answer_length": 705,
+      "errors": [],
+      "status": "pass",
+      "services": {
+        "embedding": {
+          "ok": true,
+          "latency_ms": 138,
+          "model": "embeddinggemma:latest"
+        },
+        "qdrant": {
+          "ok": true,
+          "latency_ms": 20,
+          "error": null
+        },
+        "postgres": {
+          "ok": true,
+          "latency_ms": 3
+        },
+        "redis": {
+          "ok": true,
+          "latency_ms": 6,
+          "hot_key_count": 0,
+          "cache_hits": 0,
+          "source": "valkey"
+        },
+        "neo4j": {
+          "ok": true,
+          "latency_ms": 0,
+          "matches": 0,
+          "error": null,
+          "source": "skipped_no_context"
+        },
+        "gpu": {
+          "ok": true,
+          "latency_ms": 890,
+          "source": "cpu",
+          "scores": [
+            0.4779451787471771,
+            0.4779451787471771,
+            0.3954305648803711,
+            0.3954305648803711,
+            0.356925904750824,
+            0.356925904750824,
+            0.35297656059265137,
+            0.35297656059265137,
+            0.3527442514896393,
+            0.3527442514896393,
+            0.35169172286987305,
+            0.35169172286987305
+          ]
+        },
+        "answer": {
+          "ok": true,
+          "latency_ms": 2350,
+          "model": "local",
+          "answer": "<|channel>thought\nThinking Process:\n\n1.  **Analyze the Request:** The user is asking a specific query: \"trace mcp tool validation.\"\n2.  **Analyze the Context:** The provided context is \"No context returned.\"\n3.  **Determine the Goal:** The persona is a \"concise retrieval benchmark assistant.\" The instruction is to answer *briefly and concretely* and state that evidence is thin if necessary.\n4.  **Formulate the Answer:** Since there is no information provided to answer the query, I must state that the evidence is thin.\n\n*Self-Correction/Refinement:* Do not just say \"No context.\" I must state that the *evidence* for the query is thin.\n\n5.  **Final Output Generation.**<channel|>The evidence is thin.",
+          "source": "turboquant"
+        }
+      },
+      "top_packets": []
+    },
+    {
+      "query": "nes chrom packet qdrant point id",
+      "query_hash": "b5e1d1a13050af29320d9f7110d3cee97dff89d9e6d25a548abb3a724343c851",
+      "retrieval_strategy": "fusion",
+      "qdrant_ms": 11,
+      "postgres_lookup_ms": 2,
+      "neo4j_expand_ms": 0,
+      "redis_cache_ms": 6,
+      "gpu_rerank_ms": 830,
+      "answer_ms": 2684,
+      "total_ms": 3654,
+      "qdrant_hits": 12,
+      "ledger_matches": 0,
+      "tree_matches": 0,
+      "glyph_matches": 0,
+      "neo4j_matches": 0,
+      "rerank_count": 12,
+      "answer_length": 865,
+      "errors": [],
+      "status": "pass",
+      "services": {
+        "embedding": {
+          "ok": true,
+          "latency_ms": 121,
+          "model": "embeddinggemma:latest"
+        },
+        "qdrant": {
+          "ok": true,
+          "latency_ms": 11,
+          "error": null
+        },
+        "postgres": {
+          "ok": true,
+          "latency_ms": 2
+        },
+        "redis": {
+          "ok": true,
+          "latency_ms": 6,
+          "hot_key_count": 0,
+          "cache_hits": 0,
+          "source": "valkey"
+        },
+        "neo4j": {
+          "ok": true,
+          "latency_ms": 0,
+          "matches": 0,
+          "error": null,
+          "source": "skipped_no_context"
+        },
+        "gpu": {
+          "ok": true,
+          "latency_ms": 830,
+          "source": "cpu",
+          "scores": [
+            0.39620810747146606,
+            0.39620810747146606,
+            0.36364656686782837,
+            0.36364656686782837,
+            0.363099068403244,
+            0.363099068403244,
+            0.34783801436424255,
+            0.34783801436424255,
+            0.3385356664657593,
+            0.3385356664657593,
+            0.33506545424461365,
+            0.33506545424461365
+          ]
+        },
+        "answer": {
+          "ok": true,
+          "latency_ms": 2684,
+          "model": "local",
+          "answer": "<|channel>thought\nThinking Process:\n\n1.  **Analyze the Request:** The user provided a query (\"nes chrom packet qdrant point id\") and a context (None). The goal is to act as a \"concise retrieval benchmark assistant\" and answer briefly and concretely, stating that evidence is thin if necessary.\n2.  **Analyze the Query:** The query is highly technical and specific, likely related to data indexing, vector databases, or networking/hardware (NES, chrom, packet, qdrant, point id).\n3.  **Analyze the Context:** The context is explicitly \"No context returned.\"\n4.  **Formulate the Answer:** Since no information was provided to answer the query, the response must state that the evidence is thin.\n\n*Self-Correction/Refinement:* Ensure the tone is professional and directly addresses the lack of evidence.\n\n5.  **Final Output Generation.**<channel|>The evidence is thin.",
+          "source": "turboquant"
+        }
+      },
+      "top_packets": []
+    },
+    {
+      "query": "graph refresh manifest invalidation",
+      "query_hash": "9e1c4a0afd5ca8a92cce13712633cb9783e6f18361b5e6e43e16e52726b16d9b",
+      "retrieval_strategy": "fusion",
+      "qdrant_ms": 11,
+      "postgres_lookup_ms": 3,
+      "neo4j_expand_ms": 0,
+      "redis_cache_ms": 5,
+      "gpu_rerank_ms": 764,
+      "answer_ms": 2274,
+      "total_ms": 3206,
+      "qdrant_hits": 12,
+      "ledger_matches": 0,
+      "tree_matches": 0,
+      "glyph_matches": 0,
+      "neo4j_matches": 0,
+      "rerank_count": 12,
+      "answer_length": 710,
+      "errors": [],
+      "status": "pass",
+      "services": {
+        "embedding": {
+          "ok": true,
+          "latency_ms": 148,
+          "model": "embeddinggemma:latest"
+        },
+        "qdrant": {
+          "ok": true,
+          "latency_ms": 11,
+          "error": null
+        },
+        "postgres": {
+          "ok": true,
+          "latency_ms": 3
+        },
+        "redis": {
+          "ok": true,
+          "latency_ms": 5,
+          "hot_key_count": 0,
+          "cache_hits": 0,
+          "source": "valkey"
+        },
+        "neo4j": {
+          "ok": true,
+          "latency_ms": 0,
+          "matches": 0,
+          "error": null,
+          "source": "skipped_no_context"
+        },
+        "gpu": {
+          "ok": true,
+          "latency_ms": 764,
+          "source": "cpu",
+          "scores": [
+            0.5147884488105774,
+            0.5147884488105774,
+            0.37818998098373413,
+            0.37818998098373413,
+            0.3755966126918793,
+            0.3755966126918793,
+            0.3604414165019989,
+            0.3604414165019989,
+            0.3477037250995636,
+            0.3477037250995636,
+            0.3435087203979492,
+            0.3435087203979492
+          ]
+        },
+        "answer": {
+          "ok": true,
+          "latency_ms": 2274,
+          "model": "local",
+          "answer": "<|channel>thought\nThinking Process:\n\n1.  **Analyze the Request:** The user is asking a specific technical query: \"graph refresh manifest invalidation.\"\n2.  **Analyze the Context:** The provided context is \"No context returned.\"\n3.  **Determine the Goal:** The persona is a \"concise retrieval benchmark assistant.\" The instruction is to answer briefly and concretely, and if evidence is thin, state that.\n4.  **Formulate the Answer:** Since there is no information provided to answer the query, I must state that the evidence is thin.\n\n*Self-Correction/Refinement:* Do not try to define the term; simply report on the lack of supporting material.\n\n5.  **Final Output Generation.**<channel|>The evidence is thin.",
           "source": "turboquant"
         }
       },
@@ -305,14 +397,14 @@
   "services": {
     "qdrant": {
       "ok": true,
-      "latency_ms": 56,
+      "latency_ms": 47,
       "points_count": 9840,
       "payload_fields": 2
     },
     "trace_mcp": {
       "ok": true,
       "health_ms": 3,
-      "tools_ms": 51,
+      "tools_ms": 18,
       "tools_count": 128,
       "error": null
     },
@@ -325,33 +417,39 @@
       "ok": true
     },
     "gpu": {
-      "ok": false
+      "ok": true
     },
     "answer": {
       "ok": true
     }
   },
   "summary": {
-    "status": "failed",
-    "latency_p50_ms": 8226,
-    "latency_p95_ms": 8301,
-    "qdrant_p50_ms": 10,
+    "status": "PASS",
+    "latency_p50_ms": 3407,
+    "latency_p95_ms": 3536,
+    "qdrant_p50_ms": 11,
     "qdrant_p95_ms": 11,
-    "postgres_p50_ms": 2,
-    "postgres_p95_ms": 4,
+    "postgres_p50_ms": 3,
+    "postgres_p95_ms": 3,
     "neo4j_p50_ms": 0,
     "neo4j_p95_ms": 0,
-    "redis_p50_ms": 7,
-    "redis_p95_ms": 7,
-    "gpu_p50_ms": 279,
-    "gpu_p95_ms": 314,
-    "answer_p50_ms": 2500,
-    "answer_p95_ms": 2702,
-    "all_qdrant_hits": false,
+    "redis_p50_ms": 6,
+    "redis_p95_ms": 6,
+    "gpu_p50_ms": 820,
+    "gpu_p95_ms": 830,
+    "answer_p50_ms": 2350,
+    "answer_p95_ms": 2569,
+    "queries_with_qdrant_hits": 5,
+    "queries_answered": 5,
+    "min_pass_threshold": 3,
+    "qdrant_gate": true,
+    "answer_gate": true,
     "any_ledger_matches": false,
     "total_ledger_matches": 0,
-    "all_answered": false,
-    "degraded_queries": 5,
+    "degraded_queries": 0,
+    "retrieval_strategy_counts": {
+      "fusion": 5
+    },
     "notes": [
       "Qdrant healthy and TRACE MCP healthy are required gates.",
       "Redis, Neo4j, GPU rerank, and TurboQuant/Gemma4 answer lanes are allowed to degrade.",
@@ -359,7 +457,6 @@
     ]
   },
   "errors": [
-    "one_or_more_queries_failed_core_pass_criteria",
     "no_hop_index_matches_across_all_queries (informational: hop index covers ~6% of Qdrant points)"
   ]
 }

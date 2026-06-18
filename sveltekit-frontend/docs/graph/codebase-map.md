@@ -1,5 +1,5 @@
 # Codebase Map — 20-Gate Deep Audit
-> Generated: 2026-06-16T00:54:09.964Z
+> Generated: 2026-06-17T23:56:58.320Z
 > Mode: `fast-ast` · CPU-only · No GPU required
 > Regenerate: `npm run index:codebase:fast:plan`
 
@@ -8,7 +8,7 @@
 ## Summary
 | Metric | Count |
 |--------|-------|
-| Files scanned | 58550 |
+| Files scanned | 58561 |
 | Directories analysed | 846 |
 | Route files | 4959 |
 | Svelte components | 4801 |
@@ -20,7 +20,7 @@
 | Hardcoded localhost refs | 2353 |
 | Routes without test pairing | 318 |
 | Cyclic import pairs | 3 |
-| Drizzle table refs | 4778 |
+| Drizzle table refs | 4777 |
 | TODO/FIXME markers | 1037 |
 
 ---
@@ -31,13 +31,13 @@
 |------|-------|------|------|
 | G4  | Auth guard on API routes | 3754 | 30 |
 | G5  | Zod validation on API routes | 2682 | 3 |
-| G11 | No hardcoded localhost (excl env.server) | 56197 | 2353 |
-| G14a | No `export let` (Svelte 4 props) | 58546 | 4 |
-| G14b | No `$:` reactive declarations | 58540 | 10 |
-| G14c | No `on:event=` directives | 58536 | 14 |
-| G14d | No `createEventDispatcher()` | 58550 | 0 |
-| G14e | No runes in plain `.ts` files | 58485 | 65 |
-| G15 | No SSR-unsafe globals (unguarded) | 58550 | 0 |
+| G11 | No hardcoded localhost (excl env.server) | 56208 | 2353 |
+| G14a | No `export let` (Svelte 4 props) | 58557 | 4 |
+| G14b | No `$:` reactive declarations | 58551 | 10 |
+| G14c | No `on:event=` directives | 58547 | 14 |
+| G14d | No `createEventDispatcher()` | 58561 | 0 |
+| G14e | No runes in plain `.ts` files | 58496 | 65 |
+| G15 | No SSR-unsafe globals (unguarded) | 58561 | 0 |
 | G16 | Server routes have test pairing | 3190 | 318 |
 | G17 | Server routes have error handling | 3321 | 528 |
 | G20 | Cyclic import pairs | — | 3 |
@@ -91,7 +91,7 @@
 | ✅ | `claude-mem/src/npx-cli/commands` | 85 | 6 | 2903 | 0 | 0/2 | 0 | 🟠lh |
 | ✅ | `llama-cpp-turboquant-gemma4/tools/server/bench` | 85 | 1 | 163 | 0 | 0/1 | 0 | 🟠lh |
 | ✅ | `llama-cpp-turboquant-gemma4/tools/server/public_simplechat` | 85 | 3 | 1409 | 0 | 0/1 | 0 | 🟠lh |
-| ✅ | `scripts/agentic` | 85 | 4 | 1498 | 0 | 0/4 | 0 | 🟠lh |
+| ✅ | `scripts/agentic` | 85 | 4 | 1680 | 0 | 0/4 | 0 | 🟠lh |
 | ✅ | `scripts/docs` | 85 | 2 | 830 | 0 | 0/0 | 0 | 🟠lh |
 | ✅ | `sveltekit-frontend/drizzle/introspected` | 85 | 2 | 20357 | 0 | 0/0 | 4 | — |
 | ✅ | `sveltekit-frontend/public/js` | 85 | 1 | 571 | 0 | 0/0 | 0 | 🟠lh |
@@ -114,10 +114,10 @@
 | ✅ | `docker/bifrost` | 90 | 6 | 486 | 0 | 0/0 | 0 | — |
 | ✅ | `.claude/worktrees/agent-a7203461/docker` | 90 | 4 | 164 | 0 | 0/0 | 0 | — |
 | ✅ | `docs/ai-os` | 90 | 5 | 20 | 0 | 0/0 | 0 | — |
-| ✅ | `docs/atlas` | 90 | 25 | 511425 | 0 | 0/0 | 0 | — |
+| ✅ | `docs/atlas` | 90 | 25 | 511426 | 0 | 0/0 | 0 | — |
 | ✅ | `.claude/worktrees/agent-a7203461/docs` | 90 | 724 | 4927692 | 0 | 0/0 | 0 | — |
 | ✅ | `docs/graph` | 90 | 35 | 991876 | 0 | 0/0 | 0 | — |
-| ✅ | `docs/reports` | 90 | 311 | 3826733 | 0 | 0/0 | 0 | — |
+| ✅ | `docs/reports` | 90 | 312 | 3832063 | 0 | 0/0 | 0 | — |
 | ✅ | `drizzle/meta` | 90 | 12 | 13686 | 0 | 0/0 | 0 | — |
 | ✅ | `.vscode/extensions/mcp-context7-assistant/src` | 90 | 169 | 169 | 0 | 0/0 | 0 | — |
 | ✅ | `.claude/worktrees/agent-a7203461/memory` | 90 | 272 | 4998016 | 0 | 0/0 | 0 | — |
@@ -169,9 +169,9 @@
 | ✅ | `src/tests` | 90 | 4 | 340 | 0 | 0/0 | 0 | — |
 | ✅ | `src/tests/gateway` | 90 | 4 | 276 | 0 | 0/0 | 0 | — |
 | ✅ | `sveltekit-frontend/config` | 90 | 5 | 700 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/docs` | 90 | 5 | 13342924 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/docs` | 90 | 5 | 13343428 | 0 | 0/0 | 0 | — |
 | ✅ | `sveltekit-frontend/docs/atlas-index` | 90 | 16 | 62036 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/docs/graph` | 90 | 37 | 12477415 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/docs/graph` | 90 | 37 | 12477919 | 0 | 0/0 | 0 | — |
 | ✅ | `sveltekit-frontend/docs/reports` | 90 | 127 | 801467 | 0 | 0/0 | 0 | — |
 | ✅ | `sveltekit-frontend/drizzle/meta` | 90 | 80 | 1949905 | 0 | 0/0 | 0 | — |
 | ✅ | `sveltekit-frontend/memory/agent-runs` | 90 | 5 | 365 | 0 | 0/0 | 0 | — |
@@ -509,7 +509,7 @@
 | ✅ | `sveltekit-frontend/memory/exports/atlas` | 90 | 1 | 20 | 0 | 0/0 | 0 | — |
 | ✅ | `sveltekit-frontend/memory/exports/xgboost-hotness` | 90 | 1 | 393 | 0 | 0/0 | 0 | — |
 | ✅ | `sveltekit-frontend/memory/features` | 90 | 3 | 623 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/memory/graphify/deep` | 90 | 5 | 813365 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/memory/graphify/deep` | 90 | 5 | 813532 | 0 | 0/0 | 0 | — |
 | ✅ | `sveltekit-frontend/memory/kag-notes` | 90 | 1 | 16 | 0 | 0/0 | 0 | — |
 | ✅ | `sveltekit-frontend/memory/kb/cards` | 90 | 2 | 87451 | 0 | 0/0 | 0 | — |
 | ✅ | `sveltekit-frontend/memory/kb/weights` | 90 | 1 | 13 | 0 | 0/0 | 0 | — |
@@ -835,7 +835,7 @@
 | ✅ | `scripts/docs-atlas` | 95 | 32 | 6338 | 0 | 0/14 | 0 | 🟠lh |
 | ✅ | `scripts/ingest` | 95 | 96 | 9464 | 0 | 0/58 | 0 | 🟠lh |
 | ✅ | `scripts/memory` | 95 | 30 | 577484 | 0 | 0/12 | 0 | 🟠lh |
-| ✅ | `scripts/opencode` | 95 | 316 | 36426 | 0 | 0/262 | 0 | 🟠lh |
+| ✅ | `scripts/opencode` | 95 | 316 | 36454 | 0 | 0/262 | 0 | 🟠lh |
 | ✅ | `scripts/qdrant` | 95 | 14 | 1168 | 0 | 0/2 | 0 | 🟠lh |
 | ✅ | `sveltekit-frontend/.docker-build` | 95 | 6 | 80948 | 0 | 2/196 | 0 | 🟠lh |
 | ✅ | `sveltekit-frontend/.docker-build/scripts` | 95 | 5 | 43472 | 0 | 2/196 | 0 | 🟠lh |
@@ -856,8 +856,8 @@
 | ✅ | `.claude/worktrees/agent-a7203461` | 100 | 24 | 60369856 | 408 | 3236/2683 | 32 | 🟡sv4 🟠lh |
 | ✅ | `.claude/worktrees/agent-a7203461/.claude` | 100 | 16 | 1296 | 0 | 0/8 | 0 | — |
 | ✅ | `.claude/worktrees/agent-a7203461/scripts` | 100 | 2560 | 1752004 | 8 | 8/1168 | 8 | 🟠lh |
-| ✅ | `scripts/atlas` | 100 | 1685 | 447065 | 15 | 0/911 | 2 | 🟠lh |
-| ✅ | `scripts/atlas/lib` | 100 | 107 | 15474 | 11 | 0/40 | 0 | 🟠lh |
+| ✅ | `scripts/atlas` | 100 | 1693 | 449461 | 15 | 0/919 | 2 | 🟠lh |
+| ✅ | `scripts/atlas/lib` | 100 | 109 | 15764 | 11 | 0/42 | 0 | 🟠lh |
 | ✅ | `scripts/db-tests` | 100 | 20 | 1208 | 0 | 0/0 | 0 | — |
 | ✅ | `scripts/graphify` | 100 | 12 | 1220 | 0 | 0/4 | 0 | — |
 | ✅ | `scripts/packets` | 100 | 46 | 9248 | 0 | 0/26 | 0 | — |
@@ -875,12 +875,12 @@
 | ✅ | `sveltekit-frontend/scripts/phase104-backups/src` | 100 | 1981 | 222228 | 65 | 50/481 | 180 | 🟠lh |
 | ✅ | `sveltekit-frontend/scripts/screenshots` | 100 | 7 | 2199 | 0 | 0/0 | 0 | — |
 | ✅ | `sveltekit-frontend/scripts/validate` | 100 | 6 | 6655 | 0 | 5/5 | 0 | — |
-| ✅ | `sveltekit-frontend/src` | 100 | 85 | 3440554 | 3339 | 5378/4657 | 55 | 🟠lh ⬜notest |
-| ✅ | `sveltekit-frontend/src/lib` | 100 | 55 | 2295235 | 20 | 63/1707 | 48 | 🟠lh |
+| ✅ | `sveltekit-frontend/src` | 100 | 85 | 3440639 | 3339 | 5378/4657 | 55 | 🟠lh ⬜notest |
+| ✅ | `sveltekit-frontend/src/lib` | 100 | 55 | 2295320 | 20 | 63/1707 | 48 | 🟠lh |
 | ✅ | `sveltekit-frontend/src/lib/data` | 100 | 25 | 8435 | 0 | 0/0 | 0 | — |
 | ✅ | `sveltekit-frontend/src/lib/db` | 100 | 60 | 12710 | 0 | 0/0 | 0 | — |
 | ✅ | `sveltekit-frontend/src/lib/intent` | 100 | 5 | 1195 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/src/lib/server` | 100 | 5094 | 1106387 | 20 | 52/1268 | 3 | 🟠lh |
+| ✅ | `sveltekit-frontend/src/lib/server` | 100 | 5094 | 1106472 | 20 | 52/1268 | 3 | 🟠lh |
 | ✅ | `sveltekit-frontend/src/lib/shims` | 100 | 51 | 4536 | 0 | 0/1 | 0 | — |
 | ✅ | `sveltekit-frontend/src/lib/types` | 100 | 270 | 36315 | 0 | 0/25 | 0 | — |
 | ✅ | `sveltekit-frontend/src/routes/(app)` | 100 | 1999 | 518044 | 20 | 1999/213 | 0 | 🟠lh ⬜notest |
@@ -1144,7 +1144,7 @@ _No unguarded SSR-unsafe globals. ✅_
 | `$lib/types` | 1378 |
 | `$lib/components/ui/Icon.svelte` | 1285 |
 | `$lib/server/ollama.js` | 881 |
-| `$lib/server/db/schema-postgres.js` | 846 |
+| `$lib/server/db/schema-postgres.js` | 845 |
 | `$lib/server/middleware/cache-headers.js` | 550 |
 | `$lib/server/vector/qdrant-manager.js` | 491 |
 | `$lib/server/grpc/embedding-client.js` | 470 |
@@ -1155,7 +1155,7 @@ _No unguarded SSR-unsafe globals. ✅_
 | `$lib/server/db` | 315 |
 | `$lib/server/redis` | 231 |
 | `$lib/server/observability/langfuse.js` | 230 |
-| `$lib/server/db/client.js` | 216 |
+| `$lib/server/db/client.js` | 215 |
 | `$lib/server/db/schema.js` | 214 |
 | `$lib/server/gpu/simdjson-bridge.js` | 210 |
 
@@ -1238,14 +1238,14 @@ _No unguarded SSR-unsafe globals. ✅_
 | Module | Consumer Count |
 |--------|----------------|
 | `@sveltejs/kit` | 6816 |
-| `node:path` | 5475 |
-| `node:fs` | 4647 |
+| `node:path` | 5485 |
+| `node:fs` | 4653 |
 | `vitest` | 4602 |
-| `node:url` | 3943 |
+| `node:url` | 3949 |
 | `path` | 3880 |
 | `zod` | 3290 |
 | `fs` | 2937 |
-| `drizzle-orm` | 2806 |
+| `drizzle-orm` | 2805 |
 | `pg` | 2630 |
 | `$lib/server/db/client` | 2368 |
 | `$lib/server/env.server.js` | 2328 |
@@ -1256,15 +1256,15 @@ _No unguarded SSR-unsafe globals. ✅_
 | `url` | 1328 |
 | `svelte` | 1316 |
 | `$lib/components/ui/Icon.svelte` | 1285 |
-| `node:child_process` | 1252 |
+| `node:child_process` | 1254 |
 | `dotenv` | 1228 |
 | `$lib/server/redis.js` | 1168 |
 | `fs/promises` | 979 |
-| `node:fs/promises` | 911 |
+| `node:fs/promises` | 915 |
 | `@playwright/test` | 837 |
 | `drizzle-orm/pg-core` | 796 |
 | `$lib/server/ollama.js` | 771 |
-| `$lib/server/db/schema-postgres.js` | 736 |
+| `$lib/server/db/schema-postgres.js` | 735 |
 | `child_process` | 700 |
 | `$app/environment` | 650 |
 

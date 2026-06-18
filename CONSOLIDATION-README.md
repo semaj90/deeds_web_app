@@ -39,14 +39,9 @@ Actionable checklist for all 6 stages:
 - ✅ Configuration & environment
 - ✅ Pre-production gates (all verified)
 - ✅ Benchmarks + known issues
-
 **Use this to**: Verify that all components are wired and healthy.
-
----
-
 ### 3. **PARENT-ATLAS-GPU-ACCELERATION-SUMMARY.txt** (Executive Summary)
 **📍 Location**: `PARENT-ATLAS-GPU-ACCELERATION-SUMMARY.txt`
-
 High-level overview for stakeholders:
 - 6-stage pipeline status (all operational)
 - Performance gains summary (90-95% cache hit rate)
@@ -56,28 +51,21 @@ High-level overview for stakeholders:
 - 4-phase consolidation plan
 - Deployment checklist
 - Known limitations + future roadmap
-
 **Use this to**: Brief stakeholders and understand the big picture.
-
----
-
 ### 4. **PARENT-ATLAS-CONSOLIDATION-INVENTORY.md** (File Mapping & Organization)
 **📍 Location**: `docs/PARENT-ATLAS-CONSOLIDATION-INVENTORY.md`
-
 Detailed inventory of **all existing code files** to consolidate:
 - **Planned 4-package architecture**:
   - `parent-atlas-core` (identity, schemas, adapters)
   - `parent-atlas-ingest` (AST, packets, scanning)
   - `parent-atlas-retrieval` (Bifrost, TurboVec, GPU)
   - `parent-atlas-opencode` (CLI plugin)
-
 - **File-by-file mapping** showing:
   - Current location (e.g., `src/lib/server/gpu/libtorch-bridge.ts`)
   - Lines of code
   - Purpose
   - Target package location
   - Consolidation strategy (copy, merge, or keep local)
-
 - **8-phase consolidation checklist** (Phases A-H):
   - A: Create package scaffolds
   - B: Copy Bifrost files
@@ -87,20 +75,14 @@ Detailed inventory of **all existing code files** to consolidate:
   - F: Copy retrieval pipeline
   - G: Create OpenCode plugin
   - H: Wire SvelteKit consumer routes
+ **Import consolidation map** showing before/after imports
+ **Package dependencies** graph
+ **Timeline** (target 2026-06-30)
 
-- **Import consolidation map** showing before/after imports
-- **Package dependencies** graph
-- **Timeline** (target 2026-06-30)
-
-**Use this to**: Understand exactly which files go where.
-
----
-
-### 5. **CONSOLIDATION-COMMANDS.sh** (Automated Consolidation Script)
+use this to**: Understand exactly which files go where.
+ 5. **CONSOLIDATION-COMMANDS.sh** (Automated Consolidation Script)
 **📍 Location**: `CONSOLIDATION-COMMANDS.sh`
-
 Bash script that **automates the entire consolidation process**:
-
 **Phases implemented**:
 - `phase_a()` — Create package directory structure
 - `phase_b()` — Copy Bifrost files (14 LoC → 110 LoC)
@@ -111,45 +93,34 @@ Bash script that **automates the entire consolidation process**:
 - `phase_g()` — Create OpenCode plugin structure + SKILL.md files
 - `phase_h()` — Generate `package.json` and index files
 - `verify()` — Verify directory structure and file counts
-
 **How to use**:
 ```bash
 # Make executable
 chmod +x CONSOLIDATION-COMMANDS.sh
-
 # Run all phases
 ./CONSOLIDATION-COMMANDS.sh
-
 # Or run individual phases (if sourced)
 source CONSOLIDATION-COMMANDS.sh
 phase_b  # Copy just Bifrost files
 phase_c  # Copy just TurboVec files
-```
-
 **Output**:
 - Creates `packages/parent-atlas-{core,ingest,retrieval,opencode}/`
 - Copies all source files to correct locations
 - Generates `package.json` for each package
 - Verifies directory structure
-
----
-
-## 🚀 Quick Start: How to Use These Guides
-
-### **For Understanding**: Start here
+ 🚀 Quick Start: How to Use These Guides
+ **For Understanding**: Start here
 1. Read **PARENT-ATLAS-GPU-ACCELERATION-SUMMARY.txt** (5 min)
 2. Skim **GPU-ACCELERATION-REVIEW-PARENT-ATLAS.md** (15 min)
 3. Check **GPU-ACCELERATION-WIRING-CHECKLIST.md** for current status (5 min)
-
-### **For Implementation**: Follow this order
+**For Implementation**: Follow this order
 1. Read **PARENT-ATLAS-CONSOLIDATION-INVENTORY.md** to understand file mapping
 2. Review **CONSOLIDATION-COMMANDS.sh** to see what will be copied
 3. Run the script: `./CONSOLIDATION-COMMANDS.sh`
 4. Verify output with the `verify()` function
 5. Update SvelteKit imports to use `@deeds/*` packages
 6. Run `npm run build` in each package
-
-### **For Verification**: Use the checklists
+ **For Verification**: Use the checklists
 1. **Stage-by-stage verification**: GPU-ACCELERATION-WIRING-CHECKLIST.md
 2. **Pre-production gates** (7 gates, all passing):
    - Gate 1: LibTorch CUDA available ✅
@@ -159,13 +130,8 @@ phase_c  # Copy just TurboVec files
    - Gate 5: Qdrant mirror in sync ✅
    - Gate 6: Redis L1 operational ✅
    - Gate 7: Neo4j topology wired ✅
-
----
-
 ## 📊 Overview of What's Being Consolidated
-
 **Total Code**: 2,120 lines across 6 stages
-
 | Stage | Component | LoC | Files | Binary | Status |
 |-------|-----------|-----|-------|--------|--------|
 | 1 | Bifrost | 390 | 4 | — | ✅ |
@@ -176,53 +142,38 @@ phase_c  # Copy just TurboVec files
 | Tests | — | 120 | 2 | — | ✅ |
 | Retrieval Pipeline | — | 200+ | 10+ | — | ✅ |
 | **Total** | — | **2,120** | **30+** | 1×299KB | **✅** |
-
----
-
 ## 🔗 Import Changes (Before → After)
-
 ### Before Consolidation (Scattered)
 ```typescript
 // src/routes/api/atlas/search/+server.ts
-
 // Bifrost scattered across ai/
 import { bifrostChat } from '$lib/server/ai/bifrost-provider';
 import { bifrostCacheManager } from '$lib/server/ai/bifrost-cache-manager';
-
 // TurboVec scattered across retrieval/
 import { turbovecPrefilter } from '$lib/server/retrieval/turbovec-prefilter';
 import { turbovecRerank } from '$lib/server/retrieval/turbovec-rerank';
-
 // GPU scattered across server/gpu/
 import { batchCosineSimilarity } from '$lib/server/gpu/libtorch-bridge';
 import { fastJsonParse } from '$lib/server/gpu/simdjson-bridge';
-
 // Identity scattered across vector/
 import { TurboVecMetadata } from '$lib/server/vector/turbovec-contract';
-```
-
 ### After Consolidation (Unified)
 ```typescript
 // src/routes/api/atlas/search/+server.ts
-
 import {
   // Bifrost (L1/L2 caching)
   bifrostChat,
   bifrostCacheManager,
-  
   // TurboVec (prefilter + reranking)
   turbovecPrefilter,
   turbovecRerank,
-  
   // GPU operations
   batchCosineSimilarity,
   fastJsonParse,
   getMemoryPressure,
-  
   // Full retrieval pipeline
   retrievePacketsGPU,
 } from '@deeds/parent-atlas-retrieval';
-
 import {
   // Identity contract
   verifyLineage,
@@ -230,13 +181,8 @@ import {
   ParentAtlasPacketResult,
   TurboVecMetadata,
 } from '@deeds/parent-atlas-core';
-```
-
----
-
 ## 📋 4-Package Structure (Final)
 
-```
 deeds-web-app/
 ├── packages/
 │   ├── parent-atlas-core/              # ✅ Identity contract

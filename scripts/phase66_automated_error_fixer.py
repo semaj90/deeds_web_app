@@ -107,7 +107,7 @@ KNOWN_FIXERS = {
     "fix-svelte5-all":          "scripts/fix-svelte5-all.ps1",            # Full Svelte 4→5 migration pass
 }
 
-llm = ChatOllama(model=MODEL, base_url="http://localhost:11434", temperature=0.1)
+llm = ChatOllama(model=MODEL, base_url="http://localhost:8090", temperature=0.1)
 svelte5_llm = ChatOllama(model=SVELTE5_MODEL, base_url="http://localhost:11434", temperature=0.05)
 
 print("🤖 Phase 66: Automated Error Fixer (LangGraph)")

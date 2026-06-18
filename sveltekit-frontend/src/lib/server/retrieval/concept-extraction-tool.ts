@@ -65,6 +65,102 @@ Example output:
 
 Now extract concepts from this query:`;
 
+const CONCEPT_STOPWORDS = new Set([
+  'the',
+  'and',
+  'for',
+  'with',
+  'that',
+  'this',
+  'from',
+  'into',
+  'then',
+  'when',
+  'what',
+  'how',
+  'why',
+  'where',
+  'does',
+  'do',
+  'did',
+  'can',
+  'could',
+  'should',
+  'would',
+  'will',
+  'find',
+  'show',
+  'list',
+  'give',
+  'make',
+  'use',
+  'using',
+  'need',
+  'needs',
+  'next',
+  'lane',
+  'open',
+  'done',
+  'review',
+  'continue',
+  'work',
+]);
+
+function deriveHeuristicConcepts(query: string): ExtractedConcept[] {
+  const tokens = query
+    .toLowerCase()
+    .replace(/[_/]+/g, ' ')
+    .split(/[^a-z0-9]+/g)
+    .map((token) => token.trim())
+    .filter((token) => token.length >= 3 && !CONCEPT_STOPWORDS.has(token));
+
+  const concepts = new Map<string, ExtractedConcept>();
+
+  for (const token of tokens.slice(0, 6)) {
+    concepts.set(token, {
+      name: token,
+      confidence: token.length >= 8 ? 0.82 : 0.72,
+      category: token.includes('graph') || token.includes('tree') || token.includes('neo4j')
+        ? 'graph'
+        : token.includes('cache') || token.includes('redis')
+          ? 'cache'
+          : token.includes('qdrant') || token.includes('vector')
+            ? 'retrieval'
+            : token.includes('manifest') || token.includes('topology') || token.includes('packet')
+              ? 'topology'
+              : undefined,
+    });
+  }
+
+  const bigrams: string[] = [];
+  for (let i = 0; i < Math.max(0, tokens.length - 1); i++) {
+    const a = tokens[i];
+    const b = tokens[i + 1];
+    if (!a || !b) continue;
+    if (a === b) continue;
+    if (a.length < 4 && b.length < 4) continue;
+    bigrams.push(`${a} ${b}`);
+  }
+
+  for (const phrase of bigrams.slice(0, 4)) {
+    if (!concepts.has(phrase)) {
+      concepts.set(phrase, {
+        name: phrase,
+        confidence: 0.68,
+        category: phrase.includes('graph')
+          ? 'graph'
+          : phrase.includes('packet') || phrase.includes('identity')
+            ? 'topology'
+            : phrase.includes('search') || phrase.includes('retrieval')
+              ? 'retrieval'
+              : undefined,
+      });
+    }
+  }
+
+  return [...concepts.values()].slice(0, 5);
+}
+
 // ── Main Function ────────────────────────────────────────────────────────────
 
 export async function extractQueryConceptsViaGemma(
@@ -112,23 +208,52 @@ export async function extractQueryConceptsViaGemma(
 async function streamConceptsFromGemma(
   request: ConceptExtractionRequest
 ): Promise<ExtractedConcept[]> {
+  const heuristicFallback = deriveHeuristicConcepts(request.query);
+  const timeoutMs = Number(ENV.ACE_CONCEPT_EXTRACTION_TIMEOUT_MS ?? 1500);
+  if (ENV.ACE_CONCEPT_EXTRACTION_MODE === 'heuristic') {
+    return heuristicFallback;
+  }
+
   const prompt = `${CONCEPT_EXTRACTION_PROMPT}\n\n"${request.query}"`;
 
-  // Use bifrostChat for streaming (with L1 + L2 cache automatic)
-  const response = await bifrostChat(
-    [{ role: 'user', content: prompt }],
-    ENV.GEMMA4_MODEL || 'gemma3-legal:latest',
-    {
-      temperature: 0.3,
-      maxTokens: 500,
+  try {
+    // Use bifrostChat for streaming (with L1 + L2 cache automatic), but never block the lane indefinitely.
+    const response = await Promise.race([
+      bifrostChat(
+        [{ role: 'user', content: prompt }],
+        ENV.GEMMA4_MODEL || 'gemma3-legal:latest',
+        {
+          temperature: 0.3,
+          maxTokens: 500,
+        }
+      ),
+      new Promise<string>((resolve) =>
+        setTimeout(() => resolve(''), Math.max(250, timeoutMs))
+      ),
+    ]);
+
+    if (!response) {
+      return heuristicFallback;
     }
-  );
 
-  // Parse response JSON
-  const jsonStr = response.trim();
-  const parsed = parseConceptJson(jsonStr);
+    // Parse response JSON
+    const jsonStr = response.trim();
+    const parsed = parseConceptJson(jsonStr);
+    if (!parsed.length) return heuristicFallback;
 
-  return parsed;
+    const byName = new Map<string, ExtractedConcept>();
+    for (const concept of [...heuristicFallback, ...parsed]) {
+      const key = concept.name.toLowerCase();
+      const existing = byName.get(key);
+      if (!existing || concept.confidence > existing.confidence) {
+        byName.set(key, concept);
+      }
+    }
+
+    return [...byName.values()].slice(0, request.maxConcepts ?? 5);
+  } catch {
+    return heuristicFallback;
+  }
 }
 
 function parseConceptJson(text: string): ExtractedConcept[] {

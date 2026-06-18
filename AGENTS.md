@@ -41,7 +41,24 @@ Every skill/subagent must conclude its execution by providing these structured f
 *   **`safe_next_command`**: The recommended, non-destructive command to run next (e.g., a dry-run audit).
 *   **`smoke_command`**: The final validation command to confirm the fix/feature works in a controlled environment.
 *   **`report_path`**: A path where the detailed report of this skill's execution should be stored.
-*   **`do_not_do`**: An explicit list of files, functions, or modules that must not be touched by future changes related to this feature.
+## 🧠 ACE/Atlas Context Editor Gate (Mandatory)
+
+This gate is the canonical process for synthesizing a final, actionable context packet from raw retrieval hits. It ensures that the LLM receives a single, highly curated, and versioned source of truth, minimizing token waste and hallucination.
+
+### The 5-Step Data Flow
+1. **Raw Retrieval**: Initial search (e.g., `trace_kag_search`) returns raw, un-ranked hits.
+2. **Filtering & Scoring**: Hits are filtered by relevance, authority, and recency, generating a preliminary score.
+3. **Context Assembly**: The system uses `atlas-tools_build_agentic_rag_context` to select the top-K, most relevant chunks.
+4. **Canonicalization**: The selected chunks are passed through a final scoring/reranking layer (e.g., `turbovec_turbovec_rank_chunks`) to determine the single best source of truth.
+5. **Injection**: The final, compressed context is written to Redis (`ace:packet:{runId}`) for the current session's use.
+
+### Required Data Structures
+*   **`sourceRef`**: The primary identifier, linking the context to the source file/chunk.
+*   **`ConceptID`**: The high-level topic or feature ID that anchors the context.
+*   **`ConfidenceScore`**: A calculated score (0.0 to 1.0) representing the system's certainty in the provided context.
+*   **`ContextBlob`**: The final, serialized, and token-budgeted context payload.
+
+**Actionable Rule**: Never pass raw search results directly to the LLM. Always pass the result of the final, canonicalized context injection.
 
 Example:
 ```yaml

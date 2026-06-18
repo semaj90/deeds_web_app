@@ -1,6 +1,6 @@
 {
   "schema": "parent_atlas_production_readiness.v1",
-  "generatedAt": "2026-06-15T03:26:19.977Z",
+  "generatedAt": "2026-06-17T15:00:54.295Z",
   "readOnly": true,
   "sections": {
     "summary-batch": [
@@ -60,7 +60,7 @@
         "message": "sveltekit-frontend/src/lib/server/gpu/libtorch-bridge.ts exists",
         "details": {
           "exists": true,
-          "bytes": 66252,
+          "bytes": 66200,
           "relPath": "sveltekit-frontend/src/lib/server/gpu/libtorch-bridge.ts"
         }
       },
@@ -100,7 +100,7 @@
         "message": "sveltekit-frontend/scripts/train-autoencoder.py exists",
         "details": {
           "exists": true,
-          "bytes": 11488,
+          "bytes": 12515,
           "relPath": "sveltekit-frontend/scripts/train-autoencoder.py"
         }
       },
@@ -110,7 +110,7 @@
         "message": "sveltekit-frontend/scripts/train-autoencoder.mjs exists",
         "details": {
           "exists": true,
-          "bytes": 21334,
+          "bytes": 22179,
           "relPath": "sveltekit-frontend/scripts/train-autoencoder.mjs"
         }
       },
@@ -120,7 +120,7 @@
         "message": "scripts/atlas/pytorch-qdrant-redis-som-index.mjs exists",
         "details": {
           "exists": true,
-          "bytes": 35567,
+          "bytes": 41105,
           "relPath": "scripts/atlas/pytorch-qdrant-redis-som-index.mjs"
         }
       },
@@ -297,7 +297,7 @@
         "message": "sveltekit-frontend/src/lib/server/db/schema/nes-chrom-packets.ts exists",
         "details": {
           "exists": true,
-          "bytes": 8980,
+          "bytes": 9419,
           "relPath": "sveltekit-frontend/src/lib/server/db/schema/nes-chrom-packets.ts"
         }
       },
@@ -459,7 +459,7 @@
         "message": "scripts/atlas/ndjson-mapreduce-join.mjs exists",
         "details": {
           "exists": true,
-          "bytes": 20624,
+          "bytes": 20133,
           "relPath": "scripts/atlas/ndjson-mapreduce-join.mjs"
         }
       },
@@ -526,34 +526,34 @@
       {
         "id": "rg-uu:ndjson-inventory",
         "status": "pass",
-        "message": "rg -uuu found 182 NDJSON files",
+        "message": "rg -uuu found 184 NDJSON files",
         "details": {
           "sample": [
-            ".opencode\\gemma4_candidates.ndjson",
-            ".opencode\\fixes\\fixes.ndjson",
-            ".claude\\worktrees\\agent-ae7221f6\\.opencode\\ace-packets_stale\\index.ndjson",
-            ".claude\\worktrees\\agent-ae7221f6\\.opencode\\ace-packets\\index.ndjson",
-            ".opencode\\recommendations\\tasks.ndjson",
-            ".opencode\\recommendations\\tasks-with-improved-titles.ndjson",
-            ".opencode\\recommendations\\agentic-fix-queue.ndjson",
-            ".opencode\\quarantine\\invalid-cards.ndjson",
-            ".opencode\\outcome-ledger.ndjson",
-            ".opencode\\outcome-ledger-with-cardIds.ndjson",
-            ".claude\\worktrees\\agent-ae7221f6\\.opencode\\recommendations\\tasks.ndjson",
-            ".claude\\worktrees\\agent-ae7221f6\\.opencode\\quarantine\\invalid-cards.ndjson",
-            ".claude\\worktrees\\agent-ae7221f6\\.opencode\\outcome-ledger.ndjson",
-            ".claude\\worktrees\\agent-ae7221f6\\.opencode\\ingest\\nodes.ndjson",
-            ".claude\\worktrees\\agent-ae7221f6\\.opencode\\ingest\\edges.ndjson",
-            ".claude\\worktrees\\agent-ae7221f6\\.opencode\\gemma4_candidates.ndjson",
-            ".claude\\worktrees\\agent-ae7221f6\\docs\\ai-os\\agentic-progress-log.ndjson",
+            "sveltekit-frontend\\.tmp\\offline-analysis\\tool-usage-edges.ndjson",
+            "sveltekit-frontend\\.tmp\\offline-analysis\\db-usage-edges.ndjson",
+            "sveltekit-frontend\\.tmp\\jsonb_export.ndjson",
             "neschrom97\\packets\\cards.ndjson",
-            ".claude\\worktrees\\agent-ae7221f6\\docs\\packets\\session-features.ndjson",
-            ".claude\\worktrees\\agent-ae7221f6\\docs\\packets\\rg-knowledge-packets.ndjson",
-            ".claude\\worktrees\\agent-ae7221f6\\memory\\exports\\reports.ndjson",
-            ".claude\\worktrees\\agent-ae7221f6\\sveltekit-frontend\\static\\dev-graphs\\validation\\history.ndjson",
-            ".claude\\worktrees\\agent-a7203461\\sveltekit-frontend\\static\\dev-graphs\\validation\\history.ndjson",
-            ".opencode\\ndjson\\temporal-index.ndjson",
-            ".opencode\\ndjson\\parents-atlas-test\\ledger.ndjson"
+            "sveltekit-frontend\\tmp\\qdrant-embeddings-test.ndjson",
+            "sveltekit-frontend\\tmp\\hypergraph-assignments.ndjson",
+            "sveltekit-frontend\\.tmp\\ingest\\lanes\\test-lane.ndjson",
+            "sveltekit-frontend\\tmp\\hypergraph\\codebase_chunks_768-embeddings.ndjson",
+            "sveltekit-frontend\\tmp\\hypergraph\\codebase_chunks_768-assignments.ndjson",
+            "sveltekit-frontend\\tmp\\embeddings-smoke.ndjson",
+            "sveltekit-frontend\\tmp\\codebase_chunks_768-embeddings.ndjson",
+            "sveltekit-frontend\\tmp\\chunks\\parents-corpus-rg.ndjson",
+            "sveltekit-frontend\\tmp\\chunks\\parents-corpus-expanded.ndjson",
+            "sveltekit-frontend\\tmp\\chunks\\parents-corpus-all.ndjson",
+            "sveltekit-frontend\\tmp\\chunks\\parents-corpus-4d.ndjson",
+            "sveltekit-frontend\\tmp\\assignments.ndjson",
+            "sveltekit-frontend\\tmp\\assignments-test.ndjson",
+            "sveltekit-frontend\\tmp\\assignments-ci.ndjson",
+            "docs\\packets\\session-features.ndjson",
+            "docs\\packets\\rg-knowledge-packets.ndjson",
+            "docs\\ai-os\\agentic-progress-log.ndjson",
+            "memory\\exports\\reports.ndjson",
+            "sveltekit-frontend\\sveltekit-frontend\\tmp\\embeddings-smoke.ndjson",
+            "sveltekit-frontend\\svelte-check-machine.ndjson",
+            "sveltekit-frontend\\static\\dev-graphs\\validation\\history.ndjson"
           ]
         }
       }
@@ -756,7 +756,7 @@
       "message": "sveltekit-frontend/src/lib/server/gpu/libtorch-bridge.ts exists",
       "details": {
         "exists": true,
-        "bytes": 66252,
+        "bytes": 66200,
         "relPath": "sveltekit-frontend/src/lib/server/gpu/libtorch-bridge.ts"
       }
     },
@@ -800,7 +800,7 @@
       "message": "sveltekit-frontend/scripts/train-autoencoder.py exists",
       "details": {
         "exists": true,
-        "bytes": 11488,
+        "bytes": 12515,
         "relPath": "sveltekit-frontend/scripts/train-autoencoder.py"
       }
     },
@@ -811,7 +811,7 @@
       "message": "sveltekit-frontend/scripts/train-autoencoder.mjs exists",
       "details": {
         "exists": true,
-        "bytes": 21334,
+        "bytes": 22179,
         "relPath": "sveltekit-frontend/scripts/train-autoencoder.mjs"
       }
     },
@@ -822,7 +822,7 @@
       "message": "scripts/atlas/pytorch-qdrant-redis-som-index.mjs exists",
       "details": {
         "exists": true,
-        "bytes": 35567,
+        "bytes": 41105,
         "relPath": "scripts/atlas/pytorch-qdrant-redis-som-index.mjs"
       }
     },
@@ -1009,7 +1009,7 @@
       "message": "sveltekit-frontend/src/lib/server/db/schema/nes-chrom-packets.ts exists",
       "details": {
         "exists": true,
-        "bytes": 8980,
+        "bytes": 9419,
         "relPath": "sveltekit-frontend/src/lib/server/db/schema/nes-chrom-packets.ts"
       }
     },
@@ -1185,7 +1185,7 @@
       "message": "scripts/atlas/ndjson-mapreduce-join.mjs exists",
       "details": {
         "exists": true,
-        "bytes": 20624,
+        "bytes": 20133,
         "relPath": "scripts/atlas/ndjson-mapreduce-join.mjs"
       }
     },
@@ -1259,34 +1259,34 @@
       "section": "offline",
       "id": "rg-uu:ndjson-inventory",
       "status": "pass",
-      "message": "rg -uuu found 182 NDJSON files",
+      "message": "rg -uuu found 184 NDJSON files",
       "details": {
         "sample": [
-          ".opencode\\gemma4_candidates.ndjson",
-          ".opencode\\fixes\\fixes.ndjson",
-          ".claude\\worktrees\\agent-ae7221f6\\.opencode\\ace-packets_stale\\index.ndjson",
-          ".claude\\worktrees\\agent-ae7221f6\\.opencode\\ace-packets\\index.ndjson",
-          ".opencode\\recommendations\\tasks.ndjson",
-          ".opencode\\recommendations\\tasks-with-improved-titles.ndjson",
-          ".opencode\\recommendations\\agentic-fix-queue.ndjson",
-          ".opencode\\quarantine\\invalid-cards.ndjson",
-          ".opencode\\outcome-ledger.ndjson",
-          ".opencode\\outcome-ledger-with-cardIds.ndjson",
-          ".claude\\worktrees\\agent-ae7221f6\\.opencode\\recommendations\\tasks.ndjson",
-          ".claude\\worktrees\\agent-ae7221f6\\.opencode\\quarantine\\invalid-cards.ndjson",
-          ".claude\\worktrees\\agent-ae7221f6\\.opencode\\outcome-ledger.ndjson",
-          ".claude\\worktrees\\agent-ae7221f6\\.opencode\\ingest\\nodes.ndjson",
-          ".claude\\worktrees\\agent-ae7221f6\\.opencode\\ingest\\edges.ndjson",
-          ".claude\\worktrees\\agent-ae7221f6\\.opencode\\gemma4_candidates.ndjson",
-          ".claude\\worktrees\\agent-ae7221f6\\docs\\ai-os\\agentic-progress-log.ndjson",
+          "sveltekit-frontend\\.tmp\\offline-analysis\\tool-usage-edges.ndjson",
+          "sveltekit-frontend\\.tmp\\offline-analysis\\db-usage-edges.ndjson",
+          "sveltekit-frontend\\.tmp\\jsonb_export.ndjson",
           "neschrom97\\packets\\cards.ndjson",
-          ".claude\\worktrees\\agent-ae7221f6\\docs\\packets\\session-features.ndjson",
-          ".claude\\worktrees\\agent-ae7221f6\\docs\\packets\\rg-knowledge-packets.ndjson",
-          ".claude\\worktrees\\agent-ae7221f6\\memory\\exports\\reports.ndjson",
-          ".claude\\worktrees\\agent-ae7221f6\\sveltekit-frontend\\static\\dev-graphs\\validation\\history.ndjson",
-          ".claude\\worktrees\\agent-a7203461\\sveltekit-frontend\\static\\dev-graphs\\validation\\history.ndjson",
-          ".opencode\\ndjson\\temporal-index.ndjson",
-          ".opencode\\ndjson\\parents-atlas-test\\ledger.ndjson"
+          "sveltekit-frontend\\tmp\\qdrant-embeddings-test.ndjson",
+          "sveltekit-frontend\\tmp\\hypergraph-assignments.ndjson",
+          "sveltekit-frontend\\.tmp\\ingest\\lanes\\test-lane.ndjson",
+          "sveltekit-frontend\\tmp\\hypergraph\\codebase_chunks_768-embeddings.ndjson",
+          "sveltekit-frontend\\tmp\\hypergraph\\codebase_chunks_768-assignments.ndjson",
+          "sveltekit-frontend\\tmp\\embeddings-smoke.ndjson",
+          "sveltekit-frontend\\tmp\\codebase_chunks_768-embeddings.ndjson",
+          "sveltekit-frontend\\tmp\\chunks\\parents-corpus-rg.ndjson",
+          "sveltekit-frontend\\tmp\\chunks\\parents-corpus-expanded.ndjson",
+          "sveltekit-frontend\\tmp\\chunks\\parents-corpus-all.ndjson",
+          "sveltekit-frontend\\tmp\\chunks\\parents-corpus-4d.ndjson",
+          "sveltekit-frontend\\tmp\\assignments.ndjson",
+          "sveltekit-frontend\\tmp\\assignments-test.ndjson",
+          "sveltekit-frontend\\tmp\\assignments-ci.ndjson",
+          "docs\\packets\\session-features.ndjson",
+          "docs\\packets\\rg-knowledge-packets.ndjson",
+          "docs\\ai-os\\agentic-progress-log.ndjson",
+          "memory\\exports\\reports.ndjson",
+          "sveltekit-frontend\\sveltekit-frontend\\tmp\\embeddings-smoke.ndjson",
+          "sveltekit-frontend\\svelte-check-machine.ndjson",
+          "sveltekit-frontend\\static\\dev-graphs\\validation\\history.ndjson"
         ]
       }
     },
@@ -1468,7 +1468,7 @@
       "parent_atlas_matches": 10042,
       "with_source_ref": 14911,
       "with_feature_id": 14911,
-      "with_qdrant_point": 20,
+      "with_qdrant_point": 1799,
       "with_som_cluster": 16
     },
     "routeRuntimePackets": {
@@ -1490,23 +1490,23 @@
     "url": "http://127.0.0.1:6333",
     "collection": "codebase_chunks_768",
     "pointsCount": 52606,
-    "indexedVectorsCount": 156567,
+    "indexedVectorsCount": 162305,
     "status": "green"
   },
   "neo4j": {
     "available": true,
     "uri": "bolt://127.0.0.1:7687",
-    "totalNodes": 26124,
+    "totalNodes": 26206,
     "codebaseFiles": 0,
     "parentAtlasFeatures": 0,
-    "totalRelationships": 73246,
+    "totalRelationships": 73260,
     "belongsToFeature": 0,
     "similarTopology": 0
   },
   "drizzle": {
     "nesChromSchema": {
       "exists": true,
-      "bytes": 8980,
+      "bytes": 9419,
       "relPath": "sveltekit-frontend/src/lib/server/db/schema/nes-chrom-packets.ts"
     },
     "routeRuntimeSchema": {
@@ -1588,7 +1588,7 @@
     },
     {
       "exists": true,
-      "bytes": 20624,
+      "bytes": 20133,
       "relPath": "scripts/atlas/ndjson-mapreduce-join.mjs"
     },
     {
@@ -1624,33 +1624,33 @@
   ],
   "ndjsonInventory": {
     "status": "pass",
-    "total": 182,
+    "total": 184,
     "sample": [
-      ".opencode\\gemma4_candidates.ndjson",
-      ".opencode\\fixes\\fixes.ndjson",
-      ".claude\\worktrees\\agent-ae7221f6\\.opencode\\ace-packets_stale\\index.ndjson",
-      ".claude\\worktrees\\agent-ae7221f6\\.opencode\\ace-packets\\index.ndjson",
-      ".opencode\\recommendations\\tasks.ndjson",
-      ".opencode\\recommendations\\tasks-with-improved-titles.ndjson",
-      ".opencode\\recommendations\\agentic-fix-queue.ndjson",
-      ".opencode\\quarantine\\invalid-cards.ndjson",
-      ".opencode\\outcome-ledger.ndjson",
-      ".opencode\\outcome-ledger-with-cardIds.ndjson",
-      ".claude\\worktrees\\agent-ae7221f6\\.opencode\\recommendations\\tasks.ndjson",
-      ".claude\\worktrees\\agent-ae7221f6\\.opencode\\quarantine\\invalid-cards.ndjson",
-      ".claude\\worktrees\\agent-ae7221f6\\.opencode\\outcome-ledger.ndjson",
-      ".claude\\worktrees\\agent-ae7221f6\\.opencode\\ingest\\nodes.ndjson",
-      ".claude\\worktrees\\agent-ae7221f6\\.opencode\\ingest\\edges.ndjson",
-      ".claude\\worktrees\\agent-ae7221f6\\.opencode\\gemma4_candidates.ndjson",
-      ".claude\\worktrees\\agent-ae7221f6\\docs\\ai-os\\agentic-progress-log.ndjson",
+      "sveltekit-frontend\\.tmp\\offline-analysis\\tool-usage-edges.ndjson",
+      "sveltekit-frontend\\.tmp\\offline-analysis\\db-usage-edges.ndjson",
+      "sveltekit-frontend\\.tmp\\jsonb_export.ndjson",
       "neschrom97\\packets\\cards.ndjson",
-      ".claude\\worktrees\\agent-ae7221f6\\docs\\packets\\session-features.ndjson",
-      ".claude\\worktrees\\agent-ae7221f6\\docs\\packets\\rg-knowledge-packets.ndjson",
-      ".claude\\worktrees\\agent-ae7221f6\\memory\\exports\\reports.ndjson",
-      ".claude\\worktrees\\agent-ae7221f6\\sveltekit-frontend\\static\\dev-graphs\\validation\\history.ndjson",
-      ".claude\\worktrees\\agent-a7203461\\sveltekit-frontend\\static\\dev-graphs\\validation\\history.ndjson",
-      ".opencode\\ndjson\\temporal-index.ndjson",
-      ".opencode\\ndjson\\parents-atlas-test\\ledger.ndjson"
+      "sveltekit-frontend\\tmp\\qdrant-embeddings-test.ndjson",
+      "sveltekit-frontend\\tmp\\hypergraph-assignments.ndjson",
+      "sveltekit-frontend\\.tmp\\ingest\\lanes\\test-lane.ndjson",
+      "sveltekit-frontend\\tmp\\hypergraph\\codebase_chunks_768-embeddings.ndjson",
+      "sveltekit-frontend\\tmp\\hypergraph\\codebase_chunks_768-assignments.ndjson",
+      "sveltekit-frontend\\tmp\\embeddings-smoke.ndjson",
+      "sveltekit-frontend\\tmp\\codebase_chunks_768-embeddings.ndjson",
+      "sveltekit-frontend\\tmp\\chunks\\parents-corpus-rg.ndjson",
+      "sveltekit-frontend\\tmp\\chunks\\parents-corpus-expanded.ndjson",
+      "sveltekit-frontend\\tmp\\chunks\\parents-corpus-all.ndjson",
+      "sveltekit-frontend\\tmp\\chunks\\parents-corpus-4d.ndjson",
+      "sveltekit-frontend\\tmp\\assignments.ndjson",
+      "sveltekit-frontend\\tmp\\assignments-test.ndjson",
+      "sveltekit-frontend\\tmp\\assignments-ci.ndjson",
+      "docs\\packets\\session-features.ndjson",
+      "docs\\packets\\rg-knowledge-packets.ndjson",
+      "docs\\ai-os\\agentic-progress-log.ndjson",
+      "memory\\exports\\reports.ndjson",
+      "sveltekit-frontend\\sveltekit-frontend\\tmp\\embeddings-smoke.ndjson",
+      "sveltekit-frontend\\svelte-check-machine.ndjson",
+      "sveltekit-frontend\\static\\dev-graphs\\validation\\history.ndjson"
     ]
   },
   "summary": {
@@ -1923,7 +1923,7 @@
     "files": {
       "libtorchBridge": {
         "exists": true,
-        "bytes": 66252,
+        "bytes": 66200,
         "relPath": "sveltekit-frontend/src/lib/server/gpu/libtorch-bridge.ts"
       },
       "pytorchGraph": {
@@ -1943,17 +1943,17 @@
       },
       "trainAutoencoderPy": {
         "exists": true,
-        "bytes": 11488,
+        "bytes": 12515,
         "relPath": "sveltekit-frontend/scripts/train-autoencoder.py"
       },
       "trainAutoencoderMjs": {
         "exists": true,
-        "bytes": 21334,
+        "bytes": 22179,
         "relPath": "sveltekit-frontend/scripts/train-autoencoder.mjs"
       },
       "somPipeline": {
         "exists": true,
-        "bytes": 35567,
+        "bytes": 41105,
         "relPath": "scripts/atlas/pytorch-qdrant-redis-som-index.mjs"
       },
       "libtorchGraphImpl": {

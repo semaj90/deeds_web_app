@@ -14,8 +14,12 @@ import { bm25SearchIndexed } from './bm25-search.js';
 import { conceptOverlapSearch } from './concept-overlap-search.js';
 import { combineViaRRF, type ContextHit, type RRFResult, type RetrievalLaneName } from './rrf-combiner.js';
 import { extractQueryConceptsViaGemma } from './concept-extraction-tool.js';
-import { queryNeoJsGraphSignal } from './neo4j-graph-signal.js';
+import { queryNeoJsGraphSignal, queryNeoJsGraphSignalByNames } from './neo4j-graph-signal.js';
+import { expandNeighbours, fetchAuthorityScores } from '$lib/server/search/neo4j-rerank.js';
 import { turbovecSearch } from './turbovec-prefilter.js';
+import { searchCodebaseAnn } from '$lib/server/search/qdrant-search.js';
+import { buildVectorPayload } from '$lib/server/config/vector-config.js';
+import { toStableFileKey } from './subgraph-seed-neighborhood.js';
 
 export interface RRFIntegrationOptions {
   k?: number; // RRF constant (default 60)
@@ -43,37 +47,167 @@ export interface RRFIntegrationOutput {
 async function queryQdrantVectorSignal(
   query: string,
   embedding: number[] | null,
-  topK: number
+  topK: number,
+  seedRefs: string[] = []
 ): Promise<Array<{ id: string; score: number; text?: string; metadata?: Record<string, unknown> }>> {
   if (!embedding) return [];
 
   try {
-    const { qdrant } = await import('$lib/server/vector/qdrant-manager.js');
-    const response = await qdrant._denseSearch({
-      query,
-      queryEmbedding: embedding,
-      collection: 'codebase_chunks_768',
-      limit: topK,
-      scoreThreshold: 0.001,
+    const denseLimit = Math.max(topK * 2, topK);
+    const collections = ['codebase_chunks_768'];
+
+    if (seedRefs.length > 0) {
+      const cleanedSeeds = [...new Set(seedRefs.map((ref) => String(ref ?? '').trim()).filter(Boolean))];
+      if (cleanedSeeds.length > 0) {
+        const seededRes = await fetch(`${process.env.QDRANT_URL ?? 'http://127.0.0.1:6333'}/collections/codebase_chunks_768/points/search`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            vector: buildVectorPayload('codebase_chunks_768', embedding),
+            limit: denseLimit,
+            score_threshold: 0.001,
+            with_payload: true,
+            filter: {
+              should: [
+                { key: 'source_ref', match: { any: cleanedSeeds } },
+                { key: 'sourceRef', match: { any: cleanedSeeds } },
+                { key: 'canonicalSourceRef', match: { any: cleanedSeeds } },
+                { key: 'file_path', match: { any: cleanedSeeds } },
+                { key: 'filePath', match: { any: cleanedSeeds } },
+                { key: 'stable_key', match: { any: cleanedSeeds } },
+                { key: 'packet_key', match: { any: cleanedSeeds } },
+              ],
+            },
+          }),
+          signal: AbortSignal.timeout(5000),
+        });
+
+        if (seededRes.ok) {
+          const seededData = await seededRes.json();
+          const seeded = Array.isArray((seededData as { result?: Array<{ id: string | number; score: number; payload?: Record<string, unknown> }> }).result)
+            ? ((seededData as { result: Array<{ id: string | number; score: number; payload?: Record<string, unknown> }> }).result ?? [])
+            : [];
+
+          if (seeded.length > 0) {
+            return seeded.map((r) => {
+              const payload = (r.payload ?? {}) as Record<string, unknown>;
+              return {
+                id: String(r.id),
+                score: Number(r.score ?? 0),
+                text: String(payload.content ?? payload.summary ?? ''),
+                metadata: {
+                  packet_key: String(payload.packet_key ?? payload.packetKey ?? r.id ?? '').trim() || null,
+                  source_ref: String(payload.source_ref ?? payload.sourceRef ?? payload.canonicalSourceRef ?? payload.file_path ?? payload.filePath ?? '').trim() || null,
+                  feature_id: payload.feature_id ?? payload.featureId ?? null,
+                  file_path: String(payload.file_path ?? payload.filePath ?? null) || null,
+                  qdrant_point_id: String(r.id),
+                  qdrant_collection: 'codebase_chunks_768',
+                  som_cluster: payload.som_cluster ?? payload.somCluster ?? null,
+                  som_bmu_row: payload.som_bmu_row ?? null,
+                  som_bmu_col: payload.som_bmu_col ?? null,
+                  centroid_id: payload.centroid_id ?? null,
+                  cluster_id: payload.cluster_id ?? payload.clusterId ?? null,
+                  community_id: payload.community_id ?? payload.communityId ?? null,
+                },
+              };
+            });
+          }
+          return [];
+        }
+      }
+    }
+
+    const collectionResults = await Promise.allSettled(
+      collections.map((collection) => searchCodebaseAnn(embedding, denseLimit, undefined, collection))
+    );
+
+    const mergedResults = new Map<string, { id: string; score: number; text?: string; metadata?: Record<string, unknown> }>();
+    for (let i = 0; i < collectionResults.length; i++) {
+      const collection = collections[i]!;
+      const settled = collectionResults[i]!;
+      if (settled.status !== 'fulfilled') continue;
+      for (const r of settled.value) {
+        const id = String(r.qdrant_id ?? r.stable_key ?? r.file_path ?? '');
+        if (!id) continue;
+        const current = mergedResults.get(id);
+        const next = {
+          id,
+          score: r.semantic_score,
+          text: String(r.content ?? ''),
+          metadata: {
+            packet_key: String(r.stable_key ?? r.qdrant_id ?? '').trim() || null,
+            source_ref: String(r.file_path ?? '').trim() || null,
+            feature_id: null,
+            file_path: String(r.file_path ?? '').trim() || null,
+            qdrant_point_id: String(r.qdrant_id ?? ''),
+            qdrant_collection: collection,
+            som_cluster: r.som_cluster ?? null,
+            som_bmu_row: r.som_bmu_row ?? null,
+            som_bmu_col: r.som_bmu_col ?? null,
+            centroid_id: r.centroid_id ?? null,
+            cluster_id: null,
+            community_id: null,
+          },
+        };
+        if (!current || next.score > current.score) mergedResults.set(id, next);
+      }
+    }
+
+    if (mergedResults.size > 0) {
+      return [...mergedResults.values()];
+    }
+
+    if (!seedRefs.length) return [];
+
+    const cleanedSeeds = [...new Set(seedRefs.map((ref) => String(ref ?? '').trim()).filter(Boolean))];
+    if (!cleanedSeeds.length) return [];
+
+    const res = await fetch(`${process.env.QDRANT_URL ?? 'http://127.0.0.1:6333'}/collections/codebase_chunks_768/points/search`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        vector: buildVectorPayload('codebase_chunks_768', embedding),
+        limit: denseLimit,
+        score_threshold: 0.001,
+        with_payload: true,
+        filter: {
+          should: [
+            { key: 'source_ref', match: { any: cleanedSeeds } },
+            { key: 'sourceRef', match: { any: cleanedSeeds } },
+            { key: 'canonicalSourceRef', match: { any: cleanedSeeds } },
+            { key: 'file_path', match: { any: cleanedSeeds } },
+            { key: 'filePath', match: { any: cleanedSeeds } },
+            { key: 'stable_key', match: { any: cleanedSeeds } },
+            { key: 'packet_key', match: { any: cleanedSeeds } },
+          ],
+        },
+      }),
+      signal: AbortSignal.timeout(5000),
     });
 
-    return response.results.map((r) => {
+    if (!res.ok) return [];
+    const data = await res.json();
+    const seeded = Array.isArray((data as { result?: Array<{ id: string | number; score: number; payload?: Record<string, unknown> }> }).result)
+      ? ((data as { result: Array<{ id: string | number; score: number; payload?: Record<string, unknown> }> }).result ?? [])
+      : [];
+
+    return seeded.map((r) => {
       const payload = (r.payload ?? {}) as Record<string, unknown>;
-      const packetKey = String(payload.packet_key ?? payload.packetKey ?? payload.qdrant_payload_key ?? r.id ?? '').trim();
-      const sourceRef = String(payload.source_ref ?? payload.sourceRef ?? payload.canonicalSourceRef ?? payload.file_path ?? payload.filePath ?? '').trim();
-      const featureId = String(payload.feature_id ?? payload.featureId ?? '').trim();
       return {
         id: String(r.id),
-        score: r.score,
+        score: Number(r.score ?? 0),
         text: String(payload.content ?? payload.summary ?? ''),
         metadata: {
-          packet_key: packetKey || null,
-          source_ref: sourceRef || null,
-          feature_id: featureId || null,
+          packet_key: String(payload.packet_key ?? payload.packetKey ?? r.id ?? '').trim() || null,
+          source_ref: String(payload.source_ref ?? payload.sourceRef ?? payload.canonicalSourceRef ?? payload.file_path ?? payload.filePath ?? '').trim() || null,
+          feature_id: payload.feature_id ?? payload.featureId ?? null,
           file_path: String(payload.file_path ?? payload.filePath ?? null) || null,
           qdrant_point_id: String(r.id),
           qdrant_collection: 'codebase_chunks_768',
           som_cluster: payload.som_cluster ?? payload.somCluster ?? null,
+          som_bmu_row: payload.som_bmu_row ?? null,
+          som_bmu_col: payload.som_bmu_col ?? null,
+          centroid_id: payload.centroid_id ?? null,
           cluster_id: payload.cluster_id ?? payload.clusterId ?? null,
           community_id: payload.community_id ?? payload.communityId ?? null,
         },
@@ -81,6 +215,110 @@ async function queryQdrantVectorSignal(
     });
   } catch (err) {
     console.error('Qdrant search failed:', err);
+    return [];
+  }
+}
+
+function deriveGraphConceptSeeds(query: string, extracted: Array<{ name: string; confidence: number }>): string[] {
+  const extractedNames = extracted
+    .map((concept) => concept.name.trim())
+    .filter(Boolean);
+
+  if (extractedNames.length > 0) {
+    return [...new Set(extractedNames.map((name) => name.toLowerCase()))].slice(0, 10);
+  }
+
+  const rawTerms = query
+    .toLowerCase()
+    .split(/[^a-z0-9_/-]+/g)
+    .map((term) => term.trim())
+    .filter((term) => term.length >= 4);
+
+  const stopWords = new Set([
+    'find',
+    'show',
+    'what',
+    'when',
+    'where',
+    'how',
+    'does',
+    'this',
+    'that',
+    'with',
+    'from',
+    'into',
+    'next',
+    'then',
+    'lane',
+    'open',
+    'done',
+  ]);
+
+  return [...new Set(rawTerms.filter((term) => !stopWords.has(term)))].slice(0, 10);
+}
+
+async function queryNeo4jFileGraphSignal(seedRefs: string[], topK: number): Promise<Array<{
+  id: string;
+  score: number;
+  text?: string;
+  metadata?: Record<string, unknown>;
+}>> {
+  const normalizedSeeds = [...new Set(
+    seedRefs
+      .map((ref) => toStableFileKey(String(ref ?? '').trim()))
+      .filter((ref) => ref.length > 0),
+  )];
+
+  if (!normalizedSeeds.length) return [];
+
+  const expanded = await Promise.all(
+    normalizedSeeds.slice(0, topK).map((seed) => expandNeighbours(seed, 1).catch(() => [])),
+  );
+  const neighborKeys = [...new Set(expanded.flat().map((key) => String(key ?? '').trim()).filter(Boolean))].filter(
+    (key) => !normalizedSeeds.includes(key),
+  );
+
+  if (!neighborKeys.length) return [];
+
+  const authority = await fetchAuthorityScores(neighborKeys).catch(() => ({}));
+
+  return neighborKeys
+    .map((id) => {
+      const pagerank = authority[id]?.pagerank ?? 0;
+      return {
+        id,
+        score: Math.min(1, 0.1 + Math.max(0, pagerank)),
+        text: id.replace(/^file:/, ''),
+        metadata: {
+          graph_seed_mode: 'file_stable_key',
+          pagerank,
+        },
+      };
+    })
+    .sort((a, b) => b.score - a.score || a.id.localeCompare(b.id))
+    .slice(0, topK);
+}
+
+async function loadFallbackGraphSeedRefs(pool: Pool, limit: number): Promise<string[]> {
+  try {
+    const { rows } = await pool.query<{
+      source_ref: string | null;
+      rel_path: string | null;
+    }>(
+      `
+        select source_ref, rel_path
+        from parent_atlas_documents
+        where source_ref is not null
+        order by updated_at desc nulls last, id desc
+        limit $1
+      `,
+      [Math.max(1, Math.min(limit, 10))],
+    );
+
+    return [...new Set(
+      rows.flatMap((row) => [row.source_ref, row.rel_path].map((value) => String(value ?? '').trim())).filter(Boolean),
+    )];
+  } catch {
     return [];
   }
 }
@@ -133,19 +371,59 @@ export async function multiLaneRetrievalWithRRF(
       maxConcepts: 5,
       minConfidence: 0.7,
     }).catch(() => ({ conceptIds: [], extracted: [], durationMs: 0 }));
+    const graphConceptSeeds = deriveGraphConceptSeeds(query, conceptExtractionResult.extracted);
 
-    // Run all retrieval signals in parallel
-    const [bm25Results, conceptResults, qdrantResults, turbovecResults, neoResults] = await Promise.allSettled([
+    // Run lexical + concept signals first so dense lanes can seed from them
+    const [bm25Results, conceptResults] = await Promise.allSettled([
       bm25SearchIndexed(query, topK),
       conceptOverlapSearch(conceptExtractionResult.conceptIds, topK),
-      queryQdrantVectorSignal(query, embedding, topK),
+    ]);
+
+    const seedRefs =
+      bm25Results.status === 'fulfilled'
+        ? bm25Results.value.flatMap((hit) => [hit.file_path, hit.stable_key])
+        : [];
+    const fallbackSeedRefs = seedRefs.length > 0 ? [] : await loadFallbackGraphSeedRefs(pool, topK);
+    const graphSeedRefs = seedRefs.length > 0 ? seedRefs : fallbackSeedRefs;
+    const qdrantSeedRefs = graphSeedRefs;
+
+    // Run dense/graph signals in parallel
+    const [qdrantResults, turbovecResults, neoResults] = await Promise.allSettled([
+      queryQdrantVectorSignal(query, embedding, topK, qdrantSeedRefs),
       embedding ? turbovecSearch(embedding, { topK: topK * 2, timeoutMs: 300 }) : Promise.resolve({ candidates: [], backend: 'offline', durationMs: 0 }),
-      queryNeoJsGraphSignal({ conceptIds: conceptExtractionResult.conceptIds, topK }).then((r) =>
-        r.map((hit) => ({
-          id: hit.id,
-          score: hit.score,
-          text: hit.text,
-        }))
+      Promise.allSettled([
+        conceptExtractionResult.conceptIds.length > 0
+          ? queryNeoJsGraphSignal({ conceptIds: conceptExtractionResult.conceptIds, topK }).then((r) =>
+              r.map((hit) => ({
+                id: hit.id,
+                score: hit.score,
+                text: hit.text,
+                metadata: { graph_seed_mode: 'concept_id' },
+              }))
+            )
+          : Promise.resolve([]),
+        graphConceptSeeds.length > 0
+          ? queryNeoJsGraphSignalByNames(graphConceptSeeds, topK).then((r) =>
+              r.map((hit) => ({
+                id: hit.id,
+                score: hit.score,
+                text: hit.text,
+                metadata: { graph_seed_mode: 'concept_name' },
+              }))
+            )
+          : Promise.resolve([]),
+        graphSeedRefs.length > 0
+          ? queryNeo4jFileGraphSignal(graphSeedRefs, topK).then((r) =>
+              r.map((hit) => ({
+                id: hit.id,
+                score: hit.score,
+                text: hit.text,
+                metadata: { ...(hit.metadata ?? {}), graph_seed_mode: 'file_stable_key' },
+              }))
+            )
+          : Promise.resolve([]),
+      ]).then((results) =>
+        results.flatMap((settled) => (settled.status === 'fulfilled' ? settled.value : []))
       ),
     ]);
 

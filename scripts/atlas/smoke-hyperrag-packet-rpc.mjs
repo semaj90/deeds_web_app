@@ -4,6 +4,7 @@ const VERBOSE = process.argv.includes('--verbose');
 const QUERY = process.argv.find(a => a.startsWith('--query='))?.split('=')[1] ?? 'authentication';
 const LIMIT = parseInt(process.argv.find(a => a.startsWith('--limit='))?.split('=')[1] ?? '5', 10);
 const ENDPOINT = `${BASE}/api/hyperrag/packet-rpc`;
+const REQUEST_TIMEOUT_MS = Number(process.env.SMOKE_TIMEOUT_MS ?? 60_000);
 
 const log = (msg) => console.log(`[✓] ${msg}`);
 const warn = (msg) => console.warn(`[⚠] ${msg}`);
@@ -20,7 +21,7 @@ async function testExactMatchCacheMiss() {
     body: JSON.stringify({
       query, limit: LIMIT, includeGraph: true, useFts: true, recordTelemetry: true, useExactMatchCache: true,
     }),
-    signal: AbortSignal.timeout(30_000),
+    signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
   });
   if (!response.ok) throw new Error(`HTTP ${response.status}`);
   const data = await response.json();
@@ -53,7 +54,7 @@ async function testExactMatchCacheHit(firstQuery) {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ query: firstQuery, limit: LIMIT, useExactMatchCache: true }),
-    signal: AbortSignal.timeout(30_000),
+    signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
   });
   if (!response.ok) throw new Error(`HTTP ${response.status}`);
   const data = await response.json();
@@ -72,7 +73,7 @@ async function testConfidenceScoring() {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ query: QUERY, limit: 10, useFts: true }),
-    signal: AbortSignal.timeout(30_000),
+    signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
   });
   if (!response.ok) throw new Error(`HTTP ${response.status}`);
   const data = await response.json();
@@ -90,7 +91,7 @@ async function testProvenance() {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ query: QUERY, limit: 3 }),
-    signal: AbortSignal.timeout(30_000),
+    signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
   });
   if (!response.ok) throw new Error(`HTTP ${response.status}`);
   const data = await response.json();

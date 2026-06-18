@@ -1,13 +1,12 @@
 /**
  * packet.search tool
  *
- * Bounded packet search over the codebase Qdrant collection.
- * Returns compact packet summaries only.
+ * Bounded packet search over the codebase HyperRAG packet RPC.
+ * Returns compact ACE-ready packet hits only.
  */
 
 import { registerTool, type ToolResult } from '../tool-registry';
-import { embedText } from '$lib/server/embedding/embed';
-import { QdrantManager } from '$lib/server/vector/qdrant-manager';
+import { hyperragPacketRpc } from '$lib/server/retrieval/hyperrag-packet-rpc';
 
 function clampLimit(limit: unknown): number {
   const value = Number(limit ?? 8);
@@ -28,35 +27,43 @@ registerTool('packet.search', async (args): Promise<ToolResult> => {
       };
     }
 
-    const queryEmbedding = await embedText(query);
-    const qdrant = new QdrantManager();
-    const filters = featureId ? { feature_id: featureId } : undefined;
-
-    const searchResult = await qdrant.hybridSearch({
+    const searchResult = await hyperragPacketRpc({
       query,
-      queryEmbedding,
-      collection: 'codebase_chunks',
-      filters,
       limit,
-      scoreThreshold: 0.01,
+      includeGraph: true,
+      useFts: true,
+      recordTelemetry: true,
+      awaitTelemetry: false,
     });
 
-    const packets = (searchResult.results ?? []).map((hit) => {
-      const payload = (hit.payload ?? {}) as Record<string, unknown>;
+    const packets = (searchResult.packets ?? [])
+      .filter((packet) => !featureId || packet.feature_id === featureId)
+      .map((packet) => {
+      const score = Number(packet.fusion_score ?? 0);
       return {
-        packet_id: String(hit.id),
-        score: hit.score,
-        feature_id:
-          (payload.feature_id ?? payload.featureId ?? featureId ?? null) as string | null,
-        source_ref:
-          (payload.source_ref ?? payload.sourceRef ?? payload.file_path ?? payload.path ?? null) as
-            | string
-            | null,
-        file_path: (payload.file_path ?? payload.path ?? null) as string | null,
-        summary:
-          (payload.summary ?? payload.title ?? payload.content ?? payload.text ?? '') as string,
-        cluster_id: (payload.cluster_id ?? payload.clusterId ?? null) as string | number | null,
-        semantic_path: (payload.semantic_path ?? null) as string | null,
+        packet_key: packet.packet_key,
+        packet_type: packet.packet_type,
+        source_ref: packet.source_ref,
+        canonical_source_ref: packet.canonical_source_ref,
+        feature_id: packet.feature_id,
+        feature_label: packet.feature_label,
+        score,
+        reason: [
+          packet.retrieval_lanes.dense > 0 ? 'dense' : null,
+          packet.retrieval_lanes.fts > 0 ? 'fts' : null,
+          packet.retrieval_lanes.trigram > 0 ? 'trigram' : null,
+          packet.retrieval_lanes.jsonb > 0 ? 'jsonb' : null,
+          packet.neo4j_neighbors.length > 0 ? 'neo4j' : null,
+        ].filter(Boolean).join('+') || 'hyperrag-fusion',
+        recommended_action: packet.recommended_action,
+        verification_command: packet.verification_command,
+        retrieval_strategy: searchResult.trace.retrieval_strategy,
+        rank: packet.rank,
+        summary: packet.gemma4_summary,
+        qdrant_tags: packet.qdrant_tags,
+        neo4j_neighbors: packet.neo4j_neighbors,
+        fusion_sources: packet.fusion_sources,
+        retrieval_lanes: packet.retrieval_lanes,
       };
     });
 
@@ -65,10 +72,11 @@ registerTool('packet.search', async (args): Promise<ToolResult> => {
       data: {
         query,
         feature_id: featureId || null,
-        collection: 'codebase_chunks',
+        strategy: searchResult.strategy,
         limit,
         count: packets.length,
         packets,
+        trace: searchResult.trace,
       },
     };
   } catch (err: any) {
@@ -78,4 +86,3 @@ registerTool('packet.search', async (args): Promise<ToolResult> => {
     };
   }
 });
-

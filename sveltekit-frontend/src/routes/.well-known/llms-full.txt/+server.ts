@@ -11,6 +11,7 @@ import { readFile } from 'node:fs/promises';
 import { existsSync } from 'node:fs';
 import path from 'node:path';
 import type { RequestHandler } from './$types';
+import { buildParentAtlasAgentContractLines } from '$lib/server/llms/parent-atlas-agent-contract.js';
 
 const AGENTS_FILE = path.resolve('LLMS.md');
 
@@ -22,6 +23,8 @@ export const GET: RequestHandler = async () => {
   lines.push('> Complete LLMS.md root + GPU cluster summaries + SOM neighbourhood map.');
   lines.push('> For the condensed version see `/.well-known/llms.txt`.');
   lines.push('');
+
+  lines.push(...buildParentAtlasAgentContractLines());
 
   // ── Full LLMS.md ─────────────────────────────────────────────────────────
   let agentsMd: string | null = null;

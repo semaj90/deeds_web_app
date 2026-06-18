@@ -140,23 +140,17 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 
 				// Parse response (it's stored as serialized HyperRagPacketRpcResult)
 				try {
-					// Response content is the cached LLM response, we need to rebuild the packet structure
-					cachedResponse = {
-						query,
-						strategy: 'fusion',
-						packets: [], // Will populate below
-						trace: {
-							qdrant_hits: 0,
-							postgres_hits: 0,
-							neo4j_expansions: 0,
-							duckdb_join_used: false,
-							latency_ms: Date.now() - startTime,
-							collection_split: {
-								runtime_legal: 'legal_documents',
-								codebase_topology: 'codebase_chunks_768',
+					const parsed = JSON.parse((cached as { content?: string }).content ?? '{}') as HyperRagPacketRpcResult;
+					if (parsed && Array.isArray(parsed.packets)) {
+						cachedResponse = {
+							...parsed,
+							trace: {
+								...parsed.trace,
+								retrieval_strategy: parsed.trace?.retrieval_strategy ?? 'fusion',
+								latency_ms: Date.now() - startTime,
 							},
-						},
-					};
+						};
+					}
 				} catch (err) {
 					console.warn('[hyperrag-packet-rpc] Cache parse failed, falling back to live retrieval');
 					cachedResponse = null;
@@ -228,8 +222,10 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 			packets: result.packets,
 			provenance: provenances,
 			trace: {
+				retrieval_strategy: result.trace.retrieval_strategy ?? 'fusion',
 				qdrant_hits: result.trace.qdrant_hits,
 				postgres_hits: result.trace.postgres_hits,
+				rrf_hits: result.trace.rrf_hits,
 				neo4j_expansions: result.trace.neo4j_expansions,
 				cache_hits: cacheHits,
 				latency_ms: latencyMs,

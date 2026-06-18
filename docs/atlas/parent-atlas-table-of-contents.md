@@ -130,6 +130,7 @@ The next derived surfaces are compare-only until the live contract exists:
 - offline synthesis
 - Graphify startup review and cache-hit validation
 - GPU parser lanes: libtorch, TensorRT bridge node, Rust n-api parser
+- Neo4j GDS / GPU acceleration: stabilize topology before any further `libtorch`, `TensorRT`, or SOM retraining expansion.
 - TurboVec / LangExtract enrichment lanes
 - stale document grouping by `feature_label`, `function_id`, `method`, and `variable`
 - kanban task spec board consolidation from grouped stale-document hits
@@ -148,6 +149,8 @@ The next derived surfaces are compare-only until the live contract exists:
 
 ### Remaining todo focus
 - reconcile the live tree / summary / topology schema before any fresh backfill or plugin promotion
+- run the Neo4j / GDS pass before SOM 20x20 / centroid mirror work
+- stage packet reader / writer work in `scripts/atlas` and `.tmp`, then consolidate into `packages/parent-atlas`
 - finish provenance parity and quality review
 - finish provenance UI and trust-tier editing
 - finish feature registry reconciliation and command mapping

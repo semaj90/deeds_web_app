@@ -15,6 +15,8 @@ Workspace roots:
 - `workspaceRoot`: `C:\Users\james\Videos\deeds-web-app`
 - `projectRoot`: `C:\Users\james\Videos\deeds-web-app\sveltekit-frontend`
 - template: `C:\Users\james\Videos\deeds-web-app\configs\templates\gemma4-opencode.jinja` (exists)
+- staging surfaces: `scripts/atlas` and gitignored `.tmp` NDJSON/JSONL datasets
+- production destination: `packages/atlas`
 
 Current live spine:
 
@@ -24,8 +26,17 @@ Current live spine:
 - `packet_key` is immutable identity; `feature_id` may be enriched; `metadata` may grow.
 - compare-only future surfaces: `atlas_tree_nodes`, `atlas_topology_index`, `atlas_svg_glyphs`.
 - higher-hop schema repair is now applied to `atlas_feature_packets`: `file_path` is backfilled on 277 rows, `som_cluster` is backfilled on 7 rows, and `tree_node_id` is present as a nullable forward link with no safe live join path yet.
-- `packages/parent-atlas` now exists as a real scaffold with `src/index.ts`, `src/cli.ts`, gates, adapters, and pipeline ports; consolidation is now a wiring/refinement task, not a fresh package creation task.
+- `packages/parent-atlas` now exists as a real scaffold with `src/index.ts`, `src/cli.ts`, gates, adapters, and pipeline ports; consolidation is now a wiring/refinement task, and the production destination remains `packages/atlas`.
 - The next blocker before the next backfill is live schema reconciliation: tree nodes, summary layers, and topology indexes still lag the package gate contract.
+- Phase 16-H identity spine is closed.
+- Higher-hop ledger validation is structurally PASS and enrichment WARN.
+- Redis/Bifrost mirrors are optional runtime cache, not a backfill blocker.
+- Neo4j / GDS topology pass is the next live graph lane.
+- ACE context-pack smoke is green after Valkey auth handling was fixed; cache hit is verified in the smoke path, not the canonical identity lane.
+- ACE planner cache-hit validation is now green via `npm run ace:context-planner:smoke`; the proof run writes and rereads the same stable planner state, with `beforeHit: false` and `afterHit: true`, and the second read comes back from Redis. Proof artifact: `docs/reports/ace_cache_hit_2026-06-18T00-47-18-309Z.json`.
+- SOM / AE 20x20 work remains a follow-on lane after the graph pass, not a blocker to current retrieval work.
+- The next move after the graph pass is to finish the packet reader/writer, RRF/Neo4j/HyperRAG wiring, Qdrant tag mirroring, and then consolidate the implementation into `packages/atlas`.
+- The served `/.well-known/llms.txt` and `/.well-known/llms-full.txt` contract now share a single Parent Atlas agent contract helper, and the packet RPC now emits ACE-ready packet metadata (`packet_type`, `canonical_source_ref`, `recommended_action`, `verification_command`) in addition to the identity spine.
 
 ## Consolidated Action Plan And Roadmap
 
@@ -56,10 +67,14 @@ Approx completion: ~75%
 
 Approx completion: ~65%
 
-- HyperRAG Packet RPC / Qdrant tagging: Qdrant payload enrichment complete (Layer C done); hierarchy-aware retrieval contract documented
+- HyperRAG Packet RPC / Qdrant tagging: packet contract helper is wired, ACE-ready packet metadata now emits `packet_type`, `canonical_source_ref`, `recommended_action`, and `verification_command`; remaining gap is telemetry depth / E2E benchmark gating rather than core fusion wiring
 - 5-stage ANN cascade operational: BM25 + Qdrant ANN + TurboVec + Neo4j expansion + RRF fusion
 - XGBoost reranker (Stage 4): all 7 training gates now pass; training unblocked
 - higher-hop enrichment and supernode backfill: open
+- packet reader / writer: implementation lane for replayable NDJSON/JSONL packet flow
+- SOM 20x20 / auto-clustering: follows the packet reader/writer and graph pass before board consolidation
+- Qdrant embedding tags + pgvector mirror: follow the SOM pass, then refresh the kanban task board
+- packages/atlas consolidation: production directory target after the staging lanes are complete
 
 ### Stage 4 - Agent Memory & Scoring Pipeline
 
@@ -86,25 +101,31 @@ Current live spine: every packet has `packet_key`, `source_ref`, `feature_id`, `
 The next work moves into:
 
 1. Live schema reconciliation for tree nodes, summary layers, and topology indexes
-2. Parent Atlas package wiring / wrapper cleanup / OpenCode integration
-3. XGBoost supervised reranker — train + smoke (`npm run atlas:xgboost:train` then `atlas:xgboost:serve`)
-4. Proto/RPC tool registry packetization
-5. Reward prior backfill (reward_prior column on packets without traces)
-6. PyTorch policy sidecar scaffold (Stage 5, after XGBoost is proven)
-7. Graph refresh invalidation binding
-8. semantic index mirroring
-9. cold-storage restore verification
-10. evaluation harnesses and agent-learning gates
-11. high-ROI parser / embedding lanes
-12. agentic startup briefing for read-only planning bootstraps
-13. merged packet-lane implementation on the stable packet identity spine
+2. Neo4j / GDS topology pass on the aligned bridge spine
+3. packet reader / writer lane for replayable NDJSON/JSONL datasets
+4. RRF / Neo4j / HyperRAG wiring and packet ranking stabilization
+5. SOM 20x20 / auto-clustering pass
+6. Qdrant embedding tags + pgvector mirror refresh
+7. Parent Atlas kanban task board refresh from validated evidence
+8. packages/atlas consolidation after the staging lanes are complete
+9. XGBoost supervised reranker — train + smoke (`npm run atlas:xgboost:train` then `atlas:xgboost:serve`)
+10. Proto/RPC tool registry packetization
+11. Reward prior backfill (reward_prior column on packets without traces)
+12. PyTorch policy sidecar scaffold (Stage 5, after XGBoost is proven)
+13. Graph refresh invalidation binding
+14. semantic index mirroring
+15. cold-storage restore verification
+16. evaluation harnesses and agent-learning gates
+17. high-ROI parser / embedding lanes
+18. agentic startup briefing for read-only planning bootstraps
+19. merged packet-lane implementation on the stable packet identity spine
 
 ### Active GPU / Parser Lanes
 
 These are acceleration and hygiene lanes, not the current blocker.
 
 - Graphify structural discovery: keep `atlas:startup` and `graphify:feature-labels` / `graphify:domain-topology` as the read-only startup signals for cache-hit quality. Graphify is the topology scanner; Parent Atlas remains the canonical join spine.
-- Neo4j GDS / GPU acceleration: run the graph topology pass before any further `libtorch` or `TensorRT` expansion so the ranking spine has a stable graph substrate.
+- Neo4j GDS / GPU acceleration: run the graph topology pass before any further `libtorch`, `TensorRT`, or SOM retraining so the ranking spine has a stable graph substrate.
 - GPU bridge review: `libtorch`, `TensorRT` bridge node, and Rust `n-api` parser remain acceleration lanes behind the stable packet identity spine.
 - TurboVec / LangExtract: treat as downstream enrichment and ranking aids, not as the source of truth for stale-document grouping.
 - Stale document compaction: group by `feature_label`, `function_id`, `method`, and `variable` before assigning kanban tasks.
@@ -343,7 +364,7 @@ Read-only coverage measurement now lives in `docs/reports/runtime-coverage-audit
 - selected_concepts coverage: 100%
 - USED_CONCEPT / Neo4j projection coverage: 0%
 
-The highest-leverage next lane is the Neo4j / GDS pass over the already aligned bridge spine, because trace population is complete, SOM coverage is complete, and the remaining work is graph-ranking topology rather than identity repair. Redis is optional and no longer the blocker. The join repair lane now only needs the remaining code-file subset; 262 rows are backfill-ready and parent-doc coverage is no longer the blocker; the packet community lane is closed.
+The highest-leverage next lane is the Neo4j / GDS pass over the already aligned bridge spine, because trace population is complete and the remaining work is graph-ranking topology rather than identity repair. SOM coverage is still a follow-on lane, not a blocker to GDS. Redis is optional and no longer the blocker. The join repair lane now only needs the remaining code-file subset; 262 rows are backfill-ready and parent-doc coverage is no longer the blocker; the packet community lane is closed.
 
 ## Active Data-Maturity Lane - 3F Trace Population
 

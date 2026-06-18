@@ -5,6 +5,7 @@ import type { FTSResult } from '$lib/server/search/postgres-fts.js';
 import { expandNeighbours } from '$lib/server/search/neo4j-rerank.js';
 import { recordRetrievalTelemetry } from '../telemetry/retrieval-recorder.js';
 import { multiLaneRetrievalWithRRF } from './rrf-integration.js';
+import { toStableFileKey } from './subgraph-seed-neighborhood.js';
 
 export type HyperRagPacketRpcInput = {
   query: string;
@@ -17,7 +18,9 @@ export type HyperRagPacketRpcInput = {
 
 export type HyperRagPacketRpcPacket = {
   packet_key: string;
+  packet_type: 'chrom97' | 'neschrom97';
   source_ref: string;
+  canonical_source_ref: string;
   feature_id: string | null;
   feature_label: string | null;
   directory_path: string | null;
@@ -32,6 +35,8 @@ export type HyperRagPacketRpcPacket = {
   fusion_score: number;
   fusion_sources: string[];
   gemma4_summary: string | null;
+  recommended_action: string | null;
+  verification_command: string | null;
   rank: number;
 };
 
@@ -40,6 +45,7 @@ export type HyperRagPacketRpcResult = {
   strategy: 'fusion';
   packets: HyperRagPacketRpcPacket[];
   trace: {
+    retrieval_strategy: 'fusion' | 'fts-only';
     qdrant_hits: number;
     postgres_hits: number;
     rrf_hits: number;
@@ -101,6 +107,108 @@ function splitTags(value: unknown): string[] {
 
 function sourceRefCandidates(hit: FTSResult): string[] {
   return [...new Set([hit.file_path, hit.stable_key].map(cleanText).filter(Boolean))];
+}
+
+function metaString(value: unknown): string {
+  return cleanText(value);
+}
+
+function packetSeedCandidatesFromRrf(
+  results: Array<{
+    id: string;
+    combinedScore: number;
+    sources: string[];
+    text?: string;
+    metadata?: Record<string, unknown>;
+    breakdown?: Array<{ laneName: string; laneScore: number; metadata?: Record<string, unknown> }>;
+  }>
+): Array<{
+  stable_key: string;
+  file_path: string | null;
+  source_refs: string[];
+  lexical_score: number;
+  dense_score: number;
+  packet_key: string | null;
+  headline: string | null;
+  tags: string | null;
+  content: string | null;
+  kind: 'rrf';
+}> {
+  return results.map((row) => {
+    const metadata = (row.metadata ?? {}) as Record<string, unknown>;
+    const breakdownMetas = (row.breakdown ?? []).map((b) => b.metadata ?? {}).filter((m): m is Record<string, unknown> => Boolean(m));
+    const refs = new Set<string>();
+    for (const rawValue of [
+      row.id,
+      metadata.packet_key,
+      metadata.packetKey,
+      metadata.source_ref,
+      metadata.sourceRef,
+      metadata.canonicalSourceRef,
+      metadata.file_path,
+      metadata.filePath,
+      metadata.path,
+      metadata.qdrant_point_id,
+      ...breakdownMetas.flatMap((m) => [
+        m.packet_key,
+        m.packetKey,
+        m.source_ref,
+        m.sourceRef,
+        m.canonicalSourceRef,
+        m.file_path,
+        m.filePath,
+        m.path,
+        m.qdrant_point_id,
+      ]),
+    ]) {
+      const normalized = cleanText(rawValue);
+      if (normalized) refs.add(normalized);
+    }
+
+    const denseScore =
+      row.breakdown?.find((score) => score.laneName === 'qdrant_vector' || score.laneName === 'turbovec_ann')?.laneScore ??
+      0;
+    const packetKey = metaString(metadata.packet_key ?? metadata.packetKey ?? row.id) || null;
+    const filePath = metaString(metadata.file_path ?? metadata.filePath ?? metadata.path) || null;
+    return {
+      stable_key: metaString(row.id),
+      file_path: filePath,
+      source_refs: [...refs],
+      lexical_score: 0,
+      dense_score: Number(denseScore ?? row.combinedScore ?? 0),
+      packet_key: packetKey,
+      headline: metaString(row.text ?? metadata.summary ?? metadata.content) || null,
+      tags: metaString(metadata.tags) || null,
+      content: metaString(row.text ?? metadata.summary ?? metadata.content) || null,
+      kind: 'rrf' as const,
+    };
+  });
+}
+
+function packetSeedCandidatesFromFts(hits: FTSResult[]): Array<{
+  stable_key: string;
+  file_path: string | null;
+  source_refs: string[];
+  lexical_score: number;
+  dense_score: number;
+  packet_key: string | null;
+  headline: string | null;
+  tags: string | null;
+  content: string | null;
+  kind: 'fts';
+}> {
+  return hits.map((hit) => ({
+    stable_key: cleanText(hit.stable_key),
+    file_path: cleanText(hit.file_path) || null,
+    source_refs: sourceRefCandidates(hit),
+    lexical_score: Number(hit.lexical_score ?? 0),
+    dense_score: 0,
+    packet_key: cleanText(hit.stable_key) || null,
+    headline: cleanText(hit.headline) || null,
+    tags: cleanText(hit.tags) || null,
+    content: cleanText(hit.content) || null,
+    kind: 'fts' as const,
+  }));
 }
 
 function directoryPath(sourceRef: string): string | null {
@@ -275,7 +383,23 @@ export async function hyperragPacketRpc(input: HyperRagPacketRpcInput): Promise<
     ftsHits = await fallbackParentAtlas(query, limit);
   }
 
-  const candidateRefs = [...new Set(ftsHits.flatMap(sourceRefCandidates))];
+  const rrfSeeds = rrfResult?.results?.length ? packetSeedCandidatesFromRrf(rrfResult.results) : [];
+  const ftsSeeds = packetSeedCandidatesFromFts(ftsHits);
+  const allSeeds = [...ftsSeeds, ...rrfSeeds];
+  const dedupedSeeds = Array.from(
+    new Map(
+      allSeeds.map((seed) => {
+        const key =
+          seed.packet_key ||
+          seed.source_refs[0] ||
+          seed.file_path ||
+          seed.stable_key;
+        return [key.toLowerCase(), seed] as const;
+      })
+    ).values()
+  );
+
+  const candidateRefs = [...new Set(dedupedSeeds.flatMap((seed) => seed.source_refs))];
   const [parentAtlas, nesPackets] = await Promise.all([
     loadParentAtlas(candidateRefs),
     loadNesPackets(candidateRefs),
@@ -304,42 +428,66 @@ export async function hyperragPacketRpc(input: HyperRagPacketRpcInput): Promise<
     }
   }
   const packets: HyperRagPacketRpcPacket[] = [];
+  const seedsToEmit = dedupedSeeds.slice(0, limit);
+  const neighborsBySeed = includeGraph
+    ? await Promise.all(
+        seedsToEmit.map((seed) =>
+          expandNeighbours(
+            toStableFileKey(seed.source_refs[0] ?? seed.file_path ?? seed.stable_key),
+            1,
+          ).catch(() => [])
+        )
+      )
+    : seedsToEmit.map(() => []);
 
-  for (const [index, hit] of ftsHits.slice(0, limit).entries()) {
-    const candidates = sourceRefCandidates(hit);
-    const sourceRef = candidates.find((candidate) => parentAtlas.has(candidate) || nesPackets.has(candidate)) ?? candidates[0] ?? hit.stable_key;
+  for (const [index, seed] of seedsToEmit.entries()) {
+    const candidates = seed.source_refs.length ? seed.source_refs : [seed.file_path ?? seed.stable_key];
+    const sourceRef =
+      candidates.find((candidate) => parentAtlas.has(candidate) || nesPackets.has(candidate)) ??
+      candidates[0] ??
+      seed.stable_key;
     const atlasRow = parentAtlas.get(sourceRef) ?? candidates.map((candidate) => parentAtlas.get(candidate)).find(Boolean);
     const nesRow = nesPackets.get(sourceRef) ?? candidates.map((candidate) => nesPackets.get(candidate)).find(Boolean);
     const featureId = nesRow?.feature_id ?? atlasRow?.feature_id ?? null;
-    const packetKey = nesRow?.packet_key ?? `hyperrag:${sourceRef || hit.stable_key}`;
-    const neighbors = includeGraph ? await expandNeighbours(hit.stable_key, 1).catch(() => []) : [];
+    const packetKey = nesRow?.packet_key ?? `hyperrag:${sourceRef || seed.stable_key}`;
+    const canonicalSourceRef = atlasRow?.source_ref ?? nesRow?.source_ref ?? sourceRef;
+    const packetType: HyperRagPacketRpcPacket['packet_type'] = nesRow ? 'neschrom97' : 'chrom97';
+    const neighbors = neighborsBySeed[index] ?? [];
     neo4jExpansions += neighbors.length;
     const fusionHit =
       fusionLookup.get(packetKey) ??
       fusionLookup.get(sourceRef) ??
-      fusionLookup.get(hit.stable_key) ??
-      fusionLookup.get(hit.file_path) ??
-      fusionLookup.get(hit.stable_key.toLowerCase()) ??
-      fusionLookup.get(hit.file_path.toLowerCase());
+      fusionLookup.get(seed.stable_key) ??
+      (seed.file_path ? fusionLookup.get(seed.file_path) : undefined) ??
+      fusionLookup.get(seed.stable_key.toLowerCase()) ??
+      (seed.file_path ? fusionLookup.get(seed.file_path.toLowerCase()) : undefined);
     const fusionScore = fusionHit?.score ?? 0;
+    const recommendedAction =
+      fusionScore >= 0.85
+        ? 'Use this packet as primary evidence and patch the source file only if the cited line is stale.'
+        : 'Use this packet as evidence, then verify the nearest source_ref and graph neighbors.';
 
     packets.push({
       packet_key: packetKey,
+      packet_type: packetType,
       source_ref: sourceRef,
+      canonical_source_ref: canonicalSourceRef,
       feature_id: featureId,
       feature_label: featureLabelFrom(nesRow ?? atlasRow, featureId),
       directory_path: directoryPath(atlasRow?.rel_path ?? sourceRef),
-      qdrant_tags: splitTags(hit.tags).concat(splitTags(atlasRow?.tags)).filter((tag, tagIndex, all) => all.indexOf(tag) === tagIndex),
+      qdrant_tags: splitTags(seed.tags).concat(splitTags(atlasRow?.tags)).filter((tag, tagIndex, all) => all.indexOf(tag) === tagIndex),
       neo4j_neighbors: neighbors,
       retrieval_lanes: {
-        dense: Number(hit.graph_authority_score ?? 0),
-        fts: Number(hit.lexical_score ?? 0),
+        dense: Number(seed.dense_score || fusionHit?.score || 0),
+        fts: Number(seed.lexical_score ?? 0),
         trigram: 0,
         jsonb: atlasRow || nesRow ? 1 : 0,
       },
       fusion_score: fusionScore,
       fusion_sources: fusionHit?.sources ?? [],
-      gemma4_summary: nesRow?.summary ?? atlasRow?.summary_lod0 ?? atlasRow?.summary_lod1 ?? atlasRow?.summary ?? hit.headline ?? null,
+      gemma4_summary: nesRow?.summary ?? atlasRow?.summary_lod0 ?? atlasRow?.summary_lod1 ?? atlasRow?.summary ?? seed.headline ?? null,
+      recommended_action: recommendedAction,
+      verification_command: 'npm run smoke:hyperrag-packet-rpc',
       rank: index + 1,
     });
   }
@@ -364,6 +512,7 @@ export async function hyperragPacketRpc(input: HyperRagPacketRpcInput): Promise<
     strategy: 'fusion',
     packets,
     trace: {
+      retrieval_strategy: rrfResult?.results?.length ? 'fusion' : 'fts-only',
       qdrant_hits: packets.filter((packet) => packet.qdrant_tags.length > 0).length,
       postgres_hits: ftsHits.length,
       rrf_hits: rrfResult?.results?.length ?? 0,

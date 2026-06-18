@@ -1,51 +1,47 @@
 # Repo Dirty Tree Classification
 
-Generated: 2026-06-02T02:28:29.413Z
+Generated: 2026-06-17T16:13:46.258Z
 Repo: C:\Users\james\Videos\deeds-web-app
 
 ## Summary
-- Total dirty entries: 774
-- Intentional generated artifacts: 630
-- Source changes: 143
+- Total dirty entries: 18
+- Intentional generated artifacts: 11
+- Source changes: 5
 - Untracked large blobs: 0
-- Submodule dirtiness: 1
+- Submodule dirtiness: 2
 
 ## Buckets
 ### intentionalGeneratedArtifacts
-- Count: 630
+- Count: 11
 - Sample paths:
-  - `opencode/ace-packet-summary.md` (M ) - derived/generated surface
-  - `.opencode/ace-packet.json` ( M, 0 GB) - derived/generated surface
-  - `.opencode/recommendations/recommendations.json` ( M, 0 GB) - derived/generated surface
-  - `.opencode/recommendations/recommendations.md` ( M, 0 GB) - derived/generated surface
-  - `.opencode/recommendations/tasks.md` ( M, 0 GB) - derived/generated surface
-  - `.opencode/recommendations/tasks.ndjson` ( M, 0 GB) - derived/generated surface
-  - `docs/6_1_26` ( M, 0 GB) - defaulted to generated/mirror surface
-  - `docs/reports/contract-error-map-report.json` ( M, 0 GB) - derived/generated surface
-  - `docs/reports/contract-error-map-report.md` ( M, 0 GB) - derived/generated surface
-  - `docs/reports/drizzle-postgres-contract-report.json` ( M, 0 GB) - derived/generated surface
+  - `claude/worktrees/agent-a38668f2` (M ) - defaulted to generated/mirror surface
+  - `.claude/worktrees/agent-a6ea9982` ( M, 0 GB) - defaulted to generated/mirror surface
+  - `.claude/worktrees/agent-a7203461` ( M, 0 GB) - defaulted to generated/mirror surface
+  - `.claude/worktrees/agent-ae7221f6` ( M, 0 GB) - defaulted to generated/mirror surface
+  - `docs/reports/parent-atlas-production-readiness-report.json` ( M, 0 GB) - derived/generated surface
+  - `docs/reports/parent-atlas-production-readiness-report.md` ( M, 0 GB) - derived/generated surface
+  - `granite-docling-258M` ( M, 0 GB) - defaulted to generated/mirror surface
+  - `models/embeddinggemma_300m` ( M, 0 GB) - defaulted to generated/mirror surface
+  - `simd-bridge/cpp/binding.cc` ( M, 0 GB) - defaulted to generated/mirror surface
+  - `simd-bridge/cpp/build-x64-cuda/CMakeFiles/CMakeConfigureLog.yaml` ( M, 0 GB) - defaulted to generated/mirror surface
 
 ### sourceChanges
-- Count: 143
+- Count: 5
 - Sample paths:
-  - `.vscode/tasks.json` ( M, 0 GB) - source or active-note surface
-  - `IMPLEMENTATION_STATUS.md` ( M, 0 GB) - source or active-note surface
-  - `MASTER-FEATURE-TODO-2026-05-20.md` ( M, 0 GB) - source or active-note surface
-  - `docs/CODEBASE-FEATURE-MAPPING-2026-05-29.md` ( M, 0 GB) - source or active-note surface
-  - `docs/architecture/kanban-parent-atlas-alignment.md` ( M, 0 GB) - active completion note
-  - `docs/architecture/offline-synthesis-parent-atlas.md` ( M, 0 GB) - source or active-note surface
-  - `docs/graph/contract-error-map.json` ( M, 0 GB) - source or active-note surface
-  - `docs/graph/kanban-board.json` ( M, 0 GB) - source or active-note surface
-  - `opencode.json` ( M, 0 GB) - source or active-note surface
-  - `package.json` ( M, 0 GB) - source or active-note surface
+  - `AGENTS.md` ( M, 0 GB) - source or active-note surface
+  - `scripts/phase66_automated_error_fixer.py` ( M, 0 GB) - source or active-note surface
+  - `scripts/atlas/parent-atlas-doc-indexing.mjs` (??, 0 GB) - source or active-note surface
+  - `scripts/atlas/turbovec-gpu-consolidate.mjs` (??, 0 GB) - source or active-note surface
+  - `src/lib/server/retrieval/cli.ts` (??, 0 GB) - source or active-note surface
 
 ### untrackedLargeBlobs
 - Count: 0
 - Sample paths:
 
 ### submoduleDirtiness
-- Count: 1
+- Count: 2
 - Sample paths:
+  - `claude-mem` ( M, 0 GB) - gitlink modified in working tree
   - `turbovec` ( M, 0 GB) - gitlink modified in working tree
 
 ## Notes

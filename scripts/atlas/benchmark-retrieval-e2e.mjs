@@ -103,6 +103,12 @@ function renderMarkdown(report) {
     `- GPU rerank: ${report.services.gpu.ok ? 'READY' : 'DEGRADED'}`,
     `- TurboQuant/Gemma4 answer: ${report.services.answer.ok ? 'READY' : 'DEGRADED'}`,
     '',
+    '## Retrieval Strategy',
+    '',
+    `- fusion: ${report.summary.retrieval_strategy_counts?.fusion ?? 0}`,
+    `- fallback: ${report.summary.retrieval_strategy_counts?.fallback ?? 0}`,
+    `- failed: ${report.summary.retrieval_strategy_counts?.failed ?? 0}`,
+    '',
     '## Latency',
     '',
     '| Metric | p50 ms | p95 ms |',
@@ -117,13 +123,13 @@ function renderMarkdown(report) {
     '',
     '## Per Query',
     '',
-    '| Query | Qdrant hits | Ledger | Tree | Glyph | Neo4j | Rerank | Answer chars | Total ms | Status |',
-    '|---|---:|---:|---:|---:|---:|---:|---:|---:|---|',
+    '| Query | Strategy | Qdrant hits | Ledger | Tree | Glyph | Neo4j | Rerank | Answer chars | Total ms | Status |',
+    '|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---|',
   ];
 
   for (const row of report.queries) {
     lines.push(
-      `| ${escapeMd(row.query)} | ${row.qdrant_hits} | ${row.ledger_matches} | ${row.tree_matches} | ${row.glyph_matches} | ${row.neo4j_matches} | ${row.rerank_count} | ${row.answer_length} | ${row.total_ms} | ${row.status} |`
+      `| ${escapeMd(row.query)} | ${escapeMd(row.retrieval_strategy ?? 'unknown')} | ${row.qdrant_hits} | ${row.ledger_matches} | ${row.tree_matches} | ${row.glyph_matches} | ${row.neo4j_matches} | ${row.rerank_count} | ${row.answer_length} | ${row.total_ms} | ${row.status} |`
     );
   }
 
@@ -152,6 +158,31 @@ function escapeMd(text) {
 
 function formatNum(value) {
   return Number.isFinite(value) ? String(Math.round(value)) : 'n/a';
+}
+
+function parseLooseJson(stdout) {
+  const text = String(stdout ?? '').trim();
+  if (!text) return null;
+  const lines = text.split(/\r?\n/).map((line) => line.trim()).filter(Boolean);
+  for (let i = lines.length - 1; i >= 0; i--) {
+    const candidate = lines[i];
+    if (candidate.startsWith('{') || candidate.startsWith('[')) {
+      try {
+        return JSON.parse(candidate);
+      } catch {
+        // keep scanning
+      }
+    }
+  }
+  const jsonStart = text.lastIndexOf('{');
+  if (jsonStart >= 0) {
+    try {
+      return JSON.parse(text.slice(jsonStart));
+    } catch {
+      // fall through
+    }
+  }
+  return null;
 }
 
 async function checkQdrant() {
@@ -584,7 +615,10 @@ async function gpuRerankProbe(hits, queryVector) {
   }
 
   try {
-    const parsed = JSON.parse(child.stdout.trim());
+    const parsed = parseLooseJson(child.stdout);
+    if (!parsed) {
+      throw new Error((child.stdout || child.stderr || 'missing JSON output').toString().trim().slice(0, 220));
+    }
     return {
       ok: true,
       latency_ms: now() - start,
@@ -710,6 +744,7 @@ async function runQuery(pool, columns, query) {
   const entry = {
     query,
     query_hash: sha256(query),
+    retrieval_strategy: 'unknown',
     qdrant_ms: 0,
     postgres_lookup_ms: 0,
     neo4j_expand_ms: 0,
@@ -792,6 +827,9 @@ async function runQuery(pool, columns, query) {
   entry.total_ms = now() - qStart;
 
   const coreOk = qdrant.ok && entry.qdrant_hits > 0 && answer.ok;
+  entry.retrieval_strategy = coreOk
+    ? 'fusion'
+    : (qdrant.ok && entry.qdrant_hits > 0 ? 'fallback' : 'failed');
   entry.status = coreOk ? (entry.errors.length === 0 ? 'pass' : 'degraded') : 'failed';
   if (!redis.ok || !neo4j.ok || !gpu.ok) {
     entry.status = entry.status === 'failed' ? 'failed' : 'degraded';
@@ -877,6 +915,11 @@ async function main() {
   const totalLedgerMatches = report.queries.reduce((sum, row) => sum + row.ledger_matches, 0);
 
   const optionalWarnings = report.queries.filter((row) => row.status === 'degraded').length;
+  const strategyCounts = report.queries.reduce((acc, row) => {
+    const key = row.retrieval_strategy || 'unknown';
+    acc[key] = (acc[key] || 0) + 1;
+    return acc;
+  }, {});
 
   report.summary = {
     status: allQdrantHits && allAnswered ? (optionalWarnings > 0 ? 'PASS_WITH_WARNINGS' : 'PASS') : 'FAILED',
@@ -902,6 +945,7 @@ async function main() {
     any_ledger_matches: anyLedgerMatches,
     total_ledger_matches: totalLedgerMatches,
     degraded_queries: optionalWarnings,
+    retrieval_strategy_counts: strategyCounts,
     notes: [
       'Qdrant healthy and TRACE MCP healthy are required gates.',
       'Redis, Neo4j, GPU rerank, and TurboQuant/Gemma4 answer lanes are allowed to degrade.',
@@ -934,6 +978,7 @@ main().catch(async (err) => {
     queries: [],
     services: {},
     summary: { status: 'FAILED', notes: ['benchmark crashed before completion'] },
+    retrieval_strategy_counts: {},
     errors: [err instanceof Error ? err.message : String(err)],
   };
   try {

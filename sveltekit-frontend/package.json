@@ -1,7 +1,7 @@
 {
   "name": "yorha-legal-ai-frontend",
   "version": "1.0.0",
-  "description": "YoRHa-styled legal AI frontend with Gemma3 integration",
+  "description": "YoRHa-styled legal AI frontend with Gemma4 integration",
   "type": "module",
   "engines": {
     "node": ">=22.0.0"
@@ -517,6 +517,7 @@
     "kb:embed:run": "npx tsx scripts/kb/run-embedding-jobs.mjs",
     "kb:embed:run:execute": "npx tsx scripts/kb/run-embedding-jobs.mjs --execute",
     "ace:context-pack:smoke": "node scripts/ace/smoke-context-pack-cache.mjs",
+    "ace:context-planner:smoke": "npx tsx scripts/ace/smoke-context-planner-cache.mjs",
     "memory:agent-observation:smoke": "node scripts/memory/post-agent-observation-smoke.mjs",
     "memory:claude-mem:smoke": "node scripts/memory/smoke-claude-mem-api.mjs",
     "ace:retrieval-top-cache:smoke": "node scripts/ace/smoke-top-retrieval-cache.mjs",
@@ -983,6 +984,7 @@
     "atlas:neschrom97:qdrant-tag-apply:dry": "node ../scripts/atlas/patch-neschrom97-qdrant-tags.mjs",
     "smoke:hyperrag": "node scripts/smoke/smoke-hyperrag.mjs",
     "smoke:hyperrag-packet-rpc": "node ../scripts/atlas/smoke-hyperrag-packet-rpc.mjs",
+    "smoke:agent-packet-search": "node scripts/smoke-agent-packet-search.mjs",
     "smoke:error-agent": "node scripts/smoke/smoke-error-agent.mjs",
     "smoke:upload": "node scripts/smoke/smoke-upload.mjs",
     "smoke:hyperrag:strict": "node scripts/smoke/smoke-hyperrag.mjs --strict",
