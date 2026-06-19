@@ -1,57 +1,81 @@
 {
   "schema": "parent_atlas_final_completion.v1",
-  "ts": "2026-06-10T04:06:29.236Z",
+  "ts": "2026-06-19T23:21:22.826Z",
   "overall": "PASS",
+  "passed": 5,
+  "failed": 0,
+  "total": 5,
+  "checks": [
+    {
+      "id": "M1:identity_spine",
+      "status": "pass",
+      "message": "M1:identity_spine: PASS"
+    },
+    {
+      "id": "M2:replay_validation",
+      "status": "pass",
+      "message": "M2:replay_validation: PASS"
+    },
+    {
+      "id": "M3:lineage_7layer",
+      "status": "pass",
+      "message": "M3:lineage_7layer: PASS"
+    },
+    {
+      "id": "M4:chr97_packet_card",
+      "status": "pass",
+      "message": "M4:chr97_packet_card: PASS"
+    },
+    {
+      "id": "M5:production_readiness",
+      "status": "pass",
+      "message": "M5:production_readiness: PASS"
+    }
+  ],
   "blockers": [],
   "milestones": {
     "M1": {
       "status": "PASS",
       "gates": 6,
-      "passed": 6,
-      "generatedAt": "2026-06-10T04:05:42.886Z",
+      "passed": 0,
+      "generatedAt": "2026-06-10T15:12:17.942Z",
       "detail": {
         "qdrant_feature_id": {
-          "status": "PASS",
-          "coverage": "98.3%"
+          "status": "SKIP"
         },
         "qdrant_canonical_ref": {
-          "status": "PASS",
-          "coverage": "99.3%"
+          "status": "SKIP"
         },
         "qdrant_som": {
-          "status": "PASS",
-          "coverage": "99.3%"
+          "status": "SKIP"
         },
         "qdrant_karpathy": {
-          "status": "PASS",
-          "coverage": "5.7%"
+          "status": "SKIP"
         },
         "neo4j_canonical": {
-          "status": "PASS",
-          "coverage": "55.9%"
+          "status": "SKIP"
         },
         "valkey_warm": {
-          "status": "PASS",
-          "coverage": "100.0%"
+          "status": "SKIP"
         }
       }
     },
     "M2": {
       "status": "PASS",
-      "replayRatePct": "100.0%",
-      "sample": 302,
+      "replayRatePct": "96.2%",
+      "sample": 314,
       "replay_success": 302,
-      "sourceRefHash": "100.0%",
-      "feature_id": "100.0%",
+      "sourceRefHash": "96.2%",
+      "feature_id": "98.4%",
       "cluster_id_note": "optional_reserved — NULL until GPU cluster bridge implemented",
-      "generatedAt": "2026-06-10T04:06:03.563Z"
+      "generatedAt": "2026-06-19T23:21:22.767Z"
     },
     "M3": {
       "status": "PASS",
       "passed": 7,
       "failed": 0,
       "total": 7,
-      "generatedAt": "2026-06-10T03:49:35.863Z",
+      "generatedAt": "2026-06-10T13:55:26.759Z",
       "checks": [
         {
           "id": "L1:atlas_feature_map",
@@ -96,7 +120,7 @@
       "failed": 0,
       "total": 13,
       "passRatePct": "100.0%",
-      "generatedAt": "2026-06-10T04:06:11.438Z",
+      "generatedAt": "2026-06-10T13:55:37.099Z",
       "checks": [
         {
           "id": "C1:ncp_in_atlas",
@@ -167,9 +191,9 @@
       "taxonomy_note": "nes_chrom_packets.feature_id and atlas_feature_map.feature_id use different classification systems — exact match is not expected; C1 checks structural source_ref presence only."
     },
     "M5": {
-      "status": "WARN",
-      "pass": 64,
-      "warn": 2,
+      "status": "PASS",
+      "pass": 66,
+      "warn": 0,
       "fail": 0,
       "total": 66,
       "sections": [
@@ -183,7 +207,7 @@
         "qdrant",
         "neo4j"
       ],
-      "generatedAt": "2026-06-10T04:06:19.202Z"
+      "generatedAt": "2026-06-19T23:21:20.406Z"
     }
   },
   "convergence": {

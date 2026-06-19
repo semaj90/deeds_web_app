@@ -1,0 +1,2219 @@
+{
+  "generatedAt": "2026-06-19T22:36:17.063Z",
+  "dryRun": false,
+  "canonicalBoard": "reports/parent-atlas-open-lanes-todo.md",
+  "derivedTaskBoard": "sveltekit-frontend/.opencode/tasks/task-state.md",
+  "existingTasks": 17,
+  "eventsAppended": 10,
+  "closureEvents": 5,
+  "taskCreateEvents": 5,
+  "appended": [
+    {
+      "event_id": "task_5028e402ecb6",
+      "event_type": "TASK_STATUS_CHANGED",
+      "created_at": "2026-06-19T22:36:17.063Z",
+      "run_id": "temporal-kanban-consolidation-20260619",
+      "task_id": "task_concept_evidence_spine_backfill",
+      "previous_state": "TODO",
+      "new_state": "DONE",
+      "reason": "Concept evidence is live on packet_keys and feature_ids; compatibility evidence_cards no longer block retrieval.",
+      "evidence_refs": [
+        "docs/reports/concept-evidence-spine-backfill-report.json"
+      ]
+    },
+    {
+      "event_id": "task_b1d8266ef1ec",
+      "event_type": "TASK_STATUS_CHANGED",
+      "created_at": "2026-06-19T22:36:17.063Z",
+      "run_id": "temporal-kanban-consolidation-20260619",
+      "task_id": "task_route_runtime_packets_materialization",
+      "previous_state": "TODO",
+      "new_state": "DONE",
+      "reason": "route_runtime_packets materialization and cache-hit coverage are operational.",
+      "evidence_refs": [
+        "docs/reports/runtime-coverage-audit.json"
+      ]
+    },
+    {
+      "event_id": "task_54ed668daefc",
+      "event_type": "TASK_STATUS_CHANGED",
+      "created_at": "2026-06-19T22:36:17.063Z",
+      "run_id": "temporal-kanban-consolidation-20260619",
+      "task_id": "task_feature_parent_join_repair",
+      "previous_state": "TODO",
+      "new_state": "DONE",
+      "reason": "Feature/parent source-ref coverage passed the classified repair gate.",
+      "evidence_refs": [
+        "docs/reports/atlas-feature-parent-join-gap.json"
+      ]
+    },
+    {
+      "event_id": "task_c80b9e7c5165",
+      "event_type": "TASK_STATUS_CHANGED",
+      "created_at": "2026-06-19T22:36:17.063Z",
+      "run_id": "temporal-kanban-consolidation-20260619",
+      "task_id": "task_higher_hop_coverage_repair",
+      "previous_state": "TODO",
+      "new_state": "DONE",
+      "reason": "Higher-hop identity, topology, glyph, Qdrant-lane, and Neo4j bridge validation are complete.",
+      "evidence_refs": [
+        "docs/reports/higher-hop-identity-ledger-validation.json",
+        "docs/reports/glyph-label-coverage-audit.json"
+      ]
+    },
+    {
+      "event_id": "task_5a9a168f2ff3",
+      "event_type": "TASK_STATUS_CHANGED",
+      "created_at": "2026-06-19T22:36:17.063Z",
+      "run_id": "temporal-kanban-consolidation-20260619",
+      "task_id": "task_phase_3d_retrieval_telemetry",
+      "previous_state": "IN_PROGRESS",
+      "new_state": "DONE",
+      "reason": "Replay breadth and timing are READY with one detailed packet-RPC timing row per query.",
+      "evidence_refs": [
+        "docs/reports/replay-telemetry-breadth-audit.json",
+        "docs/reports/hyperrag-timing-coverage-audit.json"
+      ]
+    },
+    {
+      "event_id": "task_1ddf062b0e9a",
+      "event_type": "TASK_CREATED",
+      "created_at": "2026-06-19T22:36:17.063Z",
+      "run_id": "temporal-kanban-consolidation-20260619",
+      "status": "TODO",
+      "parent_task_id": null,
+      "evidence_refs": [
+        "docs/reports/artifact-tiering-report.json",
+        "reports/parent-atlas-open-lanes-todo.md"
+      ],
+      "task_id": "task_artifact_tiering_application",
+      "source_recommendation_key": "artifact-tiering-application",
+      "title": "Apply artifact tier classifications",
+      "description": "Turn artifact-bloat evidence into bounded keep/compress/cold/regenerable/metadata-only decisions without deleting artifacts.",
+      "priority": "HIGH",
+      "command": "npm --prefix sveltekit-frontend run atlas:audit:artifact-bloat",
+      "feature_id": "artifact-storage",
+      "source_refs": [
+        "docs/reports/artifact-tiering-report.json",
+        "reports/parent-atlas-open-lanes-todo.md"
+      ]
+    },
+    {
+      "event_id": "task_8203c48fc44e",
+      "event_type": "TASK_CREATED",
+      "created_at": "2026-06-19T22:36:17.063Z",
+      "run_id": "temporal-kanban-consolidation-20260619",
+      "status": "TODO",
+      "parent_task_id": null,
+      "evidence_refs": [
+        "services/go-retrieval-service",
+        "docs/reports/live-service-env-report.json"
+      ],
+      "task_id": "task_go_retrieval_runtime_recovery",
+      "source_recommendation_key": "go-retrieval-runtime-recovery",
+      "title": "Recover Go Retrieval runtime",
+      "description": "Align the existing Go Retrieval HTTP/gRPC service with the live environment. Do not create a replacement service.",
+      "priority": "HIGH",
+      "command": "node scripts/atlas/audit-live-service-env.mjs",
+      "feature_id": "retrieval",
+      "source_refs": [
+        "services/go-retrieval-service",
+        "docs/reports/live-service-env-report.json"
+      ]
+    },
+    {
+      "event_id": "task_d34f765a8318",
+      "event_type": "TASK_CREATED",
+      "created_at": "2026-06-19T22:36:17.063Z",
+      "run_id": "temporal-kanban-consolidation-20260619",
+      "status": "TODO",
+      "parent_task_id": null,
+      "evidence_refs": [
+        "sveltekit-frontend/scripts/atlas/verify-cold-storage-manifest.mjs"
+      ],
+      "task_id": "task_cold_storage_restore_verification",
+      "source_recommendation_key": "cold-storage-restore-verification",
+      "title": "Verify cold-storage restore proofs",
+      "description": "Validate manifests and sample restores before any artifact move or deletion.",
+      "priority": "MEDIUM",
+      "command": "npm --prefix sveltekit-frontend run atlas:cold:verify:test",
+      "feature_id": "cold-storage",
+      "source_refs": [
+        "sveltekit-frontend/scripts/atlas/verify-cold-storage-manifest.mjs"
+      ]
+    },
+    {
+      "event_id": "task_eeb488b26327",
+      "event_type": "TASK_CREATED",
+      "created_at": "2026-06-19T22:36:17.063Z",
+      "run_id": "temporal-kanban-consolidation-20260619",
+      "status": "TODO",
+      "parent_task_id": null,
+      "evidence_refs": [
+        "packages/parent-atlas/src",
+        "packages/parent-atlas/docs/atlas/phase-lanes.md"
+      ],
+      "task_id": "task_parent_atlas_package_consolidation",
+      "source_recommendation_key": "parent-atlas-package-consolidation",
+      "title": "Finish packages/parent-atlas consolidation",
+      "description": "Move proven gates, adapters, and pipeline entrypoints into the existing package without duplicating operational scripts.",
+      "priority": "MEDIUM",
+      "command": "npm --workspace @deeds/parent-atlas run build",
+      "feature_id": "parent-atlas",
+      "source_refs": [
+        "packages/parent-atlas/src",
+        "packages/parent-atlas/docs/atlas/phase-lanes.md"
+      ]
+    },
+    {
+      "event_id": "task_477fa03a2395",
+      "event_type": "TASK_CREATED",
+      "created_at": "2026-06-19T22:36:17.063Z",
+      "run_id": "temporal-kanban-consolidation-20260619",
+      "status": "TODO",
+      "parent_task_id": null,
+      "evidence_refs": [
+        "packages/parent-atlas/src/gates",
+        "docs/reports/replay-telemetry-breadth-audit.json"
+      ],
+      "task_id": "task_parent_atlas_evaluation_gates",
+      "source_recommendation_key": "parent-atlas-evaluation-gates",
+      "title": "Run Parent Atlas evaluation and learning gates",
+      "description": "Run replay, lineage, and final gates before adapter, PPO, TensorRT, or policy-router expansion.",
+      "priority": "MEDIUM",
+      "command": "npm --workspace @deeds/parent-atlas run gate:final",
+      "feature_id": "evaluation",
+      "source_refs": [
+        "packages/parent-atlas/src/gates",
+        "docs/reports/replay-telemetry-breadth-audit.json"
+      ]
+    }
+  ],
+  "sourceInventoryCount": 288,
+  "classificationCounts": {
+    "REFERENCE": 55,
+    "SUPPORTING": 13,
+    "HISTORICAL": 80,
+    "SUPPORTING_ACTIVE": 138,
+    "CANONICAL": 1,
+    "CANONICAL_DERIVED": 1
+  },
+  "sourceInventory": [
+    {
+      "path": "next_steps/4_9_26_inference_tracks_cpu_fallback.md",
+      "classification": "REFERENCE",
+      "updatedAt": "2026-05-26T20:22:18.342Z",
+      "bytes": 8898,
+      "recommendedAction": "LINK_AS_EVIDENCE_ONLY"
+    },
+    {
+      "path": "next_steps/AST-Audit-2026-04-21-12-12-11.md",
+      "classification": "REFERENCE",
+      "updatedAt": "2026-04-21T19:12:11.132Z",
+      "bytes": 2023,
+      "recommendedAction": "LINK_AS_EVIDENCE_ONLY"
+    },
+    {
+      "path": "next_steps/california_ingestion_pipeline.md",
+      "classification": "REFERENCE",
+      "updatedAt": "2026-05-26T20:22:18.366Z",
+      "bytes": 8858,
+      "recommendedAction": "LINK_AS_EVIDENCE_ONLY"
+    },
+    {
+      "path": "next_steps/hermes-workstation-kanban.md",
+      "classification": "SUPPORTING",
+      "updatedAt": "2026-05-17T06:11:25.830Z",
+      "bytes": 1629,
+      "recommendedAction": "LINK_AS_EVIDENCE_ONLY"
+    },
+    {
+      "path": "next_steps/inference.md",
+      "classification": "REFERENCE",
+      "updatedAt": "2026-05-26T20:22:18.418Z",
+      "bytes": 7913,
+      "recommendedAction": "LINK_AS_EVIDENCE_ONLY"
+    },
+    {
+      "path": "next_steps/langgraph-eval-plan.md",
+      "classification": "SUPPORTING",
+      "updatedAt": "2026-04-06T21:50:01.821Z",
+      "bytes": 4969,
+      "recommendedAction": "LINK_AS_EVIDENCE_ONLY"
+    },
+    {
+      "path": "next_steps/merged-gguf-opencode-validation-checklist.md",
+      "classification": "REFERENCE",
+      "updatedAt": "2026-05-26T20:22:18.419Z",
+      "bytes": 6325,
+      "recommendedAction": "LINK_AS_EVIDENCE_ONLY"
+    },
+    {
+      "path": "next_steps/PHASE_76_ROADMAP.md",
+      "classification": "SUPPORTING",
+      "updatedAt": "2026-05-26T20:22:18.344Z",
+      "bytes": 3733,
+      "recommendedAction": "LINK_AS_EVIDENCE_ONLY"
+    },
+    {
+      "path": "next_steps/production-ready-audit.md",
+      "classification": "REFERENCE",
+      "updatedAt": "2026-05-16T18:44:25.411Z",
+      "bytes": 1937,
+      "recommendedAction": "LINK_AS_EVIDENCE_ONLY"
+    },
+    {
+      "path": "next_steps/production-ready-gitignore-drizzle-audit.md",
+      "classification": "REFERENCE",
+      "updatedAt": "2026-05-16T18:43:26.049Z",
+      "bytes": 15423,
+      "recommendedAction": "LINK_AS_EVIDENCE_ONLY"
+    },
+    {
+      "path": "next_steps/README.md",
+      "classification": "REFERENCE",
+      "updatedAt": "2026-05-26T20:22:18.345Z",
+      "bytes": 252,
+      "recommendedAction": "LINK_AS_EVIDENCE_ONLY"
+    },
+    {
+      "path": "next_steps/semantic-search-pipeline.md",
+      "classification": "REFERENCE",
+      "updatedAt": "2026-03-19T19:18:08.727Z",
+      "bytes": 13688,
+      "recommendedAction": "LINK_AS_EVIDENCE_ONLY"
+    },
+    {
+      "path": "next_steps/turbovecquant.md",
+      "classification": "REFERENCE",
+      "updatedAt": "2026-05-26T20:22:18.423Z",
+      "bytes": 11797,
+      "recommendedAction": "LINK_AS_EVIDENCE_ONLY"
+    },
+    {
+      "path": "next_steps/production/production_wheels.md",
+      "classification": "REFERENCE",
+      "updatedAt": "2026-05-27T14:46:17.613Z",
+      "bytes": 3610,
+      "recommendedAction": "LINK_AS_EVIDENCE_ONLY"
+    },
+    {
+      "path": "next_steps/consolidated_audits/FULL_CONSOLIDATION_REPORT.md",
+      "classification": "REFERENCE",
+      "updatedAt": "2026-04-21T19:13:44.553Z",
+      "bytes": 65479,
+      "recommendedAction": "LINK_AS_EVIDENCE_ONLY"
+    },
+    {
+      "path": "next_steps/completed/2026-03-13_SEMANTIC_CACHE_AND_EXTENSIONS.md",
+      "classification": "HISTORICAL",
+      "updatedAt": "2026-03-14T00:00:53.622Z",
+      "bytes": 4507,
+      "recommendedAction": "KEEP_LINKED_HISTORY"
+    },
+    {
+      "path": "next_steps/completed/2026-03-14_INFRASTRUCTURE_OPTIMIZATION_ROADMAP.md",
+      "classification": "HISTORICAL",
+      "updatedAt": "2026-03-15T00:38:14.554Z",
+      "bytes": 7621,
+      "recommendedAction": "KEEP_LINKED_HISTORY"
+    },
+    {
+      "path": "next_steps/completed/2026-03-15_GPU_UPGRADE_COMPARISON.md",
+      "classification": "HISTORICAL",
+      "updatedAt": "2026-03-15T14:10:01.307Z",
+      "bytes": 9723,
+      "recommendedAction": "KEEP_LINKED_HISTORY"
+    },
+    {
+      "path": "next_steps/completed/2026-04-02_EVIDENCE_UPLOAD_VLM_NOTEBOOKS_TODO.md",
+      "classification": "HISTORICAL",
+      "updatedAt": "2026-04-02T19:55:38.926Z",
+      "bytes": 2187,
+      "recommendedAction": "KEEP_LINKED_HISTORY"
+    },
+    {
+      "path": "next_steps/completed/2026-04-06_gemma4-community-integration-checklist.md",
+      "classification": "HISTORICAL",
+      "updatedAt": "2026-05-26T20:22:18.382Z",
+      "bytes": 11998,
+      "recommendedAction": "KEEP_LINKED_HISTORY"
+    },
+    {
+      "path": "next_steps/completed/2026-04-06_pipeline-audit-and-vlm-roadmap.md",
+      "classification": "HISTORICAL",
+      "updatedAt": "2026-05-26T20:22:18.384Z",
+      "bytes": 14163,
+      "recommendedAction": "KEEP_LINKED_HISTORY"
+    },
+    {
+      "path": "next_steps/completed/2026-04-06_whisper-multilingual-gpu-roadmap.md",
+      "classification": "HISTORICAL",
+      "updatedAt": "2026-04-20T06:55:22.618Z",
+      "bytes": 11838,
+      "recommendedAction": "KEEP_LINKED_HISTORY"
+    },
+    {
+      "path": "next_steps/completed/3D_PROSECUTOR_SIMULATION_ROADMAP.md",
+      "classification": "HISTORICAL",
+      "updatedAt": "2026-03-25T03:28:23.162Z",
+      "bytes": 7317,
+      "recommendedAction": "KEEP_LINKED_HISTORY"
+    },
+    {
+      "path": "next_steps/completed/ALL_ROUTES_DIRECTORY_CONSOLIDATION.md",
+      "classification": "HISTORICAL",
+      "updatedAt": "2026-04-20T06:51:36.038Z",
+      "bytes": 12856,
+      "recommendedAction": "KEEP_LINKED_HISTORY"
+    },
+    {
+      "path": "next_steps/completed/ALL_ROUTES_ENHANCEMENT_PLAN.md",
+      "classification": "HISTORICAL",
+      "updatedAt": "2026-03-04T01:31:22.537Z",
+      "bytes": 11565,
+      "recommendedAction": "KEEP_LINKED_HISTORY"
+    },
+    {
+      "path": "next_steps/completed/ARCHITECTURE_ENHANCEMENT_ROADMAP_2026-04-02.md",
+      "classification": "HISTORICAL",
+      "updatedAt": "2026-05-26T20:22:18.386Z",
+      "bytes": 37012,
+      "recommendedAction": "KEEP_LINKED_HISTORY"
+    },
+    {
+      "path": "next_steps/completed/audio-to-knowledge-pipeline.md",
+      "classification": "HISTORICAL",
+      "updatedAt": "2026-05-26T20:22:18.396Z",
+      "bytes": 38447,
+      "recommendedAction": "KEEP_LINKED_HISTORY"
+    },
+    {
+      "path": "next_steps/completed/CASE_SIMILARITY_IMPLEMENTATION.md",
+      "classification": "HISTORICAL",
+      "updatedAt": "2026-03-01T21:51:33.544Z",
+      "bytes": 11726,
+      "recommendedAction": "KEEP_LINKED_HISTORY"
+    },
+    {
+      "path": "next_steps/completed/CITATION_COLLECTIONS_NEXT_STEPS.md",
+      "classification": "HISTORICAL",
+      "updatedAt": "2026-03-04T02:25:00.568Z",
+      "bytes": 11939,
+      "recommendedAction": "KEEP_LINKED_HISTORY"
+    },
+    {
+      "path": "next_steps/completed/CODEBASE_ANALYSIS_REPORT.md",
+      "classification": "HISTORICAL",
+      "updatedAt": "2026-03-16T19:49:07.079Z",
+      "bytes": 9715,
+      "recommendedAction": "KEEP_LINKED_HISTORY"
+    },
+    {
+      "path": "next_steps/completed/COLAB_MCP_SETUP.md",
+      "classification": "HISTORICAL",
+      "updatedAt": "2026-04-04T17:39:51.977Z",
+      "bytes": 1839,
+      "recommendedAction": "KEEP_LINKED_HISTORY"
+    },
+    {
+      "path": "next_steps/completed/COUCHDB_NEO4J_GPU_READINESS_AUDIT_2026-03-31.md",
+      "classification": "HISTORICAL",
+      "updatedAt": "2026-04-19T04:03:42.281Z",
+      "bytes": 14923,
+      "recommendedAction": "KEEP_LINKED_HISTORY"
+    },
+    {
+      "path": "next_steps/completed/DEEDS_LABS_ARCHIVAL.md",
+      "classification": "HISTORICAL",
+      "updatedAt": "2026-04-07T17:19:39.822Z",
+      "bytes": 5341,
+      "recommendedAction": "KEEP_LINKED_HISTORY"
+    },
+    {
+      "path": "next_steps/completed/DEEP_REVIEW_AUDIT_2026-04-01.md",
+      "classification": "HISTORICAL",
+      "updatedAt": "2026-05-26T20:22:18.389Z",
+      "bytes": 34497,
+      "recommendedAction": "KEEP_LINKED_HISTORY"
+    },
+    {
+      "path": "next_steps/completed/ENHANCED_UX_PLAYWRIGHT_TESTING.md",
+      "classification": "HISTORICAL",
+      "updatedAt": "2026-04-19T04:02:47.622Z",
+      "bytes": 2376,
+      "recommendedAction": "KEEP_LINKED_HISTORY"
+    },
+    {
+      "path": "next_steps/completed/ERROR_ELIMINATION_ROADMAP_2026-02-09.md",
+      "classification": "HISTORICAL",
+      "updatedAt": "2026-02-09T19:24:05.973Z",
+      "bytes": 9429,
+      "recommendedAction": "KEEP_LINKED_HISTORY"
+    },
+    {
+      "path": "next_steps/completed/gemma4-audio-capabilities.md",
+      "classification": "HISTORICAL",
+      "updatedAt": "2026-05-26T20:22:18.398Z",
+      "bytes": 17319,
+      "recommendedAction": "KEEP_LINKED_HISTORY"
+    },
+    {
+      "path": "next_steps/completed/GO_GRPC_IMPLEMENTATION_GUIDE.md",
+      "classification": "HISTORICAL",
+      "updatedAt": "2025-11-23T18:51:40.753Z",
+      "bytes": 12817,
+      "recommendedAction": "KEEP_LINKED_HISTORY"
+    },
+    {
+      "path": "next_steps/completed/GRANITE_DOCLING_258M_INTEGRATION_2026-04-05.md",
+      "classification": "HISTORICAL",
+      "updatedAt": "2026-05-26T20:22:18.391Z",
+      "bytes": 21405,
+      "recommendedAction": "KEEP_LINKED_HISTORY"
+    },
+    {
+      "path": "next_steps/completed/langfuse-next-steps.md",
+      "classification": "HISTORICAL",
+      "updatedAt": "2026-03-13T23:50:51.304Z",
+      "bytes": 10123,
+      "recommendedAction": "KEEP_LINKED_HISTORY"
+    },
+    {
+      "path": "next_steps/completed/LAWPDFS_INDEXING_GUIDE.md",
+      "classification": "HISTORICAL",
+      "updatedAt": "2025-12-12T22:26:53.732Z",
+      "bytes": 10337,
+      "recommendedAction": "KEEP_LINKED_HISTORY"
+    },
+    {
+      "path": "next_steps/completed/LEGAL_AI_UX_IMPLEMENTATION.md",
+      "classification": "HISTORICAL",
+      "updatedAt": "2025-11-22T22:04:03.093Z",
+      "bytes": 9179,
+      "recommendedAction": "KEEP_LINKED_HISTORY"
+    },
+    {
+      "path": "next_steps/completed/MCP_RAG_PIPELINE_AUDIT.md",
+      "classification": "HISTORICAL",
+      "updatedAt": "2026-03-21T00:18:38.719Z",
+      "bytes": 7931,
+      "recommendedAction": "KEEP_LINKED_HISTORY"
+    },
+    {
+      "path": "next_steps/completed/P3_P4_COMPLETION_PLAN.md",
+      "classification": "HISTORICAL",
+      "updatedAt": "2026-02-28T22:33:11.702Z",
+      "bytes": 9113,
+      "recommendedAction": "KEEP_LINKED_HISTORY"
+    },
+    {
+      "path": "next_steps/completed/P4_ROUTES_PARKED_REVIEW.md",
+      "classification": "HISTORICAL",
+      "updatedAt": "2026-02-28T22:56:45.717Z",
+      "bytes": 9124,
+      "recommendedAction": "KEEP_LINKED_HISTORY"
+    },
+    {
+      "path": "next_steps/completed/PERFORMANCE_TEST_PLAN.md",
+      "classification": "HISTORICAL",
+      "updatedAt": "2026-05-26T20:22:18.392Z",
+      "bytes": 14545,
+      "recommendedAction": "KEEP_LINKED_HISTORY"
+    },
+    {
+      "path": "next_steps/completed/PHASE0_CONFIG_AUDIT.md",
+      "classification": "HISTORICAL",
+      "updatedAt": "2026-03-15T19:22:40.440Z",
+      "bytes": 11688,
+      "recommendedAction": "KEEP_LINKED_HISTORY"
+    },
+    {
+      "path": "next_steps/completed/poi-ai-enhancement-roadmap.md",
+      "classification": "HISTORICAL",
+      "updatedAt": "2025-11-13T23:54:09.173Z",
+      "bytes": 11700,
+      "recommendedAction": "KEEP_LINKED_HISTORY"
+    },
+    {
+      "path": "next_steps/completed/SERVICE_CONSOLIDATION_PLAN.md",
+      "classification": "HISTORICAL",
+      "updatedAt": "2026-02-09T19:24:05.981Z",
+      "bytes": 5230,
+      "recommendedAction": "KEEP_LINKED_HISTORY"
+    },
+    {
+      "path": "next_steps/completed/SETUP_WIZARD_ONBOARDING.md",
+      "classification": "HISTORICAL",
+      "updatedAt": "2026-04-19T04:02:47.636Z",
+      "bytes": 1925,
+      "recommendedAction": "KEEP_LINKED_HISTORY"
+    },
+    {
+      "path": "next_steps/completed/TENSORRT_ENV_AND_ARCHIVED_SERVICES.md",
+      "classification": "HISTORICAL",
+      "updatedAt": "2026-03-15T18:47:50.501Z",
+      "bytes": 3939,
+      "recommendedAction": "KEEP_LINKED_HISTORY"
+    },
+    {
+      "path": "next_steps/completed/TRT_DIRECTORY_CONSOLIDATION.md",
+      "classification": "HISTORICAL",
+      "updatedAt": "2026-03-09T23:43:33.369Z",
+      "bytes": 12484,
+      "recommendedAction": "KEEP_LINKED_HISTORY"
+    },
+    {
+      "path": "next_steps/completed/TRT_ENGINE_BUILD_STEPS.md",
+      "classification": "HISTORICAL",
+      "updatedAt": "2026-04-19T04:07:12.175Z",
+      "bytes": 7732,
+      "recommendedAction": "KEEP_LINKED_HISTORY"
+    },
+    {
+      "path": "next_steps/completed/TS_NAPI_CPP_AST_GRAPH_AUDIT_CHECKLIST_2026-03-31.md",
+      "classification": "HISTORICAL",
+      "updatedAt": "2026-04-01T00:11:36.006Z",
+      "bytes": 10502,
+      "recommendedAction": "KEEP_LINKED_HISTORY"
+    },
+    {
+      "path": "next_steps/completed/TS_NAPI_CPP_CROSS_LANGUAGE_CALL_MAP_2026-03-31.md",
+      "classification": "HISTORICAL",
+      "updatedAt": "2026-04-01T00:16:49.010Z",
+      "bytes": 11540,
+      "recommendedAction": "KEEP_LINKED_HISTORY"
+    },
+    {
+      "path": "next_steps/completed/UNSLOTH_VLM_CHR97_NEXT_STEPS_2026-04-02.md",
+      "classification": "HISTORICAL",
+      "updatedAt": "2026-04-02T17:00:03.874Z",
+      "bytes": 4417,
+      "recommendedAction": "KEEP_LINKED_HISTORY"
+    },
+    {
+      "path": "next_steps/completed/USER_ANALYTICS_NEO4J_VECTOR_CHAT.md",
+      "classification": "HISTORICAL",
+      "updatedAt": "2026-04-20T06:50:41.910Z",
+      "bytes": 8134,
+      "recommendedAction": "KEEP_LINKED_HISTORY"
+    },
+    {
+      "path": "next_steps/completed/UUID_VALIDATION_DRIZZLE_AUDIT.md",
+      "classification": "HISTORICAL",
+      "updatedAt": "2026-04-19T04:02:47.707Z",
+      "bytes": 7771,
+      "recommendedAction": "KEEP_LINKED_HISTORY"
+    },
+    {
+      "path": "next_steps/completed/VLM_POI_PHOTOS_WIRING.md",
+      "classification": "HISTORICAL",
+      "updatedAt": "2026-05-26T20:22:18.394Z",
+      "bytes": 7509,
+      "recommendedAction": "KEEP_LINKED_HISTORY"
+    },
+    {
+      "path": "next_steps/completed/WSL2_TRTLLM_READINESS_CHECKLIST_2026-03-31.md",
+      "classification": "HISTORICAL",
+      "updatedAt": "2026-04-01T00:16:49.009Z",
+      "bytes": 16424,
+      "recommendedAction": "KEEP_LINKED_HISTORY"
+    },
+    {
+      "path": "next_steps/completed/vlm-history/2026-03-15_TRITON_VLM_FULL_PIPELINE.md",
+      "classification": "HISTORICAL",
+      "updatedAt": "2026-04-19T04:03:42.399Z",
+      "bytes": 18362,
+      "recommendedAction": "KEEP_LINKED_HISTORY"
+    },
+    {
+      "path": "next_steps/completed/vlm-history/2026-03-15_TRTLLM_EXECUTION_PIPELINE.md",
+      "classification": "HISTORICAL",
+      "updatedAt": "2026-04-19T04:03:42.404Z",
+      "bytes": 9475,
+      "recommendedAction": "KEEP_LINKED_HISTORY"
+    },
+    {
+      "path": "next_steps/completed/vlm-history/2026-04-07_VLM_TRTLLM_DEPLOYMENT_PLAN.md",
+      "classification": "HISTORICAL",
+      "updatedAt": "2026-05-26T20:22:18.414Z",
+      "bytes": 15007,
+      "recommendedAction": "KEEP_LINKED_HISTORY"
+    },
+    {
+      "path": "next_steps/completed/vlm-history/GEMMA3_VLM_IMPLEMENTATION_GUIDE.md",
+      "classification": "HISTORICAL",
+      "updatedAt": "2025-12-09T00:44:59.054Z",
+      "bytes": 14273,
+      "recommendedAction": "KEEP_LINKED_HISTORY"
+    },
+    {
+      "path": "next_steps/completed/vlm-history/GEMMA4_INTEGRATION_PLAN_2026-04-03.md",
+      "classification": "HISTORICAL",
+      "updatedAt": "2026-05-26T20:22:18.415Z",
+      "bytes": 14715,
+      "recommendedAction": "KEEP_LINKED_HISTORY"
+    },
+    {
+      "path": "next_steps/completed/vlm-history/GEMMA4_VLM_MULTIMODAL_TRAINING_PLAN_2026-04-05.md",
+      "classification": "HISTORICAL",
+      "updatedAt": "2026-05-26T20:22:18.417Z",
+      "bytes": 13056,
+      "recommendedAction": "KEEP_LINKED_HISTORY"
+    },
+    {
+      "path": "next_steps/completed/vlm-history/MULTIMODAL_IMPLEMENTATION_ROADMAP.md",
+      "classification": "HISTORICAL",
+      "updatedAt": "2026-04-07T17:18:38.159Z",
+      "bytes": 17383,
+      "recommendedAction": "KEEP_LINKED_HISTORY"
+    },
+    {
+      "path": "next_steps/completed/vlm-history/MULTIMODAL_INTEGRATION_GUIDE.md",
+      "classification": "HISTORICAL",
+      "updatedAt": "2026-03-02T01:12:43.352Z",
+      "bytes": 26392,
+      "recommendedAction": "KEEP_LINKED_HISTORY"
+    },
+    {
+      "path": "next_steps/completed/session-history/2026-04-06_consolidated-todo.md",
+      "classification": "HISTORICAL",
+      "updatedAt": "2026-05-26T20:22:18.408Z",
+      "bytes": 10210,
+      "recommendedAction": "KEEP_LINKED_HISTORY"
+    },
+    {
+      "path": "next_steps/completed/session-history/2026-04-06_deep-review-pipeline-gaps-roadmap.md",
+      "classification": "HISTORICAL",
+      "updatedAt": "2026-04-07T01:59:07.432Z",
+      "bytes": 13977,
+      "recommendedAction": "KEEP_LINKED_HISTORY"
+    },
+    {
+      "path": "next_steps/completed/session-history/2026-04-06_next-steps-triage.md",
+      "classification": "HISTORICAL",
+      "updatedAt": "2026-04-19T04:03:42.201Z",
+      "bytes": 11901,
+      "recommendedAction": "KEEP_LINKED_HISTORY"
+    },
+    {
+      "path": "next_steps/completed/session-history/2026-04-17_architecture-backlog.md",
+      "classification": "HISTORICAL",
+      "updatedAt": "2026-04-19T14:59:33.931Z",
+      "bytes": 20409,
+      "recommendedAction": "KEEP_LINKED_HISTORY"
+    },
+    {
+      "path": "next_steps/completed/session-history/2026-04-18_ai-analysis-recommendations-buildout.md",
+      "classification": "HISTORICAL",
+      "updatedAt": "2026-05-26T20:22:18.409Z",
+      "bytes": 4418,
+      "recommendedAction": "KEEP_LINKED_HISTORY"
+    },
+    {
+      "path": "next_steps/completed/session-history/2026-04-18_consolidated-todo.md",
+      "classification": "HISTORICAL",
+      "updatedAt": "2026-05-26T20:22:18.410Z",
+      "bytes": 11787,
+      "recommendedAction": "KEEP_LINKED_HISTORY"
+    },
+    {
+      "path": "next_steps/completed/session-history/2026-04-19_PIPELINE_STATUS_AND_GAPS.md",
+      "classification": "HISTORICAL",
+      "updatedAt": "2026-05-26T20:22:18.411Z",
+      "bytes": 13637,
+      "recommendedAction": "KEEP_LINKED_HISTORY"
+    },
+    {
+      "path": "next_steps/completed/session-history/SESSION_TODO_2026-04-03.md",
+      "classification": "HISTORICAL",
+      "updatedAt": "2026-05-26T20:22:18.413Z",
+      "bytes": 5032,
+      "recommendedAction": "KEEP_LINKED_HISTORY"
+    },
+    {
+      "path": "next_steps/completed/production-history/OPTIMIZATION_COMPARISON.md",
+      "classification": "HISTORICAL",
+      "updatedAt": "2026-02-28T22:16:29.156Z",
+      "bytes": 10706,
+      "recommendedAction": "KEEP_LINKED_HISTORY"
+    },
+    {
+      "path": "next_steps/completed/production-history/PRODUCTION_AUDIT_2026-03-15.md",
+      "classification": "HISTORICAL",
+      "updatedAt": "2026-05-26T20:22:18.400Z",
+      "bytes": 11685,
+      "recommendedAction": "KEEP_LINKED_HISTORY"
+    },
+    {
+      "path": "next_steps/completed/production-history/PRODUCTION_ENHANCEMENT_ROADMAP_2026-03-31.md",
+      "classification": "HISTORICAL",
+      "updatedAt": "2026-04-19T04:08:57.245Z",
+      "bytes": 10257,
+      "recommendedAction": "KEEP_LINKED_HISTORY"
+    },
+    {
+      "path": "next_steps/completed/production-history/PRODUCTION_OPTIMIZATIONS_COMPLETE.md",
+      "classification": "HISTORICAL",
+      "updatedAt": "2026-02-28T22:05:05.277Z",
+      "bytes": 21488,
+      "recommendedAction": "KEEP_LINKED_HISTORY"
+    },
+    {
+      "path": "next_steps/completed/production-history/PRODUCTION_READINESS_2026-03-25.md",
+      "classification": "HISTORICAL",
+      "updatedAt": "2026-04-19T04:02:16.120Z",
+      "bytes": 20788,
+      "recommendedAction": "KEEP_LINKED_HISTORY"
+    },
+    {
+      "path": "next_steps/completed/production-history/PRODUCTION_READINESS_PLAN_2026-02-09.md",
+      "classification": "HISTORICAL",
+      "updatedAt": "2026-02-09T19:24:05.981Z",
+      "bytes": 18826,
+      "recommendedAction": "KEEP_LINKED_HISTORY"
+    },
+    {
+      "path": "next_steps/completed/production-history/PRODUCTION_READINESS_ROADMAP.md",
+      "classification": "HISTORICAL",
+      "updatedAt": "2026-05-26T20:22:18.403Z",
+      "bytes": 21660,
+      "recommendedAction": "KEEP_LINKED_HISTORY"
+    },
+    {
+      "path": "next_steps/completed/production-history/PRODUCTION_REMEDIATION_PLAN.md",
+      "classification": "HISTORICAL",
+      "updatedAt": "2026-05-26T20:22:18.407Z",
+      "bytes": 27401,
+      "recommendedAction": "KEEP_LINKED_HISTORY"
+    },
+    {
+      "path": "next_steps/completed/production-history/RTX-8GB-OPTIMIZATION-GUIDE.md",
+      "classification": "HISTORICAL",
+      "updatedAt": "2025-11-14T22:39:44.105Z",
+      "bytes": 8356,
+      "recommendedAction": "KEEP_LINKED_HISTORY"
+    },
+    {
+      "path": "next_steps/completed/production-history/RUNTIME_PROOF_HANDOFF_2026-03-31.md",
+      "classification": "HISTORICAL",
+      "updatedAt": "2026-04-19T04:03:42.405Z",
+      "bytes": 17395,
+      "recommendedAction": "KEEP_LINKED_HISTORY"
+    },
+    {
+      "path": "next_steps/canonical/ACTIVE_DEMOS_LIST.md",
+      "classification": "REFERENCE",
+      "updatedAt": "2026-02-28T23:43:04.111Z",
+      "bytes": 9097,
+      "recommendedAction": "LINK_AS_EVIDENCE_ONLY"
+    },
+    {
+      "path": "next_steps/canonical/CONTEXT7_COMPREHENSIVE_GUIDE.md",
+      "classification": "REFERENCE",
+      "updatedAt": "2025-12-30T02:51:47.749Z",
+      "bytes": 26804,
+      "recommendedAction": "LINK_AS_EVIDENCE_ONLY"
+    },
+    {
+      "path": "next_steps/canonical/LANGFUSE_INTEGRATION_GUIDE.md",
+      "classification": "REFERENCE",
+      "updatedAt": "2026-05-26T20:22:18.368Z",
+      "bytes": 13536,
+      "recommendedAction": "LINK_AS_EVIDENCE_ONLY"
+    },
+    {
+      "path": "next_steps/canonical/PERFORMANCE_OPTIMIZATION_GUIDE.md",
+      "classification": "REFERENCE",
+      "updatedAt": "2025-11-22T21:31:51.100Z",
+      "bytes": 13667,
+      "recommendedAction": "LINK_AS_EVIDENCE_ONLY"
+    },
+    {
+      "path": "next_steps/canonical/PRODUCTION_DEPLOYMENT.md",
+      "classification": "REFERENCE",
+      "updatedAt": "2026-05-26T20:22:18.370Z",
+      "bytes": 9399,
+      "recommendedAction": "LINK_AS_EVIDENCE_ONLY"
+    },
+    {
+      "path": "next_steps/canonical/QUICK_START_PRODUCTION.md",
+      "classification": "REFERENCE",
+      "updatedAt": "2026-05-26T20:22:18.373Z",
+      "bytes": 11087,
+      "recommendedAction": "LINK_AS_EVIDENCE_ONLY"
+    },
+    {
+      "path": "next_steps/canonical/README.md",
+      "classification": "REFERENCE",
+      "updatedAt": "2026-05-26T20:22:18.374Z",
+      "bytes": 8680,
+      "recommendedAction": "LINK_AS_EVIDENCE_ONLY"
+    },
+    {
+      "path": "next_steps/canonical/TESTING_GUIDE.md",
+      "classification": "REFERENCE",
+      "updatedAt": "2026-05-26T20:22:18.376Z",
+      "bytes": 12654,
+      "recommendedAction": "LINK_AS_EVIDENCE_ONLY"
+    },
+    {
+      "path": "next_steps/canonical/VLM_QUICK_TEST_GUIDE.md",
+      "classification": "REFERENCE",
+      "updatedAt": "2026-05-26T20:22:18.377Z",
+      "bytes": 6796,
+      "recommendedAction": "LINK_AS_EVIDENCE_ONLY"
+    },
+    {
+      "path": "next_steps/archive/3D_PROSECUTOR_SIMULATION_DEEP_RESEARCH.md",
+      "classification": "HISTORICAL",
+      "updatedAt": "2026-03-24T22:51:59.475Z",
+      "bytes": 38626,
+      "recommendedAction": "KEEP_LINKED_HISTORY"
+    },
+    {
+      "path": "next_steps/archive/ARCHIVE_GEMS_REVIEW.md",
+      "classification": "HISTORICAL",
+      "updatedAt": "2026-02-28T23:05:02.891Z",
+      "bytes": 4813,
+      "recommendedAction": "KEEP_LINKED_HISTORY"
+    },
+    {
+      "path": "next_steps/archive/COMPREHENSIVE_ARCHIVE_REVIEW.md",
+      "classification": "HISTORICAL",
+      "updatedAt": "2026-05-26T20:22:18.365Z",
+      "bytes": 20204,
+      "recommendedAction": "KEEP_LINKED_HISTORY"
+    },
+    {
+      "path": "next_steps/archive/COMPREHENSIVE_CONSOLIDATION_ROADMAP.md",
+      "classification": "HISTORICAL",
+      "updatedAt": "2026-02-09T19:24:05.971Z",
+      "bytes": 10212,
+      "recommendedAction": "KEEP_LINKED_HISTORY"
+    },
+    {
+      "path": "next_steps/archive/PG17_UPGRADE_AND_TRTLLM_INTEGRATION.md",
+      "classification": "HISTORICAL",
+      "updatedAt": "2026-03-13T23:01:52.090Z",
+      "bytes": 3558,
+      "recommendedAction": "KEEP_LINKED_HISTORY"
+    },
+    {
+      "path": "next_steps/archive/PRODUCTION_CONSOLIDATION_PLAN.md",
+      "classification": "HISTORICAL",
+      "updatedAt": "2026-02-09T19:24:05.980Z",
+      "bytes": 15735,
+      "recommendedAction": "KEEP_LINKED_HISTORY"
+    },
+    {
+      "path": "next_steps/archive/TENSORRT_VLM_PIPELINE.md",
+      "classification": "HISTORICAL",
+      "updatedAt": "2026-03-09T22:34:14.767Z",
+      "bytes": 6863,
+      "recommendedAction": "KEEP_LINKED_HISTORY"
+    },
+    {
+      "path": "next_steps/archive/WEBGPU_DEMO_IMPLEMENTATION.md",
+      "classification": "HISTORICAL",
+      "updatedAt": "2026-03-01T01:29:52.228Z",
+      "bytes": 12305,
+      "recommendedAction": "KEEP_LINKED_HISTORY"
+    },
+    {
+      "path": "next_steps/archive/WEBGPU_MEMORY_PALACE_ANALYSIS.md",
+      "classification": "HISTORICAL",
+      "updatedAt": "2026-02-28T23:41:54.452Z",
+      "bytes": 11729,
+      "recommendedAction": "KEEP_LINKED_HISTORY"
+    },
+    {
+      "path": "next_steps/active/2026-05-04-graph-analysis.md",
+      "classification": "SUPPORTING_ACTIVE",
+      "updatedAt": "2026-05-04T16:12:25.431Z",
+      "bytes": 9259,
+      "recommendedAction": "LINK_AS_EVIDENCE_ONLY"
+    },
+    {
+      "path": "next_steps/active/2026-05-08_3dgs-forensic-roadmap.md",
+      "classification": "SUPPORTING_ACTIVE",
+      "updatedAt": "2026-05-26T20:22:18.346Z",
+      "bytes": 9057,
+      "recommendedAction": "LINK_AS_EVIDENCE_ONLY"
+    },
+    {
+      "path": "next_steps/active/2026-05-08_agents-md-relationships-todo.md",
+      "classification": "SUPPORTING_ACTIVE",
+      "updatedAt": "2026-05-10T12:13:01.144Z",
+      "bytes": 10943,
+      "recommendedAction": "LINK_AS_EVIDENCE_ONLY"
+    },
+    {
+      "path": "next_steps/active/2026-05-08_detective-mode-3d-reconstruction.md",
+      "classification": "SUPPORTING_ACTIVE",
+      "updatedAt": "2026-05-26T20:22:18.347Z",
+      "bytes": 26333,
+      "recommendedAction": "LINK_AS_EVIDENCE_ONLY"
+    },
+    {
+      "path": "next_steps/active/2026-05-08_dual-postgres-dbs-todo.md",
+      "classification": "SUPPORTING_ACTIVE",
+      "updatedAt": "2026-05-10T12:13:01.145Z",
+      "bytes": 4100,
+      "recommendedAction": "LINK_AS_EVIDENCE_ONLY"
+    },
+    {
+      "path": "next_steps/active/2026-05-08_mcp-trace-hardening-session.md",
+      "classification": "SUPPORTING_ACTIVE",
+      "updatedAt": "2026-05-08T01:44:54.259Z",
+      "bytes": 8830,
+      "recommendedAction": "LINK_AS_EVIDENCE_ONLY"
+    },
+    {
+      "path": "next_steps/active/2026-05-08_serialization-roadmap.md",
+      "classification": "SUPPORTING_ACTIVE",
+      "updatedAt": "2026-05-08T03:01:03.208Z",
+      "bytes": 6647,
+      "recommendedAction": "LINK_AS_EVIDENCE_ONLY"
+    },
+    {
+      "path": "next_steps/active/2026-05-08_topology-notebook-glossary.md",
+      "classification": "SUPPORTING_ACTIVE",
+      "updatedAt": "2026-05-26T20:22:18.348Z",
+      "bytes": 20166,
+      "recommendedAction": "LINK_AS_EVIDENCE_ONLY"
+    },
+    {
+      "path": "next_steps/active/2026-05-08_visual-evidence-lane-todo.md",
+      "classification": "SUPPORTING_ACTIVE",
+      "updatedAt": "2026-05-26T20:22:18.349Z",
+      "bytes": 8389,
+      "recommendedAction": "LINK_AS_EVIDENCE_ONLY"
+    },
+    {
+      "path": "next_steps/active/2026-05-09_dev-test-prod-split-plan.md",
+      "classification": "SUPPORTING_ACTIVE",
+      "updatedAt": "2026-05-09T16:16:58.768Z",
+      "bytes": 17688,
+      "recommendedAction": "LINK_AS_EVIDENCE_ONLY"
+    },
+    {
+      "path": "next_steps/active/2026-05-09_gemma4-mcp-synthesis-loop.md",
+      "classification": "SUPPORTING_ACTIVE",
+      "updatedAt": "2026-05-09T18:21:02.210Z",
+      "bytes": 30116,
+      "recommendedAction": "LINK_AS_EVIDENCE_ONLY"
+    },
+    {
+      "path": "next_steps/active/2026-05-09_gpu-routing-autoencoder-todo.md",
+      "classification": "SUPPORTING_ACTIVE",
+      "updatedAt": "2026-05-10T04:45:54.381Z",
+      "bytes": 7590,
+      "recommendedAction": "LINK_AS_EVIDENCE_ONLY"
+    },
+    {
+      "path": "next_steps/active/2026-05-09_mcp-tools-list-bisect.md",
+      "classification": "SUPPORTING_ACTIVE",
+      "updatedAt": "2026-05-09T18:14:11.729Z",
+      "bytes": 14303,
+      "recommendedAction": "LINK_AS_EVIDENCE_ONLY"
+    },
+    {
+      "path": "next_steps/active/2026-05-14_183210_long-context-architecture.md",
+      "classification": "SUPPORTING_ACTIVE",
+      "updatedAt": "2026-05-15T01:32:27.146Z",
+      "bytes": 1753,
+      "recommendedAction": "LINK_AS_EVIDENCE_ONLY"
+    },
+    {
+      "path": "next_steps/active/2026-05-14_183928_trt-llm-hypergraph-routing.md",
+      "classification": "SUPPORTING_ACTIVE",
+      "updatedAt": "2026-05-15T01:39:44.563Z",
+      "bytes": 2164,
+      "recommendedAction": "LINK_AS_EVIDENCE_ONLY"
+    },
+    {
+      "path": "next_steps/active/2026-05-14_184215_task-distillates-and-trt-spike.md",
+      "classification": "SUPPORTING_ACTIVE",
+      "updatedAt": "2026-05-15T01:42:33.934Z",
+      "bytes": 3066,
+      "recommendedAction": "LINK_AS_EVIDENCE_ONLY"
+    },
+    {
+      "path": "next_steps/active/2026-05-14_docs-codebase-indexing-pathmap.md",
+      "classification": "SUPPORTING_ACTIVE",
+      "updatedAt": "2026-05-14T21:06:02.040Z",
+      "bytes": 1943,
+      "recommendedAction": "LINK_AS_EVIDENCE_ONLY"
+    },
+    {
+      "path": "next_steps/active/2026-05-14_gpu-karpathy-topology-60-100-plan.md",
+      "classification": "SUPPORTING_ACTIVE",
+      "updatedAt": "2026-05-14T21:26:18.328Z",
+      "bytes": 1989,
+      "recommendedAction": "LINK_AS_EVIDENCE_ONLY"
+    },
+    {
+      "path": "next_steps/active/2026-05-14_surrealdb-multi-store-consolidation-note.md",
+      "classification": "SUPPORTING_ACTIVE",
+      "updatedAt": "2026-05-14T20:54:14.386Z",
+      "bytes": 1731,
+      "recommendedAction": "LINK_AS_EVIDENCE_ONLY"
+    },
+    {
+      "path": "next_steps/active/2026-05-14_wiki-loop-end-to-end.md",
+      "classification": "SUPPORTING_ACTIVE",
+      "updatedAt": "2026-05-15T16:20:24.249Z",
+      "bytes": 3134,
+      "recommendedAction": "LINK_AS_EVIDENCE_ONLY"
+    },
+    {
+      "path": "next_steps/active/2026-05-19_qdrant-cluster-autoencoder-roadmap.md",
+      "classification": "SUPPORTING_ACTIVE",
+      "updatedAt": "2026-05-26T20:22:18.350Z",
+      "bytes": 4951,
+      "recommendedAction": "LINK_AS_EVIDENCE_ONLY"
+    },
+    {
+      "path": "next_steps/active/2026-05-29_implementation-roadmap.md",
+      "classification": "SUPPORTING_ACTIVE",
+      "updatedAt": "2026-05-29T21:50:26.393Z",
+      "bytes": 4775,
+      "recommendedAction": "LINK_AS_EVIDENCE_ONLY"
+    },
+    {
+      "path": "next_steps/active/2026-05-29_PHASE3_EXTRACT_COMPLETE.md",
+      "classification": "SUPPORTING_ACTIVE",
+      "updatedAt": "2026-05-29T21:56:36.107Z",
+      "bytes": 3005,
+      "recommendedAction": "LINK_AS_EVIDENCE_ONLY"
+    },
+    {
+      "path": "next_steps/active/2026-05-29_PHASE3_NEO4J_READY.md",
+      "classification": "SUPPORTING_ACTIVE",
+      "updatedAt": "2026-05-29T22:21:49.544Z",
+      "bytes": 9539,
+      "recommendedAction": "LINK_AS_EVIDENCE_ONLY"
+    },
+    {
+      "path": "next_steps/active/2026-05-29_READY_FOR_VALIDATION_TESTING.md",
+      "classification": "SUPPORTING_ACTIVE",
+      "updatedAt": "2026-05-29T23:50:39.493Z",
+      "bytes": 7804,
+      "recommendedAction": "LINK_AS_EVIDENCE_ONLY"
+    },
+    {
+      "path": "next_steps/active/2026-05-29_reconstruction-lanes-map.md",
+      "classification": "SUPPORTING_ACTIVE",
+      "updatedAt": "2026-05-29T16:14:29.270Z",
+      "bytes": 20953,
+      "recommendedAction": "LINK_AS_EVIDENCE_ONLY"
+    },
+    {
+      "path": "next_steps/active/2026-05-29_REDIS_CACHE_CONSOLIDATION_INTEGRATION.md",
+      "classification": "SUPPORTING_ACTIVE",
+      "updatedAt": "2026-05-29T23:41:24.326Z",
+      "bytes": 9056,
+      "recommendedAction": "LINK_AS_EVIDENCE_ONLY"
+    },
+    {
+      "path": "next_steps/active/2026-05-30_ARCHITECTURE_TODO_CLIENT_SERVER_SEPARATION.md",
+      "classification": "SUPPORTING_ACTIVE",
+      "updatedAt": "2026-05-30T22:24:06.765Z",
+      "bytes": 6017,
+      "recommendedAction": "LINK_AS_EVIDENCE_ONLY"
+    },
+    {
+      "path": "next_steps/active/2026-05-30_ATLAS_JOIN_FIX_COMPLETE.md",
+      "classification": "SUPPORTING_ACTIVE",
+      "updatedAt": "2026-05-30T03:15:53.077Z",
+      "bytes": 8621,
+      "recommendedAction": "LINK_AS_EVIDENCE_ONLY"
+    },
+    {
+      "path": "next_steps/active/2026-05-30_ATLAS_JOIN_FIX_STRATEGY.md",
+      "classification": "SUPPORTING_ACTIVE",
+      "updatedAt": "2026-05-30T03:01:38.686Z",
+      "bytes": 9079,
+      "recommendedAction": "LINK_AS_EVIDENCE_ONLY"
+    },
+    {
+      "path": "next_steps/active/2026-05-30_CONTINUATION_LANES_GPU_GLYPHS.md",
+      "classification": "SUPPORTING_ACTIVE",
+      "updatedAt": "2026-05-31T09:20:23.700Z",
+      "bytes": 6256,
+      "recommendedAction": "LINK_AS_EVIDENCE_ONLY"
+    },
+    {
+      "path": "next_steps/active/2026-05-30_PHASE2_REWARD_ATTRIBUTION_COMPLETE.md",
+      "classification": "SUPPORTING_ACTIVE",
+      "updatedAt": "2026-05-30T03:43:11.799Z",
+      "bytes": 9559,
+      "recommendedAction": "LINK_AS_EVIDENCE_ONLY"
+    },
+    {
+      "path": "next_steps/active/2026-05-30_PHASE_19B_ACE_INTEGRATION.md",
+      "classification": "SUPPORTING_ACTIVE",
+      "updatedAt": "2026-05-30T00:05:37.671Z",
+      "bytes": 13022,
+      "recommendedAction": "LINK_AS_EVIDENCE_ONLY"
+    },
+    {
+      "path": "next_steps/active/2026-05-30_PHASE_19B_FEATURE_REGISTRY_COMPLETE.md",
+      "classification": "SUPPORTING_ACTIVE",
+      "updatedAt": "2026-05-30T01:31:11.809Z",
+      "bytes": 7349,
+      "recommendedAction": "LINK_AS_EVIDENCE_ONLY"
+    },
+    {
+      "path": "next_steps/active/2026-05-30_PHASE_19B_UNIFIED_PIPELINE_READY.md",
+      "classification": "SUPPORTING_ACTIVE",
+      "updatedAt": "2026-05-30T01:49:27.171Z",
+      "bytes": 9735,
+      "recommendedAction": "LINK_AS_EVIDENCE_ONLY"
+    },
+    {
+      "path": "next_steps/active/2026-05-30_PHASE_19C_CONSOLIDATION_COMPLETE.md",
+      "classification": "SUPPORTING_ACTIVE",
+      "updatedAt": "2026-05-30T02:12:27.899Z",
+      "bytes": 10734,
+      "recommendedAction": "LINK_AS_EVIDENCE_ONLY"
+    },
+    {
+      "path": "next_steps/active/2026-05-30_PHASE_19_COMPLETE_SUMMARY.md",
+      "classification": "SUPPORTING_ACTIVE",
+      "updatedAt": "2026-05-30T02:27:48.125Z",
+      "bytes": 11559,
+      "recommendedAction": "LINK_AS_EVIDENCE_ONLY"
+    },
+    {
+      "path": "next_steps/active/2026-05-30_PHASE_19_SCHEMA_BRIDGE_STRATEGY.md",
+      "classification": "SUPPORTING_ACTIVE",
+      "updatedAt": "2026-05-30T02:45:04.932Z",
+      "bytes": 11325,
+      "recommendedAction": "LINK_AS_EVIDENCE_ONLY"
+    },
+    {
+      "path": "next_steps/active/2026-05-30_userid_migration_plan.md",
+      "classification": "SUPPORTING_ACTIVE",
+      "updatedAt": "2026-05-30T21:41:04.445Z",
+      "bytes": 5988,
+      "recommendedAction": "LINK_AS_EVIDENCE_ONLY"
+    },
+    {
+      "path": "next_steps/active/2026-05-31_CUDA_PRIMITIVES_IMPROVEMENTS.md",
+      "classification": "SUPPORTING_ACTIVE",
+      "updatedAt": "2026-05-31T09:34:30.858Z",
+      "bytes": 9111,
+      "recommendedAction": "LINK_AS_EVIDENCE_ONLY"
+    },
+    {
+      "path": "next_steps/active/2026-05-31_GPU_PHASE_GAP_ALIGNMENT.md",
+      "classification": "SUPPORTING_ACTIVE",
+      "updatedAt": "2026-06-02T21:40:44.507Z",
+      "bytes": 15121,
+      "recommendedAction": "LINK_AS_EVIDENCE_ONLY"
+    },
+    {
+      "path": "next_steps/active/2026-05-31_NAPI_RS_RUST_BRIDGE_OPTIMIZATIONS.md",
+      "classification": "SUPPORTING_ACTIVE",
+      "updatedAt": "2026-05-31T05:23:58.339Z",
+      "bytes": 3152,
+      "recommendedAction": "LINK_AS_EVIDENCE_ONLY"
+    },
+    {
+      "path": "next_steps/active/2026-05-31_phase-h-gpu-cmake-todo.md",
+      "classification": "SUPPORTING_ACTIVE",
+      "updatedAt": "2026-06-01T15:14:49.959Z",
+      "bytes": 12265,
+      "recommendedAction": "LINK_AS_EVIDENCE_ONLY"
+    },
+    {
+      "path": "next_steps/active/2026-05-31_PHASE_COMPLETION_ROADMAP.md",
+      "classification": "SUPPORTING_ACTIVE",
+      "updatedAt": "2026-05-31T09:18:12.300Z",
+      "bytes": 6679,
+      "recommendedAction": "LINK_AS_EVIDENCE_ONLY"
+    },
+    {
+      "path": "next_steps/active/2026-06-06_drizzle-schema-audit.md",
+      "classification": "SUPPORTING_ACTIVE",
+      "updatedAt": "2026-06-07T05:02:33.929Z",
+      "bytes": 4155,
+      "recommendedAction": "LINK_AS_EVIDENCE_ONLY"
+    },
+    {
+      "path": "next_steps/active/2026-06-07_nes-packet-pipeline-roadmap.md",
+      "classification": "SUPPORTING_ACTIVE",
+      "updatedAt": "2026-06-07T16:33:49.430Z",
+      "bytes": 10324,
+      "recommendedAction": "LINK_AS_EVIDENCE_ONLY"
+    },
+    {
+      "path": "next_steps/active/2026-06-10_ATLAS-2.0-PHASE-SUMMARY.md",
+      "classification": "SUPPORTING_ACTIVE",
+      "updatedAt": "2026-06-10T19:07:14.563Z",
+      "bytes": 11596,
+      "recommendedAction": "LINK_AS_EVIDENCE_ONLY"
+    },
+    {
+      "path": "next_steps/active/2026-06-10_atlas-phase-2b-neo4j-communities.md",
+      "classification": "SUPPORTING_ACTIVE",
+      "updatedAt": "2026-06-10T19:06:22.433Z",
+      "bytes": 8676,
+      "recommendedAction": "LINK_AS_EVIDENCE_ONLY"
+    },
+    {
+      "path": "next_steps/active/2026-06-10_atlas-runner-deployment-OLD.md",
+      "classification": "SUPPORTING_ACTIVE",
+      "updatedAt": "2026-06-10T15:22:22.825Z",
+      "bytes": 13741,
+      "recommendedAction": "LINK_AS_EVIDENCE_ONLY"
+    },
+    {
+      "path": "next_steps/active/2026-06-10_atlas-runner-deployment.md",
+      "classification": "SUPPORTING_ACTIVE",
+      "updatedAt": "2026-06-10T15:26:52.470Z",
+      "bytes": 12465,
+      "recommendedAction": "LINK_AS_EVIDENCE_ONLY"
+    },
+    {
+      "path": "next_steps/active/2026-06-10_GATE-2-DIAGNOSTIC.md",
+      "classification": "SUPPORTING_ACTIVE",
+      "updatedAt": "2026-06-10T19:19:20.586Z",
+      "bytes": 3889,
+      "recommendedAction": "LINK_AS_EVIDENCE_ONLY"
+    },
+    {
+      "path": "next_steps/active/2026-06-10_PHASE-3-ATLAS-3A-SYMBOL-MAP.md",
+      "classification": "SUPPORTING_ACTIVE",
+      "updatedAt": "2026-06-10T19:26:24.596Z",
+      "bytes": 8417,
+      "recommendedAction": "LINK_AS_EVIDENCE_ONLY"
+    },
+    {
+      "path": "next_steps/active/2026-06-10_PHASE-3-AUDIT-CORRECTION.md",
+      "classification": "SUPPORTING_ACTIVE",
+      "updatedAt": "2026-06-10T19:30:37.830Z",
+      "bytes": 6235,
+      "recommendedAction": "LINK_AS_EVIDENCE_ONLY"
+    },
+    {
+      "path": "next_steps/active/2026-06-10_PHASE-3-IMPLEMENTATION-GATES.md",
+      "classification": "SUPPORTING_ACTIVE",
+      "updatedAt": "2026-06-10T19:21:15.716Z",
+      "bytes": 12583,
+      "recommendedAction": "LINK_AS_EVIDENCE_ONLY"
+    },
+    {
+      "path": "next_steps/active/2026-06-10_PHASE-3-PRIORITY-SEQUENCE.md",
+      "classification": "SUPPORTING_ACTIVE",
+      "updatedAt": "2026-06-10T19:29:45.414Z",
+      "bytes": 9229,
+      "recommendedAction": "LINK_AS_EVIDENCE_ONLY"
+    },
+    {
+      "path": "next_steps/active/2026-06-10_PHASE-3-RUNTIME-INTELLIGENCE.md",
+      "classification": "SUPPORTING_ACTIVE",
+      "updatedAt": "2026-06-10T19:13:14.642Z",
+      "bytes": 11865,
+      "recommendedAction": "LINK_AS_EVIDENCE_ONLY"
+    },
+    {
+      "path": "next_steps/active/2026-06-10_PHASE-3-STRATEGIC-PIVOT.md",
+      "classification": "SUPPORTING_ACTIVE",
+      "updatedAt": "2026-06-10T19:27:01.072Z",
+      "bytes": 12484,
+      "recommendedAction": "LINK_AS_EVIDENCE_ONLY"
+    },
+    {
+      "path": "next_steps/active/2026-06-10_session-summary.md",
+      "classification": "SUPPORTING_ACTIVE",
+      "updatedAt": "2026-06-11T03:47:50.416Z",
+      "bytes": 7931,
+      "recommendedAction": "LINK_AS_EVIDENCE_ONLY"
+    },
+    {
+      "path": "next_steps/active/AUDIO_KNOWLEDGE_PIPELINE.md",
+      "classification": "SUPPORTING_ACTIVE",
+      "updatedAt": "2026-04-20T06:56:59.746Z",
+      "bytes": 4723,
+      "recommendedAction": "LINK_AS_EVIDENCE_ONLY"
+    },
+    {
+      "path": "next_steps/active/codebase-layer-mapping-2026-05-19.md",
+      "classification": "SUPPORTING_ACTIVE",
+      "updatedAt": "2026-05-26T20:22:18.355Z",
+      "bytes": 3725,
+      "recommendedAction": "LINK_AS_EVIDENCE_ONLY"
+    },
+    {
+      "path": "next_steps/active/CODEBASE_MAINTENANCE.md",
+      "classification": "SUPPORTING_ACTIVE",
+      "updatedAt": "2026-04-20T07:34:43.998Z",
+      "bytes": 3826,
+      "recommendedAction": "LINK_AS_EVIDENCE_ONLY"
+    },
+    {
+      "path": "next_steps/active/database-audit-context-2026-05-19.md",
+      "classification": "SUPPORTING_ACTIVE",
+      "updatedAt": "2026-05-26T20:22:18.356Z",
+      "bytes": 2964,
+      "recommendedAction": "LINK_AS_EVIDENCE_ONLY"
+    },
+    {
+      "path": "next_steps/active/DRIZZLE_SCHEMA_COLUMN_AUDIT.md",
+      "classification": "SUPPORTING_ACTIVE",
+      "updatedAt": "2026-04-25T01:23:54.190Z",
+      "bytes": 32875,
+      "recommendedAction": "LINK_AS_EVIDENCE_ONLY"
+    },
+    {
+      "path": "next_steps/active/DRIZZLE_SCHEMA_DRIFT_AUDIT.md",
+      "classification": "SUPPORTING_ACTIVE",
+      "updatedAt": "2026-04-25T01:14:24.814Z",
+      "bytes": 23393,
+      "recommendedAction": "LINK_AS_EVIDENCE_ONLY"
+    },
+    {
+      "path": "next_steps/active/FEATURE_ROADMAPS.md",
+      "classification": "SUPPORTING_ACTIVE",
+      "updatedAt": "2026-04-20T06:55:40.694Z",
+      "bytes": 4193,
+      "recommendedAction": "LINK_AS_EVIDENCE_ONLY"
+    },
+    {
+      "path": "next_steps/active/GPU_MODEL_VLM_DEPLOYMENT.md",
+      "classification": "SUPPORTING_ACTIVE",
+      "updatedAt": "2026-05-26T20:22:18.351Z",
+      "bytes": 9383,
+      "recommendedAction": "LINK_AS_EVIDENCE_ONLY"
+    },
+    {
+      "path": "next_steps/active/KAG_finalization_workflow.md",
+      "classification": "SUPPORTING_ACTIVE",
+      "updatedAt": "2026-05-26T20:22:18.352Z",
+      "bytes": 1290,
+      "recommendedAction": "LINK_AS_EVIDENCE_ONLY"
+    },
+    {
+      "path": "next_steps/active/LLMS.md",
+      "classification": "SUPPORTING_ACTIVE",
+      "updatedAt": "2026-05-30T16:36:42.645Z",
+      "bytes": 2234,
+      "recommendedAction": "LINK_AS_EVIDENCE_ONLY"
+    },
+    {
+      "path": "next_steps/active/mtp_6_26.md",
+      "classification": "SUPPORTING_ACTIVE",
+      "updatedAt": "2026-06-07T18:43:17.374Z",
+      "bytes": 2714,
+      "recommendedAction": "LINK_AS_EVIDENCE_ONLY"
+    },
+    {
+      "path": "next_steps/active/PIPELINE_GAPS_AND_TODO.md",
+      "classification": "SUPPORTING_ACTIVE",
+      "updatedAt": "2026-05-26T20:22:18.353Z",
+      "bytes": 11987,
+      "recommendedAction": "LINK_AS_EVIDENCE_ONLY"
+    },
+    {
+      "path": "next_steps/active/retrieval-replay-eval.md",
+      "classification": "SUPPORTING_ACTIVE",
+      "updatedAt": "2026-06-09T00:05:33.013Z",
+      "bytes": 1561,
+      "recommendedAction": "LINK_AS_EVIDENCE_ONLY"
+    },
+    {
+      "path": "next_steps/active/SCHEMA_CONSOLIDATION_PLAN.md",
+      "classification": "SUPPORTING_ACTIVE",
+      "updatedAt": "2026-04-25T01:28:36.339Z",
+      "bytes": 55989,
+      "recommendedAction": "LINK_AS_EVIDENCE_ONLY"
+    },
+    {
+      "path": "next_steps/active/SCHEMA_FILE_OWNERSHIP.md",
+      "classification": "SUPPORTING_ACTIVE",
+      "updatedAt": "2026-04-25T01:28:36.337Z",
+      "bytes": 48228,
+      "recommendedAction": "LINK_AS_EVIDENCE_ONLY"
+    },
+    {
+      "path": "next_steps/active/SCHEMA_MANIFEST.md",
+      "classification": "SUPPORTING_ACTIVE",
+      "updatedAt": "2026-04-25T01:28:36.335Z",
+      "bytes": 14234211,
+      "recommendedAction": "LINK_AS_EVIDENCE_ONLY"
+    },
+    {
+      "path": "next_steps/active/todo-2026-05-18.md",
+      "classification": "SUPPORTING_ACTIVE",
+      "updatedAt": "2026-05-26T20:22:18.358Z",
+      "bytes": 70332,
+      "recommendedAction": "LINK_AS_EVIDENCE_ONLY"
+    },
+    {
+      "path": "next_steps/active/todo-2026-05-19.md",
+      "classification": "SUPPORTING_ACTIVE",
+      "updatedAt": "2026-05-26T20:22:18.359Z",
+      "bytes": 20846,
+      "recommendedAction": "LINK_AS_EVIDENCE_ONLY"
+    },
+    {
+      "path": "next_steps/active/todo-5-19.md",
+      "classification": "SUPPORTING_ACTIVE",
+      "updatedAt": "2026-05-26T20:22:18.361Z",
+      "bytes": 17565,
+      "recommendedAction": "LINK_AS_EVIDENCE_ONLY"
+    },
+    {
+      "path": "next_steps/active/todo-gemma4-surgical-tensor-memory.md",
+      "classification": "SUPPORTING_ACTIVE",
+      "updatedAt": "2026-05-26T20:22:18.363Z",
+      "bytes": 5315,
+      "recommendedAction": "LINK_AS_EVIDENCE_ONLY"
+    },
+    {
+      "path": "next_steps/active/playwright_todos/20260514_175850/playwright-todo-prompt.md",
+      "classification": "SUPPORTING_ACTIVE",
+      "updatedAt": "2026-05-15T01:02:45.283Z",
+      "bytes": 1543,
+      "recommendedAction": "LINK_AS_EVIDENCE_ONLY"
+    },
+    {
+      "path": "next_steps/active/hypergraph_todos/20260514_180339/hypergraph-todo-prompt.md",
+      "classification": "SUPPORTING_ACTIVE",
+      "updatedAt": "2026-05-15T01:03:57.717Z",
+      "bytes": 2217,
+      "recommendedAction": "LINK_AS_EVIDENCE_ONLY"
+    },
+    {
+      "path": "next_steps/active/2026-05-03/agentic-error-fix-20-21-46-diagnose.md",
+      "classification": "SUPPORTING_ACTIVE",
+      "updatedAt": "2026-05-03T20:21:46.790Z",
+      "bytes": 1509,
+      "recommendedAction": "LINK_AS_EVIDENCE_ONLY"
+    },
+    {
+      "path": "next_steps/active/2026-05-03/agentic-error-fix-21-10-36-fast.md",
+      "classification": "SUPPORTING_ACTIVE",
+      "updatedAt": "2026-05-03T21:10:36.806Z",
+      "bytes": 12341,
+      "recommendedAction": "LINK_AS_EVIDENCE_ONLY"
+    },
+    {
+      "path": "sveltekit-frontend/next_steps/00-OVERVIEW.md",
+      "classification": "REFERENCE",
+      "updatedAt": "2026-03-23T15:03:32.399Z",
+      "bytes": 18768,
+      "recommendedAction": "LINK_AS_EVIDENCE_ONLY"
+    },
+    {
+      "path": "sveltekit-frontend/next_steps/01-reports-next-steps.md",
+      "classification": "SUPPORTING",
+      "updatedAt": "2026-05-05T20:12:49.045Z",
+      "bytes": 11691,
+      "recommendedAction": "LINK_AS_EVIDENCE_ONLY"
+    },
+    {
+      "path": "sveltekit-frontend/next_steps/02-mcp-integration.md",
+      "classification": "REFERENCE",
+      "updatedAt": "2026-03-10T23:45:41.588Z",
+      "bytes": 10822,
+      "recommendedAction": "LINK_AS_EVIDENCE_ONLY"
+    },
+    {
+      "path": "sveltekit-frontend/next_steps/03-evidence-improvements.md",
+      "classification": "REFERENCE",
+      "updatedAt": "2026-03-10T23:45:41.593Z",
+      "bytes": 12871,
+      "recommendedAction": "LINK_AS_EVIDENCE_ONLY"
+    },
+    {
+      "path": "sveltekit-frontend/next_steps/04-ai-integration.md",
+      "classification": "REFERENCE",
+      "updatedAt": "2026-03-10T23:45:41.590Z",
+      "bytes": 12925,
+      "recommendedAction": "LINK_AS_EVIDENCE_ONLY"
+    },
+    {
+      "path": "sveltekit-frontend/next_steps/05-infrastructure.md",
+      "classification": "REFERENCE",
+      "updatedAt": "2026-03-10T23:45:41.600Z",
+      "bytes": 13002,
+      "recommendedAction": "LINK_AS_EVIDENCE_ONLY"
+    },
+    {
+      "path": "sveltekit-frontend/next_steps/06-database-migrations.md",
+      "classification": "REFERENCE",
+      "updatedAt": "2026-05-26T20:22:19.746Z",
+      "bytes": 17322,
+      "recommendedAction": "LINK_AS_EVIDENCE_ONLY"
+    },
+    {
+      "path": "sveltekit-frontend/next_steps/07-ml-training.md",
+      "classification": "REFERENCE",
+      "updatedAt": "2026-03-10T23:45:41.595Z",
+      "bytes": 22566,
+      "recommendedAction": "LINK_AS_EVIDENCE_ONLY"
+    },
+    {
+      "path": "sveltekit-frontend/next_steps/08-detective-mode-integration.md",
+      "classification": "REFERENCE",
+      "updatedAt": "2026-03-10T23:45:41.598Z",
+      "bytes": 15334,
+      "recommendedAction": "LINK_AS_EVIDENCE_ONLY"
+    },
+    {
+      "path": "sveltekit-frontend/next_steps/09-agent-investigate-endpoint.md",
+      "classification": "REFERENCE",
+      "updatedAt": "2026-03-10T23:45:41.602Z",
+      "bytes": 20286,
+      "recommendedAction": "LINK_AS_EVIDENCE_ONLY"
+    },
+    {
+      "path": "sveltekit-frontend/next_steps/10-trtllm-triton-deployment.md",
+      "classification": "REFERENCE",
+      "updatedAt": "2026-03-12T02:40:57.015Z",
+      "bytes": 7018,
+      "recommendedAction": "LINK_AS_EVIDENCE_ONLY"
+    },
+    {
+      "path": "sveltekit-frontend/next_steps/11-wiring-production-quality.md",
+      "classification": "REFERENCE",
+      "updatedAt": "2026-03-23T03:18:41.905Z",
+      "bytes": 24048,
+      "recommendedAction": "LINK_AS_EVIDENCE_ONLY"
+    },
+    {
+      "path": "sveltekit-frontend/next_steps/12-app-wiring-consolidation.md",
+      "classification": "REFERENCE",
+      "updatedAt": "2026-03-16T18:16:17.766Z",
+      "bytes": 12314,
+      "recommendedAction": "LINK_AS_EVIDENCE_ONLY"
+    },
+    {
+      "path": "sveltekit-frontend/next_steps/12-full-codebase-audit-march2026.md",
+      "classification": "REFERENCE",
+      "updatedAt": "2026-05-26T20:22:19.748Z",
+      "bytes": 37698,
+      "recommendedAction": "LINK_AS_EVIDENCE_ONLY"
+    },
+    {
+      "path": "sveltekit-frontend/next_steps/13-dead-code-rewrite-candidates.md",
+      "classification": "REFERENCE",
+      "updatedAt": "2026-05-26T20:22:19.750Z",
+      "bytes": 13658,
+      "recommendedAction": "LINK_AS_EVIDENCE_ONLY"
+    },
+    {
+      "path": "sveltekit-frontend/next_steps/14-vlm-deferred-reference.md",
+      "classification": "REFERENCE",
+      "updatedAt": "2026-03-22T22:31:34.846Z",
+      "bytes": 3820,
+      "recommendedAction": "LINK_AS_EVIDENCE_ONLY"
+    },
+    {
+      "path": "sveltekit-frontend/next_steps/15-neo4j-gds-karpathy-gpu-architecture.md",
+      "classification": "REFERENCE",
+      "updatedAt": "2026-05-06T06:16:20.669Z",
+      "bytes": 9446,
+      "recommendedAction": "LINK_AS_EVIDENCE_ONLY"
+    },
+    {
+      "path": "sveltekit-frontend/next_steps/desktop.md",
+      "classification": "REFERENCE",
+      "updatedAt": "2026-04-08T01:23:30.027Z",
+      "bytes": 2474,
+      "recommendedAction": "LINK_AS_EVIDENCE_ONLY"
+    },
+    {
+      "path": "sveltekit-frontend/next_steps/DRIZZLE_SCHEMA_MATCHING.md",
+      "classification": "REFERENCE",
+      "updatedAt": "2026-03-16T18:16:17.783Z",
+      "bytes": 22927,
+      "recommendedAction": "LINK_AS_EVIDENCE_ONLY"
+    },
+    {
+      "path": "sveltekit-frontend/next_steps/SESSION_93r28c_COMPLETE.md",
+      "classification": "REFERENCE",
+      "updatedAt": "2026-03-10T23:45:41.587Z",
+      "bytes": 26102,
+      "recommendedAction": "LINK_AS_EVIDENCE_ONLY"
+    },
+    {
+      "path": "sveltekit-frontend/next_steps/TODO_TRTLLM_TRITON.md",
+      "classification": "SUPPORTING",
+      "updatedAt": "2026-03-12T02:45:45.365Z",
+      "bytes": 7335,
+      "recommendedAction": "LINK_AS_EVIDENCE_ONLY"
+    },
+    {
+      "path": "sveltekit-frontend/next_steps/typescripterror.md",
+      "classification": "REFERENCE",
+      "updatedAt": "2026-05-07T17:05:59.381Z",
+      "bytes": 19139,
+      "recommendedAction": "LINK_AS_EVIDENCE_ONLY"
+    },
+    {
+      "path": "sveltekit-frontend/next_steps/ZOD_SUPERFORMS_BENEFITS.md",
+      "classification": "REFERENCE",
+      "updatedAt": "2026-03-13T00:11:06.196Z",
+      "bytes": 16889,
+      "recommendedAction": "LINK_AS_EVIDENCE_ONLY"
+    },
+    {
+      "path": "sveltekit-frontend/next_steps/plans/2026-05-06-15-analysis.md",
+      "classification": "REFERENCE",
+      "updatedAt": "2026-05-06T15:29:14.508Z",
+      "bytes": 3485,
+      "recommendedAction": "LINK_AS_EVIDENCE_ONLY"
+    },
+    {
+      "path": "sveltekit-frontend/next_steps/plans/ace_feature_context_matrix_codex_prompt.md",
+      "classification": "REFERENCE",
+      "updatedAt": "2026-05-26T20:22:19.772Z",
+      "bytes": 18040,
+      "recommendedAction": "LINK_AS_EVIDENCE_ONLY"
+    },
+    {
+      "path": "sveltekit-frontend/next_steps/plans/ace_startup_cuda_bridge_docs (1).md",
+      "classification": "REFERENCE",
+      "updatedAt": "2026-05-15T18:02:25.935Z",
+      "bytes": 20169,
+      "recommendedAction": "LINK_AS_EVIDENCE_ONLY"
+    },
+    {
+      "path": "sveltekit-frontend/next_steps/plans/ace_startup_cuda_bridge_docs.md",
+      "classification": "REFERENCE",
+      "updatedAt": "2026-05-15T17:12:00.610Z",
+      "bytes": 10167,
+      "recommendedAction": "LINK_AS_EVIDENCE_ONLY"
+    },
+    {
+      "path": "sveltekit-frontend/next_steps/plans/bitfrost_turboquant_turbovec_production_todo.md",
+      "classification": "SUPPORTING",
+      "updatedAt": "2026-05-26T20:32:55.845Z",
+      "bytes": 33932,
+      "recommendedAction": "LINK_AS_EVIDENCE_ONLY"
+    },
+    {
+      "path": "sveltekit-frontend/next_steps/plans/codex_workstation_agentic_todos.md",
+      "classification": "SUPPORTING",
+      "updatedAt": "2026-05-15T01:05:46.537Z",
+      "bytes": 17847,
+      "recommendedAction": "LINK_AS_EVIDENCE_ONLY"
+    },
+    {
+      "path": "sveltekit-frontend/next_steps/plans/enhanced_master_agents_path_map.md",
+      "classification": "REFERENCE",
+      "updatedAt": "2026-05-26T20:32:55.853Z",
+      "bytes": 25521,
+      "recommendedAction": "LINK_AS_EVIDENCE_ONLY"
+    },
+    {
+      "path": "sveltekit-frontend/next_steps/plans/gpu_karpathy_ace_context_cache_architecture.md",
+      "classification": "REFERENCE",
+      "updatedAt": "2026-05-13T22:44:57.315Z",
+      "bytes": 17358,
+      "recommendedAction": "LINK_AS_EVIDENCE_ONLY"
+    },
+    {
+      "path": "sveltekit-frontend/next_steps/plans/gpu_karpathy_feature_mapping_atlas_plan.md",
+      "classification": "SUPPORTING",
+      "updatedAt": "2026-05-15T02:49:40.330Z",
+      "bytes": 21569,
+      "recommendedAction": "LINK_AS_EVIDENCE_ONLY"
+    },
+    {
+      "path": "sveltekit-frontend/next_steps/plans/hermes_agents_ace_deep_research_report.md",
+      "classification": "REFERENCE",
+      "updatedAt": "2026-05-11T22:43:51.398Z",
+      "bytes": 16913,
+      "recommendedAction": "LINK_AS_EVIDENCE_ONLY"
+    },
+    {
+      "path": "sveltekit-frontend/next_steps/plans/langextract_ace_kag_agentic_workflow_plan.md",
+      "classification": "SUPPORTING",
+      "updatedAt": "2026-05-15T01:03:43.658Z",
+      "bytes": 21649,
+      "recommendedAction": "LINK_AS_EVIDENCE_ONLY"
+    },
+    {
+      "path": "sveltekit-frontend/next_steps/plans/langfuse_embedding_subagent_observability_todo.md",
+      "classification": "SUPPORTING",
+      "updatedAt": "2026-05-26T20:32:55.911Z",
+      "bytes": 10346,
+      "recommendedAction": "LINK_AS_EVIDENCE_ONLY"
+    },
+    {
+      "path": "sveltekit-frontend/next_steps/plans/mau5 (1).md",
+      "classification": "REFERENCE",
+      "updatedAt": "2026-05-14T00:51:27.303Z",
+      "bytes": 18212,
+      "recommendedAction": "LINK_AS_EVIDENCE_ONLY"
+    },
+    {
+      "path": "sveltekit-frontend/next_steps/plans/mau5_grep_stream_analysis (1).md",
+      "classification": "REFERENCE",
+      "updatedAt": "2026-05-14T01:11:25.172Z",
+      "bytes": 10848,
+      "recommendedAction": "LINK_AS_EVIDENCE_ONLY"
+    },
+    {
+      "path": "sveltekit-frontend/next_steps/plans/mau5_subgraph_grep_stream_analysis.md",
+      "classification": "REFERENCE",
+      "updatedAt": "2026-05-14T01:21:25.885Z",
+      "bytes": 13933,
+      "recommendedAction": "LINK_AS_EVIDENCE_ONLY"
+    },
+    {
+      "path": "sveltekit-frontend/next_steps/plans/ocr_langextract_whisper_memory_gpu_todo.md",
+      "classification": "SUPPORTING",
+      "updatedAt": "2026-05-13T23:37:43.154Z",
+      "bytes": 14041,
+      "recommendedAction": "LINK_AS_EVIDENCE_ONLY"
+    },
+    {
+      "path": "sveltekit-frontend/next_steps/plans/parent_atlas_karpathy_engram_codex_tasks.md",
+      "classification": "REFERENCE",
+      "updatedAt": "2026-05-26T20:22:19.773Z",
+      "bytes": 23930,
+      "recommendedAction": "LINK_AS_EVIDENCE_ONLY"
+    },
+    {
+      "path": "sveltekit-frontend/next_steps/plans/subgraph_instruction_programming_schema_todo.md",
+      "classification": "SUPPORTING",
+      "updatedAt": "2026-05-14T01:01:45.821Z",
+      "bytes": 14440,
+      "recommendedAction": "LINK_AS_EVIDENCE_ONLY"
+    },
+    {
+      "path": "sveltekit-frontend/next_steps/plans/sveltekit_llm_wiki_evidence_ingestion_todo.md",
+      "classification": "SUPPORTING",
+      "updatedAt": "2026-05-13T23:09:10.745Z",
+      "bytes": 18334,
+      "recommendedAction": "LINK_AS_EVIDENCE_ONLY"
+    },
+    {
+      "path": "sveltekit-frontend/next_steps/plans/turbovec_gpu_bitfrost_evidence_architecture.md",
+      "classification": "REFERENCE",
+      "updatedAt": "2026-05-13T23:24:16.667Z",
+      "bytes": 16194,
+      "recommendedAction": "LINK_AS_EVIDENCE_ONLY"
+    },
+    {
+      "path": "sveltekit-frontend/next_steps/plans/useranalytics.md",
+      "classification": "REFERENCE",
+      "updatedAt": "2026-05-13T23:48:45.242Z",
+      "bytes": 15627,
+      "recommendedAction": "LINK_AS_EVIDENCE_ONLY"
+    },
+    {
+      "path": "sveltekit-frontend/next_steps/active/2026-05-03-auth-gaps.md",
+      "classification": "SUPPORTING_ACTIVE",
+      "updatedAt": "2026-05-03T20:44:51.426Z",
+      "bytes": 1103,
+      "recommendedAction": "LINK_AS_EVIDENCE_ONLY"
+    },
+    {
+      "path": "sveltekit-frontend/next_steps/active/2026-05-03-directory-consolidation.md",
+      "classification": "SUPPORTING_ACTIVE",
+      "updatedAt": "2026-05-03T20:44:51.424Z",
+      "bytes": 4243,
+      "recommendedAction": "LINK_AS_EVIDENCE_ONLY"
+    },
+    {
+      "path": "sveltekit-frontend/next_steps/active/2026-05-03-production-blockers.md",
+      "classification": "SUPPORTING_ACTIVE",
+      "updatedAt": "2026-05-03T20:44:51.427Z",
+      "bytes": 1251,
+      "recommendedAction": "LINK_AS_EVIDENCE_ONLY"
+    },
+    {
+      "path": "sveltekit-frontend/next_steps/active/2026-05-03-production-readiness-master.md",
+      "classification": "SUPPORTING_ACTIVE",
+      "updatedAt": "2026-05-26T23:42:11.525Z",
+      "bytes": 2286,
+      "recommendedAction": "LINK_AS_EVIDENCE_ONLY"
+    },
+    {
+      "path": "sveltekit-frontend/next_steps/active/2026-05-05_inverted-features-build-order.md",
+      "classification": "SUPPORTING_ACTIVE",
+      "updatedAt": "2026-05-06T01:48:56.376Z",
+      "bytes": 10001,
+      "recommendedAction": "LINK_AS_EVIDENCE_ONLY"
+    },
+    {
+      "path": "sveltekit-frontend/next_steps/active/2026-05-05_unwired-features-wiring-plan.md",
+      "classification": "SUPPORTING_ACTIVE",
+      "updatedAt": "2026-05-26T20:22:19.752Z",
+      "bytes": 7254,
+      "recommendedAction": "LINK_AS_EVIDENCE_ONLY"
+    },
+    {
+      "path": "sveltekit-frontend/next_steps/active/2026-05-07-dir-audit-lib-server.md",
+      "classification": "SUPPORTING_ACTIVE",
+      "updatedAt": "2026-05-07T20:57:56.743Z",
+      "bytes": 7512,
+      "recommendedAction": "LINK_AS_EVIDENCE_ONLY"
+    },
+    {
+      "path": "sveltekit-frontend/next_steps/active/2026-05-07_graph-glyph-ace-synthesis.md",
+      "classification": "SUPPORTING_ACTIVE",
+      "updatedAt": "2026-05-26T20:22:19.753Z",
+      "bytes": 12019,
+      "recommendedAction": "LINK_AS_EVIDENCE_ONLY"
+    },
+    {
+      "path": "sveltekit-frontend/next_steps/active/2026-05-08-production-core-routes-recommendation.md",
+      "classification": "SUPPORTING_ACTIVE",
+      "updatedAt": "2026-05-08T20:57:55.979Z",
+      "bytes": 4033,
+      "recommendedAction": "LINK_AS_EVIDENCE_ONLY"
+    },
+    {
+      "path": "sveltekit-frontend/next_steps/active/2026-05-08_23-30-42_topology-admin-thoughts.md",
+      "classification": "SUPPORTING_ACTIVE",
+      "updatedAt": "2026-05-09T06:35:50.002Z",
+      "bytes": 1340,
+      "recommendedAction": "LINK_AS_EVIDENCE_ONLY"
+    },
+    {
+      "path": "sveltekit-frontend/next_steps/active/2026-05-08_agentic-error-fixing-workflow.md",
+      "classification": "SUPPORTING_ACTIVE",
+      "updatedAt": "2026-05-08T21:10:32.742Z",
+      "bytes": 1620,
+      "recommendedAction": "LINK_AS_EVIDENCE_ONLY"
+    },
+    {
+      "path": "sveltekit-frontend/next_steps/active/2026-05-08_agentic-ingestion-program.md",
+      "classification": "SUPPORTING_ACTIVE",
+      "updatedAt": "2026-05-08T21:08:34.622Z",
+      "bytes": 4367,
+      "recommendedAction": "LINK_AS_EVIDENCE_ONLY"
+    },
+    {
+      "path": "sveltekit-frontend/next_steps/active/2026-05-08_agentic-retrieval-checklist.md",
+      "classification": "SUPPORTING_ACTIVE",
+      "updatedAt": "2026-05-08T21:17:26.136Z",
+      "bytes": 965,
+      "recommendedAction": "LINK_AS_EVIDENCE_ONLY"
+    },
+    {
+      "path": "sveltekit-frontend/next_steps/active/2026-05-08_agentic-retrieval-ladder.md",
+      "classification": "SUPPORTING_ACTIVE",
+      "updatedAt": "2026-05-08T21:15:32.353Z",
+      "bytes": 2173,
+      "recommendedAction": "LINK_AS_EVIDENCE_ONLY"
+    },
+    {
+      "path": "sveltekit-frontend/next_steps/active/2026-05-08_atlas-signal-quality-todo.md",
+      "classification": "SUPPORTING_ACTIVE",
+      "updatedAt": "2026-05-15T15:14:47.324Z",
+      "bytes": 8480,
+      "recommendedAction": "LINK_AS_EVIDENCE_ONLY"
+    },
+    {
+      "path": "sveltekit-frontend/next_steps/active/2026-05-08_knowledge-graph-retrieval-feature-tracker.md",
+      "classification": "SUPPORTING_ACTIVE",
+      "updatedAt": "2026-05-09T03:10:51.893Z",
+      "bytes": 2642,
+      "recommendedAction": "LINK_AS_EVIDENCE_ONLY"
+    },
+    {
+      "path": "sveltekit-frontend/next_steps/active/2026-05-08_master-pipeline-todo.md",
+      "classification": "SUPPORTING_ACTIVE",
+      "updatedAt": "2026-06-01T17:02:10.909Z",
+      "bytes": 19508,
+      "recommendedAction": "LINK_AS_EVIDENCE_ONLY"
+    },
+    {
+      "path": "sveltekit-frontend/next_steps/active/2026-05-08_mcp-trace-hardening-session.md",
+      "classification": "SUPPORTING_ACTIVE",
+      "updatedAt": "2026-05-08T01:28:25.275Z",
+      "bytes": 4799,
+      "recommendedAction": "LINK_AS_EVIDENCE_ONLY"
+    },
+    {
+      "path": "sveltekit-frontend/next_steps/active/2026-05-08_path-mapping-retrieval-stack.md",
+      "classification": "SUPPORTING_ACTIVE",
+      "updatedAt": "2026-05-13T23:55:23.515Z",
+      "bytes": 2523,
+      "recommendedAction": "LINK_AS_EVIDENCE_ONLY"
+    },
+    {
+      "path": "sveltekit-frontend/next_steps/active/2026-05-08_pipeline-driven-next-actions.md",
+      "classification": "SUPPORTING_ACTIVE",
+      "updatedAt": "2026-05-15T15:04:08.237Z",
+      "bytes": 9380,
+      "recommendedAction": "LINK_AS_EVIDENCE_ONLY"
+    },
+    {
+      "path": "sveltekit-frontend/next_steps/active/2026-05-08_reconstruction-track-production-ready.md",
+      "classification": "SUPPORTING_ACTIVE",
+      "updatedAt": "2026-05-08T18:44:05.692Z",
+      "bytes": 7153,
+      "recommendedAction": "LINK_AS_EVIDENCE_ONLY"
+    },
+    {
+      "path": "sveltekit-frontend/next_steps/active/2026-05-08_schema-consolidation-production-ready.md",
+      "classification": "SUPPORTING_ACTIVE",
+      "updatedAt": "2026-05-26T20:22:19.754Z",
+      "bytes": 15166,
+      "recommendedAction": "LINK_AS_EVIDENCE_ONLY"
+    },
+    {
+      "path": "sveltekit-frontend/next_steps/active/2026-05-09-dir-audit-lib-server.md",
+      "classification": "SUPPORTING_ACTIVE",
+      "updatedAt": "2026-05-09T07:09:45.387Z",
+      "bytes": 8962,
+      "recommendedAction": "LINK_AS_EVIDENCE_ONLY"
+    },
+    {
+      "path": "sveltekit-frontend/next_steps/active/2026-05-09_agents-md-incremental-pipeline.md",
+      "classification": "SUPPORTING_ACTIVE",
+      "updatedAt": "2026-05-09T16:29:09.543Z",
+      "bytes": 9501,
+      "recommendedAction": "LINK_AS_EVIDENCE_ONLY"
+    },
+    {
+      "path": "sveltekit-frontend/next_steps/active/2026-05-09_karpathy-chr97-wiring.md",
+      "classification": "SUPPORTING_ACTIVE",
+      "updatedAt": "2026-05-09T16:26:37.294Z",
+      "bytes": 11017,
+      "recommendedAction": "LINK_AS_EVIDENCE_ONLY"
+    },
+    {
+      "path": "sveltekit-frontend/next_steps/active/2026-05-09_session-end-handoff.md",
+      "classification": "SUPPORTING_ACTIVE",
+      "updatedAt": "2026-05-15T15:08:16.746Z",
+      "bytes": 9143,
+      "recommendedAction": "LINK_AS_EVIDENCE_ONLY"
+    },
+    {
+      "path": "sveltekit-frontend/next_steps/active/2026-05-10_full-stack-claude-checklist.md",
+      "classification": "SUPPORTING_ACTIVE",
+      "updatedAt": "2026-05-10T23:15:57.456Z",
+      "bytes": 19857,
+      "recommendedAction": "LINK_AS_EVIDENCE_ONLY"
+    },
+    {
+      "path": "sveltekit-frontend/next_steps/active/2026-05-10_langgraph-background-research-worker.md",
+      "classification": "SUPPORTING_ACTIVE",
+      "updatedAt": "2026-05-26T20:22:19.756Z",
+      "bytes": 13295,
+      "recommendedAction": "LINK_AS_EVIDENCE_ONLY"
+    },
+    {
+      "path": "sveltekit-frontend/next_steps/active/2026-05-10_production-mental-model.md",
+      "classification": "SUPPORTING_ACTIVE",
+      "updatedAt": "2026-05-26T20:22:19.758Z",
+      "bytes": 17069,
+      "recommendedAction": "LINK_AS_EVIDENCE_ONLY"
+    },
+    {
+      "path": "sveltekit-frontend/next_steps/active/2026-05-10_rotorquant-bitnet-cache-hierarchy.md",
+      "classification": "SUPPORTING_ACTIVE",
+      "updatedAt": "2026-05-11T00:07:56.184Z",
+      "bytes": 16502,
+      "recommendedAction": "LINK_AS_EVIDENCE_ONLY"
+    },
+    {
+      "path": "sveltekit-frontend/next_steps/active/2026-05-10_service-worker-regex-tool-router.md",
+      "classification": "SUPPORTING_ACTIVE",
+      "updatedAt": "2026-05-10T21:33:17.640Z",
+      "bytes": 26271,
+      "recommendedAction": "LINK_AS_EVIDENCE_ONLY"
+    },
+    {
+      "path": "sveltekit-frontend/next_steps/active/2026-05-14_todo-pt2-workspace-startup-and-gpu-indexing.md",
+      "classification": "SUPPORTING_ACTIVE",
+      "updatedAt": "2026-05-15T05:05:06.279Z",
+      "bytes": 1229,
+      "recommendedAction": "LINK_AS_EVIDENCE_ONLY"
+    },
+    {
+      "path": "sveltekit-frontend/next_steps/active/2026-05-14_todo-pt3-ace-cache-indexing-postgres-qdrant.md",
+      "classification": "SUPPORTING_ACTIVE",
+      "updatedAt": "2026-05-15T05:13:52.751Z",
+      "bytes": 754,
+      "recommendedAction": "LINK_AS_EVIDENCE_ONLY"
+    },
+    {
+      "path": "sveltekit-frontend/next_steps/active/2026-06-16-auth-gaps.md",
+      "classification": "SUPPORTING_ACTIVE",
+      "updatedAt": "2026-06-16T18:19:20.238Z",
+      "bytes": 1873,
+      "recommendedAction": "LINK_AS_EVIDENCE_ONLY"
+    },
+    {
+      "path": "sveltekit-frontend/next_steps/active/2026-06-16-directory-consolidation.md",
+      "classification": "SUPPORTING_ACTIVE",
+      "updatedAt": "2026-06-16T18:19:20.236Z",
+      "bytes": 1622,
+      "recommendedAction": "LINK_AS_EVIDENCE_ONLY"
+    },
+    {
+      "path": "sveltekit-frontend/next_steps/active/2026-06-16-production-blockers.md",
+      "classification": "SUPPORTING_ACTIVE",
+      "updatedAt": "2026-06-16T18:19:20.240Z",
+      "bytes": 5868,
+      "recommendedAction": "LINK_AS_EVIDENCE_ONLY"
+    },
+    {
+      "path": "sveltekit-frontend/next_steps/active/2026-06-16-production-readiness-master.md",
+      "classification": "SUPPORTING_ACTIVE",
+      "updatedAt": "2026-06-16T18:19:20.235Z",
+      "bytes": 8443,
+      "recommendedAction": "LINK_AS_EVIDENCE_ONLY"
+    },
+    {
+      "path": "sveltekit-frontend/next_steps/active/codebase-semantic-index-tasks.md",
+      "classification": "SUPPORTING_ACTIVE",
+      "updatedAt": "2026-05-26T23:42:11.527Z",
+      "bytes": 12742,
+      "recommendedAction": "LINK_AS_EVIDENCE_ONLY"
+    },
+    {
+      "path": "sveltekit-frontend/next_steps/active/codebase-todo-recommendations.md",
+      "classification": "SUPPORTING_ACTIVE",
+      "updatedAt": "2026-06-06T01:35:33.495Z",
+      "bytes": 7534,
+      "recommendedAction": "LINK_AS_EVIDENCE_ONLY"
+    },
+    {
+      "path": "sveltekit-frontend/next_steps/active/karpathy-gpu-recommendations.md",
+      "classification": "SUPPORTING_ACTIVE",
+      "updatedAt": "2026-06-10T16:37:44.506Z",
+      "bytes": 3112,
+      "recommendedAction": "LINK_AS_EVIDENCE_ONLY"
+    },
+    {
+      "path": "sveltekit-frontend/next_steps/active/2026-06-16-directory-context/ace-context.md",
+      "classification": "SUPPORTING_ACTIVE",
+      "updatedAt": "2026-06-16T18:19:20.136Z",
+      "bytes": 1253,
+      "recommendedAction": "LINK_AS_EVIDENCE_ONLY"
+    },
+    {
+      "path": "sveltekit-frontend/next_steps/active/2026-06-16-directory-context/ai-api-context.md",
+      "classification": "SUPPORTING_ACTIVE",
+      "updatedAt": "2026-06-16T18:19:20.153Z",
+      "bytes": 879,
+      "recommendedAction": "LINK_AS_EVIDENCE_ONLY"
+    },
+    {
+      "path": "sveltekit-frontend/next_steps/active/2026-06-16-directory-context/ai-context.md",
+      "classification": "SUPPORTING_ACTIVE",
+      "updatedAt": "2026-06-16T18:19:20.138Z",
+      "bytes": 845,
+      "recommendedAction": "LINK_AS_EVIDENCE_ONLY"
+    },
+    {
+      "path": "sveltekit-frontend/next_steps/active/2026-06-16-directory-context/cache-context.md",
+      "classification": "SUPPORTING_ACTIVE",
+      "updatedAt": "2026-06-16T18:19:20.142Z",
+      "bytes": 904,
+      "recommendedAction": "LINK_AS_EVIDENCE_ONLY"
+    },
+    {
+      "path": "sveltekit-frontend/next_steps/active/2026-06-16-directory-context/codebase-index-api-context.md",
+      "classification": "SUPPORTING_ACTIVE",
+      "updatedAt": "2026-06-16T18:19:20.151Z",
+      "bytes": 1782,
+      "recommendedAction": "LINK_AS_EVIDENCE_ONLY"
+    },
+    {
+      "path": "sveltekit-frontend/next_steps/active/2026-06-16-directory-context/graph-context.md",
+      "classification": "SUPPORTING_ACTIVE",
+      "updatedAt": "2026-06-16T18:19:20.144Z",
+      "bytes": 873,
+      "recommendedAction": "LINK_AS_EVIDENCE_ONLY"
+    },
+    {
+      "path": "sveltekit-frontend/next_steps/active/2026-06-16-directory-context/INDEX.md",
+      "classification": "SUPPORTING_ACTIVE",
+      "updatedAt": "2026-06-16T18:19:20.156Z",
+      "bytes": 1396,
+      "recommendedAction": "LINK_AS_EVIDENCE_ONLY"
+    },
+    {
+      "path": "sveltekit-frontend/next_steps/active/2026-06-16-directory-context/indexer-context.md",
+      "classification": "SUPPORTING_ACTIVE",
+      "updatedAt": "2026-06-16T18:19:20.145Z",
+      "bytes": 1291,
+      "recommendedAction": "LINK_AS_EVIDENCE_ONLY"
+    },
+    {
+      "path": "sveltekit-frontend/next_steps/active/2026-06-16-directory-context/retrieval-context.md",
+      "classification": "SUPPORTING_ACTIVE",
+      "updatedAt": "2026-06-16T18:19:20.147Z",
+      "bytes": 1900,
+      "recommendedAction": "LINK_AS_EVIDENCE_ONLY"
+    },
+    {
+      "path": "sveltekit-frontend/next_steps/active/2026-06-16-directory-context/services-context.md",
+      "classification": "SUPPORTING_ACTIVE",
+      "updatedAt": "2026-06-16T18:19:20.150Z",
+      "bytes": 857,
+      "recommendedAction": "LINK_AS_EVIDENCE_ONLY"
+    },
+    {
+      "path": "sveltekit-frontend/next_steps/active/2026-06-16-directory-context/vector-context.md",
+      "classification": "SUPPORTING_ACTIVE",
+      "updatedAt": "2026-06-16T18:19:20.148Z",
+      "bytes": 905,
+      "recommendedAction": "LINK_AS_EVIDENCE_ONLY"
+    },
+    {
+      "path": "docs/open-lanes/neo4j-gds-gemma4-orchestration.md",
+      "classification": "SUPPORTING_ACTIVE",
+      "updatedAt": "2026-06-11T16:43:13.357Z",
+      "bytes": 12289,
+      "recommendedAction": "LINK_AS_EVIDENCE_ONLY"
+    },
+    {
+      "path": "docs/open-lanes/phase-17i-binary-transport-gpu-json.md",
+      "classification": "SUPPORTING_ACTIVE",
+      "updatedAt": "2026-06-12T01:57:08.949Z",
+      "bytes": 1429,
+      "recommendedAction": "LINK_AS_EVIDENCE_ONLY"
+    },
+    {
+      "path": "docs/open-lanes/phase-3e-1-concept-telemetry.md",
+      "classification": "SUPPORTING_ACTIVE",
+      "updatedAt": "2026-06-11T17:05:26.454Z",
+      "bytes": 2706,
+      "recommendedAction": "LINK_AS_EVIDENCE_ONLY"
+    },
+    {
+      "path": "docs/open-lanes/phase-3f-agent-trace-distillation.md",
+      "classification": "SUPPORTING_ACTIVE",
+      "updatedAt": "2026-06-11T17:11:15.051Z",
+      "bytes": 8240,
+      "recommendedAction": "LINK_AS_EVIDENCE_ONLY"
+    },
+    {
+      "path": "docs/open-lanes/README.md",
+      "classification": "SUPPORTING_ACTIVE",
+      "updatedAt": "2026-06-13T08:08:01.687Z",
+      "bytes": 8273,
+      "recommendedAction": "LINK_AS_EVIDENCE_ONLY"
+    },
+    {
+      "path": "reports/parent-atlas-open-lanes-todo.md",
+      "classification": "CANONICAL",
+      "updatedAt": "2026-06-19T22:29:44.027Z",
+      "bytes": 46021,
+      "recommendedAction": "KEEP_CURRENT"
+    },
+    {
+      "path": "sveltekit-frontend/.opencode/tasks/task-state.md",
+      "classification": "CANONICAL_DERIVED",
+      "updatedAt": "2026-06-19T04:03:40.382Z",
+      "bytes": 1914,
+      "recommendedAction": "KEEP_CURRENT"
+    }
+  ]
+}

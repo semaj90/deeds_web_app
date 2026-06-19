@@ -1,9 +1,9 @@
 {
-  "generated_at": "2026-06-12T21:35:33.003Z",
+  "generated_at": "2026-06-19T20:22:37.224Z",
   "mode": "apply",
-  "packets_with_concepts": 8367,
-  "edges_planned": 29772,
-  "noisy_tokens_dropped": 108778,
+  "packets_with_concepts": 17985,
+  "edges_planned": 42571,
+  "noisy_tokens_dropped": 0,
   "unique_concept_labels": 10,
   "canonical_taxonomy": [
     "agent_intelligence",
@@ -29,12 +29,12 @@
     "test_harness",
     "ui_components"
   ],
-  "applied_pairs": 29772,
+  "applied_pairs": 42571,
   "skipped_pairs": 0,
   "error_pairs": 0,
   "neo4j": {
-    "edge_count": 29744,
-    "packet_count": 5824,
+    "edge_count": 33293,
+    "packet_count": 8744,
     "concept_count": 10
   },
   "gate": {

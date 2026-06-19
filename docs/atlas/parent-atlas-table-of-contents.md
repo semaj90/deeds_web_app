@@ -152,6 +152,8 @@ The next derived surfaces are compare-only until the live contract exists:
 ### Remaining todo focus
 - reconcile the live tree / summary / topology schema before any fresh backfill or plugin promotion
 - refresh-manifest invalidation is now bound to atlas truth promotion
+- OpenCode `/api/v1/chat/completions` now delegates to the ACE facade; EmbeddingGemma, Qdrant packet retrieval, Valkey/Bitfrost reuse, and llama-server fallback are wired end to end
+- reduce cold ACE synthesis latency while preserving the verified Redis repeat-hit path
 - stage packet reader / writer work in `scripts/atlas` and `.tmp`, then consolidate into `packages/parent-atlas`
 - keep HyperRAG telemetry, replay traces, and health logging read-only and append-only
 - expand `feature_id` placement coverage across the remaining cards

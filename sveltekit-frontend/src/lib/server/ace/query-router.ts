@@ -146,6 +146,10 @@ function looksLikeSourceRef(query: string): string | null {
   return null;
 }
 
+function isSomGridCoordinate(value: string | null | undefined): value is string {
+  return typeof value === 'string' && /^\d+:\d+$/.test(value);
+}
+
 // ── Main query router ─────────────────────────────────────────────────────
 
 export interface QueryRouterOpts {
@@ -352,8 +356,11 @@ export async function routeQuery(opts: QueryRouterOpts): Promise<QueryRouterResu
       try {
         const nearest = await nearestCluster(vec, 50);
         if (nearest && nearest.similarity > 0.3) {
-          clusterId = `cluster:${nearest.clusterId}`;
-          somClusterFound = somClusterFound ?? clusterId;
+          const nearestClusterId = String(nearest.clusterId);
+          if (isSomGridCoordinate(nearestClusterId)) {
+            clusterId = nearestClusterId;
+          }
+          somClusterFound = somClusterFound ?? nearestClusterId;
           trace.push({ lane: 'centroid-nn', hit: true, latency_ms: Date.now() - t0 });
         } else {
           trace.push({ lane: 'centroid-nn', hit: false, latency_ms: Date.now() - t0 });
@@ -397,10 +404,10 @@ export async function routeQuery(opts: QueryRouterOpts): Promise<QueryRouterResu
               ? `${hit.payload.somRow}:${hit.payload.somCol}`
               : undefined)
             ?? (hit.payload.gpuCluster != null
-              ? `cluster:${hit.payload.gpuCluster}`
+              ? String(hit.payload.gpuCluster)
               : undefined);
           if (hitCluster) {
-            if (!clusterId) clusterId = hitCluster;
+            if (!clusterId && isSomGridCoordinate(hitCluster)) clusterId = hitCluster;
             if (!somClusterFound) somClusterFound = hitCluster;
           }
 

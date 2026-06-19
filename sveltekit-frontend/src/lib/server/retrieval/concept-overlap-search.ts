@@ -27,12 +27,16 @@ export async function conceptOverlapSearch(
     const results = await db.execute(
       sql`
         SELECT
-          ${atlasPackets.packetId},
+          ${atlasPackets.packetId} as id,
           (
-            CARDINALITY(
-              ${atlasPackets.conceptIds} && ${queryConceptIds}::text[]
-            ) /
-            GREATEST(CARDINALITY(${atlasPackets.conceptIds}), 1)
+            cardinality(
+              array(
+                select unnest(${atlasPackets.conceptIds})
+                intersect
+                select unnest(${queryConceptIds}::text[])
+              )
+            )::float /
+            greatest(cardinality(${atlasPackets.conceptIds}), 1)
           )::float as overlap_score
         FROM ${atlasPackets}
         WHERE ${atlasPackets.conceptIds} && ${queryConceptIds}::text[]
@@ -43,8 +47,8 @@ export async function conceptOverlapSearch(
 
     return (
       results.rows?.map((row: any) => ({
-        id: row.id,
-        overlapScore: row.overlap_score || 0,
+        id: String(row.id),
+        overlapScore: Number(row.overlap_score || 0),
       })) || []
     );
   } catch (error) {

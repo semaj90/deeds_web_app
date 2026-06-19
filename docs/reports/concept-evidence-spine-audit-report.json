@@ -1,0 +1,135 @@
+{
+  "timestamp": "2026-06-19T20:43:25.290Z",
+  "concepts": [
+    {
+      "concept_id": "agent_intelligence",
+      "label": "Agent Intelligence & Self-Healing",
+      "packet_keys_count": 2748,
+      "feature_ids_count": 382,
+      "evidence_cards_count": 16,
+      "success_count": 29,
+      "failure_count": 2,
+      "is_valid": true,
+      "issues": []
+    },
+    {
+      "concept_id": "api_endpoints",
+      "label": "API Endpoints & Routing",
+      "packet_keys_count": 2848,
+      "feature_ids_count": 536,
+      "evidence_cards_count": 16,
+      "success_count": 29,
+      "failure_count": 2,
+      "is_valid": true,
+      "issues": []
+    },
+    {
+      "concept_id": "database_orm",
+      "label": "Database & ORM (PostgreSQL & Drizzle)",
+      "packet_keys_count": 3056,
+      "feature_ids_count": 476,
+      "evidence_cards_count": 16,
+      "success_count": 13,
+      "failure_count": 3,
+      "is_valid": true,
+      "issues": []
+    },
+    {
+      "concept_id": "emergent_topology",
+      "label": "Emergent Topology Clusters",
+      "packet_keys_count": 3373,
+      "feature_ids_count": 985,
+      "evidence_cards_count": 16,
+      "success_count": 29,
+      "failure_count": 2,
+      "is_valid": true,
+      "issues": []
+    },
+    {
+      "concept_id": "general_abstractions",
+      "label": "General Codebase Abstractions",
+      "packet_keys_count": 3166,
+      "feature_ids_count": 387,
+      "evidence_cards_count": 16,
+      "success_count": 29,
+      "failure_count": 2,
+      "is_valid": true,
+      "issues": []
+    },
+    {
+      "concept_id": "infrastructure_config",
+      "label": "Infrastructure & Configuration (Docker)",
+      "packet_keys_count": 3948,
+      "feature_ids_count": 694,
+      "evidence_cards_count": 16,
+      "success_count": 29,
+      "failure_count": 2,
+      "is_valid": true,
+      "issues": []
+    },
+    {
+      "concept_id": "native_accelerators",
+      "label": "Native Accelerators & GPU (LibTorch/SIMD)",
+      "packet_keys_count": 2644,
+      "feature_ids_count": 171,
+      "evidence_cards_count": 16,
+      "success_count": 29,
+      "failure_count": 2,
+      "is_valid": true,
+      "issues": []
+    },
+    {
+      "concept_id": "observability_telemetry",
+      "label": "Observability & Retrieval Telemetry",
+      "packet_keys_count": 3201,
+      "feature_ids_count": 686,
+      "evidence_cards_count": 16,
+      "success_count": 29,
+      "failure_count": 2,
+      "is_valid": true,
+      "issues": []
+    },
+    {
+      "concept_id": "test_harness",
+      "label": "Testing Harness & Smoke Benchmarks",
+      "packet_keys_count": 3274,
+      "feature_ids_count": 871,
+      "evidence_cards_count": 16,
+      "success_count": 11,
+      "failure_count": 1,
+      "is_valid": true,
+      "issues": []
+    },
+    {
+      "concept_id": "ui_components",
+      "label": "UI Components (Svelte & UX)",
+      "packet_keys_count": 2280,
+      "feature_ids_count": 291,
+      "evidence_cards_count": 16,
+      "success_count": 29,
+      "failure_count": 2,
+      "is_valid": true,
+      "issues": []
+    }
+  ],
+  "summary": {
+    "total_concepts": 10,
+    "packet_keys_present": 10,
+    "feature_ids_present": 10,
+    "evidence_cards_valid": true,
+    "coverage": {
+      "packet_keys": 100,
+      "feature_ids": 100,
+      "evidence_cards": 100
+    }
+  },
+  "gates": {
+    "audit": "PASS"
+  },
+  "evidence": [
+    "concept_records",
+    "atlas_packets",
+    "audit-concept-evidence-spine.mjs"
+  ],
+  "errors": []
+}

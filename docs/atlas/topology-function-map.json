@@ -1,0 +1,42 @@
+[
+  {
+    "lane": "CELL_MAPPING",
+    "file": "scripts/atlas/train-som-20x20.mjs",
+    "symbols": ["parseSom", "trainSOM", "euclideanDistance"],
+    "validates": ["som_row", "som_col", "som_index"],
+    "truth_source": "atlas_packets",
+    "derived_outputs": ["topology JSONB", "Redis som:centroid:*", "Redis cell assignments"]
+  },
+  {
+    "lane": "DENSE_SEARCH",
+    "file": "sveltekit-frontend/src/lib/server/retrieval/hyperrag-packet-rpc.ts",
+    "symbols": ["hyperragPacketRpc"],
+    "validates": ["packet_key", "source_ref", "feature_id"],
+    "truth_source": "Qdrant embedding_768 + Postgres atlas_packets",
+    "derived_outputs": ["ACE hit", "replay trace"]
+  },
+  {
+    "lane": "AUTOENCODER",
+    "file": "scripts/atlas/backfill-latent-vectors.mjs",
+    "symbols": ["autoencoderEncode", "loadNpy", "isCanonicalPacketPayload"],
+    "validates": ["latent_64", "ae_epoch", "ae_val_loss", "ae_timestamp"],
+    "truth_source": "ae_meta.json + checkpoints",
+    "derived_outputs": ["models/autoencoder/autoencoder_latent_index.json", "Redis gpu:autoencoder:latent_64:*"]
+  },
+  {
+    "lane": "FUSION_RERANK",
+    "file": "sveltekit-frontend/src/lib/server/retrieval/hyperrag-fusion-service.ts",
+    "symbols": ["HyperRagFusionService", "fuseResults"],
+    "validates": ["fusion_score", "som_bonus", "topology_bonus"],
+    "truth_source": "Qdrant dense embedding + BM25 + Neo4j GDS",
+    "derived_outputs": ["Ranked candidate set", "Fused packet envelope"]
+  },
+  {
+    "lane": "CACHE",
+    "file": "sveltekit-frontend/src/lib/server/ai/bifrost-cache-manager.ts",
+    "symbols": ["getKagContext", "registerKagContext", "getRetrieval", "logRetrieval"],
+    "validates": ["cache_hit", "cache_epoch", "source_ref"],
+    "truth_source": "Postgres packet pointer",
+    "derived_outputs": ["Bitfrost/Valkey hot hit", "bifrost:kv:prefix:*", "bitfrost:retrieval:*"]
+  }
+]

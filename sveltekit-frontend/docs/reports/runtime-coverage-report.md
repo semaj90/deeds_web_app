@@ -1,12 +1,12 @@
 # Runtime Coverage Audit
 
-Generated: 2026-06-13T15:07:22.746Z
+Generated: 2026-06-19T20:31:50.285Z
 
 ## Summary
 
-- agent_traces rows: 1134
-- selected_concepts coverage: 100%
-- retrieved_packets coverage: 100%
+- agent_traces rows: 1150
+- selected_concepts coverage: 98.96%
+- retrieved_packets coverage: 98.61%
 - tool_calls coverage: 100%
 - route_runtime_packets rows: 33
 - runtime low-density rows: 0
@@ -16,8 +16,8 @@ Generated: 2026-06-13T15:07:22.746Z
 
 ## Open Traces
 
-- traces with no selected_concepts: 0
-- traces with no retrieved_packets: 0
+- traces with no selected_concepts: 12
+- traces with no retrieved_packets: 16
 - traces with no tool_calls: 0
 
 ## Notes

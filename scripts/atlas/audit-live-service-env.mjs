@@ -169,7 +169,12 @@ function parseRedisConfig(env) {
 
 function parseGoRetrievalConfig(env) {
   const httpRaw = String(env.RETRIEVAL_HTTP_URL ?? env.GO_RETRIEVAL_HTTP_URL ?? '').trim();
-  const grpcRaw = String(env.RETRIEVAL_GRPC_URL ?? env.GO_RETRIEVAL_GRPC_URL ?? '').trim();
+  const grpcRaw = String(
+    env.RETRIEVAL_GRPC_URL
+      ?? env.GO_RETRIEVAL_GRPC_URL
+      ?? env.GO_RETRIEVAL_GRPC_ADDR
+      ?? '',
+  ).trim();
   const httpParsed = parseUrlLike(httpRaw, 'http');
   const grpcParsed = parseUrlLike(grpcRaw, 'http');
   const host = normalizeConnectionHost(
@@ -183,8 +188,8 @@ function parseGoRetrievalConfig(env) {
     host,
     httpPort: Number(httpParsed?.port || env.RETRIEVAL_HTTP_PORT || EXPECTED.goRetrieval.httpPort),
     grpcPort: Number(grpcParsed?.port || env.RETRIEVAL_GRPC_PORT || EXPECTED.goRetrieval.grpcPort),
-    httpEnabled: (env.RETRIEVAL_HTTP_ENABLED ?? 'false') === 'true',
-    grpcEnabled: (env.RETRIEVAL_GRPC_ENABLED ?? 'false') === 'true',
+    httpEnabled: (env.RETRIEVAL_HTTP_ENABLED ?? env.GO_RETRIEVAL_ENABLED ?? 'false') === 'true',
+    grpcEnabled: (env.RETRIEVAL_GRPC_ENABLED ?? env.GO_RETRIEVAL_ENABLED ?? 'false') === 'true',
   };
 }
 

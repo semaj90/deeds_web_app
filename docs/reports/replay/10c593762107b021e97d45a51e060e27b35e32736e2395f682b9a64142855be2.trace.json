@@ -2,7 +2,7 @@
   "query": "how is the Triton VLM model routing configured?",
   "hash": "10c593762107b021e97d45a51e060e27b35e32736e2395f682b9a64142855be2",
   "bucket": "low-density",
-  "timestamp": "2026-06-19T15:45:37.898Z",
+  "timestamp": "2026-06-19T17:10:34.320Z",
   "payload": {
     "ok": true,
     "query": "how is the Triton VLM model routing configured?",
@@ -144,10 +144,10 @@
         "packet_key": "hyperrag:src/lib/server/db/schema/case_notes.ts",
         "feature_id": "database_orm",
         "source_ref": "src/lib/server/db/schema/case_notes.ts",
-        "retrieved_at": "2026-06-19T15:45:37.895Z",
+        "retrieved_at": "2026-06-19T17:10:34.315Z",
         "retrieved_from": "hyperrag",
         "retrieval_confidence": 0.85,
-        "retrieval_latency_ms": 1601,
+        "retrieval_latency_ms": 1643,
         "ace_confidence": 0.9,
         "kag_aligned": true,
         "dag_reachable": true
@@ -156,10 +156,10 @@
         "packet_key": "hyperrag:src/lib/server/db/schema/warden_audit_log.ts",
         "feature_id": "database_orm",
         "source_ref": "src/lib/server/db/schema/warden_audit_log.ts",
-        "retrieved_at": "2026-06-19T15:45:37.895Z",
+        "retrieved_at": "2026-06-19T17:10:34.315Z",
         "retrieved_from": "hyperrag",
         "retrieval_confidence": 0.65,
-        "retrieval_latency_ms": 1601,
+        "retrieval_latency_ms": 1643,
         "ace_confidence": 0.9,
         "kag_aligned": true,
         "dag_reachable": true
@@ -168,10 +168,10 @@
         "packet_key": "hyperrag:src/lib/server/db/schema/auto_tags.ts",
         "feature_id": "database_orm",
         "source_ref": "src/lib/server/db/schema/auto_tags.ts",
-        "retrieved_at": "2026-06-19T15:45:37.895Z",
+        "retrieved_at": "2026-06-19T17:10:34.315Z",
         "retrieved_from": "hyperrag",
         "retrieval_confidence": 0.65,
-        "retrieval_latency_ms": 1601,
+        "retrieval_latency_ms": 1643,
         "ace_confidence": 0.9,
         "kag_aligned": true,
         "dag_reachable": true
@@ -180,10 +180,10 @@
         "packet_key": "hyperrag:src/lib/server/db/schema/user_ai_queries.ts",
         "feature_id": "database_orm",
         "source_ref": "src/lib/server/db/schema/user_ai_queries.ts",
-        "retrieved_at": "2026-06-19T15:45:37.895Z",
+        "retrieved_at": "2026-06-19T17:10:34.315Z",
         "retrieved_from": "hyperrag",
         "retrieval_confidence": 0.65,
-        "retrieval_latency_ms": 1601,
+        "retrieval_latency_ms": 1643,
         "ace_confidence": 0.9,
         "kag_aligned": true,
         "dag_reachable": true
@@ -192,10 +192,10 @@
         "packet_key": "hyperrag:src/lib/server/db/schema/state_constitution_sources.ts",
         "feature_id": "database_orm",
         "source_ref": "src/lib/server/db/schema/state_constitution_sources.ts",
-        "retrieved_at": "2026-06-19T15:45:37.895Z",
+        "retrieved_at": "2026-06-19T17:10:34.315Z",
         "retrieved_from": "hyperrag",
         "retrieval_confidence": 0.65,
-        "retrieval_latency_ms": 1601,
+        "retrieval_latency_ms": 1643,
         "ace_confidence": 0.9,
         "kag_aligned": true,
         "dag_reachable": true
@@ -208,7 +208,7 @@
       "rrf_hits": 0,
       "neo4j_expansions": 0,
       "cache_hits": 0,
-      "latency_ms": 1607
+      "latency_ms": 1653
     }
   }
 }

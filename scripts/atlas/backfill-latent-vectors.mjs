@@ -25,9 +25,9 @@ import { fileURLToPath } from 'url';
 import { existsSync, readFileSync, writeFileSync, mkdirSync } from 'fs';
 import pg from 'pg';
 import Redis from 'ioredis';
-import { config } from 'dotenv';
+import { loadAtlasEnv } from './load-atlas-env.mjs';
 
-config({ path: resolve('.', '.env') });
+loadAtlasEnv(resolve('.'));
 
 const __dir   = dirname(fileURLToPath(import.meta.url));
 const ROOT    = resolve(__dir, '..', '..');
@@ -49,7 +49,8 @@ const LATENT_DIM  = 64;
 const REDIS_TTL   = 7 * 24 * 3600; // 7 days
 
 const args     = process.argv.slice(2);
-const DRY_RUN  = args.includes('--dry-run');
+const APPLY    = args.includes('--apply');
+const DRY_RUN  = !APPLY || args.includes('--dry-run');
 const limitArg = args.find(a => a.startsWith('--limit='));
 const LIMIT    = limitArg ? parseInt(limitArg.split('=')[1], 10) : Infinity;
 const batchArg = args.find(a => a.startsWith('--batch='));
@@ -66,9 +67,13 @@ function floatArrayToBuffer(fa) {
 /** Load a .npy file (simple 1-D / 2-D float32, no zip, no structured dtype). */
 function loadNpy(path) {
   const raw = readFileSync(path);
-  // magic + version (10 bytes) then header length (2 bytes little-endian)
-  const magic = raw.slice(0, 6).toString('ascii');
-  if (!magic.startsWith('\x93NUMPY')) throw new Error(`Not a .npy file: ${path}`);
+  const isNpy = raw[0] === 0x93 &&
+                raw[1] === 0x4e && // 'N'
+                raw[2] === 0x55 && // 'U'
+                raw[3] === 0x4d && // 'M'
+                raw[4] === 0x50 && // 'P'
+                raw[5] === 0x59;   // 'Y'
+  if (!isNpy) throw new Error(`Not a .npy file: ${path}`);
   const hdrLen = raw[8] + (raw[9] << 8);
   const hdrStr = raw.slice(10, 10 + hdrLen).toString('ascii');
   const shapeM = hdrStr.match(/shape\s*:\s*\(([^)]+)\)/);
@@ -77,16 +82,43 @@ function loadNpy(path) {
   return { data: new Float32Array(data), shape };
 }
 
+function isCanonicalPacketPayload(payload = {}) {
+  if (
+    payload.kind === 'directory-cluster' ||
+    payload.ledger_type === 'legacy_qdrant_only' ||
+    payload.canonical === false ||
+    payload.payload_unmatched === true
+  ) return false;
+  return Boolean(
+    payload.packet_key ||
+    payload.packetKey ||
+    payload.chunk_id ||
+    payload.source_ref ||
+    payload.sourceRef ||
+    payload.canonical_source_ref ||
+    payload.file_path ||
+    payload.filePath ||
+    payload.path
+  );
+}
+
 /** Scroll all vectors from Qdrant, up to LIMIT. */
 async function scrollQdrant(url, collection, limit) {
   const vecs   = [];
   const ids    = [];
+  const candidatesMap = {};
+  const pointsMap = {};
   let   offset = null;
 
   while (vecs.length < limit) {
     const body = JSON.stringify({
       limit: Math.min(250, limit - vecs.length),
-      with_payload: false,
+      with_payload: [
+        "packet_key", "packetKey", "chunk_id", "source_ref", "sourceRef",
+        "sourceRefs", "filePath", "canonical_source_ref", "path", "file_path",
+        "qdrant_point_id", "feature_id", "featureId", "kind", "ledger_type",
+        "canonical", "payload_unmatched"
+      ],
       with_vector:  true,
       ...(offset ? { offset } : {})
     });
@@ -102,10 +134,68 @@ async function scrollQdrant(url, collection, limit) {
 
     for (const p of pts) {
       let vec = p.vector;
-      if (vec && typeof vec === 'object' && !Array.isArray(vec)) vec = Object.values(vec)[0];
-      if (Array.isArray(vec) && vec.length === INPUT_DIM) {
+      if (vec && typeof vec === 'object' && !Array.isArray(vec)) vec = p.vector.content || Object.values(vec)[0];
+      if (
+        Array.isArray(vec) &&
+        vec.length === INPUT_DIM &&
+        isCanonicalPacketPayload(p.payload)
+      ) {
         vecs.push(vec);
-        ids.push(p.id);
+
+        // Build candidate list
+        const candidates = new Set();
+        if (p.payload?.packetKey) candidates.add(String(p.payload.packetKey));
+        if (p.payload?.packet_key) candidates.add(String(p.payload.packet_key));
+        if (p.payload?.chunk_id) candidates.add(String(p.payload.chunk_id).replace(/^card:/, ""));
+        if (p.payload?.filePath) candidates.add(String(p.payload.filePath));
+        if (p.payload?.canonical_source_ref) candidates.add(String(p.payload.canonical_source_ref));
+        if (p.payload?.source_ref) candidates.add(String(p.payload.source_ref));
+        if (p.payload?.sourceRefs && p.payload.sourceRefs[0]) candidates.add(String(p.payload.sourceRefs[0]));
+        if (p.payload?.path) candidates.add(String(p.payload.path));
+        if (p.payload?.file_path) candidates.add(String(p.payload.file_path));
+        if (p.payload?.qdrant_point_id) candidates.add(String(p.payload.qdrant_point_id));
+        candidates.add(String(p.id));
+
+        // Use the first non-numeric candidate as the main ID if available, otherwise Qdrant point ID
+        let primaryId = String(p.id);
+        for (const cand of candidates) {
+          if (!/^\d+$/.test(cand)) {
+            primaryId = cand;
+            break;
+          }
+        }
+
+        const qdPointId = String(p.id);
+        const packet_key = p.payload?.packet_key ?? p.payload?.packetKey ?? p.payload?.chunk_id ?? null;
+        const source_ref = p.payload?.source_ref ?? p.payload?.sourceRef ?? p.payload?.filePath ?? p.payload?.path ?? p.payload?.file_path ?? null;
+        const canonical_source_ref = p.payload?.canonical_source_ref ?? p.payload?.canonicalSourceRef ?? null;
+        const file_path = p.payload?.file_path ?? p.payload?.filePath ?? null;
+        const feature_id = p.payload?.feature_id ?? p.payload?.featureId ?? null;
+
+        const candidate_keys = [
+          packet_key,
+          source_ref,
+          canonical_source_ref,
+          file_path,
+          p.payload?.source_ref,
+          p.payload?.metadata?.source_ref
+        ].filter(val => typeof val === 'string' && val.trim().length > 0);
+
+        ids.push(qdPointId);
+        candidatesMap[qdPointId] = Array.from(new Set([...candidates, ...candidate_keys]));
+        pointsMap[qdPointId] = {
+          primary_id: primaryId,
+          qdrant_point_id: qdPointId,
+          packet_key,
+          source_ref,
+          canonical_source_ref,
+          feature_id,
+          candidate_keys: Array.from(new Set(candidate_keys)),
+          kind: p.payload?.kind ?? null,
+          ledger_type: p.payload?.ledger_type ?? null,
+          canonical: p.payload?.canonical ?? null,
+          payload_unmatched: p.payload?.payload_unmatched ?? null
+        };
       }
     }
     offset = json.result?.next_page_offset;
@@ -113,7 +203,7 @@ async function scrollQdrant(url, collection, limit) {
     process.stdout.write(`\r  [scroll] ${vecs.length} vectors fetched...`);
   }
   process.stdout.write('\n');
-  return { vecs, ids };
+  return { vecs, ids, candidatesMap, pointsMap };
 }
 
 // ── Main ──────────────────────────────────────────────────────────────────────
@@ -174,9 +264,9 @@ async function main() {
   console.log('Step 3: Fetch embeddings from Qdrant');
   console.log('─────────────────────────────────────');
 
-  let vecs, ids;
+  let vecs, ids, candidatesMap, pointsMap;
   try {
-    ({ vecs, ids } = await scrollQdrant(QDRANT_URL, COLLECTION, LIMIT));
+    ({ vecs, ids, candidatesMap, pointsMap } = await scrollQdrant(QDRANT_URL, COLLECTION, LIMIT));
   } catch (e) {
     console.error(`❌ Qdrant scroll failed: ${e.message}`);
     process.exit(2);
@@ -199,7 +289,7 @@ async function main() {
   const W2f = W2.data;  // Float32Array [64*128]
   const b2f = b2.data;  // Float32Array [64]
 
-  const latentIndex = {};   // qdrant_id → float32 array (64-dim)
+  const latentIndex = {};   // qdrant_id → latent object
   let encoded_count = 0;
   let t_encode = 0;
 
@@ -223,7 +313,17 @@ async function main() {
 
     for (let i = 0; i < bSize; i++) {
       const id = String(ids[start + i]);
-      latentIndex[id] = Array.from(lat64.subarray(i * LATENT_DIM, (i + 1) * LATENT_DIM));
+      const ptInfo = pointsMap[id] || {};
+      latentIndex[id] = {
+        primary_id: ptInfo.primary_id || id,
+        qdrant_point_id: ptInfo.qdrant_point_id || '',
+        packet_key: ptInfo.packet_key || null,
+        source_ref: ptInfo.source_ref || null,
+        canonical_source_ref: ptInfo.canonical_source_ref || null,
+        feature_id: ptInfo.feature_id || null,
+        payload_unmatched: ptInfo.payload_unmatched,
+        latent_64: Array.from(lat64.subarray(i * LATENT_DIM, (i + 1) * LATENT_DIM))
+      };
     }
     encoded_count = end;
     process.stdout.write(`\r  Encoded ${encoded_count}/${N} (${(t_encode / encoded_count).toFixed(2)} ms/vec)...`);
@@ -235,59 +335,278 @@ async function main() {
   console.log('Step 5: Save latent index (for train-som-20x20.mjs)');
   console.log('─────────────────────────────────────────────────────');
 
-  mkdirSync(MODEL_DIR, { recursive: true });
-  writeFileSync(LATENT_FILE, JSON.stringify({
+  const latentArtifact = {
     timestamp:   new Date().toISOString(),
     model:       'autoencoder_768_128_64',
     input_dim:   INPUT_DIM,
     hidden_dim:  HIDDEN_DIM,
     output_dim:  LATENT_DIM,
     packet_count: Object.keys(latentIndex).length,
-    index:       latentIndex          // { qdrant_id: [f32 × 64] }
-  }, null, 2));
-  console.log(`  ✅ ${LATENT_FILE}  (${Object.keys(latentIndex).length} entries)\n`);
+    index:       latentIndex,          // { qdrant_id: latent object }
+    candidates:  candidatesMap         // { qdrant_id: [candidates] }
+  };
 
   if (DRY_RUN) {
-    console.log('🔍 DRY-RUN — skipping Postgres and Redis writes.');
-    console.log('   Remove --dry-run to apply.');
+    console.log(`  🔍 DRY-RUN — would write ${Object.keys(latentIndex).length} entries to ${LATENT_FILE}`);
+    console.log('   Skipping artifact, Postgres, and Redis writes. Use --apply to persist.');
     return;
   }
+
+  mkdirSync(MODEL_DIR, { recursive: true });
+  writeFileSync(LATENT_FILE, JSON.stringify(latentArtifact, null, 2));
+  console.log(`  ✅ ${LATENT_FILE}  (${Object.keys(latentIndex).length} entries)\n`);
 
   // ── Step 6: Write to Postgres atlas_packets ────────────────────────────────
   console.log('Step 6: Write latent_64 → Postgres atlas_packets');
   console.log('──────────────────────────────────────────────────');
 
   const pool = new pg.Pool({ connectionString: DATABASE_URL });
-  let pg_updated = 0;
-  let pg_skipped = 0;
+  let pg_reasons = {
+    qdrant_point_id: 0,
+    packet_key: 0,
+    source_ref: 0,
+    jsonb_fallback: 0,
+    skipped: 0
+  };
+  let pgUpdated = 0;
+  let pgNotMatched = 0;
+  let redisCached = 0;
   const entries = Object.entries(latentIndex);
 
   for (let start = 0; start < entries.length; start += BATCH_SZ) {
     const slice = entries.slice(start, start + BATCH_SZ);
     await pool.query('BEGIN');
     try {
-      for (const [qdrant_id, latent] of slice) {
-        const buf = floatArrayToBuffer(new Float32Array(latent));
-        const res = await pool.query(
+      let batchUpdated = 0;
+      for (const [qdrant_id, entry] of slice) {
+        if (
+          entry.kind === 'directory-cluster' ||
+          entry.ledger_type === 'legacy_qdrant_only' ||
+          entry.canonical === false ||
+          entry.payload_unmatched === true ||
+          (!entry.packet_key && !entry.source_ref)
+        ) {
+          pg_reasons.skipped++;
+          continue;
+        }
+        const buf = floatArrayToBuffer(new Float32Array(entry.latent_64));
+        let qdId = entry.qdrant_point_id || qdrant_id;
+        const candidate_keys = entry.candidate_keys || [];
+        
+        let pKeys = [];
+        let sRefs = [];
+
+        for (const k of candidate_keys) {
+          if (k.includes(':')) {
+            pKeys.push(k);
+            const prefix = k.startsWith('sveltekit-frontend/') ? k.replace('sveltekit-frontend/', '') : 'sveltekit-frontend/' + k;
+            pKeys.push(prefix);
+          } else {
+            sRefs.push(k);
+            const prefix = k.startsWith('sveltekit-frontend/') ? k.replace('sveltekit-frontend/', '') : 'sveltekit-frontend/' + k;
+            sRefs.push(prefix);
+          }
+        }
+
+        if (entry.packet_key) {
+          pKeys.push(entry.packet_key);
+          const prefix = entry.packet_key.startsWith('sveltekit-frontend/')
+            ? entry.packet_key.replace('sveltekit-frontend/', '')
+            : 'sveltekit-frontend/' + entry.packet_key;
+          pKeys.push(prefix);
+        }
+        if (entry.source_ref) {
+          sRefs.push(entry.source_ref);
+          const prefix = entry.source_ref.startsWith('sveltekit-frontend/')
+            ? entry.source_ref.replace('sveltekit-frontend/', '')
+            : 'sveltekit-frontend/' + entry.source_ref;
+          sRefs.push(prefix);
+        }
+
+        const finalPKeys = Array.from(new Set(pKeys));
+        const finalSRes = Array.from(new Set(sRefs));
+
+        if (!qdId) qdId = qdrant_id;
+        if (finalPKeys.length === 0) finalPKeys.push(qdrant_id, 'sveltekit-frontend/' + qdrant_id);
+        if (finalSRes.length === 0) finalSRes.push(qdrant_id, 'sveltekit-frontend/' + qdrant_id);
+
+        let matched = false;
+
+        // Reason 1: Direct qdrant_point_id match
+        let res = await pool.query(
           `UPDATE atlas_packets
-             SET latent_64 = $1, updated_at = NOW()
-           WHERE packet_key = $2 OR qdrant_id::text = $2`,
-          [buf, qdrant_id]
+              SET latent_64 = $1,
+                  metadata = jsonb_set(
+                    jsonb_set(
+                      jsonb_set(coalesce(metadata, '{}'::jsonb), '{ae_epoch}', $3::jsonb),
+                      '{ae_val_loss}', $4::jsonb
+                    ),
+                    '{ae_timestamp}', $5::jsonb
+                  ),
+                  updated_at = NOW()
+            WHERE qdrant_point_id = $2
+           RETURNING packet_id`,
+          [
+            buf,
+            qdId,
+            JSON.stringify(meta.epoch ?? 60),
+            JSON.stringify(meta.best_val_loss ?? meta.val_loss ?? 0.0),
+            JSON.stringify(meta.timestamp ?? new Date().toISOString())
+          ]
         );
-        if (res.rowCount > 0) pg_updated++;
-        else pg_skipped++;
+
+        if (res.rowCount > 0) {
+          pg_reasons.qdrant_point_id += res.rowCount;
+          matched = true;
+          batchUpdated += res.rowCount;
+        }
+
+        // Reason 2: packet_key match
+        if (!matched && finalPKeys.length > 0) {
+          res = await pool.query(
+            `UPDATE atlas_packets
+                SET latent_64 = $1,
+                    metadata = jsonb_set(
+                      jsonb_set(
+                        jsonb_set(coalesce(metadata, '{}'::jsonb), '{ae_epoch}', $3::jsonb),
+                        '{ae_val_loss}', $4::jsonb
+                      ),
+                      '{ae_timestamp}', $5::jsonb
+                    ),
+                    updated_at = NOW()
+              WHERE packet_key = ANY($2)
+             RETURNING packet_id`,
+            [
+              buf,
+              finalPKeys,
+              JSON.stringify(meta.epoch ?? 60),
+              JSON.stringify(meta.best_val_loss ?? meta.val_loss ?? 0.0),
+              JSON.stringify(meta.timestamp ?? new Date().toISOString())
+            ]
+          );
+
+          if (res.rowCount > 0) {
+            pg_reasons.packet_key += res.rowCount;
+            matched = true;
+            batchUpdated += res.rowCount;
+          }
+        }
+
+        // Reason 3: source_ref match
+        if (!matched && finalSRes.length > 0) {
+          res = await pool.query(
+            `UPDATE atlas_packets
+                SET latent_64 = $1,
+                    metadata = jsonb_set(
+                      jsonb_set(
+                        jsonb_set(coalesce(metadata, '{}'::jsonb), '{ae_epoch}', $3::jsonb),
+                        '{ae_val_loss}', $4::jsonb
+                      ),
+                      '{ae_timestamp}', $5::jsonb
+                    ),
+                    updated_at = NOW()
+              WHERE source_ref = ANY($2)
+             RETURNING packet_id`,
+            [
+              buf,
+              finalSRes,
+              JSON.stringify(meta.epoch ?? 60),
+              JSON.stringify(meta.best_val_loss ?? meta.val_loss ?? 0.0),
+              JSON.stringify(meta.timestamp ?? new Date().toISOString())
+            ]
+          );
+
+          if (res.rowCount > 0) {
+            pg_reasons.source_ref += res.rowCount;
+            matched = true;
+            batchUpdated += res.rowCount;
+          }
+        }
+
+        // Reason 4: JSONB fallback
+        if (!matched) {
+          const directPKey = entry.packet_key || qdId;
+          const directSRef = entry.source_ref || qdId;
+          const primaryIdVal = entry.primary_id || qdId;
+
+          res = await pool.query(
+            `UPDATE atlas_packets
+                SET latent_64 = $1,
+                    metadata = jsonb_set(
+                      jsonb_set(
+                        jsonb_set(coalesce(metadata, '{}'::jsonb), '{ae_epoch}', $5::jsonb),
+                        '{ae_val_loss}', $6::jsonb
+                      ),
+                      '{ae_timestamp}', $7::jsonb
+                    ),
+                    updated_at = NOW()
+              WHERE payload @> jsonb_build_object('qdrant_point_id', $2::text)
+                 OR metadata @> jsonb_build_object('qdrant_point_id', $2::text)
+                 OR payload @> jsonb_build_object('packet_key', $8::text)
+                 OR metadata @> jsonb_build_object('packet_key', $8::text)
+                 OR payload @> jsonb_build_object('packetKey', $8::text)
+                 OR metadata @> jsonb_build_object('packetKey', $8::text)
+                 OR payload @> jsonb_build_object('source_ref', $9::text)
+                 OR metadata @> jsonb_build_object('source_ref', $9::text)
+                 OR payload @> jsonb_build_object('sourceRef', $9::text)
+                 OR metadata @> jsonb_build_object('sourceRef', $9::text)
+                 OR payload @> jsonb_build_object('primary_id', $10::text)
+                 OR metadata @> jsonb_build_object('primary_id', $10::text)
+             RETURNING packet_id`,
+            [
+              buf,
+              qdId,
+              finalPKeys,
+              finalSRes,
+              JSON.stringify(meta.epoch ?? 60),
+              JSON.stringify(meta.best_val_loss ?? meta.val_loss ?? 0.0),
+              JSON.stringify(meta.timestamp ?? new Date().toISOString()),
+              directPKey,
+              directSRef,
+              primaryIdVal
+            ]
+          );
+          if (res.rowCount > 0) {
+            pg_reasons.jsonb_fallback += res.rowCount;
+            matched = true;
+            batchUpdated += res.rowCount;
+          }
+        }
       }
       await pool.query('COMMIT');
+      const result = { rowCount: batchUpdated };
+      pgUpdated += Number(result?.rowCount ?? 0);
+      const expected = slice.length;
+      pgNotMatched += Math.max(0, expected - Number(result?.rowCount ?? 0));
     } catch (e) {
       await pool.query('ROLLBACK');
       console.error(`\n  ❌ Postgres batch failed at ${start}: ${e.message}`);
       await pool.end();
       process.exit(3);
     }
-    process.stdout.write(`\r  PG: ${pg_updated} updated, ${pg_skipped} skipped...`);
+    process.stdout.write(`\r  PG: ${pgUpdated} updated, ${pgNotMatched} not matched...`);
   }
   process.stdout.write('\n');
-  console.log(`  ✅ Postgres: ${pg_updated} rows updated, ${pg_skipped} not matched\n`);
+  console.log(`  ✅ Postgres: ${pgUpdated} rows updated, ${pgNotMatched} not matched\n`);
+  
+  const writebackReportPath = resolve('.', 'docs/reports/backfill-latent-vectors-writeback.json');
+  mkdirSync(resolve('.', 'docs/reports'), { recursive: true });
+  const batchTotal = entries.length;
+  writeFileSync(writebackReportPath, JSON.stringify({
+    timestamp: new Date().toISOString(),
+    total_processed: batchTotal,
+    postgres: {
+      updated: pgUpdated,
+      notMatched: pgNotMatched,
+      matchRate:
+        batchTotal > 0
+          ? Number(((pgUpdated / batchTotal) * 100).toFixed(2))
+          : 0
+    },
+    reasons: pg_reasons
+  }, null, 2));
+  console.log(`  ✅ Reasoned writeback report saved to ${writebackReportPath}\n`);
+
   await pool.end();
 
   // ── Step 7: Cache in Redis ─────────────────────────────────────────────────
@@ -309,17 +628,17 @@ async function main() {
   let redis_ok = false;
   try {
     await redis.connect();
-    let cached = 0;
+    let redisCached = 0;
     const pipeline = redis.pipeline();
-    for (const [id, latent] of Object.entries(latentIndex)) {
-      pipeline.setex(`gpu:autoencoder:latent_64:${id}`, REDIS_TTL, JSON.stringify(latent));
-      if (++cached % 500 === 0) {
+    for (const [id, entry] of Object.entries(latentIndex)) {
+      pipeline.setex(`gpu:autoencoder:latent_64:${id}`, REDIS_TTL, JSON.stringify(entry.latent_64));
+      if (++redisCached % 500 === 0) {
         await pipeline.exec();
-        process.stdout.write(`\r  Redis: ${cached} cached...`);
+        process.stdout.write(`\r  Redis: ${redisCached} cached...`);
       }
     }
     await pipeline.exec();  // flush remainder
-    process.stdout.write(`\r  Redis: ${cached} cached      \n`);
+    process.stdout.write(`\r  Redis: ${redisCached} cached      \n`);
     console.log(`  ✅ Redis: ${Object.keys(latentIndex).length} keys (TTL=${REDIS_TTL}s)\n`);
     redis_ok = true;
   } catch (e) {
@@ -338,7 +657,7 @@ async function main() {
     [
       Object.keys(latentIndex)[0] ?? '', null, INPUT_DIM, LATENT_DIM,
       t_encode, null, null, t_encode, redis_ok,
-      JSON.stringify({ encoded_count, pg_updated, pg_skipped, model: 'autoencoder_768_128_64' })
+      JSON.stringify({ encoded_count, pgUpdated, pgNotMatched, model: 'autoencoder_768_128_64' })
     ]
   ).catch(e => console.warn('topology_eval row failed:', e.message));
   await provPool.end();
@@ -349,7 +668,7 @@ async function main() {
   console.log('║  COMPLETE                                                        ║');
   console.log('╚══════════════════════════════════════════════════════════════════╝');
   console.log(`  Vectors encoded:  ${encoded_count}`);
-  console.log(`  Postgres updated: ${pg_updated}`);
+  console.log(`  Postgres updated: ${pgUpdated}`);
   console.log(`  Redis cached:     ${redis_ok ? Object.keys(latentIndex).length : 'skipped'}`);
   console.log(`  Latent index:     ${LATENT_FILE}`);
   console.log(`\n→ Next: node scripts/atlas/train-som-20x20.mjs`);

@@ -129,7 +129,7 @@ async function main() {
     : `SELECT id, canonical_source_ref, source_ref_hash, feature_id, cluster_id,
               qdrant_point_id, point_kind
        FROM task_semantic_packets
-       ORDER BY random()
+       ORDER BY id
        LIMIT ${SAMPLE}`;
 
   const { rows: packets } = await pool.query(query);

@@ -1,6 +1,6 @@
 # MCP Tool Summary Registry
 
-Generated: 2026-06-19T04:53:48.603Z
+Generated: 2026-06-19T16:03:34.607Z
 Query: (none)
 Matched rows: 10
 
@@ -33,4 +33,3 @@ Wire the registry summarizer to the live llama-server path and keep the Postgres
 - rerank
 - read
 - identity
-- unknown

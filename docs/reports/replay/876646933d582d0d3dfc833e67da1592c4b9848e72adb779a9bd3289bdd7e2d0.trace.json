@@ -2,7 +2,7 @@
   "query": "what is the default collection name for Qdrant semantic search?",
   "hash": "876646933d582d0d3dfc833e67da1592c4b9848e72adb779a9bd3289bdd7e2d0",
   "bucket": "cache-hit",
-  "timestamp": "2026-06-19T15:45:11.420Z",
+  "timestamp": "2026-06-19T17:10:06.230Z",
   "payload": {
     "ok": true,
     "query": "what is the default collection name for Qdrant semantic search?",
@@ -64,23 +64,23 @@
         "packet_key": "nes:utility:aee2fe2a",
         "feature_id": "utility",
         "source_ref": "src/lib/server/db/migrations/002_enhanced_schema_with_qdrant.sql",
-        "retrieved_at": "2026-06-19T15:45:08.479Z",
+        "retrieved_at": "2026-06-19T17:10:02.615Z",
         "retrieved_from": "hyperrag",
         "retrieval_confidence": 0.65,
-        "retrieval_latency_ms": 1613,
+        "retrieval_latency_ms": 2327,
         "ace_confidence": 0.9,
         "kag_aligned": false,
         "dag_reachable": true,
-        "cached_at": "2026-06-19T15:45:08.479Z"
+        "cached_at": "2026-06-19T17:10:02.615Z"
       },
       {
         "packet_key": "nes:utility:aee2fe2a",
         "feature_id": "utility",
         "source_ref": "src/lib/server/db/migrations/002_enhanced_schema_with_qdrant.sql",
-        "retrieved_at": "2026-06-19T15:45:11.418Z",
+        "retrieved_at": "2026-06-19T17:10:06.223Z",
         "retrieved_from": "hyperrag",
         "retrieval_confidence": 0.65,
-        "retrieval_latency_ms": 1,
+        "retrieval_latency_ms": 3,
         "ace_confidence": 0.9,
         "kag_aligned": false,
         "dag_reachable": true
@@ -89,10 +89,10 @@
         "packet_key": "nes:utility:ff0682f9",
         "feature_id": "utility",
         "source_ref": "src/lib/server/ace/ace-agent.ts",
-        "retrieved_at": "2026-06-19T15:45:11.418Z",
+        "retrieved_at": "2026-06-19T17:10:06.223Z",
         "retrieved_from": "hyperrag",
         "retrieval_confidence": 0.65,
-        "retrieval_latency_ms": 1,
+        "retrieval_latency_ms": 3,
         "ace_confidence": 0.9,
         "kag_aligned": false,
         "dag_reachable": true
@@ -105,8 +105,8 @@
       "rrf_hits": 2,
       "neo4j_expansions": 0,
       "cache_hits": 1,
-      "latency_ms": 14,
-      "cache_latency_ms": 14
+      "latency_ms": 33,
+      "cache_latency_ms": 33
     }
   }
 }

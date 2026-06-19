@@ -6,7 +6,7 @@
     "cache_hits": 10,
     "total_packets_returned": 244,
     "avg_packets_per_query": "4.88",
-    "timestamp": "2026-06-19T15:46:04.125Z"
+    "timestamp": "2026-06-19T17:11:00.808Z"
   },
   "results": [
     {
@@ -24,7 +24,7 @@
         "rrf_hits": 0,
         "neo4j_expansions": 0,
         "cache_hits": 0,
-        "latency_ms": 1636
+        "latency_ms": 3571
       }
     },
     {
@@ -42,7 +42,7 @@
         "rrf_hits": 0,
         "neo4j_expansions": 0,
         "cache_hits": 0,
-        "latency_ms": 1722
+        "latency_ms": 2155
       }
     },
     {
@@ -60,7 +60,7 @@
         "rrf_hits": 0,
         "neo4j_expansions": 0,
         "cache_hits": 0,
-        "latency_ms": 1655
+        "latency_ms": 2532
       }
     },
     {
@@ -78,7 +78,7 @@
         "rrf_hits": 0,
         "neo4j_expansions": 0,
         "cache_hits": 0,
-        "latency_ms": 1619
+        "latency_ms": 3844
       }
     },
     {
@@ -96,7 +96,7 @@
         "rrf_hits": 0,
         "neo4j_expansions": 0,
         "cache_hits": 0,
-        "latency_ms": 1604
+        "latency_ms": 3936
       }
     },
     {
@@ -114,7 +114,7 @@
         "rrf_hits": 0,
         "neo4j_expansions": 0,
         "cache_hits": 0,
-        "latency_ms": 1759
+        "latency_ms": 3042
       }
     },
     {
@@ -132,7 +132,7 @@
         "rrf_hits": 0,
         "neo4j_expansions": 0,
         "cache_hits": 0,
-        "latency_ms": 1596
+        "latency_ms": 2601
       }
     },
     {
@@ -150,7 +150,7 @@
         "rrf_hits": 0,
         "neo4j_expansions": 0,
         "cache_hits": 0,
-        "latency_ms": 1601
+        "latency_ms": 2276
       }
     },
     {
@@ -168,7 +168,7 @@
         "rrf_hits": 2,
         "neo4j_expansions": 0,
         "cache_hits": 0,
-        "latency_ms": 1620
+        "latency_ms": 3409
       }
     },
     {
@@ -186,7 +186,7 @@
         "rrf_hits": 0,
         "neo4j_expansions": 0,
         "cache_hits": 0,
-        "latency_ms": 1674
+        "latency_ms": 2207
       }
     },
     {
@@ -204,8 +204,8 @@
         "rrf_hits": 0,
         "neo4j_expansions": 0,
         "cache_hits": 1,
-        "latency_ms": 13,
-        "cache_latency_ms": 13
+        "latency_ms": 24,
+        "cache_latency_ms": 24
       }
     },
     {
@@ -223,8 +223,8 @@
         "rrf_hits": 0,
         "neo4j_expansions": 0,
         "cache_hits": 1,
-        "latency_ms": 26,
-        "cache_latency_ms": 26
+        "latency_ms": 20,
+        "cache_latency_ms": 20
       }
     },
     {
@@ -242,8 +242,8 @@
         "rrf_hits": 0,
         "neo4j_expansions": 0,
         "cache_hits": 1,
-        "latency_ms": 29,
-        "cache_latency_ms": 29
+        "latency_ms": 24,
+        "cache_latency_ms": 24
       }
     },
     {
@@ -261,8 +261,8 @@
         "rrf_hits": 0,
         "neo4j_expansions": 0,
         "cache_hits": 1,
-        "latency_ms": 12,
-        "cache_latency_ms": 12
+        "latency_ms": 19,
+        "cache_latency_ms": 19
       }
     },
     {
@@ -280,8 +280,8 @@
         "rrf_hits": 0,
         "neo4j_expansions": 0,
         "cache_hits": 1,
-        "latency_ms": 15,
-        "cache_latency_ms": 15
+        "latency_ms": 24,
+        "cache_latency_ms": 24
       }
     },
     {
@@ -299,8 +299,8 @@
         "rrf_hits": 0,
         "neo4j_expansions": 0,
         "cache_hits": 1,
-        "latency_ms": 14,
-        "cache_latency_ms": 14
+        "latency_ms": 20,
+        "cache_latency_ms": 20
       }
     },
     {
@@ -318,8 +318,8 @@
         "rrf_hits": 0,
         "neo4j_expansions": 0,
         "cache_hits": 1,
-        "latency_ms": 14,
-        "cache_latency_ms": 14
+        "latency_ms": 29,
+        "cache_latency_ms": 29
       }
     },
     {
@@ -337,8 +337,8 @@
         "rrf_hits": 0,
         "neo4j_expansions": 0,
         "cache_hits": 1,
-        "latency_ms": 27,
-        "cache_latency_ms": 27
+        "latency_ms": 28,
+        "cache_latency_ms": 28
       }
     },
     {
@@ -356,8 +356,8 @@
         "rrf_hits": 2,
         "neo4j_expansions": 0,
         "cache_hits": 1,
-        "latency_ms": 14,
-        "cache_latency_ms": 14
+        "latency_ms": 33,
+        "cache_latency_ms": 33
       }
     },
     {
@@ -375,8 +375,8 @@
         "rrf_hits": 0,
         "neo4j_expansions": 0,
         "cache_hits": 1,
-        "latency_ms": 13,
-        "cache_latency_ms": 13
+        "latency_ms": 27,
+        "cache_latency_ms": 27
       }
     },
     {
@@ -394,7 +394,7 @@
         "rrf_hits": 0,
         "neo4j_expansions": 0,
         "cache_hits": 0,
-        "latency_ms": 1793
+        "latency_ms": 1936
       }
     },
     {
@@ -412,7 +412,7 @@
         "rrf_hits": 0,
         "neo4j_expansions": 0,
         "cache_hits": 0,
-        "latency_ms": 1936
+        "latency_ms": 2218
       }
     },
     {
@@ -430,7 +430,7 @@
         "rrf_hits": 0,
         "neo4j_expansions": 0,
         "cache_hits": 0,
-        "latency_ms": 1624
+        "latency_ms": 2045
       }
     },
     {
@@ -448,7 +448,7 @@
         "rrf_hits": 5,
         "neo4j_expansions": 0,
         "cache_hits": 0,
-        "latency_ms": 1601
+        "latency_ms": 1716
       }
     },
     {
@@ -466,7 +466,7 @@
         "rrf_hits": 0,
         "neo4j_expansions": 0,
         "cache_hits": 0,
-        "latency_ms": 1622
+        "latency_ms": 1820
       }
     },
     {
@@ -484,7 +484,7 @@
         "rrf_hits": 0,
         "neo4j_expansions": 0,
         "cache_hits": 0,
-        "latency_ms": 1597
+        "latency_ms": 1644
       }
     },
     {
@@ -502,7 +502,7 @@
         "rrf_hits": 0,
         "neo4j_expansions": 0,
         "cache_hits": 0,
-        "latency_ms": 1600
+        "latency_ms": 1638
       }
     },
     {
@@ -520,7 +520,7 @@
         "rrf_hits": 0,
         "neo4j_expansions": 0,
         "cache_hits": 0,
-        "latency_ms": 1599
+        "latency_ms": 1629
       }
     },
     {
@@ -538,7 +538,7 @@
         "rrf_hits": 0,
         "neo4j_expansions": 0,
         "cache_hits": 0,
-        "latency_ms": 1586
+        "latency_ms": 1644
       }
     },
     {
@@ -556,7 +556,7 @@
         "rrf_hits": 0,
         "neo4j_expansions": 0,
         "cache_hits": 0,
-        "latency_ms": 1614
+        "latency_ms": 1681
       }
     },
     {
@@ -574,7 +574,7 @@
         "rrf_hits": 0,
         "neo4j_expansions": 0,
         "cache_hits": 0,
-        "latency_ms": 1620
+        "latency_ms": 1638
       }
     },
     {
@@ -592,7 +592,7 @@
         "rrf_hits": 0,
         "neo4j_expansions": 0,
         "cache_hits": 0,
-        "latency_ms": 1608
+        "latency_ms": 1641
       }
     },
     {
@@ -610,7 +610,7 @@
         "rrf_hits": 0,
         "neo4j_expansions": 0,
         "cache_hits": 0,
-        "latency_ms": 1620
+        "latency_ms": 1661
       }
     },
     {
@@ -628,7 +628,7 @@
         "rrf_hits": 0,
         "neo4j_expansions": 0,
         "cache_hits": 0,
-        "latency_ms": 1617
+        "latency_ms": 1609
       }
     },
     {
@@ -646,7 +646,7 @@
         "rrf_hits": 0,
         "neo4j_expansions": 0,
         "cache_hits": 0,
-        "latency_ms": 1607
+        "latency_ms": 1653
       }
     },
     {
@@ -664,7 +664,7 @@
         "rrf_hits": 0,
         "neo4j_expansions": 0,
         "cache_hits": 0,
-        "latency_ms": 1654
+        "latency_ms": 1668
       }
     },
     {
@@ -682,7 +682,7 @@
         "rrf_hits": 0,
         "neo4j_expansions": 0,
         "cache_hits": 0,
-        "latency_ms": 1663
+        "latency_ms": 1634
       }
     },
     {
@@ -700,7 +700,7 @@
         "rrf_hits": 0,
         "neo4j_expansions": 0,
         "cache_hits": 0,
-        "latency_ms": 1613
+        "latency_ms": 1631
       }
     },
     {
@@ -718,7 +718,7 @@
         "rrf_hits": 0,
         "neo4j_expansions": 0,
         "cache_hits": 0,
-        "latency_ms": 1617
+        "latency_ms": 1647
       }
     },
     {
@@ -736,7 +736,7 @@
         "rrf_hits": 0,
         "neo4j_expansions": 0,
         "cache_hits": 0,
-        "latency_ms": 1625
+        "latency_ms": 1659
       }
     },
     {
@@ -754,7 +754,7 @@
         "rrf_hits": 0,
         "neo4j_expansions": 0,
         "cache_hits": 0,
-        "latency_ms": 1614
+        "latency_ms": 1642
       }
     },
     {
@@ -772,7 +772,7 @@
         "rrf_hits": 0,
         "neo4j_expansions": 0,
         "cache_hits": 0,
-        "latency_ms": 1643
+        "latency_ms": 1650
       }
     },
     {
@@ -790,7 +790,7 @@
         "rrf_hits": 0,
         "neo4j_expansions": 0,
         "cache_hits": 0,
-        "latency_ms": 1638
+        "latency_ms": 1644
       }
     },
     {
@@ -808,7 +808,7 @@
         "rrf_hits": 0,
         "neo4j_expansions": 0,
         "cache_hits": 0,
-        "latency_ms": 1677
+        "latency_ms": 1641
       }
     },
     {
@@ -826,7 +826,7 @@
         "rrf_hits": 0,
         "neo4j_expansions": 0,
         "cache_hits": 0,
-        "latency_ms": 1606
+        "latency_ms": 1619
       }
     },
     {
@@ -844,7 +844,7 @@
         "rrf_hits": 0,
         "neo4j_expansions": 0,
         "cache_hits": 0,
-        "latency_ms": 1636
+        "latency_ms": 1625
       }
     },
     {
@@ -862,7 +862,7 @@
         "rrf_hits": 0,
         "neo4j_expansions": 0,
         "cache_hits": 0,
-        "latency_ms": 1601
+        "latency_ms": 1628
       }
     },
     {
@@ -880,7 +880,7 @@
         "rrf_hits": 0,
         "neo4j_expansions": 0,
         "cache_hits": 0,
-        "latency_ms": 1611
+        "latency_ms": 1633
       }
     },
     {
@@ -898,7 +898,7 @@
         "rrf_hits": 0,
         "neo4j_expansions": 0,
         "cache_hits": 0,
-        "latency_ms": 1600
+        "latency_ms": 1644
       }
     },
     {
@@ -916,7 +916,7 @@
         "rrf_hits": 0,
         "neo4j_expansions": 0,
         "cache_hits": 0,
-        "latency_ms": 1607
+        "latency_ms": 1665
       }
     }
   ]

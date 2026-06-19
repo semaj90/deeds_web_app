@@ -60,6 +60,8 @@ export interface RetrievalTelemetrySignal {
   domainClass?: string | null;
   /** First source_ref from results. */
   sourceRef?: string | null;
+  /** Disable the generic eval-times mirror when the caller owns a richer one-row-per-query writer. */
+  writeEvalTimes?: boolean;
 }
 
 function cleanStringArray(values: unknown): string[] {
@@ -162,7 +164,7 @@ export async function recordRetrievalTelemetry(signal: RetrievalTelemetrySignal)
 
     // ── atlas_retrieval_eval_times: one row per query, JSONB hits summary ────
     // Pointer-only: no packet bodies, no vectors stored here.
-    void pool.query(
+    if (signal.writeEvalTimes !== false) void pool.query(
       `INSERT INTO atlas_retrieval_eval_times
          (query_hash, packet_key, feature_id, domain_class, source_ref,
           qdrant_ms, bm25_ms, redis_ms, bitfrost_ms, neo4j_ms, rerank_ms, total_ms,

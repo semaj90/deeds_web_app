@@ -78,6 +78,10 @@ export class HyperRagReplayTrace {
     this.metadata.cache_hit = hit;
   }
 
+  getId(): string {
+    return this.id;
+  }
+
   toEntry(): ReplayTraceEntry {
     if (!this.request || !this.response) {
       throw new Error('trace incomplete: missing request or response');

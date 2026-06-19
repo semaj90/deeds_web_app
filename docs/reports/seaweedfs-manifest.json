@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-06-11T05:38:31.538Z",
+  "timestamp": "2026-06-19T22:46:36.221Z",
   "version": "1.0",
   "description": "Cold-storage manifest for SeaweedFS archival",
   "archival_strategy": {

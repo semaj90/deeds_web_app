@@ -318,8 +318,12 @@ async function runVerification() {
       console.log(`[ATLAS:COLD:VERIFY] ✅ All sampled paths valid`);
     }
 
-    // Determine overall status
-    const overallStatus = totalFailures === 0 ? 'pass' : 'fail';
+    // Empty tables are structurally valid but do not prove restore readiness.
+    const overallStatus = totalFailures > 0
+      ? 'fail'
+      : manifests.rows.length === 0
+        ? 'warn_empty'
+        : 'pass';
 
     const result = {
       status: overallStatus,
@@ -339,7 +343,12 @@ async function runVerification() {
       database_url: process.env.DATABASE_URL.replace(/:[^:]*@/, ':***@'),
     };
 
-    console.log(`\n[ATLAS:COLD:VERIFY] ${result.status === 'pass' ? '✅ VERIFICATION PASSED' : '❌ VERIFICATION FAILED'}`);
+    const statusLabel = result.status === 'pass'
+      ? '✅ VERIFICATION PASSED'
+      : result.status === 'warn_empty'
+        ? '⚠️ VERIFICATION INCOMPLETE: NO MANIFEST ROWS'
+        : '❌ VERIFICATION FAILED';
+    console.log(`\n[ATLAS:COLD:VERIFY] ${statusLabel}`);
     console.log(`[ATLAS:COLD:VERIFY] Valid manifests: ${result.summary.valid_manifests}/${result.summary.total_manifests} (${result.summary.manifest_coverage}%)`);
 
     // Write reports
@@ -350,7 +359,7 @@ async function runVerification() {
     const mdReport = `# P0.3 Cold Storage Manifest Verification
 
 **Date**: ${new Date().toISOString()}
-**Status**: ${result.status === 'pass' ? '✅ PASS' : '❌ FAIL'}
+**Status**: ${result.status === 'pass' ? '✅ PASS' : result.status === 'warn_empty' ? '⚠️ WARN_EMPTY' : '❌ FAIL'}
 
 ## Summary
 
@@ -384,6 +393,10 @@ ${result.status === 'fail' ? `
 - Repair missing fields or orphaned references
 - Restore from backup if needed
 - Re-run verification after repairs
+` : result.status === 'warn_empty' ? `
+- Generate at least one real cold-storage manifest from canonical packet metadata.
+- Verify the SeaweedFS object exists and can be restored.
+- Re-run this verifier; 0/0 is not restore proof.
 ` : `
 - P0.3 verification PASSED
 - Ready for P0A (directory stability) and P0B (cold storage integration)
@@ -404,7 +417,7 @@ ${result.status === 'fail' ? `
 // Execute
 try {
   const result = await runVerification();
-  process.exit(result.status === 'pass' ? 0 : 1);
+  process.exit(result.status === 'fail' ? 1 : 0);
 } catch (err) {
   console.error('[ATLAS:COLD:VERIFY] Fatal error:', err.message);
   process.exit(2);

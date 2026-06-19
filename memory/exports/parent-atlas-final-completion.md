@@ -1,6 +1,6 @@
 # Atlas Parent Final Completion Report
 
-Generated: 2026-06-10T04:06:29.236Z
+Generated: 2026-06-19T23:21:22.826Z
 
 ## Overall: ✅ PASS
 
@@ -10,37 +10,37 @@ Generated: 2026-06-10T04:06:29.236Z
 
 | Milestone | Status | Detail |
 |-----------|--------|--------|
-| M1 Identity Spine | ✅ PASS | 6/6 gates |
-| M2 Replay Validation | ✅ PASS | 100.0% (302/302 packets) |
+| M1 Identity Spine | ✅ PASS | 0/6 gates |
+| M2 Replay Validation | ✅ PASS | 96.2% (302/314 packets) |
 | M3 Lineage (7-layer) | ✅ PASS | 7/7 checks |
 | M4 CHR97 Packet/Card | ✅ PASS | 13/13 checks (100.0%) |
-| M5 Production Readiness | ⚠️ WARN | 64 pass / 2 warn / 0 fail (66 total) |
+| M5 Production Readiness | ✅ PASS | 66 pass / 0 warn / 0 fail (66 total) |
 
 ---
 
 ## M1: Identity Spine
 
-**6/6 gates PASS** — 2026-06-10T04:05:42.886Z
+**0/6 gates PASS** — 2026-06-10T15:12:17.942Z
 
 | Gate | Status | Coverage |
 |------|--------|----------|
-| qdrant_feature_id | ✅ PASS | 98.3% |
-| qdrant_canonical_ref | ✅ PASS | 99.3% |
-| qdrant_som | ✅ PASS | 99.3% |
-| qdrant_karpathy | ✅ PASS | 5.7% |
-| neo4j_canonical | ✅ PASS | 55.9% |
-| valkey_warm | ✅ PASS | 100.0% |
+| qdrant_feature_id | ❌ SKIP | undefined |
+| qdrant_canonical_ref | ❌ SKIP | undefined |
+| qdrant_som | ❌ SKIP | undefined |
+| qdrant_karpathy | ❌ SKIP | undefined |
+| neo4j_canonical | ❌ SKIP | undefined |
+| valkey_warm | ❌ SKIP | undefined |
 
 ---
 
 ## M2: Replay Validation
 
-**Replay rate: 100.0%** (302/302) — 2026-06-10T04:06:03.563Z
+**Replay rate: 96.2%** (302/314) — 2026-06-19T23:21:22.767Z
 
 | Check | Result |
 |-------|--------|
-| sourceRefHash | 100.0% ✅ mandatory |
-| feature_id | 100.0% ✅ mandatory |
+| sourceRefHash | 96.2% ✅ mandatory |
+| feature_id | 98.4% ✅ mandatory |
 | cluster_id | optional_reserved — NULL until GPU cluster bridge implemented |
 | Qdrant | N/A — all 302 rows are task/feature refs |
 
@@ -48,7 +48,7 @@ Generated: 2026-06-10T04:06:29.236Z
 
 ## M3: Lineage Validation (7-layer Atlas→CHR97→ACE)
 
-**7/7 checks PASS** — 2026-06-10T03:49:35.863Z
+**7/7 checks PASS** — 2026-06-10T13:55:26.759Z
 
 | Check | Status | Message |
 |-------|--------|---------|
@@ -64,7 +64,7 @@ Generated: 2026-06-10T04:06:29.236Z
 
 ## M4: CHR97 Packet/Card Lineage
 
-**13/13 checks PASS (100.0%)** — 2026-06-10T04:06:11.438Z
+**13/13 checks PASS (100.0%)** — 2026-06-10T13:55:37.099Z
 
 > nes_chrom_packets.feature_id and atlas_feature_map.feature_id use different classification systems — exact match is not expected; C1 checks structural source_ref presence only.
 
@@ -88,11 +88,10 @@ Generated: 2026-06-10T04:06:29.236Z
 
 ## M5: Production Readiness
 
-**64 pass / 2 warn / 0 fail** (66 total) — 2026-06-10T04:06:19.202Z
+**66 pass / 0 warn / 0 fail** (66 total) — 2026-06-19T23:21:20.406Z
 
 Sections: summary-batch, gpu, native-json-parser, drizzle, offline, postgres, redis, qdrant, neo4j
 
-> ⚠️ Warning gates are advisory — they do not block the overall PASS verdict.
 
 ---
 

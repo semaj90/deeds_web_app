@@ -2,7 +2,7 @@
   "query": "how is the LangGraph planning graph structured?",
   "hash": "d47dcb8a5884da84b4c05365c2b8fc4a94376175d2744321951e67c5c812df9c",
   "bucket": "cache-hit",
-  "timestamp": "2026-06-19T15:45:11.038Z",
+  "timestamp": "2026-06-19T17:10:05.784Z",
   "payload": {
     "ok": true,
     "query": "how is the LangGraph planning graph structured?",
@@ -144,20 +144,20 @@
         "packet_key": "hyperrag:src/lib/server/db/schema/case_notes.ts",
         "feature_id": "database_orm",
         "source_ref": "src/lib/server/db/schema/case_notes.ts",
-        "retrieved_at": "2026-06-19T15:45:03.315Z",
+        "retrieved_at": "2026-06-19T17:09:53.971Z",
         "retrieved_from": "hyperrag",
         "retrieval_confidence": 0.85,
-        "retrieval_latency_ms": 1753,
+        "retrieval_latency_ms": 3027,
         "ace_confidence": 0.9,
         "kag_aligned": true,
         "dag_reachable": true,
-        "cached_at": "2026-06-19T15:45:03.315Z"
+        "cached_at": "2026-06-19T17:09:53.971Z"
       },
       {
         "packet_key": "hyperrag:src/lib/server/db/schema/case_notes.ts",
         "feature_id": "database_orm",
         "source_ref": "src/lib/server/db/schema/case_notes.ts",
-        "retrieved_at": "2026-06-19T15:45:11.035Z",
+        "retrieved_at": "2026-06-19T17:10:05.779Z",
         "retrieved_from": "hyperrag",
         "retrieval_confidence": 0.85,
         "retrieval_latency_ms": 1,
@@ -169,7 +169,7 @@
         "packet_key": "hyperrag:src/lib/server/db/schema/warden_audit_log.ts",
         "feature_id": "database_orm",
         "source_ref": "src/lib/server/db/schema/warden_audit_log.ts",
-        "retrieved_at": "2026-06-19T15:45:11.035Z",
+        "retrieved_at": "2026-06-19T17:10:05.780Z",
         "retrieved_from": "hyperrag",
         "retrieval_confidence": 0.65,
         "retrieval_latency_ms": 1,
@@ -181,7 +181,7 @@
         "packet_key": "hyperrag:src/lib/server/db/schema/auto_tags.ts",
         "feature_id": "database_orm",
         "source_ref": "src/lib/server/db/schema/auto_tags.ts",
-        "retrieved_at": "2026-06-19T15:45:11.035Z",
+        "retrieved_at": "2026-06-19T17:10:05.780Z",
         "retrieved_from": "hyperrag",
         "retrieval_confidence": 0.65,
         "retrieval_latency_ms": 1,
@@ -193,7 +193,7 @@
         "packet_key": "hyperrag:src/lib/server/db/schema/user_ai_queries.ts",
         "feature_id": "database_orm",
         "source_ref": "src/lib/server/db/schema/user_ai_queries.ts",
-        "retrieved_at": "2026-06-19T15:45:11.035Z",
+        "retrieved_at": "2026-06-19T17:10:05.780Z",
         "retrieved_from": "hyperrag",
         "retrieval_confidence": 0.65,
         "retrieval_latency_ms": 1,
@@ -205,7 +205,7 @@
         "packet_key": "hyperrag:src/lib/server/db/schema/state_constitution_sources.ts",
         "feature_id": "database_orm",
         "source_ref": "src/lib/server/db/schema/state_constitution_sources.ts",
-        "retrieved_at": "2026-06-19T15:45:11.035Z",
+        "retrieved_at": "2026-06-19T17:10:05.780Z",
         "retrieved_from": "hyperrag",
         "retrieval_confidence": 0.65,
         "retrieval_latency_ms": 1,
@@ -221,8 +221,8 @@
       "rrf_hits": 0,
       "neo4j_expansions": 0,
       "cache_hits": 1,
-      "latency_ms": 14,
-      "cache_latency_ms": 14
+      "latency_ms": 20,
+      "cache_latency_ms": 20
     }
   }
 }

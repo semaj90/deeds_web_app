@@ -1,0 +1,26 @@
+{
+  "status": "pass",
+  "summary": {
+    "table_exists": true,
+    "schema_valid": true,
+    "fk_integrity": true,
+    "total_manifests": 1,
+    "valid_manifests": 1,
+    "manifest_coverage": "100.0",
+    "connectivity_tested": 1,
+    "failures": {
+      "missing_id": 0,
+      "missing_packet_key": 0,
+      "missing_source_ref": 0,
+      "missing_feature_id": 0,
+      "missing_seaweedfs_path": 0,
+      "invalid_cold_object_hash": 0,
+      "orphaned_packet_key": 0,
+      "path_unreachable": 0
+    }
+  },
+  "failed_manifests": [],
+  "connectivity_failures": [],
+  "timestamp": "2026-06-19T23:00:59.347Z",
+  "database_url": "postgresql://legal_admin:***@127.0.0.1:5434/legal_ai_db"
+}

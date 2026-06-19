@@ -63,6 +63,41 @@ function canonicalPath(input) {
   return s;
 }
 
+function classifyHeuristically(sourceRef, featureId) {
+  const ref = (sourceRef || '').toLowerCase();
+  const fid = (featureId || '').toLowerCase();
+  
+  if (ref.includes('svelte') || ref.includes('components') || ref.includes('layout') || ref.includes('theme') || ref.includes('ui/')) {
+    return 'ui_components';
+  }
+  if (ref.includes('db/') || ref.includes('schema') || ref.includes('postgres') || ref.includes('drizzle') || ref.includes('migration')) {
+    return 'database_orm';
+  }
+  if (ref.includes('test') || ref.includes('bench') || ref.includes('smoke')) {
+    return 'test_harness';
+  }
+  if (ref.includes('gpu') || ref.includes('cuda') || ref.includes('simd') || ref.includes('torch') || ref.includes('accelerat')) {
+    return 'native_accelerators';
+  }
+  if (ref.includes('mcp') || ref.includes('tool') || ref.includes('proto') || ref.includes('rpc')) {
+    return 'agent_intelligence';
+  }
+  if (ref.includes('route') || ref.includes('api/') || ref.includes('+server')) {
+    return 'api_endpoints';
+  }
+  if (ref.includes('telemetry') || ref.includes('observability') || ref.includes('trace') || ref.includes('log')) {
+    return 'observability_telemetry';
+  }
+  if (ref.includes('docker') || ref.includes('config') || ref.includes('env') || ref.includes('setup')) {
+    return 'infrastructure_config';
+  }
+  if (fid === 'unclassified_packet' || ref.includes('unclassified')) {
+    return 'emergent_topology';
+  }
+  
+  return 'general_abstractions';
+}
+
 async function main() {
   console.log('══ Populate Selected Concepts & Backfill Packets ════════════════');
   console.log(`  Mode: ${APPLY ? 'APPLY' : 'DRY-RUN'}`);
@@ -225,7 +260,10 @@ async function main() {
       // A. Map via evidence cards (source files)
       const cards = Array.isArray(crec.evidence_cards) ? crec.evidence_cards : [];
       for (const cardId of cards) {
-        const rawPath = cardIdToSourceRef.get(cardId);
+        let rawPath = cardIdToSourceRef.get(cardId);
+        if (!rawPath && cardId.startsWith('hyperrag:')) {
+          rawPath = cardId.replace(/^hyperrag:(card:)?/, '');
+        }
         if (rawPath) {
           const canon = canonicalPath(rawPath);
           if (!pathToConcepts.has(canon)) {
@@ -283,6 +321,14 @@ async function main() {
         const matched = featureToConcepts.get(fid);
         if (matched) {
           for (const c of matched) pktConcepts.add(c);
+        }
+      }
+
+      // If no concepts found via exact matches, use heuristic fallback
+      if (pktConcepts.size === 0) {
+        const fallbackConcept = classifyHeuristically(rawRef, fid);
+        if (fallbackConcept) {
+          pktConcepts.add(fallbackConcept);
         }
       }
 

@@ -853,6 +853,7 @@ export const handle: Handle = async ({ event, resolve }) => {
     event.url.pathname.startsWith('/api/rag/') ||
     event.url.pathname.startsWith('/api/agent/') ||
     event.url.pathname.startsWith('/api/contextual/') ||
+    event.url.pathname.startsWith('/api/hyperrag/') ||
     event.url.pathname.startsWith('/api/synthesis/') ||
     event.url.pathname.startsWith('/api/error-brain/diagnose') ||
     event.url.pathname.startsWith('/api/evidence/upload') ||

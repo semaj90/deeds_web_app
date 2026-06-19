@@ -2,7 +2,7 @@
   "query": "what port is reserved for SeaweedFS Filer?",
   "hash": "19a945411e361f6a76bba525798d8e54111880581a8898a4aa3bb55581cd5e3b",
   "bucket": "cache-hit",
-  "timestamp": "2026-06-19T15:45:10.914Z",
+  "timestamp": "2026-06-19T17:10:05.647Z",
   "payload": {
     "ok": true,
     "query": "what port is reserved for SeaweedFS Filer?",
@@ -144,20 +144,20 @@
         "packet_key": "hyperrag:src/lib/server/db/schema/case_notes.ts",
         "feature_id": "database_orm",
         "source_ref": "src/lib/server/db/schema/case_notes.ts",
-        "retrieved_at": "2026-06-19T15:45:01.448Z",
+        "retrieved_at": "2026-06-19T17:09:50.807Z",
         "retrieved_from": "hyperrag",
         "retrieval_confidence": 0.85,
-        "retrieval_latency_ms": 1598,
+        "retrieval_latency_ms": 3916,
         "ace_confidence": 0.9,
         "kag_aligned": true,
         "dag_reachable": true,
-        "cached_at": "2026-06-19T15:45:01.448Z"
+        "cached_at": "2026-06-19T17:09:50.807Z"
       },
       {
         "packet_key": "hyperrag:src/lib/server/db/schema/case_notes.ts",
         "feature_id": "database_orm",
         "source_ref": "src/lib/server/db/schema/case_notes.ts",
-        "retrieved_at": "2026-06-19T15:45:10.911Z",
+        "retrieved_at": "2026-06-19T17:10:05.643Z",
         "retrieved_from": "hyperrag",
         "retrieval_confidence": 0.85,
         "retrieval_latency_ms": 2,
@@ -169,7 +169,7 @@
         "packet_key": "hyperrag:src/lib/server/db/schema/warden_audit_log.ts",
         "feature_id": "database_orm",
         "source_ref": "src/lib/server/db/schema/warden_audit_log.ts",
-        "retrieved_at": "2026-06-19T15:45:10.911Z",
+        "retrieved_at": "2026-06-19T17:10:05.643Z",
         "retrieved_from": "hyperrag",
         "retrieval_confidence": 0.65,
         "retrieval_latency_ms": 2,
@@ -181,7 +181,7 @@
         "packet_key": "hyperrag:src/lib/server/db/schema/auto_tags.ts",
         "feature_id": "database_orm",
         "source_ref": "src/lib/server/db/schema/auto_tags.ts",
-        "retrieved_at": "2026-06-19T15:45:10.911Z",
+        "retrieved_at": "2026-06-19T17:10:05.643Z",
         "retrieved_from": "hyperrag",
         "retrieval_confidence": 0.65,
         "retrieval_latency_ms": 2,
@@ -193,7 +193,7 @@
         "packet_key": "hyperrag:src/lib/server/db/schema/user_ai_queries.ts",
         "feature_id": "database_orm",
         "source_ref": "src/lib/server/db/schema/user_ai_queries.ts",
-        "retrieved_at": "2026-06-19T15:45:10.911Z",
+        "retrieved_at": "2026-06-19T17:10:05.643Z",
         "retrieved_from": "hyperrag",
         "retrieval_confidence": 0.65,
         "retrieval_latency_ms": 2,
@@ -205,7 +205,7 @@
         "packet_key": "hyperrag:src/lib/server/db/schema/state_constitution_sources.ts",
         "feature_id": "database_orm",
         "source_ref": "src/lib/server/db/schema/state_constitution_sources.ts",
-        "retrieved_at": "2026-06-19T15:45:10.911Z",
+        "retrieved_at": "2026-06-19T17:10:05.643Z",
         "retrieved_from": "hyperrag",
         "retrieval_confidence": 0.65,
         "retrieval_latency_ms": 2,
@@ -221,8 +221,8 @@
       "rrf_hits": 0,
       "neo4j_expansions": 0,
       "cache_hits": 1,
-      "latency_ms": 15,
-      "cache_latency_ms": 15
+      "latency_ms": 24,
+      "cache_latency_ms": 24
     }
   }
 }

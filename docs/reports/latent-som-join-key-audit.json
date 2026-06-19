@@ -1,0 +1,60 @@
+{
+  "timestamp": "2026-06-19T19:28:57.590Z",
+  "db_stats": {
+    "total": 17985,
+    "packet_key_count": 17985,
+    "source_ref_count": 17985,
+    "qdrant_point_id_count": 0,
+    "payload_qdrant_point_id_count": 77,
+    "metadata_qdrant_point_id_count": 0,
+    "latent64_count": 3136,
+    "som_index_count": 4109
+  },
+  "latent_coverage": {
+    "total_keys": 781,
+    "matched": 781,
+    "unmatched": 0,
+    "coverage_pct": "100.00"
+  },
+  "som_coverage": {
+    "total_keys": 781,
+    "matched": 781,
+    "unmatched": 0,
+    "coverage_pct": "100.00"
+  },
+  "qdrant": {
+    "collection": "codebase_chunks_768",
+    "payloads_loaded": 781,
+    "error": null
+  },
+  "latent_identity_reasons": {
+    "total": 781,
+    "addressable": 781,
+    "matched": 781,
+    "unmatched": 0,
+    "coverage_pct": "100.00",
+    "reason_counts": {
+      "matched": 781,
+      "qdrant_point_not_found": 0,
+      "non_packet_vector": 0,
+      "missing_identity_payload": 0,
+      "identity_not_in_postgres": 0
+    },
+    "unmatched_examples": []
+  },
+  "som_identity_reasons": {
+    "total": 781,
+    "addressable": 781,
+    "matched": 781,
+    "unmatched": 0,
+    "coverage_pct": "100.00",
+    "reason_counts": {
+      "matched": 781,
+      "qdrant_point_not_found": 0,
+      "non_packet_vector": 0,
+      "missing_identity_payload": 0,
+      "identity_not_in_postgres": 0
+    },
+    "unmatched_examples": []
+  }
+}

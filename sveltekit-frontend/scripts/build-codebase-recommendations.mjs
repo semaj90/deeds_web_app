@@ -141,9 +141,21 @@ if (orphanFiles.length > 0) {
 }
 
 // ── R2: Circular dependencies ─────────────────────────────────────────────────
-if (cycles.length > 0) {
-  const large = cycles.filter(c => c.size >= 3);
-  const small = cycles.filter(c => c.size === 2);
+const recommendationCycleScope = cycles.filter((cycle) =>
+  (cycle.files ?? []).every((rel) => {
+    const normalized = String(rel ?? '').replace(/\\/g, '/');
+    return !normalized.startsWith('.claude/worktrees/')
+      && !normalized.startsWith('llama-cpp-turboquant-gemma4/')
+      && !normalized.includes('/node_modules/')
+      && !normalized.includes('/.svelte-kit/')
+      && !normalized.includes('/dist/')
+      && !normalized.includes('/build/');
+  }),
+);
+
+if (recommendationCycleScope.length > 0) {
+  const large = recommendationCycleScope.filter(c => c.size >= 3);
+  const small = recommendationCycleScope.filter(c => c.size === 2);
 
   if (large.length > 0) {
     addRec('R2-cycles-large', 'high',
@@ -208,7 +220,7 @@ if (noZodRoutes.length > 0) {
 }
 
 // ── R6: Cycles with no paired test ───────────────────────────────────────────
-const cycleFilesNoTest = (cycles ?? []).flatMap(c => c.files ?? []).filter(rel => {
+const cycleFilesNoTest = recommendationCycleScope.flatMap(c => c.files ?? []).filter(rel => {
   const n = nodeMap.get(rel);
   return n && !(n.hasPairedTest ?? false) && !n.isTest;
 });

@@ -2,7 +2,7 @@
   "query": "where is Redis Valkey cache config wired?",
   "hash": "4062bd7d400d22497b9de15d45991a5a4c8d9eb09a9d4c7114a411c2e875af66",
   "bucket": "cache-hit",
-  "timestamp": "2026-06-19T15:45:10.389Z",
+  "timestamp": "2026-06-19T17:10:05.093Z",
   "payload": {
     "ok": true,
     "query": "where is Redis Valkey cache config wired?",
@@ -144,23 +144,23 @@
         "packet_key": "hyperrag:src/lib/server/db/schema/case_notes.ts",
         "feature_id": "database_orm",
         "source_ref": "src/lib/server/db/schema/case_notes.ts",
-        "retrieved_at": "2026-06-19T15:44:54.388Z",
+        "retrieved_at": "2026-06-19T17:09:37.842Z",
         "retrieved_from": "hyperrag",
         "retrieval_confidence": 0.85,
-        "retrieval_latency_ms": 1630,
+        "retrieval_latency_ms": 3554,
         "ace_confidence": 0.9,
         "kag_aligned": true,
         "dag_reachable": true,
-        "cached_at": "2026-06-19T15:44:54.389Z"
+        "cached_at": "2026-06-19T17:09:37.842Z"
       },
       {
         "packet_key": "hyperrag:src/lib/server/db/schema/case_notes.ts",
         "feature_id": "database_orm",
         "source_ref": "src/lib/server/db/schema/case_notes.ts",
-        "retrieved_at": "2026-06-19T15:45:10.386Z",
+        "retrieved_at": "2026-06-19T17:10:05.089Z",
         "retrieved_from": "hyperrag",
         "retrieval_confidence": 0.85,
-        "retrieval_latency_ms": 1,
+        "retrieval_latency_ms": 2,
         "ace_confidence": 0.9,
         "kag_aligned": true,
         "dag_reachable": true
@@ -169,10 +169,10 @@
         "packet_key": "hyperrag:src/lib/server/db/schema/warden_audit_log.ts",
         "feature_id": "database_orm",
         "source_ref": "src/lib/server/db/schema/warden_audit_log.ts",
-        "retrieved_at": "2026-06-19T15:45:10.386Z",
+        "retrieved_at": "2026-06-19T17:10:05.089Z",
         "retrieved_from": "hyperrag",
         "retrieval_confidence": 0.65,
-        "retrieval_latency_ms": 1,
+        "retrieval_latency_ms": 2,
         "ace_confidence": 0.9,
         "kag_aligned": true,
         "dag_reachable": true
@@ -181,10 +181,10 @@
         "packet_key": "hyperrag:src/lib/server/db/schema/auto_tags.ts",
         "feature_id": "database_orm",
         "source_ref": "src/lib/server/db/schema/auto_tags.ts",
-        "retrieved_at": "2026-06-19T15:45:10.386Z",
+        "retrieved_at": "2026-06-19T17:10:05.089Z",
         "retrieved_from": "hyperrag",
         "retrieval_confidence": 0.65,
-        "retrieval_latency_ms": 1,
+        "retrieval_latency_ms": 2,
         "ace_confidence": 0.9,
         "kag_aligned": true,
         "dag_reachable": true
@@ -193,10 +193,10 @@
         "packet_key": "hyperrag:src/lib/server/db/schema/user_ai_queries.ts",
         "feature_id": "database_orm",
         "source_ref": "src/lib/server/db/schema/user_ai_queries.ts",
-        "retrieved_at": "2026-06-19T15:45:10.386Z",
+        "retrieved_at": "2026-06-19T17:10:05.089Z",
         "retrieved_from": "hyperrag",
         "retrieval_confidence": 0.65,
-        "retrieval_latency_ms": 1,
+        "retrieval_latency_ms": 2,
         "ace_confidence": 0.9,
         "kag_aligned": true,
         "dag_reachable": true
@@ -205,10 +205,10 @@
         "packet_key": "hyperrag:src/lib/server/db/schema/state_constitution_sources.ts",
         "feature_id": "database_orm",
         "source_ref": "src/lib/server/db/schema/state_constitution_sources.ts",
-        "retrieved_at": "2026-06-19T15:45:10.386Z",
+        "retrieved_at": "2026-06-19T17:10:05.089Z",
         "retrieved_from": "hyperrag",
         "retrieval_confidence": 0.65,
-        "retrieval_latency_ms": 1,
+        "retrieval_latency_ms": 2,
         "ace_confidence": 0.9,
         "kag_aligned": true,
         "dag_reachable": true
@@ -221,8 +221,8 @@
       "rrf_hits": 0,
       "neo4j_expansions": 0,
       "cache_hits": 1,
-      "latency_ms": 13,
-      "cache_latency_ms": 13
+      "latency_ms": 24,
+      "cache_latency_ms": 24
     }
   }
 }

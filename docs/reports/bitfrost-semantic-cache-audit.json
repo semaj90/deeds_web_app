@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-06-19T05:25:08.418Z",
+  "generatedAt": "2026-06-19T17:22:45.064Z",
   "status": "PASS",
   "redis": {
     "container": "legal-ai-valkey",
@@ -8,9 +8,9 @@
   "summary": {
     "gpuKarpathyScores": 0,
     "gpuKarpathyEncoded": 0,
-    "bifrostKeys": 579,
+    "bifrostKeys": 148,
     "centroidKeys": 85,
-    "somKeys": 203
+    "somKeys": 152
   },
   "patterns": [
     {
@@ -34,38 +34,38 @@
     {
       "key": "bifrost:*",
       "pattern": "bifrost:*",
-      "count": 579,
+      "count": 148,
       "sample": [
-        "bifrost:packet:nes:../scripts/api-cleanup/recovery.test.ts",
-        "bifrost:packet:nes:../scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/citations/collections/[id]/+server.ts",
-        "bifrost:packet:nes:src/lib/server/wiki/LLMS.md",
-        "bifrost:packet:322b9cf893125f07",
-        "bifrost:packet:nes:../scripts/api-cleanup/reports/backup-2025-12-14T21-11-49-641Z/yorha/layout/LLMS.md"
+        "bifrost:packet:885c6c04322f6095",
+        "bifrost:packet:4b6c2a8267660eb3",
+        "bifrost:packet:bbbe630740c5d753",
+        "bifrost:sem:intent:6df9c92c207644b6",
+        "bifrost:packet:17dc1fe9f5f8a021"
       ],
       "ttlSamples": [
         {
-          "key": "bifrost:packet:nes:../scripts/api-cleanup/recovery.test.ts",
-          "ttl": 3456,
+          "key": "bifrost:packet:885c6c04322f6095",
+          "ttl": 102614,
           "ok": true
         },
         {
-          "key": "bifrost:packet:nes:../scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/citations/collections/[id]/+server.ts",
-          "ttl": 3455,
+          "key": "bifrost:packet:4b6c2a8267660eb3",
+          "ttl": 77310,
           "ok": true
         },
         {
-          "key": "bifrost:packet:nes:src/lib/server/wiki/LLMS.md",
-          "ttl": 3455,
+          "key": "bifrost:packet:bbbe630740c5d753",
+          "ttl": 102614,
           "ok": true
         },
         {
-          "key": "bifrost:packet:322b9cf893125f07",
-          "ttl": 145675,
+          "key": "bifrost:sem:intent:6df9c92c207644b6",
+          "ttl": 43381,
           "ok": true
         },
         {
-          "key": "bifrost:packet:nes:../scripts/api-cleanup/reports/backup-2025-12-14T21-11-49-641Z/yorha/layout/LLMS.md",
-          "ttl": 3456,
+          "key": "bifrost:packet:17dc1fe9f5f8a021",
+          "ttl": 102614,
           "ok": true
         }
       ],
@@ -77,36 +77,36 @@
       "pattern": "centroid:*",
       "count": 85,
       "sample": [
-        "centroid:78",
-        "centroid:18",
-        "centroid:33",
-        "centroid:54",
-        "centroid:17"
+        "centroid:68",
+        "centroid:98",
+        "centroid:16",
+        "centroid:69",
+        "centroid:78"
       ],
       "ttlSamples": [
         {
+          "key": "centroid:68",
+          "ttl": 536214,
+          "ok": true
+        },
+        {
+          "key": "centroid:98",
+          "ttl": 536220,
+          "ok": true
+        },
+        {
+          "key": "centroid:16",
+          "ttl": 536203,
+          "ok": true
+        },
+        {
+          "key": "centroid:69",
+          "ttl": 536214,
+          "ok": true
+        },
+        {
           "key": "centroid:78",
-          "ttl": 579279,
-          "ok": true
-        },
-        {
-          "key": "centroid:18",
-          "ttl": 579266,
-          "ok": true
-        },
-        {
-          "key": "centroid:33",
-          "ttl": 579270,
-          "ok": true
-        },
-        {
-          "key": "centroid:54",
-          "ttl": 579274,
-          "ok": true
-        },
-        {
-          "key": "centroid:17",
-          "ttl": 579266,
+          "ttl": 536215,
           "ok": true
         }
       ],
@@ -116,38 +116,38 @@
     {
       "key": "som:*",
       "pattern": "som:*",
-      "count": 203,
+      "count": 152,
       "sample": [
-        "som:cell:59",
-        "som:cell:90",
-        "som:centroid:2:5",
-        "som:57",
-        "som:31"
+        "som:80",
+        "som:cell:9",
+        "som:cell:17",
+        "som:cell:42",
+        "som:cell:71"
       ],
       "ttlSamples": [
         {
-          "key": "som:cell:59",
-          "ttl": 579304,
+          "key": "som:80",
+          "ttl": 536235,
           "ok": true
         },
         {
-          "key": "som:cell:90",
-          "ttl": 579302,
+          "key": "som:cell:9",
+          "ttl": 536218,
           "ok": true
         },
         {
-          "key": "som:centroid:2:5",
-          "ttl": 3454,
+          "key": "som:cell:17",
+          "ttl": 536222,
           "ok": true
         },
         {
-          "key": "som:57",
-          "ttl": 579301,
+          "key": "som:cell:42",
+          "ttl": 536247,
           "ok": true
         },
         {
-          "key": "som:31",
-          "ttl": 579301,
+          "key": "som:cell:71",
+          "ttl": 536248,
           "ok": true
         }
       ],
@@ -157,27 +157,123 @@
     {
       "key": "bifrost:sem:packet:*",
       "pattern": "bifrost:sem:packet:*",
-      "count": 0,
-      "sample": [],
-      "ttlSamples": [],
+      "count": 45,
+      "sample": [
+        "bifrost:sem:packet:6a058b76b6d7100c",
+        "bifrost:sem:packet:ebc8cdd4145caacf",
+        "bifrost:sem:packet:evidence_search_a3e84056",
+        "bifrost:sem:packet:473463c5ae07ef36",
+        "bifrost:sem:packet:codebase_stats_a3e84056"
+      ],
+      "ttlSamples": [
+        {
+          "key": "bifrost:sem:packet:6a058b76b6d7100c",
+          "ttl": 43372,
+          "ok": true
+        },
+        {
+          "key": "bifrost:sem:packet:ebc8cdd4145caacf",
+          "ttl": 43371,
+          "ok": true
+        },
+        {
+          "key": "bifrost:sem:packet:evidence_search_a3e84056",
+          "ttl": 43371,
+          "ok": true
+        },
+        {
+          "key": "bifrost:sem:packet:473463c5ae07ef36",
+          "ttl": 43370,
+          "ok": true
+        },
+        {
+          "key": "bifrost:sem:packet:codebase_stats_a3e84056",
+          "ttl": 43370,
+          "ok": true
+        }
+      ],
       "ok": true,
       "error": null
     },
     {
       "key": "bifrost:sem:feature:*",
       "pattern": "bifrost:sem:feature:*",
-      "count": 0,
-      "sample": [],
-      "ttlSamples": [],
+      "count": 10,
+      "sample": [
+        "bifrost:sem:feature:legal-statutes",
+        "bifrost:sem:feature:ai-agent",
+        "bifrost:sem:feature:unknown",
+        "bifrost:sem:feature:sveltekit-frontend",
+        "bifrost:sem:feature:evidence-pipeline"
+      ],
+      "ttlSamples": [
+        {
+          "key": "bifrost:sem:feature:legal-statutes",
+          "ttl": 43367,
+          "ok": true
+        },
+        {
+          "key": "bifrost:sem:feature:ai-agent",
+          "ttl": 43367,
+          "ok": true
+        },
+        {
+          "key": "bifrost:sem:feature:unknown",
+          "ttl": 43367,
+          "ok": true
+        },
+        {
+          "key": "bifrost:sem:feature:sveltekit-frontend",
+          "ttl": 43367,
+          "ok": true
+        },
+        {
+          "key": "bifrost:sem:feature:evidence-pipeline",
+          "ttl": 43367,
+          "ok": true
+        }
+      ],
       "ok": true,
       "error": null
     },
     {
       "key": "bifrost:sem:intent:*",
       "pattern": "bifrost:sem:intent:*",
-      "count": 0,
-      "sample": [],
-      "ttlSamples": [],
+      "count": 13,
+      "sample": [
+        "bifrost:sem:intent:6df9c92c207644b6",
+        "bifrost:sem:intent:e09efdc95c9548f9",
+        "bifrost:sem:intent:c182e42d4c34122d",
+        "bifrost:sem:intent:1184fb07bfe6ed33",
+        "bifrost:sem:intent:31b013e3547d56c4"
+      ],
+      "ttlSamples": [
+        {
+          "key": "bifrost:sem:intent:6df9c92c207644b6",
+          "ttl": 43365,
+          "ok": true
+        },
+        {
+          "key": "bifrost:sem:intent:e09efdc95c9548f9",
+          "ttl": 43364,
+          "ok": true
+        },
+        {
+          "key": "bifrost:sem:intent:c182e42d4c34122d",
+          "ttl": 43364,
+          "ok": true
+        },
+        {
+          "key": "bifrost:sem:intent:1184fb07bfe6ed33",
+          "ttl": 43364,
+          "ok": true
+        },
+        {
+          "key": "bifrost:sem:intent:31b013e3547d56c4",
+          "ttl": 43364,
+          "ok": true
+        }
+      ],
       "ok": true,
       "error": null
     },
@@ -245,7 +341,7 @@
       "ttlSamples": [
         {
           "key": "ace:authority:top",
-          "ttl": 16296,
+          "ttl": 13823,
           "ok": true
         }
       ],

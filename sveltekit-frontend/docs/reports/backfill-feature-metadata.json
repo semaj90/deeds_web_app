@@ -1,14 +1,14 @@
 {
-  "timestamp": "2026-06-14T03:44:21.799Z",
-  "mode": "backfill",
+  "timestamp": "2026-06-19T22:22:05.531Z",
+  "mode": "verify-only",
   "verification": [
     {
       "table": "atlas_packets",
-      "total": 17476,
+      "total": 17985,
       "missing": {
         "feature_id": 0,
         "feature_label": 0,
-        "source_ref": 8653,
+        "source_ref": 0,
         "metadata": 0,
         "file_path": null
       },
@@ -55,35 +55,10 @@
       "hasBtreeIndex": true
     }
   ],
-  "backfill": [
-    {
-      "table": "atlas_packets",
-      "updated": 0,
-      "errors": 0,
-      "reason": "No rows need backfill"
-    },
-    {
-      "table": "nes_chrom_packets",
-      "updated": 0,
-      "errors": 0,
-      "reason": "No rows need backfill"
-    },
-    {
-      "table": "glyph_records",
-      "updated": 0,
-      "errors": 0,
-      "reason": "No rows need backfill"
-    },
-    {
-      "table": "codebase_chunk_index",
-      "updated": 0,
-      "errors": 0,
-      "reason": "No rows need backfill"
-    }
-  ],
+  "backfill": null,
   "summary": {
     "tablesChecked": 4,
-    "totalRows": 87656,
+    "totalRows": 88165,
     "totalMissingFeatureId": 0,
     "totalMissingMetadata": 0,
     "totalUpdated": 0,

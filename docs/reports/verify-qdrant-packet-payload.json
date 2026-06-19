@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-06-18T22:24:09.338Z",
+  "generated_at": "2026-06-19T22:22:05.639Z",
   "sample_size": 100,
   "coverage": {
     "atlas_enriched_pct": 92,
@@ -15,8 +15,8 @@
     "directory_path_pct": 0
   },
   "alignment": {
-    "checked": 3,
-    "aligned": 3,
+    "checked": 0,
+    "aligned": 0,
     "mismatches": 0
   },
   "gates": [
@@ -48,7 +48,7 @@
     {
       "name": "postgres_qdrant_no_contradictions",
       "pass": true,
-      "detail": "3/3 feature_id aligned, 0 mismatches"
+      "detail": "no filterable canonicalSourceRef points found"
     }
   ],
   "pass": true

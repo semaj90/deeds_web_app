@@ -1,23 +1,23 @@
 # Artifact Bloat Audit
 
-Generated: 2026-06-12T19:25:59.024Z
+Generated: 2026-06-19T22:37:54.198Z
 
 ## Summary
 
-- total files: 7781
-- total size MB: 14974.92
-- duplicate files: 463
+- total files: 8245
+- total size MB: 15237.74
+- duplicate files: 465
 
 ## By Kind
-- raw_json: 6578
-- ndjson: 170
+- raw_json: 6725
+- ndjson: 176
 - msgpack: 0
 - duckdb: 2
 - parquet: 6
-- embedding_checkpoint: 43
-- som_checkpoint: 6
-- report: 513
-- duplicate: 463
+- embedding_checkpoint: 47
+- som_checkpoint: 8
+- report: 816
+- duplicate: 465
 
 ## Largest Files
 
@@ -46,19 +46,19 @@ Generated: 2026-06-12T19:25:59.024Z
 | `.tmp/mapreduce-full.ndjson` | ndjson | 104.58 | compress_zstd |
 | `.tmp/ingest/csv/nodes.csv` | raw_json | 97.14 | compress_zstd |
 | `.tmp/ingest/nodes.ndjson` | ndjson | 89.57 | compress_zstd |
+| `sveltekit-frontend/.tmp/addressable-packets.ndjson` | ndjson | 58.82 | compress_zstd |
 | `sveltekit-frontend/.tmp/offline-analysis/fe-graph-deep-import-graph.json` | raw_json | 56.93 | compress_zstd |
-| `sveltekit-frontend/docs/graph/deep-import-graph.json` | raw_json | 56.93 | keep_canonical |
 
 ## Duplicate Groups
 
 - 0e0f2ce3de03: sveltekit-frontend/.tmp/offline-analysis/fe-graph-sveltekit-route-gap-atlas.json, sveltekit-frontend/docs/graph/sveltekit-route-gap-atlas.json
 - ad93d182126d: sveltekit-frontend/.tmp/offline-analysis/fe-graph-sveltekit-route-map.json, sveltekit-frontend/docs/graph/sveltekit-route-map.json
 - 5bcb0c7fd6d5: docs/graph/repo-sveltekit-route-atlas.json, sveltekit-frontend/.tmp/offline-analysis/docs-graph-repo-sveltekit-route-atlas.json
+- a067b5ef548b: .tmp/addressable-packets.ndjson, .tmp/addressable-packets.validated.ndjson
 - 711ff33e746a: sveltekit-frontend/.tmp/offline-analysis/fe-graph-nes-glyph-architecture.json, sveltekit-frontend/docs/graph/nes-glyph-architecture.json
 - 832c3405615e: sveltekit-frontend/.tmp/offline-analysis/fe-graph-multihop-codebase-map.json, sveltekit-frontend/docs/graph/multihop-codebase-map.json
 - 1299c11d7cf6: models/embeddinggemma_300m_onnx/tokenizer.model, models/embeddinggemma_300m/tokenizer.model, models/gemma3_270m/tokenizer.model, models/gemma3-client-onnx/tokenizer.model
 - 0f05d3703832: sveltekit-frontend/.tmp/offline-analysis/fe-graph-enhanced-hypergraph.json, sveltekit-frontend/docs/graph/enhanced-hypergraph.json
-- d986be77b3f8: docs/atlas/feature-registry.json, sveltekit-frontend/docs/atlas/feature-registry.json
 - 360bc1b7a6d9: .tmp/repairs/unwrapped/tasks.json.report.json.items.jsonl, .tmp/repairs/unwrapped/tasks.json.report.json.items.jsonl.items.jsonl.tmp, .tmp/repairs/unwrapped/tasks.json.report.json.items.jsonl.tmp
 - 7bb43d8a79a1: turbovec/target/release/_turbovec.dll, turbovec/target/release/deps/_turbovec.dll
 - da9213875fd4: .tmp/repairs/unwrapped/svelte-errors.ndjson.report.json.items.jsonl, .tmp/repairs/unwrapped/svelte-errors.ndjson.report.json.items.jsonl.items.jsonl.tmp, .tmp/repairs/unwrapped/svelte-errors.ndjson.report.json.items.jsonl.tmp

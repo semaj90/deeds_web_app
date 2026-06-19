@@ -1105,6 +1105,10 @@ export async function bifrostChat(
           hitType = debug?.hit_type;
           bifrostGatewayUnavailableUntil = 0;
 
+          if (!content.trim() && !tool_calls?.length) {
+            throw new Error('Bifrost gateway returned an empty completion');
+          }
+
           t_l3 = performance.now() - bifrostStart;
           if (debug?.cache_hit) {
             console.debug(

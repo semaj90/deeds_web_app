@@ -1,0 +1,90 @@
+{
+  "timestamp": "2026-06-19T19:18:30Z",
+  "status": "PASS",
+  "validators": [
+    {
+      "name": "SOM Cell Mapping",
+      "status": "PASS",
+      "metrics": {
+        "grid": "20x20",
+        "total_assigned": 781,
+        "occupied_cells": 151,
+        "avg_packets_per_cell": 5.2,
+        "postgres_updates": 781,
+        "postgres_skips": 0
+      },
+      "checks": {
+        "som_index_is_integer": true,
+        "som_row_col_bounds_valid": true,
+        "original_som_cluster_preserved": true
+      }
+    },
+    {
+      "name": "Dense Vector / Qdrant Payload Alignment",
+      "status": "PASS",
+      "metrics": {
+        "embedding_dim": 768,
+        "qdrant_collection": "codebase_chunks_768",
+        "canonical_vectors_fetched": 781,
+        "writeback_match_pct": 100.00
+      },
+      "checks": {
+        "dense_is_primary_vector": true,
+        "latent_64_is_routing_only": true,
+        "payload_has_feature_id": true,
+        "qdrant_results_join_to_postgres": true
+      }
+    },
+    {
+      "name": "Autoencoder Latent Provenance",
+      "status": "PASS",
+      "metrics": {
+        "best_val_loss": 0.000736,
+        "input_dim": 768,
+        "hidden_dim": 128,
+        "latent_dim": 64,
+        "latent_index_entries": 781
+      },
+      "checks": {
+        "weights_manifest_exists": true,
+        "reconstruction_error_stored": true,
+        "latent_vectors_cached_redis": true
+      }
+    },
+    {
+      "name": "HyperRAG Rerank Boundedness",
+      "status": "PASS",
+      "metrics": {
+        "test_query": "authentication",
+        "strategy": "fusion",
+        "packets_retrieved": 5,
+        "provenance_tuples_validated": 11,
+        "cache_hit_latency_ms": 64
+      },
+      "checks": {
+        "candidates_seeded_from_dense_fts_graph": true,
+        "som_does_not_invent_candidates": true,
+        "answers_cite_packet_key_source_ref": true
+      }
+    },
+    {
+      "name": "Redis / Bitfrost Pointer Safety",
+      "status": "PASS",
+      "metrics": {
+        "cell_keys_cached": 151,
+        "packet_keys_cached": 781,
+        "latent_keys_cached": 781
+      },
+      "checks": {
+        "keys_point_to_postgres": true,
+        "cache_hits_have_source_ref": true,
+        "invalidation_clears_stale_keys": true
+      }
+    }
+  ],
+  "verification": {
+    "smoke_test": "PASS",
+    "retrieval_e2e": "PASS",
+    "join_audit": "PASS"
+  }
+}

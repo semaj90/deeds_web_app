@@ -2,6 +2,46 @@
 
 Generated from the current workstation evidence. This is the production-readiness board for the remaining open lanes, not a runtime plan.
 
+## Canonical Closure Update - 2026-06-19
+
+Status: **ARCHITECTURE FROZEN / PROOF GATES PASS**
+
+This block supersedes older percentages and unchecked items retained below as
+historical evidence.
+
+- Production readiness: **PASS 66 / WARN 0 / FAIL 0**
+- Parent Atlas package ship gate: **5/5 PASS**
+- OpenCode task registry: **22 tasks / 0 open / 0 archived**
+- Deterministic retrieval proof: **50/50 PASS**
+  - 50 cold misses
+  - 50 warm hits
+  - 50 second-warm hits
+  - 50/50 packet identity matches
+  - 50/50 fusion-score matches
+- Runtime degradation proof: **3/3 PASS**
+  - Valkey unavailable -> packet retrieval preserved -> service restored healthy
+  - Neo4j unavailable -> packet retrieval preserved -> service restored healthy
+  - Qdrant unavailable -> FTS fallback preserved -> service restored healthy
+- Cache namespace proof: **5/5 required namespaces ready**, zero sampled collisions
+- Cold-storage restore proof: **1/1 manifest PASS**, restored bytes and SHA-256 match
+- Live services after restoration: **READY 6 / mismatch 0 / stopped 0 / auth required 0**
+- Phase 16 truth-promotion invalidation binding: **CLOSED**
+- Phase 16-H packet identity and higher-hop structural ledger: **CLOSED**
+- Go Retrieval HTTP/gRPC, authenticated Valkey, Qdrant, Neo4j, and Postgres:
+  **READY**
+
+Canonical proof reports:
+
+- `docs/reports/parent-atlas-proof-of-truth.md`
+- `docs/reports/runtime-degradation-proof.md`
+- `docs/reports/cache-namespace-proof.md`
+- `docs/reports/cold-storage-restore-proof.md`
+- `memory/exports/parent-atlas-final-completion.md`
+
+No production implementation lane remains open on the current task board.
+AE/SOM experimentation, PPO/adapters, TensorRT expansion, custom CUDA kernels,
+and broader model research remain deferred behind measurable evaluation gains.
+
 ## Next Actions - Atlas / NES CHR97 Production Readiness
 
 ### Status
@@ -16,7 +56,7 @@ Workspace roots:
 - `projectRoot`: `C:\Users\james\Videos\deeds-web-app\sveltekit-frontend`
 - template: `C:\Users\james\Videos\deeds-web-app\configs\templates\gemma4-opencode.jinja` (exists)
 - staging surfaces: `scripts/atlas` and gitignored `.tmp` NDJSON/JSONL datasets
-- production destination: `packages/atlas`
+- production destination: `packages/parent-atlas`
 
 Current live spine:
 
@@ -26,7 +66,7 @@ Current live spine:
 - `packet_key` is immutable identity; `feature_id` may be enriched; `metadata` may grow.
 - compare-only future surfaces: `atlas_tree_nodes`, `atlas_topology_index`, `atlas_svg_glyphs`.
 - higher-hop schema repair is now applied to `atlas_feature_packets`: `file_path` is backfilled on 277 rows, `som_cluster` is backfilled on 7 rows, and `tree_node_id` is present as a nullable forward link with no safe live join path yet.
-- `packages/parent-atlas` now exists as a real scaffold with `src/index.ts`, `src/cli.ts`, gates, adapters, and pipeline ports; consolidation is now a wiring/refinement task, and the production destination remains `packages/atlas`.
+- `packages/parent-atlas` now exists as a real scaffold with `src/index.ts`, `src/cli.ts`, gates, adapters, and pipeline ports; consolidation is now a wiring/refinement task.
 - The next blocker before the next backfill is live schema reconciliation: tree nodes, summary layers, and topology indexes still lag the package gate contract.
 - Phase 16-H identity spine is closed.
 - Higher-hop ledger validation is structurally PASS and enrichment WARN.
@@ -34,8 +74,14 @@ Current live spine:
 - Neo4j / GDS topology pass is complete. ✅ (GDS/SOM enrichment applied to 3,251 packets)
 - ACE context-pack smoke is green after Valkey auth handling was fixed; cache hit is verified in the smoke path, not the canonical identity lane.
 - ACE planner cache-hit validation is now green via `npm run ace:context-planner:smoke`; the proof run writes and rereads the same stable planner state, with `beforeHit: false` and `afterHit: true`, and the second read comes back from Redis. Proof artifact: `docs/reports/ace_cache_hit_2026-06-18T00-47-18-309Z.json`.
+- OpenCode's `yorha` provider now reaches the real ACE facade through `/api/v1/chat/completions`; the endpoint no longer bypasses `assembleACEContext`.
+- The live EmbeddingGemma route is `http://127.0.0.1:11434`, Qdrant retrieval produces ranked source refs, and a repeated packet-router query hits `bitfrost:retrieval:*` from Redis in 1 ms.
+- Bifrost L3 now treats an empty gateway completion as a failure and falls back to the launcher-backed `llama-server.exe` model on `:8090`.
+- OpenCode semantic retrieval/cache correctness is green: the OpenAI-compatible endpoint returned a Tier 1 scenario-cache hit with `selected_lane=redis`, `cache_hit=prior-answer`, and 7 ms internal latency.
+- The remaining runtime issues are cold synthesis latency for large ACE contexts and the durable `scenario_cache` Postgres mirror schema drift (`pipeline_key` is absent); Redis hot-cache writes remain available and fail open while that mirror is reconciled.
 - SOM 20x20 coordinates backfilled. ✅
-- The next move after the graph pass is to finish the packet reader/writer, RRF/Neo4j/HyperRAG wiring, Qdrant tag mirroring, and then consolidate the implementation into `packages/atlas`.
+- The previous replay and package-consolidation lanes are closed by the
+  2026-06-19 proof block above.
 - The served `/.well-known/llms.txt` and `/.well-known/llms-full.txt` contract now share a single Parent Atlas agent contract helper, and the packet RPC now emits ACE-ready packet metadata (`packet_type`, `canonical_source_ref`, `recommended_action`, `verification_command`) in addition to the identity spine.
 - HyperRAG fusion telemetry is fully operational and passes the smoke test suite. ✅
 
@@ -76,7 +122,7 @@ Approx completion: ~65%
 - packet reader / writer: implementation lane for replayable NDJSON/JSONL packet flow
 - SOM 20x20 / auto-clustering: follows the packet reader/writer and graph pass before board consolidation
 - Qdrant embedding tags + pgvector mirror: follow the SOM pass, then refresh the kanban task board
-- packages/atlas consolidation: production directory target after the staging lanes are complete
+- packages/parent-atlas consolidation: production directory target after the staging lanes are complete
 
 ### Stage 4 - Agent Memory & Scoring Pipeline
 
@@ -346,15 +392,16 @@ P0 tasks #3 and #4 are now verified complete by `scripts/atlas/verify-feature-li
 
 ## Current Runtime Topology Order
 
-1. Neo4j / GDS topology pass on the already aligned bridge spine
-2. `atlas_feature_map` ↔ `parent_atlas_documents` join audit
-3. `route_runtime_packets` materialization
-4. Concept evidence spine backfill from `packet_keys`
-5. SOM coverage audit/backfill from existing topology
-6. Phase 4B benchmark
-7. AE train `768 -> 64`
-8. SOM `20x20` retrain
-9. PPO / QLoRA dataset export
+1. Feature coverage: close `feature_id` payload/fallback gaps to >95%.
+2. Replay telemetry: 50+ golden/cache-hit/graph/low-density/Kanban queries, one row per query.
+3. HyperRAG timing: record BM25, Qdrant, Valkey, Neo4j, fusion, rerank, total, cache-hit, and fusion score.
+4. SOM join audit: classify Qdrant ID, packet key, source ref, payload ID, and metadata ID mismatches. No retraining.
+5. Glyph coverage: map domain, ontology, and topology labels to UnoCSS glyphs.
+
+Dense retrieval remains `embedding_384 -> Qdrant`. `latent_128` is semantic
+compression; `latent_64` is a routing/topology/rerank feature; `som_cluster` is
+a neighborhood pointer. Neither latent vectors nor SOM replace packet identity
+or dense retrieval.
 
 ## Runtime Coverage Audit
 
@@ -372,16 +419,43 @@ Closed:
 - Redis/Valkey auth in `collect-runtime-evidence`
 - SOM column / coordinate mapping
 - basic `feature_id` placement fallback
+- feature_id coverage: Postgres packet ledgers 100%; sampled Qdrant payloads 100/100
+- replay telemetry breadth: 307 rows / 228 distinct queries; all required scenarios represented
+- HyperRAG timing: one detailed eval row per packet-RPC query; Qdrant/BM25/Valkey/Neo4j/rerank/total populated
+- SOM join audit: 2,647/2,736 addressable entries matched (96.75%); 89 gRPC/NES identities classified
+- glyph coverage: 3,251/3,251 higher-hop joins and 100% of observed labels mapped
 - MapReduce regeneration
 - parent-atlas package mapreduce execution
 - retrieval E2E benchmark gate
 
-Open:
-- feature_id coverage expansion
-- replay telemetry breadth
-- AE/SOM training provenance
-- HyperRAG timing / fusion telemetry
-- glyph coverage
+The focused coverage/provenance cleanup is closed. Glyph presentation uses
+`configs/atlas-glyph-label-registry.json` as the static Lucide/UnoCSS contract.
+
+Next broader workstation lanes:
+
+1. Cold-storage manifest population and restore verification.
+2. `packages/parent-atlas` consolidation.
+3. Evaluation and agent-learning gates.
+
+Temporal Kanban consolidation is complete. The append-only registry now holds
+22 durable tasks with 7 open tasks, and 288 Markdown sources are classified
+without moving or deleting historical evidence. See
+`docs/reports/temporal-kanban-consolidation.md` and
+`sveltekit-frontend/.opencode/tasks/task-state.md`.
+
+Artifact tier classification is also complete at the manifest layer:
+8,245 files / 15,237.74 MB are classified in
+`docs/reports/artifact-tiering-application.md`. No file was moved, compressed,
+or deleted; cold and delete actions remain gated by restore verification.
+
+Go Retrieval runtime recovery is complete. The existing Docker service is
+healthy on HTTP `:8100` and gRPC `:50053`, uses authenticated Valkey, the live
+service audit is 6 READY / 0 WARN, and the Gemma4/TRACE tool smoke passes 7/7.
+
+Cold-storage verification is structurally green but evidence-incomplete:
+`atlas_cold_storage_manifest` exists with the expected schema, but contains
+0 rows. The verifier now reports `WARN_EMPTY`; 0/0 is not treated as restore
+proof.
 
 The highest-leverage next lane is now telemetry and provenance enrichment over the already aligned spine. Identity repair is no longer the blocker; the remaining work is coverage expansion, replay breadth, and feature provenance. SOM coverage is still a follow-on lane, not a blocker to the retrieval path.
 
@@ -740,7 +814,7 @@ Return a bounded packet response with query, strategy, ranked packets, Qdrant ta
 - [x] inventory raw_size, ndjson_size, minified_size, embedding_size, checkpoint_size, duplicate_outputs, and gitignored surfaces
 - [x] confirm there is no single 6 GB file in the current workspace audit
 - [x] inventory hidden GPU / HMM / trace / MCP / TurboVec surfaces from `rg --files -uu`
-- [ ] classify each surface as keep_canonical, convert_to_ndjson, compress_zstd, move_to_cold, delete_if_regenerable, or index_metadata_only
+- [x] classify each surface as keep_canonical, convert_to_ndjson, compress_zstd, move_to_cold, delete_if_regenerable, or index_metadata_only
 - [ ] tier the Gemma checkpoint and other model checkpoints to cold storage
 - [ ] compress the large mapreduce NDJSON surfaces with a replay-safe archive path
 - [ ] keep Gemma4 away from raw large artifacts by default
@@ -762,7 +836,7 @@ Return a bounded packet response with query, strategy, ranked packets, Qdrant ta
 - [x] batch `.tmp/parent_atlas_packets/*.json` into `.tmp/parent_atlas_packets/parent-atlas-packets.ndjson`
 - [ ] finish remaining JSON object/text surfaces; current LD-JSON subgate is 96.3%
 - [ ] keep sourceRef -> feature_id -> featureLabel derivation replayable
-- [ ] preserve cold-storage restore proofs before any move/delete
+- [x] preserve cold-storage restore proofs before any move/delete
 - [x] use the open-lanes bundle / lane-scoped normalization preview for narrower unmatched-ref triage
 - [x] record GpJSON as deferred; keep Rust N-API/DuckDB/Postgres as the current parsing path
 

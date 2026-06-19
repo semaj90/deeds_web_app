@@ -1,7 +1,7 @@
 {
-  "generated_at": "2026-06-19T04:53:48.603Z",
+  "generated_at": "2026-06-19T16:03:34.607Z",
   "query": "",
   "input": "docs/reports/repo-function-registry-query.json",
   "matched_rows": 10,
-  "summary_text": "# MCP Tool Summary Registry\n\n## What exists\n\n- mcp.tool.ace.compact.search (ace.compact_search)\n- mcp.tool.atlas.compact.context (atlas.compact_context)\n- mcp.tool.atlas.coverage (atlas.coverage)\n- mcp.tool.atlas.explain.trace (atlas.explain_trace)\n- mcp.tool.atlas.get.chunk (atlas.get_chunk)\n\n## What is missing\n\nA live Gemma4 summary endpoint was unavailable, so this briefing is deterministic. The registry is already canonical in Postgres, but the summarization transport still needs a healthy llama-server or MCP route.\n\n## Next bounded lane\n\nWire the registry summarizer to the live llama-server path and keep the Postgres-backed registry as the source of truth.\n\n## Observed workflow lanes\n\n- cache\n- lexical\n- dense\n- graph\n- rerank\n- read\n- identity\n- unknown"
+  "summary_text": "# MCP Tool Summary Registry\n\n## What exists\n\n- mcp.tool.ace.compact.search (ace.compact_search)\n- mcp.tool.atlas.compact.context (atlas.compact_context)\n- mcp.tool.atlas.coverage (atlas.coverage)\n- mcp.tool.atlas.explain.trace (atlas.explain_trace)\n- mcp.tool.atlas.get.chunk (atlas.get_chunk)\n\n## What is missing\n\nA live Gemma4 summary endpoint was unavailable, so this briefing is deterministic. The registry is already canonical in Postgres, but the summarization transport still needs a healthy llama-server or MCP route.\n\n## Next bounded lane\n\nWire the registry summarizer to the live llama-server path and keep the Postgres-backed registry as the source of truth.\n\n## Observed workflow lanes\n\n- cache\n- lexical\n- dense\n- graph\n- rerank\n- read\n- identity"
 }

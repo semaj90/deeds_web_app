@@ -1,11 +1,11 @@
 # Live Service Env Report
 
-Generated: 2026-06-18T14:36:58.695Z
+Generated: 2026-06-19T23:20:17.574Z
 
 ## Summary
 
-- READY: 4
-- ENV_MISMATCH: 2
+- READY: 6
+- ENV_MISMATCH: 0
 - PORT_MISMATCH: 0
 - SERVICE_STOPPED: 0
 - AUTH_REQUIRED: 0
@@ -18,9 +18,9 @@ Generated: 2026-06-18T14:36:58.695Z
 | Postgres 18 | READY | 127.0.0.1:5434 | 2ms | DATABASE_URL=postgresql://legal_admin:123456@127.0.0.1:5434/legal_ai_db |
 | Qdrant | READY | 127.0.0.1:6333 | 1ms | QDRANT_URL=http://127.0.0.1:6333 |
 | Neo4j | READY | 127.0.0.1:7687 | 1ms | NEO4J_URI=bolt://127.0.0.1:7687 |
-| Redis | READY | 127.0.0.1:6379 | 0ms | REDIS_URL=redis://127.0.0.1:6379 |
-| Go Retrieval (HTTP) | ENV_MISMATCH | localhost:8100 | 4ms | RETRIEVAL_HTTP_URL=http://localhost:8100 |
-| Go Retrieval (gRPC) | ENV_MISMATCH | localhost:50053 | 2ms | RETRIEVAL_GRPC_URL=127.0.0.1:50053 |
+| Redis | READY | 127.0.0.1:6379 | 1ms | REDIS_URL=redis://127.0.0.1:6379 |
+| Go Retrieval (HTTP) | READY | 127.0.0.1:8100 | 2ms | RETRIEVAL_HTTP_URL=http://127.0.0.1:8100 |
+| Go Retrieval (gRPC) | READY | 127.0.0.1:50053 | 1ms | RETRIEVAL_GRPC_URL=127.0.0.1:50053 |
 
 ## Provenance
 
@@ -32,13 +32,13 @@ Generated: 2026-06-18T14:36:58.695Z
 ## Retrieval Telemetry
 
 - status: READY
-- detail: retrieval_telemetry rows=179, recent24h=25
-- total rows: 179
-- recent 24h rows: 25
-- rows with selected_packet_keys: 179
-- rows with feature_ids: 179
-- rows with retrieval_strategy: 179
-- latest at: Wed Jun 17 2026 18:12:39 GMT-0700 (Pacific Daylight Time)
+- detail: retrieval_telemetry rows=308, recent24h=114
+- total rows: 308
+- recent 24h rows: 114
+- rows with selected_packet_keys: 308
+- rows with feature_ids: 308
+- rows with retrieval_strategy: 308
+- latest at: Fri Jun 19 2026 15:27:09 GMT-0700 (Pacific Daylight Time)
 
 ## Notes
 

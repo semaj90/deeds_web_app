@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-06-19T04:03:40.376Z",
+  "generatedAt": "2026-06-19T23:21:19.166Z",
   "repo": "sveltekit-frontend",
   "evidenceFirst": true,
   "roles": {
@@ -19,17 +19,10 @@
     "stateJson": ".opencode\\tasks\\task-state.json",
     "stateMd": ".opencode\\tasks\\task-state.md",
     "eventsJsonl": ".opencode\\tasks\\task-events.jsonl",
-    "currentCount": 17,
-    "openCount": 8
+    "currentCount": 22,
+    "openCount": 0
   },
-  "activeLane": {
-    "taskId": "task_concept_evidence_spine_backfill",
-    "title": "Historical concept evidence spine backfill",
-    "priority": "HIGH",
-    "status": "TODO",
-    "command": "npm run atlas:concept-evidence:backfill",
-    "sourceRecommendationKey": "concept-evidence-spine-backfill"
-  },
+  "activeLane": null,
   "openLanesTodo": "reports\\parent-atlas-open-lanes-todo.md",
   "reports": {
     "temporalTaskRegistry": "docs\\reports\\temporal-task-registry-report.md",

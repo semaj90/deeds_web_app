@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-06-15T08:24:09.740Z",
+  "timestamp": "2026-06-19T17:55:07.803Z",
   "checks": {
     "tables": {
       "atlas_packets": {
@@ -129,10 +129,10 @@
       }
     },
     "rowCounts": {
-      "atlas_packets": "0",
+      "atlas_packets": "17985",
       "atlas_tree_nodes": "8823",
       "atlas_topology_index": "3251",
-      "error_logs": "0"
+      "error_logs": "5"
     }
   },
   "recommendations": [

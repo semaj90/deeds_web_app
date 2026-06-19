@@ -1,0 +1,99 @@
+{
+  "generatedAt": "2026-06-19T22:29:27.255Z",
+  "status": "READY",
+  "registryVersion": "atlas-glyph-label-v1",
+  "glyphJoin": {
+    "total": 3251,
+    "matched": 3251,
+    "pct": 100
+  },
+  "labelCoverage": {
+    "observedRows": 4628,
+    "mappedRows": 4628,
+    "pct": 100
+  },
+  "mapped": [
+    {
+      "kind": "glyph_type",
+      "value": "general",
+      "rows": 971,
+      "icon": "boxes",
+      "class": "text-zinc-600 dark:text-zinc-300"
+    },
+    {
+      "kind": "glyph_type",
+      "value": "storage",
+      "rows": 877,
+      "icon": "database",
+      "class": "text-teal-700 dark:text-teal-300"
+    },
+    {
+      "kind": "glyph_type",
+      "value": "endpoint",
+      "rows": 712,
+      "icon": "route",
+      "class": "text-blue-700 dark:text-blue-300"
+    },
+    {
+      "kind": "glyph_type",
+      "value": "ui",
+      "rows": 558,
+      "icon": "panels-top-left",
+      "class": "text-fuchsia-700 dark:text-fuchsia-300"
+    },
+    {
+      "kind": "glyph_type",
+      "value": "cache",
+      "rows": 95,
+      "icon": "database-zap",
+      "class": "text-amber-700 dark:text-amber-300"
+    },
+    {
+      "kind": "glyph_type",
+      "value": "security",
+      "rows": 25,
+      "icon": "shield-check",
+      "class": "text-red-700 dark:text-red-300"
+    },
+    {
+      "kind": "glyph_type",
+      "value": "utility",
+      "rows": 13,
+      "icon": "wrench",
+      "class": "text-slate-700 dark:text-slate-300"
+    },
+    {
+      "kind": "domain_class",
+      "value": "retrieval_pipeline",
+      "rows": 459,
+      "icon": "search",
+      "class": "text-cyan-700 dark:text-cyan-300"
+    },
+    {
+      "kind": "ontology_label",
+      "value": "hyperrag_fusion",
+      "rows": 459,
+      "icon": "network",
+      "class": "text-violet-700 dark:text-violet-300"
+    },
+    {
+      "kind": "topology_label",
+      "value": "cache_mirror",
+      "rows": 400,
+      "icon": "database-zap",
+      "class": "text-amber-700 dark:text-amber-300"
+    },
+    {
+      "kind": "topology_label",
+      "value": "core_search_entrypoint",
+      "rows": 59,
+      "icon": "route",
+      "class": "text-emerald-700 dark:text-emerald-300"
+    }
+  ],
+  "missing": [],
+  "fallback": {
+    "icon": "boxes",
+    "class": "text-zinc-600 dark:text-zinc-300"
+  }
+}

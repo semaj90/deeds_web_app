@@ -1,15 +1,15 @@
 {
-  "generated_at": "2026-06-14T01:32:39.014Z",
+  "generated_at": "2026-06-19T20:30:43.265Z",
   "postgres": {
-    "packets_with_concepts": 8367,
-    "total_concept_refs": 138550
+    "packets_with_concepts": 17985,
+    "total_concept_refs": 42571
   },
   "neo4j": {
-    "total_edges": 29744,
-    "packets_with_edges": 5824,
+    "total_edges": 33293,
+    "packets_with_edges": 8744,
     "concepts_reached": 10,
-    "atlas_edges": 29744,
-    "atlas_packets": 5824,
+    "atlas_edges": 33293,
+    "atlas_packets": 8744,
     "atlas_concepts": 10,
     "duplicate_pairs": 0
   },
@@ -21,94 +21,94 @@
   },
   "top_concepts": [
     {
+      "concept": "general_abstractions",
+      "degree": 5044
+    },
+    {
+      "concept": "infrastructure_config",
+      "degree": 3932
+    },
+    {
       "concept": "emergent_topology",
       "degree": 3358
     },
     {
-      "concept": "infrastructure_config",
-      "degree": 3342
-    },
-    {
       "concept": "test_harness",
-      "degree": 3258
+      "degree": 3260
     },
     {
       "concept": "observability_telemetry",
       "degree": 3185
     },
     {
-      "concept": "general_abstractions",
-      "degree": 3143
+      "concept": "agent_intelligence",
+      "degree": 3054
     },
     {
       "concept": "database_orm",
-      "degree": 3009
-    },
-    {
-      "concept": "api_endpoints",
-      "degree": 2825
-    },
-    {
-      "concept": "agent_intelligence",
-      "degree": 2732
-    },
-    {
-      "concept": "native_accelerators",
-      "degree": 2628
+      "degree": 3044
     },
     {
       "concept": "ui_components",
-      "degree": 2264
+      "degree": 2936
+    },
+    {
+      "concept": "api_endpoints",
+      "degree": 2834
+    },
+    {
+      "concept": "native_accelerators",
+      "degree": 2646
     }
   ],
   "supernodes": [
     {
+      "concept": "general_abstractions",
+      "degree": 5044
+    },
+    {
+      "concept": "infrastructure_config",
+      "degree": 3932
+    },
+    {
       "concept": "emergent_topology",
       "degree": 3358
     },
     {
-      "concept": "infrastructure_config",
-      "degree": 3342
-    },
-    {
       "concept": "test_harness",
-      "degree": 3258
+      "degree": 3260
     },
     {
       "concept": "observability_telemetry",
       "degree": 3185
     },
     {
-      "concept": "general_abstractions",
-      "degree": 3143
+      "concept": "agent_intelligence",
+      "degree": 3054
     },
     {
       "concept": "database_orm",
-      "degree": 3009
-    },
-    {
-      "concept": "api_endpoints",
-      "degree": 2825
-    },
-    {
-      "concept": "agent_intelligence",
-      "degree": 2732
-    },
-    {
-      "concept": "native_accelerators",
-      "degree": 2628
+      "degree": 3044
     },
     {
       "concept": "ui_components",
-      "degree": 2264
+      "degree": 2936
+    },
+    {
+      "concept": "api_endpoints",
+      "degree": 2834
+    },
+    {
+      "concept": "native_accelerators",
+      "degree": 2646
     }
   ],
-  "coverage_pct": 0.6960678857416039,
+  "coverage_pct": 0.48618293021962744,
   "gate": {
     "edges": true,
     "duplicates": true,
-    "coverage": true,
+    "coverage": false,
     "supernodes": false,
-    "pass": true
+    "pass": false
   }
 }

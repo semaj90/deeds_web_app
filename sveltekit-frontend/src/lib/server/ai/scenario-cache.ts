@@ -287,8 +287,18 @@ export async function storeScenario(
   response: string,
   metadata: Record<string, any> = {}
 ): Promise<void> {
+  const hash = getQueryHash(query);
+
+  // Keep the hot exact-match path available even when the durable
+  // Postgres/Qdrant mirror is temporarily behind the runtime schema.
   try {
-    const hash = getQueryHash(query);
+    const redis = getRedis();
+    await redis.set(`scenario:exact:${hash}`, response, 'EX', REDIS_TTL);
+  } catch (err) {
+    console.warn('[Scenario Cache] Redis pre-warming failed:', err);
+  }
+
+  try {
     const embedding = await embedQuery(query);
     if (!embedding) {
       throw new Error('Failed to generate embedding for scenario storing');
@@ -334,18 +344,12 @@ export async function storeScenario(
       ],
     });
 
-    // Also populate Redis exact-match cache immediately
-    try {
-      const redis = getRedis();
-      await redis.set(`scenario:exact:${hash}`, response, 'EX', REDIS_TTL);
-    } catch (err) {
-      console.warn('[Scenario Cache] Redis pre-warming failed:', err);
-    }
-
     console.log(`[Scenario Cache] Successfully stored scenario query_hash=${hash.slice(0, 8)}`);
   } catch (err) {
-    console.error('[Scenario Cache] Failed to store scenario:', err);
-    throw err;
+    console.warn(
+      '[Scenario Cache] Durable Postgres/Qdrant mirror failed; Redis exact cache remains available:',
+      err
+    );
   }
 }
 

@@ -1,11 +1,11 @@
 {
   "summary": {
-    "generated_at": "2026-06-19T04:46:25.782Z",
+    "generated_at": "2026-06-19T16:03:33.439Z",
     "query": "",
     "topk": 10,
-    "total_rows": 132,
+    "total_rows": 133,
     "matches": 10,
-    "registry_source": "postgres",
+    "registry_source": "file",
     "registry_table": "repo_function_registry",
     "input_files": {
       "registry": "docs/reports/repo-function-registry.json",
@@ -38,18 +38,6 @@
       ],
       "summary": "Token-budgeted semantic search returning a compact context tree. Use this instead of reading full files when you need focused retrieval within a token budget. …",
       "copy_merge_use": "Use ace.compact_search when retrieving or manipulating cache-lane packets.",
-      "metadata": {
-        "kind": "mcp_tool",
-        "source": "mcp-tool-registry-index.json",
-        "namespace": "ace",
-        "tool_name": "ace.compact_search",
-        "transport": null,
-        "feature_id": "mcp.tool.ace.compact.search",
-        "source_ref": "ace.compact_search",
-        "backfill_source": "repo-function-registry.json",
-        "backfill_version": "repo-function-registry-v1",
-        "registry_version": "repo-function-registry-v1"
-      },
       "score": 8
     },
     {
@@ -71,18 +59,6 @@
       ],
       "summary": "Build a compact Atlas context packet with top chunks, sourceRefs, a compressed summary, confidence, and retrieval path.",
       "copy_merge_use": "Use atlas.compact_context when retrieving or manipulating graph-lane packets.",
-      "metadata": {
-        "kind": "mcp_tool",
-        "source": "mcp-tool-registry-index.json",
-        "namespace": "atlas",
-        "tool_name": "atlas.compact_context",
-        "transport": null,
-        "feature_id": "mcp.tool.atlas.compact.context",
-        "source_ref": "atlas.compact_context",
-        "backfill_source": "repo-function-registry.json",
-        "backfill_version": "repo-function-registry-v1",
-        "registry_version": "repo-function-registry-v1"
-      },
       "score": 8
     },
     {
@@ -108,18 +84,6 @@
       ],
       "summary": "Phase 3I verification gate. Reports coverage metrics for the atlas_packets canonical warehouse: total packets, source_ref coverage %, feature_id coverage %, co…",
       "copy_merge_use": "Use atlas.coverage when retrieving or manipulating dense-lane packets.",
-      "metadata": {
-        "kind": "mcp_tool",
-        "source": "mcp-tool-registry-index.json",
-        "namespace": "atlas",
-        "tool_name": "atlas.coverage",
-        "transport": null,
-        "feature_id": "mcp.tool.atlas.coverage",
-        "source_ref": "atlas.coverage",
-        "backfill_source": "repo-function-registry.json",
-        "backfill_version": "repo-function-registry-v1",
-        "registry_version": "repo-function-registry-v1"
-      },
       "score": 8
     },
     {
@@ -143,18 +107,6 @@
       ],
       "summary": "Return the compact summary and retrieval path for the current Atlas packet.",
       "copy_merge_use": "Use atlas.explain_trace when retrieving or manipulating graph-lane packets.",
-      "metadata": {
-        "kind": "mcp_tool",
-        "source": "mcp-tool-registry-index.json",
-        "namespace": "atlas",
-        "tool_name": "atlas.explain_trace",
-        "transport": null,
-        "feature_id": "mcp.tool.atlas.explain.trace",
-        "source_ref": "atlas.explain_trace",
-        "backfill_source": "repo-function-registry.json",
-        "backfill_version": "repo-function-registry-v1",
-        "registry_version": "repo-function-registry-v1"
-      },
       "score": 8
     },
     {
@@ -176,18 +128,6 @@
       ],
       "summary": "Return a chunk from the compact Atlas chunk index, optionally prioritizing a chunkId, chunkIndex, or sourceRef.",
       "copy_merge_use": "Use atlas.get_chunk when retrieving or manipulating read-lane packets.",
-      "metadata": {
-        "kind": "mcp_tool",
-        "source": "mcp-tool-registry-index.json",
-        "namespace": "atlas",
-        "tool_name": "atlas.get_chunk",
-        "transport": null,
-        "feature_id": "mcp.tool.atlas.get.chunk",
-        "source_ref": "atlas.get_chunk",
-        "backfill_source": "repo-function-registry.json",
-        "backfill_version": "repo-function-registry-v1",
-        "registry_version": "repo-function-registry-v1"
-      },
       "score": 8
     },
     {
@@ -211,28 +151,37 @@
         "feature_id",
         "source_ref",
         "graph",
-        "identity",
-        "atlas.packet_search"
+        "identity"
       ],
       "summary": "Query the canonical atlas_packets table. Search by source_ref path (variants tried automatically), feature_id, concept_id membership, or free-text summary matc…",
       "copy_merge_use": "Use atlas:packet_search when retrieving or manipulating dense-lane packets.",
-      "metadata": {
-        "kind": "mcp_tool",
-        "source": "mcp-tool-registry-index.json",
-        "namespace": "atlas",
-        "tool_name": "atlas.packet_search",
-        "transport": null,
-        "feature_id": "mcp.tool.atlas.packet.search",
-        "source_ref": "atlas:packet_search",
-        "backfill_source": "repo-function-registry.json",
-        "backfill_version": "repo-function-registry-v1",
-        "registry_version": "repo-function-registry-v1",
-        "source_ref_aliases": [
-          "atlas:packet_search",
-          "atlas.packet_search"
-        ],
-        "canonical_source_ref": "atlas:packet_search"
-      },
+      "score": 8
+    },
+    {
+      "source_ref": "atlas.packet_search",
+      "file_path": null,
+      "symbol": "atlas.packet_search",
+      "kind": "mcp_tool",
+      "feature_id": "mcp.tool.atlas.packet.search",
+      "feature_label": "atlas.packet_search",
+      "runtime_lane": "service",
+      "workflow_lane": [
+        "dense",
+        "graph",
+        "identity"
+      ],
+      "permission_lane": "read_only",
+      "keywords": [
+        "atlas.packet_search",
+        "atlas",
+        "dense",
+        "feature_id",
+        "source_ref",
+        "graph",
+        "identity"
+      ],
+      "summary": "Query the canonical atlas_packets table. Search by source_ref path (variants tried automatically), feature_id, concept_id membership, or free-text summary matc…",
+      "copy_merge_use": "Use atlas.packet_search when retrieving or manipulating dense-lane packets.",
       "score": 8
     },
     {
@@ -256,18 +205,6 @@
       ],
       "summary": "TurboVec ANN cluster prefilter. Embeds the query and queries the TurboVec sidecar (:8099) to identify the top-N cluster IDs for injecting into a Qdrant should/…",
       "copy_merge_use": "Use atlas.prefilter when retrieving or manipulating dense-lane packets.",
-      "metadata": {
-        "kind": "mcp_tool",
-        "source": "mcp-tool-registry-index.json",
-        "namespace": "atlas",
-        "tool_name": "atlas.prefilter",
-        "transport": null,
-        "feature_id": "mcp.tool.atlas.prefilter",
-        "source_ref": "atlas.prefilter",
-        "backfill_source": "repo-function-registry.json",
-        "backfill_version": "repo-function-registry-v1",
-        "registry_version": "repo-function-registry-v1"
-      },
       "score": 8
     },
     {
@@ -289,18 +226,6 @@
       ],
       "summary": "Atlas alias for ranked technical search. Returns the same compact hit list as kb.trace_search for a query.",
       "copy_merge_use": "Use atlas.query when retrieving or manipulating identity-lane packets.",
-      "metadata": {
-        "kind": "mcp_tool",
-        "source": "mcp-tool-registry-index.json",
-        "namespace": "atlas",
-        "tool_name": "atlas.query",
-        "transport": null,
-        "feature_id": "mcp.tool.atlas.query",
-        "source_ref": "atlas.query",
-        "backfill_source": "repo-function-registry.json",
-        "backfill_version": "repo-function-registry-v1",
-        "registry_version": "repo-function-registry-v1"
-      },
       "score": 8
     },
     {
@@ -323,51 +248,6 @@
       ],
       "summary": "Return the top sourceRefs from the compact Atlas packet.",
       "copy_merge_use": "Use atlas.source_refs when retrieving or manipulating identity-lane packets.",
-      "metadata": {
-        "kind": "mcp_tool",
-        "source": "mcp-tool-registry-index.json",
-        "namespace": "atlas",
-        "tool_name": "atlas.source_refs",
-        "transport": null,
-        "feature_id": "mcp.tool.atlas.source.refs",
-        "source_ref": "atlas.source_refs",
-        "backfill_source": "repo-function-registry.json",
-        "backfill_version": "repo-function-registry-v1",
-        "registry_version": "repo-function-registry-v1"
-      },
-      "score": 8
-    },
-    {
-      "source_ref": "atlas.suggest_files",
-      "file_path": null,
-      "symbol": "atlas.suggest_files",
-      "kind": "mcp_tool",
-      "feature_id": "mcp.tool.atlas.suggest.files",
-      "feature_label": "atlas.suggest_files",
-      "runtime_lane": "service",
-      "workflow_lane": [
-        "unknown"
-      ],
-      "permission_lane": "read_only",
-      "keywords": [
-        "atlas.suggest_files",
-        "atlas",
-        "unknown"
-      ],
-      "summary": "Return the top suggested files from the compact Atlas packet.",
-      "copy_merge_use": "Use atlas.suggest_files when retrieving or manipulating unknown-lane packets.",
-      "metadata": {
-        "kind": "mcp_tool",
-        "source": "mcp-tool-registry-index.json",
-        "namespace": "atlas",
-        "tool_name": "atlas.suggest_files",
-        "transport": null,
-        "feature_id": "mcp.tool.atlas.suggest.files",
-        "source_ref": "atlas.suggest_files",
-        "backfill_source": "repo-function-registry.json",
-        "backfill_version": "repo-function-registry-v1",
-        "registry_version": "repo-function-registry-v1"
-      },
       "score": 8
     }
   ]

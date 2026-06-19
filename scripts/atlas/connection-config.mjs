@@ -55,6 +55,7 @@ export function loadRepoEnv(base = process.env) {
 export function normalizeConnectionHost(rawValue, fallbackHost = '127.0.0.1') {
   const raw = String(rawValue ?? '').trim();
   if (!raw || raw === '0.0.0.0') return fallbackHost;
+  if (raw.toLowerCase() === 'localhost' || raw === '::1') return '127.0.0.1';
   return raw;
 }
 

@@ -1,0 +1,205 @@
+{
+  "generatedAt": "2026-06-19T18:02:00.907Z",
+  "status": "IMPLEMENTATION_ALIGNED",
+  "contract": {
+    "latent64Storage": "bytea",
+    "aeDistance": "additive",
+    "somBmuField": "z_som",
+    "checkpointRequired": false,
+    "retrievalTruth": "embedding_384",
+    "latent128Role": "semantic_compression",
+    "latent64Role": "routing_topology_rerank_bonus",
+    "identityFields": [
+      "packet_key",
+      "source_ref"
+    ],
+    "executionOrder": [
+      "GDS",
+      "AE latent projection",
+      "SOM 20x20",
+      "higher-hop enrichment"
+    ]
+  },
+  "migration": {
+    "path": "drizzle/manual/0046_phase_16_topology_gds.sql",
+    "present": true
+  },
+  "database": {
+    "status": "READY",
+    "tableExists": true,
+    "presentColumns": [
+      "pagerank",
+      "betweenness",
+      "eigenvector",
+      "nn_1",
+      "nn_2",
+      "nn_3",
+      "nn_4",
+      "ae_distance",
+      "topology_version",
+      "topology_updated_at",
+      "relation_type"
+    ],
+    "missingColumns": [],
+    "indexes": [
+      "atlas_topology_index_pkey",
+      "idx_atlas_topology_authority",
+      "idx_atlas_topology_community_pagerank",
+      "idx_atlas_topology_nn_1",
+      "idx_atlas_topology_nn_2",
+      "idx_atlas_topology_nn_3",
+      "idx_atlas_topology_nn_4",
+      "idx_atlas_topology_packet_key",
+      "idx_atlas_topology_pagerank",
+      "idx_atlas_topology_relation_type",
+      "idx_atlas_topology_version",
+      "idx_atlas_topology_z_som",
+      "idx_topo_community",
+      "idx_topo_karpathy",
+      "idx_topo_tree_node",
+      "idx_topo_w",
+      "idx_topo_x",
+      "idx_topo_y",
+      "idx_topo_z"
+    ]
+  },
+  "nativeBridge": {
+    "present": true,
+    "cuda": true,
+    "trainSOM": true
+  },
+  "latentDataset": {
+    "present": true,
+    "total": 20702,
+    "addressable": 20642,
+    "generatedAt": "2026-06-19T17:53:33.348Z"
+  },
+  "runners": {
+    "gds": {
+      "path": "sveltekit-frontend/scripts/neo4j-graph-enrich.mjs",
+      "present": true
+    },
+    "autoencoderPython": {
+      "path": "sveltekit-frontend/scripts/train-autoencoder.py",
+      "present": true
+    },
+    "autoencoderNode": {
+      "path": "sveltekit-frontend/scripts/train-autoencoder.mjs",
+      "present": true
+    },
+    "latentBackfill": {
+      "path": "scripts/atlas/backfill-latent-vectors.mjs",
+      "present": true
+    },
+    "som20x20": {
+      "path": "scripts/atlas/train-som-20x20.mjs",
+      "present": true
+    },
+    "combinedGpuPipeline": {
+      "path": "scripts/atlas/pytorch-qdrant-redis-som-index.mjs",
+      "present": true
+    },
+    "adaptiveSchema": {
+      "path": "scripts/atlas/adaptive-schema-contract-reconciler.mjs",
+      "present": true
+    }
+  },
+  "artifacts": {
+    "count": 21,
+    "files": [
+      {
+        "path": "models/autoencoder/ae_meta.json",
+        "bytes": 462
+      },
+      {
+        "path": "models/autoencoder/autoencoder_latent_index.json",
+        "bytes": 53172193
+      },
+      {
+        "path": "models/autoencoder/b_dec_128.npy",
+        "bytes": 640
+      },
+      {
+        "path": "models/autoencoder/b_dec_768.npy",
+        "bytes": 3200
+      },
+      {
+        "path": "models/autoencoder/b_enc_128.npy",
+        "bytes": 640
+      },
+      {
+        "path": "models/autoencoder/b_enc_64.npy",
+        "bytes": 384
+      },
+      {
+        "path": "models/autoencoder/training_vectors.npy",
+        "bytes": 30720128
+      },
+      {
+        "path": "models/autoencoder/W_dec_128_768.npy",
+        "bytes": 393344
+      },
+      {
+        "path": "models/autoencoder/W_dec_64_128.npy",
+        "bytes": 32896
+      },
+      {
+        "path": "models/autoencoder/W_enc_128_64.npy",
+        "bytes": 32896
+      },
+      {
+        "path": "models/autoencoder/W_enc_768_128.npy",
+        "bytes": 393344
+      },
+      {
+        "path": "models/som/som_20x20_codebook.json",
+        "bytes": 764098
+      },
+      {
+        "path": "models/som/som_assignments.json",
+        "bytes": 2447843
+      },
+      {
+        "path": ".tmp/gpu-som-checkpoint/ae_weights_768_64.json",
+        "bytes": 1025055
+      },
+      {
+        "path": ".tmp/gpu-som-checkpoint/kmeans_k20_n76878.json",
+        "bytes": 516059
+      },
+      {
+        "path": ".tmp/gpu-som-checkpoint/kmeans_k3_n76878.json",
+        "bytes": 203027
+      },
+      {
+        "path": ".tmp/gpu-som-checkpoint/scroll_done.json",
+        "bytes": 47
+      },
+      {
+        "path": ".tmp/gpu-som-checkpoint/scroll_meta.json",
+        "bytes": 155936878
+      },
+      {
+        "path": ".tmp/gpu-som-checkpoint/scroll_vectors.json",
+        "bytes": 236169216
+      },
+      {
+        "path": ".tmp/gpu-som-checkpoint/som_2x2_n76878.json",
+        "bytes": 218834
+      },
+      {
+        "path": ".tmp/gpu-som-checkpoint/som_8x8_n76878.json",
+        "bytes": 1263239
+      }
+    ]
+  },
+  "commandMap": {
+    "gdsDryRun": "npm run atlas:phase16:gds:dry",
+    "gdsApply": "npm run atlas:phase16:gds:apply",
+    "autoencoderDryRun": "npm run atlas:phase16:ae:dry",
+    "latentDryRun": "npm run atlas:phase16:latent:dry",
+    "somDryRun": "npm run atlas:phase16:som:dry",
+    "joinAudit": "npm run atlas:phase16:join:audit"
+  },
+  "nextSafeAction": "Run the read-only join-key audit and classify unmatched reasons. Do not retrain AE/SOM or use latent_64 as the primary retrieval vector."
+}

@@ -1,5 +1,5 @@
 -- Generated adaptive schema repair migration
--- Date: 2026-06-15T08:24:09.880Z
+-- Date: 2026-06-19T17:55:08.045Z
 -- This file contains additive-only operations: CREATE TABLE/INDEX, ALTER ADD COLUMN
 -- No DROP, RENAME, or destructive operations
 

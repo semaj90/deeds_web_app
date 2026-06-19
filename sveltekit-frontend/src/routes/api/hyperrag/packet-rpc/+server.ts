@@ -82,7 +82,7 @@ function hashQuery(query: string): string {
 
 export const POST: RequestHandler = async ({ request, locals }) => {
 	const startTime = Date.now();
-	const trace = new HyperRagReplayTrace('hyperrag-packet-rpc');
+	let trace: HyperRagReplayTrace | null = null;
 
 	try {
 		const body = await request.json() as {
@@ -99,6 +99,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 		if (!query) {
 			return json({ error: 'query is required' }, { status: 400 });
 		}
+		trace = new HyperRagReplayTrace(query, 'hyperrag-packet-rpc');
 
 		const limit = Math.max(1, Math.min(body.limit ?? 10, 25));
 		const useCache = body.useExactMatchCache !== false;
@@ -121,6 +122,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 			useFts: body.useFts !== false,
 			recordTelemetry: body.recordTelemetry !== false,
 			awaitTelemetry: body.awaitTelemetry === true,
+			useExactMatchCache: false,
 		};
 
 		trace.recordRequest(rpcInput);
@@ -208,6 +210,22 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 		}
 
 		const latencyMs = Date.now() - startTime;
+		const replayId = trace.getId();
+		const cacheSource = cacheHits > 0 ? 'redis_exact_match' : 'live_fusion';
+		const operatorPackets = result.packets.map((packet) => ({
+			...packet,
+			reason: packet.fusion_sources.length
+				? `Selected by ${packet.fusion_sources.join(', ')} fusion lanes.`
+				: 'Selected by bounded lexical fallback.',
+			cache_source: cacheSource,
+			retrieval_strategy: result.trace.retrieval_strategy ?? 'fusion',
+			generated_by: 'hyperrag-packet-rpc',
+			worker: 'sveltekit-frontend',
+			run_id: replayId,
+			task_id: request.headers.get('x-atlas-task-id'),
+			replay_id: replayId,
+			cache_namespace: 'hyperrag:query',
+		}));
 
 		// Record response for replay trace (fire-and-forget)
 		trace.recordResponse(result);
@@ -218,15 +236,19 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 			ok: true,
 			query: result.query,
 			strategy: result.strategy,
-			packets: result.packets,
+			packets: operatorPackets,
 			provenance: provenances,
 			trace: {
+				query_hash: hashQuery(query),
+				replay_id: replayId,
 				retrieval_strategy: result.trace.retrieval_strategy ?? 'fusion',
 				qdrant_hits: result.trace.qdrant_hits,
 				postgres_hits: result.trace.postgres_hits,
 				rrf_hits: result.trace.rrf_hits,
 				neo4j_expansions: result.trace.neo4j_expansions,
 				cache_hits: cacheHits,
+				cache_source: cacheSource,
+				cache_namespace: 'hyperrag:query',
 				latency_ms: latencyMs,
 				cache_latency_ms: cacheHits > 0 ? latencyMs : undefined,
 			},

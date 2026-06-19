@@ -1,6 +1,6 @@
 {
   "schema": "live_service_env.v1",
-  "generatedAt": "2026-06-18T14:36:58.695Z",
+  "generatedAt": "2026-06-19T23:20:17.574Z",
   "readOnly": true,
   "services": [
     {
@@ -43,7 +43,7 @@
         "port": 6379
       },
       "envDisplay": "127.0.0.1:6379",
-      "probeDisplay": "0ms",
+      "probeDisplay": "1ms",
       "detail": "REDIS_URL=redis://127.0.0.1:6379",
       "status": "READY"
     },
@@ -53,10 +53,10 @@
         "host": "127.0.0.1",
         "port": 8100
       },
-      "envDisplay": "localhost:8100",
-      "probeDisplay": "4ms",
-      "detail": "RETRIEVAL_HTTP_URL=http://localhost:8100",
-      "status": "ENV_MISMATCH"
+      "envDisplay": "127.0.0.1:8100",
+      "probeDisplay": "2ms",
+      "detail": "RETRIEVAL_HTTP_URL=http://127.0.0.1:8100",
+      "status": "READY"
     },
     {
       "name": "Go Retrieval (gRPC)",
@@ -64,21 +64,21 @@
         "host": "127.0.0.1",
         "port": 50053
       },
-      "envDisplay": "localhost:50053",
-      "probeDisplay": "2ms",
+      "envDisplay": "127.0.0.1:50053",
+      "probeDisplay": "1ms",
       "detail": "RETRIEVAL_GRPC_URL=127.0.0.1:50053",
-      "status": "ENV_MISMATCH"
+      "status": "READY"
     }
   ],
   "telemetry": {
     "status": "READY",
-    "totalRows": 179,
-    "recent24hRows": 25,
-    "withSelectedPacketKeys": 179,
-    "withFeatureIds": 179,
-    "withStrategy": 179,
-    "latestAt": "2026-06-18T01:12:39.547Z",
-    "detail": "retrieval_telemetry rows=179, recent24h=25"
+    "totalRows": 308,
+    "recent24hRows": 114,
+    "withSelectedPacketKeys": 308,
+    "withFeatureIds": 308,
+    "withStrategy": 308,
+    "latestAt": "2026-06-19T22:27:09.271Z",
+    "detail": "retrieval_telemetry rows=308, recent24h=114"
   },
   "provenance": {
     "spine": [
@@ -100,8 +100,8 @@
   },
   "summary": {
     "counts": {
-      "READY": 4,
-      "ENV_MISMATCH": 2,
+      "READY": 6,
+      "ENV_MISMATCH": 0,
       "PORT_MISMATCH": 0,
       "SERVICE_STOPPED": 0,
       "AUTH_REQUIRED": 0,

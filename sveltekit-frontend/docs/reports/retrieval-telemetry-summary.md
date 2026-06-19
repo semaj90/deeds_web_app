@@ -1,13 +1,13 @@
 # Phase 3D Retrieval Telemetry Summary
 
-Generated: 2026-06-12T02:32:27.107Z
+Generated: 2026-06-19T22:22:33.134Z
 
 ## Status
 
 - classification: COLLECTING
 - tableExists: true
-- rows: 151
-- realRows: 150
+- rows: 306
+- realRows: 305
 - smokeRows: 1
 - targetRows: 1000
 - missingColumns: none
@@ -21,15 +21,15 @@ Generated: 2026-06-12T02:32:27.107Z
 
 ## Metrics
 
-- queryCount: 151
-- realQueryCount: 150
+- queryCount: 306
+- realQueryCount: 305
 - smokeQueryCount: 1
-- uniqueQueries: 151
-- meanLatencyMs: 151.48
-- p50LatencyMs: 150
-- p95LatencyMs: 243.5
-- p99LatencyMs: 248.5
-- cacheHitRatio: 0.1921
+- uniqueQueries: 227
+- meanLatencyMs: 1776.17
+- p50LatencyMs: 215
+- p95LatencyMs: 4244.5
+- p99LatencyMs: 31612.65
+- cacheHitRatio: 0.0948
 
 ## Next Actions
 

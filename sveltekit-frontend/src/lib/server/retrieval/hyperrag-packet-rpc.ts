@@ -25,6 +25,9 @@ export type HyperRagPacketRpcPacket = {
   canonical_source_ref: string;
   feature_id: string | null;
   feature_label: string | null;
+  qdrant_point_id: string | null;
+  community_id: string | null;
+  som_cluster: string | null;
   directory_path: string | null;
   qdrant_tags: string[];
   neo4j_neighbors: string[];
@@ -295,6 +298,7 @@ async function recordPacketRpcTelemetry(params: {
       timings: params.timings,
       domainClass: params.packets[0] ? 'retrieval_pipeline' : null,
       sourceRef: params.packets[0]?.source_ref ?? null,
+      writeEvalTimes: false,
     });
   } catch (err) {
     console.warn('[hyperrag-packet-rpc] telemetry record failed:', err instanceof Error ? err.message : String(err));
@@ -671,6 +675,23 @@ export async function hyperragPacketRpc(input: HyperRagPacketRpcInput): Promise<
       canonical_source_ref: canonicalSourceRef,
       feature_id: featureId,
       feature_label: featureLabelFrom(nesRow ?? atlasRow, featureId),
+      qdrant_point_id: (
+        nesRow?.qdrant_point_id
+        ?? cleanText(atlasRow?.payload?.qdrant_point_id ?? atlasRow?.payload?.qdrantPointId)
+      ) || null,
+      community_id: cleanText(
+        nesRow?.payload?.community_id
+        ?? nesRow?.payload?.communityId
+        ?? atlasRow?.payload?.community_id
+        ?? atlasRow?.payload?.communityId,
+      ) || null,
+      som_cluster: cleanText(
+        nesRow?.som_cluster
+        ?? nesRow?.payload?.som_cluster
+        ?? nesRow?.payload?.somCluster
+        ?? atlasRow?.payload?.som_cluster
+        ?? atlasRow?.payload?.somCluster,
+      ) || null,
       directory_path: directoryPath(atlasRow?.rel_path ?? sourceRef),
       qdrant_tags: splitTags(seed.tags).concat(splitTags(atlasRow?.tags)).filter((tag, tagIndex, all) => all.indexOf(tag) === tagIndex),
       neo4j_neighbors: neighbors,

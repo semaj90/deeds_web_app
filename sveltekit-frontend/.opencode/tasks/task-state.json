@@ -1,207 +1,223 @@
 {
-  "generatedAt": "2026-06-19T04:03:40.376Z",
+  "generatedAt": "2026-06-19T23:21:19.166Z",
   "recommendationEventsCount": 300,
-  "taskEventsCount": 27,
-  "promotedRecommendationsCount": 17,
+  "taskEventsCount": 45,
+  "promotedRecommendationsCount": 22,
   "tasks": [
     {
-      "task_id": "task_concept_evidence_spine_backfill",
-      "title": "Historical concept evidence spine backfill",
-      "description": "Rewrite concept_records.evidence_cards from stale legacy card IDs to the live packet spine using packet_keys and feature_ids.",
+      "task_id": "task_4_circular_dependency_chains_of_3_files",
+      "title": "4 circular dependency chains of 3+ files",
+      "description": "Large cycles increase coupling and make tree-shaking impossible. Break by extracting shared types to a third module.",
       "priority": "HIGH",
-      "status": "TODO",
-      "source_recommendation_key": "concept-evidence-spine-backfill",
-      "command": "npm run atlas:concept-evidence:backfill",
-      "feature_id": "evidence",
+      "status": "DONE",
+      "source_recommendation_key": "4_circular_dependency_chains_of_3_files",
+      "command": null,
+      "feature_id": "general",
       "source_refs": [
-        "docs/reports/concept-evidence-spine-backfill-report.json",
-        "reports/parent-atlas-open-lanes-todo.md"
+        "claude-mem/src/services/worker/session/SessionCompletionHandler.ts",
+        "claude-mem/src/services/worker/session/GeneratorExitHandler.ts",
+        "claude-mem/src/services/worker-service.ts",
+        "claude-mem/src/services/worker/events/SessionEventBroadcaster.ts",
+        "deeds_labs/snapshots/2026-03-10/root-stale/archives/typescript/typescript-backup/typescript-backup/unocss-main/unocss-main/packages-integrations/svelte-scoped/src/_preprocess/transformClasses/processDirective.ts",
+        "deeds_labs/snapshots/2026-03-10/root-stale/archives/typescript/typescript-backup/typescript-backup/unocss-main/unocss-main/packages-integrations/svelte-scoped/src/_preprocess/transformClasses/processClsx.ts",
+        "deeds_labs/snapshots/2026-03-10/root-stale/archives/typescript/typescript-backup/typescript-backup/unocss-main/unocss-main/packages-integrations/svelte-scoped/src/_preprocess/transformClasses/sortClassesIntoCategories.ts",
+        "deeds_labs/snapshots/2026-03-10/root-stale/archives/typescript/typescript-backup/typescript-backup/unocss-main/unocss-main/packages-integrations/svelte-scoped/src/_preprocess/transformClasses/processExpressions.ts",
+        "deeds_labs/snapshots/2026-03-10/root-stale/archives/typescript/typescript-backup/typescript-backup/unocss-main/unocss-main/packages-integrations/svelte-scoped/src/_preprocess/transformClasses/processClassBody.ts",
+        "deeds_labs/snapshots/2026-03-10/root-stale/archives/typescript/typescript-backup/typescript-backup/unocss-main/unocss-main/packages-integrations/svelte-scoped/src/_preprocess/transformClasses/processClasses.ts",
+        "deeds_labs/snapshots/2026-03-10/root-stale/unocss-main/unocss-main/packages-integrations/svelte-scoped/src/_preprocess/transformClasses/processDirective.ts",
+        "deeds_labs/snapshots/2026-03-10/root-stale/unocss-main/unocss-main/packages-integrations/svelte-scoped/src/_preprocess/transformClasses/processClsx.ts",
+        "deeds_labs/snapshots/2026-03-10/root-stale/unocss-main/unocss-main/packages-integrations/svelte-scoped/src/_preprocess/transformClasses/sortClassesIntoCategories.ts",
+        "deeds_labs/snapshots/2026-03-10/root-stale/unocss-main/unocss-main/packages-integrations/svelte-scoped/src/_preprocess/transformClasses/processExpressions.ts",
+        "deeds_labs/snapshots/2026-03-10/root-stale/unocss-main/unocss-main/packages-integrations/svelte-scoped/src/_preprocess/transformClasses/processClassBody.ts",
+        "deeds_labs/snapshots/2026-03-10/root-stale/unocss-main/unocss-main/packages-integrations/svelte-scoped/src/_preprocess/transformClasses/processClasses.ts",
+        "sveltekit-frontend/src/lib/server/ai/hermes/skills/system-audit.ts",
+        "sveltekit-frontend/src/lib/server/ai/hermes/skills/ui-diagnostics.ts",
+        "sveltekit-frontend/src/lib/server/ai/hermes/skills/gpu-acceleration.ts",
+        "sveltekit-frontend/src/lib/server/ai/hermes/skills/repair.ts"
       ],
       "evidence_refs": [
-        "docs/reports/concept-evidence-spine-backfill-report.json",
-        "reports/parent-atlas-open-lanes-todo.md"
+        "docs\\graph\\recommendations.json"
       ],
-      "first_seen": "2026-06-12T13:00:13.075Z",
-      "last_seen": "2026-06-12T13:00:13.075Z",
-      "created_at": "2026-06-12T13:00:13.075Z",
-      "updated_at": "2026-06-12T13:00:13.075Z",
+      "first_seen": "2026-06-11T03:18:47.472Z",
+      "last_seen": "2026-06-19T22:46:06.437Z",
+      "created_at": "2026-06-11T03:18:47.472Z",
+      "updated_at": "2026-06-19T22:46:06.437Z",
       "history": [
         {
-          "event_id": "task_e222e4afe8bb",
+          "event_id": "task_413aab6f5e07",
           "event_type": "TASK_CREATED",
-          "created_at": "2026-06-12T13:00:13.075Z",
-          "run_id": "2026-06-11T04:33:05.170Z",
-          "task_id": "task_concept_evidence_spine_backfill",
-          "source_recommendation_key": "concept-evidence-spine-backfill",
-          "title": "Historical concept evidence spine backfill",
-          "description": "Rewrite concept_records.evidence_cards from stale legacy card IDs to the live packet spine using packet_keys and feature_ids.",
+          "created_at": "2026-06-11T03:18:47.472Z",
+          "run_id": "2026-06-06T06:21:32.559Z",
+          "task_id": "task_4_circular_dependency_chains_of_3_files",
+          "source_recommendation_key": "4_circular_dependency_chains_of_3_files",
+          "title": "4 circular dependency chains of 3+ files",
+          "description": "Large cycles increase coupling and make tree-shaking impossible. Break by extracting shared types to a third module.",
           "priority": "HIGH",
           "status": "TODO",
           "parent_task_id": null,
-          "command": "npm run atlas:concept-evidence:backfill",
-          "feature_id": "evidence",
+          "command": null,
+          "feature_id": "general",
           "source_refs": [
-            "docs/reports/concept-evidence-spine-backfill-report.json",
-            "reports/parent-atlas-open-lanes-todo.md"
+            "claude-mem/src/services/worker/session/SessionCompletionHandler.ts",
+            "claude-mem/src/services/worker/session/GeneratorExitHandler.ts",
+            "claude-mem/src/services/worker-service.ts",
+            "claude-mem/src/services/worker/events/SessionEventBroadcaster.ts",
+            "deeds_labs/snapshots/2026-03-10/root-stale/archives/typescript/typescript-backup/typescript-backup/unocss-main/unocss-main/packages-integrations/svelte-scoped/src/_preprocess/transformClasses/processDirective.ts",
+            "deeds_labs/snapshots/2026-03-10/root-stale/archives/typescript/typescript-backup/typescript-backup/unocss-main/unocss-main/packages-integrations/svelte-scoped/src/_preprocess/transformClasses/processClsx.ts",
+            "deeds_labs/snapshots/2026-03-10/root-stale/archives/typescript/typescript-backup/typescript-backup/unocss-main/unocss-main/packages-integrations/svelte-scoped/src/_preprocess/transformClasses/sortClassesIntoCategories.ts",
+            "deeds_labs/snapshots/2026-03-10/root-stale/archives/typescript/typescript-backup/typescript-backup/unocss-main/unocss-main/packages-integrations/svelte-scoped/src/_preprocess/transformClasses/processExpressions.ts",
+            "deeds_labs/snapshots/2026-03-10/root-stale/archives/typescript/typescript-backup/typescript-backup/unocss-main/unocss-main/packages-integrations/svelte-scoped/src/_preprocess/transformClasses/processClassBody.ts",
+            "deeds_labs/snapshots/2026-03-10/root-stale/archives/typescript/typescript-backup/typescript-backup/unocss-main/unocss-main/packages-integrations/svelte-scoped/src/_preprocess/transformClasses/processClasses.ts",
+            "deeds_labs/snapshots/2026-03-10/root-stale/unocss-main/unocss-main/packages-integrations/svelte-scoped/src/_preprocess/transformClasses/processDirective.ts",
+            "deeds_labs/snapshots/2026-03-10/root-stale/unocss-main/unocss-main/packages-integrations/svelte-scoped/src/_preprocess/transformClasses/processClsx.ts",
+            "deeds_labs/snapshots/2026-03-10/root-stale/unocss-main/unocss-main/packages-integrations/svelte-scoped/src/_preprocess/transformClasses/sortClassesIntoCategories.ts",
+            "deeds_labs/snapshots/2026-03-10/root-stale/unocss-main/unocss-main/packages-integrations/svelte-scoped/src/_preprocess/transformClasses/processExpressions.ts",
+            "deeds_labs/snapshots/2026-03-10/root-stale/unocss-main/unocss-main/packages-integrations/svelte-scoped/src/_preprocess/transformClasses/processClassBody.ts",
+            "deeds_labs/snapshots/2026-03-10/root-stale/unocss-main/unocss-main/packages-integrations/svelte-scoped/src/_preprocess/transformClasses/processClasses.ts",
+            "sveltekit-frontend/src/lib/server/ai/hermes/skills/system-audit.ts",
+            "sveltekit-frontend/src/lib/server/ai/hermes/skills/ui-diagnostics.ts",
+            "sveltekit-frontend/src/lib/server/ai/hermes/skills/gpu-acceleration.ts",
+            "sveltekit-frontend/src/lib/server/ai/hermes/skills/repair.ts"
           ],
           "evidence_refs": [
-            "docs/reports/concept-evidence-spine-backfill-report.json",
-            "reports/parent-atlas-open-lanes-todo.md"
+            "docs\\graph\\recommendations.json"
           ]
+        },
+        {
+          "event_id": "task_f97e1550f416",
+          "event_type": "TASK_STATUS_CHANGED",
+          "created_at": "2026-06-19T22:46:06.437Z",
+          "run_id": "circular-scope-refresh-20260619",
+          "task_id": "task_4_circular_dependency_chains_of_3_files",
+          "previous_state": "TODO",
+          "new_state": "DONE",
+          "reason": "Fresh deep-import analysis found no 3+ file cycle in the main SvelteKit app; the old count came from ignored worktrees/vendor surfaces, with one remaining 4-file claude-mem component cycle tracked outside the Parent Atlas critical path."
         }
       ],
-      "seen_count": 1
+      "seen_count": 24
     },
     {
-      "task_id": "task_route_runtime_packets_materialization",
-      "title": "route_runtime_packets materialization",
-      "description": "Materialize route_runtime_packets from packet facts, telemetry, and source-ref joins so higher-hop evidence is replayable.",
+      "task_id": "task_go_retrieval_runtime_recovery",
+      "title": "Recover Go Retrieval runtime",
+      "description": "Align the existing Go Retrieval HTTP/gRPC service with the live environment. Do not create a replacement service.",
       "priority": "HIGH",
-      "status": "TODO",
-      "source_recommendation_key": "route-runtime-packets-materialization",
-      "command": "npm run atlas:route-runtime-packets:materialize:apply",
+      "status": "DONE",
+      "source_recommendation_key": "go-retrieval-runtime-recovery",
+      "command": "node scripts/atlas/audit-live-service-env.mjs",
       "feature_id": "retrieval",
       "source_refs": [
-        "docs/reports/runtime-packet-backfill-plan.json",
-        "reports/parent-atlas-open-lanes-todo.md"
+        "services/go-retrieval-service",
+        "docs/reports/live-service-env-report.json"
       ],
       "evidence_refs": [
-        "docs/reports/runtime-packet-backfill-plan.json",
-        "reports/parent-atlas-open-lanes-todo.md"
+        "services/go-retrieval-service",
+        "docs/reports/live-service-env-report.json"
       ],
-      "first_seen": "2026-06-12T12:45:29.470Z",
-      "last_seen": "2026-06-12T12:45:29.470Z",
-      "created_at": "2026-06-12T12:45:29.470Z",
-      "updated_at": "2026-06-12T12:45:29.470Z",
+      "first_seen": "2026-06-19T22:36:17.063Z",
+      "last_seen": "2026-06-19T22:44:24.800Z",
+      "created_at": "2026-06-19T22:36:17.063Z",
+      "updated_at": "2026-06-19T22:44:24.800Z",
       "history": [
         {
-          "event_id": "task_b7048d2c19fc",
+          "event_id": "task_8203c48fc44e",
           "event_type": "TASK_CREATED",
-          "created_at": "2026-06-12T12:45:29.470Z",
-          "run_id": "2026-06-11T04:33:05.170Z",
-          "task_id": "task_route_runtime_packets_materialization",
-          "source_recommendation_key": "route-runtime-packets-materialization",
-          "title": "route_runtime_packets materialization",
-          "description": "Materialize route_runtime_packets from packet facts, telemetry, and source-ref joins so higher-hop evidence is replayable.",
-          "priority": "HIGH",
+          "created_at": "2026-06-19T22:36:17.063Z",
+          "run_id": "temporal-kanban-consolidation-20260619",
           "status": "TODO",
           "parent_task_id": null,
-          "command": "npm run atlas:route-runtime-packets:materialize:apply",
+          "evidence_refs": [
+            "services/go-retrieval-service",
+            "docs/reports/live-service-env-report.json"
+          ],
+          "task_id": "task_go_retrieval_runtime_recovery",
+          "source_recommendation_key": "go-retrieval-runtime-recovery",
+          "title": "Recover Go Retrieval runtime",
+          "description": "Align the existing Go Retrieval HTTP/gRPC service with the live environment. Do not create a replacement service.",
+          "priority": "HIGH",
+          "command": "node scripts/atlas/audit-live-service-env.mjs",
           "feature_id": "retrieval",
           "source_refs": [
-            "docs/reports/runtime-packet-backfill-plan.json",
-            "reports/parent-atlas-open-lanes-todo.md"
-          ],
-          "evidence_refs": [
-            "docs/reports/runtime-packet-backfill-plan.json",
-            "reports/parent-atlas-open-lanes-todo.md"
+            "services/go-retrieval-service",
+            "docs/reports/live-service-env-report.json"
           ]
+        },
+        {
+          "event_id": "task_410e5fbc7caa",
+          "event_type": "TASK_STATUS_CHANGED",
+          "created_at": "2026-06-19T22:44:24.800Z",
+          "run_id": "go-retrieval-recovery-20260619",
+          "task_id": "task_go_retrieval_runtime_recovery",
+          "previous_state": "TODO",
+          "new_state": "DONE",
+          "reason": "Go Retrieval HTTP and gRPC are healthy; env aliases align to 127.0.0.1, container uses authenticated Valkey, and the tool smoke passes 7/7."
         }
       ],
-      "seen_count": 4
+      "seen_count": 0
     },
     {
-      "task_id": "task_feature_parent_join_repair",
-      "title": "atlas_feature_map parent join repair",
-      "description": "Repair the atlas_feature_map ↔ parent_atlas_documents join using the existing normalized path audit and lineage spine.",
+      "task_id": "task_artifact_tiering_application",
+      "title": "Apply artifact tier classifications",
+      "description": "Turn artifact-bloat evidence into bounded keep/compress/cold/regenerable/metadata-only decisions without deleting artifacts.",
       "priority": "HIGH",
-      "status": "TODO",
-      "source_recommendation_key": "feature-parent-join-repair",
-      "command": "npm run atlas:feature-parent-join",
-      "feature_id": "parent-atlas",
+      "status": "DONE",
+      "source_recommendation_key": "artifact-tiering-application",
+      "command": "npm --prefix sveltekit-frontend run atlas:audit:artifact-bloat",
+      "feature_id": "artifact-storage",
       "source_refs": [
-        "docs/reports/atlas-feature-parent-join-gap.json",
+        "docs/reports/artifact-tiering-report.json",
         "reports/parent-atlas-open-lanes-todo.md"
       ],
       "evidence_refs": [
-        "docs/reports/atlas-feature-parent-join-gap.json",
+        "docs/reports/artifact-tiering-report.json",
         "reports/parent-atlas-open-lanes-todo.md"
       ],
-      "first_seen": "2026-06-12T12:45:29.469Z",
-      "last_seen": "2026-06-12T12:45:29.469Z",
-      "created_at": "2026-06-12T12:45:29.469Z",
-      "updated_at": "2026-06-12T12:45:29.469Z",
+      "first_seen": "2026-06-19T22:36:17.063Z",
+      "last_seen": "2026-06-19T22:40:40.091Z",
+      "created_at": "2026-06-19T22:36:17.063Z",
+      "updated_at": "2026-06-19T22:40:40.091Z",
       "history": [
         {
-          "event_id": "task_be7601ce1677",
+          "event_id": "task_1ddf062b0e9a",
           "event_type": "TASK_CREATED",
-          "created_at": "2026-06-12T12:45:29.469Z",
-          "run_id": "2026-06-11T04:33:05.170Z",
-          "task_id": "task_feature_parent_join_repair",
-          "source_recommendation_key": "feature-parent-join-repair",
-          "title": "atlas_feature_map parent join repair",
-          "description": "Repair the atlas_feature_map ↔ parent_atlas_documents join using the existing normalized path audit and lineage spine.",
-          "priority": "HIGH",
+          "created_at": "2026-06-19T22:36:17.063Z",
+          "run_id": "temporal-kanban-consolidation-20260619",
           "status": "TODO",
           "parent_task_id": null,
-          "command": "npm run atlas:feature-parent-join",
-          "feature_id": "parent-atlas",
-          "source_refs": [
-            "docs/reports/atlas-feature-parent-join-gap.json",
+          "evidence_refs": [
+            "docs/reports/artifact-tiering-report.json",
             "reports/parent-atlas-open-lanes-todo.md"
           ],
-          "evidence_refs": [
-            "docs/reports/atlas-feature-parent-join-gap.json",
+          "task_id": "task_artifact_tiering_application",
+          "source_recommendation_key": "artifact-tiering-application",
+          "title": "Apply artifact tier classifications",
+          "description": "Turn artifact-bloat evidence into bounded keep/compress/cold/regenerable/metadata-only decisions without deleting artifacts.",
+          "priority": "HIGH",
+          "command": "npm --prefix sveltekit-frontend run atlas:audit:artifact-bloat",
+          "feature_id": "artifact-storage",
+          "source_refs": [
+            "docs/reports/artifact-tiering-report.json",
             "reports/parent-atlas-open-lanes-todo.md"
           ]
-        }
-      ],
-      "seen_count": 4
-    },
-    {
-      "task_id": "task_higher_hop_coverage_repair",
-      "title": "Higher-hop coverage repair",
-      "description": "Backfill somCluster, glyphRecord, qdrantHit, redisHotKey, and neo4jNode so semantic ACE traversals can move from report-only coverage to materialized data.",
-      "priority": "HIGH",
-      "status": "TODO",
-      "source_recommendation_key": "higher-hop-coverage-repair",
-      "command": "npm run atlas:higher-hop:coverage",
-      "feature_id": "retrieval",
-      "source_refs": [
-        "reports/parent-atlas-open-lanes-todo.md",
-        "docs/reports/higher-hop-enrichment-report.json"
-      ],
-      "evidence_refs": [
-        "reports/parent-atlas-open-lanes-todo.md",
-        "docs/reports/higher-hop-enrichment-report.json"
-      ],
-      "first_seen": "2026-06-12T12:42:11.661Z",
-      "last_seen": "2026-06-12T12:42:11.661Z",
-      "created_at": "2026-06-12T12:42:11.661Z",
-      "updated_at": "2026-06-12T12:42:11.661Z",
-      "history": [
+        },
         {
-          "event_id": "task_75907268e59d",
-          "event_type": "TASK_CREATED",
-          "created_at": "2026-06-12T12:42:11.661Z",
-          "run_id": "2026-06-11T04:33:05.170Z",
-          "task_id": "task_higher_hop_coverage_repair",
-          "source_recommendation_key": "higher-hop-coverage-repair",
-          "title": "Higher-hop coverage repair",
-          "description": "Backfill somCluster, glyphRecord, qdrantHit, redisHotKey, and neo4jNode so semantic ACE traversals can move from report-only coverage to materialized data.",
-          "priority": "HIGH",
-          "status": "TODO",
-          "parent_task_id": null,
-          "command": "npm run atlas:higher-hop:coverage",
-          "feature_id": "retrieval",
-          "source_refs": [
-            "reports/parent-atlas-open-lanes-todo.md",
-            "docs/reports/higher-hop-enrichment-report.json"
-          ],
-          "evidence_refs": [
-            "reports/parent-atlas-open-lanes-todo.md",
-            "docs/reports/higher-hop-enrichment-report.json"
-          ]
+          "event_id": "task_55733907c2dc",
+          "event_type": "TASK_STATUS_CHANGED",
+          "created_at": "2026-06-19T22:40:40.091Z",
+          "run_id": "artifact-tiering-manifest-20260619",
+          "task_id": "task_artifact_tiering_application",
+          "previous_state": "TODO",
+          "new_state": "DONE",
+          "reason": "Artifact tier decisions applied to a non-destructive manifest; runtime models protected and cold/delete actions remain restore-gated."
         }
       ],
-      "seen_count": 5
+      "seen_count": 0
     },
     {
       "task_id": "task_phase_3d_retrieval_telemetry",
       "title": "Phase 3D retrieval telemetry",
       "description": "Capture behavioral retrieval telemetry before automating cache policy, feature governance, or SeaweedFS promotion.",
       "priority": "HIGH",
-      "status": "IN_PROGRESS",
+      "status": "DONE",
       "source_recommendation_key": "phase-3d-retrieval-telemetry",
       "command": "npm run atlas:phase3d:telemetry-summary",
       "feature_id": "retrieval-telemetry",
@@ -214,9 +230,9 @@
         "../reports/parent-atlas-open-lanes-todo.md"
       ],
       "first_seen": "2026-06-11T14:22:58.859Z",
-      "last_seen": "2026-06-11T14:25:34.822Z",
+      "last_seen": "2026-06-19T22:36:17.063Z",
       "created_at": "2026-06-11T14:22:58.859Z",
-      "updated_at": "2026-06-11T14:25:34.822Z",
+      "updated_at": "2026-06-19T22:36:17.063Z",
       "history": [
         {
           "event_id": "task_5ed41d869430",
@@ -250,9 +266,268 @@
           "previous_state": "TODO",
           "new_state": "IN_PROGRESS",
           "reason": "bootstrap-selected-lane:phase-3d-retrieval-telemetry"
+        },
+        {
+          "event_id": "task_5a9a168f2ff3",
+          "event_type": "TASK_STATUS_CHANGED",
+          "created_at": "2026-06-19T22:36:17.063Z",
+          "run_id": "temporal-kanban-consolidation-20260619",
+          "task_id": "task_phase_3d_retrieval_telemetry",
+          "previous_state": "IN_PROGRESS",
+          "new_state": "DONE",
+          "reason": "Replay breadth and timing are READY with one detailed packet-RPC timing row per query.",
+          "evidence_refs": [
+            "docs/reports/replay-telemetry-breadth-audit.json",
+            "docs/reports/hyperrag-timing-coverage-audit.json"
+          ]
         }
       ],
       "seen_count": 3
+    },
+    {
+      "task_id": "task_higher_hop_coverage_repair",
+      "title": "Higher-hop coverage repair",
+      "description": "Backfill somCluster, glyphRecord, qdrantHit, redisHotKey, and neo4jNode so semantic ACE traversals can move from report-only coverage to materialized data.",
+      "priority": "HIGH",
+      "status": "DONE",
+      "source_recommendation_key": "higher-hop-coverage-repair",
+      "command": "npm run atlas:higher-hop:coverage",
+      "feature_id": "retrieval",
+      "source_refs": [
+        "reports/parent-atlas-open-lanes-todo.md",
+        "docs/reports/higher-hop-enrichment-report.json"
+      ],
+      "evidence_refs": [
+        "reports/parent-atlas-open-lanes-todo.md",
+        "docs/reports/higher-hop-enrichment-report.json"
+      ],
+      "first_seen": "2026-06-12T12:42:11.661Z",
+      "last_seen": "2026-06-19T22:36:17.063Z",
+      "created_at": "2026-06-12T12:42:11.661Z",
+      "updated_at": "2026-06-19T22:36:17.063Z",
+      "history": [
+        {
+          "event_id": "task_75907268e59d",
+          "event_type": "TASK_CREATED",
+          "created_at": "2026-06-12T12:42:11.661Z",
+          "run_id": "2026-06-11T04:33:05.170Z",
+          "task_id": "task_higher_hop_coverage_repair",
+          "source_recommendation_key": "higher-hop-coverage-repair",
+          "title": "Higher-hop coverage repair",
+          "description": "Backfill somCluster, glyphRecord, qdrantHit, redisHotKey, and neo4jNode so semantic ACE traversals can move from report-only coverage to materialized data.",
+          "priority": "HIGH",
+          "status": "TODO",
+          "parent_task_id": null,
+          "command": "npm run atlas:higher-hop:coverage",
+          "feature_id": "retrieval",
+          "source_refs": [
+            "reports/parent-atlas-open-lanes-todo.md",
+            "docs/reports/higher-hop-enrichment-report.json"
+          ],
+          "evidence_refs": [
+            "reports/parent-atlas-open-lanes-todo.md",
+            "docs/reports/higher-hop-enrichment-report.json"
+          ]
+        },
+        {
+          "event_id": "task_c80b9e7c5165",
+          "event_type": "TASK_STATUS_CHANGED",
+          "created_at": "2026-06-19T22:36:17.063Z",
+          "run_id": "temporal-kanban-consolidation-20260619",
+          "task_id": "task_higher_hop_coverage_repair",
+          "previous_state": "TODO",
+          "new_state": "DONE",
+          "reason": "Higher-hop identity, topology, glyph, Qdrant-lane, and Neo4j bridge validation are complete.",
+          "evidence_refs": [
+            "docs/reports/higher-hop-identity-ledger-validation.json",
+            "docs/reports/glyph-label-coverage-audit.json"
+          ]
+        }
+      ],
+      "seen_count": 5
+    },
+    {
+      "task_id": "task_feature_parent_join_repair",
+      "title": "atlas_feature_map parent join repair",
+      "description": "Repair the atlas_feature_map ↔ parent_atlas_documents join using the existing normalized path audit and lineage spine.",
+      "priority": "HIGH",
+      "status": "DONE",
+      "source_recommendation_key": "feature-parent-join-repair",
+      "command": "npm run atlas:feature-parent-join",
+      "feature_id": "parent-atlas",
+      "source_refs": [
+        "docs/reports/atlas-feature-parent-join-gap.json",
+        "reports/parent-atlas-open-lanes-todo.md"
+      ],
+      "evidence_refs": [
+        "docs/reports/atlas-feature-parent-join-gap.json",
+        "reports/parent-atlas-open-lanes-todo.md"
+      ],
+      "first_seen": "2026-06-12T12:45:29.469Z",
+      "last_seen": "2026-06-19T22:36:17.063Z",
+      "created_at": "2026-06-12T12:45:29.469Z",
+      "updated_at": "2026-06-19T22:36:17.063Z",
+      "history": [
+        {
+          "event_id": "task_be7601ce1677",
+          "event_type": "TASK_CREATED",
+          "created_at": "2026-06-12T12:45:29.469Z",
+          "run_id": "2026-06-11T04:33:05.170Z",
+          "task_id": "task_feature_parent_join_repair",
+          "source_recommendation_key": "feature-parent-join-repair",
+          "title": "atlas_feature_map parent join repair",
+          "description": "Repair the atlas_feature_map ↔ parent_atlas_documents join using the existing normalized path audit and lineage spine.",
+          "priority": "HIGH",
+          "status": "TODO",
+          "parent_task_id": null,
+          "command": "npm run atlas:feature-parent-join",
+          "feature_id": "parent-atlas",
+          "source_refs": [
+            "docs/reports/atlas-feature-parent-join-gap.json",
+            "reports/parent-atlas-open-lanes-todo.md"
+          ],
+          "evidence_refs": [
+            "docs/reports/atlas-feature-parent-join-gap.json",
+            "reports/parent-atlas-open-lanes-todo.md"
+          ]
+        },
+        {
+          "event_id": "task_54ed668daefc",
+          "event_type": "TASK_STATUS_CHANGED",
+          "created_at": "2026-06-19T22:36:17.063Z",
+          "run_id": "temporal-kanban-consolidation-20260619",
+          "task_id": "task_feature_parent_join_repair",
+          "previous_state": "TODO",
+          "new_state": "DONE",
+          "reason": "Feature/parent source-ref coverage passed the classified repair gate.",
+          "evidence_refs": [
+            "docs/reports/atlas-feature-parent-join-gap.json"
+          ]
+        }
+      ],
+      "seen_count": 4
+    },
+    {
+      "task_id": "task_route_runtime_packets_materialization",
+      "title": "route_runtime_packets materialization",
+      "description": "Materialize route_runtime_packets from packet facts, telemetry, and source-ref joins so higher-hop evidence is replayable.",
+      "priority": "HIGH",
+      "status": "DONE",
+      "source_recommendation_key": "route-runtime-packets-materialization",
+      "command": "npm run atlas:route-runtime-packets:materialize:apply",
+      "feature_id": "retrieval",
+      "source_refs": [
+        "docs/reports/runtime-packet-backfill-plan.json",
+        "reports/parent-atlas-open-lanes-todo.md"
+      ],
+      "evidence_refs": [
+        "docs/reports/runtime-packet-backfill-plan.json",
+        "reports/parent-atlas-open-lanes-todo.md"
+      ],
+      "first_seen": "2026-06-12T12:45:29.470Z",
+      "last_seen": "2026-06-19T22:36:17.063Z",
+      "created_at": "2026-06-12T12:45:29.470Z",
+      "updated_at": "2026-06-19T22:36:17.063Z",
+      "history": [
+        {
+          "event_id": "task_b7048d2c19fc",
+          "event_type": "TASK_CREATED",
+          "created_at": "2026-06-12T12:45:29.470Z",
+          "run_id": "2026-06-11T04:33:05.170Z",
+          "task_id": "task_route_runtime_packets_materialization",
+          "source_recommendation_key": "route-runtime-packets-materialization",
+          "title": "route_runtime_packets materialization",
+          "description": "Materialize route_runtime_packets from packet facts, telemetry, and source-ref joins so higher-hop evidence is replayable.",
+          "priority": "HIGH",
+          "status": "TODO",
+          "parent_task_id": null,
+          "command": "npm run atlas:route-runtime-packets:materialize:apply",
+          "feature_id": "retrieval",
+          "source_refs": [
+            "docs/reports/runtime-packet-backfill-plan.json",
+            "reports/parent-atlas-open-lanes-todo.md"
+          ],
+          "evidence_refs": [
+            "docs/reports/runtime-packet-backfill-plan.json",
+            "reports/parent-atlas-open-lanes-todo.md"
+          ]
+        },
+        {
+          "event_id": "task_b1d8266ef1ec",
+          "event_type": "TASK_STATUS_CHANGED",
+          "created_at": "2026-06-19T22:36:17.063Z",
+          "run_id": "temporal-kanban-consolidation-20260619",
+          "task_id": "task_route_runtime_packets_materialization",
+          "previous_state": "TODO",
+          "new_state": "DONE",
+          "reason": "route_runtime_packets materialization and cache-hit coverage are operational.",
+          "evidence_refs": [
+            "docs/reports/runtime-coverage-audit.json"
+          ]
+        }
+      ],
+      "seen_count": 4
+    },
+    {
+      "task_id": "task_concept_evidence_spine_backfill",
+      "title": "Historical concept evidence spine backfill",
+      "description": "Rewrite concept_records.evidence_cards from stale legacy card IDs to the live packet spine using packet_keys and feature_ids.",
+      "priority": "HIGH",
+      "status": "DONE",
+      "source_recommendation_key": "concept-evidence-spine-backfill",
+      "command": "npm run atlas:concept-evidence:backfill",
+      "feature_id": "evidence",
+      "source_refs": [
+        "docs/reports/concept-evidence-spine-backfill-report.json",
+        "reports/parent-atlas-open-lanes-todo.md"
+      ],
+      "evidence_refs": [
+        "docs/reports/concept-evidence-spine-backfill-report.json",
+        "reports/parent-atlas-open-lanes-todo.md"
+      ],
+      "first_seen": "2026-06-12T13:00:13.075Z",
+      "last_seen": "2026-06-19T22:36:17.063Z",
+      "created_at": "2026-06-12T13:00:13.075Z",
+      "updated_at": "2026-06-19T22:36:17.063Z",
+      "history": [
+        {
+          "event_id": "task_e222e4afe8bb",
+          "event_type": "TASK_CREATED",
+          "created_at": "2026-06-12T13:00:13.075Z",
+          "run_id": "2026-06-11T04:33:05.170Z",
+          "task_id": "task_concept_evidence_spine_backfill",
+          "source_recommendation_key": "concept-evidence-spine-backfill",
+          "title": "Historical concept evidence spine backfill",
+          "description": "Rewrite concept_records.evidence_cards from stale legacy card IDs to the live packet spine using packet_keys and feature_ids.",
+          "priority": "HIGH",
+          "status": "TODO",
+          "parent_task_id": null,
+          "command": "npm run atlas:concept-evidence:backfill",
+          "feature_id": "evidence",
+          "source_refs": [
+            "docs/reports/concept-evidence-spine-backfill-report.json",
+            "reports/parent-atlas-open-lanes-todo.md"
+          ],
+          "evidence_refs": [
+            "docs/reports/concept-evidence-spine-backfill-report.json",
+            "reports/parent-atlas-open-lanes-todo.md"
+          ]
+        },
+        {
+          "event_id": "task_5028e402ecb6",
+          "event_type": "TASK_STATUS_CHANGED",
+          "created_at": "2026-06-19T22:36:17.063Z",
+          "run_id": "temporal-kanban-consolidation-20260619",
+          "task_id": "task_concept_evidence_spine_backfill",
+          "previous_state": "TODO",
+          "new_state": "DONE",
+          "reason": "Concept evidence is live on packet_keys and feature_ids; compatibility evidence_cards no longer block retrieval.",
+          "evidence_refs": [
+            "docs/reports/concept-evidence-spine-backfill-report.json"
+          ]
+        }
+      ],
+      "seen_count": 1
     },
     {
       "task_id": "task_27_api_route_handlers_lack_auth_guards",
@@ -413,86 +688,232 @@
       "seen_count": 3
     },
     {
-      "task_id": "task_4_circular_dependency_chains_of_3_files",
-      "title": "4 circular dependency chains of 3+ files",
-      "description": "Large cycles increase coupling and make tree-shaking impossible. Break by extracting shared types to a third module.",
-      "priority": "HIGH",
-      "status": "TODO",
-      "source_recommendation_key": "4_circular_dependency_chains_of_3_files",
-      "command": null,
-      "feature_id": "general",
+      "task_id": "task_cold_storage_restore_verification",
+      "title": "Verify cold-storage restore proofs",
+      "description": "Validate manifests and sample restores before any artifact move or deletion.",
+      "priority": "MEDIUM",
+      "status": "DONE",
+      "source_recommendation_key": "cold-storage-restore-verification",
+      "command": "npm --prefix sveltekit-frontend run atlas:cold:verify:test",
+      "feature_id": "cold-storage",
       "source_refs": [
-        "claude-mem/src/services/worker/session/SessionCompletionHandler.ts",
-        "claude-mem/src/services/worker/session/GeneratorExitHandler.ts",
-        "claude-mem/src/services/worker-service.ts",
-        "claude-mem/src/services/worker/events/SessionEventBroadcaster.ts",
-        "deeds_labs/snapshots/2026-03-10/root-stale/archives/typescript/typescript-backup/typescript-backup/unocss-main/unocss-main/packages-integrations/svelte-scoped/src/_preprocess/transformClasses/processDirective.ts",
-        "deeds_labs/snapshots/2026-03-10/root-stale/archives/typescript/typescript-backup/typescript-backup/unocss-main/unocss-main/packages-integrations/svelte-scoped/src/_preprocess/transformClasses/processClsx.ts",
-        "deeds_labs/snapshots/2026-03-10/root-stale/archives/typescript/typescript-backup/typescript-backup/unocss-main/unocss-main/packages-integrations/svelte-scoped/src/_preprocess/transformClasses/sortClassesIntoCategories.ts",
-        "deeds_labs/snapshots/2026-03-10/root-stale/archives/typescript/typescript-backup/typescript-backup/unocss-main/unocss-main/packages-integrations/svelte-scoped/src/_preprocess/transformClasses/processExpressions.ts",
-        "deeds_labs/snapshots/2026-03-10/root-stale/archives/typescript/typescript-backup/typescript-backup/unocss-main/unocss-main/packages-integrations/svelte-scoped/src/_preprocess/transformClasses/processClassBody.ts",
-        "deeds_labs/snapshots/2026-03-10/root-stale/archives/typescript/typescript-backup/typescript-backup/unocss-main/unocss-main/packages-integrations/svelte-scoped/src/_preprocess/transformClasses/processClasses.ts",
-        "deeds_labs/snapshots/2026-03-10/root-stale/unocss-main/unocss-main/packages-integrations/svelte-scoped/src/_preprocess/transformClasses/processDirective.ts",
-        "deeds_labs/snapshots/2026-03-10/root-stale/unocss-main/unocss-main/packages-integrations/svelte-scoped/src/_preprocess/transformClasses/processClsx.ts",
-        "deeds_labs/snapshots/2026-03-10/root-stale/unocss-main/unocss-main/packages-integrations/svelte-scoped/src/_preprocess/transformClasses/sortClassesIntoCategories.ts",
-        "deeds_labs/snapshots/2026-03-10/root-stale/unocss-main/unocss-main/packages-integrations/svelte-scoped/src/_preprocess/transformClasses/processExpressions.ts",
-        "deeds_labs/snapshots/2026-03-10/root-stale/unocss-main/unocss-main/packages-integrations/svelte-scoped/src/_preprocess/transformClasses/processClassBody.ts",
-        "deeds_labs/snapshots/2026-03-10/root-stale/unocss-main/unocss-main/packages-integrations/svelte-scoped/src/_preprocess/transformClasses/processClasses.ts",
-        "sveltekit-frontend/src/lib/server/ai/hermes/skills/system-audit.ts",
-        "sveltekit-frontend/src/lib/server/ai/hermes/skills/ui-diagnostics.ts",
-        "sveltekit-frontend/src/lib/server/ai/hermes/skills/gpu-acceleration.ts",
-        "sveltekit-frontend/src/lib/server/ai/hermes/skills/repair.ts"
+        "sveltekit-frontend/scripts/atlas/verify-cold-storage-manifest.mjs"
       ],
       "evidence_refs": [
-        "docs\\graph\\recommendations.json"
+        "sveltekit-frontend/scripts/atlas/verify-cold-storage-manifest.mjs"
       ],
-      "first_seen": "2026-06-11T03:18:47.472Z",
-      "last_seen": "2026-06-11T03:18:47.472Z",
-      "created_at": "2026-06-11T03:18:47.472Z",
-      "updated_at": "2026-06-11T03:18:47.472Z",
+      "first_seen": "2026-06-19T22:36:17.063Z",
+      "last_seen": "2026-06-19T23:00:59.462Z",
+      "created_at": "2026-06-19T22:36:17.063Z",
+      "updated_at": "2026-06-19T23:00:59.462Z",
       "history": [
         {
-          "event_id": "task_413aab6f5e07",
+          "event_id": "task_d34f765a8318",
           "event_type": "TASK_CREATED",
-          "created_at": "2026-06-11T03:18:47.472Z",
-          "run_id": "2026-06-06T06:21:32.559Z",
-          "task_id": "task_4_circular_dependency_chains_of_3_files",
-          "source_recommendation_key": "4_circular_dependency_chains_of_3_files",
-          "title": "4 circular dependency chains of 3+ files",
-          "description": "Large cycles increase coupling and make tree-shaking impossible. Break by extracting shared types to a third module.",
-          "priority": "HIGH",
+          "created_at": "2026-06-19T22:36:17.063Z",
+          "run_id": "temporal-kanban-consolidation-20260619",
           "status": "TODO",
           "parent_task_id": null,
-          "command": null,
-          "feature_id": "general",
+          "evidence_refs": [
+            "sveltekit-frontend/scripts/atlas/verify-cold-storage-manifest.mjs"
+          ],
+          "task_id": "task_cold_storage_restore_verification",
+          "source_recommendation_key": "cold-storage-restore-verification",
+          "title": "Verify cold-storage restore proofs",
+          "description": "Validate manifests and sample restores before any artifact move or deletion.",
+          "priority": "MEDIUM",
+          "command": "npm --prefix sveltekit-frontend run atlas:cold:verify:test",
+          "feature_id": "cold-storage",
           "source_refs": [
-            "claude-mem/src/services/worker/session/SessionCompletionHandler.ts",
-            "claude-mem/src/services/worker/session/GeneratorExitHandler.ts",
-            "claude-mem/src/services/worker-service.ts",
-            "claude-mem/src/services/worker/events/SessionEventBroadcaster.ts",
-            "deeds_labs/snapshots/2026-03-10/root-stale/archives/typescript/typescript-backup/typescript-backup/unocss-main/unocss-main/packages-integrations/svelte-scoped/src/_preprocess/transformClasses/processDirective.ts",
-            "deeds_labs/snapshots/2026-03-10/root-stale/archives/typescript/typescript-backup/typescript-backup/unocss-main/unocss-main/packages-integrations/svelte-scoped/src/_preprocess/transformClasses/processClsx.ts",
-            "deeds_labs/snapshots/2026-03-10/root-stale/archives/typescript/typescript-backup/typescript-backup/unocss-main/unocss-main/packages-integrations/svelte-scoped/src/_preprocess/transformClasses/sortClassesIntoCategories.ts",
-            "deeds_labs/snapshots/2026-03-10/root-stale/archives/typescript/typescript-backup/typescript-backup/unocss-main/unocss-main/packages-integrations/svelte-scoped/src/_preprocess/transformClasses/processExpressions.ts",
-            "deeds_labs/snapshots/2026-03-10/root-stale/archives/typescript/typescript-backup/typescript-backup/unocss-main/unocss-main/packages-integrations/svelte-scoped/src/_preprocess/transformClasses/processClassBody.ts",
-            "deeds_labs/snapshots/2026-03-10/root-stale/archives/typescript/typescript-backup/typescript-backup/unocss-main/unocss-main/packages-integrations/svelte-scoped/src/_preprocess/transformClasses/processClasses.ts",
-            "deeds_labs/snapshots/2026-03-10/root-stale/unocss-main/unocss-main/packages-integrations/svelte-scoped/src/_preprocess/transformClasses/processDirective.ts",
-            "deeds_labs/snapshots/2026-03-10/root-stale/unocss-main/unocss-main/packages-integrations/svelte-scoped/src/_preprocess/transformClasses/processClsx.ts",
-            "deeds_labs/snapshots/2026-03-10/root-stale/unocss-main/unocss-main/packages-integrations/svelte-scoped/src/_preprocess/transformClasses/sortClassesIntoCategories.ts",
-            "deeds_labs/snapshots/2026-03-10/root-stale/unocss-main/unocss-main/packages-integrations/svelte-scoped/src/_preprocess/transformClasses/processExpressions.ts",
-            "deeds_labs/snapshots/2026-03-10/root-stale/unocss-main/unocss-main/packages-integrations/svelte-scoped/src/_preprocess/transformClasses/processClassBody.ts",
-            "deeds_labs/snapshots/2026-03-10/root-stale/unocss-main/unocss-main/packages-integrations/svelte-scoped/src/_preprocess/transformClasses/processClasses.ts",
-            "sveltekit-frontend/src/lib/server/ai/hermes/skills/system-audit.ts",
-            "sveltekit-frontend/src/lib/server/ai/hermes/skills/ui-diagnostics.ts",
-            "sveltekit-frontend/src/lib/server/ai/hermes/skills/gpu-acceleration.ts",
-            "sveltekit-frontend/src/lib/server/ai/hermes/skills/repair.ts"
+            "sveltekit-frontend/scripts/atlas/verify-cold-storage-manifest.mjs"
+          ]
+        },
+        {
+          "event_id": "task_7d5648ac4ba2",
+          "event_type": "TASK_STATUS_CHANGED",
+          "created_at": "2026-06-19T23:00:59.462Z",
+          "run_id": "cold-restore-proof-20260619",
+          "task_id": "task_cold_storage_restore_verification",
+          "previous_state": "TODO",
+          "new_state": "DONE",
+          "reason": "SeaweedFS proof object uploaded and restored byte-for-byte; SHA-256 matched, canonical packet lineage was recorded, and atlas_cold_storage_manifest verification passes with a real row."
+        }
+      ],
+      "seen_count": 0
+    },
+    {
+      "task_id": "task_command_mapping_mcp_allowlist",
+      "title": "Command Mapping -> MCP allowlist",
+      "description": "OpenCode routing still needs a durable allowlist contract for command mapping.",
+      "priority": "MEDIUM",
+      "status": "DONE",
+      "source_recommendation_key": "command-mapping-mcp-allowlist",
+      "command": "npm run opencode:tasks:refresh",
+      "feature_id": "mcp",
+      "source_refs": [
+        "reports/parent-atlas-open-lanes-todo.md",
+        "opencode.json"
+      ],
+      "evidence_refs": [
+        "reports/parent-atlas-open-lanes-todo.md",
+        "opencode.json"
+      ],
+      "first_seen": "2026-06-11T03:18:47.474Z",
+      "last_seen": "2026-06-19T23:00:45.270Z",
+      "created_at": "2026-06-11T03:18:47.474Z",
+      "updated_at": "2026-06-19T23:00:45.270Z",
+      "history": [
+        {
+          "event_id": "task_92601428449b",
+          "event_type": "TASK_CREATED",
+          "created_at": "2026-06-11T03:18:47.474Z",
+          "run_id": "2026-06-06T06:21:32.559Z",
+          "task_id": "task_command_mapping_mcp_allowlist",
+          "source_recommendation_key": "command-mapping-mcp-allowlist",
+          "title": "Command Mapping -> MCP allowlist",
+          "description": "OpenCode routing still needs a durable allowlist contract for command mapping.",
+          "priority": "MEDIUM",
+          "status": "TODO",
+          "parent_task_id": null,
+          "command": "npm run opencode:tasks:refresh",
+          "feature_id": "mcp",
+          "source_refs": [
+            "reports/parent-atlas-open-lanes-todo.md",
+            "opencode.json"
           ],
           "evidence_refs": [
-            "docs\\graph\\recommendations.json"
+            "reports/parent-atlas-open-lanes-todo.md",
+            "opencode.json"
           ]
+        },
+        {
+          "event_id": "task_5cd9d38e19c5",
+          "event_type": "TASK_STATUS_CHANGED",
+          "created_at": "2026-06-19T23:00:45.270Z",
+          "run_id": "mcp-allowlist-close-20260619",
+          "task_id": "task_command_mapping_mcp_allowlist",
+          "previous_state": "TODO",
+          "new_state": "DONE",
+          "reason": "TRACE/Gemma4 command mapping is normalized across dot, underscore, and double-underscore names; Go retrieval tool smoke passes 7/7 and tool schema validation has 0 failures."
         }
       ],
       "seen_count": 24
+    },
+    {
+      "task_id": "task_parent_atlas_evaluation_gates",
+      "title": "Run Parent Atlas evaluation and learning gates",
+      "description": "Run replay, lineage, and final gates before adapter, PPO, TensorRT, or policy-router expansion.",
+      "priority": "MEDIUM",
+      "status": "DONE",
+      "source_recommendation_key": "parent-atlas-evaluation-gates",
+      "command": "npm --workspace @deeds/parent-atlas run gate:final",
+      "feature_id": "evaluation",
+      "source_refs": [
+        "packages/parent-atlas/src/gates",
+        "docs/reports/replay-telemetry-breadth-audit.json"
+      ],
+      "evidence_refs": [
+        "packages/parent-atlas/src/gates",
+        "docs/reports/replay-telemetry-breadth-audit.json"
+      ],
+      "first_seen": "2026-06-19T22:36:17.063Z",
+      "last_seen": "2026-06-19T22:58:56.404Z",
+      "created_at": "2026-06-19T22:36:17.063Z",
+      "updated_at": "2026-06-19T22:58:56.404Z",
+      "history": [
+        {
+          "event_id": "task_477fa03a2395",
+          "event_type": "TASK_CREATED",
+          "created_at": "2026-06-19T22:36:17.063Z",
+          "run_id": "temporal-kanban-consolidation-20260619",
+          "status": "TODO",
+          "parent_task_id": null,
+          "evidence_refs": [
+            "packages/parent-atlas/src/gates",
+            "docs/reports/replay-telemetry-breadth-audit.json"
+          ],
+          "task_id": "task_parent_atlas_evaluation_gates",
+          "source_recommendation_key": "parent-atlas-evaluation-gates",
+          "title": "Run Parent Atlas evaluation and learning gates",
+          "description": "Run replay, lineage, and final gates before adapter, PPO, TensorRT, or policy-router expansion.",
+          "priority": "MEDIUM",
+          "command": "npm --workspace @deeds/parent-atlas run gate:final",
+          "feature_id": "evaluation",
+          "source_refs": [
+            "packages/parent-atlas/src/gates",
+            "docs/reports/replay-telemetry-breadth-audit.json"
+          ]
+        },
+        {
+          "event_id": "task_436a54e5f2ca",
+          "event_type": "TASK_STATUS_CHANGED",
+          "created_at": "2026-06-19T22:58:56.404Z",
+          "run_id": "parent-atlas-eval-close-20260619",
+          "task_id": "task_parent_atlas_evaluation_gates",
+          "previous_state": "TODO",
+          "new_state": "DONE",
+          "reason": "Parent Atlas replay gate passes and the corrected final gate reports 5 milestones passed / 0 failed."
+        }
+      ],
+      "seen_count": 0
+    },
+    {
+      "task_id": "task_parent_atlas_package_consolidation",
+      "title": "Finish packages/parent-atlas consolidation",
+      "description": "Move proven gates, adapters, and pipeline entrypoints into the existing package without duplicating operational scripts.",
+      "priority": "MEDIUM",
+      "status": "DONE",
+      "source_recommendation_key": "parent-atlas-package-consolidation",
+      "command": "npm --workspace @deeds/parent-atlas run build",
+      "feature_id": "parent-atlas",
+      "source_refs": [
+        "packages/parent-atlas/src",
+        "packages/parent-atlas/docs/atlas/phase-lanes.md"
+      ],
+      "evidence_refs": [
+        "packages/parent-atlas/src",
+        "packages/parent-atlas/docs/atlas/phase-lanes.md"
+      ],
+      "first_seen": "2026-06-19T22:36:17.063Z",
+      "last_seen": "2026-06-19T22:58:52.387Z",
+      "created_at": "2026-06-19T22:36:17.063Z",
+      "updated_at": "2026-06-19T22:58:52.387Z",
+      "history": [
+        {
+          "event_id": "task_eeb488b26327",
+          "event_type": "TASK_CREATED",
+          "created_at": "2026-06-19T22:36:17.063Z",
+          "run_id": "temporal-kanban-consolidation-20260619",
+          "status": "TODO",
+          "parent_task_id": null,
+          "evidence_refs": [
+            "packages/parent-atlas/src",
+            "packages/parent-atlas/docs/atlas/phase-lanes.md"
+          ],
+          "task_id": "task_parent_atlas_package_consolidation",
+          "source_recommendation_key": "parent-atlas-package-consolidation",
+          "title": "Finish packages/parent-atlas consolidation",
+          "description": "Move proven gates, adapters, and pipeline entrypoints into the existing package without duplicating operational scripts.",
+          "priority": "MEDIUM",
+          "command": "npm --workspace @deeds/parent-atlas run build",
+          "feature_id": "parent-atlas",
+          "source_refs": [
+            "packages/parent-atlas/src",
+            "packages/parent-atlas/docs/atlas/phase-lanes.md"
+          ]
+        },
+        {
+          "event_id": "task_de4aa7297cd1",
+          "event_type": "TASK_STATUS_CHANGED",
+          "created_at": "2026-06-19T22:58:52.387Z",
+          "run_id": "parent-atlas-package-close-20260619",
+          "task_id": "task_parent_atlas_package_consolidation",
+          "previous_state": "TODO",
+          "new_state": "DONE",
+          "reason": "packages/parent-atlas builds cleanly and exposes the operational identity, replay, lineage, final, ingest, cache, and mapreduce entrypoints without duplicating scripts/atlas."
+        }
+      ],
+      "seen_count": 0
     },
     {
       "task_id": "task_parent_atlas_overlay_mismatch",
@@ -840,49 +1261,59 @@
       "seen_count": 4
     },
     {
-      "task_id": "task_command_mapping_mcp_allowlist",
-      "title": "Command Mapping -> MCP allowlist",
-      "description": "OpenCode routing still needs a durable allowlist contract for command mapping.",
-      "priority": "MEDIUM",
-      "status": "TODO",
-      "source_recommendation_key": "command-mapping-mcp-allowlist",
+      "task_id": "task_synthetic_evidence_concept_cards",
+      "title": "Synthetic Evidence concept cards",
+      "description": "Turn the open reports into durable concept cards so the evidence trail stays searchable.",
+      "priority": "LOW",
+      "status": "DONE",
+      "source_recommendation_key": "synthetic-evidence-concept-cards",
       "command": "npm run opencode:tasks:refresh",
-      "feature_id": "mcp",
+      "feature_id": "evidence",
       "source_refs": [
         "reports/parent-atlas-open-lanes-todo.md",
-        "opencode.json"
+        "docs/reports/temporal-task-registry-report.md"
       ],
       "evidence_refs": [
         "reports/parent-atlas-open-lanes-todo.md",
-        "opencode.json"
+        "docs/reports/temporal-task-registry-report.md"
       ],
       "first_seen": "2026-06-11T03:18:47.474Z",
-      "last_seen": "2026-06-11T03:18:47.474Z",
+      "last_seen": "2026-06-19T23:00:46.099Z",
       "created_at": "2026-06-11T03:18:47.474Z",
-      "updated_at": "2026-06-11T03:18:47.474Z",
+      "updated_at": "2026-06-19T23:00:46.099Z",
       "history": [
         {
-          "event_id": "task_92601428449b",
+          "event_id": "task_e5b9a5ddf483",
           "event_type": "TASK_CREATED",
           "created_at": "2026-06-11T03:18:47.474Z",
           "run_id": "2026-06-06T06:21:32.559Z",
-          "task_id": "task_command_mapping_mcp_allowlist",
-          "source_recommendation_key": "command-mapping-mcp-allowlist",
-          "title": "Command Mapping -> MCP allowlist",
-          "description": "OpenCode routing still needs a durable allowlist contract for command mapping.",
-          "priority": "MEDIUM",
+          "task_id": "task_synthetic_evidence_concept_cards",
+          "source_recommendation_key": "synthetic-evidence-concept-cards",
+          "title": "Synthetic Evidence concept cards",
+          "description": "Turn the open reports into durable concept cards so the evidence trail stays searchable.",
+          "priority": "LOW",
           "status": "TODO",
           "parent_task_id": null,
           "command": "npm run opencode:tasks:refresh",
-          "feature_id": "mcp",
+          "feature_id": "evidence",
           "source_refs": [
             "reports/parent-atlas-open-lanes-todo.md",
-            "opencode.json"
+            "docs/reports/temporal-task-registry-report.md"
           ],
           "evidence_refs": [
             "reports/parent-atlas-open-lanes-todo.md",
-            "opencode.json"
+            "docs/reports/temporal-task-registry-report.md"
           ]
+        },
+        {
+          "event_id": "task_35eadf93d5b8",
+          "event_type": "TASK_STATUS_CHANGED",
+          "created_at": "2026-06-19T23:00:46.099Z",
+          "run_id": "synthetic-evidence-close-20260619",
+          "task_id": "task_synthetic_evidence_concept_cards",
+          "previous_state": "TODO",
+          "new_state": "DONE",
+          "reason": "The synthetic evidence recommendation is superseded by the completed concept evidence spine backfill: packet_keys and feature_ids are canonical, evidence_cards is compatibility history."
         }
       ],
       "seen_count": 24
@@ -944,54 +1375,6 @@
         }
       ],
       "seen_count": 0
-    },
-    {
-      "task_id": "task_synthetic_evidence_concept_cards",
-      "title": "Synthetic Evidence concept cards",
-      "description": "Turn the open reports into durable concept cards so the evidence trail stays searchable.",
-      "priority": "LOW",
-      "status": "TODO",
-      "source_recommendation_key": "synthetic-evidence-concept-cards",
-      "command": "npm run opencode:tasks:refresh",
-      "feature_id": "evidence",
-      "source_refs": [
-        "reports/parent-atlas-open-lanes-todo.md",
-        "docs/reports/temporal-task-registry-report.md"
-      ],
-      "evidence_refs": [
-        "reports/parent-atlas-open-lanes-todo.md",
-        "docs/reports/temporal-task-registry-report.md"
-      ],
-      "first_seen": "2026-06-11T03:18:47.474Z",
-      "last_seen": "2026-06-11T03:18:47.474Z",
-      "created_at": "2026-06-11T03:18:47.474Z",
-      "updated_at": "2026-06-11T03:18:47.474Z",
-      "history": [
-        {
-          "event_id": "task_e5b9a5ddf483",
-          "event_type": "TASK_CREATED",
-          "created_at": "2026-06-11T03:18:47.474Z",
-          "run_id": "2026-06-06T06:21:32.559Z",
-          "task_id": "task_synthetic_evidence_concept_cards",
-          "source_recommendation_key": "synthetic-evidence-concept-cards",
-          "title": "Synthetic Evidence concept cards",
-          "description": "Turn the open reports into durable concept cards so the evidence trail stays searchable.",
-          "priority": "LOW",
-          "status": "TODO",
-          "parent_task_id": null,
-          "command": "npm run opencode:tasks:refresh",
-          "feature_id": "evidence",
-          "source_refs": [
-            "reports/parent-atlas-open-lanes-todo.md",
-            "docs/reports/temporal-task-registry-report.md"
-          ],
-          "evidence_refs": [
-            "reports/parent-atlas-open-lanes-todo.md",
-            "docs/reports/temporal-task-registry-report.md"
-          ]
-        }
-      ],
-      "seen_count": 24
     }
   ],
   "recommendationSummary": [

@@ -2,7 +2,7 @@
   "query": "how does the system handle schema migration sidecars?",
   "hash": "31ff33313d7dcdae30800070aa9842820576ffbd9aaca843f19c2dfeaf6f4371",
   "bucket": "cache-hit",
-  "timestamp": "2026-06-19T15:45:11.297Z",
+  "timestamp": "2026-06-19T17:10:06.085Z",
   "payload": {
     "ok": true,
     "query": "how does the system handle schema migration sidecars?",
@@ -144,23 +144,23 @@
         "packet_key": "hyperrag:src/lib/server/db/schema/case_notes.ts",
         "feature_id": "database_orm",
         "source_ref": "src/lib/server/db/schema/case_notes.ts",
-        "retrieved_at": "2026-06-19T15:45:06.740Z",
+        "retrieved_at": "2026-06-19T17:09:59.090Z",
         "retrieved_from": "hyperrag",
         "retrieval_confidence": 0.85,
-        "retrieval_latency_ms": 1596,
+        "retrieval_latency_ms": 2264,
         "ace_confidence": 0.9,
         "kag_aligned": true,
         "dag_reachable": true,
-        "cached_at": "2026-06-19T15:45:06.740Z"
+        "cached_at": "2026-06-19T17:09:59.090Z"
       },
       {
         "packet_key": "hyperrag:src/lib/server/db/schema/case_notes.ts",
         "feature_id": "database_orm",
         "source_ref": "src/lib/server/db/schema/case_notes.ts",
-        "retrieved_at": "2026-06-19T15:45:11.292Z",
+        "retrieved_at": "2026-06-19T17:10:06.077Z",
         "retrieved_from": "hyperrag",
         "retrieval_confidence": 0.85,
-        "retrieval_latency_ms": 1,
+        "retrieval_latency_ms": 3,
         "ace_confidence": 0.9,
         "kag_aligned": true,
         "dag_reachable": true
@@ -169,10 +169,10 @@
         "packet_key": "hyperrag:src/lib/server/db/schema/warden_audit_log.ts",
         "feature_id": "database_orm",
         "source_ref": "src/lib/server/db/schema/warden_audit_log.ts",
-        "retrieved_at": "2026-06-19T15:45:11.292Z",
+        "retrieved_at": "2026-06-19T17:10:06.077Z",
         "retrieved_from": "hyperrag",
         "retrieval_confidence": 0.65,
-        "retrieval_latency_ms": 1,
+        "retrieval_latency_ms": 3,
         "ace_confidence": 0.9,
         "kag_aligned": true,
         "dag_reachable": true
@@ -181,10 +181,10 @@
         "packet_key": "hyperrag:src/lib/server/db/schema/auto_tags.ts",
         "feature_id": "database_orm",
         "source_ref": "src/lib/server/db/schema/auto_tags.ts",
-        "retrieved_at": "2026-06-19T15:45:11.292Z",
+        "retrieved_at": "2026-06-19T17:10:06.077Z",
         "retrieved_from": "hyperrag",
         "retrieval_confidence": 0.65,
-        "retrieval_latency_ms": 1,
+        "retrieval_latency_ms": 3,
         "ace_confidence": 0.9,
         "kag_aligned": true,
         "dag_reachable": true
@@ -193,10 +193,10 @@
         "packet_key": "hyperrag:src/lib/server/db/schema/user_ai_queries.ts",
         "feature_id": "database_orm",
         "source_ref": "src/lib/server/db/schema/user_ai_queries.ts",
-        "retrieved_at": "2026-06-19T15:45:11.292Z",
+        "retrieved_at": "2026-06-19T17:10:06.077Z",
         "retrieved_from": "hyperrag",
         "retrieval_confidence": 0.65,
-        "retrieval_latency_ms": 1,
+        "retrieval_latency_ms": 3,
         "ace_confidence": 0.9,
         "kag_aligned": true,
         "dag_reachable": true
@@ -205,10 +205,10 @@
         "packet_key": "hyperrag:src/lib/server/db/schema/state_constitution_sources.ts",
         "feature_id": "database_orm",
         "source_ref": "src/lib/server/db/schema/state_constitution_sources.ts",
-        "retrieved_at": "2026-06-19T15:45:11.292Z",
+        "retrieved_at": "2026-06-19T17:10:06.077Z",
         "retrieved_from": "hyperrag",
         "retrieval_confidence": 0.65,
-        "retrieval_latency_ms": 1,
+        "retrieval_latency_ms": 3,
         "ace_confidence": 0.9,
         "kag_aligned": true,
         "dag_reachable": true
@@ -221,8 +221,8 @@
       "rrf_hits": 0,
       "neo4j_expansions": 0,
       "cache_hits": 1,
-      "latency_ms": 27,
-      "cache_latency_ms": 27
+      "latency_ms": 28,
+      "cache_latency_ms": 28
     }
   }
 }

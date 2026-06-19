@@ -120,6 +120,19 @@ export const PACKET_SCHEMA_FIELDS = [
   'som_col',
   'som_index',
   'kmeans_cluster',
+  'latent_64',
+  'ae_distance',
+  'z_som',
+  'pagerank',
+  'betweenness',
+  'eigenvector',
+  'nn_1',
+  'nn_2',
+  'nn_3',
+  'nn_4',
+  'topology_version',
+  'topology_updated_at',
+  'relation_type',
 ];
 
 export function packetFieldAliases(fieldName) {
@@ -146,6 +159,19 @@ export function packetFieldAliases(fieldName) {
     som_col: ['som_col', 'somCol'],
     som_index: ['som_index', 'somIndex'],
     kmeans_cluster: ['kmeans_cluster', 'kmeansCluster'],
+    latent_64: ['latent_64', 'latent64', 'encoded_64', 'encoded64'],
+    ae_distance: ['ae_distance', 'aeDistance'],
+    z_som: ['z_som', 'zSom', 'som_index', 'somIndex', 'som_cluster', 'somCluster'],
+    pagerank: ['pagerank', 'pageRank', 'graph_pagerank', 'graphPageRank'],
+    betweenness: ['betweenness', 'graph_betweenness', 'graphBetweenness'],
+    eigenvector: ['eigenvector', 'graph_eigenvector', 'graphEigenvector'],
+    nn_1: ['nn_1', 'nn1'],
+    nn_2: ['nn_2', 'nn2'],
+    nn_3: ['nn_3', 'nn3'],
+    nn_4: ['nn_4', 'nn4'],
+    topology_version: ['topology_version', 'topologyVersion'],
+    topology_updated_at: ['topology_updated_at', 'topologyUpdatedAt'],
+    relation_type: ['relation_type', 'relationType'],
   };
   return aliases[fieldName] ?? [fieldName];
 }

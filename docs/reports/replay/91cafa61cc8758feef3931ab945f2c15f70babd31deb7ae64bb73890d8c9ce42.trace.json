@@ -2,7 +2,7 @@
   "query": "which modules import the OpenAI facade or sidecar router?",
   "hash": "91cafa61cc8758feef3931ab945f2c15f70babd31deb7ae64bb73890d8c9ce42",
   "bucket": "graph-expansion",
-  "timestamp": "2026-06-19T15:45:18.947Z",
+  "timestamp": "2026-06-19T17:10:14.771Z",
   "payload": {
     "ok": true,
     "query": "which modules import the OpenAI facade or sidecar router?",
@@ -139,10 +139,10 @@
         "packet_key": "nes:utility:c0fd4797",
         "feature_id": "utility",
         "source_ref": "src/lib/server/inference/inference-router.ts",
-        "retrieved_at": "2026-06-19T15:45:18.943Z",
+        "retrieved_at": "2026-06-19T17:10:14.766Z",
         "retrieved_from": "hyperrag",
         "retrieval_confidence": 0.65,
-        "retrieval_latency_ms": 1593,
+        "retrieval_latency_ms": 1707,
         "ace_confidence": 0.9,
         "kag_aligned": false,
         "dag_reachable": true
@@ -151,10 +151,10 @@
         "packet_key": "nes:utility:c0fd4797",
         "feature_id": "utility",
         "source_ref": "src/lib/server/inference/inference-router.ts",
-        "retrieved_at": "2026-06-19T15:45:18.943Z",
+        "retrieved_at": "2026-06-19T17:10:14.766Z",
         "retrieved_from": "hyperrag",
         "retrieval_confidence": 0.65,
-        "retrieval_latency_ms": 1593,
+        "retrieval_latency_ms": 1707,
         "ace_confidence": 0.9,
         "kag_aligned": false,
         "dag_reachable": true
@@ -163,10 +163,10 @@
         "packet_key": "nes:utility:c0fd4797",
         "feature_id": "utility",
         "source_ref": "src/lib/server/inference/inference-router.ts",
-        "retrieved_at": "2026-06-19T15:45:18.943Z",
+        "retrieved_at": "2026-06-19T17:10:14.766Z",
         "retrieved_from": "hyperrag",
         "retrieval_confidence": 0.65,
-        "retrieval_latency_ms": 1593,
+        "retrieval_latency_ms": 1707,
         "ace_confidence": 0.9,
         "kag_aligned": false,
         "dag_reachable": true
@@ -175,10 +175,10 @@
         "packet_key": "nes:scripts:8df11bdb",
         "feature_id": "scripts",
         "source_ref": "src/lib/ai/client-router.ts",
-        "retrieved_at": "2026-06-19T15:45:18.943Z",
+        "retrieved_at": "2026-06-19T17:10:14.766Z",
         "retrieved_from": "hyperrag",
         "retrieval_confidence": 0.65,
-        "retrieval_latency_ms": 1593,
+        "retrieval_latency_ms": 1707,
         "ace_confidence": 0.9,
         "kag_aligned": false,
         "dag_reachable": true
@@ -187,10 +187,10 @@
         "packet_key": "nes:scripts:8df11bdb",
         "feature_id": "scripts",
         "source_ref": "src/lib/ai/client-router.ts",
-        "retrieved_at": "2026-06-19T15:45:18.943Z",
+        "retrieved_at": "2026-06-19T17:10:14.766Z",
         "retrieved_from": "hyperrag",
         "retrieval_confidence": 0.65,
-        "retrieval_latency_ms": 1593,
+        "retrieval_latency_ms": 1707,
         "ace_confidence": 0.9,
         "kag_aligned": false,
         "dag_reachable": true
@@ -203,7 +203,7 @@
       "rrf_hits": 5,
       "neo4j_expansions": 0,
       "cache_hits": 0,
-      "latency_ms": 1601
+      "latency_ms": 1716
     }
   }
 }

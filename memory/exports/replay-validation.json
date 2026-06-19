@@ -1,31 +1,31 @@
 {
-  "ts": "2026-06-10T14:13:42.702Z",
-  "sample": 302,
+  "ts": "2026-06-19T23:21:22.767Z",
+  "sample": 314,
   "threshold": 0.95,
   "passed": true,
-  "replay_rate": 1,
+  "replay_rate": 0.9618,
   "replay_success": 302,
-  "replay_failure": 0,
+  "replay_failure": 12,
   "checks": {
     "source_ref_hash": {
       "pass": 302,
-      "fail": 0,
-      "rate": 1
+      "fail": 12,
+      "rate": 0.9618
     },
     "feature_id": {
-      "pass": 302,
-      "fail": 0,
-      "rate": 1
+      "pass": 309,
+      "fail": 5,
+      "rate": 0.9841
     },
     "cluster_id": {
       "pass": 0,
-      "fail": 302,
+      "fail": 314,
       "rate": 0,
       "status": "optional_reserved"
     },
     "qdrant_found": {
       "eligible": 0,
-      "skipped_task_refs": 302,
+      "skipped_task_refs": 314,
       "found": 0,
       "missing": 0
     },

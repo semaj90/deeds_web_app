@@ -256,16 +256,22 @@ async function conceptOverlapSearch(pool, concepts, queryCtx = {}, limit = 8) {
   if (!concepts.length) return [];
   const { featureId = null, communityId = null } = queryCtx;
   try {
-    const alignFilter = (featureId || communityId !== null)
-      ? `AND (
-           ${featureId           ? `feature_id = $4`         : 'FALSE'}
-           ${featureId && communityId !== null ? 'OR' : ''}
-           ${communityId !== null ? `community_id = $5::int`  : 'FALSE'}
-         )`
-      : '';
+    const conditions = [];
+    let paramIndex = 4;
     const params = [concepts, concepts.length, limit];
-    if (featureId)            params.push(featureId);
-    if (communityId !== null) params.push(communityId);
+
+    if (featureId) {
+      conditions.push(`feature_id = $${paramIndex++}`);
+      params.push(featureId);
+    }
+    if (communityId !== null) {
+      conditions.push(`community_id = $${paramIndex++}::int`);
+      params.push(communityId);
+    }
+
+    const alignFilter = conditions.length > 0
+      ? `AND (${conditions.join(' OR ')})`
+      : '';
 
     const res = await pool.query(`
       SELECT packet_id AS id,

@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-06-13T15:07:22.746Z",
+  "generatedAt": "2026-06-19T20:31:50.285Z",
   "featureLineage": {
     "sourceRefCoveragePct": 100,
     "featureIdCoveragePct": 100,
@@ -13,20 +13,20 @@
     "avgHydrationRatio": "88.38%"
   },
   "agentTraces": {
-    "total": 1134,
-    "selectedConcepts": 1134,
+    "total": 1150,
+    "selectedConcepts": 1138,
     "retrievedPackets": 1134,
-    "toolCalls": 1134,
-    "emptySelectedConcepts": 0,
-    "emptyRetrievedPackets": 0,
+    "toolCalls": 1150,
+    "emptySelectedConcepts": 12,
+    "emptyRetrievedPackets": 16,
     "emptyToolCalls": 0,
-    "selectedConceptCoveragePct": 100,
-    "retrievedPacketCoveragePct": 100,
+    "selectedConceptCoveragePct": 98.96,
+    "retrievedPacketCoveragePct": 98.61,
     "toolCallCoveragePct": 100,
     "topRetrievalStrategies": [
       {
         "retrieval_strategy": "fusion",
-        "hits": 396
+        "hits": 408
       },
       {
         "retrieval_strategy": "lexical_only",
@@ -43,11 +43,15 @@
       {
         "retrieval_strategy": "structural_only",
         "hits": 184
+      },
+      {
+        "retrieval_strategy": "structural",
+        "hits": 4
       }
     ],
     "outcomeCounts": {
-      "success": 991,
-      "partial": 102,
+      "success": 1003,
+      "partial": 106,
       "failure": 41
     }
   },

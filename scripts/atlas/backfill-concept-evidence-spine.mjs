@@ -1,13 +1,16 @@
 #!/usr/bin/env node
 import fs from 'node:fs/promises';
 import path from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath, pathToFileURL } from 'node:url';
+import { loadAtlasEnv } from './load-atlas-env.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, '../..');
 const APPLY = process.argv.includes('--apply');
 const VERBOSE = process.argv.includes('--verbose');
 const SAVE = process.argv.includes('--save');
+
+loadAtlasEnv(ROOT);
 
 function createAceKagDagHit(packetKind, packetKey, sourceRef, featureId, evidence) {
   return {
@@ -43,7 +46,7 @@ function canApply(hit) {
 }
 
 async function getDb() {
-  const pgModule = await import(path.resolve(ROOT, 'sveltekit-frontend/node_modules/pg'));
+  const pgModule = await import(pathToFileURL(path.resolve(ROOT, 'sveltekit-frontend/node_modules/pg/lib/index.js')).href);
   const { Pool } = pgModule.default;
   const databaseUrl = process.env.DATABASE_URL;
   if (!databaseUrl) throw new Error('DATABASE_URL env var not set');

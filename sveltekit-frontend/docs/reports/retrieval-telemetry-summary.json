@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-06-12T02:32:27.107Z",
+  "generatedAt": "2026-06-19T22:22:33.134Z",
   "phase": "3D",
   "name": "retrieval-telemetry",
   "classification": "COLLECTING",
@@ -49,23 +49,27 @@
       "environment",
       "retrieval_strategy"
     ],
-    "rows": 151,
-    "realRows": 150,
+    "rows": 306,
+    "realRows": 305,
     "smokeRows": 1,
     "error": null
   },
   "metrics": {
-    "queryCount": 151,
-    "realQueryCount": 150,
+    "queryCount": 306,
+    "realQueryCount": 305,
     "smokeQueryCount": 1,
-    "uniqueQueries": 151,
-    "meanLatencyMs": 151.48,
-    "p50LatencyMs": 150,
-    "p95LatencyMs": 243.5,
-    "p99LatencyMs": 248.5,
-    "cacheHitRatio": 0.1921
+    "uniqueQueries": 227,
+    "meanLatencyMs": 1776.17,
+    "p50LatencyMs": 215,
+    "p95LatencyMs": 4244.5,
+    "p99LatencyMs": 31612.65,
+    "cacheHitRatio": 0.0948
   },
   "bySurface": [
+    {
+      "surface": "hyperrag-packet-rpc",
+      "rows": 155
+    },
     {
       "surface": "search_api",
       "rows": 150
@@ -77,15 +81,19 @@
   ],
   "topFeatures": [
     {
+      "feature_id": "database_orm",
+      "rows": 147
+    },
+    {
+      "feature_id": "utility",
+      "rows": 23
+    },
+    {
       "feature_id": "agent_intelligence",
       "rows": 15
     },
     {
       "feature_id": "api_endpoints",
-      "rows": 15
-    },
-    {
-      "feature_id": "database_orm",
       "rows": 15
     },
     {
@@ -124,7 +132,7 @@
   "byStrategy": [
     {
       "retrieval_strategy": "fusion",
-      "rows": 100
+      "rows": 255
     },
     {
       "retrieval_strategy": "lexical_only",

@@ -1,0 +1,12 @@
+{
+  "generatedAt": "2026-06-19T17:58:38.015Z",
+  "mode": "DRY_RUN",
+  "collection": "codebase_chunks_768",
+  "totalEntries": 20702,
+  "qdrantPayloadsLoaded": 53,
+  "hydrated": 53,
+  "canonical": 0,
+  "legacyExcluded": 53,
+  "stillUnidentified": 20649,
+  "latentPath": "C:\\Users\\james\\Videos\\deeds-web-app\\models\\autoencoder\\autoencoder_latent_index.json"
+}

@@ -104,8 +104,19 @@ async function main() {
   }
 
   try {
+    const hasMetadata = cols.has('metadata');
+    const hasFilePath = cols.has('file_path');
+    const hasSourceRefKey = cols.has('source_ref_key');
+    const hasArtifactId = cols.has('artifact_id');
+
+    let selectList = ['packet_id', 'packet_key', 'source_ref', 'payload'];
+    if (hasMetadata) selectList.push('metadata');
+    if (hasFilePath) selectList.push('file_path');
+    if (hasSourceRefKey) selectList.push('source_ref_key');
+    if (hasArtifactId) selectList.push('artifact_id');
+
     let query = `
-      SELECT packet_id, artifact_id, source_ref, payload
+      SELECT ${selectList.join(', ')}
       FROM atlas_packets
       WHERE source_ref LIKE '.tmp/%'
          OR source_ref LIKE 'tmp/%'
@@ -141,10 +152,28 @@ async function main() {
         // Try to extract real path from payload
         let rawPath = extractPathFromPayload(payload);
 
-        // Fall back to artifact_id if it looks like a path
-        if (!rawPath && row.artifact_id && !row.artifact_id.includes('parent_atlas_packets')) {
-          if (row.artifact_id.includes('/') || row.artifact_id.includes('\\')) {
-            rawPath = row.artifact_id;
+        // Robust fallback path detection from other fields
+        if (!rawPath) {
+          const metadata = row.metadata ?? {};
+          const fallbackCandidates = [
+            row.source_ref,
+            row.source_ref_key,
+            row.file_path,
+            metadata.source_ref,
+            metadata.canonical_source_ref,
+            payload.source_ref,
+            payload.file_path,
+            row.packet_key,
+            row.artifact_id
+          ];
+
+          for (const cand of fallbackCandidates) {
+            if (cand && typeof cand === 'string' && cand.length > 0 && !cand.includes('parent_atlas_packets') && !cand.startsWith('.tmp')) {
+              if (cand.includes('/') || cand.includes('\\') || cand.includes('.')) {
+                rawPath = cand;
+                break;
+              }
+            }
           }
         }
 
@@ -170,6 +199,7 @@ async function main() {
 
         const updates = {
           source_ref: canonRef,
+          source_ref_key: canonRef,
           source_path: rawPath,
           source_kind: sourceKind,
           packet_key: packetKey,

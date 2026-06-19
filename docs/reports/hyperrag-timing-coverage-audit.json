@@ -1,0 +1,53 @@
+{
+  "generatedAt": "2026-06-19T22:27:59.739Z",
+  "status": "READY",
+  "rows": 524,
+  "distinctQueries": 15,
+  "cacheHitRows": 405,
+  "coverage": {
+    "qdrant": {
+      "count": 524,
+      "pct": 100
+    },
+    "bm25": {
+      "count": 524,
+      "pct": 100
+    },
+    "redis": {
+      "count": 524,
+      "pct": 100
+    },
+    "neo4j": {
+      "count": 524,
+      "pct": 100
+    },
+    "rerank": {
+      "count": 524,
+      "pct": 100
+    },
+    "total": {
+      "count": 524,
+      "pct": 100
+    },
+    "route": {
+      "count": 1,
+      "pct": 0.19
+    },
+    "result_count": {
+      "count": 1,
+      "pct": 0.19
+    }
+  },
+  "latency": {
+    "p50TotalMs": 2,
+    "p95TotalMs": 41,
+    "p50QdrantMs": 0,
+    "p95QdrantMs": 0
+  },
+  "failingFields": [],
+  "contract": {
+    "oneRowPerQueryWriter": "hyperrag-packet-rpc recordQueryEvalTimes",
+    "behavioralTelemetryWriter": "retrieval-recorder retrieval_telemetry",
+    "fusionTimingStorage": "payload/fusion trace; no new scalar column required"
+  }
+}

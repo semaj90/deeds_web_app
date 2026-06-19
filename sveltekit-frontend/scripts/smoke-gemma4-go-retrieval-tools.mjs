@@ -65,7 +65,10 @@ function printSummary() {
 // ── Load source files ─────────────────────────────────────────────────────────
 
 const mcpSrc   = readFileSync(resolve(ROOT, 'src/mcp/trace-mcp-server.ts'), 'utf8');
-const agentSrc = readFileSync(resolve(ROOT, 'src/lib/server/ai/gemma4-agent.ts'), 'utf8');
+const agentSrc = readFileSync(
+  resolve(ROOT, 'src/lib/server/features/ai/ai/gemma4-agent.ts'),
+  'utf8',
+);
 const llamaSrc = readFileSync(resolve(ROOT, 'src/lib/server/ai/llama-tool-definitions.ts'), 'utf8');
 
 // ── GRT1: trace.kag_search tries Go retrieval service FIRST ──────────────────
@@ -86,11 +89,11 @@ gate('GRT1', 'trace.kag_search Go retrieval primary path', () => {
 // A `catch { /* fall through` comment must follow the Go retrieval block.
 
 gate('GRT2', 'trace.kag_search degradation-safe fallback', () => {
-  const goIdx    = mcpSrc.indexOf('GO_RETRIEVAL_URL');
-  if (goIdx < 0) return false;
-  // The catch that bridges Go→SvelteKit must come after the Go fetch block
-  const catchIdx = mcpSrc.indexOf('} catch { /* fall through', goIdx);
-  return catchIdx > goIdx;
+  const handlerStart = mcpSrc.indexOf("'trace.kag_search'");
+  const handlerEnd = mcpSrc.indexOf('// ── trace.graphrag_search', handlerStart);
+  if (handlerStart < 0 || handlerEnd < 0) return false;
+  const handler = mcpSrc.slice(handlerStart, handlerEnd);
+  return /catch\s*\{\s*\/\*\s*fall through to SvelteKit\s*\*\//s.test(handler);
 });
 
 // ── GRT3: search.go_hybrid calls go-search-service at GO_SEARCH_URL ──────────

@@ -1,0 +1,25 @@
+{
+  "generatedAt": "2026-06-19T22:24:46.612Z",
+  "status": "READY",
+  "totalRows": 307,
+  "distinctQueries": 228,
+  "duplicateQueryRows": 79,
+  "oneRowPerQueryPct": 74.27,
+  "categoryCounts": {
+    "cache_hit": 29,
+    "fusion": 256,
+    "lexical_only": 20,
+    "vector_only": 20,
+    "cold_path": 10,
+    "low_density": 160,
+    "kanban": 1,
+    "graph": 6,
+    "golden": 20
+  },
+  "missingScenarios": [],
+  "rules": {
+    "oneRowPerQuery": "Duplicate query hashes are reported, not deleted.",
+    "graph": "Classified from query text because the current table has no graph_hits column.",
+    "golden": "Recognizes the canonical retrieval E2E benchmark query set or an explicit golden marker."
+  }
+}

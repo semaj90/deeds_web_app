@@ -1,6 +1,6 @@
 # Adaptive Schema Reconciliation Report
 
-**Generated**: 2026-06-15T08:24:09.882Z
+**Generated**: 2026-06-19T17:55:08.049Z
 
 ## Summary
 
@@ -45,7 +45,7 @@
 - unaccent: ✅ installed
 
 ### Row Counts
-- atlas_packets: 0 rows
+- atlas_packets: 17985 rows
 - atlas_tree_nodes: 8823 rows
 - atlas_topology_index: 3251 rows
-- error_logs: 0 rows
+- error_logs: 5 rows
