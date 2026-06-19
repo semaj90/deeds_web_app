@@ -3,7 +3,7 @@ import crypto from 'node:crypto';
 import { ENV } from '$lib/server/env.server.js';
 import type { FTSResult } from '$lib/server/search/postgres-fts.js';
 import { expandNeighbours } from '$lib/server/search/neo4j-rerank.js';
-import { recordRetrievalTelemetry } from '../telemetry/retrieval-recorder.js';
+import { recordRetrievalTelemetry, type RetrievalHit } from '../telemetry/retrieval-recorder.js';
 import { multiLaneRetrievalWithRRF } from './rrf-integration.js';
 import { toStableFileKey } from './subgraph-seed-neighborhood.js';
 import { getRedis } from '../redis.js';
@@ -248,10 +248,26 @@ async function recordPacketRpcTelemetry(params: {
   ftsHits: number;
   vectorHits: number;
   packets: HyperRagPacketRpcPacket[];
+  timings?: {
+    bm25_ms?:    number;
+    qdrant_ms?:  number;
+    redis_ms?:   number;
+    neo4j_ms?:   number;
+    fusion_ms?:  number;
+    rerank_ms?:  number;
+  };
 }): Promise<void> {
   try {
     const packetKeys = params.packets.map((packet) => packet.packet_key).filter(Boolean);
     const featureIds = [...new Set(params.packets.map((packet) => packet.feature_id).filter((featureId): featureId is string => Boolean(featureId)))];
+
+    const hits: RetrievalHit[] = params.packets.map(p => ({
+      packet_key: p.packet_key,
+      feature_id: p.feature_id,
+      source_ref: p.source_ref,
+      fusion_score: p.fusion_score,
+      retrieval_strategy: 'fusion',
+    }));
 
     await recordRetrievalTelemetry({
       query: params.query,
@@ -268,6 +284,17 @@ async function recordPacketRpcTelemetry(params: {
       surface: 'hyperrag-packet-rpc',
       environment: 'phase-3d-retrieval-telemetry',
       retrievalStrategy: 'fusion',
+      hitsPayload: {
+        hits,
+        counts: {
+          packet_hits: params.packets.length,
+          cache_hits: 0,
+          neo4j_expansions: params.packets.reduce((sum, p) => sum + (p.neo4j_neighbors?.length ?? 0), 0),
+        }
+      },
+      timings: params.timings,
+      domainClass: params.packets[0] ? 'retrieval_pipeline' : null,
+      sourceRef: params.packets[0]?.source_ref ?? null,
     });
   } catch (err) {
     console.warn('[hyperrag-packet-rpc] telemetry record failed:', err instanceof Error ? err.message : String(err));
@@ -749,6 +776,14 @@ export async function hyperragPacketRpc(input: HyperRagPacketRpcInput): Promise<
         ftsHits: ftsHits.length,
         vectorHits: result.trace.qdrant_hits,
         packets,
+        timings: {
+          bm25_ms: timings.bm25_ms,
+          qdrant_ms: timings.qdrant_ms,
+          redis_ms: effectiveRedisMs,
+          neo4j_ms: timings.neo4j_ms,
+          fusion_ms: timings.rrf_ms,
+          rerank_ms: timings.gemma4_ms,
+        }
       });
       if (input.awaitTelemetry) {
         await telemetry;

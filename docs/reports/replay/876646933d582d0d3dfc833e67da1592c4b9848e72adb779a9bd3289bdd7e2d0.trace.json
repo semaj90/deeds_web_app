@@ -1,0 +1,112 @@
+{
+  "query": "what is the default collection name for Qdrant semantic search?",
+  "hash": "876646933d582d0d3dfc833e67da1592c4b9848e72adb779a9bd3289bdd7e2d0",
+  "bucket": "cache-hit",
+  "timestamp": "2026-06-19T15:45:11.420Z",
+  "payload": {
+    "ok": true,
+    "query": "what is the default collection name for Qdrant semantic search?",
+    "strategy": "fusion",
+    "packets": [
+      {
+        "packet_key": "nes:utility:aee2fe2a",
+        "packet_type": "neschrom97",
+        "source_ref": "src/lib/server/db/migrations/002_enhanced_schema_with_qdrant.sql",
+        "canonical_source_ref": "src/lib/server/db/migrations/002_enhanced_schema_with_qdrant.sql",
+        "feature_id": "utility",
+        "feature_label": "utility",
+        "directory_path": "src/lib/server/db/migrations",
+        "qdrant_tags": [],
+        "neo4j_neighbors": [],
+        "retrieval_lanes": {
+          "dense": 0.01639344262295082,
+          "fts": 0,
+          "trigram": 0,
+          "jsonb": 1
+        },
+        "fusion_score": 0.01639344262295082,
+        "fusion_sources": [
+          "postgres_trigram"
+        ],
+        "gemma4_summary": "card:src/lib/server/db/migrations/002_enhanced_schema_with_qdrant.sql:63179e3d50804af4",
+        "recommended_action": "Use this packet as evidence, then verify the nearest source_ref and graph neighbors.",
+        "verification_command": "npm run smoke:hyperrag-packet-rpc",
+        "rank": 1
+      },
+      {
+        "packet_key": "nes:utility:ff0682f9",
+        "packet_type": "neschrom97",
+        "source_ref": "src/lib/server/ace/ace-agent.ts",
+        "canonical_source_ref": "src/lib/server/ace/ace-agent.ts",
+        "feature_id": "utility",
+        "feature_label": "utility",
+        "directory_path": "src/lib/server/ace",
+        "qdrant_tags": [],
+        "neo4j_neighbors": [],
+        "retrieval_lanes": {
+          "dense": 0.016129032258064516,
+          "fts": 0,
+          "trigram": 0,
+          "jsonb": 1
+        },
+        "fusion_score": 0.016129032258064516,
+        "fusion_sources": [
+          "postgres_trigram"
+        ],
+        "gemma4_summary": "card:src/lib/server/ace/ace-agent.ts:8df4c5e84e4589ac",
+        "recommended_action": "Use this packet as evidence, then verify the nearest source_ref and graph neighbors.",
+        "verification_command": "npm run smoke:hyperrag-packet-rpc",
+        "rank": 2
+      }
+    ],
+    "provenance": [
+      {
+        "packet_key": "nes:utility:aee2fe2a",
+        "feature_id": "utility",
+        "source_ref": "src/lib/server/db/migrations/002_enhanced_schema_with_qdrant.sql",
+        "retrieved_at": "2026-06-19T15:45:08.479Z",
+        "retrieved_from": "hyperrag",
+        "retrieval_confidence": 0.65,
+        "retrieval_latency_ms": 1613,
+        "ace_confidence": 0.9,
+        "kag_aligned": false,
+        "dag_reachable": true,
+        "cached_at": "2026-06-19T15:45:08.479Z"
+      },
+      {
+        "packet_key": "nes:utility:aee2fe2a",
+        "feature_id": "utility",
+        "source_ref": "src/lib/server/db/migrations/002_enhanced_schema_with_qdrant.sql",
+        "retrieved_at": "2026-06-19T15:45:11.418Z",
+        "retrieved_from": "hyperrag",
+        "retrieval_confidence": 0.65,
+        "retrieval_latency_ms": 1,
+        "ace_confidence": 0.9,
+        "kag_aligned": false,
+        "dag_reachable": true
+      },
+      {
+        "packet_key": "nes:utility:ff0682f9",
+        "feature_id": "utility",
+        "source_ref": "src/lib/server/ace/ace-agent.ts",
+        "retrieved_at": "2026-06-19T15:45:11.418Z",
+        "retrieved_from": "hyperrag",
+        "retrieval_confidence": 0.65,
+        "retrieval_latency_ms": 1,
+        "ace_confidence": 0.9,
+        "kag_aligned": false,
+        "dag_reachable": true
+      }
+    ],
+    "trace": {
+      "retrieval_strategy": "fusion",
+      "qdrant_hits": 0,
+      "postgres_hits": 2,
+      "rrf_hits": 2,
+      "neo4j_expansions": 0,
+      "cache_hits": 1,
+      "latency_ms": 14,
+      "cache_latency_ms": 14
+    }
+  }
+}

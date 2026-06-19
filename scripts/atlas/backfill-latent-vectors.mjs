@@ -1,4 +1,4 @@
-﻿#!/usr/bin/env node
+#!/usr/bin/env node
 /**
  * backfill-latent-vectors.mjs
  *
@@ -328,8 +328,24 @@ async function main() {
     try { await redis.quit(); } catch {}
   }
 
+  // Write provenance row to atlas_topology_eval_times
+  const provPool = new pg.Pool({ connectionString: DATABASE_URL });
+  await provPool.query(
+    `INSERT INTO atlas_topology_eval_times
+       (packet_key, feature_id, lane, input_dim, latent_dim,
+        encode_ms, redis_ms, postgres_ms, total_ms, cache_hit, metadata)
+     VALUES ($1, $2, 'ae_encode', $3, $4, $5, $6, $7, $8, $9, $10::jsonb)`,
+    [
+      Object.keys(latentIndex)[0] ?? '', null, INPUT_DIM, LATENT_DIM,
+      t_encode, null, null, t_encode, redis_ok,
+      JSON.stringify({ encoded_count, pg_updated, pg_skipped, model: 'autoencoder_768_128_64' })
+    ]
+  ).catch(e => console.warn('topology_eval row failed:', e.message));
+  await provPool.end();
+
   // ── Summary ────────────────────────────────────────────────────────────────
   console.log('╔══════════════════════════════════════════════════════════════════╗');
+
   console.log('║  COMPLETE                                                        ║');
   console.log('╚══════════════════════════════════════════════════════════════════╝');
   console.log(`  Vectors encoded:  ${encoded_count}`);

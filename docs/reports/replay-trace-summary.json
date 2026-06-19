@@ -1,0 +1,923 @@
+{
+  "summary": {
+    "total_queries": 50,
+    "successful_queries": 50,
+    "failed_queries": 0,
+    "cache_hits": 10,
+    "total_packets_returned": 244,
+    "avg_packets_per_query": "4.88",
+    "timestamp": "2026-06-19T15:46:04.125Z"
+  },
+  "results": [
+    {
+      "query": "where is Redis Valkey cache config wired?",
+      "hash": "4062bd7d400d22497b9de15d45991a5a4c8d9eb09a9d4c7114a411c2e875af66",
+      "bucket": "golden",
+      "cacheHit": false,
+      "packetsReturned": 5,
+      "provenanceCount": 5,
+      "strategy": "fusion",
+      "trace": {
+        "retrieval_strategy": "fts-only",
+        "qdrant_hits": 5,
+        "postgres_hits": 5,
+        "rrf_hits": 0,
+        "neo4j_expansions": 0,
+        "cache_hits": 0,
+        "latency_ms": 1636
+      }
+    },
+    {
+      "query": "how is SeaweedFS filer configured for S3 gateway?",
+      "hash": "84e5b8e38347e045f93f2bb73966ccb72e3e4ca386c539bc8d1c5b88f01f7f2e",
+      "bucket": "golden",
+      "cacheHit": false,
+      "packetsReturned": 5,
+      "provenanceCount": 5,
+      "strategy": "fusion",
+      "trace": {
+        "retrieval_strategy": "fts-only",
+        "qdrant_hits": 5,
+        "postgres_hits": 5,
+        "rrf_hits": 0,
+        "neo4j_expansions": 0,
+        "cache_hits": 0,
+        "latency_ms": 1722
+      }
+    },
+    {
+      "query": "where is the LibTorch N-API addon defined?",
+      "hash": "9a9ab02b0e53b27834af78b75a3c5ad14dd75c86c6f5b7c31e64bafd50140b06",
+      "bucket": "golden",
+      "cacheHit": false,
+      "packetsReturned": 5,
+      "provenanceCount": 5,
+      "strategy": "fusion",
+      "trace": {
+        "retrieval_strategy": "fts-only",
+        "qdrant_hits": 5,
+        "postgres_hits": 5,
+        "rrf_hits": 0,
+        "neo4j_expansions": 0,
+        "cache_hits": 0,
+        "latency_ms": 1655
+      }
+    },
+    {
+      "query": "where are the Drizzle schema files located?",
+      "hash": "0bc97f165e6d2039950d4213c5ba6b0014486175bc8264ca9ea75d7e012aa8a0",
+      "bucket": "golden",
+      "cacheHit": false,
+      "packetsReturned": 5,
+      "provenanceCount": 5,
+      "strategy": "fusion",
+      "trace": {
+        "retrieval_strategy": "fts-only",
+        "qdrant_hits": 5,
+        "postgres_hits": 5,
+        "rrf_hits": 0,
+        "neo4j_expansions": 0,
+        "cache_hits": 0,
+        "latency_ms": 1619
+      }
+    },
+    {
+      "query": "what port is reserved for SeaweedFS Filer?",
+      "hash": "19a945411e361f6a76bba525798d8e54111880581a8898a4aa3bb55581cd5e3b",
+      "bucket": "golden",
+      "cacheHit": false,
+      "packetsReturned": 5,
+      "provenanceCount": 5,
+      "strategy": "fusion",
+      "trace": {
+        "retrieval_strategy": "fts-only",
+        "qdrant_hits": 5,
+        "postgres_hits": 5,
+        "rrf_hits": 0,
+        "neo4j_expansions": 0,
+        "cache_hits": 0,
+        "latency_ms": 1604
+      }
+    },
+    {
+      "query": "how is the LangGraph planning graph structured?",
+      "hash": "d47dcb8a5884da84b4c05365c2b8fc4a94376175d2744321951e67c5c812df9c",
+      "bucket": "golden",
+      "cacheHit": false,
+      "packetsReturned": 5,
+      "provenanceCount": 5,
+      "strategy": "fusion",
+      "trace": {
+        "retrieval_strategy": "fts-only",
+        "qdrant_hits": 5,
+        "postgres_hits": 5,
+        "rrf_hits": 0,
+        "neo4j_expansions": 0,
+        "cache_hits": 0,
+        "latency_ms": 1759
+      }
+    },
+    {
+      "query": "where is the Postgres database connection pool initialized?",
+      "hash": "7e2c4e346dfed239387cfceb23fcb17a450f86cd836e52f0ae478eb534094758",
+      "bucket": "golden",
+      "cacheHit": false,
+      "packetsReturned": 5,
+      "provenanceCount": 5,
+      "strategy": "fusion",
+      "trace": {
+        "retrieval_strategy": "fts-only",
+        "qdrant_hits": 5,
+        "postgres_hits": 5,
+        "rrf_hits": 0,
+        "neo4j_expansions": 0,
+        "cache_hits": 0,
+        "latency_ms": 1596
+      }
+    },
+    {
+      "query": "how does the system handle schema migration sidecars?",
+      "hash": "31ff33313d7dcdae30800070aa9842820576ffbd9aaca843f19c2dfeaf6f4371",
+      "bucket": "golden",
+      "cacheHit": false,
+      "packetsReturned": 5,
+      "provenanceCount": 5,
+      "strategy": "fusion",
+      "trace": {
+        "retrieval_strategy": "fts-only",
+        "qdrant_hits": 5,
+        "postgres_hits": 5,
+        "rrf_hits": 0,
+        "neo4j_expansions": 0,
+        "cache_hits": 0,
+        "latency_ms": 1601
+      }
+    },
+    {
+      "query": "what is the default collection name for Qdrant semantic search?",
+      "hash": "876646933d582d0d3dfc833e67da1592c4b9848e72adb779a9bd3289bdd7e2d0",
+      "bucket": "golden",
+      "cacheHit": false,
+      "packetsReturned": 2,
+      "provenanceCount": 2,
+      "strategy": "fusion",
+      "trace": {
+        "retrieval_strategy": "fusion",
+        "qdrant_hits": 0,
+        "postgres_hits": 2,
+        "rrf_hits": 2,
+        "neo4j_expansions": 0,
+        "cache_hits": 0,
+        "latency_ms": 1620
+      }
+    },
+    {
+      "query": "how is the GPU compute worker smoke test runner executed?",
+      "hash": "40e8540e6677945fe0469c310395ec8b99c1d7609c3fa1260357b26e1eb52105",
+      "bucket": "golden",
+      "cacheHit": false,
+      "packetsReturned": 5,
+      "provenanceCount": 5,
+      "strategy": "fusion",
+      "trace": {
+        "retrieval_strategy": "fts-only",
+        "qdrant_hits": 5,
+        "postgres_hits": 5,
+        "rrf_hits": 0,
+        "neo4j_expansions": 0,
+        "cache_hits": 0,
+        "latency_ms": 1674
+      }
+    },
+    {
+      "query": "where is Redis Valkey cache config wired?",
+      "hash": "4062bd7d400d22497b9de15d45991a5a4c8d9eb09a9d4c7114a411c2e875af66",
+      "bucket": "cache-hit",
+      "cacheHit": true,
+      "packetsReturned": 5,
+      "provenanceCount": 6,
+      "strategy": "fusion",
+      "trace": {
+        "retrieval_strategy": "fts-only",
+        "qdrant_hits": 5,
+        "postgres_hits": 5,
+        "rrf_hits": 0,
+        "neo4j_expansions": 0,
+        "cache_hits": 1,
+        "latency_ms": 13,
+        "cache_latency_ms": 13
+      }
+    },
+    {
+      "query": "how is SeaweedFS filer configured for S3 gateway?",
+      "hash": "84e5b8e38347e045f93f2bb73966ccb72e3e4ca386c539bc8d1c5b88f01f7f2e",
+      "bucket": "cache-hit",
+      "cacheHit": true,
+      "packetsReturned": 5,
+      "provenanceCount": 6,
+      "strategy": "fusion",
+      "trace": {
+        "retrieval_strategy": "fts-only",
+        "qdrant_hits": 5,
+        "postgres_hits": 5,
+        "rrf_hits": 0,
+        "neo4j_expansions": 0,
+        "cache_hits": 1,
+        "latency_ms": 26,
+        "cache_latency_ms": 26
+      }
+    },
+    {
+      "query": "where is the LibTorch N-API addon defined?",
+      "hash": "9a9ab02b0e53b27834af78b75a3c5ad14dd75c86c6f5b7c31e64bafd50140b06",
+      "bucket": "cache-hit",
+      "cacheHit": true,
+      "packetsReturned": 5,
+      "provenanceCount": 6,
+      "strategy": "fusion",
+      "trace": {
+        "retrieval_strategy": "fts-only",
+        "qdrant_hits": 5,
+        "postgres_hits": 5,
+        "rrf_hits": 0,
+        "neo4j_expansions": 0,
+        "cache_hits": 1,
+        "latency_ms": 29,
+        "cache_latency_ms": 29
+      }
+    },
+    {
+      "query": "where are the Drizzle schema files located?",
+      "hash": "0bc97f165e6d2039950d4213c5ba6b0014486175bc8264ca9ea75d7e012aa8a0",
+      "bucket": "cache-hit",
+      "cacheHit": true,
+      "packetsReturned": 5,
+      "provenanceCount": 6,
+      "strategy": "fusion",
+      "trace": {
+        "retrieval_strategy": "fts-only",
+        "qdrant_hits": 5,
+        "postgres_hits": 5,
+        "rrf_hits": 0,
+        "neo4j_expansions": 0,
+        "cache_hits": 1,
+        "latency_ms": 12,
+        "cache_latency_ms": 12
+      }
+    },
+    {
+      "query": "what port is reserved for SeaweedFS Filer?",
+      "hash": "19a945411e361f6a76bba525798d8e54111880581a8898a4aa3bb55581cd5e3b",
+      "bucket": "cache-hit",
+      "cacheHit": true,
+      "packetsReturned": 5,
+      "provenanceCount": 6,
+      "strategy": "fusion",
+      "trace": {
+        "retrieval_strategy": "fts-only",
+        "qdrant_hits": 5,
+        "postgres_hits": 5,
+        "rrf_hits": 0,
+        "neo4j_expansions": 0,
+        "cache_hits": 1,
+        "latency_ms": 15,
+        "cache_latency_ms": 15
+      }
+    },
+    {
+      "query": "how is the LangGraph planning graph structured?",
+      "hash": "d47dcb8a5884da84b4c05365c2b8fc4a94376175d2744321951e67c5c812df9c",
+      "bucket": "cache-hit",
+      "cacheHit": true,
+      "packetsReturned": 5,
+      "provenanceCount": 6,
+      "strategy": "fusion",
+      "trace": {
+        "retrieval_strategy": "fts-only",
+        "qdrant_hits": 5,
+        "postgres_hits": 5,
+        "rrf_hits": 0,
+        "neo4j_expansions": 0,
+        "cache_hits": 1,
+        "latency_ms": 14,
+        "cache_latency_ms": 14
+      }
+    },
+    {
+      "query": "where is the Postgres database connection pool initialized?",
+      "hash": "7e2c4e346dfed239387cfceb23fcb17a450f86cd836e52f0ae478eb534094758",
+      "bucket": "cache-hit",
+      "cacheHit": true,
+      "packetsReturned": 5,
+      "provenanceCount": 6,
+      "strategy": "fusion",
+      "trace": {
+        "retrieval_strategy": "fts-only",
+        "qdrant_hits": 5,
+        "postgres_hits": 5,
+        "rrf_hits": 0,
+        "neo4j_expansions": 0,
+        "cache_hits": 1,
+        "latency_ms": 14,
+        "cache_latency_ms": 14
+      }
+    },
+    {
+      "query": "how does the system handle schema migration sidecars?",
+      "hash": "31ff33313d7dcdae30800070aa9842820576ffbd9aaca843f19c2dfeaf6f4371",
+      "bucket": "cache-hit",
+      "cacheHit": true,
+      "packetsReturned": 5,
+      "provenanceCount": 6,
+      "strategy": "fusion",
+      "trace": {
+        "retrieval_strategy": "fts-only",
+        "qdrant_hits": 5,
+        "postgres_hits": 5,
+        "rrf_hits": 0,
+        "neo4j_expansions": 0,
+        "cache_hits": 1,
+        "latency_ms": 27,
+        "cache_latency_ms": 27
+      }
+    },
+    {
+      "query": "what is the default collection name for Qdrant semantic search?",
+      "hash": "876646933d582d0d3dfc833e67da1592c4b9848e72adb779a9bd3289bdd7e2d0",
+      "bucket": "cache-hit",
+      "cacheHit": true,
+      "packetsReturned": 2,
+      "provenanceCount": 3,
+      "strategy": "fusion",
+      "trace": {
+        "retrieval_strategy": "fusion",
+        "qdrant_hits": 0,
+        "postgres_hits": 2,
+        "rrf_hits": 2,
+        "neo4j_expansions": 0,
+        "cache_hits": 1,
+        "latency_ms": 14,
+        "cache_latency_ms": 14
+      }
+    },
+    {
+      "query": "how is the GPU compute worker smoke test runner executed?",
+      "hash": "40e8540e6677945fe0469c310395ec8b99c1d7609c3fa1260357b26e1eb52105",
+      "bucket": "cache-hit",
+      "cacheHit": true,
+      "packetsReturned": 5,
+      "provenanceCount": 6,
+      "strategy": "fusion",
+      "trace": {
+        "retrieval_strategy": "fts-only",
+        "qdrant_hits": 5,
+        "postgres_hits": 5,
+        "rrf_hits": 0,
+        "neo4j_expansions": 0,
+        "cache_hits": 1,
+        "latency_ms": 13,
+        "cache_latency_ms": 13
+      }
+    },
+    {
+      "query": "which files depend on the database schema client?",
+      "hash": "09acfdc05bd3e3e3aa5fde6ab9dae37f617d62930042338f90ac59c49549436e",
+      "bucket": "graph-expansion",
+      "cacheHit": false,
+      "packetsReturned": 5,
+      "provenanceCount": 5,
+      "strategy": "fusion",
+      "trace": {
+        "retrieval_strategy": "fts-only",
+        "qdrant_hits": 5,
+        "postgres_hits": 5,
+        "rrf_hits": 0,
+        "neo4j_expansions": 0,
+        "cache_hits": 0,
+        "latency_ms": 1793
+      }
+    },
+    {
+      "query": "what is the relationship between atlas_packets and concept_records?",
+      "hash": "c02a581af4e06a353f835ee0d10e522291b3aa0772f2c071597b5a8e1cb47b86",
+      "bucket": "graph-expansion",
+      "cacheHit": false,
+      "packetsReturned": 5,
+      "provenanceCount": 5,
+      "strategy": "fusion",
+      "trace": {
+        "retrieval_strategy": "fts-only",
+        "qdrant_hits": 5,
+        "postgres_hits": 5,
+        "rrf_hits": 0,
+        "neo4j_expansions": 0,
+        "cache_hits": 0,
+        "latency_ms": 1936
+      }
+    },
+    {
+      "query": "how are the error clusters linked to route health metrics?",
+      "hash": "97ee05a38e00b806986ecf81b6c5fa91e41175eb349a2558e31a77e968ff6f77",
+      "bucket": "graph-expansion",
+      "cacheHit": false,
+      "packetsReturned": 5,
+      "provenanceCount": 5,
+      "strategy": "fusion",
+      "trace": {
+        "retrieval_strategy": "fts-only",
+        "qdrant_hits": 5,
+        "postgres_hits": 5,
+        "rrf_hits": 0,
+        "neo4j_expansions": 0,
+        "cache_hits": 0,
+        "latency_ms": 1624
+      }
+    },
+    {
+      "query": "which modules import the OpenAI facade or sidecar router?",
+      "hash": "91cafa61cc8758feef3931ab945f2c15f70babd31deb7ae64bb73890d8c9ce42",
+      "bucket": "graph-expansion",
+      "cacheHit": false,
+      "packetsReturned": 5,
+      "provenanceCount": 5,
+      "strategy": "fusion",
+      "trace": {
+        "retrieval_strategy": "fusion",
+        "qdrant_hits": 0,
+        "postgres_hits": 5,
+        "rrf_hits": 5,
+        "neo4j_expansions": 0,
+        "cache_hits": 0,
+        "latency_ms": 1601
+      }
+    },
+    {
+      "query": "show imports and dependents of the retrieval recorder",
+      "hash": "503693625e5b4db6742d986d2a7f0d1295202565a84b5974aba240b73f312ea2",
+      "bucket": "graph-expansion",
+      "cacheHit": false,
+      "packetsReturned": 5,
+      "provenanceCount": 5,
+      "strategy": "fusion",
+      "trace": {
+        "retrieval_strategy": "fts-only",
+        "qdrant_hits": 5,
+        "postgres_hits": 5,
+        "rrf_hits": 0,
+        "neo4j_expansions": 0,
+        "cache_hits": 0,
+        "latency_ms": 1622
+      }
+    },
+    {
+      "query": "how are codebase embeddings connected to codebase files?",
+      "hash": "e7f49ba3da4152e293845e015d4a9aab3a3e9b05662f0ab2f43c542ff581392f",
+      "bucket": "graph-expansion",
+      "cacheHit": false,
+      "packetsReturned": 5,
+      "provenanceCount": 5,
+      "strategy": "fusion",
+      "trace": {
+        "retrieval_strategy": "fts-only",
+        "qdrant_hits": 5,
+        "postgres_hits": 5,
+        "rrf_hits": 0,
+        "neo4j_expansions": 0,
+        "cache_hits": 0,
+        "latency_ms": 1597
+      }
+    },
+    {
+      "query": "what is the link between parent atlas documents and card registry?",
+      "hash": "162a39c6aff9d6e28d79dcb57665037c5c46b95e6b7660983cbf422d45d34497",
+      "bucket": "graph-expansion",
+      "cacheHit": false,
+      "packetsReturned": 5,
+      "provenanceCount": 5,
+      "strategy": "fusion",
+      "trace": {
+        "retrieval_strategy": "fts-only",
+        "qdrant_hits": 5,
+        "postgres_hits": 5,
+        "rrf_hits": 0,
+        "neo4j_expansions": 0,
+        "cache_hits": 0,
+        "latency_ms": 1600
+      }
+    },
+    {
+      "query": "which components interact with the Redis cache gateway?",
+      "hash": "eda56c543536fb611c1040102f71783fe4d99f73134f802a859864815a1fe195",
+      "bucket": "graph-expansion",
+      "cacheHit": false,
+      "packetsReturned": 5,
+      "provenanceCount": 5,
+      "strategy": "fusion",
+      "trace": {
+        "retrieval_strategy": "fts-only",
+        "qdrant_hits": 5,
+        "postgres_hits": 5,
+        "rrf_hits": 0,
+        "neo4j_expansions": 0,
+        "cache_hits": 0,
+        "latency_ms": 1599
+      }
+    },
+    {
+      "query": "what calls the N-API autoencoderEncode function?",
+      "hash": "c3a1c45bf64e8b43d36fab05344ba891b863268198fddaa57b1853c182e816ba",
+      "bucket": "graph-expansion",
+      "cacheHit": false,
+      "packetsReturned": 5,
+      "provenanceCount": 5,
+      "strategy": "fusion",
+      "trace": {
+        "retrieval_strategy": "fts-only",
+        "qdrant_hits": 5,
+        "postgres_hits": 5,
+        "rrf_hits": 0,
+        "neo4j_expansions": 0,
+        "cache_hits": 0,
+        "latency_ms": 1586
+      }
+    },
+    {
+      "query": "how does the route param guard script communicate with svelte check?",
+      "hash": "e48d795d4260251f8e53cc234ec486c3c38f2277e16548fda8746c568416189d",
+      "bucket": "graph-expansion",
+      "cacheHit": false,
+      "packetsReturned": 5,
+      "provenanceCount": 5,
+      "strategy": "fusion",
+      "trace": {
+        "retrieval_strategy": "fts-only",
+        "qdrant_hits": 5,
+        "postgres_hits": 5,
+        "rrf_hits": 0,
+        "neo4j_expansions": 0,
+        "cache_hits": 0,
+        "latency_ms": 1614
+      }
+    },
+    {
+      "query": "how is SDXL image generation service URL defined?",
+      "hash": "66eda1f16b56a351169a40455dc2ac966c297b344cfb038a8361114e73f469fe",
+      "bucket": "low-density",
+      "cacheHit": false,
+      "packetsReturned": 5,
+      "provenanceCount": 5,
+      "strategy": "fusion",
+      "trace": {
+        "retrieval_strategy": "fts-only",
+        "qdrant_hits": 5,
+        "postgres_hits": 5,
+        "rrf_hits": 0,
+        "neo4j_expansions": 0,
+        "cache_hits": 0,
+        "latency_ms": 1620
+      }
+    },
+    {
+      "query": "where is ibm/granite-docling:258m configured?",
+      "hash": "17346cf4ef85ef1f5cc79af37d27afa52e4e56018baa7a4289025214c54897c8",
+      "bucket": "low-density",
+      "cacheHit": false,
+      "packetsReturned": 5,
+      "provenanceCount": 5,
+      "strategy": "fusion",
+      "trace": {
+        "retrieval_strategy": "fts-only",
+        "qdrant_hits": 5,
+        "postgres_hits": 5,
+        "rrf_hits": 0,
+        "neo4j_expansions": 0,
+        "cache_hits": 0,
+        "latency_ms": 1608
+      }
+    },
+    {
+      "query": "what is the fallback logic for feature ID placement?",
+      "hash": "b375abfc0632570c381102fbf7e284b2fcde00b8871a8087900357a0d2bf57a8",
+      "bucket": "low-density",
+      "cacheHit": false,
+      "packetsReturned": 5,
+      "provenanceCount": 5,
+      "strategy": "fusion",
+      "trace": {
+        "retrieval_strategy": "fts-only",
+        "qdrant_hits": 5,
+        "postgres_hits": 5,
+        "rrf_hits": 0,
+        "neo4j_expansions": 0,
+        "cache_hits": 0,
+        "latency_ms": 1620
+      }
+    },
+    {
+      "query": "where is ComfyUI submit workflow smoke test located?",
+      "hash": "1ebda5411ddbb262d074adb32460ec4eb2e0ecab3e05fdb9e8c3bd3b1c0a742f",
+      "bucket": "low-density",
+      "cacheHit": false,
+      "packetsReturned": 5,
+      "provenanceCount": 5,
+      "strategy": "fusion",
+      "trace": {
+        "retrieval_strategy": "fts-only",
+        "qdrant_hits": 5,
+        "postgres_hits": 5,
+        "rrf_hits": 0,
+        "neo4j_expansions": 0,
+        "cache_hits": 0,
+        "latency_ms": 1617
+      }
+    },
+    {
+      "query": "how is the Triton VLM model routing configured?",
+      "hash": "10c593762107b021e97d45a51e060e27b35e32736e2395f682b9a64142855be2",
+      "bucket": "low-density",
+      "cacheHit": false,
+      "packetsReturned": 5,
+      "provenanceCount": 5,
+      "strategy": "fusion",
+      "trace": {
+        "retrieval_strategy": "fts-only",
+        "qdrant_hits": 5,
+        "postgres_hits": 5,
+        "rrf_hits": 0,
+        "neo4j_expansions": 0,
+        "cache_hits": 0,
+        "latency_ms": 1607
+      }
+    },
+    {
+      "query": "what is the purpose of the orphaned GenerationService gRPC?",
+      "hash": "ddb6bf0d45916bef1754fd2d2e8c6120a42f4161086f92b68f33d44868878771",
+      "bucket": "low-density",
+      "cacheHit": false,
+      "packetsReturned": 5,
+      "provenanceCount": 5,
+      "strategy": "fusion",
+      "trace": {
+        "retrieval_strategy": "fts-only",
+        "qdrant_hits": 5,
+        "postgres_hits": 5,
+        "rrf_hits": 0,
+        "neo4j_expansions": 0,
+        "cache_hits": 0,
+        "latency_ms": 1654
+      }
+    },
+    {
+      "query": "where is the WebGPU PageRank benchmark defined?",
+      "hash": "15fa9ec01597a2443e646158b0de6ad8f6a3d7e6f00bb1f60c9e0d8b1362652e",
+      "bucket": "low-density",
+      "cacheHit": false,
+      "packetsReturned": 5,
+      "provenanceCount": 5,
+      "strategy": "fusion",
+      "trace": {
+        "retrieval_strategy": "fts-only",
+        "qdrant_hits": 5,
+        "postgres_hits": 5,
+        "rrf_hits": 0,
+        "neo4j_expansions": 0,
+        "cache_hits": 0,
+        "latency_ms": 1663
+      }
+    },
+    {
+      "query": "how is the ComfyUI client strict check executed?",
+      "hash": "9ff2cc2a393f32061128d1d40c2d6a35f03786b78e790486a8491efcdbe14618",
+      "bucket": "low-density",
+      "cacheHit": false,
+      "packetsReturned": 5,
+      "provenanceCount": 5,
+      "strategy": "fusion",
+      "trace": {
+        "retrieval_strategy": "fts-only",
+        "qdrant_hits": 5,
+        "postgres_hits": 5,
+        "rrf_hits": 0,
+        "neo4j_expansions": 0,
+        "cache_hits": 0,
+        "latency_ms": 1613
+      }
+    },
+    {
+      "query": "where are the ComfyUI workflow JSON files stored?",
+      "hash": "5a58bf9ec39db24724dd1d77e5645cbe4173f7812960e4e87db3dc4bdf88989e",
+      "bucket": "low-density",
+      "cacheHit": false,
+      "packetsReturned": 5,
+      "provenanceCount": 5,
+      "strategy": "fusion",
+      "trace": {
+        "retrieval_strategy": "fts-only",
+        "qdrant_hits": 5,
+        "postgres_hits": 5,
+        "rrf_hits": 0,
+        "neo4j_expansions": 0,
+        "cache_hits": 0,
+        "latency_ms": 1617
+      }
+    },
+    {
+      "query": "what is the fallback configuration for RabbitMQ DLQ?",
+      "hash": "6f2e783e4aaf7857c603e38508d581862c618f1bb2abd31aaf927fd01c740651",
+      "bucket": "low-density",
+      "cacheHit": false,
+      "packetsReturned": 5,
+      "provenanceCount": 5,
+      "strategy": "fusion",
+      "trace": {
+        "retrieval_strategy": "fts-only",
+        "qdrant_hits": 5,
+        "postgres_hits": 5,
+        "rrf_hits": 0,
+        "neo4j_expansions": 0,
+        "cache_hits": 0,
+        "latency_ms": 1625
+      }
+    },
+    {
+      "query": "audit feature_id coverage in atlas_packets",
+      "hash": "df2b7bac3c0d5fa43fad5e1eac6a9a8532b1ddf4f60366eba2d0210998886163",
+      "bucket": "kanban-recommendation",
+      "cacheHit": false,
+      "packetsReturned": 5,
+      "provenanceCount": 5,
+      "strategy": "fusion",
+      "trace": {
+        "retrieval_strategy": "fts-only",
+        "qdrant_hits": 5,
+        "postgres_hits": 5,
+        "rrf_hits": 0,
+        "neo4j_expansions": 0,
+        "cache_hits": 0,
+        "latency_ms": 1614
+      }
+    },
+    {
+      "query": "how to resolve duplicate RETRIEVAL_GRPC_URL keys in env.server.ts?",
+      "hash": "3c44975ac9e8b9a17f18e45d338ded980303ee08b3a836896b082f6a34fff4bc",
+      "bucket": "kanban-recommendation",
+      "cacheHit": false,
+      "packetsReturned": 5,
+      "provenanceCount": 5,
+      "strategy": "fusion",
+      "trace": {
+        "retrieval_strategy": "fts-only",
+        "qdrant_hits": 5,
+        "postgres_hits": 5,
+        "rrf_hits": 0,
+        "neo4j_expansions": 0,
+        "cache_hits": 0,
+        "latency_ms": 1643
+      }
+    },
+    {
+      "query": "what are the open lanes for Phase 20.6?",
+      "hash": "25121c15090637bba092713697ddea00a1606edd753a6b5d112b3a82d5c0575e",
+      "bucket": "kanban-recommendation",
+      "cacheHit": false,
+      "packetsReturned": 5,
+      "provenanceCount": 5,
+      "strategy": "fusion",
+      "trace": {
+        "retrieval_strategy": "fts-only",
+        "qdrant_hits": 5,
+        "postgres_hits": 5,
+        "rrf_hits": 0,
+        "neo4j_expansions": 0,
+        "cache_hits": 0,
+        "latency_ms": 1638
+      }
+    },
+    {
+      "query": "how is the SOM centroid codebook initialized?",
+      "hash": "9b72c13d008100ab082c4ffe12833242903e8b84afad950f2b5d4610ab3d1c46",
+      "bucket": "kanban-recommendation",
+      "cacheHit": false,
+      "packetsReturned": 5,
+      "provenanceCount": 5,
+      "strategy": "fusion",
+      "trace": {
+        "retrieval_strategy": "fts-only",
+        "qdrant_hits": 5,
+        "postgres_hits": 5,
+        "rrf_hits": 0,
+        "neo4j_expansions": 0,
+        "cache_hits": 0,
+        "latency_ms": 1677
+      }
+    },
+    {
+      "query": "where is the Phase 16 truth-promotion binding implemented?",
+      "hash": "f0d9d0eb1c9199ffa70c56036f02411fdd61a2b9027a6c5c4c1f4222a619eca9",
+      "bucket": "kanban-recommendation",
+      "cacheHit": false,
+      "packetsReturned": 5,
+      "provenanceCount": 5,
+      "strategy": "fusion",
+      "trace": {
+        "retrieval_strategy": "fts-only",
+        "qdrant_hits": 5,
+        "postgres_hits": 5,
+        "rrf_hits": 0,
+        "neo4j_expansions": 0,
+        "cache_hits": 0,
+        "latency_ms": 1606
+      }
+    },
+    {
+      "query": "how to backfill latent vectors to postgres atlas_packets?",
+      "hash": "4d2a87d6c3c7cbcb9377393a0c73284f84c154d4d9e13ab9f85ad5ed37a7d8ea",
+      "bucket": "kanban-recommendation",
+      "cacheHit": false,
+      "packetsReturned": 5,
+      "provenanceCount": 5,
+      "strategy": "fusion",
+      "trace": {
+        "retrieval_strategy": "fts-only",
+        "qdrant_hits": 5,
+        "postgres_hits": 5,
+        "rrf_hits": 0,
+        "neo4j_expansions": 0,
+        "cache_hits": 0,
+        "latency_ms": 1636
+      }
+    },
+    {
+      "query": "what is the N-API call signature for autoencoderEncode?",
+      "hash": "71e28a445cbac6735fa81eea6610c6fd2c9b0d40dbce52ded4a2ca933fd89337",
+      "bucket": "kanban-recommendation",
+      "cacheHit": false,
+      "packetsReturned": 5,
+      "provenanceCount": 5,
+      "strategy": "fusion",
+      "trace": {
+        "retrieval_strategy": "fts-only",
+        "qdrant_hits": 5,
+        "postgres_hits": 5,
+        "rrf_hits": 0,
+        "neo4j_expansions": 0,
+        "cache_hits": 0,
+        "latency_ms": 1601
+      }
+    },
+    {
+      "query": "how to train the SOM 20x20 grid on latent vectors?",
+      "hash": "e4eed3eb37a0df219c505962cdcc33e7f87850a7afc10d8bf9c2207f703423f9",
+      "bucket": "kanban-recommendation",
+      "cacheHit": false,
+      "packetsReturned": 5,
+      "provenanceCount": 5,
+      "strategy": "fusion",
+      "trace": {
+        "retrieval_strategy": "fts-only",
+        "qdrant_hits": 5,
+        "postgres_hits": 5,
+        "rrf_hits": 0,
+        "neo4j_expansions": 0,
+        "cache_hits": 0,
+        "latency_ms": 1611
+      }
+    },
+    {
+      "query": "where is the retrieval evaluation times schema barrel export?",
+      "hash": "8cc4f0985238f54c8e50ed8d411f42c0037f22465d418e6425c1182737a10172",
+      "bucket": "kanban-recommendation",
+      "cacheHit": false,
+      "packetsReturned": 5,
+      "provenanceCount": 5,
+      "strategy": "fusion",
+      "trace": {
+        "retrieval_strategy": "fts-only",
+        "qdrant_hits": 5,
+        "postgres_hits": 5,
+        "rrf_hits": 0,
+        "neo4j_expansions": 0,
+        "cache_hits": 0,
+        "latency_ms": 1600
+      }
+    },
+    {
+      "query": "how to run the 10-layer audit CLI tool?",
+      "hash": "bc4e4ec8cd05e466ec5a91cc0cfc7bdf592a0acd7006d5dd25efbc564efefa95",
+      "bucket": "kanban-recommendation",
+      "cacheHit": false,
+      "packetsReturned": 5,
+      "provenanceCount": 5,
+      "strategy": "fusion",
+      "trace": {
+        "retrieval_strategy": "fts-only",
+        "qdrant_hits": 5,
+        "postgres_hits": 5,
+        "rrf_hits": 0,
+        "neo4j_expansions": 0,
+        "cache_hits": 0,
+        "latency_ms": 1607
+      }
+    }
+  ]
+}

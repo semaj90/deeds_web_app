@@ -1,0 +1,209 @@
+{
+  "query": "which modules import the OpenAI facade or sidecar router?",
+  "hash": "91cafa61cc8758feef3931ab945f2c15f70babd31deb7ae64bb73890d8c9ce42",
+  "bucket": "graph-expansion",
+  "timestamp": "2026-06-19T15:45:18.947Z",
+  "payload": {
+    "ok": true,
+    "query": "which modules import the OpenAI facade or sidecar router?",
+    "strategy": "fusion",
+    "packets": [
+      {
+        "packet_key": "nes:utility:c0fd4797",
+        "packet_type": "neschrom97",
+        "source_ref": "src/lib/server/inference/inference-router.ts",
+        "canonical_source_ref": "src/lib/server/inference/inference-router.ts",
+        "feature_id": "utility",
+        "feature_label": "utility",
+        "directory_path": "src/lib/server/inference",
+        "qdrant_tags": [],
+        "neo4j_neighbors": [],
+        "retrieval_lanes": {
+          "dense": 0.01639344262295082,
+          "fts": 0,
+          "trigram": 0,
+          "jsonb": 1
+        },
+        "fusion_score": 0.01639344262295082,
+        "fusion_sources": [
+          "postgres_trigram"
+        ],
+        "gemma4_summary": "card:src/lib/server/inference/inference-router.ts:a1983682149e0a88",
+        "recommended_action": "Use this packet as evidence, then verify the nearest source_ref and graph neighbors.",
+        "verification_command": "npm run smoke:hyperrag-packet-rpc",
+        "rank": 1
+      },
+      {
+        "packet_key": "nes:utility:c0fd4797",
+        "packet_type": "neschrom97",
+        "source_ref": "src/lib/server/inference/inference-router.ts",
+        "canonical_source_ref": "src/lib/server/inference/inference-router.ts",
+        "feature_id": "utility",
+        "feature_label": "utility",
+        "directory_path": "src/lib/server/inference",
+        "qdrant_tags": [],
+        "neo4j_neighbors": [],
+        "retrieval_lanes": {
+          "dense": 0.01639344262295082,
+          "fts": 0,
+          "trigram": 0,
+          "jsonb": 1
+        },
+        "fusion_score": 0.01639344262295082,
+        "fusion_sources": [
+          "postgres_trigram"
+        ],
+        "gemma4_summary": "card:src/lib/server/inference/inference-router.ts:c657923e7f7bf6d5",
+        "recommended_action": "Use this packet as evidence, then verify the nearest source_ref and graph neighbors.",
+        "verification_command": "npm run smoke:hyperrag-packet-rpc",
+        "rank": 2
+      },
+      {
+        "packet_key": "nes:utility:c0fd4797",
+        "packet_type": "neschrom97",
+        "source_ref": "src/lib/server/inference/inference-router.ts",
+        "canonical_source_ref": "src/lib/server/inference/inference-router.ts",
+        "feature_id": "utility",
+        "feature_label": "utility",
+        "directory_path": "src/lib/server/inference",
+        "qdrant_tags": [],
+        "neo4j_neighbors": [],
+        "retrieval_lanes": {
+          "dense": 0.01639344262295082,
+          "fts": 0,
+          "trigram": 0,
+          "jsonb": 1
+        },
+        "fusion_score": 0.01639344262295082,
+        "fusion_sources": [
+          "postgres_trigram"
+        ],
+        "gemma4_summary": "card:src/lib/server/inference/inference-router.ts:a93febedda846506",
+        "recommended_action": "Use this packet as evidence, then verify the nearest source_ref and graph neighbors.",
+        "verification_command": "npm run smoke:hyperrag-packet-rpc",
+        "rank": 3
+      },
+      {
+        "packet_key": "nes:scripts:8df11bdb",
+        "packet_type": "neschrom97",
+        "source_ref": "src/lib/ai/client-router.ts",
+        "canonical_source_ref": "src/lib/ai/client-router.ts",
+        "feature_id": "scripts",
+        "feature_label": "scripts",
+        "directory_path": "src/lib/ai",
+        "qdrant_tags": [],
+        "neo4j_neighbors": [],
+        "retrieval_lanes": {
+          "dense": 0.015873015873015872,
+          "fts": 0,
+          "trigram": 0,
+          "jsonb": 1
+        },
+        "fusion_score": 0.015873015873015872,
+        "fusion_sources": [
+          "postgres_trigram"
+        ],
+        "gemma4_summary": "card:src/lib/ai/client-router.ts:65704286f3e5740a",
+        "recommended_action": "Use this packet as evidence, then verify the nearest source_ref and graph neighbors.",
+        "verification_command": "npm run smoke:hyperrag-packet-rpc",
+        "rank": 4
+      },
+      {
+        "packet_key": "nes:scripts:8df11bdb",
+        "packet_type": "neschrom97",
+        "source_ref": "src/lib/ai/client-router.ts",
+        "canonical_source_ref": "src/lib/ai/client-router.ts",
+        "feature_id": "scripts",
+        "feature_label": "scripts",
+        "directory_path": "src/lib/ai",
+        "qdrant_tags": [],
+        "neo4j_neighbors": [],
+        "retrieval_lanes": {
+          "dense": 0.015873015873015872,
+          "fts": 0,
+          "trigram": 0,
+          "jsonb": 1
+        },
+        "fusion_score": 0.015873015873015872,
+        "fusion_sources": [
+          "postgres_trigram"
+        ],
+        "gemma4_summary": "card:src/lib/ai/client-router.ts:af1ae2ad5ed9f803",
+        "recommended_action": "Use this packet as evidence, then verify the nearest source_ref and graph neighbors.",
+        "verification_command": "npm run smoke:hyperrag-packet-rpc",
+        "rank": 5
+      }
+    ],
+    "provenance": [
+      {
+        "packet_key": "nes:utility:c0fd4797",
+        "feature_id": "utility",
+        "source_ref": "src/lib/server/inference/inference-router.ts",
+        "retrieved_at": "2026-06-19T15:45:18.943Z",
+        "retrieved_from": "hyperrag",
+        "retrieval_confidence": 0.65,
+        "retrieval_latency_ms": 1593,
+        "ace_confidence": 0.9,
+        "kag_aligned": false,
+        "dag_reachable": true
+      },
+      {
+        "packet_key": "nes:utility:c0fd4797",
+        "feature_id": "utility",
+        "source_ref": "src/lib/server/inference/inference-router.ts",
+        "retrieved_at": "2026-06-19T15:45:18.943Z",
+        "retrieved_from": "hyperrag",
+        "retrieval_confidence": 0.65,
+        "retrieval_latency_ms": 1593,
+        "ace_confidence": 0.9,
+        "kag_aligned": false,
+        "dag_reachable": true
+      },
+      {
+        "packet_key": "nes:utility:c0fd4797",
+        "feature_id": "utility",
+        "source_ref": "src/lib/server/inference/inference-router.ts",
+        "retrieved_at": "2026-06-19T15:45:18.943Z",
+        "retrieved_from": "hyperrag",
+        "retrieval_confidence": 0.65,
+        "retrieval_latency_ms": 1593,
+        "ace_confidence": 0.9,
+        "kag_aligned": false,
+        "dag_reachable": true
+      },
+      {
+        "packet_key": "nes:scripts:8df11bdb",
+        "feature_id": "scripts",
+        "source_ref": "src/lib/ai/client-router.ts",
+        "retrieved_at": "2026-06-19T15:45:18.943Z",
+        "retrieved_from": "hyperrag",
+        "retrieval_confidence": 0.65,
+        "retrieval_latency_ms": 1593,
+        "ace_confidence": 0.9,
+        "kag_aligned": false,
+        "dag_reachable": true
+      },
+      {
+        "packet_key": "nes:scripts:8df11bdb",
+        "feature_id": "scripts",
+        "source_ref": "src/lib/ai/client-router.ts",
+        "retrieved_at": "2026-06-19T15:45:18.943Z",
+        "retrieved_from": "hyperrag",
+        "retrieval_confidence": 0.65,
+        "retrieval_latency_ms": 1593,
+        "ace_confidence": 0.9,
+        "kag_aligned": false,
+        "dag_reachable": true
+      }
+    ],
+    "trace": {
+      "retrieval_strategy": "fusion",
+      "qdrant_hits": 0,
+      "postgres_hits": 5,
+      "rrf_hits": 5,
+      "neo4j_expansions": 0,
+      "cache_hits": 0,
+      "latency_ms": 1601
+    }
+  }
+}

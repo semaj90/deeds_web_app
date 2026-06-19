@@ -1,0 +1,228 @@
+{
+  "query": "how does the system handle schema migration sidecars?",
+  "hash": "31ff33313d7dcdae30800070aa9842820576ffbd9aaca843f19c2dfeaf6f4371",
+  "bucket": "cache-hit",
+  "timestamp": "2026-06-19T15:45:11.297Z",
+  "payload": {
+    "ok": true,
+    "query": "how does the system handle schema migration sidecars?",
+    "strategy": "fusion",
+    "packets": [
+      {
+        "packet_key": "hyperrag:src/lib/server/db/schema/case_notes.ts",
+        "packet_type": "chrom97",
+        "source_ref": "src/lib/server/db/schema/case_notes.ts",
+        "canonical_source_ref": "src/lib/server/db/schema/case_notes.ts",
+        "feature_id": "database_orm",
+        "feature_label": "database_orm",
+        "directory_path": "src/lib/server/db/schema",
+        "qdrant_tags": [
+          "code_file",
+          "parent_doc_backfill"
+        ],
+        "neo4j_neighbors": [],
+        "retrieval_lanes": {
+          "dense": 0,
+          "fts": 1,
+          "trigram": 0,
+          "jsonb": 1
+        },
+        "fusion_score": 0,
+        "fusion_sources": [],
+        "gemma4_summary": null,
+        "recommended_action": "Use this packet as evidence, then verify the nearest source_ref and graph neighbors.",
+        "verification_command": "npm run smoke:hyperrag-packet-rpc",
+        "rank": 1
+      },
+      {
+        "packet_key": "hyperrag:src/lib/server/db/schema/warden_audit_log.ts",
+        "packet_type": "chrom97",
+        "source_ref": "src/lib/server/db/schema/warden_audit_log.ts",
+        "canonical_source_ref": "src/lib/server/db/schema/warden_audit_log.ts",
+        "feature_id": "database_orm",
+        "feature_label": "database_orm",
+        "directory_path": "src/lib/server/db/schema",
+        "qdrant_tags": [
+          "code_file",
+          "parent_doc_backfill"
+        ],
+        "neo4j_neighbors": [],
+        "retrieval_lanes": {
+          "dense": 0,
+          "fts": 0.8,
+          "trigram": 0,
+          "jsonb": 1
+        },
+        "fusion_score": 0,
+        "fusion_sources": [],
+        "gemma4_summary": null,
+        "recommended_action": "Use this packet as evidence, then verify the nearest source_ref and graph neighbors.",
+        "verification_command": "npm run smoke:hyperrag-packet-rpc",
+        "rank": 2
+      },
+      {
+        "packet_key": "hyperrag:src/lib/server/db/schema/auto_tags.ts",
+        "packet_type": "chrom97",
+        "source_ref": "src/lib/server/db/schema/auto_tags.ts",
+        "canonical_source_ref": "src/lib/server/db/schema/auto_tags.ts",
+        "feature_id": "database_orm",
+        "feature_label": "database_orm",
+        "directory_path": "src/lib/server/db/schema",
+        "qdrant_tags": [
+          "code_file",
+          "parent_doc_backfill"
+        ],
+        "neo4j_neighbors": [],
+        "retrieval_lanes": {
+          "dense": 0,
+          "fts": 0.6,
+          "trigram": 0,
+          "jsonb": 1
+        },
+        "fusion_score": 0,
+        "fusion_sources": [],
+        "gemma4_summary": null,
+        "recommended_action": "Use this packet as evidence, then verify the nearest source_ref and graph neighbors.",
+        "verification_command": "npm run smoke:hyperrag-packet-rpc",
+        "rank": 3
+      },
+      {
+        "packet_key": "hyperrag:src/lib/server/db/schema/user_ai_queries.ts",
+        "packet_type": "chrom97",
+        "source_ref": "src/lib/server/db/schema/user_ai_queries.ts",
+        "canonical_source_ref": "src/lib/server/db/schema/user_ai_queries.ts",
+        "feature_id": "database_orm",
+        "feature_label": "database_orm",
+        "directory_path": "src/lib/server/db/schema",
+        "qdrant_tags": [
+          "code_file",
+          "parent_doc_backfill"
+        ],
+        "neo4j_neighbors": [],
+        "retrieval_lanes": {
+          "dense": 0,
+          "fts": 0.4,
+          "trigram": 0,
+          "jsonb": 1
+        },
+        "fusion_score": 0,
+        "fusion_sources": [],
+        "gemma4_summary": null,
+        "recommended_action": "Use this packet as evidence, then verify the nearest source_ref and graph neighbors.",
+        "verification_command": "npm run smoke:hyperrag-packet-rpc",
+        "rank": 4
+      },
+      {
+        "packet_key": "hyperrag:src/lib/server/db/schema/state_constitution_sources.ts",
+        "packet_type": "chrom97",
+        "source_ref": "src/lib/server/db/schema/state_constitution_sources.ts",
+        "canonical_source_ref": "src/lib/server/db/schema/state_constitution_sources.ts",
+        "feature_id": "database_orm",
+        "feature_label": "database_orm",
+        "directory_path": "src/lib/server/db/schema",
+        "qdrant_tags": [
+          "code_file",
+          "parent_doc_backfill"
+        ],
+        "neo4j_neighbors": [],
+        "retrieval_lanes": {
+          "dense": 0,
+          "fts": 0.19999999999999996,
+          "trigram": 0,
+          "jsonb": 1
+        },
+        "fusion_score": 0,
+        "fusion_sources": [],
+        "gemma4_summary": null,
+        "recommended_action": "Use this packet as evidence, then verify the nearest source_ref and graph neighbors.",
+        "verification_command": "npm run smoke:hyperrag-packet-rpc",
+        "rank": 5
+      }
+    ],
+    "provenance": [
+      {
+        "packet_key": "hyperrag:src/lib/server/db/schema/case_notes.ts",
+        "feature_id": "database_orm",
+        "source_ref": "src/lib/server/db/schema/case_notes.ts",
+        "retrieved_at": "2026-06-19T15:45:06.740Z",
+        "retrieved_from": "hyperrag",
+        "retrieval_confidence": 0.85,
+        "retrieval_latency_ms": 1596,
+        "ace_confidence": 0.9,
+        "kag_aligned": true,
+        "dag_reachable": true,
+        "cached_at": "2026-06-19T15:45:06.740Z"
+      },
+      {
+        "packet_key": "hyperrag:src/lib/server/db/schema/case_notes.ts",
+        "feature_id": "database_orm",
+        "source_ref": "src/lib/server/db/schema/case_notes.ts",
+        "retrieved_at": "2026-06-19T15:45:11.292Z",
+        "retrieved_from": "hyperrag",
+        "retrieval_confidence": 0.85,
+        "retrieval_latency_ms": 1,
+        "ace_confidence": 0.9,
+        "kag_aligned": true,
+        "dag_reachable": true
+      },
+      {
+        "packet_key": "hyperrag:src/lib/server/db/schema/warden_audit_log.ts",
+        "feature_id": "database_orm",
+        "source_ref": "src/lib/server/db/schema/warden_audit_log.ts",
+        "retrieved_at": "2026-06-19T15:45:11.292Z",
+        "retrieved_from": "hyperrag",
+        "retrieval_confidence": 0.65,
+        "retrieval_latency_ms": 1,
+        "ace_confidence": 0.9,
+        "kag_aligned": true,
+        "dag_reachable": true
+      },
+      {
+        "packet_key": "hyperrag:src/lib/server/db/schema/auto_tags.ts",
+        "feature_id": "database_orm",
+        "source_ref": "src/lib/server/db/schema/auto_tags.ts",
+        "retrieved_at": "2026-06-19T15:45:11.292Z",
+        "retrieved_from": "hyperrag",
+        "retrieval_confidence": 0.65,
+        "retrieval_latency_ms": 1,
+        "ace_confidence": 0.9,
+        "kag_aligned": true,
+        "dag_reachable": true
+      },
+      {
+        "packet_key": "hyperrag:src/lib/server/db/schema/user_ai_queries.ts",
+        "feature_id": "database_orm",
+        "source_ref": "src/lib/server/db/schema/user_ai_queries.ts",
+        "retrieved_at": "2026-06-19T15:45:11.292Z",
+        "retrieved_from": "hyperrag",
+        "retrieval_confidence": 0.65,
+        "retrieval_latency_ms": 1,
+        "ace_confidence": 0.9,
+        "kag_aligned": true,
+        "dag_reachable": true
+      },
+      {
+        "packet_key": "hyperrag:src/lib/server/db/schema/state_constitution_sources.ts",
+        "feature_id": "database_orm",
+        "source_ref": "src/lib/server/db/schema/state_constitution_sources.ts",
+        "retrieved_at": "2026-06-19T15:45:11.292Z",
+        "retrieved_from": "hyperrag",
+        "retrieval_confidence": 0.65,
+        "retrieval_latency_ms": 1,
+        "ace_confidence": 0.9,
+        "kag_aligned": true,
+        "dag_reachable": true
+      }
+    ],
+    "trace": {
+      "retrieval_strategy": "fts-only",
+      "qdrant_hits": 5,
+      "postgres_hits": 5,
+      "rrf_hits": 0,
+      "neo4j_expansions": 0,
+      "cache_hits": 1,
+      "latency_ms": 27,
+      "cache_latency_ms": 27
+    }
+  }
+}

@@ -19,7 +19,7 @@ import { buildRetrievalTrace, SCORE_WEIGHTS }     from './retrieval-explainer.js
 import { recordEvent }                            from '$lib/server/trace/trace-collector.js';
 import { createHash }                             from 'crypto';
 import { ENV } from '$lib/server/env.server.js';
-import { recordRetrievalTelemetry } from '../telemetry/retrieval-recorder.js';
+import { recordRetrievalTelemetry, type RetrievalHit } from '../telemetry/retrieval-recorder.js';
 import { determineRetrievalStrategy } from '../telemetry/ace-telemetry-emitter.js';
 
 
@@ -130,6 +130,13 @@ export async function hybridSearch(
       try {
         recordEvent(null, 'cache_hit', { cacheKey, symbolName: 'hybridSearch' });
         const parsed = JSON.parse(cached) as HybridSearchOutput;
+        const hits: RetrievalHit[] = parsed.results.map(r => ({
+          packet_key: r.stable_key,
+          feature_id: r.symbol_name ?? null,
+          source_ref: r.file_path ?? null,
+          fusion_score: r.final_score ?? null,
+          retrieval_strategy: parsed.mode as any ?? 'fusion',
+        }));
         void recordRetrievalTelemetry({
           query,
           latencyMs: 0,
@@ -145,6 +152,19 @@ export async function hybridSearch(
           surface: 'hybrid-search',
           environment: ENV.NODE_ENV ?? 'development',
           retrievalStrategy: parsed.mode as any ?? 'fusion',
+          hitsPayload: {
+            hits,
+            counts: {
+              packet_hits: parsed.results.length,
+              cache_hits: 1,
+              neo4j_expansions: 0,
+            }
+          },
+          timings: {
+            redis_ms: 0,
+          },
+          domainClass: parsed.results[0] ? 'retrieval_pipeline' : null,
+          sourceRef: parsed.results[0]?.file_path ?? null,
         }).catch(() => {});
         return parsed;
       } catch { /* fall through */ }
@@ -164,6 +184,7 @@ export async function hybridSearch(
       : searchCodeHybridPg(query, queryEmbedding, { limit: Math.ceil(limit * 2), topoClass }),
     searchQdrantCode(queryEmbedding, Math.ceil(limit * 1.5), topoClass),
   ]);
+  const parallelDuration = Date.now() - t1;
 
   // ── Merge by stable_key ───────────────────────────────────────────────────
 
@@ -240,6 +261,7 @@ export async function hybridSearch(
 
   // ── Neo4j authority enrichment ─────────────────────────────────────────────
 
+  const tNeo4j0 = Date.now();
   if (!skipNeo4j && candidates.length > 0) {
     const authorityMap = await fetchAuthorityScores(candidates.map((c) => c.stable_key));
     for (const c of candidates) {
@@ -250,6 +272,7 @@ export async function hybridSearch(
       }
     }
   }
+  const neo4jMs = !skipNeo4j && candidates.length > 0 ? Date.now() - tNeo4j0 : 0;
 
   // Sort before GPU rerank to pick the best candidates
   candidates.sort((a, b) => b.final_score - a.final_score);
@@ -257,6 +280,7 @@ export async function hybridSearch(
   // ── GPU rerank (top candidates only) ──────────────────────────────────────
 
   const useGpu = !skipGpuRerank && queryEmbedding.length > 0;
+  const tGpu0 = Date.now();
   if (useGpu) {
     const topN = candidates.slice(0, Math.min(candidates.length, limit * 3));
     const reranked = await rerankCandidates(
@@ -276,6 +300,7 @@ export async function hybridSearch(
     }
     candidates = Array.from(merged.values()).sort((a, b) => b.final_score - a.final_score);
   }
+  const gpuMs = useGpu ? Date.now() - tGpu0 : 0;
 
   const results = candidates.slice(0, limit);
 
@@ -304,6 +329,14 @@ export async function hybridSearch(
     pgHitsCount
   );
 
+  const hits: RetrievalHit[] = results.map(r => ({
+    packet_key: r.stable_key,
+    feature_id: r.symbol_name ?? null,
+    source_ref: r.file_path ?? null,
+    fusion_score: r.final_score ?? null,
+    retrieval_strategy: retrievalStrategy,
+  }));
+
   void recordRetrievalTelemetry({
     query,
     latencyMs: Date.now() - t0,
@@ -319,6 +352,22 @@ export async function hybridSearch(
     surface: 'hybrid-search',
     environment: ENV.NODE_ENV ?? 'development',
     retrievalStrategy,
+    hitsPayload: {
+      hits,
+      counts: {
+        packet_hits: results.length,
+        cache_hits: 0,
+        neo4j_expansions: 0,
+      }
+    },
+    timings: {
+      bm25_ms: parallelDuration,
+      qdrant_ms: parallelDuration,
+      neo4j_ms: neo4jMs,
+      rerank_ms: gpuMs,
+    },
+    domainClass: results[0] ? 'retrieval_pipeline' : null,
+    sourceRef: results[0]?.file_path ?? null,
   }).catch(() => {});
 
   const output: HybridSearchOutput = { results, mode, traceKey };

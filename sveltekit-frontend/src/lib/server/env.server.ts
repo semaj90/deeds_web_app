@@ -148,8 +148,6 @@ export const ENV = {
   // gRPC services
   EMBEDDING_GRPC_URL: privateEnv.EMBEDDING_GRPC_URL ?? `${LOOPBACK_IP}:50051`,
   EMBEDDING_GRPC_ENABLED: (privateEnv.EMBEDDING_GRPC_ENABLED ?? 'false') === 'true',
-  RETRIEVAL_GRPC_URL: privateEnv.RETRIEVAL_GRPC_URL ?? `${LOOPBACK_IP}:50053`,
-  RETRIEVAL_GRPC_ENABLED: (privateEnv.RETRIEVAL_GRPC_ENABLED ?? 'false') === 'true',
   /** Topology search engine — detached Node.js server (port 8101) */
   TOPOLOGY_SEARCH_URL: privateEnv.TOPOLOGY_SEARCH_URL ?? `http://${LOOPBACK_IP}:8101`,
   /** Hypergraph lookup service URL */
@@ -254,8 +252,10 @@ export const ENV = {
   BIFROST_OPENAI_BASE_URL:
     privateEnv.BIFROST_OPENAI_BASE_URL ?? `http://${LOOPBACK_IP}:3040/v1`,
   TURBOQUANT_BASE_URL: privateEnv.TURBOQUANT_BASE_URL ?? `http://${LOOPBACK_IP}:8090`,
-  // Alias — admin/inference-lane route references ENV.TURBOQUANT_URL; mirror BASE_URL.
   TURBOQUANT_URL: privateEnv.TURBOQUANT_URL ?? privateEnv.TURBOQUANT_BASE_URL ?? `http://${LOOPBACK_IP}:8090`,
+  ROTORQUANT_MODEL_PATH: privateEnv.ROTORQUANT_MODEL_PATH ?? null,
+  TURBO_MODEL_PATH: privateEnv.TURBO_MODEL_PATH ?? null,
+  TURBOQUANT_MODEL_PATH: privateEnv.TURBOQUANT_MODEL_PATH ?? null,
   TURBOVEC_SIDECAR_JSONRPC_URL: privateEnv.TURBOVEC_SIDECAR_JSONRPC_URL ?? privateEnv.TURBOVEC_SIDECAR ?? `http://${LOOPBACK_IP}:8792`,
   TURBOVEC_SIDECAR: privateEnv.TURBOVEC_SIDECAR ?? privateEnv.TURBOVEC_SIDECAR_JSONRPC_URL ?? `http://${LOOPBACK_IP}:8792`,
   RERANK_BASE_URL: privateEnv.RERANK_BASE_URL ?? privateEnv.RERANK_URL ?? `http://${LOOPBACK_IP}:8090`,
