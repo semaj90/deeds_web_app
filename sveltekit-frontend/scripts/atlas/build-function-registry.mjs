@@ -27,6 +27,35 @@ const VERBOSE   = process.argv.includes('--verbose');
 const DRY_RUN   = process.argv.includes('--dry-run');
 const OUT_DIR   = join(ROOT, 'docs', 'atlas');
 
+// ── Recursive File Scanner Helper ─────────────────────────────────────────────
+
+function getFilesRecursive(dir, fileList = []) {
+  if (!existsSync(dir)) return fileList;
+  let files;
+  try {
+    files = readdirSync(dir);
+  } catch {
+    return fileList;
+  }
+  for (const file of files) {
+    const absPath = join(dir, file);
+    let stat;
+    try {
+      stat = statSync(absPath);
+    } catch {
+      continue;
+    }
+    if (stat.isDirectory()) {
+      if (file !== 'node_modules' && file !== '.svelte-kit' && file !== 'dist' && file !== 'build' && file !== '.git') {
+        getFilesRecursive(absPath, fileList);
+      }
+    } else {
+      fileList.push(absPath);
+    }
+  }
+  return fileList;
+}
+
 // ── Layer definitions ─────────────────────────────────────────────────────────
 
 const LAYERS = [
@@ -38,8 +67,10 @@ const LAYERS = [
     topology:    'packet_store',
     scanDirs:    [
       'scripts/atlas',
-      'src/lib/server/ace',
-      'src/lib/server/db/schema',
+      'sveltekit-frontend/scripts/atlas',
+      'packages/parent-atlas',
+      'sveltekit-frontend/src/lib/server/ace',
+      'sveltekit-frontend/src/lib/server/db/schema',
     ],
     filePatterns: [
       /packet/i, /neschrom/i, /nes.chrom/i, /ace.packet/i, /ldjson/i, /materializ/i,
@@ -52,8 +83,8 @@ const LAYERS = [
     ontology:    'hyperrag_fusion',
     topology:    'core_search_entrypoint',
     scanDirs:    [
-      'src/lib/server/retrieval',
-      'src/lib/agent/tools',
+      'sveltekit-frontend/src/lib/server/retrieval',
+      'sveltekit-frontend/src/lib/agent/tools',
     ],
     filePatterns: [
       /hyperrag/i, /retrieval/i, /rrf/i, /bm25/i, /neo4j/i, /topolog/i, /turbovec/i,
@@ -68,7 +99,9 @@ const LAYERS = [
     topology:    'graph_index',
     scanDirs:    [
       'scripts/atlas',
+      'sveltekit-frontend/scripts/atlas',
       'scripts/graph',
+      'sveltekit-frontend/scripts/graph',
     ],
     filePatterns: [
       /neo4j/i, /gds/i, /sync.gds/i, /backfill.topology/i, /seed.neo4j/i,
@@ -83,7 +116,8 @@ const LAYERS = [
     topology:    'cache_mirror',
     scanDirs:    [
       'scripts/atlas',
-      'src/lib/server/retrieval',
+      'sveltekit-frontend/scripts/atlas',
+      'sveltekit-frontend/src/lib/server/retrieval',
     ],
     filePatterns: [
       /qdrant/i, /vector/i, /payload.tag/i, /mirror/i, /reconcil/i, /verify.qdrant/i,
@@ -97,7 +131,9 @@ const LAYERS = [
     topology:    'cluster_node',
     scanDirs:    [
       'scripts/atlas',
+      'sveltekit-frontend/scripts/atlas',
       'scripts',
+      'sveltekit-frontend/scripts',
     ],
     filePatterns: [
       /som/i, /cluster/i, /backfill.som/i, /train.som/i, /update.db.cluster/i,
@@ -111,7 +147,9 @@ const LAYERS = [
     topology:    'evidence_collector',
     scanDirs:    [
       'scripts/atlas',
+      'sveltekit-frontend/scripts/atlas',
       'scripts',
+      'sveltekit-frontend/scripts',
     ],
     filePatterns: [
       /runtime.evidence/i, /collect.runtime/i, /report.route/i, /route.runtime/i,
@@ -124,8 +162,8 @@ const LAYERS = [
     ontology:    'ace_assembly',
     topology:    'context_planner',
     scanDirs:    [
-      'src/lib/server/ace',
-      'src/lib/server/features/ai/ace',
+      'sveltekit-frontend/src/lib/server/ace',
+      'sveltekit-frontend/src/lib/server/features/ai/ace',
     ],
     filePatterns: [
       /ace.agent/i, /ace.hit/i, /context.assembler/i, /context.cache/i,
@@ -172,13 +210,13 @@ function scanLayer(layer) {
   const seen    = new Set();
 
   for (const relDir of layer.scanDirs) {
-    const absDir = join(ROOT, relDir);
+    const absDir = join(REPO_ROOT, relDir);
     if (!existsSync(absDir)) continue;
 
-    let files;
-    try { files = readdirSync(absDir); } catch { continue; }
+    const allFiles = getFilesRecursive(absDir);
 
-    for (const file of files) {
+    for (const absPath of allFiles) {
+      const file = basename(absPath);
       const ext = extname(file);
       if (!['.ts', '.mjs', '.js'].includes(ext)) continue;
       if (file.endsWith('.d.ts') || file.endsWith('.test.ts') || file.endsWith('.spec.ts')) continue;
@@ -186,7 +224,6 @@ function scanLayer(layer) {
       const matches = layer.filePatterns.some(p => p.test(file));
       if (!matches) continue;
 
-      const absPath = join(absDir, file);
       const relPath = relative(REPO_ROOT, absPath).replace(/\\/g, '/');
       if (seen.has(relPath)) continue;
       seen.add(relPath);

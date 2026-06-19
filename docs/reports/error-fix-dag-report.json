@@ -1,7 +1,7 @@
 {
-  "generatedAt": "2026-06-10T17:43:01.474Z",
-  "inputFindings": 0,
-  "activeStates": 0,
+  "generatedAt": "2026-06-19T05:26:46.776Z",
+  "inputFindings": 1,
+  "activeStates": 1,
   "topoOrder": [
     "env_url_mismatch",
     "ssr_safety_violation",
@@ -12,14 +12,41 @@
     "route_contract_mismatch",
     "api_validation_gap"
   ],
-  "dagNodes": [],
+  "dagNodes": [
+    {
+      "errorId": "contract:schema_mismatch",
+      "hmmState": "schema_mismatch",
+      "hmmLabel": "Schema Mismatch",
+      "hmmDescription": "Drizzle schema column type does not match the live Postgres column type.",
+      "rootCauseScore": 0.2,
+      "findingCount": 1,
+      "severity": "medium",
+      "downstreamErrors": [],
+      "kagRecall": [],
+      "recommendedOrder": 5,
+      "validationCommands": [
+        "npm run db:check",
+        "npm run audit:contracts",
+        "npm run test:network-contracts"
+      ],
+      "agentCommandKeys": [
+        "db.check",
+        "contract.audit",
+        "drizzle.inspect"
+      ],
+      "findings": [
+        "contract:drizzle-meta-stale_migration-001-cd7c3536"
+      ],
+      "trustTier": "canonical_local_code_plus_official_docs"
+    }
+  ],
   "dagEdges": [],
   "redisKagAvailable": false,
   "summary": {
     "high": 0,
-    "medium": 0,
+    "medium": 1,
     "low": 0,
-    "totalFindings": 0
+    "totalFindings": 1
   },
   "status": "ok"
 }

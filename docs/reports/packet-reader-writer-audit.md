@@ -1,45 +1,45 @@
 # Packet Reader / Writer Audit
 
-Generated: 2026-06-18T21:30:40.587Z
-Status: MATERIALIZED
+Generated: 2026-06-19T04:19:22.281Z
+Status: DRY_RUN_READY
 Source table: atlas_higher_hop_index
 
 ## Summary
 
-- ledger rows: 3251
-- materialized rows: 3251
-- addressable rows: 3251
-- qdrant-backed rows: 2488
-- qdrant collection rows: 2488
-- bm25 rows: 3251
+- ledger rows: 10
+- materialized rows: 10
+- addressable rows: 10
+- qdrant-backed rows: 2
+- qdrant collection rows: 2
+- bm25 rows: 10
 - concepts rows: 0
-- embedding ref rows: 3251
-- evidence matches: 2500
+- embedding ref rows: 10
+- evidence matches: 0
 - missing feature_id: 0
 - missing canonical_source_ref: 0
-- missing qdrant_point_id: 763
-- missing qdrant_collection: 763
+- missing qdrant_point_id: 8
+- missing qdrant_collection: 8
 
 ## Packet Kind Counts
 
-- qdrant_chunk: 2454
-- schema_stub: 597
-- mcp_tool_stub: 145
+- qdrant_chunk: 0
+- schema_stub: 0
+- mcp_tool_stub: 10
 - legacy_qdrant_only: 0
 - unknown: 0
 
 ## Evidence Scan
 
-- files seen: 4
-- files loaded: 4
+- files seen: 7
+- files loaded: 7
 - files skipped too large: 0
-- records indexed: 11322
+- records indexed: 11458
 
 ## Output
 
 - ndjson: .tmp/addressable-packets.ndjson
 - manifest: .tmp/addressable-packets.manifest.json
-- sha256: 64dbb85e385020c64ca2e4945e2a91a4819722a53900eca4758a6b35d95f3df9
+- sha256: 4aa569ebc1fdedd000c51370bceb999c42aca8996fef6ab157b21cc2eec5f9e1
 
 ## Samples
 

@@ -1,34 +1,25 @@
 {
-  "generatedAt": "2026-06-13T22:34:26.676Z",
-  "mode": "dry-run",
+  "generatedAt": "2026-06-19T05:22:39.725Z",
+  "mode": "live",
   "summary": {
     "graphVersion": {
-      "from": 1781390065,
-      "to": 1781390066,
+      "from": 1781846552,
+      "to": 1781846553,
       "bumped": true
     },
     "mutation": "USED_CONCEPT edges written",
-    "edgeCount": 32012,
+    "edgeCount": 32172,
     "cacheInvalidation": {
-      "redis_keys_deleted": 0,
+      "redis_keys_deleted": 533,
       "bifrost_manual_required": true,
-      "total_patterns": 0
+      "total_patterns": 7
     }
   },
   "invalidationDetails": {
     "redis": {
-      "keys_deleted": 0,
+      "keys_deleted": 533,
       "pattern_error": null,
-      "status": "documented",
-      "patterns": [
-        "bifrost:*",
-        "ace:*",
-        "som:*",
-        "kmeans:*",
-        "rpc:tools:*",
-        "gpu:karpathy:*",
-        "centroid:*"
-      ]
+      "status": "applied"
     },
     "bifrost": {
       "keys_deleted": 0,
@@ -36,27 +27,11 @@
     },
     "ace": {
       "keys_deleted": 0,
-      "patterns": [
-        "bifrost:*",
-        "ace:*",
-        "som:*",
-        "kmeans:*",
-        "rpc:tools:*",
-        "gpu:karpathy:*",
-        "centroid:*"
-      ]
+      "patterns": []
     },
     "som": {
       "keys_deleted": 0,
-      "patterns": [
-        "bifrost:*",
-        "ace:*",
-        "som:*",
-        "kmeans:*",
-        "rpc:tools:*",
-        "gpu:karpathy:*",
-        "centroid:*"
-      ]
+      "patterns": []
     },
     "kmeans": {
       "keys_deleted": 0,
@@ -65,7 +40,13 @@
     "rpc_tools": {
       "keys_deleted": 0,
       "patterns": []
-    }
+    },
+    "manifest": {
+      "invalidated": true,
+      "script": "C:\\Users\\james\\Videos\\deeds-web-app\\scripts\\atlas\\write-graph-refresh-manifest.mjs",
+      "skipped": null
+    },
+    "cache_report_file": "C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\docs\\reports\\atlas-cache-invalidation.json"
   },
   "status": {
     "mutation_verified": true,
@@ -80,5 +61,5 @@
     "4. Monitor ACE/KAG/DAG hits against new graph",
     "5. Confirm truth promotion via api/atlas/search"
   ],
-  "timestamp": "2026-06-13T22:34:26.676Z"
+  "timestamp": "2026-06-19T05:22:39.725Z"
 }

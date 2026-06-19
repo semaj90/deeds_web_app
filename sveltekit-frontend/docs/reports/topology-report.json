@@ -1,9 +1,9 @@
 {
-  "generated_at": "2026-06-18T22:55:12.769Z",
+  "generated_at": "2026-06-19T04:14:25.014Z",
   "qdrant_collection": "codebase_chunks_768",
   "qdrant_url": "http://127.0.0.1:6333",
   "structural": {
-    "gdsAvailable": false,
+    "gdsAvailable": true,
     "apocAvailable": true,
     "projectionExists": false,
     "pageRankNodeCount": 0,
@@ -15,16 +15,40 @@
     "qdrantTopoByteCoverage": null,
     "qdrantManifold4Coverage": null,
     "qdrantAuthorityCoverage": null,
-    "somSampleSize": 10,
-    "somClusterRows": 10,
+    "somSampleSize": 50,
+    "somClusterRows": 50,
     "topSomClusters": [
       {
         "cluster": "3",
-        "count": 4
+        "count": 19
+      },
+      {
+        "cluster": "0",
+        "count": 9
+      },
+      {
+        "cluster": "9",
+        "count": 3
+      },
+      {
+        "cluster": "17",
+        "count": 3
       },
       {
         "cluster": "2",
-        "count": 1
+        "count": 2
+      },
+      {
+        "cluster": "73",
+        "count": 2
+      },
+      {
+        "cluster": "16",
+        "count": 2
+      },
+      {
+        "cluster": "14",
+        "count": 2
       },
       {
         "cluster": "6",
@@ -35,15 +59,27 @@
         "count": 1
       },
       {
-        "cluster": "9",
+        "cluster": "97",
         "count": 1
       },
       {
-        "cluster": "0",
+        "cluster": "51",
         "count": 1
       },
       {
-        "cluster": "73",
+        "cluster": "59",
+        "count": 1
+      },
+      {
+        "cluster": "25",
+        "count": 1
+      },
+      {
+        "cluster": "71",
+        "count": 1
+      },
+      {
+        "cluster": "12",
         "count": 1
       }
     ]
@@ -52,10 +88,10 @@
     "topNodes": []
   },
   "telemetry": {
-    "totalRows": 192,
+    "totalRows": 216,
     "cacheHits": 29,
-    "fusionRows": 141,
+    "fusionRows": 165,
     "coldRows": 10,
-    "avgLatencyMs": 1601.09375
+    "avgLatencyMs": 1498.5462962962963
   }
 }

@@ -1,0 +1,306 @@
+{
+  "generatedAt": "2026-06-19T04:11:19.286Z",
+  "queries": 10,
+  "passed": 10,
+  "failed": 0,
+  "avg_wall_ms": 23,
+  "p50_wall_ms": 16,
+  "p95_wall_ms": 77,
+  "cache_hits_in_db": 6,
+  "live_hits_in_db": 6,
+  "eval_rows": [
+    {
+      "query_hash": "02a2c8611965a9f9",
+      "cache_hit_source": "redis",
+      "avg_qdrant": 0,
+      "avg_bm25": 0,
+      "avg_neo4j": 0,
+      "avg_redis": 2.1569199562072754,
+      "avg_total": 2.4,
+      "rows": 25
+    },
+    {
+      "query_hash": "02a2c8611965a9f9",
+      "cache_hit_source": null,
+      "avg_qdrant": 0,
+      "avg_bm25": 0,
+      "avg_neo4j": 0,
+      "avg_redis": 3.0223500728607178,
+      "avg_total": 13.5,
+      "rows": 10
+    },
+    {
+      "query_hash": "193f9935dbbbd60b",
+      "cache_hit_source": "redis",
+      "avg_qdrant": 0,
+      "avg_bm25": 0,
+      "avg_neo4j": 0,
+      "avg_redis": 1.0685399889945983,
+      "avg_total": 1.2,
+      "rows": 25
+    },
+    {
+      "query_hash": "193f9935dbbbd60b",
+      "cache_hit_source": null,
+      "avg_qdrant": 0,
+      "avg_bm25": 0,
+      "avg_neo4j": 0,
+      "avg_redis": 1.1796000003814697,
+      "avg_total": 12.5,
+      "rows": 10
+    },
+    {
+      "query_hash": "738fd1d70d9003c5",
+      "cache_hit_source": "redis",
+      "avg_qdrant": 0,
+      "avg_bm25": 0,
+      "avg_neo4j": 0,
+      "avg_redis": 1.8956000089645386,
+      "avg_total": 2.2,
+      "rows": 25
+    },
+    {
+      "query_hash": "738fd1d70d9003c5",
+      "cache_hit_source": null,
+      "avg_qdrant": 0,
+      "avg_bm25": 0,
+      "avg_neo4j": 0,
+      "avg_redis": 14.15470004081726,
+      "avg_total": 24,
+      "rows": 10
+    },
+    {
+      "query_hash": "9eb56dbac7808a2e",
+      "cache_hit_source": "redis",
+      "avg_qdrant": 0,
+      "avg_bm25": 0,
+      "avg_neo4j": 0,
+      "avg_redis": 1.6093799948692322,
+      "avg_total": 1.6,
+      "rows": 25
+    },
+    {
+      "query_hash": "9eb56dbac7808a2e",
+      "cache_hit_source": null,
+      "avg_qdrant": 0,
+      "avg_bm25": 0,
+      "avg_neo4j": 0,
+      "avg_redis": 1.1641999781131744,
+      "avg_total": 11.5,
+      "rows": 10
+    },
+    {
+      "query_hash": "c02f7512c3a2035e",
+      "cache_hit_source": "redis",
+      "avg_qdrant": 0,
+      "avg_bm25": 0,
+      "avg_neo4j": 0,
+      "avg_redis": 1.7450200080871583,
+      "avg_total": 2.2,
+      "rows": 25
+    },
+    {
+      "query_hash": "c02f7512c3a2035e",
+      "cache_hit_source": null,
+      "avg_qdrant": 0,
+      "avg_bm25": 0,
+      "avg_neo4j": 0,
+      "avg_redis": 0.7743000090122223,
+      "avg_total": 11,
+      "rows": 10
+    },
+    {
+      "query_hash": "f41842967e97cd0a",
+      "cache_hit_source": "redis",
+      "avg_qdrant": 0,
+      "avg_bm25": 0,
+      "avg_neo4j": 0,
+      "avg_redis": 1.5669999837875366,
+      "avg_total": 1.8,
+      "rows": 25
+    },
+    {
+      "query_hash": "f41842967e97cd0a",
+      "cache_hit_source": null,
+      "avg_qdrant": 0,
+      "avg_bm25": 0,
+      "avg_neo4j": 0,
+      "avg_redis": 3.180050015449524,
+      "avg_total": 15,
+      "rows": 10
+    }
+  ],
+  "results": [
+    {
+      "query": "qdrant vector retrieval fusion RRF",
+      "ok": true,
+      "packets": 5,
+      "wall_ms": 77,
+      "trace": {
+        "retrieval_strategy": "fts-only",
+        "qdrant_hits": 5,
+        "postgres_hits": 5,
+        "rrf_hits": 0,
+        "neo4j_expansions": 0,
+        "cache_hits": 1,
+        "latency_ms": 28,
+        "cache_latency_ms": 28
+      },
+      "error": null
+    },
+    {
+      "query": "neo4j graph community authority score",
+      "ok": true,
+      "packets": 5,
+      "wall_ms": 20,
+      "trace": {
+        "retrieval_strategy": "fts-only",
+        "qdrant_hits": 5,
+        "postgres_hits": 5,
+        "rrf_hits": 0,
+        "neo4j_expansions": 0,
+        "cache_hits": 1,
+        "latency_ms": 14,
+        "cache_latency_ms": 14
+      },
+      "error": null
+    },
+    {
+      "query": "atlas packet metadata topology community_id",
+      "ok": true,
+      "packets": 5,
+      "wall_ms": 19,
+      "trace": {
+        "retrieval_strategy": "fts-only",
+        "qdrant_hits": 5,
+        "postgres_hits": 5,
+        "rrf_hits": 0,
+        "neo4j_expansions": 0,
+        "cache_hits": 1,
+        "latency_ms": 14,
+        "cache_latency_ms": 14
+      },
+      "error": null
+    },
+    {
+      "query": "redis valkey exact match cache hyperrag",
+      "ok": true,
+      "packets": 5,
+      "wall_ms": 16,
+      "trace": {
+        "retrieval_strategy": "fts-only",
+        "qdrant_hits": 5,
+        "postgres_hits": 5,
+        "rrf_hits": 0,
+        "neo4j_expansions": 0,
+        "cache_hits": 1,
+        "latency_ms": 12,
+        "cache_latency_ms": 12
+      },
+      "error": null
+    },
+    {
+      "query": "postgres BM25 full text search retrieval",
+      "ok": true,
+      "packets": 5,
+      "wall_ms": 16,
+      "trace": {
+        "retrieval_strategy": "fts-only",
+        "qdrant_hits": 5,
+        "postgres_hits": 5,
+        "rrf_hits": 0,
+        "neo4j_expansions": 0,
+        "cache_hits": 1,
+        "latency_ms": 11,
+        "cache_latency_ms": 11
+      },
+      "error": null
+    },
+    {
+      "query": "SOM cluster som_x som_y centroid",
+      "ok": true,
+      "packets": 5,
+      "wall_ms": 17,
+      "trace": {
+        "retrieval_strategy": "fts-only",
+        "qdrant_hits": 5,
+        "postgres_hits": 5,
+        "rrf_hits": 0,
+        "neo4j_expansions": 0,
+        "cache_hits": 1,
+        "latency_ms": 13,
+        "cache_latency_ms": 13
+      },
+      "error": null
+    },
+    {
+      "query": "drizzle schema migration retrieval eval times",
+      "ok": true,
+      "packets": 5,
+      "wall_ms": 16,
+      "trace": {
+        "retrieval_strategy": "fts-only",
+        "qdrant_hits": 5,
+        "postgres_hits": 5,
+        "rrf_hits": 0,
+        "neo4j_expansions": 0,
+        "cache_hits": 1,
+        "latency_ms": 13,
+        "cache_latency_ms": 13
+      },
+      "error": null
+    },
+    {
+      "query": "sveltekit route server API endpoint",
+      "ok": true,
+      "packets": 5,
+      "wall_ms": 15,
+      "trace": {
+        "retrieval_strategy": "fts-only",
+        "qdrant_hits": 5,
+        "postgres_hits": 5,
+        "rrf_hits": 0,
+        "neo4j_expansions": 0,
+        "cache_hits": 1,
+        "latency_ms": 12,
+        "cache_latency_ms": 12
+      },
+      "error": null
+    },
+    {
+      "query": "embeddings 768 dimension codebase chunks",
+      "ok": true,
+      "packets": 5,
+      "wall_ms": 17,
+      "trace": {
+        "retrieval_strategy": "fts-only",
+        "qdrant_hits": 5,
+        "postgres_hits": 5,
+        "rrf_hits": 0,
+        "neo4j_expansions": 0,
+        "cache_hits": 1,
+        "latency_ms": 11,
+        "cache_latency_ms": 11
+      },
+      "error": null
+    },
+    {
+      "query": "legal document case notes schema",
+      "ok": true,
+      "packets": 5,
+      "wall_ms": 13,
+      "trace": {
+        "retrieval_strategy": "fts-only",
+        "qdrant_hits": 5,
+        "postgres_hits": 5,
+        "rrf_hits": 0,
+        "neo4j_expansions": 0,
+        "cache_hits": 1,
+        "latency_ms": 10,
+        "cache_latency_ms": 10
+      },
+      "error": null
+    }
+  ],
+  "packet_rpc_url": "http://127.0.0.1:5173/api/hyperrag/packet-rpc"
+}

@@ -77,6 +77,22 @@ function qdrantUrlFromParts(): string | undefined {
   return `http://${host}:${port}`;
 }
 
+function goRetrievalHttpUrl(): string {
+  return privateEnv.GO_RETRIEVAL_HTTP_URL ?? privateEnv.RETRIEVAL_HTTP_URL ?? `http://${LOOPBACK_IP}:8100`;
+}
+
+function goRetrievalGrpcUrl(): string {
+  return privateEnv.GO_RETRIEVAL_GRPC_ADDR ?? privateEnv.GO_RETRIEVAL_GRPC_URL ?? privateEnv.RETRIEVAL_GRPC_URL ?? `${LOOPBACK_IP}:50053`;
+}
+
+function goRetrievalHttpEnabled(): boolean {
+  return (privateEnv.GO_RETRIEVAL_ENABLED ?? privateEnv.RETRIEVAL_HTTP_ENABLED ?? 'false') === 'true';
+}
+
+function goRetrievalGrpcEnabled(): boolean {
+  return (privateEnv.GO_RETRIEVAL_GRPC_ENABLED ?? privateEnv.RETRIEVAL_GRPC_ENABLED ?? 'false') === 'true';
+}
+
 // Canonical DB resolution: only the modern Postgres on :5434 is supported.
 // The legacy :5432 stub used to live behind a DATABASE_URL_FALLBACK chain;
 // removed 2026-05-08 because the two instances had drifted independently
@@ -145,13 +161,19 @@ export const ENV = {
   /** Docling VLM service (Docker, layout-aware OCR, port 8085 by default) */
   DOCLING_SERVICE_URL: privateEnv.DOCLING_SERVICE_URL ?? `http://${LOOPBACK_IP}:8085`,
   /** Go retrieval service HTTP REST API (port 8100) — lighter weight alternative to gRPC */
-  RETRIEVAL_HTTP_URL: privateEnv.RETRIEVAL_HTTP_URL ?? `http://${LOOPBACK_IP}:8100`,
+  GO_RETRIEVAL_HTTP_URL: goRetrievalHttpUrl(),
+  RETRIEVAL_HTTP_URL: goRetrievalHttpUrl(),
+  GO_RETRIEVAL_HTTP_ENABLED: goRetrievalHttpEnabled(),
   /** ACE concept extraction timeout in milliseconds */
   ACE_CONCEPT_EXTRACTION_TIMEOUT_MS: privateEnv.ACE_CONCEPT_EXTRACTION_TIMEOUT_MS ?? '1500',
   /** ACE concept extraction mode: gemma | heuristic */
   ACE_CONCEPT_EXTRACTION_MODE: privateEnv.ACE_CONCEPT_EXTRACTION_MODE ?? 'gemma',
   SDXL_SERVICE_URL: privateEnv.SDXL_SERVICE_URL ?? `http://${LOCALHOST}:8100`,
-  RETRIEVAL_HTTP_ENABLED: (privateEnv.RETRIEVAL_HTTP_ENABLED ?? 'false') === 'true',
+  RETRIEVAL_HTTP_ENABLED: goRetrievalHttpEnabled(),
+  GO_RETRIEVAL_GRPC_ADDR: goRetrievalGrpcUrl(),
+  RETRIEVAL_GRPC_URL: goRetrievalGrpcUrl(),
+  GO_RETRIEVAL_GRPC_ENABLED: goRetrievalGrpcEnabled(),
+  RETRIEVAL_GRPC_ENABLED: goRetrievalGrpcEnabled(),
   ENABLE_CUVS_SEARCH: (privateEnv.ENABLE_CUVS_SEARCH ?? 'false') === 'true',
   CUVS_BENCH_URL: privateEnv.CUVS_BENCH_URL ?? `http://${LOOPBACK_IP}:8794`,
   CUVS_BENCH_PORT: privateEnv.CUVS_BENCH_PORT ?? '8794',

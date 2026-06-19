@@ -90,6 +90,44 @@ export interface LouvainResult {
 }
 
 const PROJECTION_NAME = 'codeTopology';
+const PROJECTION_NODE_LABELS = [
+  'CodebaseFile',
+  'ParentAtlasSource',
+  'ParentAtlasFeature',
+  'Packet',
+  'SourceRef',
+  'Feature',
+  'Concept',
+  'Trace',
+  'Community',
+  'Centroid',
+  'Function',
+  'InteractiveSession',
+  'ToolDomain',
+  'Inference',
+  'Intent',
+  'Tool',
+] as const;
+
+const PROJECTION_RELATIONSHIP_TYPES = [
+  'IMPORTS',
+  'CALLS',
+  'CONTAINS',
+  'HAS_CHUNK',
+  'BELONGS_TO_CLUSTER',
+  'REFERENCES',
+  'SIMILAR_TOPOLOGY',
+  'HAS_CENTROID',
+  'BELONGS_TO_FEATURE',
+] as const;
+
+async function loadProjectionSchema(session: ReturnType<ReturnType<typeof getNeo4jDriver>['session']>) {
+  const labelsRes = await session.run(`CALL db.labels() YIELD label RETURN collect(label) AS labels`);
+  const relTypesRes = await session.run(`CALL db.relationshipTypes() YIELD relationshipType RETURN collect(relationshipType) AS relTypes`);
+  const labels = new Set<string>((labelsRes.records[0]?.get('labels') ?? []) as string[]);
+  const relTypes = new Set<string>((relTypesRes.records[0]?.get('relTypes') ?? []) as string[]);
+  return { labels, relTypes };
+}
 
 // ── Plugin availability ───────────────────────────────────────────────────────
 
@@ -112,19 +150,17 @@ export async function getGdsStatus(): Promise<GdsStatus> {
 
     // GDS check
     try {
-      const r = await session.run(`CALL gds.version() YIELD version RETURN version`);
-      gdsVersion = r.records[0]?.get('version') ?? 'unknown';
+      const r = await session.run(`CALL gds.version()`);
+      gdsVersion = r.records[0]?.get('gdsVersion') ?? r.records[0]?.get('version') ?? 'unknown';
       gdsAvailable = true;
     } catch { /* gds not installed */ }
 
     // Projection existence
     if (gdsAvailable) {
       try {
-        const r = await session.run(
-          `CALL gds.graph.exists($name) YIELD exists RETURN exists`,
-          { name: PROJECTION_NAME }
-        );
-        projectionExists = r.records[0]?.get('exists') ?? false;
+        const r = await session.run(`CALL gds.graph.list() YIELD graphName RETURN collect(graphName) AS graphNames`);
+        const graphNames = (r.records[0]?.get('graphNames') ?? []) as string[];
+        projectionExists = graphNames.includes(PROJECTION_NAME);
       } catch { /* ignore */ }
     }
   } finally {
@@ -254,20 +290,42 @@ export async function ensureGdsProjection(force = false): Promise<{ created: boo
     }
 
     // Create projection — costs must match COSTS table in sync-graph-truth-neo4j.mjs
+    const schema = await loadProjectionSchema(session);
+    const nodeLabels = PROJECTION_NODE_LABELS.filter((label) => schema.labels.has(label));
+    const relationshipTypes = PROJECTION_RELATIONSHIP_TYPES.filter((type) => schema.relTypes.has(type));
+    if (!nodeLabels.length) {
+      throw new Error(`No projection node labels exist in Neo4j. Expected one of: ${PROJECTION_NODE_LABELS.join(', ')}`);
+    }
+    if (!relationshipTypes.length) {
+      throw new Error(`No projection relationship types exist in Neo4j. Expected one of: ${PROJECTION_RELATIONSHIP_TYPES.join(', ')}`);
+    }
+
+    const relationshipProjection = relationshipTypes.map((type) => {
+      const orientation = type === 'BELONGS_TO_CLUSTER' || type === 'SIMILAR_TOPOLOGY' || type === 'HAS_CENTROID' || type === 'BELONGS_TO_FEATURE'
+        ? 'UNDIRECTED'
+        : 'NATURAL';
+      const cost = type === 'HAS_CENTROID' || type === 'BELONGS_TO_FEATURE'
+        ? 0.10
+        : type === 'CONTAINS'
+          ? 0.25
+          : type === 'HAS_CHUNK'
+            ? 0.20
+            : type === 'BELONGS_TO_CLUSTER'
+              ? 0.30
+              : type === 'REFERENCES'
+                ? 0.35
+                : type === 'SIMILAR_TOPOLOGY'
+                  ? 0.40
+                  : 0.15;
+      return `          ${type}: { orientation: '${orientation}', properties: { cost: { property: 'cost', defaultValue: ${cost} } } }`;
+    }).join(',\n');
+
     const result = await session.run(`
       CALL gds.graph.project(
         $name,
-        ['File', 'Directory', 'Cluster', 'WikiNote', 'ResearchNote', 'SummaryLens', 'Centroid', 'CodebaseFile', 'ParentAtlasFeature'],
+        ${JSON.stringify(nodeLabels)},
         {
-          IMPORTS:            { orientation: 'NATURAL',    properties: { cost: { property: 'cost', defaultValue: 0.15 } } },
-          CALLS:              { orientation: 'NATURAL',    properties: { cost: { property: 'cost', defaultValue: 0.15 } } },
-          CONTAINS:           { orientation: 'NATURAL',    properties: { cost: { property: 'cost', defaultValue: 0.25 } } },
-          HAS_CHUNK:          { orientation: 'NATURAL',    properties: { cost: { property: 'cost', defaultValue: 0.20 } } },
-          BELONGS_TO_CLUSTER: { orientation: 'UNDIRECTED', properties: { cost: { property: 'cost', defaultValue: 0.30 } } },
-          REFERENCES:         { orientation: 'NATURAL',    properties: { cost: { property: 'cost', defaultValue: 0.35 } } },
-          SIMILAR_TOPOLOGY:   { orientation: 'UNDIRECTED', properties: { cost: { property: 'cost', defaultValue: 0.40 } } },
-          HAS_CENTROID:       { orientation: 'UNDIRECTED', properties: { cost: { property: 'cost', defaultValue: 0.10 } } },
-          BELONGS_TO_FEATURE: { orientation: 'UNDIRECTED', properties: { cost: { property: 'cost', defaultValue: 0.10 } } }
+${relationshipProjection}
         }
       )
       YIELD nodeCount, relationshipCount

@@ -34,7 +34,29 @@ export const REPO_ROOT = path.resolve(__dirname, '../..');
 
 const TRACE_MCP_URL = (process.env.TRACE_MCP_URL ?? 'http://127.0.0.1:8788').replace(/\/$/, '');
 const TURBOQUANT_URL = (process.env.TURBOQUANT_BASE_URL ?? 'http://127.0.0.1:8090').replace(/\/$/, '');
-const TURBOQUANT_MODEL = process.env.TURBOQUANT_MODEL ?? 'gemma4-legal-iq4xs-direct.gguf';
+
+function resolveLlamaServerModelId() {
+  const explicit = String(process.env.LLAMA_MODEL ?? process.env.TURBOQUANT_MODEL ?? '').trim();
+  if (explicit) return explicit;
+
+  const modelPath = String(
+    process.env.ROTORQUANT_MODEL_PATH ??
+    process.env.TURBO_MODEL_PATH ??
+    process.env.TURBOQUANT_MODEL_PATH ??
+    '',
+  ).trim();
+  if (modelPath) {
+    const base = path.basename(modelPath).trim();
+    if (base) return base;
+  }
+
+  const gemma4 = String(process.env.GEMMA4_MODEL ?? '').trim();
+  if (gemma4 && !/^gemma4-rotorquant(?::latest)?$/i.test(gemma4)) return gemma4;
+
+  return 'gemma4-legal-iq4xs-direct.gguf';
+}
+
+const TURBOQUANT_MODEL = resolveLlamaServerModelId();
 
 let VERBOSE = false;
 

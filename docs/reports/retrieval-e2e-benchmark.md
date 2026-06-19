@@ -1,14 +1,14 @@
 # Retrieval E2E Benchmark
-Generated: 2026-06-18T00:16:14.834Z
+Generated: 2026-06-19T05:34:34.817Z
 
 ## Summary
 
-- Status: PASS
+- Status: PASS_WITH_WARNINGS
 - Queries: 5
 - Qdrant: READY
 - TRACE MCP: READY
 - Redis: READY
-- GPU rerank: READY
+- GPU rerank: DEGRADED
 - TurboQuant/Gemma4 answer: READY
 
 ## Retrieval Strategy
@@ -21,23 +21,23 @@ Generated: 2026-06-18T00:16:14.834Z
 
 | Metric | p50 ms | p95 ms |
 |---|---:|---:|
-| total_ms | 3407 | 3536 |
-| qdrant_ms | 11 | 11 |
-| postgres_lookup_ms | 3 | 3 |
+| total_ms | 2602 | 3267 |
+| qdrant_ms | 20 | 21 |
+| postgres_lookup_ms | 2 | 2 |
 | neo4j_expand_ms | 0 | 0 |
 | redis_cache_ms | 6 | 6 |
-| gpu_rerank_ms | 820 | 830 |
-| answer_ms | 2350 | 2569 |
+| gpu_rerank_ms | 277 | 278 |
+| answer_ms | 2172 | 2532 |
 
 ## Per Query
 
 | Query | Strategy | Qdrant hits | Ledger | Tree | Glyph | Neo4j | Rerank | Answer chars | Total ms | Status |
 |---|---|---:|---:|---:|---:|---:|---:|---:|---:|---|
-| find parent atlas identity spine | fusion | 12 | 0 | 0 | 0 | 0 | 12 | 656 | 3177 | pass |
-| phase 16 higher hop qdrant discovery | fusion | 12 | 0 | 0 | 0 | 0 | 12 | 798 | 3536 | pass |
-| trace mcp tool validation | fusion | 12 | 0 | 0 | 0 | 0 | 12 | 705 | 3407 | pass |
-| nes chrom packet qdrant point id | fusion | 12 | 0 | 0 | 0 | 0 | 12 | 865 | 3654 | pass |
-| graph refresh manifest invalidation | fusion | 12 | 0 | 0 | 0 | 0 | 12 | 710 | 3206 | pass |
+| find parent atlas identity spine | fusion | 12 | 0 | 0 | 0 | 0 | 0 | 595 | 7888 | degraded |
+| phase 16 higher hop qdrant discovery | fusion | 12 | 0 | 0 | 0 | 0 | 0 | 713 | 2602 | degraded |
+| trace mcp tool validation | fusion | 12 | 0 | 0 | 0 | 0 | 0 | 681 | 2539 | degraded |
+| nes chrom packet qdrant point id | fusion | 12 | 0 | 0 | 0 | 0 | 0 | 925 | 3267 | degraded |
+| graph refresh manifest invalidation | fusion | 12 | 0 | 0 | 0 | 0 | 0 | 713 | 2528 | degraded |
 
 ## Notes
 

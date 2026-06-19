@@ -139,6 +139,9 @@ async function startTier1() {
       env: {
         ...process.env,
         HTTP_PORT: '8100', GRPC_PORT: '50053',
+        GO_RETRIEVAL_ENABLED: 'true',
+        GO_RETRIEVAL_HTTP_URL: 'http://127.0.0.1:8100',
+        GO_RETRIEVAL_GRPC_ADDR: '127.0.0.1:50053',
         QDRANT_URL: 'http://localhost:6333',
         REDIS_URL: 'redis://localhost:6379',
         OLLAMA_URL: 'http://localhost:11434',
@@ -154,7 +157,14 @@ async function startTier1() {
   } else if (existsSync(goCmd)) {
     logEvent('T1', 'go-retrieval :8100', 'starting-via-go-run', { cwd: goServiceDir });
     spawnDetached(goCmd, ['run', '.'], { cwd: goServiceDir,
-      env: { ...process.env, HTTP_PORT: '8100', GRPC_PORT: '50053' } });
+      env: {
+        ...process.env,
+        HTTP_PORT: '8100',
+        GRPC_PORT: '50053',
+        GO_RETRIEVAL_ENABLED: 'true',
+        GO_RETRIEVAL_HTTP_URL: 'http://127.0.0.1:8100',
+        GO_RETRIEVAL_GRPC_ADDR: '127.0.0.1:50053',
+      } });
     const ready = await waitForPort(8100, 'go-retrieval :8100', 20_000);
     logEvent('T1', 'go-retrieval :8100', ready ? 'up' : 'warn-slow');
   } else {

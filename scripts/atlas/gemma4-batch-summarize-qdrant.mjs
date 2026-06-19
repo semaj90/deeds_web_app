@@ -69,7 +69,6 @@ const LLAMA_URL     = (ENV.LLAMA_SERVER_URL ?? 'http://127.0.0.1:8090').replace(
 const OLLAMA_URL    = (ENV.OLLAMA_HOST ?? 'http://127.0.0.1:11434')
                         .replace(/^0\.0\.0\.0/, '127.0.0.1')
                         .replace(/^(?!http)/, 'http://');
-const MODEL         = ENV.LLAMA_MODEL ?? 'gemma4-legal-iq4xs-direct.gguf';
 const OLLAMA_MODEL  = ENV.GEMMA4_OLLAMA_MODEL ?? 'gemma4-rotorquant:latest';
 const DB_URL        = ENV.DATABASE_URL
   ?? `postgresql://${ENV.DB_USER ?? 'legal_admin'}:${ENV.DB_PASSWORD ?? '123456'}@${ENV.DB_HOST ?? '127.0.0.1'}:${ENV.DB_PORT ?? '5434'}/${ENV.DB_NAME ?? 'legal_ai_db'}`;
@@ -84,6 +83,29 @@ function normalizeRef(raw) {
     .replace(/^\.\//, '')
     .replace(/^sveltekit-frontend\//, '');
 }
+
+function resolveLlamaServerModelId() {
+  const explicit = String(ENV.LLAMA_MODEL ?? ENV.TURBOQUANT_MODEL ?? '').trim();
+  if (explicit) return explicit;
+
+  const modelPath = String(
+    ENV.ROTORQUANT_MODEL_PATH ??
+    ENV.TURBO_MODEL_PATH ??
+    ENV.TURBOQUANT_MODEL_PATH ??
+    '',
+  ).trim();
+  if (modelPath) {
+    const base = path.basename(modelPath).trim();
+    if (base) return base;
+  }
+
+  const gemma4 = String(ENV.GEMMA4_MODEL ?? '').trim();
+  if (gemma4 && !/^gemma4-rotorquant(?::latest)?$/i.test(gemma4)) return gemma4;
+
+  return 'gemma4-legal-iq4xs-direct.gguf';
+}
+
+const MODEL = resolveLlamaServerModelId();
 
 // ── Gemma4 summary via llama-server (stream:true per hard rules) ──────────────
 async function summarizeViaLlamaServer(text, sourceRef) {

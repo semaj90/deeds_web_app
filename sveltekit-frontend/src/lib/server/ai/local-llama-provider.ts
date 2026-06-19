@@ -1,4 +1,5 @@
 import { createOpenAICompatible } from '@ai-sdk/openai-compatible';
+import { basename } from 'node:path';
 import { ENV } from '../env.server.js';
 
 /** Base URL for llama-server.exe OpenAI-compatible API (e.g. http://127.0.0.1:8090/v1) */
@@ -10,10 +11,22 @@ export const LLAMA_SERVER_HEALTH_URL: string =
 	(ENV.TURBOQUANT_BASE_URL as string).replace(/\/?$/, '') + '/health';
 
 /** Model to use for VLM / text requests via llama-server */
-export const LOCAL_VLM_MODEL: string =
-	process.env.VLM_MODEL ??
-	process.env.TURBO_MODEL ??
-	'gemma4-legal-iq4xs-direct.gguf';
+export const LOCAL_VLM_MODEL: string = resolveLlamaServerModelId();
+
+function resolveLlamaServerModelId(): string {
+	const modelPath = String(
+		ENV.ROTORQUANT_MODEL_PATH ??
+		ENV.TURBO_MODEL_PATH ??
+		ENV.TURBOQUANT_MODEL_PATH ??
+		'',
+	).trim();
+	if (modelPath) {
+		const base = basename(modelPath).trim();
+		if (base) return base;
+	}
+
+	return 'gemma4-legal-iq4xs-direct.gguf';
+}
 
 /** Vercel AI SDK provider pointed at the local llama-server.exe synthesis lane */
 export const llamaServer = createOpenAICompatible({

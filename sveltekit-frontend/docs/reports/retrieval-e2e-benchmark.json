@@ -1,0 +1,185 @@
+{
+  "generatedAt": "2026-06-19T05:28:19.596Z",
+  "queries": 10,
+  "passed": 10,
+  "failed": 0,
+  "avg_wall_ms": 825,
+  "p50_wall_ms": 160,
+  "p95_wall_ms": 6845,
+  "cache_hits_in_db": 0,
+  "live_hits_in_db": 0,
+  "eval_rows": [],
+  "results": [
+    {
+      "query": "qdrant vector retrieval fusion RRF",
+      "ok": true,
+      "packets": 5,
+      "wall_ms": 6845,
+      "trace": {
+        "retrieval_strategy": "fts-only",
+        "qdrant_hits": 5,
+        "postgres_hits": 5,
+        "rrf_hits": 0,
+        "neo4j_expansions": 0,
+        "cache_hits": 1,
+        "latency_ms": 182,
+        "cache_latency_ms": 182
+      },
+      "error": null
+    },
+    {
+      "query": "neo4j graph community authority score",
+      "ok": true,
+      "packets": 5,
+      "wall_ms": 160,
+      "trace": {
+        "retrieval_strategy": "fts-only",
+        "qdrant_hits": 5,
+        "postgres_hits": 5,
+        "rrf_hits": 0,
+        "neo4j_expansions": 0,
+        "cache_hits": 1,
+        "latency_ms": 142,
+        "cache_latency_ms": 142
+      },
+      "error": null
+    },
+    {
+      "query": "atlas packet metadata topology community_id",
+      "ok": true,
+      "packets": 5,
+      "wall_ms": 158,
+      "trace": {
+        "retrieval_strategy": "fts-only",
+        "qdrant_hits": 5,
+        "postgres_hits": 5,
+        "rrf_hits": 0,
+        "neo4j_expansions": 0,
+        "cache_hits": 1,
+        "latency_ms": 142,
+        "cache_latency_ms": 142
+      },
+      "error": null
+    },
+    {
+      "query": "redis valkey exact match cache hyperrag",
+      "ok": true,
+      "packets": 5,
+      "wall_ms": 173,
+      "trace": {
+        "retrieval_strategy": "fts-only",
+        "qdrant_hits": 5,
+        "postgres_hits": 5,
+        "rrf_hits": 0,
+        "neo4j_expansions": 0,
+        "cache_hits": 1,
+        "latency_ms": 154,
+        "cache_latency_ms": 154
+      },
+      "error": null
+    },
+    {
+      "query": "postgres BM25 full text search retrieval",
+      "ok": true,
+      "packets": 5,
+      "wall_ms": 161,
+      "trace": {
+        "retrieval_strategy": "fts-only",
+        "qdrant_hits": 5,
+        "postgres_hits": 5,
+        "rrf_hits": 0,
+        "neo4j_expansions": 0,
+        "cache_hits": 1,
+        "latency_ms": 143,
+        "cache_latency_ms": 143
+      },
+      "error": null
+    },
+    {
+      "query": "SOM cluster som_x som_y centroid",
+      "ok": true,
+      "packets": 5,
+      "wall_ms": 166,
+      "trace": {
+        "retrieval_strategy": "fts-only",
+        "qdrant_hits": 5,
+        "postgres_hits": 5,
+        "rrf_hits": 0,
+        "neo4j_expansions": 0,
+        "cache_hits": 1,
+        "latency_ms": 142,
+        "cache_latency_ms": 142
+      },
+      "error": null
+    },
+    {
+      "query": "drizzle schema migration retrieval eval times",
+      "ok": true,
+      "packets": 5,
+      "wall_ms": 127,
+      "trace": {
+        "retrieval_strategy": "fts-only",
+        "qdrant_hits": 5,
+        "postgres_hits": 5,
+        "rrf_hits": 0,
+        "neo4j_expansions": 0,
+        "cache_hits": 1,
+        "latency_ms": 111,
+        "cache_latency_ms": 111
+      },
+      "error": null
+    },
+    {
+      "query": "sveltekit route server API endpoint",
+      "ok": true,
+      "packets": 5,
+      "wall_ms": 129,
+      "trace": {
+        "retrieval_strategy": "fts-only",
+        "qdrant_hits": 5,
+        "postgres_hits": 5,
+        "rrf_hits": 0,
+        "neo4j_expansions": 0,
+        "cache_hits": 1,
+        "latency_ms": 115,
+        "cache_latency_ms": 115
+      },
+      "error": null
+    },
+    {
+      "query": "embeddings 768 dimension codebase chunks",
+      "ok": true,
+      "packets": 5,
+      "wall_ms": 157,
+      "trace": {
+        "retrieval_strategy": "fts-only",
+        "qdrant_hits": 5,
+        "postgres_hits": 5,
+        "rrf_hits": 0,
+        "neo4j_expansions": 0,
+        "cache_hits": 1,
+        "latency_ms": 139,
+        "cache_latency_ms": 139
+      },
+      "error": null
+    },
+    {
+      "query": "legal document case notes schema",
+      "ok": true,
+      "packets": 5,
+      "wall_ms": 169,
+      "trace": {
+        "retrieval_strategy": "fts-only",
+        "qdrant_hits": 5,
+        "postgres_hits": 5,
+        "rrf_hits": 0,
+        "neo4j_expansions": 0,
+        "cache_hits": 1,
+        "latency_ms": 154,
+        "cache_latency_ms": 154
+      },
+      "error": null
+    }
+  ],
+  "packet_rpc_url": "http://127.0.0.1:5173/api/hyperrag/packet-rpc"
+}

@@ -59,6 +59,23 @@ function _parseRedisHost(redisUrl) {
 }
 const _redis = _parseRedisHost(process.env.REDIS_URL ?? 'redis://127.0.0.1:6379');
 
+function _parseGrpcAddr(value) {
+    if (!value) return null;
+    const raw = String(value).trim();
+    if (!raw) return null;
+    const hostPort = raw.replace(/^grpc:\/\//i, '').replace(/^http:\/\//i, '').replace(/^https:\/\//i, '');
+    const [host, port] = hostPort.split(':', 2);
+    if (!host) return null;
+    return { host, port: parseInt(port || '50053', 10) };
+}
+
+const _goRetrievalGrpc = _parseGrpcAddr(
+    process.env.GO_RETRIEVAL_GRPC_ADDR ??
+    process.env.GO_RETRIEVAL_GRPC_URL ??
+    process.env.RETRIEVAL_GRPC_URL ??
+    process.env.GO_SEARCH_GRPC_URL
+);
+
 const DB_CONFIG = {
     PG_CONN_STRING:    process.env.DATABASE_URL ?? 'postgresql://legal_admin:123456@127.0.0.1:5434/legal_ai_db',
     REDIS_HOST:        _redis.host,
@@ -72,8 +89,11 @@ const DB_CONFIG = {
     TURBO_URL:         `http://127.0.0.1:${process.env.TURBO_PORT ?? '8090'}`,
     EMBED_URL:         `http://127.0.0.1:${process.env.EMBED_SERVER_PORT ?? '8081'}`,
     COUCHDB_URL:       process.env.COUCHDB_URL  ?? 'http://admin:deeds123@localhost:5984',
-    RETRIEVAL_HTTP:    `http://${process.env.RETRIEVAL_HOST ?? '127.0.0.1'}:${process.env.RETRIEVAL_HTTP_PORT ?? '8100'}`,
-    RETRIEVAL_GRPC_PORT: parseInt(process.env.RETRIEVAL_GRPC_PORT ?? '50053', 10),
+    RETRIEVAL_HTTP:    process.env.GO_RETRIEVAL_HTTP_URL
+        ?? process.env.RETRIEVAL_HTTP_URL
+        ?? `http://${process.env.RETRIEVAL_HOST ?? '127.0.0.1'}:${process.env.RETRIEVAL_HTTP_PORT ?? '8100'}`,
+    RETRIEVAL_GRPC_PORT: _goRetrievalGrpc?.port
+        ?? parseInt(process.env.GO_RETRIEVAL_GRPC_PORT ?? process.env.RETRIEVAL_GRPC_PORT ?? '50053', 10),
 };
 
 // --- CORE UTILITIES ---

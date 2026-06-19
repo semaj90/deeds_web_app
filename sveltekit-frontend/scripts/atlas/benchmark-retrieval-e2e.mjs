@@ -23,7 +23,7 @@ import { fileURLToPath } from 'node:url';
 import { performance } from 'node:perf_hooks';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-const ROOT      = join(__dirname, '..'); // sveltekit-frontend/
+const ROOT      = join(__dirname, '..', '..'); // sveltekit-frontend/
 const TMP       = join(ROOT, '.tmp');
 
 // ── .env loader ───────────────────────────────────────────────────────────────
@@ -42,6 +42,8 @@ const RAW_LIM  = process.argv.find(a => a.startsWith('--limit='));
 const LIMIT    = RAW_LIM ? Math.max(1, parseInt(RAW_LIM.split('=')[1], 10)) : 5;
 const RAW_Q    = process.argv.find(a => a.startsWith('--queries='));
 const PG_URL   = process.env.DATABASE_URL ?? null;
+const APP_URL  = process.env.PUBLIC_APP_URL ?? process.env.APP_URL ?? 'http://127.0.0.1:5173';
+const PACKET_RPC_URL = new URL('/api/hyperrag/packet-rpc', APP_URL).toString();
 
 // ── Golden query set ──────────────────────────────────────────────────────────
 
@@ -86,15 +88,19 @@ async function queryEvalRows(pg, queryHashes) {
   }
 }
 
+function percentile(values, pct) {
+  const sorted = values.filter((value) => Number.isFinite(value)).sort((a, b) => a - b);
+  if (!sorted.length) return 0;
+  const rawIndex = Math.ceil((pct / 100) * sorted.length) - 1;
+  const index = Math.min(sorted.length - 1, Math.max(0, rawIndex));
+  return sorted[index];
+}
+
 // ── Main ──────────────────────────────────────────────────────────────────────
 
 async function main() {
   mkdirSync(TMP, { recursive: true });
-
-  // Dynamic import to allow .env to be loaded first
-  const { hyperragPacketRpc, closeHyperRagPacketRpcPool } = await import(
-    '../../src/lib/server/retrieval/hyperrag-packet-rpc.js'
-  );
+  mkdirSync(join(ROOT, 'docs', 'reports'), { recursive: true });
 
   let pg;
   if (PG_URL) {
@@ -109,6 +115,7 @@ async function main() {
   const queryHashes = [];
 
   console.log(`\n📊 benchmark-retrieval-e2e — ${GOLDEN_QUERIES.length} queries, limit=${LIMIT}\n`);
+  console.log(`[benchmark] packet RPC endpoint: ${PACKET_RPC_URL}`);
 
   for (const query of GOLDEN_QUERIES) {
     const t0 = performance.now();
@@ -118,14 +125,22 @@ async function main() {
     let error = null;
 
     try {
-      const res = await hyperragPacketRpc({
+      const response = await fetch(PACKET_RPC_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
         query,
         limit: LIMIT,
-        includeGraph: false,
-        useFts: false,
+        includeGraph: true,
+        useFts: true,
         awaitTelemetry: true,
         useExactMatchCache: true,
+        }),
       });
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status} from packet RPC`);
+      }
+      const res = await response.json();
       ok      = true;
       packets = res.packets.length;
       trace   = res.trace;
@@ -156,13 +171,14 @@ async function main() {
   // Pull eval rows from DB
   const evalRows = await queryEvalRows(pg, queryHashes);
   if (pg) await pg.end().catch(() => {});
-  await closeHyperRagPacketRpcPool().catch(() => {});
 
   // ── Aggregate stats ────────────────────────────────────────────────────────
 
   const passed     = results.filter(r => r.ok).length;
   const failed     = results.length - passed;
   const avgWall    = Math.round(results.reduce((s, r) => s + r.wall_ms, 0) / results.length);
+  const p50Wall    = Math.round(percentile(results.map((r) => r.wall_ms), 50));
+  const p95Wall    = Math.round(percentile(results.map((r) => r.wall_ms), 95));
   const cacheHits  = evalRows.filter(r => r.cache_hit_source === 'redis').length;
   const liveHits   = evalRows.filter(r => !r.cache_hit_source).length;
 
@@ -172,10 +188,13 @@ async function main() {
     passed,
     failed,
     avg_wall_ms:  avgWall,
+    p50_wall_ms:  p50Wall,
+    p95_wall_ms:  p95Wall,
     cache_hits_in_db: cacheHits,
     live_hits_in_db:  liveHits,
     eval_rows:    evalRows,
     results,
+    packet_rpc_url: PACKET_RPC_URL,
   };
 
   writeFileSync(join(TMP, 'benchmark-retrieval-e2e.json'), JSON.stringify(summary, null, 2));
@@ -188,6 +207,8 @@ async function main() {
     `queries    : ${summary.queries}`,
     `passed     : ${summary.passed}  failed: ${summary.failed}`,
     `avg wall ms: ${summary.avg_wall_ms}ms`,
+    `p50 wall ms : ${summary.p50_wall_ms}ms`,
+    `p95 wall ms : ${summary.p95_wall_ms}ms`,
     ``,
     `atlas_retrieval_eval_times breakdown:`,
     `  cache hits (redis): ${cacheHits} rows`,
@@ -214,6 +235,8 @@ async function main() {
 
   const txt = lines.join('\n') + '\n';
   writeFileSync(join(TMP, 'benchmark-retrieval-e2e.txt'), txt);
+  writeFileSync(join(ROOT, 'docs', 'reports', 'retrieval-e2e-benchmark.json'), JSON.stringify(summary, null, 2));
+  writeFileSync(join(ROOT, 'docs', 'reports', 'retrieval-e2e-benchmark.md'), txt);
   console.log(txt);
   console.log(`✓ Results → .tmp/benchmark-retrieval-e2e.json`);
 }

@@ -1,6 +1,6 @@
 {
   "systemState": {
-    "timestamp": "2026-06-16T17:02:01.890Z",
+    "timestamp": "2026-06-19T04:19:51.322Z",
     "greeting": "Hello James.",
     "sinceLastWorked": {
       "tasksOpen": 5,
@@ -51,6 +51,40 @@
       "taskRegistryCompletionPct": 0,
       "productionReadinessPct": 98,
       "memoryExportsCompletionPct": 100
+    },
+    "routeRuntimePackets": {
+      "total": 1,
+      "cacheHits": 0,
+      "cacheHitPct": 0,
+      "lowContextDensity": 1,
+      "avgLatencyMs": 45,
+      "topSourceRefs": [
+        {
+          "source_ref": "smoke-source-ref",
+          "hits": 1
+        }
+      ],
+      "topFeatures": [
+        {
+          "feature_id": "smoke-feature",
+          "hits": 1
+        }
+      ]
+    },
+    "repoConsolidation": {
+      "canonicalProductionTables": 1,
+      "productionReadyCodePaths": 5,
+      "plannedProduction": 11,
+      "archiveCandidates": 3,
+      "experimental": 8
+    },
+    "repoFunctionRegistry": {
+      "totalRows": 133,
+      "codePaths": 5,
+      "mcpTools": 128,
+      "routeRuntimePackets": 1,
+      "cacheHitPct": 0,
+      "lowContextDensity": 1
     },
     "warnings": [
       "Engram embed is stdio-only; TCP probes to 8792 are not the contract."

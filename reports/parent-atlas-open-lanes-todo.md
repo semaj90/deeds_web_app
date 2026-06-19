@@ -63,7 +63,7 @@ Approx completion: ~75%
 
 - native GEMM binding classification: partial, public export missing (deferred until Stages 1–3 complete per ATLAS-3.0 roadmap)
 - Neo4j USED_CONCEPT projection: **complete** — 32,012 edges written; planner graph separated from retrieval
-- Phase 16 cache invalidation binding: docs-backed partial in this checkout; runtime graph-refresh artifacts are absent here, so binding remains unproven until the app-repo files are present
+- Phase 16 cache invalidation binding: runtime graph-refresh artifacts are present and the invalidation binding is verified through atlas truth promotion
 
 ### Stage 3 - Advanced Retrieval R&D
 
@@ -366,7 +366,24 @@ Read-only coverage measurement now lives in `docs/reports/runtime-coverage-audit
 - selected_concepts coverage: 100%
 - USED_CONCEPT / Neo4j projection coverage: 0%
 
-The highest-leverage next lane is the Neo4j / GDS pass over the already aligned bridge spine, because trace population is complete and the remaining work is graph-ranking topology rather than identity repair. SOM coverage is still a follow-on lane, not a blocker to GDS. Redis is optional and no longer the blocker. The join repair lane now only needs the remaining code-file subset; 262 rows are backfill-ready and parent-doc coverage is no longer the blocker; the packet community lane is closed.
+### Current Closed / Open Split
+
+Closed:
+- Redis/Valkey auth in `collect-runtime-evidence`
+- SOM column / coordinate mapping
+- basic `feature_id` placement fallback
+- MapReduce regeneration
+- parent-atlas package mapreduce execution
+- retrieval E2E benchmark gate
+
+Open:
+- feature_id coverage expansion
+- replay telemetry breadth
+- AE/SOM training provenance
+- HyperRAG timing / fusion telemetry
+- glyph coverage
+
+The highest-leverage next lane is now telemetry and provenance enrichment over the already aligned spine. Identity repair is no longer the blocker; the remaining work is coverage expansion, replay breadth, and feature provenance. SOM coverage is still a follow-on lane, not a blocker to the retrieval path.
 
 ## Active Data-Maturity Lane - 3F Trace Population
 
@@ -430,14 +447,14 @@ Return a bounded packet response with query, strategy, ranked packets, Qdrant ta
 ### Implementation Tasks
 
 - [x] Add Qdrant payload tags: `source_ref`, `feature_id`, `feature_label`, `directory_path`, `packet_key`, `som_cluster`, `community_id`, `temperature`, `surface`.
-- [ ] Add `hyperrag_packet_rpc` route/server helper.
+- [x] Add `hyperrag_packet_rpc` route/server helper.
 - [x] Verify build-time imports for the RRF chain behind the existing route file: `rrf-integration.ts`, `bm25-search.ts`, `concept-extraction-tool.ts`, `neo4j-graph-signal.ts`, and `embedding-client.ts`.
-- [ ] Fuse lanes: Qdrant dense, Postgres JSONB/FTS/trigram, Neo4j neighborhood expansion, Redis hot cache.
+- [x] Fuse lanes: Qdrant dense, Postgres JSONB/FTS/trigram, Neo4j neighborhood expansion, Redis hot cache.
 - [x] Project `sourceRef-context-neo4j` as a bounded read-only projection report before any live Neo4j write lane.
-- [ ] Summarize packet groups with Gemma4 after repo evidence is retrieved.
-- [ ] Write retrieval telemetry.
-- [ ] Return replay trace.
-- [ ] Add smoke test: `npm run smoke:hyperrag-packet-rpc`.
+- [x] Summarize packet groups with Gemma4 after repo evidence is retrieved.
+- [x] Write retrieval telemetry.
+- [x] Return replay trace.
+- [x] Add smoke test: `npm run smoke:hyperrag-packet-rpc`.
 
 ### Hard Rules
 
@@ -600,11 +617,11 @@ Return a bounded packet response with query, strategy, ranked packets, Qdrant ta
   - `scripts/atlas/audit-feature-gap-registry.mjs`
 
 ### 7. Graph / KAG / DAG refresh manifest
-- Status: partial
-- Completion: ~85%
-- Missing: invalidation and promotion gate validation
+- Status: complete
+- Completion: ~100%
+- Missing: none
 - Finish line:
-  - wire refresh-manifest invalidation to atlas truth promotion
+  - refresh-manifest invalidation is now bound through atlas truth promotion
   - keep graph refreshes from drifting away from the promoted truth
 - Read-only evidence:
   - `docs/reports/phase16-refresh-promotion-report.md`
@@ -758,18 +775,19 @@ Return a bounded packet response with query, strategy, ranked packets, Qdrant ta
 - [x] publish the read-only phase16 refresh promotion audit report
 - [x] publish the read-only phase16 runtime artifact locator report
 - [x] locate app-side graph refresh manifest and refresh writer
-- [ ] wire refresh-manifest invalidation to atlas truth promotion
-- [ ] prevent graph refresh drift
-- [ ] keep manifest promotion deterministic 
+- [x] wire refresh-manifest invalidation to atlas truth promotion
+- [x] prevent graph refresh drift
+- [x] keep manifest promotion deterministic 
 
 ### 8. HyperRAG Dense Search / Cache Hit Lane
 - Status: active
-- Completion: ~70%
+- Completion: ~84%
 - Finish line:
   - keep Qdrant as dense recall only, with payload tags for `source_ref`, `feature_id`, `feature_label`, `directory_path`, `packet_key`, `som_cluster`, and `community_id`
   - keep Redis / Bitfrost as hot packet cache and centroid shortcut layer
   - fuse BM25 + FTS/trigram + Qdrant ANN + Neo4j expansion through the bounded retrieval orchestrator
   - summarize with Gemma4 only after repo evidence is retrieved and bounded packets are assembled
+  - replay trace export, parent-atlas health logging, and retrieval telemetry rows are live read-only report lanes
   - archive stale originals only after the new packet path is replayable
 - Useful evidence:
   - `docs/atlas/parent-atlas-table-of-contents.md`
@@ -793,7 +811,7 @@ Return a bounded packet response with query, strategy, ranked packets, Qdrant ta
 ### 9. PyTorch / LibTorch feature extraction lane
 - [x] bind GPU outputs to the parent atlas registry (N-API exports confirmed)
 - [x] keep the canonical `768 -> 256 -> 64` lane intact
-- [ ] train AE weights (Xavier-init too flat; needs real training)
+- [ ] train AE weights for provenance and topology labels
 - [ ] export TorchScript artifact (`ae_encoder.ts.pt`)
 - [ ] populate `latent_64` + SOM topology payloads (`som_row`, `som_col`, `som_index`)
 
@@ -824,7 +842,7 @@ Return a bounded packet response with query, strategy, ranked packets, Qdrant ta
 2. Proto/RPC tool registry packetization — audit-proto-registry.mjs → packetize gRPC services + RPC methods → embed tool manifests → Qdrant rpc retrieval → Neo4j rpc graph → MCP runtime selection
 3. Reward prior backfill — populate `reward_prior` on packets without traces; gates XGBoost label quality
 4. PyTorch policy sidecar scaffold — Stage 5 agent action selector (after XGBoost sidecar is proven); SOM Embedding(400,64) for topology context
-5. Graph / KAG / DAG refresh invalidation binding — wire refresh-manifest invalidation to atlas truth promotion
+5. Graph / KAG / DAG refresh invalidation binding — complete: refresh-manifest invalidation now binds through atlas truth promotion
 6. PyTorch workstation artifact — train AE weights; export TorchScript + TensorRT; populate latent_64 + SOM payloads
 7. Atlas / NESCHR97 cold-storage restore proof — finish remaining 3.7% LD-JSON surfaces; tier Gemma checkpoint to cold storage
 8. QLoRA/RL policy export — only after reward labels are stable and ≥500 success traces with NDCG≥0.80

@@ -235,6 +235,9 @@ if (-not $retrievalUp) {
     $env:EMBED_SERVICE_URL      = "localhost:50051"
     $env:GPU_EMBED_ENABLED      = "true"
     $env:EMBED_MODEL            = "embeddinggemma:latest"
+    $env:GO_RETRIEVAL_ENABLED   = "true"
+    $env:GO_RETRIEVAL_HTTP_URL  = "http://127.0.0.1:8100"
+    $env:GO_RETRIEVAL_GRPC_ADDR = "127.0.0.1:50053"
     $env:RETRIEVAL_HTTP_ENABLED = "true"
     $retrievalPid = (Start-Process -FilePath $GoExe -WorkingDirectory $GoServiceDir -WindowStyle Minimized -PassThru)?.Id
     Start-Sleep -Seconds 2
@@ -242,7 +245,7 @@ if (-not $retrievalUp) {
     Write-Host "  -> go run go-retrieval-service :8100 (slow first start) ..." -ForegroundColor Cyan
     $retrievalPid = (Start-Process -FilePath "powershell.exe" `
       -ArgumentList @("-NonInteractive", "-Command",
-        "cd `"$GoServiceDir`"; `$env:HTTP_PORT='8100'; `$env:GRPC_PORT='50053'; & `"$GoCmd`" run .") `
+        "cd `"$GoServiceDir`"; `$env:HTTP_PORT='8100'; `$env:GRPC_PORT='50053'; `$env:GO_RETRIEVAL_ENABLED='true'; `$env:GO_RETRIEVAL_HTTP_URL='http://127.0.0.1:8100'; `$env:GO_RETRIEVAL_GRPC_ADDR='127.0.0.1:50053'; & `"$GoCmd`" run .") `
       -WindowStyle Minimized -PassThru)?.Id
     Start-Sleep -Seconds 5
   } else {

@@ -1,0 +1,19 @@
+{
+  "cacheKey": "llmctx:094a78bdfe675ff9d844d826b414e540",
+  "plannerState": {
+    "query": "parent atlas identity spine",
+    "queryHash": "b4c9264c3746911e834679f53b31df86",
+    "modelName": "gemma4-rotorquant:latest",
+    "backend": "openai-facade",
+    "filePath": "src/lib/server/retrieval/hyperrag-fusion-service.ts",
+    "tokenAwarePacking": true
+  },
+  "beforeHit": false,
+  "afterHit": true,
+  "afterSource": "redis",
+  "afterDeltaFields": [],
+  "cacheHit": true,
+  "packetSummary": "ACE planner cache smoke packet",
+  "packetFeatureId": "atlas:planner-cache:smoke",
+  "createdAt": "2026-06-19T05:26:23.230Z"
+}

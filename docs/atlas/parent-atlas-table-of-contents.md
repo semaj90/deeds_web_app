@@ -27,6 +27,7 @@ This page is the navigation entry for the Parent Atlas workstream. It links the 
 - [Implementation Status](</C:/Users/james/Videos/deeds-web-app/IMPLEMENTATION_STATUS.md>)
 - [Master todo kanban board](</C:/Users/james/Videos/deeds-web-app/docs/graph/kanban-board.json>)
 - [Master todo consolidation report](</C:/Users/james/Videos/deeds-web-app/memory/exports/master-todo-consolidation-report.json>)
+- [OKF bundle export](</C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/.okf/README.md>) - generated derived index, not canonical source
 - [TurboVec kanban consolidation report](</C:/Users/james/Videos/deeds-web-app/docs/reports/kanban-turbovec-consolidation-latest.md>)
 - [Raw rg transcript organizer](</C:/Users/james/Videos/deeds-web-app/docs/reports/parent-atlas-rg-dump-organizer.md>)
 - [Raw rg transcript projection](</C:/Users/james/Videos/deeds-web-app/docs/reports/parent-atlas-rg-dump-projection.md>)
@@ -146,11 +147,17 @@ The next derived surfaces are compare-only until the live contract exists:
 - Neo4j multi-hop expansion for neighborhood traversal
 - BM25 + FTS/trigram + RRF for bounded fusion
 - Gemma4 summaries only after repo evidence is retrieved
+- Replay trace export and parent-atlas health logging are live read-only report lanes.
 
 ### Remaining todo focus
 - reconcile the live tree / summary / topology schema before any fresh backfill or plugin promotion
-- run the Neo4j / GDS pass before SOM 20x20 / centroid mirror work
+- refresh-manifest invalidation is now bound to atlas truth promotion
 - stage packet reader / writer work in `scripts/atlas` and `.tmp`, then consolidate into `packages/parent-atlas`
+- keep HyperRAG telemetry, replay traces, and health logging read-only and append-only
+- expand `feature_id` placement coverage across the remaining cards
+- increase replay export breadth so replay coverage rises above the current thin baseline
+- finish AE/SOM provenance wiring for `embedding_384 -> latent_128 -> latent_64 -> SOM 20x20`
+- keep glyph coverage separate from retrieval and SOM work
 - finish provenance parity and quality review
 - finish provenance UI and trust-tier editing
 - finish feature registry reconciliation and command mapping

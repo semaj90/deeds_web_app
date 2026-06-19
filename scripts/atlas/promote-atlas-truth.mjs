@@ -28,7 +28,8 @@
  *       Reports written
  */
 
-import { writeFileSync, mkdirSync } from 'node:fs';
+import { writeFileSync, mkdirSync, readFileSync, existsSync } from 'node:fs';
+import { spawnSync } from 'node:child_process';
 import { resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import dotenv from 'dotenv';
@@ -49,6 +50,8 @@ const NEO4J_PASS = process.env.NEO4J_PASSWORD ?? 'neo4j123';
 
 const REPORT_DIR = resolve(__dirname, '../../sveltekit-frontend/docs/reports');
 const REPORT_FILE = resolve(REPORT_DIR, 'graph-refresh.json');
+const REFRESH_MANIFEST_SCRIPT = resolve(__dirname, 'write-graph-refresh-manifest.mjs');
+const CACHE_EPOCH_SCRIPT = resolve(__dirname, 'invalidate-atlas-cache-epoch.mjs');
 
 function log(msg) {
   console.log(`[${new Date().toISOString()}] ${msg}`);
@@ -56,6 +59,15 @@ function log(msg) {
 
 function logVerbose(msg) {
   if (VERBOSE) console.log(`[VERBOSE] ${msg}`);
+}
+
+function asCount(value) {
+  if (typeof value === 'number' && Number.isFinite(value)) return value;
+  if (typeof value === 'string') {
+    const match = value.match(/^(\d+)/);
+    if (match) return Number(match[1]);
+  }
+  return 0;
 }
 
 let pgPool = null;
@@ -135,33 +147,80 @@ async function bumpGraphVersion(currentVersion) {
  * Step 3: Invalidate all cache layers (documented, not implemented)
  */
 async function invalidateCaches(newVersion) {
-  const invalidationReport = {
+  const cacheArgs = [DRY_RUN ? '--dry-run' : '--apply'];
+
+  const runNode = (scriptFile, args) => {
+    const result = spawnSync(process.execPath, [scriptFile, ...args], {
+      encoding: 'utf8',
+      env: process.env,
+      stdio: ['ignore', 'pipe', 'pipe'],
+    });
+
+    if (result.stdout) process.stdout.write(result.stdout);
+    if (result.stderr) process.stderr.write(result.stderr);
+
+    if (result.status !== 0) {
+      throw new Error(`${scriptFile} exited with code ${result.status ?? 'unknown'}`);
+    }
+  };
+
+  const manifestReport = {
+    invalidated: !DRY_RUN,
+    script: REFRESH_MANIFEST_SCRIPT,
+    skipped: DRY_RUN ? 'dry-run' : null,
+  };
+
+  if (!DRY_RUN) {
+    logVerbose(`Invalidating graph refresh manifest via ${REFRESH_MANIFEST_SCRIPT}`);
+    runNode(REFRESH_MANIFEST_SCRIPT, ['--invalidate', '--reason', 'atlas truth promotion']);
+  } else {
+    logVerbose(`Skipping refresh-manifest invalidation in dry-run mode`);
+  }
+
+  logVerbose(`Invalidating cache epoch via ${CACHE_EPOCH_SCRIPT}`);
+  runNode(CACHE_EPOCH_SCRIPT, cacheArgs);
+
+  const cacheReportPath = resolve(REPORT_DIR, 'atlas-cache-invalidation.json');
+  let cacheReport = {
     redis: { keys_deleted: 0, pattern_error: null, status: 'documented' },
     bifrost: { keys_deleted: 0, note: 'Manual header required' },
     ace: { keys_deleted: 0, patterns: [] },
     som: { keys_deleted: 0, patterns: [] },
     kmeans: { keys_deleted: 0, patterns: [] },
     rpc_tools: { keys_deleted: 0, patterns: [] },
+    report_file: cacheReportPath,
   };
 
-  // Cache patterns to invalidate
-  const patterns = [
-    'bifrost:*',
-    'ace:*',
-    'som:*',
-    'kmeans:*',
-    'rpc:tools:*',
-    'gpu:karpathy:*',
-    'centroid:*',
-  ];
+  if (existsSync(cacheReportPath)) {
+    try {
+      cacheReport = { ...cacheReport, ...JSON.parse(readFileSync(cacheReportPath, 'utf8')) };
+    } catch (err) {
+      logVerbose(`Failed to parse cache invalidation report: ${err.message}`);
+    }
+  }
 
-  logVerbose(`Cache patterns to invalidate: ${patterns.join(', ')}`);
-
-  invalidationReport.redis.patterns = patterns;
-  invalidationReport.ace.patterns = patterns;
-  invalidationReport.som.patterns = patterns;
-
-  return invalidationReport;
+  return {
+    redis: {
+      keys_deleted: asCount(cacheReport.keys_deleted?.['atlas:lru:query:*'])
+        + asCount(cacheReport.keys_deleted?.['atlas:lru:packet:*'])
+        + asCount(cacheReport.keys_deleted?.['atlas:lru:tools:*'])
+        + asCount(cacheReport.keys_deleted?.['atlas:lru:kag:*'])
+        + asCount(cacheReport.keys_deleted?.['bifrost:sem:query:*'])
+        + asCount(cacheReport.keys_deleted?.['bifrost:sem:packet:*'])
+        + asCount(cacheReport.keys_deleted?.['bifrost:sem:feature:*'])
+        + asCount(cacheReport.keys_deleted?.['bifrost:sem:intent:*'])
+        + asCount(cacheReport.keys_deleted?.['ace:packet:*']),
+      pattern_error: null,
+      status: cacheReport.status ?? 'unknown',
+    },
+    bifrost: cacheReport.bifrost ?? { keys_deleted: 0 },
+    ace: cacheReport.ace ?? { keys_deleted: 0, patterns: [] },
+    som: cacheReport.som ?? { keys_deleted: 0, patterns: [] },
+    kmeans: cacheReport.kmeans ?? { keys_deleted: 0, patterns: [] },
+    rpc_tools: cacheReport.rpc_tools ?? { keys_deleted: 0, patterns: [] },
+    manifest: manifestReport,
+    cache_report_file: cacheReportPath,
+  };
 }
 
 /**

@@ -136,6 +136,7 @@ function parseWorkstationOpenWork(markdown) {
 }
 
 const steps = [
+  { label: 'atlas:runtime-evidence:collect', command: 'npm', args: ['run', 'atlas:runtime-evidence:collect'] },
   { label: 'opencode:tasks:state', command: 'npm', args: ['run', 'opencode:tasks:state'] },
   { label: 'recommendations:atlas-coverage', command: 'npm', args: ['run', 'recommendations:atlas-coverage'] },
   { label: 'atlas:production-readiness', command: 'npm', args: ['run', 'atlas:production-readiness'] },
@@ -180,6 +181,9 @@ const openLanesMarkdown = existsSync(path.join(ROOT, 'reports', 'parent-atlas-op
 const readiness = readJson(path.join(DOCS_DIR, 'parent-atlas-production-readiness-report.json'), null);
 const liveEnv = readJson(path.join(DOCS_DIR, 'live-service-env-report.json'), null);
 const memoryExports = readJson(path.join(DOCS_DIR, 'memory-exports-ldjson-batch-report.json'), null);
+const routeRuntimePackets = readJson(path.join(DOCS_DIR, 'route-runtime-packets-report.json'), null);
+const repoFunctionRegistry = readJson(path.join(DOCS_DIR, 'repo-function-registry.json'), null);
+const repoConsolidation = readJson(path.join(DOCS_DIR, 'repo-consolidation-feature-map.json'), null);
 const sidecarAudit = readJsonFromFirst([
   path.join(TMP_DIR, 'mcp-sidecar-transport-audit.json'),
   path.join(FRONTEND_TMP_DIR, 'mcp-sidecar-transport-audit.json'),
@@ -216,6 +220,14 @@ const canonicalToolPickup = canonicalPickupQueries().map((entry) => ({
     source_ref: tool.source_ref ?? null,
   })),
 }));
+const routeRuntimeSummary = routeRuntimePackets?.summary ?? {};
+const repoFunctionRegistrySummary = repoFunctionRegistry?.summary ?? {};
+const repoConsolidationCounts = {
+  canonicalProductionTables: Array.isArray(repoConsolidation?.canonical_production_tables) ? repoConsolidation.canonical_production_tables.length : 0,
+  productionReadyCodePaths: Array.isArray(repoConsolidation?.production_ready_code_paths) ? repoConsolidation.production_ready_code_paths.length : 0,
+  plannedProduction: Array.isArray(repoConsolidation?.planned_production) ? repoConsolidation.planned_production.length : 0,
+  archiveCandidates: Array.isArray(repoConsolidation?.archive_candidates) ? repoConsolidation.archive_candidates.length : 0,
+};
 
 const workstationOpenOrder = parseWorkstationOpenWork(workstationBoardMarkdown);
 const openLaneOrder = parseOpenLaneOrder(openLanesMarkdown);
@@ -255,6 +267,30 @@ const briefing = {
       ? Math.round((readinessCounts.pass / (readinessCounts.pass + readinessCounts.warn + readinessCounts.fail)) * 100)
       : 0,
     memoryExportsCompletionPct: Number(memoryExports?.completionEstimatePct ?? 0),
+  },
+  routeRuntimePackets: {
+    total: Number(routeRuntimeSummary.total ?? 0),
+    cacheHits: Number(routeRuntimeSummary.cache_hits ?? 0),
+    cacheHitPct: Number(routeRuntimeSummary.cache_hit_pct ?? 0),
+    lowContextDensity: Number(routeRuntimeSummary.low_context_density ?? 0),
+    avgLatencyMs: Number(routeRuntimeSummary.avg_latency_ms ?? 0),
+    topSourceRefs: Array.isArray(routeRuntimePackets?.top_source_refs) ? routeRuntimePackets.top_source_refs.slice(0, 5) : [],
+    topFeatures: Array.isArray(routeRuntimePackets?.top_features) ? routeRuntimePackets.top_features.slice(0, 5) : [],
+  },
+  repoConsolidation: {
+    canonicalProductionTables: repoConsolidationCounts.canonicalProductionTables,
+    productionReadyCodePaths: repoConsolidationCounts.productionReadyCodePaths,
+    plannedProduction: repoConsolidationCounts.plannedProduction,
+    archiveCandidates: repoConsolidationCounts.archiveCandidates,
+    experimental: Array.isArray(repoConsolidation?.experimental) ? repoConsolidation.experimental.length : 0,
+  },
+  repoFunctionRegistry: {
+    totalRows: Number(repoFunctionRegistrySummary.total_rows ?? 0),
+    codePaths: Number(repoFunctionRegistrySummary.code_paths ?? 0),
+    mcpTools: Number(repoFunctionRegistrySummary.mcp_tools ?? 0),
+    routeRuntimePackets: Number(repoFunctionRegistrySummary.route_runtime_packets ?? 0),
+    cacheHitPct: Number(repoFunctionRegistrySummary.cache_hit_pct ?? 0),
+    lowContextDensity: Number(repoFunctionRegistrySummary.low_context_density ?? 0),
   },
   warnings: [],
   recommendations: mergedRecommendations,
@@ -335,6 +371,29 @@ ${briefing.toolRegistry.canonicalPickup.map((entry) => `- **${entry.name}**: ${e
 - **Production Readiness Completion**: ${briefing.progress.productionReadinessPct}%
 - **Memory Exports Completion**: ${briefing.progress.memoryExportsCompletionPct}%
 
+## Runtime Packet Evidence
+
+- **Route Runtime Packets**: ${briefing.routeRuntimePackets.total}
+- **Cache Hit %**: ${briefing.routeRuntimePackets.cacheHitPct}%
+- **Low Context Density**: ${briefing.routeRuntimePackets.lowContextDensity}
+- **Avg Latency**: ${briefing.routeRuntimePackets.avgLatencyMs} ms
+
+## Repo Consolidation Evidence
+
+- **Canonical Production Tables**: ${briefing.repoConsolidation.canonicalProductionTables}
+- **Production-Ready Code Paths**: ${briefing.repoConsolidation.productionReadyCodePaths}
+- **Planned Production Rows**: ${briefing.repoConsolidation.plannedProduction}
+- **Archive Candidates**: ${briefing.repoConsolidation.archiveCandidates}
+
+## Repo Function Registry
+
+- **Total Rows**: ${briefing.repoFunctionRegistry.totalRows}
+- **Code Paths**: ${briefing.repoFunctionRegistry.codePaths}
+- **MCP Tools**: ${briefing.repoFunctionRegistry.mcpTools}
+- **Route Runtime Packets**: ${briefing.repoFunctionRegistry.routeRuntimePackets}
+- **Cache Hit %**: ${briefing.repoFunctionRegistry.cacheHitPct}%
+- **Low Context Density**: ${briefing.repoFunctionRegistry.lowContextDensity}
+
 ## Warnings
 
 ${briefing.warnings.length > 0 ? briefing.warnings.map((w) => `- ${w}`).join('\n') : '- None'}
@@ -389,6 +448,16 @@ console.log('Coverage:');
 console.log(`  • Qdrant: ${briefing.coverage.qdrant}`);
 console.log(`  • SOM: ${briefing.coverage.som}`);
 console.log(`  • Parent Atlas: ${briefing.coverage.parentAtlas}\n`);
+console.log('Runtime Packet Evidence:');
+console.log(`  • Route runtime packets: ${briefing.routeRuntimePackets.total}`);
+console.log(`  • Cache hit %: ${briefing.routeRuntimePackets.cacheHitPct}%`);
+console.log(`  • Low context density: ${briefing.routeRuntimePackets.lowContextDensity}`);
+console.log(`  • Avg latency: ${briefing.routeRuntimePackets.avgLatencyMs} ms\n`);
+console.log('Repo Function Registry:');
+console.log(`  • Total rows: ${briefing.repoFunctionRegistry.totalRows}`);
+console.log(`  • Code paths: ${briefing.repoFunctionRegistry.codePaths}`);
+console.log(`  • MCP tools: ${briefing.repoFunctionRegistry.mcpTools}`);
+console.log(`  • Route runtime packets: ${briefing.repoFunctionRegistry.routeRuntimePackets}\n`);
 console.log('Tool Registry Pickup:');
 console.log(`  • Registry tools: ${briefing.toolRegistry.totalTools}`);
 console.log(`  • Active layers: ${briefing.toolRegistry.activeLayers.join(', ') || 'none'}`);

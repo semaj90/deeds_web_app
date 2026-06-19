@@ -1,0 +1,15 @@
+{
+  "timestamp": "2026-06-19T05:07:00.000Z",
+  "status": "SUCCESS",
+  "pipeline_run": {
+    "parsed_cards": 8170,
+    "mapreduce_phase_1": "16 clusters with feature context, 17 feature_id placements",
+    "mapreduce_phase_4": "63 clusters reduced",
+    "mapreduce_phase_5": "101 adjacency edges generated (46 with feature_id context)",
+    "postgres_backfill": "500 packets inserted/updated",
+    "valkey_cache": "500 engrams/centroids cached",
+    "e2e_benchmark": "10/10 passed"
+  },
+  "redis_auth_fix": "Use REDIS_PASSWORD from env, lazyConnect: true, enableOfflineQueue: false, and execute connect()",
+  "som_mapping_fix": "Robust parseSom function decoding cluster indexes and string coordinates, inserting som_row, som_col, som_index, and topology/metadata JSONB contracts"
+}

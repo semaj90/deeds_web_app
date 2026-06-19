@@ -40,14 +40,15 @@ export interface RRFIntegrationOutput {
   };
   durationMs: number;
   timings?: {
-    pgBm25Ms: number;
-    qdrantMs: number;
-    turbovecMs: number;
-    neo4jMs: number;
-    gemma4Ms: number;
-    rerankMs: number;
-    pgvectorMs?: number;
-    conceptOverlapMs?: number;
+    bm25_ms: number;
+    qdrant_ms: number;
+    turbovec_ms: number;
+    neo4j_ms: number;
+    redis_ms: number;
+    gemma4_ms: number;
+    rrf_ms: number;
+    pgvector_ms?: number;
+    concept_overlap_ms?: number;
   };
 }
 
@@ -570,14 +571,15 @@ export async function multiLaneRetrievalWithRRF(
       },
       durationMs: Date.now() - t0,
       timings: {
-        pgBm25Ms,
-        qdrantMs,
-        turbovecMs,
-        neo4jMs,
-        gemma4Ms,
-        rerankMs,
-        pgvectorMs,
-        conceptOverlapMs,
+        bm25_ms: pgBm25Ms,
+        qdrant_ms: qdrantMs,
+        turbovec_ms: turbovecMs,
+        neo4j_ms: neo4jMs,
+        redis_ms: 0,
+        gemma4_ms: gemma4Ms,
+        rrf_ms: rerankMs,
+        pgvector_ms: pgvectorMs,
+        concept_overlap_ms: conceptOverlapMs,
       },
     };
   } catch (error) {
@@ -587,14 +589,15 @@ export async function multiLaneRetrievalWithRRF(
       breakdown: { bm25Count: 0, conceptCount: 0, qdrantCount: 0, turbovecCount: 0, neoCount: 0 },
       durationMs: Date.now() - t0,
       timings: {
-        pgBm25Ms: 0,
-        qdrantMs: 0,
-        turbovecMs: 0,
-        neo4jMs: 0,
-        gemma4Ms: 0,
-        rerankMs: 0,
-        pgvectorMs: 0,
-        conceptOverlapMs: 0,
+        bm25_ms: 0,
+        qdrant_ms: 0,
+        turbovec_ms: 0,
+        neo4j_ms: 0,
+        redis_ms: 0,
+        gemma4_ms: 0,
+        rrf_ms: 0,
+        pgvector_ms: 0,
+        concept_overlap_ms: 0,
       },
     };
   }

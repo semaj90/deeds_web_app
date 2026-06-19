@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-06-11T16:42:48.204Z",
+  "generatedAt": "2026-06-19T04:36:27.149Z",
   "embeddingDim": 768,
   "allowedDims": [
     768,
@@ -61,6 +61,8 @@
       "vectorExtension": "v0.8.2",
       "hnswIndexes": [
         "agent_memory_observations.agent_memory_observations_embedding_hnsw",
+        "atlas_packets.idx_atlas_packets_embedding_hnsw",
+        "atlas_summary_layers.idx_summary_embedding",
         "cluster_summaries.cluster_summaries_embedding_hnsw",
         "code_retrieval_chunks.crc_embedding_hnsw",
         "codebase_chunk_index.codebase_chunk_index_summary_hnsw",
@@ -85,7 +87,7 @@
         "warden_chunks.warden_chunks_hnsw_idx"
       ],
       "missingHnswOnExistingTables": [],
-      "message": "pgvector 0.8.2 installed. 23 HNSW index(es) found.",
+      "message": "pgvector 0.8.2 installed. 25 HNSW index(es) found.",
       "suggestedFix": null
     }
   ],

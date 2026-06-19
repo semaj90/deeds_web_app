@@ -49,6 +49,29 @@ const OC_DIR       = path.join(ROOT, '.opencode');
 const OUT_DIR      = path.join(ROOT, '.opencode/ndjson');
 const MANIFEST_PATH = path.join(ROOT, 'docs/reports/parent-atlas-feature-command-atlas.json');
 
+const SOM_GRID = 20;
+
+function parseSom(value) {
+  if (value == null || value === '') return { som_row: null, som_col: null };
+
+  const text = String(value);
+  const pair = text.match(/(\d+)[,:_\- ]+(\d+)/);
+
+  if (pair) {
+    return { som_row: Number(pair[1]), som_col: Number(pair[2]) };
+  }
+
+  const bmu = Number(text);
+  if (Number.isInteger(bmu)) {
+    return {
+      som_row: Math.floor(bmu / SOM_GRID),
+      som_col: bmu % SOM_GRID
+    };
+  }
+
+  return { som_row: null, som_col: null };
+}
+
 // ─── ID normalization (mirrors nes-chrom-card-store.ts normalizeCardId) ──────
 
 const STRIP_PREFIXES = [
@@ -143,7 +166,7 @@ function loadFeatureIndex(cardMap) {
       if (!featureKey) continue;
       // Look up card by featureKey in cardMap (cards may use featureKey as id)
       for (const [, card] of cardMap) {
-        if (!card.som_bmu_row == null || card.som_bmu_col == null) continue;
+        if (card.som_bmu_row == null || card.som_bmu_col == null) continue;
         const matchesFeature = card.id === featureKey
           || card.feature_key === featureKey
           || (card.source && card.source.includes(featureKey));
@@ -198,6 +221,12 @@ function mapCards() {
     try {
       const card = JSON.parse(fs.readFileSync(path.join(CARDS_DIR, f), 'utf8'));
       if (card.id) {
+        if (card.som_bmu_row == null) {
+          const som = parseSom(card.som_cluster ?? card.somCluster ?? null);
+          card.som_bmu_row = som.som_row;
+          card.som_bmu_col = som.som_col;
+          card.som_bmu_index = som.som_row != null && som.som_col != null ? som.som_row * SOM_GRID + som.som_col : null;
+        }
         cardMap.set(card.id, card);
         // index by all normalized source path variants using shared normalizeCardId()
         if (card.source) {

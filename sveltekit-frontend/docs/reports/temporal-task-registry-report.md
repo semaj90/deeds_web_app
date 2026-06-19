@@ -1,6 +1,6 @@
 # Temporal Task Registry
 
-- recommendationEvents: 286
+- recommendationEvents: 300
 - taskEvents: 27
 - taskCount: 17
 - openTaskCount: 8

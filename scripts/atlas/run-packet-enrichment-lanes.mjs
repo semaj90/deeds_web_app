@@ -23,7 +23,6 @@ const SAMPLE = parseIntFlag(argv, '--sample', 8);
 const SUMMARY_LIMIT = parseIntFlag(argv, '--summary-limit', 25);
 
 const TURBOQUANT_URL = (process.env.TURBOQUANT_URL ?? process.env.TURBOQUANT_BASE_URL ?? 'http://127.0.0.1:8090').replace(/\/+$/, '');
-const GEMMA4_MODEL = process.env.GEMMA4_MODEL ?? process.env.TURBOQUANT_MODEL ?? 'gemma4-legal-iq4xs-direct.gguf';
 const GEMMA4_ENABLED = String(process.env.GEMMA4_ENABLED ?? 'true').toLowerCase() !== 'false';
 
 function parseIntFlag(args, name, fallback) {
@@ -48,6 +47,29 @@ function normalizeText(value) {
 function unique(values) {
   return [...new Set(values.map((value) => normalizeText(value)).filter(Boolean))];
 }
+
+function resolveLlamaServerModelId() {
+  const explicit = String(process.env.LLAMA_MODEL ?? process.env.TURBOQUANT_MODEL ?? '').trim();
+  if (explicit) return explicit;
+
+  const modelPath = String(
+    process.env.ROTORQUANT_MODEL_PATH ??
+    process.env.TURBO_MODEL_PATH ??
+    process.env.TURBOQUANT_MODEL_PATH ??
+    '',
+  ).trim();
+  if (modelPath) {
+    const base = path.basename(modelPath).trim();
+    if (base) return base;
+  }
+
+  const gemma4 = String(process.env.GEMMA4_MODEL ?? '').trim();
+  if (gemma4 && !/^gemma4-rotorquant(?::latest)?$/i.test(gemma4)) return gemma4;
+
+  return 'gemma4-legal-iq4xs-direct.gguf';
+}
+
+const GEMMA4_MODEL = resolveLlamaServerModelId();
 
 function parseNdjson(text) {
   return String(text ?? '')

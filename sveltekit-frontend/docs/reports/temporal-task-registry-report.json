@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-06-12T13:00:13.166Z",
+  "generatedAt": "2026-06-19T04:03:40.376Z",
   "sourceFiles": {
     "recommendationEvents": ".opencode\\recommendations\\recommendation-events.jsonl",
     "taskEvents": ".opencode\\tasks\\task-events.jsonl",
@@ -7,14 +7,14 @@
   },
   "counts": {
     "findings": 0,
-    "recommendations": 286,
+    "recommendations": 300,
     "tasks": 17,
     "historyPackets": 27
   },
   "summary": {
-    "runId": "2026-06-12T13:00:13.166Z",
+    "runId": "2026-06-19T04:03:40.376Z",
     "findingCount": 0,
-    "recommendationCount": 286,
+    "recommendationCount": 300,
     "taskCount": 17,
     "historyCount": 27,
     "promotedRecommendations": 17,
@@ -28,8 +28,8 @@
     }
   },
   "taskState": {
-    "generatedAt": "2026-06-12T13:00:13.166Z",
-    "recommendationEventsCount": 286,
+    "generatedAt": "2026-06-19T04:03:40.376Z",
+    "recommendationEventsCount": 300,
     "taskEventsCount": 27,
     "promotedRecommendationsCount": 17,
     "tasks": [
@@ -127,7 +127,7 @@
             ]
           }
         ],
-        "seen_count": 3
+        "seen_count": 4
       },
       {
         "task_id": "task_feature_parent_join_repair",
@@ -175,7 +175,7 @@
             ]
           }
         ],
-        "seen_count": 3
+        "seen_count": 4
       },
       {
         "task_id": "task_higher_hop_coverage_repair",
@@ -223,7 +223,7 @@
             ]
           }
         ],
-        "seen_count": 4
+        "seen_count": 5
       },
       {
         "task_id": "task_phase_3d_retrieval_telemetry",
@@ -377,7 +377,7 @@
             ]
           }
         ],
-        "seen_count": 23
+        "seen_count": 24
       },
       {
         "task_id": "task_graph_missing_neighborhood",
@@ -521,7 +521,7 @@
             ]
           }
         ],
-        "seen_count": 23
+        "seen_count": 24
       },
       {
         "task_id": "task_parent_atlas_overlay_mismatch",
@@ -866,7 +866,7 @@
             ]
           }
         ],
-        "seen_count": 3
+        "seen_count": 4
       },
       {
         "task_id": "task_command_mapping_mcp_allowlist",
@@ -914,7 +914,7 @@
             ]
           }
         ],
-        "seen_count": 23
+        "seen_count": 24
       },
       {
         "task_id": "task_atlas_topology_mirror_infer_siblings",
@@ -1020,15 +1020,15 @@
             ]
           }
         ],
-        "seen_count": 23
+        "seen_count": 24
       }
     ],
     "recommendationSummary": [
       {
         "recommendation_key": "4_circular_dependency_chains_of_3_files",
-        "count": 23,
+        "count": 24,
         "first_seen": "2026-06-11T03:18:47.299Z",
-        "last_seen": "2026-06-12T13:00:12.976Z",
+        "last_seen": "2026-06-19T04:03:40.176Z",
         "title": "4 circular dependency chains of 3+ files",
         "severity": "HIGH",
         "command": null,
@@ -1037,9 +1037,9 @@
       },
       {
         "recommendation_key": "27_api_route_handlers_lack_auth_guards",
-        "count": 23,
+        "count": 24,
         "first_seen": "2026-06-11T03:18:47.300Z",
-        "last_seen": "2026-06-12T13:00:12.977Z",
+        "last_seen": "2026-06-19T04:03:40.176Z",
         "title": "27 API route handlers lack auth guards",
         "severity": "HIGH",
         "command": null,
@@ -1048,9 +1048,9 @@
       },
       {
         "recommendation_key": "25_files_have_0_importers_and_are_not_entrypoints",
-        "count": 23,
+        "count": 24,
         "first_seen": "2026-06-11T03:18:47.300Z",
-        "last_seen": "2026-06-12T13:00:12.977Z",
+        "last_seen": "2026-06-19T04:03:40.176Z",
         "title": "25 files have 0 importers and are not entrypoints",
         "severity": "MEDIUM",
         "command": null,
@@ -1059,9 +1059,9 @@
       },
       {
         "recommendation_key": "30_files_each_depended_on_by_50_files_transitively",
-        "count": 23,
+        "count": 24,
         "first_seen": "2026-06-11T03:18:47.300Z",
-        "last_seen": "2026-06-12T13:00:12.977Z",
+        "last_seen": "2026-06-19T04:03:40.176Z",
         "title": "30 files each depended on by >50 files transitively",
         "severity": "MEDIUM",
         "command": null,
@@ -1070,9 +1070,9 @@
       },
       {
         "recommendation_key": "157_api_routes_lack_zod_input_validation",
-        "count": 23,
+        "count": 24,
         "first_seen": "2026-06-11T03:18:47.300Z",
-        "last_seen": "2026-06-12T13:00:12.977Z",
+        "last_seen": "2026-06-19T04:03:40.176Z",
         "title": "157 API routes lack Zod input validation",
         "severity": "MEDIUM",
         "command": null,
@@ -1081,9 +1081,9 @@
       },
       {
         "recommendation_key": "35_files_in_circular_dependency_chains_have_no_paired_test",
-        "count": 23,
+        "count": 24,
         "first_seen": "2026-06-11T03:18:47.300Z",
-        "last_seen": "2026-06-12T13:00:12.977Z",
+        "last_seen": "2026-06-19T04:03:40.176Z",
         "title": "35 files in circular dependency chains have no paired test",
         "severity": "MEDIUM",
         "command": null,
@@ -1092,9 +1092,9 @@
       },
       {
         "recommendation_key": "243_substantial_files_import_libraries_but_have_0_consumers",
-        "count": 23,
+        "count": 24,
         "first_seen": "2026-06-11T03:18:47.300Z",
-        "last_seen": "2026-06-12T13:00:12.977Z",
+        "last_seen": "2026-06-19T04:03:40.176Z",
         "title": "243 substantial files import libraries but have 0 consumers",
         "severity": "MEDIUM",
         "command": null,
@@ -1103,9 +1103,9 @@
       },
       {
         "recommendation_key": "11_2_file_circular_dependency_pairs",
-        "count": 23,
+        "count": 24,
         "first_seen": "2026-06-11T03:18:47.300Z",
-        "last_seen": "2026-06-12T13:00:12.977Z",
+        "last_seen": "2026-06-19T04:03:40.176Z",
         "title": "11 2-file circular dependency pairs",
         "severity": "LOW",
         "command": null,
@@ -1158,9 +1158,9 @@
       },
       {
         "recommendation_key": "task-semantic-packets-drift",
-        "count": 3,
+        "count": 4,
         "first_seen": "2026-06-11T03:18:47.301Z",
-        "last_seen": "2026-06-11T03:28:06.864Z",
+        "last_seen": "2026-06-19T04:03:40.177Z",
         "title": "task_semantic_packets manual SQL mirror drift",
         "severity": "MEDIUM",
         "command": "npm run atlas:postgres-contract-mirrors",
@@ -1180,9 +1180,9 @@
       },
       {
         "recommendation_key": "command-mapping-mcp-allowlist",
-        "count": 23,
+        "count": 24,
         "first_seen": "2026-06-11T03:18:47.301Z",
-        "last_seen": "2026-06-12T13:00:12.977Z",
+        "last_seen": "2026-06-19T04:03:40.177Z",
         "title": "Command Mapping -> MCP allowlist",
         "severity": "MEDIUM",
         "command": "npm run opencode:tasks:refresh",
@@ -1191,9 +1191,9 @@
       },
       {
         "recommendation_key": "synthetic-evidence-concept-cards",
-        "count": 23,
+        "count": 24,
         "first_seen": "2026-06-11T03:18:47.301Z",
-        "last_seen": "2026-06-12T13:00:12.977Z",
+        "last_seen": "2026-06-19T04:03:40.177Z",
         "title": "Synthetic Evidence concept cards",
         "severity": "LOW",
         "command": "npm run opencode:tasks:refresh",
@@ -1224,9 +1224,9 @@
       },
       {
         "recommendation_key": "higher-hop-coverage-repair",
-        "count": 4,
+        "count": 5,
         "first_seen": "2026-06-12T12:42:11.456Z",
-        "last_seen": "2026-06-12T13:00:12.977Z",
+        "last_seen": "2026-06-19T04:03:40.176Z",
         "title": "Higher-hop coverage repair",
         "severity": "HIGH",
         "command": "npm run atlas:higher-hop:coverage",
@@ -1235,9 +1235,9 @@
       },
       {
         "recommendation_key": "feature-parent-join-repair",
-        "count": 3,
+        "count": 4,
         "first_seen": "2026-06-12T12:45:29.302Z",
-        "last_seen": "2026-06-12T13:00:12.977Z",
+        "last_seen": "2026-06-19T04:03:40.176Z",
         "title": "atlas_feature_map parent join repair",
         "severity": "HIGH",
         "command": "npm run atlas:feature-parent-join",
@@ -1246,9 +1246,9 @@
       },
       {
         "recommendation_key": "route-runtime-packets-materialization",
-        "count": 3,
+        "count": 4,
         "first_seen": "2026-06-12T12:45:29.303Z",
-        "last_seen": "2026-06-12T13:00:12.977Z",
+        "last_seen": "2026-06-19T04:03:40.176Z",
         "title": "route_runtime_packets materialization",
         "severity": "HIGH",
         "command": "npm run atlas:route-runtime-packets:materialize:apply",

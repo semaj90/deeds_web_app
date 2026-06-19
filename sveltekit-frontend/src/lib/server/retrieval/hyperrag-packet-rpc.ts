@@ -73,6 +73,23 @@ type ParentAtlasRow = {
   payload: Record<string, unknown> | null;
 };
 
+type QueryEvalTelemetryPayload = {
+  route: string;
+  result_count: number;
+  packet_keys: string[];
+  feature_ids: string[];
+  source_refs: string[];
+  cache_hit_source: string | null;
+  error: string | null;
+  packet_summaries: Array<{
+    packet_key: string;
+    source_ref: string;
+    feature_id: string | null;
+    fusion_score: number;
+    rank: number;
+  }>;
+};
+
 type NesPacketRow = {
   packet_key: string;
   source_ref: string | null;
@@ -364,53 +381,64 @@ async function fallbackParentAtlas(query: string, limit: number): Promise<FTSRes
   }
 }
 
-async function recordEvalTimes(params: {
+async function recordQueryEvalTimes(params: {
   queryHash: string | null;
-  packetKey: string | null;
-  featureId: string | null;
-  sourceRef: string | null;
+  route: string;
+  resultCount: number;
   qdrantMs: number | null;
-  pgBm25Ms: number | null;
+  bm25Ms: number | null;
   pgvectorMs: number | null;
   redisMs: number | null;
   bitfrostMs: number | null;
   neo4jMs: number | null;
   turbovecMs: number | null;
-  rerankMs: number | null;
+  rrfMs: number | null;
   gemma4Ms: number | null;
   totalMs: number | null;
   cacheHitSource: string | null;
   ttlRemaining: number | null;
-  payload: Record<string, unknown>;
+  error: string | null;
+  payload: QueryEvalTelemetryPayload;
 }): Promise<void> {
   try {
     await getPacketRpcPool().query(
       `
         INSERT INTO atlas_retrieval_eval_times (
-          query_hash, packet_key, feature_id, source_ref,
-          qdrant_ms, pg_bm25_ms, pgvector_ms, redis_ms, bitfrost_ms,
+          query_hash, route, result_count, error,
+          packet_key, feature_id, source_ref,
+          domain_class, ontology_label, topology_label,
+          qdrant_ms, bm25_ms, pg_bm25_ms, pgvector_ms, redis_ms, bitfrost_ms,
           neo4j_ms, turbovec_ms, rerank_ms, gemma4_ms, total_ms,
           cache_hit_source, ttl_remaining, payload
         ) VALUES (
           $1, $2, $3, $4,
-          $5, $6, $7, $8, $9,
-          $10, $11, $12, $13, $14,
-          $15, $16, $17
+          $5, $6, $7,
+          $8, $9, $10,
+          $11, $12, $13, $14, $15,
+          $16, $17, $18, $19, $20,
+          $21, $22, $23, $24
         )
       `,
       [
         params.queryHash,
-        params.packetKey,
-        params.featureId,
-        params.sourceRef,
+        params.route,
+        params.resultCount,
+        params.error,
+        null,
+        null,
+        null,
+        'retrieval_pipeline',
+        'hyperrag_fusion',
+        'core_search_entrypoint',
         params.qdrantMs,
-        params.pgBm25Ms,
+        params.bm25Ms,
+        params.bm25Ms,
         params.pgvectorMs,
         params.redisMs,
         params.bitfrostMs,
         params.neo4jMs,
         params.turbovecMs,
-        params.rerankMs,
+        params.rrfMs,
         params.gemma4Ms,
         params.totalMs,
         params.cacheHitSource,
@@ -437,79 +465,88 @@ export async function hyperragPacketRpc(input: HyperRagPacketRpcInput): Promise<
   const useCache = input.useExactMatchCache !== false;
   const qHash = crypto.createHash('sha256').update(query.trim().toLowerCase()).digest('hex').slice(0, 16);
   const cacheKey = `hyperrag:query:${qHash}`;
+  const route = '/api/hyperrag/packet-rpc';
 
   let redisMs = 0;
-  if (useCache) {
-    const redis = getRedis();
-    const tRedisStart = performance.now();
-    const pipeline = redis.pipeline();
-    pipeline.get(cacheKey);
-    pipeline.get(`${cacheKey}:prov`);
-    pipeline.ttl(cacheKey);
-    const redisResults = await pipeline.exec().catch(() => null);
-    redisMs = performance.now() - tRedisStart;
+  try {
+    if (useCache) {
+      const redis = getRedis();
+      const tRedisStart = performance.now();
+      const pipeline = redis.pipeline();
+      pipeline.get(cacheKey);
+      pipeline.get(`${cacheKey}:prov`);
+      pipeline.ttl(cacheKey);
+      const redisResults = await pipeline.exec().catch(() => null);
+      redisMs = performance.now() - tRedisStart;
 
-    if (redisResults) {
-      const [resErr, resVal] = redisResults[0] || [];
-      const [provErr, provVal] = redisResults[1] || [];
-      const [ttlErr, ttlVal] = redisResults[2] || [];
+      if (redisResults) {
+        const [resErr, resVal] = redisResults[0] || [];
+        const [provErr, provVal] = redisResults[1] || [];
+        const [ttlErr, ttlVal] = redisResults[2] || [];
 
-      if (!resErr && resVal) {
-        try {
-          const cachedLlmResponse = JSON.parse(String(resVal)) as { content?: string };
-          const parsed = JSON.parse(cachedLlmResponse.content ?? '{}') as HyperRagPacketRpcResult;
-          if (parsed && Array.isArray(parsed.packets)) {
-            const ttlRemaining = typeof ttlVal === 'number' ? ttlVal : null;
-            const totalMs = Date.now() - startedAt;
-            const cachedResult = {
-              ...parsed,
-              trace: {
-                ...parsed.trace,
-                latency_ms: totalMs,
-              }
-            };
+        if (!resErr && resVal) {
+          try {
+            const cachedLlmResponse = JSON.parse(String(resVal)) as { content?: string };
+            const parsed = JSON.parse(cachedLlmResponse.content ?? '{}') as HyperRagPacketRpcResult;
+            if (parsed && Array.isArray(parsed.packets)) {
+              const ttlRemaining = typeof ttlVal === 'number' ? ttlVal : null;
+              const totalMs = Date.now() - startedAt;
+              const cachedResult = {
+                ...parsed,
+                trace: {
+                  ...parsed.trace,
+                  latency_ms: totalMs,
+                }
+              };
 
-            for (const packet of cachedResult.packets) {
-              await recordEvalTimes({
+              await recordQueryEvalTimes({
                 queryHash: qHash,
-                packetKey: packet.packet_key,
-                featureId: packet.feature_id,
-                sourceRef: packet.source_ref,
+                route,
+                resultCount: cachedResult.packets.length,
                 qdrantMs: 0,
-                pgBm25Ms: 0,
+                bm25Ms: 0,
                 pgvectorMs: 0,
                 redisMs,
                 bitfrostMs: 0,
                 neo4jMs: 0,
                 turbovecMs: 0,
-                rerankMs: 0,
+                rrfMs: 0,
                 gemma4Ms: 0,
                 totalMs,
                 cacheHitSource: 'redis',
                 ttlRemaining,
+                error: null,
                 payload: {
-                  packet_type: packet.packet_type,
-                  fusion_score: packet.fusion_score,
-                  fusion_sources: packet.fusion_sources,
-                  gemma4_summary: packet.gemma4_summary,
-                  rank: packet.rank,
-                }
+                  route,
+                  result_count: cachedResult.packets.length,
+                  packet_keys: cachedResult.packets.map((packet) => packet.packet_key),
+                  feature_ids: [...new Set(cachedResult.packets.map((packet) => packet.feature_id).filter((value): value is string => Boolean(value)))],
+                  source_refs: [...new Set(cachedResult.packets.map((packet) => packet.source_ref))],
+                  cache_hit_source: 'redis',
+                  error: null,
+                  packet_summaries: cachedResult.packets.map((packet) => ({
+                    packet_key: packet.packet_key,
+                    source_ref: packet.source_ref,
+                    feature_id: packet.feature_id,
+                    fusion_score: packet.fusion_score,
+                    rank: packet.rank,
+                  })),
+                },
               });
-            }
 
-            return cachedResult;
+              return cachedResult;
+            }
+          } catch (err) {
+            console.warn('[hyperrag-packet-rpc] Cache parse failed in RPC:', err);
           }
-        } catch (err) {
-          console.warn('[hyperrag-packet-rpc] Cache parse failed in RPC:', err);
         }
       }
     }
-  }
 
-  const [rrfResult, initialFtsHits] = await Promise.all([
-    includeGraph ? multiLaneRetrievalWithRRF(query, getPacketRpcPool(), { topK: limit, minScore: 0.001 }).catch(() => null) : Promise.resolve(null),
-    useFts ? searchCodeLexicalBounded(query, limit) : Promise.resolve([]),
-  ]);
+    const [rrfResult, initialFtsHits] = await Promise.all([
+      includeGraph ? multiLaneRetrievalWithRRF(query, getPacketRpcPool(), { topK: limit, minScore: 0.001 }).catch(() => null) : Promise.resolve(null),
+      useFts ? searchCodeLexicalBounded(query, limit) : Promise.resolve([]),
+    ]);
 
   let ftsHits = initialFtsHits;
   if (!ftsHits.length) {
@@ -692,69 +729,102 @@ export async function hyperragPacketRpc(input: HyperRagPacketRpcInput): Promise<
   }
 
   // Record timing metrics in atlas_retrieval_eval_times
-  const timings = rrfResult?.timings ?? {
-    pgBm25Ms: 0,
-    qdrantMs: 0,
-    turbovecMs: 0,
-    neo4jMs: 0,
-    gemma4Ms: 0,
-    rerankMs: 0,
-    pgvectorMs: 0,
-    conceptOverlapMs: 0,
-  };
+    const timings = rrfResult?.timings ?? {
+      bm25_ms: 0,
+      qdrant_ms: 0,
+      turbovec_ms: 0,
+      neo4j_ms: 0,
+      redis_ms: redisMs,
+      gemma4_ms: 0,
+      rrf_ms: 0,
+      pgvector_ms: 0,
+      concept_overlap_ms: 0,
+    };
+    const effectiveRedisMs = timings.redis_ms || redisMs || 0;
 
-  const evalRecordsPromises = packets.map((packet) =>
-    recordEvalTimes({
+    if (input.recordTelemetry !== false) {
+      const telemetry = recordPacketRpcTelemetry({
+        query,
+        latencyMs,
+        ftsHits: ftsHits.length,
+        vectorHits: result.trace.qdrant_hits,
+        packets,
+      });
+      if (input.awaitTelemetry) {
+        await telemetry;
+      } else {
+        void telemetry;
+      }
+    }
+
+    await recordQueryEvalTimes({
       queryHash: qHash,
-      packetKey: packet.packet_key,
-      featureId: packet.feature_id,
-      sourceRef: packet.source_ref,
-      qdrantMs: timings.qdrantMs,
-      pgBm25Ms: timings.pgBm25Ms,
-      pgvectorMs: timings.pgvectorMs,
-      redisMs,
+      route,
+      resultCount: packets.length,
+      qdrantMs: timings.qdrant_ms,
+      bm25Ms: timings.bm25_ms,
+      pgvectorMs: timings.pgvector_ms ?? 0,
+      redisMs: effectiveRedisMs,
       bitfrostMs: 0,
-      neo4jMs: timings.neo4jMs,
-      turbovecMs: timings.turbovecMs,
-      rerankMs: timings.rerankMs,
-      gemma4Ms: timings.gemma4Ms,
+      neo4jMs: timings.neo4j_ms,
+      turbovecMs: timings.turbovec_ms,
+      rrfMs: timings.rrf_ms,
+      gemma4Ms: timings.gemma4_ms,
       totalMs: latencyMs,
       cacheHitSource: null,
       ttlRemaining: null,
+      error: null,
       payload: {
-        packet_type: packet.packet_type,
-        fusion_score: packet.fusion_score,
-        fusion_sources: packet.fusion_sources,
-        gemma4_summary: packet.gemma4_summary,
-        rank: packet.rank,
+        route,
+        result_count: packets.length,
+        packet_keys: packets.map((packet) => packet.packet_key),
+        feature_ids: [...new Set(packets.map((packet) => packet.feature_id).filter((value): value is string => Boolean(value)))],
+        source_refs: [...new Set(packets.map((packet) => packet.source_ref))],
+        cache_hit_source: null,
+        error: null,
+        packet_summaries: packets.map((packet) => ({
+          packet_key: packet.packet_key,
+          source_ref: packet.source_ref,
+          feature_id: packet.feature_id,
+          fusion_score: packet.fusion_score,
+          rank: packet.rank,
+        })),
       },
-    })
-  );
-
-  if (input.recordTelemetry !== false) {
-    const telemetry = recordPacketRpcTelemetry({
-      query,
-      latencyMs,
-      ftsHits: ftsHits.length,
-      vectorHits: result.trace.qdrant_hits,
-      packets,
     });
-    if (input.awaitTelemetry) {
-      await telemetry;
-      await Promise.all(evalRecordsPromises).catch(() => null);
-    } else {
-      void telemetry;
-      void Promise.all(evalRecordsPromises).catch(() => null);
-    }
-  } else {
-    if (input.awaitTelemetry) {
-      await Promise.all(evalRecordsPromises).catch(() => null);
-    } else {
-      void Promise.all(evalRecordsPromises).catch(() => null);
-    }
-  }
 
-  return result;
+    return result;
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+    await recordQueryEvalTimes({
+      queryHash: qHash,
+      route,
+      resultCount: 0,
+      qdrantMs: 0,
+      bm25Ms: 0,
+      pgvectorMs: 0,
+      redisMs,
+      bitfrostMs: 0,
+      neo4jMs: 0,
+      turbovecMs: 0,
+      rrfMs: 0,
+      gemma4Ms: 0,
+      totalMs: Date.now() - startedAt,
+      cacheHitSource: null,
+      ttlRemaining: null,
+      error: message,
+      payload: {
+        route,
+        result_count: 0,
+        packet_keys: [],
+        feature_ids: [],
+        source_refs: [],
+        cache_hit_source: null,
+        error: message,
+        packet_summaries: [],
+      },
+    });
+    throw error;
+  }
 }
 
 export async function closeHyperRagPacketRpcPool(): Promise<void> {

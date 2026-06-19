@@ -37,8 +37,8 @@ const VERBOSE = argv.includes('--verbose');
 
 // Parse CouchDB connection parameters
 let COUCHDB_URL = process.env.COUCHDB_URL || 'http://localhost:5984';
-let COUCHDB_USER = process.env.COUCHDB_USER || null;
-let COUCHDB_PASS = process.env.COUCHDB_PASS || null;
+let COUCHDB_USER = process.env.COUCHDB_USER || 'admin';
+let COUCHDB_PASS = process.env.COUCHDB_PASS || process.env.COUCHDB_PASSWORD || 'deeds123';
 
 // Override from CLI args
 for (let i = 0; i < argv.length; i++) {

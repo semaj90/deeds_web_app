@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-06-04T14:06:07.175Z",
+  "generatedAt": "2026-06-19T05:34:15.563Z",
   "inputs": {
     "input": ".tmp/offline-synthesis/consolidated-index.ndjson",
     "manifest": ".tmp/offline-synthesis/consolidated-index.ndjson.manifest.json",

@@ -1,0 +1,2768 @@
+{
+  "summary": {
+    "generated_at": "2026-06-19T04:51:27.296Z",
+    "total_rows": 133,
+    "code_paths": 5,
+    "mcp_tools": 128,
+    "route_runtime_packets": 1,
+    "cache_hit_pct": 0,
+    "low_context_density": 1,
+    "source_files": {
+      "consolidation_map": true,
+      "mcp_registry": true,
+      "route_runtime_report": true
+    }
+  },
+  "rows": [
+    {
+      "source_ref": "ace.compact_search",
+      "file_path": null,
+      "symbol": "ace.compact_search",
+      "kind": "mcp_tool",
+      "feature_id": "mcp.tool.ace.compact.search",
+      "feature_label": "ace.compact_search",
+      "runtime_lane": "service",
+      "workflow_lane": [
+        "cache",
+        "lexical",
+        "dense",
+        "graph"
+      ],
+      "permission_lane": "read_only",
+      "keywords": [
+        "ace.compact_search",
+        "ace",
+        "cache",
+        "lexical",
+        "dense",
+        "graph"
+      ],
+      "summary": "Token-budgeted semantic search returning a compact context tree. Use this instead of reading full files when you need focused retrieval within a token budget. …",
+      "copy_merge_use": "Use ace.compact_search when retrieving or manipulating cache-lane packets."
+    },
+    {
+      "source_ref": "atlas.compact_context",
+      "file_path": null,
+      "symbol": "atlas.compact_context",
+      "kind": "mcp_tool",
+      "feature_id": "mcp.tool.atlas.compact.context",
+      "feature_label": "atlas.compact_context",
+      "runtime_lane": "service",
+      "workflow_lane": [
+        "graph"
+      ],
+      "permission_lane": "read_only",
+      "keywords": [
+        "atlas.compact_context",
+        "atlas",
+        "graph"
+      ],
+      "summary": "Build a compact Atlas context packet with top chunks, sourceRefs, a compressed summary, confidence, and retrieval path.",
+      "copy_merge_use": "Use atlas.compact_context when retrieving or manipulating graph-lane packets."
+    },
+    {
+      "source_ref": "atlas.coverage",
+      "file_path": null,
+      "symbol": "atlas.coverage",
+      "kind": "mcp_tool",
+      "feature_id": "mcp.tool.atlas.coverage",
+      "feature_label": "atlas.coverage",
+      "runtime_lane": "service",
+      "workflow_lane": [
+        "dense",
+        "rerank"
+      ],
+      "permission_lane": "read_write",
+      "keywords": [
+        "atlas.coverage",
+        "atlas",
+        "dense",
+        "feature_id",
+        "source_ref",
+        "rerank"
+      ],
+      "summary": "Phase 3I verification gate. Reports coverage metrics for the atlas_packets canonical warehouse: total packets, source_ref coverage %, feature_id coverage %, co…",
+      "copy_merge_use": "Use atlas.coverage when retrieving or manipulating dense-lane packets."
+    },
+    {
+      "source_ref": "atlas.explain_trace",
+      "file_path": null,
+      "symbol": "atlas.explain_trace",
+      "kind": "mcp_tool",
+      "feature_id": "mcp.tool.atlas.explain.trace",
+      "feature_label": "atlas.explain_trace",
+      "runtime_lane": "service",
+      "workflow_lane": [
+        "graph",
+        "read"
+      ],
+      "permission_lane": "read_only",
+      "keywords": [
+        "atlas.explain_trace",
+        "atlas",
+        "graph",
+        "read"
+      ],
+      "summary": "Return the compact summary and retrieval path for the current Atlas packet.",
+      "copy_merge_use": "Use atlas.explain_trace when retrieving or manipulating graph-lane packets."
+    },
+    {
+      "source_ref": "atlas.get_chunk",
+      "file_path": null,
+      "symbol": "atlas.get_chunk",
+      "kind": "mcp_tool",
+      "feature_id": "mcp.tool.atlas.get.chunk",
+      "feature_label": "atlas.get_chunk",
+      "runtime_lane": "service",
+      "workflow_lane": [
+        "read"
+      ],
+      "permission_lane": "read_only",
+      "keywords": [
+        "atlas.get_chunk",
+        "atlas",
+        "read"
+      ],
+      "summary": "Return a chunk from the compact Atlas chunk index, optionally prioritizing a chunkId, chunkIndex, or sourceRef.",
+      "copy_merge_use": "Use atlas.get_chunk when retrieving or manipulating read-lane packets."
+    },
+    {
+      "source_ref": "atlas:packet_search",
+      "file_path": null,
+      "symbol": "atlas:packet_search",
+      "kind": "mcp_tool",
+      "feature_id": "mcp.tool.atlas.packet.search",
+      "feature_label": "atlas:packet_search",
+      "runtime_lane": "service",
+      "workflow_lane": [
+        "dense",
+        "graph",
+        "identity"
+      ],
+      "permission_lane": "read_only",
+      "keywords": [
+        "atlas:packet_search",
+        "atlas",
+        "dense",
+        "feature_id",
+        "source_ref",
+        "graph",
+        "identity"
+      ],
+      "summary": "Query the canonical atlas_packets table. Search by source_ref path (variants tried automatically), feature_id, concept_id membership, or free-text summary matc…",
+      "copy_merge_use": "Use atlas:packet_search when retrieving or manipulating dense-lane packets."
+    },
+    {
+      "source_ref": "atlas.packet_search",
+      "file_path": null,
+      "symbol": "atlas.packet_search",
+      "kind": "mcp_tool",
+      "feature_id": "mcp.tool.atlas.packet.search",
+      "feature_label": "atlas.packet_search",
+      "runtime_lane": "service",
+      "workflow_lane": [
+        "dense",
+        "graph",
+        "identity"
+      ],
+      "permission_lane": "read_only",
+      "keywords": [
+        "atlas.packet_search",
+        "atlas",
+        "dense",
+        "feature_id",
+        "source_ref",
+        "graph",
+        "identity"
+      ],
+      "summary": "Query the canonical atlas_packets table. Search by source_ref path (variants tried automatically), feature_id, concept_id membership, or free-text summary matc…",
+      "copy_merge_use": "Use atlas.packet_search when retrieving or manipulating dense-lane packets."
+    },
+    {
+      "source_ref": "atlas.prefilter",
+      "file_path": null,
+      "symbol": "atlas.prefilter",
+      "kind": "mcp_tool",
+      "feature_id": "mcp.tool.atlas.prefilter",
+      "feature_label": "atlas.prefilter",
+      "runtime_lane": "service",
+      "workflow_lane": [
+        "dense",
+        "rerank"
+      ],
+      "permission_lane": "read_only",
+      "keywords": [
+        "atlas.prefilter",
+        "atlas",
+        "dense",
+        "rerank"
+      ],
+      "summary": "TurboVec ANN cluster prefilter. Embeds the query and queries the TurboVec sidecar (:8099) to identify the top-N cluster IDs for injecting into a Qdrant should/…",
+      "copy_merge_use": "Use atlas.prefilter when retrieving or manipulating dense-lane packets."
+    },
+    {
+      "source_ref": "atlas.query",
+      "file_path": null,
+      "symbol": "atlas.query",
+      "kind": "mcp_tool",
+      "feature_id": "mcp.tool.atlas.query",
+      "feature_label": "atlas.query",
+      "runtime_lane": "service",
+      "workflow_lane": [
+        "identity"
+      ],
+      "permission_lane": "read_only",
+      "keywords": [
+        "atlas.query",
+        "atlas",
+        "identity"
+      ],
+      "summary": "Atlas alias for ranked technical search. Returns the same compact hit list as kb.trace_search for a query.",
+      "copy_merge_use": "Use atlas.query when retrieving or manipulating identity-lane packets."
+    },
+    {
+      "source_ref": "atlas.source_refs",
+      "file_path": null,
+      "symbol": "atlas.source_refs",
+      "kind": "mcp_tool",
+      "feature_id": "mcp.tool.atlas.source.refs",
+      "feature_label": "atlas.source_refs",
+      "runtime_lane": "service",
+      "workflow_lane": [
+        "identity"
+      ],
+      "permission_lane": "read_only",
+      "keywords": [
+        "atlas.source_refs",
+        "atlas",
+        "identity",
+        "source_ref"
+      ],
+      "summary": "Return the top sourceRefs from the compact Atlas packet.",
+      "copy_merge_use": "Use atlas.source_refs when retrieving or manipulating identity-lane packets."
+    },
+    {
+      "source_ref": "atlas.suggest_files",
+      "file_path": null,
+      "symbol": "atlas.suggest_files",
+      "kind": "mcp_tool",
+      "feature_id": "mcp.tool.atlas.suggest.files",
+      "feature_label": "atlas.suggest_files",
+      "runtime_lane": "service",
+      "workflow_lane": [
+        "unknown"
+      ],
+      "permission_lane": "read_only",
+      "keywords": [
+        "atlas.suggest_files",
+        "atlas",
+        "unknown"
+      ],
+      "summary": "Return the top suggested files from the compact Atlas packet.",
+      "copy_merge_use": "Use atlas.suggest_files when retrieving or manipulating unknown-lane packets."
+    },
+    {
+      "source_ref": "atlas:verify_coverage",
+      "file_path": null,
+      "symbol": "atlas:verify_coverage",
+      "kind": "mcp_tool",
+      "feature_id": "mcp.tool.atlas.verify.coverage",
+      "feature_label": "atlas:verify_coverage",
+      "runtime_lane": "service",
+      "workflow_lane": [
+        "dense",
+        "rerank"
+      ],
+      "permission_lane": "read_only",
+      "keywords": [
+        "atlas:verify_coverage",
+        "atlas",
+        "dense",
+        "feature_id",
+        "source_ref",
+        "rerank"
+      ],
+      "summary": "Phase 3I verification gate. Reports coverage metrics for the atlas_packets canonical warehouse: total packets, source_ref coverage %, feature_id coverage %, co…",
+      "copy_merge_use": "Use atlas:verify_coverage when retrieving or manipulating dense-lane packets."
+    },
+    {
+      "source_ref": "clusters.get_members",
+      "file_path": null,
+      "symbol": "clusters.get_members",
+      "kind": "mcp_tool",
+      "feature_id": "mcp.tool.clusters.get.members",
+      "feature_label": "clusters.get_members",
+      "runtime_lane": "service",
+      "workflow_lane": [
+        "unknown"
+      ],
+      "permission_lane": "read_only",
+      "keywords": [
+        "clusters.get_members",
+        "clusters",
+        "unknown"
+      ],
+      "summary": "Returns the member nodes for a specific cluster.",
+      "copy_merge_use": "Use clusters.get_members when retrieving or manipulating unknown-lane packets."
+    },
+    {
+      "source_ref": "clusters.get_summary_lenses",
+      "file_path": null,
+      "symbol": "clusters.get_summary_lenses",
+      "kind": "mcp_tool",
+      "feature_id": "mcp.tool.clusters.get.summary.lenses",
+      "feature_label": "clusters.get_summary_lenses",
+      "runtime_lane": "service",
+      "workflow_lane": [
+        "synthesis"
+      ],
+      "permission_lane": "read_only",
+      "keywords": [
+        "clusters.get_summary_lenses",
+        "clusters",
+        "synthesis"
+      ],
+      "summary": "Returns wiki and LLMS.md context lenses for a GPU cluster.",
+      "copy_merge_use": "Use clusters.get_summary_lenses when retrieving or manipulating synthesis-lane packets."
+    },
+    {
+      "source_ref": "codebase.context_for_file",
+      "file_path": null,
+      "symbol": "codebase.context_for_file",
+      "kind": "mcp_tool",
+      "feature_id": "mcp.tool.codebase.context.for.file",
+      "feature_label": "codebase.context_for_file",
+      "runtime_lane": "service",
+      "workflow_lane": [
+        "unknown"
+      ],
+      "permission_lane": "read_only",
+      "keywords": [
+        "codebase.context_for_file",
+        "codebase",
+        "unknown"
+      ],
+      "summary": "Returns the full atlas context packet for a specific file.",
+      "copy_merge_use": "Use codebase.context_for_file when retrieving or manipulating unknown-lane packets."
+    },
+    {
+      "source_ref": "context.build_kv_packet",
+      "file_path": null,
+      "symbol": "context.build_kv_packet",
+      "kind": "mcp_tool",
+      "feature_id": "mcp.tool.context.build.kv.packet",
+      "feature_label": "context.build_kv_packet",
+      "runtime_lane": "service",
+      "workflow_lane": [
+        "unknown"
+      ],
+      "permission_lane": "read_only",
+      "keywords": [
+        "context.build_kv_packet",
+        "context",
+        "unknown"
+      ],
+      "summary": "Assembles a context packet of compressed file cards for a specific task.",
+      "copy_merge_use": "Use context.build_kv_packet when retrieving or manipulating unknown-lane packets."
+    },
+    {
+      "source_ref": "context.explain_compression",
+      "file_path": null,
+      "symbol": "context.explain_compression",
+      "kind": "mcp_tool",
+      "feature_id": "mcp.tool.context.explain.compression",
+      "feature_label": "context.explain_compression",
+      "runtime_lane": "service",
+      "workflow_lane": [
+        "unknown"
+      ],
+      "permission_lane": "read_only",
+      "keywords": [
+        "context.explain_compression",
+        "context",
+        "unknown"
+      ],
+      "summary": "Explains the compression logic and token budget for a specific task packet.",
+      "copy_merge_use": "Use context.explain_compression when retrieving or manipulating unknown-lane packets."
+    },
+    {
+      "source_ref": "context.get_compressed_card",
+      "file_path": null,
+      "symbol": "context.get_compressed_card",
+      "kind": "mcp_tool",
+      "feature_id": "mcp.tool.context.get.compressed.card",
+      "feature_label": "context.get_compressed_card",
+      "runtime_lane": "service",
+      "workflow_lane": [
+        "unknown"
+      ],
+      "permission_lane": "read_only",
+      "keywords": [
+        "context.get_compressed_card",
+        "context",
+        "unknown"
+      ],
+      "summary": "Returns a compressed context card for a specific file or trace.",
+      "copy_merge_use": "Use context.get_compressed_card when retrieving or manipulating unknown-lane packets."
+    },
+    {
+      "source_ref": "context.prefetch_feature_context",
+      "file_path": null,
+      "symbol": "context.prefetch_feature_context",
+      "kind": "mcp_tool",
+      "feature_id": "mcp.tool.context.prefetch.feature.context",
+      "feature_label": "context.prefetch_feature_context",
+      "runtime_lane": "service",
+      "workflow_lane": [
+        "graph"
+      ],
+      "permission_lane": "read_only",
+      "keywords": [
+        "context.prefetch_feature_context",
+        "context",
+        "graph"
+      ],
+      "summary": "Build a prefetch packet for the next feature edit using recent activity, directory KAG context, community graph context, AGENTS.md quick hits, and notecard sea…",
+      "copy_merge_use": "Use context.prefetch_feature_context when retrieving or manipulating graph-lane packets."
+    },
+    {
+      "source_ref": "context.refresh_task_toc",
+      "file_path": null,
+      "symbol": "context.refresh_task_toc",
+      "kind": "mcp_tool",
+      "feature_id": "mcp.tool.context.refresh.task.toc",
+      "feature_label": "context.refresh_task_toc",
+      "runtime_lane": "service",
+      "workflow_lane": [
+        "unknown"
+      ],
+      "permission_lane": "read_only",
+      "keywords": [
+        "context.refresh_task_toc",
+        "context",
+        "unknown"
+      ],
+      "summary": "Refreshes the Table of Contents for a specific task context.",
+      "copy_merge_use": "Use context.refresh_task_toc when retrieving or manipulating unknown-lane packets."
+    },
+    {
+      "source_ref": "db.schema_overview",
+      "file_path": null,
+      "symbol": "db.schema_overview",
+      "kind": "mcp_tool",
+      "feature_id": "mcp.tool.db.schema.overview",
+      "feature_label": "db.schema_overview",
+      "runtime_lane": "service",
+      "workflow_lane": [
+        "read"
+      ],
+      "permission_lane": "read_write",
+      "keywords": [
+        "db.schema_overview",
+        "db",
+        "read"
+      ],
+      "summary": "Lists every table in the public schema with row estimate + structural flags.",
+      "copy_merge_use": "Use db.schema_overview when retrieving or manipulating read-lane packets."
+    },
+    {
+      "source_ref": "db.table_inspect",
+      "file_path": null,
+      "symbol": "db.table_inspect",
+      "kind": "mcp_tool",
+      "feature_id": "mcp.tool.db.table.inspect",
+      "feature_label": "db.table_inspect",
+      "runtime_lane": "service",
+      "workflow_lane": [
+        "read"
+      ],
+      "permission_lane": "read_write",
+      "keywords": [
+        "db.table_inspect",
+        "db",
+        "read"
+      ],
+      "summary": "Returns columns + indexes + foreign keys for one table. No row data.",
+      "copy_merge_use": "Use db.table_inspect when retrieving or manipulating read-lane packets."
+    },
+    {
+      "source_ref": "engram.ace_packet_inject",
+      "file_path": null,
+      "symbol": "engram.ace_packet_inject",
+      "kind": "mcp_tool",
+      "feature_id": "mcp.tool.engram.ace.packet.inject",
+      "feature_label": "engram.ace_packet_inject",
+      "runtime_lane": "service",
+      "workflow_lane": [
+        "cache",
+        "synthesis"
+      ],
+      "permission_lane": "read_write",
+      "keywords": [
+        "engram.ace_packet_inject",
+        "engram",
+        "cache",
+        "synthesis"
+      ],
+      "summary": "Write ACE context packet to Redis with 1h TTL: ace:packet:{runId}.",
+      "copy_merge_use": "Use engram.ace_packet_inject when retrieving or manipulating cache-lane packets."
+    },
+    {
+      "source_ref": "engram.chat_memory_recent",
+      "file_path": null,
+      "symbol": "engram.chat_memory_recent",
+      "kind": "mcp_tool",
+      "feature_id": "mcp.tool.engram.chat.memory.recent",
+      "feature_label": "engram.chat_memory_recent",
+      "runtime_lane": "service",
+      "workflow_lane": [
+        "memory"
+      ],
+      "permission_lane": "read_only",
+      "keywords": [
+        "engram.chat_memory_recent",
+        "engram",
+        "memory"
+      ],
+      "summary": "Read-only recent chat memory lookup from engram_cards.",
+      "copy_merge_use": "Use engram.chat_memory_recent when retrieving or manipulating memory-lane packets."
+    },
+    {
+      "source_ref": "engram.chat_memory_store",
+      "file_path": null,
+      "symbol": "engram.chat_memory_store",
+      "kind": "mcp_tool",
+      "feature_id": "mcp.tool.engram.chat.memory.store",
+      "feature_label": "engram.chat_memory_store",
+      "runtime_lane": "service",
+      "workflow_lane": [
+        "cache",
+        "memory"
+      ],
+      "permission_lane": "read_write",
+      "keywords": [
+        "engram.chat_memory_store",
+        "engram",
+        "cache",
+        "memory"
+      ],
+      "summary": "Append a chat turn to user memory store (Redis sorted set + bounded trim).",
+      "copy_merge_use": "Use engram.chat_memory_store when retrieving or manipulating cache-lane packets."
+    },
+    {
+      "source_ref": "engram.redis_health",
+      "file_path": null,
+      "symbol": "engram.redis_health",
+      "kind": "mcp_tool",
+      "feature_id": "mcp.tool.engram.redis.health",
+      "feature_label": "engram.redis_health",
+      "runtime_lane": "service",
+      "workflow_lane": [
+        "cache"
+      ],
+      "permission_lane": "read_write",
+      "keywords": [
+        "engram.redis_health",
+        "engram",
+        "cache"
+      ],
+      "summary": "Check Redis availability used by engram memory tools.",
+      "copy_merge_use": "Use engram.redis_health when retrieving or manipulating cache-lane packets."
+    },
+    {
+      "source_ref": "evidence.image_feedback",
+      "file_path": null,
+      "symbol": "evidence.image_feedback",
+      "kind": "mcp_tool",
+      "feature_id": "mcp.tool.evidence.image.feedback",
+      "feature_label": "evidence.image_feedback",
+      "runtime_lane": "service",
+      "workflow_lane": [
+        "cache",
+        "dense"
+      ],
+      "permission_lane": "read_only",
+      "keywords": [
+        "evidence.image_feedback",
+        "evidence",
+        "cache",
+        "dense"
+      ],
+      "summary": "Record thumbs-up or thumbs-down on a visual search result. Votes accumulate in Redis; Qdrant payload (trust_score, user_approved/rejected) is updated after 3 v…",
+      "copy_merge_use": "Use evidence.image_feedback when retrieving or manipulating cache-lane packets."
+    },
+    {
+      "source_ref": "evidence.link_image_graph",
+      "file_path": null,
+      "symbol": "evidence.link_image_graph",
+      "kind": "mcp_tool",
+      "feature_id": "mcp.tool.evidence.link.image.graph",
+      "feature_label": "evidence.link_image_graph",
+      "runtime_lane": "service",
+      "workflow_lane": [
+        "graph"
+      ],
+      "permission_lane": "read_write",
+      "keywords": [
+        "evidence.link_image_graph",
+        "evidence",
+        "graph"
+      ],
+      "summary": "Create IMAGE_FOR edges in Neo4j from an evidence image node to CodebaseFile nodes. Normally fires automatically after search-by-image, but can be called manual…",
+      "copy_merge_use": "Use evidence.link_image_graph when retrieving or manipulating graph-lane packets."
+    },
+    {
+      "source_ref": "evidence.search_by_image",
+      "file_path": null,
+      "symbol": "evidence.search_by_image",
+      "kind": "mcp_tool",
+      "feature_id": "mcp.tool.evidence.search.by.image",
+      "feature_label": "evidence.search_by_image",
+      "runtime_lane": "service",
+      "workflow_lane": [
+        "dense"
+      ],
+      "permission_lane": "read_only",
+      "keywords": [
+        "evidence.search_by_image",
+        "evidence",
+        "dense"
+      ],
+      "summary": "Search evidence by uploading an image. The VLM describes the image, embeds it, and returns semantically similar evidence items from Qdrant. Use for \"find evide…",
+      "copy_merge_use": "Use evidence.search_by_image when retrieving or manipulating dense-lane packets."
+    },
+    {
+      "source_ref": "file.read_window",
+      "file_path": null,
+      "symbol": "file.read_window",
+      "kind": "mcp_tool",
+      "feature_id": "mcp.tool.file.read.window",
+      "feature_label": "file.read_window",
+      "runtime_lane": "service",
+      "workflow_lane": [
+        "read"
+      ],
+      "permission_lane": "read_only",
+      "keywords": [
+        "file.read_window",
+        "file",
+        "read"
+      ],
+      "summary": "Reads a bounded window/range of lines from a file. Highly recommended for reading large markdown (.md) or JSON files to avoid context bloating.",
+      "copy_merge_use": "Use file.read_window when retrieving or manipulating read-lane packets."
+    },
+    {
+      "source_ref": "graph.community_for_node",
+      "file_path": null,
+      "symbol": "graph.community_for_node",
+      "kind": "mcp_tool",
+      "feature_id": "mcp.tool.graph.community.for.node",
+      "feature_label": "graph.community_for_node",
+      "runtime_lane": "service",
+      "workflow_lane": [
+        "graph"
+      ],
+      "permission_lane": "read_write",
+      "keywords": [
+        "graph.community_for_node",
+        "graph"
+      ],
+      "summary": "Returns the community/cluster membership for a specific node.",
+      "copy_merge_use": "Use graph.community_for_node when retrieving or manipulating graph-lane packets."
+    },
+    {
+      "source_ref": "graph.expand_neighborhood",
+      "file_path": null,
+      "symbol": "graph.expand_neighborhood",
+      "kind": "mcp_tool",
+      "feature_id": "mcp.tool.graph.expand.neighborhood",
+      "feature_label": "graph.expand_neighborhood",
+      "runtime_lane": "service",
+      "workflow_lane": [
+        "graph"
+      ],
+      "permission_lane": "read_write",
+      "keywords": [
+        "graph.expand_neighborhood",
+        "graph"
+      ],
+      "summary": "Expands graph neighborhood from sourceRefs (read-only). Supports legacy stableKey/depth args for backward compatibility.",
+      "copy_merge_use": "Use graph.expand_neighborhood when retrieving or manipulating graph-lane packets."
+    },
+    {
+      "source_ref": "graph.materialize_pathway",
+      "file_path": null,
+      "symbol": "graph.materialize_pathway",
+      "kind": "mcp_tool",
+      "feature_id": "mcp.tool.graph.materialize.pathway",
+      "feature_label": "graph.materialize_pathway",
+      "runtime_lane": "service",
+      "workflow_lane": [
+        "graph"
+      ],
+      "permission_lane": "read_only",
+      "keywords": [
+        "graph.materialize_pathway",
+        "graph"
+      ],
+      "summary": "Materializes a synthesized pathway into the persistent hypergraph context.",
+      "copy_merge_use": "Use graph.materialize_pathway when retrieving or manipulating graph-lane packets."
+    },
+    {
+      "source_ref": "graph.pagerank_top",
+      "file_path": null,
+      "symbol": "graph.pagerank_top",
+      "kind": "mcp_tool",
+      "feature_id": "mcp.tool.graph.pagerank.top",
+      "feature_label": "graph.pagerank_top",
+      "runtime_lane": "service",
+      "workflow_lane": [
+        "graph"
+      ],
+      "permission_lane": "read_only",
+      "keywords": [
+        "graph.pagerank_top",
+        "graph"
+      ],
+      "summary": "Lists the top authoritative nodes in the graph by PageRank score.",
+      "copy_merge_use": "Use graph.pagerank_top when retrieving or manipulating graph-lane packets."
+    },
+    {
+      "source_ref": "graph.semantic_path_synthesis",
+      "file_path": null,
+      "symbol": "graph.semantic_path_synthesis",
+      "kind": "mcp_tool",
+      "feature_id": "mcp.tool.graph.semantic.path.synthesis",
+      "feature_label": "graph.semantic_path_synthesis",
+      "runtime_lane": "service",
+      "workflow_lane": [
+        "graph",
+        "synthesis"
+      ],
+      "permission_lane": "read_only",
+      "keywords": [
+        "graph.semantic_path_synthesis",
+        "graph",
+        "synthesis"
+      ],
+      "summary": "Synthesizes a semantic narrative along the shortest structural path between nodes.",
+      "copy_merge_use": "Use graph.semantic_path_synthesis when retrieving or manipulating graph-lane packets."
+    },
+    {
+      "source_ref": "graph.shortest_path",
+      "file_path": null,
+      "symbol": "graph.shortest_path",
+      "kind": "mcp_tool",
+      "feature_id": "mcp.tool.graph.shortest.path",
+      "feature_label": "graph.shortest_path",
+      "runtime_lane": "service",
+      "workflow_lane": [
+        "graph"
+      ],
+      "permission_lane": "read_write",
+      "keywords": [
+        "graph.shortest_path",
+        "graph"
+      ],
+      "summary": "Finds the shortest path between two graph nodes.",
+      "copy_merge_use": "Use graph.shortest_path when retrieving or manipulating graph-lane packets."
+    },
+    {
+      "source_ref": "hypergraph.expand_members",
+      "file_path": null,
+      "symbol": "hypergraph.expand_members",
+      "kind": "mcp_tool",
+      "feature_id": "mcp.tool.hypergraph.expand.members",
+      "feature_label": "hypergraph.expand_members",
+      "runtime_lane": "service",
+      "workflow_lane": [
+        "graph"
+      ],
+      "permission_lane": "read_write",
+      "keywords": [
+        "hypergraph.expand_members",
+        "hypergraph",
+        "graph"
+      ],
+      "summary": "Returns all related edges for a given edge hash by member overlap.",
+      "copy_merge_use": "Use hypergraph.expand_members when retrieving or manipulating graph-lane packets."
+    },
+    {
+      "source_ref": "hypergraph.explain_activation",
+      "file_path": null,
+      "symbol": "hypergraph.explain_activation",
+      "kind": "mcp_tool",
+      "feature_id": "mcp.tool.hypergraph.explain.activation",
+      "feature_label": "hypergraph.explain_activation",
+      "runtime_lane": "service",
+      "workflow_lane": [
+        "graph"
+      ],
+      "permission_lane": "read_only",
+      "keywords": [
+        "hypergraph.explain_activation",
+        "hypergraph",
+        "graph"
+      ],
+      "summary": "Explains why a specific hypergraph edge was activated for a set of query terms.",
+      "copy_merge_use": "Use hypergraph.explain_activation when retrieving or manipulating graph-lane packets."
+    },
+    {
+      "source_ref": "hypergraph.get_edge",
+      "file_path": null,
+      "symbol": "hypergraph.get_edge",
+      "kind": "mcp_tool",
+      "feature_id": "mcp.tool.hypergraph.get.edge",
+      "feature_label": "hypergraph.get_edge",
+      "runtime_lane": "service",
+      "workflow_lane": [
+        "graph"
+      ],
+      "permission_lane": "read_only",
+      "keywords": [
+        "hypergraph.get_edge",
+        "hypergraph",
+        "graph"
+      ],
+      "summary": "Returns full details for a specific hypergraph edge.",
+      "copy_merge_use": "Use hypergraph.get_edge when retrieving or manipulating graph-lane packets."
+    },
+    {
+      "source_ref": "hypergraph.search",
+      "file_path": null,
+      "symbol": "hypergraph.search",
+      "kind": "mcp_tool",
+      "feature_id": "mcp.tool.hypergraph.search",
+      "feature_label": "hypergraph.search",
+      "runtime_lane": "service",
+      "workflow_lane": [
+        "graph"
+      ],
+      "permission_lane": "read_only",
+      "keywords": [
+        "hypergraph.search",
+        "hypergraph",
+        "graph"
+      ],
+      "summary": "Semantic search across the hypergraph edges.",
+      "copy_merge_use": "Use hypergraph.search when retrieving or manipulating graph-lane packets."
+    },
+    {
+      "source_ref": "hypergraph.semantic_path_synthesis",
+      "file_path": null,
+      "symbol": "hypergraph.semantic_path_synthesis",
+      "kind": "mcp_tool",
+      "feature_id": "mcp.tool.hypergraph.semantic.path.synthesis",
+      "feature_label": "hypergraph.semantic_path_synthesis",
+      "runtime_lane": "service",
+      "workflow_lane": [
+        "graph",
+        "synthesis"
+      ],
+      "permission_lane": "read_only",
+      "keywords": [
+        "hypergraph.semantic_path_synthesis",
+        "hypergraph",
+        "graph",
+        "synthesis"
+      ],
+      "summary": "Synthesizes a semantic narrative along a path in the hypergraph.",
+      "copy_merge_use": "Use hypergraph.semantic_path_synthesis when retrieving or manipulating graph-lane packets."
+    },
+    {
+      "source_ref": "image.caption",
+      "file_path": null,
+      "symbol": "image.caption",
+      "kind": "mcp_tool",
+      "feature_id": "mcp.tool.image.caption",
+      "feature_label": "image.caption",
+      "runtime_lane": "service",
+      "workflow_lane": [
+        "dense",
+        "synthesis"
+      ],
+      "permission_lane": "read_only",
+      "keywords": [
+        "image.caption",
+        "image",
+        "dense",
+        "synthesis"
+      ],
+      "summary": "Get a VLM-generated caption and suggested tags for a local image file. Calls the Gemma4-VLM pipeline (Triton→TurboQuant→Ollama cascade). Does NOT search Qdrant…",
+      "copy_merge_use": "Use image.caption when retrieving or manipulating dense-lane packets."
+    },
+    {
+      "source_ref": "image.enrich_tags",
+      "file_path": null,
+      "symbol": "image.enrich_tags",
+      "kind": "mcp_tool",
+      "feature_id": "mcp.tool.image.enrich.tags",
+      "feature_label": "image.enrich_tags",
+      "runtime_lane": "service",
+      "workflow_lane": [
+        "dense",
+        "graph",
+        "synthesis"
+      ],
+      "permission_lane": "read_only",
+      "keywords": [
+        "image.enrich_tags",
+        "image",
+        "dense",
+        "graph",
+        "synthesis"
+      ],
+      "summary": "VLM-enrich one Qdrant evidence point with auto-generated tags. Fetches the image (from payload file_path or MinIO), runs Gemma4-VLM, and PATCHes suggestedTags …",
+      "copy_merge_use": "Use image.enrich_tags when retrieving or manipulating dense-lane packets."
+    },
+    {
+      "source_ref": "image.search_by_text",
+      "file_path": null,
+      "symbol": "image.search_by_text",
+      "kind": "mcp_tool",
+      "feature_id": "mcp.tool.image.search.by.text",
+      "feature_label": "image.search_by_text",
+      "runtime_lane": "service",
+      "workflow_lane": [
+        "dense",
+        "synthesis"
+      ],
+      "permission_lane": "read_only",
+      "keywords": [
+        "image.search_by_text",
+        "image",
+        "dense",
+        "synthesis"
+      ],
+      "summary": "Search the evidence image index using a text description. Embeds the query via embeddinggemma and searches Qdrant. No image upload needed — use for natural-lan…",
+      "copy_merge_use": "Use image.search_by_text when retrieving or manipulating dense-lane packets."
+    },
+    {
+      "source_ref": "kag.feature_lookup",
+      "file_path": null,
+      "symbol": "kag.feature_lookup",
+      "kind": "mcp_tool",
+      "feature_id": "mcp.tool.kag.feature.lookup",
+      "feature_label": "kag.feature_lookup",
+      "runtime_lane": "service",
+      "workflow_lane": [
+        "graph",
+        "identity"
+      ],
+      "permission_lane": "read_only",
+      "keywords": [
+        "kag.feature_lookup",
+        "kag",
+        "graph",
+        "identity"
+      ],
+      "summary": "Look up which files implement a named feature. Queries the durable feature_implementations + feature_file_edges tables (HyperRAG L9). Returns file paths and en…",
+      "copy_merge_use": "Use kag.feature_lookup when retrieving or manipulating graph-lane packets."
+    },
+    {
+      "source_ref": "kag.ingest_error",
+      "file_path": null,
+      "symbol": "kag.ingest_error",
+      "kind": "mcp_tool",
+      "feature_id": "mcp.tool.kag.ingest.error",
+      "feature_label": "kag.ingest_error",
+      "runtime_lane": "service",
+      "workflow_lane": [
+        "unknown"
+      ],
+      "permission_lane": "read_only",
+      "keywords": [
+        "kag.ingest_error",
+        "kag",
+        "unknown"
+      ],
+      "summary": "Fingerprints and stores a raw error text for future retrieval.",
+      "copy_merge_use": "Use kag.ingest_error when retrieving or manipulating unknown-lane packets."
+    },
+    {
+      "source_ref": "kag.ingest_memory_directory",
+      "file_path": null,
+      "symbol": "kag.ingest_memory_directory",
+      "kind": "mcp_tool",
+      "feature_id": "mcp.tool.kag.ingest.memory.directory",
+      "feature_label": "kag.ingest_memory_directory",
+      "runtime_lane": "service",
+      "workflow_lane": [
+        "unknown"
+      ],
+      "permission_lane": "read_only",
+      "keywords": [
+        "kag.ingest_memory_directory",
+        "kag",
+        "unknown"
+      ],
+      "summary": "Ingests agent run records from the memory directory into the database.",
+      "copy_merge_use": "Use kag.ingest_memory_directory when retrieving or manipulating unknown-lane packets."
+    },
+    {
+      "source_ref": "kag.multi_lane_search",
+      "file_path": null,
+      "symbol": "kag.multi_lane_search",
+      "kind": "mcp_tool",
+      "feature_id": "mcp.tool.kag.multi.lane.search",
+      "feature_label": "kag.multi_lane_search",
+      "runtime_lane": "service",
+      "workflow_lane": [
+        "lexical",
+        "synthesis"
+      ],
+      "permission_lane": "read_only",
+      "keywords": [
+        "kag.multi_lane_search",
+        "kag",
+        "lexical",
+        "synthesis"
+      ],
+      "summary": "Performs 11-lane HyperRAG retrieval across hash, n-gram, graph, feature atlas, and activity prefetch lanes. Returns ranked hits + synthesisBlock with per-chunk…",
+      "copy_merge_use": "Use kag.multi_lane_search when retrieving or manipulating lexical-lane packets."
+    },
+    {
+      "source_ref": "kag.panel_context",
+      "file_path": null,
+      "symbol": "kag.panel_context",
+      "kind": "mcp_tool",
+      "feature_id": "mcp.tool.kag.panel.context",
+      "feature_label": "kag.panel_context",
+      "runtime_lane": "service",
+      "workflow_lane": [
+        "unknown"
+      ],
+      "permission_lane": "read_only",
+      "keywords": [
+        "kag.panel_context",
+        "kag",
+        "unknown"
+      ],
+      "summary": "Return recently viewed files and tools from panel_activity_log for the active user session (HyperRAG L11 prefetch). Provides warm context about what the user i…",
+      "copy_merge_use": "Use kag.panel_context when retrieving or manipulating unknown-lane packets."
+    },
+    {
+      "source_ref": "kag.recall_similar_fix",
+      "file_path": null,
+      "symbol": "kag.recall_similar_fix",
+      "kind": "mcp_tool",
+      "feature_id": "mcp.tool.kag.recall.similar.fix",
+      "feature_label": "kag.recall_similar_fix",
+      "runtime_lane": "service",
+      "workflow_lane": [
+        "lexical",
+        "synthesis",
+        "memory"
+      ],
+      "permission_lane": "read_only",
+      "keywords": [
+        "kag.recall_similar_fix",
+        "kag",
+        "lexical",
+        "synthesis",
+        "memory"
+      ],
+      "summary": "Recalls prior fixes for an error via exact-hash + pg_trgm similarity over error_fingerprints.",
+      "copy_merge_use": "Use kag.recall_similar_fix when retrieving or manipulating lexical-lane packets."
+    },
+    {
+      "source_ref": "kag.record_agent_run",
+      "file_path": null,
+      "symbol": "kag.record_agent_run",
+      "kind": "mcp_tool",
+      "feature_id": "mcp.tool.kag.record.agent.run",
+      "feature_label": "kag.record_agent_run",
+      "runtime_lane": "service",
+      "workflow_lane": [
+        "unknown"
+      ],
+      "permission_lane": "read_only",
+      "keywords": [
+        "kag.record_agent_run",
+        "kag",
+        "unknown"
+      ],
+      "summary": "Records an autonomous agent run artifact to memory.",
+      "copy_merge_use": "Use kag.record_agent_run when retrieving or manipulating unknown-lane packets."
+    },
+    {
+      "source_ref": "kag.web_search",
+      "file_path": null,
+      "symbol": "kag.web_search",
+      "kind": "mcp_tool",
+      "feature_id": "mcp.tool.kag.web.search",
+      "feature_label": "kag.web_search",
+      "runtime_lane": "service",
+      "workflow_lane": [
+        "synthesis"
+      ],
+      "permission_lane": "read_only",
+      "keywords": [
+        "kag.web_search",
+        "kag",
+        "synthesis"
+      ],
+      "summary": "L10 lane web search (T4 trust). Searches the web for information-seeking queries. Skips for code/error queries. Returns sanitized snippets for synthesis.",
+      "copy_merge_use": "Use kag.web_search when retrieving or manipulating synthesis-lane packets."
+    },
+    {
+      "source_ref": "kb.archive_synthesis",
+      "file_path": null,
+      "symbol": "kb.archive_synthesis",
+      "kind": "mcp_tool",
+      "feature_id": "mcp.tool.kb.archive.synthesis",
+      "feature_label": "kb.archive_synthesis",
+      "runtime_lane": "service",
+      "workflow_lane": [
+        "synthesis"
+      ],
+      "permission_lane": "read_only",
+      "keywords": [
+        "kb.archive_synthesis",
+        "kb",
+        "synthesis"
+      ],
+      "summary": "Archive a synthesis artifact.",
+      "copy_merge_use": "Use kb.archive_synthesis when retrieving or manipulating synthesis-lane packets."
+    },
+    {
+      "source_ref": "kb.explain_context_pack",
+      "file_path": null,
+      "symbol": "kb.explain_context_pack",
+      "kind": "mcp_tool",
+      "feature_id": "mcp.tool.kb.explain.context.pack",
+      "feature_label": "kb.explain_context_pack",
+      "runtime_lane": "service",
+      "workflow_lane": [
+        "synthesis"
+      ],
+      "permission_lane": "read_only",
+      "keywords": [
+        "kb.explain_context_pack",
+        "kb",
+        "synthesis"
+      ],
+      "summary": "Explains the retrieval provenance and assembly logic for a generated context pack.",
+      "copy_merge_use": "Use kb.explain_context_pack when retrieving or manipulating synthesis-lane packets."
+    },
+    {
+      "source_ref": "kb.extract_citations",
+      "file_path": null,
+      "symbol": "kb.extract_citations",
+      "kind": "mcp_tool",
+      "feature_id": "mcp.tool.kb.extract.citations",
+      "feature_label": "kb.extract_citations",
+      "runtime_lane": "service",
+      "workflow_lane": [
+        "unknown"
+      ],
+      "permission_lane": "read_only",
+      "keywords": [
+        "kb.extract_citations",
+        "kb",
+        "unknown"
+      ],
+      "summary": "Extract legal citations and statutes from text.",
+      "copy_merge_use": "Use kb.extract_citations when retrieving or manipulating unknown-lane packets."
+    },
+    {
+      "source_ref": "kb.hybrid_search",
+      "file_path": null,
+      "symbol": "kb.hybrid_search",
+      "kind": "mcp_tool",
+      "feature_id": "mcp.tool.kb.hybrid.search",
+      "feature_label": "kb.hybrid_search",
+      "runtime_lane": "service",
+      "workflow_lane": [
+        "unknown"
+      ],
+      "permission_lane": "read_only",
+      "keywords": [
+        "kb.hybrid_search",
+        "kb",
+        "unknown"
+      ],
+      "summary": "Performs hybrid (lexical + semantic) search across KAG context.",
+      "copy_merge_use": "Use kb.hybrid_search when retrieving or manipulating unknown-lane packets."
+    },
+    {
+      "source_ref": "kb.organize_messy_text",
+      "file_path": null,
+      "symbol": "kb.organize_messy_text",
+      "kind": "mcp_tool",
+      "feature_id": "mcp.tool.kb.organize.messy.text",
+      "feature_label": "kb.organize_messy_text",
+      "runtime_lane": "service",
+      "workflow_lane": [
+        "unknown"
+      ],
+      "permission_lane": "read_only",
+      "keywords": [
+        "kb.organize_messy_text",
+        "kb",
+        "unknown"
+      ],
+      "summary": "Organize messy text into structured entities and sections.",
+      "copy_merge_use": "Use kb.organize_messy_text when retrieving or manipulating unknown-lane packets."
+    },
+    {
+      "source_ref": "kb.search_notecards",
+      "file_path": null,
+      "symbol": "kb.search_notecards",
+      "kind": "mcp_tool",
+      "feature_id": "mcp.tool.kb.search.notecards",
+      "feature_label": "kb.search_notecards",
+      "runtime_lane": "service",
+      "workflow_lane": [
+        "unknown"
+      ],
+      "permission_lane": "read_only",
+      "keywords": [
+        "kb.search_notecards",
+        "kb",
+        "unknown"
+      ],
+      "summary": "Searches for identity-spine notecards matching a query.",
+      "copy_merge_use": "Use kb.search_notecards when retrieving or manipulating unknown-lane packets."
+    },
+    {
+      "source_ref": "kb.search_pathways",
+      "file_path": null,
+      "symbol": "kb.search_pathways",
+      "kind": "mcp_tool",
+      "feature_id": "mcp.tool.kb.search.pathways",
+      "feature_label": "kb.search_pathways",
+      "runtime_lane": "service",
+      "workflow_lane": [
+        "graph"
+      ],
+      "permission_lane": "read_only",
+      "keywords": [
+        "kb.search_pathways",
+        "kb",
+        "graph"
+      ],
+      "summary": "Searches for previously synthesized and materialized pathways.",
+      "copy_merge_use": "Use kb.search_pathways when retrieving or manipulating graph-lane packets."
+    },
+    {
+      "source_ref": "kb.search_summary_tree",
+      "file_path": null,
+      "symbol": "kb.search_summary_tree",
+      "kind": "mcp_tool",
+      "feature_id": "mcp.tool.kb.search.summary.tree",
+      "feature_label": "kb.search_summary_tree",
+      "runtime_lane": "service",
+      "workflow_lane": [
+        "unknown"
+      ],
+      "permission_lane": "read_only",
+      "keywords": [
+        "kb.search_summary_tree",
+        "kb",
+        "unknown"
+      ],
+      "summary": "RAPTOR-style hierarchical search across per-chunk lens, cluster narrative, and directory-card summary tiers.",
+      "copy_merge_use": "Use kb.search_summary_tree when retrieving or manipulating unknown-lane packets."
+    },
+    {
+      "source_ref": "kb.trace_search",
+      "file_path": null,
+      "symbol": "kb.trace_search",
+      "kind": "mcp_tool",
+      "feature_id": "mcp.tool.kb.trace.search",
+      "feature_label": "kb.trace_search",
+      "runtime_lane": "service",
+      "workflow_lane": [
+        "unknown"
+      ],
+      "permission_lane": "read_only",
+      "keywords": [
+        "kb.trace_search",
+        "kb",
+        "unknown"
+      ],
+      "summary": "Search the hypergraph/KAG context for documents, cards, and relations matching a query.",
+      "copy_merge_use": "Use kb.trace_search when retrieving or manipulating unknown-lane packets."
+    },
+    {
+      "source_ref": "kb.wiki_note_lookup",
+      "file_path": null,
+      "symbol": "kb.wiki_note_lookup",
+      "kind": "mcp_tool",
+      "feature_id": "mcp.tool.kb.wiki.note.lookup",
+      "feature_label": "kb.wiki_note_lookup",
+      "runtime_lane": "service",
+      "workflow_lane": [
+        "read"
+      ],
+      "permission_lane": "read_only",
+      "keywords": [
+        "kb.wiki_note_lookup",
+        "kb",
+        "read"
+      ],
+      "summary": "Look up notes in the wiki.",
+      "copy_merge_use": "Use kb.wiki_note_lookup when retrieving or manipulating read-lane packets."
+    },
+    {
+      "source_ref": "knowledge.get_minified_map",
+      "file_path": null,
+      "symbol": "knowledge.get_minified_map",
+      "kind": "mcp_tool",
+      "feature_id": "mcp.tool.knowledge.get.minified.map",
+      "feature_label": "knowledge.get_minified_map",
+      "runtime_lane": "service",
+      "workflow_lane": [
+        "unknown"
+      ],
+      "permission_lane": "read_only",
+      "keywords": [
+        "knowledge.get_minified_map",
+        "knowledge",
+        "unknown"
+      ],
+      "summary": "Returns a minified architectural map for a specific directory.",
+      "copy_merge_use": "Use knowledge.get_minified_map when retrieving or manipulating unknown-lane packets."
+    },
+    {
+      "source_ref": "legal.batch_ingest",
+      "file_path": null,
+      "symbol": "legal.batch_ingest",
+      "kind": "mcp_tool",
+      "feature_id": "mcp.tool.legal.batch.ingest",
+      "feature_label": "legal.batch_ingest",
+      "runtime_lane": "service",
+      "workflow_lane": [
+        "dense"
+      ],
+      "permission_lane": "read_only",
+      "keywords": [
+        "legal.batch_ingest",
+        "legal",
+        "dense"
+      ],
+      "summary": "Publish one or more document URLs to the document.embed RabbitMQ queue for background embedding and indexing. Use to bulk-ingest case documents, transcripts, o…",
+      "copy_merge_use": "Use legal.batch_ingest when retrieving or manipulating dense-lane packets."
+    },
+    {
+      "source_ref": "legal.build_timeline",
+      "file_path": null,
+      "symbol": "legal.build_timeline",
+      "kind": "mcp_tool",
+      "feature_id": "mcp.tool.legal.build.timeline",
+      "feature_label": "legal.build_timeline",
+      "runtime_lane": "service",
+      "workflow_lane": [
+        "synthesis"
+      ],
+      "permission_lane": "read_only",
+      "keywords": [
+        "legal.build_timeline",
+        "legal",
+        "synthesis"
+      ],
+      "summary": "Extract a chronological timeline of events from all evidence associated with a case using Gemma4 NER. Returns TimelineEvent[] with time, who[], what, location,…",
+      "copy_merge_use": "Use legal.build_timeline when retrieving or manipulating synthesis-lane packets."
+    },
+    {
+      "source_ref": "legal.check_services",
+      "file_path": null,
+      "symbol": "legal.check_services",
+      "kind": "mcp_tool",
+      "feature_id": "mcp.tool.legal.check.services",
+      "feature_label": "legal.check_services",
+      "runtime_lane": "service",
+      "workflow_lane": [
+        "cache",
+        "dense",
+        "graph"
+      ],
+      "permission_lane": "read_only",
+      "keywords": [
+        "legal.check_services",
+        "legal",
+        "cache",
+        "dense",
+        "graph"
+      ],
+      "summary": "Probe all 9 backing services (Postgres, Redis, Qdrant, Neo4j, Ollama, RabbitMQ, CouchDB, SeaweedFS, Obsidian) and report health status with latency. Use to dia…",
+      "copy_merge_use": "Use legal.check_services when retrieving or manipulating cache-lane packets."
+    },
+    {
+      "source_ref": "legal.cross_examine",
+      "file_path": null,
+      "symbol": "legal.cross_examine",
+      "kind": "mcp_tool",
+      "feature_id": "mcp.tool.legal.cross.examine",
+      "feature_label": "legal.cross_examine",
+      "runtime_lane": "service",
+      "workflow_lane": [
+        "synthesis"
+      ],
+      "permission_lane": "read_only",
+      "keywords": [
+        "legal.cross_examine",
+        "legal",
+        "synthesis"
+      ],
+      "summary": "Generate strategic cross-examination questions for a witness using Gemma4. Analyzes the witness statement and case context to surface inconsistencies and credi…",
+      "copy_merge_use": "Use legal.cross_examine when retrieving or manipulating synthesis-lane packets."
+    },
+    {
+      "source_ref": "legal.cross_reference_evidence",
+      "file_path": null,
+      "symbol": "legal.cross_reference_evidence",
+      "kind": "mcp_tool",
+      "feature_id": "mcp.tool.legal.cross.reference.evidence",
+      "feature_label": "legal.cross_reference_evidence",
+      "runtime_lane": "service",
+      "workflow_lane": [
+        "dense"
+      ],
+      "permission_lane": "read_only",
+      "keywords": [
+        "legal.cross_reference_evidence",
+        "legal",
+        "dense"
+      ],
+      "summary": "Semantic cross-reference: find evidence chunks similar to a reference evidence item across one or more cases using Qdrant ANN. Use for \"has this fingerprint/ph…",
+      "copy_merge_use": "Use legal.cross_reference_evidence when retrieving or manipulating dense-lane packets."
+    },
+    {
+      "source_ref": "legal.find_precedents",
+      "file_path": null,
+      "symbol": "legal.find_precedents",
+      "kind": "mcp_tool",
+      "feature_id": "mcp.tool.legal.find.precedents",
+      "feature_label": "legal.find_precedents",
+      "runtime_lane": "service",
+      "workflow_lane": [
+        "unknown"
+      ],
+      "permission_lane": "read_only",
+      "keywords": [
+        "legal.find_precedents",
+        "legal",
+        "unknown"
+      ],
+      "summary": "Semantic + full-text search across legal precedents, case opinions, and rulings. Returns ranked results with citation, court, and summary. Use for \"find cases …",
+      "copy_merge_use": "Use legal.find_precedents when retrieving or manipulating unknown-lane packets."
+    },
+    {
+      "source_ref": "legal.find_similar_opinions",
+      "file_path": null,
+      "symbol": "legal.find_similar_opinions",
+      "kind": "mcp_tool",
+      "feature_id": "mcp.tool.legal.find.similar.opinions",
+      "feature_label": "legal.find_similar_opinions",
+      "runtime_lane": "service",
+      "workflow_lane": [
+        "lexical",
+        "dense"
+      ],
+      "permission_lane": "read_only",
+      "keywords": [
+        "legal.find_similar_opinions",
+        "legal",
+        "lexical",
+        "dense"
+      ],
+      "summary": "Find similar case opinions, judgments, and rulings via Qdrant semantic search on the legal_documents collection filtered to doc_type opinion/judgment/ruling. E…",
+      "copy_merge_use": "Use legal.find_similar_opinions when retrieving or manipulating lexical-lane packets."
+    },
+    {
+      "source_ref": "legal.get_transcript",
+      "file_path": null,
+      "symbol": "legal.get_transcript",
+      "kind": "mcp_tool",
+      "feature_id": "mcp.tool.legal.get.transcript",
+      "feature_label": "legal.get_transcript",
+      "runtime_lane": "service",
+      "workflow_lane": [
+        "unknown"
+      ],
+      "permission_lane": "read_only",
+      "keywords": [
+        "legal.get_transcript",
+        "legal",
+        "unknown"
+      ],
+      "summary": "Retrieve the Whisper transcript for an audio/video evidence item that has already been processed. Returns the full text plus any extracted speaker segments. Us…",
+      "copy_merge_use": "Use legal.get_transcript when retrieving or manipulating unknown-lane packets."
+    },
+    {
+      "source_ref": "legal.issue_spotter",
+      "file_path": null,
+      "symbol": "legal.issue_spotter",
+      "kind": "mcp_tool",
+      "feature_id": "mcp.tool.legal.issue.spotter",
+      "feature_label": "legal.issue_spotter",
+      "runtime_lane": "service",
+      "workflow_lane": [
+        "synthesis"
+      ],
+      "permission_lane": "read_only",
+      "keywords": [
+        "legal.issue_spotter",
+        "legal",
+        "synthesis"
+      ],
+      "summary": "Gemma4 legal issue analysis: identifies legal issues, applicable statutes, strengths, weaknesses, missing evidence, and recommended next steps for a case. Use …",
+      "copy_merge_use": "Use legal.issue_spotter when retrieving or manipulating synthesis-lane packets."
+    },
+    {
+      "source_ref": "legal.mock_trial",
+      "file_path": null,
+      "symbol": "legal.mock_trial",
+      "kind": "mcp_tool",
+      "feature_id": "mcp.tool.legal.mock.trial",
+      "feature_label": "legal.mock_trial",
+      "runtime_lane": "service",
+      "workflow_lane": [
+        "synthesis"
+      ],
+      "permission_lane": "read_only",
+      "keywords": [
+        "legal.mock_trial",
+        "legal",
+        "synthesis"
+      ],
+      "summary": "Multi-role mock trial simulation using Gemma4. Prosecution makes an opening statement, defense counters, then a judge delivers a ruling with evidence admissibi…",
+      "copy_merge_use": "Use legal.mock_trial when retrieving or manipulating synthesis-lane packets."
+    },
+    {
+      "source_ref": "legal.score_case",
+      "file_path": null,
+      "symbol": "legal.score_case",
+      "kind": "mcp_tool",
+      "feature_id": "mcp.tool.legal.score.case",
+      "feature_label": "legal.score_case",
+      "runtime_lane": "service",
+      "workflow_lane": [
+        "unknown"
+      ],
+      "permission_lane": "read_only",
+      "keywords": [
+        "legal.score_case",
+        "legal",
+        "unknown"
+      ],
+      "summary": "Compute an evidence-weighted case strength score (0-100) for a given case. Factors: evidence count (×10, max 40), witness count (×8, max 24), documentation qua…",
+      "copy_merge_use": "Use legal.score_case when retrieving or manipulating unknown-lane packets."
+    },
+    {
+      "source_ref": "legal.search_recordings",
+      "file_path": null,
+      "symbol": "legal.search_recordings",
+      "kind": "mcp_tool",
+      "feature_id": "mcp.tool.legal.search.recordings",
+      "feature_label": "legal.search_recordings",
+      "runtime_lane": "service",
+      "workflow_lane": [
+        "unknown"
+      ],
+      "permission_lane": "read_only",
+      "keywords": [
+        "legal.search_recordings",
+        "legal",
+        "unknown"
+      ],
+      "summary": "Timestamp-aware semantic search across Whisper audio segments. Returns matching segments with start/end times so prosecutors can jump to the exact moment in a …",
+      "copy_merge_use": "Use legal.search_recordings when retrieving or manipulating unknown-lane packets."
+    },
+    {
+      "source_ref": "legal.similar_cases",
+      "file_path": null,
+      "symbol": "legal.similar_cases",
+      "kind": "mcp_tool",
+      "feature_id": "mcp.tool.legal.similar.cases",
+      "feature_label": "legal.similar_cases",
+      "runtime_lane": "service",
+      "workflow_lane": [
+        "unknown"
+      ],
+      "permission_lane": "read_only",
+      "keywords": [
+        "legal.similar_cases",
+        "legal",
+        "unknown"
+      ],
+      "summary": "Find cases similar to a given case using PostgreSQL full-text similarity on case title and description. Returns up to 20 similar cases with a similarity score.…",
+      "copy_merge_use": "Use legal.similar_cases when retrieving or manipulating unknown-lane packets."
+    },
+    {
+      "source_ref": "legal.transcribe_video",
+      "file_path": null,
+      "symbol": "legal.transcribe_video",
+      "kind": "mcp_tool",
+      "feature_id": "mcp.tool.legal.transcribe.video",
+      "feature_label": "legal.transcribe_video",
+      "runtime_lane": "service",
+      "workflow_lane": [
+        "cache",
+        "dense"
+      ],
+      "permission_lane": "read_only",
+      "keywords": [
+        "legal.transcribe_video",
+        "legal",
+        "cache",
+        "dense"
+      ],
+      "summary": "Queue a video URL for non-blocking background processing via RabbitMQ: yt-dlp download → FFmpeg audio extraction → Whisper large-v3 transcription → timestamp-c…",
+      "copy_merge_use": "Use legal.transcribe_video when retrieving or manipulating cache-lane packets."
+    },
+    {
+      "source_ref": "legal.write_obsidian_note",
+      "file_path": null,
+      "symbol": "legal.write_obsidian_note",
+      "kind": "mcp_tool",
+      "feature_id": "mcp.tool.legal.write.obsidian.note",
+      "feature_label": "legal.write_obsidian_note",
+      "runtime_lane": "service",
+      "workflow_lane": [
+        "unknown"
+      ],
+      "permission_lane": "read_only",
+      "keywords": [
+        "legal.write_obsidian_note",
+        "legal",
+        "unknown"
+      ],
+      "summary": "Write or append a markdown note to the Obsidian vault via the Local REST API plugin (requires Obsidian running at ENV.OBSIDIAN_URL with OBSIDIAN_API_KEY set). …",
+      "copy_merge_use": "Use legal.write_obsidian_note when retrieving or manipulating unknown-lane packets."
+    },
+    {
+      "source_ref": "LLMS.md.binding_chain",
+      "file_path": null,
+      "symbol": "LLMS.md.binding_chain",
+      "kind": "mcp_tool",
+      "feature_id": "mcp.tool.llms.md.binding.chain",
+      "feature_label": "LLMS.md.binding_chain",
+      "runtime_lane": "service",
+      "workflow_lane": [
+        "synthesis"
+      ],
+      "permission_lane": "read_only",
+      "keywords": [
+        "LLMS.md.binding_chain",
+        "LLMS",
+        "synthesis"
+      ],
+      "summary": "Walks the LLMS.md binding hierarchy for a file to determine the order of applying envelopes.",
+      "copy_merge_use": "Use LLMS.md.binding_chain when retrieving or manipulating synthesis-lane packets."
+    },
+    {
+      "source_ref": "LLMS.md.context_for_file",
+      "file_path": null,
+      "symbol": "LLMS.md.context_for_file",
+      "kind": "mcp_tool",
+      "feature_id": "mcp.tool.llms.md.context.for.file",
+      "feature_label": "LLMS.md.context_for_file",
+      "runtime_lane": "service",
+      "workflow_lane": [
+        "synthesis"
+      ],
+      "permission_lane": "read_only",
+      "keywords": [
+        "LLMS.md.context_for_file",
+        "LLMS",
+        "synthesis"
+      ],
+      "summary": "Returns only the AGENTS-related slice of the atlas context packet for a file.",
+      "copy_merge_use": "Use LLMS.md.context_for_file when retrieving or manipulating synthesis-lane packets."
+    },
+    {
+      "source_ref": "LLMS.md.coverage",
+      "file_path": null,
+      "symbol": "LLMS.md.coverage",
+      "kind": "mcp_tool",
+      "feature_id": "mcp.tool.llms.md.coverage",
+      "feature_label": "LLMS.md.coverage",
+      "runtime_lane": "service",
+      "workflow_lane": [
+        "synthesis"
+      ],
+      "permission_lane": "read_only",
+      "keywords": [
+        "LLMS.md.coverage",
+        "LLMS",
+        "synthesis"
+      ],
+      "summary": "Reports the population status of the LLMS.md envelope for a file.",
+      "copy_merge_use": "Use LLMS.md.coverage when retrieving or manipulating synthesis-lane packets."
+    },
+    {
+      "source_ref": "LLMS.md.coverage_chain",
+      "file_path": null,
+      "symbol": "LLMS.md.coverage_chain",
+      "kind": "mcp_tool",
+      "feature_id": "mcp.tool.llms.md.coverage.chain",
+      "feature_label": "LLMS.md.coverage_chain",
+      "runtime_lane": "service",
+      "workflow_lane": [
+        "synthesis"
+      ],
+      "permission_lane": "read_only",
+      "keywords": [
+        "LLMS.md.coverage_chain",
+        "LLMS",
+        "synthesis"
+      ],
+      "summary": "Returns the full LLMS.md inheritance chain for a file.",
+      "copy_merge_use": "Use LLMS.md.coverage_chain when retrieving or manipulating synthesis-lane packets."
+    },
+    {
+      "source_ref": "LLMS.md.peers_for_dir",
+      "file_path": null,
+      "symbol": "LLMS.md.peers_for_dir",
+      "kind": "mcp_tool",
+      "feature_id": "mcp.tool.llms.md.peers.for.dir",
+      "feature_label": "LLMS.md.peers_for_dir",
+      "runtime_lane": "service",
+      "workflow_lane": [
+        "synthesis"
+      ],
+      "permission_lane": "read_only",
+      "keywords": [
+        "LLMS.md.peers_for_dir",
+        "LLMS",
+        "synthesis"
+      ],
+      "summary": "Returns the directory card directly from the atlas cache.",
+      "copy_merge_use": "Use LLMS.md.peers_for_dir when retrieving or manipulating synthesis-lane packets."
+    },
+    {
+      "source_ref": "LLMS.md.peers_via_relations",
+      "file_path": null,
+      "symbol": "LLMS.md.peers_via_relations",
+      "kind": "mcp_tool",
+      "feature_id": "mcp.tool.llms.md.peers.via.relations",
+      "feature_label": "LLMS.md.peers_via_relations",
+      "runtime_lane": "service",
+      "workflow_lane": [
+        "synthesis"
+      ],
+      "permission_lane": "read_only",
+      "keywords": [
+        "LLMS.md.peers_via_relations",
+        "LLMS",
+        "synthesis"
+      ],
+      "summary": "Finds neighboring directories using the SHARES_TAGS hypergraph relation.",
+      "copy_merge_use": "Use LLMS.md.peers_via_relations when retrieving or manipulating synthesis-lane packets."
+    },
+    {
+      "source_ref": "LLMS.md.shares_tags",
+      "file_path": null,
+      "symbol": "LLMS.md.shares_tags",
+      "kind": "mcp_tool",
+      "feature_id": "mcp.tool.llms.md.shares.tags",
+      "feature_label": "LLMS.md.shares_tags",
+      "runtime_lane": "service",
+      "workflow_lane": [
+        "synthesis"
+      ],
+      "permission_lane": "read_only",
+      "keywords": [
+        "LLMS.md.shares_tags",
+        "LLMS",
+        "synthesis"
+      ],
+      "summary": "Returns neighboring directories based on shared tags in their LLMS.md files.",
+      "copy_merge_use": "Use LLMS.md.shares_tags when retrieving or manipulating synthesis-lane packets."
+    },
+    {
+      "source_ref": "ops.execute_graphify",
+      "file_path": null,
+      "symbol": "ops.execute_graphify",
+      "kind": "mcp_tool",
+      "feature_id": "mcp.tool.ops.execute.graphify",
+      "feature_label": "ops.execute_graphify",
+      "runtime_lane": "service",
+      "workflow_lane": [
+        "ops"
+      ],
+      "permission_lane": "read_only",
+      "keywords": [
+        "ops.execute_graphify",
+        "ops"
+      ],
+      "summary": "Executes an authorized graphify pipeline command.",
+      "copy_merge_use": "Use ops.execute_graphify when retrieving or manipulating ops-lane packets."
+    },
+    {
+      "source_ref": "ops.fixer_pattern_store",
+      "file_path": null,
+      "symbol": "ops.fixer_pattern_store",
+      "kind": "mcp_tool",
+      "feature_id": "mcp.tool.ops.fixer.pattern.store",
+      "feature_label": "ops.fixer_pattern_store",
+      "runtime_lane": "service",
+      "workflow_lane": [
+        "dense",
+        "ops"
+      ],
+      "permission_lane": "read_only",
+      "keywords": [
+        "ops.fixer_pattern_store",
+        "ops",
+        "dense"
+      ],
+      "summary": "[OPERATOR-GATED] Stores a fix attempt outcome to the 3-layer fixer memory. Increments success/failure counts, upserts to Qdrant fixer_memory_768 (GPU-indexed) …",
+      "copy_merge_use": "Use ops.fixer_pattern_store when retrieving or manipulating dense-lane packets."
+    },
+    {
+      "source_ref": "ops.fixer_semantic_recall",
+      "file_path": null,
+      "symbol": "ops.fixer_semantic_recall",
+      "kind": "mcp_tool",
+      "feature_id": "mcp.tool.ops.fixer.semantic.recall",
+      "feature_label": "ops.fixer_semantic_recall",
+      "runtime_lane": "service",
+      "workflow_lane": [
+        "cache",
+        "dense",
+        "synthesis",
+        "ops"
+      ],
+      "permission_lane": "read_only",
+      "keywords": [
+        "ops.fixer_semantic_recall",
+        "ops",
+        "cache",
+        "dense",
+        "synthesis"
+      ],
+      "summary": "Recalls known fix templates via Redis L1 → Postgres L2 → Qdrant semantic L3. Call before LLM analysis to skip redundant inference on known error patterns.",
+      "copy_merge_use": "Use ops.fixer_semantic_recall when retrieving or manipulating cache-lane packets."
+    },
+    {
+      "source_ref": "ops.gpu_attention",
+      "file_path": null,
+      "symbol": "ops.gpu_attention",
+      "kind": "mcp_tool",
+      "feature_id": "mcp.tool.ops.gpu.attention",
+      "feature_label": "ops.gpu_attention",
+      "runtime_lane": "service",
+      "workflow_lane": [
+        "cache",
+        "rerank",
+        "ops"
+      ],
+      "permission_lane": "read_only",
+      "keywords": [
+        "ops.gpu_attention",
+        "ops",
+        "cache",
+        "rerank"
+      ],
+      "summary": "GPU scaled dot-product attention over a flat key matrix. Returns softmax attention weights per key. Results are Redis-cached 300 s by shape+input hash (CUDA Gr…",
+      "copy_merge_use": "Use ops.gpu_attention when retrieving or manipulating cache-lane packets."
+    },
+    {
+      "source_ref": "ops.gpu_pagerank",
+      "file_path": null,
+      "symbol": "ops.gpu_pagerank",
+      "kind": "mcp_tool",
+      "feature_id": "mcp.tool.ops.gpu.pagerank",
+      "feature_label": "ops.gpu_pagerank",
+      "runtime_lane": "service",
+      "workflow_lane": [
+        "graph",
+        "ops"
+      ],
+      "permission_lane": "read_only",
+      "keywords": [
+        "ops.gpu_pagerank",
+        "ops",
+        "graph"
+      ],
+      "summary": "GPU power-iteration PageRank on a flat adjacency matrix. Returns normalised rank scores (sum to 1.0). Cached 300 s by shape+input hash.",
+      "copy_merge_use": "Use ops.gpu_pagerank when retrieving or manipulating graph-lane packets."
+    },
+    {
+      "source_ref": "ops.gpu_pipeline_stats",
+      "file_path": null,
+      "symbol": "ops.gpu_pipeline_stats",
+      "kind": "mcp_tool",
+      "feature_id": "mcp.tool.ops.gpu.pipeline.stats",
+      "feature_label": "ops.gpu_pipeline_stats",
+      "runtime_lane": "service",
+      "workflow_lane": [
+        "ops"
+      ],
+      "permission_lane": "read_only",
+      "keywords": [
+        "ops.gpu_pipeline_stats",
+        "ops"
+      ],
+      "summary": "Returns GPU pipeline diagnostics: active stream slots, pending queue depth, cache hit rate over last 50 ops, and device config.",
+      "copy_merge_use": "Use ops.gpu_pipeline_stats when retrieving or manipulating ops-lane packets."
+    },
+    {
+      "source_ref": "ops.gpu_topk",
+      "file_path": null,
+      "symbol": "ops.gpu_topk",
+      "kind": "mcp_tool",
+      "feature_id": "mcp.tool.ops.gpu.topk",
+      "feature_label": "ops.gpu_topk",
+      "runtime_lane": "service",
+      "workflow_lane": [
+        "ops"
+      ],
+      "permission_lane": "read_only",
+      "keywords": [
+        "ops.gpu_topk",
+        "ops"
+      ],
+      "summary": "GPU top-k index selection. Returns k indices of highest-scoring candidates in descending order. Use after pipelineAttention to get the top chunk indices.",
+      "copy_merge_use": "Use ops.gpu_topk when retrieving or manipulating ops-lane packets."
+    },
+    {
+      "source_ref": "ops.propose_patch",
+      "file_path": null,
+      "symbol": "ops.propose_patch",
+      "kind": "mcp_tool",
+      "feature_id": "mcp.tool.ops.propose.patch",
+      "feature_label": "ops.propose_patch",
+      "runtime_lane": "service",
+      "workflow_lane": [
+        "ops"
+      ],
+      "permission_lane": "read_write",
+      "keywords": [
+        "ops.propose_patch",
+        "ops"
+      ],
+      "summary": "PROPOSES a patch for a file. READ-ONLY PREVIEW. Does NOT modify files.",
+      "copy_merge_use": "Use ops.propose_patch when retrieving or manipulating ops-lane packets."
+    },
+    {
+      "source_ref": "ops.record_fix_attempt",
+      "file_path": null,
+      "symbol": "ops.record_fix_attempt",
+      "kind": "mcp_tool",
+      "feature_id": "mcp.tool.ops.record.fix.attempt",
+      "feature_label": "ops.record_fix_attempt",
+      "runtime_lane": "service",
+      "workflow_lane": [
+        "ops"
+      ],
+      "permission_lane": "read_write",
+      "keywords": [
+        "ops.record_fix_attempt",
+        "ops"
+      ],
+      "summary": "Records a fix attempt and its outcome to the persistent audit log.",
+      "copy_merge_use": "Use ops.record_fix_attempt when retrieving or manipulating ops-lane packets."
+    },
+    {
+      "source_ref": "ops.run_quality_gate",
+      "file_path": null,
+      "symbol": "ops.run_quality_gate",
+      "kind": "mcp_tool",
+      "feature_id": "mcp.tool.ops.run.quality.gate",
+      "feature_label": "ops.run_quality_gate",
+      "runtime_lane": "service",
+      "workflow_lane": [
+        "ops"
+      ],
+      "permission_lane": "read_write",
+      "keywords": [
+        "ops.run_quality_gate",
+        "ops"
+      ],
+      "summary": "Executes a project-wide quality gate (tsc or vitest-all).",
+      "copy_merge_use": "Use ops.run_quality_gate when retrieving or manipulating ops-lane packets."
+    },
+    {
+      "source_ref": "ops.run_targeted_test",
+      "file_path": null,
+      "symbol": "ops.run_targeted_test",
+      "kind": "mcp_tool",
+      "feature_id": "mcp.tool.ops.run.targeted.test",
+      "feature_label": "ops.run_targeted_test",
+      "runtime_lane": "service",
+      "workflow_lane": [
+        "ops"
+      ],
+      "permission_lane": "read_write",
+      "keywords": [
+        "ops.run_targeted_test",
+        "ops"
+      ],
+      "summary": "Executes a single Vitest test file and returns the outcome.",
+      "copy_merge_use": "Use ops.run_targeted_test when retrieving or manipulating ops-lane packets."
+    },
+    {
+      "source_ref": "ops.trust_audit",
+      "file_path": null,
+      "symbol": "ops.trust_audit",
+      "kind": "mcp_tool",
+      "feature_id": "mcp.tool.ops.trust.audit",
+      "feature_label": "ops.trust_audit",
+      "runtime_lane": "service",
+      "workflow_lane": [
+        "dense",
+        "ops"
+      ],
+      "permission_lane": "read_only",
+      "keywords": [
+        "ops.trust_audit",
+        "ops",
+        "dense"
+      ],
+      "summary": "Read-only audit of the trust-tier injection-detection system. Returns count of blocked content hashes and the most recently blocked entries. Use for diagnostic…",
+      "copy_merge_use": "Use ops.trust_audit when retrieving or manipulating dense-lane packets."
+    },
+    {
+      "source_ref": "ops.update_LLMS.md",
+      "file_path": null,
+      "symbol": "ops.update_LLMS.md",
+      "kind": "mcp_tool",
+      "feature_id": "mcp.tool.ops.update.llms.md",
+      "feature_label": "ops.update_LLMS.md",
+      "runtime_lane": "service",
+      "workflow_lane": [
+        "cache",
+        "synthesis",
+        "ops"
+      ],
+      "permission_lane": "read_only",
+      "keywords": [
+        "ops.update_LLMS.md",
+        "ops",
+        "cache",
+        "synthesis"
+      ],
+      "summary": "Append a new fact, rule, or tool note to a directory LLMS.md file and flush to Redis. Use this after discovering something useful that should survive future co…",
+      "copy_merge_use": "Use ops.update_LLMS.md when retrieving or manipulating cache-lane packets."
+    },
+    {
+      "source_ref": "runtime.quic_status",
+      "file_path": null,
+      "symbol": "runtime.quic_status",
+      "kind": "mcp_tool",
+      "feature_id": "mcp.tool.runtime.quic.status",
+      "feature_label": "runtime.quic_status",
+      "runtime_lane": "service",
+      "workflow_lane": [
+        "unknown"
+      ],
+      "permission_lane": "read_only",
+      "keywords": [
+        "runtime.quic_status",
+        "runtime",
+        "unknown"
+      ],
+      "summary": "Reports QUIC/HTTP3 dev-lane configuration and probes the local Caddy/Vite QUIC endpoint if present.",
+      "copy_merge_use": "Use runtime.quic_status when retrieving or manipulating unknown-lane packets."
+    },
+    {
+      "source_ref": "runtime.simdjson_status",
+      "file_path": null,
+      "symbol": "runtime.simdjson_status",
+      "kind": "mcp_tool",
+      "feature_id": "mcp.tool.runtime.simdjson.status",
+      "feature_label": "runtime.simdjson_status",
+      "runtime_lane": "service",
+      "workflow_lane": [
+        "unknown"
+      ],
+      "permission_lane": "read_only",
+      "keywords": [
+        "runtime.simdjson_status",
+        "runtime",
+        "unknown"
+      ],
+      "summary": "Reports SIMD/AVX2 JSON parser availability, fallback mode, cache metrics, and safe usage notes.",
+      "copy_merge_use": "Use runtime.simdjson_status when retrieving or manipulating unknown-lane packets."
+    },
+    {
+      "source_ref": "runtime.sse_probe",
+      "file_path": null,
+      "symbol": "runtime.sse_probe",
+      "kind": "mcp_tool",
+      "feature_id": "mcp.tool.runtime.sse.probe",
+      "feature_label": "runtime.sse_probe",
+      "runtime_lane": "service",
+      "workflow_lane": [
+        "graph"
+      ],
+      "permission_lane": "read_only",
+      "keywords": [
+        "runtime.sse_probe",
+        "runtime",
+        "graph"
+      ],
+      "summary": "Verifies TRACE MCP Streamable HTTP/SSE path by calling tools/list with Accept: text/event-stream.",
+      "copy_merge_use": "Use runtime.sse_probe when retrieving or manipulating graph-lane packets."
+    },
+    {
+      "source_ref": "search.dev_context",
+      "file_path": null,
+      "symbol": "search.dev_context",
+      "kind": "mcp_tool",
+      "feature_id": "mcp.tool.search.dev.context",
+      "feature_label": "search.dev_context",
+      "runtime_lane": "service",
+      "workflow_lane": [
+        "unknown"
+      ],
+      "permission_lane": "read_only",
+      "keywords": [
+        "search.dev_context",
+        "search",
+        "unknown"
+      ],
+      "summary": "Returns codebase chunks for coding and debugging prompts.",
+      "copy_merge_use": "Use search.dev_context when retrieving or manipulating unknown-lane packets."
+    },
+    {
+      "source_ref": "search.go_hybrid",
+      "file_path": null,
+      "symbol": "search.go_hybrid",
+      "kind": "mcp_tool",
+      "feature_id": "mcp.tool.search.go.hybrid",
+      "feature_label": "search.go_hybrid",
+      "runtime_lane": "service",
+      "workflow_lane": [
+        "lexical",
+        "dense",
+        "rerank"
+      ],
+      "permission_lane": "read_only",
+      "keywords": [
+        "search.go_hybrid",
+        "search",
+        "lexical",
+        "dense",
+        "rerank"
+      ],
+      "summary": "Go search service RRF fusion of FTS + pgvector + Qdrant.",
+      "copy_merge_use": "Use search.go_hybrid when retrieving or manipulating lexical-lane packets."
+    },
+    {
+      "source_ref": "search.hybrid",
+      "file_path": null,
+      "symbol": "search.hybrid",
+      "kind": "mcp_tool",
+      "feature_id": "mcp.tool.search.hybrid",
+      "feature_label": "search.hybrid",
+      "runtime_lane": "service",
+      "workflow_lane": [
+        "lexical"
+      ],
+      "permission_lane": "read_only",
+      "keywords": [
+        "search.hybrid",
+        "search",
+        "lexical"
+      ],
+      "summary": "Performs hybrid (FTS + semantic) search across the codebase.",
+      "copy_merge_use": "Use search.hybrid when retrieving or manipulating lexical-lane packets."
+    },
+    {
+      "source_ref": "search.postgres_fts",
+      "file_path": null,
+      "symbol": "search.postgres_fts",
+      "kind": "mcp_tool",
+      "feature_id": "mcp.tool.search.postgres.fts",
+      "feature_label": "search.postgres_fts",
+      "runtime_lane": "service",
+      "workflow_lane": [
+        "lexical"
+      ],
+      "permission_lane": "read_only",
+      "keywords": [
+        "search.postgres_fts",
+        "search",
+        "lexical"
+      ],
+      "summary": "Code search using PostgreSQL Full Text Search.",
+      "copy_merge_use": "Use search.postgres_fts when retrieving or manipulating lexical-lane packets."
+    },
+    {
+      "source_ref": "search.rerank",
+      "file_path": null,
+      "symbol": "search.rerank",
+      "kind": "mcp_tool",
+      "feature_id": "mcp.tool.search.rerank",
+      "feature_label": "search.rerank",
+      "runtime_lane": "service",
+      "workflow_lane": [
+        "rerank"
+      ],
+      "permission_lane": "read_only",
+      "keywords": [
+        "search.rerank",
+        "search",
+        "rerank"
+      ],
+      "summary": "Reranks a list of document snippets for relevance to a query using llama-server.",
+      "copy_merge_use": "Use search.rerank when retrieving or manipulating rerank-lane packets."
+    },
+    {
+      "source_ref": "skills.list",
+      "file_path": null,
+      "symbol": "skills.list",
+      "kind": "mcp_tool",
+      "feature_id": "mcp.tool.skills.list",
+      "feature_label": "skills.list",
+      "runtime_lane": "service",
+      "workflow_lane": [
+        "unknown"
+      ],
+      "permission_lane": "read_only",
+      "keywords": [
+        "skills.list",
+        "skills",
+        "unknown"
+      ],
+      "summary": "Filter skills by name or description.",
+      "copy_merge_use": "Use skills.list when retrieving or manipulating unknown-lane packets."
+    },
+    {
+      "source_ref": "skills.run_mission",
+      "file_path": null,
+      "symbol": "skills.run_mission",
+      "kind": "mcp_tool",
+      "feature_id": "mcp.tool.skills.run.mission",
+      "feature_label": "skills.run_mission",
+      "runtime_lane": "service",
+      "workflow_lane": [
+        "unknown"
+      ],
+      "permission_lane": "read_only",
+      "keywords": [
+        "skills.run_mission",
+        "skills",
+        "unknown"
+      ],
+      "summary": "Execute a specialized autonomous skill mission.",
+      "copy_merge_use": "Use skills.run_mission when retrieving or manipulating unknown-lane packets."
+    },
+    {
+      "source_ref": "taxonomy.children",
+      "file_path": null,
+      "symbol": "taxonomy.children",
+      "kind": "mcp_tool",
+      "feature_id": "mcp.tool.taxonomy.children",
+      "feature_label": "taxonomy.children",
+      "runtime_lane": "service",
+      "workflow_lane": [
+        "unknown"
+      ],
+      "permission_lane": "read_only",
+      "keywords": [
+        "taxonomy.children",
+        "taxonomy",
+        "unknown"
+      ],
+      "summary": "Lists children of a specific ontological node in the topology.",
+      "copy_merge_use": "Use taxonomy.children when retrieving or manipulating unknown-lane packets."
+    },
+    {
+      "source_ref": "taxonomy.path",
+      "file_path": null,
+      "symbol": "taxonomy.path",
+      "kind": "mcp_tool",
+      "feature_id": "mcp.tool.taxonomy.path",
+      "feature_label": "taxonomy.path",
+      "runtime_lane": "service",
+      "workflow_lane": [
+        "graph"
+      ],
+      "permission_lane": "read_only",
+      "keywords": [
+        "taxonomy.path",
+        "taxonomy",
+        "graph"
+      ],
+      "summary": "Returns the full ontological path from a leaf node to root.",
+      "copy_merge_use": "Use taxonomy.path when retrieving or manipulating graph-lane packets."
+    },
+    {
+      "source_ref": "tools.batch_call",
+      "file_path": null,
+      "symbol": "tools.batch_call",
+      "kind": "mcp_tool",
+      "feature_id": "mcp.tool.tools.batch.call",
+      "feature_label": "tools.batch_call",
+      "runtime_lane": "service",
+      "workflow_lane": [
+        "unknown"
+      ],
+      "permission_lane": "read_only",
+      "keywords": [
+        "tools.batch_call",
+        "tools",
+        "unknown"
+      ],
+      "summary": "Executes multiple tool calls in parallel to reduce total latency.",
+      "copy_merge_use": "Use tools.batch_call when retrieving or manipulating unknown-lane packets."
+    },
+    {
+      "source_ref": "topology.hydration_status",
+      "file_path": null,
+      "symbol": "topology.hydration_status",
+      "kind": "mcp_tool",
+      "feature_id": "mcp.tool.topology.hydration.status",
+      "feature_label": "topology.hydration_status",
+      "runtime_lane": "service",
+      "workflow_lane": [
+        "unknown"
+      ],
+      "permission_lane": "read_only",
+      "keywords": [
+        "topology.hydration_status",
+        "topology",
+        "unknown"
+      ],
+      "summary": "Returns a diagnostic overview of topological hydration coverage.",
+      "copy_merge_use": "Use topology.hydration_status when retrieving or manipulating unknown-lane packets."
+    },
+    {
+      "source_ref": "topology.recompute_manifold_plan",
+      "file_path": null,
+      "symbol": "topology.recompute_manifold_plan",
+      "kind": "mcp_tool",
+      "feature_id": "mcp.tool.topology.recompute.manifold.plan",
+      "feature_label": "topology.recompute_manifold_plan",
+      "runtime_lane": "service",
+      "workflow_lane": [
+        "unknown"
+      ],
+      "permission_lane": "read_only",
+      "keywords": [
+        "topology.recompute_manifold_plan",
+        "topology",
+        "unknown"
+      ],
+      "summary": "Provides a recommended plan for restoring topological hydration.",
+      "copy_merge_use": "Use topology.recompute_manifold_plan when retrieving or manipulating unknown-lane packets."
+    },
+    {
+      "source_ref": "topology.same_som_cluster",
+      "file_path": null,
+      "symbol": "topology.same_som_cluster",
+      "kind": "mcp_tool",
+      "feature_id": "mcp.tool.topology.same.som.cluster",
+      "feature_label": "topology.same_som_cluster",
+      "runtime_lane": "service",
+      "workflow_lane": [
+        "unknown"
+      ],
+      "permission_lane": "read_only",
+      "keywords": [
+        "topology.same_som_cluster",
+        "topology",
+        "unknown"
+      ],
+      "summary": "Returns other nodes in the same SOM cluster as the reference node.",
+      "copy_merge_use": "Use topology.same_som_cluster when retrieving or manipulating unknown-lane packets."
+    },
+    {
+      "source_ref": "topology.search_4d",
+      "file_path": null,
+      "symbol": "topology.search_4d",
+      "kind": "mcp_tool",
+      "feature_id": "mcp.tool.topology.search.4d",
+      "feature_label": "topology.search_4d",
+      "runtime_lane": "service",
+      "workflow_lane": [
+        "unknown"
+      ],
+      "permission_lane": "read_only",
+      "keywords": [
+        "topology.search_4d",
+        "topology",
+        "unknown"
+      ],
+      "summary": "Explicit 4D manifold coordinate search with optional JSONB payload filters.",
+      "copy_merge_use": "Use topology.search_4d when retrieving or manipulating unknown-lane packets."
+    },
+    {
+      "source_ref": "topology.search_near",
+      "file_path": null,
+      "symbol": "topology.search_near",
+      "kind": "mcp_tool",
+      "feature_id": "mcp.tool.topology.search.near",
+      "feature_label": "topology.search_near",
+      "runtime_lane": "service",
+      "workflow_lane": [
+        "unknown"
+      ],
+      "permission_lane": "read_only",
+      "keywords": [
+        "topology.search_near",
+        "topology",
+        "unknown"
+      ],
+      "summary": "Semantic search for nodes within a 4D topology radius.",
+      "copy_merge_use": "Use topology.search_near when retrieving or manipulating unknown-lane packets."
+    },
+    {
+      "source_ref": "topology.search_som_neighborhood",
+      "file_path": null,
+      "symbol": "topology.search_som_neighborhood",
+      "kind": "mcp_tool",
+      "feature_id": "mcp.tool.topology.search.som.neighborhood",
+      "feature_label": "topology.search_som_neighborhood",
+      "runtime_lane": "service",
+      "workflow_lane": [
+        "graph"
+      ],
+      "permission_lane": "read_only",
+      "keywords": [
+        "topology.search_som_neighborhood",
+        "topology",
+        "graph"
+      ],
+      "summary": "Searches for nodes in the SOM grid neighborhood of an anchored query.",
+      "copy_merge_use": "Use topology.search_som_neighborhood when retrieving or manipulating graph-lane packets."
+    },
+    {
+      "source_ref": "trace.explain_retrieval",
+      "file_path": null,
+      "symbol": "trace.explain_retrieval",
+      "kind": "mcp_tool",
+      "feature_id": "mcp.tool.trace.explain.retrieval",
+      "feature_label": "trace.explain_retrieval",
+      "runtime_lane": "service",
+      "workflow_lane": [
+        "unknown"
+      ],
+      "permission_lane": "read_only",
+      "keywords": [
+        "trace.explain_retrieval",
+        "trace",
+        "unknown"
+      ],
+      "summary": "Explains the retrieval trace for a specific query.",
+      "copy_merge_use": "Use trace.explain_retrieval when retrieving or manipulating unknown-lane packets."
+    },
+    {
+      "source_ref": "trace.graphrag_search",
+      "file_path": null,
+      "symbol": "trace.graphrag_search",
+      "kind": "mcp_tool",
+      "feature_id": "mcp.tool.trace.graphrag.search",
+      "feature_label": "trace.graphrag_search",
+      "runtime_lane": "service",
+      "workflow_lane": [
+        "graph",
+        "rerank"
+      ],
+      "permission_lane": "read_only",
+      "keywords": [
+        "trace.graphrag_search",
+        "trace",
+        "graph",
+        "rerank"
+      ],
+      "summary": "GraphRAG hybrid retrieval: dense+sparse RRF prefetch → Neo4j graph expansion → Karpathy blend rerank.",
+      "copy_merge_use": "Use trace.graphrag_search when retrieving or manipulating graph-lane packets."
+    },
+    {
+      "source_ref": "trace.kag_search",
+      "file_path": null,
+      "symbol": "trace.kag_search",
+      "kind": "mcp_tool",
+      "feature_id": "mcp.tool.trace.kag.search",
+      "feature_label": "trace.kag_search",
+      "runtime_lane": "service",
+      "workflow_lane": [
+        "unknown"
+      ],
+      "permission_lane": "read_only",
+      "keywords": [
+        "trace.kag_search",
+        "trace",
+        "unknown"
+      ],
+      "summary": "High-performance KAG-DAG retrieval: Go retrieval service → SvelteKit proxy → Postgres fallback.",
+      "copy_merge_use": "Use trace.kag_search when retrieving or manipulating unknown-lane packets."
+    },
+    {
+      "source_ref": "trace.system_health",
+      "file_path": null,
+      "symbol": "trace.system_health",
+      "kind": "mcp_tool",
+      "feature_id": "mcp.tool.trace.system.health",
+      "feature_label": "trace.system_health",
+      "runtime_lane": "service",
+      "workflow_lane": [
+        "unknown"
+      ],
+      "permission_lane": "read_only",
+      "keywords": [
+        "trace.system_health",
+        "trace",
+        "unknown"
+      ],
+      "summary": "Returns the health and latency status of all backend retrieval and inference services.",
+      "copy_merge_use": "Use trace.system_health when retrieving or manipulating unknown-lane packets."
+    },
+    {
+      "source_ref": "trace.validate_ace_hit",
+      "file_path": null,
+      "symbol": "trace.validate_ace_hit",
+      "kind": "mcp_tool",
+      "feature_id": "mcp.tool.trace.validate.ace.hit",
+      "feature_label": "trace.validate_ace_hit",
+      "runtime_lane": "service",
+      "workflow_lane": [
+        "unknown"
+      ],
+      "permission_lane": "read_only",
+      "keywords": [
+        "trace.validate_ace_hit",
+        "trace",
+        "unknown"
+      ],
+      "summary": "Validates a retrieved chunk against the ACE cache and graph contracts.",
+      "copy_merge_use": "Use trace.validate_ace_hit when retrieving or manipulating unknown-lane packets."
+    },
+    {
+      "source_ref": "turbovec.rank_chunks",
+      "file_path": null,
+      "symbol": "turbovec.rank_chunks",
+      "kind": "mcp_tool",
+      "feature_id": "mcp.tool.turbovec.rank.chunks",
+      "feature_label": "turbovec.rank_chunks",
+      "runtime_lane": "service",
+      "workflow_lane": [
+        "rerank"
+      ],
+      "permission_lane": "read_only",
+      "keywords": [
+        "turbovec.rank_chunks",
+        "turbovec",
+        "rerank"
+      ],
+      "summary": "Read-only RotorQuant blended rerank for sourceRefs. No writes.",
+      "copy_merge_use": "Use turbovec.rank_chunks when retrieving or manipulating rerank-lane packets."
+    },
+    {
+      "source_ref": "ui.analyze_view",
+      "file_path": null,
+      "symbol": "ui.analyze_view",
+      "kind": "mcp_tool",
+      "feature_id": "mcp.tool.ui.analyze.view",
+      "feature_label": "ui.analyze_view",
+      "runtime_lane": "service",
+      "workflow_lane": [
+        "unknown"
+      ],
+      "permission_lane": "read_only",
+      "keywords": [
+        "ui.analyze_view",
+        "ui",
+        "unknown"
+      ],
+      "summary": "Analyzes the current UI state based on a provided snapshot.",
+      "copy_merge_use": "Use ui.analyze_view when retrieving or manipulating unknown-lane packets."
+    },
+    {
+      "source_ref": "wiki.explain_page",
+      "file_path": null,
+      "symbol": "wiki.explain_page",
+      "kind": "mcp_tool",
+      "feature_id": "mcp.tool.wiki.explain.page",
+      "feature_label": "wiki.explain_page",
+      "runtime_lane": "service",
+      "workflow_lane": [
+        "dense",
+        "graph",
+        "read"
+      ],
+      "permission_lane": "read_only",
+      "keywords": [
+        "wiki.explain_page",
+        "wiki",
+        "dense",
+        "graph",
+        "read"
+      ],
+      "summary": "Explains one wiki page with source files, imports, path aliases, feature keys, Qdrant tags, graph links, activity score, recommendations, and related FeatureMa…",
+      "copy_merge_use": "Use wiki.explain_page when retrieving or manipulating dense-lane packets."
+    },
+    {
+      "source_ref": "wiki.refresh_directory",
+      "file_path": null,
+      "symbol": "wiki.refresh_directory",
+      "kind": "mcp_tool",
+      "feature_id": "mcp.tool.wiki.refresh.directory",
+      "feature_label": "wiki.refresh_directory",
+      "runtime_lane": "service",
+      "workflow_lane": [
+        "graph",
+        "read"
+      ],
+      "permission_lane": "read_only",
+      "keywords": [
+        "wiki.refresh_directory",
+        "wiki",
+        "graph",
+        "read"
+      ],
+      "summary": "Refreshes one AGENTS/Karpathy directory card. Defaults to dryRun=true and does not start a full re-index.",
+      "copy_merge_use": "Use wiki.refresh_directory when retrieving or manipulating graph-lane packets."
+    },
+    {
+      "source_ref": "wiki.search",
+      "file_path": null,
+      "symbol": "wiki.search",
+      "kind": "mcp_tool",
+      "feature_id": "mcp.tool.wiki.search",
+      "feature_label": "wiki.search",
+      "runtime_lane": "service",
+      "workflow_lane": [
+        "cache",
+        "dense",
+        "graph",
+        "read"
+      ],
+      "permission_lane": "read_only",
+      "keywords": [
+        "wiki.search",
+        "wiki",
+        "cache",
+        "dense",
+        "graph",
+        "read"
+      ],
+      "summary": "Hybrid wiki search over rg/codebase-graph metadata, Redis Karpathy scores, Qdrant payloads, CouchDB wiki docs, and Postgres JSONB mappings.",
+      "copy_merge_use": "Use wiki.search when retrieving or manipulating cache-lane packets."
+    },
+    {
+      "source_ref": "wiki.status",
+      "file_path": null,
+      "symbol": "wiki.status",
+      "kind": "mcp_tool",
+      "feature_id": "mcp.tool.wiki.status",
+      "feature_label": "wiki.status",
+      "runtime_lane": "service",
+      "workflow_lane": [
+        "cache",
+        "dense",
+        "graph",
+        "read"
+      ],
+      "permission_lane": "read_only",
+      "keywords": [
+        "wiki.status",
+        "wiki",
+        "cache",
+        "dense",
+        "graph",
+        "read"
+      ],
+      "summary": "Returns Karpathy/AGENTS wiki status across Postgres, Redis, CouchDB, Qdrant, Neo4j, and graphify metadata.",
+      "copy_merge_use": "Use wiki.status when retrieving or manipulating cache-lane packets."
+    },
+    {
+      "source_ref": "sveltekit-frontend/src/lib/server/analytics/ldr-ace-bridge.ts",
+      "file_path": "sveltekit-frontend/src/lib/server/analytics/ldr-ace-bridge.ts",
+      "symbol": "ldr-ace-bridge",
+      "kind": "repo_file",
+      "feature_id": "repo.file.sveltekit.frontend.src.lib.server.analytics.ldr.ace.bridge.ts",
+      "feature_label": "Ldr Ace Bridge",
+      "runtime_lane": "cpu",
+      "workflow_lane": [
+        "server"
+      ],
+      "permission_lane": "read_only",
+      "keywords": [
+        "ldr-ace-bridge.ts",
+        "ldr-ace-bridge",
+        "ldr-ace-bridge.ts"
+      ],
+      "summary": "Production-ready repo file from the consolidation map: sveltekit-frontend/src/lib/server/analytics/ldr-ace-bridge.ts",
+      "copy_merge_use": "Use this file path as a canonical ship-path reference for merge planning."
+    },
+    {
+      "source_ref": "sveltekit-frontend/src/lib/server/cache/ace-packet-cache.ts",
+      "file_path": "sveltekit-frontend/src/lib/server/cache/ace-packet-cache.ts",
+      "symbol": "ace-packet-cache",
+      "kind": "repo_file",
+      "feature_id": "repo.file.sveltekit.frontend.src.lib.server.cache.ace.packet.cache.ts",
+      "feature_label": "Ace Packet Cache",
+      "runtime_lane": "cpu",
+      "workflow_lane": [
+        "server"
+      ],
+      "permission_lane": "read_only",
+      "keywords": [
+        "ace-packet-cache.ts",
+        "ace-packet-cache",
+        "ace-packet-cache.ts"
+      ],
+      "summary": "Production-ready repo file from the consolidation map: sveltekit-frontend/src/lib/server/cache/ace-packet-cache.ts",
+      "copy_merge_use": "Use this file path as a canonical ship-path reference for merge planning."
+    },
+    {
+      "source_ref": "sveltekit-frontend/src/lib/server/db/schema-postgres.ts",
+      "file_path": "sveltekit-frontend/src/lib/server/db/schema-postgres.ts",
+      "symbol": "schema-postgres",
+      "kind": "repo_file",
+      "feature_id": "repo.file.sveltekit.frontend.src.lib.server.db.schema.postgres.ts",
+      "feature_label": "Schema Postgres",
+      "runtime_lane": "cpu",
+      "workflow_lane": [
+        "server"
+      ],
+      "permission_lane": "read_only",
+      "keywords": [
+        "schema-postgres.ts",
+        "schema-postgres",
+        "schema-postgres.ts"
+      ],
+      "summary": "Production-ready repo file from the consolidation map: sveltekit-frontend/src/lib/server/db/schema-postgres.ts",
+      "copy_merge_use": "Use this file path as a canonical ship-path reference for merge planning."
+    },
+    {
+      "source_ref": "sveltekit-frontend/src/lib/server/features/cases/research-summaries-db.ts",
+      "file_path": "sveltekit-frontend/src/lib/server/features/cases/research-summaries-db.ts",
+      "symbol": "research-summaries-db",
+      "kind": "repo_file",
+      "feature_id": "repo.file.sveltekit.frontend.src.lib.server.features.cases.research.summaries.db.ts",
+      "feature_label": "Research Summaries Db",
+      "runtime_lane": "cpu",
+      "workflow_lane": [
+        "server"
+      ],
+      "permission_lane": "read_only",
+      "keywords": [
+        "research-summaries-db.ts",
+        "research-summaries-db",
+        "research-summaries-db.ts"
+      ],
+      "summary": "Production-ready repo file from the consolidation map: sveltekit-frontend/src/lib/server/features/cases/research-summaries-db.ts",
+      "copy_merge_use": "Use this file path as a canonical ship-path reference for merge planning."
+    },
+    {
+      "source_ref": "sveltekit-frontend/src/lib/server/search/qdrant-search.ts",
+      "file_path": "sveltekit-frontend/src/lib/server/search/qdrant-search.ts",
+      "symbol": "qdrant-search",
+      "kind": "repo_file",
+      "feature_id": "repo.file.sveltekit.frontend.src.lib.server.search.qdrant.search.ts",
+      "feature_label": "Qdrant Search",
+      "runtime_lane": "cpu",
+      "workflow_lane": [
+        "server"
+      ],
+      "permission_lane": "read_only",
+      "keywords": [
+        "qdrant-search.ts",
+        "qdrant-search",
+        "qdrant-search.ts"
+      ],
+      "summary": "Production-ready repo file from the consolidation map: sveltekit-frontend/src/lib/server/search/qdrant-search.ts",
+      "copy_merge_use": "Use this file path as a canonical ship-path reference for merge planning."
+    }
+  ]
+}

@@ -1,14 +1,42 @@
 #!/usr/bin/env node
 import fs from 'fs/promises';
-import { join } from 'path';
+import { basename, join } from 'path';
 import { createHash } from 'crypto';
 
 const CARDS_INDEX = '.opencode/cards/index.json';
 const CARDS_DIR = '.opencode/cards';
 const CACHE_DIR = '.opencode/cache';
 
-const GEMMA4_URL = process.env.GEMMA4_URL || process.env.OLLAMA_URL || process.env.LLM_SERVER_URL || process.env.GEMMA4_FALLBACK_URL;
-const GEMMA4_MODEL = process.env.GEMMA4_MODEL || 'gemma4';
+const GEMMA4_URL =
+  process.env.GEMMA4_URL ||
+  process.env.TURBOQUANT_BASE_URL ||
+  process.env.LLAMA_SERVER_URL ||
+  process.env.OLLAMA_URL ||
+  process.env.LLM_SERVER_URL ||
+  process.env.GEMMA4_FALLBACK_URL;
+
+function resolveLlamaServerModelId() {
+  const explicit = String(process.env.LLAMA_MODEL ?? process.env.TURBOQUANT_MODEL ?? '').trim();
+  if (explicit) return explicit;
+
+  const modelPath = String(
+    process.env.ROTORQUANT_MODEL_PATH ??
+    process.env.TURBO_MODEL_PATH ??
+    process.env.TURBOQUANT_MODEL_PATH ??
+    '',
+  ).trim();
+  if (modelPath) {
+    const base = basename(modelPath).trim();
+    if (base) return base;
+  }
+
+  const gemma4 = String(process.env.GEMMA4_MODEL ?? '').trim();
+  if (gemma4 && !/^gemma4-rotorquant(?::latest)?$/i.test(gemma4)) return gemma4;
+
+  return 'gemma4-legal-iq4xs-direct.gguf';
+}
+
+const GEMMA4_MODEL = resolveLlamaServerModelId();
 const CACHE_SUMMARIES = '.opencode/cards/summaries.jsonl';
 
 function usage(){
@@ -25,11 +53,16 @@ async function detectEndpoint(){
   let url = GEMMA4_URL || process.env.GEMMA4_FALLBACK_URL || process.env.OLLAMA_URL || process.env.LLM_SERVER_URL;
   if(!url) {
     // try local defaults
-    url = 'http://localhost:8080/v1/chat/completions';
+    url = 'http://localhost:8090/v1/chat/completions';
   }
   url = url.replace(/\/$/, '');
   let style = 'unknown';
-  if(/\/v1\//.test(url) || /chat\.completions/.test(url)) style = 'openai';
+  if (/\/v1\/chat\/completions$/.test(url) || /chat\.completions/.test(url) || /8090/.test(url)) {
+    style = 'openai';
+    if (!/\/v1\/chat\/completions$/.test(url) && /8090/.test(url)) {
+      url = `${url.replace(/\/v1$/, '')}/v1/chat/completions`;
+    }
+  }
   if(/\/api\/chat/.test(url) || /:11434/.test(url)) style = 'ollama';
   return { url, style };
 }

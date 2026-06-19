@@ -34,8 +34,9 @@ interface RetrievalHealthResult extends BaseHealthResult {
 const EMBEDDING_GRPC_URL = process.env.EMBEDDING_GRPC_URL ?? '127.0.0.1:50051';
 const EMBEDDING_GRPC_ENABLED = (process.env.EMBEDDING_GRPC_ENABLED ?? 'false') === 'true';
 const GO_SEARCH_GRPC_URL = process.env.GO_SEARCH_GRPC_URL ?? '127.0.0.1:50055';
-const RETRIEVAL_GRPC_URL = process.env.RETRIEVAL_GRPC_URL ?? GO_SEARCH_GRPC_URL;
-const RETRIEVAL_GRPC_ENABLED = (process.env.RETRIEVAL_GRPC_ENABLED ?? 'false') === 'true';
+const GO_RETRIEVAL_GRPC_URL = process.env.GO_RETRIEVAL_GRPC_ADDR ?? process.env.GO_RETRIEVAL_GRPC_URL ?? process.env.RETRIEVAL_GRPC_URL ?? GO_SEARCH_GRPC_URL;
+const RETRIEVAL_GRPC_URL = process.env.RETRIEVAL_GRPC_URL ?? GO_RETRIEVAL_GRPC_URL;
+const RETRIEVAL_GRPC_ENABLED = (process.env.RETRIEVAL_GRPC_ENABLED ?? process.env.GO_RETRIEVAL_GRPC_ENABLED ?? process.env.GO_RETRIEVAL_ENABLED ?? 'false') === 'true';
 
 function loadServiceClient(protoPath: string, packagePath: string[], serviceName: string, url: string): any {
   const packageDefinition = protoLoader.loadSync(protoPath, {

@@ -35,6 +35,8 @@ const TABLE_CANDIDATES = [
 ];
 
 const EVIDENCE_FILES = [
+  path.join(REPO_ROOT, '.tmp', 'runtime-evidence.chrom97.ndjson'),
+  path.join(REPO_ROOT, '.tmp', 'runtime-evidence.neschrom97.ndjson'),
   path.join(REPO_ROOT, '.tmp', 'kanban_tasks.jsonl'),
   path.join(REPO_ROOT, '.tmp', 'missing_feature_todos.jsonl'),
   path.join(REPO_ROOT, 'memory', 'packets', 'nes-chrom-packets.jsonl'),
@@ -45,8 +47,12 @@ const EVIDENCE_FILES = [
   path.join(REPO_ROOT, 'docs', 'reports', 'qdrant-postgres-mirror-reconciliation.json'),
   path.join(REPO_ROOT, 'docs', 'reports', 'qdrant-payload-complete-backfill.json'),
   path.join(REPO_ROOT, 'docs', 'reports', 'hidden-packet-pathmap-report.json'),
+  path.join(REPO_ROOT, 'docs', 'reports', 'route-runtime-packets-report.json'),
+  path.join(REPO_ROOT, 'docs', 'reports', 'repo-function-registry.json'),
   path.join(REPO_ROOT, 'docs', 'reports', 'feature-lineage-report.json'),
+  path.join(REPO_ROOT, 'docs', 'reports', 'runtime-evidence-collector-report.json'),
   path.join(REPO_ROOT, 'docs', 'reports', 'runtime-packet-density-report.json'),
+  path.join(REPO_ROOT, '.opencode', 'recommendations', 'recommendations.json'),
 ];
 
 function parseIntFlag(args, name, fallback) {
@@ -213,6 +219,29 @@ function extractObjectsFromJson(parsed) {
   return results;
 }
 
+function extractSyntheticObjects(filePath, parsed) {
+  const results = [];
+  const name = path.basename(filePath).toLowerCase();
+  if (name === 'repo-consolidation-feature-map.json') {
+    for (const codePath of toArray(parsed?.production_ready_code_paths)) {
+      const filePathValue = normalizeText(codePath);
+      if (!filePathValue) continue;
+      const base = path.basename(filePathValue);
+      const stem = base.replace(/\.[^.]+$/, '');
+      results.push({
+        source_ref: filePathValue,
+        file_path: filePathValue,
+        feature_id: `repo.file.${normalizeKey(filePathValue).replace(/[^a-z0-9]+/g, '.')}`,
+        feature_label: titleize(stem),
+        title: stem,
+        summary: `Production-ready repo file from the consolidation map: ${filePathValue}`,
+        packet_kind: 'repo_file',
+      });
+    }
+  }
+  return results;
+}
+
 function collectCandidateFiles() {
   const files = new Set();
 
@@ -285,7 +314,7 @@ function buildEvidenceIndex() {
         candidates = loadNdjsonFile(filePath);
       } else {
         const parsed = loadJsonFile(filePath);
-        candidates = extractObjectsFromJson(parsed);
+        candidates = [...extractObjectsFromJson(parsed), ...extractSyntheticObjects(filePath, parsed)];
       }
 
       if (candidates.length === 0) continue;

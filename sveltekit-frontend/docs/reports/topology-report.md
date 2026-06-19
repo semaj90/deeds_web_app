@@ -1,10 +1,10 @@
 # Topology Report
 
-Generated: 2026-06-18T22:55:12.769Z
+Generated: 2026-06-19T04:14:25.014Z
 
 ## Structural
 
-- GDS available: no
+- GDS available: yes
 - APOC available: yes
 - Projection exists: no
 - PageRank nodes updated: 0
@@ -17,18 +17,27 @@ Generated: 2026-06-18T22:55:12.769Z
 - Qdrant topo_byte coverage: n/a
 - Qdrant manifold4 coverage: n/a
 - Qdrant authority coverage: n/a
-- SOM sample size: 10
-- SOM-backed rows in sample: 10
+- SOM sample size: 50
+- SOM-backed rows in sample: 50
 
 ### Top SOM clusters
 
-- 3: 4
-- 2: 1
+- 3: 19
+- 0: 9
+- 9: 3
+- 17: 3
+- 2: 2
+- 73: 2
+- 16: 2
+- 14: 2
 - 6: 1
 - 8: 1
-- 9: 1
-- 0: 1
-- 73: 1
+- 97: 1
+- 51: 1
+- 59: 1
+- 25: 1
+- 71: 1
+- 12: 1
 
 ## Authority
 
@@ -36,8 +45,8 @@ Generated: 2026-06-18T22:55:12.769Z
 
 ## Retrieval Telemetry
 
-- Rows: 192
+- Rows: 216
 - Cache hits: 29
-- Fusion rows: 141
+- Fusion rows: 165
 - Cold rows: 10
-- Average latency ms: 1601.09
+- Average latency ms: 1498.55

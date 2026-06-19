@@ -1,6 +1,16 @@
 {
-  "generatedAt": "2026-06-10T17:43:01.473Z",
-  "totalFindings": 0,
-  "nodes": [],
+  "generatedAt": "2026-06-19T05:26:46.776Z",
+  "totalFindings": 1,
+  "nodes": [
+    {
+      "id": "contract:schema_mismatch",
+      "label": "Schema Mismatch",
+      "state": "schema_mismatch",
+      "severity": "medium",
+      "findingCount": 1,
+      "rootCauseScore": 0.2,
+      "fixOrder": 5
+    }
+  ],
   "edges": []
 }

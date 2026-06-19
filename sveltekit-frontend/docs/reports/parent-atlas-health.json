@@ -1,0 +1,94 @@
+{
+  "generatedAt": "2026-06-19T05:01:59.518Z",
+  "services": {
+    "postgres": {
+      "status": "READY",
+      "error": null,
+      "context": {
+        "current_database": "legal_ai_db",
+        "current_schema": "public",
+        "current_user": "legal_admin",
+        "server_version": "PostgreSQL 18.4 (Debian 18.4-1.pgdg12+1) on x86_64-pc-linux-gnu, compiled by gcc (Debian 12.2.0-14+deb12u1) 12.2.0, 64-bit"
+      }
+    },
+    "qdrant": {
+      "status": "READY",
+      "error": null,
+      "collections": 58,
+      "payloadSchema": null
+    },
+    "neo4j": {
+      "status": "READY",
+      "error": null,
+      "nodeCount": 48483,
+      "edgeCount": 113954
+    },
+    "redis": {
+      "status": "READY",
+      "error": null,
+      "dbSize": 152789,
+      "bifrostKeyCount": 112,
+      "replayTraceCount": 160
+    },
+    "goRetrievalHttp": {
+      "status": "READY",
+      "error": null
+    },
+    "goRetrievalGrpc": {
+      "status": "READY",
+      "error": null
+    }
+  },
+  "coverage": {
+    "registrySize": {
+      "status": "READY",
+      "coveragePct": 100,
+      "count": 132
+    },
+    "packetIdentity": {
+      "status": "READY",
+      "coveragePct": 100,
+      "total": 17985
+    },
+    "treeCoverage": {
+      "status": "READY",
+      "coveragePct": 100,
+      "total": 8823,
+      "packetKeyCoveragePct": 36.85,
+      "summaryCoveragePct": 0
+    },
+    "summaryCoverage": {
+      "status": "READY",
+      "coveragePct": 97.17,
+      "total": 17985
+    },
+    "glyphCoverage": {
+      "status": "MISSING",
+      "coveragePct": 0,
+      "total": 0
+    },
+    "replayCoverage": {
+      "status": "READY",
+      "coveragePct": 0.1,
+      "total": 160
+    },
+    "somProvenanceSplit": {
+      "status": "READY",
+      "coveragePct": 0,
+      "total": 1,
+      "rows": [
+        {
+          "som_source": "missing",
+          "hits": 3251
+        }
+      ]
+    }
+  },
+  "recommendations": [
+    "Postgres is reachable",
+    "Qdrant transport is reachable",
+    "Neo4j is reachable",
+    "Redis/Valkey is reachable",
+    "Go retrieval is reachable"
+  ]
+}

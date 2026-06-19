@@ -180,6 +180,7 @@ export * from './schema/schema-graph.js';
 export * from './schema/schema-semantic-cache.js';
 export * from './schema/documents-atlas.js';
 export * from './schema/feature-registry.js';
+export * from './schema/repo-function-registry.js';
 export * from './schema/atlas-cards.js';
 export * from './schema/synthesis-logs.js';
 
@@ -194,5 +195,6 @@ export * from './schema/retrieval-eval-times.js';
 export * from './schema/kanban-tasks.js';
 export * from './schema/agent-traces.js';
 export * from './schema/atlas-packets.js';
+export * from './schema/repo-function-registry.js';
 
 

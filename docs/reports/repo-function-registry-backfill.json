@@ -1,0 +1,91 @@
+{
+  "generated_at": "2026-06-19T04:42:33.208Z",
+  "mode": "verify",
+  "status": "VERIFIED",
+  "input": "docs/reports/repo-function-registry.json",
+  "table_exists": true,
+  "table_name": "repo_function_registry",
+  "summary": {
+    "source_rows": 132,
+    "db_rows_before": 132,
+    "db_rows_after": 132,
+    "applied_rows": 0,
+    "matched_rows": 132,
+    "missing_rows": 0,
+    "stale_rows": 0
+  },
+  "samples": [
+    {
+      "source_ref": "ace.compact_search",
+      "kind": "mcp_tool",
+      "feature_id": "mcp.tool.ace.compact.search",
+      "feature_label": "ace.compact_search"
+    },
+    {
+      "source_ref": "atlas.compact_context",
+      "kind": "mcp_tool",
+      "feature_id": "mcp.tool.atlas.compact.context",
+      "feature_label": "atlas.compact_context"
+    },
+    {
+      "source_ref": "atlas.coverage",
+      "kind": "mcp_tool",
+      "feature_id": "mcp.tool.atlas.coverage",
+      "feature_label": "atlas.coverage"
+    },
+    {
+      "source_ref": "atlas.explain_trace",
+      "kind": "mcp_tool",
+      "feature_id": "mcp.tool.atlas.explain.trace",
+      "feature_label": "atlas.explain_trace"
+    },
+    {
+      "source_ref": "atlas.get_chunk",
+      "kind": "mcp_tool",
+      "feature_id": "mcp.tool.atlas.get.chunk",
+      "feature_label": "atlas.get_chunk"
+    },
+    {
+      "source_ref": "atlas:packet_search",
+      "kind": "mcp_tool",
+      "feature_id": "mcp.tool.atlas.packet.search",
+      "feature_label": "atlas:packet_search"
+    },
+    {
+      "source_ref": "atlas.prefilter",
+      "kind": "mcp_tool",
+      "feature_id": "mcp.tool.atlas.prefilter",
+      "feature_label": "atlas.prefilter"
+    },
+    {
+      "source_ref": "atlas.query",
+      "kind": "mcp_tool",
+      "feature_id": "mcp.tool.atlas.query",
+      "feature_label": "atlas.query"
+    },
+    {
+      "source_ref": "atlas.source_refs",
+      "kind": "mcp_tool",
+      "feature_id": "mcp.tool.atlas.source.refs",
+      "feature_label": "atlas.source_refs"
+    },
+    {
+      "source_ref": "atlas.suggest_files",
+      "kind": "mcp_tool",
+      "feature_id": "mcp.tool.atlas.suggest.files",
+      "feature_label": "atlas.suggest_files"
+    },
+    {
+      "source_ref": "atlas:verify_coverage",
+      "kind": "mcp_tool",
+      "feature_id": "mcp.tool.atlas.verify.coverage",
+      "feature_label": "atlas:verify_coverage"
+    },
+    {
+      "source_ref": "clusters.get_members",
+      "kind": "mcp_tool",
+      "feature_id": "mcp.tool.clusters.get.members",
+      "feature_label": "clusters.get_members"
+    }
+  ]
+}

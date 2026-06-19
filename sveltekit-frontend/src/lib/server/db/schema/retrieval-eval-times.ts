@@ -16,6 +16,7 @@ import { pgTable, bigserial, text, real, integer, jsonb, timestamp, index } from
 export const atlasRetrievalEvalTimes = pgTable('atlas_retrieval_eval_times', {
   id:             bigserial('id', { mode: 'number' }).primaryKey(),
   queryHash:      text('query_hash'),
+  route:          text('route'),
   packetKey:      text('packet_key'),
   /** Stable capability/function identity — e.g. retrieval.hyperrag.packet_rpc */
   featureId:      text('feature_id'),
@@ -27,6 +28,7 @@ export const atlasRetrievalEvalTimes = pgTable('atlas_retrieval_eval_times', {
   topologyLabel:  text('topology_label'),
   sourceRef:      text('source_ref'),
   qdrantMs:       real('qdrant_ms'),
+  bm25Ms:         real('bm25_ms'),
   pgBm25Ms:       real('pg_bm25_ms'),
   pgvectorMs:     real('pgvector_ms'),
   redisMs:        real('redis_ms'),
@@ -38,17 +40,20 @@ export const atlasRetrievalEvalTimes = pgTable('atlas_retrieval_eval_times', {
   totalMs:        real('total_ms'),
   cacheHitSource: text('cache_hit_source'),
   ttlRemaining:   integer('ttl_remaining'),
+  resultCount:    integer('result_count'),
+  error:          text('error'),
   payload:        jsonb('payload').default(sql`'{}'::jsonb`),
   createdAt:      timestamp('created_at', { withTimezone: true }).defaultNow(),
 }, (table) => ({
   queryHashIdx:     index('idx_eval_times_query_hash').on(table.queryHash),
+  routeIdx:         index('idx_eval_times_route').on(table.route),
   packetKeyIdx:     index('idx_eval_times_packet_key').on(table.packetKey),
   featureIdIdx:     index('idx_eval_times_feature_id').on(table.featureId),
   domainClassIdx:   index('idx_eval_times_domain_class').on(table.domainClass),
   ontologyLabelIdx: index('idx_eval_times_ontology_label').on(table.ontologyLabel),
+  resultCountIdx:   index('idx_eval_times_result_count').on(table.resultCount),
   payloadGin:       index('idx_eval_times_payload_gin').using('gin', table.payload),
 }));
 
 export type AtlasRetrievalEvalTimes = typeof atlasRetrievalEvalTimes.$inferSelect;
 export type NewAtlasRetrievalEvalTimes = typeof atlasRetrievalEvalTimes.$inferInsert;
-

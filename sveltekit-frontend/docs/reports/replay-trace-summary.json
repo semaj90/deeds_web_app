@@ -1,0 +1,14 @@
+{
+  "generated_at": "2026-06-19T05:07:46.600Z",
+  "limit": 250,
+  "redis": {
+    "status": "READY",
+    "url": "redis://127.0.0.1:6379",
+    "error": null
+  },
+  "traces_exported": 170,
+  "rows_with_packets": 124,
+  "rows_with_error": 0,
+  "output_jsonl": "docs\\reports\\replay-trace.jsonl",
+  "output_md": "docs\\reports\\replay-trace.md"
+}
