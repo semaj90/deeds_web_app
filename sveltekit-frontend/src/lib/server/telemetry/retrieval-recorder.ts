@@ -10,6 +10,26 @@
 import { pool } from '$lib/server/db/client.js';
 import crypto from 'node:crypto';
 
+/** One retrieved packet pointer — no payload, no body. */
+export interface RetrievalHit {
+  packet_key:         string;
+  feature_id?:        string | null;
+  source_ref?:        string | null;
+  fusion_score?:      number | null;
+  retrieval_strategy?: string | null;
+}
+
+/** Per-query hit summary stored in atlas_retrieval_eval_times.payload. */
+export interface RetrievalHitsPayload {
+  hits?:   RetrievalHit[];
+  counts?: {
+    packet_hits?:      number;
+    cache_hits?:       number;
+    neo4j_expansions?: number;
+    [k: string]:       number | undefined;
+  };
+}
+
 export interface RetrievalTelemetrySignal {
   query: string;
   latencyMs: number;
@@ -25,6 +45,21 @@ export interface RetrievalTelemetrySignal {
   surface: string;
   environment: string;
   retrievalStrategy?: 'vector_only' | 'lexical_only' | 'structural_only' | 'fusion' | 'cold_neschrom';
+  /** Pointer-only hit summary — written to atlas_retrieval_eval_times.payload. No packet bodies. */
+  hitsPayload?: RetrievalHitsPayload;
+  /** Per-lane timing breakdowns (ms). */
+  timings?: {
+    bm25_ms?:    number;
+    qdrant_ms?:  number;
+    redis_ms?:   number;
+    neo4j_ms?:   number;
+    fusion_ms?:  number;
+    rerank_ms?:  number;
+  };
+  /** First domain_class from results, for atlas_retrieval_eval_times. */
+  domainClass?: string | null;
+  /** First source_ref from results. */
+  sourceRef?: string | null;
 }
 
 function cleanStringArray(values: unknown): string[] {
@@ -123,6 +158,37 @@ export async function recordRetrievalTelemetry(signal: RetrievalTelemetrySignal)
         signal.environment,
         signal.retrievalStrategy ?? 'fusion',
       ],
+    );
+
+    // ── atlas_retrieval_eval_times: one row per query, JSONB hits summary ────
+    // Pointer-only: no packet bodies, no vectors stored here.
+    void pool.query(
+      `INSERT INTO atlas_retrieval_eval_times
+         (query_hash, packet_key, feature_id, domain_class, source_ref,
+          qdrant_ms, bm25_ms, redis_ms, bitfrost_ms, neo4j_ms, rerank_ms, total_ms,
+          cache_hit_source, result_count, payload, created_at)
+       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15::jsonb,now())
+       ON CONFLICT DO NOTHING`,
+      [
+        queryHash,
+        signal.selectedPacketKey ?? selectedPacketKeys[0] ?? '',
+        signal.selectedFeatureId ?? featureIds[0] ?? null,
+        signal.domainClass ?? null,
+        signal.sourceRef ?? null,
+        signal.timings?.qdrant_ms  ?? null,
+        signal.timings?.bm25_ms    ?? null,
+        signal.timings?.redis_ms   ?? null,
+        null,                                          // bitfrost_ms — set by ACE emitter
+        signal.timings?.neo4j_ms   ?? null,
+        signal.timings?.rerank_ms  ?? null,
+        Math.max(0, Math.round(Number(signal.latencyMs ?? 0))),
+        signal.cacheHit ? 'redis' : null,
+        (selectedPacketKeys.length || 0),
+        JSON.stringify(signal.hitsPayload ?? {}),
+      ],
+    ).catch((e: unknown) =>
+      console.error('[Telemetry] atlas_retrieval_eval_times insert failed:',
+        e instanceof Error ? e.message : String(e))
     );
 
     // Concept Telemetry Integration (Phase 3E.1)

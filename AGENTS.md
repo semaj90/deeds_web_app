@@ -119,3 +119,32 @@ Startup does NOT require Redis/Qdrant/Neo4j. Engram MCP at `:8792` is the only r
 - `docs/ai-os/` — OpenCode context window, MCP atlas, skill routing
 - `memory/` — architecture references, session history
 - `CLAUDE.md` — full project instructions (loaded separately)
+
+## Retrieval Abstraction Boundary (ENFORCED)
+
+Retrieval boundary files:
+- `sveltekit-frontend/src/lib/server/search/qdrant-search.ts`
+- `sveltekit-frontend/src/lib/server/retrieval/orchestrator.ts`
+
+**Retrieval policy** (in order):
+1. Filter first (payload conditions, topo_class, cluster prefilter)
+2. Search compressed approximate semantic geometry (Qdrant ANN / quantized traversal)
+3. Exact-rescore only the bounded candidate set when quality or telemetry requires it
+
+**cuVS/CAGRA rule**: cuVS is an optional acceleration lane behind the same `SearchBackend<T>` interface (`search-backend.ts`). It is NOT the canonical store. Callers must never depend on Qdrant-specific client details directly — always go through `QdrantSearchBackend` or a conforming `SearchBackend` implementation.
+
+**Canonical truth** remains: Postgres packet/ledger tables, `sourceRef` / cold-original provenance, and Parent Atlas joins. Qdrant is a mirror, not truth.
+
+## LangGraph Boundary (ENFORCED)
+
+LangGraph is **optional orchestration and testing only**.
+
+**Allowed:**
+- Validation workflows, planning graphs, subagent sequencing
+- Gemma4 / function-tool calling, dry-run reasoning
+
+**Not allowed — hard block:**
+- Direct writes to Postgres, Qdrant, Redis, Neo4j, DuckDB, or SeaweedFS from any graph node
+- Archive, move, or delete operations
+
+Durable mutations MUST go through: promotion queue → schema gates → validation reports → bounded apply scripts.
