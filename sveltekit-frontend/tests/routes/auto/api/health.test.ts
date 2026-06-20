@@ -7,6 +7,7 @@
  */
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { execFileSync } from 'node:child_process';
 
 const { mockBreakers, mockEnv, mockDb, mockGrpc } = vi.hoisted(() => ({
   mockBreakers: {
@@ -84,6 +85,10 @@ vi.mock('drizzle-orm', () => ({
   eq: vi.fn()
 }));
 
+vi.mock('node:child_process', () => ({
+  execFileSync: vi.fn().mockReturnValue('PONG')
+}));
+
 // Mock fetch globally
 const globalFetch = vi.fn();
 vi.stubGlobal('fetch', globalFetch);
@@ -95,6 +100,7 @@ describe('src/routes/api/health/+server.ts', () => {
   beforeEach(async () => {
     vi.resetAllMocks();
     globalFetch.mockResolvedValue({ ok: true });
+    vi.mocked(execFileSync).mockReturnValue('PONG');
     
     // Re-establish implementations
     mockGrpc.checkGrpcHealth.mockResolvedValue({ available: true, enabled: true });

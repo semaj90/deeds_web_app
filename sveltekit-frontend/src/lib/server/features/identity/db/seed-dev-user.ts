@@ -27,7 +27,11 @@ async function seed() {
     } catch (err) {
         console.error('❌ Failed to seed dev user:', err);
     }
-    process.exit(0);
 }
 
-seed();
+const isMain = process.argv[1] && (process.argv[1].endsWith('seed-dev-user.ts') || process.argv[1].endsWith('seed-dev-user.js'));
+if (isMain) {
+    seed()
+        .then(() => process.exit(0))
+        .catch(() => process.exit(1));
+}

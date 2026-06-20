@@ -1,5 +1,5 @@
 use std::fs::{self, File};
-use std::io::{self, BufRead, BufReader, Write};
+use std::io::{BufRead, BufReader, Write};
 use std::path::Path;
 use napi::bindgen_prelude::*;
 use napi_derive::napi;

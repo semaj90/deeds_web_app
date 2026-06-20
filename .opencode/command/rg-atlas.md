@@ -1,5 +1,8 @@
 # OpenCode Retrieval Atlas: rg + LangExtract Lane
 
+<!-- Run the tool-first retrieval lane -->
+<!-- LangExtract-style compact extraction -->
+
 This command defines the standard tool-first retrieval path for code-search questions.
 It is used for prompts like "find where", "rg", "where is this symbol", or "show the implementation".
 The lane turns a natural-language query into a compact, sourceRef-grounded packet before synthesis.

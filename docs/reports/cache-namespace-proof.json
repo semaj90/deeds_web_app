@@ -1,6 +1,6 @@
 {
   "schema": "cache_namespace_proof.v1",
-  "generated_at": "2026-06-19T23:08:48.977Z",
+  "generated_at": "2026-06-20T00:26:01.683Z",
   "canonical_truth": "Postgres",
   "namespaces": [
     {
@@ -9,110 +9,9 @@
       "role": "query exact-match cache",
       "required": true,
       "ttl": "required",
-      "key_count": 32,
-      "samples": [
-        {
-          "key": "hyperrag:query:4082b74d17800d86",
-          "type": "string",
-          "ttl_seconds": 946
-        },
-        {
-          "key": "hyperrag:query:09acfdc05bd3e3e3",
-          "type": "string",
-          "ttl_seconds": 3473
-        },
-        {
-          "key": "hyperrag:query:354b30ecd060e144:prov",
-          "type": "string",
-          "ttl_seconds": 3441
-        },
-        {
-          "key": "hyperrag:query:09acfdc05bd3e3e3:prov",
-          "type": "string",
-          "ttl_seconds": 3473
-        },
-        {
-          "key": "hyperrag:query:8cd88530da2f8c01:prov",
-          "type": "string",
-          "ttl_seconds": 1102
-        },
-        {
-          "key": "hyperrag:query:375cc1559e938481",
-          "type": "string",
-          "ttl_seconds": 3435
-        },
-        {
-          "key": "hyperrag:query:d7a4c36fe33cae6a",
-          "type": "string",
-          "ttl_seconds": 3429
-        },
-        {
-          "key": "hyperrag:query:4082b74d17800d86:prov",
-          "type": "string",
-          "ttl_seconds": 946
-        },
-        {
-          "key": "hyperrag:query:97ee05a38e00b806:prov",
-          "type": "string",
-          "ttl_seconds": 3588
-        },
-        {
-          "key": "hyperrag:query:c02a581af4e06a35",
-          "type": "string",
-          "ttl_seconds": 3518
-        },
-        {
-          "key": "hyperrag:query:97ee05a38e00b806",
-          "type": "string",
-          "ttl_seconds": 3588
-        },
-        {
-          "key": "hyperrag:query:8017b1cabc11e63e",
-          "type": "string",
-          "ttl_seconds": 3411
-        },
-        {
-          "key": "hyperrag:query:31ff33313d7dcdae",
-          "type": "string",
-          "ttl_seconds": 3447
-        },
-        {
-          "key": "hyperrag:query:9d133344947b6aaf",
-          "type": "string",
-          "ttl_seconds": 3424
-        },
-        {
-          "key": "hyperrag:query:cbd414fb8a5a158e",
-          "type": "string",
-          "ttl_seconds": 3452
-        },
-        {
-          "key": "hyperrag:query:8cd88530da2f8c01",
-          "type": "string",
-          "ttl_seconds": 1102
-        },
-        {
-          "key": "hyperrag:query:cbd414fb8a5a158e:prov",
-          "type": "string",
-          "ttl_seconds": 3452
-        },
-        {
-          "key": "hyperrag:query:d7a4c36fe33cae6a:prov",
-          "type": "string",
-          "ttl_seconds": 3429
-        },
-        {
-          "key": "hyperrag:query:375cc1559e938481:prov",
-          "type": "string",
-          "ttl_seconds": 3435
-        },
-        {
-          "key": "hyperrag:query:bef9f56a4d36c88f:prov",
-          "type": "string",
-          "ttl_seconds": 3417
-        }
-      ],
-      "status": "PASS"
+      "key_count": 0,
+      "samples": [],
+      "status": "FAIL_EMPTY"
     },
     {
       "name": "bifrost",
@@ -123,104 +22,104 @@
       "key_count": 148,
       "samples": [
         {
-          "key": "bifrost:packet:885c6c04322f6095",
+          "key": "bifrost:packet:1703d9c005252a62",
           "type": "string",
-          "ttl_seconds": 81860
+          "ttl_seconds": 77226
         },
         {
-          "key": "bifrost:packet:4b6c2a8267660eb3",
+          "key": "bifrost:packet:e005fe879bb41ec6",
           "type": "string",
-          "ttl_seconds": 56556
-        },
-        {
-          "key": "bifrost:packet:bbbe630740c5d753",
-          "type": "string",
-          "ttl_seconds": 81860
-        },
-        {
-          "key": "bifrost:sem:intent:6df9c92c207644b6",
-          "type": "string",
-          "ttl_seconds": 22627
-        },
-        {
-          "key": "bifrost:packet:17dc1fe9f5f8a021",
-          "type": "string",
-          "ttl_seconds": 81860
-        },
-        {
-          "key": "bifrost:sem:intent:e09efdc95c9548f9",
-          "type": "string",
-          "ttl_seconds": 22627
-        },
-        {
-          "key": "bifrost:packet:175066b8a4ceee3c",
-          "type": "string",
-          "ttl_seconds": 81860
-        },
-        {
-          "key": "bifrost:packet:322b9cf893125f07",
-          "type": "string",
-          "ttl_seconds": 81860
-        },
-        {
-          "key": "bifrost:sem:packet:6a058b76b6d7100c",
-          "type": "string",
-          "ttl_seconds": 22627
-        },
-        {
-          "key": "bifrost:sem:intent:c182e42d4c34122d",
-          "type": "string",
-          "ttl_seconds": 22627
-        },
-        {
-          "key": "bifrost:packet:e172f5aebbfe0f3e",
-          "type": "string",
-          "ttl_seconds": 81860
-        },
-        {
-          "key": "bifrost:packet:1d5eba7211dea6f9",
-          "type": "string",
-          "ttl_seconds": 81860
-        },
-        {
-          "key": "bifrost:sem:packet:ebc8cdd4145caacf",
-          "type": "string",
-          "ttl_seconds": 22627
-        },
-        {
-          "key": "bifrost:packet:c91eb4c9cb71b033",
-          "type": "string",
-          "ttl_seconds": 81860
+          "ttl_seconds": 77226
         },
         {
           "key": "bifrost:packet:3f73ebb0336ae4f3",
           "type": "string",
-          "ttl_seconds": 81860
+          "ttl_seconds": 77226
         },
         {
-          "key": "bifrost:packet:d50d8ddeacd50105",
+          "key": "bifrost:sem:packet:a83063dc47fe049c",
           "type": "string",
-          "ttl_seconds": 56556
+          "ttl_seconds": 17994
         },
         {
-          "key": "bifrost:packet:d1ae3babc408287b",
+          "key": "bifrost:sem:packet:06a30620527e665c",
           "type": "string",
-          "ttl_seconds": 81860
+          "ttl_seconds": 17994
         },
         {
-          "key": "bifrost:packet:58e6adafde74465d",
+          "key": "bifrost:packet:a318d009a88a31fb",
           "type": "string",
-          "ttl_seconds": 81860
+          "ttl_seconds": 77226
+        },
+        {
+          "key": "bifrost:sem:intent:b4700090c1a7f29b",
+          "type": "string",
+          "ttl_seconds": 17994
+        },
+        {
+          "key": "bifrost:packet:175066b8a4ceee3c",
+          "type": "string",
+          "ttl_seconds": 77226
+        },
+        {
+          "key": "bifrost:packet:28e942decdcdb342",
+          "type": "string",
+          "ttl_seconds": 77226
+        },
+        {
+          "key": "bifrost:sem:packet:case_detail_a3e84056",
+          "type": "string",
+          "ttl_seconds": 17994
+        },
+        {
+          "key": "bifrost:packet:69af5ffe1b3af354",
+          "type": "string",
+          "ttl_seconds": 77226
+        },
+        {
+          "key": "bifrost:sem:packet:a3383a3ada83d202",
+          "type": "string",
+          "ttl_seconds": 17994
+        },
+        {
+          "key": "bifrost:sem:packet:rag_search_a3e84056",
+          "type": "string",
+          "ttl_seconds": 17994
+        },
+        {
+          "key": "bifrost:sem:packet:96d9e9b92acd0d05",
+          "type": "string",
+          "ttl_seconds": 17994
+        },
+        {
+          "key": "bifrost:sem:feature:ai-agent",
+          "type": "string",
+          "ttl_seconds": 17994
         },
         {
           "key": "bifrost:packet:c6cd8b39d33db2aa",
           "type": "string",
-          "ttl_seconds": 81860
+          "ttl_seconds": 77226
         },
         {
-          "key": "bifrost:packet:40ce2356b07edded",
+          "key": "bifrost:sem:packet:3afd5c91641b60c3",
           "type": "string",
-          "ttl_seconds": 81860
+          "ttl_seconds": 17994
+        },
+        {
+          "key": "bifrost:packet:32c7446a769f9c86",
+          "type": "string",
+          "ttl_seconds": 77226
+        },
+        {
+          "key": "bifrost:packet:613f572a65b1ffcc",
+          "type": "string",
+          "ttl_seconds": 77226
+        },
+        {
+          "key": "bifrost:sem:feature:codebase-intelligence",
+          "type": "string",
+          "ttl_seconds": 17994
         }
       ],
       "status": "PASS"
@@ -234,104 +133,104 @@
       "key_count": 152,
       "samples": [
         {
-          "key": "som:80",
+          "key": "som:88",
           "type": "string",
-          "ttl_seconds": 515487
+          "ttl_seconds": 510843
         },
         {
-          "key": "som:cell:9",
+          "key": "som:cell:51",
           "type": "string",
-          "ttl_seconds": 515470
+          "ttl_seconds": 510857
         },
         {
-          "key": "som:cell:17",
+          "key": "som:62",
           "type": "string",
-          "ttl_seconds": 515474
-        },
-        {
-          "key": "som:cell:42",
-          "type": "string",
-          "ttl_seconds": 515499
-        },
-        {
-          "key": "som:cell:71",
-          "type": "string",
-          "ttl_seconds": 515500
-        },
-        {
-          "key": "som:cell:45",
-          "type": "string",
-          "ttl_seconds": 515488
-        },
-        {
-          "key": "som:59",
-          "type": "string",
-          "ttl_seconds": 515490
+          "ttl_seconds": 510859
         },
         {
           "key": "som:cell:378",
           "type": "string",
-          "ttl_seconds": 515498
+          "ttl_seconds": 510865
         },
         {
-          "key": "som:cell:19",
+          "key": "som:cell:353",
           "type": "string",
-          "ttl_seconds": 515473
+          "ttl_seconds": 510864
         },
         {
-          "key": "som:cell:11",
+          "key": "som:cell:25",
           "type": "string",
-          "ttl_seconds": 515472
+          "ttl_seconds": 510848
         },
         {
-          "key": "som:cell:37",
+          "key": "som:96",
           "type": "string",
-          "ttl_seconds": 515473
+          "ttl_seconds": 510837
         },
         {
-          "key": "som:cell:96",
+          "key": "som:71",
           "type": "string",
-          "ttl_seconds": 515471
+          "ttl_seconds": 510867
         },
         {
-          "key": "som:94",
+          "key": "som:146",
           "type": "string",
-          "ttl_seconds": 515479
+          "ttl_seconds": 510861
         },
         {
-          "key": "som:cell:28",
+          "key": "som:cell:93",
           "type": "string",
-          "ttl_seconds": 515483
+          "ttl_seconds": 510867
         },
         {
-          "key": "som:50",
+          "key": "som:cell:21",
           "type": "string",
-          "ttl_seconds": 515480
+          "ttl_seconds": 510862
         },
         {
-          "key": "som:cell:73",
+          "key": "som:378",
           "type": "string",
-          "ttl_seconds": 515487
+          "ttl_seconds": 510865
+        },
+        {
+          "key": "som:76",
+          "type": "string",
+          "ttl_seconds": 510847
+        },
+        {
+          "key": "som:23",
+          "type": "string",
+          "ttl_seconds": 510853
+        },
+        {
+          "key": "som:70",
+          "type": "string",
+          "ttl_seconds": 510866
+        },
+        {
+          "key": "som:6",
+          "type": "string",
+          "ttl_seconds": 510859
+        },
+        {
+          "key": "som:cell:23",
+          "type": "string",
+          "ttl_seconds": 510853
+        },
+        {
+          "key": "som:28",
+          "type": "string",
+          "ttl_seconds": 510849
+        },
+        {
+          "key": "som:cell:50",
+          "type": "string",
+          "ttl_seconds": 510847
         },
         {
           "key": "som:cell:68",
           "type": "string",
-          "ttl_seconds": 515499
-        },
-        {
-          "key": "som:27",
-          "type": "string",
-          "ttl_seconds": 515482
-        },
-        {
-          "key": "som:45",
-          "type": "string",
-          "ttl_seconds": 515488
-        },
-        {
-          "key": "som:90",
-          "type": "string",
-          "ttl_seconds": 515489
+          "ttl_seconds": 510866
         }
       ],
       "status": "PASS"
@@ -342,107 +241,107 @@
       "role": "ACE planner/context packets",
       "required": true,
       "ttl": "mixed",
-      "key_count": 1263,
+      "key_count": 1255,
       "samples": [
         {
-          "key": "ace:atlas:dir:src_routes_api_analytics_panel-activity",
+          "key": "ace:atlas:dir:src_routes__app__demos_yorha_components_evidence",
           "type": "string",
-          "ttl_seconds": 576024
+          "ttl_seconds": 571391
         },
         {
-          "key": "ace:atlas:dir:src_routes_api_ollama_pull",
+          "key": "ace:atlas:dir:src_routes_api_ai_models",
           "type": "string",
-          "ttl_seconds": 576024
+          "ttl_seconds": 571391
         },
         {
-          "key": "ace:atlas:dir:src_lib_server_pgai",
+          "key": "ace:atlas:dir:src_lib_server_cases",
           "type": "string",
-          "ttl_seconds": 576024
+          "ttl_seconds": 571391
         },
         {
-          "key": "ace:atlas:dir:src_routes_api_docs",
+          "key": "ace:atlas:dir:src_routes_api_code-intel_claude-plan",
           "type": "string",
-          "ttl_seconds": 576024
+          "ttl_seconds": 571391
+        },
+        {
+          "key": "ace:atlas:dir:src_routes_api_graph_hypergraph_address",
+          "type": "string",
+          "ttl_seconds": 571391
+        },
+        {
+          "key": "ace:atlas:dir:src_routes_api_pgai_compare",
+          "type": "string",
+          "ttl_seconds": 571391
+        },
+        {
+          "key": "ace:atlas:dir:src_routes__app__admin_observability",
+          "type": "string",
+          "ttl_seconds": 571391
+        },
+        {
+          "key": "ace:atlas:dir:src_lib_server_messaging",
+          "type": "string",
+          "ttl_seconds": 571391
+        },
+        {
+          "key": "ace:atlas:dir:src_routes_api_system_services",
+          "type": "string",
+          "ttl_seconds": 571391
+        },
+        {
+          "key": "ace:atlas:dir:src_routes_api_admin_ai-chat_upload",
+          "type": "string",
+          "ttl_seconds": 571391
         },
         {
           "key": "ace:atlas:dir:src_routes__app__demos_nes-routes",
           "type": "string",
-          "ttl_seconds": 576024
+          "ttl_seconds": 571391
         },
         {
-          "key": "ace:atlas:dir:src_routes_api_wiki_watch",
+          "key": "ace:ctx:llmctx:094a78bdfe675ff9d844d826b414e540",
           "type": "string",
-          "ttl_seconds": 576024
+          "ttl_seconds": -1
         },
         {
-          "key": "ace:atlas:dir:src_routes__app__admin_error-analysis",
+          "key": "ace:atlas:dir:src_routes__app__error-brain",
           "type": "string",
-          "ttl_seconds": 576024
+          "ttl_seconds": 571391
         },
         {
-          "key": "ace:atlas:dir:src_lib_components_ui_user",
+          "key": "ace:atlas:dir:src_routes_api_rag_validate",
           "type": "string",
-          "ttl_seconds": 576024
+          "ttl_seconds": 571391
         },
         {
-          "key": "ace:atlas:dir:src_routes_api_cases_[id]_notes_[noteId]",
+          "key": "ace:atlas:dir:src_routes__app__admin_codebase-viewer",
           "type": "string",
-          "ttl_seconds": 576024
+          "ttl_seconds": 571391
         },
         {
-          "key": "ace:atlas:dir:src_lib_server_cache",
+          "key": "ace:atlas:dir:src_routes_api_codebase-index_export_bundle",
           "type": "string",
-          "ttl_seconds": 576024
+          "ttl_seconds": 571391
         },
         {
-          "key": "ace:atlas:dir:src_routes_api_reports_preview_[id]",
+          "key": "ace:atlas:dir:src_lib_server_couchdb",
           "type": "string",
-          "ttl_seconds": 576024
+          "ttl_seconds": 571391
         },
         {
-          "key": "ace:atlas:dir:src_lib_server_config",
+          "key": "ace:atlas:dir:src_lib_server_optimize",
           "type": "string",
-          "ttl_seconds": 576024
+          "ttl_seconds": 571391
         },
         {
-          "key": "ace:atlas:dir:src_routes_api_mcp",
+          "key": "ace:atlas:dir:src_routes_api_routes_[routeId]_health-event",
           "type": "string",
-          "ttl_seconds": 576024
+          "ttl_seconds": 571391
         },
         {
-          "key": "ace:atlas:dir:src_routes_api_persons-of-interest_search",
+          "key": "ace:atlas:dir:src_routes_api_recommendations_jobs_[jobId]",
           "type": "string",
-          "ttl_seconds": 576024
-        },
-        {
-          "key": "ace:atlas:dir:src_routes__app__demos_knowledge-graph",
-          "type": "string",
-          "ttl_seconds": 576024
-        },
-        {
-          "key": "ace:atlas:dir:src_routes_api_worker_autotag_trigger",
-          "type": "string",
-          "ttl_seconds": 576024
-        },
-        {
-          "key": "ace:atlas:dir:src_routes_api_codebase_index",
-          "type": "string",
-          "ttl_seconds": 576024
-        },
-        {
-          "key": "ace:atlas:dir:src_routes_api_system_phase78_apply-patch",
-          "type": "string",
-          "ttl_seconds": 576024
-        },
-        {
-          "key": "ace:atlas:dir:src_lib_components_demos",
-          "type": "string",
-          "ttl_seconds": 576024
-        },
-        {
-          "key": "ace:atlas:dir:src_lib_server_chrrom",
-          "type": "string",
-          "ttl_seconds": 576024
+          "ttl_seconds": 571391
         }
       ],
       "status": "PASS"
@@ -472,104 +371,104 @@
       "key_count": 85,
       "samples": [
         {
-          "key": "centroid:68",
+          "key": "centroid:51",
           "type": "string",
-          "ttl_seconds": 515461
+          "ttl_seconds": 510825
         },
         {
-          "key": "centroid:98",
+          "key": "centroid:19",
           "type": "string",
-          "ttl_seconds": 515467
-        },
-        {
-          "key": "centroid:16",
-          "type": "string",
-          "ttl_seconds": 515450
-        },
-        {
-          "key": "centroid:69",
-          "type": "string",
-          "ttl_seconds": 515462
-        },
-        {
-          "key": "centroid:78",
-          "type": "string",
-          "ttl_seconds": 515463
-        },
-        {
-          "key": "centroid:11",
-          "type": "string",
-          "ttl_seconds": 515449
-        },
-        {
-          "key": "centroid:25",
-          "type": "string",
-          "ttl_seconds": 515453
-        },
-        {
-          "key": "centroid:27",
-          "type": "string",
-          "ttl_seconds": 515453
-        },
-        {
-          "key": "centroid:10",
-          "type": "string",
-          "ttl_seconds": 515449
-        },
-        {
-          "key": "centroid:82",
-          "type": "string",
-          "ttl_seconds": 515464
+          "ttl_seconds": 510818
         },
         {
           "key": "centroid:21",
           "type": "string",
-          "ttl_seconds": 515452
+          "ttl_seconds": 510819
         },
         {
-          "key": "centroid:83",
+          "key": "centroid:4",
           "type": "string",
-          "ttl_seconds": 515464
-        },
-        {
-          "key": "centroid:34",
-          "type": "string",
-          "ttl_seconds": 515455
-        },
-        {
-          "key": "centroid:13",
-          "type": "string",
-          "ttl_seconds": 515450
-        },
-        {
-          "key": "centroid:12",
-          "type": "string",
-          "ttl_seconds": 515449
-        },
-        {
-          "key": "centroid:6",
-          "type": "string",
-          "ttl_seconds": 515460
-        },
-        {
-          "key": "centroid:35",
-          "type": "string",
-          "ttl_seconds": 515455
-        },
-        {
-          "key": "centroid:84",
-          "type": "string",
-          "ttl_seconds": 515464
+          "ttl_seconds": 510823
         },
         {
           "key": "centroid:56",
           "type": "string",
-          "ttl_seconds": 515459
+          "ttl_seconds": 510826
         },
         {
-          "key": "centroid:86",
+          "key": "centroid:88",
           "type": "string",
-          "ttl_seconds": 515465
+          "ttl_seconds": 510832
+        },
+        {
+          "key": "centroid:70",
+          "type": "string",
+          "ttl_seconds": 510829
+        },
+        {
+          "key": "centroid:26",
+          "type": "string",
+          "ttl_seconds": 510820
+        },
+        {
+          "key": "centroid:10",
+          "type": "string",
+          "ttl_seconds": 510816
+        },
+        {
+          "key": "centroid:98",
+          "type": "string",
+          "ttl_seconds": 510835
+        },
+        {
+          "key": "centroid:11",
+          "type": "string",
+          "ttl_seconds": 510816
+        },
+        {
+          "key": "centroid:82",
+          "type": "string",
+          "ttl_seconds": 510831
+        },
+        {
+          "key": "centroid:63",
+          "type": "string",
+          "ttl_seconds": 510828
+        },
+        {
+          "key": "centroid:67",
+          "type": "string",
+          "ttl_seconds": 510828
+        },
+        {
+          "key": "centroid:38",
+          "type": "string",
+          "ttl_seconds": 510823
+        },
+        {
+          "key": "centroid:28",
+          "type": "string",
+          "ttl_seconds": 510821
+        },
+        {
+          "key": "centroid:27",
+          "type": "string",
+          "ttl_seconds": 510821
+        },
+        {
+          "key": "centroid:45",
+          "type": "string",
+          "ttl_seconds": 510824
+        },
+        {
+          "key": "centroid:23",
+          "type": "string",
+          "ttl_seconds": 510820
+        },
+        {
+          "key": "centroid:85",
+          "type": "string",
+          "ttl_seconds": 510832
         }
       ],
       "status": "PASS"
@@ -577,9 +476,9 @@
   ],
   "collisions": [],
   "summary": {
-    "status": "PASS",
+    "status": "FAIL",
     "namespace_count": 6,
-    "required_ready": 5,
+    "required_ready": 4,
     "required_total": 5,
     "sampled_collisions": 0
   }

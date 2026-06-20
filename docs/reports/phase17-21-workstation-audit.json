@@ -1,0 +1,309 @@
+{
+  "schema": "phase17_21_workstation_audit.v1",
+  "generated_at": "2026-06-20T15:48:22.071Z",
+  "overall": "PARTIAL",
+  "completion_pct": 67,
+  "canonical_truth": "Postgres",
+  "summary_lane": {
+    "status": "READY",
+    "batch_size": 500,
+    "concurrency": 1,
+    "chat_backend": "llama-server",
+    "chat_model": "gemma4-legal-iq4xs-direct.gguf",
+    "embedding_backend": "Ollama/EmbeddingGemma",
+    "dry_command": "npm run atlas:summaries:gemma4:500:dry",
+    "apply_command": "npm run atlas:summaries:gemma4:500:apply",
+    "schema": {
+      "status": "READY",
+      "columns": [
+        "summary",
+        "summary_backend",
+        "summary_generated_at",
+        "summary_hash",
+        "summary_metadata",
+        "summary_model",
+        "summary_version"
+      ],
+      "missing": []
+    },
+    "coverage": {
+      "status": "READY",
+      "total": 5395,
+      "populated": 5395,
+      "missing": 0,
+      "coverage_pct": 100,
+      "provenance": {
+        "summary_hash": 5395,
+        "summary_model": 5395,
+        "summary_backend": 5395,
+        "summary_version": 5395,
+        "summary_generated_at": 5395
+      },
+      "channel_marker_rows": 0
+    }
+  },
+  "ndjson_contract": {
+    "schema": "AddressablePacketSchema",
+    "validator": "scripts/atlas/validate-addressable-packets.mjs",
+    "validation": {
+      "generated_at": "2026-06-18T22:00:45.754Z",
+      "total_checked": 3251,
+      "total_valid": 3251,
+      "total_invalid": 0,
+      "validation_pass": true,
+      "applied_fixes": true,
+      "invalid_samples": []
+    },
+    "rust_parser": true,
+    "mapreduce_materialized": true,
+    "duckdb_materialized": true
+  },
+  "accelerator_boundary": {
+    "operational": [
+      "LibTorch/CUDA bridge for feature extraction and reranking",
+      "TurboVec quantized ANN prefilter",
+      "SOM/KMeans/AE topology metadata"
+    ],
+    "optional_or_missing": [
+      "cuVS/CAGRA runtime library is not a summary-generation dependency",
+      "RAPIDS is not required by the canonical packet pipeline",
+      "atlas_packet_parser source exists but the root binary is not packaged"
+    ],
+    "forbidden_shortcut": "Do not use latent64, SOM, cuVS, CAGRA, or GEMM output as summary text or canonical identity."
+  },
+  "electricsql": {
+    "status": "NOT_PRESENT",
+    "decision": "DEFER",
+    "reason": "ElectricSQL replication does not perform tokenizer remapping. Token maps remain versioned derived artifacts and must be evaluated separately."
+  },
+  "native": {
+    "tensorrt_bridge": {
+      "path": "simd-bridge/cpp/build/Release/tensorrt_bridge.node",
+      "exists": true,
+      "bytes": 368128,
+      "modified_at": "2026-06-03T03:11:11.937Z"
+    },
+    "turbovec_napi": {
+      "path": "crates/turbovec-napi/turbovec-napi.win32-x64-msvc.node",
+      "exists": true,
+      "bytes": 1394688,
+      "modified_at": "2026-06-06T23:58:21.918Z"
+    },
+    "rust_simdjson": {
+      "path": "simd-bridge/rust-simdjson/target/release/simd_bridge_rs.node",
+      "exists": true,
+      "bytes": 936960,
+      "modified_at": "2026-05-31T06:46:08.382Z"
+    },
+    "atlas_packet_parser_source": {
+      "path": "crates/atlas_packet_parser/src/lib.rs",
+      "exists": true,
+      "bytes": 5074,
+      "modified_at": "2026-06-20T15:34:17.979Z"
+    },
+    "atlas_packet_parser_binary": {
+      "path": "crates/atlas_packet_parser/atlas-packet-parser.win32-x64-msvc.node",
+      "exists": true,
+      "bytes": 590848,
+      "modified_at": "2026-06-20T15:33:37.234Z"
+    },
+    "omni_bridge_source": {
+      "path": "crates/omni-bridge/src/lib.rs",
+      "exists": true,
+      "bytes": 3268,
+      "modified_at": "2026-06-02T20:12:07.359Z"
+    }
+  },
+  "artifacts": {
+    "addressable_packets": {
+      "raw": {
+        "path": ".tmp/addressable-packets.ndjson",
+        "exists": true,
+        "bytes": 7425598,
+        "modified_at": "2026-06-18T21:30:40.711Z"
+      },
+      "validated": {
+        "path": ".tmp/addressable-packets.validated.ndjson",
+        "exists": true,
+        "bytes": 7425598,
+        "modified_at": "2026-06-18T22:00:45.800Z"
+      },
+      "validation": {
+        "checked": 3251,
+        "valid": 3251,
+        "invalid": 0,
+        "pass": true
+      }
+    },
+    "mapreduce": {
+      "ndjson": {
+        "path": ".tmp/mapreduce-full-v5.ndjson",
+        "exists": true,
+        "bytes": 805352974,
+        "modified_at": "2026-06-12T12:37:58.277Z"
+      },
+      "duckdb": {
+        "path": ".tmp/ingest/atlas.duckdb",
+        "exists": true,
+        "bytes": 6565888,
+        "modified_at": "2026-06-12T13:21:10.759Z"
+      }
+    },
+    "phase17": {
+      "output": {
+        "path": ".tmp/phase17-pytorch-features.jsonl",
+        "exists": true,
+        "bytes": 260,
+        "modified_at": "2026-05-27T00:04:56.836Z"
+      },
+      "rows": 1
+    },
+    "phase18": {
+      "output": {
+        "path": ".tmp/phase18-xgboost-rerank.jsonl",
+        "exists": true,
+        "bytes": 103,
+        "modified_at": "2026-05-27T00:05:05.374Z"
+      },
+      "rows": 1
+    },
+    "phase19": {
+      "output": {
+        "path": ".tmp/atlas-retrieval-loop.jsonl",
+        "exists": true,
+        "bytes": 168878,
+        "modified_at": "2026-06-06T02:01:25.716Z"
+      },
+      "rows": 439
+    },
+    "topology": {
+      "ae_weights": {
+        "path": ".tmp/gpu-som-checkpoint/ae_weights_768_64.json",
+        "exists": true,
+        "bytes": 1025055,
+        "modified_at": "2026-06-08T02:40:31.045Z"
+      },
+      "som_8x8": {
+        "path": ".tmp/gpu-som-checkpoint/som_8x8_n76878.json",
+        "exists": true,
+        "bytes": 1263239,
+        "modified_at": "2026-06-08T02:40:31.031Z"
+      },
+      "kmeans_20": {
+        "path": ".tmp/gpu-som-checkpoint/kmeans_k20_n76878.json",
+        "exists": true,
+        "bytes": 516059,
+        "modified_at": "2026-06-08T02:40:30.798Z"
+      },
+      "som_20x20": {
+        "path": "models/som/som_20x20_codebook.json",
+        "exists": true,
+        "bytes": 797876,
+        "modified_at": "2026-06-19T19:28:51.952Z"
+      }
+    }
+  },
+  "phases": [
+    {
+      "id": 17,
+      "status": "SCAFFOLD_ONLY",
+      "completion_pct": 35,
+      "have": [
+        "PyTorch feature extractor and Python fallback exist.",
+        "LibTorch/TensorRT bridge and CUDA-capable native surfaces exist.",
+        "Current phase17 artifact contains 1 row(s)."
+      ],
+      "need": [
+        "Replace card-length heuristics with measured embedding/topology features.",
+        "Use the proven retrieval corpus, not a one-row contract-card sample.",
+        "Keep CUDA/GEMM as feature extraction acceleration, not packet identity."
+      ],
+      "evidence": [
+        "sveltekit-frontend/scripts/atlas/phase17-pytorch-feature-extractor.mjs",
+        "sveltekit-frontend/src/lib/server/gpu/libtorch-bridge.ts",
+        "simd-bridge/cpp/build/Release/tensorrt_bridge.node"
+      ]
+    },
+    {
+      "id": 18,
+      "status": "SCAFFOLD_ONLY",
+      "completion_pct": 40,
+      "have": [
+        "XGBoost reranker scripts and trained-sidecar lanes exist.",
+        "Current phase18 compatibility artifact contains 1 row(s)."
+      ],
+      "need": [
+        "Use the validated retrieval/evaluation dataset as the training denominator.",
+        "Require measured NDCG/MRR improvement before promotion."
+      ],
+      "evidence": [
+        "sveltekit-frontend/scripts/atlas/phase18-xgboost-reranker.mjs",
+        "scripts/atlas/train-policy-reranker.py"
+      ]
+    },
+    {
+      "id": 19,
+      "status": "OPERATIONAL",
+      "completion_pct": 90,
+      "have": [
+        "Append-only retrieval loop contains 439 rows.",
+        "Neo4j, Qdrant, and Valkey mirrors have dedicated operational lanes."
+      ],
+      "need": [
+        "Keep new events tied to replay_id, packet_key, source_ref, and outcome.",
+        "Do not reuse pseudo-cosine events as evaluation truth."
+      ],
+      "evidence": [
+        "sveltekit-frontend/scripts/atlas/phase19-retrieval-loop-seed.mjs",
+        ".tmp/atlas-retrieval-loop.jsonl"
+      ]
+    },
+    {
+      "id": 20,
+      "status": "OPERATIONAL",
+      "completion_pct": 95,
+      "have": [
+        "Zod validation: 3251/3251 addressable packets valid.",
+        "Rust SIMD JSON and TurboVec N-API packet parsers exist.",
+        "MapReduce NDJSON and DuckDB materialization artifacts exist.",
+        "Postgres remains canonical; Qdrant/Valkey/Neo4j are mirrors."
+      ],
+      "need": [
+        "Keep the Rust packet parser binary covered by snapshot tests.",
+        "Keep streaming validation; do not load the 805 MB MapReduce artifact into normal JS objects."
+      ],
+      "evidence": [
+        "scripts/atlas/validate-addressable-packets.mjs",
+        "sveltekit-frontend/src/lib/server/packets/packet-contract.ts",
+        "crates/turbovec-napi/src/lib.rs",
+        "crates/atlas_packet_parser/src/lib.rs"
+      ]
+    },
+    {
+      "id": 21,
+      "status": "EVAL_GATED",
+      "completion_pct": 75,
+      "have": [
+        "50-query replay proof, cache namespace proof, runtime degradation proof, and final package gate pass.",
+        "Policy/PPO and Gym-style scripts exist as research surfaces."
+      ],
+      "need": [
+        "Build adversarial and tensor-analysis datasets from replayed traces.",
+        "Open PPO/adapters only after a baseline-vs-candidate evaluation improves.",
+        "Keep TensorRT/custom CUDA kernel work research-only until measured."
+      ],
+      "evidence": [
+        "packages/parent-atlas/docs/atlas/PROOF-SYSTEM.md",
+        "docs/reports/parent-atlas-proof-of-truth.json",
+        "docs/reports/runtime-degradation-proof.json"
+      ]
+    }
+  ],
+  "aliases": {
+    "phase17": "node scripts/atlas/phase17-pytorch-feature-extractor.mjs --input ../memory/knowledge/schema-indexer-contract-cards.jsonl --out .tmp/phase17-pytorch-features.jsonl --report reports/phase17-pytorch-feature-summary.md",
+    "phase18": "node scripts/atlas/phase18-xgboost-reranker.mjs --input .tmp/phase17-pytorch-features.jsonl --out .tmp/phase18-xgboost-rerank.jsonl --report reports/phase18-xgboost-rerank-summary.md",
+    "phase19": "node scripts/atlas/phase19-retrieval-loop-seed.mjs",
+    "summary500Dry": "node ../scripts/atlas/gemma4-parent-atlas-summaries.mjs --cache --limit=500 --concurrency=1",
+    "summary500Apply": "node ../scripts/atlas/gemma4-parent-atlas-summaries.mjs --cache --apply --limit=500 --concurrency=1"
+  }
+}

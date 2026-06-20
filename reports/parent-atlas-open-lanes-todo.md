@@ -42,6 +42,41 @@ No production implementation lane remains open on the current task board.
 AE/SOM experimentation, PPO/adapters, TensorRT expansion, custom CUDA kernels,
 and broader model research remain deferred behind measurable evaluation gains.
 
+## Post-Frozen Phase 17-21 Audit - 2026-06-20
+
+Evidence: `docs/reports/phase17-21-workstation-audit.md`
+
+Post-frozen research/evaluation scope: **67% complete**. This does not reduce
+the 100% completion of the frozen production scope.
+
+| Phase | Status | Current truth | Next gate |
+|---:|---|---|---|
+| 17 | SCAFFOLD_ONLY | PyTorch/LibTorch/CUDA surfaces exist, but the compatibility output has 1 row | extract measured features from the validated retrieval/eval corpus |
+| 18 | SCAFFOLD_ONLY | XGBoost/policy scripts exist, but the compatibility output has 1 row | prove NDCG/MRR improvement against the frozen baseline |
+| 19 | OPERATIONAL | append-only retrieval loop has 439 rows | keep future rows tied to replay and outcome truth |
+| 20 | OPERATIONAL | 3,251/3,251 Zod-valid packets; Rust SIMD/TurboVec parser, MapReduce NDJSON, DuckDB, Postgres/Qdrant/Valkey mirrors present | keep the 805 MB MapReduce artifact streaming and package-tested |
+| 21 | EVAL_GATED | replay, namespace, degradation, and package gates pass | adversarial/tensor-analysis datasets may proceed without changing identity |
+
+Gemma4 summary completion:
+
+- 5,395/5,395 non-feature Parent Atlas documents have summary text.
+- 5,395/5,395 have summary hash/model/backend/version/timestamp provenance.
+- 0 summaries contain llama channel/thought markers.
+- Production batch command: `npm run atlas:summaries:gemma4:500:apply`.
+- Chat backend: llama-server `gemma4-legal-iq4xs-direct.gguf`.
+- Ollama remains EmbeddingGemma-only.
+
+Accelerator boundary:
+
+- Native CUDA bridge is loadable and exposes PageRank, cosine, FP16 scoring,
+  top-K, KMeans, SOM, AE encode/decode, PCA, CUDA graph replay, SIMD JSON, and
+  cuVS-compatible compression.
+- Qdrant contains 52,606 points with required identity/topology payload tags.
+- The optional TurboVec HTTP sidecar is offline; the N-API fallback is packaged.
+- ElectricSQL is not installed and is not a token-remapping engine.
+- cuVS/CAGRA, RAPIDS, GEMM, AE, and SOM may accelerate vector/tensor analysis;
+  they do not generate summaries or define packet identity.
+
 ## Next Actions - Atlas / NES CHR97 Production Readiness
 
 ### Status
@@ -179,7 +214,7 @@ These are acceleration and hygiene lanes, not the current blocker.
 - Stale document compaction: group by `feature_label`, `function_id`, `method`, and `variable` before assigning kanban tasks.
 - Kanban task spec board: use the grouped cache-hit candidates to consolidate task cards instead of emitting one card per raw stale file.
 
-### P0 - Directory Readiness
+### P0 Proof Of Truth
 
 #### 1. Directory-level sourceRef map, including gitignored paths
 
@@ -264,7 +299,7 @@ Minimum assertions:
 - summaries can be restored from cold storage
 - Qdrant, Postgres, Redis agree on `feature_id`
 
-# P1 - High ROI
+### P1 Runtime Reliability
 ## 5. Rust N-API parser lane
 
 Purpose: faster symbol extraction than Node AST scripts.
@@ -334,7 +369,7 @@ Hard rule:
 
 - No delete/move unless `restore_verified=true`
 
-### P2 - Semantic Search Wiring
+### P2 Operator Experience
 
 #### 8. Mirror stores
 
@@ -370,6 +405,15 @@ Read-only community coverage audit:
 - `atlas_packets.community_id` is currently 100% populated in the live Postgres table.
 - No P2 community backfill is required at the packet layer.
 - Keep SOM / community propagation checks as a watchpoint, not an active blocker, unless a later live audit regresses.
+
+### P3 Research
+
+#### 10. Autoencoder / SOM / CUDA Kernels
+
+- Autoencoder weight training for dimensional reduction (768 -> 64-dim latents).
+- SOM 20x20 cell clustering optimization.
+- TensorRT engine bridges, custom CUDA kernel compilations (e.g. for rapid RRF attention or CAGRA approximate semantic graph lookups).
+- DeepSeek-MLA style caching structures.
 
 ### Updated Status
 

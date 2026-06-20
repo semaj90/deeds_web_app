@@ -3,12 +3,12 @@ import { loadAutoencoderWeights, probeAutoencoderWeights } from './autoencoder-w
 import { encode768to64 } from './encode-768-to-64.js';
 import { Redis } from 'ioredis';
 
-// Mock Redis
 vi.mock('ioredis', () => {
 	const Redis = vi.fn();
 	Redis.prototype.hgetall = vi.fn();
 	Redis.prototype.disconnect = vi.fn();
-	return { Redis };
+	Redis.prototype.on = vi.fn();
+	return { Redis, default: Redis };
 });
 
 describe('Autoencoder Weights & Encoding', () => {

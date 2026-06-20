@@ -338,8 +338,7 @@
     ".claude/worktrees/agent-a38668f2/sveltekit-frontend/src/lib/server/gpu/autoencoder-scripts.test.ts",
     ".claude/worktrees/agent-a38668f2/sveltekit-frontend/src/lib/server/gpu/autoencoder.test.ts",
     ".claude/worktrees/agent-a38668f2/sveltekit-frontend/src/lib/server/gpu/autoencoder.test.ts",
-    ".claude/worktrees/agent-a38668f2/sveltekit-frontend/src/lib/server/gpu/autoencoder-scripts.test.ts",
-    ".claude/worktrees/agent-a38668f2/sveltekit-frontend/src/lib/server/gpu/autoencoder.test.ts"
+    ".claude/worktrees/agent-a38668f2/sveltekit-frontend/src/lib/server/gpu/autoencoder-scripts.test.ts"
   ],
   ".claude/worktrees/agent-a38668f2/sveltekit-frontend/src/lib/server/grpc/retrieval-client.ts": [
     ".claude/worktrees/agent-a38668f2/sveltekit-frontend/src/lib/server/grpc/retrieval-client.test.ts",
@@ -420,8 +419,6 @@
     ".claude/worktrees/agent-a38668f2/sveltekit-frontend/src/lib/server/retrieval/graphrag-stage-plan.spec.ts"
   ],
   ".claude/worktrees/agent-a38668f2/sveltekit-frontend/src/lib/server/retrieval/hyperrag-fusion-service.ts": [
-    ".claude/worktrees/agent-a38668f2/sveltekit-frontend/src/lib/server/retrieval/hyperrag-fusion-service.test.ts",
-    ".claude/worktrees/agent-a38668f2/sveltekit-frontend/src/lib/server/retrieval/hyperrag-fusion-service.test.ts",
     ".claude/worktrees/agent-a38668f2/sveltekit-frontend/src/lib/server/retrieval/hyperrag-fusion-service.test.ts",
     ".claude/worktrees/agent-a38668f2/sveltekit-frontend/src/lib/server/retrieval/hyperrag-fusion-service.test.ts",
     ".claude/worktrees/agent-a38668f2/sveltekit-frontend/src/lib/server/retrieval/hyperrag-fusion-service.test.ts",
@@ -580,11 +577,7 @@
     ".claude/worktrees/agent-a38668f2/sveltekit-frontend/tests/rag-search-ace-route.spec.ts",
     ".claude/worktrees/agent-a38668f2/sveltekit-frontend/tests/rag-search-ace-route.spec.ts",
     ".claude/worktrees/agent-a38668f2/sveltekit-frontend/tests/rag-search-ace-route.spec.ts",
-    ".claude/worktrees/agent-a38668f2/sveltekit-frontend/src/routes/api/rag/search/server.route.test.ts",
-    ".claude/worktrees/agent-a38668f2/sveltekit-frontend/tests/rag-search-ace-route.spec.ts",
-    ".claude/worktrees/agent-a38668f2/sveltekit-frontend/tests/rag-search-ace-route.spec.ts",
-    ".claude/worktrees/agent-a38668f2/sveltekit-frontend/tests/rag-search-ace-route.spec.ts",
-    ".claude/worktrees/agent-a38668f2/sveltekit-frontend/tests/rag-search-ace-route.spec.ts"
+    ".claude/worktrees/agent-a38668f2/sveltekit-frontend/src/routes/api/rag/search/server.route.test.ts"
   ],
   ".claude/worktrees/agent-a38668f2/sveltekit-frontend/src/routes/api/search/ace/+server.ts": [
     ".claude/worktrees/agent-a38668f2/sveltekit-frontend/src/routes/api/search/ace/server.route.test.ts",
@@ -1091,12 +1084,9 @@
     ".claude/worktrees/agent-a38668f2/sveltekit-frontend/tests/analytics-tags-nlp-prefs-routes.spec.ts",
     ".claude/worktrees/agent-a38668f2/sveltekit-frontend/tests/analytics-tags-nlp-prefs-routes.spec.ts",
     ".claude/worktrees/agent-a38668f2/sveltekit-frontend/tests/analytics-tags-nlp-prefs-routes.spec.ts",
-    ".claude/worktrees/agent-a38668f2/sveltekit-frontend/tests/analytics-tags-nlp-prefs-routes.spec.ts",
     ".claude/worktrees/agent-a38668f2/sveltekit-frontend/tests/analytics-tags-nlp-prefs-routes.spec.ts"
   ],
   ".claude/worktrees/agent-a38668f2/sveltekit-frontend/src/routes/api/analytics/events/+server.ts": [
-    ".claude/worktrees/agent-a38668f2/sveltekit-frontend/tests/analytics-tags-nlp-prefs-routes.spec.ts",
-    ".claude/worktrees/agent-a38668f2/sveltekit-frontend/tests/analytics-tags-nlp-prefs-routes.spec.ts",
     ".claude/worktrees/agent-a38668f2/sveltekit-frontend/tests/analytics-tags-nlp-prefs-routes.spec.ts",
     ".claude/worktrees/agent-a38668f2/sveltekit-frontend/tests/analytics-tags-nlp-prefs-routes.spec.ts",
     ".claude/worktrees/agent-a38668f2/sveltekit-frontend/tests/analytics-tags-nlp-prefs-routes.spec.ts",
@@ -1110,11 +1100,9 @@
     ".claude/worktrees/agent-a38668f2/sveltekit-frontend/tests/analytics-tags-nlp-prefs-routes.spec.ts",
     ".claude/worktrees/agent-a38668f2/sveltekit-frontend/tests/analytics-tags-nlp-prefs-routes.spec.ts",
     ".claude/worktrees/agent-a38668f2/sveltekit-frontend/tests/analytics-tags-nlp-prefs-routes.spec.ts",
-    ".claude/worktrees/agent-a38668f2/sveltekit-frontend/tests/analytics-tags-nlp-prefs-routes.spec.ts",
     ".claude/worktrees/agent-a38668f2/sveltekit-frontend/tests/analytics-tags-nlp-prefs-routes.spec.ts"
   ],
   ".claude/worktrees/agent-a38668f2/sveltekit-frontend/src/routes/api/analytics/summary/+server.ts": [
-    ".claude/worktrees/agent-a38668f2/sveltekit-frontend/tests/analytics-tags-nlp-prefs-routes.spec.ts",
     ".claude/worktrees/agent-a38668f2/sveltekit-frontend/tests/analytics-tags-nlp-prefs-routes.spec.ts",
     ".claude/worktrees/agent-a38668f2/sveltekit-frontend/tests/analytics-tags-nlp-prefs-routes.spec.ts",
     ".claude/worktrees/agent-a38668f2/sveltekit-frontend/tests/analytics-tags-nlp-prefs-routes.spec.ts",
@@ -1124,18 +1112,15 @@
     ".claude/worktrees/agent-a38668f2/sveltekit-frontend/tests/analytics-tags-nlp-prefs-routes.spec.ts",
     ".claude/worktrees/agent-a38668f2/sveltekit-frontend/tests/analytics-tags-nlp-prefs-routes.spec.ts",
     ".claude/worktrees/agent-a38668f2/sveltekit-frontend/tests/analytics-tags-nlp-prefs-routes.spec.ts",
-    ".claude/worktrees/agent-a38668f2/sveltekit-frontend/tests/analytics-tags-nlp-prefs-routes.spec.ts",
     ".claude/worktrees/agent-a38668f2/sveltekit-frontend/tests/analytics-tags-nlp-prefs-routes.spec.ts"
   ],
   ".claude/worktrees/agent-a38668f2/sveltekit-frontend/src/routes/api/analytics/token-usage/+server.ts": [
     ".claude/worktrees/agent-a38668f2/sveltekit-frontend/tests/analytics-tags-nlp-prefs-routes.spec.ts",
     ".claude/worktrees/agent-a38668f2/sveltekit-frontend/tests/analytics-tags-nlp-prefs-routes.spec.ts",
     ".claude/worktrees/agent-a38668f2/sveltekit-frontend/tests/analytics-tags-nlp-prefs-routes.spec.ts",
-    ".claude/worktrees/agent-a38668f2/sveltekit-frontend/tests/analytics-tags-nlp-prefs-routes.spec.ts",
     ".claude/worktrees/agent-a38668f2/sveltekit-frontend/tests/analytics-tags-nlp-prefs-routes.spec.ts"
   ],
   ".claude/worktrees/agent-a38668f2/sveltekit-frontend/src/routes/api/tags/+server.ts": [
-    ".claude/worktrees/agent-a38668f2/sveltekit-frontend/tests/analytics-tags-nlp-prefs-routes.spec.ts",
     ".claude/worktrees/agent-a38668f2/sveltekit-frontend/tests/analytics-tags-nlp-prefs-routes.spec.ts",
     ".claude/worktrees/agent-a38668f2/sveltekit-frontend/tests/analytics-tags-nlp-prefs-routes.spec.ts",
     ".claude/worktrees/agent-a38668f2/sveltekit-frontend/tests/analytics-tags-nlp-prefs-routes.spec.ts",
@@ -1731,14 +1716,9 @@
     ".claude/worktrees/agent-a38668f2/sveltekit-frontend/tests/error-brain-routes.spec.ts",
     ".claude/worktrees/agent-a38668f2/sveltekit-frontend/tests/error-brain-routes.spec.ts",
     ".claude/worktrees/agent-a38668f2/sveltekit-frontend/tests/error-brain-routes.spec.ts",
-    ".claude/worktrees/agent-a38668f2/sveltekit-frontend/tests/error-brain-routes.spec.ts",
     ".claude/worktrees/agent-a38668f2/sveltekit-frontend/tests/error-brain-routes.spec.ts"
   ],
   ".claude/worktrees/agent-a38668f2/sveltekit-frontend/src/routes/api/error-brain/diagnosis-history/+server.ts": [
-    ".claude/worktrees/agent-a38668f2/sveltekit-frontend/tests/error-brain-routes.spec.ts",
-    ".claude/worktrees/agent-a38668f2/sveltekit-frontend/tests/error-brain-routes.spec.ts",
-    ".claude/worktrees/agent-a38668f2/sveltekit-frontend/tests/error-brain-routes.spec.ts",
-    ".claude/worktrees/agent-a38668f2/sveltekit-frontend/tests/error-brain-routes.spec.ts",
     ".claude/worktrees/agent-a38668f2/sveltekit-frontend/tests/error-brain-routes.spec.ts",
     ".claude/worktrees/agent-a38668f2/sveltekit-frontend/tests/error-brain-routes.spec.ts",
     ".claude/worktrees/agent-a38668f2/sveltekit-frontend/tests/error-brain-routes.spec.ts",
@@ -1760,11 +1740,9 @@
     ".claude/worktrees/agent-a38668f2/sveltekit-frontend/tests/error-brain-routes.spec.ts",
     ".claude/worktrees/agent-a38668f2/sveltekit-frontend/tests/error-brain-routes.spec.ts",
     ".claude/worktrees/agent-a38668f2/sveltekit-frontend/tests/error-brain-routes.spec.ts",
-    ".claude/worktrees/agent-a38668f2/sveltekit-frontend/tests/error-brain-routes.spec.ts",
     ".claude/worktrees/agent-a38668f2/sveltekit-frontend/tests/error-brain-routes.spec.ts"
   ],
   ".claude/worktrees/agent-a38668f2/sveltekit-frontend/src/routes/api/error-brain/diagnose/+server.ts": [
-    ".claude/worktrees/agent-a38668f2/sveltekit-frontend/tests/error-brain-routes.spec.ts",
     ".claude/worktrees/agent-a38668f2/sveltekit-frontend/tests/error-brain-routes.spec.ts",
     ".claude/worktrees/agent-a38668f2/sveltekit-frontend/tests/error-brain-routes.spec.ts",
     ".claude/worktrees/agent-a38668f2/sveltekit-frontend/tests/error-brain-routes.spec.ts",
@@ -1774,11 +1752,9 @@
     ".claude/worktrees/agent-a38668f2/sveltekit-frontend/tests/error-brain-routes.spec.ts",
     ".claude/worktrees/agent-a38668f2/sveltekit-frontend/tests/error-brain-routes.spec.ts",
     ".claude/worktrees/agent-a38668f2/sveltekit-frontend/tests/error-brain-routes.spec.ts",
-    ".claude/worktrees/agent-a38668f2/sveltekit-frontend/tests/error-brain-routes.spec.ts",
     ".claude/worktrees/agent-a38668f2/sveltekit-frontend/tests/error-brain-routes.spec.ts"
   ],
   ".claude/worktrees/agent-a38668f2/sveltekit-frontend/src/routes/api/error-brain/diagnosis-history/backfill/+server.ts": [
-    ".claude/worktrees/agent-a38668f2/sveltekit-frontend/tests/error-brain-routes.spec.ts",
     ".claude/worktrees/agent-a38668f2/sveltekit-frontend/tests/error-brain-routes.spec.ts",
     ".claude/worktrees/agent-a38668f2/sveltekit-frontend/tests/error-brain-routes.spec.ts",
     ".claude/worktrees/agent-a38668f2/sveltekit-frontend/tests/error-brain-routes.spec.ts",
@@ -3745,6 +3721,9 @@
   "sveltekit-frontend/src/lib/server/features/ai/ace/telemetry-source-ref-fallback.ts": [
     "sveltekit-frontend/scripts/tests/telemetry-source-ref-fallback.test.mjs"
   ],
+  "sveltekit-frontend/src/lib/server/gpu/autoencoder-weights.ts": [
+    "sveltekit-frontend/src/lib/server/gpu/autoencoder.test.ts"
+  ],
   "sveltekit-frontend/src/lib/server/agents/agents-card-store.ts": [
     "sveltekit-frontend/tests/agents-index.spec.ts",
     "sveltekit-frontend/tests/agents-regen-markdown.spec.ts",
@@ -3819,6 +3798,10 @@
     "sveltekit-frontend/tests/ux-layout-tests.spec.ts",
     "sveltekit-frontend/tests/vector-search-rag.spec.ts"
   ],
+  "sveltekit-frontend/src/routes/api/tags/[tagId]/+server.ts": [
+    "sveltekit-frontend/tests/analytics-tags-nlp-prefs-routes.spec.ts",
+    "sveltekit-frontend/tests/routes/auto/api/tags/__tagId.test.ts"
+  ],
   "sveltekit-frontend/src/lib/server/gpu/libtorch-bridge.ts": [
     "sveltekit-frontend/tests/autoencoder-projection-smoke.spec.ts",
     "sveltekit-frontend/tests/autoencoder-projection-smoke.spec.ts",
@@ -3886,6 +3869,13 @@
     "sveltekit-frontend/tests/multi-lane-retrieval.spec.ts",
     "sveltekit-frontend/tests/multi-lane-retrieval.spec.ts",
     "sveltekit-frontend/tests/multi-lane-rrf-and-rerank.spec.ts"
+  ],
+  "sveltekit-frontend/src/routes/api/rag/search/+server.ts": [
+    "sveltekit-frontend/tests/rag-search-ace-route.spec.ts",
+    "sveltekit-frontend/tests/rag-search-ace-route.spec.ts",
+    "sveltekit-frontend/tests/rag-search-ace-route.spec.ts",
+    "sveltekit-frontend/tests/rag-search-ace-route.spec.ts",
+    "sveltekit-frontend/tests/routes/auto/api/rag/search.test.ts"
   ],
   "sveltekit-frontend/src/routes/api/ai/contextual-chat/+server.ts": [
     "sveltekit-frontend/tests/routes/api/ai/contextual-chat.spec.ts"
@@ -4088,9 +4078,6 @@
   "sveltekit-frontend/src/routes/api/pipeline/status/[jobId]/+server.ts": [
     "sveltekit-frontend/tests/routes/auto/api/pipeline/status/__jobId.test.ts"
   ],
-  "sveltekit-frontend/src/routes/api/rag/search/+server.ts": [
-    "sveltekit-frontend/tests/routes/auto/api/rag/search.test.ts"
-  ],
   "sveltekit-frontend/src/routes/api/recommendations/jobs/[jobId]/+server.ts": [
     "sveltekit-frontend/tests/routes/auto/api/recommendations/jobs/__jobId.test.ts"
   ],
@@ -4130,16 +4117,23 @@
     "sveltekit-frontend/tests/routes/auto/api/simulation/__sessionId/strategy.test.ts"
   ],
   "sveltekit-frontend/src/routes/api/sse/chat/+server.ts": [
-    "sveltekit-frontend/tests/routes/auto/api/sse/chat.test.ts"
+    "sveltekit-frontend/tests/routes/auto/api/sse/chat.test.ts",
+    "sveltekit-frontend/tests/sse-chat-glossary-metadata.spec.ts",
+    "sveltekit-frontend/tests/sse-chat-glossary-metadata.spec.ts",
+    "sveltekit-frontend/tests/sse-chat-glossary-metadata.spec.ts",
+    "sveltekit-frontend/tests/sse-chat-glossary-metadata.spec.ts",
+    "sveltekit-frontend/tests/sse-chat-glossary-metadata.spec.ts",
+    "sveltekit-frontend/tests/sse-chat-glossary-metadata.spec.ts",
+    "sveltekit-frontend/tests/sse-chat-glossary-metadata.spec.ts",
+    "sveltekit-frontend/tests/sse-chat-glossary-metadata.spec.ts",
+    "sveltekit-frontend/tests/sse-chat-glossary-metadata.spec.ts",
+    "sveltekit-frontend/tests/sse-chat-glossary-metadata.spec.ts"
   ],
   "sveltekit-frontend/src/routes/api/sse/[id]/+server.ts": [
     "sveltekit-frontend/tests/routes/auto/api/sse/__id.test.ts"
   ],
   "sveltekit-frontend/src/routes/api/summarize/synthesize/+server.ts": [
     "sveltekit-frontend/tests/routes/auto/api/summarize/synthesize.test.ts"
-  ],
-  "sveltekit-frontend/src/routes/api/tags/[tagId]/+server.ts": [
-    "sveltekit-frontend/tests/routes/auto/api/tags/__tagId.test.ts"
   ],
   "sveltekit-frontend/src/routes/api/tasks/[id]/+server.ts": [
     "sveltekit-frontend/tests/routes/auto/api/tasks/__id.test.ts",

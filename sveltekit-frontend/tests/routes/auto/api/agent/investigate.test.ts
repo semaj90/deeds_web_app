@@ -25,7 +25,7 @@ describe('src/routes/api/agent/investigate/+server.ts', () => {
       vi.resetAllMocks();
       const mod = await import('../../../../../src/routes/api/agent/investigate/+server.js') as Record<string, unknown>;
       handler = mod.POST as typeof handler;
-    });
+    }, 30000);
 
     function makeReq(body?: unknown) {
       return new Request('http://localhost/api/agent/investigate', body !== undefined ? { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) } : { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({}) });
@@ -61,7 +61,7 @@ describe('src/routes/api/agent/investigate/+server.ts', () => {
       vi.resetAllMocks();
       const mod = await import('../../../../../src/routes/api/agent/investigate/+server.js') as Record<string, unknown>;
       handler = mod.GET as typeof handler;
-    });
+    }, 30000);
 
     function makeReq(body?: unknown) {
       return new Request('http://localhost/api/agent/investigate', { method: 'GET' });

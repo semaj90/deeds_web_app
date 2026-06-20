@@ -1,38 +1,38 @@
 # Deep Import Graph - Phase A
-Generated: 2026-06-19T15:13:40.695Z
+Generated: 2026-06-20T15:18:44.511Z
 
 ## Stats
 | Metric | Value |
 |--------|-------|
-| Nodes | 58673 |
-| Total edges | 131996 |
-| Resolved edges | 12450 |
-| Unresolved (local) | 15460 |
-| External refs | 102791 |
-| Neighborhoods computed | 87 |
-| Test-covered files | 470 |
+| Nodes | 58773 |
+| Total edges | 132136 |
+| Resolved edges | 12696 |
+| Unresolved (local) | 15251 |
+| External refs | 102894 |
+| Neighborhoods computed | 90 |
+| Test-covered files | 471 |
 
 ## Zone Breakdown
 | Zone | Count |
 |------|-------|
-| shared | 47133 |
+| shared | 47209 |
 | test | 5493 |
-| script | 4951 |
+| script | 4975 |
 | types | 992 |
 | config | 104 |
 
 ## Edge Type Breakdown
 | Type | Count |
 |------|-------|
-| imports_static | 92533 |
+| imports_static | 92557 |
 | test_covers_file | 16607 |
 | redis_dependency | 5944 |
-| imports_dynamic | 5500 |
+| imports_dynamic | 5486 |
 | qdrant_dependency | 3698 |
 | exports_from | 2291 |
 | neo4j_dependency | 1753 |
-| mcp_tool_calls | 1574 |
-| env_dependency | 1308 |
+| mcp_tool_calls | 1568 |
+| env_dependency | 1444 |
 | db_dependency | 783 |
 | svelte_route_uses_loader | 5 |
 
@@ -53,9 +53,9 @@ Generated: 2026-06-19T15:13:40.695Z
 | 12 | `.claude/worktrees/agent-a7203461/scripts/atlas/_atlas-utils.mjs` | shared | 168 | 0 |
 | 13 | `.claude/worktrees/agent-a7203461/scripts/atlas/_atlas-utils.mjs` | shared | 168 | 0 |
 | 14 | `.claude/worktrees/agent-a7203461/scripts/atlas/_atlas-utils.mjs` | shared | 168 | 0 |
-| 15 | `.claude/worktrees/agent-a38668f2/sveltekit-frontend/src/lib/server/redis.js` | shared | 129 | 0 |
-| 16 | `.claude/worktrees/agent-a38668f2/sveltekit-frontend/src/lib/server/redis.js` | shared | 129 | 0 |
-| 17 | `.claude/worktrees/agent-a38668f2/sveltekit-frontend/src/lib/server/redis.js` | shared | 129 | 0 |
-| 18 | `.claude/worktrees/agent-a38668f2/sveltekit-frontend/src/lib/server/redis.js` | shared | 129 | 0 |
+| 15 | `.claude/worktrees/agent-a38668f2/sveltekit-frontend/src/lib/server/env.server.ts` | shared | 136 | 0 |
+| 16 | `.claude/worktrees/agent-a38668f2/sveltekit-frontend/src/lib/server/env.server.ts` | shared | 136 | 0 |
+| 17 | `.claude/worktrees/agent-a38668f2/sveltekit-frontend/src/lib/server/env.server.ts` | shared | 136 | 0 |
+| 18 | `.claude/worktrees/agent-a38668f2/sveltekit-frontend/src/lib/server/env.server.ts` | shared | 136 | 0 |
 | 19 | `.claude/worktrees/agent-a38668f2/sveltekit-frontend/src/lib/server/redis.js` | shared | 129 | 0 |
-| 20 | `.claude/worktrees/agent-a38668f2/sveltekit-frontend/src/lib/server/db/schema-postgres.ts` | shared | 115 | 4 |
+| 20 | `.claude/worktrees/agent-a38668f2/sveltekit-frontend/src/lib/server/redis.js` | shared | 129 | 0 |

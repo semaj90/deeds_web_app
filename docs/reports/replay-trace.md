@@ -1,6 +1,6 @@
 # Replay Breadth Benchmark Report
 
-Generated at: 2026-06-19T17:11:00.809Z
+Generated at: 2026-06-20T16:33:57.116Z
 
 ## Summary Statistics
 
@@ -10,8 +10,8 @@ Generated at: 2026-06-19T17:11:00.809Z
 | Successful Queries | 50 |
 | Failed Queries | 0 |
 | Cache Hits (Bitfrost Warm) | 10 |
-| Total Packets Retrieved | 244 |
-| Avg Packets / Query | 4.88 |
+| Total Packets Retrieved | 250 |
+| Avg Packets / Query | 5.00 |
 
 ## Query Execution Table
 
@@ -25,7 +25,7 @@ Generated at: 2026-06-19T17:11:00.809Z
 | 6 | `how is the LangGraph planning graph structured?` | golden | ❌ NO | 5 | fusion | ✅ PASS |
 | 7 | `where is the Postgres database connection pool initialized?` | golden | ❌ NO | 5 | fusion | ✅ PASS |
 | 8 | `how does the system handle schema migration sidecars?` | golden | ❌ NO | 5 | fusion | ✅ PASS |
-| 9 | `what is the default collection name for Qdrant semantic search?` | golden | ❌ NO | 2 | fusion | ✅ PASS |
+| 9 | `what is the default collection name for Qdrant semantic search?` | golden | ❌ NO | 5 | fusion | ✅ PASS |
 | 10 | `how is the GPU compute worker smoke test runner executed?` | golden | ❌ NO | 5 | fusion | ✅ PASS |
 | 11 | `where is Redis Valkey cache config wired?` | cache-hit | ✅ YES | 5 | fusion | ✅ PASS |
 | 12 | `how is SeaweedFS filer configured for S3 gateway?` | cache-hit | ✅ YES | 5 | fusion | ✅ PASS |
@@ -35,7 +35,7 @@ Generated at: 2026-06-19T17:11:00.809Z
 | 16 | `how is the LangGraph planning graph structured?` | cache-hit | ✅ YES | 5 | fusion | ✅ PASS |
 | 17 | `where is the Postgres database connection pool initialized?` | cache-hit | ✅ YES | 5 | fusion | ✅ PASS |
 | 18 | `how does the system handle schema migration sidecars?` | cache-hit | ✅ YES | 5 | fusion | ✅ PASS |
-| 19 | `what is the default collection name for Qdrant semantic search?` | cache-hit | ✅ YES | 2 | fusion | ✅ PASS |
+| 19 | `what is the default collection name for Qdrant semantic search?` | cache-hit | ✅ YES | 5 | fusion | ✅ PASS |
 | 20 | `how is the GPU compute worker smoke test runner executed?` | cache-hit | ✅ YES | 5 | fusion | ✅ PASS |
 | 21 | `which files depend on the database schema client?` | graph-expansion | ❌ NO | 5 | fusion | ✅ PASS |
 | 22 | `what is the relationship between atlas_packets and concept_records?` | graph-expansion | ❌ NO | 5 | fusion | ✅ PASS |

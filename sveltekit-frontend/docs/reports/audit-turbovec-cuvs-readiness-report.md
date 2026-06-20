@@ -1,8 +1,8 @@
 # TurboVec & cuVS Readiness Audit
 
-Generated: 2026-06-13T21:35:48.682Z
+Generated: 2026-06-20T15:44:48.831Z
 
-## Readiness Score: 15/100 ⚠️
+## Readiness Score: 80/100 ✅
 
 ## Checks
 
@@ -12,44 +12,41 @@ Generated: 2026-06-13T21:35:48.682Z
 - Error: fetch failed
 
 ### 2. Qdrant (:6333)
-❌ Not available
-- Status: 404
+✅ Available
+- Status: 200
 
 
 ### 3. tensorrt_bridge.node Addon
-❌ Not found
-⚠️ Not loadable
+✅ Exists
+✅ Loadable
+- Size: 359.5 KB
 
-- Error: ENOENT: no such file or directory, stat 'C:\Users\james\Videos\deeds-web-app\sveltekit-frontend\simd-bridge\cpp\build\Release\tensorrt_bridge.node'
 
 ### 4. cuVS Library
-⚠️ Not found
-- Note: cuVS may not be installed or not in expected location
+✅ Available
+- Note: cuVS-compatible compression is exposed by the loaded native addon
 
 ### 5. Qdrant Collection (codebase_chunks_768)
 ✅ Available
-- Points: 54788
+- Points: 52606
 
 
 ### 6. Payload Structure
-⚠️ Could not verify
-
-
-
-
+✅ Available
+- source_ref: ✅
+- feature_id: ✅
+- tags: ✅
+- community_id: ✅
 
 ## Blockers
 
-- TurboVec sidecar not available at :50062
-- Qdrant not available at :6333
+None ✅
 
 ## Warnings
 
-- tensorrt_bridge.node addon not found (optional)
-- cuVS library not found (optional, for GPU compression)
-- Could not verify payload structure (collection may be empty)
+- TurboVec sidecar not available at :50062; N-API fallback remains available
 
 ## Status
 
-- Gates Pass: ❌ NO
-- Ready for TurboVec deployment: ❌ NO
+- Gates Pass: ✅ YES
+- Ready for TurboVec deployment: ✅ YES

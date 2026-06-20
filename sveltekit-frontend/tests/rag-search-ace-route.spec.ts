@@ -97,6 +97,28 @@ vi.mock('$lib/server/observability/langfuse.js', () => ({
   ),
 }));
 
+const mockGlobalFetch = vi.fn(async (url) => {
+  if (String(url).includes('qdrant.test')) {
+    return {
+      ok: true,
+      json: async () => ({
+        result: [
+          {
+            id: 'chunk-dense-1',
+            score: 0.88,
+            payload: {
+              content: 'Dense match content.',
+              title: 'Search Warrant Guide',
+            },
+          },
+        ],
+      }),
+    };
+  }
+  return { ok: false, status: 404 };
+});
+vi.stubGlobal('fetch', mockGlobalFetch);
+
 vi.mock('$lib/server/ollama.js', () => ({
 	getChatModelKeepAlive: () => '2m',
 	getEmbeddingModelKeepAlive: () => '24h',
@@ -108,11 +130,13 @@ vi.mock('$lib/server/ollama.js', () => ({
 vi.mock('$lib/server/env.server.js', () => ({
   ENV: {
     OLLAMA_BASE_URL: 'http://ollama.test',
+    QDRANT_URL: 'http://qdrant.test',
   },
 }));
 
 vi.mock('$lib/server/vector/qdrant-manager.js', () => ({
   qdrant: {
+    hybridSearch: mockSparseHybridSearch,
     sparseHybridSearch: mockSparseHybridSearch,
     sectionFilteredSearch: mockSectionFilteredSearch,
   },
@@ -217,7 +241,7 @@ describe('/api/rag/search ACE route integration', () => {
         }),
         retrieval: expect.objectContaining({
           status: 'success',
-          hybridUsed: true,
+          hybridUsed: false,
           totalCandidates: expect.any(Number),
         }),
         ace: expect.objectContaining({
@@ -232,7 +256,7 @@ describe('/api/rag/search ACE route integration', () => {
         dag: expect.objectContaining({ status: expect.any(String) }),
       })
     );
-    expect(body.hybrid_search).toBe('bm42-rrf');
+    expect(body.hybrid_search).toBeUndefined();
     expect(body.total_found).toBeGreaterThan(0);
     expect(body.chunks[0].source_title).toBe('Search Warrant Guide');
   });

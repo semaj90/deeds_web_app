@@ -823,15 +823,23 @@ async function correctiveRetrieval(
 
   // Low-quality retrieval — ask LLM to reformulate the query
   try {
-    const reformulateRes = await ollamaFetch(`${OLLAMA_URL}/api/generate`, {
+    const { LLAMA_SERVER_BASE_URL, LOCAL_VLM_MODEL } = await import(
+      '$lib/server/ai/local-llama-provider.js'
+    );
+    const reformulateRes = await fetch(`${LLAMA_SERVER_BASE_URL}/chat/completions`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        model: 'gemma4-rotorquant:latest',
-        prompt: `Rephrase this legal search query to improve retrieval results. Return ONLY the rephrased query, no explanation.\n\nOriginal query: "${originalQuery}"`,
+        model: LOCAL_VLM_MODEL,
+        messages: [
+          {
+            role: 'user',
+            content: `Rephrase this legal search query to improve retrieval results. Return ONLY the rephrased query, no explanation.\n\nOriginal query: "${originalQuery}"`,
+          },
+        ],
         stream: false,
-        keep_alive: getChatModelKeepAlive(),
-        options: { temperature: 0.3, num_predict: 100 },
+        temperature: 0.3,
+        max_tokens: 100,
       }),
       signal: AbortSignal.timeout(15_000),
     });
@@ -840,8 +848,13 @@ async function correctiveRetrieval(
 
     // GPU-accelerated JSON parsing via simdjson (5× faster for LLM responses)
     const reformulateRawText = await reformulateRes.text();
-    const reformulateData = fastJsonParse<{ response?: string }>(reformulateRawText);
-    const newQuery = String(reformulateData.response ?? '')
+    const reformulateData = fastJsonParse<{
+      choices?: Array<{ message?: { content?: string } }>;
+      response?: string;
+    }>(reformulateRawText);
+    const newQuery = String(
+      reformulateData.choices?.[0]?.message?.content ?? reformulateData.response ?? ''
+    )
       .trim()
       .replace(/^["']|["']$/g, '');
     if (!newQuery || newQuery.length < 5) return { docs: originalDocs, reformulated: false };
@@ -1866,11 +1879,14 @@ export const POST: RequestHandler = async ({ request, locals }) => {
       const shouldRunTools = enableTools ?? !!caseMatch;
       if (shouldRunTools && !hasInlineAttachmentSource) {
         try {
+          const { LLAMA_SERVER_BASE_URL, LOCAL_VLM_MODEL } = await import(
+            '$lib/server/ai/local-llama-provider.js'
+          );
           const { runToolDetectionPass } = await import('$lib/server/ai/contextual-tools.js');
           toolResults = await Promise.race([
             runToolDetectionPass(
-              OLLAMA_URL,
-              model ?? 'gemma4-rotorquant:latest',
+              LLAMA_SERVER_BASE_URL,
+              LOCAL_VLM_MODEL,
               systemPrompt,
               conversationHistory,
               message,
@@ -2138,7 +2154,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 
         const llmStreamStart = performance.now();
         let tokenSeq = 0;
-        let inferenceBackend: 'tensorrt' | 'triton' | 'ollama' = 'ollama';
+        let inferenceBackend: 'tensorrt' | 'triton' | 'ollama' | 'turboquant' = 'ollama';
 
         await traceLLM(
           'sse-chat-generation',
@@ -2245,51 +2261,64 @@ export const POST: RequestHandler = async ({ request, locals }) => {
               }
             }
 
-            // ── Tier 3: Ollama streaming (development fallback) ──
+            // ── Tier 3: Llama-Server / TurboQuant streaming (development fallback) ──
             if (!streamed) {
-              const ollamaRes = await ollamaFetch(`${OLLAMA_URL}/api/chat`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                  model: model ?? 'gemma4-rotorquant:latest',
-                  messages: ollamaMessages,
-                  stream: true,
-                  keep_alive: getChatModelKeepAlive(),
-                }),
-              });
+              try {
+                const { LLAMA_SERVER_BASE_URL, LOCAL_VLM_MODEL } = await import(
+                  '$lib/server/ai/local-llama-provider.js'
+                );
+                const tqRes = await fetch(`${LLAMA_SERVER_BASE_URL}/chat/completions`, {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({
+                    model: LOCAL_VLM_MODEL,
+                    messages: ollamaMessages,
+                    stream: true,
+                    temperature: 0.7,
+                    max_tokens: 2048,
+                  }),
+                });
 
-              if (!ollamaRes.ok || !ollamaRes.body) {
-                throw new Error(`Ollama error: ${ollamaRes.status}`);
-              }
+                if (tqRes.ok && tqRes.body) {
+                  const reader = tqRes.body.getReader();
+                  const decoder = new TextDecoder();
 
-              const reader = ollamaRes.body.getReader();
-              const decoder = new TextDecoder();
+                  while (true) {
+                    const { done, value } = await reader.read();
+                    if (done) break;
 
-              while (true) {
-                const { done, value } = await reader.read();
-                if (done) break;
-
-                const text = decoder.decode(value, { stream: true });
-                for (const line of text.split('\n').filter(Boolean)) {
-                  try {
-                    const parsed = JSON.parse(line);
-                    const chunk = parsed.message?.content ?? parsed.response;
-                    if (chunk) {
-                      fullResponse += chunk;
-                      send({ id, role: 'assistant', content: fullResponse, status: 'streaming' });
-                      produceTokenChunk(conversationId, tokenSeq++, chunk).catch((err) => {
-                        console.warn(
-                          '[SSE chat] token chunk persist failed:',
-                          (err as Error)?.message ?? err
-                        );
-                      });
+                    const text = decoder.decode(value, { stream: true });
+                    for (const line of text.split('\n').filter((l) => l.startsWith('data: '))) {
+                      const payload = line.slice(6).trim();
+                      if (payload === '[DONE]') break;
+                      try {
+                        const parsed = JSON.parse(payload);
+                        const delta = parsed.choices?.[0]?.delta;
+                        const chunk = delta?.content ?? delta?.reasoning_content ?? '';
+                        if (chunk) {
+                          fullResponse += chunk;
+                          send({ id, role: 'assistant', content: fullResponse, status: 'streaming' });
+                          produceTokenChunk(conversationId, tokenSeq++, chunk).catch((err) => {
+                            console.warn(
+                              '[SSE chat] token chunk persist failed:',
+                              (err as Error)?.message ?? err
+                            );
+                          });
+                        }
+                      } catch {
+                        // skip malformed JSON lines
+                      }
                     }
-                  } catch {
-                    // skip malformed JSON lines
                   }
+                  inferenceBackend = 'turboquant';
+                  streamed = true;
                 }
+              } catch (tqErr) {
+                console.warn(
+                  '[SSE chat] llama-server streaming failed:',
+                  (tqErr as Error)?.message ?? tqErr
+                );
               }
-              inferenceBackend = 'ollama';
             }
 
             generation.end({
@@ -2453,7 +2482,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
                 let retryStreamed = false;
 
                 // Use same backend cascade for retry: TRT-LLM → Triton → Ollama
-                const retryBackend = inferenceBackend as 'tensorrt' | 'triton' | 'ollama';
+                const retryBackend = inferenceBackend as 'tensorrt' | 'triton' | 'ollama' | 'turboquant';
                 if (retryBackend === 'tensorrt' || retryBackend === 'triton') {
                   try {
                     const retryStream =
@@ -2479,48 +2508,63 @@ export const POST: RequestHandler = async ({ request, locals }) => {
                 }
 
                 if (!retryStreamed) {
-                  const retryRes = await ollamaFetch(`${OLLAMA_URL}/api/chat`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                      model: model ?? 'gemma4-rotorquant:latest',
-                      messages: [
-                        { role: 'system', content: systemPrompt },
-                        ...conversationHistory,
-                        { role: 'user', content: augmentedMessage },
-                        { role: 'assistant', content: fullResponse },
-                        { role: 'user', content: correctionPrompt },
-                      ],
-                      stream: true,
-                      keep_alive: getChatModelKeepAlive(),
-                    }),
-                  });
+                  try {
+                    const { LLAMA_SERVER_BASE_URL, LOCAL_VLM_MODEL } = await import(
+                      '$lib/server/ai/local-llama-provider.js'
+                    );
+                    const retryRes = await fetch(`${LLAMA_SERVER_BASE_URL}/chat/completions`, {
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify({
+                        model: LOCAL_VLM_MODEL,
+                        messages: [
+                          { role: 'system', content: systemPrompt },
+                          ...conversationHistory,
+                          { role: 'user', content: augmentedMessage },
+                          { role: 'assistant', content: fullResponse },
+                          { role: 'user', content: correctionPrompt },
+                        ],
+                        stream: true,
+                        temperature: 0.7,
+                        max_tokens: 2048,
+                      }),
+                    });
 
-                  if (retryRes.ok && retryRes.body) {
-                    const retryReader = retryRes.body.getReader();
-                    const retryDecoder = new TextDecoder();
-                    while (true) {
-                      const { done: retryDone, value: retryValue } = await retryReader.read();
-                      if (retryDone) break;
-                      const retryText = retryDecoder.decode(retryValue, { stream: true });
-                      for (const retryLine of retryText.split('\n').filter(Boolean)) {
-                        try {
-                          const retryParsed = JSON.parse(retryLine);
-                          const retryChunk = retryParsed.message?.content ?? retryParsed.response;
-                          if (retryChunk) {
-                            improvedResponse += retryChunk;
-                            send({
-                              id,
-                              role: 'assistant',
-                              content: improvedResponse,
-                              status: 'streaming',
-                            });
+                    if (retryRes.ok && retryRes.body) {
+                      const retryReader = retryRes.body.getReader();
+                      const retryDecoder = new TextDecoder();
+                      while (true) {
+                        const { done: retryDone, value: retryValue } = await retryReader.read();
+                        if (retryDone) break;
+                        const retryText = retryDecoder.decode(retryValue, { stream: true });
+                        for (const retryLine of retryText.split('\n').filter((l) => l.startsWith('data: '))) {
+                          const payload = retryLine.slice(6).trim();
+                          if (payload === '[DONE]') break;
+                          try {
+                            const retryParsed = JSON.parse(payload);
+                            const retryDelta = retryParsed.choices?.[0]?.delta;
+                            const retryChunk = retryDelta?.content ?? retryDelta?.reasoning_content ?? '';
+                            if (retryChunk) {
+                              improvedResponse += retryChunk;
+                              send({
+                                id,
+                                role: 'assistant',
+                                content: improvedResponse,
+                                status: 'streaming',
+                              });
+                            }
+                          } catch {
+                            /* skip malformed */
                           }
-                        } catch {
-                          /* skip malformed */
                         }
                       }
+                      retryStreamed = true;
                     }
+                  } catch (retryErr) {
+                    console.warn(
+                      '[SSE chat] llama-server retry streaming failed:',
+                      (retryErr as Error)?.message ?? retryErr
+                    );
                   }
                 }
 

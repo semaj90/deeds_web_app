@@ -63,9 +63,16 @@ vi.mock('$lib/server/ollama.js', () => ({
   ollamaFetch: mockOllamaFetch,
   getChatModelKeepAlive: vi.fn(() => '5m'),
   getEmbeddingModelKeepAlive: vi.fn(() => '5m'),
+  VLM_MODELS: {
+    vision: 'gemma4-rotorquant:latest',
+    embedding: 'embeddinggemma:latest',
+    legal: 'gemma4-rotorquant:latest',
+    gemma4: 'gemma4-rotorquant:latest',
+    tool: 'gemma4-rotorquant:latest',
+  },
 }));
 
-vi.mock('$lib/server/retrieval/codebase-context.js', () => ({
+vi.mock('$lib/server/features/rag/index.js', () => ({
   loadCodebaseContext: mockLoadCodebaseContext,
 }));
 

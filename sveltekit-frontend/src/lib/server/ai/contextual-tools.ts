@@ -1041,30 +1041,48 @@ export async function runToolDetectionPass(
 		{ role: 'user', content: userMessage },
 	];
 
-	const { ollamaFetch } = await import('$lib/server/ollama.js');
+	const isOpenAI = ollamaUrl.includes('/v1') || ollamaUrl.includes(':8090');
 
 	while (toolRounds < MAX_TOOL_ROUNDS) {
 		let res: Response;
 		try {
-			res = await ollamaFetch(`${ollamaUrl}/api/chat`, {
-				method: 'POST',
-				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({
-					model: modelName,
-					messages,
-					stream: false,
-					tools: CONTEXTUAL_TOOLS,
-					keep_alive: keepAlive,
-					options: {
+			if (isOpenAI) {
+				const endpoint = ollamaUrl.endsWith('/v1') ? `${ollamaUrl}/chat/completions` : `${ollamaUrl}/v1/chat/completions`;
+				res = await fetch(endpoint, {
+					method: 'POST',
+					headers: { 'Content-Type': 'application/json' },
+					body: JSON.stringify({
+						model: modelName,
+						messages,
+						stream: false,
+						tools: CONTEXTUAL_TOOLS,
 						temperature: 0.1,
-						top_k: 20,
-						top_p: 0.8,
-						num_ctx: 4096,
-						num_predict: 256, // Gemma 4 uses thinking tokens before tool calls
-					},
-				}),
-				signal: AbortSignal.timeout(15_000),
-			});
+						max_tokens: 256,
+					}),
+					signal: AbortSignal.timeout(15_000),
+				});
+			} else {
+				const { ollamaFetch } = await import('$lib/server/ollama.js');
+				res = await ollamaFetch(`${ollamaUrl}/api/chat`, {
+					method: 'POST',
+					headers: { 'Content-Type': 'application/json' },
+					body: JSON.stringify({
+						model: modelName,
+						messages,
+						stream: false,
+						tools: CONTEXTUAL_TOOLS,
+						keep_alive: keepAlive,
+						options: {
+							temperature: 0.1,
+							top_k: 20,
+							top_p: 0.8,
+							num_ctx: 4096,
+							num_predict: 256, // Gemma 4 uses thinking tokens before tool calls
+						},
+					}),
+					signal: AbortSignal.timeout(15_000),
+				});
+			}
 		} catch {
 			// Timeout or network error — abort tool detection silently
 			break;
@@ -1081,11 +1099,12 @@ export async function runToolDetectionPass(
 		} catch {
 			break;
 		}
-		const toolCalls = data.message?.tool_calls;
+		const toolCalls = data.choices?.[0]?.message?.tool_calls ?? data.message?.tool_calls;
 
 		if (!toolCalls || !Array.isArray(toolCalls) || toolCalls.length === 0) break;
 
-		messages.push({ role: 'assistant', content: data.message?.content || '' });
+		const assistantContent = data.choices?.[0]?.message?.content ?? data.message?.content ?? '';
+		messages.push({ role: 'assistant', content: assistantContent });
 
 		for (const tc of toolCalls) {
 			if (totalToolCalls >= MAX_TOTAL_TOOL_CALLS) break;

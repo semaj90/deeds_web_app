@@ -29,6 +29,13 @@ vi.mock('./centroid-cache.js', () => ({
 vi.mock('$lib/server/graph/neo4j-gds.js', () => ({
   getTopAuthorityNodes: (...args: unknown[]) => mocks.getTopAuthorityNodes(...args),
   getImpactNeighborhood: (...args: unknown[]) => mocks.getImpactNeighborhood(...args),
+  runDijkstraContext: vi.fn(async ({ sourceRef }) => ({
+    sourceRef,
+    hits: [],
+    totalCount: 0,
+    durationMs: 0,
+    gdsUsed: false,
+  })),
 }));
 
 vi.mock('$lib/server/ai/multi-query-generator.js', () => ({

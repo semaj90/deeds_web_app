@@ -26,11 +26,11 @@ const LIMIT_EQ = '--limit='; // include literal '--limit=' for contract tests
 
 // Short-circuit patterns and example gates (tests assert these strings exist)
 if (FLAGS.skipNeo4j) {
-  // short-circuit early when operator asks to skip Neo4j
+  // skip Neo4j
   console.log('[skip] Neo4j');
 }
 if (FLAGS.skipCouchdb) {
-  // short-circuit early when operator asks to skip CouchDB
+  // skip CouchDB
   console.log('[skip] CouchDB');
 }
 

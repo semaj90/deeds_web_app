@@ -465,28 +465,37 @@ async function main() {
       await pool.query(
         `
         INSERT INTO atlas_packets
-          (packet_id, artifact_id, packet_key, source_ref, feature_id, community_id,
-           summary, payload, source_kind, created_at, updated_at)
-        VALUES ($1, $2, $3, $4, $5, $6, $7, $8::jsonb, $9, NOW(), NOW())
-        ON CONFLICT (packet_id) DO UPDATE SET
-          summary     = EXCLUDED.summary,
-          payload     = EXCLUDED.payload,
-          source_ref  = EXCLUDED.source_ref,
-          feature_id  = EXCLUDED.feature_id,
-          packet_key  = EXCLUDED.packet_key,
-          source_kind = EXCLUDED.source_kind,
-          updated_at  = NOW()
+          (packet_key, source_ref, directory_path, file_path, function_symbol, feature_id, feature_label,
+           community_id, summary, payload, source_kind, domain_class, concept_ids, created_at, updated_at)
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10::jsonb, $11, $12, $13, NOW(), NOW())
+        ON CONFLICT (packet_key) DO UPDATE SET
+          source_ref     = EXCLUDED.source_ref,
+          directory_path = EXCLUDED.directory_path,
+          file_path      = EXCLUDED.file_path,
+          function_symbol= EXCLUDED.function_symbol,
+          feature_id     = EXCLUDED.feature_id,
+          feature_label  = EXCLUDED.feature_label,
+          summary        = EXCLUDED.summary,
+          payload        = EXCLUDED.payload,
+          source_kind    = EXCLUDED.source_kind,
+          domain_class   = EXCLUDED.domain_class,
+          concept_ids    = EXCLUDED.concept_ids,
+          updated_at     = NOW()
         `,
         [
-          p.packet_key,           // packet_id
-          p.source_ref,           // artifact_id
           p.packet_key,           // packet_key
           p.source_ref,           // source_ref
+          p.directory_path,       // directory_path
+          p.file_path,            // file_path
+          p.function_symbol,      // function_symbol
           p.feature_id,           // feature_id
-          p.community_id,         // community_id (null)
+          p.feature_label,        // feature_label
+          p.community_id,         // community_id
           p.summary,              // summary
           JSON.stringify(payload),// payload jsonb
           p.packet_kind,          // source_kind
+          p.domain_class,         // domain_class
+          p.concept_ids,          // concept_ids
         ],
       );
       pgInserted++;

@@ -1,6 +1,6 @@
 # Latent & SOM Join-Key Coverage Audit
 
-Report generated at: `2026-06-19T19:28:57.590Z`
+Report generated at: `2026-06-20T00:40:04.874Z`
 
 ## Database Stats (`atlas_packets` Table)
 

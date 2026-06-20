@@ -253,6 +253,6 @@
   },
   "generator": "scripts/atlas/write-graph-refresh-manifest.mjs",
   "notes": "Read from docs/graph/codebase-graph.json",
-  "invalidated_at": "2026-06-19T05:22:32.667Z",
-  "invalidation_reason": "atlas truth promotion"
+  "invalidated_at": "2026-06-20T16:25:37.989Z",
+  "invalidation_reason": "xgboost gate-pass: NDCG@10=0.9516"
 }

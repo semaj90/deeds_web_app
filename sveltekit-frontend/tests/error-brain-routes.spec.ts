@@ -96,7 +96,15 @@ const whereReturning = vi.fn(async () => []);
 const whereFn = vi.fn(() => ({ returning: whereReturning, limit: vi.fn(() => whereReturning) }));
 const setFn = vi.fn(() => ({ where: whereFn }));
 const fromFn = vi.fn(() => ({ where: whereFn, orderBy: vi.fn(() => ({ limit: vi.fn(async () => []) })) }));
-const valuesFn = vi.fn(() => ({ returning: vi.fn(async () => [{ id: 'diag-1' }]), onConflictDoNothing: vi.fn() }));
+const valuesFn = vi.fn(() => {
+  const res = {
+    returning: vi.fn(async () => [{ id: 'diag-1' }]),
+    onConflictDoNothing: vi.fn(() => res),
+    then: vi.fn((onFulfilled) => Promise.resolve().then(onFulfilled)),
+    catch: vi.fn((onRejected) => Promise.resolve().catch(onRejected)),
+  };
+  return res;
+});
 
 vi.mock('$lib/server/db/client', () => ({
   pgRows: (r) => Array.isArray(r) ? r : r?.rows ?? [],
@@ -133,6 +141,19 @@ vi.mock('$lib/server/db/schema-postgres.js', () => ({
 		createdAt: 'created_at',
 	},
 	kb_provenance_graph: {},
+	aiUsageLog: {
+		id: 'id',
+		userId: 'user_id',
+		endpoint: 'endpoint',
+		model: 'model',
+		promptTokens: 'prompt_tokens',
+		completionTokens: 'completion_tokens',
+		totalTokens: 'total_tokens',
+		durationMs: 'duration_ms',
+		cached: 'cached',
+		metadata: 'metadata',
+		createdAt: 'created_at',
+	},
 }));
 
 vi.mock('drizzle-orm', () => ({

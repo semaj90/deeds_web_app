@@ -1,435 +1,1350 @@
 {
-  "timestamp": "2026-06-19T04:19:51.322Z",
-  "greeting": "Hello James.",
-  "sinceLastWorked": {
-    "tasksOpen": 5,
-    "tasksClosed": 0,
-    "newRecommendations": 0,
-    "taskRegistryOpen": 5,
-    "taskRegistryDone": 0,
-    "productionReadiness": "PASS 65 / WARN 1 / FAIL 0"
+  "generatedAt": "2026-06-20T16:02:01.801Z",
+  "appRoot": "C:/Users/james/Videos/deeds-web-app",
+  "readOnly": true,
+  "env": {
+    "appRootResolvedFromEnv": false,
+    "redisPasswordConfigured": true,
+    "valkeyPasswordConfigured": true
   },
-  "systems": {
-    "postgres": "READY",
-    "redis": "READY",
-    "qdrant": "READY",
-    "neo4j": "READY",
-    "turbovec": "SKIPPED",
-    "engramEmbed": "OK",
-    "ldjson": "100%"
-  },
-  "coverage": {
-    "qdrant": "?%",
-    "som": "?%",
-    "parentAtlas": "?%"
-  },
-  "sidecars": [
-    {
-      "name": "turbovec",
-      "transport": "http",
-      "status": "SKIPPED",
-      "detail": "Disabled in opencode.json",
-      "enabled": true
+  "summary": {
+    "productionReadiness": {
+      "exists": true,
+      "generatedAt": "2026-06-20T15:46:38.895Z",
+      "counts": {
+        "pass": 66,
+        "warn": 0,
+        "fail": 0
+      },
+      "summary": "PASS 66 / WARN 0 / FAIL 0",
+      "keySignals": {
+        "parentAtlasDocuments": null,
+        "atlasFeatureMap": null,
+        "nesChromPackets": null,
+        "routeRuntimePackets": null,
+        "qdrantPoints": 52606,
+        "neo4jCodebaseFiles": 20542
+      }
     },
-    {
-      "name": "turbovec-sidecar",
-      "transport": "http",
-      "status": "SKIPPED",
-      "detail": "Disabled in opencode.json",
-      "enabled": true
+    "liveServiceEnv": {
+      "exists": true,
+      "generatedAt": "2026-06-20T15:58:49.985Z",
+      "readOnly": true,
+      "telemetryStatus": "READY",
+      "counts": {
+        "READY": 2,
+        "ENV_MISMATCH": 0,
+        "PORT_MISMATCH": 0,
+        "SERVICE_STOPPED": 0,
+        "AUTH_REQUIRED": 0,
+        "SOURCE_UNAVAILABLE": 0
+      },
+      "telemetry": {
+        "status": "READY",
+        "totalRows": 179,
+        "recent24hRows": 25,
+        "withSelectedPacketKeys": 179,
+        "withFeatureIds": 179,
+        "withStrategy": 179,
+        "latestAt": "2026-06-18T01:12:39.547Z"
+      },
+      "goRetrieval": {
+        "http": {
+          "status": "READY",
+          "envDisplay": "http://127.0.0.1:8100",
+          "detail": "HTTP listener present on :8100"
+        },
+        "grpc": {
+          "status": "READY",
+          "envDisplay": "127.0.0.1:50053",
+          "detail": "gRPC listener present on :50053"
+        }
+      },
+      "nextSafeAction": "Go Retrieval is aligned; move to the next retrieval lane."
     },
-    {
-      "name": "engram-embed",
-      "transport": "stdio",
-      "status": "OK",
-      "detail": "stdio transport responding with valid JSON-RPC",
-      "enabled": true
+    "temporalTaskRegistry": {
+      "exists": true,
+      "generatedAt": "2026-06-19T23:21:19.166Z",
+      "recommendationCount": 300,
+      "taskCount": 22,
+      "openTaskCount": 0,
+      "promotedRecommendations": 22,
+      "activeLane": null,
+      "topTasks": [
+        {
+          "taskId": "task_4_circular_dependency_chains_of_3_files",
+          "title": "4 circular dependency chains of 3+ files",
+          "status": "DONE",
+          "priority": "HIGH",
+          "command": null
+        },
+        {
+          "taskId": "task_go_retrieval_runtime_recovery",
+          "title": "Recover Go Retrieval runtime",
+          "status": "DONE",
+          "priority": "HIGH",
+          "command": "node scripts/atlas/audit-live-service-env.mjs"
+        },
+        {
+          "taskId": "task_artifact_tiering_application",
+          "title": "Apply artifact tier classifications",
+          "status": "DONE",
+          "priority": "HIGH",
+          "command": "npm --prefix sveltekit-frontend run atlas:audit:artifact-bloat"
+        }
+      ]
+    },
+    "runtimeCoverage": {
+      "exists": true,
+      "generatedAt": "2026-06-14T20:53:03.675Z",
+      "status": "HIGHER_HOP_ENRICHMENT_PENDING",
+      "nextLane": "higher-hop enrichment backfill",
+      "selectedConceptCoveragePct": 100,
+      "usedConceptEdgeCoveragePct": 100,
+      "joinCoveragePct": 0,
+      "somCoveragePct": 0,
+      "cacheHitPct": 96.2,
+      "higherHopStatus": "HIGHER_HOP_GAP",
+      "higherHopNeo4jNodeCoveragePct": 0
+    },
+    "replayTraceSummary": {
+      "exists": true,
+      "generatedAt": "2026-06-19T22:37:28.328Z",
+      "status": "pass_with_warnings",
+      "queryCount": 50,
+      "coverage": {
+        "qdrantHitPct": "100.0%",
+        "cacheHitPct": "0.0%",
+        "packetKeyPct": "100.0%",
+        "featureIdPct": "100.0%",
+        "sourceRefPct": "100.0%"
+      },
+      "latency": {
+        "totalP50": 4213,
+        "totalP95": 6392,
+        "bm25P50": 280,
+        "bm25P95": 737,
+        "qdrantP50": 63,
+        "qdrantP95": 351,
+        "redisP50": 5,
+        "redisP95": 14,
+        "neo4jP50": 0,
+        "neo4jP95": 1,
+        "fusionP50": 4131,
+        "fusionP95": 5912
+      },
+      "top": {
+        "packetKey": "src/lib/webgpu/compute-shader-engine.ts:3ad3d4351aa885ec",
+        "sourceRef": "src/lib/webgpu/compute-shader-engine.ts",
+        "featureId": "atlas-context",
+        "domainClass": "rag_retrieval",
+        "cacheHitSource": null,
+        "fusionScore": 0.102226
+      }
+    },
+    "retrievalBenchmark": {
+      "exists": true,
+      "generatedAt": "2026-06-19T22:33:22.219Z",
+      "status": "pass_with_warnings",
+      "queryCount": 50,
+      "latency": {
+        "totalP50": 4213,
+        "totalP95": 6392,
+        "qdrantP50": 63,
+        "qdrantP95": 351,
+        "postgresP50": 280,
+        "postgresP95": 737,
+        "neo4jP50": 0,
+        "neo4jP95": 1,
+        "redisP50": 5,
+        "redisP95": 14,
+        "gpuP50": 0,
+        "gpuP95": 3,
+        "answerP50": 3935,
+        "answerP95": 5270
+      },
+      "gates": {
+        "allQdrantHits": true,
+        "allLedgerMatches": false,
+        "allAnswered": true,
+        "degradedQueries": 50,
+        "replayQueries": 50
+      },
+      "services": {
+        "qdrant": "healthy",
+        "traceMcp": "healthy",
+        "postgres": "healthy"
+      },
+      "errors": [
+        "one_or_more_queries_missed_ledger_matches"
+      ]
+    },
+    "bitfrostAudit": {
+      "exists": true,
+      "generatedAt": "2026-06-20T15:58:50.010Z",
+      "status": "PASS",
+      "redisContainer": "legal-ai-valkey",
+      "passwordConfigured": true,
+      "gpuKarpathyScores": 0,
+      "gpuKarpathyEncoded": 0,
+      "bifrostKeys": 62,
+      "centroidKeys": 85,
+      "somKeys": 152
+    },
+    "bitfrostWarm": {
+      "exists": true,
+      "generatedAt": "2026-06-18T22:19:37.666Z",
+      "mode": "apply",
+      "appliedWrites": 125,
+      "candidateRows": 25,
+      "failures": 0,
+      "passwordConfigured": false
+    },
+    "qdrantTagMirror": {
+      "exists": true,
+      "generatedAt": "2026-06-18T15:13:28.604Z",
+      "mode": "apply",
+      "inputRows": 3251,
+      "selectedRows": 3251,
+      "eligibleRows": 2488,
+      "patchedRows": 2488,
+      "skippedNoQdrantPointId": 763,
+      "qdrantReachable": false,
+      "patchRatePct": 100,
+      "nextSafeAction": "Run the materializer again only if the packet ledger changed; do not re-embed or recreate collections."
+    },
+    "sourceRefContextNeo4j": {
+      "exists": true,
+      "generatedAt": "2026-06-18T15:26:25.243Z",
+      "status": "APPLY_OK",
+      "totalSamples": 40,
+      "readyToProjectRows": 23,
+      "alreadyProjectedRows": 0,
+      "missingJoinRows": 0,
+      "applyAttempted": true,
+      "applyRowsMerged": 25,
+      "applyError": null,
+      "nextSafeAction": "Re-run the sourceRef projection dry-run and then move to SOM 20x20 / auto-clustering if the graph lane stays stable."
+    },
+    "usedPacketEdgeSeed": {
+      "exists": true,
+      "generatedAt": "2026-06-18T15:24:20.516Z",
+      "mode": "APPLY",
+      "status": "APPLY_OK",
+      "candidateEdges": 135,
+      "packetEvidenceRows": 135,
+      "uniqueTraceIds": 135,
+      "uniquePacketKeys": 45,
+      "applyStatus": "APPLIED_HTTP"
+    },
+    "redisCentroidMirror": {
+      "exists": true,
+      "generatedAt": "2026-06-18T22:19:37.509Z",
+      "mode": "apply",
+      "status": "PASS",
+      "sourceTable": "atlas_higher_hop_index",
+      "qdrantBackedRows": 2488,
+      "communityBuckets": 85,
+      "somBuckets": 76,
+      "plannedWrites": 238,
+      "appliedWrites": 238,
+      "failures": 0,
+      "sampleKeys": [
+        "centroid:1",
+        "centroid:10",
+        "centroid:11",
+        "centroid:12",
+        "centroid:13",
+        "centroid:14",
+        "centroid:15",
+        "centroid:16",
+        "centroid:17",
+        "centroid:18"
+      ],
+      "nextSafeAction": "Re-run the mirror in dry-run mode if you want to inspect the generated keys, then proceed to Bifrost mirror wiring."
+    },
+    "agenticRecommendationWorkflow": {
+      "exists": true,
+      "generatedAt": "2026-06-16T16:44:18.731Z",
+      "mode": "DRY_RUN",
+      "status": "DRY_RUN_READY",
+      "cardsGenerated": 9,
+      "readyCount": 7,
+      "blockedCount": 2,
+      "readOnlyByDefault": true,
+      "nextSafeAction": "Use the cards as bounded Kanban work items; do not patch or mutate until a lane is explicitly selected.",
+      "openLaneHints": {
+        "nextLane": "HyperRAG fusion wiring",
+        "higherHopStatus": "PASS_WITH_WARN",
+        "runtimeCoverageStatus": "HIGHER_HOP_ENRICHMENT_PENDING"
+      }
+    },
+    "repoFunctionRegistry": {
+      "exists": true,
+      "generatedAt": "2026-06-18T14:59:44.423Z",
+      "totalRows": 1479,
+      "countsByKind": {
+        "function": 892,
+        "doc_topic": 371,
+        "cli_command": 125,
+        "mcp_tool": 91
+      },
+      "topKinds": [
+        {
+          "kind": "function",
+          "count": 892
+        },
+        {
+          "kind": "doc_topic",
+          "count": 371
+        },
+        {
+          "kind": "cli_command",
+          "count": 125
+        }
+      ],
+      "topRows": [
+        {
+          "featureId": "feature.agent.opencode",
+          "featureLabel": "OpenCode Agent",
+          "kind": "doc_topic",
+          "sourceRef": "CONTEXT-WINDOW-ALIGNMENT-ollama-turboquant-opencode-2026-05-20.md#1-treat-65536-as-the-canonical-long-context-target",
+          "symbol": "1-treat-65536-as-the-canonical-long-context-target"
+        },
+        {
+          "featureId": "feature.agent.opencode",
+          "featureLabel": "OpenCode Agent",
+          "kind": "doc_topic",
+          "sourceRef": "CONTEXT-WINDOW-ALIGNMENT-ollama-turboquant-opencode-2026-05-20.md#2-keep-a-smaller-fallback-lane-for-safety",
+          "symbol": "2-keep-a-smaller-fallback-lane-for-safety"
+        },
+        {
+          "featureId": "feature.agent.opencode",
+          "featureLabel": "OpenCode Agent",
+          "kind": "doc_topic",
+          "sourceRef": "CONTEXT-WINDOW-ALIGNMENT-ollama-turboquant-opencode-2026-05-20.md#a-turboquant-launcher-path",
+          "symbol": "a-turboquant-launcher-path"
+        },
+        {
+          "featureId": "feature.agent.opencode",
+          "featureLabel": "OpenCode Agent",
+          "kind": "doc_topic",
+          "sourceRef": "CONTEXT-WINDOW-ALIGNMENT-ollama-turboquant-opencode-2026-05-20.md#active-conclusion",
+          "symbol": "active-conclusion"
+        },
+        {
+          "featureId": "feature.agent.opencode",
+          "featureLabel": "OpenCode Agent",
+          "kind": "doc_topic",
+          "sourceRef": "CONTEXT-WINDOW-ALIGNMENT-ollama-turboquant-opencode-2026-05-20.md#b-app-layer-budget-guard",
+          "symbol": "b-app-layer-budget-guard"
+        }
+      ],
+      "topFeatureIds": [
+        "feature.agent.opencode"
+      ]
+    },
+    "mcpToolSummaryRegistry": {
+      "exists": true,
+      "generatedAt": "2026-06-18T15:05:00.545Z",
+      "mode": "grouped",
+      "totalInputRows": 1468,
+      "totalSummaries": 87,
+      "primaryFeatureId": "feature.synthesis.gemma4",
+      "primaryFeatureLabel": "Gemma4 Synthesis",
+      "primarySummary": "<|channel>thought\nThe user wants me to summarize indexed repository packets for `feature_id=feature.synthesis.gemma4`.\nI must:\n1.  Only summarize the provided rows.\n2.  Do not generalize beyond the provided rows.\n3.  Prefer `source_ref`, `feature_id`, `file_path`, and `copy_merge_use` in the output structure (though `copy_merge_use` is not provided, I will focus on the core operational summary).\n4.  Return concise operational summaries, keeping the focus on merging/synthesis.\n\nAnalyzing the rows:\n\n*   **Row 1:** `scripts/atlas/agentic-recommendation-workflow.mjs` - `normalizeSummaryText` (Synthesis/Recommendation workflow).\n*   **Row 2:** `scripts/atlas/agentic-recommendation-workflow.mjs` - `summarizeInputPresence` (Synthesis/Recommendation workflow).\n*   **Row 3:** `scripts/atlas/audit-agent-trace-data-maturity.mjs` - `classify` (Synthesis/Audit/Data Maturity).\n*   **Row 4:** `scripts/atlas/audit-agent-trace-data-maturity.mjs` - `summarizeQlorA` (Synthesis/Audit/Data Maturity).\n*   **Row 5:** `scripts/atlas/audit-agent-trace-data-maturity.mjs` - `summarizeTraceSmoke` (Synthesis/Audit/Data Maturity).\n\nI will structure the summary by file/module, detailing the functions and their purpose in a merge-focused way.<channel|>**Operational Summary for `feature.synthesis.gemma4`**\n\n**`scripts/atlas/agentic-recommendation-workflow.mjs`**\n*   **`normalizeSummaryText`**: Function for normalizing summary text within the agentic recommendation workflow.\n*   **`summarizeInputPresence`**: Function designed to summarize input presence within the agentic recommendation workflow.\n\n**`scripts/atlas/audit-agent-trace-data-maturity.mjs`**\n*   **`classify`**: Function used for classification within the audit agent trace data maturity process.\n*   **`summarizeQlorA`**: Function to summarize QlorA data within the audit agent trace data maturity process.\n*   **`summarizeTraceSmoke`**: Function to summarize trace data within the audit agent trace data maturity process.",
+      "primarySourceRefs": [
+        "scripts/atlas/agentic-recommendation-workflow.mjs#normalizeSummaryText",
+        "scripts/atlas/agentic-recommendation-workflow.mjs#summarizeInputPresence",
+        "scripts/atlas/audit-agent-trace-data-maturity.mjs#classify",
+        "scripts/atlas/audit-agent-trace-data-maturity.mjs#summarizeQlorA",
+        "scripts/atlas/audit-agent-trace-data-maturity.mjs#summarizeTraceSmoke"
+      ]
+    },
+    "higherHopEnrichment": {
+      "exists": true,
+      "generatedAt": "2026-06-18T15:22:21.344Z",
+      "status": "HIGHER_HOP_GAP",
+      "totalRows": 22,
+      "somClusterCoveragePct": 0,
+      "glyphRecordCoveragePct": 0,
+      "qdrantHitCoveragePct": 0,
+      "redisHotKeyCoveragePct": 9.09,
+      "neo4jNodeCoveragePct": 0,
+      "nextSafeAction": "Create a bounded higher-hop backfill that writes somCluster, glyphRecord, qdrantHit, redisHotKey, and neo4jNode from the stable sourceRef -> feature_id -> featureLabel spine."
+    },
+    "higherHopSchemaRepair": {
+      "exists": true,
+      "generatedAt": "2026-06-18T15:22:21.510Z",
+      "status": "COMPLETE",
+      "featureMetadata": {
+        "rowsScanned": 32702,
+        "rowsReady": 0,
+        "featureIdFills": 0,
+        "sourceRefFills": 0,
+        "metadataInitializations": 0,
+        "domainBackfillNeeded": 32702
+      },
+      "metadataClusterSpine": {
+        "status": "GROUP_CLUSTER_SPLIT_FOUND",
+        "sourceRefHits": 325,
+        "filePathHits": 54,
+        "groupIdHits": 3,
+        "qdrantTagIdHits": 0,
+        "sourceRefCanonical": true,
+        "filePathFallback": true,
+        "groupIdDuckDbOnly": true
+      },
+      "higherHop": {
+        "status": "HIGHER_HOP_GAP",
+        "totalRows": 22,
+        "sourceRefRows": 23,
+        "featureIdRows": 23,
+        "featureLabelRows": 32,
+        "averageLineageScorePct": 25.4,
+        "rows": {
+          "somCluster": 0,
+          "glyphRecord": 0,
+          "qdrantHit": 0,
+          "redisHotKey": 2,
+          "neo4jNode": 0
+        },
+        "coveragePct": {
+          "somCluster": 0,
+          "glyphRecord": 0,
+          "qdrantHit": 0,
+          "redisHotKey": 9.09,
+          "neo4jNode": 0
+        },
+        "supernodes": {
+          "joinHintsRequired": true,
+          "thresholds": {
+            "concepts": 500,
+            "features": 1000,
+            "communities": 2000
+          },
+          "conceptCount": 0,
+          "featureCount": 0,
+          "communityCount": 0,
+          "safeStartNodes": [
+            "trace_id",
+            "packet_key",
+            "source_ref_key",
+            "qdrant_point_id"
+          ]
+        },
+        "nextSafeAction": "Create a bounded higher-hop backfill that writes somCluster, glyphRecord, qdrantHit, redisHotKey, and neo4jNode from the stable sourceRef -> feature_id -> featureLabel spine."
+      },
+      "runtimeCoverage": {
+        "status": "HIGHER_HOP_ENRICHMENT_PENDING",
+        "nextLane": "higher-hop enrichment backfill",
+        "selectedConceptCoveragePct": 0,
+        "selectedPacketCoveragePct": 0,
+        "usedConceptEdgeCoveragePct": 0,
+        "somCoveragePct": 0,
+        "higherHopNeo4jNodeCoveragePct": 0
+      },
+      "repair": {
+        "filePathStatus": "COMPLETE",
+        "treeNodeIdStatus": "COMPLETE",
+        "somClusterStatus": "COMPLETE",
+        "blockingFields": [],
+        "followUpFields": [],
+        "anchoredRoots": [
+          "packet_key",
+          "source_ref_key",
+          "qdrant_point_id"
+        ]
+      },
+      "nextSafeAction": "The live higher-hop packet fields are aligned; move to the next graph expansion lane."
+    },
+    "postgresMirrors": {
+      "exists": true,
+      "generatedAt": "2026-06-12T18:01:30.810Z",
+      "liveProbe": {
+        "reachable": true,
+        "reason": null,
+        "databaseUrlPresent": true,
+        "normalizedHost": "127.0.0.1",
+        "normalizedPort": "5434"
+      },
+      "summary": {
+        "tableCount": 8,
+        "statusCounts": {
+          "COLUMN_MISMATCH": 2,
+          "LIVE_DB_ALIGNED": 4,
+          "INDEX_MISMATCH": 2
+        },
+        "repairCounts": {
+          "ADD_MANUAL_SQL": 2,
+          "IGNORE_IMPLICIT_INDEX": 4,
+          "ADD_DRIZZLE_MIRROR": 2
+        },
+        "manualOnlyCount": 0,
+        "drizzleOnlyCount": 0,
+        "columnMismatchCount": 2,
+        "indexMismatchCount": 2,
+        "liveAlignedCount": 4,
+        "liveUnavailableCount": 0,
+        "liveMismatchCount": 4
+      }
+    },
+    "agentTraceMaturity": {
+      "exists": true,
+      "generatedAt": "2026-06-16T16:40:34.413Z",
+      "status": "READY_FOR_PLANNER_LEARNING",
+      "completionEstimatePct": 100,
+      "agentTracesTotal": 1134,
+      "selectedConceptCoveragePct": 100,
+      "selectedPacketCoveragePct": 100,
+      "retrievalStrategyCoveragePct": 100,
+      "rewardCoveragePct": 100,
+      "exportedQlorAExamples": 779
+    },
+    "artifactTiering": {
+      "exists": true,
+      "generatedAt": "2026-06-16T00:33:09.182Z",
+      "status": null,
+      "totalFiles": 0,
+      "totalSizeMb": 0,
+      "duplicates": 0,
+      "moveColdCandidates": 0
+    },
+    "turbovecPlan": {
+      "exists": true,
+      "generatedAt": "2026-06-16T16:15:46.123Z",
+      "mode": null,
+      "status": "READY",
+      "laneCount": 12,
+      "readyOrDoneCount": 7,
+      "blockedCount": 1,
+      "nextSafeAction": null
+    },
+    "runtimeEvidencePacketization": {
+      "exists": true,
+      "generatedAt": "2026-06-11T19:57:02.970Z",
+      "mode": "apply",
+      "materialized": true,
+      "rawCardFiles": 8170,
+      "packetRows": 8170,
+      "sourceRefCoveragePct": 100,
+      "featureIdCoveragePct": 100,
+      "featureLabelCoveragePct": 100,
+      "writerCoveragePct": 100,
+      "canonicalLedgerMatchCoveragePct": 0.37,
+      "duplicateCardIds": 0,
+      "nextSafeAction": "Re-run atlas:lod-nes-memory-ldjson and verify neschrom97_packets is READY_LDJSON before any GPU JSONPath experiment."
+    },
+    "packetContract": {
+      "exists": true,
+      "appLlmsRoute": true,
+      "appLlmsFullRoute": true,
+      "packetContractHelper": true,
+      "packetRpc": true,
+      "aceHitFieldsPresent": {
+        "packetType": true,
+        "canonicalSourceRef": true,
+        "recommendedAction": true,
+        "verificationCommand": true
+      },
+      "nextSafeAction": "Read the shared Parent Atlas packet contract first, then use packet RPC / HyperRAG hits before broad source scans."
+    },
+    "parentAtlasDocIndex": {
+      "featureRegistry": {
+        "total": 18,
+        "implemented": 9,
+        "partial": 6,
+        "missing": 3,
+        "storageLanes": {
+          "redis-hot + qdrant + postgres": 1,
+          "redis-hot + qdrant": 1,
+          "redis-hot + json artifact": 1,
+          "redis-hot": 1,
+          "redis-hot + postgres + file snapshot": 1,
+          "postgres + redis-hot": 1,
+          "contract-doc + planned registry": 1,
+          "postgres pgvector": 1,
+          "evaluation-only": 1,
+          "reference-only": 1,
+          "postgres + docs bootstrap": 1,
+          "qdrant + pgvector + redis-hot": 1,
+          "redis exact + redis semantic + bifrost prefix + ace packet": 1,
+          "postgres-first": 1,
+          "redis-hot + ace packet cache": 1,
+          "postgres + qdrant + redis-hot": 1,
+          "redis + qdrant + docs": 1,
+          "duckdb analytical only": 1
+        }
+      },
+      "bootstrapRegistry": {
+        "total": 18,
+        "implemented": 9,
+        "partial": 6,
+        "missing": 3,
+        "storageLanes": {
+          "redis-hot + qdrant + postgres": 1,
+          "redis-hot + qdrant": 1,
+          "redis-hot + json artifact": 1,
+          "redis-hot": 1,
+          "redis-hot + postgres + file snapshot": 1,
+          "postgres + redis-hot": 1,
+          "contract-doc + planned registry": 1,
+          "postgres pgvector": 1,
+          "evaluation-only": 1,
+          "reference-only": 1,
+          "postgres + docs bootstrap": 1,
+          "qdrant + pgvector + redis-hot": 1,
+          "redis exact + redis semantic + bifrost prefix + ace packet": 1,
+          "postgres-first": 1,
+          "redis-hot + ace packet cache": 1,
+          "postgres + qdrant + redis-hot": 1,
+          "redis + qdrant + docs": 1,
+          "duckdb analytical only": 1
+        }
+      },
+      "dirtyTree": null,
+      "archivePlan": null,
+      "crosswalk": null,
+      "packetSurfaceAudit": {
+        "totalFiles": 4,
+        "invalidFiles": 0,
+        "invalidRows": 0,
+        "validRows": 16,
+        "categories": {
+          "runtime-packet": 3,
+          "atlas-doc-index": 1
+        }
+      },
+      "hiddenPacketPathmap": {
+        "packetFiles": 0,
+        "invalidRows": 0,
+        "sourceRefRows": 6765,
+        "featureIdRows": 6765,
+        "parentAtlasDocJoins": 0
+      },
+      "hiddenPacketPathmapDuckdb": {
+        "inputRows": 6353,
+        "normalizedRows": 6353,
+        "duckdbRows": 6353,
+        "joinedRows": 6353,
+        "stableIdJoins": 6353,
+        "sourceRefJoins": 6353,
+        "todoSourceRefRows": 135
+      },
+      "featureLineage": {
+        "totalRows": 100,
+        "totalArtifacts": 100,
+        "sourceRefRows": 100,
+        "featureIdRows": 100,
+        "featureLabelRows": 100,
+        "parentAtlasDocRows": 0,
+        "somRows": 0,
+        "qdrantRows": 0,
+        "redisRows": 0,
+        "neo4jRows": 0,
+        "averageLineageScorePct": 36.36,
+        "maxLineageScorePct": 36.36,
+        "sampleCount": 100,
+        "sampleMode": true,
+        "sampleLimit": 100,
+        "maxFiles": 25,
+        "warning": "bounded sample; coverage is directional, not exhaustive"
+      },
+      "temporalTaskRegistry": {
+        "findingCount": 0,
+        "recommendationCount": 286,
+        "taskCount": 17,
+        "openTaskCount": 8,
+        "archivedTaskCount": 0,
+        "historyPacketsCount": 27,
+        "promotedRecommendations": 17,
+        "runId": "2026-06-12T13:00:13.166Z"
+      },
+      "runtimePacketDensity": {
+        "totalAnalyzed": 33,
+        "lowDensityCount": 0,
+        "optimalCount": 32,
+        "emptyPointersCount": 1,
+        "avgHydrationRatio": "88.38%"
+      },
+      "postgresContractMirrors": {
+        "tableCount": 8,
+        "statusCounts": {
+          "COLUMN_MISMATCH": 2,
+          "LIVE_DB_ALIGNED": 4,
+          "INDEX_MISMATCH": 2
+        },
+        "columnMismatchCount": 2,
+        "indexMismatchCount": 2,
+        "liveAlignedCount": 4,
+        "liveUnavailableCount": 0
+      },
+      "contextualTreeReadiness": null,
+      "liveServiceEnv": null,
+      "workstationTodoLines": 404,
+      "packetSurfaces": {
+        "total": 4,
+        "byRoot": {
+          ".tmp": 3,
+          "docs": 1
+        },
+        "sampleFiles": [
+          ".tmp/feature_labels.jsonl",
+          ".tmp/kanban_tasks.jsonl",
+          ".tmp/missing_feature_todos.jsonl",
+          "docs/reports/atlas-clustering-health-history.jsonl"
+        ],
+        "files": [
+          {
+            "path": ".tmp/feature_labels.jsonl",
+            "ext": ".jsonl",
+            "size": 0,
+            "mtime": "2026-06-02T01:13:19.468Z",
+            "lane": "runtime-packet"
+          },
+          {
+            "path": ".tmp/kanban_tasks.jsonl",
+            "ext": ".jsonl",
+            "size": 11609,
+            "mtime": "2026-06-16T00:46:04.970Z",
+            "lane": "runtime-packet"
+          },
+          {
+            "path": ".tmp/missing_feature_todos.jsonl",
+            "ext": ".jsonl",
+            "size": 0,
+            "mtime": "2026-06-02T01:13:19.470Z",
+            "lane": "runtime-packet"
+          },
+          {
+            "path": "docs/reports/atlas-clustering-health-history.jsonl",
+            "ext": ".jsonl",
+            "size": 9641,
+            "mtime": "2026-06-15T02:37:13.407Z",
+            "lane": "unknown-packet"
+          }
+        ]
+      },
+      "termScan": [
+        {
+          "key": "sourceRef_pathmap",
+          "label": "sourceRef / pathmap spine",
+          "terms": [
+            "sourceRef",
+            "pathmap"
+          ],
+          "totalFiles": 158,
+          "termMatches": [
+            {
+              "term": "sourceRef",
+              "count": 153
+            },
+            {
+              "term": "pathmap",
+              "count": 37
+            }
+          ],
+          "sampleFiles": [
+            "./DOC-STATUS-AND-CONSOLIDATION-2026-05-20.md",
+            "./docs/architecture/llama-server-summary-cache-lane.md",
+            "./docs/atlas/feature-registry.json",
+            "./docs/reports/adaptive-schema-contract-reconciliation.json",
+            "./FEATURE-GOAL-LINE-CONSOLIDATION-2026-05-22.md",
+            "./package.json",
+            "./MASTER-FEATURE-TODO-2026-05-20.md",
+            "./next_steps/DAILY-TODO-2026-05-20-phased-execution.md",
+            "./reports/parent-atlas-open-lanes-todo.md",
+            "./reports/parent-atlas-workstation-todo.md",
+            "./scripts/feature-gap-registry-bootstrap.mjs",
+            "./scripts/packets/score-superseded-originals.mjs"
+          ]
+        },
+        {
+          "key": "parent_atlas",
+          "label": "parent atlas / packet flow",
+          "terms": [
+            "parent atlas",
+            "parent-atlas",
+            "packet flow"
+          ],
+          "totalFiles": 96,
+          "termMatches": [
+            {
+              "term": "parent atlas",
+              "count": 27
+            },
+            {
+              "term": "parent-atlas",
+              "count": 87
+            },
+            {
+              "term": "packet flow",
+              "count": 12
+            }
+          ],
+          "sampleFiles": [
+            "./MASTER-FEATURE-TODO-2026-05-20.md",
+            "./drizzle/manual/0032_parent_atlas_pageindex_topology_tables.sql",
+            "./reports/parent-atlas-workstation-todo.md",
+            "./reports/parent-atlas-open-lanes-todo.md",
+            "./docs/reports/feature-lineage-report.md",
+            "./scripts/atlas/audit-feature-lineage.mjs",
+            "./scripts/atlas/audit-runtime-coverage.mjs",
+            "./scripts/atlas/benchmark-retrieval-e2e.mjs",
+            "./scripts/atlas/chunk-rg-search-dumps.mjs",
+            "./docs/reports/parent-atlas-doc-indexing-2026-06-01.json",
+            "./docs/reports/parent-atlas-doc-indexing-2026-06-01.md",
+            "./scripts/atlas/locate-phase16-runtime-artifacts.mjs"
+          ]
+        },
+        {
+          "key": "llama_server_summary_cache",
+          "label": "llama-server summary cache / embeddings lane",
+          "terms": [
+            "llama-server",
+            "embeddinggemma",
+            "prompt cache",
+            "KV cache"
+          ],
+          "totalFiles": 72,
+          "termMatches": [
+            {
+              "term": "llama-server",
+              "count": 50
+            },
+            {
+              "term": "embeddinggemma",
+              "count": 37
+            },
+            {
+              "term": "prompt cache",
+              "count": 34
+            },
+            {
+              "term": "KV cache",
+              "count": 22
+            }
+          ],
+          "sampleFiles": [
+            "./CONTEXT-WINDOW-ALIGNMENT-ollama-turboquant-opencode-2026-05-20.md",
+            "./DOC-INDEX-runtime-graphrag-subgraphs-2026-05-19.md",
+            "./DOC-STATUS-AND-CONSOLIDATION-2026-05-20.md",
+            "./EXECUTION-CHECKLIST-2026-05-19.md",
+            "./FEATURE-GOAL-LINE-CONSOLIDATION-2026-05-22.md",
+            "./JSON-MAPPING-runtime-retrieval-master-2026-05-19.json",
+            "./MASTER-IMPLEMENTATION-LEDGER-runtime-graphrag-subgraphs-2026-05-19.md",
+            "./MASTER-FEATURE-TODO-2026-05-20.md",
+            "./MASTER-ROADMAP-codebase-runtime-graphrag-2026-05-19.md",
+            "./docs/architecture/llama-server-summary-cache-lane.md",
+            "./docs/atlas/parent-atlas-table-of-contents.md",
+            "./PATCH-CONTEXT-64K-REPO-FILES-2026-05-20.md"
+          ]
+        },
+        {
+          "key": "neo4j_contextual_trees",
+          "label": "Neo4j contextual trees / multi-hop traversal",
+          "terms": [
+            "neo4j",
+            "contextual tree",
+            "multi-hop"
+          ],
+          "totalFiles": 118,
+          "termMatches": [
+            {
+              "term": "neo4j",
+              "count": 112
+            },
+            {
+              "term": "contextual tree",
+              "count": 17
+            },
+            {
+              "term": "multi-hop",
+              "count": 22
+            }
+          ],
+          "sampleFiles": [
+            "./CODEBASE-MAP-docker-plugins-api-paths-2026-05-19.md",
+            "./CONTRACT-graph-refresh-manifest-schema-2026-05-19.md",
+            "./EXISTING-CODEBASE-MAPPING-AND-SUBGRAPH-VERSIONS-2026-05-19.md",
+            "./FEATURE-GOAL-LINE-CONSOLIDATION-2026-05-22.md",
+            "./JSON-MAPPING-runtime-retrieval-master-2026-05-19.json",
+            "./docs/reports/adaptive-schema-contract-reconciliation.json",
+            "./JSON-MAPPING-drizzle-postgres-qdrant-summaries-2026-05-19.json",
+            "./MASTER-FEATURE-TODO-2026-05-20.md",
+            "./docs/reports/agentic-recommendation-workflow.md",
+            "./docs/reports/agentic-recommendation-workflow.json",
+            "./JSON-MAPPING-service-mcp-api-paths-2026-05-19.json",
+            "./MASTER-ROADMAP-codebase-runtime-graphrag-2026-05-19.md"
+          ]
+        },
+        {
+          "key": "qdrant_semantic_analysis",
+          "label": "Qdrant semantic analysis / clustering",
+          "terms": [
+            "qdrant",
+            "semantic",
+            "cluster"
+          ],
+          "totalFiles": 292,
+          "termMatches": [
+            {
+              "term": "qdrant",
+              "count": 179
+            },
+            {
+              "term": "semantic",
+              "count": 146
+            },
+            {
+              "term": "cluster",
+              "count": 214
+            }
+          ],
+          "sampleFiles": [
+            "./CODEBASE-DIRECTORY-MAP-major-features-and-docs-2026-05-19.md",
+            "./CODEBASE-MAP-docker-plugins-api-paths-2026-05-19.md",
+            "./CONTRACT-codebase-to-glyph-adapter-2026-05-19.md",
+            "./CONTRACT-graph-refresh-manifest-schema-2026-05-19.md",
+            "./DOC-STATUS-AND-CONSOLIDATION-2026-05-20.md",
+            "./drizzle/manual/0048_higher_hop_identity_index_repair.sql",
+            "./drizzle/manual/0047_higher_hop_identity_index.sql",
+            "./drizzle/manual/0044_adaptive_schema_contract_repair.generated.sql",
+            "./JSON-MAPPING-autoencoder-som-libtorch-engram-2026-05-19.json",
+            "./IMPLEMENTATION-SPEC-mapreduce-duckdb-multihop-2026-05-19.md",
+            "./JSON-MAPPING-feature-labels-hyperparams-search-files-2026-05-19.json",
+            "./GAP-ANALYSIS-vs-next_steps-2026-05-19.md"
+          ]
+        },
+        {
+          "key": "redis_cache",
+          "label": "Redis / Bitfrost cache lane",
+          "terms": [
+            "redis",
+            "bitfrost",
+            "cache"
+          ],
+          "totalFiles": 253,
+          "termMatches": [
+            {
+              "term": "redis",
+              "count": 153
+            },
+            {
+              "term": "bitfrost",
+              "count": 35
+            },
+            {
+              "term": "cache",
+              "count": 209
+            }
+          ],
+          "sampleFiles": [
+            "./CODEBASE-MAP-docker-plugins-api-paths-2026-05-19.md",
+            "./CODEBASE-DIRECTORY-MAP-major-features-and-docs-2026-05-19.md",
+            "./CONTRACT-graph-refresh-manifest-schema-2026-05-19.md",
+            "./CONTRACT-retrieval-synthesis-config-2026-05-19.md",
+            "./DOC-INDEX-runtime-graphrag-subgraphs-2026-05-19.md",
+            "./drizzle/manual/0044_adaptive_schema_contract_repair.generated.sql",
+            "./docs/reports/adaptive-schema-contract-reconciliation.md",
+            "./docs/reports/adaptive-schema-contract-reconciliation.json",
+            "./JSON-MAPPING-runtime-retrieval-master-2026-05-19.json",
+            "./JSON-MAPPING-feature-labels-hyperparams-search-files-2026-05-19.json",
+            "./docs/atlas/feature-registry.json",
+            "./JSON-MAPPING-drizzle-postgres-qdrant-summaries-2026-05-19.json"
+          ]
+        },
+        {
+          "key": "ae_centroids",
+          "label": "AE centroids / TurboVec / SOM",
+          "terms": [
+            "turbovec",
+            "som",
+            "centroid"
+          ],
+          "totalFiles": 213,
+          "termMatches": [
+            {
+              "term": "turbovec",
+              "count": 74
+            },
+            {
+              "term": "som",
+              "count": 151
+            },
+            {
+              "term": "centroid",
+              "count": 102
+            }
+          ],
+          "sampleFiles": [
+            "./CODEBASE-MAP-docker-plugins-api-paths-2026-05-19.md",
+            "./DOC-STATUS-AND-CONSOLIDATION-2026-05-20.md",
+            "./FEATURE-GOAL-LINE-CONSOLIDATION-2026-05-22.md",
+            "./JSON-MAPPING-autoencoder-som-libtorch-engram-2026-05-19.json",
+            "./JSON-MAPPING-search-engine-language-stack-2026-05-19.json",
+            "./JSON-MAPPING-runtime-retrieval-master-2026-05-19.json",
+            "./JSON-MAPPING-feature-labels-hyperparams-search-files-2026-05-19.json",
+            "./package.json",
+            "./MASTER-FEATURE-TODO-2026-05-20.md",
+            "./REPO-NOTE-autoencoder-som-libtorch-engram-2026-05-19.md",
+            "./REPO-NOTE-runtime-retrieval-karpathy-clusters-2026-05-19.md",
+            "./next_steps/apply-deterministic-index-lanes.mjs"
+          ]
+        },
+        {
+          "key": "offline_processing",
+          "label": "offline processing / mapreduce / DuckDB",
+          "terms": [
+            "duckdb",
+            "mapreduce",
+            "offline"
+          ],
+          "totalFiles": 87,
+          "termMatches": [
+            {
+              "term": "duckdb",
+              "count": 60
+            },
+            {
+              "term": "mapreduce",
+              "count": 42
+            },
+            {
+              "term": "offline",
+              "count": 56
+            }
+          ],
+          "sampleFiles": [
+            "./CONTRACT-DuckDB-subgraph-schema-2026-05-19.md",
+            "./DOC-INDEX-runtime-graphrag-subgraphs-2026-05-19.md",
+            "./EXISTING-CODEBASE-MAPPING-AND-SUBGRAPH-VERSIONS-2026-05-19.md",
+            "./duckdb/smoke-duckdb.ps1",
+            "./docs/atlas/parent-atlas-table-of-contents.md",
+            "./duckdb/install-duckdb-cli.ps1",
+            "./docs/atlas/feature-registry.json",
+            "./MASTER-FEATURE-TODO-2026-05-20.md",
+            "./REPO-CONSOLIDATED-TODOS-feature-labels-clusters-2026-05-19.md",
+            "./JSON-MAPPING-runtime-retrieval-master-2026-05-19.json",
+            "./IMPLEMENTATION-SPEC-mapreduce-duckdb-multihop-2026-05-19.md",
+            "./next_steps/DAILY-TODO-2026-05-20-phased-execution.md"
+          ]
+        }
+      ]
+    },
+    "sourceFiles": {
+      "productionReadiness": {
+        "exists": true,
+        "path": "C:\\Users\\james\\Videos\\deeds-web-app\\docs\\reports\\parent-atlas-production-readiness-report.json"
+      },
+      "liveServiceEnv": {
+        "exists": true,
+        "path": "C:\\Users\\james\\Documents\\Codex\\2026-05-12\\ve-updated-the-local-quantization-notebook\\docs\\reports\\live-service-env-report.json"
+      },
+      "temporalTaskRegistry": {
+        "exists": true,
+        "path": "C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\docs\\reports\\temporal-task-registry-report.json"
+      },
+      "appLlmsRoute": {
+        "exists": true,
+        "path": "C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\src\\routes\\.well-known\\llms.txt\\+server.ts"
+      },
+      "appLlmsFullRoute": {
+        "exists": true,
+        "path": "C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\src\\routes\\.well-known\\llms-full.txt\\+server.ts"
+      },
+      "appPacketContractHelper": {
+        "exists": true,
+        "path": "C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\src\\lib\\server\\llms\\parent-atlas-agent-contract.ts"
+      },
+      "appPacketRpc": {
+        "exists": true,
+        "path": "C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\src\\lib\\server\\retrieval\\hyperrag-packet-rpc.ts"
+      },
+      "runtimeCoverage": {
+        "exists": true,
+        "path": "C:\\Users\\james\\Documents\\Codex\\2026-05-12\\ve-updated-the-local-quantization-notebook\\docs\\reports\\runtime-coverage-audit.json"
+      },
+      "replayTraceSummary": {
+        "exists": true,
+        "path": "C:\\Users\\james\\Documents\\Codex\\2026-05-12\\ve-updated-the-local-quantization-notebook\\docs\\reports\\replay-trace-summary.json"
+      },
+      "retrievalBenchmark": {
+        "exists": true,
+        "path": "C:\\Users\\james\\Documents\\Codex\\2026-05-12\\ve-updated-the-local-quantization-notebook\\docs\\reports\\retrieval-e2e-benchmark.json"
+      },
+      "bitfrostAudit": {
+        "exists": true,
+        "path": "C:\\Users\\james\\Documents\\Codex\\2026-05-12\\ve-updated-the-local-quantization-notebook\\docs\\reports\\bitfrost-semantic-cache-audit.json"
+      },
+      "bitfrostWarm": {
+        "exists": true,
+        "path": "C:\\Users\\james\\Documents\\Codex\\2026-05-12\\ve-updated-the-local-quantization-notebook\\docs\\reports\\bitfrost-semantic-cache-warm.json"
+      },
+      "qdrantTagMirror": {
+        "exists": true,
+        "path": "C:\\Users\\james\\Documents\\Codex\\2026-05-12\\ve-updated-the-local-quantization-notebook\\docs\\reports\\qdrant-tag-mirror-audit.json"
+      },
+      "sourceRefContextNeo4j": {
+        "exists": true,
+        "path": "C:\\Users\\james\\Documents\\Codex\\2026-05-12\\ve-updated-the-local-quantization-notebook\\docs\\reports\\sourceRef-context-neo4j-report.json"
+      },
+      "usedPacketEdgeSeed": {
+        "exists": true,
+        "path": "C:\\Users\\james\\Documents\\Codex\\2026-05-12\\ve-updated-the-local-quantization-notebook\\docs\\reports\\used-packet-edge-seed-report.json"
+      },
+      "redisCentroidMirror": {
+        "exists": true,
+        "path": "C:\\Users\\james\\Documents\\Codex\\2026-05-12\\ve-updated-the-local-quantization-notebook\\docs\\reports\\redis-centroid-mirror-wiring.json"
+      },
+      "agenticRecommendationWorkflow": {
+        "exists": true,
+        "path": "C:\\Users\\james\\Documents\\Codex\\2026-05-12\\ve-updated-the-local-quantization-notebook\\docs\\reports\\agentic-recommendation-workflow.json"
+      },
+      "repoFunctionRegistry": {
+        "exists": true,
+        "path": "C:\\Users\\james\\Documents\\Codex\\2026-05-12\\ve-updated-the-local-quantization-notebook\\docs\\reports\\repo-function-registry.json"
+      },
+      "mcpToolSummaryRegistry": {
+        "exists": true,
+        "path": "C:\\Users\\james\\Documents\\Codex\\2026-05-12\\ve-updated-the-local-quantization-notebook\\docs\\reports\\mcp-tool-summary-registry.json"
+      },
+      "higherHopEnrichment": {
+        "exists": true,
+        "path": "C:\\Users\\james\\Documents\\Codex\\2026-05-12\\ve-updated-the-local-quantization-notebook\\docs\\reports\\higher-hop-enrichment-report.json"
+      },
+      "higherHopSchemaRepair": {
+        "exists": true,
+        "path": "C:\\Users\\james\\Documents\\Codex\\2026-05-12\\ve-updated-the-local-quantization-notebook\\docs\\reports\\higher-hop-schema-repair-audit.json"
+      },
+      "postgresMirrors": {
+        "exists": true,
+        "path": "C:\\Users\\james\\Documents\\Codex\\2026-05-12\\ve-updated-the-local-quantization-notebook\\docs\\reports\\postgres-contract-mirrors-report.json"
+      },
+      "agentTraceMaturity": {
+        "exists": true,
+        "path": "C:\\Users\\james\\Documents\\Codex\\2026-05-12\\ve-updated-the-local-quantization-notebook\\docs\\reports\\agent-trace-data-maturity-report.json"
+      },
+      "artifactTiering": {
+        "exists": true,
+        "path": "C:\\Users\\james\\Documents\\Codex\\2026-05-12\\ve-updated-the-local-quantization-notebook\\docs\\reports\\artifact-tiering-report.json"
+      },
+      "turbovecPlan": {
+        "exists": true,
+        "path": "C:\\Users\\james\\Documents\\Codex\\2026-05-12\\ve-updated-the-local-quantization-notebook\\docs\\reports\\parent-atlas-turbovec-compression-plan.json"
+      },
+      "runtimePacketReaderWriter": {
+        "exists": true,
+        "path": "C:\\Users\\james\\Documents\\Codex\\2026-05-12\\ve-updated-the-local-quantization-notebook\\docs\\reports\\neschrom97-packet-reader-writer-report.json"
+      },
+      "runtimeLdjsonBatch": {
+        "exists": true,
+        "path": "C:\\Users\\james\\Documents\\Codex\\2026-05-12\\ve-updated-the-local-quantization-notebook\\docs\\reports\\neschrom97-ldjson-batch-report.json"
+      },
+      "runtimeCardsMaterialization": {
+        "exists": true,
+        "path": "C:\\Users\\james\\Documents\\Codex\\2026-05-12\\ve-updated-the-local-quantization-notebook\\docs\\reports\\neschrom97-cards-ldjson-materialization-report.json"
+      },
+      "board": {
+        "exists": true,
+        "path": "C:\\Users\\james\\Documents\\Codex\\2026-05-12\\ve-updated-the-local-quantization-notebook\\reports\\parent-atlas-open-lanes-todo.md"
+      },
+      "workstationTodo": {
+        "exists": true,
+        "path": "C:\\Users\\james\\Documents\\Codex\\2026-05-12\\ve-updated-the-local-quantization-notebook\\reports\\parent-atlas-workstation-todo.md"
+      },
+      "parentAtlasDocIndex": {
+        "exists": true,
+        "path": "C:\\Users\\james\\Documents\\Codex\\2026-05-12\\ve-updated-the-local-quantization-notebook\\docs\\reports\\parent-atlas-doc-indexing-2026-06-01.json"
+      }
     }
-  ],
-  "progress": {
-    "taskRegistryCompletionPct": 0,
-    "productionReadinessPct": 98,
-    "memoryExportsCompletionPct": 100
   },
-  "routeRuntimePackets": {
-    "total": 1,
-    "cacheHits": 0,
-    "cacheHitPct": 0,
-    "lowContextDensity": 1,
-    "avgLatencyMs": 45,
-    "topSourceRefs": [
-      {
-        "source_ref": "smoke-source-ref",
-        "hits": 1
-      }
+  "briefing": {
+    "greeting": "Hello James.",
+    "sinceLastWorked": {
+      "tasksOpen": 0,
+      "tasksClosed": 22,
+      "newRecommendations": 22,
+      "productionReadiness": "PASS 66 / WARN 0 / FAIL 0"
+    },
+    "systems": {
+      "postgres": "healthy",
+      "redis": "healthy",
+      "qdrant": "healthy",
+      "neo4j": "healthy",
+      "goRetrievalHttp": "READY",
+      "goRetrievalGrpc": "READY",
+      "goRetrievalTelemetry": "READY",
+      "packetContract": "wired",
+      "turbovec": "deferred",
+      "bitfrost": "PASS",
+      "bitfrostWarm": "applied",
+      "redisMirror": "PASS",
+      "runtimeEvidence": "materialized",
+      "ldjson": "96.2%",
+      "repoFunctionRegistry": "indexed (1479 rows)",
+      "mcpToolSummaryRegistry": "summarized (87 groups)",
+      "validationQuality": "materialized",
+      "registryTopFeatureIds": [
+        "feature.agent.opencode"
+      ],
+      "registryTopKinds": [
+        {
+          "kind": "function",
+          "count": 892
+        },
+        {
+          "kind": "doc_topic",
+          "count": 371
+        },
+        {
+          "kind": "cli_command",
+          "count": 125
+        }
+      ]
+    },
+    "recommendations": [
+      "With the Qdrant tag mirror applied, move to the Neo4j / GDS topology pass until graph scores, community labels, and sourceRef projection are fully applied.",
+      "The Neo4j sourceRef projection is now applied; move to SOM 20x20 / auto-clustering once the graph lane is stable.",
+      "Warm the Bitfrost semantic cache from canonical Postgres rows before treating mirrors as runtime truth.",
+      "With Redis centroid and Bitfrost warm lanes applied, move retrieval work toward HyperRAG fusion rather than more cache mirroring.",
+      "Keep runtime evidence packetization on the admin-side path: turn Playwright, dev:gpu output, server logs, and cache events into chrom97 packets before Gemma4 synthesis."
     ],
-    "topFeatures": [
-      {
-        "feature_id": "smoke-feature",
-        "hits": 1
-      }
-    ]
-  },
-  "repoConsolidation": {
-    "canonicalProductionTables": 1,
-    "productionReadyCodePaths": 5,
-    "plannedProduction": 11,
-    "archiveCandidates": 3,
-    "experimental": 8
-  },
-  "repoFunctionRegistry": {
-    "totalRows": 133,
-    "codePaths": 5,
-    "mcpTools": 128,
-    "routeRuntimePackets": 1,
-    "cacheHitPct": 0,
-    "lowContextDensity": 1
-  },
-  "warnings": [
-    "Engram embed is stdio-only; TCP probes to 8792 are not the contract."
-  ],
-  "recommendations": [
-    "Concept evidence spine repair",
-    "Higher-hop enrichment audit / backfill",
-    "Recommendation merge audit",
-    "Feature not implemented: Priority 1: Evidence Upload UI (1 hour)",
-    "Feature not implemented: Priority 2: VLM POI Integration (90 min)",
-    "Feature not implemented: Priority 3: Audit Dashboard Web UI (3-4 hours)"
-  ],
-  "openLaneOrder": [
-    "Concept evidence spine repair",
-    "Higher-hop enrichment audit / backfill",
-    "Recommendation merge audit",
-    "Artifact bloat audit",
-    "Engram / Gemma4 memory wiring",
-    "Parent Atlas overlay sync",
-    "Atlas / NESCHR97 directory mapping and cold storage",
-    "Feature-gap registry completion",
-    "Graph / KAG / DAG refresh manifest",
-    "PyTorch / LibTorch feature extraction lane"
-  ],
-  "toolRegistry": {
-    "path": "C:\\Users\\james\\Videos\\deeds-web-app\\docs\\reports\\mcp-tool-registry-index.json",
-    "totalTools": 128,
-    "activeLayers": [
-      "identity",
-      "memory",
-      "cache",
-      "lexical",
-      "dense",
-      "graph",
-      "rerank",
-      "synthesis",
-      "ops",
-      "read",
-      "unknown"
-    ],
-    "topLayers": [
-      {
-        "layer": "identity",
-        "count": 2,
-        "top": [
-          "atlas.source_refs",
-          "atlas.query"
+    "nextLane": "SOM 20x20 / auto-clustering",
+    "notes": {
+      "indexingMode": "static-plus-temporal-refresh",
+      "staticPacketIndexing": true,
+      "runtimeCoverageStatus": "HIGHER_HOP_ENRICHMENT_PENDING",
+      "higherHopStatus": "HIGHER_HOP_GAP",
+      "higherHopSchemaRepairStatus": "COMPLETE",
+      "packetContractStatus": "wired",
+      "packetContractAceHitFields": {
+        "packetType": true,
+        "canonicalSourceRef": true,
+        "recommendedAction": true,
+        "verificationCommand": true
+      },
+      "liveServiceEnvStatus": "READY",
+      "goRetrievalHttpStatus": "READY",
+      "goRetrievalGrpcStatus": "READY",
+      "goRetrievalTelemetryCounts": {
+        "READY": 2,
+        "ENV_MISMATCH": 0,
+        "PORT_MISMATCH": 0,
+        "SERVICE_STOPPED": 0,
+        "AUTH_REQUIRED": 0,
+        "SOURCE_UNAVAILABLE": 0
+      },
+      "higherHopSchemaRepairBlockingFields": [],
+      "temporalTaskRegistry": null,
+      "bitfrostAuditStatus": "PASS",
+      "bitfrostWarmAppliedWrites": 125,
+      "redisCentroidMirrorStatus": "PASS",
+      "runtimeEvidencePacketizationStatus": "materialized",
+      "runtimeEvidencePacketizationCoveragePct": 100,
+      "repoFunctionRegistryTotalRows": 1479,
+      "repoFunctionRegistryCountsByKind": {
+        "function": 892,
+        "doc_topic": 371,
+        "cli_command": 125,
+        "mcp_tool": 91
+      },
+      "repoFunctionRegistryPrimaryFeatureId": "feature.agent.opencode",
+      "repoFunctionRegistryTopKinds": [
+        {
+          "kind": "function",
+          "count": 892
+        },
+        {
+          "kind": "doc_topic",
+          "count": 371
+        },
+        {
+          "kind": "cli_command",
+          "count": 125
+        }
+      ],
+      "mcpToolSummaryRegistryTotalSummaries": 87,
+      "mcpToolSummaryRegistryPrimaryFeatureId": "feature.synthesis.gemma4",
+      "mcpToolSummaryRegistryPrimarySummary": "<|channel>thought\nThe user wants me to summarize indexed repository packets for `feature_id=feature.synthesis.gemma4`.\nI must:\n1.  Only summarize the provided rows.\n2.  Do not generalize beyond the provided rows.\n3.  Prefer `source_ref`, `feature_id`, `file_path`, and `copy_merge_use` in the output structure (though `copy_merge_use` is not provided, I will focus on the core operational summary).\n4.  Return concise operational summaries, keeping the focus on merging/synthesis.\n\nAnalyzing the rows:\n\n*   **Row 1:** `scripts/atlas/agentic-recommendation-workflow.mjs` - `normalizeSummaryText` (Synthesis/Recommendation workflow).\n*   **Row 2:** `scripts/atlas/agentic-recommendation-workflow.mjs` - `summarizeInputPresence` (Synthesis/Recommendation workflow).\n*   **Row 3:** `scripts/atlas/audit-agent-trace-data-maturity.mjs` - `classify` (Synthesis/Audit/Data Maturity).\n*   **Row 4:** `scripts/atlas/audit-agent-trace-data-maturity.mjs` - `summarizeQlorA` (Synthesis/Audit/Data Maturity).\n*   **Row 5:** `scripts/atlas/audit-agent-trace-data-maturity.mjs` - `summarizeTraceSmoke` (Synthesis/Audit/Data Maturity).\n\nI will structure the summary by file/module, detailing the functions and their purpose in a merge-focused way.<channel|>**Operational Summary for `feature.synthesis.gemma4`**\n\n**`scripts/atlas/agentic-recommendation-workflow.mjs`**\n*   **`normalizeSummaryText`**: Function for normalizing summary text within the agentic recommendation workflow.\n*   **`summarizeInputPresence`**: Function designed to summarize input presence within the agentic recommendation workflow.\n\n**`scripts/atlas/audit-agent-trace-data-maturity.mjs`**\n*   **`classify`**: Function used for classification within the audit agent trace data maturity process.\n*   **`summarizeQlorA`**: Function to summarize QlorA data within the audit agent trace data maturity process.\n*   **`summarizeTraceSmoke`**: Function to summarize trace data within the audit agent trace data maturity process.",
+      "validationQualityStatus": {
+        "replayTrace": "pass_with_warnings",
+        "retrievalBenchmark": "pass_with_warnings"
+      },
+      "validationQualityReplayTrace": {
+        "exists": true,
+        "generatedAt": "2026-06-19T22:37:28.328Z",
+        "status": "pass_with_warnings",
+        "queryCount": 50,
+        "coverage": {
+          "qdrantHitPct": "100.0%",
+          "cacheHitPct": "0.0%",
+          "packetKeyPct": "100.0%",
+          "featureIdPct": "100.0%",
+          "sourceRefPct": "100.0%"
+        },
+        "latency": {
+          "totalP50": 4213,
+          "totalP95": 6392,
+          "bm25P50": 280,
+          "bm25P95": 737,
+          "qdrantP50": 63,
+          "qdrantP95": 351,
+          "redisP50": 5,
+          "redisP95": 14,
+          "neo4jP50": 0,
+          "neo4jP95": 1,
+          "fusionP50": 4131,
+          "fusionP95": 5912
+        },
+        "top": {
+          "packetKey": "src/lib/webgpu/compute-shader-engine.ts:3ad3d4351aa885ec",
+          "sourceRef": "src/lib/webgpu/compute-shader-engine.ts",
+          "featureId": "atlas-context",
+          "domainClass": "rag_retrieval",
+          "cacheHitSource": null,
+          "fusionScore": 0.102226
+        }
+      },
+      "validationQualityRetrievalBenchmark": {
+        "exists": true,
+        "generatedAt": "2026-06-19T22:33:22.219Z",
+        "status": "pass_with_warnings",
+        "queryCount": 50,
+        "latency": {
+          "totalP50": 4213,
+          "totalP95": 6392,
+          "qdrantP50": 63,
+          "qdrantP95": 351,
+          "postgresP50": 280,
+          "postgresP95": 737,
+          "neo4jP50": 0,
+          "neo4jP95": 1,
+          "redisP50": 5,
+          "redisP95": 14,
+          "gpuP50": 0,
+          "gpuP95": 3,
+          "answerP50": 3935,
+          "answerP95": 5270
+        },
+        "gates": {
+          "allQdrantHits": true,
+          "allLedgerMatches": false,
+          "allAnswered": true,
+          "degradedQueries": 50,
+          "replayQueries": 50
+        },
+        "services": {
+          "qdrant": "healthy",
+          "traceMcp": "healthy",
+          "postgres": "healthy"
+        },
+        "errors": [
+          "one_or_more_queries_missed_ledger_matches"
         ]
       },
-      {
-        "layer": "memory",
-        "count": 1,
-        "top": [
-          "engram.chat_memory_recent"
-        ]
-      },
-      {
-        "layer": "cache",
-        "count": 12,
-        "top": [
-          "ace.compact_search",
-          "wiki.search",
-          "wiki.status"
-        ]
-      },
-      {
-        "layer": "lexical",
-        "count": 6,
-        "top": [
-          "search.go_hybrid",
-          "kag.recall_similar_fix",
-          "legal.find_similar_opinions"
-        ]
-      },
-      {
-        "layer": "dense",
-        "count": 14,
-        "top": [
-          "atlas:packet_search",
-          "atlas.packet_search",
-          "image.enrich_tags"
-        ]
-      },
-      {
-        "layer": "graph",
-        "count": 23,
-        "top": [
-          "kag.feature_lookup",
-          "trace.graphrag_search",
-          "graph.semantic_path_synthesis"
-        ]
-      },
-      {
-        "layer": "rerank",
-        "count": 2,
-        "top": [
-          "search.rerank",
-          "turbovec.rank_chunks"
-        ]
-      },
-      {
-        "layer": "synthesis",
-        "count": 15,
-        "top": [
-          "legal.build_timeline",
-          "legal.cross_examine",
-          "legal.issue_spotter"
-        ]
-      },
-      {
-        "layer": "ops",
-        "count": 7,
-        "top": [
-          "ops.gpu_pipeline_stats",
-          "ops.gpu_topk",
-          "ops.execute_graphify"
-        ]
-      },
-      {
-        "layer": "read",
-        "count": 5,
-        "top": [
-          "atlas.get_chunk",
-          "file.read_window",
-          "kb.wiki_note_lookup"
-        ]
-      }
-    ],
-    "canonicalPickup": [
-      {
-        "name": "ace",
-        "query": "ace bitfrost redis semantic cache dense retrieval",
-        "tools": [
-          {
-            "tool_name": "ace.compact_search",
-            "primary_layer": "cache",
-            "score": 430,
-            "source_ref": "ace.compact_search"
-          },
-          {
-            "tool_name": "wiki.search",
-            "primary_layer": "cache",
-            "score": 388,
-            "source_ref": "wiki.search"
-          },
-          {
-            "tool_name": "wiki.status",
-            "primary_layer": "cache",
-            "score": 388,
-            "source_ref": "wiki.status"
-          },
-          {
-            "tool_name": "ops.fixer_semantic_recall",
-            "primary_layer": "cache",
-            "score": 370,
-            "source_ref": "ops.fixer_semantic_recall"
-          },
-          {
-            "tool_name": "legal.check_services",
-            "primary_layer": "cache",
-            "score": 320,
-            "source_ref": "legal.check_services"
-          }
-        ]
-      },
-      {
-        "name": "kag",
-        "query": "kag source refs feature lookup lexical search",
-        "tools": [
-          {
-            "tool_name": "ace.compact_search",
-            "primary_layer": "cache",
-            "score": 372,
-            "source_ref": "ace.compact_search"
-          },
-          {
-            "tool_name": "wiki.search",
-            "primary_layer": "cache",
-            "score": 350,
-            "source_ref": "wiki.search"
-          },
-          {
-            "tool_name": "wiki.status",
-            "primary_layer": "cache",
-            "score": 350,
-            "source_ref": "wiki.status"
-          },
-          {
-            "tool_name": "atlas:packet_search",
-            "primary_layer": "dense",
-            "score": 324,
-            "source_ref": "atlas:packet_search"
-          },
-          {
-            "tool_name": "atlas.packet_search",
-            "primary_layer": "dense",
-            "score": 324,
-            "source_ref": "atlas.packet_search"
-          }
-        ]
-      },
-      {
-        "name": "dag",
-        "query": "dag graph topology neighborhood path expansion",
-        "tools": [
-          {
-            "tool_name": "ace.compact_search",
-            "primary_layer": "cache",
-            "score": 390,
-            "source_ref": "ace.compact_search"
-          },
-          {
-            "tool_name": "wiki.search",
-            "primary_layer": "cache",
-            "score": 378,
-            "source_ref": "wiki.search"
-          },
-          {
-            "tool_name": "wiki.status",
-            "primary_layer": "cache",
-            "score": 378,
-            "source_ref": "wiki.status"
-          },
-          {
-            "tool_name": "atlas:packet_search",
-            "primary_layer": "dense",
-            "score": 332,
-            "source_ref": "atlas:packet_search"
-          },
-          {
-            "tool_name": "atlas.packet_search",
-            "primary_layer": "dense",
-            "score": 332,
-            "source_ref": "atlas.packet_search"
-          }
-        ]
-      },
-      {
-        "name": "gemma4",
-        "query": "gemma4 summarize synthesis agent output",
-        "tools": [
-          {
-            "tool_name": "ace.compact_search",
-            "primary_layer": "cache",
-            "score": 350,
-            "source_ref": "ace.compact_search"
-          },
-          {
-            "tool_name": "ops.fixer_semantic_recall",
-            "primary_layer": "cache",
-            "score": 340,
-            "source_ref": "ops.fixer_semantic_recall"
-          },
-          {
-            "tool_name": "wiki.search",
-            "primary_layer": "cache",
-            "score": 338,
-            "source_ref": "wiki.search"
-          },
-          {
-            "tool_name": "wiki.status",
-            "primary_layer": "cache",
-            "score": 338,
-            "source_ref": "wiki.status"
-          },
-          {
-            "tool_name": "atlas:packet_search",
-            "primary_layer": "dense",
-            "score": 300,
-            "source_ref": "atlas:packet_search"
-          }
-        ]
-      },
-      {
-        "name": "opencode",
-        "query": "opencode startup tool routing agent bootstrap",
-        "tools": [
-          {
-            "tool_name": "ace.compact_search",
-            "primary_layer": "cache",
-            "score": 350,
-            "source_ref": "ace.compact_search"
-          },
-          {
-            "tool_name": "wiki.search",
-            "primary_layer": "cache",
-            "score": 350,
-            "source_ref": "wiki.search"
-          },
-          {
-            "tool_name": "wiki.status",
-            "primary_layer": "cache",
-            "score": 350,
-            "source_ref": "wiki.status"
-          },
-          {
-            "tool_name": "ops.fixer_semantic_recall",
-            "primary_layer": "cache",
-            "score": 322,
-            "source_ref": "ops.fixer_semantic_recall"
-          },
-          {
-            "tool_name": "atlas:packet_search",
-            "primary_layer": "dense",
-            "score": 304,
-            "source_ref": "atlas:packet_search"
-          }
-        ]
-      },
-      {
-        "name": "hyperrag",
-        "query": "hyperrag dense search bm25 rrf turbovec qdrant neo4j",
-        "tools": [
-          {
-            "tool_name": "wiki.status",
-            "primary_layer": "cache",
-            "score": 388,
-            "source_ref": "wiki.status"
-          },
-          {
-            "tool_name": "ace.compact_search",
-            "primary_layer": "cache",
-            "score": 380,
-            "source_ref": "ace.compact_search"
-          },
-          {
-            "tool_name": "wiki.search",
-            "primary_layer": "cache",
-            "score": 378,
-            "source_ref": "wiki.search"
-          },
-          {
-            "tool_name": "ops.fixer_semantic_recall",
-            "primary_layer": "cache",
-            "score": 342,
-            "source_ref": "ops.fixer_semantic_recall"
-          },
-          {
-            "tool_name": "atlas:packet_search",
-            "primary_layer": "dense",
-            "score": 332,
-            "source_ref": "atlas:packet_search"
-          }
-        ]
-      }
-    ]
-  },
-  "nextLane": "Concept evidence spine repair"
+      "agenticRecommendationWorkflowStatus": "DRY_RUN_READY",
+      "turbovecPlanStatus": "READY"
+    }
+  }
 }

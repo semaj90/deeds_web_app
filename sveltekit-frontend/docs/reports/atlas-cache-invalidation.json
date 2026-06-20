@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-06-19T05:22:32.846Z",
+  "timestamp": "2026-06-20T16:31:25.886Z",
   "mode": "apply",
   "redis_config": {
     "host": "127.0.0.1",
@@ -8,15 +8,15 @@
   "operations": [
     {
       "name": "INCR atlas:graph_version",
-      "result": 1
+      "result": 2
     },
     {
       "name": "INCR atlas:cache_epoch",
-      "result": 1
+      "result": 2
     },
     {
       "name": "DEL atlas:lru:query:*",
-      "keys_deleted": 0,
+      "keys_deleted": 5,
       "applied": true
     },
     {
@@ -41,12 +41,12 @@
     },
     {
       "name": "DEL bifrost:sem:packet:*",
-      "keys_deleted": 25,
+      "keys_deleted": 0,
       "applied": true
     },
     {
       "name": "DEL bifrost:sem:feature:*",
-      "keys_deleted": 8,
+      "keys_deleted": 0,
       "applied": true
     },
     {
@@ -56,19 +56,11 @@
     },
     {
       "name": "DEL ace:packet:*",
-      "keys_deleted": 500,
+      "keys_deleted": 19,
       "applied": true
     }
   ],
   "versions_before": {
-    "graph_version": 0,
-    "cache_epoch": 0,
-    "qdrant_version": 1,
-    "rpc_version": 1,
-    "som_version": 0,
-    "kmeans_version": 0
-  },
-  "versions_after": {
     "graph_version": 1,
     "cache_epoch": 1,
     "qdrant_version": 1,
@@ -76,17 +68,25 @@
     "som_version": 0,
     "kmeans_version": 0
   },
+  "versions_after": {
+    "graph_version": 2,
+    "cache_epoch": 2,
+    "qdrant_version": 1,
+    "rpc_version": 1,
+    "som_version": 0,
+    "kmeans_version": 0
+  },
   "keys_deleted": {
-    "atlas:lru:query:*": 0,
+    "atlas:lru:query:*": 5,
     "atlas:lru:packet:*": 0,
     "atlas:lru:tools:*": 0,
     "atlas:lru:kag:*": 0,
     "bifrost:sem:query:*": 0,
-    "bifrost:sem:packet:*": 25,
-    "bifrost:sem:feature:*": 8,
+    "bifrost:sem:packet:*": 0,
+    "bifrost:sem:feature:*": 0,
     "bifrost:sem:intent:*": 0,
-    "ace:packet:*": 500
+    "ace:packet:*": 19
   },
-  "total_latency_ms": 6387,
+  "total_latency_ms": 5591,
   "status": "applied"
 }

@@ -28,6 +28,11 @@ import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import Redis from 'ioredis';
 import pg from 'pg';
+import {
+  loadRepoEnv,
+  resolveDatabaseUrl,
+  resolveRedisConfig as resolveSharedRedisConfig,
+} from './connection-config.mjs';
 
 const __dir = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dir, '../..');
@@ -63,13 +68,6 @@ const REPORT_PATH = path.join(
   USE_CACHE ? 'gemma4-parent-atlas-summary-cache-report.json' : 'gemma4-parent-atlas-summary-report.json'
 );
 
-if (USE_CACHE) {
-  process.env.LOCAL_OPENAI_BASE_URL ??= 'http://127.0.0.1:8090/v1';
-  process.env.LOCAL_OPENAI_API_KEY ??= 'local';
-  process.env.LOCAL_GEMMA_MODEL ??= 'gemma4-rotorquant:latest';
-  process.env.OLLAMA_EMBED_BASE_URL ??= 'http://127.0.0.1:8081';
-}
-
 const SKIP_EXTENSIONS = new Set([
   '.min.js', '.min.css', '.gguf', '.bin', '.png', '.jpg', '.jpeg', '.webp',
   '.gif', '.ico', '.woff', '.woff2', '.ttf', '.eot', '.mp4', '.mp3',
@@ -86,36 +84,37 @@ function isVendor(ref) {
     ref.includes('/dist-info/') || ref.includes('/site-packages/');
 }
 
-function loadEnv() {
-  for (const p of [
-    path.join(ROOT, 'sveltekit-frontend', '.env.local'),
-    path.join(ROOT, 'sveltekit-frontend', '.env'),
-    path.join(ROOT, '.env.local'),
-    path.join(ROOT, '.env'),
-  ]) {
-    if (!fs.existsSync(p)) continue;
-    for (const line of fs.readFileSync(p, 'utf8').split('\n')) {
-      const m = line.trimEnd().match(/^([A-Z_][A-Z0-9_]*)=(.*)$/);
-      if (m && !process.env[m[1]]) process.env[m[1]] = m[2].replace(/^["']|["']$/g, '');
-    }
-  }
+function resolveLlamaModel(env) {
+  const explicit = String(env.LOCAL_GEMMA_MODEL ?? env.LLAMA_MODEL ?? env.TURBOQUANT_MODEL ?? '').trim();
+  if (explicit && !/^gemma4-rotorquant(?::latest)?$/i.test(explicit)) return explicit;
+  const modelPath = String(
+    env.ROTORQUANT_MODEL_PATH ??
+    env.TURBO_MODEL_PATH ??
+    env.TURBOQUANT_MODEL_PATH ??
+    '',
+  ).trim();
+  if (modelPath) return path.basename(modelPath);
+  return 'gemma4-legal-iq4xs-direct.gguf';
 }
-loadEnv();
 
-const DATABASE_URL = process.env.DATABASE_URL
-  ?? 'postgresql://legal_admin:123456@127.0.0.1:5434/legal_ai_db';
-const REDIS_CONFIG = resolveRedisConfig();
+const ENV = loadRepoEnv(process.env);
+Object.assign(process.env, ENV);
+process.env.LOCAL_OPENAI_BASE_URL ??= 'http://127.0.0.1:8090/v1';
+process.env.LOCAL_OPENAI_API_KEY ??= 'local';
+process.env.LOCAL_GEMMA_MODEL = resolveLlamaModel(ENV);
+process.env.OLLAMA_EMBED_BASE_URL ??= 'http://127.0.0.1:11434';
+
+const DATABASE_URL = resolveDatabaseUrl(ENV);
+const REDIS_CONFIG = resolveSharedRedisConfig(ENV);
 const REDIS_URL = `redis://${REDIS_CONFIG.host}:${REDIS_CONFIG.port}`;
 const REDIS_PASSWORD = REDIS_CONFIG.password;
 const EMBED_BASE_URL = String(process.env.OLLAMA_EMBED_BASE_URL ?? 'http://127.0.0.1:8081').replace(/\/+$/, '');
 const EMBED_MODEL = process.env.OLLAMA_EMBED_MODEL ?? 'embeddinggemma:latest';
 
 // ── LLM endpoint config ──────────────────────────────────────────────────────
-// Prefer TurboQuant llama-server (OpenAI compat) → fallback Ollama
+// Chat/summarization is llama-server only. Ollama remains embedding-only.
 const TURBO_PORT = process.env.TURBO_PORT ?? '8090';
 const TURBO_URL = `http://127.0.0.1:${TURBO_PORT}/v1/chat/completions`;
-const OLLAMA_URL = `http://127.0.0.1:11434/api/chat`;
-const OLLAMA_MODEL = process.env.EMBED_MODEL_CHAT ?? 'gemma4:latest';
 
 let llmMode = 'unknown';
 let phase101CacheModulePromise = null;
@@ -137,6 +136,26 @@ function summaryTextOrFallback(input) {
 
 function isNonEmptyText(input) {
   return String(input ?? '').trim().length > 0;
+}
+
+function cleanModelText(input) {
+  let text = String(input ?? '').trim();
+  const finalMarker = '<|channel>final';
+  const finalIndex = text.lastIndexOf(finalMarker);
+  if (finalIndex >= 0) text = text.slice(finalIndex + finalMarker.length).trim();
+  text = text
+    .replace(/<\|channel>(?:analysis|thought|final)/gi, '')
+    .replace(/<\|(?:start|end|message)>.*/gi, '')
+    .replace(/^```(?:json)?\s*/i, '')
+    .replace(/\s*```$/i, '')
+    .trim();
+  if (/^Thinking Process:/i.test(text)) return '';
+  return text;
+}
+
+function isUsableSummary(input) {
+  const text = cleanModelText(input);
+  return text.length >= 20 && !/<\|channel>/i.test(text);
 }
 
 function buildSourceRefSummary(row, snippet) {
@@ -168,53 +187,10 @@ function buildPacketSummary(packet, rawText, synthesis, row, snippet) {
     buildSourceRefSummary(row, snippet),
   ];
   for (const candidate of candidates) {
-    const text = String(candidate ?? '').trim();
+    const text = cleanModelText(candidate);
     if (text) return text.slice(0, 1000);
   }
   return '';
-}
-
-function normalizeRedisUrl(rawValue, fallbackHost = '127.0.0.1', fallbackPort = '6379') {
-  const raw = String(rawValue ?? '').trim();
-  if (!raw) return `redis://${fallbackHost}:${fallbackPort}`;
-  if (/^rediss?:\/\//i.test(raw)) return raw;
-  if (/^[^:/?#]+:\d+(?:\/\d+)?$/.test(raw)) {
-    const [hostPort, dbPart] = raw.split('/', 2);
-    const [host, port] = hostPort.split(':', 2);
-    return `redis://${host || fallbackHost}:${port || fallbackPort}${dbPart ? `/${dbPart}` : ''}`;
-  }
-  if (/^[^:/?#]+$/.test(raw)) {
-    return `redis://${raw}:${fallbackPort}`;
-  }
-  return `redis://${fallbackHost}:${fallbackPort}`;
-}
-
-function normalizeRedisHost(rawValue, fallbackHost = '127.0.0.1') {
-  const raw = String(rawValue ?? '').trim();
-  if (!raw || raw === '0.0.0.0') return fallbackHost;
-  return raw;
-}
-
-function resolveRedisConfig() {
-  const rawUrl = String(process.env.REDIS_URL ?? '').trim();
-  let urlHost = '';
-  let urlPort = '';
-  let urlPassword = '';
-  if (rawUrl) {
-    try {
-      const parsed = new URL(normalizeRedisUrl(rawUrl));
-      urlHost = parsed.hostname;
-      urlPort = parsed.port;
-      urlPassword = parsed.password ? decodeURIComponent(parsed.password) : '';
-    } catch {
-      // fall through to host/port envs
-    }
-  }
-
-  const host = normalizeRedisHost(process.env.REDIS_HOST ?? urlHost ?? '127.0.0.1');
-  const port = Number(process.env.REDIS_PORT ?? urlPort ?? 6379) || 6379;
-  const password = (process.env.REDIS_PASSWORD?.trim() || urlPassword || undefined);
-  return { host, port, password };
 }
 
 async function loadPhase101CacheModule() {
@@ -488,32 +464,22 @@ async function fetchGemma4Summary(row, cacheText) {
       max_tokens: 450,
       stream: false,
       cache_prompt: true,
+      chat_template_kwargs: { enable_thinking: false },
     }),
     signal: AbortSignal.timeout(90_000),
   });
   if (!r.ok) throw new Error(`llama-server HTTP ${r.status}`);
   const data = await r.json();
-  const text = String(data?.choices?.[0]?.message?.content ?? '').trim();
-  return text;
+  return cleanModelText(data?.choices?.[0]?.message?.content);
 }
 
 async function detectLLM() {
-  // Try TurboQuant llama-server first
   try {
     const r = await fetch(`http://127.0.0.1:${TURBO_PORT}/health`, {
       signal: AbortSignal.timeout(2000),
     });
     if (r.ok) { llmMode = 'turboquant'; return; }
   } catch {}
-
-  // Try Ollama
-  try {
-    const r = await fetch('http://127.0.0.1:11434/api/tags', {
-      signal: AbortSignal.timeout(2000),
-    });
-    if (r.ok) { llmMode = 'ollama'; return; }
-  } catch {}
-
   llmMode = 'unavailable';
 }
 
@@ -523,7 +489,7 @@ async function callLLM(prompt) {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        model: 'gemma4',
+        model: process.env.LOCAL_GEMMA_MODEL,
         messages: [{ role: 'user', content: prompt }],
         max_tokens: 150,
         temperature: 0.1,
@@ -536,24 +502,7 @@ async function callLLM(prompt) {
     return data.choices?.[0]?.message?.content?.trim() ?? '';
   }
 
-  if (llmMode === 'ollama') {
-    const r = await fetch(OLLAMA_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        model: OLLAMA_MODEL,
-        messages: [{ role: 'user', content: prompt }],
-        stream: false,
-        options: { num_predict: 150, temperature: 0.1 },
-      }),
-      signal: AbortSignal.timeout(30000),
-    });
-    if (!r.ok) throw new Error(`Ollama HTTP ${r.status}`);
-    const data = await r.json();
-    return data.message?.content?.trim() ?? '';
-  }
-
-  throw new Error('No LLM available (TurboQuant + Ollama both unreachable)');
+  throw new Error('No llama-server chat backend available on port 8090');
 }
 
 // ── Read first N lines of a file ─────────────────────────────────────────────
@@ -782,10 +731,22 @@ async function processOne(row, pool, dryRun, cacheRedis) {
       llamaCalled = generation.cache === 'miss';
     }
 
-    if (APPLY && !isNonEmptyText(packet?.summary)) {
+    if (APPLY && !isUsableSummary(packet?.summary)) {
+      const regeneratedText = cleanModelText(await fetchGemma4Summary(row, cacheText).catch(() => ''));
+      const regeneratedJson = safeParseJson(regeneratedText);
+      const regeneratedSynthesis = regeneratedJson?.synthesis && typeof regeneratedJson.synthesis === 'object'
+        ? regeneratedJson.synthesis
+        : null;
       const fallbackSummary = buildSourceRefSummary(row, snippet);
-      const fallbackSynthesis = {
-        mainThemes: [fallbackSummary],
+      const cleanSummary = buildPacketSummary(
+        null,
+        regeneratedText,
+        regeneratedSynthesis,
+        row,
+        snippet,
+      ) || fallbackSummary;
+      const fallbackSynthesis = regeneratedSynthesis ?? {
+        mainThemes: [cleanSummary],
         supportingEvidence: [],
         gaps: [],
         contradictions: [],
@@ -794,9 +755,9 @@ async function processOne(row, pool, dryRun, cacheRedis) {
       };
       packet = {
         ...packet,
-        summary: buildPacketSummary(packet, fallbackSummary, fallbackSynthesis, row, snippet),
-        lod1Summary: packet?.lod1Summary?.trim() ? packet.lod1Summary : fallbackSummary.slice(0, 1000),
-        lod2Summary: packet?.lod2Summary?.trim() ? packet.lod2Summary : fallbackSummary.slice(0, 1500),
+        summary: cleanSummary,
+        lod1Summary: cleanSummary.slice(0, 1000),
+        lod2Summary: cleanSummary.slice(0, 1500),
         recommendations: Array.isArray(packet?.recommendations) && packet.recommendations.length > 0
           ? packet.recommendations
           : [],
@@ -806,6 +767,7 @@ async function processOne(row, pool, dryRun, cacheRedis) {
         synthesis: fallbackSynthesis,
       };
       cacheStatus = `${cacheStatus}_repaired`;
+      llamaCalled = Boolean(regeneratedText);
       if (metrics) metrics.cacheRepairs += 1;
       if (cacheRedis) {
         await cacheRedis.set(
@@ -866,6 +828,27 @@ async function processOne(row, pool, dryRun, cacheRedis) {
       if (columnSet.has('summary_model')) {
         updates.push(`summary_model = $${params.length + 1}`);
         params.push(packet.model);
+      }
+      if (columnSet.has('summary_backend')) {
+        updates.push(`summary_backend = $${params.length + 1}`);
+        params.push('llama-server');
+      }
+      if (columnSet.has('summary_version')) {
+        updates.push(`summary_version = $${params.length + 1}`);
+        params.push('phase17-21-summary-v1');
+      }
+      if (columnSet.has('summary_generated_at')) {
+        updates.push('summary_generated_at = now()');
+      }
+      if (columnSet.has('summary_metadata')) {
+        updates.push(`summary_metadata = COALESCE(summary_metadata, '{}'::jsonb) || $${params.length + 1}::jsonb`);
+        params.push(JSON.stringify({
+          backend: 'llama-server',
+          model: packet.model,
+          cache_mode: cacheStatus,
+          embedding_backend: `ollama/${EMBED_MODEL}`,
+          topology_acceleration: 'derived-only',
+        }));
       }
       params.push(row.id);
       await pool.query(
@@ -1069,6 +1052,9 @@ async function main() {
     mode: APPLY ? 'apply' : 'dry-run',
     cache_mode: USE_CACHE ? 'phase101-summary-cache' : 'legacy',
     llm_backend: llmMode,
+    llm_model: process.env.LOCAL_GEMMA_MODEL,
+    embedding_backend: `ollama/${EMBED_MODEL}`,
+    accelerator_boundary: 'cuVS/CAGRA/LibTorch/SOM may enrich vectors and topology; they do not generate summary text',
     targetSourceRef: SOURCE_REF_FILTER || null,
     limit: LIMIT,
     concurrency: CONCURRENCY,
@@ -1123,10 +1109,12 @@ async function main() {
   console.log(`  Report  → ${REPORT_PATH}`);
   if (!APPLY) {
     console.log('\n  [DRY-RUN] Pass --apply to write summaries to DB.');
+  } else if (failed > 0) {
+    console.error(`\n  ❌ ${failed} summary row(s) failed; see ${REPORT_PATH}.`);
+    process.exitCode = 1;
   } else {
     console.log('\n  ✅ Summaries written. Re-run profile cards to see them.');
   }
-  process.exit(0);
 }
 
 main().catch(e => {

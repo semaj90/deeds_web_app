@@ -1,4 +1,3 @@
-#!/usr/bin/env node
 import crypto from 'node:crypto';
 import { MASTER_FEATURE_MAP } from '../../src/lib/server/atlas/master-feature-map.ts';
 import { sortObject, stableHash } from '../index/shared.mjs';

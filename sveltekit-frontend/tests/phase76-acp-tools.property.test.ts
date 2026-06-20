@@ -42,7 +42,7 @@ import {
   getACPToolSchema,
   getAllTools,
   toolSupportsDryRun,
-} from '../src/lib/services/knowledge-search/ACPToolRegistry';
+} from '../src/lib/server/services/knowledge-search/ACPToolRegistry';
 
 describe('Phase 76 ACP tool registry', () => {
   beforeEach(() => {

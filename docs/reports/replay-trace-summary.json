@@ -4,9 +4,9 @@
     "successful_queries": 50,
     "failed_queries": 0,
     "cache_hits": 10,
-    "total_packets_returned": 244,
-    "avg_packets_per_query": "4.88",
-    "timestamp": "2026-06-19T17:11:00.808Z"
+    "total_packets_returned": 250,
+    "avg_packets_per_query": "5.00",
+    "timestamp": "2026-06-20T16:33:57.116Z"
   },
   "results": [
     {
@@ -18,13 +18,17 @@
       "provenanceCount": 5,
       "strategy": "fusion",
       "trace": {
-        "retrieval_strategy": "fts-only",
+        "query_hash": "89e21e6ffeabbbd4",
+        "replay_id": "1781973111831-7tv7lpo",
+        "retrieval_strategy": "fusion",
         "qdrant_hits": 5,
         "postgres_hits": 5,
-        "rrf_hits": 0,
+        "rrf_hits": 5,
         "neo4j_expansions": 0,
         "cache_hits": 0,
-        "latency_ms": 3571
+        "cache_source": "live_fusion",
+        "cache_namespace": "hyperrag:query",
+        "latency_ms": 6352
       }
     },
     {
@@ -36,13 +40,17 @@
       "provenanceCount": 5,
       "strategy": "fusion",
       "trace": {
-        "retrieval_strategy": "fts-only",
+        "query_hash": "8017b1cabc11e63e",
+        "replay_id": "1781973118310-04yopni",
+        "retrieval_strategy": "fusion",
         "qdrant_hits": 5,
         "postgres_hits": 5,
-        "rrf_hits": 0,
+        "rrf_hits": 5,
         "neo4j_expansions": 0,
         "cache_hits": 0,
-        "latency_ms": 2155
+        "cache_source": "live_fusion",
+        "cache_namespace": "hyperrag:query",
+        "latency_ms": 2735
       }
     },
     {
@@ -54,13 +62,17 @@
       "provenanceCount": 5,
       "strategy": "fusion",
       "trace": {
-        "retrieval_strategy": "fts-only",
+        "query_hash": "bef9f56a4d36c88f",
+        "replay_id": "1781973121156-jhypqpd",
+        "retrieval_strategy": "fusion",
         "qdrant_hits": 5,
         "postgres_hits": 5,
-        "rrf_hits": 0,
+        "rrf_hits": 5,
         "neo4j_expansions": 0,
         "cache_hits": 0,
-        "latency_ms": 2532
+        "cache_source": "live_fusion",
+        "cache_namespace": "hyperrag:query",
+        "latency_ms": 2145
       }
     },
     {
@@ -72,13 +84,17 @@
       "provenanceCount": 5,
       "strategy": "fusion",
       "trace": {
-        "retrieval_strategy": "fts-only",
+        "query_hash": "9d133344947b6aaf",
+        "replay_id": "1781973123412-jzxqgez",
+        "retrieval_strategy": "fusion",
         "qdrant_hits": 5,
         "postgres_hits": 5,
-        "rrf_hits": 0,
+        "rrf_hits": 5,
         "neo4j_expansions": 0,
         "cache_hits": 0,
-        "latency_ms": 3844
+        "cache_source": "live_fusion",
+        "cache_namespace": "hyperrag:query",
+        "latency_ms": 2020
       }
     },
     {
@@ -90,13 +106,17 @@
       "provenanceCount": 5,
       "strategy": "fusion",
       "trace": {
-        "retrieval_strategy": "fts-only",
+        "query_hash": "d7a4c36fe33cae6a",
+        "replay_id": "1781973125539-mladf72",
+        "retrieval_strategy": "fusion",
         "qdrant_hits": 5,
         "postgres_hits": 5,
-        "rrf_hits": 0,
+        "rrf_hits": 5,
         "neo4j_expansions": 0,
         "cache_hits": 0,
-        "latency_ms": 3936
+        "cache_source": "live_fusion",
+        "cache_namespace": "hyperrag:query",
+        "latency_ms": 2025
       }
     },
     {
@@ -108,13 +128,17 @@
       "provenanceCount": 5,
       "strategy": "fusion",
       "trace": {
-        "retrieval_strategy": "fts-only",
+        "query_hash": "375cc1559e938481",
+        "replay_id": "1781973127673-9ua66bu",
+        "retrieval_strategy": "fusion",
         "qdrant_hits": 5,
         "postgres_hits": 5,
-        "rrf_hits": 0,
+        "rrf_hits": 5,
         "neo4j_expansions": 0,
         "cache_hits": 0,
-        "latency_ms": 3042
+        "cache_source": "live_fusion",
+        "cache_namespace": "hyperrag:query",
+        "latency_ms": 1903
       }
     },
     {
@@ -126,13 +150,17 @@
       "provenanceCount": 5,
       "strategy": "fusion",
       "trace": {
-        "retrieval_strategy": "fts-only",
+        "query_hash": "354b30ecd060e144",
+        "replay_id": "1781973129696-nyjqi1d",
+        "retrieval_strategy": "fusion",
         "qdrant_hits": 5,
         "postgres_hits": 5,
-        "rrf_hits": 0,
+        "rrf_hits": 5,
         "neo4j_expansions": 0,
         "cache_hits": 0,
-        "latency_ms": 2601
+        "cache_source": "live_fusion",
+        "cache_namespace": "hyperrag:query",
+        "latency_ms": 2065
       }
     },
     {
@@ -144,13 +172,17 @@
       "provenanceCount": 5,
       "strategy": "fusion",
       "trace": {
-        "retrieval_strategy": "fts-only",
+        "query_hash": "31ff33313d7dcdae",
+        "replay_id": "1781973131881-5iaai26",
+        "retrieval_strategy": "fusion",
         "qdrant_hits": 5,
         "postgres_hits": 5,
-        "rrf_hits": 0,
+        "rrf_hits": 5,
         "neo4j_expansions": 0,
         "cache_hits": 0,
-        "latency_ms": 2276
+        "cache_source": "live_fusion",
+        "cache_namespace": "hyperrag:query",
+        "latency_ms": 2456
       }
     },
     {
@@ -158,17 +190,21 @@
       "hash": "876646933d582d0d3dfc833e67da1592c4b9848e72adb779a9bd3289bdd7e2d0",
       "bucket": "golden",
       "cacheHit": false,
-      "packetsReturned": 2,
-      "provenanceCount": 2,
+      "packetsReturned": 5,
+      "provenanceCount": 5,
       "strategy": "fusion",
       "trace": {
+        "query_hash": "cbd414fb8a5a158e",
+        "replay_id": "1781973134456-gruhgof",
         "retrieval_strategy": "fusion",
         "qdrant_hits": 0,
         "postgres_hits": 2,
-        "rrf_hits": 2,
+        "rrf_hits": 5,
         "neo4j_expansions": 0,
         "cache_hits": 0,
-        "latency_ms": 3409
+        "cache_source": "live_fusion",
+        "cache_namespace": "hyperrag:query",
+        "latency_ms": 2619
       }
     },
     {
@@ -180,13 +216,17 @@
       "provenanceCount": 5,
       "strategy": "fusion",
       "trace": {
-        "retrieval_strategy": "fts-only",
+        "query_hash": "d255c30eac07b4e8",
+        "replay_id": "1781973137187-e8h2j0h",
+        "retrieval_strategy": "fusion",
         "qdrant_hits": 5,
         "postgres_hits": 5,
-        "rrf_hits": 0,
+        "rrf_hits": 5,
         "neo4j_expansions": 0,
         "cache_hits": 0,
-        "latency_ms": 2207
+        "cache_source": "live_fusion",
+        "cache_namespace": "hyperrag:query",
+        "latency_ms": 3040
       }
     },
     {
@@ -198,14 +238,18 @@
       "provenanceCount": 6,
       "strategy": "fusion",
       "trace": {
-        "retrieval_strategy": "fts-only",
+        "query_hash": "89e21e6ffeabbbd4",
+        "replay_id": "1781973140345-2evriyc",
+        "retrieval_strategy": "fusion",
         "qdrant_hits": 5,
         "postgres_hits": 5,
-        "rrf_hits": 0,
+        "rrf_hits": 5,
         "neo4j_expansions": 0,
         "cache_hits": 1,
-        "latency_ms": 24,
-        "cache_latency_ms": 24
+        "cache_source": "redis_exact_match",
+        "cache_namespace": "hyperrag:query",
+        "latency_ms": 3450,
+        "cache_latency_ms": 3450
       }
     },
     {
@@ -217,14 +261,18 @@
       "provenanceCount": 6,
       "strategy": "fusion",
       "trace": {
-        "retrieval_strategy": "fts-only",
+        "query_hash": "8017b1cabc11e63e",
+        "replay_id": "1781973143916-n89fbke",
+        "retrieval_strategy": "fusion",
         "qdrant_hits": 5,
         "postgres_hits": 5,
-        "rrf_hits": 0,
+        "rrf_hits": 5,
         "neo4j_expansions": 0,
         "cache_hits": 1,
-        "latency_ms": 20,
-        "cache_latency_ms": 20
+        "cache_source": "redis_exact_match",
+        "cache_namespace": "hyperrag:query",
+        "latency_ms": 2332,
+        "cache_latency_ms": 2332
       }
     },
     {
@@ -236,14 +284,18 @@
       "provenanceCount": 6,
       "strategy": "fusion",
       "trace": {
-        "retrieval_strategy": "fts-only",
+        "query_hash": "bef9f56a4d36c88f",
+        "replay_id": "1781973146366-qun8ig5",
+        "retrieval_strategy": "fusion",
         "qdrant_hits": 5,
         "postgres_hits": 5,
-        "rrf_hits": 0,
+        "rrf_hits": 5,
         "neo4j_expansions": 0,
         "cache_hits": 1,
-        "latency_ms": 24,
-        "cache_latency_ms": 24
+        "cache_source": "redis_exact_match",
+        "cache_namespace": "hyperrag:query",
+        "latency_ms": 2107,
+        "cache_latency_ms": 2107
       }
     },
     {
@@ -255,14 +307,18 @@
       "provenanceCount": 6,
       "strategy": "fusion",
       "trace": {
-        "retrieval_strategy": "fts-only",
+        "query_hash": "9d133344947b6aaf",
+        "replay_id": "1781973148588-tpwiqea",
+        "retrieval_strategy": "fusion",
         "qdrant_hits": 5,
         "postgres_hits": 5,
-        "rrf_hits": 0,
+        "rrf_hits": 5,
         "neo4j_expansions": 0,
         "cache_hits": 1,
-        "latency_ms": 19,
-        "cache_latency_ms": 19
+        "cache_source": "redis_exact_match",
+        "cache_namespace": "hyperrag:query",
+        "latency_ms": 2302,
+        "cache_latency_ms": 2302
       }
     },
     {
@@ -274,14 +330,18 @@
       "provenanceCount": 6,
       "strategy": "fusion",
       "trace": {
-        "retrieval_strategy": "fts-only",
+        "query_hash": "d7a4c36fe33cae6a",
+        "replay_id": "1781973150997-x91v2gw",
+        "retrieval_strategy": "fusion",
         "qdrant_hits": 5,
         "postgres_hits": 5,
-        "rrf_hits": 0,
+        "rrf_hits": 5,
         "neo4j_expansions": 0,
         "cache_hits": 1,
-        "latency_ms": 24,
-        "cache_latency_ms": 24
+        "cache_source": "redis_exact_match",
+        "cache_namespace": "hyperrag:query",
+        "latency_ms": 1879,
+        "cache_latency_ms": 1879
       }
     },
     {
@@ -293,14 +353,18 @@
       "provenanceCount": 6,
       "strategy": "fusion",
       "trace": {
-        "retrieval_strategy": "fts-only",
+        "query_hash": "375cc1559e938481",
+        "replay_id": "1781973152987-j6wh5k9",
+        "retrieval_strategy": "fusion",
         "qdrant_hits": 5,
         "postgres_hits": 5,
-        "rrf_hits": 0,
+        "rrf_hits": 5,
         "neo4j_expansions": 0,
         "cache_hits": 1,
-        "latency_ms": 20,
-        "cache_latency_ms": 20
+        "cache_source": "redis_exact_match",
+        "cache_namespace": "hyperrag:query",
+        "latency_ms": 2350,
+        "cache_latency_ms": 2350
       }
     },
     {
@@ -312,14 +376,18 @@
       "provenanceCount": 6,
       "strategy": "fusion",
       "trace": {
-        "retrieval_strategy": "fts-only",
+        "query_hash": "354b30ecd060e144",
+        "replay_id": "1781973155443-cxuq2hy",
+        "retrieval_strategy": "fusion",
         "qdrant_hits": 5,
         "postgres_hits": 5,
-        "rrf_hits": 0,
+        "rrf_hits": 5,
         "neo4j_expansions": 0,
         "cache_hits": 1,
-        "latency_ms": 29,
-        "cache_latency_ms": 29
+        "cache_source": "redis_exact_match",
+        "cache_namespace": "hyperrag:query",
+        "latency_ms": 2080,
+        "cache_latency_ms": 2080
       }
     },
     {
@@ -331,14 +399,18 @@
       "provenanceCount": 6,
       "strategy": "fusion",
       "trace": {
-        "retrieval_strategy": "fts-only",
+        "query_hash": "31ff33313d7dcdae",
+        "replay_id": "1781973157637-et1k989",
+        "retrieval_strategy": "fusion",
         "qdrant_hits": 5,
         "postgres_hits": 5,
-        "rrf_hits": 0,
+        "rrf_hits": 5,
         "neo4j_expansions": 0,
         "cache_hits": 1,
-        "latency_ms": 28,
-        "cache_latency_ms": 28
+        "cache_source": "redis_exact_match",
+        "cache_namespace": "hyperrag:query",
+        "latency_ms": 1963,
+        "cache_latency_ms": 1963
       }
     },
     {
@@ -346,18 +418,22 @@
       "hash": "876646933d582d0d3dfc833e67da1592c4b9848e72adb779a9bd3289bdd7e2d0",
       "bucket": "cache-hit",
       "cacheHit": true,
-      "packetsReturned": 2,
-      "provenanceCount": 3,
+      "packetsReturned": 5,
+      "provenanceCount": 6,
       "strategy": "fusion",
       "trace": {
+        "query_hash": "cbd414fb8a5a158e",
+        "replay_id": "1781973159715-2ys4y4x",
         "retrieval_strategy": "fusion",
         "qdrant_hits": 0,
         "postgres_hits": 2,
-        "rrf_hits": 2,
+        "rrf_hits": 5,
         "neo4j_expansions": 0,
         "cache_hits": 1,
-        "latency_ms": 33,
-        "cache_latency_ms": 33
+        "cache_source": "redis_exact_match",
+        "cache_namespace": "hyperrag:query",
+        "latency_ms": 2284,
+        "cache_latency_ms": 2284
       }
     },
     {
@@ -369,14 +445,18 @@
       "provenanceCount": 6,
       "strategy": "fusion",
       "trace": {
-        "retrieval_strategy": "fts-only",
+        "query_hash": "d255c30eac07b4e8",
+        "replay_id": "1781973162119-qpvfmva",
+        "retrieval_strategy": "fusion",
         "qdrant_hits": 5,
         "postgres_hits": 5,
-        "rrf_hits": 0,
+        "rrf_hits": 5,
         "neo4j_expansions": 0,
         "cache_hits": 1,
-        "latency_ms": 27,
-        "cache_latency_ms": 27
+        "cache_source": "redis_exact_match",
+        "cache_namespace": "hyperrag:query",
+        "latency_ms": 2323,
+        "cache_latency_ms": 2323
       }
     },
     {
@@ -388,13 +468,17 @@
       "provenanceCount": 5,
       "strategy": "fusion",
       "trace": {
-        "retrieval_strategy": "fts-only",
+        "query_hash": "09acfdc05bd3e3e3",
+        "replay_id": "1781973164555-czty12c",
+        "retrieval_strategy": "fusion",
         "qdrant_hits": 5,
         "postgres_hits": 5,
-        "rrf_hits": 0,
+        "rrf_hits": 5,
         "neo4j_expansions": 0,
         "cache_hits": 0,
-        "latency_ms": 1936
+        "cache_source": "live_fusion",
+        "cache_namespace": "hyperrag:query",
+        "latency_ms": 2383
       }
     },
     {
@@ -406,13 +490,17 @@
       "provenanceCount": 5,
       "strategy": "fusion",
       "trace": {
-        "retrieval_strategy": "fts-only",
+        "query_hash": "c02a581af4e06a35",
+        "replay_id": "1781973167053-olxurax",
+        "retrieval_strategy": "fusion",
         "qdrant_hits": 5,
         "postgres_hits": 5,
-        "rrf_hits": 0,
+        "rrf_hits": 5,
         "neo4j_expansions": 0,
         "cache_hits": 0,
-        "latency_ms": 2218
+        "cache_source": "live_fusion",
+        "cache_namespace": "hyperrag:query",
+        "latency_ms": 2208
       }
     },
     {
@@ -424,13 +512,17 @@
       "provenanceCount": 5,
       "strategy": "fusion",
       "trace": {
-        "retrieval_strategy": "fts-only",
+        "query_hash": "97ee05a38e00b806",
+        "replay_id": "1781973169383-kb1nqjz",
+        "retrieval_strategy": "fusion",
         "qdrant_hits": 5,
         "postgres_hits": 5,
-        "rrf_hits": 0,
+        "rrf_hits": 5,
         "neo4j_expansions": 0,
         "cache_hits": 0,
-        "latency_ms": 2045
+        "cache_source": "live_fusion",
+        "cache_namespace": "hyperrag:query",
+        "latency_ms": 2049
       }
     },
     {
@@ -442,13 +534,17 @@
       "provenanceCount": 5,
       "strategy": "fusion",
       "trace": {
+        "query_hash": "2205d5c5ed667fe5",
+        "replay_id": "1781973171551-veoj72c",
         "retrieval_strategy": "fusion",
-        "qdrant_hits": 0,
+        "qdrant_hits": 2,
         "postgres_hits": 5,
         "rrf_hits": 5,
         "neo4j_expansions": 0,
         "cache_hits": 0,
-        "latency_ms": 1716
+        "cache_source": "live_fusion",
+        "cache_namespace": "hyperrag:query",
+        "latency_ms": 2053
       }
     },
     {
@@ -460,13 +556,17 @@
       "provenanceCount": 5,
       "strategy": "fusion",
       "trace": {
-        "retrieval_strategy": "fts-only",
+        "query_hash": "503693625e5b4db6",
+        "replay_id": "1781973173720-10o1nb7",
+        "retrieval_strategy": "fusion",
         "qdrant_hits": 5,
         "postgres_hits": 5,
-        "rrf_hits": 0,
+        "rrf_hits": 5,
         "neo4j_expansions": 0,
         "cache_hits": 0,
-        "latency_ms": 1820
+        "cache_source": "live_fusion",
+        "cache_namespace": "hyperrag:query",
+        "latency_ms": 2757
       }
     },
     {
@@ -478,13 +578,17 @@
       "provenanceCount": 5,
       "strategy": "fusion",
       "trace": {
-        "retrieval_strategy": "fts-only",
+        "query_hash": "e7f49ba3da4152e2",
+        "replay_id": "1781973176589-mfz3t1h",
+        "retrieval_strategy": "fusion",
         "qdrant_hits": 5,
         "postgres_hits": 5,
-        "rrf_hits": 0,
+        "rrf_hits": 5,
         "neo4j_expansions": 0,
         "cache_hits": 0,
-        "latency_ms": 1644
+        "cache_source": "live_fusion",
+        "cache_namespace": "hyperrag:query",
+        "latency_ms": 2510
       }
     },
     {
@@ -496,13 +600,17 @@
       "provenanceCount": 5,
       "strategy": "fusion",
       "trace": {
-        "retrieval_strategy": "fts-only",
+        "query_hash": "162a39c6aff9d6e2",
+        "replay_id": "1781973179213-mw9rbmy",
+        "retrieval_strategy": "fusion",
         "qdrant_hits": 5,
         "postgres_hits": 5,
-        "rrf_hits": 0,
+        "rrf_hits": 5,
         "neo4j_expansions": 0,
         "cache_hits": 0,
-        "latency_ms": 1638
+        "cache_source": "live_fusion",
+        "cache_namespace": "hyperrag:query",
+        "latency_ms": 2096
       }
     },
     {
@@ -514,13 +622,17 @@
       "provenanceCount": 5,
       "strategy": "fusion",
       "trace": {
-        "retrieval_strategy": "fts-only",
+        "query_hash": "12ee37667bb8a5a4",
+        "replay_id": "1781973181422-wb4sz9k",
+        "retrieval_strategy": "fusion",
         "qdrant_hits": 5,
         "postgres_hits": 5,
-        "rrf_hits": 0,
+        "rrf_hits": 5,
         "neo4j_expansions": 0,
         "cache_hits": 0,
-        "latency_ms": 1629
+        "cache_source": "live_fusion",
+        "cache_namespace": "hyperrag:query",
+        "latency_ms": 2067
       }
     },
     {
@@ -532,13 +644,17 @@
       "provenanceCount": 5,
       "strategy": "fusion",
       "trace": {
-        "retrieval_strategy": "fts-only",
+        "query_hash": "489c590d4c186ac7",
+        "replay_id": "1781973183605-zfcc2yh",
+        "retrieval_strategy": "fusion",
         "qdrant_hits": 5,
         "postgres_hits": 5,
-        "rrf_hits": 0,
+        "rrf_hits": 5,
         "neo4j_expansions": 0,
         "cache_hits": 0,
-        "latency_ms": 1644
+        "cache_source": "live_fusion",
+        "cache_namespace": "hyperrag:query",
+        "latency_ms": 2171
       }
     },
     {
@@ -550,13 +666,17 @@
       "provenanceCount": 5,
       "strategy": "fusion",
       "trace": {
-        "retrieval_strategy": "fts-only",
+        "query_hash": "e48d795d4260251f",
+        "replay_id": "1781973185895-y5lfmm5",
+        "retrieval_strategy": "fusion",
         "qdrant_hits": 5,
         "postgres_hits": 5,
-        "rrf_hits": 0,
+        "rrf_hits": 5,
         "neo4j_expansions": 0,
         "cache_hits": 0,
-        "latency_ms": 1681
+        "cache_source": "live_fusion",
+        "cache_namespace": "hyperrag:query",
+        "latency_ms": 2064
       }
     },
     {
@@ -568,13 +688,17 @@
       "provenanceCount": 5,
       "strategy": "fusion",
       "trace": {
-        "retrieval_strategy": "fts-only",
+        "query_hash": "6b06b2848709c270",
+        "replay_id": "1781973188067-xjog8ig",
+        "retrieval_strategy": "fusion",
         "qdrant_hits": 5,
         "postgres_hits": 5,
-        "rrf_hits": 0,
+        "rrf_hits": 5,
         "neo4j_expansions": 0,
         "cache_hits": 0,
-        "latency_ms": 1638
+        "cache_source": "live_fusion",
+        "cache_namespace": "hyperrag:query",
+        "latency_ms": 2201
       }
     },
     {
@@ -586,13 +710,17 @@
       "provenanceCount": 5,
       "strategy": "fusion",
       "trace": {
-        "retrieval_strategy": "fts-only",
+        "query_hash": "17346cf4ef85ef1f",
+        "replay_id": "1781973190383-xuz11pp",
+        "retrieval_strategy": "fusion",
         "qdrant_hits": 5,
         "postgres_hits": 5,
-        "rrf_hits": 0,
+        "rrf_hits": 5,
         "neo4j_expansions": 0,
         "cache_hits": 0,
-        "latency_ms": 1641
+        "cache_source": "live_fusion",
+        "cache_namespace": "hyperrag:query",
+        "latency_ms": 2135
       }
     },
     {
@@ -604,13 +732,17 @@
       "provenanceCount": 5,
       "strategy": "fusion",
       "trace": {
-        "retrieval_strategy": "fts-only",
+        "query_hash": "4e233436767be8c9",
+        "replay_id": "1781973192627-eob4qkf",
+        "retrieval_strategy": "fusion",
         "qdrant_hits": 5,
         "postgres_hits": 5,
-        "rrf_hits": 0,
+        "rrf_hits": 5,
         "neo4j_expansions": 0,
         "cache_hits": 0,
-        "latency_ms": 1661
+        "cache_source": "live_fusion",
+        "cache_namespace": "hyperrag:query",
+        "latency_ms": 2273
       }
     },
     {
@@ -622,13 +754,17 @@
       "provenanceCount": 5,
       "strategy": "fusion",
       "trace": {
-        "retrieval_strategy": "fts-only",
+        "query_hash": "4da4211fbc3f39ca",
+        "replay_id": "1781973195020-ofb9jvb",
+        "retrieval_strategy": "fusion",
         "qdrant_hits": 5,
         "postgres_hits": 5,
-        "rrf_hits": 0,
+        "rrf_hits": 5,
         "neo4j_expansions": 0,
         "cache_hits": 0,
-        "latency_ms": 1609
+        "cache_source": "live_fusion",
+        "cache_namespace": "hyperrag:query",
+        "latency_ms": 2367
       }
     },
     {
@@ -640,13 +776,17 @@
       "provenanceCount": 5,
       "strategy": "fusion",
       "trace": {
-        "retrieval_strategy": "fts-only",
+        "query_hash": "0f407006b2c0e761",
+        "replay_id": "1781973197497-s7yl0lw",
+        "retrieval_strategy": "fusion",
         "qdrant_hits": 5,
         "postgres_hits": 5,
-        "rrf_hits": 0,
+        "rrf_hits": 5,
         "neo4j_expansions": 0,
         "cache_hits": 0,
-        "latency_ms": 1653
+        "cache_source": "live_fusion",
+        "cache_namespace": "hyperrag:query",
+        "latency_ms": 2199
       }
     },
     {
@@ -658,13 +798,17 @@
       "provenanceCount": 5,
       "strategy": "fusion",
       "trace": {
-        "retrieval_strategy": "fts-only",
+        "query_hash": "2a14ad4867e34b1b",
+        "replay_id": "1781973199808-pj2oqit",
+        "retrieval_strategy": "fusion",
         "qdrant_hits": 5,
         "postgres_hits": 5,
-        "rrf_hits": 0,
+        "rrf_hits": 5,
         "neo4j_expansions": 0,
         "cache_hits": 0,
-        "latency_ms": 1668
+        "cache_source": "live_fusion",
+        "cache_namespace": "hyperrag:query",
+        "latency_ms": 2121
       }
     },
     {
@@ -676,13 +820,17 @@
       "provenanceCount": 5,
       "strategy": "fusion",
       "trace": {
-        "retrieval_strategy": "fts-only",
+        "query_hash": "3f22a0f863725a31",
+        "replay_id": "1781973202036-ddjc8pz",
+        "retrieval_strategy": "fusion",
         "qdrant_hits": 5,
         "postgres_hits": 5,
-        "rrf_hits": 0,
+        "rrf_hits": 5,
         "neo4j_expansions": 0,
         "cache_hits": 0,
-        "latency_ms": 1634
+        "cache_source": "live_fusion",
+        "cache_namespace": "hyperrag:query",
+        "latency_ms": 2272
       }
     },
     {
@@ -694,13 +842,17 @@
       "provenanceCount": 5,
       "strategy": "fusion",
       "trace": {
-        "retrieval_strategy": "fts-only",
+        "query_hash": "eb37605c3b3a61ea",
+        "replay_id": "1781973204421-jsthp76",
+        "retrieval_strategy": "fusion",
         "qdrant_hits": 5,
         "postgres_hits": 5,
-        "rrf_hits": 0,
+        "rrf_hits": 5,
         "neo4j_expansions": 0,
         "cache_hits": 0,
-        "latency_ms": 1631
+        "cache_source": "live_fusion",
+        "cache_namespace": "hyperrag:query",
+        "latency_ms": 2362
       }
     },
     {
@@ -712,13 +864,17 @@
       "provenanceCount": 5,
       "strategy": "fusion",
       "trace": {
-        "retrieval_strategy": "fts-only",
+        "query_hash": "b713b7ef9ab5f87f",
+        "replay_id": "1781973206902-t1n3v69",
+        "retrieval_strategy": "fusion",
         "qdrant_hits": 5,
         "postgres_hits": 5,
-        "rrf_hits": 0,
+        "rrf_hits": 5,
         "neo4j_expansions": 0,
         "cache_hits": 0,
-        "latency_ms": 1647
+        "cache_source": "live_fusion",
+        "cache_namespace": "hyperrag:query",
+        "latency_ms": 2867
       }
     },
     {
@@ -730,13 +886,17 @@
       "provenanceCount": 5,
       "strategy": "fusion",
       "trace": {
-        "retrieval_strategy": "fts-only",
+        "query_hash": "345b922f2acd1f43",
+        "replay_id": "1781973209889-ovsptfo",
+        "retrieval_strategy": "fusion",
         "qdrant_hits": 5,
         "postgres_hits": 5,
-        "rrf_hits": 0,
+        "rrf_hits": 5,
         "neo4j_expansions": 0,
         "cache_hits": 0,
-        "latency_ms": 1659
+        "cache_source": "live_fusion",
+        "cache_namespace": "hyperrag:query",
+        "latency_ms": 2995
       }
     },
     {
@@ -748,13 +908,17 @@
       "provenanceCount": 5,
       "strategy": "fusion",
       "trace": {
-        "retrieval_strategy": "fts-only",
+        "query_hash": "df2b7bac3c0d5fa4",
+        "replay_id": "1781973212997-qe7hiws",
+        "retrieval_strategy": "fusion",
         "qdrant_hits": 5,
         "postgres_hits": 5,
-        "rrf_hits": 0,
+        "rrf_hits": 5,
         "neo4j_expansions": 0,
         "cache_hits": 0,
-        "latency_ms": 1642
+        "cache_source": "live_fusion",
+        "cache_namespace": "hyperrag:query",
+        "latency_ms": 2454
       }
     },
     {
@@ -766,13 +930,17 @@
       "provenanceCount": 5,
       "strategy": "fusion",
       "trace": {
-        "retrieval_strategy": "fts-only",
+        "query_hash": "e59dfd841bba6f20",
+        "replay_id": "1781973215558-1v7p65l",
+        "retrieval_strategy": "fusion",
         "qdrant_hits": 5,
         "postgres_hits": 5,
-        "rrf_hits": 0,
+        "rrf_hits": 5,
         "neo4j_expansions": 0,
         "cache_hits": 0,
-        "latency_ms": 1650
+        "cache_source": "live_fusion",
+        "cache_namespace": "hyperrag:query",
+        "latency_ms": 2487
       }
     },
     {
@@ -784,13 +952,17 @@
       "provenanceCount": 5,
       "strategy": "fusion",
       "trace": {
-        "retrieval_strategy": "fts-only",
+        "query_hash": "5a789da173fceded",
+        "replay_id": "1781973218163-l612dfr",
+        "retrieval_strategy": "fusion",
         "qdrant_hits": 5,
         "postgres_hits": 5,
-        "rrf_hits": 0,
+        "rrf_hits": 5,
         "neo4j_expansions": 0,
         "cache_hits": 0,
-        "latency_ms": 1644
+        "cache_source": "live_fusion",
+        "cache_namespace": "hyperrag:query",
+        "latency_ms": 2261
       }
     },
     {
@@ -802,13 +974,17 @@
       "provenanceCount": 5,
       "strategy": "fusion",
       "trace": {
-        "retrieval_strategy": "fts-only",
+        "query_hash": "5ea2c95b26c8596a",
+        "replay_id": "1781973220538-v143rpf",
+        "retrieval_strategy": "fusion",
         "qdrant_hits": 5,
         "postgres_hits": 5,
-        "rrf_hits": 0,
+        "rrf_hits": 5,
         "neo4j_expansions": 0,
         "cache_hits": 0,
-        "latency_ms": 1641
+        "cache_source": "live_fusion",
+        "cache_namespace": "hyperrag:query",
+        "latency_ms": 2120
       }
     },
     {
@@ -820,13 +996,17 @@
       "provenanceCount": 5,
       "strategy": "fusion",
       "trace": {
-        "retrieval_strategy": "fts-only",
+        "query_hash": "7044843121306c53",
+        "replay_id": "1781973222763-yyvz70y",
+        "retrieval_strategy": "fusion",
         "qdrant_hits": 5,
         "postgres_hits": 5,
-        "rrf_hits": 0,
+        "rrf_hits": 5,
         "neo4j_expansions": 0,
         "cache_hits": 0,
-        "latency_ms": 1619
+        "cache_source": "live_fusion",
+        "cache_namespace": "hyperrag:query",
+        "latency_ms": 2959
       }
     },
     {
@@ -838,13 +1018,17 @@
       "provenanceCount": 5,
       "strategy": "fusion",
       "trace": {
-        "retrieval_strategy": "fts-only",
+        "query_hash": "4d2a87d6c3c7cbcb",
+        "replay_id": "1781973225844-do1a3eg",
+        "retrieval_strategy": "fusion",
         "qdrant_hits": 5,
         "postgres_hits": 5,
-        "rrf_hits": 0,
+        "rrf_hits": 5,
         "neo4j_expansions": 0,
         "cache_hits": 0,
-        "latency_ms": 1625
+        "cache_source": "live_fusion",
+        "cache_namespace": "hyperrag:query",
+        "latency_ms": 2381
       }
     },
     {
@@ -856,13 +1040,17 @@
       "provenanceCount": 5,
       "strategy": "fusion",
       "trace": {
-        "retrieval_strategy": "fts-only",
+        "query_hash": "7343a615d5c70e79",
+        "replay_id": "1781973228331-iapcni2",
+        "retrieval_strategy": "fusion",
         "qdrant_hits": 5,
         "postgres_hits": 5,
-        "rrf_hits": 0,
+        "rrf_hits": 5,
         "neo4j_expansions": 0,
         "cache_hits": 0,
-        "latency_ms": 1628
+        "cache_source": "live_fusion",
+        "cache_namespace": "hyperrag:query",
+        "latency_ms": 2076
       }
     },
     {
@@ -874,13 +1062,17 @@
       "provenanceCount": 5,
       "strategy": "fusion",
       "trace": {
-        "retrieval_strategy": "fts-only",
+        "query_hash": "318c7e36126f36c2",
+        "replay_id": "1781973230521-u8yti90",
+        "retrieval_strategy": "fusion",
         "qdrant_hits": 5,
         "postgres_hits": 5,
-        "rrf_hits": 0,
+        "rrf_hits": 5,
         "neo4j_expansions": 0,
         "cache_hits": 0,
-        "latency_ms": 1633
+        "cache_source": "live_fusion",
+        "cache_namespace": "hyperrag:query",
+        "latency_ms": 2041
       }
     },
     {
@@ -892,13 +1084,17 @@
       "provenanceCount": 5,
       "strategy": "fusion",
       "trace": {
-        "retrieval_strategy": "fts-only",
+        "query_hash": "8cc4f0985238f54c",
+        "replay_id": "1781973232680-ig6gdgk",
+        "retrieval_strategy": "fusion",
         "qdrant_hits": 5,
         "postgres_hits": 5,
-        "rrf_hits": 0,
+        "rrf_hits": 5,
         "neo4j_expansions": 0,
         "cache_hits": 0,
-        "latency_ms": 1644
+        "cache_source": "live_fusion",
+        "cache_namespace": "hyperrag:query",
+        "latency_ms": 2197
       }
     },
     {
@@ -910,13 +1106,17 @@
       "provenanceCount": 5,
       "strategy": "fusion",
       "trace": {
-        "retrieval_strategy": "fts-only",
+        "query_hash": "f83d1ede3683a862",
+        "replay_id": "1781973234986-aj3ypcl",
+        "retrieval_strategy": "fusion",
         "qdrant_hits": 5,
         "postgres_hits": 5,
-        "rrf_hits": 0,
+        "rrf_hits": 5,
         "neo4j_expansions": 0,
         "cache_hits": 0,
-        "latency_ms": 1665
+        "cache_source": "live_fusion",
+        "cache_namespace": "hyperrag:query",
+        "latency_ms": 2024
       }
     }
   ]

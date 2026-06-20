@@ -2,9 +2,6 @@ import crypto from 'node:crypto';
 import { spawnSync } from 'node:child_process';
 
 import type Redis from 'ioredis';
-import { generateSingleEmbedding } from '$lib/server/grpc/embedding-client.js';
-import { getRedis } from '$lib/server/redis.js';
-import { buildSemanticCacheKey, storeSemanticCacheRecord } from './semantic-cache.js';
 
 const EXACT_PREFIX = 'atlas:summary:exact:v1:';
 const SEMANTIC_PREFIX = 'atlas:summary:semantic:v1:';
@@ -19,6 +16,31 @@ const SEMANTIC_THRESHOLD = 0.95;
 const SEMANTIC_SCAN_LIMIT = 100;
 
 let cachedRepoRevision: string | null = null;
+
+function buildSemanticRecordKey(queryHash: string, model: string, provider: string): string {
+	return `${queryHash}:${model}:${provider}`;
+}
+
+async function resolveRedisClient(redisClient?: Redis): Promise<Redis> {
+	if (redisClient) return redisClient;
+	const { getRedis } = await import('../redis.js');
+	return getRedis();
+}
+
+async function generateEmbedding(text: string): Promise<number[] | null> {
+	const { generateSingleEmbedding } = await import('../grpc/embedding-client.js');
+	return generateSingleEmbedding(text).catch(() => null);
+}
+
+async function storeSemanticRecord(packet: Phase101SummaryPacket): Promise<void> {
+	try {
+		const { storeSemanticCacheRecord } = await import('./semantic-cache.js');
+		await storeSemanticCacheRecord(buildSemanticCacheRecord(packet)).catch(() => {});
+	} catch {
+		// Durable semantic-cache promotion is optional. The exact/sourceRef Redis
+		// packet remains the operational cache contract for standalone batches.
+	}
+}
 
 export interface Phase101SummarySection {
 	title: string;
@@ -222,7 +244,7 @@ function buildSemanticCacheRecord(packet: Phase101SummaryPacket): {
 	const provider = 'llama-server';
 	return {
 		queryHash: packet.queryHash,
-		semanticCacheKey: buildSemanticCacheKey(packet.queryHash, packet.model, provider),
+		semanticCacheKey: buildSemanticRecordKey(packet.queryHash, packet.model, provider),
 		model: packet.model,
 		provider,
 		sourceRefs: packet.sourceRefs,
@@ -331,9 +353,9 @@ async function setSummaryPacketRecord(
 	packet: Phase101SummaryPacket,
 	cacheText: string,
 	semanticEmbedding?: number[],
-	redisClient: Redis = getRedis()
+	redisClient?: Redis
 ): Promise<void> {
-	const redis = redisClient;
+	const redis = await resolveRedisClient(redisClient);
 	const ttl = DEFAULT_TTL_SECONDS;
 	const exactKey = `${EXACT_PREFIX}${packet.queryHash}`;
 	const exactRecord = {
@@ -377,15 +399,15 @@ async function setSummaryPacketRecord(
 
 	await pipeline.exec();
 
-	await storeSemanticCacheRecord(buildSemanticCacheRecord(packet)).catch(() => {});
+	await storeSemanticRecord(packet);
 }
 
 export async function readPhase101SummaryPacketBySourceRef(
 	sourceRef: string,
-	redisClient: Redis = getRedis()
+	redisClient?: Redis
 ): Promise<Phase101SummaryPacket | null> {
 	try {
-		const redis = redisClient;
+		const redis = await resolveRedisClient(redisClient);
 		const indexKey = sourceRefIndexKey(sourceRef);
 		const exactKey = await redis.get(indexKey);
 		if (!exactKey) return null;
@@ -400,10 +422,10 @@ export async function readPhase101SummaryPacketBySourceRef(
 
 export async function readPhase101SummaryRecordBySourceRef(
 	sourceRef: string,
-	redisClient: Redis = getRedis()
+	redisClient?: Redis
 ): Promise<Phase101SummaryStoredRecord | null> {
 	try {
-		const redis = redisClient;
+		const redis = await resolveRedisClient(redisClient);
 		const indexKey = sourceRefIndexKey(sourceRef);
 		const exactKey = await redis.get(indexKey);
 		if (!exactKey) return null;
@@ -434,10 +456,10 @@ export async function readPhase101SummaryRecordBySourceRef(
 
 async function getExactSummaryPacket(
 	cacheKey: string,
-	redisClient: Redis = getRedis()
+	redisClient?: Redis
 ): Promise<Phase101SummaryPacket | null> {
 	try {
-		const redis = redisClient;
+		const redis = await resolveRedisClient(redisClient);
 		const raw = await redis.get(cacheKey);
 		if (!raw) return null;
 		const parsed = JSON.parse(raw) as { packet?: Phase101SummaryPacket };
@@ -452,16 +474,16 @@ async function searchSemanticSummaryPacket(
 	input: Phase101SummaryInput,
 	repoRevision: string,
 	queryEmbedding?: number[] | null,
-	redisClient: Redis = getRedis()
+	redisClient?: Redis
 ): Promise<Phase101SummaryPacket | null> {
 	try {
 		const embedding =
 			Array.isArray(queryEmbedding) && queryEmbedding.length > 0
 				? queryEmbedding
-				: await generateSingleEmbedding(cacheText).catch(() => null);
+				: await generateEmbedding(cacheText);
 		if (!Array.isArray(embedding) || embedding.length === 0) return null;
 
-		const redis = redisClient;
+		const redis = await resolveRedisClient(redisClient);
 		const recentKeys = await redis.lrange(SEMANTIC_INDEX_KEY, 0, SEMANTIC_SCAN_LIMIT - 1);
 		let bestPacket: Phase101SummaryPacket | null = null;
 		let bestScore = 0;
@@ -524,7 +546,7 @@ export async function runPhase101SummaryCache(
 ): Promise<Phase101SummaryCacheResult> {
 	const repoRevision = await resolveRepoRevision(input.repoRevision);
 	const cacheText = buildPhase101SummaryCacheText(input);
-	const redisClient = options?.redisClient ?? getRedis();
+	const redisClient = await resolveRedisClient(options?.redisClient);
 	const model = (input.model ?? DEFAULT_MODEL).trim();
 	const promptVersion = (input.promptVersion ?? DEFAULT_PROMPT_VERSION).trim();
 	const intent = (input.intent ?? DEFAULT_INTENT).trim();
@@ -559,7 +581,7 @@ export async function runPhase101SummaryCache(
 	const semanticEmbedding =
 		Array.isArray(input.semanticEmbedding) && input.semanticEmbedding.length > 0
 			? input.semanticEmbedding
-			: await generateSingleEmbedding(cacheText).catch(() => null);
+			: await generateEmbedding(cacheText);
 	const semanticHit = await searchSemanticSummaryPacket(
 		cacheText,
 		normalizedInput,

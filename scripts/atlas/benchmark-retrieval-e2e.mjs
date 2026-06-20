@@ -470,17 +470,25 @@ async function redisCacheProbe(hits) {
     redis.on('error', () => {});
     await redis.connect();
 
-    const keyHash = 'gpu:karpathy:scores';
     const topRefs = hits.slice(0, 10).map((hit) => [
       String(hit.payload?.packet_key ?? ''),
       String(hit.payload?.source_ref ?? ''),
     ]).flat().filter(Boolean);
 
-    const [hashEntries, matched] = await Promise.all([
-      redis.hgetall(keyHash).catch(() => ({})),
+    const [keysCount, matched] = await Promise.all([
+      (async () => {
+        let cursor = '0';
+        let count = 0;
+        do {
+          const [next, batch] = await redis.scan(cursor, 'MATCH', 'bifrost:packet:*', 'COUNT', 500);
+          cursor = next;
+          count += batch.length;
+        } while (cursor !== '0');
+        return count;
+      })().catch(() => 0),
       Promise.all(topRefs.map(async (ref) => {
-        const v = await redis.hget(keyHash, ref).catch(() => null);
-        return v ? 1 : 0;
+        const exists = await redis.exists(`bifrost:packet:${ref}`).catch(() => 0);
+        return exists ? 1 : 0;
       })),
     ]);
     const cacheHits = matched.reduce((sum, v) => sum + v, 0);
@@ -489,7 +497,7 @@ async function redisCacheProbe(hits) {
     return {
       ok: true,
       latency_ms: now() - start,
-      hot_key_count: Object.keys(hashEntries ?? {}).length,
+      hot_key_count: keysCount,
       cache_hits: cacheHits,
       source: 'valkey',
     };

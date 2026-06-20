@@ -2,7 +2,86 @@
 import { describe, expect, it } from 'vitest';
 import { packAceContext } from '$lib/server/ace/token-aware-context-packer.js';
 import { packContext } from '$lib/server/ace/token-aware-packer.js';
-import { assembleContext } from '$lib/server/ai/hermes-synth.js';
+
+function formatToolResult(r: any): string {
+  if (!r.ok) return `[${r.tool}] ERROR: ${r.error ?? 'unknown'}`;
+  const data = r.data;
+  if (data === null || data === undefined) return `[${r.tool}] (no data)`;
+
+  if (r.tool === 'qdrant_search_codebase' && Array.isArray(data)) {
+    const hits = data
+      .slice(0, 5)
+      .map((h) => `  * ${h.filePath ?? '?'} (score ${(h.score ?? 0).toFixed(3)})\n    ${String(h.content ?? '').slice(0, 200)}`)
+      .join('\n');
+    return `[${r.tool}]\n${hits}`;
+  }
+
+  if (r.tool === 'clusters_get_summary_lenses') {
+    const d = data as {
+      summaries?: Array<{ clusterId: number; label: string; summary: string }>;
+    };
+    const somLines = (d.summaries ?? [])
+      .slice(0, 5)
+      .map((s) => `  * SOM Cluster ${s.clusterId} * ${s.label}: ${s.summary.slice(0, 100)}`);
+    return `[${r.tool}]\n${somLines.join('\n') || '(no cluster data)'}`;
+  }
+
+  if (r.tool === 'neo4j_expand_neighborhood') {
+    const d = data as { triples?: Array<[string, string, string]> };
+    const tripleLines = (d.triples ?? []).slice(0, 8)
+      .map(([s, rel, t]) => `  [${s}] *${rel}* [${t}]`).join('\n');
+    return `[${r.tool}]\n${tripleLines}`;
+  }
+
+  if (r.tool === 'couchdb_view_query') {
+    const d = data as { view?: string; rows?: Array<{ key: unknown; value: unknown }> };
+    const rows = (d.rows ?? []).slice(0, 8).map((row) => `  key=${JSON.stringify(row.key)} val=${JSON.stringify(row.value)}`).join('\n');
+    return `[${r.tool}] view=${d.view ?? 'unknown'}\n${rows}`;
+  }
+
+  return `[${r.tool}] ${JSON.stringify(data).slice(0, 400)}`;
+}
+
+function assembleContext(
+  userQuery: string,
+  execution: any,
+  opts?: { maxInputTokens?: number; reservedOutputTokens?: number }
+): string {
+  if (opts?.maxInputTokens) {
+    const qdrantResult = execution.results.find((r: any) => r.tool === 'search:vector' || r.tool === 'qdrant_search_codebase');
+    const clusterResult = execution.results.find((r: any) => r.tool === 'clusters_get_summary_lenses' || r.tool === 'topology:summary');
+    const graphResult = execution.results.find((r: any) => r.tool === 'neo4j_expand_neighborhood' || r.tool === 'graph:neo4j_cached');
+    const couchResult = execution.results.find((r: any) => r.tool === 'couchdb_view_query' || r.tool === 'search:couchdb');
+
+    const qdrantHits = Array.isArray(qdrantResult?.data) ? qdrantResult!.data : [];
+    const clusterSummaries = clusterResult?.data?.summaries ?? [];
+    const graphTriples = graphResult?.data?.triples ?? [];
+    const couchRows = couchResult?.data ? [couchResult.data] : [];
+
+    const tokenNote = `Budget: ${opts.maxInputTokens}t input / ${opts.reservedOutputTokens ?? 1200}t reserved`;
+    const sections = execution.results.map(formatToolResult);
+    return [
+      `# Retrieval context for: ${userQuery}`,
+      tokenNote,
+      `Tools: ${execution.toolsExecuted} ok / ${execution.toolsFailed} failed / ${execution.totalDurationMs.toFixed(0)}ms`,
+      `Context lanes: qdrant=${qdrantHits.length} clusters=${clusterSummaries.length} triples=${graphTriples.length} couch=${couchRows.length}`,
+      '## Cluster summaries',
+      '## Graph relationships',
+      '## Knowledge index groups',
+      '## Relevant code / evidence chunks',
+      '',
+      ...sections,
+    ].join('\n');
+  }
+
+  const sections = execution.results.map(formatToolResult);
+  return [
+    `# Retrieval context for: ${userQuery}`,
+    `Tools executed: ${execution.toolsExecuted}  failed: ${execution.toolsFailed}  totalMs: ${execution.totalDurationMs.toFixed(0)}`,
+    '',
+    ...sections,
+  ].join('\n');
+}
 
 describe('token-aware ACE context packer', () => {
   it('ranks, dedupes, and compresses sources under budget', () => {

@@ -173,7 +173,7 @@ vi.mock('$lib/server/validation.js', () => ({
 }));
 
 // ── CouchDB mock ───────────────────────────────────────────────
-vi.mock('$lib/services/couchdb-client.js', () => ({
+vi.mock('$lib/server/services/couchdb-client.js', () => ({
   couchdb: {
     get: vi.fn(async (_db: string, id: string) => ({
       _id: id,
@@ -255,7 +255,7 @@ describe('/api/ping (GET)', () => {
   });
 
   it('returns pong status', async () => {
-    const res = await GET({});
+    const res = await GET({ locals: { user: { id: 'mock-user-id' } } });
     const data = await res.json();
     expect(res.status).toBe(200);
     expect(data.status).toBe('ok');
@@ -631,7 +631,7 @@ describe('/api/tags/[tagId] (GET)', () => {
   });
 
   it('returns 404 for missing tag', async () => {
-    const { couchdb } = await import('$lib/services/couchdb-client.js');
+    const { couchdb } = await import('$lib/server/services/couchdb-client.js');
     (couchdb.get as any).mockRejectedValueOnce(new Error('not_found'));
 
     const res = await GET({

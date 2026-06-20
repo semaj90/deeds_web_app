@@ -1,17 +1,17 @@
 {
-  "generated_at": "2026-06-13T15:02:54.904Z",
+  "generated_at": "2026-06-20T16:25:27.474Z",
   "mode": "apply",
-  "packets_processed": 11644,
+  "packets_processed": 524,
   "trace_backed": 0,
-  "heuristic": 11644,
+  "heuristic": 524,
   "trace_feature_refs": 10,
-  "new_high_reward": 11629,
+  "new_high_reward": 524,
   "post_apply": {
-    "total": 17475,
-    "has_reward": 17461,
-    "high_reward": 17460,
-    "still_zero": 14,
-    "avg_reward": 0.7794,
+    "total": 17985,
+    "has_reward": 17985,
+    "high_reward": 17984,
+    "still_zero": 0,
+    "avg_reward": 0.7632,
     "gate_pass": true
   }
 }

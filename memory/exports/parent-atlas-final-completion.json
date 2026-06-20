@@ -1,6 +1,6 @@
 {
   "schema": "parent_atlas_final_completion.v1",
-  "ts": "2026-06-19T23:21:22.826Z",
+  "ts": "2026-06-20T15:46:43.492Z",
   "overall": "PASS",
   "passed": 5,
   "failed": 0,
@@ -68,7 +68,7 @@
       "sourceRefHash": "96.2%",
       "feature_id": "98.4%",
       "cluster_id_note": "optional_reserved — NULL until GPU cluster bridge implemented",
-      "generatedAt": "2026-06-19T23:21:22.767Z"
+      "generatedAt": "2026-06-20T15:46:43.424Z"
     },
     "M3": {
       "status": "PASS",
@@ -207,7 +207,7 @@
         "qdrant",
         "neo4j"
       ],
-      "generatedAt": "2026-06-19T23:21:20.406Z"
+      "generatedAt": "2026-06-20T15:46:38.895Z"
     }
   },
   "convergence": {

@@ -197,7 +197,7 @@
     "turbovec": {
       "type": "remote",
       "url": "http://127.0.0.1:8791/mcp",
-      "enabled": false,
+      "enabled": true,
       "timeout": 30000
     },
     "gemma4-offload": {

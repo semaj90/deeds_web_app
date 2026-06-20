@@ -176,6 +176,9 @@ Test with:
 	}
 }
 
-seedCitations()
-	.then(() => process.exit(0))
-	.catch(() => process.exit(1));
+const isMain = process.argv[1] && (process.argv[1].endsWith('seed-citations.ts') || process.argv[1].endsWith('seed-citations.js'));
+if (isMain) {
+	seedCitations()
+		.then(() => process.exit(0))
+		.catch(() => process.exit(1));
+}

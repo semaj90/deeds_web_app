@@ -5,6 +5,8 @@ import { resolve } from 'node:path';
 
 // Static source paths — read at test runtime, not import time
 const SRC_ROOT = resolve(process.cwd(), 'src/lib/server/ace');
+const FEATURES_AI_ROOT = resolve(process.cwd(), 'src/lib/server/features/ai/ace');
+const FEATURES_RAG_ROOT = resolve(process.cwd(), 'src/lib/server/features/rag');
 
 const mocks = vi.hoisted(() => {
   const mockGet = vi.fn();
@@ -36,7 +38,7 @@ describe('multi-lane-spine: regression guards', () => {
   // ── 1. context-assembler is wired to runRetrievalLanes ─────────────────────
 
   it('context-assembler.ts imports and calls runRetrievalLanes', () => {
-    const src = readFileSync(resolve(SRC_ROOT, 'context-assembler.ts'), 'utf-8');
+    const src = readFileSync(resolve(FEATURES_AI_ROOT, 'context-assembler.ts'), 'utf-8');
     expect(src).toContain('runRetrievalLanes');
     // ensure it is a live call, not just a type import
     expect(src).toMatch(/runRetrievalLanes\s*\(/);
@@ -45,8 +47,8 @@ describe('multi-lane-spine: regression guards', () => {
   // ── 2. aceTopkKey is used as the shared key contract by both modules ────────
 
   it('aceTopkKey is imported by both retrieval-lanes.ts and context-assembler.ts', () => {
-    const lanesSource = readFileSync(resolve(SRC_ROOT, 'retrieval-lanes.ts'), 'utf-8');
-    const assemblerSource = readFileSync(resolve(SRC_ROOT, 'context-assembler.ts'), 'utf-8');
+    const lanesSource = readFileSync(resolve(FEATURES_RAG_ROOT, 'retrieval-lanes.ts'), 'utf-8');
+    const assemblerSource = readFileSync(resolve(FEATURES_AI_ROOT, 'context-assembler.ts'), 'utf-8');
 
     expect(lanesSource).toContain('aceTopkKey');
     expect(assemblerSource).toContain('aceTopkKey');
@@ -66,7 +68,7 @@ describe('multi-lane-spine: regression guards', () => {
       skipVectorLane: true,
     });
 
-    const vectorLane = result.lanes.find((l) => l.lane === "vector");
+    const vectorLane = result.lanes.find((l) => l.lane === "dense");
     expect(vectorLane).toBeDefined();
     expect(vectorLane?.skipped).toBe(true);
     expect(vectorLane?.skipReason).toBeTruthy();

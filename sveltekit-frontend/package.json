@@ -255,6 +255,8 @@
     "atlas:summaries:gemma4:batch": "node scripts/atlas/gemma4-batch-summaries.mjs",
     "atlas:summaries:gemma4:batch:apply": "node scripts/atlas/gemma4-batch-summaries.mjs --apply",
     "atlas:summaries:gemma4:batch:dry": "node scripts/atlas/gemma4-batch-summaries.mjs --dry-run",
+    "atlas:summaries:gemma4:500:dry": "node ../scripts/atlas/gemma4-parent-atlas-summaries.mjs --cache --limit=500 --concurrency=1",
+    "atlas:summaries:gemma4:500:apply": "node ../scripts/atlas/gemma4-parent-atlas-summaries.mjs --cache --apply --limit=500 --concurrency=1",
     "atlas:summaries:import": "node scripts/atlas/duckdb-import-summaries.mjs",
     "atlas:summaries:import:apply": "node scripts/atlas/duckdb-import-summaries.mjs --apply",
     "atlas:summaries:embed": "node scripts/atlas/embedding-prep-summaries.mjs",

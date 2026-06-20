@@ -9,16 +9,20 @@ const mockRedisExists = vi.fn().mockResolvedValue(0);
 const mockSearchCodebase = vi.fn();
 const mockNearestCluster = vi.fn();
 
-vi.mock('$lib/server/redis.js', () => ({
-  getRedis: () => ({
+vi.mock('$lib/server/redis.js', () => {
+  const connection = {
     get:      mockRedisGet,
     setex:    mockRedisSetex,
     exists:   mockRedisExists,
     keys:     vi.fn().mockResolvedValue([]),
     mget:     vi.fn().mockResolvedValue([]),
     pipeline: vi.fn(() => ({ setex: vi.fn(), exec: vi.fn().mockResolvedValue([]) })),
-  }),
-}));
+  };
+  return {
+    getRedis: () => connection,
+    redis: connection,
+  };
+});
 
 vi.mock('$lib/server/grpc/embedding-client.js', () => ({
   generateEmbeddings:     vi.fn().mockResolvedValue({ vectors: [Array(768).fill(0.1)], model: 'embeddinggemma' }),

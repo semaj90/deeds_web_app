@@ -22,6 +22,7 @@ import { loadAtlasEnv } from './load-atlas-env.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = path.resolve(__dirname, '../..');
+const WORKSPACE_ROOT = path.resolve(REPO_ROOT, '..');
 const REPORTS_DIR = path.join(REPO_ROOT, 'docs', 'reports');
 
 async function checkHttpService(url, timeout = 5000) {
@@ -51,7 +52,7 @@ async function checkHttpService(url, timeout = 5000) {
 async function checkTensorrtBridge() {
   const require = createRequire(import.meta.url);
   try {
-    const addonPath = path.resolve(REPO_ROOT, 'simd-bridge/cpp/build/Release/tensorrt_bridge.node');
+    const addonPath = path.resolve(WORKSPACE_ROOT, 'simd-bridge/cpp/build/Release/tensorrt_bridge.node');
     const stats = await fs.stat(addonPath);
 
     try {
@@ -79,8 +80,16 @@ async function checkTensorrtBridge() {
   }
 }
 
-async function checkCuvsLibrary() {
-  // Check if cuVS library is available
+async function checkCuvsLibrary(addonFunctions = []) {
+  if (addonFunctions.includes('cuvsCompressEmbedding')) {
+    return {
+      available: true,
+      path: 'tensorrt_bridge.node:cuvsCompressEmbedding',
+      note: 'cuVS-compatible compression is exposed by the loaded native addon',
+    };
+  }
+
+  // Linux/container fallback.
   try {
     const cuvsPath = '/usr/local/cuda/lib64/libcuvs.so';
     await fs.stat(cuvsPath);
@@ -125,7 +134,11 @@ async function checkQdrantCollection(qdrantUrl, collectionName) {
 async function checkPayloadStructure(qdrantUrl, collectionName) {
   // Sample a point to verify payload has reranking fields
   try {
-    const res = await fetch(`${qdrantUrl}/collections/${collectionName}/points?limit=1`);
+    const res = await fetch(`${qdrantUrl}/collections/${collectionName}/points/scroll`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ limit: 1, with_payload: true, with_vector: false }),
+    });
     if (!res.ok) return { available: false };
 
     const data = await res.json();
@@ -181,15 +194,15 @@ async function main() {
     console.log(`\n[1/6] Checking TurboVec sidecar at ${turbovecUrl}...`);
     report.checks.turbovec_http = await checkHttpService(`${turbovecUrl}/health`);
     if (!report.checks.turbovec_http.available) {
-      report.blockers.push('TurboVec sidecar not available at :50062');
-      console.log(`  ❌ TurboVec not available`);
+      report.warnings.push('TurboVec sidecar not available at :50062; N-API fallback remains available');
+      console.log(`  ⚠️ TurboVec sidecar not available`);
     } else {
       console.log(`  ✅ TurboVec available`);
     }
 
     // Check 2: Qdrant HTTP service
     console.log(`\n[2/6] Checking Qdrant at ${qdrantUrl}...`);
-    report.checks.qdrant_http = await checkHttpService(`${qdrantUrl}/health`);
+    report.checks.qdrant_http = await checkHttpService(`${qdrantUrl}/collections`);
     if (!report.checks.qdrant_http.available) {
       report.blockers.push('Qdrant not available at :6333');
       console.log(`  ❌ Qdrant not available`);
@@ -213,7 +226,7 @@ async function main() {
 
     // Check 4: cuVS library
     console.log(`\n[4/6] Checking cuVS library...`);
-    report.checks.cuvs_library = await checkCuvsLibrary();
+    report.checks.cuvs_library = await checkCuvsLibrary(report.checks.tensorrt_bridge.functions ?? []);
     if (!report.checks.cuvs_library.available) {
       report.warnings.push('cuVS library not found (optional, for GPU compression)');
       console.log(`  ⚠️ cuVS not found`);

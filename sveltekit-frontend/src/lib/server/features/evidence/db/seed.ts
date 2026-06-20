@@ -583,8 +583,11 @@ Analysis supports further investigation.
 	}
 }
 
-seed()
-	.then(() => process.exit(0))
-	.catch(() => process.exit(1));
+const isMain = process.argv[1] && (process.argv[1].endsWith('seed.ts') || process.argv[1].endsWith('seed.js'));
+if (isMain) {
+	seed()
+		.then(() => process.exit(0))
+		.catch(() => process.exit(1));
+}
 
 export { seed };

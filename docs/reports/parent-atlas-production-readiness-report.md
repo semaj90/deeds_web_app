@@ -1,6 +1,6 @@
 # Parent Atlas Production Readiness Audit
 
-Generated: 2026-06-19T23:21:20.406Z
+Generated: 2026-06-20T15:46:38.895Z
 
 ## Summary
 
@@ -19,13 +19,13 @@ Generated: 2026-06-19T23:21:20.406Z
 - Redis LOD0 latest packet coverage: 9/9
 - Native JSON parser: native addon path present; fallback present
 - NDJSON files discovered with rg -uuu: 191
-- Phase 101 batch summaries: 35 succeeded / 0 failed
+- Phase 101 batch summaries: 146 succeeded / 0 failed
 - Autoencoder dims: 768→256→64
 
 ## Directory Lanes
 
 - scripts/atlas/: batch summaries validated, NDJSON/DuckDB offline indexing present, and the production readiness audit is read-only
-- scripts/atlas/gemma4-parent-atlas-summaries.mjs: latest cached batch report loaded (35 queued)
+- scripts/atlas/gemma4-parent-atlas-summaries.mjs: latest cached batch report loaded (146 queued)
 - scripts/atlas/ndjson-mapreduce-join.mjs: offline MapReduce join, cluster summaries, and graph-edge generation present
 - scripts/atlas/materialize-mapreduce-duckdb.mjs: DuckDB materialization lane present
 - sveltekit-frontend/src/lib/server/gpu/: libtorch/autoencoder/topology projection lane present; internal torch::mm GEMM is detected; generic matmul_f32 export remains absent
@@ -34,11 +34,11 @@ Generated: 2026-06-19T23:21:20.406Z
 
 ## Checks
 
-- PASS [summary-batch] report:exists: Loaded gemma4-parent-atlas-summary-cache-report.json (35 queued)
+- PASS [summary-batch] report:exists: Loaded gemma4-parent-atlas-summary-cache-report.json (146 queued)
 - PASS [summary-batch] report:passed: Failed rows: 0
-- PASS [summary-batch] report:sourceRefReads: sourceRef packet reads: 35
-- PASS [summary-batch] report:summariesWritten: summaries written: 35
-- PASS [summary-batch] report:cache-counters: Exact hits=0, semantic hits=0, llama calls=35
+- PASS [summary-batch] report:sourceRefReads: sourceRef packet reads: 146
+- PASS [summary-batch] report:summariesWritten: summaries written: 146
+- PASS [summary-batch] report:cache-counters: Exact hits=0, semantic hits=0, llama calls=146
 - PASS [gpu] libtorchBridge: sveltekit-frontend/src/lib/server/gpu/libtorch-bridge.ts exists
 - PASS [gpu] pytorchGraph: sveltekit-frontend/src/lib/server/gpu/pytorch-graph.ts exists
 - PASS [gpu] autoencoderBridge: sveltekit-frontend/src/lib/server/gpu/autoencoder-bridge.ts exists
@@ -93,7 +93,7 @@ Generated: 2026-06-19T23:21:20.406Z
 - PASS [postgres] table:codebase_chunk_index: codebase_chunk_index exists with 40754 rows
 - PASS [postgres] table:agent_pickup_queue: agent_pickup_queue exists with 135 rows
 - PASS [postgres] parent_atlas_documents:sourceRef: Parent Atlas sourceRefs: 3941/3941
-- PASS [postgres] parent_atlas_documents:summaries: Parent Atlas summaries: 3794/3941
+- PASS [postgres] parent_atlas_documents:summaries: Parent Atlas summaries: 3941/3941
 - PASS [postgres] active-production:topology: Active production qdrant-without-SOM rows: 0
 - PASS [postgres] nes-chrom:sourceRef-parent-join: NES/CHROM packets matching Parent Atlas: 10042/14911
 - PASS [postgres] route-runtime:sourceRefs: Runtime packets with sourceRefs: 8/9

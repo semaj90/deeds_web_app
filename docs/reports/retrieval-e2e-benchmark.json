@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-06-19T20:00:08.285Z",
+  "generatedAt": "2026-06-20T01:11:10.859Z",
   "repoRoot": "C:\\Users\\james\\Videos\\deeds-web-app",
   "projectRoot": "http://127.0.0.1:5173",
   "queries": [
@@ -7,43 +7,43 @@
       "query": "find parent atlas identity spine",
       "query_hash": "bc955c9fc864673cb585490a702e7dbdac9198ec9f0274a23eb0349abdb1a358",
       "retrieval_strategy": "fusion",
-      "qdrant_ms": 168,
-      "postgres_lookup_ms": 23,
+      "qdrant_ms": 73,
+      "postgres_lookup_ms": 7,
       "neo4j_expand_ms": 0,
-      "redis_cache_ms": 14,
-      "gpu_rerank_ms": 479,
-      "answer_ms": 2232,
-      "total_ms": 7531,
+      "redis_cache_ms": 366,
+      "gpu_rerank_ms": 383,
+      "answer_ms": 2065,
+      "total_ms": 6698,
       "qdrant_hits": 12,
       "ledger_matches": 0,
       "tree_matches": 0,
       "glyph_matches": 0,
       "neo4j_matches": 0,
       "rerank_count": 0,
-      "answer_length": 471,
+      "answer_length": 649,
       "errors": [
-        "gpu_degraded: node:internal/modules/run_main:123\r\n    triggerUncaughtException(\r\n    ^\r\nError [ERR_MODULE_NOT_FOUND]: Cannot find package '$lib' imported from C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\src\\lib\\server\\gpu\\libtorch-bridge.ts\r\n    at Object.getPackageJSONURL (node:internal/modules/package_json_reader:256:9)\r\n    at packageResolve (node:internal/modules/esm/resolve:768:81)\r\n    at moduleResolve (node:internal/modules/esm/resolve:854:18)\r\n    at defaultResolve (node:internal/modules/esm/resolve:984:11)\r\n    at nextResolve (node:internal/modules/esm/hooks:748:28)\r\n    at resolveBase (file:///C:/Users/james/Videos/deeds-web-app/node_modules/tsx/dist/esm/index.mjs?1781899213698:2:3744)\r\n    at resolveDirectory (file:///C:/Users/james/Videos/deeds-web-app/node_modules/tsx/dist/esm/index.mjs?1781899213698:2:4243)\r\n    at resolveTsPaths (file:///C:/Users/james/Videos/deeds-web-app/node_modules/tsx/dist/esm/index.mjs?1781899213698:2:4984)\r\n    at resolve (file:///C:/Users/james/Videos/deeds-web-app/node_modules/tsx/dist/esm/index.mjs?1781899213698:2:5361)\r\n    at nextResolve (node:internal/modules/esm/hooks:748:28) {\r\n  code: 'ERR_MODULE_NOT_FOUND'\r\n}\r\n\r\nNode.js v22.17.1"
+        "gpu_degraded: node:internal/modules/run_main:123\r\n    triggerUncaughtException(\r\n    ^\r\nError [ERR_MODULE_NOT_FOUND]: Cannot find package '$lib' imported from C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\src\\lib\\server\\gpu\\libtorch-bridge.ts\r\n    at Object.getPackageJSONURL (node:internal/modules/package_json_reader:256:9)\r\n    at packageResolve (node:internal/modules/esm/resolve:768:81)\r\n    at moduleResolve (node:internal/modules/esm/resolve:854:18)\r\n    at defaultResolve (node:internal/modules/esm/resolve:984:11)\r\n    at nextResolve (node:internal/modules/esm/hooks:748:28)\r\n    at resolveBase (file:///C:/Users/james/Videos/deeds-web-app/node_modules/tsx/dist/esm/index.mjs?1781917875402:2:3744)\r\n    at resolveDirectory (file:///C:/Users/james/Videos/deeds-web-app/node_modules/tsx/dist/esm/index.mjs?1781917875402:2:4243)\r\n    at resolveTsPaths (file:///C:/Users/james/Videos/deeds-web-app/node_modules/tsx/dist/esm/index.mjs?1781917875402:2:4984)\r\n    at resolve (file:///C:/Users/james/Videos/deeds-web-app/node_modules/tsx/dist/esm/index.mjs?1781917875402:2:5361)\r\n    at nextResolve (node:internal/modules/esm/hooks:748:28) {\r\n  code: 'ERR_MODULE_NOT_FOUND'\r\n}\r\n\r\nNode.js v22.17.1"
       ],
       "status": "degraded",
       "services": {
         "embedding": {
           "ok": true,
-          "latency_ms": 4613,
+          "latency_ms": 3802,
           "model": "embeddinggemma:latest"
         },
         "qdrant": {
           "ok": true,
-          "latency_ms": 168,
+          "latency_ms": 73,
           "error": null
         },
         "postgres": {
           "ok": true,
-          "latency_ms": 23
+          "latency_ms": 7
         },
         "redis": {
           "ok": true,
-          "latency_ms": 14,
-          "hot_key_count": 0,
+          "latency_ms": 366,
+          "hot_key_count": 78,
           "cache_hits": 0,
           "source": "valkey"
         },
@@ -56,16 +56,16 @@
         },
         "gpu": {
           "ok": false,
-          "latency_ms": 479,
+          "latency_ms": 383,
           "source": "unavailable",
-          "error": "node:internal/modules/run_main:123\r\n    triggerUncaughtException(\r\n    ^\r\nError [ERR_MODULE_NOT_FOUND]: Cannot find package '$lib' imported from C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\src\\lib\\server\\gpu\\libtorch-bridge.ts\r\n    at Object.getPackageJSONURL (node:internal/modules/package_json_reader:256:9)\r\n    at packageResolve (node:internal/modules/esm/resolve:768:81)\r\n    at moduleResolve (node:internal/modules/esm/resolve:854:18)\r\n    at defaultResolve (node:internal/modules/esm/resolve:984:11)\r\n    at nextResolve (node:internal/modules/esm/hooks:748:28)\r\n    at resolveBase (file:///C:/Users/james/Videos/deeds-web-app/node_modules/tsx/dist/esm/index.mjs?1781899213698:2:3744)\r\n    at resolveDirectory (file:///C:/Users/james/Videos/deeds-web-app/node_modules/tsx/dist/esm/index.mjs?1781899213698:2:4243)\r\n    at resolveTsPaths (file:///C:/Users/james/Videos/deeds-web-app/node_modules/tsx/dist/esm/index.mjs?1781899213698:2:4984)\r\n    at resolve (file:///C:/Users/james/Videos/deeds-web-app/node_modules/tsx/dist/esm/index.mjs?1781899213698:2:5361)\r\n    at nextResolve (node:internal/modules/esm/hooks:748:28) {\r\n  code: 'ERR_MODULE_NOT_FOUND'\r\n}\r\n\r\nNode.js v22.17.1",
+          "error": "node:internal/modules/run_main:123\r\n    triggerUncaughtException(\r\n    ^\r\nError [ERR_MODULE_NOT_FOUND]: Cannot find package '$lib' imported from C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\src\\lib\\server\\gpu\\libtorch-bridge.ts\r\n    at Object.getPackageJSONURL (node:internal/modules/package_json_reader:256:9)\r\n    at packageResolve (node:internal/modules/esm/resolve:768:81)\r\n    at moduleResolve (node:internal/modules/esm/resolve:854:18)\r\n    at defaultResolve (node:internal/modules/esm/resolve:984:11)\r\n    at nextResolve (node:internal/modules/esm/hooks:748:28)\r\n    at resolveBase (file:///C:/Users/james/Videos/deeds-web-app/node_modules/tsx/dist/esm/index.mjs?1781917875402:2:3744)\r\n    at resolveDirectory (file:///C:/Users/james/Videos/deeds-web-app/node_modules/tsx/dist/esm/index.mjs?1781917875402:2:4243)\r\n    at resolveTsPaths (file:///C:/Users/james/Videos/deeds-web-app/node_modules/tsx/dist/esm/index.mjs?1781917875402:2:4984)\r\n    at resolve (file:///C:/Users/james/Videos/deeds-web-app/node_modules/tsx/dist/esm/index.mjs?1781917875402:2:5361)\r\n    at nextResolve (node:internal/modules/esm/hooks:748:28) {\r\n  code: 'ERR_MODULE_NOT_FOUND'\r\n}\r\n\r\nNode.js v22.17.1",
           "scores": []
         },
         "answer": {
           "ok": true,
-          "latency_ms": 2232,
+          "latency_ms": 2065,
           "model": "local",
-          "answer": "<|channel>thought\nThinking Process:\n\n1.  **Analyze the Request:** The user wants to find the \"parent atlas identity spine\" using a provided context.\n2.  **Analyze the Context:** The context provided is \"No context returned.\"\n3.  **Determine the Action:** Since there is no information (evidence) to support the query, I must state that the evidence is thin, as per the instructions.\n4.  **Formulate the Answer:** Keep it brief and concrete.<channel|>The evidence is thin.",
+          "answer": "<|channel>thought\nThinking Process:\n\n1.  **Analyze the Request:** The user is asking a specific query: \"find parent atlas identity spine.\"\n2.  **Analyze the Context:** The provided context is \"No context returned.\"\n3.  **Determine the Goal:** The role is a \"concise retrieval benchmark assistant.\" The instruction is to answer briefly and concretely, and if evidence is thin, state that.\n4.  **Formulate the Answer:** Since there is no context provided, I cannot answer the query. I must state that the evidence is thin.\n\n*Self-Correction/Refinement:* The answer must be direct and acknowledge the lack of information.<channel|>The evidence is thin.",
           "source": "turboquant"
         }
       },
@@ -75,96 +75,28 @@
       "query": "phase 16 higher hop qdrant discovery",
       "query_hash": "c166f2aafc2d0f926b60ca1097e40cc228c812b442d4d207c626b7ac8faefad5",
       "retrieval_strategy": "fusion",
-      "qdrant_ms": 49,
-      "postgres_lookup_ms": 4,
-      "neo4j_expand_ms": 0,
-      "redis_cache_ms": 5,
-      "gpu_rerank_ms": 405,
-      "answer_ms": 2265,
-      "total_ms": 2893,
-      "qdrant_hits": 12,
-      "ledger_matches": 0,
-      "tree_matches": 0,
-      "glyph_matches": 0,
-      "neo4j_matches": 0,
-      "rerank_count": 0,
-      "answer_length": 759,
-      "errors": [
-        "gpu_degraded: node:internal/modules/run_main:123\r\n    triggerUncaughtException(\r\n    ^\r\nError [ERR_MODULE_NOT_FOUND]: Cannot find package '$lib' imported from C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\src\\lib\\server\\gpu\\libtorch-bridge.ts\r\n    at Object.getPackageJSONURL (node:internal/modules/package_json_reader:256:9)\r\n    at packageResolve (node:internal/modules/esm/resolve:768:81)\r\n    at moduleResolve (node:internal/modules/esm/resolve:854:18)\r\n    at defaultResolve (node:internal/modules/esm/resolve:984:11)\r\n    at nextResolve (node:internal/modules/esm/hooks:748:28)\r\n    at resolveBase (file:///C:/Users/james/Videos/deeds-web-app/node_modules/tsx/dist/esm/index.mjs?1781899218130:2:3744)\r\n    at resolveDirectory (file:///C:/Users/james/Videos/deeds-web-app/node_modules/tsx/dist/esm/index.mjs?1781899218130:2:4243)\r\n    at resolveTsPaths (file:///C:/Users/james/Videos/deeds-web-app/node_modules/tsx/dist/esm/index.mjs?1781899218130:2:4984)\r\n    at resolve (file:///C:/Users/james/Videos/deeds-web-app/node_modules/tsx/dist/esm/index.mjs?1781899218130:2:5361)\r\n    at nextResolve (node:internal/modules/esm/hooks:748:28) {\r\n  code: 'ERR_MODULE_NOT_FOUND'\r\n}\r\n\r\nNode.js v22.17.1"
-      ],
-      "status": "degraded",
-      "services": {
-        "embedding": {
-          "ok": true,
-          "latency_ms": 165,
-          "model": "embeddinggemma:latest"
-        },
-        "qdrant": {
-          "ok": true,
-          "latency_ms": 49,
-          "error": null
-        },
-        "postgres": {
-          "ok": true,
-          "latency_ms": 4
-        },
-        "redis": {
-          "ok": true,
-          "latency_ms": 5,
-          "hot_key_count": 0,
-          "cache_hits": 0,
-          "source": "valkey"
-        },
-        "neo4j": {
-          "ok": true,
-          "latency_ms": 0,
-          "matches": 0,
-          "error": null,
-          "source": "skipped_no_context"
-        },
-        "gpu": {
-          "ok": false,
-          "latency_ms": 405,
-          "source": "unavailable",
-          "error": "node:internal/modules/run_main:123\r\n    triggerUncaughtException(\r\n    ^\r\nError [ERR_MODULE_NOT_FOUND]: Cannot find package '$lib' imported from C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\src\\lib\\server\\gpu\\libtorch-bridge.ts\r\n    at Object.getPackageJSONURL (node:internal/modules/package_json_reader:256:9)\r\n    at packageResolve (node:internal/modules/esm/resolve:768:81)\r\n    at moduleResolve (node:internal/modules/esm/resolve:854:18)\r\n    at defaultResolve (node:internal/modules/esm/resolve:984:11)\r\n    at nextResolve (node:internal/modules/esm/hooks:748:28)\r\n    at resolveBase (file:///C:/Users/james/Videos/deeds-web-app/node_modules/tsx/dist/esm/index.mjs?1781899218130:2:3744)\r\n    at resolveDirectory (file:///C:/Users/james/Videos/deeds-web-app/node_modules/tsx/dist/esm/index.mjs?1781899218130:2:4243)\r\n    at resolveTsPaths (file:///C:/Users/james/Videos/deeds-web-app/node_modules/tsx/dist/esm/index.mjs?1781899218130:2:4984)\r\n    at resolve (file:///C:/Users/james/Videos/deeds-web-app/node_modules/tsx/dist/esm/index.mjs?1781899218130:2:5361)\r\n    at nextResolve (node:internal/modules/esm/hooks:748:28) {\r\n  code: 'ERR_MODULE_NOT_FOUND'\r\n}\r\n\r\nNode.js v22.17.1",
-          "scores": []
-        },
-        "answer": {
-          "ok": true,
-          "latency_ms": 2265,
-          "model": "local",
-          "answer": "<|channel>thought\nThinking Process:\n\n1.  **Analyze the Request:** The user is asking a highly specific, technical query: \"phase 16 higher hop qdrant discovery.\"\n2.  **Analyze the Context:** The provided context is \"No context returned.\"\n3.  **Determine the Goal:** The persona is a \"concise retrieval benchmark assistant.\" The instruction is to \"answer briefly and concretely\" and state that evidence is thin if necessary.\n4.  **Formulate the Answer:** Since there is no context to support the query, the answer must state that the evidence is thin.\n\n*Self-Correction/Refinement:* Do not try to guess the meaning of the terms (phase 16, higher hop, qdrant). Stick strictly to the evidence provided.\n\n5.  **Final Output Generation.**<channel|>Evidence is thin.",
-          "source": "turboquant"
-        }
-      },
-      "top_packets": []
-    },
-    {
-      "query": "trace mcp tool validation",
-      "query_hash": "d2055c7edad263407fed5d0ebe9fd7d7a0ac78e24e2c37ddcb149fec1e3e102e",
-      "retrieval_strategy": "fusion",
       "qdrant_ms": 28,
       "postgres_lookup_ms": 2,
       "neo4j_expand_ms": 0,
-      "redis_cache_ms": 4,
-      "gpu_rerank_ms": 301,
-      "answer_ms": 1734,
-      "total_ms": 2182,
+      "redis_cache_ms": 304,
+      "gpu_rerank_ms": 321,
+      "answer_ms": 2073,
+      "total_ms": 2886,
       "qdrant_hits": 12,
       "ledger_matches": 0,
       "tree_matches": 0,
       "glyph_matches": 0,
       "neo4j_matches": 0,
       "rerank_count": 0,
-      "answer_length": 568,
+      "answer_length": 719,
       "errors": [
-        "gpu_degraded: node:internal/modules/run_main:123\r\n    triggerUncaughtException(\r\n    ^\r\nError [ERR_MODULE_NOT_FOUND]: Cannot find package '$lib' imported from C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\src\\lib\\server\\gpu\\libtorch-bridge.ts\r\n    at Object.getPackageJSONURL (node:internal/modules/package_json_reader:256:9)\r\n    at packageResolve (node:internal/modules/esm/resolve:768:81)\r\n    at moduleResolve (node:internal/modules/esm/resolve:854:18)\r\n    at defaultResolve (node:internal/modules/esm/resolve:984:11)\r\n    at nextResolve (node:internal/modules/esm/hooks:748:28)\r\n    at resolveBase (file:///C:/Users/james/Videos/deeds-web-app/node_modules/tsx/dist/esm/index.mjs?1781899222391:2:3744)\r\n    at resolveDirectory (file:///C:/Users/james/Videos/deeds-web-app/node_modules/tsx/dist/esm/index.mjs?1781899222391:2:4243)\r\n    at resolveTsPaths (file:///C:/Users/james/Videos/deeds-web-app/node_modules/tsx/dist/esm/index.mjs?1781899222391:2:4984)\r\n    at resolve (file:///C:/Users/james/Videos/deeds-web-app/node_modules/tsx/dist/esm/index.mjs?1781899222391:2:5361)\r\n    at nextResolve (node:internal/modules/esm/hooks:748:28) {\r\n  code: 'ERR_MODULE_NOT_FOUND'\r\n}\r\n\r\nNode.js v22.17.1"
+        "gpu_degraded: node:internal/modules/run_main:123\r\n    triggerUncaughtException(\r\n    ^\r\nError [ERR_MODULE_NOT_FOUND]: Cannot find package '$lib' imported from C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\src\\lib\\server\\gpu\\libtorch-bridge.ts\r\n    at Object.getPackageJSONURL (node:internal/modules/package_json_reader:256:9)\r\n    at packageResolve (node:internal/modules/esm/resolve:768:81)\r\n    at moduleResolve (node:internal/modules/esm/resolve:854:18)\r\n    at defaultResolve (node:internal/modules/esm/resolve:984:11)\r\n    at nextResolve (node:internal/modules/esm/hooks:748:28)\r\n    at resolveBase (file:///C:/Users/james/Videos/deeds-web-app/node_modules/tsx/dist/esm/index.mjs?1781917879830:2:3744)\r\n    at resolveDirectory (file:///C:/Users/james/Videos/deeds-web-app/node_modules/tsx/dist/esm/index.mjs?1781917879830:2:4243)\r\n    at resolveTsPaths (file:///C:/Users/james/Videos/deeds-web-app/node_modules/tsx/dist/esm/index.mjs?1781917879830:2:4984)\r\n    at resolve (file:///C:/Users/james/Videos/deeds-web-app/node_modules/tsx/dist/esm/index.mjs?1781917879830:2:5361)\r\n    at nextResolve (node:internal/modules/esm/hooks:748:28) {\r\n  code: 'ERR_MODULE_NOT_FOUND'\r\n}\r\n\r\nNode.js v22.17.1"
       ],
       "status": "degraded",
       "services": {
         "embedding": {
           "ok": true,
-          "latency_ms": 113,
+          "latency_ms": 158,
           "model": "embeddinggemma:latest"
         },
         "qdrant": {
@@ -178,8 +110,8 @@
         },
         "redis": {
           "ok": true,
-          "latency_ms": 4,
-          "hot_key_count": 0,
+          "latency_ms": 304,
+          "hot_key_count": 78,
           "cache_hits": 0,
           "source": "valkey"
         },
@@ -192,16 +124,84 @@
         },
         "gpu": {
           "ok": false,
-          "latency_ms": 301,
+          "latency_ms": 321,
           "source": "unavailable",
-          "error": "node:internal/modules/run_main:123\r\n    triggerUncaughtException(\r\n    ^\r\nError [ERR_MODULE_NOT_FOUND]: Cannot find package '$lib' imported from C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\src\\lib\\server\\gpu\\libtorch-bridge.ts\r\n    at Object.getPackageJSONURL (node:internal/modules/package_json_reader:256:9)\r\n    at packageResolve (node:internal/modules/esm/resolve:768:81)\r\n    at moduleResolve (node:internal/modules/esm/resolve:854:18)\r\n    at defaultResolve (node:internal/modules/esm/resolve:984:11)\r\n    at nextResolve (node:internal/modules/esm/hooks:748:28)\r\n    at resolveBase (file:///C:/Users/james/Videos/deeds-web-app/node_modules/tsx/dist/esm/index.mjs?1781899222391:2:3744)\r\n    at resolveDirectory (file:///C:/Users/james/Videos/deeds-web-app/node_modules/tsx/dist/esm/index.mjs?1781899222391:2:4243)\r\n    at resolveTsPaths (file:///C:/Users/james/Videos/deeds-web-app/node_modules/tsx/dist/esm/index.mjs?1781899222391:2:4984)\r\n    at resolve (file:///C:/Users/james/Videos/deeds-web-app/node_modules/tsx/dist/esm/index.mjs?1781899222391:2:5361)\r\n    at nextResolve (node:internal/modules/esm/hooks:748:28) {\r\n  code: 'ERR_MODULE_NOT_FOUND'\r\n}\r\n\r\nNode.js v22.17.1",
+          "error": "node:internal/modules/run_main:123\r\n    triggerUncaughtException(\r\n    ^\r\nError [ERR_MODULE_NOT_FOUND]: Cannot find package '$lib' imported from C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\src\\lib\\server\\gpu\\libtorch-bridge.ts\r\n    at Object.getPackageJSONURL (node:internal/modules/package_json_reader:256:9)\r\n    at packageResolve (node:internal/modules/esm/resolve:768:81)\r\n    at moduleResolve (node:internal/modules/esm/resolve:854:18)\r\n    at defaultResolve (node:internal/modules/esm/resolve:984:11)\r\n    at nextResolve (node:internal/modules/esm/hooks:748:28)\r\n    at resolveBase (file:///C:/Users/james/Videos/deeds-web-app/node_modules/tsx/dist/esm/index.mjs?1781917879830:2:3744)\r\n    at resolveDirectory (file:///C:/Users/james/Videos/deeds-web-app/node_modules/tsx/dist/esm/index.mjs?1781917879830:2:4243)\r\n    at resolveTsPaths (file:///C:/Users/james/Videos/deeds-web-app/node_modules/tsx/dist/esm/index.mjs?1781917879830:2:4984)\r\n    at resolve (file:///C:/Users/james/Videos/deeds-web-app/node_modules/tsx/dist/esm/index.mjs?1781917879830:2:5361)\r\n    at nextResolve (node:internal/modules/esm/hooks:748:28) {\r\n  code: 'ERR_MODULE_NOT_FOUND'\r\n}\r\n\r\nNode.js v22.17.1",
           "scores": []
         },
         "answer": {
           "ok": true,
-          "latency_ms": 1734,
+          "latency_ms": 2073,
           "model": "local",
-          "answer": "<|channel>thought\nThinking Process:\n\n1.  **Analyze the Request:** The user is asking for information on \"trace mcp tool validation.\"\n2.  **Analyze the Context:** The provided context is \"No context returned.\"\n3.  **Determine the Goal:** The response must be brief, concrete, and acknowledge the lack of evidence, as per the instructions.\n4.  **Formulate the Answer:** Since there is no context, I cannot answer the query. I must state that the evidence is thin. (Self-Correction: I must ensure the tone is that of a retrieval assistant.)<channel|>The evidence is thin.",
+          "answer": "<|channel>thought\nThinking Process:\n\n1.  **Analyze the Request:** The user is asking a specific, technical query: \"phase 16 higher hop qdrant discovery.\"\n2.  **Analyze the Context:** The provided context is \"No context returned.\"\n3.  **Determine the Goal:** The persona is a \"concise retrieval benchmark assistant.\" The instruction is to \"answer briefly and concretely\" and state that if evidence is thin, to say so.\n4.  **Formulate the Answer:** Since there is no context to support the query, the answer must state that the evidence is thin.\n\n*Self-Correction/Refinement:* Ensure the tone is professional and direct, matching the \"concise\" requirement.\n\n5.  **Final Output Generation.**<channel|>The evidence is thin.",
+          "source": "turboquant"
+        }
+      },
+      "top_packets": []
+    },
+    {
+      "query": "trace mcp tool validation",
+      "query_hash": "d2055c7edad263407fed5d0ebe9fd7d7a0ac78e24e2c37ddcb149fec1e3e102e",
+      "retrieval_strategy": "fusion",
+      "qdrant_ms": 15,
+      "postgres_lookup_ms": 1,
+      "neo4j_expand_ms": 0,
+      "redis_cache_ms": 284,
+      "gpu_rerank_ms": 297,
+      "answer_ms": 1672,
+      "total_ms": 2380,
+      "qdrant_hits": 12,
+      "ledger_matches": 0,
+      "tree_matches": 0,
+      "glyph_matches": 0,
+      "neo4j_matches": 0,
+      "rerank_count": 0,
+      "answer_length": 552,
+      "errors": [
+        "gpu_degraded: node:internal/modules/run_main:123\r\n    triggerUncaughtException(\r\n    ^\r\nError [ERR_MODULE_NOT_FOUND]: Cannot find package '$lib' imported from C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\src\\lib\\server\\gpu\\libtorch-bridge.ts\r\n    at Object.getPackageJSONURL (node:internal/modules/package_json_reader:256:9)\r\n    at packageResolve (node:internal/modules/esm/resolve:768:81)\r\n    at moduleResolve (node:internal/modules/esm/resolve:854:18)\r\n    at defaultResolve (node:internal/modules/esm/resolve:984:11)\r\n    at nextResolve (node:internal/modules/esm/hooks:748:28)\r\n    at resolveBase (file:///C:/Users/james/Videos/deeds-web-app/node_modules/tsx/dist/esm/index.mjs?1781917884127:2:3744)\r\n    at resolveDirectory (file:///C:/Users/james/Videos/deeds-web-app/node_modules/tsx/dist/esm/index.mjs?1781917884127:2:4243)\r\n    at resolveTsPaths (file:///C:/Users/james/Videos/deeds-web-app/node_modules/tsx/dist/esm/index.mjs?1781917884127:2:4984)\r\n    at resolve (file:///C:/Users/james/Videos/deeds-web-app/node_modules/tsx/dist/esm/index.mjs?1781917884127:2:5361)\r\n    at nextResolve (node:internal/modules/esm/hooks:748:28) {\r\n  code: 'ERR_MODULE_NOT_FOUND'\r\n}\r\n\r\nNode.js v22.17.1"
+      ],
+      "status": "degraded",
+      "services": {
+        "embedding": {
+          "ok": true,
+          "latency_ms": 111,
+          "model": "embeddinggemma:latest"
+        },
+        "qdrant": {
+          "ok": true,
+          "latency_ms": 15,
+          "error": null
+        },
+        "postgres": {
+          "ok": true,
+          "latency_ms": 1
+        },
+        "redis": {
+          "ok": true,
+          "latency_ms": 284,
+          "hot_key_count": 78,
+          "cache_hits": 0,
+          "source": "valkey"
+        },
+        "neo4j": {
+          "ok": true,
+          "latency_ms": 0,
+          "matches": 0,
+          "error": null,
+          "source": "skipped_no_context"
+        },
+        "gpu": {
+          "ok": false,
+          "latency_ms": 297,
+          "source": "unavailable",
+          "error": "node:internal/modules/run_main:123\r\n    triggerUncaughtException(\r\n    ^\r\nError [ERR_MODULE_NOT_FOUND]: Cannot find package '$lib' imported from C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\src\\lib\\server\\gpu\\libtorch-bridge.ts\r\n    at Object.getPackageJSONURL (node:internal/modules/package_json_reader:256:9)\r\n    at packageResolve (node:internal/modules/esm/resolve:768:81)\r\n    at moduleResolve (node:internal/modules/esm/resolve:854:18)\r\n    at defaultResolve (node:internal/modules/esm/resolve:984:11)\r\n    at nextResolve (node:internal/modules/esm/hooks:748:28)\r\n    at resolveBase (file:///C:/Users/james/Videos/deeds-web-app/node_modules/tsx/dist/esm/index.mjs?1781917884127:2:3744)\r\n    at resolveDirectory (file:///C:/Users/james/Videos/deeds-web-app/node_modules/tsx/dist/esm/index.mjs?1781917884127:2:4243)\r\n    at resolveTsPaths (file:///C:/Users/james/Videos/deeds-web-app/node_modules/tsx/dist/esm/index.mjs?1781917884127:2:4984)\r\n    at resolve (file:///C:/Users/james/Videos/deeds-web-app/node_modules/tsx/dist/esm/index.mjs?1781917884127:2:5361)\r\n    at nextResolve (node:internal/modules/esm/hooks:748:28) {\r\n  code: 'ERR_MODULE_NOT_FOUND'\r\n}\r\n\r\nNode.js v22.17.1",
+          "scores": []
+        },
+        "answer": {
+          "ok": true,
+          "latency_ms": 1672,
+          "model": "local",
+          "answer": "<|channel>thought\nThinking Process:\n\n1.  **Analyze the Request:** The user is asking for information regarding \"trace mcp tool validation.\"\n2.  **Analyze the Context:** The provided context is \"No context returned.\"\n3.  **Determine the Goal:** The response must be brief, concrete, and acknowledge the lack of evidence, as per the instructions.\n4.  **Formulate the Answer:** Since no context was provided, I cannot answer the query. I must state that the evidence is thin. (Self-Correction: I must be direct and concise.)<channel|>The evidence is thin.",
           "source": "turboquant"
         }
       },
@@ -211,33 +211,33 @@
       "query": "nes chrom packet qdrant point id",
       "query_hash": "b5e1d1a13050af29320d9f7110d3cee97dff89d9e6d25a548abb3a724343c851",
       "retrieval_strategy": "fusion",
-      "qdrant_ms": 11,
+      "qdrant_ms": 10,
       "postgres_lookup_ms": 1,
       "neo4j_expand_ms": 0,
-      "redis_cache_ms": 4,
-      "gpu_rerank_ms": 284,
-      "answer_ms": 2915,
-      "total_ms": 3368,
+      "redis_cache_ms": 315,
+      "gpu_rerank_ms": 318,
+      "answer_ms": 2294,
+      "total_ms": 3049,
       "qdrant_hits": 12,
       "ledger_matches": 0,
       "tree_matches": 0,
       "glyph_matches": 0,
       "neo4j_matches": 0,
       "rerank_count": 0,
-      "answer_length": 1008,
+      "answer_length": 711,
       "errors": [
-        "gpu_degraded: node:internal/modules/run_main:123\r\n    triggerUncaughtException(\r\n    ^\r\nError [ERR_MODULE_NOT_FOUND]: Cannot find package '$lib' imported from C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\src\\lib\\server\\gpu\\libtorch-bridge.ts\r\n    at Object.getPackageJSONURL (node:internal/modules/package_json_reader:256:9)\r\n    at packageResolve (node:internal/modules/esm/resolve:768:81)\r\n    at moduleResolve (node:internal/modules/esm/resolve:854:18)\r\n    at defaultResolve (node:internal/modules/esm/resolve:984:11)\r\n    at nextResolve (node:internal/modules/esm/hooks:748:28)\r\n    at resolveBase (file:///C:/Users/james/Videos/deeds-web-app/node_modules/tsx/dist/esm/index.mjs?1781899226103:2:3744)\r\n    at resolveDirectory (file:///C:/Users/james/Videos/deeds-web-app/node_modules/tsx/dist/esm/index.mjs?1781899226103:2:4243)\r\n    at resolveTsPaths (file:///C:/Users/james/Videos/deeds-web-app/node_modules/tsx/dist/esm/index.mjs?1781899226103:2:4984)\r\n    at resolve (file:///C:/Users/james/Videos/deeds-web-app/node_modules/tsx/dist/esm/index.mjs?1781899226103:2:5361)\r\n    at nextResolve (node:internal/modules/esm/hooks:748:28) {\r\n  code: 'ERR_MODULE_NOT_FOUND'\r\n}\r\n\r\nNode.js v22.17.1"
+        "gpu_degraded: node:internal/modules/run_main:123\r\n    triggerUncaughtException(\r\n    ^\r\nError [ERR_MODULE_NOT_FOUND]: Cannot find package '$lib' imported from C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\src\\lib\\server\\gpu\\libtorch-bridge.ts\r\n    at Object.getPackageJSONURL (node:internal/modules/package_json_reader:256:9)\r\n    at packageResolve (node:internal/modules/esm/resolve:768:81)\r\n    at moduleResolve (node:internal/modules/esm/resolve:854:18)\r\n    at defaultResolve (node:internal/modules/esm/resolve:984:11)\r\n    at nextResolve (node:internal/modules/esm/hooks:748:28)\r\n    at resolveBase (file:///C:/Users/james/Videos/deeds-web-app/node_modules/tsx/dist/esm/index.mjs?1781917888059:2:3744)\r\n    at resolveDirectory (file:///C:/Users/james/Videos/deeds-web-app/node_modules/tsx/dist/esm/index.mjs?1781917888059:2:4243)\r\n    at resolveTsPaths (file:///C:/Users/james/Videos/deeds-web-app/node_modules/tsx/dist/esm/index.mjs?1781917888059:2:4984)\r\n    at resolve (file:///C:/Users/james/Videos/deeds-web-app/node_modules/tsx/dist/esm/index.mjs?1781917888059:2:5361)\r\n    at nextResolve (node:internal/modules/esm/hooks:748:28) {\r\n  code: 'ERR_MODULE_NOT_FOUND'\r\n}\r\n\r\nNode.js v22.17.1"
       ],
       "status": "degraded",
       "services": {
         "embedding": {
           "ok": true,
-          "latency_ms": 152,
+          "latency_ms": 111,
           "model": "embeddinggemma:latest"
         },
         "qdrant": {
           "ok": true,
-          "latency_ms": 11,
+          "latency_ms": 10,
           "error": null
         },
         "postgres": {
@@ -246,8 +246,8 @@
         },
         "redis": {
           "ok": true,
-          "latency_ms": 4,
-          "hot_key_count": 0,
+          "latency_ms": 315,
+          "hot_key_count": 78,
           "cache_hits": 0,
           "source": "valkey"
         },
@@ -260,16 +260,16 @@
         },
         "gpu": {
           "ok": false,
-          "latency_ms": 284,
+          "latency_ms": 318,
           "source": "unavailable",
-          "error": "node:internal/modules/run_main:123\r\n    triggerUncaughtException(\r\n    ^\r\nError [ERR_MODULE_NOT_FOUND]: Cannot find package '$lib' imported from C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\src\\lib\\server\\gpu\\libtorch-bridge.ts\r\n    at Object.getPackageJSONURL (node:internal/modules/package_json_reader:256:9)\r\n    at packageResolve (node:internal/modules/esm/resolve:768:81)\r\n    at moduleResolve (node:internal/modules/esm/resolve:854:18)\r\n    at defaultResolve (node:internal/modules/esm/resolve:984:11)\r\n    at nextResolve (node:internal/modules/esm/hooks:748:28)\r\n    at resolveBase (file:///C:/Users/james/Videos/deeds-web-app/node_modules/tsx/dist/esm/index.mjs?1781899226103:2:3744)\r\n    at resolveDirectory (file:///C:/Users/james/Videos/deeds-web-app/node_modules/tsx/dist/esm/index.mjs?1781899226103:2:4243)\r\n    at resolveTsPaths (file:///C:/Users/james/Videos/deeds-web-app/node_modules/tsx/dist/esm/index.mjs?1781899226103:2:4984)\r\n    at resolve (file:///C:/Users/james/Videos/deeds-web-app/node_modules/tsx/dist/esm/index.mjs?1781899226103:2:5361)\r\n    at nextResolve (node:internal/modules/esm/hooks:748:28) {\r\n  code: 'ERR_MODULE_NOT_FOUND'\r\n}\r\n\r\nNode.js v22.17.1",
+          "error": "node:internal/modules/run_main:123\r\n    triggerUncaughtException(\r\n    ^\r\nError [ERR_MODULE_NOT_FOUND]: Cannot find package '$lib' imported from C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\src\\lib\\server\\gpu\\libtorch-bridge.ts\r\n    at Object.getPackageJSONURL (node:internal/modules/package_json_reader:256:9)\r\n    at packageResolve (node:internal/modules/esm/resolve:768:81)\r\n    at moduleResolve (node:internal/modules/esm/resolve:854:18)\r\n    at defaultResolve (node:internal/modules/esm/resolve:984:11)\r\n    at nextResolve (node:internal/modules/esm/hooks:748:28)\r\n    at resolveBase (file:///C:/Users/james/Videos/deeds-web-app/node_modules/tsx/dist/esm/index.mjs?1781917888059:2:3744)\r\n    at resolveDirectory (file:///C:/Users/james/Videos/deeds-web-app/node_modules/tsx/dist/esm/index.mjs?1781917888059:2:4243)\r\n    at resolveTsPaths (file:///C:/Users/james/Videos/deeds-web-app/node_modules/tsx/dist/esm/index.mjs?1781917888059:2:4984)\r\n    at resolve (file:///C:/Users/james/Videos/deeds-web-app/node_modules/tsx/dist/esm/index.mjs?1781917888059:2:5361)\r\n    at nextResolve (node:internal/modules/esm/hooks:748:28) {\r\n  code: 'ERR_MODULE_NOT_FOUND'\r\n}\r\n\r\nNode.js v22.17.1",
           "scores": []
         },
         "answer": {
           "ok": true,
-          "latency_ms": 2915,
+          "latency_ms": 2294,
           "model": "local",
-          "answer": "<|channel>thought\nThinking Process:\n\n1.  **Analyze the Request:** The user has provided a query (\"nes chrom packet qdrant point id\") and a context (None). The goal is to act as a \"concise retrieval benchmark assistant\" and answer the query using the provided context.\n2.  **Analyze the Context:** The context explicitly states: \"No context returned.\"\n3.  **Analyze the Query:** The query is highly technical and specific (NES, Chroma, packet, Qdrant, point id). It likely relates to vector databases or embedded systems.\n4.  **Determine the Action:** Since the instructions state: \"Use the grounded retrieval context below to answer briefly and concretely. If evidence is thin, say that it is thin.\" and the context is empty, I must report the lack of evidence.\n5.  **Formulate the Answer:** The answer must be brief, concrete, and directly address the lack of supporting information. (Self-Correction: Do not try to answer the technical question; only report on the evidence.)<channel|>The evidence is thin.",
+          "answer": "<|channel>thought\nThinking Process:\n\n1.  **Analyze the Request:** The user provided a query (\"nes chrom packet qdrant point id\") and a context (None: \"No context returned.\"). The goal is to act as a \"concise retrieval benchmark assistant\" and answer briefly and concretely, stating if the evidence is thin.\n2.  **Analyze the Query:** The query is highly technical and specific (NES, chrom, packet, qdrant, point id).\n3.  **Analyze the Context:** The context is empty.\n4.  **Formulate the Answer:** Since no information was provided in the context to answer the query, the evidence is thin.\n5.  **Refine the Output (Concise and Concrete):** State clearly that the evidence is thin.<channel|>The evidence is thin.",
           "source": "turboquant"
         }
       },
@@ -279,43 +279,43 @@
       "query": "graph refresh manifest invalidation",
       "query_hash": "9e1c4a0afd5ca8a92cce13712633cb9783e6f18361b5e6e43e16e52726b16d9b",
       "retrieval_strategy": "fusion",
-      "qdrant_ms": 42,
-      "postgres_lookup_ms": 2,
+      "qdrant_ms": 16,
+      "postgres_lookup_ms": 1,
       "neo4j_expand_ms": 0,
-      "redis_cache_ms": 6,
-      "gpu_rerank_ms": 434,
-      "answer_ms": 2183,
-      "total_ms": 2791,
+      "redis_cache_ms": 288,
+      "gpu_rerank_ms": 303,
+      "answer_ms": 2171,
+      "total_ms": 2887,
       "qdrant_hits": 12,
       "ledger_matches": 0,
       "tree_matches": 0,
       "glyph_matches": 0,
       "neo4j_matches": 0,
       "rerank_count": 0,
-      "answer_length": 731,
+      "answer_length": 707,
       "errors": [
-        "gpu_degraded: node:internal/modules/run_main:123\r\n    triggerUncaughtException(\r\n    ^\r\nError [ERR_MODULE_NOT_FOUND]: Cannot find package '$lib' imported from C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\src\\lib\\server\\gpu\\libtorch-bridge.ts\r\n    at Object.getPackageJSONURL (node:internal/modules/package_json_reader:256:9)\r\n    at packageResolve (node:internal/modules/esm/resolve:768:81)\r\n    at moduleResolve (node:internal/modules/esm/resolve:854:18)\r\n    at defaultResolve (node:internal/modules/esm/resolve:984:11)\r\n    at nextResolve (node:internal/modules/esm/hooks:748:28)\r\n    at resolveBase (file:///C:/Users/james/Videos/deeds-web-app/node_modules/tsx/dist/esm/index.mjs?1781899231050:2:3744)\r\n    at resolveDirectory (file:///C:/Users/james/Videos/deeds-web-app/node_modules/tsx/dist/esm/index.mjs?1781899231050:2:4243)\r\n    at resolveTsPaths (file:///C:/Users/james/Videos/deeds-web-app/node_modules/tsx/dist/esm/index.mjs?1781899231050:2:4984)\r\n    at resolve (file:///C:/Users/james/Videos/deeds-web-app/node_modules/tsx/dist/esm/index.mjs?1781899231050:2:5361)\r\n    at nextResolve (node:internal/modules/esm/hooks:748:28) {\r\n  code: 'ERR_MODULE_NOT_FOUND'\r\n}\r\n\r\nNode.js v22.17.1"
+        "gpu_degraded: node:internal/modules/run_main:123\r\n    triggerUncaughtException(\r\n    ^\r\nError [ERR_MODULE_NOT_FOUND]: Cannot find package '$lib' imported from C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\src\\lib\\server\\gpu\\libtorch-bridge.ts\r\n    at Object.getPackageJSONURL (node:internal/modules/package_json_reader:256:9)\r\n    at packageResolve (node:internal/modules/esm/resolve:768:81)\r\n    at moduleResolve (node:internal/modules/esm/resolve:854:18)\r\n    at defaultResolve (node:internal/modules/esm/resolve:984:11)\r\n    at nextResolve (node:internal/modules/esm/hooks:748:28)\r\n    at resolveBase (file:///C:/Users/james/Videos/deeds-web-app/node_modules/tsx/dist/esm/index.mjs?1781917892586:2:3744)\r\n    at resolveDirectory (file:///C:/Users/james/Videos/deeds-web-app/node_modules/tsx/dist/esm/index.mjs?1781917892586:2:4243)\r\n    at resolveTsPaths (file:///C:/Users/james/Videos/deeds-web-app/node_modules/tsx/dist/esm/index.mjs?1781917892586:2:4984)\r\n    at resolve (file:///C:/Users/james/Videos/deeds-web-app/node_modules/tsx/dist/esm/index.mjs?1781917892586:2:5361)\r\n    at nextResolve (node:internal/modules/esm/hooks:748:28) {\r\n  code: 'ERR_MODULE_NOT_FOUND'\r\n}\r\n\r\nNode.js v22.17.1"
       ],
       "status": "degraded",
       "services": {
         "embedding": {
           "ok": true,
-          "latency_ms": 124,
+          "latency_ms": 108,
           "model": "embeddinggemma:latest"
         },
         "qdrant": {
           "ok": true,
-          "latency_ms": 42,
+          "latency_ms": 16,
           "error": null
         },
         "postgres": {
           "ok": true,
-          "latency_ms": 2
+          "latency_ms": 1
         },
         "redis": {
           "ok": true,
-          "latency_ms": 6,
-          "hot_key_count": 0,
+          "latency_ms": 288,
+          "hot_key_count": 78,
           "cache_hits": 0,
           "source": "valkey"
         },
@@ -328,16 +328,16 @@
         },
         "gpu": {
           "ok": false,
-          "latency_ms": 434,
+          "latency_ms": 303,
           "source": "unavailable",
-          "error": "node:internal/modules/run_main:123\r\n    triggerUncaughtException(\r\n    ^\r\nError [ERR_MODULE_NOT_FOUND]: Cannot find package '$lib' imported from C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\src\\lib\\server\\gpu\\libtorch-bridge.ts\r\n    at Object.getPackageJSONURL (node:internal/modules/package_json_reader:256:9)\r\n    at packageResolve (node:internal/modules/esm/resolve:768:81)\r\n    at moduleResolve (node:internal/modules/esm/resolve:854:18)\r\n    at defaultResolve (node:internal/modules/esm/resolve:984:11)\r\n    at nextResolve (node:internal/modules/esm/hooks:748:28)\r\n    at resolveBase (file:///C:/Users/james/Videos/deeds-web-app/node_modules/tsx/dist/esm/index.mjs?1781899231050:2:3744)\r\n    at resolveDirectory (file:///C:/Users/james/Videos/deeds-web-app/node_modules/tsx/dist/esm/index.mjs?1781899231050:2:4243)\r\n    at resolveTsPaths (file:///C:/Users/james/Videos/deeds-web-app/node_modules/tsx/dist/esm/index.mjs?1781899231050:2:4984)\r\n    at resolve (file:///C:/Users/james/Videos/deeds-web-app/node_modules/tsx/dist/esm/index.mjs?1781899231050:2:5361)\r\n    at nextResolve (node:internal/modules/esm/hooks:748:28) {\r\n  code: 'ERR_MODULE_NOT_FOUND'\r\n}\r\n\r\nNode.js v22.17.1",
+          "error": "node:internal/modules/run_main:123\r\n    triggerUncaughtException(\r\n    ^\r\nError [ERR_MODULE_NOT_FOUND]: Cannot find package '$lib' imported from C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\src\\lib\\server\\gpu\\libtorch-bridge.ts\r\n    at Object.getPackageJSONURL (node:internal/modules/package_json_reader:256:9)\r\n    at packageResolve (node:internal/modules/esm/resolve:768:81)\r\n    at moduleResolve (node:internal/modules/esm/resolve:854:18)\r\n    at defaultResolve (node:internal/modules/esm/resolve:984:11)\r\n    at nextResolve (node:internal/modules/esm/hooks:748:28)\r\n    at resolveBase (file:///C:/Users/james/Videos/deeds-web-app/node_modules/tsx/dist/esm/index.mjs?1781917892586:2:3744)\r\n    at resolveDirectory (file:///C:/Users/james/Videos/deeds-web-app/node_modules/tsx/dist/esm/index.mjs?1781917892586:2:4243)\r\n    at resolveTsPaths (file:///C:/Users/james/Videos/deeds-web-app/node_modules/tsx/dist/esm/index.mjs?1781917892586:2:4984)\r\n    at resolve (file:///C:/Users/james/Videos/deeds-web-app/node_modules/tsx/dist/esm/index.mjs?1781917892586:2:5361)\r\n    at nextResolve (node:internal/modules/esm/hooks:748:28) {\r\n  code: 'ERR_MODULE_NOT_FOUND'\r\n}\r\n\r\nNode.js v22.17.1",
           "scores": []
         },
         "answer": {
           "ok": true,
-          "latency_ms": 2183,
+          "latency_ms": 2171,
           "model": "local",
-          "answer": "<|channel>thought\nThinking Process:\n\n1.  **Analyze the Request:** The user is asking a specific technical query: \"graph refresh manifest invalidation.\"\n2.  **Analyze the Context:** The provided context is \"No context returned.\"\n3.  **Determine the Goal:** The persona is a \"concise retrieval benchmark assistant.\" The instruction is to answer briefly and concretely, and if evidence is thin, state that.\n4.  **Formulate the Answer:** Since there is no context to support an answer, I must state that the evidence is thin.\n\n*Self-Correction/Refinement:* Do not try to answer the query using external knowledge. Stick strictly to the provided context and instructions.\n\n5.  **Final Output Generation.**<channel|>The evidence is thin.",
+          "answer": "<|channel>thought\nThinking Process:\n\n1.  **Analyze the Request:** The user is asking a specific query: \"graph refresh manifest invalidation.\"\n2.  **Analyze the Context:** The provided context is \"No context returned.\"\n3.  **Determine the Goal:** The persona is a \"concise retrieval benchmark assistant.\" The instruction is to answer briefly and concretely, and if evidence is thin, state that.\n4.  **Formulate the Answer:** Since no context was provided, I cannot answer the query. I must state that the evidence is thin (or non-existent).\n\n*Self-Correction/Refinement:* The prompt explicitly says: \"If evidence is thin, say that it is thin.\"\n\n5.  **Final Output Generation.**<channel|>The evidence is thin.",
           "source": "turboquant"
         }
       },
@@ -347,14 +347,14 @@
   "services": {
     "qdrant": {
       "ok": true,
-      "latency_ms": 85,
+      "latency_ms": 63,
       "points_count": 9840,
       "payload_fields": 2
     },
     "trace_mcp": {
       "ok": true,
-      "health_ms": 69,
-      "tools_ms": 215,
+      "health_ms": 7,
+      "tools_ms": 35,
       "tools_count": 128,
       "error": null
     },
@@ -375,20 +375,20 @@
   },
   "summary": {
     "status": "PASS_WITH_WARNINGS",
-    "latency_p50_ms": 2893,
-    "latency_p95_ms": 3368,
-    "qdrant_p50_ms": 42,
-    "qdrant_p95_ms": 49,
-    "postgres_p50_ms": 2,
-    "postgres_p95_ms": 4,
+    "latency_p50_ms": 2887,
+    "latency_p95_ms": 3049,
+    "qdrant_p50_ms": 16,
+    "qdrant_p95_ms": 28,
+    "postgres_p50_ms": 1,
+    "postgres_p95_ms": 2,
     "neo4j_p50_ms": 0,
     "neo4j_p95_ms": 0,
-    "redis_p50_ms": 5,
-    "redis_p95_ms": 6,
-    "gpu_p50_ms": 405,
-    "gpu_p95_ms": 434,
-    "answer_p50_ms": 2232,
-    "answer_p95_ms": 2265,
+    "redis_p50_ms": 304,
+    "redis_p95_ms": 315,
+    "gpu_p50_ms": 318,
+    "gpu_p95_ms": 321,
+    "answer_p50_ms": 2073,
+    "answer_p95_ms": 2171,
     "queries_with_qdrant_hits": 5,
     "queries_answered": 5,
     "min_pass_threshold": 3,

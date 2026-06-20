@@ -120,7 +120,10 @@ async function seed() {
 	}
 }
 
-seed();
+const isMain = process.argv[1] && (process.argv[1].endsWith('seed-simple.ts') || process.argv[1].endsWith('seed-simple.js'));
+if (isMain) {
+	seed();
+}
 
 
 

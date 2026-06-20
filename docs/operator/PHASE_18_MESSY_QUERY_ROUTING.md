@@ -109,7 +109,7 @@ cd sveltekit-frontend
   -m .\models\gemma4-turboquant-rotorquant.gguf \
   --host 127.0.0.1 \
   --port 8090 \
-  --ctx-size 16384 \
+  --ctx-size 64k \
   --batch-size 512 \
   --ubatch-size 256 \
   --cache-type-k q8_0 \
@@ -154,13 +154,13 @@ For OpenCode/Cline using the local OpenAI-compatible `:8090` lane:
 - Set Provider: OpenAI Compatible
 - Base URL: `http://127.0.0.1:8090/v1`
 - API Key: `local`
-- Context Window: `32768`
+- Context Window: `65536`
 - Max Output Tokens: `2048–4096`
 - Auto-compact: ON
 
 > Note: Cline’s context bar may be wrong for OpenAI-compatible providers if the gateway returns bad or null usage metrics. Do not trust UI token counts alone.
 
-Final architecture rule: Do not chase raw 64k first. Make 16k/32k act like 64k through TRACE MCP, ACE packets, Redis/Postgres cache, Qdrant/KAG/DAG ranking, and compact Gemma4 synthesis.
+Final architecture rule: Do not chase raw 64k first. Make 64k through TRACE MCP, ACE packets, Redis/Postgres cache, Qdrant/KAG/DAG ranking, and compact Gemma4 synthesis.
 
 Practical guardrails:
 
@@ -185,7 +185,7 @@ For TRACE MCP tools, default every tool call to:
 The local stack also includes a server-side budget guard at `src/lib/server/llm/token-budget.ts`.
 It uses `gpt-tokenizer` to count tokens and build a section-weighted prompt before OpenCode/Cline sends the final request.
 
-### Safe budget for `--ctx-size 32768`
+### Safe budget for `--ctx-size 64k`
 
 - ACE packet: ≤ 3500 tokens
 - tool output: ≤ 800 tokens
@@ -216,7 +216,7 @@ OLLAMA_BASE_URL=http://127.0.0.1:8090 \
 - Effective budget = `ctx-size` minus system prompt + tool definitions + retrieved chunks + MCP/ACE packets.
 - On RTX 3060 Ti, the sweet spot is `32768` with `max_tokens` around `2048–4096`.
 - Keep retrieval pressure low: `top_k = 3–5`, smaller chunk windows, and cap tool payloads.
-- `64k` is benchmark/experiment-only; `32k` is the practical production lane.
+- `64k` is benchmark/experiment-only; `64k` is the practical production lane.
 - Use `ace:topo:*` and cached context packs to avoid rebuilding large prompt payloads.
 
 ### ACE hot path & compact packet
@@ -271,13 +271,13 @@ For repo, database, routing, MCP, GraphRAG, HyperRAG, ACE, or startup questions:
 5. Inject only compact JSON facts, file paths, line ranges, and next actions.
 6. If a required service is offline, stop and report the dependency.
 
-This is the right way to get “64k behavior” on a `16k`/`32k` model window.
+This is the right way to get “64k behavior” on a `64k` model window.
 
 ## Practical 64k strategy
 
 Use a two-mode deployment:
 
-- Production: TurboQuant GGUF with `--ctx-size 16384` or `--ctx-size 32768`, plus compact ACE/Redis packets.
+- Production: TurboQuant GGUF with `--ctx-size 65536` plus compact ACE/Redis packets.
 - Experiment: `--ctx-size 65536` + `q4_0` KV cache + tiny `batch-size`/`ubatch-size`.
 
 On RTX 3060 Ti 8GB, the safest path is to treat 64k as an experimental runtime, not the default. The app should first win with compact packets and ACE cache, then optionally validate the larger window.
