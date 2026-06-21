@@ -1,6 +1,6 @@
 # Parent Atlas Proof Of Truth
 
-Generated: 2026-06-19T23:15:51.531Z
+Generated: 2026-06-21T05:46:59.836Z
 Status: PASS
 
 ## Summary
@@ -13,7 +13,7 @@ Status: PASS
 - second warm hits: 50
 - identity-equal replays: 50
 - score-equal replays: 50
-- cache namespace: `hyperrag:query:*` (84 keys observed)
+- cache namespace: `hyperrag:query:*` (80 keys observed)
 
 ## Failures
 

@@ -3,10 +3,12 @@ import type { RequestHandler } from './$types';
 import { z } from 'zod';
 import { db } from '$lib/server/db/client';
 import { qdrant } from '$lib/server/vector/qdrant-manager';
+import { encode768to64 } from '$lib/server/gpu/encode-768-to-64.js';
+import { generateSingleEmbedding } from '$lib/server/grpc/embedding-client.js';
 
 const searchSchema = z.object({
   query: z.string().min(1, 'Query required'),
-  type: z.enum(['content', 'signature', 'fusion']).default('content'),
+  type: z.enum(['content', 'signature', 'latent_64', 'fusion']).default('content'),
   limit: z.number().int().min(1).max(100).default(10),
 });
 
@@ -17,26 +19,36 @@ type MultiVectorResult = {
   payload: Record<string, any>;
 };
 
-async function embedQueryInSpace(query: string, vectorSpace: 'content' | 'signature'): Promise<number[]> {
+async function embedQueryInSpace(
+  query: string,
+  vectorSpace: 'content' | 'signature' | 'latent_64' | 'error'
+): Promise<number[]> {
   // For content space, embed via Ollama embeddinggemma
   // For signature space, extract AST signature and embed
-  // Both return 768-dim vectors
-
-  // TODO: Implement actual embedding
-  // For now, return placeholder
-  return new Array(768).fill(0);
+  // For latent_64, project the 768d query embedding into the 64d topology lane
+  const vector768 = await generateSingleEmbedding(query);
+  if (!Array.isArray(vector768) || vector768.length !== 768) {
+    throw new Error(`Expected 768d query embedding, got ${Array.isArray(vector768) ? vector768.length : typeof vector768}`);
+  }
+  if (vectorSpace === 'latent_64') {
+    const latent = await encode768to64(new Float32Array(vector768));
+    return Array.from(latent);
+  }
+  return vector768;
 }
 
 async function searchNamedVector(
   query: string,
-  vectorName: 'content' | 'signature' | 'encoded_64' | 'error',
+  vectorName: 'content' | 'signature' | 'latent_64' | 'error',
   limit: number
 ): Promise<MultiVectorResult[]> {
   try {
-    const vector = await embedQueryInSpace(query, vectorName as 'content' | 'signature');
+    if (vectorName === 'error') return [];
+    const vector = await embedQueryInSpace(query, vectorName);
+    const collection = vectorName === 'latent_64' ? 'codebase_topology_64' : 'codebase_chunks_768';
 
     const response = await qdrant.post(
-      '/collections/codebase_chunks_768/points/search',
+      `/collections/${collection}/points/search`,
       {
         vector: {
           name: vectorName,
@@ -58,7 +70,7 @@ async function searchNamedVector(
     }));
   } catch (err) {
     console.error(`Error searching ${vectorName} vector:`, err);
-    return [];
+      return [];
   }
 }
 
@@ -120,6 +132,8 @@ export const POST: RequestHandler = async ({ request, locals }) => {
       results = await searchNamedVector(query, 'content', limit);
     } else if (type === 'signature') {
       results = await searchNamedVector(query, 'signature', limit);
+    } else if (type === 'latent_64') {
+      results = await searchNamedVector(query, 'latent_64', limit);
     } else if (type === 'fusion') {
       // Dual-lane fusion: content + signature, RRF blend
       const [contentResults, signatureResults] = await Promise.all([

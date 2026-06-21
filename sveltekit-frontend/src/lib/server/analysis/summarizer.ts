@@ -7,6 +7,7 @@
 import { ENV } from '$lib/server/env.server.js';
 import { traceLLM } from '$lib/server/observability/langfuse.js';
 import { ollamaFetch } from '$lib/server/ollama.js';
+import { getOllamaEndpoint } from '$lib/server/utils/ollama-endpoint.js';
 
 const MODEL = ENV.OLLAMA_CHAT_MODEL;
 
@@ -18,7 +19,7 @@ export async function summarizeDocument(text: string, maxWords: number = 150): P
 
 	try {
 		return await traceLLM('summarize-document', { model: MODEL, prompt: input.slice(0, 500) }, async (gen) => {
-			const res = await ollamaFetch(`${ENV.OLLAMA_BASE_URL}/api/generate`, {
+			const res = await ollamaFetch(`${getOllamaEndpoint()}/api/generate`, {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify({

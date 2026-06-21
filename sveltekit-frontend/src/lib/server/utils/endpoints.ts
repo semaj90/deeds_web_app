@@ -1,4 +1,5 @@
 import { ENV } from '$lib/server/env.server.js';
+import { getOllamaEndpoint } from '$lib/server/utils/ollama-endpoint.js';
 
 export function getLegalGatewayUrl(): string {
   return ENV.LEGAL_GATEWAY_URL;
@@ -9,7 +10,7 @@ export function getQdrantUrl(): string {
 }
 
 export function getOllamaUrl(): string {
-  return ENV.OLLAMA_BASE_URL;
+  return getOllamaEndpoint();
 }
 
 export function getDatabaseUrl(): string {

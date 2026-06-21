@@ -30,6 +30,7 @@
 import { getRedis } from '$lib/server/redis.js';
 import { pool }     from '$lib/server/db/client';
 import { ENV }      from '$lib/server/env.server.js';
+import { getOllamaEndpoint } from '$lib/server/ollama.js';
 
 // ── Types ──────────────────────────────────────────────────────────────────────
 
@@ -372,7 +373,7 @@ async function generateSelfPromptChain(
 
   try {
     const { ollamaFetch } = await import('$lib/server/ollama.js');
-    const res = await ollamaFetch(`${ENV.OLLAMA_BASE_URL}/api/generate`, {
+    const res = await ollamaFetch(`${getOllamaEndpoint()}/api/generate`, {
       method:  'POST',
       headers: { 'Content-Type': 'application/json' },
       body:    JSON.stringify({

@@ -92,7 +92,12 @@ async function getQdrantPointIds(canonicalRef) {
         limit: 50,
         with_payload: false,
         with_vector: false,
-        filter: { must: [{ key: 'canonicalSourceRef', match: { value: canonicalRef } }] },
+        filter: {
+          should: [
+            { key: 'canonicalSourceRef', match: { value: canonicalRef } },
+            { key: 'canonicalSourceRef', match: { value: 'sveltekit-frontend/' + canonicalRef } }
+          ]
+        },
       }),
       signal: AbortSignal.timeout(20_000),
     });
@@ -126,7 +131,7 @@ async function main() {
     SELECT packet_id, source_ref, feature_id, feature_label, community_id,
            community_source, community_confidence,
            concept_ids, packet_key, summary,
-           payload->>'cluster_id' AS cluster_id,
+           cluster_id, som_row, som_col, domain_class,
            metadata
     FROM atlas_packets
     WHERE source_ref IS NOT NULL
@@ -234,11 +239,13 @@ async function main() {
         // Semantic enrichment
         tags,
         cluster_id:         pkt.cluster_id ? parseInt(pkt.cluster_id, 10) : null,
+        som_cluster:        (pkt.som_row !== null && pkt.som_col !== null && pkt.som_row !== undefined && pkt.som_col !== undefined) ? `${pkt.som_row}:${pkt.som_col}` : null,
         domain_class:       pkt.domain_class ?? (pkt.metadata?.domain_class) ?? null,
 
         // Metadata
         hash:               pkt.metadata?.hash ?? null,
         mtime:              pkt.metadata?.mtime ?? null,
+        metadata:           pkt.metadata ?? {},
 
         // Lineage tracking
         lineage_version:    'packet-identity-v1',

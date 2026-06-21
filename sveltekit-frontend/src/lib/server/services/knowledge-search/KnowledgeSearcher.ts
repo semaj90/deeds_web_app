@@ -15,6 +15,7 @@ import type { SearchOptions, SearchResult,
   FullDocument, CollectionStats } from './types.js';
 import { ENV } from '$lib/server/env.server.js';
 import { generateSingleEmbedding } from '$lib/server/grpc/embedding-client.js';
+import { getOllamaEndpoint } from '$lib/server/ollama.js';
 import { getQdrantKnowledgeStore } from './QdrantKnowledgeStore.js';
 import { getTfIdfRanker } from './TfIdfRanker.js';
 import { getSeaweedKnowledgeStore } from './SeaweedKnowledgeStore.js';
@@ -263,7 +264,7 @@ Answer:`;
    */
   private async callOllama(prompt: string): Promise<string> {
     try {
-      const response = await fetch(`${ENV.OLLAMA_BASE_URL}/api/generate`, {
+      const response = await fetch(`${getOllamaEndpoint()}/api/generate`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

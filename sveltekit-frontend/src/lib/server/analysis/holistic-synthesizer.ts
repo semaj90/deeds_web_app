@@ -8,6 +8,7 @@
 import { ENV } from '$lib/server/env.server.js';
 import { traceLLM } from '$lib/server/observability/langfuse.js';
 import { ollamaFetch } from '$lib/server/ollama.js';
+import { getOllamaEndpoint } from '$lib/server/utils/ollama-endpoint.js';
 import { z } from 'zod';
 
 const RUNTIME_CONTEXT_SIZE = Number(
@@ -93,7 +94,7 @@ ${input}`;
 
       if (!res.ok) {
         console.warn('[HolisticSynthesizer] TurboQuant failed, falling back to Ollama');
-        const ollamaRes = await ollamaFetch(`${ENV.OLLAMA_BASE_URL}/api/generate`, {
+        const ollamaRes = await ollamaFetch(`${getOllamaEndpoint()}/api/generate`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({

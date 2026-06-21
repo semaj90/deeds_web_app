@@ -16,6 +16,7 @@ import { dev } from '$app/environment';
 const privateEnv: Record<string, string | undefined> = process.env;
 import { ENV } from '$lib/server/env.server.js';
 import { VECTOR_CONFIG } from '$lib/server/config/vector-config.js';
+import { getOllamaEndpoint, getOllamaEmbeddingEndpoint } from '$lib/server/utils/ollama-endpoint.js';
 import type {
 	MinIOClient,
 	MinIOConfig,
@@ -77,7 +78,7 @@ export function loadServiceEnvironment(): ServiceEnvironment {
     },
     // Ollama
     ollamaConfig: {
-      baseUrl: ENV.OLLAMA_BASE_URL,
+      baseUrl: getOllamaEndpoint(),
       embeddingModel: privateEnv.EMBEDDING_MODEL || 'embeddinggemma:latest',
       chatModel: privateEnv.CHAT_MODEL || 'gemma4-rotorquant:latest',
       gpuLayers: parseInt(privateEnv.OLLAMA_GPU_LAYERS || '30', 10),
@@ -132,7 +133,7 @@ export function getServiceUrls(env: ServiceEnvironment): ServiceUrls {
     qdrant: 'http://' + env.qdrantConfig.host + ':' + env.qdrantConfig.port,
     // AI Services
     ollama: env.ollamaConfig.baseUrl,
-    ollamaEmbeddings: env.ollamaConfig.baseUrl + '/api/embeddings',
+    ollamaEmbeddings: getOllamaEmbeddingEndpoint() + '/api/embeddings',
     // Storage & Processing
     minio:
       (env.minioConfig.useSSL ? 'https' : 'http') +

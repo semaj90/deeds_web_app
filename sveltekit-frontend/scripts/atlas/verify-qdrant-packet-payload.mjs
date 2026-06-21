@@ -88,12 +88,21 @@ async function retrieveById(client, pointId) {
 
 async function retrieveBySourceRef(client, sourceRef) {
   try {
+    const stripped = sourceRef.replace(/^sveltekit-frontend\//, '');
+    const prefixed = sourceRef.startsWith('sveltekit-frontend/') ? sourceRef : 'sveltekit-frontend/' + sourceRef;
     const response = await client.scroll(COLLECTION, {
       limit: 1,
       with_payload: true,
       with_vector: false,
       filter: {
-        must: [{ key: 'source_ref', match: { value: sourceRef } }],
+        should: [
+          { key: 'canonicalSourceRef', match: { value: prefixed } },
+          { key: 'canonicalSourceRef', match: { value: stripped } },
+          { key: 'source_ref', match: { value: prefixed } },
+          { key: 'source_ref', match: { value: stripped } },
+          { key: 'path', match: { value: prefixed } },
+          { key: 'path', match: { value: stripped } }
+        ]
       },
     });
     const points = Array.isArray(response) ? response : response?.result?.points ?? response?.points ?? [];

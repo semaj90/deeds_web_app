@@ -320,7 +320,8 @@ async function main() {
     sourceRefPct: totalReturnedPackets > 0 ? Number((sourceRefMatches / totalReturnedPackets * 100).toFixed(2)) : 0,
     cacheHitPct: Number((cacheHitCount / results.length * 100).toFixed(2)),
     timeoutCount: results.filter(r => r.error && r.error.includes('timeout')).length,
-    failedQueries: results.filter(r => r.strategy === 'failed').map(r => r.query)
+    failedQueries: results.filter(r => r.strategy === 'failed').map(r => r.query),
+    results: results
   };
 
   // Write summary json

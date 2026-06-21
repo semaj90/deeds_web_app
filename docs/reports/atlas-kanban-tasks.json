@@ -1,11 +1,22 @@
 {
-  "generated": "2026-06-18T01:39:44.916Z",
+  "generated": "2026-06-21T03:40:51.332Z",
   "tasks": [
+    {
+      "id": "index_bm25",
+      "priority": "P1",
+      "label": "Backfill bm25_text in payload for BM25 search lane",
+      "count": 721,
+      "script": "node scripts/atlas/graphify-langgraph-pipeline.mjs --apply --stage index_bm25",
+      "gate": "BM25 coverage ≥ 85%",
+      "blockedBy": [
+        "feature_extract"
+      ]
+    },
     {
       "id": "rank_signals",
       "priority": "P2",
       "label": "Audit and persist RRF ranking signal coverage",
-      "count": 0,
+      "count": 17985,
       "script": "node scripts/atlas/graphify-langgraph-pipeline.mjs --apply --stage rank_signals",
       "gate": "All 3 ranking gates PASS (BM25 ≥85%, concepts ≥60%, community_conf coverage)",
       "blockedBy": [
@@ -14,10 +25,19 @@
       ]
     },
     {
+      "id": "prune_noise",
+      "priority": "P3",
+      "label": "Remove .cache/ artifact packets",
+      "count": 35,
+      "script": "node scripts/atlas/graphify-langgraph-pipeline.mjs --apply --stage prune_noise",
+      "gate": "noise refs < 5",
+      "blockedBy": []
+    },
+    {
       "id": "xgboost_export",
       "priority": "P2",
       "label": "Export XGBoost training features (unblocked once signal gates pass)",
-      "count": 0,
+      "count": 17985,
       "script": "node scripts/atlas/export-xgboost-features.mjs --apply",
       "gate": "NDCG@10 ≥ 0.80, ≥500 success traces",
       "blockedBy": [

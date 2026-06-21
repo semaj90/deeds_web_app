@@ -15,6 +15,7 @@
 
 import { getRedis } from '$lib/server/redis.js';
 import { ENV } from '$lib/server/env.server.js';
+import { getOllamaEndpoint } from '$lib/server/ollama.js';
 import type { AtlasChunk, CtxPacket } from './feature-context-matrix.js';
 
 // ── Constants & Prompts ────────────────────────────────────────────────────────
@@ -130,7 +131,7 @@ export async function synthesizeFeatureChunks(
   const isTurboActive = await checkTurboQuant();
   const endpointUrl = isTurboActive
     ? `${ENV.TURBOQUANT_URL}/v1/chat/completions`
-    : `${ENV.OLLAMA_BASE_URL}/v1/chat/completions`;
+    : `${getOllamaEndpoint()}/v1/chat/completions`;
 
   const modelName = isTurboActive ? ENV.GEMMA4_MODEL : ENV.OLLAMA_CHAT_MODEL;
 

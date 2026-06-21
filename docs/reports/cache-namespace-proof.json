@@ -1,6 +1,6 @@
 {
   "schema": "cache_namespace_proof.v1",
-  "generated_at": "2026-06-20T00:26:01.683Z",
+  "generated_at": "2026-06-21T05:40:21.450Z",
   "canonical_truth": "Postgres",
   "namespaces": [
     {
@@ -9,9 +9,110 @@
       "role": "query exact-match cache",
       "required": true,
       "ttl": "required",
-      "key_count": 0,
-      "samples": [],
-      "status": "FAIL_EMPTY"
+      "key_count": 80,
+      "samples": [
+        {
+          "key": "hyperrag:query:7343a615d5c70e79:prov",
+          "type": "string",
+          "ttl_seconds": 3490
+        },
+        {
+          "key": "hyperrag:query:4d2a87d6c3c7cbcb:prov",
+          "type": "string",
+          "ttl_seconds": 3480
+        },
+        {
+          "key": "hyperrag:query:3f22a0f863725a31:prov",
+          "type": "string",
+          "ttl_seconds": 3392
+        },
+        {
+          "key": "hyperrag:query:d255c30eac07b4e8:prov",
+          "type": "string",
+          "ttl_seconds": 3238
+        },
+        {
+          "key": "hyperrag:query:7044843121306c53",
+          "type": "string",
+          "ttl_seconds": 3471
+        },
+        {
+          "key": "hyperrag:query:318c7e36126f36c2",
+          "type": "string",
+          "ttl_seconds": 3500
+        },
+        {
+          "key": "hyperrag:query:09acfdc05bd3e3e3",
+          "type": "string",
+          "ttl_seconds": 3243
+        },
+        {
+          "key": "hyperrag:query:9d133344947b6aaf",
+          "type": "string",
+          "ttl_seconds": 3227
+        },
+        {
+          "key": "hyperrag:query:4e233436767be8c9",
+          "type": "string",
+          "ttl_seconds": 3353
+        },
+        {
+          "key": "hyperrag:query:5a789da173fceded:prov",
+          "type": "string",
+          "ttl_seconds": 3451
+        },
+        {
+          "key": "hyperrag:query:12ee37667bb8a5a4",
+          "type": "string",
+          "ttl_seconds": 3305
+        },
+        {
+          "key": "hyperrag:query:5a789da173fceded",
+          "type": "string",
+          "ttl_seconds": 3451
+        },
+        {
+          "key": "hyperrag:query:df2b7bac3c0d5fa4:prov",
+          "type": "string",
+          "ttl_seconds": 3431
+        },
+        {
+          "key": "hyperrag:query:7044843121306c53:prov",
+          "type": "string",
+          "ttl_seconds": 3471
+        },
+        {
+          "key": "hyperrag:query:2205d5c5ed667fe5",
+          "type": "string",
+          "ttl_seconds": 3266
+        },
+        {
+          "key": "hyperrag:query:89e21e6ffeabbbd4",
+          "type": "string",
+          "ttl_seconds": 3202
+        },
+        {
+          "key": "hyperrag:query:c02a581af4e06a35:prov",
+          "type": "string",
+          "ttl_seconds": 3246
+        },
+        {
+          "key": "hyperrag:query:7343a615d5c70e79",
+          "type": "string",
+          "ttl_seconds": 3490
+        },
+        {
+          "key": "hyperrag:query:162a39c6aff9d6e2",
+          "type": "string",
+          "ttl_seconds": 3295
+        },
+        {
+          "key": "hyperrag:query:e48d795d4260251f",
+          "type": "string",
+          "ttl_seconds": 3324
+        }
+      ],
+      "status": "PASS"
     },
     {
       "name": "bifrost",
@@ -19,107 +120,107 @@
       "role": "semantic packet/cache mirror",
       "required": true,
       "ttl": "mixed",
-      "key_count": 148,
+      "key_count": 346,
       "samples": [
         {
-          "key": "bifrost:packet:1703d9c005252a62",
+          "key": "bifrost:packet:40ce2356b07edded",
           "type": "string",
-          "ttl_seconds": 77226
+          "ttl_seconds": 557078
         },
         {
-          "key": "bifrost:packet:e005fe879bb41ec6",
+          "key": "bifrost:sem:packet:src/routes/api/codebase/apply-patch/+server.ts:9c361d77bcaace8e",
           "type": "string",
-          "ttl_seconds": 77226
+          "ttl_seconds": 583013
         },
         {
-          "key": "bifrost:packet:3f73ebb0336ae4f3",
+          "key": "bifrost:sem:feature:topology",
           "type": "string",
-          "ttl_seconds": 77226
+          "ttl_seconds": 583104
         },
         {
-          "key": "bifrost:sem:packet:a83063dc47fe049c",
+          "key": "bifrost:sem:packet:src/routes/api/codebase-index/enrich-qdrant/+server.ts:866533ab04bc03aa",
           "type": "string",
-          "ttl_seconds": 17994
+          "ttl_seconds": 583037
         },
         {
-          "key": "bifrost:sem:packet:06a30620527e665c",
+          "key": "bifrost:packet:9b11b6f522def1a1",
           "type": "string",
-          "ttl_seconds": 17994
+          "ttl_seconds": 557078
         },
         {
-          "key": "bifrost:packet:a318d009a88a31fb",
+          "key": "bifrost:sem:packet:src/routes/api/citations/collections/[collectionId]/+server.ts:7dcd3023a301a693",
           "type": "string",
-          "ttl_seconds": 77226
+          "ttl_seconds": 582976
         },
         {
-          "key": "bifrost:sem:intent:b4700090c1a7f29b",
+          "key": "bifrost:sem:packet:src/routes/api/cases/[id]/timeline/+server.ts:d5a35dc1b1e92f4a",
           "type": "string",
-          "ttl_seconds": 17994
+          "ttl_seconds": 583135
         },
         {
-          "key": "bifrost:packet:175066b8a4ceee3c",
+          "key": "bifrost:sem:feature:fictional-cases",
           "type": "string",
-          "ttl_seconds": 77226
+          "ttl_seconds": 583140
         },
         {
-          "key": "bifrost:packet:28e942decdcdb342",
+          "key": "bifrost:sem:packet:src/lib/ai/citation-cache.ts:1b7283296025bdf2",
           "type": "string",
-          "ttl_seconds": 77226
+          "ttl_seconds": 583171
         },
         {
-          "key": "bifrost:sem:packet:case_detail_a3e84056",
+          "key": "bifrost:sem:packet:src/routes/api/cases/[id]/notes/[noteId]/versions/+server.ts:6bde8720bda25521",
           "type": "string",
-          "ttl_seconds": 17994
+          "ttl_seconds": 583123
         },
         {
-          "key": "bifrost:packet:69af5ffe1b3af354",
+          "key": "bifrost:sem:packet:src/routes/api/citations/export/json/+server.ts:8048b5920f37c025",
           "type": "string",
-          "ttl_seconds": 77226
+          "ttl_seconds": 582979
         },
         {
-          "key": "bifrost:sem:packet:a3383a3ada83d202",
+          "key": "bifrost:packet:8d44b9719637706f",
           "type": "string",
-          "ttl_seconds": 17994
+          "ttl_seconds": 557078
         },
         {
-          "key": "bifrost:sem:packet:rag_search_a3e84056",
+          "key": "bifrost:sem:packet:src/routes/api/wiki/page/[id]/+server.ts:a484285468aa65c5",
           "type": "string",
-          "ttl_seconds": 17994
+          "ttl_seconds": 583006
         },
         {
-          "key": "bifrost:sem:packet:96d9e9b92acd0d05",
+          "key": "bifrost:sem:packet:src/routes/api/persons-of-interest/[id]/associates/[associateId]/+server.ts:7dd932249c7ddbc9",
           "type": "string",
-          "ttl_seconds": 17994
+          "ttl_seconds": 583142
         },
         {
-          "key": "bifrost:sem:feature:ai-agent",
+          "key": "bifrost:sem:packet:src/routes/api/yorha/cases/+server.ts:d10ae5ee1f990118",
           "type": "string",
-          "ttl_seconds": 17994
+          "ttl_seconds": 583160
         },
         {
-          "key": "bifrost:packet:c6cd8b39d33db2aa",
+          "key": "bifrost:sem:packet:src/routes/api/persons-of-interest/[id]/face-match/+server.ts:855e92e686dc40e9",
           "type": "string",
-          "ttl_seconds": 77226
+          "ttl_seconds": 583144
         },
         {
-          "key": "bifrost:sem:packet:3afd5c91641b60c3",
+          "key": "bifrost:sem:packet:src/routes/api/citations/collections/+server.ts:b4192b86906c5810",
           "type": "string",
-          "ttl_seconds": 17994
+          "ttl_seconds": 582977
         },
         {
-          "key": "bifrost:packet:32c7446a769f9c86",
+          "key": "bifrost:sem:packet:src/routes/api/codeintel/chunks/[chunkId]/+server.ts:4e3ce62d9a903013",
           "type": "string",
-          "ttl_seconds": 77226
+          "ttl_seconds": 583083
         },
         {
-          "key": "bifrost:packet:613f572a65b1ffcc",
+          "key": "bifrost:sem:feature:timeline",
           "type": "string",
-          "ttl_seconds": 77226
+          "ttl_seconds": 583135
         },
         {
-          "key": "bifrost:sem:feature:codebase-intelligence",
+          "key": "bifrost:sem:packet:src/routes/api/citations/saved/+server.ts:199ab926e9e078d7",
           "type": "string",
-          "ttl_seconds": 17994
+          "ttl_seconds": 582981
         }
       ],
       "status": "PASS"
@@ -133,104 +234,104 @@
       "key_count": 152,
       "samples": [
         {
-          "key": "som:88",
-          "type": "string",
-          "ttl_seconds": 510843
-        },
-        {
-          "key": "som:cell:51",
-          "type": "string",
-          "ttl_seconds": 510857
-        },
-        {
-          "key": "som:62",
-          "type": "string",
-          "ttl_seconds": 510859
-        },
-        {
-          "key": "som:cell:378",
-          "type": "string",
-          "ttl_seconds": 510865
-        },
-        {
-          "key": "som:cell:353",
-          "type": "string",
-          "ttl_seconds": 510864
-        },
-        {
           "key": "som:cell:25",
           "type": "string",
-          "ttl_seconds": 510848
+          "ttl_seconds": 405588
         },
         {
-          "key": "som:96",
+          "key": "som:cell:53",
           "type": "string",
-          "ttl_seconds": 510837
+          "ttl_seconds": 405589
         },
         {
-          "key": "som:71",
+          "key": "som:53",
           "type": "string",
-          "ttl_seconds": 510867
+          "ttl_seconds": 405589
         },
         {
-          "key": "som:146",
+          "key": "som:cell:0",
           "type": "string",
-          "ttl_seconds": 510861
-        },
-        {
-          "key": "som:cell:93",
-          "type": "string",
-          "ttl_seconds": 510867
-        },
-        {
-          "key": "som:cell:21",
-          "type": "string",
-          "ttl_seconds": 510862
-        },
-        {
-          "key": "som:378",
-          "type": "string",
-          "ttl_seconds": 510865
-        },
-        {
-          "key": "som:76",
-          "type": "string",
-          "ttl_seconds": 510847
-        },
-        {
-          "key": "som:23",
-          "type": "string",
-          "ttl_seconds": 510853
-        },
-        {
-          "key": "som:70",
-          "type": "string",
-          "ttl_seconds": 510866
-        },
-        {
-          "key": "som:6",
-          "type": "string",
-          "ttl_seconds": 510859
-        },
-        {
-          "key": "som:cell:23",
-          "type": "string",
-          "ttl_seconds": 510853
-        },
-        {
-          "key": "som:28",
-          "type": "string",
-          "ttl_seconds": 510849
+          "ttl_seconds": 405584
         },
         {
           "key": "som:cell:50",
           "type": "string",
-          "ttl_seconds": 510847
+          "ttl_seconds": 405587
         },
         {
-          "key": "som:cell:68",
+          "key": "som:cell:39",
           "type": "string",
-          "ttl_seconds": 510866
+          "ttl_seconds": 405589
+        },
+        {
+          "key": "som:62",
+          "type": "string",
+          "ttl_seconds": 405600
+        },
+        {
+          "key": "som:80",
+          "type": "string",
+          "ttl_seconds": 405594
+        },
+        {
+          "key": "som:68",
+          "type": "string",
+          "ttl_seconds": 405606
+        },
+        {
+          "key": "som:cell:146",
+          "type": "string",
+          "ttl_seconds": 405602
+        },
+        {
+          "key": "som:1",
+          "type": "string",
+          "ttl_seconds": 405576
+        },
+        {
+          "key": "som:3",
+          "type": "string",
+          "ttl_seconds": 405576
+        },
+        {
+          "key": "som:135",
+          "type": "string",
+          "ttl_seconds": 405601
+        },
+        {
+          "key": "som:19",
+          "type": "string",
+          "ttl_seconds": 405580
+        },
+        {
+          "key": "som:51",
+          "type": "string",
+          "ttl_seconds": 405597
+        },
+        {
+          "key": "som:73",
+          "type": "string",
+          "ttl_seconds": 405594
+        },
+        {
+          "key": "som:cell:6",
+          "type": "string",
+          "ttl_seconds": 405599
+        },
+        {
+          "key": "som:cell:161",
+          "type": "string",
+          "ttl_seconds": 405602
+        },
+        {
+          "key": "som:54",
+          "type": "string",
+          "ttl_seconds": 405591
+        },
+        {
+          "key": "som:96",
+          "type": "string",
+          "ttl_seconds": 405578
         }
       ],
       "status": "PASS"
@@ -241,107 +342,107 @@
       "role": "ACE planner/context packets",
       "required": true,
       "ttl": "mixed",
-      "key_count": 1255,
+      "key_count": 1310,
       "samples": [
         {
-          "key": "ace:atlas:dir:src_routes__app__demos_yorha_components_evidence",
+          "key": "ace:atlas:dir:src_routes_api_phase89_graph",
           "type": "string",
-          "ttl_seconds": 571391
+          "ttl_seconds": 604644
         },
         {
-          "key": "ace:atlas:dir:src_routes_api_ai_models",
+          "key": "ace:atlas:dir:src_routes_api_precedents",
           "type": "string",
-          "ttl_seconds": 571391
+          "ttl_seconds": 604644
         },
         {
-          "key": "ace:atlas:dir:src_lib_server_cases",
+          "key": "ace:atlas:dir:src_routes_api_agents_chat",
           "type": "string",
-          "ttl_seconds": 571391
+          "ttl_seconds": 604644
         },
         {
-          "key": "ace:atlas:dir:src_routes_api_code-intel_claude-plan",
+          "key": "ace:atlas:dir:src_routes_api_cache_warm-up",
           "type": "string",
-          "ttl_seconds": 571391
+          "ttl_seconds": 604644
         },
         {
-          "key": "ace:atlas:dir:src_routes_api_graph_hypergraph_address",
+          "key": "ace:atlas:dir:src_routes_api_analytics_codebase-research",
           "type": "string",
-          "ttl_seconds": 571391
+          "ttl_seconds": 604644
         },
         {
-          "key": "ace:atlas:dir:src_routes_api_pgai_compare",
+          "key": "ace:atlas:dir:src_routes_api_ace_health",
           "type": "string",
-          "ttl_seconds": 571391
+          "ttl_seconds": 604644
         },
         {
-          "key": "ace:atlas:dir:src_routes__app__admin_observability",
+          "key": "ace:atlas:dir:src_routes_api_topology",
           "type": "string",
-          "ttl_seconds": 571391
+          "ttl_seconds": 604644
         },
         {
-          "key": "ace:atlas:dir:src_lib_server_messaging",
+          "key": "ace:atlas:dir:src_routes_api_cases_[id]_key-points",
           "type": "string",
-          "ttl_seconds": 571391
+          "ttl_seconds": 604644
         },
         {
-          "key": "ace:atlas:dir:src_routes_api_system_services",
+          "key": "ace:atlas:dir:src_routes_api_phase89_vector-search",
           "type": "string",
-          "ttl_seconds": 571391
+          "ttl_seconds": 604644
         },
         {
-          "key": "ace:atlas:dir:src_routes_api_admin_ai-chat_upload",
+          "key": "ace:atlas:dir:src_routes_api_code-intel_wiki-status",
           "type": "string",
-          "ttl_seconds": 571391
+          "ttl_seconds": 604644
         },
         {
-          "key": "ace:atlas:dir:src_routes__app__demos_nes-routes",
+          "key": "ace:atlas:dir:src_routes_api_ai_generate-report_[scope]",
           "type": "string",
-          "ttl_seconds": 571391
+          "ttl_seconds": 604644
         },
         {
-          "key": "ace:ctx:llmctx:094a78bdfe675ff9d844d826b414e540",
+          "key": "ace:atlas:dir:src_lib_server_observability",
           "type": "string",
-          "ttl_seconds": -1
+          "ttl_seconds": 604644
         },
         {
-          "key": "ace:atlas:dir:src_routes__app__error-brain",
+          "key": "ace:atlas:dir:src_routes_api_code-intel_topology_node_[stableKey]",
           "type": "string",
-          "ttl_seconds": 571391
+          "ttl_seconds": 604644
         },
         {
-          "key": "ace:atlas:dir:src_routes_api_rag_validate",
+          "key": "ace:atlas:dir:src_routes_api_gpu_lease",
           "type": "string",
-          "ttl_seconds": 571391
+          "ttl_seconds": 604644
         },
         {
-          "key": "ace:atlas:dir:src_routes__app__admin_codebase-viewer",
+          "key": "ace:atlas:dir:src_routes__dev__demo_streaming",
           "type": "string",
-          "ttl_seconds": 571391
+          "ttl_seconds": 604644
         },
         {
-          "key": "ace:atlas:dir:src_routes_api_codebase-index_export_bundle",
+          "key": "ace:atlas:dir:src_lib_server_langextract",
           "type": "string",
-          "ttl_seconds": 571391
+          "ttl_seconds": 604644
         },
         {
-          "key": "ace:atlas:dir:src_lib_server_couchdb",
+          "key": "ace:atlas:dir:src_lib_components_research",
           "type": "string",
-          "ttl_seconds": 571391
+          "ttl_seconds": 604644
         },
         {
-          "key": "ace:atlas:dir:src_lib_server_optimize",
+          "key": "ace:atlas:dir:src_routes_api_cases_[id]_persons",
           "type": "string",
-          "ttl_seconds": 571391
+          "ttl_seconds": 604644
         },
         {
-          "key": "ace:atlas:dir:src_routes_api_routes_[routeId]_health-event",
+          "key": "ace:atlas:dir:src_lib_icons_yorha",
           "type": "string",
-          "ttl_seconds": 571391
+          "ttl_seconds": 604644
         },
         {
-          "key": "ace:atlas:dir:src_routes_api_recommendations_jobs_[jobId]",
+          "key": "ace:atlas:dir:src_routes_api_synthesis_evaluation_[id]",
           "type": "string",
-          "ttl_seconds": 571391
+          "ttl_seconds": 604644
         }
       ],
       "status": "PASS"
@@ -371,104 +472,104 @@
       "key_count": 85,
       "samples": [
         {
-          "key": "centroid:51",
-          "type": "string",
-          "ttl_seconds": 510825
-        },
-        {
-          "key": "centroid:19",
-          "type": "string",
-          "ttl_seconds": 510818
-        },
-        {
-          "key": "centroid:21",
-          "type": "string",
-          "ttl_seconds": 510819
-        },
-        {
-          "key": "centroid:4",
-          "type": "string",
-          "ttl_seconds": 510823
-        },
-        {
-          "key": "centroid:56",
-          "type": "string",
-          "ttl_seconds": 510826
-        },
-        {
           "key": "centroid:88",
           "type": "string",
-          "ttl_seconds": 510832
-        },
-        {
-          "key": "centroid:70",
-          "type": "string",
-          "ttl_seconds": 510829
-        },
-        {
-          "key": "centroid:26",
-          "type": "string",
-          "ttl_seconds": 510820
+          "ttl_seconds": 405573
         },
         {
           "key": "centroid:10",
           "type": "string",
-          "ttl_seconds": 510816
+          "ttl_seconds": 405556
         },
         {
-          "key": "centroid:98",
+          "key": "centroid:58",
           "type": "string",
-          "ttl_seconds": 510835
+          "ttl_seconds": 405567
         },
         {
           "key": "centroid:11",
           "type": "string",
-          "ttl_seconds": 510816
+          "ttl_seconds": 405557
         },
         {
-          "key": "centroid:82",
+          "key": "centroid:25",
           "type": "string",
-          "ttl_seconds": 510831
+          "ttl_seconds": 405560
         },
         {
-          "key": "centroid:63",
+          "key": "centroid:60",
           "type": "string",
-          "ttl_seconds": 510828
+          "ttl_seconds": 405567
+        },
+        {
+          "key": "centroid:12",
+          "type": "string",
+          "ttl_seconds": 405557
+        },
+        {
+          "key": "centroid:59",
+          "type": "string",
+          "ttl_seconds": 405567
+        },
+        {
+          "key": "centroid:96",
+          "type": "string",
+          "ttl_seconds": 405574
+        },
+        {
+          "key": "centroid:18",
+          "type": "string",
+          "ttl_seconds": 405558
+        },
+        {
+          "key": "centroid:69",
+          "type": "string",
+          "ttl_seconds": 405569
+        },
+        {
+          "key": "centroid:9",
+          "type": "string",
+          "ttl_seconds": 405573
+        },
+        {
+          "key": "centroid:66",
+          "type": "string",
+          "ttl_seconds": 405569
+        },
+        {
+          "key": "centroid:57",
+          "type": "string",
+          "ttl_seconds": 405567
+        },
+        {
+          "key": "centroid:74",
+          "type": "string",
+          "ttl_seconds": 405570
+        },
+        {
+          "key": "centroid:77",
+          "type": "string",
+          "ttl_seconds": 405571
+        },
+        {
+          "key": "centroid:98",
+          "type": "string",
+          "ttl_seconds": 405575
+        },
+        {
+          "key": "centroid:14",
+          "type": "string",
+          "ttl_seconds": 405557
+        },
+        {
+          "key": "centroid:31",
+          "type": "string",
+          "ttl_seconds": 405562
         },
         {
           "key": "centroid:67",
           "type": "string",
-          "ttl_seconds": 510828
-        },
-        {
-          "key": "centroid:38",
-          "type": "string",
-          "ttl_seconds": 510823
-        },
-        {
-          "key": "centroid:28",
-          "type": "string",
-          "ttl_seconds": 510821
-        },
-        {
-          "key": "centroid:27",
-          "type": "string",
-          "ttl_seconds": 510821
-        },
-        {
-          "key": "centroid:45",
-          "type": "string",
-          "ttl_seconds": 510824
-        },
-        {
-          "key": "centroid:23",
-          "type": "string",
-          "ttl_seconds": 510820
-        },
-        {
-          "key": "centroid:85",
-          "type": "string",
-          "ttl_seconds": 510832
+          "ttl_seconds": 405569
         }
       ],
       "status": "PASS"
@@ -476,9 +577,9 @@
   ],
   "collisions": [],
   "summary": {
-    "status": "FAIL",
+    "status": "PASS",
     "namespace_count": 6,
-    "required_ready": 4,
+    "required_ready": 5,
     "required_total": 5,
     "sampled_collisions": 0
   }

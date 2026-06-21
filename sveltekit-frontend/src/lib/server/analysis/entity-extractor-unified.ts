@@ -7,6 +7,7 @@ import { createHash } from 'crypto';
 import { ENV } from '$lib/server/env.server.js';
 import { traceLLM } from '$lib/server/observability/langfuse.js';
 import { ollamaFetch } from '$lib/server/ollama.js';
+import { getOllamaEndpoint } from '$lib/server/utils/ollama-endpoint.js';
 import { getRedis } from '$lib/server/redis.js';
 import { z } from 'zod';
 import { CACHE_KEYS, CACHE_TTL } from '../cache/cache-config.js';
@@ -147,7 +148,7 @@ ${text}`;
 
     try {
       return await traceLLM('entity-extraction-unified', { model: MODEL, prompt: text.slice(0, 500) }, async (gen) => {
-        const res = await ollamaFetch(`${ENV.OLLAMA_BASE_URL}/api/generate`, {
+        const res = await ollamaFetch(`${getOllamaEndpoint()}/api/generate`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({

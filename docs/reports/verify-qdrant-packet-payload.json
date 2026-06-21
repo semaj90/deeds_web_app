@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-06-19T22:22:05.639Z",
+  "generated_at": "2026-06-21T17:07:58.401Z",
   "sample_size": 100,
   "coverage": {
     "atlas_enriched_pct": 92,
@@ -7,7 +7,7 @@
     "community_id_pct": 83,
     "community_conf_pct": 92,
     "packet_key_pct": 92,
-    "concept_ids_pct": 82,
+    "concept_ids_pct": 92,
     "canonical_ref_pct": 100,
     "file_path_pct": 100,
     "content_hash_pct": 99,
@@ -15,15 +15,15 @@
     "directory_path_pct": 0
   },
   "alignment": {
-    "checked": 0,
-    "aligned": 0,
+    "checked": 3,
+    "aligned": 3,
     "mismatches": 0
   },
   "gates": [
     {
       "name": "qdrant_reachable",
       "pass": true,
-      "detail": "52606 points"
+      "detail": "69683 points"
     },
     {
       "name": "atlas_enriched_50pct",
@@ -48,7 +48,7 @@
     {
       "name": "postgres_qdrant_no_contradictions",
       "pass": true,
-      "detail": "no filterable canonicalSourceRef points found"
+      "detail": "3/3 feature_id aligned, 0 mismatches"
     }
   ],
   "pass": true

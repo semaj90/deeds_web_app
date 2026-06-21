@@ -6,6 +6,7 @@
  * G17 compliance: all dev-fallback addresses live only in env.server.ts.
  */
 import { ENV } from '$lib/server/env.server.js';
+import { getOllamaEndpoint, getOllamaEmbeddingEndpoint } from '$lib/server/utils/ollama-endpoint.js';
 
 export const serviceUrls = {
   // Core data stores
@@ -18,7 +19,8 @@ export const serviceUrls = {
   minio:      ENV.MINIO_ENDPOINT,
 
   // Inference cascade
-  ollama:     ENV.OLLAMA_BASE_URL,
+  ollama:     getOllamaEndpoint(),
+  ollamaEmbed: getOllamaEmbeddingEndpoint(),
   bifrost:    ENV.BIFROST_URL,
   turboquant: ENV.TURBOQUANT_BASE_URL,
   vlm:        ENV.VLM_BASE_URL,

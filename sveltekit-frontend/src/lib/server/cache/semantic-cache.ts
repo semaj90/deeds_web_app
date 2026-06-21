@@ -10,6 +10,7 @@ import { semanticCache as semanticCacheTable } from '../db/schema/schema-semanti
 import { sql } from 'drizzle-orm';
 import { ENV } from '../env.server.js';
 import { getRedis } from '../redis.js';
+import { getOllamaEmbeddingEndpoint } from '../ollama.js';
 import {
 	searchSemanticCache as searchRedisSemanticCache,
 	storeSemanticCache as storeRedisSemanticCache,
@@ -200,7 +201,7 @@ export interface SemanticCacheHit {
 // In a real scenario, this connects to Ollama embeddinggemma
 export async function generateEmbedding(text: string): Promise<number[]> {
 	try {
-		const res = await fetch(`${ENV.OLLAMA_BASE_URL}/api/embeddings`, {
+		const res = await fetch(`${getOllamaEmbeddingEndpoint()}/api/embeddings`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({ model: 'embeddinggemma:latest', prompt: text }),

@@ -1,8 +1,8 @@
 import type { RequestHandler } from './$types';
 import { json } from '@sveltejs/kit';
-import { ENV } from '$lib/server/env.server.js';
 import { z } from 'zod';
 import { ollamaFetch } from '$lib/server/ollama.js';
+import { getOllamaEndpoint } from '$lib/server/utils/ollama-endpoint.js';
 
 const analyzeEvidenceSchema = z.object({
 	evidenceId: z.string().max(500).optional().default(''),
@@ -53,7 +53,7 @@ ${meta.mimeType ? `Type: ${meta.mimeType}` : ''}
 Text (first 4000 chars):
 ${text.slice(0, 4000)}`;
 
-		const res = await ollamaFetch(`${ENV.OLLAMA_BASE_URL}/api/chat`, {
+		const res = await ollamaFetch(`${getOllamaEndpoint()}/api/chat`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({

@@ -4,6 +4,7 @@ import { createHash } from 'crypto';
 import { ENV } from '$lib/server/env.server.js';
 import type { OllamaResponse } from '$lib/server/ollama.js';
 import { getChatModelKeepAlive, ollamaFetch } from '$lib/server/ollama.js';
+import { getOllamaEndpoint } from '$lib/server/utils/ollama-endpoint.js';
 import { getRedis } from '$lib/server/redis.js';
 import { recordSearchQuery } from '$lib/server/analytics/search-analytics.js';
 import { z } from 'zod';
@@ -221,7 +222,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
       let totalToolCalls = 0;
 
       while (toolRounds < MAX_TOOL_ROUNDS) {
-        const res = await ollamaFetch(`${ENV.OLLAMA_BASE_URL}/api/chat`, {
+        const res = await ollamaFetch(`${getOllamaEndpoint()}/api/chat`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -283,7 +284,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 
       // If we exhausted rounds without a final text response, request one
       if (!responseText) {
-        const finalRes = await ollamaFetch(`${ENV.OLLAMA_BASE_URL}/api/chat`, {
+        const finalRes = await ollamaFetch(`${getOllamaEndpoint()}/api/chat`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -312,7 +313,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
       }
     } else {
       // Simple mode: no tools, single Ollama call
-      const res = await ollamaFetch(`${ENV.OLLAMA_BASE_URL}/api/chat`, {
+      const res = await ollamaFetch(`${getOllamaEndpoint()}/api/chat`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

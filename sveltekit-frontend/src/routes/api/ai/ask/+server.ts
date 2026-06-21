@@ -3,6 +3,7 @@ import { json } from '@sveltejs/kit';
 import { ENV } from '$lib/server/env.server.js';
 import { z } from 'zod';
 import { ollamaFetch } from '$lib/server/ollama.js';
+import { getOllamaEndpoint } from '$lib/server/utils/ollama-endpoint.js';
 
 const aiAskSchema = z.object({
 	question: z.string().max(5000).optional(),
@@ -31,7 +32,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 			? `You are a legal AI assistant. Answer the question using this context:\n\n${context.slice(0, 8000)}`
 			: 'You are a legal AI assistant. Provide concise, accurate legal analysis.';
 
-		const res = await ollamaFetch(`${ENV.OLLAMA_BASE_URL}/api/chat`, {
+		const res = await ollamaFetch(`${getOllamaEndpoint()}/api/chat`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({

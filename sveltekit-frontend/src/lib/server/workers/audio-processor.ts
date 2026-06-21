@@ -17,6 +17,7 @@ import { readFile, unlink } from 'fs/promises';
 import { join } from 'path';
 import type { Redis } from 'ioredis';
 import { ENV } from '$lib/server/env.server';
+import { getOllamaEndpoint } from '$lib/server/ollama.js';
 
 export interface AudioJob {
   evidenceId: string;
@@ -322,7 +323,7 @@ Respond in JSON format:
   "tags": ["tag1", "tag2", "tag3"]
 }`;
 
-      const response = await fetch(`${ENV.OLLAMA_BASE_URL}/api/generate`, {
+      const response = await fetch(`${getOllamaEndpoint()}/api/generate`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -374,7 +375,7 @@ Respond in JSON format:
   ): Promise<void> {
     try {
       // Get embedding from embeddinggemma
-      const embedResponse = await fetch(`${ENV.OLLAMA_BASE_URL}/api/embeddings`, {
+      const embedResponse = await fetch(`${getOllamaEndpoint()}/api/embeddings`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -541,7 +542,7 @@ Respond in JSON format:
    */
   private async getEmbedding(text: string): Promise<number[] | null> {
     try {
-      const response = await fetch(`${ENV.OLLAMA_BASE_URL}/api/embeddings`, {
+      const response = await fetch(`${getOllamaEndpoint()}/api/embeddings`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ model: 'embeddinggemma:latest', prompt: text }),

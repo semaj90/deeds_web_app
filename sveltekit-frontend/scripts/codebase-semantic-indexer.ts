@@ -312,7 +312,6 @@ async function ensureCollection(): Promise<void> {
         content: { size: VECTOR_DIM, distance: 'Cosine' },
         signature: { size: VECTOR_DIM, distance: 'Cosine' },
         error: { size: VECTOR_DIM, distance: 'Cosine' },
-        encoded_64: { size: 64, distance: 'Cosine' },
       },
       optimizers_config: { indexing_threshold: 20000 },
       quantization_config: { scalar: { type: 'int8', always_ram: true } },

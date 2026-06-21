@@ -8,8 +8,11 @@ import { fileURLToPath } from 'node:url';
 const __dir = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dir, '../..');
 
-const COUCHDB_URL = process.env.COUCHDB_URL || 'http://localhost:5984';
-const REDIS_URL = process.env.REDIS_URL || 'redis://localhost:6379';
+import { loadRepoEnv, resolveRedisConfig } from './connection-config.mjs';
+
+const env = loadRepoEnv(process.env);
+const COUCHDB_URL = env.COUCHDB_URL || 'http://localhost:5984';
+const REDIS = resolveRedisConfig(env);
 
 function checkDocker() {
   try {
@@ -41,9 +44,19 @@ function checkCSVs() {
 async function checkRedis() {
   try {
     const IORedis = await import('ioredis');
-    const client = new IORedis.default(REDIS_URL);
+    const client = new IORedis.default({
+      host: REDIS.host,
+      port: REDIS.port,
+      password: REDIS.password,
+      lazyConnect: true,
+      maxRetriesPerRequest: 1,
+      enableOfflineQueue: false,
+      retryStrategy: () => null,
+    });
+    client.on('error', () => {});
+    await client.connect();
     await client.ping();
-    await client.quit();
+    await client.quit().catch(() => {});
     return { ok: true };
   } catch (e) {
     return { ok: false, error: e.message };

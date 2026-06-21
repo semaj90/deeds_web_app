@@ -30,15 +30,32 @@ const HIGHER_HOP_ALIASES = {
 };
 
 function normalizeSourceRef(value) {
-  return String(value ?? '')
-    .replace(/\\/g, '/')
-    .replace(/^\.\//, '')
-    .replace(/^\.\.\//, '')
-    .replace(/^deeds-web-app\//i, '')
-    .replace(/^sveltekit-frontend\//i, '')
-    .replace(/\/{2,}/g, '/')
-    .trim()
-    .toLowerCase();
+  if (!value || typeof value !== 'string') return '';
+
+  let s = value.replace(/\\/g, '/');
+  s = s.replace(/^[A-Za-z]:\//, '');
+  s = s.replace(/^\/+/, '');
+  s = s.replace(/^file:/, '');
+
+  const cleanPath = s.replace(/^\.?\//, '').trim();
+
+  if (cleanPath.startsWith('sveltekit-frontend/')) {
+    return cleanPath;
+  }
+  if (cleanPath.startsWith('src/')) {
+    return `sveltekit-frontend/${cleanPath}`;
+  }
+
+  const srcIdx = cleanPath.indexOf('src/');
+  if (srcIdx >= 0) {
+    return `sveltekit-frontend/${cleanPath.slice(srcIdx)}`;
+  }
+  const frontendIdx = cleanPath.indexOf('sveltekit-frontend/');
+  if (frontendIdx >= 0) {
+    return cleanPath.slice(frontendIdx);
+  }
+
+  return cleanPath;
 }
 
 function toArray(value) {

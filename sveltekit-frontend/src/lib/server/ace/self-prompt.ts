@@ -10,12 +10,17 @@
 import { z } from 'zod';
 import { ENV } from '$lib/server/env.server.js';
 import { traceLLM } from '$lib/server/observability/langfuse.js';
-import { getChatModelKeepAlive, bifrostChat, ollamaFetch } from '$lib/server/ollama.js';
+import {
+  getChatModelKeepAlive,
+  getOllamaEndpoint,
+  bifrostChat,
+  ollamaFetch,
+} from '$lib/server/ollama.js';
 import type { Redis } from 'ioredis';
 import { getRedis } from '$lib/server/redis.js';
 import type { ACEContext, SelfEvaluation } from './types.js';
 
-const OLLAMA_URL = ENV.OLLAMA_BASE_URL;
+const OLLAMA_URL = getOllamaEndpoint();
 const MODEL = ENV.OLLAMA_CHAT_MODEL;
 const EVAL_CACHE_TTL = 3600; // 1 hour
 const QUALITY_THRESHOLD = 0.6;

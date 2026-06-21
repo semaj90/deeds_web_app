@@ -1,22 +1,22 @@
 {
-  "generatedAt": "2026-06-15T23:40:01.137Z",
+  "generatedAt": "2026-06-21T17:17:26.646Z",
   "mode": "dry-run",
   "nextSafeAction": "Use --apply to write the centroid and SOM mirrors into Redis/Valkey, then move to Bifrost mirror wiring.",
   "plannedKeys": [
     {
       "key": "centroid:1",
       "kind": "centroid",
-      "rows": 1
+      "rows": 5
     },
     {
       "key": "som:1",
       "kind": "som",
-      "rows": 1
+      "rows": 5
     },
     {
       "key": "som:cell:1",
       "kind": "som_cell",
-      "rows": 1
+      "rows": 5
     },
     {
       "key": "atlas:centroid:index",
@@ -33,26 +33,26 @@
     {
       "key": "centroid:1",
       "kind": "centroid",
-      "preview": "{\n  \"canonical_source_refs\": [\n    \"src/lib/client/timeline-client.ts\"\n  ],\n  \"chunk_ids\": [\n    \"card:src/lib/client/timeline-client.ts:3d6ecb4eaa1bb17d\"\n  ],\n…"
+      "preview": "{\n  \"canonical_source_refs\": [\n    \"sveltekit-frontend/src/lib/client/timeline-client.ts\",\n    \"sveltekit-frontend/src/routes/api/cases/[id]/citations/+server.t…"
     },
     {
       "key": "som:1",
       "kind": "som",
-      "preview": "{\n  \"canonical_source_refs\": [\n    \"src/lib/client/timeline-client.ts\"\n  ],\n  \"chunk_ids\": [\n    \"card:src/lib/client/timeline-client.ts:3d6ecb4eaa1bb17d\"\n  ],\n…"
+      "preview": "{\n  \"canonical_source_refs\": [\n    \"sveltekit-frontend/src/lib/client/timeline-client.ts\",\n    \"sveltekit-frontend/src/routes/api/cases/[id]/citations/+server.t…"
     },
     {
       "key": "som:cell:1",
       "kind": "som_cell",
-      "preview": "{\n  \"canonical_source_refs\": [\n    \"src/lib/client/timeline-client.ts\"\n  ],\n  \"chunk_ids\": [\n    \"card:src/lib/client/timeline-client.ts:3d6ecb4eaa1bb17d\"\n  ],\n…"
+      "preview": "{\n  \"canonical_source_refs\": [\n    \"sveltekit-frontend/src/lib/client/timeline-client.ts\",\n    \"sveltekit-frontend/src/routes/api/cases/[id]/citations/+server.t…"
     },
     {
       "key": "atlas:centroid:index",
       "kind": "index",
-      "preview": "{\n  \"centroid_keys\": [\n    \"centroid:1\"\n  ],\n  \"community_count\": 1,\n  \"generated_at\": \"2026-06-15T23:40:01.137Z\",\n  \"qdrant_backed_rows\": 1,\n  \"som_count\": 1,\n…"
+      "preview": "{\n  \"centroid_keys\": [\n    \"centroid:1\"\n  ],\n  \"community_count\": 1,\n  \"generated_at\": \"2026-06-21T17:17:26.646Z\",\n  \"qdrant_backed_rows\": 5,\n  \"som_count\": 1,\n…"
     }
   ],
   "source": {
-    "rowsRead": 1,
+    "rowsRead": 5,
     "table": "atlas_higher_hop_index"
   },
   "status": "PASS",
@@ -61,7 +61,7 @@
     "communityBuckets": 1,
     "failures": 0,
     "plannedWrites": 4,
-    "qdrantBackedRows": 1,
+    "qdrantBackedRows": 5,
     "sampleKeys": [
       "centroid:1",
       "som:1",

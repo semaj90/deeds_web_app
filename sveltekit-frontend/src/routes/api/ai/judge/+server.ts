@@ -3,6 +3,7 @@ import { json } from '@sveltejs/kit';
 import { ENV } from '$lib/server/env.server.js';
 import { z } from 'zod';
 import { ollamaFetch } from '$lib/server/ollama.js';
+import { getOllamaEndpoint } from '$lib/server/utils/ollama-endpoint.js';
 
 /** GBNF-constrained response schema for judicial analysis */
 const judgeResponseSchema = z.object({
@@ -129,7 +130,7 @@ ${evidenceList}
 
 Your Honor, please evaluate this case. Rule on evidence admissibility, assess probable cause, score the case strength for both prosecution and defense, and provide your judicial recommendations.`;
 
-		const res = await ollamaFetch(`${ENV.OLLAMA_BASE_URL}/api/chat`, {
+		const res = await ollamaFetch(`${getOllamaEndpoint()}/api/chat`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({

@@ -99,7 +99,6 @@ async function ensureCollection(): Promise<void> {
         content: { size: SERVER_EMBEDDING_DIMS, distance: 'Cosine' },
         signature: { size: SERVER_EMBEDDING_DIMS, distance: 'Cosine' },
         error: { size: SERVER_EMBEDDING_DIMS, distance: 'Cosine' },
-        encoded_64: { size: 64, distance: 'Cosine' },
       },
     }),
   });

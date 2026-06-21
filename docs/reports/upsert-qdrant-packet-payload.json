@@ -1,10 +1,10 @@
 {
-  "generated_at": "2026-06-18T22:23:59.780Z",
+  "generated_at": "2026-06-21T17:07:54.439Z",
   "mode": "apply",
-  "total_packets": 17485,
-  "unique_refs": 6370,
-  "refs_processed": 6370,
-  "qdrant_points_updated": 24657,
-  "refs_not_in_qdrant": 3686,
+  "total_packets": 17985,
+  "unique_refs": 6720,
+  "refs_processed": 6720,
+  "qdrant_points_updated": 26000,
+  "refs_not_in_qdrant": 3919,
   "errors": 0
 }

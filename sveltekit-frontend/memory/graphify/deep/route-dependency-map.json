@@ -197,6 +197,12 @@
     "serverDeps": 0,
     "dbDeps": 0
   },
+  "sveltekit-frontend/src/routes/(app)/recommendations/+page.svelte": {
+    "zone": "shared",
+    "directDeps": 0,
+    "serverDeps": 0,
+    "dbDeps": 0
+  },
   "sveltekit-frontend/src/routes/(app)/reports/[id]/+page.svelte": {
     "zone": "shared",
     "directDeps": 0,
@@ -798,6 +804,12 @@
     "dbDeps": 0
   },
   "sveltekit-frontend/src/routes/api/tasks/agent-pickup/+server.ts": {
+    "zone": "shared",
+    "directDeps": 0,
+    "serverDeps": 0,
+    "dbDeps": 0
+  },
+  "sveltekit-frontend/src/routes/api/tasks/hmm-diagnosis/+server.ts": {
     "zone": "shared",
     "directDeps": 0,
     "serverDeps": 0,

@@ -4,7 +4,7 @@ import { writeFile, readFile, unlink, mkdir, readdir } from 'node:fs/promises';
 import { join } from 'node:path';
 import { tmpdir } from 'node:os';
 import { randomUUID } from 'node:crypto';
-import { ollamaFetch, VLM_MODELS } from '$lib/server/ollama.js';
+import { getOllamaEndpoint, ollamaFetch, VLM_MODELS } from '$lib/server/ollama.js';
 import { qdrant } from '$lib/server/db/unified-client.js';
 import { db } from '$lib/server/db/client.js';
 import { evidenceFrames } from '$lib/server/db/schema/index.js';
@@ -81,7 +81,7 @@ export class VisionService {
     const base64 = frameBuffer.toString('base64');
 
     try {
-      const res = await ollamaFetch(`${ENV.OLLAMA_BASE_URL}/api/generate`, {
+      const res = await ollamaFetch(`${getOllamaEndpoint()}/api/generate`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -154,7 +154,7 @@ export class VisionService {
 
   private async getEmbedding(text: string): Promise<number[] | null> {
     try {
-      const res = await ollamaFetch(`${ENV.OLLAMA_BASE_URL}/api/embeddings`, {
+      const res = await ollamaFetch(`${getOllamaEndpoint()}/api/embeddings`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

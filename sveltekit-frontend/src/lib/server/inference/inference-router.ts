@@ -32,6 +32,7 @@
  */
 
 import { ENV } from '$lib/server/env.server.js';
+import { getOllamaEndpoint } from '$lib/server/ollama.js';
 import { traceLLM } from '$lib/server/observability/langfuse.js';
 import { logLLMInference } from '$lib/server/observability/inference-log.js';
 import { acquireGpuLease, releaseGpuLease, getGpuLeaseStatus } from './gpu-arbiter.js';
@@ -763,7 +764,7 @@ async function _ollamaVlmCall(request: InferenceRequest, startTime: number): Pro
 	});
 
 	try {
-		const res = await ollamaFetch(`${ENV.OLLAMA_BASE_URL}/api/chat`, {
+		const res = await ollamaFetch(`${getOllamaEndpoint()}/api/chat`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({
@@ -863,7 +864,7 @@ async function ollamaInference(request: InferenceRequest, startTime: number): Pr
 
 	try {
 		return await traceLLM('inference-router-ollama', { model, prompt: prompt.slice(0, 500) }, async (gen) => {
-			const res = await ollamaFetch(`${ENV.OLLAMA_BASE_URL}/api/generate`, {
+			const res = await ollamaFetch(`${getOllamaEndpoint()}/api/generate`, {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify({
@@ -1076,7 +1077,7 @@ export async function* routeStreamingInference(
 	}
 
 	// Tier 5: Ollama (uses /api/chat if messages provided, /api/generate otherwise)
-	const ollamaUrl = ENV.OLLAMA_BASE_URL;
+	const ollamaUrl = getOllamaEndpoint();
 	const model = request.model ?? 'gemma4-rotorquant:latest';
 
 	const [endpoint, body] = request.messages
@@ -1136,7 +1137,7 @@ export async function getRouterStatus() {
         .then((r) => r.ok)
         .catch(() => false),
       // Check if Ollama has the VLM model available (list models, check for e4b)
-      ollamaFetch(`${ENV.OLLAMA_BASE_URL}/api/tags`, { signal: AbortSignal.timeout(2_000) })
+      ollamaFetch(`${getOllamaEndpoint()}/api/tags`, { signal: AbortSignal.timeout(2_000) })
         .then((r) => (r.ok ? r.json() : null))
         .then((d) => d?.models?.some((m: { name: string }) => m.name.includes('e4b-it')) ?? false)
         .catch(() => false),
@@ -1170,7 +1171,7 @@ export async function getRouterStatus() {
     ollamaVlm: { available: ollamaVlmOk, model: 'gemma4:e4b-it-q4_K_M', visionCapable: true },
     bifrost: { enabled: ENV.BIFROST_ENABLED, url: ENV.BIFROST_URL },
     litert: { available: litertOk, url: LITERT_BASE_URL, model: 'gemma-4-E2B-it', backend: 'cpu' },
-    ollama: { url: ENV.OLLAMA_BASE_URL },
+    ollama: { url: getOllamaEndpoint() },
     gpu: {
       leaseHolder: lease?.backend ?? null,
       leaseFree: !lease,

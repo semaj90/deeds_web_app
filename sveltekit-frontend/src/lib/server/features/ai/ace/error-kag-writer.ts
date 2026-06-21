@@ -17,7 +17,7 @@
  */
 
 import { pool } from '$lib/server/db/client';
-import { ollamaFetch, VLM_MODELS } from '$lib/server/ollama.js';
+import { getOllamaEndpoint, ollamaFetch, VLM_MODELS } from '$lib/server/ollama.js';
 import { ENV } from '$lib/server/env.server.js';
 import { SERVER_EMBEDDING_MODEL } from '$lib/ai/model-ids.js';
 
@@ -117,7 +117,7 @@ async function summarizeError(entry: ErrorKagEntry): Promise<string> {
   ].filter(Boolean).join('\n');
 
   try {
-    const res = await ollamaFetch(`${ENV.OLLAMA_BASE_URL}/api/generate`, {
+    const res = await ollamaFetch(`${getOllamaEndpoint()}/api/generate`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({

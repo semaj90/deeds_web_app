@@ -20,8 +20,8 @@ import { createHash } from 'node:crypto';
 import { spawnSync } from 'node:child_process';
 import pg from 'pg';
 import Redis from 'ioredis';
-import neo4j from 'neo4j-driver';
 import { loadRepoEnv, resolveDatabaseUrl, resolveRedisConfig, REPO_ROOT, FRONTEND_ROOT } from './connection-config.mjs';
+import { queryNeo4jHttp } from './lib/neo4j-http.mjs';
 
 const { Pool } = pg;
 
@@ -33,11 +33,11 @@ const OUT_MD = path.join(REPORTS_DIR, 'retrieval-e2e-benchmark.md');
 const QUERY_DELAY_MS = 1500; // inter-query pause — reduces Ollama concurrency pressure
 
 const QUERIES = [
-  'find parent atlas identity spine',
-  'phase 16 higher hop qdrant discovery',
-  'trace mcp tool validation',
-  'nes chrom packet qdrant point id',
-  'graph refresh manifest invalidation',
+  'src/lib/components/agent/AutonomousInvestigator.svelte',
+  'src/routes/admin/observability/+page.server.ts',
+  'src/lib/components/ui/index.ts',
+  'src/mcp/server.ts',
+  'src/lib/server/db/schema/memory-registry.ts',
 ];
 
 const env = loadRepoEnv(process.env);
@@ -78,6 +78,37 @@ function sha256(text) {
   return createHash('sha256').update(String(text)).digest('hex');
 }
 
+function uniqueStrings(values) {
+  return [...new Set(values.map((value) => String(value ?? '').trim()).filter(Boolean))];
+}
+
+function pickPayloadValue(hit, keys) {
+  const payload = hit?.payload ?? {};
+  for (const key of keys) {
+    const value = payload?.[key];
+    if (value !== null && value !== undefined && String(value).trim() !== '') return value;
+  }
+  return '';
+}
+
+function normalizePacketKey(raw) {
+  const value = String(raw ?? '').trim();
+  if (!value) return '';
+  const colonIdx = value.lastIndexOf(':');
+  const base = colonIdx >= 0 ? value.slice(colonIdx + 1).trim() : value;
+  return base.replace(/^(?:\.{1,2}\/)+/, '').replace(/^src\//, '').replace(/^sveltekit-frontend\//, '');
+}
+
+function normalizeSourceRef(raw) {
+  return String(raw ?? '')
+    .trim()
+    .replace(/^(?:\.\.\/)+/, '')
+    .replace(/^\.\/+/, '')
+    .replace(/^src\//, '')
+    .replace(/^sveltekit-frontend\//, '')
+    .replace(/\/{2,}/g, '/');
+}
+
 async function ensureDir(filePath) {
   await fs.mkdir(path.dirname(filePath), { recursive: true });
 }
@@ -97,6 +128,9 @@ function renderMarkdown(report) {
     '',
     `- Status: ${report.summary.status}`,
     `- Queries: ${report.queries.length}`,
+    `- Graph proof: ${report.summary.graph_proof_status ?? 'unknown'}`,
+    `- Source ref pct: ${formatNum(report.summary.source_ref_pct)}`,
+    `- Feature id pct: ${formatNum(report.summary.feature_id_pct)}`,
     `- Qdrant: ${report.services.qdrant.ok ? 'READY' : 'FAIL'}`,
     `- TRACE MCP: ${report.services.trace_mcp.ok ? 'READY' : 'FAIL'}`,
     `- Redis: ${report.services.redis.ok ? 'READY' : 'DEGRADED'}`,
@@ -123,13 +157,13 @@ function renderMarkdown(report) {
     '',
     '## Per Query',
     '',
-    '| Query | Strategy | Qdrant hits | Ledger | Tree | Glyph | Neo4j | Rerank | Answer chars | Total ms | Status |',
-    '|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---|',
+    '| Query | Strategy | Qdrant hits | Ledger | Tree | Glyph | Neo4j | Graph | Src % | Feat % | Rerank | Answer chars | Total ms | Status |',
+    '|---|---|---:|---:|---:|---:|---:|---|---:|---:|---:|---:|---:|---|',
   ];
 
   for (const row of report.queries) {
     lines.push(
-      `| ${escapeMd(row.query)} | ${escapeMd(row.retrieval_strategy ?? 'unknown')} | ${row.qdrant_hits} | ${row.ledger_matches} | ${row.tree_matches} | ${row.glyph_matches} | ${row.neo4j_matches} | ${row.rerank_count} | ${row.answer_length} | ${row.total_ms} | ${row.status} |`
+      `| ${escapeMd(row.query)} | ${escapeMd(row.retrieval_strategy ?? 'unknown')} | ${row.qdrant_hits} | ${row.ledger_matches} | ${row.tree_matches} | ${row.glyph_matches} | ${row.neo4j_matches} | ${escapeMd(row.graph_stage_status ?? 'GRAPH_EMPTY')} | ${formatNum(row.source_ref_pct)} | ${formatNum(row.feature_id_pct)} | ${row.rerank_count} | ${row.answer_length} | ${row.total_ms} | ${row.status} |`
     );
   }
 
@@ -333,42 +367,69 @@ async function qdrantSearch(vector, topK = 10) {
   }
 }
 
-async function inspectHigherHopColumns(pool) {
+async function inspectTableColumns(pool, tableName) {
   const { rows } = await pool.query(`
     SELECT column_name
     FROM information_schema.columns
     WHERE table_schema = 'public'
-      AND table_name = 'atlas_higher_hop_index'
-  `);
+      AND table_name = $1
+  `, [tableName]);
   return new Set(rows.map((row) => row.column_name));
 }
 
-async function higherHopLookup(pool, hits, columns) {
+async function higherHopLookupOnTable(pool, hits, tableName, columns) {
   const start = now();
+  const packetKeyVariants = [];
+  const sourceRefVariants = [];
+  const featureIds = [];
+  const qdrantPointIds = [];
+  const qdrantPayloadKeys = [];
+  const contentHashes = [];
+  const sourceRefKeys = [];
 
-  // Qdrant source_ref has "sveltekit-frontend/" prefix; hop index stores without it
-  function normalizeSourceRef(raw) {
-    return String(raw ?? '').trim().replace(/^sveltekit-frontend\//, '');
+  for (const hit of hits) {
+    const rawPacketKey = String(pickPayloadValue(hit, ['packet_key', 'packetKey'])).trim();
+    if (rawPacketKey) {
+      packetKeyVariants.push(rawPacketKey);
+      packetKeyVariants.push(normalizePacketKey(rawPacketKey));
+    }
+
+    const rawSourceRef = String(pickPayloadValue(hit, ['source_ref', 'sourceRef', 'canonical_source_ref', 'canonicalSourceRef', 'source_ref_key'])).trim();
+    if (rawSourceRef) {
+      sourceRefVariants.push(rawSourceRef);
+      sourceRefVariants.push(normalizeSourceRef(rawSourceRef));
+      sourceRefKeys.push(rawSourceRef);
+      sourceRefKeys.push(normalizeSourceRef(rawSourceRef));
+    }
+
+    const rawSourceRefKey = String(pickPayloadValue(hit, ['source_ref_key', 'sourceRefKey'])).trim();
+    if (rawSourceRefKey) {
+      sourceRefKeys.push(rawSourceRefKey);
+      sourceRefKeys.push(normalizeSourceRef(rawSourceRefKey));
+    }
+
+    const rawFeatureId = String(pickPayloadValue(hit, ['feature_id', 'featureId', 'feature_ids', 'featureIds'])).trim();
+    if (rawFeatureId) featureIds.push(rawFeatureId);
+
+    const rawQdrantPointId = String(hit?.id ?? pickPayloadValue(hit, ['qdrant_point_id', 'qdrantPointId', 'point_id', 'pointId'])).trim();
+    if (rawQdrantPointId) qdrantPointIds.push(rawQdrantPointId);
+
+    const rawQdrantPayloadKey = String(pickPayloadValue(hit, ['qdrant_payload_key', 'qdrantPayloadKey'])).trim();
+    if (rawQdrantPayloadKey) qdrantPayloadKeys.push(rawQdrantPayloadKey);
+
+    const rawContentHash = String(pickPayloadValue(hit, ['content_hash', 'contentHash'])).trim();
+    if (rawContentHash) contentHashes.push(rawContentHash);
   }
 
-  // Qdrant packet_key is "src/path:hash"; hop index stores just the hash
-  const packetKeys = [...new Set(
-    hits.map((hit) => {
-      const raw = String(hit.payload?.packet_key ?? '').trim();
-      if (!raw) return '';
-      // Strip path prefix if present (e.g., "src/foo/bar.ts:abc123" → "abc123")
-      const colonIdx = raw.lastIndexOf(':');
-      return colonIdx >= 0 ? raw.slice(colonIdx + 1) : raw;
-    }).filter(Boolean),
-  )];
-  const sourceRefs = [...new Set(
-    hits.map((hit) => normalizeSourceRef(hit.payload?.source_ref ?? hit.payload?.sourceRef ?? '')).filter(Boolean),
-  )];
-  const qdrantPointIds = [...new Set(
-    hits.map((hit) => String(hit.id ?? '').trim()).filter(Boolean),
-  )];
+  const packetKeys = uniqueStrings(packetKeyVariants);
+  const sourceRefs = uniqueStrings(sourceRefVariants);
+  const featureIdsUnique = uniqueStrings(featureIds);
+  const qdrantPointIdsUnique = uniqueStrings(qdrantPointIds);
+  const qdrantPayloadKeysUnique = uniqueStrings(qdrantPayloadKeys);
+  const contentHashesUnique = uniqueStrings(contentHashes);
+  const sourceRefKeysUnique = uniqueStrings(sourceRefKeys);
 
-  if (packetKeys.length === 0 && sourceRefs.length === 0 && qdrantPointIds.length === 0) {
+  if (packetKeys.length === 0 && sourceRefs.length === 0 && featureIdsUnique.length === 0 && qdrantPointIdsUnique.length === 0 && qdrantPayloadKeysUnique.length === 0 && contentHashesUnique.length === 0 && sourceRefKeysUnique.length === 0) {
     return {
       ok: true,
       latency_ms: now() - start,
@@ -377,6 +438,10 @@ async function higherHopLookup(pool, hits, columns) {
       tree_matches: 0,
       glyph_matches: 0,
       neo4j_matches: 0,
+      row_count: 0,
+      source_ref_count: 0,
+      feature_id_count: 0,
+      qdrant_point_id_count: 0,
       matched_keys: [],
     };
   }
@@ -384,7 +449,10 @@ async function higherHopLookup(pool, hits, columns) {
   const selectParts = [
     'packet_key',
     'source_ref',
+    columns.has('source_ref_key') ? 'source_ref_key' : 'NULL::text AS source_ref_key',
     columns.has('qdrant_point_id') ? 'qdrant_point_id' : 'NULL::text AS qdrant_point_id',
+    columns.has('qdrant_payload_key') ? 'qdrant_payload_key' : 'NULL::text AS qdrant_payload_key',
+    columns.has('content_hash') ? 'content_hash' : 'NULL::text AS content_hash',
     columns.has('tree_node_id') ? 'tree_node_id' : 'NULL::text AS tree_node_id',
     columns.has('glyph_record_id') ? 'glyph_record_id' : (columns.has('glyph_id') ? 'glyph_id' : 'NULL::text AS glyph_record_id'),
     columns.has('neo4j_node_id') ? 'neo4j_node_id' : (columns.has('neo4j_node') ? 'neo4j_node' : 'NULL::text AS neo4j_node_id'),
@@ -406,16 +474,32 @@ async function higherHopLookup(pool, hits, columns) {
     whereParts.push(`source_ref = ANY($${p++}::text[])`);
     params.push(sourceRefs);
   }
-  if (qdrantPointIds.length > 0 && columns.has('qdrant_point_id')) {
+  if (sourceRefKeysUnique.length > 0 && columns.has('source_ref_key')) {
+    whereParts.push(`source_ref_key = ANY($${p++}::text[])`);
+    params.push(sourceRefKeysUnique);
+  }
+  if (featureIdsUnique.length > 0 && columns.has('feature_id')) {
+    whereParts.push(`feature_id = ANY($${p++}::text[])`);
+    params.push(featureIdsUnique);
+  }
+  if (qdrantPointIdsUnique.length > 0 && columns.has('qdrant_point_id')) {
     whereParts.push(`qdrant_point_id = ANY($${p++}::text[])`);
-    params.push(qdrantPointIds);
+    params.push(qdrantPointIdsUnique);
+  }
+  if (qdrantPayloadKeysUnique.length > 0 && columns.has('qdrant_payload_key')) {
+    whereParts.push(`qdrant_payload_key = ANY($${p++}::text[])`);
+    params.push(qdrantPayloadKeysUnique);
+  }
+  if (contentHashesUnique.length > 0 && columns.has('content_hash')) {
+    whereParts.push(`content_hash = ANY($${p++}::text[])`);
+    params.push(contentHashesUnique);
   }
 
   try {
     const sql = `
       SELECT ${selectParts.join(', ')}
-      FROM atlas_higher_hop_index
-      WHERE ${whereParts.join(' OR ')}
+      FROM ${tableName}
+      ${whereParts.length > 0 ? `WHERE ${whereParts.join(' OR ')}` : ''}
     `;
 
     const { rows } = await pool.query(sql, params);
@@ -438,6 +522,10 @@ async function higherHopLookup(pool, hits, columns) {
       tree_matches: treeMatches,
       glyph_matches: glyphMatches,
       neo4j_matches: neo4jMatches,
+      row_count: rows.length,
+      source_ref_count: rows.filter((row) => String(row.source_ref ?? '').trim() !== '').length,
+      feature_id_count: rows.filter((row) => String(row.feature_id ?? '').trim() !== '').length,
+      qdrant_point_id_count: rows.filter((row) => String(row.qdrant_point_id ?? '').trim() !== '').length,
       matched_keys: rows.map((row) => String(row.packet_key ?? row.source_ref ?? '')).filter(Boolean),
     };
   } catch (err) {
@@ -449,10 +537,34 @@ async function higherHopLookup(pool, hits, columns) {
       tree_matches: 0,
       glyph_matches: 0,
       neo4j_matches: 0,
+      row_count: 0,
+      source_ref_count: 0,
+      feature_id_count: 0,
+      qdrant_point_id_count: 0,
       matched_keys: [],
       error: err instanceof Error ? err.message : String(err),
     };
   }
+}
+
+async function higherHopLookup(pool, hits) {
+  const primaryColumns = await inspectTableColumns(pool, 'atlas_higher_hop_index');
+  const primary = await higherHopLookupOnTable(pool, hits, 'atlas_higher_hop_index', primaryColumns);
+  if (primary.ok && primary.row_count > 0) return primary;
+
+  for (const tableName of ['atlas_packets', 'atlas_codebase_packets']) {
+    const columns = await inspectTableColumns(pool, tableName);
+    const fallback = await higherHopLookupOnTable(pool, hits, tableName, columns);
+    if (fallback.ok && fallback.row_count > 0) {
+      return {
+        ...fallback,
+        source: `${tableName}_fallback`,
+        fallback_from: 'atlas_higher_hop_index',
+      };
+    }
+  }
+
+  return primary;
 }
 
 async function redisCacheProbe(hits) {
@@ -551,57 +663,118 @@ async function redisCacheProbe(hits) {
   }
 }
 
-async function neo4jExpand(hits) {
+async function neo4jExpand(pgRows, hits = []) {
   const start = now();
-  const sourceRefs = [...new Set(
-    hits
-      .map((hit) => String(hit.payload?.source_ref ?? hit.payload?.sourceRef ?? '').trim())
-      .filter(Boolean),
-  )];
-  const conceptIds = [...new Set(
-    hits.flatMap((hit) => Array.isArray(hit.payload?.concept_ids) ? hit.payload.concept_ids : [])
-      .map((value) => String(value).trim())
-      .filter(Boolean),
-  )];
+  const packetKeys = uniqueStrings([
+    ...pgRows.map((row) => row.packet_key),
+    ...hits.map((hit) => normalizePacketKey(pickPayloadValue(hit, ['packet_key', 'packetKey']))),
+  ]);
+  const sourceRefs = uniqueStrings([
+    ...pgRows.map((row) => row.source_ref),
+    ...hits.map((hit) => normalizeSourceRef(pickPayloadValue(hit, ['source_ref', 'sourceRef', 'canonical_source_ref', 'canonicalSourceRef', 'source_ref_key']))),
+  ]);
+  const conceptIds = uniqueStrings([
+    ...pgRows.map((row) => row.feature_id),
+    ...hits.flatMap((hit) => Array.isArray(hit.payload?.concept_ids) ? hit.payload.concept_ids : []),
+  ]);
 
-  if (sourceRefs.length === 0 && conceptIds.length === 0) {
-    return { ok: true, latency_ms: now() - start, matches: 0, error: null, source: 'skipped_no_context' };
+  if (packetKeys.length === 0 && sourceRefs.length === 0 && conceptIds.length === 0) {
+    return {
+      ok: true,
+      latency_ms: now() - start,
+      matches: 0,
+      graph_stage_status: 'GRAPH_EMPTY',
+      graph_hit_count: 0,
+      graph_rank_contribution: 0,
+      traversal_path: 'skipped_no_context',
+      graph_error: null,
+      rows: [],
+      source: 'skipped_no_context',
+    };
   }
 
   try {
-    const driver = neo4j.driver(
-      env.NEO4J_URI || 'bolt://127.0.0.1:7687',
-      neo4j.auth.basic(env.NEO4J_USER || 'neo4j', env.NEO4J_PASSWORD || env.NEO4J_PASS || 'neo4j123'),
-    );
-    const session = driver.session({ defaultAccessMode: neo4j.session.READ });
+    const result = await queryNeo4jHttp({
+      statement: `
+        MATCH (p:Packet)-[r:USED_CONCEPT]->(c:Concept)
+        WHERE ($relationshipTypes = [] OR type(r) IN $relationshipTypes)
+          AND (
+            ($conceptIds <> [] AND (c.id IN $conceptIds OR c.concept_id IN $conceptIds OR c.name IN $conceptIds))
+            OR ($packetKeys <> [] AND coalesce(p.packet_key, p.packetKey, p.id, '') IN $packetKeys)
+            OR ($sourceRefs <> [] AND coalesce(p.source_ref, p.sourceRef, p.canonicalSourceRef, '') IN $sourceRefs)
+          )
+        WITH
+          p,
+          count(DISTINCT c) AS graph_hit_count,
+          max(toFloat(coalesce(r.weight, 0.5))) AS graph_rank_contribution
+        RETURN
+          coalesce(p.packet_key, p.packetKey, p.id, '') AS packet_key,
+          coalesce(p.source_ref, p.sourceRef, p.canonicalSourceRef, '') AS source_ref,
+          graph_hit_count,
+          graph_rank_contribution,
+          'Concept-[:REL]->Packet' AS traversal_path
+        ORDER BY graph_rank_contribution DESC
+        LIMIT $topK
+      `,
+      parameters: {
+        relationshipTypes: ['USED_CONCEPT'],
+        conceptIds,
+        packetKeys,
+        sourceRefs,
+        topK: 20,
+      },
+    });
 
-    try {
-      const result = await session.run(
-        `
-        MATCH (p:Packet)-[:USED_CONCEPT]->(c:Concept)
-        WHERE ($sourceRefs = [] OR p.source_ref IN $sourceRefs)
-           OR ($conceptIds = [] OR c.concept_id IN $conceptIds)
-        RETURN DISTINCT p.packet_key AS packet_key, count(c) AS shared_concepts
-        ORDER BY shared_concepts DESC
-        LIMIT 50
-        `,
-        { sourceRefs, conceptIds },
-      );
+    if (!result.ok) {
+      const graphError = String(result.error ?? 'neo4j_http_error');
+      const status = Number(result.status ?? 0);
       return {
-        ok: true,
+        ok: false,
         latency_ms: now() - start,
-        matches: result.records.length,
-        error: null,
-        source: 'live',
+        graph_stage_status: status === 404 || status === 405 ? 'GRAPH_DEGRADED' : 'GRAPH_FAILED',
+        graph_hit_count: 0,
+        graph_rank_contribution: 0,
+        traversal_path: 'Concept-[:REL]->Packet',
+        graph_error: graphError,
+        rows: [],
+        matches: 0,
+        error: graphError,
+        source: 'unavailable',
+        httpUrl: result.httpUrl ?? null,
       };
-    } finally {
-      await session.close();
-      await driver.close();
     }
+
+    const rows = Array.isArray(result.rows) ? result.rows : [];
+    const graphHitCount = rows.length;
+    const graphRankContribution = rows.reduce((max, row) => {
+      const score = Number(row.graph_rank_contribution ?? row.score ?? 0);
+      return Number.isFinite(score) ? Math.max(max, score) : max;
+    }, 0);
+
+    return {
+      ok: true,
+      latency_ms: now() - start,
+      graph_stage_status: graphHitCount > 0 ? 'GRAPH_ENABLED' : 'GRAPH_EMPTY',
+      graph_hit_count: graphHitCount,
+      graph_rank_contribution: graphRankContribution,
+      traversal_path: rows[0]?.traversal_path ?? 'Packet-[:USED_CONCEPT]->Concept',
+      graph_error: null,
+      rows,
+      matches: graphHitCount,
+      error: null,
+      source: 'live_http',
+      httpUrl: result.httpUrl ?? null,
+    };
   } catch (err) {
     return {
       ok: false,
       latency_ms: now() - start,
+      graph_stage_status: 'GRAPH_FAILED',
+      graph_hit_count: 0,
+      graph_rank_contribution: 0,
+      traversal_path: 'Packet-[:USED_CONCEPT]->Concept',
+      graph_error: err instanceof Error ? err.message : String(err),
+      rows: [],
       matches: 0,
       error: err instanceof Error ? err.message : String(err),
       source: 'unavailable',
@@ -645,6 +818,7 @@ async function gpuRerankProbe(hits, queryVector) {
       encoding: 'utf8',
       maxBuffer: 10_000_000,
       env: { ...process.env },
+      cwd: FRONTEND_ROOT,
     },
   );
 
@@ -803,6 +977,13 @@ async function runQuery(pool, columns, query) {
     tree_matches: 0,
     glyph_matches: 0,
     neo4j_matches: 0,
+    source_ref_pct: 0,
+    feature_id_pct: 0,
+    graph_stage_status: 'GRAPH_EMPTY',
+    graph_hit_count: 0,
+    graph_rank_contribution: 0,
+    traversal_path: '',
+    graph_error: null,
     rerank_count: 0,
     answer_length: 0,
     errors: [],
@@ -834,12 +1015,14 @@ async function runQuery(pool, columns, query) {
     return entry;
   }
 
-  const pgLookup = await higherHopLookup(pool, qdrant.hits, columns);
+  const pgLookup = await higherHopLookup(pool, qdrant.hits);
   entry.postgres_lookup_ms = pgLookup.latency_ms;
   entry.ledger_matches = pgLookup.ledger_matches;
   entry.tree_matches = pgLookup.tree_matches;
   entry.glyph_matches = pgLookup.glyph_matches;
   entry.neo4j_matches = pgLookup.neo4j_matches;
+  entry.source_ref_pct = pgLookup.row_count > 0 ? Number(((pgLookup.source_ref_count / pgLookup.row_count) * 100).toFixed(1)) : 0;
+  entry.feature_id_pct = pgLookup.row_count > 0 ? Number(((pgLookup.feature_id_count / pgLookup.row_count) * 100).toFixed(1)) : 0;
   entry.services.postgres = { ok: pgLookup.ok, latency_ms: pgLookup.latency_ms };
   entry.top_packets = pgLookup.rows.slice(0, 5);
 
@@ -847,9 +1030,14 @@ async function runQuery(pool, columns, query) {
   entry.redis_cache_ms = redis.latency_ms;
   entry.services.redis = redis;
 
-  const neo4j = await neo4jExpand(qdrant.hits);
+  const neo4j = await neo4jExpand(pgLookup.rows, qdrant.hits);
   entry.neo4j_expand_ms = neo4j.latency_ms;
   entry.services.neo4j = neo4j;
+  entry.graph_stage_status = neo4j.graph_stage_status ?? (neo4j.ok ? 'GRAPH_ENABLED' : 'GRAPH_FAILED');
+  entry.graph_hit_count = neo4j.graph_hit_count ?? neo4j.matches ?? 0;
+  entry.graph_rank_contribution = neo4j.graph_rank_contribution ?? 0;
+  entry.traversal_path = neo4j.traversal_path ?? '';
+  entry.graph_error = neo4j.graph_error ?? neo4j.error ?? null;
   if (!neo4j.ok) {
     entry.errors.push(`neo4j_degraded: ${neo4j.error}`);
   }
@@ -926,7 +1114,7 @@ async function main() {
     process.exit(1);
   }
 
-  const columns = await inspectHigherHopColumns(pool);
+  const columns = await inspectTableColumns(pool, 'atlas_higher_hop_index');
   report.services.postgres = { ok: true, table: 'atlas_higher_hop_index', columns: columns.size };
 
   for (let i = 0; i < QUERIES.length; i++) {
@@ -947,6 +1135,22 @@ async function main() {
   const redisTimes = report.queries.map((row) => row.redis_cache_ms);
   const gpuTimes = report.queries.map((row) => row.gpu_rerank_ms);
   const answerTimes = report.queries.map((row) => row.answer_ms);
+  const sourceRefPct = report.queries.length > 0
+    ? Number((report.queries.reduce((sum, row) => sum + Number(row.source_ref_pct ?? 0), 0) / report.queries.length).toFixed(1))
+    : 0;
+  const featureIdPct = report.queries.length > 0
+    ? Number((report.queries.reduce((sum, row) => sum + Number(row.feature_id_pct ?? 0), 0) / report.queries.length).toFixed(1))
+    : 0;
+  const graphStageCounts = report.queries.reduce((acc, row) => {
+    const key = row.graph_stage_status || 'GRAPH_EMPTY';
+    acc[key] = (acc[key] || 0) + 1;
+    return acc;
+  }, {});
+  const graphProofStatus = graphStageCounts.GRAPH_ENABLED > 0
+    ? 'PASS'
+    : ((graphStageCounts.GRAPH_DEGRADED > 0 || graphStageCounts.GRAPH_EMPTY === report.queries.length)
+      ? 'PASS_WITH_WARNINGS'
+      : 'FAILED');
 
   // Hard gates: at least half of queries must return Qdrant hits and answers
   // (individual query failures may be transient embedding/model timeouts)
@@ -969,6 +1173,10 @@ async function main() {
 
   report.summary = {
     status: allQdrantHits && allAnswered ? (optionalWarnings > 0 ? 'PASS_WITH_WARNINGS' : 'PASS') : 'FAILED',
+    graph_proof_status: graphProofStatus,
+    graph_stage_counts: graphStageCounts,
+    source_ref_pct: sourceRefPct,
+    feature_id_pct: featureIdPct,
     latency_p50_ms: percentile(totals, 0.5),
     latency_p95_ms: percentile(totals, 0.95),
     qdrant_p50_ms: percentile(qdrantTimes, 0.5),

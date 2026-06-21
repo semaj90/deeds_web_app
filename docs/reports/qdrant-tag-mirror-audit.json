@@ -1,18 +1,18 @@
 {
-  "generatedAt": "2026-06-18T15:31:54.264Z",
-  "mode": "apply",
+  "generatedAt": "2026-06-21T05:31:02.530Z",
+  "mode": "dry-run",
   "inputPath": ".tmp/addressable-packets.ndjson",
   "summary": {
-    "inputRows": 100,
-    "selectedRows": 100,
-    "eligibleRows": 16,
-    "patchedRows": 16,
-    "skippedNoQdrantPointId": 84,
+    "inputRows": 3251,
+    "selectedRows": 3251,
+    "eligibleRows": 2488,
+    "patchedRows": 0,
+    "skippedNoQdrantPointId": 763,
     "skippedNoQdrantCollection": 0,
     "skippedNoChanges": 0,
     "failures": 0,
-    "qdrantReachable": false,
-    "patchRatePct": 100
+    "qdrantReachable": true,
+    "patchRatePct": 0
   },
   "samples": [
     {
@@ -86,8 +86,128 @@
         "embedding_ref",
         "payload_backfilled_at"
       ]
+    },
+    {
+      "packet_key": "198fcc43949be3e5",
+      "qdrant_collection": "codebase_chunks_768",
+      "qdrant_point_id": "284391981",
+      "patch_keys": [
+        "packet_key",
+        "canonical_source_ref",
+        "source_ref",
+        "source_ref_key",
+        "feature_id",
+        "feature_label",
+        "lane_ids",
+        "tags",
+        "bm25_text",
+        "packet_kind",
+        "ledger_type",
+        "qdrant_payload_key",
+        "tree_node_id",
+        "glyph_record_id",
+        "neo4j_node_id",
+        "embedding_ref",
+        "payload_backfilled_at"
+      ]
+    },
+    {
+      "packet_key": "2991154207842c29",
+      "qdrant_collection": "codebase_chunks_768",
+      "qdrant_point_id": "697374018",
+      "patch_keys": [
+        "packet_key",
+        "canonical_source_ref",
+        "source_ref",
+        "source_ref_key",
+        "feature_id",
+        "feature_label",
+        "lane_ids",
+        "tags",
+        "bm25_text",
+        "packet_kind",
+        "ledger_type",
+        "qdrant_payload_key",
+        "qdrant_vector_dim",
+        "tree_node_id",
+        "glyph_record_id",
+        "embedding_ref",
+        "payload_backfilled_at"
+      ]
+    },
+    {
+      "packet_key": "2cc646bc512baf66",
+      "qdrant_collection": "codebase_chunks_768",
+      "qdrant_point_id": "751191740",
+      "patch_keys": [
+        "packet_key",
+        "canonical_source_ref",
+        "source_ref",
+        "source_ref_key",
+        "feature_id",
+        "feature_label",
+        "lane_ids",
+        "tags",
+        "bm25_text",
+        "packet_kind",
+        "ledger_type",
+        "qdrant_payload_key",
+        "qdrant_vector_dim",
+        "tree_node_id",
+        "glyph_record_id",
+        "embedding_ref",
+        "payload_backfilled_at"
+      ]
+    },
+    {
+      "packet_key": "336aca4482baff82",
+      "qdrant_collection": "codebase_chunks_768",
+      "qdrant_point_id": "862636612",
+      "patch_keys": [
+        "packet_key",
+        "canonical_source_ref",
+        "source_ref",
+        "source_ref_key",
+        "feature_id",
+        "feature_label",
+        "lane_ids",
+        "tags",
+        "bm25_text",
+        "packet_kind",
+        "ledger_type",
+        "qdrant_payload_key",
+        "qdrant_vector_dim",
+        "tree_node_id",
+        "glyph_record_id",
+        "embedding_ref",
+        "payload_backfilled_at"
+      ]
+    },
+    {
+      "packet_key": "3cd0dae1ba99edd6",
+      "qdrant_collection": "codebase_chunks_768",
+      "qdrant_point_id": "1020320481",
+      "patch_keys": [
+        "packet_key",
+        "canonical_source_ref",
+        "source_ref",
+        "source_ref_key",
+        "feature_id",
+        "feature_label",
+        "lane_ids",
+        "tags",
+        "bm25_text",
+        "packet_kind",
+        "ledger_type",
+        "qdrant_payload_key",
+        "qdrant_vector_dim",
+        "tree_node_id",
+        "glyph_record_id",
+        "embedding_ref",
+        "payload_backfilled_at"
+      ]
     }
   ],
-  "status": "APPLIED",
-  "nextSafeAction": "Run the materializer again only if the packet ledger changed; do not re-embed or recreate collections."
+  "status": "DRY_RUN_READY",
+  "nextSafeAction": "Review the dry-run patch list, then re-run with --apply once the addressable packet materializer has produced rows."
 }

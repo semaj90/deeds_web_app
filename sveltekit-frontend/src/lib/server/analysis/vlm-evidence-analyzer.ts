@@ -19,6 +19,7 @@ import { ollamaFetch } from '$lib/server/ollama.js';
 import { resizeForVLM, GEMMA4_VLM_MAX_EDGE } from '$lib/server/image/resize-for-vlm.js';
 import { getVLMCache, setVLMCache } from '$lib/server/vector-cache.js';
 import { TURBOQUANT_BASE_URL } from '$lib/ai/model-ids.js';
+import { getOllamaEndpoint } from '$lib/server/utils/ollama-endpoint.js';
 
 // ── Types ──────────────────────────────────────────────────────────────────
 
@@ -176,7 +177,7 @@ async function inferOllamaVLM(
 	maxTokens: number
 ): Promise<string | null> {
 	try {
-		const ollamaRes = await ollamaFetch(`${ENV.OLLAMA_BASE_URL}/api/generate`, {
+		const ollamaRes = await ollamaFetch(`${getOllamaEndpoint()}/api/generate`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({

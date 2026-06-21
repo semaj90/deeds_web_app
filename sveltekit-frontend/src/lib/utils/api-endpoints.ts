@@ -54,8 +54,8 @@ export function getGoServiceBaseUrl(serviceName: string, defaultPort: number | s
  */
 export function getOllamaEndpoint(): string {
     // Check for environment variable first (e.g., set in Docker Compose or production)
-    if (typeof process !== 'undefined' && process.env?.OLLAMA_URL) {
-        return process.env.OLLAMA_URL;
+    if (typeof process !== 'undefined' && (process.env?.TURBOQUANT_URL || process.env?.TURBOQUANT_BASE_URL || process.env?.LLAMA_SERVER_URL)) {
+        return process.env.TURBOQUANT_URL ?? process.env.TURBOQUANT_BASE_URL ?? process.env.LLAMA_SERVER_URL!;
     }
     // Fallback to Docker service name for local Docker Compose development
     // This assumes: 'ollama' is the service name in docker-compose.yml
@@ -65,7 +65,8 @@ export function getOllamaEndpoint(): string {
         return 'http://ollama:11434';
     }
     // Fallback to localhost for direct local development (without Docker Compose)
-    return (typeof process !== 'undefined' && process.env?.OLLAMA_URL) || `http://${['local', 'host'].join('')}:11434`;
+    return (typeof process !== 'undefined' && (process.env?.OLLAMA_URL || process.env?.TURBOQUANT_URL || process.env?.TURBOQUANT_BASE_URL || process.env?.LLAMA_SERVER_URL)) ||
+      `http://${['local', 'host'].join('')}:11434`;
 }
 
 /**

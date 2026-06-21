@@ -1,5 +1,6 @@
 const env: Record<string, string | undefined> = process.env;
 import { ENV } from '$lib/server/env.server.js';
+import { getOllamaEndpoint } from '$lib/server/utils/ollama-endpoint.js';
 
 /**
  * Application Configuration
@@ -32,7 +33,7 @@ export const MCP_CONFIG = {
 export const AI_CONFIG = {
 	// Primary: Ollama with Gemma models
 	ollama: {
-	baseUrl: ENV.OLLAMA_BASE_URL,
+	baseUrl: getOllamaEndpoint(),
 		models: {
 	legal: process.env.GEMMA_LEGAL_MODEL || 'gemma4-rotorquant:latest',
 			embedding: process.env.GEMMA_EMBEDDING_MODEL || 'embeddinggemma:latest',

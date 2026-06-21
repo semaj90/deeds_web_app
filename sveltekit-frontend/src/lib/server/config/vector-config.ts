@@ -61,6 +61,8 @@ export const VECTOR_CONFIG = {
     legal_canon_chunks: 'legal_canon_chunks',
     fictional_case_chunks: 'fictional_case_chunks',
     codebase_chunks: 'codebase_chunks_768',
+    codebase_topology_128: 'codebase_topology_128',
+    codebase_topology_64: 'codebase_topology_64',
     error_embeddings: 'error_embeddings',
     diagnosis_embeddings: 'diagnosis_embeddings',
     knowledge: 'knowledge_base',
@@ -94,7 +96,15 @@ export const VECTOR_CONFIG = {
     legal_canon_chunks: { vectors: ['content'], on_disk_payload: true },
     fictional_case_chunks: { vectors: ['content'], on_disk_payload: true },
     codebase_chunks_768: {
-      vectors: ['content', 'signature', 'error', 'encoded_64'],
+      vectors: ['content', 'signature', 'error'],
+      on_disk_payload: true,
+    },
+    codebase_topology_128: {
+      vectors: ['latent_128'],
+      on_disk_payload: true,
+    },
+    codebase_topology_64: {
+      vectors: ['latent_64'],
       on_disk_payload: true,
     },
     error_embeddings: { vectors: ['error'], on_disk_payload: true },
@@ -143,10 +153,73 @@ export const VECTOR_CONFIG = {
   },
 } as const;
 
+const COLLECTION_DIMENSIONS: Record<string, number> = {
+  legal_documents: 768,
+  legal_cases: 768,
+  evidence_items: 768,
+  evidence_vectors: 768,
+  case_chunks: 768,
+  court_opinions: 768,
+  chat_messages: 768,
+  embedding_cache: 768,
+  document_tags: 768,
+  topic_clusters: 768,
+  llm_response_cache: 768,
+  poi_profiles: 768,
+  legal_canon_chunks: 768,
+  fictional_case_chunks: 768,
+  codebase_chunks_768: 768,
+  codebase_topology_128: 128,
+  codebase_topology_64: 64,
+  error_embeddings: 768,
+  diagnosis_embeddings: 768,
+  knowledge_base: 768,
+  audio_segments: 768,
+  legal_glossary: 768,
+  chunks_web_search: 768,
+  summary_lenses_768: 768,
+  synthesis_memory_768: 768,
+  agent_memory_observations: 768,
+  document_knowledge_768: 768,
+  external_programming_docs_768: 768,
+  feature_maps: 768,
+  research_memory_768: 768,
+};
+
 // Type exports
 export type VectorDistanceMetric = (typeof VECTOR_CONFIG.DISTANCE_METRIC)[keyof typeof VECTOR_CONFIG.DISTANCE_METRIC];
 export type CollectionAlias = keyof typeof VECTOR_CONFIG.COLLECTIONS;
 export type CollectionName = (typeof VECTOR_CONFIG.COLLECTIONS)[CollectionAlias];
+
+export function getCollectionDimension(collection: string): number {
+  return COLLECTION_DIMENSIONS[collection] ?? VECTOR_CONFIG.DIMENSIONS;
+}
+
+export function vectorSlotFor(vector: number[]): 'embeddinggemma_768' | 'latent_128' | 'latent_64' {
+  if (vector.length === 768) return 'embeddinggemma_768';
+  if (vector.length === 128) return 'latent_128';
+  if (vector.length === 64) return 'latent_64';
+  throw new Error(`Unsupported vector dimension: ${vector.length}`);
+}
+
+export function collectionForVector(vector: number[]): CollectionName | 'codebase_topology_128' | 'codebase_topology_64' {
+  if (vector.length === 768) return VECTOR_CONFIG.COLLECTIONS.codebase_chunks;
+  if (vector.length === 128) return VECTOR_CONFIG.COLLECTIONS.codebase_topology_128;
+  if (vector.length === 64) return VECTOR_CONFIG.COLLECTIONS.codebase_topology_64;
+  throw new Error(`Unsupported vector dimension: ${vector.length}`);
+}
+
+export function assertCollectionSlot(collection: string, slot: string): void {
+  if (collection === VECTOR_CONFIG.COLLECTIONS.codebase_chunks && slot !== 'embeddinggemma_768') {
+    throw new Error(`Invalid vector slot ${slot} for ${collection}`);
+  }
+  if (collection === VECTOR_CONFIG.COLLECTIONS.codebase_topology_128 && slot !== 'latent_128') {
+    throw new Error(`Invalid vector slot ${slot} for ${collection}`);
+  }
+  if (collection === VECTOR_CONFIG.COLLECTIONS.codebase_topology_64 && slot !== 'latent_64') {
+    throw new Error(`Invalid vector slot ${slot} for ${collection}`);
+  }
+}
 
 /**
  * Typed search config per collection.
@@ -167,7 +240,7 @@ function buildSearchConfig(collection: string): VectorSearchConfig | undefined {
 	return {
 		mode: isNamed ? 'named' : 'unnamed',
 		vectorName: isNamed ? primaryVec : undefined,
-		dimension: VECTOR_CONFIG.DIMENSIONS,
+		dimension: getCollectionDimension(collection),
 		distance: 'Cosine',
 		quantized: true, // All active collections are INT8 quantized as of P0d
 		onDiskPayload: !!entry.on_disk_payload,
@@ -199,6 +272,8 @@ export function buildVectorPayload(
 	vector: number[]
 ): number[] | { name: string; vector: number[] } {
 	const cfg = getVectorSearchConfig(collection);
+	const slot = vectorSlotFor(vector);
+	assertCollectionSlot(collection, slot);
 	if (!cfg || cfg.mode === 'unnamed') return vector;
 	return { name: cfg.vectorName!, vector };
 }

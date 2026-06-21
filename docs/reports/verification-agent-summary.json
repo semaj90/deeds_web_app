@@ -1,0 +1,241 @@
+{
+  "timestamp": "2026-06-21T17:22:21.653Z",
+  "verdict": "PASS",
+  "lanes": {
+    "smoke": {
+      "status": "PASS",
+      "timestamp": "2026-06-21T17:20:00.042Z",
+      "checks": {
+        "scripts": {
+          "status": "PASS",
+          "detail": "All 6 verify scripts registered"
+        },
+        "environment": {
+          "status": "PASS",
+          "detail": {
+            "DATABASE_URL": "present",
+            "QDRANT_URL": "present",
+            "REDIS_URL": "present",
+            "REDIS_PASSWORD": "present",
+            "VALKEY_URL": "missing",
+            "VALKEY_PASSWORD": "present",
+            "GEMMA_API_URL": "missing",
+            "OLLAMA_URL": "present"
+          }
+        },
+        "services": {
+          "status": "PASS",
+          "detail": {
+            "qdrant": "open",
+            "postgres": "open",
+            "redis": "open",
+            "neo4j_http": "open",
+            "neo4j_bolt": "open",
+            "gemma4": "open",
+            "ollama": "open",
+            "go_retrieval_grpc": "open",
+            "go_retrieval_http": "open"
+          }
+        },
+        "typescript": {
+          "status": "PASS",
+          "detail": "svelte-check completed without errors"
+        }
+      }
+    },
+    "story": {
+      "status": "PASS",
+      "timestamp": "2026-06-21T17:22:13.023Z",
+      "checks": {
+        "files": {
+          "status": "PASS",
+          "detail": {
+            "sveltekit-frontend/src/routes/api/codebase/search/multi-vector/+server.ts": "present",
+            "sveltekit-frontend/src/lib/server/utils/ollama-endpoint.ts": "present",
+            "scripts/atlas/verify-qdrant-packet-payload.mjs": "present",
+            "scripts/atlas/upsert-qdrant-packet-payload.mjs": "present",
+            "scripts/atlas/connection-config.mjs": "present",
+            "scripts/lib/canonical-source-ref.mjs": "present"
+          }
+        },
+        "schema": {
+          "status": "PASS",
+          "detail": {
+            "atlas_packets": {
+              "status": "present",
+              "columns": [
+                "packet_id",
+                "packet_key",
+                "source_ref",
+                "directory_path",
+                "file_path",
+                "function_symbol",
+                "feature_id",
+                "feature_label",
+                "community_id",
+                "community_source",
+                "community_confidence",
+                "concept_ids",
+                "cluster_id",
+                "embedding",
+                "payload",
+                "metadata",
+                "summary",
+                "byte_start",
+                "byte_end",
+                "sha256",
+                "source_kind",
+                "source_path",
+                "source_ref_key",
+                "reward_prior",
+                "created_at",
+                "updated_at",
+                "domain_class",
+                "tags",
+                "lineage_version",
+                "ledger_type",
+                "canonical",
+                "payload_backfilled_at",
+                "som_row",
+                "som_col",
+                "som_index",
+                "kmeans_cluster",
+                "identity_lane",
+                "qdrant_point_id",
+                "qdrant_collection",
+                "qdrant_vector_dim",
+                "identity_confidence",
+                "permissions",
+                "topology",
+                "vectors",
+                "pagerank",
+                "betweenness",
+                "eigenvector",
+                "neo4j_node_id",
+                "redis_centroid_key",
+                "latent_64"
+              ]
+            },
+            "atlas_embeddings": {
+              "status": "missing"
+            },
+            "atlas_token_map": {
+              "status": "missing"
+            }
+          }
+        }
+      }
+    },
+    "atlas": {
+      "status": "PASS",
+      "timestamp": "2026-06-21T17:22:13.823Z",
+      "checks": {
+        "qdrant_payload": {
+          "status": "PASS",
+          "detail": {
+            "scanned": 50,
+            "missing_required": 0
+          }
+        },
+        "redis_cache": {
+          "status": "PASS",
+          "detail": {
+            "total_keys": 222263,
+            "reward_keys": 2,
+            "centroid_keys": 85,
+            "semantic_keys": 1
+          }
+        },
+        "neo4j_relations": {
+          "status": "PASS",
+          "detail": {
+            "used_concept_count": 0
+          }
+        }
+      }
+    },
+    "cubic": {
+      "status": "PASS",
+      "timestamp": "2026-06-21T17:22:14.798Z",
+      "checks": {
+        "ollama_empty": {
+          "status": "PASS",
+          "detail": {
+            "http_status": 200,
+            "response": {
+              "embedding": []
+            }
+          }
+        },
+        "qdrant_nonexistent": {
+          "status": "PASS",
+          "detail": {
+            "found": 0
+          }
+        },
+        "gemma_empty": {
+          "status": "PASS",
+          "detail": {
+            "http_status": 200,
+            "response": {
+              "choices": [
+                {
+                  "finish_reason": "stop",
+                  "index": 0,
+                  "message": {
+                    "role": "assistant",
+                    "content": "<|channel>thought\nThinking Process:\n\n1.  **Analyze the input:** The user has provided a blank input (an empty message or an implied request for action).\n2.  **Determine the goal:** The user is waiting for a response, or they have submitted an empty prompt.\n3.  **Formulate a safe and helpful response:** The response must acknowledge the empty input, invite the user to state their purpose, and maintain a helpful, neutral, and ready-to-assist tone.\n\n*Self-Correction/Refinement:* Simply saying \"You said nothing\" is unhelpful. The response needs to be an *invitation* to proceed.\n\n4.  **Final Output Generation:** A welcoming and encouraging prompt for the user to continue their thought or ask their question.<channel|>Please let me know what I can help you with! 😊"
+                  }
+                }
+              ],
+              "created": 1782062541,
+              "model": "gemma4-legal-iq4xs-direct.gguf",
+              "system_fingerprint": "b8757-a29e4c0b7",
+              "object": "chat.completion",
+              "usage": {
+                "completion_tokens": 175,
+                "prompt_tokens": 16,
+                "total_tokens": 191,
+                "prompt_tokens_details": {
+                  "cached_tokens": 0
+                }
+              },
+              "id": "chatcmpl-DWPMU37dP0RVhRIHqRe8dvDefEEDHHTL",
+              "timings": {
+                "cache_n": 0,
+                "prompt_n": 16,
+                "prompt_ms": 52.336,
+                "prompt_per_token_ms": 3.271,
+                "prompt_per_second": 305.71690614490984,
+                "predicted_n": 175,
+                "predicted_ms": 2068.81,
+                "predicted_per_token_ms": 11.821771428571429,
+                "predicted_per_second": 84.58969165848967
+              }
+            }
+          }
+        },
+        "fallback_simulation": {
+          "status": "PASS",
+          "detail": {
+            "fallback_qdrant_ok": true
+          }
+        }
+      }
+    }
+  },
+  "proofs": {
+    "replay": {
+      "status": "PASS",
+      "queryCount": 50,
+      "cacheHitPct": 20,
+      "pointFoundPct": 100
+    },
+    "qdrant_payload": {
+      "pointFoundCount": 32,
+      "agreementCount": 20,
+      "pointFoundPct": 64,
+      "agreementPct": 40
+    }
+  }
+}

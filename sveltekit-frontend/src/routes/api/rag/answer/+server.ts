@@ -11,11 +11,12 @@ import { getRedis } from '$lib/server/redis.js';
 import { traceLLM } from '$lib/server/observability/langfuse.js';
 import { bifrostChat } from '$lib/server/ollama.js';
 import { ENV } from '$lib/server/env.server.js';
+import { getOllamaEndpoint } from '$lib/server/utils/ollama-endpoint.js';
 import { z } from 'zod';
 import { trackTokenUsage } from '$lib/server/ai/token-tracker.js';
 import { recordSearchQuery } from '$lib/server/analytics/search-analytics.js';
 
-const OLLAMA_URL = ENV.OLLAMA_BASE_URL;
+const OLLAMA_URL = getOllamaEndpoint();
 
 const ragAnswerSchema = z.object({
 	context_id: z.string().min(1, 'context_id is required').max(200),

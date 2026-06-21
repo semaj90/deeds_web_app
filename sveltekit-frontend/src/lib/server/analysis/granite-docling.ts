@@ -14,7 +14,7 @@
  * then sends each page through Granite-Docling for structured extraction.
  */
 
-import { ollamaFetch } from '$lib/server/ollama.js';
+import { getOllamaEndpoint, ollamaFetch } from '$lib/server/ollama.js';
 import { ENV } from '$lib/server/env.server.js';
 import type { DoclingBlock, DoclingResult } from '$lib/server/docling.js';
 
@@ -36,7 +36,7 @@ export async function isGraniteDoclingAvailable(): Promise<boolean> {
 	}
 
 	try {
-		const res = await ollamaFetch(`${ENV.OLLAMA_BASE_URL}/api/tags`, {
+		const res = await ollamaFetch(`${getOllamaEndpoint()}/api/tags`, {
 			signal: AbortSignal.timeout(5000),
 		});
 		if (!res.ok) {
@@ -217,7 +217,7 @@ export async function analyzeImageWithGraniteDocling(
 	const base64Image = imageBuffer.toString('base64');
 	const model = ENV.GRANITE_DOCLING_MODEL;
 
-	const ollamaRes = await ollamaFetch(`${ENV.OLLAMA_BASE_URL}/api/generate`, {
+	const ollamaRes = await ollamaFetch(`${getOllamaEndpoint()}/api/generate`, {
 		method: 'POST',
 		headers: { 'Content-Type': 'application/json' },
 		body: JSON.stringify({
@@ -274,7 +274,7 @@ export async function analyzePdfWithGraniteDocling(
 			const pageImage = await renderPdfPageToImage(pdfBuffer, i);
 			const base64 = pageImage.toString('base64');
 
-			const ollamaRes = await ollamaFetch(`${ENV.OLLAMA_BASE_URL}/api/generate`, {
+			const ollamaRes = await ollamaFetch(`${getOllamaEndpoint()}/api/generate`, {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify({

@@ -1,9 +1,9 @@
 import type { RequestHandler } from './$types';
 import { json } from '@sveltejs/kit';
 import { z } from 'zod';
-import { ENV } from '$lib/server/env.server.js';
 import { ollamaFetch } from '$lib/server/ollama.js';
 import { TIMEOUTS } from '$lib/server/timeouts.js';
+import { getOllamaEndpoint } from '$lib/server/utils/ollama-endpoint.js';
 
 const VALID_SCOPES = ['case', 'evidence', 'poi', 'timeline'] as const;
 
@@ -44,7 +44,7 @@ export const POST: RequestHandler = async ({ params, request, locals }) => {
 		const systemPrompt = SCOPE_PROMPTS[scope] || SCOPE_PROMPTS.case;
 		const userMessage = `Perform a ${scope} analysis.${contextStr}`;
 
-		const res = await ollamaFetch(`${ENV.OLLAMA_BASE_URL}/api/chat`, {
+		const res = await ollamaFetch(`${getOllamaEndpoint()}/api/chat`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({

@@ -9,9 +9,9 @@
 import { extractLegalTags } from '$lib/server/rag/tag-extractor.js';
 import { ENV } from '$lib/server/env.server.js';
 import type { GeneratedTag } from './types.js';
-import { ollamaFetch } from '$lib/server/ollama.js';
+import { getOllamaEndpoint, ollamaFetch } from '$lib/server/ollama.js';
 
-const OLLAMA_URL = ENV.OLLAMA_BASE_URL;
+const OLLAMA_URL = getOllamaEndpoint();
 const MODEL = ENV.OLLAMA_CHAT_MODEL;
 
 interface TagResult {

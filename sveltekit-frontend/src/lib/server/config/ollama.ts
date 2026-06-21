@@ -3,6 +3,7 @@
  * Centralized endpoint management for Gemma models
  */
 import { ENV } from '$lib/server/env.server.js';
+import { getOllamaEndpoint as getChatEndpoint, getOllamaEmbeddingEndpoint } from '$lib/server/utils/ollama-endpoint.js';
 
 export interface OllamaConfig {
 	baseUrl: string;
@@ -10,7 +11,8 @@ export interface OllamaConfig {
 	timeout: number;
 }
 
-const DEFAULT_OLLAMA_URL = ENV.OLLAMA_BASE_URL;
+const DEFAULT_OLLAMA_URL = getChatEndpoint();
+const DEFAULT_EMBED_OLLAMA_URL = getOllamaEmbeddingEndpoint();
 const DEFAULT_MODEL = process.env?.OLLAMA_MODEL ?? 'gemma:7b';
 const DEFAULT_TIMEOUT = 30000;
 
@@ -21,6 +23,14 @@ export function getOllamaEndpoint(): OllamaConfig {
 	return {
 		baseUrl: DEFAULT_OLLAMA_URL,
 		model: DEFAULT_MODEL,
+		timeout: DEFAULT_TIMEOUT
+	};
+}
+
+export function getOllamaEmbeddingConfig(): OllamaConfig {
+	return {
+		baseUrl: DEFAULT_EMBED_OLLAMA_URL,
+		model: process.env?.OLLAMA_EMBED_MODEL || 'embeddinggemma:latest',
 		timeout: DEFAULT_TIMEOUT
 	};
 }
@@ -53,10 +63,10 @@ export async function checkOllamaHealth(): Promise<boolean> {
  * Generate embeddings using Ollama
  */
 export async function generateEmbedding(text: string): Promise<number[]> {
-  const config = getOllamaEndpoint();
+  const config = getOllamaEmbeddingConfig();
 
   try {
-    const response = await fetch(getOllamaUrl('/api/embeddings'), {
+    const response = await fetch(`${config.baseUrl}/api/embeddings`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       signal: AbortSignal.timeout(30_000),
@@ -93,7 +103,7 @@ export async function generateText(
   const config = getOllamaEndpoint();
 
   try {
-    const response = await fetch(getOllamaUrl('/api/generate'), {
+    const response = await fetch(`${config.baseUrl}/api/generate`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       signal: AbortSignal.timeout(120_000),
@@ -134,7 +144,7 @@ export async function* streamText(
   const config = getOllamaEndpoint();
 
   try {
-    const response = await fetch(getOllamaUrl('/api/generate'), {
+    const response = await fetch(`${config.baseUrl}/api/generate`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       signal: AbortSignal.timeout(120_000),

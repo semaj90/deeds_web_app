@@ -7,5 +7,157 @@
   "sourceRefPct": 100,
   "cacheHitPct": 20,
   "timeoutCount": 0,
-  "failedQueries": []
+  "failedQueries": [],
+  "results": [
+    {
+      "query": "where is Redis Valkey cache config wired?"
+    },
+    {
+      "query": "how is SeaweedFS filer configured for S3 gateway?"
+    },
+    {
+      "query": "where is the LibTorch N-API addon defined?"
+    },
+    {
+      "query": "where are the Drizzle schema files located?"
+    },
+    {
+      "query": "what port is reserved for SeaweedFS Filer?"
+    },
+    {
+      "query": "how is the LangGraph planning graph structured?"
+    },
+    {
+      "query": "where is the Postgres database connection pool initialized?"
+    },
+    {
+      "query": "how does the system handle schema migration sidecars?"
+    },
+    {
+      "query": "what is the default collection name for Qdrant semantic search?"
+    },
+    {
+      "query": "how is the GPU compute worker smoke test runner executed?"
+    },
+    {
+      "query": "where is Redis Valkey cache config wired?"
+    },
+    {
+      "query": "how is SeaweedFS filer configured for S3 gateway?"
+    },
+    {
+      "query": "where is the LibTorch N-API addon defined?"
+    },
+    {
+      "query": "where are the Drizzle schema files located?"
+    },
+    {
+      "query": "what port is reserved for SeaweedFS Filer?"
+    },
+    {
+      "query": "how is the LangGraph planning graph structured?"
+    },
+    {
+      "query": "where is the Postgres database connection pool initialized?"
+    },
+    {
+      "query": "how does the system handle schema migration sidecars?"
+    },
+    {
+      "query": "what is the default collection name for Qdrant semantic search?"
+    },
+    {
+      "query": "how is the GPU compute worker smoke test runner executed?"
+    },
+    {
+      "query": "which files depend on the database schema client?"
+    },
+    {
+      "query": "what is the relationship between atlas_packets and concept_records?"
+    },
+    {
+      "query": "how are the error clusters linked to route health metrics?"
+    },
+    {
+      "query": "which modules import the OpenAI facade or sidecar router?"
+    },
+    {
+      "query": "show imports and dependents of the retrieval recorder"
+    },
+    {
+      "query": "how are codebase embeddings connected to codebase files?"
+    },
+    {
+      "query": "what is the link between parent atlas documents and card registry?"
+    },
+    {
+      "query": "which components interact with the Redis cache gateway?"
+    },
+    {
+      "query": "what calls the N-API autoencoderEncode function?"
+    },
+    {
+      "query": "how does the route param guard script communicate with svelte check?"
+    },
+    {
+      "query": "how is SDXL image generation service URL defined?"
+    },
+    {
+      "query": "where is ibm/granite-docling:258m configured?"
+    },
+    {
+      "query": "what is the fallback logic for feature ID placement?"
+    },
+    {
+      "query": "where is ComfyUI submit workflow smoke test located?"
+    },
+    {
+      "query": "how is the Triton VLM model routing configured?"
+    },
+    {
+      "query": "what is the purpose of the orphaned GenerationService gRPC?"
+    },
+    {
+      "query": "where is the WebGPU PageRank benchmark defined?"
+    },
+    {
+      "query": "how is the ComfyUI client strict check executed?"
+    },
+    {
+      "query": "where are the ComfyUI workflow JSON files stored?"
+    },
+    {
+      "query": "what is the fallback configuration for RabbitMQ DLQ?"
+    },
+    {
+      "query": "audit feature_id coverage in atlas_packets"
+    },
+    {
+      "query": "how to resolve duplicate RETRIEVAL_GRPC_URL keys in env.server.ts?"
+    },
+    {
+      "query": "what are the open lanes for Phase 20.6?"
+    },
+    {
+      "query": "how is the SOM centroid codebook initialized?"
+    },
+    {
+      "query": "where is the Phase 16 truth-promotion binding implemented?"
+    },
+    {
+      "query": "how to backfill latent vectors to postgres atlas_packets?"
+    },
+    {
+      "query": "what is the N-API call signature for autoencoderEncode?"
+    },
+    {
+      "query": "how to train the SOM 20x20 grid on latent vectors?"
+    },
+    {
+      "query": "where is the retrieval evaluation times schema barrel export?"
+    },
+    {
+      "query": "how to run the 10-layer audit CLI tool?"
+    }
+  ]
 }

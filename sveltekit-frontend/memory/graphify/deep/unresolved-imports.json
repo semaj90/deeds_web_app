@@ -4270,6 +4270,7 @@
     "scripts/tests/screenshot-analysis-uis.mjs",
     "scripts/tests/screenshot-evidence-upload-flow.mjs",
     "scripts/tests/smoke-atlas-cluster-worker.mjs",
+    "scripts/tests/smoke-kanban-hmm.mjs",
     "scripts/tests/test-agent-investigate.mjs",
     "scripts/tests/test-langgraph-pipeline.mjs",
     "scripts/unified-sync.js",
@@ -4345,6 +4346,7 @@
     "sveltekit-frontend/scripts/validate-demo-setup.mjs",
     "sveltekit-frontend/scripts/validate-llms-memory.mjs",
     "sveltekit-frontend/src/lib/server/ace/card-promotion-loader.ts",
+    "sveltekit-frontend/src/lib/server/analysis/hmm-kanban-diagnoser.ts",
     "sveltekit-frontend/src/lib/server/atlas/packet-parser.ts",
     "sveltekit-frontend/src/lib/server/embedding/onnx-embed.ts",
     "sveltekit-frontend/src/lib/server/gpu/libtorch-bridge.ts",
@@ -5260,6 +5262,7 @@
     "scripts/tests/screenshot-analysis-uis.mjs",
     "scripts/tests/screenshot-evidence-upload-flow.mjs",
     "scripts/tests/smoke-atlas-cluster-worker.mjs",
+    "scripts/tests/smoke-kanban-hmm.mjs",
     "scripts/tests/test-cases-ui.mjs",
     "scripts/tests/test-glossary-playwright.mjs",
     "scripts/tests/test-langgraph-pipeline.mjs",
@@ -6372,6 +6375,7 @@
     "scripts/tests/screenshot-evidence-upload-flow.mjs",
     "scripts/tests/screenshot-feedback.mjs",
     "scripts/tests/smoke-atlas-cluster-worker.mjs",
+    "scripts/tests/smoke-kanban-hmm.mjs",
     "scripts/tests/test-agent-investigate.mjs",
     "scripts/tests/test-ai-summary-modal.mjs",
     "scripts/tests/test-cases-ui.mjs",
@@ -6468,6 +6472,7 @@
     "sveltekit-frontend/scripts/validate-llms-memory.mjs",
     "sveltekit-frontend/scripts/validate-qdrant-cluster-tags.mjs",
     "sveltekit-frontend/src/lib/server/ace/card-promotion-loader.ts",
+    "sveltekit-frontend/src/lib/server/analysis/hmm-kanban-diagnoser.ts",
     "sveltekit-frontend/src/lib/server/atlas/packet-parser.ts",
     "sveltekit-frontend/src/lib/server/embedding/onnx-embed.ts",
     "sveltekit-frontend/src/lib/server/gpu/libtorch-bridge.ts",
@@ -7458,6 +7463,7 @@
     "scripts/smoke/smoke-query-router.mjs",
     "scripts/smoke/smoke-som-packet-crud.mjs",
     "scripts/startup/smoke-valkey-node-client.mjs",
+    "scripts/tests/smoke-kanban-hmm.mjs",
     "scripts/tests/smoke-runtime-packet-replay.mjs",
     "scripts/vscode-extension-performance-log.mjs",
     "sveltekit-frontend/.docker-build/scripts/atlas/cache-hypergraph-cluster-cards.mjs",
@@ -11441,6 +11447,7 @@
     "claude-mem/src/services/smart-file-read/search.ts",
     "packages/parent-atlas-ingest/src/scanner/directory-scanner.ts",
     "scripts/agentic/startup-briefing.mjs",
+    "scripts/atlas/agentic-recommendation-workflow.mjs",
     "scripts/atlas/apply-artifact-tier-classifications.mjs",
     "scripts/atlas/audit-artifact-bloat.mjs",
     "scripts/atlas/audit-bitfrost-semantic-cache.mjs",
@@ -15191,6 +15198,7 @@
     "sveltekit-frontend/src/routes/api/summarize/synthesize/+server.ts",
     "sveltekit-frontend/src/routes/api/tags/[tagId]/+server.ts",
     "sveltekit-frontend/src/routes/api/tasks/agent-pickup/+server.ts",
+    "sveltekit-frontend/src/routes/api/tasks/hmm-diagnosis/+server.ts",
     "sveltekit-frontend/src/routes/api/tasks/packets/+server.ts",
     "sveltekit-frontend/src/routes/api/tasks/packets/workflow/+server.ts",
     "sveltekit-frontend/src/routes/api/tasks/[id]/+server.ts",
@@ -15580,6 +15588,7 @@
     "scripts/scratch_check_users.mjs",
     "scripts/smoke/bifrost-trace-smoke.mjs",
     "scripts/test-qdrant-index.mjs",
+    "scripts/tests/smoke-kanban-hmm.mjs",
     "scripts/tests/smoke-route-runtime-packets.mjs",
     "sveltekit-frontend/drizzle.config.ts",
     "sveltekit-frontend/scratch/add-qdrant-vector.mjs",
@@ -15763,7 +15772,6 @@
     "scripts/atlas/backfill-gds-som-topology.mjs",
     "scripts/atlas/backfill-higher-hop-enrichment-fields.mjs",
     "scripts/atlas/backfill-trace-packet-ref-normalization.mjs",
-    "scripts/atlas/benchmark-retrieval-e2e.mjs",
     "scripts/atlas/codebase-semantics-neo4j-report.mjs",
     "scripts/atlas/export-neo4j-gds-scores.mjs",
     "scripts/atlas/export-neo4j-topology-evidence.mjs",
@@ -19501,6 +19509,7 @@
     "sveltekit-frontend/src/routes/api/simulation/[sessionId]/keyframes/+server.ts",
     "sveltekit-frontend/src/routes/api/summarize/synthesize/+server.ts",
     "sveltekit-frontend/src/routes/api/tasks/agent-pickup/+server.ts",
+    "sveltekit-frontend/src/routes/api/tasks/hmm-diagnosis/+server.ts",
     "sveltekit-frontend/src/routes/api/tasks/packets/+server.ts",
     "sveltekit-frontend/src/routes/api/tasks/packets/workflow/+server.ts",
     "sveltekit-frontend/src/routes/api/tasks/[id]/+server.ts",
@@ -23678,6 +23687,7 @@
     "sveltekit-frontend/src/lib/server/ai/openai-facade.ts",
     "sveltekit-frontend/src/lib/server/ai/scenario-cache.ts",
     "sveltekit-frontend/src/lib/server/analysis/entity-extractor-unified.ts",
+    "sveltekit-frontend/src/lib/server/analysis/hmm-kanban-diagnoser.ts",
     "sveltekit-frontend/src/lib/server/analytics/ldr-ace-bridge.ts",
     "sveltekit-frontend/src/lib/server/atlas/atlas-loader.ts",
     "sveltekit-frontend/src/lib/server/cache/atlas-cache-cascade.ts",
@@ -26130,6 +26140,7 @@
     "sveltekit-frontend/src/routes/(app)/cases/[id]/reports/+page.svelte",
     "sveltekit-frontend/src/routes/(app)/fictional-cases/[id]/+page.svelte",
     "sveltekit-frontend/src/routes/(app)/library/[documentId]/node/[nodeId]/+page.svelte",
+    "sveltekit-frontend/src/routes/(app)/recommendations/+page.svelte",
     "sveltekit-frontend/src/routes/(app)/reports/[id]/+page.svelte",
     "sveltekit-frontend/src/routes/(app)/reports/[id]/edit/+page.svelte"
   ],
@@ -26265,6 +26276,7 @@
     ".claude/worktrees/agent-a38668f2/sveltekit-frontend/src/routes/admin/parents-atlas/+page.svelte",
     ".claude/worktrees/agent-a38668f2/sveltekit-frontend/src/routes/dashboard/atlas-control-panel/+page.svelte",
     "sveltekit-frontend/src/routes/(app)/citations/[...label]/+page.svelte",
+    "sveltekit-frontend/src/routes/(app)/recommendations/+page.svelte",
     "sveltekit-frontend/src/routes/(app)/reports/[id]/+page.svelte"
   ],
   "EXTERNAL:$lib/types/agent.js": [
@@ -27047,7 +27059,8 @@
     ".claude/worktrees/agent-a38668f2/sveltekit-frontend/src/lib/components/modals/EvidenceModal.svelte",
     ".claude/worktrees/agent-a38668f2/sveltekit-frontend/src/routes/(app)/cases/[id]/+page.svelte",
     ".claude/worktrees/agent-a38668f2/sveltekit-frontend/src/routes/(app)/demos/investigate/+page.svelte",
-    ".claude/worktrees/agent-a38668f2/sveltekit-frontend/src/routes/(app)/recommendations/+page.svelte"
+    ".claude/worktrees/agent-a38668f2/sveltekit-frontend/src/routes/(app)/recommendations/+page.svelte",
+    "sveltekit-frontend/src/routes/(app)/recommendations/+page.svelte"
   ],
   "EXTERNAL:$lib/utils/tracking": [
     ".claude/worktrees/agent-a38668f2/sveltekit-frontend/src/lib/components/modals/EvidenceModal.svelte",
@@ -30271,7 +30284,8 @@
   ],
   "EXTERNAL:$lib/components/ai/RecommendationEngine.svelte": [
     ".claude/worktrees/agent-a38668f2/sveltekit-frontend/src/routes/(app)/admin/ai-dashboard/lab/+page.svelte",
-    ".claude/worktrees/agent-a38668f2/sveltekit-frontend/src/routes/(app)/recommendations/+page.svelte"
+    ".claude/worktrees/agent-a38668f2/sveltekit-frontend/src/routes/(app)/recommendations/+page.svelte",
+    "sveltekit-frontend/src/routes/(app)/recommendations/+page.svelte"
   ],
   "EXTERNAL:$lib/components/ai/AuditResults.svelte": [
     ".claude/worktrees/agent-a38668f2/sveltekit-frontend/src/routes/(app)/admin/ai-dashboard/lab/+page.svelte"
@@ -37567,6 +37581,9 @@
   ],
   "EXTERNAL:$lib/server/ai/local-llama-provider.js": [
     "sveltekit-frontend/src/routes/api/sse/chat/+server.ts"
+  ],
+  "EXTERNAL:$lib/server/analysis/hmm-kanban-diagnoser.js": [
+    "sveltekit-frontend/src/routes/api/tasks/hmm-diagnosis/+server.ts"
   ],
   "UNRESOLVED:./src/lib/webgpu/unified-runtime-abstraction.js": [
     "sveltekit-frontend/test-unified-runtime.ts"

@@ -13,6 +13,7 @@
  */
 
 import { ENV } from '$lib/server/env.server.js';
+import { getOllamaEndpoint } from '$lib/server/ollama.js';
 import { qdrant } from '$lib/server/vector/qdrant-manager.js';
 import { generateEmbedding } from '$lib/server/grpc/embedding-client.js';
 import { chunkText, truncateForEmbed } from './research-utils.js';
@@ -121,7 +122,7 @@ Content: ${chunk.body.slice(0, 500)}
 
 Tags:`;
 
-    const res = await fetch(`${ENV.OLLAMA_BASE_URL}/api/generate`, {
+    const res = await fetch(`${getOllamaEndpoint()}/api/generate`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({

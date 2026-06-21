@@ -222,6 +222,10 @@ function buildMirrorPayload(kind, key, rows) {
     tree_node_ids: unique('tree_node_id'),
     glyph_record_ids: unique('glyph_record_id'),
     neo4j_node_ids: unique('neo4j_node_id'),
+    topology_labels: unique('topology_label'),
+    ontology_labels: unique('ontology_label'),
+    cluster_keys: unique('cluster_key'),
+    kmeans_clusters: unique('kmeans_cluster'),
     karpathy_score_top: topRows.length > 0 ? topRows[0].karpathy_score ?? null : null,
     samples: topRows.map((row) => ({
       packet_key: row.packet_key,
@@ -245,6 +249,10 @@ function buildMirrorPayload(kind, key, rows) {
       tree_node_id: row.tree_node_id,
       glyph_record_id: row.glyph_record_id,
       neo4j_node_id: row.neo4j_node_id,
+      topology_label: row.topology_label,
+      ontology_label: row.ontology_label,
+      cluster_key: row.cluster_key,
+      kmeans_cluster: row.kmeans_cluster,
     })),
     updated_at: new Date().toISOString(),
   };
@@ -294,6 +302,10 @@ async function main() {
       ${col('tree_node_id')},
       ${col('glyph_record_id')},
       ${col('neo4j_node_id')},
+      ${col('topology_label')},
+      ${col('ontology_label')},
+      ${col('cluster_key')},
+      ${col('kmeans_cluster')},
       ${col('file_path')},
       ${col('metadata')}
     from public.atlas_higher_hop_index
@@ -350,6 +362,10 @@ async function main() {
     tree_node_id: normalizeText(row.tree_node_id),
     glyph_record_id: normalizeText(row.glyph_record_id),
     neo4j_node_id: normalizeText(row.neo4j_node_id),
+    topology_label: normalizeText(row.topology_label) || normalizeText(row.metadata?.topology_label ?? row.metadata?.topologyLabel ?? row.metadata?.domain_class ?? row.metadata?.domain),
+    ontology_label: normalizeText(row.ontology_label) || normalizeText(row.metadata?.ontology_label ?? row.metadata?.ontologyLabel ?? row.metadata?.domain ?? row.metadata?.domain_class),
+    cluster_key: normalizeText(row.cluster_key) || normalizeText(row.metadata?.cluster_key ?? row.metadata?.clusterKey),
+    kmeans_cluster: normalizeText(row.kmeans_cluster) || normalizeText(row.metadata?.kmeans_cluster ?? row.metadata?.kmeansCluster ?? row.metadata?.cluster_id),
     file_path: normalizeText(row.file_path),
     metadata: (() => {
       try {

@@ -24,6 +24,7 @@
  *   node scripts/atlas/agentic-recommendation-workflow.mjs --dry-run --query "atlas tree nodes"
  */
 
+import fs from 'node:fs/promises';
 import { spawnSync } from 'node:child_process';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -63,6 +64,15 @@ let VERBOSE = false;
 function vlog(label, data) {
   if (!VERBOSE) return;
   console.log(`  [VERBOSE] ${label}:`, typeof data === 'string' ? data : JSON.stringify(data, null, 2));
+}
+
+async function readJsonIfExists(relPath) {
+  try {
+    const text = await fs.readFile(path.join(REPO_ROOT, relPath), 'utf8');
+    return JSON.parse(text);
+  } catch {
+    return null;
+  }
 }
 
 // ── TRACE MCP caller ──────────────────────────────────────────────────────────
@@ -451,6 +461,25 @@ export async function runRecommendationWorkflow(userQuery, initialSourceRefs = [
   const decision = l7Decision(identity, rerankResult, gemma4, memory);
   console.log(`  [L7] Decision: ${decision}`);
 
+  const benchmarkReport = await readJsonIfExists('docs/reports/retrieval-e2e-benchmark.json');
+  const benchmarkGraphProof = String(benchmarkReport?.summary?.graph_proof_status ?? '').trim();
+  const graphProofReady = benchmarkGraphProof === 'PASS' || l4Evidence.graph_hit_count > 0;
+
+  const graphProofTask = {
+    task_id: 'neo4j-graph-proof-runtime-repair',
+    title: 'Repair Neo4j graph proof runtime',
+    status: graphProofReady ? 'READY' : 'OPEN',
+    evidence: [
+      'docs/reports/retrieval-e2e-benchmark.json',
+      'docs/reports/replay-trace-summary.json',
+      'docs/reports/provenance-tree-summary.json',
+      'docs/reports/contract-field-coverage.json',
+    ],
+    reason: graphProofReady
+      ? 'Benchmark graph proof is PASS; query-local graph hits remain coverage-dependent.'
+      : 'Graph expansion returned no hits or degraded status.',
+  };
+
   const recommendation = {
     source_id: createHash('sha256').update(userQuery).digest('hex').slice(0, 12),
     source_ref: identity.source_ref ?? normalized,
@@ -462,7 +491,7 @@ export async function runRecommendationWorkflow(userQuery, initialSourceRefs = [
     community_id: identity.community_id,
     tree_node_id: identity.tree_node_id,
     qdrant_point_id: identity.qdrant_point_id,
-    kanban_card_id: null,
+    kanban_card_id: graphProofReady ? null : graphProofTask.task_id,
     decision,
     permission_level: decision === 'patch_existing' ? 'patch_allowed' : 'read_only',
     target_files: rgMatches.slice(0, 5),
@@ -474,6 +503,7 @@ export async function runRecommendationWorkflow(userQuery, initialSourceRefs = [
       cache_hits: l4Evidence.cache_hits,
       rerank_score: rerankResult.top_score,
     },
+    kanban_recommendation: graphProofTask,
     gemma4,
     validation_commands: [
       `node --check ${rgMatches[0] ?? '<target_file>'}`,

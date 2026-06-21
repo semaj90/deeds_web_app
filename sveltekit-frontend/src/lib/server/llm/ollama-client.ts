@@ -9,7 +9,10 @@ import { ENV } from '$lib/server/env.server.js';
 import { traceLLM } from '$lib/server/observability/langfuse.js';
 import { getChatModelKeepAlive, bifrostChat, ollamaFetch } from '$lib/server/ollama.js';
 
-const DEFAULT_URL = ENV.OLLAMA_BASE_URL;
+const DEFAULT_URL =
+  ENV.TURBOQUANT_URL ??
+  ENV.TURBOQUANT_BASE_URL ??
+  ENV.OLLAMA_BASE_URL;
 const DEFAULT_MODEL =
   process.env.OLLAMA_MODEL_CHAT ?? process.env.OLLAMA_MODEL ?? 'gemma4-rotorquant:latest';
 

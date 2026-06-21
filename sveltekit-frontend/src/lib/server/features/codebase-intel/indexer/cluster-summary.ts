@@ -10,7 +10,7 @@
  * and in Claude / Copilot context enrichment.
  */
 import { ENV } from '$lib/server/env.server.js';
-import { ollamaFetch } from '$lib/server/ollama.js';
+import { getOllamaEndpoint, ollamaFetch } from '$lib/server/ollama.js';
 import { pool } from '$lib/server/db/client';
 import { TTL, clusterSummaryKey } from '$lib/server/cache-keys.js';
 import { traceLLM } from '$lib/server/observability/langfuse.js';
@@ -391,7 +391,7 @@ export async function generateClusterSummary(
       { model: MODEL, clusterId, chunkCount: chunks.length, prompt: userMessage.slice(0, 500) },
       async (gen) => {
         // Direct Ollama call (bypasses Bifrost — Bifrost provider is unreliable)
-        const ollamaUrl = `${ENV.OLLAMA_BASE_URL}/api/chat`;
+        const ollamaUrl = `${getOllamaEndpoint()}/api/chat`;
         console.log(`[cluster-summary] Calling Ollama directly: ${ollamaUrl} model=${MODEL}`);
         const res = await ollamaFetch(ollamaUrl, {
           method: 'POST',

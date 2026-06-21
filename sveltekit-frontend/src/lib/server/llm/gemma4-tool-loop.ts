@@ -22,6 +22,7 @@
  */
 
 import { ollamaFetch, getChatModelKeepAlive, VLM_MODELS } from '$lib/server/ollama.js';
+import { getOllamaEndpoint } from '$lib/server/utils/ollama-endpoint.js';
 import { ENV } from '$lib/server/env.server.js';
 import { traceLLM } from '$lib/server/observability/langfuse.js';
 import { logInference } from '$lib/server/observability/inference-log.js';
@@ -254,7 +255,7 @@ export async function callGemma4WithTools(
       'gemma4-tool-loop',
       { model, prompt: query.slice(0, 500), iteration: i + 1 },
       async (gen) => {
-        const res = await ollamaFetch(`${ENV.OLLAMA_BASE_URL}/api/chat`, {
+        const res = await ollamaFetch(`${getOllamaEndpoint()}/api/chat`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(ollamaBody),
@@ -428,7 +429,7 @@ export async function callGemma4WithTools(
     ...(opts.responseSchema ? { format: opts.responseSchema } : {}),
   };
 
-  const finalRes = await ollamaFetch(`${ENV.OLLAMA_BASE_URL}/api/chat`, {
+  const finalRes = await ollamaFetch(`${getOllamaEndpoint()}/api/chat`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(finalBody),

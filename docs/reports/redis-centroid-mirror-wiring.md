@@ -1,13 +1,13 @@
 # Redis Centroid Mirror Wiring
 
-Generated: 2026-06-15T23:40:01.137Z
+Generated: 2026-06-21T17:17:26.646Z
 Mode: dry-run
 Status: PASS
 
 ## Summary
 
 - source table: atlas_higher_hop_index
-- qdrant-backed rows read: 1
+- qdrant-backed rows read: 5
 - community buckets: 1
 - som buckets: 1
 - planned writes: 4
@@ -16,44 +16,32 @@ Status: PASS
 
 ## Planned Keys
 
-- `centroid:1` (centroid) -> 1 rows
-- `som:1` (som) -> 1 rows
-- `som:cell:1` (som_cell) -> 1 rows
+- `centroid:1` (centroid) -> 5 rows
+- `som:1` (som) -> 5 rows
+- `som:cell:1` (som_cell) -> 5 rows
 - `atlas:centroid:index` (index) -> 1 rows
 
 ## Samples
 
 - centroid | centroid:1 | {
   "canonical_source_refs": [
-    "src/lib/client/timeline-client.ts"
-  ],
-  "chunk_ids": [
-    "card:src/lib/client/timeline-client.ts:3d6ecb4eaa1bb17d"
-  ],
-…
+    "sveltekit-frontend/src/lib/client/timeline-client.ts",
+    "sveltekit-frontend/src/routes/api/cases/[id]/citations/+server.t…
 - som | som:1 | {
   "canonical_source_refs": [
-    "src/lib/client/timeline-client.ts"
-  ],
-  "chunk_ids": [
-    "card:src/lib/client/timeline-client.ts:3d6ecb4eaa1bb17d"
-  ],
-…
+    "sveltekit-frontend/src/lib/client/timeline-client.ts",
+    "sveltekit-frontend/src/routes/api/cases/[id]/citations/+server.t…
 - som_cell | som:cell:1 | {
   "canonical_source_refs": [
-    "src/lib/client/timeline-client.ts"
-  ],
-  "chunk_ids": [
-    "card:src/lib/client/timeline-client.ts:3d6ecb4eaa1bb17d"
-  ],
-…
+    "sveltekit-frontend/src/lib/client/timeline-client.ts",
+    "sveltekit-frontend/src/routes/api/cases/[id]/citations/+server.t…
 - index | atlas:centroid:index | {
   "centroid_keys": [
     "centroid:1"
   ],
   "community_count": 1,
-  "generated_at": "2026-06-15T23:40:01.137Z",
-  "qdrant_backed_rows": 1,
+  "generated_at": "2026-06-21T17:17:26.646Z",
+  "qdrant_backed_rows": 5,
   "som_count": 1,
 …
 

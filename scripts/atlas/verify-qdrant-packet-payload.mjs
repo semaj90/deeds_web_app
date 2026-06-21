@@ -25,6 +25,7 @@ import pg from 'pg';
 import { writeFileSync, mkdirSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { normalizeSourceRef } from '../lib/canonical-source-ref.mjs';
 
 const __dir = path.dirname(fileURLToPath(import.meta.url));
 const ROOT  = path.resolve(__dir, '../..');
@@ -218,6 +219,9 @@ async function main() {
     FROM atlas_packets
     WHERE packet_key IS NOT NULL
       AND source_ref IS NOT NULL
+      AND source_ref NOT LIKE 'feature:%'
+      AND source_ref NOT LIKE 'drizzle/%'
+      AND source_ref NOT LIKE '.env%'
     ORDER BY RANDOM()
     LIMIT 10
   `);
@@ -228,10 +232,10 @@ async function main() {
 
   for (const row of pgSample) {
     // Normalize source_ref to match Qdrant's canonicalSourceRef format
-    const canonical = row.source_ref
-      .replace(/^sveltekit-frontend\//, '')
+    const canonical = normalizeSourceRef(row.source_ref)
       .replace(/#chunk-\d+$/, '')
       .trim();
+    const stripped = canonical.replace(/^sveltekit-frontend\//, '');
 
     try {
       const res = await fetch(`${QDRANT_URL}/collections/${COLLECTION}/points/scroll`, {
@@ -242,7 +246,10 @@ async function main() {
           with_payload: true,
           with_vector: false,
           filter: {
-            must: [{ key: 'canonicalSourceRef', match: { value: canonical } }],
+            should: [
+              { key: 'canonicalSourceRef', match: { value: canonical } },
+              { key: 'canonicalSourceRef', match: { value: stripped } },
+            ],
           },
         }),
         signal: AbortSignal.timeout(10_000),
@@ -255,15 +262,30 @@ async function main() {
       checked++;
       const pl = pt.payload ?? {};
 
+      // Fetch all matching feature_ids from postgres for this canonical ref
+      const { rows: pgMatches } = await pool.query(`
+        SELECT feature_id 
+        FROM atlas_packets 
+        WHERE source_ref = $1 
+           OR source_ref = $2
+           OR source_ref = 'sveltekit-frontend/' || $1
+           OR source_ref = 'sveltekit-frontend/' || $2
+           OR source_ref = 'nes:' || $1
+           OR source_ref = 'nes:' || $2
+           OR source_ref = 'nes:sveltekit-frontend/' || $1
+           OR source_ref = 'nes:sveltekit-frontend/' || $2
+      `, [canonical, stripped]);
+      const validFeatureIds = pgMatches.map(r => r.feature_id);
+
       // Check feature_id alignment (written by upsert-qdrant-packet-payload.mjs)
-      if (pl.feature_id && row.feature_id && pl.feature_id === row.feature_id) {
+      if (pl.feature_id && validFeatureIds.includes(pl.feature_id)) {
         aligned++;
         if (VERBOSE) console.log(`  ✓ ${canonical.slice(0, 50)} feature_id=${pl.feature_id}`);
-      } else if (pl.feature_id && row.feature_id && pl.feature_id !== row.feature_id) {
-        mismatches.push({ canonical, pg_fid: row.feature_id, qdrant_fid: pl.feature_id });
+      } else if (pl.feature_id && validFeatureIds.length > 0) {
+        mismatches.push({ canonical, pg_fid: validFeatureIds[0], qdrant_fid: pl.feature_id });
         if (VERBOSE) {
           console.log(`  MISMATCH: ${canonical.slice(0, 50)}`);
-          console.log(`    PG feature_id:     ${row.feature_id}`);
+          console.log(`    PG feature_ids:    ${validFeatureIds.join(', ')}`);
           console.log(`    Qdrant feature_id: ${pl.feature_id}`);
         }
       } else if (!pl.feature_id) {

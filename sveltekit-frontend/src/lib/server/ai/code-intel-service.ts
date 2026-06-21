@@ -6,6 +6,7 @@ import { desc, count, eq, sql, avg } from 'drizzle-orm';
 import { ENV } from '$lib/server/env.server.js';
 import { getGraphMLStatus } from '$lib/server/grpc/graph-ml-client.js';
 import { getRedis } from '$lib/server/redis.js';
+import { getOllamaEndpoint } from '$lib/server/ollama.js';
 
 /**
  * Code Intel Service: Aggregates statistics and health metrics for the
@@ -269,7 +270,7 @@ export async function checkSystemHealth() {
 
 	const [qdrant, ollama, pg, redis, media] = await Promise.all([
 		probe(`${ENV.QDRANT_URL}/collections`),
-		probe(`${ENV.OLLAMA_BASE_URL}/api/tags`),
+		probe(`${getOllamaEndpoint()}/api/tags`),
 		postgresOk(),
 		redisOk(),
 		mediaOk(),

@@ -6,8 +6,10 @@ import {
   getEmbeddingModelKeepAlive,
   ollamaFetch,
 } from '$lib/server/ollama.js';
+import { getOllamaEndpoint, getOllamaEmbeddingEndpoint } from '$lib/server/utils/ollama-endpoint.js';
 
-const DEFAULT_OLLAMA_URL = ENV.OLLAMA_BASE_URL;
+const DEFAULT_OLLAMA_URL = getOllamaEndpoint();
+const DEFAULT_EMBED_OLLAMA_URL = getOllamaEmbeddingEndpoint();
 const DEFAULT_GENERATE_MODEL = ENV.OLLAMA_CHAT_MODEL;
 const DEFAULT_EMBED_MODEL = ENV.OLLAMA_EMBED_MODEL;
 const DEFAULT_TIMEOUT_MS = Number(process.env.OLLAMA_TIMEOUT_MS ?? 45_000);
@@ -43,6 +45,10 @@ export interface OllamaEmbeddingParams {
 
 export function getOllamaBaseUrl(): string {
   return DEFAULT_OLLAMA_URL;
+}
+
+export function getOllamaEmbeddingBaseUrl(): string {
+  return DEFAULT_EMBED_OLLAMA_URL;
 }
 
 export async function fetchFromOllama<T>(
@@ -116,16 +122,29 @@ export async function generateEmbedding(
   };
 
   return traceEmbedding(params.text, model, async () => {
-    const result = await fetchFromOllama<{ model: string; embeddings: number[][] }>('/api/embed', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(body),
-      timeoutMs: params.timeoutMs,
-    });
-    return {
-      model: result.model,
-      embedding: result.embeddings[0],
-    };
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), params.timeoutMs ?? DEFAULT_TIMEOUT_MS);
+    try {
+      const response = await fetch(`${getOllamaEmbeddingBaseUrl()}/api/embed`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        signal: controller.signal,
+        body: JSON.stringify(body),
+      });
+
+      if (!response.ok) {
+        const text = await response.text().catch(() => response.statusText);
+        throw new Error(`Ollama request failed (${response.status}): ${text}`);
+      }
+
+      const result = (await response.json()) as { model: string; embeddings: number[][] };
+      return {
+        model: result.model,
+        embedding: result.embeddings[0],
+      };
+    } finally {
+      clearTimeout(timeout);
+    }
   });
 }
 

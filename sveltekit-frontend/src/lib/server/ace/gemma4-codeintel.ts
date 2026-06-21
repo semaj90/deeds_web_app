@@ -20,6 +20,7 @@ import {
   getOllamaRequestTimeoutMs,
   ollamaFetch,
 } from '../ollama.js';
+import { getOllamaEndpoint } from '../utils/ollama-endpoint.js';
 import * as Hypergraph from '../ai/hypergraph-store.js';
 import { retrievalClient } from '../grpc/retrieval-client.js';
 
@@ -282,7 +283,7 @@ export async function callGemma4WithAceContext(
             'json-schema',
             'Structured JSON schema format is required for this lane.'
           );
-          const response = await ollamaFetch(`${ENV.OLLAMA_BASE_URL}/api/chat`, {
+          const response = await ollamaFetch(`${getOllamaEndpoint()}/api/chat`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -572,7 +573,7 @@ export async function callGemma4WithTools(
         'Native tool-calling loop requires direct /api/chat tools payload.'
       );
       const assistantStartedAt = Date.now();
-      const response = await ollamaFetch(`${ENV.OLLAMA_BASE_URL}/api/chat`, {
+      const response = await ollamaFetch(`${getOllamaEndpoint()}/api/chat`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

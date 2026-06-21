@@ -3,7 +3,25 @@
 // SvelteKit forwards all $env/dynamic/private values onto process.env at runtime,
 // so process.env is always the canonical source server-side.
 import dotenv from 'dotenv';
-dotenv.config();
+import fs from 'node:fs';
+import path from 'node:path';
+
+function loadEnvFile(filePath: string, baseValues: Record<string, string> = {}): Record<string, string> {
+  if (!fs.existsSync(filePath)) return {};
+  const parsed = dotenv.parse(fs.readFileSync(filePath));
+  for (const [key, value] of Object.entries(parsed)) {
+    const current = process.env[key];
+    if (current === undefined || current === baseValues[key]) {
+      process.env[key] = value;
+    }
+  }
+  return parsed;
+}
+
+const envRoot = path.resolve(process.cwd(), '.env');
+const envLocal = path.resolve(process.cwd(), '.env.local');
+const rootValues = loadEnvFile(envRoot);
+loadEnvFile(envLocal, rootValues);
 
 const privateEnv: Record<string, string | undefined> = process.env;
 const publicEnv: Record<string, string | undefined> = process.env;
@@ -86,7 +104,12 @@ function goRetrievalGrpcUrl(): string {
 }
 
 function goRetrievalHttpEnabled(): boolean {
-  return (privateEnv.GO_RETRIEVAL_ENABLED ?? privateEnv.RETRIEVAL_HTTP_ENABLED ?? 'false') === 'true';
+  return (
+    privateEnv.RAG_USE_GO_RETRIEVAL ??
+    privateEnv.GO_RETRIEVAL_ENABLED ??
+    privateEnv.RETRIEVAL_HTTP_ENABLED ??
+    'false'
+  ) === 'true';
 }
 
 function goRetrievalGrpcEnabled(): boolean {
@@ -162,6 +185,7 @@ export const ENV = {
   GO_RETRIEVAL_HTTP_URL: goRetrievalHttpUrl(),
   RETRIEVAL_HTTP_URL: goRetrievalHttpUrl(),
   GO_RETRIEVAL_HTTP_ENABLED: goRetrievalHttpEnabled(),
+  RAG_USE_GO_RETRIEVAL: goRetrievalHttpEnabled(),
   /** ACE concept extraction timeout in milliseconds */
   ACE_CONCEPT_EXTRACTION_TIMEOUT_MS: privateEnv.ACE_CONCEPT_EXTRACTION_TIMEOUT_MS ?? '1500',
   /** ACE concept extraction mode: gemma | heuristic */
@@ -251,8 +275,18 @@ export const ENV = {
    */
   BIFROST_OPENAI_BASE_URL:
     privateEnv.BIFROST_OPENAI_BASE_URL ?? `http://${LOOPBACK_IP}:3040/v1`,
-  TURBOQUANT_BASE_URL: privateEnv.TURBOQUANT_BASE_URL ?? `http://${LOOPBACK_IP}:8090`,
-  TURBOQUANT_URL: privateEnv.TURBOQUANT_URL ?? privateEnv.TURBOQUANT_BASE_URL ?? `http://${LOOPBACK_IP}:8090`,
+  TURBOQUANT_BASE_URL:
+    privateEnv.TURBOQUANT_BASE_URL ?? privateEnv.LLAMA_SERVER_URL ?? `http://${LOOPBACK_IP}:8090`,
+  TURBOQUANT_URL:
+    privateEnv.TURBOQUANT_URL ??
+    privateEnv.TURBOQUANT_BASE_URL ??
+    privateEnv.LLAMA_SERVER_URL ??
+    `http://${LOOPBACK_IP}:8090`,
+  LLAMA_SERVER_URL:
+    privateEnv.LLAMA_SERVER_URL ??
+    privateEnv.TURBOQUANT_URL ??
+    privateEnv.TURBOQUANT_BASE_URL ??
+    `http://${LOOPBACK_IP}:8090`,
   ROTORQUANT_MODEL_PATH: privateEnv.ROTORQUANT_MODEL_PATH ?? null,
   TURBO_MODEL_PATH: privateEnv.TURBO_MODEL_PATH ?? null,
   TURBOQUANT_MODEL_PATH: privateEnv.TURBOQUANT_MODEL_PATH ?? null,

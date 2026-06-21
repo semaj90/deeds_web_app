@@ -600,7 +600,7 @@ export async function loadCodebaseContext(query: string): Promise<{
     const { scoreBatchTriton } = await import('$lib/server/retrieval/triton-reranker');
     const marcoScores = await scoreBatchTriton(query, finalChunks.map(c => c.content));
 
-    // -- P5: 64d encoded similarity for decision-tree f8 signal ----------------
+    // -- P5: 64d latent similarity for decision-tree f8 signal -----------------
     let queryEncoded64: Float32Array | undefined;
     const encoded64Map = new Map<string, Float32Array>();
     try {
@@ -610,12 +610,12 @@ export async function loadCodebaseContext(query: string): Promise<{
         const ids = finalChunks.map(c => c.qdrantId).filter(Boolean) as (string | number)[];
         if (ids.length > 0) {
           const { qdrant: qdrantMgr } = await import('$lib/server/vector/qdrant-manager.js');
-          const pts = await qdrantMgr.client.retrieve('codebase_chunks_768', {
+          const pts = await qdrantMgr.client.retrieve('codebase_topology_64', {
             ids,
-            with_vector: ['encoded_64'],
+            with_vector: ['latent_64'],
           }).catch(() => []);
           for (const pt of pts) {
-            const vec = (pt.vector as Record<string, number[]>)?.['encoded_64'] as number[] | undefined;
+            const vec = (pt.vector as Record<string, number[]>)?.['latent_64'] as number[] | undefined;
             if (vec) encoded64Map.set(String(pt.id), new Float32Array(vec));
           }
         }

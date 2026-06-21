@@ -1,39 +1,67 @@
 /**
- * Centralized utility to get the Ollama API endpoint.
- * Prioritizes Docker service names from environment variables,
- * with a localhost fallback for local development without Docker Compose.
+ * Canonical local model endpoint helpers.
+ *
+ * Chat/generation prefers llama-server/TurboQuant on 8090.
+ * Embeddings prefer Ollama/embedding lane on 11434.
  */
+
+function readEnv(key: string): string | undefined {
+  try {
+    // @ts-ignore import.meta.env is only available in Vite contexts.
+    const viteValue = import.meta?.env?.[key];
+    if (typeof viteValue === 'string' && viteValue.trim()) return viteValue.trim();
+  } catch {
+    /* noop */
+  }
+
+  const nodeValue = typeof process !== 'undefined' ? process.env?.[key] : undefined;
+  return typeof nodeValue === 'string' && nodeValue.trim() ? nodeValue.trim() : undefined;
+}
+
+function normalizeUrl(value: string | undefined, fallback: string): string {
+  return (value ?? fallback).replace(/\/+$/, '');
+}
+
 export function getOllamaEndpoint(): string {
- const defaultPort = 11434;
- const port = process.env.OLLAMA_PORT ? Number(process.env.OLLAMA_PORT) : defaultPort;
- return process.env?.OLLAMA_URL|| `http://localhost:${port}`;
+  const chatPort = readEnv('TURBO_PORT') ?? readEnv('LLAMA_SERVER_PORT') ?? '8090';
+  return normalizeUrl(
+    readEnv('VITE_TURBOQUANT_URL') ??
+      readEnv('VITE_TURBOQUANT_BASE_URL') ??
+      readEnv('VITE_LLAMA_SERVER_URL') ??
+      readEnv('TURBOQUANT_URL') ??
+      readEnv('TURBOQUANT_BASE_URL') ??
+      readEnv('LLAMA_SERVER_URL') ??
+      readEnv('OLLAMA_URL') ??
+      readEnv('OLLAMA_BASE_URL'),
+    `http://localhost:${chatPort}`
+  );
 }
 
-/**
- * Utility to get the Ollama generation API endpoint.
- * This can be distinct from the general Ollama URL if specific generation services are used.
- */
+export function getOllamaChatEndpoint(): string {
+  return getOllamaEndpoint();
+}
+
 export function getOllamaGenerationEndpoint(): string {
- return process.env?.OLLAMA_GENERATION_URL|| getOllamaEndpoint();
+  return normalizeUrl(readEnv('OLLAMA_GENERATION_URL'), getOllamaEndpoint());
 }
 
-/**
- * Utility to get the Ollama embedding API endpoint.
- * This can be distinct from the general Ollama URL if specific embedding services are used.
- */
 export function getOllamaEmbeddingEndpoint(): string {
- return process.env?.OLLAMA_EMBEDDING_URL|| getOllamaEndpoint();
+  return normalizeUrl(
+    readEnv('VITE_OLLAMA_EMBED_BASE_URL') ??
+      readEnv('VITE_OLLAMA_EMBEDDING_URL') ??
+      readEnv('OLLAMA_EMBED_BASE_URL') ??
+      readEnv('OLLAMA_EMBEDDING_URL') ??
+      readEnv('OLLAMA_EMBED_BASEURL') ??
+      readEnv('OLLAMA_URL') ??
+      readEnv('OLLAMA_BASE_URL'),
+    'http://localhost:11434'
+  );
 }
 
-/**
- * Utility to get specific Ollama API endpoints based on type.
- * @param type The type of Ollama API endpoint to retrieve (e.g., 'generate', 'delete', 'list', 'show').
- * @returns The full URL for the specified Ollama API endpoint.
- */
 export function getOllamaApiEndpoint(
  type: 'generate' | 'delete' | 'list' | 'show' | string
 ): string {
- const base = getOllamaEndpoint(); // Get the base Ollama URL
+ const base = getOllamaEndpoint();
  switch (type) {
  case 'delete':
  return `${base}/api/delete`;
@@ -42,7 +70,7 @@ export function getOllamaApiEndpoint(
  case 'show':
  return `${base}/api/show`;
  default:
- return `${base}/api/generate`; // Default to generate if type is unknown
+ return `${base}/api/generate`;
  }
 }
 

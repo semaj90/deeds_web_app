@@ -53,6 +53,50 @@ function buildNeo4jHttpUrl({
   }
 }
 
+function buildNeo4jHttpUrls({
+  neo4jHttpUrl = process.env.NEO4J_HTTP_URL ?? null,
+  neo4jUri = process.env.NEO4J_URI ?? process.env.NEO4J_URL ?? 'bolt://localhost:7687',
+} = {}) {
+  const urls = [];
+  const add = (value) => {
+    const text = String(value ?? '').trim();
+    if (!text) return;
+    if (!urls.includes(text)) urls.push(text);
+  };
+
+  const explicitHttp = neo4jHttpUrl ? String(neo4jHttpUrl).trim() : '';
+  if (explicitHttp) add(explicitHttp);
+
+  try {
+    const base = explicitHttp
+      ? new URL(explicitHttp)
+      : new URL(String(neo4jUri).replace(/^bolt(\+s)?:\/\//i, 'http://'));
+
+    if (!base) return urls;
+    if (!base.port || base.port === '7687') base.port = '7474';
+
+    const pathCandidates = [];
+    if (base.pathname && base.pathname !== '/' && /\/db\/(?:neo4j\/tx\/commit|data\/transaction\/commit)$/i.test(base.pathname)) {
+      pathCandidates.push(base.pathname);
+    } else {
+      pathCandidates.push('/db/neo4j/tx/commit');
+      pathCandidates.push('/db/data/transaction/commit');
+    }
+
+    for (const pathname of pathCandidates) {
+      const candidate = new URL(base.toString());
+      candidate.pathname = pathname;
+      candidate.search = '';
+      candidate.hash = '';
+      add(candidate.toString());
+    }
+  } catch {
+    // ignore URL construction issues here; the caller will see missing URLs
+  }
+
+  return urls;
+}
+
 async function queryNeo4jHttp({
   neo4jHttpUrl = null,
   neo4jUri = null,
@@ -64,80 +108,93 @@ async function queryNeo4jHttp({
   const buildOpts = {};
   if (neo4jHttpUrl !== null && neo4jHttpUrl !== undefined) buildOpts.neo4jHttpUrl = neo4jHttpUrl;
   if (neo4jUri !== null && neo4jUri !== undefined) buildOpts.neo4jUri = neo4jUri;
-  const httpUrl = buildNeo4jHttpUrl(buildOpts);
-  if (!httpUrl) {
+  const httpUrls = buildNeo4jHttpUrls(buildOpts);
+  if (httpUrls.length === 0) {
     return { ok: false, error: 'missing_neo4j_http_url' };
   }
 
   const auth = Buffer.from(`${username ?? ''}:${password ?? ''}`).toString('base64');
-  let response;
-  try {
-    response = await fetch(httpUrl, {
-      method: 'POST',
-      headers: {
-        authorization: `Basic ${auth}`,
-        'content-type': 'application/json',
-        accept: 'application/json',
-      },
-      body: JSON.stringify({
-        statements: [
-          {
-            statement,
-            parameters,
-          },
-        ],
-      }),
-    });
-  } catch (error) {
+  let lastFailure = null;
+
+  for (const httpUrl of httpUrls) {
+    let response;
+    try {
+      response = await fetch(httpUrl, {
+        method: 'POST',
+        headers: {
+          authorization: `Basic ${auth}`,
+          'content-type': 'application/json',
+          accept: 'application/json',
+        },
+        body: JSON.stringify({
+          statements: [
+            {
+              statement,
+              parameters,
+            },
+          ],
+        }),
+      });
+    } catch (error) {
+      lastFailure = {
+        ok: false,
+        error: error instanceof Error ? error.message : String(error),
+        httpUrl,
+      };
+      continue;
+    }
+
+    const text = await response.text();
+    let payload = null;
+    try {
+      payload = text ? JSON.parse(text) : null;
+    } catch {
+      payload = null;
+    }
+
+    if (!response.ok) {
+      const failure = {
+        ok: false,
+        error: payload?.errors?.[0]?.message ?? text ?? `HTTP ${response.status}`,
+        status: response.status,
+        httpUrl,
+      };
+      if (response.status === 405 || response.status === 404) {
+        lastFailure = failure;
+        continue;
+      }
+      return failure;
+    }
+
+    const errors = payload?.errors ?? [];
+    if (errors.length > 0) {
+      return { ok: false, error: errors[0]?.message ?? 'neo4j_http_error', httpUrl };
+    }
+
+    const result = payload?.results?.[0] ?? {};
+    const columns = Array.isArray(result.columns) ? result.columns : [];
+    const rows = Array.isArray(result.data)
+      ? result.data.map((entry) => {
+          const row = {};
+          const values = Array.isArray(entry?.row) ? entry.row : [];
+          columns.forEach((column, index) => {
+            row[column] = values[index];
+          });
+          return row;
+        })
+      : [];
+
     return {
-      ok: false,
-      error: error instanceof Error ? error.message : String(error),
+      ok: true,
       httpUrl,
+      httpUrls,
+      columns,
+      rows,
+      stats: result.stats ?? {},
     };
   }
 
-  const text = await response.text();
-  let payload = null;
-  try {
-    payload = text ? JSON.parse(text) : null;
-  } catch {
-    payload = null;
-  }
-
-  if (!response.ok) {
-    return {
-      ok: false,
-      error: payload?.errors?.[0]?.message ?? text ?? `HTTP ${response.status}`,
-      status: response.status,
-      httpUrl,
-    };
-  }
-
-  const errors = payload?.errors ?? [];
-  if (errors.length > 0) {
-    return { ok: false, error: errors[0]?.message ?? 'neo4j_http_error', httpUrl };
-  }
-
-  const result = payload?.results?.[0] ?? {};
-  const columns = Array.isArray(result.columns) ? result.columns : [];
-  const rows = Array.isArray(result.data)
-    ? result.data.map((entry) => {
-        const row = {};
-        const values = Array.isArray(entry?.row) ? entry.row : [];
-        columns.forEach((column, index) => {
-          row[column] = values[index];
-        });
-        return row;
-      })
-    : [];
-
-  return {
-    ok: true,
-    httpUrl,
-    columns,
-    rows,
-    stats: result.stats ?? {},
-  };
+  return lastFailure ?? { ok: false, error: 'neo4j_http_unavailable', httpUrls };
 }
 
 async function countNeo4jRelationship({
@@ -163,6 +220,7 @@ async function countNeo4jRelationship({
 
 export {
   buildNeo4jHttpUrl,
+  buildNeo4jHttpUrls,
   countNeo4jRelationship,
   queryNeo4jHttp,
 };

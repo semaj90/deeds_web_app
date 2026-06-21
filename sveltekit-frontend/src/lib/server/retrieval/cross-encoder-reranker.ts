@@ -41,6 +41,7 @@ import { fastJsonParse } from '$lib/server/gpu/simdjson-bridge.js';
 import { fromRerankResult, type UnifiedRetrievalResult } from '$lib/server/types/retrieval.js';
 import { scoreBatchTriton, isRerankerReady } from './triton-reranker.js';
 import { ENV } from '$lib/server/env.server.js';
+import { getOllamaEndpoint } from '$lib/server/ollama.js';
 
 // ── Constants ─────────────────────────────────────────────────────────────────
 
@@ -366,7 +367,7 @@ async function _scoreOne(query: string, doc: RerankCandidate): Promise<number> {
 
   try {
     const res = await ollamaFetch(
-      `${ENV.OLLAMA_BASE_URL}/api/generate`,
+      `${getOllamaEndpoint()}/api/generate`,
       {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },

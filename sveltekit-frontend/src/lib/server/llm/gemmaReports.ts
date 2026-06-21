@@ -1,11 +1,10 @@
 import { ENV } from '$lib/server/env.server.js';
 import { traceLLM } from '$lib/server/observability/langfuse.js';
-import { bifrostChat } from '$lib/server/ollama.js';
-import { ollamaFetch } from '$lib/server/ollama.js';
+import { bifrostChat, getOllamaEndpoint, ollamaFetch } from '$lib/server/ollama.js';
 
 export type ReportTemplate = 'charging_memo' | 'intake_summary';
 
-const OLLAMA_URL = ENV.OLLAMA_BASE_URL;
+const OLLAMA_URL = getOllamaEndpoint();
 const OLLAMA_MODEL = process.env.OLLAMA_MODEL ?? 'gemma4-rotorquant:latest';
 
 export async function generateReportWithGemma(opts: {

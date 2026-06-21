@@ -12,11 +12,11 @@
  *   for await (const chunk of stream) { console.log(chunk.content); }
  */
 
-import { ENV } from '$lib/server/env.server.js';
 import { isLegalTask, getOptimalModel, OLLAMA_CONFIG } from '$lib/server/ai/ollama-config.js';
 import { ollamaFetch } from '$lib/server/ollama.js';
+import { getOllamaEndpoint } from '$lib/server/utils/ollama-endpoint.js';
 
-const OLLAMA_URL = ENV.OLLAMA_BASE_URL;
+const OLLAMA_URL = getOllamaEndpoint();
 
 interface StreamRequest {
   prompt: string;

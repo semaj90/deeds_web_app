@@ -169,6 +169,10 @@ function canonicalizeRow(row) {
   const clusterId = textField(row, ['cluster_id', 'clusterId']);
   const centroidId = textField(row, ['centroid_id', 'centroidId']);
   const communityId = textField(row, ['community_id', 'communityId']);
+  const topologyLabel = textField(row, ['topology_label', 'topologyLabel']) || textField(metadata, ['topology_label', 'topologyLabel', 'domain_class', 'domainClass']);
+  const ontologyLabel = textField(row, ['ontology_label', 'ontologyLabel']) || textField(metadata, ['ontology_label', 'ontologyLabel', 'domain', 'domainClass']);
+  const clusterKey = textField(row, ['cluster_key', 'clusterKey']) || textField(metadata, ['cluster_key', 'clusterKey']);
+  const kmeansCluster = textField(row, ['kmeans_cluster', 'kmeansCluster']) || textField(metadata, ['kmeans_cluster', 'kmeansCluster']) || clusterId;
   const domain = normalizeDomain(firstDefined(row, ['domain', 'domain_class', 'domainClass', 'source_kind']) ?? '');
   const qdrantPointId = textField(row, ['qdrant_point_id', 'qdrantPointId', 'point_id', 'pointId']);
   const sourceRefHash = textField(row, ['source_ref_hash', 'sourceRefHash']);
@@ -187,6 +191,10 @@ function canonicalizeRow(row) {
     clusterId,
     centroidId,
     communityId,
+    topologyLabel,
+    ontologyLabel,
+    clusterKey,
+    kmeansCluster,
     domain,
     somCluster,
     metadata,
@@ -208,6 +216,10 @@ function mergeCanonical(target, incoming) {
     'clusterId',
     'centroidId',
     'communityId',
+    'topologyLabel',
+    'ontologyLabel',
+    'clusterKey',
+    'kmeansCluster',
     'domain',
     'somCluster',
     'sourceRefHash',
@@ -233,6 +245,10 @@ function canonicalRowToPayload(row) {
   if (row.clusterId) payload.cluster_id = row.clusterId;
   if (row.centroidId) payload.centroid_id = row.centroidId;
   if (row.communityId) payload.community_id = row.communityId;
+  if (row.topologyLabel) payload.topology_label = row.topologyLabel;
+  if (row.ontologyLabel) payload.ontology_label = row.ontologyLabel;
+  if (row.clusterKey) payload.cluster_key = row.clusterKey;
+  if (row.kmeansCluster) payload.kmeans_cluster = row.kmeansCluster;
   if (row.somCluster) payload.som_cluster = row.somCluster;
   if (row.domain) payload.domain = row.domain;
   if (row.metadata && Object.keys(row.metadata).length > 0) payload.metadata = row.metadata;
@@ -254,6 +270,10 @@ function normalizeQdrantPayload(rawPayload) {
     clusterId: textField(payload, ['cluster_id', 'clusterId']),
     centroidId: textField(payload, ['centroid_id', 'centroidId']),
     communityId: textField(payload, ['community_id', 'communityId']),
+    topologyLabel: textField(payload, ['topology_label', 'topologyLabel']) || textField(metadata ?? {}, ['topology_label', 'topologyLabel', 'domain_class', 'domainClass']),
+    ontologyLabel: textField(payload, ['ontology_label', 'ontologyLabel']) || textField(metadata ?? {}, ['ontology_label', 'ontologyLabel', 'domain', 'domainClass']),
+    clusterKey: textField(payload, ['cluster_key', 'clusterKey']) || textField(metadata ?? {}, ['cluster_key', 'clusterKey']),
+    kmeansCluster: textField(payload, ['kmeans_cluster', 'kmeansCluster']) || textField(metadata ?? {}, ['kmeans_cluster', 'kmeansCluster', 'cluster_id', 'clusterId']),
     domain: normalizeDomain(payloadField(payload, ['domain', 'domain_class', 'domainClass']) ?? ''),
     somCluster: textField(payload, ['som_cluster', 'somCluster']) || textField(payload, ['cluster_id', 'clusterId']),
     qdrantTagId: textField(payload, ['qdrant_tag_id', 'qdrantTagId']),
@@ -279,6 +299,10 @@ async function loadCanonicalRows() {
         cluster_id::text as cluster_id,
         centroid_id::text as centroid_id,
         community_id::text as community_id,
+        null::text as topology_label,
+        null::text as ontology_label,
+        null::text as cluster_key,
+        null::text as kmeans_cluster,
         domain_class::text as domain,
         metadata::text as metadata_json,
         source_ref_hash::text as source_ref_hash,
@@ -299,6 +323,10 @@ async function loadCanonicalRows() {
         cluster_id::text as cluster_id,
         centroid_id::text as centroid_id,
         null::text as community_id,
+        coalesce(payload->>'topology_label', payload->>'domain_class', payload->>'domain')::text as topology_label,
+        coalesce(payload->>'ontology_label', payload->>'domain', payload->>'domain_class')::text as ontology_label,
+        payload->>'cluster_key' as cluster_key,
+        coalesce(payload->>'kmeans_cluster', payload->>'cluster_id')::text as kmeans_cluster,
         coalesce(nullif(trim(payload->>'domain'), ''), nullif(trim(payload->>'domain_class'), ''), nullif(trim(source_kind::text), '')) as domain,
         coalesce(payload::text, '{}'::text) as metadata_json,
         null::text as source_ref_hash,
@@ -321,10 +349,14 @@ async function loadCanonicalRows() {
     'canonical_source_ref',
     'feature_id',
     'feature_label',
-    'cluster_id',
-    'centroid_id',
-    'community_id',
-    'domain',
+      'cluster_id',
+      'centroid_id',
+      'community_id',
+      'topology_label',
+      'ontology_label',
+      'cluster_key',
+      'kmeans_cluster',
+      'domain',
     'metadata_json',
     'source_ref_hash',
     'payload_json',
@@ -476,6 +508,10 @@ function buildPatch(canonical, payload) {
     compareMetadata(canonical.metadata, result.metadata),
     compareField('cluster_id', canonical.clusterId, result.clusterId),
     compareField('community_id', canonical.communityId, result.communityId),
+    compareField('topology_label', canonical.topologyLabel, result.topologyLabel),
+    compareField('ontology_label', canonical.ontologyLabel, result.ontologyLabel),
+    compareField('cluster_key', canonical.clusterKey, result.clusterKey),
+    compareField('kmeans_cluster', canonical.kmeansCluster, result.kmeansCluster),
     compareField('domain', canonical.domain, result.domain, { normalize: normalizeDomain }),
     compareField('som_cluster', canonical.somCluster || canonical.clusterId, result.somCluster),
   ];
@@ -495,6 +531,14 @@ function buildPatch(canonical, payload) {
         patch.cluster_id = comparison.patchValue;
       } else if (comparison.fieldName === 'community_id') {
         patch.community_id = comparison.patchValue;
+      } else if (comparison.fieldName === 'topology_label') {
+        patch.topology_label = comparison.patchValue;
+      } else if (comparison.fieldName === 'ontology_label') {
+        patch.ontology_label = comparison.patchValue;
+      } else if (comparison.fieldName === 'cluster_key') {
+        patch.cluster_key = comparison.patchValue;
+      } else if (comparison.fieldName === 'kmeans_cluster') {
+        patch.kmeans_cluster = comparison.patchValue;
       } else if (comparison.fieldName === 'domain') {
         patch.domain = comparison.patchValue;
       } else if (comparison.fieldName === 'som_cluster') {
@@ -535,6 +579,10 @@ function compareCanonicalToPayload(canonical, payloadPoint) {
     compareMetadata(canonical.metadata, payload.metadata),
     compareField('cluster_id', canonical.clusterId, payload.clusterId),
     compareField('community_id', canonical.communityId, payload.communityId),
+    compareField('topology_label', canonical.topologyLabel, payload.topologyLabel),
+    compareField('ontology_label', canonical.ontologyLabel, payload.ontologyLabel),
+    compareField('cluster_key', canonical.clusterKey, payload.clusterKey),
+    compareField('kmeans_cluster', canonical.kmeansCluster, payload.kmeansCluster),
     compareField('domain', canonical.domain, payload.domain, { normalize: normalizeDomain }),
     compareField('som_cluster', canonical.somCluster || canonical.clusterId, payload.somCluster),
   ];
@@ -548,6 +596,10 @@ function compareCanonicalToPayload(canonical, payloadPoint) {
       if (comparison.fieldName === 'packet_key') patch.packet_key = comparison.patchValue;
       if (comparison.fieldName === 'cluster_id') patch.cluster_id = comparison.patchValue;
       if (comparison.fieldName === 'community_id') patch.community_id = comparison.patchValue;
+      if (comparison.fieldName === 'topology_label') patch.topology_label = comparison.patchValue;
+      if (comparison.fieldName === 'ontology_label') patch.ontology_label = comparison.patchValue;
+      if (comparison.fieldName === 'cluster_key') patch.cluster_key = comparison.patchValue;
+      if (comparison.fieldName === 'kmeans_cluster') patch.kmeans_cluster = comparison.patchValue;
       if (comparison.fieldName === 'domain') patch.domain = comparison.patchValue;
       if (comparison.fieldName === 'som_cluster') patch.som_cluster = comparison.patchValue;
     }
@@ -571,6 +623,10 @@ function summarizeFieldComparisons(rows) {
     metadata: { canonical: 0, present: 0, matched: 0, mismatched: 0, deferred: 0 },
     cluster_id: { canonical: 0, present: 0, matched: 0, mismatched: 0, deferred: 0 },
     community_id: { canonical: 0, present: 0, matched: 0, mismatched: 0, deferred: 0 },
+    topology_label: { canonical: 0, present: 0, matched: 0, mismatched: 0, deferred: 0 },
+    ontology_label: { canonical: 0, present: 0, matched: 0, mismatched: 0, deferred: 0 },
+    cluster_key: { canonical: 0, present: 0, matched: 0, mismatched: 0, deferred: 0 },
+    kmeans_cluster: { canonical: 0, present: 0, matched: 0, mismatched: 0, deferred: 0 },
     domain: { canonical: 0, present: 0, matched: 0, mismatched: 0, deferred: 0 },
     som_cluster: { canonical: 0, present: 0, matched: 0, mismatched: 0, deferred: 0 },
   };
@@ -827,6 +883,10 @@ async function main() {
         packet_key: { status: canonicalRows.some((row) => row.packetKey) ? 'VISIBLE' : 'DEFERRED', value: canonicalRows.find((row) => row.packetKey)?.packetKey ?? null },
         cluster_id: { status: canonicalRows.some((row) => row.clusterId) ? 'VISIBLE' : 'MISSING', value: canonicalRows.find((row) => row.clusterId)?.clusterId ?? null },
         community_id: { status: canonicalRows.some((row) => row.communityId) ? 'VISIBLE' : 'MISSING', value: canonicalRows.find((row) => row.communityId)?.communityId ?? null },
+        topology_label: { status: canonicalRows.some((row) => row.topologyLabel) ? 'VISIBLE' : 'MISSING', value: canonicalRows.find((row) => row.topologyLabel)?.topologyLabel ?? null },
+        ontology_label: { status: canonicalRows.some((row) => row.ontologyLabel) ? 'VISIBLE' : 'MISSING', value: canonicalRows.find((row) => row.ontologyLabel)?.ontologyLabel ?? null },
+        cluster_key: { status: canonicalRows.some((row) => row.clusterKey) ? 'VISIBLE' : 'MISSING', value: canonicalRows.find((row) => row.clusterKey)?.clusterKey ?? null },
+        kmeans_cluster: { status: canonicalRows.some((row) => row.kmeansCluster) ? 'VISIBLE' : 'MISSING', value: canonicalRows.find((row) => row.kmeansCluster)?.kmeansCluster ?? null },
         som_cluster: { status: canonicalRows.some((row) => row.somCluster) ? 'VISIBLE' : 'MISSING', value: canonicalRows.find((row) => row.somCluster)?.somCluster ?? null },
         domain: { status: canonicalRows.some((row) => row.domain) ? 'VISIBLE' : 'MISSING', value: canonicalRows.find((row) => row.domain)?.domain ?? null },
         qdrant_tag_id: deferredFields.qdrant_tag_id,

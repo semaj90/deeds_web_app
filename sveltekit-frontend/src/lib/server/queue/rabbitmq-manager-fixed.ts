@@ -3,6 +3,7 @@
 import { EventEmitter } from 'events';
 import { traceQueue, traceLLM } from '$lib/server/observability/langfuse.js';
 import { ENV } from '$lib/server/env.server.js';
+import { getOllamaEndpoint } from '$lib/server/ollama.js';
 import { fastJsonParse } from '$lib/server/gpu/simdjson-bridge.js';
 
 interface AmqpConnection {
@@ -1287,7 +1288,7 @@ export class RabbitMQManager extends EventEmitter {
             },
             async (gen) => {
               const llmStart = performance.now();
-              const res = await ollamaFetch(`${ENV.OLLAMA_BASE_URL}/api/chat`, {
+              const res = await ollamaFetch(`${getOllamaEndpoint()}/api/chat`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({

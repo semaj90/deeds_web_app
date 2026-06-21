@@ -15,6 +15,7 @@ import { ENV } from '$lib/server/env.server.js';
 import { acePromptPreflightTool } from '$lib/server/ai/ace-prompt-preflight-tool.js';
 import { callGemma4WithTools, type Gemma4Tool, type Gemma4ToolCallResult } from './gemma4-codeintel.js';
 import { parseQdrantResponse } from '$lib/server/qdrant/parse-qdrant-json.js';
+import { getOllamaEmbeddingEndpoint } from '$lib/server/ollama.js';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Tool definitions + executors
@@ -43,7 +44,7 @@ const searchCodebase: Gemma4Tool = {
 
     try {
       // Embed the query then hit Qdrant
-      const embedResp = await fetch(`${ENV.OLLAMA_BASE_URL}/api/embed`, {
+      const embedResp = await fetch(`${getOllamaEmbeddingEndpoint()}/api/embed`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ model: ENV.OLLAMA_EMBED_MODEL ?? 'embeddinggemma:latest', input: query }),
@@ -248,7 +249,7 @@ const webSearch: Gemma4Tool = {
 
     // Fallback: semantic search in the web_research Qdrant collection
     try {
-      const embedResp = await fetch(`${ENV.OLLAMA_BASE_URL}/api/embed`, {
+      const embedResp = await fetch(`${getOllamaEmbeddingEndpoint()}/api/embed`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ model: ENV.OLLAMA_EMBED_MODEL ?? 'embeddinggemma:latest', input: query }),

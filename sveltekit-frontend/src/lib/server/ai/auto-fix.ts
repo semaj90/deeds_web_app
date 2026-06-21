@@ -1,4 +1,5 @@
 import { ENV } from '../env.server.js';
+import { getOllamaEndpoint } from '../ollama.js';
 
 export async function suggestFix(query: string, atlasCards: any[]) {
   const relevant = atlasCards.slice(0, 3);
@@ -12,7 +13,7 @@ User encountered: ${query}
 Suggest a fix based on the known failures above.
 `;
 
-  const ollamaUrl = ENV.OLLAMA_BASE_URL;
+  const ollamaUrl = getOllamaEndpoint();
 
   const res = await fetch(`${ollamaUrl}/api/generate`, {
     method: 'POST',

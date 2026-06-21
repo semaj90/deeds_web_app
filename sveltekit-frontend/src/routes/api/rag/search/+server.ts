@@ -18,12 +18,14 @@ import { embedText } from '$lib/server/embedding/embed.js';
 import { generateEmbeddings } from '$lib/server/grpc/embedding-client.js';
 import { traceEmbedding } from '$lib/server/observability/langfuse.js';
 import { getChatModelKeepAlive, ollamaFetch } from '$lib/server/ollama.js';
+import { getOllamaEndpoint } from '$lib/server/utils/ollama-endpoint.js';
 import { ENV } from '$lib/server/env.server.js';
 import { z } from 'zod';
 import { qdrant } from '$lib/server/vector/qdrant-manager.js';
 import { retrievalKey, getCaseVersion, TTL } from '$lib/server/cache-keys.js';
 import { setCache, getFromMemoryCache, getFromRedisCache } from '$lib/server/cache.js';
 import { getRedis } from '$lib/server/redis.js';
+import { searchViaGoRetrieval, type GoRetrievalSearchHit } from '$lib/server/retrieval/go-retrieval-client.js';
 
 // ── BM42 hybrid search collections (must have sparse 'bm25' vector configured) ──
 // legal_documents and evidence_items remain intentionally dense-only in the live corpus.
@@ -37,7 +39,7 @@ const CORRECTIVE_RAG_THRESHOLD = 0.5;
 
 async function reformulateQuery(query: string, topScore: number): Promise<string | null> {
   try {
-    const res = await ollamaFetch(`${ENV.OLLAMA_BASE_URL}/api/generate`, {
+    const res = await ollamaFetch(`${getOllamaEndpoint()}/api/generate`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -104,6 +106,17 @@ type PhaseStatus = 'success' | 'warning' | 'skipped';
 
 type SearchPhaseDiagnostics = {
   cache: { hit: boolean; source: string };
+  go_retrieval: {
+    enabled: boolean;
+    status: PhaseStatus;
+    endpoint?: string;
+    cacheHit?: boolean;
+    cacheSource?: string;
+    totalCandidates?: number;
+    rankingSource?: string;
+    provenance?: Record<string, unknown>;
+    telemetry?: Record<string, unknown>;
+  };
   embedding: {
     status: PhaseStatus;
     source: string;
@@ -143,6 +156,77 @@ function toConfidence(score: number): ConfidenceLevel {
   if (score >= 0.7) return 'medium';
   if (score >= 0.5) return 'low';
   return 'marginal';
+}
+
+function mapGoRetrievalHitToChunk(hit: GoRetrievalSearchHit): RetrievedChunk {
+  const text = String(
+    hit.text ??
+      hit.content ??
+      hit.snippet ??
+      hit.metadata?.content ??
+      hit.metadata?.summary ??
+      ''
+  );
+  const score = Number(hit.score ?? hit.rerank_score ?? hit.rerankScore ?? 0);
+  const sourceType = String(
+    hit.source_type ??
+      hit.sourceType ??
+      hit.metadata?.source_type ??
+      hit.metadata?.sourceType ??
+      'document'
+  ) as RetrievedChunk['source_type'];
+  const sourceId = String(
+    hit.source_id ??
+      hit.sourceId ??
+      hit.source_ref ??
+      hit.sourceRef ??
+      hit.canonical_source_ref ??
+      hit.canonicalSourceRef ??
+      hit.feature_id ??
+      hit.featureId ??
+      hit.chunk_id ??
+      hit.chunkId ??
+      hit.id ??
+      ''
+  );
+  const chunkId = String(
+    hit.chunk_id ??
+      hit.chunkId ??
+      hit.id ??
+      `${sourceId || 'go-retrieval'}:${Math.random().toString(36).slice(2, 8)}`
+  );
+  return {
+    chunk_id: chunkId,
+    text,
+    snippet: text.slice(0, 300),
+    score,
+    bm25_score: undefined,
+    dense_score: score,
+    rerank_score: hit.rerank_score ?? hit.rerankScore,
+    vector_score: score,
+    tfidf_score: undefined,
+    confidence: toConfidence(score),
+    source_type: sourceType,
+    source_id: sourceId,
+    source_title: String(
+      (hit.source_title ??
+        hit.sourceTitle ??
+        hit.title ??
+        hit.feature_label ??
+        hit.featureLabel ??
+        hit.file_path ??
+        hit.filePath ??
+        sourceId) || 'Go Retrieval Hit'
+    ),
+    source_url: hit.source_url ?? hit.sourceUrl,
+    page_num: hit.page_num ?? hit.pageNum,
+    section: hit.section,
+    has_image: Boolean(hit.has_image ?? hit.hasImage),
+    has_table: Boolean(hit.has_table ?? hit.hasTable),
+    seal_confidence: undefined,
+    related_entities: Array.isArray(hit.related_entities) ? hit.related_entities : [],
+    graph_neighbors: Array.isArray(hit.graph_neighbors) ? hit.graph_neighbors : [],
+  };
 }
 
 /**
@@ -348,6 +432,7 @@ export const POST: RequestHandler = async ({ request, url, locals }) => {
 
     const diagnostics: SearchPhaseDiagnostics = {
       cache: { hit: false, source: 'vector-cache' },
+      go_retrieval: { enabled: ENV.RAG_USE_GO_RETRIEVAL || ENV.GO_RETRIEVAL_HTTP_ENABLED, status: 'skipped' },
       embedding: { status: 'skipped', source: 'unknown', transport: 'unknown' },
       retrieval: {
         status: 'skipped',
@@ -474,6 +559,68 @@ export const POST: RequestHandler = async ({ request, url, locals }) => {
         });
       }
     }
+
+    // 0c. Go Retrieval gateway (delegated first-pass search, fallback to local stack on miss)
+    const goRetrieval = await searchViaGoRetrieval(
+      {
+        query,
+        topK: top_k,
+        minScore: min_score,
+        caseId: effectiveCaseId,
+        sectionTypes,
+        filters: {
+          use_hybrid,
+          use_rerank,
+          scoring_method,
+          userId,
+          conversationId,
+        },
+      },
+      8000
+    );
+    if (goRetrieval?.results?.length) {
+      const goChunks = goRetrieval.results.map(mapGoRetrievalHitToChunk);
+      const topGoChunks = goChunks.slice(0, top_k);
+      diagnostics.go_retrieval = {
+        enabled: true,
+        status: 'success',
+        endpoint: goRetrieval.endpoint,
+        cacheHit: Boolean(goRetrieval.cache?.hit),
+        cacheSource: goRetrieval.cache?.source,
+        totalCandidates: goChunks.length,
+        rankingSource: String(goRetrieval.ranking?.source ?? goRetrieval.ranking?.winner ?? goRetrieval.source ?? 'go-retrieval'),
+        provenance: goRetrieval.provenance,
+        telemetry: goRetrieval.telemetry,
+      };
+      diagnostics.retrieval = {
+        status: 'success',
+        collections: ['go-retrieval'],
+        sectionFilterUsed: Boolean(sectionTypes?.length),
+        hybridUsed: Boolean(goRetrieval.ranking?.hybridUsed ?? goRetrieval.ranking?.hybrid),
+        totalCandidates: goChunks.length,
+      };
+      if (goRetrieval.cache?.hit) {
+        diagnostics.cache = {
+          hit: true,
+          source: goRetrieval.cache.source ?? 'go-retrieval',
+        };
+      }
+      return json({
+        query,
+        results: topGoChunks,
+        diagnostics,
+        source: 'go-retrieval',
+        provenance: goRetrieval.provenance ?? null,
+        telemetry: goRetrieval.telemetry ?? null,
+        cache: goRetrieval.cache ?? null,
+        timestamp: new Date().toISOString(),
+      });
+    }
+    diagnostics.go_retrieval = {
+      enabled: true,
+      status: 'warning',
+      endpoint: ENV.GO_RETRIEVAL_HTTP_URL ?? ENV.RETRIEVAL_HTTP_URL,
+    };
 
     // 1. Generate embedding (use precomputed from client if provided, else server-side 4-tier chain)
     const embedStart = performance.now();

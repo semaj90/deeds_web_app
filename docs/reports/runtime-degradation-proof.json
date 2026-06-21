@@ -1,87 +1,26 @@
 {
-  "schema": "runtime_degradation_proof.v1",
-  "generated_at": "2026-06-19T23:20:06.121Z",
-  "mode": "APPLY",
-  "baseline": {
-    "ok": true,
-    "http_status": 200,
-    "packets": 5,
-    "strategy": "fts-only",
-    "cache_source": "live_fusion",
-    "duration_ms": 2399,
-    "error": null
-  },
-  "tests": [
+  "generated_at": "2026-06-21T06:03:13.859Z",
+  "mode": "DRY_RUN",
+  "services": [
     {
       "name": "valkey",
       "container": "legal-ai-valkey",
-      "expected": "cache miss fallback",
-      "stop": {
-        "ok": true,
-        "status": 0,
-        "stdout": "Flag --time has been deprecated, use --timeout instead\nlegal-ai-valkey",
-        "stderr": ""
-      },
-      "query": {
-        "ok": true,
-        "http_status": 200,
-        "packets": 5,
-        "strategy": "fts-only",
-        "cache_source": "live_fusion",
-        "duration_ms": 6203,
-        "error": null
-      },
-      "restore_status": "healthy",
-      "passed": true
+      "expected": "cache miss fallback"
     },
     {
       "name": "neo4j",
       "container": "legal-ai-neo4j",
-      "expected": "graph skipped with lexical/dense retrieval preserved",
-      "stop": {
-        "ok": true,
-        "status": 0,
-        "stdout": "Flag --time has been deprecated, use --timeout instead\nlegal-ai-neo4j",
-        "stderr": ""
-      },
-      "query": {
-        "ok": true,
-        "http_status": 200,
-        "packets": 5,
-        "strategy": "fts-only",
-        "cache_source": "live_fusion",
-        "duration_ms": 6520,
-        "error": null
-      },
-      "restore_status": "healthy",
-      "passed": true
+      "expected": "graph skipped with lexical/dense retrieval preserved"
     },
     {
       "name": "qdrant",
       "container": "legal-ai-qdrant",
-      "expected": "FTS fallback preserved",
-      "stop": {
-        "ok": true,
-        "status": 0,
-        "stdout": "Flag --time has been deprecated, use --timeout instead\nlegal-ai-qdrant",
-        "stderr": ""
-      },
-      "query": {
-        "ok": true,
-        "http_status": 200,
-        "packets": 5,
-        "strategy": "fts-only",
-        "cache_source": "live_fusion",
-        "duration_ms": 6014,
-        "error": null
-      },
-      "restore_status": "healthy",
-      "passed": true
+      "expected": "FTS fallback preserved"
     }
   ],
+  "note": "Pass --apply to perform bounded stop/query/start tests.",
+  "tests": [],
   "summary": {
-    "passed": 3,
-    "failed": 0,
-    "status": "PASS"
+    "status": "DRY_RUN"
   }
 }

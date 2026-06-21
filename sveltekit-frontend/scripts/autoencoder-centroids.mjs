@@ -5,10 +5,10 @@
  * Computes mean centroids in 64d encoded space for each som_cluster,
  * then writes them to Redis at gpu:autoencoder:centroids_64.
  *
- * Primary path: reads encoded_64 from payloads or named vectors already
+ * Primary path: reads latent_64 from payloads or named vectors already
  * backfilled by autoencoder-backfill-qdrant.mjs (run that first).
  *
- * Fallback: if a point lacks encoded_64, encodes from 'content' on-the-fly
+ * Fallback: if a point lacks latent_64, encodes from 'content' on-the-fly
  * using weights loaded from Redis.
  *
  * Usage:
@@ -24,7 +24,7 @@ dotenv.config();
 
 const QDRANT_URL     = process.env.QDRANT_URL ?? 'http://localhost:6333';
 const REDIS_URL      = process.env.REDIS_URL  ?? 'redis://localhost:6379';
-const COLLECTION     = 'codebase_chunks_768';
+const COLLECTION     = 'codebase_topology_64';
 const CENTROIDS_KEY  = 'gpu:autoencoder:centroids_64';
 const META_KEY       = 'gpu:autoencoder:centroids_64_meta';
 const HISTORY_STREAM = 'gpu:autoencoder:centroids_64:history';
@@ -165,16 +165,16 @@ async function main() {
         // In live mode, keep connection open for writes at the end
     }
 
-    // Check if encoded_64 slot exists — if so, read it directly (faster)
-    const hasEncoded64 = await hasVectorSlot('encoded_64');
-    const withVectors = hasEncoded64 ? ['encoded_64', 'content'] : ['content'];
-    log(`[qdrant] encoded_64 slot: ${hasEncoded64 ? 'present (primary path)' : 'absent (fallback: encode from content)'}`);
+    // Check if latent_64 slot exists — if so, read it directly (faster)
+    const hasEncoded64 = await hasVectorSlot('latent_64');
+    const withVectors = hasEncoded64 ? ['latent_64', 'content'] : ['content'];
+    log(`[qdrant] latent_64 slot: ${hasEncoded64 ? 'present (primary path)' : 'absent (fallback: encode from content)'}`);
 
     // Scroll Qdrant — request vectors + som_cluster payload
     const clusters = new Map(); // clusterId -> { sum: Float32Array(64), count: number }
     let offset       = null;
     let totalScanned = 0;
-    let primary      = 0; // used encoded_64 directly
+    let primary      = 0; // used latent_64 directly
     let fallback     = 0; // encoded from content on-the-fly
     let noVector     = 0;
     let noCluster    = 0;
@@ -201,12 +201,12 @@ async function main() {
                 continue;
             }
 
-            // Try encoded_64 payload/vector first, fall back to encoding content on-the-fly
-            let encoded64 = pt.payload?.encoded_64;
+            // Try latent_64 payload/vector first, fall back to encoding content on-the-fly
+            let encoded64 = pt.payload?.latent_64;
             if (Array.isArray(encoded64) && encoded64.length === ENCODED_DIM) {
                 primary++;
             } else {
-                encoded64 = pt.vector?.encoded_64;
+                encoded64 = pt.vector?.latent_64;
                 if (Array.isArray(encoded64) && encoded64.length === ENCODED_DIM) {
                     primary++;
                 } else {
@@ -300,7 +300,7 @@ async function main() {
 
     log('\nFinal Summary:');
     log(`- Scanned:    ${totalScanned}`);
-    log(`- Primary:    ${primary} (used encoded_64)`);
+    log(`- Primary:    ${primary} (used latent_64)`);
     log(`- Fallback:   ${fallback} (encoded from content)`);
     log(`- No-vector:  ${noVector}`);
     log(`- No-cluster: ${noCluster}`);

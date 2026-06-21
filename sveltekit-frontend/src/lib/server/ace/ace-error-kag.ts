@@ -21,6 +21,7 @@ import { ENV } from '$lib/server/env.server.js';
 import { db, qdrant } from '$lib/server/db/unified-client.js';
 import { sql } from 'drizzle-orm';
 import { assertDirectOllamaAllowed, ollamaFetch } from '$lib/server/ollama.js';
+import { getOllamaEndpoint, getOllamaEmbeddingEndpoint } from '$lib/server/utils/ollama-endpoint.js';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Types
@@ -82,7 +83,7 @@ async function callGemma4ForErrorSummary(
       'error-summary',
       'Schema-constrained error object extraction currently uses direct /api/chat format.'
     );
-    const resp = await ollamaFetch(`${ENV.OLLAMA_BASE_URL}/api/chat`, {
+    const resp = await ollamaFetch(`${getOllamaEndpoint()}/api/chat`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -128,7 +129,7 @@ async function callGemma4ForErrorSummary(
 
 async function embedText(text: string): Promise<number[] | null> {
   try {
-    const resp = await fetch(`${ENV.OLLAMA_BASE_URL}/api/embed`, {
+    const resp = await fetch(`${getOllamaEmbeddingEndpoint()}/api/embed`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ model: ENV.OLLAMA_EMBED_MODEL ?? 'embeddinggemma:latest', input: text }),

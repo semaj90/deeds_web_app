@@ -241,6 +241,7 @@ async function synthesizeWithLLM(
 ): Promise<LLMSynthesis | null> {
   const { ollamaFetch } = await import('$lib/server/ollama.js');
   const { ENV } = await import('$lib/server/env.server.js');
+  const { getOllamaEndpoint } = await import('$lib/server/utils/ollama-endpoint.js');
 
   // Check Redis for cached synthesis
   const synthCacheKey = `llm_synthesis:${input.evidenceId}`;
@@ -276,7 +277,7 @@ Respond with ONLY valid JSON (no markdown):
 }`;
 
   try {
-    const res = await ollamaFetch(`${ENV.OLLAMA_BASE_URL}/api/generate`, {
+    const res = await ollamaFetch(`${getOllamaEndpoint()}/api/generate`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({

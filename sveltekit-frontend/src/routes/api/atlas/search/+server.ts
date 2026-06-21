@@ -3,7 +3,7 @@
  *
  * Atlas packet ANN cascade — 6-stage retrieval + ranking pipeline:
  *
- *   Stage 0: Qdrant payload pre-filter (feature_id + community_id + domain_class)
+ *   Stage 0: Qdrant payload pre-filter (feature_id + community_id + domain_class + topology/ontology)
  *            → narrows search space from ~54k to ~4k candidates
  *   Stage 1: ANN vector search (EmbeddingGemma 768-dim) → top 100
  *   Stage 1.5: TurboVec.Search gRPC live rerank (SIMD/CPU, ~5ms for top 500→100)
@@ -67,6 +67,10 @@ const SearchSchema = z.object({
   feature_id:   z.string().optional(),   // pre-filter hint
   community_id: z.string().optional(),   // pre-filter hint
   domain_class: z.string().optional(),   // pre-filter hint
+  topology_label: z.string().optional(),  // pre-filter hint
+  ontology_label: z.string().optional(),  // pre-filter hint
+  cluster_key: z.string().optional(),     // pre-filter hint
+  kmeans_cluster: z.union([z.string(), z.number()]).optional(), // pre-filter hint
   skip_neo4j:   z.boolean().optional().default(false),
   skip_rerank:  z.boolean().optional().default(false),
 });
@@ -81,6 +85,10 @@ interface AtlasPacket {
   domain_class:        string | null;
   domain?:             string | null;
   ontology?:           string[] | null;
+  topology_label?:     string | null;
+  ontology_label?:     string | null;
+  cluster_key?:        string | null;
+  kmeans_cluster?:     string | number | null;
   concept_ids:         string[];
   summary:             string | null;
   metadata?:           Record<string, unknown> | null;
@@ -233,13 +241,23 @@ async function qdrantSearch(
     featureId,
     communityId,
     domainClass,
-  }: { topK: number; featureId?: string; communityId?: string; domainClass?: string }
+    topologyLabel,
+    ontologyLabel,
+    clusterKey,
+    kmeansCluster,
+  }: { topK: number; featureId?: string; communityId?: string; domainClass?: string; topologyLabel?: string; ontologyLabel?: string; clusterKey?: string; kmeansCluster?: string | number }
 ): Promise<QdrantHit[]> {
   // Build pre-filter from provided hints (Stage 0 narrowing)
   const must: unknown[] = [];
   if (featureId)   must.push({ key: 'feature_id',   match: { value: featureId } });
   if (communityId) must.push({ key: 'community_id', match: { value: communityId } });
   if (domainClass) must.push({ key: 'domain_class', match: { value: domainClass } });
+  if (topologyLabel) must.push({ key: 'topology_label', match: { value: topologyLabel } });
+  if (ontologyLabel) must.push({ key: 'ontology_label', match: { value: ontologyLabel } });
+  if (clusterKey) must.push({ key: 'cluster_key', match: { value: clusterKey } });
+  if (kmeansCluster !== undefined && kmeansCluster !== null && String(kmeansCluster).trim() !== '') {
+    must.push({ key: 'kmeans_cluster', match: { value: kmeansCluster } });
+  }
 
   const body: Record<string, unknown> = {
     vector:       { name: 'content', vector },
@@ -384,6 +402,10 @@ async function hydrateHitsFromPostgres(hits: QdrantHit[]): Promise<void> {
       columns.has('source_ref') ? 'source_ref' : 'NULL::text as source_ref',
       columns.has('feature_id') ? 'feature_id' : 'NULL::text as feature_id',
       columns.has('feature_label') ? 'feature_label' : 'NULL::text as feature_label',
+      columns.has('topology_label') ? 'topology_label' : 'NULL::text as topology_label',
+      columns.has('ontology_label') ? 'ontology_label' : 'NULL::text as ontology_label',
+      columns.has('cluster_key') ? 'cluster_key' : 'NULL::text as cluster_key',
+      columns.has('kmeans_cluster') ? 'kmeans_cluster' : 'NULL::text as kmeans_cluster',
       columns.has('metadata') ? 'metadata' : 'NULL::jsonb as metadata',
       columns.has('qdrant_tag_id') ? 'qdrant_tag_id' : 'NULL::text as qdrant_tag_id',
       columns.has('cluster_id') ? 'cluster_id' : 'NULL::text as cluster_id',
@@ -444,6 +466,12 @@ async function hydrateHitsFromPostgres(hits: QdrantHit[]): Promise<void> {
         merged.feature_label = String(merged.feature_id)
           .replace(/[_-]+/g, ' ')
           .replace(/\b([a-z])/g, (m) => m.toUpperCase());
+      }
+      if (!merged.topology_label && merged.domain_class) {
+        merged.topology_label = String(merged.domain_class);
+      }
+      if (!merged.ontology_label && merged.domain) {
+        merged.ontology_label = String(merged.domain);
       }
       if (!merged.redis_hot_key && merged.redis_key) {
         merged.redis_hot_key = merged.redis_key;
@@ -748,7 +776,7 @@ export const POST: RequestHandler = async ({ request }) => {
     return json({ error: 'Invalid request', issues: parsed.error.issues }, { status: 400 });
   }
 
-  const { query, top_k, feature_id, community_id, domain_class, skip_neo4j, skip_rerank } = parsed.data;
+  const { query, top_k, feature_id, community_id, domain_class, topology_label, ontology_label, cluster_key, kmeans_cluster, skip_neo4j, skip_rerank } = parsed.data;
   const t0 = Date.now();
 
   const stats: Record<string, number | string | boolean | null> = {};
@@ -815,7 +843,7 @@ export const POST: RequestHandler = async ({ request }) => {
 
   // L3: Query Qdrant multi-vector with payload filters
   const t_l3 = Date.now();
-  cacheEnvelope = await queryQdrantCascade(vector, { feature_id, community_id, domain_class }, top_k * 5);
+  cacheEnvelope = await queryQdrantCascade(vector, { feature_id, community_id, domain_class, topology_label, ontology_label, cluster_key, kmeans_cluster }, top_k * 5);
   const l3_latency = Date.now() - t_l3;
   stats.cache_l3_hit = cacheEnvelope !== null;
   stats.cache_l3_latency_ms = l3_latency;
@@ -833,7 +861,7 @@ export const POST: RequestHandler = async ({ request }) => {
   // Extract Qdrant hits — re-fetch full payloads for downstream processing
   // (cache envelope contains metadata but needs vector data for reranking)
   const t1   = Date.now();
-  const hits = await qdrantSearch(vector, { topK: top_k * 5, featureId: feature_id, communityId: community_id, domainClass: domain_class });
+  const hits = await qdrantSearch(vector, { topK: top_k * 5, featureId: feature_id, communityId: community_id, domainClass: domain_class, topologyLabel: topology_label, ontologyLabel: ontology_label, clusterKey: cluster_key, kmeansCluster: kmeans_cluster });
   stats.qdrant_ms   = Date.now() - t1;
   stats.qdrant_hits = hits.length;
 
@@ -970,6 +998,10 @@ export const POST: RequestHandler = async ({ request }) => {
       domain_class:         (p.domain_class as string | null) ?? null,
       domain:               (p.domain as string | null) ?? (p.domain_class as string | null) ?? 'utility',
       ontology:             (Array.isArray(p.ontology) ? p.ontology.map((value) => String(value)) : ((p.domain as string | null) ?? (p.domain_class as string | null) ? [String((p.domain as string | null) ?? (p.domain_class as string | null))] : null)),
+      topology_label:       (p.topology_label as string | null) ?? (p.topologyLabel as string | null) ?? (p.domain_class as string | null) ?? null,
+      ontology_label:       (p.ontology_label as string | null) ?? (p.ontologyLabel as string | null) ?? (p.domain as string | null) ?? (p.domain_class as string | null) ?? null,
+      cluster_key:          (p.cluster_key as string | null) ?? (p.clusterKey as string | null) ?? null,
+      kmeans_cluster:       (p.kmeans_cluster as string | number | null) ?? (p.kmeansCluster as string | number | null) ?? (p.cluster_id as string | number | null) ?? null,
       concept_ids:          (p.concept_ids  as string[] | undefined) ?? [],
       summary:              (p.summary      as string | null) ?? null,
       metadata:             (p.metadata && typeof p.metadata === 'object') ? (p.metadata as Record<string, unknown>) : null,

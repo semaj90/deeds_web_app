@@ -1,5 +1,4 @@
 #!/usr/bin/env node
-import 'dotenv/config';
 /**
  * ensure-llama-server.mjs
  *
@@ -21,6 +20,7 @@ import 'dotenv/config';
 
 import os from 'node:os';
 import net from 'node:net';
+import dotenv from 'dotenv';
 import { spawn } from 'node:child_process';
 import { existsSync, readFileSync } from 'node:fs';
 import path from 'node:path';
@@ -32,8 +32,23 @@ const workspaceRoot = projectRoot.endsWith('sveltekit-frontend')
   ? path.resolve(projectRoot, '..')
   : projectRoot;
 
-const HOST = process.env.LLAMA_SERVER_HOST ?? '127.0.0.1';
-const PORT = parseInt(process.env.LLAMA_SERVER_PORT ?? '8090', 10);
+function loadEnvFile(filePath, baseValues = {}) {
+  if (!existsSync(filePath)) return {};
+  const parsed = dotenv.parse(readFileSync(filePath));
+  for (const [key, value] of Object.entries(parsed)) {
+    const current = process.env[key];
+    if (current === undefined || current === baseValues[key]) {
+      process.env[key] = value;
+    }
+  }
+  return parsed;
+}
+
+const rootEnv = loadEnvFile(path.join(projectRoot, '.env'));
+loadEnvFile(path.join(projectRoot, '.env.local'), rootEnv);
+
+const HOST = process.env.LLAMA_SERVER_HOST ?? process.env.TURBO_HOST ?? '127.0.0.1';
+const PORT = parseInt(process.env.LLAMA_SERVER_PORT ?? process.env.TURBO_PORT ?? '8090', 10);
 const BASE = `http://${HOST}:${PORT}`;
 const TIMEOUT = 1_000;
 // 5.3 GB GGUF at -ngl 99 on RTX 3060 Ti takes 45–90s to load; poll for up to 3 min

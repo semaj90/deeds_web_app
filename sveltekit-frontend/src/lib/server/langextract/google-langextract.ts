@@ -2,8 +2,9 @@
 // The service runs on port 8095 and uses gemma4-rotorquant:latest via Ollama.
 import { langextractFetch } from '$lib/server/langextract-client.js';
 import { ENV } from '$lib/server/env.server.js';
+import { getOllamaEndpoint } from '$lib/server/ollama.js';
 
-const OLLAMA_BASE_URL = ENV.OLLAMA_BASE_URL;
+const OLLAMA_BASE_URL = getOllamaEndpoint();
 
 /**
  * Extract keywords from text using the LangExtract service.

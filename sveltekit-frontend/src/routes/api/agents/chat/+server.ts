@@ -3,6 +3,7 @@ import { json } from '@sveltejs/kit';
 import { ENV } from '$lib/server/env.server.js';
 import { z } from 'zod';
 import { ollamaFetch } from '$lib/server/ollama.js';
+import { getOllamaEndpoint } from '$lib/server/utils/ollama-endpoint.js';
 import { recordSearchQuery } from '$lib/server/features/observability/index.js';
 
 const agentChatSchema = z.object({
@@ -217,7 +218,7 @@ Rules:
 
 		// Iterative tool calling loop
 		while (toolRounds < MAX_TOOL_ROUNDS) {
-			const chatRes = await ollamaFetch(`${ENV.OLLAMA_BASE_URL}/api/chat`, {
+			const chatRes = await ollamaFetch(`${getOllamaEndpoint()}/api/chat`, {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify({
@@ -268,7 +269,7 @@ Rules:
 		}
 
 		// Exhausted tool rounds — get final response with trace
-		const finalRes = await ollamaFetch(`${ENV.OLLAMA_BASE_URL}/api/chat`, {
+		const finalRes = await ollamaFetch(`${getOllamaEndpoint()}/api/chat`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({

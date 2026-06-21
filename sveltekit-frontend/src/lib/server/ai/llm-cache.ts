@@ -11,10 +11,10 @@
 
 import { qdrant, deterministicPointId } from '$lib/server/vector/qdrant-manager.js';
 import { ENV } from '$lib/server/env.server.js';
-import { ollamaFetch } from '$lib/server/ollama.js';
+import { getOllamaEndpoint, ollamaFetch } from '$lib/server/ollama.js';
 import { generateContextHash } from '$lib/server/cache-keys.js';
 
-const OLLAMA_URL = ENV.OLLAMA_BASE_URL;
+const OLLAMA_URL = getOllamaEndpoint();
 const EMBEDDING_MODEL = ENV.OLLAMA_EMBED_MODEL;
 
 // Cache hit threshold — only return cached response if similarity >= 0.88

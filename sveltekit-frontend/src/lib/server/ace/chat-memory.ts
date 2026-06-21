@@ -15,9 +15,10 @@
 
 import { ENV } from '$lib/server/env.server.js';
 import { getRedis } from '$lib/server/redis.js';
+import { getOllamaEmbeddingEndpoint } from '$lib/server/ollama.js';
 
 const QDRANT_URL = ENV.QDRANT_URL;
-const OLLAMA_URL = ENV.OLLAMA_BASE_URL;
+const OLLAMA_URL = getOllamaEmbeddingEndpoint();
 const COLLECTION = 'chat_messages';
 const VECTOR_NAME = 'message';
 const EMBED_MODEL = 'embeddinggemma:latest';

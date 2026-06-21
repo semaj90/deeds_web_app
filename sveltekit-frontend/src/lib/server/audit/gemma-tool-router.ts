@@ -17,7 +17,12 @@
  */
 
 import { z } from 'zod';
-import { assertDirectOllamaAllowed, ollamaFetch, VLM_MODELS } from '$lib/server/ollama.js';
+import {
+  assertDirectOllamaAllowed,
+  getOllamaEndpoint,
+  ollamaFetch,
+  VLM_MODELS,
+} from '$lib/server/ollama.js';
 import { ENV } from '$lib/server/env.server.js';
 
 // ── Tool Definitions (OpenAI-compatible format for Ollama) ────────────
@@ -284,7 +289,7 @@ export async function executeAuditTool(
         const limit = Number(args.limit ?? 10);
 
         // embed the query
-        const embedRes = await ollamaFetch(`${ENV.OLLAMA_BASE_URL}/api/embed`, {
+        const embedRes = await ollamaFetch(`${getOllamaEndpoint()}/api/embed`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ model: VLM_MODELS.embedding, input: query }),
@@ -493,7 +498,7 @@ export async function runAuditPlanner(req: AuditPlannerRequest): Promise<AuditPl
     { role: 'user', content: req.query },
   ];
 
-  const ollamaUrl = ENV.OLLAMA_BASE_URL;
+  const ollamaUrl = getOllamaEndpoint();
   const keepAlive = '2m';
 
   // Multi-round tool-calling loop

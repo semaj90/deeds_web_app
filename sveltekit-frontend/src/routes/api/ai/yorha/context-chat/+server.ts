@@ -10,16 +10,16 @@ import { pgRows } from '$lib/server/db/client';
  */
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
-import { ENV } from '$lib/server/env.server.js';
 import { z } from 'zod';
 import { ollamaFetch } from '$lib/server/ollama.js';
+import { getOllamaEndpoint } from '$lib/server/utils/ollama-endpoint.js';
 
 const yorhaChatSchema = z.object({
 	message: z.string().trim().min(1, 'Missing message').max(50000),
 	caseId: z.string().max(500).nullable().optional()
 });
 
-const OLLAMA_URL = ENV.OLLAMA_BASE_URL;
+const OLLAMA_URL = getOllamaEndpoint();
 const MODEL = 'gemma4-rotorquant:latest';
 
 export const POST: RequestHandler = async ({ request, locals }) => {

@@ -4,6 +4,7 @@
 import type { OllamaConfig, ModelConfig } from './types.js';
 import { SYSTEM_GEMMA4_LEGAL, SYSTEM_EMBEDDING } from '$lib/ai/prompts.js';
 import { ENV } from '$lib/server/env.server.js';
+import { getOllamaEndpoint } from '$lib/server/utils/ollama-endpoint.js';
 
 /**
  * Ollama Configuration for High-Performance AI Assistant
@@ -62,7 +63,7 @@ export const FALLBACK_CHAIN = {
 };
 
 export const OLLAMA_CONFIG: OllamaConfig = {
-  baseUrl: ENV.OLLAMA_BASE_URL,
+  baseUrl: getOllamaEndpoint() ?? ENV.OLLAMA_BASE_URL,
   defaultModel: 'gemma4-rotorquant:latest',
 	embeddingModel: 'embeddinggemma',
 	fallbackModel: 'gemma4-rotorquant:latest',

@@ -37,27 +37,27 @@ export function normalizeSourceRef(input) {
   }
 
   ref = ref.replace(/^file:\/+/, '');
+  ref = ref.replace(/^file:/, '');
 
-  const repoMarkers = [
-    '/deeds-web-app/sveltekit-frontend/',
-    '/deeds-web-app/',
-    'deeds-web-app/sveltekit-frontend/',
-    'deeds-web-app/',
-  ];
+  const cleanPath = ref.replace(/^\.?\//, '').trim();
 
-  for (const marker of repoMarkers) {
-    const idx = ref.indexOf(marker);
-    if (idx >= 0) {
-      ref = ref.slice(idx + marker.length);
-      break;
-    }
+  if (cleanPath.startsWith('sveltekit-frontend/')) {
+    return cleanPath;
+  }
+  if (cleanPath.startsWith('src/')) {
+    return `sveltekit-frontend/${cleanPath}`;
   }
 
-  ref = ref.replace(/^\.?\//, '');
-  ref = path.posix.normalize(ref);
+  const srcIdx = cleanPath.indexOf('src/');
+  if (srcIdx >= 0) {
+    return `sveltekit-frontend/${cleanPath.slice(srcIdx)}`;
+  }
+  const frontendIdx = cleanPath.indexOf('sveltekit-frontend/');
+  if (frontendIdx >= 0) {
+    return cleanPath.slice(frontendIdx);
+  }
 
-  if (ref === '.') return '';
-  return ref;
+  return cleanPath;
 }
 
 export function classifySourceRef(input) {

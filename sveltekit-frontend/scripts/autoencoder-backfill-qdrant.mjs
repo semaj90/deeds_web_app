@@ -2,16 +2,16 @@
 /**
  * scripts/autoencoder-backfill-qdrant.mjs
  *
- * Backfills the 'encoded_64' named vector into Qdrant codebase_chunks_768.
+ * Backfills the 64d latent vector into Qdrant codebase_topology_64.
  * Loads trained autoencoder weights from Redis (ace:autoencoder:weights),
  * scrolls all points that have a 'content' vector, encodes 768→256→64 via
- * two-layer tanh network, and upserts ONLY the encoded_64 named vector.
+ * two-layer tanh network, and upserts ONLY the latent_64 named vector.
  *
  * The 'content' vector is NOT re-sent — uses PUT /points/vectors to update
- * only the encoded_64 slot without touching existing vectors.
+ * only the latent_64 slot without touching existing vectors.
  *
  * Usage:
- *   npm run ae:backfill                    (live — upserts encoded_64 to Qdrant)
+ *   npm run ae:backfill                    (live — upserts latent_64 to Qdrant)
  *   npm run ae:backfill:dry                (dry-run — no Qdrant writes)
  *   npm run ae:backfill:force              (re-encode even if encoded_at set)
  */
@@ -23,8 +23,8 @@ dotenv.config();
 
 const QDRANT_URL   = process.env.QDRANT_URL   ?? 'http://localhost:6333';
 const REDIS_URL    = process.env.REDIS_URL    ?? 'redis://localhost:6379';
-const COLLECTION   = 'codebase_chunks_768';
-const ENCODED_NAME = 'encoded_64';
+const COLLECTION   = 'codebase_topology_64';
+const ENCODED_NAME = 'latent_64';
 const CONTENT_DIM  = 768;
 const HIDDEN_DIM   = 256;
 const ENCODED_DIM  = 64;
@@ -92,7 +92,7 @@ async function loadWeights(redis) {
 
     if (weights.bestLoss === 0) {
         console.warn('[backfill] WARNING: bestLoss=0 — weights may be untrained Xavier init.');
-        console.warn('[backfill] encoded_64 vectors will be produced but have no semantic meaning yet.');
+        console.warn('[backfill] latent_64 vectors will be produced but have no semantic meaning yet.');
     }
     return weights;
 }
@@ -161,9 +161,25 @@ async function qdrantPut(path, body) {
     return res.json();
 }
 
-// ── Ensure encoded_64 vector slot exists in the collection schema ─────────────
+// ── Ensure latent_64 vector slot exists in the collection schema ──────────────
 async function ensureVectorSlot() {
-    const info = await qdrantGet(`/collections/${COLLECTION}`);
+    let info;
+    try {
+      info = await qdrantGet(`/collections/${COLLECTION}`);
+    } catch {
+      if (FLAGS.dryRun) {
+        log(`[dry-run] Would create Qdrant collection '${COLLECTION}' with '${ENCODED_NAME}' (dim=${ENCODED_DIM}).`);
+        return false;
+      }
+      await qdrantPut(`/collections/${COLLECTION}`, {
+        vectors: {
+          [ENCODED_NAME]: { size: ENCODED_DIM, distance: 'Cosine' },
+        },
+        optimizers_config: { indexing_threshold: 20000 },
+        quantization_config: { scalar: { type: 'int8', always_ram: true } },
+      });
+      info = await qdrantGet(`/collections/${COLLECTION}`);
+    }
     const vectors = info.result?.config?.params?.vectors ?? {};
     if (vectors[ENCODED_NAME]) {
         log(`[qdrant] '${ENCODED_NAME}' slot already configured (dim=${vectors[ENCODED_NAME].size}).`);
@@ -182,7 +198,7 @@ async function ensureVectorSlot() {
       await qdrantPut(`/collections/${COLLECTION}/vectors/${ENCODED_NAME}`, {
         dense: { size: ENCODED_DIM, distance: 'Cosine' },
       });
-      log(`[qdrant] '${ENCODED_NAME}' slot added via named-vector API.`);
+        log(`[qdrant] '${ENCODED_NAME}' slot added via named-vector API.`);
       const refreshed = await qdrantGet(`/collections/${COLLECTION}`);
       return Boolean(refreshed.result?.config?.params?.vectors?.[ENCODED_NAME]);
     } catch (error) {
@@ -203,7 +219,7 @@ async function ensureVectorSlot() {
 
 // ── Main ──────────────────────────────────────────────────────────────────────
 async function main() {
-    log('=== Autoencoder encoded_64 Backfill ===');
+    log('=== Autoencoder latent_64 Backfill ===');
     log(`[cfg] dryRun=${FLAGS.dryRun} limit=${FLAGS.limit} batchSize=${FLAGS.batchSize} force=${FLAGS.force}`);
 
     // 1. Load weights

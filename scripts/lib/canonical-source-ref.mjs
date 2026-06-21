@@ -66,38 +66,28 @@ export function normalizeSourceRef(input) {
   // Strip leading slash(es).
   s = s.replace(/^\/+/, '');
 
-  // Strip known prefixes (order matters — most specific first).
-  // Each tuple: [prefix, remainder_prepend]
-  // remainder_prepend is re-prepended after stripping so the canonical
-  // 'src/' root is preserved even when the prefix consumed it.
-  const ordered = [
-    ['file:sveltekit-frontend/src/', 'src/'],
-    ['file:sveltekit-frontend/', ''],
-    ['file:src/', 'src/'],
-    ['file:', ''],
-    ['sveltekit-frontend/src/', 'src/'],
-    ['sveltekit-frontend/', ''],
-  ];
-  for (const [prefix, prepend] of ordered) {
-    if (s.startsWith(prefix)) {
-      s = prepend + s.slice(prefix.length);
-      break;
-    }
+  // Clean file: prefix
+  s = s.replace(/^file:/, '');
+
+  const cleanPath = s.replace(/^\.?\//, '').trim();
+
+  if (cleanPath.startsWith('sveltekit-frontend/')) {
+    return cleanPath;
+  }
+  if (cleanPath.startsWith('src/')) {
+    return `sveltekit-frontend/${cleanPath}`;
   }
 
-  // Strip any remaining absolute path segments that appear before a known
-  // root like src/, scripts/, tests/, etc.
-  const knownRoots = ['src/', 'scripts/', 'tests/', 'simd-bridge/', 'docs/', 'memory/'];
-  const rootIdx = knownRoots
-    .map(r => s.indexOf(r))
-    .filter(i => i > 0)
-    .sort((a, b) => a - b)[0];
-
-  if (rootIdx !== undefined) {
-    s = s.slice(rootIdx);
+  const srcIdx = cleanPath.indexOf('src/');
+  if (srcIdx >= 0) {
+    return `sveltekit-frontend/${cleanPath.slice(srcIdx)}`;
+  }
+  const frontendIdx = cleanPath.indexOf('sveltekit-frontend/');
+  if (frontendIdx >= 0) {
+    return cleanPath.slice(frontendIdx);
   }
 
-  return s;
+  return cleanPath;
 }
 
 /**

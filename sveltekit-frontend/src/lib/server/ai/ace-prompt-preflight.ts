@@ -6,6 +6,7 @@ import { promisify } from 'node:util';
 import { QdrantClient } from '@qdrant/js-client-rest';
 import Redis from 'ioredis';
 import { ENV } from '$lib/server/env.server.js';
+import { getOllamaEmbeddingEndpoint } from '$lib/server/ollama.js';
 import { tryEmbedOllama } from '$lib/server/embeddings/ollama.js';
 import { countTokens, enforceTokenBudget } from '$lib/server/llm/token-budget.js';
 import { getRedis } from '$lib/server/redis.js';
@@ -541,11 +542,11 @@ export async function buildAcePromptPreflight(
   // 4. Qdrant dense search
   const qdrantStart = Date.now();
   let queryEmbedding: number[] | null = null;
-  const embedded = await tryEmbedOllama(input.query, {
-    model: 'embeddinggemma:latest',
-    baseUrl: ENV.OLLAMA_BASE_URL,
-    timeoutMs: 4000,
-  }).catch(() => null);
+    const embedded = await tryEmbedOllama(input.query, {
+      model: 'embeddinggemma:latest',
+      baseUrl: getOllamaEmbeddingEndpoint(),
+      timeoutMs: 4000,
+    }).catch(() => null);
   if (embedded?.embedding) {
     queryEmbedding = embedded.embedding;
   } else {

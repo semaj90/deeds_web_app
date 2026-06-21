@@ -74,11 +74,24 @@ import safeJsonPost from '$lib/server/utils/safe-json-post.js';
 
 // ── Config ──────────────────────────────────────────────────────────────────
 
+const CHAT_BASE_URL =
+  ENV.TURBOQUANT_URL ??
+  ENV.TURBOQUANT_BASE_URL ??
+  ENV.LLAMA_SERVER_URL ??
+  ENV.OLLAMA_BASE_URL;
+const EMBED_BASE_URL =
+  ENV.OLLAMA_EMBED_BASE_URL ??
+  ENV.OLLAMA_BASE_URL;
+
 export function getOllamaEndpoint(): string {
-  return ENV.OLLAMA_BASE_URL;
+  return CHAT_BASE_URL;
 }
 
-const OLLAMA_BASE_URL = ENV.OLLAMA_BASE_URL;
+export function getOllamaEmbeddingEndpoint(): string {
+  return EMBED_BASE_URL;
+}
+
+const OLLAMA_BASE_URL = CHAT_BASE_URL;
 const CHAT_MODEL = ENV.OLLAMA_CHAT_MODEL;
 const REQUEST_TIMEOUT_MS = Number(process.env?.OLLAMA_TIMEOUT_MS ?? '600000');
 
@@ -868,7 +881,7 @@ export async function bifrostChat(
     try {
       // Embed the query using Ollama (embeddinggemma, 768-dim)
       const t0_embed = performance.now();
-      const embedRes = await fetch(`${OLLAMA_BASE_URL}/api/embed`, {
+      const embedRes = await fetch(`${EMBED_BASE_URL}/api/embed`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ model: VLM_MODELS.embedding, input: lastUserMsg }),
@@ -1011,7 +1024,7 @@ export async function bifrostChat(
 
     // ── Ollama Fallback ────────────────────────────────────────────────────
     // Default fallback if TurboQuant unavailable, not gated, or fails
-    const ollamaRes = await ollamaFetch(`${OLLAMA_BASE_URL}/api/chat`, {
+    const ollamaRes = await ollamaFetch(`${CHAT_BASE_URL}/api/chat`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -1193,7 +1206,7 @@ export async function bifrostChat(
       writebackQueued = true;
       (async () => {
         try {
-          const embedRes = await fetch(`${OLLAMA_BASE_URL}/api/embed`, {
+          const embedRes = await fetch(`${EMBED_BASE_URL}/api/embed`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ model: VLM_MODELS.embedding, input: lastUserMsg }),

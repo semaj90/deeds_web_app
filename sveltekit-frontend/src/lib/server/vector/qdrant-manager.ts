@@ -3,7 +3,11 @@ import { createHash } from 'crypto';
 import { promises as fs } from 'fs';
 import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 import { ENV } from '$lib/server/env.server.js';
-import { VECTOR_CONFIG, buildVectorPayload } from '$lib/server/config/vector-config.js';
+import {
+  VECTOR_CONFIG,
+  buildVectorPayload,
+  getCollectionDimension,
+} from '$lib/server/config/vector-config.js';
 import { generateSparseVector, type SparseVector } from './bm42-sparse.js';
 import { fastJsonParse } from '../gpu/simdjson-bridge.js';
 import { traceVectorSearch } from '../observability/langfuse.js';
@@ -93,12 +97,13 @@ export class QdrantManager {
             }> = [];
             for (const p of points) {
               const v = p.vector;
+              const expectedDim = getCollectionDimension(collectionName);
               if (Array.isArray(v)) {
-                if (v.length !== VECTOR_CONFIG.DIMENSIONS)
+                if (v.length !== expectedDim)
                   invalids.push({ id: p.id, found: v.length });
               } else if (v && typeof v === 'object') {
                 for (const [name, val] of Object.entries(v)) {
-                  if (Array.isArray(val) && (val as any).length !== VECTOR_CONFIG.DIMENSIONS) {
+                  if (Array.isArray(val) && (val as any).length !== expectedDim) {
                     invalids.push({ id: p.id, vectorName: name, found: (val as any).length });
                   }
                 }
@@ -114,7 +119,7 @@ export class QdrantManager {
                     {
                       error: 'invalid_vector_dimensions',
                       details: invalids,
-                      expected: VECTOR_CONFIG.DIMENSIONS,
+                      expected: getCollectionDimension(collectionName),
                       timestamp: new Date().toISOString(),
                     },
                     null,
@@ -125,7 +130,7 @@ export class QdrantManager {
                 console.error('Failed to write qdrant upsert dim report (wrapped upsert):', e);
               }
               throw new Error(
-                `Aborting Qdrant upsert: found ${invalids.length} points with invalid vector dimensions (expected ${VECTOR_CONFIG.DIMENSIONS}). See .tmp/qdrant-upsert-dim-report.json`
+                `Aborting Qdrant upsert: found ${invalids.length} points with invalid vector dimensions (expected ${getCollectionDimension(collectionName)}). See .tmp/qdrant-upsert-dim-report.json`
               );
             }
 
@@ -238,13 +243,13 @@ export class QdrantManager {
   }
 
   async initializeCollections() {
-    const dim = VECTOR_CONFIG.DIMENSIONS;
     const dist = VECTOR_CONFIG.DISTANCE_METRIC.QDRANT;
     const hnsw = VECTOR_CONFIG.QDRANT_HNSW;
     const quant = VECTOR_CONFIG.QDRANT_QUANTIZATION;
 
     const collectionConfigs = Object.entries(VECTOR_CONFIG.COLLECTION_VECTORS).map(
       ([name, schema]) => {
+        const dim = getCollectionDimension(name);
         const vectors: Record<string, { size: number; distance: string }> = {};
         for (const v of schema.vectors) {
           if (v === 'default') continue;

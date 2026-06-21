@@ -9,6 +9,7 @@
 import { getRedis } from '$lib/server/redis.js';
 import { execSync, spawn } from 'node:child_process';
 import { ENV } from '$lib/server/env.server.js';
+import { getOllamaEndpoint } from '$lib/server/ollama.js';
 
 export enum VlmMode {
   OFF = 'OFF',
@@ -236,7 +237,7 @@ function restartTurboQuant(modelPath: string, mmprojPath?: string): void {
  */
 async function unloadOllamaModel(model: string): Promise<void> {
   try {
-    await fetch(`${ENV.OLLAMA_BASE_URL}/api/generate`, {
+    await fetch(`${getOllamaEndpoint()}/api/generate`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ model, prompt: '', keep_alive: 0 }),

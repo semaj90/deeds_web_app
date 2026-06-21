@@ -1,35 +1,18 @@
 {
   "schema": "cold_storage_restore_proof.v1",
-  "generated_at": "2026-06-19T23:00:51.542Z",
-  "mode": "APPLY",
+  "generated_at": "2026-06-21T06:03:17.416Z",
+  "mode": "DRY_RUN",
   "source_path": "docs/reports/artifact-tiering-application.md",
   "source_hash": "4beaf759e92d2f453aa5a1ede9bc7d924fb07715fb35623da8bf00a9c0caba25",
   "source_size_bytes": 985,
   "object_path": "/atlas-cold/proofs/4beaf759e92d2f453aa5a1ede9bc7d924fb07715fb35623da8bf00a9c0caba25.md",
   "packet": {
-    "packet_key": "src/lib/server/db/schema/hypergraph_edges.ts:89b38dd701544ffd",
-    "source_ref": "sveltekit-frontend/src/lib/server/db/schema/hypergraph_edges.ts",
-    "feature_id": "database_orm"
+    "packet_key": "nes:src/lib/components/editor/LLMS.md",
+    "source_ref": "src/lib/components/editor/LLMS.md",
+    "feature_id": "repo.file.src.lib.components.editor.llms.md"
   },
-  "upload": {
-    "ok": true,
-    "status": 201,
-    "response": "{\"name\":\"4beaf759e92d2f453aa5a1ede9bc7d924fb07715fb35623da8bf00a9c0caba25.md\",\"size\":985}"
-  },
-  "restore": {
-    "ok": true,
-    "status": 200,
-    "restored_size_bytes": 985,
-    "restored_hash": "4beaf759e92d2f453aa5a1ede9bc7d924fb07715fb35623da8bf00a9c0caba25",
-    "hash_matches": true
-  },
-  "manifest": {
-    "id": "1",
-    "cold_object_key": "proof:4beaf759e92d2f453aa5a1ede9bc7d924fb07715fb35623da8bf00a9c0caba25",
-    "packet_key": "src/lib/server/db/schema/hypergraph_edges.ts:89b38dd701544ffd",
-    "source_ref": "sveltekit-frontend/src/lib/server/db/schema/hypergraph_edges.ts",
-    "feature_id": "database_orm",
-    "seaweedfs_path": "/atlas-cold/proofs/4beaf759e92d2f453aa5a1ede9bc7d924fb07715fb35623da8bf00a9c0caba25.md"
-  },
-  "status": "PASS"
+  "upload": null,
+  "restore": null,
+  "manifest": null,
+  "status": "DRY_RUN_READY"
 }

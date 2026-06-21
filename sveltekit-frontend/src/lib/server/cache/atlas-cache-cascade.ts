@@ -115,7 +115,15 @@ export async function checkBitfrostSemantic(
  */
 export async function queryQdrantCascade(
 	queryEmbedding: number[],
-	filters?: { feature_id?: string; community_id?: string; domain_class?: string },
+	filters?: {
+		feature_id?: string;
+		community_id?: string;
+		domain_class?: string;
+		topology_label?: string;
+		ontology_label?: string;
+		cluster_key?: string;
+		kmeans_cluster?: string | number;
+	},
 	limit: number = 20
 ): Promise<AtlasCacheHit | null> {
 	try {
@@ -131,6 +139,18 @@ export async function queryQdrantCascade(
 		}
 		if (filters?.domain_class) {
 			mustFilters.push({ key: 'domain_class', match: { value: filters.domain_class } });
+		}
+		if (filters?.topology_label) {
+			mustFilters.push({ key: 'topology_label', match: { value: filters.topology_label } });
+		}
+		if (filters?.ontology_label) {
+			mustFilters.push({ key: 'ontology_label', match: { value: filters.ontology_label } });
+		}
+		if (filters?.cluster_key) {
+			mustFilters.push({ key: 'cluster_key', match: { value: filters.cluster_key } });
+		}
+		if (filters?.kmeans_cluster !== undefined && filters?.kmeans_cluster !== null && String(filters.kmeans_cluster).trim() !== '') {
+			mustFilters.push({ key: 'kmeans_cluster', match: { value: filters.kmeans_cluster } });
 		}
 
 		const qdrantFilter = mustFilters.length > 0 ? { must: mustFilters } : undefined;
@@ -184,6 +204,15 @@ export async function queryQdrantCascade(
 			community_ids: [
 				...new Set(results.map((r) => r.payload?.community_id).filter(Boolean)),
 			],
+			topology_labels: [
+				...new Set(results.map((r) => r.payload?.topology_label ?? r.payload?.topologyLabel).filter(Boolean)),
+			] as string[],
+			ontology_labels: [
+				...new Set(results.map((r) => r.payload?.ontology_label ?? r.payload?.ontologyLabel).filter(Boolean)),
+			] as string[],
+			cluster_keys: [
+				...new Set(results.map((r) => r.payload?.cluster_key ?? r.payload?.clusterKey).filter(Boolean)),
+			] as string[],
 			som_clusters: results
 				.map((r) => r.payload?.som_index)
 				.filter((v) => v !== null && v !== undefined),

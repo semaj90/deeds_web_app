@@ -1,6 +1,6 @@
 # Qdrant Packet Payload Verify
 
-Generated: 2026-06-14T03:43:39.033Z
+Generated: 2026-06-21T17:12:40.184Z
 Qdrant: http://127.0.0.1:6333
 Collection: codebase_chunks_768
 Sample limit: 50
@@ -8,36 +8,36 @@ Sample limit: 50
 ## Summary
 
 - Sample rows: 50
-- Qdrant points found: 50
-- Agreements: 0
-- Mismatches: 50
-- Missing points: 0
-- Agreement pct: 0
-- Point found pct: 100
+- Qdrant points found: 32
+- Agreements: 20
+- Mismatches: 12
+- Missing points: 18
+- Agreement pct: 40
+- Point found pct: 64
 
 ## Field Coverage
 
-- source_ref: 50/50 (100%)
-- feature_id: 20/50 (40%)
-- feature_label: 0/50 (0%)
+- source_ref: 23/50 (46%)
+- feature_id: 23/50 (46%)
+- feature_label: 23/50 (46%)
 - qdrant_tag_id: 0/50 (0%)
-- cluster_id: 0/50 (0%)
-- community_id: 0/50 (0%)
+- cluster_id: 9/50 (18%)
+- community_id: 12/50 (24%)
 - som_cluster: 0/50 (0%)
-- domain_class: 0/50 (0%)
+- domain_class: 11/50 (22%)
 - domain: 0/50 (0%)
 - neo4j_node: 0/50 (0%)
-- metadata: 0/50 (0%)
+- metadata: 23/50 (46%)
 
 ## Sample
 
-- proto:CyberElephantService.HealthCheck | point=3410190877 | matched=1/4
-- proto:CyberElephantService.GetStatus | point=3075341653 | matched=1/4
-- proto:CyberElephantService.UpdateClusters | point=1144636562 | matched=2/4
-- proto:CyberElephantService.GetClusters | point=656102470 | matched=2/4
-- proto:CyberElephantService.GetDocumentById | point=3141823141 | matched=2/4
-- proto:CyberElephantService.SearchSimilar | point=732735606 | matched=1/4
-- proto:CyberElephantService.ProcessDocuments | point=2163229800 | matched=1/4
-- proto:TurboVecCudaService.Upsert | point=3420072431 | matched=1/4
-- proto:TurboVecCudaService.Transform | point=250157227 | matched=2/4
-- proto:TurboVecCudaService.AssignSom | point=3782407598 | matched=2/4
+- src/lib/components/editor/LLMS.md | point=554327204 | matched=5/5
+- src/lib/server/features/ai/ai/raptor-summarizer.ts | point=619807723 | matched=5/5
+- ../scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/rag/documents/+server.ts | point=n/a | matched=0/5
+- ../scripts/api-cleanup/reports/backup-2025-12-14T21-11-49-641Z/rag/status/[jobId]/LLMS.md | point=n/a | matched=0/5
+- src/lib/components/recommendations/index.ts | point=423899075 | matched=5/5
+- src/lib/server/evidence/docling-structure.test.ts | point=1428752701 | matched=0/5
+- src/lib/stores/unified/evidence-store.svelte.ts | point=200259260 | matched=0/5
+- src/lib/server/inference/adapter-manifest.ts | point=69695524 | matched=5/5
+- ../scripts/tests/test-phoenix-prosecutor.mjs | point=n/a | matched=0/5
+- src/lib/server/ai/backend-runtime-guards.ts | point=1854573517 | matched=5/5

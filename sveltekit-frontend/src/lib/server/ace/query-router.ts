@@ -17,6 +17,7 @@
 
 import { ENV } from '$lib/server/env.server.js';
 import { getValkeyClient } from '$lib/server/cache/valkey-client.js';
+import { getOllamaEmbeddingEndpoint } from '$lib/server/ollama.js';
 import {
   writeAcePacket,
   readAcePacketBySourceRef,
@@ -33,7 +34,7 @@ import crypto from 'crypto';
 // ── Embed query via embeddinggemma :8081 or Ollama fallback ──────────────
 
 async function embedQuery(query: string): Promise<number[] | null> {
-  const embedUrl = ENV.OLLAMA_EMBED_BASE_URL ?? ENV.OLLAMA_BASE_URL;
+  const embedUrl = getOllamaEmbeddingEndpoint();
   const model = ENV.OLLAMA_EMBED_MODEL ?? 'embeddinggemma:latest';
 
   const isV1 = embedUrl.includes('8081') || embedUrl.includes('/v1');

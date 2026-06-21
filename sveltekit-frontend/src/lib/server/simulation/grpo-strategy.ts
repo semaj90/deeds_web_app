@@ -13,7 +13,7 @@
  */
 
 import { ENV } from '$lib/server/env.server.js';
-import { ollamaFetch } from '$lib/server/ollama.js';
+import { getOllamaEndpoint, ollamaFetch } from '$lib/server/ollama.js';
 import { z } from 'zod';
 // SimulationSession is exported from the simulation API route
 type SimulationSession = import('../../../routes/api/simulation/+server').SimulationSession;
@@ -295,7 +295,7 @@ export async function generateStrategyRecommendations(
 	const { system, user } = buildSynthesisPrompt(session, rag, kag, semantic);
 
 	try {
-		const res = await ollamaFetch(`${ENV.OLLAMA_BASE_URL}/api/chat`, {
+		const res = await ollamaFetch(`${getOllamaEndpoint()}/api/chat`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({
