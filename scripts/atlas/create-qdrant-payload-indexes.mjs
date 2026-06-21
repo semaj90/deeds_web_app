@@ -39,6 +39,10 @@ const INDEX_PLAN = [
       { field_name: 'source_ref',  field_schema: 'keyword' },
       { field_name: 'stable_key',  field_schema: 'keyword' },
       { field_name: 'som_cluster', field_schema: 'keyword' },
+      { field_name: 'story_id',    field_schema: 'keyword' },
+      { field_name: 'worker_id',   field_schema: 'keyword' },
+      { field_name: 'trace_id',    field_schema: 'keyword' },
+      { field_name: 'qdrant_tags',  field_schema: 'keyword' },
     ],
   },
   {

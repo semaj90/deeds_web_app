@@ -39,7 +39,7 @@ parser.add_argument('--port', type=int, default=8793)
 parser.add_argument('--dim', type=int, default=64,  help='Projection dim for TurboVec index (max 64 for 4-bit speed)')
 parser.add_argument('--bits', type=int, default=4,   help='Quantization bits (4 or 8)')
 parser.add_argument('--qdrant', type=str, default='http://127.0.0.1:6333')
-parser.add_argument('--collection', type=str, default='codebase_chunks_768')
+parser.add_argument('--collection', type=str, default='codebase_chunks_encoded64')
 parser.add_argument('--vector-name', type=str, default='content')
 args = parser.parse_args()
 
@@ -78,7 +78,7 @@ def load_from_qdrant():
     while True:
         body = json.dumps({
             "limit": batch,
-            "with_vector": [VEC_NAME],
+            "with_vector": True if COLLECTION == 'codebase_chunks_encoded64' else [VEC_NAME],
             "with_payload": False,
             **({"offset": offset} if offset else {})
         }).encode()
@@ -171,6 +171,7 @@ class SidecarHandler(BaseHTTPRequestHandler):
             self.send_json(404, {"error": "not found"})
 
     def do_POST(self):
+        global ann_index, ann_ids
         length = int(self.headers.get("Content-Length", 0))
         body = self.rfile.read(length)
 
@@ -181,6 +182,7 @@ class SidecarHandler(BaseHTTPRequestHandler):
                 k   = min(int(req.get("k", 10)), 1000)
 
                 with index_lock:
+                    print("ann_index exists?", 'ann_index' in globals(), type(globals().get('ann_index')))
                     if ann_index is None or not TURBOVEC_OK:
                         self.send_json(200, {"ids": [], "scores": [], "fallback": True})
                         return
@@ -206,6 +208,42 @@ class SidecarHandler(BaseHTTPRequestHandler):
         elif self.path == '/reindex':
             threading.Thread(target=load_from_qdrant, daemon=True).start()
             self.send_json(202, {"status": "reindexing"})
+        elif self.path == '/build':
+            try:
+                import time
+                t0 = time.time()
+                req = json.loads(body)
+                candidates = req.get("candidates", [])
+                
+                new_index = turbovec.TurboQuantIndex(DIM, BITS)
+                ids = []
+                batch_vecs = []
+                
+                for c in candidates:
+                    cid = c.get("id")
+                    vec = c.get("vector")
+                    if cid and vec and len(vec) == DIM:
+                        ids.append(cid)
+                        batch_vecs.append(vec)
+                
+                if ids:
+                    arr = np.array(batch_vecs, dtype=np.float32)
+                    new_index.add(arr)
+                    new_index.prepare()
+                    
+                    with index_lock:
+                        ann_index = new_index
+                        ann_ids = ids
+                
+                build_ms = int((time.time() - t0) * 1000)
+                self.send_json(200, {
+                    "ok": True,
+                    "indexed": len(ann_ids),
+                    "build_ms": build_ms
+                })
+            except Exception as e:
+                traceback.print_exc()
+                self.send_json(500, {"error": str(e)})
         else:
             self.send_json(404, {"error": "not found"})
 

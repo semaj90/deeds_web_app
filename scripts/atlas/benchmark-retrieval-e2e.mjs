@@ -475,31 +475,69 @@ async function redisCacheProbe(hits) {
       String(hit.payload?.source_ref ?? ''),
     ]).flat().filter(Boolean);
 
-    const [keysCount, matched] = await Promise.all([
-      (async () => {
-        let cursor = '0';
-        let count = 0;
+    // Scan all required namespaces
+    const namespaces = [
+      'bifrost:*',
+      'bifrost:packet:*',
+      'bifrost:sem:packet:*',
+      'bifrost:sem:feature:*',
+      'bifrost:sem:intent:*',
+      'centroid:*',
+      'som:*'
+    ];
+
+    const keyCounts = {};
+    let totalKeys = 0;
+    for (const ns of namespaces) {
+      let cursor = '0';
+      let count = 0;
+      try {
         do {
-          const [next, batch] = await redis.scan(cursor, 'MATCH', 'bifrost:packet:*', 'COUNT', 500);
+          const [next, batch] = await redis.scan(cursor, 'MATCH', ns, 'COUNT', 500);
           cursor = next;
           count += batch.length;
         } while (cursor !== '0');
-        return count;
-      })().catch(() => 0),
-      Promise.all(topRefs.map(async (ref) => {
-        const exists = await redis.exists(`bifrost:packet:${ref}`).catch(() => 0);
-        return exists ? 1 : 0;
-      })),
-    ]);
+      } catch (err) {}
+      keyCounts[ns] = count;
+      totalKeys += count;
+    }
+
+    // legacy check
+    let karpathyKeys = 0;
+    try {
+      let cursor = '0';
+      do {
+        const [next, batch] = await redis.scan(cursor, 'MATCH', 'gpu:karpathy:*', 'COUNT', 500);
+        cursor = next;
+        karpathyKeys += batch.length;
+      } while (cursor !== '0');
+    } catch (err) {}
+
+    const existsChecks = [];
+    for (const ref of topRefs) {
+      existsChecks.push(
+        (async () => {
+          const checks = await Promise.all([
+            redis.exists(`bifrost:packet:${ref}`).catch(() => 0),
+            redis.exists(`bifrost:sem:packet:${ref}`).catch(() => 0),
+            redis.exists(`bifrost:sem:feature:${ref}`).catch(() => 0),
+          ]);
+          return checks.some(c => c > 0) ? 1 : 0;
+        })()
+      );
+    }
+    const matched = await Promise.all(existsChecks);
     const cacheHits = matched.reduce((sum, v) => sum + v, 0);
 
     await redis.quit().catch(() => {});
     return {
       ok: true,
       latency_ms: now() - start,
-      hot_key_count: keysCount,
+      hot_key_count: totalKeys,
       cache_hits: cacheHits,
       source: 'valkey',
+      namespaces: keyCounts,
+      legacy_karpathy_keys: karpathyKeys
     };
   } catch (err) {
     return {

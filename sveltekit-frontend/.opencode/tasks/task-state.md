@@ -1,24 +1,57 @@
-# OpenCode Task State
+# Temporal Kanban Task State
 
-## Summary
+> **Spine Join**: Parent Atlas remains the canonical join and index spine.
+> **Generated**: 2026-06-20T17:09:22.456Z
 
-- generatedAt: 2026-06-19T23:21:19.166Z
-- recommendationEvents: 300
-- taskEvents: 45
-- taskCount: 22
-- openTaskCount: 0
-- archivedTaskCount: 0
+---
 
-## Active Lane
+## ⚡ READY FOR VERIFICATION
 
-- none
+*No active ready tasks.*
 
-## Open Tasks
+---
+
+## 🛑 BLOCKED
+
+*No blocked tasks.*
+
+---
+
+## ✅ COMPLETED / VERIFIED
 
 
-## Paths
+### [rec-task-0001] fix qdrant 64d mismatch
+- **Symptom**: `Qdrant vector size mismatch: expected 768, got 64`
+- **Verification Command**: `node scripts/atlas/smoke-turbovec-ann.mjs`
+- **Status**: **VERIFIED**
 
-- recommendation events: `.opencode\recommendations\recommendation-events.jsonl`
-- task events: `.opencode\tasks\task-events.jsonl`
-- task state: `.opencode\tasks\task-state.json`
-- startup context: `.opencode\startup-context.json`
+
+### [rec-task-0002] warm turbovec centroids
+- **Symptom**: `Loaded 0 centroids from Redis`
+- **Verification Command**: `node -e "import('ioredis').then(({Redis}) => { const r = new Redis('redis://:redis@127.0.0.1:6379'); r.exists('gpu:autoencoder:centroids_64').then(e => console.log('centroids exist:', e)).then(()=>r.disconnect()) })"`
+- **Status**: **VERIFIED**
+
+
+### [rec-task-0003] add retrieval telemetry to hyperrag rpc
+- **Symptom**: `Missing retrieval telemetry logs in packet-rpc responses`
+- **Verification Command**: `npm run smoke:hyperrag-packet-rpc`
+- **Status**: **VERIFIED**
+
+
+### [rec-task-0004] return replay_trace from search and packet-rpc
+- **Symptom**: `Replay trace summary is status: failed with queryCount: 0`
+- **Verification Command**: `npm run smoke:hyperrag-packet-rpc`
+- **Status**: **VERIFIED**
+
+
+### [rec-task-0005] add multi-hop recommendation smoke test
+- **Symptom**: `Harnesses remain mostly planned and untested`
+- **Verification Command**: `npm run atlas:recommendations:replay`
+- **Status**: **VERIFIED**
+
+
+### [rec-task-20372fda] qdrant 64d mismatch
+- **Symptom**: `test_error`
+- **Verification Command**: `npm run smoke:hyperrag-packet-rpc`
+- **Status**: **VERIFIED**
+

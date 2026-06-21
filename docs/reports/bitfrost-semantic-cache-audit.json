@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-06-19T17:22:45.064Z",
+  "generatedAt": "2026-06-20T16:41:00.721Z",
   "status": "PASS",
   "redis": {
     "container": "legal-ai-valkey",
@@ -8,7 +8,7 @@
   "summary": {
     "gpuKarpathyScores": 0,
     "gpuKarpathyEncoded": 0,
-    "bifrostKeys": 148,
+    "bifrostKeys": 62,
     "centroidKeys": 85,
     "somKeys": 152
   },
@@ -34,38 +34,38 @@
     {
       "key": "bifrost:*",
       "pattern": "bifrost:*",
-      "count": 148,
+      "count": 62,
       "sample": [
-        "bifrost:packet:885c6c04322f6095",
-        "bifrost:packet:4b6c2a8267660eb3",
-        "bifrost:packet:bbbe630740c5d753",
-        "bifrost:sem:intent:6df9c92c207644b6",
-        "bifrost:packet:17dc1fe9f5f8a021"
+        "bifrost:packet:58e6adafde74465d",
+        "bifrost:packet:de3c1300921c8d5d",
+        "bifrost:packet:891b73e8db9c3bb7",
+        "bifrost:packet:1d5eba7211dea6f9",
+        "bifrost:packet:0bffe0382a0d44bb"
       ],
       "ttlSamples": [
         {
-          "key": "bifrost:packet:885c6c04322f6095",
-          "ttl": 102614,
+          "key": "bifrost:packet:58e6adafde74465d",
+          "ttl": 603833,
           "ok": true
         },
         {
-          "key": "bifrost:packet:4b6c2a8267660eb3",
-          "ttl": 77310,
+          "key": "bifrost:packet:de3c1300921c8d5d",
+          "ttl": 603833,
           "ok": true
         },
         {
-          "key": "bifrost:packet:bbbe630740c5d753",
-          "ttl": 102614,
+          "key": "bifrost:packet:891b73e8db9c3bb7",
+          "ttl": 603833,
           "ok": true
         },
         {
-          "key": "bifrost:sem:intent:6df9c92c207644b6",
-          "ttl": 43381,
+          "key": "bifrost:packet:1d5eba7211dea6f9",
+          "ttl": 603833,
           "ok": true
         },
         {
-          "key": "bifrost:packet:17dc1fe9f5f8a021",
-          "ttl": 102614,
+          "key": "bifrost:packet:0bffe0382a0d44bb",
+          "ttl": 603833,
           "ok": true
         }
       ],
@@ -77,36 +77,36 @@
       "pattern": "centroid:*",
       "count": 85,
       "sample": [
-        "centroid:68",
-        "centroid:98",
-        "centroid:16",
-        "centroid:69",
-        "centroid:78"
+        "centroid:60",
+        "centroid:84",
+        "centroid:11",
+        "centroid:73",
+        "centroid:47"
       ],
       "ttlSamples": [
         {
-          "key": "centroid:68",
-          "ttl": 536214,
+          "key": "centroid:60",
+          "ttl": 452322,
           "ok": true
         },
         {
-          "key": "centroid:98",
-          "ttl": 536220,
+          "key": "centroid:84",
+          "ttl": 452326,
           "ok": true
         },
         {
-          "key": "centroid:16",
-          "ttl": 536203,
+          "key": "centroid:11",
+          "ttl": 452311,
           "ok": true
         },
         {
-          "key": "centroid:69",
-          "ttl": 536214,
+          "key": "centroid:73",
+          "ttl": 452324,
           "ok": true
         },
         {
-          "key": "centroid:78",
-          "ttl": 536215,
+          "key": "centroid:47",
+          "ttl": 452319,
           "ok": true
         }
       ],
@@ -118,36 +118,36 @@
       "pattern": "som:*",
       "count": 152,
       "sample": [
-        "som:80",
-        "som:cell:9",
-        "som:cell:17",
-        "som:cell:42",
-        "som:cell:71"
+        "som:135",
+        "som:3",
+        "som:37",
+        "som:cell:8",
+        "som:cell:44"
       ],
       "ttlSamples": [
         {
-          "key": "som:80",
-          "ttl": 536235,
+          "key": "som:135",
+          "ttl": 452353,
           "ok": true
         },
         {
-          "key": "som:cell:9",
-          "ttl": 536218,
+          "key": "som:3",
+          "ttl": 452328,
           "ok": true
         },
         {
-          "key": "som:cell:17",
-          "ttl": 536222,
+          "key": "som:37",
+          "ttl": 452332,
           "ok": true
         },
         {
-          "key": "som:cell:42",
-          "ttl": 536247,
+          "key": "som:cell:8",
+          "ttl": 452344,
           "ok": true
         },
         {
-          "key": "som:cell:71",
-          "ttl": 536248,
+          "key": "som:cell:44",
+          "ttl": 452346,
           "ok": true
         }
       ],
@@ -157,123 +157,27 @@
     {
       "key": "bifrost:sem:packet:*",
       "pattern": "bifrost:sem:packet:*",
-      "count": 45,
-      "sample": [
-        "bifrost:sem:packet:6a058b76b6d7100c",
-        "bifrost:sem:packet:ebc8cdd4145caacf",
-        "bifrost:sem:packet:evidence_search_a3e84056",
-        "bifrost:sem:packet:473463c5ae07ef36",
-        "bifrost:sem:packet:codebase_stats_a3e84056"
-      ],
-      "ttlSamples": [
-        {
-          "key": "bifrost:sem:packet:6a058b76b6d7100c",
-          "ttl": 43372,
-          "ok": true
-        },
-        {
-          "key": "bifrost:sem:packet:ebc8cdd4145caacf",
-          "ttl": 43371,
-          "ok": true
-        },
-        {
-          "key": "bifrost:sem:packet:evidence_search_a3e84056",
-          "ttl": 43371,
-          "ok": true
-        },
-        {
-          "key": "bifrost:sem:packet:473463c5ae07ef36",
-          "ttl": 43370,
-          "ok": true
-        },
-        {
-          "key": "bifrost:sem:packet:codebase_stats_a3e84056",
-          "ttl": 43370,
-          "ok": true
-        }
-      ],
+      "count": 0,
+      "sample": [],
+      "ttlSamples": [],
       "ok": true,
       "error": null
     },
     {
       "key": "bifrost:sem:feature:*",
       "pattern": "bifrost:sem:feature:*",
-      "count": 10,
-      "sample": [
-        "bifrost:sem:feature:legal-statutes",
-        "bifrost:sem:feature:ai-agent",
-        "bifrost:sem:feature:unknown",
-        "bifrost:sem:feature:sveltekit-frontend",
-        "bifrost:sem:feature:evidence-pipeline"
-      ],
-      "ttlSamples": [
-        {
-          "key": "bifrost:sem:feature:legal-statutes",
-          "ttl": 43367,
-          "ok": true
-        },
-        {
-          "key": "bifrost:sem:feature:ai-agent",
-          "ttl": 43367,
-          "ok": true
-        },
-        {
-          "key": "bifrost:sem:feature:unknown",
-          "ttl": 43367,
-          "ok": true
-        },
-        {
-          "key": "bifrost:sem:feature:sveltekit-frontend",
-          "ttl": 43367,
-          "ok": true
-        },
-        {
-          "key": "bifrost:sem:feature:evidence-pipeline",
-          "ttl": 43367,
-          "ok": true
-        }
-      ],
+      "count": 0,
+      "sample": [],
+      "ttlSamples": [],
       "ok": true,
       "error": null
     },
     {
       "key": "bifrost:sem:intent:*",
       "pattern": "bifrost:sem:intent:*",
-      "count": 13,
-      "sample": [
-        "bifrost:sem:intent:6df9c92c207644b6",
-        "bifrost:sem:intent:e09efdc95c9548f9",
-        "bifrost:sem:intent:c182e42d4c34122d",
-        "bifrost:sem:intent:1184fb07bfe6ed33",
-        "bifrost:sem:intent:31b013e3547d56c4"
-      ],
-      "ttlSamples": [
-        {
-          "key": "bifrost:sem:intent:6df9c92c207644b6",
-          "ttl": 43365,
-          "ok": true
-        },
-        {
-          "key": "bifrost:sem:intent:e09efdc95c9548f9",
-          "ttl": 43364,
-          "ok": true
-        },
-        {
-          "key": "bifrost:sem:intent:c182e42d4c34122d",
-          "ttl": 43364,
-          "ok": true
-        },
-        {
-          "key": "bifrost:sem:intent:1184fb07bfe6ed33",
-          "ttl": 43364,
-          "ok": true
-        },
-        {
-          "key": "bifrost:sem:intent:31b013e3547d56c4",
-          "ttl": 43364,
-          "ok": true
-        }
-      ],
+      "count": 0,
+      "sample": [],
+      "ttlSamples": [],
       "ok": true,
       "error": null
     },
@@ -307,9 +211,41 @@
     {
       "key": "ace:feature:*",
       "pattern": "ace:feature:*",
-      "count": 0,
-      "sample": [],
-      "ttlSamples": [],
+      "count": 19,
+      "sample": [
+        "ace:feature:indexer",
+        "ace:feature:tests",
+        "ace:feature:ace",
+        "ace:feature:analytics",
+        "ace:feature:simulation"
+      ],
+      "ttlSamples": [
+        {
+          "key": "ace:feature:indexer",
+          "ttl": 521291,
+          "ok": true
+        },
+        {
+          "key": "ace:feature:tests",
+          "ttl": 521291,
+          "ok": true
+        },
+        {
+          "key": "ace:feature:ace",
+          "ttl": 521290,
+          "ok": true
+        },
+        {
+          "key": "ace:feature:analytics",
+          "ttl": 521290,
+          "ok": true
+        },
+        {
+          "key": "ace:feature:simulation",
+          "ttl": 521290,
+          "ok": true
+        }
+      ],
       "ok": true,
       "error": null
     },
@@ -341,7 +277,7 @@
       "ttlSamples": [
         {
           "key": "ace:authority:top",
-          "ttl": 13823,
+          "ttl": 16648,
           "ok": true
         }
       ],

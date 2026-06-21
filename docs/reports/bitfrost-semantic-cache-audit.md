@@ -1,6 +1,6 @@
 # Bitfrost Semantic Cache Audit
 
-Generated: 2026-06-19T17:22:45.064Z
+Generated: 2026-06-20T16:41:00.721Z
 Status: PASS
 Redis Container: legal-ai-valkey
 
@@ -8,7 +8,7 @@ Redis Container: legal-ai-valkey
 
 - gpu:karpathy:scores: 0
 - gpu:karpathy:encoded: 0
-- bifrost keys: 148
+- bifrost keys: 62
 - centroid keys: 85
 - som keys: 152
 
@@ -18,19 +18,19 @@ Redis Container: legal-ai-valkey
 |---|---:|---|---|
 | `gpu:karpathy:scores` | 0 | none | none |
 | `gpu:karpathy:encoded` | 0 | none | none |
-| `bifrost:*` | 148 | bifrost:packet:885c6c04322f6095, bifrost:packet:4b6c2a8267660eb3, bifrost:packet:bbbe630740c5d753, bifrost:sem:intent:6df9c92c207644b6, bifrost:packet:17dc1fe9f5f8a021 | bifrost:packet:885c6c04322f6095:102614, bifrost:packet:4b6c2a8267660eb3:77310, bifrost:packet:bbbe630740c5d753:102614, bifrost:sem:intent:6df9c92c207644b6:43381, bifrost:packet:17dc1fe9f5f8a021:102614 |
-| `centroid:*` | 85 | centroid:68, centroid:98, centroid:16, centroid:69, centroid:78 | centroid:68:536214, centroid:98:536220, centroid:16:536203, centroid:69:536214, centroid:78:536215 |
-| `som:*` | 152 | som:80, som:cell:9, som:cell:17, som:cell:42, som:cell:71 | som:80:536235, som:cell:9:536218, som:cell:17:536222, som:cell:42:536247, som:cell:71:536248 |
-| `bifrost:sem:packet:*` | 45 | bifrost:sem:packet:6a058b76b6d7100c, bifrost:sem:packet:ebc8cdd4145caacf, bifrost:sem:packet:evidence_search_a3e84056, bifrost:sem:packet:473463c5ae07ef36, bifrost:sem:packet:codebase_stats_a3e84056 | bifrost:sem:packet:6a058b76b6d7100c:43372, bifrost:sem:packet:ebc8cdd4145caacf:43371, bifrost:sem:packet:evidence_search_a3e84056:43371, bifrost:sem:packet:473463c5ae07ef36:43370, bifrost:sem:packet:codebase_stats_a3e84056:43370 |
-| `bifrost:sem:feature:*` | 10 | bifrost:sem:feature:legal-statutes, bifrost:sem:feature:ai-agent, bifrost:sem:feature:unknown, bifrost:sem:feature:sveltekit-frontend, bifrost:sem:feature:evidence-pipeline | bifrost:sem:feature:legal-statutes:43367, bifrost:sem:feature:ai-agent:43367, bifrost:sem:feature:unknown:43367, bifrost:sem:feature:sveltekit-frontend:43367, bifrost:sem:feature:evidence-pipeline:43367 |
-| `bifrost:sem:intent:*` | 13 | bifrost:sem:intent:6df9c92c207644b6, bifrost:sem:intent:e09efdc95c9548f9, bifrost:sem:intent:c182e42d4c34122d, bifrost:sem:intent:1184fb07bfe6ed33, bifrost:sem:intent:31b013e3547d56c4 | bifrost:sem:intent:6df9c92c207644b6:43365, bifrost:sem:intent:e09efdc95c9548f9:43364, bifrost:sem:intent:c182e42d4c34122d:43364, bifrost:sem:intent:1184fb07bfe6ed33:43364, bifrost:sem:intent:31b013e3547d56c4:43364 |
+| `bifrost:*` | 62 | bifrost:packet:58e6adafde74465d, bifrost:packet:de3c1300921c8d5d, bifrost:packet:891b73e8db9c3bb7, bifrost:packet:1d5eba7211dea6f9, bifrost:packet:0bffe0382a0d44bb | bifrost:packet:58e6adafde74465d:603833, bifrost:packet:de3c1300921c8d5d:603833, bifrost:packet:891b73e8db9c3bb7:603833, bifrost:packet:1d5eba7211dea6f9:603833, bifrost:packet:0bffe0382a0d44bb:603833 |
+| `centroid:*` | 85 | centroid:60, centroid:84, centroid:11, centroid:73, centroid:47 | centroid:60:452322, centroid:84:452326, centroid:11:452311, centroid:73:452324, centroid:47:452319 |
+| `som:*` | 152 | som:135, som:3, som:37, som:cell:8, som:cell:44 | som:135:452353, som:3:452328, som:37:452332, som:cell:8:452344, som:cell:44:452346 |
+| `bifrost:sem:packet:*` | 0 | none | none |
+| `bifrost:sem:feature:*` | 0 | none | none |
+| `bifrost:sem:intent:*` | 0 | none | none |
 | `reward:zset` | 0 | none | none |
 | `ace:context:*` | 0 | none | none |
 | `ace:summary:*` | 0 | none | none |
-| `ace:feature:*` | 0 | none | none |
+| `ace:feature:*` | 19 | ace:feature:indexer, ace:feature:tests, ace:feature:ace, ace:feature:analytics, ace:feature:simulation | ace:feature:indexer:521291, ace:feature:tests:521291, ace:feature:ace:521290, ace:feature:analytics:521290, ace:feature:simulation:521290 |
 | `ace:query:*` | 0 | none | none |
 | `ace:tree:*` | 0 | none | none |
-| `ace:authority:*` | 1 | ace:authority:top | ace:authority:top:13823 |
+| `ace:authority:*` | 1 | ace:authority:top | ace:authority:top:16648 |
 | `ace:ontology:*` | 0 | none | none |
 | `ace:memory:*` | 0 | none | none |
 

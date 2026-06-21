@@ -1927,7 +1927,7 @@
     "atlas:turbovec:smoke": "node scripts/atlas/turbovec-sidecar-smoke.mjs",
     "atlas:qdrant:whole-sync:dry": "node scripts/atlas/sync-qdrant-from-whole-codebase-packets.mjs --dry-run",
     "atlas:qdrant:whole-sync:apply": "node scripts/atlas/sync-qdrant-from-whole-codebase-packets.mjs --apply",
-    "atlas:retrieval:e2e": "node scripts/atlas/audit-retrieval-spine-end-to-end.mjs",
+    "atlas:retrieval:e2e": "npx vite-node scripts/atlas/benchmark-retrieval-e2e.mjs --verbose",
     "atlas:debug:qdrant-postgres": "node ../scripts/atlas/debug-qdrant-postgres-mismatch.mjs",
     "atlas:debug:qdrant-postgres:verbose": "node ../scripts/atlas/debug-qdrant-postgres-mismatch.mjs --verbose",
     "atlas:packets:validate:apply": "node scripts/atlas/validate-addressable-packets.mjs --apply",

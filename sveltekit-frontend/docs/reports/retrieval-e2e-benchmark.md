@@ -1,10 +1,10 @@
-benchmark-retrieval-e2e — 2026-06-19T05:28:19.596Z
+benchmark-retrieval-e2e — 2026-06-20T22:44:11.544Z
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 queries    : 10
 passed     : 10  failed: 0
-avg wall ms: 825ms
-p50 wall ms : 160ms
-p95 wall ms : 6845ms
+avg wall ms: 12682ms
+p50 wall ms : 11123ms
+p95 wall ms : 25692ms
 
 atlas_retrieval_eval_times breakdown:
   cache hits (redis): 0 rows

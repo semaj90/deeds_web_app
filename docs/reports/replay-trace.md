@@ -1,17 +1,19 @@
 # Replay Breadth Benchmark Report
 
-Generated at: 2026-06-20T16:33:57.116Z
+Generated at: 2026-06-21T00:18:29.636Z
 
 ## Summary Statistics
 
 | Metric | Value |
 |---|---|
+| Status | **PASS** |
 | Total Queries Run | 50 |
-| Successful Queries | 50 |
-| Failed Queries | 0 |
-| Cache Hits (Bitfrost Warm) | 10 |
-| Total Packets Retrieved | 250 |
-| Avg Packets / Query | 5.00 |
+| Qdrant Hit Pct (packets > 0) | 100% |
+| Packet Key Pct | 100% |
+| Feature ID Pct | 100% |
+| Source Ref Pct | 100% |
+| Cache Hit Pct | 20% |
+| Timeouts | 0 |
 
 ## Query Execution Table
 
@@ -25,7 +27,7 @@ Generated at: 2026-06-20T16:33:57.116Z
 | 6 | `how is the LangGraph planning graph structured?` | golden | ❌ NO | 5 | fusion | ✅ PASS |
 | 7 | `where is the Postgres database connection pool initialized?` | golden | ❌ NO | 5 | fusion | ✅ PASS |
 | 8 | `how does the system handle schema migration sidecars?` | golden | ❌ NO | 5 | fusion | ✅ PASS |
-| 9 | `what is the default collection name for Qdrant semantic search?` | golden | ❌ NO | 5 | fusion | ✅ PASS |
+| 9 | `what is the default collection name for Qdrant semantic search?` | golden | ❌ NO | 2 | fusion | ✅ PASS |
 | 10 | `how is the GPU compute worker smoke test runner executed?` | golden | ❌ NO | 5 | fusion | ✅ PASS |
 | 11 | `where is Redis Valkey cache config wired?` | cache-hit | ✅ YES | 5 | fusion | ✅ PASS |
 | 12 | `how is SeaweedFS filer configured for S3 gateway?` | cache-hit | ✅ YES | 5 | fusion | ✅ PASS |

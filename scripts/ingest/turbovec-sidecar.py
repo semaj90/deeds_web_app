@@ -283,6 +283,19 @@ class Handler(BaseHTTPRequestHandler):
 
 
 def main():
+    global PORT
+    for i, arg in enumerate(sys.argv):
+        if arg.startswith('--port='):
+            try:
+                PORT = int(arg.split('=')[1])
+            except ValueError:
+                pass
+        elif arg == '--port' and i + 1 < len(sys.argv):
+            try:
+                PORT = int(sys.argv[i + 1])
+            except ValueError:
+                pass
+
     print(f"turbovec-sidecar v0.2 — dim={DIM} bit_width={BIT_W} port={PORT}", flush=True)
     print(f"endpoints: /health /build /rerank /prefilter /search", flush=True)
     server = HTTPServer(("127.0.0.1", PORT), Handler)

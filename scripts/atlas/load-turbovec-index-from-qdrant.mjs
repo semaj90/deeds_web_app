@@ -22,13 +22,17 @@ import { pathToFileURL } from 'node:url';
 import { writeFileSync, mkdirSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import dotenv from 'dotenv';
 
 const __dir = path.dirname(fileURLToPath(import.meta.url));
 const ROOT  = path.resolve(__dir, '../..');
 
+// Load environment variables
+dotenv.config({ path: path.resolve(ROOT, 'sveltekit-frontend/.env') });
+
 const QDRANT_URL   = process.env.QDRANT_URL   || 'http://127.0.0.1:6333';
 const GRPC_URL     = process.env.TURBOVEC_SIDECAR_GRPC_URL || '127.0.0.1:50062';
-const COLLECTION   = 'codebase_chunks_768';
+const COLLECTION   = 'codebase_chunks_encoded64';
 const SCROLL_BATCH = 100;
 
 const APPLY     = process.argv.includes('--apply');
@@ -49,7 +53,7 @@ function getVector(point) {
 function usable(point) {
   const v = getVector(point);
   return (
-    v?.length === 768 &&
+    v?.length === 64 &&
     point.payload?.feature_id &&
     point.payload?.community_id !== undefined &&
     (point.payload?.tags?.length > 0 || point.payload?.concept_ids?.length > 0)
@@ -118,7 +122,7 @@ async function scrollQdrant(offset, limit) {
   const body = {
     limit,
     with_payload: true,
-    with_vector: ['content'],
+    with_vector: true,
   };
   if (offset) body.offset = offset;
 
@@ -186,7 +190,7 @@ async function main() {
   }
 
   console.log(`\nScrolled: ${scanned} points`);
-  console.log(`Usable:   ${usablePoints.length} (enriched, 768-dim)`);
+  console.log(`Usable:   ${usablePoints.length} (enriched, 64-dim)`);
   console.log(`Skipped:  ${skipped} (missing feature_id / community_id / tags / vector)`);
 
   if (usablePoints.length === 0) {
@@ -235,38 +239,39 @@ async function main() {
   }
   console.log(`\nTurboVec pre-load: indexed=${preHealth.indexed} backend=${preHealth.backend}`);
 
-  // ── 5. Upsert in batches ──────────────────────────────────────────────────
+  // ── 5. Build index directly via Python HTTP Sidecar ──────────────────────
   let totalInserted = 0;
   let totalUpdated  = 0;
   let totalErrors   = 0;
   let lastIndexed   = preHealth.indexed ?? 0;
 
-  for (let i = 0; i < usablePoints.length; i += UPSERT_BATCH) {
-    const batch = usablePoints.slice(i, i + UPSERT_BATCH);
+  const candidates = usablePoints.map(p => ({
+    id: String(p.id),
+    vector: getVector(p),
+    cluster: Number(p.payload?.community_id ?? 0),
+  }));
 
-    const records = batch.map(p => ({
-      id: String(p.id),
-      vector: getVector(p),
-      featureId: p.payload?.feature_id ?? '',
-      communityId: Number(p.payload?.community_id ?? 0),
-      tags: [
-        ...(p.payload?.concept_ids ?? []),
-        ...(p.payload?.tags ?? []),
-      ].slice(0, 20),
-    }));
-
-    const res = await grpcCall(client, 'upsert', { records }, 30_000);
-    if (res) {
-      totalInserted += res.inserted ?? 0;
-      totalUpdated  += res.updated  ?? 0;
-      lastIndexed    = res.indexed   ?? lastIndexed;
+  console.log(`\nBuilding TurboVec index with ${candidates.length} candidates via Python HTTP sidecar...`);
+  const pythonUrl = 'http://127.0.0.1:8793/build';
+  try {
+    const res = await fetch(pythonUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ candidates }),
+      signal: AbortSignal.timeout(120_000), // 2 mins timeout for build
+    });
+    if (res.ok) {
+      const data = await res.json();
+      lastIndexed = data.indexed ?? 0;
+      totalInserted = lastIndexed;
+      console.log(`✅ TurboVec index built successfully! Indexed: ${lastIndexed} points (took ${data.build_ms}ms)`);
     } else {
-      totalErrors += batch.length;
+      console.error(`❌ HTTP Error building index: ${res.status} ${await res.text()}`);
+      totalErrors = candidates.length;
     }
-
-    if (VERBOSE || (i > 0 && i % 500 === 0)) {
-      console.log(`  ${Math.min(i + UPSERT_BATCH, usablePoints.length)} / ${usablePoints.length} upserted…`);
-    }
+  } catch (err) {
+    console.error(`❌ Fetch Error building index: ${err.message}`);
+    totalErrors = candidates.length;
   }
 
   // ── 6. Post-load health check ─────────────────────────────────────────────

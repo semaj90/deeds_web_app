@@ -547,7 +547,7 @@ func (s *retrievalServer) qdrantSearchEvidence(ctx context.Context, vec []float3
 	return qdrantPointsToChunks(points, false), nil
 }
 
-func (s *retrievalServer) qdrantSearchCodebase(ctx context.Context, vec []float32, kinds []string, pathPrefixes []string, limit int) ([]qdrantChunk, error) {
+func (s *retrievalServer) qdrantSearchCodebase(ctx context.Context, vec []float32, kinds []string, pathPrefixes []string, extraFilters []*qdrantclient.Condition, limit int) ([]qdrantChunk, error) {
 	contentVec := "content"
 	sigVec := "signature"
 	prefetchLimit := uint64(limit * 3)
@@ -572,14 +572,31 @@ func (s *retrievalServer) qdrantSearchCodebase(ctx context.Context, vec []float3
 		WithPayload: qdrantclient.NewWithPayload(true),
 	}
 
-	// Kind filter
+	var mustConds []*qdrantclient.Condition
+
+	// Kind filter (Should-list inside a Must condition if other musts exist, or simply Should)
 	if len(kinds) > 0 {
-		conds := make([]*qdrantclient.Condition, len(kinds))
+		shouldConds := make([]*qdrantclient.Condition, len(kinds))
 		for i, k := range kinds {
 			k := k
-			conds[i] = qdrantclient.NewMatch("kind", k)
+			shouldConds[i] = qdrantclient.NewMatch("kind", k)
 		}
-		queryReq.Filter = &qdrantclient.Filter{Should: conds}
+		mustConds = append(mustConds, &qdrantclient.Condition{
+			ConditionOneOf: &qdrantclient.Condition_Filter{
+				Filter: &qdrantclient.Filter{Should: shouldConds},
+			},
+		})
+	}
+
+	// Extra filters from client
+	for _, f := range extraFilters {
+		if f != nil {
+			mustConds = append(mustConds, f)
+		}
+	}
+
+	if len(mustConds) > 0 {
+		queryReq.Filter = &qdrantclient.Filter{Must: mustConds}
 	}
 
 	points, err := s.qdrant.Query(ctx, queryReq)
@@ -1701,7 +1718,7 @@ func (s *retrievalServer) SearchCodebase(ctx context.Context, req *pb.CodebaseSe
 		return &pb.CodebaseSearchResponse{}, nil
 	}
 
-	chunks, err := s.qdrantSearchCodebase(ctx, vec, req.Kinds, req.PathPrefixes, limit)
+	chunks, err := s.qdrantSearchCodebase(ctx, vec, req.Kinds, req.PathPrefixes, nil, limit)
 	if err != nil {
 		slog.Warn("[retrieval] codebase search failed", "err", err)
 		return &pb.CodebaseSearchResponse{}, nil
@@ -1814,7 +1831,67 @@ func (s *retrievalServer) SearchChunks(ctx context.Context, req *pb.SearchChunks
 		collection = collectionCodebase
 	}
 
-	chunks, err := s.qdrantSearchCodebase(ctx, vec, nil, nil, int(req.Limit))
+	var extraFilters []*qdrantclient.Condition
+
+	// 1. Tags
+	if len(req.Tags) > 0 {
+		for _, tag := range req.Tags {
+			extraFilters = append(extraFilters, qdrantclient.NewMatch("qdrant_tags", tag))
+		}
+	}
+
+	// 2. SourceFilter
+	if len(req.SourceFilter) > 0 {
+		var shouldConds []*qdrantclient.Condition
+		for _, src := range req.SourceFilter {
+			shouldConds = append(shouldConds, qdrantclient.NewMatch("source_ref", src))
+		}
+		extraFilters = append(extraFilters, &qdrantclient.Condition{
+			ConditionOneOf: &qdrantclient.Condition_Filter{
+				Filter: &qdrantclient.Filter{Should: shouldConds},
+			},
+		})
+	}
+
+	// 3. ClusterIds
+	if len(req.ClusterIds) > 0 {
+		var shouldConds []*qdrantclient.Condition
+		for _, cid := range req.ClusterIds {
+			shouldConds = append(shouldConds, qdrantclient.NewMatch("cluster_id", cid))
+		}
+		extraFilters = append(extraFilters, &qdrantclient.Condition{
+			ConditionOneOf: &qdrantclient.Condition_Filter{
+				Filter: &qdrantclient.Filter{Should: shouldConds},
+			},
+		})
+	}
+
+	// 4. SomClusters
+	if len(req.SomClusters) > 0 {
+		var shouldConds []*qdrantclient.Condition
+		for _, sc := range req.SomClusters {
+			shouldConds = append(shouldConds, qdrantclient.NewMatch("som_cluster", strconv.Itoa(int(sc))))
+		}
+		extraFilters = append(extraFilters, &qdrantclient.Condition{
+			ConditionOneOf: &qdrantclient.Condition_Filter{
+				Filter: &qdrantclient.Filter{Should: shouldConds},
+			},
+		})
+	}
+
+	// 5. General filters (key:val)
+	if len(req.Filters) > 0 {
+		for _, f := range req.Filters {
+			parts := strings.SplitN(f, ":", 2)
+			if len(parts) == 2 {
+				key := strings.TrimSpace(parts[0])
+				val := strings.TrimSpace(parts[1])
+				extraFilters = append(extraFilters, qdrantclient.NewMatch(key, val))
+			}
+		}
+	}
+
+	chunks, err := s.qdrantSearchCodebase(ctx, vec, nil, nil, extraFilters, int(req.Limit))
 	if err != nil {
 		return nil, err
 	}

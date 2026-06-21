@@ -1,0 +1,29 @@
+{
+  "compiled_at": "2026-06-20T17:05:08.235Z",
+  "total_runs": 3,
+  "success_count": 3,
+  "failure_count": 0,
+  "recent_events": [
+    {
+      "trace_id": "be4c20f0-a72c-4c75-9a90-70a6cd2944ec",
+      "intent": "error_fix",
+      "query": "test query for matching",
+      "result": "success",
+      "ts": "2026-06-20T17:00:50.119Z"
+    },
+    {
+      "trace_id": "3571efd2-ad01-47de-8949-de2ecd5729a2",
+      "intent": "error_fix",
+      "query": "qdrant 64d mismatch",
+      "result": "success",
+      "ts": "2026-06-20T17:02:53.731Z"
+    },
+    {
+      "trace_id": "6df77ec0-0241-4043-b17d-51114a0ed8f9",
+      "intent": "error_fix",
+      "query": "qdrant 64d mismatch",
+      "result": "success",
+      "ts": "2026-06-20T17:04:41.016Z"
+    }
+  ]
+}

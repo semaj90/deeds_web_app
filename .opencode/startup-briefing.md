@@ -30,15 +30,19 @@ Hello James.
 
 ## Validation Quality
 
-- replay trace status: pass_with_warnings
-- retrieval benchmark status: pass_with_warnings
+- replay trace status: failed
+- retrieval benchmark status: failed
+- concept evidence status: LIVE_SPINE_PACKET_KEYS
 - replay trace qdrant hit pct: 100.0%
 - replay trace cache hit pct: 0.0%
-- replay trace total p50 / p95: 4213 / 6392
-- retrieval benchmark total p50 / p95: 4213 / 6392
+- replay trace total p50 / p95: 3374 / 6287
+- retrieval benchmark total p50 / p95: 3374 / 6287
 - retrieval benchmark qdrant hits: yes
 - retrieval benchmark ledger matches: no
-- retrieval benchmark all answered: yes
+- retrieval benchmark all answered: no
+- concept evidence packet_keys join pct: 82.61
+- concept evidence feature_ids join pct: 85.98
+- concept evidence evidence_cards join pct: 82.61
 
 ## Recommended Next Lane
 
@@ -96,6 +100,6 @@ I will structure the summary by file/module, detailing the functions and their p
 *   **`classify`**: Function used for classification within the audit agent trace data maturity process.
 *   **`summarizeQlorA`**: Function to summarize QlorA data within the audit agent trace data maturity process.
 *   **`summarizeTraceSmoke`**: Function to summarize trace data within the audit agent trace data maturity process.
-- recommendation workflow status: DRY_RUN_READY
+- recommendation workflow status: READY
 - turbovec plan status: READY
 
