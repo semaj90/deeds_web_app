@@ -36,6 +36,7 @@
     "verify:cubic": "node scripts/verify/cubic-adversarial-tests.mjs",
     "verify:verdict": "node scripts/verify/strict-verdict.mjs",
     "verify:full": "npm run verify:smoke && npm run verify:story && npm run verify:atlas && npm run verify:cubic && npm run verify:verdict",
+    "verify:rpc-gan": "node scripts/verify/rpc-validation-gan.mjs",
     "atlas:graphify:packet-contract:dry": "node scripts/atlas/graphify-packet-contract.mjs",
     "atlas:graphify:packet-contract:apply": "node scripts/atlas/graphify-packet-contract.mjs --apply",
     "atlas:backfill-reward": "node scripts/atlas/backfill-reward-prior.mjs",

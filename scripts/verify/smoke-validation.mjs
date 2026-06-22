@@ -199,11 +199,16 @@ async function main() {
   try {
     const svelteRoot = path.join(ROOT, 'sveltekit-frontend');
     const out = execSync('npx svelte-check --threshold error', { cwd: svelteRoot, stdio: 'pipe' }).toString();
-    report.checks.typescript = { status: 'PASS', detail: 'svelte-check completed without errors' };
+    report.checks.typescript = { status: 'PASS', detail: 'svelte-check completed without errors', errors: [] };
     console.log('  ✅ TypeScript/Svelte check passed.');
   } catch (err) {
     const outputMsg = err.stdout ? err.stdout.toString() : err.message;
-    report.checks.typescript = { status: 'FAIL', detail: outputMsg };
+    const parsedErrors = parseSvelteCheckErrors(outputMsg);
+    report.checks.typescript = {
+      status: 'FAIL',
+      detail: outputMsg,
+      errors: parsedErrors,
+    };
     hasFailures = true;
     console.log('  ❌ TypeScript/Svelte check failed:');
     console.log(outputMsg.slice(0, 1000));
@@ -216,6 +221,73 @@ async function main() {
   mkdirSync(tmpDir, { recursive: true });
   writeFileSync(path.join(tmpDir, 'verify-smoke.json'), JSON.stringify(report, null, 2));
   console.log(`\nSmoke validation lane report saved to .tmp/verify-smoke.json with status: ${report.status}`);
+}
+
+function parseSvelteCheckErrors(output) {
+  const cleanOutput = output.replace(/\u001b\[[0-9;]*m/g, '');
+  const errors = [];
+  const lines = cleanOutput.split('\n');
+  let currentError = null;
+
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
+    const pathMatch = line.match(/^([A-Za-z]:\\[^\s?#]+|[^\s?#]+):(\d+):(\d+)/) || line.match(/^([A-Za-z]:\/[^\s?#]+|[^\s?#]+):(\d+):(\d+)/);
+    if (pathMatch) {
+      if (currentError) {
+        errors.push(currentError);
+      }
+      let filePath = pathMatch[1].replace(/\\/g, '/');
+      const rootNormalized = ROOT.replace(/\\/g, '/');
+      if (filePath.toLowerCase().startsWith(rootNormalized.toLowerCase())) {
+        filePath = filePath.slice(rootNormalized.length).replace(/^\//, '');
+      }
+      currentError = {
+        file: filePath,
+        line: parseInt(pathMatch[2], 10),
+        col: parseInt(pathMatch[3], 10),
+        error_text: '',
+        likely_contract: 'unknown',
+        blocking: true,
+      };
+      continue;
+    }
+
+    if (currentError) {
+      if (line.trim().startsWith('Error:')) {
+        currentError.error_text = line.trim().slice(6).trim();
+        const codeMatch = line.match(/TS\d+/);
+        if (codeMatch) {
+          currentError.error_code = codeMatch[0];
+        }
+      } else if (line.trim() && !line.trim().startsWith('▲') && !line.trim().startsWith('▼')) {
+        if (currentError.error_text.length < 500) {
+          currentError.error_text += '\n' + line.trim();
+        }
+      } else if (line.trim().startsWith('▲') || line.trim().startsWith('▼') || line.includes('svelte-check found')) {
+        errors.push(currentError);
+        currentError = null;
+      }
+    }
+  }
+
+  if (currentError) {
+    errors.push(currentError);
+  }
+
+  for (const err of errors) {
+    if (err.file.includes('hyperrag-packet-rpc.ts')) {
+      err.likely_contract = 'hyperrag-packet-rpc.ts and packet contract field normalizer';
+      err.symbol = 'seed.metadata';
+      const codeMatch = err.error_text.match(/TS\d+/);
+      if (codeMatch) {
+        err.error_code = codeMatch[0];
+      } else {
+        err.error_code = 'TS2339';
+      }
+    }
+  }
+
+  return errors;
 }
 
 main().catch((err) => {

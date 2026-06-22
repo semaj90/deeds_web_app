@@ -155,6 +155,43 @@ function compactObject(value) {
   return value;
 }
 
+const COARSE_FEATURE_ID_VALUES = new Set([
+  'db',
+  'routes',
+  'ai',
+  'api',
+  'ui',
+  'graph',
+  'search',
+  'retrieval',
+  'packet',
+]);
+
+function isCoarseFeatureId(value) {
+  const text = asText(value).toLowerCase();
+  if (!text) return false;
+  if (COARSE_FEATURE_ID_VALUES.has(text)) return true;
+  return /^[a-z]{1,4}$/.test(text) && !/[./:_-]/.test(text);
+}
+
+function canonicalFeatureId(...values) {
+  for (const value of values) {
+    const text = asText(value);
+    if (!text || isCoarseFeatureId(text)) continue;
+    return text;
+  }
+  return null;
+}
+
+function inferDomainFromSourceRef(sourceRef) {
+  const normalized = asText(sourceRef).replace(/\\/g, '/');
+  if (!normalized) return null;
+  const parts = normalized.split('/').filter(Boolean);
+  if (!parts.length) return null;
+  const preferred = parts.find((part) => !['src', 'lib', 'server', 'routes', 'app', 'packages'].includes(part.toLowerCase()));
+  return asNullableText(preferred ?? parts[parts.length - 2] ?? parts[0]);
+}
+
 function redactPayload(payload) {
   return payload;
 }
@@ -285,7 +322,31 @@ function deriveRowMeta(row, tableName) {
   const centroidId = firstDefined(row.centroid_id, payload.centroid_id, payload.centroidId, metadata.centroid_id, metadata.centroidId);
   const qdrantTagId = firstDefined(row.qdrant_tag_id, payload.qdrant_tag_id, payload.qdrantTagId, metadata.qdrant_tag_id, metadata.qdrantTagId);
   const sourceRefKey = firstText(row.source_ref_key, payload.source_ref_key, payload.sourceRefKey, metadata.source_ref_key, metadata.sourceRefKey);
-  const domain = firstText(row.domain, payload.domain, payload.domain_class, payload.domainClass, metadata.domain, metadata.domain_class, metadata.domainClass);
+  const domain = firstText(
+    row.domain_class,
+    payload.domain_class,
+    payload.domainClass,
+    metadata.domain_class,
+    metadata.domainClass,
+    row.domain,
+    payload.domain,
+    metadata.domain,
+    inferDomainFromSourceRef(sourceRef),
+  );
+  const pathLabel = firstText(
+    row.path_label,
+    payload.path_label,
+    payload.pathLabel,
+    metadata.path_label,
+    metadata.pathLabel,
+    row.domain,
+    payload.domain,
+    payload.domain_class,
+    payload.domainClass,
+    metadata.domain,
+    metadata.domain_class,
+    metadata.domainClass,
+  );
   const packetType = firstText(row.packet_type, payload.packet_type, payload.packetType, metadata.packet_type);
 
   return {
@@ -303,6 +364,8 @@ function deriveRowMeta(row, tableName) {
     qdrant_tag_id: qdrantTagId,
     source_ref_key: sourceRefKey,
     domain,
+    domain_class: domain,
+    path_label: pathLabel,
     packet_type: packetType,
     metadata,
     payload,
@@ -406,7 +469,13 @@ function buildCanonicalPayload(row, point, nowIso) {
   const packetKey = firstText(row.packet_key, payload.packet_key, payload.packetKey, point?.id);
   const sourceRef = firstText(row.source_ref, payload.source_ref, payload.sourceRef, payload.canonicalSourceRef, row.source_ref_key);
   const filePath = firstText(row.file_path, payload.file_path, payload.filePath, payload.relative_path, payload.path, row.source_path);
-  const featureId = firstText(row.feature_id, payload.feature_id, payload.featureId);
+  const featureId = canonicalFeatureId(
+    row.feature_id,
+    payload.feature_id,
+    payload.featureId,
+    rowMetadata.feature_id,
+    rowMetadata.featureId,
+  );
   const featureLabel = firstText(row.feature_label, payload.feature_label, payload.featureLabel);
   const communityId = firstDefined(row.community_id, payload.community_id, payload.communityId);
   const communityConfidence = firstDefined(row.community_confidence, payload.community_confidence, payload.communityConfidence);
@@ -415,7 +484,27 @@ function buildCanonicalPayload(row, point, nowIso) {
   const centroidId = firstDefined(row.centroid_id, payload.centroid_id, payload.centroidId);
   const qdrantPointId = asText(point?.id);
   const qdrantTagId = firstDefined(row.qdrant_tag_id, payload.qdrant_tag_id, payload.qdrantTagId);
-  const domain = firstText(row.domain, payload.domain, payload.domain_class, payload.domainClass);
+  const domain = firstText(
+    row.domain_class,
+    payload.domain_class,
+    payload.domainClass,
+    row.domain,
+    payload.domain,
+    rowMetadata.domain_class,
+    rowMetadata.domainClass,
+    inferDomainFromSourceRef(sourceRef),
+  );
+  const pathLabel = firstText(
+    row.path_label,
+    payload.path_label,
+    payload.pathLabel,
+    rowMetadata.path_label,
+    rowMetadata.pathLabel,
+    row.domain,
+    payload.domain,
+    payload.domain_class,
+    payload.domainClass,
+  );
   const packetType = firstText(row.packet_type, payload.packet_type, payload.packetType);
   const sourceRefKey = firstText(row.source_ref_key, payload.source_ref_key, payload.sourceRefKey);
   const legacyAliases = mergeUniqueArrays(
@@ -435,6 +524,7 @@ function buildCanonicalPayload(row, point, nowIso) {
     payload.qdrantTagId ? ['qdrantTagId'] : [],
     payload.redisHotKey ? ['redisHotKey'] : [],
     payload.neo4jNodeId ? ['neo4jNodeId'] : [],
+    payload.pathLabel ? ['pathLabel'] : [],
   );
 
   const sourceRefs = mergeUniqueArrays(
@@ -448,13 +538,12 @@ function buildCanonicalPayload(row, point, nowIso) {
     row.source_ref_key,
   );
 
+  const payloadFeatureId = canonicalFeatureId(payload.feature_id, payload.featureId);
   const featureIds = mergeUniqueArrays(
     featureId,
-    payload.feature_id,
-    payload.featureId,
+    payloadFeatureId,
     payload.feature_ids,
     payload.featureIds,
-    row.feature_id,
   );
 
   const mergedMetadata = {
@@ -511,6 +600,8 @@ function buildCanonicalPayload(row, point, nowIso) {
     payload_unmatched: false,
     payload_backfilled_at: nowIso,
     domain,
+    domain_class: domain,
+    path_label: pathLabel,
     packet_type: packetType,
     metadata: mergedMetadata,
     updated_at: nowIso,
@@ -604,7 +695,7 @@ async function resolveTableRows(pool, tableName) {
 
 async function loadLedgerRows(pool) {
   const tableChecks = await Promise.all(
-    ['atlas_feature_packets', 'atlas_packets'].map(async (tableName) => {
+    ['atlas_codebase_packets', 'atlas_feature_packets', 'atlas_packets', 'task_semantic_packets', 'parent_atlas_documents'].map(async (tableName) => {
       const exists = await pool.query(
         `
           SELECT 1
@@ -621,7 +712,7 @@ async function loadLedgerRows(pool) {
 
   const availableTables = tableChecks.filter((item) => item.exists).map((item) => item.tableName);
   if (availableTables.length === 0) {
-    throw new Error('No canonical packet table found (expected atlas_feature_packets or atlas_packets)');
+    throw new Error('No canonical packet table found (expected atlas_codebase_packets, atlas_feature_packets, atlas_packets, task_semantic_packets, or parent_atlas_documents)');
   }
 
   const rows = [];
@@ -831,8 +922,11 @@ async function main() {
       feature_id: { matched: 0, total: 0, pct: 0 },
     },
     ledgerCounts: {
+      atlas_codebase_packets: 0,
       atlas_feature_packets: 0,
       atlas_packets: 0,
+      task_semantic_packets: 0,
+      parent_atlas_documents: 0,
       legacy_qdrant_only: 0,
     },
     samples: [],
@@ -843,8 +937,11 @@ async function main() {
     const { availableTables, rows } = await loadLedgerRows(pool);
     report.availableLedgers = availableTables;
     report.postgres.rowsScanned = rows.length;
+    report.postgres.rowsFromCodebasePackets = rows.filter((row) => row.ledger_type === 'atlas_codebase_packets').length;
     report.postgres.rowsFromFeaturePackets = rows.filter((row) => row.ledger_type === LEDGER_TYPE_FEATURE).length;
     report.postgres.rowsFromAtlasPackets = rows.filter((row) => row.ledger_type === LEDGER_TYPE_PACKETS).length;
+    report.postgres.rowsFromTaskSemanticPackets = rows.filter((row) => row.ledger_type === 'task_semantic_packets').length;
+    report.postgres.rowsFromParentAtlasDocuments = rows.filter((row) => row.ledger_type === 'parent_atlas_documents').length;
 
     const rowIndexes = buildRowIndexes(rows);
 

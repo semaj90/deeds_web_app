@@ -64,6 +64,7 @@ function buildRow(indexRow, traceEntry) {
   const trace = response.trace ?? {};
   const resultCount = packets.length || Number(indexRow?.packet_count ?? 0) || 0;
   const query = asString(entry.query ?? indexRow?.query ?? '');
+  const queryNormalized = query.toLowerCase().trim();
   const sourceRefs = uniqueStrings([
     ...packets.map((packet) => packet.source_ref),
     ...(Array.isArray(response.source_refs) ? response.source_refs : []),
@@ -78,12 +79,47 @@ function buildRow(indexRow, traceEntry) {
   ]);
   const createdAt = asString(entry.timestamp ?? indexRow?.timestamp ?? new Date().toISOString());
   const cacheHit = Boolean(entry.metadata?.cache_hit ?? indexRow?.cache_hit ?? false);
+  const cacheSource = asString(entry.metadata?.cache_source ?? trace.cache_source ?? (cacheHit ? 'redis_exact_match' : 'live_fusion'));
+  const cacheNamespace = asString(entry.metadata?.cache_namespace ?? trace.cache_namespace ?? 'hyperrag:query');
+  const replayId = asString(entry.metadata?.replay_id ?? entry.id ?? indexRow?.id ?? sha256(`${query}:${createdAt}`));
+  const topPacket = packets[0] ?? {};
+  const graphStageStatus = asString(entry.metadata?.graph_stage_status ?? trace.graph_stage_status ?? (
+    Number(trace.neo4j_expansions ?? 0) > 0
+      ? 'GRAPH_ENABLED'
+      : (Number(trace.qdrant_hits ?? 0) > 0 || Number(trace.postgres_hits ?? 0) > 0)
+        ? 'GRAPH_DEGRADED'
+        : 'GRAPH_DISABLED'
+  ));
+  const graphStageReason =
+    asString(entry.metadata?.graph_stage_reason ?? trace.graph_stage_reason ?? (
+    Number(trace.neo4j_expansions ?? 0) > 0
+      ? 'neo4j expansions available'
+      : Number(trace.qdrant_hits ?? 0) > 0 || Number(trace.postgres_hits ?? 0) > 0
+        ? 'neo4j expansion not returned for this replay entry'
+        : 'no retrieval hits recorded'
+  ));
+  const traversalPath = [
+    'packet_rpc',
+    ...(cacheHit ? ['redis'] : []),
+    ...(Number(trace.postgres_hits ?? 0) > 0 ? ['postgres'] : []),
+    ...(Number(trace.qdrant_hits ?? 0) > 0 ? ['qdrant'] : []),
+    ...(Number(trace.neo4j_expansions ?? 0) > 0 ? ['neo4j'] : []),
+    ...(Number(trace.rrf_hits ?? 0) > 0 ? ['rrf'] : []),
+  ];
 
   return {
-    trace_id: asString(indexRow?.id ?? entry?.id ?? sha256(`${query}:${createdAt}`)),
+    trace_id: replayId,
+    task_id: asString(entry.metadata?.task_id ?? response?.trace?.task_id ?? null) || null,
+    worker_id: asString(entry.metadata?.worker_id ?? response?.trace?.worker_id ?? response?.packets?.[0]?.worker ?? 'sveltekit-frontend'),
     query,
+    query_normalized: queryNormalized,
     query_hash: sha256(query),
     route: asString(entry?.request?.route ?? response?.route ?? '/api/hyperrag/packet-rpc'),
+    replay_id: replayId,
+    retrieval_path: Array.isArray(response.trace?.retrieval_path) ? response.trace.retrieval_path : traversalPath,
+    packet_key: asString(topPacket?.packet_key ?? packetKeys[0] ?? null) || null,
+    source_ref: asString(topPacket?.source_ref ?? sourceRefs[0] ?? null) || null,
+    feature_id: asString(topPacket?.feature_id ?? featureIds[0] ?? null) || null,
     bm25_hits: Number(trace.postgres_hits ?? trace.bm25_hits ?? 0) || 0,
     qdrant_hits: Number(trace.qdrant_hits ?? 0) || 0,
     neo4j_hits: Number(trace.neo4j_expansions ?? trace.neo4j_hits ?? 0) || 0,
@@ -96,8 +132,22 @@ function buildRow(indexRow, traceEntry) {
     error: entry.error ?? null,
     created_at: createdAt,
     cache_hit: cacheHit,
+    cache_hit_source: cacheSource,
+    cache_namespace: cacheNamespace,
+    cache_key: `hyperrag:query:${sha256(query)}`,
     latency_ms: Number(trace.latency_ms ?? entry?.metadata?.duration_ms ?? 0) || 0,
     retrieval_strategy: asString(trace.retrieval_strategy ?? response.strategy ?? 'fusion'),
+    graph_stage_status: graphStageStatus,
+    graph_stage_reason: graphStageReason,
+    source_ref_key: sourceRefs[0] ?? null,
+    feature_label: packets[0]?.feature_label ?? null,
+    qdrant_point_id: packets[0]?.qdrant_point_id ?? null,
+    qdrant_collection: packets[0]?.qdrant_collection ?? null,
+    domain_class: packets[0]?.domain_class ?? null,
+    ontology_label: packets[0]?.ontology_label ?? null,
+    topology_label: packets[0]?.topology_label ?? null,
+    traversal_path: traversalPath,
+    provenance: Array.isArray(response.provenance) ? response.provenance : [],
   };
 }
 
@@ -180,7 +230,11 @@ async function main() {
       '## Fields',
       '',
       '- query_hash',
+      '- trace_id',
+      '- task_id',
+      '- worker_id',
       '- route',
+      '- replay_id',
       '- bm25_hits',
       '- qdrant_hits',
       '- neo4j_hits',
@@ -192,6 +246,20 @@ async function main() {
       '- result_count',
       '- error',
       '- created_at',
+      '- cache_hit_source',
+      '- cache_namespace',
+      '- cache_key',
+      '- graph_stage_status',
+      '- graph_stage_reason',
+      '- retrieval_path',
+      '- source_ref_key',
+      '- feature_label',
+      '- qdrant_point_id',
+      '- qdrant_collection',
+      '- domain_class',
+      '- ontology_label',
+      '- topology_label',
+      '- traversal_path',
       '',
     ].join('\n');
     await fs.writeFile(OUT_MD, md, 'utf8');

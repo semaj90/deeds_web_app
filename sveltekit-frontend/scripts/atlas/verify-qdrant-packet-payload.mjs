@@ -41,6 +41,38 @@ const fieldAliases = {
   metadata: ['metadata'],
 };
 
+const COARSE_FEATURE_ID_VALUES = new Set([
+  'db',
+  'routes',
+  'ai',
+  'api',
+  'ui',
+  'graph',
+  'search',
+  'retrieval',
+  'packet',
+  'src',
+  'lib',
+  'server',
+  'client',
+  'components',
+]);
+
+function isCoarseFeatureId(value) {
+  const text = String(value ?? '').trim().toLowerCase();
+  if (!text) return false;
+  if (COARSE_FEATURE_ID_VALUES.has(text)) return true;
+  return /^[a-z]{1,4}$/.test(text) && !/[./:_-]/.test(text);
+}
+
+function chooseCanonicalFeatureId(pgFeatureId, qdrantFeatureId) {
+  const pg = String(pgFeatureId ?? '').trim();
+  const qdrant = String(qdrantFeatureId ?? '').trim();
+  if (pg) return { feature_id: pg, qdrant_coarse_feature: isCoarseFeatureId(qdrant) ? qdrant : null };
+  if (qdrant) return { feature_id: qdrant, qdrant_coarse_feature: isCoarseFeatureId(qdrant) ? qdrant : null };
+  return { feature_id: null, qdrant_coarse_feature: null };
+}
+
 function pickField(obj, aliases) {
   if (!obj || typeof obj !== 'object') return null;
   for (const key of aliases) {
@@ -119,61 +151,65 @@ async function main() {
 
   let report;
   try {
-    const tableCheck = await pool.query(`
-      select 1
+    const candidateTables = ['atlas_codebase_packets', 'atlas_feature_packets', 'atlas_packets', 'task_semantic_packets', 'parent_atlas_documents'];
+    const { rows: existingTables } = await pool.query(`
+      select table_name
       from information_schema.tables
       where table_schema = 'public'
-        and table_name = 'atlas_packets'
-      limit 1
+        and table_name = any(ARRAY[${candidateTables.map((table) => `'${table}'`).join(', ')}]::text[])
+      order by table_name asc
     `);
-    if (tableCheck.rowCount === 0) {
-      throw new Error('atlas_packets table is missing');
+    if (existingTables.length === 0) {
+      throw new Error('No canonical packet ledger tables are available');
     }
 
-    const atlasColumns = await pool.query(`
-      select column_name
-      from information_schema.columns
-      where table_schema = 'public'
-        and table_name = 'atlas_packets'
-    `);
-    const atlasColumnSet = new Set(atlasColumns.rows.map((row) => row.column_name));
-    const idColumn = atlasColumnSet.has('id')
-      ? 'id'
-      : atlasColumnSet.has('packet_id')
-        ? 'packet_id'
-        : atlasColumnSet.has('packet_key')
-          ? 'packet_key'
-          : null;
-    if (!idColumn) {
-      throw new Error('atlas_packets does not expose an id, packet_id, or packet_key column');
+    const rows = [];
+    for (const { table_name: tableName } of existingTables) {
+      const { rows: columnRows } = await pool.query(`
+        select column_name
+        from information_schema.columns
+        where table_schema = 'public'
+          and table_name = $1
+      `, [tableName]);
+      const columnSet = new Set(columnRows.map((row) => row.column_name));
+      const idColumn = columnSet.has('id')
+        ? 'id'
+        : columnSet.has('packet_id')
+          ? 'packet_id'
+          : columnSet.has('packet_key')
+            ? 'packet_key'
+            : null;
+      if (!idColumn) continue;
+
+      const selectParts = [
+        `${idColumn} as row_id`,
+        `'${tableName}' as source_table`,
+        columnSet.has('packet_key') ? 'packet_key' : 'NULL::text as packet_key',
+        columnSet.has('source_ref') ? 'source_ref' : 'NULL::text as source_ref',
+        columnSet.has('feature_id') ? 'feature_id' : 'NULL::text as feature_id',
+        columnSet.has('feature_label') ? 'feature_label' : 'NULL::text as feature_label',
+        columnSet.has('metadata') ? 'metadata' : 'NULL::jsonb as metadata',
+        columnSet.has('qdrant_tag_id') ? 'qdrant_tag_id' : 'NULL::text as qdrant_tag_id',
+        columnSet.has('cluster_id') ? 'cluster_id' : 'NULL::text as cluster_id',
+        columnSet.has('community_id') ? 'community_id' : 'NULL::text as community_id',
+        columnSet.has('som_cluster') ? 'som_cluster' : 'NULL::text as som_cluster',
+        columnSet.has('domain_class') ? 'domain_class' : 'NULL::text as domain_class',
+        columnSet.has('domain') ? 'domain' : 'NULL::text as domain',
+        columnSet.has('ontology') ? 'ontology' : 'NULL::jsonb as ontology',
+      ];
+
+      const tableRows = await pool.query(
+        `
+          select ${selectParts.join(', ')}
+          from public.${tableName}
+          where coalesce(${columnSet.has('source_ref') ? 'source_ref' : 'null'}, ${columnSet.has('packet_key') ? 'packet_key' : 'null'}, ${columnSet.has('feature_id') ? 'feature_id' : 'null'}) is not null
+          order by ${columnSet.has('updated_at') ? 'updated_at desc nulls last,' : ''} ${idColumn} desc
+          limit $1
+        `,
+        [SAMPLE_LIMIT],
+      );
+      rows.push(...tableRows.rows);
     }
-
-    const selectParts = [
-      `${idColumn} as row_id`,
-      atlasColumnSet.has('packet_key') ? 'packet_key' : 'NULL::text as packet_key',
-      atlasColumnSet.has('source_ref') ? 'source_ref' : 'NULL::text as source_ref',
-      atlasColumnSet.has('feature_id') ? 'feature_id' : 'NULL::text as feature_id',
-      atlasColumnSet.has('feature_label') ? 'feature_label' : 'NULL::text as feature_label',
-      atlasColumnSet.has('metadata') ? 'metadata' : 'NULL::jsonb as metadata',
-      atlasColumnSet.has('qdrant_tag_id') ? 'qdrant_tag_id' : 'NULL::text as qdrant_tag_id',
-      atlasColumnSet.has('cluster_id') ? 'cluster_id' : 'NULL::text as cluster_id',
-      atlasColumnSet.has('community_id') ? 'community_id' : 'NULL::text as community_id',
-      atlasColumnSet.has('som_cluster') ? 'som_cluster' : 'NULL::text as som_cluster',
-      atlasColumnSet.has('domain_class') ? 'domain_class' : 'NULL::text as domain_class',
-      atlasColumnSet.has('domain') ? 'domain' : 'NULL::text as domain',
-      atlasColumnSet.has('ontology') ? 'ontology' : 'NULL::jsonb as ontology',
-    ];
-
-    const { rows } = await pool.query(
-      `
-        select ${selectParts.join(', ')}
-        from atlas_packets
-        where source_ref is not null
-        order by updated_at desc nulls last, ${idColumn} desc
-        limit $1
-      `,
-      [SAMPLE_LIMIT],
-    );
 
     const samples = [];
     const fieldCoverage = Object.fromEntries(Object.keys(fieldAliases).map((key) => [key, 0]));
@@ -181,6 +217,8 @@ async function main() {
     let agreementCount = 0;
     let mismatchCount = 0;
     let missingCount = 0;
+    let contradictionCount = 0;
+    const contradictions = [];
 
     for (const row of rows) {
       const sourceRef = String(row.source_ref ?? '').trim();
@@ -199,6 +237,29 @@ async function main() {
       const comparison = {};
       let comparable = 0;
       let matched = 0;
+      const pgFeatureId = pickField(row, ['feature_id', 'featureId']);
+      const qdrantFeatureId = pickField(payload, ['feature_id', 'featureId']);
+      const resolvedFeature = chooseCanonicalFeatureId(pgFeatureId, qdrantFeatureId);
+      const featureContradiction =
+        Boolean(pgFeatureId && qdrantFeatureId) &&
+        String(pgFeatureId).trim() !== String(qdrantFeatureId).trim() &&
+        isCoarseFeatureId(qdrantFeatureId) &&
+        !isCoarseFeatureId(pgFeatureId);
+
+      if (featureContradiction) {
+        contradictionCount += 1;
+        if (contradictions.length < 20) {
+          contradictions.push({
+            source_ref: sourceRef || null,
+            packet_key: row.packet_key ?? null,
+            postgres_feature_id: String(pgFeatureId ?? ''),
+            qdrant_feature_id: String(qdrantFeatureId ?? ''),
+            resolved_feature_id: resolvedFeature.feature_id,
+            qdrant_coarse_feature: resolvedFeature.qdrant_coarse_feature,
+          });
+        }
+      }
+
       for (const [field, aliases] of Object.entries(fieldAliases)) {
         const pgValue = pickField(row, [field, ...aliases]);
         const qValue = pickField(payload, [field, ...aliases]);
@@ -229,6 +290,7 @@ async function main() {
         comparable,
         matched,
         allComparableMatch,
+        feature_contradiction: featureContradiction,
         comparison,
       });
     }
@@ -246,8 +308,10 @@ async function main() {
       agreementCount,
       mismatchCount,
       missingCount,
+      contradictionCount,
       agreementPct: total > 0 ? Number(((agreementCount / total) * 100).toFixed(2)) : 0,
       pointFoundPct: total > 0 ? Number(((pointFoundCount / total) * 100).toFixed(2)) : 0,
+      postgresQdrantNoContradictions: contradictionCount === 0,
       fieldCoverage: Object.fromEntries(
         Object.entries(fieldCoverage).map(([field, count]) => [
           field,
@@ -258,9 +322,10 @@ async function main() {
         ]),
       ),
       samples,
+      contradictions,
     };
 
-    if (report.agreementPct < 95 || report.pointFoundPct < 95) {
+    if (report.agreementPct < 95 || report.pointFoundPct < 95 || contradictionCount > 0) {
       report.warning = 'Coverage below 95% on sampled atlas packets';
     }
   } catch (error) {
@@ -305,8 +370,10 @@ async function main() {
       `- Agreements: ${report.agreementCount}`,
       `- Mismatches: ${report.mismatchCount}`,
       `- Missing points: ${report.missingCount}`,
+      `- Contradictions: ${report.contradictionCount ?? 0}`,
       `- Agreement pct: ${report.agreementPct}`,
       `- Point found pct: ${report.pointFoundPct}`,
+      `- postgres_qdrant_no_contradictions: ${report.postgresQdrantNoContradictions ? 'PASS' : 'FAIL'}`,
       '',
       '## Field Coverage',
       '',
@@ -319,12 +386,20 @@ async function main() {
       ...report.samples.slice(0, 10).map((sample) =>
         `- ${sample.source_ref ?? 'n/a'} | point=${sample.qdrant_point_id ?? 'n/a'} | matched=${sample.matched}/${sample.comparable}`,
       ),
+      '',
+      '## Contradictions',
+      '',
+      ...(report.contradictions ?? []).length
+        ? report.contradictions.map((item) =>
+            `- ${item.source_ref ?? 'n/a'} | pg=${item.postgres_feature_id} | qdrant=${item.qdrant_feature_id} | resolved=${item.resolved_feature_id}`,
+          )
+        : ['- none'],
     ].join('\n'),
     'utf8',
   );
 
   console.log(JSON.stringify({ ok: true, report }, null, 2));
-  process.exit(report.agreementPct >= 95 && report.pointFoundPct >= 95 ? 0 : 1);
+  process.exit(report.agreementPct >= 95 && report.pointFoundPct >= 95 && contradictionCount === 0 ? 0 : 1);
 }
 
 main().catch((error) => {

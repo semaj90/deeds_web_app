@@ -1,20 +1,20 @@
 {
-  "generatedAt": "2026-06-14T03:43:41.763Z",
-  "startedAt": "2026-06-14T03:43:37.475Z",
+  "generatedAt": "2026-06-21T21:12:08.011Z",
+  "startedAt": "2026-06-21T21:12:06.910Z",
   "appUrl": "http://localhost:5173",
   "seed": {
-    "id": "fc7b16561b82d5b13cf66563fd368da2af10868ab81a7c144fbb3c8fd862845c",
-    "source_ref": ".cache/ace/context-packs/ace_context_smoke-context-pack_v1.json",
-    "feature_id": "22d6336c5d58f51fabe00e658c381ba923fdf1d9",
-    "feature_label": "22d6336c5d58f51fabe00e658c381ba923fdf1d9",
+    "id": "e1f73006-03eb-4748-9b1b-38a198f0a875",
+    "source_ref": "sveltekit-frontend/src/lib/components/detective/UploadZone.svelte",
+    "feature_id": "utility",
+    "feature_label": "Utility",
     "qdrant_tag_id": null,
-    "cluster_id": 29,
-    "community_id": 29,
+    "cluster_id": 0,
+    "community_id": 5781,
     "som_cluster": null,
     "domain_class": null
   },
   "seedSource": "atlas_packets",
-  "query": "22d6336c5d58f51fabe00e658c381ba923fdf1d9 22d6336c5d58f51fabe00e658c381ba923fdf1d9 .cache/ace/context-packs/ace_context_smoke-context-pack_v1.json visibility 20260614034337",
+  "query": "Utility utility sveltekit-frontend/src/lib/components/detective/UploadZone.svelte visibility 20260621211206",
   "status": 200,
   "ok": true,
   "resultCount": 5,
@@ -23,7 +23,7 @@
     "source_ref": 5,
     "metadata": 5,
     "qdrant_tag_id": 5,
-    "cluster_id": 3,
+    "cluster_id": 5,
     "community_id": 5,
     "som_cluster": 5,
     "karpathy_score": 5,
@@ -35,157 +35,803 @@
   "allRequiredVisible": true,
   "packetShapes": [
     {
-      "packet_key": ".cache/ace/context-packs/ace_context_smoke-context-pack_v1.json:bd969f62ad1c261d",
-      "source_ref": ".cache/ace/context-packs/ace_context_smoke-context-pack_v1.json",
-      "feature_id": "22d6336c5d58f51fabe00e658c381ba923fdf1d9",
+      "packet_key": "src/lib/components/evidence/EvidencePrimaryUpload.svelte:34a413faba84fbd5",
+      "source_ref": "sveltekit-frontend/src/lib/components/evidence/EvidencePrimaryUpload.svelte",
+      "feature_id": "utility",
       "feature_label": null
     },
     {
-      "packet_key": "src/lib/server/cache/ace-context-pack-cache.ts:c643785255636690",
-      "source_ref": "sveltekit-frontend/src/lib/server/cache/ace-context-pack-cache.ts",
-      "feature_id": "cache",
+      "packet_key": "src/lib/components/detective/UploadZone.svelte:7e1e3a57c29d7fb3",
+      "source_ref": "sveltekit-frontend/src/lib/components/detective/UploadZone.svelte",
+      "feature_id": "utility",
       "feature_label": null
     },
     {
-      "packet_key": "src/lib/server/cache/ace-context-cache-metrics.ts:51d359bedf3fdada",
-      "source_ref": "sveltekit-frontend/src/lib/server/cache/ace-context-cache-metrics.ts",
-      "feature_id": "cache",
+      "packet_key": "src/lib/components/evidence/EvidenceUploadModal.svelte:45f46f0992ca1f7b",
+      "source_ref": "sveltekit-frontend/src/lib/components/evidence/EvidenceUploadModal.svelte",
+      "feature_id": "utility",
       "feature_label": null
     },
     {
-      "packet_key": ".cache/ace/context-packs/ace_context_local-json-hit_v1.json:0cd8ec3cced8cc06",
-      "source_ref": ".cache/ace/context-packs/ace_context_local-json-hit_v1.json",
-      "feature_id": "c19d70fff6c17dc1acf1a52ce6d5a99f35745b7a",
+      "packet_key": "src/lib/components/yorha/evidence/UploadZone.svelte:4160c6082d53c5b2",
+      "source_ref": "sveltekit-frontend/src/lib/components/yorha/evidence/UploadZone.svelte",
+      "feature_id": "utility",
       "feature_label": null
     },
     {
-      "packet_key": ".cache/ace/top-retrieval/ace_retrieval_topn_77245b8d5bd3442aa981670b_2.json:17808923d2c5c30c",
-      "source_ref": ".cache/ace/top-retrieval/ace_retrieval_topn_77245b8d5bd3442aa981670b_2.json",
-      "feature_id": "bf3368a25ed8e4bd1ee5f64ff90bb9f9d3f2ec5f",
+      "packet_key": "src/lib/components/evidence/EvidenceUploadButton.svelte:f7cba4aa79354592",
+      "source_ref": "sveltekit-frontend/src/lib/components/evidence/EvidenceUploadButton.svelte",
+      "feature_id": "utility",
       "feature_label": null
     }
   ],
   "visibleSamples": [
     {
-      "feature_id": "22d6336c5d58f51fabe00e658c381ba923fdf1d9",
-      "source_ref": ".cache/ace/context-packs/ace_context_smoke-context-pack_v1.json",
+      "feature_id": "utility",
+      "source_ref": "sveltekit-frontend/src/lib/components/evidence/EvidencePrimaryUpload.svelte",
       "metadata": {
-        "hash": "sha256:c3f291e887e1d995085259090378d5c9697afc38e1a8d3a32c0207ee1dac700b",
-        "path": ".cache/ace/context-packs/ace_context_smoke-context-pack_v1.json",
-        "mtime": "2026-06-12T16:21:21.823Z",
-        "file_url": "file:///C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/.cache/ace/context-packs/ace_context_smoke-context-pack_v1.json",
-        "repo_url": null,
-        "indexed_at": "2026-06-13T00:50:08.803Z",
-        "source_url": null,
-        "directory_path": ".cache/ace/context-packs"
+        "ae_epoch": 60,
+        "app_root": "sveltekit-frontend",
+        "file_path": "sveltekit-frontend/src/lib/components/evidence/EvidencePrimaryUpload.svelte",
+        "repo_root": "deeds-web-app",
+        "ae_val_loss": 0.0007358284494839609,
+        "ae_timestamp": "2026-06-19T16:13:04Z",
+        "cache_context": {},
+        "directory_path": "sveltekit-frontend/src/lib/components/evidence",
+        "derived_enrichment": {
+          "entities": [
+            {
+              "end": 3597,
+              "text": "text",
+              "type": "database_schema",
+              "start": 3593,
+              "confidence": 0.9
+            },
+            {
+              "end": 5346,
+              "text": "text",
+              "type": "database_schema",
+              "start": 5342,
+              "confidence": 0.9
+            },
+            {
+              "end": 7328,
+              "text": "text",
+              "type": "database_schema",
+              "start": 7324,
+              "confidence": 0.9
+            },
+            {
+              "end": 9514,
+              "text": "text",
+              "type": "database_schema",
+              "start": 9510,
+              "confidence": 0.9
+            },
+            {
+              "end": 9810,
+              "text": "text",
+              "type": "database_schema",
+              "start": 9806,
+              "confidence": 0.9
+            },
+            {
+              "end": 10857,
+              "text": "text",
+              "type": "database_schema",
+              "start": 10853,
+              "confidence": 0.9
+            },
+            {
+              "end": 11667,
+              "text": "text",
+              "type": "database_schema",
+              "start": 11663,
+              "confidence": 0.9
+            },
+            {
+              "end": 4147,
+              "text": "POST",
+              "type": "route_handler",
+              "start": 4143,
+              "confidence": 0.9
+            }
+          ]
+        }
       },
-      "qdrant_tag_id": "987581600",
-      "cluster_id": 29,
-      "community_id": 29,
-      "som_cluster": 29,
-      "karpathy_score": 0.6280972361564636,
-      "redis_hot_key": "redis:.cache/ace/context-packs/ace_context_smoke-context-pack_v1.json:bd969f62ad1c261d",
-      "neo4j_node": "neo4j:.cache/ace/context-packs/ace_context_smoke-context-pack_v1.json",
+      "qdrant_tag_id": "1783417747",
+      "cluster_id": 0,
+      "community_id": 5774,
+      "som_cluster": 0,
+      "karpathy_score": 0.4688766300678253,
+      "redis_hot_key": "redis:src/lib/components/evidence/EvidencePrimaryUpload.svelte:34a413faba84fbd5",
+      "neo4j_node": "neo4j:sveltekit-frontend/src/lib/components/evidence/EvidencePrimaryUpload.svelte",
       "domain": "utility",
       "ontology": [
         "utility"
       ]
     },
     {
-      "feature_id": "cache",
-      "source_ref": "sveltekit-frontend/src/lib/server/cache/ace-context-pack-cache.ts",
+      "feature_id": "utility",
+      "source_ref": "sveltekit-frontend/src/lib/components/detective/UploadZone.svelte",
       "metadata": {
-        "hash": "sha256:934843d0dff8d68c6f80e5e471be20f29e5d44159fd82f0c8cb14402eecaa108",
-        "path": "src/lib/server/cache/ace-context-pack-cache.ts",
-        "mtime": "2026-05-26T20:32:57.880Z",
-        "file_url": "file:///C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/server/cache/ace-context-pack-cache.ts",
-        "repo_url": null,
-        "indexed_at": "2026-06-13T00:49:42.555Z",
-        "source_url": null,
-        "directory_path": "src/lib/server/cache"
+        "ae_epoch": 60,
+        "app_root": "sveltekit-frontend",
+        "file_path": "sveltekit-frontend/src/lib/components/detective/UploadZone.svelte",
+        "repo_root": "deeds-web-app",
+        "ae_val_loss": 0.0007358284494839609,
+        "ae_timestamp": "2026-06-19T16:13:04Z",
+        "cache_context": {},
+        "directory_path": "sveltekit-frontend/src/lib/components/detective",
+        "derived_enrichment": {
+          "entities": [
+            {
+              "end": 1924,
+              "text": "text",
+              "type": "database_schema",
+              "start": 1920,
+              "confidence": 0.9
+            },
+            {
+              "end": 2157,
+              "text": "text",
+              "type": "database_schema",
+              "start": 2153,
+              "confidence": 0.9
+            },
+            {
+              "end": 2165,
+              "text": "text",
+              "type": "database_schema",
+              "start": 2161,
+              "confidence": 0.9
+            },
+            {
+              "end": 2279,
+              "text": "text",
+              "type": "database_schema",
+              "start": 2275,
+              "confidence": 0.9
+            }
+          ]
+        }
       },
-      "qdrant_tag_id": "39687381",
-      "cluster_id": null,
-      "community_id": 3,
-      "som_cluster": 3,
-      "karpathy_score": 0.5049964189529419,
-      "redis_hot_key": "redis:src/lib/server/cache/ace-context-pack-cache.ts:c643785255636690",
-      "neo4j_node": "neo4j:sveltekit-frontend/src/lib/server/cache/ace-context-pack-cache.ts",
+      "qdrant_tag_id": "409655259",
+      "cluster_id": 0,
+      "community_id": 5781,
+      "som_cluster": 0,
+      "karpathy_score": 0.4584996998310089,
+      "redis_hot_key": "redis:src/lib/components/detective/UploadZone.svelte:7e1e3a57c29d7fb3",
+      "neo4j_node": "neo4j:sveltekit-frontend/src/lib/components/detective/UploadZone.svelte",
       "domain": "utility",
       "ontology": [
         "utility"
       ]
     },
     {
-      "feature_id": "cache",
-      "source_ref": "sveltekit-frontend/src/lib/server/cache/ace-context-cache-metrics.ts",
+      "feature_id": "utility",
+      "source_ref": "sveltekit-frontend/src/lib/components/evidence/EvidenceUploadModal.svelte",
       "metadata": {
-        "hash": "sha256:76dcf0d578deefcf6156661308308757dd22889a69a93d813eb09dc58074164d",
-        "path": "src/lib/server/cache/ace-context-cache-metrics.ts",
-        "mtime": "2026-06-01T01:30:12.260Z",
-        "file_url": "file:///C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/server/cache/ace-context-cache-metrics.ts",
-        "repo_url": null,
-        "indexed_at": "2026-06-13T00:49:57.056Z",
-        "source_url": null,
-        "directory_path": "src/lib/server/cache"
+        "ae_epoch": 60,
+        "app_root": "sveltekit-frontend",
+        "file_path": "sveltekit-frontend/src/lib/components/evidence/EvidenceUploadModal.svelte",
+        "repo_root": "deeds-web-app",
+        "ae_val_loss": 0.0007358284494839609,
+        "ae_timestamp": "2026-06-19T16:13:04Z",
+        "cache_context": {},
+        "directory_path": "sveltekit-frontend/src/lib/components/evidence",
+        "derived_enrichment": {
+          "entities": [
+            {
+              "end": 1031,
+              "text": "text",
+              "type": "database_schema",
+              "start": 1027,
+              "confidence": 0.9
+            },
+            {
+              "end": 1132,
+              "text": "text",
+              "type": "database_schema",
+              "start": 1128,
+              "confidence": 0.9
+            },
+            {
+              "end": 1296,
+              "text": "vector",
+              "type": "database_schema",
+              "start": 1290,
+              "confidence": 0.9
+            },
+            {
+              "end": 2110,
+              "text": "text",
+              "type": "database_schema",
+              "start": 2106,
+              "confidence": 0.9
+            },
+            {
+              "end": 2124,
+              "text": "text",
+              "type": "database_schema",
+              "start": 2120,
+              "confidence": 0.9
+            },
+            {
+              "end": 2141,
+              "text": "text",
+              "type": "database_schema",
+              "start": 2137,
+              "confidence": 0.9
+            },
+            {
+              "end": 3008,
+              "text": "text",
+              "type": "database_schema",
+              "start": 3004,
+              "confidence": 0.9
+            },
+            {
+              "end": 8460,
+              "text": "text",
+              "type": "database_schema",
+              "start": 8456,
+              "confidence": 0.9
+            },
+            {
+              "end": 8482,
+              "text": "text",
+              "type": "database_schema",
+              "start": 8478,
+              "confidence": 0.9
+            },
+            {
+              "end": 8539,
+              "text": "text",
+              "type": "database_schema",
+              "start": 8535,
+              "confidence": 0.9
+            },
+            {
+              "end": 8547,
+              "text": "text",
+              "type": "database_schema",
+              "start": 8543,
+              "confidence": 0.9
+            },
+            {
+              "end": 9262,
+              "text": "text",
+              "type": "database_schema",
+              "start": 9258,
+              "confidence": 0.9
+            },
+            {
+              "end": 9301,
+              "text": "text",
+              "type": "database_schema",
+              "start": 9297,
+              "confidence": 0.9
+            },
+            {
+              "end": 9376,
+              "text": "text",
+              "type": "database_schema",
+              "start": 9372,
+              "confidence": 0.9
+            },
+            {
+              "end": 9389,
+              "text": "text",
+              "type": "database_schema",
+              "start": 9385,
+              "confidence": 0.9
+            },
+            {
+              "end": 10066,
+              "text": "text",
+              "type": "database_schema",
+              "start": 10062,
+              "confidence": 0.9
+            },
+            {
+              "end": 10150,
+              "text": "text",
+              "type": "database_schema",
+              "start": 10146,
+              "confidence": 0.9
+            },
+            {
+              "end": 10172,
+              "text": "text",
+              "type": "database_schema",
+              "start": 10168,
+              "confidence": 0.9
+            },
+            {
+              "end": 10233,
+              "text": "text",
+              "type": "database_schema",
+              "start": 10229,
+              "confidence": 0.9
+            },
+            {
+              "end": 10246,
+              "text": "text",
+              "type": "database_schema",
+              "start": 10242,
+              "confidence": 0.9
+            },
+            {
+              "end": 10649,
+              "text": "text",
+              "type": "database_schema",
+              "start": 10645,
+              "confidence": 0.9
+            },
+            {
+              "end": 10708,
+              "text": "text",
+              "type": "database_schema",
+              "start": 10704,
+              "confidence": 0.9
+            },
+            {
+              "end": 10950,
+              "text": "text",
+              "type": "database_schema",
+              "start": 10946,
+              "confidence": 0.9
+            },
+            {
+              "end": 11420,
+              "text": "text",
+              "type": "database_schema",
+              "start": 11416,
+              "confidence": 0.9
+            },
+            {
+              "end": 11836,
+              "text": "text",
+              "type": "database_schema",
+              "start": 11832,
+              "confidence": 0.9
+            },
+            {
+              "end": 11970,
+              "text": "text",
+              "type": "database_schema",
+              "start": 11966,
+              "confidence": 0.9
+            },
+            {
+              "end": 12095,
+              "text": "text",
+              "type": "database_schema",
+              "start": 12091,
+              "confidence": 0.9
+            },
+            {
+              "end": 12294,
+              "text": "text",
+              "type": "database_schema",
+              "start": 12290,
+              "confidence": 0.9
+            },
+            {
+              "end": 12365,
+              "text": "text",
+              "type": "database_schema",
+              "start": 12361,
+              "confidence": 0.9
+            },
+            {
+              "end": 12383,
+              "text": "text",
+              "type": "database_schema",
+              "start": 12379,
+              "confidence": 0.9
+            },
+            {
+              "end": 12452,
+              "text": "text",
+              "type": "database_schema",
+              "start": 12448,
+              "confidence": 0.9
+            },
+            {
+              "end": 12464,
+              "text": "text",
+              "type": "database_schema",
+              "start": 12460,
+              "confidence": 0.9
+            },
+            {
+              "end": 12696,
+              "text": "text",
+              "type": "database_schema",
+              "start": 12692,
+              "confidence": 0.9
+            },
+            {
+              "end": 12750,
+              "text": "text",
+              "type": "database_schema",
+              "start": 12746,
+              "confidence": 0.9
+            },
+            {
+              "end": 12936,
+              "text": "text",
+              "type": "database_schema",
+              "start": 12932,
+              "confidence": 0.9
+            },
+            {
+              "end": 12944,
+              "text": "text",
+              "type": "database_schema",
+              "start": 12940,
+              "confidence": 0.9
+            },
+            {
+              "end": 13006,
+              "text": "text",
+              "type": "database_schema",
+              "start": 13002,
+              "confidence": 0.9
+            },
+            {
+              "end": 13105,
+              "text": "text",
+              "type": "database_schema",
+              "start": 13101,
+              "confidence": 0.9
+            },
+            {
+              "end": 13234,
+              "text": "text",
+              "type": "database_schema",
+              "start": 13230,
+              "confidence": 0.9
+            },
+            {
+              "end": 13386,
+              "text": "text",
+              "type": "database_schema",
+              "start": 13382,
+              "confidence": 0.9
+            },
+            {
+              "end": 13447,
+              "text": "text",
+              "type": "database_schema",
+              "start": 13443,
+              "confidence": 0.9
+            },
+            {
+              "end": 13537,
+              "text": "text",
+              "type": "database_schema",
+              "start": 13533,
+              "confidence": 0.9
+            },
+            {
+              "end": 13632,
+              "text": "text",
+              "type": "database_schema",
+              "start": 13628,
+              "confidence": 0.9
+            },
+            {
+              "end": 13805,
+              "text": "text",
+              "type": "database_schema",
+              "start": 13801,
+              "confidence": 0.9
+            },
+            {
+              "end": 14060,
+              "text": "text",
+              "type": "database_schema",
+              "start": 14056,
+              "confidence": 0.9
+            },
+            {
+              "end": 14068,
+              "text": "text",
+              "type": "database_schema",
+              "start": 14064,
+              "confidence": 0.9
+            },
+            {
+              "end": 15974,
+              "text": "text",
+              "type": "database_schema",
+              "start": 15970,
+              "confidence": 0.9
+            },
+            {
+              "end": 17313,
+              "text": "text",
+              "type": "database_schema",
+              "start": 17309,
+              "confidence": 0.9
+            },
+            {
+              "end": 5646,
+              "text": "POST",
+              "type": "route_handler",
+              "start": 5642,
+              "confidence": 0.9
+            },
+            {
+              "end": 6536,
+              "text": "POST",
+              "type": "route_handler",
+              "start": 6532,
+              "confidence": 0.9
+            },
+            {
+              "end": 6890,
+              "text": "POST",
+              "type": "route_handler",
+              "start": 6886,
+              "confidence": 0.9
+            }
+          ]
+        }
       },
-      "qdrant_tag_id": "1248222466",
-      "cluster_id": null,
-      "community_id": 3,
-      "som_cluster": 3,
-      "karpathy_score": 0.4651050567626953,
-      "redis_hot_key": "redis:src/lib/server/cache/ace-context-cache-metrics.ts:51d359bedf3fdada",
-      "neo4j_node": "neo4j:sveltekit-frontend/src/lib/server/cache/ace-context-cache-metrics.ts",
+      "qdrant_tag_id": "1623893489",
+      "cluster_id": 0,
+      "community_id": 5743,
+      "som_cluster": 0,
+      "karpathy_score": 0.44700726866722107,
+      "redis_hot_key": "redis:src/lib/components/evidence/EvidenceUploadModal.svelte:45f46f0992ca1f7b",
+      "neo4j_node": "neo4j:sveltekit-frontend/src/lib/components/evidence/EvidenceUploadModal.svelte",
       "domain": "utility",
       "ontology": [
         "utility"
       ]
     },
     {
-      "feature_id": "c19d70fff6c17dc1acf1a52ce6d5a99f35745b7a",
-      "source_ref": ".cache/ace/context-packs/ace_context_local-json-hit_v1.json",
+      "feature_id": "utility",
+      "source_ref": "sveltekit-frontend/src/lib/components/yorha/evidence/UploadZone.svelte",
       "metadata": {
-        "hash": "sha256:9ee43864551f5cffeac438553bbef97dede30b8df59392772ecbaee06068a884",
-        "path": ".cache/ace/context-packs/ace_context_local-json-hit_v1.json",
-        "mtime": "2026-05-25T18:42:42.017Z",
-        "file_url": "file:///C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/.cache/ace/context-packs/ace_context_local-json-hit_v1.json",
-        "repo_url": null,
-        "indexed_at": "2026-06-13T00:49:51.445Z",
-        "source_url": null,
-        "directory_path": ".cache/ace/context-packs"
+        "ae_epoch": 60,
+        "app_root": "sveltekit-frontend",
+        "file_path": "sveltekit-frontend/src/lib/components/yorha/evidence/UploadZone.svelte",
+        "repo_root": "deeds-web-app",
+        "ae_val_loss": 0.0007358284494839609,
+        "ae_timestamp": "2026-06-19T16:13:04Z",
+        "cache_context": {},
+        "directory_path": "sveltekit-frontend/src/lib/components/yorha/evidence",
+        "derived_enrichment": {
+          "entities": [
+            {
+              "end": 3018,
+              "text": "text",
+              "type": "database_schema",
+              "start": 3014,
+              "confidence": 0.9
+            },
+            {
+              "end": 3277,
+              "text": "text",
+              "type": "database_schema",
+              "start": 3273,
+              "confidence": 0.9
+            },
+            {
+              "end": 3314,
+              "text": "text",
+              "type": "database_schema",
+              "start": 3310,
+              "confidence": 0.9
+            },
+            {
+              "end": 3334,
+              "text": "text",
+              "type": "database_schema",
+              "start": 3330,
+              "confidence": 0.9
+            },
+            {
+              "end": 3390,
+              "text": "text",
+              "type": "database_schema",
+              "start": 3386,
+              "confidence": 0.9
+            },
+            {
+              "end": 3403,
+              "text": "text",
+              "type": "database_schema",
+              "start": 3399,
+              "confidence": 0.9
+            },
+            {
+              "end": 3757,
+              "text": "text",
+              "type": "database_schema",
+              "start": 3753,
+              "confidence": 0.9
+            },
+            {
+              "end": 3894,
+              "text": "text",
+              "type": "database_schema",
+              "start": 3890,
+              "confidence": 0.9
+            },
+            {
+              "end": 3902,
+              "text": "text",
+              "type": "database_schema",
+              "start": 3898,
+              "confidence": 0.9
+            },
+            {
+              "end": 4132,
+              "text": "text",
+              "type": "database_schema",
+              "start": 4128,
+              "confidence": 0.9
+            },
+            {
+              "end": 4152,
+              "text": "text",
+              "type": "database_schema",
+              "start": 4148,
+              "confidence": 0.9
+            },
+            {
+              "end": 4273,
+              "text": "text",
+              "type": "database_schema",
+              "start": 4269,
+              "confidence": 0.9
+            },
+            {
+              "end": 4285,
+              "text": "text",
+              "type": "database_schema",
+              "start": 4281,
+              "confidence": 0.9
+            },
+            {
+              "end": 4545,
+              "text": "text",
+              "type": "database_schema",
+              "start": 4541,
+              "confidence": 0.9
+            },
+            {
+              "end": 4575,
+              "text": "text",
+              "type": "database_schema",
+              "start": 4571,
+              "confidence": 0.9
+            },
+            {
+              "end": 4630,
+              "text": "text",
+              "type": "database_schema",
+              "start": 4626,
+              "confidence": 0.9
+            },
+            {
+              "end": 5119,
+              "text": "text",
+              "type": "database_schema",
+              "start": 5115,
+              "confidence": 0.9
+            },
+            {
+              "end": 5217,
+              "text": "text",
+              "type": "database_schema",
+              "start": 5213,
+              "confidence": 0.9
+            },
+            {
+              "end": 5228,
+              "text": "text",
+              "type": "database_schema",
+              "start": 5224,
+              "confidence": 0.9
+            },
+            {
+              "end": 5278,
+              "text": "text",
+              "type": "database_schema",
+              "start": 5274,
+              "confidence": 0.9
+            },
+            {
+              "end": 5286,
+              "text": "text",
+              "type": "database_schema",
+              "start": 5282,
+              "confidence": 0.9
+            },
+            {
+              "end": 5375,
+              "text": "text",
+              "type": "database_schema",
+              "start": 5371,
+              "confidence": 0.9
+            },
+            {
+              "end": 5394,
+              "text": "text",
+              "type": "database_schema",
+              "start": 5390,
+              "confidence": 0.9
+            },
+            {
+              "end": 5619,
+              "text": "text",
+              "type": "database_schema",
+              "start": 5615,
+              "confidence": 0.9
+            },
+            {
+              "end": 5639,
+              "text": "text",
+              "type": "database_schema",
+              "start": 5635,
+              "confidence": 0.9
+            },
+            {
+              "end": 5688,
+              "text": "text",
+              "type": "database_schema",
+              "start": 5684,
+              "confidence": 0.9
+            },
+            {
+              "end": 5696,
+              "text": "text",
+              "type": "database_schema",
+              "start": 5692,
+              "confidence": 0.9
+            }
+          ]
+        }
       },
-      "qdrant_tag_id": "11915146",
-      "cluster_id": 22,
-      "community_id": 22,
-      "som_cluster": 22,
-      "karpathy_score": 0.5420960187911987,
-      "redis_hot_key": "redis:.cache/ace/context-packs/ace_context_local-json-hit_v1.json:0cd8ec3cced8cc06",
-      "neo4j_node": "neo4j:.cache/ace/context-packs/ace_context_local-json-hit_v1.json",
+      "qdrant_tag_id": "1233872715",
+      "cluster_id": 0,
+      "community_id": 5714,
+      "som_cluster": 0,
+      "karpathy_score": 0.45431891083717346,
+      "redis_hot_key": "redis:src/lib/components/yorha/evidence/UploadZone.svelte:4160c6082d53c5b2",
+      "neo4j_node": "neo4j:sveltekit-frontend/src/lib/components/yorha/evidence/UploadZone.svelte",
       "domain": "utility",
       "ontology": [
         "utility"
       ]
     },
     {
-      "feature_id": "bf3368a25ed8e4bd1ee5f64ff90bb9f9d3f2ec5f",
-      "source_ref": ".cache/ace/top-retrieval/ace_retrieval_topn_77245b8d5bd3442aa981670b_2.json",
+      "feature_id": "utility",
+      "source_ref": "sveltekit-frontend/src/lib/components/evidence/EvidenceUploadButton.svelte",
       "metadata": {
-        "hash": "sha256:34292265a8e25734effd0e889a8b2c5519a52c8e02b165b787fd97faa41ddfe7",
-        "path": ".cache/ace/top-retrieval/ace_retrieval_topn_77245b8d5bd3442aa981670b_2.json",
-        "mtime": "2026-06-12T16:21:23.365Z",
-        "file_url": "file:///C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/.cache/ace/top-retrieval/ace_retrieval_topn_77245b8d5bd3442aa981670b_2.json",
-        "repo_url": null,
-        "indexed_at": "2026-06-13T00:50:00.981Z",
-        "source_url": null,
-        "directory_path": ".cache/ace/top-retrieval"
+        "ae_epoch": 60,
+        "app_root": "sveltekit-frontend",
+        "file_path": "sveltekit-frontend/src/lib/components/evidence/EvidenceUploadButton.svelte",
+        "repo_root": "deeds-web-app",
+        "ae_val_loss": 0.0007358284494839609,
+        "ae_timestamp": "2026-06-19T16:13:04Z",
+        "cache_context": {},
+        "directory_path": "sveltekit-frontend/src/lib/components/evidence"
       },
-      "qdrant_tag_id": "1560429437",
-      "cluster_id": 23,
-      "community_id": 23,
-      "som_cluster": 23,
-      "karpathy_score": 0.5047990679740906,
-      "redis_hot_key": "redis:.cache/ace/top-retrieval/ace_retrieval_topn_77245b8d5bd3442aa981670b_2.json:17808923d2c5c30c",
-      "neo4j_node": "neo4j:.cache/ace/top-retrieval/ace_retrieval_topn_77245b8d5bd3442aa981670b_2.json",
+      "qdrant_tag_id": "1271375267",
+      "cluster_id": 0,
+      "community_id": 4112,
+      "som_cluster": 0,
+      "karpathy_score": 0.4328906834125519,
+      "redis_hot_key": "redis:src/lib/components/evidence/EvidenceUploadButton.svelte:f7cba4aa79354592",
+      "neo4j_node": "neo4j:sveltekit-frontend/src/lib/components/evidence/EvidenceUploadButton.svelte",
       "domain": "utility",
       "ontology": [
         "utility"
@@ -195,449 +841,1023 @@
   "responsePreview": {
     "results": [
       {
-        "packet_key": ".cache/ace/context-packs/ace_context_smoke-context-pack_v1.json:bd969f62ad1c261d",
-        "source_ref": ".cache/ace/context-packs/ace_context_smoke-context-pack_v1.json",
-        "feature_id": "22d6336c5d58f51fabe00e658c381ba923fdf1d9",
-        "community_id": 29,
+        "packet_key": "src/lib/components/evidence/EvidencePrimaryUpload.svelte:34a413faba84fbd5",
+        "source_ref": "sveltekit-frontend/src/lib/components/evidence/EvidencePrimaryUpload.svelte",
+        "feature_id": "utility",
+        "community_id": 5774,
         "domain_class": null,
         "domain": "utility",
         "ontology": [
           "utility"
         ],
+        "topology_label": "utility",
+        "ontology_label": "utility",
+        "cluster_key": null,
+        "kmeans_cluster": 0,
         "concept_ids": [
           "agent_intelligence",
+          "api_endpoints",
+          "database_orm",
+          "emergent_topology",
+          "general_abstractions",
+          "infrastructure_config",
+          "native_accelerators",
+          "observability_telemetry",
           "test_harness",
-          "22d6336c5d58f51fabe00e658c381ba923fdf1d9",
-          "agent",
-          "intelligence",
-          "test",
-          "harness",
-          "cache",
-          "packs",
-          "ace_context_smoke",
-          "ace",
-          "smoke",
-          "pack_v1",
-          "pack",
-          "hermes",
-          "app",
-          "features",
-          ".cache",
-          "context-packs",
-          "ace_context_smoke-context-pack_v1"
+          "ui_components"
         ],
         "summary": null,
         "metadata": {
-          "hash": "sha256:c3f291e887e1d995085259090378d5c9697afc38e1a8d3a32c0207ee1dac700b",
-          "path": ".cache/ace/context-packs/ace_context_smoke-context-pack_v1.json",
-          "mtime": "2026-06-12T16:21:21.823Z",
-          "file_url": "file:///C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/.cache/ace/context-packs/ace_context_smoke-context-pack_v1.json",
-          "repo_url": null,
-          "indexed_at": "2026-06-13T00:50:08.803Z",
-          "source_url": null,
-          "directory_path": ".cache/ace/context-packs"
+          "ae_epoch": 60,
+          "app_root": "sveltekit-frontend",
+          "file_path": "sveltekit-frontend/src/lib/components/evidence/EvidencePrimaryUpload.svelte",
+          "repo_root": "deeds-web-app",
+          "ae_val_loss": 0.0007358284494839609,
+          "ae_timestamp": "2026-06-19T16:13:04Z",
+          "cache_context": {},
+          "directory_path": "sveltekit-frontend/src/lib/components/evidence",
+          "derived_enrichment": {
+            "entities": [
+              {
+                "end": 3597,
+                "text": "text",
+                "type": "database_schema",
+                "start": 3593,
+                "confidence": 0.9
+              },
+              {
+                "end": 5346,
+                "text": "text",
+                "type": "database_schema",
+                "start": 5342,
+                "confidence": 0.9
+              },
+              {
+                "end": 7328,
+                "text": "text",
+                "type": "database_schema",
+                "start": 7324,
+                "confidence": 0.9
+              },
+              {
+                "end": 9514,
+                "text": "text",
+                "type": "database_schema",
+                "start": 9510,
+                "confidence": 0.9
+              },
+              {
+                "end": 9810,
+                "text": "text",
+                "type": "database_schema",
+                "start": 9806,
+                "confidence": 0.9
+              },
+              {
+                "end": 10857,
+                "text": "text",
+                "type": "database_schema",
+                "start": 10853,
+                "confidence": 0.9
+              },
+              {
+                "end": 11667,
+                "text": "text",
+                "type": "database_schema",
+                "start": 11663,
+                "confidence": 0.9
+              },
+              {
+                "end": 4147,
+                "text": "POST",
+                "type": "route_handler",
+                "start": 4143,
+                "confidence": 0.9
+              }
+            ]
+          }
         },
         "reward_prior": 0,
         "community_confidence": null,
-        "qdrant_tag_id": "987581600",
-        "cluster_id": 29,
-        "som_cluster": 29,
-        "karpathy_score": 0.6280972361564636,
-        "redis_hot_key": "redis:.cache/ace/context-packs/ace_context_smoke-context-pack_v1.json:bd969f62ad1c261d",
+        "qdrant_tag_id": "1783417747",
+        "cluster_id": 0,
+        "som_cluster": 0,
+        "karpathy_score": 0.4688766300678253,
+        "redis_hot_key": "redis:src/lib/components/evidence/EvidencePrimaryUpload.svelte:34a413faba84fbd5",
         "redis_hot_keys": [],
-        "neo4j_node": "neo4j:.cache/ace/context-packs/ace_context_smoke-context-pack_v1.json",
+        "neo4j_node": "neo4j:sveltekit-frontend/src/lib/components/evidence/EvidencePrimaryUpload.svelte",
         "ann_turbovec_score": 0,
-        "gpu_cosine_score": 0.6280972361564636,
+        "gpu_cosine_score": 0.4688766300678253,
         "som_cache_hit": 0,
         "created_at": null,
-        "cascade_score": 0.0711457441656457,
+        "cascade_score": 0.048668979492849776,
         "stage_scores": {
-          "cosine": 0.636837,
-          "concept_overlap": 0.5,
-          "same_feature": 1,
-          "pagerank": 0,
-          "reward": 0,
-          "freshness": 0.467,
-          "domain_match": 0
-        },
-        "qdrant_id": 987581600
-      },
-      {
-        "packet_key": "src/lib/server/cache/ace-context-pack-cache.ts:c643785255636690",
-        "source_ref": "sveltekit-frontend/src/lib/server/cache/ace-context-pack-cache.ts",
-        "feature_id": "cache",
-        "community_id": 3,
-        "domain_class": null,
-        "domain": "utility",
-        "ontology": [
-          "utility"
-        ],
-        "concept_ids": [
-          "api_endpoints",
-          "general_abstractions",
-          "infrastructure_config",
-          "native_accelerators",
-          "observability_telemetry",
-          "ui_components",
-          "cache",
-          "endpoints",
-          "abstractions",
-          "infrastructure",
-          "config",
-          "native",
-          "accelerators",
-          "ace",
-          "retrieval",
-          "analytics",
-          "graph",
-          "indexer",
-          "metrics",
-          "repo",
-          "sha",
-          "out",
-          "file",
-          "summary",
-          "payload",
-          "set",
-          "pack",
-          "pointer",
-          "key",
-          "normalized",
-          "maybe",
-          "lines",
-          "counts",
-          "write",
-          "local",
-          "index",
-          "path",
-          "redis",
-          "ttl",
-          "seconds",
-          "contents",
-          "snapshot",
-          "url",
-          "sveltekit-frontend",
-          "sveltekit",
-          "frontend",
-          "ace-context-pack-cache"
-        ],
-        "summary": null,
-        "metadata": {
-          "hash": "sha256:934843d0dff8d68c6f80e5e471be20f29e5d44159fd82f0c8cb14402eecaa108",
-          "path": "src/lib/server/cache/ace-context-pack-cache.ts",
-          "mtime": "2026-05-26T20:32:57.880Z",
-          "file_url": "file:///C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/server/cache/ace-context-pack-cache.ts",
-          "repo_url": null,
-          "indexed_at": "2026-06-13T00:49:42.555Z",
-          "source_url": null,
-          "directory_path": "src/lib/server/cache"
-        },
-        "reward_prior": 0,
-        "community_confidence": null,
-        "qdrant_tag_id": "39687381",
-        "cluster_id": null,
-        "som_cluster": 3,
-        "karpathy_score": 0.5049964189529419,
-        "redis_hot_key": "redis:src/lib/server/cache/ace-context-pack-cache.ts:c643785255636690",
-        "redis_hot_keys": [],
-        "neo4j_node": "neo4j:sveltekit-frontend/src/lib/server/cache/ace-context-pack-cache.ts",
-        "ann_turbovec_score": 0,
-        "gpu_cosine_score": 0.5049964189529419,
-        "som_cache_hit": 0,
-        "created_at": null,
-        "cascade_score": 0.059336408848044205,
-        "stage_scores": {
-          "cosine": 0.5215149,
-          "concept_overlap": 0.017857142857142856,
-          "same_feature": 1,
-          "pagerank": 0,
-          "reward": 0,
-          "freshness": 0.467,
-          "domain_match": 0
-        },
-        "qdrant_id": 39687381
-      },
-      {
-        "packet_key": "src/lib/server/cache/ace-context-cache-metrics.ts:51d359bedf3fdada",
-        "source_ref": "sveltekit-frontend/src/lib/server/cache/ace-context-cache-metrics.ts",
-        "feature_id": "cache",
-        "community_id": 3,
-        "domain_class": null,
-        "domain": "utility",
-        "ontology": [
-          "utility"
-        ],
-        "concept_ids": [
-          "api_endpoints",
-          "general_abstractions",
-          "infrastructure_config",
-          "native_accelerators",
-          "observability_telemetry",
-          "ui_components",
-          "cache",
-          "endpoints",
-          "abstractions",
-          "infrastructure",
-          "config",
-          "native",
-          "accelerators",
-          "ace",
-          "retrieval",
-          "analytics",
-          "graph",
-          "indexer",
-          "ttl",
-          "seconds",
-          "fresh",
-          "repo",
-          "meta",
-          "key",
-          "hits",
-          "record",
-          "hit",
-          "access",
-          "now",
-          "append",
-          "local",
-          "log",
-          "line",
-          "persist",
-          "run",
-          "metadata",
-          "send",
-          "langfuse",
-          "ace-context-cache-metrics",
-          "metrics",
-          "sveltekit-frontend",
-          "sveltekit",
-          "frontend"
-        ],
-        "summary": null,
-        "metadata": {
-          "hash": "sha256:76dcf0d578deefcf6156661308308757dd22889a69a93d813eb09dc58074164d",
-          "path": "src/lib/server/cache/ace-context-cache-metrics.ts",
-          "mtime": "2026-06-01T01:30:12.260Z",
-          "file_url": "file:///C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/server/cache/ace-context-cache-metrics.ts",
-          "repo_url": null,
-          "indexed_at": "2026-06-13T00:49:57.056Z",
-          "source_url": null,
-          "directory_path": "src/lib/server/cache"
-        },
-        "reward_prior": 0,
-        "community_confidence": null,
-        "qdrant_tag_id": "1248222466",
-        "cluster_id": null,
-        "som_cluster": 3,
-        "karpathy_score": 0.4651050567626953,
-        "redis_hot_key": "redis:src/lib/server/cache/ace-context-cache-metrics.ts:51d359bedf3fdada",
-        "redis_hot_keys": [],
-        "neo4j_node": "neo4j:sveltekit-frontend/src/lib/server/cache/ace-context-cache-metrics.ts",
-        "ann_turbovec_score": 0,
-        "gpu_cosine_score": 0.4651050567626953,
-        "som_cache_hit": 0,
-        "created_at": null,
-        "cascade_score": 0.05549369388069428,
-        "stage_scores": {
-          "cosine": 0.4780159,
-          "concept_overlap": 0.019230769230769232,
-          "same_feature": 1,
-          "pagerank": 0,
-          "reward": 0,
-          "freshness": 0.467,
-          "domain_match": 0
-        },
-        "qdrant_id": 1248222466
-      },
-      {
-        "packet_key": ".cache/ace/context-packs/ace_context_local-json-hit_v1.json:0cd8ec3cced8cc06",
-        "source_ref": ".cache/ace/context-packs/ace_context_local-json-hit_v1.json",
-        "feature_id": "c19d70fff6c17dc1acf1a52ce6d5a99f35745b7a",
-        "community_id": 22,
-        "domain_class": null,
-        "domain": "utility",
-        "ontology": [
-          "utility"
-        ],
-        "concept_ids": [
-          "agent_intelligence",
-          "c19d70fff6c17dc1acf1a52ce6d5a99f35745b7a",
-          "agent",
-          "intelligence",
-          "cache",
-          "packs",
-          "ace_context_local",
-          "ace",
-          "local",
-          "hit_v1",
-          "hit",
-          "hermes",
-          "app",
-          "features",
-          ".cache",
-          "context-packs",
-          "ace_context_local-json-hit_v1"
-        ],
-        "summary": null,
-        "metadata": {
-          "hash": "sha256:9ee43864551f5cffeac438553bbef97dede30b8df59392772ecbaee06068a884",
-          "path": ".cache/ace/context-packs/ace_context_local-json-hit_v1.json",
-          "mtime": "2026-05-25T18:42:42.017Z",
-          "file_url": "file:///C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/.cache/ace/context-packs/ace_context_local-json-hit_v1.json",
-          "repo_url": null,
-          "indexed_at": "2026-06-13T00:49:51.445Z",
-          "source_url": null,
-          "directory_path": ".cache/ace/context-packs"
-        },
-        "reward_prior": 0,
-        "community_confidence": null,
-        "qdrant_tag_id": "11915146",
-        "cluster_id": 22,
-        "som_cluster": 22,
-        "karpathy_score": 0.5420960187911987,
-        "redis_hot_key": "redis:.cache/ace/context-packs/ace_context_local-json-hit_v1.json:0cd8ec3cced8cc06",
-        "redis_hot_keys": [],
-        "neo4j_node": "neo4j:.cache/ace/context-packs/ace_context_local-json-hit_v1.json",
-        "ann_turbovec_score": 0,
-        "gpu_cosine_score": 0.5420960187911987,
-        "som_cache_hit": 0,
-        "created_at": null,
-        "cascade_score": 0.028649281587153172,
-        "stage_scores": {
-          "cosine": 0.55662537,
-          "concept_overlap": 0.22727272727272727,
+          "cosine": 0.49406433,
+          "concept_overlap": 1,
           "same_feature": 0,
           "pagerank": 0,
           "reward": 0,
           "freshness": 0.467,
           "domain_match": 0
         },
-        "qdrant_id": 11915146
+        "qdrant_id": 1783417747
       },
       {
-        "packet_key": ".cache/ace/top-retrieval/ace_retrieval_topn_77245b8d5bd3442aa981670b_2.json:17808923d2c5c30c",
-        "source_ref": ".cache/ace/top-retrieval/ace_retrieval_topn_77245b8d5bd3442aa981670b_2.json",
-        "feature_id": "bf3368a25ed8e4bd1ee5f64ff90bb9f9d3f2ec5f",
-        "community_id": 23,
+        "packet_key": "src/lib/components/detective/UploadZone.svelte:7e1e3a57c29d7fb3",
+        "source_ref": "sveltekit-frontend/src/lib/components/detective/UploadZone.svelte",
+        "feature_id": "utility",
+        "community_id": 5781,
         "domain_class": null,
         "domain": "utility",
         "ontology": [
           "utility"
         ],
+        "topology_label": "utility",
+        "ontology_label": "utility",
+        "cluster_key": null,
+        "kmeans_cluster": 0,
         "concept_ids": [
           "agent_intelligence",
-          "bf3368a25ed8e4bd1ee5f64ff90bb9f9d3f2ec5f",
-          "agent",
-          "intelligence",
-          "cache",
-          "retrieval",
-          "app",
-          "features",
-          "ace",
-          ".cache",
-          "top-retrieval",
-          "top"
+          "api_endpoints",
+          "database_orm",
+          "emergent_topology",
+          "general_abstractions",
+          "infrastructure_config",
+          "native_accelerators",
+          "observability_telemetry",
+          "test_harness",
+          "ui_components"
         ],
         "summary": null,
         "metadata": {
-          "hash": "sha256:34292265a8e25734effd0e889a8b2c5519a52c8e02b165b787fd97faa41ddfe7",
-          "path": ".cache/ace/top-retrieval/ace_retrieval_topn_77245b8d5bd3442aa981670b_2.json",
-          "mtime": "2026-06-12T16:21:23.365Z",
-          "file_url": "file:///C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/.cache/ace/top-retrieval/ace_retrieval_topn_77245b8d5bd3442aa981670b_2.json",
-          "repo_url": null,
-          "indexed_at": "2026-06-13T00:50:00.981Z",
-          "source_url": null,
-          "directory_path": ".cache/ace/top-retrieval"
+          "ae_epoch": 60,
+          "app_root": "sveltekit-frontend",
+          "file_path": "sveltekit-frontend/src/lib/components/detective/UploadZone.svelte",
+          "repo_root": "deeds-web-app",
+          "ae_val_loss": 0.0007358284494839609,
+          "ae_timestamp": "2026-06-19T16:13:04Z",
+          "cache_context": {},
+          "directory_path": "sveltekit-frontend/src/lib/components/detective",
+          "derived_enrichment": {
+            "entities": [
+              {
+                "end": 1924,
+                "text": "text",
+                "type": "database_schema",
+                "start": 1920,
+                "confidence": 0.9
+              },
+              {
+                "end": 2157,
+                "text": "text",
+                "type": "database_schema",
+                "start": 2153,
+                "confidence": 0.9
+              },
+              {
+                "end": 2165,
+                "text": "text",
+                "type": "database_schema",
+                "start": 2161,
+                "confidence": 0.9
+              },
+              {
+                "end": 2279,
+                "text": "text",
+                "type": "database_schema",
+                "start": 2275,
+                "confidence": 0.9
+              }
+            ]
+          }
         },
         "reward_prior": 0,
         "community_confidence": null,
-        "qdrant_tag_id": "1560429437",
-        "cluster_id": 23,
-        "som_cluster": 23,
-        "karpathy_score": 0.5047990679740906,
-        "redis_hot_key": "redis:.cache/ace/top-retrieval/ace_retrieval_topn_77245b8d5bd3442aa981670b_2.json:17808923d2c5c30c",
+        "qdrant_tag_id": "409655259",
+        "cluster_id": 0,
+        "som_cluster": 0,
+        "karpathy_score": 0.4584996998310089,
+        "redis_hot_key": "redis:src/lib/components/detective/UploadZone.svelte:7e1e3a57c29d7fb3",
         "redis_hot_keys": [],
-        "neo4j_node": "neo4j:.cache/ace/top-retrieval/ace_retrieval_topn_77245b8d5bd3442aa981670b_2.json",
+        "neo4j_node": "neo4j:sveltekit-frontend/src/lib/components/detective/UploadZone.svelte",
         "ann_turbovec_score": 0,
-        "gpu_cosine_score": 0.5047990679740906,
+        "gpu_cosine_score": 0.4584996998310089,
         "som_cache_hit": 0,
         "created_at": null,
-        "cascade_score": 0.02685786974018127,
+        "cascade_score": 0.04765432206246654,
         "stage_scores": {
-          "cosine": 0.51584244,
-          "concept_overlap": 0.2222222222222222,
+          "cosine": 0.48072815,
+          "concept_overlap": 1,
           "same_feature": 0,
           "pagerank": 0,
           "reward": 0,
           "freshness": 0.467,
           "domain_match": 0
         },
-        "qdrant_id": 1560429437
+        "qdrant_id": 409655259
+      },
+      {
+        "packet_key": "src/lib/components/evidence/EvidenceUploadModal.svelte:45f46f0992ca1f7b",
+        "source_ref": "sveltekit-frontend/src/lib/components/evidence/EvidenceUploadModal.svelte",
+        "feature_id": "utility",
+        "community_id": 5743,
+        "domain_class": null,
+        "domain": "utility",
+        "ontology": [
+          "utility"
+        ],
+        "topology_label": "utility",
+        "ontology_label": "utility",
+        "cluster_key": null,
+        "kmeans_cluster": 0,
+        "concept_ids": [
+          "agent_intelligence",
+          "api_endpoints",
+          "database_orm",
+          "emergent_topology",
+          "general_abstractions",
+          "infrastructure_config",
+          "native_accelerators",
+          "observability_telemetry",
+          "test_harness",
+          "ui_components"
+        ],
+        "summary": null,
+        "metadata": {
+          "ae_epoch": 60,
+          "app_root": "sveltekit-frontend",
+          "file_path": "sveltekit-frontend/src/lib/components/evidence/EvidenceUploadModal.svelte",
+          "repo_root": "deeds-web-app",
+          "ae_val_loss": 0.0007358284494839609,
+          "ae_timestamp": "2026-06-19T16:13:04Z",
+          "cache_context": {},
+          "directory_path": "sveltekit-frontend/src/lib/components/evidence",
+          "derived_enrichment": {
+            "entities": [
+              {
+                "end": 1031,
+                "text": "text",
+                "type": "database_schema",
+                "start": 1027,
+                "confidence": 0.9
+              },
+              {
+                "end": 1132,
+                "text": "text",
+                "type": "database_schema",
+                "start": 1128,
+                "confidence": 0.9
+              },
+              {
+                "end": 1296,
+                "text": "vector",
+                "type": "database_schema",
+                "start": 1290,
+                "confidence": 0.9
+              },
+              {
+                "end": 2110,
+                "text": "text",
+                "type": "database_schema",
+                "start": 2106,
+                "confidence": 0.9
+              },
+              {
+                "end": 2124,
+                "text": "text",
+                "type": "database_schema",
+                "start": 2120,
+                "confidence": 0.9
+              },
+              {
+                "end": 2141,
+                "text": "text",
+                "type": "database_schema",
+                "start": 2137,
+                "confidence": 0.9
+              },
+              {
+                "end": 3008,
+                "text": "text",
+                "type": "database_schema",
+                "start": 3004,
+                "confidence": 0.9
+              },
+              {
+                "end": 8460,
+                "text": "text",
+                "type": "database_schema",
+                "start": 8456,
+                "confidence": 0.9
+              },
+              {
+                "end": 8482,
+                "text": "text",
+                "type": "database_schema",
+                "start": 8478,
+                "confidence": 0.9
+              },
+              {
+                "end": 8539,
+                "text": "text",
+                "type": "database_schema",
+                "start": 8535,
+                "confidence": 0.9
+              },
+              {
+                "end": 8547,
+                "text": "text",
+                "type": "database_schema",
+                "start": 8543,
+                "confidence": 0.9
+              },
+              {
+                "end": 9262,
+                "text": "text",
+                "type": "database_schema",
+                "start": 9258,
+                "confidence": 0.9
+              },
+              {
+                "end": 9301,
+                "text": "text",
+                "type": "database_schema",
+                "start": 9297,
+                "confidence": 0.9
+              },
+              {
+                "end": 9376,
+                "text": "text",
+                "type": "database_schema",
+                "start": 9372,
+                "confidence": 0.9
+              },
+              {
+                "end": 9389,
+                "text": "text",
+                "type": "database_schema",
+                "start": 9385,
+                "confidence": 0.9
+              },
+              {
+                "end": 10066,
+                "text": "text",
+                "type": "database_schema",
+                "start": 10062,
+                "confidence": 0.9
+              },
+              {
+                "end": 10150,
+                "text": "text",
+                "type": "database_schema",
+                "start": 10146,
+                "confidence": 0.9
+              },
+              {
+                "end": 10172,
+                "text": "text",
+                "type": "database_schema",
+                "start": 10168,
+                "confidence": 0.9
+              },
+              {
+                "end": 10233,
+                "text": "text",
+                "type": "database_schema",
+                "start": 10229,
+                "confidence": 0.9
+              },
+              {
+                "end": 10246,
+                "text": "text",
+                "type": "database_schema",
+                "start": 10242,
+                "confidence": 0.9
+              },
+              {
+                "end": 10649,
+                "text": "text",
+                "type": "database_schema",
+                "start": 10645,
+                "confidence": 0.9
+              },
+              {
+                "end": 10708,
+                "text": "text",
+                "type": "database_schema",
+                "start": 10704,
+                "confidence": 0.9
+              },
+              {
+                "end": 10950,
+                "text": "text",
+                "type": "database_schema",
+                "start": 10946,
+                "confidence": 0.9
+              },
+              {
+                "end": 11420,
+                "text": "text",
+                "type": "database_schema",
+                "start": 11416,
+                "confidence": 0.9
+              },
+              {
+                "end": 11836,
+                "text": "text",
+                "type": "database_schema",
+                "start": 11832,
+                "confidence": 0.9
+              },
+              {
+                "end": 11970,
+                "text": "text",
+                "type": "database_schema",
+                "start": 11966,
+                "confidence": 0.9
+              },
+              {
+                "end": 12095,
+                "text": "text",
+                "type": "database_schema",
+                "start": 12091,
+                "confidence": 0.9
+              },
+              {
+                "end": 12294,
+                "text": "text",
+                "type": "database_schema",
+                "start": 12290,
+                "confidence": 0.9
+              },
+              {
+                "end": 12365,
+                "text": "text",
+                "type": "database_schema",
+                "start": 12361,
+                "confidence": 0.9
+              },
+              {
+                "end": 12383,
+                "text": "text",
+                "type": "database_schema",
+                "start": 12379,
+                "confidence": 0.9
+              },
+              {
+                "end": 12452,
+                "text": "text",
+                "type": "database_schema",
+                "start": 12448,
+                "confidence": 0.9
+              },
+              {
+                "end": 12464,
+                "text": "text",
+                "type": "database_schema",
+                "start": 12460,
+                "confidence": 0.9
+              },
+              {
+                "end": 12696,
+                "text": "text",
+                "type": "database_schema",
+                "start": 12692,
+                "confidence": 0.9
+              },
+              {
+                "end": 12750,
+                "text": "text",
+                "type": "database_schema",
+                "start": 12746,
+                "confidence": 0.9
+              },
+              {
+                "end": 12936,
+                "text": "text",
+                "type": "database_schema",
+                "start": 12932,
+                "confidence": 0.9
+              },
+              {
+                "end": 12944,
+                "text": "text",
+                "type": "database_schema",
+                "start": 12940,
+                "confidence": 0.9
+              },
+              {
+                "end": 13006,
+                "text": "text",
+                "type": "database_schema",
+                "start": 13002,
+                "confidence": 0.9
+              },
+              {
+                "end": 13105,
+                "text": "text",
+                "type": "database_schema",
+                "start": 13101,
+                "confidence": 0.9
+              },
+              {
+                "end": 13234,
+                "text": "text",
+                "type": "database_schema",
+                "start": 13230,
+                "confidence": 0.9
+              },
+              {
+                "end": 13386,
+                "text": "text",
+                "type": "database_schema",
+                "start": 13382,
+                "confidence": 0.9
+              },
+              {
+                "end": 13447,
+                "text": "text",
+                "type": "database_schema",
+                "start": 13443,
+                "confidence": 0.9
+              },
+              {
+                "end": 13537,
+                "text": "text",
+                "type": "database_schema",
+                "start": 13533,
+                "confidence": 0.9
+              },
+              {
+                "end": 13632,
+                "text": "text",
+                "type": "database_schema",
+                "start": 13628,
+                "confidence": 0.9
+              },
+              {
+                "end": 13805,
+                "text": "text",
+                "type": "database_schema",
+                "start": 13801,
+                "confidence": 0.9
+              },
+              {
+                "end": 14060,
+                "text": "text",
+                "type": "database_schema",
+                "start": 14056,
+                "confidence": 0.9
+              },
+              {
+                "end": 14068,
+                "text": "text",
+                "type": "database_schema",
+                "start": 14064,
+                "confidence": 0.9
+              },
+              {
+                "end": 15974,
+                "text": "text",
+                "type": "database_schema",
+                "start": 15970,
+                "confidence": 0.9
+              },
+              {
+                "end": 17313,
+                "text": "text",
+                "type": "database_schema",
+                "start": 17309,
+                "confidence": 0.9
+              },
+              {
+                "end": 5646,
+                "text": "POST",
+                "type": "route_handler",
+                "start": 5642,
+                "confidence": 0.9
+              },
+              {
+                "end": 6536,
+                "text": "POST",
+                "type": "route_handler",
+                "start": 6532,
+                "confidence": 0.9
+              },
+              {
+                "end": 6890,
+                "text": "POST",
+                "type": "route_handler",
+                "start": 6886,
+                "confidence": 0.9
+              }
+            ]
+          }
+        },
+        "reward_prior": 0,
+        "community_confidence": null,
+        "qdrant_tag_id": "1623893489",
+        "cluster_id": 0,
+        "som_cluster": 0,
+        "karpathy_score": 0.44700726866722107,
+        "redis_hot_key": "redis:src/lib/components/evidence/EvidenceUploadModal.svelte:45f46f0992ca1f7b",
+        "redis_hot_keys": [],
+        "neo4j_node": "neo4j:sveltekit-frontend/src/lib/components/evidence/EvidenceUploadModal.svelte",
+        "ann_turbovec_score": 0,
+        "gpu_cosine_score": 0.44700726866722107,
+        "som_cache_hit": 0,
+        "created_at": null,
+        "cascade_score": 0.0467338299202002,
+        "stage_scores": {
+          "cosine": 0.4721985,
+          "concept_overlap": 1,
+          "same_feature": 0,
+          "pagerank": 0,
+          "reward": 0,
+          "freshness": 0.467,
+          "domain_match": 0
+        },
+        "qdrant_id": 1623893489
+      },
+      {
+        "packet_key": "src/lib/components/yorha/evidence/UploadZone.svelte:4160c6082d53c5b2",
+        "source_ref": "sveltekit-frontend/src/lib/components/yorha/evidence/UploadZone.svelte",
+        "feature_id": "utility",
+        "community_id": 5714,
+        "domain_class": null,
+        "domain": "utility",
+        "ontology": [
+          "utility"
+        ],
+        "topology_label": "utility",
+        "ontology_label": "utility",
+        "cluster_key": null,
+        "kmeans_cluster": 0,
+        "concept_ids": [
+          "agent_intelligence",
+          "api_endpoints",
+          "database_orm",
+          "emergent_topology",
+          "general_abstractions",
+          "infrastructure_config",
+          "native_accelerators",
+          "observability_telemetry",
+          "test_harness",
+          "ui_components"
+        ],
+        "summary": null,
+        "metadata": {
+          "ae_epoch": 60,
+          "app_root": "sveltekit-frontend",
+          "file_path": "sveltekit-frontend/src/lib/components/yorha/evidence/UploadZone.svelte",
+          "repo_root": "deeds-web-app",
+          "ae_val_loss": 0.0007358284494839609,
+          "ae_timestamp": "2026-06-19T16:13:04Z",
+          "cache_context": {},
+          "directory_path": "sveltekit-frontend/src/lib/components/yorha/evidence",
+          "derived_enrichment": {
+            "entities": [
+              {
+                "end": 3018,
+                "text": "text",
+                "type": "database_schema",
+                "start": 3014,
+                "confidence": 0.9
+              },
+              {
+                "end": 3277,
+                "text": "text",
+                "type": "database_schema",
+                "start": 3273,
+                "confidence": 0.9
+              },
+              {
+                "end": 3314,
+                "text": "text",
+                "type": "database_schema",
+                "start": 3310,
+                "confidence": 0.9
+              },
+              {
+                "end": 3334,
+                "text": "text",
+                "type": "database_schema",
+                "start": 3330,
+                "confidence": 0.9
+              },
+              {
+                "end": 3390,
+                "text": "text",
+                "type": "database_schema",
+                "start": 3386,
+                "confidence": 0.9
+              },
+              {
+                "end": 3403,
+                "text": "text",
+                "type": "database_schema",
+                "start": 3399,
+                "confidence": 0.9
+              },
+              {
+                "end": 3757,
+                "text": "text",
+                "type": "database_schema",
+                "start": 3753,
+                "confidence": 0.9
+              },
+              {
+                "end": 3894,
+                "text": "text",
+                "type": "database_schema",
+                "start": 3890,
+                "confidence": 0.9
+              },
+              {
+                "end": 3902,
+                "text": "text",
+                "type": "database_schema",
+                "start": 3898,
+                "confidence": 0.9
+              },
+              {
+                "end": 4132,
+                "text": "text",
+                "type": "database_schema",
+                "start": 4128,
+                "confidence": 0.9
+              },
+              {
+                "end": 4152,
+                "text": "text",
+                "type": "database_schema",
+                "start": 4148,
+                "confidence": 0.9
+              },
+              {
+                "end": 4273,
+                "text": "text",
+                "type": "database_schema",
+                "start": 4269,
+                "confidence": 0.9
+              },
+              {
+                "end": 4285,
+                "text": "text",
+                "type": "database_schema",
+                "start": 4281,
+                "confidence": 0.9
+              },
+              {
+                "end": 4545,
+                "text": "text",
+                "type": "database_schema",
+                "start": 4541,
+                "confidence": 0.9
+              },
+              {
+                "end": 4575,
+                "text": "text",
+                "type": "database_schema",
+                "start": 4571,
+                "confidence": 0.9
+              },
+              {
+                "end": 4630,
+                "text": "text",
+                "type": "database_schema",
+                "start": 4626,
+                "confidence": 0.9
+              },
+              {
+                "end": 5119,
+                "text": "text",
+                "type": "database_schema",
+                "start": 5115,
+                "confidence": 0.9
+              },
+              {
+                "end": 5217,
+                "text": "text",
+                "type": "database_schema",
+                "start": 5213,
+                "confidence": 0.9
+              },
+              {
+                "end": 5228,
+                "text": "text",
+                "type": "database_schema",
+                "start": 5224,
+                "confidence": 0.9
+              },
+              {
+                "end": 5278,
+                "text": "text",
+                "type": "database_schema",
+                "start": 5274,
+                "confidence": 0.9
+              },
+              {
+                "end": 5286,
+                "text": "text",
+                "type": "database_schema",
+                "start": 5282,
+                "confidence": 0.9
+              },
+              {
+                "end": 5375,
+                "text": "text",
+                "type": "database_schema",
+                "start": 5371,
+                "confidence": 0.9
+              },
+              {
+                "end": 5394,
+                "text": "text",
+                "type": "database_schema",
+                "start": 5390,
+                "confidence": 0.9
+              },
+              {
+                "end": 5619,
+                "text": "text",
+                "type": "database_schema",
+                "start": 5615,
+                "confidence": 0.9
+              },
+              {
+                "end": 5639,
+                "text": "text",
+                "type": "database_schema",
+                "start": 5635,
+                "confidence": 0.9
+              },
+              {
+                "end": 5688,
+                "text": "text",
+                "type": "database_schema",
+                "start": 5684,
+                "confidence": 0.9
+              },
+              {
+                "end": 5696,
+                "text": "text",
+                "type": "database_schema",
+                "start": 5692,
+                "confidence": 0.9
+              }
+            ]
+          }
+        },
+        "reward_prior": 0,
+        "community_confidence": null,
+        "qdrant_tag_id": "1233872715",
+        "cluster_id": 0,
+        "som_cluster": 0,
+        "karpathy_score": 0.45431891083717346,
+        "redis_hot_key": "redis:src/lib/components/yorha/evidence/UploadZone.svelte:4160c6082d53c5b2",
+        "redis_hot_keys": [],
+        "neo4j_node": "neo4j:sveltekit-frontend/src/lib/components/yorha/evidence/UploadZone.svelte",
+        "ann_turbovec_score": 0,
+        "gpu_cosine_score": 0.45431891083717346,
+        "som_cache_hit": 0,
+        "created_at": null,
+        "cascade_score": 0.046547954098056774,
+        "stage_scores": {
+          "cosine": 0.47120285,
+          "concept_overlap": 1,
+          "same_feature": 0,
+          "pagerank": 0,
+          "reward": 0,
+          "freshness": 0.467,
+          "domain_match": 0
+        },
+        "qdrant_id": 1233872715
+      },
+      {
+        "packet_key": "src/lib/components/evidence/EvidenceUploadButton.svelte:f7cba4aa79354592",
+        "source_ref": "sveltekit-frontend/src/lib/components/evidence/EvidenceUploadButton.svelte",
+        "feature_id": "utility",
+        "community_id": 4112,
+        "domain_class": null,
+        "domain": "utility",
+        "ontology": [
+          "utility"
+        ],
+        "topology_label": "utility",
+        "ontology_label": "utility",
+        "cluster_key": null,
+        "kmeans_cluster": 0,
+        "concept_ids": [
+          "agent_intelligence",
+          "api_endpoints",
+          "database_orm",
+          "emergent_topology",
+          "general_abstractions",
+          "infrastructure_config",
+          "native_accelerators",
+          "observability_telemetry",
+          "test_harness",
+          "ui_components"
+        ],
+        "summary": null,
+        "metadata": {
+          "ae_epoch": 60,
+          "app_root": "sveltekit-frontend",
+          "file_path": "sveltekit-frontend/src/lib/components/evidence/EvidenceUploadButton.svelte",
+          "repo_root": "deeds-web-app",
+          "ae_val_loss": 0.0007358284494839609,
+          "ae_timestamp": "2026-06-19T16:13:04Z",
+          "cache_context": {},
+          "directory_path": "sveltekit-frontend/src/lib/components/evidence"
+        },
+        "reward_prior": 0,
+        "community_confidence": null,
+        "qdrant_tag_id": "1271375267",
+        "cluster_id": 0,
+        "som_cluster": 0,
+        "karpathy_score": 0.4328906834125519,
+        "redis_hot_key": "redis:src/lib/components/evidence/EvidenceUploadButton.svelte:f7cba4aa79354592",
+        "redis_hot_keys": [],
+        "neo4j_node": "neo4j:sveltekit-frontend/src/lib/components/evidence/EvidenceUploadButton.svelte",
+        "ann_turbovec_score": 0,
+        "gpu_cosine_score": 0.4328906834125519,
+        "som_cache_hit": 0,
+        "created_at": null,
+        "cascade_score": 0.04507625829943414,
+        "stage_scores": {
+          "cosine": 0.46538353,
+          "concept_overlap": 1,
+          "same_feature": 0,
+          "pagerank": 0,
+          "reward": 0,
+          "freshness": 0.467,
+          "domain_match": 0
+        },
+        "qdrant_id": 1271375267
       }
     ],
     "cascade_stats": {
       "cache_l1_hit": false,
-      "cache_l1_latency_ms": 1,
-      "embed_ms": 313,
+      "cache_l1_latency_ms": 10,
+      "embed_ms": 393,
       "cache_l2_hit": false,
-      "cache_l2_latency_ms": 1,
+      "cache_l2_latency_ms": 11,
       "cache_l3_hit": true,
-      "cache_l3_latency_ms": 60,
-      "qdrant_ms": 80,
+      "cache_l3_latency_ms": 62,
+      "qdrant_ms": 159,
       "qdrant_hits": 125,
-      "turbovec_ms": 3,
+      "turbovec_ms": 7,
       "turbovec_live_hits": 0,
       "turbovec_source": "payload:stored",
       "gpu_cosine_hits": 60,
       "gpu_cosine_source": "cpu",
-      "gpu_cosine_ms": 4,
-      "neo4j_ms": 50,
+      "gpu_cosine_ms": 1,
+      "neo4j_ms": 48,
       "neo4j_expanded": 0,
-      "bifrost_temporal_ms": 1,
+      "bifrost_temporal_ms": 4,
       "bifrost_temporal_hits": 0,
       "bifrost_temporal_source": "payload:stored",
-      "stage3_candidates": 11,
+      "stage3_candidates": 22,
       "rerank_source": "xgboost",
-      "rerank_ms": 15,
-      "total_ms": 544,
+      "rerank_ms": 38,
+      "total_ms": 806,
       "final_count": 5,
       "cache_l1_write": true,
       "cache_source": "qdrant_live",
       "cache_envelope": {
-        "query": "22d6336c5d58f51fabe00e658c381ba923fdf1d9 22d6336c5d58f51fabe00e658c381ba923fdf1d9 .cache/ace/context-packs/ace_context_smoke-context-pack_v1.json visibility 20260614034337",
+        "query": "Utility utility sveltekit-frontend/src/lib/components/detective/UploadZone.svelte visibility 20260621211206",
         "packet_keys": [
-          ".cache/ace/context-packs/ace_context_smoke-context-pack_v1.json:bd969f62ad1c261d",
-          "src/lib/server/cache/ace-context-pack-cache.ts:c643785255636690",
-          "src/lib/server/cache/ace-context-cache-metrics.ts:51d359bedf3fdada",
-          ".cache/ace/context-packs/ace_context_local-json-hit_v1.json:0cd8ec3cced8cc06",
-          ".cache/ace/top-retrieval/ace_retrieval_topn_77245b8d5bd3442aa981670b_2.json:17808923d2c5c30c"
+          "src/lib/components/evidence/EvidencePrimaryUpload.svelte:34a413faba84fbd5",
+          "src/lib/components/detective/UploadZone.svelte:7e1e3a57c29d7fb3",
+          "src/lib/components/evidence/EvidenceUploadModal.svelte:45f46f0992ca1f7b",
+          "src/lib/components/yorha/evidence/UploadZone.svelte:4160c6082d53c5b2",
+          "src/lib/components/evidence/EvidenceUploadButton.svelte:f7cba4aa79354592"
         ],
         "feature_ids": [
-          "22d6336c5d58f51fabe00e658c381ba923fdf1d9",
-          "cache",
-          "c19d70fff6c17dc1acf1a52ce6d5a99f35745b7a",
-          "bf3368a25ed8e4bd1ee5f64ff90bb9f9d3f2ec5f"
+          "utility"
         ],
         "source_refs": [
-          ".cache/ace/context-packs/ace_context_smoke-context-pack_v1.json",
-          "sveltekit-frontend/src/lib/server/cache/ace-context-pack-cache.ts",
-          "sveltekit-frontend/src/lib/server/cache/ace-context-cache-metrics.ts",
-          ".cache/ace/context-packs/ace_context_local-json-hit_v1.json",
-          ".cache/ace/top-retrieval/ace_retrieval_topn_77245b8d5bd3442aa981670b_2.json"
+          "sveltekit-frontend/src/lib/components/evidence/EvidencePrimaryUpload.svelte",
+          "sveltekit-frontend/src/lib/components/detective/UploadZone.svelte",
+          "sveltekit-frontend/src/lib/components/evidence/EvidenceUploadModal.svelte",
+          "sveltekit-frontend/src/lib/components/yorha/evidence/UploadZone.svelte",
+          "sveltekit-frontend/src/lib/components/evidence/EvidenceUploadButton.svelte"
         ],
         "qdrant_point_ids": [
-          987581600,
-          39687381,
-          1248222466,
-          11915146,
-          1560429437
+          "1783417747",
+          "409655259",
+          "1623893489",
+          "1233872715",
+          "1271375267"
         ],
         "redis_hit": false,
         "bitfrost_hit": false,
         "qdrant_hit": true,
-        "graph_version": 0,
-        "cache_epoch": 0,
+        "graph_version": 2,
+        "cache_epoch": 2,
         "ttl_seconds": 300,
-        "latency_ms": 544
+        "latency_ms": 806
       }
     },
     "embed_ok": true,

@@ -18,6 +18,13 @@ export interface ReplayTraceEntry {
     client_id?: string;
     session_id?: string;
     user_id?: string;
+    task_id?: string;
+    worker_id?: string;
+    replay_id?: string;
+    cache_source?: string;
+    cache_namespace?: string;
+    graph_stage_status?: 'GRAPH_ENABLED' | 'GRAPH_DEGRADED' | 'GRAPH_DISABLED';
+    graph_stage_reason?: string;
     duration_ms: number;
     cache_hit: boolean;
   };
@@ -48,6 +55,13 @@ export class HyperRagReplayTrace {
     client_id?: string;
     session_id?: string;
     user_id?: string;
+    task_id?: string;
+    worker_id?: string;
+    replay_id?: string;
+    cache_source?: string;
+    cache_namespace?: string;
+    graph_stage_status?: 'GRAPH_ENABLED' | 'GRAPH_DEGRADED' | 'GRAPH_DISABLED';
+    graph_stage_reason?: string;
     duration_ms: number;
     cache_hit: boolean;
   } = { duration_ms: 0, cache_hit: false };
@@ -76,6 +90,36 @@ export class HyperRagReplayTrace {
 
   setCacheHit(hit: boolean): void {
     this.metadata.cache_hit = hit;
+  }
+
+  setReplayMetadata(context: {
+    replay_id?: string;
+    cache_source?: string;
+    cache_namespace?: string;
+    task_id?: string;
+    worker_id?: string;
+    graph_stage_status?: 'GRAPH_ENABLED' | 'GRAPH_DEGRADED' | 'GRAPH_DISABLED';
+    graph_stage_reason?: string;
+  }): void {
+    if (context.replay_id) this.metadata.replay_id = context.replay_id;
+    if (context.cache_source) this.metadata.cache_source = context.cache_source;
+    if (context.cache_namespace) this.metadata.cache_namespace = context.cache_namespace;
+    if (context.task_id) this.metadata.task_id = context.task_id;
+    if (context.worker_id) this.metadata.worker_id = context.worker_id;
+    if (context.graph_stage_status) this.metadata.graph_stage_status = context.graph_stage_status;
+    if (context.graph_stage_reason) this.metadata.graph_stage_reason = context.graph_stage_reason;
+  }
+
+  setResponseContext(context: {
+    replay_id?: string;
+    cache_source?: string;
+    cache_namespace?: string;
+    task_id?: string;
+    worker_id?: string;
+    graph_stage_status?: 'GRAPH_ENABLED' | 'GRAPH_DEGRADED' | 'GRAPH_DISABLED';
+    graph_stage_reason?: string;
+  }): void {
+    this.setReplayMetadata(context);
   }
 
   getId(): string {

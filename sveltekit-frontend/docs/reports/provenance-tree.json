@@ -1,0 +1,86 @@
+{
+  "generatedAt": "2026-06-21T22:41:55.815Z",
+  "status": "PROOF_WITH_WARNINGS",
+  "taskId": "atlas:replay:breadth:50",
+  "storyId": "proof-quality-lane",
+  "replayId": "atlas:replay:breadth:50",
+  "workerId": "james",
+  "source": {
+    "benchmark": "docs/reports/replay-trace-summary.json",
+    "replay": "docs/reports/replay-trace.jsonl"
+  },
+  "summary": {
+    "queryCount": 1,
+    "passRows": 1,
+    "degradedRows": 0,
+    "failedRows": 0,
+    "cacheHitRows": 1,
+    "cacheNamespaces": [
+      "hyperrag:query"
+    ],
+    "graphEnabledRows": 0,
+    "graphDegradedRows": 1,
+    "cacheHitSources": [
+      "redis_exact_match"
+    ],
+    "replayRows": 1
+  },
+  "idempotency": {
+    "seedStrategy": "sha256(query_hash|packet_key|source_ref|source_ref_key|feature_id|cache_hit_source|graph_stage_status|task_id|story_id|index)",
+    "sampleHash": "af5db4016a3acacf8ce34b895ad8b597e896c581906c083e0c9ab599bd58aa8d"
+  },
+  "nodes": [
+    {
+      "provenance_id": "9c23d9cf97898dfec8e43c8f",
+      "query_id": "a1148d4ae02843fc7d0edce1791e6574bbcc948a59146ffdf80db0da4187f4ee",
+      "replay_id": "1782081708433-3vgfzhw",
+      "task_id": "atlas:replay:breadth:50",
+      "story_id": "proof-quality-lane",
+      "worker_id": "sveltekit-frontend",
+      "trace_id": "1782081708433-3vgfzhw",
+      "packet_key": "nes:utility:9fa84252",
+      "feature_id": "utility",
+      "feature_label": "utility",
+      "source_ref": "src/lib/types/svelte5-api-types.d.ts",
+      "source_ref_key": "src/lib/types/svelte5-api-types.d.ts",
+      "qdrant_point_id": "248413008",
+      "qdrant_collection": null,
+      "qdrant_payload_key": "nes:utility:9fa84252",
+      "graph_hit_count": 0,
+      "graph_rank_contribution": null,
+      "domain_class": null,
+      "ontology_label": "types",
+      "topology_label": "types",
+      "retrieval_strategy": "fusion",
+      "cache_strategy": "redis_exact_match",
+      "cache_namespace": "hyperrag:query",
+      "cache_key": "hyperrag:query:a1148d4ae02843fc7d0edce1791e6574bbcc948a59146ffdf80db0da4187f4ee",
+      "cache_normalized_query": "qdrant vector retrieval fusion rrf",
+      "graph_stage_status": "GRAPH_DEGRADED",
+      "graph_stage_reason": "neo4j expansion not returned for this replay entry",
+      "retrieval_path": [
+        "packet_rpc",
+        "redis_exact_match",
+        "postgres",
+        "qdrant",
+        "rrf"
+      ],
+      "reranker": "redis-hot-cache",
+      "eval_id": "a1148d4ae02843fc7d0edce1791e6574bbcc948a59146ffdf80db0da4187f4ee",
+      "confidence": 0.95,
+      "cache_hit_source": "redis_exact_match",
+      "traversal_path": [
+        "packet_rpc",
+        "redis",
+        "postgres",
+        "qdrant",
+        "rrf"
+      ],
+      "fusion_score": null,
+      "total_ms": 3546,
+      "result_count": 5,
+      "verdict": "pass"
+    }
+  ],
+  "nextSafeAction": "Use the cache-hit namespaces as the proof source, then expand provenance breadth only if new warmed rows are added."
+}

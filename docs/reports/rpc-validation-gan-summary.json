@@ -1,0 +1,221 @@
+{
+  "timestamp": "2026-06-21T18:06:08.590Z",
+  "verdict": "PASS",
+  "generator_count": 13,
+  "discriminator_verdict": "PASS",
+  "passes": 13,
+  "failures": 0,
+  "tests": [
+    {
+      "test_name": "Valid atlas.search",
+      "payload": {
+        "jsonrpc": "2.0",
+        "id": "req-1",
+        "method": "atlas.search",
+        "params": {
+          "query": "parent atlas identity spine",
+          "queryHash": "hash555",
+          "storyId": "story-10"
+        }
+      },
+      "expected_valid": true,
+      "actual_valid": true,
+      "error": null,
+      "passed": true
+    },
+    {
+      "test_name": "Missing method",
+      "payload": {
+        "jsonrpc": "2.0",
+        "id": "req-2",
+        "params": {
+          "query": "fail"
+        }
+      },
+      "expected_valid": false,
+      "actual_valid": false,
+      "error": "Invalid envelope: [\n  {\n    \"expected\": \"string\",\n    \"code\": \"invalid_type\",\n    \"path\": [\n      \"method\"\n    ],\n    \"message\": \"Invalid input: expected string, received undefined\"\n  }\n]",
+      "passed": true
+    },
+    {
+      "test_name": "Invalid jsonrpc version",
+      "payload": {
+        "jsonrpc": "1.0",
+        "id": "req-3",
+        "method": "atlas.search",
+        "params": {
+          "query": "fail"
+        }
+      },
+      "expected_valid": false,
+      "actual_valid": false,
+      "error": "Invalid envelope: [\n  {\n    \"code\": \"invalid_value\",\n    \"values\": [\n      \"2.0\"\n    ],\n    \"path\": [\n      \"jsonrpc\"\n    ],\n    \"message\": \"Invalid input: expected \\\"2.0\\\"\"\n  }\n]",
+      "passed": true
+    },
+    {
+      "test_name": "Malformed params",
+      "payload": {
+        "jsonrpc": "2.0",
+        "id": "req-4",
+        "method": "atlas.search",
+        "params": {
+          "query": 12345
+        }
+      },
+      "expected_valid": false,
+      "actual_valid": false,
+      "error": "[\n  {\n    \"expected\": \"string\",\n    \"code\": \"invalid_type\",\n    \"path\": [\n      \"query\"\n    ],\n    \"message\": \"Invalid input: expected string, received number\"\n  }\n]",
+      "passed": true
+    },
+    {
+      "test_name": "Nonexistent packet_key",
+      "payload": {
+        "jsonrpc": "2.0",
+        "id": "req-5",
+        "method": "atlas.packet.get",
+        "params": {
+          "sourceRef": "ref-1",
+          "featureId": "feat-1"
+        }
+      },
+      "expected_valid": false,
+      "actual_valid": false,
+      "error": "[\n  {\n    \"expected\": \"string\",\n    \"code\": \"invalid_type\",\n    \"path\": [\n      \"packet_key\"\n    ],\n    \"message\": \"Invalid input: expected string, received undefined\"\n  }\n]",
+      "passed": true
+    },
+    {
+      "test_name": "Valid atlas.packet.get",
+      "payload": {
+        "jsonrpc": "2.0",
+        "id": "req-6",
+        "method": "atlas.packet.get",
+        "params": {
+          "packetKey": "k1",
+          "sourceRef": "ref1",
+          "featureId": "feat1"
+        }
+      },
+      "expected_valid": true,
+      "actual_valid": true,
+      "error": null,
+      "passed": true
+    },
+    {
+      "test_name": "Cache key mismatch",
+      "payload": {
+        "jsonrpc": "2.0",
+        "id": "req-7",
+        "method": "atlas.cache.warm",
+        "params": {
+          "cacheNamespace": "bifrost",
+          "cacheKey": "other:k1"
+        }
+      },
+      "expected_valid": false,
+      "actual_valid": false,
+      "error": "Rejection: cache keys must contain the namespace prefix.",
+      "passed": true
+    },
+    {
+      "test_name": "Valid Cache Warm",
+      "payload": {
+        "jsonrpc": "2.0",
+        "id": "req-8",
+        "method": "atlas.cache.warm",
+        "params": {
+          "cacheNamespace": "bifrost",
+          "cacheKey": "bifrost:k1"
+        }
+      },
+      "expected_valid": true,
+      "actual_valid": true,
+      "error": null,
+      "passed": true
+    },
+    {
+      "test_name": "Graph path missing",
+      "payload": {
+        "jsonrpc": "2.0",
+        "id": "req-9",
+        "method": "atlas.graph.expand",
+        "params": {
+          "traversalPath": [],
+          "graphStageStatus": "COMPLETE"
+        }
+      },
+      "expected_valid": false,
+      "actual_valid": false,
+      "error": "Rejection: traversal_path is empty or missing.",
+      "passed": true
+    },
+    {
+      "test_name": "Valid Graph Expand",
+      "payload": {
+        "jsonrpc": "2.0",
+        "id": "req-10",
+        "method": "atlas.graph.expand",
+        "params": {
+          "traversalPath": [
+            "p1",
+            "p2"
+          ],
+          "graphStageStatus": "COMPLETE"
+        }
+      },
+      "expected_valid": true,
+      "actual_valid": true,
+      "error": null,
+      "passed": true
+    },
+    {
+      "test_name": "Claim PASS without evidence",
+      "payload": {
+        "jsonrpc": "2.0",
+        "id": "req-11",
+        "method": "atlas.replay.verify",
+        "params": {
+          "verdict": "PASS",
+          "evidence": []
+        }
+      },
+      "expected_valid": false,
+      "actual_valid": false,
+      "error": "Rejection: Cannot claim PASS without supporting evidence.",
+      "passed": true
+    },
+    {
+      "test_name": "Valid Replay Verify",
+      "payload": {
+        "jsonrpc": "2.0",
+        "id": "req-12",
+        "method": "atlas.replay.verify",
+        "params": {
+          "verdict": "PASS",
+          "evidence": [
+            "summary-replay.json"
+          ]
+        }
+      },
+      "expected_valid": true,
+      "actual_valid": true,
+      "error": null,
+      "passed": true
+    },
+    {
+      "test_name": "Mix gRPC/protobuf fields",
+      "payload": {
+        "jsonrpc": "2.0",
+        "id": "req-13",
+        "method": "atlas.search",
+        "params": {
+          "query": "test"
+        },
+        "proto": "PacketContext"
+      },
+      "expected_valid": false,
+      "actual_valid": false,
+      "error": "Rejection: Mixed gRPC/protobuf fields into JSON-RPC payload.",
+      "passed": true
+    }
+  ]
+}

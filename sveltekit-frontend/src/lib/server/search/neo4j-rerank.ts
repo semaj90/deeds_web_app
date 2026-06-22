@@ -42,7 +42,19 @@ export async function fetchAuthorityScores(stableKeys: string[]): Promise<Author
 
   const rows = await neo4jQuery(
     `UNWIND $keys AS k
-     MATCH (n:CodebaseFile { stable_key: k })
+     MATCH (n)
+     WHERE (
+       n:CodebaseFile OR n:Packet
+     )
+     AND coalesce(
+       n.stable_key,
+       n.filePath,
+       n.file_path,
+       n.sourceRef,
+       n.source_ref,
+       n.packet_key,
+       n.id
+     ) = k
      RETURN k, coalesce(n.pageRankScore, 0.0) AS pr, coalesce(n.gpuCluster, -1) AS community`,
     { keys: stableKeys.slice(0, 200) }
   );
@@ -62,8 +74,32 @@ export async function expandNeighbours(
 ): Promise<string[]> {
   const depthCond = hops === 2 ? '1..2' : '1';
   const rows = await neo4jQuery(
-    `MATCH (src:CodebaseFile { stable_key: $k })-[:IMPORTS*${depthCond}]->(dep:CodebaseFile)
-     RETURN dep.stable_key AS sk
+    `MATCH (src)
+     WHERE (
+       src:CodebaseFile OR src:Packet
+     )
+     AND coalesce(
+       src.stable_key,
+       src.filePath,
+       src.file_path,
+       src.sourceRef,
+       src.source_ref,
+       src.packet_key,
+       src.id
+     ) = $k
+     MATCH (src)-[:IMPORTS|CALLS|USED_CONCEPT|SIMILAR_TOPOLOGY*${depthCond}]->(dep)
+     WHERE (
+       dep:CodebaseFile OR dep:Packet
+     )
+     RETURN DISTINCT coalesce(
+       dep.stable_key,
+       dep.filePath,
+       dep.file_path,
+       dep.sourceRef,
+       dep.source_ref,
+       dep.packet_key,
+       dep.id
+     ) AS sk
      LIMIT 20`,
     { k: stableKey }
   );

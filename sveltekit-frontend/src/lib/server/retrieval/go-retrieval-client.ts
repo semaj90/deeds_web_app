@@ -14,6 +14,10 @@ export interface GoRetrievalSearchHit {
   featureId?: string;
   feature_label?: string;
   featureLabel?: string;
+  domain_class?: string;
+  domainClass?: string;
+  domain?: string;
+  ontology?: string[] | null;
   topology_label?: string;
   topologyLabel?: string;
   ontology_label?: string;
@@ -84,6 +88,72 @@ function normalizeBaseUrl(baseUrl: string): string {
   return String(baseUrl ?? '').replace(/\/+$/, '');
 }
 
+function normalizeLabel(value: unknown): string | undefined {
+  const text = String(value ?? '').trim();
+  return text ? text : undefined;
+}
+
+function normalizeHit(item: Record<string, unknown>): GoRetrievalSearchHit {
+  const metadata = (item.metadata && typeof item.metadata === 'object' ? item.metadata : {}) as Record<string, unknown>;
+  const featureId = normalizeLabel(item.feature_id ?? item.featureId ?? metadata.feature_id ?? metadata.featureId);
+  const domainClass = normalizeLabel(
+    item.domain_class ??
+    item.domainClass ??
+    metadata.domain_class ??
+    metadata.domainClass ??
+    item.domain ??
+    metadata.domain,
+  );
+  const topologyLabel = normalizeLabel(
+    item.topology_label ??
+    item.topologyLabel ??
+    metadata.topology_label ??
+    metadata.topologyLabel ??
+    domainClass,
+  );
+  const ontologyLabel = normalizeLabel(
+    item.ontology_label ??
+    item.ontologyLabel ??
+    metadata.ontology_label ??
+    metadata.ontologyLabel ??
+    item.domain ??
+    metadata.domain ??
+    domainClass ??
+    topologyLabel,
+  );
+  const clusterKey = normalizeLabel(
+    item.cluster_key ??
+    item.clusterKey ??
+    metadata.cluster_key ??
+    metadata.clusterKey,
+  );
+  const kmeansCluster = (item.kmeans_cluster ?? item.kmeansCluster ?? metadata.kmeans_cluster ?? metadata.kmeansCluster) as
+    | string
+    | number
+    | undefined;
+
+  return {
+    ...(item as GoRetrievalSearchHit),
+    feature_id: featureId,
+    featureId,
+    feature_label: normalizeLabel(item.feature_label ?? item.featureLabel ?? metadata.feature_label ?? metadata.featureLabel ?? featureId),
+    featureLabel: normalizeLabel(item.featureLabel ?? item.feature_label ?? metadata.featureLabel ?? metadata.feature_label ?? featureId),
+    topology_label: topologyLabel,
+    topologyLabel,
+    ontology_label: ontologyLabel,
+    ontologyLabel,
+    cluster_key: clusterKey,
+    clusterKey,
+    kmeans_cluster: kmeansCluster,
+    kmeansCluster: kmeansCluster,
+    source_ref: normalizeLabel(item.source_ref ?? item.sourceRef ?? metadata.source_ref ?? metadata.sourceRef),
+    sourceRef: normalizeLabel(item.sourceRef ?? item.source_ref ?? metadata.sourceRef ?? metadata.source_ref),
+    canonical_source_ref: normalizeLabel(item.canonical_source_ref ?? item.canonicalSourceRef ?? metadata.canonical_source_ref ?? metadata.canonicalSourceRef ?? item.source_ref ?? item.sourceRef),
+    canonicalSourceRef: normalizeLabel(item.canonicalSourceRef ?? item.canonical_source_ref ?? metadata.canonicalSourceRef ?? metadata.canonical_source_ref ?? item.sourceRef ?? item.source_ref),
+    metadata: metadata,
+  };
+}
+
 function normalizeResponse(data: Record<string, unknown>, endpoint: string): GoRetrievalSearchResponse {
   const rawResults =
     Array.isArray(data.results) ? data.results :
@@ -92,7 +162,7 @@ function normalizeResponse(data: Record<string, unknown>, endpoint: string): GoR
     [];
 
   return {
-    results: rawResults.map((item) => (item as GoRetrievalSearchHit)),
+    results: rawResults.map((item) => normalizeHit(item as Record<string, unknown>)),
     total_ms: Number(data.total_ms ?? data.totalMs ?? 0) || undefined,
     provenance: (data.provenance as Record<string, unknown>) ?? undefined,
     telemetry: (data.telemetry as Record<string, unknown>) ?? undefined,

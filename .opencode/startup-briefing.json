@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-06-21T15:58:01.030Z",
+  "generatedAt": "2026-06-22T03:36:24.553Z",
   "appRoot": "C:/Users/james/Videos/deeds-web-app",
   "readOnly": true,
   "env": {
@@ -28,7 +28,7 @@
     },
     "liveServiceEnv": {
       "exists": true,
-      "generatedAt": "2026-06-20T22:40:33.821Z",
+      "generatedAt": "2026-06-22T02:53:56.860Z",
       "readOnly": true,
       "telemetryStatus": "READY",
       "counts": {
@@ -144,31 +144,31 @@
     },
     "retrievalBenchmark": {
       "exists": true,
-      "generatedAt": "2026-06-21T06:44:23.702Z",
+      "generatedAt": "2026-06-22T03:14:04.217Z",
       "status": "pass",
-      "queryCount": 50,
+      "queryCount": 5,
       "latency": {
-        "totalP50": 3949,
-        "totalP95": 6190,
-        "qdrantP50": 20,
-        "qdrantP95": 31,
-        "postgresP50": 627,
-        "postgresP95": 865,
-        "neo4jP50": 61,
-        "neo4jP95": 99,
-        "redisP50": 5,
-        "redisP95": 8,
-        "gpuP50": 2,
-        "gpuP95": 3,
-        "answerP50": 3033,
-        "answerP95": 5104
+        "totalP50": 9930,
+        "totalP95": 14753,
+        "qdrantP50": 149,
+        "qdrantP95": 1018,
+        "postgresP50": 1584,
+        "postgresP95": 1587,
+        "neo4jP50": 618,
+        "neo4jP95": 2837,
+        "redisP50": 17,
+        "redisP95": 88,
+        "gpuP50": 3,
+        "gpuP95": 4,
+        "answerP50": 4570,
+        "answerP95": 12013
       },
       "gates": {
         "allQdrantHits": true,
         "allLedgerMatches": true,
         "allAnswered": true,
         "degradedQueries": 0,
-        "replayQueries": 50
+        "replayQueries": 5
       },
       "services": {
         "qdrant": "healthy",
@@ -256,7 +256,7 @@
     },
     "qdrantTagMirror": {
       "exists": true,
-      "generatedAt": "2026-06-21T00:18:52.151Z",
+      "generatedAt": "2026-06-21T21:51:48.231Z",
       "mode": "apply",
       "status": "APPLIED",
       "inputRows": 3251,
@@ -264,7 +264,7 @@
       "eligibleRows": 2488,
       "patchedRows": 2488,
       "skippedNoQdrantPointId": 763,
-      "qdrantReachable": false,
+      "qdrantReachable": true,
       "patchRatePct": 100,
       "nextSafeAction": "Run the materializer again only if the packet ledger changed; do not re-embed or recreate collections."
     },
@@ -294,7 +294,7 @@
     },
     "redisCentroidMirror": {
       "exists": true,
-      "generatedAt": "2026-06-18T22:19:37.509Z",
+      "generatedAt": "2026-06-21T21:52:02.124Z",
       "mode": "apply",
       "status": "PASS",
       "sourceTable": "atlas_higher_hop_index",
@@ -320,7 +320,7 @@
     },
     "agenticRecommendationWorkflow": {
       "exists": true,
-      "generatedAt": "2026-06-21T05:20:00.963Z",
+      "generatedAt": "2026-06-22T03:34:02.119Z",
       "mode": "READY",
       "status": "READY",
       "cardsGenerated": 13,
@@ -418,7 +418,7 @@
     },
     "toolRoutingHealth": {
       "exists": true,
-      "generatedAt": "2026-06-21T05:16:10.672Z",
+      "generatedAt": "2026-06-22T02:53:22.638Z",
       "status": "READY",
       "liveServiceReady": true,
       "repoFunctionRegistryRows": 1479,
@@ -568,6 +568,122 @@
       "retrievalStrategyCoveragePct": 100,
       "rewardCoveragePct": 100,
       "exportedQlorAExamples": 779
+    },
+    "agentContextRun": {
+      "exists": true,
+      "generatedAt": "2026-06-22T03:26:44.054Z",
+      "status": "PASS",
+      "storyId": "story:phase89-error-clustering",
+      "taskId": "task:qdrant-timeout-repair",
+      "runId": "run:becee5bf-6c8",
+      "query": "find parent atlas identity spine",
+      "packetKey": "docs/+server.ts:4c62f7025d50f175",
+      "sourceRef": "sveltekit-frontend/src/routes/api/library/ingest-codebase-docs/+server.ts",
+      "featureId": "scripts",
+      "cacheNamespace": "bifrost:sem",
+      "cacheHitSource": "valkey-semantic",
+      "stateGuess": "graph_ready",
+      "reward": 0.326666,
+      "latencyMs": 33759,
+      "tokens": 37,
+      "gpuVramMb": 0,
+      "cacheHits": {
+        "l1Exact": true,
+        "l2Semantic": true,
+        "qdrant": 24,
+        "postgres": 19
+      },
+      "tools": [
+        "graph_stage",
+        "neo4j_expand",
+        "postgres_lookup",
+        "provenance_tree",
+        "qdrant_search",
+        "valkey_semantic_cache"
+      ],
+      "nextAction": "run adaptive schema audit and then expand the feature-envelope batch",
+      "provenanceSource": {
+        "benchmark": "C:\\Users\\james\\Documents\\Codex\\2026-05-12\\ve-updated-the-local-quantization-notebook\\docs\\reports\\retrieval-e2e-benchmark.json",
+        "featureEnvelope": "C:\\Users\\james\\Documents\\Codex\\2026-05-12\\ve-updated-the-local-quantization-notebook\\docs\\reports\\feature-extraction-summary-batch.json",
+        "provenance": "C:\\Users\\james\\Documents\\Codex\\2026-05-12\\ve-updated-the-local-quantization-notebook\\docs\\reports\\provenance-tree.json",
+        "replay": "C:\\Users\\james\\Documents\\Codex\\2026-05-12\\ve-updated-the-local-quantization-notebook\\docs\\reports\\replay-trace-summary.json"
+      }
+    },
+    "contextGymEvals": {
+      "exists": true,
+      "generatedAt": "2026-06-22T03:26:44.154Z",
+      "status": "PASS",
+      "queryCount": 50,
+      "winner": {
+        "policy": "policy_C",
+        "accuracy": 0.35,
+        "latencyMs": 14262,
+        "reward": 0.3642,
+        "tokens": 3200,
+        "notes": "tool-only late-stage control"
+      },
+      "policies": [
+        {
+          "policy": "policy_A",
+          "accuracy": 0.15,
+          "latencyMs": 14262,
+          "reward": 0.2542,
+          "tokens": 3200,
+          "notes": "raw packet-summary baseline"
+        },
+        {
+          "policy": "policy_B",
+          "accuracy": 0.3,
+          "latencyMs": 14262,
+          "reward": 0.3367,
+          "tokens": 3200,
+          "notes": "feature-summary focus"
+        },
+        {
+          "policy": "policy_C",
+          "accuracy": 0.35,
+          "latencyMs": 14262,
+          "reward": 0.3642,
+          "tokens": 3200,
+          "notes": "tool-only late-stage control"
+        },
+        {
+          "policy": "policy_D",
+          "accuracy": 0.35,
+          "latencyMs": 14262,
+          "reward": 0.3642,
+          "tokens": 3200,
+          "notes": "tree+summaries+topology favored"
+        }
+      ],
+      "nextSafeAction": "Use the winning policy as the evaluation target, then compare it against a fresh replay breadth run before any policy mutation is considered."
+    },
+    "gepaPolicyMutationAudit": {
+      "exists": true,
+      "generatedAt": "2026-06-22T03:26:44.238Z",
+      "status": "PASS",
+      "winner": {
+        "policy": "policy_C",
+        "accuracy": 0.35,
+        "latencyMs": 14262,
+        "reward": 0.3642,
+        "tokens": 3200,
+        "mutationAction": "reject"
+      },
+      "guardrails": {
+        "gemma4_truth": false,
+        "neo4j_truth": false,
+        "packet_identity_mutation": false,
+        "postgresql_truth": true,
+        "qdrant_truth": false,
+        "redis_truth": false
+      },
+      "sourceEvidence": {
+        "featureEnvelopeStatus": "APPLIED",
+        "provenanceStatus": "PROOF_WITH_WARNINGS",
+        "replayStatus": "pass"
+      },
+      "nextSafeAction": "Use the winning policy as an audit target only; do not mutate prompts or ranking until a fresh replay breadth confirms the score delta."
     },
     "artifactTiering": {
       "exists": true,
@@ -1224,6 +1340,18 @@
         "exists": true,
         "path": "C:\\Users\\james\\Documents\\Codex\\2026-05-12\\ve-updated-the-local-quantization-notebook\\docs\\reports\\agent-trace-data-maturity-report.json"
       },
+      "agentContextRun": {
+        "exists": true,
+        "path": "C:\\Users\\james\\Documents\\Codex\\2026-05-12\\ve-updated-the-local-quantization-notebook\\docs\\reports\\agent-context-run.json"
+      },
+      "contextGymEvals": {
+        "exists": true,
+        "path": "C:\\Users\\james\\Documents\\Codex\\2026-05-12\\ve-updated-the-local-quantization-notebook\\docs\\reports\\context-gym-evals.json"
+      },
+      "gepaPolicyMutationAudit": {
+        "exists": true,
+        "path": "C:\\Users\\james\\Documents\\Codex\\2026-05-12\\ve-updated-the-local-quantization-notebook\\docs\\reports\\gepa-policy-mutation-audit.json"
+      },
       "artifactTiering": {
         "exists": true,
         "path": "C:\\Users\\james\\Documents\\Codex\\2026-05-12\\ve-updated-the-local-quantization-notebook\\docs\\reports\\artifact-tiering-report.json"
@@ -1280,6 +1408,9 @@
       "bitfrostWarm": "applied",
       "redisMirror": "PASS",
       "runtimeEvidence": "materialized",
+      "agentContextRun": "PASS",
+      "contextGymEvals": "PASS",
+      "gepaPolicyAudit": "PASS",
       "ldjson": "96.2%",
       "repoFunctionRegistry": "indexed (1479 rows)",
       "mcpToolSummaryRegistry": "summarized (87 groups)",
@@ -1305,13 +1436,13 @@
       ]
     },
     "recommendations": [
-      "Apply the Qdrant tag mirror from the materialized packet spine so packet_key, source_ref, feature_id, lane_ids, tags, and bm25_text land in the vector payload before retrieval fusion.",
+      "With the Qdrant tag mirror applied, move to the Neo4j / GDS topology pass until graph scores, community labels, and sourceRef projection are fully applied.",
       "Warm the Bitfrost semantic cache from canonical Postgres rows before treating mirrors as runtime truth.",
       "With Redis centroid and Bitfrost warm lanes applied, move retrieval work toward HyperRAG fusion rather than more cache mirroring.",
       "Keep runtime evidence packetization on the admin-side path: turn Playwright, dev:gpu output, server logs, and cache events into chrom97 packets before Gemma4 synthesis.",
       "Use dev:gpu as the capture harness, but keep llama-server.exe on :8090 for chat/synthesis and Ollama/EmbeddingGemma embeddings-only; route RTX into batching, compression, and rerank, not canonical truth."
     ],
-    "nextLane": "Qdrant tag mirroring apply + verify",
+    "nextLane": "Retrieval telemetry depth / replay breadth",
     "notes": {
       "indexingMode": "static-plus-temporal-refresh",
       "staticPacketIndexing": true,
@@ -1343,6 +1474,31 @@
       "redisCentroidMirrorStatus": "PASS",
       "runtimeEvidencePacketizationStatus": "materialized",
       "runtimeEvidencePacketizationCoveragePct": 100,
+      "agentContextRunStatus": "PASS",
+      "agentContextRunStoryId": "story:phase89-error-clustering",
+      "agentContextRunTaskId": "task:qdrant-timeout-repair",
+      "agentContextRunCacheNamespace": "bifrost:sem",
+      "agentContextRunCacheHitSource": "valkey-semantic",
+      "agentContextRunReward": 0.326666,
+      "contextGymEvalsStatus": "PASS",
+      "contextGymEvalsQueryCount": 50,
+      "contextGymEvalsWinner": {
+        "policy": "policy_C",
+        "accuracy": 0.35,
+        "latencyMs": 14262,
+        "reward": 0.3642,
+        "tokens": 3200,
+        "notes": "tool-only late-stage control"
+      },
+      "gepaPolicyAuditStatus": "PASS",
+      "gepaPolicyAuditWinner": {
+        "policy": "policy_C",
+        "accuracy": 0.35,
+        "latencyMs": 14262,
+        "reward": 0.3642,
+        "tokens": 3200,
+        "mutationAction": "reject"
+      },
       "repoFunctionRegistryTotalRows": 1479,
       "repoFunctionRegistryCountsByKind": {
         "function": 892,
@@ -1369,7 +1525,7 @@
       "mcpToolSummaryRegistryPrimaryFeatureId": "feature.synthesis.gemma4",
       "mcpToolSummaryRegistryPrimarySummary": "<|channel>thought\nThe user wants me to summarize indexed repository packets for `feature_id=feature.synthesis.gemma4`.\nI must:\n1.  Only summarize the provided rows.\n2.  Do not generalize beyond the provided rows.\n3.  Prefer `source_ref`, `feature_id`, `file_path`, and `copy_merge_use` in the output structure (though `copy_merge_use` is not provided, I will focus on the core operational summary).\n4.  Return concise operational summaries, keeping the focus on merging/synthesis.\n\nAnalyzing the rows:\n\n*   **Row 1:** `scripts/atlas/agentic-recommendation-workflow.mjs` - `normalizeSummaryText` (Synthesis/Recommendation workflow).\n*   **Row 2:** `scripts/atlas/agentic-recommendation-workflow.mjs` - `summarizeInputPresence` (Synthesis/Recommendation workflow).\n*   **Row 3:** `scripts/atlas/audit-agent-trace-data-maturity.mjs` - `classify` (Synthesis/Audit/Data Maturity).\n*   **Row 4:** `scripts/atlas/audit-agent-trace-data-maturity.mjs` - `summarizeQlorA` (Synthesis/Audit/Data Maturity).\n*   **Row 5:** `scripts/atlas/audit-agent-trace-data-maturity.mjs` - `summarizeTraceSmoke` (Synthesis/Audit/Data Maturity).\n\nI will structure the summary by file/module, detailing the functions and their purpose in a merge-focused way.<channel|>**Operational Summary for `feature.synthesis.gemma4`**\n\n**`scripts/atlas/agentic-recommendation-workflow.mjs`**\n*   **`normalizeSummaryText`**: Function for normalizing summary text within the agentic recommendation workflow.\n*   **`summarizeInputPresence`**: Function designed to summarize input presence within the agentic recommendation workflow.\n\n**`scripts/atlas/audit-agent-trace-data-maturity.mjs`**\n*   **`classify`**: Function used for classification within the audit agent trace data maturity process.\n*   **`summarizeQlorA`**: Function to summarize QlorA data within the audit agent trace data maturity process.\n*   **`summarizeTraceSmoke`**: Function to summarize trace data within the audit agent trace data maturity process.",
       "toolRoutingHealthStatus": "READY",
-      "toolRoutingHealthGeneratedAt": "2026-06-21T05:16:10.672Z",
+      "toolRoutingHealthGeneratedAt": "2026-06-22T02:53:22.638Z",
       "toolRoutingHealthLiveServiceReady": true,
       "toolRoutingHealthRepoFunctionRegistryRows": 1479,
       "toolRoutingHealthToolSummaries": 87,
@@ -1419,31 +1575,31 @@
       },
       "validationQualityRetrievalBenchmark": {
         "exists": true,
-        "generatedAt": "2026-06-21T06:44:23.702Z",
+        "generatedAt": "2026-06-22T03:14:04.217Z",
         "status": "pass",
-        "queryCount": 50,
+        "queryCount": 5,
         "latency": {
-          "totalP50": 3949,
-          "totalP95": 6190,
-          "qdrantP50": 20,
-          "qdrantP95": 31,
-          "postgresP50": 627,
-          "postgresP95": 865,
-          "neo4jP50": 61,
-          "neo4jP95": 99,
-          "redisP50": 5,
-          "redisP95": 8,
-          "gpuP50": 2,
-          "gpuP95": 3,
-          "answerP50": 3033,
-          "answerP95": 5104
+          "totalP50": 9930,
+          "totalP95": 14753,
+          "qdrantP50": 149,
+          "qdrantP95": 1018,
+          "postgresP50": 1584,
+          "postgresP95": 1587,
+          "neo4jP50": 618,
+          "neo4jP95": 2837,
+          "redisP50": 17,
+          "redisP95": 88,
+          "gpuP50": 3,
+          "gpuP95": 4,
+          "answerP50": 4570,
+          "answerP95": 12013
         },
         "gates": {
           "allQdrantHits": true,
           "allLedgerMatches": true,
           "allAnswered": true,
           "degradedQueries": 0,
-          "replayQueries": 50
+          "replayQueries": 5
         },
         "services": {
           "qdrant": "healthy",

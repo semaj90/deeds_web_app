@@ -156,6 +156,30 @@ function coercePointId(pointId) {
   return text;
 }
 
+function chooseCanonicalFeatureId({ pgFeatureIds, qdrantFeatureId }) {
+  const coarse = new Set([
+    'src', 'lib', 'routes', 'api', 'db', 'ai', 'server', 'client', 'components',
+    'ui', 'dialog', 'evidence', 'admin', 'parents-atlas', 'monitoring', 'citations',
+    'alert-dialog', 'monitoring', 'kb', 'research', 'synthesis', 'monitoring', 'gaming', 'yorha'
+  ]);
+  const candidates = Array.isArray(pgFeatureIds)
+    ? pgFeatureIds.filter(Boolean)
+    : String(pgFeatureIds || '').split(',').map(s => s.trim()).filter(Boolean);
+  const canonical = candidates.find(v => v.includes('.') || v.startsWith('repo.file.'))
+    ?? candidates.find(v => !coarse.has(v))
+    ?? candidates[0]
+    ?? null;
+  if (canonical) {
+    return {
+      feature_id: canonical,
+      qdrant_coarse_feature: (coarse.has(qdrantFeatureId) || qdrantFeatureId === canonical) ? qdrantFeatureId : undefined
+    };
+  }
+  return {
+    feature_id: qdrantFeatureId || null
+  };
+}
+
 function canonicalizeRow(row) {
   const metadataText = textField(row, ['metadata_json', 'metadata', 'payload_json', 'payload']);
   const metadata = safeJsonParse(metadataText) ?? null;
@@ -211,7 +235,6 @@ function mergeCanonical(target, incoming) {
     'packetKey',
     'sourceRef',
     'canonicalSourceRef',
-    'featureId',
     'featureLabel',
     'clusterId',
     'centroidId',
@@ -229,7 +252,21 @@ function mergeCanonical(target, incoming) {
     if (!merged[field] && incoming[field]) merged[field] = incoming[field];
   }
 
-  if (!merged.metadata && incoming.metadata) merged.metadata = incoming.metadata;
+  // Merge and resolve featureId using chooseCanonicalFeatureId
+  const fids = [target.featureId, incoming.featureId].filter(Boolean);
+  const resolved = chooseCanonicalFeatureId({
+    pgFeatureIds: fids,
+    qdrantFeatureId: target.featureId || incoming.featureId,
+  });
+  merged.featureId = resolved.feature_id;
+
+  const resolvedMetadata = resolved.qdrant_coarse_feature ? {
+    ...(target.metadata || incoming.metadata || {}),
+    qdrant_coarse_feature: resolved.qdrant_coarse_feature,
+  } : (target.metadata || incoming.metadata || null);
+
+  merged.metadata = resolvedMetadata;
+
   if (!merged.sourceTables) merged.sourceTables = new Set();
   if (incoming.sourceTable) merged.sourceTables.add(incoming.sourceTable);
   return merged;
@@ -308,7 +345,6 @@ async function loadCanonicalRows() {
         source_ref_hash::text as source_ref_hash,
         null::text as payload_json
       from task_semantic_packets
-      where qdrant_point_id is not null
     ),
     parent_rows as (
       select
@@ -332,7 +368,6 @@ async function loadCanonicalRows() {
         null::text as source_ref_hash,
         payload::text as payload_json
       from parent_atlas_documents
-      where qdrant_point_id is not null
     )
     select * from task_rows
     union all
@@ -365,12 +400,17 @@ async function loadCanonicalRows() {
   const merged = new Map();
   for (const row of rows) {
     const canonical = canonicalizeRow(row);
-    if (!canonical.qdrantPointId) continue;
-    const existing = merged.get(canonical.qdrantPointId);
+    const uniqueKey = canonical.qdrantPointId 
+      || canonical.packetKey 
+      || (canonical.sourceRef ? `${canonical.sourceRef}::${canonical.featureId}` : null);
+    
+    if (!uniqueKey) continue;
+
+    const existing = merged.get(uniqueKey);
     if (existing) {
-      merged.set(canonical.qdrantPointId, mergeCanonical(existing, canonical));
+      merged.set(uniqueKey, mergeCanonical(existing, canonical));
     } else {
-      merged.set(canonical.qdrantPointId, mergeCanonical({ sourceTables: new Set() }, canonical));
+      merged.set(uniqueKey, mergeCanonical({ sourceTables: new Set() }, canonical));
     }
   }
 
@@ -433,17 +473,77 @@ function buildCanonicalLookups(rows) {
   const byQdrantId = new Map();
   const byPacketKey = new Map();
   const bySourceFeature = new Map();
+  const bySourceRef = new Map();
 
   for (const row of rows) {
-    if (row.qdrantPointId) byQdrantId.set(row.qdrantPointId, row);
-    if (row.packetKey) byPacketKey.set(row.packetKey, row);
-    if (row.sourceRef && row.featureId) {
-      bySourceFeature.set(`${normalizeSourceRef(row.sourceRef)}::${row.featureId}`, row);
+    if (row.qdrantPointId) {
+      byQdrantId.set(row.qdrantPointId, row);
+    }
+    if (row.packetKey) {
+      const pKey = normalizeText(row.packetKey);
+      byPacketKey.set(pKey, row);
+      byPacketKey.set(pKey.toLowerCase(), row);
+    }
+    if (row.sourceRef) {
+      const sRef = normalizeSourceRef(row.sourceRef);
+      bySourceRef.set(sRef, row);
+      bySourceRef.set(sRef.toLowerCase(), row);
+      
+      if (row.featureId) {
+        bySourceFeature.set(`${sRef}::${row.featureId}`, row);
+        bySourceFeature.set(`${sRef.toLowerCase()}::${row.featureId.toLowerCase()}`, row);
+      }
     }
   }
 
-  return { byQdrantId, byPacketKey, bySourceFeature };
+  return { byQdrantId, byPacketKey, bySourceFeature, bySourceRef };
 }
+
+function findCanonicalRow(point, lookups) {
+  const pointId = normalizeText(point?.id);
+  let match = lookups.byQdrantId.get(pointId);
+  if (match) return match;
+
+  const packetKey = normalizeText(point?.payload?.packet_key ?? point?.payload?.packetKey ?? '');
+  if (packetKey) {
+    match = lookups.byPacketKey.get(packetKey) ?? lookups.byPacketKey.get(packetKey.toLowerCase());
+    if (match) return match;
+  }
+
+  const sourceRef = normalizeSourceRef(point?.payload?.source_ref ?? point?.payload?.sourceRef ?? point?.payload?.canonical_source_ref ?? point?.payload?.canonicalSourceRef ?? '');
+  const filePath = normalizeSourceRef(point?.payload?.file_path ?? point?.payload?.filePath ?? point?.payload?.metadata_path ?? point?.payload?.metadataPath ?? '');
+  const featureId = normalizeText(point?.payload?.feature_id ?? point?.payload?.featureId ?? '');
+
+  if (sourceRef) {
+    if (featureId) {
+      match = lookups.bySourceFeature.get(`${sourceRef}::${featureId}`)
+        ?? lookups.bySourceFeature.get(`${sourceRef.toLowerCase()}::${featureId.toLowerCase()}`);
+      if (match) return match;
+    }
+    match = lookups.bySourceRef.get(sourceRef) ?? lookups.bySourceRef.get(sourceRef.toLowerCase());
+    if (match) return match;
+  }
+
+  if (filePath) {
+    if (featureId) {
+      match = lookups.bySourceFeature.get(`${filePath}::${featureId}`)
+        ?? lookups.bySourceFeature.get(`${filePath.toLowerCase()}::${featureId.toLowerCase()}`);
+      if (match) return match;
+    }
+    match = lookups.bySourceRef.get(filePath) ?? lookups.bySourceRef.get(filePath.toLowerCase());
+    if (match) return match;
+  }
+
+  const sourceRefKey = normalizeText(point?.payload?.source_ref_key ?? '');
+  if (sourceRefKey) {
+    const normKey = normalizeSourceRef(sourceRefKey);
+    match = lookups.bySourceRef.get(normKey) ?? lookups.bySourceRef.get(normKey.toLowerCase());
+    if (match) return match;
+  }
+
+  return null;
+}
+
 
 function compareField(fieldName, canonicalValue, payloadValue, options = {}) {
   const { normalize = (value) => normalizeText(value), optional = false } = options;
@@ -501,19 +601,33 @@ function compareMetadata(canonicalMetadata, payloadMetadata) {
 
 function buildPatch(canonical, payload) {
   const result = normalizeQdrantPayload(payload);
+  const resolved = chooseCanonicalFeatureId({
+    pgFeatureIds: canonical.featureId,
+    qdrantFeatureId: result.featureId,
+  });
+
+  const resolvedCanonical = {
+    ...canonical,
+    featureId: resolved.feature_id,
+    metadata: resolved.qdrant_coarse_feature ? {
+      ...(canonical.metadata || {}),
+      qdrant_coarse_feature: resolved.qdrant_coarse_feature,
+    } : canonical.metadata,
+  };
+
   const comparisons = [
-    compareField('source_ref', canonical.sourceRef, result.sourceRef, { normalize: normalizeSourceRef }),
-    compareField('feature_id', canonical.featureId, result.featureId),
-    compareField('packet_key', canonical.packetKey, result.packetKey),
-    compareMetadata(canonical.metadata, result.metadata),
-    compareField('cluster_id', canonical.clusterId, result.clusterId),
-    compareField('community_id', canonical.communityId, result.communityId),
-    compareField('topology_label', canonical.topologyLabel, result.topologyLabel),
-    compareField('ontology_label', canonical.ontologyLabel, result.ontologyLabel),
-    compareField('cluster_key', canonical.clusterKey, result.clusterKey),
-    compareField('kmeans_cluster', canonical.kmeansCluster, result.kmeansCluster),
-    compareField('domain', canonical.domain, result.domain, { normalize: normalizeDomain }),
-    compareField('som_cluster', canonical.somCluster || canonical.clusterId, result.somCluster),
+    compareField('source_ref', resolvedCanonical.sourceRef, result.sourceRef, { normalize: normalizeSourceRef }),
+    compareField('feature_id', resolvedCanonical.featureId, result.featureId),
+    compareField('packet_key', resolvedCanonical.packetKey, result.packetKey),
+    compareMetadata(resolvedCanonical.metadata, result.metadata),
+    compareField('cluster_id', resolvedCanonical.clusterId, result.clusterId),
+    compareField('community_id', resolvedCanonical.communityId, result.communityId),
+    compareField('topology_label', resolvedCanonical.topologyLabel, result.topologyLabel),
+    compareField('ontology_label', resolvedCanonical.ontologyLabel, result.ontologyLabel),
+    compareField('cluster_key', resolvedCanonical.clusterKey, result.clusterKey),
+    compareField('kmeans_cluster', resolvedCanonical.kmeansCluster, result.kmeansCluster),
+    compareField('domain', resolvedCanonical.domain, result.domain, { normalize: normalizeDomain }),
+    compareField('som_cluster', resolvedCanonical.somCluster || resolvedCanonical.clusterId, result.somCluster),
   ];
 
   const patch = {};
@@ -572,19 +686,33 @@ async function retrieveQdrantPoints(ids) {
 
 function compareCanonicalToPayload(canonical, payloadPoint) {
   const payload = normalizeQdrantPayload(payloadPoint?.payload ?? payloadPoint ?? {});
+  const resolved = chooseCanonicalFeatureId({
+    pgFeatureIds: canonical.featureId,
+    qdrantFeatureId: payload.featureId,
+  });
+
+  const resolvedCanonical = {
+    ...canonical,
+    featureId: resolved.feature_id,
+    metadata: resolved.qdrant_coarse_feature ? {
+      ...(canonical.metadata || {}),
+      qdrant_coarse_feature: resolved.qdrant_coarse_feature,
+    } : canonical.metadata,
+  };
+
   const comparisons = [
-    compareField('source_ref', canonical.sourceRef, payload.sourceRef, { normalize: normalizeSourceRef }),
-    compareField('feature_id', canonical.featureId, payload.featureId),
-    compareField('packet_key', canonical.packetKey, payload.packetKey),
-    compareMetadata(canonical.metadata, payload.metadata),
-    compareField('cluster_id', canonical.clusterId, payload.clusterId),
-    compareField('community_id', canonical.communityId, payload.communityId),
-    compareField('topology_label', canonical.topologyLabel, payload.topologyLabel),
-    compareField('ontology_label', canonical.ontologyLabel, payload.ontologyLabel),
-    compareField('cluster_key', canonical.clusterKey, payload.clusterKey),
-    compareField('kmeans_cluster', canonical.kmeansCluster, payload.kmeansCluster),
-    compareField('domain', canonical.domain, payload.domain, { normalize: normalizeDomain }),
-    compareField('som_cluster', canonical.somCluster || canonical.clusterId, payload.somCluster),
+    compareField('source_ref', resolvedCanonical.sourceRef, payload.sourceRef, { normalize: normalizeSourceRef }),
+    compareField('feature_id', resolvedCanonical.featureId, payload.featureId),
+    compareField('packet_key', resolvedCanonical.packetKey, payload.packetKey),
+    compareMetadata(resolvedCanonical.metadata, payload.metadata),
+    compareField('cluster_id', resolvedCanonical.clusterId, payload.clusterId),
+    compareField('community_id', resolvedCanonical.communityId, payload.communityId),
+    compareField('topology_label', resolvedCanonical.topologyLabel, payload.topologyLabel),
+    compareField('ontology_label', resolvedCanonical.ontologyLabel, payload.ontologyLabel),
+    compareField('cluster_key', resolvedCanonical.clusterKey, payload.clusterKey),
+    compareField('kmeans_cluster', resolvedCanonical.kmeansCluster, payload.kmeansCluster),
+    compareField('domain', resolvedCanonical.domain, payload.domain, { normalize: normalizeDomain }),
+    compareField('som_cluster', resolvedCanonical.somCluster || resolvedCanonical.clusterId, payload.somCluster),
   ];
 
   const patch = {};
@@ -729,16 +857,9 @@ async function main() {
   const orphanSamples = [];
   const patchCandidates = [];
   const matchedPointIds = new Set();
-
   for (const point of scroll.points) {
     const pointId = normalizeText(point?.id);
-    const canonical =
-      lookups.byQdrantId.get(pointId)
-      ?? lookups.byPacketKey.get(normalizeText(point?.payload?.packet_key ?? point?.payload?.packetKey ?? ''))
-      ?? lookups.bySourceFeature.get(
-        `${normalizeSourceRef(point?.payload?.source_ref ?? point?.payload?.sourceRef ?? point?.payload?.canonical_source_ref ?? '')}::${normalizeText(point?.payload?.feature_id ?? point?.payload?.featureId ?? '')}`,
-      )
-      ?? null;
+    const canonical = findCanonicalRow(point, lookups);
 
     if (!canonical) {
       orphanSamples.push({

@@ -25,6 +25,10 @@ export type HyperRagPacketRpcPacket = {
   canonical_source_ref: string;
   feature_id: string | null;
   feature_label: string | null;
+  topology_label: string | null;
+  ontology_label: string | null;
+  cluster_key: string | null;
+  kmeans_cluster: string | number | null;
   qdrant_point_id: string | null;
   community_id: string | null;
   som_cluster: string | null;
@@ -122,6 +126,54 @@ function cleanText(value: unknown): string {
   return String(value ?? '').trim();
 }
 
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null && !Array.isArray(value);
+}
+
+function getMetadata(value: unknown): Record<string, unknown> {
+  if (!isRecord(value)) return {};
+  const metadata = value.metadata;
+  return isRecord(metadata) ? metadata : {};
+}
+
+const COARSE_FEATURE_ID_VALUES = new Set([
+  'db',
+  'routes',
+  'ai',
+  'api',
+  'ui',
+  'graph',
+  'search',
+  'retrieval',
+  'packet',
+]);
+
+function isCoarseFeatureId(value: string | null | undefined): boolean {
+  if (!value) return false;
+  const normalized = cleanText(value).toLowerCase();
+  if (!normalized) return false;
+  if (COARSE_FEATURE_ID_VALUES.has(normalized)) return true;
+  return /^[a-z]{1,4}$/.test(normalized) && !/[./:_-]/.test(normalized);
+}
+
+function canonicalFeatureId(...values: unknown[]): string | null {
+  for (const value of values) {
+    const text = cleanText(value);
+    if (!text || isCoarseFeatureId(text)) continue;
+    return text;
+  }
+  return null;
+}
+
+function inferDomainFromSourceRef(sourceRef: string | null): string | null {
+  if (!sourceRef) return null;
+  const normalized = sourceRef.replace(/\\/g, '/');
+  const parts = normalized.split('/').filter(Boolean);
+  if (parts.length === 0) return null;
+  const preferred = parts.find((part) => !['src', 'lib', 'server', 'routes', 'app', 'packages'].includes(part.toLowerCase()));
+  return cleanText(preferred ?? parts[parts.length - 2] ?? parts[0]) || null;
+}
+
 function splitTags(value: unknown): string[] {
   if (Array.isArray(value)) return [...new Set(value.map(cleanText).filter(Boolean))];
   return [...new Set(cleanText(value).split(/[,\s]+/).map((tag) => tag.trim()).filter(Boolean))];
@@ -157,8 +209,8 @@ function packetSeedCandidatesFromRrf(
   kind: 'rrf';
 }> {
   return results.map((row) => {
-    const metadata = (row.metadata ?? {}) as Record<string, unknown>;
-    const breakdownMetas = (row.breakdown ?? []).map((b) => b.metadata ?? {}).filter((m): m is Record<string, unknown> => Boolean(m));
+    const metadata = getMetadata(row);
+    const breakdownMetas = (row.breakdown ?? []).map((b) => getMetadata(b)).filter((m): m is Record<string, unknown> => Boolean(m));
     const refs = new Set<string>();
     for (const rawValue of [
       row.id,
@@ -482,6 +534,19 @@ async function recordQueryEvalTimes(params: {
   }
 }
 
+function getSeedMetadata(seed: unknown): Record<string, any> {
+  if (
+    seed &&
+    typeof seed === 'object' &&
+    'metadata' in seed &&
+    seed.metadata &&
+    typeof seed.metadata === 'object'
+  ) {
+    return seed.metadata as Record<string, any>;
+  }
+  return {};
+}
+
 export async function hyperragPacketRpc(input: HyperRagPacketRpcInput): Promise<HyperRagPacketRpcResult> {
   const startedAt = Date.now();
   const query = cleanText(input.query);
@@ -632,16 +697,23 @@ export async function hyperragPacketRpc(input: HyperRagPacketRpcInput): Promise<
   const seedsToEmit = dedupedSeeds.slice(0, limit);
   const neighborsBySeed = includeGraph
     ? await Promise.all(
-        seedsToEmit.map((seed) =>
-          expandNeighbours(
+        seedsToEmit.map(async (seed) => {
+          const candidateRoots = [...new Set([
+            seed.source_refs[0],
+            seed.file_path,
+            seed.stable_key,
             toStableFileKey(seed.source_refs[0] ?? seed.file_path ?? seed.stable_key),
-            1,
-          ).catch(() => [])
-        )
+          ].map((value) => cleanText(value)).filter(Boolean))];
+          const neighborSets = await Promise.all(
+            candidateRoots.map((root) => expandNeighbours(root, 1).catch(() => [])),
+          );
+          return [...new Set(neighborSets.flat().map((neighbor) => cleanText(neighbor)).filter(Boolean))];
+        })
       )
     : seedsToEmit.map(() => []);
 
   for (const [index, seed] of seedsToEmit.entries()) {
+    const seedMetadata = getSeedMetadata(seed);
     const candidates = seed.source_refs.length ? seed.source_refs : [seed.file_path ?? seed.stable_key];
     const sourceRef =
       candidates.find((candidate) => parentAtlas.has(candidate) || nesPackets.has(candidate)) ??
@@ -649,10 +721,75 @@ export async function hyperragPacketRpc(input: HyperRagPacketRpcInput): Promise<
       seed.stable_key;
     const atlasRow = parentAtlas.get(sourceRef) ?? candidates.map((candidate) => parentAtlas.get(candidate)).find(Boolean);
     const nesRow = nesPackets.get(sourceRef) ?? candidates.map((candidate) => nesPackets.get(candidate)).find(Boolean);
-    const featureId = nesRow?.feature_id ?? atlasRow?.feature_id ?? null;
+    const featureId = canonicalFeatureId(
+      nesRow?.feature_id,
+      atlasRow?.feature_id,
+      getMetadata(nesRow).feature_id,
+      getMetadata(atlasRow).feature_id,
+    );
     const packetKey = nesRow?.packet_key ?? `hyperrag:${sourceRef || seed.stable_key}`;
     const canonicalSourceRef = atlasRow?.source_ref ?? nesRow?.source_ref ?? sourceRef;
     const packetType: HyperRagPacketRpcPacket['packet_type'] = nesRow ? 'neschrom97' : 'chrom97';
+    const atlasMetadata = getMetadata(atlasRow);
+    const nesMetadata = getMetadata(nesRow);
+    const inferredDomainClass =
+      cleanText(
+        seedMetadata.domain_class
+        ?? seedMetadata.domainClass
+        ?? atlasMetadata.domain_class
+        ?? atlasMetadata.domainClass
+        ?? nesMetadata.domain_class
+        ?? nesMetadata.domainClass
+        ?? inferDomainFromSourceRef(canonicalSourceRef),
+      ) || null;
+    const topologyLabel = cleanText(
+      nesRow?.payload?.topology_label
+      ?? nesRow?.payload?.topologyLabel
+      ?? atlasRow?.payload?.topology_label
+      ?? atlasRow?.payload?.topologyLabel
+      ?? seedMetadata.topology_label
+      ?? seedMetadata.topologyLabel
+      ?? seedMetadata.domain_class
+      ?? seedMetadata.domain
+      ?? seedMetadata.path_label
+      ?? seedMetadata.pathLabel
+      ?? inferredDomainClass
+      ?? null,
+    ) || null;
+    const ontologyLabel = cleanText(
+      nesRow?.payload?.ontology_label
+      ?? nesRow?.payload?.ontologyLabel
+      ?? atlasRow?.payload?.ontology_label
+      ?? atlasRow?.payload?.ontologyLabel
+      ?? seedMetadata.ontology_label
+      ?? seedMetadata.ontologyLabel
+      ?? seedMetadata.domain
+      ?? seedMetadata.domain_class
+      ?? seedMetadata.path_label
+      ?? seedMetadata.pathLabel
+      ?? inferredDomainClass
+      ?? null,
+    ) || null;
+    const clusterKey = cleanText(
+      nesRow?.payload?.cluster_key
+      ?? nesRow?.payload?.clusterKey
+      ?? atlasRow?.payload?.cluster_key
+      ?? atlasRow?.payload?.clusterKey
+      ?? seedMetadata.cluster_key
+      ?? seedMetadata.clusterKey
+      ?? null,
+    ) || null;
+    const kmeansCluster = cleanText(
+      nesRow?.payload?.kmeans_cluster
+      ?? nesRow?.payload?.kmeansCluster
+      ?? atlasRow?.payload?.kmeans_cluster
+      ?? atlasRow?.payload?.kmeansCluster
+      ?? seedMetadata.kmeans_cluster
+      ?? seedMetadata.kmeansCluster
+      ?? nesRow?.payload?.cluster_id
+      ?? atlasRow?.payload?.cluster_id
+      ?? null,
+    ) || null;
     const neighbors = neighborsBySeed[index] ?? [];
     neo4jExpansions += neighbors.length;
     const fusionHit =
@@ -675,6 +812,10 @@ export async function hyperragPacketRpc(input: HyperRagPacketRpcInput): Promise<
       canonical_source_ref: canonicalSourceRef,
       feature_id: featureId,
       feature_label: featureLabelFrom(nesRow ?? atlasRow, featureId),
+      topology_label: topologyLabel,
+      ontology_label: ontologyLabel,
+      cluster_key: clusterKey,
+      kmeans_cluster: kmeansCluster,
       qdrant_point_id: (
         nesRow?.qdrant_point_id
         ?? cleanText(atlasRow?.payload?.qdrant_point_id ?? atlasRow?.payload?.qdrantPointId)

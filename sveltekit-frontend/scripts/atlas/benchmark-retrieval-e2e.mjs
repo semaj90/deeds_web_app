@@ -40,10 +40,14 @@ for (const envFile of [join(ROOT, '.env'), join(ROOT, '..', '.env')]) {
 const VERBOSE  = process.argv.includes('--verbose');
 const RAW_LIM  = process.argv.find(a => a.startsWith('--limit='));
 const LIMIT    = RAW_LIM ? Math.max(1, parseInt(RAW_LIM.split('=')[1], 10)) : 5;
+const RAW_COUNT = process.argv.find(a => a.startsWith('--count=') || a === '--count');
+const RAW_ROUND = process.argv.find(a => a.startsWith('--round=') || a === '--round');
 const RAW_Q    = process.argv.find(a => a.startsWith('--queries='));
 const PG_URL   = process.env.DATABASE_URL ?? null;
 const APP_URL  = process.env.PUBLIC_APP_URL ?? process.env.APP_URL ?? 'http://127.0.0.1:5173';
 const PACKET_RPC_URL = new URL('/api/hyperrag/packet-rpc', APP_URL).toString();
+const ROUND    = RAW_ROUND ? String(RAW_ROUND.includes('=') ? RAW_ROUND.split('=', 2)[1] : process.argv[process.argv.indexOf('--round') + 1] ?? 'cold') : 'cold';
+const COUNT    = RAW_COUNT ? Math.max(1, parseInt(RAW_COUNT.includes('=') ? RAW_COUNT.split('=')[1] : process.argv[process.argv.indexOf('--count') + 1], 10)) : 0;
 
 // ── Golden query set ──────────────────────────────────────────────────────────
 
@@ -63,6 +67,16 @@ const GOLDEN_QUERIES = RAW_Q && existsSync(RAW_Q.split('=')[1])
       'embeddings 768 dimension codebase chunks',
       'legal document case notes schema',
     ];
+
+function buildQuerySet(baseQueries, count) {
+  const target = Number.isFinite(count) && count > 0 ? Math.trunc(count) : baseQueries.length;
+  if (target <= baseQueries.length) return baseQueries.slice(0, target);
+  const out = [];
+  for (let i = 0; out.length < target; i += 1) {
+    out.push(baseQueries[i % baseQueries.length]);
+  }
+  return out;
+}
 
 // ── DB helper ─────────────────────────────────────────────────────────────────
 
@@ -113,15 +127,18 @@ async function main() {
 
   const results = [];
   const queryHashes = [];
+  const queries = buildQuerySet(GOLDEN_QUERIES, COUNT > 0 ? COUNT : GOLDEN_QUERIES.length);
 
-  console.log(`\n📊 benchmark-retrieval-e2e — ${GOLDEN_QUERIES.length} queries, limit=${LIMIT}\n`);
+  console.log(`\n📊 benchmark-retrieval-e2e — ${queries.length} queries, limit=${LIMIT}, round=${ROUND}\n`);
   console.log(`[benchmark] packet RPC endpoint: ${PACKET_RPC_URL}`);
 
-  for (const query of GOLDEN_QUERIES) {
+  for (const query of queries) {
     const t0 = performance.now();
     let ok = false;
     let packets = 0;
     let trace = null;
+    let provenance = [];
+    let responseBody = null;
     let error = null;
 
     try {
@@ -141,9 +158,11 @@ async function main() {
         throw new Error(`HTTP ${response.status} from packet RPC`);
       }
       const res = await response.json();
+      responseBody = res;
       ok      = true;
       packets = res.packets.length;
       trace   = res.trace;
+      provenance = Array.isArray(res.provenance) ? res.provenance : [];
       // collect first 16 hex chars of sha256 as query_hash proxy
       const { createHash } = await import('node:crypto');
       const h = createHash('sha256').update(query).digest('hex').slice(0, 16);
@@ -154,7 +173,49 @@ async function main() {
 
     const wall_ms = Math.round(performance.now() - t0);
 
-    const row = { query, ok, packets, wall_ms, trace, error };
+    const firstPacket = Array.isArray(responseBody?.packets) && responseBody.packets.length > 0 ? responseBody.packets[0] : null;
+    const row = {
+      query,
+      ok,
+      packets,
+      wall_ms,
+      trace,
+      provenance,
+      error,
+      round: ROUND,
+      query_count_target: queries.length,
+      query_hash: queryHashes[queryHashes.length - 1] ?? null,
+      trace_id: trace?.replay_id ?? queryHashes[queryHashes.length - 1] ?? null,
+      task_id: 'atlas:retrieval:e2e',
+      worker_id: 'sveltekit-frontend',
+      packet_key: firstPacket?.packet_key ?? null,
+      source_ref: firstPacket?.source_ref ?? null,
+      source_ref_key: String(firstPacket?.source_ref ?? '').split('#')[0] || null,
+      feature_id: firstPacket?.feature_id ?? null,
+      feature_label: firstPacket?.feature_label ?? null,
+      cache_hit_source: trace?.cache_source ?? null,
+      cache_namespace: trace?.cache_namespace ?? null,
+      cache_hit: Boolean(trace?.cache_hits ?? 0),
+      retrieval_strategy: trace?.retrieval_strategy ?? 'fusion',
+      graph_stage_status: Number(trace?.neo4j_expansions ?? 0) > 0
+        ? 'GRAPH_ENABLED'
+        : (Boolean(trace?.qdrant_hits ?? 0) || Boolean(trace?.postgres_hits ?? 0))
+          ? 'GRAPH_DEGRADED'
+          : 'GRAPH_DISABLED',
+      graph_stage_reason: Number(trace?.neo4j_expansions ?? 0) > 0
+        ? 'neo4j expansions present'
+        : (Boolean(trace?.qdrant_hits ?? 0) || Boolean(trace?.postgres_hits ?? 0))
+          ? 'neo4j expansion absent for this query'
+          : 'graph stage disabled or unavailable',
+      traversal_path: [
+        'packet_rpc',
+        ...(trace?.cache_source ? [trace.cache_source] : []),
+        ...(Number(trace?.postgres_hits ?? 0) > 0 ? ['postgres'] : []),
+        ...(Number(trace?.qdrant_hits ?? 0) > 0 ? ['qdrant'] : []),
+        ...(Number(trace?.neo4j_expansions ?? 0) > 0 ? ['neo4j'] : []),
+        ...(Number(trace?.rrf_hits ?? 0) > 0 ? ['rrf'] : []),
+      ],
+    };
     results.push(row);
 
     if (VERBOSE) {
@@ -184,7 +245,9 @@ async function main() {
 
   const summary = {
     generatedAt:  new Date().toISOString(),
-    queries:      GOLDEN_QUERIES.length,
+    queries:      queries.length,
+    query_count_target: queries.length,
+    round: ROUND,
     passed,
     failed,
     avg_wall_ms:  avgWall,

@@ -1,14 +1,146 @@
 {
-  "generated_at": "2026-06-19T05:07:46.600Z",
-  "limit": 250,
-  "redis": {
-    "status": "READY",
-    "url": "redis://127.0.0.1:6379",
-    "error": null
+  "generatedAt": "2026-06-21T22:46:32.655Z",
+  "status": "pass_with_warnings",
+  "queryCount": 1,
+  "packetCount": 5,
+  "query_count_target": 1,
+  "storyId": "proof-quality-lane",
+  "taskId": "atlas:replay:breadth:50",
+  "workerId": "james",
+  "traceId": "1782081989156-w0vqkzm",
+  "coverage": {
+    "qdrantHitPct": "100.0%",
+    "cacheHitPct": "100.0%",
+    "packetKeyPct": "100.0%",
+    "featureIdPct": "100.0%",
+    "sourceRefPct": "100.0%",
+    "provenancePct": "100.0%"
   },
-  "traces_exported": 170,
-  "rows_with_packets": 124,
-  "rows_with_error": 0,
-  "output_jsonl": "docs\\reports\\replay-trace.jsonl",
-  "output_md": "docs\\reports\\replay-trace.md"
+  "cacheHitPct": "100.0%",
+  "graphEnabledPct": "0.0%",
+  "qdrantHitPct": "100.0%",
+  "sourceRefPct": "100.0%",
+  "featureIdPct": "100.0%",
+  "packetKeyPct": "100.0%",
+  "provenancePct": "100.0%",
+  "failedQueries": [],
+  "latency": {
+    "total": {
+      "p50": 3231,
+      "p95": 3231
+    },
+    "bm25": {
+      "p50": 5,
+      "p95": 5
+    },
+    "qdrant": {
+      "p50": 5,
+      "p95": 5
+    },
+    "redis": {
+      "p50": 1,
+      "p95": 1
+    },
+    "neo4j": {
+      "p50": 0,
+      "p95": 0
+    },
+    "fusion": {
+      "p50": 5,
+      "p95": 5
+    }
+  },
+  "rounds": [
+    {
+      "round": "cold",
+      "status": "unknown",
+      "cacheHitPct": "0.0%",
+      "graphStageStatus": "unknown",
+      "queryCount": 1
+    },
+    {
+      "round": "warm",
+      "status": "unknown",
+      "cacheHitPct": "0.0%",
+      "graphStageStatus": "unknown",
+      "queryCount": 1
+    },
+    {
+      "round": "repeat",
+      "status": "unknown",
+      "cacheHitPct": "0.0%",
+      "graphStageStatus": "unknown",
+      "queryCount": 1
+    }
+  ],
+  "cacheProof": {
+    "status": "PASS",
+    "coldRun": "completed",
+    "warmRun": "completed",
+    "repeatRun": "completed",
+    "coldCacheHits": 1,
+    "warmCacheHits": 1,
+    "repeatCacheHits": 1,
+    "warmRepeatCacheHitCount": 2,
+    "warmRepeatCacheHitPct": "100.0%",
+    "cacheNamespaces": [
+      "hyperrag:query"
+    ]
+  },
+  "graphProof": {
+    "status": "GRAPH_DEGRADED",
+    "graphHitCount": 0,
+    "graphStageStatusValues": [
+      "GRAPH_DEGRADED"
+    ],
+    "graphStageReasonValues": [
+      "neo4j expansion not returned for this replay entry"
+    ]
+  },
+  "top": {
+    "packetKey": "nes:utility:9fa84252",
+    "sourceRef": "src/lib/types/svelte5-api-types.d.ts",
+    "sourceRefKey": "src/lib/types/svelte5-api-types.d.ts",
+    "featureId": "utility",
+    "domainClass": null,
+    "ontologyLabel": "types",
+    "topologyLabel": "types",
+    "cacheHitSource": "redis_exact_match",
+    "cacheNamespace": "hyperrag:query",
+    "cacheKey": "hyperrag:query:a1148d4ae02843fc7d0edce1791e6574bbcc948a59146ffdf80db0da4187f4ee",
+    "queryNormalized": "qdrant vector retrieval fusion rrf",
+    "graphStageStatus": "GRAPH_DEGRADED",
+    "graphStageReason": "neo4j expansion not returned for this replay entry",
+    "fusionScore": null,
+    "traversalPath": [
+      "packet_rpc",
+      "redis",
+      "postgres",
+      "qdrant",
+      "rrf"
+    ]
+  },
+  "topSourceRefs": [
+    {
+      "source_ref": "src/lib/types/svelte5-api-types.d.ts",
+      "hits": 1
+    }
+  ],
+  "topFeatureIds": [
+    {
+      "feature_id": "utility",
+      "hits": 1
+    }
+  ],
+  "notes": [
+    "Fresh replay breadth comes from live Redis trace entries, not point samples.",
+    "Replay breadth target reached.",
+    "Neo4j is treated as background analysis, not canonical truth.",
+    "Provenance breadth is present in the replay trace export."
+  ],
+  "source": {
+    "benchmark": "docs/reports/retrieval-e2e-benchmark.json",
+    "replay": "docs/reports/replay-trace-summary.json",
+    "export": "docs/reports/replay-trace.jsonl"
+  }
 }

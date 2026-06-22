@@ -322,7 +322,10 @@ async function queryNeo4jFileGraphSignal(seedRefs: string[], topK: number): Prom
 }>> {
   const normalizedSeeds = [...new Set(
     seedRefs
-      .map((ref) => toStableFileKey(String(ref ?? '').trim()))
+      .flatMap((ref) => {
+        const raw = String(ref ?? '').trim();
+        return raw ? [raw, toStableFileKey(raw)] : [];
+      })
       .filter((ref) => ref.length > 0),
   )];
 

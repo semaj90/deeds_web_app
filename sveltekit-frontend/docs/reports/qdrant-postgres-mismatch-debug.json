@@ -1,2590 +1,861 @@
 {
-  "timestamp": "2026-06-14T17:26:23.016Z",
-  "gate_threshold": 95,
-  "sampled_agreement_percent": 80,
-  "gate_pass": false,
-  "summary": {
-    "total_sampled": 50,
-    "postgres_found": 50,
-    "postgres_missing": 0,
-    "matched": 40,
-    "mismatched": 10
-  },
-  "samples": [
+  "generatedAt": "2026-06-21T21:43:05.152Z",
+  "qdrantUrl": "http://127.0.0.1:6333",
+  "sampleSize": 50,
+  "points": [
     {
-      "sample_idx": 1,
       "qdrant_point_id": 86694,
-      "source_ref": "sveltekit-frontend/src/routes/api/research/concurrent-deep/stream/+server.ts",
-      "status": "MATCH",
-      "postgres_found": true,
-      "match_count": 4,
-      "mismatch_count": 0,
-      "comparison": [
-        {
-          "field": "source_ref",
-          "qdrant": "sveltekit-frontend/src/routes/api/research/concurrent-deep/stream/+server.ts",
-          "postgres": "sveltekit-frontend/src/routes/api/research/concurrent-deep/stream/+server.ts",
-          "match": true
-        },
-        {
-          "field": "packet_key",
-          "qdrant": "src/routes/api/research/concurrent-deep/stream/+server.ts:d391b7e92c36906b",
-          "postgres": "src/routes/api/research/concurrent-deep/stream/+server.ts:d391b7e92c36906b",
-          "match": true
-        },
-        {
-          "field": "feature_id",
-          "qdrant": "routes",
-          "postgres": "routes",
-          "match": true
-        },
-        {
-          "field": "feature_label",
-          "qdrant": "Routes",
-          "postgres": "Routes",
-          "match": true
-        }
-      ]
-    },
-    {
-      "sample_idx": 2,
-      "qdrant_point_id": 138065,
-      "source_ref": "sveltekit-frontend/src/routes/api/recommendations/+server.ts",
-      "status": "MATCH",
-      "postgres_found": true,
-      "match_count": 4,
-      "mismatch_count": 0,
-      "comparison": [
-        {
-          "field": "source_ref",
-          "qdrant": "sveltekit-frontend/src/routes/api/recommendations/+server.ts",
-          "postgres": "sveltekit-frontend/src/routes/api/recommendations/+server.ts",
-          "match": true
-        },
-        {
-          "field": "packet_key",
-          "qdrant": "src/routes/api/recommendations/+server.ts:d5397aa82be3284c",
-          "postgres": "src/routes/api/recommendations/+server.ts:d5397aa82be3284c",
-          "match": true
-        },
-        {
-          "field": "feature_id",
-          "qdrant": "routes",
-          "postgres": "routes",
-          "match": true
-        },
-        {
-          "field": "feature_label",
-          "qdrant": "Routes",
-          "postgres": "Routes",
-          "match": true
-        }
-      ]
-    },
-    {
-      "sample_idx": 3,
-      "qdrant_point_id": 174637,
-      "source_ref": "src/lib/server/ai/contextual-tools.ts",
-      "status": "MISMATCH",
-      "postgres_found": true,
-      "match_count": 3,
-      "mismatch_count": 1,
-      "comparison": [
-        {
-          "field": "source_ref",
-          "qdrant": "src/lib/server/ai/contextual-tools.ts",
-          "postgres": "src/lib/server/ai/contextual-tools.ts",
-          "match": true
-        },
-        {
-          "field": "packet_key",
-          "qdrant": null,
-          "postgres": "src/lib/server/ai/contextual-tools.ts:b65c6a4d",
-          "match": false
-        },
-        {
-          "field": "feature_id",
-          "qdrant": "ai",
-          "postgres": "ai",
-          "match": true
-        },
-        {
-          "field": "feature_label",
-          "qdrant": "lib",
-          "postgres": "lib",
-          "match": true
-        }
-      ]
-    },
-    {
-      "sample_idx": 4,
-      "qdrant_point_id": 188608,
-      "source_ref": "src/lib/server/research/reddit-harvester.ts",
-      "status": "MISMATCH",
-      "postgres_found": true,
-      "match_count": 3,
-      "mismatch_count": 1,
-      "comparison": [
-        {
-          "field": "source_ref",
-          "qdrant": "src/lib/server/research/reddit-harvester.ts",
-          "postgres": "src/lib/server/research/reddit-harvester.ts",
-          "match": true
-        },
-        {
-          "field": "packet_key",
-          "qdrant": null,
-          "postgres": "src/lib/server/research/reddit-harvester.ts:78eef6c1",
-          "match": false
-        },
-        {
-          "field": "feature_id",
-          "qdrant": "research",
-          "postgres": "research",
-          "match": true
-        },
-        {
-          "field": "feature_label",
-          "qdrant": "lib",
-          "postgres": "lib",
-          "match": true
-        }
-      ]
-    },
-    {
-      "sample_idx": 5,
-      "qdrant_point_id": 194586,
-      "source_ref": "sveltekit-frontend/src/lib/server/gpu/libtorch-bridge.ts",
-      "status": "MATCH",
-      "postgres_found": true,
-      "match_count": 4,
-      "mismatch_count": 0,
-      "comparison": [
-        {
-          "field": "source_ref",
-          "qdrant": "sveltekit-frontend/src/lib/server/gpu/libtorch-bridge.ts",
-          "postgres": "sveltekit-frontend/src/lib/server/gpu/libtorch-bridge.ts",
-          "match": true
-        },
-        {
-          "field": "packet_key",
-          "qdrant": "src/lib/server/gpu/libtorch-bridge.ts:44dd86e0eace5c71",
-          "postgres": "src/lib/server/gpu/libtorch-bridge.ts:44dd86e0eace5c71",
-          "match": true
-        },
-        {
-          "field": "feature_id",
-          "qdrant": "utility",
-          "postgres": "utility",
-          "match": true
-        },
-        {
-          "field": "feature_label",
-          "qdrant": "Utility",
-          "postgres": "Utility",
-          "match": true
-        }
-      ]
-    },
-    {
-      "sample_idx": 6,
-      "qdrant_point_id": 227675,
-      "source_ref": "src/lib/server/couchdb/mango-indexes.ts",
-      "status": "MISMATCH",
-      "postgres_found": true,
-      "match_count": 3,
-      "mismatch_count": 1,
-      "comparison": [
-        {
-          "field": "source_ref",
-          "qdrant": "src/lib/server/couchdb/mango-indexes.ts",
-          "postgres": "src/lib/server/couchdb/mango-indexes.ts",
-          "match": true
-        },
-        {
-          "field": "packet_key",
-          "qdrant": null,
-          "postgres": "src/lib/server/couchdb/mango-indexes.ts:dff1fbc9",
-          "match": false
-        },
-        {
-          "field": "feature_id",
-          "qdrant": "couchdb",
-          "postgres": "couchdb",
-          "match": true
-        },
-        {
-          "field": "feature_label",
-          "qdrant": "lib",
-          "postgres": "lib",
-          "match": true
-        }
-      ]
-    },
-    {
-      "sample_idx": 7,
-      "qdrant_point_id": 292522,
-      "source_ref": "sveltekit-frontend/src/lib/components/monitoring/CacheMonitoringWidget.svelte",
-      "status": "MATCH",
-      "postgres_found": true,
-      "match_count": 4,
-      "mismatch_count": 0,
-      "comparison": [
-        {
-          "field": "source_ref",
-          "qdrant": "sveltekit-frontend/src/lib/components/monitoring/CacheMonitoringWidget.svelte",
-          "postgres": "sveltekit-frontend/src/lib/components/monitoring/CacheMonitoringWidget.svelte",
-          "match": true
-        },
-        {
-          "field": "packet_key",
-          "qdrant": "src/lib/components/monitoring/CacheMonitoringWidget.svelte:f9470fb28e6f344a",
-          "postgres": "src/lib/components/monitoring/CacheMonitoringWidget.svelte:f9470fb28e6f344a",
-          "match": true
-        },
-        {
-          "field": "feature_id",
-          "qdrant": "monitoring",
-          "postgres": "monitoring",
-          "match": true
-        },
-        {
-          "field": "feature_label",
-          "qdrant": "Monitoring",
-          "postgres": "Monitoring",
-          "match": true
-        }
-      ]
-    },
-    {
-      "sample_idx": 8,
-      "qdrant_point_id": 404803,
-      "source_ref": "src/lib/server/data/legal-seed-data.ts",
-      "status": "MISMATCH",
-      "postgres_found": true,
-      "match_count": 3,
-      "mismatch_count": 1,
-      "comparison": [
-        {
-          "field": "source_ref",
-          "qdrant": "src/lib/server/data/legal-seed-data.ts",
-          "postgres": "src/lib/server/data/legal-seed-data.ts",
-          "match": true
-        },
-        {
-          "field": "packet_key",
-          "qdrant": null,
-          "postgres": "src/lib/server/data/legal-seed-data.ts:1ec45097",
-          "match": false
-        },
-        {
-          "field": "feature_id",
-          "qdrant": "data",
-          "postgres": "data",
-          "match": true
-        },
-        {
-          "field": "feature_label",
-          "qdrant": "lib",
-          "postgres": "lib",
-          "match": true
-        }
-      ]
-    },
-    {
-      "sample_idx": 9,
-      "qdrant_point_id": 436451,
-      "source_ref": "src/lib/components/citations/citationsaveform.svelte",
-      "status": "MISMATCH",
-      "postgres_found": true,
-      "match_count": 3,
-      "mismatch_count": 1,
-      "comparison": [
-        {
-          "field": "source_ref",
-          "qdrant": "src/lib/components/citations/citationsaveform.svelte",
-          "postgres": "src/lib/components/citations/citationsaveform.svelte",
-          "match": true
-        },
-        {
-          "field": "packet_key",
-          "qdrant": null,
-          "postgres": "src/lib/components/citations/citationsaveform.svelte:77b10257",
-          "match": false
-        },
-        {
-          "field": "feature_id",
-          "qdrant": "citations",
-          "postgres": "citations",
-          "match": true
-        },
-        {
-          "field": "feature_label",
-          "qdrant": "lib",
-          "postgres": "lib",
-          "match": true
-        }
-      ]
-    },
-    {
-      "sample_idx": 10,
-      "qdrant_point_id": 614211,
-      "source_ref": "sveltekit-frontend/src/routes/(app)/admin/atlas/+page.server.ts",
-      "status": "MATCH",
-      "postgres_found": true,
-      "match_count": 4,
-      "mismatch_count": 0,
-      "comparison": [
-        {
-          "field": "source_ref",
-          "qdrant": "sveltekit-frontend/src/routes/(app)/admin/atlas/+page.server.ts",
-          "postgres": "sveltekit-frontend/src/routes/(app)/admin/atlas/+page.server.ts",
-          "match": true
-        },
-        {
-          "field": "packet_key",
-          "qdrant": "src/routes/(app)/admin/atlas/+page.server.ts:8ac8a88cbd487045",
-          "postgres": "src/routes/(app)/admin/atlas/+page.server.ts:8ac8a88cbd487045",
-          "match": true
-        },
-        {
-          "field": "feature_id",
-          "qdrant": "routes",
-          "postgres": "routes",
-          "match": true
-        },
-        {
-          "field": "feature_label",
-          "qdrant": "Routes",
-          "postgres": "Routes",
-          "match": true
-        }
-      ]
-    },
-    {
-      "sample_idx": 11,
-      "qdrant_point_id": 639944,
-      "source_ref": "sveltekit-frontend/src/routes/admin/parents-atlas/+page.svelte",
-      "status": "MATCH",
-      "postgres_found": true,
-      "match_count": 4,
-      "mismatch_count": 0,
-      "comparison": [
-        {
-          "field": "source_ref",
-          "qdrant": "sveltekit-frontend/src/routes/admin/parents-atlas/+page.svelte",
-          "postgres": "sveltekit-frontend/src/routes/admin/parents-atlas/+page.svelte",
-          "match": true
-        },
-        {
-          "field": "packet_key",
-          "qdrant": "src/routes/admin/parents-atlas/+page.svelte:e6c919084ef1be4a",
-          "postgres": "src/routes/admin/parents-atlas/+page.svelte:e6c919084ef1be4a",
-          "match": true
-        },
-        {
-          "field": "feature_id",
-          "qdrant": "routes",
-          "postgres": "routes",
-          "match": true
-        },
-        {
-          "field": "feature_label",
-          "qdrant": "Routes",
-          "postgres": "Routes",
-          "match": true
-        }
-      ]
-    },
-    {
-      "sample_idx": 12,
-      "qdrant_point_id": 727645,
-      "source_ref": "sveltekit-frontend/src/lib/server/ai/mcp-tool-dispatch.ts",
-      "status": "MATCH",
-      "postgres_found": true,
-      "match_count": 4,
-      "mismatch_count": 0,
-      "comparison": [
-        {
-          "field": "source_ref",
-          "qdrant": "sveltekit-frontend/src/lib/server/ai/mcp-tool-dispatch.ts",
-          "postgres": "sveltekit-frontend/src/lib/server/ai/mcp-tool-dispatch.ts",
-          "match": true
-        },
-        {
-          "field": "packet_key",
-          "qdrant": "src/lib/server/ai/mcp-tool-dispatch.ts:d962195ef653d759",
-          "postgres": "src/lib/server/ai/mcp-tool-dispatch.ts:d962195ef653d759",
-          "match": true
-        },
-        {
-          "field": "feature_id",
-          "qdrant": "ai",
-          "postgres": "ai",
-          "match": true
-        },
-        {
-          "field": "feature_label",
-          "qdrant": "Ai",
-          "postgres": "Ai",
-          "match": true
-        }
-      ]
-    },
-    {
-      "sample_idx": 13,
-      "qdrant_point_id": 761314,
-      "source_ref": "sveltekit-frontend/src/lib/components/ai/CachePerformanceDashboard.svelte",
-      "status": "MATCH",
-      "postgres_found": true,
-      "match_count": 4,
-      "mismatch_count": 0,
-      "comparison": [
-        {
-          "field": "source_ref",
-          "qdrant": "sveltekit-frontend/src/lib/components/ai/CachePerformanceDashboard.svelte",
-          "postgres": "sveltekit-frontend/src/lib/components/ai/CachePerformanceDashboard.svelte",
-          "match": true
-        },
-        {
-          "field": "packet_key",
-          "qdrant": "src/lib/components/ai/CachePerformanceDashboard.svelte:2865def3ade42484",
-          "postgres": "src/lib/components/ai/CachePerformanceDashboard.svelte:2865def3ade42484",
-          "match": true
-        },
-        {
-          "field": "feature_id",
-          "qdrant": "atlas-context",
-          "postgres": "atlas-context",
-          "match": true
-        },
-        {
-          "field": "feature_label",
-          "qdrant": "Atlas Context",
-          "postgres": "Atlas Context",
-          "match": true
-        }
-      ]
-    },
-    {
-      "sample_idx": 14,
-      "qdrant_point_id": 909958,
-      "source_ref": "sveltekit-frontend/src/lib/server/retrieval/centroid-cache.ts",
-      "status": "MATCH",
-      "postgres_found": true,
-      "match_count": 4,
-      "mismatch_count": 0,
-      "comparison": [
-        {
-          "field": "source_ref",
-          "qdrant": "sveltekit-frontend/src/lib/server/retrieval/centroid-cache.ts",
-          "postgres": "sveltekit-frontend/src/lib/server/retrieval/centroid-cache.ts",
-          "match": true
-        },
-        {
-          "field": "packet_key",
-          "qdrant": "src/lib/server/retrieval/centroid-cache.ts:cfcce45038fad33b",
-          "postgres": "src/lib/server/retrieval/centroid-cache.ts:cfcce45038fad33b",
-          "match": true
-        },
-        {
-          "field": "feature_id",
-          "qdrant": "utility",
-          "postgres": "utility",
-          "match": true
-        },
-        {
-          "field": "feature_label",
-          "qdrant": "Utility",
-          "postgres": "Utility",
-          "match": true
-        }
-      ]
-    },
-    {
-      "sample_idx": 15,
-      "qdrant_point_id": 1080785,
-      "source_ref": "sveltekit-frontend/src/lib/components/admin/AdminMonitoringDashboard.svelte",
-      "status": "MATCH",
-      "postgres_found": true,
-      "match_count": 4,
-      "mismatch_count": 0,
-      "comparison": [
-        {
-          "field": "source_ref",
-          "qdrant": "sveltekit-frontend/src/lib/components/admin/AdminMonitoringDashboard.svelte",
-          "postgres": "sveltekit-frontend/src/lib/components/admin/AdminMonitoringDashboard.svelte",
-          "match": true
-        },
-        {
-          "field": "packet_key",
-          "qdrant": "src/lib/components/admin/AdminMonitoringDashboard.svelte:50e282945262eca8",
-          "postgres": "src/lib/components/admin/AdminMonitoringDashboard.svelte:50e282945262eca8",
-          "match": true
-        },
-        {
-          "field": "feature_id",
-          "qdrant": "admin",
-          "postgres": "admin",
-          "match": true
-        },
-        {
-          "field": "feature_label",
-          "qdrant": "Admin",
-          "postgres": "Admin",
-          "match": true
-        }
-      ]
-    },
-    {
-      "sample_idx": 16,
-      "qdrant_point_id": 1103029,
-      "source_ref": "sveltekit-frontend/src/lib/components/graph/GraphifyViewer.svelte",
-      "status": "MATCH",
-      "postgres_found": true,
-      "match_count": 4,
-      "mismatch_count": 0,
-      "comparison": [
-        {
-          "field": "source_ref",
-          "qdrant": "sveltekit-frontend/src/lib/components/graph/GraphifyViewer.svelte",
-          "postgres": "sveltekit-frontend/src/lib/components/graph/GraphifyViewer.svelte",
-          "match": true
-        },
-        {
-          "field": "packet_key",
-          "qdrant": "src/lib/components/graph/GraphifyViewer.svelte:81f6bc913c8bb05b",
-          "postgres": "src/lib/components/graph/GraphifyViewer.svelte:81f6bc913c8bb05b",
-          "match": true
-        },
-        {
-          "field": "feature_id",
-          "qdrant": "atlas-context",
-          "postgres": "atlas-context",
-          "match": true
-        },
-        {
-          "field": "feature_label",
-          "qdrant": "Atlas Context",
-          "postgres": "Atlas Context",
-          "match": true
-        }
-      ]
-    },
-    {
-      "sample_idx": 17,
-      "qdrant_point_id": 1116368,
-      "source_ref": "src/lib/server/retrieval/cluster-aware-reranker.ts",
-      "status": "MISMATCH",
-      "postgres_found": true,
-      "match_count": 3,
-      "mismatch_count": 1,
-      "comparison": [
-        {
-          "field": "source_ref",
-          "qdrant": "src/lib/server/retrieval/cluster-aware-reranker.ts",
-          "postgres": "src/lib/server/retrieval/cluster-aware-reranker.ts",
-          "match": true
-        },
-        {
-          "field": "packet_key",
-          "qdrant": null,
-          "postgres": "src/lib/server/retrieval/cluster-aware-reranker.ts:95647aa7",
-          "match": false
-        },
-        {
-          "field": "feature_id",
-          "qdrant": "retrieval",
-          "postgres": "retrieval",
-          "match": true
-        },
-        {
-          "field": "feature_label",
-          "qdrant": "lib",
-          "postgres": "lib",
-          "match": true
-        }
-      ]
-    },
-    {
-      "sample_idx": 18,
-      "qdrant_point_id": 1146202,
-      "source_ref": "src/lib/server/admin/retrieval-analytics-service.ts",
-      "status": "MISMATCH",
-      "postgres_found": true,
-      "match_count": 3,
-      "mismatch_count": 1,
-      "comparison": [
-        {
-          "field": "source_ref",
-          "qdrant": "src/lib/server/admin/retrieval-analytics-service.ts",
-          "postgres": "src/lib/server/admin/retrieval-analytics-service.ts",
-          "match": true
-        },
-        {
-          "field": "packet_key",
-          "qdrant": null,
-          "postgres": "src/lib/server/admin/retrieval-analytics-service.ts:8f0ca91b",
-          "match": false
-        },
-        {
-          "field": "feature_id",
-          "qdrant": "admin",
-          "postgres": "admin",
-          "match": true
-        },
-        {
-          "field": "feature_label",
-          "qdrant": "lib",
-          "postgres": "lib",
-          "match": true
-        }
-      ]
-    },
-    {
-      "sample_idx": 19,
-      "qdrant_point_id": 1249835,
-      "source_ref": "sveltekit-frontend/src/lib/webgpu/gaussian-splat-renderer.ts",
-      "status": "MATCH",
-      "postgres_found": true,
-      "match_count": 4,
-      "mismatch_count": 0,
-      "comparison": [
-        {
-          "field": "source_ref",
-          "qdrant": "sveltekit-frontend/src/lib/webgpu/gaussian-splat-renderer.ts",
-          "postgres": "sveltekit-frontend/src/lib/webgpu/gaussian-splat-renderer.ts",
-          "match": true
-        },
-        {
-          "field": "packet_key",
-          "qdrant": "src/lib/webgpu/gaussian-splat-renderer.ts:43c70c0a3ba7ff2c",
-          "postgres": "src/lib/webgpu/gaussian-splat-renderer.ts:43c70c0a3ba7ff2c",
-          "match": true
-        },
-        {
-          "field": "feature_id",
-          "qdrant": "webgpu",
-          "postgres": "webgpu",
-          "match": true
-        },
-        {
-          "field": "feature_label",
-          "qdrant": "Webgpu",
-          "postgres": "Webgpu",
-          "match": true
-        }
-      ]
-    },
-    {
-      "sample_idx": 20,
-      "qdrant_point_id": 1354889,
-      "source_ref": "sveltekit-frontend/src/lib/components/legal/EvidenceReportSummary.svelte",
-      "status": "MATCH",
-      "postgres_found": true,
-      "match_count": 4,
-      "mismatch_count": 0,
-      "comparison": [
-        {
-          "field": "source_ref",
-          "qdrant": "sveltekit-frontend/src/lib/components/legal/EvidenceReportSummary.svelte",
-          "postgres": "sveltekit-frontend/src/lib/components/legal/EvidenceReportSummary.svelte",
-          "match": true
-        },
-        {
-          "field": "packet_key",
-          "qdrant": "src/lib/components/legal/EvidenceReportSummary.svelte:cd9b26086bb1ba11",
-          "postgres": "src/lib/components/legal/EvidenceReportSummary.svelte:cd9b26086bb1ba11",
-          "match": true
-        },
-        {
-          "field": "feature_id",
-          "qdrant": "legal",
-          "postgres": "legal",
-          "match": true
-        },
-        {
-          "field": "feature_label",
-          "qdrant": "Legal",
-          "postgres": "Legal",
-          "match": true
-        }
-      ]
-    },
-    {
-      "sample_idx": 21,
-      "qdrant_point_id": 1401737,
-      "source_ref": "sveltekit-frontend/src/lib/db/schema/evidence.ts",
-      "status": "MATCH",
-      "postgres_found": true,
-      "match_count": 4,
-      "mismatch_count": 0,
-      "comparison": [
-        {
-          "field": "source_ref",
-          "qdrant": "sveltekit-frontend/src/lib/db/schema/evidence.ts",
-          "postgres": "sveltekit-frontend/src/lib/db/schema/evidence.ts",
-          "match": true
-        },
-        {
-          "field": "packet_key",
-          "qdrant": "src/lib/db/schema/evidence.ts:bf52bff981024088",
-          "postgres": "src/lib/db/schema/evidence.ts:bf52bff981024088",
-          "match": true
-        },
-        {
-          "field": "feature_id",
-          "qdrant": "schema",
-          "postgres": "schema",
-          "match": true
-        },
-        {
-          "field": "feature_label",
-          "qdrant": "Schema",
-          "postgres": "Schema",
-          "match": true
-        }
-      ]
-    },
-    {
-      "sample_idx": 22,
-      "qdrant_point_id": 1536417,
-      "source_ref": "sveltekit-frontend/src/mcp/tools/legal-skills.tool.ts",
-      "status": "MATCH",
-      "postgres_found": true,
-      "match_count": 4,
-      "mismatch_count": 0,
-      "comparison": [
-        {
-          "field": "source_ref",
-          "qdrant": "sveltekit-frontend/src/mcp/tools/legal-skills.tool.ts",
-          "postgres": "sveltekit-frontend/src/mcp/tools/legal-skills.tool.ts",
-          "match": true
-        },
-        {
-          "field": "packet_key",
-          "qdrant": "src/mcp/tools/legal-skills.tool.ts:898b0571049c27e5",
-          "postgres": "src/mcp/tools/legal-skills.tool.ts:898b0571049c27e5",
-          "match": true
-        },
-        {
-          "field": "feature_id",
-          "qdrant": "tools",
-          "postgres": "tools",
-          "match": true
-        },
-        {
-          "field": "feature_label",
-          "qdrant": "Tools",
-          "postgres": "Tools",
-          "match": true
-        }
-      ]
-    },
-    {
-      "sample_idx": 23,
-      "qdrant_point_id": 1604171,
-      "source_ref": "sveltekit-frontend/src/lib/components/admin/ContextualAssistantModal.svelte",
-      "status": "MATCH",
-      "postgres_found": true,
-      "match_count": 4,
-      "mismatch_count": 0,
-      "comparison": [
-        {
-          "field": "source_ref",
-          "qdrant": "sveltekit-frontend/src/lib/components/admin/ContextualAssistantModal.svelte",
-          "postgres": "sveltekit-frontend/src/lib/components/admin/ContextualAssistantModal.svelte",
-          "match": true
-        },
-        {
-          "field": "packet_key",
-          "qdrant": "src/lib/components/admin/ContextualAssistantModal.svelte:0947370c5e85da9a",
-          "postgres": "src/lib/components/admin/ContextualAssistantModal.svelte:0947370c5e85da9a",
-          "match": true
-        },
-        {
-          "field": "feature_id",
-          "qdrant": "atlas-context",
-          "postgres": "atlas-context",
-          "match": true
-        },
-        {
-          "field": "feature_label",
-          "qdrant": "Atlas Context",
-          "postgres": "Atlas Context",
-          "match": true
-        }
-      ]
-    },
-    {
-      "sample_idx": 24,
-      "qdrant_point_id": 1612494,
-      "source_ref": "sveltekit-frontend/src/lib/components/legal-ai/CaseDocumentWriter.svelte",
-      "status": "MATCH",
-      "postgres_found": true,
-      "match_count": 4,
-      "mismatch_count": 0,
-      "comparison": [
-        {
-          "field": "source_ref",
-          "qdrant": "sveltekit-frontend/src/lib/components/legal-ai/CaseDocumentWriter.svelte",
-          "postgres": "sveltekit-frontend/src/lib/components/legal-ai/CaseDocumentWriter.svelte",
-          "match": true
-        },
-        {
-          "field": "packet_key",
-          "qdrant": "src/lib/components/legal-ai/CaseDocumentWriter.svelte:61aa58a3a843005c",
-          "postgres": "src/lib/components/legal-ai/CaseDocumentWriter.svelte:61aa58a3a843005c",
-          "match": true
-        },
-        {
-          "field": "feature_id",
-          "qdrant": "legal-ai",
-          "postgres": "legal-ai",
-          "match": true
-        },
-        {
-          "field": "feature_label",
-          "qdrant": "Legal Ai",
-          "postgres": "Legal Ai",
-          "match": true
-        }
-      ]
-    },
-    {
-      "sample_idx": 25,
-      "qdrant_point_id": 1631859,
-      "source_ref": "sveltekit-frontend/src/lib/server/indexer/directory-summarizer.ts",
-      "status": "MATCH",
-      "postgres_found": true,
-      "match_count": 4,
-      "mismatch_count": 0,
-      "comparison": [
-        {
-          "field": "source_ref",
-          "qdrant": "sveltekit-frontend/src/lib/server/indexer/directory-summarizer.ts",
-          "postgres": "sveltekit-frontend/src/lib/server/indexer/directory-summarizer.ts",
-          "match": true
-        },
-        {
-          "field": "packet_key",
-          "qdrant": "src/lib/server/indexer/directory-summarizer.ts:2de96f9c31988cc2",
-          "postgres": "src/lib/server/indexer/directory-summarizer.ts:2de96f9c31988cc2",
-          "match": true
-        },
-        {
-          "field": "feature_id",
-          "qdrant": "indexer",
-          "postgres": "indexer",
-          "match": true
-        },
-        {
-          "field": "feature_label",
-          "qdrant": "Indexer",
-          "postgres": "Indexer",
-          "match": true
-        }
-      ]
-    },
-    {
-      "sample_idx": 26,
-      "qdrant_point_id": 1672448,
-      "source_ref": "sveltekit-frontend/src/lib/components/analysis/KeyboardShortcutsHelp.svelte",
-      "status": "MATCH",
-      "postgres_found": true,
-      "match_count": 4,
-      "mismatch_count": 0,
-      "comparison": [
-        {
-          "field": "source_ref",
-          "qdrant": "sveltekit-frontend/src/lib/components/analysis/KeyboardShortcutsHelp.svelte",
-          "postgres": "sveltekit-frontend/src/lib/components/analysis/KeyboardShortcutsHelp.svelte",
-          "match": true
-        },
-        {
-          "field": "packet_key",
-          "qdrant": "src/lib/components/analysis/KeyboardShortcutsHelp.svelte:a1d0e5ef8170d74f",
-          "postgres": "src/lib/components/analysis/KeyboardShortcutsHelp.svelte:a1d0e5ef8170d74f",
-          "match": true
-        },
-        {
-          "field": "feature_id",
-          "qdrant": "atlas-context",
-          "postgres": "atlas-context",
-          "match": true
-        },
-        {
-          "field": "feature_label",
-          "qdrant": "Atlas Context",
-          "postgres": "Atlas Context",
-          "match": true
-        }
-      ]
-    },
-    {
-      "sample_idx": 27,
-      "qdrant_point_id": 1864541,
-      "source_ref": "sveltekit-frontend/src/lib/server/services/qdrant-client.ts",
-      "status": "MATCH",
-      "postgres_found": true,
-      "match_count": 4,
-      "mismatch_count": 0,
-      "comparison": [
-        {
-          "field": "source_ref",
-          "qdrant": "sveltekit-frontend/src/lib/server/services/qdrant-client.ts",
-          "postgres": "sveltekit-frontend/src/lib/server/services/qdrant-client.ts",
-          "match": true
-        },
-        {
-          "field": "packet_key",
-          "qdrant": "src/lib/server/services/qdrant-client.ts:b7bcd570ecf70b0b",
-          "postgres": "src/lib/server/services/qdrant-client.ts:b7bcd570ecf70b0b",
-          "match": true
-        },
-        {
-          "field": "feature_id",
-          "qdrant": "services",
-          "postgres": "services",
-          "match": true
-        },
-        {
-          "field": "feature_label",
-          "qdrant": "Services",
-          "postgres": "Services",
-          "match": true
-        }
-      ]
-    },
-    {
-      "sample_idx": 28,
-      "qdrant_point_id": 1893957,
-      "source_ref": "sveltekit-frontend/src/routes/api/chat/migrate/+server.ts",
-      "status": "MATCH",
-      "postgres_found": true,
-      "match_count": 4,
-      "mismatch_count": 0,
-      "comparison": [
-        {
-          "field": "source_ref",
-          "qdrant": "sveltekit-frontend/src/routes/api/chat/migrate/+server.ts",
-          "postgres": "sveltekit-frontend/src/routes/api/chat/migrate/+server.ts",
-          "match": true
-        },
-        {
-          "field": "packet_key",
-          "qdrant": "src/routes/api/chat/migrate/+server.ts:02d2a9f5aff2d2d0",
-          "postgres": "src/routes/api/chat/migrate/+server.ts:02d2a9f5aff2d2d0",
-          "match": true
-        },
-        {
-          "field": "feature_id",
-          "qdrant": "migrate",
-          "postgres": "migrate",
-          "match": true
-        },
-        {
-          "field": "feature_label",
-          "qdrant": "Migrate",
-          "postgres": "Migrate",
-          "match": true
-        }
-      ]
-    },
-    {
-      "sample_idx": 29,
-      "qdrant_point_id": 1924507,
-      "source_ref": "sveltekit-frontend/src/routes/api/summarize/analyze/+server.ts",
-      "status": "MATCH",
-      "postgres_found": true,
-      "match_count": 4,
-      "mismatch_count": 0,
-      "comparison": [
-        {
-          "field": "source_ref",
-          "qdrant": "sveltekit-frontend/src/routes/api/summarize/analyze/+server.ts",
-          "postgres": "sveltekit-frontend/src/routes/api/summarize/analyze/+server.ts",
-          "match": true
-        },
-        {
-          "field": "packet_key",
-          "qdrant": "src/routes/api/summarize/analyze/+server.ts:1baf5b5e0112dd9d",
-          "postgres": "src/routes/api/summarize/analyze/+server.ts:1baf5b5e0112dd9d",
-          "match": true
-        },
-        {
-          "field": "feature_id",
-          "qdrant": "analyze",
-          "postgres": "analyze",
-          "match": true
-        },
-        {
-          "field": "feature_label",
-          "qdrant": "Analyze",
-          "postgres": "Analyze",
-          "match": true
-        }
-      ]
-    },
-    {
-      "sample_idx": 30,
-      "qdrant_point_id": 1937330,
-      "source_ref": "sveltekit-frontend/src/routes/api/synthesis/generate/+server.ts",
-      "status": "MATCH",
-      "postgres_found": true,
-      "match_count": 4,
-      "mismatch_count": 0,
-      "comparison": [
-        {
-          "field": "source_ref",
-          "qdrant": "sveltekit-frontend/src/routes/api/synthesis/generate/+server.ts",
-          "postgres": "sveltekit-frontend/src/routes/api/synthesis/generate/+server.ts",
-          "match": true
-        },
-        {
-          "field": "packet_key",
-          "qdrant": "src/routes/api/synthesis/generate/+server.ts:35137e1faf8e161f",
-          "postgres": "src/routes/api/synthesis/generate/+server.ts:35137e1faf8e161f",
-          "match": true
-        },
-        {
-          "field": "feature_id",
-          "qdrant": "routes",
-          "postgres": "routes",
-          "match": true
-        },
-        {
-          "field": "feature_label",
-          "qdrant": "Routes",
-          "postgres": "Routes",
-          "match": true
-        }
-      ]
-    },
-    {
-      "sample_idx": 31,
-      "qdrant_point_id": 2121189,
-      "source_ref": "sveltekit-frontend/src/lib/components/ui/CommandPalette.svelte",
-      "status": "MATCH",
-      "postgres_found": true,
-      "match_count": 4,
-      "mismatch_count": 0,
-      "comparison": [
-        {
-          "field": "source_ref",
-          "qdrant": "sveltekit-frontend/src/lib/components/ui/CommandPalette.svelte",
-          "postgres": "sveltekit-frontend/src/lib/components/ui/CommandPalette.svelte",
-          "match": true
-        },
-        {
-          "field": "packet_key",
-          "qdrant": "src/lib/components/ui/CommandPalette.svelte:7cf7b9740ce75754",
-          "postgres": "src/lib/components/ui/CommandPalette.svelte:7cf7b9740ce75754",
-          "match": true
-        },
-        {
-          "field": "feature_id",
-          "qdrant": "ui",
-          "postgres": "ui",
-          "match": true
-        },
-        {
-          "field": "feature_label",
-          "qdrant": "Ui",
-          "postgres": "Ui",
-          "match": true
-        }
-      ]
-    },
-    {
-      "sample_idx": 32,
-      "qdrant_point_id": 2211723,
-      "source_ref": "src/lib/components/graph/glyphatlasviewer.svelte",
-      "status": "MISMATCH",
-      "postgres_found": true,
-      "match_count": 3,
-      "mismatch_count": 1,
-      "comparison": [
-        {
-          "field": "source_ref",
-          "qdrant": "src/lib/components/graph/glyphatlasviewer.svelte",
-          "postgres": "src/lib/components/graph/glyphatlasviewer.svelte",
-          "match": true
-        },
-        {
-          "field": "packet_key",
-          "qdrant": null,
-          "postgres": "src/lib/components/graph/glyphatlasviewer.svelte:c590fca2",
-          "match": false
-        },
-        {
-          "field": "feature_id",
-          "qdrant": "graph",
-          "postgres": "graph",
-          "match": true
-        },
-        {
-          "field": "feature_label",
-          "qdrant": "lib",
-          "postgres": "lib",
-          "match": true
-        }
-      ]
-    },
-    {
-      "sample_idx": 33,
-      "qdrant_point_id": 2216567,
-      "source_ref": "sveltekit-frontend/src/routes/api/sse/chat/+server.ts",
-      "status": "MISMATCH",
-      "postgres_found": true,
-      "match_count": 3,
-      "mismatch_count": 1,
-      "comparison": [
-        {
-          "field": "source_ref",
-          "qdrant": "sveltekit-frontend/src/routes/api/sse/chat/+server.ts",
-          "postgres": "sveltekit-frontend/src/routes/api/sse/chat/+server.ts",
-          "match": true
-        },
-        {
-          "field": "packet_key",
-          "qdrant": "src/routes/api/sse/chat/+server.ts:4697545054664a70",
-          "postgres": "src/routes/api/sse/chat/+server.ts:d33bf81bce04d644",
-          "match": false
-        },
-        {
-          "field": "feature_id",
-          "qdrant": "chat",
-          "postgres": "chat",
-          "match": true
-        },
-        {
-          "field": "feature_label",
-          "qdrant": "Chat",
-          "postgres": "Chat",
-          "match": true
-        }
-      ]
-    },
-    {
-      "sample_idx": 34,
-      "qdrant_point_id": 2246294,
-      "source_ref": "sveltekit-frontend/src/routes/(app)/admin/atlas/+page.svelte",
-      "status": "MATCH",
-      "postgres_found": true,
-      "match_count": 4,
-      "mismatch_count": 0,
-      "comparison": [
-        {
-          "field": "source_ref",
-          "qdrant": "sveltekit-frontend/src/routes/(app)/admin/atlas/+page.svelte",
-          "postgres": "sveltekit-frontend/src/routes/(app)/admin/atlas/+page.svelte",
-          "match": true
-        },
-        {
-          "field": "packet_key",
-          "qdrant": "src/routes/(app)/admin/atlas/+page.svelte:020405996efc7763",
-          "postgres": "src/routes/(app)/admin/atlas/+page.svelte:020405996efc7763",
-          "match": true
-        },
-        {
-          "field": "feature_id",
-          "qdrant": "atlas",
-          "postgres": "atlas",
-          "match": true
-        },
-        {
-          "field": "feature_label",
-          "qdrant": "Atlas",
-          "postgres": "Atlas",
-          "match": true
-        }
-      ]
-    },
-    {
-      "sample_idx": 35,
-      "qdrant_point_id": 2253151,
-      "source_ref": "sveltekit-frontend/src/lib/server/ai/legal-reasoning-chain.ts",
-      "status": "MATCH",
-      "postgres_found": true,
-      "match_count": 4,
-      "mismatch_count": 0,
-      "comparison": [
-        {
-          "field": "source_ref",
-          "qdrant": "sveltekit-frontend/src/lib/server/ai/legal-reasoning-chain.ts",
-          "postgres": "sveltekit-frontend/src/lib/server/ai/legal-reasoning-chain.ts",
-          "match": true
-        },
-        {
-          "field": "packet_key",
-          "qdrant": "src/lib/server/ai/legal-reasoning-chain.ts:03206cafb9398238",
-          "postgres": "src/lib/server/ai/legal-reasoning-chain.ts:03206cafb9398238",
-          "match": true
-        },
-        {
-          "field": "feature_id",
-          "qdrant": "ai",
-          "postgres": "ai",
-          "match": true
-        },
-        {
-          "field": "feature_label",
-          "qdrant": "Ai",
-          "postgres": "Ai",
-          "match": true
-        }
-      ]
-    },
-    {
-      "sample_idx": 36,
-      "qdrant_point_id": 2306238,
-      "source_ref": "sveltekit-frontend/src/routes/api/admin/atlas/cache/+server.ts",
-      "status": "MATCH",
-      "postgres_found": true,
-      "match_count": 4,
-      "mismatch_count": 0,
-      "comparison": [
-        {
-          "field": "source_ref",
-          "qdrant": "sveltekit-frontend/src/routes/api/admin/atlas/cache/+server.ts",
-          "postgres": "sveltekit-frontend/src/routes/api/admin/atlas/cache/+server.ts",
-          "match": true
-        },
-        {
-          "field": "packet_key",
-          "qdrant": "src/routes/api/admin/atlas/cache/+server.ts:5c2d38234450acc0",
-          "postgres": "src/routes/api/admin/atlas/cache/+server.ts:5c2d38234450acc0",
-          "match": true
-        },
-        {
-          "field": "feature_id",
-          "qdrant": "scripts",
-          "postgres": "scripts",
-          "match": true
-        },
-        {
-          "field": "feature_label",
-          "qdrant": "Scripts",
-          "postgres": "Scripts",
-          "match": true
-        }
-      ]
-    },
-    {
-      "sample_idx": 37,
-      "qdrant_point_id": 2316000,
-      "source_ref": "mcp-tools/src-mcp-server.ts#research:reddit_search",
-      "status": "MATCH",
-      "postgres_found": true,
-      "match_count": 4,
-      "mismatch_count": 0,
-      "comparison": [
-        {
-          "field": "source_ref",
-          "qdrant": "mcp-tools/src-mcp-server.ts#research:reddit_search",
-          "postgres": "mcp-tools/src-mcp-server.ts#research:reddit_search",
-          "match": true
-        },
-        {
-          "field": "packet_key",
-          "qdrant": "002356e08cd7e23f",
-          "postgres": "002356e08cd7e23f",
-          "match": true
-        },
-        {
-          "field": "feature_id",
-          "qdrant": "a06042c0be12e4ca",
-          "postgres": "a06042c0be12e4ca",
-          "match": true
-        },
-        {
-          "field": "feature_label",
-          "qdrant": "A06042c0be12e4ca",
-          "postgres": "A06042c0be12e4ca",
-          "match": true
-        }
-      ]
-    },
-    {
-      "sample_idx": 38,
-      "qdrant_point_id": 2367821,
-      "source_ref": "sveltekit-frontend/src/lib/server/ff1/storage/redis-cache.ts",
-      "status": "MATCH",
-      "postgres_found": true,
-      "match_count": 4,
-      "mismatch_count": 0,
-      "comparison": [
-        {
-          "field": "source_ref",
-          "qdrant": "sveltekit-frontend/src/lib/server/ff1/storage/redis-cache.ts",
-          "postgres": "sveltekit-frontend/src/lib/server/ff1/storage/redis-cache.ts",
-          "match": true
-        },
-        {
-          "field": "packet_key",
-          "qdrant": "src/lib/server/ff1/storage/redis-cache.ts:84c01e8b5238be34",
-          "postgres": "src/lib/server/ff1/storage/redis-cache.ts:84c01e8b5238be34",
-          "match": true
-        },
-        {
-          "field": "feature_id",
-          "qdrant": "storage",
-          "postgres": "storage",
-          "match": true
-        },
-        {
-          "field": "feature_label",
-          "qdrant": "Storage",
-          "postgres": "Storage",
-          "match": true
-        }
-      ]
-    },
-    {
-      "sample_idx": 39,
-      "qdrant_point_id": 2437269,
-      "source_ref": "src/lib/server/kb/rerank-weight-loader.ts",
-      "status": "MISMATCH",
-      "postgres_found": true,
-      "match_count": 3,
-      "mismatch_count": 1,
-      "comparison": [
-        {
-          "field": "source_ref",
-          "qdrant": "src/lib/server/kb/rerank-weight-loader.ts",
-          "postgres": "src/lib/server/kb/rerank-weight-loader.ts",
-          "match": true
-        },
-        {
-          "field": "packet_key",
-          "qdrant": null,
-          "postgres": "src/lib/server/kb/rerank-weight-loader.ts:72809bdc",
-          "match": false
-        },
-        {
-          "field": "feature_id",
-          "qdrant": "kb",
-          "postgres": "kb",
-          "match": true
-        },
-        {
-          "field": "feature_label",
-          "qdrant": "lib",
-          "postgres": "lib",
-          "match": true
-        }
-      ]
-    },
-    {
-      "sample_idx": 40,
-      "qdrant_point_id": 2761508,
-      "source_ref": "sveltekit-frontend/src/routes/(app)/evidence-library/+page.svelte",
-      "status": "MATCH",
-      "postgres_found": true,
-      "match_count": 4,
-      "mismatch_count": 0,
-      "comparison": [
-        {
-          "field": "source_ref",
-          "qdrant": "sveltekit-frontend/src/routes/(app)/evidence-library/+page.svelte",
-          "postgres": "sveltekit-frontend/src/routes/(app)/evidence-library/+page.svelte",
-          "match": true
-        },
-        {
-          "field": "packet_key",
-          "qdrant": "src/routes/(app)/evidence-library/+page.svelte:d05178e69a1197b5",
-          "postgres": "src/routes/(app)/evidence-library/+page.svelte:d05178e69a1197b5",
-          "match": true
-        },
-        {
-          "field": "feature_id",
-          "qdrant": "scripts",
-          "postgres": "scripts",
-          "match": true
-        },
-        {
-          "field": "feature_label",
-          "qdrant": "Scripts",
-          "postgres": "Scripts",
-          "match": true
-        }
-      ]
-    },
-    {
-      "sample_idx": 41,
-      "qdrant_point_id": 2777429,
-      "source_ref": "sveltekit-frontend/src/lib/server/agents/regen/run.ts",
-      "status": "MATCH",
-      "postgres_found": true,
-      "match_count": 4,
-      "mismatch_count": 0,
-      "comparison": [
-        {
-          "field": "source_ref",
-          "qdrant": "sveltekit-frontend/src/lib/server/agents/regen/run.ts",
-          "postgres": "sveltekit-frontend/src/lib/server/agents/regen/run.ts",
-          "match": true
-        },
-        {
-          "field": "packet_key",
-          "qdrant": "src/lib/server/agents/regen/run.ts:ad3d1ef1d7dc67d9",
-          "postgres": "src/lib/server/agents/regen/run.ts:ad3d1ef1d7dc67d9",
-          "match": true
-        },
-        {
-          "field": "feature_id",
-          "qdrant": "regen",
-          "postgres": "regen",
-          "match": true
-        },
-        {
-          "field": "feature_label",
-          "qdrant": "Regen",
-          "postgres": "Regen",
-          "match": true
-        }
-      ]
-    },
-    {
-      "sample_idx": 42,
-      "qdrant_point_id": 2811861,
-      "source_ref": "sveltekit-frontend/src/routes/api/rag/todo-suggestions/+server.ts",
-      "status": "MATCH",
-      "postgres_found": true,
-      "match_count": 4,
-      "mismatch_count": 0,
-      "comparison": [
-        {
-          "field": "source_ref",
-          "qdrant": "sveltekit-frontend/src/routes/api/rag/todo-suggestions/+server.ts",
-          "postgres": "sveltekit-frontend/src/routes/api/rag/todo-suggestions/+server.ts",
-          "match": true
-        },
-        {
-          "field": "packet_key",
-          "qdrant": "src/routes/api/rag/todo-suggestions/+server.ts:1217d42889c0ca4b",
-          "postgres": "src/routes/api/rag/todo-suggestions/+server.ts:1217d42889c0ca4b",
-          "match": true
-        },
-        {
-          "field": "feature_id",
-          "qdrant": "atlas-context",
-          "postgres": "atlas-context",
-          "match": true
-        },
-        {
-          "field": "feature_label",
-          "qdrant": "Atlas Context",
-          "postgres": "Atlas Context",
-          "match": true
-        }
-      ]
-    },
-    {
-      "sample_idx": 43,
-      "qdrant_point_id": 2968749,
-      "source_ref": "sveltekit-frontend/src/lib/components/citations/CitationList.svelte",
-      "status": "MATCH",
-      "postgres_found": true,
-      "match_count": 4,
-      "mismatch_count": 0,
-      "comparison": [
-        {
-          "field": "source_ref",
-          "qdrant": "sveltekit-frontend/src/lib/components/citations/CitationList.svelte",
-          "postgres": "sveltekit-frontend/src/lib/components/citations/CitationList.svelte",
-          "match": true
-        },
-        {
-          "field": "packet_key",
-          "qdrant": "src/lib/components/citations/CitationList.svelte:83d95f5952f96093",
-          "postgres": "src/lib/components/citations/CitationList.svelte:83d95f5952f96093",
-          "match": true
-        },
-        {
-          "field": "feature_id",
-          "qdrant": "atlas-context",
-          "postgres": "atlas-context",
-          "match": true
-        },
-        {
-          "field": "feature_label",
-          "qdrant": "Atlas Context",
-          "postgres": "Atlas Context",
-          "match": true
-        }
-      ]
-    },
-    {
-      "sample_idx": 44,
-      "qdrant_point_id": 3020277,
-      "source_ref": "sveltekit-frontend/src/routes/(app)/admin/search-intelligence/+page.svelte",
-      "status": "MATCH",
-      "postgres_found": true,
-      "match_count": 4,
-      "mismatch_count": 0,
-      "comparison": [
-        {
-          "field": "source_ref",
-          "qdrant": "sveltekit-frontend/src/routes/(app)/admin/search-intelligence/+page.svelte",
-          "postgres": "sveltekit-frontend/src/routes/(app)/admin/search-intelligence/+page.svelte",
-          "match": true
-        },
-        {
-          "field": "packet_key",
-          "qdrant": "src/routes/(app)/admin/search-intelligence/+page.svelte:ef7c867733249e79",
-          "postgres": "src/routes/(app)/admin/search-intelligence/+page.svelte:ef7c867733249e79",
-          "match": true
-        },
-        {
-          "field": "feature_id",
-          "qdrant": "search-intelligence",
-          "postgres": "search-intelligence",
-          "match": true
-        },
-        {
-          "field": "feature_label",
-          "qdrant": "Search Intelligence",
-          "postgres": "Search Intelligence",
-          "match": true
-        }
-      ]
-    },
-    {
-      "sample_idx": 45,
-      "qdrant_point_id": 3102142,
-      "source_ref": "sveltekit-frontend/src/lib/server/ace/rg-cluster-pivot.ts",
-      "status": "MATCH",
-      "postgres_found": true,
-      "match_count": 4,
-      "mismatch_count": 0,
-      "comparison": [
-        {
-          "field": "source_ref",
-          "qdrant": "sveltekit-frontend/src/lib/server/ace/rg-cluster-pivot.ts",
-          "postgres": "sveltekit-frontend/src/lib/server/ace/rg-cluster-pivot.ts",
-          "match": true
-        },
-        {
-          "field": "packet_key",
-          "qdrant": "src/lib/server/ace/rg-cluster-pivot.ts:6bd6c51be12791f7",
-          "postgres": "src/lib/server/ace/rg-cluster-pivot.ts:6bd6c51be12791f7",
-          "match": true
-        },
-        {
-          "field": "feature_id",
-          "qdrant": "utility",
-          "postgres": "utility",
-          "match": true
-        },
-        {
-          "field": "feature_label",
-          "qdrant": "Utility",
-          "postgres": "Utility",
-          "match": true
-        }
-      ]
-    },
-    {
-      "sample_idx": 46,
-      "qdrant_point_id": 3185039,
-      "source_ref": "sveltekit-frontend/src/lib/components/evidence/EvidenceBoard.svelte",
-      "status": "MATCH",
-      "postgres_found": true,
-      "match_count": 4,
-      "mismatch_count": 0,
-      "comparison": [
-        {
-          "field": "source_ref",
-          "qdrant": "sveltekit-frontend/src/lib/components/evidence/EvidenceBoard.svelte",
-          "postgres": "sveltekit-frontend/src/lib/components/evidence/EvidenceBoard.svelte",
-          "match": true
-        },
-        {
-          "field": "packet_key",
-          "qdrant": "src/lib/components/evidence/EvidenceBoard.svelte:e963eac71a565b6a",
-          "postgres": "src/lib/components/evidence/EvidenceBoard.svelte:e963eac71a565b6a",
-          "match": true
-        },
-        {
-          "field": "feature_id",
-          "qdrant": "evidence",
-          "postgres": "evidence",
-          "match": true
-        },
-        {
-          "field": "feature_label",
-          "qdrant": "Evidence",
-          "postgres": "Evidence",
-          "match": true
-        }
-      ]
-    },
-    {
-      "sample_idx": 47,
-      "qdrant_point_id": 3215075,
-      "source_ref": "sveltekit-frontend/src/lib/server/audit/gpu-audit-orchestrator.ts",
-      "status": "MATCH",
-      "postgres_found": true,
-      "match_count": 4,
-      "mismatch_count": 0,
-      "comparison": [
-        {
-          "field": "source_ref",
-          "qdrant": "sveltekit-frontend/src/lib/server/audit/gpu-audit-orchestrator.ts",
-          "postgres": "sveltekit-frontend/src/lib/server/audit/gpu-audit-orchestrator.ts",
-          "match": true
-        },
-        {
-          "field": "packet_key",
-          "qdrant": "src/lib/server/audit/gpu-audit-orchestrator.ts:52c95c5c098fb34d",
-          "postgres": "src/lib/server/audit/gpu-audit-orchestrator.ts:52c95c5c098fb34d",
-          "match": true
-        },
-        {
-          "field": "feature_id",
-          "qdrant": "audit",
-          "postgres": "audit",
-          "match": true
-        },
-        {
-          "field": "feature_label",
-          "qdrant": "Audit",
-          "postgres": "Audit",
-          "match": true
-        }
-      ]
-    },
-    {
-      "sample_idx": 48,
-      "qdrant_point_id": 3305298,
-      "source_ref": "sveltekit-frontend/src/lib/server/cache/entity-extractor-unified.ts",
-      "status": "MATCH",
-      "postgres_found": true,
-      "match_count": 4,
-      "mismatch_count": 0,
-      "comparison": [
-        {
-          "field": "source_ref",
-          "qdrant": "sveltekit-frontend/src/lib/server/cache/entity-extractor-unified.ts",
-          "postgres": "sveltekit-frontend/src/lib/server/cache/entity-extractor-unified.ts",
-          "match": true
-        },
-        {
-          "field": "packet_key",
-          "qdrant": "src/lib/server/cache/entity-extractor-unified.ts:3fe70e9f5c2b940c",
-          "postgres": "src/lib/server/cache/entity-extractor-unified.ts:3fe70e9f5c2b940c",
-          "match": true
-        },
-        {
-          "field": "feature_id",
-          "qdrant": "utility",
-          "postgres": "utility",
-          "match": true
-        },
-        {
-          "field": "feature_label",
-          "qdrant": "Utility",
-          "postgres": "Utility",
-          "match": true
-        }
-      ]
-    },
-    {
-      "sample_idx": 49,
-      "qdrant_point_id": 3312593,
-      "source_ref": "sveltekit-frontend/src/lib/server/vector/hypergraph-service.ts",
-      "status": "MATCH",
-      "postgres_found": true,
-      "match_count": 4,
-      "mismatch_count": 0,
-      "comparison": [
-        {
-          "field": "source_ref",
-          "qdrant": "sveltekit-frontend/src/lib/server/vector/hypergraph-service.ts",
-          "postgres": "sveltekit-frontend/src/lib/server/vector/hypergraph-service.ts",
-          "match": true
-        },
-        {
-          "field": "packet_key",
-          "qdrant": "src/lib/server/vector/hypergraph-service.ts:23a63bc0fe8d2f14",
-          "postgres": "src/lib/server/vector/hypergraph-service.ts:23a63bc0fe8d2f14",
-          "match": true
-        },
-        {
-          "field": "feature_id",
-          "qdrant": "vector",
-          "postgres": "vector",
-          "match": true
-        },
-        {
-          "field": "feature_label",
-          "qdrant": "Vector",
-          "postgres": "Vector",
-          "match": true
-        }
-      ]
-    },
-    {
-      "sample_idx": 50,
-      "qdrant_point_id": 3331244,
-      "source_ref": "sveltekit-frontend/src/routes/api/persons-of-interest/[id]/+server.ts",
-      "status": "MATCH",
-      "postgres_found": true,
-      "match_count": 4,
-      "mismatch_count": 0,
-      "comparison": [
-        {
-          "field": "source_ref",
-          "qdrant": "sveltekit-frontend/src/routes/api/persons-of-interest/[id]/+server.ts",
-          "postgres": "sveltekit-frontend/src/routes/api/persons-of-interest/[id]/+server.ts",
-          "match": true
-        },
-        {
-          "field": "packet_key",
-          "qdrant": "src/routes/api/persons-of-interest/[id]/+server.ts:03d9a891c25d5630",
-          "postgres": "src/routes/api/persons-of-interest/[id]/+server.ts:03d9a891c25d5630",
-          "match": true
-        },
-        {
-          "field": "feature_id",
-          "qdrant": "scripts",
-          "postgres": "scripts",
-          "match": true
-        },
-        {
-          "field": "feature_label",
-          "qdrant": "Scripts",
-          "postgres": "Scripts",
-          "match": true
-        }
-      ]
-    }
-  ],
-  "mismatch_details": [
-    {
-      "source_ref": "src/lib/server/ai/contextual-tools.ts",
-      "reason": "1 field(s) mismatch",
       "qdrant": {
-        "qdrant_point_id": 174637,
+        "source_ref": "src/routes/api/research/concurrent-deep/stream/+server.ts",
+        "packet_key": "src/routes/api/research/concurrent-deep/stream/+server.ts:d391b7e92c36906b",
+        "feature_id": "stream",
+        "feature_label": "Routes",
+        "community_id": 4896,
+        "domain_class": "source"
+      },
+      "postgres": null,
+      "mismatches": null,
+      "postgresFound": false
+    },
+    {
+      "qdrant_point_id": 138065,
+      "qdrant": {
+        "source_ref": "src/routes/api/recommendations/+server.ts",
+        "packet_key": "src/routes/api/recommendations/+server.ts:d5397aa82be3284c",
+        "feature_id": "recommendations",
+        "feature_label": "Routes",
+        "community_id": 4983,
+        "domain_class": "source"
+      },
+      "postgres": null,
+      "mismatches": null,
+      "postgresFound": false
+    },
+    {
+      "qdrant_point_id": 174637,
+      "qdrant": {
         "source_ref": "src/lib/server/ai/contextual-tools.ts",
-        "packet_key": null,
+        "packet_key": "src/lib/server/ai/contextual-tools.ts:b65c6a4d",
         "feature_id": "ai",
         "feature_label": "lib",
-        "payload_keys": [
-          "chunk_id",
-          "sourceRef",
-          "file_path",
-          "root",
-          "area",
-          "kind",
-          "tags",
-          "agent_area",
-          "feature_status",
-          "centroid_id",
-          "content_hash",
-          "schema_version",
-          "feature_label",
-          "phase_lane",
-          "dependency_cluster",
-          "hot_keyword_cluster",
-          "parent_atlas_card_id",
-          "file_name",
-          "extension",
-          "chunk_index",
-          "total_chunks",
-          "content",
-          "purpose",
-          "domain",
-          "complexity",
-          "indexed_at",
-          "gpuCluster",
-          "somRow",
-          "somCol",
-          "som_cluster",
-          "gpu_cluster",
-          "sourceRefs",
-          "source_refs",
-          "feature_ids",
-          "lane_ids",
-          "som_cell",
-          "feature_id",
-          "cluster_id",
-          "cluster_k",
-          "som_bmu_row",
-          "som_bmu_col",
-          "vector64",
-          "indexed_at_som",
-          "graphAuthorityScore",
-          "communityId",
-          "communitySize",
-          "pagerank",
-          "cluster_key",
-          "canonicalSourceRef",
-          "sourceRefHash",
-          "encoded_at",
-          "source_ref",
-          "metadata"
-        ]
+        "community_id": "community:1305",
+        "domain_class": "source"
       },
       "postgres": {
-        "packet_id": "3c68bfbc43a1edeb18b1ab80e8b348c26a8981f12e8e815ff467b7a1b65c6a4d",
         "source_ref": "src/lib/server/ai/contextual-tools.ts",
         "packet_key": "src/lib/server/ai/contextual-tools.ts:b65c6a4d",
         "feature_id": "ai",
         "feature_label": "lib",
         "community_id": null,
-        "community_confidence": null
+        "domain_class": null
       },
-      "fields": [
+      "mismatches": [
         {
-          "field": "packet_key",
-          "qdrant": null,
-          "postgres": "src/lib/server/ai/contextual-tools.ts:b65c6a4d",
-          "match": false
+          "field": "community_id",
+          "qdrant": "community:1305",
+          "postgres": null
         }
-      ]
+      ],
+      "postgresFound": true
     },
     {
-      "source_ref": "src/lib/server/research/reddit-harvester.ts",
-      "reason": "1 field(s) mismatch",
+      "qdrant_point_id": 188608,
       "qdrant": {
-        "qdrant_point_id": 188608,
         "source_ref": "src/lib/server/research/reddit-harvester.ts",
-        "packet_key": null,
+        "packet_key": "src/lib/server/research/reddit-harvester.ts:78eef6c1",
         "feature_id": "research",
         "feature_label": "lib",
-        "payload_keys": [
-          "chunk_id",
-          "sourceRef",
-          "file_path",
-          "root",
-          "area",
-          "kind",
-          "tags",
-          "agent_area",
-          "feature_status",
-          "centroid_id",
-          "content_hash",
-          "schema_version",
-          "feature_label",
-          "phase_lane",
-          "dependency_cluster",
-          "hot_keyword_cluster",
-          "parent_atlas_card_id",
-          "file_name",
-          "extension",
-          "chunk_index",
-          "total_chunks",
-          "content",
-          "purpose",
-          "domain",
-          "complexity",
-          "indexed_at",
-          "gpuCluster",
-          "somRow",
-          "somCol",
-          "som_cluster",
-          "gpu_cluster",
-          "sourceRefs",
-          "source_refs",
-          "feature_ids",
-          "lane_ids",
-          "som_cell",
-          "feature_id",
-          "graphAuthorityScore",
-          "encoded_at",
-          "communitySize",
-          "pagerank",
-          "cluster_key",
-          "cluster_id",
-          "cluster_k",
-          "som_bmu_row",
-          "som_bmu_col",
-          "vector64",
-          "indexed_at_som",
-          "canonicalSourceRef",
-          "sourceRefHash",
-          "communityId",
-          "source_ref",
-          "metadata"
-        ]
+        "community_id": "community:14020",
+        "domain_class": "source"
       },
       "postgres": {
-        "packet_id": "5358d6af1e964d5b5d920cba9e39f15e821b66fbbccdf9d26c3fd02478eef6c1",
         "source_ref": "src/lib/server/research/reddit-harvester.ts",
         "packet_key": "src/lib/server/research/reddit-harvester.ts:78eef6c1",
         "feature_id": "research",
         "feature_label": "lib",
         "community_id": null,
-        "community_confidence": null
+        "domain_class": null
       },
-      "fields": [
+      "mismatches": [
         {
-          "field": "packet_key",
-          "qdrant": null,
-          "postgres": "src/lib/server/research/reddit-harvester.ts:78eef6c1",
-          "match": false
+          "field": "community_id",
+          "qdrant": "community:14020",
+          "postgres": null
         }
-      ]
+      ],
+      "postgresFound": true
     },
     {
-      "source_ref": "src/lib/server/couchdb/mango-indexes.ts",
-      "reason": "1 field(s) mismatch",
+      "qdrant_point_id": 194586,
       "qdrant": {
-        "qdrant_point_id": 227675,
-        "source_ref": "src/lib/server/couchdb/mango-indexes.ts",
-        "packet_key": null,
-        "feature_id": "couchdb",
-        "feature_label": "lib",
-        "payload_keys": [
-          "chunk_id",
-          "sourceRef",
-          "file_path",
-          "root",
-          "area",
-          "kind",
-          "tags",
-          "agent_area",
-          "feature_status",
-          "centroid_id",
-          "content_hash",
-          "schema_version",
-          "feature_label",
-          "phase_lane",
-          "dependency_cluster",
-          "hot_keyword_cluster",
-          "parent_atlas_card_id",
-          "file_name",
-          "extension",
-          "chunk_index",
-          "total_chunks",
-          "content",
-          "purpose",
-          "domain",
-          "complexity",
-          "indexed_at",
-          "gpuCluster",
-          "somRow",
-          "somCol",
-          "som_cluster",
-          "gpu_cluster",
-          "sourceRefs",
-          "source_refs",
-          "feature_ids",
-          "lane_ids",
-          "som_cell",
-          "feature_id",
-          "cluster_id",
-          "cluster_k",
-          "som_bmu_row",
-          "som_bmu_col",
-          "vector64",
-          "indexed_at_som",
-          "canonicalSourceRef",
-          "sourceRefHash",
-          "encoded_at",
-          "source_ref",
-          "metadata"
-        ]
+        "source_ref": "src/lib/server/gpu/libtorch-bridge.ts",
+        "packet_key": "src/lib/server/gpu/libtorch-bridge.ts:44dd86e0eace5c71",
+        "feature_id": "gpu",
+        "feature_label": "Utility",
+        "community_id": 4515,
+        "domain_class": "source"
       },
       "postgres": {
-        "packet_id": "a7cfb7216cf09ac9a28bd6e2b9f50cfdee5002da2bd2f1b755df2341dff1fbc9",
+        "source_ref": "src/lib/server/gpu/libtorch-bridge.ts",
+        "packet_key": "nes:src/lib/server/gpu/libtorch-bridge.ts",
+        "feature_id": "repo.file.src.lib.server.gpu.libtorch.bridge.ts",
+        "feature_label": "Libtorch Bridge",
+        "community_id": null,
+        "domain_class": "codebase"
+      },
+      "mismatches": [
+        {
+          "field": "packet_key",
+          "qdrant": "src/lib/server/gpu/libtorch-bridge.ts:44dd86e0eace5c71",
+          "postgres": "nes:src/lib/server/gpu/libtorch-bridge.ts"
+        },
+        {
+          "field": "feature_id",
+          "qdrant": "gpu",
+          "postgres": "repo.file.src.lib.server.gpu.libtorch.bridge.ts"
+        },
+        {
+          "field": "feature_label",
+          "qdrant": "Utility",
+          "postgres": "Libtorch Bridge"
+        },
+        {
+          "field": "community_id",
+          "qdrant": 4515,
+          "postgres": null
+        }
+      ],
+      "postgresFound": true
+    },
+    {
+      "qdrant_point_id": 227675,
+      "qdrant": {
         "source_ref": "src/lib/server/couchdb/mango-indexes.ts",
         "packet_key": "src/lib/server/couchdb/mango-indexes.ts:dff1fbc9",
         "feature_id": "couchdb",
         "feature_label": "lib",
         "community_id": null,
-        "community_confidence": null
-      },
-      "fields": [
-        {
-          "field": "packet_key",
-          "qdrant": null,
-          "postgres": "src/lib/server/couchdb/mango-indexes.ts:dff1fbc9",
-          "match": false
-        }
-      ]
-    },
-    {
-      "source_ref": "src/lib/server/data/legal-seed-data.ts",
-      "reason": "1 field(s) mismatch",
-      "qdrant": {
-        "qdrant_point_id": 404803,
-        "source_ref": "src/lib/server/data/legal-seed-data.ts",
-        "packet_key": null,
-        "feature_id": "data",
-        "feature_label": "lib",
-        "payload_keys": [
-          "chunk_id",
-          "sourceRef",
-          "file_path",
-          "root",
-          "area",
-          "kind",
-          "tags",
-          "agent_area",
-          "feature_status",
-          "centroid_id",
-          "content_hash",
-          "schema_version",
-          "feature_label",
-          "phase_lane",
-          "dependency_cluster",
-          "hot_keyword_cluster",
-          "parent_atlas_card_id",
-          "file_name",
-          "extension",
-          "chunk_index",
-          "total_chunks",
-          "content",
-          "purpose",
-          "domain",
-          "complexity",
-          "indexed_at",
-          "gpuCluster",
-          "somRow",
-          "somCol",
-          "som_cluster",
-          "gpu_cluster",
-          "sourceRefs",
-          "source_refs",
-          "feature_ids",
-          "lane_ids",
-          "som_cell",
-          "feature_id",
-          "cluster_id",
-          "cluster_k",
-          "som_bmu_row",
-          "som_bmu_col",
-          "vector64",
-          "indexed_at_som",
-          "graphAuthorityScore",
-          "communityId",
-          "communitySize",
-          "pagerank",
-          "cluster_key",
-          "canonicalSourceRef",
-          "sourceRefHash",
-          "encoded_at",
-          "source_ref",
-          "metadata"
-        ]
+        "domain_class": "source"
       },
       "postgres": {
-        "packet_id": "a7dec133453f92169e30618f7e5ff88a8f61f635146d5282d0e1e91f1ec45097",
+        "source_ref": "src/lib/server/couchdb/mango-indexes.ts",
+        "packet_key": "src/lib/server/couchdb/mango-indexes.ts:dff1fbc9",
+        "feature_id": "couchdb",
+        "feature_label": "lib",
+        "community_id": null,
+        "domain_class": null
+      },
+      "mismatches": null,
+      "postgresFound": true
+    },
+    {
+      "qdrant_point_id": 292522,
+      "qdrant": {
+        "source_ref": "src/lib/components/monitoring/CacheMonitoringWidget.svelte",
+        "packet_key": "src/lib/components/monitoring/CacheMonitoringWidget.svelte:f9470fb28e6f344a",
+        "feature_id": "monitoring",
+        "feature_label": "Monitoring",
+        "community_id": 4725,
+        "domain_class": "source"
+      },
+      "postgres": null,
+      "mismatches": null,
+      "postgresFound": false
+    },
+    {
+      "qdrant_point_id": 404803,
+      "qdrant": {
+        "source_ref": "src/lib/server/data/legal-seed-data.ts",
+        "packet_key": "src/lib/server/data/legal-seed-data.ts:1ec45097",
+        "feature_id": "data",
+        "feature_label": "lib",
+        "community_id": "community:1305",
+        "domain_class": "source"
+      },
+      "postgres": {
         "source_ref": "src/lib/server/data/legal-seed-data.ts",
         "packet_key": "src/lib/server/data/legal-seed-data.ts:1ec45097",
         "feature_id": "data",
         "feature_label": "lib",
         "community_id": null,
-        "community_confidence": null
+        "domain_class": null
       },
-      "fields": [
+      "mismatches": [
         {
-          "field": "packet_key",
-          "qdrant": null,
-          "postgres": "src/lib/server/data/legal-seed-data.ts:1ec45097",
-          "match": false
+          "field": "community_id",
+          "qdrant": "community:1305",
+          "postgres": null
         }
-      ]
+      ],
+      "postgresFound": true
     },
     {
-      "source_ref": "src/lib/components/citations/citationsaveform.svelte",
-      "reason": "1 field(s) mismatch",
+      "qdrant_point_id": 436451,
       "qdrant": {
-        "qdrant_point_id": 436451,
-        "source_ref": "src/lib/components/citations/citationsaveform.svelte",
-        "packet_key": null,
-        "feature_id": "citations",
-        "feature_label": "lib",
-        "payload_keys": [
-          "chunk_id",
-          "sourceRef",
-          "file_path",
-          "root",
-          "area",
-          "kind",
-          "tags",
-          "agent_area",
-          "feature_status",
-          "centroid_id",
-          "content_hash",
-          "schema_version",
-          "feature_label",
-          "phase_lane",
-          "dependency_cluster",
-          "hot_keyword_cluster",
-          "parent_atlas_card_id",
-          "file_name",
-          "extension",
-          "chunk_index",
-          "total_chunks",
-          "content",
-          "purpose",
-          "domain",
-          "complexity",
-          "indexed_at",
-          "sourceRefs",
-          "source_refs",
-          "feature_id",
-          "related_feature_ids",
-          "cluster_id",
-          "som_cluster",
-          "feature_ids",
-          "lane_ids",
-          "gpuCluster",
-          "somRow",
-          "somCol",
-          "gpu_cluster",
-          "som_cell",
-          "cluster_k",
-          "som_bmu_row",
-          "som_bmu_col",
-          "vector64",
-          "indexed_at_som",
-          "graphAuthorityScore",
-          "communityId",
-          "communitySize",
-          "pagerank",
-          "cluster_key",
-          "canonicalSourceRef",
-          "sourceRefHash",
-          "encoded_at",
-          "source_ref",
-          "metadata"
-        ]
-      },
-      "postgres": {
-        "packet_id": "6b682bba77747499fef5bfb0583fef87b91e7612fd6bcda8f78fe7ae77b10257",
-        "source_ref": "src/lib/components/citations/citationsaveform.svelte",
+        "source_ref": "src/lib/components/citations/CitationSaveForm.svelte",
         "packet_key": "src/lib/components/citations/citationsaveform.svelte:77b10257",
         "feature_id": "citations",
         "feature_label": "lib",
-        "community_id": null,
-        "community_confidence": null
+        "community_id": "community:1442",
+        "domain_class": "source"
       },
-      "fields": [
-        {
-          "field": "packet_key",
-          "qdrant": null,
-          "postgres": "src/lib/components/citations/citationsaveform.svelte:77b10257",
-          "match": false
-        }
-      ]
+      "postgres": null,
+      "mismatches": null,
+      "postgresFound": false
     },
     {
-      "source_ref": "src/lib/server/retrieval/cluster-aware-reranker.ts",
-      "reason": "1 field(s) mismatch",
+      "qdrant_point_id": 614211,
       "qdrant": {
-        "qdrant_point_id": 1116368,
+        "source_ref": "src/routes/(app)/admin/atlas/+page.server.ts",
+        "packet_key": "src/routes/(app)/admin/atlas/+page.server.ts:8ac8a88cbd487045",
+        "feature_id": "atlas",
+        "feature_label": "Routes",
+        "community_id": 4943,
+        "domain_class": "source"
+      },
+      "postgres": null,
+      "mismatches": null,
+      "postgresFound": false
+    },
+    {
+      "qdrant_point_id": 639944,
+      "qdrant": {
+        "source_ref": "src/routes/admin/parents-atlas/+page.svelte",
+        "packet_key": "src/routes/admin/parents-atlas/+page.svelte:e6c919084ef1be4a",
+        "feature_id": "parents-atlas",
+        "feature_label": "Routes",
+        "community_id": 5090,
+        "domain_class": "source"
+      },
+      "postgres": null,
+      "mismatches": null,
+      "postgresFound": false
+    },
+    {
+      "qdrant_point_id": 727645,
+      "qdrant": {
+        "source_ref": "src/lib/server/ai/mcp-tool-dispatch.ts",
+        "packet_key": "src/lib/server/ai/mcp-tool-dispatch.ts:d962195ef653d759",
+        "feature_id": "ai",
+        "feature_label": "Ai",
+        "community_id": 2245,
+        "domain_class": "source"
+      },
+      "postgres": null,
+      "mismatches": null,
+      "postgresFound": false
+    },
+    {
+      "qdrant_point_id": 761314,
+      "qdrant": {
+        "source_ref": "src/lib/components/ai/CachePerformanceDashboard.svelte",
+        "packet_key": "src/lib/components/ai/CachePerformanceDashboard.svelte:2865def3ade42484",
+        "feature_id": "ai",
+        "feature_label": "Atlas Context",
+        "community_id": 2238,
+        "domain_class": "source"
+      },
+      "postgres": null,
+      "mismatches": null,
+      "postgresFound": false
+    },
+    {
+      "qdrant_point_id": 909958,
+      "qdrant": {
+        "source_ref": "src/lib/server/retrieval/centroid-cache.ts",
+        "packet_key": "src/lib/server/retrieval/centroid-cache.ts:cfcce45038fad33b",
+        "feature_id": "retrieval",
+        "feature_label": "Utility",
+        "community_id": 5846,
+        "domain_class": "source"
+      },
+      "postgres": null,
+      "mismatches": null,
+      "postgresFound": false
+    },
+    {
+      "qdrant_point_id": 1080785,
+      "qdrant": {
+        "source_ref": "src/lib/components/admin/AdminMonitoringDashboard.svelte",
+        "packet_key": "src/lib/components/admin/AdminMonitoringDashboard.svelte:50e282945262eca8",
+        "feature_id": "admin",
+        "feature_label": "Admin",
+        "community_id": 2172,
+        "domain_class": "source"
+      },
+      "postgres": null,
+      "mismatches": null,
+      "postgresFound": false
+    },
+    {
+      "qdrant_point_id": 1103029,
+      "qdrant": {
+        "source_ref": "src/lib/components/graph/GraphifyViewer.svelte",
+        "packet_key": "src/lib/components/graph/GraphifyViewer.svelte:81f6bc913c8bb05b",
+        "feature_id": "graph",
+        "feature_label": "Atlas Context",
+        "community_id": 2430,
+        "domain_class": "source"
+      },
+      "postgres": null,
+      "mismatches": null,
+      "postgresFound": false
+    },
+    {
+      "qdrant_point_id": 1116368,
+      "qdrant": {
         "source_ref": "src/lib/server/retrieval/cluster-aware-reranker.ts",
-        "packet_key": null,
+        "packet_key": "src/lib/server/retrieval/cluster-aware-reranker.ts:95647aa7",
         "feature_id": "retrieval",
         "feature_label": "lib",
-        "payload_keys": [
-          "chunk_id",
-          "sourceRef",
-          "file_path",
-          "root",
-          "area",
-          "kind",
-          "tags",
-          "agent_area",
-          "feature_status",
-          "centroid_id",
-          "content_hash",
-          "schema_version",
-          "feature_label",
-          "phase_lane",
-          "dependency_cluster",
-          "hot_keyword_cluster",
-          "parent_atlas_card_id",
-          "file_name",
-          "extension",
-          "chunk_index",
-          "total_chunks",
-          "content",
-          "purpose",
-          "domain",
-          "complexity",
-          "indexed_at",
-          "gpuCluster",
-          "somRow",
-          "somCol",
-          "som_cluster",
-          "gpu_cluster",
-          "sourceRefs",
-          "source_refs",
-          "feature_ids",
-          "lane_ids",
-          "som_cell",
-          "feature_id",
-          "cluster_id",
-          "cluster_k",
-          "som_bmu_row",
-          "som_bmu_col",
-          "vector64",
-          "indexed_at_som",
-          "graphAuthorityScore",
-          "communityId",
-          "communitySize",
-          "pagerank",
-          "cluster_key",
-          "canonicalSourceRef",
-          "sourceRefHash",
-          "encoded_at",
-          "source_ref",
-          "metadata"
-        ]
+        "community_id": "community:2520",
+        "domain_class": "source"
       },
       "postgres": {
-        "packet_id": "5aca4923e925c29dee33105a38850266e7e1ac2091be4a78669b515295647aa7",
         "source_ref": "src/lib/server/retrieval/cluster-aware-reranker.ts",
         "packet_key": "src/lib/server/retrieval/cluster-aware-reranker.ts:95647aa7",
         "feature_id": "retrieval",
         "feature_label": "lib",
         "community_id": null,
-        "community_confidence": null
+        "domain_class": null
       },
-      "fields": [
+      "mismatches": [
         {
-          "field": "packet_key",
-          "qdrant": null,
-          "postgres": "src/lib/server/retrieval/cluster-aware-reranker.ts:95647aa7",
-          "match": false
+          "field": "community_id",
+          "qdrant": "community:2520",
+          "postgres": null
         }
-      ]
+      ],
+      "postgresFound": true
     },
     {
-      "source_ref": "src/lib/server/admin/retrieval-analytics-service.ts",
-      "reason": "1 field(s) mismatch",
+      "qdrant_point_id": 1146202,
       "qdrant": {
-        "qdrant_point_id": 1146202,
         "source_ref": "src/lib/server/admin/retrieval-analytics-service.ts",
-        "packet_key": null,
+        "packet_key": "src/lib/server/admin/retrieval-analytics-service.ts:8f0ca91b",
         "feature_id": "admin",
         "feature_label": "lib",
-        "payload_keys": [
-          "chunk_id",
-          "sourceRef",
-          "file_path",
-          "root",
-          "area",
-          "kind",
-          "tags",
-          "agent_area",
-          "feature_status",
-          "centroid_id",
-          "content_hash",
-          "schema_version",
-          "feature_label",
-          "phase_lane",
-          "dependency_cluster",
-          "hot_keyword_cluster",
-          "parent_atlas_card_id",
-          "file_name",
-          "extension",
-          "chunk_index",
-          "total_chunks",
-          "content",
-          "purpose",
-          "domain",
-          "complexity",
-          "indexed_at",
-          "som_cluster",
-          "gpu_cluster",
-          "feature_ids",
-          "lane_ids",
-          "feature_id",
-          "cluster_id",
-          "cluster_k",
-          "som_bmu_row",
-          "som_bmu_col",
-          "vector64",
-          "indexed_at_som",
-          "graphAuthorityScore",
-          "encoded_at",
-          "communitySize",
-          "pagerank",
-          "cluster_key",
-          "canonicalSourceRef",
-          "sourceRefHash",
-          "communityId",
-          "source_ref",
-          "metadata"
-        ]
+        "community_id": "community:14401",
+        "domain_class": "source"
       },
       "postgres": {
-        "packet_id": "b2b991a4a785fdaa9b5b441890758a55e2500a4fb7e072f2f300a33c8f0ca91b",
         "source_ref": "src/lib/server/admin/retrieval-analytics-service.ts",
         "packet_key": "src/lib/server/admin/retrieval-analytics-service.ts:8f0ca91b",
         "feature_id": "admin",
         "feature_label": "lib",
         "community_id": null,
-        "community_confidence": null
+        "domain_class": null
       },
-      "fields": [
+      "mismatches": [
         {
-          "field": "packet_key",
-          "qdrant": null,
-          "postgres": "src/lib/server/admin/retrieval-analytics-service.ts:8f0ca91b",
-          "match": false
+          "field": "community_id",
+          "qdrant": "community:14401",
+          "postgres": null
         }
-      ]
+      ],
+      "postgresFound": true
     },
     {
-      "source_ref": "src/lib/components/graph/glyphatlasviewer.svelte",
-      "reason": "1 field(s) mismatch",
+      "qdrant_point_id": 1249835,
       "qdrant": {
-        "qdrant_point_id": 2211723,
-        "source_ref": "src/lib/components/graph/glyphatlasviewer.svelte",
-        "packet_key": null,
-        "feature_id": "graph",
-        "feature_label": "lib",
-        "payload_keys": [
-          "chunk_id",
-          "sourceRef",
-          "file_path",
-          "root",
-          "area",
-          "kind",
-          "tags",
-          "agent_area",
-          "feature_status",
-          "centroid_id",
-          "content_hash",
-          "schema_version",
-          "feature_label",
-          "phase_lane",
-          "dependency_cluster",
-          "hot_keyword_cluster",
-          "parent_atlas_card_id",
-          "file_name",
-          "extension",
-          "chunk_index",
-          "total_chunks",
-          "content",
-          "purpose",
-          "domain",
-          "complexity",
-          "indexed_at",
-          "sourceRefs",
-          "source_refs",
-          "feature_id",
-          "related_feature_ids",
-          "som_cluster",
-          "gpu_cluster",
-          "feature_ids",
-          "lane_ids",
-          "cluster_id",
-          "cluster_k",
-          "som_bmu_row",
-          "som_bmu_col",
-          "vector64",
-          "indexed_at_som",
-          "canonicalSourceRef",
-          "sourceRefHash",
-          "encoded_at",
-          "source_ref",
-          "metadata"
-        ]
+        "source_ref": "src/lib/webgpu/gaussian-splat-renderer.ts",
+        "packet_key": "src/lib/webgpu/gaussian-splat-renderer.ts:43c70c0a3ba7ff2c",
+        "feature_id": "webgpu",
+        "feature_label": "Webgpu",
+        "community_id": 6403,
+        "domain_class": "source"
       },
-      "postgres": {
-        "packet_id": "14d50570-c1e7-4376-9aba-50ccc590fca2",
-        "source_ref": "src/lib/components/graph/glyphatlasviewer.svelte",
+      "postgres": null,
+      "mismatches": null,
+      "postgresFound": false
+    },
+    {
+      "qdrant_point_id": 1354889,
+      "qdrant": {
+        "source_ref": "src/lib/components/legal/EvidenceReportSummary.svelte",
+        "packet_key": "src/lib/components/legal/EvidenceReportSummary.svelte:cd9b26086bb1ba11",
+        "feature_id": "legal",
+        "feature_label": "Legal",
+        "community_id": 4657,
+        "domain_class": "source"
+      },
+      "postgres": null,
+      "mismatches": null,
+      "postgresFound": false
+    },
+    {
+      "qdrant_point_id": 1401737,
+      "qdrant": {
+        "source_ref": "src/lib/db/schema/evidence.ts",
+        "packet_key": "src/lib/db/schema/evidence.ts:bf52bff981024088",
+        "feature_id": "schema",
+        "feature_label": "Schema",
+        "community_id": 5139,
+        "domain_class": "source"
+      },
+      "postgres": null,
+      "mismatches": null,
+      "postgresFound": false
+    },
+    {
+      "qdrant_point_id": 1536417,
+      "qdrant": {
+        "source_ref": "src/mcp/tools/legal-skills.tool.ts",
+        "packet_key": "src/mcp/tools/legal-skills.tool.ts:898b0571049c27e5",
+        "feature_id": "tools",
+        "feature_label": "Tools",
+        "community_id": 5502,
+        "domain_class": "source"
+      },
+      "postgres": null,
+      "mismatches": null,
+      "postgresFound": false
+    },
+    {
+      "qdrant_point_id": 1604171,
+      "qdrant": {
+        "source_ref": "src/lib/components/admin/ContextualAssistantModal.svelte",
+        "packet_key": "src/lib/components/admin/ContextualAssistantModal.svelte:0947370c5e85da9a",
+        "feature_id": "admin",
+        "feature_label": "Atlas Context",
+        "community_id": 2437,
+        "domain_class": "source"
+      },
+      "postgres": null,
+      "mismatches": null,
+      "postgresFound": false
+    },
+    {
+      "qdrant_point_id": 1612494,
+      "qdrant": {
+        "source_ref": "src/lib/components/legal-ai/CaseDocumentWriter.svelte",
+        "packet_key": "src/lib/components/legal-ai/CaseDocumentWriter.svelte:61aa58a3a843005c",
+        "feature_id": "legal-ai",
+        "feature_label": "Legal Ai",
+        "community_id": 4668,
+        "domain_class": "source"
+      },
+      "postgres": null,
+      "mismatches": null,
+      "postgresFound": false
+    },
+    {
+      "qdrant_point_id": 1631859,
+      "qdrant": {
+        "source_ref": "src/lib/server/indexer/directory-summarizer.ts",
+        "packet_key": "src/lib/server/indexer/directory-summarizer.ts:2de96f9c31988cc2",
+        "feature_id": "indexer",
+        "feature_label": "Indexer",
+        "community_id": 4588,
+        "domain_class": "source"
+      },
+      "postgres": null,
+      "mismatches": null,
+      "postgresFound": false
+    },
+    {
+      "qdrant_point_id": 1672448,
+      "qdrant": {
+        "source_ref": "src/lib/components/analysis/KeyboardShortcutsHelp.svelte",
+        "packet_key": "src/lib/components/analysis/KeyboardShortcutsHelp.svelte:a1d0e5ef8170d74f",
+        "feature_id": "analysis",
+        "feature_label": "Atlas Context",
+        "community_id": 2336,
+        "domain_class": "source"
+      },
+      "postgres": null,
+      "mismatches": null,
+      "postgresFound": false
+    },
+    {
+      "qdrant_point_id": 1864541,
+      "qdrant": {
+        "source_ref": "src/lib/server/services/qdrant-client.ts",
+        "packet_key": "src/lib/server/services/qdrant-client.ts:b7bcd570ecf70b0b",
+        "feature_id": "services",
+        "feature_label": "Services",
+        "community_id": 5364,
+        "domain_class": "source"
+      },
+      "postgres": null,
+      "mismatches": null,
+      "postgresFound": false
+    },
+    {
+      "qdrant_point_id": 1893957,
+      "qdrant": {
+        "source_ref": "src/routes/api/chat/migrate/+server.ts",
+        "packet_key": "src/routes/api/chat/migrate/+server.ts:02d2a9f5aff2d2d0",
+        "feature_id": "migrate",
+        "feature_label": "Migrate",
+        "community_id": 4712,
+        "domain_class": "source"
+      },
+      "postgres": null,
+      "mismatches": null,
+      "postgresFound": false
+    },
+    {
+      "qdrant_point_id": 1924507,
+      "qdrant": {
+        "source_ref": "src/routes/api/summarize/analyze/+server.ts",
+        "packet_key": "src/routes/api/summarize/analyze/+server.ts:1baf5b5e0112dd9d",
+        "feature_id": "analyze",
+        "feature_label": "Analyze",
+        "community_id": 2294,
+        "domain_class": "source"
+      },
+      "postgres": null,
+      "mismatches": null,
+      "postgresFound": false
+    },
+    {
+      "qdrant_point_id": 1937330,
+      "qdrant": {
+        "source_ref": "src/routes/api/synthesis/generate/+server.ts",
+        "packet_key": "src/routes/api/synthesis/generate/+server.ts:35137e1faf8e161f",
+        "feature_id": "generate",
+        "feature_label": "Routes",
+        "community_id": 5062,
+        "domain_class": "source"
+      },
+      "postgres": null,
+      "mismatches": null,
+      "postgresFound": false
+    },
+    {
+      "qdrant_point_id": 2121189,
+      "qdrant": {
+        "source_ref": "src/lib/components/ui/CommandPalette.svelte",
+        "packet_key": "src/lib/components/ui/CommandPalette.svelte:7cf7b9740ce75754",
+        "feature_id": "ui",
+        "feature_label": "Ui",
+        "community_id": 5516,
+        "domain_class": "source"
+      },
+      "postgres": null,
+      "mismatches": null,
+      "postgresFound": false
+    },
+    {
+      "qdrant_point_id": 2211723,
+      "qdrant": {
+        "source_ref": "src/lib/components/graph/GlyphAtlasViewer.svelte",
         "packet_key": "src/lib/components/graph/glyphatlasviewer.svelte:c590fca2",
         "feature_id": "graph",
         "feature_label": "lib",
         "community_id": null,
-        "community_confidence": null
+        "domain_class": "source"
       },
-      "fields": [
-        {
-          "field": "packet_key",
-          "qdrant": null,
-          "postgres": "src/lib/components/graph/glyphatlasviewer.svelte:c590fca2",
-          "match": false
-        }
-      ]
+      "postgres": null,
+      "mismatches": null,
+      "postgresFound": false
     },
     {
-      "source_ref": "sveltekit-frontend/src/routes/api/sse/chat/+server.ts",
-      "reason": "1 field(s) mismatch",
+      "qdrant_point_id": 2216567,
       "qdrant": {
-        "qdrant_point_id": 2216567,
-        "source_ref": "sveltekit-frontend/src/routes/api/sse/chat/+server.ts",
-        "packet_key": "src/routes/api/sse/chat/+server.ts:4697545054664a70",
-        "feature_id": "chat",
-        "feature_label": "Chat",
-        "payload_keys": [
-          "chunk_id",
-          "sourceRef",
-          "file_path",
-          "root",
-          "area",
-          "kind",
-          "tags",
-          "agent_area",
-          "feature_status",
-          "centroid_id",
-          "content_hash",
-          "schema_version",
-          "source_ref",
-          "phase_lane",
-          "dependency_cluster",
-          "hot_keyword_cluster",
-          "parent_atlas_card_id",
-          "file_name",
-          "extension",
-          "chunk_index",
-          "total_chunks",
-          "content",
-          "purpose",
-          "domain",
-          "complexity",
-          "indexed_at",
-          "gpuCluster",
-          "somRow",
-          "somCol",
-          "som_cluster",
-          "gpu_cluster",
-          "sourceRefs",
-          "source_refs",
-          "feature_ids",
-          "lane_ids",
-          "som_cell",
-          "feature_id",
-          "route_path",
-          "concept_ids",
-          "cluster_k",
-          "som_bmu_row",
-          "som_bmu_col",
-          "vector64",
-          "indexed_at_som",
-          "graphAuthorityScore",
-          "communityId",
-          "communitySize",
-          "pagerank",
-          "cluster_key",
-          "canonicalSourceRef",
-          "sourceRefHash",
-          "encoded_at",
-          "community_conf",
-          "packet_key",
-          "atlas_enriched",
-          "atlas_enriched_at",
-          "community_id",
-          "path",
-          "hash",
-          "mtime",
-          "packetKey",
-          "ontology",
-          "domain_confidence",
-          "domain_id",
-          "domain_parent",
-          "canonical_source_ref",
-          "filePath",
-          "lineage_version",
-          "feature_label"
-        ]
-      },
-      "postgres": {
-        "packet_id": "9f47b9e5c251cecb1323914a72d98a3ed4b6d1d9857096fa684e2c9444ab2ff1",
-        "source_ref": "sveltekit-frontend/src/routes/api/sse/chat/+server.ts",
+        "source_ref": "src/routes/api/sse/chat/+server.ts",
         "packet_key": "src/routes/api/sse/chat/+server.ts:d33bf81bce04d644",
         "feature_id": "chat",
         "feature_label": "Chat",
-        "community_id": 17,
-        "community_confidence": 1
+        "community_id": 2898,
+        "domain_class": "source"
       },
-      "fields": [
-        {
-          "field": "packet_key",
-          "qdrant": "src/routes/api/sse/chat/+server.ts:4697545054664a70",
-          "postgres": "src/routes/api/sse/chat/+server.ts:d33bf81bce04d644",
-          "match": false
-        }
-      ]
+      "postgres": null,
+      "mismatches": null,
+      "postgresFound": false
     },
     {
-      "source_ref": "src/lib/server/kb/rerank-weight-loader.ts",
-      "reason": "1 field(s) mismatch",
+      "qdrant_point_id": 2246294,
       "qdrant": {
-        "qdrant_point_id": 2437269,
-        "source_ref": "src/lib/server/kb/rerank-weight-loader.ts",
-        "packet_key": null,
-        "feature_id": "kb",
-        "feature_label": "lib",
-        "payload_keys": [
-          "chunk_id",
-          "sourceRef",
-          "file_path",
-          "root",
-          "area",
-          "kind",
-          "tags",
-          "agent_area",
-          "feature_status",
-          "centroid_id",
-          "content_hash",
-          "schema_version",
-          "feature_label",
-          "phase_lane",
-          "dependency_cluster",
-          "hot_keyword_cluster",
-          "parent_atlas_card_id",
-          "file_name",
-          "extension",
-          "chunk_index",
-          "total_chunks",
-          "content",
-          "purpose",
-          "domain",
-          "complexity",
-          "indexed_at",
-          "gpuCluster",
-          "somRow",
-          "somCol",
-          "som_cluster",
-          "gpu_cluster",
-          "sourceRefs",
-          "source_refs",
-          "feature_ids",
-          "lane_ids",
-          "som_cell",
-          "feature_id",
-          "cluster_id",
-          "cluster_k",
-          "som_bmu_row",
-          "som_bmu_col",
-          "vector64",
-          "indexed_at_som",
-          "canonicalSourceRef",
-          "sourceRefHash",
-          "encoded_at",
-          "source_ref",
-          "metadata"
-        ]
+        "source_ref": "src/routes/(app)/admin/atlas/+page.svelte",
+        "packet_key": "src/routes/(app)/admin/atlas/+page.svelte:020405996efc7763",
+        "feature_id": "atlas",
+        "feature_label": "Atlas",
+        "community_id": 2318,
+        "domain_class": "source"
+      },
+      "postgres": null,
+      "mismatches": null,
+      "postgresFound": false
+    },
+    {
+      "qdrant_point_id": 2253151,
+      "qdrant": {
+        "source_ref": "src/lib/server/ai/legal-reasoning-chain.ts",
+        "packet_key": "src/lib/server/ai/legal-reasoning-chain.ts:03206cafb9398238",
+        "feature_id": "ai",
+        "feature_label": "Ai",
+        "community_id": 2256,
+        "domain_class": "source"
+      },
+      "postgres": null,
+      "mismatches": null,
+      "postgresFound": false
+    },
+    {
+      "qdrant_point_id": 2306238,
+      "qdrant": {
+        "source_ref": "src/routes/api/admin/atlas/cache/+server.ts",
+        "packet_key": "src/routes/api/admin/atlas/cache/+server.ts:5c2d38234450acc0",
+        "feature_id": "cache",
+        "feature_label": "Scripts",
+        "community_id": 5236,
+        "domain_class": "source"
+      },
+      "postgres": null,
+      "mismatches": null,
+      "postgresFound": false
+    },
+    {
+      "qdrant_point_id": 2316000,
+      "qdrant": {
+        "source_ref": "mcp-tools/src-mcp-server.ts#research:reddit_search",
+        "packet_key": "002356e08cd7e23f",
+        "feature_id": "a06042c0be12e4ca",
+        "feature_label": "A06042c0be12e4ca",
+        "community_id": 8451,
+        "domain_class": "rag_retrieval"
       },
       "postgres": {
-        "packet_id": "b12f7ab6-3cda-45ab-a461-1e6872809bdc",
+        "source_ref": "mcp-tools/src-mcp-server.ts#research:reddit_search",
+        "packet_key": "002356e08cd7e23f",
+        "feature_id": "a06042c0be12e4ca",
+        "feature_label": "A06042c0be12e4ca",
+        "community_id": 8451,
+        "domain_class": null
+      },
+      "mismatches": null,
+      "postgresFound": true
+    },
+    {
+      "qdrant_point_id": 2367821,
+      "qdrant": {
+        "source_ref": "src/lib/server/ff1/storage/redis-cache.ts",
+        "packet_key": "src/lib/server/ff1/storage/redis-cache.ts:84c01e8b5238be34",
+        "feature_id": "storage",
+        "feature_label": "Storage",
+        "community_id": 5398,
+        "domain_class": "source"
+      },
+      "postgres": {
+        "source_ref": "src/lib/server/ff1/storage/redis-cache.ts",
+        "packet_key": "nes:src/lib/server/ff1/storage/redis-cache.ts",
+        "feature_id": "repo.file.src.lib.server.ff1.storage.redis.cache.ts",
+        "feature_label": "Redis Cache",
+        "community_id": null,
+        "domain_class": "codebase"
+      },
+      "mismatches": [
+        {
+          "field": "packet_key",
+          "qdrant": "src/lib/server/ff1/storage/redis-cache.ts:84c01e8b5238be34",
+          "postgres": "nes:src/lib/server/ff1/storage/redis-cache.ts"
+        },
+        {
+          "field": "feature_id",
+          "qdrant": "storage",
+          "postgres": "repo.file.src.lib.server.ff1.storage.redis.cache.ts"
+        },
+        {
+          "field": "feature_label",
+          "qdrant": "Storage",
+          "postgres": "Redis Cache"
+        },
+        {
+          "field": "community_id",
+          "qdrant": 5398,
+          "postgres": null
+        }
+      ],
+      "postgresFound": true
+    },
+    {
+      "qdrant_point_id": 2437269,
+      "qdrant": {
         "source_ref": "src/lib/server/kb/rerank-weight-loader.ts",
         "packet_key": "src/lib/server/kb/rerank-weight-loader.ts:72809bdc",
         "feature_id": "kb",
         "feature_label": "lib",
         "community_id": null,
-        "community_confidence": null
+        "domain_class": "source"
       },
-      "fields": [
-        {
-          "field": "packet_key",
-          "qdrant": null,
-          "postgres": "src/lib/server/kb/rerank-weight-loader.ts:72809bdc",
-          "match": false
-        }
-      ]
+      "postgres": {
+        "source_ref": "src/lib/server/kb/rerank-weight-loader.ts",
+        "packet_key": "src/lib/server/kb/rerank-weight-loader.ts:72809bdc",
+        "feature_id": "kb",
+        "feature_label": "lib",
+        "community_id": null,
+        "domain_class": null
+      },
+      "mismatches": null,
+      "postgresFound": true
+    },
+    {
+      "qdrant_point_id": 2761508,
+      "qdrant": {
+        "source_ref": "src/routes/(app)/evidence-library/+page.svelte",
+        "packet_key": "src/routes/(app)/evidence-library/+page.svelte:d05178e69a1197b5",
+        "feature_id": "evidence-library",
+        "feature_label": "Scripts",
+        "community_id": 4131,
+        "domain_class": "source"
+      },
+      "postgres": null,
+      "mismatches": null,
+      "postgresFound": false
+    },
+    {
+      "qdrant_point_id": 2777429,
+      "qdrant": {
+        "source_ref": "src/lib/server/agents/regen/run.ts",
+        "packet_key": "src/lib/server/agents/regen/run.ts:ad3d1ef1d7dc67d9",
+        "feature_id": "regen",
+        "feature_label": "Regen",
+        "community_id": 4820,
+        "domain_class": "source"
+      },
+      "postgres": null,
+      "mismatches": null,
+      "postgresFound": false
+    },
+    {
+      "qdrant_point_id": 2811861,
+      "qdrant": {
+        "source_ref": "src/routes/api/rag/todo-suggestions/+server.ts",
+        "packet_key": "src/routes/api/rag/todo-suggestions/+server.ts:1217d42889c0ca4b",
+        "feature_id": "todo-suggestions",
+        "feature_label": "Atlas Context",
+        "community_id": 2419,
+        "domain_class": "source"
+      },
+      "postgres": null,
+      "mismatches": null,
+      "postgresFound": false
+    },
+    {
+      "qdrant_point_id": 2968749,
+      "qdrant": {
+        "source_ref": "src/lib/components/citations/CitationList.svelte",
+        "packet_key": "src/lib/components/citations/CitationList.svelte:83d95f5952f96093",
+        "feature_id": "atlas-context",
+        "feature_label": "Atlas Context",
+        "community_id": 2335,
+        "domain_class": "codebase"
+      },
+      "postgres": null,
+      "mismatches": null,
+      "postgresFound": false
+    },
+    {
+      "qdrant_point_id": 3020277,
+      "qdrant": {
+        "source_ref": "src/routes/(app)/admin/search-intelligence/+page.svelte",
+        "packet_key": "src/routes/(app)/admin/search-intelligence/+page.svelte:ef7c867733249e79",
+        "feature_id": "search-intelligence",
+        "feature_label": "Search Intelligence",
+        "community_id": 5356,
+        "domain_class": "source"
+      },
+      "postgres": null,
+      "mismatches": null,
+      "postgresFound": false
+    },
+    {
+      "qdrant_point_id": 3102142,
+      "qdrant": {
+        "source_ref": "src/lib/server/ace/rg-cluster-pivot.ts",
+        "packet_key": "src/lib/server/ace/rg-cluster-pivot.ts:6bd6c51be12791f7",
+        "feature_id": "ace",
+        "feature_label": "Utility",
+        "community_id": 5960,
+        "domain_class": "source"
+      },
+      "postgres": null,
+      "mismatches": null,
+      "postgresFound": false
+    },
+    {
+      "qdrant_point_id": 3185039,
+      "qdrant": {
+        "source_ref": "src/lib/components/evidence/EvidenceBoard.svelte",
+        "packet_key": "src/lib/components/evidence/EvidenceBoard.svelte:e963eac71a565b6a",
+        "feature_id": "evidence",
+        "feature_label": "Evidence",
+        "community_id": 4113,
+        "domain_class": "source"
+      },
+      "postgres": null,
+      "mismatches": null,
+      "postgresFound": false
+    },
+    {
+      "qdrant_point_id": 3215075,
+      "qdrant": {
+        "source_ref": "src/lib/server/audit/gpu-audit-orchestrator.ts",
+        "packet_key": "src/lib/server/audit/gpu-audit-orchestrator.ts:52c95c5c098fb34d",
+        "feature_id": "audit",
+        "feature_label": "Audit",
+        "community_id": 2446,
+        "domain_class": "source"
+      },
+      "postgres": null,
+      "mismatches": null,
+      "postgresFound": false
+    },
+    {
+      "qdrant_point_id": 3305298,
+      "qdrant": {
+        "source_ref": "src/lib/server/cache/entity-extractor-unified.ts",
+        "packet_key": "src/lib/server/cache/entity-extractor-unified.ts:3fe70e9f5c2b940c",
+        "feature_id": "utility",
+        "feature_label": "Utility",
+        "community_id": 5823,
+        "domain_class": "codebase"
+      },
+      "postgres": null,
+      "mismatches": null,
+      "postgresFound": false
+    },
+    {
+      "qdrant_point_id": 3312593,
+      "qdrant": {
+        "source_ref": "src/lib/server/vector/hypergraph-service.ts",
+        "packet_key": "src/lib/server/vector/hypergraph-service.ts:23a63bc0fe8d2f14",
+        "feature_id": "vector",
+        "feature_label": "Vector",
+        "community_id": 6385,
+        "domain_class": "source"
+      },
+      "postgres": null,
+      "mismatches": null,
+      "postgresFound": false
+    },
+    {
+      "qdrant_point_id": 3331244,
+      "qdrant": {
+        "source_ref": "src/routes/api/persons-of-interest/[id]/+server.ts",
+        "packet_key": "src/routes/api/persons-of-interest/[id]/+server.ts:03d9a891c25d5630",
+        "feature_id": "[id]",
+        "feature_label": "Scripts",
+        "community_id": 4578,
+        "domain_class": "source"
+      },
+      "postgres": null,
+      "mismatches": null,
+      "postgresFound": false
     }
-  ]
+  ],
+  "histogram": {
+    "total_sampled": 50,
+    "agreement": 3,
+    "source_ref_mismatch": 0,
+    "packet_key_mismatch": 2,
+    "feature_id_mismatch": 2,
+    "feature_label_mismatch": 2,
+    "community_id_mismatch": 7,
+    "domain_class_mismatch": 0,
+    "missing_postgres_row": 40
+  },
+  "agreementRate": 6
 }

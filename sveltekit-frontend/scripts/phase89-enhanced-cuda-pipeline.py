@@ -39,7 +39,20 @@ REDIS_URL = os.getenv("REDIS_URL", "redis://localhost:6379")
 QDRANT_URL = os.getenv("QDRANT_URL", "http://localhost:6333")
 OLLAMA_URL = os.getenv("OLLAMA_URL", "http://localhost:11434")
 EMBED_MODEL = os.getenv("EMBED_MODEL", "embeddinggemma:latest")
-CHAT_MODEL = os.getenv("CHAT_MODEL", "gemma3-legal:latest")
+BIFROST_ENABLED=true
+BIFROST_URL=http://127.0.0.1:3040
+ROTORQUANT_MODEL_PATH="C:\Users\james\Videos\deeds-web-app\models\gemma4-legal-iq4xs-direct.gguf"
+TURBO_NGL=99
+TURBOQUANT_ENABLED=true
+ROTORQUANT_KV_ENABLED=true
+MTP_ENABLED=false
+TENSORRT_LLM_ENABLED=false
+TURBOQUANT_BASE_URL=http://127.0.0.1:8090
+TURBOQUANT_URL=http://127.0.0.1:8090
+# DRAFT_MODEL_PATH is deprecated and ignored by scripts/launch-turboquant.ps1.
+# Use ENABLE_MTP_DRAFTER=true and MTP_DRAFT_MODEL=<path> with a compatible small Gemma/Gemma4 GGUF.
+# DRAFT_MODEL_PATH=C:\Users\james\.ollama\models\blobs\sha256-735af2139dc652bf01112746474883d79a52fa1c19038265d363e3d42556f7a2
+DRAFT_N=5
 
 QDRANT_COLLECTION = "phase89_error_chunks"
 EMBED_DIM = 768

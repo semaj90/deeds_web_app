@@ -212,6 +212,16 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 		const latencyMs = Date.now() - startTime;
 		const replayId = trace.getId();
 		const cacheSource = cacheHits > 0 ? 'redis_exact_match' : 'live_fusion';
+		const graphStageStatus = Number(result.trace.neo4j_expansions ?? 0) > 0
+			? 'GRAPH_ENABLED'
+			: body.includeGraph === false
+				? 'GRAPH_DISABLED'
+				: 'GRAPH_DEGRADED';
+		const graphStageReason = Number(result.trace.neo4j_expansions ?? 0) > 0
+			? 'neo4j expansions available'
+			: body.includeGraph === false
+				? 'graph stage disabled by request'
+				: 'neo4j expansion not returned for this replay entry';
 		const operatorPackets = result.packets.map((packet) => ({
 			...packet,
 			reason: packet.fusion_sources.length
@@ -219,20 +229,28 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 				: 'Selected by bounded lexical fallback.',
 			cache_source: cacheSource,
 			retrieval_strategy: result.trace.retrieval_strategy ?? 'fusion',
+			graph_stage_status: graphStageStatus,
+			graph_stage_reason: graphStageReason,
 			generated_by: 'hyperrag-packet-rpc',
 			worker: 'sveltekit-frontend',
 			run_id: replayId,
 			task_id: request.headers.get('x-atlas-task-id'),
 			replay_id: replayId,
 			cache_namespace: 'hyperrag:query',
+			traversal_path: packet.neo4j_neighbors ?? [],
 		}));
 
-		// Record response for replay trace (fire-and-forget)
-		trace.recordResponse(result);
-		const redis = getRedis();
-		trace.save(redis, 86400).catch(() => {}); // 24h TTL, non-fatal
+		trace.setReplayMetadata({
+			replay_id: replayId,
+			cache_source: cacheSource,
+			cache_namespace: 'hyperrag:query',
+			task_id: request.headers.get('x-atlas-task-id') ?? undefined,
+			worker_id: 'sveltekit-frontend',
+			graph_stage_status: graphStageStatus,
+			graph_stage_reason: graphStageReason,
+		});
 
-		return json({
+		const responsePayload = {
 			ok: true,
 			query: result.query,
 			strategy: result.strategy,
@@ -249,10 +267,29 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 				cache_hits: cacheHits,
 				cache_source: cacheSource,
 				cache_namespace: 'hyperrag:query',
+				graph_stage_status: graphStageStatus,
+				graph_stage_reason: graphStageReason,
 				latency_ms: latencyMs,
 				cache_latency_ms: cacheHits > 0 ? latencyMs : undefined,
+				retrieval_path: [
+					'packet_rpc',
+					...(cacheHits > 0 ? ['redis_exact_match'] : []),
+					...(Number(result.trace.postgres_hits ?? 0) > 0 ? ['postgres'] : []),
+					...(Number(result.trace.qdrant_hits ?? 0) > 0 ? ['qdrant'] : []),
+					...(Number(result.trace.neo4j_expansions ?? 0) > 0 ? ['neo4j'] : []),
+					...(Number(result.trace.rrf_hits ?? 0) > 0 ? ['rrf'] : []),
+				],
+				task_id: request.headers.get('x-atlas-task-id') ?? undefined,
+				worker_id: 'sveltekit-frontend',
 			},
-		});
+		};
+
+		// Record response for replay trace (fire-and-forget)
+		trace.recordResponse(responsePayload as unknown as HyperRagPacketRpcResult);
+		const redis = getRedis();
+		trace.save(redis, 86400).catch(() => {}); // 24h TTL, non-fatal
+
+		return json(responsePayload);
 	} catch (err) {
 		console.error('[hyperrag-packet-rpc] Error:', err instanceof Error ? err.message : String(err));
 		return json(

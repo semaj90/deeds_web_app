@@ -8982,8 +8982,44 @@
   "sveltekit-frontend/src/routes/api/ai/agent/+server.ts": [
     "sveltekit-frontend/tests/routes/auto/api/ai/agent.test.ts"
   ],
+  "sveltekit-frontend/src/routes/api/ai/analyze/[scope]/+server.ts": [
+    "sveltekit-frontend/tests/routes/auto/api/ai/analyze/__scope.test.ts"
+  ],
+  "sveltekit-frontend/src/routes/api/ai/analyze-evidence/+server.ts": [
+    "sveltekit-frontend/tests/routes/auto/api/ai/analyze-evidence.test.ts"
+  ],
+  "sveltekit-frontend/src/routes/api/ai/ask/+server.ts": [
+    "sveltekit-frontend/tests/routes/auto/api/ai/ask.test.ts"
+  ],
+  "sveltekit-frontend/src/routes/api/ai/case-prediction/+server.ts": [
+    "sveltekit-frontend/tests/routes/auto/api/ai/case-prediction.test.ts"
+  ],
   "sveltekit-frontend/src/routes/api/ai/chat/stream/+server.ts": [
     "sveltekit-frontend/tests/routes/auto/api/ai/chat/stream.test.ts"
+  ],
+  "sveltekit-frontend/src/routes/api/ai/chat-direct/+server.ts": [
+    "sveltekit-frontend/tests/routes/auto/api/ai/chat-direct.test.ts"
+  ],
+  "sveltekit-frontend/src/routes/api/ai/cross-exam/+server.ts": [
+    "sveltekit-frontend/tests/routes/auto/api/ai/cross-exam.test.ts"
+  ],
+  "sveltekit-frontend/src/routes/api/ai/generate-report/[scope]/+server.ts": [
+    "sveltekit-frontend/tests/routes/auto/api/ai/generate-report/__scope.test.ts"
+  ],
+  "sveltekit-frontend/src/routes/api/ai/judge/+server.ts": [
+    "sveltekit-frontend/tests/routes/auto/api/ai/judge.test.ts"
+  ],
+  "sveltekit-frontend/src/routes/api/ai/legal-research/+server.ts": [
+    "sveltekit-frontend/tests/routes/auto/api/ai/legal-research.test.ts"
+  ],
+  "sveltekit-frontend/src/routes/api/ai/memo-skeleton/+server.ts": [
+    "sveltekit-frontend/tests/routes/auto/api/ai/memo-skeleton.test.ts"
+  ],
+  "sveltekit-frontend/src/routes/api/ai/summarize/+server.ts": [
+    "sveltekit-frontend/tests/routes/auto/api/ai/summarize.test.ts"
+  ],
+  "sveltekit-frontend/src/routes/api/ai/yorha/context-chat/+server.ts": [
+    "sveltekit-frontend/tests/routes/auto/api/ai/yorha/context-chat.test.ts"
   ],
   "sveltekit-frontend/src/routes/api/analytics/research-summaries/[id]/+server.ts": [
     "sveltekit-frontend/tests/routes/auto/api/analytics/research-summaries/__id.test.ts",
@@ -9040,6 +9076,9 @@
     "sveltekit-frontend/tests/routes/auto/api/cases.test.ts",
     "sveltekit-frontend/tests/routes/auto/api/cases.test.ts"
   ],
+  "sveltekit-frontend/src/routes/api/chat/+server.ts": [
+    "sveltekit-frontend/tests/routes/auto/api/chat.test.ts"
+  ],
   "sveltekit-frontend/src/routes/api/citations/[citationId]/tags/+server.ts": [
     "sveltekit-frontend/tests/routes/auto/api/citations/__citationId/tags.test.ts",
     "sveltekit-frontend/tests/routes/auto/api/citations/__citationId/tags.test.ts",
@@ -9076,6 +9115,9 @@
   "sveltekit-frontend/src/routes/api/codebase-index/wiki/+server.ts": [
     "sveltekit-frontend/tests/routes/auto/api/codebase-index/wiki.test.ts",
     "sveltekit-frontend/tests/routes/auto/api/codebase-index/wiki.test.ts"
+  ],
+  "sveltekit-frontend/src/routes/api/contextual/chat/+server.ts": [
+    "sveltekit-frontend/tests/routes/auto/api/contextual/chat.test.ts"
   ],
   "sveltekit-frontend/src/routes/api/document/analysis/[evidenceId]/+server.ts": [
     "sveltekit-frontend/tests/routes/auto/api/document/analysis/__evidenceId.test.ts"
@@ -9164,6 +9206,9 @@
   ],
   "sveltekit-frontend/src/routes/api/pipeline/status/[jobId]/+server.ts": [
     "sveltekit-frontend/tests/routes/auto/api/pipeline/status/__jobId.test.ts"
+  ],
+  "sveltekit-frontend/src/routes/api/rag/answer/+server.ts": [
+    "sveltekit-frontend/tests/routes/auto/api/rag/answer.test.ts"
   ],
   "sveltekit-frontend/src/routes/api/recommendations/jobs/[jobId]/+server.ts": [
     "sveltekit-frontend/tests/routes/auto/api/recommendations/jobs/__jobId.test.ts"

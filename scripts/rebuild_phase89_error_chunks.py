@@ -38,27 +38,65 @@ import urllib.error
 from collections import Counter, defaultdict
 from pathlib import Path
 
-try:
-    from langchain_core.messages import HumanMessage, SystemMessage
-    from langchain_ollama import ChatOllama
-    LANGCHAIN_OLLAMA_AVAILABLE = True
-except ImportError:
-    LANGCHAIN_OLLAMA_AVAILABLE = False
-
 # ── Config ────────────────────────────────────────────────────────────────────
 
 WORKSPACE_ROOT = Path(__file__).resolve().parent.parent
 FRONTEND_DIR = WORKSPACE_ROOT / "sveltekit-frontend"
 
-QDRANT_URL  = os.getenv("QDRANT_URL",  "http://localhost:6333")
-OLLAMA_URL  = os.getenv("OLLAMA_URL",  "http://localhost:11434")
-NEO4J_URL   = os.getenv("NEO4J_HTTP",  "http://localhost:7474")
+def env_bool(name: str, default: bool = False) -> bool:
+    return os.getenv(name, str(default)).strip().lower() in {"1", "true", "yes", "on"}
+
+
+def load_env_file(path: Path, override: bool = False) -> None:
+    if not path.exists():
+        return
+    try:
+        for raw_line in path.read_text(encoding="utf-8").splitlines():
+            line = raw_line.strip()
+            if not line or line.startswith("#") or "=" not in line:
+                continue
+            key, value = line.split("=", 1)
+            key = key.strip()
+            value = value.strip().strip("'").strip('"')
+            if override or key not in os.environ:
+                os.environ[key] = value
+    except Exception:
+        pass
+
+
+for _env_path in (
+    WORKSPACE_ROOT / ".env",
+    WORKSPACE_ROOT / ".env.local",
+    FRONTEND_DIR / ".env",
+    FRONTEND_DIR / ".env.local",
+):
+    load_env_file(_env_path, override=_env_path.name == ".env.local")
+
+QDRANT_URL  = os.getenv("QDRANT_URL",  "http://127.0.0.1:6333")
+OLLAMA_URL  = os.getenv("OLLAMA_URL",  "http://127.0.0.1:11434")
+NEO4J_URL   = os.getenv("NEO4J_HTTP",  "http://127.0.0.1:7474")
 NEO4J_USER  = os.getenv("NEO4J_USER",  "neo4j")
 NEO4J_PASS  = os.getenv("NEO4J_PASSWORD", "neo4j123")
 
 EMBED_MODEL = os.getenv("EMBED_MODEL", "embeddinggemma:latest")
-CHAT_MODEL  = os.getenv("LLM_MODEL",   "gemma4-legal:latest")
-SUMMARY_MODEL = os.getenv("SUMMARY_MODEL", os.getenv("SVELTE5_MODEL", "gemma4-legal-fast:latest"))
+CHAT_BASE_URL = os.getenv("CHAT_BASE_URL", os.getenv("TURBOQUANT_BASE_URL", "http://127.0.0.1:8090")).rstrip("/")
+CHAT_MODEL  = os.getenv("CHAT_MODEL", os.getenv("LLM_MODEL", "gemma4-legal-iq4xs-direct.gguf"))
+SUMMARY_MODEL = os.getenv("SUMMARY_MODEL", os.getenv("SVELTE5_MODEL", CHAT_MODEL))
+
+BIFROST_ENABLED = env_bool("BIFROST_ENABLED", True)
+BIFROST_URL = os.getenv("BIFROST_URL", "http://127.0.0.1:3040")
+ROTORQUANT_MODEL_PATH = os.getenv(
+    "ROTORQUANT_MODEL_PATH",
+    r"C:\Users\james\Videos\deeds-web-app\models\gemma4-legal-iq4xs-direct.gguf",
+)
+TURBO_NGL = int(os.getenv("TURBO_NGL", "99"))
+TURBOQUANT_ENABLED = env_bool("TURBOQUANT_ENABLED", True)
+ROTORQUANT_KV_ENABLED = env_bool("ROTORQUANT_KV_ENABLED", True)
+MTP_ENABLED = env_bool("MTP_ENABLED", False)
+TENSORRT_LLM_ENABLED = env_bool("TENSORRT_LLM_ENABLED", False)
+TURBOQUANT_BASE_URL = os.getenv("TURBOQUANT_BASE_URL", "http://127.0.0.1:8090")
+TURBOQUANT_URL = os.getenv("TURBOQUANT_URL", TURBOQUANT_BASE_URL)
+DRAFT_N = int(os.getenv("DRAFT_N", "5"))
 
 QDRANT_COLLECTION = "phase89_error_chunks"
 EMBED_DIM = 768
@@ -706,31 +744,36 @@ def llm_summarize(messages: list[str], error_type: str, graph_ctx: str) -> str:
     sample = "\n".join(f"- {m}" for m in messages[:5])
     graph_line = f"Graph context: {graph_ctx}\n" if graph_ctx else ""
 
-    if LANGCHAIN_OLLAMA_AVAILABLE:
-        try:
-            llm = ChatOllama(model=SUMMARY_MODEL, base_url=OLLAMA_URL, temperature=0.1)
-            messages_in = [
-                SystemMessage(
-                    content=(
-                        "You are a software maintenance assistant. Summarize TypeScript and Svelte error clusters "
-                        "in 1-2 sentences, identify the common root cause, and use the provided fixer guidance exactly. "
-                        "Do not invent new fixers, package-install steps, or legal analysis. Do not ask questions."
-                    )
-                ),
-                HumanMessage(
-                    content=(
-                        f"Error type: {error_type}\n"
-                        f"{graph_line}"
-                        f"Messages:\n{sample}"
-                    )
-                ),
-            ]
-            resp = llm.invoke(messages_in)
-            content = getattr(resp, "content", "")
-            if isinstance(content, str) and content.strip():
-                return content.strip()
-        except Exception:
-            pass
+    prompt = (
+        "You are a software maintenance assistant. Summarize TypeScript and Svelte error clusters "
+        "in 1-2 sentences, identify the common root cause, and use the provided fixer guidance exactly. "
+        "Do not invent new fixers, package-install steps, or legal analysis. Do not ask questions.\n\n"
+        f"Error type: {error_type}\n"
+        f"{graph_line}"
+        f"Messages:\n{sample}"
+    )
+
+    try:
+        result = json_post(
+            f"{CHAT_BASE_URL}/v1/chat/completions",
+            {
+                "model": SUMMARY_MODEL,
+                "messages": [
+                    {"role": "system", "content": "You are a software maintenance assistant."},
+                    {"role": "user", "content": prompt},
+                ],
+                "temperature": 0.1,
+                "stream": False,
+            },
+            timeout=60,
+        )
+        choices = result.get("choices") or []
+        message = (choices[0].get("message") or {}) if choices else {}
+        content = message.get("content") or message.get("reasoning_content") or ""
+        if isinstance(content, str) and content.strip():
+            return content.strip()
+    except Exception:
+        pass
 
     fallback = sample.splitlines()[0][2:] if sample else error_type
     if graph_ctx:

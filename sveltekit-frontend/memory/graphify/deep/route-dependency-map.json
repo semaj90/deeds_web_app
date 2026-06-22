@@ -263,7 +263,31 @@
     "serverDeps": 0,
     "dbDeps": 0
   },
+  "sveltekit-frontend/src/routes/api/ai/analyze/[scope]/+server.ts": {
+    "zone": "shared",
+    "directDeps": 0,
+    "serverDeps": 0,
+    "dbDeps": 0
+  },
+  "sveltekit-frontend/src/routes/api/ai/analyze-evidence/+server.ts": {
+    "zone": "shared",
+    "directDeps": 0,
+    "serverDeps": 0,
+    "dbDeps": 0
+  },
+  "sveltekit-frontend/src/routes/api/ai/ask/+server.ts": {
+    "zone": "shared",
+    "directDeps": 0,
+    "serverDeps": 0,
+    "dbDeps": 0
+  },
   "sveltekit-frontend/src/routes/api/ai/bifrost/+server.ts": {
+    "zone": "shared",
+    "directDeps": 0,
+    "serverDeps": 0,
+    "dbDeps": 0
+  },
+  "sveltekit-frontend/src/routes/api/ai/case-prediction/+server.ts": {
     "zone": "shared",
     "directDeps": 0,
     "serverDeps": 0,
@@ -275,7 +299,19 @@
     "serverDeps": 0,
     "dbDeps": 0
   },
+  "sveltekit-frontend/src/routes/api/ai/chat-direct/+server.ts": {
+    "zone": "shared",
+    "directDeps": 0,
+    "serverDeps": 0,
+    "dbDeps": 0
+  },
   "sveltekit-frontend/src/routes/api/ai/contextual-chat/+server.ts": {
+    "zone": "shared",
+    "directDeps": 0,
+    "serverDeps": 0,
+    "dbDeps": 0
+  },
+  "sveltekit-frontend/src/routes/api/ai/cross-exam/+server.ts": {
     "zone": "shared",
     "directDeps": 0,
     "serverDeps": 0,
@@ -287,13 +323,55 @@
     "serverDeps": 0,
     "dbDeps": 0
   },
+  "sveltekit-frontend/src/routes/api/ai/generate-report/[scope]/+server.ts": {
+    "zone": "shared",
+    "directDeps": 0,
+    "serverDeps": 0,
+    "dbDeps": 0
+  },
+  "sveltekit-frontend/src/routes/api/ai/judge/+server.ts": {
+    "zone": "shared",
+    "directDeps": 0,
+    "serverDeps": 0,
+    "dbDeps": 0
+  },
+  "sveltekit-frontend/src/routes/api/ai/legal-research/+server.ts": {
+    "zone": "shared",
+    "directDeps": 0,
+    "serverDeps": 0,
+    "dbDeps": 0
+  },
+  "sveltekit-frontend/src/routes/api/ai/memo-skeleton/+server.ts": {
+    "zone": "shared",
+    "directDeps": 0,
+    "serverDeps": 0,
+    "dbDeps": 0
+  },
   "sveltekit-frontend/src/routes/api/ai/policy/+server.ts": {
     "zone": "shared",
     "directDeps": 0,
     "serverDeps": 0,
     "dbDeps": 0
   },
+  "sveltekit-frontend/src/routes/api/ai/route-intent/+server.ts": {
+    "zone": "shared",
+    "directDeps": 0,
+    "serverDeps": 0,
+    "dbDeps": 0
+  },
   "sveltekit-frontend/src/routes/api/ai/status/+server.ts": {
+    "zone": "shared",
+    "directDeps": 0,
+    "serverDeps": 0,
+    "dbDeps": 0
+  },
+  "sveltekit-frontend/src/routes/api/ai/summarize/+server.ts": {
+    "zone": "shared",
+    "directDeps": 0,
+    "serverDeps": 0,
+    "dbDeps": 0
+  },
+  "sveltekit-frontend/src/routes/api/ai/yorha/context-chat/+server.ts": {
     "zone": "shared",
     "directDeps": 0,
     "serverDeps": 0,
@@ -431,6 +509,12 @@
     "serverDeps": 0,
     "dbDeps": 0
   },
+  "sveltekit-frontend/src/routes/api/chat/+server.ts": {
+    "zone": "shared",
+    "directDeps": 0,
+    "serverDeps": 0,
+    "dbDeps": 0
+  },
   "sveltekit-frontend/src/routes/api/citations/[citationId]/tags/+server.ts": {
     "zone": "shared",
     "directDeps": 0,
@@ -498,6 +582,12 @@
     "dbDeps": 0
   },
   "sveltekit-frontend/src/routes/api/codebase-index/wiki/+server.ts": {
+    "zone": "shared",
+    "directDeps": 0,
+    "serverDeps": 0,
+    "dbDeps": 0
+  },
+  "sveltekit-frontend/src/routes/api/contextual/chat/+server.ts": {
     "zone": "shared",
     "directDeps": 0,
     "serverDeps": 0,
@@ -702,6 +792,12 @@
     "dbDeps": 0
   },
   "sveltekit-frontend/src/routes/api/pipeline/status/[jobId]/+server.ts": {
+    "zone": "shared",
+    "directDeps": 0,
+    "serverDeps": 0,
+    "dbDeps": 0
+  },
+  "sveltekit-frontend/src/routes/api/rag/answer/+server.ts": {
     "zone": "shared",
     "directDeps": 0,
     "serverDeps": 0,

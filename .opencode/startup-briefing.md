@@ -36,7 +36,7 @@ Hello James.
 - replay trace qdrant hit pct: 100.0%
 - replay trace cache hit pct: 100.0%
 - replay trace total p50 / p95: 3980 / 6280
-- retrieval benchmark total p50 / p95: 3949 / 6190
+- retrieval benchmark total p50 / p95: 9930 / 14753
 - retrieval benchmark qdrant hits: yes
 - retrieval benchmark ledger matches: yes
 - retrieval benchmark all answered: yes
@@ -51,8 +51,8 @@ Hello James.
 
 ## Recommended Next Lane
 
-1. Qdrant tag mirroring apply + verify
-2. Apply the Qdrant tag mirror from the materialized packet spine so packet_key, source_ref, feature_id, lane_ids, tags, and bm25_text land in the vector payload before retrieval fusion.
+1. Retrieval telemetry depth / replay breadth
+2. With the Qdrant tag mirror applied, move to the Neo4j / GDS topology pass until graph scores, community labels, and sourceRef projection are fully applied.
 3. Warm the Bitfrost semantic cache from canonical Postgres rows before treating mirrors as runtime truth.
 4. With Redis centroid and Bitfrost warm lanes applied, move retrieval work toward HyperRAG fusion rather than more cache mirroring.
 5. Keep runtime evidence packetization on the admin-side path: turn Playwright, dev:gpu output, server logs, and cache events into chrom97 packets before Gemma4 synthesis.
@@ -73,6 +73,16 @@ Hello James.
 - redis centroid mirror status: PASS
 - runtime evidence packetization status: materialized
 - runtime evidence packetization coverage pct: 100
+- agent context run status: PASS
+- agent context run story/task: story:phase89-error-clustering / task:qdrant-timeout-repair
+- agent context run cache namespace: bifrost:sem
+- agent context run cache source: valkey-semantic
+- agent context run reward: 0.326666
+- context gym evals status: PASS
+- context gym evals query count: 50
+- context gym evals winner: policy_C
+- GEPA policy audit status: PASS
+- GEPA policy audit winner: policy_C
 - repo function registry total rows: 1479
 - repo function registry counts by kind: {"function":892,"doc_topic":371,"cli_command":125,"mcp_tool":91}
 - repo function registry primary feature id: feature.agent.opencode

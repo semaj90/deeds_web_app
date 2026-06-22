@@ -201,16 +201,16 @@ function deriveFeatureId(input: {
   sourceRef?: string | null;
   packet?: any;
 }): string | null {
-  if (input.featureId) return String(input.featureId);
   if (input.packet?.feature_id) return String(input.packet.feature_id);
   if (input.packet?.featureId) return String(input.packet.featureId);
-
+  if (input.featureId) return String(input.featureId);
+  
   const ref = normalizeSourceRef(
     input.sourceRef ??
-      input.packet?.canonical_source_ref ??
-      input.packet?.source_ref ??
-      input.packet?.sourceRef
+    input.packet?.canonical_source_ref ??
+    input.packet?.source_ref ??
+    input.packet?.sourceRef
   );
-
+  
   return ref ? `feature:${ref}` : null;
 }
