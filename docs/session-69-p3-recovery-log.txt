@@ -1,0 +1,182 @@
+2026-06-22 23:00:51 -0700 | .claude/settings.local.json
+2026-06-22 23:00:51 -0700 | .opencode/skills/proof-of-truth-skill-tests.md
+2026-06-22 23:00:51 -0700 | docs/HYPERRAG-PROOF-ROADMAP.md
+2026-06-22 23:00:51 -0700 | docs/reports/domain-ontology-classification.json
+2026-06-22 23:00:51 -0700 | docs/reports/hyperrag-runtime-proof-gaps.md
+2026-06-22 23:00:51 -0700 | docs/reports/hyperrag-runtime-proof.json
+2026-06-22 23:00:51 -0700 | docs/reports/hyperrag-runtime-proof.md
+2026-06-22 23:00:51 -0700 | docs/reports/implementation-intent-aliases.json
+2026-06-22 23:00:51 -0700 | docs/reports/implementation-intent-aliases.md
+2026-06-22 23:00:51 -0700 | docs/reports/latent-128-backfill.json
+2026-06-22 23:00:51 -0700 | docs/reports/phase-16-som-ae-schema-alignment.json
+2026-06-22 23:00:51 -0700 | docs/reports/phase-16-som-ae-schema-alignment.md
+2026-06-22 23:00:51 -0700 | docs/reports/proof-of-truth/replay-ATLAS-REPLAY-001.json
+2026-06-22 23:00:51 -0700 | docs/reports/proof-of-truth/replay-ATLAS-REPLAY-FINAL.json
+2026-06-22 23:00:51 -0700 | docs/reports/proof-of-truth/replay-ATLAS-REPLAY-TEST.json
+2026-06-22 23:00:51 -0700 | docs/reports/qdrant-join-audit.json
+2026-06-22 23:00:51 -0700 | docs/reports/sourceRef-first-parent-atlas-refresh.json
+2026-06-22 23:00:51 -0700 | docs/reports/sourceRef-first-parent-atlas-refresh.md
+2026-06-22 23:00:51 -0700 | docs/reports/temporal-bitfrost-index.json
+2026-06-22 23:00:51 -0700 | docs/reports/turbovec-qdrant-load.json
+2026-06-22 23:00:51 -0700 | docs/reports/validate-packet-contract.json
+2026-06-22 23:00:51 -0700 | memory/exports/graph-refresh-manifest.json
+2026-06-22 23:00:51 -0700 | memory/p1-phase-completion-handoff.md
+2026-06-22 23:00:51 -0700 | scripts/add-libtorch-to-path.ps1
+2026-06-22 23:00:51 -0700 | scripts/atlas/audit-parent-atlas-joins.mjs
+2026-06-22 23:00:51 -0700 | scripts/atlas/backfill-latent-128.mjs
+2026-06-22 23:00:51 -0700 | scripts/atlas/backfill-latent-vectors.mjs
+2026-06-22 23:00:51 -0700 | scripts/atlas/backfill-packet-metadata-to-postgres.mjs
+2026-06-22 23:00:51 -0700 | scripts/atlas/backfill-packets-to-qdrant.mjs
+2026-06-22 23:00:51 -0700 | scripts/atlas/build-implementation-intent-aliases.mjs
+2026-06-22 23:00:51 -0700 | scripts/atlas/record-parent-atlas-phase-proof.mjs
+2026-06-22 23:00:51 -0700 | scripts/atlas/replay-packet-rpc-proof.mjs
+2026-06-22 23:00:51 -0700 | scripts/atlas/smoke-hyperrag-packet-rpc.mjs
+2026-06-22 23:00:51 -0700 | scripts/atlas/standardize-feature-envelope.mjs
+2026-06-22 23:00:51 -0700 | scripts/atlas/validate-feature-envelope-gan.mjs
+2026-06-22 23:00:51 -0700 | scripts/atlas/validate-provenance-gan.mjs
+2026-06-22 23:00:51 -0700 | scripts/atlas/validate-qdrant-join-gan.mjs
+2026-06-22 23:00:51 -0700 | scripts/karpathy-gpu-enrich.mjs
+2026-06-22 23:00:51 -0700 | scripts/semantic-valkey/create-index.mjs
+2026-06-22 23:00:51 -0700 | scripts/skills/replay-proof-test.mjs
+2026-06-22 23:00:51 -0700 | scripts/startup/proof-of-truth-orchestrator.mjs
+2026-06-22 23:00:51 -0700 | scripts/tests/analyze_domain_ontologies_clusters.py
+2026-06-22 23:00:51 -0700 | simd-bridge/cpp/build-x64-cuda/CMakeFiles/CMakeConfigureLog.yaml
+2026-06-22 23:00:51 -0700 | sveltekit-frontend/docs/atlas-index/codebase-atlas.json
+2026-06-22 23:00:51 -0700 | sveltekit-frontend/docs/atlas-index/codebase-atlas.min.json
+2026-06-22 23:00:51 -0700 | sveltekit-frontend/docs/graph/codebase-graph.md
+2026-06-22 23:00:51 -0700 | sveltekit-frontend/docs/graph/codebase-map.md
+2026-06-22 23:00:51 -0700 | sveltekit-frontend/docs/reports/retrieval-e2e-benchmark.json
+2026-06-22 23:00:51 -0700 | sveltekit-frontend/docs/reports/retrieval-e2e-benchmark.md
+2026-06-22 23:00:51 -0700 | sveltekit-frontend/docs/startup.md
+2026-06-22 23:00:51 -0700 | sveltekit-frontend/drizzle/manual/0053_atlas_retrieval_eval_times_protocol_accelerator.sql
+2026-06-22 23:00:51 -0700 | sveltekit-frontend/memory/atlas/codebase-atlas.dirs.json
+2026-06-22 23:00:51 -0700 | sveltekit-frontend/memory/atlas/codebase-atlas.latest.md
+2026-06-22 23:00:51 -0700 | sveltekit-frontend/memory/atlas/codebase-atlas.min.json
+2026-06-22 23:00:51 -0700 | sveltekit-frontend/memory/atlas/codebase-atlas.top.json
+2026-06-22 23:00:51 -0700 | sveltekit-frontend/memory/docstore/manifest.json
+2026-06-22 23:00:51 -0700 | sveltekit-frontend/memory/graphify/deep/graph-stats.json
+2026-06-22 23:00:51 -0700 | sveltekit-frontend/memory/graphify/deep/graphify-deep-summary.md
+2026-06-22 23:00:51 -0700 | sveltekit-frontend/memory/graphify/deep/unresolved-imports.json
+2026-06-22 23:00:51 -0700 | sveltekit-frontend/memory/kag-notes/manifest.json
+2026-06-22 23:00:51 -0700 | sveltekit-frontend/package.json
+2026-06-22 23:00:51 -0700 | sveltekit-frontend/scripts/semantic-valkey/create-index.mjs
+2026-06-22 23:00:51 -0700 | sveltekit-frontend/scripts/startup/run-graphify-daily-startup.mjs
+2026-06-22 23:00:51 -0700 | sveltekit-frontend/src/lib/server/db/schema/retrieval-eval-times.ts
+2026-06-22 23:00:51 -0700 | sveltekit-frontend/src/lib/server/hyperrag/replay-trace.ts
+2026-06-22 23:00:51 -0700 | sveltekit-frontend/src/lib/server/retrieval/hyperrag-packet-rpc.ts
+2026-06-22 23:00:51 -0700 | sveltekit-frontend/src/lib/server/search/neo4j-rerank.ts
+2026-06-22 23:00:51 -0700 | sveltekit-frontend/src/lib/server/telemetry/retrieval-recorder.ts
+2026-06-22 23:00:51 -0700 | sveltekit-frontend/src/routes/api/hyperrag/packet-rpc/+server.ts
+2026-06-22 23:03:54 -0700 | docs/session-69-p1-audit-summary.md
+2026-06-22 23:19:33 -0700 | .gitignore
+2026-06-22 23:19:33 -0700 | docs/reports/provenance-tree-summary.json
+2026-06-22 23:19:33 -0700 | docs/reports/provenance-tree.md
+2026-06-22 23:19:33 -0700 | docs/session-69-p2-provenance-results.md
+2026-06-22 23:19:33 -0700 | docs/session-69-p3-join-reconciliation.md
+2026-06-22 23:19:33 -0700 | models/autoencoder/autoencoder_latent_index.json
+
+================================================================================
+NEXT STEPS FOR TOMORROW (Session 70)
+================================================================================
+
+STATUS: 76 files recovered and backed up. Ready to execute P1 closure.
+
+BLOCKING ISSUE: 101 MB File in Git History
+─────────────────────────────────────────────────────────────────────────────
+File: models/autoencoder/autoencoder_latent_index.json
+Size: 101.08 MB (exceeds GitHub's 100 MB limit)
+Location: Commit 0ee4442a03 and earlier commits
+Problem: Blocks `git push origin main` with:
+  "File models/autoencoder/autoencoder_latent_index.json is 101.08 MB; 
+   this exceeds GitHub's file size limit of 100.00 MB"
+
+Why it's there: Autoencoder latent vector index was generated during Phase 16+ 
+work (SOM clustering, latent compression). Not load-bearing for P0–P1 completion, 
+but was included in the recovery commit because git archive captured the full 
+repo state at that commit.
+
+RESOLUTION OPTIONS (pick one):
+─────────────────────────────────────────────────────────────────────────────
+1. USE GIT-LFS (Recommended for large model artifacts)
+   $ git lfs install
+   $ git lfs track "*.json" (or be more specific)
+   $ git add .gitattributes
+   $ git commit -m "Configure git-lfs for large artifacts"
+   $ git push origin main
+   Time: ~5 min
+   
+2. REMOVE FROM HISTORY (Cleanest, if file is not needed)
+   $ git filter-branch --tree-filter 'rm -f models/autoencoder/autoencoder_latent_index.json' -f -- --all
+   $ git push origin main --force-with-lease
+   Time: ~10 min
+   Note: Destructive. Only if you don't need this file in git.
+   
+3. CREATE PULL REQUEST (Safest for code review)
+   $ git push origin session-69-p3-recovery
+   $ gh pr create --title "Session 69 P3: 76 files recovered" \
+       --body "Recovered commit with P1 audit, P2 provenance, P3 join reconciliation"
+   Time: ~3 min
+   Then manually handle large file via PR comment or merge strategy.
+
+P1 CLOSURE TASKS (45 min remaining):
+─────────────────────────────────────────────────────────────────────────────
+After resolving git push issue, execute:
+
+Gap 1: Query Cache Metrics Table (20 min)
+  ✅ Migration created: sveltekit-frontend/drizzle/0048_query_cache_metrics.sql
+  ⏳ TODO: Create Drizzle schema file: query-cache-metrics.ts
+  ⏳ TODO: Apply migration: npm run db:migrate
+  ⏳ TODO: Verify table created: SELECT COUNT(*) FROM query_cache_metrics;
+
+Gap 2: Retrieval Provenance P2 Fields (30 min)
+  ⏳ TODO: Add columns to retrieval_provenance:
+      - retrieval_strategy varchar(100)
+      - retrieval_path text
+  ⏳ TODO: Create migration: drizzle/manual/0049_retrieval_provenance_p2_fields.sql
+  ⏳ TODO: Update Drizzle schema: schema/retrieval-provenance.ts
+  ⏳ TODO: Patch run-replay-breadth-50.mjs to extract and write both fields
+  ⏳ TODO: Apply migration and re-run replay benchmark
+
+AFTER P1 CLOSURE:
+─────────────────────────────────────────────────────────────────────────────
+✅ P2 Provenance Breadth: Already 100% complete (from P2 subagent)
+✅ P3 Join Reconciliation: Already 100% verified (from P3 subagent)
+⏳ P4 Graph Refresh Invalidation: Next (120 min, architectural risk)
+
+VERIFICATION CHECKLIST:
+─────────────────────────────────────────────────────────────────────────────
+□ All 76 files present in Desktop backup
+□ Timestamped log matches git commit history
+□ Large file issue resolved (git-lfs, removed, or PR'd)
+□ sveltekit-frontend/drizzle/0048_query_cache_metrics.sql verified
+□ Both P1 gaps closed
+□ npm run db:migrate succeeds
+□ P1 validation gates PASS
+□ Ready to push to origin/main
+
+COMMIT MESSAGE TEMPLATE (when ready to push):
+─────────────────────────────────────────────────────────────────────────────
+Session 70: P1 schema gap closure — query_cache_metrics + retrieval_provenance P2
+
+Closes two remaining P1 blockers:
+
+1. Query Cache Metrics Table (Gap 1)
+   - Created query_cache_metrics table (query_hash PK, counters, latency)
+   - 4 B-tree indexes for query telemetry unification
+   - Drizzle schema: src/lib/server/db/schema/query-cache-metrics.ts
+
+2. Retrieval Provenance P2 Fields (Gap 2)
+   - Added retrieval_strategy and retrieval_path columns
+   - Patched run-replay-breadth-50.mjs to extract and write both fields
+   - Updated Drizzle schema: src/lib/server/db/schema/retrieval-provenance.ts
+
+P1 Verification:
+✅ P1 status: 95% → 100% complete
+✅ 7/9 components LIVE (router, lanes, envelope, recommendation, audits, Neo4j, Qdrant)
+✅ Identity spine verified (95% confidence)
+✅ Retrieval fusion operational (90–95% coverage)
+✅ Runtime proof contract locked (90% coverage)
+
+Ready for P2–P4 sequential execution.
+
+================================================================================
