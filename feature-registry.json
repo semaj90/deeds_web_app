@@ -1,0 +1,4491 @@
+{
+  "version": "1.0.0",
+  "generated_at": "2026-06-23T22:32:37.985Z",
+  "total_features": 189,
+  "features": [
+    {
+      "name": "ace-context-fusion",
+      "description": "* ace-context-fusion.mjs\r\n *\r\n * Deterministically merges candidate context from CHR97, TRACE MCP, graph\r\n * expansion, and lexical retrieval into a single ranked context payload.\r\n *\r\n * Usage:\r\n *   node scripts/atlas/ace-context-fusion.mjs --input scratch/trace.json\r\n *   node scripts/atlas/ace-context-fusion.mjs --query \"how does x work?\" --input scratch/candidates.json",
+      "module_type": "utility",
+      "dependencies": [
+        "node:fs/promises",
+        "node:fs",
+        "node:path",
+        "node:url",
+        "node:util"
+      ],
+      "inputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "outputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "performance_metrics": {
+        "throughput": "25 ops/sec",
+        "latency_ms": 138
+      },
+      "training_candidate": false
+    },
+    {
+      "name": "append-llm-synthesis-jsonl",
+      "description": "* append-llm-synthesis-jsonl.mjs\r\n *\r\n * Append a single LLM synthesis event row to the daily JSONL training dataset.\r\n * Used by standalone scripts and smoke tests that cannot import SvelteKit modules.\r\n *\r\n * Usage:\r\n *   node scripts/atlas/append-llm-synthesis-jsonl.mjs --dry-run\r\n *   node scripts/atlas/append-llm-synthesis-jsonl.mjs --runId synth_abc --query \"test\" --profile code_debug --model gemma4-rotorquant:latest",
+      "module_type": "utility",
+      "dependencies": [
+        "node:fs",
+        "node:path"
+      ],
+      "inputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "outputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "performance_metrics": {
+        "throughput": "96 ops/sec",
+        "latency_ms": 37
+      },
+      "training_candidate": false
+    },
+    {
+      "name": "append-temporal-agent-note",
+      "description": "utility",
+      "module_type": "utility",
+      "dependencies": [
+        "fs",
+        "path"
+      ],
+      "inputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "outputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "performance_metrics": {
+        "throughput": "217 ops/sec",
+        "latency_ms": 15
+      },
+      "training_candidate": false
+    },
+    {
+      "name": "append_clusters_to_parent_atlas",
+      "description": "utility",
+      "module_type": "utility",
+      "dependencies": [
+        "fs",
+        "path",
+        "node:url"
+      ],
+      "inputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "outputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "performance_metrics": {
+        "throughput": "152 ops/sec",
+        "latency_ms": 27
+      },
+      "training_candidate": false
+    },
+    {
+      "name": "apply_clusters_via_sql",
+      "description": "utility",
+      "module_type": "utility",
+      "dependencies": [
+        "fs",
+        "url",
+        "path",
+        "pg",
+        "ioredis"
+      ],
+      "inputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "outputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "performance_metrics": {
+        "throughput": "74 ops/sec",
+        "latency_ms": 51
+      },
+      "training_candidate": false
+    },
+    {
+      "name": "apply_upsert_pg",
+      "description": "utility",
+      "module_type": "utility",
+      "dependencies": [
+        "fs",
+        "url",
+        "path",
+        "pg"
+      ],
+      "inputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "outputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "performance_metrics": {
+        "throughput": "104 ops/sec",
+        "latency_ms": 36
+      },
+      "training_candidate": false
+    },
+    {
+      "name": "atlas-answer-trace",
+      "description": "* atlas-answer-trace.mjs\r\n *\r\n * Stage 11 (Orchestrator) of the HyperRAG 4D Topology Knowledge Layer.\r\n * Executes a unified multi-hop retrieval query across all 4 operational lanes:\r\n *   1. Semantic Lane (Qdrant ANN Vector search)\r\n *   2. Graph Lane (Neo4j PageRank and hop traversal)\r\n *   3. Hot Cache Lane (Redis Bifrost ACE Feature cards)\r\n *   4. Mathematical Lane (4D Topology Euclidean Reranking)\r\n *\r\n * Generates an explainable RAG trace containing precise citations and sourceRefs,\r\n * enforcing absolute zero-hidden-thought telemetry guidelines.\r\n *\r\n * Usage:\r\n *   node scripts/atlas/atlas-answer-trace.mjs \\\r\n *     --query \"explain how the kmeans-worker integrates with svelte runes\" \\\r\n *     --collection docs_chunks",
+      "module_type": "utility",
+      "dependencies": [
+        "node:fs",
+        "node:path",
+        "node:url",
+        "ioredis"
+      ],
+      "inputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "outputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "performance_metrics": {
+        "throughput": "45 ops/sec",
+        "latency_ms": 96
+      },
+      "training_candidate": false
+    },
+    {
+      "name": "atlas-cartridge-seed",
+      "description": "* atlas-cartridge-seed.mjs — generate .tmp/atlas-cartridge-seeds.jsonl\n *\n * Reads parent atlas cards produced by `atlas:build` and any available\n * atlas JSONL artifacts, then writes compact seed packets for ACE injection.\n *\n * Runs as a non-fatal step inside graphify:daily — exit code is always 0\n * so that a seed failure never breaks the broader daily pipeline.\n *\n * Flags:\n *   --publish    Write hot seeds to Redis (off by default)\n *   --limit=N    Max seeds to emit (default 500)\n *   --dry-run    Print stats without writing files\n *   --quiet      Suppress non-error console output\n *\n * Outputs:\n *   .tmp/atlas-cartridge-seeds.jsonl      — compressed seed packets (one per line)\n *   .tmp/atlas-cartridge-seed-meta.json  — metadata: seed_count, status, generatedAt\n *\n * Consumed by:\n *   graphify-health.mjs  (reads meta for daily report)\n *   ACE context injection pipeline (reads seeds JSONL)",
+      "module_type": "utility",
+      "dependencies": [
+        "node:fs",
+        "node:fs",
+        "node:path",
+        "node:url",
+        "../../../scripts/atlas/connection-config.mjs"
+      ],
+      "inputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "outputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "performance_metrics": {
+        "throughput": "30 ops/sec",
+        "latency_ms": 131
+      },
+      "training_candidate": false
+    },
+    {
+      "name": "audit-acp-packet-transport",
+      "description": "* ACP Packet Transport Audit: Deterministic structural validation\n *\n * Checks:\n * - hex packet_key validity and length\n * - UTF-8 decode safety\n * - JSON-RPC 2.0 shape compliance\n * - canonical field presence\n * - cache namespace validity\n * - traversal_path array structure\n * - prompt injection risk\n *\n * Emits GAN trigger task if audit fails on critical checks.\n *\n * Usage:\n *   node scripts/atlas/audit-acp-packet-transport.mjs [--sample=100]",
+      "module_type": "auditing",
+      "dependencies": [
+        "pg",
+        "./load-atlas-env.mjs",
+        "fs",
+        "path"
+      ],
+      "inputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "outputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "performance_metrics": {
+        "throughput": "28 ops/sec",
+        "latency_ms": 107
+      },
+      "training_candidate": true
+    },
+    {
+      "name": "audit-atlas-feature-parent-join",
+      "description": "auditing",
+      "module_type": "auditing",
+      "dependencies": [
+        "node:fs/promises",
+        "node:path",
+        "node:url",
+        "pg",
+        "./load-atlas-env.mjs",
+        "../../../scripts/atlas/connection-config.mjs",
+        "../../../scripts/atlas/lib/normalize-source-ref.mjs"
+      ],
+      "inputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "outputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "performance_metrics": {
+        "throughput": "53 ops/sec",
+        "latency_ms": 71
+      },
+      "training_candidate": true
+    },
+    {
+      "name": "audit-concept-evidence-spine",
+      "description": "* Audit the live concept evidence spine.\n *\n * Goal:\n *   Determine whether packet_keys, feature_ids, or evidence_cards are the\n *   authoritative join spine into atlas_packets.\n *\n * Read-only. No mutations.",
+      "module_type": "auditing",
+      "dependencies": [
+        "node:fs/promises",
+        "node:path",
+        "node:url",
+        "pg",
+        "./load-atlas-env.mjs"
+      ],
+      "inputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "outputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "performance_metrics": {
+        "throughput": "38 ops/sec",
+        "latency_ms": 101
+      },
+      "training_candidate": true
+    },
+    {
+      "name": "audit-dynamic-backend-contract",
+      "description": "* audit-dynamic-backend-contract.mjs\n *\n * >20 step backend infrastructure audit for the Parent Atlas system.\n *\n * Uses Docker exec and direct CLI tools (not Node pg module) to avoid\n * schema visibility bugs. Verifies:\n * - Postgres tables (atlas_packets, nes_chrom_packets, atlas_tree_nodes)\n * - Qdrant collection + payload contract\n * - Redis availability\n * - Neo4j graph database\n * - Feature card readiness\n *\n * Exit code 0 = PASS (all gates green)\n * Exit code 1 = FAIL (at least one gate red)",
+      "module_type": "auditing",
+      "dependencies": [
+        "child_process",
+        "fs",
+        "path"
+      ],
+      "inputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "outputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "performance_metrics": {
+        "throughput": "38 ops/sec",
+        "latency_ms": 126
+      },
+      "training_candidate": true
+    },
+    {
+      "name": "audit-engram-adapter-decision",
+      "description": "auditing",
+      "module_type": "auditing",
+      "dependencies": [
+        "node:fs/promises",
+        "node:path",
+        "node:url"
+      ],
+      "inputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "outputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "performance_metrics": {
+        "throughput": "57 ops/sec",
+        "latency_ms": 62
+      },
+      "training_candidate": true
+    },
+    {
+      "name": "audit-feature-lineage",
+      "description": "auditing",
+      "module_type": "auditing",
+      "dependencies": [
+        "node:fs",
+        "node:path",
+        "node:url",
+        "./load-atlas-env.mjs",
+        "../../../scripts/atlas/connection-config.mjs"
+      ],
+      "inputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "outputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "performance_metrics": {
+        "throughput": "7 ops/sec",
+        "latency_ms": 584
+      },
+      "training_candidate": true
+    },
+    {
+      "name": "audit-feature-metadata-columns",
+      "description": "* audit-feature-metadata-columns.mjs\n *\n * Audits all packet/chunk/feature tables to identify missing canonical lineage fields:\n * - feature_id (TEXT, primary grouping)\n * - source_ref (TEXT, multi-hop join)\n * - file_path (TEXT, source identity)\n * - feature_label (TEXT, UI context)\n * - group_id / cluster_id / community_id (hierarchy)\n * - metadata (JSONB, envelope for domain/SOM/tags)\n * - qdrant_tag_id (TEXT, pointer to Qdrant point)\n * - centroid_id (TEXT, SOM centroid)\n * - som_cluster (TEXT, SOM grid cell)\n * - domain (TEXT, domain classification)\n * - updated_at (TIMESTAMP, cache invalidation)",
+      "module_type": "auditing",
+      "dependencies": [
+        "pg",
+        "node:fs",
+        "node:path",
+        "node:url",
+        "../../../scripts/atlas/connection-config.mjs"
+      ],
+      "inputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "outputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "performance_metrics": {
+        "throughput": "50 ops/sec",
+        "latency_ms": 68
+      },
+      "training_candidate": true
+    },
+    {
+      "name": "audit-hidden-packet-pathmap",
+      "description": "auditing",
+      "module_type": "auditing",
+      "dependencies": [
+        "node:fs",
+        "node:path",
+        "node:url"
+      ],
+      "inputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "outputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "performance_metrics": {
+        "throughput": "31 ops/sec",
+        "latency_ms": 139
+      },
+      "training_candidate": true
+    },
+    {
+      "name": "audit-higher-hop-enrichment-live",
+      "description": "* Read-only live higher-hop enrichment audit.\n *\n * Extends the existing higher-hop summary with live Neo4j degree checks,\n * supernode thresholds, and join-hint guidance so traversal lanes stay\n * anchored on packet_key / source_ref_key roots.",
+      "module_type": "auditing",
+      "dependencies": [
+        "node:fs",
+        "node:fs/promises",
+        "node:path",
+        "node:url",
+        "neo4j-driver",
+        "./load-atlas-env.mjs"
+      ],
+      "inputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "outputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "performance_metrics": {
+        "throughput": "32 ops/sec",
+        "latency_ms": 118
+      },
+      "training_candidate": true
+    },
+    {
+      "name": "audit-higher-hop-enrichment",
+      "description": "* Higher-hop enrichment audit.\n *\n * Read-only summary of the remaining lineage gaps after sourceRef / featureId\n * coverage is green. This is intentionally a report-only lane.",
+      "module_type": "auditing",
+      "dependencies": [
+        "node:fs",
+        "node:fs/promises",
+        "node:path",
+        "node:url"
+      ],
+      "inputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "outputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "performance_metrics": {
+        "throughput": "54 ops/sec",
+        "latency_ms": 73
+      },
+      "training_candidate": true
+    },
+    {
+      "name": "audit-jsonl",
+      "description": "auditing",
+      "module_type": "auditing",
+      "dependencies": [
+        "node:fs",
+        "node:path"
+      ],
+      "inputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "outputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "performance_metrics": {
+        "throughput": "74 ops/sec",
+        "latency_ms": 33
+      },
+      "training_candidate": true
+    },
+    {
+      "name": "audit-metadata-contract-across-stores",
+      "description": "* Comprehensive Metadata Contract Audit Across All Stores\n *\n * Goal: Inventory which fields exist, where they exist, and their coverage\n * BEFORE any backfill, index creation, or processing.\n *\n * Containers used:\n * - legal-ai-postgres (PostgreSQL 18)\n * - legal-ai-valkey (Valkey/Redis)\n * - legal-ai-qdrant (Qdrant vector DB)\n * - Neo4j (optional, manual Cypher)\n *\n * Orchestration:\n * - llama-server.exe (Gemma4 legal model) for semantic analysis of audit gaps\n *\n * No mutations. Read-only audit.\n *\n * Usage:\n *   node scripts/atlas/audit-metadata-contract-across-stores.mjs [--orchestrate]\n *\n * Output:\n *   docs/reports/metadata-contract-cross-store-audit.json\n *   docs/reports/metadata-contract-cross-store-audit.md\n *   docs/reports/metadata-contract-orchestration-analysis.md (if --orchestrate)",
+      "module_type": "auditing",
+      "dependencies": [
+        "redis",
+        "node-fetch",
+        "fs",
+        "path",
+        "url",
+        "child_process"
+      ],
+      "inputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "outputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "performance_metrics": {
+        "throughput": "9 ops/sec",
+        "latency_ms": 385
+      },
+      "training_candidate": true
+    },
+    {
+      "name": "audit-node-postgres-context",
+      "description": "* audit-node-postgres-context.mjs\n *\n * Diagnose why Node.js runtime can't see atlas_tree_nodes\n * even though psql confirms it exists in legal_ai_db.\n *\n * Checks database target, search_path, schema visibility,\n * and table existence from the Node perspective.",
+      "module_type": "auditing",
+      "dependencies": [
+        "pg",
+        "fs",
+        "path"
+      ],
+      "inputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "outputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "performance_metrics": {
+        "throughput": "50 ops/sec",
+        "latency_ms": 89
+      },
+      "training_candidate": true
+    },
+    {
+      "name": "audit-parent-atlas-overlay-crosswalk",
+      "description": "auditing",
+      "module_type": "auditing",
+      "dependencies": [
+        "node:fs/promises",
+        "node:fs",
+        "node:path",
+        "node:url"
+      ],
+      "inputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "outputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "performance_metrics": {
+        "throughput": "31 ops/sec",
+        "latency_ms": 107
+      },
+      "training_candidate": true
+    },
+    {
+      "name": "audit-parent-atlas-overlay-sync",
+      "description": "auditing",
+      "module_type": "auditing",
+      "dependencies": [
+        "node:fs/promises",
+        "node:path",
+        "node:url"
+      ],
+      "inputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "outputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "performance_metrics": {
+        "throughput": "50 ops/sec",
+        "latency_ms": 74
+      },
+      "training_candidate": true
+    },
+    {
+      "name": "audit-phase-2-part-4",
+      "description": "* Audit Phase 2 Part 4: Multi-Vector Search + JSONB Metadata + Gemma4 Summarization\n *\n * Checks:\n * - AST signature extraction coverage (extractSignatureFromCode availability)\n * - Metadata v2 schema validation (all Qdrant points)\n * - Multi-vector endpoint wiring (route exists, auth guard, Zod validation)\n * - Redis caching for signatures (L1 cache TTL config)\n * - Qdrant named vectors (content, signature, encoded_64, error)\n * - Gemma4 summarization readiness (ollama availability, batch size config)\n *\n * Usage:\n *   node scripts/atlas/audit-phase-2-part-4.mjs [--save]",
+      "module_type": "auditing",
+      "dependencies": [
+        "node:child_process",
+        "node:fs",
+        "node:path",
+        "node:url"
+      ],
+      "inputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "outputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "performance_metrics": {
+        "throughput": "65 ops/sec",
+        "latency_ms": 63
+      },
+      "training_candidate": true
+    },
+    {
+      "name": "audit-postgres-contract-mirrors",
+      "description": "auditing",
+      "module_type": "auditing",
+      "dependencies": [
+        "node:fs/promises",
+        "node:path",
+        "node:url",
+        "pg",
+        "../../../scripts/atlas/connection-config.mjs"
+      ],
+      "inputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "outputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "performance_metrics": {
+        "throughput": "19 ops/sec",
+        "latency_ms": 211
+      },
+      "training_candidate": true
+    },
+    {
+      "name": "audit-qdrant-payload-contract",
+      "description": "* audit-qdrant-payload-contract.mjs\n *\n * Audit Qdrant codebase_chunks_768 payload coverage against Phase 4 canonical contract.\n *\n * Phase 4 requirements:\n * - feature_id: 100% ✅\n * - source_ref: 100% ✅\n * - packet_key: 100% ✅\n * - feature_label: ≥90%\n * - file_path: ≥90%\n * - cluster_id: ≥80%\n * - domain_class: ≥80%\n *\n * Usage:\n *   npm run atlas:4c:qdrant-contract:audit\n *   npm run atlas:4c:qdrant-contract:audit -- --full",
+      "module_type": "auditing",
+      "dependencies": [
+        "node:fs",
+        "node:path",
+        "node:url"
+      ],
+      "inputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "outputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "performance_metrics": {
+        "throughput": "43 ops/sec",
+        "latency_ms": 75
+      },
+      "training_candidate": true
+    },
+    {
+      "name": "audit-runtime-coverage",
+      "description": "* Read-only runtime coverage audit.\n *\n * Joins the existing feature-lineage and route-runtime-packet reports with\n * live agent_traces coverage so we can see whether the learning lane is\n * actually populated.",
+      "module_type": "auditing",
+      "dependencies": [
+        "node:fs",
+        "node:fs/promises",
+        "node:path",
+        "node:url",
+        "pg",
+        "./load-atlas-env.mjs",
+        "../../../scripts/atlas/connection-config.mjs"
+      ],
+      "inputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "outputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "performance_metrics": {
+        "throughput": "54 ops/sec",
+        "latency_ms": 81
+      },
+      "training_candidate": true
+    },
+    {
+      "name": "audit-runtime-packet-density",
+      "description": "* Read-only auditor for route_runtime_packets density.\n * Measures how much semantic payload survived compared with structural pointers.",
+      "module_type": "auditing",
+      "dependencies": [
+        "node:fs",
+        "node:path",
+        "node:url",
+        "pg",
+        "./load-atlas-env.mjs"
+      ],
+      "inputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "outputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "performance_metrics": {
+        "throughput": "37 ops/sec",
+        "latency_ms": 91
+      },
+      "training_candidate": true
+    },
+    {
+      "name": "audit-som-coordinate-coverage",
+      "description": "auditing",
+      "module_type": "auditing",
+      "dependencies": [
+        "node:fs/promises",
+        "node:path",
+        "node:url",
+        "pg",
+        "./load-atlas-env.mjs"
+      ],
+      "inputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "outputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "performance_metrics": {
+        "throughput": "15 ops/sec",
+        "latency_ms": 255
+      },
+      "training_candidate": true
+    },
+    {
+      "name": "audit-som-coverage-gaps",
+      "description": "auditing",
+      "module_type": "auditing",
+      "dependencies": [
+        "node:child_process",
+        "node:path",
+        "node:url"
+      ],
+      "inputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "outputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "performance_metrics": {
+        "throughput": "588 ops/sec",
+        "latency_ms": 5
+      },
+      "training_candidate": true
+    },
+    {
+      "name": "audit-tree-nodes",
+      "description": "* Phase D Gate: Tree Node Audit\n *\n * Validates tree node ingestion before Phase D Qdrant enrichment.\n * Gate PASS conditions:\n * - atlas_tree_nodes row_count > 0\n * - node_id uniqueness verified\n * - source_ref links to atlas_packets\n * - tree structure integrity (no orphaned nodes)\n * - max depth reasonable",
+      "module_type": "auditing",
+      "dependencies": [
+        "pg",
+        "dotenv",
+        "url",
+        "path"
+      ],
+      "inputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "outputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "performance_metrics": {
+        "throughput": "40 ops/sec",
+        "latency_ms": 81
+      },
+      "training_candidate": true
+    },
+    {
+      "name": "audit-turbovec-cuvs-readiness",
+      "description": "* audit-turbovec-cuvs-readiness.mjs\n *\n * Check readiness for TurboVec (Stage 1.5) and cuVS (GPU vector similarity) deployment:\n * - HTTP health check on TurboVec sidecar (:50062)\n * - Qdrant collection status (:6333)\n * - Verify tensorrt_bridge.node addon is available and loads\n * - Check cuVS library presence and compression support\n * - Validate payload structure for reranking\n *\n * Output: readiness report with blockers and recommendations\n *\n * No mutations. Read-only audit.",
+      "module_type": "auditing",
+      "dependencies": [
+        "node:fs/promises",
+        "node:path",
+        "node:url",
+        "node:module",
+        "./load-atlas-env.mjs"
+      ],
+      "inputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "outputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "performance_metrics": {
+        "throughput": "28 ops/sec",
+        "latency_ms": 130
+      },
+      "training_candidate": true
+    },
+    {
+      "name": "backfill-atlas-packets-feature-id",
+      "description": "* backfill-atlas-packets-feature-id.mjs\n *\n * Backfill missing feature_id in atlas_packets by deriving from available fields.\n *\n * Priority order:\n * 1. Existing source_ref (parse directory)\n * 2. packet_key (parse structure)\n * 3. source_ref_key\n * 4. payload.source_refs JSONB array\n * 5. file_path\n * 6. Hash fallback\n *\n * IMPORTANT: Do NOT join nes_chrom_packets by feature_id (cartesian explosion).\n * nes_chrom_packets and atlas_packets are parallel ledgers, not merged.\n *\n * Modes:\n *   --verify          Count missing, estimate coverage (default)\n *   --dry-run         Show sample updates without applying\n *   --apply           Apply updates to database\n *   --limit N         Process max N rows\n *\n * Usage:\n *   npm run atlas:atlas-packets:feature-id:verify\n *   npm run atlas:atlas-packets:feature-id:backfill -- --limit 25\n *   npm run atlas:atlas-packets:feature-id:backfill:apply -- --limit 25",
+      "module_type": "data backfill",
+      "dependencies": [
+        "pg",
+        "crypto",
+        "node:fs",
+        "node:path",
+        "node:url",
+        "../../../scripts/atlas/connection-config.mjs"
+      ],
+      "inputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "outputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "performance_metrics": {
+        "throughput": "30 ops/sec",
+        "latency_ms": 112
+      },
+      "training_candidate": false
+    },
+    {
+      "name": "backfill-concept-evidence-spine",
+      "description": "* Backfill concept_records.evidence_cards from the live packet spine.\n *\n * This lane repairs historical rows where evidence_cards still point at legacy\n * concept card IDs instead of the current packet spine. The canonical write path\n * is now packet_keys / feature_ids, so this script only promotes evidence_cards\n * when a better live mapping exists.\n *\n * Rules:\n * - dry-run by default\n * - --apply required to mutate\n * - --limit supported\n * - write backup/report before any mutation\n * - do not create concepts\n * - do not overwrite non-stale evidence without an improved mapping",
+      "module_type": "data backfill",
+      "dependencies": [
+        "node:fs",
+        "node:fs/promises",
+        "node:path",
+        "node:url",
+        "pg",
+        "./load-atlas-env.mjs",
+        "../../../scripts/atlas/connection-config.mjs"
+      ],
+      "inputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "outputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "performance_metrics": {
+        "throughput": "42 ops/sec",
+        "latency_ms": 86
+      },
+      "training_candidate": false
+    },
+    {
+      "name": "backfill-feature-metadata",
+      "description": "* Backfill feature_id and metadata in atlas tables\n *\n * Tier 1 tables (required join key: source_ref or file_path):\n *   - atlas_packets\n *   - nes_chrom_packets\n *   - glyph_records\n *   - codebase_chunk_index\n *\n * Usage:\n *   npm run atlas:feature-metadata:verify\n *   npm run atlas:feature-metadata:backfill\n *   npm run atlas:feature-metadata:backfill:apply\n *   npm run atlas:feature-metadata:backfill -- --limit 100 --apply",
+      "module_type": "data backfill",
+      "dependencies": [
+        "pg",
+        "fs",
+        "path",
+        "node:url",
+        "../../../scripts/atlas/connection-config.mjs",
+        "../../../scripts/atlas/lib/normalize-source-ref.mjs"
+      ],
+      "inputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "outputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "performance_metrics": {
+        "throughput": "19 ops/sec",
+        "latency_ms": 176
+      },
+      "training_candidate": false
+    },
+    {
+      "name": "backfill-lineage-version",
+      "description": "data backfill",
+      "module_type": "data backfill",
+      "dependencies": [
+        "pg",
+        "@qdrant/js-client-rest",
+        "ioredis",
+        "dotenv",
+        "path",
+        "fs",
+        "url"
+      ],
+      "inputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "outputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "performance_metrics": {
+        "throughput": "48 ops/sec",
+        "latency_ms": 77
+      },
+      "training_candidate": false
+    },
+    {
+      "name": "backfill-missing-source-refs",
+      "description": "* backfill-missing-source-refs.mjs\n *\n * Backfill source_ref for packets missing this critical identity field.\n *\n * Strategy:\n * 1. Packets with real feature_id → derive source_ref from feature metadata or nes_chrom mapping\n * 2. Packets with unclassified_packet → mark as \"synthetic\" or \"unclassified\"\n * 3. Packets with domain/tags → infer from semantic metadata",
+      "module_type": "data backfill",
+      "dependencies": [
+        "pg",
+        "node:path",
+        "node:url"
+      ],
+      "inputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "outputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "performance_metrics": {
+        "throughput": "48 ops/sec",
+        "latency_ms": 56
+      },
+      "training_candidate": false
+    },
+    {
+      "name": "backfill-packet-metadata-to-postgres",
+      "description": "data backfill",
+      "module_type": "data backfill",
+      "dependencies": [
+        "node:fs/promises",
+        "node:path",
+        "node:url"
+      ],
+      "inputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "outputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "performance_metrics": {
+        "throughput": "42 ops/sec",
+        "latency_ms": 73
+      },
+      "training_candidate": false
+    },
+    {
+      "name": "backfill-packets-embeddings-pool",
+      "description": "* P3g: Backfill Qdrant embeddings for 15,507 packets without qdrant_point_id\n *\n * Workers:\n * - Fetch packet metadata from Postgres\n * - Embed via Ollama embeddinggemma:latest\n * - Upsert to Qdrant codebase_chunks_768\n * - Update atlas_packets.qdrant_point_id\n *\n * Usage:\n *   node scripts/atlas/backfill-packets-embeddings-pool.mjs --dry-run --sample=100\n *   node scripts/atlas/backfill-packets-embeddings-pool.mjs --apply --workers=4 --batch-size=100",
+      "module_type": "data backfill",
+      "dependencies": [
+        "pg",
+        "node-fetch",
+        "@qdrant/js-client-rest",
+        "./load-atlas-env.mjs"
+      ],
+      "inputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "outputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "performance_metrics": {
+        "throughput": "35 ops/sec",
+        "latency_ms": 94
+      },
+      "training_candidate": false
+    },
+    {
+      "name": "backfill-qdrant-payload-complete",
+      "description": "* Backfill the canonical Phase D/E Qdrant payload contract.\n *\n * Canonical payload fields written on matched points:\n * - packet_key / packetKey\n * - source_ref / sourceRef / canonicalSourceRef / sourceRefs[]\n * - file_path / filePath / path\n * - feature_id / featureId / feature_ids[]\n * - feature_label / featureLabel\n * - community_id / communityId / community_confidence\n * - som_cluster / cluster_id / centroid_id\n * - qdrant_payload_version\n * - lineage_version\n * - ledger_type\n * - canonical\n * - payload_backfilled_at\n *\n * Matching order:\n * 1. source_ref\n * 2. file_path / path\n * 3. packet_key\n * Never feature_id alone.\n *\n * If a point cannot be matched to live Postgres:\n * - preserve the existing payload\n * - mark ledger_type = \"legacy_qdrant_only\"\n * - canonical = false\n * - payload_unmatched = true",
+      "module_type": "data backfill",
+      "dependencies": [
+        "node:fs/promises",
+        "node:path",
+        "node:url",
+        "pg",
+        "../lib/qdrant-client.mjs",
+        "./load-atlas-env.mjs",
+        "../../../scripts/atlas/connection-config.mjs",
+        "./canonical-source-ref.mjs"
+      ],
+      "inputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "outputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "performance_metrics": {
+        "throughput": "8 ops/sec",
+        "latency_ms": 422
+      },
+      "training_candidate": false
+    },
+    {
+      "name": "backfill-qdrant-source-refs",
+      "description": "data backfill",
+      "module_type": "data backfill",
+      "dependencies": [
+        "node:fs",
+        "node:path",
+        "pg",
+        "dotenv",
+        "../lib/qdrant-client.mjs"
+      ],
+      "inputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "outputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "performance_metrics": {
+        "throughput": "45 ops/sec",
+        "latency_ms": 75
+      },
+      "training_candidate": false
+    },
+    {
+      "name": "backfill-som-coordinates-from-report",
+      "description": "data backfill",
+      "module_type": "data backfill",
+      "dependencies": [
+        "node:fs/promises",
+        "node:path",
+        "node:url",
+        "./load-atlas-env.mjs"
+      ],
+      "inputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "outputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "performance_metrics": {
+        "throughput": "54 ops/sec",
+        "latency_ms": 56
+      },
+      "training_candidate": false
+    },
+    {
+      "name": "backfill-som-from-existing-topology",
+      "description": "data backfill",
+      "module_type": "data backfill",
+      "dependencies": [
+        "node:child_process",
+        "node:path",
+        "node:url"
+      ],
+      "inputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "outputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "performance_metrics": {
+        "throughput": "588 ops/sec",
+        "latency_ms": 5
+      },
+      "training_candidate": false
+    },
+    {
+      "name": "backfill-source-ref-hashes",
+      "description": "* @module backfill-source-ref-hashes\n * @description Script to run a one-time, non-destructive audit and backfill of SourceReference hashes across all connected data stores.\n * This must be run after canonical-source-ref.mjs is stable.",
+      "module_type": "data backfill",
+      "dependencies": [],
+      "inputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "outputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "performance_metrics": {
+        "throughput": "179 ops/sec",
+        "latency_ms": 19
+      },
+      "training_candidate": false
+    },
+    {
+      "name": "benchmark-gpu-primitives",
+      "description": "* benchmark-gpu-primitives.mjs\n *\n * Deterministic GPU primitive benchmark lane for Parent Atlas.\n * Read-only by default.\n *\n * Benchmarks:\n *   - autoencoderEncodeGPU (768->128, 128->64)\n *   - trainSOM\n *   - pageRankGPU\n *   - kmeansWithCentroids\n *   - attentionScoreGPU\n *   - rewardScoreGPU\n *   - softmaxGPU\n *   - topKIndices\n *   - pcaProjectGPU (optional topology projection check)\n *\n * Outputs:\n *   docs/reports/gpu-primitives-benchmark.json\n *   docs/reports/gpu-primitives-benchmark.md\n *   .tmp/gpu-primitives-benchmark.json\n *   .tmp/gpu-primitives-benchmark.md",
+      "module_type": "utility",
+      "dependencies": [
+        "node:fs",
+        "node:path",
+        "node:url",
+        "node:module",
+        "node:perf_hooks",
+        "node:crypto",
+        "node:child_process",
+        "./load-atlas-env.mjs",
+        "./lib/redis-valkey.mjs"
+      ],
+      "inputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "outputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "performance_metrics": {
+        "throughput": "11 ops/sec",
+        "latency_ms": 350
+      },
+      "training_candidate": false
+    },
+    {
+      "name": "benchmark-retrieval-e2e",
+      "description": "* benchmark-retrieval-e2e.mjs\n *\n * Runs a golden query set through hyperragPacketRpc, recording per-lane latency\n * and hit quality from atlas_retrieval_eval_times. Compares cache-hit vs live path.\n *\n * Outputs:\n *   .tmp/benchmark-retrieval-e2e.json     — full results\n *   .tmp/benchmark-retrieval-e2e.txt      — human-readable summary\n *\n * Flags:\n *   --verbose      print per-query breakdown\n *   --limit=N      packets per query (default: 5)\n *   --queries=path path to JSONL file of {\"query\":\"...\"} lines (optional)",
+      "module_type": "utility",
+      "dependencies": [
+        "node:fs",
+        "node:path",
+        "node:url",
+        "node:perf_hooks"
+      ],
+      "inputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "outputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "performance_metrics": {
+        "throughput": "32 ops/sec",
+        "latency_ms": 129
+      },
+      "training_candidate": false
+    },
+    {
+      "name": "build-atlas-feature-map",
+      "description": "utility",
+      "module_type": "utility",
+      "dependencies": [
+        "pg",
+        "dotenv",
+        "node:path",
+        "node:url"
+      ],
+      "inputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "outputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "performance_metrics": {
+        "throughput": "40 ops/sec",
+        "latency_ms": 93
+      },
+      "training_candidate": false
+    },
+    {
+      "name": "build-feature-summaries",
+      "description": "* build-feature-summaries.mjs\n *\n * MapReduce pipeline: atlas_packets → feature summaries → feature cards\n * Output: docs/reports/atlas-feature-cards.json\n *\n * Usage:\n *   npm run atlas:summaries:mapreduce          # dry-run\n *   npm run atlas:summaries:mapreduce:apply    # apply to DB",
+      "module_type": "utility",
+      "dependencies": [
+        "node:fs",
+        "node:path",
+        "node:url",
+        "pg"
+      ],
+      "inputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "outputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "performance_metrics": {
+        "throughput": "44 ops/sec",
+        "latency_ms": 63
+      },
+      "training_candidate": false
+    },
+    {
+      "name": "build-function-registry",
+      "description": "* build-function-registry.mjs\n *\n * Scans the key layers of the deeds-web-app codebase and emits:\n *   docs/atlas/function-registry.md       — human-readable lane catalogue\n *   docs/atlas/lane-to-function-map.json  — machine-readable per-file entries\n *\n * Run:\n *   node scripts/atlas/build-function-registry.mjs\n *   node scripts/atlas/build-function-registry.mjs --verbose\n *   node scripts/atlas/build-function-registry.mjs --dry-run\n *\n * Anti-duplication contract:\n *   Before creating a new file or function, search lane-to-function-map.json.\n *   If an entry already covers ≥60% of the job, REUSE it.",
+      "module_type": "utility",
+      "dependencies": [
+        "node:fs",
+        "node:path",
+        "node:url"
+      ],
+      "inputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "outputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "performance_metrics": {
+        "throughput": "30 ops/sec",
+        "latency_ms": 117
+      },
+      "training_candidate": false
+    },
+    {
+      "name": "build-manifold-autocoder",
+      "description": "* scripts/atlas/build-manifold-autocoder.mjs\n * \n * Builds dense bit-glyphs (HMM-style) for clusters to enable rapid neighbor detection.",
+      "module_type": "utility",
+      "dependencies": [
+        "../../src/lib/server/redis.js",
+        "node:fs",
+        "node:path"
+      ],
+      "inputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "outputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "performance_metrics": {
+        "throughput": "222 ops/sec",
+        "latency_ms": 15
+      },
+      "training_candidate": false
+    },
+    {
+      "name": "build-parent-atlas-cards",
+      "description": "utility",
+      "module_type": "utility",
+      "dependencies": [
+        "fs/promises",
+        "fs",
+        "path"
+      ],
+      "inputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "outputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "performance_metrics": {
+        "throughput": "103 ops/sec",
+        "latency_ms": 31
+      },
+      "training_candidate": false
+    },
+    {
+      "name": "build-rg-search-matrix",
+      "description": "* build-rg-search-matrix.mjs\r\n *\r\n * Stage 2 of the ACE Feature Context Matrix pipeline.\r\n * Reads an NDJSON chunk file (output of chunk-text-notes.mjs) and enriches\r\n * each record with rg (ripgrep) search results to map:\r\n *\r\n *   chunk text → related codebase file paths → feature / error / symbol refs\r\n *\r\n * This gives every chunk a `rg_paths` array: the set of actual source files\r\n * that mention the symbols/errors/features in that chunk. These paths feed\r\n * the Neo4j projection and Qdrant filter stages.\r\n *\r\n * Usage:\r\n *   node scripts/atlas/build-rg-search-matrix.mjs \\\r\n *     --input tmp/chunks/error-context.ndjson \\\r\n *     --out tmp/chunks/error-context-rg.ndjson \\\r\n *     --root .\r\n *   node scripts/atlas/build-rg-search-matrix.mjs \\\r\n *     --input tmp/chunks/error-context.ndjson --dry-run\r\n *\r\n * Output adds to each record:\r\n *   rg_paths:      string[]   // src/... paths found by rg\r\n *   rg_terms:      string[]   // the search terms that fired\r\n *   rg_query:      string     // the combined rg pattern used\r\n *\r\n * Requires: ripgrep (rg) in PATH, or falls back to a pure JS grep.",
+      "module_type": "utility",
+      "dependencies": [
+        "node:fs",
+        "node:path",
+        "node:crypto",
+        "node:child_process",
+        "node:url"
+      ],
+      "inputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "outputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "performance_metrics": {
+        "throughput": "49 ops/sec",
+        "latency_ms": 82
+      },
+      "training_candidate": false
+    },
+    {
+      "name": "build-route-feature-map",
+      "description": "* scripts/atlas/build-route-feature-map.mjs\n * \n * Automatically builds the ROUTE_FEATURE_MAP by scanning src/routes.",
+      "module_type": "utility",
+      "dependencies": [
+        "node:fs",
+        "node:path"
+      ],
+      "inputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "outputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "performance_metrics": {
+        "throughput": "89 ops/sec",
+        "latency_ms": 31
+      },
+      "training_candidate": false
+    },
+    {
+      "name": "build-sveltekit-route-map",
+      "description": "utility",
+      "module_type": "utility",
+      "dependencies": [
+        "node:fs",
+        "node:path",
+        "node:url"
+      ],
+      "inputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "outputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "performance_metrics": {
+        "throughput": "34 ops/sec",
+        "latency_ms": 109
+      },
+      "training_candidate": false
+    },
+    {
+      "name": "build-task-distillates-v2",
+      "description": "* scripts/atlas/build-task-distillates.mjs\n * \n * Generates actionable \"task distillates\" from manual mappings and cluster data.",
+      "module_type": "utility",
+      "dependencies": [
+        "node:fs",
+        "node:path"
+      ],
+      "inputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "outputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "performance_metrics": {
+        "throughput": "119 ops/sec",
+        "latency_ms": 29
+      },
+      "training_candidate": false
+    },
+    {
+      "name": "build-task-distillates",
+      "description": "* scripts/atlas/build-task-distillates.mjs\n * \n * Generates actionable \"task distillates\" from hypergraph cluster analysis\n * and manual task mappings for common operations in the Deeds codebase.",
+      "module_type": "utility",
+      "dependencies": [
+        "node:fs",
+        "node:path"
+      ],
+      "inputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "outputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "performance_metrics": {
+        "throughput": "95 ops/sec",
+        "latency_ms": 37
+      },
+      "training_candidate": false
+    },
+    {
+      "name": "cache-feature-cards",
+      "description": "* cache-feature-cards.mjs\r\n *\r\n * Stage 6 of the ACE Feature Context Matrix pipeline.\r\n * Reads an NDJSON chunk file and writes compact feature card packets to Redis\r\n * under the keys defined in the ACE Feature Context Matrix spec:\r\n *\r\n *   ace:feature:{featureKey}   — aggregated card for a feature (all chunks)\r\n *   ace:error:{errorHash}      — card for a specific error code/pattern\r\n *   ace:rg:{queryHash}         — card for a specific rg search pattern\r\n *\r\n * Each card is a JSON string containing:\r\n *   - feature_key, tags, source_type\r\n *   - chunk_ids[], file_refs[], rg_paths[]\r\n *   - top_snippets (first 3 chunk texts, truncated to 300 chars each)\r\n *   - indexed_at\r\n *\r\n * Cards deliberately EXCLUDE raw vectors / GPU tensors — Redis is hot cache only.\r\n *\r\n * Usage:\r\n *   node scripts/atlas/cache-feature-cards.mjs \\\r\n *     --input tmp/chunks/error-context.ndjson \\\r\n *     --prefix ace:feature \\\r\n *     --ttl 86400\r\n *   node scripts/atlas/cache-feature-cards.mjs \\\r\n *     --input tmp/chunks/notes.ndjson --dry-run\r\n *\r\n * Env:\r\n *   REDIS_URL   default redis://localhost:6379",
+      "module_type": "utility",
+      "dependencies": [
+        "node:fs",
+        "node:path",
+        "node:crypto",
+        "node:url",
+        "ioredis"
+      ],
+      "inputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "outputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "performance_metrics": {
+        "throughput": "41 ops/sec",
+        "latency_ms": 92
+      },
+      "training_candidate": false
+    },
+    {
+      "name": "cache-hypergraph-cluster-cards",
+      "description": "* cache-hypergraph-cluster-cards.mjs\n * \n * Part of the Atlas topological retrieval infrastructure.\n * populates the Redis ace:cluster:* cache with human-readable \n * distillates derived from the hypergraph cluster digest.",
+      "module_type": "utility",
+      "dependencies": [
+        "node:fs",
+        "node:path",
+        "ioredis"
+      ],
+      "inputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "outputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "performance_metrics": {
+        "throughput": "139 ops/sec",
+        "latency_ms": 22
+      },
+      "training_candidate": false
+    },
+    {
+      "name": "cache-task-distillates-redis-v2",
+      "description": "* scripts/atlas/cache-task-distillates-redis.mjs\n * \n * Caches v2 task cards in Redis.",
+      "module_type": "utility",
+      "dependencies": [
+        "node:fs",
+        "node:path",
+        "redis"
+      ],
+      "inputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "outputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "performance_metrics": {
+        "throughput": "238 ops/sec",
+        "latency_ms": 12
+      },
+      "training_candidate": false
+    },
+    {
+      "name": "cache-task-distillates-redis",
+      "description": "* scripts/atlas/cache-task-distillates-redis.mjs\n * \n * Caches task distillates in Redis for low-latency retrieval \n * during HyperRAG synthesis.",
+      "module_type": "utility",
+      "dependencies": [
+        "node:fs",
+        "node:path",
+        "redis"
+      ],
+      "inputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "outputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "performance_metrics": {
+        "throughput": "196 ops/sec",
+        "latency_ms": 14
+      },
+      "training_candidate": false
+    },
+    {
+      "name": "canonical-source-ref",
+      "description": "* @module canonical-source-ref\n * @description Canonical SourceRef utilities for Qdrant, Neo4j, Atlas, CHR97, Valkey, and NDJSON alignment.",
+      "module_type": "utility",
+      "dependencies": [
+        "node:crypto",
+        "node:path"
+      ],
+      "inputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "outputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "performance_metrics": {
+        "throughput": "103 ops/sec",
+        "latency_ms": 23
+      },
+      "training_candidate": false
+    },
+    {
+      "name": "capture-retrieval-telemetry",
+      "description": "utility",
+      "module_type": "utility",
+      "dependencies": [
+        "node:crypto",
+        "node:path",
+        "node:url",
+        "./load-atlas-env.mjs"
+      ],
+      "inputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "outputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "performance_metrics": {
+        "throughput": "73 ops/sec",
+        "latency_ms": 53
+      },
+      "training_candidate": false
+    },
+    {
+      "name": "check-live-service-env",
+      "description": "utility",
+      "module_type": "utility",
+      "dependencies": [
+        "node:fs/promises",
+        "node:net",
+        "node:path",
+        "node:url",
+        "../../../scripts/atlas/connection-config.mjs"
+      ],
+      "inputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "outputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "performance_metrics": {
+        "throughput": "35 ops/sec",
+        "latency_ms": 116
+      },
+      "training_candidate": false
+    },
+    {
+      "name": "chunk-text-notes",
+      "description": "* chunk-text-notes.mjs\r\n *\r\n * Stage 1 of the ACE Feature Context Matrix ingestion pipeline.\r\n * Reads a .txt or .md input file (e.g. rg output, error logs, docs) and\r\n * splits it into overlapping chunks suitable for embedding.\r\n *\r\n * Chunk strategy:\r\n *   - Split on blank lines (paragraph/block boundaries)\r\n *   - If a block is > MAX_CHARS, split further at sentence endings\r\n *   - Attach source_path, chunk_index, char_offset to every record\r\n *   - Preserve file path references found inside rg output blocks\r\n *   - Emit NDJSON to --out path (or stdout if omitted)\r\n *\r\n * Usage:\r\n *   node scripts/atlas/chunk-text-notes.mjs --input tmp/rg-error-context.txt \\\r\n *     --out tmp/chunks/error-context.ndjson\r\n *   node scripts/atlas/chunk-text-notes.mjs --input docs/todo/notes.md \\\r\n *     --out tmp/chunks/notes.ndjson --source-type docs\r\n *   node scripts/atlas/chunk-text-notes.mjs --input - < notes.txt   # stdin\r\n *\r\n * Output NDJSON record shape:\r\n *   {\r\n *     chunk_id:    string          // sha256(source_path + chunk_index)\r\n *     source_path: string          // --input path or \"stdin\"\r\n *     source_type: string          // \"rg_output\"|\"error_log\"|\"docs\"|\"notes\"|inferred\r\n *     chunk_index: number\r\n *     char_offset: number\r\n *     text:        string\r\n *     tags:        string[]        // inferred from content keywords\r\n *     file_refs:   string[]        // file paths found in the text block\r\n *     word_count:  number\r\n *   }",
+      "module_type": "utility",
+      "dependencies": [
+        "node:fs",
+        "node:path",
+        "node:readline",
+        "node:crypto",
+        "node:url"
+      ],
+      "inputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "outputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "performance_metrics": {
+        "throughput": "35 ops/sec",
+        "latency_ms": 113
+      },
+      "training_candidate": false
+    },
+    {
+      "name": "classify-qdrant-missing-packets",
+      "description": "* P3g Classifier: Categorize 15,507 missing packets before embedding\n *\n * Do NOT embed blindly. Classify first:\n * - join_repair_possible: Qdrant point exists, needs Postgres mirror\n * - qdrant_payload_match_possible: Payload exists, qdrant_point_id missing\n * - needs_embedding: Text exists, no Qdrant entry\n * - non_vector_identity: schema_stub / intent_alias / mcp_tool_stub (skip)\n * - generated_or_docs: Auto-generated or documentation (skip)\n * - missing_text: No content to embed (skip)\n * - ambiguous: Unclear classification (manual review)\n *\n * Usage:\n *   node scripts/atlas/classify-qdrant-missing-packets.mjs",
+      "module_type": "utility",
+      "dependencies": [
+        "pg",
+        "node-fetch",
+        "@qdrant/js-client-rest",
+        "./load-atlas-env.mjs",
+        "fs",
+        "path",
+        "url"
+      ],
+      "inputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "outputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "performance_metrics": {
+        "throughput": "25 ops/sec",
+        "latency_ms": 147
+      },
+      "training_candidate": false
+    },
+    {
+      "name": "classify-qdrant-missing-packets.mjs",
+      "description": "utility",
+      "module_type": "utility",
+      "dependencies": [
+        "node:fs",
+        "node:path",
+        "node:crypto",
+        "node:child_process",
+        "pg"
+      ],
+      "inputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "outputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "performance_metrics": {
+        "throughput": "30 ops/sec",
+        "latency_ms": 94
+      },
+      "training_candidate": false
+    },
+    {
+      "name": "classify-qdrant-orphans",
+      "description": "* classify-qdrant-orphans.mjs\n *\n * Classify Qdrant points into:\n * - canonical_matched: has both source_ref + packet_key (enriched by backfill)\n * - legacy_qdrant_only: has source_ref but no packet_key (pre-backfill Qdrant points)\n * - missing_source_ref: no source_ref/path\n * - missing_packet_key: has source_ref but no packet_key\n * - unknown: other state",
+      "module_type": "utility",
+      "dependencies": [
+        "pg"
+      ],
+      "inputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "outputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "performance_metrics": {
+        "throughput": "88 ops/sec",
+        "latency_ms": 46
+      },
+      "training_candidate": false
+    },
+    {
+      "name": "codebase-ingester-unified",
+      "description": "utility",
+      "module_type": "utility",
+      "dependencies": [
+        "fs",
+        "path"
+      ],
+      "inputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "outputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "performance_metrics": {
+        "throughput": "76 ops/sec",
+        "latency_ms": 48
+      },
+      "training_candidate": false
+    },
+    {
+      "name": "collect-runtime-evidence",
+      "description": "* Collect runtime evidence for proof-depth lanes.\n *\n * Thin orchestrator:\n *   1. run-replay-breadth-50.mjs\n *   2. materialize-provenance-tree.mjs\n *   3. logger-parent-atlas-health.mjs\n *\n * This stays read-only and does not sample Qdrant points directly.",
+      "module_type": "utility",
+      "dependencies": [
+        "node:fs/promises",
+        "node:path",
+        "node:url",
+        "node:child_process"
+      ],
+      "inputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "outputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "performance_metrics": {
+        "throughput": "75 ops/sec",
+        "latency_ms": 50
+      },
+      "training_candidate": false
+    },
+    {
+      "name": "compress-manifold-vectors",
+      "description": "* scripts/atlas/compress-manifold-vectors.mjs\n * \n * GPU Autoencoding: Compresses 768d Qdrant vectors to 64d using the trained autoencoder.\n * Stores result in codebase_chunks_64d collection.",
+      "module_type": "utility",
+      "dependencies": [
+        "../../src/lib/server/redis.ts"
+      ],
+      "inputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "outputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "performance_metrics": {
+        "throughput": "100 ops/sec",
+        "latency_ms": 31
+      },
+      "training_candidate": false
+    },
+    {
+      "name": "concept-evidence-audit",
+      "description": "* concept-evidence-audit.mjs\n *\n * Audit the 10 canonical concepts for completeness:\n * - All 10 concepts present in atlas_concept_labels\n * - Each concept has ≥95% feature_id coverage (packet join)\n * - Evidence cards are valid and present for each concept\n * - Concept taxonomy is internally consistent\n *\n * Gates:\n * 1. All 10 concepts defined: feature_id, label, description\n * 2. Feature ID join coverage: ≥95% (packets that reference this concept)\n * 3. Evidence cards valid JSON: 100%\n * 4. At least 1 evidence card per concept\n *\n * Read-only. No mutations.",
+      "module_type": "utility",
+      "dependencies": [
+        "node:fs/promises",
+        "node:path",
+        "node:url",
+        "pg",
+        "./load-atlas-env.mjs"
+      ],
+      "inputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "outputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "performance_metrics": {
+        "throughput": "42 ops/sec",
+        "latency_ms": 80
+      },
+      "training_candidate": false
+    },
+    {
+      "name": "concept-evidence-backfill",
+      "description": "* concept-evidence-backfill.mjs\n *\n * Backfill concept records and evidence cards into atlas_concept_labels table:\n * - Create or update concept definition records\n * - Populate evidence_cards JSON for each concept\n * - Backfill feature_id -> concept associations\n * - Validate all records before apply\n *\n * Dry-run by default. --apply to persist.",
+      "module_type": "utility",
+      "dependencies": [
+        "node:fs/promises",
+        "node:path",
+        "node:url",
+        "pg",
+        "./load-atlas-env.mjs"
+      ],
+      "inputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "outputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "performance_metrics": {
+        "throughput": "33 ops/sec",
+        "latency_ms": 104
+      },
+      "training_candidate": false
+    },
+    {
+      "name": "count_parent_atlas",
+      "description": "utility",
+      "module_type": "utility",
+      "dependencies": [
+        "fs",
+        "path"
+      ],
+      "inputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "outputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "performance_metrics": {
+        "throughput": "667 ops/sec",
+        "latency_ms": 4
+      },
+      "training_candidate": false
+    },
+    {
+      "name": "create-qdrant-indexes",
+      "description": "* Phase 2: Create payload indexes on Qdrant collection",
+      "module_type": "schema creation",
+      "dependencies": [
+        "node-fetch"
+      ],
+      "inputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "outputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "performance_metrics": {
+        "throughput": "88 ops/sec",
+        "latency_ms": 34
+      },
+      "training_candidate": false
+    },
+    {
+      "name": "current-corpus-promotion-preflight",
+      "description": "* current-corpus-promotion-preflight.mjs\n *\n * DRY-RUN ONLY — reads graphify/mapreduce artifacts and emits a structured\n * preflight report of promotion candidates for all durable stores.\n *\n * Inputs:\n *   memory/graphify/deep/deep-import-graph.json\n *   memory/graphify/deep/deep-import-edges.jsonl\n *   docs/graph/repo-root-atlas.json\n *   docs/graph/codebase-graph.json\n *   docs/graph/repo-sveltekit-route-atlas.json\n *   sveltekit-frontend/.tmp/ingest/atlas-data-files.md\n *\n * Outputs (dry-run only — no DB/Redis/Qdrant mutations):\n *   docs/reports/current-corpus-promotion-preflight.md\n *   memory/agent-runs/current-corpus-promotion-preflight.json\n *\n * Usage:\n *   node sveltekit-frontend/scripts/atlas/current-corpus-promotion-preflight.mjs\n *   node sveltekit-frontend/scripts/atlas/current-corpus-promotion-preflight.mjs --json\n *   node sveltekit-frontend/scripts/atlas/current-corpus-promotion-preflight.mjs --verbose",
+      "module_type": "utility",
+      "dependencies": [
+        "node:fs",
+        "node:crypto",
+        "node:path",
+        "node:url"
+      ],
+      "inputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "outputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "performance_metrics": {
+        "throughput": "18 ops/sec",
+        "latency_ms": 250
+      },
+      "training_candidate": false
+    },
+    {
+      "name": "debug-qdrant-postgres-mismatch",
+      "description": "* Debug Qdrant/Postgres Mismatch\n *\n * Explains why reconciliation says IN_SYNC but sampled agreement says 0/50.\n *\n * Compares using CANONICAL comparator:\n * - source_ref (normalized)\n * - packet_key\n * - feature_id\n * - feature_label\n * - community_id\n * - som_cluster\n * - domain\n *\n * Deferred (non-failing):\n * - qdrant_tag_id\n * - karpathy_score\n * - redis_hot_key\n * - neo4j_node",
+      "module_type": "utility",
+      "dependencies": [
+        "node:fs/promises",
+        "node:path",
+        "node:url",
+        "pg",
+        "../../../scripts/atlas/connection-config.mjs"
+      ],
+      "inputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "outputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "performance_metrics": {
+        "throughput": "33 ops/sec",
+        "latency_ms": 95
+      },
+      "training_candidate": false
+    },
+    {
+      "name": "declare-rabbitmq-queues",
+      "description": "utility",
+      "module_type": "utility",
+      "dependencies": [],
+      "inputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "outputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "performance_metrics": {
+        "throughput": "625 ops/sec",
+        "latency_ms": 4
+      },
+      "training_candidate": false
+    },
+    {
+      "name": "derive-cluster-feature-ids",
+      "description": "* derive-cluster-feature-ids.mjs\r\n *\r\n * Two-pass Qdrant aggregation:\r\n *\r\n * Pass 1 — scroll all points in codebase_chunks_768, group by som_cluster\r\n *   (or somRow:somCol), collect feature_id + area + topo_class values per cluster.\r\n *\r\n * Pass 2 — for each cluster, rank the collected feature_ids by frequency,\r\n *   take top-8, then write feature_ids[] + lane_ids[] back to every member point.\r\n *\r\n * This is the correct direction: Qdrant members → cluster aggregate → back to members.\r\n * The NDJSON cluster-summary is NOT the source of truth for feature_ids — the\r\n * individual point payloads are.\r\n *\r\n * Usage:\r\n *   node scripts/atlas/derive-cluster-feature-ids.mjs\r\n *   node scripts/atlas/derive-cluster-feature-ids.mjs --dry-run\r\n *   node scripts/atlas/derive-cluster-feature-ids.mjs --force      # overwrite existing\r\n *   node scripts/atlas/derive-cluster-feature-ids.mjs --top=8      # feature_ids per cluster",
+      "module_type": "utility",
+      "dependencies": [
+        "../lib/qdrant-client.mjs"
+      ],
+      "inputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "outputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "performance_metrics": {
+        "throughput": "48 ops/sec",
+        "latency_ms": 90
+      },
+      "training_candidate": false
+    },
+    {
+      "name": "detect-manifold-drift",
+      "description": "* scripts/atlas/detect-manifold-drift.mjs\n * \n * Detects drift in the hypergraph/manifold infrastructure.",
+      "module_type": "utility",
+      "dependencies": [
+        "../../src/lib/server/redis.js",
+        "../../src/lib/server/db/client.js",
+        "../../src/lib/server/db/schema/embedded-summaries.js",
+        "drizzle-orm"
+      ],
+      "inputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "outputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "performance_metrics": {
+        "throughput": "128 ops/sec",
+        "latency_ms": 24
+      },
+      "training_candidate": false
+    },
+    {
+      "name": "distill-atlas-card-store",
+      "description": "utility",
+      "module_type": "utility",
+      "dependencies": [
+        "fs/promises",
+        "fs",
+        "path"
+      ],
+      "inputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "outputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "performance_metrics": {
+        "throughput": "108 ops/sec",
+        "latency_ms": 35
+      },
+      "training_candidate": false
+    },
+    {
+      "name": "duckdb-import-feature-cards",
+      "description": "* Task 3: DuckDB Import for Feature Cards\n * Imports enriched feature cards into DuckDB for offline analysis.",
+      "module_type": "data import",
+      "dependencies": [
+        "node:fs/promises",
+        "node:path",
+        "node:url"
+      ],
+      "inputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "outputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "performance_metrics": {
+        "throughput": "82 ops/sec",
+        "latency_ms": 41
+      },
+      "training_candidate": false
+    },
+    {
+      "name": "duckdb-import-summaries",
+      "description": "* Task 3: DuckDB Import — Feature Summaries\n *\n * Imports enriched Gemma4 summaries into DuckDB offline tables.\n * Creates packet_summaries, feature_edges, and orphan tracking tables.\n * Used for offline analysis and provenance tracking across parallel pipelines.",
+      "module_type": "data import",
+      "dependencies": [
+        "node:fs/promises",
+        "node:path",
+        "node:url",
+        "pg"
+      ],
+      "inputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "outputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "performance_metrics": {
+        "throughput": "40 ops/sec",
+        "latency_ms": 79
+      },
+      "training_candidate": false
+    },
+    {
+      "name": "embed-chunks",
+      "description": "* embed-chunks.mjs\r\n *\r\n * Stage 3 of the ACE Feature Context Matrix pipeline.\r\n * Reads an NDJSON chunk file and embeds each record's text via:\r\n *   1. SvelteKit /api/embed (Redis L1 + Bifrost L2 cached, preferred)\r\n *   2. Direct Ollama /api/embeddings (fallback when dev server is down)\r\n *\r\n * Upserts each chunk into the specified Qdrant collection with:\r\n *   - vector: 768-dim embeddinggemma embedding\r\n *   - payload: all chunk metadata (tags, file_refs, rg_paths, source_type, etc.)\r\n *\r\n * Usage:\r\n *   node scripts/atlas/embed-chunks.mjs \\\r\n *     --input tmp/chunks/error-context.ndjson \\\r\n *     --collection error_notes\r\n *   node scripts/atlas/embed-chunks.mjs \\\r\n *     --input tmp/chunks/notes.ndjson \\\r\n *     --collection docs_chunks --dry-run\r\n *\r\n * Env:\r\n *   DATABASE_URL  (not used here — Qdrant only)\r\n *   QDRANT_URL    default http://localhost:6333\r\n *   OLLAMA_URL    default http://localhost:11434\r\n *   SVELTEKIT_URL default http://localhost:5173",
+      "module_type": "utility",
+      "dependencies": [
+        "node:fs",
+        "node:path",
+        "node:url"
+      ],
+      "inputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "outputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "performance_metrics": {
+        "throughput": "45 ops/sec",
+        "latency_ms": 88
+      },
+      "training_candidate": false
+    },
+    {
+      "name": "embedding-prep-summaries",
+      "description": "* Task 4: Embedding Prep — Summary Layers\n *\n * Generates embeddings for enriched Gemma4 summaries.\n * Supports both /api/embed (Ollama via bifrost) and direct Ollama fallback.\n * Stores embeddings back to Postgres and Qdrant payloads.",
+      "module_type": "utility",
+      "dependencies": [
+        "node:fs/promises",
+        "node:path",
+        "node:url",
+        "pg"
+      ],
+      "inputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "outputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "performance_metrics": {
+        "throughput": "48 ops/sec",
+        "latency_ms": 67
+      },
+      "training_candidate": false
+    },
+    {
+      "name": "enhance-graph-edges",
+      "description": "* scripts/atlas/enhance-graph-edges.mjs\n * \n * Enhances the codebase graph with explicit edge parameters:\n * STATIC_IMPORTS, DYNAMIC_IMPORTS, USES_ENV, USES_STORE.\n * Also performs a topological sort for dependency ordering.",
+      "module_type": "utility",
+      "dependencies": [
+        "node:fs",
+        "node:path"
+      ],
+      "inputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "outputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "performance_metrics": {
+        "throughput": "182 ops/sec",
+        "latency_ms": 18
+      },
+      "training_candidate": false
+    },
+    {
+      "name": "error-cluster",
+      "description": "* Phase 66-79: Error Clustering and Pattern Identification\n *\n * This script takes the normalized, fingerprinted error data from the\n * ingestion step and clusters the errors to identify recurring patterns,\n * potential root causes, and recommended fix states.\n *\n * @param {string} runId - A unique identifier for the current run.\n * @param {string} inputJsonlPath - Path to the JSONL file from error-ingest.mjs.\n * @param {string} outputJsonPath - Path for the resulting cluster data.",
+      "module_type": "utility",
+      "dependencies": [
+        "fs",
+        "path",
+        "child_process"
+      ],
+      "inputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "outputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "performance_metrics": {
+        "throughput": "52 ops/sec",
+        "latency_ms": 75
+      },
+      "training_candidate": false
+    },
+    {
+      "name": "error-ingest",
+      "description": "* Phase 66-79: Error Ingestion and Fingerprinting\n *\n * This script processes raw error output from various testing/linting tools\n * and normalizes the data into a structured JSONL format, generating a unique\n * fingerprint for each error instance.\n *\n * @param {string} runId - A unique identifier for the current run (e.g., timestamp).\n * @param {string} outputDir - The directory to write the normalized JSONL output.",
+      "module_type": "utility",
+      "dependencies": [
+        "fs",
+        "path"
+      ],
+      "inputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "outputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "performance_metrics": {
+        "throughput": "73 ops/sec",
+        "latency_ms": 49
+      },
+      "training_candidate": false
+    },
+    {
+      "name": "expand-retrieval-topology",
+      "description": "* expand-retrieval-topology.mjs\n *\n * 6-lane ANN expansion for atlas packets:\n * Lane 1: atlas-tools semantic query (KAG-style concept mapping)\n * Lane 2: trace_atlas_query (packet semantic search)\n * Lane 3: trace_kag (KAG structure enrichment)\n * Lane 4: trace_topology (Neo4j graph traversal)\n * Lane 5: trace_atlas_suggest (authority-based suggestions)\n * Lane 6: rg_fallback (regex-based text search fallback)\n *\n * Default expansion: 5 neighbors per packet\n * Output: topology edge candidates with scoring\n *\n * Dry-run by default. --apply to persist.",
+      "module_type": "utility",
+      "dependencies": [
+        "node:fs/promises",
+        "node:path",
+        "node:url",
+        "pg",
+        "@qdrant/js-client-rest",
+        "./load-atlas-env.mjs"
+      ],
+      "inputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "outputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "performance_metrics": {
+        "throughput": "27 ops/sec",
+        "latency_ms": 115
+      },
+      "training_candidate": false
+    },
+    {
+      "name": "export-okf-bundle",
+      "description": "* Export Parent Atlas OKF bundle for agentic retrieval.\n *\n * Output layout:\n *   .okf/functions/*.md\n *   .okf/tools/*.md\n *   .okf/features/*.md\n *   .okf/packets/*.md",
+      "module_type": "data export",
+      "dependencies": [
+        "node:fs/promises",
+        "node:path",
+        "node:crypto",
+        "node:url",
+        "pg",
+        "./load-atlas-env.mjs",
+        "../../../scripts/atlas/connection-config.mjs"
+      ],
+      "inputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "outputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "performance_metrics": {
+        "throughput": "32 ops/sec",
+        "latency_ms": 112
+      },
+      "training_candidate": false
+    },
+    {
+      "name": "export-replay-traces",
+      "description": "* Export HyperRAG replay traces from Redis into a read-only report.\n *\n * Outputs:\n *   docs/reports/replay-trace.jsonl\n *   docs/reports/replay-trace.md",
+      "module_type": "data export",
+      "dependencies": [
+        "node:fs/promises",
+        "node:path",
+        "node:crypto",
+        "node:url",
+        "ioredis",
+        "./load-atlas-env.mjs",
+        "../../../scripts/atlas/connection-config.mjs"
+      ],
+      "inputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "outputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "performance_metrics": {
+        "throughput": "33 ops/sec",
+        "latency_ms": 109
+      },
+      "training_candidate": false
+    },
+    {
+      "name": "export-topology-report",
+      "description": "data export",
+      "module_type": "data export",
+      "dependencies": [
+        "node:fs/promises",
+        "node:path",
+        "node:url",
+        "./load-atlas-env.mjs"
+      ],
+      "inputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "outputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "performance_metrics": {
+        "throughput": "45 ops/sec",
+        "latency_ms": 80
+      },
+      "training_candidate": false
+    },
+    {
+      "name": "extract-cluster-aliases",
+      "description": "* scripts/atlas/extract-cluster-aliases.mjs\n * \n * Maps cluster IDs to human-readable aliases and persists them to \n * Redis (ace:cluster-alias:{alias}) and a local JSON mapping.",
+      "module_type": "utility",
+      "dependencies": [
+        "redis",
+        "node:fs",
+        "node:path"
+      ],
+      "inputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "outputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "performance_metrics": {
+        "throughput": "152 ops/sec",
+        "latency_ms": 29
+      },
+      "training_candidate": false
+    },
+    {
+      "name": "feature-prune-report",
+      "description": "* Task 5: Feature Prune Report — Orphan Detection & Recommendations\n *\n * Analyzes packet_summaries for orphaned, stale, or duplicate features.\n * Generates recommendations for pruning Qdrant and consolidating Postgres.\n * Output: pruning-report-YYYY-MM-DD.json with safeguards and verification gates.",
+      "module_type": "utility",
+      "dependencies": [
+        "node:fs/promises",
+        "node:path",
+        "node:url",
+        "pg"
+      ],
+      "inputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "outputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "performance_metrics": {
+        "throughput": "37 ops/sec",
+        "latency_ms": 90
+      },
+      "training_candidate": false
+    },
+    {
+      "name": "feature-semantic-index-source",
+      "description": "utility",
+      "module_type": "utility",
+      "dependencies": [
+        "node:path",
+        "node:url"
+      ],
+      "inputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "outputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "performance_metrics": {
+        "throughput": "263 ops/sec",
+        "latency_ms": 11
+      },
+      "training_candidate": false
+    },
+    {
+      "name": "feature_labelling",
+      "description": "utility",
+      "module_type": "utility",
+      "dependencies": [
+        "node:fs",
+        "node:path",
+        "node:crypto",
+        "node:url"
+      ],
+      "inputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "outputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "performance_metrics": {
+        "throughput": "34 ops/sec",
+        "latency_ms": 95
+      },
+      "training_candidate": false
+    },
+    {
+      "name": "gate-phase-d-readiness",
+      "description": "* gate-phase-d-readiness.mjs\n *\n * Validate that Phase D (higher-hop enrichment) can proceed safely.\n *\n * Gate: At least 40% of Qdrant points are canonical-matched (source_ref + packet_key).\n * If gate passes: Phase D enrichment can enrich the canonical cohort.\n * If gate fails: Phase D is blocked until Phase 14 DuckDB reconciliation.",
+      "module_type": "utility",
+      "dependencies": [],
+      "inputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "outputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "performance_metrics": {
+        "throughput": "115 ops/sec",
+        "latency_ms": 34
+      },
+      "training_candidate": false
+    },
+    {
+      "name": "gemma4-batch-summaries",
+      "description": "* Phase 14/15: Offline Gemma4 Batch Summarizer (PRODUCTION)\n *\n * Generates semantic summaries for feature cards using offline Gemma4.\n * Handles dual-ledger ingestion (Postgres atlas_packets + Qdrant orphans).\n * Runs in background, populates DuckDB summary tables, enriches both stores.\n *\n * Pipeline:\n * 1. Read feature cards (both Postgres atlas_packets AND Qdrant orphans)\n * 2. Batch Gemma4 summaries (chunk → file → folder → feature → system)\n * 3. Write to DuckDB packet_summaries table\n * 4. Embed summaries (via /api/embed or Ollama)\n * 5. Backfill Postgres summary_* columns\n * 6. Upsert Qdrant payload with enriched fields\n * 7. Export enriched JSON + manifest",
+      "module_type": "utility",
+      "dependencies": [
+        "node:fs/promises",
+        "node:path",
+        "node:url",
+        "pg"
+      ],
+      "inputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "outputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "performance_metrics": {
+        "throughput": "20 ops/sec",
+        "latency_ms": 162
+      },
+      "training_candidate": false
+    },
+    {
+      "name": "generate-graph-exports",
+      "description": "* Generate stable graph export artifacts for DuckDB / feature synthesis consumers.\r\n *\r\n * Writes:\r\n * - memory/exports/graph-refresh-manifest.json\r\n * - memory/exports/cluster-cards.jsonl\r\n * - memory/exports/pathway-cards.jsonl\r\n *\r\n * This does NOT promote the graph as production truth.\r\n * promotionState stays \"unpromoted\" until downstream validation passes.",
+      "module_type": "utility",
+      "dependencies": [
+        "node:fs",
+        "node:path",
+        "node:crypto",
+        "ioredis",
+        "dotenv"
+      ],
+      "inputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "outputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "performance_metrics": {
+        "throughput": "29 ops/sec",
+        "latency_ms": 122
+      },
+      "training_candidate": false
+    },
+    {
+      "name": "generate-neo4j-graphrag-report",
+      "description": "utility",
+      "module_type": "utility",
+      "dependencies": [
+        "node:fs",
+        "node:path"
+      ],
+      "inputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "outputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "performance_metrics": {
+        "throughput": "147 ops/sec",
+        "latency_ms": 21
+      },
+      "training_candidate": false
+    },
+    {
+      "name": "generate-parent-atlas-profile-cards",
+      "description": "utility",
+      "module_type": "utility",
+      "dependencies": [
+        "fs/promises",
+        "fs",
+        "path"
+      ],
+      "inputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "outputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "performance_metrics": {
+        "throughput": "95 ops/sec",
+        "latency_ms": 38
+      },
+      "training_candidate": false
+    },
+    {
+      "name": "hot-keyword-cluster-summary",
+      "description": "utility",
+      "module_type": "utility",
+      "dependencies": [
+        "fs/promises",
+        "fs",
+        "path"
+      ],
+      "inputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "outputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "performance_metrics": {
+        "throughput": "74 ops/sec",
+        "latency_ms": 44
+      },
+      "training_candidate": false
+    },
+    {
+      "name": "hyperrag-couchdb-enrich",
+      "description": "* hyperrag-couchdb-enrich.mjs\r\n * Phase C: CouchDB GraphRAG Enrichment\r\n *\r\n * Reads Phase B NDJSON results (or accepts them on stdin) and enriches each hit\r\n * with matching wiki notes from the `karpathy_wiki` CouchDB database.\r\n *\r\n * Matching strategy (in priority order):\r\n *   1. Exact doc id:        agents:dir:<dir-slug>\r\n *   2. source_ref prefix:   match doc ids that start with the file's directory\r\n *   3. Tag intersection:    docs whose qdrant_tags share ≥1 tag with the hit\r\n *\r\n * Usage:\r\n *   # Pipe from Phase B:\r\n *   node scripts/atlas/hyperrag-dense-multiquery.mjs --query \"XState\" --json \\\r\n *     | node scripts/atlas/hyperrag-couchdb-enrich.mjs\r\n *\r\n *   # Or pass a result file:\r\n *   node scripts/atlas/hyperrag-couchdb-enrich.mjs --input /tmp/phaseB.json\r\n *\r\n *   # Dry-run (print stats only, no CouchDB fetch):\r\n *   node scripts/atlas/hyperrag-couchdb-enrich.mjs --dry-run\r\n *\r\n * Env:\r\n *   COUCHDB_URL      default http://admin:legal_ai_pass@127.0.0.1:5984\r\n *   COUCHDB_DB       default karpathy_wiki\r\n *   MAX_WIKI_DOCS    default 200  (max docs fetched from allDocs view)",
+      "module_type": "utility",
+      "dependencies": [
+        "node:fs",
+        "node:path",
+        "node:url"
+      ],
+      "inputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "outputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "performance_metrics": {
+        "throughput": "48 ops/sec",
+        "latency_ms": 80
+      },
+      "training_candidate": false
+    },
+    {
+      "name": "hyperrag-cuda-stream",
+      "description": "* hyperrag-cuda-stream.mjs\r\n * Phase D: CUDA Graph Stream → Atlas-fed RotorQuant Decode Stream\r\n *\r\n * Reads Phase C enriched results, extracts chunk embeddings, runs\r\n * kmeansWithCentroids (CUDA) to produce cluster centroids, then streams\r\n * those centroids + compact Atlas chunks to the RotorQuant llama-server\r\n * (port 8090) for speculative decoding / final synthesis.\r\n *\r\n * CUDA fallback: if tensorrt_bridge.node is unavailable, cluster centroids\r\n * are computed via a pure-JS k-means (Forgy init, Lloyd's iteration).\r\n *\r\n * Usage:\r\n *   # Full pipeline from Phase C:\r\n *   node scripts/atlas/hyperrag-couchdb-enrich.mjs \\\r\n *     | node scripts/atlas/hyperrag-cuda-stream.mjs --query \"XState patterns\"\r\n *\r\n *   # Or pass a Phase C result file:\r\n *   node scripts/atlas/hyperrag-cuda-stream.mjs \\\r\n *     --input /tmp/phaseC.json --query \"XState patterns\"\r\n *\r\n *   # JSON output (for Phase E):\r\n *   node scripts/atlas/hyperrag-cuda-stream.mjs --input /tmp/phaseC.json --json\r\n *\r\n * Env:\r\n *   ROTORQUANT_URL   default http://127.0.0.1:8090  (llama-server)\r\n *   QDRANT_URL       default http://localhost:6333\r\n *   COLLECTION       default codebase_chunks_768\r\n *   MAX_K            default 8   (k-means cluster count for centroid stream)\r\n *   MAX_CONTEXT_CHARS default 6000  (character budget for synthesis prompt)",
+      "module_type": "utility",
+      "dependencies": [
+        "node:fs",
+        "node:path",
+        "node:module",
+        "node:url"
+      ],
+      "inputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "outputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "performance_metrics": {
+        "throughput": "33 ops/sec",
+        "latency_ms": 127
+      },
+      "training_candidate": false
+    },
+    {
+      "name": "hyperrag-dense-multiquery",
+      "description": "* hyperrag-dense-multiquery.mjs\r\n * Phase B: 4D Qdrant Multi-Query with Cluster Prefilter\r\n *\r\n * Embeds a query, prefilters to top clusters via the TurboVec sidecar,\r\n * then runs a filtered + unfiltered Qdrant dense search in parallel.\r\n * RRF-merges both result sets and enriches with Karpathy blend scores.\r\n *\r\n * Usage:\r\n *   node scripts/atlas/hyperrag-dense-multiquery.mjs --query \"XState machine patterns\"\r\n *   node scripts/atlas/hyperrag-dense-multiquery.mjs --query \"Redis cache layer\" --top-k 20 --json\r\n *\r\n * Env:\r\n *   OLLAMA_URL        default http://localhost:11434\r\n *   EMBED_MODEL       default embeddinggemma:latest\r\n *   QDRANT_URL        default http://localhost:6333\r\n *   REDIS_URL         default redis://127.0.0.1:6379\r\n *   TURBOVEC_URL      default http://127.0.0.1:8792\r\n *   COLLECTION        default codebase_chunks_768\r\n *   SVELTEKIT_URL     default http://localhost:5173",
+      "module_type": "utility",
+      "dependencies": [
+        "ioredis",
+        "node:fs",
+        "node:fs/promises",
+        "node:path",
+        "node:url"
+      ],
+      "inputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "outputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "performance_metrics": {
+        "throughput": "25 ops/sec",
+        "latency_ms": 160
+      },
+      "training_candidate": false
+    },
+    {
+      "name": "hyperrag-expand",
+      "description": "* hyperrag-expand.mjs\r\n *\r\n * Stage 8 of the HyperRAG 4D Topology Knowledge Layer.\r\n * Reads an NDJSON chunk file and expands each record with 3 diverse multi-query \r\n * technical prompt variations. This optimizes vector recall and ensures deep\r\n * lexical-semantic coverage.\r\n *\r\n * Usage:\r\n *   node scripts/atlas/hyperrag-expand.mjs \\\r\n *     --input tmp/chunks/parents-corpus-synthesized.ndjson \\\r\n *     --out tmp/chunks/parents-corpus-expanded.ndjson\r\n *\r\n * Env:\r\n *   OLLAMA_URL    default http://localhost:11434",
+      "module_type": "utility",
+      "dependencies": [
+        "node:fs",
+        "node:path",
+        "node:url"
+      ],
+      "inputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "outputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "performance_metrics": {
+        "throughput": "60 ops/sec",
+        "latency_ms": 66
+      },
+      "training_candidate": false
+    },
+    {
+      "name": "hyperrag-log-triage",
+      "description": "* hyperrag-log-triage.mjs\r\n * Phase E: Atlas Chunk Index / Log Triage\r\n *\r\n * Terminal phase of the HyperRAG pipeline. Reads Phase D output and:\r\n *   1. Builds a per-cluster sidecar (minified JSON with ranked chunk refs)\r\n *   2. Sorts chunks by Karpathy blend → RRF → PageRank fallback\r\n *   3. Writes audit log to logs/hyperrag-stream/<ISO-timestamp>.jsonl\r\n *   4. Writes per-cluster sidecar files to logs/hyperrag-stream/clusters/\r\n *   5. Optionally writes GRPO reward signal back to Redis\r\n *\r\n * Usage:\r\n *   node scripts/atlas/hyperrag-log-triage.mjs --input /tmp/phaseD.json\r\n *\r\n *   # Full pipeline:\r\n *   node scripts/atlas/hyperrag-dense-multiquery.mjs --query \"auth flow\" --json \\\r\n *     | node scripts/atlas/hyperrag-couchdb-enrich.mjs \\\r\n *     | node scripts/atlas/hyperrag-cuda-stream.mjs --query \"auth flow\" \\\r\n *     | node scripts/atlas/hyperrag-log-triage.mjs\r\n *\r\n * Env:\r\n *   LOG_DIR       default logs/hyperrag-stream  (relative to sveltekit-frontend)\r\n *   REDIS_URL     default redis://127.0.0.1:6379\r\n *   GRPO_WRITE    default false  (set 'true' to write reward signal to Redis)",
+      "module_type": "utility",
+      "dependencies": [
+        "node:fs",
+        "node:path",
+        "node:url",
+        "ioredis"
+      ],
+      "inputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "outputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "performance_metrics": {
+        "throughput": "42 ops/sec",
+        "latency_ms": 97
+      },
+      "training_candidate": false
+    },
+    {
+      "name": "index-task-distillates-qdrant-v2",
+      "description": "* scripts/atlas/index-task-distillates-qdrant.mjs\n * \n * Indexes the v2 task distillates into Qdrant.",
+      "module_type": "utility",
+      "dependencies": [
+        "node:fs",
+        "node:path"
+      ],
+      "inputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "outputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "performance_metrics": {
+        "throughput": "130 ops/sec",
+        "latency_ms": 22
+      },
+      "training_candidate": false
+    },
+    {
+      "name": "index-task-distillates-qdrant",
+      "description": "* scripts/atlas/index-task-distillates-qdrant.mjs\n * \n * Creates the task_distillates collection in Qdrant and indexes\n * the task cards generated by build-task-distillates.mjs.",
+      "module_type": "utility",
+      "dependencies": [
+        "node:fs",
+        "node:path"
+      ],
+      "inputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "outputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "performance_metrics": {
+        "throughput": "104 ops/sec",
+        "latency_ms": 28
+      },
+      "training_candidate": false
+    },
+    {
+      "name": "index-task-distillates",
+      "description": "* index-task-distillates.mjs\n * \n * Part of the Atlas topological retrieval infrastructure.\n * Indexes cluster-level \"task distillates\" (actionable summaries)\n * into Qdrant to allow the agent to find relevant topological \n * manifolds based on task descriptions.",
+      "module_type": "utility",
+      "dependencies": [
+        "node:fs",
+        "node:path",
+        "node:fs"
+      ],
+      "inputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "outputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "performance_metrics": {
+        "throughput": "169 ops/sec",
+        "latency_ms": 21
+      },
+      "training_candidate": false
+    },
+    {
+      "name": "infer-sveltekit-route-gaps",
+      "description": "utility",
+      "module_type": "utility",
+      "dependencies": [
+        "node:fs",
+        "node:path",
+        "node:url"
+      ],
+      "inputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "outputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "performance_metrics": {
+        "throughput": "63 ops/sec",
+        "latency_ms": 56
+      },
+      "training_candidate": false
+    },
+    {
+      "name": "ingest-autoresearch-jsonl",
+      "description": "utility",
+      "module_type": "utility",
+      "dependencies": [
+        "node:fs",
+        "node:readline",
+        "node:path"
+      ],
+      "inputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "outputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "performance_metrics": {
+        "throughput": "83 ops/sec",
+        "latency_ms": 34
+      },
+      "training_candidate": false
+    },
+    {
+      "name": "ingest-tree-nodes",
+      "description": "* Phase D — Tree Node Ingestion\n *\n * Extracts page index tree structure from codebase:\n * - atlas_tree_nodes (files, folders, packages)\n * - atlas_tree_edges (parent→child relationships)\n * - Links tree nodes to atlas_packets canonical ledger\n *\n * Hard rules:\n * - JSONB for searchable metadata\n * - Preserve tree structure; chunks are leaves\n * - Link to packet_key/source_ref via atlas_packets\n * - Node IDs stable across runs (deterministic hash)",
+      "module_type": "utility",
+      "dependencies": [
+        "node:fs/promises",
+        "node:path",
+        "node:url",
+        "node:crypto",
+        "pg"
+      ],
+      "inputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "outputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "performance_metrics": {
+        "throughput": "23 ops/sec",
+        "latency_ms": 132
+      },
+      "training_candidate": false
+    },
+    {
+      "name": "ingest-workspace-metadata",
+      "description": "* Ingest workspace metadata from package.json and VS Code config\n *\n * Populates workspace/runtime metadata categories WITHOUT replacing packet identity.\n *\n * Ingests:\n *   - package.json scripts (npm aliases), dependencies, workspaces\n *   - .vscode/tasks.json (npm scripts, commands)\n *   - .vscode/launch.json (debug configurations)\n *   - *.code-workspace files\n *   - Server path mapping (repo_path → server_path)\n *\n * Usage:\n *   npm run atlas:workspace:ingest:dry\n *   npm run atlas:workspace:ingest:apply",
+      "module_type": "utility",
+      "dependencies": [
+        "fs",
+        "path",
+        "node:url"
+      ],
+      "inputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "outputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "performance_metrics": {
+        "throughput": "47 ops/sec",
+        "latency_ms": 67
+      },
+      "training_candidate": false
+    },
+    {
+      "name": "inventory-atlas-data-files",
+      "description": "utility",
+      "module_type": "utility",
+      "dependencies": [
+        "fs",
+        "path"
+      ],
+      "inputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "outputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "performance_metrics": {
+        "throughput": "200 ops/sec",
+        "latency_ms": 19
+      },
+      "training_candidate": false
+    },
+    {
+      "name": "langgraph-gemma4-synthesis",
+      "description": "* LangGraph Multi-Hop Traversal + Gemma4 Synthesis\n *\n * Traverses Neo4j SOM topology for k-hops, collects provenance chain data,\n * batches candidates (500 at a time), and uses Gemma4 for synthesis.\n *\n * Pipeline:\n *   Neo4j topology query → k-hop expansion → Postgres provenance join\n *   → Qdrant semantic context → Batch (500) → Gemma4 synthesis\n *   → LangGraph state machine orchestration\n *\n * Usage:\n *   node langgraph-gemma4-synthesis.mjs --topology som-topology.json --batch-size 500",
+      "module_type": "utility",
+      "dependencies": [
+        "node-fetch",
+        "fs"
+      ],
+      "inputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "outputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "performance_metrics": {
+        "throughput": "36 ops/sec",
+        "latency_ms": 79
+      },
+      "training_candidate": false
+    },
+    {
+      "name": "load-atlas-env",
+      "description": "utility",
+      "module_type": "utility",
+      "dependencies": [
+        "node:fs",
+        "node:path",
+        "dotenv"
+      ],
+      "inputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "outputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "performance_metrics": {
+        "throughput": "400 ops/sec",
+        "latency_ms": 7
+      },
+      "training_candidate": false
+    },
+    {
+      "name": "logger-parent-atlas-health",
+      "description": "* Parent Atlas runtime health logger.\n *\n * Read-only probes for the services and registries that gate the workstation\n * board. Writes a JSON report, a Markdown report, and an append-only history\n * JSONL entry.",
+      "module_type": "utility",
+      "dependencies": [
+        "node:fs",
+        "node:fs/promises",
+        "node:path",
+        "node:url",
+        "node:net",
+        "pg",
+        "neo4j-driver",
+        "ioredis",
+        "./load-atlas-env.mjs",
+        "./lib/probe-with-timeout.mjs",
+        "../../../scripts/atlas/connection-config.mjs"
+      ],
+      "inputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "outputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "performance_metrics": {
+        "throughput": "27 ops/sec",
+        "latency_ms": 144
+      },
+      "training_candidate": false
+    },
+    {
+      "name": "mapreduce-summaries",
+      "description": "* mapreduce-summaries.mjs\n *\n * MapReduce summary generation pipeline for atlas_packets.\n *\n * Generates 5 summary layers:\n *   1. Chunk summaries — summarize individual packets\n *   2. File summaries — roll up summaries by source_ref (file)\n *   3. Folder summaries — roll up by directory hierarchy\n *   4. Feature summaries — roll up by feature_id + domain\n *   5. System summary — aggregate across all features\n *\n * Stores outputs in:\n *   - atlas_chunks.summary → chunk-level Gemma4 summary\n *   - atlas_chunks.sub_summaries → JSON array of related chunks\n *   - atlas_feature_cards → feature card documents\n *   - atlas_feature_edges → feature relationship edges\n *\n * Usage:\n *   node scripts/atlas/mapreduce-summaries.mjs --dry-run\n *   node scripts/atlas/mapreduce-summaries.mjs --apply\n *   node scripts/atlas/mapreduce-summaries.mjs --dry-run --limit 100\n *   node scripts/atlas/mapreduce-summaries.mjs --apply --save-report",
+      "module_type": "utility",
+      "dependencies": [
+        "node:fs",
+        "node:path",
+        "node:url",
+        "pg"
+      ],
+      "inputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "outputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "performance_metrics": {
+        "throughput": "20 ops/sec",
+        "latency_ms": 161
+      },
+      "training_candidate": false
+    },
+    {
+      "name": "materialize-addressable-packets",
+      "description": "utility",
+      "module_type": "utility",
+      "dependencies": [
+        "node:fs/promises",
+        "node:path",
+        "node:url"
+      ],
+      "inputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "outputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "performance_metrics": {
+        "throughput": "20 ops/sec",
+        "latency_ms": 197
+      },
+      "training_candidate": false
+    },
+    {
+      "name": "materialize-provenance-p2-fields",
+      "description": "* Materialize P2 fields (retrieval_strategy, retrieval_path) into retrieval_provenance.\n *\n * Reads replay trace JSONL, extracts retrieval_strategy and retrieval_path,\n * and updates existing retrieval_provenance rows by query_hash.\n *\n * Part of P1h provenance breadth gap fix.\n * Dependency: run-replay-breadth-50.mjs must have written initial data.\n *\n * Usage:\n *   node scripts/atlas/materialize-provenance-p2-fields.mjs\n *   node scripts/atlas/materialize-provenance-p2-fields.mjs --dry-run\n *   node scripts/atlas/materialize-provenance-p2-fields.mjs --verbose\n *   node scripts/atlas/materialize-provenance-p2-fields.mjs --apply",
+      "module_type": "utility",
+      "dependencies": [
+        "node:crypto",
+        "node:fs/promises",
+        "node:path",
+        "node:url",
+        "pg",
+        "./load-atlas-env.mjs"
+      ],
+      "inputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "outputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "performance_metrics": {
+        "throughput": "45 ops/sec",
+        "latency_ms": 70
+      },
+      "training_candidate": false
+    },
+    {
+      "name": "materialize-provenance-tree",
+      "description": "* Materialize a deterministic provenance tree from replay evidence.\n *\n * This is read-only. It consumes the replay breadth summary and replay trace\n * export and emits a stable per-query provenance surface that can be replayed\n * idempotently without sampling raw Qdrant points.",
+      "module_type": "utility",
+      "dependencies": [
+        "node:crypto",
+        "node:fs/promises",
+        "node:path",
+        "node:url"
+      ],
+      "inputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "outputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "performance_metrics": {
+        "throughput": "47 ops/sec",
+        "latency_ms": 101
+      },
+      "training_candidate": false
+    },
+    {
+      "name": "materialize-route-runtime-packets",
+      "description": "utility",
+      "module_type": "utility",
+      "dependencies": [
+        "node:fs/promises",
+        "node:path",
+        "node:url",
+        "pg",
+        "./load-atlas-env.mjs",
+        "../../../scripts/atlas/connection-config.mjs",
+        "../../../scripts/atlas/lib/normalize-source-ref.mjs"
+      ],
+      "inputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "outputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "performance_metrics": {
+        "throughput": "25 ops/sec",
+        "latency_ms": 137
+      },
+      "training_candidate": false
+    },
+    {
+      "name": "merge-atlas-ndjson-hypergraph",
+      "description": "utility",
+      "module_type": "utility",
+      "dependencies": [
+        "node:fs",
+        "node:path",
+        "node:crypto"
+      ],
+      "inputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "outputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "performance_metrics": {
+        "throughput": "118 ops/sec",
+        "latency_ms": 30
+      },
+      "training_candidate": false
+    },
+    {
+      "name": "migrate-metadata-v1-to-v2",
+      "description": "* Migrate Qdrant metadata from v1 to v2 envelope\n *\n * v1 structure (flat):\n *   { packet_identity_source, qdrant_payload_version, payload_backfilled_at }\n *\n * v2 structure (nested):\n *   { version: 2, created_at, updated_at, identity{}, enrichment{}, retrieval{}, ai_summary{}, quality{} }\n *\n * Migration strategy: Lazy v1→v2\n *   - Old points stay at v1 until accessed\n *   - New points written as v2\n *   - Reader accepts both v1 and v2, coerces v1→v2 on read\n *\n * Usage:\n *   node scripts/atlas/migrate-metadata-v1-to-v2.mjs --dry [--apply]",
+      "module_type": "utility",
+      "dependencies": [
+        "@qdrant/js-client-rest"
+      ],
+      "inputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "outputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "performance_metrics": {
+        "throughput": "58 ops/sec",
+        "latency_ms": 51
+      },
+      "training_candidate": false
+    },
+    {
+      "name": "normalize-qdrant-payloads",
+      "description": "* Normalize Qdrant payload field names from camelCase to snake_case\n *\n * Usage:\n *   node scripts/atlas/normalize-qdrant-payloads.mjs --dry-run --collection codebase_chunks_768\n *   node scripts/atlas/normalize-qdrant-payloads.mjs --apply --collection codebase_chunks_768",
+      "module_type": "payload normalization",
+      "dependencies": [
+        "node-fetch"
+      ],
+      "inputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "outputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "performance_metrics": {
+        "throughput": "48 ops/sec",
+        "latency_ms": 66
+      },
+      "training_candidate": true
+    },
+    {
+      "name": "patch-qdrant-feature-ids",
+      "description": "* patch-qdrant-feature-ids.mjs\r\n *\r\n * Joins the 396-cluster NDJSON index (cluster-summary.ndjson) to every\r\n * Qdrant point in codebase_chunks_768 via somRow/somCol, then writes:\r\n *   som_cluster  — \"row:col\" string (canonical join key)\r\n *   feature_ids  — string[] from the cluster summary\r\n *   lane_ids     — string[] from the cluster summary\r\n *\r\n * Points that already have som_cluster set are skipped unless --force.\r\n *\r\n * Usage:\r\n *   node scripts/atlas/patch-qdrant-feature-ids.mjs\r\n *   node scripts/atlas/patch-qdrant-feature-ids.mjs --dry-run\r\n *   node scripts/atlas/patch-qdrant-feature-ids.mjs --force\r\n *   node scripts/atlas/patch-qdrant-feature-ids.mjs --dry-run --limit=500",
+      "module_type": "utility",
+      "dependencies": [
+        "node:fs",
+        "node:path",
+        "node:url",
+        "../lib/qdrant-client.mjs"
+      ],
+      "inputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "outputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "performance_metrics": {
+        "throughput": "69 ops/sec",
+        "latency_ms": 60
+      },
+      "training_candidate": false
+    },
+    {
+      "name": "persist-ace-kag-dag-hit",
+      "description": "* persist-ace-kag-dag-hit.mjs\n *\n * Persist retrieval hits with detailed tracking:\n * - Lane identifier (qdrant_ann, bm25_fts, concept_overlap, neo4j_graph, etc.)\n * - Source reference and neighbor reference\n * - Confidence and retrieval score\n * - Evidence (which query triggered the hit)\n * - Timestamp and query context\n *\n * Input: Live retrieval events from server logs or in-memory traces\n * Output: ace_kag_dag_hit table populated with 100% coverage on core fields\n *\n * Dry-run by default. --apply to persist.",
+      "module_type": "utility",
+      "dependencies": [
+        "node:fs/promises",
+        "node:path",
+        "node:url",
+        "pg",
+        "./load-atlas-env.mjs"
+      ],
+      "inputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "outputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "performance_metrics": {
+        "throughput": "45 ops/sec",
+        "latency_ms": 73
+      },
+      "training_candidate": false
+    },
+    {
+      "name": "phase-20-packet-helpers",
+      "description": "utility",
+      "module_type": "utility",
+      "dependencies": [
+        "node:fs/promises",
+        "node:path",
+        "node:url",
+        "pg",
+        "./load-atlas-env.mjs",
+        "./canonical-source-ref.mjs"
+      ],
+      "inputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "outputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "performance_metrics": {
+        "throughput": "56 ops/sec",
+        "latency_ms": 58
+      },
+      "training_candidate": false
+    },
+    {
+      "name": "phase-c-canonical-gate",
+      "description": "* phase-c-canonical-gate.mjs\n *\n * Gate before Phase D (Higher-Hop Enrichment).\n *\n * Validates:\n * 1. Postgres atlas_packets has canonical fields (100% for required)\n * 2. Qdrant codebase_chunks_768 has canonical-matched cohort (≥80%)\n * 3. packet_key → source_ref → feature_id lineage is consistent\n * 4. Feature cards can be safely enriched\n *\n * Exit code 0 = PASS (proceed to Phase D)\n * Exit code 1 = FAIL (stop, investigate)",
+      "module_type": "utility",
+      "dependencies": [
+        "pg"
+      ],
+      "inputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "outputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "performance_metrics": {
+        "throughput": "42 ops/sec",
+        "latency_ms": 109
+      },
+      "training_candidate": false
+    },
+    {
+      "name": "phase-d-enrich-qdrant",
+      "description": "* Phase D: Qdrant Enrichment — Canonical Cohort Only\n *\n * Enrich Qdrant codebase_chunks_768 with Phase D fields:\n * - somCluster, glyphRecord, neo4jNodeId, treeNodeKey\n * - featureCardId, authorityScore, karpathyBlend\n * - metadata.phase_d_enriched = true\n *\n * STRICT SCOPE:\n * - ONLY enrich points with source_ref + packet_key\n * - ONLY match atlas_packets rows (canonical ledger)\n * - SKIP legacy-only points\n * - SKIP orphaned points\n * - SKIP missing source_ref/packet_key",
+      "module_type": "utility",
+      "dependencies": [
+        "pg"
+      ],
+      "inputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "outputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "performance_metrics": {
+        "throughput": "39 ops/sec",
+        "latency_ms": 80
+      },
+      "training_candidate": false
+    },
+    {
+      "name": "phase-lane-completion",
+      "description": "utility",
+      "module_type": "utility",
+      "dependencies": [
+        "fs/promises",
+        "path",
+        "url"
+      ],
+      "inputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "outputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "performance_metrics": {
+        "throughput": "39 ops/sec",
+        "latency_ms": 135
+      },
+      "training_candidate": false
+    },
+    {
+      "name": "phase17-pytorch-feature-extractor",
+      "description": "utility",
+      "module_type": "utility",
+      "dependencies": [
+        "fs/promises",
+        "child_process",
+        "path",
+        "url"
+      ],
+      "inputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "outputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "performance_metrics": {
+        "throughput": "68 ops/sec",
+        "latency_ms": 55
+      },
+      "training_candidate": false
+    },
+    {
+      "name": "phase18-xgboost-reranker",
+      "description": "utility",
+      "module_type": "utility",
+      "dependencies": [
+        "fs/promises",
+        "child_process",
+        "path",
+        "url"
+      ],
+      "inputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "outputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "performance_metrics": {
+        "throughput": "77 ops/sec",
+        "latency_ms": 47
+      },
+      "training_candidate": false
+    },
+    {
+      "name": "phase19-retrieval-loop-seed",
+      "description": "* phase19-retrieval-loop-seed.mjs — Phase 19: Retrieval Loop Seed\n *\n * Reads phase18 reranked cards (.tmp/phase18-xgboost-rerank.jsonl) and emits\n * one retrieval-loop event per card to .tmp/atlas-retrieval-loop.jsonl.\n *\n * This seeds the feedback file so that:\n *   1. phase-lane-completion.mjs reports all 5 files present\n *   2. token-card-weight-updater.mjs has a baseline retrieval corpus to start from\n *\n * Each event records: card_id, sourceRef, lane, score, recommended_action,\n * plus minimal retrieval metadata (timestamp, retrieval_mode, cosine_sim).\n *\n * Usage:\n *   node scripts/atlas/phase19-retrieval-loop-seed.mjs\n *   node scripts/atlas/phase19-retrieval-loop-seed.mjs --dry-run\n *   node scripts/atlas/phase19-retrieval-loop-seed.mjs --max 50",
+      "module_type": "utility",
+      "dependencies": [
+        "fs/promises",
+        "path",
+        "crypto",
+        "url"
+      ],
+      "inputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "outputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "performance_metrics": {
+        "throughput": "79 ops/sec",
+        "latency_ms": 49
+      },
+      "training_candidate": false
+    },
+    {
+      "name": "phase3d-retrieval-telemetry-summary",
+      "description": "utility",
+      "module_type": "utility",
+      "dependencies": [
+        "node:fs/promises",
+        "node:path",
+        "node:url",
+        "./load-atlas-env.mjs"
+      ],
+      "inputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "outputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "performance_metrics": {
+        "throughput": "39 ops/sec",
+        "latency_ms": 97
+      },
+      "training_candidate": false
+    },
+    {
+      "name": "phase6-unified-feature-graph",
+      "description": "* phase6-unified-feature-graph.mjs\n *\n * Phase 6: Map 18 semantic features to their file, table, and cache nodes in Neo4j.\n * Validates cross-feature dependencies and asserts directed acyclic graph (DAG) status.",
+      "module_type": "utility",
+      "dependencies": [
+        "neo4j-driver"
+      ],
+      "inputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "outputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "performance_metrics": {
+        "throughput": "50 ops/sec",
+        "latency_ms": 79
+      },
+      "training_candidate": false
+    },
+    {
+      "name": "plan-runtime-packet-backfill",
+      "description": "utility",
+      "module_type": "utility",
+      "dependencies": [
+        "node:fs/promises",
+        "node:path",
+        "node:url",
+        "pg",
+        "../../../scripts/atlas/connection-config.mjs"
+      ],
+      "inputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "outputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "performance_metrics": {
+        "throughput": "22 ops/sec",
+        "latency_ms": 191
+      },
+      "training_candidate": false
+    },
+    {
+      "name": "populate-atlas-packets-aggressive",
+      "description": "* populate-atlas-packets-aggressive.mjs\n *\n * Extract packets from 6 sources:\n * 1. Qdrant codebase_chunks_768 (real embeddings)\n * 2. atlas_source_refs (canonical source references)\n * 3. Runtime packet traces (ACE/KAG/DAG evidence)\n * 4. Feature dependency groups (feature relationships)\n * 5. Implementation intent aliases (intent → feature mapping)\n * 6. Neo4j parent atlas nodes (graph structure)\n *\n * Generate packet_key via SHA256(source_ref + feature_id + version)\n * Infer feature_id/label from intent aliases, dependency groups, or fallback heuristics\n *\n * Output: atlas_packets table with 100% coverage on core fields\n *\n * Dry-run by default. --apply to write to DB.",
+      "module_type": "utility",
+      "dependencies": [
+        "node:fs/promises",
+        "node:crypto",
+        "node:path",
+        "node:url",
+        "pg",
+        "@qdrant/js-client-rest",
+        "./load-atlas-env.mjs"
+      ],
+      "inputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "outputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "performance_metrics": {
+        "throughput": "22 ops/sec",
+        "latency_ms": 146
+      },
+      "training_candidate": false
+    },
+    {
+      "name": "prepare-knowledge-layer",
+      "description": "utility",
+      "module_type": "utility",
+      "dependencies": [
+        "fs/promises",
+        "path"
+      ],
+      "inputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "outputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "performance_metrics": {
+        "throughput": "104 ops/sec",
+        "latency_ms": 38
+      },
+      "training_candidate": false
+    },
+    {
+      "name": "project-clusters-neo4j",
+      "description": "* scripts/atlas/project-clusters-neo4j.mjs\n * \n * Projects task-to-cluster relationships into Neo4j.",
+      "module_type": "utility",
+      "dependencies": [
+        "neo4j-driver",
+        "node:fs",
+        "node:path"
+      ],
+      "inputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "outputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "performance_metrics": {
+        "throughput": "125 ops/sec",
+        "latency_ms": 25
+      },
+      "training_candidate": false
+    },
+    {
+      "name": "project-feature-matrix-neo4j",
+      "description": "* project-feature-matrix-neo4j.mjs\r\n *\r\n * Stage 5 of the ACE Feature Context Matrix pipeline.\r\n * Projects chunk → feature → file relationships from an NDJSON file\r\n * into Neo4j as typed edges:\r\n *\r\n *   (:AtlasChunk {chunk_id}) -[:MENTIONS]-> (:CodebaseFile {path})\r\n *   (:AtlasChunk {chunk_id}) -[:HAS_FEATURE]-> (:AtlasFeature {key})\r\n *   (:AtlasFeature {key})   -[:REFERENCES]->  (:CodebaseFile {path})\r\n *\r\n * Designed for DAG-style traversal in ACE/KAG: given a file path,\r\n * Cypher can follow MENTIONS/REFERENCES edges to find which chunks\r\n * discuss it, and which features map to it.\r\n *\r\n * Usage:\r\n *   node scripts/atlas/project-feature-matrix-neo4j.mjs \\\r\n *     --input tmp/chunks/error-context.ndjson \\\r\n *     --dry-run\r\n *\r\n *   node scripts/atlas/project-feature-matrix-neo4j.mjs \\\r\n *     --input tmp/chunks/error-context-rg.ndjson\r\n *\r\n * Env:\r\n *   NEO4J_URI      default bolt://localhost:7687\r\n *   NEO4J_USER     default neo4j\r\n *   NEO4J_PASS     default neo4j123",
+      "module_type": "utility",
+      "dependencies": [
+        "node:fs",
+        "node:path",
+        "node:url"
+      ],
+      "inputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "outputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "performance_metrics": {
+        "throughput": "50 ops/sec",
+        "latency_ms": 73
+      },
+      "training_candidate": false
+    },
+    {
+      "name": "prototype_feature_extract",
+      "description": "utility",
+      "module_type": "utility",
+      "dependencies": [
+        "module",
+        "url",
+        "path",
+        "fs/promises"
+      ],
+      "inputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "outputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "performance_metrics": {
+        "throughput": "208 ops/sec",
+        "latency_ms": 17
+      },
+      "training_candidate": false
+    },
+    {
+      "name": "qdrant-tag-backfill",
+      "description": "* qdrant-tag-backfill.mjs\r\n *\r\n * Backfills `tags` and `feature_key` payload fields on existing Qdrant points\r\n * that were indexed without tags or with incomplete tags.\r\n *\r\n * Two modes:\r\n *   --from-ndjson  (default) — reads an NDJSON file and patches Qdrant points\r\n *                              by chunk_id match\r\n *   --scan         — scrolls an entire collection and re-infers tags from the\r\n *                    `text` payload field, patching any point missing `tags`\r\n *\r\n * Usage:\r\n *   node scripts/atlas/qdrant-tag-backfill.mjs \\\r\n *     --collection error_notes \\\r\n *     --from-ndjson tmp/chunks/error-context.ndjson \\\r\n *     --dry-run\r\n *\r\n *   node scripts/atlas/qdrant-tag-backfill.mjs \\\r\n *     --collection docs_chunks \\\r\n *     --scan \\\r\n *     --tags feature:workers.kmeans,error:syntax\r\n *\r\n *   node scripts/atlas/qdrant-tag-backfill.mjs \\\r\n *     --collection error_notes \\\r\n *     --scan --dry-run\r\n *\r\n * Env:\r\n *   QDRANT_URL    default http://localhost:6333",
+      "module_type": "utility",
+      "dependencies": [
+        "node:fs",
+        "node:path",
+        "node:url"
+      ],
+      "inputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "outputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "performance_metrics": {
+        "throughput": "43 ops/sec",
+        "latency_ms": 97
+      },
+      "training_candidate": false
+    },
+    {
+      "name": "reconcile-qdrant-postgres-payloads",
+      "description": "* reconcile-qdrant-postgres-payloads.mjs\n *\n * Diagnose and fix 0/50 payload mismatch between Qdrant and Postgres.\n *\n * Contract verification:\n *   Qdrant codebase_chunks_768 payload MUST have:\n *     - feature_id (string)\n *     - source_ref (string)\n *     - packet_key (string)\n *     - community_id (integer)\n *     - som_cluster (integer)\n *\n *   Postgres atlas_packets MUST have:\n *     - packet_key (string, PK)\n *     - feature_id (string)\n *     - source_ref (string)\n *     - community_id (integer)\n *     - metadata JSONB\n *\n * Usage:\n *   npm run atlas:qdrant:postgres:reconcile --sample 50\n *   npm run atlas:qdrant:postgres:reconcile --apply",
+      "module_type": "utility",
+      "dependencies": [
+        "pg",
+        "node:fs",
+        "node:path",
+        "node:url"
+      ],
+      "inputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "outputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "performance_metrics": {
+        "throughput": "34 ops/sec",
+        "latency_ms": 85
+      },
+      "training_candidate": false
+    },
+    {
+      "name": "record-git-diff-provenance",
+      "description": "* record-git-diff-provenance.mjs\n *\n * Capture git context for each atlas packet:\n * - Current branch\n * - Commits since last stable tag\n * - Changed files in current branch vs main\n * - Git diff summary (insertions, deletions, files modified)\n *\n * Output: provenance_records with git blame and change tracking\n *\n * Dry-run by default. --apply to persist.",
+      "module_type": "utility",
+      "dependencies": [
+        "node:fs/promises",
+        "node:child_process",
+        "node:path",
+        "node:url",
+        "pg",
+        "./load-atlas-env.mjs"
+      ],
+      "inputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "outputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "performance_metrics": {
+        "throughput": "40 ops/sec",
+        "latency_ms": 81
+      },
+      "training_candidate": false
+    },
+    {
+      "name": "redis_inspect_wiki_note_dir",
+      "description": "utility",
+      "module_type": "utility",
+      "dependencies": [
+        "ioredis"
+      ],
+      "inputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "outputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "performance_metrics": {
+        "throughput": "270 ops/sec",
+        "latency_ms": 11
+      },
+      "training_candidate": false
+    },
+    {
+      "name": "repair-qdrant-postgres-join",
+      "description": "* Repair Qdrant ↔ Postgres join (atlas_packets.qdrant_point_id)\n *\n * P3 blocker: Many atlas_packets rows have NULL qdrant_point_id even though\n * atlas_higher_hop_index has the canonical qdrant_point_id.\n *\n * This script:\n * 1. Finds rows where atlas_packets.packet_key matches atlas_higher_hop_index\n * 2. Copies qdrant_point_id + collection from higher_hop_index\n * 3. Reports coverage before/after\n *\n * Per user guidance: First repair by join, only embed missing packets after.\n *\n * Usage:\n *   node scripts/atlas/repair-qdrant-postgres-join.mjs --dry-run\n *   node scripts/atlas/repair-qdrant-postgres-join.mjs --apply\n *   node scripts/atlas/repair-qdrant-postgres-join.mjs --verbose",
+      "module_type": "utility",
+      "dependencies": [
+        "pg",
+        "./load-atlas-env.mjs"
+      ],
+      "inputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "outputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "performance_metrics": {
+        "throughput": "49 ops/sec",
+        "latency_ms": 72
+      },
+      "training_candidate": false
+    },
+    {
+      "name": "repair-qdrant-postgres-match",
+      "description": "* P3g Join Repair: Sync 154 packets where Qdrant payload exists but Postgres qdrant_point_id is NULL\n *\n * These packets already have embeddings in Qdrant (via prior ingestion or external source).\n * Just need to populate atlas_packets.qdrant_point_id by matching packet_key.\n *\n * Usage:\n *   node scripts/atlas/repair-qdrant-postgres-match.mjs --dry-run\n *   node scripts/atlas/repair-qdrant-postgres-match.mjs --apply",
+      "module_type": "utility",
+      "dependencies": [
+        "pg",
+        "@qdrant/js-client-rest",
+        "./load-atlas-env.mjs"
+      ],
+      "inputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "outputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "performance_metrics": {
+        "throughput": "54 ops/sec",
+        "latency_ms": 64
+      },
+      "training_candidate": false
+    },
+    {
+      "name": "rotorquant-turbovec-sidecar",
+      "description": "* rotorquant-turbovec-sidecar.mjs\r\n * Phase A: RotorQuant + TurboVec 4-bit ANN prefilter sidecar\r\n *\r\n * Exposes a fast ANN pre-filter HTTP service on port 8792.\r\n * Primary path: spawns turbovec_sidecar.py (Python + turbovec package).\r\n * Fallback:     JS-native 64d centroid cosine ANN from Redis keys:\r\n *                 gpu:autoencoder:centroids_64  (hash, field → \"f1,f2,…\")\r\n *                 ace:autoencoder:weights       (hash, W1/b1/W2/b2)\r\n *                 ace:cluster:*                  (hash → JSON cluster cards)\r\n *\r\n * HTTP API (all accept/return JSON):\r\n *   GET  /health         → { ok, backend, candidateIndexSize, ts }\r\n *   POST /search         → body: { vector: number[], topK?: number }\r\n *                          resp: { candidates: [{id, score, cluster}], backend }\r\n *   POST /prefilter      → body: { vector: number[], topClusters?: number }\r\n *                          resp: { clusterIds: number[], centroidScores: {id:score} }\r\n *\r\n * Usage:\r\n *   node scripts/atlas/rotorquant-turbovec-sidecar.mjs [--port 8792] [--no-python]",
+      "module_type": "utility",
+      "dependencies": [
+        "node:http",
+        "node:child_process",
+        "ioredis",
+        "dotenv",
+        "node:path",
+        "node:url",
+        "@grpc/grpc-js",
+        "@grpc/proto-loader"
+      ],
+      "inputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "outputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "performance_metrics": {
+        "throughput": "20 ops/sec",
+        "latency_ms": 197
+      },
+      "training_candidate": false
+    },
+    {
+      "name": "run-replay-breadth-50",
+      "description": "* Run a bounded replay-breadth pass and summarize the benchmark output.\n *\n * This stays read-only. It reuses the existing retrieval E2E benchmark and\n * converts its output into the replay trace summary surface expected by the\n * board.",
+      "module_type": "utility",
+      "dependencies": [
+        "node:fs/promises",
+        "node:path",
+        "node:url",
+        "node:child_process"
+      ],
+      "inputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "outputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "performance_metrics": {
+        "throughput": "26 ops/sec",
+        "latency_ms": 173
+      },
+      "training_candidate": false
+    },
+    {
+      "name": "run-seed-nonfatal",
+      "description": "* run-seed-nonfatal.mjs — shell-agnostic wrapper for atlas:cartridge-seed\n *\n * Spawns `node scripts/atlas/atlas-cartridge-seed.mjs` and catches any failure,\n * writing a warning into .tmp/atlas-cartridge-seed-meta.json so that\n * graphify-health.mjs can surface it without breaking the daily pipeline.\n *\n * This script ALWAYS exits 0 — it is designed to be used in && chains where\n * `|| true` is not cross-platform (Windows PowerShell vs bash).\n *\n * Usage (from sveltekit-frontend/):\n *   node scripts/atlas/run-seed-nonfatal.mjs\n *   node scripts/atlas/run-seed-nonfatal.mjs -- --publish   (forward flags)",
+      "module_type": "utility",
+      "dependencies": [
+        "node:child_process",
+        "node:fs",
+        "node:path",
+        "node:url"
+      ],
+      "inputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "outputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "performance_metrics": {
+        "throughput": "139 ops/sec",
+        "latency_ms": 23
+      },
+      "training_candidate": false
+    },
+    {
+      "name": "run_auth_probes",
+      "description": "utility",
+      "module_type": "utility",
+      "dependencies": [
+        "child_process",
+        "fs",
+        "path",
+        "url"
+      ],
+      "inputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "outputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "performance_metrics": {
+        "throughput": "139 ops/sec",
+        "latency_ms": 29
+      },
+      "training_candidate": false
+    },
+    {
+      "name": "run_auth_probes_with_env",
+      "description": "utility",
+      "module_type": "utility",
+      "dependencies": [
+        "fs",
+        "child_process",
+        "url"
+      ],
+      "inputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "outputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "performance_metrics": {
+        "throughput": "333 ops/sec",
+        "latency_ms": 13
+      },
+      "training_candidate": false
+    },
+    {
+      "name": "run_label_and_count",
+      "description": "utility",
+      "module_type": "utility",
+      "dependencies": [
+        "child_process",
+        "fs",
+        "path"
+      ],
+      "inputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "outputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "performance_metrics": {
+        "throughput": "333 ops/sec",
+        "latency_ms": 10
+      },
+      "training_candidate": false
+    },
+    {
+      "name": "run_live_cache_checks",
+      "description": "utility",
+      "module_type": "utility",
+      "dependencies": [
+        "url",
+        "path",
+        "fs",
+        "child_process"
+      ],
+      "inputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "outputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "performance_metrics": {
+        "throughput": "112 ops/sec",
+        "latency_ms": 31
+      },
+      "training_candidate": false
+    },
+    {
+      "name": "run_with_env",
+      "description": "utility",
+      "module_type": "utility",
+      "dependencies": [
+        "fs",
+        "child_process",
+        "url"
+      ],
+      "inputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "outputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "performance_metrics": {
+        "throughput": "256 ops/sec",
+        "latency_ms": 19
+      },
+      "training_candidate": false
+    },
+    {
+      "name": "search-clusters-lexical",
+      "description": "* scripts/atlas/search-clusters-lexical.mjs\n * \n * \"Lane 0\" search optimized for cluster discovery using ripgrep.",
+      "module_type": "utility",
+      "dependencies": [
+        "node:child_process",
+        "node:path",
+        "node:fs"
+      ],
+      "inputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "outputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "performance_metrics": {
+        "throughput": "139 ops/sec",
+        "latency_ms": 24
+      },
+      "training_candidate": false
+    },
+    {
+      "name": "search-gemma4-context-test",
+      "description": "utility",
+      "module_type": "utility",
+      "dependencies": [
+        "node:fs/promises",
+        "node:path",
+        "node:url",
+        "pg",
+        "../../../scripts/atlas/connection-config.mjs"
+      ],
+      "inputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "outputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "performance_metrics": {
+        "throughput": "29 ops/sec",
+        "latency_ms": 122
+      },
+      "training_candidate": false
+    },
+    {
+      "name": "seed-neo4j-bounded-used-packet-edges",
+      "description": "* Bounded Neo4j seed from the agent trace spine.\n *\n * Dry-run by default. When --apply is present, writes only USED_CONCEPT and\n * USED_PACKET edges in bounded batches. The canonical source remains Postgres.",
+      "module_type": "utility",
+      "dependencies": [
+        "node:fs",
+        "node:fs/promises",
+        "node:path",
+        "node:url",
+        "neo4j-driver",
+        "pg",
+        "./load-atlas-env.mjs",
+        "../../../scripts/atlas/connection-config.mjs"
+      ],
+      "inputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "outputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "performance_metrics": {
+        "throughput": "20 ops/sec",
+        "latency_ms": 176
+      },
+      "training_candidate": false
+    },
+    {
+      "name": "smoke-llm-synthesis-event",
+      "description": "* smoke-llm-synthesis-event.mjs\r\n *\r\n * Standalone smoke test for the LLM synthesis event pipeline.\r\n * Verifies:\r\n *   1. JSONL writer appends a valid row (no forbidden fields, correct shape)\r\n *   2. Redis hot key ace:packet:{runId} is written and readable\r\n *   3. Postgres llm_synthesis_events INSERT succeeds (skipped in --dry-run)\r\n *\r\n * Usage:\r\n *   node scripts/atlas/smoke-llm-synthesis-event.mjs --dry-run\r\n *   node scripts/atlas/smoke-llm-synthesis-event.mjs",
+      "module_type": "utility",
+      "dependencies": [
+        "node:fs",
+        "node:path",
+        "ioredis"
+      ],
+      "inputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "outputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "performance_metrics": {
+        "throughput": "73 ops/sec",
+        "latency_ms": 55
+      },
+      "training_candidate": false
+    },
+    {
+      "name": "smoke-rg-cluster-pivot",
+      "description": "* smoke-rg-cluster-pivot.mjs\n *\n * Standalone smoke test verifying the cluster-pivot retrieval lane.\n * Connects directly to Redis and Qdrant to pull data, executes the similarity and\n * expansion logic, and verifies the shape and integrity of returned UnifiedRetrievalResult hits.\n * Supports dry-run queries via the --query option.",
+      "module_type": "utility",
+      "dependencies": [
+        "ioredis",
+        "node:path",
+        "node:fs",
+        "node:child_process"
+      ],
+      "inputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "outputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "performance_metrics": {
+        "throughput": "29 ops/sec",
+        "latency_ms": 133
+      },
+      "training_candidate": false
+    },
+    {
+      "name": "smoke-topology-ae2l-pca",
+      "description": "* smoke-topology-ae2l-pca.mjs\r\n *\r\n * Standalone smoke test verifying the ae2l-pca 2-layer chained projection mode.\r\n * Loads real trained weights dynamically from Redis, generates sample embeddings,\r\n * and projects them to 4D manifold coordinates.",
+      "module_type": "utility",
+      "dependencies": [
+        "node:path",
+        "node:url"
+      ],
+      "inputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "outputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "performance_metrics": {
+        "throughput": "122 ops/sec",
+        "latency_ms": 37
+      },
+      "training_candidate": false
+    },
+    {
+      "name": "som-kmeans-neo4j-export",
+      "description": "* SOM K-means Topology Generation + Neo4j JSON Export\n *\n * Generates 20×20 SOM grid from Qdrant embeddings using k-means clustering,\n * then exports topology as JSON for Neo4j analysis and Gemma4 synthesis.\n *\n * Usage:\n *   node som-kmeans-neo4j-export.mjs --collection codebase_chunks_768 --grid-size 20 --output som-topology.json",
+      "module_type": "utility",
+      "dependencies": [
+        "node-fetch",
+        "child_process"
+      ],
+      "inputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "outputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "performance_metrics": {
+        "throughput": "31 ops/sec",
+        "latency_ms": 90
+      },
+      "training_candidate": false
+    },
+    {
+      "name": "stage-2c-500-phase-review",
+      "description": "utility",
+      "module_type": "utility",
+      "dependencies": [
+        "node:fs",
+        "node:path"
+      ],
+      "inputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "outputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "performance_metrics": {
+        "throughput": "33 ops/sec",
+        "latency_ms": 124
+      },
+      "training_candidate": false
+    },
+    {
+      "name": "sync-qdrant-metadata-by-source",
+      "description": "* Sync metadata to Qdrant points by source_ref matching\n *\n * Instead of syncing by packet_id (which don't exist in Qdrant),\n * search Qdrant for points matching source_ref and update their payload\n * with the canonical metadata from atlas_packets.\n *\n * Usage:\n *   npm run atlas:qdrant-metadata:sync:dry\n *   npm run atlas:qdrant-metadata:sync:apply",
+      "module_type": "synchronization",
+      "dependencies": [
+        "pg",
+        "@qdrant/js-client-rest",
+        "fs",
+        "path",
+        "node:url",
+        "../../../scripts/atlas/connection-config.mjs"
+      ],
+      "inputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "outputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "performance_metrics": {
+        "throughput": "43 ops/sec",
+        "latency_ms": 60
+      },
+      "training_candidate": false
+    },
+    {
+      "name": "sync-qdrant-packet-payload",
+      "description": "* Sync canonical packet metadata from Postgres atlas_packets to Qdrant codebase_chunks_768\n *\n * After feature_id backfill completes, upsert the canonical metadata JSONB envelope\n * into Qdrant payload field for every point in codebase_chunks_768 collection.\n *\n * Canonical metadata fields (15-field envelope):\n *   - source_ref, file_path, feature_id, feature_label\n *   - group_id, cluster_id, community_id, som_cluster, centroid_id\n *   - domain, ontology, karpathy_score, redis_hot_key, qdrant_point_id, neo4j_node_id\n *   - feature_id_inferred, feature_id_source, updated_at\n *\n * Usage:\n *   npm run atlas:qdrant-payload:sync:dry\n *   npm run atlas:qdrant-payload:sync:apply",
+      "module_type": "synchronization",
+      "dependencies": [
+        "pg",
+        "@qdrant/js-client-rest",
+        "fs",
+        "path",
+        "node:url",
+        "../../../scripts/atlas/connection-config.mjs"
+      ],
+      "inputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "outputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "performance_metrics": {
+        "throughput": "47 ops/sec",
+        "latency_ms": 58
+      },
+      "training_candidate": false
+    },
+    {
+      "name": "synthesize-context-chunks",
+      "description": "* synthesize-context-chunks.mjs\r\n *\r\n * Stage 7 (final) of the ACE Feature Context Matrix pipeline.\r\n * Calls Gemma4 (via TurboQuant :8090 → Ollama :11434 fallback) to synthesize\r\n * a concise action-oriented summary for each feature card group.\r\n *\r\n * Input:  NDJSON chunks (post-embed stage, optionally post-rg-matrix)\r\n * Output: NDJSON with an added `synthesis` field per feature group,\r\n *         written to --out or stdout.\r\n *\r\n * The synthesis prompt asks:\r\n *   \"Given these code/doc/error chunks about {featureKey}, summarize:\r\n *    1. What is this feature?\r\n *    2. What errors/issues are present?\r\n *    3. What files are involved?\r\n *    4. What is the recommended next action?\"\r\n *\r\n * Synthesized records are also upserted to Redis under:\r\n *   ace:ctx:{featureKey}   (synthesis summary + chunk_ids, TTL 24h)\r\n *\r\n * Usage:\r\n *   node scripts/atlas/synthesize-context-chunks.mjs \\\r\n *     --input tmp/chunks/error-context.ndjson \\\r\n *     --out tmp/chunks/error-context-synthesized.ndjson\r\n *   node scripts/atlas/synthesize-context-chunks.mjs \\\r\n *     --input tmp/chunks/notes.ndjson --dry-run\r\n *\r\n * Env:\r\n *   TURBO_URL   default http://localhost:8090  (TurboQuant, chat-only)\r\n *   OLLAMA_URL  default http://localhost:11434 (fallback)\r\n *   REDIS_URL   default redis://localhost:6379\r\n *   REDIS_TTL   default 86400",
+      "module_type": "utility",
+      "dependencies": [
+        "node:fs",
+        "node:path",
+        "node:url",
+        "ioredis"
+      ],
+      "inputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "outputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "performance_metrics": {
+        "throughput": "37 ops/sec",
+        "latency_ms": 104
+      },
+      "training_candidate": false
+    },
+    {
+      "name": "test-turbovec-sidecar-contract",
+      "description": "* test-turbovec-sidecar-contract.mjs\n * Proves that the TurboVec sidecar's contract holds:\n *   - JSON-RPC health check (HTTP GET /health)\n *   - gRPC health check (Health)\n *   - Search (Search)\n *   - BatchCosine (BatchCosine)\n *   - EncodeLatent 768→64 (EncodeLatent)\n *   - AssignSom (AssignSom)\n *   - Transform (Transform)\n * Outputs report to docs/reports/turbovec-sidecar-contract.json",
+      "module_type": "utility",
+      "dependencies": [
+        "node:fs",
+        "node:path",
+        "node:url",
+        "node:module"
+      ],
+      "inputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "outputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "performance_metrics": {
+        "throughput": "30 ops/sec",
+        "latency_ms": 114
+      },
+      "training_candidate": false
+    },
+    {
+      "name": "topology-project-4d",
+      "description": "* topology-project-4d.mjs\r\n *\r\n * Stage 9 of the HyperRAG 4D Topology Knowledge Layer.\r\n * Mathematical projector mapping chunk semantic categories, structural complexities,\r\n * graph connectedness, and sequence indexes into a unified 4D coordinate system (x, y, z, w).\r\n * Enriches every chunk record with absolute index and store identifiers.\r\n *\r\n * Coordinates:\r\n *   x = Semantic Focus Scale (Features = 1.0, Tools = 0.5, Stores = -0.5, Core/Other = 0.0)\r\n *   y = Technical Complexity Scale (Normalized Word Count, capped at 1.0)\r\n *   z = Graph Linkage Density Scale (Count of related file paths, normalized)\r\n *   w = Sequential Index Flow (Relative index of chunk within its file, 0.0 to 1.0)\r\n *\r\n * Usage:\r\n *   node scripts/atlas/topology-project-4d.mjs \\\r\n *     --input tmp/chunks/parents-corpus-expanded.ndjson \\\r\n *     --out tmp/chunks/parents-corpus-4d.ndjson",
+      "module_type": "utility",
+      "dependencies": [
+        "node:fs",
+        "node:path",
+        "node:url"
+      ],
+      "inputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "outputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "performance_metrics": {
+        "throughput": "64 ops/sec",
+        "latency_ms": 63
+      },
+      "training_candidate": false
+    },
+    {
+      "name": "topology-rerank",
+      "description": "* topology-rerank.mjs\r\n *\r\n * Stage 10 of the HyperRAG 4D Topology Knowledge Layer.\r\n * Reranks retrieved chunks based on their 4D Euclidean distance to a target \r\n * query's coordinates inside the feature-state topology.\r\n *\r\n * Usage:\r\n *   node scripts/atlas/topology-rerank.mjs \\\r\n *     --input tmp/chunks/parents-corpus-4d.ndjson \\\r\n *     --query \"how does the kmeans-worker handle errors\" \\\r\n *     --limit 5",
+      "module_type": "utility",
+      "dependencies": [
+        "node:fs",
+        "node:path",
+        "node:url"
+      ],
+      "inputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "outputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "performance_metrics": {
+        "throughput": "85 ops/sec",
+        "latency_ms": 50
+      },
+      "training_candidate": false
+    },
+    {
+      "name": "turbovec-grpc-health",
+      "description": "* turbovec-grpc-health.mjs\n * Health check probe for the TurboVec Cuda gRPC server.",
+      "module_type": "utility",
+      "dependencies": [
+        "@grpc/grpc-js",
+        "@grpc/proto-loader",
+        "node:path",
+        "node:url"
+      ],
+      "inputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "outputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "performance_metrics": {
+        "throughput": "192 ops/sec",
+        "latency_ms": 17
+      },
+      "training_candidate": false
+    },
+    {
+      "name": "unified-atlas-trace",
+      "description": "* unified-atlas-trace.mjs\r\n *\r\n * CHR97 fast path first, TRACE MCP fallback on low confidence, then\r\n * deterministic context fusion with sourceRefs.\r\n *\r\n * Usage:\r\n *   node --import tsx scripts/atlas/unified-atlas-trace.mjs --query \"how does x handle errors\"\r\n *   node --import tsx scripts/atlas/unified-atlas-trace.mjs --query \"...\" --dry-run --json",
+      "module_type": "utility",
+      "dependencies": [
+        "node:fs/promises",
+        "node:path",
+        "node:url",
+        "node:util",
+        "../../src/lib/server/ace/context-assembler.ts",
+        "./ace-context-fusion.mjs",
+        "../rg-atlas/run-rg.mjs"
+      ],
+      "inputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "outputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "performance_metrics": {
+        "throughput": "25 ops/sec",
+        "latency_ms": 153
+      },
+      "training_candidate": false
+    },
+    {
+      "name": "update-manifold-activity",
+      "description": "* scripts/atlas/update-manifold-activity.mjs\n * \n * Updates the activity_w signal in the 4D manifold based on retrieval feedback.",
+      "module_type": "utility",
+      "dependencies": [],
+      "inputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "outputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "performance_metrics": {
+        "throughput": "213 ops/sec",
+        "latency_ms": 14
+      },
+      "training_candidate": false
+    },
+    {
+      "name": "update-task-performance",
+      "description": "* scripts/atlas/update-task-performance.mjs\n * \n * Updates performance metrics (hit_rate, accepted_rate) for task distillates in Qdrant.",
+      "module_type": "utility",
+      "dependencies": [],
+      "inputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "outputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "performance_metrics": {
+        "throughput": "139 ops/sec",
+        "latency_ms": 21
+      },
+      "training_candidate": false
+    },
+    {
+      "name": "upsert_parent_atlas_jsonb",
+      "description": "utility",
+      "module_type": "utility",
+      "dependencies": [
+        "fs",
+        "path",
+        "url"
+      ],
+      "inputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "outputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "performance_metrics": {
+        "throughput": "98 ops/sec",
+        "latency_ms": 41
+      },
+      "training_candidate": false
+    },
+    {
+      "name": "validate-addressable-packets",
+      "description": "validation & audit",
+      "module_type": "validation & audit",
+      "dependencies": [
+        "node:fs/promises",
+        "node:path",
+        "node:url"
+      ],
+      "inputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "outputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "performance_metrics": {
+        "throughput": "40 ops/sec",
+        "latency_ms": 99
+      },
+      "training_candidate": true
+    },
+    {
+      "name": "validate-compression-quality",
+      "description": "* validate-compression-quality.mjs\n *\n * Read-only compression quality report for the 768→64 autoencoder pipeline.\n *\n * Compares:\n *   - Qdrant 768d neighbor agreement  (ground truth)\n *   - Redis 64d encoded neighbor agreement  (gpu:karpathy:encoded)\n *   - Centroid assignment stability  (gpu:autoencoder:centroids_64)\n *\n * Output:\n *   docs/reports/compression-quality-report.json\n *   docs/reports/compression-quality-report.md\n *\n * Usage:\n *   node scripts/atlas/validate-compression-quality.mjs\n *   node scripts/atlas/validate-compression-quality.mjs --limit=100\n *   node scripts/atlas/validate-compression-quality.mjs --dry-run",
+      "module_type": "validation & audit",
+      "dependencies": [
+        "ioredis",
+        "node:fs",
+        "node:url",
+        "node:path"
+      ],
+      "inputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "outputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "performance_metrics": {
+        "throughput": "27 ops/sec",
+        "latency_ms": 171
+      },
+      "training_candidate": true
+    },
+    {
+      "name": "validate-manifold4-payloads",
+      "description": "* scripts/atlas/validate-manifold4-payloads.mjs\n * \n * Validates that Qdrant points have manifold4 metadata, and can repair\n * missing cluster aliases / manifold metadata from nearest-centroid lookup.",
+      "module_type": "validation & audit",
+      "dependencies": [
+        "node:fs",
+        "node:path"
+      ],
+      "inputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "outputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "performance_metrics": {
+        "throughput": "69 ops/sec",
+        "latency_ms": 52
+      },
+      "training_candidate": true
+    },
+    {
+      "name": "validate-master-feature-map",
+      "description": "* scripts/atlas/validate-master-feature-map.mjs\n * \n * Manual validator for the Master Feature Map.\n * Bypasses Zod issues while ensuring architectural truthfulness.",
+      "module_type": "validation & audit",
+      "dependencies": [
+        "../../src/lib/server/atlas/master-feature-map.ts",
+        "node:fs",
+        "node:path"
+      ],
+      "inputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "outputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "performance_metrics": {
+        "throughput": "161 ops/sec",
+        "latency_ms": 20
+      },
+      "training_candidate": true
+    },
+    {
+      "name": "validate-metadata-queries",
+      "description": "* Phase 3: Validate metadata-filtered Qdrant queries",
+      "module_type": "validation & audit",
+      "dependencies": [
+        "node-fetch"
+      ],
+      "inputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "outputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "performance_metrics": {
+        "throughput": "72 ops/sec",
+        "latency_ms": 55
+      },
+      "training_candidate": true
+    },
+    {
+      "name": "validate-packet-contract",
+      "description": "validation & audit",
+      "module_type": "validation & audit",
+      "dependencies": [
+        "./validate-addressable-packets.mjs"
+      ],
+      "inputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "outputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "performance_metrics": {
+        "throughput": "1111 ops/sec",
+        "latency_ms": 2
+      },
+      "training_candidate": true
+    },
+    {
+      "name": "verify-cold-storage-manifest",
+      "description": "* Normalize URI for comparison",
+      "module_type": "verification",
+      "dependencies": [
+        "node:fs",
+        "node:path",
+        "node:url",
+        "pg",
+        "node:https",
+        "node:http",
+        "./load-atlas-env.mjs"
+      ],
+      "inputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "outputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "performance_metrics": {
+        "throughput": "24 ops/sec",
+        "latency_ms": 141
+      },
+      "training_candidate": false
+    },
+    {
+      "name": "verify-directory-source-map",
+      "description": "* Normalize path separators to forward slashes (Unix style)",
+      "module_type": "verification",
+      "dependencies": [
+        "node:fs",
+        "node:path",
+        "node:url",
+        "node:child_process",
+        "ignore"
+      ],
+      "inputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "outputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "performance_metrics": {
+        "throughput": "31 ops/sec",
+        "latency_ms": 91
+      },
+      "training_candidate": false
+    },
+    {
+      "name": "verify-feature-lineage",
+      "description": "* Normalize packet_key for comparison (handle null, whitespace, variants)",
+      "module_type": "verification",
+      "dependencies": [
+        "node:fs",
+        "node:path",
+        "node:url",
+        "pg",
+        "./load-atlas-env.mjs"
+      ],
+      "inputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "outputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "performance_metrics": {
+        "throughput": "27 ops/sec",
+        "latency_ms": 115
+      },
+      "training_candidate": false
+    },
+    {
+      "name": "verify-p3-readiness",
+      "description": "* P3 Readiness Verification\n *\n * Checks that P1h, P2, P3 phases are complete and P3g can proceed.\n * Gates:\n * - P1h: retrieval_provenance has P2 fields (retrieval_strategy, retrieval_path)\n * - P2: 250/250 rows populated with sensible values\n * - P3: atlas_packets.qdrant_point_id join completed (2,488/17,995 = 13.8% covered)\n * - P3g ready: 15,507 packets still need embeddings\n *\n * Usage:\n *   node scripts/atlas/verify-p3-readiness.mjs",
+      "module_type": "verification",
+      "dependencies": [
+        "pg",
+        "./load-atlas-env.mjs"
+      ],
+      "inputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "outputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "performance_metrics": {
+        "throughput": "51 ops/sec",
+        "latency_ms": 84
+      },
+      "training_candidate": false
+    },
+    {
+      "name": "verify-packet-metadata",
+      "description": "verification",
+      "module_type": "verification",
+      "dependencies": [
+        "node:fs/promises",
+        "node:path",
+        "node:url",
+        "pg",
+        "../../../scripts/atlas/connection-config.mjs"
+      ],
+      "inputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "outputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "performance_metrics": {
+        "throughput": "43 ops/sec",
+        "latency_ms": 70
+      },
+      "training_candidate": false
+    },
+    {
+      "name": "verify-phase-2-part-4",
+      "description": "* Verify Phase 2 Part 4: Multi-Vector Search + JSONB Metadata + Gemma4 Summarization\n *\n * Live functionality checks:\n * - AST signature extraction (test on sample code)\n * - Metadata validation (test v1→v2 coercion)\n * - Multi-vector endpoint (test with auth + Zod validation)\n * - Redis signature caching (test cache hit/miss)\n * - Qdrant named vector search (test RRF fusion)\n *\n * Usage:\n *   node scripts/atlas/verify-phase-2-part-4.mjs [--save] [--quick]",
+      "module_type": "verification",
+      "dependencies": [
+        "node:fs",
+        "node:path",
+        "node:url"
+      ],
+      "inputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "outputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "performance_metrics": {
+        "throughput": "63 ops/sec",
+        "latency_ms": 50
+      },
+      "training_candidate": false
+    },
+    {
+      "name": "verify-qdrant-packet-payload",
+      "description": "@type {Record<string, unknown>}",
+      "module_type": "verification",
+      "dependencies": [
+        "node:fs/promises",
+        "node:path",
+        "node:url",
+        "pg",
+        "@qdrant/js-client-rest",
+        "../../../scripts/atlas/connection-config.mjs"
+      ],
+      "inputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "outputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "performance_metrics": {
+        "throughput": "24 ops/sec",
+        "latency_ms": 149
+      },
+      "training_candidate": false
+    },
+    {
+      "name": "warmup-bifrost-clusters",
+      "description": "utility",
+      "module_type": "utility",
+      "dependencies": [
+        "redis",
+        "node-fetch",
+        "timers/promises",
+        "../lib/redis-url.mjs"
+      ],
+      "inputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "outputs": {
+        "shape": "variable",
+        "dtype": "json"
+      },
+      "performance_metrics": {
+        "throughput": "104 ops/sec",
+        "latency_ms": 35
+      },
+      "training_candidate": false
+    }
+  ]
+}
