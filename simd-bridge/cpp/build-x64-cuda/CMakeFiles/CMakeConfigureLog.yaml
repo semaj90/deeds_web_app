@@ -5926,3 +5926,358 @@ events:
         13.0
       exitCode: 0
 ...
+
+---
+events:
+  -
+    kind: "try_run-v1"
+    backtrace:
+      - "C:/libtorch-win-shared-with-deps-2.9.0+cu130/libtorch/share/cmake/Caffe2/public/cuda.cmake:99 (try_run)"
+      - "C:/libtorch-win-shared-with-deps-2.9.0+cu130/libtorch/share/cmake/Caffe2/Caffe2Config.cmake:86 (include)"
+      - "C:/libtorch-win-shared-with-deps-2.9.0+cu130/libtorch/share/cmake/Torch/TorchConfig.cmake:68 (find_package)"
+      - "CMakeLists.txt:266 (find_package)"
+    directories:
+      source: "C:/Users/james/Videos/deeds-web-app/simd-bridge/cpp/build-x64-cuda/7VJm1/CMakeFiles/CMakeTmp"
+      binary: "C:/Users/james/Videos/deeds-web-app/simd-bridge/cpp/build-x64-cuda/7VJm1/CMakeFiles/CMakeTmp"
+    cmakeVariables:
+      CMAKE_CXX_FLAGS: "/DWIN32 /D_WINDOWS /GR /EHsc"
+      CMAKE_CXX_FLAGS_DEBUG: "/Zi /Ob0 /Od /RTC1"
+      CMAKE_EXE_LINKER_FLAGS: "/machine:x64"
+      CMAKE_MODULE_PATH: "C:/libtorch-win-shared-with-deps-2.9.0+cu130/libtorch/share/cmake/Caffe2;C:/libtorch-win-shared-with-deps-2.9.0+cu130/libtorch/share/cmake/Caffe2/public/../Modules_CUDA_fix"
+      CMAKE_POSITION_INDEPENDENT_CODE: "ON"
+    buildResult:
+      variable: "compile_result"
+      cached: true
+      stdout: |
+        Change Dir: 'C:/Users/james/Videos/deeds-web-app/simd-bridge/cpp/build-x64-cuda/7VJm1/CMakeFiles/CMakeTmp'
+        
+        Run Build Command(s): "C:/Program Files/Microsoft Visual Studio/2022/Community/MSBuild/Current/Bin/amd64/MSBuild.exe" cmTC_9df7a.vcxproj /p:Configuration=Debug /p:Platform=x64 /p:VisualStudioVersion=17.0 /v:n
+        MSBuild version 17.13.19+0d9f5a35a for .NET Framework
+        Build started 6/22/2026 7:22:03 AM.
+        
+        Project "C:\\Users\\james\\Videos\\deeds-web-app\\simd-bridge\\cpp\\build-x64-cuda\\7VJm1\\CMakeFiles\\CMakeTmp\\cmTC_9df7a.vcxproj" on node 1 (default targets).
+        PrepareForBuild:
+          Creating directory "cmTC_9df7a.dir\\Debug\\".
+          Structured output is enabled. The formatting of compiler diagnostics will reflect the error hierarchy. See https://aka.ms/cpp/structured-output for more details.
+          Creating directory "C:\\Users\\james\\Videos\\deeds-web-app\\simd-bridge\\cpp\\build-x64-cuda\\7VJm1\\CMakeFiles\\CMakeTmp\\Debug\\".
+          Creating directory "cmTC_9df7a.dir\\Debug\\cmTC_9df7a.tlog\\".
+        InitializeBuildStatus:
+          Creating "cmTC_9df7a.dir\\Debug\\cmTC_9df7a.tlog\\unsuccessfulbuild" because "AlwaysCreate" was specified.
+          Touching "cmTC_9df7a.dir\\Debug\\cmTC_9df7a.tlog\\unsuccessfulbuild".
+        VcpkgTripletSelection:
+          Using triplet "x64-windows" from "C:\\vcpkg\\installed\\x64-windows\\"
+          Using normalized configuration "Debug"
+        ClCompile:
+          C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.42.34433\\bin\\HostX64\\x64\\CL.exe /c /I"C:\\Program Files\\NVIDIA GPU Computing Toolkit\\CUDA\\v13.0\\include" /I"C:\\vcpkg\\installed\\x64-windows\\include" /Zi /W1 /WX- /diagnostics:column /Od /Ob0 /D _MBCS /D WIN32 /D _WINDOWS /D "CMAKE_INTDIR=\\"Debug\\"" /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Zc:inline /GR /std:c++17 /Fo"cmTC_9df7a.dir\\Debug\\\\" /Fd"cmTC_9df7a.dir\\Debug\\vc143.pdb" /external:W1 /Gd /TP /errorReport:queue "C:\\Users\\james\\Videos\\deeds-web-app\\simd-bridge\\cpp\\build-x64-cuda\\detect_cuda_version.cc"
+          Microsoft (R) C/C++ Optimizing Compiler Version 19.42.34440 for x64
+          Copyright (C) Microsoft Corporation.  All rights reserved.
+          cl /c /I"C:\\Program Files\\NVIDIA GPU Computing Toolkit\\CUDA\\v13.0\\include" /I"C:\\vcpkg\\installed\\x64-windows\\include" /Zi /W1 /WX- /diagnostics:column /Od /Ob0 /D _MBCS /D WIN32 /D _WINDOWS /D "CMAKE_INTDIR=\\"Debug\\"" /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Zc:inline /GR /std:c++17 /Fo"cmTC_9df7a.dir\\Debug\\\\" /Fd"cmTC_9df7a.dir\\Debug\\vc143.pdb" /external:W1 /Gd /TP /errorReport:queue "C:\\Users\\james\\Videos\\deeds-web-app\\simd-bridge\\cpp\\build-x64-cuda\\detect_cuda_version.cc"
+          detect_cuda_version.cc
+        Link:
+          C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.42.34433\\bin\\HostX64\\x64\\link.exe /ERRORREPORT:QUEUE /OUT:"C:\\Users\\james\\Videos\\deeds-web-app\\simd-bridge\\cpp\\build-x64-cuda\\7VJm1\\CMakeFiles\\CMakeTmp\\Debug\\cmTC_9df7a.exe" /INCREMENTAL /ILK:"cmTC_9df7a.dir\\Debug\\cmTC_9df7a.ilk" /NOLOGO /LIBPATH:"C:\\vcpkg\\installed\\x64-windows\\debug\\lib" /LIBPATH:"C:\\vcpkg\\installed\\x64-windows\\debug\\lib\\manual-link" "C:\\Program Files\\NVIDIA GPU Computing Toolkit\\CUDA\\v13.0\\lib\\x64\\cudart_static.lib" kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib "C:\\vcpkg\\installed\\x64-windows\\debug\\lib\\*.lib" /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"C:/Users/james/Videos/deeds-web-app/simd-bridge/cpp/build-x64-cuda/7VJm1/CMakeFiles/CMakeTmp/Debug/cmTC_9df7a.pdb" /SUBSYSTEM:CONSOLE /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"C:/Users/james/Videos/deeds-web-app/simd-bridge/cpp/build-x64-cuda/7VJm1/CMakeFiles/CMakeTmp/Debug/cmTC_9df7a.lib" /MACHINE:X64  /machine:x64 cmTC_9df7a.dir\\Debug\\detect_cuda_version.obj
+          cmTC_9df7a.vcxproj -> C:\\Users\\james\\Videos\\deeds-web-app\\simd-bridge\\cpp\\build-x64-cuda\\7VJm1\\CMakeFiles\\CMakeTmp\\Debug\\cmTC_9df7a.exe
+        AppLocalFromInstalled:
+          pwsh.exe -ExecutionPolicy Bypass -noprofile -File "C:\\vcpkg\\scripts\\buildsystems\\msbuild\\applocal.ps1" "C:\\Users\\james\\Videos\\deeds-web-app\\simd-bridge\\cpp\\build-x64-cuda\\7VJm1\\CMakeFiles\\CMakeTmp\\Debug\\cmTC_9df7a.exe" "C:\\vcpkg\\installed\\x64-windows\\debug\\bin" "cmTC_9df7a.dir\\Debug\\cmTC_9df7a.tlog\\cmTC_9df7a.write.1u.tlog" "cmTC_9df7a.dir\\Debug\\vcpkg.applocal.log"
+        FinalizeBuildStatus:
+          Deleting file "cmTC_9df7a.dir\\Debug\\cmTC_9df7a.tlog\\unsuccessfulbuild".
+          Touching "cmTC_9df7a.dir\\Debug\\cmTC_9df7a.tlog\\cmTC_9df7a.lastbuildstate".
+        Done Building Project "C:\\Users\\james\\Videos\\deeds-web-app\\simd-bridge\\cpp\\build-x64-cuda\\7VJm1\\CMakeFiles\\CMakeTmp\\cmTC_9df7a.vcxproj" (default targets).
+        
+        Build succeeded.
+            0 Warning(s)
+            0 Error(s)
+        
+        Time Elapsed 00:00:04.84
+        
+      exitCode: 0
+    runResult:
+      variable: "run_result"
+      cached: true
+      stdout: |
+        13.0
+      exitCode: 0
+...
+
+---
+events:
+  -
+    kind: "try_run-v1"
+    backtrace:
+      - "C:/libtorch-win-shared-with-deps-2.9.0+cu130/libtorch/share/cmake/Caffe2/public/cuda.cmake:99 (try_run)"
+      - "C:/libtorch-win-shared-with-deps-2.9.0+cu130/libtorch/share/cmake/Caffe2/Caffe2Config.cmake:86 (include)"
+      - "C:/libtorch-win-shared-with-deps-2.9.0+cu130/libtorch/share/cmake/Torch/TorchConfig.cmake:68 (find_package)"
+      - "CMakeLists.txt:266 (find_package)"
+    directories:
+      source: "C:/Users/james/Videos/deeds-web-app/simd-bridge/cpp/build-x64-cuda/ktbrG/CMakeFiles/CMakeTmp"
+      binary: "C:/Users/james/Videos/deeds-web-app/simd-bridge/cpp/build-x64-cuda/ktbrG/CMakeFiles/CMakeTmp"
+    cmakeVariables:
+      CMAKE_CXX_FLAGS: "/DWIN32 /D_WINDOWS /GR /EHsc"
+      CMAKE_CXX_FLAGS_DEBUG: "/Zi /Ob0 /Od /RTC1"
+      CMAKE_EXE_LINKER_FLAGS: "/machine:x64"
+      CMAKE_MODULE_PATH: "C:/libtorch-win-shared-with-deps-2.9.0+cu130/libtorch/share/cmake/Caffe2;C:/libtorch-win-shared-with-deps-2.9.0+cu130/libtorch/share/cmake/Caffe2/public/../Modules_CUDA_fix"
+      CMAKE_POSITION_INDEPENDENT_CODE: "ON"
+    buildResult:
+      variable: "compile_result"
+      cached: true
+      stdout: |
+        Change Dir: 'C:/Users/james/Videos/deeds-web-app/simd-bridge/cpp/build-x64-cuda/ktbrG/CMakeFiles/CMakeTmp'
+        
+        Run Build Command(s): "C:/Program Files/Microsoft Visual Studio/2022/Community/MSBuild/Current/Bin/amd64/MSBuild.exe" cmTC_14d19.vcxproj /p:Configuration=Debug /p:Platform=x64 /p:VisualStudioVersion=17.0 /v:n
+        MSBuild version 17.13.19+0d9f5a35a for .NET Framework
+        Build started 6/22/2026 1:29:23 PM.
+        
+        Project "C:\\Users\\james\\Videos\\deeds-web-app\\simd-bridge\\cpp\\build-x64-cuda\\ktbrG\\CMakeFiles\\CMakeTmp\\cmTC_14d19.vcxproj" on node 1 (default targets).
+        PrepareForBuild:
+          Creating directory "cmTC_14d19.dir\\Debug\\".
+          Structured output is enabled. The formatting of compiler diagnostics will reflect the error hierarchy. See https://aka.ms/cpp/structured-output for more details.
+          Creating directory "C:\\Users\\james\\Videos\\deeds-web-app\\simd-bridge\\cpp\\build-x64-cuda\\ktbrG\\CMakeFiles\\CMakeTmp\\Debug\\".
+          Creating directory "cmTC_14d19.dir\\Debug\\cmTC_14d19.tlog\\".
+        InitializeBuildStatus:
+          Creating "cmTC_14d19.dir\\Debug\\cmTC_14d19.tlog\\unsuccessfulbuild" because "AlwaysCreate" was specified.
+          Touching "cmTC_14d19.dir\\Debug\\cmTC_14d19.tlog\\unsuccessfulbuild".
+        VcpkgTripletSelection:
+          Using triplet "x64-windows" from "C:\\vcpkg\\installed\\x64-windows\\"
+          Using normalized configuration "Debug"
+        ClCompile:
+          C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.42.34433\\bin\\HostX64\\x64\\CL.exe /c /I"C:\\Program Files\\NVIDIA GPU Computing Toolkit\\CUDA\\v13.0\\include" /I"C:\\vcpkg\\installed\\x64-windows\\include" /Zi /W1 /WX- /diagnostics:column /Od /Ob0 /D _MBCS /D WIN32 /D _WINDOWS /D "CMAKE_INTDIR=\\"Debug\\"" /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Zc:inline /GR /std:c++17 /Fo"cmTC_14d19.dir\\Debug\\\\" /Fd"cmTC_14d19.dir\\Debug\\vc143.pdb" /external:W1 /Gd /TP /errorReport:queue "C:\\Users\\james\\Videos\\deeds-web-app\\simd-bridge\\cpp\\build-x64-cuda\\detect_cuda_version.cc"
+          Microsoft (R) C/C++ Optimizing Compiler Version 19.42.34440 for x64
+          Copyright (C) Microsoft Corporation.  All rights reserved.
+          cl /c /I"C:\\Program Files\\NVIDIA GPU Computing Toolkit\\CUDA\\v13.0\\include" /I"C:\\vcpkg\\installed\\x64-windows\\include" /Zi /W1 /WX- /diagnostics:column /Od /Ob0 /D _MBCS /D WIN32 /D _WINDOWS /D "CMAKE_INTDIR=\\"Debug\\"" /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Zc:inline /GR /std:c++17 /Fo"cmTC_14d19.dir\\Debug\\\\" /Fd"cmTC_14d19.dir\\Debug\\vc143.pdb" /external:W1 /Gd /TP /errorReport:queue "C:\\Users\\james\\Videos\\deeds-web-app\\simd-bridge\\cpp\\build-x64-cuda\\detect_cuda_version.cc"
+          detect_cuda_version.cc
+        Link:
+          C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.42.34433\\bin\\HostX64\\x64\\link.exe /ERRORREPORT:QUEUE /OUT:"C:\\Users\\james\\Videos\\deeds-web-app\\simd-bridge\\cpp\\build-x64-cuda\\ktbrG\\CMakeFiles\\CMakeTmp\\Debug\\cmTC_14d19.exe" /INCREMENTAL /ILK:"cmTC_14d19.dir\\Debug\\cmTC_14d19.ilk" /NOLOGO /LIBPATH:"C:\\vcpkg\\installed\\x64-windows\\debug\\lib" /LIBPATH:"C:\\vcpkg\\installed\\x64-windows\\debug\\lib\\manual-link" "C:\\Program Files\\NVIDIA GPU Computing Toolkit\\CUDA\\v13.0\\lib\\x64\\cudart_static.lib" kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib "C:\\vcpkg\\installed\\x64-windows\\debug\\lib\\*.lib" /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"C:/Users/james/Videos/deeds-web-app/simd-bridge/cpp/build-x64-cuda/ktbrG/CMakeFiles/CMakeTmp/Debug/cmTC_14d19.pdb" /SUBSYSTEM:CONSOLE /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"C:/Users/james/Videos/deeds-web-app/simd-bridge/cpp/build-x64-cuda/ktbrG/CMakeFiles/CMakeTmp/Debug/cmTC_14d19.lib" /MACHINE:X64  /machine:x64 cmTC_14d19.dir\\Debug\\detect_cuda_version.obj
+          cmTC_14d19.vcxproj -> C:\\Users\\james\\Videos\\deeds-web-app\\simd-bridge\\cpp\\build-x64-cuda\\ktbrG\\CMakeFiles\\CMakeTmp\\Debug\\cmTC_14d19.exe
+        AppLocalFromInstalled:
+          pwsh.exe -ExecutionPolicy Bypass -noprofile -File "C:\\vcpkg\\scripts\\buildsystems\\msbuild\\applocal.ps1" "C:\\Users\\james\\Videos\\deeds-web-app\\simd-bridge\\cpp\\build-x64-cuda\\ktbrG\\CMakeFiles\\CMakeTmp\\Debug\\cmTC_14d19.exe" "C:\\vcpkg\\installed\\x64-windows\\debug\\bin" "cmTC_14d19.dir\\Debug\\cmTC_14d19.tlog\\cmTC_14d19.write.1u.tlog" "cmTC_14d19.dir\\Debug\\vcpkg.applocal.log"
+        FinalizeBuildStatus:
+          Deleting file "cmTC_14d19.dir\\Debug\\cmTC_14d19.tlog\\unsuccessfulbuild".
+          Touching "cmTC_14d19.dir\\Debug\\cmTC_14d19.tlog\\cmTC_14d19.lastbuildstate".
+        Done Building Project "C:\\Users\\james\\Videos\\deeds-web-app\\simd-bridge\\cpp\\build-x64-cuda\\ktbrG\\CMakeFiles\\CMakeTmp\\cmTC_14d19.vcxproj" (default targets).
+        
+        Build succeeded.
+            0 Warning(s)
+            0 Error(s)
+        
+        Time Elapsed 00:00:03.19
+        
+      exitCode: 0
+    runResult:
+      variable: "run_result"
+      cached: true
+      stdout: |
+        13.0
+      exitCode: 0
+...
+
+---
+events:
+  -
+    kind: "try_run-v1"
+    backtrace:
+      - "C:/libtorch-win-shared-with-deps-2.9.0+cu130/libtorch/share/cmake/Caffe2/public/cuda.cmake:99 (try_run)"
+      - "C:/libtorch-win-shared-with-deps-2.9.0+cu130/libtorch/share/cmake/Caffe2/Caffe2Config.cmake:86 (include)"
+      - "C:/libtorch-win-shared-with-deps-2.9.0+cu130/libtorch/share/cmake/Torch/TorchConfig.cmake:68 (find_package)"
+      - "CMakeLists.txt:266 (find_package)"
+    directories:
+      source: "C:/Users/james/Videos/deeds-web-app/simd-bridge/cpp/build-x64-cuda/WhuEG/CMakeFiles/CMakeTmp"
+      binary: "C:/Users/james/Videos/deeds-web-app/simd-bridge/cpp/build-x64-cuda/WhuEG/CMakeFiles/CMakeTmp"
+    cmakeVariables:
+      CMAKE_CXX_FLAGS: "/DWIN32 /D_WINDOWS /GR /EHsc"
+      CMAKE_CXX_FLAGS_DEBUG: "/Zi /Ob0 /Od /RTC1"
+      CMAKE_EXE_LINKER_FLAGS: "/machine:x64"
+      CMAKE_MODULE_PATH: "C:/libtorch-win-shared-with-deps-2.9.0+cu130/libtorch/share/cmake/Caffe2;C:/libtorch-win-shared-with-deps-2.9.0+cu130/libtorch/share/cmake/Caffe2/public/../Modules_CUDA_fix"
+      CMAKE_POSITION_INDEPENDENT_CODE: "ON"
+    buildResult:
+      variable: "compile_result"
+      cached: true
+      stdout: |
+        Change Dir: 'C:/Users/james/Videos/deeds-web-app/simd-bridge/cpp/build-x64-cuda/WhuEG/CMakeFiles/CMakeTmp'
+        
+        Run Build Command(s): "C:/Program Files/Microsoft Visual Studio/2022/Community/MSBuild/Current/Bin/amd64/MSBuild.exe" cmTC_ee0da.vcxproj /p:Configuration=Debug /p:Platform=x64 /p:VisualStudioVersion=17.0 /v:n
+        MSBuild version 17.13.19+0d9f5a35a for .NET Framework
+        Build started 6/22/2026 2:33:47 PM.
+        
+        Project "C:\\Users\\james\\Videos\\deeds-web-app\\simd-bridge\\cpp\\build-x64-cuda\\WhuEG\\CMakeFiles\\CMakeTmp\\cmTC_ee0da.vcxproj" on node 1 (default targets).
+        PrepareForBuild:
+          Creating directory "cmTC_ee0da.dir\\Debug\\".
+          Structured output is enabled. The formatting of compiler diagnostics will reflect the error hierarchy. See https://aka.ms/cpp/structured-output for more details.
+          Creating directory "C:\\Users\\james\\Videos\\deeds-web-app\\simd-bridge\\cpp\\build-x64-cuda\\WhuEG\\CMakeFiles\\CMakeTmp\\Debug\\".
+          Creating directory "cmTC_ee0da.dir\\Debug\\cmTC_ee0da.tlog\\".
+        InitializeBuildStatus:
+          Creating "cmTC_ee0da.dir\\Debug\\cmTC_ee0da.tlog\\unsuccessfulbuild" because "AlwaysCreate" was specified.
+          Touching "cmTC_ee0da.dir\\Debug\\cmTC_ee0da.tlog\\unsuccessfulbuild".
+        VcpkgTripletSelection:
+          Using triplet "x64-windows" from "C:\\vcpkg\\installed\\x64-windows\\"
+          Using normalized configuration "Debug"
+        ClCompile:
+          C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.42.34433\\bin\\HostX64\\x64\\CL.exe /c /I"C:\\Program Files\\NVIDIA GPU Computing Toolkit\\CUDA\\v13.0\\include" /I"C:\\vcpkg\\installed\\x64-windows\\include" /Zi /W1 /WX- /diagnostics:column /Od /Ob0 /D _MBCS /D WIN32 /D _WINDOWS /D "CMAKE_INTDIR=\\"Debug\\"" /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Zc:inline /GR /std:c++17 /Fo"cmTC_ee0da.dir\\Debug\\\\" /Fd"cmTC_ee0da.dir\\Debug\\vc143.pdb" /external:W1 /Gd /TP /errorReport:queue "C:\\Users\\james\\Videos\\deeds-web-app\\simd-bridge\\cpp\\build-x64-cuda\\detect_cuda_version.cc"
+          Microsoft (R) C/C++ Optimizing Compiler Version 19.42.34440 for x64
+          Copyright (C) Microsoft Corporation.  All rights reserved.
+          cl /c /I"C:\\Program Files\\NVIDIA GPU Computing Toolkit\\CUDA\\v13.0\\include" /I"C:\\vcpkg\\installed\\x64-windows\\include" /Zi /W1 /WX- /diagnostics:column /Od /Ob0 /D _MBCS /D WIN32 /D _WINDOWS /D "CMAKE_INTDIR=\\"Debug\\"" /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Zc:inline /GR /std:c++17 /Fo"cmTC_ee0da.dir\\Debug\\\\" /Fd"cmTC_ee0da.dir\\Debug\\vc143.pdb" /external:W1 /Gd /TP /errorReport:queue "C:\\Users\\james\\Videos\\deeds-web-app\\simd-bridge\\cpp\\build-x64-cuda\\detect_cuda_version.cc"
+          detect_cuda_version.cc
+        Link:
+          C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.42.34433\\bin\\HostX64\\x64\\link.exe /ERRORREPORT:QUEUE /OUT:"C:\\Users\\james\\Videos\\deeds-web-app\\simd-bridge\\cpp\\build-x64-cuda\\WhuEG\\CMakeFiles\\CMakeTmp\\Debug\\cmTC_ee0da.exe" /INCREMENTAL /ILK:"cmTC_ee0da.dir\\Debug\\cmTC_ee0da.ilk" /NOLOGO /LIBPATH:"C:\\vcpkg\\installed\\x64-windows\\debug\\lib" /LIBPATH:"C:\\vcpkg\\installed\\x64-windows\\debug\\lib\\manual-link" "C:\\Program Files\\NVIDIA GPU Computing Toolkit\\CUDA\\v13.0\\lib\\x64\\cudart_static.lib" kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib "C:\\vcpkg\\installed\\x64-windows\\debug\\lib\\*.lib" /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"C:/Users/james/Videos/deeds-web-app/simd-bridge/cpp/build-x64-cuda/WhuEG/CMakeFiles/CMakeTmp/Debug/cmTC_ee0da.pdb" /SUBSYSTEM:CONSOLE /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"C:/Users/james/Videos/deeds-web-app/simd-bridge/cpp/build-x64-cuda/WhuEG/CMakeFiles/CMakeTmp/Debug/cmTC_ee0da.lib" /MACHINE:X64  /machine:x64 cmTC_ee0da.dir\\Debug\\detect_cuda_version.obj
+          cmTC_ee0da.vcxproj -> C:\\Users\\james\\Videos\\deeds-web-app\\simd-bridge\\cpp\\build-x64-cuda\\WhuEG\\CMakeFiles\\CMakeTmp\\Debug\\cmTC_ee0da.exe
+        AppLocalFromInstalled:
+          pwsh.exe -ExecutionPolicy Bypass -noprofile -File "C:\\vcpkg\\scripts\\buildsystems\\msbuild\\applocal.ps1" "C:\\Users\\james\\Videos\\deeds-web-app\\simd-bridge\\cpp\\build-x64-cuda\\WhuEG\\CMakeFiles\\CMakeTmp\\Debug\\cmTC_ee0da.exe" "C:\\vcpkg\\installed\\x64-windows\\debug\\bin" "cmTC_ee0da.dir\\Debug\\cmTC_ee0da.tlog\\cmTC_ee0da.write.1u.tlog" "cmTC_ee0da.dir\\Debug\\vcpkg.applocal.log"
+        FinalizeBuildStatus:
+          Deleting file "cmTC_ee0da.dir\\Debug\\cmTC_ee0da.tlog\\unsuccessfulbuild".
+          Touching "cmTC_ee0da.dir\\Debug\\cmTC_ee0da.tlog\\cmTC_ee0da.lastbuildstate".
+        Done Building Project "C:\\Users\\james\\Videos\\deeds-web-app\\simd-bridge\\cpp\\build-x64-cuda\\WhuEG\\CMakeFiles\\CMakeTmp\\cmTC_ee0da.vcxproj" (default targets).
+        
+        Build succeeded.
+            0 Warning(s)
+            0 Error(s)
+        
+        Time Elapsed 00:00:01.81
+        
+      exitCode: 0
+    runResult:
+      variable: "run_result"
+      cached: true
+      stdout: |
+        13.0
+      exitCode: 0
+...
+
+---
+events:
+  -
+    kind: "try_run-v1"
+    backtrace:
+      - "C:/libtorch-win-shared-with-deps-2.9.0+cu130/libtorch/share/cmake/Caffe2/public/cuda.cmake:99 (try_run)"
+      - "C:/libtorch-win-shared-with-deps-2.9.0+cu130/libtorch/share/cmake/Caffe2/Caffe2Config.cmake:86 (include)"
+      - "C:/libtorch-win-shared-with-deps-2.9.0+cu130/libtorch/share/cmake/Torch/TorchConfig.cmake:68 (find_package)"
+      - "CMakeLists.txt:266 (find_package)"
+    directories:
+      source: "C:/Users/james/Videos/deeds-web-app/simd-bridge/cpp/build-x64-cuda/y8beD/CMakeFiles/CMakeTmp"
+      binary: "C:/Users/james/Videos/deeds-web-app/simd-bridge/cpp/build-x64-cuda/y8beD/CMakeFiles/CMakeTmp"
+    cmakeVariables:
+      CMAKE_CXX_FLAGS: "/DWIN32 /D_WINDOWS /GR /EHsc"
+      CMAKE_CXX_FLAGS_DEBUG: "/Zi /Ob0 /Od /RTC1"
+      CMAKE_EXE_LINKER_FLAGS: "/machine:x64"
+      CMAKE_MODULE_PATH: "C:/libtorch-win-shared-with-deps-2.9.0+cu130/libtorch/share/cmake/Caffe2;C:/libtorch-win-shared-with-deps-2.9.0+cu130/libtorch/share/cmake/Caffe2/public/../Modules_CUDA_fix"
+      CMAKE_POSITION_INDEPENDENT_CODE: "ON"
+    buildResult:
+      variable: "compile_result"
+      cached: true
+      stdout: |
+        Change Dir: 'C:/Users/james/Videos/deeds-web-app/simd-bridge/cpp/build-x64-cuda/y8beD/CMakeFiles/CMakeTmp'
+        
+        Run Build Command(s): "C:/Program Files/Microsoft Visual Studio/2022/Community/MSBuild/Current/Bin/amd64/MSBuild.exe" cmTC_4b47a.vcxproj /p:Configuration=Debug /p:Platform=x64 /p:VisualStudioVersion=17.0 /v:n
+        MSBuild version 17.13.19+0d9f5a35a for .NET Framework
+        Build started 6/22/2026 2:35:19 PM.
+        
+        Project "C:\\Users\\james\\Videos\\deeds-web-app\\simd-bridge\\cpp\\build-x64-cuda\\y8beD\\CMakeFiles\\CMakeTmp\\cmTC_4b47a.vcxproj" on node 1 (default targets).
+        PrepareForBuild:
+          Creating directory "cmTC_4b47a.dir\\Debug\\".
+          Structured output is enabled. The formatting of compiler diagnostics will reflect the error hierarchy. See https://aka.ms/cpp/structured-output for more details.
+          Creating directory "C:\\Users\\james\\Videos\\deeds-web-app\\simd-bridge\\cpp\\build-x64-cuda\\y8beD\\CMakeFiles\\CMakeTmp\\Debug\\".
+          Creating directory "cmTC_4b47a.dir\\Debug\\cmTC_4b47a.tlog\\".
+        InitializeBuildStatus:
+          Creating "cmTC_4b47a.dir\\Debug\\cmTC_4b47a.tlog\\unsuccessfulbuild" because "AlwaysCreate" was specified.
+          Touching "cmTC_4b47a.dir\\Debug\\cmTC_4b47a.tlog\\unsuccessfulbuild".
+        VcpkgTripletSelection:
+          Using triplet "x64-windows" from "C:\\vcpkg\\installed\\x64-windows\\"
+          Using normalized configuration "Debug"
+        ClCompile:
+          C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.42.34433\\bin\\HostX64\\x64\\CL.exe /c /I"C:\\Program Files\\NVIDIA GPU Computing Toolkit\\CUDA\\v13.0\\include" /I"C:\\vcpkg\\installed\\x64-windows\\include" /Zi /W1 /WX- /diagnostics:column /Od /Ob0 /D _MBCS /D WIN32 /D _WINDOWS /D "CMAKE_INTDIR=\\"Debug\\"" /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Zc:inline /GR /std:c++17 /Fo"cmTC_4b47a.dir\\Debug\\\\" /Fd"cmTC_4b47a.dir\\Debug\\vc143.pdb" /external:W1 /Gd /TP /errorReport:queue "C:\\Users\\james\\Videos\\deeds-web-app\\simd-bridge\\cpp\\build-x64-cuda\\detect_cuda_version.cc"
+          Microsoft (R) C/C++ Optimizing Compiler Version 19.42.34440 for x64
+          Copyright (C) Microsoft Corporation.  All rights reserved.
+          cl /c /I"C:\\Program Files\\NVIDIA GPU Computing Toolkit\\CUDA\\v13.0\\include" /I"C:\\vcpkg\\installed\\x64-windows\\include" /Zi /W1 /WX- /diagnostics:column /Od /Ob0 /D _MBCS /D WIN32 /D _WINDOWS /D "CMAKE_INTDIR=\\"Debug\\"" /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Zc:inline /GR /std:c++17 /Fo"cmTC_4b47a.dir\\Debug\\\\" /Fd"cmTC_4b47a.dir\\Debug\\vc143.pdb" /external:W1 /Gd /TP /errorReport:queue "C:\\Users\\james\\Videos\\deeds-web-app\\simd-bridge\\cpp\\build-x64-cuda\\detect_cuda_version.cc"
+          detect_cuda_version.cc
+        Link:
+          C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.42.34433\\bin\\HostX64\\x64\\link.exe /ERRORREPORT:QUEUE /OUT:"C:\\Users\\james\\Videos\\deeds-web-app\\simd-bridge\\cpp\\build-x64-cuda\\y8beD\\CMakeFiles\\CMakeTmp\\Debug\\cmTC_4b47a.exe" /INCREMENTAL /ILK:"cmTC_4b47a.dir\\Debug\\cmTC_4b47a.ilk" /NOLOGO /LIBPATH:"C:\\vcpkg\\installed\\x64-windows\\debug\\lib" /LIBPATH:"C:\\vcpkg\\installed\\x64-windows\\debug\\lib\\manual-link" "C:\\Program Files\\NVIDIA GPU Computing Toolkit\\CUDA\\v13.0\\lib\\x64\\cudart_static.lib" kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib "C:\\vcpkg\\installed\\x64-windows\\debug\\lib\\*.lib" /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"C:/Users/james/Videos/deeds-web-app/simd-bridge/cpp/build-x64-cuda/y8beD/CMakeFiles/CMakeTmp/Debug/cmTC_4b47a.pdb" /SUBSYSTEM:CONSOLE /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"C:/Users/james/Videos/deeds-web-app/simd-bridge/cpp/build-x64-cuda/y8beD/CMakeFiles/CMakeTmp/Debug/cmTC_4b47a.lib" /MACHINE:X64  /machine:x64 cmTC_4b47a.dir\\Debug\\detect_cuda_version.obj
+          cmTC_4b47a.vcxproj -> C:\\Users\\james\\Videos\\deeds-web-app\\simd-bridge\\cpp\\build-x64-cuda\\y8beD\\CMakeFiles\\CMakeTmp\\Debug\\cmTC_4b47a.exe
+        AppLocalFromInstalled:
+          pwsh.exe -ExecutionPolicy Bypass -noprofile -File "C:\\vcpkg\\scripts\\buildsystems\\msbuild\\applocal.ps1" "C:\\Users\\james\\Videos\\deeds-web-app\\simd-bridge\\cpp\\build-x64-cuda\\y8beD\\CMakeFiles\\CMakeTmp\\Debug\\cmTC_4b47a.exe" "C:\\vcpkg\\installed\\x64-windows\\debug\\bin" "cmTC_4b47a.dir\\Debug\\cmTC_4b47a.tlog\\cmTC_4b47a.write.1u.tlog" "cmTC_4b47a.dir\\Debug\\vcpkg.applocal.log"
+        FinalizeBuildStatus:
+          Deleting file "cmTC_4b47a.dir\\Debug\\cmTC_4b47a.tlog\\unsuccessfulbuild".
+          Touching "cmTC_4b47a.dir\\Debug\\cmTC_4b47a.tlog\\cmTC_4b47a.lastbuildstate".
+        Done Building Project "C:\\Users\\james\\Videos\\deeds-web-app\\simd-bridge\\cpp\\build-x64-cuda\\y8beD\\CMakeFiles\\CMakeTmp\\cmTC_4b47a.vcxproj" (default targets).
+        
+        Build succeeded.
+            0 Warning(s)
+            0 Error(s)
+        
+        Time Elapsed 00:00:05.14
+        
+      exitCode: 0
+    runResult:
+      variable: "run_result"
+      cached: true
+      stdout: |
+        13.0
+      exitCode: 0
+...
+
+---
+events:
+  -
+    kind: "try_run-v1"
+    backtrace:
+      - "C:/libtorch-win-shared-with-deps-2.9.0+cu130/libtorch/share/cmake/Caffe2/public/cuda.cmake:99 (try_run)"
+      - "C:/libtorch-win-shared-with-deps-2.9.0+cu130/libtorch/share/cmake/Caffe2/Caffe2Config.cmake:86 (include)"
+      - "C:/libtorch-win-shared-with-deps-2.9.0+cu130/libtorch/share/cmake/Torch/TorchConfig.cmake:68 (find_package)"
+      - "CMakeLists.txt:266 (find_package)"
+    directories:
+      source: "C:/Users/james/Videos/deeds-web-app/simd-bridge/cpp/build-x64-cuda/H1VUl/CMakeFiles/CMakeTmp"
+      binary: "C:/Users/james/Videos/deeds-web-app/simd-bridge/cpp/build-x64-cuda/H1VUl/CMakeFiles/CMakeTmp"
+    cmakeVariables:
+      CMAKE_CXX_FLAGS: "/DWIN32 /D_WINDOWS /GR /EHsc"
+      CMAKE_CXX_FLAGS_DEBUG: "/Zi /Ob0 /Od /RTC1"
+      CMAKE_EXE_LINKER_FLAGS: "/machine:x64"
+      CMAKE_MODULE_PATH: "C:/libtorch-win-shared-with-deps-2.9.0+cu130/libtorch/share/cmake/Caffe2;C:/libtorch-win-shared-with-deps-2.9.0+cu130/libtorch/share/cmake/Caffe2/public/../Modules_CUDA_fix"
+      CMAKE_POSITION_INDEPENDENT_CODE: "ON"
+    buildResult:
+      variable: "compile_result"
+      cached: true
+      stdout: |
+        Change Dir: 'C:/Users/james/Videos/deeds-web-app/simd-bridge/cpp/build-x64-cuda/H1VUl/CMakeFiles/CMakeTmp'
+        
+        Run Build Command(s): "C:/Program Files/Microsoft Visual Studio/2022/Community/MSBuild/Current/Bin/amd64/MSBuild.exe" cmTC_d1c97.vcxproj /p:Configuration=Debug /p:Platform=x64 /p:VisualStudioVersion=17.0 /v:n
+        MSBuild version 17.13.19+0d9f5a35a for .NET Framework
+        Build started 6/22/2026 7:41:02 PM.
+        
+        Project "C:\\Users\\james\\Videos\\deeds-web-app\\simd-bridge\\cpp\\build-x64-cuda\\H1VUl\\CMakeFiles\\CMakeTmp\\cmTC_d1c97.vcxproj" on node 1 (default targets).
+        PrepareForBuild:
+          Creating directory "cmTC_d1c97.dir\\Debug\\".
+          Structured output is enabled. The formatting of compiler diagnostics will reflect the error hierarchy. See https://aka.ms/cpp/structured-output for more details.
+          Creating directory "C:\\Users\\james\\Videos\\deeds-web-app\\simd-bridge\\cpp\\build-x64-cuda\\H1VUl\\CMakeFiles\\CMakeTmp\\Debug\\".
+          Creating directory "cmTC_d1c97.dir\\Debug\\cmTC_d1c97.tlog\\".
+        InitializeBuildStatus:
+          Creating "cmTC_d1c97.dir\\Debug\\cmTC_d1c97.tlog\\unsuccessfulbuild" because "AlwaysCreate" was specified.
+          Touching "cmTC_d1c97.dir\\Debug\\cmTC_d1c97.tlog\\unsuccessfulbuild".
+        VcpkgTripletSelection:
+          Using triplet "x64-windows" from "C:\\vcpkg\\installed\\x64-windows\\"
+          Using normalized configuration "Debug"
+        ClCompile:
+          C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.42.34433\\bin\\HostX64\\x64\\CL.exe /c /I"C:\\Program Files\\NVIDIA GPU Computing Toolkit\\CUDA\\v13.0\\include" /I"C:\\vcpkg\\installed\\x64-windows\\include" /Zi /W1 /WX- /diagnostics:column /Od /Ob0 /D _MBCS /D WIN32 /D _WINDOWS /D "CMAKE_INTDIR=\\"Debug\\"" /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Zc:inline /GR /std:c++17 /Fo"cmTC_d1c97.dir\\Debug\\\\" /Fd"cmTC_d1c97.dir\\Debug\\vc143.pdb" /external:W1 /Gd /TP /errorReport:queue "C:\\Users\\james\\Videos\\deeds-web-app\\simd-bridge\\cpp\\build-x64-cuda\\detect_cuda_version.cc"
+          Microsoft (R) C/C++ Optimizing Compiler Version 19.42.34440 for x64
+          Copyright (C) Microsoft Corporation.  All rights reserved.
+          cl /c /I"C:\\Program Files\\NVIDIA GPU Computing Toolkit\\CUDA\\v13.0\\include" /I"C:\\vcpkg\\installed\\x64-windows\\include" /Zi /W1 /WX- /diagnostics:column /Od /Ob0 /D _MBCS /D WIN32 /D _WINDOWS /D "CMAKE_INTDIR=\\"Debug\\"" /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Zc:inline /GR /std:c++17 /Fo"cmTC_d1c97.dir\\Debug\\\\" /Fd"cmTC_d1c97.dir\\Debug\\vc143.pdb" /external:W1 /Gd /TP /errorReport:queue "C:\\Users\\james\\Videos\\deeds-web-app\\simd-bridge\\cpp\\build-x64-cuda\\detect_cuda_version.cc"
+          detect_cuda_version.cc
+        Link:
+          C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.42.34433\\bin\\HostX64\\x64\\link.exe /ERRORREPORT:QUEUE /OUT:"C:\\Users\\james\\Videos\\deeds-web-app\\simd-bridge\\cpp\\build-x64-cuda\\H1VUl\\CMakeFiles\\CMakeTmp\\Debug\\cmTC_d1c97.exe" /INCREMENTAL /ILK:"cmTC_d1c97.dir\\Debug\\cmTC_d1c97.ilk" /NOLOGO /LIBPATH:"C:\\vcpkg\\installed\\x64-windows\\debug\\lib" /LIBPATH:"C:\\vcpkg\\installed\\x64-windows\\debug\\lib\\manual-link" "C:\\Program Files\\NVIDIA GPU Computing Toolkit\\CUDA\\v13.0\\lib\\x64\\cudart_static.lib" kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib "C:\\vcpkg\\installed\\x64-windows\\debug\\lib\\*.lib" /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"C:/Users/james/Videos/deeds-web-app/simd-bridge/cpp/build-x64-cuda/H1VUl/CMakeFiles/CMakeTmp/Debug/cmTC_d1c97.pdb" /SUBSYSTEM:CONSOLE /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"C:/Users/james/Videos/deeds-web-app/simd-bridge/cpp/build-x64-cuda/H1VUl/CMakeFiles/CMakeTmp/Debug/cmTC_d1c97.lib" /MACHINE:X64  /machine:x64 cmTC_d1c97.dir\\Debug\\detect_cuda_version.obj
+          cmTC_d1c97.vcxproj -> C:\\Users\\james\\Videos\\deeds-web-app\\simd-bridge\\cpp\\build-x64-cuda\\H1VUl\\CMakeFiles\\CMakeTmp\\Debug\\cmTC_d1c97.exe
+        AppLocalFromInstalled:
+          pwsh.exe -ExecutionPolicy Bypass -noprofile -File "C:\\vcpkg\\scripts\\buildsystems\\msbuild\\applocal.ps1" "C:\\Users\\james\\Videos\\deeds-web-app\\simd-bridge\\cpp\\build-x64-cuda\\H1VUl\\CMakeFiles\\CMakeTmp\\Debug\\cmTC_d1c97.exe" "C:\\vcpkg\\installed\\x64-windows\\debug\\bin" "cmTC_d1c97.dir\\Debug\\cmTC_d1c97.tlog\\cmTC_d1c97.write.1u.tlog" "cmTC_d1c97.dir\\Debug\\vcpkg.applocal.log"
+        FinalizeBuildStatus:
+          Deleting file "cmTC_d1c97.dir\\Debug\\cmTC_d1c97.tlog\\unsuccessfulbuild".
+          Touching "cmTC_d1c97.dir\\Debug\\cmTC_d1c97.tlog\\cmTC_d1c97.lastbuildstate".
+        Done Building Project "C:\\Users\\james\\Videos\\deeds-web-app\\simd-bridge\\cpp\\build-x64-cuda\\H1VUl\\CMakeFiles\\CMakeTmp\\cmTC_d1c97.vcxproj" (default targets).
+        
+        Build succeeded.
+            0 Warning(s)
+            0 Error(s)
+        
+        Time Elapsed 00:00:08.08
+        
+      exitCode: 0
+    runResult:
+      variable: "run_result"
+      cached: true
+      stdout: |
+        13.0
+      exitCode: 0
+...

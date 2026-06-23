@@ -16,6 +16,12 @@ export type HyperRagPacketRpcInput = {
   recordTelemetry?: boolean;
   awaitTelemetry?: boolean;
   useExactMatchCache?: boolean;
+  protocol?: 'jsonrpc' | 'http' | 'grpc' | 'mcp';
+  accelerator?: string;
+  cudaAvailable?: boolean;
+  cuvsEnabled?: boolean;
+  matmulMs?: number;
+  embeddingMs?: number;
 };
 
 export type HyperRagPacketRpcPacket = {
@@ -303,6 +309,12 @@ async function recordPacketRpcTelemetry(params: {
   ftsHits: number;
   vectorHits: number;
   packets: HyperRagPacketRpcPacket[];
+  protocol?: 'jsonrpc' | 'http' | 'grpc' | 'mcp';
+  accelerator?: string;
+  cudaAvailable?: boolean;
+  cuvsEnabled?: boolean;
+  matmulMs?: number | null;
+  embeddingMs?: number | null;
   timings?: {
     bm25_ms?:    number;
     qdrant_ms?:  number;
@@ -339,6 +351,13 @@ async function recordPacketRpcTelemetry(params: {
       surface: 'hyperrag-packet-rpc',
       environment: 'phase-3d-retrieval-telemetry',
       retrievalStrategy: 'fusion',
+      protocol: params.protocol ?? 'http',
+      accelerator: params.accelerator ?? 'cpu',
+      cudaAvailable: params.cudaAvailable ?? null,
+      cuvsEnabled: params.cuvsEnabled ?? null,
+      matmulMs: params.matmulMs ?? null,
+      embeddingMs: params.embeddingMs ?? null,
+      verdict: params.packets.some((packet) => packet.neo4j_neighbors.length > 0) ? 'PASS' : 'WARN',
       hitsPayload: {
         hits,
         counts: {
@@ -477,6 +496,13 @@ async function recordQueryEvalTimes(params: {
   turbovecMs: number | null;
   rrfMs: number | null;
   gemma4Ms: number | null;
+  protocol?: string | null;
+  accelerator?: string | null;
+  cudaAvailable?: boolean | null;
+  cuvsEnabled?: boolean | null;
+  matmulMs?: number | null;
+  embeddingMs?: number | null;
+  verdict?: string | null;
   totalMs: number | null;
   cacheHitSource: string | null;
   ttlRemaining: number | null;
@@ -492,14 +518,18 @@ async function recordQueryEvalTimes(params: {
           domain_class, ontology_label, topology_label,
           qdrant_ms, bm25_ms, pg_bm25_ms, pgvector_ms, redis_ms, bitfrost_ms,
           neo4j_ms, turbovec_ms, rerank_ms, gemma4_ms, total_ms,
-          cache_hit_source, ttl_remaining, payload
+          cache_hit_source, ttl_remaining,
+          protocol, accelerator, cuda_available, cuvs_enabled, matmul_ms, embedding_ms, verdict,
+          payload
         ) VALUES (
           $1, $2, $3, $4,
           $5, $6, $7,
           $8, $9, $10,
           $11, $12, $13, $14, $15,
           $16, $17, $18, $19, $20,
-          $21, $22, $23, $24
+          $21, $22,
+          $23, $24, $25, $26, $27, $28, $29,
+          $30, $31
         )
       `,
       [
@@ -526,6 +556,13 @@ async function recordQueryEvalTimes(params: {
         params.totalMs,
         params.cacheHitSource,
         params.ttlRemaining,
+        params.protocol ?? null,
+        params.accelerator ?? null,
+        params.cudaAvailable ?? null,
+        params.cuvsEnabled ?? null,
+        params.matmulMs ?? null,
+        params.embeddingMs ?? null,
+        params.verdict ?? null,
         JSON.stringify(params.payload),
       ]
     );
@@ -938,6 +975,12 @@ export async function hyperragPacketRpc(input: HyperRagPacketRpcInput): Promise<
         ftsHits: ftsHits.length,
         vectorHits: result.trace.qdrant_hits,
         packets,
+        protocol: input.protocol ?? 'http',
+        accelerator: input.accelerator ?? 'cpu',
+        cudaAvailable: input.cudaAvailable ?? null,
+        cuvsEnabled: input.cuvsEnabled ?? null,
+        matmulMs: input.matmulMs ?? null,
+        embeddingMs: input.embeddingMs ?? null,
         timings: {
           bm25_ms: timings.bm25_ms,
           qdrant_ms: timings.qdrant_ms,
@@ -967,6 +1010,13 @@ export async function hyperragPacketRpc(input: HyperRagPacketRpcInput): Promise<
       turbovecMs: timings.turbovec_ms,
       rrfMs: timings.rrf_ms,
       gemma4Ms: timings.gemma4_ms,
+      protocol: input.protocol ?? 'http',
+      accelerator: input.accelerator ?? 'cpu',
+      cudaAvailable: input.cudaAvailable ?? null,
+      cuvsEnabled: input.cuvsEnabled ?? null,
+      matmulMs: input.matmulMs ?? null,
+      embeddingMs: input.embeddingMs ?? null,
+      verdict: result.trace.neo4j_expansions > 0 ? 'PASS' : 'WARN',
       totalMs: latencyMs,
       cacheHitSource: null,
       ttlRemaining: null,
@@ -1005,6 +1055,13 @@ export async function hyperragPacketRpc(input: HyperRagPacketRpcInput): Promise<
       turbovecMs: 0,
       rrfMs: 0,
       gemma4Ms: 0,
+      protocol: input.protocol ?? 'http',
+      accelerator: input.accelerator ?? 'cpu',
+      cudaAvailable: input.cudaAvailable ?? null,
+      cuvsEnabled: input.cuvsEnabled ?? null,
+      matmulMs: input.matmulMs ?? null,
+      embeddingMs: input.embeddingMs ?? null,
+      verdict: 'FAIL',
       totalMs: Date.now() - startedAt,
       cacheHitSource: null,
       ttlRemaining: null,

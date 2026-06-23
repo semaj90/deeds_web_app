@@ -1,0 +1,20 @@
+{
+  "generatedAt": "2026-06-23T00:05:29.634Z",
+  "status": "PASS",
+  "mode": "DRY_RUN",
+  "sourceCollection": "legal_documents",
+  "sourceVector": "content",
+  "targetVector": "latent_128",
+  "sourceDim": 768,
+  "latentDim": 128,
+  "projection": "provisional-fold-tanh-768-to-128",
+  "metrics": {
+    "pointsRead": 100,
+    "projected": 100,
+    "qdrantUpdated": 0,
+    "redisWritten": 0,
+    "skippedMissingContent": 0,
+    "skippedWrongDim": 0,
+    "errors": 0
+  }
+}

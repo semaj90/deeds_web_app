@@ -1,31 +1,48 @@
 #!/usr/bin/env pwsh
 # ═══════════════════════════════════════════════════════════════════════
-# Add LibTorch + CUDA to User PATH (permanent)
+# Add LibTorch + CUDA + cuDNN to User PATH (permanent)
 # Usage: pwsh scripts/add-libtorch-to-path.ps1
 # ═══════════════════════════════════════════════════════════════════════
 
 $LibTorchPath = "C:\libtorch-win-shared-with-deps-2.9.0+cu130\libtorch\lib"
-$CudaPath = "C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v13.0\bin"
+$CudaPaths = @(
+    "C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v13.0\bin",
+    "C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v12.8\bin"
+)
+$CuDnnPaths = @(
+    "C:\Program Files\NVIDIA\CUDNN\v9.16\bin\13.0",
+    "C:\Program Files\NVIDIA\CUDNN\v9.8\bin\12.8"
+)
+
+function Add-PathEntry {
+    param(
+        [string]$PathValue,
+        [string]$Label
+    )
+
+    if ($CurrentPath -notlike "*$PathValue*") {
+        Write-Host "➕ Adding $Label to PATH: $PathValue" -ForegroundColor Green
+        $script:CurrentPath = "$PathValue;$script:CurrentPath"
+        return $true
+    }
+
+    Write-Host "✅ $Label already in PATH" -ForegroundColor Cyan
+    return $false
+}
 
 # Get current user PATH
 $CurrentPath = [Environment]::GetEnvironmentVariable("PATH", "User")
 
 # Check if paths already exist
 $NeedsUpdate = $false
-if ($CurrentPath -notlike "*$LibTorchPath*") {
-    Write-Host "➕ Adding LibTorch to PATH: $LibTorchPath" -ForegroundColor Green
-    $CurrentPath = "$LibTorchPath;$CurrentPath"
-    $NeedsUpdate = $true
-} else {
-    Write-Host "✅ LibTorch already in PATH" -ForegroundColor Cyan
+$NeedsUpdate = (Add-PathEntry -PathValue $LibTorchPath -Label 'LibTorch') -or $NeedsUpdate
+
+foreach ($CudaPath in $CudaPaths) {
+    $NeedsUpdate = (Add-PathEntry -PathValue $CudaPath -Label 'CUDA') -or $NeedsUpdate
 }
 
-if ($CurrentPath -notlike "*$CudaPath*") {
-    Write-Host "➕ Adding CUDA to PATH: $CudaPath" -ForegroundColor Green
-    $CurrentPath = "$CudaPath;$CurrentPath"
-    $NeedsUpdate = $true
-} else {
-    Write-Host "✅ CUDA already in PATH" -ForegroundColor Cyan
+foreach ($CuDnnPath in $CuDnnPaths) {
+    $NeedsUpdate = (Add-PathEntry -PathValue $CuDnnPath -Label 'cuDNN') -or $NeedsUpdate
 }
 
 # Update PATH if needed

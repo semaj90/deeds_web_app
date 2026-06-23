@@ -7,6 +7,9 @@
  * Purpose:
  *   Human concept -> implementation vocabulary -> likely files -> Atlas packet.
  *
+ * Credentials are read from the root .env file (DATABASE_URL, QDRANT_URL,
+ * REDIS_HOST, REDIS_PASSWORD). No hardcoded passwords.
+ *
  * Default mode is dry-run. --apply writes additive atlas_packets rows only.
  */
 
@@ -16,6 +19,21 @@ import crypto from 'node:crypto';
 import process from 'node:process';
 
 const ROOT = process.cwd();
+
+// Load root .env before anything else
+const ENV_FILE = path.join(ROOT, '.env');
+if (fs.existsSync(ENV_FILE)) {
+  for (const line of fs.readFileSync(ENV_FILE, 'utf8').split('\n')) {
+    const trimmed = line.trim();
+    if (!trimmed || trimmed.startsWith('#')) continue;
+    const eq = trimmed.indexOf('=');
+    if (eq === -1) continue;
+    const key = trimmed.slice(0, eq).trim();
+    const val = trimmed.slice(eq + 1).trim();
+    if (key && !(key in process.env)) process.env[key] = val;
+  }
+}
+
 const APPLY = process.argv.includes('--apply');
 const VERIFY = process.argv.includes('--verify');
 const DRY_RUN = process.argv.includes('--dry-run') || (!APPLY && !VERIFY);
@@ -43,12 +61,6 @@ function getEnv(name, fallback = undefined) {
   return value === undefined || value === '' ? fallback : value;
 }
 
-function requireEnv(name) {
-  const value = getEnv(name);
-  if (!value) throw new Error(`Missing required env: ${name}`);
-  return value;
-}
-
 function redact(value) {
   if (!value) return value;
   const s = String(value);
@@ -69,6 +81,27 @@ async function getPgClientCtor() {
   }
   return Client;
 }
+
+// ---------------------------------------------------------------------------
+// Active vector surfaces (as of 2026-06-22, verified in codebase_chunks_768)
+//
+//   content      768-dim   canonical semantic search
+//   encoded_64    64-dim   topology / search (active latent surface)
+//   error        768-dim   error-context embeddings
+//   signature    768-dim   code signature embeddings
+//
+// Redis active keys:
+//   gpu:karpathy:scores    — Karpathy authority blend hash (file -> JSON scores)
+//   gpu:karpathy:encoded   — 64-dim encoded vectors hash (file -> CSV)
+//
+// Neo4j active properties:
+//   gpuCluster, som_cluster, PageRank
+//
+// POSTPONED — do not pursue until retrieval + telemetry lanes are stable:
+//   latent_128            (PATCH to Qdrant failed; no caller yet)
+//   AE training pipeline  (no concrete caller)
+//   manifold graph        (depends on trained AE)
+// ---------------------------------------------------------------------------
 
 const INTENTS = [
   {
@@ -251,7 +284,74 @@ const INTENTS = [
     domain: 'admin_observability',
     feature_id: 'env_runtime_contract',
     feature_label: 'Environment Runtime Contract',
-    description: 'Maps service URL, credential, and local-vs-Docker runtime issues to the env helper and configuration files.'
+    description: 'Maps service URL, credential, and local-vs-Docker runtime issues to the env helper and configuration files. Canonical source: root .env (DATABASE_URL, QDRANT_URL, REDIS_HOST, REDIS_PASSWORD).'
+  },
+  {
+    // Active latent surface: encoded_64 (64-dim) in codebase_chunks_768.
+    // latent_128 is POSTPONED — Qdrant PATCH failed, no caller. Do not pursue
+    // until retrieval and telemetry lanes are stable and a concrete caller exists.
+    intent: 'active_latent_surfaces',
+    aliases: [
+      'encoded_64 search',
+      'latent 64 topology',
+      'qdrant named vector encoded_64',
+      'karpathy encoded hash',
+      'gpu karpathy latent cache',
+      'latent vector current surface'
+    ],
+    implementation_tokens: [
+      'encoded_64',
+      'gpu:karpathy:encoded',
+      'gpu:karpathy:scores',
+      'with_vector',
+      'points/vectors',
+      'latent_64'
+    ],
+    likely_files: [
+      'scripts/karpathy-gpu-enrich.mjs',
+      'scripts/atlas/backfill-latent-vectors.mjs',
+      'sveltekit-frontend/src/lib/server/vector/qdrant-manager.ts'
+    ],
+    domain: 'latent_manifold',
+    feature_id: 'active_latent_surfaces',
+    feature_label: 'Active Latent Surfaces',
+    description: 'Documents the currently active latent vector surfaces. encoded_64 (64-dim) is the live topology/search surface in Qdrant codebase_chunks_768. Redis gpu:karpathy:encoded holds the 64-dim vectors; gpu:karpathy:scores holds the Karpathy authority blend. latent_128, AE training, and manifold graph are POSTPONED until retrieval and telemetry lanes are fully stable.'
+  },
+  {
+    // Active SOM/cluster surfaces in Qdrant payload, Redis, and Neo4j.
+    // Covers the fields that are live today: som_cluster, gpuCluster, PageRank,
+    // somRow, somCol stored as Qdrant payload fields and Neo4j node properties.
+    intent: 'som_topology_surfaces',
+    aliases: [
+      'som payload repair',
+      'gpuCluster payload',
+      'som_cluster backfill',
+      'centroid payload mirror',
+      'qdrant som topology payload',
+      'neo4j gpu cluster pagerank',
+      'som row col centroid'
+    ],
+    implementation_tokens: [
+      'som_cluster',
+      'gpuCluster',
+      'centroid_id',
+      'somRow',
+      'somCol',
+      'cluster:kmeans:k20:centroids',
+      'points/payload',
+      'PageRank',
+      'gpuCluster'
+    ],
+    likely_files: [
+      'scripts/atlas/backfill-qdrant-som-centroids.mjs',
+      'scripts/atlas/train-som-20x20.mjs',
+      'scripts/atlas/backfill-latent-vectors.mjs',
+      'scripts/karpathy-gpu-enrich.mjs'
+    ],
+    domain: 'som_topology',
+    feature_id: 'som_topology_surfaces',
+    feature_label: 'SOM Topology Surfaces',
+    description: 'Maps SOM centroid and cluster payload backfill to the active surfaces: som_cluster/somRow/somCol/centroid_id in Qdrant points/payload; gpuCluster/som_cluster/PageRank as Neo4j node properties; cluster:kmeans:k20:centroids in Redis. AE training and manifold graph are POSTPONED pending retrieval stability.'
   }
 ];
 
@@ -364,6 +464,27 @@ function writeReports(packets, validation) {
     `Packets: ${packets.length}`,
     `Status: ${validation.ok ? 'PASS' : 'FAIL'}`,
     '',
+    '## Active Vector Surfaces',
+    '',
+    '| Named vector | Dim | Role |',
+    '|---|---|---|',
+    '| `content` | 768 | canonical semantic search |',
+    '| `encoded_64` | 64 | topology / search (active latent) |',
+    '| `error` | 768 | error-context embeddings |',
+    '| `signature` | 768 | code signature embeddings |',
+    '',
+    '**Postponed** (no concrete caller, pending retrieval stability): `latent_128`, AE training, manifold graph.',
+    '',
+    '## Active Cache Keys',
+    '',
+    '| Store | Key | Purpose |',
+    '|---|---|---|',
+    '| Redis | `gpu:karpathy:scores` | Karpathy authority blend (file → JSON) |',
+    '| Redis | `gpu:karpathy:encoded` | 64-dim encoded vectors (file → CSV) |',
+    '| Neo4j | `gpuCluster` | GPU cluster node property |',
+    '| Neo4j | `som_cluster` | SOM cluster node property |',
+    '| Neo4j | `PageRank` | PageRank score node property |',
+    '',
     '## Intents',
     '',
     ...packets.map((p) => `- **${p.intent}** -> ${p.feature_label} (${p.likely_files.length} likely files)`),
@@ -384,6 +505,7 @@ function writeReports(packets, validation) {
 
 async function applyToPostgres(packets) {
   const Client = await getPgClientCtor();
+  // DATABASE_URL takes priority; falls back to individual env vars (all from .env)
   const client = getEnv('DATABASE_URL')
     ? new Client({ connectionString: getEnv('DATABASE_URL') })
     : new Client({
@@ -391,7 +513,7 @@ async function applyToPostgres(packets) {
         port: Number(getEnv('POSTGRES_PORT', '5434')),
         database: getEnv('POSTGRES_DB', 'legal_ai_db'),
         user: getEnv('POSTGRES_USER', 'legal_admin'),
-        password: getEnv('POSTGRES_PASSWORD', 'legal')
+        password: getEnv('POSTGRES_PASSWORD')
       });
 
   await client.connect();
@@ -400,28 +522,28 @@ async function applyToPostgres(packets) {
     await client.query(
       `
       INSERT INTO atlas_packets
-        (packet_id, artifact_id, packet_key, source_ref, feature_id, community_id,
-         summary, payload, source_kind, created_at, updated_at)
-      VALUES ($1,$2,$3,$4,$5,$6,$7,$8::jsonb,$9,NOW(),NOW())
-      ON CONFLICT (packet_id) DO UPDATE SET
-        packet_key = EXCLUDED.packet_key,
-        source_ref = EXCLUDED.source_ref,
-        feature_id = EXCLUDED.feature_id,
-        summary = EXCLUDED.summary,
-        payload = EXCLUDED.payload,
-        source_kind = EXCLUDED.source_kind,
-        updated_at = NOW()
+        (packet_key, source_ref, feature_id, feature_label, community_id,
+         summary, payload, source_kind, directory_path, created_at, updated_at)
+      VALUES ($1,$2,$3,$4,$5,$6,$7::jsonb,$8,$9,NOW(),NOW())
+      ON CONFLICT (packet_key) DO UPDATE SET
+        source_ref    = EXCLUDED.source_ref,
+        feature_id    = EXCLUDED.feature_id,
+        feature_label = EXCLUDED.feature_label,
+        summary       = EXCLUDED.summary,
+        payload       = EXCLUDED.payload,
+        source_kind   = EXCLUDED.source_kind,
+        updated_at    = NOW()
       `,
       [
         p.packet_key,
-        p.intent,
-        p.packet_key,
         p.source_ref,
         p.feature_id,
+        p.feature_label,
         p.community_id,
         p.summary,
         JSON.stringify(p),
-        'implementation_intent_alias'
+        'implementation_intent_alias',
+        'scripts/atlas'
       ]
     );
     count++;

@@ -1,30 +1,30 @@
 {
-  "generated_at": "2026-06-18T22:38:50.048Z",
-  "total_packets": 17485,
-  "addressable_packets": 17485,
+  "generated_at": "2026-06-22T16:36:16.674Z",
+  "total_packets": 17985,
+  "addressable_packets": 17985,
   "identity_coverage": {
     "packet_key": {
-      "count": 17485,
+      "count": 17985,
       "pct": 1
     },
     "source_ref": {
-      "count": 17485,
+      "count": 17985,
       "pct": 1
     },
     "feature_id": {
-      "count": 17485,
+      "count": 17985,
       "pct": 1
     },
     "community_id": {
       "count": 17397,
-      "pct": 0.9949671146697169
+      "pct": 0.9673060884070058
     }
   },
   "missing_identity": {
     "packet_key": 0,
     "source_ref": 0,
     "feature_id": 0,
-    "community_id": 88
+    "community_id": 588
   },
   "metadata_coverage": {
     "payload_path": 8367,
@@ -33,8 +33,8 @@
     "payload_source_url": 0,
     "payload_mtime": 7617,
     "payload_hash": 7615,
-    "payload_bm25_text": 17264,
-    "payload_tags": 3171
+    "payload_bm25_text": 17764,
+    "payload_tags": 3671
   },
   "noise_source_refs": 34,
   "duplicate_packet_keys": 0,
@@ -97,7 +97,7 @@
       "pass": true
     },
     "community_id_coverage": {
-      "value": 0.9949671146697169,
+      "value": 0.9673060884070058,
       "threshold": 0.9,
       "pass": true
     },
@@ -122,7 +122,7 @@
       "pass": true
     },
     "metadata_env_coverage": {
-      "value": 0.9815270231627109,
+      "value": 1,
       "threshold": 0,
       "pass": true
     },
@@ -132,7 +132,7 @@
       "pass": true
     },
     "vectors_coverage": {
-      "value": 1,
+      "value": 0.9721990547678621,
       "threshold": 0,
       "pass": true
     }

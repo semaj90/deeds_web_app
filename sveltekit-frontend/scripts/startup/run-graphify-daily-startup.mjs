@@ -16,6 +16,8 @@ const LOG_PATH = resolve(LOG_DIR, 'graphify-daily-startup.log');
 const CACHE_PATH = resolve(LOG_DIR, 'graphify-daily-startup.json');
 const TMP_CACHE_PATH = resolve(TMP_DIR, 'graphify-daily-startup.json');
 const COOLDOWN_SEC = 3600;
+const INCLUDE_SEMANTIC_REFRESH = /^(1|true|yes|on)$/i.test(process.env.GRAPHIFY_DAILY_INCLUDE_SEMANTIC ?? '');
+const SEMANTIC_REFRESH_SCRIPT = process.env.GRAPHIFY_DAILY_SEMANTIC_SCRIPT?.trim() || 'graphify:semantic';
 
 // Load the frontend env before spawning graphify so Redis/Qdrant/Postgres
 // auth and host values are available to every nested npm script.
@@ -44,6 +46,23 @@ function writeValidationCache(payload) {
   return cache;
 }
 
+function spawnNpmScript(scriptName) {
+  return process.platform === 'win32'
+    ? spawnSync(
+        'cmd.exe',
+        ['/d', '/s', '/c', `npm run ${scriptName}`],
+        {
+          cwd: ROOT,
+          stdio: 'inherit',
+          windowsHide: true,
+        }
+      )
+    : spawnSync('npm', ['run', scriptName], {
+        cwd: ROOT,
+        stdio: 'inherit',
+        windowsHide: true,
+      });
+}
 async function preflightRedisAuth() {
   const redis = new Redis({
     ...resolveRedisConnection(),
@@ -111,33 +130,57 @@ if (!redisGate.ok) {
   process.exit(0);
 }
 
-const run = process.platform === 'win32'
-  ? spawnSync(
-      'cmd.exe',
-      ['/d', '/s', '/c', 'npm run graphify:daily'],
-      {
-        cwd: ROOT,
-        stdio: 'inherit',
-        windowsHide: true,
-      }
-    )
-  : spawnSync('npm', ['run', 'graphify:daily'], {
-      cwd: ROOT,
-      stdio: 'inherit',
-      windowsHide: true,
-    });
+const run = spawnNpmScript('graphify:daily');
 
 if (run.status === 0) {
   writeFileSync(STAMP, new Date().toISOString() + '\n', 'utf8');
-  writeFileSync(LOG_PATH, `${new Date().toISOString()} graphify:daily complete\n`, 'utf8');
+
+  let semanticRefresh = {
+    enabled: INCLUDE_SEMANTIC_REFRESH,
+    script: SEMANTIC_REFRESH_SCRIPT,
+    status: 'skipped',
+    detail: null,
+  };
+
+  if (INCLUDE_SEMANTIC_REFRESH) {
+    console.log(`🗺️ graphify:daily semantic refresh → npm run ${SEMANTIC_REFRESH_SCRIPT}`);
+    const semanticRun = spawnNpmScript(SEMANTIC_REFRESH_SCRIPT);
+    if (semanticRun.status === 0) {
+      semanticRefresh = {
+        ...semanticRefresh,
+        status: 'complete',
+        detail: 'graphify:semantic completed successfully',
+      };
+    } else {
+      const semanticError = semanticRun.error ? String(semanticRun.error.message ?? semanticRun.error) : '';
+      semanticRefresh = {
+        ...semanticRefresh,
+        status: 'failed',
+        detail: semanticError || `exit:${semanticRun.status ?? 1}`,
+      };
+      console.warn(`🗺️ graphify:daily semantic refresh failed — ${semanticRefresh.detail}`);
+    }
+  }
+
+  const logBits = [`${new Date().toISOString()} graphify:daily complete`];
+  if (INCLUDE_SEMANTIC_REFRESH) {
+    logBits.push(`semantic:${semanticRefresh.status}`);
+    if (semanticRefresh.detail) logBits.push(`[${semanticRefresh.detail}]`);
+  }
+  writeFileSync(LOG_PATH, `${logBits.join(' | ')}\n`, 'utf8');
   writeValidationCache({
     status: 'complete',
     reason: null,
     detail: 'graphify:daily completed successfully',
     graphFailedDueTo: null,
+    semanticRefresh,
     redis: resolveRedisConnection(),
   });
-  console.log('🗺️ graphify:daily complete');
+  console.log(INCLUDE_SEMANTIC_REFRESH && semanticRefresh.status === 'complete'
+    ? '🗺️ graphify:daily complete + semantic refresh complete'
+    : INCLUDE_SEMANTIC_REFRESH
+      ? '🗺️ graphify:daily complete + semantic refresh warning'
+      : '🗺️ graphify:daily complete');
   process.exit(0);
 }
 
@@ -154,6 +197,12 @@ writeValidationCache({
   reason: runError || (run.signal ? `signal:${run.signal}` : `exit:${run.status ?? 1}`),
   detail: exitBits.join(' | '),
   graphFailedDueTo: runError || (run.signal ? `signal:${run.signal}` : `exit:${run.status ?? 1}`),
+  semanticRefresh: {
+    enabled: INCLUDE_SEMANTIC_REFRESH,
+    script: SEMANTIC_REFRESH_SCRIPT,
+    status: 'skipped',
+    detail: null,
+  },
   redis: resolveRedisConnection(),
 });
 console.error(exitBits.join('\n'));

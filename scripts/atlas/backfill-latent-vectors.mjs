@@ -314,16 +314,30 @@ async function main() {
     for (let i = 0; i < bSize; i++) {
       const id = String(ids[start + i]);
       const ptInfo = pointsMap[id] || {};
-      latentIndex[id] = {
-        primary_id: ptInfo.primary_id || id,
-        qdrant_point_id: ptInfo.qdrant_point_id || '',
-        packet_key: ptInfo.packet_key || null,
-        source_ref: ptInfo.source_ref || null,
-        canonical_source_ref: ptInfo.canonical_source_ref || null,
-        feature_id: ptInfo.feature_id || null,
-        payload_unmatched: ptInfo.payload_unmatched,
-        latent_64: Array.from(lat64.subarray(i * LATENT_DIM, (i + 1) * LATENT_DIM))
-      };
+latentIndex[id] = {
+  primary_id: ptInfo.primary_id || id,
+  qdrant_point_id: ptInfo.qdrant_point_id || '',
+  packet_key: ptInfo.packet_key || null,
+  source_ref: ptInfo.source_ref || null,
+  canonical_source_ref: ptInfo.canonical_source_ref || null,
+  feature_id: ptInfo.feature_id || null,
+
+  // NEW
+  candidate_keys: ptInfo.candidate_keys || [],
+
+  // preserve topology metadata
+  kind: ptInfo.kind ?? null,
+  ledger_type: ptInfo.ledger_type ?? null,
+  canonical: ptInfo.canonical ?? null,
+  payload_unmatched: ptInfo.payload_unmatched ?? null,
+
+  latent_64: Array.from(
+    lat64.subarray(
+      i * LATENT_DIM,
+      (i + 1) * LATENT_DIM
+    )
+  )
+};
     }
     encoded_count = end;
     process.stdout.write(`\r  Encoded ${encoded_count}/${N} (${(t_encode / encoded_count).toFixed(2)} ms/vec)...`);
@@ -378,6 +392,8 @@ async function main() {
     await pool.query('BEGIN');
     try {
       let batchUpdated = 0;
+let batchMatched = 0;
+let batchNotMatched = 0;
       for (const [qdrant_id, entry] of slice) {
         if (
           entry.kind === 'directory-cluster' ||
@@ -435,7 +451,7 @@ async function main() {
         // Reason 1: Direct qdrant_point_id match
         let res = await pool.query(
           `UPDATE atlas_packets
-              SET latent_64 = $1,
+              SET latent_64 = $1::bytea,
                   metadata = jsonb_set(
                     jsonb_set(
                       jsonb_set(coalesce(metadata, '{}'::jsonb), '{ae_epoch}', $3::jsonb),
@@ -465,7 +481,7 @@ async function main() {
         if (!matched && finalPKeys.length > 0) {
           res = await pool.query(
             `UPDATE atlas_packets
-                SET latent_64 = $1,
+                SET latent_64 = $1::bytea,
                     metadata = jsonb_set(
                       jsonb_set(
                         jsonb_set(coalesce(metadata, '{}'::jsonb), '{ae_epoch}', $3::jsonb),
@@ -474,7 +490,7 @@ async function main() {
                       '{ae_timestamp}', $5::jsonb
                     ),
                     updated_at = NOW()
-              WHERE packet_key = ANY($2)
+              WHERE packet_key = ANY($2::text[])
              RETURNING packet_id`,
             [
               buf,
@@ -496,7 +512,7 @@ async function main() {
         if (!matched && finalSRes.length > 0) {
           res = await pool.query(
             `UPDATE atlas_packets
-                SET latent_64 = $1,
+                SET latent_64 = $1::bytea,
                     metadata = jsonb_set(
                       jsonb_set(
                         jsonb_set(coalesce(metadata, '{}'::jsonb), '{ae_epoch}', $3::jsonb),
@@ -505,7 +521,7 @@ async function main() {
                       '{ae_timestamp}', $5::jsonb
                     ),
                     updated_at = NOW()
-              WHERE source_ref = ANY($2)
+              WHERE source_ref = ANY($2::text[])
              RETURNING packet_id`,
             [
               buf,
@@ -531,7 +547,7 @@ async function main() {
 
           res = await pool.query(
             `UPDATE atlas_packets
-                SET latent_64 = $1,
+                SET latent_64 = $1::bytea,
                     metadata = jsonb_set(
                       jsonb_set(
                         jsonb_set(coalesce(metadata, '{}'::jsonb), '{ae_epoch}', $5::jsonb),
@@ -678,3 +694,8 @@ main().catch(err => {
   console.error('\n❌ Fatal:', err.message);
   process.exit(1);
 });
+
+
+
+
+

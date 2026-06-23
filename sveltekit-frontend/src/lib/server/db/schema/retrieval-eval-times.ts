@@ -1,5 +1,5 @@
 import { sql } from 'drizzle-orm';
-import { pgTable, bigserial, text, real, integer, jsonb, timestamp, index } from 'drizzle-orm/pg-core';
+import { pgTable, bigserial, text, real, integer, boolean, jsonb, timestamp, index } from 'drizzle-orm/pg-core';
 
 /**
  * atlas_retrieval_eval_times
@@ -40,6 +40,13 @@ export const atlasRetrievalEvalTimes = pgTable('atlas_retrieval_eval_times', {
   totalMs:        real('total_ms'),
   cacheHitSource: text('cache_hit_source'),
   ttlRemaining:   integer('ttl_remaining'),
+  protocol:       text('protocol'),
+  accelerator:    text('accelerator'),
+  cudaAvailable:  boolean('cuda_available'),
+  cuvsEnabled:    boolean('cuvs_enabled'),
+  matmulMs:       real('matmul_ms'),
+  embeddingMs:    real('embedding_ms'),
+  verdict:        text('verdict'),
   resultCount:    integer('result_count'),
   error:          text('error'),
   payload:        jsonb('payload').default(sql`'{}'::jsonb`),
@@ -52,6 +59,9 @@ export const atlasRetrievalEvalTimes = pgTable('atlas_retrieval_eval_times', {
   domainClassIdx:   index('idx_eval_times_domain_class').on(table.domainClass),
   ontologyLabelIdx: index('idx_eval_times_ontology_label').on(table.ontologyLabel),
   resultCountIdx:   index('idx_eval_times_result_count').on(table.resultCount),
+  protocolIdx:      index('idx_eval_times_protocol').on(table.protocol),
+  acceleratorIdx:   index('idx_eval_times_accelerator').on(table.accelerator),
+  verdictIdx:       index('idx_eval_times_verdict').on(table.verdict),
   payloadGin:       index('idx_eval_times_payload_gin').using('gin', table.payload),
 }));
 

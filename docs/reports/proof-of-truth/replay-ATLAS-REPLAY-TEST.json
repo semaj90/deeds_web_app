@@ -1,0 +1,50 @@
+{
+  "story_id": "ATLAS-REPLAY-TEST",
+  "timestamp": "2026-06-23T04:54:09.222Z",
+  "total_queries": 45,
+  "queries_executed": 45,
+  "queries_successful": 41,
+  "coverage": {
+    "packet_key": 0.9111111111111111,
+    "feature_id": 1,
+    "source_ref": 1,
+    "qdrant_hit": 0.7777777777777778
+  },
+  "samples": [
+    {
+      "query": "how is session validation implemented?",
+      "packet_key": true,
+      "feature_id": true,
+      "source_ref": true,
+      "qdrant_hit": true
+    },
+    {
+      "query": "where is the login route handler?",
+      "packet_key": true,
+      "feature_id": true,
+      "source_ref": true,
+      "qdrant_hit": true
+    },
+    {
+      "query": "what is the user authentication flow?",
+      "packet_key": false,
+      "feature_id": true,
+      "source_ref": true,
+      "qdrant_hit": true
+    },
+    {
+      "query": "how does the session middleware work?",
+      "packet_key": true,
+      "feature_id": true,
+      "source_ref": true,
+      "qdrant_hit": true
+    },
+    {
+      "query": "where are user roles defined?",
+      "packet_key": true,
+      "feature_id": true,
+      "source_ref": true,
+      "qdrant_hit": false
+    }
+  ]
+}

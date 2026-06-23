@@ -171,6 +171,7 @@ VS Code workspace startup now uses dedicated scripts for the two noisy folder-op
 
 - `node scripts/startup/run-service-health-check.mjs`
 - `node scripts/startup/run-graphify-daily-startup.mjs`
+  - set `GRAPHIFY_DAILY_INCLUDE_SEMANTIC=1` to run the semantic codebase refresh (`npm run graphify:semantic` by default, or `npm run graphify:semantic:search` to include a HyperRAG packet-rpc smoke)` after the daily graphify pass
 - `node scripts/startup/run-ace-context-pack-startup.mjs`
 - `node scripts/startup/run-ace-top-retrieval-startup.mjs`
 - `node scripts/startup/run-feature-map-startup.mjs`

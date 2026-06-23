@@ -1,0 +1,25 @@
+{
+  "timestamp": "2026-06-23T05:32:28.009Z",
+  "limit": 1000,
+  "coverage": {
+    "total_packets": "17995",
+    "with_qdrant_point_id": "0",
+    "with_qdrant_point_id_pct": 0,
+    "with_qdrant_collection": "0"
+  },
+  "consistency": {
+    "has_identity_fields": "17995",
+    "has_identity_pct": 100
+  },
+  "join_quality": {
+    "matched": "0",
+    "matched_pct": 0,
+    "missing_qdrant_id": "17995",
+    "missing_qdrant_id_pct": 100,
+    "missing_packet_key": "0",
+    "ambiguous": "0",
+    "ambiguous_pct": 0
+  },
+  "duplicate_qdrant_ids_found": 0,
+  "verdict": "REVIEW"
+}

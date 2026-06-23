@@ -1,30 +1,30 @@
 # Deep Import Graph - Phase A
-Generated: 2026-06-21T20:37:59.920Z
+Generated: 2026-06-22T21:41:32.814Z
 
 ## Stats
 | Metric | Value |
 |--------|-------|
-| Nodes | 58863 |
-| Total edges | 132491 |
-| Resolved edges | 18873 |
-| Unresolved (local) | 9112 |
-| External refs | 103211 |
+| Nodes | 58869 |
+| Total edges | 132504 |
+| Resolved edges | 18871 |
+| Unresolved (local) | 9114 |
+| External refs | 103224 |
 | Neighborhoods computed | 91 |
 | Test-covered files | 1012 |
 
 ## Zone Breakdown
 | Zone | Count |
 |------|-------|
-| shared | 47229 |
+| shared | 47245 |
 | test | 5495 |
-| script | 5042 |
+| script | 5032 |
 | types | 993 |
 | config | 104 |
 
 ## Edge Type Breakdown
 | Type | Count |
 |------|-------|
-| imports_static | 92651 |
+| imports_static | 92664 |
 | test_covers_file | 16611 |
 | redis_dependency | 5963 |
 | imports_dynamic | 5459 |

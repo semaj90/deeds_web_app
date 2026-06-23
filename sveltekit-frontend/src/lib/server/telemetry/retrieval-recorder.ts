@@ -60,6 +60,13 @@ export interface RetrievalTelemetrySignal {
   domainClass?: string | null;
   /** First source_ref from results. */
   sourceRef?: string | null;
+  protocol?: 'jsonrpc' | 'http' | 'grpc' | 'mcp' | string;
+  accelerator?: string | null;
+  cudaAvailable?: boolean | null;
+  cuvsEnabled?: boolean | null;
+  matmulMs?: number | null;
+  embeddingMs?: number | null;
+  verdict?: 'PASS' | 'WARN' | 'FAIL' | string | null;
   /** Disable the generic eval-times mirror when the caller owns a richer one-row-per-query writer. */
   writeEvalTimes?: boolean;
 }
@@ -168,8 +175,9 @@ export async function recordRetrievalTelemetry(signal: RetrievalTelemetrySignal)
       `INSERT INTO atlas_retrieval_eval_times
          (query_hash, packet_key, feature_id, domain_class, source_ref,
           qdrant_ms, bm25_ms, redis_ms, bitfrost_ms, neo4j_ms, rerank_ms, total_ms,
-          cache_hit_source, result_count, payload, created_at)
-       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15::jsonb,now())
+          cache_hit_source, result_count, protocol, accelerator, cuda_available, cuvs_enabled,
+          matmul_ms, embedding_ms, verdict, payload, created_at)
+       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,$21,$22::jsonb,now())
        ON CONFLICT DO NOTHING`,
       [
         queryHash,
@@ -186,6 +194,13 @@ export async function recordRetrievalTelemetry(signal: RetrievalTelemetrySignal)
         Math.max(0, Math.round(Number(signal.latencyMs ?? 0))),
         signal.cacheHit ? 'redis' : null,
         (selectedPacketKeys.length || 0),
+        signal.protocol ?? 'http',
+        signal.accelerator ?? 'cpu',
+        signal.cudaAvailable ?? null,
+        signal.cuvsEnabled ?? null,
+        signal.matmulMs ?? null,
+        signal.embeddingMs ?? null,
+        signal.verdict ?? null,
         JSON.stringify(signal.hitsPayload ?? {}),
       ],
     ).catch((e: unknown) =>

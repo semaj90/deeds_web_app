@@ -1,0 +1,95 @@
+{
+  "generated_at": "2026-06-23T03:17:55.351Z",
+  "query": "atlas packet retrieval fusion trace",
+  "trace_id": "1782184671302-6uovrzk",
+  "run_id": "1782184671302-6uovrzk",
+  "retrieval_strategy": "fusion",
+  "cache_status": "redis_exact_match",
+  "graph_stage": "GRAPH_ENABLED",
+  "latency_ms": 4047,
+  "contributors": {
+    "bm25_hits": 10,
+    "qdrant_hits": 2,
+    "neo4j_hits": 11,
+    "turbovec_hits": 0,
+    "rrf_final_hits": 10
+  },
+  "degraded": {
+    "turbovec": true
+  },
+  "pass": true,
+  "pass_degraded": true,
+  "pass_status": "PASS-DEGRADED",
+  "fail_reasons": [],
+  "top_packets": [
+    {
+      "packet_key": "nes:utility:9fa84252",
+      "source_ref": "src/lib/types/svelte5-api-types.d.ts",
+      "feature_id": "utility",
+      "fusion_sources": [
+        "qdrant_vector"
+      ],
+      "retrieval_lanes": {
+        "dense": 0.01639344262295082,
+        "fts": 0.9,
+        "trigram": 0,
+        "jsonb": 1
+      },
+      "graph_stage_status": "GRAPH_ENABLED"
+    },
+    {
+      "packet_key": "nes:utility:8c023912",
+      "source_ref": "src/lib/components/ui/gaming/types/gaming-types-minimal.ts",
+      "feature_id": "utility",
+      "fusion_sources": [
+        "qdrant_vector"
+      ],
+      "retrieval_lanes": {
+        "dense": 0.015384615384615385,
+        "fts": 1,
+        "trigram": 0,
+        "jsonb": 1
+      },
+      "graph_stage_status": "GRAPH_ENABLED"
+    },
+    {
+      "packet_key": "hyperrag:src/lib/services/error-analysis/types.ts",
+      "source_ref": "src/lib/services/error-analysis/types.ts",
+      "feature_id": "codebase-structure",
+      "fusion_sources": [],
+      "retrieval_lanes": {
+        "dense": 0,
+        "fts": 0.8,
+        "trigram": 0,
+        "jsonb": 1
+      },
+      "graph_stage_status": "GRAPH_ENABLED"
+    }
+  ],
+  "provenance_sample": [
+    {
+      "packet_key": "nes:utility:9fa84252",
+      "retrieved_from": "hyperrag",
+      "retrieval_confidence": 0.85,
+      "kag_aligned": true,
+      "dag_reachable": true
+    },
+    {
+      "packet_key": "nes:utility:9fa84252",
+      "retrieved_from": "hyperrag",
+      "retrieval_confidence": 0.85,
+      "kag_aligned": true,
+      "dag_reachable": true
+    },
+    {
+      "packet_key": "nes:utility:8c023912",
+      "retrieved_from": "hyperrag",
+      "retrieval_confidence": 0.85,
+      "kag_aligned": true,
+      "dag_reachable": true
+    }
+  ],
+  "recommended_patches": [
+    "turbovec: start TurboVec service or accept PASS-DEGRADED"
+  ]
+}

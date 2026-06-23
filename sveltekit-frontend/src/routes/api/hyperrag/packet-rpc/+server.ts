@@ -67,6 +67,7 @@ import {
 	type HyperRagPacketRpcResult,
 	type HyperRagPacketRpcPacket,
 } from '$lib/server/retrieval/hyperrag-packet-rpc.js';
+import { validateJsonRpcMessage } from '$lib/server/retrieval/rpc-validator.js';
 import {
 	getExactMatchCacheWithProvenance,
 	setExactMatchCacheWithProvenance,
@@ -80,12 +81,46 @@ function hashQuery(query: string): string {
 	return crypto.createHash('sha256').update(query.trim().toLowerCase()).digest('hex').slice(0, 16);
 }
 
+function parseBooleanHeader(value: string | null): boolean | undefined {
+	if (value == null) return undefined;
+	const normalized = value.trim().toLowerCase();
+	if (!normalized) return undefined;
+	if (['1', 'true', 'yes', 'on'].includes(normalized)) return true;
+	if (['0', 'false', 'no', 'off'].includes(normalized)) return false;
+	return undefined;
+}
+
+function buildJsonRpcError(
+	id: string | number | null,
+	code: number,
+	message: string,
+	data?: unknown,
+) {
+	return {
+		jsonrpc: '2.0' as const,
+		id,
+		error: data === undefined ? { code, message } : { code, message, data },
+	};
+}
+
 export const POST: RequestHandler = async ({ request, locals }) => {
 	const startTime = Date.now();
 	let trace: HyperRagReplayTrace | null = null;
+	let rpcId: string | number | null | undefined;
+	let rpcProtocol: 'jsonrpc' | 'http' = 'http';
 
 	try {
-		const body = await request.json() as {
+		const body = await request.json() as Record<string, unknown>;
+		const looksLikeJsonRpcEnvelope =
+			typeof body === 'object' &&
+			body !== null &&
+			('jsonrpc' in body || 'method' in body || 'params' in body || 'id' in body);
+		const isJsonRpcEnvelope =
+			looksLikeJsonRpcEnvelope &&
+			(body as { jsonrpc?: unknown }).jsonrpc === '2.0' &&
+			typeof (body as { method?: unknown }).method === 'string';
+
+		let normalizedBody: {
 			query?: string;
 			limit?: number;
 			includeGraph?: boolean;
@@ -93,16 +128,47 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 			recordTelemetry?: boolean;
 			awaitTelemetry?: boolean;
 			useExactMatchCache?: boolean;
+			protocol?: 'jsonrpc' | 'http';
+			accelerator?: string;
+			cudaAvailable?: boolean;
+			cuvsEnabled?: boolean;
+			matmulMs?: number;
+			embeddingMs?: number;
 		};
 
-		const query = body.query?.trim();
+		if (looksLikeJsonRpcEnvelope) {
+			rpcProtocol = 'jsonrpc';
+			const validation = validateJsonRpcMessage(body);
+			rpcId = validation.id ?? (body as { id?: string | number | null }).id ?? null;
+			if (!validation.valid || validation.normalizedMethod !== 'atlas.search') {
+				return json(
+					buildJsonRpcError(
+						rpcId ?? null,
+						-32600,
+						validation.valid
+							? `Unsupported JSON-RPC method for HyperRAG packet RPC: ${validation.normalizedMethod ?? 'unknown'}`
+							: validation.error ?? 'Invalid JSON-RPC request',
+						validation.error ? { validation_error: validation.error } : undefined,
+					),
+					{ status: 400 },
+				);
+			}
+			normalizedBody = validation.normalizedParams as typeof normalizedBody;
+		} else {
+			normalizedBody = body as typeof normalizedBody;
+		}
+
+		const query = normalizedBody.query?.trim();
 		if (!query) {
 			return json({ error: 'query is required' }, { status: 400 });
 		}
 		trace = new HyperRagReplayTrace(query, 'hyperrag-packet-rpc');
 
-		const limit = Math.max(1, Math.min(body.limit ?? 10, 25));
-		const useCache = body.useExactMatchCache !== false;
+		const limit = Math.max(1, Math.min(normalizedBody.limit ?? 10, 25));
+		const useCache = normalizedBody.useExactMatchCache !== false;
+		const accelerator = normalizedBody.accelerator ?? request.headers.get('x-atlas-accelerator') ?? 'cpu';
+		const cudaAvailable = normalizedBody.cudaAvailable ?? parseBooleanHeader(request.headers.get('x-atlas-cuda-available'));
+		const cuvsEnabled = normalizedBody.cuvsEnabled ?? parseBooleanHeader(request.headers.get('x-atlas-cuvs-enabled'));
 
 		// Set session context for replay trace
 		if (locals.user) {
@@ -118,11 +184,17 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 		const rpcInput: HyperRagPacketRpcInput = {
 			query,
 			limit,
-			includeGraph: body.includeGraph !== false,
-			useFts: body.useFts !== false,
-			recordTelemetry: body.recordTelemetry !== false,
-			awaitTelemetry: body.awaitTelemetry === true,
+			includeGraph: normalizedBody.includeGraph !== false,
+			useFts: normalizedBody.useFts !== false,
+			recordTelemetry: normalizedBody.recordTelemetry !== false,
+			awaitTelemetry: normalizedBody.awaitTelemetry === true,
 			useExactMatchCache: false,
+			protocol: rpcProtocol,
+			accelerator,
+			cudaAvailable,
+			cuvsEnabled,
+			matmulMs: normalizedBody.matmulMs,
+			embeddingMs: normalizedBody.embeddingMs,
 		};
 
 		trace.recordRequest(rpcInput);
@@ -211,6 +283,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 
 		const latencyMs = Date.now() - startTime;
 		const replayId = trace.getId();
+		const traceId = replayId; // promote run_id → trace_id for proof contract
 		const cacheSource = cacheHits > 0 ? 'redis_exact_match' : 'live_fusion';
 		const graphStageStatus = Number(result.trace.neo4j_expansions ?? 0) > 0
 			? 'GRAPH_ENABLED'
@@ -219,7 +292,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 				: 'GRAPH_DEGRADED';
 		const graphStageReason = Number(result.trace.neo4j_expansions ?? 0) > 0
 			? 'neo4j expansions available'
-			: body.includeGraph === false
+			: normalizedBody.includeGraph === false
 				? 'graph stage disabled by request'
 				: 'neo4j expansion not returned for this replay entry';
 		const operatorPackets = result.packets.map((packet) => ({
@@ -248,18 +321,50 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 			worker_id: 'sveltekit-frontend',
 			graph_stage_status: graphStageStatus,
 			graph_stage_reason: graphStageReason,
+			protocol: rpcProtocol,
+			accelerator,
+			cuda_available: cudaAvailable,
+			cuvs_enabled: cuvsEnabled,
 		});
+
+		// Derive contributor counts from per-packet lane data
+		const bm25Hits = operatorPackets.filter(p => (p.retrieval_lanes?.fts ?? 0) > 0).length;
+		const qdrantHits = operatorPackets.filter(p =>
+			p.fusion_sources?.includes('qdrant_vector') || (p.retrieval_lanes?.dense ?? 0) > 0
+		).length;
+		const neo4jHits = provenances.filter(p =>
+			p.kag_aligned || p.dag_reachable || (p.graph_neighbors?.length ?? 0) > 0
+		).length;
+		const turbovecHits = operatorPackets.filter(p =>
+			p.fusion_sources?.includes('turbovec')
+		).length;
+		const rrfFinalHits = operatorPackets.length;
 
 		const responsePayload = {
 			ok: true,
 			query: result.query,
 			strategy: result.strategy,
+			retrieval_strategy: result.trace.retrieval_strategy ?? 'hyperrag_fusion',
+			trace_id: traceId,
+			run_id: replayId,
+			latency_ms: latencyMs,
+			cache_status: cacheSource,
+			contributors: {
+				bm25_hits: bm25Hits,
+				qdrant_hits: qdrantHits,
+				neo4j_hits: neo4jHits,
+				turbovec_hits: turbovecHits,
+				rrf_final_hits: rrfFinalHits,
+			},
+			degraded: {
+				turbovec: turbovecHits === 0,
+			},
 			packets: operatorPackets,
 			provenance: provenances,
 			trace: {
 				query_hash: hashQuery(query),
 				replay_id: replayId,
-				retrieval_strategy: result.trace.retrieval_strategy ?? 'fusion',
+				retrieval_strategy: result.trace.retrieval_strategy ?? 'hyperrag_fusion',
 				qdrant_hits: result.trace.qdrant_hits,
 				postgres_hits: result.trace.postgres_hits,
 				rrf_hits: result.trace.rrf_hits,
@@ -269,6 +374,10 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 				cache_namespace: 'hyperrag:query',
 				graph_stage_status: graphStageStatus,
 				graph_stage_reason: graphStageReason,
+				protocol: rpcProtocol,
+				accelerator,
+				cuda_available: cudaAvailable,
+				cuvs_enabled: cuvsEnabled,
 				latency_ms: latencyMs,
 				cache_latency_ms: cacheHits > 0 ? latencyMs : undefined,
 				retrieval_path: [
@@ -289,9 +398,26 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 		const redis = getRedis();
 		trace.save(redis, 86400).catch(() => {}); // 24h TTL, non-fatal
 
+		if (isJsonRpcEnvelope) {
+			return json({
+				jsonrpc: '2.0',
+				id: rpcId ?? null,
+				result: responsePayload,
+			});
+		}
 		return json(responsePayload);
 	} catch (err) {
 		console.error('[hyperrag-packet-rpc] Error:', err instanceof Error ? err.message : String(err));
+		if (rpcProtocol === 'jsonrpc') {
+			return json(
+				buildJsonRpcError(
+					rpcId ?? null,
+					-32000,
+					err instanceof Error ? err.message : 'Unknown error',
+				),
+				{ status: 500 },
+			);
+		}
 		return json(
 			{
 				ok: false,

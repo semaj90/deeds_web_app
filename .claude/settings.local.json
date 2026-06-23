@@ -551,7 +551,10 @@
       "PowerShell($mcpPid = \\(Get-NetTCPConnection -LocalPort 8788 -State Listen\\).OwningProcess; Stop-Process -Id $mcpPid -Force; Write-Host \"Killed PID $mcpPid\"; Start-Sleep -Seconds 2; Write-Host \"Done\")",
       "Bash(wmic process *)",
       "PowerShell(Get-WmiObject Win32_Process -Filter \"ProcessId = 41992\" | Select-Object ProcessId, Name, @{N='CommandLine';E={$_.CommandLine}})",
-      "PowerShell(Get-CimInstance Win32_Process -Filter \"ProcessId = 41992\")"
+      "PowerShell(Get-CimInstance Win32_Process -Filter \"ProcessId = 41992\")",
+      "Bash(DATABASE_URL=\"postgresql://legal_admin:123456@127.0.0.1:5434/legal_ai_db\" node scripts/atlas/build-implementation-intent-aliases.mjs --apply)",
+      "PowerShell(try { $json = Get-Content C:\\\\Users\\\\james\\\\Videos\\\\deeds-web-app\\\\package.json -Raw | ConvertFrom-Json; Write-Host \"JSON valid\"; Write-Host \"Scripts count: $\\($json.scripts.PSObject.Properties.Count\\)\" } catch { Write-Host \"JSON INVALID: $_\" })",
+      "PowerShell(try { $json = Get-Content C:\\\\Users\\\\james\\\\Videos\\\\deeds-web-app\\\\package.json -Raw | ConvertFrom-Json; Write-Host \"JSON valid\"; Write-Host \"Type: $\\($json.type\\)\" } catch { Write-Host \"JSON INVALID: $\\($_\\)\" })"
     ],
     "deny": [],
     "ask": []

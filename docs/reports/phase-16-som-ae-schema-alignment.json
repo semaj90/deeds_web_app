@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-06-19T18:02:00.907Z",
+  "generatedAt": "2026-06-23T00:28:40.019Z",
   "status": "IMPLEMENTATION_ALIGNED",
   "contract": {
     "latent64Storage": "bytea",
@@ -70,9 +70,9 @@
   },
   "latentDataset": {
     "present": true,
-    "total": 20702,
-    "addressable": 20642,
-    "generatedAt": "2026-06-19T17:53:33.348Z"
+    "total": 781,
+    "addressable": 781,
+    "generatedAt": "2026-06-19T19:28:09.398Z"
   },
   "runners": {
     "gds": {
@@ -113,7 +113,7 @@
       },
       {
         "path": "models/autoencoder/autoencoder_latent_index.json",
-        "bytes": 53172193
+        "bytes": 1980253
       },
       {
         "path": "models/autoencoder/b_dec_128.npy",
@@ -153,11 +153,11 @@
       },
       {
         "path": "models/som/som_20x20_codebook.json",
-        "bytes": 764098
+        "bytes": 797876
       },
       {
         "path": "models/som/som_assignments.json",
-        "bytes": 2447843
+        "bytes": 86216
       },
       {
         "path": ".tmp/gpu-som-checkpoint/ae_weights_768_64.json",

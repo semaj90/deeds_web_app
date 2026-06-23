@@ -1,6 +1,6 @@
 # Phase 16-H SOM/AE Schema Alignment
 
-Generated: 2026-06-19T18:02:00.907Z
+Generated: 2026-06-23T00:28:40.019Z
 Status: IMPLEMENTATION_ALIGNED
 
 ## Current Truth
@@ -15,8 +15,8 @@ Status: IMPLEMENTATION_ALIGNED
 - checkpoint required: no
 - native SOM bridge: present
 - CUDA available: yes
-- latent artifact entries: 20702
-- addressable packet entries in latent artifact: 20642
+- latent artifact entries: 781
+- addressable packet entries in latent artifact: 781
 - derived AE/SOM/checkpoint artifacts found: 21
 
 ## Existing Runners

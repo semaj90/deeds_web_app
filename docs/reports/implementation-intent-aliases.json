@@ -1,0 +1,667 @@
+{
+  "ok": true,
+  "generated_at": "2026-06-23T02:54:30.121Z",
+  "dry_run": false,
+  "apply": true,
+  "with_qdrant": false,
+  "with_redis": false,
+  "validation": {
+    "ok": true,
+    "failures": [],
+    "warnings": [],
+    "gates": {
+      "packets_total": 8,
+      "duplicate_packet_keys": 0,
+      "missing_description": 0,
+      "missing_summary": 0
+    }
+  },
+  "intents": [
+    {
+      "packet_kind": "implementation_intent_alias",
+      "packet_key": "intent_alias:8b100f135caa3cbb",
+      "source_ref": "intent:qdrant_payload_writer",
+      "feature_id": "qdrant_payload_enrichment",
+      "feature_label": "Qdrant Payload Enrichment",
+      "community_id": null,
+      "domain": "qdrant_vector_index",
+      "intent": "qdrant_payload_writer",
+      "description": "Maps natural-language requests about Qdrant payload construction to implementation tokens and candidate source files.",
+      "summary": "Grounded by ACE/KAG/DAG retrieval context: Qdrant Payload Enrichment maps concept aliases (payload construction metadata aggregation, qdrant payload enrichment, vector payload mirror) to implementation tokens (upsert, setPayload, points, payload:, with_payload) and likely source refs.",
+      "ace_kag_dag_hits": [
+        {
+          "tool": "atlas-tools_build_agentic_rag_context",
+          "query": "payload construction metadata aggregation",
+          "evidence_kind": "agentic_rag_context",
+          "confidence": 0.75,
+          "source_ref": "scripts/atlas/build-mcp-tool-manifest-packets.mjs"
+        }
+      ],
+      "aliases": [
+        "payload construction metadata aggregation",
+        "qdrant payload enrichment",
+        "vector payload mirror",
+        "points upsert",
+        "set payload",
+        "with payload",
+        "source reference payload",
+        "source_ref feature_id packet_key"
+      ],
+      "implementation_tokens": [
+        "upsert",
+        "setPayload",
+        "points",
+        "payload:",
+        "with_payload",
+        "qdrant_point_id",
+        "source_ref",
+        "feature_id",
+        "packet_key"
+      ],
+      "likely_files": [
+        "scripts/atlas/build-mcp-tool-manifest-packets.mjs",
+        "scripts/atlas/audit-proto-registry.mjs",
+        "scripts/atlas/index-function-packets.mjs",
+        "sveltekit-frontend/src/routes/api/atlas/index-doc/+server.ts",
+        "sveltekit-frontend/src/routes/api/atlas/search/+server.ts",
+        "sveltekit-frontend/src/lib/server/db/qdrant-sync.ts",
+        "sveltekit-frontend/src/lib/server/db/qdrant-integration.ts"
+      ],
+      "metadata": {
+        "path": "implementation-intents/qdrant_payload_writer.json",
+        "hash": "sha256:18481bf12ae57bf8",
+        "indexed_at": "2026-06-23T02:54:30.119Z"
+      },
+      "payload": {
+        "intent": "qdrant_payload_writer",
+        "aliases": [
+          "payload construction metadata aggregation",
+          "qdrant payload enrichment",
+          "vector payload mirror",
+          "points upsert",
+          "set payload",
+          "with payload",
+          "source reference payload",
+          "source_ref feature_id packet_key"
+        ],
+        "implementation_tokens": [
+          "upsert",
+          "setPayload",
+          "points",
+          "payload:",
+          "with_payload",
+          "qdrant_point_id",
+          "source_ref",
+          "feature_id",
+          "packet_key"
+        ],
+        "likely_files": [
+          "scripts/atlas/build-mcp-tool-manifest-packets.mjs",
+          "scripts/atlas/audit-proto-registry.mjs",
+          "scripts/atlas/index-function-packets.mjs",
+          "sveltekit-frontend/src/routes/api/atlas/index-doc/+server.ts",
+          "sveltekit-frontend/src/routes/api/atlas/search/+server.ts",
+          "sveltekit-frontend/src/lib/server/db/qdrant-sync.ts",
+          "sveltekit-frontend/src/lib/server/db/qdrant-integration.ts"
+        ],
+        "domain": "qdrant_vector_index",
+        "feature_id": "qdrant_payload_enrichment",
+        "feature_label": "Qdrant Payload Enrichment"
+      },
+      "confidence": 1
+    },
+    {
+      "packet_kind": "implementation_intent_alias",
+      "packet_key": "intent_alias:b3d7d3ad5a03afec",
+      "source_ref": "intent:packet_contract_writer",
+      "feature_id": "packet_contract_lane",
+      "feature_label": "Packet Contract Lane",
+      "community_id": null,
+      "domain": "packet_contract",
+      "intent": "packet_contract_writer",
+      "description": "Maps stable packet identity and metadata JSONB requirements to canonical atlas_packets writer surfaces.",
+      "summary": "Grounded by ACE/KAG/DAG retrieval context: Packet Contract Lane maps concept aliases (packet contract, stable packet identity, metadata jsonb) to implementation tokens (atlas_packets, packet_key, source_ref, feature_id, community_id) and likely source refs.",
+      "ace_kag_dag_hits": [
+        {
+          "tool": "atlas-tools_build_agentic_rag_context",
+          "query": "packet contract",
+          "evidence_kind": "agentic_rag_context",
+          "confidence": 0.75,
+          "source_ref": "scripts/atlas/audit-postgres-contract-mirrors.mjs"
+        }
+      ],
+      "aliases": [
+        "packet contract",
+        "stable packet identity",
+        "metadata jsonb",
+        "atlas_packets payload",
+        "source_ref feature_id community_id"
+      ],
+      "implementation_tokens": [
+        "atlas_packets",
+        "packet_key",
+        "source_ref",
+        "feature_id",
+        "community_id",
+        "metadata",
+        "jsonb",
+        "INSERT INTO atlas_packets"
+      ],
+      "likely_files": [
+        "scripts/atlas/audit-postgres-contract-mirrors.mjs",
+        "scripts/atlas/index-function-packets.mjs",
+        "scripts/atlas/build-mcp-tool-manifest-packets.mjs",
+        "sveltekit-frontend/src/routes/api/atlas/index-doc/+server.ts"
+      ],
+      "metadata": {
+        "path": "implementation-intents/packet_contract_writer.json",
+        "hash": "sha256:1f1f76f7e942cc98",
+        "indexed_at": "2026-06-23T02:54:30.120Z"
+      },
+      "payload": {
+        "intent": "packet_contract_writer",
+        "aliases": [
+          "packet contract",
+          "stable packet identity",
+          "metadata jsonb",
+          "atlas_packets payload",
+          "source_ref feature_id community_id"
+        ],
+        "implementation_tokens": [
+          "atlas_packets",
+          "packet_key",
+          "source_ref",
+          "feature_id",
+          "community_id",
+          "metadata",
+          "jsonb",
+          "INSERT INTO atlas_packets"
+        ],
+        "likely_files": [
+          "scripts/atlas/audit-postgres-contract-mirrors.mjs",
+          "scripts/atlas/index-function-packets.mjs",
+          "scripts/atlas/build-mcp-tool-manifest-packets.mjs",
+          "sveltekit-frontend/src/routes/api/atlas/index-doc/+server.ts"
+        ],
+        "domain": "packet_contract",
+        "feature_id": "packet_contract_lane",
+        "feature_label": "Packet Contract Lane"
+      },
+      "confidence": 1
+    },
+    {
+      "packet_kind": "implementation_intent_alias",
+      "packet_key": "intent_alias:1eeafc661819ab0f",
+      "source_ref": "intent:mcp_tool_manifest_writer",
+      "feature_id": "mcp_tool_manifest_packets",
+      "feature_label": "MCP Tool Manifest Packets",
+      "community_id": null,
+      "domain": "mcp_agents",
+      "intent": "mcp_tool_manifest_writer",
+      "description": "Maps MCP/tool-calling requests to manifest packets and runtime tool narrowing files.",
+      "summary": "Grounded by ACE/KAG/DAG retrieval context: MCP Tool Manifest Packets maps concept aliases (tool manifest packets, mcp tool selection, tools array forwarding) to implementation tokens (tool_manifest, tools, tool_calls, ALLOWED_MCP_TOOLS, use_mcp) and likely source refs.",
+      "ace_kag_dag_hits": [
+        {
+          "tool": "atlas-tools_build_agentic_rag_context",
+          "query": "tool manifest packets",
+          "evidence_kind": "agentic_rag_context",
+          "confidence": 0.75,
+          "source_ref": "scripts/atlas/build-mcp-tool-manifest-packets.mjs"
+        }
+      ],
+      "aliases": [
+        "tool manifest packets",
+        "mcp tool selection",
+        "tools array forwarding",
+        "tool schema indexing",
+        "llama server tool calls"
+      ],
+      "implementation_tokens": [
+        "tool_manifest",
+        "tools",
+        "tool_calls",
+        "ALLOWED_MCP_TOOLS",
+        "use_mcp",
+        "selectToolsForQuery"
+      ],
+      "likely_files": [
+        "scripts/atlas/build-mcp-tool-manifest-packets.mjs",
+        "scripts/atlas/runtime-mcp-tool-selector.mjs",
+        "sveltekit-frontend/src/routes/api/mcp/select-tools/+server.ts",
+        "sveltekit-frontend/src/lib/server/ai/gemma4-agent.ts",
+        "sveltekit-frontend/src/lib/server/ai/gemma4-tool-controller.ts"
+      ],
+      "metadata": {
+        "path": "implementation-intents/mcp_tool_manifest_writer.json",
+        "hash": "sha256:4b61c640f34bc3db",
+        "indexed_at": "2026-06-23T02:54:30.120Z"
+      },
+      "payload": {
+        "intent": "mcp_tool_manifest_writer",
+        "aliases": [
+          "tool manifest packets",
+          "mcp tool selection",
+          "tools array forwarding",
+          "tool schema indexing",
+          "llama server tool calls"
+        ],
+        "implementation_tokens": [
+          "tool_manifest",
+          "tools",
+          "tool_calls",
+          "ALLOWED_MCP_TOOLS",
+          "use_mcp",
+          "selectToolsForQuery"
+        ],
+        "likely_files": [
+          "scripts/atlas/build-mcp-tool-manifest-packets.mjs",
+          "scripts/atlas/runtime-mcp-tool-selector.mjs",
+          "sveltekit-frontend/src/routes/api/mcp/select-tools/+server.ts",
+          "sveltekit-frontend/src/lib/server/ai/gemma4-agent.ts",
+          "sveltekit-frontend/src/lib/server/ai/gemma4-tool-controller.ts"
+        ],
+        "domain": "mcp_agents",
+        "feature_id": "mcp_tool_manifest_packets",
+        "feature_label": "MCP Tool Manifest Packets"
+      },
+      "confidence": 1
+    },
+    {
+      "packet_kind": "implementation_intent_alias",
+      "packet_key": "intent_alias:39237c6ebbd796c7",
+      "source_ref": "intent:gpu_rerank_writer",
+      "feature_id": "gpu_batch_cosine_rerank",
+      "feature_label": "GPU BatchCosine Rerank",
+      "community_id": null,
+      "domain": "gpu_turbovec_libtorch",
+      "intent": "gpu_rerank_writer",
+      "description": "Maps GPU reranking and CUDA cosine scoring requests to the TypeScript and N-API bridge surfaces.",
+      "summary": "Grounded by ACE/KAG/DAG retrieval context: GPU BatchCosine Rerank maps concept aliases (gpu batch cosine, tensorrt bridge, libtorch bridge) to implementation tokens (gpu_cosine_score, batchCosineSimilarity, tensorrt_bridge, libtorch, isCudaAvailable) and likely source refs.",
+      "ace_kag_dag_hits": [
+        {
+          "tool": "atlas-tools_build_agentic_rag_context",
+          "query": "gpu batch cosine",
+          "evidence_kind": "agentic_rag_context",
+          "confidence": 0.75,
+          "source_ref": "sveltekit-frontend/src/lib/server/gpu/libtorch-bridge.ts"
+        }
+      ],
+      "aliases": [
+        "gpu batch cosine",
+        "tensorrt bridge",
+        "libtorch bridge",
+        "cuda rerank",
+        "gpu cosine score"
+      ],
+      "implementation_tokens": [
+        "gpu_cosine_score",
+        "batchCosineSimilarity",
+        "tensorrt_bridge",
+        "libtorch",
+        "isCudaAvailable",
+        "CUDA_VISIBLE_DEVICES"
+      ],
+      "likely_files": [
+        "sveltekit-frontend/src/lib/server/gpu/libtorch-bridge.ts",
+        "sveltekit-frontend/src/routes/api/atlas/search/+server.ts",
+        "simd-bridge/cpp/binding.cc"
+      ],
+      "metadata": {
+        "path": "implementation-intents/gpu_rerank_writer.json",
+        "hash": "sha256:8e76711da0ea74dc",
+        "indexed_at": "2026-06-23T02:54:30.120Z"
+      },
+      "payload": {
+        "intent": "gpu_rerank_writer",
+        "aliases": [
+          "gpu batch cosine",
+          "tensorrt bridge",
+          "libtorch bridge",
+          "cuda rerank",
+          "gpu cosine score"
+        ],
+        "implementation_tokens": [
+          "gpu_cosine_score",
+          "batchCosineSimilarity",
+          "tensorrt_bridge",
+          "libtorch",
+          "isCudaAvailable",
+          "CUDA_VISIBLE_DEVICES"
+        ],
+        "likely_files": [
+          "sveltekit-frontend/src/lib/server/gpu/libtorch-bridge.ts",
+          "sveltekit-frontend/src/routes/api/atlas/search/+server.ts",
+          "simd-bridge/cpp/binding.cc"
+        ],
+        "domain": "gpu_turbovec_libtorch",
+        "feature_id": "gpu_batch_cosine_rerank",
+        "feature_label": "GPU BatchCosine Rerank"
+      },
+      "confidence": 1
+    },
+    {
+      "packet_kind": "implementation_intent_alias",
+      "packet_key": "intent_alias:defd5914cd147b4f",
+      "source_ref": "intent:feature_dependency_group_writer",
+      "feature_id": "feature_dependency_groups",
+      "feature_label": "Feature Dependency Groups",
+      "community_id": null,
+      "domain": "code_intelligence",
+      "intent": "feature_dependency_group_writer",
+      "description": "Maps feature implementation context requests to grouped dependency packets.",
+      "summary": "Grounded by ACE/KAG/DAG retrieval context: Feature Dependency Groups maps concept aliases (feature dependency group, implementation cluster, related files by feature) to implementation tokens (feature_dependency_group, feature_label, dependency_files, root_files, route_files) and likely source refs.",
+      "ace_kag_dag_hits": [
+        {
+          "tool": "atlas-tools_build_agentic_rag_context",
+          "query": "feature dependency group",
+          "evidence_kind": "agentic_rag_context",
+          "confidence": 0.75,
+          "source_ref": "scripts/atlas/build-feature-dependency-groups.mjs"
+        }
+      ],
+      "aliases": [
+        "feature dependency group",
+        "implementation cluster",
+        "related files by feature",
+        "dependency group packet",
+        "implementation context group"
+      ],
+      "implementation_tokens": [
+        "feature_dependency_group",
+        "feature_label",
+        "dependency_files",
+        "root_files",
+        "route_files",
+        "test_files"
+      ],
+      "likely_files": [
+        "scripts/atlas/build-feature-dependency-groups.mjs",
+        "sveltekit-frontend/docs/graph/codebase-graph.json",
+        "sveltekit-frontend/docs/atlas-index/codebase-atlas.json"
+      ],
+      "metadata": {
+        "path": "implementation-intents/feature_dependency_group_writer.json",
+        "hash": "sha256:ae7acfdfa6160862",
+        "indexed_at": "2026-06-23T02:54:30.120Z"
+      },
+      "payload": {
+        "intent": "feature_dependency_group_writer",
+        "aliases": [
+          "feature dependency group",
+          "implementation cluster",
+          "related files by feature",
+          "dependency group packet",
+          "implementation context group"
+        ],
+        "implementation_tokens": [
+          "feature_dependency_group",
+          "feature_label",
+          "dependency_files",
+          "root_files",
+          "route_files",
+          "test_files"
+        ],
+        "likely_files": [
+          "scripts/atlas/build-feature-dependency-groups.mjs",
+          "sveltekit-frontend/docs/graph/codebase-graph.json",
+          "sveltekit-frontend/docs/atlas-index/codebase-atlas.json"
+        ],
+        "domain": "code_intelligence",
+        "feature_id": "feature_dependency_groups",
+        "feature_label": "Feature Dependency Groups"
+      },
+      "confidence": 1
+    },
+    {
+      "packet_kind": "implementation_intent_alias",
+      "packet_key": "intent_alias:d16b0431ab4b7b7d",
+      "source_ref": "intent:env_runtime_contract",
+      "feature_id": "env_runtime_contract",
+      "feature_label": "Environment Runtime Contract",
+      "community_id": null,
+      "domain": "admin_observability",
+      "intent": "env_runtime_contract",
+      "description": "Maps service URL, credential, and local-vs-Docker runtime issues to the env helper and configuration files. Canonical source: root .env (DATABASE_URL, QDRANT_URL, REDIS_HOST, REDIS_PASSWORD).",
+      "summary": "Grounded by ACE/KAG/DAG retrieval context: Environment Runtime Contract maps concept aliases (environment variables, .env credentials, postgres password) to implementation tokens (DATABASE_URL, POSTGRES_HOST, POSTGRES_PASSWORD, REDIS_HOST, REDIS_PASSWORD) and likely source refs.",
+      "ace_kag_dag_hits": [
+        {
+          "tool": "atlas-tools_build_agentic_rag_context",
+          "query": "environment variables",
+          "evidence_kind": "agentic_rag_context",
+          "confidence": 0.75,
+          "source_ref": "sveltekit-frontend/src/lib/server/env.ts"
+        }
+      ],
+      "aliases": [
+        "environment variables",
+        ".env credentials",
+        "postgres password",
+        "redis password",
+        "local versus docker host",
+        "service url normalization"
+      ],
+      "implementation_tokens": [
+        "DATABASE_URL",
+        "POSTGRES_HOST",
+        "POSTGRES_PASSWORD",
+        "REDIS_HOST",
+        "REDIS_PASSWORD",
+        "QDRANT_URL",
+        "normalizeHttpUrl",
+        "RUNNING_IN_DOCKER"
+      ],
+      "likely_files": [
+        "sveltekit-frontend/src/lib/server/env.ts",
+        "sveltekit-frontend/src/lib/server/env.server.ts",
+        "sveltekit-frontend/.env",
+        ".env",
+        "scripts/atlas/batch-fix-env-errors.cjs"
+      ],
+      "metadata": {
+        "path": "implementation-intents/env_runtime_contract.json",
+        "hash": "sha256:82c12f839b95d011",
+        "indexed_at": "2026-06-23T02:54:30.121Z"
+      },
+      "payload": {
+        "intent": "env_runtime_contract",
+        "aliases": [
+          "environment variables",
+          ".env credentials",
+          "postgres password",
+          "redis password",
+          "local versus docker host",
+          "service url normalization"
+        ],
+        "implementation_tokens": [
+          "DATABASE_URL",
+          "POSTGRES_HOST",
+          "POSTGRES_PASSWORD",
+          "REDIS_HOST",
+          "REDIS_PASSWORD",
+          "QDRANT_URL",
+          "normalizeHttpUrl",
+          "RUNNING_IN_DOCKER"
+        ],
+        "likely_files": [
+          "sveltekit-frontend/src/lib/server/env.ts",
+          "sveltekit-frontend/src/lib/server/env.server.ts",
+          "sveltekit-frontend/.env",
+          ".env",
+          "scripts/atlas/batch-fix-env-errors.cjs"
+        ],
+        "domain": "admin_observability",
+        "feature_id": "env_runtime_contract",
+        "feature_label": "Environment Runtime Contract"
+      },
+      "confidence": 1
+    },
+    {
+      "packet_kind": "implementation_intent_alias",
+      "packet_key": "intent_alias:7b345de1f7d6aa2c",
+      "source_ref": "intent:active_latent_surfaces",
+      "feature_id": "active_latent_surfaces",
+      "feature_label": "Active Latent Surfaces",
+      "community_id": null,
+      "domain": "latent_manifold",
+      "intent": "active_latent_surfaces",
+      "description": "Documents the currently active latent vector surfaces. encoded_64 (64-dim) is the live topology/search surface in Qdrant codebase_chunks_768. Redis gpu:karpathy:encoded holds the 64-dim vectors; gpu:karpathy:scores holds the Karpathy authority blend. latent_128, AE training, and manifold graph are POSTPONED until retrieval and telemetry lanes are fully stable.",
+      "summary": "Grounded by ACE/KAG/DAG retrieval context: Active Latent Surfaces maps concept aliases (encoded_64 search, latent 64 topology, qdrant named vector encoded_64) to implementation tokens (encoded_64, gpu:karpathy:encoded, gpu:karpathy:scores, with_vector, points/vectors) and likely source refs.",
+      "ace_kag_dag_hits": [
+        {
+          "tool": "atlas-tools_build_agentic_rag_context",
+          "query": "encoded_64 search",
+          "evidence_kind": "agentic_rag_context",
+          "confidence": 0.75,
+          "source_ref": "scripts/karpathy-gpu-enrich.mjs"
+        }
+      ],
+      "aliases": [
+        "encoded_64 search",
+        "latent 64 topology",
+        "qdrant named vector encoded_64",
+        "karpathy encoded hash",
+        "gpu karpathy latent cache",
+        "latent vector current surface"
+      ],
+      "implementation_tokens": [
+        "encoded_64",
+        "gpu:karpathy:encoded",
+        "gpu:karpathy:scores",
+        "with_vector",
+        "points/vectors",
+        "latent_64"
+      ],
+      "likely_files": [
+        "scripts/karpathy-gpu-enrich.mjs",
+        "scripts/atlas/backfill-latent-vectors.mjs",
+        "sveltekit-frontend/src/lib/server/vector/qdrant-manager.ts"
+      ],
+      "metadata": {
+        "path": "implementation-intents/active_latent_surfaces.json",
+        "hash": "sha256:f6c4c97b56d641e7",
+        "indexed_at": "2026-06-23T02:54:30.121Z"
+      },
+      "payload": {
+        "intent": "active_latent_surfaces",
+        "aliases": [
+          "encoded_64 search",
+          "latent 64 topology",
+          "qdrant named vector encoded_64",
+          "karpathy encoded hash",
+          "gpu karpathy latent cache",
+          "latent vector current surface"
+        ],
+        "implementation_tokens": [
+          "encoded_64",
+          "gpu:karpathy:encoded",
+          "gpu:karpathy:scores",
+          "with_vector",
+          "points/vectors",
+          "latent_64"
+        ],
+        "likely_files": [
+          "scripts/karpathy-gpu-enrich.mjs",
+          "scripts/atlas/backfill-latent-vectors.mjs",
+          "sveltekit-frontend/src/lib/server/vector/qdrant-manager.ts"
+        ],
+        "domain": "latent_manifold",
+        "feature_id": "active_latent_surfaces",
+        "feature_label": "Active Latent Surfaces"
+      },
+      "confidence": 1
+    },
+    {
+      "packet_kind": "implementation_intent_alias",
+      "packet_key": "intent_alias:a4702463bce502b5",
+      "source_ref": "intent:som_topology_surfaces",
+      "feature_id": "som_topology_surfaces",
+      "feature_label": "SOM Topology Surfaces",
+      "community_id": null,
+      "domain": "som_topology",
+      "intent": "som_topology_surfaces",
+      "description": "Maps SOM centroid and cluster payload backfill to the active surfaces: som_cluster/somRow/somCol/centroid_id in Qdrant points/payload; gpuCluster/som_cluster/PageRank as Neo4j node properties; cluster:kmeans:k20:centroids in Redis. AE training and manifold graph are POSTPONED pending retrieval stability.",
+      "summary": "Grounded by ACE/KAG/DAG retrieval context: SOM Topology Surfaces maps concept aliases (som payload repair, gpuCluster payload, som_cluster backfill) to implementation tokens (som_cluster, gpuCluster, centroid_id, somRow, somCol) and likely source refs.",
+      "ace_kag_dag_hits": [
+        {
+          "tool": "atlas-tools_build_agentic_rag_context",
+          "query": "som payload repair",
+          "evidence_kind": "agentic_rag_context",
+          "confidence": 0.75,
+          "source_ref": "scripts/atlas/backfill-qdrant-som-centroids.mjs"
+        }
+      ],
+      "aliases": [
+        "som payload repair",
+        "gpuCluster payload",
+        "som_cluster backfill",
+        "centroid payload mirror",
+        "qdrant som topology payload",
+        "neo4j gpu cluster pagerank",
+        "som row col centroid"
+      ],
+      "implementation_tokens": [
+        "som_cluster",
+        "gpuCluster",
+        "centroid_id",
+        "somRow",
+        "somCol",
+        "cluster:kmeans:k20:centroids",
+        "points/payload",
+        "PageRank",
+        "gpuCluster"
+      ],
+      "likely_files": [
+        "scripts/atlas/backfill-qdrant-som-centroids.mjs",
+        "scripts/atlas/train-som-20x20.mjs",
+        "scripts/atlas/backfill-latent-vectors.mjs",
+        "scripts/karpathy-gpu-enrich.mjs"
+      ],
+      "metadata": {
+        "path": "implementation-intents/som_topology_surfaces.json",
+        "hash": "sha256:b12071ba3f3e7096",
+        "indexed_at": "2026-06-23T02:54:30.121Z"
+      },
+      "payload": {
+        "intent": "som_topology_surfaces",
+        "aliases": [
+          "som payload repair",
+          "gpuCluster payload",
+          "som_cluster backfill",
+          "centroid payload mirror",
+          "qdrant som topology payload",
+          "neo4j gpu cluster pagerank",
+          "som row col centroid"
+        ],
+        "implementation_tokens": [
+          "som_cluster",
+          "gpuCluster",
+          "centroid_id",
+          "somRow",
+          "somCol",
+          "cluster:kmeans:k20:centroids",
+          "points/payload",
+          "PageRank",
+          "gpuCluster"
+        ],
+        "likely_files": [
+          "scripts/atlas/backfill-qdrant-som-centroids.mjs",
+          "scripts/atlas/train-som-20x20.mjs",
+          "scripts/atlas/backfill-latent-vectors.mjs",
+          "scripts/karpathy-gpu-enrich.mjs"
+        ],
+        "domain": "som_topology",
+        "feature_id": "som_topology_surfaces",
+        "feature_label": "SOM Topology Surfaces"
+      },
+      "confidence": 1
+    }
+  ],
+  "env": {
+    "qdrant_url": "http://127.0.0.1:6333",
+    "postgres_host": "127.0.0.1",
+    "postgres_port": "5434",
+    "postgres_password": "12****56",
+    "redis_host": "127.0.0.1",
+    "redis_password": "re****is"
+  }
+}

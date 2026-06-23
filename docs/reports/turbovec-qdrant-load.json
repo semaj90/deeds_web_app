@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-06-20T16:59:54.490Z",
+  "generated_at": "2026-06-23T00:29:00.353Z",
   "mode": "apply",
   "collection": "codebase_chunks_encoded64",
   "total_qdrant_points": 52606,
@@ -7,19 +7,19 @@
   "usable_points": 51937,
   "skipped_points": 669,
   "upserted": {
-    "inserted": 51937,
+    "inserted": 0,
     "updated": 0,
-    "errors": 0
+    "errors": 51937
   },
   "turbovec": {
-    "pre_indexed": 50,
-    "post_indexed": 50,
-    "backend": "turbovec-python"
+    "pre_indexed": 0,
+    "post_indexed": 0,
+    "backend": "bridge:addon(cuda)"
   },
   "gate": {
-    "indexed": true,
-    "inserted": true,
-    "errors": true,
-    "pass": true
+    "indexed": false,
+    "inserted": false,
+    "errors": false,
+    "pass": false
   }
 }
