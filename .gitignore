@@ -938,3 +938,4 @@ docs/reports/ignored-directory-audit.md
 docs/reports/ignored-directory-audit.min.json
 docs/reports/ignored-directory-audit*.gz
 docs/reports/ignored-directory-audit*.zst
+models/autoencoder/autoencoder_latent_index.json
