@@ -49,16 +49,16 @@ console.log(`Ollama URL: ${OLLAMA_URL}`);
 console.log(`Qdrant URL: ${QDRANT_URL}\n`);
 
 // Helpers
-async function qdrantPost(path, body) {
+async function qdrantRequest(method, path, body) {
   const res = await fetch(`${QDRANT_URL}${path}`, {
-    method: 'POST',
+    method,
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(body),
   });
   const text = await res.text();
   if (!res.ok) {
-    console.error(`Qdrant ${res.status} on ${path}:`, text.slice(0, 200));
-    throw new Error(`Qdrant POST failed: ${res.status}`);
+    console.error(`Qdrant ${method} ${res.status} on ${path}:`, text.slice(0, 200));
+    throw new Error(`Qdrant ${method} failed: ${res.status}`);
   }
   return JSON.parse(text);
 }
@@ -97,7 +97,7 @@ async function getPacketContent(packet) {
 }
 
 async function upsertToQdrant(pointId, vector, payload) {
-  await qdrantPost(`/collections/${COLLECTION_NAME}/points`, {
+  await qdrantRequest('PUT', `/collections/${COLLECTION_NAME}/points?wait=false`, {
     points: [
       {
         id: pointId,
