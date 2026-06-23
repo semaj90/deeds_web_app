@@ -1,5 +1,6 @@
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
+import { z } from 'zod';
 import { createHash } from 'node:crypto';
 import type { AtlasNode, AtlasEdge, AtlasChunk, TraceStep, AtlasRoutingSignals, AtlasWeightProfile } from '$lib/types/atlas.js';
 import { runRgAsync } from '../../../../../../scripts/rg-atlas/run-rg.mjs';
@@ -9,6 +10,14 @@ const WIKI_COLLECTION = 'llm_wiki_chunks';
 const CACHE_PREFIX = 'ace:cartridge:';
 const CACHE_TTL = 1800;
 const BLEND = { cosine: 0.45, pagerank: 0.20, topology: 0.15 };
+
+const queryBodySchema = z.object({
+	query: z.string().min(1, 'query is required').max(500),
+	blendCosine: z.number().min(0).max(1).optional(),
+	blendPageRank: z.number().min(0).max(1).optional(),
+	blendTopology: z.number().min(0).max(1).optional(),
+	noCache: z.boolean().optional().default(false)
+});
 
 const WIKI_TOPICS: Record<string, string> = {
 	'backpropagation': 'Backpropagation & Gradient Descent',
@@ -190,13 +199,17 @@ function chunkFromHit(r: QHit): AtlasChunk {
 export const POST: RequestHandler = async ({ request, locals }) => {
   if (!locals.user) return json({ error: 'Unauthorized' }, { status: 401 });
 
-  const body = await request.json().catch(() => ({}));
-  const query: string = (body.query ?? '').trim();
+  const raw = await request.json().catch(() => ({}));
+  const parsed = queryBodySchema.safeParse(raw);
+  if (!parsed.success) {
+    return json({ error: parsed.error.issues[0]?.message ?? 'Invalid input' }, { status: 400 });
+  }
+  const { query } = parsed.data;
 
   const requestedWeights = {
-    cosine: body.blendCosine !== undefined ? Number(body.blendCosine) : BLEND.cosine,
-    pagerank: body.blendPageRank !== undefined ? Number(body.blendPageRank) : BLEND.pagerank,
-    topology: body.blendTopology !== undefined ? Number(body.blendTopology) : BLEND.topology,
+    cosine: parsed.data.blendCosine ?? BLEND.cosine,
+    pagerank: parsed.data.blendPageRank ?? BLEND.pagerank,
+    topology: parsed.data.blendTopology ?? BLEND.topology,
   };
 
   const hasCustomWeights =
@@ -209,8 +222,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
     ? buildManualWeightProfile(requestedWeights)
     : buildAdaptiveWeightProfile(query, routingSignals);
 
-  const noCache: boolean = (body.noCache ?? false) || hasCustomWeights;
-  if (!query) return json({ error: 'query required' }, { status: 400 });
+  const noCache: boolean = parsed.data.noCache || hasCustomWeights;
 
   const t0 = performance.now();
   const trace: TraceStep[] = [];

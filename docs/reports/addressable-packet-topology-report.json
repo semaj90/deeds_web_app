@@ -1,18 +1,18 @@
 {
-  "generated_at": "2026-06-18T22:12:30.461Z",
-  "mode": "apply",
-  "input_file": ".tmp/addressable-packets.validated.ndjson",
+  "generated_at": "2026-06-23T18:50:12.068Z",
+  "mode": "dry-run",
+  "input_file": ".tmp/addressable-packets.enriched.ndjson",
   "statistics": {
-    "total_packets_processed": 3251,
-    "success_count": 3251,
-    "gds_enriched": 3226,
-    "som_enriched": 3251,
+    "total_packets_processed": 10,
+    "success_count": 10,
+    "gds_enriched": 9,
+    "som_enriched": 0,
     "error_count": 0
   },
   "neo4j": {
     "reachable": true,
     "total_scored": 8804,
-    "resolved_matches": 3226
+    "resolved_matches": 9
   },
   "som": {
     "loaded": true,

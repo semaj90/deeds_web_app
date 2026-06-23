@@ -554,7 +554,14 @@
       "PowerShell(Get-CimInstance Win32_Process -Filter \"ProcessId = 41992\")",
       "Bash(DATABASE_URL=\"postgresql://legal_admin:123456@127.0.0.1:5434/legal_ai_db\" node scripts/atlas/build-implementation-intent-aliases.mjs --apply)",
       "PowerShell(try { $json = Get-Content C:\\\\Users\\\\james\\\\Videos\\\\deeds-web-app\\\\package.json -Raw | ConvertFrom-Json; Write-Host \"JSON valid\"; Write-Host \"Scripts count: $\\($json.scripts.PSObject.Properties.Count\\)\" } catch { Write-Host \"JSON INVALID: $_\" })",
-      "PowerShell(try { $json = Get-Content C:\\\\Users\\\\james\\\\Videos\\\\deeds-web-app\\\\package.json -Raw | ConvertFrom-Json; Write-Host \"JSON valid\"; Write-Host \"Type: $\\($json.type\\)\" } catch { Write-Host \"JSON INVALID: $\\($_\\)\" })"
+      "PowerShell(try { $json = Get-Content C:\\\\Users\\\\james\\\\Videos\\\\deeds-web-app\\\\package.json -Raw | ConvertFrom-Json; Write-Host \"JSON valid\"; Write-Host \"Type: $\\($json.type\\)\" } catch { Write-Host \"JSON INVALID: $\\($_\\)\" })",
+      "Bash(git count-objects *)",
+      "Bash(PGPASSWORD=legal_password psql -h 127.0.0.1 -p 5434 -U legal_admin -d legal_ai_db -c \"SELECT COUNT\\(*\\) FROM atlas_packets LIMIT 1;\")",
+      "Bash(DATABASE_URL=\"postgresql://legal_admin:123456@127.0.0.1:5434/legal_ai_db\" node scripts/atlas/repair-qdrant-postgres-join.mjs)",
+      "Bash(DATABASE_URL=\"postgresql://legal_admin:123456@127.0.0.1:5434/legal_ai_db\" psql -c \"\\\\d atlas_packets\")",
+      "Bash(DATABASE_URL=\"postgresql://legal_admin:123456@127.0.0.1:5434/legal_ai_db\" QDRANT_HOST=localhost QDRANT_PORT=6333 node scripts/atlas/repair-qdrant-postgres-join.mjs)",
+      "Bash(DATABASE_URL=\"postgresql://legal_admin:123456@127.0.0.1:5434/legal_ai_db\" OLLAMA_URL=\"http://127.0.0.1:11434\" QDRANT_URL=\"http://127.0.0.1:6333\" node scripts/atlas/backfill-packets-to-qdrant-ollama.mjs --dry-run --limit 10)",
+      "Bash(DATABASE_URL=\"postgresql://legal_admin:123456@127.0.0.1:5434/legal_ai_db\" OLLAMA_URL=\"http://127.0.0.1:11434\" QDRANT_URL=\"http://127.0.0.1:6333\" timeout 180 node scripts/atlas/backfill-packets-to-qdrant-ollama.mjs --apply --limit 100 --batch=25)"
     ],
     "deny": [],
     "ask": []

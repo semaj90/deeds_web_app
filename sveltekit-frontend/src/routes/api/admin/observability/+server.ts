@@ -1,8 +1,13 @@
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types.js';
+import { z } from 'zod';
 import { readFileSync, existsSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { extractSignal, QueryRouter4x4 } from '$lib/server/routing/query-router-4x4.js';
+
+const observabilityBodySchema = z.object({
+	query: z.string().min(1, 'query is required').max(1000)
+});
 
 export const GET: RequestHandler = async ({ locals }) => {
   if (!locals.user) {
@@ -74,10 +79,12 @@ export const POST: RequestHandler = async ({ request, locals }) => {
   }
 
   try {
-    const { query } = await request.json();
-    if (!query || typeof query !== 'string') {
-      return json({ error: 'Invalid query' }, { status: 400 });
+    const raw = await request.json().catch(() => ({}));
+    const parsed = observabilityBodySchema.safeParse(raw);
+    if (!parsed.success) {
+      return json({ error: parsed.error.issues[0]?.message ?? 'Invalid input' }, { status: 400 });
     }
+    const { query } = parsed.data;
 
     const signal = extractSignal(query);
     const router = new QueryRouter4x4();

@@ -1,5 +1,6 @@
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types.js';
+import { z } from 'zod';
 import { ENV } from '$lib/server/env.server.js';
 import { getRedis } from '$lib/server/redis.js';
 
@@ -12,6 +13,13 @@ const TURBOVEC_URL = process.env.TURBOVEC_URL ?? 'http://127.0.0.1:8099';
 const ROTORQUANT   = process.env.ROTORQUANT_URL ?? 'http://127.0.0.1:8090';
 const COLLECTION   = 'codebase_chunks_768';
 const RRF_K        = 60;
+
+const hyperragBodySchema = z.object({
+	query: z.string().min(1, 'query is required').max(500),
+	topK: z.number().int().min(1).max(100).optional().default(10),
+	topClusters: z.number().int().min(1).max(50).optional().default(5),
+	noInference: z.boolean().optional().default(false)
+});
 
 function sourceRef(p: Record<string, unknown> | null): string | null {
 	if (!p) return null;
@@ -172,13 +180,16 @@ async function synthesise(hits: Awaited<ReturnType<typeof enrichWithCouchDB>>, q
 export const POST: RequestHandler = async ({ request, locals }) => {
 	if (!locals.user) return json({ error: 'Unauthorized' }, { status: 401 });
 
-	const body = await request.json() as { query?: string; topK?: number; topClusters?: number; noInference?: boolean };
-	const query = (body.query ?? '').trim();
-	if (!query) return json({ error: 'query required' }, { status: 400 });
+	const raw = await request.json().catch(() => ({}));
+	const parsed = hyperragBodySchema.safeParse(raw);
+	if (!parsed.success) {
+		return json({ error: parsed.error.issues[0]?.message ?? 'Invalid input' }, { status: 400 });
+	}
+	const { query } = parsed.data;
 
-	const topK        = Math.min(Number(body.topK ?? 10), 50);
-	const topClusters = Math.min(Number(body.topClusters ?? 5), 20);
-	const noInference = Boolean(body.noInference);
+	const topK        = Math.min(parsed.data.topK, 50);
+	const topClusters = Math.min(parsed.data.topClusters, 20);
+	const noInference = parsed.data.noInference;
 
 	const t0 = Date.now();
 

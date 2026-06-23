@@ -1,0 +1,35 @@
+{
+  "timestamp": "2026-06-23T17:24:22.009Z",
+  "version": "1.0.0",
+  "lanes": {
+    "acp_ownership": {
+      "status": "PASS",
+      "checks": 3
+    },
+    "acp_transport": {
+      "status": "PASS",
+      "checks": 2
+    },
+    "payload_join": {
+      "status": "PASS",
+      "checks": 4
+    },
+    "memory_tiers": {
+      "status": "PASS",
+      "checks": 4
+    },
+    "gpu_eligibility": {
+      "status": "PASS",
+      "checks": 5
+    },
+    "feature_extraction": {
+      "status": "PASS",
+      "checks": 3
+    }
+  },
+  "summary": {
+    "overall_status": "PASS",
+    "total_checks": 21,
+    "passed_checks": 21
+  }
+}

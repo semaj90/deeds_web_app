@@ -1,0 +1,141 @@
+{
+  "timestamp": "2026-06-23T16:03:55.516Z",
+  "health": {
+    "ollama_ok": true,
+    "embedding_model_ok": true,
+    "qdrant_ok": true,
+    "collection_dim": 768,
+    "postgres_ok": true,
+    "valkey_ok": true,
+    "gpu_visible": false,
+    "recommended_batch_size": 100
+  },
+  "classification": {
+    "join_repair_possible": 0,
+    "qdrant_payload_match_possible": 154,
+    "needs_embedding": 13545,
+    "non_vector_identity": 1385,
+    "generated_or_docs": 120,
+    "missing_text": 7,
+    "ambiguous": 296,
+    "total": 15507
+  },
+  "samples": {
+    "needs_embedding": [
+      {
+        "packet_id": "0002ca90-38b7-428b-93ae-4e6eaa3d8aaa",
+        "packet_key": "5ee867f78c3ad62b",
+        "source_ref": "feature:unclassified_packet",
+        "file_path": null,
+        "feature_id": "unclassified_packet",
+        "feature_label": "Unclassified Packet",
+        "summary": "Metadata record for unknown file. Kind: unknown. Feature ID: unassigned.        ",
+        "dim": 768
+      },
+      {
+        "packet_id": "00051297-8b66-40c8-80ef-ae2afdaffd1c",
+        "packet_key": "adc1ed2694d4a2bc",
+        "source_ref": "feature:unclassified_packet",
+        "file_path": null,
+        "feature_id": "unclassified_packet",
+        "feature_label": "Unclassified Packet",
+        "summary": "Metadata record for unknown file. Kind: unknown. Feature ID: unassigned.        ",
+        "dim": 768
+      },
+      {
+        "packet_id": "000a6f6a-ad41-4431-b22b-4cd7c79ecc69",
+        "packet_key": "244ffc42a235971f",
+        "source_ref": "feature:unclassified_packet",
+        "file_path": null,
+        "feature_id": "unclassified_packet",
+        "feature_label": "Unclassified Packet",
+        "summary": "Metadata record for unknown file. Kind: unknown. Feature ID: unassigned.        ",
+        "dim": 768
+      },
+      {
+        "packet_id": "000bb2a7-b5dd-40de-88b7-f3965a14a19d",
+        "packet_key": "ee5c2f1d82d0124a",
+        "source_ref": "feature:unclassified_packet",
+        "file_path": null,
+        "feature_id": "unclassified_packet",
+        "feature_label": "Unclassified Packet",
+        "summary": "Metadata record for unknown file. Kind: unknown. Feature ID: unassigned.        ",
+        "dim": 768
+      },
+      {
+        "packet_id": "000e40f3-f274-44f2-be72-a986485d0841",
+        "packet_key": "e98e59665227f601",
+        "source_ref": "feature:unclassified_packet",
+        "file_path": null,
+        "feature_id": "unclassified_packet",
+        "feature_label": "Unclassified Packet",
+        "summary": "Metadata record for unknown file. Kind: unknown. Feature ID: unassigned.        ",
+        "dim": 768
+      }
+    ],
+    "non_vector_identity": [
+      {
+        "packet_id": "0007079b-60b2-4ad6-87fa-0ca6e612d9bc",
+        "packet_key": "docs/documents-atlas-index.md#chunk-698:8d95322722fd7e83",
+        "source_ref": "docs/documents-atlas-index.md#chunk-698",
+        "file_path": null,
+        "feature_id": "documentation",
+        "feature_label": "Documentation",
+        "summary": "*Generated at: 2026-05-23T22:33:26.628Z | Total Documents Indexed: 4550 | Skipped (too large): 20*\n# Documents Master Atlas Index\nThis document serves as the master catalog of indexed documents inside the deeds web app repository, linking structural context directly to absolute source references for token-efficient retrieval.\n## 📅 Session Logs & Timelines\n### 📄 [> yorha-legal-ai-frontend@1.0.0 precheck](file:///c:/Users/james/Videos/deeds-web-app/sveltekit-frontend/check_log_session.txt)\n- **Path**: `check_log_session.txt`\n- **Size**: `215.13 KB` | **Lines**: `2673` | **Modified**: `2026-01-24`\n- **Search Groups (rg)**: `db-drizzle-postgres`, `ml-inference-cuda`, `web-svelte-frontend`, `rag-vector-search`, `caching-redis`, `infra-devops`, `logs-timelines`\n- **Core Tags**: `pgvector`, `simd`, `drizzle`, `svelte`, `mcp`, `cuda`, `qdrant`, `neo4j`, `redis`, `webgpu`, `rabbitmq`, `reranker`, `langextract`, `docker`\n- **AST Relations**: references files: `scripts/guard-route-params.ps1`, `src/lib/components/AIChat.stories.ts`, `src/lib/components/ui/bits/component-loader.ts`, `src/lib/components/ui/bits/custom-design-integration.ts`, `src/lib/components/ui/bits/index.enhanced.ts`, `src/lib/components/ui/bits/index.ts`, `src/lib/components/ui/button-variants.ts`, `src/lib/components/ui/Button.stories.ts`, `src/lib/components/ui/card/index.ts`, `src/lib/components/ui/command/index.ts`, `src/lib/components/ui/context-menu/index.ts`, `src/lib/components/ui/dialog/types.ts`, `src/lib/components/ui/drawer/index.ts`, `src/lib/components/ui/dropdown-menu/index.ts`, `src/lib/components/ui/enhanced-bits.ts`, `src/lib/components/ui/enhanced/button-variants.ts`, `src/lib/components/ui/enhanced/Button.stories.ts`, `src/lib/components/ui/enhanced/Card.stories.ts`, `src/lib/components/ui/index.ts`, `src/lib/components/ui/orchestrated/index.ts`, `src/lib/components/ui/select/index.ts`, `src/lib/components/ui/svelte5-index.ts`, `src/lib/components/ui/tabs-bits/index.ts`, `src/lib/compo",
+        "dim": 768
+      },
+      {
+        "packet_id": "0038160c-5356-41e7-9055-96a9d02a5b6c",
+        "packet_key": "docs/documents-atlas-index.md#chunk-211:589c72a42c1d3c1c",
+        "source_ref": "docs/documents-atlas-index.md#chunk-211",
+        "file_path": null,
+        "feature_id": "documentation",
+        "feature_label": "Documentation",
+        "summary": "*Generated at: 2026-05-23T22:33:26.628Z | Total Documents Indexed: 4550 | Skipped (too large): 20*\n# Documents Master Atlas Index\nThis document serves as the master catalog of indexed documents inside the deeds web app repository, linking structural context directly to absolute source references for token-efficient retrieval.\n## 📅 Session Logs & Timelines\n### 📄 [> yorha-legal-ai-frontend@1.0.0 precheck](file:///c:/Users/james/Videos/deeds-web-app/sveltekit-frontend/check_log_session.txt)\n- **Path**: `check_log_session.txt`\n- **Size**: `215.13 KB` | **Lines**: `2673` | **Modified**: `2026-01-24`\n- **Search Groups (rg)**: `db-drizzle-postgres`, `ml-inference-cuda`, `web-svelte-frontend`, `rag-vector-search`, `caching-redis`, `infra-devops`, `logs-timelines`\n- **Core Tags**: `pgvector`, `simd`, `drizzle`, `svelte`, `mcp`, `cuda`, `qdrant`, `neo4j`, `redis`, `webgpu`, `rabbitmq`, `reranker`, `langextract`, `docker`\n- **AST Relations**: references files: `scripts/guard-route-params.ps1`, `src/lib/components/AIChat.stories.ts`, `src/lib/components/ui/bits/component-loader.ts`, `src/lib/components/ui/bits/custom-design-integration.ts`, `src/lib/components/ui/bits/index.enhanced.ts`, `src/lib/components/ui/bits/index.ts`, `src/lib/components/ui/button-variants.ts`, `src/lib/components/ui/Button.stories.ts`, `src/lib/components/ui/card/index.ts`, `src/lib/components/ui/command/index.ts`, `src/lib/components/ui/context-menu/index.ts`, `src/lib/components/ui/dialog/types.ts`, `src/lib/components/ui/drawer/index.ts`, `src/lib/components/ui/dropdown-menu/index.ts`, `src/lib/components/ui/enhanced-bits.ts`, `src/lib/components/ui/enhanced/button-variants.ts`, `src/lib/components/ui/enhanced/Button.stories.ts`, `src/lib/components/ui/enhanced/Card.stories.ts`, `src/lib/components/ui/index.ts`, `src/lib/components/ui/orchestrated/index.ts`, `src/lib/components/ui/select/index.ts`, `src/lib/components/ui/svelte5-index.ts`, `src/lib/components/ui/tabs-bits/index.ts`, `src/lib/compo",
+        "dim": 768
+      },
+      {
+        "packet_id": "004d6837-2cb7-4f69-9f02-97ef68bfc462",
+        "packet_key": "docs/documents-atlas-index.md#chunk-1174:8b83cf2cf32c9701",
+        "source_ref": "docs/documents-atlas-index.md#chunk-1174",
+        "file_path": null,
+        "feature_id": "documentation",
+        "feature_label": "Documentation",
+        "summary": "*Generated at: 2026-05-23T22:33:26.628Z | Total Documents Indexed: 4550 | Skipped (too large): 20*\n# Documents Master Atlas Index\nThis document serves as the master catalog of indexed documents inside the deeds web app repository, linking structural context directly to absolute source references for token-efficient retrieval.\n## 📅 Session Logs & Timelines\n### 📄 [> yorha-legal-ai-frontend@1.0.0 precheck](file:///c:/Users/james/Videos/deeds-web-app/sveltekit-frontend/check_log_session.txt)\n- **Path**: `check_log_session.txt`\n- **Size**: `215.13 KB` | **Lines**: `2673` | **Modified**: `2026-01-24`\n- **Search Groups (rg)**: `db-drizzle-postgres`, `ml-inference-cuda`, `web-svelte-frontend`, `rag-vector-search`, `caching-redis`, `infra-devops`, `logs-timelines`\n- **Core Tags**: `pgvector`, `simd`, `drizzle`, `svelte`, `mcp`, `cuda`, `qdrant`, `neo4j`, `redis`, `webgpu`, `rabbitmq`, `reranker`, `langextract`, `docker`\n- **AST Relations**: references files: `scripts/guard-route-params.ps1`, `src/lib/components/AIChat.stories.ts`, `src/lib/components/ui/bits/component-loader.ts`, `src/lib/components/ui/bits/custom-design-integration.ts`, `src/lib/components/ui/bits/index.enhanced.ts`, `src/lib/components/ui/bits/index.ts`, `src/lib/components/ui/button-variants.ts`, `src/lib/components/ui/Button.stories.ts`, `src/lib/components/ui/card/index.ts`, `src/lib/components/ui/command/index.ts`, `src/lib/components/ui/context-menu/index.ts`, `src/lib/components/ui/dialog/types.ts`, `src/lib/components/ui/drawer/index.ts`, `src/lib/components/ui/dropdown-menu/index.ts`, `src/lib/components/ui/enhanced-bits.ts`, `src/lib/components/ui/enhanced/button-variants.ts`, `src/lib/components/ui/enhanced/Button.stories.ts`, `src/lib/components/ui/enhanced/Card.stories.ts`, `src/lib/components/ui/index.ts`, `src/lib/components/ui/orchestrated/index.ts`, `src/lib/components/ui/select/index.ts`, `src/lib/components/ui/svelte5-index.ts`, `src/lib/components/ui/tabs-bits/index.ts`, `src/lib/compo",
+        "dim": 768
+      }
+    ],
+    "ambiguous": [
+      {
+        "packet_id": "017daecc-95c3-4c2d-b151-b4d03c104a8d",
+        "packet_key": "nes:src/lib/server/db/schema/citations.ts",
+        "source_ref": "src/lib/server/db/schema/citations.ts",
+        "file_path": "src/lib/server/db/schema/citations.ts",
+        "feature_id": "repo.file.src.lib.server.db.schema.citations.ts",
+        "feature_label": "Citations",
+        "summary": null,
+        "dim": 768
+      },
+      {
+        "packet_id": "01ed0230-f9fc-4f4c-888b-3e5208f23662",
+        "packet_key": "nes:src/lib/server/clients/ollama.ts",
+        "source_ref": "src/lib/server/clients/ollama.ts",
+        "file_path": "src/lib/server/clients/ollama.ts",
+        "feature_id": "repo.file.src.lib.server.clients.ollama.ts",
+        "feature_label": "Ollama",
+        "summary": null,
+        "dim": 768
+      },
+      {
+        "packet_id": "043fdf56-d3fe-478f-9d29-91fd522ee02d",
+        "packet_key": "nes:src/routes/api/analytics/research-index/+server.ts",
+        "source_ref": "src/routes/api/analytics/research-index/+server.ts",
+        "file_path": "src/routes/api/analytics/research-index/+server.ts",
+        "feature_id": "repo.file.src.routes.api.analytics.research.index.server.ts",
+        "feature_label": "+server",
+        "summary": null,
+        "dim": 768
+      }
+    ]
+  }
+}

@@ -20,6 +20,7 @@ export default defineConfig({
       'tests/gemma4-tool-controller.spec.ts',
       'tests/llama-tool-definitions.spec.ts',
       'tests/agents-md-relations.spec.ts',
+      'tests/agent-memory-schema-matching.spec.ts',
       'tests/redis-disposable.spec.ts',
       'tests/langextract-native.spec.ts',
       'tests/ace-context-glossary.spec.ts',

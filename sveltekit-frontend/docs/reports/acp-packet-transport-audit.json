@@ -1,0 +1,449 @@
+{
+  "total_packets": 17995,
+  "valid_packets": 17931,
+  "invalid_packets": 64,
+  "gan_trigger": true,
+  "issues": [
+    {
+      "packet_id": "069cbf0c-e30d-4368-94d3-ad23d08f3034",
+      "packet_key": "memory/runs/01cb725b540e/gap_report.json:5812a9c2882a3488",
+      "issue": "prompt injection risk detected"
+    },
+    {
+      "packet_id": "0ca9319c-ced3-4fa8-bdf4-05ca30753bba",
+      "packet_key": "src/routes/api/document/analysis/[evidenceId]/+server.ts:06757b10a87ca59c",
+      "issue": "prompt injection risk detected"
+    },
+    {
+      "packet_id": "10776a5b-2ce7-42a6-a281-f6abdf622cf1",
+      "packet_key": "src/lib/server/reconstruction/scene-intent-extractor.ts:e0686fcc0a660a61",
+      "issue": "prompt injection risk detected"
+    },
+    {
+      "packet_id": "114758b5-3542-4e06-8f79-730218b3f93e",
+      "packet_key": "src/routes/api/admin/ai-chat/summarize-panel/+server.ts:abdf0bc43eb0fae9",
+      "issue": "prompt injection risk detected"
+    },
+    {
+      "packet_id": "1c8c63cf-c280-4a11-aa37-e08d8239ef4d",
+      "packet_key": "src/routes/api/codebase-index/evidence-analyze/+server.ts:688a6d36668f68a8",
+      "issue": "prompt injection risk detected"
+    },
+    {
+      "packet_id": "1c9deb8a-1cbc-4087-934c-ecbb403416e0",
+      "packet_key": "f90bdca555d954ed",
+      "issue": "prompt injection risk detected"
+    },
+    {
+      "packet_id": "23e82188-2312-40c3-b455-7261c40a8c4e",
+      "packet_key": "src/lib/server/ai/gemma4-tool-controller.ts:20b173e1342234a4",
+      "issue": "prompt injection risk detected"
+    },
+    {
+      "packet_id": "2547aafd-e1fd-4bad-85ef-d72272f54838",
+      "packet_key": "src/routes/api/files/[id]/+server.ts:c34e545be8b8a091",
+      "issue": "prompt injection risk detected"
+    },
+    {
+      "packet_id": "265f7800-f74c-4a30-8176-bc419a204872",
+      "packet_key": "src/routes/api/analytics/deep-research/+server.ts:99eecc030f734d35",
+      "issue": "prompt injection risk detected"
+    },
+    {
+      "packet_id": "28fc4846-8041-46e1-864a-73babce365e0",
+      "packet_key": "src/routes/api/audio/analysis/[evidenceId]/+server.ts:66ede84436f3aec1",
+      "issue": "prompt injection risk detected"
+    },
+    {
+      "packet_id": "2ae59ada-c3e5-47e4-92b0-4235675a5d08",
+      "packet_key": "src/lib/server/gpu/gpu-job-queue.ts:95fd8e5245e7d1eb",
+      "issue": "prompt injection risk detected"
+    },
+    {
+      "packet_id": "2c502390-e0d9-4ee5-81f1-011f6067bed0",
+      "packet_key": "src/routes/api/tools/batch/+server.ts:3972fb75c753c2c3",
+      "issue": "prompt injection risk detected"
+    },
+    {
+      "packet_id": "2d4e4b9f-994b-438a-960b-8380b495a52f",
+      "packet_key": "src/routes/api/contextual/chat/+server.ts:02f4175aa229faac",
+      "issue": "prompt injection risk detected"
+    },
+    {
+      "packet_id": "2e0a57b3-2499-40bc-b480-885d5c7d08c1",
+      "packet_key": "21c7e3e332ebb53c",
+      "issue": "prompt injection risk detected"
+    },
+    {
+      "packet_id": "2ec6276e-8189-4991-93ff-4156106940f1",
+      "packet_key": "0a103a7794f0b91f",
+      "issue": "prompt injection risk detected"
+    },
+    {
+      "packet_id": "3806f9a6-e9a0-4a25-b864-a3dc13d5d3a9",
+      "packet_key": "src/routes/(analysis)@/video-analysis/[evidenceId]/+page.server.ts:0a49a6bfb3703d03",
+      "issue": "prompt injection risk detected"
+    },
+    {
+      "packet_id": "3c2c09d3-c435-4de5-a3eb-743213ec5dff",
+      "packet_key": "src/routes/api/cache/warm-up/+server.ts:39f1cacd4787aa5d",
+      "issue": "prompt injection risk detected"
+    },
+    {
+      "packet_id": "40dcf6c8-d3c2-4b44-a751-6623fbf1ad1d",
+      "packet_key": "src/routes/api/dev/login-demo/+server.ts:0a64105eb63f228c",
+      "issue": "prompt injection risk detected"
+    },
+    {
+      "packet_id": "4a44ee27-5c95-4259-ab00-bf3f23d00c7a",
+      "packet_key": "src/lib/server/admin/subagent-orchestrator.ts:f0489aa96d9c4a06",
+      "issue": "prompt injection risk detected"
+    },
+    {
+      "packet_id": "5062d09e-8e06-4c76-8735-8c94b16c5c63",
+      "packet_key": "src/routes/(analysis)@/audio-analysis/[evidenceId]/+page.server.ts:c088073cceaf80fa",
+      "issue": "prompt injection risk detected"
+    },
+    {
+      "packet_id": "5372eacf-d9c1-4d2d-85d2-54f5242a875b",
+      "packet_key": "memory/+page.svelte:9a98345b5d839ce8",
+      "issue": "prompt injection risk detected"
+    },
+    {
+      "packet_id": "5b113d4b-f1ed-41d3-a5d1-bf77587edb85",
+      "packet_key": "2388da7a95b80d63",
+      "issue": "prompt injection risk detected"
+    },
+    {
+      "packet_id": "5b479c90-9523-48c4-9dd9-0b32a44f719d",
+      "packet_key": "0bffe0382a0d44bb",
+      "issue": "prompt injection risk detected"
+    },
+    {
+      "packet_id": "5d3348f4-0966-4739-9189-0c6d6dbcc1f0",
+      "packet_key": ".tmp/mega-audit/chunk3-storage-integrity.json:bb8b86cab41dcf52",
+      "issue": "prompt injection risk detected"
+    },
+    {
+      "packet_id": "60c75014-f0c9-4e98-a772-018619daf6e1",
+      "packet_key": "src/routes/api/ai/agent/+server.ts:fc49ee762db97c0c",
+      "issue": "prompt injection risk detected"
+    },
+    {
+      "packet_id": "6190d65c-4709-421e-bbcb-b68fc94b5d6f",
+      "packet_key": "src/lib/server/analysis/analysis-jobs.ts:a619784815fadd9e",
+      "issue": "prompt injection risk detected"
+    },
+    {
+      "packet_id": "61a80f76-fb9d-45e4-8992-7b2ac354c783",
+      "packet_key": "docs_readme/deeds_labs_archive/redis-mass-optimization-report.json:dc47c123316571d2",
+      "issue": "prompt injection risk detected"
+    },
+    {
+      "packet_id": "6c2a08d1-0be5-4ccd-a307-0d7af8044f80",
+      "packet_key": "src/routes/api/admin/ai-chat/subagent/launch/+server.ts:9afb9a35cdf2e22c",
+      "issue": "prompt injection risk detected"
+    },
+    {
+      "packet_id": "6c3360e9-1b7e-4d46-addf-9a01612f6b2f",
+      "packet_key": "src/routes/api/files/+server.ts:08c9c14875ae3f4a",
+      "issue": "prompt injection risk detected"
+    },
+    {
+      "packet_id": "73124219-39a2-4b85-a20f-c44e3d2bfc17",
+      "packet_key": "src/routes/api/video/analysis/[evidenceId]/+server.ts:0800caee10e41d57",
+      "issue": "prompt injection risk detected"
+    },
+    {
+      "packet_id": "7ba25038-bd67-4119-8105-18ec368df0f0",
+      "packet_key": "ab79a8d8daf848a4",
+      "issue": "prompt injection risk detected"
+    },
+    {
+      "packet_id": "7d0441f4-e58d-4af9-88f8-24a96841b174",
+      "packet_key": "src/lib/server/ace/user-analytics-context.ts:64f805e021914556",
+      "issue": "prompt injection risk detected"
+    },
+    {
+      "packet_id": "7ef3296f-b37b-4ef6-b362-c41fc7efb43d",
+      "packet_key": ".vscode/tasks.backup.json:fc7e57ceca880386",
+      "issue": "prompt injection risk detected"
+    },
+    {
+      "packet_id": "82279625-776b-4fea-b5ec-a686108f840c",
+      "packet_key": "6c442611911b5842",
+      "issue": "prompt injection risk detected"
+    },
+    {
+      "packet_id": "828fb224-39de-4558-b108-9a6c6aa9beca",
+      "packet_key": "src/routes/api/admin/ai-chat/+server.ts:8169eb079eab1c5d",
+      "issue": "prompt injection risk detected"
+    },
+    {
+      "packet_id": "85abeaea-128e-4a5a-a861-b89f814caec4",
+      "packet_key": "src/routes/api/ai/agent/batch/+server.ts:2c1cf49fbc451b19",
+      "issue": "prompt injection risk detected"
+    },
+    {
+      "packet_id": "85c7a47c-13b7-4d9f-bebc-5eb4d7226bd6",
+      "packet_key": ".tmp/mega-audit/storage-touchpoints.json:f818a2b7731e3ddf",
+      "issue": "prompt injection risk detected"
+    },
+    {
+      "packet_id": "86f5c2d0-a771-4b48-ace8-baab05845174",
+      "packet_key": "src/routes/api/evidence/upload/+server.ts:e17df3a2773c5716",
+      "issue": "prompt injection risk detected"
+    },
+    {
+      "packet_id": "975544ae-758b-46c4-8c8f-f6b242389734",
+      "packet_key": "26d8eb819c841b3f",
+      "issue": "prompt injection risk detected"
+    },
+    {
+      "packet_id": "99eec299-ad9e-4e5d-964b-62bd9a1d6086",
+      "packet_key": "src/routes/api/persons-of-interest/[id]/photos/+server.ts:9cc1fed43701695e",
+      "issue": "prompt injection risk detected"
+    },
+    {
+      "packet_id": "a05233fd-2930-495f-b83d-2432d52869b8",
+      "packet_key": "src/lib/server/db/schema/ai_chat.ts:ae95de4d59ffc62e",
+      "issue": "prompt injection risk detected"
+    },
+    {
+      "packet_id": "a7191e7f-699e-40aa-84ff-d66ffba50a01",
+      "packet_key": "docs/ARCHITECTURE_GUIDE_V1.md#chunk-2:94b9fcc1371fd9f5",
+      "issue": "prompt injection risk detected"
+    },
+    {
+      "packet_id": "ab2d2232-ec40-4b28-b190-cb3cb176f75d",
+      "packet_key": "src/lib/server/codeintel/fix-recommender.ts:0534d5fee732546a",
+      "issue": "prompt injection risk detected"
+    },
+    {
+      "packet_id": "be98e268-42d3-4092-96b5-23ab91d6af84",
+      "packet_key": "docs/ARCHITECTURE_GUIDE_V1.md#chunk-1:da7c0a54f13c17e7",
+      "issue": "prompt injection risk detected"
+    },
+    {
+      "packet_id": "c1892ed8-a2db-4df7-ab31-a25263b2cd55",
+      "packet_key": "src/routes/api/ai/chat-direct/+server.ts:6a557b1f034bd3de",
+      "issue": "prompt injection risk detected"
+    },
+    {
+      "packet_id": "c775a338-207b-4c01-a7ad-172024b550ab",
+      "packet_key": "src/lib/server/mcp/mcp-logger.ts:0f8de46284aff24d",
+      "issue": "prompt injection risk detected"
+    },
+    {
+      "packet_id": "cdb19377-d6d2-424b-802f-8b3bebe6703a",
+      "packet_key": ".tmp/turbovec/mega-audit-2026-05-21.jsonl:fb0406bb2a21b258",
+      "issue": "prompt injection risk detected"
+    },
+    {
+      "packet_id": "d6121700-2613-4dd5-a157-7c3810dbfebf",
+      "packet_key": "src/lib/server/ai/tiered-llm-cache.ts:398447d47153423f",
+      "issue": "prompt injection risk detected"
+    },
+    {
+      "packet_id": "db1b67c5-47b5-4187-8599-e65b21f470e4",
+      "packet_key": "src/routes/api/test/cache-simple/+server.ts:67ceb4aa5bf906f4",
+      "issue": "prompt injection risk detected"
+    },
+    {
+      "packet_id": "dcda918a-0851-4cba-8998-95f6f53b2e00",
+      "packet_key": "src/lib/server/ai/bifrost-cache-manager.ts:10b332029a7ad648",
+      "issue": "prompt injection risk detected"
+    },
+    {
+      "packet_id": "df293126-a922-4cc9-b036-b1c79f36e2c9",
+      "packet_key": "src/routes/api/ai/chat/stream/+server.ts:1e58bf9f73ad64e1",
+      "issue": "prompt injection risk detected"
+    },
+    {
+      "packet_id": "e3c754d3-b203-49dd-81e0-ad52eedcd090",
+      "packet_key": "src/routes/api/codebase-index/cluster-summary/+server.ts:ffbba1f1a33277b5",
+      "issue": "prompt injection risk detected"
+    },
+    {
+      "packet_id": "e48ca2b1-670b-454b-8816-b264717fae49",
+      "packet_key": "src/routes/(analysis)@/+layout.svelte:60d3d4b03019d23d",
+      "issue": "prompt injection risk detected"
+    },
+    {
+      "packet_id": "e4e85b90-38af-4509-914c-75202f98ce38",
+      "packet_key": "src/routes/api/admin/model/upload-weights/+server.ts:fef205c676c249a4",
+      "issue": "prompt injection risk detected"
+    },
+    {
+      "packet_id": "ebe9ebe2-3840-4c1c-bde3-fd9cb60fd176",
+      "packet_key": "src/routes/(analysis)@/document-analysis/[evidenceId]/+page.server.ts:1d19e92b2f16ccf8",
+      "issue": "prompt injection risk detected"
+    },
+    {
+      "packet_id": "ec90f0cc-0477-4401-8c28-ac08e91e20a4",
+      "packet_key": "40ce2356b07edded",
+      "issue": "prompt injection risk detected"
+    },
+    {
+      "packet_id": "ecde9518-63e9-48d1-9652-6ddf2ff25c5e",
+      "packet_key": "src/routes/api/ai/chat/+server.ts:f9df5d3110fb1fc1",
+      "issue": "prompt injection risk detected"
+    },
+    {
+      "packet_id": "ed295bcb-9b7a-4459-8355-e50b8ba855ea",
+      "packet_key": "src/lib/server/db/schema/admin-ai-skills.ts:86f629a92da3d2ca",
+      "issue": "prompt injection risk detected"
+    },
+    {
+      "packet_id": "f039aa28-762d-4797-b737-f831b6842487",
+      "packet_key": "src/lib/server/ollama-cached.ts:669807135f526cc5",
+      "issue": "prompt injection risk detected"
+    },
+    {
+      "packet_id": "f6054bfb-b34c-4c08-a6dc-0b395d0a1ae7",
+      "packet_key": "src/routes/(app)/+layout.server.ts:e5cf2e7b99f9cc42",
+      "issue": "prompt injection risk detected"
+    },
+    {
+      "packet_id": "f69a27ef-ac9c-47f7-91cd-c61f8ab2d616",
+      "packet_key": "src/lib/server/gpu/gpu-pipeline.ts:139ac15e21e44c74",
+      "issue": "prompt injection risk detected"
+    },
+    {
+      "packet_id": "fac46ba5-1a1d-4d0d-98fb-a41ea9cc8a83",
+      "packet_key": "src/routes/api/evidence/upload/+server.ts:93cfff37f749933f",
+      "issue": "prompt injection risk detected"
+    },
+    {
+      "packet_id": "fb085900-b611-4cba-99fb-ebf84ffafc76",
+      "packet_key": "76078e69c508469c",
+      "issue": "prompt injection risk detected"
+    },
+    {
+      "packet_id": "ffbd3ac8-21cf-463a-95af-651d8935137e",
+      "packet_key": "src/lib/server/inference/inference-router.ts:206283bfedb0b4a2",
+      "issue": "prompt injection risk detected"
+    }
+  ],
+  "samples": {
+    "valid": [
+      {
+        "packet_id": "0002ca90-38b7-428b-93ae-4e6eaa3d8aaa",
+        "packet_key": "5ee867f78c3ad62b",
+        "checks": {
+          "hex_packet_key_valid": true,
+          "packet_key_length_valid": true,
+          "utf8_decode_safe": true,
+          "json_payload_valid": false,
+          "jsonrpc_shape_valid": false,
+          "method_allowlisted": true,
+          "canonical_fields_present": true,
+          "cache_namespace_valid": true,
+          "traversal_path_array": true,
+          "prompt_injection_risk": false
+        },
+        "gan_trigger": false,
+        "issues": []
+      },
+      {
+        "packet_id": "00051297-8b66-40c8-80ef-ae2afdaffd1c",
+        "packet_key": "adc1ed2694d4a2bc",
+        "checks": {
+          "hex_packet_key_valid": true,
+          "packet_key_length_valid": true,
+          "utf8_decode_safe": true,
+          "json_payload_valid": false,
+          "jsonrpc_shape_valid": false,
+          "method_allowlisted": true,
+          "canonical_fields_present": true,
+          "cache_namespace_valid": true,
+          "traversal_path_array": true,
+          "prompt_injection_risk": false
+        },
+        "gan_trigger": false,
+        "issues": []
+      },
+      {
+        "packet_id": "0007079b-60b2-4ad6-87fa-0ca6e612d9bc",
+        "packet_key": "docs/documents-atlas-index.md#chunk-698:8d95322722fd7e83",
+        "checks": {
+          "hex_packet_key_valid": true,
+          "packet_key_length_valid": true,
+          "utf8_decode_safe": true,
+          "json_payload_valid": false,
+          "jsonrpc_shape_valid": false,
+          "method_allowlisted": true,
+          "canonical_fields_present": true,
+          "cache_namespace_valid": true,
+          "traversal_path_array": true,
+          "prompt_injection_risk": false
+        },
+        "gan_trigger": false,
+        "issues": []
+      }
+    ],
+    "invalid": [],
+    "high_risk": [
+      {
+        "packet_id": "069cbf0c-e30d-4368-94d3-ad23d08f3034",
+        "packet_key": "memory/runs/01cb725b540e/gap_report.json:5812a9c2882a3488",
+        "checks": {
+          "hex_packet_key_valid": true,
+          "packet_key_length_valid": true,
+          "utf8_decode_safe": true,
+          "json_payload_valid": false,
+          "jsonrpc_shape_valid": false,
+          "method_allowlisted": true,
+          "canonical_fields_present": true,
+          "cache_namespace_valid": true,
+          "traversal_path_array": true,
+          "prompt_injection_risk": true
+        },
+        "gan_trigger": true,
+        "issues": [
+          "prompt injection risk detected"
+        ]
+      },
+      {
+        "packet_id": "0ca9319c-ced3-4fa8-bdf4-05ca30753bba",
+        "packet_key": "src/routes/api/document/analysis/[evidenceId]/+server.ts:06757b10a87ca59c",
+        "checks": {
+          "hex_packet_key_valid": true,
+          "packet_key_length_valid": true,
+          "utf8_decode_safe": true,
+          "json_payload_valid": false,
+          "jsonrpc_shape_valid": false,
+          "method_allowlisted": true,
+          "canonical_fields_present": true,
+          "cache_namespace_valid": true,
+          "traversal_path_array": true,
+          "prompt_injection_risk": true
+        },
+        "gan_trigger": true,
+        "issues": [
+          "prompt injection risk detected"
+        ]
+      },
+      {
+        "packet_id": "10776a5b-2ce7-42a6-a281-f6abdf622cf1",
+        "packet_key": "src/lib/server/reconstruction/scene-intent-extractor.ts:e0686fcc0a660a61",
+        "checks": {
+          "hex_packet_key_valid": true,
+          "packet_key_length_valid": true,
+          "utf8_decode_safe": true,
+          "json_payload_valid": false,
+          "jsonrpc_shape_valid": false,
+          "method_allowlisted": true,
+          "canonical_fields_present": true,
+          "cache_namespace_valid": true,
+          "traversal_path_array": true,
+          "prompt_injection_risk": true
+        },
+        "gan_trigger": true,
+        "issues": [
+          "prompt injection risk detected"
+        ]
+      }
+    ]
+  }
+}
