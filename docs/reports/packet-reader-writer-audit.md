@@ -1,6 +1,6 @@
 # Packet Reader / Writer Audit
 
-Generated: 2026-06-21T05:24:55.411Z
+Generated: 2026-06-23T19:57:21.743Z
 Status: MATERIALIZED
 Source table: atlas_higher_hop_index
 
@@ -30,16 +30,16 @@ Source table: atlas_higher_hop_index
 
 ## Evidence Scan
 
-- files seen: 7
-- files loaded: 7
+- files seen: 8
+- files loaded: 8
 - files skipped too large: 0
-- records indexed: 8358
+- records indexed: 8359
 
 ## Output
 
 - ndjson: .tmp/addressable-packets.ndjson
 - manifest: .tmp/addressable-packets.manifest.json
-- sha256: b87eb373239e6b1bfecdba429f5ccec25d8a70255d2f48c62eaf6ab0614c5f06
+- sha256: 8d49d141d01849ca08378f07b629a368dbe4882f8bceda3bca7888d6cb870277
 
 ## Samples
 

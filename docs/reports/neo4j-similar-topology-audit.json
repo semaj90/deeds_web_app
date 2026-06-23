@@ -1,0 +1,25 @@
+{
+  "timestamp": "2026-06-23T19:33:10.567Z",
+  "phase": "P4 Phase 1.5: Neo4j Topology Integrity",
+  "checks": {},
+  "queries_to_execute": [
+    {
+      "name": "Edge count",
+      "cypher": "MATCH ()-[r:SIMILAR_TOPOLOGY]->() RETURN count(r) AS edge_count"
+    },
+    {
+      "name": "Self-loop count",
+      "cypher": "MATCH (a)-[r:SIMILAR_TOPOLOGY]->(b) WHERE a.cell_id = b.cell_id RETURN count(r) AS self_loop_count"
+    },
+    {
+      "name": "Isolated node count",
+      "cypher": "MATCH (n) WHERE NOT (n)-[:SIMILAR_TOPOLOGY]-() RETURN count(n) AS isolated_count"
+    },
+    {
+      "name": "Duplicate edges",
+      "cypher": "MATCH (a)-[r:SIMILAR_TOPOLOGY]->(b) WITH a.cell_id AS from_cell, b.cell_id AS to_cell, count(r) AS rel_count WHERE rel_count > 1 RETURN from_cell, to_cell, rel_count ORDER BY rel_count DESC"
+    }
+  ],
+  "status": "PENDING",
+  "reason": "Neo4j Bolt driver not configured in Node.js environment. Execute queries manually via Neo4j Browser or wire neo4j-driver."
+}

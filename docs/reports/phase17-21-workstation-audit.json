@@ -1,6 +1,6 @@
 {
   "schema": "phase17_21_workstation_audit.v1",
-  "generated_at": "2026-06-20T15:48:22.071Z",
+  "generated_at": "2026-06-23T19:37:33.824Z",
   "overall": "PARTIAL",
   "completion_pct": 67,
   "canonical_truth": "Postgres",
@@ -119,8 +119,8 @@
       "raw": {
         "path": ".tmp/addressable-packets.ndjson",
         "exists": true,
-        "bytes": 7425598,
-        "modified_at": "2026-06-18T21:30:40.711Z"
+        "bytes": 7424807,
+        "modified_at": "2026-06-21T05:24:55.514Z"
       },
       "validated": {
         "path": ".tmp/addressable-packets.validated.ndjson",

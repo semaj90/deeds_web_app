@@ -1,0 +1,1050 @@
+{
+  "timestamp": "2026-06-23T21:03:09.025Z",
+  "stores": {
+    "postgres": {
+      "tables": {},
+      "indexes": {},
+      "verdict": "COMPLETE"
+    },
+    "qdrant": {
+      "collections": {
+        "task_semantic_packets": {
+          "vector_size": 768,
+          "point_count": 0,
+          "payload_fields": {},
+          "payload_indexes": {}
+        },
+        "phase89_error_chunks": {
+          "vector_size": 768,
+          "point_count": 13,
+          "payload_fields": {},
+          "payload_indexes": {}
+        },
+        "external_error_fixes": {
+          "vector_size": 768,
+          "point_count": 0,
+          "payload_fields": {},
+          "payload_indexes": {}
+        },
+        "embedding_cache": {
+          "vector_size": 0,
+          "point_count": 0,
+          "payload_fields": {},
+          "payload_indexes": {}
+        },
+        "audio_segments": {
+          "vector_size": 0,
+          "point_count": 0,
+          "payload_fields": {},
+          "payload_indexes": {}
+        },
+        "error_embeddings": {
+          "vector_size": 0,
+          "point_count": 25,
+          "payload_fields": {},
+          "payload_indexes": {}
+        },
+        "parents_atlas_chunks": {
+          "vector_size": 768,
+          "point_count": 15,
+          "payload_fields": {},
+          "payload_indexes": {}
+        },
+        "documents_atlas_768": {
+          "vector_size": 768,
+          "point_count": 6515,
+          "payload_fields": {},
+          "payload_indexes": {}
+        },
+        "external_api_examples": {
+          "vector_size": 768,
+          "point_count": 0,
+          "payload_fields": {},
+          "payload_indexes": {}
+        },
+        "codebase_chunks_768_repair_tmp": {
+          "vector_size": 0,
+          "point_count": 16626,
+          "payload_fields": {
+            "som_cluster": {
+              "exists": true,
+              "actual_key_name": "som_cluster",
+              "populated_count": 100,
+              "coverage_pct": "100.0",
+              "sample_value": "1"
+            }
+          },
+          "payload_indexes": {}
+        },
+        "external_programming_docs_64d": {
+          "vector_size": 64,
+          "point_count": 0,
+          "payload_fields": {},
+          "payload_indexes": {}
+        },
+        "phase90_error_clusters": {
+          "vector_size": 768,
+          "point_count": 13,
+          "payload_fields": {},
+          "payload_indexes": {}
+        },
+        "code_llm_outputs": {
+          "vector_size": 768,
+          "point_count": 1,
+          "payload_fields": {},
+          "payload_indexes": {}
+        },
+        "phase90_error_cards": {
+          "vector_size": 768,
+          "point_count": 13,
+          "payload_fields": {},
+          "payload_indexes": {}
+        },
+        "chunks_web_search": {
+          "vector_size": 0,
+          "point_count": 54,
+          "payload_fields": {},
+          "payload_indexes": {}
+        },
+        "qdrant_docs": {
+          "vector_size": 768,
+          "point_count": 10,
+          "payload_fields": {},
+          "payload_indexes": {}
+        },
+        "legal_cases": {
+          "vector_size": 0,
+          "point_count": 1,
+          "payload_fields": {},
+          "payload_indexes": {}
+        },
+        "glyph_atlas": {
+          "vector_size": 768,
+          "point_count": 1336,
+          "payload_fields": {
+            "som_cluster": {
+              "exists": true,
+              "actual_key_name": "som_cluster",
+              "populated_count": 100,
+              "coverage_pct": "100.0",
+              "sample_value": "0"
+            }
+          },
+          "payload_indexes": {}
+        },
+        "evidence_items": {
+          "vector_size": 0,
+          "point_count": 37,
+          "payload_fields": {},
+          "payload_indexes": {}
+        },
+        "codebase_chunks_64d": {
+          "vector_size": 64,
+          "point_count": 40628,
+          "payload_fields": {
+            "som_cluster": {
+              "exists": true,
+              "actual_key_name": "som_cluster",
+              "populated_count": 100,
+              "coverage_pct": "100.0",
+              "sample_value": "0"
+            }
+          },
+          "payload_indexes": {}
+        },
+        "scenarios": {
+          "vector_size": 768,
+          "point_count": 2,
+          "payload_fields": {
+            "source_ref": {
+              "exists": true,
+              "actual_key_name": "source_ref",
+              "populated_count": 2,
+              "coverage_pct": "100.0",
+              "sample_value": "\"docs_readme/deeds_labs_archive/svelte-check-curre"
+            }
+          },
+          "payload_indexes": {}
+        },
+        "synthesis_memory_768": {
+          "vector_size": 0,
+          "point_count": 2,
+          "payload_fields": {},
+          "payload_indexes": {}
+        },
+        "agent_memory_observations": {
+          "vector_size": 768,
+          "point_count": 207,
+          "payload_fields": {
+            "source_ref": {
+              "exists": true,
+              "actual_key_name": "source_refs",
+              "populated_count": 100,
+              "coverage_pct": "100.0",
+              "sample_value": "[\"scripts/memory/smoke-claude-mem-api.mjs\"]"
+            }
+          },
+          "payload_indexes": {}
+        },
+        "research_memory_768": {
+          "vector_size": 0,
+          "point_count": 2,
+          "payload_fields": {},
+          "payload_indexes": {}
+        },
+        "summary_cards_768": {
+          "vector_size": 768,
+          "point_count": 4654,
+          "payload_fields": {},
+          "payload_indexes": {}
+        },
+        "scenario_cache": {
+          "vector_size": 768,
+          "point_count": 0,
+          "payload_fields": {},
+          "payload_indexes": {}
+        },
+        "external_programming_docs_768": {
+          "vector_size": 768,
+          "point_count": 67,
+          "payload_fields": {
+            "sourceRef": {
+              "exists": true,
+              "actual_key_name": "sourceRefs",
+              "populated_count": 49,
+              "coverage_pct": "73.1",
+              "sample_value": "[\"docs/llms/generated/webgpu.llms-full.txt\"]"
+            }
+          },
+          "payload_indexes": {}
+        },
+        "chat_messages": {
+          "vector_size": 0,
+          "point_count": 68,
+          "payload_fields": {},
+          "payload_indexes": {}
+        },
+        "parent_atlas_rg_packets_768": {
+          "vector_size": 0,
+          "point_count": 50,
+          "payload_fields": {
+            "source_ref": {
+              "exists": true,
+              "actual_key_name": "source_ref",
+              "populated_count": 50,
+              "coverage_pct": "100.0",
+              "sample_value": "\"docs/reports/rg_turbovec.txt\""
+            },
+            "sourceRef": {
+              "exists": true,
+              "actual_key_name": "sourceRefs",
+              "populated_count": 50,
+              "coverage_pct": "100.0",
+              "sample_value": "[\"sveltekit-frontend/errors-phase76-4.txt#L76312\","
+            },
+            "feature_id": {
+              "exists": true,
+              "actual_key_name": "feature_id",
+              "populated_count": 50,
+              "coverage_pct": "100.0",
+              "sample_value": "\"search.qdrant_vector\""
+            }
+          },
+          "payload_indexes": {}
+        },
+        "codebase_topology_128": {
+          "vector_size": 0,
+          "point_count": 0,
+          "payload_fields": {},
+          "payload_indexes": {}
+        },
+        "task_distillates": {
+          "vector_size": 768,
+          "point_count": 106,
+          "payload_fields": {},
+          "payload_indexes": {}
+        },
+        "opencode_cards_768": {
+          "vector_size": 768,
+          "point_count": 0,
+          "payload_fields": {},
+          "payload_indexes": {}
+        },
+        "court_opinions": {
+          "vector_size": 768,
+          "point_count": 0,
+          "payload_fields": {},
+          "payload_indexes": {}
+        },
+        "case_chunks": {
+          "vector_size": 768,
+          "point_count": 0,
+          "payload_fields": {},
+          "payload_indexes": {}
+        },
+        "evidence_vectors": {
+          "vector_size": 768,
+          "point_count": 0,
+          "payload_fields": {},
+          "payload_indexes": {}
+        },
+        "feature_maps": {
+          "vector_size": 0,
+          "point_count": 52844,
+          "payload_fields": {
+            "source_ref": {
+              "exists": true,
+              "actual_key_name": "source_ref",
+              "populated_count": 100,
+              "coverage_pct": "100.0",
+              "sample_value": "\".opencode/embeddings/90a901760543ebf1.json\""
+            }
+          },
+          "payload_indexes": {}
+        },
+        "legal_canon_chunks": {
+          "vector_size": 0,
+          "point_count": 59,
+          "payload_fields": {},
+          "payload_indexes": {}
+        },
+        "llm_response_cache": {
+          "vector_size": 0,
+          "point_count": 114,
+          "payload_fields": {},
+          "payload_indexes": {}
+        },
+        "cluster_narratives": {
+          "vector_size": 0,
+          "point_count": 20,
+          "payload_fields": {},
+          "payload_indexes": {}
+        },
+        "summary_lenses_768": {
+          "vector_size": 0,
+          "point_count": 3,
+          "payload_fields": {},
+          "payload_indexes": {}
+        },
+        "BifrostSemanticCachePlugin": {
+          "vector_size": 768,
+          "point_count": 5633,
+          "payload_fields": {},
+          "payload_indexes": {}
+        },
+        "document_knowledge_768": {
+          "vector_size": 768,
+          "point_count": 58,
+          "payload_fields": {
+            "sourceRef": {
+              "exists": true,
+              "actual_key_name": "sourceRefs",
+              "populated_count": 58,
+              "coverage_pct": "100.0",
+              "sample_value": "[\"docs/graph/cluster-summaries.json\",\"src/lib/db/m"
+            }
+          },
+          "payload_indexes": {}
+        },
+        "feature_registry_768": {
+          "vector_size": 768,
+          "point_count": 0,
+          "payload_fields": {},
+          "payload_indexes": {}
+        },
+        "chat_documents": {
+          "vector_size": 768,
+          "point_count": 4,
+          "payload_fields": {},
+          "payload_indexes": {}
+        },
+        "poi_profiles": {
+          "vector_size": 0,
+          "point_count": 0,
+          "payload_fields": {},
+          "payload_indexes": {}
+        },
+        "kb_notecards": {
+          "vector_size": 768,
+          "point_count": 2298,
+          "payload_fields": {},
+          "payload_indexes": {}
+        },
+        "codebase_topology_64": {
+          "vector_size": 0,
+          "point_count": 0,
+          "payload_fields": {},
+          "payload_indexes": {}
+        },
+        "codebase_chunks_encoded64": {
+          "vector_size": 64,
+          "point_count": 52606,
+          "payload_fields": {
+            "packet_key": {
+              "exists": true,
+              "actual_key_name": "packet_key",
+              "populated_count": 92,
+              "coverage_pct": "92.0",
+              "sample_value": "\"src/routes/api/research/concurrent-deep/stream/+s"
+            },
+            "source_ref": {
+              "exists": true,
+              "actual_key_name": "source_refs",
+              "populated_count": 84,
+              "coverage_pct": "84.0",
+              "sample_value": "[\"src/routes/api/research/concurrent-deep/stream/+"
+            },
+            "sourceRef": {
+              "exists": true,
+              "actual_key_name": "sourceRefs",
+              "populated_count": 98,
+              "coverage_pct": "98.0",
+              "sample_value": "[\"sveltekit-frontend/src/routes/api/research/concu"
+            },
+            "feature_id": {
+              "exists": true,
+              "actual_key_name": "feature_ids",
+              "populated_count": 100,
+              "coverage_pct": "100.0",
+              "sample_value": "[\"routes,atlas-context,utility,api,codebase,codeba"
+            },
+            "feature_ids": {
+              "exists": true,
+              "actual_key_name": "feature_ids",
+              "populated_count": 100,
+              "coverage_pct": "100.0",
+              "sample_value": "[\"routes,atlas-context,utility,api,codebase,codeba"
+            },
+            "qdrant_point_id": {
+              "exists": true,
+              "actual_key_name": "qdrant_point_id",
+              "populated_count": 1,
+              "coverage_pct": "1.0",
+              "sample_value": "\"2316000\""
+            },
+            "community_id": {
+              "exists": true,
+              "actual_key_name": "community_id",
+              "populated_count": 100,
+              "coverage_pct": "100.0",
+              "sample_value": "8"
+            },
+            "som_cluster": {
+              "exists": true,
+              "actual_key_name": "som_cluster",
+              "populated_count": 100,
+              "coverage_pct": "100.0",
+              "sample_value": "8"
+            }
+          },
+          "payload_indexes": {}
+        },
+        "legal_glossary": {
+          "vector_size": 768,
+          "point_count": 867,
+          "payload_fields": {},
+          "payload_indexes": {}
+        },
+        "atlas_component_profiles_768": {
+          "vector_size": 768,
+          "point_count": 0,
+          "payload_fields": {},
+          "payload_indexes": {}
+        },
+        "llm_wiki_chunks": {
+          "vector_size": 768,
+          "point_count": 250,
+          "payload_fields": {},
+          "payload_indexes": {}
+        },
+        "legal_documents": {
+          "vector_size": 0,
+          "point_count": 9840,
+          "payload_fields": {},
+          "payload_indexes": {}
+        },
+        "topic_clusters": {
+          "vector_size": 768,
+          "point_count": 0,
+          "payload_fields": {},
+          "payload_indexes": {}
+        },
+        "fictional_case_chunks": {
+          "vector_size": 0,
+          "point_count": 0,
+          "payload_fields": {},
+          "payload_indexes": {}
+        },
+        "knowledge_base": {
+          "vector_size": 768,
+          "point_count": 115,
+          "payload_fields": {},
+          "payload_indexes": {}
+        },
+        "diagnosis_embeddings": {
+          "vector_size": 0,
+          "point_count": 0,
+          "payload_fields": {},
+          "payload_indexes": {}
+        },
+        "phase76_knowledge_base": {
+          "vector_size": 768,
+          "point_count": 0,
+          "payload_fields": {},
+          "payload_indexes": {}
+        },
+        "parent_atlas_feature_commands_768": {
+          "vector_size": 0,
+          "point_count": 6,
+          "payload_fields": {
+            "source_ref": {
+              "exists": true,
+              "actual_key_name": "source_refs",
+              "populated_count": 6,
+              "coverage_pct": "100.0",
+              "sample_value": "[\"local:docs/archive/sessions/SESSION_SUMMARY_APRI"
+            },
+            "sourceRef": {
+              "exists": true,
+              "actual_key_name": "sourceRefs",
+              "populated_count": 6,
+              "coverage_pct": "100.0",
+              "sample_value": "[\"local:docs/archive/sessions/SESSION_SUMMARY_APRI"
+            },
+            "feature_id": {
+              "exists": true,
+              "actual_key_name": "feature_id",
+              "populated_count": 6,
+              "coverage_pct": "100.0",
+              "sample_value": "\"2_gpu_audit_storage_postgresql_jsonb_chosen\""
+            }
+          },
+          "payload_indexes": {}
+        },
+        "codebase_chunks_768": {
+          "vector_size": 0,
+          "point_count": 52606,
+          "payload_fields": {
+            "packet_key": {
+              "exists": true,
+              "actual_key_name": "packet_key",
+              "populated_count": 94,
+              "coverage_pct": "94.0",
+              "sample_value": "\"src/routes/api/research/concurrent-deep/stream/+s"
+            },
+            "source_ref": {
+              "exists": true,
+              "actual_key_name": "source_refs",
+              "populated_count": 84,
+              "coverage_pct": "84.0",
+              "sample_value": "[\"src/routes/api/research/concurrent-deep/stream/+"
+            },
+            "sourceRef": {
+              "exists": true,
+              "actual_key_name": "sourceRefs",
+              "populated_count": 99,
+              "coverage_pct": "99.0",
+              "sample_value": "[\"sveltekit-frontend/src/routes/api/research/concu"
+            },
+            "feature_id": {
+              "exists": true,
+              "actual_key_name": "feature_ids",
+              "populated_count": 100,
+              "coverage_pct": "100.0",
+              "sample_value": "[\"stream\",\"routes,atlas-context,utility,api,codeba"
+            },
+            "feature_ids": {
+              "exists": true,
+              "actual_key_name": "feature_ids",
+              "populated_count": 100,
+              "coverage_pct": "100.0",
+              "sample_value": "[\"stream\",\"routes,atlas-context,utility,api,codeba"
+            },
+            "qdrant_point_id": {
+              "exists": true,
+              "actual_key_name": "qdrant_point_id",
+              "populated_count": 94,
+              "coverage_pct": "94.0",
+              "sample_value": "\"86694\""
+            },
+            "community_id": {
+              "exists": true,
+              "actual_key_name": "community_id",
+              "populated_count": 90,
+              "coverage_pct": "90.0",
+              "sample_value": "4896"
+            },
+            "som_cluster": {
+              "exists": true,
+              "actual_key_name": "som_cluster",
+              "populated_count": 100,
+              "coverage_pct": "100.0",
+              "sample_value": "\"2\""
+            },
+            "ontology_label": {
+              "exists": true,
+              "actual_key_name": "ontology_label",
+              "populated_count": 3,
+              "coverage_pct": "3.0",
+              "sample_value": "\"Vector Retrieval\""
+            },
+            "topology_label": {
+              "exists": true,
+              "actual_key_name": "topology_label",
+              "populated_count": 3,
+              "coverage_pct": "3.0",
+              "sample_value": "\"som:0\""
+            }
+          },
+          "payload_indexes": {}
+        },
+        "codebase_chunks_10m": {
+          "vector_size": 768,
+          "point_count": 1000000,
+          "payload_fields": {},
+          "payload_indexes": {}
+        },
+        "document_tags": {
+          "vector_size": 768,
+          "point_count": 0,
+          "payload_fields": {},
+          "payload_indexes": {}
+        }
+      },
+      "payload_schema": {},
+      "verdict": "COMPLETE"
+    },
+    "neo4j": {
+      "nodes": {},
+      "edges": {},
+      "verdict": "DEFERRED",
+      "note": "Run manually in Neo4j Browser. Queries: node_structure, topology_edges, source_ref_populated, feature_id_populated, community_id_populated, som_cluster_populated"
+    },
+    "redis": {
+      "key_prefixes": {
+        "atlas:": {
+          "key_count": 6,
+          "sample_keys": [
+            "atlas:cache_epoch",
+            "atlas:graph:manifest:invalidated",
+            "atlas:centroid:index"
+          ]
+        },
+        "ace:": {
+          "key_count": 1794,
+          "sample_keys": [
+            "ace:atlas:dir:src_routes_api_search_filters",
+            "ace:atlas:dir:src_routes_api_evidence_[id]_vlm-analyze",
+            "ace:atlas:dir:src_routes_api_analytics_search-patterns"
+          ]
+        },
+        "bifrost:": {
+          "key_count": 1297,
+          "sample_keys": [
+            "bifrost:summary:summary:dfb6a26c146da3d0",
+            "bifrost:sem:feature:import",
+            "bifrost:summary:summary:af265b50a1f2bd92"
+          ]
+        },
+        "karpathy:": {
+          "key_count": 0,
+          "sample_keys": []
+        },
+        "som:": {
+          "key_count": 152,
+          "sample_keys": [
+            "som:cell:37",
+            "som:cell:121",
+            "som:99"
+          ]
+        },
+        "feature:": {
+          "key_count": 0,
+          "sample_keys": []
+        },
+        "qdrant:": {
+          "key_count": 0,
+          "sample_keys": []
+        },
+        "gpu:": {
+          "key_count": 70436,
+          "sample_keys": [
+            "gpu:autoencoder:latent_64:286095774",
+            "gpu:autoencoder:latent_64:2087008230",
+            "gpu:autoencoder:latent_64:../scripts/atlas/analyze-directory-roles.mjs:b42f1293dc75bfbb"
+          ]
+        }
+      },
+      "verdict": "COMPLETE",
+      "memory_usage": "172.19M",
+      "backend": "Valkey"
+    }
+  },
+  "cross_store_analysis": {
+    "packet_key": {
+      "postgres": false,
+      "qdrant": true,
+      "neo4j": false,
+      "redis": false,
+      "coverage": {
+        "qdrant": {
+          "populated": 94,
+          "coverage_pct": "94.0"
+        }
+      },
+      "verdict": "QDRANT_ONLY"
+    },
+    "source_ref": {
+      "postgres": false,
+      "qdrant": true,
+      "neo4j": false,
+      "redis": false,
+      "coverage": {
+        "qdrant": {
+          "populated": 84,
+          "coverage_pct": "84.0"
+        }
+      },
+      "verdict": "QDRANT_ONLY"
+    },
+    "sourceRef": {
+      "postgres": false,
+      "qdrant": true,
+      "neo4j": false,
+      "redis": false,
+      "coverage": {
+        "qdrant": {
+          "populated": 99,
+          "coverage_pct": "99.0"
+        }
+      },
+      "verdict": "QDRANT_ONLY"
+    },
+    "feature_id": {
+      "postgres": false,
+      "qdrant": true,
+      "neo4j": false,
+      "redis": false,
+      "coverage": {
+        "qdrant": {
+          "populated": 100,
+          "coverage_pct": "100.0"
+        }
+      },
+      "verdict": "QDRANT_ONLY"
+    },
+    "feature_ids": {
+      "postgres": false,
+      "qdrant": true,
+      "neo4j": false,
+      "redis": false,
+      "coverage": {
+        "qdrant": {
+          "populated": 100,
+          "coverage_pct": "100.0"
+        }
+      },
+      "verdict": "QDRANT_ONLY"
+    },
+    "qdrant_point_id": {
+      "postgres": false,
+      "qdrant": true,
+      "neo4j": false,
+      "redis": false,
+      "coverage": {
+        "qdrant": {
+          "populated": 94,
+          "coverage_pct": "94.0"
+        }
+      },
+      "verdict": "QDRANT_ONLY"
+    },
+    "community_id": {
+      "postgres": false,
+      "qdrant": true,
+      "neo4j": false,
+      "redis": false,
+      "coverage": {
+        "qdrant": {
+          "populated": 90,
+          "coverage_pct": "90.0"
+        }
+      },
+      "verdict": "QDRANT_ONLY"
+    },
+    "som_cluster": {
+      "postgres": false,
+      "qdrant": true,
+      "neo4j": false,
+      "redis": false,
+      "coverage": {
+        "qdrant": {
+          "populated": 100,
+          "coverage_pct": "100.0"
+        }
+      },
+      "verdict": "QDRANT_ONLY"
+    },
+    "som_code": {
+      "postgres": false,
+      "qdrant": false,
+      "neo4j": false,
+      "redis": false,
+      "coverage": {},
+      "verdict": "MISSING"
+    },
+    "som_x": {
+      "postgres": false,
+      "qdrant": false,
+      "neo4j": false,
+      "redis": false,
+      "coverage": {},
+      "verdict": "MISSING"
+    },
+    "som_y": {
+      "postgres": false,
+      "qdrant": false,
+      "neo4j": false,
+      "redis": false,
+      "coverage": {},
+      "verdict": "MISSING"
+    },
+    "ontology_label": {
+      "postgres": false,
+      "qdrant": true,
+      "neo4j": false,
+      "redis": false,
+      "coverage": {
+        "qdrant": {
+          "populated": 3,
+          "coverage_pct": "3.0"
+        }
+      },
+      "verdict": "QDRANT_ONLY"
+    },
+    "topology_label": {
+      "postgres": false,
+      "qdrant": true,
+      "neo4j": false,
+      "redis": false,
+      "coverage": {
+        "qdrant": {
+          "populated": 3,
+          "coverage_pct": "3.0"
+        }
+      },
+      "verdict": "QDRANT_ONLY"
+    },
+    "retrieval_strategy": {
+      "postgres": false,
+      "qdrant": false,
+      "neo4j": false,
+      "redis": false,
+      "coverage": {},
+      "verdict": "MISSING"
+    },
+    "retrieval_path": {
+      "postgres": false,
+      "qdrant": false,
+      "neo4j": false,
+      "redis": false,
+      "coverage": {},
+      "verdict": "MISSING"
+    },
+    "trace_id": {
+      "postgres": false,
+      "qdrant": false,
+      "neo4j": false,
+      "redis": false,
+      "coverage": {},
+      "verdict": "MISSING"
+    },
+    "ae_epoch": {
+      "postgres": false,
+      "qdrant": false,
+      "neo4j": false,
+      "redis": false,
+      "coverage": {},
+      "verdict": "MISSING"
+    },
+    "ae_val_loss": {
+      "postgres": false,
+      "qdrant": false,
+      "neo4j": false,
+      "redis": false,
+      "coverage": {},
+      "verdict": "MISSING"
+    },
+    "ae_confidence": {
+      "postgres": false,
+      "qdrant": false,
+      "neo4j": false,
+      "redis": false,
+      "coverage": {},
+      "verdict": "MISSING"
+    },
+    "latent_64": {
+      "postgres": false,
+      "qdrant": false,
+      "neo4j": false,
+      "redis": false,
+      "coverage": {},
+      "verdict": "MISSING"
+    },
+    "latent_64_embedding": {
+      "postgres": false,
+      "qdrant": false,
+      "neo4j": false,
+      "redis": false,
+      "coverage": {},
+      "verdict": "MISSING"
+    },
+    "embedding": {
+      "postgres": false,
+      "qdrant": false,
+      "neo4j": false,
+      "redis": false,
+      "coverage": {},
+      "verdict": "MISSING"
+    },
+    "embedding_384": {
+      "postgres": false,
+      "qdrant": false,
+      "neo4j": false,
+      "redis": false,
+      "coverage": {},
+      "verdict": "MISSING"
+    },
+    "embedding_768": {
+      "postgres": false,
+      "qdrant": false,
+      "neo4j": false,
+      "redis": false,
+      "coverage": {},
+      "verdict": "MISSING"
+    }
+  },
+  "critical_gaps": [
+    {
+      "field": "packet_key",
+      "severity": "HIGH",
+      "message": "packet_key in Qdrant but NOT in Postgres — breaks source of truth"
+    },
+    {
+      "field": "source_ref",
+      "severity": "HIGH",
+      "message": "source_ref in Qdrant but NOT in Postgres — breaks source of truth"
+    },
+    {
+      "field": "feature_id",
+      "severity": "HIGH",
+      "message": "feature_id in Qdrant but NOT in Postgres — breaks source of truth"
+    },
+    {
+      "field": "qdrant_point_id",
+      "severity": "HIGH",
+      "message": "qdrant_point_id in Qdrant but NOT in Postgres — breaks source of truth"
+    },
+    {
+      "field": "community_id",
+      "severity": "HIGH",
+      "message": "community_id in Qdrant but NOT in Postgres — breaks source of truth"
+    },
+    {
+      "field": "som_cluster",
+      "severity": "HIGH",
+      "message": "som_cluster in Qdrant but NOT in Postgres — breaks source of truth"
+    }
+  ],
+  "recommendations": [
+    {
+      "type": "NAMING_DRIFT",
+      "issue": "Both source_ref and sourceRef exist",
+      "action": "Standardize on source_ref everywhere (Postgres, Qdrant, Neo4j)",
+      "priority": "HIGH"
+    },
+    {
+      "type": "NAMING_DRIFT",
+      "issue": "Both feature_id and feature_ids exist",
+      "action": "Standardize on feature_id everywhere",
+      "priority": "HIGH"
+    },
+    {
+      "type": "TRUTH_GAP",
+      "field": "packet_key",
+      "issue": "packet_key exists in Qdrant but not in Postgres",
+      "action": "Investigate whether this should be in Postgres as canonical source",
+      "priority": "HIGH"
+    },
+    {
+      "type": "TRUTH_GAP",
+      "field": "source_ref",
+      "issue": "source_ref exists in Qdrant but not in Postgres",
+      "action": "Investigate whether this should be in Postgres as canonical source",
+      "priority": "HIGH"
+    },
+    {
+      "type": "TRUTH_GAP",
+      "field": "sourceRef",
+      "issue": "sourceRef exists in Qdrant but not in Postgres",
+      "action": "Investigate whether this should be in Postgres as canonical source",
+      "priority": "HIGH"
+    },
+    {
+      "type": "TRUTH_GAP",
+      "field": "feature_id",
+      "issue": "feature_id exists in Qdrant but not in Postgres",
+      "action": "Investigate whether this should be in Postgres as canonical source",
+      "priority": "HIGH"
+    },
+    {
+      "type": "TRUTH_GAP",
+      "field": "feature_ids",
+      "issue": "feature_ids exists in Qdrant but not in Postgres",
+      "action": "Investigate whether this should be in Postgres as canonical source",
+      "priority": "HIGH"
+    },
+    {
+      "type": "TRUTH_GAP",
+      "field": "qdrant_point_id",
+      "issue": "qdrant_point_id exists in Qdrant but not in Postgres",
+      "action": "Investigate whether this should be in Postgres as canonical source",
+      "priority": "HIGH"
+    },
+    {
+      "type": "TRUTH_GAP",
+      "field": "community_id",
+      "issue": "community_id exists in Qdrant but not in Postgres",
+      "action": "Investigate whether this should be in Postgres as canonical source",
+      "priority": "HIGH"
+    },
+    {
+      "type": "TRUTH_GAP",
+      "field": "som_cluster",
+      "issue": "som_cluster exists in Qdrant but not in Postgres",
+      "action": "Investigate whether this should be in Postgres as canonical source",
+      "priority": "HIGH"
+    },
+    {
+      "type": "TRUTH_GAP",
+      "field": "ontology_label",
+      "issue": "ontology_label exists in Qdrant but not in Postgres",
+      "action": "Investigate whether this should be in Postgres as canonical source",
+      "priority": "HIGH"
+    },
+    {
+      "type": "TRUTH_GAP",
+      "field": "topology_label",
+      "issue": "topology_label exists in Qdrant but not in Postgres",
+      "action": "Investigate whether this should be in Postgres as canonical source",
+      "priority": "HIGH"
+    }
+  ],
+  "orchestration": {
+    "model": "gemma4-legal-iq4xs-direct.gguf",
+    "llama_server_url": "http://127.0.0.1:8090",
+    "prompt_summary": "Metadata parity gap analysis",
+    "analysis": "<|channel>thought\nHere's a plan to structure the analysis:\n1.  **Analyze the data state:** Qdrant is populated (52k vectors, 61 collections); Postgres is empty (0 rows, 0 tables).\n2.  **Analyze the metadata gap:** Qdrant has specific, non-standard fields (e.g., `packet_key`, `source_ref`, `ontology_label`) that are missing in Postgres.\n3.  **Address Q1 (Root Cause):** Why is Postgres empty while Qdrant is full?\n4.  **Address Q2 (Source of Truth):** Should the fields move to Postgres? (Canonical vs. Runtime).\n5.  **Address Q3 (Blocking Order):** What needs fixing immediately? (Actionable steps).\n6.  **Constraint Check:** Keep it to 3-4 sentences, focus on actionable diagnosis.\n\n*Self-Correction/Refinement:* The tone must be highly technical and decisive, suitable for a critical engineering meeting.\n\n*(Drafting the response based on the structure.)*<channel|>The root cause is a complete failure in the ETL/synchronization pipeline, resulting in a data vacuum in Postgres despite active data ingestion",
+    "timestamp": "2026-06-23T21:03:15.788Z"
+  }
+}

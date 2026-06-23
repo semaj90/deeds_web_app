@@ -1,6 +1,6 @@
 # Parent Atlas Production Readiness Audit
 
-Generated: 2026-06-20T15:46:38.895Z
+Generated: 2026-06-23T19:37:12.706Z
 
 ## Summary
 
@@ -16,9 +16,9 @@ Generated: 2026-06-20T15:46:38.895Z
 - Route runtime packets: 9
 - Qdrant points: 52606
 - Neo4j CodebaseFile nodes: 20542
-- Redis LOD0 latest packet coverage: 9/9
+- Redis LOD0 latest packet coverage: 1/9
 - Native JSON parser: native addon path present; fallback present
-- NDJSON files discovered with rg -uuu: 191
+- NDJSON files discovered with rg -uuu: 212
 - Phase 101 batch summaries: 146 succeeded / 0 failed
 - Autoencoder dims: 768→256→64
 
@@ -82,7 +82,7 @@ Generated: 2026-06-20T15:46:38.895Z
 - PASS [offline] scripts/atlas/report-compressed-semantic-geometry.mjs: scripts/atlas/report-compressed-semantic-geometry.mjs exists
 - PASS [offline] scripts/atlas/audit-hidden-packet-pathmap.mjs: scripts/atlas/audit-hidden-packet-pathmap.mjs exists
 - PASS [offline] scripts/atlas/materialize-hidden-packet-pathmap-duckdb.mjs: scripts/atlas/materialize-hidden-packet-pathmap-duckdb.mjs exists
-- PASS [offline] rg-uu:ndjson-inventory: rg -uuu found 191 NDJSON files
+- PASS [offline] rg-uu:ndjson-inventory: rg -uuu found 212 NDJSON files
 - PASS [postgres] table:parent_atlas_documents: parent_atlas_documents exists with 5395 rows
 - PASS [postgres] table:atlas_feature_map: atlas_feature_map exists with 19611 rows
 - PASS [postgres] table:atlas_feature_map_synthesized: atlas_feature_map_synthesized exists with 14465 rows
@@ -97,7 +97,7 @@ Generated: 2026-06-20T15:46:38.895Z
 - PASS [postgres] active-production:topology: Active production qdrant-without-SOM rows: 0
 - PASS [postgres] nes-chrom:sourceRef-parent-join: NES/CHROM packets matching Parent Atlas: 10042/14911
 - PASS [postgres] route-runtime:sourceRefs: Runtime packets with sourceRefs: 8/9
-- PASS [redis] lod0:route-runtime: Redis LOD0 runtime packets: 9/9
+- PASS [redis] lod0:route-runtime: Redis LOD0 runtime packets: 1/9
 - PASS [qdrant] collection:codebase_chunks_768: Qdrant codebase_chunks_768 points: 52606
 - PASS [neo4j] contextual-tree: Neo4j CodebaseFile=20542, ParentAtlasFeature=1582
 

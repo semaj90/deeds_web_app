@@ -561,7 +561,9 @@
       "Bash(DATABASE_URL=\"postgresql://legal_admin:123456@127.0.0.1:5434/legal_ai_db\" psql -c \"\\\\d atlas_packets\")",
       "Bash(DATABASE_URL=\"postgresql://legal_admin:123456@127.0.0.1:5434/legal_ai_db\" QDRANT_HOST=localhost QDRANT_PORT=6333 node scripts/atlas/repair-qdrant-postgres-join.mjs)",
       "Bash(DATABASE_URL=\"postgresql://legal_admin:123456@127.0.0.1:5434/legal_ai_db\" OLLAMA_URL=\"http://127.0.0.1:11434\" QDRANT_URL=\"http://127.0.0.1:6333\" node scripts/atlas/backfill-packets-to-qdrant-ollama.mjs --dry-run --limit 10)",
-      "Bash(DATABASE_URL=\"postgresql://legal_admin:123456@127.0.0.1:5434/legal_ai_db\" OLLAMA_URL=\"http://127.0.0.1:11434\" QDRANT_URL=\"http://127.0.0.1:6333\" timeout 180 node scripts/atlas/backfill-packets-to-qdrant-ollama.mjs --apply --limit 100 --batch=25)"
+      "Bash(DATABASE_URL=\"postgresql://legal_admin:123456@127.0.0.1:5434/legal_ai_db\" OLLAMA_URL=\"http://127.0.0.1:11434\" QDRANT_URL=\"http://127.0.0.1:6333\" timeout 180 node scripts/atlas/backfill-packets-to-qdrant-ollama.mjs --apply --limit 100 --batch=25)",
+      "Read(//c/Users/james/.claude/projects/c--Users-james-Videos-deeds-web-app/memory/**)",
+      "Bash(cd c:\\\\\\\\Users\\\\\\\\james\\\\\\\\Videos\\\\\\\\deeds-web-app)"
     ],
     "deny": [],
     "ask": []

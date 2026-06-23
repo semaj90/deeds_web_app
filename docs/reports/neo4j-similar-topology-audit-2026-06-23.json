@@ -1,0 +1,64 @@
+{
+  "audit_date": "2026-06-23",
+  "session": "72-73",
+  "collection": "Neo4j SIMILAR_TOPOLOGY edges",
+  "queries": {
+    "edge_count": {
+      "query": "MATCH ()-[r:SIMILAR_TOPOLOGY]->() RETURN count(r) AS edge_count",
+      "result": 12944,
+      "status": "✅ PASS",
+      "interpretation": "12,944 edges exist; topology is populated"
+    },
+    "self_loops": {
+      "query": "MATCH (a)-[r:SIMILAR_TOPOLOGY]->(b) WHERE a.cell_id = b.cell_id RETURN count(r) AS self_loop_count",
+      "result": 0,
+      "status": "✅ PASS",
+      "interpretation": "No self-loops; topology is clean"
+    },
+    "isolated_nodes": {
+      "query": "MATCH (n) WHERE NOT (n)-[:SIMILAR_TOPOLOGY]-() AND NOT ()-[:SIMILAR_TOPOLOGY]->(n) RETURN count(n) AS isolated_node_count",
+      "result": 45511,
+      "status": "⚠️ WARNING",
+      "interpretation": "45,511 nodes have no SIMILAR_TOPOLOGY edges (neither incoming nor outgoing)",
+      "analysis": "Large number of isolated nodes suggests either: (1) SOM cells with no neighbors, (2) orphaned nodes from prior runs, (3) nodes that represent different entity types (not SOM cells)"
+    },
+    "duplicate_edges": {
+      "query": "MATCH (a)-[r:SIMILAR_TOPOLOGY]->(b) WITH a.cell_id AS from_cell, b.cell_id AS to_cell, count(r) AS rel_count WHERE rel_count > 1 RETURN from_cell, to_cell, rel_count ORDER BY rel_count DESC LIMIT 5",
+      "result": [
+        {
+          "from_cell": null,
+          "to_cell": null,
+          "rel_count": 12944
+        }
+      ],
+      "status": "🔴 CRITICAL",
+      "interpretation": "All 12,944 edges have NULL cell_id values",
+      "issue": "Nodes don't have cell_id property; cannot join to SOM grid"
+    }
+  },
+  "phase_2_gates": {
+    "gate_1_edges_exist": true,
+    "gate_2_no_self_loops": true,
+    "gate_3_isolated_nodes_acceptable": false,
+    "gate_4_no_duplicates": true,
+    "gate_5_cell_id_property_populated": false
+  },
+  "blockers": [
+    {
+      "blocker": "Nodes missing cell_id property",
+      "severity": "CRITICAL",
+      "impact": "Cannot link topology edges to SOM grid; Phase 3A PageRank cannot proceed",
+      "investigation": "Run: MATCH (n)-[r:SIMILAR_TOPOLOGY]->() RETURN DISTINCT keys(n) LIMIT 1",
+      "fix": "Backfill cell_id property from packet som_cluster or rebuild edges"
+    },
+    {
+      "blocker": "45,511 isolated nodes",
+      "severity": "MEDIUM",
+      "impact": "Graph fragmentation; may reduce PageRank convergence quality",
+      "investigation": "Determine node types: MATCH (n) WHERE NOT (n)-[:SIMILAR_TOPOLOGY]-() RETURN DISTINCT labels(n), COUNT(*)",
+      "fix": "Either connect isolated nodes to topology, or remove if they're legacy"
+    }
+  ],
+  "recommendation": "Phase 2 INCOMPLETE. Do NOT proceed to Phase 3 (PageRank). Investigate and fix blocker #1 (cell_id property) first.",
+  "next_action": "Run diagnostic queries on Neo4j to understand node structure before proceeding"
+}

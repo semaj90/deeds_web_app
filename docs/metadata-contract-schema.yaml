@@ -1,0 +1,449 @@
+# Metadata Contract Schema — Postgres Source of Truth
+# Generated: 2026-06-23 Session 72
+# This defines what fields MUST be indexed, searchable, and synchronized across mirrors
+
+version: "1.0"
+canonical_table: atlas_packets
+total_rows: 17995
+
+# TIER 1: Identity Chain (100% required, all indexed)
+identity_tier:
+  packet_key:
+    type: text
+    required: true
+    coverage_percent: 100.0
+    index: "UNIQUE btree"
+    description: "Canonical packet identifier"
+    sync_to_qdrant: true
+    searchable_in_ace: true
+    searchable_in_kag: true
+    searchable_in_dag: true
+
+  source_ref:
+    type: text
+    required: true
+    coverage_percent: 100.0
+    index: "btree (with WHERE IS NOT NULL)"
+    description: "Source code reference (file:line:symbol)"
+    sync_to_qdrant: true
+    searchable_in_ace: true
+    searchable_in_kag: true
+    searchable_in_dag: true
+
+  feature_id:
+    type: text
+    required: true
+    coverage_percent: 100.0
+    index: "btree composite with directory_path"
+    description: "Feature/module identifier (auth.sessions, db.schema, etc)"
+    sync_to_qdrant: true
+    searchable_in_ace: true
+    searchable_in_kag: true
+    searchable_in_dag: true
+
+  qdrant_point_id:
+    type: text
+    required: true
+    coverage_percent: 99.99
+    index: "btree"
+    description: "Mirror link to Qdrant point UUID"
+    sync_to_qdrant: true
+    searchable_in_ace: false
+    searchable_in_kag: false
+    searchable_in_dag: false
+
+# TIER 2: Routing & Clustering (95%+ required)
+routing_tier:
+  som_cluster:
+    type: "integer (in JSONB)"
+    required: true
+    coverage_percent: 0.0
+    index: "btree on ((metadata->>'som_cluster')::integer)"
+    coverage_required: 95.0
+    description: "SOM grid cell ID for neighborhood routing (0-399 for 20x20 grid)"
+    source: "Must backfill from SOM training or Qdrant"
+    sync_to_qdrant: true
+    searchable_in_ace: true
+    searchable_in_kag: true
+    searchable_in_dag: false
+    gap_severity: "CRITICAL"
+
+  som_x:
+    type: "integer (in JSONB)"
+    required: false
+    coverage_percent: 0.0
+    index: "optional: btree on ((metadata->>'som_x')::integer)"
+    coverage_required: 80.0
+    description: "SOM grid X coordinate (0-19)"
+    source: "Derives from som_cluster or SOM training"
+    sync_to_qdrant: false
+    searchable_in_ace: false
+
+  som_y:
+    type: "integer (in JSONB)"
+    required: false
+    coverage_percent: 0.0
+    index: "optional: btree on ((metadata->>'som_y')::integer)"
+    coverage_required: 80.0
+    description: "SOM grid Y coordinate (0-19)"
+    source: "Derives from som_cluster or SOM training"
+    sync_to_qdrant: false
+    searchable_in_ace: false
+
+# TIER 3: Graph & Community (80%+ required)
+graph_tier:
+  community_id:
+    type: "text (in JSONB)"
+    required: true
+    coverage_percent: 0.0
+    index: "btree on ((metadata->>'community_id'))"
+    coverage_required: 80.0
+    description: "Neo4j graph community/cluster ID for KAG grouping"
+    source: "Must backfill from Neo4j graph clustering"
+    sync_to_qdrant: true
+    searchable_in_ace: false
+    searchable_in_kag: true
+    searchable_in_dag: true
+    gap_severity: "HIGH"
+
+  ontology_label:
+    type: "text (in JSONB)"
+    required: true
+    coverage_percent: 2.78
+    index: "btree on ((metadata->>'ontology_label'))"
+    coverage_required: 90.0
+    description: "Domain class: auth, db, ui, crypto, patterns, etc"
+    source: "Partially populated (500/17995); must complete"
+    sync_to_qdrant: true
+    searchable_in_ace: true
+    searchable_in_kag: true
+    searchable_in_dag: true
+    gap_severity: "CRITICAL"
+
+  topology_label:
+    type: "text (in JSONB)"
+    required: true
+    coverage_percent: 0.0
+    index: "btree on ((metadata->>'topology_label'))"
+    coverage_required: 85.0
+    description: "Neo4j topology classification (hub, leaf, bridge, etc)"
+    source: "Must backfill from Neo4j centrality analysis"
+    sync_to_qdrant: true
+    searchable_in_ace: true
+    searchable_in_kag: false
+    searchable_in_dag: true
+    gap_severity: "CRITICAL"
+
+# TIER 4: Retrieval Routing (90%+ required)
+retrieval_tier:
+  retrieval_strategy:
+    type: "text (in JSONB)"
+    required: true
+    coverage_percent: 0.0
+    index: "btree on ((metadata->>'retrieval_strategy'))"
+    coverage_required: 90.0
+    description: "ACE routing: dense, concept, sparse, graph"
+    source: "Inferred from packet type and feature_id"
+    sync_to_qdrant: true
+    searchable_in_ace: true
+    searchable_in_kag: true
+    searchable_in_dag: false
+    gap_severity: "CRITICAL"
+    allowed_values:
+      - "dense"          # Full 768-dim vector search
+      - "concept"        # Concept embedding + FTS
+      - "sparse"         # BM25 full-text
+      - "graph"          # Neo4j topology traversal
+      - "hybrid"         # Multiple strategies fused
+
+  ae_confidence:
+    type: "numeric (in JSONB)"
+    required: true
+    coverage_percent: 0.0
+    index: "btree on ((metadata->'ae_confidence')::numeric)"
+    coverage_required: 85.0
+    description: "Autoencoder reconstruction quality [0.0-1.0]; gate at 0.8"
+    source: "Must backfill from AE model or assume 1.0"
+    sync_to_qdrant: true
+    searchable_in_ace: true
+    searchable_in_kag: false
+    searchable_in_dag: false
+    gap_severity: "MEDIUM"
+
+# TIER 5: Provenance & Audit (100% required)
+provenance_tier:
+  trace_id:
+    type: "text (in JSONB)"
+    required: true
+    coverage_percent: 0.0
+    index: "btree on ((metadata->>'trace_id'))"
+    coverage_required: 100.0
+    description: "Trace ID for audit chain linking embedding → storage → retrieval"
+    source: "Must generate UUID on packet creation"
+    sync_to_qdrant: true
+    searchable_in_ace: false
+    searchable_in_kag: false
+    searchable_in_dag: false
+    gap_severity: "CRITICAL"
+
+# QDRANT MIRROR SYNC REQUIREMENTS
+qdrant_sync:
+  collection: codebase_chunks_768
+  current_points: 52606
+  current_unique_ids: 17919
+  current_collisions: 75
+  payload_schema_status: "PARTIAL"
+
+  required_payload_fields:
+    - packet_key          # MISSING completely — blocks JOIN back to Postgres
+    - source_ref          # PARTIAL (77% populated; also named 'sourceRef')
+    - feature_id          # PARTIAL (99% populated; also named 'feature_ids')
+    - qdrant_point_id     # MISSING completely — identity key
+    - som_cluster         # PARTIAL (53% populated)
+    - community_id        # MISSING completely
+    - ontology_label      # PARTIAL
+    - topology_label      # MISSING completely
+    - retrieval_strategy  # MISSING completely
+    - ae_confidence       # MISSING completely
+
+  payload_schema_definition:
+    packet_key:
+      type: keyword
+      indexable: true
+      priority: "P0"  # Cannot retrieve without this
+
+    source_ref:
+      type: keyword
+      indexable: true
+      priority: "P0"
+      note: "Reconcile 'source_ref' vs 'sourceRef' naming"
+
+    feature_id:
+      type: keyword
+      indexable: true
+      priority: "P0"
+      note: "Reconcile 'feature_id' vs 'feature_ids' naming"
+
+    qdrant_point_id:
+      type: keyword
+      indexable: true
+      priority: "P1"
+      note: "Store the point ID itself for audit trail"
+
+    som_cluster:
+      type: integer
+      indexable: true
+      priority: "P1"
+
+    community_id:
+      type: keyword
+      indexable: true
+      priority: "P1"
+
+    ontology_label:
+      type: keyword
+      indexable: true
+      priority: "P1"
+
+    topology_label:
+      type: keyword
+      indexable: true
+      priority: "P1"
+
+    retrieval_strategy:
+      type: keyword
+      indexable: true
+      priority: "P1"
+
+    ae_confidence:
+      type: float
+      indexable: true
+      priority: "P2"
+
+# POSTGRES INDEXES REQUIRED
+postgres_indexes:
+  critical:
+    - name: "idx_atlas_packets_identity"
+      columns: ["packet_key", "source_ref", "feature_id", "directory_path"]
+      type: "btree"
+      status: "EXISTS"
+
+    - name: "idx_atlas_packets_qdrant_point_id"
+      columns: ["qdrant_point_id"]
+      type: "btree"
+      status: "EXISTS"
+
+    - name: "idx_atlas_packets_metadata_gin_pathops"
+      columns: ["metadata jsonb_path_ops"]
+      type: "gin"
+      status: "EXISTS"
+
+  must_add:
+    - name: "idx_atlas_packets_som_cluster_expr"
+      columns: ["(metadata->>'som_cluster')::integer"]
+      type: "btree"
+      status: "MISSING"
+
+    - name: "idx_atlas_packets_community_id_expr"
+      columns: ["(metadata->>'community_id')"]
+      type: "btree"
+      status: "MISSING"
+
+    - name: "idx_atlas_packets_topology_label_expr"
+      columns: ["(metadata->>'topology_label')"]
+      type: "btree"
+      status: "MISSING"
+
+    - name: "idx_atlas_packets_retrieval_strategy_expr"
+      columns: ["(metadata->>'retrieval_strategy')"]
+      type: "btree"
+      status: "MISSING"
+
+    - name: "idx_atlas_packets_ae_confidence_expr"
+      columns: ["(metadata->'ae_confidence')::numeric"]
+      type: "btree"
+      status: "MISSING"
+
+    - name: "idx_atlas_packets_trace_id_expr"
+      columns: ["(metadata->>'trace_id')"]
+      type: "btree"
+      status: "MISSING"
+
+# BACKFILL PRIORITY ORDER
+backfill_sequence:
+  phase_1_identity:
+    description: "Add missing Postgres indexes (identity already exists)"
+    time_estimate: "5 minutes"
+    risk: "Low — indexes only, no data changes"
+    gate: "All 6 MISSING indexes created successfully"
+
+  phase_2_critical_metadata:
+    description: "Backfill CRITICAL Postgres JSONB fields"
+    time_estimate: "30 minutes"
+    risk: "Medium — requires external source coordination"
+    fields:
+      - som_cluster      # From SOM training or Qdrant payload
+      - community_id     # From Neo4j clustering
+      - topology_label   # From Neo4j centrality
+      - retrieval_strategy  # Inferred from packet_type
+      - trace_id         # Generate UUIDs
+    gate: "Coverage ≥90% for each field"
+
+  phase_3_qdrant_sync:
+    description: "Patch Qdrant payloads from Postgres"
+    time_estimate: "20 minutes"
+    risk: "Medium — Qdrant payload update, can rollback"
+    actions:
+      - "Add packet_key to all 52,606 Qdrant points"
+      - "Add qdrant_point_id to all points"
+      - "Reconcile source_ref vs sourceRef naming"
+      - "Reconcile feature_id vs feature_ids naming"
+      - "Backfill missing community_id, topology_label, retrieval_strategy"
+    gate: "100% of Qdrant points have packet_key; spot-check payloads"
+
+  phase_4_qdrant_indexes:
+    description: "Create Qdrant payload indexes"
+    time_estimate: "10 minutes"
+    risk: "Low — index operations only"
+    indexes:
+      - "packet_key (keyword)"
+      - "qdrant_point_id (keyword)"
+      - "som_cluster (integer)"
+      - "community_id (keyword)"
+      - "ontology_label (keyword)"
+      - "topology_label (keyword)"
+      - "retrieval_strategy (keyword)"
+      - "ae_confidence (float)"
+    gate: "All 8 indexes created; verify via /collections endpoint"
+
+# VERIFICATION GATES
+verification_gates:
+  gate_1_postgres_coverage:
+    description: "Postgres metadata field coverage audit"
+    query: "Coverage audit query in Postgres"
+    pass_criteria:
+      som_cluster: "≥90%"
+      community_id: "≥85%"
+      ontology_label: "≥90%"
+      topology_label: "≥85%"
+      retrieval_strategy: "≥90%"
+      ae_confidence: "≥85%"
+      trace_id: "100%"
+
+  gate_2_postgres_indexes:
+    description: "All required Postgres indexes exist"
+    query: "SELECT COUNT(*) FROM pg_indexes WHERE tablename='atlas_packets' AND indexname LIKE 'idx_atlas_packets_%'"
+    pass_criteria: "≥16 indexes"
+
+  gate_3_qdrant_payload:
+    description: "Qdrant points have packet_key and source_ref"
+    query: "Sample 10 Qdrant points; check payload"
+    pass_criteria: "100% have packet_key; 100% have source_ref or sourceRef"
+
+  gate_4_qdrant_indexes:
+    description: "Qdrant payload indexes created"
+    query: "GET /collections/codebase_chunks_768"
+    pass_criteria: "payload_schema has all 8 critical fields indexed"
+
+  gate_5_ace_retrieval:
+    description: "ACE can filter+rerank by metadata"
+    test: "Query with filter: som_cluster=42 AND ae_confidence≥0.8"
+    pass_criteria: "Returns packets; latency <500ms"
+
+  gate_6_kag_expansion:
+    description: "KAG can expand by community_id+ontology_label"
+    test: "Query retrieval with community_id filter + Neo4j hop"
+    pass_criteria: "Expansion respects community boundaries"
+
+  gate_7_dag_routing:
+    description: "DAG can route by topology_label"
+    test: "Retrieve packet; follow topology_label to next packet"
+    pass_criteria: "Topology chain is acyclic and traces properly"
+
+# MONITORING & ALERTS
+monitoring:
+  critical_alerts:
+    - condition: "som_cluster coverage drops below 85%"
+      action: "Page oncall; restart backfill"
+
+    - condition: "Qdrant payload update fails silently"
+      action: "Verify all points have packet_key; replay patch"
+
+    - condition: "ACE retrieval times exceed 1000ms"
+      action: "Check Postgres indexes; verify Qdrant indexes exist"
+
+  dashboards:
+    - name: "Metadata Contract Health"
+      metrics:
+        - "Field coverage % for each Postgres JSONB field"
+        - "Qdrant payload index status"
+        - "P3g collision count (should be 0)"
+        - "ACE retrieval latency p95"
+
+# NOTES
+notes: |
+  The problem is not "more vectors." The problem is that the existing 768-dim vectors
+  are not searchable by their metadata because:
+
+  1. Postgres atlas_packets has 56 pgvector columns indexed, but JSONB metadata
+     is sparsely populated (8/29 possible fields; som_cluster=0%, trace_id=0%)
+
+  2. Qdrant has the same payload fields but MISSING packet_key (cannot join back to Postgres)
+     and MISSING qdrant_point_id (cannot audit the point itself)
+
+  3. Without metadata filters, ACE/KAG/DAG cannot route queries intelligently:
+     - ACE cannot skip low-confidence packets
+     - KAG cannot group by community or domain
+     - DAG cannot follow topology chains
+
+  4. Indexes exist on identity fields (packet_key, source_ref, feature_id) but NOT on
+     routing fields (som_cluster, community_id, topology_label, retrieval_strategy)
+
+  Fix sequence:
+  1. Add 6 Postgres expression indexes (5 min)
+  2. Backfill 5 JSONB fields from external sources (30 min)
+  3. Patch Qdrant payloads with packet_key + qdrant_point_id (20 min)
+  4. Create 8 Qdrant payload indexes (10 min)
+  5. Replay ACE/KAG/DAG retrieval with filters (validation only)
+
+  Total: ~65 minutes to full metadata contract compliance.

@@ -1,0 +1,510 @@
+{
+  "version": "1.0",
+  "canonical_table": "atlas_packets",
+  "total_rows": 17995,
+  "audit_date": "2026-06-23",
+  "problem_statement": "Metadata contract broken: Postgres and Qdrant have disconnected field definitions and coverage. ACE/KAG/DAG cannot filter by routing/graph/provenance fields because they are missing, unindexed, or inconsistently named.",
+  "solution": "Synchronize Postgres JSONB fields with Qdrant payload fields; add missing indexes; backfill critical gaps",
+  "postgres_audit": {
+    "total_packets": 17995,
+    "identity_fields_coverage": {
+      "packet_key": 100.0,
+      "source_ref": 100.0,
+      "feature_id": 100.0,
+      "qdrant_point_id": 99.99
+    },
+    "metadata_fields_in_jsonb": 29,
+    "fields_above_50_percent_coverage": 7,
+    "critical_missing_fields": [
+      "som_cluster (0%)",
+      "som_x (0%)",
+      "som_y (0%)",
+      "community_id (0%)",
+      "topology_label (0%)",
+      "retrieval_strategy (0%)",
+      "ae_confidence (0%)",
+      "trace_id (0%)"
+    ]
+  },
+  "qdrant_audit": {
+    "collection": "codebase_chunks_768",
+    "total_points": 52606,
+    "unique_postgres_packets": 17995,
+    "unique_qdrant_ids": 17919,
+    "collisions": 75,
+    "orphaned_qdrant_points": 34687,
+    "payload_schema_fields": 40,
+    "critical_missing": [
+      "packet_key (blocks Postgres JOIN)",
+      "qdrant_point_id (identity for audit)",
+      "community_id (KAG grouping)",
+      "retrieval_strategy (ACE routing)"
+    ],
+    "naming_inconsistencies": [
+      {
+        "field": "source_ref",
+        "postgres_name": "source_ref (100%)",
+        "qdrant_variants": ["source_ref (77.3%)", "sourceRef (99.7%)"],
+        "action": "Reconcile to single name before sync"
+      },
+      {
+        "field": "feature_id",
+        "postgres_name": "feature_id (100%)",
+        "qdrant_variants": ["feature_id (88.5%)", "feature_ids (99.0%)"],
+        "action": "Reconcile to single name before sync"
+      }
+    ]
+  },
+  "metadata_contract_definition": {
+    "identity_tier": {
+      "packet_key": {
+        "postgres": {
+          "type": "text",
+          "column": "packet_key",
+          "coverage": 100.0,
+          "index": "UNIQUE btree"
+        },
+        "qdrant": {
+          "field": "packet_key",
+          "type": "keyword",
+          "coverage": 0.0,
+          "status": "MISSING"
+        },
+        "priority": "P0",
+        "reason": "Cannot JOIN Qdrant hits back to Postgres without this"
+      },
+      "source_ref": {
+        "postgres": {
+          "type": "text",
+          "column": "source_ref",
+          "coverage": 100.0,
+          "index": "btree with WHERE IS NOT NULL"
+        },
+        "qdrant": {
+          "field": "source_ref / sourceRef",
+          "type": "keyword",
+          "coverage_source_ref": 77.3,
+          "coverage_sourceRef": 99.7,
+          "status": "PARTIAL + NAMING_CONFLICT"
+        },
+        "priority": "P0",
+        "reason": "Source code reference for retrieval audit trail"
+      },
+      "feature_id": {
+        "postgres": {
+          "type": "text",
+          "column": "feature_id",
+          "coverage": 100.0,
+          "index": "btree composite with directory_path"
+        },
+        "qdrant": {
+          "field": "feature_id / feature_ids",
+          "type": "keyword",
+          "coverage_feature_id": 88.5,
+          "coverage_feature_ids": 99.0,
+          "status": "PARTIAL + NAMING_CONFLICT"
+        },
+        "priority": "P0",
+        "reason": "Feature/module identifier for KAG concept linking"
+      },
+      "qdrant_point_id": {
+        "postgres": {
+          "type": "text",
+          "column": "qdrant_point_id",
+          "coverage": 99.99,
+          "index": "btree"
+        },
+        "qdrant": {
+          "field": "qdrant_point_id",
+          "type": "keyword",
+          "coverage": 0.0,
+          "status": "MISSING"
+        },
+        "priority": "P0",
+        "reason": "Point ID itself should be in payload for audit trail"
+      }
+    },
+    "routing_tier": {
+      "som_cluster": {
+        "postgres": {
+          "type": "integer",
+          "storage": "JSONB metadata",
+          "column": "metadata->>'som_cluster'",
+          "coverage": 0.0,
+          "index": "MISSING"
+        },
+        "qdrant": {
+          "field": "som_cluster",
+          "type": "integer",
+          "coverage": 53.4,
+          "index": "EXISTS"
+        },
+        "priority": "P1",
+        "required_coverage": 95.0,
+        "backfill_source": "Qdrant payload or SOM training output",
+        "reason": "SOM grid routing for neighborhood-based retrieval"
+      },
+      "retrieval_strategy": {
+        "postgres": {
+          "type": "text",
+          "storage": "JSONB metadata",
+          "column": "metadata->>'retrieval_strategy'",
+          "coverage": 0.0,
+          "index": "MISSING",
+          "allowed_values": ["dense", "concept", "sparse", "graph", "hybrid"]
+        },
+        "qdrant": {
+          "field": "retrieval_strategy",
+          "type": "keyword",
+          "coverage": 0.0,
+          "index": "MISSING"
+        },
+        "priority": "P1",
+        "required_coverage": 90.0,
+        "backfill_source": "Infer from packet_type: CASE WHEN packet_type='schema_stub' THEN 'sparse' ELSE 'dense'",
+        "reason": "ACE must know which retrieval strategy to use (dense vector, BM25, concept, etc)"
+      }
+    },
+    "graph_tier": {
+      "community_id": {
+        "postgres": {
+          "type": "text",
+          "storage": "JSONB metadata",
+          "column": "metadata->>'community_id'",
+          "coverage": 0.0,
+          "index": "MISSING"
+        },
+        "qdrant": {
+          "field": "community_id",
+          "type": "keyword",
+          "coverage": 0.0,
+          "index": "MISSING"
+        },
+        "priority": "P1",
+        "required_coverage": 80.0,
+        "backfill_source": "Neo4j: MATCH (n:CodebaseFile)-[:BELONGS_TO_COMMUNITY]->(c:Community) RETURN n.stable_key, c.community_id",
+        "reason": "KAG needs to group packets by community for knowledge expansion"
+      },
+      "ontology_label": {
+        "postgres": {
+          "type": "text",
+          "storage": "JSONB metadata",
+          "column": "metadata->>'ontology_label'",
+          "coverage": 2.78,
+          "index": "EXISTS",
+          "partial": true
+        },
+        "qdrant": {
+          "field": "ontology_label",
+          "type": "keyword",
+          "coverage": "partial",
+          "index": "EXISTS"
+        },
+        "priority": "P1",
+        "required_coverage": 90.0,
+        "backfill_source": "Complete from existing 500 values; infer rest from feature_id domain"
+      },
+      "topology_label": {
+        "postgres": {
+          "type": "text",
+          "storage": "JSONB metadata",
+          "column": "metadata->>'topology_label'",
+          "coverage": 0.0,
+          "index": "MISSING"
+        },
+        "qdrant": {
+          "field": "topology_label",
+          "type": "keyword",
+          "coverage": 0.0,
+          "index": "MISSING"
+        },
+        "priority": "P1",
+        "required_coverage": 85.0,
+        "backfill_source": "Neo4j centrality: CASE WHEN pagerank > 0.95 THEN 'hub' WHEN < 0.05 THEN 'leaf' ELSE 'bridge'",
+        "reason": "DAG uses topology labels to route retrieval chains"
+      }
+    },
+    "provenance_tier": {
+      "trace_id": {
+        "postgres": {
+          "type": "text (UUID)",
+          "storage": "JSONB metadata",
+          "column": "metadata->>'trace_id'",
+          "coverage": 0.0,
+          "index": "MISSING"
+        },
+        "qdrant": {
+          "field": "trace_id",
+          "type": "keyword",
+          "coverage": 0.0,
+          "index": "MISSING"
+        },
+        "priority": "P1",
+        "required_coverage": 100.0,
+        "backfill_source": "gen_random_uuid() for each packet",
+        "reason": "Audit trail: link embedding -> storage -> retrieval queries"
+      },
+      "ae_confidence": {
+        "postgres": {
+          "type": "numeric",
+          "storage": "JSONB metadata",
+          "column": "metadata->'ae_confidence'",
+          "coverage": 0.0,
+          "index": "MISSING",
+          "range": [0.0, 1.0]
+        },
+        "qdrant": {
+          "field": "ae_confidence",
+          "type": "float",
+          "coverage": 0.0,
+          "index": "MISSING"
+        },
+        "priority": "P2",
+        "required_coverage": 85.0,
+        "gate_threshold": 0.8,
+        "backfill_source": "AE model output or assume 1.0 if not available",
+        "reason": "ACE confidence gate: skip packets with ae_confidence < 0.8"
+      }
+    }
+  },
+  "postgres_indexes_required": {
+    "existing_critical": [
+      "atlas_packets_packet_key_key (UNIQUE btree)",
+      "idx_atlas_packets_identity (packet_key, source_ref, feature_id, directory_path)",
+      "idx_atlas_packets_qdrant_point_id (btree)",
+      "idx_atlas_packets_source_feature (source_ref, feature_id)",
+      "idx_atlas_packets_metadata_gin_pathops (JSONB)"
+    ],
+    "must_add": [
+      {
+        "name": "idx_atlas_packets_som_cluster_expr",
+        "definition": "CREATE INDEX idx_atlas_packets_som_cluster_expr ON atlas_packets ((metadata->>'som_cluster')::integer)",
+        "status": "MISSING"
+      },
+      {
+        "name": "idx_atlas_packets_community_id_expr",
+        "definition": "CREATE INDEX idx_atlas_packets_community_id_expr ON atlas_packets ((metadata->>'community_id'))",
+        "status": "MISSING"
+      },
+      {
+        "name": "idx_atlas_packets_topology_label_expr",
+        "definition": "CREATE INDEX idx_atlas_packets_topology_label_expr ON atlas_packets ((metadata->>'topology_label'))",
+        "status": "MISSING"
+      },
+      {
+        "name": "idx_atlas_packets_retrieval_strategy_expr",
+        "definition": "CREATE INDEX idx_atlas_packets_retrieval_strategy_expr ON atlas_packets ((metadata->>'retrieval_strategy'))",
+        "status": "MISSING"
+      },
+      {
+        "name": "idx_atlas_packets_ae_confidence_expr",
+        "definition": "CREATE INDEX idx_atlas_packets_ae_confidence_expr ON atlas_packets ((metadata->'ae_confidence')::numeric)",
+        "status": "MISSING"
+      },
+      {
+        "name": "idx_atlas_packets_trace_id_expr",
+        "definition": "CREATE INDEX idx_atlas_packets_trace_id_expr ON atlas_packets ((metadata->>'trace_id'))",
+        "status": "MISSING"
+      }
+    ],
+    "total_indexes_after_adds": 16
+  },
+  "qdrant_payload_schema_required": {
+    "critical_must_have": [
+      {
+        "field": "packet_key",
+        "type": "keyword",
+        "indexable": true,
+        "priority": "P0",
+        "reason": "Primary JOIN key back to Postgres"
+      },
+      {
+        "field": "qdrant_point_id",
+        "type": "keyword",
+        "indexable": true,
+        "priority": "P0",
+        "reason": "Point identity for audit trail"
+      },
+      {
+        "field": "source_ref",
+        "type": "keyword",
+        "indexable": true,
+        "priority": "P0",
+        "reason": "Source code reference; reconcile sourceRef variant"
+      },
+      {
+        "field": "feature_id",
+        "type": "keyword",
+        "indexable": true,
+        "priority": "P0",
+        "reason": "Feature identifier; reconcile feature_ids variant"
+      }
+    ],
+    "high_priority": [
+      {
+        "field": "som_cluster",
+        "type": "integer",
+        "indexable": true,
+        "priority": "P1"
+      },
+      {
+        "field": "community_id",
+        "type": "keyword",
+        "indexable": true,
+        "priority": "P1"
+      },
+      {
+        "field": "ontology_label",
+        "type": "keyword",
+        "indexable": true,
+        "priority": "P1"
+      },
+      {
+        "field": "topology_label",
+        "type": "keyword",
+        "indexable": true,
+        "priority": "P1"
+      },
+      {
+        "field": "retrieval_strategy",
+        "type": "keyword",
+        "indexable": true,
+        "priority": "P1"
+      }
+    ],
+    "medium_priority": [
+      {
+        "field": "ae_confidence",
+        "type": "float",
+        "indexable": true,
+        "priority": "P2"
+      }
+    ]
+  },
+  "backfill_sequence": [
+    {
+      "phase": 1,
+      "name": "Add Postgres JSONB indexes",
+      "duration_minutes": 5,
+      "risk": "Low",
+      "steps": [
+        "CREATE INDEX idx_atlas_packets_som_cluster_expr ON atlas_packets ((metadata->>'som_cluster')::integer)",
+        "CREATE INDEX idx_atlas_packets_community_id_expr ON atlas_packets ((metadata->>'community_id'))",
+        "CREATE INDEX idx_atlas_packets_topology_label_expr ON atlas_packets ((metadata->>'topology_label'))",
+        "CREATE INDEX idx_atlas_packets_retrieval_strategy_expr ON atlas_packets ((metadata->>'retrieval_strategy'))",
+        "CREATE INDEX idx_atlas_packets_ae_confidence_expr ON atlas_packets ((metadata->'ae_confidence')::numeric)",
+        "CREATE INDEX idx_atlas_packets_trace_id_expr ON atlas_packets ((metadata->>'trace_id'))"
+      ],
+      "gate": "All 6 indexes created and visible in pg_indexes"
+    },
+    {
+      "phase": 2,
+      "name": "Backfill critical Postgres JSONB metadata",
+      "duration_minutes": 30,
+      "risk": "Medium",
+      "fields_to_backfill": [
+        {
+          "field": "som_cluster",
+          "target": "metadata->>'som_cluster'",
+          "source": "SELECT DISTINCT som_cluster FROM nes_chrom_packets WHERE som_cluster IS NOT NULL",
+          "join_logic": "JOIN nes_chrom_packets ON atlas_packets.source_ref = nes_chrom_packets.source_ref",
+          "fallback": "Query Qdrant payload if not in nes_chrom_packets",
+          "required_coverage": 95.0
+        },
+        {
+          "field": "community_id",
+          "target": "metadata->>'community_id'",
+          "source": "Neo4j MATCH (n:CodebaseFile)-[:BELONGS_TO_COMMUNITY]->(c:Community) RETURN n.stable_key, c.community_id",
+          "join_logic": "JOIN on stable_key or feature_id",
+          "fallback": "Assign default 'c_default' or cluster from som_cluster",
+          "required_coverage": 80.0
+        },
+        {
+          "field": "topology_label",
+          "target": "metadata->>'topology_label'",
+          "source": "Neo4j pagerank analysis: CASE WHEN pagerank > 0.95 THEN 'hub' WHEN < 0.05 THEN 'leaf' ELSE 'bridge'",
+          "join_logic": "JOIN on stable_key or feature_id",
+          "fallback": "Infer from packet degree (in + out edges)",
+          "required_coverage": 85.0
+        },
+        {
+          "field": "retrieval_strategy",
+          "target": "metadata->>'retrieval_strategy'",
+          "source": "CASE WHEN packet_type='schema_stub' THEN 'sparse' WHEN packet_type='qdrant_chunk' THEN 'dense' ELSE 'hybrid' END",
+          "join_logic": "Local computation; no external join",
+          "fallback": "Default to 'dense'",
+          "required_coverage": 90.0
+        },
+        {
+          "field": "ae_confidence",
+          "target": "metadata->'ae_confidence'",
+          "source": "AE model output stored separately or assume 1.0",
+          "join_logic": "JOIN on packet_key if AE scores exist",
+          "fallback": "Assume 1.0 (perfect reconstruction)",
+          "required_coverage": 85.0
+        },
+        {
+          "field": "trace_id",
+          "target": "metadata->>'trace_id'",
+          "source": "gen_random_uuid() for each packet",
+          "join_logic": "Generate new UUID per row",
+          "fallback": "N/A",
+          "required_coverage": 100.0
+        }
+      ],
+      "gate": "Coverage audit: coverage ≥ required_coverage for each field"
+    },
+    {
+      "phase": 3,
+      "name": "Patch Qdrant payloads from Postgres",
+      "duration_minutes": 20,
+      "risk": "Medium",
+      "steps": [
+        "Query Postgres: SELECT qdrant_point_id, packet_key, source_ref, feature_id, metadata FROM atlas_packets WHERE qdrant_point_id IS NOT NULL",
+        "For each row: Prepare Qdrant payload with all fields",
+        "Batch upsert to Qdrant with updated payloads (batch size: 100-500 points)",
+        "Action: Add packet_key to all 52,606 Qdrant points (currently 0%)",
+        "Action: Add qdrant_point_id to all points (currently 0%)",
+        "Action: Reconcile 'source_ref' vs 'sourceRef' — keep canonical 'source_ref' in Qdrant",
+        "Action: Reconcile 'feature_id' vs 'feature_ids' — keep canonical 'feature_id' in Qdrant",
+        "Action: Backfill community_id, topology_label, retrieval_strategy from Postgres into Qdrant payload",
+        "Verify: Spot-check 10 random Qdrant points for packet_key presence"
+      ],
+      "gate": "100% of Qdrant points have packet_key and qdrant_point_id; spot-check passes"
+    },
+    {
+      "phase": 4,
+      "name": "Create Qdrant payload indexes",
+      "duration_minutes": 10,
+      "risk": "Low",
+      "note": "Qdrant payload indexing is configured via REST API or collection settings",
+      "indexes_to_create": [
+        "packet_key (keyword index)",
+        "qdrant_point_id (keyword index)",
+        "source_ref (keyword index)",
+        "feature_id (keyword index)",
+        "som_cluster (integer index)",
+        "community_id (keyword index)",
+        "ontology_label (keyword index)",
+        "topology_label (keyword index)",
+        "retrieval_strategy (keyword index)",
+        "ae_confidence (float index)"
+      ],
+      "gate": "All 10 indexes created; verify via GET /collections/codebase_chunks_768; payload_schema shows all fields indexed"
+    }
+  ],
+  "total_time_estimate": {
+    "phase_1": 5,
+    "phase_2": 30,
+    "phase_3": 20,
+    "phase_4": 10,
+    "total_minutes": 65,
+    "assumptions": "Assumes Neo4j and Qdrant are accessible; external source queries return in <5 min each"
+  },
+  "dependency_on_p3g": {
+    "blocking": true,
+    "reason": "P3g collision repair must complete first; adds 75 new unique qdrant_point_id values",
+    "sequence": "1. Fix P3g collisions (60 min) → 2. Backfill metadata contract (65 min) → 3. Verify ACE/KAG/DAG retrieval (30 min)"
+  },
+  "next_action": "User approval to proceed with Phase 1 (Postgres indexes)"
+}
