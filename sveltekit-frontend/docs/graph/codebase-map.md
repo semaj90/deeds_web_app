@@ -1,5 +1,5 @@
 # Codebase Map — 20-Gate Deep Audit
-> Generated: 2026-06-23T18:59:09.887Z
+> Generated: 2026-06-23T19:11:59.791Z
 > Mode: `fast-ast` · CPU-only · No GPU required
 > Regenerate: `npm run index:codebase:fast:plan`
 
@@ -8,7 +8,7 @@
 ## Summary
 | Metric | Count |
 |--------|-------|
-| Files scanned | 67964 |
+| Files scanned | 67966 |
 | Directories analysed | 745 |
 | Route files | 177 |
 | Svelte components | 5718 |
@@ -31,13 +31,13 @@
 |------|-------|------|------|
 | G4  | Auth guard on API routes | 144 | 7 |
 | G5  | Zod validation on API routes | 103 | 2 |
-| G11 | No hardcoded localhost (excl env.server) | 65125 | 2839 |
-| G14a | No `export let` (Svelte 4 props) | 67959 | 5 |
-| G14b | No `$:` reactive declarations | 67952 | 12 |
-| G14c | No `on:event=` directives | 67947 | 17 |
-| G14d | No `createEventDispatcher()` | 67964 | 0 |
-| G14e | No runes in plain `.ts` files | 67889 | 75 |
-| G15 | No SSR-unsafe globals (unguarded) | 67964 | 0 |
+| G11 | No hardcoded localhost (excl env.server) | 65127 | 2839 |
+| G14a | No `export let` (Svelte 4 props) | 67961 | 5 |
+| G14b | No `$:` reactive declarations | 67954 | 12 |
+| G14c | No `on:event=` directives | 67949 | 17 |
+| G14d | No `createEventDispatcher()` | 67966 | 0 |
+| G14e | No runes in plain `.ts` files | 67891 | 75 |
+| G15 | No SSR-unsafe globals (unguarded) | 67966 | 0 |
 | G16 | Server routes have test pairing | 104 | 34 |
 | G17 | Server routes have error handling | 142 | 12 |
 | G20 | Cyclic import pairs | — | 3 |
@@ -381,7 +381,7 @@
 | ✅ | `sveltekit-frontend/.venv_turbovec/Lib/site-packages` | 90 | 1 | 7857 | 0 | 0/0 | 0 | — |
 | ✅ | `sveltekit-frontend/.vscode` | 90 | 4 | 4167 | 0 | 0/0 | 0 | — |
 | ✅ | `sveltekit-frontend/docs/atlas` | 90 | 1 | 5156 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/docs/graph` | 90 | 17 | 6797618 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/docs/graph` | 90 | 17 | 6797700 | 0 | 0/0 | 0 | — |
 | ✅ | `sveltekit-frontend/docs/obsidian-vault` | 90 | 2 | 108 | 0 | 0/0 | 0 | — |
 | ✅ | `sveltekit-frontend/docs/profile-cards/data` | 90 | 20 | 1588 | 0 | 0/0 | 0 | — |
 | ✅ | `sveltekit-frontend/docs_readme/deeds_labs_archive` | 90 | 84 | 2997942 | 0 | 0/0 | 0 | — |
@@ -770,14 +770,14 @@
 | ✅ | `sveltekit-frontend/scripts/tests` | 95 | 52 | 9386 | 0 | 2/14 | 0 | 🟠lh |
 | ✅ | `sveltekit-frontend/src` | 98 | 1 | 184774 | 133 | 175/226 | 3 | 🟠lh ⬜notest |
 | ✅ | `.claude/hooks` | 100 | 2 | 164 | 0 | 0/2 | 0 | — |
-| ✅ | `.claude/worktrees/agent-a38668f2` | 100 | 293 | 88733134 | 4522 | 10509/11717 | 363 | 🟡sv4 🟠lh |
+| ✅ | `.claude/worktrees/agent-a38668f2` | 100 | 293 | 88732868 | 4522 | 10509/11717 | 363 | 🟡sv4 🟠lh |
 | ✅ | `.claude/worktrees/agent-a38668f2/.claude` | 100 | 24 | 3532 | 0 | 0/10 | 0 | — |
 | ✅ | `.claude/worktrees/agent-a38668f2/drizzle` | 100 | 21 | 16268 | 0 | 0/0 | 0 | — |
 | ✅ | `.claude/worktrees/agent-a38668f2/scripts` | 100 | 6324 | 2678621 | 64 | 10/2607 | 42 | 🟠lh |
-| ✅ | `.claude/worktrees/agent-a38668f2/sveltekit-frontend` | 100 | 37831 | 71693012 | 4423 | 10494/9045 | 305 | 🟡sv4 🟠lh |
+| ✅ | `.claude/worktrees/agent-a38668f2/sveltekit-frontend` | 100 | 37830 | 71692746 | 4423 | 10494/9045 | 305 | 🟡sv4 🟠lh |
 | ✅ | `.claude/worktrees/agent-a87590c9` | 100 | 2 | 5341867 | 33 | 35/253 | 5 | 🟠lh |
 | ✅ | `.claude/worktrees/agent-a87590c9/scripts` | 100 | 332 | 88393 | 1 | 0/129 | 0 | 🟠lh |
-| ✅ | `scripts/atlas` | 100 | 1449 | 381222 | 4 | 0/668 | 10 | 🟠lh |
+| ✅ | `scripts/atlas` | 100 | 1451 | 381487 | 4 | 0/668 | 10 | 🟠lh |
 | ✅ | `.claude/worktrees/agent-a87590c9/sveltekit-frontend` | 100 | 337 | 4853804 | 31 | 35/121 | 4 | 🟠lh |
 | ✅ | `sveltekit-frontend/scripts` | 100 | 223 | 124168 | 1 | 11/221 | 1 | 🟠lh |
 | ✅ | `sveltekit-frontend/scripts/agents` | 100 | 4 | 1430 | 0 | 1/2 | 0 | — |
@@ -1117,7 +1117,7 @@ _No unguarded SSR-unsafe globals. ✅_
 | `node:fs` | 5685 |
 | `vitest` | 5584 |
 | `node:url` | 4891 |
-| `path` | 4659 |
+| `path` | 4661 |
 | `zod` | 3935 |
 | `fs` | 3498 |
 | `pg` | 3336 |
@@ -1130,7 +1130,7 @@ _No unguarded SSR-unsafe globals. ✅_
 | `crypto` | 1621 |
 | `svelte` | 1568 |
 | `$lib/types` | 1557 |
-| `dotenv` | 1544 |
+| `dotenv` | 1546 |
 | `$lib/components/ui/Icon.svelte` | 1542 |
 | `node:child_process` | 1535 |
 | `$lib/server/redis.js` | 1405 |
