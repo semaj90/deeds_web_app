@@ -19,6 +19,8 @@ export const retrievalProvenance = pgTable('retrieval_provenance', {
   traversalPath: jsonb('traversal_path'),
   fusionScore: doublePrecision('fusion_score'),
   verdict: text('verdict'),
+  retrievalStrategy: text('retrieval_strategy'),
+  retrievalPath: jsonb('retrieval_path').default([]),
   createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),
 }, (table) => ({
   storyTaskIdx: index('idx_rp_story_task').on(table.storyId, table.taskId),
