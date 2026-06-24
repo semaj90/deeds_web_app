@@ -88,9 +88,10 @@ async function main() {
     for (let i = 0; i < packets.length; i += BATCH_SIZE) {
       const batch = packets.slice(i, i + BATCH_SIZE);
 
-      // Build parameterized query
+      // Build parameterized query with separate CASE clauses for row and col
       const params = {};
-      const setClauses = [];
+      const rowCases = [];
+      const colCases = [];
 
       for (let j = 0; j < batch.length; j++) {
         const { source_ref, som_row, som_col } = batch[j];
@@ -98,10 +99,8 @@ async function main() {
         params[`row_${j}`] = som_row;
         params[`col_${j}`] = som_col;
 
-        setClauses.push(`
-          WHEN $ref_${j}
-          THEN { som_row: $row_${j}, som_col: $col_${j} }
-        `);
+        rowCases.push(`WHEN $ref_${j} THEN $row_${j}`);
+        colCases.push(`WHEN $ref_${j} THEN $col_${j}`);
       }
 
       const query = `
@@ -109,11 +108,11 @@ async function main() {
         WHERE n.sourceRef IN [${batch.map((_, j) => `$ref_${j}`).join(', ')}]
         WITH n, n.sourceRef AS src
         SET n.som_row = CASE src
-          ${setClauses.join('')}
+          ${rowCases.join(' ')}
           ELSE n.som_row
         END,
         n.som_col = CASE src
-          ${setClauses.join('')}
+          ${colCases.join(' ')}
           ELSE n.som_col
         END,
         n.updatedAt = datetime()
