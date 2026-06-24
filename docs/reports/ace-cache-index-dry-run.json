@@ -1,10 +1,10 @@
 {
   "ok": true,
   "mode": "dry-run",
-  "generated_at": "2026-06-13T20:31:58.951Z",
-  "next_step": "node C:\\Users\\james\\Videos\\deeds-web-app\\scripts\\atlas\\index-ace-cache.mjs --apply",
+  "generated_at": "2026-06-24T18:40:56.943Z",
+  "next_step": "node c:\\Users\\james\\Videos\\deeds-web-app\\scripts\\atlas\\index-ace-cache.mjs --apply",
   "cache_config": {
-    "timestamp": "2026-06-13T20:31:58.944Z",
+    "timestamp": "2026-06-24T18:40:56.930Z",
     "version": "1.0",
     "cache_strategy": {
       "l0_redis_exact": {

@@ -3,7 +3,7 @@
  * Create or verify the Valkey FT index for semantic prompt caching.
  */
 
-import { createClient } from 'redis';
+import Redis from 'ioredis';
 
 const REDIS_URL =
   process.env.REDIS_URL ??
@@ -67,13 +67,12 @@ async function safeQuit(client) {
   }
 }
 
-const redis = createClient({
+const redis = new Redis({
   url: REDIS_URL,
   password: REDIS_PASS,
-  socket: {
-    connectTimeout: 4000,
-    reconnectStrategy: (retries) => Math.min(retries * 250, 3000),
-  },
+  connectTimeout: 4000,
+  retryStrategy: (retries) => Math.min(retries * 250, 3000),
+  lazyConnect: true,
 });
 
 redis.on('error', (err) => {
@@ -89,7 +88,7 @@ try {
 
   if (dropFirst) {
     try {
-      await redis.sendCommand(['FT.DROPINDEX', INDEX_NAME]);
+      await redis.call('FT.DROPINDEX', INDEX_NAME);
       console.log(`✅ Dropped existing index ${INDEX_NAME}`);
     } catch (err) {
       const msg = String(err?.message || err);
@@ -106,7 +105,7 @@ try {
   }
 
   try {
-    const info = await redis.sendCommand(['FT.INFO', INDEX_NAME]);
+    const info = await redis.call('FT.INFO', INDEX_NAME);
     console.log(`✅ Index ${INDEX_NAME} already exists — skipping creation`);
 
     const numDocs = Array.isArray(info) ? (info[info.indexOf('num_docs') + 1] ?? '?') : '?';
@@ -126,7 +125,7 @@ try {
     }
   }
 
-  await redis.sendCommand([
+  await redis.call(
     'FT.CREATE',
     INDEX_NAME,
     'ON',
@@ -156,8 +155,8 @@ try {
     'M',
     '16',
     'EF_CONSTRUCTION',
-    '200',
-  ]);
+    '200'
+  );
 
   console.log(`✅ Created index ${INDEX_NAME}`);
   console.log(`   prefix  : ${KEY_PREFIX}`);

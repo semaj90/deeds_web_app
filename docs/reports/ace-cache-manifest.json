@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "generated_at": "2026-06-13T20:31:58.872Z",
+  "generated_at": "2026-06-24T18:40:56.845Z",
   "cache_strategy": {
     "l0_redis_exact": {
       "description": "Exact-match L1 cache (query hash)",

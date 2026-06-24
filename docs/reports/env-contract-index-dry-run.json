@@ -1,8 +1,8 @@
 {
   "ok": true,
   "mode": "dry-run",
-  "generated_at": "2026-06-13T20:31:58.441Z",
-  "next_step": "node C:\\Users\\james\\Videos\\deeds-web-app\\scripts\\atlas\\index-env-contract.mjs --apply",
+  "generated_at": "2026-06-24T18:40:56.299Z",
+  "next_step": "node c:\\Users\\james\\Videos\\deeds-web-app\\scripts\\atlas\\index-env-contract.mjs --apply",
   "ace_kag_dag_hit": {
     "packet_kind": "env_contract",
     "packet_key": "env_contract:55cc9208cfd61244",
@@ -27,20 +27,19 @@
     "summary": "ACE/KAG/DAG-grounded env contract for Postgres, Redis/Valkey, Qdrant, llama-server, TurboVec, XGBoost, CUDA, and optional browser ONNX/WebGPU settings. Secrets are redacted.",
     "ace_kag_dag_hits": [],
     "metadata": {
-      "generated_at": "2026-06-13T20:31:58.281Z",
+      "generated_at": "2026-06-24T18:40:56.062Z",
       "source_files": [
         ".env",
         ".env.local",
         "sveltekit-frontend/.env",
         "sveltekit-frontend/.env.local"
       ],
-      "server_keys_found": 11,
+      "server_keys_found": 12,
       "server_keys_required": 17,
       "server_keys_missing": [
         "POSTGRES_HOST",
         "POSTGRES_PORT",
         "QDRANT_API_KEY",
-        "LLAMA_SERVER_URL",
         "TURBOVEC_GRPC_URL",
         "XGBOOST_URL"
       ],
@@ -102,6 +101,12 @@
           "scope": "server",
           "is_secret": false,
           "redacted_value": "http://127.0.0.1:8788"
+        },
+        "LLAMA_SERVER_URL": {
+          "present": true,
+          "scope": "server",
+          "is_secret": false,
+          "redacted_value": "http://127.0.0.1:8090"
         },
         "TENSORRT_BRIDGE_NODE_PATH": {
           "present": true,

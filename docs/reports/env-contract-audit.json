@@ -1,19 +1,18 @@
 {
   "metadata": {
-    "generated_at": "2026-06-13T20:31:58.281Z",
+    "generated_at": "2026-06-24T18:40:56.062Z",
     "source_files": [
       ".env",
       ".env.local",
       "sveltekit-frontend/.env",
       "sveltekit-frontend/.env.local"
     ],
-    "server_keys_found": 11,
+    "server_keys_found": 12,
     "server_keys_required": 17,
     "server_keys_missing": [
       "POSTGRES_HOST",
       "POSTGRES_PORT",
       "QDRANT_API_KEY",
-      "LLAMA_SERVER_URL",
       "TURBOVEC_GRPC_URL",
       "XGBOOST_URL"
     ],
@@ -75,6 +74,12 @@
         "scope": "server",
         "is_secret": false,
         "redacted_value": "http://127.0.0.1:8788"
+      },
+      "LLAMA_SERVER_URL": {
+        "present": true,
+        "scope": "server",
+        "is_secret": false,
+        "redacted_value": "http://127.0.0.1:8090"
       },
       "TENSORRT_BRIDGE_NODE_PATH": {
         "present": true,

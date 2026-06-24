@@ -103,7 +103,9 @@ async function enqueueJobs() {
     conn = await amqp.connect(RABBITMQ_URL);
     channel = await conn.createChannel();
 
-    await channel.assertQueue(QUEUE, { durable: true });
+    // Use checkQueue to verify it exists; don't re-assert with different parameters
+    const qInfo = await channel.checkQueue(QUEUE);
+    log(`  Queue '${QUEUE}' exists: ${qInfo.messageCount} current messages, ${qInfo.consumerCount} consumers\n`);
 
     // Fetch chunks needing summaries
     const result = await db.query(`
@@ -262,7 +264,11 @@ async function showStats() {
     log(`❌ Stats error: ${e.message}`);
     process.exit(1);
   } finally {
-    await db.end();
+    try {
+      await db.end();
+    } catch {
+      // Already closed
+    }
   }
 }
 

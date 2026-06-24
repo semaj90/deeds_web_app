@@ -1,8 +1,8 @@
 {
   "ok": true,
   "mode": "dry-run",
-  "generated_at": "2026-06-13T20:31:58.717Z",
-  "next_step": "node C:\\Users\\james\\Videos\\deeds-web-app\\scripts\\atlas\\index-parent-atlas-packets.mjs --apply",
+  "generated_at": "2026-06-24T18:40:56.681Z",
+  "next_step": "node c:\\Users\\james\\Videos\\deeds-web-app\\scripts\\atlas\\index-parent-atlas-packets.mjs --apply",
   "packet_count": 9,
   "would_write": {
     "postgres": "atlas_packets",
@@ -21,7 +21,7 @@
         "stage": "foundation",
         "stage_description": "Core infrastructure packets (auth, DB, cache)",
         "manifest_version": "1.0",
-        "generated_at": "2026-06-13T20:31:58.577Z"
+        "generated_at": "2026-06-24T18:40:56.482Z"
       }
     },
     {
@@ -36,7 +36,7 @@
         "stage": "foundation",
         "stage_description": "Core infrastructure packets (auth, DB, cache)",
         "manifest_version": "1.0",
-        "generated_at": "2026-06-13T20:31:58.577Z"
+        "generated_at": "2026-06-24T18:40:56.482Z"
       }
     },
     {
@@ -51,7 +51,7 @@
         "stage": "foundation",
         "stage_description": "Core infrastructure packets (auth, DB, cache)",
         "manifest_version": "1.0",
-        "generated_at": "2026-06-13T20:31:58.577Z"
+        "generated_at": "2026-06-24T18:40:56.482Z"
       }
     }
   ]

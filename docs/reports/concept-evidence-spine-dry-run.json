@@ -1,8 +1,8 @@
 {
   "ok": true,
   "mode": "dry-run",
-  "generated_at": "2026-06-13T20:31:59.160Z",
-  "next_step": "node C:\\Users\\james\\Videos\\deeds-web-app\\scripts\\atlas\\index-concept-evidence-spine.mjs --apply",
+  "generated_at": "2026-06-24T18:40:57.413Z",
+  "next_step": "node c:\\Users\\james\\Videos\\deeds-web-app\\scripts\\atlas\\index-concept-evidence-spine.mjs --apply",
   "index_plan": {
     "concepts_to_index": 10,
     "evidence_packets_to_link": 9,
