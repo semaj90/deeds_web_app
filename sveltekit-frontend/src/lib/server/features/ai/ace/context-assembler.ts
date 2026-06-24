@@ -87,6 +87,10 @@ import {
   attentionScoreChunks_fp16,
   batchCosineSimilarityFp16,
 } from '$lib/server/gpu/libtorch-bridge.js';
+import {
+  turbovecGrpcSearch,
+  type TurboVecGrpcSearchResponse,
+} from '$lib/server/grpc/turbovec-cuda-client.js';
 import { logInference } from '$lib/server/observability/inference-log.js';
 import { determineACEPolicy } from '../../../ace/policy.js';
 import { fetchDbSchemaContext } from '$lib/server/ai/ldr/db-schema-tools.js';
@@ -1202,6 +1206,29 @@ async function fetchACPKnowledgeResultsStub(
 
     const fused = allScored.length > 0 ? rrfFuse(allScored, fusionWeights).slice(0, limit) : [];
 
+    // Optional TurboVec reranking (Stage A2b) — non-blocking refinement of RRF order
+    let turbovecApplied = false;
+    let finalResults = fused;
+    if (ENV.TURBOVEC_SIDECAR_GRPC_ENABLED && fused.length > 0) {
+      try {
+        const tvResult = await turbovecGrpcSearch(emb, Math.min(fused.length, 200));
+        if (tvResult?.candidates?.length) {
+          const tvScoreMap = new Map<string, number>(
+            tvResult.candidates.map((c) => [c.id, c.score])
+          );
+          finalResults = [...fused].sort((a, b) => {
+            const scoreA = tvScoreMap.get(a.id) ?? a.score;
+            const scoreB = tvScoreMap.get(b.id) ?? b.score;
+            return scoreB - scoreA;
+          });
+          turbovecApplied = true;
+        }
+      } catch (error) {
+        console.warn('[ACE] TurboVec reranking failed:', (error as Error).message);
+        // Fallback to RRF order silently (no error)
+      }
+    }
+
     // Persist topo candidates + adapt router (fire-and-forget)
     const queryClass = classifyQuery(query);
     const qHash = topoQueryHash(query);
@@ -1240,7 +1267,7 @@ async function fetchACPKnowledgeResultsStub(
     return {
       ok: true,
       query,
-      results: fused.map((r) => {
+      results: finalResults.map((r) => {
         const p = payloadMap.get(r.id) ?? {};
         return {
           id: r.id,

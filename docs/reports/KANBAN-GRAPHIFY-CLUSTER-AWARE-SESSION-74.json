@@ -1,0 +1,595 @@
+{
+  "title": "Graphify Cluster-Aware Integration — Kanban Board",
+  "generated": "2026-06-23T23:50:00Z",
+  "totalTasks": 22,
+  "estimatedHours": "8-10 (parallel lanes)",
+  "criticalPath": "A → B1-B2 → C2 → E1",
+  "phases": {
+    "A": {
+      "name": "Prepare",
+      "status": "ready",
+      "estimatedMinutes": 30,
+      "tasks": [
+        {
+          "id": "A1",
+          "title": "Validate SOM grid in Redis",
+          "description": "Verify all 272 SOM cells exist in Redis with cell metadata",
+          "script": "redis-cli KEYS 'som:cell:*' | wc -l",
+          "expected": "≥270 keys",
+          "owner": "automation",
+          "priority": "P0",
+          "estimatedMinutes": 10,
+          "blocking": ["B1", "C1"],
+          "status": "todo",
+          "notes": "Run health check on Redis container first"
+        },
+        {
+          "id": "A2",
+          "title": "Verify TurboVec proto + load script",
+          "description": "Check proto definitions and load-turbovec-index-from-qdrant.mjs",
+          "script": "head -20 scripts/atlas/load-turbovec-index-from-qdrant.mjs",
+          "expected": "gRPC loader present, correct collection name",
+          "owner": "automation",
+          "priority": "P0",
+          "estimatedMinutes": 10,
+          "blocking": ["C2"],
+          "status": "todo",
+          "notes": "Verify GRPC_URL env var is set correctly"
+        },
+        {
+          "id": "A3",
+          "title": "Check Bifrost health (port 3040)",
+          "description": "Verify Bifrost semantic cache is running and responding",
+          "script": "curl -s http://localhost:3040/health | jq .",
+          "expected": "HTTP 200, status: healthy",
+          "owner": "automation",
+          "priority": "P0",
+          "estimatedMinutes": 10,
+          "blocking": ["C3"],
+          "status": "todo",
+          "notes": "Start Bifrost if not running: docker-compose up bifrost-semantic"
+        }
+      ]
+    },
+    "B": {
+      "name": "Cluster Sync",
+      "status": "ready",
+      "estimatedMinutes": 90,
+      "tasks": [
+        {
+          "id": "B1",
+          "title": "Create cluster_sync_and_partition node",
+          "description": "Add Stage 5.5 to graphify pipeline between index_bm25 and rank_signals",
+          "file": "scripts/atlas/graphify-langgraph-pipeline.mjs",
+          "owner": "engineer",
+          "priority": "P0",
+          "estimatedMinutes": 40,
+          "blocking": ["C2", "C3", "D1"],
+          "status": "todo",
+          "dependencies": ["A1"],
+          "notes": "Use existing StateGraph pattern from lines 59-104",
+          "checklist": [
+            "Read atlas_packets with feature_id, community_id, som_cluster",
+            "Compute cluster partition metadata",
+            "Output cluster assignment summary",
+            "Handle missing som_cluster gracefully (fallback to default)",
+            "Dry-run mode works correctly"
+          ]
+        },
+        {
+          "id": "B2",
+          "title": "Wire TurboVec loading into cluster_sync",
+          "description": "Load enriched packets (64-dim) into TurboVec via gRPC",
+          "owner": "engineer",
+          "priority": "P0",
+          "estimatedMinutes": 30,
+          "blocking": ["C2", "D3"],
+          "status": "todo",
+          "dependencies": ["A2", "B1"],
+          "notes": "Inline gRPC upsert or call load-turbovec-index-from-qdrant.mjs",
+          "checklist": [
+            "TurboVec.Upsert RPC called with enriched points",
+            "Verify TurboVec.Health.indexed > 0 after load",
+            "Handle gRPC connection errors gracefully",
+            "Log indexing summary (total indexed, failures)"
+          ]
+        },
+        {
+          "id": "B3",
+          "title": "Redis cache partitioning setup",
+          "description": "Create per-cluster cache key namespaces and preload metadata",
+          "owner": "automation",
+          "priority": "P1",
+          "estimatedMinutes": 25,
+          "blocking": ["C3"],
+          "status": "todo",
+          "dependencies": ["A1", "B1"],
+          "notes": "Use bifrost:cell:{x}:{y}:* naming convention",
+          "checklist": [
+            "Create som:cell:{x}:{y}:centroids (24h TTL)",
+            "Create som:cell:{x}:{y}:neighbors (24h TTL)",
+            "Preload neighbor cell adjacencies (3-cell expansion)",
+            "Document Redis key format in code comment"
+          ]
+        },
+        {
+          "id": "B4",
+          "title": "Create Bifrost pre-filter rule (SOM-aware)",
+          "description": "Query → SOM affinity → pre-filter to cell + neighbors",
+          "file": "src/lib/server/bifrost-manager.ts OR bifrost sidecar config",
+          "owner": "engineer",
+          "priority": "P0",
+          "estimatedMinutes": 35,
+          "blocking": ["C3", "D1"],
+          "status": "todo",
+          "dependencies": ["A3", "B3"],
+          "notes": "Recommend: Bifrost sidecar option (Option A)",
+          "checklist": [
+            "Query embedding → SOM cell affinity computed",
+            "Qdrant filter built with som_cell match + neighbors",
+            "Fallback to full-corpus search if cell returns <10 results",
+            "Log pre-filter hit/miss rate for benchmarking"
+          ]
+        },
+        {
+          "id": "B5",
+          "title": "Test cluster_sync end-to-end (dry-run)",
+          "description": "Run graphify pipeline at stage cluster_sync, verify outputs",
+          "script": "node scripts/atlas/graphify-langgraph-pipeline.mjs --stage cluster_sync --dry-run",
+          "owner": "qa",
+          "priority": "P0",
+          "estimatedMinutes": 20,
+          "blocking": ["C2", "C3"],
+          "status": "todo",
+          "dependencies": ["B1", "B2", "B3", "B4"],
+          "checklist": [
+            "Dry-run completes without errors",
+            "Cluster partition metadata generated",
+            "TurboVec would be indexed (previewed, not applied)",
+            "Redis cache keys would be created (previewed)"
+          ]
+        }
+      ]
+    },
+    "C": {
+      "name": "Gemma4 Cluster Summaries",
+      "status": "ready",
+      "estimatedMinutes": 90,
+      "tasks": [
+        {
+          "id": "C1",
+          "title": "Optimize cluster summary prompt (token budget)",
+          "description": "Craft 2-sentence prompts targeting <60 tokens per summary",
+          "owner": "engineer",
+          "priority": "P0",
+          "estimatedMinutes": 20,
+          "blocking": ["C2"],
+          "status": "todo",
+          "dependencies": ["A1"],
+          "notes": "Use representative_files + concepts + domain heuristics",
+          "checklist": [
+            "Prompt template under 60 tokens",
+            "Includes representative_files_list",
+            "Includes extracted_concepts_csv",
+            "Includes cluster_domain_label",
+            "Test with 3 sample clusters"
+          ]
+        },
+        {
+          "id": "C2",
+          "title": "Batch Gemma4 cluster summarizer",
+          "description": "Call Gemma4 in batches (272 clusters → 4 workers)",
+          "script": "node scripts/atlas/graphify-cluster-summaries.mjs --batch-by-som --apply",
+          "owner": "engineer",
+          "priority": "P0",
+          "estimatedMinutes": 50,
+          "blocking": ["D2"],
+          "status": "todo",
+          "dependencies": ["C1", "A1"],
+          "notes": "272 clusters / 4 workers = ~68 calls per worker",
+          "checklist": [
+            "Gemma4 batch call (4 parallel workers)",
+            "Handle timeouts gracefully (default to 60s timeout)",
+            "Retry failed summaries (max 3 retries)",
+            "Output summary JSON + embedding vectors",
+            "Log: {cluster_id, token_count, generation_time}"
+          ]
+        },
+        {
+          "id": "C3",
+          "title": "Cache cluster summaries in Redis + Bifrost",
+          "description": "Store summaries with 24h TTL + embed for semantic search",
+          "owner": "engineer",
+          "priority": "P1",
+          "estimatedMinutes": 20,
+          "blocking": ["D1"],
+          "status": "todo",
+          "dependencies": ["B4", "C2"],
+          "notes": "Use som:cell:{x}:{y}:summary + bifrost:cell:{x}:{y}:summary",
+          "checklist": [
+            "Summaries stored as JSON in Redis (som:cell:*:summary)",
+            "Summary vectors cached in Bifrost L2 (bifrost:cell:*:summary)",
+            "TTL: 24h for both",
+            "Invalidation: manual only (no auto-refresh)"
+          ]
+        },
+        {
+          "id": "C4",
+          "title": "Test cluster summary injection (Gemma4)",
+          "description": "Verify summaries appear in system prompt + count tokens",
+          "owner": "qa",
+          "priority": "P1",
+          "estimatedMinutes": 20,
+          "blocking": ["D2"],
+          "status": "todo",
+          "dependencies": ["C3"],
+          "checklist": [
+            "System prompt includes cluster summary",
+            "Total prompt tokens <300 (KV cache friendly)",
+            "Gemma4 response quality improved (human review 3 samples)",
+            "No token overflow errors"
+          ]
+        }
+      ]
+    },
+    "D": {
+      "name": "Error Fixing Integration",
+      "status": "ready",
+      "estimatedMinutes": 120,
+      "tasks": [
+        {
+          "id": "D1",
+          "title": "Cluster-aware error analysis audit",
+          "description": "Find error hotspots (>2σ density) by SOM cluster",
+          "script": "node scripts/atlas/audit-error-fixes.mjs --cluster-analysis",
+          "owner": "automation",
+          "priority": "P0",
+          "estimatedMinutes": 30,
+          "blocking": ["D2"],
+          "status": "todo",
+          "dependencies": ["B4"],
+          "output": "docs/reports/error-hotspots-by-cluster.json",
+          "checklist": [
+            "Read error_logs table (or fallback to schema if table missing)",
+            "Group by som_cluster",
+            "Compute mean error density + std dev",
+            "Identify clusters >2σ above mean",
+            "Output: {som_cell, error_count, error_rate, dominant_category}"
+          ]
+        },
+        {
+          "id": "D2",
+          "title": "Build error priority queue (cluster hotspots)",
+          "description": "Score errors by (count/size) × severity × fixability",
+          "owner": "engineer",
+          "priority": "P0",
+          "estimatedMinutes": 35,
+          "blocking": ["D3", "D4"],
+          "status": "todo",
+          "dependencies": ["D1", "C2"],
+          "output": "docs/reports/error-fixing-kanban.json",
+          "checklist": [
+            "Priority = (error_count / cluster_size) × severity × fixability",
+            "Fixability: pattern=0.95, ast=0.80, semantic=0.60, manual=0.10",
+            "Tier P0: Critical (severity=CRITICAL || fixability >0.90)",
+            "Tier P1: High (severity=ERROR || error_rate >0.20)",
+            "Tier P2: Medium (semantic fixes, requires LLM)",
+            "Tier P3: Low (manual review, low priority)",
+            "Output format: {tier, cluster_id, error_count, recommended_fixer}"
+          ]
+        },
+        {
+          "id": "D3",
+          "title": "Wire TurboVec status into audit report",
+          "description": "Report: 'TurboVec indexing: {indexed}/{total}', alert if <50%",
+          "owner": "engineer",
+          "priority": "P1",
+          "estimatedMinutes": 20,
+          "blocking": [],
+          "status": "todo",
+          "dependencies": ["B2"],
+          "checklist": [
+            "Query TurboVec.Health.indexed",
+            "Compare to expected packet count",
+            "Alert if indexing <50% (flag as P0 blocker)",
+            "Log indexing rate (points/sec)"
+          ]
+        },
+        {
+          "id": "D4",
+          "title": "Create error-fixing playbook (per-cluster)",
+          "description": "Playbook: Fix strategy for each high-priority cluster",
+          "owner": "engineer",
+          "priority": "P1",
+          "estimatedMinutes": 25,
+          "blocking": ["D5"],
+          "status": "todo",
+          "dependencies": ["D2"],
+          "output": "docs/reports/error-fixing-playbook.md",
+          "checklist": [
+            "Template: '## Cluster {x},{y} ({error_count} errors)'",
+            "For each error: category, severity, dominant fixer type",
+            "Suggested command: apply-error-fixes.mjs --cluster {x},{y}",
+            "Expected outcome: error_count → {expected_fixed_count}",
+            "Confidence score and risk assessment"
+          ]
+        },
+        {
+          "id": "D5",
+          "title": "Execute P0 error fixes (first hotspot)",
+          "description": "Dry-run then apply fixes to highest-priority cluster",
+          "script": "node scripts/atlas/apply-error-fixes.mjs --cluster {x},{y} --dry-run",
+          "owner": "engineer",
+          "priority": "P0",
+          "estimatedMinutes": 30,
+          "blocking": ["D6"],
+          "status": "todo",
+          "dependencies": ["D4"],
+          "checklist": [
+            "Identify P0 hotspot cluster from D2 kanban",
+            "Dry-run: preview changes (no apply)",
+            "Review changes: >80% confidence?",
+            "Apply: node scripts/atlas/apply-error-fixes.mjs --cluster {x},{y} --apply",
+            "Log: fixed_count, failed_count, regressions"
+          ]
+        },
+        {
+          "id": "D6",
+          "title": "Validate fixes (regression test)",
+          "description": "Verify error count decreased, no new errors introduced",
+          "script": "node scripts/atlas/verify-error-fixes.mjs --post-fix",
+          "owner": "qa",
+          "priority": "P0",
+          "estimatedMinutes": 20,
+          "blocking": [],
+          "status": "todo",
+          "dependencies": ["D5"],
+          "gateConditions": [
+            "error_count decreased ≥10%",
+            "new_errors < 5 (or 0)",
+            "fix_confidence > 0.85",
+            "all_categories verified"
+          ],
+          "checklist": [
+            "Run verify script post-fix",
+            "Check: error_count pre vs. post",
+            "Check: regression count (new errors)",
+            "Check: fix confidence per category",
+            "Output: pass/fail gate result"
+          ]
+        }
+      ]
+    },
+    "E": {
+      "name": "Performance Validation",
+      "status": "ready",
+      "estimatedMinutes": 60,
+      "tasks": [
+        {
+          "id": "E1",
+          "title": "Benchmark: Qdrant-only vs. cluster-aware retrieval",
+          "description": "100 queries from different SOM cells, compare latency + relevance",
+          "owner": "qa",
+          "priority": "P0",
+          "estimatedMinutes": 25,
+          "blocking": ["E2"],
+          "status": "todo",
+          "dependencies": ["B5"],
+          "output": "docs/reports/cluster-aware-retrieval-benchmark.json",
+          "metrics": [
+            "Qdrant ANN latency (baseline)",
+            "Cluster-aware ANN latency (with pre-filter)",
+            "Cache hit rate (bifrost cell vs. full corpus)",
+            "Relevance (MRR top-10)",
+            "Speedup factor"
+          ],
+          "checklist": [
+            "Generate 100 test queries from diverse SOM cells",
+            "Run baseline (Qdrant only)",
+            "Run cluster-aware (Bifrost + pre-filter)",
+            "Measure: latency, hit rate, MRR",
+            "Compare and report improvement %"
+          ]
+        },
+        {
+          "id": "E2",
+          "title": "Benchmark: Cluster summary injection (Gemma4)",
+          "description": "With/without cluster summary: token count, response time, quality",
+          "owner": "qa",
+          "priority": "P0",
+          "estimatedMinutes": 20,
+          "blocking": ["E3"],
+          "status": "todo",
+          "dependencies": ["C4"],
+          "output": "docs/reports/cluster-summary-injection-benchmark.json",
+          "metrics": [
+            "Token count (with vs. without)",
+            "Response time (Gemma4 latency)",
+            "Human quality assessment (3-point scale)",
+            "Relevance improvement"
+          ],
+          "checklist": [
+            "50 test queries with cluster summary",
+            "50 control queries without summary",
+            "Measure token usage (system prompt + response)",
+            "Measure time-to-first-token + total time",
+            "Human review: quality improvement?"
+          ]
+        },
+        {
+          "id": "E3",
+          "title": "Error fixing time-to-resolution analysis",
+          "description": "Analyze P0 cluster fix: time, confidence, regression rate",
+          "owner": "automation",
+          "priority": "P1",
+          "estimatedMinutes": 15,
+          "blocking": ["E4"],
+          "status": "todo",
+          "dependencies": ["D6"],
+          "output": "docs/reports/error-fixing-performance.json",
+          "checklist": [
+            "Extract metrics: D5 duration, fix_count, confidence scores",
+            "Compare with baseline (no cluster prioritization)",
+            "Calculate: time-to-resolve, throughput (errors/min)",
+            "Assess regression rate vs. confidence",
+            "Output: improvement % over baseline"
+          ]
+        },
+        {
+          "id": "E4",
+          "title": "Sign-off: Cluster-aware graphify production-ready",
+          "description": "Final checklist: all 22 tasks done, benchmarks pass, no regressions",
+          "owner": "operator",
+          "priority": "P0",
+          "estimatedMinutes": 10,
+          "blocking": [],
+          "status": "todo",
+          "dependencies": ["E1", "E2", "E3"],
+          "output": "docs/reports/graphify-cluster-aware-production-ready.md",
+          "gateConditions": [
+            "All 22 tasks completed (checkmark)",
+            "E1: Retrieval speedup ≥2× on cache hits",
+            "E2: Token savings ≥2% (cluster summary injected)",
+            "E3: Error fixing ≥4× faster (with clustering)",
+            "D6: No regressions (new errors <5%)"
+          ],
+          "checklist": [
+            "Review all task completions",
+            "Verify all benchmark outputs exist",
+            "Check gate conditions (all PASS)",
+            "Document any known limitations",
+            "Approve for production deployment"
+          ]
+        }
+      ]
+    }
+  },
+  "dependencies": {
+    "A1": [],
+    "A2": [],
+    "A3": [],
+    "B1": ["A1"],
+    "B2": ["A2", "B1"],
+    "B3": ["A1", "B1"],
+    "B4": ["A3", "B3"],
+    "B5": ["B1", "B2", "B3", "B4"],
+    "C1": ["A1"],
+    "C2": ["C1", "A1"],
+    "C3": ["B4", "C2"],
+    "C4": ["C3"],
+    "D1": ["B4"],
+    "D2": ["D1", "C2"],
+    "D3": ["B2"],
+    "D4": ["D2"],
+    "D5": ["D4"],
+    "D6": ["D5"],
+    "E1": ["B5"],
+    "E2": ["C4"],
+    "E3": ["D6"],
+    "E4": ["E1", "E2", "E3"]
+  },
+  "criticalPathAnalysis": {
+    "path": ["A1", "A2", "A3", "B1", "B2", "B5", "C2", "C4", "D1", "D2", "D5", "D6", "E1", "E2", "E3", "E4"],
+    "totalMinutes": 545,
+    "canParallelize": {
+      "A": "all 3 in parallel (30 min)",
+      "B": "B3 parallel to B1-B2 (then B4 sequential)",
+      "C": "C1 parallel to B2 (then C2 sequential)",
+      "D": "D1 + D3 parallel to C2 (then D2-D5-D6 sequential)",
+      "E": "E1 + E2 sequential, E3 parallel to E2"
+    },
+    "parallelEstimate": "8-10 hours with 2-3 parallel workers"
+  },
+  "riskMitigation": {
+    "turbovecLoadFailure": {
+      "description": "TurboVec gRPC load fails mid-pipeline",
+      "mitigation": "Graceful fallback: skip TurboVec, continue to rank_signals. Log error, flag for manual review. Retry TurboVec load as standalone script later.",
+      "task": "B2"
+    },
+    "somCellPrefilterRecall": {
+      "description": "SOM cell pre-filter too narrow, reduces recall",
+      "mitigation": "Include neighbors (3-cell expansion). Measure MRR before/after; alert if <5% improvement. Fall back to full Qdrant if cluster-only <top-10 results.",
+      "task": "B4"
+    },
+    "gemma4SummariesTooSlow": {
+      "description": "Cluster summaries take >1 hour",
+      "mitigation": "Pre-generate offline (background process). Use cached summaries if fresh (<24h). Batch in smaller groups (50 clusters at a time).",
+      "task": "C2"
+    },
+    "errorFixingRegressions": {
+      "description": "Error fixing introduces new errors",
+      "mitigation": "Always dry-run first. Verify gate: error_count ≥10%, new_errors <5%. Rollback script: git checkout HEAD~1 && revert-fixes.mjs",
+      "task": "D5"
+    }
+  },
+  "successCriteria": {
+    "technical": [
+      {
+        "gate": "TurboVec indexed",
+        "target": ">10K vectors",
+        "current": "0 (pending B2)",
+        "task": "B2"
+      },
+      {
+        "gate": "Bifrost cell hit rate",
+        "target": "≥50% of L2 hits",
+        "current": "0% (new feature)",
+        "task": "B4"
+      },
+      {
+        "gate": "Cluster summary injection",
+        "target": "System prompt <300 tokens",
+        "current": "TBD",
+        "task": "C3"
+      },
+      {
+        "gate": "Error hotspot detection",
+        "target": "≥3 clusters >2σ",
+        "current": "TBD",
+        "task": "D1"
+      },
+      {
+        "gate": "Error fix success",
+        "target": "≥80% confidence",
+        "current": "TBD",
+        "task": "D5"
+      },
+      {
+        "gate": "No regression",
+        "target": "New errors <5% baseline",
+        "current": "TBD",
+        "task": "D6"
+      }
+    ],
+    "performance": [
+      {
+        "metric": "Bifrost L2 hit latency",
+        "baseline": "2–5s",
+        "target": "50–150ms",
+        "improvement": "20–100×",
+        "task": "E1"
+      },
+      {
+        "metric": "Query-within-cluster latency",
+        "baseline": "N/A",
+        "target": "<500ms",
+        "improvement": "N/A",
+        "task": "E1"
+      },
+      {
+        "metric": "Gemma4 token budget saved",
+        "baseline": "~8K tokens",
+        "target": "~7.8K tokens",
+        "improvement": "2–3%",
+        "task": "E2"
+      },
+      {
+        "metric": "Error fixing throughput",
+        "baseline": "5 errors/min",
+        "target": "20 errors/min",
+        "improvement": "4×",
+        "task": "E3"
+      }
+    ]
+  }
+}

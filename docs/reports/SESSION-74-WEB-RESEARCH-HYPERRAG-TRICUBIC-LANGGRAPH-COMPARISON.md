@@ -1,7 +1,7 @@
 # Session 74 Extended — Web Research: HyperRAG vs Tricubic Search vs LangGraph Deep Agents
 
-**Date**: 2026-06-23T23:45:00Z  
-**Research Focus**: How tricubic search compares to modern HyperRAG (2026), and how to wire LangGraph Deep Agents as subagents for local deep research  
+**Date**: 2026-06-23T23:45:00Z
+**Research Focus**: How tricubic search compares to modern HyperRAG (2026), and how to wire LangGraph Deep Agents as subagents for local deep research
 **Status**: Research + Analysis Complete
 
 ---
@@ -43,9 +43,9 @@ Query → N-ary hypergraph encoding (entities + higher-order relations)
 - More efficient than binary graphs for complex queries
 
 **Relation to Our Stack**:
-✅ **We already do this**: Neo4j topology + k-hop expansion (Y-axis in 4D manifold)  
-✅ **We already do this**: Qdrant ANN retrieval (X-axis in 4D manifold)  
-⚠️ **We could improve**: HyperRetriever learns structural chains; our chains are static Cypher  
+✅ **We already do this**: Neo4j topology + k-hop expansion (Y-axis in 4D manifold)
+✅ **We already do this**: Qdrant ANN retrieval (X-axis in 4D manifold)
+⚠️ **We could improve**: HyperRetriever learns structural chains; our chains are static Cypher
 
 ---
 
@@ -224,10 +224,10 @@ Query → 7-node pipeline → Output JSON
 **What Deep Agents Do** (Multi-agent, context-isolated):
 ```
 Main Agent: "Index the codebase"
-  ├─ Subagent 1: Scan directory structure (Ollama gemma4)
-  ├─ Subagent 2: Extract features per file (Ollama gemma4)
-  ├─ Subagent 3: Build graph topology (Ollama gemma4)
-  └─ Subagent 4: Synthesize summary (Ollama gemma4)
+  ├─ Subagent 1: Scan directory structure llama-server.exe gemma4)
+  ├─ Subagent 2: Extract features per file (llama-server.exe gemma4)
+  ├─ Subagent 3: Build graph topology (llama-server.exe gemma4)
+  └─ Subagent 4: Synthesize summary (llama-server.exe gemma4)
 
 Main Agent: Reads 4 summaries, writes final context
 ```
@@ -242,7 +242,7 @@ import { createAgent } from 'deepagents';
 // Each "stage" becomes a subagent
 const stage1 = createAgent({
   name: 'audit-coverage-agent',
-  model: 'ollama:gemma4-rotorquant:latest',  // Local Gemma4
+  model: 'llama-server.exe:rotorquant.gguf',  // Local Gemma4
   tools: ['db.query', 'qdrant.search', 'neo4j.run'],
   instructions: 'Audit signal-density gaps across Qdrant, Neo4j, Postgres',
   fileSystem: '/tmp/atlas-audit'  // Persistent state
@@ -250,7 +250,7 @@ const stage1 = createAgent({
 
 const stage2 = createAgent({
   name: 'feature-extract-agent',
-  model: 'ollama:gemma4-rotorquant:latest',
+  model: 'llama-server.exe:rotorquant.gguf',  // Local Gemma4
   tools: ['db.update', 'ast.parse', 'feature.assign'],
   instructions: 'Assign feature_id to packets missing it using heuristics'
 });

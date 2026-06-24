@@ -123,3 +123,27 @@ The repo already has the raw pieces:
 - `kag_dag_runs` / `kag_dag_nodes` / `kag_dag_edges` for DAG execution
 
 This layer compresses those into a packet-and-hit shape that is cheap to replay and easy to join.
+
+---
+
+## Session 75 Append — Parent Atlas Canonical File Registry Integration
+
+**Temporal anchor**: 2026-06-23, Session 75
+
+**Previous state** (Session 74 end): Comprehensive audit complete—identity spine frozen, 4D axes verified, KAG foundation built, P4 Neo4j redesign queued. P0 ✅ | P1 ✅ | P2 ✅ | P3 ✅ (2,488 packets linked via JOIN repair) | P3g 🟡 (33.2% embedded).
+
+**Session 75 pivot**: 600K files identified in repository with unknown classification (authoritative/generated/mirror/stale/worktree). Critical blocker discovered: agentic loops cannot reliably know which script owns which collection without canonical file registry. **Prior approach (MapReduce 17,995 packets, AE training 768→64, TurboVec integration, repo pruning) deferred.** Session 75 deliverable locked: **atlas-function-registry.json, atlas-data-registry.json, atlas-join-contract.json.**
+
+**File registry scope**: 4-stage implementation (Inventory 4h + Linkage 6h + Analysis 4h + Generation 2h = 16 hours total).
+- Stage 1: rg scan authoritative dirs (src/, scripts/, drizzle/, packages/, docs/, tests/) + classify by pattern
+- Stage 2: Link canonical_file_registry rows to atlas_packets via source_ref
+- Stage 3: Export detection, stale patterns, service classification (auth/topology/embedding/neo4j/postgres/redis/rag/kag/ui/gpu)
+- Stage 4: Generate registry JSON + system map JSON + readiness report
+
+**Expected findings**: 5K authoritative (0.8%) | 45K generated (7.5%) | 392K mirror (65%) | 123 stale (<1%) | 437K safe-to-delete (73%).
+
+**Canonical registry feeds into**: atlas-function-registry (script → service → inputs/outputs), atlas-data-registry (table → collection → owner → join keys), atlas-join-contract (complete ownership chains script → postgres → qdrant → neo4j → redis).
+
+**NES Chrom Packet integration point**: Once canonical registry is live, packet provenance audits can leverage `atlas_functions.source_script` and `atlas_data.canonical_owner` to validate packet lineage spans known-authoritative files only. Prevents orphaned packets and invalid joins.
+
+**KAG DAG integration point**: DAG node dependencies can be cross-checked against `atlas_join_contract` to ensure all upstream data sources are canonical before materialization.

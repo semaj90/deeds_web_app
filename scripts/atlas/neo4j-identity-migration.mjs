@@ -38,8 +38,9 @@ async function main() {
   try {
     // Pre-flight check
     console.log('\n📋 Pre-flight checks...');
-    const dbVersion = await session.run('RETURN apoc.version.core() AS version');
-    console.log(`✅ Neo4j is reachable. APOC available: ${dbVersion.records[0]?.get('version') ? 'YES' : 'NO'}`);
+    const dbVersionCheck = await session.run('CALL dbms.components() YIELD name, versions RETURN name, versions');
+    const isNeo4jReachable = dbVersionCheck.records.length > 0;
+    console.log(`✅ Neo4j is reachable: ${isNeo4jReachable ? 'YES' : 'NO'}`);
 
     // Audit current state
     console.log('\n📊 Current Neo4j state (before migration)...');
@@ -128,9 +129,6 @@ async function executePhase1(session) {
       name: 'ContextTree nodes',
       cypher: `
         MATCH (t:DocumentNode) WHERE t.depth > 0 LIMIT 10
-        RETURN t
-      `,
-      create: `
         CREATE (ct:ContextTree {
           tree_id: 'tree:' + t.id,
           directory_path: COALESCE(t.path, 'root'),
@@ -145,10 +143,7 @@ async function executePhase1(session) {
     {
       name: 'Feature nodes',
       cypher: `
-        MATCH (f:Feature) WHERE exists(f.feature_id)
-        RETURN f
-      `,
-      create: `
+        MATCH (f:Feature) WHERE f.feature_id IS NOT NULL
         CREATE (feat:Feature {
           feature_id: f.feature_id,
           feature_label: COALESCE(f.label, 'unknown'),
@@ -165,10 +160,7 @@ async function executePhase1(session) {
       cypher: `
         UNWIND range(0, 19) AS x
         UNWIND range(0, 19) AS y
-        RETURN x, y, (x * 20 + y) AS som_cluster
-      `,
-      create: `
-        WITH x, y, som_cluster,
+        WITH x, y, (x * 20 + y) AS som_cluster,
              [n IN [
                {dx: -1, dy: -1}, {dx: -1, dy: 0}, {dx: -1, dy: 1},
                {dx:  0, dy: -1},                  {dx:  0, dy: 1},
@@ -194,7 +186,7 @@ async function executePhase1(session) {
   for (const step of queries) {
     console.log(`   • ${step.name}...`);
     try {
-      const result = await session.run(step.create);
+      const result = await session.run(step.cypher);
       const created = result.records[0]?.get('created')?.toNumber?.() || 0;
       console.log(`     ✅ Created ${created} nodes`);
     } catch (e) {

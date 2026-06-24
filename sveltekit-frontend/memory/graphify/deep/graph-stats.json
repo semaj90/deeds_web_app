@@ -1,29 +1,29 @@
 {
-  "generatedAt": "2026-06-23T21:15:22.328Z",
-  "nodeCount": 67989,
-  "edgeCount": 157194,
+  "generatedAt": "2026-06-24T03:11:02.970Z",
+  "nodeCount": 68013,
+  "edgeCount": 157271,
   "resolvedEdges": 22503,
   "unresolvedEdges": 10534,
-  "externalEdges": 122626,
+  "externalEdges": 122703,
   "edgeTypeBreakdown": {
-    "imports_static": 109376,
+    "imports_static": 109441,
     "imports_dynamic": 6550,
     "redis_dependency": 7099,
     "test_covers_file": 19923,
-    "neo4j_dependency": 2148,
+    "neo4j_dependency": 2158,
     "db_dependency": 1204,
-    "qdrant_dependency": 4559,
+    "qdrant_dependency": 4561,
     "exports_from": 2714,
     "env_dependency": 1775,
     "mcp_tool_calls": 1840,
     "svelte_route_uses_loader": 6
   },
   "zoneBreakdown": {
-    "shared": 54946,
+    "shared": 54954,
     "types": 1185,
     "config": 124,
     "test": 6621,
-    "script": 5113
+    "script": 5129
   },
   "hotspotCount": 50,
   "routeCount": 50,

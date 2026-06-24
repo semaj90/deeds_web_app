@@ -1,5 +1,5 @@
 {
-  "audit_date": "2026-06-23T20:46:08.043Z",
+  "audit_date": "2026-06-24T05:08:30.540Z",
   "fields": {
     "source_ref": {
       "exists_in": {
@@ -9,10 +9,9 @@
           "type": "text"
         },
         "qdrant": {
-          "collection": "codebase_chunks_768",
+          "collection": "parent_atlas_rg_packets_768",
           "field": "source_ref",
-          "type": "payload_key",
-          "in_sample": true
+          "type": "keyword"
         },
         "neo4j": [
           {
@@ -239,10 +238,9 @@
           "type": "text"
         },
         "qdrant": {
-          "collection": "codebase_chunks_768",
+          "collection": "parent_atlas_rg_packets_768",
           "field": "feature_id",
-          "type": "payload_key",
-          "in_sample": true
+          "type": "keyword"
         },
         "neo4j": [
           {
@@ -2828,36 +2826,10 @@
     "qdrant": {
       "status": "complete",
       "collections": {
-        "task_semantic_packets": {
-          "payload_schema": {
-            "feature_id": {
-              "data_type": "keyword",
-              "points": 0
-            }
-          }
-        },
-        "phase89_error_chunks": {
+        "legal_cases": {
           "payload_schema": {}
         },
         "external_error_fixes": {
-          "payload_schema": {}
-        },
-        "embedding_cache": {
-          "payload_schema": {}
-        },
-        "audio_segments": {
-          "payload_schema": {}
-        },
-        "error_embeddings": {
-          "payload_schema": {}
-        },
-        "parents_atlas_chunks": {
-          "payload_schema": {}
-        },
-        "documents_atlas_768": {
-          "payload_schema": {}
-        },
-        "external_api_examples": {
           "payload_schema": {}
         },
         "codebase_chunks_768_repair_tmp": {
@@ -2866,28 +2838,149 @@
         "external_programming_docs_64d": {
           "payload_schema": {}
         },
-        "phase90_error_clusters": {
+        "error_embeddings": {
           "payload_schema": {}
         },
-        "code_llm_outputs": {
+        "synthesis_memory_768": {
           "payload_schema": {}
         },
-        "phase90_error_cards": {
+        "legal_canon_chunks": {
           "payload_schema": {}
         },
-        "chunks_web_search": {
+        "codebase_topology_128": {
+          "payload_schema": {}
+        },
+        "feature_maps": {
+          "payload_schema": {}
+        },
+        "audio_segments": {
+          "payload_schema": {}
+        },
+        "chat_documents": {
           "payload_schema": {}
         },
         "qdrant_docs": {
           "payload_schema": {}
         },
-        "legal_cases": {
+        "chat_messages": {
+          "payload_schema": {}
+        },
+        "feature_registry_768": {
+          "payload_schema": {}
+        },
+        "summary_cards_768": {
+          "payload_schema": {}
+        },
+        "documents_atlas_768": {
+          "payload_schema": {}
+        },
+        "poi_profiles": {
+          "payload_schema": {}
+        },
+        "document_tags": {
+          "payload_schema": {}
+        },
+        "topic_clusters": {
+          "payload_schema": {}
+        },
+        "research_memory_768": {
+          "payload_schema": {}
+        },
+        "external_programming_docs_768": {
+          "payload_schema": {}
+        },
+        "codebase_topology_64": {
+          "payload_schema": {}
+        },
+        "codebase_chunks_768": {
+          "payload_schema": {
+            "feature_ids": {
+              "data_type": "keyword",
+              "points": 52063
+            },
+            "sourceRef": {
+              "data_type": "keyword",
+              "points": 52455
+            },
+            "som_cluster": {
+              "data_type": "integer",
+              "points": 28001
+            },
+            "feature_id": {
+              "data_type": "keyword",
+              "points": 46416
+            },
+            "trace_id": {
+              "data_type": "keyword",
+              "points": 0
+            },
+            "source_ref": {
+              "data_type": "keyword",
+              "points": 40648
+            }
+          }
+        },
+        "cluster_narratives": {
+          "payload_schema": {}
+        },
+        "codebase_chunks_10m": {
+          "payload_schema": {}
+        },
+        "llm_response_cache": {
+          "payload_schema": {}
+        },
+        "atlas_component_profiles_768": {
+          "payload_schema": {}
+        },
+        "parents_atlas_chunks": {
+          "payload_schema": {}
+        },
+        "phase89_error_chunks": {
+          "payload_schema": {}
+        },
+        "phase76_knowledge_base": {
+          "payload_schema": {}
+        },
+        "codebase_chunks_encoded64": {
           "payload_schema": {}
         },
         "glyph_atlas": {
           "payload_schema": {}
         },
-        "evidence_items": {
+        "scenario_cache": {
+          "payload_schema": {}
+        },
+        "legal_glossary": {
+          "payload_schema": {}
+        },
+        "opencode_cards_768": {
+          "payload_schema": {}
+        },
+        "evidence_vectors": {
+          "payload_schema": {}
+        },
+        "BifrostSemanticCachePlugin": {
+          "payload_schema": {}
+        },
+        "phase90_error_cards": {
+          "payload_schema": {}
+        },
+        "task_distillates": {
+          "payload_schema": {}
+        },
+        "knowledge_base": {
+          "payload_schema": {}
+        },
+        "diagnosis_embeddings": {
+          "payload_schema": {}
+        },
+        "document_knowledge_768": {
+          "payload_schema": {}
+        },
+        "llm_wiki_chunks": {
+          "payload_schema": {}
+        },
+        "legal_documents": {
           "payload_schema": {}
         },
         "codebase_chunks_64d": {
@@ -2896,25 +2989,33 @@
         "scenarios": {
           "payload_schema": {}
         },
-        "synthesis_memory_768": {
+        "parent_atlas_feature_commands_768": {
           "payload_schema": {}
         },
         "agent_memory_observations": {
           "payload_schema": {}
         },
-        "research_memory_768": {
+        "embedding_cache": {
           "payload_schema": {}
         },
-        "summary_cards_768": {
+        "chunks_web_search": {
           "payload_schema": {}
         },
-        "scenario_cache": {
+        "external_api_examples": {
           "payload_schema": {}
         },
-        "external_programming_docs_768": {
+        "summary_lenses_768": {
           "payload_schema": {}
         },
-        "chat_messages": {
+        "task_semantic_packets": {
+          "payload_schema": {
+            "feature_id": {
+              "data_type": "keyword",
+              "points": 0
+            }
+          }
+        },
+        "phase90_error_clusters": {
           "payload_schema": {}
         },
         "parent_atlas_rg_packets_768": {
@@ -2929,13 +3030,13 @@
             }
           }
         },
-        "codebase_topology_128": {
+        "kb_notecards": {
           "payload_schema": {}
         },
-        "task_distillates": {
+        "evidence_items": {
           "payload_schema": {}
         },
-        "opencode_cards_768": {
+        "code_llm_outputs": {
           "payload_schema": {}
         },
         "court_opinions": {
@@ -2944,110 +3045,7 @@
         "case_chunks": {
           "payload_schema": {}
         },
-        "evidence_vectors": {
-          "payload_schema": {}
-        },
-        "feature_maps": {
-          "payload_schema": {}
-        },
-        "legal_canon_chunks": {
-          "payload_schema": {}
-        },
-        "llm_response_cache": {
-          "payload_schema": {}
-        },
-        "cluster_narratives": {
-          "payload_schema": {}
-        },
-        "summary_lenses_768": {
-          "payload_schema": {}
-        },
-        "BifrostSemanticCachePlugin": {
-          "payload_schema": {}
-        },
-        "document_knowledge_768": {
-          "payload_schema": {}
-        },
-        "feature_registry_768": {
-          "payload_schema": {}
-        },
-        "chat_documents": {
-          "payload_schema": {}
-        },
-        "poi_profiles": {
-          "payload_schema": {}
-        },
-        "kb_notecards": {
-          "payload_schema": {}
-        },
-        "codebase_topology_64": {
-          "payload_schema": {}
-        },
-        "codebase_chunks_encoded64": {
-          "payload_schema": {}
-        },
-        "legal_glossary": {
-          "payload_schema": {}
-        },
-        "atlas_component_profiles_768": {
-          "payload_schema": {}
-        },
-        "llm_wiki_chunks": {
-          "payload_schema": {}
-        },
-        "legal_documents": {
-          "payload_schema": {}
-        },
-        "topic_clusters": {
-          "payload_schema": {}
-        },
         "fictional_case_chunks": {
-          "payload_schema": {}
-        },
-        "knowledge_base": {
-          "payload_schema": {}
-        },
-        "diagnosis_embeddings": {
-          "payload_schema": {}
-        },
-        "phase76_knowledge_base": {
-          "payload_schema": {}
-        },
-        "parent_atlas_feature_commands_768": {
-          "payload_schema": {}
-        },
-        "codebase_chunks_768": {
-          "payload_schema": {
-            "feature_ids": {
-              "data_type": "keyword",
-              "points": 52063
-            },
-            "source_ref": {
-              "data_type": "keyword",
-              "points": 40648
-            },
-            "sourceRef": {
-              "data_type": "keyword",
-              "points": 52455
-            },
-            "som_cluster": {
-              "data_type": "integer",
-              "points": 28001
-            },
-            "trace_id": {
-              "data_type": "keyword",
-              "points": 0
-            },
-            "feature_id": {
-              "data_type": "keyword",
-              "points": 46416
-            }
-          }
-        },
-        "codebase_chunks_10m": {
-          "payload_schema": {}
-        },
-        "document_tags": {
           "payload_schema": {}
         }
       }

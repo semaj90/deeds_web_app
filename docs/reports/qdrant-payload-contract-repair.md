@@ -1,7 +1,7 @@
 # Qdrant Payload Contract Repair
 
-**Timestamp**: 2026-06-14T21:01:36.122Z
-**Mode**: APPLY
+**Timestamp**: 2026-06-24T04:50:07.687Z
+**Mode**: DRY_RUN
 **Status**: WARN
 
 ## Collection
@@ -21,7 +21,7 @@
 
 **Status**: ok
 - sampled: 200
-- coverage: {"packet_key":179,"source_ref":200,"feature_id":200,"lineage_version":200}...
+- coverage: {"packet_key":183,"source_ref":200,"feature_id":171,"lineage_version":200}...
 
 
 ### 3. build_candidates
@@ -33,7 +33,7 @@
 ### 4. match_candidates
 
 **Status**: ok
-- matched: 161
+- matched: 160
 - no_source_ref: 0
 - ambiguous: 16
 - mismatches: [{"point_id":1937330,"source_ref":"sveltekit-frontend/src/routes/api/synthesis/generate/+server.ts",...
@@ -42,15 +42,9 @@
 ### 5. apply_repairs
 
 **Status**: ok
-- mode: APPLY
-- applied_count: 161
+- mode: DRY_RUN
+- applied_count: 160
 - failure_count: 0
-
-
-### 6. verify_repairs
-
-**Status**: ok
-- coverage_after: {"packet_key":179,"source_ref":200,"feature_id":200,"lineage_version":200}...
 
 
 ## Pass Condition

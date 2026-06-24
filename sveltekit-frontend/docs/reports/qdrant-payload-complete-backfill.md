@@ -1,6 +1,6 @@
 # Qdrant Payload Complete Backfill
 
-Generated: 2026-06-21T22:11:16.157Z
+Generated: 2026-06-24T05:35:45.268Z
 Mode: apply
 Collection: codebase_chunks_768
 Database: postgresql://legal_admin:***@127.0.0.1:5434/legal_ai_db
@@ -8,17 +8,17 @@ Ledgers: atlas_codebase_packets, atlas_feature_packets, atlas_packets, task_sema
 
 ## Summary
 
-- Postgres rows scanned: 41179
+- Postgres rows scanned: 41189
 - Postgres rows matched: 39754
-- Rows updated: 51641
-- Rows already canonical: 688
+- Rows updated: 14950
+- Rows already canonical: 37379
 - Rows skipped: 12852
 - Rows ambiguous: 277
 - Rows unmatched: 12575
 - Qdrant points scanned: 52606
 - Qdrant points matched: 39754
-- Qdrant points updated: 51641
-- Qdrant points already canonical: 688
+- Qdrant points updated: 14950
+- Qdrant points already canonical: 37379
 - Qdrant points legacy only: 12575
 
 ## Canonical Coverage

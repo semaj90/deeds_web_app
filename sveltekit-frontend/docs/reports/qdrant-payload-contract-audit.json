@@ -1,82 +1,82 @@
 {
-  "generatedAt": "2026-06-14T15:42:00.719Z",
+  "generatedAt": "2026-06-24T05:37:09.387Z",
   "collection": "codebase_chunks_768",
   "url": "http://localhost:6333",
   "mode": "sample",
   "sampleSize": 500,
   "fields": {
     "feature_id": {
-      "present": 477,
+      "present": 438,
       "missing": 0,
-      "null": 23,
+      "null": 62,
       "total": 500,
-      "percent": 95.4,
+      "percent": 87.6,
       "required": true,
       "threshold": 100,
       "pass": false
     },
     "source_ref": {
-      "present": 480,
+      "present": 500,
       "missing": 0,
-      "null": 20,
+      "null": 0,
       "total": 500,
-      "percent": 96,
+      "percent": 100,
       "required": true,
       "threshold": 100,
-      "pass": false
+      "pass": true
     },
     "packet_key": {
-      "present": 244,
+      "present": 455,
       "missing": 0,
-      "null": 256,
+      "null": 45,
       "total": 500,
-      "percent": 48.8,
+      "percent": 91,
       "required": true,
       "threshold": 100,
       "pass": false
     },
     "feature_label": {
-      "present": 231,
+      "present": 500,
       "missing": 0,
-      "null": 269,
+      "null": 0,
       "total": 500,
-      "percent": 46.2,
+      "percent": 100,
       "required": false,
       "threshold": 80,
-      "pass": false
+      "pass": true
     },
     "file_path": {
-      "present": 479,
+      "present": 500,
       "missing": 0,
-      "null": 21,
+      "null": 0,
       "total": 500,
-      "percent": 95.8,
+      "percent": 100,
       "required": false,
       "threshold": 80,
       "pass": true
     },
     "cluster_id": {
-      "present": 254,
+      "present": 498,
       "missing": 0,
-      "null": 246,
+      "null": 2,
       "total": 500,
-      "percent": 50.8,
+      "percent": 99.6,
       "required": false,
       "threshold": 80,
-      "pass": false
+      "pass": true
     },
     "domain_class": {
-      "present": 1,
+      "present": 455,
       "missing": 0,
-      "null": 499,
+      "null": 45,
       "total": 500,
-      "percent": 0.2,
+      "percent": 91,
       "required": false,
       "threshold": 80,
-      "pass": false
+      "pass": true
     }
   },
   "pointsScanned": 500,
-  "totalPoints": 54898,
+  "totalPoints": 58282,
   "gate": "FAIL"
 }

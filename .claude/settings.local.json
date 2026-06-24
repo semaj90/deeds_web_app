@@ -563,7 +563,10 @@
       "Bash(DATABASE_URL=\"postgresql://legal_admin:123456@127.0.0.1:5434/legal_ai_db\" OLLAMA_URL=\"http://127.0.0.1:11434\" QDRANT_URL=\"http://127.0.0.1:6333\" node scripts/atlas/backfill-packets-to-qdrant-ollama.mjs --dry-run --limit 10)",
       "Bash(DATABASE_URL=\"postgresql://legal_admin:123456@127.0.0.1:5434/legal_ai_db\" OLLAMA_URL=\"http://127.0.0.1:11434\" QDRANT_URL=\"http://127.0.0.1:6333\" timeout 180 node scripts/atlas/backfill-packets-to-qdrant-ollama.mjs --apply --limit 100 --batch=25)",
       "Read(//c/Users/james/.claude/projects/c--Users-james-Videos-deeds-web-app/memory/**)",
-      "Bash(cd c:\\\\\\\\Users\\\\\\\\james\\\\\\\\Videos\\\\\\\\deeds-web-app)"
+      "Bash(cd c:\\\\\\\\Users\\\\\\\\james\\\\\\\\Videos\\\\\\\\deeds-web-app)",
+      "Bash(REDIS_URL=\"redis://:redis@127.0.0.1:6379\" node scripts/atlas/graphify-cluster-sync-partition.mjs --dry-run --limit=100)",
+      "Bash(REDIS_URL=\"redis://:redis@127.0.0.1:6379\" node scripts/atlas/graphify-cluster-sync-partition.mjs --dry-run --limit=1000)",
+      "Bash(REDIS_URL=\"redis://:redis@127.0.0.1:6379\" node scripts/atlas/graphify-cluster-sync-partition.mjs --apply)"
     ],
     "deny": [],
     "ask": []

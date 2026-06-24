@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-06-14T20:56:00.498Z",
+  "timestamp": "2026-06-24T04:50:07.687Z",
   "collection": "codebase_chunks_768",
   "mode": "DRY_RUN",
   "steps": [
@@ -13,9 +13,9 @@
       "status": "ok",
       "sampled": 200,
       "coverage": {
-        "packet_key": 179,
+        "packet_key": 183,
         "source_ref": 200,
-        "feature_id": 200,
+        "feature_id": 171,
         "lineage_version": 200
       }
     },
@@ -27,7 +27,7 @@
     {
       "step": "match_candidates",
       "status": "ok",
-      "matched": 161,
+      "matched": 160,
       "no_source_ref": 0,
       "ambiguous": 16,
       "mismatches": [
@@ -49,8 +49,13 @@
           "reason": "no_postgres_candidate"
         },
         {
+          "point_id": 3459028,
+          "source_ref": "src/lib/components/ui/select/selectroot.svelte",
+          "reason": "no_postgres_candidate"
+        },
+        {
           "point_id": 3771092,
-          "source_ref": "src/lib/server/services/error-analysis/decisionengine.ts",
+          "source_ref": "sveltekit-frontend/src/lib/server/services/error-analysis/DecisionEngine.ts",
           "reason": "no_postgres_candidate"
         },
         {
@@ -72,7 +77,7 @@
         },
         {
           "point_id": 4329068,
-          "source_ref": "src/lib/components/editor/wysiwygeditor.svelte",
+          "source_ref": "sveltekit-frontend/src/lib/components/editor/WysiwygEditor.svelte",
           "reason": "no_postgres_candidate"
         },
         {
@@ -161,7 +166,7 @@
         },
         {
           "point_id": 9868627,
-          "source_ref": "src/lib/components/yorha/yorhadialog.svelte",
+          "source_ref": "sveltekit-frontend/src/lib/components/yorha/YoRHaDialog.svelte",
           "reason": "no_postgres_candidate"
         },
         {
@@ -211,7 +216,7 @@
         },
         {
           "point_id": 11711819,
-          "source_ref": "src/lib/components/legalanalysisdialog.svelte",
+          "source_ref": "sveltekit-frontend/src/lib/components/LegalAnalysisDialog.svelte",
           "reason": "no_postgres_candidate"
         },
         {
@@ -248,7 +253,7 @@
       "step": "apply_repairs",
       "status": "ok",
       "mode": "DRY_RUN",
-      "applied_count": 161,
+      "applied_count": 160,
       "failure_count": 0
     }
   ],
