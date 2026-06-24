@@ -1,0 +1,115 @@
+syntax = "proto3";
+
+package yorha.tools;
+
+option go_package = "github.com/deeds-web-app/proto/tools";
+
+// ─────────────────────────────────────────────────────────────────────────
+// ToolCallingService — gRPC boundary for LLM tool call execution.
+//
+// Replaces JSON serialization with protobuf for:
+//   - Faster (de)serialization (~3-5x vs JSON.parse for structured tool args)
+//   - Schema-enforced validation (no malformed args from LLM hallucination)
+//   - Zero-copy vector extraction from tool results (embedding arrays)
+//
+// Client: SvelteKit contextual-tools.ts → gRPC stub
+// Server: Go microservice or in-process Node handler
+// ─────────────────────────────────────────────────────────────────────────
+
+service ToolCallingService {
+  // Execute a single tool call with validated arguments
+  rpc ExecuteTool(ToolCallRequest) returns (ToolCallResponse);
+
+  // Batch execute multiple tool calls (from multi-tool LLM responses)
+  rpc ExecuteToolBatch(ToolCallBatchRequest) returns (ToolCallBatchResponse);
+
+  // Stream tool results for long-running operations (authority_drill, web_search)
+  rpc ExecuteToolStream(ToolCallRequest) returns (stream ToolCallEvent);
+
+  // Get available tool definitions (for LLM function-calling schema injection)
+  rpc ListTools(ListToolsRequest) returns (ListToolsResponse);
+}
+
+// ── Tool Definitions ──────────────────────────────────────────────────────
+
+// JSON Schema-compatible parameter definition (serialized as proto for speed)
+message ToolParameter {
+  string name = 1;               // Parameter name (e.g., "query")
+  string type = 2;               // JSON Schema type: "string", "number", "boolean"
+  string description = 3;        // Human-readable description
+  bool required = 4;             // Required parameter
+  string default_value = 5;      // Default value (as string, type-coerced by executor)
+  // Validation constraints
+  int32 min_length = 6;          // String min length
+  int32 max_length = 7;          // String max length
+  double min_value = 8;          // Numeric min
+  double max_value = 9;          // Numeric max
+  string pattern = 10;           // Regex pattern (e.g., UUID format)
+}
+
+message ToolDefinition {
+  string name = 1;               // Tool name (e.g., "glossary_search")
+  string description = 2;        // LLM-facing description
+  repeated ToolParameter parameters = 3;  // Validated parameter schema
+  int32 timeout_ms = 4;          // Execution timeout
+  string category = 5;           // "retrieval", "search", "graph", "authority"
+}
+
+// ── Request / Response ────────────────────────────────────────────────────
+
+message ToolCallRequest {
+  string request_id = 1;         // Unique request ID (for tracing)
+  string tool_name = 2;          // Tool to execute
+  map<string, string> arguments = 3;  // String-typed args (coerced by executor)
+  // Context for policy decisions
+  string case_id = 4;            // Case UUID (for case-bound tools)
+  string user_id = 5;            // User UUID (for auth/audit)
+  float retrieval_confidence = 6; // Pre-retrieval confidence (gates web_search)
+  string message = 7;            // User message (for policy inference)
+}
+
+message ToolCallResponse {
+  string request_id = 1;         // Matches request
+  bool ok = 2;                   // Execution success
+  string tool_name = 3;          // Tool that was executed
+  string result = 4;             // Formatted result text (for LLM context injection)
+  float duration_ms = 5;         // Execution time
+  // Structured metadata
+  int32 result_count = 6;        // Number of results found
+  repeated float scores = 7 [packed = true];  // Relevance scores (packed for speed)
+  map<string, string> metadata = 8;  // Additional metadata
+  string error = 9;              // Error message (if ok=false)
+}
+
+// ── Batch Operations ──────────────────────────────────────────────────────
+
+message ToolCallBatchRequest {
+  repeated ToolCallRequest calls = 1;  // Up to 3 tool calls (matches MAX_TOTAL_TOOL_CALLS)
+  bool parallel = 2;                    // Execute in parallel (default: sequential)
+}
+
+message ToolCallBatchResponse {
+  repeated ToolCallResponse results = 1;
+  float total_duration_ms = 2;
+}
+
+// ── Streaming Events ──────────────────────────────────────────────────────
+
+message ToolCallEvent {
+  string request_id = 1;
+  string event_type = 2;    // "start", "progress", "result", "error", "done"
+  string tool_name = 3;
+  string data = 4;          // Event payload (JSON or plain text)
+  float elapsed_ms = 5;
+}
+
+// ── Tool Discovery ────────────────────────────────────────────────────────
+
+message ListToolsRequest {
+  string category = 1;      // Filter by category (empty = all)
+}
+
+message ListToolsResponse {
+  repeated ToolDefinition tools = 1;
+  int32 total = 2;
+}

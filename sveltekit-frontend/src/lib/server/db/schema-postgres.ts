@@ -4917,6 +4917,28 @@ export const errorLogs = pgTable('error_logs', {
 export type ErrorLog = typeof errorLogs.$inferSelect;
 export type NewErrorLog = typeof errorLogs.$inferInsert;
 
+// === DEEP RESEARCH REPORTS ===
+export const deepResearchReports = pgTable('deep_research_reports', {
+  id: uuid('id').defaultRandom().primaryKey().notNull(),
+  userId: integer('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+  query: text('query').notNull(),
+  reportType: varchar('report_type', { length: 50 }).default('full').notNull(),
+  modelUsed: varchar('model_used', { length: 100 }).default('gemma4-rotorquant:latest'),
+  markdownContent: text('markdown_content'),
+  citations: jsonb('citations'), // Array of {num, title, url, snippet}
+  recommendations: jsonb('recommendations'), // Array of {id, title, description, action_type, confidence}
+  metadata: jsonb('metadata').default('{}'), // {pipelineHint, caseId, durationMs, provider, tags, etc}
+  createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
+  updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
+}, (table) => ({
+  userIdIdx: index('idx_deep_research_reports_user_id').on(table.userId),
+  createdAtIdx: index('idx_deep_research_reports_created_at').on(table.createdAt.desc()),
+  modelIdx: index('idx_deep_research_reports_model').on(table.modelUsed),
+}));
+
+export type DeepResearchReport = typeof deepResearchReports.$inferSelect;
+export type NewDeepResearchReport = typeof deepResearchReports.$inferInsert;
+
 export * from './schema/atlas-packets.js';
 
 

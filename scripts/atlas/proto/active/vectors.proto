@@ -1,0 +1,146 @@
+syntax = "proto3";
+
+package cyber_elephant;
+
+option go_package = "github.com/deeds-web/cyber-elephant/proto";
+
+// Document vector representation
+message DocumentVector {
+  string id = 1;
+  string title = 2;
+  string content_snippet = 3;
+  repeated float embedding = 4;
+  ProjectedPoint projected_3d = 5;
+  string document_type = 6;
+  map<string, string> metadata = 7;
+}
+
+// 3D projected point for visualization
+message ProjectedPoint {
+  float x = 1;
+  float y = 2;
+  float z = 3;
+  float confidence = 4;
+}
+
+// Cluster information
+message DocumentCluster {
+  string id = 1;
+  string name = 2;
+  ProjectedPoint centroid = 3;
+  repeated string document_ids = 4;
+  float density = 5;
+  string cluster_type = 6;
+}
+
+// Search query
+message VectorQuery {
+  string query_text = 1;
+  repeated float query_embedding = 2;
+  int32 limit = 3;
+  float threshold = 4;
+  repeated string document_types = 5;
+  map<string, string> filters = 6;
+}
+
+// Search results
+message VectorSearchResponse {
+  repeated DocumentVector documents = 1;
+  repeated DocumentCluster clusters = 2;
+  QueryStatistics stats = 3;
+  string session_id = 4;
+}
+
+// Query performance statistics
+message QueryStatistics {
+  int32 total_documents = 1;
+  int32 processed_documents = 2;
+  float processing_time_ms = 3;
+  float embedding_time_ms = 4;
+  float search_time_ms = 5;
+  string algorithm_used = 6;
+}
+
+// Bulk document processing
+message DocumentBatch {
+  repeated DocumentVector documents = 1;
+  string batch_id = 2;
+  ProcessingOptions options = 3;
+}
+
+// Processing configuration
+message ProcessingOptions {
+  bool use_gpu_acceleration = 1;
+  bool enable_clustering = 2;
+  float cluster_threshold = 3;
+  string embedding_model = 4;
+  int32 max_dimensions = 5;
+}
+
+// Health check and status
+message SystemStatus {
+  bool healthy = 1;
+  string version = 2;
+  SystemMetrics metrics = 3;
+  repeated string available_models = 4;
+  bool gpu_available = 5;
+}
+
+message SystemMetrics {
+  int32 total_documents = 1;
+  int32 active_clusters = 2;
+  float avg_query_time_ms = 3;
+  float memory_usage_mb = 4;
+  float cpu_usage_percent = 5;
+  float gpu_usage_percent = 6;
+}
+
+// Service definitions
+service CyberElephantService {
+  // Document operations
+  rpc ProcessDocuments(DocumentBatch) returns (VectorSearchResponse);
+  rpc SearchSimilar(VectorQuery) returns (VectorSearchResponse);
+  rpc GetDocumentById(DocumentIdRequest) returns (DocumentVector);
+  
+  // Clustering operations
+  rpc GetClusters(ClusterRequest) returns (ClusterResponse);
+  rpc UpdateClusters(ClusterUpdateRequest) returns (ClusterResponse);
+  
+  // System operations
+  rpc GetStatus(StatusRequest) returns (SystemStatus);
+  rpc HealthCheck(HealthRequest) returns (HealthResponse);
+}
+
+// Request/Response messages
+message DocumentIdRequest {
+  string id = 1;
+}
+
+message ClusterRequest {
+  string cluster_id = 1;
+  bool include_documents = 2;
+}
+
+message ClusterResponse {
+  repeated DocumentCluster clusters = 1;
+  QueryStatistics stats = 2;
+}
+
+message ClusterUpdateRequest {
+  string cluster_id = 1;
+  ProcessingOptions options = 2;
+}
+
+message StatusRequest {
+  bool include_metrics = 1;
+}
+
+message HealthRequest {
+  string component = 1;
+}
+
+message HealthResponse {
+  bool healthy = 1;
+  string status = 2;
+  map<string, string> details = 3;
+}

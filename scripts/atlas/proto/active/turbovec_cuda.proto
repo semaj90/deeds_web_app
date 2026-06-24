@@ -1,0 +1,127 @@
+syntax = "proto3";
+
+// DEPRECATED — use turbovec.proto (TurboVecService) and gpu_bridge.proto (GpuBridgeService).
+// This file is kept for backward compatibility with clients that load turbovec_cuda.proto directly.
+// It re-declares both services in their original combined form.
+// Do NOT add new RPCs here; add them to the appropriate split proto instead.
+
+package turbovec;
+
+service TurboVecCudaService {
+  rpc Health (HealthRequest) returns (HealthResponse);
+  rpc Search (TurboSearchRequest) returns (TurboSearchResponse);
+  rpc BatchCosine (BatchCosineRequest) returns (BatchCosineResponse);
+  rpc EncodeLatent (EncodeLatentRequest) returns (EncodeLatentResponse);
+  rpc AssignSom (AssignSomRequest) returns (AssignSomResponse);
+  rpc Transform (TransformRequest) returns (TransformResponse);
+  rpc Upsert (UpsertRequest) returns (UpsertResponse);
+}
+
+// ── Health ────────────────────────────────────────────────────────────────────
+
+message HealthRequest {}
+
+message HealthResponse {
+  bool ok = 1;
+  int32 indexed = 2;
+  int32 dim = 3;
+  int32 bits = 4;
+  string backend = 5;
+}
+
+// ── Search ────────────────────────────────────────────────────────────────────
+
+message TurboSearchRequest {
+  repeated float query_vector = 1;
+  int32 top_k = 2;
+  string transform_id = 3;  // replaces quaternion_rot — reference a stored matrix
+}
+
+message TurboSearchResponse {
+  message Candidate {
+    string id = 1;
+    float score = 2;
+    int32 cluster_id = 3;
+  }
+  repeated Candidate candidates = 1;
+  string backend = 2;
+  int32 indexed = 3;
+}
+
+// ── BatchCosine ───────────────────────────────────────────────────────────────
+
+message BatchCosineRequest {
+  repeated float query_vector = 1;
+  repeated float candidate_vectors = 2;
+  int32 candidate_count = 3;
+  int32 dim = 4;
+}
+
+message BatchCosineResponse {
+  repeated float scores = 1;
+  int32 count = 2;
+}
+
+// ── EncodeLatent ──────────────────────────────────────────────────────────────
+
+message EncodeLatentRequest {
+  repeated float vectors = 1;
+  int32 count = 2;
+  int32 in_dim = 3;
+  int32 out_dim = 4;
+}
+
+message EncodeLatentResponse {
+  repeated float encoded = 1;
+  int32 count = 2;
+  int32 out_dim = 3;
+}
+
+// ── AssignSom ─────────────────────────────────────────────────────────────────
+
+message AssignSomRequest {
+  repeated float vectors = 1;
+  int32 count = 2;
+}
+
+message AssignSomResponse {
+  repeated int32 cluster_ids = 1;
+  repeated float bmu_scores = 2;
+}
+
+// ── Transform ─────────────────────────────────────────────────────────────────
+
+message TransformRequest {
+  repeated float vectors = 1;
+  int32 count = 2;
+  int32 in_dim = 3;
+  int32 out_dim = 4;
+  string transform_id = 5;
+}
+
+message TransformResponse {
+  repeated float projected_vectors = 1;
+  int32 count = 2;
+  int32 out_dim = 3;
+}
+
+// ── Upsert ────────────────────────────────────────────────────────────────────
+
+message UpsertRecord {
+  string id = 1;
+  repeated float vector = 2;
+  string feature_id = 3;
+  int32 community_id = 4;
+  repeated string tags = 5;
+}
+
+message UpsertRequest {
+  repeated UpsertRecord records = 1;
+}
+
+message UpsertResponse {
+  int32 indexed = 1;
+  int32 inserted = 2;
+  int32 updated = 3;
+  string backend = 4;
+}

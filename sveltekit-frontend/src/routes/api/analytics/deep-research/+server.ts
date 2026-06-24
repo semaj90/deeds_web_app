@@ -30,6 +30,8 @@ import { generateDeepResearch, invalidateDeepResearchCache } from '$lib/server/a
 import { bifrostChat } from '$lib/server/ollama.js';
 import { ENV } from '$lib/server/env.server.js';
 import { startLdrResearch, searchLdrHistory } from '$lib/server/analytics/ldr-client.js';
+import { db } from '$lib/server/db/client.js';
+import { deepResearchReports } from '$lib/server/db/schema-postgres.js';
 
 // ── Schemas ────────────────────────────────────────────────────────────────
 
@@ -143,13 +145,47 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 			},
 		);
 
-		return json({
-			answer,
-			pipeline: pipelineHint ?? 'ace',
-			durationMs: Date.now() - start,
-			cached: false,
-			provider: 'gemma4-rotorquant:latest',
-		});
+		const durationMs = Date.now() - start;
+
+		// Persist report to database (non-blocking)
+		try {
+			const [savedReport] = await db
+				.insert(deepResearchReports)
+				.values({
+					userId: Number(locals.user.id),
+					query: selfPrompt,
+					reportType: 'summary',
+					modelUsed: 'gemma4-rotorquant:latest',
+					markdownContent: answer,
+					metadata: {
+						pipelineHint: pipelineHint ?? 'ace',
+						caseId,
+						durationMs,
+						provider: 'bifrost',
+					},
+				})
+				.returning();
+
+			return json({
+				answer,
+				pipeline: pipelineHint ?? 'ace',
+				durationMs,
+				cached: false,
+				provider: 'gemma4-rotorquant:latest',
+				reportId: savedReport?.id,
+			});
+		} catch (dbErr) {
+			console.warn('[deep-research] DB persistence failed:', dbErr);
+			// Still return response even if DB write fails
+			return json({
+				answer,
+				pipeline: pipelineHint ?? 'ace',
+				durationMs,
+				cached: false,
+				provider: 'gemma4-rotorquant:latest',
+				warning: 'Report not persisted to database',
+			});
+		}
 	} catch (err) {
 		return json({
 			error: 'Deep research execution failed',

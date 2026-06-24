@@ -1,0 +1,118 @@
+syntax = "proto3";
+
+package evidence;
+
+// Unified evidence metadata for efficient storage and GPU→CPU transfer
+//
+// Usage:
+//   - JSONB storage: Serialize to bytes → base64 encode → store in evidence.ai_analysis
+//   - Network transfer: gRPC embedding/analysis services
+//   - GPU transfers: FlatBuffer for zero-copy (separate schema)
+//
+// This replaces ad-hoc JSONB with versioned, typed schema
+
+message EvidenceMetadata {
+  string evidence_id = 1;
+  int32 schema_version = 2;  // Increment on breaking changes
+  int64 timestamp = 3;       // Unix milliseconds
+
+  ExtractionInfo extraction = 4;
+  repeated Entity entities = 5;
+  VLMAnalysis vlm = 6;
+  ForensicsResult forensics = 7;
+  repeated LangExtractSection sections = 8;
+  YOLODetections yolo = 9;
+  NLPClassification nlp = 10;
+  repeated string suggested_tags = 11;
+  AnalysisPipeline pipeline_stats = 12;
+}
+
+message ExtractionInfo {
+  string method = 1;          // "ocr-tesseract", "vlm-ocr-fallback", "whisper-gpu-en", etc.
+  int32 text_length = 2;
+  string language = 3;        // ISO 639-1 code (en, es, fr, ...)
+  bool ocr_fallback_used = 4;
+  ResizeMetadata resize = 5;  // Image resize info (if applicable)
+}
+
+message ResizeMetadata {
+  bool resized = 1;
+  int32 original_width = 2;
+  int32 original_height = 3;
+  int32 vlm_size = 4;  // Target edge length (e.g. 2048)
+}
+
+message Entity {
+  string type = 1;       // PERSON, DATE, MONEY, EMAIL, PHONE, CITATION, STATUTE, etc.
+  string value = 2;
+  float confidence = 3;
+  int32 start_offset = 4;
+  int32 end_offset = 5;
+  string source = 6;     // "langextract", "llm", "regex"
+}
+
+message VLMAnalysis {
+  string summary = 1;
+  repeated string key_findings = 2;
+  repeated string suggested_tags = 3;
+  string model = 4;      // "gemma4-legal-turbo3 (turboquant)", "triton/gemma_vlm_ensemble", etc.
+  bool cached = 5;
+}
+
+message ForensicsResult {
+  repeated ForensicFlag flags = 1;
+  float risk_score = 2;  // 0.0 (no risk) to 1.0 (high risk)
+}
+
+message ForensicFlag {
+  string type = 1;       // "SSN", "CC", "EMAIL", "CONTACT_DENSITY", etc.
+  string description = 2;
+  string severity = 3;   // "low", "medium", "high", "critical"
+  map<string, string> metadata = 4;  // Flexible key-value for flag-specific data
+}
+
+message LangExtractSection {
+  string section_type = 1;  // "ARTICLE", "SECTION", "PARAGRAPH", "PREAMBLE", etc.
+  float confidence = 2;
+  int32 start_offset = 3;
+  int32 end_offset = 4;
+}
+
+message YOLODetections {
+  repeated YOLOObject objects = 1;
+  YOLOLayout layout = 2;
+  string model_type = 3;  // "yolov8", "yolov10", etc.
+}
+
+message YOLOObject {
+  string class_name = 1;
+  float confidence = 2;
+  BoundingBox bbox = 3;
+}
+
+message BoundingBox {
+  float x = 1;
+  float y = 2;
+  float width = 3;
+  float height = 4;
+}
+
+message YOLOLayout {
+  repeated string detected_layout_elements = 1;  // ["text_block", "signature", "table", ...]
+}
+
+message NLPClassification {
+  string document_type = 1;    // "contract", "motion", "brief", "evidence_log", etc.
+  string practice_area = 2;    // "criminal", "civil", "family", "corporate", etc.
+  float confidence = 3;
+  repeated string key_phrases = 4;
+}
+
+message AnalysisPipeline {
+  bool llm_escalated = 1;
+  string llm_synthesis = 2;
+  int32 graph_connections_created = 3;
+  bool yolo_cache_hit = 4;
+  bool cached_to_db = 5;
+  int64 processing_time_ms = 6;
+}

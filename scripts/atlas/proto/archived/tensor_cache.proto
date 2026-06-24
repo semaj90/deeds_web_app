@@ -1,0 +1,314 @@
+syntax = "proto3";
+
+package tensor_cache;
+
+option go_package = "github.com/legal-ai/proto/tensor";
+
+// Tensor Cache Service for GPU-aware multi-tier storage
+service TensorCacheService {
+    // Store tensor with automatic LoD generation
+    rpc StoreTensor(StoreTensorRequest) returns (StoreTensorResponse);
+
+    // Retrieve tensor from multi-tier cache
+    rpc GetTensor(GetTensorRequest) returns (GetTensorResponse);
+
+    // Batch operations for efficiency
+    rpc BatchStoreTensors(BatchStoreTensorRequest) returns (BatchStoreTensorResponse);
+    rpc BatchGetTensors(BatchGetTensorRequest) returns (BatchGetTensorResponse);
+
+    // Memory management
+    rpc EvictTensors(EvictTensorsRequest) returns (EvictTensorsResponse);
+    rpc GetCacheMetrics(GetCacheMetricsRequest) returns (GetCacheMetricsResponse);
+
+    // GPU buffer operations
+    rpc PromoteToGPU(PromoteToGPURequest) returns (PromoteToGPUResponse);
+    rpc OptimizeGPUMemory(OptimizeGPUMemoryRequest) returns (OptimizeGPUMemoryResponse);
+}
+
+// Core tensor data structure
+message TensorCache {
+    string id = 1;                    // Unique tensor identifier
+    repeated uint64 shape = 2;        // Tensor dimensions
+    string dtype = 3;                 // "float32", "float16", "int8", etc.
+    bytes data = 4;                   // Bit-packed tensor data
+    repeated string references = 5;   // Parent case/document IDs
+    int32 lod_level = 6;             // Level of Detail: 0=full, 1=half, 2=quarter
+    uint64 gpu_offset = 7;           // Offset in GPU buffer if loaded
+    int64 timestamp = 8;             // Creation/access timestamp
+    TensorMetadata metadata = 9;     // Additional metadata
+    CompressionInfo compression = 10; // Compression details
+}
+
+// Tensor metadata for cache management
+message TensorMetadata {
+    string session_id = 1;           // User session
+    string case_id = 2;              // Legal case identifier
+    string document_id = 3;          // Source document
+    string model_name = 4;           // Model that generated tensor
+    TensorType tensor_type = 5;      // Type of tensor
+    uint64 access_count = 6;         // Number of times accessed
+    int64 last_accessed = 7;         // Last access timestamp
+    Priority priority = 8;           // Cache priority
+    repeated string tags = 9;        // Searchable tags
+}
+
+// Compression information for bit-packing
+message CompressionInfo {
+    CompressionType type = 1;        // Compression algorithm used
+    float scale_factor = 2;          // Quantization scale
+    float offset = 3;                // Quantization offset
+    uint64 original_size = 4;        // Original uncompressed size
+    uint64 compressed_size = 5;      // Compressed size
+    string checksum = 6;             // Data integrity check
+}
+
+// Request/Response messages
+message StoreTensorRequest {
+    TensorCache tensor = 1;
+    bool generate_lod = 2;           // Auto-generate LoD versions
+    bool force_gpu = 3;              // Force GPU storage
+    CacheOptions options = 4;        // Storage options
+}
+
+message StoreTensorResponse {
+    bool success = 1;
+    string tensor_id = 2;
+    repeated string lod_ids = 3;     // IDs of generated LoD versions
+    CacheLocation location = 4;      // Where tensor was stored
+    string error = 5;
+}
+
+message GetTensorRequest {
+    string tensor_id = 1;
+    int32 required_lod = 2;          // Minimum LoD level required
+    bool prefer_gpu = 3;             // Prefer GPU version if available
+    bool promote_to_gpu = 4;         // Promote to GPU after retrieval
+}
+
+message GetTensorResponse {
+    bool success = 1;
+    TensorCache tensor = 2;
+    CacheLocation source = 3;        // Which cache tier provided the tensor
+    PerformanceMetrics metrics = 4;  // Retrieval performance
+    string error = 5;
+}
+
+message BatchStoreTensorRequest {
+    repeated StoreTensorRequest requests = 1;
+    bool atomic = 2;                 // All or nothing storage
+}
+
+message BatchStoreTensorResponse {
+    repeated StoreTensorResponse responses = 1;
+    bool all_succeeded = 2;
+    PerformanceMetrics metrics = 3;
+}
+
+message BatchGetTensorRequest {
+    repeated GetTensorRequest requests = 1;
+    bool prefetch_to_gpu = 2;        // Prefetch results to GPU
+}
+
+message BatchGetTensorResponse {
+    repeated GetTensorResponse responses = 1;
+    PerformanceMetrics metrics = 2;
+}
+
+message EvictTensorsRequest {
+    repeated string tensor_ids = 1;  // Specific tensors to evict
+    EvictionPolicy policy = 2;       // Eviction strategy
+    CacheLocation target_tier = 3;   // Which tier to evict from
+}
+
+message EvictTensorsResponse {
+    bool success = 1;
+    uint32 evicted_count = 2;
+    uint64 freed_bytes = 3;
+    string error = 4;
+}
+
+message GetCacheMetricsRequest {
+    bool include_detailed = 1;
+    repeated string tensor_ids = 2;  // Specific tensors to get metrics for
+}
+
+message GetCacheMetricsResponse {
+    CacheMetrics metrics = 1;
+    repeated TensorMetrics tensor_metrics = 2;
+}
+
+message PromoteToGPURequest {
+    repeated string tensor_ids = 1;
+    int32 max_lod_level = 2;         // Maximum LoD to load
+    bool force_promotion = 3;        // Evict other tensors if needed
+}
+
+message PromoteToGPUResponse {
+    bool success = 1;
+    repeated string promoted_ids = 2;
+    repeated string failed_ids = 3;
+    string error = 4;
+}
+
+message OptimizeGPUMemoryRequest {
+    OptimizationStrategy strategy = 1;
+    float target_utilization = 2;    // Target GPU memory utilization (0.0-1.0)
+}
+
+message OptimizeGPUMemoryResponse {
+    bool success = 1;
+    uint64 freed_bytes = 2;
+    uint32 optimized_tensors = 3;
+    PerformanceMetrics metrics = 4;
+    string error = 5;
+}
+
+// Supporting data structures
+message CacheOptions {
+    Duration ttl = 1;                // Time to live
+    bool persist_to_disk = 2;        // Create memory-mapped backup
+    bool enable_compression = 3;     // Use bit-packing
+    CompressionType compression_type = 4;
+    Priority priority = 5;           // Cache priority
+}
+
+message PerformanceMetrics {
+    int64 retrieval_time_ns = 1;     // Nanoseconds
+    uint64 bytes_transferred = 2;
+    CacheLocation source_tier = 3;
+    bool cache_hit = 4;
+    float hit_rate = 5;
+    int32 lod_level_used = 6;
+}
+
+message CacheMetrics {
+    uint64 total_queries = 1;
+    uint64 gpu_hits = 2;
+    uint64 ram_hits = 3;
+    uint64 redis_hits = 4;
+    uint64 mmap_hits = 5;
+    uint64 cache_misses = 6;
+    float overall_hit_rate = 7;
+
+    // Memory usage by tier
+    MemoryUsage gpu_memory = 8;
+    MemoryUsage ram_memory = 9;
+    MemoryUsage redis_memory = 10;
+    MemoryUsage disk_memory = 11;
+
+    // Performance metrics
+    float avg_retrieval_time_ms = 12;
+    uint64 total_evictions = 13;
+    int64 last_gc_time = 14;
+}
+
+message MemoryUsage {
+    uint64 used_bytes = 1;
+    uint64 total_bytes = 2;
+    float utilization = 3;           // 0.0 to 1.0
+    uint32 object_count = 4;
+}
+
+message TensorMetrics {
+    string tensor_id = 1;
+    uint64 access_count = 2;
+    int64 last_accessed = 3;
+    uint64 size_bytes = 4;
+    CacheLocation current_location = 5;
+    int32 current_lod = 6;
+    repeated CacheLocation available_locations = 7;
+}
+
+message Duration {
+    int64 seconds = 1;
+    int32 nanos = 2;
+}
+
+// Enums
+enum TensorType {
+    TENSOR_TYPE_UNKNOWN = 0;
+    TENSOR_TYPE_EMBEDDING = 1;       // Text/document embeddings
+    TENSOR_TYPE_ATTENTION = 2;       // Attention weights
+    TENSOR_TYPE_HIDDEN_STATE = 3;    // Hidden layer states
+    TENSOR_TYPE_LOGITS = 4;          // Model output logits
+    TENSOR_TYPE_KV_CACHE = 5;        // Key-value cache for inference
+    TENSOR_TYPE_GRADIENT = 6;        // Gradient tensors
+    TENSOR_TYPE_WEIGHTS = 7;         // Model weights
+    TENSOR_TYPE_ACTIVATIONS = 8;     // Layer activations
+}
+
+enum CompressionType {
+    COMPRESSION_NONE = 0;
+    COMPRESSION_FLOAT16 = 1;         // 50% reduction
+    COMPRESSION_INT8 = 2;            // 75% reduction
+    COMPRESSION_INT4 = 3;            // 87.5% reduction
+    COMPRESSION_HUFFMAN = 4;         // Variable compression
+    COMPRESSION_LZ4 = 5;             // Fast compression
+    COMPRESSION_ZSTD = 6;            // High ratio compression
+}
+
+enum CacheLocation {
+    LOCATION_UNKNOWN = 0;
+    LOCATION_GPU_VRAM = 1;           // Fastest access
+    LOCATION_RAM = 2;                // Fast access
+    LOCATION_REDIS = 3;              // Network access
+    LOCATION_MMAP = 4;               // Disk access
+    LOCATION_COLD_STORAGE = 5;       // Archive storage
+}
+
+enum Priority {
+    PRIORITY_LOW = 0;
+    PRIORITY_NORMAL = 1;
+    PRIORITY_HIGH = 2;
+    PRIORITY_CRITICAL = 3;           // Never evict
+}
+
+enum EvictionPolicy {
+    EVICTION_LRU = 0;               // Least Recently Used
+    EVICTION_LFU = 1;               // Least Frequently Used
+    EVICTION_FIFO = 2;              // First In, First Out
+    EVICTION_RANDOM = 3;            // Random eviction
+    EVICTION_PRIORITY = 4;          // Priority-based
+    EVICTION_SIZE = 5;              // Largest first
+    EVICTION_AGE = 6;               // Oldest first
+}
+
+enum OptimizationStrategy {
+    OPTIMIZE_NONE = 0;
+    OPTIMIZE_MEMORY = 1;            // Minimize memory usage
+    OPTIMIZE_SPEED = 2;             // Minimize access time
+    OPTIMIZE_BALANCED = 3;          // Balance memory and speed
+    OPTIMIZE_AGGRESSIVE = 4;        // Maximum optimization
+}
+
+// WebGPU Integration Messages
+message WebGPUBuffer {
+    string buffer_id = 1;
+    uint64 size = 2;
+    GPUBufferUsage usage = 3;
+    bool mapped = 4;
+    repeated string tensor_ids = 5;  // Tensors stored in this buffer
+}
+
+message GPUBufferLayout {
+    repeated BufferBinding bindings = 1;
+    uint64 total_size = 2;
+    uint32 alignment = 3;
+}
+
+message BufferBinding {
+    uint32 binding = 1;
+    uint64 offset = 2;
+    uint64 size = 3;
+    string tensor_id = 4;
+}
+
+enum GPUBufferUsage {
+    GPU_BUFFER_VERTEX = 0;
+    GPU_BUFFER_INDEX = 1;
+    GPU_BUFFER_UNIFORM = 2;
+    GPU_BUFFER_STORAGE = 3;
+    GPU_BUFFER_INDIRECT = 4;
+    GPU_BUFFER_COPY_SRC = 5;
+    GPU_BUFFER_COPY_DST = 6;
+}

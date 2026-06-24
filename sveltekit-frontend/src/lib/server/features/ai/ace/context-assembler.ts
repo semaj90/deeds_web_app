@@ -1747,7 +1747,7 @@ export async function assembleACEContext(opts: {
       // Mutable ref: fetchCodebaseContext writes topoPrefilter/graphAuthority/manifold4 here
       const codebaseFetchStats: CodebaseFetchStats = {};
 
-      // 🚀 Stage A0: Cartridge Early Retrieval Gating
+      // 🚀 Stage A0: Cartridge Early Retrieval Gating + 4x6 Routing Matrix
       const qHash = topoQueryHash(query);
       let cartridgeResults = {
         confidence: 0,
@@ -1755,6 +1755,11 @@ export async function assembleACEContext(opts: {
         results: [] as any[],
         topoPrefilter: undefined as any,
       };
+
+      // Stage A0.5: Determine retrieval lane via 4x6 routing matrix
+      let routingDecision = null as any;
+      const { selectRoutingLane, extractQuerySignals, cacheRoutingMatrixConfig } = await import('../../ace/stage-a0-routing.js');
+
       if (opts.enableCodebaseContext) {
         try {
           const redis = getRedis();
@@ -1774,6 +1779,17 @@ export async function assembleACEContext(opts: {
             8,
             userId ?? undefined
           )) as typeof cartridgeResults;
+
+          // Extract query signals and compute routing scores
+          try {
+            const querySignals = await extractQuerySignals(query, new Float32Array(), userId);
+            routingDecision = selectRoutingLane(querySignals);
+
+            // Cache routing matrix config for observability
+            await cacheRoutingMatrixConfig().catch(() => {});
+          } catch (e) {
+            console.warn('[Stage A0] Routing matrix extraction failed:', (e as Error).message);
+          }
           if (cartridgeResults.confidence >= configuredThreshold) {
             // Retrieve codebase context from seeds and return immediately!
             const codebaseContext = await fetchCodebaseContext(
@@ -1850,6 +1866,14 @@ export async function assembleACEContext(opts: {
               },
               retrievalTrace: {
                 topoPrefilter: cartridgeResults.topoPrefilter,
+                routingDecision: routingDecision ? {
+                  lane: routingDecision.lane,
+                  score: routingDecision.score,
+                  confidence: routingDecision.confidence,
+                  batch_size: routingDecision.recommended_batch_size,
+                  use_gpu_rerank: routingDecision.use_gpu_rerank,
+                  postgres_filter: routingDecision.postgres_filter,
+                } : null,
               },
             };
 

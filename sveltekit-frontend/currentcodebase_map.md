@@ -62,9 +62,9 @@ deeds-web-app/
 | **Vector DB** | Qdrant | — |
 | **Graph DB** | Neo4j 5 Community | — |
 | **Message Queue** | RabbitMQ | — |
-| **Object Storage** | MinIO | — |
+| **Object Storage** | seaweedfs | — |
 | **Client AI** | ONNX Runtime (WebGPU/WASM) | 1.23.2 |
-| **Server AI** | Ollama (gemma3-legal + embeddinggemma) | — |
+| **Server AI** | llama-server (gemma3-legal + embeddinggemma) | — |
 | **GPU** | LibTorch/CUDA (RTX 3060 Ti) | — |
 | **State Machines** | XState v5 | 5.24.0 |
 | **Rich Text** | Tiptap | @tiptap/core + StarterKit |

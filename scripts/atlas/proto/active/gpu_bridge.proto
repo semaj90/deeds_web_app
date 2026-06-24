@@ -1,0 +1,57 @@
+syntax = "proto3";
+
+package gpubridge;
+
+// LibTorch/CUDA N-API operations. Requires tensorrt_bridge.node.
+// Separate from TurboVecService (ANN index) — these are matrix/GPU workloads.
+service GpuBridgeService {
+  // Batch cosine similarity: one query vs N flattened candidate vectors
+  rpc BatchCosine (BatchCosineRequest) returns (BatchCosineResponse);
+
+  // Project vectors through the 768→64 autoencoder (SOM latent encoding)
+  rpc EncodeLatent (EncodeLatentRequest) returns (EncodeLatentResponse);
+
+  // Assign vectors to SOM BMU cluster IDs
+  rpc AssignSom (AssignSomRequest) returns (AssignSomResponse);
+}
+
+// ── BatchCosine ───────────────────────────────────────────────────────────────
+
+message BatchCosineRequest {
+  repeated float query_vector = 1;       // single dim-dimensional query
+  repeated float candidate_vectors = 2;  // flattened N x dim candidates
+  int32 candidate_count = 3;             // N
+  int32 dim = 4;                         // vector dimension (default 768)
+}
+
+message BatchCosineResponse {
+  repeated float scores = 1;  // N cosine similarity scores
+  int32 count = 2;
+}
+
+// ── EncodeLatent ──────────────────────────────────────────────────────────────
+
+message EncodeLatentRequest {
+  repeated float vectors = 1;  // flattened N x in_dim
+  int32 count = 2;
+  int32 in_dim = 3;            // input dimension (default 768)
+  int32 out_dim = 4;           // latent dimension (default 64)
+}
+
+message EncodeLatentResponse {
+  repeated float encoded = 1;  // flattened N x out_dim
+  int32 count = 2;
+  int32 out_dim = 3;
+}
+
+// ── AssignSom ─────────────────────────────────────────────────────────────────
+
+message AssignSomRequest {
+  repeated float vectors = 1;  // flattened N x 768
+  int32 count = 2;
+}
+
+message AssignSomResponse {
+  repeated int32 cluster_ids = 1;  // BMU cluster per vector
+  repeated float bmu_scores = 2;   // distance to BMU centroid
+}

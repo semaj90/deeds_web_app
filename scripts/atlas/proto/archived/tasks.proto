@@ -1,0 +1,38 @@
+syntax = "proto3";
+package platform.tasks.v1;
+option go_package = "legal-ai-cuda/gen/tasks;tasks";
+
+// TaskKind enumerates async job categories used across services.
+enum TaskKind {
+  TASK_KIND_UNSPECIFIED = 0;
+  TASK_KIND_EMBED_DOCUMENT = 1;
+  TASK_KIND_SUMMARIZE_DOCUMENT = 2;
+  TASK_KIND_VECTOR_SEARCH = 3;
+  TASK_KIND_CONTRACT_ANALYSIS = 4;
+}
+
+message TaskRequest {
+  string id = 1;                // client-supplied or generated
+  TaskKind kind = 2;            // job type
+  string payload_json = 3;      // normalized JSON payload
+  string correlation_id = 4;    // trace / request linkage
+  int64 enqueue_unix_ms = 5;    // audit timestamp
+}
+
+message TaskAck { string id = 1; bool accepted = 2; string message = 3; }
+
+message TaskStatusQuery { string id = 1; }
+
+message TaskStatus {
+  string id = 1;
+  string state = 2;           // queued|running|failed|succeeded|canceled
+  string error = 3;           // terminal error if failed
+  int64 started_unix_ms = 4;
+  int64 completed_unix_ms = 5;
+  string result_ref = 6;      // pointer to Redis / Postgres / S3
+}
+
+service TaskQueue {
+  rpc Enqueue(TaskRequest) returns (TaskAck);
+  rpc GetStatus(TaskStatusQuery) returns (TaskStatus);
+}

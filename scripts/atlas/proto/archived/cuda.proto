@@ -1,0 +1,354 @@
+syntax = "proto3";
+
+package cuda;
+
+option go_package = "github.com/legal-ai-platform/deeds-web-app/pkg/grpc/cuda";
+
+// CUDAService provides high-performance tensor operations for AI inference
+service CUDAService {
+  // StreamingInference provides real-time AI inference with tensor streaming
+  rpc StreamingInference(stream InferenceRequest) returns (stream InferenceResponse);
+
+  // StreamingEmbedding generates embeddings with tensor streaming
+  rpc StreamingEmbedding(stream EmbeddingRequest) returns (stream EmbeddingResponse);
+
+  // StreamingVectorSearch performs similarity search with tensor operations
+  rpc StreamingVectorSearch(stream VectorSearchRequest) returns (stream VectorSearchResponse);
+
+  // GetGPUMetrics returns current GPU utilization and performance metrics
+  rpc GetGPUMetrics(GPUMetricsRequest) returns (GPUMetricsResponse);
+
+  // HealthCheck returns service status and capabilities
+  rpc HealthCheck(HealthRequest) returns (HealthResponse);
+}
+
+// Tensor represents multi-dimensional arrays for AI operations
+message Tensor {
+  // Shape of the tensor (dimensions)
+  repeated int32 shape = 1;
+
+  // Data type of tensor elements
+  TensorType dtype = 2;
+
+  // Raw tensor data (float32, int32, or bytes)
+  oneof data {
+    FloatTensor float_data = 3;
+    Int32Tensor int_data = 4;
+    BytesTensor bytes_data = 5;
+  }
+
+  // Optional metadata
+  map<string, string> metadata = 6;
+}
+
+// Tensor data types
+enum TensorType {
+  FLOAT32 = 0;
+  INT32 = 1;
+  BYTES = 2;
+  FLOAT16 = 3;
+  INT64 = 4;
+}
+
+// Specialized tensor types for efficiency
+message FloatTensor {
+  repeated float values = 1;
+}
+
+message Int32Tensor {
+  repeated int32 values = 1;
+}
+
+message BytesTensor {
+  bytes values = 1;
+}
+
+// Inference request with tensor support
+message InferenceRequest {
+  // Request ID for tracking
+  string request_id = 1;
+
+  // Model to use for inference
+  string model = 2;
+
+  // Input tensors (text, embeddings, etc.)
+  repeated Tensor inputs = 3;
+
+  // Inference parameters
+  map<string, string> parameters = 4;
+
+  // Streaming control
+  bool stream_response = 5;
+
+  // Request metadata
+  map<string, string> metadata = 6;
+}
+
+// Inference response with tensor outputs
+message InferenceResponse {
+  // Request ID for correlation
+  string request_id = 1;
+
+  // Output tensors (logits, probabilities, etc.)
+  repeated Tensor outputs = 2;
+
+  // Processing metadata
+  ProcessingMetrics metrics = 3;
+
+  // Error information if any
+  string error = 4;
+
+  // Streaming control
+  bool is_final = 5;
+
+  // Response metadata
+  map<string, string> metadata = 6;
+}
+
+// Embedding request with text and tensor support
+message EmbeddingRequest {
+  // Request ID for tracking
+  string request_id = 1;
+
+  // Model to use for embeddings
+  string model = 2;
+
+  // Input text or tensor
+  oneof input {
+    string text = 3;
+    Tensor tensor_input = 4;
+  }
+
+  // Embedding parameters
+  map<string, string> parameters = 5;
+
+  // Batch processing
+  repeated string texts = 6;
+
+  // Request metadata
+  map<string, string> metadata = 7;
+}
+
+// Embedding response with tensor outputs
+message EmbeddingResponse {
+  // Request ID for correlation
+  string request_id = 1;
+
+  // Embedding tensor(s)
+  repeated Tensor embeddings = 2;
+
+  // Embedding dimensions
+  int32 dimensions = 3;
+
+  // Processing metadata
+  ProcessingMetrics metrics = 4;
+
+  // Error information if any
+  string error = 5;
+
+  // Response metadata
+  map<string, string> metadata = 6;
+}
+
+// Vector search request with tensor queries
+message VectorSearchRequest {
+  // Request ID for tracking
+  string request_id = 1;
+
+  // Query embedding tensor
+  Tensor query_embedding = 2;
+
+  // Search parameters
+  int32 top_k = 3;
+  float threshold = 4;
+  string index_name = 5;
+
+  // Filter criteria
+  map<string, string> filters = 6;
+
+  // Request metadata
+  map<string, string> metadata = 7;
+}
+
+// Vector search response with similarity results
+message VectorSearchResponse {
+  // Request ID for correlation
+  string request_id = 1;
+
+  // Search results
+  repeated SearchResult results = 2;
+
+  // Total results found
+  int32 total_results = 3;
+
+  // Processing metadata
+  ProcessingMetrics metrics = 4;
+
+  // Error information if any
+  string error = 5;
+
+  // Response metadata
+  map<string, string> metadata = 6;
+}
+
+// Individual search result
+message SearchResult {
+  // Document/vector ID
+  string id = 1;
+
+  // Similarity score
+  float score = 2;
+
+  // Result embedding (optional)
+  Tensor embedding = 3;
+
+  // Result metadata
+  map<string, string> metadata = 4;
+
+  // Document content (if available)
+  string content = 5;
+}
+
+// GPU metrics request
+message GPUMetricsRequest {
+  // Include detailed metrics
+  bool detailed = 1;
+
+  // Request metadata
+  map<string, string> metadata = 2;
+}
+
+// GPU metrics response
+message GPUMetricsResponse {
+  // GPU utilization (0.0 - 1.0)
+  float gpu_utilization = 1;
+
+  // Memory utilization (0.0 - 1.0)
+  float memory_utilization = 2;
+
+  // Temperature in Celsius
+  float temperature = 3;
+
+  // Power consumption in watts
+  float power_consumption = 4;
+
+  // Number of active models
+  int32 active_models = 5;
+
+  // Queue depth
+  int32 queued_tasks = 6;
+
+  // GPU device information
+  GPUDevice device_info = 7;
+
+  // Performance counters
+  repeated PerformanceCounter counters = 8;
+
+  // Response metadata
+  map<string, string> metadata = 9;
+}
+
+// GPU device information
+message GPUDevice {
+  // Device name
+  string name = 1;
+
+  // Compute capability
+  string compute_capability = 2;
+
+  // Total memory in bytes
+  int64 total_memory = 3;
+
+  // Available memory in bytes
+  int64 available_memory = 4;
+
+  // Number of streaming multiprocessors
+  int32 multiprocessor_count = 5;
+
+  // Device ID
+  int32 device_id = 6;
+}
+
+// Performance counter
+message PerformanceCounter {
+  // Counter name
+  string name = 1;
+
+  // Counter value
+  double value = 2;
+
+  // Unit of measurement
+  string unit = 3;
+
+  // Description
+  string description = 4;
+}
+
+// Processing metrics
+message ProcessingMetrics {
+  // Processing time in milliseconds
+  float processing_time_ms = 1;
+
+  // Queue time in milliseconds
+  float queue_time_ms = 2;
+
+  // Memory usage in bytes
+  int64 memory_usage = 3;
+
+  // GPU utilization during processing
+  float gpu_utilization = 4;
+
+  // Throughput (operations per second)
+  float throughput = 5;
+
+  // Additional metrics
+  map<string, string> additional_metrics = 6;
+}
+
+// Health check request
+message HealthRequest {
+  // Check GPU availability
+  bool check_gpu = 1;
+
+  // Check model availability
+  repeated string models = 2;
+
+  // Request metadata
+  map<string, string> metadata = 3;
+}
+
+// Health check response
+message HealthResponse {
+  // Service status
+  HealthStatus status = 1;
+
+  // GPU availability
+  bool gpu_available = 2;
+
+  // Available models
+  repeated string available_models = 3;
+
+  // Service version
+  string version = 4;
+
+  // Uptime in seconds
+  int64 uptime_seconds = 5;
+
+  // System capabilities
+  repeated string capabilities = 6;
+
+  // Error messages if any
+  repeated string errors = 7;
+
+  // Response metadata
+  map<string, string> metadata = 8;
+}
+
+// Health status enumeration
+enum HealthStatus {
+  UNKNOWN = 0;
+  HEALTHY = 1;
+  DEGRADED = 2;
+  UNHEALTHY = 3;
+  MAINTENANCE = 4;
+}

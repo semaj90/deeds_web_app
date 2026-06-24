@@ -1,0 +1,213 @@
+syntax = "proto3";
+
+package analytics_service;
+
+option go_package = "github.com/legal-ai/proto/analytics";
+option java_package = "com.legal_ai.proto.analytics";
+option java_outer_classname = "AnalyticsServiceProto";
+
+// High-performance analytics service for statistics aggregation
+// Optimized for real-time metrics and reporting
+service AnalyticsService {
+    // Get comprehensive analytics
+    rpc GetAnalytics(AnalyticsRequest) returns (AnalyticsResponse);
+
+    // Get analytics for specific case
+    rpc GetCaseAnalytics(CaseAnalyticsRequest) returns (CaseAnalyticsResponse);
+
+    // Get user analytics
+    rpc GetUserAnalytics(UserAnalyticsRequest) returns (UserAnalyticsResponse);
+
+    // Get system health metrics
+    rpc GetSystemMetrics(SystemMetricsRequest) returns (SystemMetricsResponse);
+
+    // Stream real-time metrics
+    rpc StreamMetrics(MetricsStreamRequest) returns (stream MetricsUpdate);
+}
+
+// Analytics Request
+message AnalyticsRequest {
+    string case_id = 1;                        // Optional: specific case
+    string timeframe = 2;                      // "7d", "30d", "90d", "1y"
+    bool include_breakdown = 3;
+    bool include_trends = 4;
+    bool include_performance = 5;
+}
+
+// Summary Statistics
+message SummaryStats {
+    int32 total_cases = 1;
+    int32 active_cases = 2;
+    int32 total_evidence = 3;
+    int32 total_chats = 4;
+    int32 total_messages = 5;
+    float avg_case_duration_days = 6;
+}
+
+// Breakdown Statistics
+message BreakdownStats {
+    repeated KeyValuePair cases_by_status = 1;
+    repeated KeyValuePair cases_by_priority = 2;
+    repeated KeyValuePair evidence_by_type = 3;
+    repeated TimeSeriesPoint chat_activity = 4;
+}
+
+// Trend Statistics
+message TrendStats {
+    int32 cases_this_week = 1;
+    int32 evidence_this_week = 2;
+    int32 messages_this_week = 3;
+    float week_over_week_growth = 4;
+    string system_health = 5;                  // "healthy", "warning", "critical"
+}
+
+// Performance Metrics
+message PerformanceMetrics {
+    float avg_case_resolution_time_days = 1;
+    float avg_evidence_per_case = 2;
+    float avg_messages_per_session = 3;
+    repeated KeyValuePair top_evidence_types = 4;
+    float search_performance_ms = 5;
+    float inference_performance_ms = 6;
+}
+
+// Analytics Response
+message AnalyticsResponse {
+    bool success = 1;
+    SummaryStats summary = 2;
+    BreakdownStats breakdown = 3;
+    TrendStats trends = 4;
+    PerformanceMetrics performance = 5;
+    int64 generated_at = 6;                    // Unix timestamp
+    int64 took_ms = 7;                         // Computation time
+    string error = 8;
+}
+
+// Case-Specific Analytics
+message CaseAnalyticsRequest {
+    string case_id = 1;
+    string timeframe = 2;
+}
+
+message CaseAnalyticsResponse {
+    string case_id = 1;
+    string case_number = 2;
+    int32 total_evidence = 3;
+    int32 total_messages = 4;
+    int32 total_participants = 5;
+    int64 created_at = 6;
+    int64 last_updated = 7;
+    float completion_percentage = 8;
+    repeated CaseMetric metrics = 9;
+}
+
+message CaseMetric {
+    string name = 1;
+    float value = 2;
+    string unit = 3;
+    float trend = 4;                           // Positive or negative change
+}
+
+// User Analytics
+message UserAnalyticsRequest {
+    string user_id = 1;
+    string timeframe = 2;
+}
+
+message UserAnalyticsResponse {
+    string user_id = 1;
+    int32 cases_created = 2;
+    int32 cases_active = 3;
+    int32 cases_completed = 4;
+    int32 total_evidence_uploaded = 5;
+    int32 total_messages_sent = 6;
+    int64 total_time_spent_seconds = 7;
+    float avg_case_resolution_time_days = 8;
+    repeated UserActivity recent_activity = 9;
+}
+
+message UserActivity {
+    string activity_type = 1;
+    string description = 2;
+    int64 timestamp = 3;
+    string case_id = 4;
+}
+
+// System Metrics
+message SystemMetricsRequest {
+    bool include_gpu = 1;
+    bool include_database = 2;
+    bool include_cache = 3;
+}
+
+message SystemMetricsResponse {
+    string status = 1;                         // "healthy", "degraded", "unhealthy"
+    int64 uptime_seconds = 2;
+
+    // CPU/Memory
+    float cpu_usage_percent = 3;
+    float memory_usage_percent = 4;
+
+    // GPU (if available)
+    float gpu_usage_percent = 5;
+    float gpu_memory_percent = 6;
+    int32 active_gpu_processes = 7;
+
+    // Database
+    int32 active_connections = 8;
+    float query_latency_ms = 9;
+
+    // Cache
+    float cache_hit_rate = 10;
+    int32 cache_size_mb = 11;
+
+    // Services
+    repeated ServiceStatus services = 12;
+}
+
+message ServiceStatus {
+    string name = 1;
+    string status = 2;                         // "running", "degraded", "down"
+    int64 uptime_seconds = 3;
+    float latency_ms = 4;
+}
+
+// Metrics Stream
+message MetricsStreamRequest {
+    int32 interval_seconds = 1;                // Update interval
+    repeated string metrics = 2;               // Specific metrics to stream
+}
+
+message MetricsUpdate {
+    int64 timestamp = 1;
+    map<string, float> metrics = 2;
+    string status = 3;
+}
+
+// Key-Value Pair (for flexible data)
+message KeyValuePair {
+    string key = 1;
+    int32 value = 2;
+    float percentage = 3;
+}
+
+// Time Series Point
+message TimeSeriesPoint {
+    int64 timestamp = 1;
+    float value = 2;
+    string label = 3;
+}
+
+// Aggregated Metrics
+message AggregatedMetrics {
+    string period = 1;                         // "hourly", "daily", "weekly"
+    int64 start_time = 2;
+    int64 end_time = 3;
+    map<string, float> metrics = 4;
+    repeated MetricBreakdown breakdowns = 5;
+}
+
+message MetricBreakdown {
+    string dimension = 1;                      // "type", "status", "priority"
+    map<string, float> values = 2;
+}

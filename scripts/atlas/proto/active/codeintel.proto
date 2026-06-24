@@ -1,0 +1,145 @@
+// proto/active/codeintel.proto
+// CodeIntel Service — typed query interface for cluster_summaries,
+// codebase_chunk_index, and enrichment_jobs.
+// Replaces direct script execution with a stable service boundary.
+//
+// Package: codeintel.v1
+// Port convention: 50058
+
+syntax = "proto3";
+
+package codeintel.v1;
+
+option go_package = "github.com/deeds-web-app/services/go-codeintel-service/proto/codeintel;codeintelv1";
+
+// ─────────────────────────────────────────────────────────────────────────────
+// ClusterSummary — maps to cluster_summaries table
+// ─────────────────────────────────────────────────────────────────────────────
+
+message ClusterSummary {
+  string          id                        = 1;
+  string          repo_id                   = 2;
+  int32           gpu_cluster               = 3;
+  string          summary                   = 4;
+  string          purpose                   = 5;
+  repeated string patterns                  = 6;
+  repeated string warnings                  = 7;
+  repeated string tags                      = 8;
+  int32           member_count              = 9;
+  repeated string representative_chunk_ids  = 10;
+  string          summary_model             = 11;
+  bool            has_summary_embedding     = 12;
+  string          metadata_json             = 13;
+  string          updated_at                = 14;
+  float           centroid_distance_mean    = 15;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// GetClusterSummary
+// ─────────────────────────────────────────────────────────────────────────────
+
+message GetClusterSummaryRequest {
+  string repo_id     = 1;
+  int32  gpu_cluster = 2;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// ListClusterSummaries
+// ─────────────────────────────────────────────────────────────────────────────
+
+message ListClusterSummariesRequest {
+  string          repo_id      = 1;
+  repeated int32  gpu_clusters = 2; // empty = all clusters
+  int32           limit        = 3; // 0 = no limit
+  int32           offset       = 4;
+}
+
+message ListClusterSummariesResponse {
+  repeated ClusterSummary items = 1;
+  int32                   total = 2;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// SummarizeCluster — trigger LLM summarization (may run async)
+// ─────────────────────────────────────────────────────────────────────────────
+
+message SummarizeClusterRequest {
+  string repo_id     = 1;
+  int32  gpu_cluster = 2;
+  string model       = 3; // empty = server default
+  bool   force       = 4; // ignore Redis cache
+  bool   use_cache   = 5; // default true
+}
+
+message SummarizeClusterResponse {
+  bool           ok        = 1;
+  ClusterSummary item      = 2;
+  bool           cache_hit = 3;
+  string         job_id    = 4;
+  string         message   = 5;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// JobStatus — maps to enrichment_jobs table
+// ─────────────────────────────────────────────────────────────────────────────
+
+message JobStatus {
+  string job_id          = 1;
+  string job_type        = 2;
+  string status          = 3;
+  int32  total_processed = 4;
+  int32  total_upserted  = 5;
+  int32  total_failed    = 6;
+  string error_json      = 7;
+  string updated_at      = 8;
+}
+
+message GetJobStatusRequest {
+  string job_id = 1;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// LookupChunk — maps to codebase_chunk_index
+// ─────────────────────────────────────────────────────────────────────────────
+
+message ChunkLookupRequest {
+  string repo_id  = 1;
+  string chunk_id = 2; // qdrant_id (uuid or sha1-hex)
+}
+
+message ChunkLookupResponse {
+  string          chunk_id      = 1;
+  string          repo_id       = 2;
+  string          relative_path = 3;
+  string          symbol        = 4;
+  string          kind          = 5;
+  string          domain        = 6;
+  string          language      = 7;
+  string          extension     = 8;
+  int32           gpu_cluster   = 9;
+  int32           som_cluster   = 10;
+  repeated string semantic_tags = 11;
+  string          summary       = 12;
+  string          metadata_json = 13;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// CodeIntelService
+// ─────────────────────────────────────────────────────────────────────────────
+
+service CodeIntelService {
+  // Read cluster summary from DB
+  rpc GetClusterSummary(GetClusterSummaryRequest) returns (ClusterSummary);
+
+  // List cluster summaries with optional filter
+  rpc ListClusterSummaries(ListClusterSummariesRequest) returns (ListClusterSummariesResponse);
+
+  // Trigger LLM summarization + embedding (Redis-cached)
+  rpc SummarizeCluster(SummarizeClusterRequest) returns (SummarizeClusterResponse);
+
+  // Poll enrichment job status
+  rpc GetJobStatus(GetJobStatusRequest) returns (JobStatus);
+
+  // Look up a single codebase chunk by ID
+  rpc LookupChunk(ChunkLookupRequest) returns (ChunkLookupResponse);
+}

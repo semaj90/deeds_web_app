@@ -1,0 +1,311 @@
+syntax = "proto3";
+
+package legal_ai;
+
+option go_package = "github.com/legal-ai/proto";
+
+// Legal AI gRPC Service for GPU-accelerated inference
+service LegalAIService {
+    // GPU-accelerated text inference
+    rpc Inference(InferenceRequest) returns (InferenceResponse);
+    
+    // Streaming inference for long documents
+    rpc StreamInference(InferenceRequest) returns (stream InferenceChunk);
+    
+    // Vector embedding generation
+    rpc GenerateEmbedding(EmbeddingRequest) returns (EmbeddingResponse);
+    
+    // Semantic similarity search
+    rpc SearchSimilar(SearchRequest) returns (SearchResponse);
+    
+    // GPU health and metrics
+    rpc GetGPUMetrics(MetricsRequest) returns (MetricsResponse);
+    
+    // Legal document analysis
+    rpc AnalyzeDocument(DocumentRequest) returns (DocumentResponse);
+    
+    // Legal case recommendation engine
+    rpc GetRecommendations(RecommendationRequest) returns (RecommendationResponse);
+    
+    // Streaming recommendations for real-time updates
+    rpc StreamRecommendations(RecommendationRequest) returns (stream RecommendationChunk);
+    
+    // Case similarity analysis
+    rpc AnalyzeCaseSimilarity(CaseSimilarityRequest) returns (CaseSimilarityResponse);
+    
+    // Legal precedent search
+    rpc SearchPrecedents(PrecedentSearchRequest) returns (PrecedentSearchResponse);
+}
+
+// Request messages
+message InferenceRequest {
+    string prompt = 1;
+    string model = 2;
+    int32 max_tokens = 3;
+    float temperature = 4;
+    float top_p = 5;
+    repeated string stop_tokens = 6;
+    bool use_gpu = 7;
+    bool stream = 8;
+    map<string, string> metadata = 9;
+}
+
+message EmbeddingRequest {
+    string text = 1;
+    string model = 2;
+    map<string, string> metadata = 3;
+}
+
+message SearchRequest {
+    repeated float query_embedding = 1;
+    int32 limit = 2;
+    float threshold = 3;
+    string legal_domain = 4;
+    map<string, string> filters = 5;
+}
+
+message DocumentRequest {
+    bytes document_data = 1;
+    string document_type = 2;
+    string filename = 3;
+    bool extract_entities = 4;
+    bool analyze_sentiment = 5;
+    bool classify_domain = 6;
+}
+
+message MetricsRequest {
+    bool include_detailed = 1;
+}
+
+// Recommendation Engine Request Messages
+message RecommendationRequest {
+    string case_id = 1;
+    repeated string case_facts = 2;
+    string legal_domain = 3;
+    string jurisdiction = 4;
+    int32 max_recommendations = 5;
+    float similarity_threshold = 6;
+    bool include_precedents = 7;
+    bool include_similar_cases = 8;
+    bool include_risk_assessment = 9;
+    map<string, string> filters = 10;
+}
+
+message CaseSimilarityRequest {
+    string primary_case_id = 1;
+    repeated string compare_case_ids = 2;
+    repeated string comparison_factors = 3;
+    bool include_legal_analysis = 4;
+}
+
+message PrecedentSearchRequest {
+    repeated string legal_concepts = 1;
+    string jurisdiction = 2;
+    string court_level = 3;
+    int32 date_range_years = 4;
+    int32 max_results = 5;
+    float relevance_threshold = 6;
+}
+
+// Response messages
+message InferenceResponse {
+    string id = 1;
+    string text = 2;
+    int32 tokens = 3;
+    int64 processing_time_ms = 4;
+    double tokens_per_second = 5;
+    float gpu_utilization = 6;
+    int64 memory_usage_mb = 7;
+    float confidence = 8;
+    string legal_domain = 9;
+    bool success = 10;
+    string error = 11;
+    repeated SimilarQuery similar_queries = 12;
+    map<string, string> metadata = 13;
+}
+
+message InferenceChunk {
+    string id = 1;
+    string text_chunk = 2;
+    int32 chunk_index = 3;
+    bool is_final = 4;
+    float confidence = 5;
+}
+
+message EmbeddingResponse {
+    repeated float embedding = 1;
+    int32 dimension = 2;
+    string model = 3;
+    int64 processing_time_ms = 4;
+    bool success = 5;
+    string error = 6;
+}
+
+message SearchResponse {
+    repeated SimilarQuery results = 1;
+    int32 total_count = 2;
+    float max_similarity = 3;
+    int64 processing_time_ms = 4;
+    bool success = 5;
+    string error = 6;
+}
+
+message DocumentResponse {
+    string document_id = 1;
+    string summary = 2;
+    repeated string key_entities = 3;
+    repeated string legal_concepts = 4;
+    float confidence = 5;
+    string legal_domain = 6;
+    float sentiment_score = 7;
+    int32 complexity_score = 8;
+    repeated Citation citations = 9;
+    bool success = 10;
+    string error = 11;
+}
+
+message MetricsResponse {
+    GPUMetrics gpu_metrics = 1;
+    ServiceMetrics service_metrics = 2;
+    int64 timestamp = 3;
+}
+
+// Recommendation Engine Response Messages
+message RecommendationResponse {
+    repeated LegalRecommendation recommendations = 1;
+    int32 total_count = 2;
+    float confidence_score = 3;
+    int64 processing_time_ms = 4;
+    bool success = 5;
+    string error = 6;
+}
+
+message RecommendationChunk {
+    string recommendation_id = 1;
+    LegalRecommendation recommendation = 2;
+    int32 chunk_index = 3;
+    bool is_final = 4;
+    float confidence = 5;
+}
+
+message CaseSimilarityResponse {
+    repeated CaseSimilarity similarities = 1;
+    float overall_similarity = 2;
+    repeated string key_factors = 3;
+    string analysis_summary = 4;
+    int64 processing_time_ms = 5;
+    bool success = 6;
+    string error = 7;
+}
+
+message PrecedentSearchResponse {
+    repeated LegalPrecedent precedents = 1;
+    int32 total_count = 2;
+    float relevance_threshold_used = 3;
+    int64 processing_time_ms = 4;
+    bool success = 5;
+    string error = 6;
+}
+
+// Data structures
+message SimilarQuery {
+    string id = 1;
+    string query = 2;
+    string response = 3;
+    float similarity = 4;
+    string legal_domain = 5;
+    map<string, string> metadata = 6;
+}
+
+message GPUMetrics {
+    float utilization_percent = 1;
+    int64 memory_usage_mb = 2;
+    int64 memory_total_mb = 3;
+    int32 tensor_core_load = 4;
+    string thermal_status = 5;
+    int32 bandwidth_gbs = 6;
+    string gpu_model = 7;
+    int64 last_updated = 8;
+}
+
+message ServiceMetrics {
+    int64 total_jobs = 1;
+    int64 successful_jobs = 2;
+    int32 active_workers = 3;
+    int32 queue_length = 4;
+    float success_rate = 5;
+    int64 uptime_seconds = 6;
+    map<string, int64> endpoint_counts = 7;
+}
+
+message Citation {
+    string title = 1;
+    string author = 2;
+    string source = 3;
+    string url = 4;
+    int32 year = 5;
+    float relevance_score = 6;
+}
+
+// Recommendation Engine Data Structures
+message LegalRecommendation {
+    string id = 1;
+    string title = 2;
+    string description = 3;
+    float confidence_score = 4;
+    string legal_domain = 5;
+    string jurisdiction = 6;
+    repeated string relevant_cases = 7;
+    repeated string legal_concepts = 8;
+    RiskAssessment risk_assessment = 9;
+    repeated Citation citations = 10;
+    string recommendation_type = 11; // "precedent", "similar_case", "strategy"
+    map<string, string> metadata = 12;
+}
+
+message CaseSimilarity {
+    string case_id = 1;
+    string case_title = 2;
+    float similarity_score = 3;
+    repeated string matching_factors = 4;
+    repeated string differing_factors = 5;
+    string legal_analysis = 6;
+    repeated Citation supporting_precedents = 7;
+}
+
+message LegalPrecedent {
+    string precedent_id = 1;
+    string case_name = 2;
+    string court = 3;
+    int32 year = 4;
+    string jurisdiction = 5;
+    repeated string legal_principles = 6;
+    string holding = 7;
+    string reasoning = 8;
+    float relevance_score = 9;
+    repeated Citation citations = 10;
+    string court_level = 11;
+}
+
+message RiskAssessment {
+    float overall_risk_score = 1; // 0.0 to 1.0
+    string risk_level = 2; // "low", "medium", "high", "critical"
+    repeated RiskFactor risk_factors = 3;
+    repeated string mitigation_strategies = 4;
+    float confidence = 5;
+}
+
+message RiskFactor {
+    string factor_name = 1;
+    float impact_score = 2;
+    float probability = 3;
+    string description = 4;
+    repeated string related_cases = 5;
+}
+
+// FlatBuffers alternative for high-performance binary transport
+message FlatBufferWrapper {
+    bytes flatbuffer_data = 1;
+    string schema_name = 2;
+    int32 version = 3;
+}
