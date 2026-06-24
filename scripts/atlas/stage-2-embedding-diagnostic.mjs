@@ -23,7 +23,7 @@ const GEMMA4_URL =
 
 const EMBED_URL =
   process.env.EMBED_URL ??
-  'http://127.0.0.1:11434/api/embeddings';
+  'http://127.0.0.1:5173/api/embed';
 
 async function main() {
   console.log('\n🔍 Stage 2 Embedding Diagnostic\n');
@@ -57,10 +57,13 @@ async function main() {
 
     const embedRes = await fetch(EMBED_URL, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer mock-token'
+      },
       body: JSON.stringify({
-        model: 'embeddinggemma:latest',
-        input: chunk.summary,
+        text: chunk.summary,
+        model: 'embeddinggemma',
       }),
     });
 

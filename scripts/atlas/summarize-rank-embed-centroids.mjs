@@ -243,21 +243,26 @@ async function stage2_embedAndRank(pool, qdrant) {
 
     for (const chunk of toEmbed.rows) {
       try {
-        // Embed via Ollama
-        const embedRes = await fetch(`${OLLAMA_URL}/api/embed`, {
+        // Embed via SvelteKit API (uses ONNX client embedding with Ollama fallback)
+        // This is more robust than calling Ollama directly since it can fall back to nomic-embed-text
+        const embedRes = await fetch('http://127.0.0.1:5173/api/embed', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer mock-token' // API allows unauth for degraded response
+          },
           body: JSON.stringify({
-            model: 'embeddinggemma:latest',
-            input: chunk.summary,
+            text: chunk.summary,
+            model: 'embeddinggemma', // Will use ONNX client embedding
           }),
-          signal: AbortSignal.timeout(10000),
+          signal: AbortSignal.timeout(30000), // Longer timeout for initial ONNX model load
         });
 
         if (!embedRes.ok) throw new Error(`Embed failed: HTTP ${embedRes.status}`);
 
         const embedData = await embedRes.json();
-        const embedding = embedData.embedding || embedData.embeddings?.[0];
+        // SvelteKit API returns { embedding: [...], model, dimensions }
+        const embedding = embedData.embedding;
 
         // Gate 4 diagnostics: catch {} and other invalid states
         if (!embedding) {
