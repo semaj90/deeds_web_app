@@ -24,6 +24,16 @@
 
 ## ✅ DONE
 
+- **Runtime Queue Layer — NATS / LangGraph**
+  - **Status**: READY
+  - **Evidence**:
+    - Connected to NATS cluster at `127.0.0.1:4222`
+    - Listening on `agent.task.execute`
+    - Listening on `retrieval.turbovec.rerank`
+    - Listening on `gpu.cuvs.search`
+    - Listening on `gpu.cuda.rank`
+    - Listening on `engram.feedback.async`
+  - **Role**: NATS / LangGraph is the async task fabric. Routes: agent tasks, TurboVec rerank jobs, cuVS/GPU benchmark jobs, CUDA rank jobs, async engram feedback. It does not replace Postgres truth, Qdrant dense mirror, Valkey / Bitfrost cache, Neo4j graph mirror, or Go Retrieval fusion.
 - **Quantized Codebase Vector realignment & Tool-GAN Traversal Loop**:
   - Re-indexed 52,606 points to default 64d flat vector collection `codebase_chunks_encoded64`.
   - Trained Spherical K-Means ($k=50$) on the 64d projections, populated Redis centroids, and updated payloads.

@@ -46,9 +46,10 @@ function log(...args) { console.log(...args); }
 
 // Generate a deterministic trace_id for audit trail
 function generateTraceId(packet_key, source_ref) {
+  // Deterministic: same packet always gets same trace ID (idempotent backfills)
   return crypto
     .createHash('sha256')
-    .update(`${packet_key}:${source_ref}:${Date.now()}`)
+    .update(`${packet_key}:${source_ref}`)
     .digest('hex')
     .slice(0, 12);
 }

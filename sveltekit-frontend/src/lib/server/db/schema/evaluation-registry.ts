@@ -2,7 +2,7 @@ import { pgTable, bigserial, text, integer, real, boolean, jsonb, timestamp, uni
 
 // Task-Function Effectiveness Registry
 export const taskFunctionEvals = pgTable('task_function_evals', {
-  id: bigserial('id').primaryKey(),
+  id: bigserial('id', { mode: 'number' }).primaryKey(),
 
   // Task Identity
   taskId: text('task_id').notNull(),
@@ -48,7 +48,7 @@ export type NewTaskFunctionEval = typeof taskFunctionEvals.$inferInsert;
 
 // Domain-Function Mapping
 export const domainFunctionMapping = pgTable('domain_function_mapping', {
-  id: bigserial('id').primaryKey(),
+  id: bigserial('id', { mode: 'number' }).primaryKey(),
 
   // Domain Identification
   domain: text('domain').notNull(),
@@ -86,7 +86,7 @@ export type NewDomainFunctionMapping = typeof domainFunctionMapping.$inferInsert
 
 // Path Selection History
 export const pathSelectionHistory = pgTable('path_selection_history', {
-  id: bigserial('id').primaryKey(),
+  id: bigserial('id', { mode: 'number' }).primaryKey(),
 
   // Decision Context
   taskId: text('task_id').notNull(),
@@ -124,7 +124,7 @@ export type NewPathSelectionHistory = typeof pathSelectionHistory.$inferInsert;
 
 // Schema Matching Registry
 export const schemaMatchRegistry = pgTable('schema_match_registry', {
-  id: bigserial('id').primaryKey(),
+  id: bigserial('id', { mode: 'number' }).primaryKey(),
 
   // Entity Being Matched
   entityType: text('entity_type').notNull(),
@@ -168,7 +168,7 @@ export type NewSchemaMatchRegistry = typeof schemaMatchRegistry.$inferInsert;
 
 // GAN Validation Registry
 export const ganValidationRegistry = pgTable('gan_validation_registry', {
-  id: bigserial('id').primaryKey(),
+  id: bigserial('id', { mode: 'number' }).primaryKey(),
 
   // Feature Being Validated
   featureName: text('feature_name').notNull(),

@@ -1,29 +1,37 @@
 {
   "feature": "Verifier Union-Shape Repair Recommendation",
   "task_source": "Codex Task - Install Parent Atlas Verification Agent Skill",
-  "timestamp": "2026-06-21T18:09:11.161Z",
-  "verdict": "PASS",
-  "reason": "",
-  "recommendation": "",
-  "aceHits": [],
-  "kagHits": [],
+  "timestamp": "2026-06-24T13:59:52.343Z",
+  "verdict": "FAIL",
+  "reason": "compile blocker",
+  "recommendation": "Fix TypeScript compiler error in sveltekit-frontend/src/lib/server/db/schema/agent-memory-registry.ts:4",
+  "aceHits": [
+    "sveltekit-frontend/src/lib/server/db/schema/agent-memory-registry.ts"
+  ],
+  "kagHits": [
+    "unknown"
+  ],
   "dagHits": [],
-  "recommendedFiles": [],
-  "recommendedCommands": [],
-  "repairPrompt": "",
+  "recommendedFiles": [
+    "sveltekit-frontend/src/lib/server/db/schema/agent-memory-registry.ts"
+  ],
+  "recommendedCommands": [
+    "npm run check"
+  ],
+  "repairPrompt": "TypeScript compile error in sveltekit-frontend/src/lib/server/db/schema/agent-memory-registry.ts:4:\nArgument of type 'string' is not assignable to parameter of type 'PgBigSerialConfig<\"number\" | \"bigint\">'.\nexport const agentMemoryRegistry = pgTable('agent_memory_registry', {\nid: bigserial('id').primaryKey(),",
   "lanes": {
-    "smoke": "PASS",
+    "smoke": "FAIL",
     "story": "PASS",
-    "atlas_traversal": "PASS",
+    "atlas_traversal": "FAIL",
     "cubic_adversarial": "PASS"
   },
   "retrieval_proof": {
     "replay_status": "PASS",
     "cacheHitPct": "20%",
-    "featureIdPct": "40%",
-    "sourceRefPct": "64%",
+    "featureIdPct": "0%",
+    "sourceRefPct": "24%",
     "graphProof": "GRAPH_OK",
-    "provenanceRows": 32
+    "provenanceRows": 30
   },
   "commands": [
     "npm run verify:smoke",
@@ -32,5 +40,87 @@
     "npm run verify:cubic",
     "npm run verify:verdict"
   ],
-  "failures": []
+  "failures": [
+    {
+      "lane": "smoke",
+      "type": "TypeScript",
+      "file": "sveltekit-frontend/src/lib/server/db/schema/agent-memory-registry.ts",
+      "line": 4,
+      "error_text": "Argument of type 'string' is not assignable to parameter of type 'PgBigSerialConfig<\"number\" | \"bigint\">'.\nexport const agentMemoryRegistry = pgTable('agent_memory_registry', {\nid: bigserial('id').primaryKey(),",
+      "likely_contract": "unknown",
+      "blocking": true
+    },
+    {
+      "lane": "smoke",
+      "type": "TypeScript",
+      "file": "sveltekit-frontend/src/lib/server/db/schema/agent-memory-registry.ts",
+      "line": 59,
+      "error_text": "Argument of type 'string' is not assignable to parameter of type 'PgBigSerialConfig<\"number\" | \"bigint\">'.\nexport const mcpTraceOwnership = pgTable('mcp_trace_ownership', {\nid: bigserial('id').primaryKey(),",
+      "likely_contract": "unknown",
+      "blocking": true
+    },
+    {
+      "lane": "smoke",
+      "type": "TypeScript",
+      "file": "sveltekit-frontend/src/lib/server/db/schema/agent-memory-registry.ts",
+      "line": 89,
+      "error_text": "Argument of type 'string' is not assignable to parameter of type 'PgBigSerialConfig<\"number\" | \"bigint\">'.\nexport const gpuEligibilityGate = pgTable('gpu_eligibility_gate', {\nid: bigserial('id').primaryKey(),",
+      "likely_contract": "unknown",
+      "blocking": true
+    },
+    {
+      "lane": "smoke",
+      "type": "TypeScript",
+      "file": "sveltekit-frontend/src/lib/server/db/schema-kag.ts",
+      "line": 21,
+      "error_text": "'\"drizzle-orm/pg-core\"' has no exported member named 'array'. Did you mean 'PgArray'?\nunique,\narray,\nboolean,",
+      "likely_contract": "unknown",
+      "blocking": true
+    },
+    {
+      "lane": "smoke",
+      "type": "TypeScript",
+      "file": "sveltekit-frontend/src/lib/server/db/schema/evaluation-registry.ts",
+      "line": 5,
+      "error_text": "Argument of type 'string' is not assignable to parameter of type 'PgBigSerialConfig<\"number\" | \"bigint\">'.\nexport const taskFunctionEvals = pgTable('task_function_evals', {\nid: bigserial('id').primaryKey(),",
+      "likely_contract": "unknown",
+      "blocking": true
+    },
+    {
+      "lane": "smoke",
+      "type": "TypeScript",
+      "file": "sveltekit-frontend/src/lib/server/db/schema/evaluation-registry.ts",
+      "line": 51,
+      "error_text": "Argument of type 'string' is not assignable to parameter of type 'PgBigSerialConfig<\"number\" | \"bigint\">'.\nexport const domainFunctionMapping = pgTable('domain_function_mapping', {\nid: bigserial('id').primaryKey(),",
+      "likely_contract": "unknown",
+      "blocking": true
+    },
+    {
+      "lane": "smoke",
+      "type": "TypeScript",
+      "file": "sveltekit-frontend/src/lib/server/db/schema/evaluation-registry.ts",
+      "line": 89,
+      "error_text": "Argument of type 'string' is not assignable to parameter of type 'PgBigSerialConfig<\"number\" | \"bigint\">'.\nexport const pathSelectionHistory = pgTable('path_selection_history', {\nid: bigserial('id').primaryKey(),",
+      "likely_contract": "unknown",
+      "blocking": true
+    },
+    {
+      "lane": "smoke",
+      "type": "TypeScript",
+      "file": "sveltekit-frontend/src/lib/server/db/schema/evaluation-registry.ts",
+      "line": 127,
+      "error_text": "Argument of type 'string' is not assignable to parameter of type 'PgBigSerialConfig<\"number\" | \"bigint\">'.\nexport const schemaMatchRegistry = pgTable('schema_match_registry', {\nid: bigserial('id').primaryKey(),",
+      "likely_contract": "unknown",
+      "blocking": true
+    },
+    {
+      "lane": "smoke",
+      "type": "TypeScript",
+      "file": "sveltekit-frontend/src/lib/server/db/schema/evaluation-registry.ts",
+      "line": 171,
+      "error_text": "Argument of type 'string' is not assignable to parameter of type 'PgBigSerialConfig<\"number\" | \"bigint\">'.\nexport const ganValidationRegistry = pgTable('gan_validation_registry', {\nid: bigserial('id').primaryKey(),\n====================================\nsvelte-check found 9 errors and 11 warnings in 11 files",
+      "likely_contract": "unknown",
+      "blocking": true
+    }
+  ]
 }

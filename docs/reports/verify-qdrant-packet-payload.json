@@ -1,12 +1,12 @@
 {
-  "generated_at": "2026-06-21T18:06:00.368Z",
+  "generated_at": "2026-06-24T06:20:31.280Z",
   "sample_size": 100,
   "coverage": {
     "atlas_enriched_pct": 92,
-    "feature_id_pct": 100,
-    "community_id_pct": 83,
+    "feature_id_pct": 84,
+    "community_id_pct": 90,
     "community_conf_pct": 92,
-    "packet_key_pct": 92,
+    "packet_key_pct": 94,
     "concept_ids_pct": 92,
     "canonical_ref_pct": 100,
     "file_path_pct": 100,
@@ -15,9 +15,9 @@
     "directory_path_pct": 0
   },
   "alignment": {
-    "checked": 2,
+    "checked": 4,
     "aligned": 2,
-    "mismatches": 0
+    "mismatches": 1
   },
   "gates": [
     {
@@ -33,12 +33,12 @@
     {
       "name": "feature_id_50pct",
       "pass": true,
-      "detail": "100.0% (100/100)"
+      "detail": "84.0% (84/100)"
     },
     {
       "name": "packet_key_30pct",
       "pass": true,
-      "detail": "92.0% (92/100)"
+      "detail": "94.0% (94/100)"
     },
     {
       "name": "file_path_coverage_50pct",
@@ -47,9 +47,9 @@
     },
     {
       "name": "postgres_qdrant_no_contradictions",
-      "pass": true,
-      "detail": "2/2 feature_id aligned, 0 mismatches"
+      "pass": false,
+      "detail": "2/4 feature_id aligned, 1 mismatches"
     }
   ],
-  "pass": true
+  "pass": false
 }

@@ -566,7 +566,10 @@
       "Bash(cd c:\\\\\\\\Users\\\\\\\\james\\\\\\\\Videos\\\\\\\\deeds-web-app)",
       "Bash(REDIS_URL=\"redis://:redis@127.0.0.1:6379\" node scripts/atlas/graphify-cluster-sync-partition.mjs --dry-run --limit=100)",
       "Bash(REDIS_URL=\"redis://:redis@127.0.0.1:6379\" node scripts/atlas/graphify-cluster-sync-partition.mjs --dry-run --limit=1000)",
-      "Bash(REDIS_URL=\"redis://:redis@127.0.0.1:6379\" node scripts/atlas/graphify-cluster-sync-partition.mjs --apply)"
+      "Bash(REDIS_URL=\"redis://:redis@127.0.0.1:6379\" node scripts/atlas/graphify-cluster-sync-partition.mjs --apply)",
+      "Bash(CHUNK_LIMIT=10 npm run atlas:summary:phase1:dry)",
+      "Bash(CHUNK_LIMIT=50 npm run atlas:summary:phase1)",
+      "Bash(PACKET_LIMIT=10 node scripts/atlas/phase1-canonical-embedding-backfill.mjs --apply)"
     ],
     "deny": [],
     "ask": []

@@ -1,0 +1,83 @@
+{
+  "generatedAt": "2026-06-24T06:09:28.102Z",
+  "timestamp": 1782281368103,
+  "environment": {
+    "postgres": "postgresql://legal_admin:***@127.0.0.1:5434/legal_ai_db",
+    "neo4j": "bolt://127.0.0.1:7687",
+    "redis": "redis://:***@127.0.0.1:6379"
+  },
+  "sections": {
+    "identity": {
+      "total": "17995",
+      "with_packet_key": "17995",
+      "with_source_ref": "17995",
+      "with_feature_id": "17995",
+      "with_som_index": "4109",
+      "complete_spine": "17995"
+    },
+    "qdrant": {
+      "total": "17995",
+      "with_qdrant_point_id": "17994"
+    },
+    "neo4j": {
+      "total": 8804,
+      "with_packet_key": 8790,
+      "with_source_ref": 8789,
+      "with_feature_id": 8789,
+      "with_som_cluster": 8804
+    },
+    "som": {
+      "total": "3251",
+      "with_z_som": "3251",
+      "with_x_cosine": "0",
+      "with_y_graph": "0",
+      "complete_coords": "0",
+      "with_pagerank": "3226"
+    },
+    "traceMcp": {
+      "claimed_tasks": 0,
+      "tool_calls": 0,
+      "agent_claims": "N/A (table missing)"
+    },
+    "retrieval": [
+      {
+        "source": "Postgres FTS",
+        "indexed": "17486"
+      },
+      {
+        "source": "Qdrant ANN",
+        "indexed": "17994"
+      }
+    ],
+    "features": {
+      "total": "17995",
+      "with_summary": "17486",
+      "with_label": "17995",
+      "with_domain": "561",
+      "complete": "17486"
+    },
+    "mismatches": {
+      "postgres_total": "17995",
+      "qdrant_total": "17994",
+      "qdrant_with_packet_key": "17994",
+      "gap": 0
+    },
+    "redis": {
+      "total_keys": 228527
+    },
+    "authority": {
+      "used_concept_edges": 36838,
+      "source_nodes": 12260,
+      "target_nodes": 55
+    },
+    "readiness": {
+      "postgres": "100.0%",
+      "qdrant": "100.0%",
+      "neo4j": "99.8%",
+      "som": "0.0%",
+      "features": "97.2%",
+      "authority": "80.0%",
+      "overall": "79.5%"
+    }
+  }
+}

@@ -1,0 +1,77 @@
+{
+  "timestamp": "2026-06-24T13:44:45.299Z",
+  "nats_url": "nats://127.0.0.1:4222",
+  "subjects": {
+    "agent.task.execute": {
+      "ok": true,
+      "type": "request_reply",
+      "duration_ms": 81.69080000000001,
+      "response": {
+        "success": false,
+        "result": "\"Successful synthesis for: NATS LangGraph worker no-op query\"",
+        "history": [
+          "\"Successful synthesis for: NATS LangGraph worker no-op query\"",
+          "\"Successful synthesis for: NATS LangGraph worker no-op query\"",
+          "\"Successful synthesis for: NATS LangGraph worker no-op query\"",
+          "\"Successful synthesis for: NATS LangGraph worker no-op query\""
+        ],
+        "suggestedFix": "Could not generate fix from Ollama."
+      }
+    },
+    "retrieval.turbovec.rerank": {
+      "ok": true,
+      "type": "request_reply",
+      "duration_ms": 277.5213,
+      "response": {
+        "ok": true,
+        "subject": "retrieval.turbovec.rerank",
+        "backend": "bridge:offline",
+        "durationMs": 273,
+        "prefilter": {
+          "clusterIds": [],
+          "centroidScores": {},
+          "backend": "offline",
+          "durationMs": 2
+        },
+        "search": {
+          "candidates": [],
+          "backend": "bridge:offline",
+          "durationMs": 273
+        }
+      }
+    },
+    "gpu.cuvs.search": {
+      "ok": true,
+      "type": "request_reply",
+      "duration_ms": 1.830699999999979,
+      "response": {
+        "ok": true,
+        "enabled": false,
+        "subject": "gpu.cuvs.search",
+        "backend": "offline",
+        "notes": [
+          "ENABLE_CUVS_SEARCH=false"
+        ]
+      }
+    },
+    "gpu.cuda.rank": {
+      "ok": true,
+      "type": "request_reply",
+      "duration_ms": 1.6762999999999693,
+      "response": {
+        "ok": true,
+        "enabled": false,
+        "subject": "gpu.cuda.rank",
+        "backend": "offline",
+        "notes": [
+          "ENABLE_CUVS_SEARCH=false"
+        ]
+      }
+    },
+    "engram.feedback.async": {
+      "ok": true,
+      "type": "publish",
+      "duration_ms": 0.09780000000000655
+    }
+  }
+}

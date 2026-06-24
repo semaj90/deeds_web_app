@@ -1,7 +1,7 @@
 import { pgTable, bigserial, text, timestamp, jsonb, boolean, uniqueIndex, index, primaryKey } from 'drizzle-orm/pg-core';
 
 export const agentMemoryRegistry = pgTable('agent_memory_registry', {
-  id: bigserial('id').primaryKey(),
+  id: bigserial('id', { mode: 'number' }).primaryKey(),
 
   // Task & Story
   taskId: text('task_id').notNull(),
@@ -56,7 +56,7 @@ export type AgentMemoryRegistry = typeof agentMemoryRegistry.$inferSelect;
 export type NewAgentMemoryRegistry = typeof agentMemoryRegistry.$inferInsert;
 
 export const mcpTraceOwnership = pgTable('mcp_trace_ownership', {
-  id: bigserial('id').primaryKey(),
+  id: bigserial('id', { mode: 'number' }).primaryKey(),
 
   traceId: text('trace_id').notNull().unique(),
   taskId: text('task_id').notNull(),
@@ -86,7 +86,7 @@ export type McpTraceOwnership = typeof mcpTraceOwnership.$inferSelect;
 export type NewMcpTraceOwnership = typeof mcpTraceOwnership.$inferInsert;
 
 export const gpuEligibilityGate = pgTable('gpu_eligibility_gate', {
-  id: bigserial('id').primaryKey(),
+  id: bigserial('id', { mode: 'number' }).primaryKey(),
 
   taskId: text('task_id').notNull(),
   packetKey: text('packet_key').notNull(),

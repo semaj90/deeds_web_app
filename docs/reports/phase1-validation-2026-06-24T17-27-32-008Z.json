@@ -1,0 +1,20 @@
+{
+  "timestamp": "2026-06-24T17:27:32.008Z",
+  "summaryGeneration": {
+    "chunkIndexCoverage": "1850/40754 (4.5%)",
+    "atomicsPacketsCoverage": "17486/17995 (97.2%)"
+  },
+  "embeddingGeneration": {
+    "chunkIndexWithEmbedding": "602/40754 (1.5%)",
+    "qualityScoreMedian": "N/A",
+    "qualityScoreP95": "N/A"
+  },
+  "cacheState": {
+    "bifrostPacketKeys": 17995
+  },
+  "readiness": {
+    "summaryGeneration": "READY",
+    "embeddingGeneration": "IN_PROGRESS",
+    "cacheWarming": "READY"
+  }
+}

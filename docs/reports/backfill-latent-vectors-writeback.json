@@ -1,14 +1,14 @@
 {
-  "timestamp": "2026-06-19T19:28:12.290Z",
-  "total_processed": 781,
+  "timestamp": "2026-06-24T16:59:42.266Z",
+  "total_processed": 25,
   "postgres": {
-    "updated": 781,
+    "updated": 25,
     "notMatched": 0,
     "matchRate": 100
   },
   "reasons": {
-    "qdrant_point_id": 0,
-    "packet_key": 781,
+    "qdrant_point_id": 1,
+    "packet_key": 24,
     "source_ref": 0,
     "jsonb_fallback": 0,
     "skipped": 0

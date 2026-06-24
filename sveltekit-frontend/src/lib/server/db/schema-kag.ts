@@ -18,7 +18,6 @@ import {
   jsonb,
   index,
   unique,
-  array,
   boolean,
   integer,
 } from 'drizzle-orm/pg-core';
@@ -43,11 +42,11 @@ export const kagKnowledgeTuples = pgTable(
 
     // Ontology hierarchy
     parentConcept: varchar('parent_concept', { length: 200 }),
-    childConcepts: array(varchar('child_concepts')),
+    childConcepts: varchar('child_concepts').array(),
 
     // Examples
-    codeExamples: array(text('code_examples')),
-    queryExamples: array(text('query_examples')),
+    codeExamples: text('code_examples').array(),
+    queryExamples: text('query_examples').array(),
 
     // Timestamps
     createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
@@ -79,7 +78,7 @@ export const kagDomainTaxonomy = pgTable(
     domainClass: varchar('domain_class', { length: 50 }).unique().notNull(),
     parentDomain: varchar('parent_domain', { length: 50 }),
     description: text('description'),
-    exampleConcepts: array(varchar('example_concepts')),
+    exampleConcepts: varchar('example_concepts').array(),
 
     // Routing hints for 4D manifold
     preferXAxis: boolean('prefer_x_axis').default(false),
@@ -138,7 +137,7 @@ export const kagLdrTasks = pgTable(
     // Results
     summary: text('summary'),
     sources: jsonb('sources').default('{}'),
-    extractedTuples: array(uuid('extracted_tuples')),
+    extractedTuples: uuid('extracted_tuples').array(),
 
     // Timestamps
     createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),

@@ -1,0 +1,474 @@
+{
+  "timestamp": "2026-06-24T16:15:35.554Z",
+  "test": "phase1-validation-2000-chunks",
+  "config": {
+    "limit": 2000
+  },
+  "metrics": {
+    "total_chunks": 2000,
+    "with_summary": 160,
+    "with_summary_embedding": 160,
+    "cache_l1_hits": 0,
+    "cache_l1_misses": 160,
+    "total_duration_ms": 126
+  },
+  "provenance_sample": [
+    {
+      "chunk_id": "0000d635-8df8-4a03-a1b0-e33d2699f6c0",
+      "relative_path": "src/lib/components/evidence/EvidencePrimaryUpload.svelte",
+      "symbol": null,
+      "kind": null,
+      "cache_l1": "MISS",
+      "has_summary": true,
+      "has_qdrant_id": true
+    },
+    {
+      "chunk_id": "0001981c-da69-4b0e-9acb-ad29544029c8",
+      "relative_path": "src/routes/(app)/demos/+page.svelte",
+      "symbol": null,
+      "kind": null,
+      "cache_l1": "MISS",
+      "has_summary": true,
+      "has_qdrant_id": true
+    },
+    {
+      "chunk_id": "0002c4d4-3f96-4a8f-934d-61d8c6985340",
+      "relative_path": "src/routes/(app)/demos/notifications/+page.svelte",
+      "symbol": null,
+      "kind": null,
+      "cache_l1": "MISS",
+      "has_summary": true,
+      "has_qdrant_id": true
+    },
+    {
+      "chunk_id": "0004791e-40fe-4736-be3b-d84796ac5476",
+      "relative_path": "src/routes/(app)/admin/codebase-index/+page.svelte",
+      "symbol": null,
+      "kind": null,
+      "cache_l1": "MISS",
+      "has_summary": true,
+      "has_qdrant_id": true
+    },
+    {
+      "chunk_id": "0006a6fd-d2ec-48ab-926b-2adb327acaaf",
+      "relative_path": "src/lib/server/analytics/unified-research-query.ts",
+      "symbol": null,
+      "kind": null,
+      "cache_l1": "MISS",
+      "has_summary": true,
+      "has_qdrant_id": true
+    },
+    {
+      "chunk_id": "000700dd-d698-4589-a3b3-62c404909095",
+      "relative_path": "src/lib/server/db/schema-postgres.ts",
+      "symbol": "SynthesisRun",
+      "kind": "type",
+      "cache_l1": "MISS",
+      "has_summary": true,
+      "has_qdrant_id": true
+    },
+    {
+      "chunk_id": "000b45f4-0368-4a92-bde7-5698e49d6f8c",
+      "relative_path": "src/routes/(app)/demos/bits-ui/+page.svelte",
+      "symbol": null,
+      "kind": null,
+      "cache_l1": "MISS",
+      "has_summary": true,
+      "has_qdrant_id": true
+    },
+    {
+      "chunk_id": "000d381c-017b-4154-900c-f87e54e79539",
+      "relative_path": "src/lib/server/helpers/docker-discovery.ts",
+      "symbol": null,
+      "kind": null,
+      "cache_l1": "MISS",
+      "has_summary": true,
+      "has_qdrant_id": true
+    },
+    {
+      "chunk_id": "0010432e-9be2-4faf-9fc6-f6c26db3fe44",
+      "relative_path": "src/lib/server/embedding-cache.ts",
+      "symbol": null,
+      "kind": null,
+      "cache_l1": "MISS",
+      "has_summary": true,
+      "has_qdrant_id": true
+    },
+    {
+      "chunk_id": "00113f4e-919d-4799-8eb1-b5e65f5a72fc",
+      "relative_path": "src/lib/utils/webgpu-array-utils.ts",
+      "symbol": null,
+      "kind": null,
+      "cache_l1": "MISS",
+      "has_summary": true,
+      "has_qdrant_id": true
+    },
+    {
+      "chunk_id": "00127e7c-b8b8-49cd-a3f1-04033827d5d6",
+      "relative_path": "src/lib/server/triton-llm.ts",
+      "symbol": null,
+      "kind": null,
+      "cache_l1": "MISS",
+      "has_summary": true,
+      "has_qdrant_id": true
+    },
+    {
+      "chunk_id": "0013b0dd-ebf5-4f1e-9d64-4134bacc9490",
+      "relative_path": "src/lib/components/codebase/CodebaseWikiDashboard.svelte",
+      "symbol": null,
+      "kind": null,
+      "cache_l1": "MISS",
+      "has_summary": true,
+      "has_qdrant_id": true
+    },
+    {
+      "chunk_id": "0014482f-cc66-4466-9464-ee57a482acb8",
+      "relative_path": "src/routes/api/knowledge/search/+server.ts",
+      "symbol": "POST",
+      "kind": "route-handler",
+      "cache_l1": "MISS",
+      "has_summary": true,
+      "has_qdrant_id": true
+    },
+    {
+      "chunk_id": "0014ead0-2982-4e1a-bb8f-81b8aadd8d60",
+      "relative_path": "src/routes/api/codebase-index/claude-assist/feedback/analysis/+server.ts",
+      "symbol": null,
+      "kind": null,
+      "cache_l1": "MISS",
+      "has_summary": true,
+      "has_qdrant_id": true
+    },
+    {
+      "chunk_id": "0016a3ab-3b9c-4e83-8527-48ee65f434b8",
+      "relative_path": "src/lib/server/workers/audio-queue-consumer.ts",
+      "symbol": null,
+      "kind": null,
+      "cache_l1": "MISS",
+      "has_summary": true,
+      "has_qdrant_id": true
+    },
+    {
+      "chunk_id": "00173130-6713-4be9-aafe-804c2d7f5899",
+      "relative_path": "src/lib/components/ui/tabs/Svelte5Tabs.svelte",
+      "symbol": null,
+      "kind": null,
+      "cache_l1": "MISS",
+      "has_summary": true,
+      "has_qdrant_id": true
+    },
+    {
+      "chunk_id": "001873a1-fa8b-48f4-afbf-c1ce9ffacf5b",
+      "relative_path": "src/lib/components/canvas/hybrid/types.ts",
+      "symbol": "BoardNode",
+      "kind": "type",
+      "cache_l1": "MISS",
+      "has_summary": true,
+      "has_qdrant_id": true
+    },
+    {
+      "chunk_id": "001938cd-b242-4fb0-a783-6f3fa0b4f194",
+      "relative_path": "src/routes/api/synthesis/save/+server.ts",
+      "symbol": null,
+      "kind": null,
+      "cache_l1": "MISS",
+      "has_summary": true,
+      "has_qdrant_id": true
+    },
+    {
+      "chunk_id": "001b6a7e-f6d1-4e13-b5b5-550377e8e724",
+      "relative_path": "src/lib/webgpu/webgpu-rag-service.ts",
+      "symbol": null,
+      "kind": null,
+      "cache_l1": "MISS",
+      "has_summary": true,
+      "has_qdrant_id": true
+    },
+    {
+      "chunk_id": "001c5b43-f0d5-4e60-8a22-d1de44136304",
+      "relative_path": "src/lib/components/yorha/PhoenixProsecutorDashboard.svelte",
+      "symbol": null,
+      "kind": null,
+      "cache_l1": "MISS",
+      "has_summary": true,
+      "has_qdrant_id": true
+    },
+    {
+      "chunk_id": "001e1899-3709-47c5-a2a1-75619cc2e38f",
+      "relative_path": "src/lib/types/vector-jobs.ts",
+      "symbol": "LegalVectorEmbedding",
+      "kind": "type",
+      "cache_l1": "MISS",
+      "has_summary": true,
+      "has_qdrant_id": true
+    },
+    {
+      "chunk_id": "002362ba-f59d-4b4f-9d2d-88d543455d07",
+      "relative_path": "src/routes/(app)/demos/smart-positioning/+page.svelte",
+      "symbol": null,
+      "kind": null,
+      "cache_l1": "MISS",
+      "has_summary": true,
+      "has_qdrant_id": true
+    },
+    {
+      "chunk_id": "002612e3-6989-41bc-a330-4551092e4c79",
+      "relative_path": "src/routes/api/chat/stream/+server.ts",
+      "symbol": null,
+      "kind": null,
+      "cache_l1": "MISS",
+      "has_summary": true,
+      "has_qdrant_id": true
+    },
+    {
+      "chunk_id": "00271993-e370-4102-a285-97e20a775ff6",
+      "relative_path": "src/routes/api/system/phase78/status/+server.ts",
+      "symbol": null,
+      "kind": null,
+      "cache_l1": "MISS",
+      "has_summary": true,
+      "has_qdrant_id": true
+    },
+    {
+      "chunk_id": "0028a5cb-46a2-4032-bb13-b0d4c1c5f058",
+      "relative_path": "src/routes/api/rag/search/+server.ts",
+      "symbol": null,
+      "kind": null,
+      "cache_l1": "MISS",
+      "has_summary": true,
+      "has_qdrant_id": true
+    },
+    {
+      "chunk_id": "002a48cf-46f2-439b-8bed-7d641186fd04",
+      "relative_path": "src/routes/api/phase109/tag-chunks/+server.ts",
+      "symbol": null,
+      "kind": null,
+      "cache_l1": "MISS",
+      "has_summary": true,
+      "has_qdrant_id": true
+    },
+    {
+      "chunk_id": "002ac5f2-bcc5-4f09-9fab-6fe6a56f7b5c",
+      "relative_path": "src/lib/workers/compute-worker.mjs",
+      "symbol": null,
+      "kind": null,
+      "cache_l1": "MISS",
+      "has_summary": true,
+      "has_qdrant_id": true
+    },
+    {
+      "chunk_id": "002f8724-e13f-4cd5-9c97-40f30608de94",
+      "relative_path": "src/lib/components/codebase/ClusterVisualization.svelte",
+      "symbol": null,
+      "kind": null,
+      "cache_l1": "MISS",
+      "has_summary": true,
+      "has_qdrant_id": true
+    },
+    {
+      "chunk_id": "0030d459-c801-44be-826b-04762d45590d",
+      "relative_path": "src/lib/server/tools/registry.ts",
+      "symbol": null,
+      "kind": null,
+      "cache_l1": "MISS",
+      "has_summary": true,
+      "has_qdrant_id": true
+    },
+    {
+      "chunk_id": "00318766-7e63-41e3-9ac0-cb2265d385d6",
+      "relative_path": "src/lib/server/db/meta/0000_snapshot.json",
+      "symbol": null,
+      "kind": null,
+      "cache_l1": "MISS",
+      "has_summary": true,
+      "has_qdrant_id": true
+    },
+    {
+      "chunk_id": "0031f46b-b4d7-4496-b53c-bdad54cea853",
+      "relative_path": "src/routes/(app)/legal-corpus/[id]/+page.svelte",
+      "symbol": null,
+      "kind": null,
+      "cache_l1": "MISS",
+      "has_summary": true,
+      "has_qdrant_id": true
+    },
+    {
+      "chunk_id": "0032f0ca-8b15-4f1e-8918-04983f215658",
+      "relative_path": "src/lib/components/ai/ContextualChatDemo.svelte",
+      "symbol": null,
+      "kind": null,
+      "cache_l1": "MISS",
+      "has_summary": true,
+      "has_qdrant_id": true
+    },
+    {
+      "chunk_id": "003479bd-b852-46b7-a98a-22692fa2b82f",
+      "relative_path": "src/lib/components/evidence/EvidenceViewModal.svelte",
+      "symbol": null,
+      "kind": null,
+      "cache_l1": "MISS",
+      "has_summary": true,
+      "has_qdrant_id": true
+    },
+    {
+      "chunk_id": "0037718d-c4b6-41ad-b915-a571b376c653",
+      "relative_path": "src/routes/api/synthesis/generate/+server.ts",
+      "symbol": null,
+      "kind": null,
+      "cache_l1": "MISS",
+      "has_summary": true,
+      "has_qdrant_id": true
+    },
+    {
+      "chunk_id": "00377645-b57a-4ad3-91fc-ccaa6236653c",
+      "relative_path": "src/service-worker.ts",
+      "symbol": null,
+      "kind": null,
+      "cache_l1": "MISS",
+      "has_summary": true,
+      "has_qdrant_id": true
+    },
+    {
+      "chunk_id": "0037db8b-355a-4210-afc4-fd3c08bb42d6",
+      "relative_path": "src/lib/server/types/retrieval.ts",
+      "symbol": "fromWebResult",
+      "kind": "function",
+      "cache_l1": "MISS",
+      "has_summary": true,
+      "has_qdrant_id": true
+    },
+    {
+      "chunk_id": "00395793-5a02-4a2b-9ab2-9b653d865ed6",
+      "relative_path": "src/lib/components/forms/EnhancedFileUpload.svelte",
+      "symbol": "EnhancedFileUpload.svelte",
+      "kind": "component",
+      "cache_l1": "MISS",
+      "has_summary": true,
+      "has_qdrant_id": true
+    },
+    {
+      "chunk_id": "003d1e2f-f938-4ddf-865b-12ccf5c73581",
+      "relative_path": "src/lib/components/legal/EvidenceReportSummary.svelte",
+      "symbol": null,
+      "kind": null,
+      "cache_l1": "MISS",
+      "has_summary": true,
+      "has_qdrant_id": true
+    },
+    {
+      "chunk_id": "00410b03-d92f-4824-be68-50647a4ccfc6",
+      "relative_path": "src/lib/machines/auth-machine.ts",
+      "symbol": null,
+      "kind": null,
+      "cache_l1": "MISS",
+      "has_summary": true,
+      "has_qdrant_id": true
+    },
+    {
+      "chunk_id": "00413e6d-0428-4a24-9f65-45503d12dea9",
+      "relative_path": "src/lib/server/retrieval/cross-encoder-reranker.ts",
+      "symbol": null,
+      "kind": null,
+      "cache_l1": "MISS",
+      "has_summary": true,
+      "has_qdrant_id": true
+    },
+    {
+      "chunk_id": "00438fe4-90dc-4712-afaf-fda961ada3a4",
+      "relative_path": "src/lib/components/evidence/CaseEvidenceOrganizer.svelte",
+      "symbol": null,
+      "kind": null,
+      "cache_l1": "MISS",
+      "has_summary": true,
+      "has_qdrant_id": true
+    },
+    {
+      "chunk_id": "00478258-c89c-48e6-a7e7-08b4c15dcb99",
+      "relative_path": "src/routes/api/chat/memory/search/+server.ts",
+      "symbol": null,
+      "kind": null,
+      "cache_l1": "MISS",
+      "has_summary": true,
+      "has_qdrant_id": true
+    },
+    {
+      "chunk_id": "0047ab6b-d9a2-4132-b1b1-473e88b964de",
+      "relative_path": "src/routes/(app)/persons-of-interest/+page.svelte",
+      "symbol": null,
+      "kind": null,
+      "cache_l1": "MISS",
+      "has_summary": true,
+      "has_qdrant_id": true
+    },
+    {
+      "chunk_id": "004c040e-5e5d-4b7c-8c8b-ad53139f47ea",
+      "relative_path": "src/lib/server/agent/supervisor.ts",
+      "symbol": null,
+      "kind": null,
+      "cache_l1": "MISS",
+      "has_summary": true,
+      "has_qdrant_id": true
+    },
+    {
+      "chunk_id": "0051daac-0850-4150-838d-079915932943",
+      "relative_path": "src/lib/client/search-client.ts",
+      "symbol": null,
+      "kind": null,
+      "cache_l1": "MISS",
+      "has_summary": true,
+      "has_qdrant_id": true
+    },
+    {
+      "chunk_id": "005228a6-8256-49dc-abbb-bc68bc4a58f2",
+      "relative_path": "src/lib/server/ace/ace-wiki.ts",
+      "symbol": null,
+      "kind": null,
+      "cache_l1": "MISS",
+      "has_summary": true,
+      "has_qdrant_id": true
+    },
+    {
+      "chunk_id": "00537352-b039-45bf-9009-b44d4ccf337d",
+      "relative_path": "src/lib/services/error-analysis/KAGTraverser.ts",
+      "symbol": null,
+      "kind": null,
+      "cache_l1": "MISS",
+      "has_summary": true,
+      "has_qdrant_id": true
+    },
+    {
+      "chunk_id": "0055f29f-26b2-4bdc-9f07-610150d7e751",
+      "relative_path": "src/lib/server/gpu/libtorch-bridge.ts",
+      "symbol": null,
+      "kind": null,
+      "cache_l1": "MISS",
+      "has_summary": true,
+      "has_qdrant_id": true
+    },
+    {
+      "chunk_id": "0056ba9b-7c4a-4b85-939f-66095ebf350c",
+      "relative_path": "src/routes/(app)/admin/all-routes/+page.server.ts",
+      "symbol": null,
+      "kind": null,
+      "cache_l1": "MISS",
+      "has_summary": true,
+      "has_qdrant_id": true
+    },
+    {
+      "chunk_id": "005acd85-9fb6-4fb3-8116-8dfc1fc7d4b7",
+      "relative_path": "src/lib/components/legal/AISummaryReader.svelte",
+      "symbol": null,
+      "kind": null,
+      "cache_l1": "MISS",
+      "has_summary": true,
+      "has_qdrant_id": true
+    }
+  ],
+  "gaps": {
+    "missing_summary": 1840,
+    "missing_summary_embedding": 1840,
+    "missing_feature_id": 0,
+    "missing_source_ref": 0,
+    "missing_qdrant_id": 0
+  }
+}

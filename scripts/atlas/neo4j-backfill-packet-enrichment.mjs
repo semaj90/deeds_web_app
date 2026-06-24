@@ -68,14 +68,13 @@ async function main() {
     log(`\n2. Fetching enrichment data from Postgres...`);
 
     const enrichmentRows = await pgPool.query(`
-      SELECT
+      SELECT DISTINCT
         packet_key,
         som_cluster,
-        directory_path,
         feature_id,
         source_ref
-      FROM atlas_codebase_packets
-      WHERE packet_key IS NOT NULL
+      FROM nes_chrom_packets
+      WHERE packet_key IS NOT NULL AND feature_id IS NOT NULL
       LIMIT 10000
     `);
 
@@ -99,7 +98,7 @@ async function main() {
         MATCH (p:Packet { packet_key: pkt.packet_key })
         SET
           p.som_cluster = pkt.som_cluster,
-          p.directory_path = pkt.directory_path
+          p.updated_at = datetime()
         RETURN count(p) AS updated
       `;
 
@@ -142,15 +141,13 @@ async function main() {
     const verify = verifyResult.records[0];
     const totalAfter = verify.get('total_packets')?.toNumber?.() || 0;
     const withSomAfter = verify.get('with_som_cluster')?.toNumber?.() || 0;
-    const withDirAfter = verify.get('with_directory_path')?.toNumber?.() || 0;
 
     log(`   Total Packets: ${totalAfter}`);
     log(`   With som_cluster: ${withSomAfter} (${(withSomAfter/totalAfter*100).toFixed(1)}%)`);
-    log(`   With directory_path: ${withDirAfter} (${(withDirAfter/totalAfter*100).toFixed(1)}%)`);
 
     // Step 5: Report
     log(`\n═══ Enrichment Status ═══`);
-    if (withSomAfter === totalAfter && withDirAfter === totalAfter) {
+    if (withSomAfter === totalAfter) {
       log(`✅ ALL PACKET NODES ENRICHED — Ready for Phase 2 relationships`);
     } else {
       log(`⚠️  PARTIAL ENRICHMENT — ${totalAfter - withSomAfter} packets missing som_cluster`);
@@ -167,7 +164,6 @@ async function main() {
       afterEnrichment: {
         totalPackets: totalAfter,
         withSomCluster: withSomAfter,
-        withDirectoryPath: withDirAfter,
       },
     }, null, 2));
 
