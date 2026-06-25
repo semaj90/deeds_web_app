@@ -320,7 +320,7 @@ async function testRetrievalConsistency(pool, measurement, sampleSize = 20) {
 
   // Use 20 representative queries from telemetry
   const { rows: queries } = await pool.query(
-    `SELECT DISTINCT query_hash, query FROM retrieval_telemetry
+    `SELECT query_hash, query FROM retrieval_telemetry
      WHERE selected_packet_keys IS NOT NULL
      ORDER BY RANDOM() LIMIT $1`,
     [sampleSize]
