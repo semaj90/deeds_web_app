@@ -57,7 +57,7 @@ function ensureDir(dir) {
   }
 }
 
-async function runSkillTest(skillName, args) {
+async function runSkillTest(skillName, args, workdir = 'sveltekit-frontend') {
   return new Promise((resolve, reject) => {
     log(`Running test: ${skillName}`);
 
@@ -75,7 +75,7 @@ async function runSkillTest(skillName, args) {
     }
 
     const proc = spawn(cmd, cmdArgs, {
-      cwd: path.join(ROOT, 'sveltekit-frontend'),
+      cwd: path.join(ROOT, workdir),
       stdio: 'pipe',
       shell: true
     });
@@ -173,7 +173,7 @@ async function runLane1_ReplayProof() {
   try {
     // Lane 1: Run graphify authority to baseline Neo4j ranking
     log('  Running graphify:authority...');
-    await runSkillTest('graphify:authority', []);
+    await runSkillTest('graphify:authority', [], 'sveltekit-frontend');
 
     return {
       lane: 'authority',
@@ -199,10 +199,10 @@ async function runLane2_CacheProof() {
   try {
     // Lane 2: Run karpathy GPU to compute attention scores
     log('  Running karpathy:gpu...');
-    await runSkillTest('karpathy:gpu', []);
+    await runSkillTest('karpathy:gpu', [], 'sveltekit-frontend');
 
     log('  Backfilling Qdrant with Karpathy scores...');
-    await runSkillTest('karpathy:backfill:qdrant:auto', []);
+    await runSkillTest('karpathy:backfill:qdrant', [], 'sveltekit-frontend');
 
     return {
       lane: 'karpathy_gpu',

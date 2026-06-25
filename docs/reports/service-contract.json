@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-06-25T03:24:42.039Z",
+  "timestamp": "2026-06-25T03:56:46.740Z",
   "title": "Canonical Service Contract",
   "description": "Single source of truth for service configuration, ports, health, and dependencies",
   "services": [
@@ -29,7 +29,7 @@
         "status": "no_health_check",
         "response_code": null,
         "message": null,
-        "checked_at": "2026-06-25T03:24:38.750Z"
+        "checked_at": "2026-06-25T03:56:46.034Z"
       }
     },
     {
@@ -57,7 +57,7 @@
         "status": "no_health_check",
         "response_code": null,
         "message": null,
-        "checked_at": "2026-06-25T03:24:38.751Z"
+        "checked_at": "2026-06-25T03:56:46.035Z"
       }
     },
     {
@@ -86,7 +86,7 @@
         "status": "unhealthy",
         "response_code": 404,
         "message": "",
-        "checked_at": "2026-06-25T03:24:38.751Z"
+        "checked_at": "2026-06-25T03:56:46.035Z"
       }
     },
     {
@@ -114,7 +114,7 @@
         "status": "healthy",
         "response_code": 200,
         "message": "{\"components\":{\"db_pings\":\"ok\"},\"status\":\"ok\"}\n",
-        "checked_at": "2026-06-25T03:24:39.314Z"
+        "checked_at": "2026-06-25T03:56:46.080Z"
       }
     },
     {
@@ -143,7 +143,7 @@
         "status": "healthy",
         "response_code": 200,
         "message": "<!doctype html><html lang=\"en\"><head><meta charset=\"UTF-8\"/><title>Neo4j Browser</title><style>* {\n        padding: 0;\n        margin: 0;\n      }\n      html,\n      body {\n        width: 100%;\n        ",
-        "checked_at": "2026-06-25T03:24:39.357Z"
+        "checked_at": "2026-06-25T03:56:46.121Z"
       }
     },
     {
@@ -172,7 +172,7 @@
         "status": "unhealthy",
         "response_code": 401,
         "message": "",
-        "checked_at": "2026-06-25T03:24:40.784Z"
+        "checked_at": "2026-06-25T03:56:46.168Z"
       }
     },
     {
@@ -202,8 +202,8 @@
         "container_name": "legal-ai-go-retrieval",
         "status": "healthy",
         "response_code": 200,
-        "message": "{\"embeddingServiceUp\":true,\"pgvectorConnected\":true,\"qdrantConnected\":true,\"redisConnected\":true,\"status\":\"healthy\",\"timestamp\":1782357880914}\n",
-        "checked_at": "2026-06-25T03:24:40.856Z"
+        "message": "{\"embeddingServiceUp\":true,\"pgvectorConnected\":true,\"qdrantConnected\":true,\"redisConnected\":true,\"status\":\"healthy\",\"timestamp\":1782359806247}\n",
+        "checked_at": "2026-06-25T03:56:46.210Z"
       }
     },
     {
@@ -232,8 +232,8 @@
         "container_name": "legal-ai-go-embedding",
         "status": "healthy",
         "response_code": 200,
-        "message": "{\"status\":\"healthy\",\"model_loaded\":\"true\",\"device\":\"cpu\",\"timestamp\":1782357880}\n",
-        "checked_at": "2026-06-25T03:24:40.925Z"
+        "message": "{\"status\":\"healthy\",\"model_loaded\":\"true\",\"device\":\"cpu\",\"timestamp\":1782359806}\n",
+        "checked_at": "2026-06-25T03:56:46.258Z"
       }
     },
     {
@@ -262,7 +262,7 @@
         "status": "healthy",
         "response_code": 200,
         "message": "{\"embeddingServiceUp\":true,\"indexed_chunks\":3744,\"indexed_documents\":1,\"pgvectorConnected\":true,\"qdrant\":{\"knowledge_base_points\":0,\"legal_documents_points\":0},\"qdrantConnected\":false,\"redisConnected\"",
-        "checked_at": "2026-06-25T03:24:40.997Z"
+        "checked_at": "2026-06-25T03:56:46.307Z"
       }
     },
     {
@@ -289,7 +289,7 @@
         "status": "healthy",
         "response_code": 200,
         "message": "<!DOCTYPE html><html lang=\"en\"><head><meta charSet=\"utf-8\" data-next-head=\"\"/><meta name=\"viewport\" content=\"width=device-width\" data-next-head=\"\"/><link rel=\"preload\" href=\"/_next/static/chunks/1475h",
-        "checked_at": "2026-06-25T03:24:41.062Z"
+        "checked_at": "2026-06-25T03:56:46.362Z"
       }
     },
     {
@@ -319,7 +319,7 @@
         "status": "healthy",
         "response_code": 200,
         "message": "Ok.\n",
-        "checked_at": "2026-06-25T03:24:41.687Z"
+        "checked_at": "2026-06-25T03:56:46.415Z"
       }
     },
     {
@@ -346,7 +346,7 @@
         "status": "healthy",
         "response_code": 200,
         "message": "{\"status\":\"healthy\",\"services\":{\"docling\":true,\"whisper\":true,\"yolo\":true,\"vlm_ocr\":true},\"config\":{\"vlm_model\":\"gemma4:e4b\",\"yolo_model_active\":\"yolov8n.pt\",\"yolo_model_gpu\":\"yolov8x.pt\",\"yolo_model_",
-        "checked_at": "2026-06-25T03:24:41.730Z"
+        "checked_at": "2026-06-25T03:56:46.457Z"
       }
     },
     {
@@ -373,7 +373,7 @@
         "status": "unhealthy",
         "response_code": 404,
         "message": "{\"detail\":\"Not Found\"}",
-        "checked_at": "2026-06-25T03:24:41.777Z"
+        "checked_at": "2026-06-25T03:56:46.507Z"
       }
     },
     {
@@ -400,7 +400,7 @@
         "status": "healthy",
         "response_code": 200,
         "message": "{\"IsLeader\":true,\"Leader\":\"seaweedfs-master:9333.19333\",\"MaxVolumeId\":35}",
-        "checked_at": "2026-06-25T03:24:41.847Z"
+        "checked_at": "2026-06-25T03:56:46.556Z"
       }
     },
     {
@@ -426,8 +426,8 @@
         "container_name": "legal-ai-seaweed-s3",
         "status": "unhealthy",
         "response_code": 403,
-        "message": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<Error><Code>AccessDenied</Code><Message>Access Denied.</Message><Resource>/</Resource><RequestId>18BC350CDF92071875270DAC</RequestId></Error>",
-        "checked_at": "2026-06-25T03:24:41.894Z"
+        "message": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<Error><Code>AccessDenied</Code><Message>Access Denied.</Message><Resource>/</Resource><RequestId>18BC36CD005C0C7B1A966EF6</RequestId></Error>",
+        "checked_at": "2026-06-25T03:56:46.597Z"
       }
     },
     {
@@ -453,7 +453,7 @@
         "status": "healthy",
         "response_code": 200,
         "message": "{\"models\":[{\"name\":\"gemma4-rotorquant:latest\",\"model\":\"gemma4-rotorquant:latest\",\"modified_at\":\"2026-05-23T10:55:48.593731-07:00\",\"size\":5091434800,\"digest\":\"97331517de8947798a95915272c94438ff7133990b",
-        "checked_at": "2026-06-25T03:24:41.942Z"
+        "checked_at": "2026-06-25T03:56:46.638Z"
       }
     },
     {
@@ -480,7 +480,7 @@
         "status": "healthy",
         "response_code": 200,
         "message": "{\"models\":[{\"name\":\"gemma4-legal-iq4xs-direct.gguf\",\"model\":\"gemma4-legal-iq4xs-direct.gguf\",\"modified_at\":\"\",\"size\":\"\",\"digest\":\"\",\"type\":\"model\",\"description\":\"\",\"tags\":[\"\"],\"capabilities\":[\"complet",
-        "checked_at": "2026-06-25T03:24:41.985Z"
+        "checked_at": "2026-06-25T03:56:46.678Z"
       }
     }
   ],

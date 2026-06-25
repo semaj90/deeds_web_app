@@ -170,9 +170,11 @@ export function validateRouterOutput(output: RouterOutput): RouterOutput {
   try {
     return routerOutputSchema.parse(output);
   } catch (error) {
-    throw new Error(
-      `Invalid router output: ${error instanceof z.ZodError ? error.errors.map((e) => e.message).join('; ') : String(error)}`
-    );
+    let message = String(error);
+    if (error instanceof z.ZodError) {
+      message = error.issues?.map((e) => e.message).join('; ') || String(error);
+    }
+    throw new Error(`Invalid router output: ${message}`);
   }
 }
 

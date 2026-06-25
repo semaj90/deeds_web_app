@@ -1,0 +1,50 @@
+{
+  "story_id": "ATLAS-PROOF-1782358244767",
+  "timestamp": "2026-06-25T03:31:24.138Z",
+  "duration_ms": 39286,
+  "dry_run": false,
+  "lanes": [
+    {
+      "lane": "authority",
+      "status": "PASS",
+      "story_id": "ATLAS-PROOF-1782358244767-AUTHORITY",
+      "timestamp": "2026-06-25T03:30:45.804Z",
+      "verdict": "PASS"
+    },
+    {
+      "lane": "karpathy_gpu",
+      "status": "PASS",
+      "story_id": "ATLAS-PROOF-1782358244767-KARPATHY",
+      "timestamp": "2026-06-25T03:31:24.137Z",
+      "verdict": "PASS"
+    },
+    {
+      "lane": "ace_context",
+      "status": "PASS",
+      "story_id": "ATLAS-PROOF-1782358244767-ACE",
+      "timestamp": "2026-06-25T03:31:24.137Z",
+      "note": "ACE context assembly wired to read Karpathy scores at Stage A0.5",
+      "verdict": "PASS"
+    },
+    {
+      "lane": "integration",
+      "status": "PASS",
+      "story_id": "ATLAS-PROOF-1782358244767-INTEGRATION",
+      "timestamp": "2026-06-25T03:31:24.138Z",
+      "verdict": "PASS"
+    }
+  ],
+  "verdict": {
+    "by_lane": {
+      "replay": "UNKNOWN",
+      "cache": "UNKNOWN",
+      "live_app": "UNKNOWN",
+      "cubic": "UNKNOWN"
+    },
+    "pass_count": 0,
+    "fail_count": 0,
+    "pending_count": 0,
+    "overall": "UNKNOWN"
+  },
+  "can_promote": false
+}

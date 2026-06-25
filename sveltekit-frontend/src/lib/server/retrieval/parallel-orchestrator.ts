@@ -136,7 +136,7 @@ async function searchQdrant(
       vector: Array.from(vector),
       limit,
       with_payload: true,
-      with_vectors: false,
+      with_vector: false,
     });
 
     return searchRes.map((point) => ({

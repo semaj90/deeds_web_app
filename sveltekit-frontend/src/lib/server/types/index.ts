@@ -51,3 +51,12 @@ export type {
   LegalDocChunkPayload,
   QdrantPoint,
 } from './qdrant.js';
+
+// ── Unified retrieval types (RAG, KAG, DAG normalization) ────────────────────
+export type {
+  RetrievalKind,
+  RetrievalSourceSystem,
+  RetrievalCacheLayer,
+  RankExplain,
+  UnifiedRetrievalResult,
+} from './retrieval.js';

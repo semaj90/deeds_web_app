@@ -1866,14 +1866,6 @@ export async function assembleACEContext(opts: {
               },
               retrievalTrace: {
                 topoPrefilter: cartridgeResults.topoPrefilter,
-                routingDecision: routingDecision ? {
-                  lane: routingDecision.lane,
-                  score: routingDecision.score,
-                  confidence: routingDecision.confidence,
-                  batch_size: routingDecision.recommended_batch_size,
-                  use_gpu_rerank: routingDecision.use_gpu_rerank,
-                  postgres_filter: routingDecision.postgres_filter,
-                } : null,
               },
             };
 
