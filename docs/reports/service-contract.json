@@ -1,0 +1,494 @@
+{
+  "timestamp": "2026-06-25T03:24:42.039Z",
+  "title": "Canonical Service Contract",
+  "description": "Single source of truth for service configuration, ports, health, and dependencies",
+  "services": [
+    {
+      "id": "postgres",
+      "name": "PostgreSQL 18.4",
+      "container_name": "legal-ai-postgres",
+      "image": "postgres:18.4-alpine",
+      "ports": {
+        "http": null,
+        "tcp": 5434
+      },
+      "container_ports": {
+        "tcp": 5432
+      },
+      "protocol": "PostgreSQL TCP",
+      "health_check": "docker exec legal-ai-postgres pg_isready -U legal_admin",
+      "health_endpoint": null,
+      "dependencies": [
+        "none"
+      ],
+      "tier": "essential",
+      "profile": "default",
+      "health": {
+        "name": "PostgreSQL 18.4",
+        "container_name": "legal-ai-postgres",
+        "status": "no_health_check",
+        "response_code": null,
+        "message": null,
+        "checked_at": "2026-06-25T03:24:38.750Z"
+      }
+    },
+    {
+      "id": "valkey",
+      "name": "Valkey 8.1 (Redis-compatible)",
+      "container_name": "legal-ai-valkey",
+      "image": "valkey/valkey-bundle:8.1.1",
+      "ports": {
+        "tcp": 6379
+      },
+      "container_ports": {
+        "tcp": 6379
+      },
+      "protocol": "Redis RESP",
+      "health_endpoint": null,
+      "dependencies": [
+        "none"
+      ],
+      "tier": "essential",
+      "profile": "default",
+      "binding_note": "Bound to 127.0.0.1 for security (internal only)",
+      "health": {
+        "name": "Valkey 8.1 (Redis-compatible)",
+        "container_name": "legal-ai-valkey",
+        "status": "no_health_check",
+        "response_code": null,
+        "message": null,
+        "checked_at": "2026-06-25T03:24:38.751Z"
+      }
+    },
+    {
+      "id": "qdrant",
+      "name": "Qdrant Vector Database",
+      "container_name": "legal-ai-qdrant",
+      "image": "qdrant/qdrant:latest",
+      "ports": {
+        "http": 6333,
+        "grpc": 6334
+      },
+      "container_ports": {
+        "http": 6333,
+        "grpc": 6334
+      },
+      "protocol": "HTTP + gRPC",
+      "health_endpoint": "http://127.0.0.1:6333/health",
+      "dependencies": [
+        "none"
+      ],
+      "tier": "essential",
+      "profile": "default",
+      "health": {
+        "name": "Qdrant Vector Database",
+        "container_name": "legal-ai-qdrant",
+        "status": "unhealthy",
+        "response_code": 404,
+        "message": "",
+        "checked_at": "2026-06-25T03:24:38.751Z"
+      }
+    },
+    {
+      "id": "bifrost",
+      "name": "Bifrost Semantic Cache",
+      "container_name": "legal-ai-bifrost",
+      "image": "bifrost:latest",
+      "ports": {
+        "http": 3040
+      },
+      "container_ports": {
+        "http": 8080
+      },
+      "protocol": "HTTP (OpenAI-compatible)",
+      "health_endpoint": "http://127.0.0.1:3040/health",
+      "dependencies": [
+        "qdrant",
+        "ollama"
+      ],
+      "tier": "essential",
+      "profile": "default",
+      "health": {
+        "name": "Bifrost Semantic Cache",
+        "container_name": "legal-ai-bifrost",
+        "status": "healthy",
+        "response_code": 200,
+        "message": "{\"components\":{\"db_pings\":\"ok\"},\"status\":\"ok\"}\n",
+        "checked_at": "2026-06-25T03:24:39.314Z"
+      }
+    },
+    {
+      "id": "neo4j",
+      "name": "Neo4j Graph Database",
+      "container_name": "legal-ai-neo4j",
+      "image": "neo4j:latest",
+      "ports": {
+        "http": 7474,
+        "bolt": 7687
+      },
+      "container_ports": {
+        "http": 7474,
+        "bolt": 7687
+      },
+      "protocol": "HTTP + Bolt",
+      "health_endpoint": "http://127.0.0.1:7474/browser/",
+      "dependencies": [
+        "none"
+      ],
+      "tier": "graph",
+      "profile": "default",
+      "health": {
+        "name": "Neo4j Graph Database",
+        "container_name": "legal-ai-neo4j",
+        "status": "healthy",
+        "response_code": 200,
+        "message": "<!doctype html><html lang=\"en\"><head><meta charset=\"UTF-8\"/><title>Neo4j Browser</title><style>* {\n        padding: 0;\n        margin: 0;\n      }\n      html,\n      body {\n        width: 100%;\n        ",
+        "checked_at": "2026-06-25T03:24:39.357Z"
+      }
+    },
+    {
+      "id": "rabbitmq",
+      "name": "RabbitMQ Message Broker",
+      "container_name": "legal-ai-rabbitmq",
+      "image": "rabbitmq:3.13-management",
+      "ports": {
+        "amqp": 5672,
+        "management": 15672
+      },
+      "container_ports": {
+        "amqp": 5672,
+        "management": 15672
+      },
+      "protocol": "AMQP + HTTP (Management)",
+      "health_endpoint": "http://127.0.0.1:15672/api/overview",
+      "dependencies": [
+        "none"
+      ],
+      "tier": "messaging",
+      "profile": "default",
+      "health": {
+        "name": "RabbitMQ Message Broker",
+        "container_name": "legal-ai-rabbitmq",
+        "status": "unhealthy",
+        "response_code": 401,
+        "message": "",
+        "checked_at": "2026-06-25T03:24:40.784Z"
+      }
+    },
+    {
+      "id": "go_retrieval",
+      "name": "Go Retrieval Service (RAG+KAG+DAG)",
+      "container_name": "legal-ai-go-retrieval",
+      "image": "legal-ai-go-retrieval:latest",
+      "ports": {
+        "http": 8100,
+        "grpc": 50053
+      },
+      "container_ports": {
+        "http": 8100,
+        "grpc": 50053
+      },
+      "protocol": "HTTP + gRPC",
+      "health_endpoint": "http://127.0.0.1:8100/health",
+      "dependencies": [
+        "qdrant",
+        "neo4j",
+        "valkey"
+      ],
+      "tier": "retrieval",
+      "profile": "default",
+      "health": {
+        "name": "Go Retrieval Service (RAG+KAG+DAG)",
+        "container_name": "legal-ai-go-retrieval",
+        "status": "healthy",
+        "response_code": 200,
+        "message": "{\"embeddingServiceUp\":true,\"pgvectorConnected\":true,\"qdrantConnected\":true,\"redisConnected\":true,\"status\":\"healthy\",\"timestamp\":1782357880914}\n",
+        "checked_at": "2026-06-25T03:24:40.856Z"
+      }
+    },
+    {
+      "id": "go_embedding",
+      "name": "Go Embedding Service",
+      "container_name": "legal-ai-go-embedding",
+      "image": "legal-ai-go-embedding:latest",
+      "ports": {
+        "http": 8097,
+        "grpc": 50051
+      },
+      "container_ports": {
+        "http": 8097,
+        "grpc": 50051
+      },
+      "protocol": "HTTP + gRPC",
+      "health_endpoint": "http://127.0.0.1:8097/health",
+      "dependencies": [
+        "ollama",
+        "valkey"
+      ],
+      "tier": "embedding",
+      "profile": "default",
+      "health": {
+        "name": "Go Embedding Service",
+        "container_name": "legal-ai-go-embedding",
+        "status": "healthy",
+        "response_code": 200,
+        "message": "{\"status\":\"healthy\",\"model_loaded\":\"true\",\"device\":\"cpu\",\"timestamp\":1782357880}\n",
+        "checked_at": "2026-06-25T03:24:40.925Z"
+      }
+    },
+    {
+      "id": "go_search",
+      "name": "Go Search Service (Semantic Search)",
+      "container_name": "legal-ai-go-search",
+      "image": "legal-ai-go-search:latest",
+      "ports": {
+        "http": 8096,
+        "grpc": 50055
+      },
+      "container_ports": {
+        "http": 8096,
+        "grpc": 50055
+      },
+      "protocol": "HTTP + gRPC",
+      "health_endpoint": "http://127.0.0.1:8096/health",
+      "dependencies": [
+        "qdrant"
+      ],
+      "tier": "search",
+      "profile": "default",
+      "health": {
+        "name": "Go Search Service (Semantic Search)",
+        "container_name": "legal-ai-go-search",
+        "status": "healthy",
+        "response_code": 200,
+        "message": "{\"embeddingServiceUp\":true,\"indexed_chunks\":3744,\"indexed_documents\":1,\"pgvectorConnected\":true,\"qdrant\":{\"knowledge_base_points\":0,\"legal_documents_points\":0},\"qdrantConnected\":false,\"redisConnected\"",
+        "checked_at": "2026-06-25T03:24:40.997Z"
+      }
+    },
+    {
+      "id": "langfuse_server",
+      "name": "Langfuse Web UI",
+      "container_name": "langfuse-server",
+      "image": "langfuse:latest",
+      "ports": {
+        "http": 3030
+      },
+      "container_ports": {
+        "http": 3000
+      },
+      "protocol": "HTTP",
+      "health_endpoint": "http://127.0.0.1:3030/",
+      "dependencies": [
+        "langfuse-clickhouse"
+      ],
+      "tier": "observability",
+      "profile": "default",
+      "health": {
+        "name": "Langfuse Web UI",
+        "container_name": "langfuse-server",
+        "status": "healthy",
+        "response_code": 200,
+        "message": "<!DOCTYPE html><html lang=\"en\"><head><meta charSet=\"utf-8\" data-next-head=\"\"/><meta name=\"viewport\" content=\"width=device-width\" data-next-head=\"\"/><link rel=\"preload\" href=\"/_next/static/chunks/1475h",
+        "checked_at": "2026-06-25T03:24:41.062Z"
+      }
+    },
+    {
+      "id": "langfuse_clickhouse",
+      "name": "ClickHouse (Langfuse Analytics)",
+      "container_name": "langfuse-clickhouse",
+      "image": "clickhouse/clickhouse-server:latest",
+      "ports": {
+        "http": 8124,
+        "grpc": 9009
+      },
+      "container_ports": {
+        "http": 8123,
+        "grpc": 9000
+      },
+      "protocol": "HTTP + gRPC",
+      "health_endpoint": "http://127.0.0.1:8124/",
+      "dependencies": [
+        "none"
+      ],
+      "tier": "observability",
+      "profile": "default",
+      "binding_note": "Bound to 127.0.0.1 for security (internal only)",
+      "health": {
+        "name": "ClickHouse (Langfuse Analytics)",
+        "container_name": "langfuse-clickhouse",
+        "status": "healthy",
+        "response_code": 200,
+        "message": "Ok.\n",
+        "checked_at": "2026-06-25T03:24:41.687Z"
+      }
+    },
+    {
+      "id": "docling_vlm",
+      "name": "Docling VLM (Document OCR)",
+      "container_name": "legal-ai-docling-vlm",
+      "image": "legal-ai-docling-vlm:latest",
+      "ports": {
+        "http": 8085
+      },
+      "container_ports": {
+        "http": 8085
+      },
+      "protocol": "HTTP",
+      "health_endpoint": "http://127.0.0.1:8085/health",
+      "dependencies": [
+        "none"
+      ],
+      "tier": "vision",
+      "profile": "default",
+      "health": {
+        "name": "Docling VLM (Document OCR)",
+        "container_name": "legal-ai-docling-vlm",
+        "status": "healthy",
+        "response_code": 200,
+        "message": "{\"status\":\"healthy\",\"services\":{\"docling\":true,\"whisper\":true,\"yolo\":true,\"vlm_ocr\":true},\"config\":{\"vlm_model\":\"gemma4:e4b\",\"yolo_model_active\":\"yolov8n.pt\",\"yolo_model_gpu\":\"yolov8x.pt\",\"yolo_model_",
+        "checked_at": "2026-06-25T03:24:41.730Z"
+      }
+    },
+    {
+      "id": "image_synthesis",
+      "name": "ComfyUI Image Synthesis",
+      "container_name": "legal-ai-image-synthesis",
+      "image": "legal-ai-image-synthesis:latest",
+      "ports": {
+        "http": 8092
+      },
+      "container_ports": {
+        "http": 8092
+      },
+      "protocol": "HTTP (ComfyUI)",
+      "health_endpoint": "http://127.0.0.1:8092/system_stats",
+      "dependencies": [
+        "none"
+      ],
+      "tier": "generation",
+      "profile": "default",
+      "health": {
+        "name": "ComfyUI Image Synthesis",
+        "container_name": "legal-ai-image-synthesis",
+        "status": "unhealthy",
+        "response_code": 404,
+        "message": "{\"detail\":\"Not Found\"}",
+        "checked_at": "2026-06-25T03:24:41.777Z"
+      }
+    },
+    {
+      "id": "seaweedfs_master",
+      "name": "SeaweedFS Master (Metadata)",
+      "container_name": "legal-ai-seaweed-master",
+      "image": "chrislusf/seaweedfs:latest",
+      "ports": {
+        "http": 9333
+      },
+      "container_ports": {
+        "http": 9333
+      },
+      "protocol": "HTTP",
+      "health_endpoint": "http://127.0.0.1:9333/cluster/status",
+      "dependencies": [
+        "none"
+      ],
+      "tier": "storage",
+      "profile": "default",
+      "health": {
+        "name": "SeaweedFS Master (Metadata)",
+        "container_name": "legal-ai-seaweed-master",
+        "status": "healthy",
+        "response_code": 200,
+        "message": "{\"IsLeader\":true,\"Leader\":\"seaweedfs-master:9333.19333\",\"MaxVolumeId\":35}",
+        "checked_at": "2026-06-25T03:24:41.847Z"
+      }
+    },
+    {
+      "id": "seaweedfs_s3",
+      "name": "SeaweedFS S3 Gateway",
+      "container_name": "legal-ai-seaweed-s3",
+      "image": "chrislusf/seaweedfs:latest",
+      "ports": {
+        "http": 8333
+      },
+      "container_ports": {
+        "http": 8333
+      },
+      "protocol": "HTTP (S3-compatible)",
+      "health_endpoint": "http://127.0.0.1:8333/",
+      "dependencies": [
+        "seaweedfs_master"
+      ],
+      "tier": "storage",
+      "profile": "default",
+      "health": {
+        "name": "SeaweedFS S3 Gateway",
+        "container_name": "legal-ai-seaweed-s3",
+        "status": "unhealthy",
+        "response_code": 403,
+        "message": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<Error><Code>AccessDenied</Code><Message>Access Denied.</Message><Resource>/</Resource><RequestId>18BC350CDF92071875270DAC</RequestId></Error>",
+        "checked_at": "2026-06-25T03:24:41.894Z"
+      }
+    },
+    {
+      "id": "ollama",
+      "name": "Ollama Inference Server",
+      "container_name": "N/A (native)",
+      "image": "N/A",
+      "ports": {
+        "http": 11434
+      },
+      "container_ports": null,
+      "protocol": "HTTP",
+      "health_endpoint": "http://localhost:11434/api/tags",
+      "dependencies": [
+        "CUDA GPU"
+      ],
+      "tier": "inference",
+      "profile": "native",
+      "location": "Windows WSL / native",
+      "health": {
+        "name": "Ollama Inference Server",
+        "container_name": "N/A (native)",
+        "status": "healthy",
+        "response_code": 200,
+        "message": "{\"models\":[{\"name\":\"gemma4-rotorquant:latest\",\"model\":\"gemma4-rotorquant:latest\",\"modified_at\":\"2026-05-23T10:55:48.593731-07:00\",\"size\":5091434800,\"digest\":\"97331517de8947798a95915272c94438ff7133990b",
+        "checked_at": "2026-06-25T03:24:41.942Z"
+      }
+    },
+    {
+      "id": "llama_server",
+      "name": "llama-server (TurboQuant)",
+      "container_name": "N/A (native)",
+      "image": "N/A",
+      "ports": {
+        "http": 8090
+      },
+      "container_ports": null,
+      "protocol": "HTTP (OpenAI-compatible)",
+      "health_endpoint": "http://127.0.0.1:8090/v1/models",
+      "dependencies": [
+        "CUDA GPU",
+        "Gemma4 model"
+      ],
+      "tier": "inference",
+      "profile": "native",
+      "location": "Windows / WSL native binary",
+      "health": {
+        "name": "llama-server (TurboQuant)",
+        "container_name": "N/A (native)",
+        "status": "healthy",
+        "response_code": 200,
+        "message": "{\"models\":[{\"name\":\"gemma4-legal-iq4xs-direct.gguf\",\"model\":\"gemma4-legal-iq4xs-direct.gguf\",\"modified_at\":\"\",\"size\":\"\",\"digest\":\"\",\"type\":\"model\",\"description\":\"\",\"tags\":[\"\"],\"capabilities\":[\"complet",
+        "checked_at": "2026-06-25T03:24:41.985Z"
+      }
+    }
+  ],
+  "summary": {
+    "total_services": 17,
+    "healthy": 11,
+    "unhealthy": 4,
+    "unreachable": 0,
+    "no_health_check": 2
+  }
+}
