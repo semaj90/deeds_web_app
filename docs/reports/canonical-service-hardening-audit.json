@@ -1,0 +1,150 @@
+{
+  "generated_at": "2026-06-25T01:55:08.858Z",
+  "status": "FAIL",
+  "summary": {
+    "PASS": 8,
+    "WARN": 0,
+    "TODO": 0,
+    "FAIL": 1,
+    "total": 9
+  },
+  "results": [
+    {
+      "service": "Repo Map",
+      "status": "PASS",
+      "findings": {
+        "package_json_exists": true,
+        "npm_scripts_count": 2000,
+        "ts_config_exists": true,
+        "api_routes_count": 747,
+        "server_files_count": 1249,
+        "worker_files_count": 37,
+        "proto_files": [
+          "C:\\Users\\james\\Videos\\deeds-web-app\\proto/active/chat_assistant.proto",
+          "C:\\Users\\james\\Videos\\deeds-web-app\\proto/active/chr97_agent.proto",
+          "C:\\Users\\james\\Videos\\deeds-web-app\\proto/active/codeintel.proto",
+          "C:\\Users\\james\\Videos\\deeds-web-app\\proto/active/codeintel_enrichment.proto",
+          "C:\\Users\\james\\Videos\\deeds-web-app\\proto/active/embedding.proto",
+          "C:\\Users\\james\\Videos\\deeds-web-app\\proto/active/evidence_metadata.proto",
+          "C:\\Users\\james\\Videos\\deeds-web-app\\proto/active/gpu_bridge.proto",
+          "C:\\Users\\james\\Videos\\deeds-web-app\\proto/active/library_search.proto",
+          "C:\\Users\\james\\Videos\\deeds-web-app\\proto/active/retrieval.proto",
+          "C:\\Users\\james\\Videos\\deeds-web-app\\proto/active/tool_calling.proto",
+          "C:\\Users\\james\\Videos\\deeds-web-app\\proto/active/turbovec.proto",
+          "C:\\Users\\james\\Videos\\deeds-web-app\\proto/active/turbovec_cuda.proto",
+          "C:\\Users\\james\\Videos\\deeds-web-app\\proto/active/vectors.proto",
+          "C:\\Users\\james\\Videos\\deeds-web-app\\proto/archived/ai-service.proto",
+          "C:\\Users\\james\\Videos\\deeds-web-app\\proto/archived/analytics-service.proto",
+          "C:\\Users\\james\\Videos\\deeds-web-app\\proto/archived/auth.proto",
+          "C:\\Users\\james\\Videos\\deeds-web-app\\proto/archived/case_scoring.proto",
+          "C:\\Users\\james\\Videos\\deeds-web-app\\proto/archived/chat.proto",
+          "C:\\Users\\james\\Videos\\deeds-web-app\\proto/archived/cuda.proto",
+          "C:\\Users\\james\\Videos\\deeds-web-app\\proto/archived/embed.proto",
+          "C:\\Users\\james\\Videos\\deeds-web-app\\proto/archived/embedding-service.proto",
+          "C:\\Users\\james\\Videos\\deeds-web-app\\proto/archived/embedding.proto",
+          "C:\\Users\\james\\Videos\\deeds-web-app\\proto/archived/embeddings.proto",
+          "C:\\Users\\james\\Videos\\deeds-web-app\\proto/archived/enhanced-rag.proto",
+          "C:\\Users\\james\\Videos\\deeds-web-app\\proto/archived/events.proto",
+          "C:\\Users\\james\\Videos\\deeds-web-app\\proto/archived/gateway_streaming.proto",
+          "C:\\Users\\james\\Videos\\deeds-web-app\\proto/archived/gpu_service.proto",
+          "C:\\Users\\james\\Videos\\deeds-web-app\\proto/archived/ingest-service.proto",
+          "C:\\Users\\james\\Videos\\deeds-web-app\\proto/archived/ingest.proto",
+          "C:\\Users\\james\\Videos\\deeds-web-app\\proto/archived/ingest_new.proto",
+          "C:\\Users\\james\\Videos\\deeds-web-app\\proto/archived/legal-ai-services.proto",
+          "C:\\Users\\james\\Videos\\deeds-web-app\\proto/archived/legal_ai.proto",
+          "C:\\Users\\james\\Videos\\deeds-web-app\\proto/archived/legal_ai_tensors.proto",
+          "C:\\Users\\james\\Videos\\deeds-web-app\\proto/archived/legal_cuda_streaming.proto",
+          "C:\\Users\\james\\Videos\\deeds-web-app\\proto/archived/legal_services.proto",
+          "C:\\Users\\james\\Videos\\deeds-web-app\\proto/archived/legal_tensorrt.proto",
+          "C:\\Users\\james\\Videos\\deeds-web-app\\proto/archived/metrics/metrics.proto",
+          "C:\\Users\\james\\Videos\\deeds-web-app\\proto/archived/metrics.proto",
+          "C:\\Users\\james\\Videos\\deeds-web-app\\proto/archived/qlora_service.proto",
+          "C:\\Users\\james\\Videos\\deeds-web-app\\proto/archived/qlora_training.proto",
+          "C:\\Users\\james\\Videos\\deeds-web-app\\proto/archived/search-service.proto",
+          "C:\\Users\\james\\Videos\\deeds-web-app\\proto/archived/tasks.proto",
+          "C:\\Users\\james\\Videos\\deeds-web-app\\proto/archived/tensor.proto",
+          "C:\\Users\\james\\Videos\\deeds-web-app\\proto/archived/tensorstore.proto",
+          "C:\\Users\\james\\Videos\\deeds-web-app\\proto/archived/tensor_cache.proto",
+          "C:\\Users\\james\\Videos\\deeds-web-app\\proto/archived/timeline-service.proto",
+          "C:\\Users\\james\\Videos\\deeds-web-app\\proto/generation.proto",
+          "C:\\Users\\james\\Videos\\deeds-web-app\\proto/gpu.proto",
+          "C:\\Users\\james\\Videos\\deeds-web-app\\proto/graph.proto",
+          "C:\\Users\\james\\Videos\\deeds-web-app\\proto/memory.proto",
+          "C:\\Users\\james\\Videos\\deeds-web-app\\proto/shared_ids.proto",
+          "C:\\Users\\james\\Videos\\deeds-web-app\\proto/trace.proto"
+        ]
+      },
+      "recommendation": "Repo healthy: 2000 npm scripts, 747 API routes, 1249 server files"
+    },
+    {
+      "service": "PostgreSQL",
+      "status": "PASS",
+      "findings": {
+        "query_result": 1
+      },
+      "recommendation": "PostgreSQL accessible"
+    },
+    {
+      "service": "Valkey/Redis",
+      "status": "PASS",
+      "findings": {
+        "pong": "PONG",
+        "has_memory_info": true
+      },
+      "recommendation": "Valkey/Redis operational"
+    },
+    {
+      "service": "Qdrant",
+      "status": "PASS",
+      "findings": {
+        "collections": 61,
+        "has_codebase_chunks": true
+      },
+      "recommendation": "Qdrant operational with 61 collections"
+    },
+    {
+      "service": "Neo4j",
+      "status": "FAIL",
+      "findings": {
+        "error": "The client is unauthorized due to authentication failure."
+      },
+      "recommendation": "Neo4j connection failed: The client is unauthorized due to authentication failure."
+    },
+    {
+      "service": "RabbitMQ",
+      "status": "PASS",
+      "findings": {
+        "cache.invalidate": 0,
+        "document.embed": 0,
+        "evidence.process": 0
+      },
+      "recommendation": "RabbitMQ operational"
+    },
+    {
+      "service": "Ollama",
+      "status": "PASS",
+      "findings": {
+        "model_count": 4,
+        "has_embedding_model": true
+      },
+      "recommendation": "Ollama operational with 4 models"
+    },
+    {
+      "service": "llama-server",
+      "status": "PASS",
+      "findings": {
+        "model_count": 1
+      },
+      "recommendation": "llama-server operational (TurboQuant) with 1 models"
+    },
+    {
+      "service": "CUDA/N-API Bridge",
+      "status": "PASS",
+      "findings": {
+        "exports": 36,
+        "missing_funcs": []
+      },
+      "recommendation": "All CUDA functions available"
+    }
+  ]
+}

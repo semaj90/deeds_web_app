@@ -28,6 +28,7 @@
 import type { RequestHandler } from './$types';
 import { json } from '@sveltejs/kit';
 import { z } from 'zod';
+import crypto from 'node:crypto';
 import {
 	supervisorPlan,
 	runWorker,
@@ -37,7 +38,8 @@ import {
 import type { ResearchDomain, WorkerFinding } from '$lib/server/ai/langgraph-research.js';
 import { resolveRuntimeConfig } from '$lib/server/ai/inference-configs.js';
 import { db } from '$lib/server/db/client';
-import { researchSummaries, contextTimeline } from '$lib/server/db/schema-postgres.js';
+import { researchSummaries, contextTimeline, chunkHitLog } from '$lib/server/db/schema-postgres.js';
+import { sql } from 'drizzle-orm';
 import { COMPACT_DEFAULTS } from '$lib/server/ai/compact-budgets.js';
 
 /** 8-char FNV-1a hash of query string. */
@@ -150,6 +152,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 	} = parsed.data;
 	const userId = locals.user.id;
 	const queryHash = fnv1a8(query);
+	const traceId = crypto.randomUUID(); // ← Loop A: Trace this research session
 
 	const stream = new ReadableStream({
 		async start(controller) {
@@ -176,7 +179,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 					? (explicitDomains as ResearchDomain[])
 					: await supervisorPlan(query);
 
-				send('plan', { domains });
+				send('plan', { traceId, domains });
 
 				// 2. Concurrent workers — emit each finding as it arrives
 				const workerFindings: WorkerFinding[] = [];
@@ -201,12 +204,34 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 
 						workerFindings.push(finding);
 
+						// ── Loop A: Log chunk hits for demand scoring ────────────────
+						// Record top 20 chunks from this worker for feedback loop.
+						const chunkHits = finding.chunks.slice(0, 20).map((chunk, rank) => ({
+							traceId,
+							queryHash,
+							packetKey: (chunk as any).packet_key ?? null,
+							sourceRef: (chunk as any).source_ref ?? (chunk as any).path ?? null,
+							featureId: (chunk as any).feature_id ?? null,
+							lane: finding.domain,
+							rank,
+							score: (chunk as any).score ?? null,
+							usedInAnswer: false,
+						}));
+
+						// Fire-and-forget: non-blocking chunk hit log insert
+						if (chunkHits.length > 0) {
+							db.insert(chunkHitLog)
+								.values(chunkHits)
+								.catch(() => {});
+						}
+
 						// ── context_timeline: worker done ─────────────────────────
 						emitTimeline(userId, 'research.concurrent.worker_done', {
 							pipeline:   'langgraph',
 							source:     'codebase',
 							entityType: 'concurrent-research',
 							queryHash,
+							traceId,
 							domain: finding.domain,
 							chunkCount: finding.chunks.length,
 							cached: finding.cached,
@@ -216,6 +241,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 
 						// Emit immediately — don't wait for other workers
 						send('worker', {
+							traceId,
 							domain:        finding.domain,
 							chunkCount:    finding.chunks.length,
 							summary:       compact ? finding.summary.slice(0, 300) : finding.summary,
@@ -230,10 +256,35 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 
 				// 3. Supervisor merge
 				const totalChunks = workerFindings.reduce((n, w) => n + w.chunks.length, 0);
-				send('merging', { domainCount: workerFindings.length, totalChunks });
+				send('merging', { traceId, domainCount: workerFindings.length, totalChunks });
 
 				const { supervisorSummary, keyFindings, actionItems } =
 					await supervisorMerge(query, workerFindings);
+
+				// ── Loop B: Update demand_score for chunks used in answer ─────
+				// Supervisor has merged findings. Mark which chunks made it into the final answer.
+				if (keyFindings && keyFindings.length > 0) {
+					const usedChunkIds = new Set<string>();
+					keyFindings.forEach((finding) => {
+						if ((finding as any).packetKey) {
+							usedChunkIds.add((finding as any).packetKey);
+						}
+						if ((finding as any).sourceRef) {
+							usedChunkIds.add((finding as any).sourceRef);
+						}
+					});
+
+					// Update demand_score for chunks that were selected
+					if (usedChunkIds.size > 0) {
+						const ids = Array.from(usedChunkIds);
+						db.update(chunkHitLog)
+							.set({
+								usedInAnswer: true,
+							})
+							.where(sql`${chunkHitLog.traceId} = ${traceId} AND (${chunkHitLog.packetKey} = ANY(${ids}::text[]) OR ${chunkHitLog.sourceRef} = ANY(${ids}::text[]))`)
+							.catch(() => {});
+					}
+				}
 
 				// ── context_timeline: supervisor done ─────────────────────────
 				emitTimeline(userId, 'research.concurrent.supervisor_done', {
@@ -241,6 +292,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 					source:      'codebase',
 					entityType:  'concurrent-research',
 					queryHash,
+					traceId,
 					workerCount: workerFindings.length,
 					totalChunks,
 					durationMs:  Math.round(performance.now() - t0),
@@ -273,6 +325,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 						source:     'codebase',
 						entityType: 'concurrent-research',
 						queryHash,
+						traceId,
 						workerCount: workerFindings.length,
 						totalChunks,
 						durationMs:  Math.round(performance.now() - t0),
@@ -282,6 +335,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 				}
 
 				send('complete', {
+					traceId,
 					supervisorSummary: compact
 						? supervisorSummary.slice(0, maxSummaryChars)
 						: supervisorSummary,
@@ -315,12 +369,13 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 					source:     'codebase',
 					entityType: 'concurrent-research',
 					queryHash,
+					traceId,
 					error: (err as Error).message,
 					mode: 'stream',
 					runtime: resolveRuntimeConfig(),
 					cache: { l1: false, l2: false, l3: false },
 				});
-				send('error', { message: (err as Error).message ?? 'Research pipeline failed' });
+				send('error', { traceId, message: (err as Error).message ?? 'Research pipeline failed' });
 			} finally {
 				controller.close();
 			}

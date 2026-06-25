@@ -1,6 +1,5 @@
 import { expect, test } from '@playwright/test';
 import { PORTS } from './helpers/env-ports.js';
-import { PORTS } from './helpers/env-ports.js';
 
 const BASE = PORTS.APP_BASE;
 

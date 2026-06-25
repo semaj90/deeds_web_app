@@ -1,0 +1,101 @@
+{
+  "generated_at": "2026-06-25T01:38:05.789Z",
+  "status": "WARN",
+  "summary": {
+    "PASS": 5,
+    "WARN": 1,
+    "TODO": 1,
+    "FAIL": 0,
+    "total": 7
+  },
+  "results": [
+    {
+      "task": 1,
+      "name": "clusterEmbeddings empty-cluster guard + re-seed",
+      "status": "PASS",
+      "findings": {
+        "ts_wrapper": true,
+        "cpp_implementation": true,
+        "reseeding_exposed": false,
+        "reseeded_count_param": true
+      },
+      "recommendation": "Empty-cluster re-seeding implemented in C++ and parameter exposed"
+    },
+    {
+      "task": 2,
+      "name": "graphSimilarity N-cap + error details",
+      "status": "WARN",
+      "findings": {
+        "has_n_cap": true,
+        "cap_value": 4096,
+        "has_error_details": false,
+        "has_cuda_oom_guard": true,
+        "hard_limit_regex": {}
+      },
+      "recommendation": "Partial implementation: cap=true, errors=false, oom=true"
+    },
+    {
+      "task": 3,
+      "name": "Async N-API wrapper for large n (n > 256)",
+      "status": "PASS",
+      "findings": {
+        "has_adaptive_batch": true,
+        "has_threshold_256": true,
+        "has_worker_routing": true
+      },
+      "recommendation": "Async wrapper pattern exists with n > 256 threshold"
+    },
+    {
+      "task": 4,
+      "name": "Worker-thread pool for indexing",
+      "status": "TODO",
+      "findings": {
+        "pool_exists": false,
+        "worker_implementations": [],
+        "bounded_queue": false,
+        "has_hashing": false,
+        "has_chunking": false,
+        "has_metadata": false
+      },
+      "recommendation": "TODO: Create worker-pool.ts with bounded queue for hashing, chunking, metadata, entity extraction"
+    },
+    {
+      "task": 5,
+      "name": "Tensor/similarity caching (Redis/Valkey)",
+      "status": "PASS",
+      "findings": {
+        "cache_module_exists": true,
+        "has_centroid_cache": true,
+        "has_embedding_hash": true,
+        "has_query_cluster_scores": true,
+        "redis_import": true
+      },
+      "recommendation": "Cache module exists with Redis integration for centroid lists, embedding hashes, and query+cluster scores"
+    },
+    {
+      "task": 6,
+      "name": "Native addon runtime smoke test",
+      "status": "PASS",
+      "findings": {
+        "addon_built": true,
+        "addon_loadable": true,
+        "total_exports": 36,
+        "critical_funcs_present": 5,
+        "missing_funcs": []
+      },
+      "recommendation": "All critical CUDA functions exported"
+    },
+    {
+      "task": 7,
+      "name": "Valkey/Redis cache connectivity",
+      "status": "PASS",
+      "findings": {
+        "redis_available": true,
+        "ping_response": "PONG",
+        "centroid_som_keys": 0,
+        "karpathy_score_keys": 1
+      },
+      "recommendation": "Redis available with 1 cache keys for tensors/SOM"
+    }
+  ]
+}

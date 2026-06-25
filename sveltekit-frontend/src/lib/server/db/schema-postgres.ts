@@ -4939,6 +4939,36 @@ export const deepResearchReports = pgTable('deep_research_reports', {
 export type DeepResearchReport = typeof deepResearchReports.$inferSelect;
 export type NewDeepResearchReport = typeof deepResearchReports.$inferInsert;
 
+// ═══════════════════════════════════════════════════════════════
+// Chunk Hit Log — Feedback Loop A: Retrieval Analytics
+// ═══════════════════════════════════════════════════════════════
+// Tracks which chunks were selected by workers and ranked by the ACE pipeline.
+// Powers demand_score feedback signal for improving retrieval rank weights.
+
+export const chunkHitLog = pgTable('chunk_hit_log', {
+  id: uuid('id').defaultRandom().primaryKey().notNull(),
+  traceId: uuid('trace_id').notNull(), // Links to research trace
+  queryHash: varchar('query_hash', { length: 8 }).notNull(), // 8-char FNV-1a hash for fast joins
+  packetKey: varchar('packet_key', { length: 255 }), // ace:packet:feature:NNN or null if not found
+  sourceRef: varchar('source_ref', { length: 255 }), // src/lib/server/auth.ts or null
+  featureId: varchar('feature_id', { length: 255 }), // auth.sessions or null
+  lane: varchar('lane', { length: 50 }).notNull(), // 'api-routes', 'state-machines', etc — which worker emitted this
+  rank: integer('rank').notNull(), // 0-19 position in worker's top-20 results
+  score: real('score'), // Qdrant cosine, pg_trgm, or hybrid blend score
+  usedInAnswer: boolean('used_in_answer').default(false).notNull(), // True if supervisor included this chunk in final answer
+  demandScore: real('demand_score').default(0).notNull(), // 0.0-1.0, incremented by demand_feedback_score() after supervisor merges
+  createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
+}, (table) => ({
+  traceIdIdx: index('idx_chunk_hit_log_trace_id').on(table.traceId),
+  queryHashIdx: index('idx_chunk_hit_log_query_hash').on(table.queryHash),
+  packetKeyIdx: index('idx_chunk_hit_log_packet_key').on(table.packetKey),
+  laneIdx: index('idx_chunk_hit_log_lane').on(table.lane),
+  demandIdx: index('idx_chunk_hit_log_demand_score').on(table.demandScore.desc()),
+}));
+
+export type ChunkHitLog = typeof chunkHitLog.$inferSelect;
+export type NewChunkHitLog = typeof chunkHitLog.$inferInsert;
+
 export * from './schema/atlas-packets.js';
 
 
