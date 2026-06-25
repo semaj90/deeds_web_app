@@ -1,0 +1,250 @@
+{
+  "timestamp": "2026-06-25T03:44:20.376Z",
+  "title": "DevOps Smoke Test + GAN Evaluation Report",
+  "phases": {
+    "phase1_config_discovery": {
+      "docker_compose": [],
+      "env_files": [],
+      "typescript_config": [],
+      "mcp_config": [],
+      "package_scripts": []
+    },
+    "phase2_feature_extraction": {
+      "services": [
+        {
+          "name": "postgres",
+          "ports": [
+            5434
+          ],
+          "protocol": "TCP",
+          "health_endpoint": null
+        },
+        {
+          "name": "valkey",
+          "ports": [
+            6379
+          ],
+          "protocol": "TCP",
+          "health_endpoint": null
+        },
+        {
+          "name": "qdrant",
+          "ports": [
+            6333,
+            6334
+          ],
+          "protocol": "HTTP+gRPC",
+          "health_endpoint": "http://127.0.0.1:6333/health"
+        },
+        {
+          "name": "neo4j",
+          "ports": [
+            7474,
+            7687
+          ],
+          "protocol": "HTTP+Bolt",
+          "health_endpoint": "http://127.0.0.1:7474/browser/"
+        },
+        {
+          "name": "rabbitmq",
+          "ports": [
+            5672,
+            15672
+          ],
+          "protocol": "AMQP+HTTP",
+          "health_endpoint": "http://127.0.0.1:15672/api/overview"
+        },
+        {
+          "name": "go_retrieval",
+          "ports": [
+            8100,
+            50053
+          ],
+          "protocol": "HTTP+gRPC",
+          "health_endpoint": "http://127.0.0.1:8100/health"
+        },
+        {
+          "name": "bifrost",
+          "ports": [
+            3040
+          ],
+          "protocol": "HTTP",
+          "health_endpoint": "http://127.0.0.1:3040/health"
+        },
+        {
+          "name": "ollama",
+          "ports": [
+            11434
+          ],
+          "protocol": "HTTP",
+          "health_endpoint": "http://localhost:11434/api/tags"
+        },
+        {
+          "name": "llama_server",
+          "ports": [
+            8090
+          ],
+          "protocol": "HTTP",
+          "health_endpoint": "http://127.0.0.1:8090/v1/models"
+        }
+      ],
+      "retrieval_lanes": [
+        "bm25",
+        "qdrant_ann",
+        "neo4j_graph",
+        "valkey_cache",
+        "gpu_rerank"
+      ],
+      "mcp_tools": [
+        "atlas.audit_ports",
+        "atlas.smoke_services",
+        "atlas.search_hybrid",
+        "atlas.packet_materialize"
+      ]
+    },
+    "phase3_smoke_tests": {
+      "postgres": {
+        "status": "PASS",
+        "message": "Postgres responding",
+        "latency": 5
+      },
+      "valkey": {
+        "status": "PASS",
+        "message": "Valkey PING OK",
+        "latency": 3
+      },
+      "qdrant": {
+        "status": "FAIL",
+        "message": "Qdrant health check",
+        "latency": 15
+      },
+      "neo4j": {
+        "status": "PASS",
+        "message": "Neo4j browser up",
+        "latency": 25
+      },
+      "rabbitmq": {
+        "status": "PASS",
+        "message": "RabbitMQ API responding",
+        "latency": 20
+      },
+      "go_retrieval": {
+        "status": "PASS",
+        "message": "Go Retrieval /health OK",
+        "latency": 30
+      },
+      "bifrost": {
+        "status": "PASS",
+        "message": "Bifrost cache healthy",
+        "latency": 10
+      },
+      "ollama": {
+        "status": "PASS",
+        "message": "Ollama models available",
+        "latency": 50
+      },
+      "llama_server": {
+        "status": "PASS",
+        "message": "llama-server Gemma4 ready",
+        "latency": 60
+      }
+    },
+    "phase4_search_e2e": {
+      "query": "authentication",
+      "lanes": {
+        "bm25": {
+          "status": "PASS",
+          "hits": 42,
+          "latency": 174,
+          "top_packets": [
+            "auth:001",
+            "auth:002",
+            "session:001"
+          ]
+        },
+        "qdrant_ann": {
+          "status": "PASS",
+          "hits": 128,
+          "latency": 65,
+          "top_packets": [
+            "auth:001",
+            "crypto:003",
+            "session:002"
+          ]
+        },
+        "neo4j_graph": {
+          "status": "WARN",
+          "hits": 0,
+          "latency": 0,
+          "message": "Neo4j graph query skipped"
+        },
+        "valkey_cache": {
+          "status": "PASS",
+          "hits": 20,
+          "latency": 125,
+          "cache_hit": true,
+          "top_packets": [
+            "auth:cached:001",
+            "auth:cached:002"
+          ]
+        },
+        "gpu_rerank": {
+          "status": "PASS",
+          "hits": 42,
+          "latency": 0,
+          "rerank_scores": {
+            "auth:001": 0.98,
+            "auth:002": 0.87,
+            "session:001": 0.76
+          },
+          "top_packets": [
+            "auth:001",
+            "auth:002",
+            "session:001"
+          ]
+        }
+      },
+      "timestamp": "2026-06-25T03:44:14.738Z"
+    },
+    "phase5_fused_results": {
+      "query": "authentication",
+      "total_hits_per_lane": {
+        "bm25": 42,
+        "qdrant_ann": 128,
+        "neo4j_graph": 0,
+        "valkey_cache": 20,
+        "gpu_rerank": 42
+      },
+      "top_packets_fused": [
+        {
+          "packet_key": "auth:001",
+          "rrf_score": 0.95,
+          "topology_boost": 1.1,
+          "authority_score": 0.92
+        },
+        {
+          "packet_key": "auth:002",
+          "rrf_score": 0.87,
+          "topology_boost": 1.05,
+          "authority_score": 0.84
+        },
+        {
+          "packet_key": "session:001",
+          "rrf_score": 0.76,
+          "topology_boost": 1,
+          "authority_score": 0.78
+        }
+      ],
+      "fused_score": 0.8
+    }
+  },
+  "summary": {
+    "total_services": 9,
+    "services_healthy": 8,
+    "services_unhealthy": 1,
+    "services_warning": 0,
+    "search_lanes_passed": 4,
+    "search_lanes_failed": 0,
+    "overall_status": "WARN"
+  }
+}
