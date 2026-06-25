@@ -132,18 +132,34 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 			? `\n\nContext: This analysis pertains to case ID ${caseId}. Consider case-specific evidence and relationships.`
 			: '';
 
-		const answer = await bifrostChat(
-			[
-				{ role: 'system', content: system + caseContext },
-				{ role: 'user', content: selfPrompt },
-			],
-			'gemma4-rotorquant:latest',
-			{
+		// Call llama-server /v1/chat/completions directly (gemma4-legal-iq4xs-direct.gguf with TurboQuant)
+		const llmUrl = process.env.LLAMA_SERVER_URL || 'http://127.0.0.1:8090';
+		const llmResponse = await fetch(`${llmUrl}/v1/chat/completions`, {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({
+				model: 'gemma4-legal-iq4xs-direct.gguf',
+				messages: [
+					{ role: 'system', content: system + caseContext },
+					{ role: 'user', content: selfPrompt },
+				],
 				temperature: 0.3,
-				maxTokens: 1536,
-				timeoutMs: 60_000,
-			},
-		);
+				max_tokens: 1536,
+				stream: false,
+			}),
+			signal: AbortSignal.timeout(60_000),
+		});
+
+		if (!llmResponse.ok) {
+			throw new Error(`LLM server error: ${llmResponse.status}`);
+		}
+
+		const llmData = await llmResponse.json();
+		const answer = llmData.choices?.[0]?.message?.content ?? '';
+
+		if (!answer) {
+			throw new Error('No response from LLM');
+		}
 
 		const durationMs = Date.now() - start;
 
@@ -155,13 +171,14 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 					userId: Number(locals.user.id),
 					query: selfPrompt,
 					reportType: 'summary',
-					modelUsed: 'gemma4-rotorquant:latest',
+					modelUsed: 'gemma4-legal-iq4xs-direct.gguf',
 					markdownContent: answer,
 					metadata: {
 						pipelineHint: pipelineHint ?? 'ace',
 						caseId,
 						durationMs,
-						provider: 'bifrost',
+						provider: 'llama-server',
+						model: 'gemma4-legal-iq4xs-direct.gguf',
 					},
 				})
 				.returning();
@@ -171,7 +188,8 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 				pipeline: pipelineHint ?? 'ace',
 				durationMs,
 				cached: false,
-				provider: 'gemma4-rotorquant:latest',
+				provider: 'llama-server',
+				model: 'gemma4-legal-iq4xs-direct.gguf',
 				reportId: savedReport?.id,
 			});
 		} catch (dbErr) {
@@ -182,7 +200,8 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 				pipeline: pipelineHint ?? 'ace',
 				durationMs,
 				cached: false,
-				provider: 'gemma4-rotorquant:latest',
+				provider: 'llama-server',
+				model: 'gemma4-legal-iq4xs-direct.gguf',
 				warning: 'Report not persisted to database',
 			});
 		}
