@@ -1,208 +1,132 @@
 #!/usr/bin/env node
 
-import fs from 'node:fs';
-import path from 'node:path';
-import { fileURLToPath } from 'node:url';
 import pg from 'pg';
 
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const REPO_ROOT = path.resolve(__dirname, '../..');
+const isVerbose = process.argv.includes('--verbose');
+const log = (msg) => console.log(`[P1.5 Trace] ${msg}`);
+const verbose = (msg) => isVerbose && console.log(`  ${msg}`);
 
-// Load environment variables
-function loadAtlasEnv(root) {
-  const envFile = path.join(root, 'sveltekit-frontend', '.env');
-  if (fs.existsSync(envFile)) {
-    const content = fs.readFileSync(envFile, 'utf-8');
-    for (const line of content.split('\n')) {
-      const [key, val] = line.split('=');
-      if (key && val && !key.startsWith('#')) {
-        process.env[key.trim()] = val.trim();
-      }
-    }
-  }
-  return { loadedFiles: [envFile] };
+async function getDb() {
+  const pool = new pg.Pool({
+    connectionString: process.env.DATABASE_URL || 'postgresql://legal_admin:123456@127.0.0.1:5434/legal_ai_db'
+  });
+  return pool;
 }
 
-const { loadedFiles } = loadAtlasEnv(REPO_ROOT);
-console.log(`[ATLAS:ERROR:TRACE] Loaded env from: ${loadedFiles.join(', ') || '(none)'}`);
-
-const pool = new pg.Pool({
-  connectionString: process.env.DATABASE_URL,
-  statement_timeout: 30000,
-  idleTimeoutMillis: 5000,
-  max: 2,
-});
-
-const REPORT_DIR = path.join(REPO_ROOT, 'docs', 'reports');
-const TIMESTAMP = new Date().toISOString().split('T')[0];
-const REPORT_JSON = path.join(REPORT_DIR, `error-trace-${TIMESTAMP}.json`);
-const REPORT_MD = path.join(REPORT_DIR, `error-trace-${TIMESTAMP}.md`);
-
-fs.mkdirSync(REPORT_DIR, { recursive: true });
-
-async function runTrace() {
-  console.log('[ATLAS:ERROR:TRACE] Starting error attribution analysis...\n');
-
-  const client = await pool.connect();
+async function main() {
+  const db = await getDb();
 
   try {
-    // Error distribution by category
-    const byCategory = await client.query(`
+    log('Analyzing error root causes and fix attribution...');
+
+    // Errors by component/context
+    const byContextResult = await db.query(`
+      SELECT
+        context_key,
+        error_category,
+        COUNT(*) as error_count,
+        MIN(created_at) as first_occurrence,
+        MAX(created_at) as last_occurrence,
+        STRING_AGG(DISTINCT message, '; ' ORDER BY message DESC) FILTER (WHERE message IS NOT NULL) as sample_messages
+      FROM error_logs
+      GROUP BY context_key, error_category
+      ORDER BY error_count DESC
+    `);
+
+    log('\n=== Errors by Context ===');
+    const contextMap = new Map();
+    for (const row of byContextResult.rows) {
+      const ctx = row.context_key || '(none)';
+      verbose(`${ctx} [${row.error_category}]:`);
+      verbose(`  Count: ${row.error_count}`);
+      verbose(`  First: ${row.first_occurrence?.toISOString() || 'N/A'}`);
+      verbose(`  Last: ${row.last_occurrence?.toISOString() || 'N/A'}`);
+      verbose(`  Sample: ${row.sample_messages || 'N/A'}`);
+
+      if (!contextMap.has(ctx)) {
+        contextMap.set(ctx, 0);
+      }
+      contextMap.set(ctx, contextMap.get(ctx) + row.error_count);
+    }
+
+    // Infer root causes
+    log('\n=== Root Cause Attribution ===');
+
+    const embedErrors = byContextResult.rows.filter(r => r.context_key === 'embed');
+    if (embedErrors.length > 0 && embedErrors.every(r => r.error_category === 'inference_error')) {
+      log('✓ Inferred Root Cause: Embedding service (Ollama) downtime');
+      verbose('  Evidence: All errors from embed context, all category inference_error');
+      const hours = (embedErrors[0].last_occurrence - embedErrors[0].first_occurrence) / (1000 * 60 * 60);
+      verbose(`  Timespan: ${hours.toFixed(1)} hours`);
+      verbose('  Fix Attribution: health_check_and_restart');
+    }
+
+    // Timeline analysis
+    const timelineResult = await db.query(`
+      SELECT
+        DATE_TRUNC('hour', created_at) as hour_bucket,
+        error_category,
+        COUNT(*) as count
+      FROM error_logs
+      WHERE created_at > NOW() - INTERVAL '7 days'
+      GROUP BY DATE_TRUNC('hour', created_at), error_category
+      ORDER BY hour_bucket DESC
+      LIMIT 24
+    `);
+
+    if (timelineResult.rows.length > 0) {
+      log('\n=== Error Timeline (Last 24 hours) ===');
+      for (const row of timelineResult.rows) {
+        verbose(`${row.hour_bucket?.toISOString() || 'Unknown'}: ${row.count} ${row.error_category} errors`);
+      }
+    }
+
+    // Fix success rate by strategy
+    const strategyResult = await db.query(`
+      SELECT
+        fix_strategy,
+        COUNT(*) as applied_count,
+        SUM(CASE WHEN resolved = true THEN 1 ELSE 0 END) as success_count
+      FROM error_logs
+      WHERE fix_strategy IS NOT NULL
+      GROUP BY fix_strategy
+      ORDER BY success_count DESC
+    `);
+
+    if (strategyResult.rows.length > 0) {
+      log('\n=== Fix Strategy Success Rates ===');
+      for (const row of strategyResult.rows) {
+        const rate = (row.success_count / row.applied_count) * 100;
+        log(`${row.fix_strategy}: ${rate.toFixed(1)}% success (${row.success_count}/${row.applied_count})`);
+      }
+    }
+
+    // Components with most errors
+    const componentResult = await db.query(`
       SELECT
         error_category,
-        COUNT(*) as count,
-        COUNT(CASE WHEN fixed_at IS NOT NULL THEN 1 END) as fixed_count,
-        ROUND(100.0 * COUNT(*) / (SELECT COUNT(*) FROM error_logs), 1) as percentage,
-        MIN(created_at) as first_seen,
-        MAX(created_at) as last_seen
+        COUNT(*) as total,
+        COUNT(CASE WHEN resolved = false THEN 1 END) as unresolved,
+        ROUND(100.0 * COUNT(CASE WHEN resolved = true THEN 1 END) / COUNT(*), 1) as fix_rate
       FROM error_logs
       GROUP BY error_category
-      ORDER BY count DESC
+      ORDER BY total DESC
     `);
 
-    // Error distribution by route
-    const byRoute = await client.query(`
-      SELECT
-        route_path,
-        COUNT(*) as count,
-        COUNT(DISTINCT error_category) as unique_categories,
-        MIN(created_at) as first_seen,
-        MAX(created_at) as last_seen
-      FROM error_logs
-      WHERE route_path IS NOT NULL
-      GROUP BY route_path
-      ORDER BY count DESC
-      LIMIT 20
-    `);
+    log('\n=== Component Health Summary ===');
+    for (const row of componentResult.rows) {
+      log(`${row.error_category}:`);
+      verbose(`  Total: ${row.total} | Unresolved: ${row.unresolved} | Fix Rate: ${row.fix_rate}%`);
+    }
 
-    // Error distribution by severity
-    const bySeverity = await client.query(`
-      SELECT
-        severity,
-        COUNT(*) as count,
-        COUNT(CASE WHEN fixed_at IS NOT NULL THEN 1 END) as fixed_count,
-        ROUND(100.0 * COUNT(*) / (SELECT COUNT(*) FROM error_logs), 1) as percentage
-      FROM error_logs
-      GROUP BY severity
-      ORDER BY count DESC
-    `);
+    log('\n✓ Root cause analysis complete');
 
-    // Root cause analysis: most common error messages
-    const topErrors = await client.query(`
-      SELECT
-        error_category,
-        message,
-        COUNT(*) as frequency,
-        COUNT(CASE WHEN fixed_at IS NOT NULL THEN 1 END) as fixed_count
-      FROM error_logs
-      GROUP BY error_category, message
-      ORDER BY frequency DESC
-      LIMIT 15
-    `);
-
-    const result = {
-      status: 'pass',
-      summary: {
-        total_errors: byCategory.rows.reduce((sum, row) => sum + row.count, 0),
-        total_categories: byCategory.rows.length,
-        fixed_count: byCategory.rows.reduce((sum, row) => sum + row.fixed_count, 0),
-        routes_with_errors: byRoute.rows.length,
-        severity_levels: bySeverity.rows.length
-      },
-      by_category: byCategory.rows.slice(0, 15),
-      by_route: byRoute.rows.slice(0, 10),
-      by_severity: bySeverity.rows,
-      top_errors: topErrors.rows.slice(0, 10),
-      timestamp: new Date().toISOString(),
-    };
-
-    const totalFixed = result.summary.fixed_count;
-    const totalErrors = result.summary.total_errors;
-    const fixRate = totalErrors > 0 ? ((totalFixed / totalErrors) * 100).toFixed(1) : 0;
-
-    fs.writeFileSync(REPORT_JSON, JSON.stringify(result, null, 2));
-    console.log(`[ATLAS:ERROR:TRACE] Analysis complete:`);
-    console.log(`  Total errors: ${totalErrors}`);
-    console.log(`  Fixed: ${totalFixed} (${fixRate}%)`);
-    console.log(`  Categories: ${result.summary.total_categories}`);
-    console.log(`  Routes affected: ${result.summary.routes_with_errors}`);
-
-    // Write markdown report
-    const mdReport = `# P1.5: Error Trace Report
-
-**Date**: ${new Date().toISOString()}
-**Status**: ✅ PASS
-
-## Summary
-
-| Metric | Value |
-|--------|-------|
-| Total errors | ${totalErrors} |
-| Fixed | ${totalFixed} (${fixRate}%) |
-| Categories | ${result.summary.total_categories} |
-| Routes affected | ${result.summary.routes_with_errors} |
-
-## Errors by Category (Top 10)
-
-${byCategory.rows.slice(0, 10).map(row => `
-- **${row.error_category}**: ${row.count} (${row.percentage}%) — Fixed: ${row.fixed_count}
-`).join('\n')}
-
-## Errors by Severity
-
-${bySeverity.rows.map(row => `
-- **${row.severity}**: ${row.count} (${row.percentage}%) — Fixed: ${row.fixed_count}
-`).join('\n')}
-
-## Most Common Errors
-
-${topErrors.rows.slice(0, 10).map(row => `
-- **${row.error_category}**: "${row.message}" (${row.frequency}×, fixed ${row.fixed_count}×)
-`).join('\n')}
-
-## Routes with Most Errors
-
-${byRoute.rows.slice(0, 10).map(row => `
-- **${row.route_path}**: ${row.count} errors across ${row.unique_categories} categories
-`).join('\n')}
-
-## Key Insights
-
-1. **Top category**: ${byCategory.rows[0]?.error_category || 'N/A'} (${byCategory.rows[0]?.count || 0} errors)
-2. **Most affected route**: ${byRoute.rows[0]?.route_path || 'N/A'} (${byRoute.rows[0]?.count || 0} errors)
-3. **Severity distribution**:
-${bySeverity.rows.map(r => `   - ${r.severity}: ${r.count} (${r.percentage}%)`).join('\n')}
-
-## Attribution Summary
-
-- Errors concentrated in: ${result.summary.routes_with_errors} API routes
-- Fix coverage: ${fixRate}% of errors fixed
-- Systematic issue: ${byCategory.rows[0]?.error_category} accounts for ${byCategory.rows[0]?.percentage}% of all errors
-
-## Next Steps
-
-1. ✅ Error attribution complete
-2. Review systematic issues (highest-count categories)
-3. Consider preventive measures for top error sources
-4. Handoff to P2 (Rust parser) with error analysis
-
-`;
-
-    fs.writeFileSync(REPORT_MD, mdReport);
-    console.log(`[ATLAS:ERROR:TRACE] ✅ PASS`);
-    console.log(`[ATLAS:ERROR:TRACE] Report: ${REPORT_JSON}`);
-
-    return result;
   } finally {
-    client.release();
-    await pool.end();
+    await db.end();
   }
 }
 
-try {
-  const result = await runTrace();
-  process.exit(result.status === 'pass' ? 0 : 1);
-} catch (err) {
-  console.error('[ATLAS:ERROR:TRACE] Fatal error:', err.message);
-  process.exit(2);
-}
+main().catch(err => {
+  console.error('Fatal error:', err.message);
+  process.exit(1);
+});

@@ -1,6 +1,6 @@
 # Feature Lineage Verification Report
 
-**Generated**: 2026-06-13T19:40:22.494Z
+**Generated**: 2026-06-25T22:45:37.824Z
 **Status**: ✅ PASSED
 
 ## Summary
@@ -16,23 +16,23 @@
 
 ### ✅ G0a: Postgres atlas_packets reachable
 
-8822 packets in atlas_packets
+9572 packets in atlas_packets
 
 ### ✅ G0b: No missing source_ref
 
-0 packets missing source_ref (of 8822)
+0 packets missing source_ref (of 9572)
 
 ### ✅ G0c: No missing feature_id
 
-0 packets missing feature_id (of 8822)
+0 packets missing feature_id (of 9572)
 
 ### ✅ G0d: feature_label in payload
 
-0/8822 packets missing payload.feature_label (warn if >50%)
+239/9572 packets missing payload.feature_label (warn if >50%)
 
 ### ✅ G0e: No missing packet_key
 
-0 packets missing packet_key (of 8822)
+0 packets missing packet_key (of 9572)
 
 ### ✅ G1: All directories have required fields
 

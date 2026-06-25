@@ -1,0 +1,76 @@
+{
+  "status": "pass",
+  "summary": {
+    "total_errors": "6",
+    "categories": "1",
+    "severity_levels": "1",
+    "date_range": {
+      "oldest": "2026-06-16T18:12:58.675Z",
+      "newest": "2026-06-22T04:03:36.825Z"
+    },
+    "errors_by_category": {
+      "inference_error": {
+        "count": "6",
+        "percentage": "100.0"
+      }
+    },
+    "errors_by_severity": {
+      "WARNING": {
+        "count": "6",
+        "percentage": "100.0"
+      }
+    },
+    "coverage": "errors detected"
+  },
+  "error_samples": [
+    {
+      "id": "b08be667-d3f1-4693-b0e9-9548244dfc48",
+      "category": "inference_error",
+      "severity": "WARNING",
+      "message": "EmbeddingGenerationError: All embedding tiers failed",
+      "context": "embed",
+      "timestamp": "2026-06-22T04:03:36.825Z"
+    },
+    {
+      "id": "82934103-67ea-44e4-b45f-f8804f040bf4",
+      "category": "inference_error",
+      "severity": "WARNING",
+      "message": "EmbeddingGenerationError: All embedding tiers failed",
+      "context": "embed",
+      "timestamp": "2026-06-19T17:24:11.637Z"
+    },
+    {
+      "id": "d39cf3d8-2b74-4722-9797-11a9d033df47",
+      "category": "inference_error",
+      "severity": "WARNING",
+      "message": "EmbeddingGenerationError: All embedding tiers failed",
+      "context": "embed",
+      "timestamp": "2026-06-17T15:00:33.806Z"
+    },
+    {
+      "id": "86e1eb3c-e44c-41d6-b3c9-da30c6585258",
+      "category": "inference_error",
+      "severity": "WARNING",
+      "message": "EmbeddingGenerationError: All embedding tiers failed",
+      "context": "embed",
+      "timestamp": "2026-06-17T13:49:39.111Z"
+    },
+    {
+      "id": "5c3db426-3b16-4c9f-99e3-3a510ae455ce",
+      "category": "inference_error",
+      "severity": "WARNING",
+      "message": "EmbeddingGenerationError: All embedding tiers failed",
+      "context": "embed",
+      "timestamp": "2026-06-17T13:46:43.228Z"
+    },
+    {
+      "id": "18ba0949-8dae-4d82-8ebb-7130c452a85a",
+      "category": "inference_error",
+      "severity": "WARNING",
+      "message": "EmbeddingGenerationError: All embedding tiers failed",
+      "context": "embed",
+      "timestamp": "2026-06-16T18:12:58.675Z"
+    }
+  ],
+  "timestamp": "2026-06-25T15:23:27.786Z"
+}

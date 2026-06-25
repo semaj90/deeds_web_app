@@ -1,0 +1,126 @@
+{
+  "timestamp": "2026-06-25T22-45-36",
+  "totalDuration": 1019,
+  "startTime": "2026-06-25T22:45:36.824Z",
+  "endTime": "2026-06-25T22:45:37.843Z",
+  "lanes": [
+    {
+      "number": 1,
+      "label": "P0: Identity Frozen",
+      "script": "C:\\Users\\james\\Videos\\deeds-web-app\\scripts\\atlas\\verify-feature-lineage.mjs",
+      "passed": false,
+      "duration": 1019,
+      "gates": [
+        {
+          "name": "P0.1-Lineage-Frozen",
+          "passed": false,
+          "requirement": "All 3,251 packets have stable packet_key"
+        },
+        {
+          "name": "P0.2-Directory-Stable",
+          "passed": false,
+          "requirement": "Zero directory path duplicates across revisions"
+        },
+        {
+          "name": "P0.3-Cold-Storage-Manifest",
+          "passed": false,
+          "requirement": "Cold storage backup manifest is consistent"
+        }
+      ]
+    },
+    {
+      "number": 2,
+      "label": "P1: Agentic Error Fixing",
+      "script": "C:\\Users\\james\\Videos\\deeds-web-app\\scripts\\atlas\\audit-errors.mjs",
+      "passed": false,
+      "duration": 48,
+      "gates": [
+        {
+          "name": "P1-Error-Audit",
+          "passed": false,
+          "requirement": "Error audit pipeline can identify issues"
+        },
+        {
+          "name": "P1-Error-Plan",
+          "passed": false,
+          "requirement": "Error planning generates fix strategies"
+        },
+        {
+          "name": "P1-Error-Apply",
+          "passed": false,
+          "requirement": "Error fixes apply atomically to Postgres"
+        }
+      ]
+    },
+    {
+      "number": 3,
+      "label": "P2: Rust N-API Parser",
+      "script": "C:\\Users\\james\\Videos\\deeds-web-app\\scripts\\atlas\\verify-rust-addon.mjs",
+      "passed": false,
+      "duration": 39,
+      "gates": [
+        {
+          "name": "P2-Rust-Build",
+          "passed": false,
+          "requirement": "Rust crates compile without errors"
+        },
+        {
+          "name": "P2-N-API-Addon",
+          "passed": false,
+          "requirement": "N-API addon available for GPU functions"
+        },
+        {
+          "name": "P2-TypeScript-Bridge",
+          "passed": false,
+          "requirement": "TypeScript can call Rust functions"
+        }
+      ]
+    },
+    {
+      "number": 4,
+      "label": "P4: Higher-Hop + Karpathy",
+      "script": "C:\\Users\\james\\Videos\\deeds-web-app\\scripts\\atlas\\compute-p4-karpathy-blend.mjs",
+      "passed": false,
+      "duration": 764,
+      "gates": [
+        {
+          "name": "P3-Qdrant-v2-Payloads",
+          "passed": false,
+          "requirement": "Qdrant payloads match Postgres identity contract"
+        },
+        {
+          "name": "P4-SOM-Topology",
+          "passed": false,
+          "requirement": "SOM grid has Moore adjacency edges (~1,200)"
+        },
+        {
+          "name": "P4-Karpathy-Authority",
+          "passed": true,
+          "requirement": "Authority blend (PR + ATT + FREQ + PROV) computes successfully"
+        }
+      ]
+    }
+  ],
+  "globalGates": [
+    {
+      "name": "P0-Complete",
+      "passed": false,
+      "requirement": "Identity frozen + lineage verified"
+    },
+    {
+      "name": "P1-Complete",
+      "passed": false,
+      "requirement": "Error audit/plan/apply infrastructure ready"
+    },
+    {
+      "name": "P2-Complete",
+      "passed": false,
+      "requirement": "Rust N-API addon built and callable"
+    },
+    {
+      "name": "P3P4-Complete",
+      "passed": false,
+      "requirement": "Qdrant v2 + Higher-hop + Karpathy authority wired"
+    }
+  ]
+}

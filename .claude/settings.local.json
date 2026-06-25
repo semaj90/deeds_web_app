@@ -573,7 +573,22 @@
       "PowerShell(curl http://127.0.0.1:5173/api/embed -Method POST -ContentType \"application/json\" -Body '{\"text\":\"test\"}' 2>&1)",
       "PowerShell(head -50)",
       "Bash(EMBED_MODE=ollama node scripts/atlas/phase1-canonical-embedding-rabbitmq.mjs --worker --concurrency=4)",
-      "Bash(tail -80 c:\\\\\\\\Users\\\\\\\\james\\\\\\\\Videos\\\\\\\\deeds-web-app\\\\\\\\scripts\\\\\\\\startup\\\\\\\\proof-of-truth-orchestrator.mjs)"
+      "Bash(tail -80 c:\\\\\\\\Users\\\\\\\\james\\\\\\\\Videos\\\\\\\\deeds-web-app\\\\\\\\scripts\\\\\\\\startup\\\\\\\\proof-of-truth-orchestrator.mjs)",
+      "Bash(export DATABASE_URL=\"postgresql://legal_admin:postgres@127.0.0.1:5434/legal_ai_db\")",
+      "Bash(export DATABASE_URL=\"postgresql://legal_admin:123456@127.0.0.1:5434/legal_ai_db\")",
+      "Bash(DATABASE_URL=\"postgresql://legal_admin:legal_admin@127.0.0.1:5434/legal_ai_db\" NODE_PATH=sveltekit-frontend/node_modules node scripts/atlas/compute-p4-pagerank.mjs --verbose --dry-run)",
+      "Bash(DATABASE_URL=\"postgresql://legal_admin:123456@127.0.0.1:5434/legal_ai_db\" NEO4J_PASSWORD=\"neo4j123\" NODE_PATH=sveltekit-frontend/node_modules node scripts/atlas/compute-p4-pagerank.mjs --verbose --dry-run)",
+      "Bash(DATABASE_URL=\"postgresql://legal_admin:123456@127.0.0.1:5434/legal_ai_db\" NEO4J_PASSWORD=\"neo4j123\" NODE_PATH=sveltekit-frontend/node_modules timeout 120 node scripts/atlas/compute-p4-pagerank.mjs --verbose)",
+      "Bash(DATABASE_URL=\"postgresql://legal_admin:123456@127.0.0.1:5434/legal_ai_db\" NEO4J_PASSWORD=\"neo4j123\" NODE_PATH=sveltekit-frontend/node_modules timeout 120 node scripts/atlas/compute-p4-attention-scores.mjs --verbose --dry-run)",
+      "Bash(DATABASE_URL=\"postgresql://legal_admin:123456@127.0.0.1:5434/legal_ai_db\" NEO4J_PASSWORD=\"neo4j123\" NODE_PATH=sveltekit-frontend/node_modules timeout 120 node scripts/atlas/compute-p4-attention-scores.mjs --verbose)",
+      "Bash(DATABASE_URL=\"postgresql://legal_admin:123456@127.0.0.1:5434/legal_ai_db\" NEO4J_PASSWORD=\"neo4j123\" NODE_PATH=sveltekit-frontend/node_modules timeout 120 node scripts/atlas/compute-p4-karpathy-blend.mjs --verbose)",
+      "Bash(DATABASE_URL=\"postgresql://legal_admin:123456@127.0.0.1:5434/legal_ai_db\" NEO4J_PASSWORD=\"neo4j123\" NODE_PATH=sveltekit-frontend/node_modules timeout 120 node scripts/atlas/audit-p5-gpu-acceleration.mjs --verbose)",
+      "Bash(DATABASE_URL=\"postgresql://legal_admin:123456@127.0.0.1:5434/legal_ai_db\" NEO4J_PASSWORD=\"neo4j123\" NODE_PATH=sveltekit-frontend/node_modules timeout 120 node scripts/atlas/audit-p6-ae-som-optimization.mjs --verbose)",
+      "Bash(export NEO4J_PASSWORD=neo4j123)",
+      "Bash(cypher-shell -u neo4j -p neo4j123 \"MATCH \\(c:SOMCell\\) RETURN COUNT\\(c\\) AS cell_count;\")",
+      "Bash(export DATABASE_URL='postgresql://legal_admin:123456@127.0.0.1:5434/legal_ai_db')",
+      "Bash(export REDIS_URL='redis://:redis@127.0.0.1:6379')",
+      "Bash(PGPASSWORD=123456 docker exec -i legal-ai-postgres psql -U legal_admin -d legal_ai_db -c \"SELECT COUNT\\(DISTINCT pagerank_score\\) as unique_scores, ROUND\\(MIN\\(pagerank_score\\)::numeric, 4\\) as min_score, ROUND\\(MAX\\(pagerank_score\\)::numeric, 4\\) as max_score FROM atlas_som_cell_scores;\")"
     ],
     "deny": [],
     "ask": []

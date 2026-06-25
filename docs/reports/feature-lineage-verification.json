@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-06-13T19:40:22.487Z",
+  "timestamp": "2026-06-25T22:45:37.815Z",
   "summary": {
     "total": 16,
     "passed": 16,
@@ -11,27 +11,27 @@
     {
       "name": "G0a: Postgres atlas_packets reachable",
       "passed": true,
-      "message": "8822 packets in atlas_packets"
+      "message": "9572 packets in atlas_packets"
     },
     {
       "name": "G0b: No missing source_ref",
       "passed": true,
-      "message": "0 packets missing source_ref (of 8822)"
+      "message": "0 packets missing source_ref (of 9572)"
     },
     {
       "name": "G0c: No missing feature_id",
       "passed": true,
-      "message": "0 packets missing feature_id (of 8822)"
+      "message": "0 packets missing feature_id (of 9572)"
     },
     {
       "name": "G0d: feature_label in payload",
       "passed": true,
-      "message": "0/8822 packets missing payload.feature_label (warn if >50%)"
+      "message": "239/9572 packets missing payload.feature_label (warn if >50%)"
     },
     {
       "name": "G0e: No missing packet_key",
       "passed": true,
-      "message": "0 packets missing packet_key (of 8822)"
+      "message": "0 packets missing packet_key (of 9572)"
     },
     {
       "name": "G1: All directories have required fields",
