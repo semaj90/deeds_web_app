@@ -2014,7 +2014,12 @@
     "atlas:packets:validate:apply": "node scripts/atlas/validate-addressable-packets.mjs --apply",
     "atlas:packets:metadata:backfill": "node scripts/atlas/backfill-packet-metadata-to-postgres.mjs --dry-run",
     "atlas:packets:metadata:backfill:apply": "node scripts/atlas/backfill-packet-metadata-to-postgres.mjs --apply",
-    "atlas:packets:metadata:report": "node scripts/atlas/validate-packet-contract.mjs --verbose"
+    "atlas:packets:metadata:report": "node scripts/atlas/validate-packet-contract.mjs --verbose",
+    "atlas:smoke:ace-offline": "node scripts/atlas/smoke-ace-offline-batch.mjs",
+    "atlas:smoke:ace-injection": "node scripts/atlas/smoke-ace-prompt-injection.mjs",
+    "atlas:eval:retrieval-timing": "node scripts/atlas/eval-retrieval-acceleration-timing.mjs",
+    "atlas:proof:gpu-baseline": "node scripts/atlas/eval-retrieval-acceleration-timing.mjs --gpu-baseline",
+    "atlas:proof:ace": "npm run atlas:smoke:ace-offline && npm run atlas:smoke:ace-injection"
   },
   "devDependencies": {
     "@ai-sdk/openai": "3.0.65",
