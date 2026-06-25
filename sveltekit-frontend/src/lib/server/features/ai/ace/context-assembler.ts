@@ -2802,6 +2802,64 @@ export async function assembleACEContext(opts: {
         }
       }
 
+      // P3-A0.5: Karpathy GPU authority blend reranking (reads fresh gpu:karpathy:scores from Redis)
+      // If available, re-score all retrieval results using GPU-computed attention blend
+      // Blend: 0.4·PageRank + 0.3·attention + 0.3·authority (computed offline, 24h TTL)
+      try {
+        const redis = getRedis();
+        const karpathyScoresRaw = await redis.hgetall('gpu:karpathy:scores').catch(() => ({}));
+
+        if (Object.keys(karpathyScoresRaw).length > 0) {
+          const karpathyScores = new Map<
+            string,
+            { pr: number; attn: number; authority: number; blend: number }
+          >();
+
+          for (const [key, val] of Object.entries(karpathyScoresRaw)) {
+            try {
+              karpathyScores.set(key, JSON.parse(val as string));
+            } catch {
+              /* skip malformed entries */
+            }
+          }
+
+          // Apply Karpathy blend as a re-weighting multiplier
+          if (baseContext.ragChunks && karpathyScores.size > 0) {
+            for (const chunk of baseContext.ragChunks) {
+              const sourceKey = chunk.filePath || chunk.sourceId;
+              const karpScore = sourceKey ? karpathyScores.get(sourceKey) : undefined;
+
+              if (karpScore) {
+                // Re-weight existing score by Karpathy blend (higher blend = higher confidence)
+                const originalScore = chunk.score ?? 0.5;
+                chunk.score = originalScore * karpScore.blend;
+                chunk.explain ??= {};
+                Object.assign(chunk.explain, {
+                  karpathyPageRank: karpScore.pr,
+                  karpathyAttention: karpScore.attn,
+                  karpathyAuthority: karpScore.authority,
+                  karpathyBlend: karpScore.blend,
+                });
+              }
+            }
+
+            // Re-sort after Karpathy weighting
+            baseContext.ragChunks = assignRanks(sortByBestScore(baseContext.ragChunks));
+
+            if (baseContext.retrievalTrace) {
+              (baseContext.retrievalTrace as Record<string, unknown>).karpathyRerank = {
+                karpathyScoresAvailable: karpathyScores.size,
+                resultsReweighted: baseContext.ragChunks.filter(
+                  (c) => (c.explain as Record<string, unknown>)?.karpathyBlend
+                ).length,
+              };
+            }
+          }
+        }
+      } catch (err) {
+        console.warn('[ACE Stage A0.5] Karpathy rerank unavailable (non-blocking):', err);
+      }
+
       // P3-B: boost ragChunks whose filePath appears in multiLane.topFiles
       // Files confirmed by ngram+symbol or ace_cache+symbol get +0.05 on top of existing score.
       if (

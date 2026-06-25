@@ -1,0 +1,47 @@
+{
+  "story_id": "ATLAS-PROOF-1782356203508",
+  "timestamp": "2026-06-25T02:56:47.185Z",
+  "duration_ms": 3586,
+  "dry_run": false,
+  "lanes": [
+    {
+      "lane": "replay",
+      "status": "PASS",
+      "story_id": "ATLAS-PROOF-1782356203508-REPLAY",
+      "timestamp": "2026-06-25T02:56:45.025Z",
+      "dry_run": false,
+      "verdict": "PASS"
+    },
+    {
+      "lane": "cache",
+      "status": "FAIL",
+      "error": "cache-proof failed with code 1: node:internal/modules/cjs/loader:1404\r\n  throw err;\r\n  ^\r\n\r\nError: Cannot find module 'C:\\Users\\james\\Videos\\deeds-web-app\\scripts\\skills\\cache-proof-test.mjs'\r\n    at Function._resolveFilename (node:internal/modules/cjs/loader:1401:15)\r\n    at defaultResolveImpl (node:internal/modules/cjs/loader:1057:19)\r\n    at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1062:22)\r\n    at Function._load (node:internal/modules/cjs/loader:1211:37)\r\n    at TracingChannel.traceSync (node:diagnostics_channel:322:14)\r\n    at wrapModuleLoad (node:internal/modules/cjs/loader:235:24)\r\n    at Function.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:171:5)\r\n    at node:internal/main/run_main_module:36:49 {\r\n  code: 'MODULE_NOT_FOUND',\r\n  requireStack: []\r\n}\r\n\r\nNode.js v22.17.1\r\n",
+      "verdict": "FAIL"
+    },
+    {
+      "lane": "live_app",
+      "status": "FAIL",
+      "error": "live-app-proof failed with code 1: node:internal/modules/cjs/loader:1404\r\n  throw err;\r\n  ^\r\n\r\nError: Cannot find module 'C:\\Users\\james\\Videos\\deeds-web-app\\scripts\\skills\\live-app-proof-test.mjs'\r\n    at Function._resolveFilename (node:internal/modules/cjs/loader:1401:15)\r\n    at defaultResolveImpl (node:internal/modules/cjs/loader:1057:19)\r\n    at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1062:22)\r\n    at Function._load (node:internal/modules/cjs/loader:1211:37)\r\n    at TracingChannel.traceSync (node:diagnostics_channel:322:14)\r\n    at wrapModuleLoad (node:internal/modules/cjs/loader:235:24)\r\n    at Function.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:171:5)\r\n    at node:internal/main/run_main_module:36:49 {\r\n  code: 'MODULE_NOT_FOUND',\r\n  requireStack: []\r\n}\r\n\r\nNode.js v22.17.1\r\n",
+      "verdict": "FAIL"
+    },
+    {
+      "lane": "cubic",
+      "status": "FAIL",
+      "error": "cubic-test failed with code 1: node:internal/modules/cjs/loader:1404\r\n  throw err;\r\n  ^\r\n\r\nError: Cannot find module 'C:\\Users\\james\\Videos\\deeds-web-app\\scripts\\skills\\cubic-adversarial-test.mjs'\r\n    at Function._resolveFilename (node:internal/modules/cjs/loader:1401:15)\r\n    at defaultResolveImpl (node:internal/modules/cjs/loader:1057:19)\r\n    at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1062:22)\r\n    at Function._load (node:internal/modules/cjs/loader:1211:37)\r\n    at TracingChannel.traceSync (node:diagnostics_channel:322:14)\r\n    at wrapModuleLoad (node:internal/modules/cjs/loader:235:24)\r\n    at Function.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:171:5)\r\n    at node:internal/main/run_main_module:36:49 {\r\n  code: 'MODULE_NOT_FOUND',\r\n  requireStack: []\r\n}\r\n\r\nNode.js v22.17.1\r\n",
+      "verdict": "FAIL"
+    }
+  ],
+  "verdict": {
+    "by_lane": {
+      "replay": "PASS",
+      "cache": "FAIL",
+      "live_app": "FAIL",
+      "cubic": "FAIL"
+    },
+    "pass_count": 1,
+    "fail_count": 3,
+    "pending_count": 0,
+    "overall": "FAIL"
+  },
+  "can_promote": false
+}

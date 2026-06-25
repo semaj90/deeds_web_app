@@ -1,0 +1,2714 @@
+{
+  "timestamp": "2026-06-25T03:07:37.578Z",
+  "title": "Port Contract Audit Report",
+  "sources": {
+    "docker_ps": {
+      "legal-ai-postgres": {
+        "ports": [
+          {
+            "host": 5434,
+            "container": 5432,
+            "protocol": "tcp",
+            "raw": "0.0.0.0:5434->5432/tcp"
+          },
+          {
+            "host": 5434,
+            "container": 5432,
+            "protocol": "tcp",
+            "raw": "[::]:5434->5432/tcp"
+          }
+        ],
+        "raw": "0.0.0.0:5434->5432/tcp, [::]:5434->5432/tcp"
+      },
+      "legal-ai-go-retrieval": {
+        "ports": [
+          {
+            "host": 8100,
+            "container": 8100,
+            "protocol": "tcp",
+            "raw": "0.0.0.0:8100->8100/tcp"
+          },
+          {
+            "host": 8100,
+            "container": 8100,
+            "protocol": "tcp",
+            "raw": "[::]:8100->8100/tcp"
+          },
+          {
+            "host": 50053,
+            "container": 50053,
+            "protocol": "tcp",
+            "raw": "0.0.0.0:50053->50053/tcp"
+          },
+          {
+            "host": 50053,
+            "container": 50053,
+            "protocol": "tcp",
+            "raw": "[::]:50053->50053/tcp"
+          }
+        ],
+        "raw": "0.0.0.0:8100->8100/tcp, [::]:8100->8100/tcp, 0.0.0.0:50053->50053/tcp, [::]:50053->50053/tcp"
+      },
+      "legal-ai-go-embedding": {
+        "ports": [
+          {
+            "host": 8097,
+            "container": 8097,
+            "protocol": "tcp",
+            "raw": "0.0.0.0:8097->8097/tcp"
+          },
+          {
+            "host": 8097,
+            "container": 8097,
+            "protocol": "tcp",
+            "raw": "[::]:8097->8097/tcp"
+          },
+          {
+            "host": 50051,
+            "container": 50051,
+            "protocol": "tcp",
+            "raw": "0.0.0.0:50051->50051/tcp"
+          },
+          {
+            "host": 50051,
+            "container": 50051,
+            "protocol": "tcp",
+            "raw": "[::]:50051->50051/tcp"
+          }
+        ],
+        "raw": "0.0.0.0:8097->8097/tcp, [::]:8097->8097/tcp, 0.0.0.0:50051->50051/tcp, [::]:50051->50051/tcp"
+      },
+      "legal-ai-valkey": {
+        "ports": [
+          {
+            "host": 6379,
+            "container": 6379,
+            "protocol": "tcp",
+            "raw": "127.0.0.1:6379->6379/tcp"
+          }
+        ],
+        "raw": "127.0.0.1:6379->6379/tcp"
+      },
+      "legal-ai-langgraph": {
+        "ports": [
+          {
+            "host": 8091,
+            "container": 8091,
+            "protocol": "tcp",
+            "raw": "0.0.0.0:8091->8091/tcp"
+          },
+          {
+            "host": 8091,
+            "container": 8091,
+            "protocol": "tcp",
+            "raw": "[::]:8091->8091/tcp"
+          }
+        ],
+        "raw": "0.0.0.0:8091->8091/tcp, [::]:8091->8091/tcp"
+      },
+      "legal-ai-caddy": {
+        "ports": [
+          {
+            "host": 5178,
+            "container": 5178,
+            "protocol": "tcp",
+            "raw": "0.0.0.0:5178->5178/tcp"
+          },
+          {
+            "host": 5178,
+            "container": 5178,
+            "protocol": "udp",
+            "raw": "0.0.0.0:5178->5178/udp"
+          },
+          {
+            "host": 5178,
+            "container": 5178,
+            "protocol": "tcp",
+            "raw": "[::]:5178->5178/tcp"
+          },
+          {
+            "host": 5178,
+            "container": 5178,
+            "protocol": "udp",
+            "raw": "[::]:5178->5178/udp"
+          }
+        ],
+        "raw": "0.0.0.0:5178->5178/tcp, 0.0.0.0:5178->5178/udp, [::]:5178->5178/tcp, [::]:5178->5178/udp"
+      },
+      "legal-ai-couchdb": {
+        "ports": [
+          {
+            "host": 5984,
+            "container": 5984,
+            "protocol": "tcp",
+            "raw": "0.0.0.0:5984->5984/tcp"
+          },
+          {
+            "host": 5984,
+            "container": 5984,
+            "protocol": "tcp",
+            "raw": "[::]:5984->5984/tcp"
+          }
+        ],
+        "raw": "0.0.0.0:5984->5984/tcp, [::]:5984->5984/tcp"
+      },
+      "legal-ai-docling-vlm": {
+        "ports": [
+          {
+            "host": 8085,
+            "container": 8085,
+            "protocol": "tcp",
+            "raw": "0.0.0.0:8085->8085/tcp"
+          },
+          {
+            "host": 8085,
+            "container": 8085,
+            "protocol": "tcp",
+            "raw": "[::]:8085->8085/tcp"
+          }
+        ],
+        "raw": "0.0.0.0:8085->8085/tcp, [::]:8085->8085/tcp"
+      },
+      "langfuse-server": {
+        "ports": [
+          {
+            "host": 3030,
+            "container": 3000,
+            "protocol": "tcp",
+            "raw": "0.0.0.0:3030->3000/tcp"
+          },
+          {
+            "host": 3030,
+            "container": 3000,
+            "protocol": "tcp",
+            "raw": "[::]:3030->3000/tcp"
+          }
+        ],
+        "raw": "0.0.0.0:3030->3000/tcp, [::]:3030->3000/tcp"
+      },
+      "langfuse-worker": {
+        "ports": [],
+        "raw": "3030/tcp"
+      },
+      "legal-ai-qdrant": {
+        "ports": [
+          {
+            "host": 6333,
+            "container": 6333,
+            "protocol": "tcp",
+            "raw": "0.0.0.0:6333-6334->6333-6334/tcp",
+            "isRange": true
+          },
+          {
+            "host": 6334,
+            "container": 6334,
+            "protocol": "tcp",
+            "raw": "0.0.0.0:6333-6334->6333-6334/tcp",
+            "isRange": true
+          },
+          {
+            "host": 6333,
+            "container": 6333,
+            "protocol": "tcp",
+            "raw": "[::]:6333-6334->6333-6334/tcp",
+            "isRange": true
+          },
+          {
+            "host": 6334,
+            "container": 6334,
+            "protocol": "tcp",
+            "raw": "[::]:6333-6334->6333-6334/tcp",
+            "isRange": true
+          }
+        ],
+        "raw": "0.0.0.0:6333-6334->6333-6334/tcp, [::]:6333-6334->6333-6334/tcp"
+      },
+      "legal-ai-neo4j": {
+        "ports": [
+          {
+            "host": 7474,
+            "container": 7474,
+            "protocol": "tcp",
+            "raw": "0.0.0.0:7474->7474/tcp"
+          },
+          {
+            "host": 7474,
+            "container": 7474,
+            "protocol": "tcp",
+            "raw": "[::]:7474->7474/tcp"
+          },
+          {
+            "host": 7687,
+            "container": 7687,
+            "protocol": "tcp",
+            "raw": "0.0.0.0:7687->7687/tcp"
+          },
+          {
+            "host": 7687,
+            "container": 7687,
+            "protocol": "tcp",
+            "raw": "[::]:7687->7687/tcp"
+          }
+        ],
+        "raw": "0.0.0.0:7474->7474/tcp, [::]:7474->7474/tcp, 0.0.0.0:7687->7687/tcp, [::]:7687->7687/tcp"
+      },
+      "legal-ai-bifrost": {
+        "ports": [
+          {
+            "host": 3040,
+            "container": 8080,
+            "protocol": "tcp",
+            "raw": "0.0.0.0:3040->8080/tcp"
+          },
+          {
+            "host": 3040,
+            "container": 8080,
+            "protocol": "tcp",
+            "raw": "[::]:3040->8080/tcp"
+          }
+        ],
+        "raw": "0.0.0.0:3040->8080/tcp, [::]:3040->8080/tcp"
+      },
+      "legal-ai-image-synthesis": {
+        "ports": [
+          {
+            "host": 8092,
+            "container": 8092,
+            "protocol": "tcp",
+            "raw": "0.0.0.0:8092->8092/tcp"
+          },
+          {
+            "host": 8092,
+            "container": 8092,
+            "protocol": "tcp",
+            "raw": "[::]:8092->8092/tcp"
+          }
+        ],
+        "raw": "0.0.0.0:8092->8092/tcp, [::]:8092->8092/tcp"
+      },
+      "legal-ai-seaweed-s3": {
+        "ports": [
+          {
+            "host": 8333,
+            "container": 8333,
+            "protocol": "tcp",
+            "raw": "0.0.0.0:8333->8333/tcp"
+          },
+          {
+            "host": 8333,
+            "container": 8333,
+            "protocol": "tcp",
+            "raw": "[::]:8333->8333/tcp"
+          }
+        ],
+        "raw": "0.0.0.0:8333->8333/tcp, [::]:8333->8333/tcp"
+      },
+      "legal-ai-seaweed-filer": {
+        "ports": [
+          {
+            "host": 8888,
+            "container": 8888,
+            "protocol": "tcp",
+            "raw": "0.0.0.0:8888->8888/tcp"
+          },
+          {
+            "host": 8888,
+            "container": 8888,
+            "protocol": "tcp",
+            "raw": "[::]:8888->8888/tcp"
+          }
+        ],
+        "raw": "0.0.0.0:8888->8888/tcp, [::]:8888->8888/tcp"
+      },
+      "legal-ai-seaweed-volume": {
+        "ports": [
+          {
+            "host": 8080,
+            "container": 8080,
+            "protocol": "tcp",
+            "raw": "0.0.0.0:8080->8080/tcp"
+          },
+          {
+            "host": 8080,
+            "container": 8080,
+            "protocol": "tcp",
+            "raw": "[::]:8080->8080/tcp"
+          }
+        ],
+        "raw": "0.0.0.0:8080->8080/tcp, [::]:8080->8080/tcp"
+      },
+      "2270b936a296_legal-ai-searxng": {
+        "ports": [
+          {
+            "host": 8889,
+            "container": 8080,
+            "protocol": "tcp",
+            "raw": "0.0.0.0:8889->8080/tcp"
+          },
+          {
+            "host": 8889,
+            "container": 8080,
+            "protocol": "tcp",
+            "raw": "[::]:8889->8080/tcp"
+          }
+        ],
+        "raw": "0.0.0.0:8889->8080/tcp, [::]:8889->8080/tcp"
+      },
+      "b19c2ffc2b28_legal-ai-rabbitmq": {
+        "ports": [
+          {
+            "host": 5672,
+            "container": 5672,
+            "protocol": "tcp",
+            "raw": "0.0.0.0:5672->5672/tcp"
+          },
+          {
+            "host": 5672,
+            "container": 5672,
+            "protocol": "tcp",
+            "raw": "[::]:5672->5672/tcp"
+          },
+          {
+            "host": 15672,
+            "container": 15672,
+            "protocol": "tcp",
+            "raw": "0.0.0.0:15672->15672/tcp"
+          },
+          {
+            "host": 15672,
+            "container": 15672,
+            "protocol": "tcp",
+            "raw": "[::]:15672->15672/tcp"
+          }
+        ],
+        "raw": "0.0.0.0:5672->5672/tcp, [::]:5672->5672/tcp, 0.0.0.0:15672->15672/tcp, [::]:15672->15672/tcp"
+      },
+      "78471ead1a9d_legal-ai-seaweed-master": {
+        "ports": [
+          {
+            "host": 9333,
+            "container": 9333,
+            "protocol": "tcp",
+            "raw": "0.0.0.0:9333->9333/tcp"
+          },
+          {
+            "host": 9333,
+            "container": 9333,
+            "protocol": "tcp",
+            "raw": "[::]:9333->9333/tcp"
+          }
+        ],
+        "raw": "0.0.0.0:9333->9333/tcp, [::]:9333->9333/tcp"
+      },
+      "16ac98cb8d6f_legal-ai-nats": {
+        "ports": [
+          {
+            "host": 4222,
+            "container": 4222,
+            "protocol": "tcp",
+            "raw": "0.0.0.0:4222->4222/tcp"
+          },
+          {
+            "host": 4222,
+            "container": 4222,
+            "protocol": "tcp",
+            "raw": "[::]:4222->4222/tcp"
+          },
+          {
+            "host": 8222,
+            "container": 8222,
+            "protocol": "tcp",
+            "raw": "0.0.0.0:8222->8222/tcp"
+          },
+          {
+            "host": 8222,
+            "container": 8222,
+            "protocol": "tcp",
+            "raw": "[::]:8222->8222/tcp"
+          }
+        ],
+        "raw": "0.0.0.0:4222->4222/tcp, [::]:4222->4222/tcp, 0.0.0.0:8222->8222/tcp, [::]:8222->8222/tcp"
+      },
+      "local-deep-research": {
+        "ports": [
+          {
+            "host": 5000,
+            "container": 5000,
+            "protocol": "tcp",
+            "raw": "0.0.0.0:5000->5000/tcp"
+          },
+          {
+            "host": 5000,
+            "container": 5000,
+            "protocol": "tcp",
+            "raw": "[::]:5000->5000/tcp"
+          }
+        ],
+        "raw": "0.0.0.0:5000->5000/tcp, [::]:5000->5000/tcp"
+      },
+      "langfuse-clickhouse": {
+        "ports": [
+          {
+            "host": 8124,
+            "container": 8123,
+            "protocol": "tcp",
+            "raw": "127.0.0.1:8124->8123/tcp"
+          },
+          {
+            "host": 9009,
+            "container": 9000,
+            "protocol": "tcp",
+            "raw": "127.0.0.1:9009->9000/tcp"
+          }
+        ],
+        "raw": "127.0.0.1:8124->8123/tcp, 127.0.0.1:9009->9000/tcp"
+      },
+      "legal-ai-go-search": {
+        "ports": [
+          {
+            "host": 8096,
+            "container": 8096,
+            "protocol": "tcp",
+            "raw": "0.0.0.0:8096->8096/tcp"
+          },
+          {
+            "host": 8096,
+            "container": 8096,
+            "protocol": "tcp",
+            "raw": "[::]:8096->8096/tcp"
+          },
+          {
+            "host": 50055,
+            "container": 50055,
+            "protocol": "tcp",
+            "raw": "0.0.0.0:50055->50055/tcp"
+          },
+          {
+            "host": 50055,
+            "container": 50055,
+            "protocol": "tcp",
+            "raw": "[::]:50055->50055/tcp"
+          }
+        ],
+        "raw": "0.0.0.0:8096->8096/tcp, [::]:8096->8096/tcp, 0.0.0.0:50055->50055/tcp, [::]:50055->50055/tcp"
+      }
+    },
+    "env_files": {
+      ".env": {
+        "NODE_ENV": "development",
+        "VITE_NODE_ENV": "development",
+        "PORT": "5173",
+        "HOST": "localhost",
+        "DEEDS_ROOT": "C:\\Users\\james\\Videos\\deeds-web-app",
+        "WORKSPACE_ROOT": "C:\\Users\\james\\Videos\\deeds-web-app",
+        "FRONTEND_ROOT": "C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend",
+        "PROJECT_ROOT": "C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend",
+        "HERMES_WORKSPACE_ROOT": "C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend",
+        "HERMES_REPO_ROOT": "C:\\Users\\james\\Videos\\deeds-web-app",
+        "DATABASE_URL": "postgresql://legal_admin:123456@127.0.0.1:5434/legal_ai_db",
+        "PG_CONN_STRING": "postgresql://legal_admin:123456@127.0.0.1:5434/legal_ai_db",
+        "PG_URL": "postgresql://legal_admin:123456@localhost:5434/legal_ai_db",
+        "DB_HOST": "localhost",
+        "DB_PORT": "5434",
+        "DB_USER": "legal_admin",
+        "DB_PASSWORD": "123456",
+        "DB_NAME": "legal_ai_db",
+        "POSTGRES_DB": "legal_ai_db",
+        "POSTGRES_USER": "legal_admin",
+        "POSTGRES_PASSWORD": "123456",
+        "REDIS_URL": "redis://127.0.0.1:6379",
+        "REDIS_HOST": "localhost",
+        "REDIS_PORT": "6379",
+        "REDIS_PASSWORD": "redis",
+        "REDIS_CONTAINER": "legal-ai-valkey",
+        "REDIS_ADDR": "localhost:6379",
+        "REDIS_DB": "0",
+        "NATS_URL": "nats://127.0.0.1:4222",
+        "RABBITMQ_URL": "amqp://guest:guest@localhost:5672",
+        "RABBITMQ_USER": "guest",
+        "RABBITMQ_PASSWORD": "guest",
+        "RABBITMQ_MGMT_URL": "http://127.0.0.1:15672",
+        "GO_RETRIEVAL_ENABLED": "true",
+        "GO_RETRIEVAL_HTTP_URL": "http://127.0.0.1:8100",
+        "GO_RETRIEVAL_GRPC_ADDR": "127.0.0.1:50053",
+        "AUTH_SECRET": "phase14-yorha-legal-ai-32char-secret-change-in-production",
+        "AUTH_COOKIE_NAME": "yorha_session",
+        "JWT_SECRET": "phase14-yorha-legal-ai-32char-secret-change-in-production",
+        "SESSION_SECRET": "phase14-yorha-legal-ai-session-secret",
+        "SERVICE_AUTH_TOKEN": "dev-only-service-token",
+        "DEV_BYPASS_AUTH": "true",
+        "VITE_DEV_BYPASS_AUTH": "true",
+        "OLLAMA_URL": "http://localhost:11434",
+        "VITE_OLLAMA_URL": "http://localhost:11434",
+        "OLLAMA_API_URL": "http://localhost:11434",
+        "OLLAMA_BASE_URL": "http://localhost:11434",
+        "OPENAI_BASE_URL": "http://127.0.0.1:3040/v1",
+        "OPENAI_API_KEY": "_",
+        "OLLAMA_MODEL": "gemma4-legal:latest",
+        "OLLAMA_MODEL_SUMMARY": "gemma4-legal:latest",
+        "OLLAMA_CHAT_MODEL": "gemma4-legal-vlm:latest",
+        "OLLAMA_VLM_MODEL": "gemma4-legal-vlm:latest",
+        "GEMMA4_MODEL": "gemma4-legal-vlm:latest",
+        "FUNCTION_GEMMA_MODEL": "gemma4-legal-vlm:latest",
+        "OLLAMA_GPU_LAYERS": "30",
+        "BIFROST_ENABLED": "true",
+        "BIFROST_URL": "http://127.0.0.1:3040",
+        "BIFROST_TIMEOUT_MS": "90000",
+        "OLLAMA_TIMEOUT_MS": "90000",
+        "LITELLM_ENABLED": "false",
+        "EMBEDDING_MODEL": "nomic-embed-text:latest",
+        "EMBED_MODEL": "nomic-embed-text",
+        "OLLAMA_EMBED_MODEL": "embeddinggemma:latest",
+        "EMBEDDING_DIMENSION": "768",
+        "EMBEDDING_URL": "http://localhost:11434",
+        "EMBEDDING_GRPC_ENABLED": "true",
+        "EMBEDDING_GRPC_URL": "127.0.0.1:50051",
+        "EMBEDDING_QUIC_ENABLED": "true",
+        "ROTORQUANT_MODEL_PATH": "C:\\Users\\james\\Videos\\deeds-web-app\\models\\gemma4-legal-iq4xs-direct.gguf",
+        "TURBO_MODEL_PATH": "C:\\Users\\james\\Videos\\deeds-web-app\\models\\gemma4-legal-iq4xs-direct.gguf",
+        "TURBO_MMPROJ_PATH": "C:\\Users\\james\\Videos\\deeds-web-app\\models\\mmproj-F16.gguf",
+        "LLAMA_SERVER_PATH": "C:\\Users\\james\\Desktop\\llama-server-cuda\\llama-server.exe",
+        "TURBO_PROFILE": "turboquant-safe",
+        "TURBO_KV_K": "q8_0",
+        "TURBO_KV_V": "q8_0",
+        "TURBO_CTX": "65536",
+        "TURBO_PARALLEL": "1",
+        "LLM_CONTEXT_SIZE": "65536",
+        "OPENAI_MAX_OUTPUT_TOKENS": "4096",
+        "OPENAI_HARD_INPUT_CAP": "60000",
+        "TURBO_NGL": "99",
+        "TURBOQUANT_ENABLED": "true",
+        "ROTORQUANT_KV_ENABLED": "true",
+        "MTP_ENABLED": "false",
+        "TENSORRT_LLM_ENABLED": "false",
+        "TURBOQUANT_BASE_URL": "http://127.0.0.1:8090",
+        "TURBOQUANT_URL": "http://127.0.0.1:8090",
+        "DRAFT_N": "5",
+        "QDRANT_URL": "http://127.0.0.1:6333",
+        "QDRANT_HOST": "127.0.0.1",
+        "QDRANT_PORT": "6333",
+        "QDRANT_COLLECTION": "legal_documents",
+        "QDRANT_TRANSPORT": "rest",
+        "QDRANT_USE_GRPC": "false",
+        "QDRANT_GRPC_HOST": "127.0.0.1",
+        "QDRANT_GRPC_PORT": "6334",
+        "QDRANT_PREFER_GRPC": "false",
+        "OLLAMA_EMBED_BASE_URL": "http://127.0.0.1:11434",
+        "COUCHDB_URL": "http://admin:deeds123@localhost:5984",
+        "COUCHDB_USER": "admin",
+        "COUCHDB_PASSWORD": "deeds123",
+        "NEO4J_URI": "bolt://127.0.0.1:7687",
+        "NEO4J_URL": "bolt://127.0.0.1:7687",
+        "NEO4J_HTTP_URL": "http://localhost:7474",
+        "NEO4J_USER": "neo4j",
+        "NEO4J_PASSWORD": "neo4j123",
+        "NEO4J_PASS": "neo4j123",
+        "CACHE_TTL": "300",
+        "NES_PIPELINE_PORT": "8097",
+        "MCP_SERVER_PORT": "3002",
+        "FRONTEND_PORT": "5174",
+        "OLLAMA_PORT": "11434",
+        "NES_API_URL": "http://localhost:8097/api",
+        "EMBEDDING_API_URL": "http://localhost:11434/api/embeddings",
+        "NINTENDO_L1_GPU_BUDGET": "1048576",
+        "NINTENDO_L2_RAM_BUDGET": "2097152",
+        "NINTENDO_L3_REDIS_BUDGET": "1048576",
+        "CHR_ROM_TOTAL_SIZE": "32768",
+        "CHR_ROM_BANKS": "4",
+        "MCP_LEGACY_ALIASES": "true",
+        "ACE_ENCODED_PREFILTER_ENABLED": "true",
+        "ACE_ENCODED_PREFILTER_MODE": "boost",
+        "ACE_ENCODED_RERANK_ENABLED": "true",
+        "ACE_ENCODED_RERANK_WEIGHT": "0.15",
+        "KARPATHY_SCORE_REDIS_KEY": "gpu:karpathy:scores",
+        "GRAPH_JSONL_PATH": "C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\memory\\graph\\graph-facts.jsonl",
+        "ACE_CONTEXT_PACKET_DIR": "C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\memory\\context-packets",
+        "GO_SEARCH_URL": "http://localhost:8096",
+        "GO_SEARCH_GRPC_URL": "127.0.0.1:50055",
+        "RETRIEVAL_GRPC_URL": "127.0.0.1:50053",
+        "RETRIEVAL_GRPC_ENABLED": "true",
+        "RETRIEVAL_HTTP_URL": "http://127.0.0.1:8100",
+        "RETRIEVAL_HTTP_ENABLED": "true",
+        "TOPOLOGY_SEARCH_URL": "http://127.0.0.1:8101",
+        "TRACE_MCP_URL": "http://127.0.0.1:8788",
+        "KB_MCP_URL": "http://127.0.0.1:8789",
+        "QUIC_HEALTH_URL": "http://127.0.0.1:5178/health",
+        "MINIO_ENDPOINT": "localhost",
+        "MINIO_PORT": "9000",
+        "MINIO_ACCESS_KEY": "minio",
+        "MINIO_SECRET_KEY": "minio123",
+        "MINIO_ROOT_USER": "minio",
+        "MINIO_ROOT_PASSWORD": "minio123",
+        "MINIO_USE_SSL": "false",
+        "MINIO_EVIDENCE_BUCKET": "legal-evidence",
+        "MINIO_LIBRARY_BUCKET": "legal-library",
+        "SEAWEED_ENDPOINT": "localhost",
+        "SEAWEED_S3_PORT": "8333",
+        "SEAWEED_ACCESS_KEY": "admin",
+        "SEAWEED_SECRET_KEY": "admin",
+        "SEAWEED_MASTER_PORT": "9333",
+        "SEAWEED_FILER_PORT": "8888",
+        "SEAWEED_S3_ENDPOINT": "http://localhost:8333",
+        "SEAWEED_S3_REGION": "us-east-1",
+        "SEAWEED_S3_BUCKET": "deeds-dev",
+        "PUBLIC_APP_URL": "http://localhost:5173",
+        "LANGEXTRACT_ENABLED": "true",
+        "LANGEXTRACT_URL": "http://127.0.0.1:8095",
+        "LANGEXTRACT_NATIVE": "true",
+        "WHISPER_USE_SERVER": "false",
+        "WHISPER_SERVER_URL": "http://127.0.0.1:8178",
+        "WHISPER_PATH": "c:/Users/james/Videos/deeds-web-app/.venv/Scripts/whisper.exe",
+        "WHISPER_MODEL": "base",
+        "WHISPER_DEVICE": "cpu",
+        "FFMPEG_PATH": "c:/Users/james/Videos/deeds-web-app/tools/ffmpeg/ffmpeg.exe",
+        "SEARXNG_URL": "http://localhost:8889",
+        "LANGFUSE_ENABLED": "true",
+        "LANGFUSE_PUBLIC_KEY": "pk-lf-4e3db8a0107de7872b894e309494252b",
+        "LANGFUSE_SECRET_KEY": "sk-lf-3941aba7500ce9fabbe0c513ad6c3a58",
+        "LANGFUSE_HOST": "http://localhost:3030",
+        "GEMINI_API_KEY": "AIzaSyBkvkJZ5BI0LdiP3Oic0sfCj61X8DSbhQw",
+        "GEMINI_MODEL": "gemini-2.0-flash-exp",
+        "GEMINI_API_ENDPOINT": "https://generativelanguage.googleapis.com/v1beta/models",
+        "GEMINI_ENABLE_SEARCH": "true",
+        "PUBLIC_API_URL": "http://127.0.0.1:5173",
+        "FRONTEND_BASE_URL": "http://127.0.0.1:5173",
+        "VITE_UPLOAD_SERVICE_URL": "http://localhost:8094",
+        "VITE_RAG_SERVICE_URL": "http://localhost:8093",
+        "UPLOAD_SERVICE_URL": "http://localhost:8094",
+        "RAG_BACKEND_URL": "http://localhost:8093",
+        "RAG_SERVICE_URL": "http://127.0.0.1:8103",
+        "PUBLIC_ANALYTICS_API": "http://localhost:8001",
+        "TRITON_URL": "http://localhost:8000",
+        "TRITON_MODEL_NAME": "gemma4-legal",
+        "ENABLE_GPU_ACCELERATION": "true",
+        "ENABLE_RAG": "true",
+        "ENABLE_STREAMING": "true",
+        "ENABLE_TEXT_EXTRACTION": "true",
+        "ENABLE_EMBEDDINGS": "true",
+        "ENABLE_SUMMARY_GENERATION": "true",
+        "ENABLE_ENTITY_EXTRACTION": "true",
+        "ENABLE_SENTIMENT_ANALYSIS": "false",
+        "ENABLE_DOCUMENT_CLASSIFICATION": "false",
+        "MAX_WORKERS": "4",
+        "LOG_LEVEL": "info",
+        "LOG_FORMAT": "json",
+        "UPLOAD_DIR": "./uploads",
+        "TEMP_DIR": "./temp",
+        "LOGS_DIR": "./logs",
+        "ENGRAM_ONLY": "false",
+        "REDIS_ENABLED": "true",
+        "VALKEY_PASSWORD": "redis",
+        "QDRANT_ENABLED": "false",
+        "NEO4J_ENABLED": "false",
+        "FAST_AST_ENABLED": "false",
+        "GRAPHIFY_STARTUP_ENABLED": "false",
+        "TURBOVEC_PREFILTER_ENABLED": "false"
+      },
+      ".env.local": {
+        "OLLAMA_URL": "http://10.0.0.243:11434",
+        "REDIS_URL": "redis://127.0.0.1:6379",
+        "REDIS_PASSWORD": "redis",
+        "DATABASE_URL": "\"postgresql://legal_admin:123456@127.0.0.1:5434/legal_ai_db\"",
+        "CONTEXT7_ENDPOINT": "http://localhost:3001",
+        "GPU_WORKERS": "4",
+        "GPU_MEMORY_LIMIT": "8192",
+        "PRIMARY_EMBEDDING_MODEL": "embeddinggemma:latest",
+        "FALLBACK_EMBEDDING_MODEL": "nomic-embed-text:latest",
+        "LEGAL_AI_MODEL": "gemma3-legal:latest",
+        "OLLAMA_PORT": "12376"
+      },
+      "sveltekit-frontend\\.env": {
+        "SIMDJSON_DISABLED": "0",
+        "REDIS_HOST": "127.0.0.1",
+        "REDIS_PORT": "6379",
+        "REDIS_PASSWORD": "redis",
+        "REDIS_URL": "redis://:redis@127.0.0.1:6379",
+        "REDIS_CONTAINER": "legal-ai-valkey",
+        "GO_RETRIEVAL_ENABLED": "true",
+        "RAG_USE_GO_RETRIEVAL": "true",
+        "GO_RETRIEVAL_HTTP_URL": "http://127.0.0.1:8100",
+        "GO_RETRIEVAL_GRPC_ADDR": "127.0.0.1:50053",
+        "DATABASE_URL": "postgresql://legal_admin:123456@127.0.0.1:5434/legal_ai_db",
+        "EMBED_MODEL": "nomic-embed-text",
+        "FASTAPI_URL": "http://localhost:8096",
+        "VLLM_ENDPOINT": "http://localhost:8000/v1",
+        "OLLAMA_CHAT_KEEP_ALIVE": "0",
+        "OLLAMA_EMBED_KEEP_ALIVE": "5m",
+        "OLLAMA_EMBED_BASE_URL": "http://127.0.0.1:11434",
+        "EXPECTED_EMBED_DIM": "768",
+        "CODE_INDEX_REDIS_TTL": "604800",
+        "ACE_ATLAS_REDIS_TTL": "604800",
+        "KARPATHY_REDIS_TTL": "604800",
+        "WIKI_NOTE_REDIS_TTL": "604800",
+        "NODE_ENV": "development",
+        "SEAWEED_S3_PORT": "8333",
+        "SEAWEED_ENDPOINT": "localhost",
+        "SEAWEED_ACCESS_KEY": "minio",
+        "SEAWEED_SECRET_KEY": "minio123",
+        "SEAWEED_MASTER_PORT": "9333",
+        "SEAWEED_FILER_PORT": "8382",
+        "ROTORQUANT_MODEL_PATH": "C:\\Users\\james\\Videos\\deeds-web-app\\models\\gemma4-legal-iq4xs-direct.gguf",
+        "TURBO_MODEL_PATH": "C:\\Users\\james\\Videos\\deeds-web-app\\models\\gemma4-legal-iq4xs-direct.gguf",
+        "TURBOQUANT_MODEL_PATH": "C:\\Users\\james\\Videos\\deeds-web-app\\models\\gemma4-legal-iq4xs-direct.gguf",
+        "MMPROJ_PATH": "C:\\Users\\james\\Videos\\deeds-web-app\\models\\mmproj-F16.gguf",
+        "TURBOQUANT_MMPROJ_PATH": "C:\\Users\\james\\Videos\\deeds-web-app\\models\\mmproj-F16.gguf",
+        "LLAMA_SERVER_PATH": "C:\\Users\\james\\Desktop\\llama-server-cuda\\llama-server.exe",
+        "TURBO_PORT": "8090",
+        "TURBOQUANT_URL": "http://127.0.0.1:8090",
+        "TURBOQUANT_BASE_URL": "http://127.0.0.1:8090",
+        "LLAMA_SERVER_URL": "http://127.0.0.1:8090",
+        "TURBO_PROFILE": "stock",
+        "TURBO_CTX": "65536",
+        "TURBO_NGL": "99",
+        "LLAMA_CACHE_TYPE_K": "q8_0",
+        "LLAMA_CACHE_TYPE_V": "q8_0",
+        "NEO4J_URI": "bolt://127.0.0.1:7687",
+        "NEO4J_URL": "bolt://127.0.0.1:7687",
+        "NEO4J_HTTP_URL": "http://localhost:7474",
+        "NEO4J_USER": "neo4j",
+        "NEO4J_PASSWORD": "neo4j123",
+        "NEO4J_PASS": "neo4j123",
+        "TURBOVEC_SIDECAR_GRPC_ENABLED": "true",
+        "TURBOVEC_SIDECAR_GRPC_URL": "127.0.0.1:50062",
+        "TENSORRT_BRIDGE_NODE_PATH": "C:/Users/james/Videos/deeds-web-app/simd-bridge/cpp/build/Release/tensorrt_bridge.node",
+        "CUDA_VISIBLE_DEVICES": "0"
+      },
+      "sveltekit-frontend\\.env.local": {
+        "DATABASE_URL": "postgresql://legal_admin:123456@127.0.0.1:5434/legal_ai_db",
+        "OLLAMA_EMBED_MODEL": "embeddinggemma:latest",
+        "QDRANT_URL": "http://127.0.0.1:6333",
+        "QDRANT_COLLECTION": "legal_documents",
+        "VITE_WS_canvas_UUID": "f9018313-a43b-4392-87a8-b421fbe686bc",
+        "VITE_WS_canvas_PORT": "5173",
+        "VITE_WS_notifications_UUID": "20ab55af-ae1d-409a-8b72-5616f0684a8e",
+        "VITE_WS_notifications_PORT": "5174",
+        "VITE_WS_ENHANCED_RAG_UUID": "d3823db4-a209-48cd-a40e-6eb195c5213c",
+        "VITE_WS_ENHANCED_RAG_PORT": "5175",
+        "VITE_WS_rag_UUID": "8668824a-7e76-4dde-8a7e-275616243350",
+        "VITE_WS_rag_PORT": "5176",
+        "VITE_WS_chat_UUID": "22bef94c-6c0a-4e51-97a3-0ca32739f5ad",
+        "VITE_WS_chat_PORT": "5177",
+        "REDIS_URL": "redis://127.0.0.1:6379",
+        "REDIS_PASSWORD": "redis",
+        "GO_SEARCH_URL": "http://localhost:8096"
+      }
+    },
+    "docker_compose": {
+      "docker-compose.yml": {
+        "postgres": {
+          "image": "pgvector/pgvector:pg18",
+          "ports": [
+            {
+              "ip": "0.0.0.0",
+              "host": 5434,
+              "container": 5432,
+              "protocol": "tcp"
+            }
+          ],
+          "profile": "default",
+          "environment": [
+            "POSTGRES_DB=legal_ai_db",
+            "POSTGRES_USER=legal_admin",
+            "POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-123456}",
+            "POSTGRES_HOST_AUTH_METHOD=md5"
+          ]
+        },
+        "rabbitmq": {
+          "image": "rabbitmq:3-management-alpine",
+          "ports": [
+            {
+              "ip": "0.0.0.0",
+              "host": 5672,
+              "container": 5672,
+              "protocol": "tcp"
+            },
+            {
+              "ip": "0.0.0.0",
+              "host": 15672,
+              "container": 15672,
+              "protocol": "tcp"
+            }
+          ],
+          "profile": "default",
+          "environment": [
+            "RABBITMQ_DEFAULT_USER=legal_admin",
+            "RABBITMQ_DEFAULT_PASS=secret123",
+            "RABBITMQ_DEFAULT_VHOST=/"
+          ]
+        },
+        "valkey": {
+          "image": "valkey/valkey-bundle:8.1.1",
+          "ports": [
+            {
+              "ip": "127.0.0.1",
+              "host": 6379,
+              "container": 6379,
+              "protocol": "tcp"
+            }
+          ],
+          "profile": "default",
+          "environment": {}
+        },
+        "qdrant": {
+          "image": "qdrant/qdrant:latest",
+          "ports": [
+            {
+              "ip": "0.0.0.0",
+              "host": 6333,
+              "container": 6333,
+              "protocol": "tcp"
+            },
+            {
+              "ip": "0.0.0.0",
+              "host": 6334,
+              "container": 6334,
+              "protocol": "tcp"
+            }
+          ],
+          "profile": "default",
+          "environment": [
+            "QDRANT__SERVICE__HTTP_PORT=6333",
+            "QDRANT__SERVICE__GRPC_PORT=6334"
+          ]
+        },
+        "minio": {
+          "image": "minio/minio:latest",
+          "ports": [
+            {
+              "ip": "0.0.0.0",
+              "host": 9000,
+              "container": 9000,
+              "protocol": "tcp"
+            },
+            {
+              "ip": "0.0.0.0",
+              "host": 9001,
+              "container": 9001,
+              "protocol": "tcp"
+            }
+          ],
+          "profile": "legacy-minio",
+          "environment": [
+            "MINIO_ROOT_USER=minio",
+            "MINIO_ROOT_PASSWORD=${MINIO_ROOT_PASSWORD:-minio123}"
+          ]
+        },
+        "seaweedfs-master": {
+          "image": "chrislusf/seaweedfs:latest",
+          "ports": [
+            {
+              "ip": "0.0.0.0",
+              "host": 9333,
+              "container": 9333,
+              "protocol": "tcp"
+            }
+          ],
+          "profile": "seaweedfs",
+          "environment": {}
+        },
+        "seaweedfs-volume": {
+          "image": "chrislusf/seaweedfs:latest",
+          "ports": [
+            {
+              "ip": "0.0.0.0",
+              "host": 8080,
+              "container": 8080,
+              "protocol": "tcp"
+            }
+          ],
+          "profile": "seaweedfs",
+          "environment": {}
+        },
+        "seaweedfs-filer": {
+          "image": "chrislusf/seaweedfs:latest",
+          "ports": [
+            {
+              "ip": "0.0.0.0",
+              "host": 8888,
+              "container": 8888,
+              "protocol": "tcp"
+            }
+          ],
+          "profile": "seaweedfs",
+          "environment": {}
+        },
+        "seaweedfs-s3": {
+          "image": "chrislusf/seaweedfs:latest",
+          "ports": [
+            {
+              "ip": "0.0.0.0",
+              "host": 8333,
+              "container": 8333,
+              "protocol": "tcp"
+            }
+          ],
+          "profile": "seaweedfs",
+          "environment": {}
+        },
+        "caddy": {
+          "image": "caddy:2.8-alpine",
+          "ports": [],
+          "profile": "default",
+          "environment": {
+            "CADDY_DOMAIN": "${CADDY_DOMAIN:-localhost}",
+            "CADDY_PORT": "${CADDY_PORT:-5178}",
+            "SVELTEKIT_UPSTREAM": "${SVELTEKIT_UPSTREAM:-host.docker.internal:5173}",
+            "VECTOR_BACKEND": "${VECTOR_BACKEND:-host.docker.internal:8095}"
+          }
+        },
+        "couchdb": {
+          "image": "couchdb:3.3",
+          "ports": [
+            {
+              "ip": "0.0.0.0",
+              "host": 5984,
+              "container": 5984,
+              "protocol": "tcp"
+            }
+          ],
+          "profile": "full",
+          "environment": {
+            "COUCHDB_USER": "admin",
+            "COUCHDB_PASSWORD": "${COUCHDB_PASSWORD:-legal_ai_pass}",
+            "ERL_CRASH_DUMP": "/dev/null",
+            "ERL_CRASH_DUMP_SECONDS": 0,
+            "ERL_FLAGS": "+P 131072 +Q 4096"
+          }
+        },
+        "neo4j": {
+          "image": "neo4j:5-community",
+          "ports": [
+            {
+              "ip": "0.0.0.0",
+              "host": 7474,
+              "container": 7474,
+              "protocol": "tcp"
+            },
+            {
+              "ip": "0.0.0.0",
+              "host": 7687,
+              "container": 7687,
+              "protocol": "tcp"
+            }
+          ],
+          "profile": "full",
+          "environment": [
+            "NEO4J_AUTH=neo4j/neo4j123",
+            "NEO4J_PLUGINS=[\"apoc\", \"graph-data-science\"]",
+            "NEO4J_dbms_security_procedures_unrestricted=apoc.*,gds.*",
+            "NEO4J_dbms_security_procedures_allowlist=apoc.*,gds.*",
+            "NEO4J_dbms_memory_heap_initial__size=2g",
+            "NEO4J_dbms_memory_heap_max__size=4g",
+            "NEO4J_dbms_memory_pagecache_size=1g"
+          ]
+        },
+        "searxng": {
+          "image": "searxng/searxng:latest",
+          "ports": [],
+          "profile": "full",
+          "environment": {}
+        },
+        "nats": {
+          "image": "nats:latest",
+          "ports": [
+            {
+              "ip": "0.0.0.0",
+              "host": 4222,
+              "container": 4222,
+              "protocol": "tcp"
+            },
+            {
+              "ip": "0.0.0.0",
+              "host": 8222,
+              "container": 8222,
+              "protocol": "tcp"
+            }
+          ],
+          "profile": "full",
+          "environment": {}
+        },
+        "bifrost": {
+          "image": "maximhq/bifrost:latest",
+          "ports": [
+            {
+              "ip": "0.0.0.0",
+              "host": 3040,
+              "container": 8080,
+              "protocol": "tcp"
+            }
+          ],
+          "profile": "full",
+          "environment": [
+            "OLLAMA_BASE_URL=http://host.docker.internal:11434"
+          ]
+        },
+        "docling-vlm": {
+          "image": "deeds-web-app-docling-vlm:latest",
+          "ports": [
+            {
+              "ip": "0.0.0.0",
+              "host": 8085,
+              "container": 8085,
+              "protocol": "tcp"
+            }
+          ],
+          "profile": "full",
+          "environment": {
+            "OLLAMA_URL": "http://host.docker.internal:11434",
+            "OLLAMA_BASE_URL": "http://host.docker.internal:11434",
+            "MINIO_ENDPOINT": "minio:9000",
+            "MINIO_ACCESS_KEY": "${MINIO_ACCESS_KEY:-minioadmin}",
+            "MINIO_SECRET_KEY": "${MINIO_SECRET_KEY:-minioadmin}",
+            "VLM_MODEL": "${VLM_MODEL:-gemma4:e4b}",
+            "YOLO_MODEL_PATH": "${YOLO_MODEL_PATH:-yolov8x.pt}",
+            "YOLO_CPU_FALLBACK_PATH": "${YOLO_CPU_FALLBACK_PATH:-yolov8n.pt}",
+            "MAX_IMAGE_LONG_EDGE": "${MAX_IMAGE_LONG_EDGE:-1536}",
+            "PRELOAD_MODELS": "${PRELOAD_MODELS:-false}"
+          }
+        },
+        "image-synthesis": {
+          "image": "deeds-web-app-image-synthesis:latest",
+          "ports": [
+            {
+              "ip": "0.0.0.0",
+              "host": 8092,
+              "container": 8092,
+              "protocol": "tcp"
+            }
+          ],
+          "profile": "full",
+          "environment": {
+            "OLLAMA_URL": "http://host.docker.internal:11434",
+            "LLM_MODEL": "${LLM_MODEL:-gemma4-legal:latest}",
+            "WAN_MODEL_ID": "${WAN_MODEL_ID:-Wan-AI/Wan2.1-T2V-1.3B}",
+            "FLUX_MODEL_ID": "${FLUX_MODEL_ID:-black-forest-labs/FLUX.1-schnell}",
+            "DEPTH_MODEL_ID": "${DEPTH_MODEL_ID:-depth-anything/Depth-Anything-V2-Large-hf}",
+            "IMAGE_WIDTH": "${IMAGE_WIDTH:-512}",
+            "IMAGE_HEIGHT": "${IMAGE_HEIGHT:-512}",
+            "VIDEO_FRAMES": "${VIDEO_FRAMES:-25}",
+            "VIDEO_FPS": "${VIDEO_FPS:-24}",
+            "WAN_STEPS": "${WAN_STEPS:-30}",
+            "FLUX_STEPS": "${FLUX_STEPS:-4}",
+            "QUANT_MODE": "${QUANT_MODE:-int8}",
+            "USE_FLASH_ATTN": "${USE_FLASH_ATTN:-true}",
+            "GENERATION_MODE": "${GENERATION_MODE:-i2v}",
+            "PRELOAD_MODELS": "${PRELOAD_MODELS:-false}",
+            "ENABLE_GAUSSIAN_SPLATTING": "${ENABLE_GAUSSIAN_SPLATTING:-false}"
+          }
+        },
+        "langfuse-clickhouse": {
+          "image": "clickhouse/clickhouse-server",
+          "ports": [
+            {
+              "ip": "127.0.0.1",
+              "host": 8124,
+              "container": 8123,
+              "protocol": "tcp"
+            },
+            {
+              "ip": "127.0.0.1",
+              "host": 9009,
+              "container": 9000,
+              "protocol": "tcp"
+            }
+          ],
+          "profile": "full",
+          "environment": {
+            "CLICKHOUSE_DB": "default",
+            "CLICKHOUSE_USER": "clickhouse",
+            "CLICKHOUSE_PASSWORD": "${CLICKHOUSE_PASSWORD:-clickhouse_langfuse}",
+            "CLICKHOUSE_MAX_SERVER_MEMORY_USAGE_RATIO": "0.8"
+          }
+        },
+        "langfuse-worker": {
+          "image": "langfuse/langfuse-worker:3",
+          "ports": [],
+          "profile": "full",
+          "environment": {
+            "DATABASE_URL": "postgresql://legal_admin:${POSTGRES_PASSWORD:-123456}@postgres:5432/langfuse?connect_timeout=10&pool_timeout=10",
+            "CLICKHOUSE_URL": "http://langfuse-clickhouse:8123",
+            "CLICKHOUSE_MIGRATION_URL": "clickhouse://clickhouse:${CLICKHOUSE_PASSWORD:-clickhouse_langfuse}@langfuse-clickhouse:9000",
+            "CLICKHOUSE_USER": "clickhouse",
+            "CLICKHOUSE_PASSWORD": "${CLICKHOUSE_PASSWORD:-clickhouse_langfuse}",
+            "CLICKHOUSE_CLUSTER_ENABLED": "false",
+            "LANGFUSE_S3_EVENT_UPLOAD_BUCKET": "langfuse",
+            "LANGFUSE_S3_EVENT_UPLOAD_REGION": "auto",
+            "LANGFUSE_S3_EVENT_UPLOAD_ACCESS_KEY_ID": "${SEAWEED_ACCESS_KEY:-admin}",
+            "LANGFUSE_S3_EVENT_UPLOAD_SECRET_ACCESS_KEY": "${SEAWEED_SECRET_KEY:-admin}",
+            "LANGFUSE_S3_EVENT_UPLOAD_ENDPOINT": "http://seaweedfs-s3:8333",
+            "LANGFUSE_S3_EVENT_UPLOAD_FORCE_PATH_STYLE": "true",
+            "LANGFUSE_S3_EVENT_UPLOAD_PREFIX": "events/",
+            "LANGFUSE_S3_MEDIA_UPLOAD_BUCKET": "langfuse",
+            "LANGFUSE_S3_MEDIA_UPLOAD_REGION": "auto",
+            "LANGFUSE_S3_MEDIA_UPLOAD_ACCESS_KEY_ID": "${SEAWEED_ACCESS_KEY:-admin}",
+            "LANGFUSE_S3_MEDIA_UPLOAD_SECRET_ACCESS_KEY": "${SEAWEED_SECRET_KEY:-admin}",
+            "LANGFUSE_S3_MEDIA_UPLOAD_ENDPOINT": "http://seaweedfs-s3:8333",
+            "LANGFUSE_S3_MEDIA_UPLOAD_FORCE_PATH_STYLE": "true",
+            "LANGFUSE_S3_MEDIA_UPLOAD_PREFIX": "media/",
+            "LANGFUSE_USE_AZURE_BLOB": "false",
+            "REDIS_HOST": "valkey",
+            "REDIS_PORT": "6379",
+            "REDIS_TLS_ENABLED": "false",
+            "NEXTAUTH_URL": "http://localhost:3030",
+            "SALT": "langfuse-salt-change-in-production",
+            "ENCRYPTION_KEY": "8754be3c748398a38dd9a797fbb84747cb8b94d34dd15a2d5237851dbbe1b671",
+            "TELEMETRY_ENABLED": "false",
+            "LANGFUSE_ENABLE_EXPERIMENTAL_FEATURES": "true"
+          }
+        },
+        "langfuse-web": {
+          "image": "langfuse/langfuse:3",
+          "ports": [
+            {
+              "ip": "0.0.0.0",
+              "host": 3030,
+              "container": 3000,
+              "protocol": "tcp"
+            }
+          ],
+          "profile": "full",
+          "environment": {
+            "DATABASE_URL": "postgresql://legal_admin:${POSTGRES_PASSWORD:-123456}@postgres:5432/langfuse?connect_timeout=10&pool_timeout=10",
+            "CLICKHOUSE_URL": "http://langfuse-clickhouse:8123",
+            "CLICKHOUSE_MIGRATION_URL": "clickhouse://clickhouse:${CLICKHOUSE_PASSWORD:-clickhouse_langfuse}@langfuse-clickhouse:9000",
+            "CLICKHOUSE_USER": "clickhouse",
+            "CLICKHOUSE_PASSWORD": "${CLICKHOUSE_PASSWORD:-clickhouse_langfuse}",
+            "CLICKHOUSE_CLUSTER_ENABLED": "false",
+            "LANGFUSE_S3_EVENT_UPLOAD_BUCKET": "langfuse",
+            "LANGFUSE_S3_EVENT_UPLOAD_REGION": "auto",
+            "LANGFUSE_S3_EVENT_UPLOAD_ACCESS_KEY_ID": "${SEAWEED_ACCESS_KEY:-admin}",
+            "LANGFUSE_S3_EVENT_UPLOAD_SECRET_ACCESS_KEY": "${SEAWEED_SECRET_KEY:-admin}",
+            "LANGFUSE_S3_EVENT_UPLOAD_ENDPOINT": "http://seaweedfs-s3:8333",
+            "LANGFUSE_S3_EVENT_UPLOAD_FORCE_PATH_STYLE": "true",
+            "LANGFUSE_S3_EVENT_UPLOAD_PREFIX": "events/",
+            "LANGFUSE_S3_MEDIA_UPLOAD_BUCKET": "langfuse",
+            "LANGFUSE_S3_MEDIA_UPLOAD_REGION": "auto",
+            "LANGFUSE_S3_MEDIA_UPLOAD_ACCESS_KEY_ID": "${SEAWEED_ACCESS_KEY:-admin}",
+            "LANGFUSE_S3_MEDIA_UPLOAD_SECRET_ACCESS_KEY": "${SEAWEED_SECRET_KEY:-admin}",
+            "LANGFUSE_S3_MEDIA_UPLOAD_ENDPOINT": "http://seaweedfs-s3:8333",
+            "LANGFUSE_S3_MEDIA_UPLOAD_FORCE_PATH_STYLE": "true",
+            "LANGFUSE_S3_MEDIA_UPLOAD_PREFIX": "media/",
+            "LANGFUSE_USE_AZURE_BLOB": "false",
+            "REDIS_HOST": "valkey",
+            "REDIS_PORT": "6379",
+            "REDIS_TLS_ENABLED": "false",
+            "NEXTAUTH_URL": "http://localhost:3030",
+            "SALT": "langfuse-salt-change-in-production",
+            "ENCRYPTION_KEY": "8754be3c748398a38dd9a797fbb84747cb8b94d34dd15a2d5237851dbbe1b671",
+            "TELEMETRY_ENABLED": "false",
+            "LANGFUSE_ENABLE_EXPERIMENTAL_FEATURES": "true",
+            "NEXTAUTH_SECRET": "langfuse-secret-key-change-in-production-min-32-chars",
+            "LANGFUSE_INIT_ORG_ID": "deeds-legal-ai",
+            "LANGFUSE_INIT_ORG_NAME": "Deeds Legal AI",
+            "LANGFUSE_INIT_PROJECT_ID": "deeds-observability",
+            "LANGFUSE_INIT_PROJECT_NAME": "Deeds LLM Observability",
+            "LANGFUSE_INIT_PROJECT_PUBLIC_KEY": "pk-lf-4e3db8a0107de7872b894e309494252b",
+            "LANGFUSE_INIT_PROJECT_SECRET_KEY": "sk-lf-3941aba7500ce9fabbe0c513ad6c3a58",
+            "LANGFUSE_INIT_USER_EMAIL": "admin@deeds-legal.ai",
+            "LANGFUSE_INIT_USER_NAME": "Admin",
+            "LANGFUSE_INIT_USER_PASSWORD": "admin123"
+          }
+        },
+        "go-search-service": {
+          "image": "unknown",
+          "ports": [
+            {
+              "ip": "0.0.0.0",
+              "host": 8096,
+              "container": 8096,
+              "protocol": "tcp"
+            },
+            {
+              "ip": "0.0.0.0",
+              "host": 50055,
+              "container": 50055,
+              "protocol": "tcp"
+            }
+          ],
+          "profile": "full",
+          "environment": {
+            "DATABASE_URL": "postgresql://legal_admin:123456@postgres:5432/legal_ai_db",
+            "QDRANT_URL": "http://qdrant:6333",
+            "QDRANT_GRPC_HOST": "qdrant",
+            "QDRANT_GRPC_PORT": "6334",
+            "REDIS_URL": "redis://:redis@valkey:6379",
+            "OLLAMA_URL": "http://host.docker.internal:11434",
+            "GRPC_PORT": "50055",
+            "HTTP_PORT": "8096"
+          }
+        },
+        "go-embedding-service": {
+          "image": "unknown",
+          "ports": [
+            {
+              "ip": "0.0.0.0",
+              "host": 50051,
+              "container": 50051,
+              "protocol": "tcp"
+            },
+            {
+              "ip": "0.0.0.0",
+              "host": 8097,
+              "container": 8097,
+              "protocol": "tcp"
+            }
+          ],
+          "profile": "full",
+          "environment": {
+            "OLLAMA_URL": "http://host.docker.internal:11434",
+            "REDIS_URL": "redis://:redis@valkey:6379",
+            "EMBED_MODEL": "embeddinggemma:latest",
+            "EMBED_BATCH_MAX": "4",
+            "GRPC_PORT": "50051",
+            "HTTP_PORT": "8097"
+          }
+        },
+        "go-retrieval-service": {
+          "image": "unknown",
+          "ports": [
+            {
+              "ip": "0.0.0.0",
+              "host": 50053,
+              "container": 50053,
+              "protocol": "tcp"
+            },
+            {
+              "ip": "0.0.0.0",
+              "host": 8100,
+              "container": 8100,
+              "protocol": "tcp"
+            }
+          ],
+          "profile": "full",
+          "environment": {
+            "DATABASE_URL": "postgresql://legal_admin:123456@postgres:5432/legal_ai_db",
+            "QDRANT_URL": "http://qdrant:6333",
+            "QDRANT_GRPC_HOST": "qdrant",
+            "QDRANT_GRPC_PORT": "6334",
+            "REDIS_URL": "redis://:redis@valkey:6379",
+            "OLLAMA_URL": "http://host.docker.internal:11434",
+            "EMBED_SERVICE_URL": "http://go-embedding-service:8097",
+            "EMBED_MODEL": "embeddinggemma:latest",
+            "GPU_EMBED_ENABLED": "true",
+            "GRPC_PORT": "50053",
+            "HTTP_PORT": "8100"
+          }
+        },
+        "tensorrt-llm": {
+          "image": "nvcr.io/nvidia/tensorrt-llm/release:latest",
+          "ports": [],
+          "profile": "gpu",
+          "environment": [
+            "NVIDIA_VISIBLE_DEVICES=${NVIDIA_VISIBLE_DEVICES:-all}",
+            "NVIDIA_DRIVER_CAPABILITIES=compute,utility",
+            "CUDA_VISIBLE_DEVICES=${CUDA_VISIBLE_DEVICES:-0}",
+            "HF_HUB_CACHE=/workspace/cache",
+            "DATABASE_URL=postgresql://legal_admin:123456@postgres:5432/legal_ai_db",
+            "REDIS_URL=redis://:redis@valkey:6379/0",
+            "TORCHINDUCTOR_CACHE_DIR=/workspace/.cache/torchinductor",
+            "TRITON_CACHE_DIR=/workspace/.cache/triton",
+            "TORCHINDUCTOR_COMPILE_THREADS=4"
+          ]
+        },
+        "langgraph-synthesis": {
+          "image": "unknown",
+          "ports": [],
+          "profile": "gpu",
+          "environment": [
+            "NVIDIA_VISIBLE_DEVICES=${NVIDIA_VISIBLE_DEVICES:-all}",
+            "NVIDIA_DRIVER_CAPABILITIES=compute,utility",
+            "CUDA_VISIBLE_DEVICES=${CUDA_VISIBLE_DEVICES:-0}",
+            "OLLAMA_URL=http://host.docker.internal:11434",
+            "QDRANT_URL=http://qdrant:6333",
+            "NEO4J_URI=bolt://neo4j:7687",
+            "NEO4J_USER=${NEO4J_USER:-neo4j}",
+            "NEO4J_PASSWORD=${NEO4J_PASSWORD:-password}",
+            "DATABASE_URL=postgresql://legal_admin:123456@postgres:5432/legal_ai_db",
+            "REDIS_URL=redis://:redis@valkey:6379/1",
+            "LLM_MODEL=${LLM_MODEL:-gemma4-legal-vlm:latest}",
+            "EMBED_MODEL=${EMBED_MODEL:-embeddinggemma:latest}",
+            "LANGFUSE_HOST=http://langfuse-web:3000",
+            "CONFIDENCE_THRESHOLD=${CONFIDENCE_THRESHOLD:-0.65}",
+            "TORCHINDUCTOR_CACHE_DIR=/app/.cache/torchinductor",
+            "TRITON_CACHE_DIR=/app/.cache/triton",
+            "TORCHINDUCTOR_COMPILE_THREADS=4"
+          ]
+        },
+        "atlas-runner": {
+          "image": "node:22-alpine",
+          "ports": [],
+          "profile": "tools",
+          "environment": [
+            "DATABASE_URL=postgresql://legal_admin:${POSTGRES_PASSWORD:-123456}@legal-ai-postgres:5432/legal_ai_db",
+            "NEO4J_URI=bolt://legal-ai-neo4j:7687",
+            "NEO4J_USER=neo4j",
+            "NEO4J_PASSWORD=${NEO4J_PASSWORD:-neo4j}",
+            "REDIS_HOST=legal-ai-valkey",
+            "REDIS_PORT=6379",
+            "REDIS_PASSWORD=${REDIS_PASSWORD}",
+            "QDRANT_URL=http://legal-ai-qdrant:6333",
+            "OLLAMA_URL=http://host.docker.internal:11434",
+            "LLAMA_URL=http://host.docker.internal:8090",
+            "NODE_ENV=production"
+          ]
+        }
+      },
+      "docker-compose.dev.yml": {
+        "postgres": {
+          "image": "pgvector/pgvector:pg17",
+          "ports": [
+            {
+              "ip": "0.0.0.0",
+              "host": 5433,
+              "container": 5432,
+              "protocol": "tcp"
+            }
+          ],
+          "profile": "default",
+          "environment": [
+            "POSTGRES_DB=legal_ai_db",
+            "POSTGRES_USER=legal_admin",
+            "POSTGRES_PASSWORD=123456",
+            "POSTGRES_HOST_AUTH_METHOD=md5"
+          ]
+        },
+        "redis": {
+          "image": "valkey/valkey-bundle:8.1.1",
+          "ports": [
+            {
+              "ip": "127.0.0.1",
+              "host": 6379,
+              "container": 6379,
+              "protocol": "tcp"
+            }
+          ],
+          "profile": "default",
+          "environment": {}
+        },
+        "legal-gateway": {
+          "image": "unknown",
+          "ports": [
+            {
+              "ip": "0.0.0.0",
+              "host": 8080,
+              "container": 8080,
+              "protocol": "tcp"
+            }
+          ],
+          "profile": "default",
+          "environment": [
+            "DATABASE_URL=postgres://legal_admin:123456@postgres:5432/legal_ai_db?sslmode=disable",
+            "REDIS_URL=redis://redis:6379/0",
+            "ENVIRONMENT=development",
+            "DEBUG=true",
+            "PORT=8080"
+          ]
+        },
+        "enhanced-rag-service": {
+          "image": "unknown",
+          "ports": [
+            {
+              "ip": "0.0.0.0",
+              "host": 8094,
+              "container": 8094,
+              "protocol": "tcp"
+            }
+          ],
+          "profile": "default",
+          "environment": [
+            "DATABASE_URL=postgres://legal_admin:123456@postgres:5432/legal_ai_db?sslmode=disable",
+            "REDIS_URL=redis://redis:6379/0",
+            "OLLAMA_URL=http://host.docker.internal:11434",
+            "PORT=8094"
+          ]
+        },
+        "gpu-orchestrator": {
+          "image": "unknown",
+          "ports": [
+            {
+              "ip": "0.0.0.0",
+              "host": 8095,
+              "container": 8095,
+              "protocol": "tcp"
+            }
+          ],
+          "profile": "default",
+          "environment": [
+            "DATABASE_URL=postgres://legal_admin:123456@postgres:5432/legal_ai_db?sslmode=disable",
+            "REDIS_URL=redis://redis:6379/0",
+            "OLLAMA_URL=http://host.docker.internal:11434",
+            "CUDA_VISIBLE_DEVICES=0",
+            "PORT=8095"
+          ]
+        },
+        "mcp-multicore": {
+          "image": "unknown",
+          "ports": [
+            {
+              "ip": "0.0.0.0",
+              "host": 3002,
+              "container": 3002,
+              "protocol": "tcp"
+            }
+          ],
+          "profile": "default",
+          "environment": [
+            "MCP_PORT=3002",
+            "NODE_ENV=development",
+            "WORKER_CORES=4"
+          ]
+        },
+        "minio": {
+          "image": "minio/minio:latest",
+          "ports": [
+            {
+              "ip": "0.0.0.0",
+              "host": 9000,
+              "container": 9000,
+              "protocol": "tcp"
+            },
+            {
+              "ip": "0.0.0.0",
+              "host": 9001,
+              "container": 9001,
+              "protocol": "tcp"
+            }
+          ],
+          "profile": "default",
+          "environment": [
+            "MINIO_ROOT_USER=minio",
+            "MINIO_ROOT_PASSWORD=minio123"
+          ]
+        },
+        "qdrant": {
+          "image": "qdrant/qdrant:latest",
+          "ports": [
+            {
+              "ip": "0.0.0.0",
+              "host": 6333,
+              "container": 6333,
+              "protocol": "tcp"
+            },
+            {
+              "ip": "0.0.0.0",
+              "host": 6334,
+              "container": 6334,
+              "protocol": "tcp"
+            }
+          ],
+          "profile": "default",
+          "environment": {}
+        }
+      },
+      "docker-compose.production.yml": {
+        "postgres": {
+          "image": "pgvector/pgvector:pg17",
+          "ports": [
+            {
+              "ip": "0.0.0.0",
+              "host": 5434,
+              "container": 5432,
+              "protocol": "tcp"
+            }
+          ],
+          "profile": "default",
+          "environment": [
+            "POSTGRES_DB=legal_ai_db",
+            "POSTGRES_USER=legal_admin",
+            "POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-production_secured_db_password_9921}",
+            "POSTGRES_HOST_AUTH_METHOD=md5"
+          ]
+        },
+        "redis": {
+          "image": "valkey/valkey-bundle:8.1.1",
+          "ports": [
+            {
+              "ip": "127.0.0.1",
+              "host": 6379,
+              "container": 6379,
+              "protocol": "tcp"
+            }
+          ],
+          "profile": "default",
+          "environment": {}
+        },
+        "qdrant": {
+          "image": "qdrant/qdrant:latest",
+          "ports": [
+            {
+              "ip": "0.0.0.0",
+              "host": 6333,
+              "container": 6333,
+              "protocol": "tcp"
+            },
+            {
+              "ip": "0.0.0.0",
+              "host": 6334,
+              "container": 6334,
+              "protocol": "tcp"
+            }
+          ],
+          "profile": "default",
+          "environment": [
+            "QDRANT__SERVICE__HTTP_PORT=6333",
+            "QDRANT__SERVICE__GRPC_PORT=6334"
+          ]
+        },
+        "neo4j": {
+          "image": "neo4j:5-community",
+          "ports": [
+            {
+              "ip": "0.0.0.0",
+              "host": 7474,
+              "container": 7474,
+              "protocol": "tcp"
+            },
+            {
+              "ip": "0.0.0.0",
+              "host": 7687,
+              "container": 7687,
+              "protocol": "tcp"
+            }
+          ],
+          "profile": "default",
+          "environment": [
+            "NEO4J_AUTH=neo4j/${NEO4J_PASSWORD:-production_secured_neo4j_password_8842}",
+            "NEO4J_PLUGINS=[\"apoc\", \"graph-data-science\"]",
+            "NEO4J_dbms_security_procedures_unrestricted=apoc.*,gds.*",
+            "NEO4J_dbms_security_procedures_allowlist=apoc.*,gds.*",
+            "NEO4J_dbms_memory_heap_initial__size=1g",
+            "NEO4J_dbms_memory_heap_max__size=2g",
+            "NEO4J_dbms_memory_pagecache_size=1g"
+          ]
+        },
+        "searxng": {
+          "image": "searxng/searxng:latest",
+          "ports": [
+            {
+              "ip": "0.0.0.0",
+              "host": 8889,
+              "container": 8080,
+              "protocol": "tcp"
+            }
+          ],
+          "profile": "default",
+          "environment": {}
+        },
+        "seaweedfs-master": {
+          "image": "chrislusf/seaweedfs:latest",
+          "ports": [
+            {
+              "ip": "0.0.0.0",
+              "host": 9333,
+              "container": 9333,
+              "protocol": "tcp"
+            }
+          ],
+          "profile": "default",
+          "environment": {}
+        },
+        "seaweedfs-volume": {
+          "image": "chrislusf/seaweedfs:latest",
+          "ports": [
+            {
+              "ip": "0.0.0.0",
+              "host": 8080,
+              "container": 8080,
+              "protocol": "tcp"
+            }
+          ],
+          "profile": "default",
+          "environment": {}
+        },
+        "seaweedfs-filer": {
+          "image": "chrislusf/seaweedfs:latest",
+          "ports": [
+            {
+              "ip": "0.0.0.0",
+              "host": 8888,
+              "container": 8888,
+              "protocol": "tcp"
+            }
+          ],
+          "profile": "default",
+          "environment": {}
+        },
+        "seaweedfs-s3": {
+          "image": "chrislusf/seaweedfs:latest",
+          "ports": [
+            {
+              "ip": "0.0.0.0",
+              "host": 8333,
+              "container": 8333,
+              "protocol": "tcp"
+            }
+          ],
+          "profile": "default",
+          "environment": {}
+        },
+        "turboquant": {
+          "image": "alpine:latest",
+          "ports": [],
+          "profile": "default",
+          "environment": {}
+        }
+      },
+      "sveltekit-frontend\\docker-compose.full.yml": {
+        "postgres": {
+          "image": "pgvector/pgvector:pg17",
+          "ports": [
+            {
+              "ip": "0.0.0.0",
+              "host": 5432,
+              "container": 5432,
+              "protocol": "tcp"
+            }
+          ],
+          "profile": "default",
+          "environment": {
+            "POSTGRES_DB": "legal_ai_db",
+            "POSTGRES_USER": "legal_admin",
+            "POSTGRES_PASSWORD": 123456,
+            "POSTGRES_HOST_AUTH_METHOD": "trust"
+          }
+        },
+        "redis": {
+          "image": "redis:7-alpine",
+          "ports": [
+            {
+              "ip": "0.0.0.0",
+              "host": 6379,
+              "container": 6379,
+              "protocol": "tcp"
+            }
+          ],
+          "profile": "default",
+          "environment": {}
+        },
+        "minio": {
+          "image": "minio/minio:latest",
+          "ports": [
+            {
+              "ip": "0.0.0.0",
+              "host": 9000,
+              "container": 9000,
+              "protocol": "tcp"
+            },
+            {
+              "ip": "0.0.0.0",
+              "host": 9001,
+              "container": 9001,
+              "protocol": "tcp"
+            }
+          ],
+          "profile": "default",
+          "environment": {
+            "MINIO_ROOT_USER": "minioadmin",
+            "MINIO_ROOT_PASSWORD": "minioadmin123"
+          }
+        },
+        "qdrant": {
+          "image": "qdrant/qdrant:latest",
+          "ports": [
+            {
+              "ip": "0.0.0.0",
+              "host": 6333,
+              "container": 6333,
+              "protocol": "tcp"
+            },
+            {
+              "ip": "0.0.0.0",
+              "host": 6334,
+              "container": 6334,
+              "protocol": "tcp"
+            }
+          ],
+          "profile": "default",
+          "environment": {}
+        },
+        "ollama": {
+          "image": "ollama/ollama:latest",
+          "ports": [
+            {
+              "ip": "0.0.0.0",
+              "host": 11434,
+              "container": 11434,
+              "protocol": "tcp"
+            }
+          ],
+          "profile": "default",
+          "environment": [
+            "OLLAMA_HOST=0.0.0.0"
+          ]
+        },
+        "tensorrt-llm": {
+          "image": "nvcr.io/nvidia/tensorrt-llm/release:latest",
+          "ports": [
+            {
+              "ip": "0.0.0.0",
+              "host": 8000,
+              "container": 8000,
+              "protocol": "tcp"
+            }
+          ],
+          "profile": "default",
+          "environment": [
+            "NVIDIA_VISIBLE_DEVICES=all"
+          ]
+        },
+        "fastapi-rag": {
+          "image": "unknown",
+          "ports": [
+            {
+              "ip": "0.0.0.0",
+              "host": 8005,
+              "container": 8005,
+              "protocol": "tcp"
+            }
+          ],
+          "profile": "default",
+          "environment": {
+            "DATABASE_URL": "postgresql://legal_admin:123456@postgres:5432/legal_ai_db",
+            "REDIS_URL": "redis://:redis@redis:6379/0",
+            "MINIO_URL": "http://minio:9000",
+            "MINIO_ACCESS_KEY": "minioadmin",
+            "MINIO_SECRET_KEY": "minioadmin123",
+            "QDRANT_URL": "http://qdrant:6333",
+            "OLLAMA_URL": "http://ollama:11434",
+            "OLLAMA_EMBED_ENDPOINT": "http://ollama:11434/api/embed",
+            "TRT_LLM_ENDPOINT": "http://tensorrt-llm:8000/api/infer",
+            "USE_SIMDJSON_NODE": "1",
+            "USE_JSON_FAST": "1"
+          }
+        },
+        "rabbitmq": {
+          "image": "rabbitmq:3-management-alpine",
+          "ports": [
+            {
+              "ip": "0.0.0.0",
+              "host": 5672,
+              "container": 5672,
+              "protocol": "tcp"
+            },
+            {
+              "ip": "0.0.0.0",
+              "host": 15672,
+              "container": 15672,
+              "protocol": "tcp"
+            }
+          ],
+          "profile": "default",
+          "environment": {
+            "RABBITMQ_DEFAULT_USER": "admin",
+            "RABBITMQ_DEFAULT_PASS": "admin123"
+          }
+        },
+        "couchdb": {
+          "image": "couchdb:3.3",
+          "ports": [
+            {
+              "ip": "0.0.0.0",
+              "host": 5984,
+              "container": 5984,
+              "protocol": "tcp"
+            }
+          ],
+          "profile": "default",
+          "environment": [
+            "COUCHDB_USER=admin",
+            "COUCHDB_PASSWORD=password"
+          ]
+        }
+      }
+    },
+    "env_server_ts": {
+      "QDRANT_URL": {
+        "default": "http://${LOOPBACK_IP}:6333",
+        "source": "env.server.ts"
+      },
+      "QDRANT_PORT": {
+        "default": "6333",
+        "source": "env.server.ts"
+      },
+      "NEO4J_HTTP_URL": {
+        "default": "http://${LOOPBACK_IP}:7474",
+        "source": "env.server.ts"
+      },
+      "REDIS_URL": {
+        "default": "redis://${LOOPBACK_IP}:6379",
+        "source": "env.server.ts"
+      },
+      "RABBITMQ_URL": {
+        "default": "amqp://guest:guest@${LOOPBACK_IP}:5672",
+        "source": "env.server.ts"
+      },
+      "EMBEDDING_GRPC_URL": {
+        "default": "${LOOPBACK_IP}:50051",
+        "source": "env.server.ts"
+      },
+      "RETRIEVAL_HTTP_URL": {
+        "default": "http://${LOOPBACK_IP}:8100",
+        "source": "env.server.ts"
+      },
+      "RETRIEVAL_GRPC_URL": {
+        "default": "${LOOPBACK_IP}:50053",
+        "source": "env.server.ts"
+      },
+      "TRACE_MCP_URL": {
+        "default": "http://${LOOPBACK_IP}:8788",
+        "source": "env.server.ts"
+      },
+      "KB_MCP_URL": {
+        "default": "http://${LOOPBACK_IP}:8789",
+        "source": "env.server.ts"
+      },
+      "BIFROST_URL": {
+        "default": "http://${LOOPBACK_IP}:3040",
+        "source": "env.server.ts"
+      },
+      "LANGFUSE_HOST": {
+        "default": "http://${LOOPBACK_IP}:3030",
+        "source": "env.server.ts"
+      },
+      "DOCLING_SERVICE_URL": {
+        "default": "http://${LOOPBACK_IP}:8085",
+        "source": "env.server.ts"
+      }
+    },
+    "codebase_scan": {
+      "full-scan": {
+        "status": "requires-cli-execution",
+        "command": "rg -n \"6333|7474|11434|6379|5672|50053|8100\" . --glob \"!node_modules/**\""
+      }
+    }
+  },
+  "validation": {
+    "matches": [
+      {
+        "service": "postgres",
+        "expected": {
+          "host": 5434,
+          "container": 5432,
+          "service": "legal-ai-postgres",
+          "protocol": "tcp"
+        },
+        "docker_ps": {
+          "host": 5434,
+          "container": 5432,
+          "protocol": "tcp",
+          "raw": "0.0.0.0:5434->5432/tcp"
+        },
+        "env_files": {
+          ".env": {
+            "key": "DB_PORT",
+            "value": "5434"
+          }
+        },
+        "docker_compose": null,
+        "env_server_ts": null,
+        "status": "found-in-docker",
+        "issues": []
+      },
+      {
+        "service": "rabbitmq",
+        "expected": {
+          "host": 5672,
+          "container": 5672,
+          "service": "legal-ai-rabbitmq",
+          "protocol": "tcp",
+          "mgmt": 15672
+        },
+        "docker_ps": {
+          "host": 5672,
+          "container": 5672,
+          "protocol": "tcp",
+          "raw": "0.0.0.0:5672->5672/tcp"
+        },
+        "env_files": {},
+        "docker_compose": null,
+        "env_server_ts": null,
+        "status": "found-in-docker",
+        "issues": []
+      },
+      {
+        "service": "valkey",
+        "expected": {
+          "host": 6379,
+          "container": 6379,
+          "service": "legal-ai-valkey",
+          "protocol": "tcp"
+        },
+        "docker_ps": {
+          "host": 6379,
+          "container": 6379,
+          "protocol": "tcp",
+          "raw": "127.0.0.1:6379->6379/tcp"
+        },
+        "env_files": {
+          ".env": {
+            "key": "REDIS_PORT",
+            "value": "6379"
+          },
+          "sveltekit-frontend\\.env": {
+            "key": "REDIS_PORT",
+            "value": "6379"
+          }
+        },
+        "docker_compose": null,
+        "env_server_ts": null,
+        "status": "found-in-docker",
+        "issues": []
+      },
+      {
+        "service": "qdrant_http",
+        "expected": {
+          "host": 6333,
+          "container": 6333,
+          "service": "legal-ai-qdrant",
+          "protocol": "tcp"
+        },
+        "docker_ps": {
+          "host": 6333,
+          "container": 6333,
+          "protocol": "tcp",
+          "raw": "0.0.0.0:6333-6334->6333-6334/tcp",
+          "isRange": true
+        },
+        "env_files": {
+          ".env": {
+            "key": "QDRANT_PORT",
+            "value": "6333"
+          }
+        },
+        "docker_compose": null,
+        "env_server_ts": null,
+        "status": "found-in-docker",
+        "issues": []
+      },
+      {
+        "service": "qdrant_grpc",
+        "expected": {
+          "host": 6334,
+          "container": 6334,
+          "service": "legal-ai-qdrant",
+          "protocol": "tcp"
+        },
+        "docker_ps": {
+          "host": 6334,
+          "container": 6334,
+          "protocol": "tcp",
+          "raw": "0.0.0.0:6333-6334->6333-6334/tcp",
+          "isRange": true
+        },
+        "env_files": {
+          ".env": {
+            "key": "QDRANT_GRPC_PORT",
+            "value": "6334"
+          }
+        },
+        "docker_compose": null,
+        "env_server_ts": null,
+        "status": "found-in-docker",
+        "issues": []
+      },
+      {
+        "service": "neo4j_http",
+        "expected": {
+          "host": 7474,
+          "container": 7474,
+          "service": "legal-ai-neo4j",
+          "protocol": "tcp",
+          "profile": "full"
+        },
+        "docker_ps": {
+          "host": 7474,
+          "container": 7474,
+          "protocol": "tcp",
+          "raw": "0.0.0.0:7474->7474/tcp"
+        },
+        "env_files": {},
+        "docker_compose": null,
+        "env_server_ts": null,
+        "status": "found-in-docker",
+        "issues": []
+      },
+      {
+        "service": "neo4j_bolt",
+        "expected": {
+          "host": 7687,
+          "container": 7687,
+          "service": "legal-ai-neo4j",
+          "protocol": "tcp",
+          "profile": "full"
+        },
+        "docker_ps": {
+          "host": 7687,
+          "container": 7687,
+          "protocol": "tcp",
+          "raw": "0.0.0.0:7687->7687/tcp"
+        },
+        "env_files": {},
+        "docker_compose": null,
+        "env_server_ts": null,
+        "status": "found-in-docker",
+        "issues": []
+      },
+      {
+        "service": "bifrost",
+        "expected": {
+          "host": 3040,
+          "container": 8080,
+          "service": "legal-ai-bifrost",
+          "protocol": "tcp",
+          "profile": "full"
+        },
+        "docker_ps": {
+          "host": 3040,
+          "container": 8080,
+          "protocol": "tcp",
+          "raw": "0.0.0.0:3040->8080/tcp"
+        },
+        "env_files": {},
+        "docker_compose": null,
+        "env_server_ts": null,
+        "status": "found-in-docker",
+        "issues": []
+      },
+      {
+        "service": "searxng",
+        "expected": {
+          "host": 8889,
+          "container": 8080,
+          "service": "legal-ai-searxng",
+          "protocol": "tcp",
+          "profile": "full"
+        },
+        "docker_ps": {
+          "host": 8889,
+          "container": 8080,
+          "protocol": "tcp",
+          "raw": "0.0.0.0:8889->8080/tcp"
+        },
+        "env_files": {},
+        "docker_compose": null,
+        "env_server_ts": null,
+        "status": "found-in-docker",
+        "issues": []
+      },
+      {
+        "service": "langfuse_web",
+        "expected": {
+          "host": 3030,
+          "container": 3000,
+          "service": "langfuse-server",
+          "protocol": "tcp",
+          "profile": "full"
+        },
+        "docker_ps": {
+          "host": 3030,
+          "container": 3000,
+          "protocol": "tcp",
+          "raw": "0.0.0.0:3030->3000/tcp"
+        },
+        "env_files": {},
+        "docker_compose": null,
+        "env_server_ts": null,
+        "status": "found-in-docker",
+        "issues": []
+      },
+      {
+        "service": "langfuse_clickhouse_http",
+        "expected": {
+          "host": 8124,
+          "container": 8123,
+          "service": "langfuse-clickhouse",
+          "protocol": "tcp",
+          "profile": "full"
+        },
+        "docker_ps": {
+          "host": 8124,
+          "container": 8123,
+          "protocol": "tcp",
+          "raw": "127.0.0.1:8124->8123/tcp"
+        },
+        "env_files": {},
+        "docker_compose": {
+          "file": "docker-compose.yml",
+          "port": {
+            "ip": "127.0.0.1",
+            "host": 8124,
+            "container": 8123,
+            "protocol": "tcp"
+          }
+        },
+        "env_server_ts": null,
+        "status": "found-in-docker",
+        "issues": []
+      },
+      {
+        "service": "langfuse_clickhouse_grpc",
+        "expected": {
+          "host": 9009,
+          "container": 9000,
+          "service": "langfuse-clickhouse",
+          "protocol": "tcp",
+          "profile": "full"
+        },
+        "docker_ps": {
+          "host": 9009,
+          "container": 9000,
+          "protocol": "tcp",
+          "raw": "127.0.0.1:9009->9000/tcp"
+        },
+        "env_files": {},
+        "docker_compose": {
+          "file": "docker-compose.yml",
+          "port": {
+            "ip": "127.0.0.1",
+            "host": 9009,
+            "container": 9000,
+            "protocol": "tcp"
+          }
+        },
+        "env_server_ts": null,
+        "status": "found-in-docker",
+        "issues": []
+      },
+      {
+        "service": "go_retrieval_grpc",
+        "expected": {
+          "host": 50053,
+          "container": 50053,
+          "service": "legal-ai-go-retrieval",
+          "protocol": "tcp",
+          "profile": "full"
+        },
+        "docker_ps": {
+          "host": 50053,
+          "container": 50053,
+          "protocol": "tcp",
+          "raw": "0.0.0.0:50053->50053/tcp"
+        },
+        "env_files": {},
+        "docker_compose": null,
+        "env_server_ts": null,
+        "status": "found-in-docker",
+        "issues": []
+      },
+      {
+        "service": "go_retrieval_http",
+        "expected": {
+          "host": 8100,
+          "container": 8100,
+          "service": "legal-ai-go-retrieval",
+          "protocol": "tcp",
+          "profile": "full"
+        },
+        "docker_ps": {
+          "host": 8100,
+          "container": 8100,
+          "protocol": "tcp",
+          "raw": "0.0.0.0:8100->8100/tcp"
+        },
+        "env_files": {},
+        "docker_compose": null,
+        "env_server_ts": null,
+        "status": "found-in-docker",
+        "issues": []
+      },
+      {
+        "service": "go_embedding_grpc",
+        "expected": {
+          "host": 50051,
+          "container": 50051,
+          "service": "legal-ai-go-embedding",
+          "protocol": "tcp",
+          "profile": "full"
+        },
+        "docker_ps": {
+          "host": 50051,
+          "container": 50051,
+          "protocol": "tcp",
+          "raw": "0.0.0.0:50051->50051/tcp"
+        },
+        "env_files": {},
+        "docker_compose": null,
+        "env_server_ts": null,
+        "status": "found-in-docker",
+        "issues": []
+      },
+      {
+        "service": "go_embedding_http",
+        "expected": {
+          "host": 8097,
+          "container": 8097,
+          "service": "legal-ai-go-embedding",
+          "protocol": "tcp",
+          "profile": "full"
+        },
+        "docker_ps": {
+          "host": 8097,
+          "container": 8097,
+          "protocol": "tcp",
+          "raw": "0.0.0.0:8097->8097/tcp"
+        },
+        "env_files": {
+          ".env": {
+            "key": "NES_PIPELINE_PORT",
+            "value": "8097"
+          }
+        },
+        "docker_compose": null,
+        "env_server_ts": null,
+        "status": "found-in-docker",
+        "issues": []
+      },
+      {
+        "service": "go_search_grpc",
+        "expected": {
+          "host": 50055,
+          "container": 50055,
+          "service": "legal-ai-go-search",
+          "protocol": "tcp",
+          "profile": "full"
+        },
+        "docker_ps": {
+          "host": 50055,
+          "container": 50055,
+          "protocol": "tcp",
+          "raw": "0.0.0.0:50055->50055/tcp"
+        },
+        "env_files": {},
+        "docker_compose": null,
+        "env_server_ts": null,
+        "status": "found-in-docker",
+        "issues": []
+      },
+      {
+        "service": "go_search_http",
+        "expected": {
+          "host": 8096,
+          "container": 8096,
+          "service": "legal-ai-go-search",
+          "protocol": "tcp",
+          "profile": "full"
+        },
+        "docker_ps": {
+          "host": 8096,
+          "container": 8096,
+          "protocol": "tcp",
+          "raw": "0.0.0.0:8096->8096/tcp"
+        },
+        "env_files": {},
+        "docker_compose": null,
+        "env_server_ts": null,
+        "status": "found-in-docker",
+        "issues": []
+      },
+      {
+        "service": "seaweedfs_master",
+        "expected": {
+          "host": 9333,
+          "container": 9333,
+          "service": "legal-ai-seaweed-master",
+          "protocol": "tcp",
+          "profile": "seaweedfs"
+        },
+        "docker_ps": {
+          "host": 9333,
+          "container": 9333,
+          "protocol": "tcp",
+          "raw": "0.0.0.0:9333->9333/tcp"
+        },
+        "env_files": {
+          ".env": {
+            "key": "SEAWEED_MASTER_PORT",
+            "value": "9333"
+          },
+          "sveltekit-frontend\\.env": {
+            "key": "SEAWEED_MASTER_PORT",
+            "value": "9333"
+          }
+        },
+        "docker_compose": null,
+        "env_server_ts": null,
+        "status": "found-in-docker",
+        "issues": []
+      },
+      {
+        "service": "seaweedfs_volume",
+        "expected": {
+          "host": 8080,
+          "container": 8080,
+          "service": "legal-ai-seaweed-volume",
+          "protocol": "tcp",
+          "profile": "seaweedfs"
+        },
+        "docker_ps": {
+          "host": 8080,
+          "container": 8080,
+          "protocol": "tcp",
+          "raw": "0.0.0.0:8080->8080/tcp"
+        },
+        "env_files": {},
+        "docker_compose": null,
+        "env_server_ts": null,
+        "status": "found-in-docker",
+        "issues": []
+      },
+      {
+        "service": "seaweedfs_filer",
+        "expected": {
+          "host": 8888,
+          "container": 8888,
+          "service": "legal-ai-seaweed-filer",
+          "protocol": "tcp",
+          "profile": "seaweedfs"
+        },
+        "docker_ps": {
+          "host": 8888,
+          "container": 8888,
+          "protocol": "tcp",
+          "raw": "0.0.0.0:8888->8888/tcp"
+        },
+        "env_files": {
+          ".env": {
+            "key": "SEAWEED_FILER_PORT",
+            "value": "8888"
+          }
+        },
+        "docker_compose": null,
+        "env_server_ts": null,
+        "status": "found-in-docker",
+        "issues": []
+      },
+      {
+        "service": "seaweedfs_s3",
+        "expected": {
+          "host": 8333,
+          "container": 8333,
+          "service": "legal-ai-seaweed-s3",
+          "protocol": "tcp",
+          "profile": "seaweedfs"
+        },
+        "docker_ps": {
+          "host": 8333,
+          "container": 8333,
+          "protocol": "tcp",
+          "raw": "0.0.0.0:8333->8333/tcp"
+        },
+        "env_files": {
+          ".env": {
+            "key": "SEAWEED_S3_PORT",
+            "value": "8333"
+          },
+          "sveltekit-frontend\\.env": {
+            "key": "SEAWEED_S3_PORT",
+            "value": "8333"
+          }
+        },
+        "docker_compose": null,
+        "env_server_ts": null,
+        "status": "found-in-docker",
+        "issues": []
+      },
+      {
+        "service": "couchdb",
+        "expected": {
+          "host": 5984,
+          "container": 5984,
+          "service": "legal-ai-couchdb",
+          "protocol": "tcp",
+          "profile": "full"
+        },
+        "docker_ps": {
+          "host": 5984,
+          "container": 5984,
+          "protocol": "tcp",
+          "raw": "0.0.0.0:5984->5984/tcp"
+        },
+        "env_files": {},
+        "docker_compose": null,
+        "env_server_ts": null,
+        "status": "found-in-docker",
+        "issues": []
+      },
+      {
+        "service": "nats",
+        "expected": {
+          "host": 4222,
+          "container": 4222,
+          "service": "legal-ai-nats",
+          "protocol": "tcp",
+          "profile": "full"
+        },
+        "docker_ps": {
+          "host": 4222,
+          "container": 4222,
+          "protocol": "tcp",
+          "raw": "0.0.0.0:4222->4222/tcp"
+        },
+        "env_files": {},
+        "docker_compose": null,
+        "env_server_ts": null,
+        "status": "found-in-docker",
+        "issues": []
+      },
+      {
+        "service": "docling_vlm",
+        "expected": {
+          "host": 8085,
+          "container": 8085,
+          "service": "legal-ai-docling-vlm",
+          "protocol": "tcp",
+          "profile": "full"
+        },
+        "docker_ps": {
+          "host": 8085,
+          "container": 8085,
+          "protocol": "tcp",
+          "raw": "0.0.0.0:8085->8085/tcp"
+        },
+        "env_files": {},
+        "docker_compose": null,
+        "env_server_ts": null,
+        "status": "found-in-docker",
+        "issues": []
+      },
+      {
+        "service": "image_synthesis",
+        "expected": {
+          "host": 8092,
+          "container": 8092,
+          "service": "legal-ai-image-synthesis",
+          "protocol": "tcp",
+          "profile": "full"
+        },
+        "docker_ps": {
+          "host": 8092,
+          "container": 8092,
+          "protocol": "tcp",
+          "raw": "0.0.0.0:8092->8092/tcp"
+        },
+        "env_files": {},
+        "docker_compose": null,
+        "env_server_ts": null,
+        "status": "found-in-docker",
+        "issues": []
+      }
+    ],
+    "issues": []
+  },
+  "expected_ports": {
+    "postgres": {
+      "host": 5434,
+      "container": 5432,
+      "service": "legal-ai-postgres",
+      "protocol": "tcp"
+    },
+    "rabbitmq": {
+      "host": 5672,
+      "container": 5672,
+      "service": "legal-ai-rabbitmq",
+      "protocol": "tcp",
+      "mgmt": 15672
+    },
+    "valkey": {
+      "host": 6379,
+      "container": 6379,
+      "service": "legal-ai-valkey",
+      "protocol": "tcp"
+    },
+    "qdrant_http": {
+      "host": 6333,
+      "container": 6333,
+      "service": "legal-ai-qdrant",
+      "protocol": "tcp"
+    },
+    "qdrant_grpc": {
+      "host": 6334,
+      "container": 6334,
+      "service": "legal-ai-qdrant",
+      "protocol": "tcp"
+    },
+    "neo4j_http": {
+      "host": 7474,
+      "container": 7474,
+      "service": "legal-ai-neo4j",
+      "protocol": "tcp",
+      "profile": "full"
+    },
+    "neo4j_bolt": {
+      "host": 7687,
+      "container": 7687,
+      "service": "legal-ai-neo4j",
+      "protocol": "tcp",
+      "profile": "full"
+    },
+    "ollama": {
+      "host": 11434,
+      "container": 11434,
+      "service": "native",
+      "protocol": "tcp",
+      "location": "host"
+    },
+    "llama_server": {
+      "host": 8090,
+      "container": 8090,
+      "service": "native",
+      "protocol": "tcp",
+      "location": "host"
+    },
+    "bifrost": {
+      "host": 3040,
+      "container": 8080,
+      "service": "legal-ai-bifrost",
+      "protocol": "tcp",
+      "profile": "full"
+    },
+    "searxng": {
+      "host": 8889,
+      "container": 8080,
+      "service": "legal-ai-searxng",
+      "protocol": "tcp",
+      "profile": "full"
+    },
+    "langfuse_web": {
+      "host": 3030,
+      "container": 3000,
+      "service": "langfuse-server",
+      "protocol": "tcp",
+      "profile": "full"
+    },
+    "langfuse_clickhouse_http": {
+      "host": 8124,
+      "container": 8123,
+      "service": "langfuse-clickhouse",
+      "protocol": "tcp",
+      "profile": "full"
+    },
+    "langfuse_clickhouse_grpc": {
+      "host": 9009,
+      "container": 9000,
+      "service": "langfuse-clickhouse",
+      "protocol": "tcp",
+      "profile": "full"
+    },
+    "go_retrieval_grpc": {
+      "host": 50053,
+      "container": 50053,
+      "service": "legal-ai-go-retrieval",
+      "protocol": "tcp",
+      "profile": "full"
+    },
+    "go_retrieval_http": {
+      "host": 8100,
+      "container": 8100,
+      "service": "legal-ai-go-retrieval",
+      "protocol": "tcp",
+      "profile": "full"
+    },
+    "go_embedding_grpc": {
+      "host": 50051,
+      "container": 50051,
+      "service": "legal-ai-go-embedding",
+      "protocol": "tcp",
+      "profile": "full"
+    },
+    "go_embedding_http": {
+      "host": 8097,
+      "container": 8097,
+      "service": "legal-ai-go-embedding",
+      "protocol": "tcp",
+      "profile": "full"
+    },
+    "go_search_grpc": {
+      "host": 50055,
+      "container": 50055,
+      "service": "legal-ai-go-search",
+      "protocol": "tcp",
+      "profile": "full"
+    },
+    "go_search_http": {
+      "host": 8096,
+      "container": 8096,
+      "service": "legal-ai-go-search",
+      "protocol": "tcp",
+      "profile": "full"
+    },
+    "seaweedfs_master": {
+      "host": 9333,
+      "container": 9333,
+      "service": "legal-ai-seaweed-master",
+      "protocol": "tcp",
+      "profile": "seaweedfs"
+    },
+    "seaweedfs_volume": {
+      "host": 8080,
+      "container": 8080,
+      "service": "legal-ai-seaweed-volume",
+      "protocol": "tcp",
+      "profile": "seaweedfs"
+    },
+    "seaweedfs_filer": {
+      "host": 8888,
+      "container": 8888,
+      "service": "legal-ai-seaweed-filer",
+      "protocol": "tcp",
+      "profile": "seaweedfs"
+    },
+    "seaweedfs_s3": {
+      "host": 8333,
+      "container": 8333,
+      "service": "legal-ai-seaweed-s3",
+      "protocol": "tcp",
+      "profile": "seaweedfs"
+    },
+    "couchdb": {
+      "host": 5984,
+      "container": 5984,
+      "service": "legal-ai-couchdb",
+      "protocol": "tcp",
+      "profile": "full"
+    },
+    "nats": {
+      "host": 4222,
+      "container": 4222,
+      "service": "legal-ai-nats",
+      "protocol": "tcp",
+      "profile": "full"
+    },
+    "docling_vlm": {
+      "host": 8085,
+      "container": 8085,
+      "service": "legal-ai-docling-vlm",
+      "protocol": "tcp",
+      "profile": "full"
+    },
+    "image_synthesis": {
+      "host": 8092,
+      "container": 8092,
+      "service": "legal-ai-image-synthesis",
+      "protocol": "tcp",
+      "profile": "full"
+    }
+  },
+  "summary": {
+    "total_services": 28,
+    "running_correctly": 26,
+    "issues_found": 0,
+    "issue_percentage": "0.0"
+  },
+  "recommendations": [
+    {
+      "priority": "INFO",
+      "action": "All port contracts validated successfully",
+      "details": "The codebase, .env files, and running containers are in sync."
+    },
+    {
+      "priority": "INFO",
+      "action": "Run full code scan for hardcoded port references",
+      "details": "Execute: rg -n \"6333|7474|11434|6379|5672|50053|8100|3040\" . --glob \"!node_modules/**\""
+    }
+  ]
+}

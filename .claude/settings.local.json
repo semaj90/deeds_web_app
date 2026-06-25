@@ -572,7 +572,8 @@
       "Bash(PACKET_LIMIT=10 node scripts/atlas/phase1-canonical-embedding-backfill.mjs --apply)",
       "PowerShell(curl http://127.0.0.1:5173/api/embed -Method POST -ContentType \"application/json\" -Body '{\"text\":\"test\"}' 2>&1)",
       "PowerShell(head -50)",
-      "Bash(EMBED_MODE=ollama node scripts/atlas/phase1-canonical-embedding-rabbitmq.mjs --worker --concurrency=4)"
+      "Bash(EMBED_MODE=ollama node scripts/atlas/phase1-canonical-embedding-rabbitmq.mjs --worker --concurrency=4)",
+      "Bash(tail -80 c:\\\\\\\\Users\\\\\\\\james\\\\\\\\Videos\\\\\\\\deeds-web-app\\\\\\\\scripts\\\\\\\\startup\\\\\\\\proof-of-truth-orchestrator.mjs)"
     ],
     "deny": [],
     "ask": []
