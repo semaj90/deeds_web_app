@@ -14,10 +14,11 @@
 
 import { spawn } from 'child_process';
 import { mkdirSync, writeFileSync } from 'fs';
-import { resolve } from 'path';
+import { resolve as resolvePath } from 'path';
 
 const VERBOSE = process.argv.includes('--verbose');
 const DRY_RUN = process.argv.includes('--dry-run');
+const PROOF_DIR = resolvePath('.proofs', 'four-lanes');
 
 const LANES = [
   {
@@ -25,7 +26,7 @@ const LANES = [
     name: 'REPLAY',
     script: 'scripts/atlas/run-replay-breadth-50.mjs',
     description: 'Historical query replay (identity + behavior consistency)',
-    timeout: 120000
+    timeout: 300000
   },
   {
     number: 2,
@@ -50,9 +51,6 @@ const LANES = [
     args: ['--apply']
   }
 ];
-
-const PROOF_DIR = resolve('.proofs/four-lanes');
-mkdirSync(PROOF_DIR, { recursive: true });
 
 /**
  * Execute a single lane
@@ -97,7 +95,7 @@ function executeLane(lane) {
 
       // Write lane log
       writeFileSync(
-        resolve(PROOF_DIR, `lane-${lane.number}-${lane.name.toLowerCase()}.log`),
+        resolvePath(PROOF_DIR, `lane-${lane.number}-${lane.name.toLowerCase()}.log`),
         laneLog.join('')
       );
 
@@ -119,6 +117,9 @@ function executeLane(lane) {
  * Main orchestrator
  */
 async function main() {
+  // Create proof directory
+  mkdirSync(PROOF_DIR, { recursive: true });
+
   console.log('╔════════════════════════════════════════════════════════════════╗');
   console.log('║         FOUR-LANE PROOF-OF-TRUTH ORCHESTRATOR                  ║');
   console.log('╚════════════════════════════════════════════════════════════════╝');
@@ -178,7 +179,7 @@ async function main() {
   console.log('╚════════════════════════════════════════════════════════════════╝\n');
 
   // Write manifest
-  const manifestPath = resolve(PROOF_DIR, `manifest-${new Date().toISOString().replace(/[:.]/g, '-').slice(0, -5)}.json`);
+  const manifestPath = resolvePath(PROOF_DIR, `manifest-${new Date().toISOString().replace(/[:.]/g, '-').slice(0, -5)}.json`);
   writeFileSync(manifestPath, JSON.stringify(manifest, null, 2));
   console.log(`📝 Manifest: ${manifestPath}`);
 

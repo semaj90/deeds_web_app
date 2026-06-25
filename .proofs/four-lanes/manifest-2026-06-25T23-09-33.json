@@ -1,0 +1,34 @@
+{
+  "timestamp": "2026-06-25T23:09:33.467Z",
+  "totalDuration": 120015,
+  "lanes": [
+    {
+      "number": 1,
+      "name": "REPLAY",
+      "passed": false,
+      "duration": 120015,
+      "exitCode": null
+    },
+    {
+      "number": 2,
+      "name": "CACHE",
+      "passed": true,
+      "duration": 1492,
+      "exitCode": 0
+    },
+    {
+      "number": 3,
+      "name": "PROVENANCE",
+      "passed": true,
+      "duration": 175,
+      "exitCode": 0
+    },
+    {
+      "number": 4,
+      "name": "TELEMETRY",
+      "passed": true,
+      "duration": 210,
+      "exitCode": 0
+    }
+  ]
+}
