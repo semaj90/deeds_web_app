@@ -1,5 +1,5 @@
 # Codebase Map — 20-Gate Deep Audit
-> Generated: 2026-06-24T23:16:18.854Z
+> Generated: 2026-06-24T23:38:50.775Z
 > Mode: `fast-ast` · CPU-only · No GPU required
 > Regenerate: `npm run index:codebase:fast:plan`
 
@@ -8,8 +8,8 @@
 ## Summary
 | Metric | Count |
 |--------|-------|
-| Files scanned | 68159 |
-| Directories analysed | 746 |
+| Files scanned | 68160 |
+| Directories analysed | 747 |
 | Route files | 181 |
 | Svelte components | 5719 |
 | API handlers | 7139 |
@@ -31,20 +31,20 @@
 |------|-------|------|------|
 | G4  | Auth guard on API routes | 147 | 7 |
 | G5  | Zod validation on API routes | 106 | 2 |
-| G11 | No hardcoded localhost (excl env.server) | 65229 | 2930 |
-| G14a | No `export let` (Svelte 4 props) | 68154 | 5 |
-| G14b | No `$:` reactive declarations | 68147 | 12 |
-| G14c | No `on:event=` directives | 68142 | 17 |
-| G14d | No `createEventDispatcher()` | 68159 | 0 |
-| G14e | No runes in plain `.ts` files | 68084 | 75 |
-| G15 | No SSR-unsafe globals (unguarded) | 68159 | 0 |
+| G11 | No hardcoded localhost (excl env.server) | 65230 | 2930 |
+| G14a | No `export let` (Svelte 4 props) | 68155 | 5 |
+| G14b | No `$:` reactive declarations | 68148 | 12 |
+| G14c | No `on:event=` directives | 68143 | 17 |
+| G14d | No `createEventDispatcher()` | 68160 | 0 |
+| G14e | No runes in plain `.ts` files | 68085 | 75 |
+| G15 | No SSR-unsafe globals (unguarded) | 68160 | 0 |
 | G16 | Server routes have test pairing | 106 | 35 |
 | G17 | Server routes have error handling | 145 | 12 |
 | G20 | Cyclic import pairs | — | 3 |
 
 ---
 
-## Directory Scorecard (746 dirs · lowest score = most attention needed)
+## Directory Scorecard (747 dirs · lowest score = most attention needed)
 
 **Score factors**: Auth/API coverage 25pts · Zod coverage 15pts · Drizzle ref 10pts · No TODOs 15pts · SSR-safe 10pts · No Svelte4 10pts · No localhost 5pts · Error handling 5pts · Non-empty 5pts
 
@@ -725,6 +725,7 @@
 | ✅ | `sveltekit-frontend/sveltekit-frontend/.docker-build` | 90 | 2 | 14 | 0 | 0/0 | 0 | — |
 | ✅ | `sveltekit-frontend/sveltekit-frontend/docs/reports` | 90 | 2 | 368 | 0 | 0/0 | 0 | — |
 | ✅ | `sveltekit-frontend/sveltekit-frontend/scripts/atlas` | 90 | 4 | 564 | 0 | 0/2 | 0 | — |
+| ✅ | `sveltekit-frontend/sveltekit-frontend/src/lib` | 90 | 1 | 371 | 0 | 0/0 | 0 | — |
 | ✅ | `sveltekit-frontend/sveltekit-frontend/sveltekit-frontend/docs` | 90 | 2 | 98 | 0 | 0/0 | 0 | — |
 | ✅ | `sveltekit-frontend/sveltekit-frontend/sveltekit-frontend/scripts` | 90 | 3 | 556 | 0 | 0/1 | 0 | — |
 | ✅ | `sveltekit-frontend/test` | 90 | 1 | 63 | 0 | 0/0 | 0 | — |
@@ -778,7 +779,7 @@
 | ✅ | `.claude/worktrees/agent-a38668f2/sveltekit-frontend` | 100 | 37829 | 71692576 | 4422 | 10493/9044 | 305 | 🟡sv4 🟠lh |
 | ✅ | `.claude/worktrees/agent-a87590c9` | 100 | 2 | 5341867 | 33 | 35/253 | 5 | 🟠lh |
 | ✅ | `.claude/worktrees/agent-a87590c9/scripts` | 100 | 332 | 88393 | 1 | 0/129 | 0 | 🟠lh |
-| ✅ | `scripts/atlas` | 100 | 1598 | 419314 | 4 | 0/713 | 18 | 🟠lh |
+| ✅ | `scripts/atlas` | 100 | 1598 | 419416 | 4 | 0/713 | 18 | 🟠lh |
 | ✅ | `.claude/worktrees/agent-a87590c9/sveltekit-frontend` | 100 | 337 | 4853804 | 31 | 35/121 | 4 | 🟠lh |
 | ✅ | `sveltekit-frontend/scripts` | 100 | 223 | 128170 | 1 | 11/230 | 1 | 🟠lh |
 | ✅ | `sveltekit-frontend/scripts/agents` | 100 | 4 | 1430 | 0 | 1/2 | 0 | — |
@@ -796,7 +797,7 @@
 | ✅ | `sveltekit-frontend/scripts/phase104-backups/src` | 100 | 6 | 243 | 0 | 0/1 | 0 | — |
 | ✅ | `sveltekit-frontend/scripts/screenshots` | 100 | 2 | 319 | 0 | 0/0 | 0 | — |
 | ✅ | `sveltekit-frontend/src/routes/atlas` | 100 | 2 | 432 | 0 | 0/1 | 0 | ⬜notest |
-| ✅ | `sveltekit-frontend/sveltekit-frontend` | 100 | 2 | 2186 | 1 | 1/4 | 1 | 🟠lh |
+| ✅ | `sveltekit-frontend/sveltekit-frontend` | 100 | 2 | 2557 | 1 | 1/4 | 1 | 🟠lh |
 | ✅ | `sveltekit-frontend/tests/routes` | 100 | 20 | 55577 | 1 | 700/6 | 0 | — |
 | ✅ | `sveltekit-frontend/tests/routes/auto` | 100 | 700 | 48931 | 0 | 695/0 | 0 | — |
 

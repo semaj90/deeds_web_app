@@ -1758,7 +1758,7 @@ export async function assembleACEContext(opts: {
 
       // Stage A0.5: Determine retrieval lane via 4x6 routing matrix
       let routingDecision = null as any;
-      const { selectRoutingLane, extractQuerySignals, cacheRoutingMatrixConfig } = await import('../../ace/stage-a0-routing.js');
+      const { selectRoutingLane, extractQuerySignals, cacheRoutingMatrixConfig } = await import('../../../ace/stage-a0-routing.js');
 
       if (opts.enableCodebaseContext) {
         try {
