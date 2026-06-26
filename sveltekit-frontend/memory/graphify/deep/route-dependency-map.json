@@ -167,6 +167,18 @@
     "serverDeps": 0,
     "dbDeps": 0
   },
+  "sveltekit-frontend/src/routes/(app)/deep-research/+page.server.ts": {
+    "zone": "shared",
+    "directDeps": 0,
+    "serverDeps": 0,
+    "dbDeps": 0
+  },
+  "sveltekit-frontend/src/routes/(app)/deep-research/+page.svelte": {
+    "zone": "shared",
+    "directDeps": 0,
+    "serverDeps": 0,
+    "dbDeps": 0
+  },
   "sveltekit-frontend/src/routes/(app)/demos/gpu-pipeline/+page.server.ts": {
     "zone": "shared",
     "directDeps": 0,
@@ -282,6 +294,12 @@
     "dbDeps": 0
   },
   "sveltekit-frontend/src/routes/api/agent/rpc/+server.ts": {
+    "zone": "shared",
+    "directDeps": 0,
+    "serverDeps": 0,
+    "dbDeps": 0
+  },
+  "sveltekit-frontend/src/routes/api/agent/rpc/test/+server.ts": {
     "zone": "shared",
     "directDeps": 0,
     "serverDeps": 0,
@@ -408,6 +426,12 @@
     "dbDeps": 0
   },
   "sveltekit-frontend/src/routes/api/ai/yorha/context-chat/+server.ts": {
+    "zone": "shared",
+    "directDeps": 0,
+    "serverDeps": 0,
+    "dbDeps": 0
+  },
+  "sveltekit-frontend/src/routes/api/analytics/deep-research/+server.ts": {
     "zone": "shared",
     "directDeps": 0,
     "serverDeps": 0,
@@ -852,6 +876,12 @@
     "dbDeps": 0
   },
   "sveltekit-frontend/src/routes/api/reports/[id]/publish/+server.ts": {
+    "zone": "shared",
+    "directDeps": 0,
+    "serverDeps": 0,
+    "dbDeps": 0
+  },
+  "sveltekit-frontend/src/routes/api/research/concurrent-deep/stream/+server.ts": {
     "zone": "shared",
     "directDeps": 0,
     "serverDeps": 0,

@@ -588,7 +588,8 @@
       "Bash(cypher-shell -u neo4j -p neo4j123 \"MATCH \\(c:SOMCell\\) RETURN COUNT\\(c\\) AS cell_count;\")",
       "Bash(export DATABASE_URL='postgresql://legal_admin:123456@127.0.0.1:5434/legal_ai_db')",
       "Bash(export REDIS_URL='redis://:redis@127.0.0.1:6379')",
-      "Bash(PGPASSWORD=123456 docker exec -i legal-ai-postgres psql -U legal_admin -d legal_ai_db -c \"SELECT COUNT\\(DISTINCT pagerank_score\\) as unique_scores, ROUND\\(MIN\\(pagerank_score\\)::numeric, 4\\) as min_score, ROUND\\(MAX\\(pagerank_score\\)::numeric, 4\\) as max_score FROM atlas_som_cell_scores;\")"
+      "Bash(PGPASSWORD=123456 docker exec -i legal-ai-postgres psql -U legal_admin -d legal_ai_db -c \"SELECT COUNT\\(DISTINCT pagerank_score\\) as unique_scores, ROUND\\(MIN\\(pagerank_score\\)::numeric, 4\\) as min_score, ROUND\\(MAX\\(pagerank_score\\)::numeric, 4\\) as max_score FROM atlas_som_cell_scores;\")",
+      "Bash(npm remove *)"
     ],
     "deny": [],
     "ask": []

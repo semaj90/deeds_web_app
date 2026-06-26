@@ -1,7 +1,7 @@
 # Packet Reader / Writer Audit
 
-Generated: 2026-06-23T19:57:21.743Z
-Status: MATERIALIZED
+Generated: 2026-06-26T02:02:24.520Z
+Status: DRY_RUN_READY
 Source table: atlas_higher_hop_index
 
 ## Summary
@@ -39,7 +39,7 @@ Source table: atlas_higher_hop_index
 
 - ndjson: .tmp/addressable-packets.ndjson
 - manifest: .tmp/addressable-packets.manifest.json
-- sha256: 8d49d141d01849ca08378f07b629a368dbe4882f8bceda3bca7888d6cb870277
+- sha256: 19f357d96174e50a9f4bfe1135736c5fda8a057d6a1e9e7dfc2769e676e3bad4
 
 ## Samples
 

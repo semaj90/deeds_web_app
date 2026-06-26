@@ -1,7 +1,7 @@
 {
   "schema": "addressable_packets_materialization_manifest.v1",
-  "generatedAt": "2026-06-23T19:57:21.743Z",
-  "mode": "apply",
+  "generatedAt": "2026-06-26T02:02:24.520Z",
+  "mode": "dry-run",
   "sourceTable": "atlas_higher_hop_index",
   "outputNdjson": ".tmp/addressable-packets.ndjson",
   "outputManifest": ".tmp/addressable-packets.manifest.json",
@@ -57,8 +57,8 @@
     "119403f1ca0164b4",
     "13039d77318546e0"
   ],
-  "outputSha256": "8d49d141d01849ca08378f07b629a368dbe4882f8bceda3bca7888d6cb870277",
-  "status": "MATERIALIZED",
+  "outputSha256": "19f357d96174e50a9f4bfe1135736c5fda8a057d6a1e9e7dfc2769e676e3bad4",
+  "status": "DRY_RUN_READY",
   "nextSafeAction": "Run qdrant-tag-mirror next, then resume the retrieval pipeline after the materialized packet count is positive.",
   "samples": [
     {

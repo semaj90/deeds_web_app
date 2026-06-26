@@ -1,6 +1,6 @@
 # Directory Atlas Recommendations
 
-> Generated: 2026-06-24T05:56:27.554Z · 1167 directories · 3746 files
+> Generated: 2026-06-25T22:46:46.877Z · 1167 directories · 3746 files
 
 ## `src/lib/server/db`
 
@@ -48,19 +48,9 @@
 - AGENTS: `agents:src/lib/server/db/schema/AGENTS.md` (parent: `agents:src/lib/server/db/AGENTS.md`)
 - Authority max=0.5 avg=0.093, PageRank max=0, Karpathy blend=0
 - Topo classes: `database-schema`
-- Clusters: `gpu:55`, `general`, `database-schema:55`, `gpu:47`
+- Clusters: `gpu:55`, `gpu:18`, `general`, `database-schema:55`
 - Tools: `kag.multi_lane_search`, `graph.expand_neighborhood`, `topology.same_som_cluster`, `clusters.get_members`
 - Top files: `src/lib/server/db/schema/ace-web-crawl.ts`, `src/lib/server/db/schema/error_events.ts`, `src/lib/server/db/schema/legal-chunks.ts`
-
-## `src/lib/server/retrieval`
-
-- Rank: **0.325** · files=29 · hits=0 · dirty=0
-- AGENTS: `agents:src/lib/server/retrieval/AGENTS.md` (parent: `agents:src/lib/server/AGENTS.md`)
-- Authority max=0.45 avg=0.143, PageRank max=0, Karpathy blend=0.215
-- Topo classes: `trace-retrieval`
-- Clusters: `general`, `trace-retrieval:72`, `gpu:24`, `gpu:73`
-- Tools: `kag.multi_lane_search`, `graph.expand_neighborhood`, `topology.same_som_cluster`, `clusters.get_members`
-- Top files: `src/lib/server/retrieval/cross-encoder-reranker.ts`, `src/lib/server/retrieval/citation-graph.ts`, `src/lib/server/retrieval/codebase-context.ts`
 
 ## `src/lib/server/research`
 
@@ -71,6 +61,16 @@
 - Clusters: `general`, `gpu:32`, `gpu:82`, `gpu:73`
 - Tools: `kag.multi_lane_search`, `graph.expand_neighborhood`, `topology.same_som_cluster`, `clusters.get_members`
 - Top files: `src/lib/server/research/github-harvester.ts`, `src/lib/server/research/lane4-feedback.ts`, `src/lib/server/research/reddit-harvester.ts`
+
+## `src/lib/server/retrieval`
+
+- Rank: **0.324** · files=29 · hits=0 · dirty=0
+- AGENTS: `agents:src/lib/server/retrieval/AGENTS.md` (parent: `agents:src/lib/server/AGENTS.md`)
+- Authority max=0.45 avg=0.143, PageRank max=0, Karpathy blend=0.199
+- Topo classes: `trace-retrieval`
+- Clusters: `general`, `trace-retrieval:72`, `gpu:24`, `gpu:73`
+- Tools: `kag.multi_lane_search`, `graph.expand_neighborhood`, `topology.same_som_cluster`, `clusters.get_members`
+- Top files: `src/lib/server/retrieval/cross-encoder-reranker.ts`, `src/lib/server/retrieval/citation-graph.ts`, `src/lib/server/retrieval/codebase-context.ts`
 
 ## `src/lib/server/types`
 

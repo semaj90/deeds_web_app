@@ -5,159 +5,659 @@
   "packetKeyPct": 100,
   "featureIdPct": 100,
   "sourceRefPct": 100,
-  "cacheHitPct": 20,
+  "cacheHitPct": 100,
   "timeoutCount": 0,
   "failedQueries": [],
   "results": [
     {
-      "query": "where is Redis Valkey cache config wired?"
+      "query": "where is Redis Valkey cache config wired?",
+      "hash": "4062bd7d",
+      "bucket": "golden",
+      "cacheHit": true,
+      "packetsReturned": 5,
+      "packetKeyCount": 5,
+      "featureIdCount": 5,
+      "sourceRefCount": 5,
+      "strategy": "fusion",
+      "traceId": "8ceab828-7152-471e-bf97-ff2e02c7377d",
+      "latencyMs": 10013
     },
     {
-      "query": "how is SeaweedFS filer configured for S3 gateway?"
+      "query": "how is SeaweedFS filer configured for S3 gateway?",
+      "hash": "84e5b8e3",
+      "bucket": "golden",
+      "cacheHit": true,
+      "packetsReturned": 5,
+      "packetKeyCount": 5,
+      "featureIdCount": 5,
+      "sourceRefCount": 5,
+      "strategy": "fusion",
+      "traceId": "c07eccda-6385-4cba-80f9-ac766cd98146",
+      "latencyMs": 5186
     },
     {
-      "query": "where is the LibTorch N-API addon defined?"
+      "query": "where is the LibTorch N-API addon defined?",
+      "hash": "9a9ab02b",
+      "bucket": "golden",
+      "cacheHit": true,
+      "packetsReturned": 5,
+      "packetKeyCount": 5,
+      "featureIdCount": 5,
+      "sourceRefCount": 5,
+      "strategy": "fusion",
+      "traceId": "37dcf466-0381-47c8-9fe1-ed5d4e08f7ae",
+      "latencyMs": 4650
     },
     {
-      "query": "where are the Drizzle schema files located?"
+      "query": "where are the Drizzle schema files located?",
+      "hash": "0bc97f16",
+      "bucket": "golden",
+      "cacheHit": true,
+      "packetsReturned": 5,
+      "packetKeyCount": 5,
+      "featureIdCount": 5,
+      "sourceRefCount": 5,
+      "strategy": "fusion",
+      "traceId": "5d94f19d-9449-46c1-813d-68265862470f",
+      "latencyMs": 4788
     },
     {
-      "query": "what port is reserved for SeaweedFS Filer?"
+      "query": "what port is reserved for SeaweedFS Filer?",
+      "hash": "19a94541",
+      "bucket": "golden",
+      "cacheHit": true,
+      "packetsReturned": 5,
+      "packetKeyCount": 5,
+      "featureIdCount": 5,
+      "sourceRefCount": 5,
+      "strategy": "fusion",
+      "traceId": "4b936ca4-96af-496f-ac26-2d9c161081b5",
+      "latencyMs": 4208
     },
     {
-      "query": "how is the LangGraph planning graph structured?"
+      "query": "how is the LangGraph planning graph structured?",
+      "hash": "d47dcb8a",
+      "bucket": "golden",
+      "cacheHit": true,
+      "packetsReturned": 5,
+      "packetKeyCount": 5,
+      "featureIdCount": 5,
+      "sourceRefCount": 5,
+      "strategy": "fusion",
+      "traceId": "6ac288c3-f7c6-4422-9eae-d145809bdc4d",
+      "latencyMs": 3885
     },
     {
-      "query": "where is the Postgres database connection pool initialized?"
+      "query": "where is the Postgres database connection pool initialized?",
+      "hash": "7e2c4e34",
+      "bucket": "golden",
+      "cacheHit": true,
+      "packetsReturned": 5,
+      "packetKeyCount": 5,
+      "featureIdCount": 5,
+      "sourceRefCount": 5,
+      "strategy": "fusion",
+      "traceId": "7b32aa59-d8ef-4df1-9df8-a8e2e50513ec",
+      "latencyMs": 3622
     },
     {
-      "query": "how does the system handle schema migration sidecars?"
+      "query": "how does the system handle schema migration sidecars?",
+      "hash": "31ff3331",
+      "bucket": "golden",
+      "cacheHit": true,
+      "packetsReturned": 5,
+      "packetKeyCount": 5,
+      "featureIdCount": 5,
+      "sourceRefCount": 5,
+      "strategy": "fusion",
+      "traceId": "8b725f19-8d7f-4400-82e4-5fb5f9da6c25",
+      "latencyMs": 3451
     },
     {
-      "query": "what is the default collection name for Qdrant semantic search?"
+      "query": "what is the default collection name for Qdrant semantic search?",
+      "hash": "87664693",
+      "bucket": "golden",
+      "cacheHit": true,
+      "packetsReturned": 5,
+      "packetKeyCount": 5,
+      "featureIdCount": 5,
+      "sourceRefCount": 5,
+      "strategy": "fusion",
+      "traceId": "382da7f2-1375-454d-9246-118498fcbeb4",
+      "latencyMs": 3698
     },
     {
-      "query": "how is the GPU compute worker smoke test runner executed?"
+      "query": "how is the GPU compute worker smoke test runner executed?",
+      "hash": "40e8540e",
+      "bucket": "golden",
+      "cacheHit": true,
+      "packetsReturned": 5,
+      "packetKeyCount": 5,
+      "featureIdCount": 5,
+      "sourceRefCount": 5,
+      "strategy": "fusion",
+      "traceId": "54d7f38d-ddd8-45a1-811a-894b5e331930",
+      "latencyMs": 3787
     },
     {
-      "query": "where is Redis Valkey cache config wired?"
+      "query": "where is Redis Valkey cache config wired?",
+      "hash": "4062bd7d",
+      "bucket": "cache-hit",
+      "cacheHit": true,
+      "packetsReturned": 5,
+      "packetKeyCount": 5,
+      "featureIdCount": 5,
+      "sourceRefCount": 5,
+      "strategy": "fusion",
+      "traceId": "13f80214-24c8-4374-bd51-ff64d67e4450",
+      "latencyMs": 4516
     },
     {
-      "query": "how is SeaweedFS filer configured for S3 gateway?"
+      "query": "how is SeaweedFS filer configured for S3 gateway?",
+      "hash": "84e5b8e3",
+      "bucket": "cache-hit",
+      "cacheHit": true,
+      "packetsReturned": 5,
+      "packetKeyCount": 5,
+      "featureIdCount": 5,
+      "sourceRefCount": 5,
+      "strategy": "fusion",
+      "traceId": "a8e927fd-b110-4700-9c43-791ec0f91de7",
+      "latencyMs": 5294
     },
     {
-      "query": "where is the LibTorch N-API addon defined?"
+      "query": "where is the LibTorch N-API addon defined?",
+      "hash": "9a9ab02b",
+      "bucket": "cache-hit",
+      "cacheHit": true,
+      "packetsReturned": 5,
+      "packetKeyCount": 5,
+      "featureIdCount": 5,
+      "sourceRefCount": 5,
+      "strategy": "fusion",
+      "traceId": "acf55c31-99fa-4908-9c26-e7646ecde7f8",
+      "latencyMs": 5054
     },
     {
-      "query": "where are the Drizzle schema files located?"
+      "query": "where are the Drizzle schema files located?",
+      "hash": "0bc97f16",
+      "bucket": "cache-hit",
+      "cacheHit": true,
+      "packetsReturned": 5,
+      "packetKeyCount": 5,
+      "featureIdCount": 5,
+      "sourceRefCount": 5,
+      "strategy": "fusion",
+      "traceId": "8b8f5db3-7390-4e1a-9bec-1e30ea3fa38a",
+      "latencyMs": 3779
     },
     {
-      "query": "what port is reserved for SeaweedFS Filer?"
+      "query": "what port is reserved for SeaweedFS Filer?",
+      "hash": "19a94541",
+      "bucket": "cache-hit",
+      "cacheHit": true,
+      "packetsReturned": 5,
+      "packetKeyCount": 5,
+      "featureIdCount": 5,
+      "sourceRefCount": 5,
+      "strategy": "fusion",
+      "traceId": "57c4a265-a76c-4fbe-a639-480f9634fcc9",
+      "latencyMs": 4326
     },
     {
-      "query": "how is the LangGraph planning graph structured?"
+      "query": "how is the LangGraph planning graph structured?",
+      "hash": "d47dcb8a",
+      "bucket": "cache-hit",
+      "cacheHit": true,
+      "packetsReturned": 5,
+      "packetKeyCount": 5,
+      "featureIdCount": 5,
+      "sourceRefCount": 5,
+      "strategy": "fusion",
+      "traceId": "ff0eeb52-72b3-4c4d-b1d5-ed09b0f6ee75",
+      "latencyMs": 3811
     },
     {
-      "query": "where is the Postgres database connection pool initialized?"
+      "query": "where is the Postgres database connection pool initialized?",
+      "hash": "7e2c4e34",
+      "bucket": "cache-hit",
+      "cacheHit": true,
+      "packetsReturned": 5,
+      "packetKeyCount": 5,
+      "featureIdCount": 5,
+      "sourceRefCount": 5,
+      "strategy": "fusion",
+      "traceId": "e6598340-bf63-499c-aa36-7d176c6bbdc8",
+      "latencyMs": 4361
     },
     {
-      "query": "how does the system handle schema migration sidecars?"
+      "query": "how does the system handle schema migration sidecars?",
+      "hash": "31ff3331",
+      "bucket": "cache-hit",
+      "cacheHit": true,
+      "packetsReturned": 5,
+      "packetKeyCount": 5,
+      "featureIdCount": 5,
+      "sourceRefCount": 5,
+      "strategy": "fusion",
+      "traceId": "711a0d77-d432-425e-bfa8-6206f9ad7df6",
+      "latencyMs": 3875
     },
     {
-      "query": "what is the default collection name for Qdrant semantic search?"
+      "query": "what is the default collection name for Qdrant semantic search?",
+      "hash": "87664693",
+      "bucket": "cache-hit",
+      "cacheHit": true,
+      "packetsReturned": 5,
+      "packetKeyCount": 5,
+      "featureIdCount": 5,
+      "sourceRefCount": 5,
+      "strategy": "fusion",
+      "traceId": "fb607fb0-4e5b-423d-9046-d67fa3bd2df4",
+      "latencyMs": 4169
     },
     {
-      "query": "how is the GPU compute worker smoke test runner executed?"
+      "query": "how is the GPU compute worker smoke test runner executed?",
+      "hash": "40e8540e",
+      "bucket": "cache-hit",
+      "cacheHit": true,
+      "packetsReturned": 5,
+      "packetKeyCount": 5,
+      "featureIdCount": 5,
+      "sourceRefCount": 5,
+      "strategy": "fusion",
+      "traceId": "3e7532cb-f7ab-4077-9610-5daa86d59ea1",
+      "latencyMs": 4734
     },
     {
-      "query": "which files depend on the database schema client?"
+      "query": "which files depend on the database schema client?",
+      "hash": "09acfdc0",
+      "bucket": "graph-expansion",
+      "cacheHit": true,
+      "packetsReturned": 5,
+      "packetKeyCount": 5,
+      "featureIdCount": 5,
+      "sourceRefCount": 5,
+      "strategy": "fusion",
+      "traceId": "a8b18a7f-0e85-426b-8985-8fc003e1be4c",
+      "latencyMs": 4249
     },
     {
-      "query": "what is the relationship between atlas_packets and concept_records?"
+      "query": "what is the relationship between atlas_packets and concept_records?",
+      "hash": "c02a581a",
+      "bucket": "graph-expansion",
+      "cacheHit": true,
+      "packetsReturned": 5,
+      "packetKeyCount": 5,
+      "featureIdCount": 5,
+      "sourceRefCount": 5,
+      "strategy": "fusion",
+      "traceId": "d0423505-09dd-42c0-bda7-84db0d074315",
+      "latencyMs": 3745
     },
     {
-      "query": "how are the error clusters linked to route health metrics?"
+      "query": "how are the error clusters linked to route health metrics?",
+      "hash": "97ee05a3",
+      "bucket": "graph-expansion",
+      "cacheHit": true,
+      "packetsReturned": 5,
+      "packetKeyCount": 5,
+      "featureIdCount": 5,
+      "sourceRefCount": 5,
+      "strategy": "fusion",
+      "traceId": "bcb01e31-0647-442e-bde8-b1b06e59779a",
+      "latencyMs": 3511
     },
     {
-      "query": "which modules import the OpenAI facade or sidecar router?"
+      "query": "which modules import the OpenAI facade or sidecar router?",
+      "hash": "91cafa61",
+      "bucket": "graph-expansion",
+      "cacheHit": true,
+      "packetsReturned": 5,
+      "packetKeyCount": 5,
+      "featureIdCount": 5,
+      "sourceRefCount": 5,
+      "strategy": "fusion",
+      "traceId": "ce120d72-ff88-425a-9be6-020dc1779a75",
+      "latencyMs": 4606
     },
     {
-      "query": "show imports and dependents of the retrieval recorder"
+      "query": "show imports and dependents of the retrieval recorder",
+      "hash": "50369362",
+      "bucket": "graph-expansion",
+      "cacheHit": true,
+      "packetsReturned": 5,
+      "packetKeyCount": 5,
+      "featureIdCount": 5,
+      "sourceRefCount": 5,
+      "strategy": "fusion",
+      "traceId": "86ceee7f-95f0-46f9-8a13-7f1d6471aab8",
+      "latencyMs": 3984
     },
     {
-      "query": "how are codebase embeddings connected to codebase files?"
+      "query": "how are codebase embeddings connected to codebase files?",
+      "hash": "e7f49ba3",
+      "bucket": "graph-expansion",
+      "cacheHit": true,
+      "packetsReturned": 5,
+      "packetKeyCount": 5,
+      "featureIdCount": 5,
+      "sourceRefCount": 5,
+      "strategy": "fusion",
+      "traceId": "35ae168a-9995-4afc-9f2f-96f550f2ff2f",
+      "latencyMs": 4596
     },
     {
-      "query": "what is the link between parent atlas documents and card registry?"
+      "query": "what is the link between parent atlas documents and card registry?",
+      "hash": "162a39c6",
+      "bucket": "graph-expansion",
+      "cacheHit": true,
+      "packetsReturned": 5,
+      "packetKeyCount": 5,
+      "featureIdCount": 5,
+      "sourceRefCount": 5,
+      "strategy": "fusion",
+      "traceId": "a0333967-cd46-45e8-809c-2f44554b48d6",
+      "latencyMs": 3863
     },
     {
-      "query": "which components interact with the Redis cache gateway?"
+      "query": "which components interact with the Redis cache gateway?",
+      "hash": "eda56c54",
+      "bucket": "graph-expansion",
+      "cacheHit": true,
+      "packetsReturned": 5,
+      "packetKeyCount": 5,
+      "featureIdCount": 5,
+      "sourceRefCount": 5,
+      "strategy": "fusion",
+      "traceId": "68f80da7-3802-40ff-aa36-2de8f114b7d9",
+      "latencyMs": 4543
     },
     {
-      "query": "what calls the N-API autoencoderEncode function?"
+      "query": "what calls the N-API autoencoderEncode function?",
+      "hash": "c3a1c45b",
+      "bucket": "graph-expansion",
+      "cacheHit": true,
+      "packetsReturned": 5,
+      "packetKeyCount": 5,
+      "featureIdCount": 5,
+      "sourceRefCount": 5,
+      "strategy": "fusion",
+      "traceId": "a978cf61-8c6c-4f54-9e86-f714a5960844",
+      "latencyMs": 4028
     },
     {
-      "query": "how does the route param guard script communicate with svelte check?"
+      "query": "how does the route param guard script communicate with svelte check?",
+      "hash": "e48d795d",
+      "bucket": "graph-expansion",
+      "cacheHit": true,
+      "packetsReturned": 5,
+      "packetKeyCount": 5,
+      "featureIdCount": 5,
+      "sourceRefCount": 5,
+      "strategy": "fusion",
+      "traceId": "19814ad9-8246-4604-ab46-b97558abaa01",
+      "latencyMs": 3689
     },
     {
-      "query": "how is SDXL image generation service URL defined?"
+      "query": "how is SDXL image generation service URL defined?",
+      "hash": "66eda1f1",
+      "bucket": "low-density",
+      "cacheHit": true,
+      "packetsReturned": 5,
+      "packetKeyCount": 5,
+      "featureIdCount": 5,
+      "sourceRefCount": 5,
+      "strategy": "fusion",
+      "traceId": "603b64d6-94d9-4581-9299-084a008984c1",
+      "latencyMs": 3931
     },
     {
-      "query": "where is ibm/granite-docling:258m configured?"
+      "query": "where is ibm/granite-docling:258m configured?",
+      "hash": "17346cf4",
+      "bucket": "low-density",
+      "cacheHit": true,
+      "packetsReturned": 5,
+      "packetKeyCount": 5,
+      "featureIdCount": 5,
+      "sourceRefCount": 5,
+      "strategy": "fusion",
+      "traceId": "06d0a3e4-ce69-4ee4-aa62-c38df1af9a90",
+      "latencyMs": 3637
     },
     {
-      "query": "what is the fallback logic for feature ID placement?"
+      "query": "what is the fallback logic for feature ID placement?",
+      "hash": "b375abfc",
+      "bucket": "low-density",
+      "cacheHit": true,
+      "packetsReturned": 5,
+      "packetKeyCount": 5,
+      "featureIdCount": 5,
+      "sourceRefCount": 5,
+      "strategy": "fusion",
+      "traceId": "26df8f44-6d5e-48f6-ac95-74bdb4174821",
+      "latencyMs": 3820
     },
     {
-      "query": "where is ComfyUI submit workflow smoke test located?"
+      "query": "where is ComfyUI submit workflow smoke test located?",
+      "hash": "1ebda541",
+      "bucket": "low-density",
+      "cacheHit": true,
+      "packetsReturned": 5,
+      "packetKeyCount": 5,
+      "featureIdCount": 5,
+      "sourceRefCount": 5,
+      "strategy": "fusion",
+      "traceId": "a312efc4-1a09-43ad-a306-ea490b3a6a80",
+      "latencyMs": 3921
     },
     {
-      "query": "how is the Triton VLM model routing configured?"
+      "query": "how is the Triton VLM model routing configured?",
+      "hash": "10c59376",
+      "bucket": "low-density",
+      "cacheHit": true,
+      "packetsReturned": 5,
+      "packetKeyCount": 5,
+      "featureIdCount": 5,
+      "sourceRefCount": 5,
+      "strategy": "fusion",
+      "traceId": "bd870a9c-334a-4a68-8469-f34875620c3f",
+      "latencyMs": 3567
     },
     {
-      "query": "what is the purpose of the orphaned GenerationService gRPC?"
+      "query": "what is the purpose of the orphaned GenerationService gRPC?",
+      "hash": "ddb6bf0d",
+      "bucket": "low-density",
+      "cacheHit": true,
+      "packetsReturned": 5,
+      "packetKeyCount": 5,
+      "featureIdCount": 5,
+      "sourceRefCount": 5,
+      "strategy": "fusion",
+      "traceId": "39736feb-87ee-457b-a89a-40ff7977e906",
+      "latencyMs": 4156
     },
     {
-      "query": "where is the WebGPU PageRank benchmark defined?"
+      "query": "where is the WebGPU PageRank benchmark defined?",
+      "hash": "15fa9ec0",
+      "bucket": "low-density",
+      "cacheHit": true,
+      "packetsReturned": 5,
+      "packetKeyCount": 5,
+      "featureIdCount": 5,
+      "sourceRefCount": 5,
+      "strategy": "fusion",
+      "traceId": "e16dc6b0-1087-4ac8-816a-540b5338401c",
+      "latencyMs": 3721
     },
     {
-      "query": "how is the ComfyUI client strict check executed?"
+      "query": "how is the ComfyUI client strict check executed?",
+      "hash": "9ff2cc2a",
+      "bucket": "low-density",
+      "cacheHit": true,
+      "packetsReturned": 5,
+      "packetKeyCount": 5,
+      "featureIdCount": 5,
+      "sourceRefCount": 5,
+      "strategy": "fusion",
+      "traceId": "951a43f1-aaeb-4570-920b-aa902bb749de",
+      "latencyMs": 3539
     },
     {
-      "query": "where are the ComfyUI workflow JSON files stored?"
+      "query": "where are the ComfyUI workflow JSON files stored?",
+      "hash": "5a58bf9e",
+      "bucket": "low-density",
+      "cacheHit": true,
+      "packetsReturned": 5,
+      "packetKeyCount": 5,
+      "featureIdCount": 5,
+      "sourceRefCount": 5,
+      "strategy": "fusion",
+      "traceId": "3f742cb0-d1ca-4d01-8343-7a996b39ee6d",
+      "latencyMs": 3806
     },
     {
-      "query": "what is the fallback configuration for RabbitMQ DLQ?"
+      "query": "what is the fallback configuration for RabbitMQ DLQ?",
+      "hash": "6f2e783e",
+      "bucket": "low-density",
+      "cacheHit": true,
+      "packetsReturned": 5,
+      "packetKeyCount": 5,
+      "featureIdCount": 5,
+      "sourceRefCount": 5,
+      "strategy": "fusion",
+      "traceId": "e3815b15-68bd-4054-b678-6073035d2b2d",
+      "latencyMs": 3510
     },
     {
-      "query": "audit feature_id coverage in atlas_packets"
+      "query": "audit feature_id coverage in atlas_packets",
+      "hash": "df2b7bac",
+      "bucket": "kanban-recommendation",
+      "cacheHit": true,
+      "packetsReturned": 5,
+      "packetKeyCount": 5,
+      "featureIdCount": 5,
+      "sourceRefCount": 5,
+      "strategy": "fusion",
+      "traceId": "d59ccf1b-f6e1-4e19-9931-ffc574c81b4d",
+      "latencyMs": 3637
     },
     {
-      "query": "how to resolve duplicate RETRIEVAL_GRPC_URL keys in env.server.ts?"
+      "query": "how to resolve duplicate RETRIEVAL_GRPC_URL keys in env.server.ts?",
+      "hash": "3c44975a",
+      "bucket": "kanban-recommendation",
+      "cacheHit": true,
+      "packetsReturned": 5,
+      "packetKeyCount": 5,
+      "featureIdCount": 5,
+      "sourceRefCount": 5,
+      "strategy": "fusion",
+      "traceId": "03ad8a62-5316-46bb-94f0-f1d34cf8c757",
+      "latencyMs": 4098
     },
     {
-      "query": "what are the open lanes for Phase 20.6?"
+      "query": "what are the open lanes for Phase 20.6?",
+      "hash": "25121c15",
+      "bucket": "kanban-recommendation",
+      "cacheHit": true,
+      "packetsReturned": 5,
+      "packetKeyCount": 5,
+      "featureIdCount": 5,
+      "sourceRefCount": 5,
+      "strategy": "fusion",
+      "traceId": "67a2ba74-cb2c-4890-a503-7f33e2e63ae8",
+      "latencyMs": 3761
     },
     {
-      "query": "how is the SOM centroid codebook initialized?"
+      "query": "how is the SOM centroid codebook initialized?",
+      "hash": "9b72c13d",
+      "bucket": "kanban-recommendation",
+      "cacheHit": true,
+      "packetsReturned": 5,
+      "packetKeyCount": 5,
+      "featureIdCount": 5,
+      "sourceRefCount": 5,
+      "strategy": "fusion",
+      "traceId": "71c917a0-0114-4a6f-a348-fdc116b96861",
+      "latencyMs": 5057
     },
     {
-      "query": "where is the Phase 16 truth-promotion binding implemented?"
+      "query": "where is the Phase 16 truth-promotion binding implemented?",
+      "hash": "f0d9d0eb",
+      "bucket": "kanban-recommendation",
+      "cacheHit": true,
+      "packetsReturned": 5,
+      "packetKeyCount": 5,
+      "featureIdCount": 5,
+      "sourceRefCount": 5,
+      "strategy": "fusion",
+      "traceId": "0d957121-a3c3-4349-92bf-7d2a21e3d3aa",
+      "latencyMs": 4645
     },
     {
-      "query": "how to backfill latent vectors to postgres atlas_packets?"
+      "query": "how to backfill latent vectors to postgres atlas_packets?",
+      "hash": "4d2a87d6",
+      "bucket": "kanban-recommendation",
+      "cacheHit": true,
+      "packetsReturned": 5,
+      "packetKeyCount": 5,
+      "featureIdCount": 5,
+      "sourceRefCount": 5,
+      "strategy": "fusion",
+      "traceId": "a79495d3-a71c-4a05-b446-29d102ccca3e",
+      "latencyMs": 4202
     },
     {
-      "query": "what is the N-API call signature for autoencoderEncode?"
+      "query": "what is the N-API call signature for autoencoderEncode?",
+      "hash": "71e28a44",
+      "bucket": "kanban-recommendation",
+      "cacheHit": true,
+      "packetsReturned": 5,
+      "packetKeyCount": 5,
+      "featureIdCount": 5,
+      "sourceRefCount": 5,
+      "strategy": "fusion",
+      "traceId": "1f3a0291-67cf-4fe4-8085-ea0f59e1eaae",
+      "latencyMs": 3894
     },
     {
-      "query": "how to train the SOM 20x20 grid on latent vectors?"
+      "query": "how to train the SOM 20x20 grid on latent vectors?",
+      "hash": "e4eed3eb",
+      "bucket": "kanban-recommendation",
+      "cacheHit": true,
+      "packetsReturned": 5,
+      "packetKeyCount": 5,
+      "featureIdCount": 5,
+      "sourceRefCount": 5,
+      "strategy": "fusion",
+      "traceId": "a40836d5-98a8-4170-ad83-f6a5bf2f0697",
+      "latencyMs": 4565
     },
     {
-      "query": "where is the retrieval evaluation times schema barrel export?"
+      "query": "where is the retrieval evaluation times schema barrel export?",
+      "hash": "8cc4f098",
+      "bucket": "kanban-recommendation",
+      "cacheHit": true,
+      "packetsReturned": 5,
+      "packetKeyCount": 5,
+      "featureIdCount": 5,
+      "sourceRefCount": 5,
+      "strategy": "fusion",
+      "traceId": "f4da2c50-8fe2-4ca6-8c6e-b73ecf644970",
+      "latencyMs": 3701
     },
     {
-      "query": "how to run the 10-layer audit CLI tool?"
+      "query": "how to run the 10-layer audit CLI tool?",
+      "hash": "bc4e4ec8",
+      "bucket": "kanban-recommendation",
+      "cacheHit": true,
+      "packetsReturned": 5,
+      "packetKeyCount": 5,
+      "featureIdCount": 5,
+      "sourceRefCount": 5,
+      "strategy": "fusion",
+      "traceId": "23a67ded-5885-4566-b302-0cf3ef8711e1",
+      "latencyMs": 4037
     }
   ]
 }

@@ -1,6 +1,6 @@
 {
-  "generatedAt": "2026-06-14T01:31:58.358Z",
-  "mode": "apply",
+  "generatedAt": "2026-06-26T02:02:26.695Z",
+  "mode": "dry-run",
   "tables": [
     {
       "tableName": "task_semantic_packets",
@@ -45,7 +45,20 @@
         "idx_atlas_packets_summary_fts"
       ],
       "missingColumns": [],
-      "missingIndexes": [],
+      "missingIndexes": [
+        "atlas_packets_identity_idx",
+        "atlas_packets_metadata_gin_idx",
+        "atlas_packets_metadata_path_idx",
+        "atlas_packets_metadata_hash_idx",
+        "atlas_packets_payload_hash_idx",
+        "idx_atlas_packets_payload_path",
+        "idx_atlas_packets_payload_file_url",
+        "idx_atlas_packets_feature_id",
+        "idx_atlas_packets_community_id",
+        "idx_atlas_packets_source_ref_key",
+        "idx_atlas_packets_concept_ids",
+        "idx_atlas_packets_summary_fts"
+      ],
       "executed": []
     },
     {
@@ -74,9 +87,7 @@
       ],
       "missingColumns": [],
       "missingIndexes": [],
-      "executed": [
-        "CREATE EXTENSION IF NOT EXISTS pg_trgm"
-      ]
+      "executed": []
     },
     {
       "tableName": "route_runtime_packets",
@@ -112,18 +123,14 @@
         "idx_rrp_superseded_by"
       ],
       "missingColumns": [],
-      "missingIndexes": [
-        "rrp_feature_idx"
-      ],
-      "executed": [
-        "CREATE INDEX IF NOT EXISTS rrp_feature_idx ON public.route_runtime_packets (feature_id, captured_at DESC)"
-      ]
+      "missingIndexes": [],
+      "executed": []
     }
   ],
   "summary": {
     "tablesChecked": 4,
-    "statementsExecuted": 2,
-    "statementsSkipped": 66,
+    "statementsExecuted": 0,
+    "statementsSkipped": 55,
     "errors": []
   }
 }

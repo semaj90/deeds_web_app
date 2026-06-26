@@ -12,10 +12,11 @@
  *   node scripts/semantic-valkey/seed-opencode-rules.mjs --embed   # also write vec entries
  */
 
-import { createClient } from 'redis';
-import { createHash }   from 'node:crypto';
+import Redis from 'ioredis';
+import { createHash } from 'node:crypto';
 
-const REDIS_URL  = process.env.REDIS_URL  ?? `redis://${process.env.REDIS_HOST ?? '127.0.0.1'}:${process.env.REDIS_PORT ?? 6379}`;
+const REDIS_HOST = process.env.REDIS_HOST ?? '127.0.0.1';
+const REDIS_PORT = process.env.REDIS_PORT ?? 6379;
 const REDIS_PASS = process.env.REDIS_PASSWORD ?? process.env.REDIS_PASS ?? 'redis';
 const DRY_RUN    = process.argv.includes('--dry-run');
 const WITH_EMBED = process.argv.includes('--embed');
@@ -177,10 +178,15 @@ async function embedText(text) {
 
 // ── Seed ──────────────────────────────────────────────────────────────────────
 
-const redis = createClient({
-  url: REDIS_URL,
+const redis = new Redis({
+  host: REDIS_HOST,
+  port: REDIS_PORT,
   password: REDIS_PASS,
-  socket: { connectTimeout: 4000 },
+  connectTimeout: 4000,
+  maxRetriesPerRequest: 1,
+  enableOfflineQueue: false,
+  retryStrategy: () => null,
+  lazyConnect: true,
 });
 redis.on('error', () => {});
 await redis.connect();
@@ -194,7 +200,7 @@ async function writeCard(key, fields) {
     skipped++;
     return;
   }
-  await redis.hSet(key, fields);
+  await redis.hset(key, fields);
   await redis.expire(key, TTL);
   written++;
 }
@@ -219,7 +225,7 @@ for (const rule of RULES) {
       const id = `rule:${rule.topic}`;
       const semKey = `prompt:sem:v1:${id}`;
       const inputHash = createHash('sha256').update(rule.summary.toLowerCase()).digest('hex');
-      await redis.hSet(semKey, {
+      await redis.hset(semKey, {
         id,
         kind: 'rule',
         inputHash,
@@ -259,7 +265,7 @@ for (const fix of FIXES) {
       const id = `fix:${fix.errorHash}`;
       const semKey = `prompt:sem:v1:${id}`;
       const inputHash = createHash('sha256').update(fix.summary.toLowerCase()).digest('hex');
-      await redis.hSet(semKey, {
+      await redis.hset(semKey, {
         id,
         kind: 'fix',
         inputHash,
@@ -280,7 +286,7 @@ for (const fix of FIXES) {
   console.log(`  ${DRY_RUN ? '[dry]' : '✅'} fix:${fix.errorHash}`);
 }
 
-await redis.quit();
+await redis.disconnect();
 console.log(`\n── Done: ${written} written, ${skipped} dry-run skipped`);
 console.log('   Lookup: redis-cli HGETALL opencode:rule:v1:tool-failure-proof');
 if (WITH_EMBED) console.log('   Vectors indexed under prompt:sem:v1:rule:* and prompt:sem:v1:fix:*');

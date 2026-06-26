@@ -10460,7 +10460,6 @@
     "sveltekit-frontend/tests/seeded-cases-e2e.spec.ts",
     "sveltekit-frontend/tests/simple-ux-test.spec.ts",
     "sveltekit-frontend/tests/sprint1-critical-fixes.spec.ts",
-    "sveltekit-frontend/tests/sprint1-critical-fixes.spec.ts",
     "sveltekit-frontend/tests/sprint2-embedding-consolidation.spec.ts",
     "sveltekit-frontend/tests/sprint4-production-readiness.spec.ts",
     "sveltekit-frontend/tests/sprint5-6-monitoring.spec.ts",
@@ -10594,6 +10593,11 @@
   ],
   "sveltekit-frontend/src/routes/api/ai/yorha/context-chat/+server.ts": [
     "sveltekit-frontend/tests/routes/auto/api/ai/yorha/context-chat.test.ts"
+  ],
+  "sveltekit-frontend/src/routes/api/analytics/deep-research/+server.ts": [
+    "sveltekit-frontend/tests/routes/auto/api/analytics/deep-research.test.ts",
+    "sveltekit-frontend/tests/routes/auto/api/analytics/deep-research.test.ts",
+    "sveltekit-frontend/tests/routes/auto/api/analytics/deep-research.test.ts"
   ],
   "sveltekit-frontend/src/routes/api/analytics/research-summaries/[id]/+server.ts": [
     "sveltekit-frontend/tests/routes/auto/api/analytics/research-summaries/__id.test.ts",
@@ -10802,6 +10806,9 @@
   "sveltekit-frontend/src/routes/api/reports/[id]/publish/+server.ts": [
     "sveltekit-frontend/tests/routes/auto/api/reports/__id/publish.test.ts",
     "sveltekit-frontend/tests/routes/auto/api/reports/__id/publish.test.ts"
+  ],
+  "sveltekit-frontend/src/routes/api/research/concurrent-deep/stream/+server.ts": [
+    "sveltekit-frontend/tests/routes/auto/api/research/concurrent-deep/stream.test.ts"
   ],
   "sveltekit-frontend/src/routes/api/routes/[routeId]/errors/+server.ts": [
     "sveltekit-frontend/tests/routes/auto/api/routes/__routeId/errors.test.ts",

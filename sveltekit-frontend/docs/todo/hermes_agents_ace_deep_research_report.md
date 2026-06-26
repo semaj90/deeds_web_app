@@ -1,7 +1,7 @@
 # Hermes Agents for ACE Deep Research, Case Building, GraphRAG, and Rapid Prototyping
 
-**Prepared for:** James Woodard  
-**Date:** 2026-05-11  
+**Prepared for:** James Woodard
+**Date:** 2026-05-11
 **Stack context:** Hermes Agent, Ollama/Gemma4 VLM, SvelteKit ACE, TRACE MCP, Qdrant, Redis, Neo4j, CouchDB, Postgres, CUDA/AVX2, Obsidian, local deep research
 
 ---
@@ -31,7 +31,7 @@ The highest-value use case is:
 ```txt
 Busy prosecutor / investigator
   → drop videos, PDFs, transcripts, evidence notes, case law, prior opinions
-  → Hermes batches extraction and indexing
+  → langchain batches extraction and indexing
   → ACE clusters chunks and builds graph relationships
   → Gemma4 summarizes and explains
   → Neo4j/CouchDB/Qdrant provide cross-reference memory
