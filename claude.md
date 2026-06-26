@@ -26,6 +26,119 @@ deeds-web-app/
 
 ---
 
+## ⚡ SESSIONS 82–83: LangGraph Worker + ACP/MCP Telemetry (COMPLETE)
+
+**Status**: ✅ LangGraph 8-node state machine + telemetry system complete. Ready for integration.
+
+**Key Files**:
+- `packages/atlas-core/src/langgraph/worker.ts` (538 lines) — 8-node orchestrator with all TODO sections wired
+- `packages/atlas-core/src/langgraph/clients.ts` (250 lines) — Postgres/Redis/Qdrant/Neo4j service clients
+- `packages/atlas-core/src/telemetry/acp-mcp-telemetry.ts` (420 lines) — unified observability (decisions + tool calls + async ops)
+
+**Routing Decision Tree for Agent Work**:
+
+```
+Is this work about orchestrating async agent loops?
+  → Use LangGraph worker (packages/atlas-core/src/langgraph/)
+    ├─ load_trace_state: Redis cache → Postgres fallback
+    ├─ packet_registry_lookup: validate identity + Postgres read
+    ├─ bitfrost_cache_check: L1/L2 cache (ff1:packet:*, ff1:feature:*)
+    ├─ hybrid_retrieval: Qdrant RAG + Neo4j KAG (parallel)
+    ├─ optional_gpu_rerank: skip if < 5 candidates
+    ├─ packet_truth_validate: 3 hard fail gates
+    ├─ gemma4_synthesis: LLM generation (TODO: wire TurboQuant)
+    └─ write_trace_event: Postgres write → Redis invalidate → NATS emit (TODO: wire NATS)
+
+Is this work about observability/debugging slow queries?
+  → Use ACP/MCP Telemetry (packages/atlas-core/src/telemetry/)
+    ├─ AcpRoutingDecision: record routing choices (cache strategy, tool set, reranker)
+    ├─ McpToolCall: record tool invocation (name, params, execution time, cache hits)
+    ├─ AsyncOp: record granular awaits (postgres.query, redis.get, qdrant.search, neo4j.run)
+    ├─ TelemetryCollector: accumulate + correlate + attribute latency
+    ├─ TelemetryAnalyzer: drill down ("Why is my query slow?")
+    └─ TelemetryExporter: export to Langfuse/Datadog/Jaeger/Redis
+
+Canonical Truth Flow (5 steps — STRICT ORDER):
+  1. Read from Postgres (loadTraceState, packetRegistryLookup)
+  2. Validate structure (packetTruthValidate, 3 hard fail gates)
+  3. Write to Postgres (writeTraceEvent, set updated_at = NOW())
+  4. Invalidate Redis (writeTraceEvent, delete ff1:* keys AFTER Postgres succeeds)
+  5. Emit NATS events (writeTraceEvent, publish to SUBJECTS.TRACE_CHECKPOINT)
+```
+
+**Hard Rules for Agent Routing**:
+- ✅ LangGraph = loop controller ONLY (no datastore ownership)
+- ✅ Postgres = truth (all hard fail gates check Postgres first)
+- ✅ Redis = hot memory (invalidate AFTER Postgres write succeeds)
+- ✅ Qdrant/Neo4j = mirrors (read-only, no write access from worker)
+- ✅ NATS = event bus (non-blocking, async notifications)
+- ✅ Async visibility = TelemetryCollector records every await()
+
+**Next Steps (Session 84)**:
+1. Wire TelemetryCollector into all 8 worker nodes
+2. Export telemetry to Redis (simplest backend)
+3. Build Grafana dashboard from Redis telemetry
+4. Add alerts (cache_hit_rate < 0.4, critical_path > 10s)
+
+---
+
+## ⚡ SESSION 84 (In Progress): Go Retrieval Integration + Admin UI
+
+**Status**: ✅ Go search service fully wired into admin console.
+
+**What Was Integrated**:
+- **Go Search Bridge** (`src/lib/server/retrieval/go-search-bridge.ts`) — TypeScript wrapper for Go legal search service (HTTP :8096 or gRPC :50055)
+- **Admin API Routes** (`src/routes/api/admin/retrieval/`) — 3 endpoints:
+  - `/api/admin/retrieval/search` (GET/POST) — paginated search with RRF fusion
+  - `/api/admin/retrieval/clusters` (GET) — paginated SOM cluster listing
+  - `/api/admin/retrieval/clusters/[id]` (GET) — cluster detail with packets
+- **Admin UI Pages** (`src/routes/(app)/command-center/retrieval/`) — Svelte 5 cluster browser with pagination
+
+**Routing Decision Tree for Retrieval Work**:
+
+```
+Is this work about browsing indexed packets?
+  → Use Go Retrieval Bridge (src/lib/server/retrieval/go-search-bridge.ts)
+    ├─ searchGoService() — parallel Qdrant + BM25 + FTS with RRF
+    ├─ suggestGoService() — autocomplete suggestions
+    ├─ getTocGoService() — document hierarchy
+    ├─ getNodeGoService() — node context with chunks
+    ├─ resolveCitationGoService() — citation resolution
+    └─ healthGoService() — service health check
+
+Is this work about admin cluster browsing?
+  → Use Admin API Routes (/api/admin/retrieval/)
+    ├─ POST /search?q= — full-text index search
+    ├─ GET /clusters — paginated SOM cluster list
+    └─ GET /clusters/[id] — single cluster detail
+
+Is this work about displaying retrieval results in UI?
+  → Use SvelteKit Pages (/command-center/retrieval/)
+    ├─ Cluster browser with pagination (20 items/page)
+    ├─ Sorting by authority or packet count
+    └─ Detail modal showing packets within cluster
+```
+
+**Key Files**:
+- Bridge: `src/lib/server/retrieval/go-search-bridge.ts` (320 lines)
+- APIs: `src/routes/api/admin/retrieval/[search,clusters,clusters/[id]]/+server.ts` (280 lines)
+- UI: `src/routes/(app)/command-center/retrieval/+page.svelte` (180 lines)
+
+**Port Configuration**:
+- **HTTP** (primary): :8100 (go-retrieval unified) or :8096 (go-search-service dedicated)
+- **gRPC** (fallback): :50055 (go-search-service) ⚠️ collision with chr97-agent-client, see note below
+- **SvelteKit UI**: :5173
+
+**⚠️ Port 50055 Collision Note**:
+- Both `go-search-service` (gRPC) and `chr97-agent-client` claim port 50055
+- **Mitigation**: HTTP bridge (:8100 or :8096) is primary; gRPC is read-only fallback
+- **Fix**: Move chr97 to port 50057 if both services need simultaneous gRPC
+- **Current Status**: HTTP is sufficient; gRPC collision is documented but non-blocking
+
+**See**: `docs/GO-RETRIEVAL-INTEGRATION-WIRED.md` for full architecture, usage, and fallback patterns.
+
+---
+
 ## ⚡ PRIORITY: Parent Atlas P0–P7 Roadmap (Identity Frozen)
 
 **Authoritative Reference**: `memory/parent-atlas-frozen-identity-contract.md`

@@ -1,9 +1,9 @@
 {
-  "generated": "2026-06-24T17:25:30.141Z",
+  "generated": "2026-06-26T16:58:44.142Z",
   "mode": "apply",
-  "total": 17995,
+  "total": 18046,
   "cohorts": 1,
-  "avgFreshness": 0.9860055570995798,
+  "avgFreshness": 0.9810756400308785,
   "withReward": 17985,
   "warmTotal": 0,
   "bifrostProbeLimit": 200,
@@ -12,7 +12,7 @@
   "cohortList": [
     {
       "month": "2026-06",
-      "count": 17995
+      "count": 18046
     }
   ]
 }

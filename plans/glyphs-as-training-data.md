@@ -1,9 +1,9 @@
 # Plan: ES Glyphs As Training Data
 
-**Created:** 2026-05-28  
-**Updated:** 2026-05-29 (Phase 1 complete + integrated into master implementation roadmap)  
-**Scope:** Wire the existing GlyphRecord infrastructure into a QLoRA training pipeline that teaches Gemma Atlas concepts via compressed symbolic glyphs instead of raw text.  
-**Status:** **Phase 1 COMPLETE** — Phase 2 ready to launch  
+**Created:** 2026-05-28
+**Updated:** 2026-05-29 (Phase 1 complete + integrated into master implementation roadmap)
+**Scope:** Wire the existing GlyphRecord infrastructure into a QLoRA training pipeline that teaches Gemma Atlas concepts via compressed symbolic glyphs instead of raw text.
+**Status:** **Phase 1 COMPLETE** — Phase 2 ready to launch
 **Master Status:** See [MASTER-IMPLEMENTATION-STATUS-2026-05-29.md](../MASTER-IMPLEMENTATION-STATUS-2026-05-29.md) for full 4-stream roadmap (Glyphs + NES UI + 3-Track Reconstruction + Codebase Organization).
 
 ---
@@ -161,7 +161,7 @@ Aliases:
 
 **Goal:** Compute `grpoRewardScore` for each glyph and emit `{prompt, completion}` JSONL files that teach Gemma Atlas patterns.
 
-### 2A — GRPO reward score computation
+### 2A — GRPO reward rank computation
 
 The reward is cosine similarity between a glyph's embedding and a "reference" embedding representing a known-good answer for that glyph's domain. This is the same signal `glyph-tile-engine.ts` already computes for tile clustering — reuse it.
 

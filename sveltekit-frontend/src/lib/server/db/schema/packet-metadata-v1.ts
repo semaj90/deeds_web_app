@@ -6,6 +6,9 @@
  *
  * Never let path/runtime evidence replace packet identity.
  * Split into 4 orthogonal categories: identity, runtime, workspace, ranking.
+ *
+ * Note: This PacketIdentity type mirrors packages/atlas-core/src/packet/identity.ts
+ * (Pass 1 consolidation deferred until atlas-core is integrated into build system)
  */
 
 /** Core packet identity — immutable, keys the entire system */

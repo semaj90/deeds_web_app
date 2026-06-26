@@ -16,6 +16,7 @@ import { getQdrantClient } from '$lib/server/vector/qdrant-manager.js';
 import { getRedis } from '$lib/server/redis.js';
 import { db } from '$lib/server/db/client.js';
 import { atlas_packets } from '$lib/server/db/schema-postgres.js';
+import { embedText } from '$lib/server/embedding/embed.js';
 import { eq } from 'drizzle-orm';
 
 export interface MaterializeOptions {
@@ -86,9 +87,20 @@ export async function materializePacket(options: MaterializeOptions): Promise<Ma
       metadata: pkt.metadata || {}
     };
 
-    // 4. Get or create vector (placeholder: use zeros for now)
-    // In production, fetch from embedding cache or recompute
-    const vector = new Array(VECTOR_DIM).fill(0.5);
+    // 4. Generate embedding vector from packet summary + title
+    // Uses 4-tier cache: Redis L3 → Postgres L4 → gRPC embedding → Ollama fallback
+    let vector: number[];
+    try {
+      const embeddingText = `${pkt.feature_label || ''} ${pkt.summary || ''}`.trim();
+      if (!embeddingText) {
+        throw new Error('No text to embed');
+      }
+      vector = await embedText(embeddingText);
+    } catch (err) {
+      console.error(`Embedding generation failed for ${options.packetKey}:`, err);
+      // Fallback: use zero vector (will degrade search quality)
+      vector = new Array(VECTOR_DIM).fill(0);
+    }
 
     // 5. Upsert to Qdrant (if not dry-run)
     if (!options.dryRun) {
@@ -196,9 +208,10 @@ export async function getPacketMaterializationStatus(packetKey: string): Promise
   const redisKey = `bifrost:packet:${packetKey}`;
   const inRedis = await redis.exists(redisKey);
 
-  // Check Qdrant (simple check via search for packet_key in payload)
+  // Check Qdrant (search using zero vector as proxy for existence check)
   let inQdrant = false;
   try {
+    // Use a zero vector for existence check (faster than full embedding generation)
     const results = await qdrant.search('codebase_chunks_768', {
       vector: new Array(VECTOR_DIM).fill(0),
       limit: 1,

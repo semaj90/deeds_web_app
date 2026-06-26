@@ -1,31 +1,31 @@
 {
-  "generated": "2026-06-22T21:37:01.385Z",
+  "generated": "2026-06-26T16:57:57.361Z",
   "mode": "apply",
-  "total_scanned": 17985,
-  "already_tagged": 2697,
-  "to_classify": 15288,
-  "known_domain": 15288,
+  "total_scanned": 18046,
+  "already_tagged": 2709,
+  "to_classify": 15337,
+  "known_domain": 15337,
   "unknown": 0,
   "coverage_pct": 100,
   "domain_distribution": {
-    "rag_retrieval": 9224,
-    "evidence_upload_storage": 254,
+    "legal_reports": 1026,
+    "mcp_agents": 655,
+    "neo4j_context_graph": 744,
+    "qdrant_vector_index": 397,
+    "rag_retrieval": 9022,
+    "auth_login_register": 122,
+    "evidence_upload_storage": 252,
     "case_management": 186,
-    "mcp_agents": 659,
-    "qdrant_vector_index": 393,
-    "neo4j_context_graph": 743,
     "tests_smoke_harness": 381,
-    "redis_bitfrost_cache": 746,
-    "legal_reports": 765,
+    "redis_bitfrost_cache": 745,
+    "document_processing": 216,
     "citation_engine": 70,
-    "document_processing": 220,
-    "admin_observability": 1428,
-    "auth_login_register": 121,
-    "gpu_turbovec_libtorch": 98
+    "admin_observability": 1424,
+    "gpu_turbovec_libtorch": 97
   },
-  "db_updated": 15288,
+  "db_updated": 15337,
   "qdrant_updated": "skipped",
-  "redis_entries": 15288,
+  "redis_entries": 15337,
   "gates": [
     {
       "name": "domain_coverage",
@@ -35,7 +35,7 @@
     {
       "name": "db_write_success",
       "pass": true,
-      "detail": "15288 rows updated"
+      "detail": "15337 rows updated"
     },
     {
       "name": "unknown_below_5",

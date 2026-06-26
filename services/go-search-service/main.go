@@ -590,6 +590,7 @@ func (s *libraryServer) parallelSearch(ctx context.Context, req *searchRequest) 
 	})
 
 	// 4. Qdrant ANN search (native gRPC with BM42 hybrid, REST fallback)
+	// Try legal_documents first, then fall back to codebase_chunks_768 if no results
 	g.Go(func() error {
 		if embedding == nil {
 			select {
@@ -600,6 +601,10 @@ func (s *libraryServer) parallelSearch(ctx context.Context, req *searchRequest) 
 		}
 		t := time.Now()
 		hits := s.searchQdrant(gCtx, embedding, req)
+		if len(hits) == 0 {
+			// Fallback to codebase_chunks_768 if legal_documents returned nothing
+			hits = s.searchCodebaseChunks(gCtx, embedding, req)
+		}
 		select {
 		case results <- result{hits, "qdrant", time.Since(t).Milliseconds()}:
 		case <-gCtx.Done():
@@ -1079,6 +1084,153 @@ func (s *libraryServer) searchKnowledgeBase(ctx context.Context, embedding []flo
 			hit.CorpusType = "knowledge_base"
 		}
 		hit.ChunkID = fmt.Sprintf("kb-%v", r.ID)
+		hits = append(hits, hit)
+	}
+	return hits
+}
+
+// searchCodebaseChunks searches the codebase_chunks_768 Qdrant collection for code-related queries.
+// This collection is populated by the Atlas semantic indexing pipeline and contains packet embeddings.
+// Falls back to REST API if the native client is unavailable.
+func (s *libraryServer) searchCodebaseChunks(ctx context.Context, embedding []float32, req *searchRequest) []libraryHit {
+	if embedding == nil {
+		return nil
+	}
+
+	// Try native gRPC first if available
+	if s.qdrant != nil {
+		hits := s.searchCodebaseChunksNative(ctx, embedding, req)
+		if hits != nil {
+			return hits
+		}
+	}
+
+	// Fall back to REST API
+	return s.searchCodebaseChunksREST(ctx, embedding, req)
+}
+
+// searchCodebaseChunksNative performs dense-only ANN search on codebase_chunks_768 via gRPC.
+func (s *libraryServer) searchCodebaseChunksNative(ctx context.Context, embedding []float32, req *searchRequest) []libraryHit {
+	limit := uint64(req.Limit * 2)
+
+	contentVecName := "embedding"
+	queryReq := &qdrantclient.QueryPoints{
+		CollectionName: "codebase_chunks_768",
+		Query:          qdrantclient.NewQuery(embedding...),
+		Using:          &contentVecName,
+		Limit:          &limit,
+		WithPayload:    qdrantclient.NewWithPayload(true),
+	}
+
+	points, err := s.qdrant.Query(ctx, queryReq)
+	if err != nil {
+		slog.Debug("codebase chunks native search failed, falling back to REST",
+			"error", err, "collection", "codebase_chunks_768")
+		return nil
+	}
+
+	slog.Debug("codebase chunks native search success",
+		"collection", "codebase_chunks_768",
+		"results", len(points),
+	)
+
+	return codebasePointsToHits(points)
+}
+
+// searchCodebaseChunksREST performs dense-only ANN search on codebase_chunks_768 via REST.
+func (s *libraryServer) searchCodebaseChunksREST(ctx context.Context, embedding []float32, req *searchRequest) []libraryHit {
+	type qdrantReq struct {
+		Vector      any `json:"vector"`
+		Limit       int `json:"limit"`
+		WithPayload bool `json:"with_payload"`
+	}
+
+	body := qdrantReq{
+		Vector:      map[string]any{"name": "embedding", "vector": embedding},
+		Limit:       req.Limit * 2,
+		WithPayload: true,
+	}
+
+	jsonBody, _ := json.Marshal(body)
+
+	httpReq, _ := http.NewRequestWithContext(ctx, "POST",
+		s.cfg.QdrantURL+"/collections/codebase_chunks_768/points/search",
+		strings.NewReader(string(jsonBody)))
+	httpReq.Header.Set("Content-Type", "application/json")
+
+	resp, err := s.httpClient.Do(httpReq)
+	if err != nil {
+		slog.Warn("codebase chunks REST search failed", "error", err)
+		return nil
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != 200 {
+		slog.Warn("codebase chunks REST non-200", "status", resp.StatusCode)
+		return nil
+	}
+
+	var qdResp struct {
+		Result []struct {
+			ID      any            `json:"id"`
+			Score   float64        `json:"score"`
+			Payload map[string]any `json:"payload"`
+		} `json:"result"`
+	}
+	if err := json.NewDecoder(resp.Body).Decode(&qdResp); err != nil {
+		slog.Warn("codebase chunks REST decode failed", "error", err)
+		return nil
+	}
+
+	var hits []libraryHit
+	for _, r := range qdResp.Result {
+		hit := libraryHit{
+			Score:     r.Score,
+			MatchType: "codebase",
+		}
+		if p := r.Payload; p != nil {
+			hit.ChunkID = strVal(p, "packet_key")
+			if hit.ChunkID == "" {
+				hit.ChunkID = strVal(p, "chunk_id")
+			}
+			hit.Title = strVal(p, "source_ref")
+			hit.Heading = strVal(p, "feature_id")
+			hit.Snippet = strVal(p, "summary")
+			hit.CorpusType = "codebase"
+			hit.SourceType = "source_code"
+			hit.NodePath = strVal(p, "directory_path")
+		}
+		if hit.ChunkID == "" {
+			hit.ChunkID = fmt.Sprintf("cb-%v", r.ID)
+		}
+		hits = append(hits, hit)
+	}
+	return hits
+}
+
+// codebasePointsToHits converts Qdrant query results from codebase_chunks_768 to libraryHit slice.
+func codebasePointsToHits(points []*qdrantclient.ScoredPoint) []libraryHit {
+	var hits []libraryHit
+	for _, p := range points {
+		hit := libraryHit{
+			Score:     float64(p.Score),
+			MatchType: "codebase",
+		}
+		if payload := p.GetPayload(); payload != nil {
+			hit.ChunkID = qdrantStr(payload, "packet_key")
+			if hit.ChunkID == "" {
+				hit.ChunkID = qdrantStr(payload, "chunk_id")
+			}
+			hit.Title = qdrantStr(payload, "source_ref")
+			hit.Heading = qdrantStr(payload, "feature_id")
+			hit.Snippet = qdrantStr(payload, "summary")
+			hit.CorpusType = "codebase"
+			hit.SourceType = "source_code"
+			hit.NodePath = qdrantStr(payload, "directory_path")
+		}
+		if hit.ChunkID == "" {
+			hit.ChunkID = fmt.Sprintf("cb-%v", p.GetId())
+		}
 		hits = append(hits, hit)
 	}
 	return hits

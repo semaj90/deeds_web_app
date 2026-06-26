@@ -12,6 +12,7 @@ import { countTokens, enforceTokenBudget } from '$lib/server/llm/token-budget.js
 import { getRedis } from '$lib/server/redis.js';
 import { turbovecPrefilter, turbovecSearch } from '$lib/server/retrieval/turbovec-prefilter.js';
 import { existsSync } from 'node:fs';
+import { validateAceSchema, type SchemaValidationResult } from '$lib/server/ai/ace-schema-validator.js';
 
 const execFileAsync = promisify(execFile);
 const DOCUMENT_KNOWLEDGE_COLLECTION = 'document_knowledge_768';
@@ -805,6 +806,26 @@ export async function buildAcePromptPreflight(
         ACE_CTX_TTL_SECONDS,
       )
       .catch(() => {});
+  }
+
+  // P3 Gate: Validate ACE schema before returning prompt
+  // Block placeholder terms and unsafe writes
+  const schemaValidation = validateAceSchema({
+    text: promptUser + promptSystem + promptContext,
+    packet: packedCards[0]
+      ? {
+          source_ref: packedCards[0].sourceRefs?.[0],
+          feature_id: packedCards[0].featureLabels?.[0],
+          packet_key: packedCards[0].cardId,
+        }
+      : undefined,
+  });
+
+  // Log validation result for audit
+  if (!schemaValidation.valid) {
+    console.warn('❌ ACE Schema Validation FAILED:', schemaValidation.report);
+    // Store failed validation in Redis for operators to review
+    await redis.set(`ace:schema:invalid:${queryHash}`, JSON.stringify(schemaValidation), 'EX', 3600).catch(() => {});
   }
 
   return {
