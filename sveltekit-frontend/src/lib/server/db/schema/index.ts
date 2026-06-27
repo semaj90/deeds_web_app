@@ -32,6 +32,9 @@ export * from './errorBrainDiffs.js';
 export * from './ace-web-crawl.js';
 export * from '../schema-ace.js';
 
+// Phase 85a: Production Feedback Loop (Semantic Diff, Artifact Registry)
+export * from './atlas-semantic-diffs.js';
+
 // Analytics (user_analytics_events — used via raw SQL in event-logger.ts)
 export * from './analytics.js';
 

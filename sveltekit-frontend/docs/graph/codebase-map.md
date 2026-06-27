@@ -1,5 +1,5 @@
 # Codebase Map — 20-Gate Deep Audit
-> Generated: 2026-06-27T18:28:13.634Z
+> Generated: 2026-06-27T19:39:55.864Z
 > Mode: `fast-ast` · CPU-only · No GPU required
 > Regenerate: `npm run index:codebase:fast:plan`
 
@@ -8,9 +8,9 @@
 ## Summary
 | Metric | Count |
 |--------|-------|
-| Files scanned | 68353 |
-| Directories analysed | 952 |
-| Route files | 1115 |
+| Files scanned | 68359 |
+| Directories analysed | 765 |
+| Route files | 191 |
 | Svelte components | 5720 |
 | API handlers | 7146 |
 | API routes without auth | 9 |
@@ -18,9 +18,9 @@
 | SSR-unsafe files | 0 |
 | Svelte 4 legacy patterns | 28 |
 | Hardcoded localhost refs | 2963 |
-| Routes without test pairing | 80 |
+| Routes without test pairing | 39 |
 | Cyclic import pairs | 3 |
-| Drizzle table refs | 5736 |
+| Drizzle table refs | 5738 |
 | TODO/FIXME markers | 1129 |
 
 ---
@@ -29,22 +29,22 @@
 
 | Gate | Check | Pass | Fail |
 |------|-------|------|------|
-| G4  | Auth guard on API routes | 852 | 10 |
-| G5  | Zod validation on API routes | 600 | 3 |
-| G11 | No hardcoded localhost (excl env.server) | 65390 | 2963 |
-| G14a | No `export let` (Svelte 4 props) | 68348 | 5 |
-| G14b | No `$:` reactive declarations | 68341 | 12 |
-| G14c | No `on:event=` directives | 68336 | 17 |
-| G14d | No `createEventDispatcher()` | 68353 | 0 |
-| G14e | No runes in plain `.ts` files | 68278 | 75 |
-| G15 | No SSR-unsafe globals (unguarded) | 68353 | 0 |
-| G16 | Server routes have test pairing | 717 | 80 |
-| G17 | Server routes have error handling | 762 | 113 |
+| G4  | Auth guard on API routes | 153 | 10 |
+| G5  | Zod validation on API routes | 110 | 3 |
+| G11 | No hardcoded localhost (excl env.server) | 65396 | 2963 |
+| G14a | No `export let` (Svelte 4 props) | 68354 | 5 |
+| G14b | No `$:` reactive declarations | 68347 | 12 |
+| G14c | No `on:event=` directives | 68342 | 17 |
+| G14d | No `createEventDispatcher()` | 68359 | 0 |
+| G14e | No runes in plain `.ts` files | 68284 | 75 |
+| G15 | No SSR-unsafe globals (unguarded) | 68359 | 0 |
+| G16 | Server routes have test pairing | 110 | 39 |
+| G17 | Server routes have error handling | 153 | 13 |
 | G20 | Cyclic import pairs | — | 3 |
 
 ---
 
-## Directory Scorecard (952 dirs · lowest score = most attention needed)
+## Directory Scorecard (765 dirs · lowest score = most attention needed)
 
 **Score factors**: Auth/API coverage 25pts · Zod coverage 15pts · Drizzle ref 10pts · No TODOs 15pts · SSR-safe 10pts · No Svelte4 10pts · No localhost 5pts · Error handling 5pts · Non-empty 5pts
 
@@ -53,138 +53,98 @@
 
 | Status | Directory | Score | Files | Lines | APIs | Auth/Zod | TODOs | Flags |
 |--------|-----------|-------|-------|-------|------|----------|-------|-------|
-| ⚠️ | `scripts/api-cleanup/reports/backup-2025-12-14T21-11-49-641Z` | 44 | 554 | 22618 | 452 | 48/54 | 74 | 🟠lh |
-| ⚠️ | `scripts/api-cleanup` | 45 | 40 | 201148 | 2450 | 262/388 | 670 | 🟠lh |
-| ⚠️ | `scripts/api-cleanup/reports` | 45 | 6 | 191588 | 2442 | 262/384 | 668 | 🟠lh |
-| ⚠️ | `scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z` | 45 | 2154 | 158310 | 1990 | 214/330 | 594 | 🟠lh |
-| ⚠️ | `.claude/worktrees/agent-a38668f2/src` | 51 | 43 | 2276 | 7 | 1/6 | 4 | 🟡sv4 |
-| ⚠️ | `.claude/worktrees/agent-a6ea9982/src` | 51 | 43 | 2276 | 7 | 1/6 | 4 | 🟡sv4 |
-| ⚠️ | `.claude/worktrees/agent-a7203461/src` | 51 | 43 | 2276 | 7 | 1/6 | 4 | 🟡sv4 |
-| ⚠️ | `.claude/worktrees/agent-ae7221f6/src` | 51 | 43 | 2276 | 7 | 1/6 | 4 | 🟡sv4 |
-| ⚠️ | `sveltekit-frontend/src/routes/.well-known` | 58 | 4 | 512 | 4 | 0/2 | 0 | — |
-| ⚠️ | `.claude/worktrees/agent-a87590c9/src` | 59 | 54 | 3420 | 8 | 1/7 | 1 | 🟡sv4 |
-| ⚠️ | `docker/langgraph-synthesis/.venv/Lib` | 65 | 54 | 298352 | 0 | 0/4 | 44 | 🔴ssr |
+| ⚠️ | `scripts/api-cleanup/reports` | 45 | 4 | 191488 | 2442 | 262/384 | 668 | 🟠lh |
+| ⚠️ | `scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z` | 45 | 2610 | 180612 | 2436 | 258/380 | 664 | 🟠lh |
+| ⚠️ | `.claude/worktrees/agent-a38668f2/src` | 51 | 214 | 11128 | 35 | 5/30 | 16 | 🟡sv4 |
+| ⚠️ | `docker/langgraph-synthesis/.venv/Lib` | 65 | 60 | 300052 | 0 | 0/4 | 44 | 🔴ssr |
+| ⚠️ | `sveltekit-frontend/src/routes/.well-known` | 65 | 2 | 371 | 2 | 0/2 | 0 | — |
+| ⚠️ | `.claude/worktrees/agent-a87590c9/src` | 68 | 12 | 1396 | 1 | 0/1 | 1 | — |
 | ✅ | `llama-cpp-turboquant-gemma4/tools/server` | 70 | 1 | 60689 | 0 | 2/24 | 3 | 🟠lh |
 | ✅ | `scripts/verify` | 70 | 16 | 3594 | 0 | 0/8 | 8 | 🟠lh |
+| ✅ | `scripts/api-cleanup/reports/backup-2025-12-14T21-11-49-641Z` | 72 | 6 | 224 | 6 | 4/4 | 4 | — |
 | ✅ | `llama-cpp-turboquant-gemma4/tools/server/webui` | 78 | 435 | 57041 | 0 | 1/18 | 1 | 🟠lh |
 | ✅ | `packages/atlas-core/src/langgraph` | 78 | 4 | 1062 | 0 | 0/2 | 2 | 🟠lh |
-| ✅ | `packages/parent-atlas` | 78 | 3 | 3969 | 0 | 0/3 | 1 | 🟠lh |
-| ✅ | `packages/parent-atlas/src` | 78 | 3 | 3593 | 0 | 0/3 | 1 | 🟠lh |
-| ✅ | `sveltekit-frontend/sveltekit-frontend/sveltekit-frontend/sveltekit-frontend` | 78 | 4 | 787 | 0 | 0/0 | 1 | 🟠lh |
+| ✅ | `packages/parent-atlas` | 78 | 3 | 5105 | 0 | 0/5 | 1 | 🟠lh |
+| ✅ | `packages/parent-atlas/src` | 78 | 3 | 4729 | 0 | 0/5 | 1 | 🟠lh |
+| ✅ | `sveltekit-frontend/src/lib/server` | 80 | 362 | 93752 | 0 | 3/117 | 7 | 🟠lh |
 | ✅ | `llama-cpp-turboquant-gemma4/tools/server/public_legacy` | 83 | 5 | 1474 | 0 | 0/2 | 2 | — |
 | ✅ | `packages/parent-atlas/src/core` | 83 | 2 | 798 | 0 | 0/0 | 1 | — |
 | ✅ | `scripts/benchmark` | 83 | 2 | 774 | 0 | 0/2 | 2 | — |
-| ✅ | `sveltekit-frontend/src/lib/workers` | 83 | 10 | 1873 | 0 | 0/1 | 2 | — |
-| ✅ | `sveltekit-frontend/src/routes/api` | 84 | 753 | 113790 | 747 | 732/573 | 1 | 🟠lh ⬜notest |
-| ✅ | `.claude/worktrees/agent-a38668f2/tests` | 85 | 4 | 602 | 0 | 0/1 | 0 | 🟠lh |
-| ✅ | `.claude/worktrees/agent-a6ea9982/tests` | 85 | 4 | 602 | 0 | 0/1 | 0 | 🟠lh |
-| ✅ | `.claude/worktrees/agent-a7203461/tests` | 85 | 4 | 602 | 0 | 0/1 | 0 | 🟠lh |
-| ✅ | `.claude/worktrees/agent-a87590c9/tests` | 85 | 6 | 1103 | 0 | 0/2 | 0 | 🟠lh |
-| ✅ | `.claude/worktrees/agent-ae7221f6/tests` | 85 | 4 | 602 | 0 | 0/1 | 0 | 🟠lh |
+| ✅ | `sveltekit-frontend/sveltekit-frontend/sveltekit-frontend/src` | 83 | 1 | 143 | 1 | 1/1 | 1 | — |
+| ✅ | `.claude/worktrees/agent-a38668f2/tests` | 85 | 28 | 4214 | 0 | 0/7 | 0 | 🟠lh |
+| ✅ | `scripts/startup` | 85 | 21 | 3908 | 0 | 0/2 | 0 | 🟠lh |
+| ✅ | `sveltekit-frontend/scripts/startup` | 85 | 7 | 1559 | 0 | 0/1 | 0 | 🟠lh |
 | ✅ | `claude-mem/src/npx-cli` | 85 | 3 | 3852 | 0 | 0/4 | 0 | 🟠lh |
 | ✅ | `claude-mem/src/npx-cli/commands` | 85 | 6 | 2903 | 0 | 0/2 | 0 | 🟠lh |
 | ✅ | `llama-cpp-turboquant-gemma4/tools/server/bench` | 85 | 1 | 163 | 0 | 0/1 | 0 | 🟠lh |
 | ✅ | `llama-cpp-turboquant-gemma4/tools/server/public_simplechat` | 85 | 3 | 1409 | 0 | 0/1 | 0 | 🟠lh |
-| ✅ | `packages/parent-atlas/src/pipelines` | 85 | 9 | 1291 | 0 | 0/1 | 0 | 🟠lh |
+| ✅ | `packages/parent-atlas/src/pipelines` | 85 | 17 | 2427 | 0 | 0/3 | 0 | 🟠lh |
+| ✅ | `scripts/agent` | 85 | 4 | 1044 | 0 | 0/4 | 0 | 🟠lh |
 | ✅ | `scripts/agentic` | 85 | 10 | 2886 | 0 | 0/10 | 0 | 🟠lh |
-| ✅ | `scripts/ai` | 85 | 8 | 714 | 0 | 0/8 | 0 | 🟠lh |
-| ✅ | `scripts/atlas/ingester` | 85 | 22 | 2668 | 0 | 0/14 | 0 | 🟠lh |
-| ✅ | `scripts/audit` | 85 | 6 | 2078 | 0 | 0/2 | 0 | 🟠lh |
+| ✅ | `scripts/atlas/ingester` | 85 | 6 | 1534 | 0 | 0/4 | 0 | 🟠lh |
+| ✅ | `scripts/audit` | 85 | 4 | 1482 | 0 | 0/2 | 0 | 🟠lh |
 | ✅ | `scripts/docs` | 85 | 2 | 830 | 0 | 0/0 | 0 | 🟠lh |
-| ✅ | `scripts/graph` | 85 | 10 | 2282 | 0 | 0/8 | 0 | 🟠lh |
+| ✅ | `scripts/graph` | 85 | 4 | 1104 | 0 | 0/4 | 0 | 🟠lh |
 | ✅ | `scripts/graphify-audit` | 85 | 8 | 2208 | 0 | 0/4 | 0 | 🟠lh |
-| ✅ | `scripts/operator` | 85 | 6 | 1362 | 0 | 0/4 | 0 | 🟠lh |
-| ✅ | `scripts/smoke` | 85 | 22 | 3464 | 0 | 0/12 | 0 | 🟠lh |
-| ✅ | `scripts/startup` | 85 | 20 | 3568 | 0 | 0/2 | 0 | 🟠lh |
-| ✅ | `scripts/vector` | 85 | 2 | 246 | 0 | 0/0 | 0 | 🟠lh |
-| ✅ | `sveltekit-frontend/.vscode` | 85 | 14 | 6166 | 0 | 0/1 | 0 | 🟠lh |
-| ✅ | `sveltekit-frontend/drizzle` | 85 | 8 | 793407 | 0 | 0/0 | 4 | — |
+| ✅ | `scripts/operator` | 85 | 4 | 936 | 0 | 0/4 | 0 | 🟠lh |
+| ✅ | `scripts/smoke` | 85 | 18 | 2666 | 0 | 0/10 | 0 | 🟠lh |
+| ✅ | `sveltekit-frontend/drizzle` | 85 | 4 | 480248 | 0 | 0/0 | 4 | — |
 | ✅ | `sveltekit-frontend/drizzle/introspected` | 85 | 2 | 20357 | 0 | 0/0 | 4 | — |
-| ✅ | `sveltekit-frontend/public` | 85 | 1 | 572 | 0 | 0/0 | 0 | 🟠lh |
 | ✅ | `sveltekit-frontend/public/js` | 85 | 1 | 571 | 0 | 0/0 | 0 | 🟠lh |
-| ✅ | `sveltekit-frontend/scripts/ace` | 85 | 17 | 1410 | 0 | 0/7 | 0 | 🟠lh |
 | ✅ | `sveltekit-frontend/scripts/diagnose` | 85 | 2 | 379 | 0 | 0/0 | 0 | 🟠lh |
-| ✅ | `sveltekit-frontend/scripts/diagnostics` | 85 | 8 | 571 | 0 | 0/4 | 0 | 🟠lh |
+| ✅ | `sveltekit-frontend/scripts/diagnostics` | 85 | 3 | 291 | 0 | 0/2 | 0 | 🟠lh |
 | ✅ | `sveltekit-frontend/scripts/kag` | 85 | 1 | 308 | 0 | 0/1 | 0 | 🟠lh |
-| ✅ | `sveltekit-frontend/scripts/scenarios` | 85 | 4 | 359 | 0 | 0/3 | 0 | 🟠lh |
-| ✅ | `sveltekit-frontend/src/lib/components` | 85 | 658 | 167251 | 0 | 0/45 | 6 | — |
-| ✅ | `sveltekit-frontend/src/lib/utils` | 85 | 44 | 7288 | 0 | 2/7 | 0 | 🟠lh |
+| ✅ | `sveltekit-frontend/scripts/lib` | 85 | 6 | 1194 | 0 | 0/3 | 0 | 🟠lh |
+| ✅ | `sveltekit-frontend/scripts/scenarios` | 85 | 1 | 38 | 0 | 0/0 | 0 | 🟠lh |
+| ✅ | `sveltekit-frontend/src/lib/utils` | 85 | 4 | 235 | 0 | 0/0 | 0 | 🟠lh |
 | ✅ | `sveltekit-frontend/src/routes/dev` | 85 | 2 | 524 | 0 | 1/1 | 0 | 🟠lh ⬜notest |
-| ✅ | `sveltekit-frontend/sveltekit-frontend/scripts/atlas` | 85 | 6 | 1054 | 0 | 0/3 | 0 | 🟠lh |
-| ✅ | `sveltekit-frontend/sveltekit-frontend/sveltekit-frontend/scripts` | 85 | 5 | 1053 | 0 | 0/1 | 0 | 🟠lh |
+| ✅ | `sveltekit-frontend/sveltekit-frontend/sveltekit-frontend/sveltekit-frontend` | 85 | 3 | 434 | 0 | 0/0 | 0 | 🟠lh |
 | ✅ | `sveltekit-frontend/tests/helpers` | 85 | 3 | 374 | 0 | 1/1 | 0 | 🟠lh |
-| ✅ | `sveltekit-frontend/tests/scripts` | 85 | 3 | 104 | 0 | 0/0 | 0 | 🟠lh |
 | ✅ | `sveltekit-frontend/tmp` | 85 | 14 | 162199 | 0 | 0/0 | 0 | 🟠lh |
 | ✅ | `packages/atlas-core` | 88 | 2 | 6456 | 0 | 0/7 | 2 | 🟠lh |
 | ✅ | `packages/atlas-core/src` | 88 | 1 | 6283 | 0 | 0/7 | 2 | 🟠lh |
-| ✅ | `sveltekit-frontend/scripts/atlas` | 88 | 208 | 49382 | 0 | 2/103 | 1 | 🟠lh |
-| ✅ | `$lib/utils` | 90 | 1 | 15 | 0 | 0/0 | 0 | — |
-| ✅ | `.claude/worktrees/agent-a38668f2/$lib` | 90 | 1 | 15 | 0 | 0/0 | 0 | — |
-| ✅ | `.claude/worktrees/agent-a38668f2/.github` | 90 | 1 | 10 | 0 | 0/0 | 0 | — |
-| ✅ | `.claude/worktrees/agent-a38668f2/.vscode` | 90 | 3 | 11350 | 0 | 0/0 | 0 | — |
-| ✅ | `.claude/worktrees/agent-a38668f2/audit` | 90 | 1 | 13 | 0 | 0/0 | 0 | — |
-| ✅ | `.claude/worktrees/agent-a38668f2/crates` | 90 | 10 | 848 | 0 | 0/0 | 0 | — |
-| ✅ | `.claude/worktrees/agent-a38668f2/data` | 90 | 1 | 7 | 0 | 0/0 | 0 | — |
-| ✅ | `.claude/worktrees/agent-a38668f2/docker` | 90 | 2 | 122 | 0 | 0/0 | 0 | — |
-| ✅ | `.claude/worktrees/agent-a38668f2/docs` | 90 | 212 | 1346134 | 0 | 0/0 | 0 | — |
-| ✅ | `.claude/worktrees/agent-a38668f2/memory` | 90 | 75 | 1249601 | 0 | 0/0 | 0 | — |
-| ✅ | `.claude/worktrees/agent-a38668f2/next_steps` | 90 | 1 | 232175 | 0 | 0/0 | 0 | — |
-| ✅ | `.claude/worktrees/agent-a38668f2/simd-bridge` | 90 | 23 | 945 | 0 | 0/2 | 0 | — |
-| ✅ | `.claude/worktrees/agent-a6ea9982/$lib` | 90 | 1 | 15 | 0 | 0/0 | 0 | — |
-| ✅ | `.claude/worktrees/agent-a6ea9982/.github` | 90 | 1 | 10 | 0 | 0/0 | 0 | — |
-| ✅ | `.claude/worktrees/agent-a6ea9982/.vscode` | 90 | 3 | 11350 | 0 | 0/0 | 0 | — |
-| ✅ | `.claude/worktrees/agent-a6ea9982/audit` | 90 | 1 | 13 | 0 | 0/0 | 0 | — |
-| ✅ | `.claude/worktrees/agent-a6ea9982/crates` | 90 | 10 | 848 | 0 | 0/0 | 0 | — |
-| ✅ | `.claude/worktrees/agent-a6ea9982/data` | 90 | 1 | 7 | 0 | 0/0 | 0 | — |
-| ✅ | `.claude/worktrees/agent-a6ea9982/docker` | 90 | 2 | 122 | 0 | 0/0 | 0 | — |
-| ✅ | `.claude/worktrees/agent-a6ea9982/docs` | 90 | 212 | 1346134 | 0 | 0/0 | 0 | — |
-| ✅ | `.claude/worktrees/agent-a6ea9982/memory` | 90 | 75 | 1249601 | 0 | 0/0 | 0 | — |
-| ✅ | `.claude/worktrees/agent-a6ea9982/next_steps` | 90 | 1 | 232175 | 0 | 0/0 | 0 | — |
-| ✅ | `.claude/worktrees/agent-a6ea9982/simd-bridge` | 90 | 23 | 945 | 0 | 0/2 | 0 | — |
-| ✅ | `.claude/worktrees/agent-a7203461/$lib` | 90 | 1 | 15 | 0 | 0/0 | 0 | — |
-| ✅ | `.claude/worktrees/agent-a7203461/.github` | 90 | 1 | 10 | 0 | 0/0 | 0 | — |
-| ✅ | `.claude/worktrees/agent-a7203461/.vscode` | 90 | 3 | 11350 | 0 | 0/0 | 0 | — |
-| ✅ | `.claude/worktrees/agent-a7203461/audit` | 90 | 1 | 13 | 0 | 0/0 | 0 | — |
-| ✅ | `.claude/worktrees/agent-a7203461/crates` | 90 | 10 | 848 | 0 | 0/0 | 0 | — |
-| ✅ | `.claude/worktrees/agent-a7203461/data` | 90 | 1 | 7 | 0 | 0/0 | 0 | — |
-| ✅ | `.claude/worktrees/agent-a7203461/docker` | 90 | 2 | 122 | 0 | 0/0 | 0 | — |
-| ✅ | `.claude/worktrees/agent-a7203461/docs` | 90 | 212 | 1346134 | 0 | 0/0 | 0 | — |
-| ✅ | `.claude/worktrees/agent-a7203461/memory` | 90 | 75 | 1249601 | 0 | 0/0 | 0 | — |
-| ✅ | `.claude/worktrees/agent-a7203461/next_steps` | 90 | 1 | 232175 | 0 | 0/0 | 0 | — |
-| ✅ | `.claude/worktrees/agent-a7203461/simd-bridge` | 90 | 23 | 945 | 0 | 0/2 | 0 | — |
-| ✅ | `.claude/worktrees/agent-a87590c9/$lib` | 90 | 1 | 15 | 0 | 0/0 | 0 | — |
-| ✅ | `.claude/worktrees/agent-a87590c9/.github` | 90 | 1 | 10 | 0 | 0/0 | 0 | — |
-| ✅ | `.claude/worktrees/agent-a87590c9/.vscode` | 90 | 3 | 11382 | 0 | 0/0 | 0 | — |
-| ✅ | `.claude/worktrees/agent-a87590c9/audit` | 90 | 1 | 13 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/scripts/atlas` | 88 | 159 | 43181 | 0 | 1/67 | 1 | 🟠lh |
+| ✅ | `sveltekit-frontend/src/routes/api` | 89 | 141 | 29071 | 141 | 131/102 | 0 | 🟠lh ⬜notest |
+| ✅ | `$lib/utils` | 90 | 6 | 90 | 0 | 0/0 | 0 | — |
+| ✅ | `.claude/worktrees/agent-a38668f2/.github` | 90 | 6 | 60 | 0 | 0/0 | 0 | — |
+| ✅ | `.claude/worktrees/agent-a38668f2/.vscode` | 90 | 16 | 45414 | 0 | 0/0 | 0 | — |
+| ✅ | `.claude/worktrees/agent-a38668f2/audit` | 90 | 5 | 65 | 0 | 0/0 | 0 | — |
+| ✅ | `.claude/worktrees/agent-a38668f2/crates` | 90 | 52 | 4242 | 0 | 0/0 | 0 | — |
+| ✅ | `.claude/worktrees/agent-a38668f2/data` | 90 | 5 | 35 | 0 | 0/0 | 0 | — |
+| ✅ | `.claude/worktrees/agent-a38668f2/docker` | 90 | 12 | 772 | 0 | 0/0 | 0 | — |
+| ✅ | `.claude/worktrees/agent-a38668f2/docs` | 90 | 1052 | 6945740 | 0 | 0/0 | 0 | — |
+| ✅ | `.claude/worktrees/agent-a38668f2/memory` | 90 | 379 | 6156442 | 0 | 0/0 | 0 | — |
+| ✅ | `.claude/worktrees/agent-a38668f2/next_steps` | 90 | 5 | 1160875 | 0 | 0/0 | 0 | — |
+| ✅ | `.claude/worktrees/agent-a38668f2/simd-bridge` | 90 | 137 | 5103 | 0 | 0/12 | 0 | — |
+| ✅ | `.claude/worktrees/agent-ae7221f6/sveltekit-frontend` | 90 | 16 | 5668 | 0 | 4/6 | 0 | — |
+| ✅ | `.claude/worktrees/agent-a87590c9/.vscode` | 90 | 1 | 11375 | 0 | 0/0 | 0 | — |
 | ✅ | `.claude/worktrees/agent-a87590c9/configs` | 90 | 1 | 60 | 0 | 0/0 | 0 | — |
-| ✅ | `.claude/worktrees/agent-a87590c9/crates` | 90 | 13 | 876 | 0 | 0/0 | 0 | — |
-| ✅ | `.claude/worktrees/agent-a87590c9/data` | 90 | 1 | 7 | 0 | 0/0 | 0 | — |
-| ✅ | `.claude/worktrees/agent-a87590c9/docker` | 90 | 2 | 122 | 0 | 0/0 | 0 | — |
-| ✅ | `.claude/worktrees/agent-a87590c9/docs` | 90 | 367 | 1508338 | 0 | 0/0 | 0 | — |
-| ✅ | `.claude/worktrees/agent-a87590c9/memory` | 90 | 75 | 1254466 | 0 | 0/0 | 0 | — |
-| ✅ | `.claude/worktrees/agent-a87590c9/next_steps` | 90 | 1 | 232175 | 0 | 0/0 | 0 | — |
-| ✅ | `.claude/worktrees/agent-a87590c9/simd-bridge` | 90 | 23 | 945 | 0 | 0/2 | 0 | — |
-| ✅ | `.claude/worktrees/agent-ae7221f6/$lib` | 90 | 1 | 15 | 0 | 0/0 | 0 | — |
-| ✅ | `.claude/worktrees/agent-ae7221f6/.github` | 90 | 1 | 10 | 0 | 0/0 | 0 | — |
-| ✅ | `.claude/worktrees/agent-ae7221f6/.vscode` | 90 | 3 | 11350 | 0 | 0/0 | 0 | — |
-| ✅ | `.claude/worktrees/agent-ae7221f6/audit` | 90 | 1 | 13 | 0 | 0/0 | 0 | — |
-| ✅ | `.claude/worktrees/agent-ae7221f6/crates` | 90 | 10 | 848 | 0 | 0/0 | 0 | — |
-| ✅ | `.claude/worktrees/agent-ae7221f6/data` | 90 | 1 | 7 | 0 | 0/0 | 0 | — |
-| ✅ | `.claude/worktrees/agent-ae7221f6/docker` | 90 | 2 | 122 | 0 | 0/0 | 0 | — |
-| ✅ | `.claude/worktrees/agent-ae7221f6/docs` | 90 | 212 | 1346134 | 0 | 0/0 | 0 | — |
-| ✅ | `.claude/worktrees/agent-ae7221f6/memory` | 90 | 75 | 1249601 | 0 | 0/0 | 0 | — |
-| ✅ | `.claude/worktrees/agent-ae7221f6/next_steps` | 90 | 1 | 232175 | 0 | 0/0 | 0 | — |
-| ✅ | `.claude/worktrees/agent-ae7221f6/simd-bridge` | 90 | 23 | 945 | 0 | 0/2 | 0 | — |
+| ✅ | `.claude/worktrees/agent-a87590c9/crates` | 90 | 2 | 27 | 0 | 0/0 | 0 | — |
+| ✅ | `.claude/worktrees/agent-a87590c9/docs` | 90 | 180 | 289610 | 0 | 0/0 | 0 | — |
+| ✅ | `docs/reports` | 90 | 277 | 3704632 | 0 | 0/0 | 0 | — |
+| ✅ | `docs/reports/proof-of-truth` | 90 | 12 | 596 | 0 | 0/0 | 0 | — |
+| ✅ | `.claude/worktrees/agent-a87590c9/memory` | 90 | 4 | 96268 | 0 | 0/0 | 0 | — |
+| ✅ | `memory/exports` | 90 | 52 | 388011 | 0 | 0/0 | 0 | — |
+| ✅ | `scripts/semantic-valkey` | 90 | 3 | 243 | 0 | 0/0 | 0 | — |
+| ✅ | `scripts/skills` | 90 | 3 | 708 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/docs/atlas-index` | 90 | 6 | 122787 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/docs/reports` | 90 | 87 | 818736 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/memory/atlas` | 90 | 4 | 4 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/memory/docstore` | 90 | 2 | 44 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/memory/graphify/deep` | 90 | 7 | 983240 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/memory/kag-notes` | 90 | 2 | 32 | 0 | 0/0 | 0 | — |
+| ✅ | `packages/parent-atlas-retrieval` | 90 | 1 | 6919 | 0 | 0/4 | 0 | — |
+| ✅ | `packages/parent-atlas-retrieval/src` | 90 | 1 | 5786 | 0 | 0/4 | 0 | — |
+| ✅ | `packages/parent-atlas-retrieval/src/gpu` | 90 | 8 | 4606 | 0 | 0/2 | 0 | — |
+| ✅ | `.claude/worktrees/agent-a87590c9/tests` | 90 | 2 | 501 | 0 | 0/1 | 0 | — |
 | ✅ | `.gemini/antigravity/scratch` | 90 | 3 | 132 | 0 | 0/0 | 0 | — |
-| ✅ | `.github/hooks` | 90 | 1 | 10 | 0 | 0/0 | 0 | — |
 | ✅ | `.proofs/four-lanes` | 90 | 5 | 170 | 0 | 0/0 | 0 | — |
 | ✅ | `.proofs/p4` | 90 | 1 | 126 | 0 | 0/0 | 0 | — |
 | ✅ | `.python311/lib/python3.11/site-packages` | 90 | 2 | 2 | 0 | 0/0 | 0 | — |
-| ✅ | `.vscode/extensions/mcp-context7-assistant/src` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `.vscode/tasks` | 90 | 2 | 12 | 0 | 0/0 | 0 | — |
+| ✅ | `.vscode/tasks` | 90 | 1 | 11 | 0 | 0/0 | 0 | — |
 | ✅ | `claude-mem/.agents/plugins` | 90 | 1 | 21 | 0 | 0/0 | 0 | — |
 | ✅ | `claude-mem/.claude` | 90 | 1 | 11 | 0 | 0/0 | 0 | — |
-| ✅ | `claude-mem/.claude-plugin` | 90 | 2 | 44 | 0 | 0/0 | 0 | — |
+| ✅ | `claude-mem/.claude-plugin` | 90 | 3 | 69 | 0 | 0/0 | 0 | — |
 | ✅ | `claude-mem/.codex-plugin` | 90 | 1 | 47 | 0 | 0/0 | 0 | — |
 | ✅ | `claude-mem/cursor-hooks` | 90 | 1 | 35 | 0 | 0/0 | 0 | — |
 | ✅ | `claude-mem/docker/e2e` | 90 | 1 | 303 | 0 | 0/1 | 0 | — |
@@ -195,7 +155,6 @@
 | ✅ | `claude-mem/install/public` | 90 | 1 | 14 | 0 | 0/0 | 0 | — |
 | ✅ | `claude-mem/openclaw` | 90 | 4 | 2459 | 0 | 1/2 | 0 | — |
 | ✅ | `claude-mem/openclaw/src` | 90 | 2 | 2212 | 0 | 1/2 | 0 | — |
-| ✅ | `claude-mem/plugin/.claude-plugin` | 90 | 1 | 25 | 0 | 0/0 | 0 | — |
 | ✅ | `claude-mem/plugin/.codex-plugin` | 90 | 1 | 47 | 0 | 0/0 | 0 | — |
 | ✅ | `claude-mem/plugin/hooks` | 90 | 2 | 163 | 0 | 0/0 | 0 | — |
 | ✅ | `claude-mem/plugin/modes` | 90 | 35 | 1250 | 0 | 0/0 | 0 | — |
@@ -284,31 +243,22 @@
 | ✅ | `claude-mem/tests/worker/http` | 90 | 4 | 749 | 0 | 3/0 | 0 | — |
 | ✅ | `claude-mem/tests/worker/middleware` | 90 | 1 | 185 | 0 | 0/0 | 0 | — |
 | ✅ | `claude-mem/tests/worker/search` | 90 | 5 | 1961 | 0 | 3/0 | 0 | — |
-| ✅ | `crates/atlas_packet_parser` | 90 | 6 | 538 | 0 | 0/0 | 0 | — |
-| ✅ | `crates/atlas_packet_parser/target` | 90 | 1 | 129 | 0 | 0/0 | 0 | — |
-| ✅ | `crates/atlas_packet_parser/target/debug` | 90 | 64 | 64 | 0 | 0/0 | 0 | — |
-| ✅ | `crates/atlas_packet_parser/target/release` | 90 | 64 | 64 | 0 | 0/0 | 0 | — |
-| ✅ | `crates/omni-bridge/target` | 90 | 1 | 34 | 0 | 0/0 | 0 | — |
-| ✅ | `crates/omni-bridge/target/debug` | 90 | 33 | 33 | 0 | 0/0 | 0 | — |
-| ✅ | `crates/turbovec-napi` | 90 | 6 | 986 | 0 | 0/0 | 0 | — |
-| ✅ | `crates/turbovec-napi/target` | 90 | 1 | 454 | 0 | 0/0 | 0 | — |
-| ✅ | `crates/turbovec-napi/target/debug` | 90 | 170 | 170 | 0 | 0/0 | 0 | — |
-| ✅ | `crates/turbovec-napi/target/release` | 90 | 170 | 170 | 0 | 0/0 | 0 | — |
+| ✅ | `crates/atlas_packet_parser` | 90 | 6 | 796 | 0 | 0/0 | 0 | — |
+| ✅ | `crates/atlas_packet_parser/target/debug` | 90 | 220 | 220 | 0 | 0/0 | 0 | — |
+| ✅ | `crates/atlas_packet_parser/target/release` | 90 | 167 | 167 | 0 | 0/0 | 0 | — |
+| ✅ | `crates/omni-bridge/target/debug` | 90 | 10 | 10 | 0 | 0/0 | 0 | — |
+| ✅ | `crates/turbovec-napi` | 90 | 6 | 929 | 0 | 0/0 | 0 | — |
+| ✅ | `crates/turbovec-napi/target/debug` | 90 | 147 | 147 | 0 | 0/0 | 0 | — |
+| ✅ | `crates/turbovec-napi/target/release` | 90 | 137 | 137 | 0 | 0/0 | 0 | — |
 | ✅ | `crates/turbovec-napi/target/x86_64-pc-windows-msvc` | 90 | 113 | 113 | 0 | 0/0 | 0 | — |
-| ✅ | `docker/bifrost` | 90 | 2 | 162 | 0 | 0/0 | 0 | — |
-| ✅ | `docker/langgraph-synthesis/.venv/share` | 90 | 4 | 90 | 0 | 0/0 | 0 | — |
 | ✅ | `docker/seaweedfs` | 90 | 2 | 82 | 0 | 0/0 | 0 | — |
-| ✅ | `docs/ai-os` | 90 | 1 | 4 | 0 | 0/0 | 0 | — |
-| ✅ | `docs/atlas` | 90 | 5 | 55611 | 0 | 0/0 | 0 | — |
-| ✅ | `docs/graph` | 90 | 27 | 983405 | 0 | 0/0 | 0 | — |
+| ✅ | `docs/atlas` | 90 | 2 | 46762 | 0 | 0/0 | 0 | — |
+| ✅ | `docs/graph` | 90 | 25 | 981253 | 0 | 0/0 | 0 | — |
 | ✅ | `docs/packets` | 90 | 1 | 532 | 0 | 0/0 | 0 | — |
 | ✅ | `docs/phase100` | 90 | 7 | 29520 | 0 | 0/0 | 0 | — |
 | ✅ | `docs/profile-cards/data` | 90 | 23 | 716 | 0 | 0/0 | 0 | — |
-| ✅ | `docs/reports` | 90 | 285 | 3755795 | 0 | 0/0 | 0 | — |
 | ✅ | `docs/reports/atlas` | 90 | 4 | 174 | 0 | 0/0 | 0 | — |
-| ✅ | `docs/reports/proof-of-truth` | 90 | 9 | 446 | 0 | 0/0 | 0 | — |
 | ✅ | `docs/reports/replay` | 90 | 40 | 11334 | 0 | 0/0 | 0 | — |
-| ✅ | `drizzle/meta` | 90 | 4 | 4562 | 0 | 0/0 | 0 | — |
 | ✅ | `llama-cpp-turboquant-gemma4/.gemini` | 90 | 1 | 2 | 0 | 0/0 | 0 | — |
 | ✅ | `llama-cpp-turboquant-gemma4/benches/dgx-spark` | 90 | 2 | 2902 | 0 | 0/0 | 0 | — |
 | ✅ | `llama-cpp-turboquant-gemma4/docs/backend/snapdragon` | 90 | 1 | 62 | 0 | 0/0 | 0 | — |
@@ -318,17 +268,15 @@
 | ✅ | `llama-cpp-turboquant-gemma4/tests` | 90 | 1 | 11 | 0 | 0/1 | 0 | — |
 | ✅ | `llama-cpp-turboquant-gemma4/tools/server/public` | 90 | 1 | 470 | 0 | 1/1 | 0 | — |
 | ✅ | `memory/agent-runs` | 90 | 1 | 146 | 0 | 0/0 | 0 | — |
-| ✅ | `memory/clusters` | 90 | 2 | 2 | 0 | 0/0 | 0 | — |
-| ✅ | `memory/exports` | 90 | 52 | 387799 | 0 | 0/0 | 0 | — |
 | ✅ | `memory/exports/atlas` | 90 | 1 | 91651 | 0 | 0/0 | 0 | — |
 | ✅ | `memory/exports/parent-atlas` | 90 | 1 | 131565 | 0 | 0/0 | 0 | — |
 | ✅ | `memory/graph` | 90 | 1 | 4320 | 0 | 0/0 | 0 | — |
 | ✅ | `memory/graphify/deep` | 90 | 1 | 663970 | 0 | 0/0 | 0 | — |
-| ✅ | `memory/knowledge` | 90 | 6 | 1440 | 0 | 0/0 | 0 | — |
+| ✅ | `memory/knowledge` | 90 | 5 | 1395 | 0 | 0/0 | 0 | — |
 | ✅ | `memory/manifests` | 90 | 3 | 140 | 0 | 0/0 | 0 | — |
 | ✅ | `memory/packets` | 90 | 1 | 105 | 0 | 0/0 | 0 | — |
 | ✅ | `memory/reports` | 90 | 1 | 195667 | 0 | 0/0 | 0 | — |
-| ✅ | `memory/rewards` | 90 | 5 | 55 | 0 | 0/0 | 0 | — |
+| ✅ | `memory/rewards` | 90 | 2 | 52 | 0 | 0/0 | 0 | — |
 | ✅ | `minio-data/.minio.sys` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
 | ✅ | `neschrom97/cards` | 90 | 8170 | 166304 | 0 | 0/0 | 0 | — |
 | ✅ | `neschrom97/index` | 90 | 5 | 74105 | 0 | 0/0 | 0 | — |
@@ -343,49 +291,31 @@
 | ✅ | `packages/atlas-core/src/types` | 90 | 1 | 115 | 0 | 0/1 | 0 | — |
 | ✅ | `packages/parent-atlas/src/adapters` | 90 | 5 | 824 | 0 | 0/1 | 0 | — |
 | ✅ | `packages/parent-atlas/src/gates` | 90 | 6 | 316 | 0 | 0/1 | 0 | — |
-| ✅ | `packages/parent-atlas-core` | 90 | 1 | 162 | 0 | 0/0 | 0 | — |
-| ✅ | `packages/parent-atlas-core/src` | 90 | 1 | 118 | 0 | 0/0 | 0 | — |
-| ✅ | `packages/parent-atlas-core/src/schemas` | 90 | 1 | 51 | 0 | 0/0 | 0 | — |
+| ✅ | `packages/parent-atlas-core` | 90 | 1 | 111 | 0 | 0/0 | 0 | — |
+| ✅ | `packages/parent-atlas-core/src` | 90 | 1 | 67 | 0 | 0/0 | 0 | — |
 | ✅ | `packages/parent-atlas-ingest` | 90 | 2 | 374 | 0 | 0/0 | 0 | — |
 | ✅ | `packages/parent-atlas-ingest/src` | 90 | 1 | 318 | 0 | 0/0 | 0 | — |
 | ✅ | `packages/parent-atlas-ingest/src/scanner` | 90 | 2 | 304 | 0 | 0/0 | 0 | — |
 | ✅ | `packages/parent-atlas-opencode` | 90 | 1 | 47 | 0 | 0/0 | 0 | — |
-| ✅ | `packages/parent-atlas-retrieval/src/bifrost` | 90 | 5 | 625 | 0 | 0/1 | 0 | — |
-| ✅ | `packages/parent-atlas-retrieval/tests` | 90 | 1 | 789 | 0 | 0/0 | 0 | — |
-| ✅ | `packages/parent-atlas-retrieval/tests/bifrost` | 90 | 1 | 357 | 0 | 0/0 | 0 | — |
-| ✅ | `packages/parent-atlas-retrieval/tests/gpu` | 90 | 1 | 75 | 0 | 0/0 | 0 | — |
+| ✅ | `packages/parent-atlas-retrieval/src/bifrost` | 90 | 8 | 1150 | 0 | 0/2 | 0 | — |
+| ✅ | `packages/parent-atlas-retrieval/tests/bifrost` | 90 | 3 | 1071 | 0 | 0/0 | 0 | — |
 | ✅ | `scratch/index-checkpoints` | 90 | 2 | 196384 | 0 | 0/0 | 0 | — |
 | ✅ | `scratch/obsidian_vault/.obsidian/plugins` | 90 | 2 | 59245 | 0 | 1/1 | 0 | — |
-| ✅ | `scripts/agents` | 90 | 4 | 234 | 0 | 0/2 | 0 | — |
-| ✅ | `scripts/ai-os` | 90 | 6 | 182 | 0 | 0/4 | 0 | — |
-| ✅ | `scripts/analysis` | 90 | 8 | 398 | 0 | 0/0 | 0 | — |
+| ✅ | `scripts/agents` | 90 | 2 | 16 | 0 | 0/0 | 0 | — |
 | ✅ | `scripts/analysis_reports` | 90 | 24 | 10410 | 0 | 0/0 | 0 | — |
 | ✅ | `scripts/atlas/out` | 90 | 8 | 6782 | 0 | 0/0 | 0 | — |
 | ✅ | `scripts/bench` | 90 | 2 | 266 | 0 | 0/2 | 0 | — |
-| ✅ | `scripts/cache` | 90 | 12 | 1022 | 0 | 0/6 | 0 | — |
+| ✅ | `scripts/cache` | 90 | 6 | 750 | 0 | 0/4 | 0 | — |
 | ✅ | `scripts/case_data/_cache` | 90 | 292 | 292 | 0 | 0/0 | 0 | — |
 | ✅ | `scripts/court_data/constitutions` | 90 | 18 | 2360 | 0 | 0/0 | 0 | — |
-| ✅ | `scripts/dev` | 90 | 8 | 690 | 0 | 0/4 | 0 | — |
-| ✅ | `scripts/engram` | 90 | 2 | 8 | 0 | 0/0 | 0 | — |
-| ✅ | `scripts/error-resolution` | 90 | 8 | 10336 | 0 | 0/4 | 0 | — |
-| ✅ | `scripts/error-resolution/services` | 90 | 12 | 3876 | 0 | 0/4 | 0 | — |
-| ✅ | `scripts/error-resolution/tests` | 90 | 12 | 5436 | 0 | 0/0 | 0 | — |
-| ✅ | `scripts/eval/data` | 90 | 2 | 328 | 0 | 0/0 | 0 | — |
+| ✅ | `scripts/dev` | 90 | 2 | 252 | 0 | 0/2 | 0 | — |
 | ✅ | `scripts/evals` | 90 | 2 | 800 | 0 | 0/0 | 0 | — |
-| ✅ | `scripts/lib` | 90 | 4 | 514 | 0 | 0/0 | 0 | — |
-| ✅ | `scripts/mapreduce` | 90 | 4 | 176 | 0 | 0/0 | 0 | — |
+| ✅ | `scripts/lib` | 90 | 2 | 314 | 0 | 0/0 | 0 | — |
 | ✅ | `scripts/memory/graphify/gds` | 90 | 16 | 573596 | 0 | 0/0 | 0 | — |
-| ✅ | `scripts/native` | 90 | 4 | 1256 | 0 | 0/2 | 0 | — |
+| ✅ | `scripts/native` | 90 | 2 | 874 | 0 | 0/2 | 0 | — |
 | ✅ | `scripts/phase-3d` | 90 | 2 | 348 | 0 | 0/0 | 0 | — |
 | ✅ | `scripts/phase85` | 90 | 4 | 660 | 0 | 0/0 | 0 | — |
-| ✅ | `scripts/redis` | 90 | 2 | 266 | 0 | 0/2 | 0 | — |
-| ✅ | `scripts/reports` | 90 | 8 | 456 | 0 | 0/4 | 0 | — |
-| ✅ | `scripts/semantic-valkey` | 90 | 2 | 162 | 0 | 0/0 | 0 | — |
 | ✅ | `scripts/sidecars` | 90 | 2 | 512 | 0 | 0/0 | 0 | — |
-| ✅ | `scripts/simd` | 90 | 28 | 2310 | 0 | 0/20 | 0 | — |
-| ✅ | `scripts/simdtest` | 90 | 6 | 384 | 0 | 0/6 | 0 | — |
-| ✅ | `scripts/skills` | 90 | 2 | 472 | 0 | 0/0 | 0 | — |
-| ✅ | `scripts/sync-labels` | 90 | 4 | 136 | 0 | 0/0 | 0 | — |
 | ✅ | `scripts/tests/agent-investigate-results` | 90 | 22 | 1992 | 0 | 0/0 | 0 | — |
 | ✅ | `scripts/tests/performance-results` | 90 | 44 | 828 | 0 | 0/0 | 0 | — |
 | ✅ | `scripts/tests/screenshots/2026-02-21T20-52-49` | 90 | 2 | 374 | 0 | 0/0 | 0 | — |
@@ -448,68 +378,44 @@
 | ✅ | `scripts/tests/screenshots/2026-04-17T04-45-07` | 90 | 2 | 2346 | 0 | 0/0 | 0 | — |
 | ✅ | `scripts/tests/screenshots/2026-04-18T01-11-27` | 90 | 2 | 126 | 0 | 0/0 | 0 | — |
 | ✅ | `scripts/tests/screenshots/2026-04-18T01-12-20` | 90 | 2 | 126 | 0 | 0/0 | 0 | — |
-| ✅ | `scripts/tests/screenshots/2026-04-18T02-59-52` | 90 | 2 | 80 | 0 | 0/0 | 0 | — |
+| ✅ | `scripts/tests/screenshots/2026-04-18T02-59-52` | 90 | 4 | 160 | 0 | 0/0 | 0 | — |
 | ✅ | `scripts/tests/screenshots/cases-ui` | 90 | 2 | 112 | 0 | 0/0 | 0 | — |
 | ✅ | `scripts/tests/screenshots/glossary` | 90 | 2 | 140 | 0 | 0/0 | 0 | — |
-| ✅ | `scripts/tests/screenshots/latest` | 90 | 2 | 80 | 0 | 0/0 | 0 | — |
 | ✅ | `scripts/tests/screenshots/production-proof` | 90 | 2 | 2344 | 0 | 0/0 | 0 | — |
-| ✅ | `scripts/tests/vlm-tests` | 90 | 12 | 12 | 0 | 0/0 | 0 | — |
 | ✅ | `scripts/unsloth-training/COLAB_PACKAGE/training-datasets` | 90 | 2 | 198 | 0 | 0/0 | 0 | — |
-| ✅ | `scripts/valkey` | 90 | 6 | 468 | 0 | 0/6 | 0 | — |
 | ✅ | `scripts/workers` | 90 | 4 | 936 | 0 | 0/2 | 0 | — |
-| ✅ | `simd-bridge/cpp` | 90 | 4 | 1500 | 0 | 0/2 | 0 | — |
-| ✅ | `simd-bridge/cpp/build-verify-2026-05-31T08-06-57-567Z/CMakeFiles` | 90 | 2 | 16 | 0 | 0/0 | 0 | — |
-| ✅ | `simd-bridge/cpp/build-x64-cuda/CMakeFiles` | 90 | 4 | 32 | 0 | 0/0 | 0 | — |
-| ✅ | `simd-bridge/cpp/build-x64-cuda-cublas/CMakeFiles` | 90 | 4 | 32 | 0 | 0/0 | 0 | — |
-| ✅ | `simd-bridge/cpp/build-x64-cuda-cuvs/CMakeFiles` | 90 | 4 | 32 | 0 | 0/0 | 0 | — |
-| ✅ | `simd-bridge/cpp/build-x64-fallback/CMakeFiles` | 90 | 2 | 16 | 0 | 0/0 | 0 | — |
-| ✅ | `simd-bridge/examples` | 90 | 4 | 60 | 0 | 0/0 | 0 | — |
-| ✅ | `simd-bridge/rust/graph-engine` | 90 | 6 | 176 | 0 | 0/0 | 0 | — |
-| ✅ | `simd-bridge/rust/graph-engine/target` | 90 | 110 | 110 | 0 | 0/0 | 0 | — |
-| ✅ | `simd-bridge/rust/hmm-repair` | 90 | 6 | 268 | 0 | 0/0 | 0 | — |
-| ✅ | `simd-bridge/rust/hmm-repair/target` | 90 | 202 | 202 | 0 | 0/0 | 0 | — |
-| ✅ | `simd-bridge/rust-simdjson/target` | 90 | 2 | 332 | 0 | 0/0 | 0 | — |
-| ✅ | `simd-bridge/rust-simdjson/target/debug` | 90 | 152 | 152 | 0 | 0/0 | 0 | — |
-| ✅ | `simd-bridge/rust-simdjson/target/release` | 90 | 178 | 178 | 0 | 0/0 | 0 | — |
+| ✅ | `simd-bridge/cpp` | 90 | 4 | 1372 | 0 | 0/2 | 0 | — |
+| ✅ | `simd-bridge/rust/graph-engine` | 90 | 4 | 228 | 0 | 0/0 | 0 | — |
+| ✅ | `simd-bridge/rust/graph-engine/target` | 90 | 164 | 164 | 0 | 0/0 | 0 | — |
+| ✅ | `simd-bridge/rust/hmm-repair` | 90 | 4 | 208 | 0 | 0/0 | 0 | — |
+| ✅ | `simd-bridge/rust/hmm-repair/target` | 90 | 144 | 144 | 0 | 0/0 | 0 | — |
+| ✅ | `simd-bridge/rust-simdjson/target/debug` | 90 | 42 | 42 | 0 | 0/0 | 0 | — |
+| ✅ | `simd-bridge/rust-simdjson/target/release` | 90 | 108 | 108 | 0 | 0/0 | 0 | — |
 | ✅ | `sveltekit-frontend/.claude` | 90 | 1 | 45 | 0 | 0/0 | 0 | — |
 | ✅ | `sveltekit-frontend/.okf` | 90 | 1 | 20 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/.venv/Lib/python3.9` | 90 | 3 | 1960 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/.venv/Lib/site-packages` | 90 | 4 | 2071 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/.venv/Lib/python3.9` | 90 | 5 | 2421 | 0 | 0/0 | 0 | — |
 | ✅ | `sveltekit-frontend/.venv_turbovec/Lib/site-packages` | 90 | 1 | 7857 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/config` | 90 | 1 | 140 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/docs` | 90 | 1 | 9018463 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/docs/atlas` | 90 | 2 | 51874 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/docs/atlas-index` | 90 | 3 | 61520 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/docs/graph` | 90 | 21 | 8082128 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/.vscode` | 90 | 4 | 4167 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/docs/atlas` | 90 | 1 | 5156 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/docs/graph` | 90 | 17 | 6814899 | 0 | 0/0 | 0 | — |
 | ✅ | `sveltekit-frontend/docs/obsidian-vault` | 90 | 2 | 108 | 0 | 0/0 | 0 | — |
 | ✅ | `sveltekit-frontend/docs/profile-cards/data` | 90 | 20 | 1588 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/docs/reports` | 90 | 98 | 821183 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/docs_readme/deeds_labs_archive` | 90 | 85 | 2999318 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/docs_readme/deeds_labs_archive/components` | 90 | 3 | 1820 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/docs_readme/deeds_labs_archive` | 90 | 84 | 2997942 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/docs_readme/deeds_labs_archive/components` | 90 | 1 | 445 | 0 | 0/0 | 0 | — |
 | ✅ | `sveltekit-frontend/drizzle/introspected/meta` | 90 | 2 | 17338 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/drizzle/meta` | 90 | 33 | 738673 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/drizzle/meta` | 90 | 21 | 426580 | 0 | 0/0 | 0 | — |
 | ✅ | `sveltekit-frontend/drizzle/meta_backup_20260101` | 90 | 10 | 32129 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/memory/agent-runs` | 90 | 1 | 73 | 0 | 0/0 | 0 | — |
 | ✅ | `sveltekit-frontend/memory/agents-dag` | 90 | 34 | 2433 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/memory/atlas` | 90 | 3 | 3 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/memory/cards` | 90 | 2 | 8999 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/memory/codebase` | 90 | 2 | 38788 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/memory/datasets/legal-contracts` | 90 | 2 | 12 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/memory/docstore` | 90 | 1 | 22 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/memory/codebase` | 90 | 1 | 38787 | 0 | 0/0 | 0 | — |
 | ✅ | `sveltekit-frontend/memory/exports` | 90 | 5 | 1758 | 0 | 0/0 | 0 | — |
 | ✅ | `sveltekit-frontend/memory/exports/atlas` | 90 | 1 | 20 | 0 | 0/0 | 0 | — |
 | ✅ | `sveltekit-frontend/memory/exports/xgboost-hotness` | 90 | 1 | 393 | 0 | 0/0 | 0 | — |
 | ✅ | `sveltekit-frontend/memory/features` | 90 | 3 | 623 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/memory/graph` | 90 | 1 | 3480 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/memory/graphify/deep` | 90 | 5 | 943262 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/memory/graphify/gds` | 90 | 94 | 2035592 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/memory/index` | 90 | 6 | 1672 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/memory/kag-notes` | 90 | 1 | 16 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/memory/kb` | 90 | 1 | 88473 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/memory/graphify/gds` | 90 | 90 | 2014017 | 0 | 0/0 | 0 | — |
 | ✅ | `sveltekit-frontend/memory/kb/cards` | 90 | 2 | 87451 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/memory/kb/notecards` | 90 | 2 | 963 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/memory/kb/notecards` | 90 | 1 | 203 | 0 | 0/0 | 0 | — |
 | ✅ | `sveltekit-frontend/memory/kb/weights` | 90 | 1 | 13 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/memory/knowledge` | 90 | 2 | 29 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/memory/knowledge` | 90 | 1 | 17 | 0 | 0/0 | 0 | — |
 | ✅ | `sveltekit-frontend/memory/reconstruction` | 90 | 2 | 273 | 0 | 0/0 | 0 | — |
 | ✅ | `sveltekit-frontend/memory/runs/01cb725b540e` | 90 | 4 | 211 | 0 | 0/0 | 0 | — |
 | ✅ | `sveltekit-frontend/memory/runs/2026-05-06` | 90 | 12 | 312 | 0 | 0/0 | 0 | — |
@@ -520,82 +426,82 @@
 | ✅ | `sveltekit-frontend/memory/runs/2026-05-07-16-59-57` | 90 | 1 | 92 | 0 | 0/0 | 0 | — |
 | ✅ | `sveltekit-frontend/memory/runs/2026-05-07-17-00-51` | 90 | 1 | 92 | 0 | 0/0 | 0 | — |
 | ✅ | `sveltekit-frontend/memory/runs/2026-05-07-17-03-48` | 90 | 1 | 92 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/memory/runs/2026-05-07T01-05-54` | 90 | 6 | 69302 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/memory/runs/2026-05-07T02-21-01` | 90 | 6 | 69302 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/memory/runs/2026-05-07T02-21-04` | 90 | 6 | 69302 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/memory/runs/2026-05-07T02-24-29` | 90 | 6 | 71504 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/memory/runs/2026-05-07T02-26-55` | 90 | 6 | 71505 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/memory/runs/2026-05-07T02-28-15` | 90 | 6 | 71505 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/memory/runs/2026-05-07T02-28-20` | 90 | 6 | 71505 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/memory/runs/2026-05-07T02-33-56` | 90 | 6 | 71505 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/memory/runs/2026-05-07T02-45-52` | 90 | 6 | 71505 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/memory/runs/2026-05-07T02-47-24` | 90 | 6 | 71505 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/memory/runs/2026-05-07T02-47-34` | 90 | 6 | 71505 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/memory/runs/2026-05-07T02-52-31` | 90 | 6 | 71505 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/memory/runs/2026-05-07T02-53-22` | 90 | 6 | 71505 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/memory/runs/2026-05-07T02-59-42` | 90 | 6 | 71545 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/memory/runs/2026-05-07T03-00-05` | 90 | 6 | 71545 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/memory/runs/2026-05-07T03-00-30` | 90 | 6 | 71545 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/memory/runs/2026-05-07T03-07-59` | 90 | 6 | 71545 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/memory/runs/2026-05-07T03-08-03` | 90 | 6 | 71545 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/memory/runs/2026-05-07T03-08-06` | 90 | 6 | 71545 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/memory/runs/2026-05-07T03-08-18` | 90 | 6 | 71545 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/memory/runs/2026-05-07T03-08-46` | 90 | 6 | 71545 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/memory/runs/2026-05-07T03-14-40` | 90 | 6 | 71545 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/memory/runs/2026-05-07T03-28-02` | 90 | 6 | 71545 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/memory/runs/2026-05-07T03-28-08` | 90 | 6 | 71545 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/memory/runs/2026-05-07T04-00-48` | 90 | 6 | 71545 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/memory/runs/2026-05-07T04-07-10` | 90 | 6 | 79844 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/memory/runs/2026-05-07T04-08-11` | 90 | 6 | 79844 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/memory/runs/2026-05-07T04-08-31` | 90 | 6 | 79844 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/memory/runs/2026-05-07T04-39-46` | 90 | 6 | 80052 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/memory/runs/2026-05-07T04-40-45` | 90 | 6 | 80052 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/memory/runs/2026-05-07T04-44-14` | 90 | 6 | 80052 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/memory/runs/2026-05-07T04-47-36` | 90 | 6 | 80052 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/memory/runs/2026-05-07T05-05-54` | 90 | 6 | 80046 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/memory/runs/2026-05-07T05-06-12` | 90 | 6 | 80046 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/memory/runs/2026-05-07T05-08-08` | 90 | 6 | 80046 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/memory/runs/2026-05-07T05-33-38` | 90 | 6 | 80046 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/memory/runs/2026-05-07T05-40-07` | 90 | 6 | 80046 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/memory/runs/2026-05-07T05-41-09` | 90 | 6 | 80046 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/memory/runs/2026-05-07T05-41-24` | 90 | 6 | 80046 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/memory/runs/2026-05-07T05-41-29` | 90 | 6 | 80046 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/memory/runs/2026-05-07T06-47-46` | 90 | 6 | 80046 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/memory/runs/2026-05-07T06-48-10` | 90 | 6 | 80046 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/memory/runs/2026-05-07T06-56-03` | 90 | 6 | 80046 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/memory/runs/2026-05-07T09-04-38` | 90 | 6 | 80046 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/memory/runs/2026-05-07T09-05-35` | 90 | 6 | 80046 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/memory/runs/2026-05-07T09-07-52` | 90 | 6 | 80046 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/memory/runs/2026-05-07T09-08-12` | 90 | 6 | 80046 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/memory/runs/2026-05-07T09-12-17` | 90 | 6 | 80046 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/memory/runs/2026-05-07T09-12-49` | 90 | 6 | 80046 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/memory/runs/2026-05-07T09-41-43` | 90 | 6 | 80046 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/memory/runs/2026-05-07T09-42-15` | 90 | 6 | 80046 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/memory/runs/2026-05-07T14-55-56` | 90 | 10 | 81252 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/memory/runs/2026-05-07T15-55-50` | 90 | 6 | 80046 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/memory/runs/2026-05-07T15-56-22` | 90 | 9 | 80748 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/memory/runs/2026-05-07T16-01-36` | 90 | 9 | 80748 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/memory/runs/2026-05-07T16-02-09` | 90 | 6 | 80046 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/memory/runs/2026-05-07T16-06-18` | 90 | 6 | 80046 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/memory/runs/2026-05-07T16-07-29` | 90 | 6 | 80046 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/memory/runs/2026-05-07T16-08-31` | 90 | 6 | 80046 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/memory/runs/2026-05-07T16-09-00` | 90 | 6 | 80046 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/memory/runs/2026-05-07T16-11-51` | 90 | 7 | 80269 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/memory/runs/2026-05-07T16-13-19` | 90 | 6 | 80046 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/memory/runs/2026-05-07T16-17-06` | 90 | 6 | 80046 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/memory/runs/2026-05-07T16-17-56` | 90 | 6 | 80046 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/memory/runs/2026-05-07T16-18-50` | 90 | 6 | 80046 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/memory/runs/2026-05-07T16-19-09` | 90 | 6 | 80046 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/memory/runs/2026-05-07T16-21-48` | 90 | 6 | 80046 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/memory/runs/2026-05-07T16-22-48` | 90 | 10 | 80775 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/memory/runs/2026-05-07T16-45-33` | 90 | 6 | 80046 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/memory/runs/2026-05-07T16-45-39` | 90 | 6 | 80046 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/memory/runs/2026-05-07T16-46-33` | 90 | 10 | 82811 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/memory/runs/2026-05-07T17-03-59` | 90 | 9 | 82755 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/memory/runs/2026-05-07T17-11-51` | 90 | 11 | 82845 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/memory/runs/2026-05-07T18-56-43` | 90 | 13 | 82950 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/memory/runs/2026-05-07T19-11-14` | 90 | 12 | 82283 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/memory/runs/2026-05-07T20-53-22` | 90 | 12 | 82335 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/memory/runs/2026-05-07T01-05-54` | 90 | 53 | 1717669 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/memory/runs/2026-05-07T02-21-01` | 90 | 3 | 619 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/memory/runs/2026-05-07T02-21-04` | 90 | 3 | 619 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/memory/runs/2026-05-07T02-24-29` | 90 | 28 | 4790 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/memory/runs/2026-05-07T02-26-55` | 90 | 3 | 2741 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/memory/runs/2026-05-07T02-28-15` | 90 | 3 | 2741 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/memory/runs/2026-05-07T02-28-20` | 90 | 3 | 2741 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/memory/runs/2026-05-07T02-33-56` | 90 | 3 | 2741 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/memory/runs/2026-05-07T02-45-52` | 90 | 3 | 2741 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/memory/runs/2026-05-07T02-47-24` | 90 | 3 | 2741 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/memory/runs/2026-05-07T02-47-34` | 90 | 3 | 2741 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/memory/runs/2026-05-07T02-52-31` | 90 | 3 | 2741 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/memory/runs/2026-05-07T02-53-22` | 90 | 3 | 2741 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/memory/runs/2026-05-07T02-59-42` | 90 | 3 | 2781 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/memory/runs/2026-05-07T03-00-05` | 90 | 3 | 2781 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/memory/runs/2026-05-07T03-00-30` | 90 | 3 | 2781 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/memory/runs/2026-05-07T03-07-59` | 90 | 3 | 2781 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/memory/runs/2026-05-07T03-08-03` | 90 | 3 | 2781 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/memory/runs/2026-05-07T03-08-06` | 90 | 3 | 2781 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/memory/runs/2026-05-07T03-08-18` | 90 | 3 | 2781 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/memory/runs/2026-05-07T03-08-46` | 90 | 3 | 2781 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/memory/runs/2026-05-07T03-14-40` | 90 | 3 | 2781 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/memory/runs/2026-05-07T03-28-02` | 90 | 3 | 2781 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/memory/runs/2026-05-07T03-28-08` | 90 | 3 | 2781 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/memory/runs/2026-05-07T04-00-48` | 90 | 3 | 2781 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/memory/runs/2026-05-07T04-07-10` | 90 | 99 | 3744574 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/memory/runs/2026-05-07T04-08-11` | 90 | 3 | 2860 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/memory/runs/2026-05-07T04-08-31` | 90 | 3 | 2860 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/memory/runs/2026-05-07T04-39-46` | 90 | 51 | 12879 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/memory/runs/2026-05-07T04-40-45` | 90 | 3 | 2943 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/memory/runs/2026-05-07T04-44-14` | 90 | 3 | 2943 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/memory/runs/2026-05-07T04-47-36` | 90 | 3 | 2943 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/memory/runs/2026-05-07T05-05-54` | 90 | 3 | 2937 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/memory/runs/2026-05-07T05-06-12` | 90 | 3 | 2937 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/memory/runs/2026-05-07T05-08-08` | 90 | 3 | 2937 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/memory/runs/2026-05-07T05-33-38` | 90 | 3 | 2937 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/memory/runs/2026-05-07T05-40-07` | 90 | 3 | 2937 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/memory/runs/2026-05-07T05-41-09` | 90 | 3 | 2937 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/memory/runs/2026-05-07T05-41-24` | 90 | 3 | 2937 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/memory/runs/2026-05-07T05-41-29` | 90 | 3 | 2937 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/memory/runs/2026-05-07T06-47-46` | 90 | 3 | 2937 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/memory/runs/2026-05-07T06-48-10` | 90 | 3 | 2937 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/memory/runs/2026-05-07T06-56-03` | 90 | 3 | 2937 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/memory/runs/2026-05-07T09-04-38` | 90 | 3 | 2937 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/memory/runs/2026-05-07T09-05-35` | 90 | 3 | 2937 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/memory/runs/2026-05-07T09-07-52` | 90 | 3 | 2937 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/memory/runs/2026-05-07T09-08-12` | 90 | 3 | 2937 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/memory/runs/2026-05-07T09-12-17` | 90 | 3 | 2937 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/memory/runs/2026-05-07T09-12-49` | 90 | 3 | 2937 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/memory/runs/2026-05-07T09-41-43` | 90 | 3 | 2937 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/memory/runs/2026-05-07T09-42-15` | 90 | 3 | 2937 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/memory/runs/2026-05-07T14-55-56` | 90 | 7 | 4143 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/memory/runs/2026-05-07T15-55-50` | 90 | 3 | 2937 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/memory/runs/2026-05-07T15-56-22` | 90 | 6 | 3639 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/memory/runs/2026-05-07T16-01-36` | 90 | 6 | 3639 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/memory/runs/2026-05-07T16-02-09` | 90 | 3 | 2937 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/memory/runs/2026-05-07T16-06-18` | 90 | 3 | 2937 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/memory/runs/2026-05-07T16-07-29` | 90 | 3 | 2937 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/memory/runs/2026-05-07T16-08-31` | 90 | 3 | 2937 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/memory/runs/2026-05-07T16-09-00` | 90 | 3 | 2937 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/memory/runs/2026-05-07T16-11-51` | 90 | 4 | 3160 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/memory/runs/2026-05-07T16-13-19` | 90 | 3 | 2937 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/memory/runs/2026-05-07T16-17-06` | 90 | 3 | 2937 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/memory/runs/2026-05-07T16-17-56` | 90 | 3 | 2937 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/memory/runs/2026-05-07T16-18-50` | 90 | 3 | 2937 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/memory/runs/2026-05-07T16-19-09` | 90 | 3 | 2937 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/memory/runs/2026-05-07T16-21-48` | 90 | 3 | 2937 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/memory/runs/2026-05-07T16-22-48` | 90 | 7 | 3666 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/memory/runs/2026-05-07T16-45-33` | 90 | 3 | 2937 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/memory/runs/2026-05-07T16-45-39` | 90 | 3 | 2937 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/memory/runs/2026-05-07T16-46-33` | 90 | 8 | 35750 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/memory/runs/2026-05-07T17-03-59` | 90 | 7 | 35694 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/memory/runs/2026-05-07T17-11-51` | 90 | 9 | 35784 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/memory/runs/2026-05-07T18-56-43` | 90 | 13 | 99985 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/memory/runs/2026-05-07T19-11-14` | 90 | 9 | 3174 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/memory/runs/2026-05-07T20-53-22` | 90 | 9 | 3226 | 0 | 0/0 | 0 | — |
 | ✅ | `sveltekit-frontend/memory/runs/2026-05-07T21-08-58` | 90 | 1 | 21 | 0 | 0/0 | 0 | — |
 | ✅ | `sveltekit-frontend/memory/runs/2026-05-07T23-01-22` | 90 | 1 | 209 | 0 | 0/0 | 0 | — |
 | ✅ | `sveltekit-frontend/memory/runs/2026-05-07T23-33-32` | 90 | 1 | 209 | 0 | 0/0 | 0 | — |
@@ -632,276 +538,230 @@
 | ✅ | `sveltekit-frontend/memory/runs/2026-05-09T04-09-49` | 90 | 1 | 45 | 0 | 0/0 | 0 | — |
 | ✅ | `sveltekit-frontend/memory/runs/2026-05-09T04-10-42` | 90 | 1 | 45 | 0 | 0/0 | 0 | — |
 | ✅ | `sveltekit-frontend/memory/runs/2026-05-12T19-48-04` | 90 | 1 | 45 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/memory/runs/2026-05-13T06-03-16` | 90 | 5 | 4527 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/memory/runs/2026-05-13T06-06-14` | 90 | 5 | 4527 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/memory/runs/2026-05-13T06-06-59` | 90 | 11 | 90578 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/memory/runs/2026-05-15T21-39-17` | 90 | 16 | 92032 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/memory/runs/2026-05-17T00-26-41` | 90 | 14 | 91944 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/memory/runs/2026-05-17T01-26-59` | 90 | 6 | 90377 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/memory/runs/2026-05-17T01-27-03` | 90 | 6 | 90377 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/memory/runs/2026-05-17T05-29-33` | 90 | 6 | 90377 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/memory/runs/2026-05-17T05-30-37` | 90 | 6 | 90377 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/memory/runs/2026-05-17T05-33-51` | 90 | 6 | 90377 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/memory/runs/2026-05-17T05-34-44` | 90 | 6 | 90377 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/memory/runs/2026-05-17T05-39-25` | 90 | 6 | 90377 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/memory/runs/2026-05-17T05-41-01` | 90 | 6 | 90377 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/memory/runs/2026-05-17T05-41-54` | 90 | 6 | 90377 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/memory/runs/2026-05-17T05-42-53` | 90 | 6 | 90377 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/memory/runs/2026-05-17T05-46-02` | 90 | 6 | 90377 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/memory/runs/2026-05-17T05-46-57` | 90 | 6 | 90377 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/memory/runs/2026-05-17T05-54-07` | 90 | 6 | 90377 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/memory/runs/2026-05-17T05-54-58` | 90 | 6 | 90377 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/memory/runs/2026-05-17T09-23-56` | 90 | 6 | 90377 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/memory/runs/2026-05-17T09-25-25` | 90 | 6 | 90377 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/memory/runs/2026-05-17T09-30-23` | 90 | 6 | 90377 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/memory/runs/2026-05-17T09-31-18` | 90 | 9 | 90493 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/memory/runs/2026-05-17T09-44-19` | 90 | 6 | 90377 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/memory/runs/2026-05-17T09-45-13` | 90 | 6 | 90377 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/memory/runs/2026-05-17T09-57-05` | 90 | 6 | 90377 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/memory/runs/2026-05-17T09-57-57` | 90 | 6 | 90377 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/memory/runs/2026-05-17T15-22-43` | 90 | 6 | 90377 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/memory/runs/2026-05-17T15-24-39` | 90 | 6 | 90377 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/memory/runs/2026-05-17T15-27-34` | 90 | 6 | 90377 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/memory/runs/2026-05-17T15-28-36` | 90 | 9 | 90493 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/memory/runs/2026-05-17T15-40-55` | 90 | 6 | 90377 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/memory/runs/2026-05-17T15-43-52` | 90 | 6 | 90377 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/memory/runs/2026-05-17T15-44-23` | 90 | 6 | 90377 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/memory/runs/2026-05-17T15-45-53` | 90 | 6 | 90377 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/memory/runs/2026-05-17T16-05-51` | 90 | 6 | 90377 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/memory/runs/2026-05-17T16-53-53` | 90 | 6 | 90377 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/memory/runs/2026-05-17T16-54-38` | 90 | 6 | 90377 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/memory/runs/2026-05-17T16-58-52` | 90 | 6 | 90377 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/memory/runs/2026-05-17T16-59-44` | 90 | 6 | 90377 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/memory/runs/2026-05-17T17-04-24` | 90 | 6 | 90377 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/memory/runs/2026-05-17T17-05-17` | 90 | 6 | 90377 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/memory/runs/2026-05-17T17-09-56` | 90 | 6 | 90377 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/memory/runs/2026-05-17T17-10-45` | 90 | 6 | 90377 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/memory/runs/2026-05-17T17-14-59` | 90 | 6 | 90377 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/memory/runs/2026-05-17T17-15-45` | 90 | 6 | 90377 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/memory/runs/2026-05-17T17-24-02` | 90 | 6 | 90377 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/memory/runs/2026-05-17T17-24-49` | 90 | 6 | 90377 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/memory/runs/2026-05-17T20-14-54` | 90 | 6 | 90377 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/memory/runs/2026-05-17T20-15-49` | 90 | 6 | 90377 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/memory/runs/2026-05-17T20-19-55` | 90 | 6 | 90377 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/memory/runs/2026-05-17T20-24-07` | 90 | 6 | 90377 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/memory/runs/2026-05-17T20-30-24` | 90 | 6 | 90377 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/memory/runs/2026-05-17T20-33-50` | 90 | 6 | 90377 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/memory/runs/2026-05-17T22-05-28` | 90 | 6 | 90377 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/memory/runs/2026-05-17T22-06-54` | 90 | 6 | 90377 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/memory/runs/2026-05-17T22-16-53` | 90 | 6 | 90377 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/memory/runs/2026-05-17T22-17-52` | 90 | 9 | 90498 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/memory/runs/2026-05-18T18-04-46` | 90 | 14 | 92051 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/memory/runs/2026-05-19T19-10-37` | 90 | 14 | 92045 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/memory/runs/2026-05-13T06-03-16` | 90 | 9 | 8959 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/memory/runs/2026-05-13T06-06-14` | 90 | 1 | 95 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/memory/runs/2026-05-13T06-06-59` | 90 | 115 | 5887642 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/memory/runs/2026-05-15T21-39-17` | 90 | 68 | 47090 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/memory/runs/2026-05-17T00-26-41` | 90 | 41 | 980942 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/memory/runs/2026-05-17T01-26-59` | 90 | 3 | 2938 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/memory/runs/2026-05-17T01-27-03` | 90 | 3 | 2938 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/memory/runs/2026-05-17T05-29-33` | 90 | 3 | 2938 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/memory/runs/2026-05-17T05-30-37` | 90 | 3 | 2938 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/memory/runs/2026-05-17T05-33-51` | 90 | 3 | 2938 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/memory/runs/2026-05-17T05-34-44` | 90 | 3 | 2938 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/memory/runs/2026-05-17T05-39-25` | 90 | 3 | 2938 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/memory/runs/2026-05-17T05-41-01` | 90 | 3 | 2938 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/memory/runs/2026-05-17T05-41-54` | 90 | 3 | 2938 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/memory/runs/2026-05-17T05-42-53` | 90 | 3 | 2938 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/memory/runs/2026-05-17T05-46-02` | 90 | 3 | 2938 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/memory/runs/2026-05-17T05-46-57` | 90 | 3 | 2938 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/memory/runs/2026-05-17T05-54-07` | 90 | 3 | 2938 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/memory/runs/2026-05-17T05-54-58` | 90 | 3 | 2938 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/memory/runs/2026-05-17T09-23-56` | 90 | 3 | 2938 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/memory/runs/2026-05-17T09-25-25` | 90 | 3 | 2938 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/memory/runs/2026-05-17T09-30-23` | 90 | 3 | 2938 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/memory/runs/2026-05-17T09-31-18` | 90 | 6 | 3054 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/memory/runs/2026-05-17T09-44-19` | 90 | 3 | 2938 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/memory/runs/2026-05-17T09-45-13` | 90 | 3 | 2938 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/memory/runs/2026-05-17T09-57-05` | 90 | 3 | 2938 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/memory/runs/2026-05-17T09-57-57` | 90 | 3 | 2938 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/memory/runs/2026-05-17T15-22-43` | 90 | 3 | 2938 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/memory/runs/2026-05-17T15-24-39` | 90 | 3 | 2938 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/memory/runs/2026-05-17T15-27-34` | 90 | 3 | 2938 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/memory/runs/2026-05-17T15-28-36` | 90 | 6 | 3054 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/memory/runs/2026-05-17T15-40-55` | 90 | 3 | 2938 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/memory/runs/2026-05-17T15-43-52` | 90 | 3 | 2938 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/memory/runs/2026-05-17T15-44-23` | 90 | 3 | 2938 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/memory/runs/2026-05-17T15-45-53` | 90 | 3 | 2938 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/memory/runs/2026-05-17T16-05-51` | 90 | 35 | 1010874 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/memory/runs/2026-05-17T16-53-53` | 90 | 3 | 2938 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/memory/runs/2026-05-17T16-54-38` | 90 | 3 | 2938 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/memory/runs/2026-05-17T16-58-52` | 90 | 3 | 2938 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/memory/runs/2026-05-17T16-59-44` | 90 | 3 | 2938 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/memory/runs/2026-05-17T17-04-24` | 90 | 3 | 2938 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/memory/runs/2026-05-17T17-05-17` | 90 | 3 | 2938 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/memory/runs/2026-05-17T17-09-56` | 90 | 3 | 2938 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/memory/runs/2026-05-17T17-10-45` | 90 | 3 | 2938 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/memory/runs/2026-05-17T17-14-59` | 90 | 3 | 2938 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/memory/runs/2026-05-17T17-15-45` | 90 | 3 | 2938 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/memory/runs/2026-05-17T17-24-02` | 90 | 3 | 2938 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/memory/runs/2026-05-17T17-24-49` | 90 | 3 | 2938 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/memory/runs/2026-05-17T20-14-54` | 90 | 3 | 2938 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/memory/runs/2026-05-17T20-15-49` | 90 | 3 | 2938 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/memory/runs/2026-05-17T20-19-55` | 90 | 3 | 2938 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/memory/runs/2026-05-17T20-24-07` | 90 | 3 | 2938 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/memory/runs/2026-05-17T20-30-24` | 90 | 3 | 2938 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/memory/runs/2026-05-17T20-33-50` | 90 | 3 | 2938 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/memory/runs/2026-05-17T22-05-28` | 90 | 3 | 2938 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/memory/runs/2026-05-17T22-06-54` | 90 | 3 | 2938 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/memory/runs/2026-05-17T22-16-53` | 90 | 3 | 2938 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/memory/runs/2026-05-17T22-17-52` | 90 | 6 | 3059 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/memory/runs/2026-05-18T18-04-46` | 90 | 14 | 4910 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/memory/runs/2026-05-19T19-10-37` | 90 | 15 | 5561 | 0 | 0/0 | 0 | — |
 | ✅ | `sveltekit-frontend/memory/runs/2026-05-20` | 90 | 1 | 19 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/memory/runs/2026-05-20T02-36-07` | 90 | 6 | 90378 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/memory/runs/2026-05-20T02-37-24` | 90 | 9 | 90499 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/memory/runs/2026-05-20T20-59-02` | 90 | 6 | 90378 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/memory/runs/2026-05-20T21-00-02` | 90 | 9 | 90499 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/memory/runs/2026-05-20T02-36-07` | 90 | 3 | 2938 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/memory/runs/2026-05-20T02-37-24` | 90 | 6 | 3059 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/memory/runs/2026-05-20T20-59-02` | 90 | 3 | 2938 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/memory/runs/2026-05-20T21-00-02` | 90 | 6 | 3059 | 0 | 0/0 | 0 | — |
 | ✅ | `sveltekit-frontend/memory/runs/2026-05-20T21-17-02` | 90 | 1 | 737 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/memory/runs/2026-05-20T21-28-24` | 90 | 14 | 92070 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/memory/runs/2026-05-21T22-17-08` | 90 | 6 | 90378 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/memory/runs/2026-05-21T22-18-05` | 90 | 9 | 90499 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/memory/runs/2026-05-22T01-44-37` | 90 | 14 | 92061 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/memory/runs/2026-05-22T13-23-31` | 90 | 6 | 90378 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/memory/runs/2026-05-22T13-24-30` | 90 | 6 | 90378 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/memory/runs/2026-05-23T02-44-53` | 90 | 14 | 92168 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/memory/runs/2026-05-24T16-28-25` | 90 | 14 | 92247 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/memory/runs/2026-05-24T23-07-15` | 90 | 6 | 90378 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/memory/runs/2026-05-24T23-09-00` | 90 | 9 | 90645 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/memory/runs/2026-05-26T17-32-25` | 90 | 5 | 1732 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/memory/runs/2026-05-26T17-32-26` | 90 | 10 | 90696 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/memory/runs/2026-05-27T19-37-18` | 90 | 15 | 92420 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/memory/runs/2026-05-29T02-00-27` | 90 | 6 | 90378 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/memory/runs/2026-05-29T02-01-53` | 90 | 6 | 90378 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/memory/runs/2026-05-29T02-16-15` | 90 | 6 | 90378 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/memory/runs/2026-05-29T02-17-36` | 90 | 6 | 90378 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/memory/runs/2026-05-29T04-09-19` | 90 | 6 | 90378 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/memory/runs/2026-05-29T04-11-06` | 90 | 6 | 90378 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/memory/runs/2026-05-29T04-14-58` | 90 | 6 | 90378 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/memory/runs/2026-05-29T04-15-48` | 90 | 6 | 90378 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/memory/runs/2026-05-29T05-38-52` | 90 | 6 | 90378 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/memory/runs/2026-05-29T05-40-05` | 90 | 6 | 90378 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/memory/runs/2026-05-29T05-46-36` | 90 | 6 | 90378 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/memory/runs/2026-05-29T05-47-57` | 90 | 6 | 90378 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/memory/runs/2026-05-29T05-59-03` | 90 | 6 | 90378 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/memory/runs/2026-05-29T06-00-23` | 90 | 6 | 90378 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/memory/runs/2026-05-29T06-05-46` | 90 | 6 | 90378 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/memory/runs/2026-05-29T06-07-17` | 90 | 6 | 90378 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/memory/runs/2026-05-29T06-15-45` | 90 | 6 | 90378 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/memory/runs/2026-05-29T06-17-33` | 90 | 6 | 90378 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/memory/runs/2026-05-29T15-30-49` | 90 | 14 | 92123 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/memory/runs/2026-05-30T08-33-59` | 90 | 6 | 90378 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/memory/runs/2026-05-30T08-35-01` | 90 | 6 | 90378 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/memory/runs/2026-05-30T17-12-06` | 90 | 6 | 90378 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/memory/runs/2026-05-30T17-12-13` | 90 | 6 | 90378 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/memory/runs/2026-05-30T17-18-43` | 90 | 6 | 90378 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/memory/runs/2026-05-30T17-19-54` | 90 | 9 | 90465 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/memory/runs/2026-05-30T20-02-16` | 90 | 14 | 92085 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/memory/runs/2026-05-31T20-36-25` | 90 | 14 | 92045 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/memory/runs/2026-06-01T22-22-15` | 90 | 14 | 92051 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/memory/runs/2026-06-03T15-49-43` | 90 | 6 | 90384 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/memory/runs/2026-06-03T15-49-51` | 90 | 6 | 90384 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/memory/runs/2026-05-20T21-28-24` | 90 | 13 | 5184 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/memory/runs/2026-05-21T22-17-08` | 90 | 3 | 2938 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/memory/runs/2026-05-21T22-18-05` | 90 | 6 | 3059 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/memory/runs/2026-05-22T01-44-37` | 90 | 44 | 888292 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/memory/runs/2026-05-22T13-23-31` | 90 | 3 | 2938 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/memory/runs/2026-05-22T13-24-30` | 90 | 3 | 2938 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/memory/runs/2026-05-23T02-44-53` | 90 | 10 | 3805 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/memory/runs/2026-05-24T16-28-25` | 90 | 41 | 10837 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/memory/runs/2026-05-24T23-07-15` | 90 | 3 | 2938 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/memory/runs/2026-05-24T23-09-00` | 90 | 6 | 3205 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/memory/runs/2026-05-26T17-32-25` | 90 | 13 | 3439 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/memory/runs/2026-05-26T17-32-26` | 90 | 6 | 3255 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/memory/runs/2026-05-27T19-37-18` | 90 | 9 | 3538 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/memory/runs/2026-05-29T02-00-27` | 90 | 3 | 2938 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/memory/runs/2026-05-29T02-01-53` | 90 | 3 | 2938 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/memory/runs/2026-05-29T02-16-15` | 90 | 3 | 2938 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/memory/runs/2026-05-29T02-17-36` | 90 | 3 | 2938 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/memory/runs/2026-05-29T04-09-19` | 90 | 3 | 2938 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/memory/runs/2026-05-29T04-11-06` | 90 | 3 | 2938 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/memory/runs/2026-05-29T04-14-58` | 90 | 3 | 2938 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/memory/runs/2026-05-29T04-15-48` | 90 | 3 | 2938 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/memory/runs/2026-05-29T05-38-52` | 90 | 3 | 2938 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/memory/runs/2026-05-29T05-40-05` | 90 | 3 | 2938 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/memory/runs/2026-05-29T05-46-36` | 90 | 3 | 2938 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/memory/runs/2026-05-29T05-47-57` | 90 | 3 | 2938 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/memory/runs/2026-05-29T05-59-03` | 90 | 3 | 2938 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/memory/runs/2026-05-29T06-00-23` | 90 | 3 | 2938 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/memory/runs/2026-05-29T06-05-46` | 90 | 3 | 2938 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/memory/runs/2026-05-29T06-07-17` | 90 | 3 | 2938 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/memory/runs/2026-05-29T06-15-45` | 90 | 3 | 2938 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/memory/runs/2026-05-29T06-17-33` | 90 | 3 | 2938 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/memory/runs/2026-05-29T15-30-49` | 90 | 10 | 4630 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/memory/runs/2026-05-30T08-33-59` | 90 | 13 | 317918 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/memory/runs/2026-05-30T08-35-01` | 90 | 3 | 2938 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/memory/runs/2026-05-30T17-12-06` | 90 | 3 | 2938 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/memory/runs/2026-05-30T17-12-13` | 90 | 3 | 2938 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/memory/runs/2026-05-30T17-18-43` | 90 | 3 | 2938 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/memory/runs/2026-05-30T17-19-54` | 90 | 6 | 3025 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/memory/runs/2026-05-30T20-02-16` | 90 | 12 | 4996 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/memory/runs/2026-05-31T20-36-25` | 90 | 9 | 4549 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/memory/runs/2026-06-01T22-22-15` | 90 | 15 | 36866 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/memory/runs/2026-06-03T15-49-43` | 90 | 3 | 2942 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/memory/runs/2026-06-03T15-49-51` | 90 | 3 | 2942 | 0 | 0/0 | 0 | — |
 | ✅ | `sveltekit-frontend/memory/runs/2026-06-06` | 90 | 1 | 19 | 0 | 0/0 | 0 | — |
 | ✅ | `sveltekit-frontend/memory/runs/2026-06-06T01-36-20` | 90 | 1 | 755 | 0 | 0/0 | 0 | — |
 | ✅ | `sveltekit-frontend/memory/runs/2026-06-06T01-50-52` | 90 | 1 | 755 | 0 | 0/0 | 0 | — |
 | ✅ | `sveltekit-frontend/memory/runs/2026-06-06T02-04-19` | 90 | 1 | 755 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/memory/runs/2026-06-11T03-27-26` | 90 | 5 | 1693 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/memory/runs/2026-06-11T03-27-27` | 90 | 6 | 90384 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/memory/runs/2026-06-11T03-27-26` | 90 | 4 | 1640 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/memory/runs/2026-06-11T03-27-27` | 90 | 4 | 34440 | 0 | 0/0 | 0 | — |
 | ✅ | `sveltekit-frontend/memory/synthesis` | 90 | 1 | 10 | 0 | 0/0 | 0 | — |
 | ✅ | `sveltekit-frontend/mini_active_nvme_cache` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
 | ✅ | `sveltekit-frontend/reports` | 90 | 6 | 304025 | 0 | 0/0 | 0 | — |
 | ✅ | `sveltekit-frontend/reports/deep-audit` | 90 | 4 | 303959 | 0 | 0/0 | 0 | — |
 | ✅ | `sveltekit-frontend/reports/deep-audit/encoded` | 90 | 29 | 139362 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/scratch/synthesis-runs/2026-05-09T18-23-55` | 90 | 4 | 33 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/scratch/synthesis-runs/2026-05-09T18-49-48` | 90 | 4 | 33 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/scratch/synthesis-runs/2026-05-09T18-52-33` | 90 | 4 | 31 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/scratch/synthesis-runs/2026-05-09T22-39-57` | 90 | 4 | 33 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/scratch/synthesis-runs/2026-05-09T23-15-14` | 90 | 4 | 33 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/scratch/synthesis-runs/2026-05-09T23-28-37` | 90 | 4 | 31 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/scratch/synthesis-runs/2026-05-09T23-31-59` | 90 | 4 | 31 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/scratch/synthesis-runs/2026-05-09T23-32-06` | 90 | 4 | 31 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/scratch/synthesis-runs/2026-05-09T23-33-12` | 90 | 4 | 82 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/scratch/synthesis-runs/2026-05-09T23-35-06` | 90 | 4 | 93 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/scratch/synthesis-runs/2026-05-09T23-37-55` | 90 | 4 | 82 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/scratch/synthesis-runs/2026-05-09T23-43-00` | 90 | 4 | 99 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/scratch/synthesis-runs/2026-05-09T23-48-27` | 90 | 4 | 48 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/scratch/synthesis-runs/2026-05-09T23-58-13` | 90 | 4 | 120 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/scratch/synthesis-runs/2026-05-09T23-58-21` | 90 | 4 | 120 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/scratch/synthesis-runs/2026-05-10T00-10-13` | 90 | 4 | 131 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/scratch/synthesis-runs/2026-05-10T00-15-53` | 90 | 4 | 144 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/scratch/synthesis-runs/2026-05-10T00-31-09` | 90 | 4 | 129 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/scratch/synthesis-runs/2026-05-09T18-23-55` | 90 | 51 | 286 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/scratch/synthesis-runs/2026-05-09T18-49-48` | 90 | 1 | 16 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/scratch/synthesis-runs/2026-05-09T18-52-33` | 90 | 3 | 26 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/scratch/synthesis-runs/2026-05-09T22-39-57` | 90 | 2 | 21 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/scratch/synthesis-runs/2026-05-09T23-15-14` | 90 | 12 | 71 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/scratch/synthesis-runs/2026-05-09T23-28-37` | 90 | 1 | 14 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/scratch/synthesis-runs/2026-05-09T23-31-59` | 90 | 1 | 14 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/scratch/synthesis-runs/2026-05-09T23-32-06` | 90 | 1 | 14 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/scratch/synthesis-runs/2026-05-09T23-33-12` | 90 | 1 | 65 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/scratch/synthesis-runs/2026-05-09T23-35-06` | 90 | 2 | 81 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/scratch/synthesis-runs/2026-05-09T23-37-55` | 90 | 1 | 65 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/scratch/synthesis-runs/2026-05-09T23-43-00` | 90 | 2 | 89 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/scratch/synthesis-runs/2026-05-09T23-48-27` | 90 | 2 | 38 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/scratch/synthesis-runs/2026-05-09T23-58-13` | 90 | 2 | 110 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/scratch/synthesis-runs/2026-05-09T23-58-21` | 90 | 2 | 110 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/scratch/synthesis-runs/2026-05-10T00-10-13` | 90 | 3 | 126 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/scratch/synthesis-runs/2026-05-10T00-15-53` | 90 | 3 | 139 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/scratch/synthesis-runs/2026-05-10T00-31-09` | 90 | 3 | 124 | 0 | 0/0 | 0 | — |
 | ✅ | `sveltekit-frontend/scratch/synthesis-runs/2026-05-10T00-36-44` | 90 | 4 | 123 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/scratch/synthesis-runs/2026-05-10T00-37-41` | 90 | 4 | 123 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/scratch/synthesis-runs/2026-05-10T00-37-58` | 90 | 4 | 129 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/scratch/synthesis-runs/2026-05-10T00-39-05` | 90 | 4 | 129 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/scratch/synthesis-runs/2026-05-10T00-39-33` | 90 | 4 | 140 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/scratch/synthesis-runs/2026-05-10T00-41-49` | 90 | 4 | 140 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/scratch/synthesis-runs/2026-05-10T00-55-47` | 90 | 4 | 120 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/scratch/synthesis-runs/2026-05-10T01-10-06` | 90 | 4 | 368 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/scratch/synthesis-runs/2026-05-10T01-10-42` | 90 | 4 | 387 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/scratch/synthesis-runs/2026-05-10T01-37-08` | 90 | 4 | 239 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/scratch/synthesis-runs/2026-05-10T01-37-35` | 90 | 4 | 256 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/scratch/synthesis-runs/2026-05-10T01-41-33` | 90 | 4 | 228 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/scratch/synthesis-runs/2026-05-10T01-41-52` | 90 | 4 | 254 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/scratch/synthesis-runs/2026-05-10T01-42-12` | 90 | 4 | 255 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/scratch/synthesis-runs/2026-05-10T01-45-56` | 90 | 4 | 244 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/scratch/synthesis-runs/2026-05-10T01-46-47` | 90 | 4 | 269 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/scratch/synthesis-runs/2026-05-10T01-47-55` | 90 | 4 | 270 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/scratch/synthesis-runs/2026-05-10T02-42-37` | 90 | 4 | 190 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/scratch/synthesis-runs/2026-05-10T03-11-12` | 90 | 4 | 188 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/scratch/synthesis-runs/2026-05-10T03-13-21` | 90 | 4 | 178 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/scratch/synthesis-runs/2026-05-10T00-37-41` | 90 | 2 | 113 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/scratch/synthesis-runs/2026-05-10T00-37-58` | 90 | 2 | 119 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/scratch/synthesis-runs/2026-05-10T00-39-05` | 90 | 3 | 124 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/scratch/synthesis-runs/2026-05-10T00-39-33` | 90 | 3 | 135 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/scratch/synthesis-runs/2026-05-10T00-41-49` | 90 | 3 | 135 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/scratch/synthesis-runs/2026-05-10T00-55-47` | 90 | 3 | 115 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/scratch/synthesis-runs/2026-05-10T01-10-06` | 90 | 3 | 363 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/scratch/synthesis-runs/2026-05-10T01-10-42` | 90 | 3 | 382 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/scratch/synthesis-runs/2026-05-10T01-37-08` | 90 | 3 | 234 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/scratch/synthesis-runs/2026-05-10T01-37-35` | 90 | 3 | 251 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/scratch/synthesis-runs/2026-05-10T01-41-33` | 90 | 3 | 223 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/scratch/synthesis-runs/2026-05-10T01-41-52` | 90 | 3 | 249 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/scratch/synthesis-runs/2026-05-10T01-42-12` | 90 | 3 | 250 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/scratch/synthesis-runs/2026-05-10T01-45-56` | 90 | 3 | 239 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/scratch/synthesis-runs/2026-05-10T01-46-47` | 90 | 3 | 264 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/scratch/synthesis-runs/2026-05-10T01-47-55` | 90 | 3 | 265 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/scratch/synthesis-runs/2026-05-10T02-42-37` | 90 | 3 | 185 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/scratch/synthesis-runs/2026-05-10T03-11-12` | 90 | 4 | 207 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/scratch/synthesis-runs/2026-05-10T03-13-21` | 90 | 2 | 149 | 0 | 0/0 | 0 | — |
 | ✅ | `sveltekit-frontend/scratch/synthesis-runs/2026-05-12T07-53-27` | 90 | 4 | 110 | 0 | 0/0 | 0 | — |
 | ✅ | `sveltekit-frontend/scratch/synthesis-runs/2026-05-12T07-56-43` | 90 | 4 | 298 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/scripts/activity` | 90 | 1 | 123 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/scripts/atlas/lib` | 90 | 2 | 135 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/scripts/ace` | 90 | 3 | 434 | 0 | 0/2 | 0 | — |
+| ✅ | `sveltekit-frontend/scripts/atlas/lib` | 90 | 1 | 42 | 0 | 0/0 | 0 | — |
 | ✅ | `sveltekit-frontend/scripts/atlas/workers` | 90 | 1 | 146 | 0 | 0/1 | 0 | — |
-| ✅ | `sveltekit-frontend/scripts/authority` | 90 | 1 | 277 | 0 | 0/1 | 0 | — |
 | ✅ | `sveltekit-frontend/scripts/backup-consolidation` | 90 | 17 | 4382 | 0 | 0/10 | 0 | — |
 | ✅ | `sveltekit-frontend/scripts/backup-consolidation/tests` | 90 | 4 | 999 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/scripts/bifrost` | 90 | 2 | 587 | 0 | 0/2 | 0 | — |
-| ✅ | `sveltekit-frontend/scripts/cache` | 90 | 6 | 791 | 0 | 0/4 | 0 | — |
-| ✅ | `sveltekit-frontend/scripts/cards` | 90 | 7 | 1373 | 0 | 0/4 | 0 | — |
-| ✅ | `sveltekit-frontend/scripts/ci` | 90 | 1 | 62 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/scripts/comfyui` | 90 | 3 | 282 | 0 | 0/1 | 0 | — |
-| ✅ | `sveltekit-frontend/scripts/comfyui/workflows` | 90 | 1 | 42 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/scripts/cache` | 90 | 3 | 546 | 0 | 0/3 | 0 | — |
+| ✅ | `sveltekit-frontend/scripts/comfyui` | 90 | 2 | 282 | 0 | 0/1 | 0 | — |
+| ✅ | `sveltekit-frontend/scripts/comfyui/workflows` | 90 | 2 | 84 | 0 | 0/0 | 0 | — |
 | ✅ | `sveltekit-frontend/scripts/daily` | 90 | 1 | 78 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/scripts/datasets` | 90 | 1 | 32 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/scripts/db` | 90 | 3 | 294 | 0 | 0/1 | 0 | — |
-| ✅ | `sveltekit-frontend/scripts/dev` | 90 | 6 | 451 | 0 | 0/3 | 0 | — |
-| ✅ | `sveltekit-frontend/scripts/diff` | 90 | 3 | 721 | 0 | 0/2 | 0 | — |
+| ✅ | `sveltekit-frontend/scripts/dev` | 90 | 1 | 140 | 0 | 0/0 | 0 | — |
 | ✅ | `sveltekit-frontend/scripts/docs/reports` | 90 | 1 | 306 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/scripts/duckdb` | 90 | 3 | 447 | 0 | 0/3 | 0 | — |
-| ✅ | `sveltekit-frontend/scripts/engram` | 90 | 1 | 47 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/scripts/export` | 90 | 1 | 112 | 0 | 0/1 | 0 | — |
-| ✅ | `sveltekit-frontend/scripts/features` | 90 | 6 | 358 | 0 | 0/4 | 0 | — |
+| ✅ | `sveltekit-frontend/scripts/features` | 90 | 1 | 46 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/scripts/graph` | 90 | 9 | 1754 | 0 | 0/6 | 0 | — |
 | ✅ | `sveltekit-frontend/scripts/health` | 90 | 1 | 243 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/scripts/ingest` | 90 | 2 | 245 | 0 | 0/1 | 0 | — |
-| ✅ | `sveltekit-frontend/scripts/legal` | 90 | 2 | 135 | 0 | 0/1 | 0 | — |
-| ✅ | `sveltekit-frontend/scripts/llms` | 90 | 5 | 1472 | 0 | 0/3 | 0 | — |
-| ✅ | `sveltekit-frontend/scripts/mega-audit` | 90 | 4 | 619 | 0 | 0/3 | 0 | — |
-| ✅ | `sveltekit-frontend/scripts/memory` | 90 | 2 | 102 | 0 | 0/2 | 0 | — |
-| ✅ | `sveltekit-frontend/scripts/observability` | 90 | 1 | 20 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/scripts/opencode` | 90 | 16 | 3657 | 0 | 0/4 | 0 | — |
-| ✅ | `sveltekit-frontend/scripts/operator` | 90 | 1 | 169 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/scripts/phase9` | 90 | 1 | 41 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/scripts/prompt-cache` | 90 | 1 | 49 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/scripts/ingest` | 90 | 1 | 108 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/scripts/knowledge` | 90 | 1 | 55 | 0 | 0/1 | 0 | — |
+| ✅ | `sveltekit-frontend/scripts/llms` | 90 | 3 | 714 | 0 | 0/2 | 0 | — |
+| ✅ | `sveltekit-frontend/scripts/opencode` | 90 | 14 | 3459 | 0 | 0/4 | 0 | — |
 | ✅ | `sveltekit-frontend/scripts/qdrant` | 90 | 3 | 384 | 0 | 0/2 | 0 | — |
 | ✅ | `sveltekit-frontend/scripts/reconstruction` | 90 | 4 | 439 | 0 | 0/1 | 0 | — |
-| ✅ | `sveltekit-frontend/scripts/redis` | 90 | 2 | 93 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/scripts/reports` | 90 | 4 | 203 | 0 | 0/1 | 0 | — |
-| ✅ | `sveltekit-frontend/scripts/rg-atlas` | 90 | 2 | 162 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/scripts/rg-atlas` | 90 | 1 | 42 | 0 | 0/0 | 0 | — |
 | ✅ | `sveltekit-frontend/scripts/sidecars` | 90 | 3 | 14 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/scripts/skills` | 90 | 2 | 750 | 0 | 0/1 | 0 | — |
-| ✅ | `sveltekit-frontend/scripts/synth` | 90 | 3 | 929 | 0 | 0/2 | 0 | — |
-| ✅ | `sveltekit-frontend/scripts/tests/nes-arch` | 90 | 2 | 191 | 0 | 0/1 | 0 | — |
+| ✅ | `sveltekit-frontend/scripts/synth` | 90 | 1 | 113 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/scripts/tests/nes-arch` | 90 | 1 | 76 | 0 | 0/1 | 0 | — |
 | ✅ | `sveltekit-frontend/scripts/tests/probes` | 90 | 3 | 88 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/scripts/tests/screenshots` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/scripts/tools` | 90 | 3 | 275 | 0 | 0/1 | 0 | — |
-| ✅ | `sveltekit-frontend/scripts/turboquant` | 90 | 5 | 1481 | 0 | 0/4 | 0 | — |
-| ✅ | `sveltekit-frontend/scripts/wiki` | 90 | 11 | 2999 | 0 | 0/6 | 0 | — |
+| ✅ | `sveltekit-frontend/scripts/tools` | 90 | 2 | 205 | 0 | 0/1 | 0 | — |
+| ✅ | `sveltekit-frontend/scripts/turboquant` | 90 | 1 | 82 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/scripts/validate` | 90 | 1 | 260 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/scripts/wiki` | 90 | 10 | 2818 | 0 | 0/5 | 0 | — |
 | ✅ | `sveltekit-frontend/scripts/__fixtures__` | 90 | 1 | 28 | 0 | 0/1 | 0 | — |
 | ✅ | `sveltekit-frontend/src/lib/agent` | 90 | 9 | 977 | 0 | 0/2 | 0 | — |
-| ✅ | `sveltekit-frontend/src/lib/ai` | 90 | 19 | 5350 | 0 | 0/1 | 0 | — |
-| ✅ | `sveltekit-frontend/src/lib/cache` | 90 | 5 | 1046 | 0 | 0/1 | 0 | — |
-| ✅ | `sveltekit-frontend/src/lib/canvas` | 90 | 1 | 15 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/src/lib/client` | 90 | 11 | 1081 | 0 | 0/4 | 0 | — |
-| ✅ | `sveltekit-frontend/src/lib/collaboration` | 90 | 1 | 267 | 0 | 0/1 | 0 | — |
-| ✅ | `sveltekit-frontend/src/lib/config` | 90 | 8 | 1536 | 0 | 1/1 | 0 | — |
-| ✅ | `sveltekit-frontend/src/lib/courtroom` | 90 | 4 | 1561 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/src/lib/env` | 90 | 2 | 27 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/src/lib/features` | 90 | 6 | 546 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/src/lib/ai` | 90 | 1 | 49 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/src/lib/client` | 90 | 1 | 104 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/src/lib/components` | 90 | 11 | 1040 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/src/lib/config` | 90 | 1 | 311 | 0 | 1/1 | 0 | — |
 | ✅ | `sveltekit-frontend/src/lib/generated` | 90 | 10 | 24980 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/src/lib/gpu` | 90 | 17 | 4876 | 0 | 0/2 | 0 | — |
-| ✅ | `sveltekit-frontend/src/lib/graph` | 90 | 1 | 54 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/src/lib/icons` | 90 | 15 | 572 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/src/lib/machines` | 90 | 11 | 4093 | 0 | 0/1 | 0 | — |
-| ✅ | `sveltekit-frontend/src/lib/messaging` | 90 | 1 | 168 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/src/lib/phase72` | 90 | 1 | 148 | 0 | 0/1 | 0 | — |
-| ✅ | `sveltekit-frontend/src/lib/schemas` | 90 | 13 | 1050 | 0 | 0/5 | 0 | — |
-| ✅ | `sveltekit-frontend/src/lib/services` | 90 | 6 | 738 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/src/lib/shared` | 90 | 5 | 284 | 0 | 0/1 | 0 | — |
-| ✅ | `sveltekit-frontend/src/lib/state` | 90 | 1 | 8 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/src/lib/stores` | 90 | 27 | 5109 | 0 | 0/6 | 0 | — |
-| ✅ | `sveltekit-frontend/src/lib/test-utils` | 90 | 1 | 11 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/src/lib/webgpu` | 90 | 20 | 5786 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/src/mcp/tools` | 90 | 8 | 2584 | 0 | 0/7 | 0 | — |
-| ✅ | `sveltekit-frontend/src/mcp/zod-to-json-schema-bridge` | 90 | 2 | 94 | 0 | 0/1 | 0 | — |
-| ✅ | `sveltekit-frontend/src/routes/(admin)` | 90 | 3 | 634 | 0 | 3/0 | 0 | — |
-| ✅ | `sveltekit-frontend/src/routes/(analysis)` | 90 | 8 | 2992 | 0 | 4/0 | 0 | ⬜notest |
-| ✅ | `sveltekit-frontend/src/routes/(analysis)@` | 90 | 8 | 2719 | 0 | 4/0 | 0 | ⬜notest |
-| ✅ | `sveltekit-frontend/src/routes/(dev)` | 90 | 13 | 2336 | 0 | 1/1 | 0 | ⬜notest |
-| ✅ | `sveltekit-frontend/src/routes/debug` | 90 | 1 | 198 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/src/routes/minio` | 90 | 1 | 8 | 0 | 0/0 | 0 | ⬜notest |
-| ✅ | `sveltekit-frontend/src/routes/seaweed` | 90 | 1 | 7 | 0 | 0/0 | 0 | ⬜notest |
-| ✅ | `sveltekit-frontend/src/shims` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/src/stores` | 90 | 1 | 47 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/src/tests` | 90 | 1 | 10 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/src/wasm` | 90 | 2 | 524 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/src/workers` | 90 | 3 | 282 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/sveltekit-frontend/.docker-build` | 90 | 1 | 7 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/src/lib/shims` | 90 | 1 | 426 | 0 | 0/1 | 0 | — |
+| ✅ | `sveltekit-frontend/src/mcp/tools` | 90 | 1 | 409 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/src/routes/(analysis)` | 90 | 9 | 3078 | 0 | 6/0 | 0 | ⬜notest |
+| ✅ | `sveltekit-frontend/src/routes/(analysis)@` | 90 | 3 | 2471 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/sveltekit-frontend/.docker-build` | 90 | 2 | 14 | 0 | 0/0 | 0 | — |
 | ✅ | `sveltekit-frontend/sveltekit-frontend/docs/reports` | 90 | 2 | 368 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/sveltekit-frontend/src/lib` | 90 | 2 | 405 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/sveltekit-frontend/scripts/atlas` | 90 | 5 | 650 | 0 | 0/2 | 0 | — |
+| ✅ | `sveltekit-frontend/sveltekit-frontend/src/lib` | 90 | 1 | 371 | 0 | 0/0 | 0 | — |
 | ✅ | `sveltekit-frontend/sveltekit-frontend/sveltekit-frontend/docs` | 90 | 2 | 98 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/sveltekit-frontend/sveltekit-frontend/scripts` | 90 | 3 | 556 | 0 | 0/1 | 0 | — |
 | ✅ | `sveltekit-frontend/test` | 90 | 1 | 63 | 0 | 0/0 | 0 | — |
 | ✅ | `sveltekit-frontend/test-results` | 90 | 2 | 366 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/tests/accessibility` | 90 | 2 | 557 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/tests/e2e` | 90 | 30 | 9084 | 0 | 10/3 | 0 | — |
+| ✅ | `sveltekit-frontend/tests/accessibility` | 90 | 1 | 106 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/tests/e2e` | 90 | 18 | 5799 | 0 | 10/3 | 0 | — |
 | ✅ | `sveltekit-frontend/tests/e2e/route-forensic` | 90 | 35 | 1750 | 0 | 4/0 | 0 | — |
-| ✅ | `sveltekit-frontend/tests/e2e/utils` | 90 | 3 | 505 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/tests/fixtures` | 90 | 2 | 90 | 0 | 1/0 | 0 | — |
-| ✅ | `sveltekit-frontend/tests/intent` | 90 | 3 | 498 | 0 | 0/1 | 0 | — |
+| ✅ | `sveltekit-frontend/tests/fixtures` | 90 | 1 | 46 | 0 | 1/0 | 0 | — |
+| ✅ | `sveltekit-frontend/tests/intent` | 90 | 2 | 472 | 0 | 0/1 | 0 | — |
 | ✅ | `sveltekit-frontend/tests/mapreduce` | 90 | 1 | 217 | 0 | 0/0 | 0 | — |
 | ✅ | `sveltekit-frontend/tests/opencode` | 90 | 1 | 294 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/tests/reports` | 90 | 2 | 64 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/tests/routes/api` | 90 | 2 | 185 | 0 | 2/0 | 0 | — |
+| ✅ | `sveltekit-frontend/tests/reports` | 90 | 1 | 26 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/tests/routes/api` | 90 | 1 | 126 | 0 | 1/0 | 0 | — |
 | ✅ | `sveltekit-frontend/tests/runes` | 90 | 1 | 230 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/tests/setup` | 90 | 1 | 226 | 0 | 0/0 | 0 | — |
 | ✅ | `sveltekit-frontend/tests/sw` | 90 | 1 | 97 | 0 | 0/1 | 0 | — |
+| ✅ | `sveltekit-frontend/tests/unit` | 90 | 10 | 1484 | 0 | 0/2 | 0 | — |
 | ✅ | `sveltekit-frontend/tests/utils` | 90 | 1 | 134 | 0 | 0/0 | 0 | — |
 | ✅ | `sveltekit-frontend/tmp/ace-context-snapshots` | 90 | 2 | 115 | 0 | 0/0 | 0 | — |
 | ✅ | `sveltekit-frontend/tmp/hypergraph` | 90 | 1 | 77108 | 0 | 0/0 | 0 | — |
 | ✅ | `sveltekit-frontend/tmp/uscode-extracted` | 90 | 1 | 83 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/uploads/audio` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
 | ✅ | `sveltekit-frontend/uploads/transcriptions` | 90 | 2 | 1388 | 0 | 0/0 | 0 | — |
 | ✅ | `tests/integration` | 90 | 2 | 324 | 0 | 0/0 | 0 | — |
 | ✅ | `tests/opencode` | 90 | 2 | 678 | 0 | 0/2 | 0 | — |
@@ -909,171 +769,124 @@
 | ✅ | `turbovec/benchmarks/results` | 90 | 23 | 328 | 0 | 0/0 | 0 | — |
 | ✅ | `turbovec/target` | 90 | 1 | 155 | 0 | 0/0 | 0 | — |
 | ✅ | `turbovec/target/release/.fingerprint` | 90 | 154 | 154 | 0 | 0/0 | 0 | — |
-| ✅ | `claude-mem/plugin` | 95 | 2 | 24742 | 0 | 2/10 | 0 | 🟠lh |
+| ✅ | `.claude/worktrees/agent-a6ea9982/sveltekit-frontend` | 95 | 3 | 24756 | 0 | 0/3 | 0 | 🟠lh |
+| ✅ | `sveltekit-frontend/scripts/semantic-valkey` | 95 | 3 | 637 | 0 | 1/0 | 0 | 🟠lh |
+| ✅ | `sveltekit-frontend/src/mcp` | 95 | 4 | 17704 | 0 | 0/3 | 0 | 🟠lh |
+| ✅ | `sveltekit-frontend/src/routes/(app)` | 95 | 41 | 10723 | 0 | 41/4 | 0 | 🟠lh ⬜notest |
+| ✅ | `claude-mem/plugin` | 95 | 2 | 24717 | 0 | 2/10 | 0 | 🟠lh |
 | ✅ | `claude-mem/plugin/scripts` | 95 | 9 | 23096 | 0 | 2/8 | 0 | 🟠lh |
 | ✅ | `packages/atlas-core/src/retrieval` | 95 | 3 | 1579 | 0 | 0/1 | 0 | 🟠lh |
-| ✅ | `scripts/agent` | 95 | 6 | 1162 | 0 | 0/4 | 0 | 🟠lh |
-| ✅ | `scripts/docs-atlas` | 95 | 24 | 3754 | 0 | 0/10 | 0 | 🟠lh |
-| ✅ | `scripts/ingest` | 95 | 48 | 6830 | 0 | 0/34 | 0 | 🟠lh |
-| ✅ | `scripts/memory` | 95 | 10 | 574892 | 0 | 0/4 | 0 | 🟠lh |
-| ✅ | `scripts/opencode` | 95 | 144 | 19750 | 0 | 0/122 | 0 | 🟠lh |
-| ✅ | `scripts/qdrant` | 95 | 6 | 604 | 0 | 0/2 | 0 | 🟠lh |
-| ✅ | `sveltekit-frontend/.docker-build` | 95 | 2 | 40309 | 0 | 1/39 | 0 | 🟠lh |
-| ✅ | `sveltekit-frontend/.docker-build/scripts` | 95 | 1 | 9033 | 0 | 1/39 | 0 | 🟠lh |
-| ✅ | `sveltekit-frontend/.docker-build/scripts/atlas` | 95 | 54 | 8853 | 0 | 1/39 | 0 | 🟠lh |
+| ✅ | `scripts/docs-atlas` | 95 | 20 | 2462 | 0 | 0/8 | 0 | 🟠lh |
+| ✅ | `scripts/ingest` | 95 | 24 | 5498 | 0 | 0/22 | 0 | 🟠lh |
+| ✅ | `scripts/opencode` | 95 | 58 | 10786 | 0 | 0/50 | 0 | 🟠lh |
+| ✅ | `scripts/qdrant` | 95 | 2 | 322 | 0 | 0/2 | 0 | 🟠lh |
+| ✅ | `scripts/tests` | 95 | 66 | 77846 | 0 | 4/14 | 0 | 🟠lh |
+| ✅ | `sveltekit-frontend/.docker-build` | 95 | 1 | 33663 | 0 | 2/21 | 0 | 🟠lh |
+| ✅ | `sveltekit-frontend/.docker-build/scripts/atlas` | 95 | 38 | 3937 | 0 | 2/21 | 0 | 🟠lh |
 | ✅ | `sveltekit-frontend/scratch` | 95 | 54 | 7233 | 0 | 0/7 | 0 | 🟠lh |
-| ✅ | `sveltekit-frontend/scripts/graph` | 95 | 12 | 2899 | 0 | 1/8 | 0 | 🟠lh |
-| ✅ | `sveltekit-frontend/scripts/index` | 95 | 10 | 806 | 0 | 0/7 | 0 | 🟠lh |
-| ✅ | `sveltekit-frontend/scripts/mcp` | 95 | 16 | 5336 | 0 | 0/10 | 0 | 🟠lh |
-| ✅ | `sveltekit-frontend/scripts/semantic-valkey` | 95 | 2 | 464 | 0 | 1/0 | 0 | 🟠lh |
-| ✅ | `sveltekit-frontend/scripts/smoke` | 95 | 32 | 4346 | 0 | 0/11 | 0 | 🟠lh |
-| ✅ | `sveltekit-frontend/scripts/startup` | 95 | 13 | 2546 | 0 | 0/4 | 0 | 🟠lh |
-| ✅ | `sveltekit-frontend/scripts/tests` | 95 | 74 | 15584 | 0 | 4/25 | 0 | 🟠lh |
-| ✅ | `sveltekit-frontend/src/mcp` | 95 | 16 | 18841 | 0 | 1/21 | 0 | 🟠lh |
+| ✅ | `sveltekit-frontend/scripts/mcp` | 95 | 7 | 2911 | 0 | 0/6 | 0 | 🟠lh |
+| ✅ | `sveltekit-frontend/scripts/smoke` | 95 | 28 | 3747 | 0 | 0/9 | 0 | 🟠lh |
+| ✅ | `sveltekit-frontend/scripts/tests` | 95 | 52 | 9386 | 0 | 2/14 | 0 | 🟠lh |
+| ✅ | `sveltekit-frontend/src` | 97 | 1 | 187338 | 143 | 184/234 | 7 | 🟠lh ⬜notest |
 | ✅ | `.claude/hooks` | 100 | 2 | 164 | 0 | 0/2 | 0 | — |
-| ✅ | `.claude/worktrees/agent-a38668f2` | 100 | 21 | 17810162 | 779 | 1933/2085 | 63 | 🟡sv4 🟠lh |
-| ✅ | `.claude/worktrees/agent-a38668f2/.claude` | 100 | 5 | 802 | 0 | 0/2 | 0 | — |
-| ✅ | `.claude/worktrees/agent-a38668f2/drizzle` | 100 | 3 | 2324 | 0 | 0/0 | 0 | — |
-| ✅ | `.claude/worktrees/agent-a38668f2/scripts` | 100 | 1105 | 513438 | 9 | 2/467 | 7 | 🟠lh |
-| ✅ | `.claude/worktrees/agent-a38668f2/sveltekit-frontend` | 100 | 6824 | 14448065 | 763 | 1930/1606 | 52 | 🟡sv4 🟠lh |
-| ✅ | `.claude/worktrees/agent-a6ea9982` | 100 | 21 | 17810161 | 779 | 1933/2085 | 63 | 🟡sv4 🟠lh |
-| ✅ | `.claude/worktrees/agent-a6ea9982/.claude` | 100 | 5 | 802 | 0 | 0/2 | 0 | — |
-| ✅ | `.claude/worktrees/agent-a6ea9982/drizzle` | 100 | 3 | 2324 | 0 | 0/0 | 0 | — |
-| ✅ | `.claude/worktrees/agent-a6ea9982/scripts` | 100 | 1105 | 513438 | 9 | 2/467 | 7 | 🟠lh |
-| ✅ | `.claude/worktrees/agent-a6ea9982/sveltekit-frontend` | 100 | 6824 | 14448064 | 763 | 1930/1606 | 52 | 🟡sv4 🟠lh |
-| ✅ | `.claude/worktrees/agent-a7203461` | 100 | 21 | 17810161 | 779 | 1933/2085 | 63 | 🟡sv4 🟠lh |
-| ✅ | `.claude/worktrees/agent-a7203461/.claude` | 100 | 5 | 802 | 0 | 0/2 | 0 | — |
-| ✅ | `.claude/worktrees/agent-a7203461/drizzle` | 100 | 3 | 2324 | 0 | 0/0 | 0 | — |
-| ✅ | `.claude/worktrees/agent-a7203461/scripts` | 100 | 1105 | 513438 | 9 | 2/467 | 7 | 🟠lh |
-| ✅ | `.claude/worktrees/agent-a7203461/sveltekit-frontend` | 100 | 6824 | 14448064 | 763 | 1930/1606 | 52 | 🟡sv4 🟠lh |
-| ✅ | `.claude/worktrees/agent-a87590c9` | 100 | 24 | 20353471 | 789 | 1943/2235 | 62 | 🟡sv4 🟠lh |
-| ✅ | `.claude/worktrees/agent-a87590c9/.claude` | 100 | 5 | 888 | 0 | 0/2 | 0 | — |
-| ✅ | `.claude/worktrees/agent-a87590c9/drizzle` | 100 | 3 | 2324 | 0 | 0/0 | 0 | — |
-| ✅ | `.claude/worktrees/agent-a87590c9/scripts` | 100 | 1371 | 578460 | 9 | 2/561 | 6 | 🟠lh |
-| ✅ | `.claude/worktrees/agent-a87590c9/sveltekit-frontend` | 100 | 7010 | 16757029 | 772 | 1940/1659 | 55 | 🟡sv4 🟠lh |
-| ✅ | `.claude/worktrees/agent-ae7221f6` | 100 | 21 | 17810161 | 779 | 1933/2085 | 63 | 🟡sv4 🟠lh |
-| ✅ | `.claude/worktrees/agent-ae7221f6/.claude` | 100 | 5 | 802 | 0 | 0/2 | 0 | — |
-| ✅ | `.claude/worktrees/agent-ae7221f6/drizzle` | 100 | 3 | 2324 | 0 | 0/0 | 0 | — |
-| ✅ | `.claude/worktrees/agent-ae7221f6/scripts` | 100 | 1105 | 513438 | 9 | 2/467 | 7 | 🟠lh |
-| ✅ | `.claude/worktrees/agent-ae7221f6/sveltekit-frontend` | 100 | 6824 | 14448064 | 763 | 1930/1606 | 52 | 🟡sv4 🟠lh |
+| ✅ | `.claude/worktrees/agent-a38668f2` | 100 | 292 | 88724684 | 4520 | 10503/11707 | 363 | 🟡sv4 🟠lh |
+| ✅ | `.claude/worktrees/agent-a38668f2/.claude` | 100 | 24 | 3532 | 0 | 0/10 | 0 | — |
+| ✅ | `.claude/worktrees/agent-a38668f2/drizzle` | 100 | 21 | 16268 | 0 | 0/0 | 0 | — |
+| ✅ | `.claude/worktrees/agent-a38668f2/scripts` | 100 | 6324 | 2678621 | 64 | 10/2607 | 42 | 🟠lh |
+| ✅ | `.claude/worktrees/agent-a38668f2/sveltekit-frontend` | 100 | 37805 | 71684563 | 4421 | 10488/9035 | 305 | 🟡sv4 🟠lh |
+| ✅ | `.claude/worktrees/agent-a87590c9` | 100 | 2 | 5363197 | 33 | 37/267 | 5 | 🟠lh |
+| ✅ | `.claude/worktrees/agent-a87590c9/scripts` | 100 | 335 | 88693 | 1 | 0/129 | 0 | 🟠lh |
+| ✅ | `scripts/atlas` | 100 | 1665 | 439470 | 4 | 0/717 | 18 | 🟠lh |
+| ✅ | `.claude/worktrees/agent-a87590c9/sveltekit-frontend` | 100 | 382 | 4874834 | 31 | 37/135 | 4 | 🟠lh |
+| ✅ | `sveltekit-frontend/scripts` | 100 | 221 | 133178 | 1 | 11/233 | 1 | 🟠lh |
 | ✅ | `packages/atlas-core/src/validation` | 100 | 7 | 2367 | 0 | 0/1 | 0 | — |
-| ✅ | `packages/parent-atlas-retrieval` | 100 | 1 | 7392 | 0 | 0/4 | 0 | — |
-| ✅ | `packages/parent-atlas-retrieval/src` | 100 | 1 | 6541 | 0 | 0/4 | 0 | — |
-| ✅ | `packages/parent-atlas-retrieval/src/gpu` | 100 | 17 | 5886 | 0 | 0/3 | 0 | — |
-| ✅ | `scripts/atlas` | 100 | 1676 | 441860 | 6 | 0/734 | 18 | 🟠lh |
-| ✅ | `scripts/atlas/lib` | 100 | 36 | 5384 | 2 | 0/16 | 0 | 🟠lh |
-| ✅ | `scripts/db-tests` | 100 | 12 | 560 | 0 | 0/0 | 0 | — |
-| ✅ | `scripts/graphify` | 100 | 8 | 800 | 0 | 0/4 | 0 | — |
-| ✅ | `scripts/packets` | 100 | 42 | 8664 | 0 | 0/26 | 0 | — |
+| ✅ | `scripts/atlas/lib` | 100 | 24 | 3703 | 0 | 0/11 | 0 | — |
+| ✅ | `scripts/db-tests` | 100 | 8 | 236 | 0 | 0/0 | 0 | — |
+| ✅ | `scripts/graphify` | 100 | 6 | 590 | 0 | 0/4 | 0 | — |
+| ✅ | `scripts/packets` | 100 | 40 | 8372 | 0 | 0/26 | 0 | — |
 | ✅ | `scripts/postgres` | 100 | 2 | 694 | 0 | 0/0 | 0 | — |
 | ✅ | `scripts/promotion` | 100 | 14 | 3746 | 0 | 0/10 | 0 | — |
-| ✅ | `scripts/tests` | 100 | 166 | 90200 | 2 | 4/24 | 0 | 🟠lh |
-| ✅ | `sveltekit-frontend/drizzle/schema` | 100 | 1 | 311 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/scripts` | 100 | 375 | 252244 | 16 | 30/515 | 37 | 🟠lh |
-| ✅ | `sveltekit-frontend/scripts/agents` | 100 | 5 | 1365 | 0 | 1/2 | 0 | — |
+| ✅ | `sveltekit-frontend/scripts/agents` | 100 | 2 | 1174 | 0 | 1/2 | 0 | — |
 | ✅ | `sveltekit-frontend/scripts/agents/skills` | 100 | 5 | 546 | 0 | 1/1 | 0 | — |
-| ✅ | `sveltekit-frontend/scripts/atlas/mapreduce` | 100 | 1 | 121 | 0 | 0/1 | 0 | — |
 | ✅ | `sveltekit-frontend/scripts/audit` | 100 | 1 | 522 | 0 | 0/1 | 0 | — |
-| ✅ | `sveltekit-frontend/scripts/docs` | 100 | 1 | 530 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/scripts/kb` | 100 | 16 | 3802 | 0 | 1/10 | 0 | — |
-| ✅ | `sveltekit-frontend/scripts/knowledge` | 100 | 20 | 3138 | 0 | 0/19 | 0 | — |
-| ✅ | `sveltekit-frontend/scripts/lib` | 100 | 18 | 2925 | 1 | 0/8 | 0 | 🟠lh |
+| ✅ | `sveltekit-frontend/scripts/kb` | 100 | 8 | 1020 | 0 | 0/4 | 0 | — |
 | ✅ | `sveltekit-frontend/scripts/mapreduce` | 100 | 2 | 549 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/scripts/phase104-backups/src` | 100 | 401 | 44640 | 13 | 10/97 | 36 | 🟠lh |
-| ✅ | `sveltekit-frontend/scripts/screenshots` | 100 | 3 | 695 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/scripts/validate` | 100 | 2 | 1539 | 0 | 1/1 | 0 | — |
-| ✅ | `sveltekit-frontend/src` | 100 | 17 | 796360 | 759 | 1235/1067 | 17 | 🟠lh ⬜notest |
-| ✅ | `sveltekit-frontend/src/lib` | 100 | 11 | 519368 | 4 | 15/409 | 15 | 🟠lh |
-| ✅ | `sveltekit-frontend/src/lib/data` | 100 | 5 | 1687 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/src/lib/db` | 100 | 12 | 2542 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/src/lib/intent` | 100 | 1 | 239 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/src/lib/server` | 100 | 1258 | 268126 | 4 | 12/320 | 7 | 🟠lh |
-| ✅ | `sveltekit-frontend/src/lib/shims` | 100 | 11 | 1248 | 0 | 0/1 | 0 | — |
-| ✅ | `sveltekit-frontend/src/lib/types` | 100 | 54 | 7263 | 0 | 0/5 | 0 | — |
-| ✅ | `sveltekit-frontend/src/routes` | 100 | 6 | 251781 | 755 | 1218/633 | 2 | 🟠lh ⬜notest |
-| ✅ | `sveltekit-frontend/src/routes/(app)` | 100 | 467 | 120917 | 4 | 467/48 | 1 | 🟠lh ⬜notest |
-| ✅ | `sveltekit-frontend/src/routes/admin` | 100 | 4 | 2702 | 0 | 2/2 | 0 | ⬜notest |
+| ✅ | `sveltekit-frontend/scripts/phase104-backups/src` | 100 | 6 | 243 | 0 | 0/1 | 0 | — |
+| ✅ | `sveltekit-frontend/scripts/screenshots` | 100 | 2 | 319 | 0 | 0/0 | 0 | — |
 | ✅ | `sveltekit-frontend/src/routes/atlas` | 100 | 2 | 432 | 0 | 0/1 | 0 | ⬜notest |
-| ✅ | `sveltekit-frontend/src/routes/dashboard` | 100 | 1 | 172 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/src/routes/login` | 100 | 3 | 502 | 0 | 1/3 | 0 | — |
-| ✅ | `sveltekit-frontend/src/routes/register` | 100 | 3 | 627 | 0 | 1/2 | 0 | — |
-| ✅ | `sveltekit-frontend/src/types` | 100 | 23 | 882 | 0 | 0/1 | 0 | — |
-| ✅ | `sveltekit-frontend/sveltekit-frontend` | 100 | 2 | 4345 | 1 | 1/7 | 2 | 🟠lh |
-| ✅ | `sveltekit-frontend/sveltekit-frontend/sveltekit-frontend` | 100 | 1 | 2330 | 1 | 1/4 | 2 | 🟠lh |
-| ✅ | `sveltekit-frontend/sveltekit-frontend/sveltekit-frontend/src` | 100 | 3 | 385 | 1 | 1/3 | 1 | — |
-| ✅ | `sveltekit-frontend/tests` | 100 | 238 | 139094 | 5 | 742/57 | 1 | 🟠lh |
-| ✅ | `sveltekit-frontend/tests/routes` | 100 | 32 | 60280 | 2 | 709/10 | 0 | — |
-| ✅ | `sveltekit-frontend/tests/routes/auto` | 100 | 709 | 49871 | 0 | 701/1 | 0 | — |
-| ✅ | `sveltekit-frontend/tests/unit` | 100 | 13 | 1943 | 0 | 0/3 | 0 | — |
+| ✅ | `sveltekit-frontend/sveltekit-frontend` | 100 | 2 | 2815 | 1 | 1/4 | 1 | 🟠lh |
+| ✅ | `sveltekit-frontend/tests` | 100 | 143 | 94628 | 2 | 720/36 | 2 | 🟠lh |
+| ✅ | `sveltekit-frontend/tests/routes` | 100 | 20 | 55577 | 1 | 700/6 | 0 | — |
+| ✅ | `sveltekit-frontend/tests/routes/auto` | 100 | 700 | 48931 | 0 | 695/0 | 0 | — |
 
 ---
 
-## API Routes (755 total · top 60)
+## API Routes (143 total · top 60)
 
 | Route [params] | Methods | Auth | Zod | Error handling |
 |----------------|---------|------|-----|----------------|
-| `sveltekit-frontend/api/admin/audit/+server.ts` | GET, POST, PUT, PATCH, DELETE | ✅ | ✅ | ✅ |
 | `sveltekit-frontend/api/cases/+server.ts` | GET, POST, PATCH, DELETE | ✅ | ✅ | ✅ |
-| `sveltekit-frontend/api/cases/[id]/connections/+server.ts [id]` | GET, POST, PATCH, DELETE | ✅ | ✅ | ❌ |
-| `sveltekit-frontend/api/citations/+server.ts` | GET, POST, PATCH, DELETE | ✅ | ✅ | ✅ |
-| `sveltekit-frontend/api/error-brain/diagnosis-history/+server.ts` | GET, POST, PATCH, DELETE | ✅ | ✅ | ✅ |
-| `sveltekit-frontend/api/reports/+server.ts` | GET, POST, PATCH, DELETE | ✅ | ✅ | ✅ |
-| `sveltekit-frontend/api/analytics/codebase-research/+server.ts` | GET, POST, DELETE | ✅ | ✅ | ✅ |
+| `sveltekit-frontend/api/cases/+server.ts` | GET, POST, PATCH, DELETE | ✅ | ✅ | ✅ |
 | `sveltekit-frontend/api/analytics/deep-research/+server.ts` | GET, POST, DELETE | ✅ | ✅ | ✅ |
-| `sveltekit-frontend/api/analytics/generate-todos/+server.ts` | POST, GET, PATCH | ✅ | ✅ | ✅ |
-| `sveltekit-frontend/api/analytics/mapreduce-matrix/+server.ts` | GET, POST, DELETE | ✅ | ✅ | ✅ |
-| `sveltekit-frontend/api/analytics/unified-research/+server.ts` | GET, POST, DELETE | ✅ | ✅ | ✅ |
-| `sveltekit-frontend/api/browser-context/snapshot/+server.ts` | POST, GET, DELETE | ✅ | ✅ | ✅ |
-| `sveltekit-frontend/api/cache/+server.ts` | GET, POST, DELETE | ✅ | ✅ | ✅ |
-| `sveltekit-frontend/api/cache/som/+server.ts` | GET, POST, PUT | ✅ | ✅ | ✅ |
-| `sveltekit-frontend/api/cases/[id]/+server.ts [id]` | GET, PATCH, DELETE | ✅ | ✅ | ✅ |
 | `sveltekit-frontend/api/cases/[id]/authorities/+server.ts [id]` | GET, POST, DELETE | ✅ | ✅ | ✅ |
-| `sveltekit-frontend/api/cases/[id]/citations/+server.ts [id]` | GET, POST, DELETE | ✅ | ✅ | ✅ |
 | `sveltekit-frontend/api/cases/[id]/notes/[noteId]/+server.ts [id, noteId]` | GET, PATCH, DELETE | ✅ | ✅ | ✅ |
-| `sveltekit-frontend/api/cases/[id]/notes/[noteId]/evidence/+server.ts [id, noteId]` | GET, POST, DELETE | ✅ | ✅ | ✅ |
 | `sveltekit-frontend/api/cases/[id]/persons/+server.ts [id]` | GET, POST, DELETE | ✅ | ✅ | ✅ |
-| `sveltekit-frontend/api/chat/memory/settings/+server.ts` | GET, DELETE, PATCH | ✅ | ✅ | ✅ |
-| `sveltekit-frontend/api/citations/collections/[collectionId]/+server.ts [collectionId]` | GET, DELETE, PATCH | ✅ | ✅ | ✅ |
-| `sveltekit-frontend/api/citations/collections/[collectionId]/citations/+server.ts [collectionId]` | POST, DELETE, GET | ✅ | ✅ | ✅ |
-| `sveltekit-frontend/api/citations/saved/+server.ts` | GET, POST, DELETE | ✅ | ✅ | ✅ |
 | `sveltekit-frontend/api/citations/[citationId]/tags/+server.ts [citationId]` | GET, POST, DELETE | ✅ | ✅ | ✅ |
-| `sveltekit-frontend/api/codebase-index/cluster-summary/+server.ts` | POST, GET, PUT | ✅ | ✅ | ✅ |
-| `sveltekit-frontend/api/codebase-index/llm-output/+server.ts` | GET, POST, DELETE | ✅ | ✅ | ✅ |
-| `sveltekit-frontend/api/evidence/[id]/+server.ts [id]` | GET, PATCH, DELETE | ✅ | ✅ | ✅ |
 | `sveltekit-frontend/api/fictional-cases/[id]/+server.ts [id]` | GET, PATCH, DELETE | ✅ | ✅ | ✅ |
-| `sveltekit-frontend/api/glyph/tile-atlas/+server.ts` | GET, POST, DELETE | ✅ | ✅ | ✅ |
-| `sveltekit-frontend/api/gpu/lease/+server.ts` | GET, POST, DELETE | ✅ | ✅ | ✅ |
-| `sveltekit-frontend/api/graph/hypergraph/+server.ts` | GET, POST, DELETE | ✅ | ❌ | ✅ |
-| `sveltekit-frontend/api/health/ocr/+server.ts` | GET, POST, HEAD | ✅ | ✅ | ✅ |
-| `sveltekit-frontend/api/knowledge/+server.ts` | POST, GET, PATCH | ✅ | ✅ | ✅ |
 | `sveltekit-frontend/api/library/documents/[documentId]/+server.ts [documentId]` | GET, PUT, DELETE | ✅ | ✅ | ❌ |
 | `sveltekit-frontend/api/persons-of-interest/[id]/+server.ts [id]` | GET, PATCH, DELETE | ✅ | ✅ | ✅ |
-| `sveltekit-frontend/api/persons-of-interest/[id]/photos/+server.ts [id]` | GET, POST, DELETE | ✅ | ✅ | ✅ |
-| `sveltekit-frontend/api/push/+server.ts` | GET, POST, DELETE | ✅ | ✅ | ✅ |
-| `sveltekit-frontend/api/simulation/[sessionId]/+server.ts [sessionId]` | GET, POST, DELETE | ✅ | ✅ | ✅ |
-| `sveltekit-frontend/api/statutes/[id]/+server.ts [id]` | GET, PUT, DELETE | ✅ | ✅ | ✅ |
-| `sveltekit-frontend/api/wiki/watch/+server.ts` | GET, POST, DELETE | ✅ | ❌ | ❌ |
-| `sveltekit-frontend/(app)/admin/api-testing/agentic-loop/+server.ts` | POST, GET | ✅ | ✅ | ✅ |
-| `sveltekit-frontend/(app)/evidence/+server.ts` | GET, POST | ✅ | ✅ | ✅ |
-| `sveltekit-frontend/api/ace/packet/+server.ts` | POST, GET | ✅ | ✅ | ✅ |
+| `sveltekit-frontend/api/embed/+server.ts` | POST, GET | ✅ | ✅ | ✅ |
 | `sveltekit-frontend/api/ace/packets/+server.ts` | POST, GET | ✅ | ✅ | ✅ |
-| `sveltekit-frontend/api/ace/stream/+server.ts` | POST, GET | ✅ | ✅ | ✅ |
-| `sveltekit-frontend/api/admin/atlas/cache/+server.ts` | GET, DELETE | ✅ | ✅ | ✅ |
-| `sveltekit-frontend/api/admin/grpo/flush/+server.ts` | GET, POST | ✅ | ✅ | ❌ |
-| `sveltekit-frontend/api/admin/model/validate-checkpoint/+server.ts` | POST, GET | ✅ | ✅ | ✅ |
 | `sveltekit-frontend/api/admin/observability/+server.ts` | GET, POST | ✅ | ✅ | ✅ |
 | `sveltekit-frontend/api/admin/packets/enrich-labels/+server.ts` | GET, POST | ✅ | ❌ | ✅ |
-| `sveltekit-frontend/api/admin/qlora/+server.ts` | GET, POST | ✅ | ✅ | ✅ |
 | `sveltekit-frontend/api/admin/retrieval/search/+server.ts` | GET, POST | ❌ | ✅ | ✅ |
-| `sveltekit-frontend/api/admin/seed-knowledge/+server.ts` | POST, GET | ✅ | ✅ | ✅ |
 | `sveltekit-frontend/api/admin/summaries/scan-quality/+server.ts` | GET, POST | ✅ | ❌ | ✅ |
-| `sveltekit-frontend/api/admin/weights/+server.ts` | GET, POST | ✅ | ✅ | ✅ |
-| `sveltekit-frontend/api/agent/investigate/+server.ts` | POST, GET | ✅ | ✅ | ✅ |
 | `sveltekit-frontend/api/agent/rpc/+server.ts` | POST, GET | ✅ | ❌ | ✅ |
 | `sveltekit-frontend/api/ai/policy/+server.ts` | POST, GET | ✅ | ❌ | ✅ |
-| `sveltekit-frontend/api/ai/scenario/+server.ts` | POST, GET | ✅ | ✅ | ✅ |
+| `sveltekit-frontend/api/analytics/research-summaries/[id]/+server.ts [id]` | GET, DELETE | ✅ | ❌ | ✅ |
+| `sveltekit-frontend/api/atlas/gan-audit/deep/+server.ts` | POST, GET | ✅ | ✅ | ✅ |
+| `sveltekit-frontend/api/cache/bitfrost-effectiveness/+server.ts` | GET, POST | ✅ | ✅ | ✅ |
+| `sveltekit-frontend/api/cases/[id]/canvas/+server.ts [id]` | POST, GET | ✅ | ✅ | ✅ |
+| `sveltekit-frontend/api/cases/[id]/chat/+server.ts [id]` | POST, GET | ✅ | ✅ | ✅ |
+| `sveltekit-frontend/api/codebase-index/agents-write/+server.ts` | POST, GET | ✅ | ✅ | ✅ |
+| `sveltekit-frontend/api/codebase-index/wiki/+server.ts` | GET, POST | ✅ | ✅ | ✅ |
+| `sveltekit-frontend/api/embed/+server.ts` | POST, GET | ✅ | ✅ | ✅ |
+| `sveltekit-frontend/api/evidence/[id]/versions/+server.ts [id]` | GET, POST | ✅ | ✅ | ✅ |
+| `sveltekit-frontend/api/indexing/queue/+server.ts` | POST, GET | ✅ | ✅ | ✅ |
+| `sveltekit-frontend/api/persons-of-interest/[id]/risk/+server.ts [id]` | GET, POST | ✅ | ✅ | ✅ |
+| `sveltekit-frontend/api/persons-of-interest/[id]/summary/+server.ts [id]` | GET, POST | ✅ | ✅ | ✅ |
+| `sveltekit-frontend/api/recommendations/[userId]/+server.ts [userId]` | GET, POST | ✅ | ✅ | ✅ |
+| `sveltekit-frontend/api/reports/preview/[id]/+server.ts [id]` | GET, POST | ✅ | ✅ | ✅ |
+| `sveltekit-frontend/api/reports/[id]/export/+server.ts [id]` | GET, POST | ✅ | ✅ | ✅ |
+| `sveltekit-frontend/api/reports/[id]/publish/+server.ts [id]` | POST, DELETE | ✅ | ❌ | ✅ |
+| `sveltekit-frontend/api/routes/[routeId]/errors/+server.ts [routeId]` | POST, GET | ✅ | ✅ | ✅ |
+| `sveltekit-frontend/api/routes/[routeId]/health-event/+server.ts [routeId]` | POST, GET | ✅ | ✅ | ✅ |
+| `sveltekit-frontend/api/routes/[routeId]/interactions/+server.ts [routeId]` | POST, GET | ✅ | ✅ | ✅ |
+| `sveltekit-frontend/api/simulation/[sessionId]/keyframes/+server.ts [sessionId]` | GET, POST | ✅ | ✅ | ✅ |
+| `sveltekit-frontend/api/tasks/agent-pickup/+server.ts` | GET, POST | ✅ | ✅ | ✅ |
+| `sveltekit-frontend/api/tasks/hmm-diagnosis/+server.ts` | GET, POST | ❌ | ✅ | ✅ |
+| `sveltekit-frontend/api/tasks/packets/+server.ts` | GET, POST | ✅ | ✅ | ✅ |
+| `sveltekit-frontend/api/tasks/packets/workflow/+server.ts` | GET, POST | ✅ | ✅ | ✅ |
+| `sveltekit-frontend/api/tasks/[id]/+server.ts [id]` | PATCH, DELETE | ✅ | ✅ | ✅ |
+| `sveltekit-frontend/api/hyperrag/packet-rpc/+server.ts` | POST | ✅ | ✅ | ✅ |
+| `sveltekit-frontend/.well-known/llms-full.txt/+server.ts` | GET | ❌ | ✅ | ✅ |
+| `sveltekit-frontend/.well-known/llms.txt/+server.ts` | GET | ❌ | ✅ | ✅ |
+| `sveltekit-frontend/api/ace/stage-5-policy/+server.ts` | POST | ✅ | ✅ | ✅ |
+| `sveltekit-frontend/api/admin/ai-chat/[sessionId]/+server.ts [sessionId]` | GET | ✅ | ❌ | ❌ |
+| `sveltekit-frontend/api/admin/atlas/hyperrag/+server.ts` | POST | ✅ | ✅ | ✅ |
+| `sveltekit-frontend/api/admin/atlas/query/+server.ts` | POST | ✅ | ✅ | ✅ |
+| `sveltekit-frontend/api/admin/retrieval/clusters/+server.ts` | GET | ❌ | ❌ | ✅ |
+| `sveltekit-frontend/api/admin/retrieval/clusters/[id]/+server.ts [id]` | GET | ❌ | ❌ | ✅ |
+| `sveltekit-frontend/api/agent/rpc/test/+server.ts` | GET | ✅ | ✅ | ✅ |
+| `sveltekit-frontend/api/agents/chat/+server.ts` | POST | ✅ | ✅ | ✅ |
+| `sveltekit-frontend/api/ai/agent/+server.ts` | POST | ✅ | ✅ | ✅ |
+| `sveltekit-frontend/api/ai/analyze/[scope]/+server.ts [scope]` | POST | ✅ | ✅ | ✅ |
+| `sveltekit-frontend/api/ai/analyze-evidence/+server.ts` | POST | ✅ | ✅ | ✅ |
+| `sveltekit-frontend/api/ai/ask/+server.ts` | POST | ✅ | ✅ | ✅ |
+| `sveltekit-frontend/api/ai/bifrost/+server.ts` | POST | ✅ | ✅ | ✅ |
+| `sveltekit-frontend/api/ai/case-prediction/+server.ts` | POST | ✅ | ✅ | ✅ |
 
-_…and 695 more. See `codebase-graph.json` for full list._
+_…and 83 more. See `codebase-graph.json` for full list._
 
 ---
 
@@ -1103,21 +916,21 @@ _…and 695 more. See `codebase-graph.json` for full list._
 - `.claude/worktrees/agent-a38668f2/sveltekit-frontend/temp_upload.svelte` · on:event
 - `.claude/worktrees/agent-a38668f2/sveltekit-frontend/test-errors-validation.svelte` · $:reactive, on:event
 - `.claude/worktrees/agent-a38668f2/sveltekit-frontend/test-errors.svelte` · $:reactive
-- `.claude/worktrees/agent-a6ea9982/src/routes/admin/cache/+page.svelte` · export-let
-- `.claude/worktrees/agent-a6ea9982/src/routes/atlas/studio/+page.svelte` · on:event
-- `.claude/worktrees/agent-a6ea9982/sveltekit-frontend/temp_upload.svelte` · on:event
-- `.claude/worktrees/agent-a6ea9982/sveltekit-frontend/test-errors-validation.svelte` · $:reactive, on:event
-- `.claude/worktrees/agent-a6ea9982/sveltekit-frontend/test-errors.svelte` · $:reactive
-- `.claude/worktrees/agent-a7203461/src/routes/admin/cache/+page.svelte` · export-let
-- `.claude/worktrees/agent-a7203461/src/routes/atlas/studio/+page.svelte` · on:event
-- `.claude/worktrees/agent-a7203461/sveltekit-frontend/temp_upload.svelte` · on:event
-- `.claude/worktrees/agent-a7203461/sveltekit-frontend/test-errors-validation.svelte` · $:reactive, on:event
-- `.claude/worktrees/agent-a7203461/sveltekit-frontend/test-errors.svelte` · $:reactive
-- `.claude/worktrees/agent-a87590c9/src/routes/admin/cache/+page.svelte` · export-let
-- `.claude/worktrees/agent-a87590c9/src/routes/atlas/studio/+page.svelte` · on:event
-- `.claude/worktrees/agent-a87590c9/sveltekit-frontend/temp_upload.svelte` · on:event
-- `.claude/worktrees/agent-a87590c9/sveltekit-frontend/test-errors-validation.svelte` · $:reactive, on:event
-- `.claude/worktrees/agent-a87590c9/sveltekit-frontend/test-errors.svelte` · $:reactive
+- `.claude/worktrees/agent-a38668f2/src/routes/admin/cache/+page.svelte` · export-let
+- `.claude/worktrees/agent-a38668f2/src/routes/atlas/studio/+page.svelte` · on:event
+- `.claude/worktrees/agent-a38668f2/sveltekit-frontend/temp_upload.svelte` · on:event
+- `.claude/worktrees/agent-a38668f2/sveltekit-frontend/test-errors-validation.svelte` · $:reactive, on:event
+- `.claude/worktrees/agent-a38668f2/sveltekit-frontend/test-errors.svelte` · $:reactive
+- `.claude/worktrees/agent-a38668f2/src/routes/admin/cache/+page.svelte` · export-let
+- `.claude/worktrees/agent-a38668f2/src/routes/atlas/studio/+page.svelte` · on:event
+- `.claude/worktrees/agent-a38668f2/sveltekit-frontend/temp_upload.svelte` · on:event
+- `.claude/worktrees/agent-a38668f2/sveltekit-frontend/test-errors-validation.svelte` · $:reactive, on:event
+- `.claude/worktrees/agent-a38668f2/sveltekit-frontend/test-errors.svelte` · $:reactive
+- `.claude/worktrees/agent-a38668f2/src/routes/admin/cache/+page.svelte` · export-let
+- `.claude/worktrees/agent-a38668f2/src/routes/atlas/studio/+page.svelte` · on:event
+- `.claude/worktrees/agent-a38668f2/sveltekit-frontend/temp_upload.svelte` · on:event
+- `.claude/worktrees/agent-a38668f2/sveltekit-frontend/test-errors-validation.svelte` · $:reactive, on:event
+- `.claude/worktrees/agent-a38668f2/sveltekit-frontend/test-errors.svelte` · $:reactive
 
 ---
 
@@ -1126,37 +939,37 @@ _No unguarded SSR-unsafe globals. ✅_
 
 ---
 
-## G16 — Routes Without Test Pairing (80)
-- `sveltekit-frontend/src/routes/api/ace/packet/+server.ts` · POST/GET
-- `sveltekit-frontend/src/routes/api/ace/route/+server.ts` · POST
-- `sveltekit-frontend/src/routes/api/admin/ace-metrics/+server.ts` · GET
+## G16 — Routes Without Test Pairing (39)
 - `sveltekit-frontend/src/routes/api/admin/ai-chat/[sessionId]/+server.ts` · GET
-- `sveltekit-frontend/src/routes/api/admin/atlas/cluster-search/+server.ts` · POST
-- `sveltekit-frontend/src/routes/api/admin/atlas/couchdb-rollback/+server.ts` · POST
-- `sveltekit-frontend/src/routes/api/admin/atlas/couchdb-status/+server.ts` · GET
-- `sveltekit-frontend/src/routes/api/admin/atlas/couchdb-synthesize/+server.ts` · POST
-- `sveltekit-frontend/src/routes/api/admin/atlas/messy-routing/+server.ts` · GET
-- `sveltekit-frontend/src/routes/api/admin/atlas/node/[id]/+server.ts` · GET
-- `sveltekit-frontend/src/routes/api/admin/atlas/turbovec-prefilter/+server.ts` · POST
-- `sveltekit-frontend/src/routes/api/admin/grpo/flush/+server.ts` · GET/POST
 - `sveltekit-frontend/src/routes/api/admin/packets/enrich-labels/+server.ts` · GET/POST
-- `sveltekit-frontend/src/routes/api/admin/parents-atlas/actions/+server.ts` · POST
 - `sveltekit-frontend/src/routes/api/admin/retrieval/clusters/[id]/+server.ts` · GET
 - `sveltekit-frontend/src/routes/api/admin/summaries/scan-quality/+server.ts` · GET/POST
 - `sveltekit-frontend/src/routes/api/agent/rpc/test/+server.ts` · GET
 - `sveltekit-frontend/src/routes/api/ai/analyze/[scope]/+server.ts` · POST
-- `sveltekit-frontend/src/routes/api/ai/context/compact-search/+server.ts` · POST
 - `sveltekit-frontend/src/routes/api/ai/generate-report/[scope]/+server.ts` · POST
-- `sveltekit-frontend/src/routes/api/ai/scenario/+server.ts` · POST/GET
-- `sveltekit-frontend/src/routes/api/analytics/knowledge-triples/+server.ts` · GET
-- `sveltekit-frontend/src/routes/api/analytics/knowledge-triples/prune/+server.ts` · POST
 - `sveltekit-frontend/src/routes/api/analytics/research-summaries/[id]/+server.ts` · GET/DELETE
 - `sveltekit-frontend/src/routes/api/atlas/cards/[id]/+server.ts` · GET
 - `sveltekit-frontend/src/routes/api/atlas/memory-address/[source_ref_id]/+server.ts` · GET
-- `sveltekit-frontend/src/routes/api/atlas/studio/cards/[id]/+server.ts` · GET
 - `sveltekit-frontend/src/routes/api/audio/analysis/[evidenceId]/+server.ts` · GET
-- `sveltekit-frontend/src/routes/api/audio/progress/[evidenceId]/+server.ts` · GET
 - `sveltekit-frontend/src/routes/api/cache/bitfrost-effectiveness/+server.ts` · GET/POST
+- `sveltekit-frontend/src/routes/api/canon/chunks/[chunkId]/+server.ts` · GET
+- `sveltekit-frontend/src/routes/api/cases/[id]/notes/[noteId]/+server.ts` · GET/PATCH/DELETE
+- `sveltekit-frontend/src/routes/api/code-intel/clusters/[clusterKey]/+server.ts` · GET
+- `sveltekit-frontend/src/routes/api/code-intel/research-provenance/[id]/+server.ts` · GET
+- `sveltekit-frontend/src/routes/api/code-intel/retrieval-runs/[id]/+server.ts` · GET
+- `sveltekit-frontend/src/routes/api/code-intel/topology/node/[stableKey]/+server.ts` · GET
+- `sveltekit-frontend/src/routes/api/document/analysis/[evidenceId]/+server.ts` · GET
+- `sveltekit-frontend/src/routes/api/evidence/tags/[id]/+server.ts` · GET
+- `sveltekit-frontend/src/routes/api/fictional-cases/[id]/+server.ts` · GET/PATCH/DELETE
+- `sveltekit-frontend/src/routes/api/files/[id]/+server.ts` · DELETE
+- `sveltekit-frontend/src/routes/api/hypergraph/edge/[id]/+server.ts` · GET
+- `sveltekit-frontend/src/routes/api/knowledge/document/[id]/+server.ts` · GET
+- `sveltekit-frontend/src/routes/api/library/document/[id]/node/[nodeId]/+server.ts` · GET
+- `sveltekit-frontend/src/routes/api/library/documents/[documentId]/+server.ts` · GET/PUT/DELETE
+- `sveltekit-frontend/src/routes/api/library/ingest/[jobId]/+server.ts` · GET
+- `sveltekit-frontend/src/routes/api/persons-of-interest/[id]/+server.ts` · GET/PATCH/DELETE
+- `sveltekit-frontend/src/routes/api/persons-of-interest/[id]/associates/[associateId]/+server.ts` · DELETE
+- `sveltekit-frontend/src/routes/api/phase89/related/[id]/+server.ts` · GET
 
 ---
 
@@ -1188,36 +1001,36 @@ _No unguarded SSR-unsafe globals. ✅_
 
 | Route [params] | Depth | Params | Methods |
 |----------------|-------|--------|---------|
-| `sveltekit-frontend/api/cases/[id]/notes/[noteId]/evidence/+server.ts` | 9 | `[id] [noteId]` | GET, POST, DELETE |
 | `sveltekit-frontend/api/cases/[id]/notes/[noteId]/versions/+server.ts` | 9 | `[id] [noteId]` | GET |
 | `sveltekit-frontend/api/library/document/[id]/node/[nodeId]/+server.ts` | 9 | `[id] [nodeId]` | GET |
-| `sveltekit-frontend/(app)/admin/phase78/routes/[routePath]/+page.server.ts` | 8 | `[routePath]` |  |
-| `sveltekit-frontend/(app)/cases/[id]/evidence/upload/+page.server.ts` | 8 | `[id]` |  |
 | `sveltekit-frontend/(app)/command-center/codebase/clusters/[id]/+page.server.ts` | 8 | `[id]` |  |
 | `sveltekit-frontend/(app)/command-center/codebase/components/[id]/+page.server.ts` | 8 | `[id]` |  |
 | `sveltekit-frontend/(app)/library/[documentId]/node/[nodeId]/+page.server.ts` | 8 | `[documentId] [nodeId]` |  |
-| `sveltekit-frontend/api/admin/atlas/node/[id]/+server.ts` | 8 | `[id]` | GET |
 | `sveltekit-frontend/api/admin/retrieval/clusters/[id]/+server.ts` | 8 | `[id]` | GET |
-| `sveltekit-frontend/api/atlas/studio/cards/[id]/+server.ts` | 8 | `[id]` | GET |
-| `sveltekit-frontend/api/cases/[id]/analyze/stream/+server.ts` | 8 | `[id]` | POST |
-| `sveltekit-frontend/api/cases/[id]/export/pdf/+server.ts` | 8 | `[id]` | POST |
-| `sveltekit-frontend/api/cases/[id]/notes/search/+server.ts` | 8 | `[id]` | GET |
 | `sveltekit-frontend/api/cases/[id]/notes/[noteId]/+server.ts` | 8 | `[id] [noteId]` | GET, PATCH, DELETE |
-| `sveltekit-frontend/api/citations/collections/[collectionId]/citations/+server.ts` | 8 | `[collectionId]` | POST, DELETE, GET |
-| `sveltekit-frontend/api/citations/collections/[collectionId]/export/+server.ts` | 8 | `[collectionId]` | GET, POST |
 | `sveltekit-frontend/api/code-intel/clusters/[clusterKey]/lenses/+server.ts` | 8 | `[clusterKey]` | GET |
 | `sveltekit-frontend/api/code-intel/topology/node/[stableKey]/+server.ts` | 8 | `[stableKey]` | GET |
-| `sveltekit-frontend/api/codebase/clusters/[id]/summary/+server.ts` | 8 | `[id]` | GET |
-| `sveltekit-frontend/api/evidence/summary/[id]/approve/+server.ts` | 8 | `[id]` | POST |
-| `sveltekit-frontend/api/evidence/[id]/analyze/stream/+server.ts` | 8 | `[id]` | GET |
 | `sveltekit-frontend/api/library/document/[id]/toc/+server.ts` | 8 | `[id]` | GET |
-| `sveltekit-frontend/api/library/documents/[documentId]/chunks/+server.ts` | 8 | `[documentId]` | GET |
-| `sveltekit-frontend/api/library/documents/[documentId]/pdf/+server.ts` | 8 | `[documentId]` | GET |
-| `sveltekit-frontend/api/library/documents/[documentId]/summary/+server.ts` | 8 | `[documentId]` | GET |
-| `sveltekit-frontend/api/library/documents/[documentId]/toc/+server.ts` | 8 | `[documentId]` | GET |
 | `sveltekit-frontend/api/persons-of-interest/[id]/associates/[associateId]/+server.ts` | 8 | `[id] [associateId]` | DELETE |
 | `sveltekit-frontend/api/phase89/node/[id]/docs/+server.ts` | 8 | `[id]` | GET |
 | `sveltekit-frontend/api/phase89/node/[id]/similar/+server.ts` | 8 | `[id]` | GET |
+| `sveltekit-frontend/(app)/cases/[id]/notes/+page.server.ts` | 7 | `[id]` |  |
+| `sveltekit-frontend/(app)/cases/[id]/overview/+page.server.ts` | 7 | `[id]` |  |
+| `sveltekit-frontend/(app)/cases/[id]/reports/+page.server.ts` | 7 | `[id]` |  |
+| `sveltekit-frontend/(app)/evidence/[id]/view/+page.server.ts` | 7 | `[id]` |  |
+| `sveltekit-frontend/(app)/library/[documentId]/reader/+page.server.ts` | 7 | `[documentId]` |  |
+| `sveltekit-frontend/api/admin/ai-chat/[sessionId]/+server.ts` | 7 | `[sessionId]` | GET |
+| `sveltekit-frontend/api/ai/analyze/[scope]/+server.ts` | 7 | `[scope]` | POST |
+| `sveltekit-frontend/api/ai/generate-report/[scope]/+server.ts` | 7 | `[scope]` | POST |
+| `sveltekit-frontend/api/analytics/research-summaries/[id]/+server.ts` | 7 | `[id]` | GET, DELETE |
+| `sveltekit-frontend/api/atlas/cards/[id]/+server.ts` | 7 | `[id]` | GET |
+| `sveltekit-frontend/api/atlas/memory-address/[source_ref_id]/+server.ts` | 7 | `[source_ref_id]` | GET |
+| `sveltekit-frontend/api/audio/analysis/[evidenceId]/+server.ts` | 7 | `[evidenceId]` | GET |
+| `sveltekit-frontend/api/canon/chunks/[chunkId]/+server.ts` | 7 | `[chunkId]` | GET |
+| `sveltekit-frontend/api/cases/[id]/authorities/+server.ts` | 7 | `[id]` | GET, POST, DELETE |
+| `sveltekit-frontend/api/cases/[id]/canvas/+server.ts` | 7 | `[id]` | POST, GET |
+| `sveltekit-frontend/api/cases/[id]/chat/+server.ts` | 7 | `[id]` | POST, GET |
+| `sveltekit-frontend/api/cases/[id]/persons/+server.ts` | 7 | `[id]` | GET, POST, DELETE |
 
 ---
 
@@ -1229,8 +1042,8 @@ _No unguarded SSR-unsafe globals. ✅_
 | `$lib/server/redis.js` | 1983 |
 | `$lib/types` | 1557 |
 | `$lib/components/ui/Icon.svelte` | 1544 |
-| `$lib/server/ollama.js` | 1088 |
-| `$lib/server/db/schema-postgres.js` | 1020 |
+| `$lib/server/ollama.js` | 1089 |
+| `$lib/server/db/schema-postgres.js` | 1021 |
 | `$lib/server/middleware/cache-headers.js` | 660 |
 | `$lib/server/vector/qdrant-manager.js` | 588 |
 | `$lib/server/grpc/embedding-client.js` | 564 |
@@ -1240,7 +1053,7 @@ _No unguarded SSR-unsafe globals. ✅_
 | `$lib/server/db/schema` | 422 |
 | `$lib/server/db` | 326 |
 | `$lib/server/observability/langfuse.js` | 276 |
-| `$lib/server/db/client.js` | 271 |
+| `$lib/server/db/client.js` | 272 |
 | `$lib/server/redis` | 270 |
 | `$lib/server/db/schema.js` | 257 |
 | `$lib/server/gpu/simdjson-bridge.js` | 252 |
@@ -1328,17 +1141,17 @@ _No unguarded SSR-unsafe globals. ✅_
 | `node:fs` | 5709 |
 | `vitest` | 5591 |
 | `node:url` | 4916 |
-| `path` | 4788 |
-| `zod` | 3946 |
-| `fs` | 3594 |
-| `pg` | 3495 |
-| `drizzle-orm` | 3311 |
+| `path` | 4792 |
+| `zod` | 3947 |
+| `fs` | 3598 |
+| `pg` | 3497 |
+| `drizzle-orm` | 3312 |
 | `$lib/server/db/client` | 2837 |
 | `$lib/server/env.server.js` | 2776 |
 | `node:crypto` | 1984 |
-| `ioredis` | 1814 |
-| `url` | 1711 |
-| `crypto` | 1647 |
+| `ioredis` | 1815 |
+| `url` | 1715 |
+| `crypto` | 1651 |
 | `dotenv` | 1569 |
 | `svelte` | 1569 |
 | `$lib/types` | 1557 |
@@ -1348,30 +1161,30 @@ _No unguarded SSR-unsafe globals. ✅_
 | `node:fs/promises` | 1210 |
 | `fs/promises` | 1177 |
 | `@playwright/test` | 1003 |
-| `drizzle-orm/pg-core` | 974 |
-| `$lib/server/ollama.js` | 956 |
+| `drizzle-orm/pg-core` | 975 |
+| `$lib/server/ollama.js` | 957 |
 | `child_process` | 889 |
-| `$lib/server/db/schema-postgres.js` | 888 |
+| `$lib/server/db/schema-postgres.js` | 889 |
 | `$app/environment` | 768 |
 
 ---
 
 ## Directories with TODO/FIXME
-- `scripts/api-cleanup` — 670 marker(s), score 45
 - `scripts/api-cleanup/reports` — 668 marker(s), score 45
-- `scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z` — 594 marker(s), score 45
-- `scripts/api-cleanup/reports/backup-2025-12-14T21-11-49-641Z` — 74 marker(s), score 44
-- `.claude/worktrees/agent-a38668f2` — 63 marker(s), score 100
-- `.claude/worktrees/agent-a6ea9982` — 63 marker(s), score 100
-- `.claude/worktrees/agent-a7203461` — 63 marker(s), score 100
-- `.claude/worktrees/agent-ae7221f6` — 63 marker(s), score 100
-- `.claude/worktrees/agent-a87590c9` — 62 marker(s), score 100
-- `.claude/worktrees/agent-a87590c9/sveltekit-frontend` — 55 marker(s), score 100
-- `.claude/worktrees/agent-a38668f2/sveltekit-frontend` — 52 marker(s), score 100
-- `.claude/worktrees/agent-a6ea9982/sveltekit-frontend` — 52 marker(s), score 100
-- `.claude/worktrees/agent-a7203461/sveltekit-frontend` — 52 marker(s), score 100
-- `.claude/worktrees/agent-ae7221f6/sveltekit-frontend` — 52 marker(s), score 100
+- `scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z` — 664 marker(s), score 45
+- `.claude/worktrees/agent-a38668f2` — 363 marker(s), score 100
+- `.claude/worktrees/agent-a38668f2/sveltekit-frontend` — 305 marker(s), score 100
 - `docker/langgraph-synthesis/.venv/Lib` — 44 marker(s), score 65
+- `.claude/worktrees/agent-a38668f2/scripts` — 42 marker(s), score 100
+- `scripts/atlas` — 18 marker(s), score 100
+- `.claude/worktrees/agent-a38668f2/src` — 16 marker(s), score 51
+- `scripts/verify` — 8 marker(s), score 70
+- `sveltekit-frontend/src/lib/server` — 7 marker(s), score 80
+- `sveltekit-frontend/src` — 7 marker(s), score 97
+- `.claude/worktrees/agent-a87590c9` — 5 marker(s), score 100
+- `scripts/api-cleanup/reports/backup-2025-12-14T21-11-49-641Z` — 4 marker(s), score 72
+- `sveltekit-frontend/drizzle` — 4 marker(s), score 85
+- `sveltekit-frontend/drizzle/introspected` — 4 marker(s), score 85
 
 ---
 
