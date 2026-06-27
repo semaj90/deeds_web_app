@@ -1,26 +1,26 @@
 # Codebase Graph Plan — Fast AST (20-Gate)
-> Generated: 2026-06-26T21:26:47.420Z
+> Generated: 2026-06-27T11:04:39.287Z
 > Mode: `fast-ast` (CPU only)
 
 ## Stats
 | Metric | Count |
 |--------|-------|
-| Files | 68313 |
-| Routes | 187 |
+| Files | 68343 |
+| Routes | 191 |
 | Components | 5720 |
-| API handlers | 7142 |
-| TODOs | 1135 |
-| Dirs | 761 |
+| API handlers | 7146 |
+| TODOs | 1128 |
+| Dirs | 764 |
 
 ## Gate Failures (action needed)
 | Gate | Fail Count |
 |------|-----------|
 | G4 No auth | 10 |
-| G5 No Zod  | 2 |
-| G11 Localhost | 2960 |
+| G5 No Zod  | 3 |
+| G11 Localhost | 2961 |
 | G14 Svelte4 | 34 |
 | G15 SSR unsafe | 0 |
-| G16 No test | 36 |
+| G16 No test | 39 |
 | G20 Cyclic | 3 |
 
 ## Files with TODO/FIXME
@@ -34,7 +34,6 @@
 - `.claude/worktrees/agent-a38668f2/sveltekit-frontend/scripts/phase104-backups/src/lib/services/vector-service.ts` — 13 marker(s)
 - `scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/enhanced/components/[slug]/+server.ts` — 11 marker(s)
 - `scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/enhanced/components/[slug]/+server.ts` — 11 marker(s)
-- `packages/atlas-core/src/telemetry/acp-mcp-telemetry.ts` — 7 marker(s)
 - `scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/v1/evidence/[id]/ocr/+server.ts` — 7 marker(s)
 - `scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/v1/timeline/[caseId]/+server.ts` — 7 marker(s)
 - `scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/v1/evidence/[id]/ocr/+server.ts` — 7 marker(s)
@@ -44,6 +43,7 @@
 - `.claude/worktrees/agent-a38668f2/sveltekit-frontend/scripts/phase104-backups/src/lib/server/ai/feedback-loop.ts` — 6 marker(s)
 - `.claude/worktrees/agent-a38668f2/sveltekit-frontend/scripts/phase104-backups/src/lib/server/ai/feedback-loop.ts` — 6 marker(s)
 - `.claude/worktrees/agent-a38668f2/sveltekit-frontend/scripts/phase104-backups/src/lib/server/ai/feedback-loop.ts` — 6 marker(s)
+- `scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/document/[id]/+server.ts` — 6 marker(s)
 
 ## ACE usage
 Redis `code:index:manifest`, `code:index:tag:{word}`, `code:index:gate-stats`, `wiki:note:dir:*`

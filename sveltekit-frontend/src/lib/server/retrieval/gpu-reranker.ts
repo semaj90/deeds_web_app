@@ -21,6 +21,15 @@ import {
 	getCudaMemoryInfo,
 } from '$lib/server/gpu/libtorch-bridge.js';
 
+// Phase 2: Packet-centric telemetry (optional — reranker works without it)
+let recordPacketCentricTelemetry: ((event: any) => Promise<void>) | null = null;
+try {
+	const mod = await import('$lib/server/telemetry/packet-centric-telemetry.js');
+	recordPacketCentricTelemetry = mod.recordPacketCentricTelemetry ?? null;
+} catch {
+	// Telemetry module not available — skip non-blocking
+}
+
 export interface RerankableDoc {
 	content: string;
 	similarity: number;
@@ -76,6 +85,7 @@ export async function gpuRerank<T extends RerankableDoc>(
 ): Promise<RerankResult<T>> {
 	const cfg = { ...DEFAULT_CONFIG, ...config };
 	const start = performance.now();
+	const telemetryStart = Date.now();
 
 	// Not enough docs — plain sort is faster than GPU overhead
 	if (docs.length < cfg.minDocsForGpu || queryVector.length === 0) {
@@ -142,15 +152,80 @@ export async function gpuRerank<T extends RerankableDoc>(
 		// Re-sort all docs by blended score
 		docs.sort((a, b) => b.similarity - a.similarity);
 
+		const rerankMs = Math.round(performance.now() - start);
+
+		// Phase 3: Emit GPU kernel telemetry with operation metadata (non-blocking)
+		if (recordPacketCentricTelemetry) {
+			recordPacketCentricTelemetry({
+				latency_ms: Date.now() - telemetryStart,
+				retrieval_strategy: 'gpu_rerank',
+				packet_context: {
+					packet_id: null,
+					feature_id: 'gpu.reranker',
+					som_cell: null,
+					schema_version: 1,
+					embedding_version: 'embeddinggemma:latest',
+					tool_version: 'mcp:1.0',
+					gpu_kernel_version: 'tensorrt_bridge:1.0',
+					rpc_transport: 'cuda',
+				},
+				// Phase 3 GPU kernel metadata
+				gpu_metadata: {
+					kernel_name: 'batchCosineSimilarity',
+					gpu_backend: result.source === 'gpu' ? 'cuda' : 'webgpu',
+					operation: 'cosine',
+					candidate_count: batchSize,
+					input_dim: queryVector.length,
+					output_dim: 1,
+					fallback_used: false,
+					error_code: null,
+				},
+			}).catch((err) => {
+				console.debug('[gpu-reranker] Telemetry failed (non-blocking):', err);
+			});
+		}
+
 		return {
 			docs,
 			source: result.source,
-			rerankMs: Math.round(performance.now() - start),
+			rerankMs,
 			docsReranked: batchSize,
 		};
 	} catch (err) {
 		console.warn('[gpu-reranker] GPU reranking failed, falling back to sort:', (err as Error)?.message);
 		docs.sort((a, b) => b.similarity - a.similarity);
+
+		// Phase 3: Emit GPU failure telemetry with fallback metadata (non-blocking)
+		if (recordPacketCentricTelemetry) {
+			recordPacketCentricTelemetry({
+				latency_ms: Date.now() - telemetryStart,
+				retrieval_strategy: 'gpu_rerank_fallback',
+				packet_context: {
+					packet_id: null,
+					feature_id: 'gpu.reranker.fallback',
+					som_cell: null,
+					schema_version: 1,
+					embedding_version: 'embeddinggemma:latest',
+					tool_version: 'mcp:1.0',
+					gpu_kernel_version: 'tensorrt_bridge:1.0',
+					rpc_transport: 'cpu',
+				},
+				// Phase 3 GPU kernel fallback metadata
+				gpu_metadata: {
+					kernel_name: 'batchCosineSimilarity',
+					gpu_backend: 'cpu_fallback',
+					operation: 'cosine',
+					candidate_count: docs.length,
+					input_dim: queryVector.length,
+					output_dim: 1,
+					fallback_used: true,
+					error_code: (err as Error)?.message?.slice(0, 64) || 'unknown_fallback',
+				},
+			}).catch((err) => {
+				console.debug('[gpu-reranker] Fallback telemetry failed (non-blocking):', err);
+			});
+		}
+
 		return {
 			docs,
 			source: 'cpu',
@@ -177,6 +252,7 @@ export async function gpuRerankQdrantResults(
 }> {
 	const cfg = { ...DEFAULT_CONFIG, ...config };
 	const start = performance.now();
+	const telemetryStart = Date.now();
 
 	const withVectors = results.filter((r) => Array.isArray(r.vector) && r.vector.length === queryVector.length);
 
@@ -197,12 +273,65 @@ export async function gpuRerankQdrantResults(
 
 		results.sort((a, b) => b.score - a.score);
 
+		const rerankMs = Math.round(performance.now() - start);
+
+		// Phase 2: Emit Qdrant GPU telemetry (non-blocking)
+		if (recordPacketCentricTelemetry) {
+			recordPacketCentricTelemetry({
+				latency_ms: Date.now() - telemetryStart,
+				retrieval_strategy: 'qdrant_gpu_rerank',
+				packet_context: {
+					packet_id: null,
+					feature_id: 'qdrant.gpu_rerank',
+					som_cell: null,
+					schema_version: 1,
+					embedding_version: 'embeddinggemma:latest',
+					tool_version: 'mcp:1.0',
+					gpu_kernel_version: 'tensorrt_bridge:1.0',
+					rpc_transport: 'cuda',
+				},
+			}).catch((err) => {
+				console.debug('[gpu-reranker] Qdrant telemetry failed (non-blocking):', err);
+			});
+		}
+
 		return {
 			results,
 			source: batchResult.source,
-			rerankMs: Math.round(performance.now() - start),
+			rerankMs,
 		};
-	} catch {
+	} catch (err) {
+		// Phase 3: Emit GPU failure telemetry with fallback metadata (non-blocking)
+		if (recordPacketCentricTelemetry) {
+			recordPacketCentricTelemetry({
+				latency_ms: Date.now() - telemetryStart,
+				retrieval_strategy: 'qdrant_gpu_rerank_fallback',
+				packet_context: {
+					packet_id: null,
+					feature_id: 'qdrant.gpu_rerank.fallback',
+					som_cell: null,
+					schema_version: 1,
+					embedding_version: 'embeddinggemma:latest',
+					tool_version: 'mcp:1.0',
+					gpu_kernel_version: 'tensorrt_bridge:1.0',
+					rpc_transport: 'cpu',
+				},
+				// Phase 3 GPU kernel fallback metadata
+				gpu_metadata: {
+					kernel_name: 'batchCosineSimilarity',
+					gpu_backend: 'cpu_fallback',
+					operation: 'cosine',
+					candidate_count: withVectors.length,
+					input_dim: queryVector.length,
+					output_dim: 1,
+					fallback_used: true,
+					error_code: (err as Error)?.message?.slice(0, 64) || 'unknown_fallback',
+				},
+			}).catch((err) => {
+				console.debug('[gpu-reranker] Qdrant fallback telemetry failed (non-blocking):', err);
+			});
+		}
+
 		return { results, source: 'cpu', rerankMs: Math.round(performance.now() - start) };
 	}
 }

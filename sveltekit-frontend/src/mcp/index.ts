@@ -7,6 +7,15 @@ import {
   type ToolCallResponse,
 } from '$lib/types/protocol';
 
+// Phase 2: Packet-centric telemetry (optional — MCP works without it)
+let recordPacketCentricTelemetry: ((event: any) => Promise<void>) | null = null;
+try {
+  const mod = await import('$lib/server/telemetry/packet-centric-telemetry.js');
+  recordPacketCentricTelemetry = mod.recordPacketCentricTelemetry ?? null;
+} catch {
+  // Telemetry module not available — skip non-blocking
+}
+
 export type MCPToolResponse<T extends JsonValue = JsonValue> = Omit<
   ToolCallResponse,
   'arguments' | 'metadata' | 'result'
@@ -78,17 +87,78 @@ async function runTool<T extends JsonValue>(
   args: ToolArgs,
   runner: () => Promise<{ ok: boolean; result: unknown; metadata?: Record<string, unknown> }>
 ): Promise<MCPToolResponse<T>> {
+  const telemetryStart = Date.now();
   try {
     const { ok, result, metadata } = await runner();
     if (!ok) {
+      // Phase 2: Emit MCP tool failure telemetry (non-blocking)
+      if (recordPacketCentricTelemetry) {
+        recordPacketCentricTelemetry({
+          latency_ms: Date.now() - telemetryStart,
+          retrieval_strategy: 'mcp_tool_call',
+          packet_context: {
+            packet_id: null,
+            feature_id: `mcp.${toolName}`,
+            som_cell: null,
+            schema_version: 1,
+            embedding_version: 'embeddinggemma:latest',
+            tool_version: 'mcp:1.0',
+            gpu_kernel_version: 'tensorrt_bridge:1.0',
+            rpc_transport: 'mcp',
+          },
+        }).catch((err) => {
+          console.debug('[mcp] Tool failure telemetry failed (non-blocking):', err);
+        });
+      }
+
       return toolError(toolName, args, 'Tool execution returned a non-ok result', {
         ...metadata,
         result: jsonValueFromUnknown(result),
       });
     }
 
+    // Phase 2: Emit MCP tool success telemetry (non-blocking)
+    if (recordPacketCentricTelemetry) {
+      recordPacketCentricTelemetry({
+        latency_ms: Date.now() - telemetryStart,
+        retrieval_strategy: 'mcp_tool_call',
+        packet_context: {
+          packet_id: null,
+          feature_id: `mcp.${toolName}`,
+          som_cell: null,
+          schema_version: 1,
+          embedding_version: 'embeddinggemma:latest',
+          tool_version: 'mcp:1.0',
+          gpu_kernel_version: 'tensorrt_bridge:1.0',
+          rpc_transport: 'mcp',
+        },
+      }).catch((err) => {
+        console.debug('[mcp] Tool telemetry failed (non-blocking):', err);
+      });
+    }
+
     return toolOk(toolName, args, jsonValueFromUnknown(result) as T, metadata);
   } catch (error) {
+    // Phase 2: Emit MCP tool exception telemetry (non-blocking)
+    if (recordPacketCentricTelemetry) {
+      recordPacketCentricTelemetry({
+        latency_ms: Date.now() - telemetryStart,
+        retrieval_strategy: 'mcp_tool_exception',
+        packet_context: {
+          packet_id: null,
+          feature_id: `mcp.${toolName}.error`,
+          som_cell: null,
+          schema_version: 1,
+          embedding_version: 'embeddinggemma:latest',
+          tool_version: 'mcp:1.0',
+          gpu_kernel_version: 'tensorrt_bridge:1.0',
+          rpc_transport: 'mcp',
+        },
+      }).catch((err) => {
+        console.debug('[mcp] Exception telemetry failed (non-blocking):', err);
+      });
+    }
+
     return toolError(toolName, args, error);
   }
 }

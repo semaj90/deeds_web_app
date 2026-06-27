@@ -151,6 +151,16 @@ export const ENV = {
   /** Gemma 4 unified legal+VLM — tool calling + thinking + vision (5.3GB) */
   GEMMA4_MODEL: privateEnv.GEMMA4_MODEL ?? 'gemma4-rotorquant:latest',
   /**
+   * Gemma4 OpenAI-compatible base URL
+   * Points to Bifrost cache gateway (primary) or direct TurboQuant (fallback)
+   * Windows dev: http://127.0.0.1:3040/v1 (Bifrost) or http://127.0.0.1:8090/v1 (TurboQuant)
+   * Docker: http://legal-ai-bifrost:8080/v1 or http://legal-ai-turboquant:8090/v1
+   */
+  GEMMA4_OPENAI_BASE_URL:
+    privateEnv.GEMMA4_OPENAI_BASE_URL ??
+    privateEnv.BIFROST_OPENAI_BASE_URL ??
+    `http://${LOOPBACK_IP}:3040/v1`,
+  /**
    * Structured-call / function-calling translator.
    * Defaults to the unified Gemma 4 model until a lighter FunctionGemma
    * Ollama tag is available. Override with FUNCTION_GEMMA_MODEL=functiongemma:latest

@@ -170,11 +170,13 @@ export function validateSchemaReferences(text: string): string[] {
     }
   }
 
-  // Extract function references
-  const functionMatches = text.match(/\b(\w+)\s*\(/g) ?? [];
+  // Extract function references (only before parens that contain params, not column lists)
+  // Pattern: function_name(something) but NOT table_name (column_list)
+  // Heuristic: table names in SQL appear in FROM/INTO/UPDATE, function calls are elsewhere
+  const functionMatches = text.match(/(?<!FROM\s)(?<!INTO\s)(?<!UPDATE\s)\b([a-z_][a-z0-9_]*)\s*\(/gi) ?? [];
   const functions = new Set(
     functionMatches.map((m) => {
-      const match = /(\w+)\s*\(/.exec(m);
+      const match = /\b([a-z_][a-z0-9_]*)\s*\(/i.exec(m);
       return match ? match[1].toLowerCase() : null;
     }).filter((f): f is string => f !== null)
   );
@@ -183,7 +185,7 @@ export function validateSchemaReferences(text: string): string[] {
     if (!KNOWN_FUNCTIONS.has(func) && !func.match(/^(select|insert|update|delete|create|alter|drop|if|else|case|when|then|end)$/i)) {
       // Only warn if it's not a SQL keyword
       // (many functions will be legitimate — this is a heuristic gate)
-      if (!func.match(/^(length|substring|trim|upper|lower|cast|coalesce|nullif|round|date|now|current)$/i)) {
+      if (!func.match(/^(length|substring|trim|upper|lower|cast|coalesce|nullif|round|date|now|current|values)$/i)) {
         violations.push(`Function '${func}' not in known functions (check if exists before execution)`);
       }
     }

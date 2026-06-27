@@ -1,8 +1,8 @@
 # llama-server (TurboQuant) Priority Gate — Implementation Complete
 
-**Date**: 2026-06-15  
-**Status**: ✅ WIRED  
-**Priority**: Gemma4 models prefer llama-server (TurboQuant KV cache) over Ollama  
+**Date**: 2026-06-15
+**Status**: ✅ WIRED
+**Priority**: Gemma4 models prefer llama-server (TurboQuant KV cache) over Ollama
 
 ---
 
@@ -22,7 +22,7 @@ if (isTurboQuantModel) {
   try {
     // Health probe: /v1/models (2s timeout, fast ~10ms)
     const modelsProbe = await fetch(`${turboQuantUrl}/v1/models`, { signal: AbortSignal.timeout(2000) });
-    
+
     if (modelsProbe.ok) {
       // TurboQuant healthy — use it (OpenAI-compatible /v1/chat/completions)
       const turboquantRes = await fetch(`${turboQuantUrl}/v1/chat/completions`, { ... });
@@ -63,7 +63,6 @@ Is model "gemma4-*" or "gemma3-*"?
 
 ### TurboQuant Benefits (llama-server)
 - **KV Cache Compression**: `-ctk q8_0 -ctv turbo3` → 4× context expansion
-  - Standard: 16KB context fits ~8GB GPU
   - TurboQuant: 64KB context fits ~8GB GPU
 - **Same Quality**: Identical output to standard quantization (turbo3 is lossless)
 - **Automatic**: No code changes needed — operator just runs llama-server with KV flags
@@ -175,8 +174,8 @@ L3: Backend selection
 
 ---
 
-**Status**: Production-ready ✅  
-**Risk**: Minimal (gate fails safely to Ollama, health probe timeout 2s)  
+**Status**: Production-ready ✅
+**Risk**: Minimal (gate fails safely to Ollama, health probe timeout 2s)
 **Next**: Run Phase 17.2 tests to measure TurboQuant latency benefit
 
 ---

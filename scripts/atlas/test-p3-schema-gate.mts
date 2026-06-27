@@ -148,6 +148,7 @@ async function runTests() {
       console.log(`   Expected valid=${testCase.expectedValid}, got valid=${result.valid}`);
       if (result.blockedTerms.length > 0) console.log(`   Blocked: ${result.blockedTerms.join(', ')}`);
       if (result.missingIdentity.length > 0) console.log(`   Missing: ${result.missingIdentity.join(', ')}`);
+      if (result.schemaViolations.length > 0) console.log(`   SchemaViolations: ${result.schemaViolations.join(', ')}`);
       if (result.unsafeOperations.length > 0) console.log(`   Unsafe: ${result.unsafeOperations.join(', ')}`);
     }
 
@@ -159,6 +160,7 @@ async function runTests() {
       passed: testPassed,
       blockedTerms: result.blockedTerms,
       missingIdentity: result.missingIdentity,
+      schemaViolations: result.schemaViolations,
       unsafeOperations: result.unsafeOperations
     });
   }

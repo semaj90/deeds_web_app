@@ -8,6 +8,7 @@
  */
 
 import { recordRetrievalTelemetry, type RetrievalTelemetrySignal } from './retrieval-recorder.js';
+import { recordPacketCentricTelemetry, normalizePacketContext, type PacketCentricContext } from './packet-centric-telemetry.js';
 import { ENV } from '$lib/server/env.server.js';
 
 export interface ACERetrievalMetrics {
@@ -26,21 +27,32 @@ export interface ACERetrievalMetrics {
   userId?: string;
   surface?: string;
   fromParentAtlas?: boolean;
+
+  // Phase 2: Packet-centric context (optional, filled in if available)
+  packetContext?: PacketCentricContext;
+  somCell?: string | null;
+  schemaVersion?: number;
+  embeddingVersion?: string;
+  toolVersion?: string;
+  gpuKernelVersion?: string;
+  rpcTransport?: string;
 }
 
 /**
  * Record ACE retrieval telemetry asynchronously.
  *
  * This function:
- * 1. Validates required fields
- * 2. Constructs telemetry signal
- * 3. Emits to PostgreSQL via recorder
+ * 1. Records legacy retrieval telemetry (for backward compatibility)
+ * 2. Emits packet-centric telemetry (Phase 2: 8 mandatory fields)
+ * 3. Combines both signals for rich analysis
  * 4. Never throws (fires and forgets)
  *
  * @param metrics - ACE retrieval metrics from context assembly
  */
 export async function recordACERetrievalTelemetry(metrics: ACERetrievalMetrics): Promise<void> {
   // Fire-and-forget: do not await, do not propagate errors
+
+  // Emit legacy retrieval telemetry (backward compatible)
   recordRetrievalTelemetry({
     query: metrics.query,
     latencyMs: metrics.latencyMs,
@@ -57,10 +69,44 @@ export async function recordACERetrievalTelemetry(metrics: ACERetrievalMetrics):
     environment: ENV.NODE_ENV ?? 'development',
     retrievalStrategy: metrics.retrievalStrategy,
   }).catch((err) => {
-    // Telemetry failure should never block ACE
-    console.debug('[ACE Telemetry] Emit failed (non-blocking):', {
+    console.debug('[ACE Telemetry] Legacy emit failed (non-blocking):', {
       query: metrics.query.slice(0, 50),
       strategy: metrics.retrievalStrategy,
+      error: err instanceof Error ? err.message : String(err),
+    });
+  });
+
+  // Emit packet-centric telemetry (Phase 2)
+  recordPacketCentricTelemetry({
+    query: metrics.query,
+    query_hash: metrics.query.slice(0, 64),
+    latency_ms: metrics.latencyMs,
+    vector_hits: metrics.vectorHits,
+    trigram_hits: metrics.trigramHits,
+    fts_hits: metrics.ftsHits,
+    cache_hit: metrics.cacheHit,
+    fusion_score: metrics.fusionScore,
+    retrieval_strategy: metrics.retrievalStrategy,
+    surface: metrics.surface ?? 'ace',
+    environment: ENV.NODE_ENV ?? 'development',
+    selected_packet_key: metrics.selectedPacketKey,
+    selected_packet_keys: metrics.selectedPacketKeys,
+    selected_feature_id: metrics.selectedFeatureId,
+    feature_ids: metrics.featureIds,
+    packet_context: metrics.packetContext ?? {
+      packet_id: metrics.selectedPacketKey,
+      feature_id: metrics.selectedFeatureId,
+      som_cell: metrics.somCell,
+      schema_version: metrics.schemaVersion ?? 1,
+      embedding_version: metrics.embeddingVersion ?? 'embeddinggemma:latest',
+      tool_version: metrics.toolVersion ?? 'mcp:1.0',
+      gpu_kernel_version: metrics.gpuKernelVersion ?? 'tensorrt_bridge:1.0',
+      rpc_transport: metrics.rpcTransport ?? 'jsonrpc',
+    },
+  }).catch((err) => {
+    console.debug('[Packet-Centric Telemetry] Emit failed (non-blocking):', {
+      packet_id: metrics.selectedPacketKey,
+      feature_id: metrics.selectedFeatureId,
       error: err instanceof Error ? err.message : String(err),
     });
   });

@@ -18,6 +18,7 @@
 
 import { ENV } from '$lib/server/env.server.js';
 import { batchCosineSimilarity, isCudaAvailable } from '$lib/server/gpu/libtorch-bridge.js';
+import { emitTelemetry } from '$lib/server/telemetry/gpu-telemetry.js';
 
 // ── Semantic tag vocabulary with rich descriptions for embedding ─────────────
 
@@ -159,6 +160,7 @@ export async function classifyChunksGpu(
 	maxTags = 4,
 ): Promise<GpuTagResult[]> {
 	const results: GpuTagResult[] = [];
+	const telemetryStart = Date.now();
 
 	// Build corpus: 20 tag embeddings as number[][]
 	const corpus = tagEmbeddings.map(e => Array.from(e));
@@ -189,6 +191,22 @@ export async function classifyChunksGpu(
 			scores: above,
 		});
 	}
+
+	// Emit telemetry for batch operation
+	try {
+		await emitTelemetry({
+			kernel_name: 'karpathyTaggingGpu',
+			gpu_backend: isCudaAvailable() ? 'cuda' : 'cpu_fallback',
+			operation: 'semantic_tagging',
+			candidate_count: chunks.length,
+			input_dim: 768,
+			output_dim: SEMANTIC_TAGS.length,
+			fallback_used: !isCudaAvailable(),
+			error_code: undefined,
+			duration_ms: Date.now() - telemetryStart,
+			rpc_transport: 'direct'
+		});
+	} catch {}
 
 	return results;
 }
@@ -260,6 +278,22 @@ export async function gpuTagBatch(
 	} else {
 		tagged = results.filter(r => r.tags.length > 0).length;
 	}
+
+	// Emit telemetry for full batch pipeline
+	try {
+		await emitTelemetry({
+			kernel_name: 'gpuTagBatchPipeline',
+			gpu_backend: isCudaAvailable() ? 'cuda' : 'cpu_fallback',
+			operation: 'batch_tagging_pipeline',
+			candidate_count: chunks.length,
+			input_dim: 768,
+			output_dim: SEMANTIC_TAGS.length,
+			fallback_used: !isCudaAvailable(),
+			error_code: undefined,
+			duration_ms: classifyMs + embedMs,
+			rpc_transport: 'direct'
+		});
+	} catch {}
 
 	return {
 		results,

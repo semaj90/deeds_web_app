@@ -21,3 +21,6 @@
 !.opencode/outcome-ledger-with-cardIds.ndjson
 !.opencode/cards/
 !.opencode/cards/*.json
+
+# Codebase graph — large gitignored JSON, but searchable for offline analytics
+!sveltekit-frontend/docs/graph/codebase-graph.json

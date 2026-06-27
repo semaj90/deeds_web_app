@@ -1,7 +1,23 @@
 #!/usr/bin/env node
 import { loadConfig, loadRouteMap, loadRouteGapAtlas, loadClusterAliases, loadHypergraphClusters, loadLlmNotes, streamCodebaseGraph, routeSummary, fileLanguage, workspaceForPath, fileSidecarKind, collectEnvFromRoots, parentAtlasMarkdown, resolveRepoPath, writeJson, writeMarkdown, topEntries } from './_atlas-utils.mjs';
+import fs from 'node:fs';
 
 const config = loadConfig();
+
+// PREFLIGHT: Validate config and sources exist
+if (!config?.sources?.codebaseGraph) {
+  throw new Error('Missing config.sources.codebaseGraph in atlas.config.json');
+}
+
+const sourceGraphPath = resolveRepoPath(config.sources.codebaseGraph);
+if (!fs.existsSync(sourceGraphPath)) {
+  throw new Error(
+    `codebaseGraph source not found: ${sourceGraphPath}\n` +
+    `Configured path: ${config.sources.codebaseGraph}\n` +
+    `Resolved from repo root: ${sourceGraphPath}`
+  );
+}
+
 const routes = loadRouteMap(config);
 const routeGaps = loadRouteGapAtlas(config);
 const aliases = loadClusterAliases(config);
@@ -23,8 +39,6 @@ let graphMeta = {
 };
 
 let filesCounted = 0;
-
-const sourceGraphPath = resolveRepoPath(config.sources.codebaseGraph);
 
 console.log(`⏳ Streaming codebase graph memory-efficiently: ${config.sources.codebaseGraph}...`);
 

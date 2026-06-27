@@ -1,7 +1,7 @@
 # Gemma 4 Integration Guide
 
 **Model**: `gemma4:e4b-it-q4_K_M` (4B params, Q4_K_M quantization, 9.6GB)
-**Features**: VLM (via mmproj) + Tool Calling + 32K context + Legal GRPO fine-tune
+**Features**: VLM (via mmproj) + Tool Calling + 64K context + Legal GRPO fine-tune
 **Status**: ✅ Production Ready
 
 ---

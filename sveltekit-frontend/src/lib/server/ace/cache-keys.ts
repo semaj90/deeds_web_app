@@ -20,3 +20,21 @@ export const wikiGapKey = (gapId: string): string => `wiki:gap:${gapId}`;
 export const wikiFileKey = (filePath: string): string => `wiki:file:${filePath}`;
 export const wikiSymbolKey = (symbol: string): string => `wiki:symbol:${symbol}`;
 export const wikiGapReportLatestKey = (): string => 'wiki:gap:report:latest';
+
+// BitFrost L1/L2/L3 cache key patterns — canonical entry point
+// Use these ONLY; do not create ad-hoc bifrost:* keys elsewhere
+
+export const bifrostPacketKey = (packetKey: string): string =>
+	`bifrost:packet:${packetKey}`;
+
+export const bifrostFeatureKey = (featureId: string): string =>
+	`bifrost:feature:${featureId}`;
+
+export const bifrostSourceKey = (sourceRef: string): string =>
+	`bifrost:source:${sourceRef}`;
+
+export const bifrostQueryKey = (queryHash: string): string =>
+	`bifrost:query:${queryHash}`;
+
+export const bifrostWorkflowKey = (workflowHash: string): string =>
+	`bifrost:workflow:${workflowHash}`;

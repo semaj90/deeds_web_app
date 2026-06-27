@@ -1,16 +1,16 @@
 # Repo Root Atlas
 
 - repo: deeds-web-app
-- generatedAt: 2026-06-05T04:51:20.554Z
+- generatedAt: 2026-06-27T10:01:15.495Z
 - sourceGraph: sveltekit-frontend/docs/graph/codebase-graph.json
-- fileCount: 55000
-- routeCount: 1097
-- componentCount: 5348
-- apiCount: 5543
-- dirCount: 1408
-- workspaceCount: 27
+- fileCount: 68330
+- routeCount: 189
+- componentCount: 5720
+- apiCount: 5873
+- dirCount: 764
+- workspaceCount: 24
 - languageCount: 4
-- envKeyCount: 866
+- envKeyCount: 997
 - clusterAliasCount: 17
 - hypergraphClusters: 0
 - llmNoteChars: 2414
@@ -19,7 +19,7 @@
 ## Top Entries
 
 - routes: 909 total (683 api, 223 page, 3 layout)
-- workspaces: $lib, repo-root, audit, claude-mem, data, deeds_labs, docker, docs, drizzle, granite-docling-258M, memory, minio-data, models, next_steps, phase13graph_exportgenerator, qdrant-windows, scratch, scripts, simd-bridge, src, storage, sveltekit-frontend, test-results, tests, tmp, turbovec, vscode-extension
+- workspaces: $lib, repo-root, docs, memory, scripts, sveltekit-frontend, packages, audit, claude-mem, configs, crates, data, docker, llama-cpp-turboquant-gemma4, minio-data, neschrom97, next_steps, reports, scratch, simd-bridge, test-results, tests, tmp, turbovec
 - languages: typescript, javascript, json, svelte
 - top import: @sveltejs/kit
-- env keys: REDIS_URL, SCENARIO_API_URL, QDRANT_URL, QDRANT_COLLECTION, BATCH, EMBED_URL, SCENARIO_API, QUIC_SERVER_URL, TENSORRT_BRIDGE_URL, OLLAMA_URL
+- env keys: REDIS_URL, REDIS_PASSWORD, REDIS_PASS, QDRANT_URL, NEO4J_URL, NEO4J_USER, NEO4J_PASS, SCENARIO_API_URL, QDRANT_COLLECTION, BATCH

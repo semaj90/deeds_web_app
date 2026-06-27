@@ -9,6 +9,7 @@
  */
 import { ENV } from '$lib/server/env.server.js';
 import { buildGrpcClientChannelOptions } from './client-options.js';
+import { emitTelemetry } from '$lib/server/telemetry/gpu-telemetry.js';
 
 // ── Public types ──────────────────────────────────────────────────────────────
 
@@ -152,14 +153,49 @@ export async function turbovecGrpcSearch(
   topK = 200,
   transformId = ''
 ): Promise<TurboVecGrpcSearchResponse | null> {
+  const telemetryStart = Date.now();
   const client = await getClient();
-  if (!client) return null;
-  return grpcCall<TurboVecGrpcSearchResponse>(
+  if (!client) {
+    try {
+      await emitTelemetry({
+        kernel_name: 'turbovecSearch',
+        gpu_backend: 'cpu_fallback',
+        operation: 'ann_search',
+        candidate_count: topK,
+        input_dim: queryVector.length,
+        output_dim: topK,
+        fallback_used: true,
+        error_code: 'grpc_client_unavailable',
+        duration_ms: Date.now() - telemetryStart,
+        rpc_transport: 'grpc'
+      });
+    } catch {}
+    return null;
+  }
+
+  const response = await grpcCall<TurboVecGrpcSearchResponse>(
     client,
     'search',
     { queryVector: Array.from(queryVector), topK, transformId },
     2000
   );
+
+  try {
+    await emitTelemetry({
+      kernel_name: 'turbovecSearch',
+      gpu_backend: response ? 'simd' : 'cpu_fallback',
+      operation: 'ann_search',
+      candidate_count: topK,
+      input_dim: queryVector.length,
+      output_dim: response?.candidates.length ?? topK,
+      fallback_used: !response,
+      error_code: response ? undefined : 'grpc_call_failed',
+      duration_ms: Date.now() - telemetryStart,
+      rpc_transport: 'grpc'
+    });
+  } catch {}
+
+  return response;
 }
 
 /**
@@ -191,12 +227,47 @@ export async function turbovecGrpcTransform(
   outDim = 64,
   transformId = ''
 ): Promise<TurboVecGrpcTransformResponse | null> {
+  const telemetryStart = Date.now();
   const client = await getClient();
-  if (!client) return null;
-  return grpcCall<TurboVecGrpcTransformResponse>(
+  if (!client) {
+    try {
+      await emitTelemetry({
+        kernel_name: 'turbovecTransform',
+        gpu_backend: 'cpu_fallback',
+        operation: 'orthogonal_transform',
+        candidate_count: count,
+        input_dim: inDim,
+        output_dim: outDim,
+        fallback_used: true,
+        error_code: 'grpc_client_unavailable',
+        duration_ms: Date.now() - telemetryStart,
+        rpc_transport: 'grpc'
+      });
+    } catch {}
+    return null;
+  }
+
+  const response = await grpcCall<TurboVecGrpcTransformResponse>(
     client,
     'transform',
     { vectors: Array.from(vectors), count, inDim, outDim, transformId },
     5000
   );
+
+  try {
+    await emitTelemetry({
+      kernel_name: 'turbovecTransform',
+      gpu_backend: response ? 'simd' : 'cpu_fallback',
+      operation: 'orthogonal_transform',
+      candidate_count: count,
+      input_dim: inDim,
+      output_dim: outDim,
+      fallback_used: !response,
+      error_code: response ? undefined : 'grpc_call_failed',
+      duration_ms: Date.now() - telemetryStart,
+      rpc_transport: 'grpc'
+    });
+  } catch {}
+
+  return response;
 }

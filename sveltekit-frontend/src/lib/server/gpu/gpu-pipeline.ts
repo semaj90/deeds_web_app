@@ -23,6 +23,15 @@
 import { createHash } from 'node:crypto';
 import { getAddonInternal, gpuHasRoom, vramNeededMB } from './libtorch-bridge.js';
 
+// Phase 3: Packet-centric telemetry (optional — pipeline works without it)
+let recordPacketCentricTelemetry: ((event: any) => Promise<void>) | null = null;
+try {
+	const mod = await import('$lib/server/telemetry/packet-centric-telemetry.js');
+	recordPacketCentricTelemetry = mod.recordPacketCentricTelemetry ?? null;
+} catch {
+	// Telemetry module not available — skip non-blocking
+}
+
 // ── ENV (lazy import — avoids circular deps at module init) ──────────────────
 
 let _maxStreams = 4;
@@ -243,6 +252,7 @@ export async function pipelineAttention(
   dim:   number,
 ): Promise<{ weights: Float32Array; source: 'gpu' | 'cpu' | 'cache' }> {
   const t0  = performance.now();
+  const telemetryStart = Date.now();
   const ckey = `gpu:graph:attn:${n}:${dim}:${inputHash(query)}`;
 
   const cached = await cacheGet(ckey, base64ToF32);
@@ -256,20 +266,54 @@ export async function pipelineAttention(
     const addon = getAddonInternal();
     let weights: Float32Array;
     let source: 'gpu' | 'cpu' = 'cpu';
+    let errorCode: string | null = null;
 
     if (addon?.attentionScoreGPU && gpuHasRoom(vramNeededMB(n + 1, dim) + 256)) {
       try {
         weights = addon.attentionScoreGPU(query, dim, keys, n);
         source  = 'gpu';
-      } catch {
+      } catch (err) {
         weights = cpuAttention(query, dim, keys, n);
+        errorCode = (err as Error)?.message?.slice(0, 64) || 'gpu_fallback';
       }
     } else {
       weights = cpuAttention(query, dim, keys, n);
     }
 
     cacheSet(ckey, f32ToBase64(weights)).catch(() => {});
-    record({ fn: 'attn', n, dim, source, durationMs: performance.now() - t0 });
+    const durationMs = performance.now() - t0;
+    record({ fn: 'attn', n, dim, source, durationMs });
+
+    // Phase 3: Emit GPU pipeline telemetry (non-blocking)
+    if (recordPacketCentricTelemetry) {
+      recordPacketCentricTelemetry({
+        latency_ms: Date.now() - telemetryStart,
+        retrieval_strategy: source === 'cache' ? 'gpu_pipeline_cache' : `gpu_pipeline_attention_${source}`,
+        packet_context: {
+          packet_id: null,
+          feature_id: 'gpu.pipeline.attention',
+          som_cell: null,
+          schema_version: 1,
+          embedding_version: 'embeddinggemma:latest',
+          tool_version: 'mcp:1.0',
+          gpu_kernel_version: 'tensorrt_bridge:1.0',
+          rpc_transport: source === 'gpu' ? 'cuda' : source === 'cache' ? 'redis' : 'cpu',
+        },
+        gpu_metadata: {
+          kernel_name: 'attentionScoreGPU',
+          gpu_backend: source === 'gpu' ? 'cuda' : source === 'cache' ? 'redis' : 'cpu_fallback',
+          operation: 'attention',
+          candidate_count: n,
+          input_dim: dim,
+          output_dim: n,
+          fallback_used: source !== 'gpu',
+          error_code: errorCode,
+        },
+      }).catch((err) => {
+        console.debug('[gpu-pipeline] Attention telemetry failed (non-blocking):', err);
+      });
+    }
+
     return { weights, source };
   });
 }
@@ -286,6 +330,7 @@ export async function pipelinePageRank(
   iters    = 50,
 ): Promise<{ scores: Float32Array; source: 'gpu' | 'cpu' | 'cache' }> {
   const t0   = performance.now();
+  const telemetryStart = Date.now();
   const ckey = `gpu:graph:pr:${n}:${Math.round(damping * 100)}:${inputHash(adj)}`;
 
   const cached = await cacheGet(ckey, base64ToF32);
@@ -299,20 +344,54 @@ export async function pipelinePageRank(
     const addon = getAddonInternal();
     let scores: Float32Array;
     let source: 'gpu' | 'cpu' = 'cpu';
+    let errorCode: string | null = null;
 
     if (addon?.pageRankGPU && gpuHasRoom(vramNeededMB(n, n) + 256)) {
       try {
         scores = addon.pageRankGPU(adj, n, damping, iters);
         source = 'gpu';
-      } catch {
+      } catch (err) {
         scores = cpuPageRank(adj, n, damping, iters);
+        errorCode = (err as Error)?.message?.slice(0, 64) || 'gpu_fallback';
       }
     } else {
       scores = cpuPageRank(adj, n, damping, iters);
     }
 
     cacheSet(ckey, f32ToBase64(scores)).catch(() => {});
-    record({ fn: 'pr', n, dim: n, source, durationMs: performance.now() - t0 });
+    const durationMs = performance.now() - t0;
+    record({ fn: 'pr', n, dim: n, source, durationMs });
+
+    // Phase 3: Emit GPU pipeline telemetry (non-blocking)
+    if (recordPacketCentricTelemetry) {
+      recordPacketCentricTelemetry({
+        latency_ms: Date.now() - telemetryStart,
+        retrieval_strategy: source === 'cache' ? 'gpu_pipeline_cache' : `gpu_pipeline_pagerank_${source}`,
+        packet_context: {
+          packet_id: null,
+          feature_id: 'gpu.pipeline.pagerank',
+          som_cell: null,
+          schema_version: 1,
+          embedding_version: 'embeddinggemma:latest',
+          tool_version: 'mcp:1.0',
+          gpu_kernel_version: 'tensorrt_bridge:1.0',
+          rpc_transport: source === 'gpu' ? 'cuda' : source === 'cache' ? 'redis' : 'cpu',
+        },
+        gpu_metadata: {
+          kernel_name: 'pageRankGPU',
+          gpu_backend: source === 'gpu' ? 'cuda' : source === 'cache' ? 'redis' : 'cpu_fallback',
+          operation: 'pagerank',
+          candidate_count: n,
+          input_dim: n,
+          output_dim: n,
+          fallback_used: source !== 'gpu',
+          error_code: errorCode,
+        },
+      }).catch((err) => {
+        console.debug('[gpu-pipeline] PageRank telemetry failed (non-blocking):', err);
+      });
+    }
+
     return { scores, source };
   });
 }
@@ -329,6 +408,7 @@ export async function pipelineReward(
   dim: number,
 ): Promise<{ scores: Float32Array; source: 'gpu' | 'cpu' | 'cache' }> {
   const t0   = performance.now();
+  const telemetryStart = Date.now();
   const ckey = `gpu:graph:reward:${n}:${dim}:${inputHash(gen)}`;
 
   const cached = await cacheGet(ckey, base64ToF32);
@@ -342,20 +422,54 @@ export async function pipelineReward(
     const addon = getAddonInternal();
     let scores: Float32Array;
     let source: 'gpu' | 'cpu' = 'cpu';
+    let errorCode: string | null = null;
 
     if (addon?.rewardScoreGPU && gpuHasRoom(vramNeededMB(2 * n, dim) + 256)) {
       try {
         scores = addon.rewardScoreGPU(gen, ref, n, dim);
         source = 'gpu';
-      } catch {
+      } catch (err) {
         scores = cpuReward(gen, ref, n, dim);
+        errorCode = (err as Error)?.message?.slice(0, 64) || 'gpu_fallback';
       }
     } else {
       scores = cpuReward(gen, ref, n, dim);
     }
 
     cacheSet(ckey, f32ToBase64(scores)).catch(() => {});
-    record({ fn: 'reward', n, dim, source, durationMs: performance.now() - t0 });
+    const durationMs = performance.now() - t0;
+    record({ fn: 'reward', n, dim, source, durationMs });
+
+    // Phase 3: Emit GPU pipeline telemetry (non-blocking)
+    if (recordPacketCentricTelemetry) {
+      recordPacketCentricTelemetry({
+        latency_ms: Date.now() - telemetryStart,
+        retrieval_strategy: source === 'cache' ? 'gpu_pipeline_cache' : `gpu_pipeline_reward_${source}`,
+        packet_context: {
+          packet_id: null,
+          feature_id: 'gpu.pipeline.reward',
+          som_cell: null,
+          schema_version: 1,
+          embedding_version: 'embeddinggemma:latest',
+          tool_version: 'mcp:1.0',
+          gpu_kernel_version: 'tensorrt_bridge:1.0',
+          rpc_transport: source === 'gpu' ? 'cuda' : source === 'cache' ? 'redis' : 'cpu',
+        },
+        gpu_metadata: {
+          kernel_name: 'rewardScoreGPU',
+          gpu_backend: source === 'gpu' ? 'cuda' : source === 'cache' ? 'redis' : 'cpu_fallback',
+          operation: 'reward',
+          candidate_count: n,
+          input_dim: dim,
+          output_dim: 1,
+          fallback_used: source !== 'gpu',
+          error_code: errorCode,
+        },
+      }).catch((err) => {
+        console.debug('[gpu-pipeline] Reward telemetry failed (non-blocking):', err);
+      });
+    }
+
     return { scores, source };
   });
 }
@@ -370,6 +484,7 @@ export async function pipelineTopK(
   k:      number,
 ): Promise<{ indices: Int32Array; source: 'gpu' | 'cpu' | 'cache' }> {
   const t0   = performance.now();
+  const telemetryStart = Date.now();
   const ckey = `gpu:graph:topk:${n}:${k}:${inputHash(scores)}`;
 
   const cached = await cacheGet(ckey, base64ToI32);
@@ -383,20 +498,54 @@ export async function pipelineTopK(
     const addon = getAddonInternal();
     let indices: Int32Array;
     let source: 'gpu' | 'cpu' = 'cpu';
+    let errorCode: string | null = null;
 
     if (addon?.topKIndicesGPU && k <= n && gpuHasRoom(vramNeededMB(n, 1) + 64)) {
       try {
         indices = addon.topKIndicesGPU(scores, n, k);
         source  = 'gpu';
-      } catch {
+      } catch (err) {
         indices = cpuTopK(scores, n, k);
+        errorCode = (err as Error)?.message?.slice(0, 64) || 'gpu_fallback';
       }
     } else {
       indices = cpuTopK(scores, n, k);
     }
 
     cacheSet(ckey, i32ToBase64(indices)).catch(() => {});
-    record({ fn: 'topk', n, dim: k, source, durationMs: performance.now() - t0 });
+    const durationMs = performance.now() - t0;
+    record({ fn: 'topk', n, dim: k, source, durationMs });
+
+    // Phase 3: Emit GPU pipeline telemetry (non-blocking)
+    if (recordPacketCentricTelemetry) {
+      recordPacketCentricTelemetry({
+        latency_ms: Date.now() - telemetryStart,
+        retrieval_strategy: source === 'cache' ? 'gpu_pipeline_cache' : `gpu_pipeline_topk_${source}`,
+        packet_context: {
+          packet_id: null,
+          feature_id: 'gpu.pipeline.topk',
+          som_cell: null,
+          schema_version: 1,
+          embedding_version: 'embeddinggemma:latest',
+          tool_version: 'mcp:1.0',
+          gpu_kernel_version: 'tensorrt_bridge:1.0',
+          rpc_transport: source === 'gpu' ? 'cuda' : source === 'cache' ? 'redis' : 'cpu',
+        },
+        gpu_metadata: {
+          kernel_name: 'topKIndicesGPU',
+          gpu_backend: source === 'gpu' ? 'cuda' : source === 'cache' ? 'redis' : 'cpu_fallback',
+          operation: 'topk',
+          candidate_count: n,
+          input_dim: 1,
+          output_dim: k,
+          fallback_used: source !== 'gpu',
+          error_code: errorCode,
+        },
+      }).catch((err) => {
+        console.debug('[gpu-pipeline] TopK telemetry failed (non-blocking):', err);
+      });
+    }
+
     return { indices, source };
   });
 }
@@ -417,6 +566,7 @@ export async function pipelineKmeans(
   source:      'gpu' | 'cpu' | 'cache';
 }> {
   const t0   = performance.now();
+  const telemetryStart = Date.now();
   const ckey = `gpu:graph:kmeans:${n}:${dim}:${k}:${inputHash(embeddings)}`;
 
   const cached = await cacheGet(ckey, (raw) => {
@@ -434,6 +584,7 @@ export async function pipelineKmeans(
     let assignments: Int32Array;
     let centroids:   Float32Array;
     let source: 'gpu' | 'cpu' = 'cpu';
+    let errorCode: string | null = null;
 
     if (addon?.kmeansWithCentroids && n > 0 && dim > 0 && k > 0
         && gpuHasRoom(vramNeededMB(n + k, dim) + 256)) {
@@ -442,8 +593,9 @@ export async function pipelineKmeans(
         assignments = res.assignments;
         centroids   = res.centroids;
         source      = 'gpu';
-      } catch {
+      } catch (err) {
         ({ assignments, centroids } = cpuKmeans(embeddings, n, dim, k, maxIters));
+        errorCode = (err as Error)?.message?.slice(0, 64) || 'gpu_fallback';
       }
     } else {
       ({ assignments, centroids } = cpuKmeans(embeddings, n, dim, k, maxIters));
@@ -451,7 +603,39 @@ export async function pipelineKmeans(
 
     const payload = JSON.stringify({ a: i32ToBase64(assignments), c: f32ToBase64(centroids) });
     cacheSet(ckey, payload).catch(() => {});
-    record({ fn: 'kmeans', n, dim, source, durationMs: performance.now() - t0 });
+    const durationMs = performance.now() - t0;
+    record({ fn: 'kmeans', n, dim, source, durationMs });
+
+    // Phase 3: Emit GPU pipeline telemetry (non-blocking)
+    if (recordPacketCentricTelemetry) {
+      recordPacketCentricTelemetry({
+        latency_ms: Date.now() - telemetryStart,
+        retrieval_strategy: source === 'cache' ? 'gpu_pipeline_cache' : `gpu_pipeline_kmeans_${source}`,
+        packet_context: {
+          packet_id: null,
+          feature_id: 'gpu.pipeline.kmeans',
+          som_cell: null,
+          schema_version: 1,
+          embedding_version: 'embeddinggemma:latest',
+          tool_version: 'mcp:1.0',
+          gpu_kernel_version: 'tensorrt_bridge:1.0',
+          rpc_transport: source === 'gpu' ? 'cuda' : source === 'cache' ? 'redis' : 'cpu',
+        },
+        gpu_metadata: {
+          kernel_name: 'kmeansWithCentroids',
+          gpu_backend: source === 'gpu' ? 'cuda' : source === 'cache' ? 'redis' : 'cpu_fallback',
+          operation: 'kmeans',
+          candidate_count: n,
+          input_dim: dim,
+          output_dim: k,
+          fallback_used: source !== 'gpu',
+          error_code: errorCode,
+        },
+      }).catch((err) => {
+        console.debug('[gpu-pipeline] KMeans telemetry failed (non-blocking):', err);
+      });
+    }
+
     return { assignments, centroids, source };
   });
 }
@@ -463,15 +647,61 @@ export async function pipelineSoftmax(
   logits: Float32Array,
   n:      number,
 ): Promise<{ probs: Float32Array; source: 'gpu' | 'cpu' }> {
+  const t0 = performance.now();
+  const telemetryStart = Date.now();
   const q = await getQueue();
   return q.run(async () => {
     const addon = getAddonInternal();
+    let source: 'gpu' | 'cpu' = 'cpu';
+    let probs: Float32Array;
+    let errorCode: string | null = null;
+
     if (addon?.softmaxGPU && gpuHasRoom(vramNeededMB(n, 1) + 64)) {
       try {
-        return { probs: addon.softmaxGPU(logits, n), source: 'gpu' };
-      } catch { /* fall through */ }
+        probs = addon.softmaxGPU(logits, n);
+        source = 'gpu';
+      } catch (err) {
+        probs = cpuSoftmax(logits, n);
+        errorCode = (err as Error)?.message?.slice(0, 64) || 'gpu_fallback';
+      }
+    } else {
+      probs = cpuSoftmax(logits, n);
     }
-    return { probs: cpuSoftmax(logits, n), source: 'cpu' };
+
+    const durationMs = performance.now() - t0;
+    record({ fn: 'softmax', n, dim: 1, source, durationMs });
+
+    // Phase 3: Emit GPU pipeline telemetry (non-blocking)
+    if (recordPacketCentricTelemetry) {
+      recordPacketCentricTelemetry({
+        latency_ms: Date.now() - telemetryStart,
+        retrieval_strategy: `gpu_pipeline_softmax_${source}`,
+        packet_context: {
+          packet_id: null,
+          feature_id: 'gpu.pipeline.softmax',
+          som_cell: null,
+          schema_version: 1,
+          embedding_version: 'embeddinggemma:latest',
+          tool_version: 'mcp:1.0',
+          gpu_kernel_version: 'tensorrt_bridge:1.0',
+          rpc_transport: source === 'gpu' ? 'cuda' : 'cpu',
+        },
+        gpu_metadata: {
+          kernel_name: 'softmaxGPU',
+          gpu_backend: source === 'gpu' ? 'cuda' : 'cpu_fallback',
+          operation: 'softmax',
+          candidate_count: n,
+          input_dim: 1,
+          output_dim: 1,
+          fallback_used: source !== 'gpu',
+          error_code: errorCode,
+        },
+      }).catch((err) => {
+        console.debug('[gpu-pipeline] Softmax telemetry failed (non-blocking):', err);
+      });
+    }
+
+    return { probs, source };
   });
 }
 

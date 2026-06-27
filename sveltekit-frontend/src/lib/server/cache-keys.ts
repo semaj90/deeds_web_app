@@ -75,6 +75,14 @@ export const TTL = {
   ACE_TOKEN_BUDGET: 2 * 60 * 60, // 2 hours
   /** User activity heartbeat: long-lived engagement tracking */
   USER_ACTIVITY: 30 * 24 * 60 * 60, // 30 days
+  /** BitFrost L1 cache: packet-level hot memory */
+  BIFROST_PACKET: 60 * 60, // 1 hour
+  /** BitFrost L1 cache: feature/source centroids */
+  BIFROST_INDEX: 6 * 60 * 60, // 6 hours
+  /** BitFrost L1 cache: query results from same session */
+  BIFROST_QUERY: 30 * 60, // 30 min
+  /** BitFrost L1 cache: workflow patterns */
+  BIFROST_WORKFLOW: 60 * 60, // 1 hour
 } as const;
 
 // ── Case Version Stamps ───────────────────────────────────────────────────
@@ -294,6 +302,65 @@ export const aceTokenBudgetKey = {
     `ace:token:budget:${topoClass}:${clusterId}`,
   /** Fallback when cluster is unknown — keyed by topoClass only. */
   forClass: (topoClass: number): string => `ace:token:budget:${topoClass}:unknown`,
+};
+
+// ── BitFrost Cache Key Helpers ──────────────────────────────────────────────
+/**
+ * Canonical BitFrost key helpers (P1 consolidation).
+ * All bifrost:* keys generated from these functions to prevent key collisions.
+ */
+
+export const bifrostKey = {
+  /**
+   * bifrost:packet:{packet_key}
+   * Stores: full packet record from atlas_packets
+   * TTL: 1 hour
+   */
+  packet: (packetKey: string) => `bifrost:packet:${packetKey}`,
+
+  /**
+   * bifrost:feature:{feature_id}
+   * Stores: centroid vector + top-k similar packets
+   * TTL: 6 hours
+   */
+  feature: (featureId: string) => `bifrost:feature:${hashStr16(featureId)}`,
+
+  /**
+   * bifrost:source:{source_ref}
+   * Stores: source-level metadata + child packets
+   * TTL: 6 hours
+   */
+  source: (sourceRef: string) => `bifrost:source:${hashStr16(sourceRef)}`,
+
+  /**
+   * bifrost:query:{query_hash}
+   * Stores: successful retrieval results from earlier in session
+   * TTL: 30 minutes
+   */
+  query: (query: string) => `bifrost:query:${hashStr16(query)}`,
+
+  /**
+   * bifrost:workflow:{workflow_id}
+   * Stores: cached successful workflow pattern
+   * TTL: 1 hour
+   */
+  workflow: (workflowId: string) => `bifrost:workflow:${hashStr16(workflowId)}`,
+
+  /**
+   * Semantic cache lanes (bifrost:sem:* prefix)
+   * These are the existing semantic cache keys from atlas-reward-cache.ts
+   * Consolidating into a single source of truth
+   */
+  semantic: {
+    /** bifrost:sem:packet:{packet_key} — packet-level semantic cache (TTL 1h) */
+    packet: (packetKey: string) => `bifrost:sem:packet:${packetKey}`,
+
+    /** bifrost:sem:feature:{feature_id} — feature-level semantic cache (TTL 4h) */
+    feature: (featureId: string) => `bifrost:sem:feature:${featureId}`,
+
+    /** bifrost:sem:intent:{intent_hash} — query intent cache (TTL 30min) */
+    intent: (intentHash: string) => `bifrost:sem:intent:${intentHash}`,
+  },
 };
 
 // ── LLM Cache Key Utilities ───────────────────────────────────────────────
