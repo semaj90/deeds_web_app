@@ -15,11 +15,9 @@
 
 import type Redis from 'ioredis';
 import { createHash } from 'node:crypto';
+import { bifrostKey } from '$lib/server/cache-keys.js';
 
 // ── Key builders ──────────────────────────────────────────────────────────────
-
-export const PACKET_KEY_PREFIX  = 'bifrost:sem:packet:';
-export const FEATURE_KEY_PREFIX = 'bifrost:sem:feature:';
 
 export const REWARD_ZSET_PACKET  = 'reward:zset:packet';
 export const REWARD_ZSET_FEATURE = 'reward:zset:feature';
@@ -29,11 +27,11 @@ export const REWARD_ZSET_QUERY   = 'reward:zset:query';
 const REWARD_ZSET_MAX = 10_000;
 
 function packetCacheKey(packetKey: string): string {
-  return `${PACKET_KEY_PREFIX}${packetKey}`;
+  return bifrostKey.semantic.packet(packetKey);
 }
 
 function featureCacheKey(featureId: string): string {
-  return `${FEATURE_KEY_PREFIX}${featureId}`;
+  return bifrostKey.semantic.feature(featureId);
 }
 
 export function queryRewardKey(queryText: string): string {

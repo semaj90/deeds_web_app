@@ -17,6 +17,7 @@ import { getRedis } from '$lib/server/redis.js';
 import { db } from '$lib/server/db/client.js';
 import { atlas_packets } from '$lib/server/db/schema-postgres.js';
 import { embedText } from '$lib/server/embedding/embed.js';
+import { bifrostKey, TTL } from '$lib/server/cache-keys.js';
 import { eq } from 'drizzle-orm';
 
 export interface MaterializeOptions {
@@ -134,7 +135,7 @@ export async function materializePacket(options: MaterializeOptions): Promise<Ma
       try {
         const redis = getRedis();
         const ttl = options.redisTtl || DEFAULT_REDIS_TTL;
-        const cacheKey = `bifrost:packet:${options.packetKey}`;
+        const cacheKey = bifrostKey.packet(options.packetKey);
         const cacheValue = JSON.stringify(payload);
 
         await redis.setex(cacheKey, ttl, cacheValue);
@@ -205,7 +206,7 @@ export async function getPacketMaterializationStatus(packetKey: string): Promise
   const qdrant = await getQdrantClient();
 
   // Check Redis
-  const redisKey = `bifrost:packet:${packetKey}`;
+  const redisKey = bifrostKey.packet(packetKey);
   const inRedis = await redis.exists(redisKey);
 
   // Check Qdrant (search using zero vector as proxy for existence check)
@@ -244,7 +245,7 @@ export async function invalidateMaterializedPacket(packetKey: string): Promise<v
   const redis = getRedis();
 
   // Clear Redis cache
-  const redisKey = `bifrost:packet:${packetKey}`;
+  const redisKey = bifrostKey.packet(packetKey);
   await redis.del(redisKey);
 
   // Qdrant deletion would require point ID tracking (implement if needed)

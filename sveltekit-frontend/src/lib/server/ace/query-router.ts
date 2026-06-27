@@ -18,6 +18,7 @@
 import { ENV } from '$lib/server/env.server.js';
 import { getValkeyClient } from '$lib/server/cache/valkey-client.js';
 import { getOllamaEmbeddingEndpoint } from '$lib/server/ollama.js';
+import { bifrostKey } from '$lib/server/cache-keys.js';
 import {
   writeAcePacket,
   readAcePacketBySourceRef,
@@ -250,15 +251,15 @@ export async function routeQuery(opts: QueryRouterOpts): Promise<QueryRouterResu
     const t0 = Date.now();
     try {
       // 1. Direct query-hash lookup
-      let bifrostRaw = await redis.get(`bifrost:sem:packet:${queryHash}`).catch(() => null);
+      let bifrostRaw = await redis.get(bifrostKey.semantic.packet(queryHash)).catch(() => null);
 
       // 2. Intent-normalized lookup (cross-phrasing)
       if (!bifrostRaw) {
         const intentNorm = query.toLowerCase().replace(/[^\w\s]/g, ' ').replace(/\s+/g, ' ').trim();
         const intentHash = crypto.createHash('sha256').update(intentNorm).digest('hex').slice(0, 16);
-        const intentQh = await redis.get(`bifrost:sem:intent:${intentHash}`).catch(() => null);
+        const intentQh = await redis.get(bifrostKey.semantic.intent(intentHash)).catch(() => null);
         if (intentQh) {
-          bifrostRaw = await redis.get(`bifrost:sem:packet:${intentQh}`).catch(() => null);
+          bifrostRaw = await redis.get(bifrostKey.semantic.packet(intentQh)).catch(() => null);
         }
       }
 
