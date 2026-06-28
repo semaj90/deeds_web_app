@@ -104,6 +104,7 @@ try {
     }
   }
 
+  let indexExists = false;
   try {
     const info = await redis.call('FT.INFO', INDEX_NAME);
     console.log(`✅ Index ${INDEX_NAME} already exists — skipping creation`);
@@ -111,8 +112,7 @@ try {
     const numDocs = Array.isArray(info) ? (info[info.indexOf('num_docs') + 1] ?? '?') : '?';
 
     console.log(`   num_docs: ${numDocs}`);
-    await safeQuit(redis);
-    process.exit(0);
+    indexExists = true;
   } catch (err) {
     const msg = String(err?.message || err);
 
@@ -123,45 +123,48 @@ try {
     ) {
       throw err;
     }
+    // Index doesn't exist, proceed to create it
   }
 
-  await redis.call(
-    'FT.CREATE',
-    INDEX_NAME,
-    'ON',
-    'HASH',
-    'PREFIX',
-    '1',
-    KEY_PREFIX,
-    'SCHEMA',
-    'kind',
-    'TAG',
-    'tags',
-    'TAG',
-    'SEPARATOR',
-    ',',
-    'model',
-    'TAG',
-    'vec',
-    'VECTOR',
-    'HNSW',
-    '10',
-    'TYPE',
-    'FLOAT32',
-    'DIM',
-    String(DIM),
-    'DISTANCE_METRIC',
-    'COSINE',
-    'M',
-    '16',
-    'EF_CONSTRUCTION',
-    '200'
-  );
+  if (!indexExists) {
+    await redis.call(
+      'FT.CREATE',
+      INDEX_NAME,
+      'ON',
+      'HASH',
+      'PREFIX',
+      '1',
+      KEY_PREFIX,
+      'SCHEMA',
+      'kind',
+      'TAG',
+      'tags',
+      'TAG',
+      'SEPARATOR',
+      ',',
+      'model',
+      'TAG',
+      'vec',
+      'VECTOR',
+      'HNSW',
+      '10',
+      'TYPE',
+      'FLOAT32',
+      'DIM',
+      String(DIM),
+      'DISTANCE_METRIC',
+      'COSINE',
+      'M',
+      '16',
+      'EF_CONSTRUCTION',
+      '200'
+    );
 
-  console.log(`✅ Created index ${INDEX_NAME}`);
-  console.log(`   prefix  : ${KEY_PREFIX}`);
-  console.log(`   vector  : HNSW FLOAT32 ${DIM}-dim cosine`);
-  console.log('   fields  : kind(TAG), tags(TAG), model(TAG), vec(VECTOR)');
+    console.log(`✅ Created index ${INDEX_NAME}`);
+    console.log(`   prefix  : ${KEY_PREFIX}`);
+    console.log(`   vector  : HNSW FLOAT32 ${DIM}-dim cosine`);
+    console.log('   fields  : kind(TAG), tags(TAG), model(TAG), vec(VECTOR)');
+  }
 
   await safeQuit(redis);
 } catch (err) {

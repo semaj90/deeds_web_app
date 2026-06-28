@@ -1,12 +1,12 @@
 /**
  * GAN Validate Live Packets
  * Read actual indexed packets from Postgres and validate with GAN adversarial probes
+ *
+ * ⚠️ FIXED: Uses direct pg.Pool connection instead of docker exec (prevents OOM)
  */
 
-import { exec } from 'child_process';
-import { promisify } from 'util';
-
-const execAsync = promisify(exec);
+import pg from 'pg';
+const { Pool } = pg;
 
 interface Packet {
   packet_key: string;
@@ -22,42 +22,45 @@ console.log('╔═════════════════════�
 console.log('║ GAN Validate Live Packets — Real Data Validation      ║');
 console.log('╚════════════════════════════════════════════════════════╝\n');
 
-try {
-  // Query real packets from Postgres
-  console.log('Step 1: Reading 10 sample packets from Postgres...');
-
-  const query = `
-    SELECT
-      packet_key,
-      feature_id,
-      source_ref,
-      som_row,
-      som_col,
-      summary,
-      identity_confidence
-    FROM atlas_packets
-    WHERE packet_key IS NOT NULL
-      AND feature_id IS NOT NULL
-      AND source_ref IS NOT NULL
-    LIMIT 10
-  `;
-
-  const command = `docker exec legal-ai-postgres psql -U legal_admin -d legal_ai_db -t -A -F'|' -c "${query}"`;
-  const { stdout } = await execAsync(command);
-
-  const lines = stdout.trim().split('\n').filter(l => l.length > 0);
-  const packets: Packet[] = lines.map(line => {
-    const [packet_key, feature_id, source_ref, som_row, som_col, summary, identity_confidence] = line.split('|');
-    return {
-      packet_key: packet_key.trim(),
-      feature_id: feature_id.trim(),
-      source_ref: source_ref.trim(),
-      som_row: som_row ? parseInt(som_row.trim()) : undefined,
-      som_col: som_col ? parseInt(som_col.trim()) : undefined,
-      summary: summary?.trim(),
-      identity_confidence: identity_confidence ? parseFloat(identity_confidence.trim()) : undefined,
-    };
+(async () => {
+  const pool = new Pool({
+    host: process.env.POSTGRES_HOST || '127.0.0.1',
+    port: parseInt(process.env.POSTGRES_PORT || '5434', 10),
+    user: process.env.POSTGRES_USER || 'legal_admin',
+    password: process.env.POSTGRES_PASSWORD || '123456',
+    database: process.env.POSTGRES_DB || 'legal_ai_db',
   });
+
+  try {
+    // Query real packets from Postgres
+    console.log('Step 1: Reading 10 sample packets from Postgres...');
+
+    const query = `
+      SELECT
+        packet_key,
+        feature_id,
+        source_ref,
+        som_row,
+        som_col,
+        summary,
+        identity_confidence
+      FROM atlas_packets
+      WHERE packet_key IS NOT NULL
+        AND feature_id IS NOT NULL
+        AND source_ref IS NOT NULL
+      LIMIT 10
+    `;
+
+    const result = await pool.query(query);
+    const packets: Packet[] = result.rows.map(row => ({
+      packet_key: row.packet_key,
+      feature_id: row.feature_id,
+      source_ref: row.source_ref,
+      som_row: row.som_row,
+      som_col: row.som_col,
+      summary: row.summary,
+      identity_confidence: row.identity_confidence,
+    }));
 
   console.log(`✅ Retrieved ${packets.length} packets\n`);
 
@@ -169,9 +172,13 @@ try {
   console.log(`║ ${success ? '✅ GAN VALIDATION PASS' : '❌ GAN VALIDATION FAIL'} — Live packet audit complete   ║`);
   console.log(`╚════════════════════════════════════════════════════════╝\n`);
 
-  process.exit(success ? 0 : 1);
-} catch (err) {
-  console.error('❌ Error reading packets from Postgres:');
-  console.error((err as Error).message);
-  process.exit(1);
+    process.exit(success ? 0 : 1);
+  } catch (err) {
+    console.error('❌ Error reading packets from Postgres:');
+    console.error((err as Error).message);
+    process.exit(1);
+  } finally {
+    await pool.end();
+  }
+})();
 }
