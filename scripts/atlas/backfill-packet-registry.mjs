@@ -6,11 +6,14 @@
 
 import pg from 'pg';
 import { createHash } from 'crypto';
+import { loadRepoEnv, resolveDatabaseUrl } from './connection-config.mjs';
 
 const { Pool } = pg;
+const ENV = loadRepoEnv(process.env);
+Object.assign(process.env, ENV);
 
 const pool = new Pool({
-  connectionString: process.env.DATABASE_URL || 'postgresql://legal_admin:123456@127.0.0.1:5434/legal_ai_db'
+  connectionString: resolveDatabaseUrl(ENV)
 });
 
 async function backfillPacketRegistry() {
@@ -23,21 +26,6 @@ async function backfillPacketRegistry() {
     const countRes = await client.query('SELECT COUNT(*) as count FROM atlas_packets');
     const packetCount = countRes.rows[0].count;
     console.log(`[Backfill] Found ${packetCount} packets in atlas_packets`);
-
-    // Insert test row
-    console.log('[Backfill] Testing insert with test row...');
-    await client.query(
-      `INSERT INTO atlas_packet_registry (packet_key, source_ref, file_path, feature_id)
-       VALUES ($1, $2, $3, $4)
-       ON CONFLICT (packet_key) DO NOTHING`,
-      ['test:backfill:registry', 'src/test.ts', 'src/test.ts', 'test.backfill']
-    );
-
-    const testCheck = await client.query(
-      'SELECT COUNT(*) as count FROM atlas_packet_registry WHERE packet_key = $1',
-      ['test:backfill:registry']
-    );
-    console.log(`[Backfill] Test row inserted: ${testCheck.rows[0].count > 0 ? 'YES' : 'NO'}`);
 
     // Backfill from atlas_packets
     console.log('[Backfill] Executing bulk backfill...');
@@ -58,7 +46,7 @@ async function backfillPacketRegistry() {
       )
       SELECT
         ap.packet_key,
-        encode(digest(ap.packet_key || now()::text, 'md5'), 'hex') as trace_id,
+        md5(ap.packet_key || now()::text) as trace_id,
         ap.source_ref,
         COALESCE(ap.file_path, ap.source_ref, ap.packet_key) as file_path,
         ap.feature_id,

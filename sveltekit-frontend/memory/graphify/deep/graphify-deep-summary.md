@@ -1,39 +1,39 @@
 # Deep Import Graph - Phase A
-Generated: 2026-06-27T23:07:06.296Z
+Generated: 2026-06-28T05:04:08.613Z
 
 ## Stats
 | Metric | Value |
 |--------|-------|
-| Nodes | 68369 |
-| Total edges | 158418 |
-| Resolved edges | 22360 |
-| Unresolved (local) | 10761 |
-| External refs | 123764 |
-| Neighborhoods computed | 87 |
-| Test-covered files | 1045 |
+| Nodes | 68403 |
+| Total edges | 158507 |
+| Resolved edges | 22577 |
+| Unresolved (local) | 10563 |
+| External refs | 123834 |
+| Neighborhoods computed | 88 |
+| Test-covered files | 1043 |
 
 ## Zone Breakdown
 | Zone | Count |
 |------|-------|
-| shared | 55082 |
+| shared | 55138 |
 | test | 6628 |
-| script | 5347 |
+| script | 5325 |
 | types | 1188 |
 | config | 124 |
 
 ## Edge Type Breakdown
 | Type | Count |
 |------|-------|
-| imports_static | 110422 |
+| imports_static | 110339 |
 | test_covers_file | 19939 |
-| redis_dependency | 7186 |
-| imports_dynamic | 6629 |
-| qdrant_dependency | 4648 |
+| redis_dependency | 7184 |
+| imports_dynamic | 6611 |
+| qdrant_dependency | 4638 |
 | exports_from | 2748 |
-| neo4j_dependency | 2222 |
-| mcp_tool_calls | 1853 |
-| env_dependency | 1563 |
-| db_dependency | 1202 |
+| neo4j_dependency | 2217 |
+| mcp_tool_calls | 1841 |
+| env_dependency | 1777 |
+| db_dependency | 1207 |
 | svelte_route_uses_loader | 6 |
 
 ## Top 20 Coupling Hotspots (directFanIn)

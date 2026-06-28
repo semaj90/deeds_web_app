@@ -1,3 +1,5 @@
+import { createClient } from 'redis';
+
 // Function to wait for Redis to finish loading the dataset
 async function waitForValkeyReady(client, retries = 90) {
   for (let i = 1; i <= retries; i++) {
@@ -52,10 +54,10 @@ async function runIndexCreation(redisClient, indexName) {
   await redisClient.connect();
   await waitForValkeyReady(redisClient);
 
-  // 3. Attempt to get index info
+  // 3. Attempt to get index info (or create if missing)
   try {
     const info = await redisClient.sendCommand(['FT.INFO', indexName]);
-    console.log(`✅ Index ${indexName} already exists — skipping creation`);
+    console.log(`✅ Index ${indexName} already exists`);
 
     const infoArr = info;
     const numDocs = Array.isArray(infoArr)
@@ -67,15 +69,69 @@ async function runIndexCreation(redisClient, indexName) {
     process.exit(0);
   } catch (err) {
     const msg = String(err?.message || err);
-    // Re-throw if the error is NOT related to the loading state
-    if (msg.includes('LOADING')) {
-      // This is expected, so we just log and continue the process
-      console.log('Index creation skipped: Redis is still loading.');
+
+    // If index doesn't exist (expected), create it
+    if (msg.includes('not found') || msg.includes('Unknown command')) {
+      console.log(`⏳ Index ${indexName} not found, creating...`);
+      try {
+        // Create simple semantic index for embeddings (768-dim vectors)
+        await redisClient.sendCommand([
+          'FT.CREATE',
+          indexName,
+          'ON', 'HASH',
+          'SCHEMA',
+          'embedding', 'VECTOR', 'FLOAT32', '768',
+          'packet_key', 'TAG',
+          'source_ref', 'TAG',
+          'feature_id', 'TAG'
+        ]);
+        console.log(`✅ Created index ${indexName}`);
+        await redisClient.quit();
+        process.exit(0);
+      } catch (createErr) {
+        console.error('❌ Failed to create index:', createErr.message);
+        throw createErr;
+      }
+    } else if (msg.includes('LOADING')) {
+      console.log('Index check skipped: Redis is still loading.');
     } else {
-      throw err; // Re-throw unexpected errors
+      throw err; // Re-throw other unexpected errors
     }
   }
 }
 
-// Example usage:
-// runIndexCreation(redisClient, 'my_index');
+// --- Main Entry Point ---
+
+async function main() {
+  const host = process.env.REDIS_HOST || '127.0.0.1';
+  const port = parseInt(process.env.REDIS_PORT || '6379', 10);
+  const password = process.env.REDIS_PASSWORD || 'redis';
+
+  const client = createClient({
+    host,
+    port,
+    password,
+    lazyConnect: true,
+    maxRetriesPerRequest: 1,
+    enableOfflineQueue: false,
+    retryStrategy: () => null,
+  });
+
+  client.on('error', (err) => {
+    const msg = String(err?.message || err);
+    if (!msg.includes('LOADING')) {
+      console.error(`[valkey] Error: ${msg}`);
+    }
+  });
+
+  try {
+    await runIndexCreation(client, 'semantic_index');
+    console.log('✅ Valkey index creation completed');
+  } catch (err) {
+    console.error('❌ Failed to create Valkey index:', err.message);
+    await client.quit().catch(() => {});
+    process.exit(1);
+  }
+}
+
+main();

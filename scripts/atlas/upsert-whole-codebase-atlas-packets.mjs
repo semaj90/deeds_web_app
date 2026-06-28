@@ -18,11 +18,14 @@ import path from 'path';
 import crypto from 'crypto';
 import fs from 'fs/promises';
 import { fileURLToPath } from 'url';
+import { loadRepoEnv, resolveDatabaseUrl } from './connection-config.mjs';
 
 const { Pool } = pg;
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = path.resolve(__dirname, '../../');
+const ENV = loadRepoEnv(process.env);
+Object.assign(process.env, ENV);
 
 const args = process.argv.slice(2);
 const dryRun = !args.includes('--apply');
@@ -82,7 +85,7 @@ async function extractWholeCodebasePackets() {
       const fullPath = path.join(REPO_ROOT, file);
       let size = 0;
       try {
-        const stat = fs.statSync(fullPath);
+        const stat = await fs.stat(fullPath);
         size = stat.size;
       } catch {
         // Skip files we can't stat
@@ -107,7 +110,9 @@ async function extractWholeCodebasePackets() {
       };
 
       packets.push({
+        packet_id: packet_key,
         packet_key,
+        artifact_id: `artifact:${sha256(source_ref).slice(0, 16)}`,
         source_ref,
         file_path: source_ref,
         feature_id,
@@ -155,11 +160,13 @@ async function upsertPackets(pool, packets) {
       // Insert new packet
       await pool.query(
         `INSERT INTO atlas_packets (
-          packet_key, source_ref, file_path, feature_id, feature_label,
+          packet_id, artifact_id, packet_key, source_ref, file_path, feature_id, feature_label,
           group_id, packet_universe, metadata, created_at, updated_at
-        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8::jsonb, $9, $10)
+        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10::jsonb, $11, $12)
         ON CONFLICT (packet_key) DO NOTHING`,
         [
+          packet.packet_id,
+          packet.artifact_id,
           packet.packet_key,
           packet.source_ref,
           packet.file_path,
@@ -231,7 +238,7 @@ async function generateReports(packets, result) {
  * Main
  */
 async function main() {
-  const pool = new Pool({ connectionString: process.env.DATABASE_URL, max: 1 });
+  const pool = new Pool({ connectionString: resolveDatabaseUrl(ENV), max: 1 });
 
   console.log('[phase-d] Phase D: Whole-Codebase Atlas Packet Upsert');
   console.log(`[phase-d] Mode: ${dryRun ? 'DRY-RUN' : 'APPLY'}`);

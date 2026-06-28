@@ -1,0 +1,20 @@
+[33m94c0cffd85[m I moved the notebook-side proof chain forward and stopped the Postgres restart from killing the run. What changed: scripts/atlas/benchmark-retrieval-e2e.mjsnow degrades cleanly when the Postgres container is restarting instead of throwing normalizes Neo4j input rows from direct fields, payload, and metadata emits qdrant_point_id, qdrant_collection, story_id, task_id, worker_id, and trace_id at the benchmark row level
+[33m1697567aef[m All proof gates are green, including the service-failure matrix. I’m now updating both canonical boards with a closure block that supersedes the stale percentages and old open checkboxes while preserving the older sections as historical evidence.
+[33m9b827c29e7[m Make it a startup assistant contract that runs Graphify/readiness passes, then turns the result into a short human briefing. Target behavior
+[33m3b153e0705[m svg glyph reader, one to many relationship, where text encoding bitmap encoding to tile hashmap postgresql 18 aio what it does som autoencoding nibble msgpack of json binary bytes coordinates of the engrams in the cache bitfrost postgresql summary store for cosine retrieval bm25 ann hnsw hyperrag dense multi vector semantic search how do we test and model this where text is encoded and glyph is a one to many using 4d topology quanterion qdrant tag search search official api documentations json works nows jsonb gin indexing is better toon is great and grpc protobuffer for udp quic caddy will come later for agentic error fixing with vite server playwright testing all functionality from kanban task board Yes — model this as three linked stores, not one blob system. glyphs-as-training-data.md
+[33m5c2d84c3aa[m 6_6_26__make NDJSON/JSONL Atlas packets the interchange format, then process them in lanes:
+[33m045b063f45[m parent_atlas_indexing_test_1_files_6226
+[33mc930bbc49c[m Commit: backfill dry-run export + docs + create langfuse DB
+[33mad27e3a0a1[m 5_25_26_MASTER-FEATURE-TODO-2026-05-20.md
+[33m4515cd8e36[m 5_23_26_pt1
+[33m6593be2f71[m graphify_code_anythinglibrary_looked
+[33m934f8a6610[m 5_20_antigravityopencodecodexclaude
+[33m3a3b178e2b[m chore(atlas): graphify snapshots, docs-atlas scripts, and Phase 6E reports
+[33m67cf847f93[m 5_15_26
+[33m7f924efee5[m docs: update llm wiki and repo atlas
+[33mdee50fe459[m fix(seaweedfs): correct healthcheck hostnames + wire S3 gateway
+[33mba1bef54b6[m feat(neo4j): enable APOC + GDS plugins and add gds-status endpoint
+[33mfbbe816533[m 421_26__
+[33me6c434e900[m feat: codebase index sub-endpoints, unified model wiring, Docker+config updates
+[33m772b36126b[m fix: go-retrieval-service EMBED_SERVICE_URL points to HTTP port (8097) not gRPC (50051)
+[33m71bb6966ad[m chore: infra — Bifrost named volume, go-retrieval-service, Docker memory limits, zod record fix

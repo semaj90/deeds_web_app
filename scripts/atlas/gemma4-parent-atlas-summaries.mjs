@@ -84,6 +84,89 @@ function isVendor(ref) {
     ref.includes('/dist-info/') || ref.includes('/site-packages/');
 }
 
+async function tableExists(pool, tableName) {
+  const { rows } = await pool.query(`
+    SELECT to_regclass($1) IS NOT NULL AS exists
+  `, [`public.${tableName}`]);
+  return Boolean(rows[0]?.exists);
+}
+
+async function resolveSummaryTarget(pool) {
+  if (await tableExists(pool, 'parent_atlas_documents')) {
+    return {
+      tableName: 'parent_atlas_documents',
+      tableSql: 'public.parent_atlas_documents',
+      rowIdColumn: 'id',
+      selectSql: `
+        SELECT
+          id, source_ref, feature_id, summary, tags,
+          imports, exports, route_handlers
+        FROM public.parent_atlas_documents
+      `,
+      sourceRefWhere: `
+        source_ref = $1
+        AND source_ref NOT LIKE 'feature:%'
+        AND NOT ('vendor' = ANY(COALESCE(tags, '{}')))
+      `,
+      missingWhere: `
+        (summary IS NULL OR summary = '')
+        AND source_ref NOT LIKE 'feature:%'
+        AND NOT ('vendor' = ANY(COALESCE(tags, '{}')))
+      `,
+      orderSql: 'line_count DESC NULLS LAST',
+      vendorMissingWhere: `
+        (summary IS NULL OR summary = '')
+        AND 'vendor' = ANY(COALESCE(tags, '{}'))
+      `,
+      featureBucketMissingWhere: `
+        (summary IS NULL OR summary = '')
+        AND (source_ref LIKE 'feature:%' OR feature_id LIKE 'feature:%')
+      `,
+    };
+  }
+
+  if (await tableExists(pool, 'atlas_packets')) {
+    return {
+      tableName: 'atlas_packets',
+      tableSql: 'public.atlas_packets',
+      rowIdColumn: 'packet_id',
+      selectSql: `
+        SELECT
+          packet_id AS id,
+          source_ref,
+          feature_id,
+          summary,
+          COALESCE(tags, '{}') AS tags,
+          ARRAY[]::text[] AS imports,
+          ARRAY[]::text[] AS exports,
+          ARRAY[]::text[] AS route_handlers
+        FROM public.atlas_packets
+      `,
+      sourceRefWhere: `
+        source_ref = $1
+        AND source_ref NOT LIKE 'feature:%'
+        AND NOT ('vendor' = ANY(COALESCE(tags, '{}')))
+      `,
+      missingWhere: `
+        (summary IS NULL OR summary = '')
+        AND source_ref NOT LIKE 'feature:%'
+        AND NOT ('vendor' = ANY(COALESCE(tags, '{}')))
+      `,
+      orderSql: 'source_ref ASC',
+      vendorMissingWhere: `
+        (summary IS NULL OR summary = '')
+        AND 'vendor' = ANY(COALESCE(tags, '{}'))
+      `,
+      featureBucketMissingWhere: `
+        (summary IS NULL OR summary = '')
+        AND (source_ref LIKE 'feature:%' OR feature_id LIKE 'feature:%')
+      `,
+    };
+  }
+
+  throw new Error('No Parent Atlas summary source table found. Expected public.parent_atlas_documents or public.atlas_packets.');
+}
+
 function resolveLlamaModel(env) {
   const explicit = String(env.LOCAL_GEMMA_MODEL ?? env.LLAMA_MODEL ?? env.TURBOQUANT_MODEL ?? '').trim();
   if (explicit && !/^gemma4-rotorquant(?::latest)?$/i.test(explicit)) return explicit;
@@ -494,12 +577,14 @@ async function callLLM(prompt) {
         max_tokens: 150,
         temperature: 0.1,
         stream: false,
+        stop: ['<|channel>thought', '<think>', '</think>', 'Thinking:', 'Self-Correction'],
+        chat_template_kwargs: { enable_thinking: false },
       }),
       signal: AbortSignal.timeout(30000),
     });
     if (!r.ok) throw new Error(`TurboQuant HTTP ${r.status}`);
     const data = await r.json();
-    return data.choices?.[0]?.message?.content?.trim() ?? '';
+    return cleanModelText(data.choices?.[0]?.message?.content);
   }
 
   throw new Error('No llama-server chat backend available on port 8090');
@@ -852,7 +937,7 @@ async function processOne(row, pool, dryRun, cacheRedis) {
       }
       params.push(row.id);
       await pool.query(
-        `UPDATE public.parent_atlas_documents SET ${updates.join(', ')} WHERE id = $${params.length}`,
+        `UPDATE ${metrics.summaryTarget.tableSql} SET ${updates.join(', ')} WHERE ${metrics.summaryTarget.rowIdColumn} = $${params.length}`,
         params
       );
       metrics.summariesWritten += 1;
@@ -882,14 +967,21 @@ async function processOne(row, pool, dryRun, cacheRedis) {
     };
   }
 
-  const summary = await callLLM(prompt);
-  if (!summary) return { source_ref: row.source_ref, error: 'empty response', success: false };
+  const summary = cleanModelText(await callLLM(prompt));
+  if (!isUsableSummary(summary)) {
+    return { source_ref: row.source_ref, error: 'empty or unusable response', success: false };
+  }
 
   // Write to DB
+  const metrics = globalThis.__gemma4SummaryMetrics;
+  const target = metrics?.summaryTarget ?? {
+    tableSql: 'public.parent_atlas_documents',
+    rowIdColumn: 'id',
+  };
   await pool.query(`
-    UPDATE public.parent_atlas_documents
+    UPDATE ${target.tableSql}
     SET summary = $1, updated_at = now()
-    WHERE id = $2
+    WHERE ${target.rowIdColumn} = $2
   `, [summary, row.id]);
 
   return { source_ref: row.source_ref, summary_length: summary.length, success: true };
@@ -919,6 +1011,8 @@ async function main() {
   }
 
   const pool = new pg.Pool({ connectionString: DATABASE_URL });
+  const summaryTarget = await resolveSummaryTarget(pool);
+  console.log(`  Summary table: ${summaryTarget.tableSql}`);
   let cacheRedis = null;
   if (USE_CACHE) {
     try {
@@ -936,24 +1030,14 @@ async function main() {
   const queryParams = SOURCE_REF_FILTER ? [SOURCE_REF_FILTER] : [LIMIT];
   const { rows } = SOURCE_REF_FILTER
     ? await pool.query(`
-    SELECT
-      id, source_ref, feature_id, summary, tags,
-      imports, exports, route_handlers
-      FROM public.parent_atlas_documents
-      WHERE source_ref = $1
-        AND source_ref NOT LIKE 'feature:%'
-        AND NOT ('vendor' = ANY(COALESCE(tags, '{}')))
+      ${summaryTarget.selectSql}
+      WHERE ${summaryTarget.sourceRefWhere}
       LIMIT 1
     `, queryParams)
     : await pool.query(`
-      SELECT
-        id, source_ref, feature_id, summary, tags,
-        imports, exports, route_handlers
-      FROM public.parent_atlas_documents
-      WHERE (summary IS NULL OR summary = '')
-        AND source_ref NOT LIKE 'feature:%'
-        AND NOT ('vendor' = ANY(COALESCE(tags, '{}')))
-      ORDER BY line_count DESC NULLS LAST
+      ${summaryTarget.selectSql}
+      WHERE ${summaryTarget.missingWhere}
+      ORDER BY ${summaryTarget.orderSql}
       LIMIT $1
     `, queryParams);
 
@@ -971,7 +1055,7 @@ async function main() {
     SELECT
       COUNT(*) AS total,
       COUNT(*) FILTER (WHERE summary IS NULL OR summary = '') AS missing
-    FROM public.parent_atlas_documents
+    FROM ${summaryTarget.tableSql}
     WHERE source_ref NOT LIKE 'feature:%'
       AND NOT ('vendor' = ANY(COALESCE(tags, '{}')))
   `);
@@ -982,23 +1066,21 @@ async function main() {
     SELECT column_name
     FROM information_schema.columns
     WHERE table_schema = 'public'
-      AND table_name = 'parent_atlas_documents'
-  `);
+      AND table_name = $1
+  `, [summaryTarget.tableName]);
   const summaryColumns = new Set(columnRows.map((row) => String(row.column_name)));
   const skippedVendor = Number(
     (await pool.query(`
       SELECT COUNT(*)::int AS count
-      FROM public.parent_atlas_documents
-      WHERE (summary IS NULL OR summary = '')
-        AND 'vendor' = ANY(COALESCE(tags, '{}'))
+      FROM ${summaryTarget.tableSql}
+      WHERE ${summaryTarget.vendorMissingWhere}
     `)).rows[0]?.count ?? 0
   );
   const skippedFeatureBuckets = Number(
     (await pool.query(`
       SELECT COUNT(*)::int AS count
-      FROM public.parent_atlas_documents
-      WHERE (summary IS NULL OR summary = '')
-        AND (source_ref LIKE 'feature:%' OR feature_id LIKE 'feature:%')
+      FROM ${summaryTarget.tableSql}
+      WHERE ${summaryTarget.featureBucketMissingWhere}
     `)).rows[0]?.count ?? 0
   );
 
@@ -1021,6 +1103,7 @@ async function main() {
     sourceRefPacketReads: 0,
     totalLatencyMs: 0,
     summaryColumns,
+    summaryTarget,
     skippedDryRun: 0,
   };
   globalThis.__gemma4SummaryMetrics = metrics;

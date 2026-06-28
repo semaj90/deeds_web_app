@@ -4,11 +4,15 @@ import { spawn, spawnSync } from 'node:child_process';
 import { existsSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { loadRepoEnv } from '../../../scripts/atlas/connection-config.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const projectRoot = path.resolve(__dirname, '..', '..');
 const rootDir = path.resolve(projectRoot, '..');
 const composeFile = path.join(rootDir, 'docker-compose.yml');
+const COMPOSE_PROJECT_NAME = 'deeds-web-app';
+
+Object.assign(process.env, loadRepoEnv(process.env));
 
 const AUDIT = process.argv.includes('--audit');
 const DRY = process.argv.includes('--dry');
@@ -21,6 +25,11 @@ const SERVICES = [
 	{ service: 'seaweedfs-volume', container: 'legal-ai-seaweed-volume' },
 	{ service: 'seaweedfs-filer', container: 'legal-ai-seaweed-filer' },
 	{ service: 'seaweedfs-s3', container: 'legal-ai-seaweed-s3' },
+];
+
+const SEAWEED_VOLUMES = [
+	{ envName: 'SEAWEED_MASTER_VOLUME_NAME', fallback: 'deeds-web-app_seaweed_master_data' },
+	{ envName: 'SEAWEED_VOLUME_NAME', fallback: 'deeds-web-app_seaweed_volume_data' },
 ];
 
 function log(message) {
@@ -107,6 +116,31 @@ function inspectContainerState(container) {
 	return result.stdout.trim() || 'unknown';
 }
 
+function inspectVolumeState(volume) {
+	const result = runDocker(['volume', 'inspect', '-f', '{{.Name}}', volume], {
+		stdio: 'pipe',
+		timeout: 5_000,
+	});
+
+	if (result.status !== 0) return null;
+	return result.stdout.trim() || 'unknown';
+}
+
+function ensureSeaweedVolumesPresent() {
+	for (const entry of SEAWEED_VOLUMES) {
+		const volumeName = String(process.env[entry.envName] ?? '').trim() || entry.fallback;
+		const state = inspectVolumeState(volumeName);
+		if (!state) {
+			throw new Error(
+				`Expected SeaweedFS volume not found: ${volumeName}. ` +
+				`This stack now requires stable named volumes. ` +
+				`Verify docker-compose.yml volume names and restore data before starting SeaweedFS.`
+			);
+		}
+		log(`SeaweedFS volume present: ${state}`);
+	}
+}
+
 function startExistingContainers(existingContainers) {
 	for (const { container } of existingContainers) {
 		const state = inspectContainerState(container);
@@ -139,7 +173,7 @@ function composeMissingServices(missingServices) {
 	log(`Creating missing services via docker compose: ${serviceNames.join(', ')}`);
 	if (DRY) return;
 
-	const dockerComposeArgs = ['compose', '-f', composeFile, '--profile', 'seaweedfs', 'up', '-d', ...serviceNames];
+	const dockerComposeArgs = ['compose', '-p', COMPOSE_PROJECT_NAME, '-f', composeFile, '--profile', 'seaweedfs', 'up', '-d', ...serviceNames];
 	let result = spawnSync('docker', dockerComposeArgs, {
 		cwd: rootDir,
 		stdio: 'inherit',
@@ -148,7 +182,7 @@ function composeMissingServices(missingServices) {
 	});
 
 	if (result.error || result.status !== 0) {
-		const fallback = spawnSync('docker-compose', ['-f', composeFile, '--profile', 'seaweedfs', 'up', '-d', ...serviceNames], {
+		const fallback = spawnSync('docker-compose', ['-p', COMPOSE_PROJECT_NAME, '-f', composeFile, '--profile', 'seaweedfs', 'up', '-d', ...serviceNames], {
 			cwd: rootDir,
 			stdio: 'inherit',
 			env: process.env,
@@ -186,6 +220,8 @@ async function ensureDockerGpuStack() {
 			throw new Error('Docker Desktop did not become ready in time. Start Docker Desktop and re-run dev:gpu.');
 		}
 	}
+
+	ensureSeaweedVolumesPresent();
 
 	const running = [];
 	const existingButStopped = [];

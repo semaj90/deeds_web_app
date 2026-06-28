@@ -590,7 +590,13 @@
       "Bash(export REDIS_URL='redis://:redis@127.0.0.1:6379')",
       "Bash(PGPASSWORD=123456 docker exec -i legal-ai-postgres psql -U legal_admin -d legal_ai_db -c \"SELECT COUNT\\(DISTINCT pagerank_score\\) as unique_scores, ROUND\\(MIN\\(pagerank_score\\)::numeric, 4\\) as min_score, ROUND\\(MAX\\(pagerank_score\\)::numeric, 4\\) as max_score FROM atlas_som_cell_scores;\")",
       "Bash(npm remove *)",
-      "Bash(git check-ignore *)"
+      "Bash(git check-ignore *)",
+      "Bash(find . -name \"p5-feature-label-extraction.mjs\" -type f)",
+      "Bash(yq -r '.services | keys[]' docker-compose.yml)",
+      "PowerShell(docker exec legal-ai-postgres psql -U legal_admin -d legal_ai_db -c \"\\\\dt\" 2>&1)",
+      "PowerShell(grep -i packet)",
+      "PowerShell(head -10)",
+      "PowerShell(docker exec legal-ai-postgres psql -U legal_admin -d legal_ai_db -c \"SELECT table_name FROM information_schema.tables WHERE table_schema='public' AND table_name LIKE '%packet%' OR table_name LIKE '%artifact%' ORDER BY table_name;\" 2>&1)"
     ],
     "deny": [],
     "ask": []

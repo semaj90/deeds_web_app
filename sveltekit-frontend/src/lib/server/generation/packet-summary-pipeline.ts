@@ -12,12 +12,14 @@
  */
 
 import { getRedis } from '$lib/server/redis.js';
+import { ENV } from '$lib/server/env.server.js';
 import { db } from '$lib/server/db/client.js';
 import { atlasPackets } from '$lib/server/db/schema-postgres.js';
 import { eq } from 'drizzle-orm';
 import { semanticDiffGate } from './semantic-diff-gate.js';
 import { storeSummaryArtifact } from './summary-qa.js';
 import { logArtifact } from './artifact-logger.js';
+import { extractPacketFeatures } from './feature-label-extractor.js';
 
 export interface SummaryPipelineResult {
   packet_key: string;
@@ -35,12 +37,14 @@ export interface SummaryPipelineResult {
 
 async function generateSummaryViaLlamaServer(sourceRef: string, context: string): Promise<string | null> {
   try {
-    const llmaServerUrl = process.env.LLAMA_SERVER_URL ?? 'http://127.0.0.1:8090';
-    const response = await fetch(`${llmaServerUrl}/v1/chat/completions`, {
+    const baseUrl = String(ENV.LLAMA_SERVER_URL ?? process.env.LLAMA_SERVER_URL ?? 'http://127.0.0.1:8090').replace(/\/$/, '');
+    const model = ENV.GEMMA4_MODEL ?? process.env.GEMMA4_MODEL ?? 'gemma4-legal-iq4xs-direct.gguf';
+
+    const response = await fetch(`${baseUrl}/v1/chat/completions`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        model: 'gemma4-legal-iq4xs-direct.gguf',
+        model,
         messages: [
           {
             role: 'system',
@@ -55,17 +59,16 @@ async function generateSummaryViaLlamaServer(sourceRef: string, context: string)
         max_tokens: 150,
         stream: false,
       }),
-      signal: AbortSignal.timeout(30000),
+      signal: AbortSignal.timeout(15000),
     });
 
     if (!response.ok) {
-      console.error(`llama-server error for ${sourceRef}:`, response.status, response.statusText);
+      console.error(`Summary generation failed for ${sourceRef}: HTTP ${response.status}`);
       return null;
     }
 
     const data = await response.json() as { choices?: Array<{ message?: { content?: string } }> };
     const summary = data.choices?.[0]?.message?.content?.trim();
-
     return summary || null;
   } catch (err) {
     console.error(`Failed to generate summary for ${sourceRef}:`, err);
@@ -169,7 +172,44 @@ export async function runPacketSummaryPipeline(input: {
     result.artifact_id = qaResult.artifactId;
     result.action_taken = 'regenerate';
 
-    // Step 5: Update Postgres packet table
+    // Step 5: Extract feature labels (P5 Feature Label Extraction)
+    try {
+      const featureResult = await extractPacketFeatures({
+        packetKey: input.packet_key,
+        sourceRef: input.source_ref,
+        featureId: input.feature_id || 'unclassified',
+        summary: newSummary,
+        useSynthesis: true
+      });
+
+      // Log feature labels as artifact
+      if (featureResult.extractedFeatures.labels.length > 0) {
+        await logArtifact({
+          packet_key: input.packet_key,
+          source_ref: input.source_ref,
+          feature_id: input.feature_id,
+          artifact_type: 'feature_labels',
+          generator: 'Gemma4',
+          generator_version: 'rotorquant:latest',
+          storage_backend: 'postgres_jsonb',
+          status: featureResult.status,
+          gan_validation_score: featureResult.extractedFeatures.confidence,
+          generator_config: {
+            labels: featureResult.extractedFeatures.labels,
+            symbols: featureResult.extractedFeatures.symbols
+          },
+          content: JSON.stringify({
+            labels: featureResult.extractedFeatures.labels,
+            symbols: featureResult.extractedFeatures.symbols
+          })
+        });
+      }
+    } catch (err) {
+      console.warn(`[P5] Feature extraction failed for ${input.packet_key}:`, err);
+      // Non-blocking — continue without features
+    }
+
+    // Step 6: Update Postgres packet table
     await db
       .update(atlasPackets)
       .set({

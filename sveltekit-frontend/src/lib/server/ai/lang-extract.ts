@@ -2,8 +2,8 @@
  * LangExtract — typed structured extraction from LLM outputs.
  *
  * Wraps bifrostChat() with JSON-mode prompting + Zod schema validation.
- * Defaults to L1 Redis → L2 Bifrost → L3 Ollama, with optional OpenAI-compatible
- * routing when the OpenAI provider is enabled.
+ * Defaults to L1 Redis → L2 Bifrost → L3 llama-server/TurboQuant, with optional
+ * OpenAI-compatible routing when the OpenAI provider is enabled.
  *
  * Memory / performance:
  *   - Schema fingerprint (L1 cache key) derived from Zod shape description
@@ -123,7 +123,7 @@ function describeShape(schema: z.ZodTypeAny, depth = 0): string {
 /**
  * Extract structured data from `content` using LLM + Zod schema validation.
  *
- * Routes through L1 Redis → L2 Bifrost → L3 Ollama by default, or an
+ * Routes through L1 Redis → L2 Bifrost → L3 llama-server/TurboQuant by default, or an
  * OpenAI-compatible endpoint when enabled.
  * Temperature defaults to 0 for deterministic extraction.
  *
@@ -146,7 +146,7 @@ export async function extractStructured<T>(
 	}
 ): Promise<ExtractResult<T>> {
 	const t0    = performance.now();
-	const model = options?.model ?? ENV.OLLAMA_CHAT_MODEL;
+	const model = options?.model ?? ENV.GEMMA4_MODEL ?? ENV.FUNCTION_GEMMA_MODEL ?? ENV.OLLAMA_CHAT_MODEL;
 
 	// Build JSON shape description for system prompt
 	const shapeDesc = describeShape(schema as z.ZodTypeAny);

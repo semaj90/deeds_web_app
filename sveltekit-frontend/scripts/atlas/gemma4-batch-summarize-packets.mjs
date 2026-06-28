@@ -40,6 +40,8 @@ const report = {
     packetsProcessed: 0,
     summariesGenerated: 0,
     summariesFailed: 0,
+    featureLabelsGenerated: 0,
+    featureLabelsFailed: 0,
     tokensUsed: 0,
     latencyMs: 0,
     averageSummaryLength: 0
@@ -48,6 +50,61 @@ const report = {
   warnings: [],
   status: 'PASS'
 };
+
+function stripReasoning(text) {
+  if (!text) return '';
+  let out = String(text).trim();
+
+  // Remove the most common Gemma4 / llama-server reasoning wrappers.
+  out = out.replace(/<think>[\s\S]*?<\/think>/gi, '');
+  out = out.replace(/<\|assistant_thinking\|>[\s\S]*?(?=<\|assistant\|>|\n{2,}|$)/gi, '');
+  out = out.replace(/<\|channel\|>thought[\s\S]*?(?=<\|channel\|>|$)/gi, '');
+  out = out.replace(/```think[\s\S]*?```/gi, '');
+
+  const paragraphs = out
+    .split(/\n{2,}/)
+    .map((p) => p.trim())
+    .filter(Boolean);
+
+  if (paragraphs.length > 2) {
+    for (let i = paragraphs.length - 1; i >= 0; i--) {
+      const p = paragraphs[i];
+      if (!/^\d+[.)]\s/.test(p) && !/^[-*•]\s/.test(p) && p.length > 20) {
+        out = p;
+        break;
+      }
+    }
+  }
+
+  return out
+    .replace(/^[-*•]\s+/gm, '')
+    .replace(/^#{1,6}\s+/gm, '')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+async function postFeatureLabels(packet, summary) {
+  const endpoint = process.env.ATLAS_FEATURE_LABELS_URL || 'http://127.0.0.1:5173/api/atlas/feature-labels';
+  const response = await fetch(endpoint, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      packetKey: packet.packet_key,
+      sourceRef: packet.source_ref,
+      featureId: packet.feature_id || 'unclassified',
+      summary,
+      useSynthesis: true,
+      saveToDB: true
+    }),
+    signal: AbortSignal.timeout(30000)
+  });
+
+  if (!response.ok) {
+    throw new Error(`feature-label route failed: HTTP ${response.status}`);
+  }
+
+  return response.json().catch(() => ({}));
+}
 
 async function callGemma4Summarize(sourceRef, featureId, redis) {
   try {
@@ -70,9 +127,9 @@ Respond with ONLY the summary, no additional text.`;
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        model: 'gemma4-rotorquant:latest',
+        model: process.env.GEMMA4_MODEL || 'gemma4-legal-iq4xs-direct.gguf',
         messages: [{ role: 'user', content: prompt }],
-        max_tokens: 100,
+        max_tokens: 160,
         temperature: 0.3,
         stream: false
       }),
@@ -84,7 +141,14 @@ Respond with ONLY the summary, no additional text.`;
     }
 
     const data = await response.json();
-    const summary = (data.choices?.[0]?.message?.content || '').trim();
+    const choice = data.choices?.[0] ?? {};
+    const msg = choice.message ?? {};
+    const content = (msg.content || choice.text || '').trim();
+    const reasoning = (msg.reasoning_content || '').trim();
+    const rawSummary = content && reasoning && content.length < 80
+      ? `${reasoning}\n\n${content}`
+      : (content || reasoning);
+    const summary = stripReasoning(rawSummary);
 
     if (summary) {
       // Cache for future use
@@ -132,6 +196,13 @@ async function processBatch(packets, pool, redis) {
             `UPDATE atlas_packets SET summary = $1, updated_at = NOW() WHERE packet_key = $2`,
             [result.summary, result.packet_key]
           );
+          try {
+            await postFeatureLabels(result, result.summary);
+            report.stats.featureLabelsGenerated++;
+          } catch (featureErr) {
+            report.stats.featureLabelsFailed++;
+            report.warnings.push(`Feature labels failed for ${result.packet_key}: ${featureErr.message}`);
+          }
         } catch (err) {
           report.issues.push(`Failed to update ${result.packet_key}: ${err.message}`);
           report.stats.summariesFailed++;

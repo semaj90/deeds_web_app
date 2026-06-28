@@ -10664,12 +10664,6 @@
   "sveltekit-frontend/src/routes/api/cases/[id]/similar/+server.ts": [
     "sveltekit-frontend/tests/routes/auto/api/cases/__id/similar.test.ts"
   ],
-  "sveltekit-frontend/src/routes/api/cases/+server.ts": [
-    "sveltekit-frontend/tests/routes/auto/api/cases.test.ts",
-    "sveltekit-frontend/tests/routes/auto/api/cases.test.ts",
-    "sveltekit-frontend/tests/routes/auto/api/cases.test.ts",
-    "sveltekit-frontend/tests/routes/auto/api/cases.test.ts"
-  ],
   "sveltekit-frontend/src/routes/api/chat/+server.ts": [
     "sveltekit-frontend/tests/routes/auto/api/chat.test.ts"
   ],
@@ -10718,10 +10712,6 @@
   ],
   "sveltekit-frontend/src/routes/api/document/analysis/[evidenceId]/+server.ts": [
     "sveltekit-frontend/tests/routes/auto/api/document/analysis/__evidenceId.test.ts"
-  ],
-  "sveltekit-frontend/src/routes/api/embed/+server.ts": [
-    "sveltekit-frontend/tests/routes/auto/api/embed.test.ts",
-    "sveltekit-frontend/tests/routes/auto/api/embed.test.ts"
   ],
   "sveltekit-frontend/src/routes/api/error-brain/generate-fix/+server.ts": [
     "sveltekit-frontend/tests/routes/auto/api/error-brain/generate-fix.test.ts"

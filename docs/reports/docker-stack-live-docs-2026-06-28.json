@@ -1,0 +1,85 @@
+{
+  "generated_at": "2026-06-27T00:00:00-07:00",
+  "compose_file": "C:\\Users\\james\\Videos\\deeds-web-app\\docker-compose.yml",
+  "shared_env_helper": "C:\\Users\\james\\Videos\\deeds-web-app\\scripts\\atlas\\connection-config.mjs",
+  "env_precedence": [".env", ".env.local"],
+  "live_containers": [
+    {
+      "name": "legal-ai-postgres",
+      "status": "healthy",
+      "role": "Canonical packet/data truth, Postgres 18 + pgvector"
+    },
+    {
+      "name": "legal-ai-valkey",
+      "status": "healthy",
+      "role": "Redis-compatible hot cache / semantic cache"
+    },
+    {
+      "name": "legal-ai-qdrant",
+      "status": "healthy",
+      "role": "Dense vector mirror / ANN retrieval"
+    },
+    {
+      "name": "legal-ai-rabbitmq",
+      "status": "healthy",
+      "role": "Async job fabric / event broker"
+    },
+    {
+      "name": "legal-ai-caddy",
+      "status": "healthy",
+      "role": "HTTP front door / reverse proxy"
+    },
+    {
+      "name": "legal-ai-seaweed-master",
+      "status": "healthy",
+      "role": "SeaweedFS metadata / volume assignment"
+    },
+    {
+      "name": "legal-ai-seaweed-volume",
+      "status": "running",
+      "role": "SeaweedFS blob volume storage"
+    },
+    {
+      "name": "legal-ai-seaweed-filer",
+      "status": "running",
+      "role": "SeaweedFS filer metadata index"
+    },
+    {
+      "name": "legal-ai-seaweed-s3",
+      "status": "healthy",
+      "role": "SeaweedFS S3-compatible gateway"
+    }
+  ],
+  "optional_services_not_running": [
+    "legal-ai-couchdb",
+    "legal-ai-neo4j",
+    "legal-ai-searxng",
+    "legal-ai-nats",
+    "legal-ai-bifrost",
+    "legal-ai-docling-vlm",
+    "legal-ai-image-synthesis",
+    "langfuse-clickhouse",
+    "langfuse-worker",
+    "langfuse-server",
+    "legal-ai-go-search",
+    "legal-ai-go-embedding",
+    "legal-ai-go-retrieval",
+    "legal-ai-tensorrt-llm",
+    "legal-ai-langgraph"
+  ],
+  "official_docs": [
+    "https://github.com/pgvector/pgvector",
+    "https://valkey.io/docs/",
+    "https://qdrant.tech/documentation/",
+    "https://www.rabbitmq.com/docs",
+    "https://caddyserver.com/docs/",
+    "https://neo4j.com/docs/",
+    "https://docs.nats.io/",
+    "https://github.com/seaweedfs/seaweedfs"
+  ],
+  "notes": [
+    "SeaweedFS named volumes are mounted but currently sparse.",
+    "Root docker-compose.yml is the canonical runtime definition.",
+    ".env.local overrides .env through the shared Atlas helper."
+  ]
+}

@@ -1,0 +1,53 @@
+{
+  "generated_at": "2026-06-28T00:00:00-07:00",
+  "current_named_volumes": [
+    "deeds-web-app_caddy_config",
+    "deeds-web-app_caddy_data",
+    "deeds-web-app_postgres_data",
+    "deeds-web-app_qdrant_data",
+    "deeds-web-app_rabbitmq_data",
+    "deeds-web-app_seaweed_master_data",
+    "deeds-web-app_seaweed_volume_data",
+    "deeds-web-app_valkey_data"
+  ],
+  "anonymous_or_unclassified_volumes": [
+    "56a1197f6e3c46e878f9bd2c7dbef8d17c25e08fd02095d7f45de2a99e68f01b",
+    "f08367f9815733858e8bbe24638adbab7f3ec91c9248ae5e7c469eabd0b67009"
+  ],
+  "compose_defined_volumes_all_profiles": [
+    "postgres_data",
+    "qdrant_data",
+    "langfuse_clickhouse_data",
+    "langfuse_clickhouse_logs",
+    "couchdb_data",
+    "couchdb_config",
+    "seaweed_volume_data",
+    "triton_cache",
+    "caddy_config",
+    "caddy_data",
+    "valkey_data",
+    "nats_data",
+    "neo4j_logs",
+    "torchinductor_cache",
+    "rabbitmq_data",
+    "bifrost_data",
+    "neo4j_data",
+    "seaweed_master_data"
+  ],
+  "missing_from_current_docker_volume_ls": [
+    "langfuse_clickhouse_data",
+    "langfuse_clickhouse_logs",
+    "couchdb_data",
+    "couchdb_config",
+    "nats_data",
+    "neo4j_data",
+    "neo4j_logs",
+    "bifrost_data",
+    "triton_cache",
+    "torchinductor_cache"
+  ],
+  "notes": [
+    "Current SeaweedFS named volumes were recreated freshly under the deeds-web-app compose project.",
+    "The other services may have state elsewhere, but it is not attached to the live Docker volume set."
+  ]
+}

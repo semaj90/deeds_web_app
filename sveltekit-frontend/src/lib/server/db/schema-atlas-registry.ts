@@ -10,14 +10,11 @@ import {
   integer,
   real,
   bigint,
-  bytea,
   jsonb,
   timestamp,
-  timestamptz,
   vector,
   index,
   uniqueIndex,
-  check,
   sql,
 } from 'drizzle-orm/pg-core';
 
@@ -36,18 +33,11 @@ export const atlasPacketRegistry = pgTable(
     summary: text('summary'),
 
     // Embedding & Latent State
-    embedding_status: text('embedding_status')
-      .default('missing')
-      .check(
-        check(
-          'embedding_status_check',
-          sql`embedding_status IN ('missing', 'pending', 'complete', 'failed')`
-        )
-      ),
+    embedding_status: text('embedding_status').default('missing'),
     embedding_dim: integer('embedding_dim').default(768),
     embedding_768d: vector('embedding_768d', { dimensions: 768 }),
     latent_384d: vector('latent_384d', { dimensions: 384 }),
-    latent_64: bytea('latent_64'), // Compressed 64-dim latent vector (from autoencoder)
+    latent_64: text('latent_64'), // Compressed 64-dim latent vector (from autoencoder), stored as hex string
 
     // Clustering & Manifold Geometry
     kmeans_cluster_id: text('kmeans_cluster_id'),

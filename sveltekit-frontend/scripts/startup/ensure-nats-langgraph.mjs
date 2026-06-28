@@ -20,6 +20,7 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const SF_ROOT = path.resolve(__dirname, '..', '..');
 const ROOT = path.resolve(SF_ROOT, '..');
 const COMPOSE_FILE = path.join(ROOT, 'docker-compose.yml');
+const COMPOSE_PROJECT_NAME = 'deeds-web-app';
 
 const NATS_CONTAINER = 'legal-ai-nats';
 const NATS_HEALTH_URL = 'http://127.0.0.1:8222/healthz';
@@ -62,7 +63,7 @@ function composeNats() {
   if (DRY) { log('(dry-run, skipping)'); return; }
   // NATS is under --profile full; we bring up only the nats service
   const r = spawnSync('docker', [
-    'compose', '-f', COMPOSE_FILE, '--profile', 'full', 'up', '-d', 'nats',
+    'compose', '-p', COMPOSE_PROJECT_NAME, '-f', COMPOSE_FILE, '--profile', 'full', 'up', '-d', 'nats',
   ], { stdio: 'inherit', timeout: 120_000, cwd: ROOT, env: process.env });
   if (r.status !== 0) throw new Error('docker compose up nats failed');
 }

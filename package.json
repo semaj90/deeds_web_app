@@ -457,6 +457,7 @@
     "zod-to-json-schema": "file:C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/mcp/zod-to-json-schema-bridge"
   },
   "workspaces": [
+    "packages/atlas-core",
     "packages/parent-atlas",
     "packages/parent-atlas-core",
     "packages/parent-atlas-retrieval",

@@ -1183,8 +1183,10 @@ volumes:
   # SeaweedFS volumes (profile: seaweedfs)
   seaweed_master_data:
     driver: local
+    name: ${SEAWEED_MASTER_VOLUME_NAME:-deeds-web-app_seaweed_master_data}
   seaweed_volume_data:
     driver: local
+    name: ${SEAWEED_VOLUME_NAME:-deeds-web-app_seaweed_volume_data}
 
   # torch.compile() / Triton kernel caches — shared between GPU containers.
   # Persists compiled sm_86 .cubin/.ttgir artefacts so containers don't recompile

@@ -1,0 +1,49 @@
+{
+  "story_id": "ATLAS-PROOF-1782621565069",
+  "timestamp": "2026-06-28T04:39:30.042Z",
+  "duration_ms": 4800,
+  "dry_run": false,
+  "lanes": [
+    {
+      "lane": "authority",
+      "status": "PASS",
+      "story_id": "ATLAS-PROOF-1782621565069-AUTHORITY",
+      "timestamp": "2026-06-28T04:39:26.395Z",
+      "verdict": "PASS"
+    },
+    {
+      "lane": "karpathy_gpu",
+      "status": "SKIP",
+      "error": "karpathy:backfill:qdrant failed with code 1: [backfill-karpathy] gpu:karpathy:scores is empty — run npm run karpathy:gpu first\n",
+      "verdict": "SKIP"
+    },
+    {
+      "lane": "ace_context",
+      "status": "PASS",
+      "story_id": "ATLAS-PROOF-1782621565069-ACE",
+      "timestamp": "2026-06-28T04:39:30.041Z",
+      "note": "ACE context assembly wired to read Karpathy scores at Stage A0.5",
+      "verdict": "PASS"
+    },
+    {
+      "lane": "integration",
+      "status": "PASS",
+      "story_id": "ATLAS-PROOF-1782621565069-INTEGRATION",
+      "timestamp": "2026-06-28T04:39:30.041Z",
+      "verdict": "PASS"
+    }
+  ],
+  "verdict": {
+    "by_lane": {
+      "replay": "UNKNOWN",
+      "cache": "UNKNOWN",
+      "live_app": "UNKNOWN",
+      "cubic": "UNKNOWN"
+    },
+    "pass_count": 0,
+    "fail_count": 0,
+    "pending_count": 0,
+    "overall": "UNKNOWN"
+  },
+  "can_promote": false
+}

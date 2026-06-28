@@ -31,6 +31,7 @@ import pg from 'pg';
 import Redis from 'ioredis';
 import { QdrantClient } from '@qdrant/js-client-rest';
 import fetch from 'node-fetch';
+import { loadRepoEnv } from '../../scripts/atlas/connection-config.mjs';
 
 // LangExtract: Intent-based prompt routing for Gemma4
 const INTENT_SYSTEM_PROMPTS = {
@@ -40,6 +41,8 @@ const INTENT_SYSTEM_PROMPTS = {
   explain: 'Focus on contracts, interfaces, and data flow. Explain what the code does, not why.',
   general: 'Provide a balanced, comprehensive summary of functionality and purpose.',
 };
+
+Object.assign(process.env, loadRepoEnv(process.env));
 
 function inferSummaryIntent(chunk) {
   const text = `${chunk.relative_path} ${chunk.symbol || ''} ${chunk.content || ''}`.toLowerCase();
@@ -111,6 +114,17 @@ async function writeBifrostCache(chunkId, contentHash, summary) {
 const __dir = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dir, '../..');
 
+function normalizeBaseUrl(raw, fallback) {
+  const value = String(raw ?? '').trim();
+  if (!value) return fallback;
+  if (/^https?:\/\//i.test(value)) return value.replace(/\/$/, '');
+  if (/^[^:/?#]+:\d+(?:\/.*)?$/.test(value)) return `http://${value.replace(/\/$/, '')}`;
+  if (/^[^:/?#]+$/.test(value)) return `${fallback.split(':')[0]}://${value}:${
+    fallback.split(':').pop()?.replace(/\/$/, '') ?? ''
+  }`;
+  return fallback;
+}
+
 // ── CLI flags ──────────────────────────────────────────────────────────────
 const STAGE = process.argv.find(a => a.startsWith('--stage='))?.split('=')[1] || '1';
 const ALL_STAGES = process.argv.includes('--all');
@@ -130,8 +144,14 @@ const REDIS_HOST = process.env.REDIS_HOST || '127.0.0.1';
 const REDIS_PORT = parseInt(process.env.REDIS_PORT || '6379', 10);
 const REDIS_PASS = process.env.REDIS_PASSWORD || process.env.REDIS_PASS || 'redis';
 const QDRANT_URL = process.env.QDRANT_URL || 'http://127.0.0.1:6333';
-const OLLAMA_URL = (process.env.OLLAMA_HOST || '127.0.0.1:11434').replace(/^0\.0\.0\.0/, '127.0.0.1');
-const GEMMA4_URL = process.env.LLAMA_SERVER_URL || 'http://127.0.0.1:8090';
+const OLLAMA_URL = normalizeBaseUrl(
+  process.env.OLLAMA_BASE_URL || process.env.OLLAMA_URL || process.env.OLLAMA_HOST,
+  'http://127.0.0.1:11434'
+);
+const GEMMA4_URL = normalizeBaseUrl(
+  process.env.LLAMA_SERVER_URL || process.env.TURBOQUANT_BASE_URL || process.env.TURBOQUANT_URL,
+  'http://127.0.0.1:8090'
+);
 const BIFROST_URL = process.env.BIFROST_URL || 'http://127.0.0.1:3040';
 
 // Bifrost cache stats
@@ -149,6 +169,55 @@ const report = {
   errors: [],
   duration_ms: 0,
 };
+
+async function resolvePipelineSource(pool) {
+  const candidates = [
+    {
+      name: 'atlas_packets',
+      existsSql: `SELECT to_regclass('public.atlas_packets') IS NOT NULL AS ok`,
+      idColumn: 'packet_id',
+      pathExpr: `coalesce(nullif(file_path, ''), nullif(source_ref, ''), nullif(directory_path, ''))`,
+      contentExpr: `coalesce(
+        nullif(payload->>'content', ''),
+        nullif(metadata->>'content', ''),
+        nullif(payload->>'text', ''),
+        nullif(metadata->>'text', ''),
+        nullif(payload->>'summary', ''),
+        nullif(summary, '')
+      )`,
+      summaryColumn: 'summary',
+      qdrantIdColumn: 'qdrant_point_id',
+      embeddingColumn: 'embedding',
+      directoryExpr: 'directory_path',
+      summaryUpdateSql: 'UPDATE atlas_packets SET summary = $1 WHERE packet_id = $2',
+      embeddingUpdateSql: 'UPDATE atlas_packets SET embedding = $1::vector WHERE packet_id = $2',
+    },
+    {
+      name: 'codebase_chunk_index',
+      existsSql: `SELECT to_regclass('public.codebase_chunk_index') IS NOT NULL AS ok`,
+      idColumn: 'id',
+      pathExpr: 'relative_path',
+      contentExpr: 'content',
+      summaryColumn: 'summary',
+      qdrantIdColumn: 'qdrant_id',
+      embeddingColumn: 'summary_embedding',
+      directoryExpr: `substr(relative_path, 1, strpos(relative_path, '/') - 1)`,
+      summaryUpdateSql: 'UPDATE codebase_chunk_index SET summary = $1 WHERE id = $2',
+      embeddingUpdateSql: 'UPDATE codebase_chunk_index SET summary_embedding = $1::halfvec WHERE id = $2',
+    },
+  ];
+
+  for (const source of candidates) {
+    try {
+      const res = await pool.query(source.existsSql);
+      if (res.rows[0]?.ok) return source;
+    } catch {
+      // ignore and try next candidate
+    }
+  }
+
+  return null;
+}
 
 // ── Service Health Checks ──────────────────────────────────────────────────
 async function checkServices() {
@@ -196,7 +265,7 @@ async function checkServices() {
 
   // Ollama (EmbeddingGemma)
   try {
-    const res = await fetch(`http://${OLLAMA_URL}/api/tags`, { signal: AbortSignal.timeout(3000) });
+    const res = await fetch(`${OLLAMA_URL}/api/tags`, { signal: AbortSignal.timeout(3000) });
     if (res.ok) {
       checks.ollama = true;
       log('✅ Ollama (EmbeddingGemma): OK');
@@ -233,6 +302,15 @@ async function stage1BackfillSummaries() {
 
   try {
     const pool = new pg.Pool({ connectionString: PG_URL, max: 5 });
+    const source = await resolvePipelineSource(pool);
+
+    if (!source) {
+      report.stages.stage1.status = 'skipped';
+      report.stages.stage1.detail = 'No supported packet/source table found (atlas_packets or codebase_chunk_index)';
+      log('⚠️  Stage 1 skipped — no supported packet/source table found (atlas_packets or codebase_chunk_index)\n');
+      await pool.end();
+      return;
+    }
 
     let processed = 0;
     let generated = 0;
@@ -241,7 +319,39 @@ async function stage1BackfillSummaries() {
     // Loop: claim and process chunks (prevents concurrent race conditions)
     while (true) {
       // Claim next batch of chunks with FOR UPDATE SKIP LOCKED (atomic)
-      const claimedChunks = await pool.query(`
+      const claimSql = source.name === 'atlas_packets'
+        ? `
+        WITH picked AS (
+          SELECT packet_id
+          FROM atlas_packets
+          WHERE (summary IS NULL OR summary = '')
+            AND coalesce(
+              nullif(payload->>'content', ''),
+              nullif(metadata->>'content', ''),
+              nullif(payload->>'text', ''),
+              nullif(metadata->>'text', ''),
+              nullif(payload->>'summary', '')
+            ) IS NOT NULL
+          ORDER BY created_at ASC
+          LIMIT $1
+          FOR UPDATE SKIP LOCKED
+        )
+        SELECT
+          p.packet_id AS id,
+          coalesce(nullif(p.file_path, ''), nullif(p.source_ref, ''), nullif(p.directory_path, '')) AS relative_path,
+          coalesce(
+            nullif(p.payload->>'content', ''),
+            nullif(p.metadata->>'content', ''),
+            nullif(p.payload->>'text', ''),
+            nullif(p.metadata->>'text', ''),
+            nullif(p.payload->>'summary', '')
+          ) AS content,
+          0::int AS line_start,
+          coalesce(nullif(p.function_symbol, ''), nullif(p.feature_id, ''), nullif(p.feature_label, '')) AS symbol
+        FROM atlas_packets p
+        JOIN picked px ON px.packet_id = p.packet_id
+        `
+        : `
         WITH picked AS (
           SELECT id
           FROM codebase_chunk_index
@@ -253,7 +363,9 @@ async function stage1BackfillSummaries() {
         SELECT c.id, c.relative_path, c.content, c.line_start, c.symbol
         FROM codebase_chunk_index c
         JOIN picked p ON p.id = c.id
-      `, [CHUNK_BATCH]);
+      `;
+
+      const claimedChunks = await pool.query(claimSql, [CHUNK_BATCH]);
 
       if (claimedChunks.rows.length === 0) {
         log(`\n✅ No more chunks to process (all summaries complete)\n`);
@@ -372,10 +484,7 @@ ${c.content?.slice(0, 1200) || ''}
           for (const item of summaries) {
             if (item.id && item.summary) {
               if (APPLY) {
-                await pool.query(
-                  'UPDATE codebase_chunk_index SET summary = $1 WHERE id = $2',
-                  [item.summary, item.id]
-                );
+                await pool.query(source.summaryUpdateSql, [item.summary, item.id]);
               }
               generated++;
             }
@@ -421,16 +530,37 @@ async function stage2EmbedAndTag() {
   try {
     const pool = new pg.Pool({ connectionString: PG_URL, max: 5 });
     const qdrant = new QdrantClient({ url: QDRANT_URL });
+    const source = await resolvePipelineSource(pool);
+
+    if (!source) {
+      report.stages.stage2.status = 'skipped';
+      report.stages.stage2.detail = 'No supported packet/source table found (atlas_packets or codebase_chunk_index)';
+      log('⚠️  Stage 2 skipped — no supported packet/source table found (atlas_packets or codebase_chunk_index)\n');
+      await pool.end();
+      return;
+    }
 
     // Get summaries to embed (includes qdrant_id for named vector storage)
-    const toEmbed = await pool.query(`
+    const toEmbed = await pool.query(
+      source.name === 'atlas_packets'
+        ? `
+      SELECT packet_id AS id, coalesce(nullif(file_path, ''), nullif(source_ref, ''), nullif(directory_path, '')) AS relative_path, summary, qdrant_point_id AS qdrant_id
+      FROM atlas_packets
+      WHERE summary IS NOT NULL AND summary != ''
+        AND embedding IS NULL
+      ORDER BY created_at ASC
+      LIMIT $1
+    `
+        : `
       SELECT id, relative_path, summary, qdrant_id
       FROM codebase_chunk_index
       WHERE summary IS NOT NULL AND summary != ''
         AND summary_embedding IS NULL
       ORDER BY id
       LIMIT $1
-    `, [LIMIT]);
+    `,
+      [LIMIT]
+    );
 
     log(`Found ${toEmbed.rows.length} chunks to embed\n`);
 
@@ -441,7 +571,7 @@ async function stage2EmbedAndTag() {
     for (const chunk of toEmbed.rows) {
       try {
         // Embed summary with EmbeddingGemma via Ollama
-        const embedRes = await fetch(`http://${OLLAMA_URL}/api/embed`, {
+          const embedRes = await fetch(`${OLLAMA_URL}/api/embed`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -468,10 +598,7 @@ async function stage2EmbedAndTag() {
         if (APPLY) {
           // Store in pgvector (halfvec(768)) as vector literal string
           const vectorLiteral = `[${embedding.join(',')}]`;
-          await pool.query(
-            'UPDATE codebase_chunk_index SET summary_embedding = $1::halfvec WHERE id = $2',
-            [vectorLiteral, chunk.id]
-          );
+          await pool.query(source.embeddingUpdateSql, [vectorLiteral, chunk.id]);
           pgvectorWritten++;
 
           // Store in Qdrant as named vector (not in payload)
@@ -541,40 +668,71 @@ async function stage3ComputeCentroids() {
   try {
     const redis = new Redis({ host: REDIS_HOST, port: REDIS_PORT, password: REDIS_PASS });
     const pool = new pg.Pool({ connectionString: PG_URL, max: 5 });
+    const source = await resolvePipelineSource(pool);
+
+    if (!source) {
+      report.stages.stage3.status = 'skipped';
+      report.stages.stage3.detail = 'No supported packet/source table found (atlas_packets or codebase_chunk_index)';
+      log('⚠️  Stage 3 skipped — no supported packet/source table found (atlas_packets or codebase_chunk_index)\n');
+      await redis.quit();
+      await pool.end();
+      return;
+    }
 
     // Get embeddings grouped by directory
-    const dirs = await pool.query(`
+    const dirs = await pool.query(
+      source.name === 'atlas_packets'
+        ? `
+      SELECT split_part(coalesce(nullif(directory_path, ''), nullif(file_path, ''), nullif(source_ref, '')), '/', 1) as dir, count(*) as cnt
+      FROM atlas_packets
+      WHERE embedding IS NOT NULL
+      GROUP BY 1
+      ORDER BY cnt DESC
+      LIMIT $1
+    `
+        : `
       SELECT substr(relative_path, 1, strpos(relative_path, '/') - 1) as dir, count(*) as cnt
       FROM codebase_chunk_index
       WHERE summary_embedding IS NOT NULL
       GROUP BY 1
       ORDER BY cnt DESC
       LIMIT $1
-    `, [LIMIT]);
+    `,
+      [LIMIT]
+    );
 
     log(`Computing centroids for ${dirs.rows.length} directories\n`);
 
     let computed = 0;
 
     for (const { dir } of dirs.rows) {
-      try {
-        // Query with explicit casting for halfvec comparison
-        const chunks = await pool.query(`
-          SELECT summary_embedding
-          FROM codebase_chunk_index
-          WHERE relative_path LIKE $1 || '/%' AND summary_embedding IS NOT NULL
-        `, [dir]);
+        try {
+          // Query with explicit casting for halfvec comparison
+          const chunks = await pool.query(
+            source.name === 'atlas_packets'
+              ? `
+            SELECT embedding
+            FROM atlas_packets
+            WHERE coalesce(nullif(directory_path, ''), nullif(file_path, ''), nullif(source_ref, '')) LIKE $1 || '/%'
+              AND embedding IS NOT NULL
+          `
+              : `
+            SELECT summary_embedding
+            FROM codebase_chunk_index
+            WHERE relative_path LIKE $1 || '/%' AND summary_embedding IS NOT NULL
+          `,
+            [dir]
+          );
 
         if (chunks.rows.length > 0) {
           // Compute centroid (mean of halfvec embeddings)
-          let centroid = new Array(768).fill(0);
-          let count = 0;
+            let centroid = new Array(768).fill(0);
+            let count = 0;
 
           for (const row of chunks.rows) {
             // halfvec is stored as string representation in some drivers
-            const emb = Array.isArray(row.summary_embedding)
-              ? row.summary_embedding
-              : JSON.parse(JSON.stringify(row.summary_embedding));
+            const rawEmb = row.embedding ?? row.summary_embedding;
+            const emb = Array.isArray(rawEmb) ? rawEmb : JSON.parse(JSON.stringify(rawEmb));
 
             if (emb && emb.length === 768) {
               for (let i = 0; i < 768; i++) {
@@ -632,16 +790,37 @@ async function stage4WarmContextCache() {
   try {
     const redis = new Redis({ host: REDIS_HOST, port: REDIS_PORT, password: REDIS_PASS });
     const pool = new pg.Pool({ connectionString: PG_URL, max: 5 });
+    const source = await resolvePipelineSource(pool);
+
+    if (!source) {
+      report.stages.stage4.status = 'skipped';
+      report.stages.stage4.detail = 'No supported packet/source table found (atlas_packets or codebase_chunk_index)';
+      log('⚠️  Stage 4 skipped — no supported packet/source table found (atlas_packets or codebase_chunk_index)\n');
+      await redis.quit();
+      await pool.end();
+      return;
+    }
 
     // Get top directories by chunk count (ones most likely to be queried)
-    const topDirs = await pool.query(`
+    const topDirs = await pool.query(
+      source.name === 'atlas_packets'
+        ? `
+      SELECT split_part(coalesce(nullif(directory_path, ''), nullif(file_path, ''), nullif(source_ref, '')), '/', 1) as dir, count(*) as count
+      FROM atlas_packets
+      WHERE summary IS NOT NULL
+      GROUP BY 1
+      ORDER BY count DESC
+      LIMIT 20
+    `
+        : `
       SELECT substr(relative_path, 1, strpos(relative_path, '/') - 1) as dir, count(*) as count
       FROM codebase_chunk_index
       WHERE summary IS NOT NULL
       GROUP BY 1
       ORDER BY count DESC
       LIMIT 20
-    `);
+    `
+    );
 
     log(`Warming ${topDirs.rows.length} top directories in ACE cache\n`);
 
