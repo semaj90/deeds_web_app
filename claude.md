@@ -38,6 +38,158 @@ drift. Historical references remain reference-only.
 
 ---
 
+## 🔐 Atlas Data Persistence + Retrieval Contract (HARD RULES)
+
+**Core Principle**: Postgres is truth; Qdrant is fast ANN mirror; Redis is ephemeral cache; Neo4j is topology mirror.
+
+### Docker Disposability Rule
+
+Docker containers are disposable. **Volumes are the only durable layer.** Before any destructive command, verify mounted volumes:
+
+```bash
+docker inspect legal-ai-postgres | jq '.[0].Mounts'
+docker inspect legal-ai-qdrant   | jq '.[0].Mounts'
+docker inspect legal-ai-neo4j    | jq '.[0].Mounts'
+docker inspect legal-ai-redis    | jq '.[0].Mounts'
+```
+
+**Never run** (without explicit operator approval + backups):
+```bash
+docker compose down -v
+docker volume prune
+docker system prune --volumes
+```
+
+### Store Roles (Immutable)
+
+| Store | Role | Truth? | Rebuildable? |
+|-------|------|--------|-------------|
+| **Postgres pgvector** | Canonical truth | ✅ YES | No (restore from backup) |
+| **Qdrant** | ANN vector search mirror | ❌ NO | Yes (from Postgres) |
+| **Redis/Bifrost** | Hot cache only | ❌ NO | Yes (from Postgres) |
+| **Neo4j** | Topology/ontology mirror | ❌ NO | Yes (from Postgres + Qdrant) |
+
+**Hard rules:**
+- ✅ Write to Postgres FIRST (atomic, durable)
+- ✅ Invalidate Redis AFTER Postgres succeeds (never before)
+- ✅ Rebuild Qdrant from Postgres if diverged (idempotent upsert)
+- ✅ Rebuild Neo4j from Postgres if lost (deterministic Cypher)
+- ❌ Never make Qdrant/Redis/Neo4j the source of truth
+- ❌ Never write to cache before Postgres succeeds
+- ❌ Never assume Docker data is safe (volume check first)
+
+### Schema Truth: Split Identity + Chunks
+
+**atlas_packets** (58,304 rows)
+- Packet identity / metadata only
+- `embedding` column is vector(768), ALL NULL (deprecated, do not use)
+- Join key: `packet_key`, `source_ref`
+- Not the embedding source
+
+**codebase_chunk_index** (40,754 rows)
+- Canonical code chunks with embeddings
+- `content_embedding` column is vector(384), 99.5% populated (40,568 rows)
+- **This is the truth source for embeddings**
+- Mirrors to Qdrant `codebase_chunks_768` (40,568 points)
+
+**Qdrant codebase_chunks_768** (40,568 points)
+- Mirror of codebase_chunk_index
+- Fast ANN search
+- Payload indexed by source_ref, feature_id, etc.
+- Rebuildable: `npm run atlas:qdrant:384:restore:apply`
+
+**Why the gap?**
+- Atlas_packets = identity/metadata (58K)
+- Codebase_chunk_index = actual chunks (40.7K, subset that are code)
+- Qdrant = embedded chunks only (40.5K, excludes 186 null embeddings)
+- **Expected and correct.** Do not force all atlas_packets to Qdrant.
+
+### Dimension Policy (PROJECT CANONICAL)
+
+```
+PROJECT_CANONICAL_EMBED_DIM = 384
+EMBED_MODEL                 = embeddinggemma:latest
+FULL_MODEL_DIM              = 768 (native, truncated to 384 for this project)
+INDEX_DIM_REQUIRED          = 384 (hard stop if different)
+```
+
+**Hard stops:**
+- ❌ Do NOT write 384 vectors into 768 collection
+- ❌ Do NOT write 768 vectors into 384 collection
+- ❌ Do NOT use AE 64-dim vectors for ANN search
+- ❌ Do NOT call 384 "EmbeddingGemma universal standard" (it's this project's choice)
+
+**Verify before any migration:**
+```bash
+npm run atlas:audit:embeddings --verbose
+```
+
+Must report Ollama, Postgres, Qdrant, Redis dimensions and agree on 384.
+
+### Query Flow (Canonical Order)
+
+```
+user query
+  → embed query (embeddinggemma, 384-dim)
+  → Redis exact/cache check
+  → Qdrant ANN top-K
+  → Postgres join by source_ref/source_id/chunk_id
+  → optional Neo4j topology expansion
+  → rerank (GPU cosine similarity)
+  → Gemma4 answer/summary
+```
+
+**Critical**: Do NOT generate answers from Qdrant payloads alone. Always join back to Postgres truth before synthesis.
+
+### Recovery Order (Verified)
+
+1. ✅ Verify Docker volumes exist and are mounted
+2. ✅ Verify Postgres counts (58K packets, 40.7K chunks)
+3. ✅ Verify Qdrant collection counts (40.5K codebase_chunks_768)
+4. ⏳ Verify embedding dimensions (audit-embedding-dimensions.mjs)
+5. ⏳ Rebuild Qdrant from codebase_chunk_index if needed
+6. ⏳ Rebuild Neo4j topology if needed
+7. ⏳ Warm Redis/Bifrost from Postgres + Qdrant
+8. ⏳ Regenerate missing summaries
+9. ⏳ Run final recovery gate
+
+### Backup Commands (Before Destructive Ops)
+
+**Postgres:**
+```bash
+docker exec legal-ai-postgres pg_dump -U legal_admin -d legal_ai_db -Fc -f /tmp/legal_ai_db.dump
+docker cp legal-ai-postgres:/tmp/legal_ai_db.dump ./backups/legal_ai_db_$(date +%Y%m%d_%H%M%S).dump
+```
+
+**Qdrant snapshot:**
+```bash
+curl -X POST http://127.0.0.1:6333/collections/codebase_chunks_768/snapshots
+curl http://127.0.0.1:6333/collections/codebase_chunks_768/snapshots
+```
+
+**Redis:**
+```bash
+docker exec legal-ai-redis redis-cli SAVE
+```
+
+**Neo4j:**
+```bash
+docker exec legal-ai-neo4j neo4j-admin database dump neo4j --to-path=/backups
+```
+
+### Status Language (ENFORCED)
+
+Use only:
+- **CREATED** — File exists, syntax valid
+- **WIRED** — Ready for dry-run, no side effects
+- **DRY_RUN_PROVEN** — Dry-run passes, verified safe
+- **APPLY_PROVEN** — Apply succeeded, verification gate passes
+- **NOT_PROVEN** — Blocked by prerequisite or failed gate
+
+**Never claim "production-ready" from dry-run evidence.**
+
+---
+
 ## 🔧 NPX Execution Context & Module Alias Resolution
 
 **Updated: June 26, 2026 (Session 82 Phase 2 Real Client Wiring)**
