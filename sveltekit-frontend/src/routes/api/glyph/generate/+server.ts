@@ -27,10 +27,10 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 		const { evidence_id, prompt, style, dimensions } = parsed.data;
 
 		// Generate a text-based glyph descriptor via LLM
-		const { ollamaFetch } = await import('$lib/server/ollama.js');
+		const { ollamaFetch, getOllamaGenerationEndpoint } = await import('$lib/server/ollama.js');
 		const { ENV } = await import('$lib/server/env.server.js');
 
-		const res = await ollamaFetch(`${ENV.OLLAMA_BASE_URL}/api/generate`, {
+		const res = await ollamaFetch(`${getOllamaGenerationEndpoint()}/api/generate`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({
@@ -105,3 +105,5 @@ Return JSON with these fields:
 		return json({ success: false, error: 'Glyph generation failed' }, { status: 500 });
 	}
 };
+
+

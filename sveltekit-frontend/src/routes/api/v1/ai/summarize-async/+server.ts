@@ -1,6 +1,7 @@
 import type { RequestHandler } from './$types';
 import { json } from '@sveltejs/kit';
 import { z } from 'zod';
+import { getOllamaGenerationEndpoint } from '$lib/server/ollama.js';
 const safeJsonPost = (await import('$lib/server/utils/safe-json-post.js')).default as unknown as <
   T,
 >(
@@ -50,7 +51,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
         const { ENV } = await import('$lib/server/env.server.js');
 
         const data = await safeJsonPost<any>(
-          `${ENV.OLLAMA_BASE_URL}/api/generate`,
+          `${getOllamaGenerationEndpoint()}/api/generate`,
           {
             model: 'gemma4-rotorquant:latest',
             prompt: `Summarize the following legal text concisely. Focus on key facts, legal issues, and conclusions.\n\nText:\n${content.slice(0, 50000)}`,
@@ -96,3 +97,5 @@ export const POST: RequestHandler = async ({ request, locals }) => {
     return json({ error: 'Failed to start summarization' }, { status: 500 });
   }
 };
+
+

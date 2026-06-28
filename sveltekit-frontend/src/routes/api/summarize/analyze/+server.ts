@@ -30,10 +30,10 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 		const { sections } = parsed.data;
 		const combinedText = sections.map((s) => `${s.title}: ${s.content}`).join('\n\n');
 
-		const { ollamaFetch } = await import('$lib/server/ollama.js');
+		const { ollamaFetch, getOllamaGenerationEndpoint } = await import('$lib/server/ollama.js');
 		const { ENV } = await import('$lib/server/env.server.js');
 
-		const res = await ollamaFetch(`${ENV.OLLAMA_BASE_URL}/api/generate`, {
+		const res = await ollamaFetch(`${getOllamaGenerationEndpoint()}/api/generate`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({
@@ -66,3 +66,5 @@ Return JSON: { "results": [{ "type": "section_title", "score": 0.0-1.0, "explana
 		return json({ results: [] }, { status: 500 });
 	}
 };
+
+

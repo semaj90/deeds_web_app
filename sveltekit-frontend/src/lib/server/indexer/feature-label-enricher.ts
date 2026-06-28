@@ -13,7 +13,7 @@
  */
 
 import { db } from '$lib/server/db/client.js';
-import { atlasPackets } from '$lib/server/db/schema-postgres.js';
+import { atlasPackets } from '$lib/server/db/schema/atlas-packets.js';
 import { sql } from 'drizzle-orm';
 
 export interface FeatureLabel {
@@ -215,9 +215,9 @@ export async function enrichPacketWithLabels(
           '{feature_labels}',
           ${JSON.stringify(featureLabel)}::jsonb
         )`,
-        updated_at: new Date(),
+        updatedAt: new Date(),
       })
-      .where(sql`packet_key = ${packetKey}`);
+      .where(sql`${atlasPackets.packetKey} = ${packetKey}`);
   } catch (err) {
     console.error(`[feature-label-enricher] Failed to update ${packetKey}:`, err);
   }
@@ -260,11 +260,11 @@ export async function batchEnrichPacketsWithLabels(limit: number = 10000): Promi
     for (const packet of packets) {
       try {
         const featureLabel = await enrichPacketWithLabels(
-          packet.packet_key,
-          packet.feature_id,
-          packet.source_ref,
-          packet.file_path || packet.source_ref,
-          packet.function_symbol
+          packet.packetKey,
+          packet.featureId,
+          packet.sourceRef,
+          packet.filePath || packet.sourceRef,
+          packet.functionSymbol ?? undefined
         );
 
         results.success++;
@@ -275,7 +275,7 @@ export async function batchEnrichPacketsWithLabels(limit: number = 10000): Promi
         results.confidences.push(featureLabel.confidence);
       } catch (err) {
         results.failures++;
-        console.error(`[feature-label-enricher] Batch error for ${packet.packet_key}:`, err);
+        console.error(`[feature-label-enricher] Batch error for ${packet.packetKey}:`, err);
       }
     }
   } catch (err) {
@@ -310,7 +310,7 @@ export async function getFeatureLabelCoverage(): Promise<{
     const [totalRow] = await db
       .select({ count: sql<number>`COUNT(*)` })
       .from(atlasPackets)
-      .where(sql`packet_key IS NOT NULL`);
+      .where(sql`${atlasPackets.packetKey} IS NOT NULL`);
 
     const [labeledRow] = await db
       .select({ count: sql<number>`COUNT(*)` })

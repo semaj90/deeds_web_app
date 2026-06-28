@@ -4,7 +4,7 @@ import { db } from '$lib/server/db/client';
 import { cases, evidence } from '$lib/server/db/schema-postgres.js';
 import { and, eq, sql } from 'drizzle-orm';
 import { ENV } from '$lib/server/env.server.js';
-import { ollamaFetch } from '$lib/server/ollama.js';
+import { ollamaFetch, getOllamaGenerationEndpoint } from '$lib/server/ollama.js';
 import { z } from 'zod';
 import { isUuid } from '$lib/server/validation.js';
 
@@ -87,7 +87,7 @@ Respond with ONLY a JSON object:
 }`;
 
 		try {
-			const ollamaRes = await ollamaFetch(`${ENV.OLLAMA_BASE_URL}/api/generate`, {
+			const ollamaRes = await ollamaFetch(`${getOllamaGenerationEndpoint()}/api/generate`, {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify({
@@ -134,3 +134,5 @@ Respond with ONLY a JSON object:
 		total: rows.length
 	});
 };
+
+

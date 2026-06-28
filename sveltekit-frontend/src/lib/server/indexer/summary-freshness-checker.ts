@@ -10,7 +10,7 @@
 
 import crypto from 'crypto';
 import { db } from '$lib/server/db/client.js';
-import { atlasPackets } from '$lib/server/db/schema-postgres.js';
+import { atlasPackets } from '$lib/server/db/schema/atlas-packets.js';
 import { eq } from 'drizzle-orm';
 import { getRedis } from '$lib/server/redis.js';
 
@@ -64,7 +64,7 @@ export async function checkSummaryFreshness(
     const packet = await db
       .select()
       .from(atlasPackets)
-      .where(eq(atlasPackets.packet_key, packetKey))
+      .where(eq(atlasPackets.packetKey, packetKey))
       .limit(1);
 
     if (!packet || packet.length === 0) {
@@ -149,9 +149,9 @@ export async function recordSummaryGeneration(
           summary_hash: summaryHash,
           last_summary_at: new Date().toISOString(),
         },
-        updated_at: new Date(),
+        updatedAt: new Date(),
       })
-      .where(eq(atlasPackets.packet_key, packetKey));
+      .where(eq(atlasPackets.packetKey, packetKey));
 
     // Invalidate Redis cache
     try {

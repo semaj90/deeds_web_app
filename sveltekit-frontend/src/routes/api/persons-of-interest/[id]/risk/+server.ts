@@ -4,7 +4,7 @@ import { db } from '$lib/server/db/client';
 import { personsOfInterest, evidence, cases } from '$lib/server/db/schema-postgres.js';
 import { and, eq, isNull, or, sql, arrayContains } from 'drizzle-orm';
 import { ENV } from '$lib/server/env.server.js';
-import { ollamaFetch } from '$lib/server/ollama.js';
+import { ollamaFetch, getOllamaGenerationEndpoint } from '$lib/server/ollama.js';
 import { z } from 'zod';
 import { isUuid } from '$lib/server/validation.js';
 import { cacheControl } from '$lib/server/middleware/cache-headers.js';
@@ -163,7 +163,7 @@ Provide a JSON object with: riskScore (0-100), patterns (string[]), recommendati
   };
 
   try {
-    const ollamaRes = await ollamaFetch(`${ENV.OLLAMA_BASE_URL}/api/generate`, {
+    const ollamaRes = await ollamaFetch(`${getOllamaGenerationEndpoint()}/api/generate`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -200,3 +200,4 @@ Provide a JSON object with: riskScore (0-100), patterns (string[]), recommendati
 
   return json({ success: true, aiProfile });
 };
+

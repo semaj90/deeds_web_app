@@ -2,7 +2,7 @@ import type { RequestHandler } from './$types';
 import { json, error } from '@sveltejs/kit';
 import { z } from 'zod';
 import { ENV } from '$lib/server/env.server.js';
-import { ollamaFetch } from '$lib/server/ollama.js';
+import { ollamaFetch, getOllamaGenerationEndpoint } from '$lib/server/ollama.js';
 import { trackTokenUsage } from '$lib/server/ai/token-tracker.js';
 
 /** GBNF-constrained response schema for error fix generation */
@@ -83,7 +83,7 @@ Respond in JSON format:
 }`;
 
 	try {
-		const ollamaRes = await ollamaFetch(`${ENV.OLLAMA_BASE_URL}/api/generate`, {
+		const ollamaRes = await ollamaFetch(`${getOllamaGenerationEndpoint()}/api/generate`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({
@@ -158,3 +158,5 @@ Respond in JSON format:
 		}, { status: 503 });
 	}
 };
+
+

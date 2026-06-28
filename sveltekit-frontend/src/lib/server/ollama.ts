@@ -87,8 +87,16 @@ export function getOllamaEndpoint(): string {
   return CHAT_BASE_URL;
 }
 
+export function getOllamaChatEndpoint(): string {
+  return CHAT_BASE_URL;
+}
+
 export function getOllamaEmbeddingEndpoint(): string {
   return EMBED_BASE_URL;
+}
+
+export function getOllamaGenerationEndpoint(): string {
+  return CHAT_BASE_URL;
 }
 
 const OLLAMA_BASE_URL = CHAT_BASE_URL;

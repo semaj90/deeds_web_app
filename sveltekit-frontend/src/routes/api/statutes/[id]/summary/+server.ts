@@ -9,7 +9,7 @@ import { db } from '$lib/server/db/client';
 import { statutes, statuteChunks } from '$lib/server/db/schema-postgres';
 import { eq } from 'drizzle-orm';
 import { ENV } from '$lib/server/env.server.js';
-import { getChatModelKeepAlive, ollamaFetch } from '$lib/server/ollama.js';
+import { getChatModelKeepAlive, getOllamaGenerationEndpoint, ollamaFetch } from '$lib/server/ollama.js';
 import { redis } from '$lib/server/redis.js';
 import { isUuid } from '$lib/server/validation.js';
 const CACHE_TTL = 86400; // 24 hours
@@ -79,7 +79,7 @@ Respond in JSON format:
 }`;
 
   try {
-    const res = await ollamaFetch(`${ENV.OLLAMA_BASE_URL}/api/generate`, {
+    const res = await ollamaFetch(`${getOllamaGenerationEndpoint()}/api/generate`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -165,3 +165,5 @@ Respond in JSON format:
     );
   }
 };
+
+

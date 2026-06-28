@@ -85,11 +85,11 @@ export const POST: RequestHandler = async (event) => {
 		}
 
 		// ── Ollama Inference (gemma3:270m = 4.5s, gemma4-rotorquant:latest = 25s) ──
-		const { ollamaFetch } = await import('$lib/server/ollama.js');
+		const { ollamaFetch, getOllamaGenerationEndpoint } = await import('$lib/server/ollama.js');
 		const { ENV } = await import('$lib/server/env.server.js');
 
 		const inferenceStart = performance.now();
-		const res = await ollamaFetch(`${ENV.OLLAMA_BASE_URL}/api/generate`, {
+		const res = await ollamaFetch(`${getOllamaGenerationEndpoint()}/api/generate`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({
@@ -147,3 +147,5 @@ Return JSON: { "analysis": "...", "suggestions": ["...", "..."] }`,
 		return json({ analysis: 'Analysis failed', suggestions: [] }, { status: 500 });
 	}
 };
+
+

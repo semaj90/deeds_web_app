@@ -53,7 +53,7 @@ import { evaluateResponse, generateCorrectionPrompt } from '$lib/server/ace/self
 import { rabbitmq } from '$lib/server/queue/rabbitmq-manager-fixed.js';
 import { dispatchOrExecuteInline } from '$lib/server/queue/dispatch-inline.js';
 import { createHash } from 'crypto';
-import { ollamaFetch } from '$lib/server/ollama.js';
+import { ollamaFetch, getOllamaChatEndpoint } from '$lib/server/ollama.js';
 import { routeInference } from '$lib/server/inference/inference-router.js';
 import { trackTokenUsage } from '$lib/server/ai/token-tracker.js';
 import { orderByDependency, extractCitationRefs } from '$lib/server/retrieval/document-dag.js';
@@ -357,7 +357,7 @@ async function callOllama(
       }
 
       // Direct Ollama (default path — Bifrost skipped due to 30s timeout constraint)
-      const res = await ollamaFetch(`${ENV.OLLAMA_BASE_URL}/api/chat`, {
+      const res = await ollamaFetch(`${getOllamaChatEndpoint()}/api/chat`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -553,7 +553,7 @@ async function handleStream(body: SynthesisRequest, userId: string): Promise<Res
         sendEvent('synthesis_started', { model: MODEL, maxTokens });
 
         const userPrompt = `${acePrompt.contextWindow}\n\nQuestion: ${query}\n\nProvide a comprehensive legal analysis. Include [Source N] citations where applicable.`;
-        const genRes = await ollamaFetch(`${ENV.OLLAMA_BASE_URL}/api/chat`, {
+        const genRes = await ollamaFetch(`${getOllamaChatEndpoint()}/api/chat`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({

@@ -2,6 +2,7 @@ import type { RequestHandler } from './$types';
 import { json } from '@sveltejs/kit';
 import { z } from 'zod';
 import { ENV } from '$lib/server/env.server.js';
+import { getOllamaChatEndpoint } from '$lib/server/utils/ollama-endpoint.js';
 import { ollamaFetch } from '$lib/server/ollama.js';
 import { TIMEOUTS } from '$lib/server/timeouts.js';
 
@@ -23,7 +24,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 
 		const prompt = `Given evidence data for a legal case, suggest how to organize and group related evidence items on an investigation board. Respond with a JSON array of suggestions, each with: { "type": "group"|"link"|"highlight", "description": string, "targetIds": string[] }`;
 
-		const res = await ollamaFetch(`${ENV.OLLAMA_BASE_URL}/api/chat`, {
+		const res = await ollamaFetch(`${getOllamaChatEndpoint()}/api/chat`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({

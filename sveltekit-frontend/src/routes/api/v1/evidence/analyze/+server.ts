@@ -1,6 +1,7 @@
 import type { RequestHandler } from './$types';
 import { json } from '@sveltejs/kit';
 import { ENV } from '$lib/server/env.server.js';
+import { getOllamaChatEndpoint } from '$lib/server/utils/ollama-endpoint.js';
 import { z } from 'zod';
 import { ollamaFetch } from '$lib/server/ollama.js';
 const safeJsonPost = (await import('$lib/server/utils/safe-json-post.js')).default as unknown as <
@@ -46,7 +47,7 @@ Evidence text:
 ${textToAnalyze.slice(0, 2000)}`;
 
     const data = await safeJsonPost<any>(
-      `${ENV.OLLAMA_BASE_URL}/api/chat`,
+      `${getOllamaChatEndpoint()}/api/chat`,
       {
         model: 'gemma4-rotorquant:latest',
         messages: [

@@ -3,7 +3,7 @@ import type { RequestHandler } from './$types';
 import { assembleACEContext, buildACEPromptCached } from '$lib/server/ace/context-assembler.js';
 import { ENV } from '$lib/server/env.server.js';
 import { z } from 'zod';
-import { ollamaFetch } from '$lib/server/ollama.js';
+import { ollamaFetch, getOllamaGenerationEndpoint } from '$lib/server/ollama.js';
 
 const aceSummarizeSchema = z.object({
 	evidenceId: z.string().uuid().optional(),
@@ -65,7 +65,7 @@ Format as JSON:
 		const acePrompt = await buildACEPromptCached(context, summaryPrompt);
 
 		// Call Ollama with ACE-enhanced prompt + Zod-derived structured output
-		const response = await ollamaFetch(`${ENV.OLLAMA_BASE_URL}/api/generate`, {
+		const response = await ollamaFetch(`${getOllamaGenerationEndpoint()}/api/generate`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({
@@ -131,3 +131,6 @@ Format as JSON:
 		);
 	}
 };
+
+
+

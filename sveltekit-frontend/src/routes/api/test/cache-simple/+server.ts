@@ -8,8 +8,7 @@
 import { json } from '@sveltejs/kit';
 import { dev } from '$app/environment';
 import type { RequestHandler } from './$types';
-import { ollamaFetch } from '$lib/server/ollama.js';
-import { ENV } from '$lib/server/env.server.js';
+import { ollamaFetch, getOllamaChatEndpoint } from '$lib/server/ollama.js';
 import {
   generateCacheKey,
   getExactMatchCache,
@@ -61,7 +60,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
       } else {
         // L1 miss → call Ollama directly
         tier = 'L3-Ollama';
-        const ollamaRes = await ollamaFetch(`${ENV.OLLAMA_BASE_URL}/api/chat`, {
+        const ollamaRes = await ollamaFetch(`${getOllamaChatEndpoint()}/api/chat`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({

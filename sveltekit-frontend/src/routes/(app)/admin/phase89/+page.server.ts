@@ -1,6 +1,6 @@
 import { db } from '$lib/server/db/client';
 import { ENV } from '$lib/server/env.server.js';
-import { ollamaFetch } from '$lib/server/ollama.js';
+import { ollamaFetch, getOllamaGenerationEndpoint } from '$lib/server/ollama.js';
 import { sql } from 'drizzle-orm';
 import type { Actions, PageServerLoad } from './$types';
 
@@ -82,7 +82,7 @@ export const actions: Actions = {
         'Format as JSON: { "title": "...", "description": "...", "fix_strategy": "...", "tags": ["..."] }',
       ].join('\n');
 
-      const response = await ollamaFetch(`${ENV.OLLAMA_BASE_URL}/api/generate`, {
+      const response = await ollamaFetch(`${getOllamaGenerationEndpoint()}/api/generate`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -131,3 +131,5 @@ export const actions: Actions = {
     }
   },
 };
+
+

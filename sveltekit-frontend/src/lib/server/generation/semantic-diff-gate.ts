@@ -14,7 +14,7 @@
  */
 
 import { createHash } from 'crypto';
-import { getRedis } from '$lib/server/cache/valkey-client.js';
+import { getRedis } from '$lib/server/redis.js';
 import { ollamaFetch } from '$lib/server/ollama.js';
 import { db } from '$lib/server/db/client.js';
 import { atlas_semantic_diffs } from '$lib/server/db/schema-postgres.js';
@@ -203,7 +203,7 @@ export async function cacheSummaryEmbedding(
   summaryHash: string,
   embedding: number[]
 ): Promise<void> {
-  const redis = await getRedis();
+  const redis = getRedis();
   const key = `semantic:embedding:${summaryHash}`;
   const ttl = 86400 * 7; // 7 days
 
@@ -215,7 +215,7 @@ export async function cacheSummaryEmbedding(
 }
 
 export async function getCachedSummaryEmbedding(summaryHash: string): Promise<number[] | null> {
-  const redis = await getRedis();
+  const redis = getRedis();
   const key = `semantic:embedding:${summaryHash}`;
 
   try {

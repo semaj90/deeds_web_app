@@ -8,7 +8,7 @@ import type { RequestHandler } from './$types';
 import { db } from '$lib/server/db/client';
 import { reports } from '$lib/server/db/schema';
 import { ENV } from '$lib/server/env.server.js';
-import { ollamaFetch } from '$lib/server/ollama.js';
+import { ollamaFetch, getOllamaGenerationEndpoint } from '$lib/server/ollama.js';
 import { z } from 'zod';
 
 const policeReportSchema = z.object({
@@ -56,7 +56,7 @@ Output ONLY HTML content. Use h1, h2, h3, p, ul, li, strong, em tags.`;
 
 		// Try LLM generation
 		try {
-			const res = await ollamaFetch(`${ENV.OLLAMA_BASE_URL}/api/generate`, {
+			const res = await ollamaFetch(`${getOllamaGenerationEndpoint()}/api/generate`, {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify({
@@ -123,3 +123,5 @@ ${evidence.length > 0
 		return json({ error: 'Failed to generate police report' }, { status: 500 });
 	}
 };
+
+

@@ -35,7 +35,7 @@ import {
 } from '$lib/server/analytics/research-cache.js';
 import { getRedis } from '$lib/server/redis.js';
 import { ENV } from '$lib/server/env.server.js';
-import { ollamaFetch } from '$lib/server/ollama.js';
+import { ollamaFetch, getOllamaGenerationEndpoint } from '$lib/server/ollama.js';
 
 // ── Param schema ───────────────────────────────────────────────────────────────
 
@@ -116,7 +116,7 @@ async function generatePromptChain(
 		`Output ONLY the ${depth} questions, one per line, no numbering, no extra text.`;
 
 	try {
-		const res = await ollamaFetch(`${ENV.OLLAMA_BASE_URL}/api/generate`, {
+		const res = await ollamaFetch(`${getOllamaGenerationEndpoint()}/api/generate`, {
 			method:  'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({
@@ -292,3 +292,5 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 
 	return json({ error: 'Unknown action' }, { status: 400 });
 };
+
+

@@ -1,0 +1,205 @@
+{
+  "label": "Phase 85a Test Suite",
+  "tasks": [
+    {
+      "label": "🧪 Phase 85a: Test Single Packet Summary",
+      "type": "shell",
+      "command": "pwsh",
+      "args": [
+        "-NoProfile",
+        "-Command",
+        "curl.exe -s -X POST http://localhost:5173/api/atlas/summary -H 'Content-Type: application/json' -d @-  | ConvertFrom-Json | ConvertTo-Json -Depth 5 | Tee-Object -FilePath '.tmp/phase85a-test-single.json' | Write-Host -ForegroundColor Green"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}",
+        "shell": {
+          "executable": "pwsh",
+          "args": []
+        }
+      },
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": true,
+        "panel": "new"
+      },
+      "detail": "Test Phase 85a API with single packet. Logs to .tmp/phase85a-test-single.json. Check response for: recommendation, similarity, action_taken, errors.",
+      "group": {
+        "kind": "test",
+        "isDefault": false
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "🧪 Phase 85a: Test Batch (10 packets)",
+      "type": "shell",
+      "command": "node",
+      "args": [
+        "scripts/phase85/test-batch-10.mjs"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": true,
+        "panel": "new"
+      },
+      "detail": "Test Phase 85a batch API with 10 packets. Logs to .tmp/phase85a-batch-10.json. Measures: total time, success rate, avg similarity, gating breakdown.",
+      "group": {
+        "kind": "test",
+        "isDefault": false
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "🧪 Phase 85a: Test Batch (500 packets)",
+      "type": "shell",
+      "command": "node",
+      "args": [
+        "scripts/phase85/test-batch-500.mjs"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": true,
+        "panel": "new"
+      },
+      "detail": "Test Phase 85a batch API with 500 packets from atlas_packets. Logs to .tmp/phase85a-batch-500.json. WARNING: Takes ~5-10 minutes. Measures throughput, cost savings, gate distribution.",
+      "group": {
+        "kind": "test",
+        "isDefault": false
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "🧪 Phase 85a: Verify Database (artifacts)",
+      "type": "shell",
+      "command": "pwsh",
+      "args": [
+        "-NoProfile",
+        "-Command",
+        "$c = docker exec legal-ai-postgres psql -U legal_admin -d legal_ai_db -c \"SELECT COUNT(*) as total, COUNT(CASE WHEN status='generated' THEN 1 END) as generated, COUNT(CASE WHEN status='superseded' THEN 1 END) as superseded FROM atlas_artifacts;\" | Select-Object -Skip 2; Write-Host 'atlas_artifacts:' -ForegroundColor Green; $c | Write-Host"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": true,
+        "panel": "new"
+      },
+      "detail": "Show atlas_artifacts table stats: total rows, generated status, superseded status.",
+      "group": {
+        "kind": "test",
+        "isDefault": false
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "🧪 Phase 85a: Verify Database (semantic_diffs)",
+      "type": "shell",
+      "command": "pwsh",
+      "args": [
+        "-NoProfile",
+        "-Command",
+        "$c = docker exec legal-ai-postgres psql -U legal_admin -d legal_ai_db -c \"SELECT recommendation, COUNT(*) as count FROM atlas_semantic_diffs GROUP BY recommendation ORDER BY count DESC;\" | Select-Object -Skip 2; Write-Host 'atlas_semantic_diffs by recommendation:' -ForegroundColor Green; $c | Write-Host"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": true,
+        "panel": "new"
+      },
+      "detail": "Show atlas_semantic_diffs distribution: count by recommendation (skip, metadata_only, regenerate, gan_review, full_regeneration).",
+      "group": {
+        "kind": "test",
+        "isDefault": false
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "🧪 Phase 85a: Tail Test Logs",
+      "type": "shell",
+      "command": "pwsh",
+      "args": [
+        "-NoProfile",
+        "-Command",
+        "Write-Host 'Tailing Phase 85a test logs (.tmp/phase85a-*.log)...' -ForegroundColor Cyan; Get-ChildItem .tmp/phase85a-*.log -ErrorAction SilentlyContinue | Sort-Object LastWriteTime -Descending | Select-Object -First 1 | ForEach-Object { Get-Content $_.FullName -Tail 50 -Wait }"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "isBackground": true,
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": true,
+        "panel": "new"
+      },
+      "detail": "Live tail of most recent Phase 85a test log. Press Ctrl+C to stop.",
+      "group": {
+        "kind": "test",
+        "isDefault": false
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "🧪 Phase 85a: Show Cost Savings Report",
+      "type": "shell",
+      "command": "pwsh",
+      "args": [
+        "-NoProfile",
+        "-Command",
+        "if (Test-Path .tmp/phase85a-batch-500.json) { $data = Get-Content .tmp/phase85a-batch-500.json | ConvertFrom-Json; Write-Host 'Phase 85a Cost Savings Report:' -ForegroundColor Green; Write-Host \"Total packets: $($data.total_packets)\"; Write-Host \"Skipped (100% cost): $($data.gates.skip) packets\"; Write-Host \"Metadata only (80% cost): $($data.gates.metadata_only) packets\"; Write-Host \"Regenerated: $($data.gates.regenerate + $data.gates.gan_review + $data.gates.full_regeneration) packets\"; Write-Host \"Total cost saved: $([Math]::Round($data.total_cost_saved_percent, 1))%\"; Write-Host \"Avg similarity: $(([Math]::Round($data.avg_similarity, 3)))\"; } else { Write-Host '.tmp/phase85a-batch-500.json not found. Run test batch first.' -ForegroundColor Yellow }"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": true,
+        "panel": "new"
+      },
+      "detail": "Parse batch-500 results and show cost savings breakdown by gating decision.",
+      "group": {
+        "kind": "test",
+        "isDefault": false
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "🧪 Phase 85a: Performance Benchmark",
+      "type": "shell",
+      "command": "node",
+      "args": [
+        "-e",
+        "console.time('Phase 85a benchmark'); const tests = [1, 10, 50, 100, 500]; for (const n of tests) { const start = Date.now(); fetch('http://localhost:5173/api/atlas/summary', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({packet_key: 'bench-' + n, source_ref: 'test', context: 'test'.repeat(20), git_commit: '0'.repeat(40)}) }).then(r => r.json()).then(d => console.log(`${n} packets: ${Date.now() - start}ms, recommendation: ${d.recommendation}`)).catch(e => console.log(`${n}: ${e.message}`)); } setTimeout(() => console.timeEnd('Phase 85a benchmark'), 10000);"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": true,
+        "panel": "new"
+      },
+      "detail": "Benchmark Phase 85a API latency with sequential requests. Shows time per packet and recommendation type.",
+      "group": {
+        "kind": "test",
+        "isDefault": false
+      },
+      "problemMatcher": []
+    }
+  ]
+}

@@ -24,7 +24,7 @@ import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { z } from 'zod';
 import { ENV } from '$lib/server/env.server.js';
-import { ollamaFetch } from '$lib/server/ollama.js';
+import { ollamaFetch, getOllamaGenerationEndpoint } from '$lib/server/ollama.js';
 import { createHash } from 'crypto';
 import { readFile } from 'fs/promises';
 import { resolve } from 'path';
@@ -127,7 +127,7 @@ Respond with JSON only:
   "dependencies": ["key", "imports", "this", "file", "uses"]
 }`;
 
-		const res = await ollamaFetch(`${ENV.OLLAMA_BASE_URL}/api/generate`, {
+		const res = await ollamaFetch(`${getOllamaGenerationEndpoint()}/api/generate`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({
@@ -381,3 +381,5 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 		return json({ error: 'Auto-research failed' }, { status: 500 });
 	}
 };
+
+

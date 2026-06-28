@@ -37,7 +37,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 		}
 
 		const { sections, keyInsights, sourceRefs, featureIds, intent, promptVersion, model } = parsed.data;
-		const { ollamaFetch } = await import('$lib/server/ollama.js');
+		const { ollamaFetch, getOllamaGenerationEndpoint } = await import('$lib/server/ollama.js');
 		const { ENV } = await import('$lib/server/env.server.js');
 
 		const result = await runPhase101SummaryCache(
@@ -52,7 +52,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 				model
 			},
 			async (ctx): Promise<Phase101SummaryGeneration> => {
-				const res = await ollamaFetch(`${ENV.OLLAMA_BASE_URL}/api/generate`, {
+				const res = await ollamaFetch(`${getOllamaGenerationEndpoint()}/api/generate`, {
 					method: 'POST',
 					headers: { 'Content-Type': 'application/json' },
 					body: JSON.stringify({
@@ -130,3 +130,5 @@ Return JSON: {
 		return json({ synthesis: null }, { status: 500 });
 	}
 };
+
+

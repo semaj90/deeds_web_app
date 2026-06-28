@@ -4970,5 +4970,6 @@ export type ChunkHitLog = typeof chunkHitLog.$inferSelect;
 export type NewChunkHitLog = typeof chunkHitLog.$inferInsert;
 
 export * from './schema/atlas-packets.js';
-
+export * from './schema/atlas-artifacts.js';
+export * from './schema/atlas-semantic-diffs.js';
 

@@ -43,7 +43,7 @@ function checkThinkingLeaks(summary: string): string | null {
     /<\|begin_of_thought/gi,
     /<\|start_thinking/gi,
     /\[\THINK\]/gi,
-    /\[/thinking\]/gi,
+    /\[\/thinking\]/gi,
     /<reasoning>/gi,
     /<justification>/gi,
   ];
@@ -205,7 +205,7 @@ export async function scanAllSummaries(): Promise<BadSummaryReport> {
     for (const packet of packets) {
       if (!packet.summary) continue;
 
-      const issues = scanSummary(packet.packet_key, packet.summary);
+      const issues = scanSummary(packet.packetKey, packet.summary);
       if (issues.length > 0) {
         report.bad_count++;
         report.issues.push(...issues);

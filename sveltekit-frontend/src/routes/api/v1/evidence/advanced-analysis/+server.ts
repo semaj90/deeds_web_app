@@ -42,7 +42,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 		const text = item.description || item.title || '';
 		const results: Record<string, unknown> = {};
 
-		const { ollamaFetch } = await import('$lib/server/ollama.js');
+		const { ollamaFetch, getOllamaGenerationEndpoint } = await import('$lib/server/ollama.js');
 		const { ENV } = await import('$lib/server/env.server.js');
 
 		for (const type of analysisTypes) {
@@ -56,7 +56,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 			};
 
 			try {
-				const res = await ollamaFetch(`${ENV.OLLAMA_BASE_URL}/api/generate`, {
+				const res = await ollamaFetch(`${getOllamaGenerationEndpoint()}/api/generate`, {
 					method: 'POST',
 					headers: { 'Content-Type': 'application/json' },
 					body: JSON.stringify({
@@ -89,3 +89,5 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 		return json({ error: 'Analysis failed' }, { status: 500 });
 	}
 };
+
+

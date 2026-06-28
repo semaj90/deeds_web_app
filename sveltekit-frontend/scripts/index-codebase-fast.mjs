@@ -498,11 +498,27 @@ let dbTableCount   = 0;
 let todoCount      = 0;
 
 const META_CACHE_VERSION = 'v23'; // bumped 2026-06-11 — invalidate cache for requireUser updates
+const CAN_WRITE_PROGRESS = Boolean(process.stdout?.isTTY && !process.stdout.destroyed);
+
+if (process.stdout?.on) {
+  process.stdout.on('error', (error) => {
+    if (error?.code !== 'EPIPE') throw error;
+  });
+}
+
+function writeProgress(message) {
+  if (!CAN_WRITE_PROGRESS) return;
+  try {
+    process.stdout.write(message);
+  } catch (error) {
+    if (error?.code !== 'EPIPE') throw error;
+  }
+}
 
 let processed = 0;
 for (const filePath of walk(scanRoot)) {
   processed++;
-  if (processed % 100 === 0) process.stdout.write(`\r   Indexed ${processed} files...`);
+  if (processed % 100 === 0) writeProgress(`\r   Indexed ${processed} files...`);
 
 
 
@@ -583,7 +599,8 @@ for (const dirName of EXTRA_INDEX_DIRS) {
   if (!fs.existsSync(dir)) continue;
   for (const filePath of walk(dir)) {
     processed++;
-    if (processed % 100 === 0) process.stdout.write(`\r   Indexed ${processed} files...`);
+  if (processed % 100 === 0) process.stdout.write(`\r   Indexed ${processed} files...`);
+  if (processed % 100 === 0) writeProgress(`\r   Indexed ${processed} files...`);
 
 
     let src;

@@ -1,11 +1,17 @@
 /**
  * Server endpoint helpers — re-exports canonical implementations.
  *
- * getOllamaEndpoint → ollama.ts (canonical, Docker-aware)
+ * getOllamaEndpoint / getOllamaEmbeddingEndpoint / getOllamaGenerationEndpoint
+ * → ollama.ts (canonical, Docker-aware)
  */
 import { ENV } from '$lib/server/env.server.js';
 
-export { getOllamaEndpoint } from '$lib/server/ollama.js';
+export {
+  getOllamaEndpoint,
+  getOllamaEmbeddingEndpoint,
+  getOllamaGenerationEndpoint,
+  getOllamaChatEndpoint,
+} from '$lib/server/ollama.js';
 
 /**
  * Docker-first endpoint helpers for server code

@@ -3,8 +3,8 @@ import { spawnSync } from 'node:child_process';
 import { mkdirSync, existsSync, statSync, writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import dotenv from 'dotenv';
 import Redis from 'ioredis';
+import { loadRepoEnv } from '../../../scripts/atlas/connection-config.mjs';
 import { resolveRedisConfig } from '../lib/redis-url.mjs';
 
 const __dirname = resolve(fileURLToPath(import.meta.url), '..');
@@ -19,10 +19,9 @@ const COOLDOWN_SEC = 3600;
 const INCLUDE_SEMANTIC_REFRESH = /^(1|true|yes|on)$/i.test(process.env.GRAPHIFY_DAILY_INCLUDE_SEMANTIC ?? '');
 const SEMANTIC_REFRESH_SCRIPT = process.env.GRAPHIFY_DAILY_SEMANTIC_SCRIPT?.trim() || 'graphify:semantic';
 
-// Load the frontend env before spawning graphify so Redis/Qdrant/Postgres
-// auth and host values are available to every nested npm script.
-dotenv.config({ path: resolve(ROOT, '.env'), override: false });
-dotenv.config({ path: resolve(ROOT, '.env.local'), override: false });
+// Load repo + frontend env through the shared Atlas helper so .env.local
+// can override .env consistently for every nested startup script.
+Object.assign(process.env, loadRepoEnv(process.env));
 
 mkdirSync(LOG_DIR, { recursive: true });
 mkdirSync(TMP_DIR, { recursive: true });
@@ -64,11 +63,16 @@ function spawnNpmScript(scriptName) {
       });
 }
 async function preflightRedisAuth() {
+  const config = resolveRedisConnection();
   const redis = new Redis({
-    ...resolveRedisConnection(),
+    host: config.host,
+    port: config.port,
+    ...(config.password ? { password: config.password } : {}),
     lazyConnect: true,
     connectTimeout: 3000,
     maxRetriesPerRequest: 1,
+    enableOfflineQueue: false,
+    retryStrategy: () => null,
   });
   const onError = () => {};
   redis.on('error', onError);

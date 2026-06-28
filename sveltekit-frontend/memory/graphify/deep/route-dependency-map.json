@@ -95,6 +95,12 @@
     "serverDeps": 0,
     "dbDeps": 0
   },
+  "sveltekit-frontend/src/routes/(app)/admin/phase89/+page.server.ts": {
+    "zone": "shared",
+    "directDeps": 0,
+    "serverDeps": 0,
+    "dbDeps": 0
+  },
   "sveltekit-frontend/src/routes/(app)/cases/[id]/+page.server.ts": {
     "zone": "shared",
     "directDeps": 0,
@@ -162,6 +168,18 @@
     "dbDeps": 0
   },
   "sveltekit-frontend/src/routes/(app)/command-center/codebase/components/[id]/+page.server.ts": {
+    "zone": "shared",
+    "directDeps": 0,
+    "serverDeps": 0,
+    "dbDeps": 0
+  },
+  "sveltekit-frontend/src/routes/(app)/command-center/retrieval/+page.server.ts": {
+    "zone": "shared",
+    "directDeps": 0,
+    "serverDeps": 0,
+    "dbDeps": 0
+  },
+  "sveltekit-frontend/src/routes/(app)/command-center/retrieval/+page.svelte": {
     "zone": "shared",
     "directDeps": 0,
     "serverDeps": 0,
@@ -269,6 +287,12 @@
     "serverDeps": 0,
     "dbDeps": 0
   },
+  "sveltekit-frontend/src/routes/api/ace/summarize/+server.ts": {
+    "zone": "shared",
+    "directDeps": 0,
+    "serverDeps": 0,
+    "dbDeps": 0
+  },
   "sveltekit-frontend/src/routes/api/admin/ai-chat/[sessionId]/+server.ts": {
     "zone": "shared",
     "directDeps": 0,
@@ -288,6 +312,36 @@
     "dbDeps": 0
   },
   "sveltekit-frontend/src/routes/api/admin/observability/+server.ts": {
+    "zone": "shared",
+    "directDeps": 0,
+    "serverDeps": 0,
+    "dbDeps": 0
+  },
+  "sveltekit-frontend/src/routes/api/admin/packets/enrich-labels/+server.ts": {
+    "zone": "shared",
+    "directDeps": 0,
+    "serverDeps": 0,
+    "dbDeps": 0
+  },
+  "sveltekit-frontend/src/routes/api/admin/retrieval/clusters/+server.ts": {
+    "zone": "shared",
+    "directDeps": 0,
+    "serverDeps": 0,
+    "dbDeps": 0
+  },
+  "sveltekit-frontend/src/routes/api/admin/retrieval/clusters/[id]/+server.ts": {
+    "zone": "shared",
+    "directDeps": 0,
+    "serverDeps": 0,
+    "dbDeps": 0
+  },
+  "sveltekit-frontend/src/routes/api/admin/retrieval/search/+server.ts": {
+    "zone": "shared",
+    "directDeps": 0,
+    "serverDeps": 0,
+    "dbDeps": 0
+  },
+  "sveltekit-frontend/src/routes/api/admin/summaries/scan-quality/+server.ts": {
     "zone": "shared",
     "directDeps": 0,
     "serverDeps": 0,
@@ -377,6 +431,12 @@
     "serverDeps": 0,
     "dbDeps": 0
   },
+  "sveltekit-frontend/src/routes/api/ai/generate-image/+server.ts": {
+    "zone": "shared",
+    "directDeps": 0,
+    "serverDeps": 0,
+    "dbDeps": 0
+  },
   "sveltekit-frontend/src/routes/api/ai/generate-report/[scope]/+server.ts": {
     "zone": "shared",
     "directDeps": 0,
@@ -443,6 +503,12 @@
     "serverDeps": 0,
     "dbDeps": 0
   },
+  "sveltekit-frontend/src/routes/api/analytics/research-topics/+server.ts": {
+    "zone": "shared",
+    "directDeps": 0,
+    "serverDeps": 0,
+    "dbDeps": 0
+  },
   "sveltekit-frontend/src/routes/api/atlas/audit/+server.ts": {
     "zone": "shared",
     "directDeps": 0,
@@ -456,6 +522,12 @@
     "dbDeps": 0
   },
   "sveltekit-frontend/src/routes/api/atlas/cards/[id]/+server.ts": {
+    "zone": "shared",
+    "directDeps": 0,
+    "serverDeps": 0,
+    "dbDeps": 0
+  },
+  "sveltekit-frontend/src/routes/api/atlas/gan-audit/deep/+server.ts": {
     "zone": "shared",
     "directDeps": 0,
     "serverDeps": 0,
@@ -503,7 +575,19 @@
     "serverDeps": 0,
     "dbDeps": 0
   },
+  "sveltekit-frontend/src/routes/api/atlas/summary/+server.ts": {
+    "zone": "shared",
+    "directDeps": 0,
+    "serverDeps": 0,
+    "dbDeps": 0
+  },
   "sveltekit-frontend/src/routes/api/audio/analysis/[evidenceId]/+server.ts": {
+    "zone": "shared",
+    "directDeps": 0,
+    "serverDeps": 0,
+    "dbDeps": 0
+  },
+  "sveltekit-frontend/src/routes/api/cache/bitfrost-effectiveness/+server.ts": {
     "zone": "shared",
     "directDeps": 0,
     "serverDeps": 0,
@@ -534,6 +618,12 @@
     "dbDeps": 0
   },
   "sveltekit-frontend/src/routes/api/cases/[id]/chat/+server.ts": {
+    "zone": "shared",
+    "directDeps": 0,
+    "serverDeps": 0,
+    "dbDeps": 0
+  },
+  "sveltekit-frontend/src/routes/api/cases/[id]/key-points/+server.ts": {
     "zone": "shared",
     "directDeps": 0,
     "serverDeps": 0,
@@ -605,6 +695,12 @@
     "serverDeps": 0,
     "dbDeps": 0
   },
+  "sveltekit-frontend/src/routes/api/codebase/auto-research/+server.ts": {
+    "zone": "shared",
+    "directDeps": 0,
+    "serverDeps": 0,
+    "dbDeps": 0
+  },
   "sveltekit-frontend/src/routes/api/codebase/rerank/+server.ts": {
     "zone": "shared",
     "directDeps": 0,
@@ -659,6 +755,18 @@
     "serverDeps": 0,
     "dbDeps": 0
   },
+  "sveltekit-frontend/src/routes/api/error-brain/generate-fix/+server.ts": {
+    "zone": "shared",
+    "directDeps": 0,
+    "serverDeps": 0,
+    "dbDeps": 0
+  },
+  "sveltekit-frontend/src/routes/api/evidence/ai/analyze/+server.ts": {
+    "zone": "shared",
+    "directDeps": 0,
+    "serverDeps": 0,
+    "dbDeps": 0
+  },
   "sveltekit-frontend/src/routes/api/evidence/tags/[id]/+server.ts": {
     "zone": "shared",
     "directDeps": 0,
@@ -683,6 +791,12 @@
     "serverDeps": 0,
     "dbDeps": 0
   },
+  "sveltekit-frontend/src/routes/api/evidence/[id]/key-points/+server.ts": {
+    "zone": "shared",
+    "directDeps": 0,
+    "serverDeps": 0,
+    "dbDeps": 0
+  },
   "sveltekit-frontend/src/routes/api/evidence/[id]/versions/+server.ts": {
     "zone": "shared",
     "directDeps": 0,
@@ -701,6 +815,12 @@
     "serverDeps": 0,
     "dbDeps": 0
   },
+  "sveltekit-frontend/src/routes/api/glyph/generate/+server.ts": {
+    "zone": "shared",
+    "directDeps": 0,
+    "serverDeps": 0,
+    "dbDeps": 0
+  },
   "sveltekit-frontend/src/routes/api/health/+server.ts": {
     "zone": "shared",
     "directDeps": 0,
@@ -714,6 +834,12 @@
     "dbDeps": 0
   },
   "sveltekit-frontend/src/routes/api/indexing/queue/+server.ts": {
+    "zone": "shared",
+    "directDeps": 0,
+    "serverDeps": 0,
+    "dbDeps": 0
+  },
+  "sveltekit-frontend/src/routes/api/investigate/suggest/+server.ts": {
     "zone": "shared",
     "directDeps": 0,
     "serverDeps": 0,
@@ -750,6 +876,12 @@
     "dbDeps": 0
   },
   "sveltekit-frontend/src/routes/api/mcp/select-tools/+server.ts": {
+    "zone": "shared",
+    "directDeps": 0,
+    "serverDeps": 0,
+    "dbDeps": 0
+  },
+  "sveltekit-frontend/src/routes/api/ollama/generate/+server.ts": {
     "zone": "shared",
     "directDeps": 0,
     "serverDeps": 0,
@@ -815,6 +947,12 @@
     "serverDeps": 0,
     "dbDeps": 0
   },
+  "sveltekit-frontend/src/routes/api/phase72/similar/+server.ts": {
+    "zone": "shared",
+    "directDeps": 0,
+    "serverDeps": 0,
+    "dbDeps": 0
+  },
   "sveltekit-frontend/src/routes/api/phase89/node/[id]/docs/+server.ts": {
     "zone": "shared",
     "directDeps": 0,
@@ -858,6 +996,18 @@
     "dbDeps": 0
   },
   "sveltekit-frontend/src/routes/api/recommendations/[userId]/+server.ts": {
+    "zone": "shared",
+    "directDeps": 0,
+    "serverDeps": 0,
+    "dbDeps": 0
+  },
+  "sveltekit-frontend/src/routes/api/reports/generate-from-template/+server.ts": {
+    "zone": "shared",
+    "directDeps": 0,
+    "serverDeps": 0,
+    "dbDeps": 0
+  },
+  "sveltekit-frontend/src/routes/api/reports/police/+server.ts": {
     "zone": "shared",
     "directDeps": 0,
     "serverDeps": 0,
@@ -911,6 +1061,12 @@
     "serverDeps": 0,
     "dbDeps": 0
   },
+  "sveltekit-frontend/src/routes/api/simulation/[sessionId]/+server.ts": {
+    "zone": "shared",
+    "directDeps": 0,
+    "serverDeps": 0,
+    "dbDeps": 0
+  },
   "sveltekit-frontend/src/routes/api/simulation/[sessionId]/keyframes/+server.ts": {
     "zone": "shared",
     "directDeps": 0,
@@ -935,7 +1091,25 @@
     "serverDeps": 0,
     "dbDeps": 0
   },
+  "sveltekit-frontend/src/routes/api/statutes/[id]/summary/+server.ts": {
+    "zone": "shared",
+    "directDeps": 0,
+    "serverDeps": 0,
+    "dbDeps": 0
+  },
+  "sveltekit-frontend/src/routes/api/summarize/analyze/+server.ts": {
+    "zone": "shared",
+    "directDeps": 0,
+    "serverDeps": 0,
+    "dbDeps": 0
+  },
   "sveltekit-frontend/src/routes/api/summarize/synthesize/+server.ts": {
+    "zone": "shared",
+    "directDeps": 0,
+    "serverDeps": 0,
+    "dbDeps": 0
+  },
+  "sveltekit-frontend/src/routes/api/synthesis/generate/+server.ts": {
     "zone": "shared",
     "directDeps": 0,
     "serverDeps": 0,
@@ -977,6 +1151,12 @@
     "serverDeps": 0,
     "dbDeps": 0
   },
+  "sveltekit-frontend/src/routes/api/test/cache-simple/+server.ts": {
+    "zone": "shared",
+    "directDeps": 0,
+    "serverDeps": 0,
+    "dbDeps": 0
+  },
   "sveltekit-frontend/src/routes/api/tools/rpc-search/+server.ts": {
     "zone": "shared",
     "directDeps": 0,
@@ -989,7 +1169,37 @@
     "serverDeps": 0,
     "dbDeps": 0
   },
+  "sveltekit-frontend/src/routes/api/v1/agentic/tool-loop/+server.ts": {
+    "zone": "shared",
+    "directDeps": 0,
+    "serverDeps": 0,
+    "dbDeps": 0
+  },
+  "sveltekit-frontend/src/routes/api/v1/ai/canvas-suggestions/+server.ts": {
+    "zone": "shared",
+    "directDeps": 0,
+    "serverDeps": 0,
+    "dbDeps": 0
+  },
+  "sveltekit-frontend/src/routes/api/v1/ai/summarize-async/+server.ts": {
+    "zone": "shared",
+    "directDeps": 0,
+    "serverDeps": 0,
+    "dbDeps": 0
+  },
   "sveltekit-frontend/src/routes/api/v1/chat/completions/+server.ts": {
+    "zone": "shared",
+    "directDeps": 0,
+    "serverDeps": 0,
+    "dbDeps": 0
+  },
+  "sveltekit-frontend/src/routes/api/v1/evidence/advanced-analysis/+server.ts": {
+    "zone": "shared",
+    "directDeps": 0,
+    "serverDeps": 0,
+    "dbDeps": 0
+  },
+  "sveltekit-frontend/src/routes/api/v1/evidence/analyze/+server.ts": {
     "zone": "shared",
     "directDeps": 0,
     "serverDeps": 0,

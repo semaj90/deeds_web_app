@@ -14,7 +14,7 @@ import { getRedis } from '$lib/server/redis.js';
 import { isUuid } from '$lib/server/validation.js';
 import { z } from 'zod';
 import { ENV } from '$lib/server/env.server.js';
-import { ollamaFetch } from '$lib/server/ollama.js';
+import { ollamaFetch, getOllamaChatEndpoint } from '$lib/server/ollama.js';
 import type { SimulationSession } from '../+server';
 
 const SESSION_PREFIX = 'sim:session:';
@@ -382,7 +382,7 @@ RULES:
 		: `Recent proceedings:\n${recentDialogue}\n\nContinue the ${phase.replace(/_/g, ' ')} phase. Deliver your next statement as ${speaker}.`;
 
 	try {
-		const res = await ollamaFetch(`${ENV.OLLAMA_BASE_URL}/api/chat`, {
+		const res = await ollamaFetch(`${getOllamaChatEndpoint()}/api/chat`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({

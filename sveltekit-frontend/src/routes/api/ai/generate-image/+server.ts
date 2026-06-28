@@ -31,10 +31,10 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 
 		// Generate a text-based visualization descriptor via LLM
 		// (No local image generation model available — return SVG placeholder)
-		const { ollamaFetch } = await import('$lib/server/ollama.js');
+		const { ollamaFetch, getOllamaGenerationEndpoint } = await import('$lib/server/ollama.js');
 		const { ENV } = await import('$lib/server/env.server.js');
 
-		const res = await ollamaFetch(`${ENV.OLLAMA_BASE_URL}/api/generate`, {
+		const res = await ollamaFetch(`${getOllamaGenerationEndpoint()}/api/generate`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({
@@ -74,3 +74,5 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 		return json({ success: false, error: 'Image generation failed' }, { status: 500 });
 	}
 };
+
+

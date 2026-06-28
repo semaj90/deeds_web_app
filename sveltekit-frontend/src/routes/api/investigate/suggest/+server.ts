@@ -15,7 +15,7 @@ import { UserHistoryTracker } from '$lib/server/ml/user-history.js';
 import { ENV } from '$lib/server/env.server.js';
 import { z } from 'zod';
 import { recordSearchQuery } from '$lib/server/analytics/search-analytics.js';
-import { ollamaFetch } from '$lib/server/ollama.js';
+import { ollamaFetch, getOllamaGenerationEndpoint } from '$lib/server/ollama.js';
 
 /** GBNF-constrained response schema for investigation suggestions */
 const suggestResponseSchema = z.array(z.object({
@@ -80,7 +80,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 		// 3. Generate follow-up investigation suggestions with confidence ranking via Ollama
 		let suggestedQueries: Array<{ query: string; confidence: number; reason: string }> = [];
 		try {
-			const res = await ollamaFetch(`${ENV.OLLAMA_BASE_URL}/api/generate`, {
+			const res = await ollamaFetch(`${getOllamaGenerationEndpoint()}/api/generate`, {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify({
@@ -178,3 +178,5 @@ Return ONLY a JSON array:
 		);
 	}
 };
+
+

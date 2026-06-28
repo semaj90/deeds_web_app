@@ -9726,28 +9726,42 @@
     ".claude/worktrees/agent-a38668f2/sveltekit-frontend/tests/wiki-vault-watcher.spec.ts",
     ".claude/worktrees/agent-a38668f2/sveltekit-frontend/tests/wiki-vault-watcher.spec.ts"
   ],
-  "sveltekit-frontend/src/lib/server/gpu/autoencoder-weights.ts": [
-    "sveltekit-frontend/src/lib/server/gpu/autoencoder.test.ts",
-    "sveltekit-frontend/src/lib/server/gpu/autoencoder.test.ts"
+  ".claude/worktrees/agent-a87590c9/sveltekit-frontend/src/lib/server/gpu/autoencoder-weights.ts": [
+    ".claude/worktrees/agent-a87590c9/sveltekit-frontend/src/lib/server/gpu/autoencoder.test.ts",
+    ".claude/worktrees/agent-a87590c9/sveltekit-frontend/src/lib/server/gpu/autoencoder.test.ts"
   ],
-  "sveltekit-frontend/src/routes/api/tags/[tagId]/+server.ts": [
-    "sveltekit-frontend/tests/analytics-tags-nlp-prefs-routes.spec.ts",
-    "sveltekit-frontend/tests/analytics-tags-nlp-prefs-routes.spec.ts",
-    "sveltekit-frontend/tests/routes/auto/api/tags/__tagId.test.ts"
-  ],
-  "sveltekit-frontend/src/routes/api/rag/search/+server.ts": [
-    "sveltekit-frontend/tests/rag-search-ace-route.spec.ts",
-    "sveltekit-frontend/tests/rag-search-ace-route.spec.ts",
-    "sveltekit-frontend/tests/rag-search-ace-route.spec.ts",
-    "sveltekit-frontend/tests/rag-search-ace-route.spec.ts",
-    "sveltekit-frontend/tests/rag-search-ace-route.spec.ts",
-    "sveltekit-frontend/tests/rag-search-ace-route.spec.ts",
-    "sveltekit-frontend/tests/rag-search-ace-route.spec.ts",
-    "sveltekit-frontend/tests/rag-search-ace-route.spec.ts",
-    "sveltekit-frontend/tests/routes/auto/api/rag/search.test.ts"
+  ".claude/worktrees/agent-a87590c9/sveltekit-frontend/src/routes/api/rag/search/+server.ts": [
+    ".claude/worktrees/agent-a87590c9/sveltekit-frontend/tests/rag-search-ace-route.spec.ts",
+    ".claude/worktrees/agent-a87590c9/sveltekit-frontend/tests/rag-search-ace-route.spec.ts",
+    ".claude/worktrees/agent-a87590c9/sveltekit-frontend/tests/rag-search-ace-route.spec.ts",
+    ".claude/worktrees/agent-a87590c9/sveltekit-frontend/tests/rag-search-ace-route.spec.ts",
+    ".claude/worktrees/agent-a87590c9/sveltekit-frontend/tests/rag-search-ace-route.spec.ts",
+    ".claude/worktrees/agent-a87590c9/sveltekit-frontend/tests/rag-search-ace-route.spec.ts",
+    ".claude/worktrees/agent-a87590c9/sveltekit-frontend/tests/rag-search-ace-route.spec.ts",
+    ".claude/worktrees/agent-a87590c9/sveltekit-frontend/tests/rag-search-ace-route.spec.ts"
   ],
   ".claude/worktrees/agent-a87590c9/sveltekit-frontend/src/routes/api/sse/chat/+server.ts": [
-    ".claude/worktrees/agent-a87590c9/sveltekit-frontend/tests/routes/auto/api/sse/chat.test.ts"
+    ".claude/worktrees/agent-a87590c9/sveltekit-frontend/tests/routes/auto/api/sse/chat.test.ts",
+    ".claude/worktrees/agent-a87590c9/sveltekit-frontend/tests/sse-chat-glossary-metadata.spec.ts",
+    ".claude/worktrees/agent-a87590c9/sveltekit-frontend/tests/sse-chat-glossary-metadata.spec.ts",
+    ".claude/worktrees/agent-a87590c9/sveltekit-frontend/tests/sse-chat-glossary-metadata.spec.ts",
+    ".claude/worktrees/agent-a87590c9/sveltekit-frontend/tests/sse-chat-glossary-metadata.spec.ts",
+    ".claude/worktrees/agent-a87590c9/sveltekit-frontend/tests/sse-chat-glossary-metadata.spec.ts",
+    ".claude/worktrees/agent-a87590c9/sveltekit-frontend/tests/sse-chat-glossary-metadata.spec.ts",
+    ".claude/worktrees/agent-a87590c9/sveltekit-frontend/tests/sse-chat-glossary-metadata.spec.ts",
+    ".claude/worktrees/agent-a87590c9/sveltekit-frontend/tests/sse-chat-glossary-metadata.spec.ts",
+    ".claude/worktrees/agent-a87590c9/sveltekit-frontend/tests/sse-chat-glossary-metadata.spec.ts",
+    ".claude/worktrees/agent-a87590c9/sveltekit-frontend/tests/sse-chat-glossary-metadata.spec.ts",
+    ".claude/worktrees/agent-a87590c9/sveltekit-frontend/tests/sse-chat-glossary-metadata.spec.ts",
+    ".claude/worktrees/agent-a87590c9/sveltekit-frontend/tests/sse-chat-glossary-metadata.spec.ts",
+    ".claude/worktrees/agent-a87590c9/sveltekit-frontend/tests/sse-chat-glossary-metadata.spec.ts",
+    ".claude/worktrees/agent-a87590c9/sveltekit-frontend/tests/sse-chat-glossary-metadata.spec.ts",
+    ".claude/worktrees/agent-a87590c9/sveltekit-frontend/tests/sse-chat-glossary-metadata.spec.ts",
+    ".claude/worktrees/agent-a87590c9/sveltekit-frontend/tests/sse-chat-glossary-metadata.spec.ts",
+    ".claude/worktrees/agent-a87590c9/sveltekit-frontend/tests/sse-chat-glossary-metadata.spec.ts",
+    ".claude/worktrees/agent-a87590c9/sveltekit-frontend/tests/sse-chat-glossary-metadata.spec.ts",
+    ".claude/worktrees/agent-a87590c9/sveltekit-frontend/tests/sse-chat-glossary-metadata.spec.ts",
+    ".claude/worktrees/agent-a87590c9/sveltekit-frontend/tests/sse-chat-glossary-metadata.spec.ts"
   ],
   ".claude/worktrees/agent-a87590c9/sveltekit-frontend/src/routes/api/tools/rpc-search/+server.ts": [
     ".claude/worktrees/agent-a87590c9/sveltekit-frontend/tests/routes/tools-rpc-search.test.ts",
@@ -9758,29 +9772,6 @@
     ".claude/worktrees/agent-a87590c9/sveltekit-frontend/tests/routes/tools-rpc-search.test.ts",
     ".claude/worktrees/agent-a87590c9/sveltekit-frontend/tests/routes/tools-rpc-search.test.ts",
     ".claude/worktrees/agent-a87590c9/sveltekit-frontend/tests/routes/tools-rpc-search.test.ts"
-  ],
-  "sveltekit-frontend/src/routes/api/sse/chat/+server.ts": [
-    "sveltekit-frontend/tests/sse-chat-glossary-metadata.spec.ts",
-    "sveltekit-frontend/tests/sse-chat-glossary-metadata.spec.ts",
-    "sveltekit-frontend/tests/sse-chat-glossary-metadata.spec.ts",
-    "sveltekit-frontend/tests/sse-chat-glossary-metadata.spec.ts",
-    "sveltekit-frontend/tests/sse-chat-glossary-metadata.spec.ts",
-    "sveltekit-frontend/tests/sse-chat-glossary-metadata.spec.ts",
-    "sveltekit-frontend/tests/sse-chat-glossary-metadata.spec.ts",
-    "sveltekit-frontend/tests/sse-chat-glossary-metadata.spec.ts",
-    "sveltekit-frontend/tests/sse-chat-glossary-metadata.spec.ts",
-    "sveltekit-frontend/tests/sse-chat-glossary-metadata.spec.ts",
-    "sveltekit-frontend/tests/routes/auto/api/sse/chat.test.ts",
-    "sveltekit-frontend/tests/sse-chat-glossary-metadata.spec.ts",
-    "sveltekit-frontend/tests/sse-chat-glossary-metadata.spec.ts",
-    "sveltekit-frontend/tests/sse-chat-glossary-metadata.spec.ts",
-    "sveltekit-frontend/tests/sse-chat-glossary-metadata.spec.ts",
-    "sveltekit-frontend/tests/sse-chat-glossary-metadata.spec.ts",
-    "sveltekit-frontend/tests/sse-chat-glossary-metadata.spec.ts",
-    "sveltekit-frontend/tests/sse-chat-glossary-metadata.spec.ts",
-    "sveltekit-frontend/tests/sse-chat-glossary-metadata.spec.ts",
-    "sveltekit-frontend/tests/sse-chat-glossary-metadata.spec.ts",
-    "sveltekit-frontend/tests/sse-chat-glossary-metadata.spec.ts"
   ],
   "claude-mem/openclaw/src/index.ts": [
     "claude-mem/openclaw/src/index.test.ts"
@@ -10374,6 +10365,18 @@
   "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/constants/uri-template.ts": [
     "llama-cpp-turboquant-gemma4/tools/server/webui/tests/unit/uri-template.test.ts"
   ],
+  "packages/atlas-core/src/retrieval/feature-registry-search.ts": [
+    "packages/atlas-core/src/retrieval/feature-registry-search.spec.ts",
+    "packages/atlas-core/src/validation/gan-deep-audit.test.ts"
+  ],
+  "packages/atlas-core/src/validation/gan-audit-integration.ts": [
+    "packages/atlas-core/src/validation/gan-audit-integration.test.ts",
+    "packages/atlas-core/src/validation/gan-audit-integration.test.ts"
+  ],
+  "packages/atlas-core/src/validation/gan-deep-audit.ts": [
+    "packages/atlas-core/src/validation/gan-deep-audit.test.ts",
+    "packages/atlas-core/src/validation/gan-deep-audit.test.ts"
+  ],
   "packages/parent-atlas-ingest/src/scanner/directory-scanner.ts": [
     "packages/parent-atlas-ingest/src/scanner/directory-scanner.test.ts"
   ],
@@ -10546,6 +10549,9 @@
   "sveltekit-frontend/src/routes/.well-known/llms.txt/+server.ts": [
     "sveltekit-frontend/tests/routes/auto/.well-known/llms.txt.test.ts"
   ],
+  "sveltekit-frontend/src/routes/api/ace/summarize/+server.ts": [
+    "sveltekit-frontend/tests/routes/auto/api/ace/summarize.test.ts"
+  ],
   "sveltekit-frontend/src/routes/api/admin/ai-chat/[sessionId]/+server.ts": [
     "sveltekit-frontend/tests/routes/auto/api/admin/ai-chat/__sessionId.test.ts"
   ],
@@ -10576,6 +10582,9 @@
   "sveltekit-frontend/src/routes/api/ai/cross-exam/+server.ts": [
     "sveltekit-frontend/tests/routes/auto/api/ai/cross-exam.test.ts"
   ],
+  "sveltekit-frontend/src/routes/api/ai/generate-image/+server.ts": [
+    "sveltekit-frontend/tests/routes/auto/api/ai/generate-image.test.ts"
+  ],
   "sveltekit-frontend/src/routes/api/ai/generate-report/[scope]/+server.ts": [
     "sveltekit-frontend/tests/routes/auto/api/ai/generate-report/__scope.test.ts"
   ],
@@ -10602,6 +10611,10 @@
   "sveltekit-frontend/src/routes/api/analytics/research-summaries/[id]/+server.ts": [
     "sveltekit-frontend/tests/routes/auto/api/analytics/research-summaries/__id.test.ts",
     "sveltekit-frontend/tests/routes/auto/api/analytics/research-summaries/__id.test.ts"
+  ],
+  "sveltekit-frontend/src/routes/api/analytics/research-topics/+server.ts": [
+    "sveltekit-frontend/tests/routes/auto/api/analytics/research-topics.test.ts",
+    "sveltekit-frontend/tests/routes/auto/api/analytics/research-topics.test.ts"
   ],
   "sveltekit-frontend/src/routes/api/audio/analysis/[evidenceId]/+server.ts": [
     "sveltekit-frontend/tests/routes/auto/api/audio/analysis/__evidenceId.test.ts"
@@ -10631,6 +10644,9 @@
   "sveltekit-frontend/src/routes/api/cases/[id]/chat/+server.ts": [
     "sveltekit-frontend/tests/routes/auto/api/cases/__id/chat.test.ts",
     "sveltekit-frontend/tests/routes/auto/api/cases/__id/chat.test.ts"
+  ],
+  "sveltekit-frontend/src/routes/api/cases/[id]/key-points/+server.ts": [
+    "sveltekit-frontend/tests/routes/auto/api/cases/__id/key-points.test.ts"
   ],
   "sveltekit-frontend/src/routes/api/cases/[id]/notes/[noteId]/versions/+server.ts": [
     "sveltekit-frontend/tests/routes/auto/api/cases/__id/notes/__noteId/versions.test.ts"
@@ -10677,6 +10693,9 @@
   "sveltekit-frontend/src/routes/api/code-intel/topology/node/[stableKey]/+server.ts": [
     "sveltekit-frontend/tests/routes/auto/api/code-intel/topology/node/__stableKey.test.ts"
   ],
+  "sveltekit-frontend/src/routes/api/codebase/auto-research/+server.ts": [
+    "sveltekit-frontend/tests/routes/auto/api/codebase/auto-research.test.ts"
+  ],
   "sveltekit-frontend/src/routes/api/codebase/rerank/+server.ts": [
     "sveltekit-frontend/tests/routes/auto/api/codebase/rerank.test.ts"
   ],
@@ -10704,6 +10723,12 @@
     "sveltekit-frontend/tests/routes/auto/api/embed.test.ts",
     "sveltekit-frontend/tests/routes/auto/api/embed.test.ts"
   ],
+  "sveltekit-frontend/src/routes/api/error-brain/generate-fix/+server.ts": [
+    "sveltekit-frontend/tests/routes/auto/api/error-brain/generate-fix.test.ts"
+  ],
+  "sveltekit-frontend/src/routes/api/evidence/ai/analyze/+server.ts": [
+    "sveltekit-frontend/tests/routes/auto/api/evidence/ai/analyze.test.ts"
+  ],
   "sveltekit-frontend/src/routes/api/evidence/tags/[id]/+server.ts": [
     "sveltekit-frontend/tests/routes/auto/api/evidence/tags/__id.test.ts"
   ],
@@ -10712,6 +10737,10 @@
   ],
   "sveltekit-frontend/src/routes/api/evidence/[docId]/status/+server.ts": [
     "sveltekit-frontend/tests/routes/auto/api/evidence/__docId/status.test.ts"
+  ],
+  "sveltekit-frontend/src/routes/api/evidence/[id]/key-points/+server.ts": [
+    "sveltekit-frontend/tests/routes/auto/api/evidence/__id/key-points.test.ts",
+    "sveltekit-frontend/tests/routes/auto/api/evidence/__id/key-points.test.ts"
   ],
   "sveltekit-frontend/src/routes/api/evidence/[id]/versions/+server.ts": [
     "sveltekit-frontend/tests/routes/auto/api/evidence/__id/versions.test.ts",
@@ -10725,11 +10754,17 @@
   "sveltekit-frontend/src/routes/api/files/[id]/+server.ts": [
     "sveltekit-frontend/tests/routes/auto/api/files.test.ts"
   ],
+  "sveltekit-frontend/src/routes/api/glyph/generate/+server.ts": [
+    "sveltekit-frontend/tests/routes/auto/api/glyph/generate.test.ts"
+  ],
   "sveltekit-frontend/src/routes/api/health/+server.ts": [
     "sveltekit-frontend/tests/routes/auto/api/health.test.ts"
   ],
   "sveltekit-frontend/src/routes/api/hypergraph/edge/[id]/+server.ts": [
     "sveltekit-frontend/tests/routes/auto/api/hypergraph/edge/__id.test.ts"
+  ],
+  "sveltekit-frontend/src/routes/api/investigate/suggest/+server.ts": [
+    "sveltekit-frontend/tests/routes/auto/api/investigate/suggest.test.ts"
   ],
   "sveltekit-frontend/src/routes/api/knowledge/document/[id]/+server.ts": [
     "sveltekit-frontend/tests/routes/auto/api/knowledge/document/__id.test.ts"
@@ -10744,6 +10779,9 @@
     "sveltekit-frontend/tests/routes/auto/api/library/documents/__documentId.test.ts",
     "sveltekit-frontend/tests/routes/auto/api/library/documents/__documentId.test.ts",
     "sveltekit-frontend/tests/routes/auto/api/library/documents/__documentId.test.ts"
+  ],
+  "sveltekit-frontend/src/routes/api/ollama/generate/+server.ts": [
+    "sveltekit-frontend/tests/routes/auto/api/ollama/generate.test.ts"
   ],
   "sveltekit-frontend/src/routes/api/persons-of-interest/[id]/associates/[associateId]/+server.ts": [
     "sveltekit-frontend/tests/routes/auto/api/persons-of-interest/__id/associates/__associateId.test.ts"
@@ -10773,6 +10811,10 @@
     "sveltekit-frontend/tests/routes/auto/api/persons-of-interest/__id.test.ts",
     "sveltekit-frontend/tests/routes/auto/api/persons-of-interest/__id.test.ts"
   ],
+  "sveltekit-frontend/src/routes/api/phase72/similar/+server.ts": [
+    "sveltekit-frontend/tests/routes/auto/api/phase72/similar.test.ts",
+    "sveltekit-frontend/tests/routes/auto/api/phase72/similar.test.ts"
+  ],
   "sveltekit-frontend/src/routes/api/phase89/node/[id]/docs/+server.ts": [
     "sveltekit-frontend/tests/routes/auto/api/phase89/node/__id/docs.test.ts"
   ],
@@ -10788,12 +10830,21 @@
   "sveltekit-frontend/src/routes/api/rag/answer/+server.ts": [
     "sveltekit-frontend/tests/routes/auto/api/rag/answer.test.ts"
   ],
+  "sveltekit-frontend/src/routes/api/rag/search/+server.ts": [
+    "sveltekit-frontend/tests/routes/auto/api/rag/search.test.ts"
+  ],
   "sveltekit-frontend/src/routes/api/recommendations/jobs/[jobId]/+server.ts": [
     "sveltekit-frontend/tests/routes/auto/api/recommendations/jobs/__jobId.test.ts"
   ],
   "sveltekit-frontend/src/routes/api/recommendations/[userId]/+server.ts": [
     "sveltekit-frontend/tests/routes/auto/api/recommendations/__userId.test.ts",
     "sveltekit-frontend/tests/routes/auto/api/recommendations/__userId.test.ts"
+  ],
+  "sveltekit-frontend/src/routes/api/reports/generate-from-template/+server.ts": [
+    "sveltekit-frontend/tests/routes/auto/api/reports/generate-from-template.test.ts"
+  ],
+  "sveltekit-frontend/src/routes/api/reports/police/+server.ts": [
+    "sveltekit-frontend/tests/routes/auto/api/reports/police.test.ts"
   ],
   "sveltekit-frontend/src/routes/api/reports/preview/[id]/+server.ts": [
     "sveltekit-frontend/tests/routes/auto/api/reports/preview/__id.test.ts",
@@ -10829,18 +10880,57 @@
   "sveltekit-frontend/src/routes/api/simulation/[sessionId]/strategy/+server.ts": [
     "sveltekit-frontend/tests/routes/auto/api/simulation/__sessionId/strategy.test.ts"
   ],
+  "sveltekit-frontend/src/routes/api/simulation/[sessionId]/+server.ts": [
+    "sveltekit-frontend/tests/routes/auto/api/simulation/__sessionId.test.ts",
+    "sveltekit-frontend/tests/routes/auto/api/simulation/__sessionId.test.ts",
+    "sveltekit-frontend/tests/routes/auto/api/simulation/__sessionId.test.ts"
+  ],
+  "sveltekit-frontend/src/routes/api/sse/chat/+server.ts": [
+    "sveltekit-frontend/tests/routes/auto/api/sse/chat.test.ts"
+  ],
   "sveltekit-frontend/src/routes/api/sse/[id]/+server.ts": [
     "sveltekit-frontend/tests/routes/auto/api/sse/__id.test.ts"
   ],
+  "sveltekit-frontend/src/routes/api/statutes/[id]/summary/+server.ts": [
+    "sveltekit-frontend/tests/routes/auto/api/statutes/__id/summary.test.ts"
+  ],
+  "sveltekit-frontend/src/routes/api/summarize/analyze/+server.ts": [
+    "sveltekit-frontend/tests/routes/auto/api/summarize/analyze.test.ts"
+  ],
   "sveltekit-frontend/src/routes/api/summarize/synthesize/+server.ts": [
     "sveltekit-frontend/tests/routes/auto/api/summarize/synthesize.test.ts"
+  ],
+  "sveltekit-frontend/src/routes/api/synthesis/generate/+server.ts": [
+    "sveltekit-frontend/tests/routes/auto/api/synthesis/generate.test.ts"
+  ],
+  "sveltekit-frontend/src/routes/api/tags/[tagId]/+server.ts": [
+    "sveltekit-frontend/tests/routes/auto/api/tags/__tagId.test.ts"
   ],
   "sveltekit-frontend/src/routes/api/tasks/[id]/+server.ts": [
     "sveltekit-frontend/tests/routes/auto/api/tasks/__id.test.ts",
     "sveltekit-frontend/tests/routes/auto/api/tasks/__id.test.ts"
   ],
+  "sveltekit-frontend/src/routes/api/test/cache-simple/+server.ts": [
+    "sveltekit-frontend/tests/routes/auto/api/test/cache-simple.test.ts"
+  ],
+  "sveltekit-frontend/src/routes/api/v1/agentic/tool-loop/+server.ts": [
+    "sveltekit-frontend/tests/routes/auto/api/v1/agentic/tool-loop.test.ts",
+    "sveltekit-frontend/tests/routes/auto/api/v1/agentic/tool-loop.test.ts"
+  ],
   "sveltekit-frontend/src/routes/api/v1/agentic/+server.ts": [
     "sveltekit-frontend/tests/routes/auto/api/v1/agentic.test.ts"
+  ],
+  "sveltekit-frontend/src/routes/api/v1/ai/canvas-suggestions/+server.ts": [
+    "sveltekit-frontend/tests/routes/auto/api/v1/ai/canvas-suggestions.test.ts"
+  ],
+  "sveltekit-frontend/src/routes/api/v1/ai/summarize-async/+server.ts": [
+    "sveltekit-frontend/tests/routes/auto/api/v1/ai/summarize-async.test.ts"
+  ],
+  "sveltekit-frontend/src/routes/api/v1/evidence/advanced-analysis/+server.ts": [
+    "sveltekit-frontend/tests/routes/auto/api/v1/evidence/advanced-analysis.test.ts"
+  ],
+  "sveltekit-frontend/src/routes/api/v1/evidence/analyze/+server.ts": [
+    "sveltekit-frontend/tests/routes/auto/api/v1/evidence/analyze.test.ts"
   ],
   "sveltekit-frontend/src/routes/api/video/analysis/[evidenceId]/+server.ts": [
     "sveltekit-frontend/tests/routes/auto/api/video/analysis/__evidenceId.test.ts"

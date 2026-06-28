@@ -15,9 +15,9 @@
 import { getQdrantClient } from '$lib/server/vector/qdrant-manager.js';
 import { getRedis } from '$lib/server/redis.js';
 import { db } from '$lib/server/db/client.js';
-import { atlas_packets } from '$lib/server/db/schema-postgres.js';
+import { atlasPackets } from '$lib/server/db/schema/atlas-packets.js';
 import { embedText } from '$lib/server/embedding/embed.js';
-import { bifrostKey, TTL } from '$lib/server/cache-keys.js';
+import { bifrostKey } from '$lib/server/cache-keys.js';
 import { eq } from 'drizzle-orm';
 
 export interface MaterializeOptions {
@@ -59,8 +59,8 @@ export async function materializePacket(options: MaterializeOptions): Promise<Ma
     // 1. Fetch packet from Postgres
     const packet = await db
       .select()
-      .from(atlas_packets)
-      .where(eq(atlas_packets.packet_key, options.packetKey))
+      .from(atlasPackets)
+      .where(eq(atlasPackets.packetKey, options.packetKey))
       .limit(1);
 
     if (packet.length === 0) {
@@ -70,21 +70,21 @@ export async function materializePacket(options: MaterializeOptions): Promise<Ma
     const pkt = packet[0];
 
     // 2. Validate required fields
-    if (!pkt.packet_key || !pkt.feature_id || !pkt.summary) {
+    if (!pkt.packetKey || !pkt.featureId || !pkt.summary) {
       throw new Error(`Packet incomplete: missing key/feature_id/summary`);
     }
 
     // 3. Prepare payload for Qdrant
     const payload = {
-      packet_key: pkt.packet_key,
-      source_ref: pkt.source_ref,
-      file_path: pkt.file_path,
-      feature_id: pkt.feature_id,
-      feature_label: pkt.feature_label,
+      packet_key: pkt.packetKey,
+      source_ref: pkt.sourceRef,
+      file_path: pkt.filePath,
+      feature_id: pkt.featureId,
+      feature_label: pkt.featureLabel,
       summary: pkt.summary,
-      som_row: pkt.som_row,
-      som_col: pkt.som_col,
-      community_id: pkt.community_id,
+      som_row: pkt.somRow,
+      som_col: pkt.somCol,
+      community_id: pkt.communityId,
       metadata: pkt.metadata || {}
     };
 
@@ -92,7 +92,7 @@ export async function materializePacket(options: MaterializeOptions): Promise<Ma
     // Uses 4-tier cache: Redis L3 → Postgres L4 → gRPC embedding → Ollama fallback
     let vector: number[];
     try {
-      const embeddingText = `${pkt.feature_label || ''} ${pkt.summary || ''}`.trim();
+      const embeddingText = `${pkt.featureLabel || ''} ${pkt.summary || ''}`.trim();
       if (!embeddingText) {
         throw new Error('No text to embed');
       }
@@ -213,13 +213,13 @@ export async function getPacketMaterializationStatus(packetKey: string): Promise
   let inQdrant = false;
   try {
     // Use a zero vector for existence check (faster than full embedding generation)
-    const results = await qdrant.search('codebase_chunks_768', {
-      vector: new Array(VECTOR_DIM).fill(0),
-      limit: 1,
-      query_filter: {
-        must: [
-          {
-            key: 'packet_key',
+      const results = await qdrant.search('codebase_chunks_768', {
+        vector: new Array(VECTOR_DIM).fill(0),
+        limit: 1,
+        filter: {
+          must: [
+            {
+              key: 'packet_key',
             match: { value: packetKey }
           }
         ]
