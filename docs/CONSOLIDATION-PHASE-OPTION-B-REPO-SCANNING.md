@@ -427,7 +427,7 @@ packages/
       index.ts
     package.json
 
-  parent-atlas-sveltekit/               # NEW: SvelteKit routes + UI
+  sveltekit-frontend/                   # NEW: SvelteKit routes + UI
     src/
       routes/
         api/atlas/ingest/+server.ts

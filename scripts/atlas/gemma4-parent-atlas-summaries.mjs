@@ -33,6 +33,7 @@ import {
   resolveDatabaseUrl,
   resolveRedisConfig as resolveSharedRedisConfig,
 } from './connection-config.mjs';
+import { buildSummaryContext, formatSummaryContext } from './lib/summary-context-map.mjs';
 
 const __dir = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dir, '../..');
@@ -60,7 +61,18 @@ function readStringArg(name, defaultValue = '') {
   return defaultValue;
 }
 const LIMIT = readNumericArg('limit', 25);
-const CONCURRENCY = readNumericArg('concurrency', 2);
+const REQUESTED_CONCURRENCY = readNumericArg(
+  'concurrency',
+  readNumericArg(
+    'cpu-workers',
+    readNumericArg('workers', Number(process.env.ATLAS_SUMMARY_CPU_WORKERS ?? 2)),
+  ),
+);
+const MAX_CONCURRENCY = readNumericArg('max-concurrency', Number(process.env.ATLAS_SUMMARY_MAX_CONCURRENCY ?? 4));
+const CONCURRENCY = Math.max(1, Math.min(
+  Number.isFinite(REQUESTED_CONCURRENCY) ? REQUESTED_CONCURRENCY : 2,
+  Number.isFinite(MAX_CONCURRENCY) ? Math.max(1, MAX_CONCURRENCY) : 4,
+));
 const SOURCE_REF_FILTER = String(readStringArg('source-ref', '')).trim();
 const REPORT_PATH = path.join(
   ROOT,
@@ -71,12 +83,13 @@ const REPORT_PATH = path.join(
 const SKIP_EXTENSIONS = new Set([
   '.min.js', '.min.css', '.gguf', '.bin', '.png', '.jpg', '.jpeg', '.webp',
   '.gif', '.ico', '.woff', '.woff2', '.ttf', '.eot', '.mp4', '.mp3',
-  '.parquet', '.duckdb', '.zip', '.tar', '.gz',
+  '.parquet', '.duckdb', '.zip', '.tar', '.gz', '.zst', '.snapshot',
 ]);
 
 const VENDOR_PREFIXES = [
   'turbovec/', 'docker/langgraph-synthesis/.venv/', '.venv/',
   'node_modules/', '.svelte-kit/', '.vite/', 'dist/', 'build/', 'models/',
+  'backups/', 'artifacts/', '.tmp/', 'tmp/', 'coverage/', 'archive/logs/', 'archive/tmp/',
 ];
 function isVendor(ref) {
   return VENDOR_PREFIXES.some(p => ref.startsWith(p)) ||
@@ -99,18 +112,42 @@ async function resolveSummaryTarget(pool) {
       rowIdColumn: 'id',
       selectSql: `
         SELECT
-          id, source_ref, feature_id, summary, tags,
-          imports, exports, route_handlers
+          id, NULL::text AS packet_key, source_ref, feature_id, summary, tags,
+          imports, exports, route_handlers,
+          NULL::text AS directory_path,
+          source_ref AS file_path,
+          NULL::text AS feature_label,
+          NULL::int AS community_id,
+          NULL::int AS cluster_id,
+          NULL::text AS som_cluster,
+          NULL::int AS kmeans_cluster,
+          NULL::real AS pagerank,
+          '{}'::jsonb AS metadata,
+          '{}'::jsonb AS payload,
+          '{}'::jsonb AS topology,
+          NULL::text AS function_symbol
         FROM public.parent_atlas_documents
       `,
       sourceRefWhere: `
         source_ref = $1
         AND source_ref NOT LIKE 'feature:%'
+        AND source_ref NOT LIKE 'backups/%'
+        AND source_ref NOT LIKE 'artifacts/%'
+        AND source_ref NOT LIKE '.tmp/%'
+        AND source_ref NOT LIKE 'archive/logs/%'
+        AND source_ref NOT LIKE 'archive/tmp/%'
         AND NOT ('vendor' = ANY(COALESCE(tags, '{}')))
       `,
       missingWhere: `
         (summary IS NULL OR summary = '')
         AND source_ref NOT LIKE 'feature:%'
+        AND (source_ref LIKE '%.%' OR source_ref LIKE '%/%')
+        AND source_ref NOT LIKE 'backups/%'
+        AND source_ref NOT LIKE 'artifacts/%'
+        AND source_ref NOT LIKE '.tmp/%'
+        AND source_ref NOT LIKE 'archive/logs/%'
+        AND source_ref NOT LIKE 'archive/tmp/%'
+        AND COALESCE(NULLIF(metadata #>> '{workspace,size_bytes}', '')::bigint, 1) > 0
         AND NOT ('vendor' = ANY(COALESCE(tags, '{}')))
       `,
       orderSql: 'line_count DESC NULLS LAST',
@@ -133,23 +170,48 @@ async function resolveSummaryTarget(pool) {
       selectSql: `
         SELECT
           packet_id AS id,
+          packet_key,
           source_ref,
+          directory_path,
+          file_path,
           feature_id,
           summary,
           COALESCE(tags, '{}') AS tags,
           ARRAY[]::text[] AS imports,
           ARRAY[]::text[] AS exports,
-          ARRAY[]::text[] AS route_handlers
+          ARRAY[]::text[] AS route_handlers,
+          feature_label,
+          community_id,
+          cluster_id,
+          som_cluster,
+          kmeans_cluster,
+          pagerank,
+          metadata,
+          payload,
+          topology,
+          function_symbol
         FROM public.atlas_packets
       `,
       sourceRefWhere: `
         source_ref = $1
         AND source_ref NOT LIKE 'feature:%'
+        AND source_ref NOT LIKE 'backups/%'
+        AND source_ref NOT LIKE 'artifacts/%'
+        AND source_ref NOT LIKE '.tmp/%'
+        AND source_ref NOT LIKE 'archive/logs/%'
+        AND source_ref NOT LIKE 'archive/tmp/%'
         AND NOT ('vendor' = ANY(COALESCE(tags, '{}')))
       `,
       missingWhere: `
         (summary IS NULL OR summary = '')
         AND source_ref NOT LIKE 'feature:%'
+        AND (source_ref LIKE '%.%' OR source_ref LIKE '%/%')
+        AND source_ref NOT LIKE 'backups/%'
+        AND source_ref NOT LIKE 'artifacts/%'
+        AND source_ref NOT LIKE '.tmp/%'
+        AND source_ref NOT LIKE 'archive/logs/%'
+        AND source_ref NOT LIKE 'archive/tmp/%'
+        AND COALESCE(NULLIF(metadata #>> '{workspace,size_bytes}', '')::bigint, 1) > 0
         AND NOT ('vendor' = ANY(COALESCE(tags, '{}')))
       `,
       orderSql: 'source_ref ASC',
@@ -165,6 +227,69 @@ async function resolveSummaryTarget(pool) {
   }
 
   throw new Error('No Parent Atlas summary source table found. Expected public.parent_atlas_documents or public.atlas_packets.');
+}
+
+async function writeSummaryLayer(pool, row, summary, packet, cacheStatus) {
+  const packetKey = String(row?.packet_key ?? '').trim();
+  if (!packetKey) return false;
+
+  const metadata = {
+    status: 'generated',
+    source: 'gemma4-parent-atlas-summaries',
+    source_ref: row.source_ref ?? null,
+    feature_id: row.feature_id ?? null,
+    model: packet?.model ?? process.env.LOCAL_GEMMA_MODEL ?? 'gemma4-legal-iq4xs-direct.gguf',
+    backend: 'llama-server',
+    cache_mode: cacheStatus ?? null,
+    summary_packet_key: packet?.packetId ?? null,
+    summary_context: buildSummaryContext(row),
+    generated_at: new Date().toISOString(),
+  };
+
+  const update = await pool.query(`
+    UPDATE atlas_summary_layers
+    SET
+      summary = $2,
+      summary_text = $2,
+      model_name = $3,
+      metadata = COALESCE(metadata, '{}'::jsonb) || $4::jsonb,
+      generated_at = now(),
+      updated_at = now()
+    WHERE packet_key = $1
+      AND COALESCE(layer_type, summary_level) = 'file'
+  `, [
+    packetKey,
+    summary,
+    metadata.model,
+    JSON.stringify(metadata),
+  ]);
+
+  if (update.rowCount > 0) return true;
+
+  await pool.query(`
+    INSERT INTO atlas_summary_layers (
+      packet_key,
+      layer_type,
+      summary_level,
+      summary,
+      summary_text,
+      keywords,
+      entities,
+      metadata,
+      model_name,
+      generated_at,
+      created_at,
+      updated_at
+    )
+    VALUES ($1, 'file', 'file', $2, $2, ARRAY[]::text[], ARRAY[]::text[], $3::jsonb, $4, now(), now(), now())
+  `, [
+    packetKey,
+    summary,
+    JSON.stringify(metadata),
+    metadata.model,
+  ]);
+
+  return true;
 }
 
 function resolveLlamaModel(env) {
@@ -242,6 +367,7 @@ function isUsableSummary(input) {
 }
 
 function buildSourceRefSummary(row, snippet) {
+  const context = buildSummaryContext(row);
   const tags = Array.isArray(row?.tags) ? row.tags.filter(Boolean).slice(0, 10).join(', ') : 'none';
   const imports = Array.isArray(row?.imports) ? row.imports.filter(Boolean).slice(0, 8).join(', ') : 'none';
   const exports = Array.isArray(row?.exports) ? row.exports.filter(Boolean).slice(0, 8).join(', ') : 'none';
@@ -250,6 +376,10 @@ function buildSourceRefSummary(row, snippet) {
   return [
     `source_ref: ${row?.source_ref ?? 'unknown'}`,
     `feature_id: ${row?.feature_id ?? 'unknown'}`,
+    `domain_class: ${context.domain_class ?? 'unknown'}`,
+    `ontology_label: ${context.ontology_label ?? 'unknown'}`,
+    `topology_label: ${context.topology_label ?? 'unknown'}`,
+    `cluster_key: ${context.cluster_key ?? 'unknown'}`,
     `tags: ${tags}`,
     `imports: ${imports}`,
     `exports: ${exports}`,
@@ -259,18 +389,32 @@ function buildSourceRefSummary(row, snippet) {
 }
 
 function buildPacketSummary(packet, rawText, synthesis, row, snippet) {
+  let parsedSynthesis = synthesis;
+  const rawClean = cleanModelText(rawText);
+  if (!parsedSynthesis && rawClean.startsWith('{')) {
+    try {
+      const parsed = JSON.parse(rawClean);
+      if (parsed?.synthesis && typeof parsed.synthesis === 'object') {
+        parsedSynthesis = parsed.synthesis;
+      }
+    } catch {
+      // Raw model text is allowed to be plain text.
+    }
+  }
   const candidates = [
-    packet?.summary,
+    rawClean.startsWith('{') ? null : packet?.summary,
     packet?.lod1Summary,
     packet?.lod2Summary,
     ...(Array.isArray(packet?.recommendations) ? packet.recommendations : []),
-    ...(Array.isArray(synthesis?.mainThemes) ? synthesis.mainThemes : []),
-    ...(Array.isArray(synthesis?.nextSteps) ? synthesis.nextSteps : []),
-    rawText,
+    ...(Array.isArray(parsedSynthesis?.mainThemes) ? parsedSynthesis.mainThemes : []),
+    ...(Array.isArray(parsedSynthesis?.supportingEvidence) ? parsedSynthesis.supportingEvidence : []),
+    ...(Array.isArray(parsedSynthesis?.nextSteps) ? parsedSynthesis.nextSteps : []),
+    rawClean.startsWith('{') ? null : rawClean,
     buildSourceRefSummary(row, snippet),
   ];
   for (const candidate of candidates) {
     const text = cleanModelText(candidate);
+    if (text.startsWith('{')) continue;
     if (text) return text.slice(0, 1000);
   }
   return '';
@@ -439,10 +583,12 @@ Rules:
 
 source_ref: ${row.source_ref}
 feature_id: ${row.feature_id ?? 'unknown'}
+${formatSummaryContext(buildSummaryContext(row))}
 `;
 }
 
 function buildSummaryUserPrompt(row, snippet) {
+  const context = buildSummaryContext(row);
   const tags = Array.isArray(row.tags) ? row.tags.filter((t) =>
     t.startsWith('has_') || t.startsWith('crud:') || t.startsWith('api:') ||
     t.startsWith('auth:') || t.startsWith('runtime:') || t.startsWith('route:') ||
@@ -460,6 +606,9 @@ function buildSummaryUserPrompt(row, snippet) {
     : '';
 
   return `Tags: ${tags.join(', ') || 'none'}
+Domain/topology context:
+${formatSummaryContext(context)}
+
 Route handlers: ${handlers || 'none'}
 Imports (top 10): ${imports || 'none'}
 Exports (top 10): ${exports || 'none'}
@@ -486,6 +635,7 @@ function buildDeterministicSemanticEmbedding(seedText) {
 }
 
 function buildCachedSummaryInput(row, snippet) {
+  const context = buildSummaryContext(row);
   const tags = Array.isArray(row.tags) ? row.tags.filter((t) =>
     t.startsWith('has_') || t.startsWith('crud:') || t.startsWith('api:') ||
     t.startsWith('auth:') || t.startsWith('runtime:') || t.startsWith('route:') ||
@@ -506,6 +656,10 @@ function buildCachedSummaryInput(row, snippet) {
     sections: [
       { title: 'source_ref', content: row.source_ref ?? '' },
       { title: 'feature_id', content: row.feature_id ?? 'unknown' },
+      { title: 'domain_class', content: context.domain_class ?? 'unknown' },
+      { title: 'ontology_label', content: context.ontology_label ?? 'unknown' },
+      { title: 'topology_label', content: context.topology_label ?? 'unknown' },
+      { title: 'cluster_key', content: context.cluster_key ?? 'unknown' },
       { title: 'tags', content: tags.join(', ') || 'none' },
       { title: 'route_handlers', content: handlers || 'none' },
       { title: 'imports', content: imports || 'none' },
@@ -514,12 +668,17 @@ function buildCachedSummaryInput(row, snippet) {
     ],
     keyInsights: uniqueStrings([
       ...(tags.slice(0, 6) ?? []),
+      context.domain_class ? `domain:${context.domain_class}` : null,
+      context.ontology_label ? `ontology:${context.ontology_label}` : null,
+      context.topology_label ? `topology:${context.topology_label}` : null,
+      context.cluster_key ? `cluster:${context.cluster_key}` : null,
       row.feature_id ? `feature:${row.feature_id}` : null,
       row.source_ref ? `sourceRef:${row.source_ref}` : null,
     ]),
     sourceRefs: [row.source_ref],
     featureIds: row.feature_id ? [row.feature_id] : [],
     laneIds: row.feature_id ? [`feature:${String(row.feature_id).split(':')[0]}`] : [],
+    summaryContext: context,
     semanticEmbedding: buildDeterministicSemanticEmbedding(`${row.source_ref}:${row.feature_id ?? 'unknown'}:${snippet.slice(0, 160)}`),
     intent: 'summary',
     promptVersion: 'phase101-summary-v1',
@@ -682,6 +841,9 @@ async function processOne(row, pool, dryRun, cacheRedis) {
   }
 
   const snippet = readFirstLines(row.source_ref);
+  if (!snippet.trim()) {
+    return { source_ref: row.source_ref, skipped: true, skippedUnsupported: true, reason: 'missing_or_empty_source' };
+  }
   const prompt = buildPrompt(row, snippet);
 
   if (dryRun && !USE_CACHE) {
@@ -900,6 +1062,10 @@ async function processOne(row, pool, dryRun, cacheRedis) {
     if (skippedDryRun) metrics.skippedDryRun += 1;
     if (exactHit || semanticHit || skippedDryRun) metrics.callsAvoided += 1;
 
+    const normalizedSummary = buildPacketSummary(packet, packet?.summary, packet?.synthesis, row, snippet);
+    if (normalizedSummary) {
+      packet.summary = normalizedSummary;
+    }
     const summaryHash = sha256(packet.summary);
 
     if (APPLY && !dryRun && !skipDbUpdate) {
@@ -940,6 +1106,9 @@ async function processOne(row, pool, dryRun, cacheRedis) {
         `UPDATE ${metrics.summaryTarget.tableSql} SET ${updates.join(', ')} WHERE ${metrics.summaryTarget.rowIdColumn} = $${params.length}`,
         params
       );
+      if (await writeSummaryLayer(pool, row, packet.summary, packet, cacheStatus)) {
+        metrics.summaryLayersWritten += 1;
+      }
       metrics.summariesWritten += 1;
     }
 
@@ -983,6 +1152,9 @@ async function processOne(row, pool, dryRun, cacheRedis) {
     SET summary = $1, updated_at = now()
     WHERE ${target.rowIdColumn} = $2
   `, [summary, row.id]);
+  if (metrics && await writeSummaryLayer(pool, row, summary, { model: process.env.LOCAL_GEMMA_MODEL }, 'legacy')) {
+    metrics.summaryLayersWritten += 1;
+  }
 
   return { source_ref: row.source_ref, summary_length: summary.length, success: true };
 }
@@ -993,7 +1165,7 @@ async function main() {
   console.log('\n══ Gemma4 Parent Atlas Summaries ══════════════════════════');
   console.log(`  Mode:        ${APPLY ? 'APPLY' : 'DRY-RUN'}`);
   console.log(`  Limit:       ${LIMIT} files`);
-  console.log(`  Concurrency: ${CONCURRENCY}`);
+  console.log(`  CPU workers: ${CONCURRENCY} bounded async lanes (requested=${REQUESTED_CONCURRENCY}, max=${MAX_CONCURRENCY})`);
   if (SOURCE_REF_FILTER) {
     console.log(`  SourceRef:   ${SOURCE_REF_FILTER}`);
   }
@@ -1097,6 +1269,7 @@ async function main() {
     wouldCallLlama: 0,
     callsAvoided: 0,
     summariesWritten: 0,
+    summaryLayersWritten: 0,
     skippedVendor,
     skippedFeatureBuckets,
     packetsRead: 0,
@@ -1141,6 +1314,14 @@ async function main() {
     targetSourceRef: SOURCE_REF_FILTER || null,
     limit: LIMIT,
     concurrency: CONCURRENCY,
+    requestedConcurrency: REQUESTED_CONCURRENCY,
+    maxConcurrency: MAX_CONCURRENCY,
+    workerMode: 'bounded-async-cpu-lanes',
+    safety: {
+      deletesData: false,
+      mutatesPacketIdentity: false,
+      writesWhenApply: ['atlas_packets.summary', 'atlas_summary_layers file summary rows', 'summary cache records'],
+    },
     rows_queued: rows.length,
     succeeded,
     skippedUnsupported,
@@ -1158,6 +1339,7 @@ async function main() {
     llamaCallsAvoided,
     callsAvoided: metrics.callsAvoided,
     summariesWritten: metrics.summariesWritten,
+    summaryLayersWritten: metrics.summaryLayersWritten,
     skippedVendor: metrics.skippedVendor,
     skippedFeatureBuckets: metrics.skippedFeatureBuckets,
     avgLatencyMs,
@@ -1165,6 +1347,8 @@ async function main() {
     sourceRefPacketReads: metrics.sourceRefPacketReads,
     still_missing: parseInt(totals[0].missing) - succeeded,
     sample: results.slice(0, 10),
+    failedSample: results.filter((row) => row.error).slice(0, 20),
+    skippedSample: results.filter((row) => row.skippedUnsupported).slice(0, 20),
   };
 
   fs.mkdirSync(path.dirname(REPORT_PATH), { recursive: true });

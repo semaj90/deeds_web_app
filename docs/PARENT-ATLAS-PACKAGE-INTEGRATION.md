@@ -2,18 +2,28 @@
 
 ## Overview
 
-Parent Atlas GPU acceleration pipeline has been consolidated into 4 reusable npm packages:
+Parent Atlas currently spans 6 workspace package surfaces:
 
-- `@deeds/parent-atlas-core` — Identity contract, schemas, types
-- `@deeds/parent-atlas-retrieval` — Bifrost, TurboVec, GPU/SIMD bridges
+- `@deeds/atlas-core` — Canonical packet contracts, validation, RPC, GPU types
+- `@deeds/parent-atlas` — CLI, audits, adapters, cache/mapreduce orchestration
+- `@deeds/parent-atlas-core` — Identity / schema / adapter bridge layer
+- `@deeds/parent-atlas-retrieval` — Bifrost, TurboVec, GPU/SIMD retrieval bridges
 - `@deeds/parent-atlas-ingest` — Repository scanning, AST parsing, packet generation
 - `@deeds/parent-atlas-opencode` — OpenCode CLI skills and commands
 
 ## Package Structure
 
+### atlas-core
+
+**Exports**: Canonical packet identity contract, validation gates, RPC contracts, GPU types
+
+```typescript
+import { PacketIdentitySchema, HyperRagRequestSchema } from '@deeds/atlas-core';
+```
+
 ### parent-atlas-core
 
-**Exports**: Identity chain types, Postgres schema, verification gates
+**Exports**: Identity bridge, schema adapters, lineages, canonical Postgres helpers
 
 ```typescript
 import { IDENTITY_CONTRACT, verifyLineageContract } from '@deeds/parent-atlas-core';
@@ -51,6 +61,8 @@ Add workspaces:
 ```json
 {
   "workspaces": [
+    "packages/atlas-core",
+    "packages/parent-atlas",
     "packages/parent-atlas-core",
     "packages/parent-atlas-retrieval",
     "packages/parent-atlas-ingest",
@@ -77,6 +89,7 @@ import {
   batchCosineSimilarity,
   TurboVecMetadata,
 } from '@deeds/parent-atlas-retrieval';
+import { PacketIdentitySchema } from '@deeds/atlas-core';
 import { IDENTITY_CONTRACT } from '@deeds/parent-atlas-core';
 ```
 
@@ -88,7 +101,8 @@ Add path aliases for convenience:
 {
   "compilerOptions": {
     "paths": {
-      "@atlas/*": ["packages/parent-atlas-retrieval/dist/*"],
+      "@atlas/*": ["packages/atlas-core/dist/*"],
+      "@atlas-retrieval/*": ["packages/parent-atlas-retrieval/dist/*"],
       "@atlas-core/*": ["packages/parent-atlas-core/dist/*"]
     }
   }

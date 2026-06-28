@@ -1,0 +1,35 @@
+{
+  "generated_at": "2026-06-28T17:51:57.579Z",
+  "registry": {
+    "canonical": "packages/atlas-core",
+    "operational": "packages/parent-atlas",
+    "compatibility_bridge": "packages/parent-atlas-core",
+    "historical_reference_only": [
+      "packages/atlas",
+      "packages/parent-atlas-sveltekit"
+    ]
+  },
+  "status": "CURRENT",
+  "canonical_ready_percent": 100,
+  "active_boundary_score": 100,
+  "package_boundary_score": 100,
+  "registry_score": 100,
+  "active_findings": [],
+  "historical_findings": [
+    {
+      "file": "docs/reports/phase2-gemma4-acp-kanban-audit.md",
+      "token": "packages/atlas"
+    }
+  ],
+  "missing_packages": [],
+  "name_mismatches": [],
+  "registry_issues": [],
+  "package_names": {
+    "packages/atlas-core/package.json": "@deeds/atlas-core",
+    "packages/parent-atlas/package.json": "@deeds/parent-atlas",
+    "packages/parent-atlas-core/package.json": "@deeds/parent-atlas-core",
+    "packages/parent-atlas-retrieval/package.json": "@deeds/parent-atlas-retrieval",
+    "packages/parent-atlas-ingest/package.json": "@deeds/parent-atlas-ingest",
+    "packages/parent-atlas-opencode/package.json": "@deeds/parent-atlas-opencode"
+  }
+}

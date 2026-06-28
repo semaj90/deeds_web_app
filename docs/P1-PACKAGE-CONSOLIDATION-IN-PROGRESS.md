@@ -10,7 +10,7 @@
 
 Parent Atlas was previously five standalone scripts in `scripts/atlas/`. Now consolidating into the modular package structure so it can be:
 - Imported as a library (`@deeds/parent-atlas`)
-- Called from other packages (`parent-atlas-opencode`, `parent-atlas-sveltekit`)
+- Called from other packages (`parent-atlas-opencode`, `sveltekit-frontend`)
 - Reused for any repository ingestion (not just deeds-web-app)
 
 Current state:

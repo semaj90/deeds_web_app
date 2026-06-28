@@ -1,0 +1,950 @@
+{
+  "generated_at": "2026-06-28T17:44:00.017Z",
+  "rows_sampled": 5000,
+  "limit": 5000,
+  "coverage": {
+    "directory_path": {
+      "count": 4909,
+      "percent": 98.2
+    },
+    "source_ref": {
+      "count": 5000,
+      "percent": 100
+    },
+    "file_path": {
+      "count": 5000,
+      "percent": 100
+    },
+    "function_symbol": {
+      "count": 0,
+      "percent": 0
+    },
+    "packet_key": {
+      "count": 5000,
+      "percent": 100
+    },
+    "feature_id": {
+      "count": 5000,
+      "percent": 100
+    },
+    "feature_label": {
+      "count": 5000,
+      "percent": 100
+    },
+    "domain_class": {
+      "count": 5000,
+      "percent": 100
+    },
+    "ontology_label": {
+      "count": 5000,
+      "percent": 100
+    },
+    "topology_label": {
+      "count": 5000,
+      "percent": 100
+    },
+    "cluster_key": {
+      "count": 5000,
+      "percent": 100
+    },
+    "identity_required_complete": {
+      "count": 4909,
+      "percent": 98.2
+    },
+    "identity_chain_complete": {
+      "count": 0,
+      "percent": 0
+    }
+  },
+  "distributions": {
+    "domain_class": {
+      "codebase": 1386,
+      "retrieval": 81,
+      "gpu": 2782,
+      "ui": 64,
+      "docs": 202,
+      "graph": 68,
+      "agent": 121,
+      "database": 167,
+      "ops": 54,
+      "cache": 28,
+      "legal": 47
+    },
+    "ontology_label": {
+      "utility": 408,
+      "artifact": 1008,
+      "schema": 96,
+      "retrieval_contract": 18,
+      "validation": 121,
+      "semantic_enrichment": 42,
+      "graph_contract": 51,
+      "worker": 105,
+      "api_route": 2926,
+      "adapter": 212,
+      "cache_contract": 13
+    },
+    "topology_label": {
+      "codebase_layer": 1419,
+      "retrieval_layer": 81,
+      "accelerator_layer": 2781,
+      "ui_layer": 283,
+      "graph_layer": 68,
+      "agent_layer": 112,
+      "cache_layer": 28,
+      "validation_layer": 125,
+      "storage_layer": 103
+    },
+    "cluster_key": {
+      "codebase:codebase_layer": 1089,
+      "retrieval:retrieval_layer": 81,
+      "gpu:accelerator_layer": 2781,
+      "ui:ui_layer": 64,
+      "docs:codebase_layer": 184,
+      "graph:graph_layer": 68,
+      "agent:agent_layer": 111,
+      "database:codebase_layer": 65,
+      "ops:codebase_layer": 39,
+      "cache:cache_layer": 28,
+      "legal:validation_layer": 1,
+      "legal:codebase_layer": 42,
+      "database:storage_layer": 93,
+      "codebase:validation_layer": 107,
+      "docs:validation_layer": 10,
+      "legal:ui_layer": 4,
+      "docs:ui_layer": 8,
+      "ops:ui_layer": 8,
+      "ops:validation_layer": 7,
+      "codebase:ui_layer": 190,
+      "agent:storage_layer": 10,
+      "database:ui_layer": 9,
+      "gpu:agent_layer": 1
+    },
+    "identity_missing_required": {
+      "directory_path": 91
+    }
+  },
+  "samples": [
+    {
+      "directory_path": "$lib/utils",
+      "source_ref": "$lib/utils/file-reader.ts",
+      "file_path": "$lib/utils/file-reader.ts",
+      "function_symbol": null,
+      "packet_key": "packet:f605461709d9",
+      "feature_id": "$lib.file-reader",
+      "feature_label": "file-reader.ts",
+      "domain_class": "codebase",
+      "ontology_label": "utility",
+      "topology_label": "codebase_layer",
+      "cluster_key": "codebase:codebase_layer",
+      "community_id": null,
+      "cluster_id": null,
+      "som_cluster": null,
+      "pagerank": null,
+      "language": "typescript",
+      "ontology_tags": [
+        "codebase",
+        "utility",
+        "codebase_layer"
+      ],
+      "identity_chain": {
+        "directory_path": "$lib/utils",
+        "source_ref": "$lib/utils/file-reader.ts",
+        "file_path": "$lib/utils/file-reader.ts",
+        "function_symbol": null,
+        "feature_id": "$lib.file-reader",
+        "feature_label": "file-reader.ts",
+        "packet_key": "packet:f605461709d9"
+      },
+      "identity_required_complete": true,
+      "identity_chain_complete": false,
+      "identity_missing_required": [],
+      "identity_missing_full": [
+        "function_symbol"
+      ]
+    },
+    {
+      "directory_path": null,
+      "source_ref": "61026__.txt",
+      "file_path": "61026__.txt",
+      "function_symbol": null,
+      "packet_key": "packet:4db0031b7a9b",
+      "feature_id": "61026__",
+      "feature_label": "61026__.txt",
+      "domain_class": "retrieval",
+      "ontology_label": "artifact",
+      "topology_label": "retrieval_layer",
+      "cluster_key": "retrieval:retrieval_layer",
+      "community_id": null,
+      "cluster_id": null,
+      "som_cluster": null,
+      "pagerank": null,
+      "language": "text",
+      "ontology_tags": [
+        "retrieval",
+        "artifact",
+        "retrieval_layer"
+      ],
+      "identity_chain": {
+        "directory_path": null,
+        "source_ref": "61026__.txt",
+        "file_path": "61026__.txt",
+        "function_symbol": null,
+        "feature_id": "61026__",
+        "feature_label": "61026__.txt",
+        "packet_key": "packet:4db0031b7a9b"
+      },
+      "identity_required_complete": false,
+      "identity_chain_complete": false,
+      "identity_missing_required": [
+        "directory_path"
+      ],
+      "identity_missing_full": [
+        "directory_path",
+        "function_symbol"
+      ]
+    },
+    {
+      "directory_path": null,
+      "source_ref": "6_10_libtorch_review.txt",
+      "file_path": "6_10_libtorch_review.txt",
+      "function_symbol": null,
+      "packet_key": "packet:9ce270d0f182",
+      "feature_id": "6_10_libtorch_review",
+      "feature_label": "6_10_libtorch_review.txt",
+      "domain_class": "gpu",
+      "ontology_label": "utility",
+      "topology_label": "accelerator_layer",
+      "cluster_key": "gpu:accelerator_layer",
+      "community_id": null,
+      "cluster_id": null,
+      "som_cluster": null,
+      "pagerank": null,
+      "language": "text",
+      "ontology_tags": [
+        "gpu",
+        "utility",
+        "accelerator_layer"
+      ],
+      "identity_chain": {
+        "directory_path": null,
+        "source_ref": "6_10_libtorch_review.txt",
+        "file_path": "6_10_libtorch_review.txt",
+        "function_symbol": null,
+        "feature_id": "6_10_libtorch_review",
+        "feature_label": "6_10_libtorch_review.txt",
+        "packet_key": "packet:9ce270d0f182"
+      },
+      "identity_required_complete": false,
+      "identity_chain_complete": false,
+      "identity_missing_required": [
+        "directory_path"
+      ],
+      "identity_missing_full": [
+        "directory_path",
+        "function_symbol"
+      ]
+    },
+    {
+      "directory_path": null,
+      "source_ref": "6_10_todo_parentatlas.txt",
+      "file_path": "6_10_todo_parentatlas.txt",
+      "function_symbol": null,
+      "packet_key": "packet:cd44fc93e235",
+      "feature_id": "6_10_todo_parentatlas",
+      "feature_label": "6_10_todo_parentatlas.txt",
+      "domain_class": "ui",
+      "ontology_label": "artifact",
+      "topology_label": "ui_layer",
+      "cluster_key": "ui:ui_layer",
+      "community_id": null,
+      "cluster_id": null,
+      "som_cluster": null,
+      "pagerank": null,
+      "language": "text",
+      "ontology_tags": [
+        "ui",
+        "artifact",
+        "ui_layer"
+      ],
+      "identity_chain": {
+        "directory_path": null,
+        "source_ref": "6_10_todo_parentatlas.txt",
+        "file_path": "6_10_todo_parentatlas.txt",
+        "function_symbol": null,
+        "feature_id": "6_10_todo_parentatlas",
+        "feature_label": "6_10_todo_parentatlas.txt",
+        "packet_key": "packet:cd44fc93e235"
+      },
+      "identity_required_complete": false,
+      "identity_chain_complete": false,
+      "identity_missing_required": [
+        "directory_path"
+      ],
+      "identity_missing_full": [
+        "directory_path",
+        "function_symbol"
+      ]
+    },
+    {
+      "directory_path": null,
+      "source_ref": "6_11_26_mem.txt",
+      "file_path": "6_11_26_mem.txt",
+      "function_symbol": null,
+      "packet_key": "packet:24abbee99423",
+      "feature_id": "6_11_26_mem",
+      "feature_label": "6_11_26_mem.txt",
+      "domain_class": "codebase",
+      "ontology_label": "artifact",
+      "topology_label": "codebase_layer",
+      "cluster_key": "codebase:codebase_layer",
+      "community_id": null,
+      "cluster_id": null,
+      "som_cluster": null,
+      "pagerank": null,
+      "language": "text",
+      "ontology_tags": [
+        "codebase",
+        "artifact",
+        "codebase_layer"
+      ],
+      "identity_chain": {
+        "directory_path": null,
+        "source_ref": "6_11_26_mem.txt",
+        "file_path": "6_11_26_mem.txt",
+        "function_symbol": null,
+        "feature_id": "6_11_26_mem",
+        "feature_label": "6_11_26_mem.txt",
+        "packet_key": "packet:24abbee99423"
+      },
+      "identity_required_complete": false,
+      "identity_chain_complete": false,
+      "identity_missing_required": [
+        "directory_path"
+      ],
+      "identity_missing_full": [
+        "directory_path",
+        "function_symbol"
+      ]
+    },
+    {
+      "directory_path": null,
+      "source_ref": "6_11_26_phase5_cannonical_.txt",
+      "file_path": "6_11_26_phase5_cannonical_.txt",
+      "function_symbol": null,
+      "packet_key": "packet:97bf04d3b9cc",
+      "feature_id": "6_11_26_phase5_cannonical_",
+      "feature_label": "6_11_26_phase5_cannonical_.txt",
+      "domain_class": "retrieval",
+      "ontology_label": "artifact",
+      "topology_label": "retrieval_layer",
+      "cluster_key": "retrieval:retrieval_layer",
+      "community_id": null,
+      "cluster_id": null,
+      "som_cluster": null,
+      "pagerank": null,
+      "language": "text",
+      "ontology_tags": [
+        "retrieval",
+        "artifact",
+        "retrieval_layer"
+      ],
+      "identity_chain": {
+        "directory_path": null,
+        "source_ref": "6_11_26_phase5_cannonical_.txt",
+        "file_path": "6_11_26_phase5_cannonical_.txt",
+        "function_symbol": null,
+        "feature_id": "6_11_26_phase5_cannonical_",
+        "feature_label": "6_11_26_phase5_cannonical_.txt",
+        "packet_key": "packet:97bf04d3b9cc"
+      },
+      "identity_required_complete": false,
+      "identity_chain_complete": false,
+      "identity_missing_required": [
+        "directory_path"
+      ],
+      "identity_missing_full": [
+        "directory_path",
+        "function_symbol"
+      ]
+    },
+    {
+      "directory_path": null,
+      "source_ref": "6_11_todo.txt",
+      "file_path": "6_11_todo.txt",
+      "function_symbol": null,
+      "packet_key": "packet:aa56922a151e",
+      "feature_id": "6_11_todo",
+      "feature_label": "6_11_todo.txt",
+      "domain_class": "retrieval",
+      "ontology_label": "artifact",
+      "topology_label": "retrieval_layer",
+      "cluster_key": "retrieval:retrieval_layer",
+      "community_id": null,
+      "cluster_id": null,
+      "som_cluster": null,
+      "pagerank": null,
+      "language": "text",
+      "ontology_tags": [
+        "retrieval",
+        "artifact",
+        "retrieval_layer"
+      ],
+      "identity_chain": {
+        "directory_path": null,
+        "source_ref": "6_11_todo.txt",
+        "file_path": "6_11_todo.txt",
+        "function_symbol": null,
+        "feature_id": "6_11_todo",
+        "feature_label": "6_11_todo.txt",
+        "packet_key": "packet:aa56922a151e"
+      },
+      "identity_required_complete": false,
+      "identity_chain_complete": false,
+      "identity_missing_required": [
+        "directory_path"
+      ],
+      "identity_missing_full": [
+        "directory_path",
+        "function_symbol"
+      ]
+    },
+    {
+      "directory_path": null,
+      "source_ref": "6_13_26_todo.txt",
+      "file_path": "6_13_26_todo.txt",
+      "function_symbol": null,
+      "packet_key": "packet:a7757a8d6b32",
+      "feature_id": "6_13_26_todo",
+      "feature_label": "6_13_26_todo.txt",
+      "domain_class": "docs",
+      "ontology_label": "artifact",
+      "topology_label": "codebase_layer",
+      "cluster_key": "docs:codebase_layer",
+      "community_id": null,
+      "cluster_id": null,
+      "som_cluster": null,
+      "pagerank": null,
+      "language": "text",
+      "ontology_tags": [
+        "docs",
+        "artifact",
+        "codebase_layer"
+      ],
+      "identity_chain": {
+        "directory_path": null,
+        "source_ref": "6_13_26_todo.txt",
+        "file_path": "6_13_26_todo.txt",
+        "function_symbol": null,
+        "feature_id": "6_13_26_todo",
+        "feature_label": "6_13_26_todo.txt",
+        "packet_key": "packet:a7757a8d6b32"
+      },
+      "identity_required_complete": false,
+      "identity_chain_complete": false,
+      "identity_missing_required": [
+        "directory_path"
+      ],
+      "identity_missing_full": [
+        "directory_path",
+        "function_symbol"
+      ]
+    },
+    {
+      "directory_path": null,
+      "source_ref": "6_13_26__.txt",
+      "file_path": "6_13_26__.txt",
+      "function_symbol": null,
+      "packet_key": "packet:58cba0c8aa2f",
+      "feature_id": "6_13_26__",
+      "feature_label": "6_13_26__.txt",
+      "domain_class": "codebase",
+      "ontology_label": "artifact",
+      "topology_label": "codebase_layer",
+      "cluster_key": "codebase:codebase_layer",
+      "community_id": null,
+      "cluster_id": null,
+      "som_cluster": null,
+      "pagerank": null,
+      "language": "text",
+      "ontology_tags": [
+        "codebase",
+        "artifact",
+        "codebase_layer"
+      ],
+      "identity_chain": {
+        "directory_path": null,
+        "source_ref": "6_13_26__.txt",
+        "file_path": "6_13_26__.txt",
+        "function_symbol": null,
+        "feature_id": "6_13_26__",
+        "feature_label": "6_13_26__.txt",
+        "packet_key": "packet:58cba0c8aa2f"
+      },
+      "identity_required_complete": false,
+      "identity_chain_complete": false,
+      "identity_missing_required": [
+        "directory_path"
+      ],
+      "identity_missing_full": [
+        "directory_path",
+        "function_symbol"
+      ]
+    },
+    {
+      "directory_path": null,
+      "source_ref": "___6_13-codexout_.txt",
+      "file_path": "___6_13-codexout_.txt",
+      "function_symbol": null,
+      "packet_key": "packet:de12a47db2b2",
+      "feature_id": "___6_13-codexout_",
+      "feature_label": "___6_13-codexout_.txt",
+      "domain_class": "graph",
+      "ontology_label": "artifact",
+      "topology_label": "graph_layer",
+      "cluster_key": "graph:graph_layer",
+      "community_id": null,
+      "cluster_id": null,
+      "som_cluster": null,
+      "pagerank": null,
+      "language": "text",
+      "ontology_tags": [
+        "graph",
+        "artifact",
+        "graph_layer"
+      ],
+      "identity_chain": {
+        "directory_path": null,
+        "source_ref": "___6_13-codexout_.txt",
+        "file_path": "___6_13-codexout_.txt",
+        "function_symbol": null,
+        "feature_id": "___6_13-codexout_",
+        "feature_label": "___6_13-codexout_.txt",
+        "packet_key": "packet:de12a47db2b2"
+      },
+      "identity_required_complete": false,
+      "identity_chain_complete": false,
+      "identity_missing_required": [
+        "directory_path"
+      ],
+      "identity_missing_full": [
+        "directory_path",
+        "function_symbol"
+      ]
+    },
+    {
+      "directory_path": null,
+      "source_ref": "6_13_opencode_validation_skills.txt",
+      "file_path": "6_13_opencode_validation_skills.txt",
+      "function_symbol": null,
+      "packet_key": "packet:e8bdea54acbc",
+      "feature_id": "6_13_opencode_validation_skills",
+      "feature_label": "6_13_opencode_validation_skills.txt",
+      "domain_class": "agent",
+      "ontology_label": "artifact",
+      "topology_label": "agent_layer",
+      "cluster_key": "agent:agent_layer",
+      "community_id": null,
+      "cluster_id": null,
+      "som_cluster": null,
+      "pagerank": null,
+      "language": "text",
+      "ontology_tags": [
+        "agent",
+        "artifact",
+        "agent_layer"
+      ],
+      "identity_chain": {
+        "directory_path": null,
+        "source_ref": "6_13_opencode_validation_skills.txt",
+        "file_path": "6_13_opencode_validation_skills.txt",
+        "function_symbol": null,
+        "feature_id": "6_13_opencode_validation_skills",
+        "feature_label": "6_13_opencode_validation_skills.txt",
+        "packet_key": "packet:e8bdea54acbc"
+      },
+      "identity_required_complete": false,
+      "identity_chain_complete": false,
+      "identity_missing_required": [
+        "directory_path"
+      ],
+      "identity_missing_full": [
+        "directory_path",
+        "function_symbol"
+      ]
+    },
+    {
+      "directory_path": null,
+      "source_ref": "6_14_26_codexended_614.txt",
+      "file_path": "6_14_26_codexended_614.txt",
+      "function_symbol": null,
+      "packet_key": "packet:f725ae66087d",
+      "feature_id": "6_14_26_codexended_614",
+      "feature_label": "6_14_26_codexended_614.txt",
+      "domain_class": "gpu",
+      "ontology_label": "artifact",
+      "topology_label": "accelerator_layer",
+      "cluster_key": "gpu:accelerator_layer",
+      "community_id": null,
+      "cluster_id": null,
+      "som_cluster": null,
+      "pagerank": null,
+      "language": "text",
+      "ontology_tags": [
+        "gpu",
+        "artifact",
+        "accelerator_layer"
+      ],
+      "identity_chain": {
+        "directory_path": null,
+        "source_ref": "6_14_26_codexended_614.txt",
+        "file_path": "6_14_26_codexended_614.txt",
+        "function_symbol": null,
+        "feature_id": "6_14_26_codexended_614",
+        "feature_label": "6_14_26_codexended_614.txt",
+        "packet_key": "packet:f725ae66087d"
+      },
+      "identity_required_complete": false,
+      "identity_chain_complete": false,
+      "identity_missing_required": [
+        "directory_path"
+      ],
+      "identity_missing_full": [
+        "directory_path",
+        "function_symbol"
+      ]
+    },
+    {
+      "directory_path": null,
+      "source_ref": "6_14_26__todo_find_schema_matching.txt",
+      "file_path": "6_14_26__todo_find_schema_matching.txt",
+      "function_symbol": null,
+      "packet_key": "packet:5f926e99ad8f",
+      "feature_id": "6_14_26__todo_find_schema_matching",
+      "feature_label": "6_14_26__todo_find_schema_matching.txt",
+      "domain_class": "retrieval",
+      "ontology_label": "schema",
+      "topology_label": "retrieval_layer",
+      "cluster_key": "retrieval:retrieval_layer",
+      "community_id": null,
+      "cluster_id": null,
+      "som_cluster": null,
+      "pagerank": null,
+      "language": "text",
+      "ontology_tags": [
+        "retrieval",
+        "schema",
+        "retrieval_layer"
+      ],
+      "identity_chain": {
+        "directory_path": null,
+        "source_ref": "6_14_26__todo_find_schema_matching.txt",
+        "file_path": "6_14_26__todo_find_schema_matching.txt",
+        "function_symbol": null,
+        "feature_id": "6_14_26__todo_find_schema_matching",
+        "feature_label": "6_14_26__todo_find_schema_matching.txt",
+        "packet_key": "packet:5f926e99ad8f"
+      },
+      "identity_required_complete": false,
+      "identity_chain_complete": false,
+      "identity_missing_required": [
+        "directory_path"
+      ],
+      "identity_missing_full": [
+        "directory_path",
+        "function_symbol"
+      ]
+    },
+    {
+      "directory_path": null,
+      "source_ref": "6_14_26__to_do_parent_atlas_registery.txt",
+      "file_path": "6_14_26__to_do_parent_atlas_registery.txt",
+      "function_symbol": null,
+      "packet_key": "packet:07db78a3e18e",
+      "feature_id": "6_14_26__to_do_parent_atlas_registery",
+      "feature_label": "6_14_26__to_do_parent_atlas_registery.txt",
+      "domain_class": "agent",
+      "ontology_label": "artifact",
+      "topology_label": "agent_layer",
+      "cluster_key": "agent:agent_layer",
+      "community_id": null,
+      "cluster_id": null,
+      "som_cluster": null,
+      "pagerank": null,
+      "language": "text",
+      "ontology_tags": [
+        "agent",
+        "artifact",
+        "agent_layer"
+      ],
+      "identity_chain": {
+        "directory_path": null,
+        "source_ref": "6_14_26__to_do_parent_atlas_registery.txt",
+        "file_path": "6_14_26__to_do_parent_atlas_registery.txt",
+        "function_symbol": null,
+        "feature_id": "6_14_26__to_do_parent_atlas_registery",
+        "feature_label": "6_14_26__to_do_parent_atlas_registery.txt",
+        "packet_key": "packet:07db78a3e18e"
+      },
+      "identity_required_complete": false,
+      "identity_chain_complete": false,
+      "identity_missing_required": [
+        "directory_path"
+      ],
+      "identity_missing_full": [
+        "directory_path",
+        "function_symbol"
+      ]
+    },
+    {
+      "directory_path": null,
+      "source_ref": "6_15_hyperrag_tod.txt",
+      "file_path": "6_15_hyperrag_tod.txt",
+      "function_symbol": null,
+      "packet_key": "packet:8abbf103de6a",
+      "feature_id": "6_15_hyperrag_tod",
+      "feature_label": "6_15_hyperrag_tod.txt",
+      "domain_class": "retrieval",
+      "ontology_label": "artifact",
+      "topology_label": "retrieval_layer",
+      "cluster_key": "retrieval:retrieval_layer",
+      "community_id": null,
+      "cluster_id": null,
+      "som_cluster": null,
+      "pagerank": null,
+      "language": "text",
+      "ontology_tags": [
+        "retrieval",
+        "artifact",
+        "retrieval_layer"
+      ],
+      "identity_chain": {
+        "directory_path": null,
+        "source_ref": "6_15_hyperrag_tod.txt",
+        "file_path": "6_15_hyperrag_tod.txt",
+        "function_symbol": null,
+        "feature_id": "6_15_hyperrag_tod",
+        "feature_label": "6_15_hyperrag_tod.txt",
+        "packet_key": "packet:8abbf103de6a"
+      },
+      "identity_required_complete": false,
+      "identity_chain_complete": false,
+      "identity_missing_required": [
+        "directory_path"
+      ],
+      "identity_missing_full": [
+        "directory_path",
+        "function_symbol"
+      ]
+    },
+    {
+      "directory_path": null,
+      "source_ref": "618__25todo.txt",
+      "file_path": "618__25todo.txt",
+      "function_symbol": null,
+      "packet_key": "packet:51ad92951859",
+      "feature_id": "618__25todo",
+      "feature_label": "618__25todo.txt",
+      "domain_class": "docs",
+      "ontology_label": "artifact",
+      "topology_label": "codebase_layer",
+      "cluster_key": "docs:codebase_layer",
+      "community_id": null,
+      "cluster_id": null,
+      "som_cluster": null,
+      "pagerank": null,
+      "language": "text",
+      "ontology_tags": [
+        "docs",
+        "artifact",
+        "codebase_layer"
+      ],
+      "identity_chain": {
+        "directory_path": null,
+        "source_ref": "618__25todo.txt",
+        "file_path": "618__25todo.txt",
+        "function_symbol": null,
+        "feature_id": "618__25todo",
+        "feature_label": "618__25todo.txt",
+        "packet_key": "packet:51ad92951859"
+      },
+      "identity_required_complete": false,
+      "identity_chain_complete": false,
+      "identity_missing_required": [
+        "directory_path"
+      ],
+      "identity_missing_full": [
+        "directory_path",
+        "function_symbol"
+      ]
+    },
+    {
+      "directory_path": null,
+      "source_ref": "6_18_todopt2.txt",
+      "file_path": "6_18_todopt2.txt",
+      "function_symbol": null,
+      "packet_key": "packet:fbdc772d15fe",
+      "feature_id": "6_18_todopt2",
+      "feature_label": "6_18_todopt2.txt",
+      "domain_class": "ui",
+      "ontology_label": "artifact",
+      "topology_label": "ui_layer",
+      "cluster_key": "ui:ui_layer",
+      "community_id": null,
+      "cluster_id": null,
+      "som_cluster": null,
+      "pagerank": null,
+      "language": "text",
+      "ontology_tags": [
+        "ui",
+        "artifact",
+        "ui_layer"
+      ],
+      "identity_chain": {
+        "directory_path": null,
+        "source_ref": "6_18_todopt2.txt",
+        "file_path": "6_18_todopt2.txt",
+        "function_symbol": null,
+        "feature_id": "6_18_todopt2",
+        "feature_label": "6_18_todopt2.txt",
+        "packet_key": "packet:fbdc772d15fe"
+      },
+      "identity_required_complete": false,
+      "identity_chain_complete": false,
+      "identity_missing_required": [
+        "directory_path"
+      ],
+      "identity_missing_full": [
+        "directory_path",
+        "function_symbol"
+      ]
+    },
+    {
+      "directory_path": null,
+      "source_ref": "6_18_todo_pt3.txt",
+      "file_path": "6_18_todo_pt3.txt",
+      "function_symbol": null,
+      "packet_key": "packet:b9038666fefe",
+      "feature_id": "6_18_todo_pt3",
+      "feature_label": "6_18_todo_pt3.txt",
+      "domain_class": "retrieval",
+      "ontology_label": "artifact",
+      "topology_label": "retrieval_layer",
+      "cluster_key": "retrieval:retrieval_layer",
+      "community_id": null,
+      "cluster_id": null,
+      "som_cluster": null,
+      "pagerank": null,
+      "language": "text",
+      "ontology_tags": [
+        "retrieval",
+        "artifact",
+        "retrieval_layer"
+      ],
+      "identity_chain": {
+        "directory_path": null,
+        "source_ref": "6_18_todo_pt3.txt",
+        "file_path": "6_18_todo_pt3.txt",
+        "function_symbol": null,
+        "feature_id": "6_18_todo_pt3",
+        "feature_label": "6_18_todo_pt3.txt",
+        "packet_key": "packet:b9038666fefe"
+      },
+      "identity_required_complete": false,
+      "identity_chain_complete": false,
+      "identity_missing_required": [
+        "directory_path"
+      ],
+      "identity_missing_full": [
+        "directory_path",
+        "function_symbol"
+      ]
+    },
+    {
+      "directory_path": null,
+      "source_ref": "6_19_26_pt1.2_todo.txt",
+      "file_path": "6_19_26_pt1.2_todo.txt",
+      "function_symbol": null,
+      "packet_key": "packet:a6f6fdb79109",
+      "feature_id": "6_19_26_pt1.2_todo",
+      "feature_label": "6_19_26_pt1.2_todo.txt",
+      "domain_class": "retrieval",
+      "ontology_label": "artifact",
+      "topology_label": "retrieval_layer",
+      "cluster_key": "retrieval:retrieval_layer",
+      "community_id": null,
+      "cluster_id": null,
+      "som_cluster": null,
+      "pagerank": null,
+      "language": "text",
+      "ontology_tags": [
+        "retrieval",
+        "artifact",
+        "retrieval_layer"
+      ],
+      "identity_chain": {
+        "directory_path": null,
+        "source_ref": "6_19_26_pt1.2_todo.txt",
+        "file_path": "6_19_26_pt1.2_todo.txt",
+        "function_symbol": null,
+        "feature_id": "6_19_26_pt1.2_todo",
+        "feature_label": "6_19_26_pt1.2_todo.txt",
+        "packet_key": "packet:a6f6fdb79109"
+      },
+      "identity_required_complete": false,
+      "identity_chain_complete": false,
+      "identity_missing_required": [
+        "directory_path"
+      ],
+      "identity_missing_full": [
+        "directory_path",
+        "function_symbol"
+      ]
+    },
+    {
+      "directory_path": null,
+      "source_ref": "619_nextsteps_todopt1.3.txt",
+      "file_path": "619_nextsteps_todopt1.3.txt",
+      "function_symbol": null,
+      "packet_key": "packet:500ed1a09614",
+      "feature_id": "619_nextsteps_todopt1.3",
+      "feature_label": "619_nextsteps_todopt1.3.txt",
+      "domain_class": "graph",
+      "ontology_label": "artifact",
+      "topology_label": "graph_layer",
+      "cluster_key": "graph:graph_layer",
+      "community_id": null,
+      "cluster_id": null,
+      "som_cluster": null,
+      "pagerank": null,
+      "language": "text",
+      "ontology_tags": [
+        "graph",
+        "artifact",
+        "graph_layer"
+      ],
+      "identity_chain": {
+        "directory_path": null,
+        "source_ref": "619_nextsteps_todopt1.3.txt",
+        "file_path": "619_nextsteps_todopt1.3.txt",
+        "function_symbol": null,
+        "feature_id": "619_nextsteps_todopt1.3",
+        "feature_label": "619_nextsteps_todopt1.3.txt",
+        "packet_key": "packet:500ed1a09614"
+      },
+      "identity_required_complete": false,
+      "identity_chain_complete": false,
+      "identity_missing_required": [
+        "directory_path"
+      ],
+      "identity_missing_full": [
+        "directory_path",
+        "function_symbol"
+      ]
+    }
+  ],
+  "notes": [
+    "This is a deterministic mapping audit for enhanced Gemma4 summaries.",
+    "Domain/ontology/topology may be inferred when explicit LangExtract/GDS fields are not yet repopulated.",
+    "Postgres atlas_packets remains canonical; Qdrant/Redis/Neo4j should mirror this context later."
+  ]
+}

@@ -1,0 +1,26 @@
+{
+  "canonical": "packages/atlas-core",
+  "operational": "packages/parent-atlas",
+  "compatibility_bridge": "packages/parent-atlas-core",
+  "retrieval": "packages/parent-atlas-retrieval",
+  "ingest": "packages/parent-atlas-ingest",
+  "opencode": "packages/parent-atlas-opencode",
+  "historical_reference_only": [
+    "packages/atlas",
+    "packages/parent-atlas-sveltekit"
+  ],
+  "truth_layers": [
+    "Postgres",
+    "Qdrant",
+    "Redis",
+    "Neo4j"
+  ],
+  "roles": {
+    "packages/atlas-core": "canonical_contracts_and_validation",
+    "packages/parent-atlas": "cli_and_infrastructure_adapters",
+    "packages/parent-atlas-core": "identity_bridge_and_schema_adapters",
+    "packages/parent-atlas-retrieval": "retrieval_acceleration_and_cache_mirrors",
+    "packages/parent-atlas-ingest": "repository_scanning_and_packet_generation",
+    "packages/parent-atlas-opencode": "agent_cli_and_skill_surface"
+  }
+}

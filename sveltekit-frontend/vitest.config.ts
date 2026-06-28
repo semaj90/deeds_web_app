@@ -225,6 +225,13 @@ export default defineConfig({
       'tests/rg-cluster-pivot.spec.ts',
       // Phase 12C — bifrost semantic cache correctness + drift prevention
       'tests/bifrost-semantic-cache.spec.ts',
+      // GPU acceleration implementations (Session 88 — Lane 4 GPU wiring)
+      'tests/gpu/som-clustering.spec.ts',
+      'tests/gpu/attention-scoring.spec.ts',
+      'tests/gpu/autoencoder-compression.spec.ts',
+      'tests/gpu/som-topology-prefilter.spec.ts',
+      // TensorRT N-API worker pool integration (Session 88 Continuation)
+      'tests/gpu/tensorrt-integration.spec.ts',
     ],
     exclude: [
       'node_modules/**',

@@ -12,15 +12,27 @@
 
 **Pivot**: Parent Atlas becomes a **library**, not an app feature.
 
+**Current package map**
+
 ```
 deeds-web-app/
   packages/
-    parent-atlas-core/      (identity, schemas, adapters)
-    parent-atlas-ingest/    (repo scanning, AST, packets)
-    parent-atlas-opencode/  (OpenCode integration)
-    parent-atlas-sveltekit/ (API routes, UI)
-  sveltekit-frontend/       (consumes the packages)
+    atlas-core/              (canonical contracts, validation, RPC, GPU types)
+    parent-atlas/            (CLI, audits, adapters, cache/mapreduce orchestration)
+    parent-atlas-core/       (identity/schemas/adapters bridge)
+    parent-atlas-ingest/     (repo scanning, AST, packet generation)
+    parent-atlas-retrieval/  (Bifrost, TurboVec, GPU/SIMD bridges)
+    parent-atlas-opencode/   (OpenCode integration)
+  sveltekit-frontend/        (consumes the packages)
 ```
+
+**Boundary rule**: `packages/atlas-core` is the canonical contract layer. `packages/parent-atlas`
+is the operational CLI / adapter boundary. The specialized `parent-atlas-*` packages are
+the package surfaces for ingest, retrieval, and OpenCode integration.
+
+**Boundary verifier**: `npm run verify:spec-supersedes` reads
+`docs/atlas/package-boundary-registry.json` and keeps active docs free of stale package-boundary
+drift. Historical references remain reference-only.
 
 **See**: `docs/P1-PACKAGE-CONSOLIDATION-IN-PROGRESS.md` for phase tracking.
 

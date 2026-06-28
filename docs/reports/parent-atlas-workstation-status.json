@@ -1,0 +1,51 @@
+{
+  "generated_at": "2026-06-28T17:02:02.210Z",
+  "database": {
+    "database": "legal_ai_db",
+    "username": "legal_admin",
+    "schema": "public"
+  },
+  "boundary": {
+    "canonical_truth": [
+      "atlas_packets",
+      "atlas_packet_registry",
+      "atlas_summary_layers"
+    ],
+    "derived_mirrors": [
+      "qdrant",
+      "redis_bitfrost",
+      "neo4j",
+      "turbovec"
+    ],
+    "rule": "Postgres packet and summary spine first; mirrors are refreshed after canonical summaries exist."
+  },
+  "tables": {
+    "atlas_packets": 58304,
+    "atlas_packet_registry": 58304,
+    "atlas_summary_layers": 181,
+    "atlas_artifacts": 58305,
+    "codebase_chunk_index": 40754,
+    "parent_atlas_documents": null,
+    "atlas_feature_envelopes": null,
+    "atlas_retrieval_eval_times": null,
+    "atlas_provenance_tree": null
+  },
+  "metrics": {
+    "packetSummaries": 182,
+    "summaryLayersPopulated": 181,
+    "jsonShapedPacketSummaries": 0,
+    "jsonShapedSummaryLayers": 0,
+    "missingPacketRegistryRows": 0
+  },
+  "status": {
+    "canonicalSpine": "READY",
+    "summaries": "STARTED",
+    "summaryLayers": "STARTED",
+    "mirrors": "READY_FOR_MIRROR_REFRESH"
+  },
+  "next_actions": [
+    "Continue bounded Gemma4 summary batches with atlas:workstation:summaries:100.",
+    "Do not mirror to Qdrant/Redis/Neo4j until summary coverage is intentionally advanced.",
+    "Use atlas_summary_layers as the canonical envelope source for downstream feature extraction."
+  ]
+}

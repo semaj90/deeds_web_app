@@ -4,6 +4,7 @@ import { existsSync } from 'node:fs';
 import path from 'path';
 import { createHash } from 'node:crypto';
 import Redis from 'ioredis';
+import { loadAtlasEnvFiles, getRedisPassword } from '../../scripts/atlas/lib/redis-valkey.mjs';
 
 function findRepoRoot(startDir) {
   const current = path.resolve(startDir);
@@ -49,6 +50,8 @@ async function main() {
     throw new Error(`Missing enriched cards file: ${cardsPath}`);
   }
 
+  const mergedEnv = await loadAtlasEnvFiles(cwd, ['.env', '.env.local']);
+  const redisPassword = getRedisPassword({ ...mergedEnv, ...process.env });
   const cards = readJsonlSyncSafe(await fs.readFile(cardsPath, 'utf8'));
   const edges = existsSync(edgesPath) ? readJsonlSyncSafe(await fs.readFile(edgesPath, 'utf8')) : [];
   const report = existsSync(reportPath) ? JSON.parse(await fs.readFile(reportPath, 'utf8')) : null;
@@ -128,6 +131,7 @@ async function main() {
     lazyConnect: true,
     maxRetriesPerRequest: 1,
     connectTimeout: 3000,
+    ...(redisPassword ? { password: redisPassword } : {}),
   });
   await redis.connect();
   await redis.set(

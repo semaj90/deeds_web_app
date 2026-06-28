@@ -140,6 +140,9 @@ CREATE INDEX IF NOT EXISTS idx_summary_layers_packet_key
 CREATE INDEX IF NOT EXISTS idx_summary_layers_layer_type
   ON atlas_summary_layers (layer_type);
 
+CREATE INDEX IF NOT EXISTS idx_summary_layers_packet_effective_level
+  ON atlas_summary_layers (packet_key, COALESCE(layer_type, summary_level));
+
 CREATE INDEX IF NOT EXISTS idx_summary_layers_keywords
   ON atlas_summary_layers USING gin (keywords);
 

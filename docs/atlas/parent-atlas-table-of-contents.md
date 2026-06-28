@@ -7,6 +7,7 @@ This page is the navigation entry for the Parent Atlas workstream. It links the 
 - [**Retrieval Layer Separation**](</C:/Users/james/Videos/deeds-web-app/docs/architecture/retrieval-layer-separation.md>) — Three-layer architecture: Orchestrator → Search Contract → Backend Implementation. Caller rule: never call Qdrant directly.
 - [Compressed Semantic Geometry](</C:/Users/james/Videos/deeds-web-app/docs/architecture/compressed-semantic-geometry.md>) — Qdrant/TurboVec/Redis LOD as approximate search geometry with optional exact rescore.
 - [Parent Atlas - Storage & Runtime Decision](</C:/Users/james/Videos/deeds-web-app/docs/atlas/parent-atlas-storage-decision.md>)
+- [Parent Atlas Package Boundary Registry](</C:/Users/james/Videos/deeds-web-app/docs/atlas/package-boundary-registry.json>)
 - [Parent Atlas - Data Spine](</C:/Users/james/Videos/deeds-web-app/docs/atlas/parent-atlas-data-spine.md>)
 - [Parent Atlas - Packet Identity Operating System](</C:/Users/james/Videos/deeds-web-app/docs/PARENT-ATLAS-PACKET-IDENTITY-OS.md>)
 - [Parent Atlas Karpathy Pipeline](</C:/Users/james/Videos/deeds-web-app/docs/architecture/parent-atlas-karpathy-pipeline.md>)

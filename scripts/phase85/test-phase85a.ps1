@@ -61,7 +61,7 @@ try {
 
 Write-Info "Checking Redis..."
 try {
-  $redisResult = docker exec legal-ai-redis redis-cli ping 2>&1
+  $redisResult = docker exec legal-ai-valkey valkey-cli -a redis ping 2>&1
   if ($redisResult -eq 'PONG') {
     Write-Pass "Redis: Connected"
   } else {
@@ -162,7 +162,7 @@ foreach ($name in $modules.Keys) {
     $size = (Get-Item $path).Length
     Write-Pass "$name ($([Math]::Round($size/1KB))KB)"
   } else {
-    Write-Fail "$name: NOT FOUND at $path"
+    Write-Fail "${name}: NOT FOUND at $path"
   }
 }
 
@@ -175,19 +175,19 @@ $diffPath = 'c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\src\lib\serv
 if (Test-Path $diffPath) {
   $content = Get-Content $diffPath -Raw
 
-  $features = @(
+  $features = @{
     'cosineSimilarity' = 'Cosine similarity function'
     'SEMANTIC_DIFF_THRESHOLDS' = 'Thresholds (0.99/0.95/0.80/0.60)'
     'embedText' = 'Text embedding via EmbeddingGemma'
     'computeTextSimilarity' = 'Levenshtein fallback'
     'cacheSummaryEmbedding' = 'Redis embedding cache'
-  )
+  }
 
   foreach ($feature in $features.Keys) {
     if ($content -match $feature) {
       Write-Pass $features[$feature]
     } else {
-      Write-Warn "$feature: Not found"
+      Write-Warn "${feature}: Not found"
     }
   }
 } else {
@@ -270,11 +270,11 @@ $schemaPath = 'c:\Users\james\Videos\deeds-web-app\sveltekit-frontend\src\lib\se
 if (Test-Path $schemaPath) {
   $content = Get-Content $schemaPath -Raw
 
-  $schemas = @(
+  $schemas = @{
     './schema/atlas-packets.js' = 'atlasPackets'
     './schema/atlas-artifacts.js' = 'atlas_artifacts'
     './schema/atlas-semantic-diffs.js' = 'atlas_semantic_diffs'
-  )
+  }
 
   foreach ($schema in $schemas.Keys) {
     if ($content -match "export.*from.*$schema") {
