@@ -445,6 +445,7 @@
     "langextract:canonical:dry": "node scripts/phase85/langextract-canonical-pipeline.mjs --verbose",
     "langextract:canonical": "node scripts/phase85/langextract-canonical-pipeline.mjs --apply --verbose",
     "atlas:summary-surface:verify": "node scripts/atlas/verify-summary-surface.mjs"
+    "atlas:summary-envelope:multihop:audit": "node scripts/atlas/audit-summary-envelope-multihop.mjs",
   },
   "devDependencies": {
     "@ast-grep/cli": "0.42.3",
