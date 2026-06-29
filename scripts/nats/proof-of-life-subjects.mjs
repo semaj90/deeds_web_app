@@ -14,9 +14,22 @@
  * - retrieval.turbovec.rerank
  * - gpu.cuvs.search
  * - gpu.cuda.rank
+ *
+ * NOTE: Requires 'npm install nats' (not installed by default)
+ * This script is optional; the idle-review agent works in simulation mode without it.
  */
 
-import { connect } from 'nats';
+let connect;
+try {
+  const natsModule = await import('nats');
+  connect = natsModule.connect;
+} catch (err) {
+  console.error('\n❌ NATS package not installed.');
+  console.error('To run this proof-of-life test, install: npm install nats');
+  console.error('\nThe idle-review agent works in simulation mode without NATS.');
+  console.error('Status: WIRED_NOT_PROVEN (NATS not available)\n');
+  process.exit(1);
+}
 import { delay } from './utils.mjs';
 
 const NATS_SERVERS = process.env.NATS_SERVERS || 'nats://127.0.0.1:4222';

@@ -124,7 +124,7 @@ async function rankNextTasks(state) {
       evidence: ['gemma4-feedback-layer.ts complete', '6 function signatures defined', 'No worker nodes yet'],
       status: 'DESIGN',
       scoreBreakdown: {
-        blocker_severity: 0.8, // RLM can\'t execute without workers
+        blocker_severity: 0.8, // RLM can't execute without workers
         dependency_unblock: 0.9, // Unblocks Gemma4 iteration loop
         replay_reward: 0.7, // Will improve recommendation quality
         recent_user_context: 0.6, // Medium context
