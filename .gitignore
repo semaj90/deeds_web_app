@@ -713,6 +713,7 @@ legal-corpus-load-test.exe
 python3.11/
 .venv-phase46/
 .venv/
+.venv-gemma4/
 venv/
 **/venv/
 .python311/

@@ -215,10 +215,10 @@ async function main() {
   console.log('──────────────────────────────────────────────────\n');
 
   if (pass && profArg !== 'q8') {
-    console.log('  Next step: set TURBO_KV_K=q8_0 TURBO_KV_V=turbo3 TURBO_CTX=16384 before turbo:start:detached');
+    console.log('  Next step: set TURBO_KV_K=q8_0 TURBO_KV_V=turbo3 TURBO_CTX=65536 before turbo:start:detached');
     console.log('  (requires TurboQuant-enabled llama-server binary at LLAMA_SERVER_PATH).\n');
   } else if (!pass) {
-    console.log('  Keep: -ctk q8_0 -ctv q8_0 (stable baseline). If q8/turbo3 fails, fall back to q8/q8 with TURBO_CTX=16384.\n');
+    console.log('  Keep: -ctk q8_0 -ctv q8_0 (stable baseline). If q8/turbo3 fails, fall back to q8/q8 with TURBO_CTX=65536.\n');
   }
 
   // Write report

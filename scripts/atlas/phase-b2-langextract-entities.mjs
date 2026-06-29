@@ -183,6 +183,8 @@ async function writeToPostgres(packets) {
   }
 }
 
+const startTime = Date.now();
+
 async function main() {
   console.log('╔════════════════════════════════════════════════════════════════╗');
   console.log('║  Phase B Pass 2: Entity Extraction & Keywords                  ║');
@@ -268,5 +270,4 @@ async function main() {
   }
 }
 
-const startTime = Date.now();
 main();

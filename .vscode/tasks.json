@@ -11801,6 +11801,72 @@
         "clear": false
       },
       "detail": "Phase 85 P0: Dry-run mirror restoration from Postgres canonical truth. Verifies 40,568 codebase chunks ready for Qdrant upsert (406 batches @ 100 points). Zero writes, safe on startup."
+    },
+    {
+      "label": "📦 Phase B: Gemma4 RabbitMQ Consumer (Packet Summaries)",
+      "type": "shell",
+      "command": "npx tsx scripts/atlas/phase-b-queue-consumer-gemma4.mts",
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
+      "isBackground": true,
+      "runOptions": {
+        "runOn": "userRequest"
+      },
+      "problemMatcher": [],
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": true,
+        "panel": "shared",
+        "showReuseMessage": true,
+        "clear": false
+      },
+      "detail": "Phase B: Asynchronous Gemma4 summarization worker. Consumes 57,112 remaining packets from RabbitMQ atlas.enrichment.gemma4 queue. Logs analysis_pass_results with provenance. Runs continuously until stopped (Ctrl+C). Restart-safe via idempotent queue consumption."
+    },
+    {
+      "label": "📤 Phase B: Enqueue Remaining Packets to RabbitMQ",
+      "type": "shell",
+      "command": "npx tsx scripts/atlas/phase-b-queue-producer.mts --apply",
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
+      "isBackground": false,
+      "runOptions": {
+        "runOn": "userRequest"
+      },
+      "problemMatcher": [],
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": true,
+        "panel": "shared",
+        "showReuseMessage": false,
+        "clear": false
+      },
+      "detail": "Phase B: Enqueue all remaining 57,112 packets (without summaries) into RabbitMQ atlas.enrichment.gemma4 queue. Durable messages, safe to restart consumer. Run this before starting the consumer."
+    },
+    {
+      "label": "🎯 Phase B: EmbeddingGemma RabbitMQ Consumer (Packet Embeddings)",
+      "type": "shell",
+      "command": "npx tsx scripts/atlas/phase-b-queue-consumer-embedding.mts",
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
+      "isBackground": true,
+      "runOptions": {
+        "runOn": "userRequest"
+      },
+      "problemMatcher": [],
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": true,
+        "panel": "shared",
+        "showReuseMessage": true,
+        "clear": false
+      },
+      "detail": "Phase B: Asynchronous EmbeddingGemma worker. Consumes summaries from RabbitMQ atlas.enrichment.embedding queue, computes 384-dim embeddings via Ollama, logs analysis_pass_results, updates atlas_summary_layers. Runs continuously. Stop with Ctrl+C."
     }
   ]
 }

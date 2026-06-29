@@ -24,3 +24,7 @@
 
 # Codebase graph — large gitignored JSON, but searchable for offline analytics
 !sveltekit-frontend/docs/graph/codebase-graph.json
+
+# Python virtual environments — gitignored but searchable by rg
+!.venv-gemma4/
+!.venv-gemma4/**

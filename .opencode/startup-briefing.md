@@ -17,7 +17,7 @@ Hello James.
 - neo4j: healthy
 - packet contract: wired
 - turbovec: deferred
-- bitfrost: PASS
+- bitfrost: AUTH_REQUIRED
 - bitfrost warm: applied
 - redis mirror: PASS
 - runtime evidence packetization: materialized
@@ -30,15 +30,15 @@ Hello James.
 
 ## Validation Quality
 
-- replay trace status: pass
-- retrieval benchmark status: pass
+- replay trace status: pass_with_warnings
+- retrieval benchmark status: pass_with_warnings
 - concept evidence status: LIVE_SPINE_PACKET_KEYS
 - replay trace qdrant hit pct: 100.0%
 - replay trace cache hit pct: 100.0%
-- replay trace total p50 / p95: 3980 / 6280
-- retrieval benchmark total p50 / p95: 9930 / 14753
+- replay trace total p50 / p95: 5741 / 6099
+- retrieval benchmark total p50 / p95: 23972 / 36167
 - retrieval benchmark qdrant hits: yes
-- retrieval benchmark ledger matches: yes
+- retrieval benchmark ledger matches: no
 - retrieval benchmark all answered: yes
 - kanban loop diagnosis status: WARN
 - kanban loop diagnosis anomaly count: 2
@@ -53,9 +53,9 @@ Hello James.
 
 1. Retrieval telemetry depth / replay breadth
 2. With the Qdrant tag mirror applied, move to the Neo4j / GDS topology pass until graph scores, community labels, and sourceRef projection are fully applied.
-3. Warm the Bitfrost semantic cache from canonical Postgres rows before treating mirrors as runtime truth.
-4. With Redis centroid and Bitfrost warm lanes applied, move retrieval work toward HyperRAG fusion rather than more cache mirroring.
-5. Keep runtime evidence packetization on the admin-side path: turn Playwright, dev:gpu output, server logs, and cache events into chrom97 packets before Gemma4 synthesis.
+3. With Redis centroid and Bitfrost warm lanes applied, move retrieval work toward HyperRAG fusion rather than more cache mirroring.
+4. Keep runtime evidence packetization on the admin-side path: turn Playwright, dev:gpu output, server logs, and cache events into chrom97 packets before Gemma4 synthesis.
+5. Use dev:gpu as the capture harness, but keep llama-server.exe on :8090 for chat/synthesis and Ollama/EmbeddingGemma embeddings-only; route RTX into batching, compression, and rerank, not canonical truth.
 
 ## Notes
 
@@ -68,7 +68,7 @@ Hello James.
 - higher-hop schema repair status: COMPLETE
 - higher-hop schema repair blockers: n/a
 - active temporal lane: n/a
-- bitfrost audit status: PASS
+- bitfrost audit status: AUTH_REQUIRED
 - bitfrost warm applied writes: 1000
 - redis centroid mirror status: PASS
 - runtime evidence packetization status: materialized
@@ -77,7 +77,15 @@ Hello James.
 - agent context run story/task: story:phase89-error-clustering / task:qdrant-timeout-repair
 - agent context run cache namespace: bifrost:sem
 - agent context run cache source: valkey-semantic
-- agent context run reward: 0.326666
+- agent context run reward: 0.387303
+- agent context run token budget: 1024
+- agent context run estimated context tokens: 31
+- agent context run permission level: app-checkout-required
+- agent context run best path: valkey-exact-cache -> agent-context-run -> packet-first response
+- agent context run retrieval engine: go-retrieval
+- agent context run need firecrawl: no
+- agent context run need web search: no
+- agent context run route open: yes
 - context gym evals status: PASS
 - context gym evals query count: 50
 - context gym evals winner: policy_C

@@ -271,7 +271,7 @@ if (-not (Test-Path $model)) { throw "TurboQuant model GGUF not found at: $model
 
 
 # -- Pre-flight: evict Ollama-resident model so VRAM is free --------------
-if (-not $NoEvict) {
+if (-not $NoEvict -and -not $StatusOnly) {
   try {
     $ps = Invoke-RestMethod 'http://127.0.0.1:11434/api/ps' -TimeoutSec 2
     if ($ps.models -and $ps.models.Count -gt 0) {
@@ -406,7 +406,7 @@ if (-not $StatusOnly) {
             $jinjaOk = $false
             try {
                 $props = Invoke-RestMethod ("http://127.0.0.1:$port/props") -TimeoutSec 2 -ErrorAction Stop
-                $jinjaOk = ($props.system_prompt.supports_system_role -eq $true) -or ($props.supports_system_role -eq $true)
+                $jinjaOk = ($props.chat_template_caps.supports_system_role -eq $true) -or ($props.system_prompt.supports_system_role -eq $true) -or ($props.supports_system_role -eq $true)
             } catch {
                 # /props unavailable on old builds — treat as unknown, require restart
                 $jinjaOk = $false
@@ -431,7 +431,7 @@ if (-not $StatusOnly) {
             # /slots returned empty — fall back to /props check before accepting
             try {
                 $props = Invoke-RestMethod ("http://127.0.0.1:$port/props") -TimeoutSec 2 -ErrorAction Stop
-                $jinjaOk = ($props.system_prompt.supports_system_role -eq $true) -or ($props.supports_system_role -eq $true)
+                $jinjaOk = ($props.chat_template_caps.supports_system_role -eq $true) -or ($props.system_prompt.supports_system_role -eq $true) -or ($props.supports_system_role -eq $true)
                 if ($jinjaOk) {
                     Write-Host "TurboQuant already healthy on http://127.0.0.1:$port (system_role=OK)" -ForegroundColor Yellow
                     exit 0

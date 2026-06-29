@@ -19,7 +19,7 @@ The system is split into two specialized pipelines to ensure maximum performance
     7.  **Output**: Context-packed `chunk_id` bundles for the generation lane.
 
 ### B. Generation Lane (llama-server)
-*   **Model**: `Gemma4` / `Qwen` via `llama-server`.
+*   **Model**: `Gemma4` via `llama-server`.
 *   **Inference Tech**: KV Cache / TurboQuant / Bitfrost.
 *   **Purpose**: Reasoning over retrieved context, answer generation, and plan synthesis.
 *   **Flow**:
