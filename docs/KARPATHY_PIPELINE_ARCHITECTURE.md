@@ -59,17 +59,172 @@ Every piece of information follows a unified identification protocol to enable s
 ### Example Metadata (JSON)
 ```json
 {
+  "packet_key": "packet:card:src/hooks.server.ts:09dd0811f209",
   "chunk_id": "card:src/hooks.server.ts:09dd0811f209",
   "text_hash": "sha256:...",
+  "kb_snapshot_hash": "sha256:...",
   "source_path": "src/hooks.server.ts",
+  "canonical_source_ref": "src/hooks.server.ts",
+  "source_ref": "src/hooks.server.ts#default",
+  "source_ref_key": "src/hooks.server.ts#default",
+  "feature_id": "hooks.server",
+  "feature_label": "hooks.server.ts",
+  "domain_class": "auth",
+  "ontology_label": "auth_pipeline",
+  "topology_label": "web_entrypoint",
+  "community_id": "auth",
+  "cluster_key": "server-entry",
+  "som_cluster": 42,
+  "community_confidence": 0.91,
+  "qdrant_point_id": "144288",
+  "qdrant_collection": "codebase_chunks_768",
+  "redis_centroid_key": "centroid:auth",
+  "tags": ["auth", "redis", "qdrant", "db", "llm"],
+  "ace_tags": ["auth", "cache", "retrieval"],
+  "risk_score": 0.297,
+  "embedding_model": "embeddinggemma:latest",
+  "embedding_dim": 768
+}
+```
+
+### Multihop Summary Envelope
+
+For multihop traversal, the summary layer should preserve the same identity spine and persist the traversal labels used by Neo4j/GDS, Redis centroids, and Qdrant mirrors:
+
+- `packet_key`
+- `source_ref`
+- `source_ref_key`
+- `feature_id`
+- `feature_label`
+- `domain_class`
+- `ontology_label`
+- `topology_label`
+- `summary_packet_key`
+- `community_id`
+- `som_cluster`
+- `qdrant_point_id`
+- `redis_centroid_key`
+
+These fields are searchable metadata, not identity replacements. The canonical truth remains Postgres packet and summary tables.
+
+## Karpathy Metadata Contract
+
+Each indexed code chunk should carry enough metadata to support deterministic retrieval, topology expansion, reranking, and replay learning.
+
+### Required Metadata
+```json
+{
+  "packet_key": "packet:card:src/hooks.server.ts:09dd0811f209",
+  "chunk_id": "card:src/hooks.server.ts:09dd0811f209",
+  "text_hash": "sha256:...",
+  "kb_snapshot_hash": "sha256:...",
+  "source_path": "src/hooks.server.ts",
+  "source_ref": "src/hooks.server.ts#handle",
+  "source_ref_key": "src/hooks.server.ts#handle",
+  "symbol": "handle",
   "kind": "hooks",
+  "feature_id": "auth.session.middleware",
+  "feature_label": "Session Middleware",
+  "domain_class": "authentication",
+  "ontology_label": "auth_pipeline",
+  "topology_label": "web_entrypoint",
   "tags": ["auth", "redis", "qdrant", "db", "llm"],
   "risk_score": 0.297,
   "embedding_model": "embeddinggemma:latest",
   "embedding_dim": 768,
-  "kb_snapshot_hash": "sha256:..."
+  "summary_version": "gemma4-v1",
+  "policy_model_version": "policy-reranker-v1"
 }
 ```
+
+### Storage Mapping
+
+- `Postgres atlas_packets` = truth, packet identity, metadata, summaries, replay state.
+- `Postgres atlas_summary_layers` = stored summary layer and summary metadata envelope.
+- `Qdrant` = semantic mirror, vector search, payload filters.
+- `Neo4j` = topology mirror, imports/calls/feature graph.
+- `Valkey / BitFrost` = hot cache, packet lookup, SOM cell cache, replay hints.
+- `.pt` artifacts = learned structures: policy, SOM codebook, autoencoder, centroids.
+
+### Retrieval Use
+
+This metadata enables:
+
+```text
+query
+  ↓
+intent decomposition
+  ↓
+Qdrant content/summary/signature search
+  ↓
+metadata filter by feature_id/domain/tags/risk
+  ↓
+Neo4j expansion by source_path/symbol/imports
+  ↓
+Karpathy rerank
+  ↓
+policy-reranker.pt score
+  ↓
+ACE packet assembly
+  ↓
+Gemma4 synthesis
+```
+
+### Karpathy Rerank Score
+
+```text
+karpathy_score =
+  0.25 * semantic_similarity
++ 0.20 * summary_similarity
++ 0.15 * authority_score
++ 0.10 * risk_score
++ 0.10 * topology_score
++ 0.10 * replay_reward
++ 0.05 * recency_score
++ 0.05 * cache_hit_score
+```
+
+Final displayed rank should be normalized to 0-100%.
+
+### Snapshot Rule
+
+Every packet must include:
+
+- `text_hash`
+- `kb_snapshot_hash`
+- `embedding_model`
+- `embedding_dim`
+- `summary_version`
+- `policy_model_version`
+
+This prevents stale embeddings, stale summaries, and replay contamination.
+
+### Agentic OS Use
+
+At VS Code startup or idle time:
+
+```text
+scan recent logs
+  ↓
+map errors to packets
+  ↓
+query indexed summaries
+  ↓
+rank likely blockers
+  ↓
+create Kanban tasks
+  ↓
+write RLM replay events
+  ↓
+warm BitFrost cache
+```
+
+### Status Labels
+
+- `CREATED` = metadata exists
+- `WIRED` = searchable through Postgres/Qdrant/Neo4j
+- `PROVEN` = proof command returned expected packet/rank
+- `DONE` = replay/eval confirms improvement
 
 ---
 

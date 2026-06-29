@@ -1,0 +1,70 @@
+{
+  "generated_at": "2026-06-29T04:18:41.786Z",
+  "status": "PASS",
+  "tables": {
+    "atlas_summary_layers": {
+      "rows": 336
+    }
+  },
+  "coverage": {
+    "summary_rows": {
+      "count": 336,
+      "percent": 100
+    },
+    "packet_join": {
+      "count": 336,
+      "percent": 100
+    },
+    "source_ref": {
+      "count": 336,
+      "percent": 100
+    },
+    "feature_id": {
+      "count": 336,
+      "percent": 100
+    },
+    "feature_label": {
+      "count": 336,
+      "percent": 100
+    },
+    "domain_class": {
+      "count": 155,
+      "percent": 46.13
+    },
+    "ontology_label": {
+      "count": 155,
+      "percent": 46.13
+    },
+    "topology_label": {
+      "count": 155,
+      "percent": 46.13
+    },
+    "summary_packet_key": {
+      "count": 336,
+      "percent": 100
+    }
+  },
+  "jsonb": {
+    "metadata_pct": 100,
+    "keywords_pct": 0,
+    "entities_pct": 0
+  },
+  "traversal": {
+    "multihop_ready": {
+      "count": 155,
+      "percent": 46.13
+    },
+    "joined_context": {
+      "count": 155,
+      "percent": 46.13
+    },
+    "gds_labels": {
+      "count": 155,
+      "percent": 46.13
+    }
+  },
+  "notes": [
+    "Summary metadata is now audited from stored JSONB summary_context plus joined packet context.",
+    "Neo4j/GDS, Redis centroids, and Qdrant remain enrichment mirrors."
+  ]
+}

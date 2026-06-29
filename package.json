@@ -108,6 +108,8 @@
     "atlas:functions:summarize:registry": "node scripts/opencode/summarize-tool-registry-gemma4.mjs",
     "agent:hello": "node scripts/agentic/startup-briefing.mjs",
     "agent:startup-briefing": "node scripts/agentic/startup-briefing.mjs",
+    "agent:idle-review": "node scripts/agent/idle-review.mjs",
+    "nats:proof-of-life:all": "node scripts/nats/proof-of-life-subjects.mjs",
     "atlas:runtime-evidence:collect": "node scripts/atlas/collect-runtime-evidence.mjs",
     "atlas:runtime-evidence:collect:apply": "node scripts/atlas/collect-runtime-evidence.mjs --apply",
     "atlas:runtime-evidence:collect:verbose": "node scripts/atlas/collect-runtime-evidence.mjs --apply --verbose",
@@ -444,8 +446,8 @@
     "atlas:p6:rebuild:summaries:apply:detached": "node scripts/startup/run-detached.mjs atlas:p6:rebuild:summaries:apply:500",
     "langextract:canonical:dry": "node scripts/phase85/langextract-canonical-pipeline.mjs --verbose",
     "langextract:canonical": "node scripts/phase85/langextract-canonical-pipeline.mjs --apply --verbose",
-    "atlas:summary-surface:verify": "node scripts/atlas/verify-summary-surface.mjs"
-    "atlas:summary-envelope:multihop:audit": "node scripts/atlas/audit-summary-envelope-multihop.mjs",
+    "atlas:summary-surface:verify": "node scripts/atlas/verify-summary-surface.mjs",
+    "atlas:summary-envelope:multihop:audit": "node scripts/atlas/audit-summary-envelope-multihop.mjs"
   },
   "devDependencies": {
     "@ast-grep/cli": "0.42.3",
