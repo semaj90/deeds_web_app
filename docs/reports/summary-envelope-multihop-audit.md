@@ -1,6 +1,6 @@
 # Summary Envelope Multihop Audit
 
-Generated: 2026-06-29T04:18:41.786Z
+Generated: 2026-06-29T05:04:45.122Z
 Status: PASS
 
 ## Coverage
@@ -10,11 +10,11 @@ Status: PASS
 - source_ref coverage: 336 (100%)
 - feature_id coverage: 336 (100%)
 - feature_label coverage: 336 (100%)
-- domain_class coverage: 155 (46.13%)
-- ontology_label coverage: 155 (46.13%)
-- topology_label coverage: 155 (46.13%)
+- domain_class coverage: 336 (100%)
+- ontology_label coverage: 336 (100%)
+- topology_label coverage: 336 (100%)
 - summary_packet_key coverage: 336 (100%)
 
 ## Traversal Readiness
 
-- multihop-ready rows: 155 (46.13%)
+- multihop-ready rows: 336 (100%)

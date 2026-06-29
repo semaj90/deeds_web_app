@@ -7,8 +7,9 @@ You are working in:
 ## Mission
 
 Surface the highest-leverage engineering targets in this codebase by fusing
-every signal the indexing stack already produces, then have Gemma4 rerank
-the top entries into an actionable TODO list.
+every signal the indexing stack already produces, then have the current
+llama-server-backed Gemma4 chat surface rerank the top entries into an
+actionable TODO list.
 
 This skill is the read-side companion to the indexing pipeline. It does NOT
 mutate code, run heavy GPU passes, or trigger destructive operations — it
@@ -35,7 +36,7 @@ single ranked recommendation document.
 | AGENTS.md rule density | Postgres `agent_context_files.rules` JSONB | `npm run agents:pipeline:safe` | filter |
 | Engram bigram (query-conditioned) | Redis `ace:engram:bigram:<hash>` (1h TTL) | implicit on retrieval | bias |
 | Cluster summary lenses | MCP `clusters.get_summary_lenses` | live `:8788` | context |
-| Gemma4 rerank | Ollama `gemma4-rotorquant:latest` | live `:11434` | final |
+| Gemma4 rerank | OpenAI-compatible chat via `llama-server.exe` (`gemma4-legal-iq4xs-direct.gguf`) | live `http://127.0.0.1:8090/v1` | final |
 
 The fused score is computed by `scripts/skills/codebase-todo-aggregator.mjs`:
 
@@ -43,9 +44,10 @@ The fused score is computed by `scripts/skills/codebase-todo-aggregator.mjs`:
 blend = 0.40*authority + 0.35*(karpBlend/4) + 0.15*attention + 0.10*isDirty
 ```
 
-Then top-15 candidates are sent to Gemma4 with directory-level AGENTS.md rule
-density and a 30-line excerpt of the latest agent timeline synthesis. Gemma4
-returns 5-7 prioritized bullets — that's the human-facing TODO list.
+Then top-15 candidates are sent to the current llama-server-backed Gemma4
+chat surface with directory-level AGENTS.md rule density and a 30-line excerpt
+of the latest agent timeline synthesis. Gemma4 returns 5-7 prioritized bullets
+— that's the human-facing TODO list.
 
 ## Invocation
 
@@ -87,9 +89,9 @@ Before invoking, verify:
 
 ```bash
 # All four data signals present (any missing will degrade the ranking)
-docker exec legal-ai-redis redis-cli HLEN ace:authority:top      # expect 200
-docker exec legal-ai-redis redis-cli HLEN gpu:karpathy:scores    # expect 25-50
-docker exec legal-ai-redis redis-cli SCARD ace:rank:dirty_files  # expect ≥0
+npm run atlas:bitfrost-semantic-cache:audit                      # expect healthy
+npm run atlas:redis-centroid:mirror:dry                         # expect client reachability
+npm run atlas:bitfrost-semantic-cache:warm                      # expect cache family coverage
 ls docs/agent_timeline_synthesis.md                              # expect present
 ```
 
@@ -106,7 +108,7 @@ Aggregator pulls Redis + Postgres + docs in parallel  (≤200ms typical)
   ↓
 Score fusion + sort → top-25
   ↓
-Gemma4 rerank pass over top-15 with AGENTS.md rule context  (≤8s)
+Gemma4 chat rerank pass over top-15 with AGENTS.md rule context  (≤8s)
   ↓
 Markdown returned to Claude Code conversation
   ↓
@@ -135,7 +137,7 @@ The rest is provenance + raw rankings.
 ## Constraints
 
 - **Read-only**: never patches code, never triggers destructive ops
-- **Deterministic blend**: same Redis state → same ranking (Gemma4 reranking is
+- **Deterministic blend**: same Redis state → same ranking (Gemma4 chat reranking is
   the only stochastic component; pin temperature=0.3)
 - **Degraded mode**: missing signals lower confidence but never block — empty
   `ace:authority:top` just zeros that 0.40 weight; the remaining signals still

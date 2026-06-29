@@ -1,0 +1,15 @@
+{
+  "generated_at": "2026-06-29T05:04:48.278Z",
+  "apply": true,
+  "limit": 500,
+  "rows_read": 336,
+  "rows_with_core_identity": 336,
+  "updated_packets": 336,
+  "updated_summary_layers": 336,
+  "ndjson": ".tmp/feature-envelopes.ndjson",
+  "status": "PASS",
+  "notes": [
+    "Feature envelopes are derived from the summary row plus joined packet identity.",
+    "The envelope is materialized into atlas_packets.metadata.feature_envelope and mirrored onto atlas_summary_layers.metadata.feature_envelope."
+  ]
+}

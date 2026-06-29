@@ -88,6 +88,7 @@
     "error-fixing:kanban:agent": "node --loader tsx packages/atlas-core/src/langgraph/run-error-fixing-agent.ts",
     "error-fixing:kanban:dry": "node --loader tsx packages/atlas-core/src/langgraph/run-error-fixing-agent.ts --dry-run",
     "error-fixing:kanban:verbose": "node --loader tsx packages/atlas-core/src/langgraph/run-error-fixing-agent.ts --verbose",
+    "nats:handlers": "node scripts/nats-handlers.mjs",
     "nats:proof-of-life:all": "node scripts/nats-proof-of-life.mjs",
     "langgraph:version:audit": "node ../scripts/langgraph-version-audit.mjs",
     "atlas:phase1:setup:columns:dry": "node scripts/atlas/phase1-create-rff-columns.mjs",

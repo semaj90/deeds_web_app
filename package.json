@@ -123,6 +123,8 @@
     "atlas:summary:phase1:test:bg": "pwsh scripts/atlas/run-phase1-500-chunk-test.ps1",
     "atlas:summary-context:backfill": "node scripts/atlas/backfill-summary-context.mjs",
     "atlas:summary-context:backfill:apply": "node scripts/atlas/backfill-summary-context.mjs --apply",
+    "atlas:feature-envelope:backfill": "node scripts/atlas/backfill-feature-envelopes.mjs",
+    "atlas:feature-envelope:backfill:apply": "node scripts/atlas/backfill-feature-envelopes.mjs --apply",
     "atlas:phase1:canonical:embeddings:dry": "node scripts/atlas/phase1-canonical-embedding-backfill.mjs",
     "atlas:phase1:canonical:embeddings:apply": "node scripts/atlas/phase1-canonical-embedding-backfill.mjs --apply",
     "atlas:phase1:canonical:embeddings:limit": "PACKET_LIMIT=100 node scripts/atlas/phase1-canonical-embedding-backfill.mjs --apply",

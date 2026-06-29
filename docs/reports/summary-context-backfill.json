@@ -1,0 +1,17 @@
+{
+  "generated_at": "2026-06-29T04:41:41.395Z",
+  "apply": true,
+  "limit": 1000,
+  "candidates": 181,
+  "updated": 181,
+  "status": "PASS",
+  "coverage": {
+    "total_rows": 336,
+    "with_context": 336,
+    "multihop_ready": 336
+  },
+  "notes": [
+    "Backfills summary_context JSONB on atlas_summary_layers using the shared Parent Atlas summary context builder.",
+    "This preserves packet_key joins and keeps Postgres canonical for traversal metadata."
+  ]
+}

@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-06-29T04:18:41.786Z",
+  "generated_at": "2026-06-29T05:04:45.122Z",
   "status": "PASS",
   "tables": {
     "atlas_summary_layers": {
@@ -28,16 +28,16 @@
       "percent": 100
     },
     "domain_class": {
-      "count": 155,
-      "percent": 46.13
+      "count": 336,
+      "percent": 100
     },
     "ontology_label": {
-      "count": 155,
-      "percent": 46.13
+      "count": 336,
+      "percent": 100
     },
     "topology_label": {
-      "count": 155,
-      "percent": 46.13
+      "count": 336,
+      "percent": 100
     },
     "summary_packet_key": {
       "count": 336,
@@ -51,16 +51,16 @@
   },
   "traversal": {
     "multihop_ready": {
-      "count": 155,
-      "percent": 46.13
+      "count": 336,
+      "percent": 100
     },
     "joined_context": {
-      "count": 155,
-      "percent": 46.13
+      "count": 336,
+      "percent": 100
     },
     "gds_labels": {
-      "count": 155,
-      "percent": 46.13
+      "count": 336,
+      "percent": 100
     }
   },
   "notes": [
