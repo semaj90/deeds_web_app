@@ -1,23 +1,23 @@
 {
-  "timestamp": "2026-06-24T16:32:23.094Z",
-  "pg_total": 17995,
-  "pg_with_qdrant_id": 17994,
-  "qdrant_total": 52606,
-  "neo4j_total": 8804,
-  "neo4j_with_qdrant_id": 8744,
-  "redis_bifrost_packets": 17995,
-  "redis_centroid_dirs": 1,
-  "parity_pg_qdrant": 17994,
-  "parity_pg_neo4j": 8804,
-  "parity_pg_redis": 17995,
+  "timestamp": "2026-06-28T18:51:43.028Z",
+  "pg_total": 58304,
+  "pg_with_qdrant_id": 0,
+  "qdrant_total": 40568,
+  "neo4j_total": 40754,
+  "neo4j_with_qdrant_id": 0,
+  "redis_bifrost_packets": 0,
+  "redis_centroid_dirs": 0,
+  "parity_pg_qdrant": 0,
+  "parity_pg_neo4j": 40754,
+  "parity_pg_redis": 0,
   "gaps": {
-    "qdrant_missing": -34611,
-    "neo4j_missing": 9191,
-    "redis_missing": 0
+    "qdrant_missing": 17736,
+    "neo4j_missing": 17550,
+    "redis_missing": 58304
   },
   "coverage_percent": {
-    "qdrant": 292.33676021116975,
-    "neo4j": 48.92470130591831,
-    "redis": 100
+    "qdrant": 69.5801317233809,
+    "neo4j": 69.89914928649836,
+    "redis": 0
   }
 }

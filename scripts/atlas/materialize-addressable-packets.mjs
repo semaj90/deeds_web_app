@@ -6,6 +6,8 @@ import fsPromises from 'node:fs/promises';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
+import pkg from 'pg';
+const { Pool } = pkg;
 import { normalizeSourceRef } from './lib/lineage-field-aliases.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -28,10 +30,10 @@ const SAMPLE = parseIntFlag(argv, '--sample', 8);
 const MAX_SOURCE_BYTES = parseIntFlag(argv, '--max-source-bytes', 12 * 1024 * 1024);
 
 const TABLE_CANDIDATES = [
-  'atlas_higher_hop_index',
-  'atlas_codebase_packets',
-  'atlas_feature_packets',
   'atlas_packets',
+  'atlas_packet_registry',
+  'atlas_summary_layers',
+  'atlas_semantic_diffs',
 ];
 
 const EVIDENCE_FILES = [
@@ -140,36 +142,37 @@ function parseTsvRows(text, columns) {
     });
 }
 
-function runPsql(sql) {
-  const result = spawnSync(
-    'docker',
-    [
-      'exec',
-      '-e',
-      `PGPASSWORD=${POSTGRES_PASSWORD}`,
-      POSTGRES_CONTAINER,
-      'psql',
-      '-U',
-      POSTGRES_USER,
-      '-d',
-      POSTGRES_DB,
-      '-v',
-      'ON_ERROR_STOP=1',
-      '-At',
-      '-F',
-      '\t',
-      '-c',
-      sql,
-    ],
-    { encoding: 'utf8', maxBuffer: 1024 * 1024 * 24 },
-  );
+let pool;
 
-  if (result.status !== 0) {
-    const stderr = String(result.stderr ?? '').trim();
-    throw new Error(`psql failed: ${stderr || `exit ${result.status}`}`);
+async function initPool() {
+  if (pool) return pool;
+  pool = new Pool({
+    host: process.env.POSTGRES_HOST || 'localhost',
+    port: parseInt(process.env.POSTGRES_PORT || '5434'),
+    user: POSTGRES_USER,
+    password: POSTGRES_PASSWORD,
+    database: POSTGRES_DB,
+  });
+  return pool;
+}
+
+async function runPsql(sql) {
+  const client = await initPool();
+  try {
+    const result = await client.query(sql);
+    // Convert result rows to TSV format to match the old spawnSync behavior
+    if (result.rows.length === 0) return '';
+    const headers = Object.keys(result.rows[0]);
+    const lines = result.rows.map((row) =>
+      headers.map((h) => {
+        const val = row[h];
+        return val === null ? '' : String(val);
+      }).join('\t')
+    );
+    return lines.join('\n');
+  } catch (err) {
+    throw new Error(`psql failed: ${err.message}`);
   }
-
-  return String(result.stdout ?? '').trim();
 }
 
 function loadJsonFile(filePath) {
@@ -601,10 +604,10 @@ function classCounts(rows) {
   ].map((key) => ({ key, count: counts.get(key) ?? 0 }));
 }
 
-function findTable() {
+async function findTable() {
   for (const table of TABLE_CANDIDATES) {
     const rows = parseTsvRows(
-      runPsql(`select case when to_regclass('public.${table}') is not null then 't' else 'f' end as exists;`),
+      await runPsql(`select case when to_regclass('public.${table}') is not null then 't' else 'f' end as exists;`),
       ['exists'],
     );
     if (rows[0]?.exists === 't') return table;
@@ -612,9 +615,9 @@ function findTable() {
   throw new Error(`No canonical packet table found. Tried: ${TABLE_CANDIDATES.join(', ')}`);
 }
 
-function loadRows(table, limit = 0) {
+async function loadRows(table, limit = 0) {
   const columns = parseTsvRows(
-    runPsql(`
+    await runPsql(`
       select column_name
       from information_schema.columns
       where table_schema = 'public'
@@ -637,7 +640,7 @@ function loadRows(table, limit = 0) {
     ${limit > 0 ? `limit ${limit}` : ''}
   `;
 
-  return parseTsvRows(runPsql(sql), ['row_json']).map((row) => {
+  return parseTsvRows(await runPsql(sql), ['row_json']).map((row) => {
     try {
       return JSON.parse(row.row_json);
     } catch {
@@ -653,9 +656,9 @@ function writeOutputs(rows, manifest) {
 }
 
 async function main() {
-  const sourceTable = findTable();
+  const sourceTable = await findTable();
   const evidence = buildEvidenceIndex();
-  const ledgerRows = loadRows(sourceTable, LIMIT);
+  const ledgerRows = await loadRows(sourceTable, LIMIT);
   const packets = ledgerRows.map((row) => {
     const matchedEvidence = firstEvidence(
       evidence.index,
@@ -797,9 +800,12 @@ async function main() {
     evidenceMatchedRows: summary.evidenceMatchedRows,
     missingQdrantPointId: summary.missingQdrantPointId,
   }, null, 2));
+
+  if (pool) await pool.end();
 }
 
-main().catch((error) => {
+main().catch(async (error) => {
+  if (pool) await pool.end();
   console.error('[materialize-addressable-packets] failed:', error?.stack || error?.message || String(error));
   process.exit(1);
 });

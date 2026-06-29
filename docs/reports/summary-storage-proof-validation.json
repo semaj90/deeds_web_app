@@ -1,0 +1,27 @@
+{
+  "generated_at": "2026-06-29T03:24:34.184Z",
+  "status": "PASS",
+  "commands": {
+    "storage_script": "node scripts/atlas/verify-summary-storage.mjs"
+  },
+  "assertions": {
+    "storage_report_exists": true,
+    "surface_report_exists": true,
+    "atlas_packets_present": true,
+    "atlas_summary_layers_present": true,
+    "summary_rows_present": true,
+    "summary_metadata_present": true,
+    "packet_jsonb_present": true
+  },
+  "counts": {
+    "atlas_packets_rows": 58304,
+    "atlas_summary_layers_rows": 336,
+    "summary_surface_rows": 313
+  },
+  "coverage": {
+    "atlas_packets_metadata_pct": 100,
+    "atlas_packets_topology_pct": 0,
+    "atlas_packets_vectors_pct": 0,
+    "atlas_summary_layers_metadata_pct": 100
+  }
+}

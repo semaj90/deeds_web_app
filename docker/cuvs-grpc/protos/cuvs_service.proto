@@ -1,0 +1,49 @@
+syntax = "proto3";
+
+package rapids.cuvs;
+
+service CuVSService {
+  // Build index from embedding vectors
+  rpc BuildIndex(BuildIndexRequest) returns (BuildIndexResponse) {}
+
+  // ANN search (k-nearest neighbors)
+  rpc Search(SearchRequest) returns (SearchResponse) {}
+
+  // Index info
+  rpc GetIndexInfo(GetIndexInfoRequest) returns (GetIndexInfoResponse) {}
+}
+
+message BuildIndexRequest {
+  repeated float embeddings = 1;  // Flattened 768-dim vectors
+  uint32 n_rows = 2;
+  uint32 n_cols = 3;
+  string index_type = 4;  // "ivf_pq", "cagra", "hnsw"
+}
+
+message BuildIndexResponse {
+  string index_id = 1;
+  uint32 n_vectors = 2;
+  string status = 3;
+}
+
+message SearchRequest {
+  repeated float query = 1;  // Single query vector (768-dim)
+  uint32 k = 2;
+  string index_id = 3;
+}
+
+message SearchResponse {
+  repeated int32 indices = 1;  // k neighbor indices
+  repeated float distances = 2;  // k similarity scores
+}
+
+message GetIndexInfoRequest {
+  string index_id = 1;
+}
+
+message GetIndexInfoResponse {
+  uint32 n_vectors = 1;
+  uint32 embedding_dim = 2;
+  string algorithm = 3;
+  uint32 build_time_ms = 4;
+}

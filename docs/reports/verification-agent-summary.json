@@ -1,37 +1,39 @@
 {
   "feature": "Verifier Union-Shape Repair Recommendation",
   "task_source": "Codex Task - Install Parent Atlas Verification Agent Skill",
-  "timestamp": "2026-06-24T13:59:52.343Z",
+  "timestamp": "2026-06-28T22:42:07.729Z",
   "verdict": "FAIL",
   "reason": "compile blocker",
-  "recommendation": "Fix TypeScript compiler error in sveltekit-frontend/src/lib/server/db/schema/agent-memory-registry.ts:4",
+  "recommendation": "Fix TypeScript compiler error in sveltekit-frontend/src/lib/server/grpc/turbovec-cuda-client.ts:12",
   "aceHits": [
-    "sveltekit-frontend/src/lib/server/db/schema/agent-memory-registry.ts"
+    "sveltekit-frontend/src/lib/server/grpc/turbovec-cuda-client.ts"
   ],
   "kagHits": [
     "unknown"
   ],
   "dagHits": [],
   "recommendedFiles": [
-    "sveltekit-frontend/src/lib/server/db/schema/agent-memory-registry.ts"
+    "sveltekit-frontend/src/lib/server/grpc/turbovec-cuda-client.ts"
   ],
   "recommendedCommands": [
     "npm run check"
   ],
-  "repairPrompt": "TypeScript compile error in sveltekit-frontend/src/lib/server/db/schema/agent-memory-registry.ts:4:\nArgument of type 'string' is not assignable to parameter of type 'PgBigSerialConfig<\"number\" | \"bigint\">'.\nexport const agentMemoryRegistry = pgTable('agent_memory_registry', {\nid: bigserial('id').primaryKey(),",
+  "repairPrompt": "TypeScript compile error in sveltekit-frontend/src/lib/server/grpc/turbovec-cuda-client.ts:12:\nModule '\"$lib/*\"' has no exported member 'emitTelemetry'. Did you mean to use 'import emitTelemetry from \"$lib/*\"' instead?\nimport { buildGrpcClientChannelOptions } from './client-options.js';\nimport { emitTelemetry } from '$lib/server/telemetry/gpu-telemetry.js';",
   "lanes": {
     "smoke": "FAIL",
     "story": "PASS",
-    "atlas_traversal": "FAIL",
+    "atlas_traversal": "PASS",
     "cubic_adversarial": "PASS"
   },
   "retrieval_proof": {
     "replay_status": "PASS",
-    "cacheHitPct": "20%",
-    "featureIdPct": "0%",
-    "sourceRefPct": "24%",
+    "cacheHitPct": "100%",
+    "featureIdPct": "100%",
+    "sourceRefPct": "100%",
+    "boundaryStatus": "CURRENT",
+    "provenanceStatus": "PASS",
     "graphProof": "GRAPH_OK",
-    "provenanceRows": 30
+    "provenanceRows": 0
   },
   "commands": [
     "npm run verify:smoke",
@@ -44,81 +46,423 @@
     {
       "lane": "smoke",
       "type": "TypeScript",
-      "file": "sveltekit-frontend/src/lib/server/db/schema/agent-memory-registry.ts",
-      "line": 4,
-      "error_text": "Argument of type 'string' is not assignable to parameter of type 'PgBigSerialConfig<\"number\" | \"bigint\">'.\nexport const agentMemoryRegistry = pgTable('agent_memory_registry', {\nid: bigserial('id').primaryKey(),",
+      "file": "sveltekit-frontend/src/lib/server/grpc/turbovec-cuda-client.ts",
+      "line": 12,
+      "error_text": "Module '\"$lib/*\"' has no exported member 'emitTelemetry'. Did you mean to use 'import emitTelemetry from \"$lib/*\"' instead?\nimport { buildGrpcClientChannelOptions } from './client-options.js';\nimport { emitTelemetry } from '$lib/server/telemetry/gpu-telemetry.js';",
       "likely_contract": "unknown",
       "blocking": true
     },
     {
       "lane": "smoke",
       "type": "TypeScript",
-      "file": "sveltekit-frontend/src/lib/server/db/schema/agent-memory-registry.ts",
-      "line": 59,
-      "error_text": "Argument of type 'string' is not assignable to parameter of type 'PgBigSerialConfig<\"number\" | \"bigint\">'.\nexport const mcpTraceOwnership = pgTable('mcp_trace_ownership', {\nid: bigserial('id').primaryKey(),",
+      "file": "sveltekit-frontend/src/lib/server/features/ai/ace/context-assembler.ts",
+      "line": 4013,
+      "error_text": "Property 'TENSORRT_BRIDGE_VERSION' does not exist on type '{ DATABASE_URL: string; AGENT_TRACE_ENABLED: string; REDIS_URL: string; REDIS_PASSWORD: string; QDRANT_URL: string; QDRANT_API_KEY: string; RABBITMQ_URL: string; OLLAMA_BASE_URL: string; ... 161 more ...; ENABLE_LEGACY_ATLAS_FIELDS: string; }'.\ntoolVersion: 'mcp:1.0',\ngpuKernelVersion: ENV.TENSORRT_BRIDGE_VERSION ?? 'tensorrt_bridge:1.0',\nrpcTransport: 'jsonrpc',",
       "likely_contract": "unknown",
       "blocking": true
     },
     {
       "lane": "smoke",
       "type": "TypeScript",
-      "file": "sveltekit-frontend/src/lib/server/db/schema/agent-memory-registry.ts",
-      "line": 89,
-      "error_text": "Argument of type 'string' is not assignable to parameter of type 'PgBigSerialConfig<\"number\" | \"bigint\">'.\nexport const gpuEligibilityGate = pgTable('gpu_eligibility_gate', {\nid: bigserial('id').primaryKey(),",
+      "file": "sveltekit-frontend/src/lib/server/hyperrag/hyperrag-rpc-client.ts",
+      "line": 32,
+      "error_text": "Expected 2-3 arguments, but got 1.\nconfidence: z.number().min(0).max(1),\nmetadata: z.record(z.unknown()).optional(),\n});",
       "likely_contract": "unknown",
       "blocking": true
     },
     {
       "lane": "smoke",
       "type": "TypeScript",
-      "file": "sveltekit-frontend/src/lib/server/db/schema-kag.ts",
+      "file": "sveltekit-frontend/src/lib/server/hyperrag/hyperrag-packet-pipeline.ts",
+      "line": 90,
+      "error_text": "Type 'unknown[]' is not assignable to type 'string[]'.\nType 'unknown' is not assignable to type 'string'.\nreturn Array.from(new Set([\n...normalizedIds,",
+      "likely_contract": "unknown",
+      "blocking": true
+    },
+    {
+      "lane": "smoke",
+      "type": "TypeScript",
+      "file": "sveltekit-frontend/src/lib/server/db/schema-atlas-registry.ts",
+      "line": 13,
+      "error_text": "Module '\"drizzle-orm/pg-core\"' has no exported member 'bytea'.\nbigint,\nbytea,\njsonb,",
+      "likely_contract": "unknown",
+      "blocking": true
+    },
+    {
+      "lane": "smoke",
+      "type": "TypeScript",
+      "file": "sveltekit-frontend/src/lib/server/db/schema-atlas-registry.ts",
+      "line": 16,
+      "error_text": "'\"drizzle-orm/pg-core\"' has no exported member named 'timestamptz'. Did you mean 'timestamp'?\ntimestamp,\ntimestamptz,\nvector,",
+      "likely_contract": "unknown",
+      "blocking": true
+    },
+    {
+      "lane": "smoke",
+      "type": "TypeScript",
+      "file": "sveltekit-frontend/src/lib/server/db/schema-atlas-registry.ts",
       "line": 21,
-      "error_text": "'\"drizzle-orm/pg-core\"' has no exported member named 'array'. Did you mean 'PgArray'?\nunique,\narray,\nboolean,",
+      "error_text": "Module '\"drizzle-orm/pg-core\"' has no exported member 'sql'.\ncheck,\nsql,\n} from 'drizzle-orm/pg-core';",
       "likely_contract": "unknown",
       "blocking": true
     },
     {
       "lane": "smoke",
       "type": "TypeScript",
-      "file": "sveltekit-frontend/src/lib/server/db/schema/evaluation-registry.ts",
-      "line": 5,
-      "error_text": "Argument of type 'string' is not assignable to parameter of type 'PgBigSerialConfig<\"number\" | \"bigint\">'.\nexport const taskFunctionEvals = pgTable('task_function_evals', {\nid: bigserial('id').primaryKey(),",
+      "file": "sveltekit-frontend/src/lib/server/db/schema-atlas-registry.ts",
+      "line": 41,
+      "error_text": "Property 'check' does not exist on type 'HasDefault<PgTextBuilderInitial<\"embedding_status\", [string, ...string[]]>>'.\n.default('missing')\n.check(\ncheck(",
       "likely_contract": "unknown",
       "blocking": true
     },
     {
       "lane": "smoke",
       "type": "TypeScript",
-      "file": "sveltekit-frontend/src/lib/server/db/schema/evaluation-registry.ts",
-      "line": 51,
-      "error_text": "Argument of type 'string' is not assignable to parameter of type 'PgBigSerialConfig<\"number\" | \"bigint\">'.\nexport const domainFunctionMapping = pgTable('domain_function_mapping', {\nid: bigserial('id').primaryKey(),",
+      "file": "sveltekit-frontend/src/lib/server/db/schema-atlas-registry.ts",
+      "line": 83,
+      "error_text": "Property 'check' does not exist on type 'HasDefault<PgTextBuilderInitial<\"cache_state\", [string, ...string[]]>>'.\n.default('cold')\n.check(\ncheck(",
       "likely_contract": "unknown",
       "blocking": true
     },
     {
       "lane": "smoke",
       "type": "TypeScript",
-      "file": "sveltekit-frontend/src/lib/server/db/schema/evaluation-registry.ts",
-      "line": 89,
-      "error_text": "Argument of type 'string' is not assignable to parameter of type 'PgBigSerialConfig<\"number\" | \"bigint\">'.\nexport const pathSelectionHistory = pgTable('path_selection_history', {\nid: bigserial('id').primaryKey(),",
+      "file": "sveltekit-frontend/src/lib/server/db/schema-atlas-registry.ts",
+      "line": 92,
+      "error_text": "Property 'check' does not exist on type 'HasDefault<PgTextBuilderInitial<\"status\", [string, ...string[]]>>'.\n.default('active')\n.check(\ncheck('status_check', sql`status IN ('active', 'archived', 'staged', 'error')`)",
       "likely_contract": "unknown",
       "blocking": true
     },
     {
       "lane": "smoke",
       "type": "TypeScript",
-      "file": "sveltekit-frontend/src/lib/server/db/schema/evaluation-registry.ts",
-      "line": 127,
-      "error_text": "Argument of type 'string' is not assignable to parameter of type 'PgBigSerialConfig<\"number\" | \"bigint\">'.\nexport const schemaMatchRegistry = pgTable('schema_match_registry', {\nid: bigserial('id').primaryKey(),",
+      "file": "sveltekit-frontend/src/lib/server/db/schema-atlas-registry.ts",
+      "line": 106,
+      "error_text": "Property 'check' does not exist on type 'PgTextBuilderInitial<\"validation_status\", [string, ...string[]]>'.\ntotal_size_bytes: bigint('total_size_bytes', { mode: 'number' }),\nvalidation_status: text('validation_status').check(\ncheck(",
       "likely_contract": "unknown",
       "blocking": true
     },
     {
       "lane": "smoke",
       "type": "TypeScript",
-      "file": "sveltekit-frontend/src/lib/server/db/schema/evaluation-registry.ts",
-      "line": 171,
-      "error_text": "Argument of type 'string' is not assignable to parameter of type 'PgBigSerialConfig<\"number\" | \"bigint\">'.\nexport const ganValidationRegistry = pgTable('gan_validation_registry', {\nid: bigserial('id').primaryKey(),\n====================================\nsvelte-check found 9 errors and 11 warnings in 11 files",
+      "file": "sveltekit-frontend/src/lib/server/generation/feature-label-extractor.ts",
+      "line": 65,
+      "error_text": "Property 'toLowerCase' does not exist on type 'ExtractedEntity'.\nqueryFeatures.entities.forEach(e => {\ncombinedLabels.add(e.toLowerCase());\n});",
+      "likely_contract": "unknown",
+      "blocking": true
+    },
+    {
+      "lane": "smoke",
+      "type": "TypeScript",
+      "file": "sveltekit-frontend/src/lib/server/generation/semantic-diff-gate.ts",
+      "line": 48,
+      "error_text": "Object literal may only specify known properties, and 'model' does not exist in type 'ReadableStream<any> | Blob | ArrayBuffer | ArrayBufferView<ArrayBuffer> | FormData | URLSearchParams'.\nbody: {\nmodel: 'embeddinggemma:latest',\ninput: text,",
+      "likely_contract": "unknown",
+      "blocking": true
+    },
+    {
+      "lane": "smoke",
+      "type": "TypeScript",
+      "file": "sveltekit-frontend/src/lib/server/generation/packet-summary-pipeline.ts",
+      "line": 242,
+      "error_text": "Type '\"generated\" | \"rejected\" | \"flagged\"' is not assignable to type 'ArtifactStatus'.\nType '\"rejected\"' is not assignable to type 'ArtifactStatus'.\ncontent_hash: featureResult.contentHash,\nstatus: featureResult.status,\ngan_validation_score: featureResult.extractedFeatures.confidence,",
+      "likely_contract": "unknown",
+      "blocking": true
+    },
+    {
+      "lane": "smoke",
+      "type": "TypeScript",
+      "file": "sveltekit-frontend/src/lib/server/gpu/gpu-pipeline.ts",
+      "line": 291,
+      "error_text": "This comparison appears to be unintentional because the types '\"cpu\" | \"gpu\"' and '\"cache\"' have no overlap.\nlatency_ms: Date.now() - telemetryStart,\nretrieval_strategy: source === 'cache' ? 'gpu_pipeline_cache' : `gpu_pipeline_attention_${source}`,\npacket_context: {",
+      "likely_contract": "unknown",
+      "blocking": true
+    },
+    {
+      "lane": "smoke",
+      "type": "TypeScript",
+      "file": "sveltekit-frontend/src/lib/server/gpu/gpu-pipeline.ts",
+      "line": 300,
+      "error_text": "This comparison appears to be unintentional because the types '\"cpu\"' and '\"cache\"' have no overlap.\ngpu_kernel_version: 'tensorrt_bridge:1.0',\nrpc_transport: source === 'gpu' ? 'cuda' : source === 'cache' ? 'redis' : 'cpu',\n},",
+      "likely_contract": "unknown",
+      "blocking": true
+    },
+    {
+      "lane": "smoke",
+      "type": "TypeScript",
+      "file": "sveltekit-frontend/src/lib/server/gpu/gpu-pipeline.ts",
+      "line": 304,
+      "error_text": "This comparison appears to be unintentional because the types '\"cpu\"' and '\"cache\"' have no overlap.\nkernel_name: 'attentionScoreGPU',\ngpu_backend: source === 'gpu' ? 'cuda' : source === 'cache' ? 'redis' : 'cpu_fallback',\noperation: 'attention',",
+      "likely_contract": "unknown",
+      "blocking": true
+    },
+    {
+      "lane": "smoke",
+      "type": "TypeScript",
+      "file": "sveltekit-frontend/src/lib/server/gpu/gpu-pipeline.ts",
+      "line": 369,
+      "error_text": "This comparison appears to be unintentional because the types '\"cpu\" | \"gpu\"' and '\"cache\"' have no overlap.\nlatency_ms: Date.now() - telemetryStart,\nretrieval_strategy: source === 'cache' ? 'gpu_pipeline_cache' : `gpu_pipeline_pagerank_${source}`,\npacket_context: {",
+      "likely_contract": "unknown",
+      "blocking": true
+    },
+    {
+      "lane": "smoke",
+      "type": "TypeScript",
+      "file": "sveltekit-frontend/src/lib/server/gpu/gpu-pipeline.ts",
+      "line": 378,
+      "error_text": "This comparison appears to be unintentional because the types '\"cpu\"' and '\"cache\"' have no overlap.\ngpu_kernel_version: 'tensorrt_bridge:1.0',\nrpc_transport: source === 'gpu' ? 'cuda' : source === 'cache' ? 'redis' : 'cpu',\n},",
+      "likely_contract": "unknown",
+      "blocking": true
+    },
+    {
+      "lane": "smoke",
+      "type": "TypeScript",
+      "file": "sveltekit-frontend/src/lib/server/gpu/gpu-pipeline.ts",
+      "line": 382,
+      "error_text": "This comparison appears to be unintentional because the types '\"cpu\"' and '\"cache\"' have no overlap.\nkernel_name: 'pageRankGPU',\ngpu_backend: source === 'gpu' ? 'cuda' : source === 'cache' ? 'redis' : 'cpu_fallback',\noperation: 'pagerank',",
+      "likely_contract": "unknown",
+      "blocking": true
+    },
+    {
+      "lane": "smoke",
+      "type": "TypeScript",
+      "file": "sveltekit-frontend/src/lib/server/gpu/gpu-pipeline.ts",
+      "line": 447,
+      "error_text": "This comparison appears to be unintentional because the types '\"cpu\" | \"gpu\"' and '\"cache\"' have no overlap.\nlatency_ms: Date.now() - telemetryStart,\nretrieval_strategy: source === 'cache' ? 'gpu_pipeline_cache' : `gpu_pipeline_reward_${source}`,\npacket_context: {",
+      "likely_contract": "unknown",
+      "blocking": true
+    },
+    {
+      "lane": "smoke",
+      "type": "TypeScript",
+      "file": "sveltekit-frontend/src/lib/server/gpu/gpu-pipeline.ts",
+      "line": 456,
+      "error_text": "This comparison appears to be unintentional because the types '\"cpu\"' and '\"cache\"' have no overlap.\ngpu_kernel_version: 'tensorrt_bridge:1.0',\nrpc_transport: source === 'gpu' ? 'cuda' : source === 'cache' ? 'redis' : 'cpu',\n},",
+      "likely_contract": "unknown",
+      "blocking": true
+    },
+    {
+      "lane": "smoke",
+      "type": "TypeScript",
+      "file": "sveltekit-frontend/src/lib/server/gpu/gpu-pipeline.ts",
+      "line": 460,
+      "error_text": "This comparison appears to be unintentional because the types '\"cpu\"' and '\"cache\"' have no overlap.\nkernel_name: 'rewardScoreGPU',\ngpu_backend: source === 'gpu' ? 'cuda' : source === 'cache' ? 'redis' : 'cpu_fallback',\noperation: 'reward',",
+      "likely_contract": "unknown",
+      "blocking": true
+    },
+    {
+      "lane": "smoke",
+      "type": "TypeScript",
+      "file": "sveltekit-frontend/src/lib/server/gpu/gpu-pipeline.ts",
+      "line": 523,
+      "error_text": "This comparison appears to be unintentional because the types '\"cpu\" | \"gpu\"' and '\"cache\"' have no overlap.\nlatency_ms: Date.now() - telemetryStart,\nretrieval_strategy: source === 'cache' ? 'gpu_pipeline_cache' : `gpu_pipeline_topk_${source}`,\npacket_context: {",
+      "likely_contract": "unknown",
+      "blocking": true
+    },
+    {
+      "lane": "smoke",
+      "type": "TypeScript",
+      "file": "sveltekit-frontend/src/lib/server/gpu/gpu-pipeline.ts",
+      "line": 532,
+      "error_text": "This comparison appears to be unintentional because the types '\"cpu\"' and '\"cache\"' have no overlap.\ngpu_kernel_version: 'tensorrt_bridge:1.0',\nrpc_transport: source === 'gpu' ? 'cuda' : source === 'cache' ? 'redis' : 'cpu',\n},",
+      "likely_contract": "unknown",
+      "blocking": true
+    },
+    {
+      "lane": "smoke",
+      "type": "TypeScript",
+      "file": "sveltekit-frontend/src/lib/server/gpu/gpu-pipeline.ts",
+      "line": 536,
+      "error_text": "This comparison appears to be unintentional because the types '\"cpu\"' and '\"cache\"' have no overlap.\nkernel_name: 'topKIndicesGPU',\ngpu_backend: source === 'gpu' ? 'cuda' : source === 'cache' ? 'redis' : 'cpu_fallback',\noperation: 'topk',",
+      "likely_contract": "unknown",
+      "blocking": true
+    },
+    {
+      "lane": "smoke",
+      "type": "TypeScript",
+      "file": "sveltekit-frontend/src/lib/server/gpu/gpu-pipeline.ts",
+      "line": 613,
+      "error_text": "This comparison appears to be unintentional because the types '\"cpu\" | \"gpu\"' and '\"cache\"' have no overlap.\nlatency_ms: Date.now() - telemetryStart,\nretrieval_strategy: source === 'cache' ? 'gpu_pipeline_cache' : `gpu_pipeline_kmeans_${source}`,\npacket_context: {",
+      "likely_contract": "unknown",
+      "blocking": true
+    },
+    {
+      "lane": "smoke",
+      "type": "TypeScript",
+      "file": "sveltekit-frontend/src/lib/server/gpu/gpu-pipeline.ts",
+      "line": 622,
+      "error_text": "This comparison appears to be unintentional because the types '\"cpu\"' and '\"cache\"' have no overlap.\ngpu_kernel_version: 'tensorrt_bridge:1.0',\nrpc_transport: source === 'gpu' ? 'cuda' : source === 'cache' ? 'redis' : 'cpu',\n},",
+      "likely_contract": "unknown",
+      "blocking": true
+    },
+    {
+      "lane": "smoke",
+      "type": "TypeScript",
+      "file": "sveltekit-frontend/src/lib/server/gpu/gpu-pipeline.ts",
+      "line": 626,
+      "error_text": "This comparison appears to be unintentional because the types '\"cpu\"' and '\"cache\"' have no overlap.\nkernel_name: 'kmeansWithCentroids',\ngpu_backend: source === 'gpu' ? 'cuda' : source === 'cache' ? 'redis' : 'cpu_fallback',\noperation: 'kmeans',",
+      "likely_contract": "unknown",
+      "blocking": true
+    },
+    {
+      "lane": "smoke",
+      "type": "TypeScript",
+      "file": "sveltekit-frontend/src/lib/server/grpc/gpu-bridge-client.ts",
+      "line": 14,
+      "error_text": "Module '\"$lib/*\"' has no exported member 'emitTelemetry'. Did you mean to use 'import emitTelemetry from \"$lib/*\"' instead?\nimport { buildGrpcClientChannelOptions } from './client-options.js';\nimport { emitTelemetry } from '$lib/server/telemetry/gpu-telemetry.js';",
+      "likely_contract": "unknown",
+      "blocking": true
+    },
+    {
+      "lane": "smoke",
+      "type": "TypeScript",
+      "file": "sveltekit-frontend/src/lib/server/indexer/gpu-karpathy-tagger.ts",
+      "line": 21,
+      "error_text": "Module '\"$lib/*\"' has no exported member 'emitTelemetry'. Did you mean to use 'import emitTelemetry from \"$lib/*\"' instead?\nimport { batchCosineSimilarity, isCudaAvailable } from '$lib/server/gpu/libtorch-bridge.js';\nimport { emitTelemetry } from '$lib/server/telemetry/gpu-telemetry.js';",
+      "likely_contract": "unknown",
+      "blocking": true
+    },
+    {
+      "lane": "smoke",
+      "type": "TypeScript",
+      "file": "sveltekit-frontend/src/lib/server/retrieval/go-search-bridge.ts",
+      "line": 184,
+      "error_text": "Type 'string' is not assignable to type '\"qdrant\" | \"redis\" | \"go-search\"'.\ndurationMs,\ncacheSource: result.cacheSource as string | undefined\n};",
+      "likely_contract": "unknown",
+      "blocking": true
+    },
+    {
+      "lane": "smoke",
+      "type": "TypeScript",
+      "file": "sveltekit-frontend/src/lib/server/retrieval/go-search-bridge.ts",
+      "line": 260,
+      "error_text": "Argument of type 'GoCitationRequest' is not assignable to parameter of type 'Record<string, unknown>'.\nIndex signature for type 'string' is missing in type 'GoCitationRequest'.\nconst startMs = performance.now();\nconst result = (await fetchGoSearch('/citation', 'POST', req)) as Record<string, unknown> | null;\nconst durationMs = Math.round(performance.now() - startMs);",
+      "likely_contract": "unknown",
+      "blocking": true
+    },
+    {
+      "lane": "smoke",
+      "type": "TypeScript",
+      "file": "sveltekit-frontend/src/routes/api/admin/packets/enrich-labels/+server.ts",
+      "line": 15,
+      "error_text": "Property 'isAdmin' does not exist on type 'User'.\nexport const GET: RequestHandler = async ({ locals }) => {\nif (!locals.user?.isAdmin) {\nreturn json({ error: 'Admin only' }, { status: 403 });",
+      "likely_contract": "unknown",
+      "blocking": true
+    },
+    {
+      "lane": "smoke",
+      "type": "TypeScript",
+      "file": "sveltekit-frontend/src/routes/api/admin/packets/enrich-labels/+server.ts",
+      "line": 42,
+      "error_text": "Property 'isAdmin' does not exist on type 'User'.\nexport const POST: RequestHandler = async ({ locals }) => {\nif (!locals.user?.isAdmin) {\nreturn json({ error: 'Admin only' }, { status: 403 });",
+      "likely_contract": "unknown",
+      "blocking": true
+    },
+    {
+      "lane": "smoke",
+      "type": "TypeScript",
+      "file": "sveltekit-frontend/src/routes/api/admin/summaries/scan-quality/+server.ts",
+      "line": 17,
+      "error_text": "Property 'isAdmin' does not exist on type 'User'.\nexport const GET: RequestHandler = async ({ locals }) => {\nif (!locals.user?.isAdmin) {\nreturn json({ error: 'Admin only' }, { status: 403 });",
+      "likely_contract": "unknown",
+      "blocking": true
+    },
+    {
+      "lane": "smoke",
+      "type": "TypeScript",
+      "file": "sveltekit-frontend/src/routes/api/admin/summaries/scan-quality/+server.ts",
+      "line": 42,
+      "error_text": "Property 'isAdmin' does not exist on type 'User'.\nexport const POST: RequestHandler = async ({ request, locals }) => {\nif (!locals.user?.isAdmin) {\nreturn json({ error: 'Admin only' }, { status: 403 });",
+      "likely_contract": "unknown",
+      "blocking": true
+    },
+    {
+      "lane": "smoke",
+      "type": "TypeScript",
+      "file": "sveltekit-frontend/src/routes/api/atlas/feature-labels/+server.ts",
+      "line": 12,
+      "error_text": "Expected 2-3 arguments, but got 1.\nsummary: z.string().optional(),\nsymbols: z.record(z.array(z.string())).optional(),\nuseSynthesis: z.boolean().optional().default(true),",
+      "likely_contract": "unknown",
+      "blocking": true
+    },
+    {
+      "lane": "smoke",
+      "type": "TypeScript",
+      "file": "sveltekit-frontend/src/routes/api/atlas/feature-labels/+server.ts",
+      "line": 27,
+      "error_text": "Argument of type '{ packetKey: string; sourceRef: string; featureId: string; useSynthesis: boolean; saveToDB: boolean; summary?: string; symbols?: Record<string | number | symbol, unknown>; }' is not assignable to parameter of type '{ packetKey: string; sourceRef: string; featureId: string; summary?: string; symbols?: Record<string, string[]>; useSynthesis?: boolean; }'.\nTypes of property 'symbols' are incompatible.\nType 'Record<string | number | symbol, unknown>' is not assignable to type 'Record<string, string[]>'.",
+      "likely_contract": "unknown",
+      "blocking": true
+    },
+    {
+      "lane": "smoke",
+      "type": "TypeScript",
+      "file": "sveltekit-frontend/src/routes/api/atlas/feature-labels/+server.ts",
+      "line": 41,
+      "error_text": "Type '\"generated\" | \"rejected\" | \"flagged\"' is not assignable to type 'ArtifactStatus'.\nType '\"rejected\"' is not assignable to type 'ArtifactStatus'.\ncontentHash: result.contentHash,\nstatus: result.status,\nganValidationScore: result.extractedFeatures.confidence,",
+      "likely_contract": "unknown",
+      "blocking": true
+    },
+    {
+      "lane": "smoke",
+      "type": "TypeScript",
+      "file": "sveltekit-frontend/src/routes/api/atlas/feature-labels/+server.ts",
+      "line": 67,
+      "error_text": "Property 'errors' does not exist on type 'ZodError<unknown>'.\nconst message = err instanceof z.ZodError\n? `Validation error: ${err.errors[0].message}`\n: err instanceof Error",
+      "likely_contract": "unknown",
+      "blocking": true
+    },
+    {
+      "lane": "smoke",
+      "type": "TypeScript",
+      "file": "sveltekit-frontend/src/routes/api/atlas/gan-audit/deep/+server.ts",
+      "line": 14,
+      "error_text": "Module '\"$lib/*\"' has no exported member 'getNats'. Did you mean to use 'import getNats from \"$lib/*\"' instead?\nimport { getRedis } from '$lib/server/redis.js';\nimport { getNats } from '$lib/server/nats.js';",
+      "likely_contract": "unknown",
+      "blocking": true
+    },
+    {
+      "lane": "smoke",
+      "type": "TypeScript",
+      "file": "sveltekit-frontend/src/routes/api/atlas/gan-audit/deep/+server.ts",
+      "line": 44,
+      "error_text": "Cannot find module '@deeds/atlas-core/validation/gan-deep-audit.js' or its corresponding type declarations.\n// Dynamically import Phase 2.5 modules (lazy load to avoid circular deps)\nconst { executeGanDeepAudit } = await import('@deeds/atlas-core/validation/gan-deep-audit.js');\nconst { goSearchBridge } = await import('$lib/server/retrieval/go-search-bridge.js');",
+      "likely_contract": "unknown",
+      "blocking": true
+    },
+    {
+      "lane": "smoke",
+      "type": "TypeScript",
+      "file": "sveltekit-frontend/src/routes/api/atlas/gan-audit/deep/+server.ts",
+      "line": 45,
+      "error_text": "Property 'goSearchBridge' does not exist on type 'typeof import(\"c:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/server/retrieval/go-search-bridge\")'.\nconst { executeGanDeepAudit } = await import('@deeds/atlas-core/validation/gan-deep-audit.js');\nconst { goSearchBridge } = await import('$lib/server/retrieval/go-search-bridge.js');",
+      "likely_contract": "unknown",
+      "blocking": true
+    },
+    {
+      "lane": "smoke",
+      "type": "TypeScript",
+      "file": "sveltekit-frontend/src/routes/api/cache/bitfrost-effectiveness/+server.ts",
+      "line": 196,
+      "error_text": "Property 'isAdmin' does not exist on type 'User'.\nexport const POST: RequestHandler = async ({ request, locals }) => {\nif (!locals.user?.isAdmin) {\nreturn json({ error: 'Admin only' }, { status: 403 });",
+      "likely_contract": "unknown",
+      "blocking": true
+    },
+    {
+      "lane": "smoke",
+      "type": "TypeScript",
+      "file": "sveltekit-frontend/src/routes/(app)/deep-research/+page.svelte",
+      "line": 191,
+      "error_text": "Type '\"danger\"' is not assignable to type '\"default\" | \"primary\" | \"secondary\" | \"destructive\" | \"outline\" | \"ghost\"'. (ts)\n<Button\nvariant=\"danger\"\nsize=\"sm\"",
+      "likely_contract": "unknown",
+      "blocking": true
+    },
+    {
+      "lane": "smoke",
+      "type": "TypeScript",
+      "file": "sveltekit-frontend/src/routes/(app)/deep-research/+page.svelte",
+      "line": 300,
+      "error_text": "Type '\"danger\"' is not assignable to type '\"default\" | \"primary\" | \"secondary\" | \"destructive\" | \"outline\" | \"ghost\"'. (ts)\n<Button\nvariant=\"danger\"\nsize=\"sm\"\n====================================\nsvelte-check found 47 errors and 11 warnings in 26 files",
       "likely_contract": "unknown",
       "blocking": true
     }

@@ -1,6 +1,6 @@
 # DevOps Smoke Test + GAN Evaluation Report
 
-**Generated**: 2026-06-28T00:05:53.602Z
+**Generated**: 2026-06-29T00:26:14.942Z
 
 ## Executive Summary
 
@@ -34,10 +34,10 @@ Query: `authentication`
 
 | Lane | Status | Hits | Latency | Top Results |
 |------|--------|------|---------|-------------|
-| bm25 | ✅ PASS | 42 | 278ms | auth:001, auth:002 |
-| qdrant_ann | ✅ PASS | 128 | 135ms | auth:001, crypto:003 |
+| bm25 | ✅ PASS | 42 | 230ms | auth:001, auth:002 |
+| qdrant_ann | ✅ PASS | 128 | 95ms | auth:001, crypto:003 |
 | neo4j_graph | ⚠️ WARN | 0 | 0ms | N/A |
-| valkey_cache | ✅ PASS | 20 | 343ms | auth:cached:001, auth:cached:002 |
+| valkey_cache | ✅ PASS | 20 | 186ms | auth:cached:001, auth:cached:002 |
 | gpu_rerank | ✅ PASS | 42 | 0ms | auth:001, auth:002 |
 
 ## Phase 5: Fused Results (RRF + Topology + Authority)

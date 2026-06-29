@@ -1,6 +1,6 @@
 # Live Service Env Report
 
-Generated: 2026-06-19T23:20:17.574Z
+Generated: 2026-06-28T23:42:33.328Z
 
 ## Summary
 
@@ -19,7 +19,7 @@ Generated: 2026-06-19T23:20:17.574Z
 | Qdrant | READY | 127.0.0.1:6333 | 1ms | QDRANT_URL=http://127.0.0.1:6333 |
 | Neo4j | READY | 127.0.0.1:7687 | 1ms | NEO4J_URI=bolt://127.0.0.1:7687 |
 | Redis | READY | 127.0.0.1:6379 | 1ms | REDIS_URL=redis://127.0.0.1:6379 |
-| Go Retrieval (HTTP) | READY | 127.0.0.1:8100 | 2ms | RETRIEVAL_HTTP_URL=http://127.0.0.1:8100 |
+| Go Retrieval (HTTP) | READY | 127.0.0.1:8100 | 1ms | RETRIEVAL_HTTP_URL=http://127.0.0.1:8100 |
 | Go Retrieval (gRPC) | READY | 127.0.0.1:50053 | 1ms | RETRIEVAL_GRPC_URL=127.0.0.1:50053 |
 
 ## Provenance
@@ -31,14 +31,14 @@ Generated: 2026-06-19T23:20:17.574Z
 
 ## Retrieval Telemetry
 
-- status: READY
-- detail: retrieval_telemetry rows=308, recent24h=114
-- total rows: 308
-- recent 24h rows: 114
-- rows with selected_packet_keys: 308
-- rows with feature_ids: 308
-- rows with retrieval_strategy: 308
-- latest at: Fri Jun 19 2026 15:27:09 GMT-0700 (Pacific Daylight Time)
+- status: SOURCE_UNAVAILABLE
+- detail: relation "retrieval_telemetry" does not exist
+- total rows: n/a
+- recent 24h rows: n/a
+- rows with selected_packet_keys: n/a
+- rows with feature_ids: n/a
+- rows with retrieval_strategy: n/a
+- latest at: n/a
 
 ## Notes
 

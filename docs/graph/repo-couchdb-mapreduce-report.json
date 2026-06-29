@@ -1,16 +1,16 @@
 {
   "repo": "deeds-web-app",
-  "runId": "manual",
-  "generatedAt": "2026-06-04T19:05:12.251Z",
-  "dryRun": false,
+  "runId": "run_1782697489670",
+  "generatedAt": "2026-06-29T01:44:51.859Z",
+  "dryRun": true,
   "workspace": "all",
   "limit": 0,
-  "docs": 9526,
+  "docs": 31155,
   "docCounts": {
-    "directory_wiki": 2713,
-    "cluster_summary": 1,
-    "feature_card": 1559,
-    "source_card": 5253,
+    "directory_wiki": 5436,
+    "cluster_summary": 0,
+    "feature_card": 1,
+    "source_card": 25718,
     "engram_memory": 0
   },
   "views": [
@@ -29,715 +29,749 @@
   "routeCount": 909,
   "sample": [
     {
-      "_id": "wiki:dir:scripts",
+      "_id": "wiki:dir:$lib/utils",
       "type": "directory_wiki",
-      "source_id": "dir:scripts",
-      "source_ref": "dir:scripts",
+      "source_id": "dir:$lib/utils",
+      "source_ref": "dir:$lib/utils",
       "source_kind": "directory",
       "file_path": null,
-      "rel_path": "scripts",
+      "rel_path": "$lib/utils",
       "feature_id": null,
       "related_feature_ids": [],
       "atlas_version": "1",
       "cold_storage_ready": true,
-      "workspace": "scripts",
-      "path": "scripts",
+      "workspace": "$lib",
+      "path": "$lib/utils",
       "summary": "",
       "clusters": [],
       "topFiles": [
-        "scripts/10-layer-audit-cli.mjs",
-        "scripts/glossary_batch_4.cjs",
-        "scripts/glossary_batch_8.cjs",
-        "scripts/analyze-current-errors.mjs",
-        "scripts/glossary_batch_9.cjs"
+        "$lib/utils/file-reader.ts",
+        "$lib/utils/file-reader.ts",
+        "$lib/utils/file-reader.ts",
+        "$lib/utils/file-reader.ts",
+        "$lib/utils/file-reader.ts"
       ],
       "tags": [
-        "scripts"
+        "feature.unknown"
       ],
       "pageRankAvg": 0,
-      "runId": "manual",
-      "updatedAt": "2026-06-04T19:05:08.468Z"
+      "runId": "run_1782697489670",
+      "updatedAt": "2026-06-29T01:44:51.167Z"
     },
     {
-      "_id": "wiki:dir:scripts/agent",
+      "_id": "wiki:dir:.claude/hooks",
       "type": "directory_wiki",
-      "source_id": "dir:scripts/agent",
-      "source_ref": "dir:scripts/agent",
+      "source_id": "dir:.claude/hooks",
+      "source_ref": "dir:.claude/hooks",
       "source_kind": "directory",
       "file_path": null,
-      "rel_path": "scripts/agent",
+      "rel_path": ".claude/hooks",
       "feature_id": null,
       "related_feature_ids": [],
       "atlas_version": "1",
       "cold_storage_ready": true,
-      "workspace": "scripts",
-      "path": "scripts/agent",
+      "workspace": "repo-root",
+      "path": ".claude/hooks",
       "summary": "",
       "clusters": [],
       "topFiles": [
-        "scripts/agent/log-subagent.mjs",
-        "scripts/agent/prompt-generator.mjs",
-        "scripts/agent/turbovec-search-memory.mjs"
+        ".claude/hooks/posttooluse-audit.mjs",
+        ".claude/hooks/pretooluse-deny.mjs"
       ],
       "tags": [
-        "agent"
+        "feature.unknown"
       ],
       "pageRankAvg": 0,
-      "runId": "manual",
-      "updatedAt": "2026-06-04T19:05:08.470Z"
+      "runId": "run_1782697489670",
+      "updatedAt": "2026-06-29T01:44:51.169Z"
     },
     {
-      "_id": "wiki:dir:scripts/ai",
+      "_id": "wiki:dir:.claude",
       "type": "directory_wiki",
-      "source_id": "dir:scripts/ai",
-      "source_ref": "dir:scripts/ai",
+      "source_id": "dir:.claude",
+      "source_ref": "dir:.claude",
       "source_kind": "directory",
       "file_path": null,
-      "rel_path": "scripts/ai",
+      "rel_path": ".claude",
       "feature_id": null,
       "related_feature_ids": [],
       "atlas_version": "1",
       "cold_storage_ready": true,
-      "workspace": "scripts",
-      "path": "scripts/ai",
+      "workspace": "repo-root",
+      "path": ".claude",
       "summary": "",
       "clusters": [],
       "topFiles": [
-        "scripts/ai/smoke_scenario_pipeline.mjs",
-        "scripts/ai/cache_startup_prompt.mjs",
-        "scripts/ai/embed_and_index_scenarios.mjs",
-        "scripts/ai/index_scenarios.mjs"
+        ".claude/mcp.json",
+        ".claude/settings.json",
+        ".claude/settings.local.json"
       ],
       "tags": [
-        "ai"
+        "feature.unknown"
       ],
       "pageRankAvg": 0,
-      "runId": "manual",
-      "updatedAt": "2026-06-04T19:05:08.470Z"
+      "runId": "run_1782697489670",
+      "updatedAt": "2026-06-29T01:44:51.169Z"
     },
     {
-      "_id": "wiki:dir:sveltekit-frontend/src/lib/shims",
+      "_id": "wiki:dir:.claude/worktrees/agent-a38668f2/.claude/hooks",
       "type": "directory_wiki",
-      "source_id": "dir:sveltekit-frontend/src/lib/shims",
-      "source_ref": "dir:sveltekit-frontend/src/lib/shims",
+      "source_id": "dir:.claude/worktrees/agent-a38668f2/.claude/hooks",
+      "source_ref": "dir:.claude/worktrees/agent-a38668f2/.claude/hooks",
       "source_kind": "directory",
       "file_path": null,
-      "rel_path": "sveltekit-frontend/src/lib/shims",
+      "rel_path": ".claude/worktrees/agent-a38668f2/.claude/hooks",
       "feature_id": null,
       "related_feature_ids": [],
       "atlas_version": "1",
       "cold_storage_ready": true,
-      "workspace": "sveltekit-frontend",
-      "path": "sveltekit-frontend/src/lib/shims",
+      "workspace": "repo-root",
+      "path": ".claude/worktrees/agent-a38668f2/.claude/hooks",
       "summary": "",
       "clusters": [],
       "topFiles": [
-        "sveltekit-frontend/src/lib/shims/missing-types-shim.d.ts",
-        "sveltekit-frontend/src/lib/shims/commonjs-shim.js",
-        "sveltekit-frontend/src/lib/shims/dns-browser-shim.js",
-        "sveltekit-frontend/src/lib/shims/fs-browser-shim.js",
-        "sveltekit-frontend/src/lib/shims/ioredis-browser-shim.js"
+        ".claude/worktrees/agent-a38668f2/.claude/hooks/posttooluse-audit.mjs",
+        ".claude/worktrees/agent-a38668f2/.claude/hooks/pretooluse-deny.mjs",
+        ".claude/worktrees/agent-a38668f2/.claude/hooks/posttooluse-audit.mjs",
+        ".claude/worktrees/agent-a38668f2/.claude/hooks/pretooluse-deny.mjs",
+        ".claude/worktrees/agent-a38668f2/.claude/hooks/posttooluse-audit.mjs"
       ],
       "tags": [
-        "shims"
+        "feature.unknown"
       ],
       "pageRankAvg": 0,
-      "runId": "manual",
-      "updatedAt": "2026-06-04T19:05:08.470Z"
+      "runId": "run_1782697489670",
+      "updatedAt": "2026-06-29T01:44:51.169Z"
     },
     {
-      "_id": "wiki:dir:docker/langgraph-synthesis/.venv/Lib/site-packages/jiter-0.14.0.dist-info/sboms",
+      "_id": "wiki:dir:.claude/worktrees/agent-a38668f2/.claude",
       "type": "directory_wiki",
-      "source_id": "dir:docker/langgraph-synthesis/.venv/Lib/site-packages/jiter-0.14.0.dist-info/sboms",
-      "source_ref": "dir:docker/langgraph-synthesis/.venv/Lib/site-packages/jiter-0.14.0.dist-info/sboms",
+      "source_id": "dir:.claude/worktrees/agent-a38668f2/.claude",
+      "source_ref": "dir:.claude/worktrees/agent-a38668f2/.claude",
       "source_kind": "directory",
       "file_path": null,
-      "rel_path": "docker/langgraph-synthesis/.venv/Lib/site-packages/jiter-0.14.0.dist-info/sboms",
+      "rel_path": ".claude/worktrees/agent-a38668f2/.claude",
       "feature_id": null,
       "related_feature_ids": [],
       "atlas_version": "1",
       "cold_storage_ready": true,
-      "workspace": "docker",
-      "path": "docker/langgraph-synthesis/.venv/Lib/site-packages/jiter-0.14.0.dist-info/sboms",
+      "workspace": "repo-root",
+      "path": ".claude/worktrees/agent-a38668f2/.claude",
       "summary": "",
       "clusters": [],
       "topFiles": [
-        "docker/langgraph-synthesis/.venv/Lib/site-packages/jiter-0.14.0.dist-info/sboms/jiter-python.cyclonedx.json"
+        ".claude/worktrees/agent-a38668f2/.claude/mcp.json",
+        ".claude/worktrees/agent-a38668f2/.claude/settings.json",
+        ".claude/worktrees/agent-a38668f2/.claude/settings.local.json",
+        ".claude/worktrees/agent-a38668f2/.claude/mcp.json",
+        ".claude/worktrees/agent-a38668f2/.claude/settings.json"
       ],
       "tags": [
-        "sboms"
+        "feature.unknown"
       ],
       "pageRankAvg": 0,
-      "runId": "manual",
-      "updatedAt": "2026-06-04T19:05:08.470Z"
+      "runId": "run_1782697489670",
+      "updatedAt": "2026-06-29T01:44:51.169Z"
     },
     {
-      "_id": "wiki:dir:sveltekit-frontend/src/lib/schemas/tools",
+      "_id": "wiki:dir:.claude/worktrees/agent-a38668f2/.github/hooks",
       "type": "directory_wiki",
-      "source_id": "dir:sveltekit-frontend/src/lib/schemas/tools",
-      "source_ref": "dir:sveltekit-frontend/src/lib/schemas/tools",
+      "source_id": "dir:.claude/worktrees/agent-a38668f2/.github/hooks",
+      "source_ref": "dir:.claude/worktrees/agent-a38668f2/.github/hooks",
       "source_kind": "directory",
       "file_path": null,
-      "rel_path": "sveltekit-frontend/src/lib/schemas/tools",
+      "rel_path": ".claude/worktrees/agent-a38668f2/.github/hooks",
       "feature_id": null,
       "related_feature_ids": [],
       "atlas_version": "1",
       "cold_storage_ready": true,
-      "workspace": "sveltekit-frontend",
-      "path": "sveltekit-frontend/src/lib/schemas/tools",
+      "workspace": "repo-root",
+      "path": ".claude/worktrees/agent-a38668f2/.github/hooks",
       "summary": "",
       "clusters": [],
       "topFiles": [
-        "sveltekit-frontend/src/lib/schemas/tools/source-validation.schema.json",
-        "sveltekit-frontend/src/lib/schemas/tools/kb-search.schema.json",
-        "sveltekit-frontend/src/lib/schemas/tools/langextract-batch.schema.json",
-        "sveltekit-frontend/src/lib/schemas/tools/scan-repo.schema.json",
-        "sveltekit-frontend/src/lib/schemas/tools/chunk-embed.schema.json"
+        ".claude/worktrees/agent-a38668f2/.github/hooks/rg.json",
+        ".claude/worktrees/agent-a38668f2/.github/hooks/rg.json",
+        ".claude/worktrees/agent-a38668f2/.github/hooks/rg.json",
+        ".claude/worktrees/agent-a38668f2/.github/hooks/rg.json",
+        ".claude/worktrees/agent-a38668f2/.github/hooks/rg.json"
       ],
       "tags": [
-        "tools"
+        "feature.unknown"
       ],
       "pageRankAvg": 0,
-      "runId": "manual",
-      "updatedAt": "2026-06-04T19:05:08.470Z"
+      "runId": "run_1782697489670",
+      "updatedAt": "2026-06-29T01:44:51.169Z"
     },
     {
-      "_id": "wiki:dir:scripts/api-cleanup",
+      "_id": "wiki:dir:.claude/worktrees/agent-a38668f2",
       "type": "directory_wiki",
-      "source_id": "dir:scripts/api-cleanup",
-      "source_ref": "dir:scripts/api-cleanup",
+      "source_id": "dir:.claude/worktrees/agent-a38668f2",
+      "source_ref": "dir:.claude/worktrees/agent-a38668f2",
       "source_kind": "directory",
       "file_path": null,
-      "rel_path": "scripts/api-cleanup",
+      "rel_path": ".claude/worktrees/agent-a38668f2",
       "feature_id": null,
       "related_feature_ids": [],
       "atlas_version": "1",
       "cold_storage_ready": true,
-      "workspace": "scripts",
-      "path": "scripts/api-cleanup",
+      "workspace": "repo-root",
+      "path": ".claude/worktrees/agent-a38668f2",
       "summary": "",
       "clusters": [],
       "topFiles": [
-        "scripts/api-cleanup/build-validator.ts",
-        "scripts/api-cleanup/categorizer.ts",
-        "scripts/api-cleanup/disabler.ts",
-        "scripts/api-cleanup/fixer.ts",
-        "scripts/api-cleanup/production-route-fixer.ts"
+        ".claude/worktrees/agent-a38668f2/.mcp.json",
+        ".claude/worktrees/agent-a38668f2/atlas.config.json",
+        ".claude/worktrees/agent-a38668f2/CMakePresets.json",
+        ".claude/worktrees/agent-a38668f2/ecosystem.config.cjs",
+        ".claude/worktrees/agent-a38668f2/ecosystem.dev.config.cjs"
       ],
       "tags": [
-        "api-cleanup"
+        "feature.unknown"
       ],
       "pageRankAvg": 0,
-      "runId": "manual",
-      "updatedAt": "2026-06-04T19:05:08.470Z"
+      "runId": "run_1782697489670",
+      "updatedAt": "2026-06-29T01:44:51.169Z"
     },
     {
-      "_id": "wiki:dir:scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/ace/graph-build",
+      "_id": "wiki:dir:.claude/worktrees/agent-a38668f2/.vscode",
       "type": "directory_wiki",
-      "source_id": "dir:scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/ace/graph-build",
-      "source_ref": "dir:scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/ace/graph-build",
+      "source_id": "dir:.claude/worktrees/agent-a38668f2/.vscode",
+      "source_ref": "dir:.claude/worktrees/agent-a38668f2/.vscode",
       "source_kind": "directory",
       "file_path": null,
-      "rel_path": "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/ace/graph-build",
+      "rel_path": ".claude/worktrees/agent-a38668f2/.vscode",
       "feature_id": null,
       "related_feature_ids": [],
       "atlas_version": "1",
       "cold_storage_ready": true,
-      "workspace": "scripts",
-      "path": "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/ace/graph-build",
-      "summary": "",
-      "clusters": [
-        "gpu:10"
-      ],
-      "topFiles": [
-        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/ace/graph-build/+server.ts"
-      ],
-      "tags": [
-        "graph-build"
-      ],
-      "pageRankAvg": 0,
-      "runId": "manual",
-      "updatedAt": "2026-06-04T19:05:08.470Z"
-    },
-    {
-      "_id": "wiki:dir:scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/ace/llm-analyze",
-      "type": "directory_wiki",
-      "source_id": "dir:scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/ace/llm-analyze",
-      "source_ref": "dir:scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/ace/llm-analyze",
-      "source_kind": "directory",
-      "file_path": null,
-      "rel_path": "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/ace/llm-analyze",
-      "feature_id": null,
-      "related_feature_ids": [],
-      "atlas_version": "1",
-      "cold_storage_ready": true,
-      "workspace": "scripts",
-      "path": "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/ace/llm-analyze",
-      "summary": "",
-      "clusters": [
-        "gpu:10"
-      ],
-      "topFiles": [
-        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/ace/llm-analyze/+server.ts"
-      ],
-      "tags": [
-        "llm-analyze"
-      ],
-      "pageRankAvg": 0,
-      "runId": "manual",
-      "updatedAt": "2026-06-04T19:05:08.470Z"
-    },
-    {
-      "_id": "wiki:dir:scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/ace/vector-index",
-      "type": "directory_wiki",
-      "source_id": "dir:scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/ace/vector-index",
-      "source_ref": "dir:scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/ace/vector-index",
-      "source_kind": "directory",
-      "file_path": null,
-      "rel_path": "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/ace/vector-index",
-      "feature_id": null,
-      "related_feature_ids": [],
-      "atlas_version": "1",
-      "cold_storage_ready": true,
-      "workspace": "scripts",
-      "path": "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/ace/vector-index",
-      "summary": "",
-      "clusters": [
-        "gpu:10"
-      ],
-      "topFiles": [
-        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/ace/vector-index/+server.ts"
-      ],
-      "tags": [
-        "vector-index"
-      ],
-      "pageRankAvg": 0,
-      "runId": "manual",
-      "updatedAt": "2026-06-04T19:05:08.470Z"
-    },
-    {
-      "_id": "wiki:dir:scripts/case_data/_cache",
-      "type": "directory_wiki",
-      "source_id": "dir:scripts/case_data/_cache",
-      "source_ref": "dir:scripts/case_data/_cache",
-      "source_kind": "directory",
-      "file_path": null,
-      "rel_path": "scripts/case_data/_cache",
-      "feature_id": null,
-      "related_feature_ids": [],
-      "atlas_version": "1",
-      "cold_storage_ready": true,
-      "workspace": "scripts",
-      "path": "scripts/case_data/_cache",
+      "workspace": "repo-root",
+      "path": ".claude/worktrees/agent-a38668f2/.vscode",
       "summary": "",
       "clusters": [],
       "topFiles": [
-        "scripts/case_data/_cache/cybercrime_9028ddda.json",
-        "scripts/case_data/_cache/cybercrime_a104576a.json",
-        "scripts/case_data/_cache/cybercrime_a605fbc1.json",
-        "scripts/case_data/_cache/cybercrime_be7a1aba.json",
-        "scripts/case_data/_cache/cybercrime_d1b772a9.json"
+        ".claude/worktrees/agent-a38668f2/.vscode/extensions.json",
+        ".claude/worktrees/agent-a38668f2/.vscode/launch.json",
+        ".claude/worktrees/agent-a38668f2/.vscode/tasks.json",
+        ".claude/worktrees/agent-a38668f2/.vscode/extensions.json",
+        ".claude/worktrees/agent-a38668f2/.vscode/launch.json"
       ],
       "tags": [
-        "_cache"
+        "feature.unknown"
       ],
       "pageRankAvg": 0,
-      "runId": "manual",
-      "updatedAt": "2026-06-04T19:05:08.470Z"
+      "runId": "run_1782697489670",
+      "updatedAt": "2026-06-29T01:44:51.170Z"
     },
     {
-      "_id": "wiki:dir:docker/langgraph-synthesis/.venv/Lib/site-packages/plotly/package_data/templates",
+      "_id": "wiki:dir:.claude/worktrees/agent-a38668f2/audit",
       "type": "directory_wiki",
-      "source_id": "dir:docker/langgraph-synthesis/.venv/Lib/site-packages/plotly/package_data/templates",
-      "source_ref": "dir:docker/langgraph-synthesis/.venv/Lib/site-packages/plotly/package_data/templates",
+      "source_id": "dir:.claude/worktrees/agent-a38668f2/audit",
+      "source_ref": "dir:.claude/worktrees/agent-a38668f2/audit",
       "source_kind": "directory",
       "file_path": null,
-      "rel_path": "docker/langgraph-synthesis/.venv/Lib/site-packages/plotly/package_data/templates",
+      "rel_path": ".claude/worktrees/agent-a38668f2/audit",
       "feature_id": null,
       "related_feature_ids": [],
       "atlas_version": "1",
       "cold_storage_ready": true,
-      "workspace": "docker",
-      "path": "docker/langgraph-synthesis/.venv/Lib/site-packages/plotly/package_data/templates",
+      "workspace": "repo-root",
+      "path": ".claude/worktrees/agent-a38668f2/audit",
       "summary": "",
       "clusters": [],
       "topFiles": [
-        "docker/langgraph-synthesis/.venv/Lib/site-packages/plotly/package_data/templates/ygridoff.json",
-        "docker/langgraph-synthesis/.venv/Lib/site-packages/plotly/package_data/templates/ggplot2.json",
-        "docker/langgraph-synthesis/.venv/Lib/site-packages/plotly/package_data/templates/gridon.json",
-        "docker/langgraph-synthesis/.venv/Lib/site-packages/plotly/package_data/templates/plotly_dark.json",
-        "docker/langgraph-synthesis/.venv/Lib/site-packages/plotly/package_data/templates/plotly_white.json"
+        ".claude/worktrees/agent-a38668f2/audit/public-route-allowlist.json",
+        ".claude/worktrees/agent-a38668f2/audit/public-route-allowlist.json",
+        ".claude/worktrees/agent-a38668f2/audit/public-route-allowlist.json",
+        ".claude/worktrees/agent-a38668f2/audit/public-route-allowlist.json",
+        ".claude/worktrees/agent-a38668f2/audit/public-route-allowlist.json"
       ],
       "tags": [
-        "templates"
+        "feature.unknown"
       ],
       "pageRankAvg": 0,
-      "runId": "manual",
-      "updatedAt": "2026-06-04T19:05:08.470Z"
+      "runId": "run_1782697489670",
+      "updatedAt": "2026-06-29T01:44:51.170Z"
     },
     {
-      "_id": "wiki:dir:scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/ace/vlm-process",
+      "_id": "wiki:dir:.claude/worktrees/agent-a38668f2/crates/atlas_packet_parser",
       "type": "directory_wiki",
-      "source_id": "dir:scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/ace/vlm-process",
-      "source_ref": "dir:scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/ace/vlm-process",
+      "source_id": "dir:.claude/worktrees/agent-a38668f2/crates/atlas_packet_parser",
+      "source_ref": "dir:.claude/worktrees/agent-a38668f2/crates/atlas_packet_parser",
       "source_kind": "directory",
       "file_path": null,
-      "rel_path": "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/ace/vlm-process",
+      "rel_path": ".claude/worktrees/agent-a38668f2/crates/atlas_packet_parser",
       "feature_id": null,
       "related_feature_ids": [],
       "atlas_version": "1",
       "cold_storage_ready": true,
-      "workspace": "scripts",
-      "path": "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/ace/vlm-process",
+      "workspace": "repo-root",
+      "path": ".claude/worktrees/agent-a38668f2/crates/atlas_packet_parser",
       "summary": "",
-      "clusters": [
-        "gpu:10"
-      ],
+      "clusters": [],
       "topFiles": [
-        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/ace/vlm-process/+server.ts"
+        ".claude/worktrees/agent-a38668f2/crates/atlas_packet_parser/index.d.ts",
+        ".claude/worktrees/agent-a38668f2/crates/atlas_packet_parser/index.js",
+        ".claude/worktrees/agent-a38668f2/crates/atlas_packet_parser/package.json",
+        ".claude/worktrees/agent-a38668f2/crates/atlas_packet_parser/index.d.ts",
+        ".claude/worktrees/agent-a38668f2/crates/atlas_packet_parser/index.js"
       ],
       "tags": [
-        "vlm-process"
+        "feature.unknown"
       ],
       "pageRankAvg": 0,
-      "runId": "manual",
-      "updatedAt": "2026-06-04T19:05:08.471Z"
+      "runId": "run_1782697489670",
+      "updatedAt": "2026-06-29T01:44:51.170Z"
     },
     {
-      "_id": "wiki:dir:scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/ace/web-crawl",
+      "_id": "wiki:dir:.claude/worktrees/agent-a38668f2/crates/atlas_packet_parser/target",
       "type": "directory_wiki",
-      "source_id": "dir:scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/ace/web-crawl",
-      "source_ref": "dir:scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/ace/web-crawl",
+      "source_id": "dir:.claude/worktrees/agent-a38668f2/crates/atlas_packet_parser/target",
+      "source_ref": "dir:.claude/worktrees/agent-a38668f2/crates/atlas_packet_parser/target",
       "source_kind": "directory",
       "file_path": null,
-      "rel_path": "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/ace/web-crawl",
+      "rel_path": ".claude/worktrees/agent-a38668f2/crates/atlas_packet_parser/target",
       "feature_id": null,
       "related_feature_ids": [],
       "atlas_version": "1",
       "cold_storage_ready": true,
-      "workspace": "scripts",
-      "path": "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/ace/web-crawl",
+      "workspace": "repo-root",
+      "path": ".claude/worktrees/agent-a38668f2/crates/atlas_packet_parser/target",
       "summary": "",
-      "clusters": [
-        "gpu:10"
-      ],
+      "clusters": [],
       "topFiles": [
-        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/ace/web-crawl/+server.ts"
+        ".claude/worktrees/agent-a38668f2/crates/atlas_packet_parser/target/.rustc_info.json",
+        ".claude/worktrees/agent-a38668f2/crates/atlas_packet_parser/target/.rustc_info.json",
+        ".claude/worktrees/agent-a38668f2/crates/atlas_packet_parser/target/.rustc_info.json",
+        ".claude/worktrees/agent-a38668f2/crates/atlas_packet_parser/target/.rustc_info.json",
+        ".claude/worktrees/agent-a38668f2/crates/atlas_packet_parser/target/.rustc_info.json"
       ],
       "tags": [
-        "web-crawl"
+        "feature.unknown"
       ],
       "pageRankAvg": 0,
-      "runId": "manual",
-      "updatedAt": "2026-06-04T19:05:08.471Z"
+      "runId": "run_1782697489670",
+      "updatedAt": "2026-06-29T01:44:51.170Z"
     },
     {
-      "_id": "wiki:dir:scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/admin/cache-dashboard",
+      "_id": "wiki:dir:.claude/worktrees/agent-a38668f2/crates/turbovec-napi",
       "type": "directory_wiki",
-      "source_id": "dir:scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/admin/cache-dashboard",
-      "source_ref": "dir:scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/admin/cache-dashboard",
+      "source_id": "dir:.claude/worktrees/agent-a38668f2/crates/turbovec-napi",
+      "source_ref": "dir:.claude/worktrees/agent-a38668f2/crates/turbovec-napi",
       "source_kind": "directory",
       "file_path": null,
-      "rel_path": "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/admin/cache-dashboard",
+      "rel_path": ".claude/worktrees/agent-a38668f2/crates/turbovec-napi",
       "feature_id": null,
       "related_feature_ids": [],
       "atlas_version": "1",
       "cold_storage_ready": true,
-      "workspace": "scripts",
-      "path": "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/admin/cache-dashboard",
+      "workspace": "repo-root",
+      "path": ".claude/worktrees/agent-a38668f2/crates/turbovec-napi",
       "summary": "",
-      "clusters": [
-        "gpu:10"
-      ],
+      "clusters": [],
       "topFiles": [
-        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/admin/cache-dashboard/+server.ts"
+        ".claude/worktrees/agent-a38668f2/crates/turbovec-napi/index.d.ts",
+        ".claude/worktrees/agent-a38668f2/crates/turbovec-napi/index.js",
+        ".claude/worktrees/agent-a38668f2/crates/turbovec-napi/package.json",
+        ".claude/worktrees/agent-a38668f2/crates/turbovec-napi/wrapper.d.ts",
+        ".claude/worktrees/agent-a38668f2/crates/turbovec-napi/wrapper.js"
       ],
       "tags": [
-        "cache-dashboard"
+        "feature.unknown"
       ],
       "pageRankAvg": 0,
-      "runId": "manual",
-      "updatedAt": "2026-06-04T19:05:08.471Z"
+      "runId": "run_1782697489670",
+      "updatedAt": "2026-06-29T01:44:51.170Z"
     },
     {
-      "_id": "wiki:dir:scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/admin/cache-metrics",
+      "_id": "wiki:dir:.claude/worktrees/agent-a38668f2/crates/turbovec-napi/target",
       "type": "directory_wiki",
-      "source_id": "dir:scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/admin/cache-metrics",
-      "source_ref": "dir:scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/admin/cache-metrics",
+      "source_id": "dir:.claude/worktrees/agent-a38668f2/crates/turbovec-napi/target",
+      "source_ref": "dir:.claude/worktrees/agent-a38668f2/crates/turbovec-napi/target",
       "source_kind": "directory",
       "file_path": null,
-      "rel_path": "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/admin/cache-metrics",
+      "rel_path": ".claude/worktrees/agent-a38668f2/crates/turbovec-napi/target",
       "feature_id": null,
       "related_feature_ids": [],
       "atlas_version": "1",
       "cold_storage_ready": true,
-      "workspace": "scripts",
-      "path": "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/admin/cache-metrics",
+      "workspace": "repo-root",
+      "path": ".claude/worktrees/agent-a38668f2/crates/turbovec-napi/target",
       "summary": "",
-      "clusters": [
-        "gpu:10"
-      ],
+      "clusters": [],
       "topFiles": [
-        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/admin/cache-metrics/+server.ts"
+        ".claude/worktrees/agent-a38668f2/crates/turbovec-napi/target/.rustc_info.json",
+        ".claude/worktrees/agent-a38668f2/crates/turbovec-napi/target/.rustc_info.json",
+        ".claude/worktrees/agent-a38668f2/crates/turbovec-napi/target/.rustc_info.json",
+        ".claude/worktrees/agent-a38668f2/crates/turbovec-napi/target/.rustc_info.json",
+        ".claude/worktrees/agent-a38668f2/crates/turbovec-napi/target/.rustc_info.json"
       ],
       "tags": [
-        "cache-metrics"
+        "feature.unknown"
       ],
       "pageRankAvg": 0,
-      "runId": "manual",
-      "updatedAt": "2026-06-04T19:05:08.471Z"
+      "runId": "run_1782697489670",
+      "updatedAt": "2026-06-29T01:44:51.170Z"
     },
     {
-      "_id": "wiki:dir:scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/admin/cache/stats",
+      "_id": "wiki:dir:.claude/worktrees/agent-a38668f2/data",
       "type": "directory_wiki",
-      "source_id": "dir:scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/admin/cache/stats",
-      "source_ref": "dir:scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/admin/cache/stats",
+      "source_id": "dir:.claude/worktrees/agent-a38668f2/data",
+      "source_ref": "dir:.claude/worktrees/agent-a38668f2/data",
       "source_kind": "directory",
       "file_path": null,
-      "rel_path": "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/admin/cache/stats",
+      "rel_path": ".claude/worktrees/agent-a38668f2/data",
       "feature_id": null,
       "related_feature_ids": [],
       "atlas_version": "1",
       "cold_storage_ready": true,
-      "workspace": "scripts",
-      "path": "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/admin/cache/stats",
+      "workspace": "repo-root",
+      "path": ".claude/worktrees/agent-a38668f2/data",
       "summary": "",
-      "clusters": [
-        "gpu:10"
-      ],
+      "clusters": [],
       "topFiles": [
-        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/admin/cache/stats/+server.ts"
+        ".claude/worktrees/agent-a38668f2/data/couchdb-ingest-registry.json",
+        ".claude/worktrees/agent-a38668f2/data/couchdb-ingest-registry.json",
+        ".claude/worktrees/agent-a38668f2/data/couchdb-ingest-registry.json",
+        ".claude/worktrees/agent-a38668f2/data/couchdb-ingest-registry.json",
+        ".claude/worktrees/agent-a38668f2/data/couchdb-ingest-registry.json"
       ],
       "tags": [
-        "stats"
+        "feature.unknown"
       ],
       "pageRankAvg": 0,
-      "runId": "manual",
-      "updatedAt": "2026-06-04T19:05:08.471Z"
+      "runId": "run_1782697489670",
+      "updatedAt": "2026-06-29T01:44:51.171Z"
     },
     {
-      "_id": "wiki:dir:scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/admin/dlq-monitor",
+      "_id": "wiki:dir:.claude/worktrees/agent-a38668f2/docker/bifrost",
       "type": "directory_wiki",
-      "source_id": "dir:scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/admin/dlq-monitor",
-      "source_ref": "dir:scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/admin/dlq-monitor",
+      "source_id": "dir:.claude/worktrees/agent-a38668f2/docker/bifrost",
+      "source_ref": "dir:.claude/worktrees/agent-a38668f2/docker/bifrost",
       "source_kind": "directory",
       "file_path": null,
-      "rel_path": "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/admin/dlq-monitor",
+      "rel_path": ".claude/worktrees/agent-a38668f2/docker/bifrost",
       "feature_id": null,
       "related_feature_ids": [],
       "atlas_version": "1",
       "cold_storage_ready": true,
-      "workspace": "scripts",
-      "path": "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/admin/dlq-monitor",
+      "workspace": "repo-root",
+      "path": ".claude/worktrees/agent-a38668f2/docker/bifrost",
       "summary": "",
-      "clusters": [
-        "gpu:10"
-      ],
+      "clusters": [],
       "topFiles": [
-        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/admin/dlq-monitor/+server.ts"
+        ".claude/worktrees/agent-a38668f2/docker/bifrost/config.json",
+        ".claude/worktrees/agent-a38668f2/docker/bifrost/config.json",
+        ".claude/worktrees/agent-a38668f2/docker/bifrost/config.json",
+        ".claude/worktrees/agent-a38668f2/docker/bifrost/config.json",
+        ".claude/worktrees/agent-a38668f2/docker/bifrost/config.json"
       ],
       "tags": [
-        "dlq-monitor"
+        "feature.unknown"
       ],
       "pageRankAvg": 0,
-      "runId": "manual",
-      "updatedAt": "2026-06-04T19:05:08.471Z"
+      "runId": "run_1782697489670",
+      "updatedAt": "2026-06-29T01:44:51.171Z"
     },
     {
-      "_id": "wiki:dir:scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/admin/index-directory",
+      "_id": "wiki:dir:.claude/worktrees/agent-a38668f2/docker/seaweedfs",
       "type": "directory_wiki",
-      "source_id": "dir:scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/admin/index-directory",
-      "source_ref": "dir:scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/admin/index-directory",
+      "source_id": "dir:.claude/worktrees/agent-a38668f2/docker/seaweedfs",
+      "source_ref": "dir:.claude/worktrees/agent-a38668f2/docker/seaweedfs",
       "source_kind": "directory",
       "file_path": null,
-      "rel_path": "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/admin/index-directory",
+      "rel_path": ".claude/worktrees/agent-a38668f2/docker/seaweedfs",
       "feature_id": null,
       "related_feature_ids": [],
       "atlas_version": "1",
       "cold_storage_ready": true,
-      "workspace": "scripts",
-      "path": "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/admin/index-directory",
+      "workspace": "repo-root",
+      "path": ".claude/worktrees/agent-a38668f2/docker/seaweedfs",
       "summary": "",
-      "clusters": [
-        "gpu:10"
-      ],
+      "clusters": [],
       "topFiles": [
-        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/admin/index-directory/+server.ts"
+        ".claude/worktrees/agent-a38668f2/docker/seaweedfs/s3.json",
+        ".claude/worktrees/agent-a38668f2/docker/seaweedfs/s3.json",
+        ".claude/worktrees/agent-a38668f2/docker/seaweedfs/s3.json",
+        ".claude/worktrees/agent-a38668f2/docker/seaweedfs/s3.json",
+        ".claude/worktrees/agent-a38668f2/docker/seaweedfs/s3.json"
       ],
       "tags": [
-        "index-directory"
+        "feature.unknown"
       ],
       "pageRankAvg": 0,
-      "runId": "manual",
-      "updatedAt": "2026-06-04T19:05:08.471Z"
+      "runId": "run_1782697489670",
+      "updatedAt": "2026-06-29T01:44:51.171Z"
     },
     {
-      "_id": "wiki:dir:scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/admin/index-web",
+      "_id": "wiki:dir:.claude/worktrees/agent-a38668f2/docs/ai-os",
       "type": "directory_wiki",
-      "source_id": "dir:scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/admin/index-web",
-      "source_ref": "dir:scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/admin/index-web",
+      "source_id": "dir:.claude/worktrees/agent-a38668f2/docs/ai-os",
+      "source_ref": "dir:.claude/worktrees/agent-a38668f2/docs/ai-os",
       "source_kind": "directory",
       "file_path": null,
-      "rel_path": "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/admin/index-web",
+      "rel_path": ".claude/worktrees/agent-a38668f2/docs/ai-os",
       "feature_id": null,
       "related_feature_ids": [],
       "atlas_version": "1",
       "cold_storage_ready": true,
-      "workspace": "scripts",
-      "path": "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/admin/index-web",
+      "workspace": "repo-root",
+      "path": ".claude/worktrees/agent-a38668f2/docs/ai-os",
       "summary": "",
-      "clusters": [
-        "gpu:10"
-      ],
+      "clusters": [],
       "topFiles": [
-        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/admin/index-web/+server.ts"
+        ".claude/worktrees/agent-a38668f2/docs/ai-os/atlas-retry-index.json",
+        ".claude/worktrees/agent-a38668f2/docs/ai-os/atlas-retry-index.json",
+        ".claude/worktrees/agent-a38668f2/docs/ai-os/atlas-retry-index.json",
+        ".claude/worktrees/agent-a38668f2/docs/ai-os/atlas-retry-index.json",
+        ".claude/worktrees/agent-a38668f2/docs/ai-os/atlas-retry-index.json"
       ],
       "tags": [
-        "index-web"
+        "feature.unknown"
       ],
       "pageRankAvg": 0,
-      "runId": "manual",
-      "updatedAt": "2026-06-04T19:05:08.471Z"
+      "runId": "run_1782697489670",
+      "updatedAt": "2026-06-29T01:44:51.171Z"
     },
     {
-      "_id": "wiki:dir:scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/admin/inspector",
+      "_id": "wiki:dir:.claude/worktrees/agent-a38668f2/docs/atlas",
       "type": "directory_wiki",
-      "source_id": "dir:scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/admin/inspector",
-      "source_ref": "dir:scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/admin/inspector",
+      "source_id": "dir:.claude/worktrees/agent-a38668f2/docs/atlas",
+      "source_ref": "dir:.claude/worktrees/agent-a38668f2/docs/atlas",
       "source_kind": "directory",
       "file_path": null,
-      "rel_path": "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/admin/inspector",
+      "rel_path": ".claude/worktrees/agent-a38668f2/docs/atlas",
       "feature_id": null,
       "related_feature_ids": [],
       "atlas_version": "1",
       "cold_storage_ready": true,
-      "workspace": "scripts",
-      "path": "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/admin/inspector",
+      "workspace": "repo-root",
+      "path": ".claude/worktrees/agent-a38668f2/docs/atlas",
       "summary": "",
-      "clusters": [
-        "gpu:10"
-      ],
+      "clusters": [],
       "topFiles": [
-        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/admin/inspector/+server.ts"
+        ".claude/worktrees/agent-a38668f2/docs/atlas/cluster-cards.json",
+        ".claude/worktrees/agent-a38668f2/docs/atlas/feature-registry.json",
+        ".claude/worktrees/agent-a38668f2/docs/atlas/parent-atlas.json",
+        ".claude/worktrees/agent-a38668f2/docs/atlas/retry-queries.json",
+        ".claude/worktrees/agent-a38668f2/docs/atlas/feature-registry.json"
       ],
       "tags": [
-        "inspector"
+        "feature.unknown"
       ],
       "pageRankAvg": 0,
-      "runId": "manual",
-      "updatedAt": "2026-06-04T19:05:08.471Z"
+      "runId": "run_1782697489670",
+      "updatedAt": "2026-06-29T01:44:51.171Z"
     },
     {
-      "_id": "wiki:dir:scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/admin/rag-health",
+      "_id": "wiki:dir:.claude/worktrees/agent-a38668f2/docs/graph",
       "type": "directory_wiki",
-      "source_id": "dir:scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/admin/rag-health",
-      "source_ref": "dir:scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/admin/rag-health",
+      "source_id": "dir:.claude/worktrees/agent-a38668f2/docs/graph",
+      "source_ref": "dir:.claude/worktrees/agent-a38668f2/docs/graph",
       "source_kind": "directory",
       "file_path": null,
-      "rel_path": "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/admin/rag-health",
+      "rel_path": ".claude/worktrees/agent-a38668f2/docs/graph",
       "feature_id": null,
       "related_feature_ids": [],
       "atlas_version": "1",
       "cold_storage_ready": true,
-      "workspace": "scripts",
-      "path": "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/admin/rag-health",
+      "workspace": "repo-root",
+      "path": ".claude/worktrees/agent-a38668f2/docs/graph",
       "summary": "",
-      "clusters": [
-        "gpu:10"
-      ],
+      "clusters": [],
       "topFiles": [
-        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/admin/rag-health/+server.ts"
+        ".claude/worktrees/agent-a38668f2/docs/graph/atlas-write-manifest.json",
+        ".claude/worktrees/agent-a38668f2/docs/graph/atlas-write-scale-report.json",
+        ".claude/worktrees/agent-a38668f2/docs/graph/batch-gpu-analysis-report.json",
+        ".claude/worktrees/agent-a38668f2/docs/graph/codebase-feature-map.json",
+        ".claude/worktrees/agent-a38668f2/docs/graph/codebase-graph.json"
       ],
       "tags": [
-        "rag-health"
+        "feature.unknown"
       ],
       "pageRankAvg": 0,
-      "runId": "manual",
-      "updatedAt": "2026-06-04T19:05:08.471Z"
+      "runId": "run_1782697489670",
+      "updatedAt": "2026-06-29T01:44:51.171Z"
     },
     {
-      "_id": "wiki:dir:scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/admin/service-graph",
+      "_id": "wiki:dir:.claude/worktrees/agent-a38668f2/docs/packets",
       "type": "directory_wiki",
-      "source_id": "dir:scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/admin/service-graph",
-      "source_ref": "dir:scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/admin/service-graph",
+      "source_id": "dir:.claude/worktrees/agent-a38668f2/docs/packets",
+      "source_ref": "dir:.claude/worktrees/agent-a38668f2/docs/packets",
       "source_kind": "directory",
       "file_path": null,
-      "rel_path": "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/admin/service-graph",
+      "rel_path": ".claude/worktrees/agent-a38668f2/docs/packets",
       "feature_id": null,
       "related_feature_ids": [],
       "atlas_version": "1",
       "cold_storage_ready": true,
-      "workspace": "scripts",
-      "path": "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/admin/service-graph",
+      "workspace": "repo-root",
+      "path": ".claude/worktrees/agent-a38668f2/docs/packets",
       "summary": "",
-      "clusters": [
-        "gpu:10"
-      ],
+      "clusters": [],
       "topFiles": [
-        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/admin/service-graph/+server.ts"
+        ".claude/worktrees/agent-a38668f2/docs/packets/rg-toc.json",
+        ".claude/worktrees/agent-a38668f2/docs/packets/rg-toc.json",
+        ".claude/worktrees/agent-a38668f2/docs/packets/rg-toc.json",
+        ".claude/worktrees/agent-a38668f2/docs/packets/rg-toc.json",
+        ".claude/worktrees/agent-a38668f2/docs/packets/rg-toc.json"
       ],
       "tags": [
-        "service-graph"
+        "feature.unknown"
       ],
       "pageRankAvg": 0,
-      "runId": "manual",
-      "updatedAt": "2026-06-04T19:05:08.471Z"
+      "runId": "run_1782697489670",
+      "updatedAt": "2026-06-29T01:44:51.171Z"
     },
     {
-      "_id": "wiki:dir:scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/agent-logs",
+      "_id": "wiki:dir:.claude/worktrees/agent-a38668f2/docs/phase100",
       "type": "directory_wiki",
-      "source_id": "dir:scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/agent-logs",
-      "source_ref": "dir:scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/agent-logs",
+      "source_id": "dir:.claude/worktrees/agent-a38668f2/docs/phase100",
+      "source_ref": "dir:.claude/worktrees/agent-a38668f2/docs/phase100",
       "source_kind": "directory",
       "file_path": null,
-      "rel_path": "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/agent-logs",
+      "rel_path": ".claude/worktrees/agent-a38668f2/docs/phase100",
       "feature_id": null,
       "related_feature_ids": [],
       "atlas_version": "1",
       "cold_storage_ready": true,
-      "workspace": "scripts",
-      "path": "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/agent-logs",
+      "workspace": "repo-root",
+      "path": ".claude/worktrees/agent-a38668f2/docs/phase100",
       "summary": "",
-      "clusters": [
-        "gpu:10"
-      ],
+      "clusters": [],
       "topFiles": [
-        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/agent-logs/+server.ts"
+        ".claude/worktrees/agent-a38668f2/docs/phase100/consolidation-recommendations.json",
+        ".claude/worktrees/agent-a38668f2/docs/phase100/feature-graph-cycles.json",
+        ".claude/worktrees/agent-a38668f2/docs/phase100/feature-graph.json",
+        ".claude/worktrees/agent-a38668f2/docs/phase100/feature-recommendations.json",
+        ".claude/worktrees/agent-a38668f2/docs/phase100/file-consolidation-audit.json"
       ],
       "tags": [
-        "agent-logs"
+        "feature.unknown"
       ],
       "pageRankAvg": 0,
-      "runId": "manual",
-      "updatedAt": "2026-06-04T19:05:08.471Z"
+      "runId": "run_1782697489670",
+      "updatedAt": "2026-06-29T01:44:51.171Z"
     },
     {
-      "_id": "wiki:dir:scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/agent-orchestrate",
+      "_id": "wiki:dir:.claude/worktrees/agent-a38668f2/docs/profile-cards/data",
       "type": "directory_wiki",
-      "source_id": "dir:scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/agent-orchestrate",
-      "source_ref": "dir:scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/agent-orchestrate",
+      "source_id": "dir:.claude/worktrees/agent-a38668f2/docs/profile-cards/data",
+      "source_ref": "dir:.claude/worktrees/agent-a38668f2/docs/profile-cards/data",
       "source_kind": "directory",
       "file_path": null,
-      "rel_path": "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/agent-orchestrate",
+      "rel_path": ".claude/worktrees/agent-a38668f2/docs/profile-cards/data",
       "feature_id": null,
       "related_feature_ids": [],
       "atlas_version": "1",
       "cold_storage_ready": true,
-      "workspace": "scripts",
-      "path": "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/agent-orchestrate",
+      "workspace": "repo-root",
+      "path": ".claude/worktrees/agent-a38668f2/docs/profile-cards/data",
       "summary": "",
-      "clusters": [
-        "gpu:10"
-      ],
+      "clusters": [],
       "topFiles": [
-        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/agent-orchestrate/+server.ts"
+        ".claude/worktrees/agent-a38668f2/docs/profile-cards/data/docker_langgraph-synthesis_.venv_Lib_site-packages_plotly_package_data_plotly.min.js.json",
+        ".claude/worktrees/agent-a38668f2/docs/profile-cards/data/docker_langgraph-synthesis_.venv_Lib_site-packages_plotly_package_data_widgetbundle.js.json",
+        ".claude/worktrees/agent-a38668f2/docs/profile-cards/data/docker_langgraph-synthesis_.venv_Lib_site-packages_plotly_validators__validators.json",
+        ".claude/worktrees/agent-a38668f2/docs/profile-cards/data/docker_langgraph-synthesis_.venv_Lib_site-packages_plotly_validators__validators.json.json",
+        ".claude/worktrees/agent-a38668f2/docs/profile-cards/data/next_steps_active_SCHEMA_MANIFEST.json"
       ],
       "tags": [
-        "agent-orchestrate"
+        "feature.unknown"
       ],
       "pageRankAvg": 0,
-      "runId": "manual",
-      "updatedAt": "2026-06-04T19:05:08.471Z"
+      "runId": "run_1782697489670",
+      "updatedAt": "2026-06-29T01:44:51.171Z"
+    },
+    {
+      "_id": "wiki:dir:.claude/worktrees/agent-a38668f2/docs/reports",
+      "type": "directory_wiki",
+      "source_id": "dir:.claude/worktrees/agent-a38668f2/docs/reports",
+      "source_ref": "dir:.claude/worktrees/agent-a38668f2/docs/reports",
+      "source_kind": "directory",
+      "file_path": null,
+      "rel_path": ".claude/worktrees/agent-a38668f2/docs/reports",
+      "feature_id": null,
+      "related_feature_ids": [],
+      "atlas_version": "1",
+      "cold_storage_ready": true,
+      "workspace": "repo-root",
+      "path": ".claude/worktrees/agent-a38668f2/docs/reports",
+      "summary": "",
+      "clusters": [],
+      "topFiles": [
+        ".claude/worktrees/agent-a38668f2/docs/reports/ace-packet-smoke-report.json",
+        ".claude/worktrees/agent-a38668f2/docs/reports/active-topology-mirror-backfill-report.json",
+        ".claude/worktrees/agent-a38668f2/docs/reports/artifact-bloat-report.json",
+        ".claude/worktrees/agent-a38668f2/docs/reports/atlas-drizzle-schema-map-report.json",
+        ".claude/worktrees/agent-a38668f2/docs/reports/atlas-feature-map-duckdb-report.json"
+      ],
+      "tags": [
+        "feature.unknown"
+      ],
+      "pageRankAvg": 0,
+      "runId": "run_1782697489670",
+      "updatedAt": "2026-06-29T01:44:51.171Z"
+    },
+    {
+      "_id": "wiki:dir:.claude/worktrees/agent-a38668f2/docs/reports/atlas",
+      "type": "directory_wiki",
+      "source_id": "dir:.claude/worktrees/agent-a38668f2/docs/reports/atlas",
+      "source_ref": "dir:.claude/worktrees/agent-a38668f2/docs/reports/atlas",
+      "source_kind": "directory",
+      "file_path": null,
+      "rel_path": ".claude/worktrees/agent-a38668f2/docs/reports/atlas",
+      "feature_id": null,
+      "related_feature_ids": [],
+      "atlas_version": "1",
+      "cold_storage_ready": true,
+      "workspace": "repo-root",
+      "path": ".claude/worktrees/agent-a38668f2/docs/reports/atlas",
+      "summary": "",
+      "clusters": [],
+      "topFiles": [
+        ".claude/worktrees/agent-a38668f2/docs/reports/atlas/atlas-board-state.json",
+        ".claude/worktrees/agent-a38668f2/docs/reports/atlas/atlas-kanban-tasks.json",
+        ".claude/worktrees/agent-a38668f2/docs/reports/atlas/atlas-next-actions.json",
+        ".claude/worktrees/agent-a38668f2/docs/reports/atlas/atlas-risk-report.json",
+        ".claude/worktrees/agent-a38668f2/docs/reports/atlas/atlas-board-state.json"
+      ],
+      "tags": [
+        "feature.unknown"
+      ],
+      "pageRankAvg": 0,
+      "runId": "run_1782697489670",
+      "updatedAt": "2026-06-29T01:44:51.171Z"
+    },
+    {
+      "_id": "wiki:dir:.claude/worktrees/agent-a38668f2/drizzle/meta",
+      "type": "directory_wiki",
+      "source_id": "dir:.claude/worktrees/agent-a38668f2/drizzle/meta",
+      "source_ref": "dir:.claude/worktrees/agent-a38668f2/drizzle/meta",
+      "source_kind": "directory",
+      "file_path": null,
+      "rel_path": ".claude/worktrees/agent-a38668f2/drizzle/meta",
+      "feature_id": null,
+      "related_feature_ids": [],
+      "atlas_version": "1",
+      "cold_storage_ready": true,
+      "workspace": "repo-root",
+      "path": ".claude/worktrees/agent-a38668f2/drizzle/meta",
+      "summary": "",
+      "clusters": [],
+      "topFiles": [
+        ".claude/worktrees/agent-a38668f2/drizzle/meta/0000_snapshot.json",
+        ".claude/worktrees/agent-a38668f2/drizzle/meta/_journal.json",
+        ".claude/worktrees/agent-a38668f2/drizzle/meta/0000_snapshot.json",
+        ".claude/worktrees/agent-a38668f2/drizzle/meta/_journal.json",
+        ".claude/worktrees/agent-a38668f2/drizzle/meta/0000_snapshot.json"
+      ],
+      "tags": [
+        "feature.unknown"
+      ],
+      "pageRankAvg": 0,
+      "runId": "run_1782697489670",
+      "updatedAt": "2026-06-29T01:44:51.173Z"
     }
   ]
 }

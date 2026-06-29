@@ -1,7 +1,7 @@
 # Parent Atlas Open Lanes TODO — Phase Execution Checklist
 
 **Date**: June 23, 2026 (Session 73)  
-**Status**: 90% Complete (Core) | Execution Phase Starting  
+**Status**: 90% Complete (Core) | Execution Phase Starting | Package boundary CURRENT via `verify:spec-supersedes`
 **Authority**: `docs/parent-atlas-100pct-next-steps.md`
 
 ---
@@ -13,7 +13,7 @@
 | **1** | Complete P3g Qdrant Backfill | 45 min | 🔄 IN PROGRESS (33%) | None — autonomous |
 | **2** | P4 Verification Gates (Neo4j Audit) | 30 min | ⏳ READY | Phase 1 completion |
 | **3** | P4 Graph Enrichment (PageRank/Attention/Karpathy) | 45 min | ⏳ READY | Phase 2 audit PASS |
-| **4** | Package Consolidation (@deeds/parent-atlas-*) | 120 min | 🚫 TODO | Optional, can parallelize |
+| **4** | Package Consolidation (@deeds/parent-atlas-* + @deeds/atlas-core) | 120 min | 🚧 CURRENT | Boundary registry verified; historical-only refs isolated |
 | **5** | ACE/KAG Integration Final Verification | 30 min | ⏳ READY | Phase 3 completion |
 
 **Critical Path**: Phase 1 → Phase 2 → Phase 3 → Phase 5 (Phases run sequentially, Phase 4 optional parallel)
@@ -156,7 +156,7 @@ karpathy_score = 0.40 × pagerank_score
 ## PHASE 4: Package Consolidation (120 min) — OPTIONAL, PARALLELIZABLE
 
 **Authority**: `docs/PARENT-ATLAS-CONSOLIDATION-INVENTORY.md`  
-**Can Run**: In parallel with Phase 3 (independent work)
+**Boundary verifier**: `npm run verify:spec-supersedes`
 
 ### Package Structure (4 packages)
 
@@ -182,7 +182,14 @@ karpathy_score = 0.40 × pagerank_score
 - Export CLI: `atlas:search`, `atlas:analyze`, `atlas:gpu-stats`
 
 ### Gate Condition
-✅ PASS when: All 4 packages publish to npm (or local registry)
+✅ PASS when: All 4 package surfaces are aligned, `npm run verify:spec-supersedes` returns `CURRENT`, and historical-only references remain isolated
+
+### Boundary Roles
+- Canonical: `packages/atlas-core`
+- Operational: `packages/parent-atlas`
+- Bridge: `packages/parent-atlas-core`
+- Specialized: `packages/parent-atlas-retrieval`, `packages/parent-atlas-ingest`, `packages/parent-atlas-opencode`
+- Historical only: `packages/atlas`, `packages/parent-atlas-sveltekit`
 
 ---
 

@@ -1,25 +1,39 @@
 # Lane 5: PyTorch Policy Sidecar Training Scaffold
 
 **Date**: June 13, 2026  
-**Status**: ✅ **COMPLETE AND TESTED**  
+**Status**: 🟡 **WIRED / NOT YET PROVEN**
 **Stage**: Stage 5 (Action Selector) for Atlas Packet Ranking Pipeline
 
 ---
 
 ## Executive Summary
 
-The PyTorch policy sidecar training scaffold has been **fully implemented** and is **ready for production use**. This is a complete replacement for the legacy XGBoost reranker, with advantages in handling sparse features, SOM embeddings, and extensibility to GRPO reward shaping.
+The PyTorch policy sidecar training scaffold is **wired** and testable, but it is not yet the canonical production truth layer. It is a policy scorer that consumes contextual-tree features, cached packet evidence, and SOM/topology signals to choose a routing policy or action. It is a candidate successor to the legacy XGBoost reranker, not a proven replacement yet.
+
+### Current Boundary
+
+```text
+Postgres JSONB contextual trees
+→ feature envelopes
+→ Bitfrost / Redis cache mirror
+→ tensorized policy features
+→ PyTorch policy reranker
+→ selected_action / selected_expert / routing_decision
+→ Gemma4 synthesis or tool execution
+```
+
+Use it for policy, routing, and recommendation ordering. Do not use it as canonical packet identity, source truth, or the only ranking authority.
 
 ### Key Achievements
 
-✅ **Complete Implementation** (531 lines, 0 placeholders)
+✅ **Implemented Scaffold** (531 lines, 0 placeholders)
 - Full training loop with ListMLE loss
 - BatchNorm + Dropout regularization
 - Early stopping with NDCG@10 gate
 - SOM cell embedding (400 cells → 64-dim)
 - Comprehensive evaluation metrics
 
-✅ **Production Infrastructure**
+✅ **Wiring Present**
 - Training script: `scripts/atlas/train-policy-reranker.py`
 - Serving sidecar: `scripts/atlas/serve-policy-reranker.py`
 - 4 npm scripts registered and tested
@@ -33,7 +47,7 @@ The PyTorch policy sidecar training scaffold has been **fully implemented** and 
 
 ✅ **Architecture Sound**
 - Feedforward network (80→128→64→32→1)
-- Input: 16 scalars + 64-dim SOM embedding (80 total)
+- Input: 16 scalar route features + 64-dim SOM embedding (80 total)
 - Output: relevance score [0, 1] via Sigmoid
 - 42,369 parameters with BatchNorm + Dropout
 
@@ -67,7 +81,7 @@ PolicyRanker (PyTorch nn.Module)
 | domain_class_match | Binary | {0, 1} | Domain alignment |
 | freshness_score | Time decay | [0.1, 1.0] | Age-decay from mtime |
 | pagerank_score | Karpathy blend | [0, 1] | Clamped Karpathy / 10 |
-| som_cache_hit | **NEW** Redis SOM cache | {0, 1} | SOM cell was cached |
+| som_cache_hit | **NEW** Redis / Bitfrost cache | {0, 1} | SOM cell or neighborhood was cached |
 | packet_hit_count_norm | Query traffic | [0, 1] | hit_count / n_retrieved |
 | n_retrieved_norm | Log-scaled | [0, 1] | log1p(n_retrieved) / log1p(200) |
 | n_concepts_norm | Concept count | [0, 1] | n_concepts / 20 |
@@ -94,7 +108,7 @@ PolicyRanker (PyTorch nn.Module)
 
 | Gate | Threshold | Purpose |
 |------|-----------|---------|
-| NDCG@10 | ≥ 0.70 | Minimum ranking quality for promotion to Stage 4 |
+| NDCG@10 | ≥ 0.70 | Minimum ranking quality for promotion to the policy lane |
 | Positive rows | ≥ 500 | Minimum training data coverage |
 | Features | 16/16 | All features must be present |
 | Traces | ≥ 100 | Minimum unique traces for stratification |
@@ -170,7 +184,7 @@ npm run atlas:policy:serve:no-som
 ### HTTP API
 
 #### POST /score
-Score a batch of packets.
+Score a batch of contextual-tree route candidates.
 
 **Request:**
 ```json
@@ -283,7 +297,7 @@ Health check and model metadata.
 ### Markdown Summary
 **Location**: `docs/reports/policy-reranker-training-report.md`
 
-Friendly text summary of training results, metrics, and next steps.
+Friendly text summary of training results, metrics, and next steps. If this file is absent in the current checkout, treat the JSON report as the authoritative generated artifact and mark the Markdown summary as pending.
 
 ---
 
@@ -369,7 +383,7 @@ XGBoost is a static reranker; PyTorch is a learnable policy amenable to RL.
 
 ### Stage 4 Cascade Wiring
 
-When NDCG@10 ≥ 0.70, the policy reranker is promoted to Stage 4 of the Atlas ranking cascade:
+When NDCG@10 ≥ 0.70 and replay/cache/provenance proofs are green, the policy reranker can participate in the ranking cascade:
 
 ```
 Qdrant ANN (Stage 0: 54k → 100)
@@ -378,12 +392,20 @@ Neo4j contextual expansion (Stage 1: 100 → 150)
     ↓
 Feature engineering (Stage 2: cosine, pagerank, etc.)
     ↓
-PolicyRanker (Stage 3: relevance score via PyTorch) ← YOU ARE HERE
+PolicyRanker (policy scoring on contextual-tree features) ← YOU ARE HERE
     ↓
 Optionally: RewardMemory boost (Stage 4: prior outcomes)
     ↓
 Bifrost cache update (final: store score for next query)
 ```
+
+### Phase 17 Comparison Lane
+
+Keep the existing XGBoost lane as the comparison baseline until this policy path is proven against replay, cache, and provenance gates.
+
+- XGBoost remains the reference comparator for Phase 17 / reranker evaluation.
+- PolicyRanker should be judged by the same query set and the same evidence contract.
+- Do not claim replacement until it wins on live replay evidence, not just on training metrics.
 
 ### API Integration
 
@@ -503,7 +525,7 @@ trace = Trace(
 
 ## Files Modified/Created
 
-✅ **Existing** (fully implemented, 0 placeholders):
+✅ **Existing** (wiring present, 0 placeholders):
 - `scripts/atlas/train-policy-reranker.py` (531 lines)
 - `scripts/atlas/serve-policy-reranker.py` (221 lines)
 
@@ -531,15 +553,15 @@ trace = Trace(
 ✅ **Training**: 80 epochs, AdamW + cosine schedule, early stopping  
 ✅ **Gates**: NDCG@10 ≥ 0.70 for promotion  
 ✅ **Serving**: HTTP API with /score and /health endpoints  
-✅ **Integration**: Ready for Stage 4 cascade + Lane 13 RL  
+✅ **Integration**: Ready for policy cascade comparison + Lane 13 RL research  
 ✅ **npm scripts**: 6 commands registered and tested  
-✅ **No placeholders**: 531 + 221 = 752 lines of production code  
+✅ **No placeholders**: 531 + 221 = 752 lines of working code  
 
 ---
 
 ## Summary
 
-The Lane 5 PyTorch policy sidecar is **complete, tested, and ready for deployment**. All requirements have been met:
+The Lane 5 PyTorch policy sidecar is **implemented and wired**, but it still needs proof-depth against the same replay/cache/provenance gates used elsewhere in Parent Atlas. Treat it as a policy lane, not canonical truth:
 
 1. ✅ Script created with no placeholders
 2. ✅ Training data loaded (1,134 agent traces → 101,708 CSV rows)
@@ -550,6 +572,6 @@ The Lane 5 PyTorch policy sidecar is **complete, tested, and ready for deploymen
 7. ✅ Reports generated (JSON + Markdown)
 8. ✅ Gates validated (NDCG ≥ 0.70 for promotion)
 9. ✅ npm scripts registered (6 commands)
-10. ✅ Documentation complete (this file)
+10. ✅ Documentation scaffold present (this file)
 
-**Ready for integration into Stage 4 cascade and Lane 13 RL policy loop.**
+**Ready for comparison against the Phase 17 XGBoost lane and for integration into the policy loop once proof gates pass.**

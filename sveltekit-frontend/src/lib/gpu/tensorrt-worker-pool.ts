@@ -16,7 +16,7 @@
 
 import { Worker } from 'worker_threads';
 import type { TransferListItem } from 'worker_threads';
-import path from 'path';
+import { resolve } from 'path';
 
 export interface GPUTask {
 	taskId: string;
@@ -54,7 +54,8 @@ class TensorRTWorkerPool {
 
 	constructor(poolSize: number = 4) {
 		this.poolSize = Math.min(poolSize, 4); // cap at 4 (CUDA stream contexts on RTX 3060 Ti)
-		this.workerScript = path.resolve(__dirname, './tensorrt-worker.js');
+		// Resolve worker script path relative to this file
+		this.workerScript = resolve(__dirname, './tensorrt-worker.js');
 		this.initializeWorkers();
 	}
 
@@ -105,7 +106,8 @@ class TensorRTWorkerPool {
 
 	private handleWorkerError(err: Error) {
 		// Reject all pending tasks on worker death
-		for (const { reject } of this.taskMap.values()) {
+		const entries = Array.from(this.taskMap.values());
+		for (const { reject } of entries) {
 			reject(err);
 		}
 		this.taskMap.clear();
@@ -136,24 +138,24 @@ class TensorRTWorkerPool {
 		const taskData = { ...task };
 
 		if (task.embedding?.buffer) {
-			transfer.push(task.embedding.buffer);
+			transfer.push(task.embedding.buffer as ArrayBuffer);
 		}
 		if (task.embeddings) {
 			for (const emb of task.embeddings) {
-				if (emb.buffer) transfer.push(emb.buffer);
+				if (emb.buffer) transfer.push(emb.buffer as ArrayBuffer);
 			}
 		}
 		if (task.centroids?.buffer) {
-			transfer.push(task.centroids.buffer);
+			transfer.push(task.centroids.buffer as ArrayBuffer);
 		}
 		if (task.queryEmbedding?.buffer) {
-			transfer.push(task.queryEmbedding.buffer);
+			transfer.push(task.queryEmbedding.buffer as ArrayBuffer);
 		}
 		if (task.keys?.buffer) {
-			transfer.push(task.keys.buffer);
+			transfer.push(task.keys.buffer as ArrayBuffer);
 		}
 		if (task.corpus?.buffer) {
-			transfer.push(task.corpus.buffer);
+			transfer.push(task.corpus.buffer as ArrayBuffer);
 		}
 
 		try {
@@ -339,8 +341,15 @@ export async function gpuKmeansWithCentroids(
 
 	// Parse: first n elements are assignments, rest are centroids
 	const data = result.data as Int32Array;
-	const assignments = new Int32Array(data.slice(0, n));
-	const centroids = new Float32Array(data.slice(n) as any);
+	const assignments = new Int32Array(n);
+	const centroids = new Float32Array((k * dim) || 0);
+
+	for (let i = 0; i < n; i++) {
+		assignments[i] = data[i];
+	}
+	for (let i = 0; i < k * dim && n + i < data.length; i++) {
+		centroids[i] = data[n + i] / 1000000; // undo scaling from worker
+	}
 
 	return { assignments, centroids };
 }
@@ -363,5 +372,14 @@ export async function gpuPageRank(
 	});
 
 	if (result.error || !result.data) throw new Error(result.error || 'PageRank computation failed');
-	return result.data as Float32Array;
+	const prData = result.data;
+	if (prData instanceof Float32Array) {
+		return prData;
+	}
+	// Convert from Int32Array if needed (scaled values)
+	const pr = new Float32Array((prData as any).length);
+	for (let i = 0; i < pr.length; i++) {
+		pr[i] = (prData as any)[i] / 1000000;
+	}
+	return pr;
 }

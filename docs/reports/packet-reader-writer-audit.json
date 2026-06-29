@@ -1,37 +1,37 @@
 {
   "schema": "addressable_packets_materialization_manifest.v1",
-  "generatedAt": "2026-06-26T02:02:24.520Z",
-  "mode": "dry-run",
-  "sourceTable": "atlas_higher_hop_index",
+  "generatedAt": "2026-06-28T23:53:18.021Z",
+  "mode": "apply",
+  "sourceTable": "atlas_packets",
   "outputNdjson": ".tmp/addressable-packets.ndjson",
   "outputManifest": ".tmp/addressable-packets.manifest.json",
   "summary": {
-    "sourceTable": "atlas_higher_hop_index",
-    "tableRows": 3251,
-    "materializedRows": 3251,
-    "addressableRows": 3251,
-    "qdrantBackedRows": 2488,
-    "qdrantCollectionRows": 2488,
+    "sourceTable": "atlas_packets",
+    "tableRows": 58304,
+    "materializedRows": 58304,
+    "addressableRows": 58304,
+    "qdrantBackedRows": 0,
+    "qdrantCollectionRows": 0,
     "conceptsRows": 0,
-    "bm25Rows": 3251,
-    "embeddingRefRows": 3251,
-    "evidenceMatchedRows": 2467,
+    "bm25Rows": 58304,
+    "embeddingRefRows": 0,
+    "evidenceMatchedRows": 7501,
     "missingFeatureId": 0,
     "missingCanonicalSourceRef": 0,
-    "missingQdrantPointId": 763,
-    "missingQdrantCollection": 763,
+    "missingQdrantPointId": 58304,
+    "missingQdrantCollection": 58304,
     "classCounts": [
       {
         "key": "qdrant_chunk",
-        "count": 2454
+        "count": 56552
       },
       {
         "key": "schema_stub",
-        "count": 597
+        "count": 1061
       },
       {
         "key": "mcp_tool_stub",
-        "count": 145
+        "count": 691
       },
       {
         "key": "legacy_qdrant_only",
@@ -48,138 +48,129 @@
     "evidenceRecordsIndexed": 8359
   },
   "samplePacketKeys": [
-    "05dbd8cc7c550bbe",
-    "05f26c6dc1b51a12",
-    "08dce8e980d1e261",
-    "0e584542cbd3ec1f",
-    "106474ac880329aa",
-    "1125b964826d67d7",
-    "119403f1ca0164b4",
-    "13039d77318546e0"
+    "packet:0003260092b1",
+    "packet:0003850e84ca",
+    "packet:0003ab694534",
+    "packet:0003dda5e534",
+    "packet:0004b466d863",
+    "packet:0004f849be72",
+    "packet:0006ca4a45e3",
+    "packet:0008d535a1f6"
   ],
-  "outputSha256": "19f357d96174e50a9f4bfe1135736c5fda8a057d6a1e9e7dfc2769e676e3bad4",
-  "status": "DRY_RUN_READY",
+  "outputSha256": "e07266cc33bafc81244eb32a844ae35c0594b676fc1497b79df4421f0a95ca89",
+  "status": "MATERIALIZED",
   "nextSafeAction": "Run qdrant-tag-mirror next, then resume the retrieval pipeline after the materialized packet count is positive.",
   "samples": [
     {
-      "packet_key": "05dbd8cc7c550bbe",
-      "source_ref": "sveltekit-frontend/src/lib/server/ai/llama-tool-definitions.ts#kb__search_cards",
-      "feature_id": "895884c03a86a386",
-      "packet_kind": "mcp_tool_stub",
+      "packet_key": "packet:0003260092b1",
+      "source_ref": "sveltekit-frontend/memory/runs/2026-05-29T04-11-06/llm_synthesis_mapping.json",
+      "feature_id": "sveltekit-frontend.llm_synthesis_mapping",
+      "packet_kind": "qdrant_chunk",
       "qdrant_collection": null,
       "qdrant_point_id": null,
-      "bm25_text": "895884c03a86a386 sveltekit-frontend/src/lib/server/ai/llama-tool-definitions.ts#kb__search_cards sveltekit-frontend/src/lib/server/ai/llama-tool-definitions.ts#kb__search_cards",
+      "bm25_text": "llm_synthesis_mapping.json sveltekit-frontend/memory/runs/2026-05-29T04-11-06/llm_synthesis_mapping.json sveltekit-frontend/memory/runs/2026-05-29T04-11-06/llm_synthesis_mapping.js",
       "concepts": [],
       "tags": [
-        "895884c03a86a386",
-        "mcp_tool_stub",
-        "packet_spine"
+        "llm_synthesis_mapping.json",
+        "qdrant_chunk"
       ]
     },
     {
-      "packet_key": "05f26c6dc1b51a12",
-      "source_ref": "sveltekit-frontend/src/routes/api/atlas/search/+server.ts#gpubatchcosinererank",
-      "feature_id": "atlas.search",
-      "packet_kind": "mcp_tool_stub",
-      "qdrant_collection": "codebase_chunks_768",
-      "qdrant_point_id": "99773549",
-      "bm25_text": "Atlas.Search sveltekit-frontend/src/routes/api/atlas/search/+server.ts#gpubatchcosinererank sveltekit-frontend/src/routes/api/atlas/search/+server.ts#gpubatchcosinererank",
+      "packet_key": "packet:0003850e84ca",
+      "source_ref": "sveltekit-frontend/docs/obsidian-vault/Files/tests__cases-sub-routes.spec.md",
+      "feature_id": "sveltekit-frontend.tests__cases-sub-routes.spec",
+      "packet_kind": "qdrant_chunk",
+      "qdrant_collection": null,
+      "qdrant_point_id": null,
+      "bm25_text": "tests__cases-sub-routes.spec.md sveltekit-frontend/docs/obsidian-vault/Files/tests__cases-sub-routes.spec.md sveltekit-frontend/docs/obsidian-vault/Files/tests__cases-sub-routes.sp",
       "concepts": [],
       "tags": [
-        "Atlas.Search",
-        "codebase_chunks_768",
-        "mcp_tool_stub",
-        "source_ref"
+        "qdrant_chunk",
+        "tests__cases-sub-routes.spec.md"
       ]
     },
     {
-      "packet_key": "08dce8e980d1e261",
-      "source_ref": "sveltekit-frontend/src/mcp/server.ts#reports:update",
-      "feature_id": "4a0c3649b58e6c1e",
-      "packet_kind": "mcp_tool_stub",
+      "packet_key": "packet:0003ab694534",
+      "source_ref": "sveltekit-frontend/docs/obsidian-vault/Files/tests__routes__auto__api__cache__metrics.test.md",
+      "feature_id": "sveltekit-frontend.tests__routes__auto__api__cache__metrics.test",
+      "packet_kind": "qdrant_chunk",
       "qdrant_collection": null,
       "qdrant_point_id": null,
-      "bm25_text": "4a0c3649b58e6c1e sveltekit-frontend/src/mcp/server.ts#reports:update sveltekit-frontend/src/mcp/server.ts#reports:update",
+      "bm25_text": "tests__routes__auto__api__cache__metrics.test.md sveltekit-frontend/docs/obsidian-vault/Files/tests__routes__auto__api__cache__metrics.test.md sveltekit-frontend/docs/obsidian-vaul",
       "concepts": [],
       "tags": [
-        "4a0c3649b58e6c1e",
-        "mcp_tool_stub",
-        "packet_spine"
+        "qdrant_chunk",
+        "tests__routes__auto__api__cache__metrics.test.md"
       ]
     },
     {
-      "packet_key": "0e584542cbd3ec1f",
-      "source_ref": "sveltekit-frontend/src/mcp/server.ts#wiki.explain_page",
-      "feature_id": "121b02dff31f995b",
-      "packet_kind": "mcp_tool_stub",
+      "packet_key": "packet:0003dda5e534",
+      "source_ref": "neschrom97/cards/93f973562fff24ed.json",
+      "feature_id": "neschrom97.93f973562fff24ed",
+      "packet_kind": "qdrant_chunk",
       "qdrant_collection": null,
       "qdrant_point_id": null,
-      "bm25_text": "121b02dff31f995b sveltekit-frontend/src/mcp/server.ts#wiki.explain_page sveltekit-frontend/src/mcp/server.ts#wiki.explain_page",
+      "bm25_text": "93f973562fff24ed.json neschrom97/cards/93f973562fff24ed.json neschrom97/cards/93f973562fff24ed.json",
       "concepts": [],
       "tags": [
-        "121b02dff31f995b",
-        "mcp_tool_stub",
-        "packet_spine"
+        "93f973562fff24ed.json",
+        "qdrant_chunk"
       ]
     },
     {
-      "packet_key": "106474ac880329aa",
-      "source_ref": "sveltekit-frontend/src/lib/server/ai/llama-tool-definitions.ts#kb__explain_retrieval",
-      "feature_id": "931687f31329e048",
-      "packet_kind": "mcp_tool_stub",
+      "packet_key": "packet:0004b466d863",
+      "source_ref": "sveltekit-frontend/src/routes/(evidence)/canvas/+layout.svelte",
+      "feature_id": ".svelte-error-fixes-backup.+layout",
+      "packet_kind": "qdrant_chunk",
       "qdrant_collection": null,
       "qdrant_point_id": null,
-      "bm25_text": "931687f31329e048 sveltekit-frontend/src/lib/server/ai/llama-tool-definitions.ts#kb__explain_retrieval sveltekit-frontend/src/lib/server/ai/llama-tool-definitions.ts#kb__explain_ret",
+      "bm25_text": "+layout.svelte sveltekit-frontend/src/routes/(evidence)/canvas/+layout.svelte sveltekit-frontend/src/routes/(evidence)/canvas/+layout.svelte",
       "concepts": [],
       "tags": [
-        "931687f31329e048",
-        "mcp_tool_stub",
-        "packet_spine"
+        "+layout.svelte",
+        "qdrant_chunk"
       ]
     },
     {
-      "packet_key": "1125b964826d67d7",
-      "source_ref": "sveltekit-frontend/src/mcp/server.ts#langextract:custom",
-      "feature_id": "6a545f1e8ce22358",
-      "packet_kind": "mcp_tool_stub",
+      "packet_key": "packet:0004f849be72",
+      "source_ref": "sveltekit-frontend/tests/sprint5-6-monitoring.spec.ts",
+      "feature_id": "sveltekit-frontend.sprint5-6-monitoring.spec",
+      "packet_kind": "qdrant_chunk",
       "qdrant_collection": null,
       "qdrant_point_id": null,
-      "bm25_text": "6a545f1e8ce22358 sveltekit-frontend/src/mcp/server.ts#langextract:custom sveltekit-frontend/src/mcp/server.ts#langextract:custom",
+      "bm25_text": "sprint5-6-monitoring.spec.ts sveltekit-frontend/tests/sprint5-6-monitoring.spec.ts sveltekit-frontend/tests/sprint5-6-monitoring.spec.ts",
       "concepts": [],
       "tags": [
-        "6a545f1e8ce22358",
-        "mcp_tool_stub",
-        "packet_spine"
+        "qdrant_chunk",
+        "sprint5-6-monitoring.spec.ts"
       ]
     },
     {
-      "packet_key": "119403f1ca0164b4",
-      "source_ref": "sveltekit-frontend/src/mcp/server.ts#reports:list",
-      "feature_id": "5a8f718e6f8c271a",
-      "packet_kind": "mcp_tool_stub",
+      "packet_key": "packet:0006ca4a45e3",
+      "source_ref": "sveltekit-frontend/logs/trace-mcp/launch-2026-06-25T22-12-53-881Z.out",
+      "feature_id": "sveltekit-frontend.launch-2026-06-25T22-12-53-881Z",
+      "packet_kind": "qdrant_chunk",
       "qdrant_collection": null,
       "qdrant_point_id": null,
-      "bm25_text": "5a8f718e6f8c271a sveltekit-frontend/src/mcp/server.ts#reports:list sveltekit-frontend/src/mcp/server.ts#reports:list",
+      "bm25_text": "launch-2026-06-25T22-12-53-881Z.out sveltekit-frontend/logs/trace-mcp/launch-2026-06-25T22-12-53-881Z.out sveltekit-frontend/logs/trace-mcp/launch-2026-06-25T22-12-53-881Z.out",
       "concepts": [],
       "tags": [
-        "5a8f718e6f8c271a",
-        "mcp_tool_stub",
-        "packet_spine"
+        "launch-2026-06-25T22-12-53-881Z.out",
+        "qdrant_chunk"
       ]
     },
     {
-      "packet_key": "13039d77318546e0",
-      "source_ref": "sveltekit-frontend/src/lib/server/ai/llama-tool-definitions.ts#search__dev_context",
-      "feature_id": "4521761888863c86",
-      "packet_kind": "mcp_tool_stub",
+      "packet_key": "packet:0008d535a1f6",
+      "source_ref": "llama-cpp-turboquant-gemma4/tools/completion/completion.cpp",
+      "feature_id": "llama-cpp-turboquant-gemma4.completion",
+      "packet_kind": "qdrant_chunk",
       "qdrant_collection": null,
       "qdrant_point_id": null,
-      "bm25_text": "4521761888863c86 sveltekit-frontend/src/lib/server/ai/llama-tool-definitions.ts#search__dev_context sveltekit-frontend/src/lib/server/ai/llama-tool-definitions.ts#search__dev_conte",
+      "bm25_text": "completion.cpp llama-cpp-turboquant-gemma4/tools/completion/completion.cpp llama-cpp-turboquant-gemma4/tools/completion/completion.cpp",
       "concepts": [],
       "tags": [
-        "4521761888863c86",
-        "mcp_tool_stub",
-        "packet_spine"
+        "completion.cpp",
+        "qdrant_chunk"
       ]
     }
   ]

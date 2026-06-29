@@ -1,0 +1,80 @@
+{
+  "generated_at": "2026-06-29T02:41:38.232Z",
+  "status": "PASS",
+  "files": {
+    "package_dist": {
+      "path": "packages/parent-atlas/dist/index.js",
+      "exists": true
+    },
+    "legacy_shim": {
+      "path": "scripts/atlas/lib/summary-context-map.mjs",
+      "exists": true
+    },
+    "gemma4_ndjson": {
+      "path": ".tmp/gemma4-summary-packets.ndjson",
+      "exists": true,
+      "rows": 313
+    },
+    "chrom97_ndjson": {
+      "path": ".tmp/chrom97-summary-packets.ndjson",
+      "exists": true,
+      "rows": 191
+    }
+  },
+  "exports": {
+    "package": {
+      "buildSummaryContext": true,
+      "classifyDomain": true,
+      "classifyOntology": true,
+      "classifyTopology": true,
+      "formatSummaryContext": true,
+      "makeGemma4SummaryPacket": true,
+      "makeChrom97Packet": true,
+      "toNdjsonLine": true
+    },
+    "shim": {
+      "buildSummaryContext": true,
+      "classifyDomain": true,
+      "classifyOntology": true,
+      "classifyTopology": true,
+      "formatSummaryContext": true
+    }
+  },
+  "sample": {
+    "package_context_fields": {
+      "packet_key": true,
+      "source_ref": true,
+      "feature_id": true,
+      "feature_label": true,
+      "domain_class": true,
+      "ontology_label": true,
+      "topology_label": true
+    },
+    "shim_context_fields": {
+      "packet_key": true,
+      "source_ref": true,
+      "feature_id": true,
+      "feature_label": true,
+      "domain_class": true,
+      "ontology_label": true,
+      "topology_label": true
+    },
+    "gemma4_packet": {
+      "packet_key": "packet-1",
+      "feature_id": "feature.search.foo",
+      "summary_packet_key": "packet-1:summary"
+    },
+    "chrom97_packet": {
+      "packet_key": "packet-1",
+      "feature_id": "feature.search.foo",
+      "summary_packet_key": "packet-1:summary",
+      "canonical_source_ref": "repo:src/routes/api/foo.ts"
+    }
+  },
+  "proof": {
+    "package_export_surface": true,
+    "legacy_shim_surface": true,
+    "sample_identity_preserved": true,
+    "ndjson_ready": true
+  }
+}

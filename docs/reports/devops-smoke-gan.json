@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-06-28T00:05:53.602Z",
+  "timestamp": "2026-06-29T00:26:14.942Z",
   "title": "DevOps Smoke Test + GAN Evaluation Report",
   "phases": {
     "phase1_config_discovery": {
@@ -155,7 +155,7 @@
         "bm25": {
           "status": "PASS",
           "hits": 42,
-          "latency": 278,
+          "latency": 230,
           "top_packets": [
             "auth:001",
             "auth:002",
@@ -165,7 +165,7 @@
         "qdrant_ann": {
           "status": "PASS",
           "hits": 128,
-          "latency": 135,
+          "latency": 95,
           "top_packets": [
             "auth:001",
             "crypto:003",
@@ -181,7 +181,7 @@
         "valkey_cache": {
           "status": "PASS",
           "hits": 20,
-          "latency": 343,
+          "latency": 186,
           "cache_hit": true,
           "top_packets": [
             "auth:cached:001",
@@ -204,7 +204,7 @@
           ]
         }
       },
-      "timestamp": "2026-06-28T00:05:47.234Z"
+      "timestamp": "2026-06-29T00:26:09.753Z"
     },
     "phase5_fused_results": {
       "query": "authentication",

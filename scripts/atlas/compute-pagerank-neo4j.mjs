@@ -22,8 +22,11 @@ const driver = neo4j.default.driver(
 );
 
 const redis = createClient({
-  url: `redis://${process.env.REDIS_HOST || 'localhost'}:${process.env.REDIS_PORT || 6379}`,
-  password: process.env.REDIS_PASSWORD || undefined
+  socket: {
+    host: process.env.REDIS_HOST || 'localhost',
+    port: parseInt(process.env.REDIS_PORT || '6379'),
+  },
+  password: process.env.REDIS_PASSWORD || 'redis',
 });
 
 const APPLY = process.argv.includes('--apply');
@@ -40,14 +43,13 @@ async function computePageRank() {
   try {
     console.log('📊 Step 1: Create GDS projection\n');
 
-    // Create graph projection
+    // Create graph projection (using only SIMILAR_TOPOLOGY which exists in the DB)
     const projRes = await session.run(`
       CALL gds.graph.project(
         'codebaseGraph',
         'Packet',
         {
-          SIMILAR_TOPOLOGY: { orientation: 'NATURAL' },
-          IMPORTS: { orientation: 'NATURAL' }
+          SIMILAR_TOPOLOGY: { orientation: 'NATURAL' }
         }
       )
       YIELD nodeCount, relationshipCount

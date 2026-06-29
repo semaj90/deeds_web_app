@@ -74,6 +74,12 @@ const CONCURRENCY = Math.max(1, Math.min(
   Number.isFinite(MAX_CONCURRENCY) ? Math.max(1, MAX_CONCURRENCY) : 4,
 ));
 const SOURCE_REF_FILTER = String(readStringArg('source-ref', '')).trim();
+const DOCS_FIRST = process.argv.includes('--docs-first');
+const INCLUDE_DOCS = process.argv.includes('--include-docs');
+const PATH_PREFIX_FILTER = String(readStringArg('path-prefix', '')).trim();
+const PATH_PREFIXES = PATH_PREFIX_FILTER
+  ? PATH_PREFIX_FILTER.split(',').map((v) => String(v).trim()).filter(Boolean)
+  : [];
 const REPORT_PATH = path.join(
   ROOT,
   '.tmp',
@@ -95,6 +101,56 @@ function isVendor(ref) {
   return VENDOR_PREFIXES.some(p => ref.startsWith(p)) ||
     ref.includes('/.venv/') || ref.includes('/node_modules/') ||
     ref.includes('/dist-info/') || ref.includes('/site-packages/');
+}
+
+function summaryPathPrioritySql(column = 'source_ref') {
+  const c = String(column || 'source_ref');
+  return `
+    CASE
+      WHEN ${c} ~* '\\.(ts|tsx|js|mjs|cjs|py|rs|sql|svelte)$' THEN 0
+      WHEN ${c} LIKE 'src/%' THEN 0
+      WHEN ${c} LIKE 'scripts/%' THEN 0
+      WHEN ${c} LIKE 'sveltekit-frontend/src/%' THEN 0
+      WHEN ${c} LIKE 'sveltekit-frontend/scripts/%' THEN 0
+      WHEN ${c} LIKE 'packages/%/src/%' THEN 0
+      WHEN ${c} LIKE 'packages/%/scripts/%' THEN 0
+      WHEN ${c} LIKE 'packages/%/events/%' THEN 0
+      WHEN ${c} LIKE 'docs/%' THEN 1
+      WHEN ${c} LIKE 'reports/%' THEN 1
+      WHEN ${c} LIKE '%/docs/%' THEN 1
+      WHEN ${c} LIKE '%/README.%' THEN 2
+      WHEN ${c} LIKE '%.md' OR ${c} LIKE '%.txt' OR ${c} LIKE '%.json' OR ${c} LIKE '%.jsonl' OR ${c} LIKE '%.ndjson' THEN 2
+      ELSE 3
+    END
+  `;
+}
+
+function summaryWhereBase(alias = '') {
+  const prefix = alias ? `${alias}.` : '';
+  const sourceRef = `${prefix}source_ref`;
+  const featureId = `${prefix}feature_id`;
+  const tags = `COALESCE(${prefix}tags, '{}')`;
+  const textFilter = INCLUDE_DOCS
+    ? `AND (${sourceRef} LIKE '%.%' OR ${sourceRef} LIKE '%/%')`
+    : `AND (${sourceRef} LIKE '%.%' OR ${sourceRef} LIKE '%/%')`;
+  return `
+    (summary IS NULL OR summary = '')
+    AND ${sourceRef} NOT LIKE 'feature:%'
+    AND ${sourceRef} NOT LIKE 'backups/%'
+    AND ${sourceRef} NOT LIKE 'artifacts/%'
+    AND ${sourceRef} NOT LIKE '.tmp/%'
+    AND ${sourceRef} NOT LIKE 'archive/logs/%'
+    AND ${sourceRef} NOT LIKE 'archive/tmp/%'
+    AND NOT ('vendor' = ANY(${tags}))
+    ${textFilter}
+  `;
+}
+
+function summaryPathPrefixWhere(alias = '') {
+  if (!PATH_PREFIXES.length) return '';
+  const column = alias ? `${alias}.source_ref` : 'source_ref';
+  const clauses = PATH_PREFIXES.map((prefix) => `${column} LIKE '${prefix.replace(/'/g, "''")}%` + `'`);
+  return `AND (${clauses.join(' OR ')})`;
 }
 
 async function tableExists(pool, tableName) {
@@ -137,20 +193,16 @@ async function resolveSummaryTarget(pool) {
         AND source_ref NOT LIKE 'archive/logs/%'
         AND source_ref NOT LIKE 'archive/tmp/%'
         AND NOT ('vendor' = ANY(COALESCE(tags, '{}')))
+        ${summaryPathPrefixWhere()}
       `,
       missingWhere: `
-        (summary IS NULL OR summary = '')
-        AND source_ref NOT LIKE 'feature:%'
-        AND (source_ref LIKE '%.%' OR source_ref LIKE '%/%')
-        AND source_ref NOT LIKE 'backups/%'
-        AND source_ref NOT LIKE 'artifacts/%'
-        AND source_ref NOT LIKE '.tmp/%'
-        AND source_ref NOT LIKE 'archive/logs/%'
-        AND source_ref NOT LIKE 'archive/tmp/%'
+        ${summaryWhereBase()}
         AND COALESCE(NULLIF(metadata #>> '{workspace,size_bytes}', '')::bigint, 1) > 0
-        AND NOT ('vendor' = ANY(COALESCE(tags, '{}')))
+        ${summaryPathPrefixWhere()}
       `,
-      orderSql: 'line_count DESC NULLS LAST',
+      orderSql: DOCS_FIRST
+        ? `line_count DESC NULLS LAST, ${summaryPathPrioritySql()} ASC, source_ref ASC`
+        : `${summaryPathPrioritySql()} ASC, line_count DESC NULLS LAST, source_ref ASC`,
       vendorMissingWhere: `
         (summary IS NULL OR summary = '')
         AND 'vendor' = ANY(COALESCE(tags, '{}'))
@@ -201,20 +253,16 @@ async function resolveSummaryTarget(pool) {
         AND source_ref NOT LIKE 'archive/logs/%'
         AND source_ref NOT LIKE 'archive/tmp/%'
         AND NOT ('vendor' = ANY(COALESCE(tags, '{}')))
+        ${summaryPathPrefixWhere()}
       `,
       missingWhere: `
-        (summary IS NULL OR summary = '')
-        AND source_ref NOT LIKE 'feature:%'
-        AND (source_ref LIKE '%.%' OR source_ref LIKE '%/%')
-        AND source_ref NOT LIKE 'backups/%'
-        AND source_ref NOT LIKE 'artifacts/%'
-        AND source_ref NOT LIKE '.tmp/%'
-        AND source_ref NOT LIKE 'archive/logs/%'
-        AND source_ref NOT LIKE 'archive/tmp/%'
+        ${summaryWhereBase()}
         AND COALESCE(NULLIF(metadata #>> '{workspace,size_bytes}', '')::bigint, 1) > 0
-        AND NOT ('vendor' = ANY(COALESCE(tags, '{}')))
+        ${summaryPathPrefixWhere()}
       `,
-      orderSql: 'source_ref ASC',
+      orderSql: DOCS_FIRST
+        ? `source_ref ASC`
+        : `${summaryPathPrioritySql()} ASC, source_ref ASC`,
       vendorMissingWhere: `
         (summary IS NULL OR summary = '')
         AND 'vendor' = ANY(COALESCE(tags, '{}'))

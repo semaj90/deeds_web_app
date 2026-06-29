@@ -7,9 +7,396 @@
       "type": "promptString",
       "description": "Enter the ripgrep query (regex or literal) to search for",
       "default": ""
+    },
+    {
+      "id": "karpathyQuery",
+      "type": "promptString",
+      "description": "Search query (regex for lexical patterns A+B; natural language for semantic pattern C)",
+      "default": "UploadZone"
+    },
+    {
+      "id": "nesPath",
+      "type": "promptString",
+      "description": "File or directory path (e.g. src/lib/server/ace/agent.ts or src/routes/api/cases) — walks UP to nearest AGENTS.md in Redis",
+      "default": "src/lib/server/ace"
+    },
+    {
+      "id": "batchTopN",
+      "type": "promptString",
+      "description": "How many audit hotspot directories to analyze in parallel (1-30)",
+      "default": "5"
+    },
+    {
+      "id": "batchConcurrency",
+      "type": "promptString",
+      "description": "Concurrent agent loops (1-8). Higher = faster but more VRAM contention. Default 3.",
+      "default": "3"
+    },
+    {
+      "id": "dirAnalysisQuery",
+      "type": "promptString",
+      "description": "Directory path or analysis question for Gemma4 (e.g., 'lib/server/cache — what auth gaps exist?')",
+      "default": "lib/server/cache — summarize purpose and identify any missing auth guards or Zod validation"
+    },
+    {
+      "id": "targetDir",
+      "type": "promptString",
+      "description": "Relative path from src/ for KAG wiki note generation (e.g., lib/server/cache)",
+      "default": "lib/server/cache"
+    },
+    {
+      "id": "screenshotRoute",
+      "type": "promptString",
+      "description": "Route path to screenshot (e.g., /evidence, /legal-corpus, /cases)",
+      "default": "/dashboard"
+    },
+    {
+      "id": "aceAgentQuery",
+      "type": "promptString",
+      "description": "ACE Tool Loop: semantic query for agentic codebase research",
+      "default": "How does the authentication middleware work and where are the session guards?"
+    },
+    {
+      "id": "aceErrorMessage",
+      "type": "promptString",
+      "description": "ACE Error Fix: paste error message or stack trace for agentic diagnosis",
+      "default": "Cannot find module '$lib/server/ollama' — TS2307"
+    },
+    {
+      "id": "agentQuery",
+      "type": "promptString",
+      "description": "Enter the MCP agent task or question",
+      "default": "Search the codebase for Svelte 5 migration hotspots and summarize the highest-priority fixes"
+    },
+    {
+      "id": "acpTool",
+      "type": "promptString",
+      "description": "Enter an ACP tool name (run 'ACP - List All Tools' first to see the current registry)",
+      "default": "cases:load"
+    },
+    {
+      "id": "acpArgs",
+      "type": "promptString",
+      "description": "Enter ACP JSON args for the selected tool",
+      "default": "{\"limit\":5}"
+    },
+    {
+      "id": "clusterId",
+      "type": "promptString",
+      "description": "Enter cluster ID (0-11)",
+      "default": "0"
+    },
+    {
+      "id": "errorType",
+      "type": "pickString",
+      "description": "Select error type",
+      "options": [
+        "SYNTAX",
+        "TYPE",
+        "NULL_CHECK",
+        "IMPORT",
+        "EXPORT",
+        "UNDEFINED_VAR"
+      ],
+      "default": "SYNTAX"
+    },
+    {
+      "id": "auditModule",
+      "type": "promptString",
+      "description": "Module name to audit (e.g., SearchBox, qdrant-manager, redis, webgpu-init)",
+      "default": "SearchBox"
+    },
+    {
+      "id": "indexDir",
+      "type": "promptString",
+      "description": "Directory to index into Qdrant (relative to sveltekit-frontend/)",
+      "default": "src/lib/server"
+    },
+    {
+      "id": "codeSearchQuery",
+      "type": "promptString",
+      "description": "Semantic search query for codebase chunks in Qdrant",
+      "default": "authentication middleware session validation"
+    },
+    {
+      "id": "researchQuery",
+      "type": "promptString",
+      "description": "Auto-research topic (Karpathy-style knowledge building)",
+      "default": "Svelte 5 runes migration patterns"
+    },
+    {
+      "id": "kbSearchQuery",
+      "type": "promptString",
+      "description": "Knowledge base semantic search query",
+      "default": "legal document embedding pipeline"
+    },
+    {
+      "id": "goSearchQuery",
+      "type": "promptString",
+      "description": "Go search service query (5-way fan-out: Citation + FTS + pgvector + Qdrant + KB)",
+      "default": "breach of contract evidence requirements"
+    },
+    {
+      "id": "youtubeUrl",
+      "type": "promptString",
+      "description": "YouTube video URL or ID to ingest into knowledge base",
+      "default": "https://www.youtube.com/watch?v="
+    },
+    {
+      "id": "graphMaxNodes",
+      "type": "promptString",
+      "description": "Maximum Neo4j nodes to fetch for graph analysis (50-500)",
+      "default": "100"
+    },
+    {
+      "id": "autoResearchQuery",
+      "type": "promptString",
+      "description": "Codebase auto-research topic (Karpathy gap-fill pattern)",
+      "default": "how does the evidence upload pipeline work"
+    },
+    {
+      "id": "auditPlannerQuery",
+      "type": "promptString",
+      "description": "Ask Gemma 4 about your codebase (triggers GPU audit tools automatically)",
+      "default": "What are the most critical files and are there any near-duplicate code sections?"
+    },
+    {
+      "id": "obsidianSearchQuery",
+      "type": "promptString",
+      "description": "Search query for Obsidian vault notes",
+      "default": "legal research"
+    },
+    {
+      "id": "obsidianCaseTitle",
+      "type": "promptString",
+      "description": "Case title for Obsidian export (creates Legal AI/Cases/<title>.md)",
+      "default": "Smith v Johnson"
+    },
+    {
+      "id": "specFile",
+      "type": "promptString",
+      "description": "Spec filename inside tests/ (e.g. codebase-indexer.spec.ts)",
+      "default": "codebase-indexer.spec.ts"
+    },
+    {
+      "id": "routePath",
+      "type": "promptString",
+      "description": "Route path (e.g., /evidence or /cases)",
+      "default": "/evidence"
+    },
+    {
+      "id": "kagErrorId",
+      "type": "promptString",
+      "description": "Error ID to traverse in KAG Neo4j graph",
+      "default": "demo-0"
+    },
+    {
+      "id": "crawlUrl",
+      "type": "promptString",
+      "description": "URL to crawl and ingest into library corpus (e.g. https://kit.svelte.dev/docs/introduction)",
+      "default": "https://kit.svelte.dev/docs/introduction"
+    },
+    {
+      "id": "annSearchQuery",
+      "type": "promptString",
+      "description": "Semantic ANN search query for Qdrant codebase_chunks_768",
+      "default": "authentication middleware session handling"
+    },
+    {
+      "id": "claudeFramework",
+      "type": "promptString",
+      "description": "ML framework filter (libtorch, onnx, webgpu, tensorrt) — leave empty to skip",
+      "default": ""
+    },
+    {
+      "id": "claudeModelType",
+      "type": "promptString",
+      "description": "ML model type filter (transformer, cnn, rnn, som, kmeans, embedding) — leave empty to skip",
+      "default": ""
+    },
+    {
+      "id": "claudePrecision",
+      "type": "promptString",
+      "description": "Precision filter (fp16, fp32, int8, int4) — leave empty to skip",
+      "default": ""
+    },
+    {
+      "id": "assistQuery",
+      "type": "promptString",
+      "description": "Claude Assist: semantic query — drives content + signature + error ANN rerank",
+      "default": "fix libtorch som fp16 error in the inference pipeline"
+    },
+    {
+      "id": "assistErrorQuery",
+      "type": "promptString",
+      "description": "Claude Assist: error text to activate error-vector lane (leave blank to skip)",
+      "default": ""
+    },
+    {
+      "id": "lgResearchQuery",
+      "type": "promptString",
+      "description": "LangGraph concurrent research question",
+      "default": "How does authentication work and where are the auth guards in the API routes?"
+    },
+    {
+      "id": "tagSearchQuery",
+      "type": "promptString",
+      "description": "Tag name to search in Qdrant (e.g., api-route, database, rag-pipeline)",
+      "default": "rag-pipeline"
+    },
+    {
+      "id": "codeIntelSmokeQuery",
+      "type": "promptString",
+      "description": "CodeIntel semantic search smoke query",
+      "default": "authentication session middleware guard"
+    },
+    {
+      "id": "codeIntelWikiTopic",
+      "type": "promptString",
+      "description": "Topic for CodeIntel wiki generation",
+      "default": "evidence upload pipeline and OCR fallback"
+    },
+    {
+      "id": "codeIntelFixError",
+      "type": "promptString",
+      "description": "Error message or stack trace for fix recommender smoke test",
+      "default": "Type 'string | undefined' is not assignable to type 'string'"
+    },
+    {
+      "id": "codeIntelAgentQuery",
+      "type": "promptString",
+      "description": "Query for the Gemma4 multi-step tool loop agent",
+      "default": "Which file handles RabbitMQ queue initialization and what queues does it declare?"
+    },
+    {
+      "id": "devAuthCookie",
+      "type": "promptString",
+      "description": "Session cookie for dev server auth (paste from browser DevTools → Application → Cookies). Leave empty if DEV_BYPASS_AUTH=true is set.",
+      "default": ""
+    },
+    {
+      "id": "turboQuantQuery",
+      "type": "promptString",
+      "description": "TurboQuant agentic query — sent to llama-server on :8090 using the stable q8_0 KV cache path",
+      "default": "Summarize the key legal principles around hearsay evidence and chain of custody"
+    },
+    {
+      "id": "vlmTextPrompt",
+      "type": "promptString",
+      "description": "VLM text prompt for TurboQuant vision+text inference (pair with an image)",
+      "default": "Describe this legal document and identify any key entities or dates"
+    },
+    {
+      "id": "webSearchQuery",
+      "type": "promptString",
+      "description": "Web search / TurboVec query — routed through Gemma4 agent tool loop + research corpus",
+      "default": "Latest SvelteKit 2 performance optimizations and Svelte 5 runes best practices"
+    },
+    {
+      "id": "gemma4Prompt",
+      "type": "promptString",
+      "description": "Your question or instruction for Gemma4 (TurboQuant :8090 or dev server agent)",
+      "default": "Explain the hearsay rule and its exceptions under the Federal Rules of Evidence"
+    },
+    {
+      "id": "a2aQuery",
+      "type": "promptString",
+      "description": "A2A Task query — sent as an Agent2Agent Task envelope to /api/ai/agent",
+      "default": "What is hearsay evidence and what are its main exceptions?"
+    },
+    {
+      "id": "gemma4System",
+      "type": "promptString",
+      "description": "System prompt for Gemma4 (leave blank for legal AI default)",
+      "default": "You are a legal AI assistant specializing in case law, evidence rules, and document analysis."
+    },
+    {
+      "id": "gemma4MaxTokens",
+      "type": "promptString",
+      "description": "Max tokens for Gemma4 response (default 1024, use 256 for quick answers)",
+      "default": "1024"
+    },
+    {
+      "id": "gemma4Temp",
+      "type": "promptString",
+      "description": "Temperature for Gemma4 (0.1=deterministic, 0.7=creative, default 0.3)",
+      "default": "0.3"
+    },
+    {
+      "id": "gemma4Pipeline",
+      "type": "pickString",
+      "description": "Agent pipeline for Gemma4 tool loop",
+      "options": [
+        "ace",
+        "rag",
+        "kag",
+        "dag"
+      ],
+      "default": "ace"
+    },
+    {
+      "id": "hgCollection",
+      "type": "pickString",
+      "description": "Qdrant collection for hypergraph build/tag",
+      "options": [
+        "evidence_items",
+        "codebase_chunks_768",
+        "legal_documents",
+        "legal_cases",
+        "chat_messages",
+        "embedding_cache"
+      ],
+      "default": "evidence_items"
+    },
+    {
+      "id": "hgClusters",
+      "type": "promptString",
+      "description": "Number of k-means clusters for the hypergraph build (e.g. 50, 100, 200)",
+      "default": "100"
+    },
+    {
+      "id": "rgAtlasQuery",
+      "type": "promptString",
+      "description": "RG-Atlas Search Query (Regex for stage 1, NL for semantic stages)",
+      "default": "UploadZone"
+    },
+    {
+      "id": "hermesQuery",
+      "type": "promptString",
+      "description": "Hermes query (natural language — sent to plan→execute→synth pipeline)",
+      "default": "What retrieval tools are healthy and what cluster summaries are available?"
+    },
+    {
+      "id": "hermesAceMode",
+      "type": "pickString",
+      "description": "ACE mode for the Hermes run",
+      "options": [
+        "search",
+        "debug",
+        "repair",
+        "analyze"
+      ],
+      "default": "search"
+    },
+    {
+      "id": "devSessionCookie",
+      "type": "promptString",
+      "description": "Session cookie for auth (copy 'auth_session=<value>' from browser DevTools → Application → Cookies)",
+      "default": "auth_session="
+    },
+    {
+      "id": "hyperragQuery",
+      "type": "promptString",
+      "description": "HyperRAG dense search query — TurboVec ANN prefilter -> Qdrant multi-lane -> Bifrost inference stream -> RRF -> CouchDB wiki enrichment",
+      "default": "context assembler retrieval kag pipeline"
+    },
+    {
+      "id": "messyRoutingQuery",
+      "type": "promptString",
+      "description": "Messy query text for the Phase 18 routing evaluation",
+      "default": "explain the TurboVec ANN + HyperRAG fallback for a mixed query involving Neo4j, Redis, and CHR97"
     }
   ],
-  // TODO: split VS Code tasks into grouped include files or generate tasks from scripts.
   "tasks": [
     {
       "label": "🤖 LangGraph NATS Worker",
@@ -446,25 +833,44 @@
       "detail": "Runs checklist Phase 0/1/8 health + memory + Bifrost boundary checks and writes docs/reports/kag-phase-gate-latest.json."
     },
     {
-      "label": "ACE: TurboVec MCP Sidecar :8791 (Node, detached)",
+      "label": "ACE: TurboVec MCP Sidecar :8792 (Node, detached)",
       "type": "shell",
-      "command": "pwsh -NoProfile -Command \"$p = Get-NetTCPConnection -LocalPort 8791 -State Listen -ErrorAction SilentlyContinue; if ($p) { $proc = Get-CimInstance Win32_Process -Filter \\\"ProcessId=$($p.OwningProcess)\\\" -ErrorAction SilentlyContinue; if ($proc.Name -like '*node*') { Write-Host '⚡ TurboVec MCP sidecar already running on :8791'; exit 0 } else { Write-Host \\\"⚠️ Wrong process on :8791 ($($proc.Name)) — killing\\\"; Stop-Process -Id $p.OwningProcess -Force -ErrorAction SilentlyContinue; Start-Sleep 1 } }; Start-Process node -ArgumentList 'scripts/mcp/turbovec-sidecar-mcp.mjs' -WorkingDirectory '${workspaceFolder}/sveltekit-frontend' -WindowStyle Hidden; Start-Sleep 2; $h = Invoke-RestMethod http://127.0.0.1:8791/health -ErrorAction SilentlyContinue; if ($h.server -eq 'turbovec-sidecar-mcp') { Write-Host '⚡ TurboVec MCP sidecar started :8791 OK' } else { Write-Host '⚠️ TurboVec MCP sidecar may not have started — run: node sveltekit-frontend/scripts/mcp/turbovec-sidecar-mcp.mjs' }\"",
-      "options": { "cwd": "${workspaceFolder}" },
+      "command": "pwsh -NoProfile -Command \"$p = Get-NetTCPConnection -LocalPort 8792 -State Listen -ErrorAction SilentlyContinue; if ($p) { $proc = Get-CimInstance Win32_Process -Filter \\\"ProcessId=$($p.OwningProcess)\\\" -ErrorAction SilentlyContinue; if ($proc.Name -like '*node*') { Write-Host 'TurboVec MCP sidecar already running on :8792'; exit 0 } else { Write-Host \\\"Port :8792 is held by $($proc.Name); not killing from startup task\\\"; exit 1 } }; $env:TURBOVEC_MCP_PORT='8792'; Start-Process node -ArgumentList 'scripts/mcp/turbovec-sidecar-mcp.mjs' -WorkingDirectory '${workspaceFolder}/sveltekit-frontend' -WindowStyle Hidden -Environment @{TURBOVEC_MCP_PORT='8792'}; Start-Sleep 2; $h = Invoke-RestMethod http://127.0.0.1:8792/health -ErrorAction SilentlyContinue; if ($h.server -eq 'turbovec-sidecar-mcp') { Write-Host 'TurboVec MCP sidecar started :8792 OK' } else { Write-Host 'TurboVec MCP sidecar may not have started — run: `$env:TURBOVEC_MCP_PORT=8792; node sveltekit-frontend/scripts/mcp/turbovec-sidecar-mcp.mjs' }\"",
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
       "group": "build",
       "problemMatcher": [],
-      "runOptions": { "runOn": "folderOpen" },
-      "presentation": { "echo": true, "reveal": "silent", "focus": false, "panel": "shared", "showReuseMessage": false, "clear": false },
-      "detail": "Start the TurboVec Node.js MCP sidecar on :8791 (detached, idempotent — kills wrong-process imposters, skips if node already listening). Serves POST /mcp JSON-RPC for turbovec.rank_chunks, turbovec.quantize_deque, turbovec.cluster_label_inject, turbovec.avx2_batch_score tools."
+      "presentation": {
+        "echo": true,
+        "reveal": "silent",
+        "focus": false,
+        "panel": "shared",
+        "showReuseMessage": false,
+        "clear": false
+      },
+      "detail": "Start the TurboVec Node.js MCP sidecar on :8792. Port :8791 is reserved for the Python ANN sidecar used by TurboVec gRPC. This task no longer kills the process on :8791."
     },
     {
       "label": "ACE: Stub + Rank + Rerank + Recommend (full pipeline)",
       "type": "shell",
       "command": "pwsh -NoProfile -ExecutionPolicy Bypass -File scripts/ace-startup-with-cooldown.ps1",
-      "options": { "cwd": "${workspaceFolder}" },
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
       "group": "build",
       "problemMatcher": [],
-      "runOptions": { "runOn": "folderOpen" },
-      "presentation": { "echo": true, "reveal": "silent", "focus": false, "panel": "shared", "showReuseMessage": false, "clear": false },
+      "runOptions": {
+        "runOn": "folderOpen"
+      },
+      "presentation": {
+        "echo": true,
+        "reveal": "silent",
+        "focus": false,
+        "panel": "shared",
+        "showReuseMessage": false,
+        "clear": false
+      },
       "detail": "On folder open: stub missing embeddings → rank-cards → rerank-cards (TurboVec) → compress-cards → build-recommendations → feature-labeling → domain-topology → intent-cache → cache-ace-packet → materialize-tasks. 1h cooldown stamp. Logs to logs/task-output/ace-startup-latest.log."
     },
     {
@@ -562,11 +968,11 @@
       "detail": "Bring up the orchestration plane (MCP), inference plane (TurboQuant llama-server), and retrieval topology plane. Use before Gemma4 agentic tool-calling tests."
     },
     {
-      "label": "RTX Pipeline: TurboVec ANN Sidecar (detached)",
+      "label": "RTX Pipeline: TurboVec Python ANN Sidecar :8791 (detached)",
       "type": "shell",
-      "command": "node scripts/startup/run-detached.mjs turbovec:sidecar",
+      "command": "pwsh -NoProfile -Command \"$p = Get-NetTCPConnection -LocalPort 8791 -State Listen -ErrorAction SilentlyContinue; if ($p) { $proc = Get-CimInstance Win32_Process -Filter \\\"ProcessId=$($p.OwningProcess)\\\" -ErrorAction SilentlyContinue; if ($proc.Name -like '*python*') { Write-Host 'TurboVec Python ANN sidecar already listening on :8791'; exit 0 } else { Write-Host \\\"Port :8791 is held by $($proc.Name); not killing from startup task\\\"; exit 1 } }; New-Item -ItemType Directory -Force -Path logs/sidecars | Out-Null; Start-Process python -ArgumentList @('sveltekit-frontend/scripts/turbovec-sidecar.py','--port','8791','--collection','codebase_chunks_768','--dim','64','--bits','4','--vector-name','content') -WorkingDirectory '${workspaceFolder}' -WindowStyle Hidden -RedirectStandardOutput 'logs/sidecars/turbovec-python-8791.out.log' -RedirectStandardError 'logs/sidecars/turbovec-python-8791.err.log'; Start-Sleep 3; $h = Invoke-RestMethod http://127.0.0.1:8791/health -ErrorAction SilentlyContinue; if ($h.ok) { Write-Host \\\"TurboVec Python ANN :8791 started; indexed=$($h.indexed); indexing may continue in background\\\" } else { Write-Host 'TurboVec Python ANN did not respond — see logs/sidecars/turbovec-python-8791.err.log' }\"",
       "options": {
-        "cwd": "${workspaceFolder}/sveltekit-frontend"
+        "cwd": "${workspaceFolder}"
       },
       "group": "build",
       "problemMatcher": [],
@@ -578,7 +984,10 @@
         "showReuseMessage": false,
         "clear": false
       },
-      "detail": "Spawn TurboVec ANN wrapper on :8792 (detached). It spawns the RotorQuant helper on :8793 when available, scrolls codebase_chunks_768 from Qdrant, builds 4-bit quantized index for ultra-fast HyperRAG candidate prefilter. Logs → logs/task-output/pipeline-test/turbovec-sidecar.{out,err}.log. Health: GET http://127.0.0.1:8792/health"
+      "detail": "Start the real TurboVec Python ANN sidecar on :8791. It scrolls codebase_chunks_768 from Qdrant, projects 768d vectors to 64d, and builds the 4-bit TurboVec index consumed by the gRPC bridge on :50062. Logs -> logs/sidecars/turbovec-python-8791.{out,err}.log.",
+      "runOptions": {
+        "runOn": "folderOpen"
+      }
     },
     {
       "label": "RTX Pipeline: Semantic Cluster (4D Manifold to Redis)",
@@ -640,7 +1049,7 @@
     {
       "label": "RTX Pipeline: Full Startup (TurboVec + Cluster + Smoke)",
       "dependsOn": [
-        "RTX Pipeline: TurboVec ANN Sidecar (detached)",
+        "RTX Pipeline: TurboVec Python ANN Sidecar :8791 (detached)",
         "RTX Pipeline: Semantic Cluster (4D Manifold to Redis)"
       ],
       "dependsOrder": "sequence",
@@ -1937,7 +2346,6 @@
       "detail": "Runs smoke:mcp:opencode-sidecars in startup chain after atlas smoke. Skips cleanly when sidecar ports are not running, otherwise validates TurboVec/Engram/LangExtract tool surfaces and engram memory write/read path. 15-min cooldown stamp: logs/task-output/.opencode-sidecar-smoke-last-run."
     },
     {
-      // G18: GPU bridge probe — verifies tensorrt_bridge.node loads and ≥10 functions are live (not NO_LIBTORCH stubs)
       "label": "🧪 Startup: GPU Bridge Probe (G18)",
       "type": "shell",
       "command": "node scripts/startup-gpu-bridge-probe.mjs 2>&1 | Tee-Object -FilePath logs/task-output/gpu-bridge-probe-startup.log; if ($LASTEXITCODE -eq 0) { Write-Host '🧪 GPU bridge: addon live + CUDA active' } else { Write-Host '⚠️  GPU bridge: running in CPU fallback — check .tmp/gpu-bridge-probe.json' }",
@@ -3117,7 +3525,9 @@
       "label": "⚡ TurboQuant: Start (text-only, :8090)",
       "type": "shell",
       "command": "pwsh -NoProfile -ExecutionPolicy Bypass -File scripts/launch-turboquant.ps1 -Detached -TextOnly",
-      "options": { "cwd": "${workspaceFolder}" },
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
       "group": "build",
       "presentation": {
         "reveal": "always",
@@ -3132,7 +3542,9 @@
       "label": "⚡ TurboQuant: Start (vision + text, :8090)",
       "type": "shell",
       "command": "pwsh -NoProfile -ExecutionPolicy Bypass -File scripts/launch-turboquant.ps1 -Detached",
-      "options": { "cwd": "${workspaceFolder}" },
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
       "group": "build",
       "presentation": {
         "reveal": "always",
@@ -3147,7 +3559,9 @@
       "label": "⚡ Embed Server: Start (:8081)",
       "type": "shell",
       "command": "node scripts/ensure-llama-server.mjs --spawn-embed",
-      "options": { "cwd": "${workspaceFolder}/sveltekit-frontend" },
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
       "group": "build",
       "presentation": {
         "reveal": "silent",
@@ -3952,10 +4366,6 @@
       "problemMatcher": []
     },
     {
-      // ── STARTUP: Full AI Stack — parallel compound task ───────────────────
-      // Starts TurboQuant (:8090) + TRACE MCP (:8788) + Bifrost (:3040) +
-      // graphify:daily all simultaneously with one keystroke.
-      // Individual task definitions below; this just wires them together.
       "label": "🚀 STARTUP: Full AI Stack (parallel)",
       "dependsOrder": "parallel",
       "dependsOn": [
@@ -3965,63 +4375,96 @@
         "🌉 Startup: Bifrost Semantic Cache (:3040)",
         "🗺️ Startup: Auto-Map Codebase (graphify:daily)"
       ],
-      "group": { "kind": "build", "isDefault": false },
+      "group": {
+        "kind": "build",
+        "isDefault": false
+      },
       "problemMatcher": []
     },
     {
-      // ── Node.js canonical orchestrator — tier-ordered, health-checked ─────
-      // Replaces the parallel compound task with ordered startup + startup.jsonl journal.
-      // Use this for reliable first-boot; use the parallel task for quick restarts.
       "label": "🚀 Dev Stack: Node Orchestrator (tier-ordered)",
       "type": "shell",
       "command": "node scripts/start-dev-stack.mjs --full",
-      "options": { "cwd": "${workspaceFolder}/sveltekit-frontend" },
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
       "isBackground": true,
-      "problemMatcher": [{
-        "pattern": { "regexp": "^$" },
-        "background": { "activeOnStart": true, "beginsPattern": ".", "endsPattern": "SvelteKit" }
-      }],
-      "group": { "kind": "build", "isDefault": false },
-      "presentation": { "reveal": "always", "panel": "new", "clear": true }
+      "problemMatcher": [
+        {
+          "pattern": {
+            "regexp": "^$"
+          },
+          "background": {
+            "activeOnStart": true,
+            "beginsPattern": ".",
+            "endsPattern": "SvelteKit"
+          }
+        }
+      ],
+      "group": {
+        "kind": "build",
+        "isDefault": false
+      },
+      "presentation": {
+        "reveal": "always",
+        "panel": "new",
+        "clear": true
+      }
     },
     {
-      // ── TurboQuant stability test — run before promoting turbo3/4 ─────────
       "label": "🧪 TurboQuant: Stability Test (q8_0 baseline, 20 gen)",
       "type": "shell",
       "command": "npm run turbo:test:stability 2>&1 | Tee-Object logs/task-output/turbo-stability-latest.log",
-      "options": { "cwd": "${workspaceFolder}/sveltekit-frontend" },
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
       "group": "test",
-      "presentation": { "reveal": "always", "panel": "new", "clear": true },
+      "presentation": {
+        "reveal": "always",
+        "panel": "new",
+        "clear": true
+      },
       "problemMatcher": []
     },
     {
-      // ── Bifrost semantic cache (maximhq/bifrost Docker image, :3040) ────────
-      // Health-checks first; starts via docker compose --profile full (no Go source needed)
       "label": "🌉 Startup: Bifrost Semantic Cache (:3040)",
       "type": "shell",
       "command": "pwsh -NoProfile -Command \"try { Invoke-WebRequest 'http://127.0.0.1:3040/health' -TimeoutSec 1 | Out-Null; Write-Host '🌉 Bifrost already :3040' -ForegroundColor Yellow; exit 0 } catch {}; Write-Host '🌉 Starting Bifrost via docker compose...' -ForegroundColor Cyan; Set-Location '${workspaceFolder}/..'; docker compose --profile full up -d bifrost; Start-Sleep 3; Write-Host '🌉 Bifrost :3040 started' -ForegroundColor Green\"",
-      "options": { "cwd": "${workspaceFolder}" },
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
       "isBackground": true,
-      "problemMatcher": [{
-        "pattern": { "regexp": "^$" },
-        "background": {
-          "activeOnStart": true,
-          "beginsPattern": ".",
-          "endsPattern": "(?:listening|already running)"
+      "problemMatcher": [
+        {
+          "pattern": {
+            "regexp": "^$"
+          },
+          "background": {
+            "activeOnStart": true,
+            "beginsPattern": ".",
+            "endsPattern": "(?:listening|already running)"
+          }
         }
-      }],
+      ],
       "group": "build",
-      "presentation": { "reveal": "silent", "panel": "shared" }
+      "presentation": {
+        "reveal": "silent",
+        "panel": "shared"
+      }
     },
     {
-      // ── Hypergraph centroid rebuild — run after embedding new files ───────
-      // Full graphify:topology pipeline: Qdrant export → k-means → Redis + tag
       "label": "🕸️ Rebuild: Hypergraph Centroids (graphify:topology)",
       "type": "shell",
       "command": "npm run graphify:topology 2>&1 | Tee-Object logs/task-output/graphify-topology-latest.log; Write-Host '🕸️ Hypergraph centroids rebuilt' -ForegroundColor Green",
-      "options": { "cwd": "${workspaceFolder}/sveltekit-frontend" },
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
       "group": "build",
-      "presentation": { "reveal": "always", "panel": "new", "clear": true },
+      "presentation": {
+        "reveal": "always",
+        "panel": "new",
+        "clear": true
+      },
       "problemMatcher": []
     },
     {
@@ -4537,10 +4980,6 @@
       "detail": "Check Go search service deep health (pg + redis + qdrant + ollama)"
     },
     {
-      // ── Legal corpus vector truth checklist ───────────────────────────────
-      // A) Canon corpus: Postgres canonical_chunks ↔ Qdrant legal_canon_chunks
-      // B) Main corpus:  Postgres legal_chunks      ↔ Qdrant legal_documents
-      // Returns parity ratio, actionNeeded string, and current search path.
       "label": "📚 Legal: Vector Parity Check",
       "type": "shell",
       "command": "curl -sf http://localhost:5173/api/library/health | python -m json.tool",
@@ -4557,9 +4996,6 @@
       "detail": "Vector truth checklist: Postgres legal_chunks ↔ Qdrant legal_documents parity + canon corpus status + search path"
     },
     {
-      // Backfill Qdrant legal_documents from Postgres legal_chunks (embedded rows only).
-      // Safe to re-run: uses deterministic point IDs — won't create duplicates.
-      // Typical run time: 5-15 min for 6000+ chunks.
       "label": "📚 Legal: Backfill Qdrant (legal_documents)",
       "type": "shell",
       "command": "node scripts/backfill-qdrant-legal.mjs",
@@ -5024,18 +5460,6 @@
       "problemMatcher": []
     },
     {
-      "label": "⚡ TurboQuant: Health Check",
-      "type": "shell",
-      "command": "pwsh -NoProfile -Command \"try { Invoke-RestMethod 'http://localhost:8090/health' -TimeoutSec 5 | Out-Null; Write-Host 'TurboQuant :8090 OK' -ForegroundColor Green } catch { Write-Host 'TurboQuant :8090 DOWN' -ForegroundColor Red }\"",
-      "group": "build",
-      "presentation": {
-        "reveal": "always",
-        "panel": "shared",
-        "clear": false
-      },
-      "problemMatcher": []
-    },
-    {
       "label": "⚡ TurboQuant: Test Inference",
       "type": "shell",
       "command": "pwsh -NoProfile -Command \"$body = @{model='gemma4-rotorquant:latest';messages=@(@{role='user';content='What is hearsay evidence? (2 sentences)'});max_tokens=150;temperature=0.3} | ConvertTo-Json -Depth 5; $sw = [System.Diagnostics.Stopwatch]::StartNew(); $r = Invoke-RestMethod 'http://localhost:8090/v1/chat/completions' -Method Post -Headers @{'Content-Type'='application/json'} -Body $body -TimeoutSec 60; $sw.Stop(); Write-Host \\\"TurboQuant: $($sw.ElapsedMilliseconds)ms\\\" -ForegroundColor Cyan; $r.choices[0].message.content | Write-Host\"",
@@ -5074,65 +5498,6 @@
       },
       "isBackground": true,
       "group": "build",
-      "presentation": {
-        "reveal": "always",
-        "panel": "dedicated",
-        "clear": true
-      },
-      "problemMatcher": []
-    },
-    {
-      "label": "🧠 LangGraph: Start (no rebuild)",
-      "type": "shell",
-      "command": "docker compose --profile gpu up langgraph-synthesis",
-      "options": {
-        "cwd": "${workspaceFolder}"
-      },
-      "isBackground": true,
-      "group": "build",
-      "presentation": {
-        "reveal": "always",
-        "panel": "dedicated",
-        "clear": true
-      },
-      "problemMatcher": []
-    },
-    {
-      "label": "🧠 LangGraph: Stop",
-      "type": "shell",
-      "command": "docker compose --profile gpu stop langgraph-synthesis",
-      "options": {
-        "cwd": "${workspaceFolder}"
-      },
-      "group": "build",
-      "presentation": {
-        "reveal": "always",
-        "panel": "shared",
-        "clear": false
-      },
-      "problemMatcher": []
-    },
-    {
-      "label": "🧠 LangGraph: Logs (follow)",
-      "type": "shell",
-      "command": "docker compose --profile gpu logs -f langgraph-synthesis",
-      "options": {
-        "cwd": "${workspaceFolder}"
-      },
-      "isBackground": true,
-      "group": "build",
-      "presentation": {
-        "reveal": "always",
-        "panel": "dedicated",
-        "clear": true
-      },
-      "problemMatcher": []
-    },
-    {
-      "label": "🧠 LangGraph: Test Synthesis Query",
-      "type": "shell",
-      "command": "pwsh -NoProfile -Command \"$body = @{model='gemma4-rotorquant:latest';messages=@(@{role='user';content='Summarize hearsay exceptions under FRE 803.'});temperature=0.3;max_tokens=400;use_ace=$true;use_web_search=$false;use_rg_search=$false} | ConvertTo-Json -Depth 5; $sw = [System.Diagnostics.Stopwatch]::StartNew(); $r = Invoke-RestMethod 'http://localhost:8091/synthesize' -Method Post -Headers @{'Content-Type'='application/json'} -Body $body -TimeoutSec 120; $sw.Stop(); Write-Host \\\"LangGraph: $($sw.ElapsedMilliseconds)ms | cache=$($r.cache_tier) | conf=$($r.confidence)\\\" -ForegroundColor Cyan; $r.response | Write-Host\"",
-      "group": "test",
       "presentation": {
         "reveal": "always",
         "panel": "dedicated",
@@ -7673,15 +8038,6 @@
       },
       "problemMatcher": []
     },
-    // ══════════════════════════════════════════════════════════════════════
-    // 🧩 ACE Pipeline — Agentic Codebase Error Fixing
-    // Run these in sequence for the full dev-tool pipeline:
-    //   1. ACE: Health Check      → verify all services ready
-    //   2. ACE: Index Codebase    → embed + push to Qdrant
-    //   3. ACE: Svelte-Check → KAG → run type checks, push errors to KAG
-    //   4. ACE: Agent Query       → multi-step Gemma 4 fix recommendation
-    //   5. ACE: Full Pipeline     → runs 1→2→3→4 in sequence
-    // ══════════════════════════════════════════════════════════════════════
     {
       "label": "🩺 ACE: Health Check (Semantic Search + All Services)",
       "type": "shell",
@@ -7985,19 +8341,6 @@
         "$tsc"
       ]
     },
-    // ══════════════════════════════════════════════════════════════════════
-    // 🧠 CodeIntel — Canonical Operator Flow
-    // Run in this order for end-to-end agentic dev pipeline:
-    //   1. CodeIntel: Preflight    → verify all services alive
-    //   2. CodeIntel: Health       → fast (no embed round-trip)
-    //   3. CodeIntel: Semantic Health → deep (embed + sample query)
-    //   4. CodeIntel: Start MCP    → launch MCP tool server
-    //   5. CodeIntel: Semantic Search Smoke
-    //   6. CodeIntel: Wiki Smoke
-    //   7. CodeIntel: Fix Recommend Smoke
-    //   8. CodeIntel: svelte-check
-    //   (optional) CodeIntel: Graph Index / Graph Status
-    // ══════════════════════════════════════════════════════════════════════
     {
       "label": "🧠 CodeIntel: Preflight (all services)",
       "type": "shell",
@@ -8208,91 +8551,86 @@
       "problemMatcher": [],
       "detail": "Canonical end-to-end operator flow: start → preflight → fast health → smoke tests → tool loop query → svelte-check"
     },
-// ─── 🧠 CodeIntel: nes-arch agents.md path-first context ───────────────
-{
-  "label": "🧠 CodeIntel: Agents Health",
-  "type": "shell",
-  "command": "npm run smoke:graphify && npm run nes:inspect:agents",
-  "options": {
-    "cwd": "${workspaceFolder}/sveltekit-frontend"
-  },
-  "group": "test",
-  "detail": "Quick health: 5-pillar Graphify smoke + count of agents:dir:* keys + presence of agents:root. Use after a git pull or to verify the path-first ACE preflight is live.",
-  "presentation": {
-    "reveal": "always",
-    "panel": "dedicated",
-    "clear": true
-  },
-  "problemMatcher": []
-},
-{
-  "label": "🧠 CodeIntel: Agents Regen",
-  "type": "shell",
-  "command": "npm run agents:write && npm run nes:inspect:agents",
-  "options": {
-    "cwd": "${workspaceFolder}/sveltekit-frontend"
-  },
-  "group": "build",
-  "detail": "Regenerate per-directory AGENTS.md from KAG + graph JSON, mirror to Redis agents:dir:* (24h TTL), then verify the mirror count. ~5s.",
-  "presentation": {
-    "reveal": "always",
-    "panel": "dedicated",
-    "clear": true
-  },
-  "problemMatcher": []
-},
-{
-  "label": "🧠 CodeIntel: NES Inspect (agents:dir:* mirror)",
-  "type": "shell",
-  "command": "npm run nes:inspect:agents",
-  "options": {
-    "cwd": "${workspaceFolder}/sveltekit-frontend"
-  },
-  "group": "test",
-  "detail": "Read-only Redis inspector: list agents:dir:* keys with TTLs and char lengths. Verify the path-first quick-hit cache is populated.",
-  "presentation": {
-    "reveal": "always",
-    "panel": "dedicated",
-    "clear": true
-  },
-  "problemMatcher": []
-},
-{
-  "label": "🧠 CodeIntel: NES Health (full diagnostic chain)",
-  "type": "shell",
-  "command": "test -f docs/graph/codebase-graph.json || npm run index:codebase:fast; npm run smoke:graphify; npm run nes:inspect:agents; npm run nes:inspect:kag",
-  "options": {
-    "cwd": "${workspaceFolder}/sveltekit-frontend"
-  },
-  "group": "test",
-  "detail": "Full nes-arch diagnostic: ensure graph JSON exists (re-index if not) → 5-pillar smoke → agents:dir:* mirror → underlying KAG notes. Use this when ACE feels context-poor or after big git pulls.",
-  "presentation": {
-    "reveal": "always",
-    "panel": "dedicated",
-    "clear": true
-  },
-  "problemMatcher": []
-},
-// ─── 🧠 CodeIntel: Full GPU Loop (canonical lifecycle) ─────────────────
-// Splices agents:write + nes:inspect:agents into the deep refresh so
-// AGENTS.md generation is part of the index lifecycle. Run after each
-// significant code change to keep the path-first cache fresh.
-{
-  "label": "🧠 CodeIntel: Full GPU Loop",
-  "type": "shell",
-  "command": "npm run graphify:full && npm run agents:write && npm run nes:inspect:agents",
-  "options": {
-    "cwd": "${workspaceFolder}/sveltekit-frontend"
-  },
-  "group": "build",
-  "detail": "Deep refresh + AGENTS.md regen + mirror verification. Pipeline: graphify:daily → codebase:index → graphify:topology → agents:write → smoke:ace:full → nes:inspect:agents. Heavy (~3-10 min). Use before major reviews or after big merges.",
-  "presentation": {
-    "reveal": "always",
-    "panel": "dedicated",
-    "clear": true
-  },
-  "problemMatcher": []
-},
+    {
+      "label": "🧠 CodeIntel: Agents Health",
+      "type": "shell",
+      "command": "npm run smoke:graphify && npm run nes:inspect:agents",
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
+      "group": "test",
+      "detail": "Quick health: 5-pillar Graphify smoke + count of agents:dir:* keys + presence of agents:root. Use after a git pull or to verify the path-first ACE preflight is live.",
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "🧠 CodeIntel: Agents Regen",
+      "type": "shell",
+      "command": "npm run agents:write && npm run nes:inspect:agents",
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
+      "group": "build",
+      "detail": "Regenerate per-directory AGENTS.md from KAG + graph JSON, mirror to Redis agents:dir:* (24h TTL), then verify the mirror count. ~5s.",
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "🧠 CodeIntel: NES Inspect (agents:dir:* mirror)",
+      "type": "shell",
+      "command": "npm run nes:inspect:agents",
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
+      "group": "test",
+      "detail": "Read-only Redis inspector: list agents:dir:* keys with TTLs and char lengths. Verify the path-first quick-hit cache is populated.",
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "🧠 CodeIntel: NES Health (full diagnostic chain)",
+      "type": "shell",
+      "command": "test -f docs/graph/codebase-graph.json || npm run index:codebase:fast; npm run smoke:graphify; npm run nes:inspect:agents; npm run nes:inspect:kag",
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
+      "group": "test",
+      "detail": "Full nes-arch diagnostic: ensure graph JSON exists (re-index if not) → 5-pillar smoke → agents:dir:* mirror → underlying KAG notes. Use this when ACE feels context-poor or after big git pulls.",
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "🧠 CodeIntel: Full GPU Loop",
+      "type": "shell",
+      "command": "npm run graphify:full && npm run agents:write && npm run nes:inspect:agents",
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
+      "group": "build",
+      "detail": "Deep refresh + AGENTS.md regen + mirror verification. Pipeline: graphify:daily → codebase:index → graphify:topology → agents:write → smoke:ace:full → nes:inspect:agents. Heavy (~3-10 min). Use before major reviews or after big merges.",
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      },
+      "problemMatcher": []
+    },
     {
       "label": "🧠 CodeIntel: Deep Legal Backfill",
       "type": "shell",
@@ -9348,9 +9686,6 @@
     {
       "label": "💬 Gemma4: Prompt from VS Code (TurboQuant :8090)",
       "type": "shell",
-      // Was: node -e '...'  inline. PowerShell on Windows treats `(text-only, :8090)`
-      // inside the inline expression as a parameter list and throws ParserError.
-      // Moving the script on-disk avoids the quoting hell entirely.
       "command": "node",
       "args": [
         "${workspaceFolder}/sveltekit-frontend/scripts/tools/gemma4-turboquant-prompt.mjs"
@@ -9378,8 +9713,6 @@
     {
       "label": "💬 Gemma4: Agentic Tool Loop from VS Code (dev server :5173)",
       "type": "shell",
-      // Same fix as the TurboQuant prompt task — the inline node -e body
-      // exploded under PowerShell's parser. Now an on-disk module.
       "command": "node",
       "args": [
         "${workspaceFolder}/sveltekit-frontend/scripts/tools/gemma4-agent-prompt.mjs"
@@ -9909,139 +10242,218 @@
       "label": "🧠 Index: Codebase Fast AST",
       "type": "shell",
       "command": "npm run index:codebase:fast",
-      "options": { "cwd": "${workspaceFolder}/sveltekit-frontend" },
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
       "group": "build",
       "detail": "CPU-only AST scan → Redis code:index:* keys (6h TTL) + docs/graph/codebase-graph.json. No GPU required. ~5–15s.",
-      "presentation": { "reveal": "always", "panel": "dedicated" }
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated"
+      }
     },
     {
       "label": "🧠 Index: Codebase Fast AST + Write Plan",
       "type": "shell",
       "command": "npm run index:codebase:fast:plan",
-      "options": { "cwd": "${workspaceFolder}/sveltekit-frontend" },
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
       "group": "build",
       "detail": "Fast AST scan + writes docs/graph/codebase-graph.md with route map, TODO list, and ACE usage notes.",
-      "presentation": { "reveal": "always", "panel": "dedicated" }
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated"
+      }
     },
     {
       "label": "🤖 Agent: Copilot Fast Plan",
       "type": "shell",
       "command": "npm run agent:copilot:fast",
-      "options": { "cwd": "${workspaceFolder}/sveltekit-frontend" },
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
       "group": "test",
       "detail": "Fast AST index → agentic-error-fix plan mode. CPU only, no GPU. Writes patch plan.",
-      "presentation": { "reveal": "always", "panel": "dedicated" }
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated"
+      }
     },
     {
       "label": "🤖 Agent: Copilot Fast Direct (no dev server)",
       "type": "shell",
       "command": "npm run agent:copilot:fast:direct",
-      "options": { "cwd": "${workspaceFolder}/sveltekit-frontend" },
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
       "group": "test",
       "detail": "Fast AST index (no Redis) + production-readiness --direct --skip-index. Requires only Ollama/TurboQuant.",
-      "presentation": { "reveal": "always", "panel": "dedicated" }
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated"
+      }
     },
     {
       "label": "📂 Dir Map: Generate CODEBASE_DIRECTORY_MAP.md",
       "type": "shell",
       "command": "node scripts/tests/generate-codebase-directory-map.mjs",
-      "options": { "cwd": "${workspaceFolder}/sveltekit-frontend" },
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
       "group": "test",
       "detail": "Walk src/ tree + fetch Redis wiki notes → write docs/CODEBASE_DIRECTORY_MAP.md",
-      "presentation": { "reveal": "always", "panel": "dedicated", "clear": true },
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      },
       "problemMatcher": []
     },
     {
       "label": "📂 Dir Map: Generate (quiet → logs/task-output)",
       "type": "shell",
       "command": "mkdir -p logs/task-output && node scripts/tests/generate-codebase-directory-map.mjs --quiet > logs/task-output/dir-map-latest.log 2>&1 && tail -20 logs/task-output/dir-map-latest.log",
-      "options": { "cwd": "${workspaceFolder}/sveltekit-frontend" },
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
       "group": "test",
       "detail": "Same as Generate but redirects all phase logs to logs/task-output/dir-map-latest.log. Terminal shows only the last 20 lines (final summary). The CODEBASE_DIRECTORY_MAP.md is still written normally.",
-      "presentation": { "reveal": "always", "panel": "dedicated", "clear": true },
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      },
       "problemMatcher": []
     },
     {
       "label": "📂 Dir Map: Summary only (1 line)",
       "type": "shell",
       "command": "node scripts/tests/generate-codebase-directory-map.mjs --summary-only",
-      "options": { "cwd": "${workspaceFolder}/sveltekit-frontend" },
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
       "group": "test",
       "detail": "Generate the map and emit a single summary line — safe for VS Code chat. Output: 'Map written: <path>' + 'Summary: N critical, N warning, N good, N total'.",
-      "presentation": { "reveal": "always", "panel": "dedicated", "clear": true },
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      },
       "problemMatcher": []
     },
     {
       "label": "📂 Dir Map: Dry-run (print to terminal)",
       "type": "shell",
       "command": "node scripts/tests/generate-codebase-directory-map.mjs --dry-run",
-      "options": { "cwd": "${workspaceFolder}/sveltekit-frontend" },
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
       "group": "test",
       "detail": "Preview CODEBASE_DIRECTORY_MAP.md without writing file",
-      "presentation": { "reveal": "always", "panel": "dedicated", "clear": true },
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      },
       "problemMatcher": []
     },
     {
       "label": "📂 Dir Audit: lib/server (direct LLM, no graph)",
       "type": "shell",
       "command": "node scripts/tests/deep-directory-audit.mjs lib/server --direct --no-graph",
-      "options": { "cwd": "${workspaceFolder}/sveltekit-frontend" },
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
       "group": "test",
       "detail": "Audit src/lib/server/ — structural metrics + TurboQuant/Ollama AI summaries → next_steps/active/",
-      "presentation": { "reveal": "always", "panel": "dedicated", "clear": true },
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      },
       "problemMatcher": []
     },
     {
       "label": "📂 Dir Audit: lib/server (quiet → logs/task-output)",
       "type": "shell",
       "command": "mkdir -p logs/task-output && node scripts/tests/deep-directory-audit.mjs lib/server --direct --no-graph --quiet > logs/task-output/dir-audit-lib-server-latest.log 2>&1 && tail -30 logs/task-output/dir-audit-lib-server-latest.log",
-      "options": { "cwd": "${workspaceFolder}/sveltekit-frontend" },
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
       "group": "test",
       "detail": "Same as lib/server audit but redirects all phase logs to logs/task-output/dir-audit-lib-server-latest.log. Terminal shows only the last 30 lines. Plan still written to next_steps/active/.",
-      "presentation": { "reveal": "always", "panel": "dedicated", "clear": true },
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      },
       "problemMatcher": []
     },
     {
       "label": "📂 Dir Audit: lib/server (summary only — 1 line)",
       "type": "shell",
       "command": "node scripts/tests/deep-directory-audit.mjs lib/server --direct --no-graph --summary-only",
-      "options": { "cwd": "${workspaceFolder}/sveltekit-frontend" },
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
       "group": "test",
       "detail": "Run the lib/server audit and emit only the final summary line — safe for VS Code chat. Plan still written to next_steps/active/.",
-      "presentation": { "reveal": "always", "panel": "dedicated", "clear": true },
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      },
       "problemMatcher": []
     },
     {
       "label": "📂 Dir Audit: routes/api (direct LLM, no graph)",
       "type": "shell",
       "command": "node scripts/tests/deep-directory-audit.mjs routes/api --direct --no-graph",
-      "options": { "cwd": "${workspaceFolder}/sveltekit-frontend" },
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
       "group": "test",
       "detail": "Audit src/routes/api/ — structural metrics + TurboQuant/Ollama AI summaries → next_steps/active/",
-      "presentation": { "reveal": "always", "panel": "dedicated", "clear": true },
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      },
       "problemMatcher": []
     },
     {
       "label": "📂 Dir Audit: Full (lib + routes + write-map)",
       "type": "shell",
       "command": "node scripts/tests/deep-directory-audit.mjs lib --direct --no-graph --depth 3 --write-map && node scripts/tests/deep-directory-audit.mjs routes/api --direct --no-graph",
-      "options": { "cwd": "${workspaceFolder}/sveltekit-frontend" },
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
       "group": "test",
       "detail": "Audit lib/ + routes/api/, then regenerate CODEBASE_DIRECTORY_MAP.md. Requires TurboQuant or Ollama.",
-      "presentation": { "reveal": "always", "panel": "dedicated", "clear": true },
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      },
       "problemMatcher": []
     },
     {
       "label": "📂 Dir Audit + KAG Ingest: lib/server (via summarize-dirs API)",
       "type": "shell",
       "command": "node scripts/tests/deep-directory-audit.mjs lib/server --direct --no-graph && curl -s -X POST http://localhost:5173/api/codebase-index/summarize-dirs -H 'Content-Type: application/json' -H 'x-dev-bypass-auth: true' | pwsh -NoProfile -Command \"$input | ConvertFrom-Json | ConvertTo-Json -Depth 3\"",
-      "options": { "cwd": "${workspaceFolder}/sveltekit-frontend" },
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
       "group": "test",
       "detail": "Audit lib/server, then POST to /api/codebase-index/summarize-dirs to ingest into Redis/Postgres for ACE KAG",
-      "presentation": { "reveal": "always", "panel": "dedicated", "clear": true },
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      },
       "problemMatcher": []
     },
-
     {
       "label": "🦙 llama-server: Start Gemma4 VLM (TurboQuant :8090)",
       "type": "shell",
@@ -10057,109 +10469,157 @@
       },
       "group": "build",
       "detail": "Start llama-server.exe with gemma4-rotorquant:latest GGUF + mmproj on :8090 (q8_0 KV, flash-attn, ngl 99). Detached — returns when /health responds.",
-      "presentation": { "reveal": "always", "panel": "dedicated", "clear": true },
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      },
       "problemMatcher": []
     },
-
     {
       "label": "🦙 llama-server: Prompt Gemma4 — Directory Analysis",
       "type": "shell",
       "command": "pwsh -NoProfile -Command \"$query = '${input:dirAnalysisQuery}'; $body = @{ model = 'gemma4-rotorquant:latest'; messages = @(@{ role = 'system'; content = 'You are a legal AI codebase analyst. Analyze the directory structure and return: (1) dominant purpose, (2) missing auth/validation gaps, (3) suggested refactor. Be concise.' }, @{ role = 'user'; content = $query }); max_tokens = 512; temperature = 0.2; cache_prompt = $true } | ConvertTo-Json -Depth 5; $resp = Invoke-RestMethod -Uri 'http://127.0.0.1:8090/v1/chat/completions' -Method Post -Body $body -ContentType 'application/json' -TimeoutSec 120; $resp.choices[0].message.content\"",
-      "options": { "cwd": "${workspaceFolder}/sveltekit-frontend" },
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
       "group": "test",
       "detail": "Prompt Gemma4 via llama-server :8090 for directory analysis. Uses system prompt + cache_prompt:true for KV reuse. Input: directory path or question.",
-      "presentation": { "reveal": "always", "panel": "dedicated", "clear": true },
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      },
       "problemMatcher": []
     },
-
     {
       "label": "🦙 llama-server: Prompt Gemma4 — KAG Wiki Note (single dir)",
       "type": "shell",
       "command": "pwsh -NoProfile -Command \"$dir = '${input:targetDir}'; $fileList = Get-ChildItem -Path (Join-Path '${workspaceFolder}/sveltekit-frontend/src' $dir) -File -Recurse -ErrorAction SilentlyContinue | Select-Object -First 20 | ForEach-Object { $_.Name }; $files = $fileList -join ', '; $sys = 'You are a codebase knowledge-graph agent. Given a source directory and its files, produce a structured wiki note for the KAG system. Format: PURPOSE: <one sentence> | PATTERNS: <comma list> | GAPS: <auth/validation/test gaps> | TAGS: <tag list>'; $body = @{ model = 'gemma4-rotorquant:latest'; messages = @(@{ role = 'system'; content = $sys }, @{ role = 'user'; content = \\\"Directory: $dir\\nFiles: $files\\nProduce the KAG wiki note.\\\" }); max_tokens = 300; temperature = 0.15; cache_prompt = $true } | ConvertTo-Json -Depth 5; $resp = Invoke-RestMethod -Uri 'http://127.0.0.1:8090/v1/chat/completions' -Method Post -Body $body -ContentType 'application/json' -TimeoutSec 120; Write-Host \\\"\\n--- KAG note for $dir ---\\\"; $resp.choices[0].message.content\"",
-      "options": { "cwd": "${workspaceFolder}/sveltekit-frontend" },
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
       "group": "test",
       "detail": "List up to 20 files in the target dir, then prompt Gemma4 via llama-server to generate a structured KAG wiki note (PURPOSE/PATTERNS/GAPS/TAGS). Input: relative path from src/ e.g. lib/server/cache",
-      "presentation": { "reveal": "always", "panel": "dedicated", "clear": true },
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      },
       "problemMatcher": []
     },
-
     {
       "label": "🦙 llama-server: Audit + KAG Ingest + Gemma4 Summary (full pipeline)",
       "type": "shell",
       "command": "pwsh -NoProfile -Command \"Write-Host '=== Step 1: Dir audit ===' -ForegroundColor Cyan; node scripts/tests/deep-directory-audit.mjs lib/server --direct --no-graph --write-map; Write-Host '=== Step 2: KAG ingest (Qdrant SOM coords + Redis wiki notes) ===' -ForegroundColor Cyan; $ingest = Invoke-RestMethod -Uri 'http://127.0.0.1:5173/api/codebase-index/summarize-dirs' -Method Post -Headers @{ 'x-dev-bypass-auth' = 'true'; 'Content-Type' = 'application/json' } -TimeoutSec 300; Write-Host (\\\"Ingested: $($ingest.directoriesFound) dirs, $($ingest.upserted) upserted, $($ingest.wikiNotesWritten) wiki notes\\\"); Write-Host '=== Step 3: Gemma4 meta-summary ===' -ForegroundColor Cyan; $sys = 'You are a legal AI platform architect. Summarize the codebase health in 5 bullet points covering: auth coverage, cache utilization, inference routing, SOM topology coverage, and top refactor priority.'; $ctx = \\\"Directories indexed: $($ingest.directoriesFound). Wiki notes written: $($ingest.wikiNotesWritten). Upserted community_reports: $($ingest.upserted).\\\"; $body = @{ model = 'gemma4-rotorquant:latest'; messages = @(@{ role = 'system'; content = $sys }, @{ role = 'user'; content = $ctx }); max_tokens = 400; temperature = 0.2; cache_prompt = $true } | ConvertTo-Json -Depth 5; $resp = Invoke-RestMethod -Uri 'http://127.0.0.1:8090/v1/chat/completions' -Method Post -Body $body -ContentType 'application/json' -TimeoutSec 120; Write-Host '--- Gemma4 codebase health summary ---' -ForegroundColor Green; $resp.choices[0].message.content\"",
-      "options": { "cwd": "${workspaceFolder}/sveltekit-frontend" },
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
       "group": "test",
       "detail": "Full pipeline: (1) deep-directory-audit lib/server → (2) POST /api/codebase-index/summarize-dirs (Qdrant SOM coords + Redis wiki notes + Postgres) → (3) Gemma4 meta-summary via llama-server :8090. Requires TurboQuant running.",
-      "presentation": { "reveal": "always", "panel": "dedicated", "clear": true },
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      },
       "problemMatcher": []
     },
-
     {
       "label": "🦙 llama-server: Interactive Chat with Gemma4 (terminal REPL)",
       "type": "shell",
       "command": "pwsh -NoProfile -Command \"Write-Host 'Gemma4 Chat via llama-server :8090 — type your query, empty line to quit' -ForegroundColor Green; $history = @(); while ($true) { $line = Read-Host 'You'; if ([string]::IsNullOrWhiteSpace($line)) { break }; $history += @{ role = 'user'; content = $line }; $msgs = @(@{ role = 'system'; content = 'You are a legal AI assistant with deep knowledge of SvelteKit, TypeScript, and legal document analysis.' }) + $history; $body = @{ model = 'gemma4-rotorquant:latest'; messages = $msgs; max_tokens = 512; temperature = 0.3; cache_prompt = $true } | ConvertTo-Json -Depth 6; try { $resp = Invoke-RestMethod -Uri 'http://127.0.0.1:8090/v1/chat/completions' -Method Post -Body $body -ContentType 'application/json' -TimeoutSec 120; $reply = $resp.choices[0].message.content; $history += @{ role = 'assistant'; content = $reply }; Write-Host ('Gemma4: ' + $reply) -ForegroundColor Yellow } catch { Write-Host ('Error: ' + $_.Exception.Message) -ForegroundColor Red } }\"",
-      "options": { "cwd": "${workspaceFolder}/sveltekit-frontend" },
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
       "group": "test",
       "detail": "Interactive multi-turn chat with Gemma4 via llama-server :8090. Maintains conversation history. cache_prompt:true reuses system prompt KV across turns. Empty line exits.",
-      "presentation": { "reveal": "always", "panel": "dedicated", "clear": true },
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      },
       "problemMatcher": []
     },
-
     {
       "label": "🦙 llama-server: Prompt Gemma4 — 4D SOM Topology Report",
       "type": "shell",
       "command": "pwsh -NoProfile -Command \"Write-Host 'Fetching SOM topology from Redis wiki notes...' -ForegroundColor Cyan; $keys = redis-cli KEYS 'wiki:note:dir:*' 2>$null; if (-not $keys) { Write-Host 'No wiki notes in Redis — run KAG ingest first' -ForegroundColor Red; exit 1 }; $sample = $keys | Select-Object -First 5 | ForEach-Object { $val = redis-cli GET $_ 2>$null; try { $doc = $val | ConvertFrom-Json; \\\"dir=$($doc.directoryPath) SOM=($($doc.somBmuRow),$($doc.somBmuCol)) cluster=$($doc.somCluster) score=$($doc.auditScore)\\\" } catch { $_ } }; $ctx = $sample -join \\\"`n\\\"; $body = @{ model = 'gemma4-rotorquant:latest'; messages = @(@{ role = 'system'; content = 'You are a codebase topology analyst. Given SOM grid positions and cluster assignments for source directories, identify: (1) which clusters group related infrastructure, (2) outlier directories (isolated SOM positions), (3) recommended directory merges or splits.' }, @{ role = 'user'; content = \\\"SOM topology sample (`n$ctx`n)`nAnalyze the topology and give recommendations.\\\" }); max_tokens = 400; temperature = 0.2; cache_prompt = $true } | ConvertTo-Json -Depth 5; $resp = Invoke-RestMethod -Uri 'http://127.0.0.1:8090/v1/chat/completions' -Method Post -Body $body -ContentType 'application/json' -TimeoutSec 120; Write-Host '--- SOM Topology Analysis ---' -ForegroundColor Green; $resp.choices[0].message.content\"",
-      "options": { "cwd": "${workspaceFolder}/sveltekit-frontend" },
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
       "group": "test",
       "detail": "Read a sample of Redis wiki notes, extract SOM grid positions (row, col, cluster), then prompt Gemma4 via llama-server to analyse the 4D topology and suggest structural improvements.",
-      "presentation": { "reveal": "always", "panel": "dedicated", "clear": true },
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      },
       "problemMatcher": []
     },
-
     {
       "label": "🤫 Quiet: Dir Audit (lib/server) → log file",
       "type": "shell",
       "command": "pwsh -NoProfile -Command \"$ts = Get-Date -Format 'yyyyMMdd-HHmmss'; $log = \\\"logs/dir-audit-lib-server-$ts.log\\\"; New-Item -ItemType Directory -Force -Path logs | Out-Null; node scripts/tests/deep-directory-audit.mjs lib/server --direct --no-graph *>&1 | Tee-Object -FilePath $log | Select-Object -First 80; Write-Host \\\"---\\\" -ForegroundColor Cyan; Write-Host \\\"Full log: $log\\\" -ForegroundColor Green; $size = (Get-Item $log).Length; Write-Host \\\"Size: $([math]::Round($size/1KB,1)) KB\\\" -ForegroundColor Green\"",
-      "options": { "cwd": "${workspaceFolder}/sveltekit-frontend" },
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
       "group": "test",
       "detail": "Run dir audit, write full output to logs/dir-audit-lib-server-<timestamp>.log, show first 80 lines + log path. Prevents VS Code chat session bloat.",
-      "presentation": { "reveal": "always", "panel": "dedicated", "clear": true },
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      },
       "problemMatcher": []
     },
-
     {
       "label": "🤫 Quiet: Prompt Gemma4 → log file",
       "type": "shell",
       "command": "pwsh -NoProfile -Command \"$ts = Get-Date -Format 'yyyyMMdd-HHmmss'; $log = \\\"logs/gemma4-prompt-$ts.log\\\"; New-Item -ItemType Directory -Force -Path logs | Out-Null; $query = '${input:dirAnalysisQuery}'; $body = @{ model = 'gemma4-rotorquant:latest'; messages = @(@{ role = 'system'; content = 'You are a legal AI codebase analyst. Return concise, structured analysis.' }, @{ role = 'user'; content = $query }); max_tokens = 512; temperature = 0.2; cache_prompt = $true } | ConvertTo-Json -Depth 5; $resp = Invoke-RestMethod -Uri 'http://127.0.0.1:8090/v1/chat/completions' -Method Post -Body $body -ContentType 'application/json' -TimeoutSec 120; $content = $resp.choices[0].message.content; Set-Content -Path $log -Value $content -Encoding UTF8; if ($content.Length -le 4000) { Write-Host $content } else { Write-Host ($content.Substring(0,4000)); Write-Host \\\"... truncated $($content.Length - 4000) chars\\\" -ForegroundColor Yellow }; Write-Host \\\"---\\\" -ForegroundColor Cyan; Write-Host \\\"Full response: $log ($($content.Length) chars)\\\" -ForegroundColor Green\"",
-      "options": { "cwd": "${workspaceFolder}/sveltekit-frontend" },
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
       "group": "test",
       "detail": "Prompt Gemma4 via llama-server :8090, write full response to logs/gemma4-prompt-<timestamp>.log, show first 4000 chars inline. Safe for VS Code chat — caps inline output.",
-      "presentation": { "reveal": "always", "panel": "dedicated", "clear": true },
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      },
       "problemMatcher": []
     },
-
     {
       "label": "🤫 Quiet: Full pipeline (audit + KAG + Gemma4) → log file",
       "type": "shell",
       "command": "pwsh -NoProfile -Command \"$ts = Get-Date -Format 'yyyyMMdd-HHmmss'; $log = \\\"logs/full-pipeline-$ts.log\\\"; New-Item -ItemType Directory -Force -Path logs | Out-Null; '=== Step 1: Dir audit (lib/server) ===' | Out-File $log; node scripts/tests/deep-directory-audit.mjs lib/server --direct --no-graph --write-map *>>&1 $log; '=== Step 2: KAG ingest ===' | Add-Content $log; try { $ingest = Invoke-RestMethod -Uri 'http://127.0.0.1:5173/api/codebase-index/summarize-dirs' -Method Post -Headers @{ 'x-dev-bypass-auth' = 'true' } -TimeoutSec 300; \\\"Ingested: $($ingest.directoriesFound) dirs, $($ingest.upserted) upserted\\\" | Add-Content $log } catch { \\\"KAG ingest skipped (dev server not running): $_\\\" | Add-Content $log }; '=== Step 3: Gemma4 summary ===' | Add-Content $log; $body = @{ model = 'gemma4-rotorquant:latest'; messages = @(@{ role = 'system'; content = 'Codebase health analyst. 5 bullets: auth, cache, inference, topology, top refactor priority.' }, @{ role = 'user'; content = 'Summarize codebase production readiness.' }); max_tokens = 400; temperature = 0.2; cache_prompt = $true } | ConvertTo-Json -Depth 5; try { $r = Invoke-RestMethod -Uri 'http://127.0.0.1:8090/v1/chat/completions' -Method Post -Body $body -ContentType 'application/json' -TimeoutSec 120; $r.choices[0].message.content | Add-Content $log } catch { \\\"Gemma4 unreachable: $_\\\" | Add-Content $log }; Get-Content $log | Select-Object -Last 60; Write-Host \\\"---\\\" -ForegroundColor Cyan; Write-Host \\\"Full pipeline log: $log\\\" -ForegroundColor Green; Write-Host \\\"Size: $([math]::Round((Get-Item $log).Length/1KB,1)) KB\\\" -ForegroundColor Green\"",
-      "options": { "cwd": "${workspaceFolder}/sveltekit-frontend" },
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
       "group": "test",
       "detail": "Full 3-step pipeline (audit → KAG ingest → Gemma4) → all output to logs/full-pipeline-<timestamp>.log → show last 60 lines. KAG step gracefully skips if dev server not running.",
-      "presentation": { "reveal": "always", "panel": "dedicated", "clear": true },
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      },
       "problemMatcher": []
     },
-
     {
       "label": "📁 Open latest log file",
       "type": "shell",
       "command": "pwsh -NoProfile -Command \"$latest = Get-ChildItem logs/*.log -ErrorAction SilentlyContinue | Sort-Object LastWriteTime -Descending | Select-Object -First 1; if ($latest) { Write-Host \\\"Latest: $($latest.FullName) ($([math]::Round($latest.Length/1KB,1)) KB)\\\" -ForegroundColor Green; code $latest.FullName } else { Write-Host 'No logs found in logs/ — run a 🤫 Quiet task first' -ForegroundColor Yellow }\"",
-      "options": { "cwd": "${workspaceFolder}/sveltekit-frontend" },
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
       "group": "test",
       "detail": "Open the most recently-written file in logs/ in VS Code. Pairs with the 🤫 Quiet tasks.",
-      "presentation": { "reveal": "always", "panel": "dedicated", "clear": false },
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": false
+      },
       "problemMatcher": []
     },
-
     {
       "label": "shell: 🔬 FF1: Audit (tsgo + svelte-check, OOM-safe)",
       "type": "shell",
@@ -10260,199 +10720,294 @@
       "label": "🗺️ Graphify: Daily Map (fast AST + smoke)",
       "type": "shell",
       "command": "npm run graphify:daily",
-      "options": { "cwd": "${workspaceFolder}/sveltekit-frontend" },
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
       "group": "build",
       "detail": "Fast AST → docs/graph/codebase-graph.json + codebase-map.md → deep import graph (cycles/orphans/hotspots) → Redis cache → smoke. ~15s, no LLM, no GPU.",
-      "presentation": { "reveal": "always", "panel": "dedicated", "clear": true },
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      },
       "problemMatcher": []
     },
-
     {
       "label": "🔗 Graphify: Deep Import Graph (cycles + orphans + hotspots)",
       "type": "shell",
       "command": "npm run graphify:deep",
-      "options": { "cwd": "${workspaceFolder}/sveltekit-frontend" },
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
       "group": "build",
       "detail": "Phase A typed import graph (graphify-deep-imports.mjs): 14 edge types, zone classification, BFS neighborhoods. Outputs memory/graphify/deep/ + ACE ingest JSONL. ~3s.",
-      "presentation": { "reveal": "always", "panel": "dedicated", "clear": true },
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      },
       "problemMatcher": []
     },
-
     {
       "label": "🔗 Graphify: Deep Import Graph + Neo4j TRANSITIVELY_IMPORTS edges",
       "type": "shell",
       "command": "npm run graphify:deep:neo4j",
-      "options": { "cwd": "${workspaceFolder}/sveltekit-frontend" },
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
       "group": "build",
       "detail": "Same as deep import graph but also writes TRANSITIVELY_IMPORTS edges to Neo4j for top-50 hotspots. Requires Neo4j running. ~5s.",
-      "presentation": { "reveal": "always", "panel": "dedicated", "clear": true },
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      },
       "problemMatcher": []
     },
-
     {
       "label": "🔗 Graphify: Phase A Deep Imports (typed edges + zones + BFS neighborhoods)",
       "type": "shell",
       "command": "npm run graphify:deep-imports",
-      "options": { "cwd": "${workspaceFolder}/sveltekit-frontend" },
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
       "group": "build",
       "detail": "Phase A typed import graph: 14 edge types, zone classification, bounded BFS neighborhoods for hotspots/routes/tests. Outputs memory/graphify/deep/ + ACE ingest JSONL. ~3s.",
-      "presentation": { "reveal": "always", "panel": "dedicated", "clear": true },
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      },
       "problemMatcher": []
     },
-
     {
       "label": "🩺 Graphify: Phase A Deep Imports Smoke (8-gate)",
       "type": "shell",
       "command": "npm run graphify:deep:smoke",
-      "options": { "cwd": "${workspaceFolder}/sveltekit-frontend" },
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
       "group": "test",
       "detail": "8-gate smoke: graph exists, node fields, edge count, >=50% resolved, infra edge types, unresolved map, ACE ingest JSONL, top hotspot fanIn>=100.",
-      "presentation": { "reveal": "always", "panel": "dedicated", "clear": true },
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      },
       "problemMatcher": []
     },
-
     {
       "label": "🔎 Graphify: Semantic Index (Qdrant codebase_chunks_768)",
       "type": "shell",
       "command": "npm run graphify:semantic",
-      "options": { "cwd": "${workspaceFolder}/sveltekit-frontend" },
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
       "group": "build",
       "detail": "EmbeddingGemma → Qdrant codebase_chunks_768 → smoke:ace verification. Slower (embedding pass), enables semantic search and ACE retrieval.",
-      "presentation": { "reveal": "always", "panel": "dedicated", "clear": true },
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      },
       "problemMatcher": []
     },
-
     {
       "label": "🧠 Graphify: Full ACE Index (daily + semantic + topology)",
       "type": "shell",
       "command": "npm run graphify:full",
-      "options": { "cwd": "${workspaceFolder}/sveltekit-frontend" },
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
       "group": "build",
       "detail": "Full stack refresh: fast AST + EmbeddingGemma + hypergraph topology + smoke:ace:full (14 gates). Use weekly or before deploys.",
-      "presentation": { "reveal": "always", "panel": "dedicated", "clear": true },
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      },
       "problemMatcher": []
     },
-
     {
       "label": "🏭 Graphify: Full GPU + TurboQuant",
       "type": "shell",
       "command": "npm run graphify:gpu:turbo",
-      "options": { "cwd": "${workspaceFolder}/sveltekit-frontend" },
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
       "group": "build",
       "detail": "Heavy: starts TurboQuant (:8090) + runs full GPU production-readiness pipeline (SOM BMU, hypergraph, PageRank, Neo4j, Gemma4 plans). Hour+ runtime.",
-      "presentation": { "reveal": "always", "panel": "dedicated", "clear": true },
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      },
       "problemMatcher": []
     },
-
     {
       "label": "✅ Graphify: 5-Pillar Smoke",
       "type": "shell",
       "command": "npm run smoke:graphify",
-      "options": { "cwd": "${workspaceFolder}/sveltekit-frontend" },
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
       "group": "test",
       "detail": "Verify all 5 Graphify pillars: fast AST graph, Redis cache, KAG wiki notes, Qdrant semantic index, ACE fallback contract. ~3s. Use --strict to fail on any absent pillar.",
-      "presentation": { "reveal": "always", "panel": "dedicated", "clear": true },
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      },
       "problemMatcher": []
     },
-
     {
       "label": "🧠 Graphify: Batch GPU Analysis",
       "type": "shell",
       "command": "npm run graphify:batch-gpu-analysis",
-      "options": { "cwd": "${workspaceFolder}/sveltekit-frontend" },
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
       "group": "test",
       "detail": "8-stage pipeline: codebase map → PageRank enrichment → cluster/SOM audit → Gemma4 glyph summaries → embed → Qdrant upsert → tag write-back → ACE hit logging → report → smoke. Full run ~5-10 min. Use :test (--limit 10) or :dry for quick checks.",
-      "presentation": { "reveal": "always", "panel": "dedicated", "clear": true },
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      },
       "problemMatcher": []
     },
     {
       "label": "🧪 Graphify: ACE Smoke (retrieval probe)",
       "type": "shell",
       "command": "npm run graphify:ace-smoke",
-      "options": { "cwd": "${workspaceFolder}/sveltekit-frontend" },
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
       "group": "test",
       "detail": "Probe /api/graph/bow-texture + /api/graph/traverse to verify glyph embeddings are reachable via ACE. ~5s. Run after batch GPU analysis to confirm end-to-end wiring.",
-      "presentation": { "reveal": "always", "panel": "dedicated", "clear": true },
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      },
       "problemMatcher": []
     },
     {
       "label": "🗺️🧠 Graphify: Daily → Batch GPU (end-to-end Karpathy wiki)",
       "type": "shell",
       "command": "npm run graphify:daily && npm run graphify:batch-gpu-analysis:test && npm run graphify:ace-smoke",
-      "options": { "cwd": "${workspaceFolder}/sveltekit-frontend" },
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
       "group": "test",
       "detail": "Full Karpathy wiki pipeline: (1) fast-AST map → wiki:note:dir:* Redis notes, (2) batch GPU: Qdrant cluster lookup → TurboQuant/Ollama Gemma4 summaries → embed → glyph_atlas upsert → Redis wiki enrichment, (3) ACE smoke. ~10 min total.",
-      "presentation": { "reveal": "always", "panel": "dedicated", "clear": true },
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      },
       "problemMatcher": []
     },
-
     {
       "label": "🔁 Graphify: Resume Batch (fill missing Gemma4)",
       "type": "shell",
       "command": "node scripts/graphify-batch-gpu-analysis.mjs --skip-ace",
       "options": {
         "cwd": "${workspaceFolder}/sveltekit-frontend",
-        "env": { "SUMMARY_CONCURRENCY": "2" }
+        "env": {
+          "SUMMARY_CONCURRENCY": "2"
+        }
       },
       "group": "test",
       "detail": "Second-pass enrichment: skips dirs that already have gemma4Summary, processes only the remaining backlog. Safe to re-run repeatedly — idempotent.",
-      "presentation": { "reveal": "always", "panel": "dedicated", "clear": false },
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": false
+      },
       "problemMatcher": []
     },
-
     {
       "label": "🗾 Graphify: SOM Topology",
       "type": "shell",
       "command": "npm run graphify:som",
-      "options": { "cwd": "${workspaceFolder}/sveltekit-frontend" },
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
       "group": "test",
       "detail": "Run CPU SOM on 100 clusters (8×8 grid, 600 iters) → assign somRow/Col → enrich hypergraph-clusters.json + codebase-graph.json → write 100 cluster BoW tiles to Redis → write cluster-topology.json",
-      "presentation": { "reveal": "always", "panel": "dedicated", "clear": true },
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      },
       "problemMatcher": []
     },
-
     {
       "label": "🩺 Graphify: Health Report",
       "type": "shell",
       "command": "npm run graphify:health",
-      "options": { "cwd": "${workspaceFolder}/sveltekit-frontend" },
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
       "group": "test",
       "detail": "Collect Redis wiki/BoW tile counts, Qdrant glyph_atlas size, graph JSON stats, AGENTS.md mirror count → write docs/graph/graphify-health.json + .md",
-      "presentation": { "reveal": "always", "panel": "dedicated", "clear": true },
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      },
       "problemMatcher": []
     },
-
     {
       "label": "♻️ Graphify: Re-seed LLM-Output Index",
       "type": "shell",
       "command": "npm run graphify:seed-llm-index",
-      "options": { "cwd": "${workspaceFolder}/sveltekit-frontend" },
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
       "group": "build",
       "detail": "Backfill code:llm_output:* from wiki notes — refreshes 6h TTL, repopulates by-cluster SETs, drives green tile tints in GraphifyViewer. Run after graphify:som / graphify:full.",
-      "presentation": { "reveal": "always", "panel": "dedicated", "clear": true },
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      },
       "problemMatcher": []
     },
-
     {
       "label": "⏰ Graphify: LLM Index Hourly Refresh Loop",
       "type": "shell",
       "command": "while ($true) { npm run graphify:seed-llm-index; Start-Sleep -Seconds 3000 }",
-      "options": { "cwd": "${workspaceFolder}/sveltekit-frontend", "shell": { "executable": "pwsh" } },
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend",
+        "shell": {
+          "executable": "pwsh"
+        }
+      },
       "isBackground": true,
       "group": "build",
       "detail": "Run seed-llm-output-index every 50min (TTL/2 = keep entries warm). Stop with Terminal: Kill Task. Use during long ACE sessions without graphify:full.",
-      "presentation": { "reveal": "silent", "panel": "dedicated" },
+      "presentation": {
+        "reveal": "silent",
+        "panel": "dedicated"
+      },
       "problemMatcher": []
     },
-
     {
       "label": "📈 Graphify: Analyze → next_steps plan",
       "type": "shell",
       "command": "npm run analyze:graph",
-      "options": { "cwd": "${workspaceFolder}/sveltekit-frontend" },
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
       "group": "test",
       "detail": "Read codebase-graph.json + hypergraph-clusters.json, cross-correlate gate failures with hypergraph clusters, write next_steps/active/<date>-graph-analysis.md with prioritized findings. ~3s, no LLM.",
-      "presentation": { "reveal": "always", "panel": "dedicated", "clear": true },
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      },
       "problemMatcher": []
     },
     {
@@ -10488,81 +11043,118 @@
       },
       "problemMatcher": []
     },
-
-    // ─── 🎮 nes-arch — agents.md spec / Redis quick-hit context ──────────────
     {
       "label": "🎮 nes-arch: Regen all AGENTS.md (disk + Redis mirror)",
       "type": "shell",
       "command": "npm run agents:write",
-      "options": { "cwd": "${workspaceFolder}/sveltekit-frontend" },
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
       "group": "build",
       "detail": "Generate per-directory AGENTS.md files from KAG notes + graph JSON, mirror to Redis agents:dir:* (24h TTL) for sub-5ms agent tool-call lookups. ~5s.",
-      "presentation": { "reveal": "always", "panel": "dedicated", "clear": true },
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      },
       "problemMatcher": []
     },
     {
       "label": "🎮 nes-arch: Regen root AGENTS.md only",
       "type": "shell",
       "command": "npm run agents:write:root",
-      "options": { "cwd": "${workspaceFolder}/sveltekit-frontend" },
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
       "group": "build",
       "detail": "Only rebuild repo-root AGENTS.md (audit gate snapshot). Skip the 248 per-dir files. <1s.",
-      "presentation": { "reveal": "always", "panel": "dedicated", "clear": true },
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      },
       "problemMatcher": []
     },
     {
       "label": "🎮 nes-arch: Inspect Redis agents:dir:* mirror",
       "type": "shell",
       "command": "npm run nes:inspect:agents",
-      "options": { "cwd": "${workspaceFolder}/sveltekit-frontend" },
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
       "group": "test",
       "detail": "Read-only inspector — confirm Redis mirror is populated and which keys exist. Shows TTLs, char lengths, top 10 keys. NEVER writes.",
-      "presentation": { "reveal": "always", "panel": "dedicated", "clear": true },
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      },
       "problemMatcher": []
     },
     {
       "label": "🎮 nes-arch: Inspect underlying KAG notes (debug empty AGENTS.md)",
       "type": "shell",
       "command": "npm run nes:inspect:kag",
-      "options": { "cwd": "${workspaceFolder}/sveltekit-frontend" },
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
       "group": "test",
       "detail": "Peek at the underlying ClusterNote JSON in wiki:note:dir:*. Use this when an AGENTS.md looks empty — confirm whether the indexer captured the data the renderer expects.",
-      "presentation": { "reveal": "always", "panel": "dedicated", "clear": true },
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      },
       "problemMatcher": []
     },
     {
       "label": "🎮 nes-arch: Walk-up resolution test (path → AGENTS.md key)",
       "type": "shell",
       "command": "npm run nes:inspect:agents -- --path ${input:nesPath}",
-      "options": { "cwd": "${workspaceFolder}/sveltekit-frontend" },
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
       "group": "test",
       "detail": "Given a file/dir path, replicate the getAgentsMdQuickHit walk-up logic and show which agents:dir:* key resolves. Useful for debugging tool-call context.",
-      "presentation": { "reveal": "always", "panel": "dedicated", "clear": true },
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      },
       "problemMatcher": []
     },
-
     {
       "label": "📊 Graphify: Live Progress (latest log)",
       "type": "shell",
       "command": "pwsh -NoProfile -Command \"$latest = Get-ChildItem logs/task-output/graphify-full-*.log -ErrorAction SilentlyContinue | Sort-Object LastWriteTime -Descending | Select-Object -First 1; if (-not $latest) { Write-Host 'No graphify-full log yet — run graphify:full first' -ForegroundColor Yellow; exit 0 }; Write-Host \\\"Log: $($latest.FullName)\\\" -ForegroundColor Cyan; Write-Host \\\"Size: $([math]::Round($latest.Length/1KB,1)) KB, modified $($latest.LastWriteTime)\\\" -ForegroundColor Cyan; Write-Host '---'; $content = Get-Content $latest.FullName -Raw; $matches = [regex]::Matches($content, 'Progress: (\\d+)% \\((\\d+) indexed, (\\d+) cached, (\\d+) errors\\)'); if ($matches.Count -gt 0) { $last = $matches[$matches.Count-1]; Write-Host \\\"Latest: $($last.Value)\\\" -ForegroundColor Green; if ($matches.Count -gt 5) { $first = $matches[0]; $rate = ([int]$last.Groups[2].Value - [int]$first.Groups[2].Value); Write-Host \\\"Indexed delta since first sample: $rate chunks\\\" -ForegroundColor Cyan } } else { Write-Host 'No progress lines (job may have finished or failed)' -ForegroundColor Yellow }; Write-Host '---'; Write-Host 'Tail (last 15 non-progress lines):' -ForegroundColor Cyan; (Get-Content $latest.FullName) | Where-Object { $_ -notmatch 'Progress:' } | Select-Object -Last 15\"",
-      "options": { "cwd": "${workspaceFolder}/sveltekit-frontend" },
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
       "group": "test",
       "detail": "Read latest logs/task-output/graphify-full-*.log — show progress %, chunks indexed, and last 15 non-progress lines. Use during long graphify:full runs to check status without blocking.",
-      "presentation": { "reveal": "always", "panel": "dedicated", "clear": true },
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      },
       "problemMatcher": []
     },
-
     {
       "label": "📖 Open ACE/KAG/Gemma4 how-to guide",
       "type": "shell",
       "command": "pwsh -NoProfile -Command \"code docs/ace-kag-howto.md\"",
-      "options": { "cwd": "${workspaceFolder}/sveltekit-frontend" },
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
       "group": "test",
       "detail": "Open docs/ace-kag-howto.md — operator's manual for fast AST → Redis KAG → Gemma4 → ACE workflows, all VS Code tasks, npm scripts, and troubleshooting.",
-      "presentation": { "reveal": "always", "panel": "dedicated", "clear": false },
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": false
+      },
       "problemMatcher": []
     },
-
     {
       "label": "📖 Open Codebase Strategy Guide",
       "type": "shell",
@@ -10583,279 +11175,372 @@
       "label": "🤖 Agent: Batch Error Fix — Dry Run (list hotspots)",
       "type": "shell",
       "command": "node scripts/agentic-batch-fix.mjs ${input:batchTopN} --dry-run",
-      "options": { "cwd": "${workspaceFolder}/sveltekit-frontend" },
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
       "group": "build",
       "detail": "List the top-N audit hotspot directories from codebase-graph.json without dispatching to the agent. Safe to run anytime — no dev server needed.",
-      "presentation": { "reveal": "always", "panel": "dedicated", "clear": true },
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      },
       "problemMatcher": []
     },
-
     {
       "label": "🤖 Agent: Batch Error Fix — Parallel (top-N hotspots → fix plans)",
       "type": "shell",
       "command": "node scripts/agentic-batch-fix.mjs ${input:batchTopN} --concurrency=${input:batchConcurrency}",
-      "options": { "cwd": "${workspaceFolder}/sveltekit-frontend" },
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
       "group": "build",
       "detail": "Fan out top-N audit hotspots from codebase-graph.json to /api/ai/agent/batch (SSE). Runs Gemma4 agent loops in parallel (default 3-way) — one fix plan per directory. Plans written to next_steps/active/{date}/batch-fix-{ts}/. Requires dev server on :5173.",
-      "presentation": { "reveal": "always", "panel": "dedicated", "clear": true },
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      },
       "problemMatcher": []
     },
-
     {
       "label": "🤖 Agent: Batch Error Fix — Quiet (logs/task-output)",
       "type": "shell",
       "command": "mkdir -p logs/task-output && node scripts/agentic-batch-fix.mjs ${input:batchTopN} --concurrency=${input:batchConcurrency} --quiet > logs/task-output/agent-batch-fix-latest.log 2>&1 && tail -40 logs/task-output/agent-batch-fix-latest.log",
-      "options": { "cwd": "${workspaceFolder}/sveltekit-frontend" },
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
       "group": "build",
       "detail": "Same as parallel batch fix, but redirects all output to logs/task-output/agent-batch-fix-latest.log. Terminal shows only the last 40 lines (summary). Plans still written to next_steps/active/. Use this when running large topN to avoid VS Code chat buffer overflow.",
-      "presentation": { "reveal": "always", "panel": "dedicated", "clear": true },
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      },
       "problemMatcher": []
     },
-
-    {
-      "label": "🗺️ Graphify: Daily Map (fast AST + smoke)",
-      "type": "shell",
-      "command": "npm run graphify:daily",
-      "options": { "cwd": "${workspaceFolder}/sveltekit-frontend" },
-      "group": "build",
-      "detail": "Layer 1 — fast AST indexer (no GPU, no dev server) + smoke-fast-ast + smoke-kag. Refreshes docs/graph/codebase-graph.json + Redis code:index:* + wiki:note:dir:* in ~3-5s. Run this every morning.",
-      "presentation": { "reveal": "always", "panel": "dedicated", "clear": true },
-      "problemMatcher": []
-    },
-
     {
       "label": "🔎 Graphify: Semantic Index (Qdrant + ACE smoke)",
       "type": "shell",
       "command": "npm run graphify:semantic",
-      "options": { "cwd": "${workspaceFolder}/sveltekit-frontend" },
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
       "group": "build",
       "detail": "Layer 2 — codebase-semantic-indexer (EmbeddingGemma 768-dim → Qdrant codebase_chunks_768) + ACE smoke. Run after big code changes. Requires Qdrant on :6333 and EmbeddingGemma reachable.",
-      "presentation": { "reveal": "always", "panel": "dedicated", "clear": true },
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      },
       "problemMatcher": []
     },
-
     {
       "label": "🧠 Graphify: Full ACE Index (daily + semantic + hypergraph)",
       "type": "shell",
       "command": "npm run graphify:full",
-      "options": { "cwd": "${workspaceFolder}/sveltekit-frontend" },
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
       "group": "build",
       "detail": "Full pipeline — daily map + Qdrant semantic + hypergraph build (Redis-backed) + ACE full smoke. Takes ~2-5 min. Use before a big agent run or production-readiness audit.",
-      "presentation": { "reveal": "always", "panel": "dedicated", "clear": true },
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      },
       "problemMatcher": []
     },
-
-    {
-      "label": "🏭 Graphify: Full GPU + TurboQuant",
-      "type": "shell",
-      "command": "npm run graphify:gpu:turbo",
-      "options": { "cwd": "${workspaceFolder}/sveltekit-frontend" },
-      "group": "build",
-      "detail": "Layer 3 — start TurboQuant detached + full GPU production-readiness (SOM BMU + hypergraph + PageRank + Neo4j + cluster synthesis + ACE plans). Heavy (~5-10 min, RTX 3060 Ti). Output: next_steps/active/.",
-      "presentation": { "reveal": "always", "panel": "dedicated", "clear": true },
-      "problemMatcher": []
-    },
-
     {
       "label": "🩺 Graphify: Smoke (5-pillar health check)",
       "type": "shell",
       "command": "npm run smoke:graphify",
-      "options": { "cwd": "${workspaceFolder}/sveltekit-frontend" },
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
       "group": "test",
       "detail": "Read-only health check across all 5 Graphify pillars: graph JSON, codebase-map.md, Redis fast cache + KAG notes, Qdrant codebase_chunks_768, ACE FAST_AST_SCORE_CAP. Use --no-redis or --no-qdrant to skip service-dependent pillars.",
-      "presentation": { "reveal": "always", "panel": "dedicated", "clear": true },
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      },
       "problemMatcher": []
     },
-
     {
       "label": "🚀 Startup: Analysis (detached — smoke + topo + Gemma4 plan)",
       "type": "shell",
       "command": "mkdir -p logs/startup && node scripts/startup-analysis.mjs > logs/startup/latest.log 2>&1 & echo '[startup] Analysis running in background — tail logs/startup/latest.log'",
-      "options": { "cwd": "${workspaceFolder}/sveltekit-frontend" },
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
       "group": "test",
       "detail": "Runs smoke:graphify + topology:validate detached, feeds results to Gemma4 agent, writes timestamped plan to next_steps/plans/. Use startup:analysis:dry to preview in terminal.",
-      "presentation": { "reveal": "always", "panel": "dedicated", "clear": true },
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      },
       "problemMatcher": []
     },
-
     {
       "label": "🚀 Startup: Analysis (dry-run — preview in terminal)",
       "type": "shell",
       "command": "node scripts/startup-analysis.mjs --dry-run",
-      "options": { "cwd": "${workspaceFolder}/sveltekit-frontend" },
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
       "group": "test",
       "detail": "Preview startup health report in terminal without writing files or calling Gemma4.",
-      "presentation": { "reveal": "always", "panel": "dedicated", "clear": true },
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      },
       "problemMatcher": []
     },
-
     {
       "label": "📚 Graphify: Cluster Digest (per-centroid topic + members)",
       "type": "shell",
       "command": "npm run hypergraph:digest",
-      "options": { "cwd": "${workspaceFolder}/sveltekit-frontend" },
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
       "group": "test",
       "detail": "Join hypergraph k-means assignments + Qdrant payloads → docs/graph/hypergraph-clusters.{md,json}. Pure aggregation (no LLM). Each cluster gets: inferredTopic, topKinds, topTags, topSymbols, topPaths, memberFiles. Requires hypergraph:build:redis to have run first. ~1-2s for K=100 / 32k vectors.",
-      "presentation": { "reveal": "always", "panel": "dedicated", "clear": true },
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      },
       "problemMatcher": []
     },
-
     {
       "label": "🤖 Graphify: Write AGENTS.md per directory",
       "type": "shell",
       "command": "npm run agents:write",
-      "options": { "cwd": "${workspaceFolder}/sveltekit-frontend" },
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
       "group": "build",
       "detail": "Synthesize one AGENTS.md per non-trivial directory from codebase-graph.json + hypergraph-clusters.json + Redis wiki:note:dir:* KAG notes. Files include: purpose, audit score, file list, hypergraph cluster topic + tags, agentic tool-calling examples (graph_search/wiki_note_lookup/audit_hotspots/read_file). Idempotent: human-edited files (no AGENTS-GEN marker) are preserved. ~249 files generated. Use --dry-run/--filter for partial regen.",
-      "presentation": { "reveal": "always", "panel": "dedicated", "clear": true },
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      },
       "problemMatcher": []
     },
-
     {
       "label": "🤖 Graphify: AGENTS.md (dry-run preview)",
       "type": "shell",
       "command": "npm run agents:write:dry",
-      "options": { "cwd": "${workspaceFolder}/sveltekit-frontend" },
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
       "group": "test",
       "detail": "Preview which AGENTS.md files would be written (no file IO). Shows KAG-enriched vs graph-only flag per dir. Safe to run anytime.",
-      "presentation": { "reveal": "always", "panel": "dedicated", "clear": true },
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      },
       "problemMatcher": []
     },
-
-    // ══════════════════════════════════════════════════════════════════════════
-    // TRACE STACK — GPU LLM + Karpathy wiki + MCP graph tools (May 2026)
-    // Architecture:
-    //   llama-server.exe :8090  — Gemma4 TurboQuant GGUF inference
-    //   topology-search  :8101  — 4D manifold search engine (detached)
-    //   trace-mcp-server :8788  — TypeScript MCP (graph/KAG/topology tools)
-    //   SvelteKit        :5173  — main app (spawns :8101 + :8788 via predev)
-    // ══════════════════════════════════════════════════════════════════════════
-
     {
       "label": "🚀 TRACE: Start Full Stack (llama + topo + MCP + SvelteKit)",
       "type": "shell",
       "command": "powershell -ExecutionPolicy Bypass -File scripts/start-trace-stack.ps1",
-      "options": { "cwd": "${workspaceFolder}/sveltekit-frontend" },
-      "group": { "kind": "build", "isDefault": false },
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
+      "group": {
+        "kind": "build",
+        "isDefault": false
+      },
       "detail": "Launches: llama-server.exe :8090 (Gemma4 GGUF), topology-search :8101, TRACE MCP :8788, SvelteKit dev :5173",
-      "presentation": { "reveal": "always", "panel": "dedicated", "clear": true },
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      },
       "problemMatcher": []
     },
     {
       "label": "🧠 TRACE: Start MCP Server only (:8788)",
       "type": "shell",
       "command": "npm run mcp:trace",
-      "options": { "cwd": "${workspaceFolder}/sveltekit-frontend" },
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
       "isBackground": true,
       "group": "none",
       "detail": "Starts trace-mcp-server.ts on :8788 — 10 graph/KAG/topology tools for Gemma4 agentic calls. Connect Claude Desktop: http://127.0.0.1:8788",
-      "presentation": { "reveal": "always", "panel": "dedicated", "clear": true },
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      },
       "problemMatcher": []
     },
     {
       "label": "🔍 TRACE: Smoke — MCP health check (:8788)",
       "type": "shell",
       "command": "npm run smoke:trace",
-      "options": { "cwd": "${workspaceFolder}/sveltekit-frontend" },
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
       "group": "test",
       "detail": "Checks TRACE MCP server health at :8788. Returns 'healthy' or 'not running'.",
-      "presentation": { "reveal": "always", "panel": "shared", "clear": false },
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared",
+        "clear": false
+      },
       "problemMatcher": []
     },
     {
       "label": "🔍 TRACE: Smoke — topology search health (:8101)",
       "type": "shell",
       "command": "curl -s http://127.0.0.1:8101/health | node -e \"process.stdin.resume(); let d=''; process.stdin.on('data',c=>d+=c); process.stdin.on('end',()=>console.log(JSON.parse(d)))\"",
-      "options": { "cwd": "${workspaceFolder}/sveltekit-frontend" },
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
       "group": "test",
       "detail": "Health-check the topology search server at :8101. Shows ok/version/uptime.",
-      "presentation": { "reveal": "always", "panel": "shared", "clear": false },
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared",
+        "clear": false
+      },
       "problemMatcher": []
     },
     {
       "label": "🧪 TRACE: Test topology search (hybrid query)",
       "type": "shell",
       "command": "curl -s -X POST http://127.0.0.1:8101/search/hybrid -H \"Content-Type: application/json\" -d \"{\\\"query\\\":\\\"ace context assembler retrieval\\\",\\\"limit\\\":5}\" | node -e \"process.stdin.resume(); let d=''; process.stdin.on('data',c=>d+=c); process.stdin.on('end',()=>{ const r=JSON.parse(d); console.log('Found:', r.totalFound, '| Hits:', r.hits?.length); r.hits?.forEach(h=>console.log(' -', h.stableKey || h.file_path, '| score:', h.hybridScore?.toFixed(3))); })\"",
-      "options": { "cwd": "${workspaceFolder}/sveltekit-frontend" },
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
       "group": "test",
       "detail": "POST a hybrid search query to topology-search-server :8101 and print results. Requires server running and Ollama embedding model.",
-      "presentation": { "reveal": "always", "panel": "shared", "clear": false },
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared",
+        "clear": false
+      },
       "problemMatcher": []
     },
     {
       "label": "🧪 TRACE: Test MCP graph.expand_neighborhood",
       "type": "shell",
       "command": "curl -s -X POST http://127.0.0.1:8788/mcp -H \"Content-Type: application/json\" -d \"{\\\"jsonrpc\\\":\\\"2.0\\\",\\\"method\\\":\\\"tools/call\\\",\\\"id\\\":1,\\\"params\\\":{\\\"name\\\":\\\"graph.expand_neighborhood\\\",\\\"arguments\\\":{\\\"stableKey\\\":\\\"dir:src/lib/server/ace\\\",\\\"depth\\\":2}}}\" | node -e \"process.stdin.resume(); let d=''; process.stdin.on('data',c=>d+=c); process.stdin.on('end',()=>console.log(JSON.stringify(JSON.parse(d),null,2)))\"",
-      "options": { "cwd": "${workspaceFolder}/sveltekit-frontend" },
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
       "group": "test",
       "detail": "Test the graph.expand_neighborhood MCP tool — expands ego-graph for src/lib/server/ace directory.",
-      "presentation": { "reveal": "always", "panel": "shared", "clear": false },
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared",
+        "clear": false
+      },
       "problemMatcher": []
     },
     {
       "label": "🧪 TRACE: Test MCP topology.search_near",
       "type": "shell",
       "command": "curl -s -X POST http://127.0.0.1:8788/mcp -H \"Content-Type: application/json\" -d \"{\\\"jsonrpc\\\":\\\"2.0\\\",\\\"method\\\":\\\"tools/call\\\",\\\"id\\\":1,\\\"params\\\":{\\\"name\\\":\\\"topology.search_near\\\",\\\"arguments\\\":{\\\"query\\\":\\\"auth route test gaps\\\",\\\"limit\\\":5}}}\" | node -e \"process.stdin.resume(); let d=''; process.stdin.on('data',c=>d+=c); process.stdin.on('end',()=>console.log(JSON.stringify(JSON.parse(d),null,2)))\"",
-      "options": { "cwd": "${workspaceFolder}/sveltekit-frontend" },
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
       "group": "test",
       "detail": "Test the topology.search_near MCP tool — finds nodes near a query in 4D manifold space.",
-      "presentation": { "reveal": "always", "panel": "shared", "clear": false },
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared",
+        "clear": false
+      },
       "problemMatcher": []
     },
-
-    // ══════════════════════════════════════════════════════════════════════════
-    // Claude Code token-saving tools — keep codebase graph fresh so Claude
-    // doesn't need to grep/read files manually each session.
-    // ══════════════════════════════════════════════════════════════════════════
-
     {
       "label": "🤖 Graphify: Synthesize Next Actions (tsgo + gates + Gemma4)",
       "type": "shell",
       "command": "mkdir -p logs/task-output && npm run graph:synthesize 2>&1 | Tee-Object -FilePath logs/task-output/synthesize-next-actions-latest.log; $latest = Get-ChildItem memory/runs -Directory -ErrorAction SilentlyContinue | Sort-Object LastWriteTime -Descending | Select-Object -First 1 -ExpandProperty Name; if ($latest) { Write-Host \"✅ next_actions.md → memory/runs/$latest/next_actions.md\" -ForegroundColor Green; Get-Content \"memory/runs/$latest/next_actions.md\" | Select-Object -First 40 } else { Write-Host '⚠️ No run found' -ForegroundColor Yellow }",
-      "options": { "cwd": "${workspaceFolder}/sveltekit-frontend" },
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
       "group": "build",
       "detail": "Run synthesize-next-actions.mjs: tsgo diagnostics + G17-G25 audit gates + risk scoring + TurboQuant synthesis → memory/runs/<ts>/next_actions.md. Prints P0/P1 summary on completion. ~30-60s.",
-      "presentation": { "reveal": "always", "panel": "dedicated", "clear": true },
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      },
       "problemMatcher": []
     },
     {
       "label": "🔍 Claude: Context Brief (next_actions P0/P1)",
       "type": "shell",
       "command": "$latest = Get-ChildItem memory/runs -Directory -ErrorAction SilentlyContinue | Sort-Object LastWriteTime -Descending | Select-Object -First 1 -ExpandProperty Name; if ($latest) { Write-Host \"Run: $latest\" -ForegroundColor Cyan; Get-Content \"memory/runs/$latest/next_actions.md\" | Select-Object -First 80 } else { Write-Host '⚠️ No run found — run 🤖 Graphify: Synthesize Next Actions first' -ForegroundColor Yellow }",
-      "options": { "cwd": "${workspaceFolder}/sveltekit-frontend" },
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
       "group": "test",
       "detail": "Print the P0/P1 priorities + audit table from the latest next_actions.md run. Use this to give Claude a quick context brief without manual file reading.",
-      "presentation": { "reveal": "always", "panel": "shared", "clear": true },
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared",
+        "clear": true
+      },
       "problemMatcher": []
     },
     {
       "label": "🧠 GRPO: Wire Synthesis Risk → NES Cartridge",
       "type": "shell",
       "command": "cd sveltekit-frontend && npm run wire:synthesis:grpo",
-      "options": { "cwd": "${workspaceFolder}" },
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
       "group": "build",
       "detail": "Reads latest synthesis_summary.json cluster risk scores → updates Qdrant codebase_chunks_768 payload (grpo_reward, nes_risk_level, nes_priority) + writes Redis nes:cluster_risk:{cluster} keys (6h TTL). Run after graph:synthesize. ~5s.",
-      "presentation": { "reveal": "always", "panel": "dedicated", "clear": true },
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      },
       "problemMatcher": []
     },
     {
       "label": "🧠 GRPO: Wire Synthesis Risk → NES Cartridge (dry run)",
       "type": "shell",
       "command": "cd sveltekit-frontend && npm run wire:synthesis:grpo:dry",
-      "options": { "cwd": "${workspaceFolder}" },
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
       "group": "test",
       "detail": "Dry-run: prints what would be written to Qdrant + Redis without making any changes.",
-      "presentation": { "reveal": "always", "panel": "shared", "clear": true },
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared",
+        "clear": true
+      },
       "problemMatcher": []
     },
     {
       "label": "🔍 Claude: Graph Relations (extract + synthesize)",
       "type": "shell",
       "command": "mkdir -p logs/task-output && npm run graph:full 2>&1 | Tee-Object -FilePath logs/task-output/graph-full-latest.log; Write-Host '✅ graph:full done — relations extracted + next_actions synthesized + GRPO wired' -ForegroundColor Green",
-      "options": { "cwd": "${workspaceFolder}/sveltekit-frontend" },
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
       "group": "build",
       "detail": "Full relation pipeline: extract-code-relations → build-codebase-relationships (11k+ edges) → synthesize-next-actions → wire-synthesis-grpo. Use after merging large PRs or before a major agent run. ~2-3 min.",
-      "presentation": { "reveal": "always", "panel": "dedicated", "clear": true },
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      },
       "problemMatcher": []
     },
     {
@@ -10875,11 +11560,16 @@
       "command": "bash",
       "args": [
         "-c",
-        "rg -l \"${input:karpathyQuery}\" sveltekit-frontend/src --type ts --type svelte 2>/dev/null | while read f; do rel=\"${f#sveltekit-frontend/}\"; raw=$(docker exec legal-ai-redis redis-cli HGET gpu:karpathy:scores \"$rel\" 2>/dev/null); blend=$(echo \"$raw\" | awk -F'\"blend\":' 'NF>1 {gsub(/[},].*/,\"\",$2); print $2}'); lines=$(wc -l < \"$f\" 2>/dev/null); printf \"%-8s %-6s %s\\n\" \"${blend:-0}\" \"${lines:-?}\" \"$rel\"; done | sort -rn | head -25"
+        "rg -l \"${input:karpathyQuery}\" sveltekit-frontend/src --type ts --type svelte 2>/dev/null | while read f; do rel=\"${f#sveltekit-frontend/}\"; raw=$(docker exec legal-ai-redis redis-cli HGET gpu:karpathy:scores \"$rel\" 2>/dev/null); blend=$(echo \"$raw\" | awk -F'\"blend\":' 'NF>1 {gsub(/[}].*/,\"\",$2); print $2}'); lines=$(wc -l < \"$f\" 2>/dev/null); printf \"%-8s %-6s %s\\n\" \"${blend:-0}\" \"${lines:-?}\" \"$rel\"; done | sort -rn | head -25"
       ],
       "group": "test",
       "detail": "Pattern A — lexical rg filter + Karpathy blend rerank from Redis gpu:karpathy:scores hash. Sparse: only top-N PageRank files have scores; rest show 0. Use to find authoritative central files matching a regex.",
-      "presentation": { "reveal": "always", "panel": "dedicated", "clear": true, "echo": true },
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true,
+        "echo": true
+      },
       "problemMatcher": []
     },
     {
@@ -10892,7 +11582,12 @@
       ],
       "group": "test",
       "detail": "Pattern B — rg-style search over the daily graphify pipeline output (docs/graph/codebase-graph.json). Returns lineCount + routeHandler count + rel path for every file whose path matches the regex. Works for ANY file, not just top-N. Fresh after `npm run graphify:daily`.",
-      "presentation": { "reveal": "always", "panel": "dedicated", "clear": true, "echo": true },
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true,
+        "echo": true
+      },
       "problemMatcher": []
     },
     {
@@ -10905,7 +11600,12 @@
       ],
       "group": "test",
       "detail": "Pattern C — full semantic via TRACE MCP at :8788. Embeds the query, hits Qdrant ANN, reranks via Karpathy blend, returns top-15 with paths + scores. Requires dev server / mcp:trace running. Same path the agentic loop uses.",
-      "presentation": { "reveal": "always", "panel": "dedicated", "clear": true, "echo": true },
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true,
+        "echo": true
+      },
       "problemMatcher": []
     },
     {
@@ -10931,7 +11631,9 @@
       "label": "🦉 Hermes: Smoke — /api/ai/hermes-run",
       "type": "shell",
       "command": "Invoke-RestMethod -Method POST -Uri http://localhost:5173/api/ai/hermes-run -ContentType 'application/json' -Headers @{ Cookie = \"${input:devSessionCookie}\" } -Body ('{\"userQuery\":\"What retrieval tools are healthy?\",\"aceMode\":\"debug\"}' | ConvertTo-Json -Compress) | ConvertTo-Json -Depth 6",
-      "options": { "cwd": "${workspaceFolder}/sveltekit-frontend" },
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
       "group": "none",
       "problemMatcher": [],
       "presentation": {
@@ -10948,7 +11650,9 @@
       "label": "🦉 Hermes: Run Query (plan → execute → synth)",
       "type": "shell",
       "command": "$body = ConvertTo-Json @{ userQuery = '${input:hermesQuery}'; aceMode = '${input:hermesAceMode}' } -Compress; Invoke-RestMethod -Method POST -Uri http://localhost:5173/api/ai/hermes-run -ContentType 'application/json' -Headers @{ Cookie = \"${input:devSessionCookie}\" } -Body $body | ConvertTo-Json -Depth 8",
-      "options": { "cwd": "${workspaceFolder}/sveltekit-frontend" },
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
       "group": "none",
       "problemMatcher": [],
       "presentation": {
@@ -10960,418 +11664,7 @@
         "clear": true
       },
       "detail": "Interactive Hermes run: prompts for a query + ACE mode, POSTs to /api/ai/hermes-run, returns { plan, execution, context, synthesis }. Dev server must be running. Useful for manual end-to-end testing of the planner→executor→synth pipeline."
-    }
-  ],
-  "inputs": [
-    {
-      "id": "karpathyQuery",
-      "type": "promptString",
-      "description": "Search query (regex for lexical patterns A+B; natural language for semantic pattern C)",
-      "default": "UploadZone"
     },
-    {
-      "id": "nesPath",
-      "type": "promptString",
-      "description": "File or directory path (e.g. src/lib/server/ace/agent.ts or src/routes/api/cases) — walks UP to nearest AGENTS.md in Redis",
-      "default": "src/lib/server/ace"
-    },
-    {
-      "id": "batchTopN",
-      "type": "promptString",
-      "description": "How many audit hotspot directories to analyze in parallel (1-30)",
-      "default": "5"
-    },
-    {
-      "id": "batchConcurrency",
-      "type": "promptString",
-      "description": "Concurrent agent loops (1-8). Higher = faster but more VRAM contention. Default 3.",
-      "default": "3"
-    },
-    {
-      "id": "dirAnalysisQuery",
-      "type": "promptString",
-      "description": "Directory path or analysis question for Gemma4 (e.g., 'lib/server/cache — what auth gaps exist?')",
-      "default": "lib/server/cache — summarize purpose and identify any missing auth guards or Zod validation"
-    },
-    {
-      "id": "targetDir",
-      "type": "promptString",
-      "description": "Relative path from src/ for KAG wiki note generation (e.g., lib/server/cache)",
-      "default": "lib/server/cache"
-    },
-    {
-      "id": "screenshotRoute",
-      "type": "promptString",
-      "description": "Route path to screenshot (e.g., /evidence, /legal-corpus, /cases)",
-      "default": "/dashboard"
-    },
-    {
-      "id": "aceAgentQuery",
-      "type": "promptString",
-      "description": "ACE Tool Loop: semantic query for agentic codebase research",
-      "default": "How does the authentication middleware work and where are the session guards?"
-    },
-    {
-      "id": "aceErrorMessage",
-      "type": "promptString",
-      "description": "ACE Error Fix: paste error message or stack trace for agentic diagnosis",
-      "default": "Cannot find module '$lib/server/ollama' — TS2307"
-    },
-    {
-      "id": "agentQuery",
-      "type": "promptString",
-      "description": "Enter the MCP agent task or question",
-      "default": "Search the codebase for Svelte 5 migration hotspots and summarize the highest-priority fixes"
-    },
-    {
-      "id": "acpTool",
-      "type": "promptString",
-      "description": "Enter an ACP tool name (run 'ACP - List All Tools' first to see the current registry)",
-      "default": "cases:load"
-    },
-    {
-      "id": "acpArgs",
-      "type": "promptString",
-      "description": "Enter ACP JSON args for the selected tool",
-      "default": "{\"limit\":5}"
-    },
-    {
-      "id": "clusterId",
-      "type": "promptString",
-      "description": "Enter cluster ID (0-11)",
-      "default": "0"
-    },
-    {
-      "id": "errorType",
-      "type": "pickString",
-      "description": "Select error type",
-      "options": [
-        "SYNTAX",
-        "TYPE",
-        "NULL_CHECK",
-        "IMPORT",
-        "EXPORT",
-        "UNDEFINED_VAR"
-      ],
-      "default": "SYNTAX"
-    },
-    {
-      "id": "auditModule",
-      "type": "promptString",
-      "description": "Module name to audit (e.g., SearchBox, qdrant-manager, redis, webgpu-init)",
-      "default": "SearchBox"
-    },
-    {
-      "id": "indexDir",
-      "type": "promptString",
-      "description": "Directory to index into Qdrant (relative to sveltekit-frontend/)",
-      "default": "src/lib/server"
-    },
-    {
-      "id": "codeSearchQuery",
-      "type": "promptString",
-      "description": "Semantic search query for codebase chunks in Qdrant",
-      "default": "authentication middleware session validation"
-    },
-    {
-      "id": "researchQuery",
-      "type": "promptString",
-      "description": "Auto-research topic (Karpathy-style knowledge building)",
-      "default": "Svelte 5 runes migration patterns"
-    },
-    {
-      "id": "kbSearchQuery",
-      "type": "promptString",
-      "description": "Knowledge base semantic search query",
-      "default": "legal document embedding pipeline"
-    },
-    {
-      "id": "goSearchQuery",
-      "type": "promptString",
-      "description": "Go search service query (5-way fan-out: Citation + FTS + pgvector + Qdrant + KB)",
-      "default": "breach of contract evidence requirements"
-    },
-    {
-      "id": "youtubeUrl",
-      "type": "promptString",
-      "description": "YouTube video URL or ID to ingest into knowledge base",
-      "default": "https://www.youtube.com/watch?v="
-    },
-    {
-      "id": "graphMaxNodes",
-      "type": "promptString",
-      "description": "Maximum Neo4j nodes to fetch for graph analysis (50-500)",
-      "default": "100"
-    },
-    {
-      "id": "autoResearchQuery",
-      "type": "promptString",
-      "description": "Codebase auto-research topic (Karpathy gap-fill pattern)",
-      "default": "how does the evidence upload pipeline work"
-    },
-    {
-      "id": "auditPlannerQuery",
-      "type": "promptString",
-      "description": "Ask Gemma 4 about your codebase (triggers GPU audit tools automatically)",
-      "default": "What are the most critical files and are there any near-duplicate code sections?"
-    },
-    {
-      "id": "obsidianSearchQuery",
-      "type": "promptString",
-      "description": "Search query for Obsidian vault notes",
-      "default": "legal research"
-    },
-    {
-      "id": "obsidianCaseTitle",
-      "type": "promptString",
-      "description": "Case title for Obsidian export (creates Legal AI/Cases/<title>.md)",
-      "default": "Smith v Johnson"
-    },
-    {
-      "id": "specFile",
-      "type": "promptString",
-      "description": "Spec filename inside tests/ (e.g. codebase-indexer.spec.ts)",
-      "default": "codebase-indexer.spec.ts"
-    },
-    {
-      "id": "routePath",
-      "type": "promptString",
-      "description": "Route path (e.g., /evidence or /cases)",
-      "default": "/evidence"
-    },
-    {
-      "id": "auditPlannerQuery",
-      "type": "promptString",
-      "description": "Ask Gemma 4 about your codebase (triggers GPU audit tools automatically)",
-      "default": "What are the most critical files and are there any near-duplicate code sections?"
-    },
-    {
-      "id": "obsidianSearchQuery",
-      "type": "promptString",
-      "description": "Search query for Obsidian vault notes",
-      "default": "legal research"
-    },
-    {
-      "id": "obsidianCaseTitle",
-      "type": "promptString",
-      "description": "Case title for Obsidian export (creates Legal AI/Cases/<title>.md)",
-      "default": "Smith v Johnson"
-    },
-    {
-      "id": "kagErrorId",
-      "type": "promptString",
-      "description": "Error ID to traverse in KAG Neo4j graph",
-      "default": "demo-0"
-    },
-    {
-      "id": "crawlUrl",
-      "type": "promptString",
-      "description": "URL to crawl and ingest into library corpus (e.g. https://kit.svelte.dev/docs/introduction)",
-      "default": "https://kit.svelte.dev/docs/introduction"
-    },
-    {
-      "id": "annSearchQuery",
-      "type": "promptString",
-      "description": "Semantic ANN search query for Qdrant codebase_chunks_768",
-      "default": "authentication middleware session handling"
-    },
-    {
-      "id": "researchQuery",
-      "type": "promptString",
-      "description": "Research query for Claude Assist / LangGraph concurrent research",
-      "default": "How does the embedding pipeline handle CUDA OOM and what are the fallback paths?"
-    },
-    {
-      "id": "claudeFramework",
-      "type": "promptString",
-      "description": "ML framework filter (libtorch, onnx, webgpu, tensorrt) — leave empty to skip",
-      "default": ""
-    },
-    {
-      "id": "claudeModelType",
-      "type": "promptString",
-      "description": "ML model type filter (transformer, cnn, rnn, som, kmeans, embedding) — leave empty to skip",
-      "default": ""
-    },
-    {
-      "id": "claudePrecision",
-      "type": "promptString",
-      "description": "Precision filter (fp16, fp32, int8, int4) — leave empty to skip",
-      "default": ""
-    },
-    {
-      "id": "assistQuery",
-      "type": "promptString",
-      "description": "Claude Assist: semantic query — drives content + signature + error ANN rerank",
-      "default": "fix libtorch som fp16 error in the inference pipeline"
-    },
-    {
-      "id": "assistErrorQuery",
-      "type": "promptString",
-      "description": "Claude Assist: error text to activate error-vector lane (leave blank to skip)",
-      "default": ""
-    },
-    {
-      "id": "lgResearchQuery",
-      "type": "promptString",
-      "description": "LangGraph concurrent research question",
-      "default": "How does authentication work and where are the auth guards in the API routes?"
-    },
-    {
-      "id": "tagSearchQuery",
-      "type": "promptString",
-      "description": "Tag name to search in Qdrant (e.g., api-route, database, rag-pipeline)",
-      "default": "rag-pipeline"
-    },
-    {
-      "id": "codeIntelSmokeQuery",
-      "type": "promptString",
-      "description": "CodeIntel semantic search smoke query",
-      "default": "authentication session middleware guard"
-    },
-    {
-      "id": "codeIntelWikiTopic",
-      "type": "promptString",
-      "description": "Topic for CodeIntel wiki generation",
-      "default": "evidence upload pipeline and OCR fallback"
-    },
-    {
-      "id": "codeIntelFixError",
-      "type": "promptString",
-      "description": "Error message or stack trace for fix recommender smoke test",
-      "default": "Type 'string | undefined' is not assignable to type 'string'"
-    },
-    {
-      "id": "codeIntelAgentQuery",
-      "type": "promptString",
-      "description": "Query for the Gemma4 multi-step tool loop agent",
-      "default": "Which file handles RabbitMQ queue initialization and what queues does it declare?"
-    },
-    {
-      "id": "devAuthCookie",
-      "type": "promptString",
-      "description": "Session cookie for dev server auth (paste from browser DevTools → Application → Cookies). Leave empty if DEV_BYPASS_AUTH=true is set.",
-      "default": ""
-    },
-    {
-      "id": "turboQuantQuery",
-      "type": "promptString",
-      "description": "TurboQuant agentic query — sent to llama-server on :8090 using the stable q8_0 KV cache path",
-      "default": "Summarize the key legal principles around hearsay evidence and chain of custody"
-    },
-    {
-      "id": "vlmTextPrompt",
-      "type": "promptString",
-      "description": "VLM text prompt for TurboQuant vision+text inference (pair with an image)",
-      "default": "Describe this legal document and identify any key entities or dates"
-    },
-    {
-      "id": "webSearchQuery",
-      "type": "promptString",
-      "description": "Web search / TurboVec query — routed through Gemma4 agent tool loop + research corpus",
-      "default": "Latest SvelteKit 2 performance optimizations and Svelte 5 runes best practices"
-    },
-    {
-      "id": "gemma4Prompt",
-      "type": "promptString",
-      "description": "Your question or instruction for Gemma4 (TurboQuant :8090 or dev server agent)",
-      "default": "Explain the hearsay rule and its exceptions under the Federal Rules of Evidence"
-    },
-    {
-      "id": "a2aQuery",
-      "type": "promptString",
-      "description": "A2A Task query — sent as an Agent2Agent Task envelope to /api/ai/agent",
-      "default": "What is hearsay evidence and what are its main exceptions?"
-    },
-    {
-      "id": "gemma4System",
-      "type": "promptString",
-      "description": "System prompt for Gemma4 (leave blank for legal AI default)",
-      "default": "You are a legal AI assistant specializing in case law, evidence rules, and document analysis."
-    },
-    {
-      "id": "gemma4MaxTokens",
-      "type": "promptString",
-      "description": "Max tokens for Gemma4 response (default 1024, use 256 for quick answers)",
-      "default": "1024"
-    },
-    {
-      "id": "gemma4Temp",
-      "type": "promptString",
-      "description": "Temperature for Gemma4 (0.1=deterministic, 0.7=creative, default 0.3)",
-      "default": "0.3"
-    },
-    {
-      "id": "gemma4Pipeline",
-      "type": "pickString",
-      "description": "Agent pipeline for Gemma4 tool loop",
-      "options": [
-        "ace",
-        "rag",
-        "kag",
-        "dag"
-      ],
-      "default": "ace"
-    },
-    {
-      "id": "hgCollection",
-      "type": "pickString",
-      "description": "Qdrant collection for hypergraph build/tag",
-      "options": [
-        "evidence_items",
-        "codebase_chunks_768",
-        "legal_documents",
-        "legal_cases",
-        "chat_messages",
-        "embedding_cache"
-      ],
-      "default": "evidence_items"
-    },
-    {
-      "id": "hgClusters",
-      "type": "promptString",
-      "description": "Number of k-means clusters for the hypergraph build (e.g. 50, 100, 200)",
-      "default": "100"
-    },
-    {
-      "id": "rgAtlasQuery",
-      "type": "promptString",
-      "description": "RG-Atlas Search Query (Regex for stage 1, NL for semantic stages)",
-      "default": "UploadZone"
-    },
-    {
-      "id": "hermesQuery",
-      "type": "promptString",
-      "description": "Hermes query (natural language — sent to plan→execute→synth pipeline)",
-      "default": "What retrieval tools are healthy and what cluster summaries are available?"
-    },
-    {
-      "id": "hermesAceMode",
-      "type": "pickString",
-      "description": "ACE mode for the Hermes run",
-      "options": ["search", "debug", "repair", "analyze"],
-      "default": "search"
-    },
-    {
-      "id": "devSessionCookie",
-      "type": "promptString",
-      "description": "Session cookie for auth (copy 'auth_session=<value>' from browser DevTools → Application → Cookies)",
-      "default": "auth_session="
-    },
-    {
-      "id": "hyperragQuery",
-      "type": "promptString",
-      "description": "HyperRAG dense search query — TurboVec ANN prefilter -> Qdrant multi-lane -> Bifrost inference stream -> RRF -> CouchDB wiki enrichment",
-      "default": "context assembler retrieval kag pipeline"
-    },
-    {
-      "id": "messyRoutingQuery",
-      "type": "promptString",
-      "description": "Messy query text for the Phase 18 routing evaluation",
-      "default": "explain the TurboVec ANN + HyperRAG fallback for a mixed query involving Neo4j, Redis, and CHR97"
-    }
-  ],
-  "tasks": [
     {
       "label": "🤖 ACP Subagent: Semantic Diff (P8) + LangExtract Batch",
       "type": "shell",
@@ -11446,7 +11739,7 @@
     {
       "label": "🚀 Phase 85 P6: Summary Generation (Startup Dry-Run)",
       "type": "shell",
-      "command": "npm run atlas:p6:rebuild:summaries:dry",
+      "command": "npm run atlas:p6:rebuild:summaries:dry -- --limit=25",
       "options": {
         "cwd": "${workspaceFolder}/sveltekit-frontend"
       },
@@ -11463,7 +11756,7 @@
         "showReuseMessage": false,
         "clear": false
       },
-      "detail": "Phase 85 P6: Dry-run Gemma4 summary generation. Verifies context for 25 codebase chunks (configurable --limit=N). Requires Gemma4 llama-server (:8090) online. Zero writes."
+      "detail": "Phase 85 P6: bounded dry-run Gemma4 summary generation over 25 codebase chunks. Requires Gemma4 llama-server (:8090), Ollama embeddinggemma, and Qdrant online. Zero writes."
     },
     {
       "label": "🚀 Phase 85 P8: Semantic Diff Analyzer (Startup Dry-Run)",

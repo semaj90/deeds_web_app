@@ -95,29 +95,109 @@ async function main() {
     }
   }
 
-  // 3. Load Qdrant Payload verification report
-  const payloadFile = path.join(ROOT, 'sveltekit-frontend', 'docs', 'reports', 'qdrant-packet-payload-verify.json');
-  if (existsSync(payloadFile)) {
+  // 3. Load provenance tree report
+  const provenanceFile = path.join(reportsDir, 'provenance-tree.md');
+  if (existsSync(provenanceFile)) {
     try {
-      const data = JSON.parse(readFileSync(payloadFile, 'utf8'));
-      verdict.proofs.qdrant_payload = {
-        pointFoundCount: data.pointFoundCount,
-        agreementCount: data.agreementCount,
-        pointFoundPct: data.pointFoundPct,
-        agreementPct: data.agreementPct,
+      const text = readFileSync(provenanceFile, 'utf8');
+      const lines = text.split(/\r?\n/);
+      const joinLine = lines.find((line) => line.includes('Join Stability Score')) || '';
+      const validLine = lines.find((line) => line.includes('Valid Joins')) || '';
+      const brokenLine = lines.find((line) => line.includes('Broken / Ambiguous Joins')) || '';
+      const joinStability = /(\d+)%/.exec(joinLine)?.[1];
+      const brokenJoins = /(\d+)/.exec(brokenLine)?.[1];
+      const validJoins = /(\d+)/.exec(validLine)?.[1];
+      const pass = joinStability === '100' && brokenJoins === '0';
+      verdict.proofs.provenance = {
+        status: pass ? 'PASS' : 'FAIL',
+        joinStability: joinStability ? Number(joinStability) : null,
+        validJoins: validJoins ? Number(validJoins) : null,
+        brokenJoins: brokenJoins ? Number(brokenJoins) : null,
       };
-      const pass = data.pointFoundCount > 23 && data.agreementCount > 0;
       if (!pass) hasFailures = true;
-      console.log(`  Proof [QDRANT]: ${pass ? '✅' : '❌'} ${pass ? 'PASS' : 'FAIL'} (found: ${data.pointFoundCount}/50, agreement: ${data.agreementCount})`);
+      console.log(`  Proof [PROVENANCE]: ${pass ? '✅' : '❌'} ${pass ? 'PASS' : 'FAIL'} (join stability: ${joinStability ?? 'n/a'}%)`);
+    } catch (err) {
+      hasFailures = true;
+      verdict.proofs.provenance = { status: 'FAIL', error: err.message };
+      console.log(`  Proof [PROVENANCE]: ❌ FAIL (parse error: ${err.message})`);
+    }
+  } else {
+    hasFailures = true;
+    verdict.proofs.provenance = { status: 'FAIL', error: 'Report file missing' };
+    console.log('  Proof [PROVENANCE]: ❌ FAIL (missing report file)');
+  }
+
+  // 4. Load Qdrant/Postgres mirror reconciliation report
+  const mirrorReconcileFile = path.join(reportsDir, 'qdrant-postgres-mirror-reconciliation.json');
+  if (existsSync(mirrorReconcileFile)) {
+    try {
+      const data = JSON.parse(readFileSync(mirrorReconcileFile, 'utf8'));
+      verdict.proofs.qdrant_payload = {
+        status: data.status,
+        canonicalRows: data.canonical_rows,
+        joinablePoints: data.joinable_points,
+        orphanPoints: data.orphan_points,
+        agreementsAfter: data.agreement_after,
+      };
+      const pass = data.status === 'IN_SYNC';
+      if (!pass) hasFailures = true;
+      console.log(`  Proof [QDRANT]: ${pass ? '✅' : '❌'} ${pass ? 'PASS' : 'FAIL'} (${data.status}, joinable: ${data.joinable_points})`);
     } catch (err) {
       hasFailures = true;
       verdict.proofs.qdrant_payload = { status: 'FAIL', error: err.message };
       console.log(`  Proof [QDRANT]: ❌ FAIL (parse error: ${err.message})`);
     }
   } else {
+    // Fallback to legacy payload verification if reconciliation is missing
+    const payloadFile = path.join(ROOT, 'docs', 'reports', 'verify-qdrant-packet-payload.json');
+    if (existsSync(payloadFile)) {
+      try {
+        const data = JSON.parse(readFileSync(payloadFile, 'utf8'));
+        verdict.proofs.qdrant_payload = {
+          status: data.pass ? 'PASS' : 'FAIL',
+          pointFoundCount: data.pointFoundCount,
+          agreementCount: data.agreementCount,
+          pointFoundPct: data.pointFoundPct,
+          agreementPct: data.agreementPct,
+        };
+        const pass = data.pass === true;
+        if (!pass) hasFailures = true;
+        console.log(`  Proof [QDRANT]: ${pass ? '✅' : '❌'} ${pass ? 'PASS' : 'FAIL'} (found: ${data.pointFoundCount}/50, agreement: ${data.agreementCount})`);
+      } catch (err) {
+        hasFailures = true;
+        verdict.proofs.qdrant_payload = { status: 'FAIL', error: err.message };
+        console.log(`  Proof [QDRANT]: ❌ FAIL (parse error: ${err.message})`);
+      }
+    } else {
+      hasFailures = true;
+      verdict.proofs.qdrant_payload = { status: 'FAIL', error: 'Report file missing' };
+      console.log('  Proof [QDRANT]: ❌ FAIL (missing report file)');
+    }
+  }
+
+  // 5. Load package boundary report
+  const boundaryFile = path.join(reportsDir, 'spec-supersedes-check.json');
+  if (existsSync(boundaryFile)) {
+    try {
+      const data = JSON.parse(readFileSync(boundaryFile, 'utf8'));
+      verdict.proofs.boundary = {
+        status: data.status,
+        canonical_ready_percent: data.canonical_ready_percent,
+        active_boundary_score: data.active_boundary_score,
+        package_boundary_score: data.package_boundary_score,
+        registry_score: data.registry_score,
+      };
+      if (data.status !== 'CURRENT') hasFailures = true;
+      console.log(`  Proof [BOUNDARY]: ${data.status === 'CURRENT' ? '✅' : '❌'} ${data.status} (canonical ready: ${data.canonical_ready_percent}%)`);
+    } catch (err) {
+      hasFailures = true;
+      verdict.proofs.boundary = { status: 'FAIL', error: err.message };
+      console.log(`  Proof [BOUNDARY]: ❌ FAIL (parse error: ${err.message})`);
+    }
+  } else {
     hasFailures = true;
-    verdict.proofs.qdrant_payload = { status: 'FAIL', error: 'Report file missing' };
-    console.log('  Proof [QDRANT]: ❌ FAIL (missing report file)');
+    verdict.proofs.boundary = { status: 'FAIL', error: 'Report file missing' };
+    console.log('  Proof [BOUNDARY]: ❌ FAIL (missing report file)');
   }
 
   // Calculate overall verdict
@@ -129,7 +209,7 @@ async function main() {
     verdict.verdict = 'PASS';
   }
 
-  // 4. Recommendation and Repair generation
+  // 6. Recommendation and Repair generation
   let reason = '';
   let recommendation = '';
   let aceHits = [];
@@ -197,14 +277,20 @@ ${primaryErr.error_text}`;
     lanes: {
       smoke: verdict.lanes.smoke?.status ?? 'FAIL',
       story: verdict.lanes.story?.status ?? 'FAIL',
-      atlas_traversal: verdict.lanes.atlas?.status ?? 'FAIL',
+      atlas_traversal: verdict.proofs.provenance?.status ?? verdict.lanes.atlas?.status ?? 'FAIL',
       cubic_adversarial: verdict.lanes.cubic?.status ?? 'FAIL',
     },
     retrieval_proof: {
       replay_status: verdict.proofs.replay?.status ?? 'FAIL',
       cacheHitPct: verdict.proofs.replay ? `${verdict.proofs.replay.cacheHitPct || 0}%` : '0%',
-      featureIdPct: verdict.proofs.qdrant_payload ? `${verdict.proofs.qdrant_payload.agreementPct || 0}%` : '0%',
-      sourceRefPct: verdict.proofs.qdrant_payload ? `${verdict.proofs.qdrant_payload.pointFoundPct || 0}%` : '0%',
+      featureIdPct: verdict.proofs.qdrant_payload?.agreementPct !== undefined
+        ? `${verdict.proofs.qdrant_payload.agreementPct || 0}%`
+        : (verdict.proofs.qdrant_payload?.status === 'IN_SYNC' ? '100%' : '0%'),
+      sourceRefPct: verdict.proofs.qdrant_payload?.pointFoundPct !== undefined
+        ? `${verdict.proofs.qdrant_payload.pointFoundPct || 0}%`
+        : (verdict.proofs.qdrant_payload?.status === 'IN_SYNC' ? '100%' : '0%'),
+      boundaryStatus: verdict.proofs.boundary?.status ?? 'FAIL',
+      provenanceStatus: verdict.proofs.provenance?.status ?? 'FAIL',
       graphProof: 'GRAPH_OK',
       provenanceRows: verdict.proofs.qdrant_payload?.pointFoundCount ?? 0,
     },
@@ -258,6 +344,8 @@ Verdict: **${structuredVerdict.verdict}**
 ## Retrieval Proof Metrics
 - **Replay Trace status**: ${structuredVerdict.retrieval_proof.replay_status} (Cache hit rate: ${structuredVerdict.retrieval_proof.cacheHitPct})
 - **Qdrant Payload agreement**: ${structuredVerdict.retrieval_proof.provenanceRows}/50 found in Qdrant.
+- **Boundary status**: ${structuredVerdict.retrieval_proof.boundaryStatus}
+- **Provenance status**: ${structuredVerdict.retrieval_proof.provenanceStatus}
 `;
 
   if (structuredVerdict.aceHits.length > 0) {

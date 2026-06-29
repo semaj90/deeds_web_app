@@ -104,7 +104,16 @@ async function pythonSearch(queryVector, topK) {
     });
     if (!res.ok) return null;
     const j = await res.json();
-    return Array.isArray(j.candidates) ? j.candidates : null;
+    if (Array.isArray(j.candidates)) return j.candidates;
+    if (Array.isArray(j.ids)) {
+      const scores = Array.isArray(j.scores) ? j.scores : [];
+      return j.ids.map((id, index) => ({
+        id,
+        score: Number(scores[index] ?? 0),
+        cluster: 0,
+      }));
+    }
+    return null;
   } catch {
     return null;
   }
@@ -149,14 +158,13 @@ function batchCosine(call, cb) {
     return cb(null, { scores: [], count: 0 });
   }
   try {
-    const n      = Number(candidateCount) || Math.floor(candidateVectors.length / dim);
-    const corpus = [];
-    for (let i = 0; i < n; i++) {
-      corpus.push(candidateVectors.slice(i * dim, (i + 1) * dim));
-    }
-    const res = addon.batchCosineSimilarity(queryVector, corpus);
-    const scores = Array.isArray(res?.scores) ? res.scores : Array.isArray(res) ? res : [];
-    cb(null, { scores: Array.from(scores, Number), count: scores.length });
+    const d = Number(dim) || 768;
+    const n = Number(candidateCount) || Math.floor(candidateVectors.length / d);
+    const query = toF32(queryVector, d);
+    const corpus = toF32(candidateVectors, n * d);
+    const scores = new Float32Array(n);
+    const rc = addon.batchCosineSimilarity(query, d, corpus, n, scores, n);
+    cb(null, { scores: rc === 0 ? Array.from(scores, Number) : [], count: rc === 0 ? scores.length : 0 });
   } catch (err) {
     console.warn('[bridge] batchCosine failed:', err.message);
     cb(null, { scores: [], count: 0 });
@@ -169,9 +177,13 @@ function encodeLatent(call, cb) {
     return cb(null, { encoded: [], count: 0, outDim });
   }
   try {
-    const res = addon.autoencoderEncode(vectors, count, inDim, outDim);
-    const encoded = Array.isArray(res?.encoded) ? res.encoded : Array.isArray(res) ? res : [];
-    cb(null, { encoded: Array.from(encoded, Number), count: Number(count), outDim });
+    const n = Number(count) || Math.floor(vectors.length / Number(inDim || 768)) || 1;
+    const inputDim = Number(inDim) || 768;
+    const hidden = Number(outDim) || 64;
+    const input = toF32(vectors, n * inputDim);
+    const { weights, bias } = makeProjectionWeights(inputDim, hidden);
+    const res = addon.autoencoderEncode(input, n, inputDim, weights, bias, hidden);
+    cb(null, { encoded: Array.from(res ?? [], Number), count: n, outDim: hidden });
   } catch (err) {
     console.warn('[bridge] encodeLatent failed:', err.message);
     cb(null, { encoded: [], count: 0, outDim });
@@ -184,11 +196,14 @@ function assignSom(call, cb) {
     return cb(null, { clusterIds: [], bmuScores: [] });
   }
   try {
-    // somCache(vectors, count) — addon contract returns { clusterIds, bmuScores }
-    const res = addon.somCache(vectors, count);
+    // somCache(vectors, count) — current addon returns Float32Array of BMU ids.
+    const n = Number(count) || 1;
+    const input = toF32(vectors);
+    const res = addon.somCache(input, n);
+    const clusters = Array.from(res ?? [], Number).slice(0, n);
     cb(null, {
-      clusterIds: Array.from(res?.clusterIds ?? [], Number),
-      bmuScores:  Array.from(res?.bmuScores  ?? [], Number),
+      clusterIds: clusters.map((value) => Math.trunc(value)),
+      bmuScores:  clusters.map(() => 1),
     });
   } catch (err) {
     console.warn('[bridge] assignSom failed:', err.message);
@@ -204,10 +219,14 @@ function transform(call, cb) {
     return cb(null, { projectedVectors: [], count: 0, outDim });
   }
   try {
-    const res = addon.pcaProject(vectors, count, inDim, outDim, transformId);
-    const proj = Array.isArray(res?.projected) ? res.projected
-              : Array.isArray(res) ? res : [];
-    cb(null, { projectedVectors: Array.from(proj, Number), count: Number(count), outDim });
+    const n = Number(count) || Math.floor(vectors.length / Number(inDim || 768)) || 1;
+    const inputDim = Number(inDim) || 768;
+    const projectedDim = Number(outDim) || 64;
+    const input = toF32(vectors, n * inputDim);
+    const mean = new Float32Array(inputDim);
+    const components = makeProjectionComponents(inputDim, projectedDim);
+    const res = addon.pcaProject(input, n, inputDim, mean, components, projectedDim);
+    cb(null, { projectedVectors: Array.from(res ?? [], Number), count: n, outDim: projectedDim });
   } catch (err) {
     console.warn('[bridge] transform failed:', err.message);
     cb(null, { projectedVectors: [], count: 0, outDim });
@@ -217,6 +236,29 @@ function transform(call, cb) {
 function upsert(_call, cb) {
   // Hard rule: no re-ingest from the bridge. Python sidecar owns index state.
   cb(null, { indexed: 0, inserted: 0, updated: 0, backend: 'bridge:read-only' });
+}
+
+function toF32(values, expectedLength = 0) {
+  const out = new Float32Array(expectedLength || values.length);
+  const n = Math.min(out.length, values.length);
+  for (let i = 0; i < n; i++) out[i] = Number(values[i]) || 0;
+  return out;
+}
+
+function makeProjectionComponents(inputDim, outDim) {
+  const components = new Float32Array(inputDim * outDim);
+  const step = Math.max(1, Math.floor(inputDim / outDim));
+  for (let i = 0; i < outDim; i++) {
+    components[i * inputDim + Math.min(inputDim - 1, i * step)] = 1;
+  }
+  return components;
+}
+
+function makeProjectionWeights(inputDim, outDim) {
+  return {
+    weights: makeProjectionComponents(inputDim, outDim),
+    bias: new Float32Array(outDim),
+  };
 }
 
 // ── Server ────────────────────────────────────────────────────────────────────

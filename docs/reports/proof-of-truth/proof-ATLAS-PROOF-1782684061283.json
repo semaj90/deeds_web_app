@@ -1,0 +1,48 @@
+{
+  "story_id": "ATLAS-PROOF-1782684061283",
+  "timestamp": "2026-06-28T22:01:02.351Z",
+  "duration_ms": 974,
+  "dry_run": false,
+  "lanes": [
+    {
+      "lane": "authority",
+      "status": "SKIP",
+      "error": "graphify:authority failed with code 1: npm error Missing script: \"graphify:authority\"\nnpm error\nnpm error Did you mean one of these?\nnpm error   npm run graphify:audit # run the \"graphify:audit\" package script\nnpm error   npm run graphify:audit:dry # run the \"graphify:audit:dry\" package script\nnpm error   npm run graphify:audit:health # run the \"graphify:audit:health\" package script\nnpm error\nnpm error To see a list of scripts, run:\nnpm error   npm run\nnpm error A complete log of this run can be found in: C:\\Users\\james\\AppData\\Local\\npm-cache\\_logs\\2026-06-28T22_01_01_697Z-debug-0.log\n",
+      "verdict": "SKIP"
+    },
+    {
+      "lane": "karpathy_gpu",
+      "status": "SKIP",
+      "error": "karpathy:gpu failed with code 1: npm error Missing script: \"karpathy:gpu\"\nnpm error\nnpm error To see a list of scripts, run:\nnpm error   npm run\nnpm error A complete log of this run can be found in: C:\\Users\\james\\AppData\\Local\\npm-cache\\_logs\\2026-06-28T22_01_02_183Z-debug-0.log\n",
+      "verdict": "SKIP"
+    },
+    {
+      "lane": "ace_context",
+      "status": "PASS",
+      "story_id": "ATLAS-PROOF-1782684061283-ACE",
+      "timestamp": "2026-06-28T22:01:02.350Z",
+      "note": "ACE context assembly wired to read Karpathy scores at Stage A0.5",
+      "verdict": "PASS"
+    },
+    {
+      "lane": "integration",
+      "status": "PASS",
+      "story_id": "ATLAS-PROOF-1782684061283-INTEGRATION",
+      "timestamp": "2026-06-28T22:01:02.350Z",
+      "verdict": "PASS"
+    }
+  ],
+  "verdict": {
+    "by_lane": {
+      "replay": "UNKNOWN",
+      "cache": "UNKNOWN",
+      "live_app": "UNKNOWN",
+      "cubic": "UNKNOWN"
+    },
+    "pass_count": 0,
+    "fail_count": 0,
+    "pending_count": 0,
+    "overall": "UNKNOWN"
+  },
+  "can_promote": false
+}

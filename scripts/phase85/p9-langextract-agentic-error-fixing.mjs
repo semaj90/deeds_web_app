@@ -34,8 +34,9 @@ const dryRun = args.includes('--dry-run');
 const verbose = args.includes('--verbose');
 const apply = args.includes('--apply');
 const featureFilter = args.find(a => a.startsWith('--feature='))?.split('=')[1];
-const batchSize = parseInt(args.find(a => a.startsWith('--batch='))?.split('=')[1] || '50');
-const maxSamples = parseInt(args.find(a => a.startsWith('--limit='))?.split('=')[1] || '100');
+const batchSize = parseInt(args.find(a => a.startsWith('--batch='))?.split('=')[1] || '50', 10);
+const limitArg = args.find(a => a.startsWith('--limit='))?.split('=')[1];
+const maxSamples = parseInt(limitArg || '100', 10);
 
 // Paths
 const LANGEXTRACT_BRIDGE = path.resolve(__root, 'scripts/langextract/langextract-gemma4-bridge.py');
@@ -43,13 +44,14 @@ const TMP_DIR = path.resolve(__root, '.tmp');
 const REPORT_PATH = path.resolve(TMP_DIR, 'p9-langextract-agentic-results.json');
 const GEMMA4_URL = process.env.LLAMA_SERVER_URL || 'http://127.0.0.1:8090';
 
-// Initialize Postgres pool
+// Initialize Postgres pool with aggressive cache invalidation
 const pool = new pg.Pool({
   host: process.env.PGHOST || 'localhost',
   port: process.env.PGPORT || 5434,
   user: process.env.PGUSER || 'legal_admin',
   password: process.env.PGPASSWORD || '123456',
   database: process.env.PGDATABASE || 'legal_ai_db',
+  statement_cache_size: 0, // Disable prepared statement caching to avoid schema cache issues
 });
 
 if (!fs.existsSync(TMP_DIR)) {
@@ -65,17 +67,23 @@ if (featureFilter) console.log(`Feature filter: ${featureFilter}\n`);
 // ── STAGE 1: Load evidence and feature summaries ────────────────────────
 
 async function loadEvidenceForExtraction(limit = maxSamples) {
-  // Query embedded_summaries for sample evidence
+  // STEP 1: Load evidence with canonical metadata from atlas_packets (canonical source)
   const query = `
     SELECT
-      'summary-' || es.id::text as packet_key,
-      'feature-unknown' as feature_id,
-      'Unknown Feature' as feature_label,
-      COALESCE(es.summary_text, '') as summary,
-      COALESCE(es.tags::text, '') as key_entities
-    FROM embedded_summaries es
-    WHERE es.summary_text IS NOT NULL AND es.summary_text != ''
-    ORDER BY es.created_at DESC
+      COALESCE(ap.packet_key, 'packet-' || ap.packet_id::text) as packet_key,
+      COALESCE(ap.source_ref, 'unknown') as source_ref,
+      COALESCE(ap.feature_id, 'feature-unknown') as feature_id,
+      COALESCE(ap.feature_label, 'Unknown Feature') as feature_label,
+      COALESCE((ap.metadata->>'domain_class'), 'general') as domain_class,
+      COALESCE((ap.metadata->'ontology_tags')::text, '[]')::jsonb as ontology_tags,
+      COALESCE(CAST((ap.metadata->>'domain_confidence') AS FLOAT), 0.0) as domain_confidence,
+      COALESCE(CAST((ap.metadata->>'som_cluster') AS INTEGER), 0) as som_cluster,
+      COALESCE(ap.community_id::text, 'unknown') as community_id,
+      COALESCE(ap.summary, '') as summary,
+      COALESCE(array_to_string(ap.tags, ', '), '') as key_entities
+    FROM atlas_packets ap
+    WHERE ap.summary IS NOT NULL AND ap.summary != ''
+    ORDER BY ap.packet_id DESC
     LIMIT $1
   `;
 
@@ -100,7 +108,14 @@ async function extractPoliciesAndEntities(evidence) {
 
   for (let i = 0; i < evidence.length; i++) {
     const item = evidence[i];
-    const text = `${item.summary || ''}\n${item.key_entities || ''}`.trim();
+
+    // STEP 2: Build enriched prompt with domain context (ontology_tags, domain_class)
+    const ontologyTags = Array.isArray(item.ontology_tags) ? item.ontology_tags : [];
+    const domainContextPrompt = item.domain_class && item.domain_class !== 'general'
+      ? `\n[DOMAIN CONTEXT]\nDomain: ${item.domain_class}\nOntology Tags: ${ontologyTags.join(', ')}\nThis helps guide entity and policy classification.\n`
+      : '';
+
+    const text = `${domainContextPrompt}${item.summary || ''}\n${item.key_entities || ''}`.trim();
 
     if (text.length < 10) {
       if (verbose) console.log(`   ⊘ Skipped ${item.packet_key} (insufficient text)`);
@@ -136,8 +151,14 @@ async function extractPoliciesAndEntities(evidence) {
               const result = JSON.parse(line);
               extractions.push({
                 packet_key: item.packet_key,
+                source_ref: item.source_ref,
                 feature_id: item.feature_id,
                 feature_label: item.feature_label,
+                domain_class: item.domain_class,
+                ontology_tags: item.ontology_tags,
+                domain_confidence: item.domain_confidence,
+                som_cluster: item.som_cluster,
+                community_id: item.community_id,
                 extraction: result,
                 confidence: calculateExtractionConfidence(result),
                 timestamp: new Date().toISOString(),
@@ -421,34 +442,64 @@ async function storeResults(extractions, connections, gaps, patterns, recommenda
     try {
       console.log('\n📝 Storing extraction records in database...');
 
+      let stored = 0;
       for (const extraction of extractions.slice(0, batchSize)) {
-        const query = `
-          INSERT INTO atlas_artifacts (
-            packet_key,
-            artifact_type,
-            generator,
-            generator_version,
-            storage_backend,
-            status,
-            created_at
-          )
-          VALUES ($1, $2, $3, $4, $5, $6, NOW())
-          ON CONFLICT DO NOTHING
-        `;
+        try {
+          // STEP 3: Store results with enriched metadata (domain_class, ontology_tags)
+          const metadata = {
+            source_ref: extraction.source_ref,
+            feature_id: extraction.feature_id,
+            domain_class: extraction.domain_class,
+            ontology_tags: extraction.ontology_tags,
+            domain_confidence: extraction.domain_confidence,
+            som_cluster: extraction.som_cluster,
+            community_id: extraction.community_id,
+          };
 
-        await pool.query(query, [
-          extraction.packet_key,
-          'langextract_policy_extraction',
-          'langextract-gemma4-bridge',
-          'p9-v1.0',
-          'postgres_jsonb',
-          extraction.confidence > 0.7 ? 'valid' : 'review_needed',
-        ]);
+          const query = `
+            INSERT INTO public.atlas_artifacts (
+              artifact_id,
+              packet_key,
+              source_ref,
+              artifact_type,
+              generator,
+              generator_version,
+              storage_backend,
+              metadata,
+              status
+            )
+            VALUES (gen_random_uuid(), $1, $2, $3, $4, $5, $6, $7::jsonb, $8)
+          `;
+
+          await pool.query(query, [
+            extraction.packet_key,
+            extraction.source_ref || 'unknown',
+            'langextract_policy_extraction',
+            'langextract-gemma4-bridge',
+            'p9-v1.1-canonical-enriched',
+            'postgres_jsonb',
+            JSON.stringify(metadata),
+            extraction.confidence > 0.7 ? 'valid' : 'review_needed',
+          ]);
+          stored++;
+        } catch (insertErr) {
+          if (insertErr.code === '23505') { // Unique violation
+            if (verbose) console.log(`   ⓘ Skipped duplicate: ${extraction.packet_key}`);
+          } else {
+            throw insertErr;
+          }
+        }
       }
 
-      console.log(`   ✅ Stored ${Math.min(batchSize, extractions.length)} extraction records`);
+      console.log(`   ✅ Stored ${stored}/${Math.min(batchSize, extractions.length)} extraction records`);
     } catch (err) {
       console.error(`   ❌ Storage failed: ${err.message}`);
+      if (verbose) {
+        console.error(`      Full error: ${err.toString()}`);
+        console.error(`      Code: ${err.code}`);
+        console.error(`      Position: ${err.position}`);
+        console.error(`      Severity: ${err.severity}`);
+      }
     }
   }
 

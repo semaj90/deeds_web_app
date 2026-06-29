@@ -16,6 +16,101 @@ See `Parent Atlas Frozen Identity Contract` section in root CLAUDE.md for P0–P
 
 ---
 
+## 🔐 Schema Mismatch: atlas_* Tables (June 28, 2026)
+
+**Issue**: Materialization scripts reference tables that don't exist:
+- ❌ `atlas_higher_hop_index` (missing)
+- ❌ `atlas_codebase_packets` (missing)
+- ❌ `atlas_feature_packets` (missing)
+- ✅ `atlas_packets` (exists, 58,304 rows)
+- ✅ `atlas_packet_registry` (exists)
+- ✅ `atlas_summary_layers` (exists)
+- ✅ `atlas_semantic_diffs` (exists)
+
+**Fix**: Update `TABLE_CANDIDATES` in `materialize-addressable-packets.mjs` to use tables that actually exist. This is a P1/P2 schema completion task.
+
+---
+
+## 🔐 Valkey/Redis Connection Pattern (ioredis)
+
+**Stack**: Valkey (AGPL-free Redis drop-in) on port 6379 with password `redis` (from `.env`).
+
+**ioredis client initialization** (correct pattern for all Node.js scripts):
+
+```typescript
+import Redis from 'ioredis';
+
+const redis = new Redis({
+  host: process.env.REDIS_HOST || 'localhost',      // 127.0.0.1
+  port: parseInt(process.env.REDIS_PORT || '6379'), // 6379
+  password: process.env.REDIS_PASSWORD || 'redis',  // From .env: REDIS_PASSWORD=redis
+  lazyConnect: true,      // Don't auto-connect
+  enableOfflineQueue: false,
+  retryStrategy: () => null
+});
+
+await redis.connect();
+// ... use redis ...
+await redis.quit();
+```
+
+**Hard rules**:
+- ✅ Extract host/port/password from `.env` separately (don't parse REDIS_URL string)
+- ✅ Use `lazyConnect: true` + explicit `await redis.connect()` before first operation
+- ✅ Set `enableOfflineQueue: false` to catch connection errors immediately
+- ✅ Set `retryStrategy: () => null` to fail fast (no retry loop spam)
+- ✅ Always check `redis.isOpen` before `await redis.quit()`
+- ❌ Never use Node's `redis` package (v4+ ESM issues) — use `ioredis` only
+- ❌ Never hardcode `redis://` URLs — Docker exec may change host
+
+**Valkey vs Redis**: Functionally identical. Valkey is AGPL-free drop-in. Password is always `redis` (set in docker-compose.yml).
+
+---
+
+## 🔐 Data Persistence + Retrieval Contract (Session 89 Corrected)
+
+**Verified Architecture (June 28, 2026)**:
+- **Postgres**: 58,304 packets (identity/metadata) + 40,754 chunks with embeddings
+- **Qdrant**: 40,568 points (mirrors codebase_chunk_index, not atlas_packets)
+- **Valkey**: Partial cache (125 keys warmed, full warming pending) — password: `redis`
+- **Neo4j**: Topology mirror (status pending verification)
+
+**Core Rule**: Postgres pgvector is canonical truth. Qdrant/Valkey/Neo4j are rebuildable mirrors.
+
+**Key Finding**: Schema is split:
+- `atlas_packets.embedding` → vector(768), ALL NULL (deprecated, ignore)
+- `codebase_chunk_index.content_embedding` → vector(384), 99.5% populated (use this)
+- Qdrant mirror size (40.5K) matches chunk_index populated (expected, not a gap)
+
+**Recovery Order**:
+1. Verify Docker volumes mounted (never assume safety)
+2. Verify Postgres counts (identity + chunks)
+3. Verify Qdrant collection counts
+4. Audit embedding dimensions (Ollama, Postgres, Qdrant must agree on 384)
+5. Rebuild Qdrant from codebase_chunk_index if needed
+6. Rebuild Neo4j topology if needed
+7. Warm Redis/Bifrost from canonical sources
+8. Regenerate missing summaries (40.5K+ in codebase_chunk_index)
+9. Run final recovery gate (count validation + sanity checks)
+
+**Dimension Policy** (PROJECT CANONICAL):
+- PROJECT_CANONICAL_EMBED_DIM = 384 (project choice, not model universal)
+- codebase_chunk_index.content_embedding = vector(384)
+- Qdrant vectors = 384-dim
+- Hard stop: no mixing 384 + 768 in same operation
+- Hard stop: no AE 64-dim for search
+
+**Status Language** (Use only):
+- CREATED (file exists)
+- WIRED (ready for dry-run)
+- DRY_RUN_PROVEN (dry-run passes)
+- APPLY_PROVEN (apply + verification pass)
+- NOT_PROVEN (blocked)
+
+Never claim "production-ready" from dry-run evidence.
+
+---
+
 ## Current Diagnostics Regression Checkpoint
 
 - Run `npm run test:diagnostics` from `sveltekit-frontend` after diagnostics-related changes.

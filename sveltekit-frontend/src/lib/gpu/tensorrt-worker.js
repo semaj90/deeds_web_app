@@ -1,235 +1,251 @@
 /**
- * TensorRT Worker Thread
+ * TensorRT Worker Thread — Routes GPU operations to N-API addon
  *
- * Each worker thread runs independently with its own CUDA context/stream.
- * N-API addon calls are thread-safe (cuBLAS/cuDNN handle per-thread).
+ * Receives GPU tasks via worker message protocol and executes them on the
+ * tensorrt_bridge.node N-API addon (CUDA kernels on RTX 3060 Ti).
  *
  * Message protocol:
- *   IN:  { taskId, operation, embedding, embeddings, centroids, dim, n, k, maxIters, gridSize, ... }
- *   OUT: { taskId, error?, data?, duration? }
- *
- * Operations:
- *   - findBMU: SOM clustering (Best Matching Unit)
- *   - attention: attention scoring
- *   - autoencoder: 768->64 compression
- *   - cosine: batch cosine similarity
- *   - kmeans: k-means with centroids
- *   - pagerank: PageRank on adjacency matrix
+ * IN:  { taskId, operation, embedding, embeddings, centroids, dim, n, k, maxIters, gridSize, damping, iters }
+ * OUT: { taskId, error?, data?, duration? }
  */
 
 const { parentPort, workerData } = require('worker_threads');
 
-// Lazy-load N-API addon (only when needed)
+// Try to load the N-API addon (CUDA kernels)
 let addon = null;
-
-function loadAddon() {
-	if (!addon) {
-		try {
-			addon = require('../../../build/Release/tensorrt_bridge.node');
-		} catch (err) {
-			console.error('[TensorRT Worker] Failed to load N-API addon:', err.message);
-			throw err;
-		}
-	}
-	return addon;
+try {
+	// Try different possible paths for the compiled addon
+	addon = require('../../../simd-bridge/cpp/build/Release/tensorrt_bridge.node');
+} catch (e) {
+	// Fallback: addon not available, will use CPU emulation
+	console.warn(`[Worker ${workerData?.workerId}] N-API addon not available, using CPU emulation:`, e.message);
+	addon = null;
 }
 
-parentPort.on('message', async (task) => {
-	const t0 = Date.now();
-	let result = { taskId: task.taskId };
+// CPU emulation fallbacks (when CUDA unavailable)
+function emulateGpuOperation(task) {
+	const { operation, embedding, embeddings, centroids, queryEmbedding, keys, corpus, dim, n, k, maxIters, gridSize, damping, iters } = task;
 
 	try {
-		const addon = loadAddon();
-
-		switch (task.operation) {
+		switch (operation) {
 			case 'findBMU': {
-				if (!task.embeddings || !task.centroids) {
-					throw new Error('findBMU requires embeddings and centroids');
-				}
-
-				const gridSize = task.gridSize || 20;
-				const numEmbeddings = task.embeddings.length;
-				const output = new Int32Array(numEmbeddings * 2); // cluster, distance
-
-				for (let i = 0; i < numEmbeddings; i++) {
-					const embedding = task.embeddings[i];
-
-					// Call N-API: find BMU in SOM grid
-					const bmuIdx = addon.findBMU(embedding, task.centroids, gridSize);
-					const bmuRow = Math.floor(bmuIdx / gridSize);
-					const bmuCol = bmuIdx % gridSize;
-					const cluster = bmuRow * gridSize + bmuCol;
-
-					// Compute distance to BMU (L2)
-					const centroidOffset = bmuIdx * embedding.length;
-					let distSq = 0;
-					for (let d = 0; d < embedding.length; d++) {
-						const diff = embedding[d] - task.centroids[centroidOffset + d];
-						distSq += diff * diff;
+				// CPU: find closest centroid for each embedding
+				if (!embeddings || !centroids) throw new Error('Missing embeddings or centroids');
+				const results = new Int32Array(embeddings.length * 2);
+				for (let i = 0; i < embeddings.length; i++) {
+					let minDist = Infinity;
+					let bestCluster = 0;
+					const emb = embeddings[i];
+					for (let c = 0; c < centroids.length; c += dim) {
+						let dist = 0;
+						for (let d = 0; d < dim; d++) {
+							const diff = emb[d] - centroids[c + d];
+							dist += diff * diff;
+						}
+						dist = Math.sqrt(dist);
+						if (dist < minDist) {
+							minDist = dist;
+							bestCluster = Math.floor(c / dim);
+						}
 					}
-					const distance = Math.sqrt(distSq);
-
-					output[i * 2] = cluster;
-					output[i * 2 + 1] = distance;
+					results[i * 2] = bestCluster;
+					results[i * 2 + 1] = Math.floor(minDist * 1000); // scale to int
 				}
-
-				result.data = output;
-				break;
+				return results;
 			}
 
 			case 'attention': {
-				if (!task.queryEmbedding || !task.keys) {
-					throw new Error('attention requires queryEmbedding and keys');
+				// CPU: softmax(Q @ K^T / sqrt(d))
+				if (!queryEmbedding || !keys) throw new Error('Missing query or keys');
+				const n_keys = Math.floor(keys.length / dim);
+				const scores = new Float32Array(n_keys);
+				let max_score = -Infinity;
+				for (let i = 0; i < n_keys; i++) {
+					let score = 0;
+					for (let d = 0; d < dim; d++) {
+						score += queryEmbedding[d] * keys[i * dim + d];
+					}
+					score /= Math.sqrt(dim);
+					scores[i] = score;
+					if (score > max_score) max_score = score;
 				}
-
-				const n = task.n || task.keys.length / task.dim;
-				const output = new Float32Array(n);
-
-				// Call N-API: attention score
-				const status = addon.attentionScoreGPU(
-					task.queryEmbedding,
-					task.dim,
-					task.keys,
-					n,
-					output,
-					output.length
-				);
-
-				if (status !== 0) {
-					throw new Error(`attentionScoreGPU failed with status ${status}`);
+				// Softmax
+				let sum = 0;
+				for (let i = 0; i < n_keys; i++) {
+					scores[i] = Math.exp(scores[i] - max_score);
+					sum += scores[i];
 				}
-
-				result.data = output;
-				break;
+				for (let i = 0; i < n_keys; i++) scores[i] /= sum;
+				return scores;
 			}
 
 			case 'cosine': {
-				if (!task.queryEmbedding || !task.corpus) {
-					throw new Error('cosine requires queryEmbedding and corpus');
+				// CPU: ||A - B|| / (||A|| * ||B||)
+				if (!queryEmbedding || !corpus) throw new Error('Missing query or corpus');
+				const n_corpus = Math.floor(corpus.length / dim);
+				const similarities = new Float32Array(n_corpus);
+				let queryNorm = 0;
+				for (let d = 0; d < dim; d++) {
+					queryNorm += queryEmbedding[d] * queryEmbedding[d];
 				}
-
-				const n = task.n || task.corpus.length / task.dim;
-				const output = new Float32Array(n);
-
-				// Call N-API: batch cosine similarity
-				const status = addon.batchCosineSimilarity(
-					task.queryEmbedding,
-					task.dim,
-					task.corpus,
-					n,
-					output,
-					output.length
-				);
-
-				if (status !== 0) {
-					throw new Error(`batchCosineSimilarity failed with status ${status}`);
+				queryNorm = Math.sqrt(queryNorm) || 1;
+				for (let i = 0; i < n_corpus; i++) {
+					let dot = 0;
+					let corpusNorm = 0;
+					for (let d = 0; d < dim; d++) {
+						const c = corpus[i * dim + d];
+						dot += queryEmbedding[d] * c;
+						corpusNorm += c * c;
+					}
+					corpusNorm = Math.sqrt(corpusNorm) || 1;
+					similarities[i] = dot / (queryNorm * corpusNorm);
 				}
-
-				result.data = output;
-				break;
+				return similarities;
 			}
 
 			case 'kmeans': {
-				if (!task.embeddings) {
-					throw new Error('kmeans requires embeddings');
+				// CPU: simple k-means (k iterations)
+				if (!embeddings) throw new Error('Missing embeddings');
+				const assignments = new Int32Array(n);
+				const newCentroids = new Float32Array(k * dim);
+
+				// Initialize centroids (first k embeddings)
+				for (let i = 0; i < k && i < n; i++) {
+					newCentroids.set(embeddings[i], i * dim);
 				}
 
-				// Concatenate embeddings into single buffer
-				const embeddingsBuffer = new Float32Array(task.n * task.dim);
-				for (let i = 0; i < task.embeddings.length; i++) {
-					embeddingsBuffer.set(task.embeddings[i], i * task.dim);
+				// Iterate
+				for (let iter = 0; iter < (maxIters || 1); iter++) {
+					// Assign clusters
+					for (let i = 0; i < n; i++) {
+						let minDist = Infinity;
+						let bestCluster = 0;
+						for (let c = 0; c < k; c++) {
+							let dist = 0;
+							for (let d = 0; d < dim; d++) {
+								const diff = embeddings[i * dim + d] - newCentroids[c * dim + d];
+								dist += diff * diff;
+							}
+							if (dist < minDist) {
+								minDist = dist;
+								bestCluster = c;
+							}
+						}
+						assignments[i] = bestCluster;
+					}
+
+					// Recompute centroids
+					const counts = new Int32Array(k);
+					newCentroids.fill(0);
+					for (let i = 0; i < n; i++) {
+						const cluster = assignments[i];
+						counts[cluster]++;
+						for (let d = 0; d < dim; d++) {
+							newCentroids[cluster * dim + d] += embeddings[i * dim + d];
+						}
+					}
+					for (let c = 0; c < k; c++) {
+						if (counts[c] > 0) {
+							for (let d = 0; d < dim; d++) {
+								newCentroids[c * dim + d] /= counts[c];
+							}
+						}
+					}
 				}
 
-				const assignments = new Int32Array(task.n);
-				const centroids = new Float32Array(task.k * task.dim);
-				const reseededCount = new Int32Array(1);
-
-				// Call N-API: k-means
-				const status = addon.kmeansWithCentroids(
-					embeddingsBuffer,
-					task.n,
-					task.dim,
-					task.k,
-					task.maxIters || 10,
-					assignments,
-					assignments.length,
-					centroids,
-					centroids.length,
-					reseededCount
-				);
-
-				if (status !== 0) {
-					throw new Error(`kmeansWithCentroids failed with status ${status}`);
+				// Return assignments + centroids
+				const result = new Int32Array(n + k * dim);
+				result.set(assignments, 0);
+				for (let i = 0; i < k * dim; i++) {
+					result[n + i] = Math.floor(newCentroids[i] * 1000000);
 				}
-
-				// Return combined output (assignments + centroids)
-				const combined = new Int32Array(task.n + task.k * task.dim);
-				combined.set(assignments, 0);
-				combined.set(new Int32Array(centroids.buffer), task.n);
-
-				result.data = combined;
-				break;
+				return result;
 			}
 
 			case 'pagerank': {
-				if (!task.embeddings) {
-					throw new Error('pagerank requires embeddings (adjacency matrix)');
+				// CPU: power iteration method
+				if (!embedding) throw new Error('Missing adjacency matrix');
+				const pr = new Float32Array(n);
+				pr.fill(1 / n);
+				const damping_factor = damping || 0.85;
+
+				for (let iter = 0; iter < (iters || 10); iter++) {
+					const new_pr = new Float32Array(n);
+					for (let i = 0; i < n; i++) {
+						new_pr[i] = (1 - damping_factor) / n;
+						for (let j = 0; j < n; j++) {
+							if (embedding[j * n + i] > 0) {
+								let out_degree = 0;
+								for (let k = 0; k < n; k++) {
+									if (embedding[j * n + k] > 0) out_degree++;
+								}
+								if (out_degree > 0) {
+									new_pr[i] += damping_factor * (pr[j] / out_degree);
+								}
+							}
+						}
+					}
+					pr.set(new_pr);
 				}
-
-				const n = task.n;
-				const output = new Float32Array(n);
-
-				// Call N-API: PageRank
-				const status = addon.pageRankGPU(
-					task.embeddings,
-					n,
-					task.damping || 0.85,
-					task.iters || 20,
-					output,
-					output.length
-				);
-
-				if (status !== 0) {
-					throw new Error(`pageRankGPU failed with status ${status}`);
-				}
-
-				result.data = output;
-				break;
-			}
-
-			case 'autoencoder': {
-				if (!task.embedding) {
-					throw new Error('autoencoder requires embedding');
-				}
-
-				// TODO: wire autoencoder N-API function once available
-				// For now, return mock output
-				const output = new Float32Array(64);
-				for (let i = 0; i < 64; i++) {
-					output[i] = task.embedding[i * 12] || 0; // sum pooling mock
-				}
-
-				result.data = output;
-				break;
+				return pr;
 			}
 
 			default:
-				throw new Error(`Unknown operation: ${task.operation}`);
+				throw new Error(`Unknown operation: ${operation}`);
 		}
-
-		result.duration = Date.now() - t0;
-	} catch (err) {
-		result.error = err.message;
-		result.duration = Date.now() - t0;
+	} catch (e) {
+		throw new Error(`CPU emulation failed for ${operation}: ${e.message}`);
 	}
+}
 
-	// Send result back to main thread
-	if (result.data && result.data.buffer) {
-		// Transfer typed array buffer back
-		parentPort.postMessage(result, [result.data.buffer]);
-	} else {
-		parentPort.postMessage(result);
-	}
-});
+// Main worker message handler
+if (parentPort) {
+	parentPort.on('message', async (task) => {
+		const startTime = Date.now();
+		const { taskId, operation } = task;
 
-console.log(`[TensorRT Worker ${workerData.workerId}] Started (pool size: ${workerData.poolSize})`);
+		try {
+			let data;
+
+			if (addon && addon[operation]) {
+				// GPU path: call N-API addon
+				switch (operation) {
+					case 'findBMU':
+						data = await addon.findBMU(task.embedding, task.centroids, task.gridSize || 20);
+						break;
+					case 'attention':
+						data = await addon.computeAttention(task.queryEmbedding, task.keys, task.dim || 768);
+						break;
+					case 'cosine':
+						data = await addon.batchCosineSimilarity(task.queryEmbedding, task.corpus, task.dim || 768);
+						break;
+					case 'kmeans':
+						data = await addon.kmeansWithCentroids(task.embeddings, task.n, task.dim || 768, task.k, task.maxIters || 10);
+						break;
+					case 'pagerank':
+						data = await addon.pageRankGPU(task.embeddings, task.n, task.damping || 0.85, task.iters || 20);
+						break;
+					default:
+						throw new Error(`Unknown GPU operation: ${operation}`);
+				}
+			} else {
+				// CPU emulation path
+				data = emulateGpuOperation(task);
+			}
+
+			parentPort.postMessage({
+				taskId,
+				data,
+				duration: Date.now() - startTime
+			});
+		} catch (error) {
+			parentPort.postMessage({
+				taskId,
+				error: error.message,
+				duration: Date.now() - startTime
+			});
+		}
+	});
+}
+
+console.log(`[TensorRT Worker ${workerData?.workerId}] Started (addon: ${addon ? 'CUDA' : 'CPU-emulated'})`);

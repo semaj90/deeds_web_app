@@ -1,0 +1,42 @@
+{
+  "generated_at": "2026-06-28T23:57:32.204Z",
+  "mode": "apply",
+  "limit": null,
+  "path_prefixes": [],
+  "source_count": 313,
+  "output_ndjson": ".tmp/gemma4-summary-packets.ndjson",
+  "summary_coverage_pct": 100,
+  "sample": [
+    {
+      "packet_key": "packet:c9ecd962690c",
+      "source_ref": "claude-mem/src/server/queue/BullMqObservationQueueEngine.ts",
+      "feature_id": "claude-mem.BullMqObservationQueueEngine",
+      "summary_length": 64
+    },
+    {
+      "packet_key": "packet:b69b77028c43",
+      "source_ref": "claude-mem/src/server/middleware/request-id.ts",
+      "feature_id": "claude-mem.request-id",
+      "summary_length": 90
+    },
+    {
+      "packet_key": "packet:e935f44e35ee",
+      "source_ref": "claude-mem/src/server/middleware/postgres-auth.ts",
+      "feature_id": "claude-mem.postgres-auth",
+      "summary_length": 86
+    },
+    {
+      "packet_key": "packet:a24422bb843f",
+      "source_ref": "claude-mem/src/server/middleware/auth.ts",
+      "feature_id": "claude-mem.auth",
+      "summary_length": 73
+    },
+    {
+      "packet_key": "packet:281f8e905bc7",
+      "source_ref": "claude-mem/src/server/mcp/tools.ts",
+      "feature_id": "claude-mem.tools",
+      "summary_length": 71
+    }
+  ],
+  "note": "This export is a handoff stream for chrom97 / Rust JSON parsing and downstream cache warmers. It does not replace atlas_packets or atlas_summary_layers."
+}

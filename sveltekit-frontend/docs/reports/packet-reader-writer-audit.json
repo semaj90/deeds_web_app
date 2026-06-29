@@ -1,52 +1,52 @@
 {
-  "generatedAt": "2026-06-18T21:27:12.560Z",
+  "generatedAt": "2026-06-28T23:20:27.621Z",
   "applyMode": true,
-  "totalRows": 29145,
+  "totalRows": 58304,
   "tableStats": [
     {
       "table": "atlas_packets",
+      "rows": 58304,
+      "addressableRows": 58304
+    },
+    {
+      "table": "nes_chrom_packets",
       "rows": 0,
       "addressableRows": 0
     },
     {
-      "table": "nes_chrom_packets",
-      "rows": 14911,
-      "addressableRows": 14911
-    },
-    {
       "table": "atlas_feature_packets",
-      "rows": 14234,
-      "addressableRows": 14234
+      "rows": 0,
+      "addressableRows": 0
     }
   ],
   "byTable": {
     "atlas_packets": {
       "table": "atlas_packets",
-      "rows": 0,
-      "addressableRows": 0
+      "rows": 58304,
+      "addressableRows": 58304
     },
     "nes_chrom_packets": {
       "table": "nes_chrom_packets",
-      "rows": 14911,
-      "addressableRows": 14911
+      "rows": 0,
+      "addressableRows": 0
     },
     "atlas_feature_packets": {
       "table": "atlas_feature_packets",
-      "rows": 14234,
-      "addressableRows": 14234
+      "rows": 0,
+      "addressableRows": 0
     }
   },
   "coverage": {
-    "packet_key": 29145,
-    "source_ref": 29145,
-    "feature_id": 29145,
-    "feature_label": 29145,
-    "permissions": 29145,
-    "metadata": 29145,
-    "topology": 29145,
-    "vectors": 29145,
-    "qdrant_point_id": 13101,
-    "som_cluster": 9376
+    "packet_key": 58304,
+    "source_ref": 58304,
+    "feature_id": 58304,
+    "feature_label": 58304,
+    "permissions": 58304,
+    "metadata": 58304,
+    "topology": 58304,
+    "vectors": 58304,
+    "qdrant_point_id": 0,
+    "som_cluster": 0
   },
   "outputFiles": {
     "ndjson": "C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\.tmp\\addressable-packets.ndjson",

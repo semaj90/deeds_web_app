@@ -1,78 +1,8 @@
 {
-  "generatedAt": "2026-06-21T21:07:46.728Z",
+  "generatedAt": "2026-06-29T00:24:09.409Z",
   "mode": "apply",
   "nextSafeAction": "Re-run the mirror in dry-run mode if you want to inspect the generated keys, then proceed to Bifrost mirror wiring.",
   "plannedKeys": [
-    {
-      "key": "centroid:1",
-      "kind": "centroid",
-      "rows": 22
-    },
-    {
-      "key": "centroid:10",
-      "kind": "centroid",
-      "rows": 3
-    },
-    {
-      "key": "som:1",
-      "kind": "som",
-      "rows": 17
-    },
-    {
-      "key": "som:cell:1",
-      "kind": "som_cell",
-      "rows": 17
-    },
-    {
-      "key": "som:3",
-      "kind": "som",
-      "rows": 2
-    },
-    {
-      "key": "som:cell:3",
-      "kind": "som_cell",
-      "rows": 2
-    },
-    {
-      "key": "som:58",
-      "kind": "som",
-      "rows": 2
-    },
-    {
-      "key": "som:cell:58",
-      "kind": "som_cell",
-      "rows": 2
-    },
-    {
-      "key": "som:9",
-      "kind": "som",
-      "rows": 2
-    },
-    {
-      "key": "som:cell:9",
-      "kind": "som_cell",
-      "rows": 2
-    },
-    {
-      "key": "som:96",
-      "kind": "som",
-      "rows": 1
-    },
-    {
-      "key": "som:cell:96",
-      "kind": "som_cell",
-      "rows": 1
-    },
-    {
-      "key": "som:7",
-      "kind": "som",
-      "rows": 1
-    },
-    {
-      "key": "som:cell:7",
-      "kind": "som_cell",
-      "rows": 1
-    },
     {
       "key": "atlas:centroid:index",
       "kind": "index",
@@ -86,180 +16,28 @@
   },
   "samples": [
     {
-      "key": "centroid:1",
-      "kind": "centroid",
-      "preview": "{\n  \"canonical_source_refs\": [\n    \"sveltekit-frontend/src/lib/client/timeline-client.ts\",\n    \"sveltekit-frontend/src/lib/utils/simd-markdown-parser.ts\",\n    \"…"
-    },
-    {
-      "key": "centroid:10",
-      "kind": "centroid",
-      "preview": "{\n  \"canonical_source_refs\": [\n    \"sveltekit-frontend/src/auth-store.svelte.ts\",\n    \"sveltekit-frontend/src/mcp-gpu-orchestrator.ts\",\n    \"sveltekit-frontend/…"
-    },
-    {
-      "key": "som:1",
-      "kind": "som",
-      "preview": "{\n  \"canonical_source_refs\": [\n    \"sveltekit-frontend/src/lib/client/timeline-client.ts\",\n    \"sveltekit-frontend/src/routes/(app)/citations/+page.svelte\",\n   …"
-    },
-    {
-      "key": "som:cell:1",
-      "kind": "som_cell",
-      "preview": "{\n  \"canonical_source_refs\": [\n    \"sveltekit-frontend/src/lib/client/timeline-client.ts\",\n    \"sveltekit-frontend/src/routes/(app)/citations/+page.svelte\",\n   …"
-    },
-    {
-      "key": "som:3",
-      "kind": "som",
-      "preview": "{\n  \"canonical_source_refs\": [\n    \"sveltekit-frontend/src/auth-store.svelte.ts\",\n    \"sveltekit-frontend/src/routes/api/graphify/stream/+server.ts\"\n  ],\n  \"chu…"
-    },
-    {
-      "key": "som:cell:3",
-      "kind": "som_cell",
-      "preview": "{\n  \"canonical_source_refs\": [\n    \"sveltekit-frontend/src/auth-store.svelte.ts\",\n    \"sveltekit-frontend/src/routes/api/graphify/stream/+server.ts\"\n  ],\n  \"chu…"
-    },
-    {
-      "key": "som:58",
-      "kind": "som",
-      "preview": "{\n  \"canonical_source_refs\": [\n    \"sveltekit-frontend/src/routes/api/rabbitmq/health/+server.ts\",\n    \"sveltekit-frontend/src/routes/api/research/ldr-status/+s…"
-    },
-    {
-      "key": "som:cell:58",
-      "kind": "som_cell",
-      "preview": "{\n  \"canonical_source_refs\": [\n    \"sveltekit-frontend/src/routes/api/rabbitmq/health/+server.ts\",\n    \"sveltekit-frontend/src/routes/api/research/ldr-status/+s…"
-    },
-    {
-      "key": "som:9",
-      "kind": "som",
-      "preview": "{\n  \"canonical_source_refs\": [\n    \"sveltekit-frontend/src/lib/utils/simd-markdown-parser.ts\",\n    \"sveltekit-frontend/src/lib/utils/ui-recon.ts\"\n  ],\n  \"chunk_…"
-    },
-    {
-      "key": "som:cell:9",
-      "kind": "som_cell",
-      "preview": "{\n  \"canonical_source_refs\": [\n    \"sveltekit-frontend/src/lib/utils/simd-markdown-parser.ts\",\n    \"sveltekit-frontend/src/lib/utils/ui-recon.ts\"\n  ],\n  \"chunk_…"
+      "key": "atlas:centroid:index",
+      "kind": "index",
+      "preview": "{\n  \"centroid_keys\": [],\n  \"community_count\": 0,\n  \"generated_at\": \"2026-06-29T00:24:09.407Z\",\n  \"qdrant_backed_rows\": 0,\n  \"som_count\": 0,\n  \"som_keys\": [],\n  …"
     }
   ],
   "source": {
-    "rowsRead": 25,
+    "rowsRead": 0,
     "table": "atlas_higher_hop_index"
   },
   "status": "PASS",
   "summary": {
-    "appliedWrites": 15,
-    "communityBuckets": 2,
+    "appliedWrites": 1,
+    "communityBuckets": 0,
     "failures": 0,
-    "plannedWrites": 15,
-    "qdrantBackedRows": 25,
+    "plannedWrites": 1,
+    "qdrantBackedRows": 0,
     "sampleKeys": [
-      "centroid:1",
-      "centroid:10",
-      "som:1",
-      "som:cell:1",
-      "som:3",
-      "som:cell:3",
-      "som:58",
-      "som:cell:58",
-      "som:9",
-      "som:cell:9"
+      "atlas:centroid:index"
     ],
-    "somBuckets": 6
+    "somBuckets": 0
   },
   "writes": [
-    {
-      "key": "centroid:1",
-      "kind": "centroid",
-      "ok": true,
-      "status": 0,
-      "stderr": "Warning: Using a password with '-a' or '-u' option on the command line interface may not be safe."
-    },
-    {
-      "key": "centroid:10",
-      "kind": "centroid",
-      "ok": true,
-      "status": 0,
-      "stderr": "Warning: Using a password with '-a' or '-u' option on the command line interface may not be safe."
-    },
-    {
-      "key": "som:1",
-      "kind": "som",
-      "ok": true,
-      "status": 0,
-      "stderr": "Warning: Using a password with '-a' or '-u' option on the command line interface may not be safe."
-    },
-    {
-      "key": "som:cell:1",
-      "kind": "som_cell",
-      "ok": true,
-      "status": 0,
-      "stderr": "Warning: Using a password with '-a' or '-u' option on the command line interface may not be safe."
-    },
-    {
-      "key": "som:3",
-      "kind": "som",
-      "ok": true,
-      "status": 0,
-      "stderr": "Warning: Using a password with '-a' or '-u' option on the command line interface may not be safe."
-    },
-    {
-      "key": "som:cell:3",
-      "kind": "som_cell",
-      "ok": true,
-      "status": 0,
-      "stderr": "Warning: Using a password with '-a' or '-u' option on the command line interface may not be safe."
-    },
-    {
-      "key": "som:58",
-      "kind": "som",
-      "ok": true,
-      "status": 0,
-      "stderr": "Warning: Using a password with '-a' or '-u' option on the command line interface may not be safe."
-    },
-    {
-      "key": "som:cell:58",
-      "kind": "som_cell",
-      "ok": true,
-      "status": 0,
-      "stderr": "Warning: Using a password with '-a' or '-u' option on the command line interface may not be safe."
-    },
-    {
-      "key": "som:9",
-      "kind": "som",
-      "ok": true,
-      "status": 0,
-      "stderr": "Warning: Using a password with '-a' or '-u' option on the command line interface may not be safe."
-    },
-    {
-      "key": "som:cell:9",
-      "kind": "som_cell",
-      "ok": true,
-      "status": 0,
-      "stderr": "Warning: Using a password with '-a' or '-u' option on the command line interface may not be safe."
-    },
-    {
-      "key": "som:96",
-      "kind": "som",
-      "ok": true,
-      "status": 0,
-      "stderr": "Warning: Using a password with '-a' or '-u' option on the command line interface may not be safe."
-    },
-    {
-      "key": "som:cell:96",
-      "kind": "som_cell",
-      "ok": true,
-      "status": 0,
-      "stderr": "Warning: Using a password with '-a' or '-u' option on the command line interface may not be safe."
-    },
-    {
-      "key": "som:7",
-      "kind": "som",
-      "ok": true,
-      "status": 0,
-      "stderr": "Warning: Using a password with '-a' or '-u' option on the command line interface may not be safe."
-    },
-    {
-      "key": "som:cell:7",
-      "kind": "som_cell",
-      "ok": true,
-      "status": 0,
-      "stderr": "Warning: Using a password with '-a' or '-u' option on the command line interface may not be safe."
-    },
     {
       "key": "atlas:centroid:index",
       "kind": "index",

@@ -236,40 +236,41 @@ async function backfill() {
           packetKey: packet.packet_key,
           nodeType: 'chunk',
         });
-        const createChunkNode = !chunkNodeId;
-        if (!chunkNodeId) {
-          chunkNodeId = randomUUID();
-        }
-        const chunkMetadata = {
-          source: packetLedger.tableName,
-          packet_key: packet.packet_key,
-          feature_id: packet.feature_id,
-          backfill: 'tree-nodes-v1',
-        };
+      const createChunkNode = !chunkNodeId;
+      if (!chunkNodeId) {
+        chunkNodeId = randomUUID();
+      }
+      const chunkMetadata = {
+        source: packetLedger.tableName,
+        packet_key: packet.packet_key,
+        feature_id: packet.feature_id,
+        backfill: 'tree-nodes-v1',
+      };
+      const contentPreview = packet.summary ? packet.summary.substring(0, 500) : null;
 
-        try {
-          if (!args.dryRun && createChunkNode) {
-            await client.query(
-              `INSERT INTO atlas_tree_nodes
+      try {
+        if (!args.dryRun && createChunkNode) {
+          await client.query(
+            `INSERT INTO atlas_tree_nodes
                 (node_id, packet_key, root_id, parent_id, source_ref, file_path, page_index_path, node_type, tree_depth, title, summary, content_preview, feature_id, metadata, ledger_type, lineage_version)
               VALUES
                 ($12, $1, $2, $3, $4, $5, $6, 'chunk', 1, $7, $8, $9, $10, $11, 'canonical', 'tree-nodes-v1')
               ON CONFLICT DO NOTHING`,
-              [
-                packet.packet_key,
+            [
+              packet.packet_key,
                 rootNodeId,
                 rootNodeId,
                 sourceRef,
                 filePath,
-                chunkPageIndexPath,
-                packet.feature_label || packet.packet_key,
-                packet.summary || null,
-                packet.summary ? packet.summary.substring(0, 500) : null,
-                packet.feature_id,
-                JSON.stringify(chunkMetadata),
-                chunkNodeId,
-              ]
-            );
+              chunkPageIndexPath,
+              packet.feature_label || packet.packet_key,
+              packet.summary || null,
+              contentPreview,
+              packet.feature_id,
+              JSON.stringify(chunkMetadata),
+              chunkNodeId,
+            ]
+          );
             stats.chunksCreated++;
           } else if (!createChunkNode) {
             stats.chunksReused++;

@@ -1,0 +1,64 @@
+{
+  "generated_at": "2026-06-29T03:24:34.040Z",
+  "status": "PASS",
+  "tables": {
+    "atlas_packets": {
+      "exists": true,
+      "rows": 58304
+    },
+    "atlas_summary_layers": {
+      "exists": true,
+      "rows": 336
+    }
+  },
+  "coverage": {
+    "atlas_packets_metadata_pct": 100,
+    "atlas_packets_topology_pct": 0,
+    "atlas_packets_vectors_pct": 0,
+    "atlas_summary_layers_metadata_pct": 100
+  },
+  "proof": {
+    "summary_rows": true,
+    "summary_metadata": true,
+    "packet_jsonb": true
+  },
+  "sample": {
+    "atlas_packets": {
+      "packet_key": "packet:0dd1afcfef4b",
+      "source_ref": "sveltekit-frontend/scratch/synthesis-runs/2026-05-10T00-10-13/lane3-rerank.json",
+      "feature_id": "sveltekit-frontend.lane3-rerank",
+      "metadata": {
+        "identity": {
+          "source": "filesystem",
+          "version": 1,
+          "created_at": "2026-06-28T08:36:36.711Z",
+          "created_by": "phase-d:whole-codebase-scan"
+        },
+        "workspace": {
+          "domain": "codebase",
+          "universe": "atlas",
+          "text_safe": true,
+          "size_bytes": 409
+        }
+      },
+      "topology": {},
+      "vectors": {}
+    },
+    "atlas_summary_layers": {
+      "packet_key": "packet:24abbee99423",
+      "summary_level": "file",
+      "summary_text": "Advancement in AI development moving beyond traditional RAG systems.",
+      "metadata": {
+        "model": "gemma4-legal-iq4xs-direct.gguf",
+        "source": "gemma4-parent-atlas-summaries",
+        "status": "generated",
+        "backend": "llama-server",
+        "cache_mode": "miss",
+        "feature_id": "6_11_26_mem",
+        "source_ref": "6_11_26_mem.txt",
+        "generated_at": "2026-06-28T16:28:46.689Z",
+        "summary_packet_key": "sum:7860d19ce89f1dbe"
+      }
+    }
+  }
+}

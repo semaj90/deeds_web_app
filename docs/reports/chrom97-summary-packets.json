@@ -1,0 +1,43 @@
+{
+  "generated_at": "2026-06-28T23:57:31.734Z",
+  "mode": "apply",
+  "input_ndjson": ".tmp/gemma4-summary-packets.ndjson",
+  "output_ndjson": ".tmp/chrom97-summary-packets.ndjson",
+  "input_rows": 191,
+  "selected_rows": 191,
+  "written_rows": 191,
+  "packet_type": "chrom97",
+  "sample": [
+    {
+      "packet_key": "packet:240807f63a7b",
+      "source_ref": "scripts/atlas/agentic-toolgan-execute.mjs",
+      "feature_id": "scripts.agentic-toolgan-execute",
+      "summary_length": 425
+    },
+    {
+      "packet_key": "packet:feca30d5a01d",
+      "source_ref": "scripts/atlas/agentic-toolgan-dedupe.mjs",
+      "feature_id": "scripts.agentic-toolgan-dedupe",
+      "summary_length": 439
+    },
+    {
+      "packet_key": "packet:992783ee4901",
+      "source_ref": "scripts/atlas/agentic-recommendation-workflow.mjs",
+      "feature_id": "scripts.agentic-recommendation-workflow",
+      "summary_length": 529
+    },
+    {
+      "packet_key": "packet:74019514f123",
+      "source_ref": "scripts/atlas/add-atlas-packets-columns.mjs",
+      "feature_id": "scripts.add-atlas-packets-columns",
+      "summary_length": 452
+    },
+    {
+      "packet_key": "packet:2f9cc583862b",
+      "source_ref": "scripts/atlas/adaptive-schema-recommendations.mjs",
+      "feature_id": "scripts.adaptive-schema-recommendations",
+      "summary_length": 497
+    }
+  ],
+  "note": "chrom97 packets are derived from Gemma4 summary export and preserve canonical packet identity for downstream BitFrost, Qdrant, and multihop search lanes."
+}

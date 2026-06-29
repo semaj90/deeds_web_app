@@ -9,7 +9,16 @@
  */
 import { ENV } from '$lib/server/env.server.js';
 import { buildGrpcClientChannelOptions } from './client-options.js';
-import { emitTelemetry } from '$lib/server/telemetry/gpu-telemetry.js';
+
+// Lazy telemetry: import dynamically to allow graceful fallback if module unavailable
+async function tryEmitTelemetry(event: any): Promise<void> {
+  try {
+    const { emitTelemetry } = await import('$lib/server/telemetry/gpu-telemetry.js');
+    await emitTelemetry(event);
+  } catch {
+    // Telemetry unavailable; continue without it (non-critical)
+  }
+}
 
 // ── Public types ──────────────────────────────────────────────────────────────
 
@@ -156,20 +165,18 @@ export async function turbovecGrpcSearch(
   const telemetryStart = Date.now();
   const client = await getClient();
   if (!client) {
-    try {
-      await emitTelemetry({
-        kernel_name: 'turbovecSearch',
-        gpu_backend: 'cpu_fallback',
-        operation: 'ann_search',
-        candidate_count: topK,
-        input_dim: queryVector.length,
-        output_dim: topK,
-        fallback_used: true,
-        error_code: 'grpc_client_unavailable',
-        duration_ms: Date.now() - telemetryStart,
-        rpc_transport: 'grpc'
-      });
-    } catch {}
+    await tryEmitTelemetry({
+      kernel_name: 'turbovecSearch',
+      gpu_backend: 'cpu_fallback',
+      operation: 'ann_search',
+      candidate_count: topK,
+      input_dim: queryVector.length,
+      output_dim: topK,
+      fallback_used: true,
+      error_code: 'grpc_client_unavailable',
+      duration_ms: Date.now() - telemetryStart,
+      rpc_transport: 'grpc'
+    });
     return null;
   }
 
@@ -180,20 +187,18 @@ export async function turbovecGrpcSearch(
     2000
   );
 
-  try {
-    await emitTelemetry({
-      kernel_name: 'turbovecSearch',
-      gpu_backend: response ? 'simd' : 'cpu_fallback',
-      operation: 'ann_search',
-      candidate_count: topK,
-      input_dim: queryVector.length,
-      output_dim: response?.candidates.length ?? topK,
-      fallback_used: !response,
-      error_code: response ? undefined : 'grpc_call_failed',
-      duration_ms: Date.now() - telemetryStart,
-      rpc_transport: 'grpc'
-    });
-  } catch {}
+  await tryEmitTelemetry({
+    kernel_name: 'turbovecSearch',
+    gpu_backend: response ? 'simd' : 'cpu_fallback',
+    operation: 'ann_search',
+    candidate_count: topK,
+    input_dim: queryVector.length,
+    output_dim: response?.candidates.length ?? topK,
+    fallback_used: !response,
+    error_code: response ? undefined : 'grpc_call_failed',
+    duration_ms: Date.now() - telemetryStart,
+    rpc_transport: 'grpc'
+  });
 
   return response;
 }
@@ -230,20 +235,18 @@ export async function turbovecGrpcTransform(
   const telemetryStart = Date.now();
   const client = await getClient();
   if (!client) {
-    try {
-      await emitTelemetry({
-        kernel_name: 'turbovecTransform',
-        gpu_backend: 'cpu_fallback',
-        operation: 'orthogonal_transform',
-        candidate_count: count,
-        input_dim: inDim,
-        output_dim: outDim,
-        fallback_used: true,
-        error_code: 'grpc_client_unavailable',
-        duration_ms: Date.now() - telemetryStart,
-        rpc_transport: 'grpc'
-      });
-    } catch {}
+    await tryEmitTelemetry({
+      kernel_name: 'turbovecTransform',
+      gpu_backend: 'cpu_fallback',
+      operation: 'orthogonal_transform',
+      candidate_count: count,
+      input_dim: inDim,
+      output_dim: outDim,
+      fallback_used: true,
+      error_code: 'grpc_client_unavailable',
+      duration_ms: Date.now() - telemetryStart,
+      rpc_transport: 'grpc'
+    });
     return null;
   }
 
@@ -254,20 +257,18 @@ export async function turbovecGrpcTransform(
     5000
   );
 
-  try {
-    await emitTelemetry({
-      kernel_name: 'turbovecTransform',
-      gpu_backend: response ? 'simd' : 'cpu_fallback',
-      operation: 'orthogonal_transform',
-      candidate_count: count,
-      input_dim: inDim,
-      output_dim: outDim,
-      fallback_used: !response,
-      error_code: response ? undefined : 'grpc_call_failed',
-      duration_ms: Date.now() - telemetryStart,
-      rpc_transport: 'grpc'
-    });
-  } catch {}
+  await tryEmitTelemetry({
+    kernel_name: 'turbovecTransform',
+    gpu_backend: response ? 'simd' : 'cpu_fallback',
+    operation: 'orthogonal_transform',
+    candidate_count: count,
+    input_dim: inDim,
+    output_dim: outDim,
+    fallback_used: !response,
+    error_code: response ? undefined : 'grpc_call_failed',
+    duration_ms: Date.now() - telemetryStart,
+    rpc_transport: 'grpc'
+  });
 
   return response;
 }

@@ -213,13 +213,13 @@ export async function getPacketMaterializationStatus(packetKey: string): Promise
   let inQdrant = false;
   try {
     // Use a zero vector for existence check (faster than full embedding generation)
-      const results = await qdrant.search('codebase_chunks_768', {
-        vector: new Array(VECTOR_DIM).fill(0),
-        limit: 1,
-        filter: {
-          must: [
-            {
-              key: 'packet_key',
+    const results = await qdrant.search('codebase_chunks_768', {
+      vector: new Array(VECTOR_DIM).fill(0),
+      limit: 1,
+      filter: {
+        must: [
+          {
+            key: 'packet_key',
             match: { value: packetKey }
           }
         ]

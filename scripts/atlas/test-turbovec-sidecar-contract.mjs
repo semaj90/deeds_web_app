@@ -20,7 +20,7 @@ import { createRequire } from 'node:module';
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = join(__dirname, '../..');
 
-const HTTP_URL = 'http://127.0.0.1:8792';
+const HTTP_URL = process.env.TURBOVEC_SIDECAR_URL ?? 'http://127.0.0.1:8791';
 const GRPC_ADDRESS = '127.0.0.1:50062';
 const PROTO_PATH = join(ROOT, 'proto/active/turbovec_cuda.proto');
 
@@ -282,13 +282,23 @@ async function run() {
 
   try {
     const [grpcRes, httpRes] = await Promise.all([searchPromise, httpSearchPromise]);
+    const httpCandidates = Array.isArray(httpRes.candidates)
+      ? httpRes.candidates
+      : Array.isArray(httpRes.ids)
+        ? httpRes.ids.map((id, index) => ({
+            id,
+            score: Array.isArray(httpRes.scores) ? httpRes.scores[index] : 0,
+            cluster: 0
+          }))
+        : [];
+
     report.details.grpcSearchCandidatesCount = grpcRes.candidates?.length ?? 0;
-    report.details.httpSearchCandidatesCount = httpRes.candidates?.length ?? 0;
+    report.details.httpSearchCandidatesCount = httpCandidates.length;
     report.details.grpcBackend = grpcRes.backend;
     report.details.httpBackend = httpRes.backend;
 
     const grpcIds = (grpcRes.candidates ?? []).map(c => c.id).join(',');
-    const httpIds = (httpRes.candidates ?? []).map(c => c.id).join(',');
+    const httpIds = httpCandidates.map(c => c.id).join(',');
 
     if (grpcIds === httpIds) {
       report.tests.search = true;

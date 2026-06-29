@@ -1,6 +1,6 @@
 {
   "schema": "live_service_env.v1",
-  "generatedAt": "2026-06-19T23:20:17.574Z",
+  "generatedAt": "2026-06-28T23:42:33.328Z",
   "readOnly": true,
   "services": [
     {
@@ -54,7 +54,7 @@
         "port": 8100
       },
       "envDisplay": "127.0.0.1:8100",
-      "probeDisplay": "2ms",
+      "probeDisplay": "1ms",
       "detail": "RETRIEVAL_HTTP_URL=http://127.0.0.1:8100",
       "status": "READY"
     },
@@ -71,14 +71,8 @@
     }
   ],
   "telemetry": {
-    "status": "READY",
-    "totalRows": 308,
-    "recent24hRows": 114,
-    "withSelectedPacketKeys": 308,
-    "withFeatureIds": 308,
-    "withStrategy": 308,
-    "latestAt": "2026-06-19T22:27:09.271Z",
-    "detail": "retrieval_telemetry rows=308, recent24h=114"
+    "status": "SOURCE_UNAVAILABLE",
+    "detail": "relation \"retrieval_telemetry\" does not exist"
   },
   "provenance": {
     "spine": [
@@ -107,6 +101,6 @@
       "AUTH_REQUIRED": 0,
       "SOURCE_UNAVAILABLE": 0
     },
-    "telemetryStatus": "READY"
+    "telemetryStatus": "SOURCE_UNAVAILABLE"
   }
 }

@@ -22,6 +22,7 @@ const __dirname = dirname(__filename);
 dotenv.config({ path: `${__dirname}/../../.env` });
 
 const pool = new pg.Pool({ connectionString: process.env.DATABASE_URL });
+const PACKET_TABLE_CANDIDATES = ['atlas_packets', 'atlas_codebase_packets'];
 
 const log = {
   info: (msg) => console.log(`[phase-16-h-1] ${msg}`),
@@ -163,6 +164,26 @@ async function createIndexes(client) {
 async function backfillIdentitySpine(client) {
   log.progress('Backfilling identity spine from atlas_codebase_packets...');
 
+  const packetTableRes = await client.query(
+    `
+      SELECT table_name
+      FROM information_schema.tables
+      WHERE table_schema = 'public'
+        AND table_name = ANY($1::text[])
+      ORDER BY CASE table_name
+        WHEN 'atlas_packets' THEN 0
+        WHEN 'atlas_codebase_packets' THEN 1
+        ELSE 2
+      END
+      LIMIT 1
+    `,
+    [PACKET_TABLE_CANDIDATES]
+  );
+  if (packetTableRes.rows.length === 0) {
+    throw new Error(`No packet ledger found. Expected one of: ${PACKET_TABLE_CANDIDATES.join(', ')}`);
+  }
+  const packetTable = packetTableRes.rows[0].table_name;
+
   const backfillSQL = `
     INSERT INTO atlas_higher_hop_index (
       packet_key, source_ref, feature_id, file_path, community_id
@@ -173,7 +194,7 @@ async function backfillIdentitySpine(client) {
       p.feature_id,
       p.file_path,
       p.community_id
-    FROM atlas_codebase_packets p
+    FROM ${packetTable} p
     ON CONFLICT (packet_key) DO NOTHING;
   `;
 

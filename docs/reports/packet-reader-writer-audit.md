@@ -1,30 +1,30 @@
 # Packet Reader / Writer Audit
 
-Generated: 2026-06-26T02:02:24.520Z
-Status: DRY_RUN_READY
-Source table: atlas_higher_hop_index
+Generated: 2026-06-28T23:53:18.021Z
+Status: MATERIALIZED
+Source table: atlas_packets
 
 ## Summary
 
-- ledger rows: 3251
-- materialized rows: 3251
-- addressable rows: 3251
-- qdrant-backed rows: 2488
-- qdrant collection rows: 2488
-- bm25 rows: 3251
+- ledger rows: 58304
+- materialized rows: 58304
+- addressable rows: 58304
+- qdrant-backed rows: 0
+- qdrant collection rows: 0
+- bm25 rows: 58304
 - concepts rows: 0
-- embedding ref rows: 3251
-- evidence matches: 2467
+- embedding ref rows: 0
+- evidence matches: 7501
 - missing feature_id: 0
 - missing canonical_source_ref: 0
-- missing qdrant_point_id: 763
-- missing qdrant_collection: 763
+- missing qdrant_point_id: 58304
+- missing qdrant_collection: 58304
 
 ## Packet Kind Counts
 
-- qdrant_chunk: 2454
-- schema_stub: 597
-- mcp_tool_stub: 145
+- qdrant_chunk: 56552
+- schema_stub: 1061
+- mcp_tool_stub: 691
 - legacy_qdrant_only: 0
 - unknown: 0
 
@@ -39,18 +39,18 @@ Source table: atlas_higher_hop_index
 
 - ndjson: .tmp/addressable-packets.ndjson
 - manifest: .tmp/addressable-packets.manifest.json
-- sha256: 19f357d96174e50a9f4bfe1135736c5fda8a057d6a1e9e7dfc2769e676e3bad4
+- sha256: e07266cc33bafc81244eb32a844ae35c0594b676fc1497b79df4421f0a95ca89
 
 ## Samples
 
-- 05dbd8cc7c550bbe | mcp_tool_stub | 895884c03a86a386 | (no qdrant collection)
-- 05f26c6dc1b51a12 | mcp_tool_stub | atlas.search | codebase_chunks_768
-- 08dce8e980d1e261 | mcp_tool_stub | 4a0c3649b58e6c1e | (no qdrant collection)
-- 0e584542cbd3ec1f | mcp_tool_stub | 121b02dff31f995b | (no qdrant collection)
-- 106474ac880329aa | mcp_tool_stub | 931687f31329e048 | (no qdrant collection)
-- 1125b964826d67d7 | mcp_tool_stub | 6a545f1e8ce22358 | (no qdrant collection)
-- 119403f1ca0164b4 | mcp_tool_stub | 5a8f718e6f8c271a | (no qdrant collection)
-- 13039d77318546e0 | mcp_tool_stub | 4521761888863c86 | (no qdrant collection)
+- packet:0003260092b1 | qdrant_chunk | sveltekit-frontend.llm_synthesis_mapping | (no qdrant collection)
+- packet:0003850e84ca | qdrant_chunk | sveltekit-frontend.tests__cases-sub-routes.spec | (no qdrant collection)
+- packet:0003ab694534 | qdrant_chunk | sveltekit-frontend.tests__routes__auto__api__cache__metrics.test | (no qdrant collection)
+- packet:0003dda5e534 | qdrant_chunk | neschrom97.93f973562fff24ed | (no qdrant collection)
+- packet:0004b466d863 | qdrant_chunk | .svelte-error-fixes-backup.+layout | (no qdrant collection)
+- packet:0004f849be72 | qdrant_chunk | sveltekit-frontend.sprint5-6-monitoring.spec | (no qdrant collection)
+- packet:0006ca4a45e3 | qdrant_chunk | sveltekit-frontend.launch-2026-06-25T22-12-53-881Z | (no qdrant collection)
+- packet:0008d535a1f6 | qdrant_chunk | llama-cpp-turboquant-gemma4.completion | (no qdrant collection)
 
 ## Next Safe Action
 

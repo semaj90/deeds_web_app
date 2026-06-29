@@ -1,40 +1,42 @@
 
 # Parent Atlas Verification Agent Summary
 
-Generated: 2026-06-24T13:59:52.343Z
+Generated: 2026-06-28T22:42:07.729Z
 Verdict: **FAIL**
 Reason: **compile blocker**
-Recommendation: **Fix TypeScript compiler error in sveltekit-frontend/src/lib/server/db/schema/agent-memory-registry.ts:4**
+Recommendation: **Fix TypeScript compiler error in sveltekit-frontend/src/lib/server/grpc/turbovec-cuda-client.ts:12**
 
 ## Lane Verdicts
 | Lane | Status | Details / Checks |
 | --- | --- | --- |
 | **Smoke Validation** | FAIL | Scripts registered, Environment checked, Services pinged |
 | **Feature Memory Story** | PASS | Key integration files present, Database schemas verified |
-| **Parent Atlas Traversal** | FAIL | Qdrant point payloads matched, Valkey keys scanned, Neo4j traversals read |
+| **Parent Atlas Traversal** | PASS | Qdrant point payloads matched, Valkey keys scanned, Neo4j traversals read |
 | **Cubic Adversarial Tests** | PASS | Empty parameters, nonexistent filters fallback path checks |
 
 ## Retrieval Proof Metrics
-- **Replay Trace status**: PASS (Cache hit rate: 20%)
-- **Qdrant Payload agreement**: 30/50 found in Qdrant.
+- **Replay Trace status**: PASS (Cache hit rate: 100%)
+- **Qdrant Payload agreement**: 0/50 found in Qdrant.
+- **Boundary status**: CURRENT
+- **Provenance status**: PASS
 
 ## ACE/KAG/DAG hits
-- **ACE Hits**: `sveltekit-frontend/src/lib/server/db/schema/agent-memory-registry.ts`
+- **ACE Hits**: `sveltekit-frontend/src/lib/server/grpc/turbovec-cuda-client.ts`
 - **KAG Hits**: `unknown`
 - **DAG Hits**: None
 
 ## Recommended Files to Fix
-- `sveltekit-frontend/src/lib/server/db/schema/agent-memory-registry.ts`
+- `sveltekit-frontend/src/lib/server/grpc/turbovec-cuda-client.ts`
 
 ## Recommended Verification Commands
 - `npm run check`
 
 ## Repair Prompt
 ```
-TypeScript compile error in sveltekit-frontend/src/lib/server/db/schema/agent-memory-registry.ts:4:
-Argument of type 'string' is not assignable to parameter of type 'PgBigSerialConfig<"number" | "bigint">'.
-export const agentMemoryRegistry = pgTable('agent_memory_registry', {
-id: bigserial('id').primaryKey(),
+TypeScript compile error in sveltekit-frontend/src/lib/server/grpc/turbovec-cuda-client.ts:12:
+Module '"$lib/*"' has no exported member 'emitTelemetry'. Did you mean to use 'import emitTelemetry from "$lib/*"' instead?
+import { buildGrpcClientChannelOptions } from './client-options.js';
+import { emitTelemetry } from '$lib/server/telemetry/gpu-telemetry.js';
 ```
 
 ## OpenCode Skill Contract (Mandatory Addendum)

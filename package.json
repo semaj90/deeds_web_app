@@ -41,6 +41,7 @@
     "verify:verdict": "node scripts/verify/strict-verdict.mjs",
     "verify:full": "npm run verify:smoke && npm run verify:story && npm run verify:atlas && npm run verify:cubic && npm run verify:spec-supersedes && npm run verify:verdict",
     "verify:rpc-gan": "node scripts/verify/rpc-validation-gan.mjs",
+    "verify:summary-storage": "node scripts/verify/summary-storage-proof.mjs",
     "verify:spec-supersedes": "node scripts/verify/spec-supersedes-check.mjs",
     "atlas:error:audit": "node scripts/atlas/audit-error-fixes.mjs",
     "atlas:error:audit:verbose": "node scripts/atlas/audit-error-fixes.mjs --verbose",
@@ -74,6 +75,8 @@
     "atlas:p4:karpathy": "node scripts/atlas/compute-p4-karpathy-blend.mjs",
     "atlas:p4:karpathy:apply": "node scripts/atlas/compute-p4-karpathy-blend.mjs --apply",
     "atlas:p4:proof": "node scripts/atlas/P4-proof-of-truth-orchestrator.mjs",
+    "atlas:phase3:neo4j:rff:dry": "node scripts/atlas/phase3-neo4j-rff-topology.mjs",
+    "atlas:phase3:neo4j:rff:apply": "node scripts/atlas/phase3-neo4j-rff-topology.mjs --apply",
     "verify:nats-smoke": "node scripts/verify/nats-langgraph-worker-smoke.mjs",
     "audit:ports": "node scripts/atlas/audit-port-contracts.mjs",
     "audit:services": "node scripts/atlas/generate-service-contract.mjs",
@@ -267,6 +270,10 @@
     "atlas:summaries:gemma4:500:apply": "node scripts/atlas/gemma4-parent-atlas-summaries.mjs --cache --apply --limit=500 --concurrency=1",
     "atlas:summaries:gemma4:500:cpu:dry": "node scripts/atlas/gemma4-parent-atlas-summaries.mjs --cache --limit=500 --cpu-workers=4 --max-concurrency=4",
     "atlas:summaries:gemma4:500:cpu:apply": "node scripts/atlas/gemma4-parent-atlas-summaries.mjs --cache --apply --limit=500 --cpu-workers=4 --max-concurrency=4",
+    "atlas:summaries:gemma4:export:ndjson": "node scripts/atlas/export-gemma4-summaries-ndjson.mjs --apply",
+    "atlas:summaries:gemma4:export:ndjson:dry": "node scripts/atlas/export-gemma4-summaries-ndjson.mjs",
+    "atlas:summaries:chrom97:materialize": "node scripts/atlas/materialize-gemma4-summary-chrom97.mjs --apply",
+    "atlas:summaries:chrom97:materialize:dry": "node scripts/atlas/materialize-gemma4-summary-chrom97.mjs",
     "atlas:hyperrag:timing:audit": "node scripts/atlas/audit-hyperrag-timing-coverage.mjs",
     "atlas:glyph-labels:audit": "node scripts/atlas/audit-glyph-label-coverage.mjs",
     "atlas:xgboost:serve": "cross-env PYTHONIOENCODING=utf-8 python scripts/atlas/serve-xgboost-reranker.py",
@@ -333,8 +340,8 @@
     "atlas:1b:qdrant-payload:dry": "node scripts/atlas/qdrant-payload-contract-repair.mjs --dry-run",
     "atlas:1b:qdrant-payload:apply": "node scripts/atlas/qdrant-payload-contract-repair.mjs --apply",
     "atlas:1b:cache-audit": "node scripts/atlas/bitfrost-cache-audit.mjs",
-    "atlas:1b:all:dry": "echo '🔍 Phase 1B — Running all repairs (dry-run mode)' && npm run atlas:1b:clustering-health && npm run atlas:1b:postgres-indexes && npm run atlas:1b:qdrant-payload:dry && npm run atlas:1b:cache-audit",
-    "atlas:1b:all:apply": "echo '🔄 Phase 1B — Running all repairs (apply mode - REQUIRES CONFIRMATION)' && npm run atlas:1b:clustering-health && npm run atlas:1b:postgres-indexes && npm run atlas:1b:qdrant-payload:apply && npm run atlas:1b:cache-audit",
+    "atlas:1b:all:dry": "echo '\ud83d\udd0d Phase 1B \u2014 Running all repairs (dry-run mode)' && npm run atlas:1b:clustering-health && npm run atlas:1b:postgres-indexes && npm run atlas:1b:qdrant-payload:dry && npm run atlas:1b:cache-audit",
+    "atlas:1b:all:apply": "echo '\ud83d\udd04 Phase 1B \u2014 Running all repairs (apply mode - REQUIRES CONFIRMATION)' && npm run atlas:1b:clustering-health && npm run atlas:1b:postgres-indexes && npm run atlas:1b:qdrant-payload:apply && npm run atlas:1b:cache-audit",
     "atlas:trace-packet-refs:audit": "node scripts/atlas/audit-trace-packet-ref-normalization.mjs",
     "atlas:trace-packet-refs:dry": "node scripts/atlas/backfill-trace-packet-ref-normalization.mjs --dry-run",
     "atlas:trace-packet-refs:apply": "node scripts/atlas/backfill-trace-packet-ref-normalization.mjs --apply",
@@ -436,7 +443,8 @@
     "atlas:p6:rebuild:summaries:apply": "node scripts/atlas/rebuild-gemma4-summaries-384.mjs --apply",
     "atlas:p6:rebuild:summaries:apply:detached": "node scripts/startup/run-detached.mjs atlas:p6:rebuild:summaries:apply:500",
     "langextract:canonical:dry": "node scripts/phase85/langextract-canonical-pipeline.mjs --verbose",
-    "langextract:canonical": "node scripts/phase85/langextract-canonical-pipeline.mjs --apply --verbose"
+    "langextract:canonical": "node scripts/phase85/langextract-canonical-pipeline.mjs --apply --verbose",
+    "atlas:summary-surface:verify": "node scripts/atlas/verify-summary-surface.mjs"
   },
   "devDependencies": {
     "@ast-grep/cli": "0.42.3",
@@ -499,6 +507,7 @@
     "ollama": "^0.6.0",
     "pdf-parse": "2.4.5",
     "pg": "^8.0.0",
+    "redis": "4.7.1",
     "svelte-preprocess": "6.0.4",
     "sveltekit-superforms": "^2.0.0",
     "zod": "4.4.3"
@@ -515,3 +524,6 @@
     "packages/parent-atlas-opencode"
   ]
 }
+
+
+

@@ -1,0 +1,35 @@
+{
+  "timestamp": "2026-06-29T00:13:07.519Z",
+  "mode": "APPLY",
+  "steps": [
+    {
+      "step": "create_table",
+      "status": "ok",
+      "table_created": true
+    },
+    {
+      "step": "generate_glyphs",
+      "status": "ok",
+      "glyph_count": 100
+    },
+    {
+      "step": "insert_glyphs",
+      "status": "ok",
+      "inserted": 100
+    },
+    {
+      "step": "verify_coverage",
+      "status": "ok",
+      "total": 100,
+      "with_glyph": 100,
+      "coverage_percent": 100
+    }
+  ],
+  "statistics": {
+    "table_created": true,
+    "glyphs_generated": 100,
+    "glyphs_inserted": 100,
+    "coverage_percent": 100
+  },
+  "status": "PASS"
+}

@@ -1,10 +1,10 @@
 {
-  "generatedAt": "2026-06-26T02:02:26.695Z",
+  "generatedAt": "2026-06-28T23:53:28.338Z",
   "mode": "dry-run",
   "tables": [
     {
       "tableName": "task_semantic_packets",
-      "tableExists": true,
+      "tableExists": false,
       "desiredColumns": [
         "canonical_source_ref",
         "source_ref_hash"
@@ -12,8 +12,13 @@
       "desiredIndexes": [
         "tsp_source_ref_hash_idx"
       ],
-      "missingColumns": [],
-      "missingIndexes": [],
+      "missingColumns": [
+        "canonical_source_ref",
+        "source_ref_hash"
+      ],
+      "missingIndexes": [
+        "tsp_source_ref_hash_idx"
+      ],
       "executed": []
     },
     {
@@ -44,7 +49,10 @@
         "idx_atlas_packets_concept_ids",
         "idx_atlas_packets_summary_fts"
       ],
-      "missingColumns": [],
+      "missingColumns": [
+        "community_source",
+        "community_confidence"
+      ],
       "missingIndexes": [
         "atlas_packets_identity_idx",
         "atlas_packets_metadata_gin_idx",
@@ -53,17 +61,13 @@
         "atlas_packets_payload_hash_idx",
         "idx_atlas_packets_payload_path",
         "idx_atlas_packets_payload_file_url",
-        "idx_atlas_packets_feature_id",
-        "idx_atlas_packets_community_id",
-        "idx_atlas_packets_source_ref_key",
-        "idx_atlas_packets_concept_ids",
-        "idx_atlas_packets_summary_fts"
+        "idx_atlas_packets_community_id"
       ],
       "executed": []
     },
     {
       "tableName": "nes_chrom_packets",
-      "tableExists": true,
+      "tableExists": false,
       "desiredColumns": [
         "feature_ids",
         "som_cluster",
@@ -85,13 +89,32 @@
         "nes_chrom_packets_norm_source_ref_trgm_idx",
         "nes_chrom_packets_summary_trgm_idx"
       ],
-      "missingColumns": [],
-      "missingIndexes": [],
+      "missingColumns": [
+        "feature_ids",
+        "som_cluster",
+        "lane_ids",
+        "source_ref_id",
+        "feature_code",
+        "som_code",
+        "confidence_score",
+        "packet_zstd"
+      ],
+      "missingIndexes": [
+        "idx_nes_chrom_packets_feature_ids_gin",
+        "idx_nes_chrom_packets_lane_ids_gin",
+        "idx_nes_chrom_packets_som_cluster",
+        "nes_chrom_packets_source_ref_id_idx",
+        "nes_chrom_packets_feature_code_idx",
+        "nes_chrom_packets_som_code_idx",
+        "nes_chrom_packets_source_ref_trgm_idx",
+        "nes_chrom_packets_norm_source_ref_trgm_idx",
+        "nes_chrom_packets_summary_trgm_idx"
+      ],
       "executed": []
     },
     {
       "tableName": "route_runtime_packets",
-      "tableExists": true,
+      "tableExists": false,
       "desiredColumns": [
         "raw",
         "prompt_hash",
@@ -122,15 +145,43 @@
         "idx_rrp_source_ref_quality",
         "idx_rrp_superseded_by"
       ],
-      "missingColumns": [],
-      "missingIndexes": [],
+      "missingColumns": [
+        "raw",
+        "prompt_hash",
+        "reward",
+        "packet_uuid",
+        "route_state",
+        "feature_id",
+        "packet_version",
+        "supersedes_packet_uuid",
+        "superseded_by",
+        "git_sha",
+        "git_diff_rank",
+        "source_ref_quality",
+        "repair_reason",
+        "repair_method"
+      ],
+      "missingIndexes": [
+        "rrp_packet_uuid_uidx",
+        "rrp_raw_gin",
+        "rrp_state_idx",
+        "rrp_feature_idx",
+        "idx_route_runtime_packets_feature_id",
+        "idx_route_runtime_packets_feature_ids_gin",
+        "idx_route_runtime_packets_source_refs_gin",
+        "idx_route_runtime_packets_raw_gin",
+        "idx_rrp_git_sha",
+        "idx_rrp_packet_version",
+        "idx_rrp_source_ref_quality",
+        "idx_rrp_superseded_by"
+      ],
       "executed": []
     }
   ],
   "summary": {
     "tablesChecked": 4,
     "statementsExecuted": 0,
-    "statementsSkipped": 55,
+    "statementsSkipped": 11,
     "errors": []
   }
 }

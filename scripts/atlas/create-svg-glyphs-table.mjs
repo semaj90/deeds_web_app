@@ -44,6 +44,7 @@ const pool = new Pool({
 
 const REPORTS_DIR = resolve(ROOT, 'docs/reports');
 const dryRun = process.argv.includes('--dry-run') || !process.argv.includes('--apply');
+const PACKET_TABLE_CANDIDATES = ['atlas_packets', 'atlas_codebase_packets'];
 
 const logger = {
   log: (msg) => console.log(msg),
@@ -77,6 +78,30 @@ function generateGlyphId(packet) {
 
   const glyphType = glyphMap[ext] || 'icon-file';
   return `glyph:${featureId}:${glyphType}`;
+}
+
+async function detectPacketTable(client) {
+  const res = await client.query(
+    `
+      SELECT table_name
+      FROM information_schema.tables
+      WHERE table_schema = 'public'
+        AND table_name = ANY($1::text[])
+      ORDER BY CASE table_name
+        WHEN 'atlas_packets' THEN 0
+        WHEN 'atlas_codebase_packets' THEN 1
+        ELSE 2
+      END
+      LIMIT 1
+    `,
+    [PACKET_TABLE_CANDIDATES]
+  );
+
+  if (res.rows.length === 0) {
+    throw new Error(`No packet ledger found. Expected one of: ${PACKET_TABLE_CANDIDATES.join(', ')}`);
+  }
+
+  return res.rows[0].table_name;
 }
 
 async function createAndBackfillGlyphs() {
@@ -135,8 +160,9 @@ async function createAndBackfillGlyphs() {
     // Step 2: Sample packets and generate glyphs
     logger.log('\nStep 2: Generate glyphs for canonical packets...');
 
+    const packetTable = await detectPacketTable(pool);
     const packetsRes = await pool.query(
-      `SELECT packet_key, source_ref, feature_id FROM atlas_codebase_packets
+      `SELECT packet_key, source_ref, feature_id FROM ${packetTable}
        ORDER BY created_at DESC LIMIT 100`
     );
 
