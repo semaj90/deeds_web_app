@@ -23,6 +23,15 @@
  * Output:
  *   next_steps/active/codebase-todo-recommendations.md
  *   Redis ace:todo:latest (24h TTL JSON)
+ *
+ * REDIS WIRING STATUS (Session 95):
+ * ✅ Mock data working (Session 94)
+ * ⏳ TODO: Replace with live Redis queries
+ *   - Connect to Redis at process.env.REDIS_URL or 127.0.0.1:6379
+ *   - Query: redis.hgetall('ace:authority:top')
+ *   - Query: redis.hgetall('gpu:karpathy:scores')
+ *   - Query: redis.smembers('ace:rank:dirty_files')
+ *   - Merge with mock data for missing signals
  */
 
 import path from 'path';
@@ -43,14 +52,78 @@ console.log('[codebase-todo] Signals: authority (0.40) + karpathy (0.35) + atten
 if (query) console.log(`[codebase-todo] Query-biased: "${query}"`);
 
 // ============================================================================
-// MOCK IMPLEMENTATION (pending Redis/Gemma4 wiring)
+// REDIS SIGNAL RETRIEVAL (with graceful fallback to mock data)
 // ============================================================================
 
-// When Redis becomes available, replace with:
-// const redis = require('ioredis');
-// const authScores = await redis.hgetall('ace:authority:top');
-// const karpScores = await redis.hgetall('gpu:karpathy:scores');
-// const dirtyFiles = await redis.smembers('ace:rank:dirty_files');
+async function fetchRedisSignals() {
+  const signals = {
+    authority: {},      // file → authority score (0-1)
+    karpathy: {},       // file → karpathy blend (0-1)
+    dirty: new Set(),   // set of recently changed files
+    source: 'mock'      // 'redis' or 'mock'
+  };
+
+  try {
+    // Try to connect to Redis (optional)
+    const Redis = (await import('ioredis')).default;
+    const redis = new Redis({
+      host: process.env.REDIS_HOST || '127.0.0.1',
+      port: process.env.REDIS_PORT || 6379,
+      password: process.env.REDIS_PASSWORD,
+      lazyConnect: true,
+      enableOfflineQueue: false,
+      retryStrategy: () => null
+    });
+
+    try {
+      await redis.connect();
+      console.log('[codebase-todo] Connected to Redis');
+
+      // Fetch authority scores
+      const authData = await redis.hgetall('ace:authority:top');
+      if (authData && Object.keys(authData).length > 0) {
+        signals.authority = Object.fromEntries(
+          Object.entries(authData).map(([k, v]) => [k, parseFloat(v)])
+        );
+        console.log(`[codebase-todo] Fetched ${Object.keys(signals.authority).length} authority scores`);
+      }
+
+      // Fetch Karpathy scores
+      const karpData = await redis.hgetall('gpu:karpathy:scores');
+      if (karpData && Object.keys(karpData).length > 0) {
+        signals.karpathy = Object.fromEntries(
+          Object.entries(karpData).map(([k, v]) => {
+            const parsed = JSON.parse(v);
+            return [k, parsed.blend || 0.5];
+          })
+        );
+        console.log(`[codebase-todo] Fetched ${Object.keys(signals.karpathy).length} Karpathy scores`);
+      }
+
+      // Fetch dirty files
+      const dirtyData = await redis.smembers('ace:rank:dirty_files');
+      if (dirtyData && dirtyData.length > 0) {
+        signals.dirty = new Set(dirtyData);
+        console.log(`[codebase-todo] Fetched ${signals.dirty.size} dirty files`);
+      }
+
+      signals.source = 'redis';
+      await redis.quit();
+    } catch (err) {
+      console.warn(`[codebase-todo] Redis connection failed: ${err.message}`);
+      console.log('[codebase-todo] Using mock data instead');
+    }
+  } catch (err) {
+    // ioredis not installed or connection failed
+    console.warn('[codebase-todo] Redis unavailable (ioredis not installed or connection failed)');
+    console.log('[codebase-todo] Using mock data instead');
+  }
+
+  return signals;
+}
+
+// Fetch Redis signals (or use mock)
+const redisSignals = await fetchRedisSignals();
 
 const mockRecommendations = [
   {
@@ -105,19 +178,44 @@ const mockRecommendations = [
   }
 ];
 
+// Blend recommendations with Redis signals (if available)
+const recommendations = mockRecommendations.map((rec) => {
+  // Use Redis signals if available, fall back to mock values
+  const authority = redisSignals.authority[rec.file] !== undefined
+    ? redisSignals.authority[rec.file]
+    : rec.authority;
+  const karpathy = redisSignals.karpathy[rec.file] !== undefined
+    ? redisSignals.karpathy[rec.file]
+    : rec.karpathy;
+  const isDirty = redisSignals.dirty.has(rec.file) || rec.isDirty;
+
+  // Calculate blend score: 0.40*authority + 0.35*(karpathy/4) + 0.15*attention + 0.10*dirty_boost
+  const dirtyBoost = isDirty ? 0.10 : 0;
+  const blend = 0.40 * authority + 0.35 * (karpathy / 4) + 0.15 * rec.attention + dirtyBoost;
+
+  return {
+    ...rec,
+    authority,
+    karpathy,
+    isDirty,
+    blend
+  };
+});
+
 // Sort by blend score descending
-mockRecommendations.sort((a, b) => b.blend - a.blend);
+recommendations.sort((a, b) => b.blend - a.blend);
 
 // Generate markdown output
 const markdown = `# Codebase TODO Recommendations
 
 **Generated**: ${new Date().toISOString()}
 **Method**: Redis authority (0.40) + Karpathy GPU (0.35) + attention (0.15) + dirty (0.10)
+**Data Source**: ${redisSignals.source === 'redis' ? '✅ Redis signals' : '⏳ Mock data (Redis unavailable)'}
 **Gemma4 rerank**: temperature=0.3, deterministic
 
 ## Top Priorities (Gemma4-Ranked)
 
-${mockRecommendations
+${recommendations
   .slice(0, 7)
   .map((rec, idx) => `${idx + 1}. **${rec.title}** (${(rec.blend * 100).toFixed(0)}%)\n   - File: ${rec.file}\n   - Reason: ${rec.reason}`)
   .join('\n')}
@@ -126,7 +224,7 @@ ${mockRecommendations
 
 | Rank | File | Title | Authority | Karpathy | Attention | Dirty | Blend |
 |------|------|-------|-----------|----------|-----------|-------|-------|
-${mockRecommendations
+${recommendations
   .map(
     (rec, idx) =>
       `| ${idx + 1} | \`${rec.file}\` | ${rec.title} | ${rec.authority.toFixed(2)} | ${rec.karpathy.toFixed(2)} | ${rec.attention.toFixed(2)} | ${rec.isDirty ? '✓' : '·'} | **${(rec.blend * 100).toFixed(0)}%** |`
@@ -147,13 +245,13 @@ When working in these areas, pay extra attention to the AGENTS.md files.
 
 ## Provenance & Signal Health
 
-- **Redis ace:authority:top**: ⏳ TODO (200 entries, 6h TTL) — run \`npm run graphify:gds\`
-- **Redis gpu:karpathy:scores**: ⏳ TODO (200+ entries, 24h TTL) — run \`npm run karpathy:gpu\`
-- **Redis ace:rank:dirty_files**: ⏳ TODO (live set) — updated during startup
+- **Redis ace:authority:top**: ${Object.keys(redisSignals.authority).length > 0 ? `✅ ${Object.keys(redisSignals.authority).length} entries` : '⏳ Empty'} (6h TTL) — run \`npm run graphify:gds\`
+- **Redis gpu:karpathy:scores**: ${Object.keys(redisSignals.karpathy).length > 0 ? `✅ ${Object.keys(redisSignals.karpathy).length} entries` : '⏳ Empty'} (24h TTL) — run \`npm run karpathy:gpu\`
+- **Redis ace:rank:dirty_files**: ${redisSignals.dirty.size > 0 ? `✅ ${redisSignals.dirty.size} files` : '⏳ Empty'} (live set) — updated during startup
 - **Postgres agent_context_files**: ⏳ TODO (rule density) — run \`npm run agents:pipeline:safe\`
 - **Engram bigram cache**: ⏳ TODO (1h TTL) — live during retrieval
 
-Status: **MOCK DATA** (pending Redis wiring in Session 95)
+Status: ${redisSignals.source === 'redis' ? '✅ Redis signals live' : '⏳ Mock data (Redis unavailable)'}
 
 ## Integration Points
 
