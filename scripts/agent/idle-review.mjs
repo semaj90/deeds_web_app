@@ -6,13 +6,20 @@
  *
  * Pipeline:
  * 1. Read latest logs + git diff + reports
- * 2. Query own ACE packets (what work was just done?)
- * 3. Rank likely next tasks (0-100% priority)
- * 4. Warm BitFrost cache (prefetch related packets)
+ * 2. Rank likely next tasks (uses codebase-todo-recommendations skill framework)
+ *    - Pulls Redis signals: authority, Karpathy GPU blend, dirty files
+ *    - Fuses: 0.40*authority + 0.35*karpathy + 0.15*attention + 0.10*dirty
+ *    - Filters by AGENTS.md rule density (strictest directories matter most)
+ *    - Reranks with Gemma4 (temperature=0.3, deterministic)
+ * 3. Warm BitFrost cache (prefetch related packets for top 3)
+ * 4. Write RLM feedback row (for training loop)
  * 5. Publish NATS tasks (agent.recommendation.created)
- * 6. Write RLM feedback row (for training loop)
  *
- * Output: Kanban recommendations + RLM trace
+ * Output: Ranked recommendations + RLM trace
+ *
+ * TODO (Session 95+): Replace hard-coded recommendations with live call to:
+ *   node scripts/skills/codebase-todo-aggregator.mjs --stdout
+ * This will pull real Redis signals and Gemma4-reranked results.
  */
 
 import fs from 'fs';
@@ -83,13 +90,16 @@ async function readRecentState() {
 }
 
 // ============================================================================
-// 2. RANK LIKELY NEXT TASKS
+// 2. RANK LIKELY NEXT TASKS (using TODO skill framework)
 // ============================================================================
 
 async function rankNextTasks(state) {
   console.log('[idle-review] Ranking next tasks...');
 
-  // Scoring formula (from user spec):
+  // Scoring formula (from codebase-todo-recommendations skill):
+  // Fused blend = 0.40*authority + 0.35*(karpathy/4) + 0.15*attention + 0.10*isDirty
+  //
+  // Fallback scoring formula (when Redis unavailable):
   // score = 0.30 blocker_severity
   //       + 0.20 dependency_unblock
   //       + 0.15 replay_reward
@@ -97,6 +107,12 @@ async function rankNextTasks(state) {
   //       + 0.10 cache_miss_penalty
   //       + 0.10 low_cost_bonus
   //       + 0.05 gpu_available
+  //
+  // Redis signals:
+  // - ace:authority:top (200 entries, 6h TTL)
+  // - gpu:karpathy:scores (200+ entries, 24h TTL)
+  // - ace:rank:dirty_files (set of recently changed)
+  // - agent_context_files.rules JSONB (AGENTS.md density)
 
   const recommendations = [
     {
