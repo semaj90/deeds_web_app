@@ -122,8 +122,48 @@ async function fetchRedisSignals() {
   return signals;
 }
 
+// ============================================================================
+// POSTGRES AGENTS.MD RULE DENSITY (for directory-based boost)
+// ============================================================================
+
+async function fetchAgentsMdRuleDensity() {
+  const density = {};
+  try {
+    const pg = (await import('pg')).default;
+    const pool = new pg.Pool({
+      host: process.env.DB_HOST || 'localhost',
+      port: process.env.DB_PORT || 5432,
+      user: process.env.DB_USER || 'legal_admin',
+      password: process.env.DB_PASSWORD,
+      database: process.env.DB_NAME || 'legal_ai_db'
+    });
+
+    const res = await pool.query(`
+      SELECT directory_path, COUNT(*) as rule_count
+      FROM agent_context_files
+      WHERE rules IS NOT NULL AND jsonb_array_length(rules) > 0
+      GROUP BY directory_path
+      ORDER BY rule_count DESC
+    `);
+
+    for (const row of res.rows) {
+      density[row.directory_path] = row.rule_count;
+    }
+
+    await pool.end();
+  } catch (err) {
+    // Graceful fallback — rule density filter is optional
+    if (process.env.DEBUG_AGENTS_MD) {
+      console.warn(`[codebase-todo] Postgres rule density unavailable: ${err.message}`);
+    }
+  }
+
+  return density;
+}
+
 // Fetch Redis signals (or use mock)
 const redisSignals = await fetchRedisSignals();
+const agentsMdDensity = await fetchAgentsMdRuleDensity();
 
 const mockRecommendations = [
   {
@@ -178,7 +218,7 @@ const mockRecommendations = [
   }
 ];
 
-// Blend recommendations with Redis signals (if available)
+// Blend recommendations with Redis signals + Postgres rule density
 const recommendations = mockRecommendations.map((rec) => {
   // Use Redis signals if available, fall back to mock values
   const authority = redisSignals.authority[rec.file] !== undefined
@@ -189,45 +229,145 @@ const recommendations = mockRecommendations.map((rec) => {
     : rec.karpathy;
   const isDirty = redisSignals.dirty.has(rec.file) || rec.isDirty;
 
-  // Calculate blend score: 0.40*authority + 0.35*(karpathy/4) + 0.15*attention + 0.10*dirty_boost
+  // Extract directory from file path for rule density lookup
+  const fileDir = rec.file.split('/').slice(0, -1).join('/') || '.';
+  const ruleCount = agentsMdDensity[fileDir] || 0;
+  // Density boost: +0.05 per rule, capped at 0.20 (4 rules max boost)
+  const densityBoost = Math.min(ruleCount * 0.05, 0.20);
+
+  // Calculate blend score: 0.40*authority + 0.35*(karpathy/4) + 0.15*attention + 0.10*dirty_boost + density_boost
   const dirtyBoost = isDirty ? 0.10 : 0;
-  const blend = 0.40 * authority + 0.35 * (karpathy / 4) + 0.15 * rec.attention + dirtyBoost;
+  const blend = 0.40 * authority + 0.35 * (karpathy / 4) + 0.15 * rec.attention + dirtyBoost + densityBoost;
 
   return {
     ...rec,
     authority,
     karpathy,
     isDirty,
+    ruleCount,
+    densityBoost,
     blend
   };
 });
 
+// ============================================================================
+// GEMMA4 RERANKING (Stage 4 — optional, deterministic T=0.3)
+// ============================================================================
+
+async function reankWithGemma4(topRecs, contextRules) {
+  try {
+    const LLAMA_URL = process.env.LLAMA_SERVER_URL || 'http://127.0.0.1:8090';
+    const MODEL = process.env.LLAMA_MODEL || 'gemma4-legal-iq4xs-direct.gguf';
+
+    // Build reranking prompt with AGENTS.md context
+    const agentContext = contextRules
+      ? `**AGENTS.md Context**: ${contextRules}`
+      : 'No specific AGENTS.md rules apply.';
+
+    const prompt = `You are an expert code review agent. Rerank the following TODO recommendations by priority for the codebase author. Consider:
+1. Blocking dependencies (what unblocks the most other work)
+2. AGENTS.md rules (strictest directories have more governance)
+3. Signal strength (authority, attention, karpathy scores)
+4. Risk (WIRED_NOT_PROVEN tasks need validation)
+
+${agentContext}
+
+**Recommendations to rank**:
+${topRecs.slice(0, 15).map((rec, i) =>
+  `${i+1}. **${rec.title}** (${(rec.blend * 100).toFixed(0)}%, rules:${rec.ruleCount}) — ${rec.file}`
+).join('\n')}
+
+**Return JSON array** with reranked order (1 = highest priority) — just the numbers [#, #, #, ...], no explanation.`;
+
+    const response = await fetch(`${LLAMA_URL}/v1/chat/completions`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: MODEL,
+        messages: [{ role: 'user', content: prompt }],
+        temperature: 0.3,
+        max_tokens: 200,
+        stream: false
+      }),
+      signal: AbortSignal.timeout(30_000)
+    });
+
+    if (!response.ok) {
+      console.warn(`[codebase-todo] Gemma4 call failed: HTTP ${response.status}`);
+      return topRecs; // Return unsorted if Gemma4 fails
+    }
+
+    const data = await response.json();
+    const content = data.choices?.[0]?.message?.content || '';
+
+    // Parse JSON array from response
+    const match = content.match(/\[\s*[\d,\s]+\]/);
+    if (!match) {
+      console.warn('[codebase-todo] Gemma4 response did not contain valid JSON array');
+      return topRecs;
+    }
+
+    const order = JSON.parse(match[0]);
+
+    // Reorder recommendations based on Gemma4 ranking
+    const reranked = [];
+    for (const idx of order) {
+      if (idx > 0 && idx <= topRecs.length) {
+        reranked.push(topRecs[idx - 1]);
+      }
+    }
+
+    // Add any missed recommendations at the end
+    const rerankedSet = new Set(reranked);
+    for (const rec of topRecs) {
+      if (!rerankedSet.has(rec)) {
+        reranked.push(rec);
+      }
+    }
+
+    return reranked;
+  } catch (err) {
+    console.warn(`[codebase-todo] Gemma4 reranking failed: ${err.message}`);
+    return topRecs; // Return original ranking if reranking fails
+  }
+}
+
 // Sort by blend score descending
 recommendations.sort((a, b) => b.blend - a.blend);
+
+// Optional Gemma4 reranking (if LLAMA_SERVER available)
+let finalRecommendations = recommendations;
+if (!isDry && process.env.SKIP_GEMMA4_RERANK !== 'true') {
+  console.log('[codebase-todo] Attempting Gemma4 reranking...');
+  const strictestDir = 'sveltekit-frontend/src/lib/server/rlm/';
+  const contextRules = `Changes in ${strictestDir} require strict adherence to recursive language model patterns. Priority on unblocking RLM feedback loop.`;
+  finalRecommendations = await reankWithGemma4(recommendations, contextRules);
+  console.log('[codebase-todo] Reranking complete');
+}
 
 // Generate markdown output
 const markdown = `# Codebase TODO Recommendations
 
 **Generated**: ${new Date().toISOString()}
-**Method**: Redis authority (0.40) + Karpathy GPU (0.35) + attention (0.15) + dirty (0.10)
+**Method**: Redis authority (0.40) + Karpathy GPU (0.35) + attention (0.15) + dirty (0.10) + Postgres rules density
 **Data Source**: ${redisSignals.source === 'redis' ? '✅ Redis signals' : '⏳ Mock data (Redis unavailable)'}
-**Gemma4 rerank**: temperature=0.3, deterministic
+**Gemma4 rerank**: temperature=0.3, deterministic ${process.env.SKIP_GEMMA4_RERANK === 'true' ? '(disabled)' : ''}
 
-## Top Priorities (Gemma4-Ranked)
+## Top Priorities (${process.env.SKIP_GEMMA4_RERANK === 'true' ? 'Blend-Sorted' : 'Gemma4-Ranked'})
 
-${recommendations
+${finalRecommendations
   .slice(0, 7)
   .map((rec, idx) => `${idx + 1}. **${rec.title}** (${(rec.blend * 100).toFixed(0)}%)\n   - File: ${rec.file}\n   - Reason: ${rec.reason}`)
   .join('\n')}
 
 ## Ranked Targets (Full Blend Scores)
 
-| Rank | File | Title | Authority | Karpathy | Attention | Dirty | Blend |
-|------|------|-------|-----------|----------|-----------|-------|-------|
-${recommendations
+| Rank | File | Title | Authority | Karpathy | Attention | Dirty | Rules | Blend |
+|------|------|-------|-----------|----------|-----------|-------|-------|-------|
+${finalRecommendations
   .map(
     (rec, idx) =>
-      `| ${idx + 1} | \`${rec.file}\` | ${rec.title} | ${rec.authority.toFixed(2)} | ${rec.karpathy.toFixed(2)} | ${rec.attention.toFixed(2)} | ${rec.isDirty ? '✓' : '·'} | **${(rec.blend * 100).toFixed(0)}%** |`
+      `| ${idx + 1} | \`${rec.file}\` | ${rec.title} | ${rec.authority.toFixed(2)} | ${rec.karpathy.toFixed(2)} | ${rec.attention.toFixed(2)} | ${rec.isDirty ? '✓' : '·'} | ${rec.ruleCount} | **${(rec.blend * 100).toFixed(0)}%** |`
   )
   .join('\n')}
 
@@ -248,10 +388,10 @@ When working in these areas, pay extra attention to the AGENTS.md files.
 - **Redis ace:authority:top**: ${Object.keys(redisSignals.authority).length > 0 ? `✅ ${Object.keys(redisSignals.authority).length} entries` : '⏳ Empty'} (6h TTL) — run \`npm run graphify:gds\`
 - **Redis gpu:karpathy:scores**: ${Object.keys(redisSignals.karpathy).length > 0 ? `✅ ${Object.keys(redisSignals.karpathy).length} entries` : '⏳ Empty'} (24h TTL) — run \`npm run karpathy:gpu\`
 - **Redis ace:rank:dirty_files**: ${redisSignals.dirty.size > 0 ? `✅ ${redisSignals.dirty.size} files` : '⏳ Empty'} (live set) — updated during startup
-- **Postgres agent_context_files**: ⏳ TODO (rule density) — run \`npm run agents:pipeline:safe\`
+- **Postgres agent_context_files**: ${Object.keys(agentsMdDensity).length > 0 ? `✅ ${Object.keys(agentsMdDensity).length} directories` : '⏳ Empty'} (rule density indexed) — run \`npm run agents:pipeline:safe\`
 - **Engram bigram cache**: ⏳ TODO (1h TTL) — live during retrieval
 
-Status: ${redisSignals.source === 'redis' ? '✅ Redis signals live' : '⏳ Mock data (Redis unavailable)'}
+Status: ${redisSignals.source === 'redis' ? '✅ Redis signals live' : '⏳ Mock data (Redis unavailable)'} | ${Object.keys(agentsMdDensity).length > 0 ? '✅ AGENTS.md rules indexed' : '⏳ AGENTS.md rules empty'}
 
 ## Integration Points
 

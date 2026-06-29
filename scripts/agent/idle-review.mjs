@@ -34,6 +34,80 @@ const ROOT = path.resolve(__dirname, '../..');
 // 1. READ LATEST LOGS + GIT STATE
 // ============================================================================
 
+// ============================================================================
+// FETCH TODO SKILL RECOMMENDATIONS (replaces hard-coded mock)
+// ============================================================================
+
+async function fetchTODOSkillRecommendations() {
+  try {
+    const todoMarkdown = execSync(
+      'npm run skill:codebase-todo:stdout 2>/dev/null',
+      { cwd: ROOT, encoding: 'utf-8', timeout: 30_000 }
+    );
+
+    // Parse markdown into structured recommendations
+    const recommendations = [];
+    const tableStart = todoMarkdown.indexOf('## Ranked Targets');
+    if (tableStart === -1) {
+      console.warn('[idle-review] TODO skill markdown missing table');
+      return null;
+    }
+
+    // Extract table rows (| rank | file | title | ... |)
+    const tableSection = todoMarkdown.substring(tableStart);
+    const lines = tableSection.split('\n');
+    let inTable = false;
+
+    for (const line of lines) {
+      if (line.includes('| Rank |')) {
+        inTable = true;
+        continue;
+      }
+      if (inTable && line.startsWith('|')) {
+        const cols = line.split('|').slice(1, -1).map((c) => c.trim());
+        if (cols.length < 7 || cols[0] === '---' || !cols[0]) continue;
+
+        // Parse: rank, file, title, authority, karpathy, attention, dirty, rules, blend
+        const rank = parseInt(cols[0], 10);
+        const file = cols[1]?.replace(/`/g, '') || '';
+        const title = cols[2] || '';
+        const authority = parseFloat(cols[3]) || 0;
+        const karpathy = parseFloat(cols[4]) || 0;
+        const attention = parseFloat(cols[5]) || 0;
+        const isDirty = cols[6]?.includes('✓') || false;
+        const ruleCount = parseInt(cols[7], 10) || 0;
+        const blend = parseFloat(cols[8]?.replace(/[*%]/g, '')) / 100 || 0;
+
+        if (file && title) {
+          recommendations.push({
+            title,
+            priority_0_100: Math.round(blend * 100),
+            reason: `File: ${file}, Rules: ${ruleCount}, Authority: ${(authority * 100).toFixed(0)}%`,
+            file,
+            authority,
+            karpathy,
+            attention,
+            isDirty,
+            ruleCount,
+            blend,
+            status: 'SKILL_RANKED'
+          });
+        }
+      }
+    }
+
+    if (recommendations.length > 0) {
+      console.log(`[idle-review] Fetched ${recommendations.length} TODO skill recommendations`);
+      return recommendations.slice(0, 5); // Top 5 for idle agent
+    }
+
+    return null;
+  } catch (err) {
+    console.warn(`[idle-review] TODO skill fetch failed: ${err.message}`);
+    return null;
+  }
+}
+
 async function readRecentState() {
   console.log('[idle-review] Reading recent state...');
 
@@ -114,9 +188,14 @@ async function rankNextTasks(state) {
   // - ace:rank:dirty_files (set of recently changed)
   // - agent_context_files.rules JSONB (AGENTS.md density)
 
-  const recommendations = [
-    {
-      title: 'End-to-end test /api/ace/policy-orchestrator',
+  // Try to fetch live TODO skill recommendations; fall back to mock if unavailable
+  let recommendations = await fetchTODOSkillRecommendations();
+
+  if (!recommendations) {
+    console.log('[idle-review] TODO skill unavailable, using fallback mock recommendations');
+    recommendations = [
+      {
+        title: 'Wire codebase-todo skill to idle-review agent',
       priority_0_100: 87,
       reason: 'Stage 5 synthesis just wired. Need to verify 6-stage pipeline works.',
       nextCommand: 'npm run test:ace:policy-orchestrator',
@@ -199,8 +278,9 @@ async function rankNextTasks(state) {
         low_cost_bonus: 0.7, // Proof-of-life is cheap
         gpu_available: 0.0 // Not GPU-related
       }
-    }
-  ];
+      }
+    ];
+  }
 
   // Sort by priority descending
   return recommendations.sort((a, b) => b.priority_0_100 - a.priority_0_100);
