@@ -134,80 +134,77 @@ if (!redisGate.ok) {
   process.exit(0);
 }
 
-const run = spawnNpmScript('graphify:daily');
+const steps = [
+  ['graphify:daily', { required: true, name: 'Graphify Audit (Gemma4)' }],
+  ['graphify:cluster-cards:generate', { required: false, name: 'Generate cluster-cards.jsonl' }],
+  ['graphify:cluster-cards:validate', { required: false, name: 'Validate schema' }],
+  ['graphify:cluster-cards:load', { required: false, name: 'Load into Postgres' }],
+];
 
-if (run.status === 0) {
-  writeFileSync(STAMP, new Date().toISOString() + '\n', 'utf8');
+const stepResults = [];
+for (const [script, opts] of steps) {
+  console.log(`🗺️ ${opts.name} → npm run ${script}`);
+  const result = spawnNpmScript(script);
+  stepResults.push({ script, ...opts, status: result.status === 0 ? 'pass' : 'fail' });
 
-  let semanticRefresh = {
-    enabled: INCLUDE_SEMANTIC_REFRESH,
-    script: SEMANTIC_REFRESH_SCRIPT,
-    status: 'skipped',
-    detail: null,
-  };
-
-  if (INCLUDE_SEMANTIC_REFRESH) {
-    console.log(`🗺️ graphify:daily semantic refresh → npm run ${SEMANTIC_REFRESH_SCRIPT}`);
-    const semanticRun = spawnNpmScript(SEMANTIC_REFRESH_SCRIPT);
-    if (semanticRun.status === 0) {
-      semanticRefresh = {
-        ...semanticRefresh,
-        status: 'complete',
-        detail: 'graphify:semantic completed successfully',
-      };
-    } else {
-      const semanticError = semanticRun.error ? String(semanticRun.error.message ?? semanticRun.error) : '';
-      semanticRefresh = {
-        ...semanticRefresh,
-        status: 'failed',
-        detail: semanticError || `exit:${semanticRun.status ?? 1}`,
-      };
-      console.warn(`🗺️ graphify:daily semantic refresh failed — ${semanticRefresh.detail}`);
-    }
+  if (result.status !== 0 && opts.required) {
+    console.error(`🗺️ ${opts.name} failed (exit ${result.status}) — aborting`);
+    process.exit(result.status ?? 1);
   }
-
-  const logBits = [`${new Date().toISOString()} graphify:daily complete`];
-  if (INCLUDE_SEMANTIC_REFRESH) {
-    logBits.push(`semantic:${semanticRefresh.status}`);
-    if (semanticRefresh.detail) logBits.push(`[${semanticRefresh.detail}]`);
-  }
-  writeFileSync(LOG_PATH, `${logBits.join(' | ')}\n`, 'utf8');
-  writeValidationCache({
-    status: 'complete',
-    reason: null,
-    detail: 'graphify:daily completed successfully',
-    graphFailedDueTo: null,
-    semanticRefresh,
-    redis: resolveRedisConnection(),
-  });
-  console.log(INCLUDE_SEMANTIC_REFRESH && semanticRefresh.status === 'complete'
-    ? '🗺️ graphify:daily complete + semantic refresh complete'
-    : INCLUDE_SEMANTIC_REFRESH
-      ? '🗺️ graphify:daily complete + semantic refresh warning'
-      : '🗺️ graphify:daily complete');
-  process.exit(0);
 }
 
-const runError = run.error ? String(run.error.message ?? run.error) : '';
-const exitBits = [
-  'graphify:daily failed',
-  runError ? `[spawn error] ${runError}` : '',
-  typeof run.status === 'number' ? `[exit code] ${run.status}` : '',
-  run.signal ? `[signal] ${run.signal}` : '',
-].filter(Boolean);
-writeFileSync(LOG_PATH, `${new Date().toISOString()} ${exitBits.join(' | ')}\n`, 'utf8');
+const passed = stepResults.filter((r) => r.status === 'pass').length;
+const failed = stepResults.filter((r) => r.status === 'fail').length;
+
+if (passed > 0) {
+  writeFileSync(STAMP, new Date().toISOString() + '\n', 'utf8');
+}
+
+let semanticRefresh = {
+  enabled: INCLUDE_SEMANTIC_REFRESH,
+  script: SEMANTIC_REFRESH_SCRIPT,
+  status: 'skipped',
+  detail: null,
+};
+
+if (INCLUDE_SEMANTIC_REFRESH && passed > 0) {
+  console.log(`🗺️ graphify:daily semantic refresh → npm run ${SEMANTIC_REFRESH_SCRIPT}`);
+  const semanticRun = spawnNpmScript(SEMANTIC_REFRESH_SCRIPT);
+  if (semanticRun.status === 0) {
+    semanticRefresh = {
+      ...semanticRefresh,
+      status: 'complete',
+      detail: 'semantic refresh completed successfully',
+    };
+  } else {
+    const semanticError = semanticRun.error ? String(semanticRun.error.message ?? semanticRun.error) : '';
+    semanticRefresh = {
+      ...semanticRefresh,
+      status: 'failed',
+      detail: semanticError || `exit:${semanticRun.status ?? 1}`,
+    };
+    console.warn(`🗺️ graphify:daily semantic refresh failed — ${semanticRefresh.detail}`);
+  }
+}
+
+const stepsSummary = stepResults.map((r) => `${r.script}:${r.status}`).join(' | ');
+const logBits = [
+  `${new Date().toISOString()} graphify startup complete`,
+  `${passed}/${stepResults.length} steps passed`,
+  stepsSummary,
+];
+if (INCLUDE_SEMANTIC_REFRESH) {
+  logBits.push(`semantic:${semanticRefresh.status}`);
+}
+writeFileSync(LOG_PATH, `${logBits.join(' | ')}\n`, 'utf8');
 writeValidationCache({
-  status: 'failed',
-  reason: runError || (run.signal ? `signal:${run.signal}` : `exit:${run.status ?? 1}`),
-  detail: exitBits.join(' | '),
-  graphFailedDueTo: runError || (run.signal ? `signal:${run.signal}` : `exit:${run.status ?? 1}`),
-  semanticRefresh: {
-    enabled: INCLUDE_SEMANTIC_REFRESH,
-    script: SEMANTIC_REFRESH_SCRIPT,
-    status: 'skipped',
-    detail: null,
-  },
+  status: 'complete',
+  reason: null,
+  detail: `${passed}/${stepResults.length} startup steps completed`,
+  graphFailedDueTo: null,
+  stepResults,
+  semanticRefresh,
   redis: resolveRedisConnection(),
 });
-console.error(exitBits.join('\n'));
-process.exit(run.status ?? 1);
+console.log(`🗺️ graphify:startup:safe complete — ${passed}/${stepResults.length} steps passed`);
+process.exit(0);

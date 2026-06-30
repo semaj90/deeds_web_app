@@ -887,8 +887,13 @@ export async function searchCodebaseViaHttp(params: {
       return null;
     }
 
-    const data = await res.json() as { results?: unknown[]; total_ms?: number };
-    const raw = Array.isArray(data.results) ? data.results : [];
+    const data = await res.json() as { results?: unknown[]; hits?: unknown[]; items?: unknown[]; chunks?: unknown[]; total_ms?: number };
+    const raw =
+      Array.isArray(data.results) ? data.results :
+      Array.isArray(data.hits) ? data.hits :
+      Array.isArray(data.items) ? data.items :
+      Array.isArray(data.chunks) ? data.chunks :
+      [];
     const results: RetrievedCodebaseChunk[] = raw.map((r: unknown) => {
       const row = r as Record<string, unknown>;
       return {

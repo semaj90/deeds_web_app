@@ -37,9 +37,13 @@ function getAddon(): GpuAddon | null {
 	if (loadAttempted) return addon;
 	loadAttempted = true;
 	const paths = [
+		process.env.TENSORRT_BRIDGE_NODE_PATH?.trim(),
+		resolve(process.cwd(), '../simd-bridge/cpp/build-x64-cuda/Release/tensorrt_bridge.node'),
+		resolve(process.cwd(), 'simd-bridge/cpp/build-x64-cuda/Release/tensorrt_bridge.node'),
+		'C:/Users/james/Videos/deeds-web-app/simd-bridge/cpp/build-x64-cuda/Release/tensorrt_bridge.node',
 		resolve(process.cwd(), '../simd-bridge/cpp/build/Release/tensorrt_bridge.node'),
 		resolve(process.cwd(), '../simd-bridge/cpp/build/tensorrt_bridge.node'),
-	];
+	].filter(Boolean) as string[];
 	for (const p of paths) {
 		try {
 			if (!existsSync(p)) continue;

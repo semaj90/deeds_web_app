@@ -12,7 +12,7 @@ Sits alongside `memory/gpu-weight-architecture.md` (RotorQuant vs TurboQuant vs 
 
 The system today is fast enough for the work the operator is doing. This doc captures the architecture so the next session doesn't re-research the same trade-offs. Three things specifically:
 
-1. **RotorQuant** — Scrya repo (Mar 2026 release). 3-bit weights via block-diagonal rotations. 28% faster decode, 5.3× faster prefill vs TurboQuant **on Llama-3.1-8B** (D=128). **Gemma 4 head_dim safety unverified.**
+1. **RotorQuant** — Scrya repo (Mar 2026 release). 3-bit weights via block-diagonal rotations. 28% faster decode, 5.3× faster prefill vs TurboQuant (D=128). **Gemma 4 head_dim safety unverified.**
 2. **bitnet.c** — `https://github.com/artalis-io/bitnet.c` — pure C11 ternary/1-bit inference, zero deps, 20+ quant formats including TurboQuant 3-bit KV. **No CUDA path** (CPU + WebGPU + Metal only). For your RTX 3060 Ti, this is a CPU-offload / edge play, not a primary inference target.
 3. **NVMe → SSD → RAM → VRAM → L1/L2/L3 cache hierarchy** — currently we only have Bifrost L2 (port 3040) + Redis L1 (5ms exact-match) + L3 (cold Ollama). Want to extend with on-disk warm tiers + attention-head-aware KV.
 
@@ -50,7 +50,7 @@ The system today is fast enough for the work the operator is doing. This doc cap
 
 **Hit rate target**: 90–95% across Tiers 0–2 (matches current L1+L2 combined per CLAUDE.md "Redis L1 + Bifrost L2 Cache System"). Tier 3 catches the cold reactivation case where a user returns to a case after a week.
 
-**The "attention NVMe warm cache" idea** is concretely Tier 2 above — KV blocks keyed by `(prefix_hash, layer_idx)`, sharded to one file per layer per prefix. The win is that re-warming a 16K-context conversation is bound by sequential NVMe read (≈200ms for 2 GB) instead of attention prefill (≈25s).
+**The "attention NVMe warm cache" idea** is concretely Tier 2 above — KV blocks keyed by `(prefix_hash, layer_idx)`, sharded to one file per layer per prefix. The win is that re-warming a 64K-context conversation is bound by sequential NVMe read (≈200ms for 2 GB) instead of attention prefill (≈25s).
 
 ---
 

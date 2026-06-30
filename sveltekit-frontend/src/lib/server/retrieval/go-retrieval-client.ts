@@ -159,6 +159,7 @@ function normalizeResponse(data: Record<string, unknown>, endpoint: string): GoR
     Array.isArray(data.results) ? data.results :
     Array.isArray(data.hits) ? data.hits :
     Array.isArray(data.items) ? data.items :
+    Array.isArray(data.chunks) ? data.chunks :
     [];
 
   return {

@@ -516,7 +516,10 @@
       "type": "shell",
       "command": "node scripts/startup/run-detached.mjs dev:gpu",
       "options": {
-        "cwd": "${workspaceFolder}/sveltekit-frontend"
+        "cwd": "${workspaceFolder}/sveltekit-frontend",
+        "env": {
+          "DEV_BYPASS_AUTH": "true"
+        }
       },
       "runOptions": {
         "runOn": "folderOpen"
@@ -532,6 +535,28 @@
         "clear": false
       },
       "detail": "AUTO-STARTS on folder open — spawns npm run dev:gpu detached so VS Code returns immediately. Uses scripts/startup/run-detached.mjs and writes logs to logs/task-output/pipeline-test/dev-gpu.{out,err}.log."
+    },
+    {
+      "label": "🎯 EmbeddingGemma Summary Embeddings (startup bounded)",
+      "type": "shell",
+      "command": "node scripts/startup/run-detached.mjs worker:embedding:batch:startup",
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
+      "runOptions": {
+        "runOn": "folderOpen"
+      },
+      "group": "build",
+      "problemMatcher": [],
+      "presentation": {
+        "echo": true,
+        "reveal": "never",
+        "focus": false,
+        "panel": "dedicated",
+        "showReuseMessage": false,
+        "clear": false
+      },
+      "detail": "AUTO-STARTS on folder open — runs a bounded 100-row EmbeddingGemma batch over atlas_summary_layers via Ollama /api/embed. Writes 768-dim pgvector embeddings and proof reports without mutating packet identity."
     },
     {
       "label": "Dev Server (gRPC Retrieval)",
@@ -11866,7 +11891,7 @@
         "showReuseMessage": true,
         "clear": false
       },
-      "detail": "Phase B: Asynchronous EmbeddingGemma worker. Consumes summaries from RabbitMQ atlas.enrichment.embedding queue, computes 384-dim embeddings via Ollama, logs analysis_pass_results, updates atlas_summary_layers. Runs continuously. Stop with Ctrl+C."
+      "detail": "Phase B: Asynchronous EmbeddingGemma worker. Consumes summaries from RabbitMQ atlas.enrichment.embedding queue, computes 768-dim embeddings via Ollama, logs analysis_pass_results, updates atlas_summary_layers. Runs continuously. Stop with Ctrl+C."
     }
   ]
 }

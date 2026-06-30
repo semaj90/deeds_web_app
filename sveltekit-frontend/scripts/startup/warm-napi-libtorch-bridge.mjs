@@ -25,6 +25,39 @@ const STRICT = process.argv.includes('--strict');
 
 const requireEsm = createRequire(import.meta.url);
 
+function uniquePaths(paths) {
+  const seen = new Set();
+  const out = [];
+  for (const raw of paths) {
+    const p = String(raw || '').trim();
+    if (!p || seen.has(p)) continue;
+    seen.add(p);
+    out.push(p);
+  }
+  return out;
+}
+
+function ensureRuntimePath() {
+  const sep = process.platform === 'win32' ? ';' : ':';
+  let current = process.env.PATH || '';
+  const dirs = [
+    'C:/libtorch-win-shared-with-deps-2.9.0+cu130/libtorch/lib',
+    resolve(ROOT, '../libtorch-win-shared-with-deps-2.9.0+cu130/libtorch/lib'),
+    'C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v13.0/bin',
+    'C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v13.0/bin/x64',
+    'C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.8/bin',
+    'C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.8/bin/x64',
+    'C:/Program Files/NVIDIA/CUDNN/v9.16/bin/13.0',
+    'C:/Program Files/NVIDIA/CUDNN/v9.8/bin/12.8',
+  ];
+  for (const dir of dirs) {
+    if (existsSync(dir) && !current.includes(dir)) {
+      current = `${dir}${sep}${current}`;
+    }
+  }
+  process.env.PATH = current;
+}
+
 function nowStamp() {
   return new Date().toISOString().replace(/[:.]/g, '-');
 }
@@ -40,24 +73,53 @@ function writeArtifact(payload) {
 }
 
 function candidateAddonPaths() {
-  return [
+  return uniquePaths([
+    process.env.TENSORRT_BRIDGE_NODE_PATH,
+    resolve(ROOT, '../simd-bridge/cpp/build-x64-cuda/Release/tensorrt_bridge.node'),
     resolve(ROOT, '../simd-bridge/cpp/build/Release/tensorrt_bridge.node'),
     resolve(ROOT, '../simd-bridge/cpp/build/Debug/tensorrt_bridge.node'),
     resolve(ROOT, '../simd-bridge/cpp/build/tensorrt_bridge.node'),
-  ];
+    'C:/Users/james/Videos/deeds-web-app/simd-bridge/cpp/build-x64-cuda/Release/tensorrt_bridge.node',
+    'C:/Users/james/Videos/deeds-web-app/simd-bridge/cpp/build/Release/tensorrt_bridge.node',
+  ]);
 }
 
 function loadAddon() {
+  ensureRuntimePath();
+  const probes = [];
+  let firstLoaded = null;
   for (const addonPath of candidateAddonPaths()) {
-    if (!existsSync(addonPath)) continue;
+    if (!existsSync(addonPath)) {
+      probes.push({ addonPath, exists: false, loaded: false, cudaFlag: null });
+      continue;
+    }
     try {
       const addon = requireEsm(addonPath);
-      return { addon, addonPath };
+      const cudaFlag = typeof addon.checkCudaAvailable === 'function' ? addon.checkCudaAvailable() : 0;
+      probes.push({
+        addonPath,
+        exists: true,
+        loaded: true,
+        cudaFlag,
+        exportCount: Object.keys(addon).length,
+        hasKmeansWithCentroids: typeof addon.kmeansWithCentroids === 'function',
+        hasTrainSOM: typeof addon.trainSOM === 'function',
+        hasBatchCosineSimilarity: typeof addon.batchCosineSimilarity === 'function',
+      });
+      firstLoaded ??= { addon, addonPath, probes };
+      if (cudaFlag > 0) return { addon, addonPath, probes };
     } catch (error) {
-      return { addon: null, addonPath, loadError: String(error?.message ?? error) };
+      probes.push({
+        addonPath,
+        exists: true,
+        loaded: false,
+        cudaFlag: null,
+        loadError: String(error?.message ?? error),
+      });
     }
   }
-  return { addon: null, addonPath: null, loadError: 'tensorrt_bridge.node not found' };
+  if (firstLoaded) return firstLoaded;
+  return { addon: null, addonPath: null, probes, loadError: 'tensorrt_bridge.node not found' };
 }
 
 function makeRingAdj(n) {
@@ -100,12 +162,14 @@ function main() {
     source: 'napi-libtorch',
     addonPath: null,
     cudaAvailable: false,
+    candidateProbes: [],
     ops: [],
     errors: [],
   };
 
-  const { addon, addonPath, loadError } = loadAddon();
+  const { addon, addonPath, loadError, probes } = loadAddon();
   info.addonPath = addonPath;
+  info.candidateProbes = probes ?? [];
 
   if (!addon) {
     info.status = 'skip';

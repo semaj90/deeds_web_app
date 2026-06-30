@@ -5,7 +5,7 @@
 
 import { QdrantClient } from '@qdrant/js-client-rest';
 import { ENV } from '$lib/server/env.server.js';
-import { VECTOR_CONFIG } from '$lib/server/config/vector-config.js';
+import { VECTOR_CONFIG, getCollectionDimension } from '$lib/server/config/vector-config.js';
 
 export interface CollectionHealth {
 	name: string;
@@ -32,13 +32,14 @@ export interface QdrantHealthReport {
 
 /**
  * Expected collection schemas — derived from VECTOR_CONFIG (single source of truth)
+ * Each collection validates against its own declared dimension.
  */
 export const COLLECTION_SCHEMAS = Object.fromEntries(
 	Object.entries(VECTOR_CONFIG.COLLECTION_VECTORS).map(([name, schema]) => [
 		name,
 		{
 			vectors: schema.vectors,
-			size: VECTOR_CONFIG.DIMENSIONS,
+			size: getCollectionDimension(name),
 			distance: VECTOR_CONFIG.DISTANCE_METRIC.QDRANT,
 			quantized: true,
 		},

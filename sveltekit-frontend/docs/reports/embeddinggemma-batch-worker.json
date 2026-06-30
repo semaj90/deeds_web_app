@@ -1,0 +1,18 @@
+{
+  "status": "PASS",
+  "mode": "apply",
+  "model": "embeddinggemma:latest",
+  "expectedDim": 768,
+  "selectedRows": 3824,
+  "embeddedRows": 3824,
+  "updatedRows": 3824,
+  "batches": 192,
+  "batchSize": 20,
+  "concurrency": 1,
+  "elapsedMs": 257955,
+  "failures": [],
+  "outputs": {
+    "json": "C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\docs\\reports\\embeddinggemma-batch-worker.json",
+    "markdown": "C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\docs\\reports\\embeddinggemma-batch-worker.md"
+  }
+}

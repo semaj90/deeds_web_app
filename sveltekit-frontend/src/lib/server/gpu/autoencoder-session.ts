@@ -21,24 +21,33 @@ const esmRequire = createRequire(import.meta.url);
 // ── Addon loader (mirrors libtorch-bridge.ts pattern) ─────────────────────────
 
 const ADDON_CANDIDATES = [
+  process.env.TENSORRT_BRIDGE_NODE_PATH?.trim(),
+  resolve(dirname(fileURLToPath(import.meta.url)), '../../../../../simd-bridge/cpp/build-x64-cuda/Release/tensorrt_bridge.node'),
+  resolve(dirname(fileURLToPath(import.meta.url)), '../../../../../../simd-bridge/cpp/build-x64-cuda/Release/tensorrt_bridge.node'),
   resolve(dirname(fileURLToPath(import.meta.url)), '../../../../../simd-bridge/cpp/build/Release/tensorrt_bridge.node'),
   resolve(dirname(fileURLToPath(import.meta.url)), '../../../../../../simd-bridge/cpp/build/Release/tensorrt_bridge.node'),
-];
+].filter(Boolean) as string[];
 
 interface TensorrtAddon {
   autoencoderEncode?: (input: Float32Array, inputDim: number, latentDim: number) => Float32Array;
   autoencoderDecode?: (latent: Float32Array, latentDim: number, outputDim: number) => Float32Array;
   isCudaAvailable?: () => boolean;
+  checkCudaAvailable?: () => number;
 }
 
 function loadAddon(): TensorrtAddon | null {
+  let firstLoaded: TensorrtAddon | null = null;
   for (const p of ADDON_CANDIDATES) {
     if (existsSync(p)) {
-      try { return esmRequire(p) as TensorrtAddon; }
+      try {
+        const loaded = esmRequire(p) as TensorrtAddon;
+        firstLoaded ??= loaded;
+        if ((loaded.checkCudaAvailable?.() ?? 0) > 0 || loaded.isCudaAvailable?.()) return loaded;
+      }
       catch { /* try next */ }
     }
   }
-  return null;
+  return firstLoaded;
 }
 
 const addon = loadAddon();
@@ -85,7 +94,7 @@ class AutoencoderSession {
 
   get isWarm(): boolean { return this.warm; }
 
-  get cudaAvailable(): boolean { return addon?.isCudaAvailable?.() ?? false; }
+  get cudaAvailable(): boolean { return (addon?.checkCudaAvailable?.() ?? 0) > 0 || (addon?.isCudaAvailable?.() ?? false); }
 
   private dispatch(fn: () => Float32Array): Promise<Float32Array> {
     if (this.warm) {

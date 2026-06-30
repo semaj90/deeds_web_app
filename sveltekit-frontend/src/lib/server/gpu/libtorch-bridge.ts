@@ -254,33 +254,72 @@ export function getAddonInternal(): NativeAddon | null {
 
 	ensureLibtorchInPath();
 
-	// Allow operator override via env var (closes load-path issues in detached
-	// dev processes where process.cwd() differs from the workspace root).
-	const envOverride = process.env.TENSORRT_BRIDGE_NODE_PATH?.trim();
-	const paths = [
-		envOverride,
-		resolve(process.cwd(), '../simd-bridge/cpp/build/Release/tensorrt_bridge.node'),
-		resolve(process.cwd(), '../simd-bridge/cpp/build/tensorrt_bridge.node'),
-		resolve(process.cwd(), '../simd-bridge/build/Release/tensorrt_bridge.node'),
-		resolve(process.cwd(), 'simd-bridge/cpp/build/Release/tensorrt_bridge.node'),
-		'C:/Users/james/Videos/deeds-web-app/simd-bridge/cpp/build/Release/tensorrt_bridge.node',
-	].filter(Boolean) as string[];
+	const paths = bridgeCandidatePaths();
+	let firstLoaded: { addon: NativeAddon; path: string; cudaCode: number } | null = null;
 
 	for (const p of paths) {
 		try {
 			if (!existsSync(p)) continue;
-			addon = esmRequire(p) as NativeAddon;
-			const cudaCode = addon.checkCudaAvailable?.() ?? 0;
+			const loaded = esmRequire(p) as NativeAddon;
+			const cudaCode = loaded.checkCudaAvailable?.() ?? 0;
 			const cudaLabel = cudaCode === 2 ? 'CUDA+cuDNN' : cudaCode === 1 ? 'CUDA' : 'CPU';
-			console.log(`[libtorch-bridge] Loaded native addon from ${p} (${cudaLabel})`);
+			console.log(`[libtorch-bridge] Probed native addon ${p} (${cudaLabel})`);
+			firstLoaded ??= { addon: loaded, path: p, cudaCode };
+			if (cudaCode <= 0) continue;
+			addon = loaded;
+			_addonPath = p;
+			console.log(`[libtorch-bridge] Selected native addon from ${p} (${cudaLabel})`);
 			return addon;
 		} catch (err) {
 			console.warn(`[libtorch-bridge] Failed to load ${p}:`, (err as Error).message);
 		}
 	}
 
+	if (firstLoaded) {
+		addon = firstLoaded.addon;
+		_addonPath = firstLoaded.path;
+		console.warn(
+			`[libtorch-bridge] Selected CPU-only native addon from ${firstLoaded.path}; ` +
+				'no CUDA-positive bridge candidate was loadable.',
+		);
+		return addon;
+	}
+
 	console.warn('[libtorch-bridge] Native addon not found, using CPU fallback');
 	return null;
+}
+
+function uniquePaths(paths: Array<string | undefined>): string[] {
+	const seen = new Set<string>();
+	const out: string[] = [];
+	for (const raw of paths) {
+		const p = raw?.trim();
+		if (!p || seen.has(p)) continue;
+		seen.add(p);
+		out.push(p);
+	}
+	return out;
+}
+
+function bridgeCandidatePaths(): string[] {
+	const envOverride = process.env.TENSORRT_BRIDGE_NODE_PATH?.trim();
+	const thisDir = dirname(fileURLToPath(import.meta.url));
+	const cwd = process.cwd();
+	return uniquePaths([
+		envOverride,
+		resolve(thisDir, '../../../../../simd-bridge/cpp/build-x64-cuda/Release/tensorrt_bridge.node'),
+		resolve(thisDir, '../../../../../../simd-bridge/cpp/build-x64-cuda/Release/tensorrt_bridge.node'),
+		resolve(cwd, '../simd-bridge/cpp/build-x64-cuda/Release/tensorrt_bridge.node'),
+		resolve(cwd, 'simd-bridge/cpp/build-x64-cuda/Release/tensorrt_bridge.node'),
+		'C:/Users/james/Videos/deeds-web-app/simd-bridge/cpp/build-x64-cuda/Release/tensorrt_bridge.node',
+		resolve(thisDir, '../../../../../simd-bridge/cpp/build/Release/tensorrt_bridge.node'),
+		resolve(thisDir, '../../../../../../simd-bridge/cpp/build/Release/tensorrt_bridge.node'),
+		resolve(cwd, '../simd-bridge/cpp/build/Release/tensorrt_bridge.node'),
+		resolve(cwd, '../simd-bridge/cpp/build/tensorrt_bridge.node'),
+		resolve(cwd, '../simd-bridge/build/Release/tensorrt_bridge.node'),
+		resolve(cwd, 'simd-bridge/cpp/build/Release/tensorrt_bridge.node'),
+		'C:/Users/james/Videos/deeds-web-app/simd-bridge/cpp/build/Release/tensorrt_bridge.node',
+	]);
 }
 
 /**
@@ -1452,16 +1491,8 @@ let _libPath: string | null   = null;
 
 function getWorkerPaths(): { addonPath: string; libPath: string; workerScriptPath: string } {
   if (!_addonPath) {
-    // Resolve addon path using __dirname equivalent — absolute so the worker
-    // can require() it regardless of its own cwd.
-    const thisDir = dirname(fileURLToPath(import.meta.url));
-    const cwd = process.cwd();
-    const candidates = [
-      resolve(thisDir, '../../../../../../simd-bridge/cpp/build/Release/tensorrt_bridge.node'),
-      resolve(cwd, 'simd-bridge/cpp/build/Release/tensorrt_bridge.node'),
-      resolve(cwd, '../simd-bridge/cpp/build/Release/tensorrt_bridge.node'),
-    ];
-    _addonPath = candidates.find(existsSync) ?? candidates[0];
+    getAddonInternal();
+    _addonPath ??= bridgeCandidatePaths().find(existsSync) ?? bridgeCandidatePaths()[0];
 
     // Mirror the PATH additions from getAddonInternal
     const libCandidates = [

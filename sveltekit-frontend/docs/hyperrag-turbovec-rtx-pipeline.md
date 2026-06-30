@@ -31,7 +31,7 @@ This is a **retrieval pipeline**, not a model optimizer. It improves what Gemma4
 - **TurboVec 4-bit ANN + GPU cluster centroids** narrow the Qdrant search before the expensive 768-dim scan — fewer irrelevant chunks reach the model
 - **RRF merge across 3 lanes** (semantic / kag / wide) + Karpathy PageRank boost picks the most authoritative chunks, not just the nearest ones
 - **CouchDB wiki enrichment** adds pre-computed Karpathy domain notes alongside results
-- **Compact `latest.min.json` packet** (Step 7) respects the 32K context budget — summaries truncated to 300 chars, vectors stripped, sidecar logged to `logs/hyperrag-stream/`
+- **Compact `latest.min.json` packet** (Step 7) respects the 64K context budget — summaries truncated to 300 chars, vectors stripped, sidecar logged to `logs/hyperrag-stream/`
 
 Net effect: Gemma4 sees higher-signal, more compact context → fewer wasted tokens → better answers without touching tok/sec or TTFT.
 
@@ -66,7 +66,7 @@ cd sveltekit-frontend
   -m .\models\gemma4-turboquant-rotorquant.gguf \
   --host 127.0.0.1 \
   --port 8090 \
-  --ctx-size 32768 \
+  --ctx-size 64768 \
   --batch-size 512 \
   --ubatch-size 256 \
   --cache-type-k q8_0 \
@@ -76,7 +76,7 @@ cd sveltekit-frontend
 
 On 8GB RTX, the production target is:
 
-- `--ctx-size 32768`
+- `--ctx-size 64768`
 - `max_tokens` 2048–4096
 - retrieval `top_k` 3–5
 - `q8_0` KV cache
@@ -139,7 +139,7 @@ The safest wiring is two lanes, not one:
 
 - Lane A (production): keep the current Gemma4 RotorQuant GGUF / TurboQuant path intact.
   - `llama-server.exe` on `:8090`
-  - `--ctx-size 32768`
+  - `--ctx-size 64000`
   - `--cache-type-k q8_0 --cache-type-v q8_0`
   - `--flash-attn`
   - use ACE/Redis compact packets, Qdrant topological clusters, and TRACE MCP for retrieval

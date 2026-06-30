@@ -24,7 +24,7 @@ import { cacheExport } from '$lib/server/cache/pdf-export-cache.js';
 import { storeCachedResponse } from '$lib/server/ai/llm-cache.js';
 import { ENV } from '$lib/server/env.server.js';
 import type { Handle, HandleServerError } from '@sveltejs/kit';
-import { getChatModelKeepAlive, ollamaFetch } from '$lib/server/ollama.js';
+import { ollamaFetch } from '$lib/server/ollama.js';
 import { auditBuffer } from '$lib/server/audit/api-audit-buffer';
 import { ensureRedis, getRedis } from '$lib/server/redis.js';
 import { checkHooksRateLimit, startCleanup } from '$lib/server/middleware/rate-limiter.js';
@@ -608,32 +608,34 @@ async function warmupLLMCache(): Promise<WarmupStatus> {
  * do not pay the full cold-load cost.
  */
 async function warmupChatModel(): Promise<WarmupStatus> {
-  const OLLAMA_URL = ENV.OLLAMA_BASE_URL;
+  const CHAT_BASE_URL = (
+    ENV.LLAMA_SERVER_URL ??
+    ENV.TURBOQUANT_URL ??
+    ENV.TURBOQUANT_BASE_URL ??
+    'http://127.0.0.1:8090'
+  ).replace(/\/$/, '');
+  const CHAT_MODEL = ENV.GEMMA4_MODEL ?? ENV.FUNCTION_GEMMA_MODEL ?? 'gemma4-legal-iq4xs-direct.gguf';
 
   try {
-    const ping = await ollamaFetch(`${OLLAMA_URL}/api/tags`, { signal: AbortSignal.timeout(3000) });
-    if (!ping.ok) return { status: 'skipped', reason: `Ollama returned ${ping.status}` };
+    const ping = await fetch(`${CHAT_BASE_URL}/v1/models`, { signal: AbortSignal.timeout(3000) });
+    if (!ping.ok) return { status: 'skipped', reason: `Chat server returned ${ping.status}` };
   } catch {
-    return { status: 'skipped', reason: 'Ollama unreachable' };
+    return { status: 'skipped', reason: 'Chat server unreachable' };
   }
 
   try {
-    const warmRes = await ollamaFetch(`${OLLAMA_URL}/api/chat`, {
+    const warmRes = await fetch(`${CHAT_BASE_URL}/v1/chat/completions`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        model: 'gemma4-rotorquant:latest',
+        model: CHAT_MODEL,
         messages: [
           { role: 'system', content: 'You are a legal AI assistant.' },
           { role: 'user', content: 'Reply with OK.' },
         ],
         stream: false,
-        keep_alive: getChatModelKeepAlive(),
-        options: {
-          temperature: 0,
-          num_predict: 1,
-          num_ctx: 512,
-        },
+        temperature: 0,
+        max_tokens: 1,
       }),
       signal: AbortSignal.timeout(90_000),
     });
