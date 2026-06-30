@@ -16,12 +16,17 @@ const LOG_PATH = resolve(LOG_DIR, 'graphify-daily-startup.log');
 const CACHE_PATH = resolve(LOG_DIR, 'graphify-daily-startup.json');
 const TMP_CACHE_PATH = resolve(TMP_DIR, 'graphify-daily-startup.json');
 const COOLDOWN_SEC = 3600;
-const INCLUDE_SEMANTIC_REFRESH = /^(1|true|yes|on)$/i.test(process.env.GRAPHIFY_DAILY_INCLUDE_SEMANTIC ?? '');
-const SEMANTIC_REFRESH_SCRIPT = process.env.GRAPHIFY_DAILY_SEMANTIC_SCRIPT?.trim() || 'graphify:semantic';
 
 // Load repo + frontend env through the shared Atlas helper so .env.local
 // can override .env consistently for every nested startup script.
 Object.assign(process.env, loadRepoEnv(process.env));
+
+const INCLUDE_SEMANTIC_REFRESH = /^(1|true|yes|on)$/i.test(process.env.GRAPHIFY_DAILY_INCLUDE_SEMANTIC ?? '');
+const SEMANTIC_REFRESH_SCRIPT = process.env.GRAPHIFY_DAILY_SEMANTIC_SCRIPT?.trim() || 'graphify:semantic';
+const INCLUDE_QDRANT_LINK_REPAIR = !/^(0|false|no|off)$/i.test(process.env.GRAPHIFY_DAILY_INCLUDE_QDRANT_LINKS ?? 'true');
+const QDRANT_LINK_REPAIR_SCRIPT = process.env.GRAPHIFY_DAILY_QDRANT_LINK_SCRIPT?.trim() || 'atlas:packet-qdrant-links:startup';
+const INCLUDE_EMBEDDING_REFRESH = /^(1|true|yes|on)$/i.test(process.env.GRAPHIFY_DAILY_INCLUDE_EMBEDDINGS ?? '');
+const EMBEDDING_REFRESH_SCRIPT = process.env.GRAPHIFY_DAILY_EMBEDDING_SCRIPT?.trim() || 'worker:embedding:batch:startup:detached';
 
 mkdirSync(LOG_DIR, { recursive: true });
 mkdirSync(TMP_DIR, { recursive: true });
@@ -141,6 +146,14 @@ const steps = [
   ['graphify:cluster-cards:load', { required: false, name: 'Load into Postgres' }],
 ];
 
+if (INCLUDE_QDRANT_LINK_REPAIR) {
+  steps.push([QDRANT_LINK_REPAIR_SCRIPT, { required: false, name: 'Repair packet → Qdrant mirror links' }]);
+}
+
+if (INCLUDE_EMBEDDING_REFRESH) {
+  steps.push([EMBEDDING_REFRESH_SCRIPT, { required: false, name: 'Launch EmbeddingGemma batch worker' }]);
+}
+
 const stepResults = [];
 for (const [script, opts] of steps) {
   console.log(`🗺️ ${opts.name} → npm run ${script}`);
@@ -204,6 +217,15 @@ writeValidationCache({
   graphFailedDueTo: null,
   stepResults,
   semanticRefresh,
+  qdrantLinkRepair: {
+    enabled: INCLUDE_QDRANT_LINK_REPAIR,
+    script: QDRANT_LINK_REPAIR_SCRIPT,
+  },
+  embeddingRefresh: {
+    enabled: INCLUDE_EMBEDDING_REFRESH,
+    script: EMBEDDING_REFRESH_SCRIPT,
+    mode: INCLUDE_EMBEDDING_REFRESH ? 'detached_or_script_defined' : 'skipped',
+  },
   redis: resolveRedisConnection(),
 });
 console.log(`🗺️ graphify:startup:safe complete — ${passed}/${stepResults.length} steps passed`);

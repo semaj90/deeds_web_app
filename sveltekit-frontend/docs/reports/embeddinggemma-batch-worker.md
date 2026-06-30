@@ -3,14 +3,26 @@
 - status: PASS
 - mode: apply
 - model: embeddinggemma:latest
+- endpoint: http://127.0.0.1:11434/v1/embeddings
+- transport: openai_compatible
 - expected_dim: 768
-- selected_rows: 3824
-- embedded_rows: 3824
-- updated_rows: 3824
-- batches: 192
+- selected_rows: 20
+- embedded_rows: 20
+- updated_rows: 20
+- batches: 1
 - batch_size: 20
 - concurrency: 1
-- elapsed_ms: 257955
+- elapsed_ms: 1058
+- schema_failures: 0
+- schema_hints: 1
 - report_json: C:\Users\james\Videos\deeds-web-app\sveltekit-frontend\docs\reports\embeddinggemma-batch-worker.json
+
+## Schema Hints
+
+- canonical_source_ref is not a scalar column in this database; derive it from source_ref/source_ref_key/file_path or JSONB metadata/payload.
+
+## Schema Failures
+
+- none
 
 This worker embeds summary rows only. It does not mutate packet identity fields.

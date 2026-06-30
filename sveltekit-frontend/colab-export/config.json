@@ -1,0 +1,11 @@
+{
+  "export_timestamp": "2026-06-30T15:45:00Z",
+  "total_packets": 53570,
+  "model": "gemma4",
+  "instructions": {
+    "step_1": "Upload packets.jsonl to Google Drive or Colab",
+    "step_2": "Run: python colab-summarize.py",
+    "step_3": "Download summaries.jsonl back to local machine",
+    "step_4": "Run: npm run colab:import:summaries"
+  }
+}

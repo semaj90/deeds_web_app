@@ -27,6 +27,7 @@ import { existsSync, mkdirSync, readFileSync as fsReadFileSync, writeFileSync } 
 import { resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import pg from 'pg';
+import { loadRepoEnv, resolveDatabaseUrl } from './connection-config.mjs';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = resolve(__dirname, '../..');
@@ -39,8 +40,9 @@ const LIMIT_ARG = [...args].find(a => a.startsWith('--limit='))?.split('=')[1];
 const LIMIT = LIMIT_ARG ? parseInt(LIMIT_ARG, 10) : 0;
 
 const RUN_ID = `graphify_cold_${Date.now()}`;
-const DATABASE_URL =
-  process.env.DATABASE_URL || 'postgresql://legal_admin:123456@127.0.0.1:5434/legal_ai_db';
+const repoEnv = loadRepoEnv(process.env);
+Object.assign(process.env, repoEnv);
+const DATABASE_URL = resolveDatabaseUrl(repoEnv);
 
 const results = {
   runId: RUN_ID,
@@ -66,6 +68,92 @@ async function auditPostgresLineage() {
   log('── Step 1: Postgres lineage coverage audit ──────────────────────────────');
   const pool = new pg.Pool({ connectionString: DATABASE_URL });
   try {
+    const { rows: tableRows } = await pool.query(`
+      SELECT table_name
+      FROM information_schema.tables
+      WHERE table_schema = 'public'
+        AND table_name IN (
+          'parent_atlas_documents',
+          'atlas_packets',
+          'atlas_summary_layers',
+          'atlas_feature_map',
+          'atlas_feature_synthesis',
+          'route_runtime_packets'
+        )
+    `);
+    const tables = new Set(tableRows.map((row) => row.table_name));
+
+    if (!tables.has('parent_atlas_documents') && tables.has('atlas_packets')) {
+      const { rows: packetRows } = await pool.query(`
+        SELECT
+          COUNT(*)                                             AS total,
+          COUNT(*) FILTER (WHERE source_ref IS NOT NULL)      AS has_source_ref,
+          COUNT(*) FILTER (WHERE source_ref_key IS NOT NULL)  AS has_source_ref_key,
+          COUNT(*) FILTER (WHERE feature_id IS NOT NULL)      AS has_feature_id,
+          COUNT(*) FILTER (WHERE file_path IS NOT NULL)       AS has_file_path,
+          COUNT(*) FILTER (WHERE qdrant_point_id IS NOT NULL) AS has_qdrant_point_id,
+          COUNT(*) FILTER (WHERE som_cluster IS NOT NULL)     AS has_som_cluster,
+          COUNT(*) FILTER (WHERE kmeans_cluster IS NOT NULL)  AS has_kmeans_cluster,
+          COUNT(*) FILTER (WHERE source_ref LIKE 'feature:%') AS feature_bucket_misuse
+        FROM atlas_packets
+      `);
+      const packets = packetRows[0];
+
+      const { rows: summaryRows } = tables.has('atlas_summary_layers')
+        ? await pool.query(`
+            SELECT
+              COUNT(*)                                        AS total,
+              COUNT(*) FILTER (WHERE embedding IS NOT NULL)   AS has_embedding,
+              COUNT(*) FILTER (WHERE feature_id IS NOT NULL)  AS has_feature_id,
+              COUNT(*) FILTER (WHERE source_ref IS NOT NULL)  AS has_source_ref
+            FROM atlas_summary_layers
+          `)
+        : { rows: [{ total: 0, has_embedding: 0, has_feature_id: 0, has_source_ref: 0 }] };
+
+      const report = {
+        canonical_source_table: 'atlas_packets',
+        compatibility: {
+          parent_atlas_documents_exists: false,
+          atlas_packets_exists: true,
+          duckdb_legacy_mapreduce_supported: false,
+          hint: 'Legacy parent_atlas_documents is absent; daily graphify is using atlas_packets as the canonical Parent Atlas spine.',
+        },
+        atlas_packets: {
+          total: Number(packets.total),
+          has_source_ref: Number(packets.has_source_ref),
+          has_source_ref_key: Number(packets.has_source_ref_key),
+          has_feature_id: Number(packets.has_feature_id),
+          has_file_path: Number(packets.has_file_path),
+          has_qdrant_point_id: Number(packets.has_qdrant_point_id),
+          has_som_cluster: Number(packets.has_som_cluster),
+          has_kmeans_cluster: Number(packets.has_kmeans_cluster),
+          feature_bucket_misuse: Number(packets.feature_bucket_misuse),
+        },
+        atlas_summary_layers: {
+          total: Number(summaryRows[0].total),
+          has_embedding: Number(summaryRows[0].has_embedding),
+          has_feature_id: Number(summaryRows[0].has_feature_id),
+          has_source_ref: Number(summaryRows[0].has_source_ref),
+        },
+        auditedAt: new Date().toISOString(),
+      };
+
+      mkdirSync(resolve(REPO_ROOT, '.tmp'), { recursive: true });
+      writeFileSync(
+        resolve(REPO_ROOT, '.tmp/parent-atlas-postgres-lineage-report.json'),
+        JSON.stringify(report, null, 2) + '\n',
+        'utf8'
+      );
+
+      results.summary.postgresLineage = report;
+
+      logStep('postgres-lineage', {
+        ok: Number(packets.feature_bucket_misuse) === 0,
+        message: `atlas_packets=${packets.total} rows, summaries=${summaryRows[0].total} rows, qdrant_links=${packets.has_qdrant_point_id}, legacy parent_atlas_documents absent`,
+      });
+      return report;
+    }
+
     const { rows: padRows } = await pool.query(`
       SELECT
         COUNT(*)                                             AS total,
@@ -208,6 +296,18 @@ function runDuckDBMapReduce() {
     return true;
   }
 
+  if (results.summary.postgresLineage?.compatibility?.duckdb_legacy_mapreduce_supported === false) {
+    log('── Step 3: DuckDB offline synthesis (SKIPPED) ───────────────────────────');
+    const detail = results.summary.postgresLineage.compatibility.hint || 'Legacy DuckDB MapReduce source tables are unavailable.';
+    results.summary.duckdbMapreduce = {
+      skipped: true,
+      reason: 'legacy_parent_atlas_documents_absent',
+      detail,
+    };
+    logStep('duckdb-mapreduce', { ok: true, message: `Skipped: ${detail}` });
+    return true;
+  }
+
   log('── Step 3: DuckDB offline MapReduce synthesis ───────────────────────────');
 
   // Check for DuckDB binary
@@ -324,7 +424,11 @@ function writeSummaryReport() {
   );
 
   const lin = results.summary.postgresLineage;
-  const padTotal = lin?.parent_atlas_documents?.total ?? 'N/A';
+  const sourceTableName = lin?.canonical_source_table ?? 'parent_atlas_documents';
+  const sourceTableTotal = lin?.atlas_packets?.total ?? lin?.parent_atlas_documents?.total ?? 'N/A';
+  const summaryLayerTotal = lin?.atlas_summary_layers?.total ?? 'N/A';
+  const qdrantLinkedTotal = lin?.atlas_packets?.has_qdrant_point_id ?? lin?.parent_atlas_documents?.has_qdrant_point_id ?? 'N/A';
+  const featureIdTotal = lin?.atlas_packets?.has_feature_id ?? lin?.parent_atlas_documents?.has_feature_id ?? 'N/A';
   const afmTotal = lin?.atlas_feature_map?.total ?? 'N/A';
   const afsTotal = lin?.atlas_feature_synthesis?.total ?? 'N/A';
   const rrpTotal = lin?.route_runtime_packets?.total ?? 'N/A';
@@ -369,7 +473,10 @@ ${stepLines}
 
 | Table | Count |
 |-------|-------|
-| parent_atlas_documents | ${padTotal} |
+| active source table: ${sourceTableName} | ${sourceTableTotal} |
+| active source qdrant_point_id coverage | ${qdrantLinkedTotal} |
+| active source feature_id coverage | ${featureIdTotal} |
+| atlas_summary_layers | ${summaryLayerTotal} |
 | atlas_feature_map | ${afmTotal} |
 | atlas_feature_synthesis | ${afsTotal} |
 | route_runtime_packets | ${rrpTotal} |

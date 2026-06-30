@@ -85,6 +85,8 @@ log.info(f"Model path: {model_path}")
 embed_fn    = None
 model_name  = "embeddinggemma"
 output_dim  = 768
+available_providers = []
+active_providers = []
 _req_count  = 0
 _total_ms   = 0.0
 
@@ -107,15 +109,22 @@ if BACKEND == "onnx":
         sess_opts.intra_op_num_threads = 4
         sess_opts.graph_optimization_level = ort.GraphOptimizationLevel.ORT_ENABLE_ALL
 
-        # Try DirectML (GPU) first, fall back to CPU
+        # Try CUDA/DirectML GPU providers first, fall back to CPU.
+        # CUDA is used when onnxruntime-gpu is installed in a CUDA-capable env.
+        # DirectML is the practical native-Windows GPU path.
         providers = []
         available = ort.get_available_providers()
+        available_providers = list(available)
+        if "CUDAExecutionProvider" in available:
+            providers.append("CUDAExecutionProvider")
+            log.info("Using CUDA execution provider")
         if "DmlExecutionProvider" in available:
             providers.append("DmlExecutionProvider")
             log.info("Using DirectML (GPU) execution provider")
         providers.append("CPUExecutionProvider")
 
         session   = ort.InferenceSession(str(onnx_path), sess_opts, providers=providers)
+        active_providers = list(session.get_providers())
         tokenizer = Tokenizer.from_file(str(tokenizer_path))
         tokenizer.enable_padding(pad_id=0, pad_token="<pad>")
         tokenizer.enable_truncation(max_length=512)
@@ -220,6 +229,8 @@ class EmbedHandler(BaseHTTPRequestHandler):
                 "model": model_name,
                 "dim": output_dim,
                 "backend": BACKEND,
+                "providers_available": available_providers,
+                "providers_active": active_providers,
                 "requests": _req_count,
             })
         elif self.path == "/metrics":
@@ -229,6 +240,7 @@ class EmbedHandler(BaseHTTPRequestHandler):
                 "avg_latency_ms": round(avg_ms, 2),
                 "model": model_name,
                 "dim": output_dim,
+                "providers_active": active_providers,
             })
         elif self.path.startswith("/api/"):
             # Explicitly reject Ollama routes — this is NOT an Ollama server

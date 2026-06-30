@@ -1,0 +1,141 @@
+{
+  "generated_at": "2026-06-30T19:30:57.196Z",
+  "mode": "apply",
+  "status": "PASS",
+  "limit": 10000,
+  "selected_rows": 11,
+  "packet_cleanup": {
+    "selected": 0,
+    "invalidated": 0,
+    "samples": []
+  },
+  "actions": {
+    "cleaned_reasoning_leak": 0,
+    "duplicate_superseded": 7,
+    "requires_regeneration": 4
+  },
+  "before": {
+    "atlas_summary_layers": {
+      "total_rows": 9823,
+      "summary_text_rows": 1141,
+      "embedded_rows": 1138,
+      "leaked_rows": 11,
+      "distinct_packet_keys": 5780,
+      "duplicate_rows": 4043
+    },
+    "atlas_packets": {
+      "total_rows": 58304,
+      "summary_text_rows": 357,
+      "leaked_rows": 0
+    }
+  },
+  "after": {
+    "atlas_summary_layers": {
+      "total_rows": 9823,
+      "summary_text_rows": 1130,
+      "embedded_rows": 1130,
+      "leaked_rows": 0,
+      "distinct_packet_keys": 5780,
+      "duplicate_rows": 4043
+    },
+    "atlas_packets": {
+      "total_rows": 58304,
+      "summary_text_rows": 357,
+      "leaked_rows": 0
+    }
+  },
+  "samples": [
+    {
+      "packet_key": "packet:3c2e579e417d",
+      "rank": 4,
+      "action": "duplicate_superseded",
+      "had_embedding": false,
+      "preview": "<|channel>thought Thinking Process: 1. **Analyze the Request:** The user wants a 1-2 sentence summary of a code feature, specifically for \"legal code intelligence.\" 2. **Analyze the Input:** * **Feature:** `production-config.json.report.jso",
+      "cleaned_preview": null
+    },
+    {
+      "packet_key": "packet:aaf07340dba0",
+      "rank": 4,
+      "action": "duplicate_superseded",
+      "had_embedding": true,
+      "preview": "<|channel>thought Thinking Process: 1. **Analyze the Request:** The user wants me to summarize a specific code feature, identified by a JSON file path (`dbf458a38b8bb438.json`), in 1-2 sentences, tailored for \"legal code intelligence.\" 2. *",
+      "cleaned_preview": null
+    },
+    {
+      "packet_key": "packet:e343da960950",
+      "rank": 4,
+      "action": "duplicate_superseded",
+      "had_embedding": true,
+      "preview": "<|channel>thought Thinking Process: 1. **Analyze the Request:** The user wants me to summarize a code feature, given a file path and a JSON identifier, specifically tailored for \"legal code intelligence.\" The summary must be 1-2 sentences. ",
+      "cleaned_preview": null
+    },
+    {
+      "packet_key": "packet:3c2e579e417d",
+      "rank": 3,
+      "action": "duplicate_superseded",
+      "had_embedding": false,
+      "preview": "<|channel>thought Here's a thinking process to arrive at the suggested summary: 1. **Analyze the Request:** * **Goal:** Summarize a code feature/file path for \"legal code intelligence.\" * **Input:** * Feature: `production-config.json.report",
+      "cleaned_preview": null
+    },
+    {
+      "packet_key": "packet:e343da960950",
+      "rank": 3,
+      "action": "duplicate_superseded",
+      "had_embedding": true,
+      "preview": "<|channel>thought Thinking Process: 1. **Analyze the Request:** The user wants me to summarize a code feature based on provided metadata (a JSON file path and a unique identifier) for an audience focused on \"legal code intelligence.\" 2. **E",
+      "cleaned_preview": null
+    },
+    {
+      "packet_key": "packet:3c2e579e417d",
+      "rank": 2,
+      "action": "duplicate_superseded",
+      "had_embedding": false,
+      "preview": "<|channel>thought Thinking Process: 1. **Analyze the Request:** The user wants a 1-2 sentence summary of a \"code feature\" based on provided file paths/names, specifically tailored for \"legal code intelligence.\" 2. **Analyze the Input Data:*",
+      "cleaned_preview": null
+    },
+    {
+      "packet_key": "packet:e343da960950",
+      "rank": 2,
+      "action": "duplicate_superseded",
+      "had_embedding": true,
+      "preview": "<|channel>thought Thinking Process: 1. **Analyze the Request:** The user wants me to summarize a code feature based on provided metadata (a JSON file path and a generic \"Summary\" placeholder). 2. **Examine the Input:** * `Feature: dbe1d5371",
+      "cleaned_preview": null
+    },
+    {
+      "packet_key": "packet:2360469a9705",
+      "rank": 1,
+      "action": "requires_regeneration",
+      "had_embedding": true,
+      "preview": "<|channel>thought Thinking Process: 1. **Analyze the Request:** The user wants a 1-2 sentence summary of a specific code feature/file path for an audience focused on \"legal code intelligence.\" 2. **Analyze the Input:** * Feature: `tsconfig.",
+      "cleaned_preview": null
+    },
+    {
+      "packet_key": "packet:3c2e579e417d",
+      "rank": 1,
+      "action": "requires_regeneration",
+      "had_embedding": true,
+      "preview": "<|channel>thought Thinking Process: 1. **Analyze the Request:** The user wants a 1-2 sentence summary of a \"code feature\" based on provided file paths/names, specifically tailored for \"legal code intelligence.\" 2. **Analyze the Input Data:*",
+      "cleaned_preview": null
+    },
+    {
+      "packet_key": "packet:9cacdc02b078",
+      "rank": 1,
+      "action": "requires_regeneration",
+      "had_embedding": true,
+      "preview": "<|channel>thought Here's a thinking process to arrive at the suggested summary: 1. **Analyze the Input:** * **Feature:** `tsconfig.audit.ollama.json.wrap-backup.2026-05-31T07-23-45-182Z` * **File:** `.tmp/repairs/tsconfig.audit.ollama.json.",
+      "cleaned_preview": null
+    },
+    {
+      "packet_key": "packet:e343da960950",
+      "rank": 1,
+      "action": "requires_regeneration",
+      "had_embedding": true,
+      "preview": "<|channel>thought Thinking Process: 1. **Analyze the Request:** The user wants me to summarize a code feature, given a file path/name (`dbe1d53710d54129.json`) and a placeholder for the summary. 2. **Examine the Input:** The input is: * `Fe",
+      "cleaned_preview": null
+    }
+  ],
+  "outputs": {
+    "json": "C:\\Users\\james\\Videos\\deeds-web-app\\docs\\reports\\summary-layer-quality-cleanup.json",
+    "markdown": "C:\\Users\\james\\Videos\\deeds-web-app\\docs\\reports\\summary-layer-quality-cleanup.md"
+  }
+}
