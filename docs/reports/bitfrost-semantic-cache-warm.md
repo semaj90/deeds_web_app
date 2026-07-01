@@ -1,13 +1,13 @@
 # Bitfrost Semantic Cache Warm Plan
 
-Generated: 2026-06-28T23:57:32.938Z
+Generated: 2026-07-01T01:51:24.645Z
 Mode: apply
 Limit: 25
 
 ## Summary
 
 - candidate rows: 25
-- source table: atlas_packets
+- source table: atlas_higher_hop_index
 - packets planned: 25
 - feature keys planned: 25
 - ace keys planned: 75

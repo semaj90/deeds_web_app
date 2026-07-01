@@ -1,0 +1,64 @@
+{
+  "generated_at": "2026-07-01T01:01:03.103Z",
+  "mode": "dry-run",
+  "input": "C:\\Users\\james\\Desktop\\colab_630\\upload-parent-atlas\\atlas_summary_layers.ndjson",
+  "input_files": [
+    "C:\\Users\\james\\Desktop\\colab_630\\upload-parent-atlas\\atlas_summary_layers.ndjson"
+  ],
+  "output_packets": "C:\\Users\\james\\Videos\\deeds-web-app\\.tmp\\gemma4-summary-packets.ndjson",
+  "stats": {
+    "lines": 7530,
+    "accepted": 1131,
+    "parseErrors": 0,
+    "rejected": 6399,
+    "skippedStatus": 0,
+    "inserted": 0,
+    "skippedDuplicates": 0
+  },
+  "candidate_rows": 1131,
+  "summary_packet_rows": 1131,
+  "inserted_rows": 0,
+  "sample": [
+    {
+      "packet_key": "packet:0003260092b1",
+      "source_ref": "sveltekit-frontend/memory/runs/2026-05-29T04-11-06/llm_synthesis_mapping.json",
+      "feature_id": null,
+      "summary_packet_key": "summary:packet:0003260092b1:de7d98da84bf",
+      "summary_length": 299
+    },
+    {
+      "packet_key": "packet:0003260092b1",
+      "source_ref": "sveltekit-frontend/memory/runs/2026-05-29T04-11-06/llm_synthesis_mapping.json",
+      "feature_id": null,
+      "summary_packet_key": "summary:packet:0003260092b1:0ad1d5b90e5f",
+      "summary_length": 458
+    },
+    {
+      "packet_key": "packet:0003260092b1",
+      "source_ref": "sveltekit-frontend/memory/runs/2026-05-29T04-11-06/llm_synthesis_mapping.json",
+      "feature_id": "sveltekit-frontend.llm_synthesis_mapping",
+      "summary_packet_key": "summary:packet:0003260092b1:2ff57e552f85",
+      "summary_length": 317
+    },
+    {
+      "packet_key": "packet:0003260092b1",
+      "source_ref": "sveltekit-frontend/memory/runs/2026-05-29T04-11-06/llm_synthesis_mapping.json",
+      "feature_id": "sveltekit-frontend.llm_synthesis_mapping",
+      "summary_packet_key": "summary:packet:0003260092b1:b81fc187e5ab",
+      "summary_length": 643
+    },
+    {
+      "packet_key": "packet:0003850e84ca",
+      "source_ref": "sveltekit-frontend/docs/obsidian-vault/Files/tests__cases-sub-routes.spec.md",
+      "feature_id": null,
+      "summary_packet_key": "summary:packet:0003850e84ca:792606524655",
+      "summary_length": 617
+    }
+  ],
+  "next_steps": [
+    "Run the EmbeddingGemma batch worker over atlas_summary_layers rows without embeddings.",
+    "Mirror canonical feature/source metadata to Qdrant payloads.",
+    "Warm Redis/BitFrost semantic cache from packet and summary rows.",
+    "Materialize chrom97 summary packets from .tmp/gemma4-summary-packets.ndjson."
+  ]
+}

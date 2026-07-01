@@ -137,7 +137,7 @@ services:
       --io-threads 4
       --io-threads-do-reads yes
       --maxmemory 2gb
-      --maxmemory-policy allkeys-lru
+      --maxmemory-policy noeviction
       --save 900 1
       --save 300 10
       --save 60 10000
@@ -783,12 +783,14 @@ services:
       LANGFUSE_USE_AZURE_BLOB: "false"
       REDIS_HOST: valkey
       REDIS_PORT: "6379"
+      REDIS_AUTH: ${REDIS_PASSWORD:-redis}
       REDIS_TLS_ENABLED: "false"
       NEXTAUTH_URL: http://localhost:3030
       SALT: langfuse-salt-change-in-production
       ENCRYPTION_KEY: 8754be3c748398a38dd9a797fbb84747cb8b94d34dd15a2d5237851dbbe1b671
       TELEMETRY_ENABLED: "false"
       LANGFUSE_ENABLE_EXPERIMENTAL_FEATURES: "true"
+      NODE_OPTIONS: --max-old-space-size=1536
     networks:
       - legal-ai-network
 

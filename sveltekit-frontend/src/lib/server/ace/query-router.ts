@@ -378,7 +378,35 @@ export async function routeQuery(opts: QueryRouterOpts): Promise<QueryRouterResu
     const t0 = Date.now();
     const embedding = sharedEmbedding ?? await embedQuery(query);
     if (embedding) {
-      const hits = await qdrantSearch(embedding, limit, collection);
+      let hits = await qdrantSearch(embedding, limit, collection);
+
+      // ── GPU Reranking (CUDA Graph Cache) ────────────────────────────────
+      // Apply GPU cosine similarity reranking if batch size warrants it
+      if (hits.length >= 5 && hits.length <= 500) {
+        try {
+          const { reankACECandidates, shouldRerank } = await import('../../gpu/cuda-graph-rerank-hook.js');
+          if (shouldRerank(hits.length)) {
+            const queryVec = new Float32Array(embedding);
+            const reranked = await reankACECandidates(queryVec, hits.map((h, idx) => ({
+              id: String(h.id),
+              metadata: { embedding: h.payload.embedding as number[] | Float32Array, score: h.score },
+              source_ref: (h.payload.sourceRef ?? h.payload.relativePath ?? h.payload.file_path ?? '') as string,
+              payload: h.payload,
+            })), { maxCandidates: limit, logTelemetry: true });
+
+            // Map reranked hits back to original Qdrant hit structure
+            const rerankedMap = new Map(reranked.hits.map(rh => [rh.id, rh.score]));
+            hits = hits.sort((a, b) => (rerankedMap.get(String(b.id)) ?? b.score) - (rerankedMap.get(String(a.id)) ?? a.score));
+
+            trace.push({ lane: 'gpu-rerank', hit: true, latency_ms: Date.now() - t0 });
+          }
+        } catch (err) {
+          // Non-blocking: GPU reranking failure doesn't break retrieval
+          console.debug('[QueryRouter] GPU reranking failed:', err);
+          trace.push({ lane: 'gpu-rerank', hit: false, latency_ms: Date.now() - t0 });
+        }
+      }
+
       if (hits.length > 0) {
         for (const hit of hits) {
           qdrantPointIds.push(hit.id);

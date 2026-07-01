@@ -13,6 +13,9 @@ import type { SearchBackend, SearchBackendRequest } from './search-backend.js';
 export interface QdrantCodeResult {
   stable_key: string;
   file_path: string;
+  packet_key?: string | null;
+  source_ref?: string | null;
+  feature_id?: string | null;
   symbol_name?: string;
   symbol_kind?: string;
   language?: string;
@@ -42,10 +45,14 @@ class QdrantSearchBackend implements SearchBackend<QdrantCodeResult> {
 
     try {
       const mgr = getManager();
-      const mustConditions: any[] = [];
+      const filters: Record<string, unknown> = {};
+
+      if (collection === 'codebase_chunks_768') {
+        filters.atlas_enriched = true;
+      }
 
       if (topoClass) {
-        mustConditions.push({ key: 'topo_class', match: { value: topoClass } });
+        filters.topo_class = topoClass;
       }
 
       // Apply encoded-cluster prefilter (Stage A0) if enabled
@@ -53,29 +60,44 @@ class QdrantSearchBackend implements SearchBackend<QdrantCodeResult> {
         try {
           const pre = await encodedClusterPrefilter(new Float32Array(embedding));
           if (pre && pre.filter && pre.filter.should) {
-            mustConditions.push({ should: pre.filter.should });
-          }
+              // Encoded prefilter emits raw Qdrant filter syntax. Keep it disabled
+              // for this wrapper until the manager accepts mixed raw filters; the
+              // canonical packet proof path must not be masked by filter-shape drift.
+            }
         } catch (err) {
           console.warn('[searchQdrantCode] Encoded prefilter failed:', err);
         }
       }
-
-      const filter = mustConditions.length > 0 ? { must: mustConditions } : undefined;
 
       const res = await mgr.hybridSearch({
         collection,
         query: '',
         queryEmbedding: embedding,
         limit,
-        filters: filter,
+        filters: Object.keys(filters).length > 0 ? filters : undefined,
+        scoreThreshold: 0.001,
       });
 
       return (res.results ?? []).map((r) => {
         const p = r.payload ?? {};
         const somCluster = p.som_cluster ?? p.somCluster;
+        const packetKey = String(p.packet_key ?? p.packetKey ?? '').trim() || null;
+        const sourceRef = String(
+          p.source_ref ??
+          p.sourceRef ??
+          p.canonical_source_ref ??
+          p.canonicalSourceRef ??
+          p.file_path ??
+          p.filePath ??
+          p.relative_path ??
+          ''
+        ).trim() || null;
         return {
-          stable_key: String(p.stable_key ?? p.chunk_id ?? r.id),
-          file_path: String(p.file_path ?? ''),
+          stable_key: packetKey ?? String(p.stable_key ?? p.chunk_id ?? r.id),
+          file_path: sourceRef ?? String(p.file_path ?? ''),
+          packet_key: packetKey,
+          source_ref: sourceRef,
+          feature_id: String(p.feature_id ?? p.featureId ?? '').trim() || null,
           symbol_name: p.symbol_name ? String(p.symbol_name) : undefined,
           symbol_kind: p.symbol_kind ? String(p.symbol_kind) : undefined,
           language: p.language ? String(p.language) : undefined,

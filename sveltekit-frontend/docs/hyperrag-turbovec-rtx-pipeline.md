@@ -254,6 +254,8 @@ For Gemma4 (D=256/512 layers), only the `test1111…/llama-cpp-turboquant-gemma4
 
 ## Pipeline Phases — Implementation Status
 
+Paths in this table are relative to `sveltekit-frontend/` unless they begin with `../`.
+
 | Phase | Description | Script | Status |
 |---|---|---|---|
 | A | RotorQuant Sidecar + TurboVec ANN | `scripts/atlas/rotorquant-turbovec-sidecar.mjs` | ✅ exists |
@@ -261,7 +263,21 @@ For Gemma4 (D=256/512 layers), only the `test1111…/llama-cpp-turboquant-gemma4
 | C | CouchDB Atlas Enrichment | baked into Phase B Step 6 | ✅ wired |
 | D | CUDA Graph Stream → RotorQuant Decode Stream | `scripts/atlas/hyperrag-cuda-stream.mjs` (`npm run atlas:hyperrag:cuda`) | ✅ exists |
 | E | Atlas Chunk Index / Log Triage | baked into Phase B Step 7, writes `logs/hyperrag-stream/` | ✅ wired |
-| F | Messy Query Routing Evaluation | `scripts/atlas/eval-messy-query-routing.mjs` (`npm run atlas:messy-routing`) + `docs/operator/PHASE_18_MESSY_QUERY_ROUTING.md` | ✅ complete |
+| F | Messy Query Routing Evaluation | `../scripts/atlas/eval-messy-query-routing.mjs` (`npm run atlas:messy-routing`) + `../docs/operator/PHASE_18_MESSY_QUERY_ROUTING.md` | ✅ complete |
+
+### Live dependency status — 2026-07-01
+
+The current checkout has the Phase A/B/D/F scripts and npm aliases wired, but the cluster prefilter is degraded until the ANN/index inputs are refreshed:
+
+| Dependency | Current proof | Status |
+|---|---|---|
+| TurboVec gRPC bridge `:50062` | `node ../scripts/atlas/test-turbovec-sidecar-contract.mjs` passes `Transform`, `EncodeLatent`, `AssignSom`, and `BatchCosine` | ✅ CUDA tensor ops ready |
+| RotorQuant/TurboVec wrapper `:8792` | `/health` returns `backend=js-centroid-fallback`, `candidateIndexSize=0`, `clusterCount=0` | ⚠️ online but empty |
+| TurboVec Python helper `:8793` | `/health` unavailable | ⚠️ offline |
+| 4D manifold centroid key | `cluster:kmeans:k20:manifold4:all` missing in Valkey | ⚠️ refresh needed |
+| Qdrant `glyph_atlas` | collection lookup returns 404 | ⚠️ refresh needed |
+
+This means the production search path remains functional through Qdrant/BM25/Neo4j/RRF, while Phase B loses the cluster-prefilter advantage until the dependency refresh commands below are run.
 
 ### Phase A detail
 

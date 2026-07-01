@@ -1,8 +1,11 @@
 /**
  * turbovec-cuda-client.ts — gRPC client for TurboVecService (port 50062)
  *
- * ANN index search + optional orthogonal transform. CPU/SIMD, no LibTorch.
- * For GPU tensor ops (BatchCosine, EncodeLatent, AssignSom) see gpu-bridge-client.ts.
+ * ANN index search + optional orthogonal transform. The live :50062 bridge also
+ * exposes CUDA-backed tensor ops through the same TurboVecCudaService contract:
+ * BatchCosine, EncodeLatent, AssignSom, and Transform. The ANN Search method
+ * depends on the separate Python/ANN sidecar being loaded from Qdrant; the
+ * tensor ops can still be healthy when indexed=0.
  *
  * Transport boundary: gRPC = typed high-throughput vector/index calls only.
  * JSON-RPC at :8792 handles agent/tool/debug calls (turbovec-prefilter.ts).

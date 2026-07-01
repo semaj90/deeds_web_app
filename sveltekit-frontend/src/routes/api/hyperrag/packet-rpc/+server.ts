@@ -75,6 +75,8 @@ import {
 } from '$lib/server/cache/redis-exact-match.js';
 import { HyperRagReplayTrace } from '$lib/server/hyperrag/replay-trace.js';
 import { getRedis } from '$lib/server/redis.js';
+import { startRun, recordEvent, finishRun } from '$lib/server/trace/trace-collector.js';
+import { recordRetrievalTelemetry } from '$lib/server/telemetry/retrieval-recorder.js';
 import crypto from 'crypto';
 
 function hashQuery(query: string): string {
@@ -103,11 +105,22 @@ function buildJsonRpcError(
 	};
 }
 
+function cleanOptionalString(value: unknown): string | undefined {
+	const text = String(value ?? '').trim();
+	return text || undefined;
+}
+
+function maybeNumber(value: unknown): number | undefined {
+	const number = Number(value);
+	return Number.isFinite(number) ? number : undefined;
+}
+
 export const POST: RequestHandler = async ({ request, locals }) => {
 	const startTime = Date.now();
 	let trace: HyperRagReplayTrace | null = null;
 	let rpcId: string | number | null | undefined;
 	let rpcProtocol: 'jsonrpc' | 'http' = 'http';
+	let traceRunId: string | null = null;
 
 	try {
 		const body = await request.json() as Record<string, unknown>;
@@ -134,6 +147,10 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 			cuvsEnabled?: boolean;
 			matmulMs?: number;
 			embeddingMs?: number;
+			story_id?: string;
+			task_id?: string;
+			worker_id?: string;
+			tool_name?: string;
 		};
 
 		if (looksLikeJsonRpcEnvelope) {
@@ -169,6 +186,40 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 		const accelerator = normalizedBody.accelerator ?? request.headers.get('x-atlas-accelerator') ?? 'cpu';
 		const cudaAvailable = normalizedBody.cudaAvailable ?? parseBooleanHeader(request.headers.get('x-atlas-cuda-available'));
 		const cuvsEnabled = normalizedBody.cuvsEnabled ?? parseBooleanHeader(request.headers.get('x-atlas-cuvs-enabled'));
+		const storyId = cleanOptionalString(normalizedBody.story_id) ?? cleanOptionalString(request.headers.get('x-atlas-story-id')) ?? 'hyperrag-packet-rpc';
+		const taskId = cleanOptionalString(normalizedBody.task_id) ?? cleanOptionalString(request.headers.get('x-atlas-task-id')) ?? 'packet-rpc-search';
+		const workerId = cleanOptionalString(normalizedBody.worker_id) ?? cleanOptionalString(request.headers.get('x-atlas-worker-id')) ?? 'sveltekit-frontend';
+		const toolName = cleanOptionalString(normalizedBody.tool_name) ?? 'atlas.search';
+
+		if (normalizedBody.recordTelemetry !== false) {
+			traceRunId = await startRun('agent', 'hyperrag.packet-rpc', {
+				triggeredBy: workerId,
+				metadata: {
+					trace_id: trace.getId(),
+					story_id: storyId,
+					task_id: taskId,
+					worker_id: workerId,
+					tool_name: toolName,
+					jsonrpc: rpcProtocol === 'jsonrpc' ? '2.0' : undefined,
+					jsonrpc_id: rpcId ?? undefined,
+					protocol: rpcProtocol,
+					cache_namespace: 'hyperrag:query',
+					accelerator,
+					cuda_available: cudaAvailable,
+					cuvs_enabled: cuvsEnabled,
+				},
+			});
+			recordEvent(traceRunId, 'tool_call', {
+				metadata: {
+					trace_id: trace.getId(),
+					story_id: storyId,
+					task_id: taskId,
+					worker_id: workerId,
+					tool_name: toolName,
+					method: looksLikeJsonRpcEnvelope ? (body as { method?: unknown }).method : 'http.post',
+				},
+			});
+		}
 
 		// Set session context for replay trace
 		if (locals.user) {
@@ -186,8 +237,11 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 			limit,
 			includeGraph: normalizedBody.includeGraph !== false,
 			useFts: normalizedBody.useFts !== false,
-			recordTelemetry: normalizedBody.recordTelemetry !== false,
-			awaitTelemetry: normalizedBody.awaitTelemetry === true,
+			// This public route owns durable one-row-per-query telemetry because it
+			// has ACP/story/task/cache context. Disable the inner generic writer to
+			// avoid duplicate atlas_retrieval_eval_times rows.
+			recordTelemetry: false,
+			awaitTelemetry: false,
 			useExactMatchCache: false,
 			protocol: rpcProtocol,
 			accelerator,
@@ -308,6 +362,8 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 			worker: 'sveltekit-frontend',
 			run_id: replayId,
 			task_id: request.headers.get('x-atlas-task-id'),
+			story_id: storyId,
+			worker_id: workerId,
 			replay_id: replayId,
 			cache_namespace: 'hyperrag:query',
 			traversal_path: packet.neo4j_neighbors ?? [],
@@ -318,7 +374,8 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 			cache_source: cacheSource,
 			cache_namespace: 'hyperrag:query',
 			task_id: request.headers.get('x-atlas-task-id') ?? undefined,
-			worker_id: 'sveltekit-frontend',
+			story_id: storyId,
+			worker_id: workerId,
 			graph_stage_status: graphStageStatus,
 			graph_stage_reason: graphStageReason,
 			protocol: rpcProtocol,
@@ -389,7 +446,8 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 					...(Number(result.trace.rrf_hits ?? 0) > 0 ? ['rrf'] : []),
 				],
 				task_id: request.headers.get('x-atlas-task-id') ?? undefined,
-				worker_id: 'sveltekit-frontend',
+				story_id: storyId,
+				worker_id: workerId,
 			},
 		};
 
@@ -397,6 +455,100 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 		trace.recordResponse(responsePayload as unknown as HyperRagPacketRpcResult);
 		const redis = getRedis();
 		trace.save(redis, 86400).catch(() => {}); // 24h TTL, non-fatal
+
+		if (normalizedBody.recordTelemetry !== false) {
+			const selectedPacketKeys = operatorPackets.map((packet) => packet.packet_key).filter(Boolean);
+			const featureIds = operatorPackets.map((packet) => packet.feature_id).filter(Boolean) as string[];
+			const hitsPayload = {
+				hits: operatorPackets.map((packet) => ({
+					packet_key: packet.packet_key,
+					feature_id: packet.feature_id,
+					source_ref: packet.source_ref,
+					fusion_score: packet.fusion_score,
+					retrieval_strategy: result.trace.retrieval_strategy ?? 'fusion',
+				})),
+				counts: {
+					packet_hits: operatorPackets.length,
+					cache_hits: cacheHits,
+					neo4j_expansions: Number(result.trace.neo4j_expansions ?? 0),
+					qdrant_hits: Number(result.trace.qdrant_hits ?? 0),
+					postgres_hits: Number(result.trace.postgres_hits ?? 0),
+					rrf_hits: Number(result.trace.rrf_hits ?? 0),
+				},
+			};
+			const telemetryPromise = recordRetrievalTelemetry({
+				query,
+				latencyMs,
+				vectorHits: Number(result.trace.qdrant_hits ?? qdrantHits),
+				trigramHits: 0,
+				ftsHits: Number(result.trace.postgres_hits ?? bm25Hits),
+				selectedPacketKeys,
+				featureIds,
+				selectedPacketKey: selectedPacketKeys[0] ?? null,
+				selectedFeatureId: featureIds[0] ?? null,
+				fusionScore: operatorPackets[0]?.fusion_score,
+				cacheHit: cacheHits > 0,
+				surface: 'hyperrag-packet-rpc',
+				environment: 'sveltekit-frontend',
+				retrievalStrategy: 'fusion',
+				hitsPayload,
+				timings: {
+					bm25_ms: maybeNumber((result.trace as Record<string, unknown>).bm25_ms),
+					qdrant_ms: maybeNumber((result.trace as Record<string, unknown>).qdrant_ms),
+					redis_ms: cacheHits > 0 ? latencyMs : undefined,
+					neo4j_ms: maybeNumber((result.trace as Record<string, unknown>).neo4j_ms),
+					fusion_ms: maybeNumber((result.trace as Record<string, unknown>).fusion_ms),
+					rerank_ms: maybeNumber((result.trace as Record<string, unknown>).rerank_ms),
+				},
+				sourceRef: operatorPackets[0]?.source_ref ?? null,
+				domainClass: operatorPackets[0]?.directory_path ?? null,
+				protocol: rpcProtocol,
+				accelerator,
+				cudaAvailable: cudaAvailable ?? null,
+				cuvsEnabled: cuvsEnabled ?? null,
+				matmulMs: normalizedBody.matmulMs ?? null,
+				embeddingMs: normalizedBody.embeddingMs ?? null,
+				verdict: graphStageStatus === 'GRAPH_ENABLED' ? 'PASS' : 'WARN',
+			});
+			if (normalizedBody.awaitTelemetry === true) {
+				await telemetryPromise;
+			} else {
+				telemetryPromise.catch(() => {});
+			}
+			recordEvent(traceRunId, cacheHits > 0 ? 'cache_hit' : 'cache_miss', {
+				cacheKey,
+				durationMs: cacheHits > 0 ? latencyMs : undefined,
+				metadata: {
+					trace_id: traceId,
+					story_id: storyId,
+					task_id: taskId,
+					worker_id: workerId,
+					cache_namespace: 'hyperrag:query',
+					cache_source: cacheSource,
+				},
+			});
+			recordEvent(traceRunId, 'span', {
+				durationMs: latencyMs,
+				metadata: {
+					trace_id: traceId,
+					story_id: storyId,
+					task_id: taskId,
+					worker_id: workerId,
+					retrieval_path: responsePayload.trace.retrieval_path,
+					graph_stage_status: graphStageStatus,
+					contributors: responsePayload.contributors,
+					result_count: operatorPackets.length,
+				},
+			});
+			if (traceRunId) {
+				finishRun(traceRunId, {
+					status: 'passed',
+					durationMs: latencyMs,
+					passCount: operatorPackets.length,
+					failureCount: 0,
+				});
+			}
+		}
 
 		if (isJsonRpcEnvelope) {
 			return json({
@@ -408,6 +560,14 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 		return json(responsePayload);
 	} catch (err) {
 		console.error('[hyperrag-packet-rpc] Error:', err instanceof Error ? err.message : String(err));
+		if (traceRunId) {
+			finishRun(traceRunId, {
+				status: 'error',
+				durationMs: Date.now() - startTime,
+				failureCount: 1,
+				errorSummary: err instanceof Error ? err.message : String(err),
+			});
+		}
 		if (rpcProtocol === 'jsonrpc') {
 			return json(
 				buildJsonRpcError(

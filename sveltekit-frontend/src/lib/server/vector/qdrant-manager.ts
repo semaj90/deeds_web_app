@@ -684,7 +684,10 @@ export class QdrantManager {
                 const { getRedis } = await import('../redis.js');
                 const redis = getRedis();
                 if (redis) {
-                  const cached = await redis.get(cacheKey);
+                  const cached = await Promise.race([
+                    redis.get(cacheKey),
+                    new Promise<null>((resolve) => setTimeout(() => resolve(null), 1000)),
+                  ]);
                   if (cached) {
                     const parsed = fastJsonParse<QdrantSearchResult>(cached);
                     parsed.metadata.responseTime = Date.now() - startTime;
@@ -742,7 +745,10 @@ export class QdrantManager {
                   const { getRedis } = await import('../redis.js');
                   const redis = getRedis();
                   if (redis) {
-                    await redis.set(cacheKey, JSON.stringify(response), 'EX', 300);
+                    await Promise.race([
+                      redis.set(cacheKey, JSON.stringify(response), 'EX', 300),
+                      new Promise<null>((resolve) => setTimeout(() => resolve(null), 1000)),
+                    ]);
                   }
                 } catch {
                   /* cache write failure — non-fatal */

@@ -17,6 +17,8 @@
  */
 
 import { Pool } from 'pg';
+import crypto from 'node:crypto';
+import { loadRepoEnv, resolveDatabaseUrl } from '../../../scripts/atlas/connection-config.mjs';
 
 const DRY_RUN = process.argv.includes('--dry-run');
 const APPLY = process.argv.includes('--apply');
@@ -24,11 +26,9 @@ const LIMIT = parseInt(
   process.argv.find(arg => arg.startsWith('--limit='))?.split('=')[1] || '0'
 ) || 1000;
 
-const PG_HOST = process.env.POSTGRES_HOST || 'localhost';
-const PG_PORT = parseInt(process.env.POSTGRES_PORT || '5434');
-const PG_DB = process.env.POSTGRES_DB || 'legal_ai_db';
-const PG_USER = process.env.POSTGRES_USER || 'legal_admin';
-const PG_PASSWORD = process.env.POSTGRES_PASSWORD || '123456';
+const repoEnv = loadRepoEnv(process.env);
+Object.assign(process.env, repoEnv);
+const DATABASE_URL = resolveDatabaseUrl(repoEnv);
 
 interface FeatureEnvelope {
   packet_key: string;
@@ -123,8 +123,13 @@ async function fetchFeatureEnvelopes(pool: Pool, limit: number): Promise<Feature
 function generateChrom97Packet(envelope: FeatureEnvelope, summary: string): Chrom97Packet {
   const now = new Date().toISOString();
 
-  // Generate stable packet ID from feature_id + timestamp hash
-  const packetId = `chrom97:${envelope.feature_id}:${Math.random().toString(36).slice(2, 11)}`;
+  const stableSeed = [
+    envelope.packet_key,
+    envelope.source_ref,
+    envelope.feature_id,
+    summary || '',
+  ].join('\n');
+  const packetId = `chrom97:${crypto.createHash('sha256').update(stableSeed).digest('hex').slice(0, 16)}`;
 
   return {
     packet_id: packetId,
@@ -225,11 +230,7 @@ async function main() {
   console.log(`Limit: ${LIMIT > 0 ? LIMIT : 'all'}\n`);
 
   const pool = new Pool({
-    host: PG_HOST,
-    port: PG_PORT,
-    database: PG_DB,
-    user: PG_USER,
-    password: PG_PASSWORD,
+    connectionString: DATABASE_URL,
   });
 
   try {

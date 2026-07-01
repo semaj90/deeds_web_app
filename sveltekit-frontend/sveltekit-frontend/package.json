@@ -3,6 +3,7 @@
     "pg": "^8.21.0"
   },
   "devDependencies": {
-    "ignore": "^7.0.5"
+    "ignore": "^7.0.5",
+    "tsx": "^4.22.4"
   }
 }

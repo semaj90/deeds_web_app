@@ -17,6 +17,8 @@ import { Pool } from 'pg';
 import Redis from 'ioredis';
 import { QdrantClient } from '@qdrant/js-client-rest';
 import neo4j from 'neo4j-driver';
+import crypto from 'node:crypto';
+import { loadRepoEnv, resolveDatabaseUrl, resolveRedisConfig } from '../../../scripts/atlas/connection-config.mjs';
 
 const DRY_RUN = process.argv.includes('--dry-run');
 const APPLY = process.argv.includes('--apply');
@@ -25,21 +27,26 @@ const LIMIT = parseInt(
 ) || 0;
 
 const targetsArg = process.argv.find(arg => arg.startsWith('--targets='))?.split('=')[1] || 'redis,qdrant,neo4j';
-const TARGETS = new Set(targetsArg.split(',').map(t => t.trim()));
+const TARGETS = new Set(targetsArg.split(/[,\s]+/).map(t => t.trim()).filter(Boolean));
+const repoEnv = loadRepoEnv(process.env);
+Object.assign(process.env, repoEnv);
+const DATABASE_URL = resolveDatabaseUrl(repoEnv);
+const redisConfig = resolveRedisConfig(repoEnv);
+const QDRANT_URL = repoEnv.QDRANT_URL || 'http://127.0.0.1:6333';
+const OPENAI_EMBED_BASE_URL = String(repoEnv.OLLAMA_EMBED_BASE_URL || repoEnv.EMBED_SERVER_URL || 'http://127.0.0.1:8081').replace(/\/$/, '');
+const EMBED_MODEL = repoEnv.OLLAMA_EMBED_MODEL || repoEnv.PRIMARY_EMBEDDING_MODEL || repoEnv.EMBED_MODEL || 'embeddinggemma:latest';
+const CHROM97_COLLECTION = repoEnv.CHROM97_QDRANT_COLLECTION || 'chrom97_context_768';
+const EXPECTED_DIM = Number(repoEnv.EMBEDDING_DIM || 768);
 
 // DB Clients
 const pgPool = new Pool({
-  host: process.env.POSTGRES_HOST || 'localhost',
-  port: parseInt(process.env.POSTGRES_PORT || '5434'),
-  database: process.env.POSTGRES_DB || 'legal_ai_db',
-  user: process.env.POSTGRES_USER || 'legal_admin',
-  password: process.env.POSTGRES_PASSWORD || '123456',
+  connectionString: DATABASE_URL,
 });
 
 const redis = new Redis({
-  host: process.env.REDIS_HOST || '127.0.0.1',
-  port: parseInt(process.env.REDIS_PORT || '6379'),
-  password: process.env.REDIS_PASSWORD || undefined,
+  host: redisConfig.host,
+  port: redisConfig.port,
+  password: redisConfig.password,
   lazyConnect: true,
   maxRetriesPerRequest: 1,
   enableOfflineQueue: false,
@@ -47,8 +54,7 @@ const redis = new Redis({
 });
 
 const qdrant = new QdrantClient({
-  host: process.env.QDRANT_HOST || '127.0.0.1',
-  port: parseInt(process.env.QDRANT_PORT || '6333'),
+  url: QDRANT_URL,
   checkCompatibility: false,
 });
 
@@ -91,6 +97,68 @@ interface Chrom97Packet {
     confidence: number;
     identity_chain_complete: boolean;
   };
+}
+
+function stablePointId(packet: Chrom97Packet): string {
+  const hex = crypto
+    .createHash('sha256')
+    .update([packet.packet_key, packet.source_ref, packet.feature_id].join('\n'))
+    .digest('hex');
+  return `${hex.slice(0, 8)}-${hex.slice(8, 12)}-${hex.slice(12, 16)}-${hex.slice(16, 20)}-${hex.slice(20, 32)}`;
+}
+
+function compactText(parts: Array<unknown>, maxLength = 4096): string {
+  return parts
+    .flatMap((part) => Array.isArray(part) ? part : [part])
+    .map((part) => String(part ?? '').trim())
+    .filter(Boolean)
+    .join('\n')
+    .slice(0, maxLength);
+}
+
+function embeddingText(packet: Chrom97Packet): string {
+  return compactText([
+    packet.feature_label,
+    packet.feature_id,
+    packet.source_ref,
+    packet.context?.domain_class,
+    packet.context?.topology_label,
+    packet.context?.summary,
+    packet.features?.keywords,
+    packet.features?.entities,
+    packet.features?.ace_tags,
+    packet.features?.kag_nodes,
+  ]);
+}
+
+function neo4jRelationType(value: unknown): string {
+  const normalized = String(value ?? 'RELATED_TO').trim().toUpperCase().replace(/[^A-Z0-9_]/g, '_');
+  return /^[A-Z][A-Z0-9_]{0,63}$/.test(normalized) ? normalized : 'RELATED_TO';
+}
+
+async function embedTexts(texts: string[]): Promise<number[][]> {
+  if (!texts.length) return [];
+  const response = await fetch(`${OPENAI_EMBED_BASE_URL}/v1/embeddings`, {
+    method: 'POST',
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify({ model: EMBED_MODEL, input: texts }),
+    signal: AbortSignal.timeout(120000),
+  });
+  if (!response.ok) {
+    const body = await response.text().catch(() => '');
+    throw new Error(`Embedding request failed: HTTP ${response.status} ${body.slice(0, 300)}`);
+  }
+  const json = await response.json();
+  const vectors = Array.isArray(json?.data) ? json.data.map((row: any) => row?.embedding ?? []) : [];
+  if (vectors.length !== texts.length) {
+    throw new Error(`Embedding response count mismatch: expected ${texts.length}, got ${vectors.length}`);
+  }
+  for (const [idx, vector] of vectors.entries()) {
+    if (!Array.isArray(vector) || vector.length !== EXPECTED_DIM) {
+      throw new Error(`Embedding dimension mismatch at index ${idx}: expected ${EXPECTED_DIM}, got ${vector?.length ?? 0}`);
+    }
+  }
+  return vectors;
 }
 
 async function fetchChrom97Packets(limit: number): Promise<any[]> {
@@ -161,41 +229,53 @@ async function mirrorToQdrant(packets: Chrom97Packet[]): Promise<number> {
   let written = 0;
   try {
     // Ensure collection exists
-    const collection = 'chrom97_context';
+    const collection = CHROM97_COLLECTION;
     try {
       await qdrant.getCollection(collection);
     } catch {
       console.log(`  Creating Qdrant collection: ${collection}`);
       await qdrant.createCollection(collection, {
         vectors: {
-          size: 384,
+          size: EXPECTED_DIM,
           distance: 'Cosine',
         },
       });
     }
 
-    // Upsert packets as points
-    const points = packets.map((packet, idx) => ({
-      id: idx + 1,
-      vector: new Array(384).fill(0).map(() => Math.random()), // Placeholder; would embed keywords
-      payload: {
-        packet_key: packet.packet_key,
-        feature_id: packet.feature_id,
-        source_ref: packet.source_ref,
-        feature_label: packet.feature_label,
-        domain_class: packet.context.domain_class,
-        topology_label: packet.context.topology_label,
-        keywords: packet.features.keywords,
-        ace_tags: packet.features.ace_tags,
-        confidence: packet.evidence.confidence,
-      },
-    }));
+    const batchSize = 32;
+    for (let offset = 0; offset < packets.length; offset += batchSize) {
+      const batch = packets.slice(offset, offset + batchSize);
+      const vectors = await embedTexts(batch.map(embeddingText));
+      const points = batch.map((packet, idx) => ({
+        id: stablePointId(packet),
+        vector: vectors[idx],
+        payload: {
+          packet_key: packet.packet_key,
+          feature_id: packet.feature_id,
+          source_ref: packet.source_ref,
+          feature_label: packet.feature_label,
+          domain_class: packet.context.domain_class,
+          topology_label: packet.context.topology_label,
+          community_id: packet.context.community_id ?? null,
+          keywords: packet.features.keywords,
+          entities: packet.features.entities,
+          ace_tags: packet.features.ace_tags,
+          kag_nodes: packet.features.kag_nodes,
+          som_cluster: packet.topology.som_cluster ?? null,
+          pagerank: packet.topology.pagerank ?? null,
+          confidence: packet.evidence.confidence,
+          embedding_model: EMBED_MODEL,
+          embedding_dim: EXPECTED_DIM,
+          canonical: false,
+          mirror_source: 'chrom97',
+          payload_backfilled_at: new Date().toISOString(),
+        },
+      }));
 
-    if (points.length > 0) {
-      await qdrant.upsert(collection, {
-        points,
-      });
-      written = points.length;
+      if (points.length > 0) {
+        await qdrant.upsert(collection, { points });
+        written += points.length;
+      }
     }
   } catch (err) {
     console.warn(`⚠️  Qdrant mirror failed: ${err}`);
@@ -238,13 +318,15 @@ async function mirrorToNeo4j(packets: Chrom97Packet[]): Promise<number> {
 
       // Create relationships from DAG edges
       for (const edge of packet.topology.dag_edges) {
+        const relationType = neo4jRelationType(edge.relation);
         await session.run(
           `
           MATCH (ctx:Chrom97Context {packet_key: $packet_key})
           MERGE (to:Feature {feature_id: $to_id})
           MERGE (from:Feature {feature_id: $from_id})
-          MERGE (from)-[:${edge.relation}]->(to)
-          SET (from)-[:${edge.relation}]->(to).updated_at = datetime()
+          MERGE (from)-[rel:${relationType}]->(to)
+          SET rel.updated_at = datetime(),
+              rel.source = 'chrom97'
           WITH ctx, from
           MERGE (ctx)-[:DERIVED_FROM {relation: $relation}]->(from)
           `,
@@ -252,7 +334,7 @@ async function mirrorToNeo4j(packets: Chrom97Packet[]): Promise<number> {
             packet_key: packet.packet_key,
             to_id: edge.to,
             from_id: edge.from,
-            relation: edge.relation,
+            relation: relationType,
           }
         );
       }

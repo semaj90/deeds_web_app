@@ -615,19 +615,16 @@ async function getCachedEmbedding(text: string): Promise<number[] | null> {
 }
 
 async function getCachedEmbeddingEntry(text: string): Promise<CachedEmbeddingEntry | null> {
-  console.log('--- getCachedEmbeddingEntry start:', text);
   try {
     const { getRedis } = await import('../redis.js');
-    console.log('--- getCachedEmbeddingEntry got getRedis');
     const redis = getRedis();
-    console.log('--- getCachedEmbeddingEntry got redis:', !!redis);
     if (!redis) return null;
     const { createHash } = await import('crypto');
-    console.log('--- getCachedEmbeddingEntry got createHash');
     const key = `embed:${SERVER_EMBEDDING_MODEL}:${createHash('sha256').update(text).digest('hex').slice(0, 16)}`;
-    console.log('--- getCachedEmbeddingEntry key:', key);
-    const cached = await redis.get(key);
-    console.log('--- getCachedEmbeddingEntry got cached:', !!cached);
+    const cached = await Promise.race([
+      redis.get(key),
+      new Promise<null>((resolve) => setTimeout(() => resolve(null), 1000)),
+    ]);
     if (!cached) return null;
     const parsed = JSON.parse(cached) as number[] | CachedEmbeddingEntry;
     if (Array.isArray(parsed)) {
@@ -635,8 +632,7 @@ async function getCachedEmbeddingEntry(text: string): Promise<CachedEmbeddingEnt
     }
     if (!Array.isArray(parsed.vector)) return null;
     return parsed;
-  } catch (err) {
-    console.log('--- getCachedEmbeddingEntry error for text:', text, err);
+  } catch {
     return null;
   }
 }
@@ -769,7 +765,6 @@ export async function generateEmbeddings(
   texts: string[],
   options: EmbeddingOptions = {}
 ): Promise<EmbeddingResult> {
-  console.log('--- generateEmbeddings texts:', texts);
   const start = performance.now();
   const attempts: EmbeddingAttempt[] = [];
 
@@ -807,8 +802,34 @@ export async function generateEmbeddings(
   let source: EmbeddingResult['source'] = 'http-ollama';
   let model = SERVER_EMBEDDING_MODEL;
 
+  // Tier 0: dedicated OpenAI-compatible embedding endpoint. If configured,
+  // this is the explicit workstation embedding path and should not wait on
+  // older gRPC/QUIC fallbacks.
+  if (LLAMA_EMBED_URL) {
+    const llamaStart = performance.now();
+    const llamaVecs = await generateViaLlamaEmbed(uncachedTexts);
+    if (llamaVecs) {
+      newVectors = llamaVecs;
+      source = 'http-ollama';
+      model = 'embeddinggemma-openai-compatible';
+      attempts.push({
+        transport: 'http-ollama',
+        status: 'success',
+        detail: `llama-embed ${LLAMA_EMBED_URL}`,
+        durationMs: Math.round(performance.now() - llamaStart),
+      });
+    } else {
+      attempts.push({
+        transport: 'http-ollama',
+        status: 'failed',
+        detail: `llama-embed ${LLAMA_EMBED_URL} unavailable`,
+        durationMs: Math.round(performance.now() - llamaStart),
+      });
+    }
+  }
+
   // Tier 1: gRPC (binary protocol, lowest latency)
-  if (ENV.EMBEDDING_GRPC_ENABLED) {
+  if (!newVectors && ENV.EMBEDDING_GRPC_ENABLED) {
     const grpcStart = performance.now();
     const grpcResult = await generateViaGrpc(uncachedTexts);
     const grpcVectors = grpcResult.vectors;
@@ -830,7 +851,7 @@ export async function generateEmbeddings(
         durationMs: Math.round(performance.now() - grpcStart),
       });
     }
-  } else {
+  } else if (!newVectors) {
     attempts.push({ transport: 'grpc', status: 'skipped', detail: 'disabled by config' });
   }
 
@@ -859,29 +880,6 @@ export async function generateEmbeddings(
     }
   } else if (!newVectors) {
     attempts.push({ transport: 'quic', status: 'skipped', detail: 'disabled by config' });
-  }
-
-  // Tier 2.5: llama-server embed (:8081) — GPU GGUF embed, faster than Ollama
-  if (!newVectors && LLAMA_EMBED_URL) {
-    const llamaStart = performance.now();
-    const llamaVecs = await generateViaLlamaEmbed(uncachedTexts);
-    if (llamaVecs) {
-      newVectors = llamaVecs;
-      source = 'http-ollama'; // closest existing source tag; observability shows LLAMA_EMBED_URL
-      attempts.push({
-        transport: 'http-ollama',
-        status: 'success',
-        detail: `llama-embed ${LLAMA_EMBED_URL}`,
-        durationMs: Math.round(performance.now() - llamaStart),
-      });
-    } else {
-      attempts.push({
-        transport: 'http-ollama',
-        status: 'failed',
-        detail: `llama-embed ${LLAMA_EMBED_URL} unavailable`,
-        durationMs: Math.round(performance.now() - llamaStart),
-      });
-    }
   }
 
   // Tier 3+4: HTTP/Ollama (batch → sequential fallback)

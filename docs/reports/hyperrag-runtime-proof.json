@@ -1,15 +1,15 @@
 {
-  "generated_at": "2026-06-23T03:17:55.351Z",
+  "generated_at": "2026-07-01T04:39:18.695Z",
   "query": "atlas packet retrieval fusion trace",
-  "trace_id": "1782184671302-6uovrzk",
-  "run_id": "1782184671302-6uovrzk",
+  "trace_id": "1782880757094-ptpb12v",
+  "run_id": "1782880757094-ptpb12v",
   "retrieval_strategy": "fusion",
   "cache_status": "redis_exact_match",
   "graph_stage": "GRAPH_ENABLED",
-  "latency_ms": 4047,
+  "latency_ms": 1598,
   "contributors": {
     "bm25_hits": 10,
-    "qdrant_hits": 2,
+    "qdrant_hits": 7,
     "neo4j_hits": 11,
     "turbovec_hits": 0,
     "rrf_final_hits": 10
@@ -23,68 +23,70 @@
   "fail_reasons": [],
   "top_packets": [
     {
-      "packet_key": "nes:utility:9fa84252",
-      "source_ref": "src/lib/types/svelte5-api-types.d.ts",
-      "feature_id": "utility",
+      "packet_key": "packet:397dc52f4ccc",
+      "source_ref": "sveltekit-frontend/src/lib/server/ai/context-compression.ts",
+      "feature_id": "sveltekit-frontend.context-compression",
+      "fusion_sources": [
+        "postgres_trigram"
+      ],
+      "retrieval_lanes": {
+        "dense": 0.01639344262295082,
+        "fts": 0.4125,
+        "trigram": 0,
+        "jsonb": 0
+      },
+      "graph_stage_status": "GRAPH_ENABLED"
+    },
+    {
+      "packet_key": "packet:f4a8413a566f",
+      "source_ref": "sveltekit-frontend/src/lib/server/observability/langfuse.ts",
+      "feature_id": "sveltekit-frontend.langfuse",
       "fusion_sources": [
         "qdrant_vector"
       ],
       "retrieval_lanes": {
         "dense": 0.01639344262295082,
-        "fts": 0.9,
+        "fts": 0.378125,
         "trigram": 0,
-        "jsonb": 1
+        "jsonb": 0
       },
       "graph_stage_status": "GRAPH_ENABLED"
     },
     {
-      "packet_key": "nes:utility:8c023912",
-      "source_ref": "src/lib/components/ui/gaming/types/gaming-types-minimal.ts",
-      "feature_id": "utility",
+      "packet_key": "packet:397dc52f4ccc",
+      "source_ref": "sveltekit-frontend/src/lib/server/ai/context-compression.ts",
+      "feature_id": "sveltekit-frontend.context-compression",
       "fusion_sources": [
-        "qdrant_vector"
+        "postgres_trigram"
       ],
       "retrieval_lanes": {
-        "dense": 0.015384615384615385,
-        "fts": 1,
+        "dense": 0.016129032258064516,
+        "fts": 0.4125,
         "trigram": 0,
-        "jsonb": 1
-      },
-      "graph_stage_status": "GRAPH_ENABLED"
-    },
-    {
-      "packet_key": "hyperrag:src/lib/services/error-analysis/types.ts",
-      "source_ref": "src/lib/services/error-analysis/types.ts",
-      "feature_id": "codebase-structure",
-      "fusion_sources": [],
-      "retrieval_lanes": {
-        "dense": 0,
-        "fts": 0.8,
-        "trigram": 0,
-        "jsonb": 1
+        "jsonb": 0
       },
       "graph_stage_status": "GRAPH_ENABLED"
     }
   ],
   "provenance_sample": [
     {
-      "packet_key": "nes:utility:9fa84252",
+      "packet_key": "packet:f4a8413a566f",
       "retrieved_from": "hyperrag",
-      "retrieval_confidence": 0.85,
-      "kag_aligned": true,
+      "retrieval_confidence": 0.65,
+      "kag_aligned": false,
       "dag_reachable": true
     },
     {
-      "packet_key": "nes:utility:9fa84252",
+      "packet_key": "packet:397dc52f4ccc",
       "retrieved_from": "hyperrag",
-      "retrieval_confidence": 0.85,
-      "kag_aligned": true,
+      "retrieval_confidence": 0.65,
+      "kag_aligned": false,
       "dag_reachable": true
     },
     {
-      "packet_key": "nes:utility:8c023912",
+      "packet_key": "packet:f4a8413a566f",
       "retrieved_from": "hyperrag",
-      "retrieval_confidence": 0.85,
+      "retrieval_confidence": 0.65,
       "kag_aligned": true,
       "dag_reachable": true
     }

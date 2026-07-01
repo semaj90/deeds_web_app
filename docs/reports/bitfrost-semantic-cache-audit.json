@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-06-20T16:41:00.721Z",
+  "generatedAt": "2026-07-01T02:22:07.810Z",
   "status": "PASS",
   "redis": {
     "container": "legal-ai-valkey",
@@ -8,9 +8,9 @@
   "summary": {
     "gpuKarpathyScores": 0,
     "gpuKarpathyEncoded": 0,
-    "bifrostKeys": 62,
-    "centroidKeys": 85,
-    "somKeys": 152
+    "bifrostKeys": 1130,
+    "centroidKeys": 0,
+    "somKeys": 0
   },
   "patterns": [
     {
@@ -34,38 +34,38 @@
     {
       "key": "bifrost:*",
       "pattern": "bifrost:*",
-      "count": 62,
+      "count": 1130,
       "sample": [
-        "bifrost:packet:58e6adafde74465d",
-        "bifrost:packet:de3c1300921c8d5d",
-        "bifrost:packet:891b73e8db9c3bb7",
-        "bifrost:packet:1d5eba7211dea6f9",
-        "bifrost:packet:0bffe0382a0d44bb"
+        "bifrost:sem:packet:packet:0141fd3854b1",
+        "bifrost:sem:packet:packet:023deb8570b2",
+        "bifrost:sem:packet:packet:0242eca5b9f3",
+        "bifrost:sem:feature:scripts.load-packets-neo4j",
+        "bifrost:sem:feature:neschrom97.30e6b5d0c6a8f393"
       ],
       "ttlSamples": [
         {
-          "key": "bifrost:packet:58e6adafde74465d",
-          "ttl": 603833,
+          "key": "bifrost:sem:packet:packet:0141fd3854b1",
+          "ttl": 85023,
           "ok": true
         },
         {
-          "key": "bifrost:packet:de3c1300921c8d5d",
-          "ttl": 603833,
+          "key": "bifrost:sem:packet:packet:023deb8570b2",
+          "ttl": 85313,
           "ok": true
         },
         {
-          "key": "bifrost:packet:891b73e8db9c3bb7",
-          "ttl": 603833,
+          "key": "bifrost:sem:packet:packet:0242eca5b9f3",
+          "ttl": 85317,
           "ok": true
         },
         {
-          "key": "bifrost:packet:1d5eba7211dea6f9",
-          "ttl": 603833,
+          "key": "bifrost:sem:feature:scripts.load-packets-neo4j",
+          "ttl": 85009,
           "ok": true
         },
         {
-          "key": "bifrost:packet:0bffe0382a0d44bb",
-          "ttl": 603833,
+          "key": "bifrost:sem:feature:neschrom97.30e6b5d0c6a8f393",
+          "ttl": 84724,
           "ok": true
         }
       ],
@@ -75,79 +75,56 @@
     {
       "key": "centroid:*",
       "pattern": "centroid:*",
-      "count": 85,
-      "sample": [
-        "centroid:60",
-        "centroid:84",
-        "centroid:11",
-        "centroid:73",
-        "centroid:47"
-      ],
-      "ttlSamples": [
-        {
-          "key": "centroid:60",
-          "ttl": 452322,
-          "ok": true
-        },
-        {
-          "key": "centroid:84",
-          "ttl": 452326,
-          "ok": true
-        },
-        {
-          "key": "centroid:11",
-          "ttl": 452311,
-          "ok": true
-        },
-        {
-          "key": "centroid:73",
-          "ttl": 452324,
-          "ok": true
-        },
-        {
-          "key": "centroid:47",
-          "ttl": 452319,
-          "ok": true
-        }
-      ],
+      "count": 0,
+      "sample": [],
+      "ttlSamples": [],
       "ok": true,
       "error": null
     },
     {
       "key": "som:*",
       "pattern": "som:*",
-      "count": 152,
+      "count": 0,
+      "sample": [],
+      "ttlSamples": [],
+      "ok": true,
+      "error": null
+    },
+    {
+      "key": "bifrost:sem:packet:*",
+      "pattern": "bifrost:sem:packet:*",
+      "count": 614,
       "sample": [
-        "som:135",
-        "som:3",
-        "som:37",
-        "som:cell:8",
-        "som:cell:44"
+        "bifrost:sem:packet:packet:0141fd3854b1",
+        "bifrost:sem:packet:packet:023deb8570b2",
+        "bifrost:sem:packet:packet:0242eca5b9f3",
+        "bifrost:sem:packet:packet:0224aacdd67e",
+        "bifrost:sem:packet:packet:0003260092b1"
       ],
       "ttlSamples": [
         {
-          "key": "som:135",
-          "ttl": 452353,
+          "key": "bifrost:sem:packet:packet:0141fd3854b1",
+          "ttl": 85021,
           "ok": true
         },
         {
-          "key": "som:3",
-          "ttl": 452328,
+          "key": "bifrost:sem:packet:packet:023deb8570b2",
+          "ttl": 85310,
           "ok": true
         },
         {
-          "key": "som:37",
-          "ttl": 452332,
+          "key": "bifrost:sem:packet:packet:0242eca5b9f3",
+          "ttl": 85315,
           "ok": true
         },
         {
-          "key": "som:cell:8",
-          "ttl": 452344,
+          "key": "bifrost:sem:packet:packet:0224aacdd67e",
+          "ttl": 85281,
           "ok": true
         },
         {
-          "key": "som:cell:44",
-          "ttl": 452346,
+          "key": "bifrost:sem:packet:packet:0003260092b1",
+          "ttl": 84638,
           "ok": true
         }
       ],
@@ -155,20 +132,43 @@
       "error": null
     },
     {
-      "key": "bifrost:sem:packet:*",
-      "pattern": "bifrost:sem:packet:*",
-      "count": 0,
-      "sample": [],
-      "ttlSamples": [],
-      "ok": true,
-      "error": null
-    },
-    {
       "key": "bifrost:sem:feature:*",
       "pattern": "bifrost:sem:feature:*",
-      "count": 0,
-      "sample": [],
-      "ttlSamples": [],
+      "count": 516,
+      "sample": [
+        "bifrost:sem:feature:scripts.load-packets-neo4j",
+        "bifrost:sem:feature:neschrom97.30e6b5d0c6a8f393",
+        "bifrost:sem:feature:.python311.entry2",
+        "bifrost:sem:feature:scripts.legal-corpus",
+        "bifrost:sem:feature:neschrom97.e46d6187de1edbd6"
+      ],
+      "ttlSamples": [
+        {
+          "key": "bifrost:sem:feature:scripts.load-packets-neo4j",
+          "ttl": 85005,
+          "ok": true
+        },
+        {
+          "key": "bifrost:sem:feature:neschrom97.30e6b5d0c6a8f393",
+          "ttl": 84720,
+          "ok": true
+        },
+        {
+          "key": "bifrost:sem:feature:.python311.entry2",
+          "ttl": 85095,
+          "ok": true
+        },
+        {
+          "key": "bifrost:sem:feature:scripts.legal-corpus",
+          "ttl": 84796,
+          "ok": true
+        },
+        {
+          "key": "bifrost:sem:feature:neschrom97.e46d6187de1edbd6",
+          "ttl": 84988,
+          "ok": true
+        }
+      ],
       "ok": true,
       "error": null
     },
@@ -193,56 +193,120 @@
     {
       "key": "ace:context:*",
       "pattern": "ace:context:*",
-      "count": 0,
-      "sample": [],
-      "ttlSamples": [],
+      "count": 614,
+      "sample": [
+        "ace:context:packet:00bacf58384b",
+        "ace:context:packet:0194484feed4",
+        "ace:context:packet:01c26f2c1882",
+        "ace:context:packet:001d9f093944",
+        "ace:context:packet:016584fd707a"
+      ],
+      "ttlSamples": [
+        {
+          "key": "ace:context:packet:00bacf58384b",
+          "ttl": 2079,
+          "ok": true
+        },
+        {
+          "key": "ace:context:packet:0194484feed4",
+          "ttl": 2297,
+          "ok": true
+        },
+        {
+          "key": "ace:context:packet:01c26f2c1882",
+          "ttl": 2356,
+          "ok": true
+        },
+        {
+          "key": "ace:context:packet:001d9f093944",
+          "ttl": 1879,
+          "ok": true
+        },
+        {
+          "key": "ace:context:packet:016584fd707a",
+          "ttl": 2256,
+          "ok": true
+        }
+      ],
       "ok": true,
       "error": null
     },
     {
       "key": "ace:summary:*",
       "pattern": "ace:summary:*",
-      "count": 0,
-      "sample": [],
-      "ttlSamples": [],
+      "count": 697,
+      "sample": [
+        "ace:summary:packet:00615b1a7515",
+        "ace:summary:packet:000b2df0cfdf",
+        "ace:summary:packet:007e489e8e2e",
+        "ace:summary:packet:01630dcae75d",
+        "ace:summary:summary:2ee79ea9a56e40c7"
+      ],
+      "ttlSamples": [
+        {
+          "key": "ace:summary:packet:00615b1a7515",
+          "ttl": 1971,
+          "ok": true
+        },
+        {
+          "key": "ace:summary:packet:000b2df0cfdf",
+          "ttl": 1850,
+          "ok": true
+        },
+        {
+          "key": "ace:summary:packet:007e489e8e2e",
+          "ttl": 1998,
+          "ok": true
+        },
+        {
+          "key": "ace:summary:packet:01630dcae75d",
+          "ttl": 2253,
+          "ok": true
+        },
+        {
+          "key": "ace:summary:summary:2ee79ea9a56e40c7",
+          "ttl": 491345,
+          "ok": true
+        }
+      ],
       "ok": true,
       "error": null
     },
     {
       "key": "ace:feature:*",
       "pattern": "ace:feature:*",
-      "count": 19,
+      "count": 516,
       "sample": [
-        "ace:feature:indexer",
-        "ace:feature:tests",
-        "ace:feature:ace",
-        "ace:feature:analytics",
-        "ace:feature:simulation"
+        "ace:feature:simd-bridge.lib-cfg_if",
+        "ace:feature:.svelte-error-fixes-backup.LLMS",
+        "ace:feature:sveltekit-frontend.gaming-types",
+        "ace:feature:neschrom97.e60e5d78cdd9ddfb",
+        "ace:feature:neschrom97.e1a884a6c504bbdc"
       ],
       "ttlSamples": [
         {
-          "key": "ace:feature:indexer",
-          "ttl": 521291,
+          "key": "ace:feature:simd-bridge.lib-cfg_if",
+          "ttl": 2123,
           "ok": true
         },
         {
-          "key": "ace:feature:tests",
-          "ttl": 521291,
+          "key": "ace:feature:.svelte-error-fixes-backup.LLMS",
+          "ttl": 2578,
           "ok": true
         },
         {
-          "key": "ace:feature:ace",
-          "ttl": 521290,
+          "key": "ace:feature:sveltekit-frontend.gaming-types",
+          "ttl": 2043,
           "ok": true
         },
         {
-          "key": "ace:feature:analytics",
-          "ttl": 521290,
+          "key": "ace:feature:neschrom97.e60e5d78cdd9ddfb",
+          "ttl": 1963,
           "ok": true
         },
         {
-          "key": "ace:feature:simulation",
-          "ttl": 521290,
+          "key": "ace:feature:neschrom97.e1a884a6c504bbdc",
+          "ttl": 2486,
           "ok": true
         }
       ],
@@ -270,17 +334,9 @@
     {
       "key": "ace:authority:*",
       "pattern": "ace:authority:*",
-      "count": 1,
-      "sample": [
-        "ace:authority:top"
-      ],
-      "ttlSamples": [
-        {
-          "key": "ace:authority:top",
-          "ttl": 16648,
-          "ok": true
-        }
-      ],
+      "count": 0,
+      "sample": [],
+      "ttlSamples": [],
       "ok": true,
       "error": null
     },

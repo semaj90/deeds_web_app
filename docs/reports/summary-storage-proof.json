@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-06-29T04:18:41.511Z",
+  "generated_at": "2026-07-01T01:01:42.258Z",
   "status": "PASS",
   "tables": {
     "atlas_packets": {
@@ -8,14 +8,14 @@
     },
     "atlas_summary_layers": {
       "exists": true,
-      "rows": 336
+      "rows": 11939
     }
   },
   "coverage": {
     "atlas_packets_metadata_pct": 100,
     "atlas_packets_topology_pct": 0,
-    "atlas_packets_vectors_pct": 0,
-    "atlas_summary_layers_metadata_pct": 100
+    "atlas_packets_vectors_pct": 4.99,
+    "atlas_summary_layers_metadata_pct": 99.72
   },
   "proof": {
     "summary_rows": true,
@@ -24,40 +24,37 @@
   },
   "sample": {
     "atlas_packets": {
-      "packet_key": "packet:0dd1afcfef4b",
-      "source_ref": "sveltekit-frontend/scratch/synthesis-runs/2026-05-10T00-10-13/lane3-rerank.json",
-      "feature_id": "sveltekit-frontend.lane3-rerank",
+      "packet_key": "packet:60af0155eada",
+      "source_ref": "neschrom97/cards/e5920305a014bd65.json",
+      "feature_id": "neschrom97.e5920305a014bd65",
       "metadata": {
         "identity": {
           "source": "filesystem",
           "version": 1,
-          "created_at": "2026-06-28T08:36:36.711Z",
+          "created_at": "2026-06-28T08:36:32.836Z",
           "created_by": "phase-d:whole-codebase-scan"
         },
         "workspace": {
           "domain": "codebase",
           "universe": "atlas",
           "text_safe": true,
-          "size_bytes": 409
+          "size_bytes": 384
         }
       },
       "topology": {},
       "vectors": {}
     },
     "atlas_summary_layers": {
-      "packet_key": "packet:24abbee99423",
-      "summary_level": "file",
-      "summary_text": "Advancement in AI development moving beyond traditional RAG systems.",
+      "packet_key": "packet:0057df284547",
+      "summary_level": "gemma4_packet_summary",
+      "summary_text": "This packet group validates the wiring and connectivity within the NATS messaging system for the P4 implementation. Retrieval should use the feature ID: scripts.test-p4-nats-wiring. The operator should execute this test suite to confirm that all necessary NATS endpoints and message paths are correctly established before proceeding with integration testing. --- End of Summary ---",
       "metadata": {
-        "model": "gemma4-legal-iq4xs-direct.gguf",
-        "source": "gemma4-parent-atlas-summaries",
-        "status": "generated",
-        "backend": "llama-server",
-        "cache_mode": "miss",
-        "feature_id": "6_11_26_mem",
-        "source_ref": "6_11_26_mem.txt",
-        "generated_at": "2026-06-28T16:28:46.689Z",
-        "summary_packet_key": "sum:7860d19ce89f1dbe"
+        "worker": "embeddinggemma-batch-worker",
+        "batch_index": 0,
+        "embedded_at": "2026-06-30T05:26:32.318Z",
+        "embedding_source": "ollama_batch",
+        "ollama_duration_ns": 1514993200,
+        "embedding_batch_size": 20
       }
     }
   }

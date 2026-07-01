@@ -1,0 +1,49 @@
+{
+  "timestamp": "2026-07-01T03:03:50.751Z",
+  "iterations": 10,
+  "batchSizes": [
+    16,
+    32,
+    64,
+    128
+  ],
+  "results": [
+    {
+      "batchSize": 16,
+      "avgFirstMs": "24.89",
+      "avgRepeatMs": "5.21",
+      "speedup": "4.8",
+      "minSpeedup": 4.775484149851208,
+      "maxSpeedup": 4.775484149851208
+    },
+    {
+      "batchSize": 32,
+      "avgFirstMs": "22.04",
+      "avgRepeatMs": "5.30",
+      "speedup": "4.2",
+      "minSpeedup": 4.157133669009505,
+      "maxSpeedup": 4.157133669009505
+    },
+    {
+      "batchSize": 64,
+      "avgFirstMs": "23.36",
+      "avgRepeatMs": "5.02",
+      "speedup": "4.7",
+      "minSpeedup": 4.654526586033467,
+      "maxSpeedup": 4.654526586033467
+    },
+    {
+      "batchSize": 128,
+      "avgFirstMs": "26.80",
+      "avgRepeatMs": "5.38",
+      "speedup": "5.0",
+      "minSpeedup": 4.979222727656976,
+      "maxSpeedup": 4.979222727656976
+    }
+  ],
+  "summary": {
+    "avgSpeedup": "4.6",
+    "totalSavingsMs": "762",
+    "elapsedS": "0.0"
+  }
+}

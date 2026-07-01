@@ -86,6 +86,27 @@ type ParentAtlasRow = {
   payload: Record<string, unknown> | null;
 };
 
+type AtlasPacketRow = {
+  packet_key: string | null;
+  source_ref: string | null;
+  source_ref_key: string | null;
+  file_path: string | null;
+  source_path: string | null;
+  feature_id: string | null;
+  feature_label: string | null;
+  summary: string | null;
+  tags: string[] | null;
+  payload: Record<string, unknown> | null;
+  metadata: Record<string, unknown> | null;
+  topology: Record<string, unknown> | null;
+  qdrant_point_id: string | null;
+  qdrant_collection: string | null;
+  community_id: number | null;
+  cluster_id: number | null;
+  som_cluster: string | null;
+  kmeans_cluster: number | null;
+};
+
 type QueryEvalTelemetryPayload = {
   route: string;
   result_count: number;
@@ -185,8 +206,35 @@ function splitTags(value: unknown): string[] {
   return [...new Set(cleanText(value).split(/[,\s]+/).map((tag) => tag.trim()).filter(Boolean))];
 }
 
+function identityKey(value: unknown): string {
+  return cleanText(value).replace(/\\/g, '/');
+}
+
+function addIdentityCandidate(out: Set<string>, value: unknown): void {
+  const normalized = identityKey(value);
+  if (!normalized) return;
+  out.add(normalized);
+  out.add(normalized.replace(/^C:\/Users\/james\/Videos\/deeds-web-app\//i, ''));
+  if (!normalized.startsWith('sveltekit-frontend/') && normalized.startsWith('src/')) {
+    out.add(`sveltekit-frontend/${normalized}`);
+  }
+}
+
+function fileStableKeyPath(value: unknown): string | null {
+  const text = identityKey(value);
+  if (!text.startsWith('file:')) return null;
+  const body = text.slice('file:'.length);
+  const idx = body.lastIndexOf(':');
+  return idx > 0 ? body.slice(0, idx) : body;
+}
+
 function sourceRefCandidates(hit: FTSResult): string[] {
-  return [...new Set([hit.file_path, hit.stable_key].map(cleanText).filter(Boolean))];
+  const out = new Set<string>();
+  addIdentityCandidate(out, hit.file_path);
+  addIdentityCandidate(out, hit.stable_key);
+  const stablePath = fileStableKeyPath(hit.stable_key);
+  addIdentityCandidate(out, stablePath);
+  return [...out];
 }
 
 function metaString(value: unknown): string {
@@ -212,6 +260,7 @@ function packetSeedCandidatesFromRrf(
   headline: string | null;
   tags: string | null;
   content: string | null;
+  metadata: Record<string, unknown>;
   kind: 'rrf';
 }> {
   return results.map((row) => {
@@ -219,37 +268,52 @@ function packetSeedCandidatesFromRrf(
     const breakdownMetas = (row.breakdown ?? []).map((b) => getMetadata(b)).filter((m): m is Record<string, unknown> => Boolean(m));
     const refs = new Set<string>();
     for (const rawValue of [
-      row.id,
-      metadata.packet_key,
-      metadata.packetKey,
       metadata.source_ref,
       metadata.sourceRef,
+      metadata.canonical_source_ref,
       metadata.canonicalSourceRef,
       metadata.file_path,
       metadata.filePath,
       metadata.path,
+      metadata.packet_key,
+      metadata.packetKey,
       metadata.qdrant_point_id,
+      row.id,
       ...breakdownMetas.flatMap((m) => [
-        m.packet_key,
-        m.packetKey,
         m.source_ref,
         m.sourceRef,
+        m.canonical_source_ref,
         m.canonicalSourceRef,
         m.file_path,
         m.filePath,
         m.path,
+        m.packet_key,
+        m.packetKey,
         m.qdrant_point_id,
       ]),
     ]) {
       const normalized = cleanText(rawValue);
       if (normalized) refs.add(normalized);
+      const stablePath = fileStableKeyPath(normalized);
+      if (stablePath) {
+        refs.add(stablePath);
+        if (stablePath.startsWith('src/')) refs.add(`sveltekit-frontend/${stablePath}`);
+      }
     }
 
     const denseScore =
       row.breakdown?.find((score) => score.laneName === 'qdrant_vector' || score.laneName === 'turbovec_ann')?.laneScore ??
       0;
     const packetKey = metaString(metadata.packet_key ?? metadata.packetKey ?? row.id) || null;
-    const filePath = metaString(metadata.file_path ?? metadata.filePath ?? metadata.path) || null;
+    const filePath = metaString(
+      metadata.source_ref ??
+      metadata.sourceRef ??
+      metadata.canonical_source_ref ??
+      metadata.canonicalSourceRef ??
+      metadata.file_path ??
+      metadata.filePath ??
+      metadata.path
+    ) || null;
     return {
       stable_key: metaString(row.id),
       file_path: filePath,
@@ -260,6 +324,7 @@ function packetSeedCandidatesFromRrf(
       headline: metaString(row.text ?? metadata.summary ?? metadata.content) || null,
       tags: metaString(metadata.tags) || null,
       content: metaString(row.text ?? metadata.summary ?? metadata.content) || null,
+      metadata,
       kind: 'rrf' as const,
     };
   });
@@ -275,6 +340,7 @@ function packetSeedCandidatesFromFts(hits: FTSResult[]): Array<{
   headline: string | null;
   tags: string | null;
   content: string | null;
+  metadata: Record<string, unknown>;
   kind: 'fts';
 }> {
   return hits.map((hit) => ({
@@ -287,6 +353,7 @@ function packetSeedCandidatesFromFts(hits: FTSResult[]): Array<{
     headline: cleanText(hit.headline) || null,
     tags: cleanText(hit.tags) || null,
     content: cleanText(hit.content) || null,
+    metadata: {},
     kind: 'fts' as const,
   }));
 }
@@ -297,10 +364,10 @@ function directoryPath(sourceRef: string): string | null {
   return idx > 0 ? normalized.slice(0, idx) : null;
 }
 
-function featureLabelFrom(row: ParentAtlasRow | NesPacketRow | undefined, featureId: string | null): string | null {
+function featureLabelFrom(row: ParentAtlasRow | NesPacketRow | AtlasPacketRow | undefined, featureId: string | null): string | null {
   const payload = row?.payload;
   const label = payload?.feature_label ?? payload?.featureLabel ?? payload?.label ?? payload?.title;
-  return cleanText(label) || featureId;
+  return cleanText(label) || cleanText((row as AtlasPacketRow | undefined)?.feature_label) || featureId;
 }
 
 async function recordPacketRpcTelemetry(params: {
@@ -394,6 +461,93 @@ async function loadParentAtlas(sourceRefs: string[]): Promise<Map<string, Parent
     for (const row of rows) {
       if (row.source_ref) out.set(row.source_ref, row);
       if (row.rel_path) out.set(row.rel_path, row);
+    }
+    return out;
+  } catch {
+    return new Map();
+  }
+}
+
+function addAtlasPacketIdentity(out: Map<string, AtlasPacketRow>, value: unknown, row: AtlasPacketRow): void {
+  const key = identityKey(value);
+  if (!key) return;
+  if (!out.has(key)) out.set(key, row);
+  const lower = key.toLowerCase();
+  if (!out.has(lower)) out.set(lower, row);
+}
+
+async function loadAtlasPacketsByIdentity(keys: string[]): Promise<Map<string, AtlasPacketRow>> {
+  const identities = [...new Set(keys.map(identityKey).filter(Boolean))];
+  if (!identities.length) return new Map();
+  try {
+    const { rows } = await getPacketRpcPool().query<AtlasPacketRow>(
+      `
+        select
+          packet_key,
+          source_ref,
+          source_ref_key,
+          file_path,
+          source_path,
+          feature_id,
+          feature_label,
+          summary,
+          tags,
+          payload,
+          metadata,
+          topology,
+          qdrant_point_id,
+          qdrant_collection,
+          community_id,
+          cluster_id,
+          som_cluster,
+          kmeans_cluster
+        from atlas_packets
+        where packet_key = any($1::text[])
+           or source_ref = any($1::text[])
+           or source_ref_key = any($1::text[])
+           or file_path = any($1::text[])
+           or source_path = any($1::text[])
+           or qdrant_point_id = any($1::text[])
+        order by updated_at desc nulls last, created_at desc nulls last
+        limit 500
+      `,
+      [identities],
+    );
+
+    const out = new Map<string, AtlasPacketRow>();
+    for (const row of rows) {
+      for (const value of [
+        row.packet_key,
+        row.source_ref,
+        row.source_ref_key,
+        row.file_path,
+        row.source_path,
+        row.qdrant_point_id,
+        row.payload?.packet_key,
+        row.payload?.packetKey,
+        row.payload?.source_ref,
+        row.payload?.sourceRef,
+        row.payload?.canonical_source_ref,
+        row.payload?.canonicalSourceRef,
+        row.payload?.file_path,
+        row.payload?.filePath,
+        row.payload?.path,
+        row.payload?.qdrant_point_id,
+        row.payload?.qdrantPointId,
+        row.metadata?.packet_key,
+        row.metadata?.packetKey,
+        row.metadata?.source_ref,
+        row.metadata?.sourceRef,
+        row.metadata?.canonical_source_ref,
+        row.metadata?.canonicalSourceRef,
+        row.metadata?.file_path,
+        row.metadata?.filePath,
+        row.metadata?.path,
+        row.metadata?.qdrant_point_id,
+        row.metadata?.qdrantPointId,
+      ]) {
+        addAtlasPacketIdentity(out, value, row);
+      }
     }
     return out;
   } catch {
@@ -689,21 +843,38 @@ export async function hyperragPacketRpc(input: HyperRagPacketRpcInput): Promise<
   const rrfSeeds = rrfResult?.results?.length ? packetSeedCandidatesFromRrf(rrfResult.results) : [];
   const ftsSeeds = packetSeedCandidatesFromFts(ftsHits);
   const allSeeds = [...ftsSeeds, ...rrfSeeds];
-  const dedupedSeeds = Array.from(
-    new Map(
-      allSeeds.map((seed) => {
-        const key =
-          seed.packet_key ||
-          seed.source_refs[0] ||
-          seed.file_path ||
-          seed.stable_key;
-        return [key.toLowerCase(), seed] as const;
-      })
-    ).values()
-  );
+  const dedupeMap = new Map<string, (typeof allSeeds)[number]>();
+  for (const seed of allSeeds) {
+    const key = (
+      seed.packet_key ||
+      seed.source_refs[0] ||
+      seed.file_path ||
+      seed.stable_key
+    ).toLowerCase();
+    const existing = dedupeMap.get(key);
+    if (!existing) {
+      dedupeMap.set(key, seed);
+      continue;
+    }
+    dedupeMap.set(key, {
+      ...existing,
+      ...seed,
+      source_refs: [...new Set([...existing.source_refs, ...seed.source_refs])],
+      lexical_score: Math.max(Number(existing.lexical_score ?? 0), Number(seed.lexical_score ?? 0)),
+      dense_score: Math.max(Number(existing.dense_score ?? 0), Number(seed.dense_score ?? 0)),
+      packet_key: existing.packet_key ?? seed.packet_key,
+      headline: existing.headline ?? seed.headline,
+      tags: existing.tags ?? seed.tags,
+      content: existing.content ?? seed.content,
+      metadata: { ...existing.metadata, ...seed.metadata },
+      kind: existing.kind === 'fts' ? existing.kind : seed.kind,
+    });
+  }
+  const dedupedSeeds = Array.from(dedupeMap.values());
 
   const candidateRefs = [...new Set(dedupedSeeds.flatMap((seed) => seed.source_refs))];
-  const [parentAtlas, nesPackets] = await Promise.all([
+  const [canonicalPackets, parentAtlas, nesPackets] = await Promise.all([
+    loadAtlasPacketsByIdentity(candidateRefs),
     loadParentAtlas(candidateRefs),
     loadNesPackets(candidateRefs),
   ]);
@@ -752,20 +923,40 @@ export async function hyperragPacketRpc(input: HyperRagPacketRpcInput): Promise<
   for (const [index, seed] of seedsToEmit.entries()) {
     const seedMetadata = getSeedMetadata(seed);
     const candidates = seed.source_refs.length ? seed.source_refs : [seed.file_path ?? seed.stable_key];
+    const canonicalPacket =
+      candidates.map((candidate) => canonicalPackets.get(candidate) ?? canonicalPackets.get(candidate.toLowerCase())).find(Boolean) ??
+      canonicalPackets.get(seed.stable_key) ??
+      canonicalPackets.get(seed.stable_key.toLowerCase()) ??
+      (seed.file_path ? canonicalPackets.get(seed.file_path) ?? canonicalPackets.get(seed.file_path.toLowerCase()) : undefined);
     const sourceRef =
+      canonicalPacket?.source_ref ??
+      canonicalPacket?.file_path ??
       candidates.find((candidate) => parentAtlas.has(candidate) || nesPackets.has(candidate)) ??
       candidates[0] ??
       seed.stable_key;
     const atlasRow = parentAtlas.get(sourceRef) ?? candidates.map((candidate) => parentAtlas.get(candidate)).find(Boolean);
     const nesRow = nesPackets.get(sourceRef) ?? candidates.map((candidate) => nesPackets.get(candidate)).find(Boolean);
     const featureId = canonicalFeatureId(
+      canonicalPacket?.feature_id,
       nesRow?.feature_id,
       atlasRow?.feature_id,
+      canonicalPacket?.payload?.feature_id,
+      canonicalPacket?.payload?.featureId,
+      canonicalPacket?.metadata?.feature_id,
+      canonicalPacket?.metadata?.featureId,
       getMetadata(nesRow).feature_id,
       getMetadata(atlasRow).feature_id,
+      seedMetadata.feature_id,
+      seedMetadata.featureId,
     );
-    const packetKey = nesRow?.packet_key ?? `hyperrag:${sourceRef || seed.stable_key}`;
-    const canonicalSourceRef = atlasRow?.source_ref ?? nesRow?.source_ref ?? sourceRef;
+    const packetKey = (
+      canonicalPacket?.packet_key ??
+      nesRow?.packet_key ??
+      seed.packet_key ??
+      cleanText(seedMetadata.packet_key ?? seedMetadata.packetKey) ??
+      `hyperrag:${sourceRef || seed.stable_key}`
+    );
+    const canonicalSourceRef = canonicalPacket?.source_ref ?? atlasRow?.source_ref ?? nesRow?.source_ref ?? sourceRef;
     const packetType: HyperRagPacketRpcPacket['packet_type'] = nesRow ? 'neschrom97' : 'chrom97';
     const atlasMetadata = getMetadata(atlasRow);
     const nesMetadata = getMetadata(nesRow);
@@ -855,6 +1046,7 @@ export async function hyperragPacketRpc(input: HyperRagPacketRpcInput): Promise<
       kmeans_cluster: kmeansCluster,
       qdrant_point_id: (
         nesRow?.qdrant_point_id
+        ?? cleanText(seedMetadata.qdrant_point_id ?? seedMetadata.qdrantPointId)
         ?? cleanText(atlasRow?.payload?.qdrant_point_id ?? atlasRow?.payload?.qdrantPointId)
       ) || null,
       community_id: cleanText(
@@ -997,86 +1189,90 @@ export async function hyperragPacketRpc(input: HyperRagPacketRpcInput): Promise<
       }
     }
 
-    await recordQueryEvalTimes({
-      queryHash: qHash,
-      route,
-      resultCount: packets.length,
-      qdrantMs: timings.qdrant_ms,
-      bm25Ms: timings.bm25_ms,
-      pgvectorMs: timings.pgvector_ms ?? 0,
-      redisMs: effectiveRedisMs,
-      bitfrostMs: 0,
-      neo4jMs: timings.neo4j_ms,
-      turbovecMs: timings.turbovec_ms,
-      rrfMs: timings.rrf_ms,
-      gemma4Ms: timings.gemma4_ms,
-      protocol: input.protocol ?? 'http',
-      accelerator: input.accelerator ?? 'cpu',
-      cudaAvailable: input.cudaAvailable ?? null,
-      cuvsEnabled: input.cuvsEnabled ?? null,
-      matmulMs: input.matmulMs ?? null,
-      embeddingMs: input.embeddingMs ?? null,
-      verdict: result.trace.neo4j_expansions > 0 ? 'PASS' : 'WARN',
-      totalMs: latencyMs,
-      cacheHitSource: null,
-      ttlRemaining: null,
-      error: null,
-      payload: {
+    if (input.recordTelemetry !== false) {
+      await recordQueryEvalTimes({
+        queryHash: qHash,
         route,
-        result_count: packets.length,
-        packet_keys: packets.map((packet) => packet.packet_key),
-        feature_ids: [...new Set(packets.map((packet) => packet.feature_id).filter((value): value is string => Boolean(value)))],
-        source_refs: [...new Set(packets.map((packet) => packet.source_ref))],
-        cache_hit_source: null,
+        resultCount: packets.length,
+        qdrantMs: timings.qdrant_ms,
+        bm25Ms: timings.bm25_ms,
+        pgvectorMs: timings.pgvector_ms ?? 0,
+        redisMs: effectiveRedisMs,
+        bitfrostMs: 0,
+        neo4jMs: timings.neo4j_ms,
+        turbovecMs: timings.turbovec_ms,
+        rrfMs: timings.rrf_ms,
+        gemma4Ms: timings.gemma4_ms,
+        protocol: input.protocol ?? 'http',
+        accelerator: input.accelerator ?? 'cpu',
+        cudaAvailable: input.cudaAvailable ?? null,
+        cuvsEnabled: input.cuvsEnabled ?? null,
+        matmulMs: input.matmulMs ?? null,
+        embeddingMs: input.embeddingMs ?? null,
+        verdict: result.trace.neo4j_expansions > 0 ? 'PASS' : 'WARN',
+        totalMs: latencyMs,
+        cacheHitSource: null,
+        ttlRemaining: null,
         error: null,
-        packet_summaries: packets.map((packet) => ({
-          packet_key: packet.packet_key,
-          source_ref: packet.source_ref,
-          feature_id: packet.feature_id,
-          fusion_score: packet.fusion_score,
-          rank: packet.rank,
-        })),
-      },
-    });
+        payload: {
+          route,
+          result_count: packets.length,
+          packet_keys: packets.map((packet) => packet.packet_key),
+          feature_ids: [...new Set(packets.map((packet) => packet.feature_id).filter((value): value is string => Boolean(value)))],
+          source_refs: [...new Set(packets.map((packet) => packet.source_ref))],
+          cache_hit_source: null,
+          error: null,
+          packet_summaries: packets.map((packet) => ({
+            packet_key: packet.packet_key,
+            source_ref: packet.source_ref,
+            feature_id: packet.feature_id,
+            fusion_score: packet.fusion_score,
+            rank: packet.rank,
+          })),
+        },
+      });
+    }
 
     return result;
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
-    await recordQueryEvalTimes({
-      queryHash: qHash,
-      route,
-      resultCount: 0,
-      qdrantMs: 0,
-      bm25Ms: 0,
-      pgvectorMs: 0,
-      redisMs,
-      bitfrostMs: 0,
-      neo4jMs: 0,
-      turbovecMs: 0,
-      rrfMs: 0,
-      gemma4Ms: 0,
-      protocol: input.protocol ?? 'http',
-      accelerator: input.accelerator ?? 'cpu',
-      cudaAvailable: input.cudaAvailable ?? null,
-      cuvsEnabled: input.cuvsEnabled ?? null,
-      matmulMs: input.matmulMs ?? null,
-      embeddingMs: input.embeddingMs ?? null,
-      verdict: 'FAIL',
-      totalMs: Date.now() - startedAt,
-      cacheHitSource: null,
-      ttlRemaining: null,
-      error: message,
-      payload: {
+    if (input.recordTelemetry !== false) {
+      await recordQueryEvalTimes({
+        queryHash: qHash,
         route,
-        result_count: 0,
-        packet_keys: [],
-        feature_ids: [],
-        source_refs: [],
-        cache_hit_source: null,
+        resultCount: 0,
+        qdrantMs: 0,
+        bm25Ms: 0,
+        pgvectorMs: 0,
+        redisMs,
+        bitfrostMs: 0,
+        neo4jMs: 0,
+        turbovecMs: 0,
+        rrfMs: 0,
+        gemma4Ms: 0,
+        protocol: input.protocol ?? 'http',
+        accelerator: input.accelerator ?? 'cpu',
+        cudaAvailable: input.cudaAvailable ?? null,
+        cuvsEnabled: input.cuvsEnabled ?? null,
+        matmulMs: input.matmulMs ?? null,
+        embeddingMs: input.embeddingMs ?? null,
+        verdict: 'FAIL',
+        totalMs: Date.now() - startedAt,
+        cacheHitSource: null,
+        ttlRemaining: null,
         error: message,
-        packet_summaries: [],
-      },
-    });
+        payload: {
+          route,
+          result_count: 0,
+          packet_keys: [],
+          feature_ids: [],
+          source_refs: [],
+          cache_hit_source: null,
+          error: message,
+          packet_summaries: [],
+        },
+      });
+    }
     throw error;
   }
 }

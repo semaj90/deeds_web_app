@@ -19,7 +19,6 @@ import { expandNeighbours, fetchAuthorityScores } from '$lib/server/search/neo4j
 import { turbovecSearch } from './turbovec-prefilter.js';
 import { searchCodebaseAnn } from '$lib/server/search/qdrant-search.js';
 import { buildVectorPayload } from '$lib/server/config/vector-config.js';
-import { encode768to64 } from '$lib/server/gpu/encode-768-to-64.js';
 import { toStableFileKey } from './subgraph-seed-neighborhood.js';
 
 export interface RRFIntegrationOptions {
@@ -67,7 +66,6 @@ async function queryQdrantVectorSignal(
   try {
     const denseLimit = Math.max(topK * 2, topK);
     const collections = ['codebase_chunks_768'];
-    const topologyVector = await encode768to64(new Float32Array(embedding));
 
     if (seedRefs.length > 0) {
       const cleanedSeeds = [...new Set(seedRefs.map((ref) => String(ref ?? '').trim()).filter(Boolean))];
@@ -125,52 +123,10 @@ async function queryQdrantVectorSignal(
               };
             });
           }
-          return [];
+          // Seed filters are only a precision hint. If they are stale or do not
+          // match Qdrant payload aliases, fall through to the unfiltered ANN lane
+          // instead of masking dense retrieval entirely.
         }
-      }
-    }
-
-    const topologyRes = await fetch(`${process.env.QDRANT_URL ?? 'http://127.0.0.1:6333'}/collections/codebase_topology_64/points/search`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        vector: buildVectorPayload('codebase_topology_64', Array.from(topologyVector)),
-        limit: denseLimit,
-        score_threshold: 0.001,
-        with_payload: true,
-      }),
-      signal: AbortSignal.timeout(5000),
-    }).catch(() => null);
-
-    if (topologyRes?.ok) {
-      const topologyData = await topologyRes.json();
-      const topologyHits = Array.isArray((topologyData as { result?: Array<{ id: string | number; score: number; payload?: Record<string, unknown> }> }).result)
-        ? ((topologyData as { result: Array<{ id: string | number; score: number; payload?: Record<string, unknown> }> }).result ?? [])
-        : [];
-
-      if (topologyHits.length > 0) {
-        return topologyHits.map((r) => {
-          const payload = (r.payload ?? {}) as Record<string, unknown>;
-          return {
-            id: String(r.id),
-            score: Number(r.score ?? 0),
-            text: String(payload.content ?? payload.summary ?? ''),
-            metadata: {
-              packet_key: String(payload.packet_key ?? payload.packetKey ?? r.id ?? '').trim() || null,
-              source_ref: String(payload.source_ref ?? payload.sourceRef ?? payload.canonicalSourceRef ?? payload.file_path ?? payload.filePath ?? '').trim() || null,
-              feature_id: payload.feature_id ?? payload.featureId ?? null,
-              file_path: String(payload.file_path ?? payload.filePath ?? null) || null,
-              qdrant_point_id: String(r.id),
-              qdrant_collection: 'codebase_topology_64',
-              som_cluster: payload.som_cluster ?? payload.somCluster ?? null,
-              som_bmu_row: payload.som_bmu_row ?? null,
-              som_bmu_col: payload.som_bmu_col ?? null,
-              centroid_id: payload.centroid_id ?? null,
-              cluster_id: payload.cluster_id ?? payload.clusterId ?? null,
-              community_id: payload.community_id ?? payload.communityId ?? null,
-            },
-          };
-        });
       }
     }
 
@@ -192,9 +148,9 @@ async function queryQdrantVectorSignal(
           score: r.semantic_score,
           text: String(r.content ?? ''),
           metadata: {
-            packet_key: String(r.stable_key ?? r.qdrant_id ?? '').trim() || null,
-            source_ref: String(r.file_path ?? '').trim() || null,
-            feature_id: null,
+            packet_key: String(r.packet_key ?? r.stable_key ?? r.qdrant_id ?? '').trim() || null,
+            source_ref: String(r.source_ref ?? r.file_path ?? '').trim() || null,
+            feature_id: r.feature_id ?? null,
             file_path: String(r.file_path ?? '').trim() || null,
             qdrant_point_id: String(r.qdrant_id ?? ''),
             qdrant_collection: collection,
@@ -213,6 +169,9 @@ async function queryQdrantVectorSignal(
     if (mergedResults.size > 0) {
       return [...mergedResults.values()];
     }
+
+    const topologyHits = await queryTopology64Signal(embedding, denseLimit).catch(() => []);
+    if (topologyHits.length > 0) return topologyHits;
 
     if (!seedRefs.length) return [];
 
@@ -274,6 +233,61 @@ async function queryQdrantVectorSignal(
     console.error('Qdrant search failed:', err);
     return [];
   }
+}
+
+async function queryTopology64Signal(
+  embedding: number[],
+  denseLimit: number
+): Promise<Array<{ id: string; score: number; text?: string; metadata?: Record<string, unknown> }>> {
+  const topologyVector = await Promise.race([
+    (async () => {
+      const { encode768to64 } = await import('$lib/server/gpu/encode-768-to-64.js');
+      return encode768to64(new Float32Array(embedding));
+    })(),
+    new Promise<null>((resolve) => setTimeout(() => resolve(null), 1500)),
+  ]);
+  if (!topologyVector) return [];
+
+  const topologyRes = await fetch(`${process.env.QDRANT_URL ?? 'http://127.0.0.1:6333'}/collections/codebase_topology_64/points/search`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      vector: buildVectorPayload('codebase_topology_64', Array.from(topologyVector)),
+      limit: denseLimit,
+      score_threshold: 0.001,
+      with_payload: true,
+    }),
+    signal: AbortSignal.timeout(5000),
+  }).catch(() => null);
+
+  if (!topologyRes?.ok) return [];
+  const topologyData = await topologyRes.json();
+  const topologyRows = Array.isArray((topologyData as { result?: Array<{ id: string | number; score: number; payload?: Record<string, unknown> }> }).result)
+    ? ((topologyData as { result: Array<{ id: string | number; score: number; payload?: Record<string, unknown> }> }).result ?? [])
+    : [];
+
+  return topologyRows.map((r) => {
+    const payload = (r.payload ?? {}) as Record<string, unknown>;
+    return {
+      id: String(r.id),
+      score: Number(r.score ?? 0),
+      text: String(payload.content ?? payload.summary ?? ''),
+      metadata: {
+        packet_key: String(payload.packet_key ?? payload.packetKey ?? r.id ?? '').trim() || null,
+        source_ref: String(payload.source_ref ?? payload.sourceRef ?? payload.canonicalSourceRef ?? payload.file_path ?? payload.filePath ?? '').trim() || null,
+        feature_id: payload.feature_id ?? payload.featureId ?? null,
+        file_path: String(payload.file_path ?? payload.filePath ?? null) || null,
+        qdrant_point_id: String(r.id),
+        qdrant_collection: 'codebase_topology_64',
+        som_cluster: payload.som_cluster ?? payload.somCluster ?? null,
+        som_bmu_row: payload.som_bmu_row ?? null,
+        som_bmu_col: payload.som_bmu_col ?? null,
+        centroid_id: payload.centroid_id ?? null,
+        cluster_id: payload.cluster_id ?? payload.clusterId ?? null,
+        community_id: payload.community_id ?? payload.communityId ?? null,
+      },
+    };
+  });
 }
 
 function deriveGraphConceptSeeds(query: string, extracted: Array<{ name: string; confidence: number }>): string[] {

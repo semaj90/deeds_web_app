@@ -1,0 +1,438 @@
+{
+  "generated_at": "2026-07-01T04:45:52.667Z",
+  "verdict": "PASS",
+  "apply": true,
+  "sample": {
+    "jsonrpc": "2.0",
+    "id": "acp-audit-request",
+    "method": "atlas.search",
+    "params": {
+      "trace_id": "11111111-1111-4111-8111-111111111111",
+      "story_id": "acp-transport-proof",
+      "task_id": "audit-acp-packet-transport",
+      "worker_id": "codex-acp-audit",
+      "tool_name": "packet.search",
+      "query": "prove ACP packet transport",
+      "packet_key": "packet:proof:acp-transport",
+      "source_ref": "scripts/atlas/audit-acp-packet-transport.mjs",
+      "feature_id": "feature.parent_atlas.acp_transport",
+      "cache_namespace": "bifrost:sem:packet",
+      "retrieval_strategy": "bm25+qdrant+neo4j+rrf",
+      "verdict": "PASS",
+      "latency_ms": 0
+    }
+  },
+  "jsonrpc": {
+    "ok": true,
+    "errors": [],
+    "adversarial_total": 6,
+    "adversarial_rejected": 6,
+    "adversarial": [
+      {
+        "name": "missing_jsonrpc",
+        "rejected": true,
+        "shape": {
+          "ok": false,
+          "errors": [
+            "jsonrpc_must_be_2.0"
+          ]
+        },
+        "canonical": {
+          "ok": false,
+          "missing": [
+            "trace_id",
+            "story_id",
+            "task_id",
+            "worker_id",
+            "tool_name",
+            "packet_key",
+            "source_ref",
+            "feature_id",
+            "cache_namespace",
+            "retrieval_strategy",
+            "verdict",
+            "latency_ms"
+          ],
+          "invalid": []
+        },
+        "prompt_injection": {
+          "ok": true,
+          "hits": []
+        }
+      },
+      {
+        "name": "wrong_jsonrpc",
+        "rejected": true,
+        "shape": {
+          "ok": false,
+          "errors": [
+            "jsonrpc_must_be_2.0"
+          ]
+        },
+        "canonical": {
+          "ok": false,
+          "missing": [
+            "trace_id",
+            "story_id",
+            "task_id",
+            "worker_id",
+            "tool_name",
+            "packet_key",
+            "source_ref",
+            "feature_id",
+            "cache_namespace",
+            "retrieval_strategy",
+            "verdict",
+            "latency_ms"
+          ],
+          "invalid": []
+        },
+        "prompt_injection": {
+          "ok": true,
+          "hits": []
+        }
+      },
+      {
+        "name": "missing_method",
+        "rejected": true,
+        "shape": {
+          "ok": false,
+          "errors": [
+            "method_required"
+          ]
+        },
+        "canonical": {
+          "ok": false,
+          "missing": [
+            "trace_id",
+            "story_id",
+            "task_id",
+            "worker_id",
+            "tool_name",
+            "packet_key",
+            "source_ref",
+            "feature_id",
+            "cache_namespace",
+            "retrieval_strategy",
+            "verdict",
+            "latency_ms"
+          ],
+          "invalid": []
+        },
+        "prompt_injection": {
+          "ok": true,
+          "hits": []
+        }
+      },
+      {
+        "name": "missing_params",
+        "rejected": true,
+        "shape": {
+          "ok": false,
+          "errors": [
+            "params_object_required"
+          ]
+        },
+        "canonical": {
+          "ok": false,
+          "missing": [
+            "trace_id",
+            "story_id",
+            "task_id",
+            "worker_id",
+            "tool_name",
+            "packet_key",
+            "source_ref",
+            "feature_id",
+            "cache_namespace",
+            "retrieval_strategy",
+            "verdict",
+            "latency_ms"
+          ],
+          "invalid": []
+        },
+        "prompt_injection": {
+          "ok": true,
+          "hits": []
+        }
+      },
+      {
+        "name": "unknown_method",
+        "rejected": true,
+        "shape": {
+          "ok": false,
+          "errors": [
+            "method_not_allowed"
+          ]
+        },
+        "canonical": {
+          "ok": false,
+          "missing": [
+            "trace_id",
+            "story_id",
+            "task_id",
+            "worker_id",
+            "tool_name",
+            "packet_key",
+            "source_ref",
+            "feature_id",
+            "cache_namespace",
+            "retrieval_strategy",
+            "verdict",
+            "latency_ms"
+          ],
+          "invalid": []
+        },
+        "prompt_injection": {
+          "ok": true,
+          "hits": []
+        }
+      },
+      {
+        "name": "prompt_injection_tool",
+        "rejected": true,
+        "shape": {
+          "ok": true,
+          "errors": []
+        },
+        "canonical": {
+          "ok": true,
+          "missing": [],
+          "invalid": []
+        },
+        "prompt_injection": {
+          "ok": false,
+          "hits": [
+            "ignore previous instructions",
+            "overwrite packet_key"
+          ]
+        }
+      }
+    ]
+  },
+  "canonical": {
+    "ok": true,
+    "missing": [],
+    "invalid": []
+  },
+  "prompt_injection": {
+    "ok": true,
+    "hits": []
+  },
+  "services": {
+    "langfuse": {
+      "status": "READY",
+      "detail": "HTTP 200",
+      "probe": {
+        "url": "http://127.0.0.1:3030/api/public/health",
+        "ok": true,
+        "status_code": 200,
+        "output": "HTTP 200"
+      }
+    },
+    "langfuse_otlp": {
+      "status": "READY_REQUIRES_AUTH",
+      "detail": "HTTP 401"
+    },
+    "go_retrieval": {
+      "status": "READY",
+      "detail": "HTTP 200",
+      "probe": {
+        "url": "http://127.0.0.1:8100/health",
+        "ok": true,
+        "status_code": 200,
+        "output": "HTTP 200"
+      }
+    },
+    "qdrant": {
+      "status": "READY",
+      "detail": "HTTP 200",
+      "probe": {
+        "url": "http://127.0.0.1:6333/collections",
+        "ok": true,
+        "status_code": 200,
+        "output": "HTTP 200"
+      }
+    },
+    "neo4j_http": {
+      "status": "READY",
+      "detail": "HTTP 200",
+      "probe": {
+        "url": "http://127.0.0.1:7474",
+        "ok": true,
+        "status_code": 200,
+        "output": "HTTP 200"
+      }
+    },
+    "nats_http": {
+      "status": "READY",
+      "detail": "HTTP 200",
+      "probe": {
+        "url": "http://127.0.0.1:8222/varz",
+        "ok": true,
+        "status_code": 200,
+        "output": "HTTP 200"
+      }
+    }
+  },
+  "rabbitmq": {
+    "command": "C:\\Program Files\\nodejs\\node.exe -e \nconst amqp = require('amqplib');\nconst url = \"amqp://guest:guest@localhost:5672\";\nconst queues = [\"cache.invalidate\",\"document.embed\",\"chat.document.embed\",\"evidence.process\",\"vector.index\",\"chat.context\",\"analytics.track\",\"codebase.index\",\"ace.evaluate\",\"error.embed\",\"synthesis.generate\",\"knowledge.backfill\",\"audio.process\",\"glyph.tile.rebuild\",\"qlora.distill\",\"media.download\",\"media.transcribe\",\"cards.refresh\",\"repair.workflow.run\",\"inference.log.flush\"];\n(async () => {\n  const conn = await amqp.connect(url);\n  const ch = await conn.createChannel();\n  const out = [];\n  for (const name of queues) {\n    try {\n      const info = await ch.checkQueue(name);\n      out.push({ name, messages: info.messageCount, consumers: info.consumerCount, status: 'READY' });\n    } catch (error) {\n      out.push({ name, messages: null, consumers: null, status: 'MISSING', error: error.message });\n    }\n  }\n  await ch.close();\n  await conn.close();\n  console.log(JSON.stringify(out));\n})().catch((error) => {\n  console.error(error.message);\n  process.exit(1);\n});\n",
+    "ok": true,
+    "queue_count": 20,
+    "queues": [
+      {
+        "name": "cache.invalidate",
+        "messages": 0,
+        "consumers": 3,
+        "status": "READY"
+      },
+      {
+        "name": "document.embed",
+        "messages": 0,
+        "consumers": 3,
+        "status": "READY"
+      },
+      {
+        "name": "chat.document.embed",
+        "messages": 0,
+        "consumers": 0,
+        "status": "READY"
+      },
+      {
+        "name": "evidence.process",
+        "messages": 0,
+        "consumers": 3,
+        "status": "READY"
+      },
+      {
+        "name": "vector.index",
+        "messages": 0,
+        "consumers": 3,
+        "status": "READY"
+      },
+      {
+        "name": "chat.context",
+        "messages": 0,
+        "consumers": 3,
+        "status": "READY"
+      },
+      {
+        "name": "analytics.track",
+        "messages": 0,
+        "consumers": 3,
+        "status": "READY"
+      },
+      {
+        "name": "codebase.index",
+        "messages": 0,
+        "consumers": 3,
+        "status": "READY"
+      },
+      {
+        "name": "ace.evaluate",
+        "messages": 0,
+        "consumers": 3,
+        "status": "READY"
+      },
+      {
+        "name": "error.embed",
+        "messages": 0,
+        "consumers": 3,
+        "status": "READY"
+      },
+      {
+        "name": "synthesis.generate",
+        "messages": 0,
+        "consumers": 3,
+        "status": "READY"
+      },
+      {
+        "name": "knowledge.backfill",
+        "messages": 0,
+        "consumers": 3,
+        "status": "READY"
+      },
+      {
+        "name": "audio.process",
+        "messages": 0,
+        "consumers": 0,
+        "status": "READY"
+      },
+      {
+        "name": "glyph.tile.rebuild",
+        "messages": 0,
+        "consumers": 3,
+        "status": "READY"
+      },
+      {
+        "name": "qlora.distill",
+        "messages": 0,
+        "consumers": 3,
+        "status": "READY"
+      },
+      {
+        "name": "media.download",
+        "messages": 0,
+        "consumers": 3,
+        "status": "READY"
+      },
+      {
+        "name": "media.transcribe",
+        "messages": 0,
+        "consumers": 3,
+        "status": "READY"
+      },
+      {
+        "name": "cards.refresh",
+        "messages": 0,
+        "consumers": 3,
+        "status": "READY"
+      },
+      {
+        "name": "repair.workflow.run",
+        "messages": 0,
+        "consumers": 3,
+        "status": "READY"
+      },
+      {
+        "name": "inference.log.flush",
+        "messages": 0,
+        "consumers": 3,
+        "status": "READY"
+      }
+    ],
+    "output": "[{\"name\":\"cache.invalidate\",\"messages\":0,\"consumers\":3,\"status\":\"READY\"},{\"name\":\"document.embed\",\"messages\":0,\"consumers\":3,\"status\":\"READY\"},{\"name\":\"chat.document.embed\",\"messages\":0,\"consumers\":0,\"status\":\"READY\"},{\"name\":\"evidence.process\",\"messages\":0,\"consumers\":3,\"status\":\"READY\"},{\"name\":\"vector.index\",\"messages\":0,\"consumers\":3,\"status\":\"READY\"},{\"name\":\"chat.context\",\"messages\":0,\"consumers\":3,\"status\":\"READY\"},{\"name\":\"analytics.track\",\"messages\":0,\"consumers\":3,\"status\":\"READY\"},{\"name\":\"codebase.index\",\"messages\":0,\"consumers\":3,\"status\":\"READY\"},{\"name\":\"ace.evaluate\",\"messages\":0,\"consumers\":3,\"status\":\"READY\"},{\"name\":\"error.embed\",\"messages\":0,\"consumers\":3,\"status\":\"READY\"},{\"name\":\"synthesis.generate\",\"messages\":0,\"consumers\":3,\"status\":\"READY\"},{\"name\":\"knowledge.backfill\",\"messages\":0,\"consumers\":3,\"status\":\"READY\"},{\"name\":\"audio.process\",\"messages\":0,\"consumers\":0,\"status\":\"READY\"},{\"name\":\"glyph.tile.rebuild\",\"messages\":0,\"consumers\":3,\"status\":\"READY\"},{\"name\":\"qlora.distill\",\"messages\":0,\"consumers\":3,\"status\":\"READY\"},{\"name\":\"media.download\",\"messages\":0,\"consumers\":3,\"status\":\"READY\"},{\"name\":\"media.transcribe\",\"messages\":0,\"consumers\":3,\"status\":\"READY\"},{\"name\":\"cards.refresh\",\"messages\":0,\"consumers\":3,\"status\":\"READY\"},{\"name\":\"repair.workflow.run\",\"messages\":0,\"consumers\":3,\"status\":\"READY\"},{\"name\":\"inference.log.flush\",\"messages\":0,\"consumers\":3,\"status\":\"READY\"}]",
+    "status": "READY_WITH_QUEUES"
+  },
+  "nats": {
+    "command": "cd C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend && npm run nats:proof-of-life:all --silent",
+    "ok": true,
+    "connected": true,
+    "status": "PASS",
+    "output": "🚀 NATS Proof-of-Life Test Suite (Request/Reply)\n\n   URL: nats://localhost:4222\n   Timeout: 5000ms\n\n✅ Connected to NATS\n\n\n📤 Testing agent.task.execute...\n   ✅ PASS (5ms)\n   Message: Task executed: agent.task.execute\n\n📤 Testing retrieval.turbovec.rerank...\n   ✅ PASS (3ms)\n   Message: TurboVec: 3 candidates reordered via turbovec-gpu\n\n📤 Testing gpu.cuvs.search...\n   ✅ PASS (2ms)\n   Message: cuVS: 5 results via cuvs-gpu\n\n📤 Testing gpu.cuda.rank...\n   ✅ PASS (3ms)\n   Message: CUDA: 2 items ranked via cuda-gpu\n\n📤 Testing engram.feedback.async...\n   ✅ PASS (2ms)\n   Message: Engram: persisted=true, outcome=fixed\n\n======================================================================\n📊 PROOF-OF-LIFE TEST SUMMARY\n======================================================================\n\n✅ agent.task.execute\n   Duration: 5ms\n   Message: Task executed: agent.task.execute\n\n✅ retrieval.turbovec.rerank\n   Duration: 3ms\n   Message: TurboVec: 3 candidates reordered via turbovec-gpu\n\n✅ gpu.cuvs.search\n   Duration: 2ms\n   Message: cuVS: 5 results via cuvs-gpu\n\n✅ gpu.cuda.rank\n   Duration: 3ms\n   Message: CUDA: 2 items ranked via cuda-gpu\n\n✅ engram.feedback.async\n   Duration: 2ms\n   Message: Engram: persisted=true, outcome=fixed\n\n======================================================================\n🎯 Result: 5/5 subjects passed\n======================================================================\n\n🎉 ALL SUBJECTS PROVEN!\n   NATS worker: WIRED ✓\n   Distributed task bus: WIRED ✓\n   Subject proof: ALL PROVEN ✓\n   Overall: PRODUCTION READY ✓"
+  },
+  "postgres": {
+    "command": "docker exec legal-ai-postgres psql -U legal_admin -d legal_ai_db -t -A -c \nselect table_name\nfrom information_schema.tables\nwhere table_schema='public'\n  and table_name in ('agent_os_events','analytics_events','phase89_agentic_calls','trace_events','trace_runs','ace_retrieval_runs','ace_retrieval_hits','task_registry')\norder by table_name;\n",
+    "ok": true,
+    "tables": [
+      "ace_retrieval_hits",
+      "ace_retrieval_runs",
+      "agent_os_events",
+      "analytics_events",
+      "phase89_agentic_calls",
+      "task_registry",
+      "trace_events",
+      "trace_runs"
+    ],
+    "output": "ace_retrieval_hits\nace_retrieval_runs\nagent_os_events\nanalytics_events\nphase89_agentic_calls\ntask_registry\ntrace_events\ntrace_runs"
+  },
+  "critical_failures": [],
+  "warnings": [],
+  "next_action": "ACP transport proof is ready; wire the same metadata fields into request handlers and Langfuse traces.",
+  "run_id": "acp-audit-1782881152666",
+  "agent_os_event": {
+    "command": "docker exec -i legal-ai-postgres psql ...",
+    "ok": true,
+    "output": "INSERT 0 1"
+  }
+}

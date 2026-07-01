@@ -1,0 +1,130 @@
+{
+  "generated_at": "2026-07-01T01:20:43.732Z",
+  "overall_completion_pct": 43,
+  "counts": {
+    "atlas_packets": 58304,
+    "packets_feature_id": 58304,
+    "packets_source_ref": 58304,
+    "packets_qdrant_point_id": 2907,
+    "summary_rows": 11939,
+    "summarized_packets": 3246,
+    "summary_embeddings": 3239,
+    "feature_envelopes": 58304,
+    "packet_features": 58304
+  },
+  "lanes": [
+    {
+      "lane": "identity_spine",
+      "status": "PASS",
+      "completion_pct": 100,
+      "evidence": "atlas_packets feature_id/source_ref counts",
+      "missing": "none if 100%",
+      "next_action": "Keep packet_key/source_ref/feature_id immutable."
+    },
+    {
+      "lane": "summary_coverage",
+      "status": "FAIL",
+      "completion_pct": 5.57,
+      "evidence": "atlas_summary_layers distinct packet_key rows with non-empty summary",
+      "missing": "55058 packets still need clean summaries",
+      "next_action": "Import completed Colab Gemma4 summary shards, then rerun this audit."
+    },
+    {
+      "lane": "summary_embedding_coverage",
+      "status": "FAIL",
+      "completion_pct": 5.56,
+      "evidence": "atlas_summary_layers.embedding count",
+      "missing": "55065 packet-level summary embeddings still missing",
+      "next_action": "Run EmbeddingGemma batch worker against ONNX /v1/embeddings after summary import."
+    },
+    {
+      "lane": "feature_envelope_storage",
+      "status": "PASS",
+      "completion_pct": 100,
+      "evidence": "atlas_feature_envelopes and packet_features row counts",
+      "missing": "feature envelopes may need refresh after new summaries, even though row coverage is high",
+      "next_action": "Re-materialize feature envelopes from newly imported summaries."
+    },
+    {
+      "lane": "qdrant_payload_mirror",
+      "status": "FAIL",
+      "completion_pct": 0,
+      "evidence": "docs/reports/verify-qdrant-packet-payload.json",
+      "missing": "Qdrant payload sample currently lacks packet_key/feature_id/canonicalSourceRef/file_path",
+      "next_action": "Run qdrant payload sync/tag mirror after embeddings and packet-qdrant link repair."
+    },
+    {
+      "lane": "packet_qdrant_linkage",
+      "status": "FAIL",
+      "completion_pct": 4.99,
+      "evidence": "atlas_packets.qdrant_point_id coverage",
+      "missing": "55397 atlas_packets rows lack qdrant_point_id",
+      "next_action": "Run packet-qdrant link backfill against restored Qdrant points."
+    },
+    {
+      "lane": "redis_bitfrost_hot_cache",
+      "status": "FAIL",
+      "completion_pct": 0,
+      "evidence": "docs/reports/bitfrost-semantic-cache-audit.json",
+      "missing": "semantic bifrost:* families are not warmed from canonical rows",
+      "next_action": "Run warm-bitfrost-semantic-cache.mjs --apply after summary and payload mirror."
+    },
+    {
+      "lane": "neo4j_feature_concept_reachability",
+      "status": "WARN",
+      "completion_pct": 10,
+      "evidence": "docs/reports/concept-reachability-check.json",
+      "missing": "Neo4j has Packet nodes but no Feature/Concept reachability edges in current proof",
+      "next_action": "Project feature envelopes to Neo4j, then rerun concept reachability check."
+    },
+    {
+      "lane": "neo4j_graph_density",
+      "status": "PASS",
+      "completion_pct": 90,
+      "evidence": "docs/reports/graph-density-check.json",
+      "missing": "feature/concept edge semantics still missing even though Packet graph density exists",
+      "next_action": "Keep density check as read-only GDS proof gate."
+    },
+    {
+      "lane": "hyperrag_runtime_proof",
+      "status": "FAIL",
+      "completion_pct": 30,
+      "evidence": "docs/reports/hyperrag-runtime-proof.json",
+      "missing": [
+        "qdrant_hits=0",
+        "bm25_hits=0",
+        "neo4j_hits=0",
+        "rrf_final_hits=0"
+      ],
+      "next_action": "Rerun after Qdrant payload mirror and summary embeddings are refreshed."
+    },
+    {
+      "lane": "onnx_embedding_server",
+      "status": "PASS",
+      "completion_pct": 80,
+      "evidence": "docs/reports/onnx-embedding-server-audit.json",
+      "missing": "GPU provider not active; current path is CPU ONNX batching",
+      "next_action": "Use current ONNX batching now; install DirectML/CUDA provider later if needed."
+    },
+    {
+      "lane": "summary_storage_contract",
+      "status": "PASS",
+      "completion_pct": 90,
+      "evidence": "docs/reports/summary-storage-proof-validation.json",
+      "missing": "storage contract passes, but coverage is not complete",
+      "next_action": "Do not reopen schema; widen data coverage."
+    }
+  ],
+  "blockers": [
+    "summary_coverage",
+    "summary_embedding_coverage",
+    "qdrant_payload_mirror",
+    "packet_qdrant_linkage",
+    "redis_bitfrost_hot_cache",
+    "hyperrag_runtime_proof"
+  ],
+  "warnings": [
+    "neo4j_feature_concept_reachability"
+  ],
+  "next_patch": "Import completed Colab Gemma4 summary shards, then rerun this audit."
+}

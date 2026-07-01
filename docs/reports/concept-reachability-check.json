@@ -1,0 +1,23 @@
+{
+  "generated_at": "2026-07-01T01:15:50.015Z",
+  "status": "WARN",
+  "neo4j": {
+    "uri": "bolt://127.0.0.1:7687"
+  },
+  "counts": {
+    "packets": 40754,
+    "features": 0,
+    "concepts": 0,
+    "packet_feature_edges": 0,
+    "used_concept_edges": 0
+  },
+  "samples": [
+    {
+      "labels": [
+        "Chrom97Context"
+      ],
+      "id": "packet:fb289b6c5b5e"
+    }
+  ],
+  "error": null
+}

@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-06-29T04:18:44.559Z",
+  "generated_at": "2026-07-01T01:01:42.429Z",
   "status": "PASS",
   "commands": {
     "storage_script": "node scripts/atlas/verify-summary-storage.mjs"
@@ -15,13 +15,13 @@
   },
   "counts": {
     "atlas_packets_rows": 58304,
-    "atlas_summary_layers_rows": 336,
+    "atlas_summary_layers_rows": 11939,
     "summary_surface_rows": 313
   },
   "coverage": {
     "atlas_packets_metadata_pct": 100,
     "atlas_packets_topology_pct": 0,
-    "atlas_packets_vectors_pct": 0,
-    "atlas_summary_layers_metadata_pct": 100
+    "atlas_packets_vectors_pct": 4.99,
+    "atlas_summary_layers_metadata_pct": 99.72
   }
 }
