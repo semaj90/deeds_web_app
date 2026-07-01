@@ -12,6 +12,8 @@
 import amqp, { Channel, Connection, Message } from 'amqplib';
 import { Pool } from 'pg';
 import { createHash } from 'crypto';
+// @ts-ignore shared ESM runtime helper has no local .d.ts
+import { sanitizeGemma4Summary } from '../../../scripts/atlas/lib/gemma4-summary-sanitizer.mjs';
 
 const DRY_RUN = process.argv.includes('--dry-run');
 
@@ -68,7 +70,9 @@ async function callGemma4(sourceRef: string, featureLabel: string): Promise<stri
     });
 
     const data = (await response.json()) as any;
-    return data.choices?.[0]?.message?.content?.trim() || '';
+    const content = data.choices?.[0]?.message?.content?.trim() || '';
+    const sanitized = sanitizeGemma4Summary(content);
+    return sanitized.safe ? sanitized.summary : '';
   } catch (err) {
     console.error(`  ⚠️  Gemma4 call failed: ${err}`);
     return `[Summary unavailable: ${err}]`;
@@ -81,6 +85,11 @@ async function logAnalysisPass(
   summary: string
 ): Promise<void> {
   if (DRY_RUN) {
+    return;
+  }
+  const sanitized = sanitizeGemma4Summary(summary);
+  if (!sanitized.safe) {
+    console.error(`  ✗ Refusing to log leaked Gemma4 summary for ${packet.packet_key}`);
     return;
   }
 
@@ -114,7 +123,7 @@ async function logAnalysisPass(
         'success',
         inputHash,
         MODEL,
-        JSON.stringify({ summary, summary_tokens: summary.split(' ').length }),
+        JSON.stringify({ summary: sanitized.summary, summary_tokens: sanitized.summary.split(' ').length }),
         JSON.stringify({ confidence: 0.85, coherence: 0.90 }),
         JSON.stringify({
           postgres: true,
@@ -146,6 +155,11 @@ async function writeSummaryLayer(
   if (DRY_RUN) {
     return;
   }
+  const sanitized = sanitizeGemma4Summary(summary);
+  if (!sanitized.safe) {
+    console.error(`  ✗ Refusing to write leaked Gemma4 summary for ${packet.packet_key}`);
+    return;
+  }
 
   try {
     await pool.query(
@@ -158,7 +172,7 @@ async function writeSummaryLayer(
       `,
       [
         packet.packet_key,
-        summary,
+        sanitized.summary,
         'embeddinggemma:latest',
         JSON.stringify({
           feature_id: packet.feature_id,

@@ -1,0 +1,40 @@
+{
+  "generated_at": "2026-07-01T16:34:52.687Z",
+  "apply": true,
+  "input": "C:\\Users\\james\\Videos\\deeds-web-app\\.tmp\\source-tuples-all.ndjson",
+  "out": "C:\\Users\\james\\Videos\\deeds-web-app\\.tmp\\turbovec-candidates.ndjson",
+  "context_dir": "C:\\Users\\james\\Videos\\deeds-web-app\\.tmp\\packet-context",
+  "limit": 5000,
+  "packets_grouped": 16231,
+  "candidates_written": 5000,
+  "context_files_written": 5000,
+  "elapsed_ms": 13408,
+  "input_report": {
+    "input": "C:\\Users\\james\\Videos\\deeds-web-app\\.tmp\\source-tuples-all.ndjson",
+    "tuple_rows_read": 176237,
+    "malformed_rows": 0,
+    "by_relation": {
+      "DEFINES": 50077,
+      "VALIDATES": 13393,
+      "IMPORTS": 54157,
+      "EXPORTS": 16407,
+      "USES_POSTGRES": 6597,
+      "USES_QDRANT": 292,
+      "IMPORTS_DYNAMIC": 10293,
+      "USES_REDIS_CACHE": 11246,
+      "USES_NEO4J": 1571,
+      "USES_RABBITMQ": 88,
+      "ROUTE_HANDLES": 1227,
+      "USES_VECTOR_SEARCH": 7129,
+      "MCP_TOOL": 1816,
+      "RISK_SIGNAL": 1944
+    }
+  },
+  "queue_recommendation": {
+    "retrieval_candidates": "C:\\Users\\james\\Videos\\deeds-web-app\\.tmp\\turbovec-candidates.ndjson",
+    "gemma4_summary_requests": "derive from candidates where atlas_summary_layers missing or stale",
+    "vector_indexing": "embed candidate summaries with EmbeddingGemma 768",
+    "cluster_kmeans": "run after summary embeddings exist",
+    "cluster_som": "run after kmeans/latent lane exists"
+  }
+}

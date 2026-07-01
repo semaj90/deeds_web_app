@@ -940,7 +940,7 @@ services:
       QDRANT_GRPC_PORT: "6334"
       REDIS_URL: redis://:redis@valkey:6379
       OLLAMA_URL: http://host.docker.internal:11434
-      EMBED_SERVICE_URL: http://go-embedding-service:8097
+      EMBED_SERVICE_URL: http://legal-ai-go-embedding:8097
       EMBED_MODEL: "embeddinggemma:latest"
       GPU_EMBED_ENABLED: "true"
       GRPC_PORT: "50053"

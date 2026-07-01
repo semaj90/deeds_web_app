@@ -1,10 +1,10 @@
 {
-  "generatedAt": "2026-06-21T21:07:47.682Z",
+  "generatedAt": "2026-07-01T22:01:04.800Z",
   "status": "IN_SYNC",
   "collection": "codebase_chunks_768",
   "qdrantUrl": "http://127.0.0.1:6333",
   "postgresContainer": "legal-ai-postgres",
-  "applyRequested": true,
+  "applyRequested": false,
   "qdrant": {
     "reachable": true,
     "error": null,
@@ -12,18 +12,14 @@
       "result": {
         "status": "green",
         "optimizer_status": "ok",
-        "indexed_vectors_count": 161619,
-        "points_count": 52606,
+        "indexed_vectors_count": 121704,
+        "points_count": 40570,
         "segments_count": 4,
         "config": {
           "params": {
             "vectors": {
               "content": {
                 "size": 768,
-                "distance": "Cosine"
-              },
-              "encoded_64": {
-                "size": 64,
                 "distance": "Cosine"
               },
               "error": {
@@ -42,7 +38,7 @@
           },
           "hnsw_config": {
             "m": 16,
-            "ef_construct": 100,
+            "ef_construct": 200,
             "full_scan_threshold": 10000,
             "max_indexing_threads": 0,
             "on_disk": false
@@ -53,9 +49,10 @@
             "default_segment_number": 0,
             "max_segment_size": null,
             "memmap_threshold": null,
-            "indexing_threshold": 20000,
+            "indexing_threshold": 10000,
             "flush_interval_sec": 5,
-            "max_optimization_threads": null
+            "max_optimization_threads": null,
+            "prevent_unoptimized": null
           },
           "wal_config": {
             "wal_capacity_mb": 32,
@@ -65,39 +62,17 @@
           "quantization_config": {
             "scalar": {
               "type": "int8",
-              "always_ram": true
+              "quantile": 0.99,
+              "always_ram": false
             }
-          },
-          "strict_mode_config": {
-            "enabled": false
           }
         },
         "payload_schema": {
-          "parent_centroid_id": {
+          "centroid_id": {
             "data_type": "keyword",
             "points": 0
           },
-          "worker_id": {
-            "data_type": "keyword",
-            "points": 0
-          },
-          "feature_ids": {
-            "data_type": "keyword",
-            "points": 51818
-          },
-          "workspace_task_id": {
-            "data_type": "keyword",
-            "points": 3
-          },
-          "next_action": {
-            "data_type": "keyword",
-            "points": 0
-          },
-          "workspace_id": {
-            "data_type": "keyword",
-            "points": 0
-          },
-          "observed_at": {
+          "symbol_name": {
             "data_type": "keyword",
             "points": 0
           },
@@ -105,23 +80,19 @@
             "data_type": "keyword",
             "points": 0
           },
-          "repo": {
+          "source_ref": {
             "data_type": "keyword",
-            "points": 0
+            "points": 32281
           },
-          "file_path": {
+          "tags": {
             "data_type": "keyword",
-            "points": 52455
-          },
-          "language": {
-            "data_type": "keyword",
-            "points": 0
-          },
-          "gpuCluster": {
-            "data_type": "integer",
-            "points": 45420
+            "points": 32944
           },
           "semantic_path": {
+            "data_type": "keyword",
+            "points": 0
+          },
+          "cluster_key": {
             "data_type": "keyword",
             "points": 0
           },
@@ -129,71 +100,19 @@
             "data_type": "keyword",
             "points": 0
           },
-          "path": {
+          "file_path": {
             "data_type": "keyword",
-            "points": 26241
+            "points": 32258
           },
-          "story_id": {
-            "data_type": "keyword",
-            "points": 0
-          },
-          "area": {
-            "data_type": "keyword",
-            "points": 51462
-          },
-          "centroid_id": {
-            "data_type": "keyword",
-            "points": 6609
-          },
-          "kind": {
-            "data_type": "keyword",
-            "points": 51581
-          },
-          "qdrant_tags": {
-            "data_type": "keyword",
-            "points": 110
-          },
-          "task_id": {
+          "parent_centroid_id": {
             "data_type": "keyword",
             "points": 0
           },
-          "cluster_id": {
-            "data_type": "keyword",
-            "points": 41076
-          },
-          "trace_id": {
+          "language": {
             "data_type": "keyword",
             "points": 0
           },
-          "som_cluster": {
-            "data_type": "integer",
-            "points": 25688
-          },
-          "point_kind": {
-            "data_type": "keyword",
-            "points": 0
-          },
-          "source_ref": {
-            "data_type": "keyword",
-            "points": 35785
-          },
-          "canonicalSourceRef": {
-            "data_type": "keyword",
-            "points": 51418
-          },
-          "topo_class": {
-            "data_type": "keyword",
-            "points": 34
-          },
-          "lane_ids": {
-            "data_type": "keyword",
-            "points": 51381
-          },
-          "agent_pickup_ready": {
-            "data_type": "keyword",
-            "points": 0
-          },
-          "stable_key": {
+          "repo": {
             "data_type": "keyword",
             "points": 0
           },
@@ -201,55 +120,78 @@
             "data_type": "keyword",
             "points": 0
           },
-          "neo4j_gpuCluster": {
-            "data_type": "integer",
+          "sourceRefs": {
+            "data_type": "keyword",
+            "points": 32258
+          },
+          "workspace_task_id": {
+            "data_type": "keyword",
             "points": 0
+          },
+          "som_cluster": {
+            "data_type": "integer",
+            "points": 8310
+          },
+          "observed_at": {
+            "data_type": "keyword",
+            "points": 0
+          },
+          "next_action": {
+            "data_type": "keyword",
+            "points": 0
+          },
+          "path": {
+            "data_type": "keyword",
+            "points": 32258
           },
           "updated_at": {
             "data_type": "integer",
             "points": 0
           },
-          "indexed_at": {
-            "data_type": "datetime",
-            "points": 51933
-          },
-          "sourceRef": {
+          "cluster_id": {
             "data_type": "keyword",
-            "points": 52449
+            "points": 0
           },
-          "symbol_name": {
+          "kind": {
+            "data_type": "keyword",
+            "points": 0
+          },
+          "point_kind": {
+            "data_type": "keyword",
+            "points": 0
+          },
+          "agent_pickup_ready": {
+            "data_type": "keyword",
+            "points": 0
+          },
+          "workspace_id": {
             "data_type": "keyword",
             "points": 0
           },
           "feature_id": {
             "data_type": "keyword",
-            "points": 52108
+            "points": 32281
           },
-          "sourceRefs": {
+          "topo_class": {
             "data_type": "keyword",
-            "points": 32614
-          },
-          "tags": {
-            "data_type": "keyword",
-            "points": 52475
-          },
-          "cluster_key": {
-            "data_type": "keyword",
-            "points": 27194
+            "points": 0
           }
+        },
+        "update_queue": {
+          "length": 0
         }
       },
       "status": "ok",
-      "time": 0.059177793
+      "time": 0.005532034
     }
   },
   "summary": {
-    "canonicalRows": 5702,
+    "canonicalRows": 58298,
     "qdrantPointsScanned": 250,
-    "joinablePoints": 243,
-    "orphanPoints": 7,
-    "agreementBefore": 243,
-    "agreementAfter": 243,
+    "joinablePoints": 229,
+    "orphanPoints": 21,
+    "agreementBefore": 229,
+    "agreementAfter": 229,
     "patchCandidates": 0,
     "appliedPatches": 0,
     "applyFailures": 0,
@@ -262,43 +204,43 @@
   },
   "fieldCoverage": {
     "source_ref": {
-      "canonical": 243,
-      "present": 243,
-      "matched": 243,
+      "canonical": 229,
+      "present": 229,
+      "matched": 229,
       "mismatched": 0,
       "deferred": 0
     },
     "feature_id": {
-      "canonical": 243,
-      "present": 243,
-      "matched": 243,
+      "canonical": 229,
+      "present": 229,
+      "matched": 229,
       "mismatched": 0,
       "deferred": 0
     },
     "packet_key": {
-      "canonical": 0,
-      "present": 212,
-      "matched": 0,
+      "canonical": 229,
+      "present": 229,
+      "matched": 229,
       "mismatched": 0,
       "deferred": 0
     },
     "metadata": {
-      "canonical": 243,
-      "present": 243,
-      "matched": 243,
+      "canonical": 229,
+      "present": 229,
+      "matched": 229,
       "mismatched": 0,
       "deferred": 0
     },
     "cluster_id": {
-      "canonical": 243,
-      "present": 243,
-      "matched": 243,
+      "canonical": 0,
+      "present": 0,
+      "matched": 0,
       "mismatched": 0,
       "deferred": 0
     },
     "community_id": {
       "canonical": 0,
-      "present": 232,
+      "present": 0,
       "matched": 0,
       "mismatched": 0,
       "deferred": 0
@@ -319,60 +261,116 @@
     },
     "cluster_key": {
       "canonical": 0,
-      "present": 189,
+      "present": 0,
       "matched": 0,
       "mismatched": 0,
       "deferred": 0
     },
     "kmeans_cluster": {
-      "canonical": 243,
-      "present": 243,
-      "matched": 243,
+      "canonical": 0,
+      "present": 0,
+      "matched": 0,
       "mismatched": 0,
       "deferred": 0
     },
     "domain": {
-      "canonical": 243,
-      "present": 243,
-      "matched": 243,
+      "canonical": 0,
+      "present": 0,
+      "matched": 0,
       "mismatched": 0,
       "deferred": 0
     },
     "som_cluster": {
-      "canonical": 243,
-      "present": 243,
-      "matched": 243,
+      "canonical": 0,
+      "present": 21,
+      "matched": 0,
       "mismatched": 0,
       "deferred": 0
     }
   },
   "orphanSamples": [
     {
-      "pointId": "2316000",
+      "pointId": "00537352-b039-45bf-9009-b44d4ccf337d",
       "reason": "not joinable to canonical Postgres spine"
     },
     {
-      "pointId": "2968749",
+      "pointId": "0062a661-a993-4cfc-9e86-0bc1785dd997",
       "reason": "not joinable to canonical Postgres spine"
     },
     {
-      "pointId": "3305298",
+      "pointId": "006960bb-8d3a-49e1-8c9b-ee1a8138111f",
       "reason": "not joinable to canonical Postgres spine"
     },
     {
-      "pointId": "7660230",
+      "pointId": "00865f5e-a81d-454a-b60a-ad66b5781146",
       "reason": "not joinable to canonical Postgres spine"
     },
     {
-      "pointId": "11034662",
+      "pointId": "008a52ea-f999-4d9e-8b3e-7acad60238d9",
       "reason": "not joinable to canonical Postgres spine"
     },
     {
-      "pointId": "11915146",
+      "pointId": "0096d303-1566-4c9b-9686-46fb24d70eba",
       "reason": "not joinable to canonical Postgres spine"
     },
     {
-      "pointId": "14544441",
+      "pointId": "00a5ac67-62a0-4539-b8dd-65d5f9714135",
+      "reason": "not joinable to canonical Postgres spine"
+    },
+    {
+      "pointId": "00abe2b4-f279-4aff-8b28-1c39e429a60d",
+      "reason": "not joinable to canonical Postgres spine"
+    },
+    {
+      "pointId": "00aee0f9-ac9d-4f90-9fb9-600fc04ccd8f",
+      "reason": "not joinable to canonical Postgres spine"
+    },
+    {
+      "pointId": "00b6cd93-7b91-4283-a7b3-0a09d19acb0e",
+      "reason": "not joinable to canonical Postgres spine"
+    },
+    {
+      "pointId": "00bac87c-24c9-4873-97ad-8bf0a921f32c",
+      "reason": "not joinable to canonical Postgres spine"
+    },
+    {
+      "pointId": "00f23cbd-3f36-428c-8579-c29f0b632ea1",
+      "reason": "not joinable to canonical Postgres spine"
+    },
+    {
+      "pointId": "011e26f2-64f6-456d-b776-b51366ddc19b",
+      "reason": "not joinable to canonical Postgres spine"
+    },
+    {
+      "pointId": "013b47c1-31b5-4438-b043-555a28c76d58",
+      "reason": "not joinable to canonical Postgres spine"
+    },
+    {
+      "pointId": "014a97cb-9a99-4258-bc3d-624194fdba42",
+      "reason": "not joinable to canonical Postgres spine"
+    },
+    {
+      "pointId": "0157bd1a-4ae3-4c59-859a-a18569f89c4a",
+      "reason": "not joinable to canonical Postgres spine"
+    },
+    {
+      "pointId": "015863c2-e2b1-4296-94be-2e7be29a098f",
+      "reason": "not joinable to canonical Postgres spine"
+    },
+    {
+      "pointId": "01792e27-0930-46b6-ab26-896d11eae31e",
+      "reason": "not joinable to canonical Postgres spine"
+    },
+    {
+      "pointId": "017e96d6-ed80-4710-a657-d27da715e9f5",
+      "reason": "not joinable to canonical Postgres spine"
+    },
+    {
+      "pointId": "017f7d5c-40ec-4ef1-bb2c-cfbe2119a339",
+      "reason": "not joinable to canonical Postgres spine"
+    },
+    {
+      "pointId": "01830c2b-80be-4f3a-bad2-e3c809ef5c1c",
       "reason": "not joinable to canonical Postgres spine"
     }
   ],
@@ -401,32 +399,45 @@
     }
   },
   "canonicalSources": {
-    "taskSemanticPackets": 307,
-    "parentAtlasDocuments": 5395
+    "taskSemanticPackets": 0,
+    "parentAtlasDocuments": 0,
+    "atlasPackets": 58298
   },
   "gemma4Context": {
     "fields": {
       "feature_id": {
         "status": "VISIBLE",
-        "value": "database"
+        "value": "sveltekit-frontend.EvidencePrimaryUpload"
       },
       "source_ref": {
         "status": "VISIBLE",
-        "value": "feature:database"
+        "value": "sveltekit-frontend/src/lib/components/evidence/EvidencePrimaryUpload.svelte"
       },
       "metadata": {
         "status": "VISIBLE",
         "value": {
-          "qdrant_coarse_feature": "database"
+          "identity": {
+            "source": "filesystem",
+            "version": 1,
+            "created_at": "2026-06-28T08:36:37.877Z",
+            "created_by": "phase-d:whole-codebase-scan"
+          },
+          "workspace": {
+            "domain": "codebase",
+            "universe": "atlas",
+            "text_safe": true,
+            "size_bytes": 13590
+          },
+          "qdrant_coarse_feature": "sveltekit-frontend.EvidencePrimaryUpload"
         }
       },
       "packet_key": {
         "status": "VISIBLE",
-        "value": "$lib/utils/file-reader.ts"
+        "value": "packet:12dfac568730"
       },
       "cluster_id": {
-        "status": "VISIBLE",
-        "value": "4"
+        "status": "MISSING",
+        "value": null
       },
       "community_id": {
         "status": "MISSING",
@@ -445,16 +456,16 @@
         "value": null
       },
       "kmeans_cluster": {
-        "status": "VISIBLE",
-        "value": "4"
+        "status": "MISSING",
+        "value": null
       },
       "som_cluster": {
-        "status": "VISIBLE",
-        "value": "4"
+        "status": "MISSING",
+        "value": null
       },
       "domain": {
         "status": "VISIBLE",
-        "value": "source"
+        "value": "classification failed"
       },
       "qdrant_tag_id": {
         "status": "DEFERRED",

@@ -1,0 +1,157 @@
+{
+  "generated_at": "2026-07-01T22:30:28.066Z",
+  "status": "LIVE_PASS",
+  "query": "GPU Qdrant TurboVec Go Retrieval HyperRAG dense search summaries",
+  "rule": "LIVE_PASS means real service, real port, real data. Fallbacks and warnings are visible, not green.",
+  "lanes": {
+    "embeddinggemma": {
+      "status": "LIVE_PASS",
+      "url": "http://127.0.0.1:8081",
+      "model": "embeddinggemma:latest",
+      "dimension": 768,
+      "duration_ms": 72
+    },
+    "qdrant": {
+      "status": "LIVE_PASS",
+      "url": "http://127.0.0.1:6333",
+      "collection": "codebase_chunks_768",
+      "vector_name": "content",
+      "hits": 16,
+      "identity_hits": 16,
+      "duration_ms": 80
+    },
+    "turbovec_grpc": {
+      "status": "LIVE_PASS",
+      "grpc_url": "127.0.0.1:50062",
+      "transport": "grpc",
+      "backend": "bridge:py(python)+addon(cuda)",
+      "in_dim": 768,
+      "out_dim": 64,
+      "duration_ms": 421
+    },
+    "go_retrieval": {
+      "status": "LIVE_PASS",
+      "url": "http://127.0.0.1:8100",
+      "endpoint": "/search/codebase",
+      "query_used": "Parent Atlas Qdrant TurboVec summarization",
+      "results": 8,
+      "total_ms": 14,
+      "duration_ms": 6033
+    },
+    "postgres_truth_join": {
+      "status": "LIVE_PASS",
+      "table": "atlas_packets",
+      "packet_keys_in": 24,
+      "source_refs_in": 22,
+      "rows": 13,
+      "identity_rows": 13,
+      "duration_ms": 33
+    },
+    "langextract": {
+      "status": "LIVE_PASS",
+      "url": "http://127.0.0.1:8096",
+      "entities": 0,
+      "structure_keys": 5,
+      "duration_ms": 2892
+    },
+    "gemma4_summary": {
+      "status": "LIVE_PASS",
+      "url": "http://127.0.0.1:8090/v1",
+      "model": "gemma4-legal-iq4xs-direct.gguf",
+      "reasoning_leak_stripped": false,
+      "json_parsed": true,
+      "output_chars": 1344,
+      "duration_ms": 4941
+    }
+  },
+  "candidates": {
+    "qdrant": [
+      {
+        "id": "00cb1f82-4ddd-4835-ac84-bb94060409ff",
+        "score": 0.09218872,
+        "packet_key": "packet:f8bc5005d44a",
+        "source_ref": "sveltekit-frontend/src/lib/server/ai/error-fix-memory.ts",
+        "feature_id": "sveltekit-frontend.error-fix-memory",
+        "feature_label": "error-fix-memory.ts"
+      },
+      {
+        "id": "3012ea9b-6499-49b8-b6e9-233e63b64e73",
+        "score": 0.09167099,
+        "packet_key": "packet:c9355c310a10",
+        "source_ref": "sveltekit-frontend/src/lib/components/ui/gaming/effects/gradient-utils.ts",
+        "feature_id": "sveltekit-frontend.gradient-utils",
+        "feature_label": "gradient-utils.ts"
+      },
+      {
+        "id": "3e9216e2-7ebc-4aa7-ad99-99a22626a010",
+        "score": 0.08478546,
+        "packet_key": "packet:213117ef7c84",
+        "source_ref": "sveltekit-frontend/src/lib/gpu/nes-glyph-webgpu.ts",
+        "feature_id": "sveltekit-frontend.nes-glyph-webgpu",
+        "feature_label": "nes-glyph-webgpu.ts"
+      },
+      {
+        "id": "8fb15d8a-9efa-443d-af4b-9edcfcafde8f",
+        "score": 0.084243774,
+        "packet_key": "packet:f1319049f580",
+        "source_ref": "sveltekit-frontend/src/lib/config/retro-console-palettes.ts",
+        "feature_id": "sveltekit-frontend.retro-console-palettes",
+        "feature_label": "retro-console-palettes.ts"
+      },
+      {
+        "id": "0b9af12f-bd86-442b-b0a2-8cad81fc4e0d",
+        "score": 0.08315277,
+        "packet_key": "packet:ea23ac5787fd",
+        "source_ref": "sveltekit-frontend/src/lib/utils/accessibility.ts",
+        "feature_id": "sveltekit-frontend.accessibility",
+        "feature_label": "accessibility.ts"
+      },
+      {
+        "id": "72d761d1-95c4-440b-a7fb-2a465b2dfc55",
+        "score": 0.08164024,
+        "packet_key": "packet:c9355c310a10",
+        "source_ref": "sveltekit-frontend/src/lib/components/ui/gaming/effects/gradient-utils.ts",
+        "feature_id": "sveltekit-frontend.gradient-utils",
+        "feature_label": "gradient-utils.ts"
+      },
+      {
+        "id": "49d38463-22d5-4e59-9c47-a8b123ef4d0d",
+        "score": 0.08069801,
+        "packet_key": "packet:f1319049f580",
+        "source_ref": "sveltekit-frontend/src/lib/config/retro-console-palettes.ts",
+        "feature_id": "sveltekit-frontend.retro-console-palettes",
+        "feature_label": "retro-console-palettes.ts"
+      },
+      {
+        "id": "5707cc30-3262-4766-b21f-eefdb9cd0258",
+        "score": 0.08031273,
+        "packet_key": "packet:c9355c310a10",
+        "source_ref": "sveltekit-frontend/src/lib/components/ui/gaming/effects/gradient-utils.ts",
+        "feature_id": "sveltekit-frontend.gradient-utils",
+        "feature_label": "gradient-utils.ts"
+      }
+    ],
+    "go_retrieval_count": 8
+  },
+  "summary": {
+    "summary": "The provided context is a codebase feature envelope summary, detailing basic statistics for the analyzed code. Key metrics include a word count of 129, 40 sentences, 25 paragraphs, and a character count of 2656. The average words per sentence is calculated as 3.225. The document type is classified as a 'codebase_feature_envelope' with a general contract type.",
+    "domain_class": "Codebase Analysis",
+    "ontology_label": "Codebase Feature Envelope Summary",
+    "topology_label": "Basic Code Metrics",
+    "source_refs": [
+      "sveltekit-frontend/src/lib/server/ai/error-fix-memory.ts",
+      "sveltekit-frontend/src/lib/server/analytics/research-summaries-db.ts",
+      "sveltekit-frontend/src/lib/config/retro-console-palettes.ts",
+      "sveltekit-frontend/src/lib/server/db/schema/search-analytics.ts",
+      "sveltekit-frontend/src/lib/components/ui/gaming/effects/gradient-utils.ts",
+      "sveltekit-frontend/src/lib/server/indexer/cluster-summary.ts",
+      "sveltekit-frontend/src/lib/components/ui/gaming/constants/gaming-constants.ts",
+      "sveltekit-frontend/src/lib/utils/accessibility.ts"
+    ],
+    "missing_evidence": [
+      "Specific details regarding GPU Qdrant TurboVec Go Retrieval HyperRAG dense search summaries are not present in the provided source references or extracted structure."
+    ],
+    "confidence": 0.9
+  },
+  "elapsed_ms": 14475
+}

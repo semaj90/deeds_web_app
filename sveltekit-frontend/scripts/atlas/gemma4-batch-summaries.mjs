@@ -20,6 +20,7 @@ import fs from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import pg from 'pg';
+import { sanitizeGemma4Summary } from '../../../scripts/atlas/lib/gemma4-summary-sanitizer.mjs';
 
 const { Pool } = pg;
 
@@ -207,7 +208,8 @@ async function summarizeWithGemma4(summaryType, card) {
     }
 
     const body = await res.json();
-    return body.response?.trim() || null;
+    const sanitized = sanitizeGemma4Summary(body.response?.trim() || '');
+    return sanitized.safe ? sanitized.summary : null;
   } catch (err) {
     if (err.name === 'AbortError') {
       console.warn(`[gemma4] ⏱️  60s timeout on ${summaryType}/${card.feature_id || card.file_path} — skipping`);

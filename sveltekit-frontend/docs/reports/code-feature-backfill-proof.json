@@ -1,0 +1,14 @@
+{
+  "timestamp": "2026-07-01T23:19:47.266Z",
+  "mode": "apply",
+  "limit": 100,
+  "stats": {
+    "evidence_processed": 100,
+    "features_extracted": 3,
+    "features_upserted": 3,
+    "edges_created": 0,
+    "errors": 0,
+    "canonical_ast_index_files": 6745
+  },
+  "errors": []
+}

@@ -4,7 +4,7 @@ Optimized LangExtract Service - Memory-efficient version
 Target: ~200-300MB RAM (down from 1GB)
 Changes:
 - spaCy en_core_web_md (40MB) instead of en_core_web_trf (500MB)
-- Removed in-process BERT model — uses Ollama for NER
+- Removed in-process BERT model — uses Gemma4 llama-server for NER
 - Lazy model loading — models load on first use
 - Removed EasyOCR (use server-side tesseract.js instead)
 - Optional gRPC support for efficient binary payloads
@@ -39,7 +39,14 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 # Configuration
-OLLAMA_URL = os.environ.get('OLLAMA_URL', 'http://host.docker.internal:11434')
+LLAMA_SERVER_URL = (
+    os.environ.get('LLAMA_SERVER_URL')
+    or os.environ.get('TURBOQUANT_BASE_URL')
+    or os.environ.get('TURBOQUANT_URL')
+    or os.environ.get('LLAMA_URL')
+    or 'http://127.0.0.1:8090'
+).rstrip('/')
+LLM_MODEL = os.environ.get('LANGEXTRACT_MODEL', 'gemma4-legal-iq4xs-direct.gguf')
 SPACY_MODEL = os.environ.get('SPACY_MODEL', 'en_core_web_md')  # 40MB vs 500MB
 ENABLE_SPACY = os.environ.get('ENABLE_SPACY', 'true').lower() == 'true'
 
@@ -49,7 +56,7 @@ class ExtractRequest(BaseModel):
     document_type: Optional[str] = Field("legal", description="Type of document")
     extract_entities: bool = Field(True, description="Extract named entities")
     extract_structure: bool = Field(True, description="Extract document structure")
-    use_ollama_ner: bool = Field(False, description="Use Ollama for NER (slower but better)")
+    use_ollama_ner: bool = Field(False, description="Use Gemma4 llama-server for NER")
 
 class ExtractResponse(BaseModel):
     document_id: str
@@ -139,8 +146,8 @@ class LangExtractService:
 
         return entities
 
-    async def extract_entities_ollama(self, content: str) -> List[Dict[str, Any]]:
-        """Extract entities using Ollama (slower but higher quality)"""
+    async def extract_entities_llm(self, content: str) -> List[Dict[str, Any]]:
+        """Extract entities using Gemma4 llama-server."""
         client = await self.get_http_client()
 
         # Limit content for LLM
@@ -148,7 +155,7 @@ class LangExtractService:
         if len(content) > max_len:
             content = content[:max_len] + "..."
 
-        prompt = f"""Extract legal entities from this document. Return a JSON array of objects with keys: text, label, importance.
+        prompt = f"""Extract legal entities from this document. Return only a JSON array of objects with keys: text, label, importance.
 Labels should be: PERSON, ORG, DATE, MONEY, STATUTE, CASE_CITATION, CLAUSE, LOCATION.
 Document:
 {content}
@@ -157,18 +164,26 @@ JSON array:"""
 
         try:
             response = await client.post(
-                f"{OLLAMA_URL}/api/generate",
+                f"{LLAMA_SERVER_URL}/v1/chat/completions",
                 json={
-                    "model": "gemma4-legal:latest",
-                    "prompt": prompt,
-                    "stream": False,
-                    "options": {"num_predict": 1000, "temperature": 0.1}
+                    "model": LLM_MODEL,
+                    "messages": [{"role": "user", "content": prompt}],
+                    "temperature": 0.1,
+                    "max_tokens": 1000,
+                    "stream": False
                 }
             )
 
             if response.status_code == 200:
                 result = response.json()
                 text = result.get('response', '')
+                if not text and isinstance(result.get('choices'), list) and result['choices']:
+                    choice = result['choices'][0]
+                    message = choice.get('message') if isinstance(choice, dict) else None
+                    if isinstance(message, dict):
+                        text = message.get('content', '')
+                    elif isinstance(choice, dict):
+                        text = choice.get('text', '')
 
                 # Try to parse JSON from response
                 try:
@@ -178,14 +193,14 @@ JSON array:"""
                     if start != -1 and end > start:
                         entities = json.loads(text[start:end])
                         return [
-                            {**e, 'source': 'ollama'}
+                            {**e, 'source': 'gemma4-llama-server'}
                             for e in entities
                             if isinstance(e, dict) and 'text' in e
                         ]
                 except json.JSONDecodeError:
                     pass
         except Exception as e:
-            logger.warning(f"Ollama NER failed: {e}")
+            logger.warning(f"Gemma4 llama-server NER failed: {e}")
 
         return []
 
@@ -301,14 +316,14 @@ JSON array:"""
             # Always get regex entities (free)
             entities.extend(await self.extract_entities_regex(request.content))
 
-            # Use spaCy if available and not using Ollama
+            # Use spaCy if available and not using the configured LLM
             if not request.use_ollama_ner:
                 spacy_ents = await self.extract_entities_spacy(request.content)
                 entities.extend(spacy_ents)
             else:
-                # Use Ollama for higher quality NER
-                ollama_ents = await self.extract_entities_ollama(request.content)
-                entities.extend(ollama_ents)
+                # Use the configured LLM for higher quality NER
+                llm_ents = await self.extract_entities_llm(request.content)
+                entities.extend(llm_ents)
 
         # Dedupe by text + label
         seen = set()
@@ -324,7 +339,8 @@ JSON array:"""
             structure=structure,
             entities=unique_entities,
             metadata={
-                'model': SPACY_MODEL if not request.use_ollama_ner else 'ollama/gemma4-legal',
+                'model': SPACY_MODEL if not request.use_ollama_ner else f'gemma4-llama-server/{LLM_MODEL}',
+                'llm_url': None if not request.use_ollama_ner else LLAMA_SERVER_URL,
                 'entity_count': len(unique_entities),
                 'section_count': len(structure['sections'])
             },
@@ -372,12 +388,12 @@ async def health():
     process = psutil.Process()
     mem_mb = process.memory_info().rss / (1024 * 1024)
 
-    # Check Ollama connectivity
-    ollama_ok = False
+    # Check Gemma4 llama-server connectivity
+    llama_server_ok = False
     try:
         async with httpx.AsyncClient(timeout=5.0) as client:
-            r = await client.get(f"{OLLAMA_URL}/api/tags")
-            ollama_ok = r.status_code == 200
+            r = await client.get(f"{LLAMA_SERVER_URL}/v1/models")
+            llama_server_ok = r.status_code == 200
     except:
         pass
 
@@ -386,7 +402,7 @@ async def health():
         services={
             "spacy_loaded": LazySpaCy._nlp is not None,
             "spacy_enabled": ENABLE_SPACY,
-            "ollama_available": ollama_ok
+            "llama_server_available": llama_server_ok
         },
         memory_mb=round(mem_mb, 1)
     )
@@ -414,9 +430,8 @@ async def root():
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(
-        "langextract_service:app",
+        app,
         host="0.0.0.0",
-        port=8095,
-        workers=2,
+        port=int(os.environ.get('LANGEXTRACT_PORT', '8095')),
         log_level="info"
     )

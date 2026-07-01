@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-01T01:07:48.828Z",
+  "generated_at": "2026-07-01T15:53:40.973Z",
   "url": "http://127.0.0.1:8081",
   "status": "PASS",
   "health": {
@@ -18,7 +18,7 @@
   },
   "batch_size": 8,
   "embedding_probe": {
-    "elapsed_ms": 63,
+    "elapsed_ms": 57,
     "vectors": 8,
     "dimensions": [
       768,
@@ -31,7 +31,7 @@
       768
     ],
     "dimension_ok": true,
-    "ms_per_text": 7.9
+    "ms_per_text": 7.1
   },
   "error": null
 }

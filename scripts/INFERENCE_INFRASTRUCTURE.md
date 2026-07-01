@@ -16,16 +16,16 @@ User Query → routeInference() (inference-router.ts)
   ├─ Tier 1: TensorRT-LLM (:8099)   — INT4 AWQ, GPU lease required
   ├─ Tier 2: Triton (:8000)          — production GPU fallback
   ├─ Tier 3: llama-server (:8090)    — q4_0 KV cache, flash attention, CUDA
-  ├─ Tier 4: Bifrost/LiteLLM (:3030) — semantic cache proxy
+  ├─ Tier 4: Bifrost (:3030) — semantic cache proxy
   ├─ Tier 5: VLM HF (:8085)          — Gemma 4 E4B NF4, text fallback
   ├─ Tier 6: LiteRT-LM (:8070)       — CPU sidecar, Gemma 4 E2B, 0 VRAM
-  └─ Tier 7: Ollama (:11434)         — gemma4-rotorquant:latest Q4_K_M, default fallback
+  └─ Tier 7: Ollama embeddinggemma(sp?) (:11434)         — gemma4-rotorquant:latest Q4_K_M, default fallback
 ```
 
 All tiers are OpenAI-compatible (`/v1/chat/completions`). The router health-checks each tier with a 1s timeout and falls through to the next on failure.
 
 > [!IMPORTANT]
-> **Healthy != GPU Active**: The `/health` endpoint only confirms the server process is alive and responding. It does **not** verify that GPU offload is configured correctly or that VRAM is being used. 
+> **Healthy != GPU Active**: The `/health` endpoint only confirms the server process is alive and responding. It does **not** verify that GPU offload is configured correctly or that VRAM is being used.
 > - **Verify GPU**: Always check `nvidia-smi` during generation. If GPU usage stays at 0% or VRAM doesn't increase, the server is running on CPU.
 > - **Speculative Decoding**: Requires a valid draft model. If none is configured, it will be disabled automatically.
 

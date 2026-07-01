@@ -1,0 +1,380 @@
+{
+  "generated_at": "2026-07-01T21:55:55.253Z",
+  "status": "PASS_WITH_WARNINGS",
+  "summary": {
+    "livePass": 10,
+    "fallbackPass": 0,
+    "fail": 0,
+    "criticalFailures": 0,
+    "legacyWarnings": 2
+  },
+  "probes": [
+    {
+      "service_name": "gemma4-llama-server",
+      "url": "http://127.0.0.1:8090",
+      "port": 8090,
+      "transport": "http",
+      "status": "LIVE_PASS",
+      "fallback_used": false,
+      "duration_ms": 72,
+      "details": {
+        "http_status": 200,
+        "body": {
+          "models": [
+            {
+              "name": "gemma4-legal-iq4xs-direct.gguf",
+              "model": "gemma4-legal-iq4xs-direct.gguf",
+              "modified_at": "",
+              "size": "",
+              "digest": "",
+              "type": "model",
+              "description": "",
+              "tags": [
+                ""
+              ],
+              "capabilities": [
+                "completion",
+                "multimodal"
+              ],
+              "parameters": "",
+              "details": {
+                "parent_model": "",
+                "format": "gguf",
+                "family": "",
+                "families": [
+                  ""
+                ],
+                "parameter_size": "",
+                "quantization_level": ""
+              }
+            }
+          ],
+          "object": "list",
+          "data": [
+            {
+              "id": "gemma4-legal-iq4xs-direct.gguf",
+              "aliases": [],
+              "tags": [],
+              "object": "model",
+              "created": 1782942953,
+              "owned_by": "llamacpp",
+              "meta": {
+                "vocab_type": 2,
+                "n_vocab": 262144,
+                "n_ctx_train": 131072,
+                "n_embd": 2560,
+                "n_params": 7518069290,
+                "size": 5075609768
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "service_name": "langextract",
+      "url": "http://127.0.0.1:8096",
+      "port": 8096,
+      "transport": "http",
+      "status": "LIVE_PASS",
+      "fallback_used": false,
+      "duration_ms": 601,
+      "details": {
+        "http_status": 200,
+        "body": {
+          "status": "healthy",
+          "services": {
+            "spacy_loaded": false,
+            "spacy_enabled": true,
+            "llama_server_available": true
+          },
+          "memory_mb": 21
+        }
+      }
+    },
+    {
+      "service_name": "turbovec-grpc",
+      "url": "127.0.0.1:50062",
+      "port": 50062,
+      "transport": "grpc",
+      "status": "LIVE_PASS",
+      "fallback_used": false,
+      "duration_ms": 2
+    },
+    {
+      "service_name": "go-retrieval",
+      "url": "http://127.0.0.1:8100",
+      "port": 8100,
+      "transport": "http",
+      "status": "LIVE_PASS",
+      "fallback_used": false,
+      "duration_ms": 38,
+      "details": {
+        "http_status": 200,
+        "body": {
+          "embeddingServiceUp": true,
+          "pgvectorConnected": true,
+          "qdrantConnected": true,
+          "redisConnected": true,
+          "status": "healthy",
+          "timestamp": 1782942954515
+        }
+      }
+    },
+    {
+      "service_name": "embeddinggemma",
+      "url": "http://127.0.0.1:11434",
+      "port": 11434,
+      "transport": "http",
+      "status": "LIVE_PASS",
+      "fallback_used": false,
+      "duration_ms": 13,
+      "details": {
+        "http_status": 200,
+        "body": {
+          "object": "list",
+          "data": [
+            {
+              "id": "embeddinggemma:latest",
+              "object": "model",
+              "created": 1782936588,
+              "owned_by": "library"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "service_name": "qdrant",
+      "url": "http://127.0.0.1:6333",
+      "port": 6333,
+      "transport": "http",
+      "status": "LIVE_PASS",
+      "fallback_used": false,
+      "duration_ms": 16,
+      "details": {
+        "http_status": 200,
+        "body": {
+          "result": {
+            "collections": [
+              {
+                "name": "BifrostSemanticCachePlugin"
+              },
+              {
+                "name": "agent_memory_observations"
+              },
+              {
+                "name": "audio_segments"
+              },
+              {
+                "name": "case_chunks"
+              },
+              {
+                "name": "chat_messages"
+              },
+              {
+                "name": "chrom97_context"
+              },
+              {
+                "name": "chrom97_context_768"
+              },
+              {
+                "name": "chunks_web_search"
+              },
+              {
+                "name": "codebase_chunks_384"
+              },
+              {
+                "name": "codebase_chunks_768"
+              },
+              {
+                "name": "codebase_topology_128"
+              },
+              {
+                "name": "codebase_topology_64"
+              },
+              {
+                "name": "court_opinions"
+              },
+              {
+                "name": "diagnosis_embeddings"
+              },
+              {
+                "name": "document_knowledge_768"
+              },
+              {
+                "name": "document_tags"
+              },
+              {
+                "name": "embedding_cache"
+              },
+              {
+                "name": "error_embeddings"
+              },
+              {
+                "name": "evidence_items"
+              },
+              {
+                "name": "evidence_vectors"
+              },
+              {
+                "name": "external_programming_docs_768"
+              },
+              {
+                "name": "feature_maps"
+              },
+              {
+                "name": "fictional_case_chunks"
+              },
+              {
+                "name": "knowledge_base"
+              },
+              {
+                "name": "legal_canon_chunks"
+              },
+              {
+                "name": "legal_cases"
+              },
+              {
+                "name": "legal_documents"
+              },
+              {
+                "name": "legal_glossary"
+              },
+              {
+                "name": "llm_response_cache"
+              },
+              {
+                "name": "poi_profiles"
+              },
+              {
+                "name": "research_memory_768"
+              },
+              {
+                "name": "summary_lenses_768"
+              },
+              {
+                "name": "synthesis_memory_768"
+              },
+              {
+                "name": "topic_clusters"
+              }
+            ]
+          },
+          "status": "ok",
+          "time": 0.000025001
+        }
+      }
+    },
+    {
+      "service_name": "postgres",
+      "url": "postgresql://legal_admin:***@127.0.0.1:5434/legal_ai_db",
+      "port": 5434,
+      "transport": "postgres",
+      "status": "LIVE_PASS",
+      "fallback_used": false,
+      "duration_ms": 42
+    },
+    {
+      "service_name": "seaweedfs",
+      "url": "http://127.0.0.1:8333",
+      "port": 8333,
+      "transport": "http",
+      "status": "LIVE_PASS",
+      "fallback_used": false,
+      "duration_ms": 6,
+      "details": {
+        "http_status": 403,
+        "body": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<Error><Code>AccessDenied</Code><Message>Access Denied.</Message><Resource>/</Resource><RequestId>18BE492BB91465DD48CD3E58</RequestId></Error>"
+      }
+    },
+    {
+      "service_name": "neo4j",
+      "url": "http://localhost:7474",
+      "port": 7474,
+      "transport": "http",
+      "status": "LIVE_PASS",
+      "fallback_used": false,
+      "duration_ms": 27,
+      "details": {
+        "http_status": 200,
+        "body": {
+          "bolt_routing": "neo4j://localhost:7687",
+          "query": "http://localhost:7474/db/{databaseName}/query/v2",
+          "transaction": "http://localhost:7474/db/{databaseName}/tx",
+          "bolt_direct": "bolt://localhost:7687",
+          "neo4j_version": "5.26.27",
+          "neo4j_edition": "community"
+        }
+      }
+    },
+    {
+      "service_name": "redis-valkey",
+      "url": "redis://127.0.0.1:6379",
+      "port": 6379,
+      "transport": "redis",
+      "status": "LIVE_PASS",
+      "fallback_used": false,
+      "duration_ms": 170
+    }
+  ],
+  "legacy_warnings": [
+    {
+      "lane": "langextract-stale-8095",
+      "severity": "WARN",
+      "reason": "Legacy LangExtract listener still advertises ollama_available; canonical Gemma4-backed LangExtract is 127.0.0.1:8096.",
+      "probe": {
+        "service_name": "langextract-stale-8095",
+        "url": "http://127.0.0.1:8095",
+        "port": 8095,
+        "transport": "http",
+        "status": "FAIL",
+        "fallback_used": false,
+        "duration_ms": 427,
+        "error": "HTTP 200",
+        "details": {
+          "http_status": 200,
+          "body": {
+            "status": "healthy",
+            "services": {
+              "spacy_loaded": false,
+              "spacy_enabled": true,
+              "ollama_available": true
+            },
+            "memory_mb": 20
+          }
+        }
+      }
+    },
+    {
+      "lane": "turbovec-jsonrpc-8792",
+      "severity": "WARN",
+      "reason": "Legacy TurboVec JSON-RPC wrapper is not live; canonical accelerator proof uses TurboVec gRPC on 50062 and HTTP ANN sidecar on 8791.",
+      "probe": {
+        "service_name": "turbovec-jsonrpc",
+        "url": "http://127.0.0.1:8792",
+        "port": 8792,
+        "transport": "http",
+        "status": "FAIL",
+        "fallback_used": false,
+        "duration_ms": 4,
+        "error": "fetch failed"
+      }
+    }
+  ],
+  "opentelemetry_mapping": {
+    "resource_attributes": [
+      "service_name",
+      "url",
+      "port",
+      "transport"
+    ],
+    "span_attributes": [
+      "status",
+      "fallback_used",
+      "duration_ms",
+      "error"
+    ]
+  },
+  "rule": "LIVE_PASS requires the real service, real port, and real transport. FALLBACK_PASS is WARN, never green success."
+}

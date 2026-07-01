@@ -65,3 +65,56 @@ npm run agents:write       # Regenerates per-dir docs (use --root-only for speed
 
 <!-- /atlas-append:0bf81df426b5 -->
 
+## Parent Atlas Runtime Contract — 2026-07-01
+
+Parent Atlas uses Postgres as canonical truth. Qdrant, Redis/Valkey, Neo4j, TurboVec, and Go Retrieval are mirrors, caches, graph projections, or accelerators. Do not promote accelerator output to packet identity.
+
+Canonical identity fields:
+
+- `packet_key`
+- `source_ref`
+- `source_ref_key`
+- `canonical_source_ref`
+- `feature_id`
+- `feature_label`
+
+Canonical live service map:
+
+| lane | endpoint | role |
+|---|---|---|
+| Gemma4 llama-server | `http://127.0.0.1:8090` | bounded synthesis and LangExtract fallback |
+| LangExtract | `http://127.0.0.1:8096` | Gemma4-backed extraction |
+| TurboVec gRPC | `127.0.0.1:50062` | accelerator proof and ANN bridge |
+| Go Retrieval | `http://127.0.0.1:8100`, gRPC `127.0.0.1:50053` | retrieval orchestration |
+| EmbeddingGemma | `http://127.0.0.1:8081`, Ollama fallback `11434` | embeddings only |
+| Postgres | host `127.0.0.1:5434`, Docker `postgres:5432` | canonical packet, summary, feature, telemetry, provenance truth |
+| Qdrant | `http://127.0.0.1:6333` | dense vector mirror and payload filters |
+| Redis/Valkey | `redis://127.0.0.1:6379` | BitFrost and hot cache |
+| Neo4j | `http://127.0.0.1:7474`, Bolt `7687` | graph mirror and GDS/PageRank |
+| SeaweedFS | `http://127.0.0.1:8333` | authenticated object/blob store |
+
+Probe semantics:
+
+- `LIVE_PASS` means the real service, real port, and real transport responded.
+- `FALLBACK_PASS` is a warning, not green success.
+- Legacy warnings are diagnostics only and do not count as canonical ACP/OpenTelemetry service probes.
+- Stale LangExtract `8095` and stale TurboVec JSON-RPC `8792` should not be used for new lanes.
+- Legacy endpoints `8095` and `8792` are diagnostic-only. They must never count against canonical service readiness unless they are explicitly promoted back into the service contract.
+
+Current proof commands:
+
+```bash
+npm run atlas:services:probe
+npm run atlas:evidence-spine:validate
+npm run atlas:turbovec:qdrant-ingest:test
+node scripts/atlas/qdrant-postgres-mirror-reconciliation.mjs --limit=250
+```
+
+Next indexing lanes:
+
+1. Widen Gemma4 summaries in `atlas_summary_layers`.
+2. Embed new summaries with EmbeddingGemma 768d.
+3. Reconcile Qdrant payload tags from Postgres.
+4. Warm Redis/BitFrost feature and packet cache keys.
+5. Project feature envelopes into Neo4j for GDS/PageRank.
+6. Feed ACP/OpenTelemetry events into the agentic Kanban recommendations.

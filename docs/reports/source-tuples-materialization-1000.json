@@ -1,0 +1,25 @@
+{
+  "generated_at": "2026-07-01T16:20:34.585Z",
+  "apply": true,
+  "limit": 1000,
+  "out": "C:\\Users\\james\\Videos\\deeds-web-app\\.tmp\\source-tuples-1000.ndjson",
+  "packets_scanned": 1000,
+  "packets_with_text": 900,
+  "tuples_written": 5571,
+  "skip_reasons": {
+    "empty": 3,
+    "skipped_path": 76,
+    "too_large": 3,
+    "binary": 18
+  },
+  "by_relation": {
+    "DEFINES": 1676,
+    "VALIDATES": 790,
+    "IMPORTS": 2104,
+    "EXPORTS": 592,
+    "USES_POSTGRES": 223,
+    "USES_QDRANT": 3,
+    "IMPORTS_DYNAMIC": 182,
+    "USES_REDIS_CACHE": 1
+  }
+}

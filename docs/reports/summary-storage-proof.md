@@ -1,12 +1,12 @@
 # Summary Storage Proof
 
-Generated: 2026-07-01T01:01:42.258Z
+Generated: 2026-07-01T21:56:06.637Z
 Status: PASS
 
 ## Tables
 
 - atlas_packets: PASS (58304 rows)
-- atlas_summary_layers: PASS (11939 rows)
+- atlas_summary_layers: PASS (11994 rows)
 
 ## JSONB Coverage
 

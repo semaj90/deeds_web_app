@@ -135,55 +135,104 @@ export class EntityExtractorUnified {
   }
 
   /**
-   * Extract entities via LLM
+   * Extract entities via Gemma4 RotorQuant at :8090 (streaming)
    */
   async extractViaLLM(text: string, types?: EntityType[]): Promise<Entity[]> {
-    const prompt = `Extract named entities from the following legal document text.
-Return an object with an "entities" array of objects with fields: {"text": "...", "label": "..."}
-where label is one of: PERSON, ORG, LOCATION, DATE, LAW, CASE, COURT, STATUTE, MONEY, EMAIL, PHONE.
-Only return entities that are clearly present. Do not fabricate.
+    const systemPrompt = `You are a legal document entity extractor. Extract named entities and return ONLY a valid JSON object (no markdown, no explanations).`;
 
-Text:
-${text}`;
+    const userPrompt = `Extract named entities from this legal document. Return a JSON object with format: {"entities": [{"text": "...", "label": "PERSON|ORG|LOCATION|DATE|STATUTE|CASE|COURT|MONEY|EMAIL|PHONE"}]}
+Only extract entities clearly present. Do not fabricate.
+
+Text (first 8000 chars):
+${text.slice(0, 8000)}`;
+
+    const gemma4Url = process.env.GEMMA4_URL || 'http://127.0.0.1:8090';
 
     try {
-      return await traceLLM('entity-extraction-unified', { model: MODEL, prompt: text.slice(0, 500) }, async (gen) => {
-        const res = await ollamaFetch(`${getOllamaEndpoint()}/api/generate`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            model: MODEL,
-            prompt,
-            stream: false,
-            format: entityJsonSchema,
-            options: { temperature: 0.1, top_p: 0.9 },
-          }),
-          signal: AbortSignal.timeout(90_000),
-        });
+      return await traceLLM('entity-extraction-unified', { model: 'gemma4-legal-iq4xs-direct.gguf', prompt: text.slice(0, 500) }, async (gen) => {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 90_000);
 
-        if (!res.ok) {
-          gen.end({ output: 'failed', level: 'WARNING' });
-          return [];
+        try {
+          const res = await fetch(`${gemma4Url}/v1/chat/completions`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              model: 'gemma4-legal-iq4xs-direct.gguf',
+              messages: [
+                { role: 'system', content: systemPrompt },
+                { role: 'user', content: userPrompt },
+              ],
+              max_tokens: 2048,
+              temperature: 0.1,
+              stream: true,
+            }),
+            signal: controller.signal,
+          });
+
+          clearTimeout(timeoutId);
+
+          if (!res.ok) {
+            gen.end({ output: 'gemma4-error', level: 'WARNING' });
+            return [];
+          }
+
+          // Parse streaming SSE response
+          let accumulated = '';
+          const decoder = new TextDecoder();
+          let buffer = '';
+
+          if (!res.body) {
+            gen.end({ output: 'no-body', level: 'WARNING' });
+            return [];
+          }
+
+          for await (const chunk of res.body) {
+            buffer += decoder.decode(chunk, { stream: true });
+            const lines = buffer.split('\n');
+            buffer = lines.pop() ?? '';
+
+            for (const line of lines) {
+              if (!line.trim().startsWith('data:')) continue;
+              const payload = line.slice(5).trim();
+              if (payload === '[DONE]') break;
+
+              try {
+                const parsed = JSON.parse(payload);
+                const content = parsed.choices?.[0]?.delta?.content ?? '';
+                accumulated += content;
+              } catch {
+                // Skip malformed lines
+              }
+            }
+          }
+
+          // Parse JSON response
+          const jsonMatch = accumulated.match(/\{[\s\S]*\}/);
+          if (!jsonMatch) {
+            gen.end({ output: 'no-json', level: 'WARNING' });
+            return [];
+          }
+
+          const parsed = JSON.parse(jsonMatch[0]);
+          const arr = Array.isArray(parsed.entities) ? parsed.entities : [];
+          const entities = arr
+            .filter((e: any) => typeof e?.text === 'string' && typeof e?.label === 'string' && e.text.length > 0)
+            .map((e: any) => ({
+              type: e.label as EntityType,
+              value: e.text,
+              confidence: 0.9,
+              source: 'llm' as const,
+            }));
+
+          gen.end({ output: `${entities.length} entities`, level: 'SUCCESS' });
+          return entities;
+        } finally {
+          clearTimeout(timeoutId);
         }
-
-        const data = await res.json();
-        const raw = typeof data.response === 'string' ? data.response : JSON.stringify(data.response);
-        const parsed = JSON.parse(raw);
-        const arr = Array.isArray(parsed.entities) ? parsed.entities : [];
-        const entities = arr
-          .filter((e: any) => typeof e?.text === 'string' && typeof e?.label === 'string' && e.text.length > 0)
-          .map((e: any) => ({
-            type: e.label as EntityType,
-            value: e.text,
-            confidence: typeof e.score === 'number' ? e.score : 0.85,
-            source: 'llm' as const,
-          }));
-
-        gen.end({ output: `${entities.length} entities extracted` });
-        return entities;
       });
     } catch (err) {
-      console.warn('[EntityExtractorUnified] LLM extraction failed:', err);
+      console.warn('[EntityExtractorUnified] Gemma4 extraction failed:', err);
       return [];
     }
   }

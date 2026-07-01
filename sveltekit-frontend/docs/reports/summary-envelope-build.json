@@ -1,0 +1,22 @@
+{
+  "timestamp": "2026-07-01T17:14:48.639Z",
+  "dry_run": false,
+  "total_envelopes": 501,
+  "total_jobs": 501,
+  "tuples_to_summarize": 16573,
+  "avg_tuples_per_envelope": 33,
+  "top_k_groups": 500,
+  "tuple_limit_per_group": 2000,
+  "distribution": {
+    "by_domain_class": {
+      "unknown": 498,
+      "Classification failed": 3
+    },
+    "by_rank": {
+      "top_10": 11,
+      "top_50": 51,
+      "top_100": 101,
+      "top_500": 501
+    }
+  }
+}

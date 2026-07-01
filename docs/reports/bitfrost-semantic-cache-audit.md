@@ -1,6 +1,6 @@
 # Bitfrost Semantic Cache Audit
 
-Generated: 2026-07-01T02:22:07.810Z
+Generated: 2026-07-01T21:26:05.595Z
 Status: PASS
 Redis Container: legal-ai-valkey
 
@@ -9,8 +9,8 @@ Redis Container: legal-ai-valkey
 - gpu:karpathy:scores: 0
 - gpu:karpathy:encoded: 0
 - bifrost keys: 1130
-- centroid keys: 0
-- som keys: 0
+- centroid keys: 1
+- som keys: 62
 
 ## Patterns
 
@@ -18,16 +18,16 @@ Redis Container: legal-ai-valkey
 |---|---:|---|---|
 | `gpu:karpathy:scores` | 0 | none | none |
 | `gpu:karpathy:encoded` | 0 | none | none |
-| `bifrost:*` | 1130 | bifrost:sem:packet:packet:0141fd3854b1, bifrost:sem:packet:packet:023deb8570b2, bifrost:sem:packet:packet:0242eca5b9f3, bifrost:sem:feature:scripts.load-packets-neo4j, bifrost:sem:feature:neschrom97.30e6b5d0c6a8f393 | bifrost:sem:packet:packet:0141fd3854b1:85023, bifrost:sem:packet:packet:023deb8570b2:85313, bifrost:sem:packet:packet:0242eca5b9f3:85317, bifrost:sem:feature:scripts.load-packets-neo4j:85009, bifrost:sem:feature:neschrom97.30e6b5d0c6a8f393:84724 |
-| `centroid:*` | 0 | none | none |
-| `som:*` | 0 | none | none |
-| `bifrost:sem:packet:*` | 614 | bifrost:sem:packet:packet:0141fd3854b1, bifrost:sem:packet:packet:023deb8570b2, bifrost:sem:packet:packet:0242eca5b9f3, bifrost:sem:packet:packet:0224aacdd67e, bifrost:sem:packet:packet:0003260092b1 | bifrost:sem:packet:packet:0141fd3854b1:85021, bifrost:sem:packet:packet:023deb8570b2:85310, bifrost:sem:packet:packet:0242eca5b9f3:85315, bifrost:sem:packet:packet:0224aacdd67e:85281, bifrost:sem:packet:packet:0003260092b1:84638 |
-| `bifrost:sem:feature:*` | 516 | bifrost:sem:feature:scripts.load-packets-neo4j, bifrost:sem:feature:neschrom97.30e6b5d0c6a8f393, bifrost:sem:feature:.python311.entry2, bifrost:sem:feature:scripts.legal-corpus, bifrost:sem:feature:neschrom97.e46d6187de1edbd6 | bifrost:sem:feature:scripts.load-packets-neo4j:85005, bifrost:sem:feature:neschrom97.30e6b5d0c6a8f393:84720, bifrost:sem:feature:.python311.entry2:85095, bifrost:sem:feature:scripts.legal-corpus:84796, bifrost:sem:feature:neschrom97.e46d6187de1edbd6:84988 |
+| `bifrost:*` | 1130 | bifrost:sem:feature:turbovec.lib-equator_macro, bifrost:sem:packet:packet:009e1a7df286, bifrost:sem:feature:simd-bridge.lstm_gpu, bifrost:sem:feature:sveltekit-frontend.0010-mcp-tool-atlas-suggest-files-atlas-suggest-files, bifrost:sem:packet:packet:0057df284547 | bifrost:sem:feature:turbovec.lib-equator_macro:16740, bifrost:sem:packet:packet:009e1a7df286:16217, bifrost:sem:feature:simd-bridge.lstm_gpu:16219, bifrost:sem:feature:sveltekit-frontend.0010-mcp-tool-atlas-suggest-files-atlas-suggest-files:16699, bifrost:sem:packet:packet:0057df284547:16123 |
+| `centroid:*` | 1 | centroid:0 | centroid:0:-1 |
+| `som:*` | 62 | som:14, som:60, som:27, som:96, som:46 | som:14:-1, som:60:-1, som:27:-1, som:96:-1, som:46:-1 |
+| `bifrost:sem:packet:*` | 614 | bifrost:sem:packet:packet:009e1a7df286, bifrost:sem:packet:packet:0057df284547, bifrost:sem:packet:packet:004719ec513f, bifrost:sem:packet:packet:02359269ec4c, bifrost:sem:packet:packet:021fa5c13fbd | bifrost:sem:packet:packet:009e1a7df286:16212, bifrost:sem:packet:packet:0057df284547:16119, bifrost:sem:packet:packet:004719ec513f:16092, bifrost:sem:packet:packet:02359269ec4c:16661, bifrost:sem:packet:packet:021fa5c13fbd:16628 |
+| `bifrost:sem:feature:*` | 516 | bifrost:sem:feature:turbovec.lib-equator_macro, bifrost:sem:feature:simd-bridge.lstm_gpu, bifrost:sem:feature:sveltekit-frontend.0010-mcp-tool-atlas-suggest-files-atlas-suggest-files, bifrost:sem:feature:docs.todO_pt2_5526, bifrost:sem:feature:get_proper_metadata_retrieval_packetreader_wired_up_test_615 | bifrost:sem:feature:turbovec.lib-equator_macro:16734, bifrost:sem:feature:simd-bridge.lstm_gpu:16213, bifrost:sem:feature:sveltekit-frontend.0010-mcp-tool-atlas-suggest-files-atlas-suggest-files:16693, bifrost:sem:feature:docs.todO_pt2_5526:16283, bifrost:sem:feature:get_proper_metadata_retrieval_packetreader_wired_up_test_615:16060 |
 | `bifrost:sem:intent:*` | 0 | none | none |
 | `reward:zset` | 0 | none | none |
-| `ace:context:*` | 614 | ace:context:packet:00bacf58384b, ace:context:packet:0194484feed4, ace:context:packet:01c26f2c1882, ace:context:packet:001d9f093944, ace:context:packet:016584fd707a | ace:context:packet:00bacf58384b:2079, ace:context:packet:0194484feed4:2297, ace:context:packet:01c26f2c1882:2356, ace:context:packet:001d9f093944:1879, ace:context:packet:016584fd707a:2256 |
-| `ace:summary:*` | 697 | ace:summary:packet:00615b1a7515, ace:summary:packet:000b2df0cfdf, ace:summary:packet:007e489e8e2e, ace:summary:packet:01630dcae75d, ace:summary:summary:2ee79ea9a56e40c7 | ace:summary:packet:00615b1a7515:1971, ace:summary:packet:000b2df0cfdf:1850, ace:summary:packet:007e489e8e2e:1998, ace:summary:packet:01630dcae75d:2253, ace:summary:summary:2ee79ea9a56e40c7:491345 |
-| `ace:feature:*` | 516 | ace:feature:simd-bridge.lib-cfg_if, ace:feature:.svelte-error-fixes-backup.LLMS, ace:feature:sveltekit-frontend.gaming-types, ace:feature:neschrom97.e60e5d78cdd9ddfb, ace:feature:neschrom97.e1a884a6c504bbdc | ace:feature:simd-bridge.lib-cfg_if:2123, ace:feature:.svelte-error-fixes-backup.LLMS:2578, ace:feature:sveltekit-frontend.gaming-types:2043, ace:feature:neschrom97.e60e5d78cdd9ddfb:1963, ace:feature:neschrom97.e1a884a6c504bbdc:2486 |
+| `ace:context:*` | 26 | ace:context:packet:0011712c94d1, ace:context:packet:000db15dc8ef, ace:context:packet:000fde9311af, ace:context:packet:000f704e5207, ace:context:packet:0009a56456fc | ace:context:packet:0011712c94d1:3428, ace:context:packet:000db15dc8ef:3415, ace:context:packet:000fde9311af:3423, ace:context:packet:000f704e5207:3421, ace:context:packet:0009a56456fc:3410 |
+| `ace:summary:*` | 109 | ace:summary:packet:0011712c94d1, ace:summary:summary:f73d0fc78141b854, ace:summary:summary:d7544be729eb4686, ace:summary:summary:98c80633d64e86c4, ace:summary:summary:28c92795954008de | ace:summary:packet:0011712c94d1:3426, ace:summary:summary:f73d0fc78141b854:422680, ace:summary:summary:d7544be729eb4686:422682, ace:summary:summary:98c80633d64e86c4:421791, ace:summary:summary:28c92795954008de:421785 |
+| `ace:feature:*` | 25 | ace:feature:sveltekit-frontend.tests__routes__auto__api__cache__metrics.test, ace:feature:crates.libryu-555024bdb0a51304, ace:feature:.python311.bq300-8rv, ace:feature:llama-cpp-turboquant-gemma4.completion, ace:feature:sveltekit-frontend.llm_synthesis_mapping | ace:feature:sveltekit-frontend.tests__routes__auto__api__cache__metrics.test:3395, ace:feature:crates.libryu-555024bdb0a51304:3415, ace:feature:.python311.bq300-8rv:3418, ace:feature:llama-cpp-turboquant-gemma4.completion:3403, ace:feature:sveltekit-frontend.llm_synthesis_mapping:3389 |
 | `ace:query:*` | 0 | none | none |
 | `ace:tree:*` | 0 | none | none |
 | `ace:authority:*` | 0 | none | none |

@@ -24,7 +24,7 @@
 //
 // ENV:
 //
-//	DATABASE_URL        — PostgreSQL (default postgresql://legal_admin:123456@localhost:5432/legal_ai_db)
+//	DATABASE_URL        — PostgreSQL (default postgresql://legal_admin:123456@127.0.0.1:5434/legal_ai_db for host runs; Docker compose overrides to postgres:5432)
 //	QDRANT_URL          — Qdrant REST endpoint (default http://localhost:6333)
 //	QDRANT_GRPC_HOST    — Qdrant gRPC host (default localhost)
 //	QDRANT_GRPC_PORT    — Qdrant gRPC port (default 6334)
@@ -100,7 +100,7 @@ func loadConfig() config {
 	cacheTTL, _ := strconv.Atoi(envOr("RETRIEVAL_CACHE_TTL", "300"))
 	gpuEnabled := envOr("GPU_EMBED_ENABLED", "true") == "true"
 	return config{
-		DatabaseURL:     envOr("DATABASE_URL", "postgresql://legal_admin:123456@localhost:5432/legal_ai_db"),
+		DatabaseURL:     envOr("DATABASE_URL", "postgresql://legal_admin:123456@127.0.0.1:5434/legal_ai_db"),
 		QdrantURL:       envOr("QDRANT_URL", "http://localhost:6333"),
 		QdrantHost:      envOr("QDRANT_GRPC_HOST", "localhost"),
 		QdrantPort:      qdPort,

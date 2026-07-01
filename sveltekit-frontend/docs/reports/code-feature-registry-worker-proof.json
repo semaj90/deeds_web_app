@@ -1,0 +1,121 @@
+{
+  "timestamp": "2026-07-01T23:11:06.182Z",
+  "stages": {},
+  "gateStatus": {
+    "worker_stage_config": {
+      "status": "LIVE_PASS",
+      "stage_in_config": true,
+      "executor_defined": true,
+      "file": "C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\src\\lib\\server\\analysis\\worker.ts"
+    },
+    "ast_grep_extractor": {
+      "status": "LIVE_PASS",
+      "function_exists": true,
+      "file": "C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\src\\lib\\server\\analysis\\ast-grep-extractor.ts"
+    },
+    "canonical_order": {
+      "status": "LIVE_PASS",
+      "actual_order": [
+        "entity_extraction",
+        "code_feature_registry",
+        "forensics",
+        "summarization"
+      ],
+      "expected_order": [
+        "entity_extraction",
+        "code_feature_registry",
+        "forensics",
+        "summarization"
+      ],
+      "is_canonical": true,
+      "found_count": 4
+    },
+    "code_features_schema": {
+      "status": "LIVE_PASS",
+      "table_exists": true,
+      "column_count": 14,
+      "expected_columns": [
+        "feature_id",
+        "source_ref",
+        "symbol",
+        "kind",
+        "language",
+        "line_start",
+        "line_end",
+        "packet_key",
+        "domain_class",
+        "ontology_label",
+        "static_tags",
+        "summary",
+        "created_at",
+        "updated_at"
+      ],
+      "actual_columns": [
+        "feature_id",
+        "source_ref",
+        "symbol",
+        "kind",
+        "language",
+        "line_start",
+        "line_end",
+        "packet_key",
+        "domain_class",
+        "ontology_label",
+        "static_tags",
+        "summary",
+        "created_at",
+        "updated_at"
+      ],
+      "missing_columns": []
+    },
+    "code_feature_edges_schema": {
+      "status": "LIVE_PASS",
+      "table_exists": true,
+      "column_count": 6,
+      "expected_columns": [
+        "from_feature_id",
+        "to_feature_id",
+        "relation",
+        "evidence_ref",
+        "confidence",
+        "created_at"
+      ],
+      "actual_columns": [
+        "from_feature_id",
+        "to_feature_id",
+        "relation",
+        "evidence_ref",
+        "confidence",
+        "created_at"
+      ],
+      "missing_columns": []
+    },
+    "code_feature_embeddings_schema": {
+      "status": "LIVE_PASS",
+      "table_exists": true,
+      "column_count": 6,
+      "expected_columns": [
+        "feature_id",
+        "embedding_model",
+        "qdrant_id",
+        "vector_name",
+        "vector_dim",
+        "created_at"
+      ],
+      "actual_columns": [
+        "feature_id",
+        "embedding_model",
+        "qdrant_id",
+        "vector_name",
+        "vector_dim",
+        "created_at"
+      ],
+      "missing_columns": []
+    },
+    "upsert_capability": {
+      "status": "LIVE_PASS",
+      "inserted_feature_id": "test:validateWorker:1782947466234",
+      "insertion_verified": true
+    }
+  }
+}

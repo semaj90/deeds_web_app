@@ -42,15 +42,22 @@ param(
 $ErrorActionPreference = 'Stop'
 
 # -- Load .env ----------------------------------------------------------------
-$envPath = Join-Path $PSScriptRoot "..\.env"
-if (Test-Path $envPath) {
-  Get-Content $envPath | Where-Object { $_ -match '=' -and $_ -notmatch '^#' } | ForEach-Object {
-    $name, $value = $_.Split('=', 2)
-    if ($name -and $value) {
-      $name  = $name.Trim()
-      $value = $value.Trim().Trim('"').Trim("'")
-      if (-not [string]::IsNullOrWhiteSpace($name)) {
-        [System.Environment]::SetEnvironmentVariable($name, $value)
+# Match scripts/atlas/connection-config.mjs semantics:
+# .env primary, .env.local override, explicit process env wins.
+$initialProcessEnv = [System.Environment]::GetEnvironmentVariables('Process')
+foreach ($envPath in @(
+  (Join-Path $PSScriptRoot "..\.env"),
+  (Join-Path $PSScriptRoot "..\.env.local")
+)) {
+  if (Test-Path $envPath) {
+    Get-Content $envPath | Where-Object { $_ -match '=' -and $_ -notmatch '^#' } | ForEach-Object {
+      $name, $value = $_.Split('=', 2)
+      if ($name -and $value) {
+        $name  = $name.Trim()
+        $value = $value.Trim().Trim('"').Trim("'")
+        if (-not [string]::IsNullOrWhiteSpace($name) -and -not $initialProcessEnv.Contains($name)) {
+          [System.Environment]::SetEnvironmentVariable($name, $value)
+        }
       }
     }
   }

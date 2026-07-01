@@ -1,0 +1,11 @@
+{
+  "timestamp": "2026-07-01T23:28:00.198Z",
+  "mode": "apply",
+  "stats": {
+    "features_total": 11,
+    "edges_read": 101,
+    "feature_edges_created": 110,
+    "errors": 0
+  },
+  "errors": []
+}

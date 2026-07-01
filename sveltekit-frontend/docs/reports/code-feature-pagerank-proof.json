@@ -1,0 +1,14 @@
+{
+  "timestamp": "2026-07-01T23:28:07.031Z",
+  "mode": "apply",
+  "stats": {
+    "features_total": 11,
+    "edges_total": 110,
+    "pagerank_computed": 11,
+    "pagerank_updated": 11,
+    "errors": 0,
+    "iterations": 20,
+    "damping_factor": 0.85
+  },
+  "errors": []
+}

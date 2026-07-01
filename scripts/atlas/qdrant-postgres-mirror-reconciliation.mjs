@@ -109,7 +109,7 @@ function runPsql(sql) {
       '-c',
       sql,
     ],
-    { encoding: 'utf8', maxBuffer: 1024 * 1024 * 24 },
+    { encoding: 'utf8', maxBuffer: 1024 * 1024 * 128 },
   );
 
   if (result.status !== 0) {
@@ -322,8 +322,38 @@ function normalizeQdrantPayload(rawPayload) {
 }
 
 async function loadCanonicalRows() {
-  const sql = `
-    with task_rows as (
+  const sourceTables = new Set(parseTsvRows(runPsql(`
+    select table_name
+    from information_schema.tables
+    where table_schema = 'public'
+      and table_name in ('task_semantic_packets', 'parent_atlas_documents', 'atlas_packets')
+  `), ['table_name']).map((row) => row.table_name));
+
+  const emptyRowsSql = `
+      select
+        null::text as source_table,
+        null::text as row_id,
+        null::text as qdrant_point_id,
+        null::text as packet_key,
+        null::text as source_ref,
+        null::text as canonical_source_ref,
+        null::text as feature_id,
+        null::text as feature_label,
+        null::text as cluster_id,
+        null::text as centroid_id,
+        null::text as community_id,
+        null::text as topology_label,
+        null::text as ontology_label,
+        null::text as cluster_key,
+        null::text as kmeans_cluster,
+        null::text as domain,
+        null::text as metadata_json,
+        null::text as source_ref_hash,
+        null::text as payload_json
+      where false
+  `;
+
+  const taskRowsSql = sourceTables.has('task_semantic_packets') ? `
       select
         'task_semantic_packets' as source_table,
         id::text as row_id,
@@ -345,8 +375,9 @@ async function loadCanonicalRows() {
         source_ref_hash::text as source_ref_hash,
         null::text as payload_json
       from task_semantic_packets
-    ),
-    parent_rows as (
+  ` : emptyRowsSql;
+
+  const parentRowsSql = sourceTables.has('parent_atlas_documents') ? `
       select
         'parent_atlas_documents' as source_table,
         id::text as row_id,
@@ -368,10 +399,47 @@ async function loadCanonicalRows() {
         null::text as source_ref_hash,
         payload::text as payload_json
       from parent_atlas_documents
+  ` : emptyRowsSql;
+
+  const atlasRowsSql = sourceTables.has('atlas_packets') ? `
+      select
+        'atlas_packets' as source_table,
+        packet_id::text as row_id,
+        qdrant_point_id::text as qdrant_point_id,
+        packet_key::text as packet_key,
+        source_ref::text as source_ref,
+        coalesce(nullif(source_ref_key::text, ''), source_ref::text, file_path::text, source_path::text) as canonical_source_ref,
+        feature_id::text as feature_id,
+        coalesce(metadata->>'feature_label', payload->>'feature_label')::text as feature_label,
+        coalesce(metadata->>'cluster_id', payload->>'cluster_id')::text as cluster_id,
+        coalesce(metadata->>'centroid_id', payload->>'centroid_id')::text as centroid_id,
+        community_id::text as community_id,
+        coalesce(metadata->>'topology_label', payload->>'topology_label')::text as topology_label,
+        coalesce(metadata->>'ontology_label', payload->>'ontology_label')::text as ontology_label,
+        coalesce(metadata->>'cluster_key', payload->>'cluster_key')::text as cluster_key,
+        coalesce(metadata->>'kmeans_cluster', payload->>'kmeans_cluster')::text as kmeans_cluster,
+        coalesce(domain_class::text, metadata->>'domain_class', payload->>'domain_class') as domain,
+        coalesce(metadata::text, '{}'::text) as metadata_json,
+        null::text as source_ref_hash,
+        payload::text as payload_json
+      from atlas_packets
+  ` : emptyRowsSql;
+
+  const sql = `
+    with task_rows as (
+      ${taskRowsSql}
+    ),
+    parent_rows as (
+      ${parentRowsSql}
+    ),
+    atlas_rows as (
+      ${atlasRowsSql}
     )
     select * from task_rows
     union all
     select * from parent_rows
+    union all
+    select * from atlas_rows
     order by qdrant_point_id asc, source_table asc
   `;
 
@@ -995,6 +1063,7 @@ async function main() {
     canonicalSources: {
       taskSemanticPackets: canonicalRows.filter((row) => row.sourceTables.includes('task_semantic_packets')).length,
       parentAtlasDocuments: canonicalRows.filter((row) => row.sourceTables.includes('parent_atlas_documents')).length,
+      atlasPackets: canonicalRows.filter((row) => row.sourceTables.includes('atlas_packets')).length,
     },
     gemma4Context: {
       fields: {

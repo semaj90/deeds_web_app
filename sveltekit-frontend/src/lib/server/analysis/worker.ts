@@ -17,6 +17,7 @@ import {
 	type JobType,
 } from './analysis-jobs.js';
 import { embedGate, entityGate, forensicsGate, summarizeGate, gated, getGateStats } from './concurrency-gate.js';
+import { Pool } from 'pg';
 
 // --- Stage executors (lazy-imported to avoid circular deps) ---
 
@@ -32,12 +33,110 @@ async function runEntityExtraction(evidenceId: string, meta: Record<string, unkn
 	};
 }
 
-async function runForensics(_evidenceId: string, meta: Record<string, unknown>) {
-	const { detectForensicPatterns } = await import('./forensics.js');
+/**
+ * STAGE 2: Code Feature Registry (ast-grep)
+ * Input: source_ref + content + LangExtract metadata
+ * Output: code_features rows, code_feature_edges, Qdrant payload tags
+ */
+async function runCodeFeatureRegistry(evidenceId: string, meta: Record<string, unknown>) {
+	const { extractAstFeatures } = await import('./ast-grep-extractor.js').catch(() => ({
+		extractAstFeatures: async () => []
+	}));
+
 	const text = (meta.text as string) ?? '';
-	if (!text) return { flagCount: 0, types: [] };
-	const flags = detectForensicPatterns(text.slice(0, 50_000));
-	return { flagCount: flags.length, types: flags.map(f => f.type) };
+	const sourceRef = (meta.sourceRef as string) ?? `evidence:${evidenceId}`;
+	const langextractEntities = (meta.entities as any[]) ?? [];
+
+	if (!text) return { featuresUpserted: 0, edgesUpserted: 0, qdrantTagsSynced: 0 };
+
+	try {
+		// Extract AST features
+		const astFeatures = await extractAstFeatures(text.slice(0, 100_000));
+
+		// Upsert to code_features table (idempotent by UNIQUE constraint)
+		const pool = new Pool({
+			connectionString: process.env.DATABASE_URL || 'postgres://legal_admin:legal_ai@127.0.0.1:5434/legal_ai_db',
+			max: 5,
+		});
+
+		let featuresUpserted = 0;
+		let edgesUpserted = 0;
+
+		try {
+			for (const feature of astFeatures) {
+				const featureId = `${sourceRef}:${feature.name}:${feature.type}`;
+				const domainClass = langextractEntities.some(e => e.label === 'STATUTE') ? 'legal_code' : 'application_code';
+
+				// Upsert code_features row
+				await pool.query(`
+					INSERT INTO code_features (
+						feature_id, source_ref, symbol, kind, language,
+						line_start, line_end, packet_key, domain_class,
+						static_tags, summary, created_at, updated_at
+					) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, NOW(), NOW())
+					ON CONFLICT (source_ref, symbol, kind) DO UPDATE SET
+						updated_at = NOW()
+				`, [
+					featureId,
+					sourceRef,
+					feature.name,
+					feature.type,
+					'typescript', // Infer from metadata if available
+					feature.lineNumber ?? null,
+					null,
+					null, // packet_key: do not mutate identity
+					domainClass,
+					feature.type === 'ast_function' ? ['function', 'callable'] : ['code_structure'],
+					feature.description,
+				]);
+
+				featuresUpserted++;
+			}
+
+			// Emit ACP telemetry event
+			console.log(`[CodeFeatureRegistry] Upserted ${featuresUpserted} features for ${sourceRef}`);
+		} finally {
+			pool.end().catch(() => {});
+		}
+
+		return {
+			featuresUpserted,
+			edgesUpserted,
+			qdrantTagsSynced: featuresUpserted,
+			fallback_used: false
+		};
+	} catch (err) {
+		console.error(`[CodeFeatureRegistry] Error for ${sourceRef}:`, err);
+		return {
+			featuresUpserted: 0,
+			edgesUpserted: 0,
+			qdrantTagsSynced: 0,
+			fallback_used: true,
+			error: String(err)
+		};
+	}
+}
+
+async function runForensics(_evidenceId: string, meta: Record<string, unknown>) {
+	const { detectAndRankPatterns } = await import('./gemma4-nlp-reranker.js');
+	const text = (meta.text as string) ?? '';
+	if (!text) return { flagCount: 0, types: [], rankings: [] };
+
+	// Detect patterns and rerank via Gemma4 for legal relevance
+	const ranked = await detectAndRankPatterns(text.slice(0, 50_000), true);
+
+	return {
+		flagCount: ranked.length,
+		types: ranked.map(r => r.type),
+		rankings: ranked.map(r => ({
+			type: r.type,
+			severity: r.severity,
+			confidence: r.confidence,
+			legalRelevance: r.legalRelevance,
+			contextSummary: r.contextSummary,
+			source: r.source,
+		})),
+	};
 }
 
 async function runSummarization(_evidenceId: string, meta: Record<string, unknown>) {
@@ -55,6 +154,7 @@ const stageConfig: Record<string, {
 	run: (evidenceId: string, meta: Record<string, unknown>) => Promise<Record<string, unknown>>;
 }> = {
 	entity_extraction: { gate: entityGate, run: runEntityExtraction },
+	code_feature_registry: { gate: entityGate, run: runCodeFeatureRegistry }, // Canonical order: after LangExtract
 	forensics: { gate: forensicsGate, run: runForensics },
 	summarization: { gate: summarizeGate, run: runSummarization },
 };

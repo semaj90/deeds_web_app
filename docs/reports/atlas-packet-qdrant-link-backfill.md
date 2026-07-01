@@ -4,7 +4,7 @@
 - mode: apply
 - collection: codebase_chunks_768
 - packets_loaded: 55397
-- qdrant_points_scanned: 40568
+- qdrant_points_scanned: 5000
 - matches: 0
 - updated: 0
 - skipped_duplicate_packet: 0

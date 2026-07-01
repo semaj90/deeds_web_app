@@ -33,10 +33,16 @@ interface RetrievalHealthResult extends BaseHealthResult {
 
 const EMBEDDING_GRPC_URL = process.env.EMBEDDING_GRPC_URL ?? '127.0.0.1:50051';
 const EMBEDDING_GRPC_ENABLED = (process.env.EMBEDDING_GRPC_ENABLED ?? 'false') === 'true';
+
+// Port 50053: Go Retrieval service (canonical)
+// Port 50055: Reserved for library search service (go-search-library)
+// Port 50057: CHR97 agent client (moved from 50055 to avoid collision)
 const GO_SEARCH_GRPC_URL = process.env.GO_SEARCH_GRPC_URL ?? '127.0.0.1:50055';
-const GO_RETRIEVAL_GRPC_URL = process.env.GO_RETRIEVAL_GRPC_ADDR ?? process.env.GO_RETRIEVAL_GRPC_URL ?? process.env.RETRIEVAL_GRPC_URL ?? GO_SEARCH_GRPC_URL;
+const GO_RETRIEVAL_GRPC_URL = process.env.GO_RETRIEVAL_GRPC_ADDR ?? process.env.GO_RETRIEVAL_GRPC_URL ?? process.env.RETRIEVAL_GRPC_URL ?? '127.0.0.1:50053';
 const RETRIEVAL_GRPC_URL = process.env.RETRIEVAL_GRPC_URL ?? GO_RETRIEVAL_GRPC_URL;
 const RETRIEVAL_GRPC_ENABLED = (process.env.RETRIEVAL_GRPC_ENABLED ?? process.env.GO_RETRIEVAL_GRPC_ENABLED ?? process.env.GO_RETRIEVAL_ENABLED ?? 'false') === 'true';
+const CHR97_AGENT_GRPC_URL = process.env.CHR97_AGENT_GRPC_URL ?? '127.0.0.1:50057';
+const CHR97_AGENT_GRPC_ENABLED = (process.env.CHR97_AGENT_GRPC_ENABLED ?? 'false') === 'true';
 
 function loadServiceClient(protoPath: string, packagePath: string[], serviceName: string, url: string): any {
   const packageDefinition = protoLoader.loadSync(protoPath, {
@@ -206,11 +212,48 @@ async function checkRetrievalHealth(): Promise<RetrievalHealthResult> {
   }
 }
 
+interface ServiceHealthStatus {
+  [key: string]: BaseHealthResult | EmbeddingHealthResult | RetrievalHealthResult;
+}
+
+async function checkAllServices(): Promise<ServiceHealthStatus> {
+  return {
+    embedding: await checkEmbeddingHealth(),
+    retrieval: await checkRetrievalHealth(),
+    // Disabled services (enable by setting env vars)
+    chr97_agent: {
+      enabled: CHR97_AGENT_GRPC_ENABLED,
+      url: CHR97_AGENT_GRPC_URL,
+      available: false,
+      status: 'disabled (set CHR97_AGENT_GRPC_ENABLED=true)'
+    },
+    generation_service: {
+      enabled: false,
+      url: process.env.GENERATION_GRPC_URL ?? '127.0.0.1:50052',
+      available: false,
+      status: 'not implemented'
+    },
+    graphml_pytorch: {
+      enabled: false,
+      url: process.env.GRAPHML_GRPC_URL ?? '127.0.0.1:50056',
+      available: false,
+      status: 'not implemented'
+    }
+  };
+}
+
 async function main() {
   const mode = (process.argv[2] ?? 'all') as HealthMode;
 
   if (!['embedding', 'retrieval', 'all'].includes(mode)) {
     console.error('Usage: npx tsx scripts/health/grpc-health.ts [embedding|retrieval|all]');
+    console.error('\nPort map:');
+    console.error('  50051: EmbeddingService (Go)');
+    console.error('  50053: RetrievalService (Go) ← canonical retrieval');
+    console.error('  50055: LibrarySearchService (Go) ← legacy fallback');
+    console.error('  50057: CHR97AgentClient (moved from 50055)');
+    console.error('  50052: GenerationService (not implemented)');
+    console.error('  50056: GraphMLPyTorch (not implemented)');
     process.exit(1);
   }
 
@@ -224,16 +267,7 @@ async function main() {
     return;
   }
 
-  console.log(
-    JSON.stringify(
-      {
-        embedding: await checkEmbeddingHealth(),
-        retrieval: await checkRetrievalHealth(),
-      },
-      null,
-      2
-    )
-  );
+  console.log(JSON.stringify(await checkAllServices(), null, 2));
 }
 
 main().catch((error) => {

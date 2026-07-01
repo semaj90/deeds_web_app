@@ -18,6 +18,7 @@ import path from 'node:path';
 import crypto from 'node:crypto';
 import { fileURLToPath } from 'node:url';
 import { loadRepoEnv, resolveDatabaseUrl } from './connection-config.mjs';
+import { hasGemma4ReasoningLeak, isUsableGemma4Summary, sanitizeGemma4Summary } from './lib/gemma4-summary-sanitizer.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = path.resolve(__dirname, '../..');
@@ -74,15 +75,11 @@ function stableHash(value) {
 }
 
 function hasThoughtLeak(summary) {
-  return /<think>|<\/think>|we need answer|the user asks|i need to|let's craft|analysis:/i.test(String(summary ?? ''));
+  return hasGemma4ReasoningLeak(summary);
 }
 
 function isUsableSummary(summary) {
-  const text = normalizeText(summary);
-  if (text.length < 40) return false;
-  if (hasThoughtLeak(text)) return false;
-  const uniqueWords = new Set(text.toLowerCase().match(/[a-z0-9_.$/-]{3,}/g) ?? []);
-  return uniqueWords.size >= 8;
+  return isUsableGemma4Summary(summary);
 }
 
 function packetKeyFor(obj) {
@@ -94,7 +91,8 @@ function sourceRefFor(obj) {
 }
 
 function summaryFor(obj) {
-  return normalizeText(obj.summary ?? obj.summary_text ?? obj.text);
+  const sanitized = sanitizeGemma4Summary(obj.summary ?? obj.summary_text ?? obj.text);
+  return normalizeText(sanitized.summary);
 }
 
 function featureIdFor(obj) {

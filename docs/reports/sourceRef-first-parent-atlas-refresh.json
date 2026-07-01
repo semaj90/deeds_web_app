@@ -1,6 +1,6 @@
 {
   "schema": "sourceRef_first_parent_atlas_refresh_report.v1",
-  "generatedAt": "2026-06-28T23:45:21.335Z",
+  "generatedAt": "2026-07-01T15:16:40.165Z",
   "mode": "dry-run",
   "inputs": {
     "hotJoinReport": "C:\\Users\\james\\Videos\\deeds-web-app\\docs\\reports\\sourceRef-first-hot-join-warmup.json",

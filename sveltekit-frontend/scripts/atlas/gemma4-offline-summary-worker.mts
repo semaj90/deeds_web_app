@@ -15,6 +15,8 @@ import { Pool } from 'pg';
 import { createHash } from 'crypto';
 import * as https from 'https';
 import * as http from 'http';
+// @ts-ignore shared ESM runtime helper has no local .d.ts
+import { sanitizeGemma4Summary } from '../../../scripts/atlas/lib/gemma4-summary-sanitizer.mjs';
 
 const DRY_RUN = process.argv.includes('--dry-run');
 const APPLY = process.argv.includes('--apply');
@@ -148,8 +150,9 @@ Summary:`;
       res.on('end', () => {
         try {
           const parsed = JSON.parse(data);
-          const summary = parsed.choices?.[0]?.message?.content?.trim() || '';
-          resolve(summary);
+          const content = parsed.choices?.[0]?.message?.content?.trim() || '';
+          const sanitized = sanitizeGemma4Summary(content);
+          resolve(sanitized.safe ? sanitized.summary : '');
         } catch (err) {
           reject(new Error(`Failed to parse Gemma4 response: ${err}`));
         }
@@ -221,6 +224,10 @@ async function writeSummaryLayer(pool: Pool, packet: PacketRow, summary: string)
   if (DRY_RUN) {
     return;
   }
+  const sanitized = sanitizeGemma4Summary(summary);
+  if (!sanitized.safe) {
+    throw new Error(`Refusing to write leaked Gemma4 summary for ${packet.packet_key}`);
+  }
 
   try {
     await pool.query(
@@ -233,7 +240,7 @@ async function writeSummaryLayer(pool: Pool, packet: PacketRow, summary: string)
       `,
       [
         packet.packet_key,
-        summary,
+        sanitized.summary,
         'embeddinggemma:latest',
         JSON.stringify({
           feature_id: packet.feature_id,

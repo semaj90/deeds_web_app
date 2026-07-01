@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-01T01:01:42.258Z",
+  "generated_at": "2026-07-01T21:56:06.637Z",
   "status": "PASS",
   "tables": {
     "atlas_packets": {
@@ -8,7 +8,7 @@
     },
     "atlas_summary_layers": {
       "exists": true,
-      "rows": 11939
+      "rows": 11994
     }
   },
   "coverage": {
@@ -24,21 +24,21 @@
   },
   "sample": {
     "atlas_packets": {
-      "packet_key": "packet:60af0155eada",
-      "source_ref": "neschrom97/cards/e5920305a014bd65.json",
-      "feature_id": "neschrom97.e5920305a014bd65",
+      "packet_key": "packet:5118cc67e6df",
+      "source_ref": "scripts/atlas/audit-recommendation-sourceref.mjs",
+      "feature_id": "scripts.audit-recommendation-sourceref",
       "metadata": {
         "identity": {
           "source": "filesystem",
           "version": 1,
-          "created_at": "2026-06-28T08:36:32.836Z",
+          "created_at": "2026-06-28T08:36:34.587Z",
           "created_by": "phase-d:whole-codebase-scan"
         },
         "workspace": {
           "domain": "codebase",
           "universe": "atlas",
           "text_safe": true,
-          "size_bytes": 384
+          "size_bytes": 6951
         }
       },
       "topology": {},

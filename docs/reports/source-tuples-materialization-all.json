@@ -1,0 +1,50 @@
+{
+  "generated_at": "2026-07-01T16:32:58.294Z",
+  "apply": true,
+  "limit": 58304,
+  "out": "C:\\Users\\james\\Videos\\deeds-web-app\\.tmp\\source-tuples-all.ndjson",
+  "packets_scanned": 58304,
+  "packets_with_text": 48279,
+  "tuples_written": 176237,
+  "skip_reasons": {
+    "empty": 720,
+    "skipped_path": 3352,
+    "too_large": 799,
+    "binary": 4763,
+    "not_found": 391
+  },
+  "by_relation": {
+    "DEFINES": 50077,
+    "VALIDATES": 13393,
+    "IMPORTS": 54157,
+    "EXPORTS": 16407,
+    "USES_POSTGRES": 6597,
+    "USES_QDRANT": 292,
+    "IMPORTS_DYNAMIC": 10293,
+    "USES_REDIS_CACHE": 11246,
+    "USES_NEO4J": 1571,
+    "USES_RABBITMQ": 88,
+    "ROUTE_HANDLES": 1227,
+    "USES_VECTOR_SEARCH": 7129,
+    "MCP_TOOL": 1816,
+    "RISK_SIGNAL": 1944
+  },
+  "ast_grep": {
+    "path": "C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\memory\\index\\symbols.jsonl",
+    "found": true,
+    "rows": 39948,
+    "by_kind": {
+      "vector_call": 7093,
+      "mcp_tool": 1776,
+      "cache_call": 1093,
+      "exported_function": 3880,
+      "exported_const": 3193,
+      "drizzle_table": 507,
+      "mock_or_stub": 1944,
+      "sveltekit_route_handler": 982,
+      "import_dynamic": 4075,
+      "import_static": 15405
+    }
+  },
+  "ast_grep_tuples_added": 40327
+}

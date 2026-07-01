@@ -1,0 +1,2062 @@
+{
+  "generated_at": "2026-07-01T22:09:56.356Z",
+  "status": "WARN",
+  "source_artifacts": {
+    "candidates": "C:\\Users\\james\\Videos\\deeds-web-app\\.tmp\\turbovec-candidates.ndjson",
+    "tuples": "C:\\Users\\james\\Videos\\deeds-web-app\\.tmp\\source-tuples-all.ndjson"
+  },
+  "counts": {
+    "candidates": 5000,
+    "tuples": 176237,
+    "with_packet_key": 5000,
+    "with_source_ref": 5000,
+    "canonical_feature_id": 4998,
+    "domain_class": 11,
+    "ontology_label": 0,
+    "topology_label_or_graph_relation": 337,
+    "bounded_context_refs": 5000,
+    "structural_edges": 4787,
+    "kag_ready": 2407
+  },
+  "metrics": {
+    "lexical": {
+      "score": 1,
+      "coverage_pct": 100,
+      "evidence": "symbols/trigrams available for candidate rows"
+    },
+    "taxonomic": {
+      "score": 0.5009,
+      "coverage_pct": 50.09,
+      "evidence": "canonical feature_id plus domain_class coverage"
+    },
+    "semantic": {
+      "score": 1,
+      "coverage_pct": 100,
+      "evidence": "TurboVec ANN gRPC proof passed over Qdrant vectors"
+    },
+    "context": {
+      "score": 1,
+      "coverage_pct": 100,
+      "evidence": "bounded packet context refs exist on disk"
+    },
+    "syntactic": {
+      "score": 0.9999,
+      "coverage_pct": 99.99,
+      "evidence": "packet_key/source_ref/feature_id contract fields"
+    },
+    "structural": {
+      "score": 0.9574,
+      "coverage_pct": 95.74,
+      "evidence": "IMPORTS/EXPORTS/DEFINES/ROUTE_HANDLES tuple coverage"
+    },
+    "application": {
+      "score": 0.4814,
+      "coverage_pct": 48.14,
+      "evidence": "KAG/ACE-ready rows with feature identity and runtime/retrieval relations"
+    },
+    "data_driven": {
+      "score": 1,
+      "coverage_pct": 100,
+      "evidence": "tuple corpus volume relative to candidate set"
+    },
+    "user_based": {
+      "score": 0,
+      "coverage_pct": 0,
+      "evidence": "operator acceptance/rejection signal not present in this artifact"
+    }
+  },
+  "validation_score": {
+    "lexical": 0.9606,
+    "taxonomic": 0.5009,
+    "semantic": 0.0291,
+    "contextual": 0.5176,
+    "syntactic": 1,
+    "structural": 0.7895,
+    "completeness": 0.9999,
+    "consistency": 0.9928,
+    "coupling": 0.4898,
+    "modularity": 0.8276,
+    "connectivity": 0.4787,
+    "authority": 0.2409
+  },
+  "validation_distribution": {
+    "lexical": {
+      "p10": 0.875,
+      "p50": 1,
+      "p90": 1
+    },
+    "taxonomic": {
+      "p10": 0.5,
+      "p50": 0.5,
+      "p90": 0.5
+    },
+    "semantic": {
+      "p10": 0.0136,
+      "p50": 0.0214,
+      "p90": 0.0559
+    },
+    "contextual": {
+      "p10": 0.2,
+      "p50": 0.2,
+      "p90": 1
+    },
+    "syntactic": {
+      "p10": 1,
+      "p50": 1,
+      "p90": 1
+    },
+    "structural": {
+      "p10": 0.4783,
+      "p50": 0.8667,
+      "p90": 1
+    },
+    "completeness": {
+      "p10": 1,
+      "p50": 1,
+      "p90": 1
+    },
+    "consistency": {
+      "p10": 1,
+      "p50": 1,
+      "p90": 1
+    },
+    "coupling": {
+      "p10": 0.22,
+      "p50": 0.4,
+      "p90": 1
+    },
+    "modularity": {
+      "p10": 0,
+      "p50": 0.998,
+      "p90": 0.998
+    },
+    "connectivity": {
+      "p10": 0.25,
+      "p50": 0.4125,
+      "p90": 0.8375
+    },
+    "authority": {
+      "p10": 0.1837,
+      "p50": 0.2373,
+      "p90": 0.3052
+    }
+  },
+  "low_validation_nodes": [
+    {
+      "packet_key": "packet:4ff1e056008f",
+      "source_ref": "llama-cpp-turboquant-gemma4/tests/peg-parser/test-python-dict-parser.cpp",
+      "feature_id": "llama-cpp-turboquant-gemma4.test-python-dict-parser",
+      "feature_label": "test-python-dict-parser.cpp",
+      "domain_class": null,
+      "ontology_label": null,
+      "topology_label": null,
+      "validation_score": {
+        "lexical": 0.125,
+        "taxonomic": 0.5,
+        "semantic": 0.0133,
+        "contextual": 0.2,
+        "syntactic": 1,
+        "structural": 0,
+        "completeness": 1,
+        "consistency": 1,
+        "coupling": 0.5,
+        "modularity": 0.998,
+        "connectivity": 0.3125,
+        "authority": 0.0115
+      },
+      "average_score": 0.4717
+    },
+    {
+      "packet_key": "packet:7dd22644df75",
+      "source_ref": "sveltekit-frontend/tsconfig.check.tsbuildinfo",
+      "feature_id": "sveltekit-frontend.tsconfig.check",
+      "feature_label": "tsconfig.check.tsbuildinfo",
+      "domain_class": null,
+      "ontology_label": null,
+      "topology_label": null,
+      "validation_score": {
+        "lexical": 0.125,
+        "taxonomic": 0.5,
+        "semantic": 0.0133,
+        "contextual": 0.2,
+        "syntactic": 1,
+        "structural": 0,
+        "completeness": 1,
+        "consistency": 1,
+        "coupling": 0.5,
+        "modularity": 0.998,
+        "connectivity": 0.3125,
+        "authority": 0.0115
+      },
+      "average_score": 0.4717
+    },
+    {
+      "packet_key": "packet:99bab6e4f0ea",
+      "source_ref": "sveltekit-frontend/reports/deep-audit/d9-orphan-verification.json",
+      "feature_id": "sveltekit-frontend.d9-orphan-verification",
+      "feature_label": "d9-orphan-verification.json",
+      "domain_class": null,
+      "ontology_label": null,
+      "topology_label": null,
+      "validation_score": {
+        "lexical": 0.125,
+        "taxonomic": 0.5,
+        "semantic": 0.0149,
+        "contextual": 0.2,
+        "syntactic": 1,
+        "structural": 0,
+        "completeness": 1,
+        "consistency": 1,
+        "coupling": 0.56,
+        "modularity": 0.998,
+        "connectivity": 0.35,
+        "authority": 0.0121
+      },
+      "average_score": 0.48
+    },
+    {
+      "packet_key": "packet:c6642933150a",
+      "source_ref": "memory/runs/claude-code/2026-06-08.jsonl",
+      "feature_id": "memory.2026-06-08",
+      "feature_label": "2026-06-08.jsonl",
+      "domain_class": null,
+      "ontology_label": null,
+      "topology_label": null,
+      "validation_score": {
+        "lexical": 0.125,
+        "taxonomic": 0.5,
+        "semantic": 0.0164,
+        "contextual": 0.2,
+        "syntactic": 1,
+        "structural": 0,
+        "completeness": 1,
+        "consistency": 1,
+        "coupling": 0.62,
+        "modularity": 0.998,
+        "connectivity": 0.3875,
+        "authority": 0.0126
+      },
+      "average_score": 0.4883
+    },
+    {
+      "packet_key": "packet:9301e67905bc",
+      "source_ref": "claude-mem/bun.lock",
+      "feature_id": "claude-mem.bun",
+      "feature_label": "bun.lock",
+      "domain_class": null,
+      "ontology_label": null,
+      "topology_label": null,
+      "validation_score": {
+        "lexical": 0.125,
+        "taxonomic": 0.5,
+        "semantic": 0.021,
+        "contextual": 0.2,
+        "syntactic": 1,
+        "structural": 0,
+        "completeness": 1,
+        "consistency": 1,
+        "coupling": 0.8,
+        "modularity": 0.998,
+        "connectivity": 0.5,
+        "authority": 0.0141
+      },
+      "average_score": 0.5132
+    },
+    {
+      "packet_key": "packet:80a981d1c7bc",
+      "source_ref": "claude-mem/openclaw/test-install.sh",
+      "feature_id": "claude-mem.test-install",
+      "feature_label": "test-install.sh",
+      "domain_class": null,
+      "ontology_label": null,
+      "topology_label": null,
+      "validation_score": {
+        "lexical": 0.125,
+        "taxonomic": 0.5,
+        "semantic": 0.021,
+        "contextual": 0.2,
+        "syntactic": 1,
+        "structural": 0,
+        "completeness": 1,
+        "consistency": 1,
+        "coupling": 0.8,
+        "modularity": 0.998,
+        "connectivity": 0.5,
+        "authority": 0.0141
+      },
+      "average_score": 0.5132
+    },
+    {
+      "packet_key": "packet:1f0ed6db564f",
+      "source_ref": "sveltekit-frontend/src/routes/api/tasks/hmm-diagnosis/+server.ts",
+      "feature_id": "sveltekit-frontend.+server",
+      "feature_label": "+server.ts",
+      "domain_class": null,
+      "ontology_label": null,
+      "topology_label": null,
+      "validation_score": {
+        "lexical": 0.875,
+        "taxonomic": 0.5,
+        "semantic": 0.013,
+        "contextual": 0.2,
+        "syntactic": 1,
+        "structural": 0.8462,
+        "completeness": 1,
+        "consistency": 1,
+        "coupling": 0.26,
+        "modularity": 0,
+        "connectivity": 0.3,
+        "authority": 0.1827
+      },
+      "average_score": 0.5147
+    },
+    {
+      "packet_key": "packet:59492e1ce2ec",
+      "source_ref": "llama-cpp-turboquant-gemma4/tests/peg-parser/test-basic.cpp",
+      "feature_id": "llama-cpp-turboquant-gemma4.test-basic",
+      "feature_label": "test-basic.cpp",
+      "domain_class": null,
+      "ontology_label": null,
+      "topology_label": null,
+      "validation_score": {
+        "lexical": 0.125,
+        "taxonomic": 0.5,
+        "semantic": 0.022,
+        "contextual": 0.2,
+        "syntactic": 1,
+        "structural": 0,
+        "completeness": 1,
+        "consistency": 1,
+        "coupling": 0.84,
+        "modularity": 0.998,
+        "connectivity": 0.525,
+        "authority": 0.0145
+      },
+      "average_score": 0.5187
+    },
+    {
+      "packet_key": "packet:ee3ce959ab5c",
+      "source_ref": "sveltekit-frontend/.docker-build/package-lock.json",
+      "feature_id": "sveltekit-frontend.package-lock",
+      "feature_label": "package-lock.json",
+      "domain_class": null,
+      "ontology_label": null,
+      "topology_label": null,
+      "validation_score": {
+        "lexical": 0.125,
+        "taxonomic": 0.5,
+        "semantic": 0.022,
+        "contextual": 0.2,
+        "syntactic": 1,
+        "structural": 0,
+        "completeness": 1,
+        "consistency": 1,
+        "coupling": 0.84,
+        "modularity": 0.998,
+        "connectivity": 0.525,
+        "authority": 0.0145
+      },
+      "average_score": 0.5187
+    },
+    {
+      "packet_key": "packet:ea155fb156bb",
+      "source_ref": "memory/runs/claude-code/2026-05-11.jsonl",
+      "feature_id": "memory.2026-05-11",
+      "feature_label": "2026-05-11.jsonl",
+      "domain_class": null,
+      "ontology_label": null,
+      "topology_label": null,
+      "validation_score": {
+        "lexical": 0.5,
+        "taxonomic": 0.5,
+        "semantic": 0.0151,
+        "contextual": 0.2,
+        "syntactic": 1,
+        "structural": 0.0741,
+        "completeness": 1,
+        "consistency": 1,
+        "coupling": 0.54,
+        "modularity": 0.998,
+        "connectivity": 0.3625,
+        "authority": 0.042
+      },
+      "average_score": 0.5193
+    },
+    {
+      "packet_key": "packet:4e42e49ab3a7",
+      "source_ref": "memory/runs/claude-code/2026-05-31.jsonl",
+      "feature_id": "memory.2026-05-31",
+      "feature_label": "2026-05-31.jsonl",
+      "domain_class": null,
+      "ontology_label": null,
+      "topology_label": null,
+      "validation_score": {
+        "lexical": 0.25,
+        "taxonomic": 0.5,
+        "semantic": 0.0199,
+        "contextual": 0.2,
+        "syntactic": 1,
+        "structural": 0.027,
+        "completeness": 1,
+        "consistency": 1,
+        "coupling": 0.74,
+        "modularity": 0.998,
+        "connectivity": 0.475,
+        "authority": 0.024
+      },
+      "average_score": 0.5195
+    },
+    {
+      "packet_key": "packet:27ee31f65196",
+      "source_ref": "sveltekit-frontend/src/routes/api/admin/summaries/scan-quality/+server.ts",
+      "feature_id": "sveltekit-frontend.+server",
+      "feature_label": "+server.ts",
+      "domain_class": null,
+      "ontology_label": null,
+      "topology_label": null,
+      "validation_score": {
+        "lexical": 0.75,
+        "taxonomic": 0.5,
+        "semantic": 0.0133,
+        "contextual": 0.2,
+        "syntactic": 1,
+        "structural": 1,
+        "completeness": 1,
+        "consistency": 1,
+        "coupling": 0.26,
+        "modularity": 0,
+        "connectivity": 0.325,
+        "authority": 0.1942
+      },
+      "average_score": 0.5202
+    },
+    {
+      "packet_key": "packet:fbbbeea77e2d",
+      "source_ref": "sveltekit-frontend/src/routes/api/rabbitmq/publish/+server.ts",
+      "feature_id": "sveltekit-frontend.+server",
+      "feature_label": "+server.ts",
+      "domain_class": null,
+      "ontology_label": null,
+      "topology_label": null,
+      "validation_score": {
+        "lexical": 1,
+        "taxonomic": 0.5,
+        "semantic": 0.014,
+        "contextual": 0.2,
+        "syntactic": 1,
+        "structural": 0.75,
+        "completeness": 1,
+        "consistency": 0.9375,
+        "coupling": 0.32,
+        "modularity": 0,
+        "connectivity": 0.35,
+        "authority": 0.1732
+      },
+      "average_score": 0.5204
+    },
+    {
+      "packet_key": "packet:8d97c5225c56",
+      "source_ref": "sveltekit-frontend/src/routes/api/routes/events/+server.ts",
+      "feature_id": "sveltekit-frontend.+server",
+      "feature_label": "+server.ts",
+      "domain_class": null,
+      "ontology_label": null,
+      "topology_label": null,
+      "validation_score": {
+        "lexical": 0.75,
+        "taxonomic": 0.5,
+        "semantic": 0.0187,
+        "contextual": 0.2,
+        "syntactic": 1,
+        "structural": 1,
+        "completeness": 1,
+        "consistency": 1,
+        "coupling": 0.26,
+        "modularity": 0,
+        "connectivity": 0.325,
+        "authority": 0.2099
+      },
+      "average_score": 0.522
+    },
+    {
+      "packet_key": "packet:7a237f222f93",
+      "source_ref": "sveltekit-frontend/src/lib/types/mermaid.d.ts",
+      "feature_id": "sveltekit-frontend.mermaid.d",
+      "feature_label": "mermaid.d.ts",
+      "domain_class": null,
+      "ontology_label": null,
+      "topology_label": null,
+      "validation_score": {
+        "lexical": 0.375,
+        "taxonomic": 0.5,
+        "semantic": 0.0135,
+        "contextual": 0.2,
+        "syntactic": 1,
+        "structural": 0.6667,
+        "completeness": 1,
+        "consistency": 1,
+        "coupling": 0.18,
+        "modularity": 0.998,
+        "connectivity": 0.1875,
+        "authority": 0.1456
+      },
+      "average_score": 0.5222
+    },
+    {
+      "packet_key": "packet:504e5e897bd9",
+      "source_ref": "sveltekit-frontend/src/routes/api/ai/analyze-evidence/+server.ts",
+      "feature_id": "sveltekit-frontend.+server",
+      "feature_label": "+server.ts",
+      "domain_class": null,
+      "ontology_label": null,
+      "topology_label": null,
+      "validation_score": {
+        "lexical": 1,
+        "taxonomic": 0.5,
+        "semantic": 0.0129,
+        "contextual": 0.2,
+        "syntactic": 1,
+        "structural": 0.7222,
+        "completeness": 1,
+        "consistency": 0.9444,
+        "coupling": 0.36,
+        "modularity": 0,
+        "connectivity": 0.3875,
+        "authority": 0.1711
+      },
+      "average_score": 0.5248
+    },
+    {
+      "packet_key": "packet:759dec549374",
+      "source_ref": "memory/runs/claude-code/2026-05-28.jsonl",
+      "feature_id": "memory.2026-05-28",
+      "feature_label": "2026-05-28.jsonl",
+      "domain_class": null,
+      "ontology_label": null,
+      "topology_label": null,
+      "validation_score": {
+        "lexical": 0.25,
+        "taxonomic": 0.5,
+        "semantic": 0.0209,
+        "contextual": 0.2,
+        "syntactic": 1,
+        "structural": 0.0256,
+        "completeness": 1,
+        "consistency": 1,
+        "coupling": 0.78,
+        "modularity": 0.998,
+        "connectivity": 0.5,
+        "authority": 0.0242
+      },
+      "average_score": 0.5249
+    },
+    {
+      "packet_key": "packet:76fcefed014a",
+      "source_ref": "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/yorha/test-db/+server.ts.any-backup",
+      "feature_id": "scripts.+server.ts",
+      "feature_label": "+server.ts.any-backup",
+      "domain_class": null,
+      "ontology_label": null,
+      "topology_label": null,
+      "validation_score": {
+        "lexical": 0.375,
+        "taxonomic": 0.5,
+        "semantic": 0.0152,
+        "contextual": 1,
+        "syntactic": 1,
+        "structural": 0.1429,
+        "completeness": 1,
+        "consistency": 1,
+        "coupling": 0.52,
+        "modularity": 0.42,
+        "connectivity": 0.2,
+        "authority": 0.1462
+      },
+      "average_score": 0.5266
+    },
+    {
+      "packet_key": "packet:75280258001c",
+      "source_ref": "scripts/api-cleanup/reports/backup-2025-12-14T21-11-49-641Z/yorha/test-db/+server.ts.any-backup",
+      "feature_id": "scripts.+server.ts",
+      "feature_label": "+server.ts.any-backup",
+      "domain_class": null,
+      "ontology_label": null,
+      "topology_label": null,
+      "validation_score": {
+        "lexical": 0.375,
+        "taxonomic": 0.5,
+        "semantic": 0.0152,
+        "contextual": 1,
+        "syntactic": 1,
+        "structural": 0.1429,
+        "completeness": 1,
+        "consistency": 1,
+        "coupling": 0.52,
+        "modularity": 0.42,
+        "connectivity": 0.2,
+        "authority": 0.1462
+      },
+      "average_score": 0.5266
+    },
+    {
+      "packet_key": "packet:a0fa2c1c061e",
+      "source_ref": "scripts/api-cleanup/reports/backup-2025-12-14T21-11-49-641Z/yorha/test-db/+server.ts.disabled",
+      "feature_id": "scripts.+server.ts",
+      "feature_label": "+server.ts.disabled",
+      "domain_class": null,
+      "ontology_label": null,
+      "topology_label": null,
+      "validation_score": {
+        "lexical": 0.375,
+        "taxonomic": 0.5,
+        "semantic": 0.0152,
+        "contextual": 1,
+        "syntactic": 1,
+        "structural": 0.1429,
+        "completeness": 1,
+        "consistency": 1,
+        "coupling": 0.52,
+        "modularity": 0.42,
+        "connectivity": 0.2,
+        "authority": 0.1462
+      },
+      "average_score": 0.5266
+    },
+    {
+      "packet_key": "packet:408b1e11eda2",
+      "source_ref": "sveltekit-frontend/src/routes/api/wiki/watch/+server.ts",
+      "feature_id": "sveltekit-frontend.+server",
+      "feature_label": "+server.ts",
+      "domain_class": null,
+      "ontology_label": null,
+      "topology_label": null,
+      "validation_score": {
+        "lexical": 0.875,
+        "taxonomic": 0.5,
+        "semantic": 0.016,
+        "contextual": 0.2,
+        "syntactic": 1,
+        "structural": 0.9333,
+        "completeness": 1,
+        "consistency": 0.9333,
+        "coupling": 0.3,
+        "modularity": 0,
+        "connectivity": 0.3625,
+        "authority": 0.2024
+      },
+      "average_score": 0.5269
+    },
+    {
+      "packet_key": "packet:a1070130c4fc",
+      "source_ref": "sveltekit-frontend/src/routes/api/obsidian/+server.ts",
+      "feature_id": "sveltekit-frontend.+server",
+      "feature_label": "+server.ts",
+      "domain_class": null,
+      "ontology_label": null,
+      "topology_label": null,
+      "validation_score": {
+        "lexical": 1,
+        "taxonomic": 0.5,
+        "semantic": 0.0141,
+        "contextual": 0.2,
+        "syntactic": 1,
+        "structural": 0.8125,
+        "completeness": 1,
+        "consistency": 0.9375,
+        "coupling": 0.32,
+        "modularity": 0,
+        "connectivity": 0.3625,
+        "authority": 0.1878
+      },
+      "average_score": 0.5279
+    },
+    {
+      "packet_key": "packet:3967501b892b",
+      "source_ref": "sveltekit-frontend/src/routes/api/ai/scenario/+server.ts",
+      "feature_id": "sveltekit-frontend.+server",
+      "feature_label": "+server.ts",
+      "domain_class": null,
+      "ontology_label": null,
+      "topology_label": null,
+      "validation_score": {
+        "lexical": 0.875,
+        "taxonomic": 0.5,
+        "semantic": 0.0149,
+        "contextual": 0.2,
+        "syntactic": 1,
+        "structural": 0.875,
+        "completeness": 1,
+        "consistency": 1,
+        "coupling": 0.32,
+        "modularity": 0,
+        "connectivity": 0.375,
+        "authority": 0.1816
+      },
+      "average_score": 0.5285
+    },
+    {
+      "packet_key": "packet:172849cee87e",
+      "source_ref": "sveltekit-frontend/src/routes/api/rag/search/__tests__/rag-search-schema.test.ts",
+      "feature_id": "sveltekit-frontend.rag-search-schema.test",
+      "feature_label": "rag-search-schema.test.ts",
+      "domain_class": null,
+      "ontology_label": null,
+      "topology_label": null,
+      "validation_score": {
+        "lexical": 0.5,
+        "taxonomic": 0.5,
+        "semantic": 0.0144,
+        "contextual": 0.2,
+        "syntactic": 1,
+        "structural": 0.1538,
+        "completeness": 1,
+        "consistency": 1,
+        "coupling": 0.52,
+        "modularity": 0.998,
+        "connectivity": 0.375,
+        "authority": 0.0913
+      },
+      "average_score": 0.5294
+    },
+    {
+      "packet_key": "packet:e90defd8fa51",
+      "source_ref": "sveltekit-frontend/src/routes/api/admin/atlas/couchdb-rollback/+server.ts",
+      "feature_id": "sveltekit-frontend.+server",
+      "feature_label": "+server.ts",
+      "domain_class": null,
+      "ontology_label": null,
+      "topology_label": null,
+      "validation_score": {
+        "lexical": 1,
+        "taxonomic": 0.5,
+        "semantic": 0.0126,
+        "contextual": 0.2,
+        "syntactic": 1,
+        "structural": 0.8571,
+        "completeness": 1,
+        "consistency": 1,
+        "coupling": 0.28,
+        "modularity": 0,
+        "connectivity": 0.325,
+        "authority": 0.1803
+      },
+      "average_score": 0.5296
+    },
+    {
+      "packet_key": "packet:46eaef191092",
+      "source_ref": "sveltekit-frontend/src/routes/api/search/ace/+server.ts",
+      "feature_id": "sveltekit-frontend.+server",
+      "feature_label": "+server.ts",
+      "domain_class": null,
+      "ontology_label": null,
+      "topology_label": null,
+      "validation_score": {
+        "lexical": 1,
+        "taxonomic": 0.5,
+        "semantic": 0.0126,
+        "contextual": 0.2,
+        "syntactic": 1,
+        "structural": 0.8571,
+        "completeness": 1,
+        "consistency": 1,
+        "coupling": 0.28,
+        "modularity": 0,
+        "connectivity": 0.325,
+        "authority": 0.1803
+      },
+      "average_score": 0.5296
+    },
+    {
+      "packet_key": "packet:f70482155efa",
+      "source_ref": "sveltekit-frontend/src/routes/api/summarize/analyze/+server.ts",
+      "feature_id": "sveltekit-frontend.+server",
+      "feature_label": "+server.ts",
+      "domain_class": null,
+      "ontology_label": null,
+      "topology_label": null,
+      "validation_score": {
+        "lexical": 1,
+        "taxonomic": 0.5,
+        "semantic": 0.0144,
+        "contextual": 0.2,
+        "syntactic": 1,
+        "structural": 0.7647,
+        "completeness": 1,
+        "consistency": 1,
+        "coupling": 0.34,
+        "modularity": 0,
+        "connectivity": 0.375,
+        "authority": 0.1703
+      },
+      "average_score": 0.5304
+    },
+    {
+      "packet_key": "packet:a3fa57257f3e",
+      "source_ref": "sveltekit-frontend/src/routes/api/vlm/status/+server.ts",
+      "feature_id": "sveltekit-frontend.+server",
+      "feature_label": "+server.ts",
+      "domain_class": null,
+      "ontology_label": null,
+      "topology_label": null,
+      "validation_score": {
+        "lexical": 0.875,
+        "taxonomic": 0.5,
+        "semantic": 0.0135,
+        "contextual": 0.2,
+        "syntactic": 1,
+        "structural": 1,
+        "completeness": 1,
+        "consistency": 1,
+        "coupling": 0.26,
+        "modularity": 0,
+        "connectivity": 0.325,
+        "authority": 0.1966
+      },
+      "average_score": 0.5308
+    },
+    {
+      "packet_key": "packet:bf88bca9f880",
+      "source_ref": "sveltekit-frontend/src/routes/api/admin/grpo/flush/+server.ts",
+      "feature_id": "sveltekit-frontend.+server",
+      "feature_label": "+server.ts",
+      "domain_class": null,
+      "ontology_label": null,
+      "topology_label": null,
+      "validation_score": {
+        "lexical": 0.875,
+        "taxonomic": 0.5,
+        "semantic": 0.0144,
+        "contextual": 0.2,
+        "syntactic": 1,
+        "structural": 0.9333,
+        "completeness": 1,
+        "consistency": 1,
+        "coupling": 0.3,
+        "modularity": 0,
+        "connectivity": 0.3625,
+        "authority": 0.1899
+      },
+      "average_score": 0.5313
+    },
+    {
+      "packet_key": "packet:821b0f15df1f",
+      "source_ref": "sveltekit-frontend/src/routes/api/ai/analyze/[scope]/+server.ts",
+      "feature_id": "sveltekit-frontend.+server",
+      "feature_label": "+server.ts",
+      "domain_class": null,
+      "ontology_label": null,
+      "topology_label": null,
+      "validation_score": {
+        "lexical": 1,
+        "taxonomic": 0.5,
+        "semantic": 0.013,
+        "contextual": 0.2,
+        "syntactic": 1,
+        "structural": 0.7895,
+        "completeness": 1,
+        "consistency": 0.8947,
+        "coupling": 0.38,
+        "modularity": 0,
+        "connectivity": 0.425,
+        "authority": 0.1786
+      },
+      "average_score": 0.5317
+    },
+    {
+      "packet_key": "packet:ca107793d290",
+      "source_ref": "sveltekit-frontend/src/routes/api/ai/generate-report/[scope]/+server.ts",
+      "feature_id": "sveltekit-frontend.+server",
+      "feature_label": "+server.ts",
+      "domain_class": null,
+      "ontology_label": null,
+      "topology_label": null,
+      "validation_score": {
+        "lexical": 1,
+        "taxonomic": 0.5,
+        "semantic": 0.013,
+        "contextual": 0.2,
+        "syntactic": 1,
+        "structural": 0.7895,
+        "completeness": 1,
+        "consistency": 0.8947,
+        "coupling": 0.38,
+        "modularity": 0,
+        "connectivity": 0.425,
+        "authority": 0.1786
+      },
+      "average_score": 0.5317
+    },
+    {
+      "packet_key": "packet:c53edb5364ab",
+      "source_ref": "sveltekit-frontend/src/routes/api/ai/generate-image/+server.ts",
+      "feature_id": "sveltekit-frontend.+server",
+      "feature_label": "+server.ts",
+      "domain_class": null,
+      "ontology_label": null,
+      "topology_label": null,
+      "validation_score": {
+        "lexical": 1,
+        "taxonomic": 0.5,
+        "semantic": 0.0139,
+        "contextual": 0.2,
+        "syntactic": 1,
+        "structural": 0.8125,
+        "completeness": 1,
+        "consistency": 1,
+        "coupling": 0.32,
+        "modularity": 0,
+        "connectivity": 0.3625,
+        "authority": 0.1765
+      },
+      "average_score": 0.5321
+    },
+    {
+      "packet_key": "packet:e6c43fc7adf4",
+      "source_ref": "sveltekit-frontend/src/routes/api/charges/add/+server.ts",
+      "feature_id": "sveltekit-frontend.+server",
+      "feature_label": "+server.ts",
+      "domain_class": null,
+      "ontology_label": null,
+      "topology_label": null,
+      "validation_score": {
+        "lexical": 1,
+        "taxonomic": 0.5,
+        "semantic": 0.0127,
+        "contextual": 0.2,
+        "syntactic": 1,
+        "structural": 0.8667,
+        "completeness": 1,
+        "consistency": 1,
+        "coupling": 0.3,
+        "modularity": 0,
+        "connectivity": 0.35,
+        "authority": 0.1763
+      },
+      "average_score": 0.5338
+    },
+    {
+      "packet_key": "packet:c7fec03e9ca0",
+      "source_ref": "sveltekit-frontend/src/routes/api/websearch/+server.ts",
+      "feature_id": "sveltekit-frontend.+server",
+      "feature_label": "+server.ts",
+      "domain_class": null,
+      "ontology_label": null,
+      "topology_label": null,
+      "validation_score": {
+        "lexical": 1,
+        "taxonomic": 0.5,
+        "semantic": 0.0127,
+        "contextual": 0.2,
+        "syntactic": 1,
+        "structural": 0.8667,
+        "completeness": 1,
+        "consistency": 1,
+        "coupling": 0.3,
+        "modularity": 0,
+        "connectivity": 0.35,
+        "authority": 0.1763
+      },
+      "average_score": 0.5338
+    },
+    {
+      "packet_key": "packet:3bfb07ecac48",
+      "source_ref": "scripts/api-cleanup/reports/backup-2025-12-14T21-11-49-641Z/v1/evidence/strategy/[endpoint]/+server.ts.disabled",
+      "feature_id": "scripts.+server.ts",
+      "feature_label": "+server.ts.disabled",
+      "domain_class": null,
+      "ontology_label": null,
+      "topology_label": null,
+      "validation_score": {
+        "lexical": 1,
+        "taxonomic": 0.5,
+        "semantic": 0.0146,
+        "contextual": 0.2,
+        "syntactic": 1,
+        "structural": 0.5,
+        "completeness": 1,
+        "consistency": 1,
+        "coupling": 0.32,
+        "modularity": 0.42,
+        "connectivity": 0.3,
+        "authority": 0.1537
+      },
+      "average_score": 0.534
+    },
+    {
+      "packet_key": "packet:eab4e89ca773",
+      "source_ref": "sveltekit-frontend/src/routes/api/atlas/studio/cards/[id]/+server.ts",
+      "feature_id": "sveltekit-frontend.+server",
+      "feature_label": "+server.ts",
+      "domain_class": null,
+      "ontology_label": null,
+      "topology_label": null,
+      "validation_score": {
+        "lexical": 0.875,
+        "taxonomic": 0.5,
+        "semantic": 0.0129,
+        "contextual": 0.2,
+        "syntactic": 1,
+        "structural": 1,
+        "completeness": 1,
+        "consistency": 1,
+        "coupling": 0.28,
+        "modularity": 0,
+        "connectivity": 0.35,
+        "authority": 0.1905
+      },
+      "average_score": 0.534
+    },
+    {
+      "packet_key": "packet:4d14a6800651",
+      "source_ref": "sveltekit-frontend/src/routes/api/synthesis/qlora-export/+server.ts",
+      "feature_id": "sveltekit-frontend.+server",
+      "feature_label": "+server.ts",
+      "domain_class": null,
+      "ontology_label": null,
+      "topology_label": null,
+      "validation_score": {
+        "lexical": 0.875,
+        "taxonomic": 0.5,
+        "semantic": 0.0129,
+        "contextual": 0.2,
+        "syntactic": 1,
+        "structural": 1,
+        "completeness": 1,
+        "consistency": 1,
+        "coupling": 0.28,
+        "modularity": 0,
+        "connectivity": 0.35,
+        "authority": 0.1905
+      },
+      "average_score": 0.534
+    },
+    {
+      "packet_key": "packet:f28552cbd8b4",
+      "source_ref": "sveltekit-frontend/src/routes/api/ollama/pull/+server.ts",
+      "feature_id": "sveltekit-frontend.+server",
+      "feature_label": "+server.ts",
+      "domain_class": null,
+      "ontology_label": null,
+      "topology_label": null,
+      "validation_score": {
+        "lexical": 1,
+        "taxonomic": 0.5,
+        "semantic": 0.017,
+        "contextual": 0.2,
+        "syntactic": 1,
+        "structural": 0.7,
+        "completeness": 1,
+        "consistency": 1,
+        "coupling": 0.4,
+        "modularity": 0,
+        "connectivity": 0.425,
+        "authority": 0.1708
+      },
+      "average_score": 0.5344
+    },
+    {
+      "packet_key": "packet:a25a123edae2",
+      "source_ref": "sveltekit-frontend/src/routes/api/analytics/research-index/+server.ts",
+      "feature_id": "sveltekit-frontend.+server",
+      "feature_label": "+server.ts",
+      "domain_class": null,
+      "ontology_label": null,
+      "topology_label": null,
+      "validation_score": {
+        "lexical": 1,
+        "taxonomic": 0.5,
+        "semantic": 0.0143,
+        "contextual": 0.2,
+        "syntactic": 1,
+        "structural": 0.8667,
+        "completeness": 1,
+        "consistency": 1,
+        "coupling": 0.3,
+        "modularity": 0,
+        "connectivity": 0.35,
+        "authority": 0.1889
+      },
+      "average_score": 0.535
+    },
+    {
+      "packet_key": "packet:a6e58e789096",
+      "source_ref": "sveltekit-frontend/src/routes/api/gpu/queue/+server.ts",
+      "feature_id": "sveltekit-frontend.+server",
+      "feature_label": "+server.ts",
+      "domain_class": null,
+      "ontology_label": null,
+      "topology_label": null,
+      "validation_score": {
+        "lexical": 1,
+        "taxonomic": 0.5,
+        "semantic": 0.0143,
+        "contextual": 0.2,
+        "syntactic": 1,
+        "structural": 0.8667,
+        "completeness": 1,
+        "consistency": 1,
+        "coupling": 0.3,
+        "modularity": 0,
+        "connectivity": 0.35,
+        "authority": 0.1889
+      },
+      "average_score": 0.535
+    },
+    {
+      "packet_key": "packet:2ac077b45899",
+      "source_ref": "sveltekit-frontend/src/routes/api/error-brain/generate-fix/+server.ts",
+      "feature_id": "sveltekit-frontend.+server",
+      "feature_label": "+server.ts",
+      "domain_class": null,
+      "ontology_label": null,
+      "topology_label": null,
+      "validation_score": {
+        "lexical": 1,
+        "taxonomic": 0.5,
+        "semantic": 0.0147,
+        "contextual": 0.2,
+        "syntactic": 1,
+        "structural": 0.7143,
+        "completeness": 1,
+        "consistency": 0.9524,
+        "coupling": 0.42,
+        "modularity": 0,
+        "connectivity": 0.45,
+        "authority": 0.1763
+      },
+      "average_score": 0.5356
+    },
+    {
+      "packet_key": "packet:ac33f07bcda2",
+      "source_ref": "sveltekit-frontend/src/routes/api/health/redis/+server.ts",
+      "feature_id": "sveltekit-frontend.+server",
+      "feature_label": "+server.ts",
+      "domain_class": null,
+      "ontology_label": null,
+      "topology_label": null,
+      "validation_score": {
+        "lexical": 1,
+        "taxonomic": 0.5,
+        "semantic": 0.0127,
+        "contextual": 0.2,
+        "syntactic": 1,
+        "structural": 0.9333,
+        "completeness": 1,
+        "consistency": 0.9333,
+        "coupling": 0.3,
+        "modularity": 0,
+        "connectivity": 0.3625,
+        "authority": 0.1883
+      },
+      "average_score": 0.5358
+    },
+    {
+      "packet_key": "packet:a3eb78961135",
+      "source_ref": "sveltekit-frontend/src/routes/api/ai/cross-exam/+server.ts",
+      "feature_id": "sveltekit-frontend.+server",
+      "feature_label": "+server.ts",
+      "domain_class": null,
+      "ontology_label": null,
+      "topology_label": null,
+      "validation_score": {
+        "lexical": 1,
+        "taxonomic": 0.5,
+        "semantic": 0.0163,
+        "contextual": 0.2,
+        "syntactic": 1,
+        "structural": 0.625,
+        "completeness": 1,
+        "consistency": 0.9583,
+        "coupling": 0.48,
+        "modularity": 0,
+        "connectivity": 0.4875,
+        "authority": 0.165
+      },
+      "average_score": 0.536
+    },
+    {
+      "packet_key": "packet:9b89a2f71d2d",
+      "source_ref": "scripts/api-cleanup/reports/backup-2025-12-14T21-11-49-641Z/ai-boilerplate/+server.ts.any-backup",
+      "feature_id": "scripts.+server.ts",
+      "feature_label": "+server.ts.any-backup",
+      "domain_class": null,
+      "ontology_label": null,
+      "topology_label": null,
+      "validation_score": {
+        "lexical": 1,
+        "taxonomic": 0.5,
+        "semantic": 0.0159,
+        "contextual": 0.2,
+        "syntactic": 1,
+        "structural": 0.5714,
+        "completeness": 1,
+        "consistency": 1,
+        "coupling": 0.28,
+        "modularity": 0.42,
+        "connectivity": 0.275,
+        "authority": 0.1697
+      },
+      "average_score": 0.536
+    },
+    {
+      "packet_key": "packet:07ca85f2931f",
+      "source_ref": "sveltekit-frontend/src/routes/api/summarize/synthesize/+server.ts",
+      "feature_id": "sveltekit-frontend.+server",
+      "feature_label": "+server.ts",
+      "domain_class": null,
+      "ontology_label": null,
+      "topology_label": null,
+      "validation_score": {
+        "lexical": 1,
+        "taxonomic": 0.5,
+        "semantic": 0.0151,
+        "contextual": 0.2,
+        "syntactic": 1,
+        "structural": 0.7778,
+        "completeness": 1,
+        "consistency": 1,
+        "coupling": 0.36,
+        "modularity": 0,
+        "connectivity": 0.4,
+        "authority": 0.1785
+      },
+      "average_score": 0.536
+    },
+    {
+      "packet_key": "packet:6b4e087996bb",
+      "source_ref": "sveltekit-frontend/src/routes/api/ai/route-intent/+server.ts",
+      "feature_id": "sveltekit-frontend.+server",
+      "feature_label": "+server.ts",
+      "domain_class": null,
+      "ontology_label": null,
+      "topology_label": null,
+      "validation_score": {
+        "lexical": 1,
+        "taxonomic": 0.5,
+        "semantic": 0.0142,
+        "contextual": 0.2,
+        "syntactic": 1,
+        "structural": 0.75,
+        "completeness": 1,
+        "consistency": 0.95,
+        "coupling": 0.4,
+        "modularity": 0,
+        "connectivity": 0.4375,
+        "authority": 0.1808
+      },
+      "average_score": 0.536
+    },
+    {
+      "packet_key": "packet:78f50d2f1715",
+      "source_ref": "sveltekit-frontend/src/routes/api/ai/memo-skeleton/+server.ts",
+      "feature_id": "sveltekit-frontend.+server",
+      "feature_label": "+server.ts",
+      "domain_class": null,
+      "ontology_label": null,
+      "topology_label": null,
+      "validation_score": {
+        "lexical": 1,
+        "taxonomic": 0.5,
+        "semantic": 0.0137,
+        "contextual": 0.2,
+        "syntactic": 1,
+        "structural": 0.7895,
+        "completeness": 1,
+        "consistency": 0.9474,
+        "coupling": 0.38,
+        "modularity": 0,
+        "connectivity": 0.425,
+        "authority": 0.1859
+      },
+      "average_score": 0.5368
+    },
+    {
+      "packet_key": "packet:eb98bddf842d",
+      "source_ref": "sveltekit-frontend/src/routes/api/ai/tensorrt/stream/+server.ts",
+      "feature_id": "sveltekit-frontend.+server",
+      "feature_label": "+server.ts",
+      "domain_class": null,
+      "ontology_label": null,
+      "topology_label": null,
+      "validation_score": {
+        "lexical": 1,
+        "taxonomic": 0.5,
+        "semantic": 0.0137,
+        "contextual": 0.2,
+        "syntactic": 1,
+        "structural": 0.7895,
+        "completeness": 1,
+        "consistency": 0.9474,
+        "coupling": 0.38,
+        "modularity": 0,
+        "connectivity": 0.425,
+        "authority": 0.1859
+      },
+      "average_score": 0.5368
+    },
+    {
+      "packet_key": "packet:16dd26e475cc",
+      "source_ref": "sveltekit-frontend/src/routes/api/engagement/heartbeat/+server.ts",
+      "feature_id": "sveltekit-frontend.+server",
+      "feature_label": "+server.ts",
+      "domain_class": null,
+      "ontology_label": null,
+      "topology_label": null,
+      "validation_score": {
+        "lexical": 1,
+        "taxonomic": 0.5,
+        "semantic": 0.0154,
+        "contextual": 0.2,
+        "syntactic": 1,
+        "structural": 0.8235,
+        "completeness": 1,
+        "consistency": 1,
+        "coupling": 0.34,
+        "modularity": 0,
+        "connectivity": 0.3875,
+        "authority": 0.1812
+      },
+      "average_score": 0.5373
+    },
+    {
+      "packet_key": "packet:bf5dac197ca1",
+      "source_ref": "sveltekit-frontend/src/routes/api/wiki/search/+server.ts",
+      "feature_id": "sveltekit-frontend.+server",
+      "feature_label": "+server.ts",
+      "domain_class": null,
+      "ontology_label": null,
+      "topology_label": null,
+      "validation_score": {
+        "lexical": 1,
+        "taxonomic": 0.5,
+        "semantic": 0.0154,
+        "contextual": 0.2,
+        "syntactic": 1,
+        "structural": 0.8235,
+        "completeness": 1,
+        "consistency": 1,
+        "coupling": 0.34,
+        "modularity": 0,
+        "connectivity": 0.3875,
+        "authority": 0.1812
+      },
+      "average_score": 0.5373
+    }
+  ],
+  "gan_proof_matrix": [
+    {
+      "category": "lexical",
+      "implementation": "Compare symbols, identifiers, comments, summaries, and trigrams against LangExtract/domain vocabulary.",
+      "created": true,
+      "wired": true,
+      "proven": true,
+      "evidence": [
+        "symbols/trigrams in turbovec candidates",
+        "C:\\Users\\james\\Videos\\deeds-web-app\\.tmp\\turbovec-candidates.ndjson"
+      ],
+      "missing": [],
+      "proof_command": "npm run atlas:ontology-kag:readiness",
+      "gan_status": "PROVEN"
+    },
+    {
+      "category": "taxonomic",
+      "implementation": "Verify IS_A, PART_OF/HAS_A, IMPLEMENTS, EXTENDS, and hierarchy edges from AST/source tuples.",
+      "created": true,
+      "wired": true,
+      "proven": false,
+      "evidence": [
+        "feature_id coverage plus domain_class coverage",
+        "C:\\Users\\james\\Videos\\deeds-web-app\\.tmp\\turbovec-candidates.ndjson"
+      ],
+      "missing": [
+        "domain_class coverage is low",
+        "HAS_A/IS_A projection to KAG/Neo4j not proven"
+      ],
+      "proof_command": "npm run atlas:ontology-kag:readiness",
+      "gan_status": "WIRED"
+    },
+    {
+      "category": "semantic",
+      "implementation": "Use embeddings and graph consistency to detect incompatible relationships between concepts.",
+      "created": true,
+      "wired": true,
+      "proven": true,
+      "evidence": [
+        "tuple-derived semantic candidate score exists",
+        "TurboVec ANN gRPC proof PASS over Qdrant vectors",
+        "C:\\Users\\james\\Videos\\deeds-web-app\\docs\\reports\\turbovec-ann-grpc-proof.json"
+      ],
+      "missing": [
+        "summary embedding similarity",
+        "graph consistency proof"
+      ],
+      "proof_command": "npm run atlas:turbovec:ann-grpc:proof && npm run atlas:ontology-kag:readiness",
+      "gan_status": "PROVEN"
+    },
+    {
+      "category": "context",
+      "implementation": "Compare concepts with neighboring modules, source_ref siblings, docs, and linked retrieval context.",
+      "created": true,
+      "wired": true,
+      "proven": true,
+      "evidence": [
+        "bounded packet context refs",
+        "C:\\Users\\james\\Videos\\deeds-web-app\\.tmp\\turbovec-candidates.ndjson"
+      ],
+      "missing": [
+        "neighbor module/document comparison still partial"
+      ],
+      "proof_command": "npm run atlas:ontology-kag:readiness",
+      "gan_status": "PROVEN"
+    },
+    {
+      "category": "syntactic",
+      "implementation": "Validate AST integrity, schema correctness, Zod/JSON schema, protobuf/gRPC, and RPC contracts.",
+      "created": true,
+      "wired": true,
+      "proven": true,
+      "evidence": [
+        "packet_key/source_ref/feature_id contract fields",
+        "C:\\Users\\james\\Videos\\deeds-web-app\\.tmp\\turbovec-candidates.ndjson"
+      ],
+      "missing": [],
+      "proof_command": "npm run atlas:ontology-kag:readiness && npm run verify:rpc-gan",
+      "gan_status": "PROVEN"
+    },
+    {
+      "category": "structural",
+      "implementation": "Detect orphans, duplicates, cycles, disconnected subgraphs, coupling, and missing core concepts.",
+      "created": true,
+      "wired": true,
+      "proven": true,
+      "evidence": [
+        "IMPORTS/EXPORTS/DEFINES/ROUTE_HANDLES source tuples",
+        "C:\\Users\\james\\Videos\\deeds-web-app\\.tmp\\source-tuples-all.ndjson"
+      ],
+      "missing": [
+        "Neo4j projection/PageRank/GDS not yet proven for this candidate set"
+      ],
+      "proof_command": "npm run atlas:source-tuples:apply && npm run atlas:ontology-kag:readiness",
+      "gan_status": "PROVEN"
+    },
+    {
+      "category": "application",
+      "implementation": "Measure whether retrieval, summarization, KAG/DAG traversal, and agent tasks improve after updates.",
+      "created": true,
+      "wired": true,
+      "proven": false,
+      "evidence": [
+        "KAG-ready relation coverage in candidates"
+      ],
+      "missing": [
+        "HyperRAG packet RPC replay proof",
+        "ACE/KAG/DAG provenance persistence",
+        "operator accepted/rejected signal"
+      ],
+      "proof_command": "npm run smoke:hyperrag-packet-rpc && npm run atlas:ontology-kag:readiness",
+      "gan_status": "WIRED"
+    },
+    {
+      "category": "data_driven",
+      "implementation": "Compare ontology coverage against the full corpus of extracted packets and tuples.",
+      "created": true,
+      "wired": true,
+      "proven": true,
+      "evidence": [
+        "source tuple corpus volume",
+        "C:\\Users\\james\\Videos\\deeds-web-app\\.tmp\\source-tuples-all.ndjson"
+      ],
+      "missing": [],
+      "proof_command": "npm run atlas:source-tuples:apply && npm run atlas:ontology-kag:readiness",
+      "gan_status": "PROVEN"
+    },
+    {
+      "category": "user_based",
+      "implementation": "Use operator feedback, review flags, corrected summaries, and accepted/rejected recommendations.",
+      "created": true,
+      "wired": false,
+      "proven": false,
+      "evidence": [
+        "readiness report identifies missing operator signal"
+      ],
+      "missing": [
+        "operator feedback capture",
+        "accepted/rejected recommendation replay reward"
+      ],
+      "proof_command": "npm run atlas:recommendations:replay",
+      "gan_status": "CREATED"
+    }
+  ],
+  "accelerator_proof": {
+    "status": "PASS",
+    "sidecar_dim": 64,
+    "http_indexed": 1000,
+    "grpc_candidates": 10,
+    "backend": "bridge:py(python)+addon(cuda)",
+    "gates": {
+      "qdrant_vectors": true,
+      "http_indexed": true,
+      "grpc_ok": true,
+      "grpc_search_nonempty": true,
+      "identity_preserved": true,
+      "pass": true
+    },
+    "report": "C:\\Users\\james\\Videos\\deeds-web-app\\docs\\reports\\turbovec-ann-grpc-proof.json"
+  },
+  "lexical_trigram_top": [
+    {
+      "key": "server",
+      "count": 3912
+    },
+    {
+      "key": "sveltekit",
+      "count": 3247
+    },
+    {
+      "key": "frontend",
+      "count": 3211
+    },
+    {
+      "key": "sveltekit frontend",
+      "count": 3198
+    },
+    {
+      "key": "ts",
+      "count": 2970
+    },
+    {
+      "key": "node",
+      "count": 2510
+    },
+    {
+      "key": "lib",
+      "count": 2333
+    },
+    {
+      "key": "svelte",
+      "count": 1815
+    },
+    {
+      "key": "js",
+      "count": 1813
+    },
+    {
+      "key": "server ts",
+      "count": 1311
+    },
+    {
+      "key": "fs",
+      "count": 1205
+    },
+    {
+      "key": "mjs",
+      "count": 1185
+    },
+    {
+      "key": "path",
+      "count": 1162
+    },
+    {
+      "key": "types",
+      "count": 1096
+    },
+    {
+      "key": "lib server",
+      "count": 1075
+    },
+    {
+      "key": "scripts",
+      "count": 1029
+    },
+    {
+      "key": "redis",
+      "count": 996
+    },
+    {
+      "key": "kit",
+      "count": 796
+    },
+    {
+      "key": "sveltejs",
+      "count": 791
+    },
+    {
+      "key": "sveltejs kit",
+      "count": 790
+    },
+    {
+      "key": "test",
+      "count": 768
+    },
+    {
+      "key": "node fs",
+      "count": 756
+    },
+    {
+      "key": "node path",
+      "count": 686
+    },
+    {
+      "key": "url",
+      "count": 638
+    },
+    {
+      "key": "client",
+      "count": 637
+    },
+    {
+      "key": "db",
+      "count": 596
+    },
+    {
+      "key": "frontend server",
+      "count": 572
+    },
+    {
+      "key": "sveltekit frontend server",
+      "count": 572
+    },
+    {
+      "key": "backup",
+      "count": 513
+    },
+    {
+      "key": "graph",
+      "count": 505
+    }
+  ],
+  "top_relations": [
+    {
+      "key": "IMPORTS",
+      "count": 54157
+    },
+    {
+      "key": "DEFINES",
+      "count": 50077
+    },
+    {
+      "key": "EXPORTS",
+      "count": 16407
+    },
+    {
+      "key": "VALIDATES",
+      "count": 13393
+    },
+    {
+      "key": "USES_REDIS_CACHE",
+      "count": 11246
+    },
+    {
+      "key": "IMPORTS_DYNAMIC",
+      "count": 10293
+    },
+    {
+      "key": "USES_VECTOR_SEARCH",
+      "count": 7129
+    },
+    {
+      "key": "USES_POSTGRES",
+      "count": 6597
+    },
+    {
+      "key": "RISK_SIGNAL",
+      "count": 1944
+    },
+    {
+      "key": "MCP_TOOL",
+      "count": 1816
+    },
+    {
+      "key": "USES_NEO4J",
+      "count": 1571
+    },
+    {
+      "key": "ROUTE_HANDLES",
+      "count": 1227
+    },
+    {
+      "key": "USES_QDRANT",
+      "count": 292
+    },
+    {
+      "key": "USES_RABBITMQ",
+      "count": 88
+    }
+  ],
+  "top_features": [
+    {
+      "key": "sveltekit-frontend.+server",
+      "count": 569
+    },
+    {
+      "key": "scripts.+server.ts",
+      "count": 290
+    },
+    {
+      "key": "sveltekit-frontend.graph_edges",
+      "count": 178
+    },
+    {
+      "key": "scripts.+server",
+      "count": 122
+    },
+    {
+      "key": "sveltekit-frontend.+page",
+      "count": 92
+    },
+    {
+      "key": ".svelte-error-fixes-backup.+page",
+      "count": 41
+    },
+    {
+      "key": "sveltekit-frontend.+page.server",
+      "count": 27
+    },
+    {
+      "key": "sveltekit-frontend.__id.test",
+      "count": 16
+    },
+    {
+      "key": ".python311.__init__",
+      "count": 13
+    },
+    {
+      "key": "sveltekit-frontend.types",
+      "count": 13
+    },
+    {
+      "key": "sveltekit-frontend.index",
+      "count": 7
+    },
+    {
+      "key": "claude-mem.index",
+      "count": 5
+    },
+    {
+      "key": "claude-mem.types",
+      "count": 5
+    },
+    {
+      "key": "sveltekit-frontend.analyze.test",
+      "count": 5
+    },
+    {
+      "key": "sveltekit-frontend.ollama",
+      "count": 5
+    },
+    {
+      "key": ".python311.errors",
+      "count": 4
+    },
+    {
+      "key": ".python311.more",
+      "count": 4
+    },
+    {
+      "key": "llama-cpp-turboquant-gemma4.index",
+      "count": 4
+    },
+    {
+      "key": "sveltekit-frontend.evidence",
+      "count": 4
+    },
+    {
+      "key": "sveltekit-frontend.qdrant-client",
+      "count": 4
+    },
+    {
+      "key": ".python311.exceptions",
+      "count": 3
+    },
+    {
+      "key": ".python311.typing_extensions",
+      "count": 3
+    },
+    {
+      "key": ".svelte-error-fixes-backup.Dialog",
+      "count": 3
+    },
+    {
+      "key": ".svelte-error-fixes-backup.EvidenceCanvas",
+      "count": 3
+    },
+    {
+      "key": ".svelte-error-fixes-backup.VectorIntelligenceDemo",
+      "count": 3
+    },
+    {
+      "key": "routes.+server",
+      "count": 3
+    },
+    {
+      "key": "sveltekit-frontend.__init__",
+      "count": 3
+    },
+    {
+      "key": "sveltekit-frontend.ai-service",
+      "count": 3
+    },
+    {
+      "key": "sveltekit-frontend.citations.test",
+      "count": 3
+    },
+    {
+      "key": "sveltekit-frontend.client",
+      "count": 3
+    }
+  ],
+  "som_20x20_guidance": {
+    "status": "DEFER_UNTIL_EMBEDDINGS_EXIST",
+    "cells": 400,
+    "input_order": [
+      "EmbeddingGemma 768 summary/content vectors",
+      "optional latent_128/latent_64",
+      "kmeans precluster",
+      "SOM 20x20 labels"
+    ],
+    "rule": "SOM, topology_label, ontology_label, and domain_class are enrichment metadata, not identity."
+  },
+  "kag_mutation_awareness": {
+    "status": "READY_FOR_PROOF_QUEUE",
+    "rule": "mutations are agentic workflow attempts, not canonical packet changes",
+    "weak_metrics": [
+      "user_based",
+      "semantic",
+      "authority",
+      "connectivity",
+      "application",
+      "coupling",
+      "taxonomic",
+      "contextual",
+      "structural",
+      "modularity"
+    ],
+    "routing_use": {
+      "maintenance_agent": "prioritize low completeness, high coupling, low modularity, or low consistency",
+      "retrieval_agent": "prioritize high authority, connectivity, lexical, and semantic scores",
+      "summarizer_agent": "prioritize high structural/contextual evidence before Gemma4 summary generation"
+    }
+  },
+  "recommendations": [
+    {
+      "metric": "user_based",
+      "score": 0,
+      "coverage_pct": 0,
+      "evidence": "operator acceptance/rejection signal not present in this artifact",
+      "mutation_attempts": [
+        {
+          "attempt": 1,
+          "action": "Expose top weak ontology clusters to the operator board for review.",
+          "reason": "operator acceptance/rejection signal not present in this artifact"
+        },
+        {
+          "attempt": 2,
+          "action": "Store operator accepted/rejected recommendations as replay reward evidence.",
+          "reason": "operator acceptance/rejection signal not present in this artifact"
+        },
+        {
+          "attempt": 3,
+          "action": "Do not mark DONE until replay/eval confirms improvement.",
+          "reason": "operator acceptance/rejection signal not present in this artifact"
+        }
+      ]
+    },
+    {
+      "metric": "semantic",
+      "score": 0.0291,
+      "coverage_pct": 2.91,
+      "evidence": "continuous validation vector average for semantic",
+      "mutation_attempts": [
+        {
+          "attempt": 1,
+          "action": "Embed candidate context with EmbeddingGemma 768 and compare summary_embedding similarity.",
+          "reason": "continuous validation vector average for semantic"
+        },
+        {
+          "attempt": 2,
+          "action": "Run LangExtract over candidate summaries to normalize entities/actions/dependencies.",
+          "reason": "continuous validation vector average for semantic"
+        },
+        {
+          "attempt": 3,
+          "action": "Ask Gemma4 for a 2-3 sentence purpose only after ranked evidence is assembled.",
+          "reason": "continuous validation vector average for semantic"
+        }
+      ]
+    },
+    {
+      "metric": "authority",
+      "score": 0.2409,
+      "coverage_pct": 24.09,
+      "evidence": "continuous validation vector average for authority",
+      "mutation_attempts": [
+        {
+          "attempt": 1,
+          "action": "Compute PageRank/GDS authority after Neo4j projection, not before embeddings.",
+          "reason": "continuous validation vector average for authority"
+        },
+        {
+          "attempt": 2,
+          "action": "Use authority as rerank metadata rather than identity.",
+          "reason": "continuous validation vector average for authority"
+        },
+        {
+          "attempt": 3,
+          "action": "Compare authority score against replay success before boosting recommendations.",
+          "reason": "continuous validation vector average for authority"
+        }
+      ]
+    },
+    {
+      "metric": "connectivity",
+      "score": 0.4787,
+      "coverage_pct": 47.87,
+      "evidence": "continuous validation vector average for connectivity",
+      "mutation_attempts": [
+        {
+          "attempt": 1,
+          "action": "Project tuple edges into Neo4j and compute bounded PageRank later.",
+          "reason": "continuous validation vector average for connectivity"
+        },
+        {
+          "attempt": 2,
+          "action": "Find orphan packets with zero structural/runtime edges.",
+          "reason": "continuous validation vector average for connectivity"
+        },
+        {
+          "attempt": 3,
+          "action": "Add KAG traversal proof for connected packets before board promotion.",
+          "reason": "continuous validation vector average for connectivity"
+        }
+      ]
+    },
+    {
+      "metric": "application",
+      "score": 0.4814,
+      "coverage_pct": 48.14,
+      "evidence": "KAG/ACE-ready rows with feature identity and runtime/retrieval relations",
+      "mutation_attempts": [
+        {
+          "attempt": 1,
+          "action": "Run HyperRAG packet RPC smoke and require packet_key/source_ref/feature_id survival.",
+          "reason": "KAG/ACE-ready rows with feature identity and runtime/retrieval relations"
+        },
+        {
+          "attempt": 2,
+          "action": "Persist ACE/KAG/DAG hit provenance for accepted recommendations.",
+          "reason": "KAG/ACE-ready rows with feature identity and runtime/retrieval relations"
+        },
+        {
+          "attempt": 3,
+          "action": "Create kanban task cards only from candidates with direct proof artifacts.",
+          "reason": "KAG/ACE-ready rows with feature identity and runtime/retrieval relations"
+        }
+      ]
+    },
+    {
+      "metric": "coupling",
+      "score": 0.4898,
+      "coverage_pct": 48.98,
+      "evidence": "continuous validation vector average for coupling",
+      "mutation_attempts": [
+        {
+          "attempt": 1,
+          "action": "Flag high-coupling packets for split/review instead of boosting them blindly.",
+          "reason": "continuous validation vector average for coupling"
+        },
+        {
+          "attempt": 2,
+          "action": "Use coupling as a routing warning for agentic patch planning.",
+          "reason": "continuous validation vector average for coupling"
+        },
+        {
+          "attempt": 3,
+          "action": "Prefer lower-coupling sibling packets when retrieval scores tie.",
+          "reason": "continuous validation vector average for coupling"
+        }
+      ]
+    },
+    {
+      "metric": "taxonomic",
+      "score": 0.5009,
+      "coverage_pct": 50.09,
+      "evidence": "canonical feature_id plus domain_class coverage",
+      "mutation_attempts": [
+        {
+          "attempt": 1,
+          "action": "Add HAS_A edges from packet -> symbols and IS_A edges from feature_id -> domain_class.",
+          "reason": "canonical feature_id plus domain_class coverage"
+        },
+        {
+          "attempt": 2,
+          "action": "Reject coarse labels such as db/routes/ai as feature_id and keep them in domain_class.",
+          "reason": "canonical feature_id plus domain_class coverage"
+        },
+        {
+          "attempt": 3,
+          "action": "Project feature_id/domain_class pairs into KAG nodes for traversal proof.",
+          "reason": "canonical feature_id plus domain_class coverage"
+        }
+      ]
+    },
+    {
+      "metric": "contextual",
+      "score": 0.5176,
+      "coverage_pct": 51.76,
+      "evidence": "continuous validation vector average for contextual",
+      "mutation_attempts": [
+        {
+          "attempt": 1,
+          "action": "Inspect this metric manually.",
+          "reason": "continuous validation vector average for contextual"
+        }
+      ]
+    },
+    {
+      "metric": "structural",
+      "score": 0.7895,
+      "coverage_pct": 78.95,
+      "evidence": "continuous validation vector average for structural",
+      "mutation_attempts": [
+        {
+          "attempt": 1,
+          "action": "Project IMPORTS/DEFINES/EXPORTS/USES_* tuples into Neo4j bounded edges.",
+          "reason": "continuous validation vector average for structural"
+        },
+        {
+          "attempt": 2,
+          "action": "Detect loops, duplicate definitions, and high-tangledness packets before PageRank.",
+          "reason": "continuous validation vector average for structural"
+        },
+        {
+          "attempt": 3,
+          "action": "Use SOM 20x20 only as topology neighborhood metadata after embeddings exist.",
+          "reason": "continuous validation vector average for structural"
+        }
+      ]
+    },
+    {
+      "metric": "modularity",
+      "score": 0.8276,
+      "coverage_pct": 82.76,
+      "evidence": "continuous validation vector average for modularity",
+      "mutation_attempts": [
+        {
+          "attempt": 1,
+          "action": "Group packets into feature modules before summary synthesis.",
+          "reason": "continuous validation vector average for modularity"
+        },
+        {
+          "attempt": 2,
+          "action": "Create reusable feature envelopes for repeated symbol/dependency clusters.",
+          "reason": "continuous validation vector average for modularity"
+        },
+        {
+          "attempt": 3,
+          "action": "Split over-large feature groups into subdomains before SOM training.",
+          "reason": "continuous validation vector average for modularity"
+        }
+      ]
+    }
+  ]
+}

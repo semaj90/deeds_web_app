@@ -95,7 +95,8 @@ function Test-LlamaFlag {
 
 # -- Load .env files if present --------------------------------------------
 # Keep the same precedence convention as the app checkout:
-#   .env primary, .env.local override
+#   .env primary, .env.local override, explicit process env wins
+$initialProcessEnv = [System.Environment]::GetEnvironmentVariables('Process')
 foreach ($envPath in @(
     (Join-Path $PSScriptRoot "..\.env"),
     (Join-Path $PSScriptRoot "..\.env.local")
@@ -109,8 +110,11 @@ foreach ($envPath in @(
                     $name = $name.Trim()
                     $value = $value.Trim().Trim('"').Trim("'")
                     if (-not [string]::IsNullOrWhiteSpace($name)) {
-                        # Later files intentionally override earlier files.
-                        [System.Environment]::SetEnvironmentVariable($name, $value)
+                        # Later files intentionally override earlier files, but
+                        # caller-provided process env remains the final override.
+                        if (-not $initialProcessEnv.Contains($name)) {
+                            [System.Environment]::SetEnvironmentVariable($name, $value)
+                        }
                     }
                 }
             }
@@ -580,12 +584,18 @@ if ($kvProfile -eq 'atomicbot') {
 # -- Reasoning format: suppress chain-of-thought for OpenCode/short queries --
 # Default: none (stops thinking loops on short prompts like "test").
 # Set TURBO_REASONING_FORMAT=deepseek in .env to re-enable for long-form tasks.
+# HARD RULE: Always pass --reasoning-budget 0 to block <|channel>thought leak.
 $reasoningFormat = if ($env:TURBO_REASONING_FORMAT) { $env:TURBO_REASONING_FORMAT } else { 'none' }
 if (Test-LlamaFlag $llama '--reasoning-format') {
     $baseArgs = $baseArgs + @('--reasoning-format', $reasoningFormat)
     Write-Host "Reasoning format: --reasoning-format $reasoningFormat" -ForegroundColor Cyan
 } else {
     Write-Host "Reasoning format: --reasoning-format not supported by this binary - skipping" -ForegroundColor DarkYellow
+}
+# Block <|channel>thought output even if embedded in GGUF
+if (Test-LlamaFlag $llama '--reasoning-budget') {
+    $baseArgs = $baseArgs + @('--reasoning-budget', '0')
+    Write-Host "Reasoning budget: --reasoning-budget 0 (suppress <|channel>thought leak)" -ForegroundColor Cyan
 }
 
 # -- Chat template: opt-in only via TURBO_CHAT_TEMPLATE_FILE env var ------

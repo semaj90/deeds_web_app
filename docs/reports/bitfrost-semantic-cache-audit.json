@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-07-01T02:22:07.810Z",
+  "generatedAt": "2026-07-01T21:26:05.595Z",
   "status": "PASS",
   "redis": {
     "container": "legal-ai-valkey",
@@ -9,8 +9,8 @@
     "gpuKarpathyScores": 0,
     "gpuKarpathyEncoded": 0,
     "bifrostKeys": 1130,
-    "centroidKeys": 0,
-    "somKeys": 0
+    "centroidKeys": 1,
+    "somKeys": 62
   },
   "patterns": [
     {
@@ -36,36 +36,36 @@
       "pattern": "bifrost:*",
       "count": 1130,
       "sample": [
-        "bifrost:sem:packet:packet:0141fd3854b1",
-        "bifrost:sem:packet:packet:023deb8570b2",
-        "bifrost:sem:packet:packet:0242eca5b9f3",
-        "bifrost:sem:feature:scripts.load-packets-neo4j",
-        "bifrost:sem:feature:neschrom97.30e6b5d0c6a8f393"
+        "bifrost:sem:feature:turbovec.lib-equator_macro",
+        "bifrost:sem:packet:packet:009e1a7df286",
+        "bifrost:sem:feature:simd-bridge.lstm_gpu",
+        "bifrost:sem:feature:sveltekit-frontend.0010-mcp-tool-atlas-suggest-files-atlas-suggest-files",
+        "bifrost:sem:packet:packet:0057df284547"
       ],
       "ttlSamples": [
         {
-          "key": "bifrost:sem:packet:packet:0141fd3854b1",
-          "ttl": 85023,
+          "key": "bifrost:sem:feature:turbovec.lib-equator_macro",
+          "ttl": 16740,
           "ok": true
         },
         {
-          "key": "bifrost:sem:packet:packet:023deb8570b2",
-          "ttl": 85313,
+          "key": "bifrost:sem:packet:packet:009e1a7df286",
+          "ttl": 16217,
           "ok": true
         },
         {
-          "key": "bifrost:sem:packet:packet:0242eca5b9f3",
-          "ttl": 85317,
+          "key": "bifrost:sem:feature:simd-bridge.lstm_gpu",
+          "ttl": 16219,
           "ok": true
         },
         {
-          "key": "bifrost:sem:feature:scripts.load-packets-neo4j",
-          "ttl": 85009,
+          "key": "bifrost:sem:feature:sveltekit-frontend.0010-mcp-tool-atlas-suggest-files-atlas-suggest-files",
+          "ttl": 16699,
           "ok": true
         },
         {
-          "key": "bifrost:sem:feature:neschrom97.30e6b5d0c6a8f393",
-          "ttl": 84724,
+          "key": "bifrost:sem:packet:packet:0057df284547",
+          "ttl": 16123,
           "ok": true
         }
       ],
@@ -75,18 +75,58 @@
     {
       "key": "centroid:*",
       "pattern": "centroid:*",
-      "count": 0,
-      "sample": [],
-      "ttlSamples": [],
+      "count": 1,
+      "sample": [
+        "centroid:0"
+      ],
+      "ttlSamples": [
+        {
+          "key": "centroid:0",
+          "ttl": -1,
+          "ok": true
+        }
+      ],
       "ok": true,
       "error": null
     },
     {
       "key": "som:*",
       "pattern": "som:*",
-      "count": 0,
-      "sample": [],
-      "ttlSamples": [],
+      "count": 62,
+      "sample": [
+        "som:14",
+        "som:60",
+        "som:27",
+        "som:96",
+        "som:46"
+      ],
+      "ttlSamples": [
+        {
+          "key": "som:14",
+          "ttl": -1,
+          "ok": true
+        },
+        {
+          "key": "som:60",
+          "ttl": -1,
+          "ok": true
+        },
+        {
+          "key": "som:27",
+          "ttl": -1,
+          "ok": true
+        },
+        {
+          "key": "som:96",
+          "ttl": -1,
+          "ok": true
+        },
+        {
+          "key": "som:46",
+          "ttl": -1,
+          "ok": true
+        }
+      ],
       "ok": true,
       "error": null
     },
@@ -95,36 +135,36 @@
       "pattern": "bifrost:sem:packet:*",
       "count": 614,
       "sample": [
-        "bifrost:sem:packet:packet:0141fd3854b1",
-        "bifrost:sem:packet:packet:023deb8570b2",
-        "bifrost:sem:packet:packet:0242eca5b9f3",
-        "bifrost:sem:packet:packet:0224aacdd67e",
-        "bifrost:sem:packet:packet:0003260092b1"
+        "bifrost:sem:packet:packet:009e1a7df286",
+        "bifrost:sem:packet:packet:0057df284547",
+        "bifrost:sem:packet:packet:004719ec513f",
+        "bifrost:sem:packet:packet:02359269ec4c",
+        "bifrost:sem:packet:packet:021fa5c13fbd"
       ],
       "ttlSamples": [
         {
-          "key": "bifrost:sem:packet:packet:0141fd3854b1",
-          "ttl": 85021,
+          "key": "bifrost:sem:packet:packet:009e1a7df286",
+          "ttl": 16212,
           "ok": true
         },
         {
-          "key": "bifrost:sem:packet:packet:023deb8570b2",
-          "ttl": 85310,
+          "key": "bifrost:sem:packet:packet:0057df284547",
+          "ttl": 16119,
           "ok": true
         },
         {
-          "key": "bifrost:sem:packet:packet:0242eca5b9f3",
-          "ttl": 85315,
+          "key": "bifrost:sem:packet:packet:004719ec513f",
+          "ttl": 16092,
           "ok": true
         },
         {
-          "key": "bifrost:sem:packet:packet:0224aacdd67e",
-          "ttl": 85281,
+          "key": "bifrost:sem:packet:packet:02359269ec4c",
+          "ttl": 16661,
           "ok": true
         },
         {
-          "key": "bifrost:sem:packet:packet:0003260092b1",
-          "ttl": 84638,
+          "key": "bifrost:sem:packet:packet:021fa5c13fbd",
+          "ttl": 16628,
           "ok": true
         }
       ],
@@ -136,36 +176,36 @@
       "pattern": "bifrost:sem:feature:*",
       "count": 516,
       "sample": [
-        "bifrost:sem:feature:scripts.load-packets-neo4j",
-        "bifrost:sem:feature:neschrom97.30e6b5d0c6a8f393",
-        "bifrost:sem:feature:.python311.entry2",
-        "bifrost:sem:feature:scripts.legal-corpus",
-        "bifrost:sem:feature:neschrom97.e46d6187de1edbd6"
+        "bifrost:sem:feature:turbovec.lib-equator_macro",
+        "bifrost:sem:feature:simd-bridge.lstm_gpu",
+        "bifrost:sem:feature:sveltekit-frontend.0010-mcp-tool-atlas-suggest-files-atlas-suggest-files",
+        "bifrost:sem:feature:docs.todO_pt2_5526",
+        "bifrost:sem:feature:get_proper_metadata_retrieval_packetreader_wired_up_test_615"
       ],
       "ttlSamples": [
         {
-          "key": "bifrost:sem:feature:scripts.load-packets-neo4j",
-          "ttl": 85005,
+          "key": "bifrost:sem:feature:turbovec.lib-equator_macro",
+          "ttl": 16734,
           "ok": true
         },
         {
-          "key": "bifrost:sem:feature:neschrom97.30e6b5d0c6a8f393",
-          "ttl": 84720,
+          "key": "bifrost:sem:feature:simd-bridge.lstm_gpu",
+          "ttl": 16213,
           "ok": true
         },
         {
-          "key": "bifrost:sem:feature:.python311.entry2",
-          "ttl": 85095,
+          "key": "bifrost:sem:feature:sveltekit-frontend.0010-mcp-tool-atlas-suggest-files-atlas-suggest-files",
+          "ttl": 16693,
           "ok": true
         },
         {
-          "key": "bifrost:sem:feature:scripts.legal-corpus",
-          "ttl": 84796,
+          "key": "bifrost:sem:feature:docs.todO_pt2_5526",
+          "ttl": 16283,
           "ok": true
         },
         {
-          "key": "bifrost:sem:feature:neschrom97.e46d6187de1edbd6",
-          "ttl": 84988,
+          "key": "bifrost:sem:feature:get_proper_metadata_retrieval_packetreader_wired_up_test_615",
+          "ttl": 16060,
           "ok": true
         }
       ],
@@ -193,38 +233,38 @@
     {
       "key": "ace:context:*",
       "pattern": "ace:context:*",
-      "count": 614,
+      "count": 26,
       "sample": [
-        "ace:context:packet:00bacf58384b",
-        "ace:context:packet:0194484feed4",
-        "ace:context:packet:01c26f2c1882",
-        "ace:context:packet:001d9f093944",
-        "ace:context:packet:016584fd707a"
+        "ace:context:packet:0011712c94d1",
+        "ace:context:packet:000db15dc8ef",
+        "ace:context:packet:000fde9311af",
+        "ace:context:packet:000f704e5207",
+        "ace:context:packet:0009a56456fc"
       ],
       "ttlSamples": [
         {
-          "key": "ace:context:packet:00bacf58384b",
-          "ttl": 2079,
+          "key": "ace:context:packet:0011712c94d1",
+          "ttl": 3428,
           "ok": true
         },
         {
-          "key": "ace:context:packet:0194484feed4",
-          "ttl": 2297,
+          "key": "ace:context:packet:000db15dc8ef",
+          "ttl": 3415,
           "ok": true
         },
         {
-          "key": "ace:context:packet:01c26f2c1882",
-          "ttl": 2356,
+          "key": "ace:context:packet:000fde9311af",
+          "ttl": 3423,
           "ok": true
         },
         {
-          "key": "ace:context:packet:001d9f093944",
-          "ttl": 1879,
+          "key": "ace:context:packet:000f704e5207",
+          "ttl": 3421,
           "ok": true
         },
         {
-          "key": "ace:context:packet:016584fd707a",
-          "ttl": 2256,
+          "key": "ace:context:packet:0009a56456fc",
+          "ttl": 3410,
           "ok": true
         }
       ],
@@ -234,38 +274,38 @@
     {
       "key": "ace:summary:*",
       "pattern": "ace:summary:*",
-      "count": 697,
+      "count": 109,
       "sample": [
-        "ace:summary:packet:00615b1a7515",
-        "ace:summary:packet:000b2df0cfdf",
-        "ace:summary:packet:007e489e8e2e",
-        "ace:summary:packet:01630dcae75d",
-        "ace:summary:summary:2ee79ea9a56e40c7"
+        "ace:summary:packet:0011712c94d1",
+        "ace:summary:summary:f73d0fc78141b854",
+        "ace:summary:summary:d7544be729eb4686",
+        "ace:summary:summary:98c80633d64e86c4",
+        "ace:summary:summary:28c92795954008de"
       ],
       "ttlSamples": [
         {
-          "key": "ace:summary:packet:00615b1a7515",
-          "ttl": 1971,
+          "key": "ace:summary:packet:0011712c94d1",
+          "ttl": 3426,
           "ok": true
         },
         {
-          "key": "ace:summary:packet:000b2df0cfdf",
-          "ttl": 1850,
+          "key": "ace:summary:summary:f73d0fc78141b854",
+          "ttl": 422680,
           "ok": true
         },
         {
-          "key": "ace:summary:packet:007e489e8e2e",
-          "ttl": 1998,
+          "key": "ace:summary:summary:d7544be729eb4686",
+          "ttl": 422682,
           "ok": true
         },
         {
-          "key": "ace:summary:packet:01630dcae75d",
-          "ttl": 2253,
+          "key": "ace:summary:summary:98c80633d64e86c4",
+          "ttl": 421791,
           "ok": true
         },
         {
-          "key": "ace:summary:summary:2ee79ea9a56e40c7",
-          "ttl": 491345,
+          "key": "ace:summary:summary:28c92795954008de",
+          "ttl": 421785,
           "ok": true
         }
       ],
@@ -275,38 +315,38 @@
     {
       "key": "ace:feature:*",
       "pattern": "ace:feature:*",
-      "count": 516,
+      "count": 25,
       "sample": [
-        "ace:feature:simd-bridge.lib-cfg_if",
-        "ace:feature:.svelte-error-fixes-backup.LLMS",
-        "ace:feature:sveltekit-frontend.gaming-types",
-        "ace:feature:neschrom97.e60e5d78cdd9ddfb",
-        "ace:feature:neschrom97.e1a884a6c504bbdc"
+        "ace:feature:sveltekit-frontend.tests__routes__auto__api__cache__metrics.test",
+        "ace:feature:crates.libryu-555024bdb0a51304",
+        "ace:feature:.python311.bq300-8rv",
+        "ace:feature:llama-cpp-turboquant-gemma4.completion",
+        "ace:feature:sveltekit-frontend.llm_synthesis_mapping"
       ],
       "ttlSamples": [
         {
-          "key": "ace:feature:simd-bridge.lib-cfg_if",
-          "ttl": 2123,
+          "key": "ace:feature:sveltekit-frontend.tests__routes__auto__api__cache__metrics.test",
+          "ttl": 3395,
           "ok": true
         },
         {
-          "key": "ace:feature:.svelte-error-fixes-backup.LLMS",
-          "ttl": 2578,
+          "key": "ace:feature:crates.libryu-555024bdb0a51304",
+          "ttl": 3415,
           "ok": true
         },
         {
-          "key": "ace:feature:sveltekit-frontend.gaming-types",
-          "ttl": 2043,
+          "key": "ace:feature:.python311.bq300-8rv",
+          "ttl": 3418,
           "ok": true
         },
         {
-          "key": "ace:feature:neschrom97.e60e5d78cdd9ddfb",
-          "ttl": 1963,
+          "key": "ace:feature:llama-cpp-turboquant-gemma4.completion",
+          "ttl": 3403,
           "ok": true
         },
         {
-          "key": "ace:feature:neschrom97.e1a884a6c504bbdc",
-          "ttl": 2486,
+          "key": "ace:feature:sveltekit-frontend.llm_synthesis_mapping",
+          "ttl": 3389,
           "ok": true
         }
       ],

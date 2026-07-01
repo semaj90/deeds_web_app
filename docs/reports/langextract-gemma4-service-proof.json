@@ -1,0 +1,25 @@
+{
+  "generated_at": "2026-07-01T21:55:56.682Z",
+  "status": "LIVE_PASS",
+  "langextract_url": "http://127.0.0.1:8096",
+  "llama_server_url": "http://127.0.0.1:8090",
+  "model": "gemma4-legal-iq4xs-direct.gguf",
+  "pid": null,
+  "health": {
+    "ok": true,
+    "status": 200,
+    "body": {
+      "status": "healthy",
+      "services": {
+        "spacy_loaded": false,
+        "spacy_enabled": true,
+        "llama_server_available": true
+      },
+      "memory_mb": 22.5
+    }
+  },
+  "notes": [
+    "Ollama is intentionally not used for LangExtract NER; Ollama remains embedding-only for EmbeddingGemma.",
+    "Use explicit 127.0.0.1 instead of localhost to avoid IPv6 service collisions."
+  ]
+}

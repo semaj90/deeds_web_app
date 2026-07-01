@@ -2,9 +2,9 @@
   "status": "WARN",
   "mode": "apply",
   "collection": "codebase_chunks_768",
-  "started_at": "2026-07-01T01:22:37.222Z",
+  "started_at": "2026-07-01T15:45:43.941Z",
   "packets_loaded": 55397,
-  "qdrant_points_scanned": 40568,
+  "qdrant_points_scanned": 5000,
   "matches": 0,
   "updated": 0,
   "skipped_duplicate_packet": 0,
@@ -13,5 +13,5 @@
   "errors": [
     "No Postgres/Qdrant joins found. Check path normalization or collection payload schema."
   ],
-  "finished_at": "2026-07-01T01:24:40.301Z"
+  "finished_at": "2026-07-01T15:46:03.394Z"
 }

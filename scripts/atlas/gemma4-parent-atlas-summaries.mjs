@@ -611,28 +611,102 @@ async function lookupCachedSummary(cacheRedis, cacheModule, phase101Input, cache
 function buildStableSummaryPrefix(row) {
   return `You are Parent Atlas summarizer.
 
-Return strict JSON with this exact structure:
-{
-  "synthesis": {
-    "mainThemes": ["..."],
-    "supportingEvidence": ["..."],
-    "gaps": ["..."],
-    "contradictions": ["..."],
-    "legalImplications": ["..."],
-    "nextSteps": ["..."]
-  }
-}
+Return plain text only: 2-3 concise technical sentences.
 
 Rules:
 - Preserve sourceRef and feature_id provenance.
 - Treat feature:* as a feature bucket, not a file path.
-- Keep the summary concise and technical.
-- Prefer actionable, high-signal language.
+- Use the ranked evidence sections; do not summarize unrelated boilerplate.
+- Prefer behavior, responsibilities, dependencies, and failure modes.
+- Do not output JSON, markdown fences, chain-of-thought, or labels.
 
 source_ref: ${row.source_ref}
 feature_id: ${row.feature_id ?? 'unknown'}
 ${formatSummaryContext(buildSummaryContext(row))}
 `;
+}
+
+function lineNumberAt(text, index) {
+  return String(text.slice(0, Math.max(0, index)).split('\n').length);
+}
+
+function pushMatches(tuples, text, regex, kind, relation, weight = 1) {
+  for (const match of text.matchAll(regex)) {
+    const symbol = String(match.groups?.name ?? match[1] ?? match[0] ?? '').trim().slice(0, 160);
+    const snippet = String(match[0] ?? '').trim().replace(/\s+/g, ' ').slice(0, 240);
+    if (!symbol && !snippet) continue;
+    tuples.push({
+      kind,
+      relation,
+      symbol,
+      line: Number(lineNumberAt(text, match.index ?? 0)),
+      weight,
+      snippet,
+    });
+  }
+}
+
+function extractSourceTuples(row, sourceText) {
+  const text = String(sourceText ?? '');
+  const tuples = [];
+  pushMatches(tuples, text, /^\s*import\s+(?:type\s+)?(?:.+?\s+from\s+)?['"](?<name>[^'"]+)['"]/gm, 'import_static', 'imports', 1.0);
+  pushMatches(tuples, text, /import\s*\(\s*['"](?<name>[^'"]+)['"]\s*\)/g, 'import_dynamic', 'imports_dynamic', 1.2);
+  pushMatches(tuples, text, /^\s*(?:export\s+)?(?:async\s+)?function\s+(?<name>[A-Za-z_$][\w$]*)\s*\(/gm, 'function', 'defines', 1.8);
+  pushMatches(tuples, text, /^\s*(?:export\s+)?const\s+(?<name>[A-Za-z_$][\w$]*)\s*=\s*(?:async\s*)?\([^)]*\)\s*=>/gm, 'function_arrow', 'defines', 1.6);
+  pushMatches(tuples, text, /^\s*(?:export\s+)?class\s+(?<name>[A-Za-z_$][\w$]*)/gm, 'class', 'defines', 1.6);
+  pushMatches(tuples, text, /^\s*export\s+(?:const|let|var|type|interface|enum)\s+(?<name>[A-Za-z_$][\w$]*)/gm, 'export', 'exports', 1.3);
+  pushMatches(tuples, text, /(?:GET|POST|PUT|PATCH|DELETE)\s*[:=]\s*(?:async\s*)?\(/g, 'route_handler', 'handles_route', 1.7);
+  pushMatches(tuples, text, /\b(?:fetch|axios\.[a-z]+)\s*\(/g, 'http_client', 'calls_http', 1.0);
+  pushMatches(tuples, text, /\b(?:pool|client|db|sql)\.(?:query|execute|select|insert|update|delete)\s*\(/g, 'postgres', 'reads_writes_postgres', 1.4);
+  pushMatches(tuples, text, /\b(?:redis|valkey|cache)\.(?:get|set|hget|hset|del|expire|publish)\s*\(/gi, 'redis_cache', 'reads_writes_cache', 1.4);
+  pushMatches(tuples, text, /\bqdrant\.(?:search|upsert|scroll|setPayload|createCollection|getCollection)\s*\(/gi, 'qdrant', 'uses_vector_mirror', 1.4);
+  pushMatches(tuples, text, /\b(?:neo4j|session)\.(?:run|executeRead|executeWrite)\s*\(/gi, 'neo4j', 'uses_graph_mirror', 1.4);
+  pushMatches(tuples, text, /\b(?:amqp|channel)\.(?:sendToQueue|publish|consume|assertQueue)\s*\(/gi, 'rabbitmq', 'uses_queue', 1.4);
+  pushMatches(tuples, text, /\b(?:z\.object|schema|parse|safeParse)\b/g, 'validation', 'validates_contract', 1.1);
+  pushMatches(tuples, text, /\b(?:TODO|FIXME|throw new Error|catch\s*\()/g, 'risk_signal', 'has_failure_mode', 0.9);
+
+  const sourceRef = String(row?.source_ref ?? '');
+  return tuples
+    .map((tuple, index) => ({
+      ...tuple,
+      tuple_id: `${sourceRef}:${tuple.kind}:${tuple.line}:${index}`,
+      from: sourceRef,
+      to: tuple.symbol || tuple.kind,
+    }))
+    .sort((a, b) => (b.weight - a.weight) || (a.line - b.line));
+}
+
+function rankSummaryEvidence(row, sourceText) {
+  const text = String(sourceText ?? '');
+  const tuples = extractSourceTuples(row, text);
+  const topTuples = tuples.slice(0, 40);
+  const tupleLines = topTuples.map((tuple) =>
+    `(${tuple.from}) -[${tuple.relation}]-> (${tuple.to}) line=${tuple.line} kind=${tuple.kind} weight=${tuple.weight}: ${tuple.snippet}`
+  );
+
+  const sourceLines = text.split('\n');
+  const selectedLineNumbers = new Set();
+  for (const tuple of topTuples.slice(0, 16)) {
+    for (let i = Math.max(1, tuple.line - 2); i <= Math.min(sourceLines.length, tuple.line + 4); i += 1) {
+      selectedLineNumbers.add(i);
+    }
+  }
+  if (selectedLineNumbers.size === 0) {
+    for (let i = 1; i <= Math.min(sourceLines.length, 80); i += 1) selectedLineNumbers.add(i);
+  }
+  const rankedSource = [...selectedLineNumbers]
+    .sort((a, b) => a - b)
+    .slice(0, 160)
+    .map((line) => `${line}: ${sourceLines[line - 1] ?? ''}`)
+    .join('\n');
+
+  return [
+    'Linked tuples:',
+    tupleLines.length ? tupleLines.join('\n') : '(none detected; fallback source window follows)',
+    '',
+    'Ranked source windows:',
+    rankedSource,
+  ].join('\n').slice(0, 12000);
 }
 
 function buildSummaryUserPrompt(row, snippet) {
@@ -653,6 +727,8 @@ function buildSummaryUserPrompt(row, snippet) {
     ? row.route_handlers.join(', ')
     : '';
 
+  const evidence = rankSummaryEvidence(row, snippet);
+
   return `Tags: ${tags.join(', ') || 'none'}
 Domain/topology context:
 ${formatSummaryContext(context)}
@@ -661,12 +737,12 @@ Route handlers: ${handlers || 'none'}
 Imports (top 10): ${imports || 'none'}
 Exports (top 10): ${exports || 'none'}
 
-Code (first 80 lines):
+Ranked evidence:
 \`\`\`
-${snippet.slice(0, 2000)}
+${evidence}
 \`\`\`
 
-Write the JSON payload only.`;
+Write 2-3 concise technical sentences describing this file's role, important code paths, and how it relates to feature_id/source_ref.`;
 }
 
 function buildDeterministicSemanticEmbedding(seedText) {
@@ -712,7 +788,7 @@ function buildCachedSummaryInput(row, snippet) {
       { title: 'route_handlers', content: handlers || 'none' },
       { title: 'imports', content: imports || 'none' },
       { title: 'exports', content: exports || 'none' },
-      { title: 'snippet', content: snippet || '' },
+      { title: 'ranked_evidence', content: rankSummaryEvidence(row, snippet) || '' },
     ],
     keyInsights: uniqueStrings([
       ...(tags.slice(0, 6) ?? []),
@@ -797,8 +873,8 @@ async function callLLM(prompt) {
   throw new Error('No llama-server chat backend available on port 8090');
 }
 
-// ── Read first N lines of a file ─────────────────────────────────────────────
-function readFirstLines(sourceRef, n = 80) {
+// ── Read a bounded whole-file source body for tuple extraction ───────────────
+function readFirstLines(sourceRef, _n = 80) {
   // Resolve relative to repo root
   const candidates = [
     path.join(ROOT, sourceRef),
@@ -807,8 +883,11 @@ function readFirstLines(sourceRef, n = 80) {
   for (const p of candidates) {
     if (fs.existsSync(p)) {
       try {
+        const stat = fs.statSync(p);
+        if (!stat.isFile() || stat.size > 2_000_000) return '';
         const content = fs.readFileSync(p, 'utf8');
-        return content.split('\n').slice(0, n).join('\n');
+        if (content.includes('\u0000')) return '';
+        return content.slice(0, 250_000);
       } catch { }
     }
   }
@@ -841,7 +920,7 @@ Tags: ${tags.join(', ') || 'none'}
 Route handlers: ${handlers || 'none'}
 Imports (top 10): ${imports || 'none'}
 Exports (top 10): ${exports || 'none'}
-${snippet ? `\nCode (first 80 lines):\n\`\`\`\n${snippet.slice(0, 2000)}\n\`\`\`` : ''}
+${snippet ? `\nRanked evidence:\n\`\`\`\n${rankSummaryEvidence(row, snippet)}\n\`\`\`` : ''}
 
 Write a single concise paragraph (2-4 sentences) describing what this file does, its role in the system, and any notable patterns. Do NOT repeat the filename. Focus on behavior, not file structure.`;
 }
