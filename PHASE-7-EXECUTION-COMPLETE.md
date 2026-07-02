@@ -10,13 +10,15 @@ Phase 7 summary ingestion pipeline is **live and processing** all 40,754 code ch
 
 | Metric | Value |
 |--------|-------|
-| **Summaries written** | 1,686 / 40,754 (4.1%) |
-| **Queue batches** | 2,442 pending |
+| **Summaries written** | 1,826 / 40,754 (4.5%) |
+| **Queue batches** | ~2,300 pending |
 | **Active workers** | 4 concurrent |
 | **Batch size** | 16 chunks |
 | **Backend** | llama-server :8090 |
-| **Throughput** | ~40-50 summaries/min (est.) |
-| **ETA to completion** | ~14-16 hours (overnight) |
+| **Throughput** | ~45-55 summaries/min (measured) |
+| **ETA to completion** | ~13-14 hours |
+| **Latest update** | 7s ago (HEALTHY) |
+| **Worker status** | ACTIVE - all 4 consuming |
 
 ---
 
@@ -150,6 +152,26 @@ Gemma4 producing valid summaries (14-50s for 16 chunks):
 ---
 
 ## How to Monitor
+
+### Stall Detection (Recommended)
+
+**One-command health check** (detects stalls, confirms Redis/Postgres):
+```bash
+node verify-phase7-write.mjs
+```
+
+Output shows:
+- ✅ Summary counts (not-null vs non-empty)
+- ✅ Latest update timestamp and seconds since update
+- ✅ Worker health status (HEALTHY if < 15 min since update)
+- ✅ Redis cache verification
+- ✅ Sample summaries with lengths
+
+**If stalled** (no updates for 15+ minutes):
+```bash
+tail -f phase7-worker-{1,2,3,4}.log | grep -E "Batch|Error|Postgres"
+node -e "const amqp=require('amqplib');(async()=>{const c=await amqp.connect('amqp://guest:guest@127.0.0.1:5672');const ch=await c.createChannel();const q=await ch.assertQueue('summaries.batch.work',{passive:true});console.log('Pending:',q.messageCount,'Consumers:',q.consumerCount);c.close()})();"
+```
 
 ### Real-Time Progress
 ```bash
