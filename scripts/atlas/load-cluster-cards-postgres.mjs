@@ -19,6 +19,7 @@ import fs from 'node:fs';
 import { resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import pg from 'pg';
+import { loadRepoEnv, resolveDatabaseUrl } from './connection-config.mjs';
 
 const { Pool } = pg;
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -39,16 +40,33 @@ const c = {
 
 // ── Postgres client ────────────────────────────────────────────────────────
 
+const env = loadRepoEnv();
 const pool = new Pool({
-  host: process.env.POSTGRES_HOST ?? 'localhost',
-  port: parseInt(process.env.POSTGRES_PORT ?? '5432', 10),
-  database: process.env.POSTGRES_DB ?? 'legal_ai_db',
-  user: process.env.POSTGRES_USER ?? 'postgres',
-  password: process.env.POSTGRES_PASSWORD ?? 'postgres',
+  connectionString: resolveDatabaseUrl(env),
   max: 10,
   idleTimeoutMillis: 30000,
   connectionTimeoutMillis: 5000,
 });
+
+async function ensureClusterCardsTable(client) {
+  await client.query(`
+    CREATE TABLE IF NOT EXISTS cluster_cards (
+      id text PRIMARY KEY,
+      card jsonb NOT NULL,
+      centroid_dim integer NOT NULL DEFAULT 768,
+      created_at timestamptz NOT NULL DEFAULT now(),
+      updated_at timestamptz NOT NULL DEFAULT now()
+    )
+  `);
+  await client.query(`
+    CREATE INDEX IF NOT EXISTS cluster_cards_card_gin
+      ON cluster_cards USING gin (card)
+  `);
+  await client.query(`
+    CREATE INDEX IF NOT EXISTS cluster_cards_centroid_dim_idx
+      ON cluster_cards (centroid_dim)
+  `);
+}
 
 // ── Main ───────────────────────────────────────────────────────────────────
 
@@ -88,6 +106,8 @@ try {
     log(`  ${c.g('✓')} Connected`);
 
     try {
+      await ensureClusterCardsTable(client);
+
       // Step 3: Upsert cards
       log(`\n${c.b('Step 3')} — Upsert cluster cards`);
 

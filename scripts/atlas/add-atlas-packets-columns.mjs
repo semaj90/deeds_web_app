@@ -11,12 +11,12 @@
  */
 
 import pg from 'pg';
+import { loadRepoEnv, resolveDatabaseUrl } from './connection-config.mjs';
 
 const { Pool } = pg;
 
-const DATABASE_URL =
-  process.env.DATABASE_URL ||
-  'postgresql://legal_admin:123456@127.0.0.1:5434/legal_ai_db';
+const env = loadRepoEnv(process.env);
+const DATABASE_URL = resolveDatabaseUrl(env);
 
 const DRY_RUN = process.argv.includes('--dry-run');
 
@@ -52,10 +52,15 @@ const MIGRATIONS = [
 const EXTRA_INDEXES = [
   `CREATE INDEX IF NOT EXISTS idx_atlas_packets_source_ref ON atlas_packets(source_ref)`,
   `CREATE INDEX IF NOT EXISTS idx_atlas_packets_feature_id ON atlas_packets(feature_id)`,
+  `CREATE INDEX IF NOT EXISTS idx_atlas_packets_source_feature ON atlas_packets(source_ref, feature_id)`,
+  `CREATE INDEX IF NOT EXISTS idx_atlas_packets_qdrant_point_id ON atlas_packets(qdrant_point_id)`,
   `CREATE INDEX IF NOT EXISTS idx_atlas_packets_community_id ON atlas_packets(community_id)`,
   `CREATE INDEX IF NOT EXISTS idx_atlas_packets_source_kind ON atlas_packets(source_kind)`,
   `CREATE INDEX IF NOT EXISTS idx_atlas_packets_concept_ids ON atlas_packets USING GIN(concept_ids)`,
+  `CREATE INDEX IF NOT EXISTS idx_atlas_packets_metadata_gin_pathops ON atlas_packets USING GIN(metadata jsonb_path_ops)`,
+  `CREATE INDEX IF NOT EXISTS idx_atlas_packets_payload_gin_pathops ON atlas_packets USING GIN(payload jsonb_path_ops)`,
   `CREATE INDEX IF NOT EXISTS idx_atlas_packets_summary_fts ON atlas_packets USING GIN(to_tsvector('english', coalesce(summary, '')))`,
+  `CREATE INDEX IF NOT EXISTS idx_atlas_packets_envelope_fts ON atlas_packets USING GIN(to_tsvector('english', coalesce(payload->>'title', '') || ' ' || coalesce(summary, '') || ' ' || coalesce(feature_label, '') || ' ' || coalesce(feature_id, '')))`,
 ];
 
 async function main() {

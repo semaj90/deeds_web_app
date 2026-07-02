@@ -36,14 +36,14 @@ echo ""
 
 # ─ Check Karpathy GPU enrichment
 echo "2️⃣  Karpathy GPU Enrichment (Redis)"
-karpathy_count=$(docker exec legal-ai-redis redis-cli HLEN gpu:karpathy:scores 2>/dev/null || echo "0")
+karpathy_count=$(docker exec legal-ai-valkey redis-cli HLEN gpu:karpathy:scores 2>/dev/null || echo "0")
 if [ "$karpathy_count" -gt "0" ]; then
   echo "   ✅ Karpathy scores cached: $karpathy_count entries"
 
   # Sample a score
-  sample_key=$(docker exec legal-ai-redis redis-cli HKEYS gpu:karpathy:scores 2>/dev/null | head -1)
+  sample_key=$(docker exec legal-ai-valkey redis-cli HKEYS gpu:karpathy:scores 2>/dev/null | head -1)
   if [ -n "$sample_key" ]; then
-    sample_score=$(docker exec legal-ai-redis redis-cli HGET gpu:karpathy:scores "$sample_key" 2>/dev/null)
+    sample_score=$(docker exec legal-ai-valkey redis-cli HGET gpu:karpathy:scores "$sample_key" 2>/dev/null)
     echo "   ✅ Sample score: $sample_score"
   fi
 else

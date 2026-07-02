@@ -162,7 +162,7 @@ function redisProbe() {
 
 async function main() {
   const gemma = parseUrl(env.LLAMA_SERVER_URL || env.TURBOQUANT_BASE_URL || 'http://127.0.0.1:8090', 8090);
-  const lang = parseUrl(env.LANGEXTRACT_URL || 'http://127.0.0.1:8096', 8096);
+  const lang = parseUrl(env.LANGEXTRACT_URL || 'http://127.0.0.1:8095', 8095);
   const goRetrieval = parseUrl(env.GO_RETRIEVAL_HTTP_URL || env.RETRIEVAL_HTTP_URL || 'http://127.0.0.1:8100', 8100);
   const embedding = parseUrl(env.OLLAMA_EMBED_BASE_URL || env.EMBED_SERVER_URL || 'http://127.0.0.1:8081', 8081);
   const qdrant = parseUrl(env.QDRANT_URL || 'http://127.0.0.1:6333', 6333);
@@ -275,24 +275,24 @@ async function main() {
 
   const legacyWarnings = [];
   const staleLang = await httpProbe({
-    service_name: 'langextract-stale-8095',
-    url: 'http://127.0.0.1:8095',
-    port: 8095,
+    service_name: 'langextract-stale-8096',
+    url: 'http://127.0.0.1:8096',
+    port: 8096,
     pathName: '/health',
     validate: (body) => body?.services?.llama_server_available === true,
   });
   if (staleLang.status !== 'FAIL') {
     legacyWarnings.push({
-      lane: 'langextract-stale-8095',
+      lane: 'langextract-stale-8096',
       severity: 'WARN',
-      reason: 'Legacy LangExtract port responded as Gemma4-compatible; canonical port is 8096.',
+      reason: 'Legacy LangExtract check on 8096 responded as Gemma4-compatible; canonical LangExtract port is 8095 and Go Search owns 8096.',
       probe: staleLang,
     });
   } else if (staleLang.details?.body?.services?.ollama_available === true) {
     legacyWarnings.push({
-      lane: 'langextract-stale-8095',
+      lane: 'langextract-stale-8096',
       severity: 'WARN',
-      reason: 'Legacy LangExtract listener still advertises ollama_available; canonical Gemma4-backed LangExtract is 127.0.0.1:8096.',
+      reason: 'Legacy LangExtract listener still advertises ollama_available on 8096; canonical Gemma4-backed LangExtract is 127.0.0.1:8095.',
       probe: staleLang,
     });
   }

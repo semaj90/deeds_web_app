@@ -1,9 +1,9 @@
 # Go Retrieval Smoke
 
 Status: PASS
-Generated: 2026-07-01T21:56:05.934Z
+Generated: 2026-07-02T03:54:50.633Z
 
-- HTTP: READY http://127.0.0.1:8100/health (51ms)
+- HTTP: READY http://127.0.0.1:8100/health (49ms)
 - gRPC/TCP: READY 127.0.0.1:50053 (2ms)
 
 ## HTTP Health
@@ -15,6 +15,6 @@ Generated: 2026-07-01T21:56:05.934Z
   "qdrantConnected": true,
   "redisConnected": true,
   "status": "healthy",
-  "timestamp": 1782942965970
+  "timestamp": 1782964490667
 }
 ```

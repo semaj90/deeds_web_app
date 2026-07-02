@@ -6,7 +6,7 @@
 # invalidateResearchCaches) to prove the Redis delete-by-pattern logic
 # matches the actual key shapes.
 #
-# Runs against Docker container `legal-ai-redis`. Does NOT require the
+# Runs against Docker container `legal-ai-valkey`. Does NOT require the
 # SvelteKit dev server — this is a pure Redis-layer smoke test.
 #
 # Usage:
@@ -14,7 +14,7 @@
 
 set -e
 
-REDIS_CONTAINER="${REDIS_CONTAINER:-legal-ai-redis}"
+REDIS_CONTAINER="${REDIS_CONTAINER:-legal-ai-valkey}"
 PASS=0
 FAIL=0
 

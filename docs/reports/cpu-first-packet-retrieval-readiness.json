@@ -1,0 +1,75 @@
+{
+  "generated_at": "2026-07-02T04:06:51.642Z",
+  "status": "LIVE_PASS",
+  "cutoff": "CPU fp32 packet truth and queryability first; GPU/TensorRT/cuVS only as acceleration lanes.",
+  "lanes": {
+    "postgres": {
+      "status": "LIVE_PASS",
+      "missing_columns": [],
+      "index_coverage": {
+        "source_ref": true,
+        "feature_id": true,
+        "source_feature": true,
+        "qdrant_point_id": true,
+        "metadata_gin": true,
+        "payload_gin": true,
+        "fts": true
+      },
+      "counts": {
+        "total": 58304,
+        "with_packet_key": 58304,
+        "with_source_ref": 58304,
+        "with_feature_id": 58304,
+        "with_source_ref_key": 58304,
+        "with_qdrant_point_id": 3092,
+        "with_packet_summary": 412,
+        "with_pgvector_embedding": 0,
+        "packet_key_pct": 100,
+        "source_ref_pct": 100,
+        "feature_id_pct": 100,
+        "source_ref_key_pct": 100,
+        "qdrant_point_id_pct": 5.3,
+        "packet_summary_pct": 0.71,
+        "pgvector_embedding_pct": 0
+      },
+      "fts_sample_count": 0,
+      "fts_samples": []
+    },
+    "qdrant": {
+      "status": "LIVE_PASS",
+      "url": "http://127.0.0.1:6333",
+      "collection": "codebase_chunks_768",
+      "points": 40573,
+      "indexed_vectors": 121704,
+      "named_vectors": [
+        "content",
+        "error",
+        "signature"
+      ],
+      "content_vector_dim": 768
+    },
+    "redis": {
+      "status": "LIVE_PASS",
+      "container": "legal-ai-valkey",
+      "counts": {
+        "bifrost:*": 55,
+        "bifrost:sem:packet:*": 26,
+        "bifrost:sem:feature:*": 28,
+        "ace:context:*": 1,
+        "centroid:*": 8,
+        "som:*": 62
+      }
+    },
+    "code": {
+      "status": "LIVE_PASS",
+      "surfaces": {
+        "source_ref_normalizer": true,
+        "rrf_scorer": true,
+        "atlas_search_route": true,
+        "qdrant_upsert_adapter": true,
+        "redis_hot_cache_writer": true,
+        "embedding_qdrant_turbovec_proof": true
+      }
+    }
+  }
+}

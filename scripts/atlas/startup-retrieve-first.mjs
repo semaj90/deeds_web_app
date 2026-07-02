@@ -33,8 +33,8 @@
  *   node scripts/atlas/startup-retrieve-first.mjs --apply --verbose
  *
  * Verification:
- *   docker exec legal-ai-redis redis-cli HGETALL ace:startup:last_board
- *   docker exec legal-ai-redis redis-cli TTL    ace:startup:hot_domains
+ *   docker exec legal-ai-valkey redis-cli HGETALL ace:startup:last_board
+ *   docker exec legal-ai-valkey redis-cli TTL    ace:startup:hot_domains
  */
 
 import { existsSync, readFileSync } from 'fs';

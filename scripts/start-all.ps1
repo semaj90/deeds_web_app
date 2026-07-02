@@ -73,7 +73,7 @@ function Wait-Health {
 
 Write-Host "`n==> Starting Docker services" -ForegroundColor Cyan
 
-$requiredContainers  = @('legal-ai-postgres', 'legal-ai-redis', 'legal-ai-qdrant')
+$requiredContainers  = @('legal-ai-postgres', 'legal-ai-valkey', 'legal-ai-qdrant')
 $optionalContainers  = @(
   'legal-ai-rabbitmq', 'legal-ai-minio', 'legal-ai-neo4j',
   'legal-ai-couchdb',  'legal-ai-nats',  'legal-ai-bifrost',
@@ -119,7 +119,7 @@ Write-Host "`n==> Waiting for health..." -ForegroundColor Cyan
 
 # Required
 Wait-Health 'postgres'  { pg_isready -h 127.0.0.1 -p 5432 -U legal_admin 2>&1 | Out-Null; if ($LASTEXITCODE -ne 0) { throw } } -Required $true
-Wait-Health 'redis'     { docker exec legal-ai-redis redis-cli ping 2>&1 | Select-String 'PONG' | Out-Null; if ($LASTEXITCODE -ne 0) { throw } } -Required $true
+Wait-Health 'redis'     { docker exec legal-ai-valkey redis-cli ping 2>&1 | Select-String 'PONG' | Out-Null; if ($LASTEXITCODE -ne 0) { throw } } -Required $true
 Wait-Health 'qdrant'    { Invoke-HttpCheck 'http://localhost:6333/collections' } -Required $true
 Wait-Health 'ollama'    { Invoke-HttpCheck 'http://localhost:11434/api/tags' } -Required $true -MaxSeconds 180
 

@@ -41,7 +41,7 @@ else
 fi
 
 info "Checking Redis..."
-REDIS_CHECK=$(docker exec legal-ai-redis redis-cli ping 2>&1)
+REDIS_CHECK=$(docker exec legal-ai-valkey redis-cli ping 2>&1)
 if [ "$REDIS_CHECK" = "PONG" ]; then
   pass "Redis: Connected"
 else

@@ -14,7 +14,7 @@ const LOG_DIR = path.join(ROOT, 'logs', 'langextract-gemma4');
 
 const argv = new Set(process.argv.slice(2));
 const CHECK_ONLY = argv.has('--check');
-const PORT = Number(process.env.LANGEXTRACT_PORT || 8096);
+const PORT = Number(process.env.LANGEXTRACT_PORT || 8095);
 const BASE_URL = `http://127.0.0.1:${PORT}`;
 const LLAMA_SERVER_URL = String(process.env.LLAMA_SERVER_URL || process.env.TURBOQUANT_BASE_URL || 'http://127.0.0.1:8090').replace(/\/+$/, '');
 const LANGEXTRACT_MODEL = String(process.env.LANGEXTRACT_MODEL || 'gemma4-legal-iq4xs-direct.gguf');
@@ -90,6 +90,7 @@ function startService() {
       LANGEXTRACT_PORT: String(PORT),
       LLAMA_SERVER_URL,
       LANGEXTRACT_MODEL,
+      ENABLE_SPACY: process.env.ENABLE_SPACY ?? 'false',
     },
   });
   child.unref();

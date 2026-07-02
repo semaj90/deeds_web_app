@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-01T21:56:02.252Z",
+  "generated_at": "2026-07-02T03:00:36.182Z",
   "qdrant": {
     "url": "http://127.0.0.1:6333",
     "collection": "codebase_chunks_768",
@@ -59,7 +59,7 @@
   "sidecar_dim": 64,
   "http_health_before": {
     "ok": true,
-    "indexed": 1000,
+    "indexed": 0,
     "dim": 64,
     "bits": 4,
     "turbovec": true,
@@ -68,8 +68,8 @@
   "http_build": {
     "ok": true,
     "indexed": 1000,
-    "build_ms": 590,
-    "build_request_ms": 632
+    "build_ms": 641,
+    "build_request_ms": 662
   },
   "http_health_after": {
     "ok": true,
@@ -143,5 +143,5 @@
     ],
     "candidate_count": 10
   },
-  "elapsed_ms": 3060
+  "elapsed_ms": 4128
 }

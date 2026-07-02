@@ -543,6 +543,50 @@ function buildCanonicalLookups(rows) {
   const bySourceFeature = new Map();
   const bySourceRef = new Map();
 
+  function sourceRefVariants(value) {
+    const normalized = normalizeSourceRef(value);
+    if (!normalized) return [];
+    const variants = new Set([normalized]);
+    if (!normalized.startsWith('sveltekit-frontend/')) {
+      variants.add(`sveltekit-frontend/${normalized}`);
+    }
+    if (normalized.startsWith('sveltekit-frontend/')) {
+      variants.add(normalized.replace(/^sveltekit-frontend\//, ''));
+    }
+    for (const variant of [...variants]) {
+      if (variant.startsWith('src/lib/services/')) {
+        variants.add(variant.replace(/^src\/lib\/services\//, 'src/lib/server/services/'));
+      }
+      if (variant.startsWith('sveltekit-frontend/src/lib/services/')) {
+        variants.add(variant.replace(
+          /^sveltekit-frontend\/src\/lib\/services\//,
+          'sveltekit-frontend/src/lib/server/services/',
+        ));
+      }
+      if (variant.startsWith('src/lib/server/services/')) {
+        variants.add(variant.replace(/^src\/lib\/server\/services\//, 'src/lib/services/'));
+      }
+      if (variant.startsWith('sveltekit-frontend/src/lib/server/services/')) {
+        variants.add(variant.replace(
+          /^sveltekit-frontend\/src\/lib\/server\/services\//,
+          'sveltekit-frontend/src/lib/services/',
+        ));
+      }
+    }
+    return [...variants].filter(Boolean);
+  }
+
+  function addSourceRefLookup(sourceRef, row) {
+    for (const variant of sourceRefVariants(sourceRef)) {
+      bySourceRef.set(variant, row);
+      bySourceRef.set(variant.toLowerCase(), row);
+      if (row.featureId) {
+        bySourceFeature.set(`${variant}::${row.featureId}`, row);
+        bySourceFeature.set(`${variant.toLowerCase()}::${row.featureId.toLowerCase()}`, row);
+      }
+    }
+  }
+
   for (const row of rows) {
     if (row.qdrantPointId) {
       byQdrantId.set(row.qdrantPointId, row);
@@ -553,18 +597,14 @@ function buildCanonicalLookups(rows) {
       byPacketKey.set(pKey.toLowerCase(), row);
     }
     if (row.sourceRef) {
-      const sRef = normalizeSourceRef(row.sourceRef);
-      bySourceRef.set(sRef, row);
-      bySourceRef.set(sRef.toLowerCase(), row);
-      
-      if (row.featureId) {
-        bySourceFeature.set(`${sRef}::${row.featureId}`, row);
-        bySourceFeature.set(`${sRef.toLowerCase()}::${row.featureId.toLowerCase()}`, row);
-      }
+      addSourceRefLookup(row.sourceRef, row);
+    }
+    if (row.canonicalSourceRef && row.canonicalSourceRef !== row.sourceRef) {
+      addSourceRefLookup(row.canonicalSourceRef, row);
     }
   }
 
-  return { byQdrantId, byPacketKey, bySourceFeature, bySourceRef };
+  return { byQdrantId, byPacketKey, bySourceFeature, bySourceRef, sourceRefVariants };
 }
 
 function findCanonicalRow(point, lookups) {
@@ -583,30 +623,35 @@ function findCanonicalRow(point, lookups) {
   const featureId = normalizeText(point?.payload?.feature_id ?? point?.payload?.featureId ?? '');
 
   if (sourceRef) {
-    if (featureId) {
-      match = lookups.bySourceFeature.get(`${sourceRef}::${featureId}`)
-        ?? lookups.bySourceFeature.get(`${sourceRef.toLowerCase()}::${featureId.toLowerCase()}`);
+    for (const variant of lookups.sourceRefVariants(sourceRef)) {
+      if (featureId) {
+        match = lookups.bySourceFeature.get(`${variant}::${featureId}`)
+          ?? lookups.bySourceFeature.get(`${variant.toLowerCase()}::${featureId.toLowerCase()}`);
+        if (match) return match;
+      }
+      match = lookups.bySourceRef.get(variant) ?? lookups.bySourceRef.get(variant.toLowerCase());
       if (match) return match;
     }
-    match = lookups.bySourceRef.get(sourceRef) ?? lookups.bySourceRef.get(sourceRef.toLowerCase());
-    if (match) return match;
   }
 
   if (filePath) {
-    if (featureId) {
-      match = lookups.bySourceFeature.get(`${filePath}::${featureId}`)
-        ?? lookups.bySourceFeature.get(`${filePath.toLowerCase()}::${featureId.toLowerCase()}`);
+    for (const variant of lookups.sourceRefVariants(filePath)) {
+      if (featureId) {
+        match = lookups.bySourceFeature.get(`${variant}::${featureId}`)
+          ?? lookups.bySourceFeature.get(`${variant.toLowerCase()}::${featureId.toLowerCase()}`);
+        if (match) return match;
+      }
+      match = lookups.bySourceRef.get(variant) ?? lookups.bySourceRef.get(variant.toLowerCase());
       if (match) return match;
     }
-    match = lookups.bySourceRef.get(filePath) ?? lookups.bySourceRef.get(filePath.toLowerCase());
-    if (match) return match;
   }
 
   const sourceRefKey = normalizeText(point?.payload?.source_ref_key ?? '');
   if (sourceRefKey) {
-    const normKey = normalizeSourceRef(sourceRefKey);
-    match = lookups.bySourceRef.get(normKey) ?? lookups.bySourceRef.get(normKey.toLowerCase());
-    if (match) return match;
+    for (const variant of lookups.sourceRefVariants(sourceRefKey)) {
+      match = lookups.bySourceRef.get(variant) ?? lookups.bySourceRef.get(variant.toLowerCase());
+      if (match) return match;
+    }
   }
 
   return null;

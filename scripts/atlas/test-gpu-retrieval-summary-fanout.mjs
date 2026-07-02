@@ -23,7 +23,7 @@ for (const arg of process.argv.slice(2)) {
 const env = loadRepoEnv();
 const INPUT = path.resolve(REPO_ROOT, String(argv.get('input') ?? '.tmp/gpu-retrieval-summary-envelopes.ndjson'));
 const LIMIT = Number(argv.get('limit') ?? 6);
-const LANGEXTRACT_URL = String(argv.get('langextract-url') ?? env.LANGEXTRACT_URL ?? 'http://127.0.0.1:8096').replace(/\/+$/, '');
+const LANGEXTRACT_URL = String(argv.get('langextract-url') ?? env.LANGEXTRACT_URL ?? 'http://127.0.0.1:8095').replace(/\/+$/, '');
 const GEMMA4_URL = String(argv.get('gemma4-url') ?? env.GEMMA4_URL ?? env.LLAMA_SERVER_URL ?? 'http://127.0.0.1:8090').replace(/\/+$/, '');
 const OUT_ACE = path.resolve(REPO_ROOT, String(argv.get('ace-out') ?? '.tmp/ace-envelope-from-gpu-retrieval.ndjson'));
 const OUT_SEEDS = path.resolve(REPO_ROOT, String(argv.get('seeds-out') ?? '.tmp/kmeans-som-feature-seeds.ndjson'));
@@ -229,6 +229,65 @@ function extractLangFeatures(data) {
 async function langExtract(snippets) {
   const started = Date.now();
   const content = snippets.map((item) => `FILE: ${item.source_ref}\n${item.content}`).join('\n\n---\n\n').slice(0, 9000);
+
+  async function gemma4InlineExtraction(reason) {
+    const data = await postJson(`${GEMMA4_URL}/v1/chat/completions`, {
+      model: 'gemma4-legal-iq4xs-direct.gguf',
+      messages: [
+        {
+          role: 'system',
+          content: 'Extract compact codebase feature metadata. Return strict JSON only with entities, keywords, and structure.',
+        },
+        {
+          role: 'user',
+          content: JSON.stringify({
+            task: 'Extract entities, keywords, dependencies, and document_type from these code snippets.',
+            content,
+            required_json: {
+              entities: [{ text: 'string', label: 'string' }],
+              keywords: ['string'],
+              structure: { document_type: 'string', dependencies: ['string'] },
+            },
+          }),
+        },
+      ],
+      temperature: 0.1,
+      max_tokens: 420,
+      response_format: { type: 'json_object' },
+    }, 90_000);
+    const sanitized = sanitizeGemmaJsonText(data?.choices?.[0]?.message?.content ?? '');
+    let parsed;
+    try {
+      parsed = JSON.parse(sanitized.cleaned || '{}');
+    } catch {
+      parsed = {
+        entities: [],
+        keywords: [],
+        structure: { document_type: 'codebase_feature_envelope', parse_error: true },
+      };
+    }
+    parsed.entities = Array.isArray(parsed.entities) ? parsed.entities : [];
+    parsed.keywords = Array.isArray(parsed.keywords) ? parsed.keywords : [];
+    parsed.structure = parsed.structure && typeof parsed.structure === 'object'
+      ? parsed.structure
+      : { document_type: 'codebase_feature_envelope' };
+    return {
+      lane: {
+        status: 'FALLBACK_PASS',
+        url: LANGEXTRACT_URL,
+        endpoint: '/extract',
+        fallback_url: GEMMA4_URL,
+        fallback_endpoint: '/v1/chat/completions',
+        fallback_used: true,
+        reason,
+        duration_ms: Date.now() - started,
+        feature_count: extractLangFeatures(parsed).length,
+      },
+      data: parsed,
+      features: extractLangFeatures(parsed),
+    };
+  }
+
   try {
     const data = await postJson(`${LANGEXTRACT_URL}/extract`, {
       content,
@@ -249,17 +308,24 @@ async function langExtract(snippets) {
       features: extractLangFeatures(data),
     };
   } catch (error) {
-    return {
-      lane: {
-        status: 'FAIL',
-        url: LANGEXTRACT_URL,
-        endpoint: '/extract',
-        duration_ms: Date.now() - started,
-        error: error.message,
-      },
-      data: null,
-      features: [],
-    };
+    try {
+      return await gemma4InlineExtraction(`LangExtract unavailable: ${error.message}`);
+    } catch (fallbackError) {
+      return {
+        lane: {
+          status: 'FAIL',
+          url: LANGEXTRACT_URL,
+          endpoint: '/extract',
+          fallback_url: GEMMA4_URL,
+          fallback_endpoint: '/v1/chat/completions',
+          duration_ms: Date.now() - started,
+          error: error.message,
+          fallback_error: fallbackError.message,
+        },
+        data: null,
+        features: [],
+      };
+    }
   }
 }
 

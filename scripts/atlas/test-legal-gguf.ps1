@@ -118,6 +118,6 @@ Write-Host "══════════════════════�
 Write-Host ""
 Write-Host "Next steps:" -ForegroundColor Yellow
 Write-Host "  1. Start warm: npm run atlas:warm" -ForegroundColor Gray
-Write-Host "  2. Check cache: docker exec legal-ai-redis redis-cli KEYS 'bifrost:*' | wc -l" -ForegroundColor Gray
+Write-Host "  2. Check cache: docker exec legal-ai-valkey redis-cli KEYS 'bifrost:*' | wc -l" -ForegroundColor Gray
 Write-Host "  3. Monitor: docker logs legal-ai-bifrost --tail 50 --follow" -ForegroundColor Gray
 Write-Host ""

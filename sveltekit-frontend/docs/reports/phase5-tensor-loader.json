@@ -1,0 +1,15 @@
+{
+  "phase": "102-step-5",
+  "timestamp": "2026-07-02T04:38:01.205Z",
+  "embedding_count": 40568,
+  "embedding_dim": 384,
+  "memory_mb": 59.43,
+  "memory_gb": 0.058,
+  "gpu_available": false,
+  "precision": "fp32",
+  "metadata_rows": 40568,
+  "chunk_id_range": {
+    "min": "0000d635-8df8-4a03-a1b0-e33d2699f6c0",
+    "max": "fffe10ea-a814-4ff4-aa16-5535da32ae18"
+  }
+}

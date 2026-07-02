@@ -1,11 +1,11 @@
 {
-  "timestamp": "2026-06-14T03:20:05.413Z",
-  "mode": "apply",
+  "timestamp": "2026-07-02T03:27:45.884Z",
+  "mode": "dry-run",
   "collection": "codebase_chunks_768",
   "stats": {
-    "totalPackets": 17476,
-    "updated": 0,
-    "errors": 17476,
-    "batchSize": 100
+    "totalPackets": 58304,
+    "updated": 58304,
+    "errors": 0,
+    "batchSize": 10000
   }
 }

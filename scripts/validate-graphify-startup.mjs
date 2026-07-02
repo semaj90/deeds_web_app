@@ -7,10 +7,10 @@
  * - Port availability checks (LangExtract :8095, LLaMA :8090, etc.)
  * - OpenTelemetry schema detection
  * - Service health probes
- * - Dimensional conformance (384-dim embeddings)
+ * - Dimensional conformance (EmbeddingGemma 768-dim embeddings)
  *
  * Critical Services:
- *   - Embedding service (embeddinggemma:latest, 384-dim)
+ *   - Embedding service (embeddinggemma:latest, 768-dim)
  *   - Synthesis server (Gemma4 RotorQuant at :8090)
  *   - Go Retrieval (embedding sidecar + search)
  *   - TurboVec (vector prefilter at :8791)
@@ -55,15 +55,18 @@ const checks = [
     name: 'Embedding Service (embeddinggemma @ :11434)',
     port: 11434,
     url: 'http://127.0.0.1:11434/api/tags',
-    schema: { service: 'ollama', model: 'embeddinggemma', dim: 384, critical: true },
+    schema: { service: 'ollama', model: 'embeddinggemma', dim: 768, critical: true },
     validate: (data) => {
-      const models = data.models?.map(m => m.name) || [];
-      const hasEmbedding = models.some(m => m.includes('embedding'));
-      const dims = hasEmbedding ? '384-dim' : 'unknown';
+      const modelRows = data.models || [];
+      const models = modelRows.map(m => m.name);
+      const embeddingModel = modelRows.find(m => String(m.name || '').includes('embedding'));
+      const embeddingLength = embeddingModel?.details?.embedding_length || 768;
+      const hasEmbedding = Boolean(embeddingModel);
+      const dims = hasEmbedding ? `${embeddingLength}-dim` : 'unknown';
       return {
         ok: hasEmbedding,
         msg: hasEmbedding ? `✓ Ready (${dims})` : '✗ No embedding models',
-        schema: { service: 'ollama', dim: 384, models }
+        schema: { service: 'ollama', dim: embeddingLength, models }
       };
     }
   },
@@ -121,7 +124,7 @@ const checks = [
     name: 'Qdrant Vector DB (:6333)',
     port: 6333,
     url: 'http://127.0.0.1:6333/collections',
-    schema: { service: 'qdrant', dim: 384, vectors_stored: true },
+    schema: { service: 'qdrant', dim: 768, vectors_stored: true },
     validate: (data) => {
       const count = data.result?.collections?.length || 0;
       const hasCodebase = data.result?.collections?.some(c => c.name.includes('codebase')) || false;
@@ -135,7 +138,7 @@ const checks = [
   },
   {
     name: 'Postgres Truth Layer (port 5434)',
-    cmd: `docker exec legal-ai-postgres psql -U legal_admin -d legal_ai_db -c "SELECT count(*) FROM atlas_packets;" 2>&1 | grep -E '^[[:space:]]*[0-9]+' | tail -1 | xargs echo || echo "0"`,
+    cmd: `docker exec legal-ai-postgres psql -U legal_admin -d legal_ai_db -t -A -c "SELECT count(*) FROM atlas_packets;"`,
     validate: (output) => {
       const count = parseInt(output.trim()) || 0;
       const ok = count >= 10000; // Relaxed to 10K (accounting for dynamic loading)
@@ -147,9 +150,9 @@ const checks = [
   },
   {
     name: 'Valkey/Redis Cache (:6379)',
-    cmd: `docker exec legal-ai-redis redis-cli PING 2>&1 || echo "offline"`,
+    cmd: `docker exec legal-ai-valkey redis-cli -a redis PING`,
     validate: (output) => {
-      const ok = output.trim() === 'PONG';
+      const ok = output.includes('PONG');
       return {
         ok,
         msg: ok ? '✓ Connected' : `⚠ Redis offline (optional for graphify:daily)`
@@ -266,7 +269,7 @@ async function main() {
 
     // Report schema conformance
     console.log('📊 Schema Conformance:');
-    console.log(`  Embedding Dimension: 384-dim (canonical)`);
+    console.log(`  Embedding Dimension: 768-dim (canonical)`);
     console.log(`  Quantization: IQ4_XS (Gemma4) + 4-bit (TurboVec)`);
     console.log(`  OpenTelemetry: ${otelServices.length > 0 ? otelServices.join(', ') : 'Not detected'}`);
     console.log();

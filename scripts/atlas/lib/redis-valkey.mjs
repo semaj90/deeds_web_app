@@ -39,8 +39,8 @@ export function getRedisContainerCandidates(env = process.env) {
     env.PARENT_ATLAS_VALKEY_CONTAINER,
     env.REDIS_CONTAINER,
     env.VALKEY_CONTAINER,
-    'legal-ai-redis',
     'legal-ai-valkey',
+    'legal-ai-redis',
     'redis',
     'valkey',
   ].filter(Boolean);

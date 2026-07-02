@@ -4,7 +4,7 @@
  *
  * Validates optional rg (ripgrep) search integration for the repository.
  * Performs three checks:
- *   1. Docker containers: legal-ai-postgres, legal-ai-redis, legal-ai-qdrant
+ *   1. Docker containers: legal-ai-postgres, legal-ai-valkey, legal-ai-qdrant
  *   2. rg binary: Available in PATH or via npm
  *   3. Scripts wiring: Verify search integration points exist
  *
@@ -31,7 +31,7 @@ const execAsync = promisify(exec);
 
 const REQUIRED_CONTAINERS = [
   { name: 'legal-ai-postgres', port: 5432, purpose: 'Database (search index metadata)' },
-  { name: 'legal-ai-redis', port: 6379, purpose: 'Cache (query results)' },
+  { name: 'legal-ai-valkey', port: 6379, purpose: 'Cache (query results)' },
   { name: 'legal-ai-qdrant', port: 6333, purpose: 'Vector store (ANN search)' }
 ];
 

@@ -84,5 +84,5 @@ echo "════════════════════════�
 echo ""
 echo "Next steps:"
 echo "  1. Start warm: npm run atlas:warm"
-echo "  2. Check cache: docker exec legal-ai-redis redis-cli KEYS 'bifrost:*' | wc -l"
+echo "  2. Check cache: docker exec legal-ai-valkey redis-cli KEYS 'bifrost:*' | wc -l"
 echo "  3. Monitor: docker logs legal-ai-bifrost --tail 50 --follow"

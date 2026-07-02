@@ -40,10 +40,27 @@ function normalizeJoinKey(value) {
     .replace(/^sveltekit-frontend\//, '');
 }
 
+function joinKeyVariants(value) {
+  const normalized = normalizeJoinKey(value);
+  if (!normalized) return [];
+
+  const variants = new Set([normalized]);
+
+  // Some older Qdrant payloads were written before the server/services path
+  // was canonicalized. Preserve Postgres truth and only bridge the mirror join.
+  if (normalized.startsWith('src/lib/server/services/')) {
+    variants.add(normalized.replace(/^src\/lib\/server\/services\//, 'src/lib/services/'));
+  } else if (normalized.startsWith('src/lib/services/')) {
+    variants.add(normalized.replace(/^src\/lib\/services\//, 'src/lib/server/services/'));
+  }
+
+  return [...variants];
+}
+
 function addKey(map, key, packet) {
-  const normalized = normalizeJoinKey(key);
-  if (!normalized || map.has(normalized)) return;
-  map.set(normalized, packet);
+  for (const normalized of joinKeyVariants(key)) {
+    if (!map.has(normalized)) map.set(normalized, packet);
+  }
 }
 
 function vectorDim(point) {
@@ -74,7 +91,7 @@ function payloadKeys(point) {
     payload.canonicalSourceRef,
     payload.file_path,
     payload.filePath,
-  ].map(normalizeJoinKey).filter(Boolean);
+  ].flatMap(joinKeyVariants).filter(Boolean);
 }
 
 async function loadPackets(pool) {
@@ -86,35 +103,47 @@ async function loadPackets(pool) {
       file_path,
       source_path,
       qdrant_point_id,
+      qdrant_collection,
       payload,
-      metadata
-    FROM atlas_packets
-    WHERE packet_key IS NOT NULL
-      AND (
+      metadata,
+      (
         qdrant_point_id IS NULL
         OR qdrant_collection IS NULL
         OR qdrant_vector_dim IS NULL
-      )
+      ) AS needs_qdrant_link
+    FROM atlas_packets
+    WHERE packet_key IS NOT NULL
   `);
 
-  const map = new Map();
+  const missingMap = new Map();
+  const allMap = new Map();
+  let missingCount = 0;
   for (const packet of result.rows) {
-    addKey(map, packet.packet_key, packet);
-    addKey(map, packet.source_ref, packet);
-    addKey(map, packet.source_ref_key, packet);
-    addKey(map, packet.file_path, packet);
-    addKey(map, packet.source_path, packet);
-    addKey(map, packet.qdrant_point_id, packet);
-    addKey(map, packet.payload?.relative_path, packet);
-    addKey(map, packet.payload?.source_ref, packet);
-    addKey(map, packet.payload?.canonical_source_ref, packet);
-    addKey(map, packet.payload?.file_path, packet);
-    addKey(map, packet.metadata?.relative_path, packet);
-    addKey(map, packet.metadata?.source_ref, packet);
-    addKey(map, packet.metadata?.canonical_source_ref, packet);
-    addKey(map, packet.metadata?.file_path, packet);
+    const maps = packet.needs_qdrant_link ? [allMap, missingMap] : [allMap];
+    if (packet.needs_qdrant_link) missingCount++;
+    for (const map of maps) {
+      addKey(map, packet.packet_key, packet);
+      addKey(map, packet.source_ref, packet);
+      addKey(map, packet.source_ref_key, packet);
+      addKey(map, packet.file_path, packet);
+      addKey(map, packet.source_path, packet);
+      addKey(map, packet.qdrant_point_id, packet);
+      addKey(map, packet.payload?.relative_path, packet);
+      addKey(map, packet.payload?.source_ref, packet);
+      addKey(map, packet.payload?.canonical_source_ref, packet);
+      addKey(map, packet.payload?.file_path, packet);
+      addKey(map, packet.metadata?.relative_path, packet);
+      addKey(map, packet.metadata?.source_ref, packet);
+      addKey(map, packet.metadata?.canonical_source_ref, packet);
+      addKey(map, packet.metadata?.file_path, packet);
+    }
   }
-  return { packets: result.rows, keyToPacket: map };
+  return {
+    packets: result.rows,
+    missingCount,
+    keyToPacket: missingMap,
+    allKeyToPacket: allMap,
+  };
 }
 
 async function updatePacket(pool, match) {
@@ -167,18 +196,24 @@ async function main() {
     collection: COLLECTION,
     started_at: new Date().toISOString(),
     packets_loaded: 0,
+    all_packets_loaded: 0,
+    already_linked_seen: 0,
+    no_postgres_join_seen: 0,
     qdrant_points_scanned: 0,
     matches: 0,
     updated: 0,
     skipped_duplicate_packet: 0,
+    already_linked_samples: [],
+    no_postgres_join_samples: [],
     unmatched_samples: [],
     matched_samples: [],
     errors: [],
   };
 
   try {
-    const { packets, keyToPacket } = await loadPackets(pool);
-    report.packets_loaded = packets.length;
+    const { packets, missingCount, keyToPacket, allKeyToPacket } = await loadPackets(pool);
+    report.all_packets_loaded = packets.length;
+    report.packets_loaded = missingCount;
     const matchedPacketKeys = new Set();
     let offset = undefined;
 
@@ -195,9 +230,15 @@ async function main() {
       for (const point of points) {
         report.qdrant_points_scanned++;
         const dim = vectorDim(point);
-        for (const joinKey of payloadKeys(point)) {
+        const keys = payloadKeys(point);
+        let sawAnyPgMatch = false;
+        let sawMissingPgMatch = false;
+        for (const joinKey of keys) {
           const packet = keyToPacket.get(joinKey);
+          const anyPacket = allKeyToPacket.get(joinKey);
+          if (anyPacket) sawAnyPgMatch = true;
           if (!packet) continue;
+          sawMissingPgMatch = true;
           if (matchedPacketKeys.has(packet.packet_key)) {
             report.skipped_duplicate_packet++;
             break;
@@ -218,6 +259,29 @@ async function main() {
           }
           break;
         }
+        if (!sawMissingPgMatch) {
+          if (sawAnyPgMatch) {
+            report.already_linked_seen++;
+            if (report.already_linked_samples.length < 10) {
+              const packet = keys.map((key) => allKeyToPacket.get(key)).find(Boolean);
+              report.already_linked_samples.push({
+                pointId: point.id,
+                packetKey: packet?.packet_key ?? null,
+                sourceRef: packet?.source_ref ?? null,
+              });
+            }
+          } else {
+            report.no_postgres_join_seen++;
+            if (report.no_postgres_join_samples.length < 10) {
+              report.no_postgres_join_samples.push({
+                pointId: point.id,
+                qdrantPayloadKeys: keys.slice(0, 8),
+                relativePath: point.payload?.relative_path ?? null,
+                sourceRef: point.payload?.source_ref ?? point.payload?.sourceRef ?? null,
+              });
+            }
+          }
+        }
         if (LIMIT > 0 && report.qdrant_points_scanned >= LIMIT) break;
       }
 
@@ -228,7 +292,11 @@ async function main() {
 
     if (report.matches === 0) {
       report.status = 'WARN';
-      report.errors.push('No Postgres/Qdrant joins found. Check path normalization or collection payload schema.');
+      if (report.already_linked_seen > 0 || report.no_postgres_join_seen > 0) {
+        report.errors.push('Bounded scan found no missing-link updates. Scanned points were already linked or had path-drifted Qdrant payloads.');
+      } else {
+        report.errors.push('No Postgres/Qdrant joins found. Check path normalization or collection payload schema.');
+      }
     }
   } catch (error) {
     report.status = 'FAIL';
@@ -247,14 +315,25 @@ async function main() {
     `- mode: ${report.mode}`,
     `- collection: ${report.collection}`,
     `- packets_loaded: ${report.packets_loaded}`,
+    `- all_packets_loaded: ${report.all_packets_loaded}`,
     `- qdrant_points_scanned: ${report.qdrant_points_scanned}`,
     `- matches: ${report.matches}`,
     `- updated: ${report.updated}`,
     `- skipped_duplicate_packet: ${report.skipped_duplicate_packet}`,
+    `- already_linked_seen: ${report.already_linked_seen}`,
+    `- no_postgres_join_seen: ${report.no_postgres_join_seen}`,
     '',
     '## Matched Samples',
     '',
     ...report.matched_samples.map((m) => `- ${m.packetKey} -> ${m.pointId} via ${m.joinKey} (${m.vectorDim}d)`),
+    '',
+    '## Already Linked Samples',
+    '',
+    ...report.already_linked_samples.map((m) => `- ${m.packetKey} -> ${m.pointId} (${m.sourceRef})`),
+    '',
+    '## No Postgres Join Samples',
+    '',
+    ...report.no_postgres_join_samples.map((m) => `- ${m.pointId}: ${m.relativePath ?? m.sourceRef ?? 'unknown'}`),
     '',
     '## Errors',
     '',

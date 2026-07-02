@@ -135,9 +135,9 @@ async function cmdRestore() {
     // docker cp to container
     if (!DRY_RUN) {
       log(`  📋 Copying ${latestDump} to Redis container...`);
-      // This would be: docker cp docker-backup/redis-dump-*.rdb legal-ai-redis:/data/dump.rdb
+      // This would be: docker cp docker-backup/redis-dump-*.rdb legal-ai-valkey:/data/dump.rdb
       log(`  ✅ RDB restored (restart Redis to apply)`);
-      log(`  📝 Command: docker restart legal-ai-redis`);
+      log(`  📝 Command: docker restart legal-ai-valkey`);
     } else {
       log(`  [DRY-RUN] Would restore ${latestDump}`);
     }

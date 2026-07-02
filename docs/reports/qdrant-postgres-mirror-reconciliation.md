@@ -1,29 +1,29 @@
 # Qdrant / Postgres Mirror Reconciliation
 
-Generated: 2026-07-01T22:01:04.800Z
-Status: IN_SYNC
+Generated: 2026-07-02T03:46:01.937Z
+Status: RECONCILED
 Collection: codebase_chunks_768
-Apply requested: no
+Apply requested: yes
 
 ## Summary
 
 - canonical rows: 58298
-- qdrant points scanned: 250
-- joinable points: 229
-- orphan points: 21
-- agreement before: 229
-- agreement after: 229
-- suggested patches: 0
-- applied patches: 0
+- qdrant points scanned: 500
+- joinable points: 445
+- orphan points: 55
+- agreement before: 444
+- agreement after: 445
+- suggested patches: 1
+- applied patches: 1
 
 ## Field Coverage
 
 | field | canonical | payload-present | matched | mismatched | deferred |
 |---|---:|---:|---:|---:|---:|
-| source_ref | 229 | 229 | 229 | 0 | 0 |
-| feature_id | 229 | 229 | 229 | 0 | 0 |
-| packet_key | 229 | 229 | 229 | 0 | 0 |
-| metadata | 229 | 229 | 229 | 0 | 0 |
+| source_ref | 445 | 445 | 445 | 0 | 0 |
+| feature_id | 445 | 445 | 444 | 1 | 0 |
+| packet_key | 445 | 445 | 444 | 1 | 0 |
+| metadata | 445 | 445 | 444 | 1 | 0 |
 | cluster_id | 0 | 0 | 0 | 0 | 0 |
 | community_id | 0 | 0 | 0 | 0 | 0 |
 | topology_label | 0 | 0 | 0 | 0 | 0 |
@@ -31,7 +31,7 @@ Apply requested: no
 | cluster_key | 0 | 0 | 0 | 0 | 0 |
 | kmeans_cluster | 0 | 0 | 0 | 0 | 0 |
 | domain | 0 | 0 | 0 | 0 | 0 |
-| som_cluster | 0 | 21 | 0 | 0 | 0 |
+| som_cluster | 0 | 37 | 0 | 0 | 0 |
 
 ## Sample Orphans
 
@@ -46,7 +46,7 @@ Apply requested: no
 
 ## Patch Candidates
 
-- none
+- 01c6caaa-1cbd-4b92-a488-e6b6c17385de: feature_id, packet_key, metadata
 
 ## Gemma4 Context Visibility
 
@@ -69,5 +69,5 @@ Apply requested: no
 
 ## Next Safe Action
 
-Keep the payload lane read-only; the current canonical rows are already aligned with Qdrant for the checked fields.
+Backfill the Qdrant payload fields from the canonical Postgres spine using the apply alias, then rerun the audit.
 

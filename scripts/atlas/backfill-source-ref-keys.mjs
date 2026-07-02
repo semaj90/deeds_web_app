@@ -7,13 +7,12 @@
  */
 
 import pg from 'pg';
+import { loadRepoEnv, resolveDatabaseUrl } from './connection-config.mjs';
 import { normalizeSourceRef } from '../lib/canonical-source-ref.mjs';
 
-const DATABASE_URL =
-  process.env.DATABASE_URL ||
-  'postgresql://legal_admin:123456@127.0.0.1:5434/legal_ai_db';
-
 async function main() {
+  const env = loadRepoEnv();
+  const DATABASE_URL = resolveDatabaseUrl(env);
   const pool = new pg.Pool({ connectionString: DATABASE_URL });
 
   console.log('\n🔧 Backfilling source_ref_key in atlas_packets...');
@@ -48,6 +47,7 @@ async function main() {
         await client.query('BEGIN');
         for (const row of batch) {
           const canonical = normalizeSourceRef(row.source_ref);
+          if (!canonical) continue;
           await client.query(
             'UPDATE atlas_packets SET source_ref_key = $1 WHERE packet_id = $2',
             [canonical, row.packet_id]

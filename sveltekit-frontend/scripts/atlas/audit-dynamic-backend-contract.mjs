@@ -150,7 +150,7 @@ async function audit() {
   // G13: Redis is accessible
   let redisHealthy = false;
   try {
-    const redisRes = execSync(`docker exec legal-ai-redis redis-cli ping`, { encoding: 'utf-8', timeout: 2000 });
+    const redisRes = execSync(`docker exec legal-ai-valkey redis-cli ping`, { encoding: 'utf-8', timeout: 2000 });
     redisHealthy = redisRes.includes('PONG');
   } catch (e) {}
   gate('G13: Redis is accessible', redisHealthy ? 'PONG' : 'no response', redisHealthy) ? passed++ : failed++;
@@ -159,7 +159,7 @@ async function audit() {
   let redisMemory = 'unknown';
   if (redisHealthy) {
     try {
-      const info = execSync(`docker exec legal-ai-redis redis-cli info memory | grep used_memory_human`, {
+      const info = execSync(`docker exec legal-ai-valkey redis-cli info memory | grep used_memory_human`, {
         encoding: 'utf-8',
         timeout: 2000
       });

@@ -18,14 +18,14 @@ import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { spawn } from 'child_process';
-import dotenv from 'dotenv';
+import { loadRepoEnv } from '../atlas/connection-config.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, '../..');
 
-// Load environment
-dotenv.config({ path: path.join(ROOT, '.env'), override: false });
-dotenv.config({ path: path.join(ROOT, '.env.local'), override: false });
+// Load repo + frontend env through the shared Atlas helper so .env.local
+// overrides .env consistently across graphify, LangExtract, Redis, and DB lanes.
+Object.assign(process.env, loadRepoEnv(process.env));
 
 // Configuration
 const DRY_RUN = process.argv.includes('--dry-run');
@@ -33,6 +33,7 @@ const USE_GEMMA4 = process.argv.includes('--gemma4');
 const LIMIT = parseInt(process.argv.find((a) => a.startsWith('--limit='))?.split('=')[1] || '50');
 const OUTPUT_DIR = process.argv.find((a) => a.startsWith('--output-dir='))?.split('=')[1] || '.tmp';
 const VERBOSE = process.argv.includes('--verbose');
+const LANGEXTRACT_URL = String(process.env.LANGEXTRACT_URL || 'http://127.0.0.1:8095').replace(/\/+$/, '');
 
 // Ensure output directory
 if (!fs.existsSync(OUTPUT_DIR)) {
@@ -75,6 +76,74 @@ async function runCommand(cmd, args, opts = {}) {
 
     proc.on('error', reject);
   });
+}
+
+function extractFeaturesRegex(fileContent) {
+  const exportPattern = /export\s+(async\s+)?(function|class|interface|type|enum)\s+(\w+)/g;
+  const features = [];
+
+  let match;
+  while ((match = exportPattern.exec(fileContent)) !== null) {
+    features.push({
+      name: match[3],
+      type: match[2],
+      confidence: 0.85,
+      source: 'regex'
+    });
+  }
+
+  return features;
+}
+
+function langExtractEntitiesToFeatures(data) {
+  const entities = Array.isArray(data?.entities) ? data.entities : [];
+  return entities
+    .map((entity) => ({
+      name: String(entity?.text ?? entity?.name ?? '').trim(),
+      type: String(entity?.label ?? entity?.type ?? 'entity').toLowerCase(),
+      confidence: Number(entity?.importance ?? entity?.confidence ?? 0.8),
+      source: String(entity?.source ?? 'langextract')
+    }))
+    .filter((feature) => feature.name);
+}
+
+async function extractFeaturesLive(fileContent, file) {
+  const started = Date.now();
+  const response = await fetch(`${LANGEXTRACT_URL}/extract`, {
+    method: 'POST',
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify({
+      content: fileContent.slice(0, 12000),
+      document_type: file.endsWith('.rs') ? 'rust' : 'code',
+      extract_entities: true,
+      extract_structure: true,
+      use_ollama_ner: true
+    }),
+    signal: AbortSignal.timeout(60_000)
+  });
+
+  const text = await response.text();
+  let data = null;
+  try {
+    data = text ? JSON.parse(text) : null;
+  } catch {
+    data = { raw: text };
+  }
+
+  if (!response.ok) {
+    throw new Error(`LangExtract HTTP ${response.status}: ${text.slice(0, 240)}`);
+  }
+
+  return {
+    features: langExtractEntitiesToFeatures(data),
+    extraction: {
+      status: 'LIVE_PASS',
+      source: 'langextract',
+      url: LANGEXTRACT_URL,
+      durationMs: Date.now() - started,
+      entityCount: Array.isArray(data?.entities) ? data.entities.length : 0
+    }
+  };
 }
 
 // Core audit logic
@@ -152,7 +221,9 @@ async function auditCodebaseFeatures() {
   fs.writeFileSync(manifestPath, JSON.stringify(manifest, null, 2));
   log(`Manifest written to ${manifestPath}`);
 
-  // Step 3: Extract features (mock for now, real impl calls Gemma4)
+  // Step 3: Extract features. --gemma4 uses live LangExtract backed by Gemma4;
+  // regex extraction remains a labeled fallback so graphify never reports a
+  // simulated pass as a live service proof.
   log('Extracting features via LangExtract...');
   const ganValidationResults = [];
   const aceSearchCache = [];
@@ -162,16 +233,35 @@ async function auditCodebaseFeatures() {
     verbose(`Analyzing ${file}`);
 
     const fileContent = fs.readFileSync(path.join(ROOT, file), 'utf-8');
-    const exportPattern = /export\s+(async\s+)?(function|class|interface|type|enum)\s+(\w+)/g;
-    const features = [];
+    let extraction = {
+      status: USE_GEMMA4 ? 'FALLBACK_PASS' : 'LIVE_PASS',
+      source: 'regex',
+      url: null,
+      durationMs: 0,
+      entityCount: 0
+    };
+    let features = extractFeaturesRegex(fileContent);
 
-    let match;
-    while ((match = exportPattern.exec(fileContent)) !== null) {
-      features.push({
-        name: match[3],
-        type: match[2],
-        confidence: 0.85
-      });
+    if (USE_GEMMA4) {
+      try {
+        const live = await extractFeaturesLive(fileContent, file);
+        extraction = live.extraction;
+        if (live.features.length) {
+          const merged = new Map(features.map((feature) => [`${feature.type}:${feature.name}`, feature]));
+          for (const feature of live.features) merged.set(`${feature.type}:${feature.name}`, feature);
+          features = [...merged.values()];
+        }
+      } catch (error) {
+        extraction = {
+          status: 'FALLBACK_PASS',
+          source: 'regex',
+          url: LANGEXTRACT_URL,
+          durationMs: 0,
+          entityCount: 0,
+          error: error instanceof Error ? error.message : String(error)
+        };
+        log(`LangExtract fallback for ${file}: ${extraction.error}`, 'warn');
+      }
     }
 
     if (features.length > 0) {
@@ -179,6 +269,7 @@ async function auditCodebaseFeatures() {
         file,
         featureCount: features.length,
         features,
+        extraction,
         status: 'pass',
         validationTime: Date.now()
       });

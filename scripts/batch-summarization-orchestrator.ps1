@@ -100,7 +100,7 @@ if (-not $SkipEmbedding) {
 
 # Check Docker services (required for all pipelines)
 Write-Log "Docker services:" "INFO"
-foreach ($container in @("legal-ai-postgres", "legal-ai-redis", "legal-ai-rabbitmq", "legal-ai-qdrant", "legal-ai-go-embedding")) {
+foreach ($container in @("legal-ai-postgres", "legal-ai-valkey", "legal-ai-rabbitmq", "legal-ai-qdrant", "legal-ai-go-embedding")) {
     $status = docker ps --filter "name=$container" --format "{{.State}}" 2>$null
     if ($status -eq "running") {
         Write-Log "  ✓ $container running" "INFO"

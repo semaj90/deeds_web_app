@@ -1,7 +1,7 @@
 {
-  "generated_at": "2026-07-01T21:55:56.682Z",
+  "generated_at": "2026-07-02T03:45:17.685Z",
   "status": "LIVE_PASS",
-  "langextract_url": "http://127.0.0.1:8096",
+  "langextract_url": "http://127.0.0.1:8095",
   "llama_server_url": "http://127.0.0.1:8090",
   "model": "gemma4-legal-iq4xs-direct.gguf",
   "pid": null,
@@ -12,10 +12,10 @@
       "status": "healthy",
       "services": {
         "spacy_loaded": false,
-        "spacy_enabled": true,
+        "spacy_enabled": false,
         "llama_server_available": true
       },
-      "memory_mb": 22.5
+      "memory_mb": 21.5
     }
   },
   "notes": [

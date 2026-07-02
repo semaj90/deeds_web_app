@@ -258,7 +258,7 @@ async function runChecks() {
 
   if (!services.redis.status) {
     log('⚠️  Start Redis/Valkey:');
-    log('    docker-compose up -d legal-ai-redis\n');
+    log('    docker-compose up -d legal-ai-valkey\n');
   }
 
   if (!services.postgres.status) {

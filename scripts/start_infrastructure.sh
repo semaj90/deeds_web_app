@@ -18,7 +18,7 @@ set -e
 
 # Configuration
 POSTGRES_CONTAINER="postgres-pgvector"
-REDIS_CONTAINER="legal-ai-redis"
+REDIS_CONTAINER="legal-ai-valkey"
 RABBITMQ_CONTAINER="rabbitmq-legal"
 QDRANT_CONTAINER="legal-ai-qdrant"
 

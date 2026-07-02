@@ -37,7 +37,7 @@ const QDRANT_COLLECTION = String(args.get('collection') ?? env.QDRANT_CODE_COLLE
 const QDRANT_VECTOR_NAME = String(args.get('vector-name') ?? env.QDRANT_CODE_VECTOR_NAME ?? 'content');
 const TURBOVEC_GRPC_URL = String(args.get('turbovec-grpc') ?? env.TURBOVEC_SIDECAR_GRPC_URL ?? '127.0.0.1:50062');
 const GO_RETRIEVAL_URL = String(args.get('go-retrieval-url') ?? env.GO_RETRIEVAL_HTTP_URL ?? env.RETRIEVAL_HTTP_URL ?? 'http://127.0.0.1:8100').replace(/\/+$/, '');
-const LANGEXTRACT_URL = String(args.get('langextract-url') ?? env.LANGEXTRACT_URL ?? 'http://127.0.0.1:8096').replace(/\/+$/, '');
+const LANGEXTRACT_URL = String(args.get('langextract-url') ?? env.LANGEXTRACT_URL ?? 'http://127.0.0.1:8095').replace(/\/+$/, '');
 const GEMMA4_URL = String(args.get('gemma4-url') ?? env.LOCAL_OPENAI_BASE_URL ?? 'http://127.0.0.1:8090/v1').replace(/\/+$/, '');
 const GEMMA4_MODEL = String(args.get('gemma4-model') ?? env.LOCAL_GEMMA_MODEL ?? env.LANGEXTRACT_MODEL ?? 'gemma4-legal-iq4xs-direct.gguf');
 
@@ -385,6 +385,70 @@ async function langextract(rows) {
     `feature_label: ${row.feature_label ?? ''}`,
     `summary: ${row.summary ?? ''}`,
   ].join('\n')).join('\n\n---\n\n').slice(0, 12_000);
+
+  async function gemma4InlineExtraction(reason) {
+    const body = await fetchJson(`${GEMMA4_URL}/chat/completions`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${env.LOCAL_OPENAI_API_KEY ?? 'local'}`,
+      },
+      body: JSON.stringify({
+        model: GEMMA4_MODEL,
+        messages: [
+          {
+            role: 'system',
+            content: 'Extract compact codebase feature metadata. Return strict JSON only with entities, keywords, and structure.',
+          },
+          {
+            role: 'user',
+            content: JSON.stringify({
+              task: 'Extract entities, keywords, dependencies, and document_type from these Parent Atlas packet rows.',
+              content,
+              required_json: {
+                entities: [{ text: 'string', label: 'string' }],
+                keywords: ['string'],
+                structure: { document_type: 'string', dependencies: ['string'] },
+              },
+            }),
+          },
+        ],
+        temperature: 0.1,
+        max_tokens: 420,
+        response_format: { type: 'json_object' },
+      }),
+      timeoutMs: 90_000,
+    });
+    const sanitized = sanitizeGemma4Summary(body?.choices?.[0]?.message?.content ?? '');
+    let parsed;
+    try {
+      parsed = JSON.parse(sanitized.summary || sanitized.cleaned || '{}');
+    } catch {
+      parsed = {
+        entities: [],
+        keywords: [],
+        structure: { document_type: 'codebase_feature_envelope', parse_error: true },
+      };
+    }
+    parsed.entities = Array.isArray(parsed.entities) ? parsed.entities : [];
+    parsed.keywords = Array.isArray(parsed.keywords) ? parsed.keywords : [];
+    parsed.structure = parsed.structure && typeof parsed.structure === 'object'
+      ? parsed.structure
+      : { document_type: 'codebase_feature_envelope' };
+    return {
+      body: parsed,
+      lane: lane('FALLBACK_PASS', {
+        url: LANGEXTRACT_URL,
+        fallback_url: GEMMA4_URL,
+        fallback_used: true,
+        reason,
+        entities: parsed.entities.length,
+        structure_keys: Object.keys(parsed.structure).length,
+        duration_ms: Date.now() - started,
+      }),
+    };
+  }
+
   try {
     const body = await fetchJson(`${LANGEXTRACT_URL}/extract`, {
       method: 'POST',
@@ -408,14 +472,20 @@ async function langextract(rows) {
       }),
     };
   } catch (error) {
-    return {
-      body: null,
-      lane: lane('FAIL', {
-        url: LANGEXTRACT_URL,
-        error: error.message,
-        duration_ms: Date.now() - started,
-      }),
-    };
+    try {
+      return await gemma4InlineExtraction(`LangExtract unavailable: ${error.message}`);
+    } catch (fallbackError) {
+      return {
+        body: null,
+        lane: lane('FAIL', {
+          url: LANGEXTRACT_URL,
+          fallback_url: GEMMA4_URL,
+          error: error.message,
+          fallback_error: fallbackError.message,
+          duration_ms: Date.now() - started,
+        }),
+      };
+    }
   }
 }
 

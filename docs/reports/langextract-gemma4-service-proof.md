@@ -1,11 +1,11 @@
 # LangExtract Gemma4 Service Proof
 
-Generated: 2026-07-01T21:55:56.682Z
+Generated: 2026-07-02T03:45:17.685Z
 Status: LIVE_PASS
 
 ## Runtime
 
-- langextract_url: http://127.0.0.1:8096
+- langextract_url: http://127.0.0.1:8095
 - llama_server_url: http://127.0.0.1:8090
 - model: gemma4-legal-iq4xs-direct.gguf
 - pid: n/a

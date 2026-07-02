@@ -1,10 +1,10 @@
 {
-  "generatedAt": "2026-07-01T22:01:04.800Z",
-  "status": "IN_SYNC",
+  "generatedAt": "2026-07-02T03:46:01.937Z",
+  "status": "RECONCILED",
   "collection": "codebase_chunks_768",
   "qdrantUrl": "http://127.0.0.1:6333",
   "postgresContainer": "legal-ai-postgres",
-  "applyRequested": false,
+  "applyRequested": true,
   "qdrant": {
     "reachable": true,
     "error": null,
@@ -13,7 +13,7 @@
         "status": "green",
         "optimizer_status": "ok",
         "indexed_vectors_count": 121704,
-        "points_count": 40570,
+        "points_count": 40572,
         "segments_count": 4,
         "config": {
           "params": {
@@ -68,87 +68,7 @@
           }
         },
         "payload_schema": {
-          "centroid_id": {
-            "data_type": "keyword",
-            "points": 0
-          },
-          "symbol_name": {
-            "data_type": "keyword",
-            "points": 0
-          },
-          "summary_hash": {
-            "data_type": "keyword",
-            "points": 0
-          },
-          "source_ref": {
-            "data_type": "keyword",
-            "points": 32281
-          },
-          "tags": {
-            "data_type": "keyword",
-            "points": 32944
-          },
-          "semantic_path": {
-            "data_type": "keyword",
-            "points": 0
-          },
-          "cluster_key": {
-            "data_type": "keyword",
-            "points": 0
-          },
-          "error_id": {
-            "data_type": "keyword",
-            "points": 0
-          },
-          "file_path": {
-            "data_type": "keyword",
-            "points": 32258
-          },
-          "parent_centroid_id": {
-            "data_type": "keyword",
-            "points": 0
-          },
-          "language": {
-            "data_type": "keyword",
-            "points": 0
-          },
-          "repo": {
-            "data_type": "keyword",
-            "points": 0
-          },
-          "status": {
-            "data_type": "keyword",
-            "points": 0
-          },
-          "sourceRefs": {
-            "data_type": "keyword",
-            "points": 32258
-          },
-          "workspace_task_id": {
-            "data_type": "keyword",
-            "points": 0
-          },
-          "som_cluster": {
-            "data_type": "integer",
-            "points": 8310
-          },
-          "observed_at": {
-            "data_type": "keyword",
-            "points": 0
-          },
-          "next_action": {
-            "data_type": "keyword",
-            "points": 0
-          },
-          "path": {
-            "data_type": "keyword",
-            "points": 32258
-          },
-          "updated_at": {
-            "data_type": "integer",
-            "points": 0
-          },
-          "cluster_id": {
+          "workspace_id": {
             "data_type": "keyword",
             "points": 0
           },
@@ -156,7 +76,47 @@
             "data_type": "keyword",
             "points": 0
           },
+          "som_cluster": {
+            "data_type": "integer",
+            "points": 8310
+          },
+          "tags": {
+            "data_type": "keyword",
+            "points": 32944
+          },
+          "centroid_id": {
+            "data_type": "keyword",
+            "points": 0
+          },
+          "sourceRefs": {
+            "data_type": "keyword",
+            "points": 32258
+          },
+          "summary_hash": {
+            "data_type": "keyword",
+            "points": 0
+          },
+          "next_action": {
+            "data_type": "keyword",
+            "points": 0
+          },
+          "status": {
+            "data_type": "keyword",
+            "points": 0
+          },
+          "updated_at": {
+            "data_type": "integer",
+            "points": 0
+          },
           "point_kind": {
+            "data_type": "keyword",
+            "points": 0
+          },
+          "source_ref": {
+            "data_type": "keyword",
+            "points": 32299
+          },
+          "workspace_task_id": {
             "data_type": "keyword",
             "points": 0
           },
@@ -164,15 +124,55 @@
             "data_type": "keyword",
             "points": 0
           },
-          "workspace_id": {
+          "parent_centroid_id": {
+            "data_type": "keyword",
+            "points": 0
+          },
+          "cluster_id": {
+            "data_type": "keyword",
+            "points": 0
+          },
+          "repo": {
+            "data_type": "keyword",
+            "points": 0
+          },
+          "error_id": {
+            "data_type": "keyword",
+            "points": 0
+          },
+          "symbol_name": {
+            "data_type": "keyword",
+            "points": 0
+          },
+          "path": {
+            "data_type": "keyword",
+            "points": 32258
+          },
+          "topo_class": {
+            "data_type": "keyword",
+            "points": 0
+          },
+          "file_path": {
+            "data_type": "keyword",
+            "points": 32258
+          },
+          "language": {
             "data_type": "keyword",
             "points": 0
           },
           "feature_id": {
             "data_type": "keyword",
-            "points": 32281
+            "points": 32299
           },
-          "topo_class": {
+          "cluster_key": {
+            "data_type": "keyword",
+            "points": 0
+          },
+          "semantic_path": {
+            "data_type": "keyword",
+            "points": 0
+          },
+          "observed_at": {
             "data_type": "keyword",
             "points": 0
           }
@@ -182,18 +182,18 @@
         }
       },
       "status": "ok",
-      "time": 0.005532034
+      "time": 0.004986912
     }
   },
   "summary": {
     "canonicalRows": 58298,
-    "qdrantPointsScanned": 250,
-    "joinablePoints": 229,
-    "orphanPoints": 21,
-    "agreementBefore": 229,
-    "agreementAfter": 229,
-    "patchCandidates": 0,
-    "appliedPatches": 0,
+    "qdrantPointsScanned": 500,
+    "joinablePoints": 445,
+    "orphanPoints": 55,
+    "agreementBefore": 444,
+    "agreementAfter": 445,
+    "patchCandidates": 1,
+    "appliedPatches": 1,
     "applyFailures": 0,
     "deferredFields": {
       "qdrant_tag_id": "DEFERRED",
@@ -204,31 +204,31 @@
   },
   "fieldCoverage": {
     "source_ref": {
-      "canonical": 229,
-      "present": 229,
-      "matched": 229,
+      "canonical": 445,
+      "present": 445,
+      "matched": 445,
       "mismatched": 0,
       "deferred": 0
     },
     "feature_id": {
-      "canonical": 229,
-      "present": 229,
-      "matched": 229,
-      "mismatched": 0,
+      "canonical": 445,
+      "present": 445,
+      "matched": 444,
+      "mismatched": 1,
       "deferred": 0
     },
     "packet_key": {
-      "canonical": 229,
-      "present": 229,
-      "matched": 229,
-      "mismatched": 0,
+      "canonical": 445,
+      "present": 445,
+      "matched": 444,
+      "mismatched": 1,
       "deferred": 0
     },
     "metadata": {
-      "canonical": 229,
-      "present": 229,
-      "matched": 229,
-      "mismatched": 0,
+      "canonical": 445,
+      "present": 445,
+      "matched": 444,
+      "mismatched": 1,
       "deferred": 0
     },
     "cluster_id": {
@@ -282,7 +282,7 @@
     },
     "som_cluster": {
       "canonical": 0,
-      "present": 21,
+      "present": 37,
       "matched": 0,
       "mismatched": 0,
       "deferred": 0
@@ -372,9 +372,180 @@
     {
       "pointId": "01830c2b-80be-4f3a-bad2-e3c809ef5c1c",
       "reason": "not joinable to canonical Postgres spine"
+    },
+    {
+      "pointId": "0194cf36-53c5-4187-8a02-acf1ddaf4a5b",
+      "reason": "not joinable to canonical Postgres spine"
+    },
+    {
+      "pointId": "0199c1d6-3236-4a16-a632-ecd12db77945",
+      "reason": "not joinable to canonical Postgres spine"
+    },
+    {
+      "pointId": "019eba1d-ce59-410f-94c9-240717a5bcd8",
+      "reason": "not joinable to canonical Postgres spine"
+    },
+    {
+      "pointId": "01acf772-e27e-4555-b3b5-ddb467718a7e",
+      "reason": "not joinable to canonical Postgres spine"
+    },
+    {
+      "pointId": "01bd327f-24ba-4a52-b110-eeeceafa2c1d",
+      "reason": "not joinable to canonical Postgres spine"
+    },
+    {
+      "pointId": "01d18795-fb63-4c04-a9fc-696d8b6307ae",
+      "reason": "not joinable to canonical Postgres spine"
+    },
+    {
+      "pointId": "01e326cf-400c-4d45-8b09-083142b85bfb",
+      "reason": "not joinable to canonical Postgres spine"
+    },
+    {
+      "pointId": "01e66c37-c3b1-435f-9e9e-b975a3b08560",
+      "reason": "not joinable to canonical Postgres spine"
+    },
+    {
+      "pointId": "021954ea-c8cd-4ca0-971d-0a512f445bc5",
+      "reason": "not joinable to canonical Postgres spine"
+    },
+    {
+      "pointId": "022e0506-351f-4321-8ab1-8ead96f2346e",
+      "reason": "not joinable to canonical Postgres spine"
+    },
+    {
+      "pointId": "022eb3fb-b546-46b2-b42f-24102ff767b4",
+      "reason": "not joinable to canonical Postgres spine"
+    },
+    {
+      "pointId": "022fad88-25e9-446f-8a38-f9c4bbec970d",
+      "reason": "not joinable to canonical Postgres spine"
+    },
+    {
+      "pointId": "024123f1-1c97-437e-9c01-fe47be383e6e",
+      "reason": "not joinable to canonical Postgres spine"
+    },
+    {
+      "pointId": "02527db0-c735-42c5-9a09-aaac41e450b4",
+      "reason": "not joinable to canonical Postgres spine"
+    },
+    {
+      "pointId": "02571631-3f7b-41fd-a6e7-65e73dc78bec",
+      "reason": "not joinable to canonical Postgres spine"
+    },
+    {
+      "pointId": "02710ad5-cbab-408e-8f6e-482a623b04d1",
+      "reason": "not joinable to canonical Postgres spine"
+    },
+    {
+      "pointId": "028acf78-cd2d-4211-ba94-c15c43fa9216",
+      "reason": "not joinable to canonical Postgres spine"
+    },
+    {
+      "pointId": "028ce2eb-10be-4e1d-9158-0c4debb7728d",
+      "reason": "not joinable to canonical Postgres spine"
+    },
+    {
+      "pointId": "02900bd8-52ff-44de-a3ca-2a19a83165b5",
+      "reason": "not joinable to canonical Postgres spine"
+    },
+    {
+      "pointId": "029f03d2-eaa5-4193-9ae9-e734c643e1e2",
+      "reason": "not joinable to canonical Postgres spine"
+    },
+    {
+      "pointId": "02a1d423-face-43ba-b851-7c0fd94424a3",
+      "reason": "not joinable to canonical Postgres spine"
+    },
+    {
+      "pointId": "02a456f1-b2bb-4889-8568-0e04227d9a0b",
+      "reason": "not joinable to canonical Postgres spine"
+    },
+    {
+      "pointId": "02c32db5-4ce4-47bc-af25-2defdf1d41b1",
+      "reason": "not joinable to canonical Postgres spine"
+    },
+    {
+      "pointId": "02e919ae-9bdc-42d4-bc5f-dd6bc521c470",
+      "reason": "not joinable to canonical Postgres spine"
+    },
+    {
+      "pointId": "02e919e6-96ab-4660-9004-050b1f8d5c7c",
+      "reason": "not joinable to canonical Postgres spine"
+    },
+    {
+      "pointId": "02f10f38-4f90-4001-af58-041d7c89a4ec",
+      "reason": "not joinable to canonical Postgres spine"
+    },
+    {
+      "pointId": "0301f221-be66-423f-961b-9e02c5192363",
+      "reason": "not joinable to canonical Postgres spine"
+    },
+    {
+      "pointId": "030d9858-1d76-4dd8-9a46-a9283806a53c",
+      "reason": "not joinable to canonical Postgres spine"
+    },
+    {
+      "pointId": "03118e79-dee4-41b6-840a-4ecaf0b75142",
+      "reason": "not joinable to canonical Postgres spine"
+    },
+    {
+      "pointId": "0315066a-e9fa-4eff-bf4a-e6f2563210ad",
+      "reason": "not joinable to canonical Postgres spine"
+    },
+    {
+      "pointId": "03159f7d-e6b6-48d4-a26c-ed88dcb7efd9",
+      "reason": "not joinable to canonical Postgres spine"
+    },
+    {
+      "pointId": "031cf4bf-4e4a-4c51-8a5e-d67b8c0270a4",
+      "reason": "not joinable to canonical Postgres spine"
+    },
+    {
+      "pointId": "032d1a20-b1e9-4d70-8824-910726301b7c",
+      "reason": "not joinable to canonical Postgres spine"
+    },
+    {
+      "pointId": "032f0488-f502-451c-829e-9e48771a83f4",
+      "reason": "not joinable to canonical Postgres spine"
     }
   ],
-  "patchCandidates": [],
+  "patchCandidates": [
+    {
+      "pointId": "01c6caaa-1cbd-4b92-a488-e6b6c17385de",
+      "canonical": {
+        "sourceTable": "atlas_packets",
+        "qdrantPointId": "01c6caaa-1cbd-4b92-a488-e6b6c17385de",
+        "packetKey": "packet:3b4260e18be3",
+        "sourceRef": "sveltekit-frontend/src/lib/server/ace/context-assembler.ts",
+        "featureId": "sveltekit-frontend.context-assembler"
+      },
+      "mismatchedFields": [
+        "feature_id",
+        "packet_key",
+        "metadata"
+      ],
+      "patch": {
+        "feature_id": "sveltekit-frontend.context-assembler",
+        "packet_key": "packet:3b4260e18be3",
+        "metadata": {
+          "identity": {
+            "source": "filesystem",
+            "version": 1,
+            "created_at": "2026-06-28T08:36:38.074Z",
+            "created_by": "phase-d:whole-codebase-scan"
+          },
+          "workspace": {
+            "domain": "codebase",
+            "universe": "atlas",
+            "text_safe": true,
+            "size_bytes": 57
+          },
+          "qdrant_coarse_feature": "sveltekit-frontend.context-assembler"
+        }
+      }
+    }
+  ],
   "applyFailures": [],
   "deferredFields": {
     "qdrant_tag_id": {
@@ -490,8 +661,8 @@
     },
     "briefingCompatibility": {
       "greeting": "Hello James.",
-      "nextLane": "Maintain current packet contract alignment"
+      "nextLane": "Qdrant payload agreement"
     }
   },
-  "nextSafeAction": "Keep the payload lane read-only; the current canonical rows are already aligned with Qdrant for the checked fields."
+  "nextSafeAction": "Backfill the Qdrant payload fields from the canonical Postgres spine using the apply alias, then rerun the audit."
 }

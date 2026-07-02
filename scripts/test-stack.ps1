@@ -58,7 +58,7 @@ foreach ($test in $tests) {
 # Redis test
 Write-Host "4️⃣  Redis/Valkey" -ForegroundColor Yellow
 try {
-  $ping = docker exec legal-ai-redis redis-cli PING 2>&1
+  $ping = docker exec legal-ai-valkey redis-cli PING 2>&1
   if ($ping -eq "PONG") {
     Write-Host "   ✅ OK (PONG)" -ForegroundColor Green
   } else {

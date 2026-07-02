@@ -362,7 +362,7 @@ async function observeRedisKeyspace() {
     // Redis keyspace observation (reference only, requires Redis client)
     recommendations.redis_keyspace_observations.push({
       observation: 'Redis should have cache keys: bifrost:packet:*, centroid:*, gpu:karpathy:*',
-      gap: 'Verify via: docker exec legal-ai-redis redis-cli KEYS "*"',
+      gap: 'Verify via: docker exec legal-ai-valkey redis-cli KEYS "*"',
       recommendation: 'Monitor key patterns for orphaned entries',
     });
 

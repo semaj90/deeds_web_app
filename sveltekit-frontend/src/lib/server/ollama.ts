@@ -12,23 +12,26 @@
  */
 
 // VLM model configurations — resolved from ENV so .env overrides work without code changes.
+// CRITICAL (July 2026): Synthesis models come from llama-server :8090 (TurboQuant canonical).
+// Ollama serves EMBEDDING ONLY (embeddinggemma:latest @ :11434).
 // Keys are populated after ENV is imported below (see ── Config ──).
-// Callers use VLM_MODELS.legal / .vision / .embedding / .gemma4 as before.
+// Callers use VLM_MODELS.embedding for embeddings ONLY.
+// Callers use VLM_MODELS.legal / .gemma4 / .tool for synthesis → routed to llama-server :8090.
 export const VLM_MODELS: Record<'vision' | 'embedding' | 'legal' | 'gemma4' | 'tool', string> = {
-  /** Unified legal+VLM model (GRPO legal LoRA merged, mmproj vision, 5.3GB) */
-  vision: 'gemma4-rotorquant:latest',
+  /** Embedding model (Ollama :11434, 384-dim) */
   embedding: 'embeddinggemma:latest',
-  /** Legal text reasoning / chat / agentic tool-calling (same unified model) */
-  legal: 'gemma4-rotorquant:latest',
-  /** Gemma 4 unified — tool calling + thinking + vision */
-  gemma4: 'gemma4-rotorquant:latest',
+  /** Legal text reasoning / chat / agentic tool-calling (llama-server :8090, TurboQuant canonical) */
+  legal: 'gemma4-legal-iq4xs-direct.gguf',
+  /** Gemma 4 unified (llama-server :8090) — never Ollama */
+  gemma4: 'gemma4-legal-iq4xs-direct.gguf',
+  /** Vision+Legal (llama-server :8090) */
+  vision: 'gemma4-legal-iq4xs-direct.gguf',
   /**
-   * Structured-call translator (broker boundary).
-   * Defaults to unified Gemma 4. Set FUNCTION_GEMMA_MODEL=functiongemma:latest
-   * to route structured tool-call translation through the lighter 270M model
-   * once `ollama pull functiongemma:latest` has completed.
+   * Structured-call translator (llama-server :8090 canonical).
+   * Do NOT use Ollama for synthesis. Set FUNCTION_GEMMA_MODEL only if
+   * a separate llama-server instance is running on a different port.
    */
-  tool: 'gemma4-rotorquant:latest',
+  tool: 'gemma4-legal-iq4xs-direct.gguf',
 };
 
 export type VLMModel = string;
@@ -73,15 +76,20 @@ import * as Hypergraph from '$lib/server/ai/hypergraph-store.js';
 import safeJsonPost from '$lib/server/utils/safe-json-post.js';
 
 // ── Config ──────────────────────────────────────────────────────────────────
+// CRITICAL (July 2026): Synthesis routes to llama-server :8090 (TurboQuant canonical).
+// Embedding routes to Ollama :11434 (embeddinggemma:latest).
+// CHAT_BASE_URL MUST prefer llama-server. Do NOT fall back to Ollama for synthesis.
 
 const CHAT_BASE_URL =
+  ENV.LLAMA_SERVER_URL ??
   ENV.TURBOQUANT_URL ??
   ENV.TURBOQUANT_BASE_URL ??
-  ENV.LLAMA_SERVER_URL ??
-  ENV.OLLAMA_BASE_URL;
+  'http://127.0.0.1:8090';
+
 const EMBED_BASE_URL =
   ENV.OLLAMA_EMBED_BASE_URL ??
-  ENV.OLLAMA_BASE_URL;
+  ENV.OLLAMA_BASE_URL ??
+  'http://127.0.0.1:11434';
 
 export function getOllamaEndpoint(): string {
   return CHAT_BASE_URL;
@@ -157,12 +165,14 @@ export function assertDirectOllamaAllowed(
   }
 }
 
-// Populate VLM_MODELS from ENV now that ENV is initialized
-VLM_MODELS.vision = ENV.OLLAMA_VLM_MODEL;
-VLM_MODELS.gemma4 = ENV.GEMMA4_MODEL;
-VLM_MODELS.legal = ENV.OLLAMA_CHAT_MODEL;
-VLM_MODELS.embedding = ENV.OLLAMA_EMBED_MODEL;
-VLM_MODELS.tool = ENV.FUNCTION_GEMMA_MODEL;
+// Populate VLM_MODELS from ENV now that ENV is initialized.
+// CRITICAL: Embedding uses Ollama. Synthesis uses llama-server :8090.
+VLM_MODELS.embedding = ENV.OLLAMA_EMBED_MODEL ?? 'embeddinggemma:latest';
+// Synthesis models: prefer env overrides, else use llama-server canonical
+VLM_MODELS.legal = ENV.OLLAMA_CHAT_MODEL ?? 'gemma4-legal-iq4xs-direct.gguf';
+VLM_MODELS.gemma4 = ENV.GEMMA4_MODEL ?? 'gemma4-legal-iq4xs-direct.gguf';
+VLM_MODELS.vision = ENV.OLLAMA_VLM_MODEL ?? 'gemma4-legal-iq4xs-direct.gguf';
+VLM_MODELS.tool = ENV.FUNCTION_GEMMA_MODEL ?? 'gemma4-legal-iq4xs-direct.gguf';
 
 // ── HTTP Keep-Alive Agent ───────────────────────────────────────────────────
 // Reuses TCP connections to Ollama instead of creating new ones per request.

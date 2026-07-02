@@ -1,12 +1,12 @@
 {
-  "generated_at": "2026-07-01T21:55:55.253Z",
+  "generated_at": "2026-07-02T03:54:00.905Z",
   "status": "PASS_WITH_WARNINGS",
   "summary": {
     "livePass": 10,
     "fallbackPass": 0,
     "fail": 0,
     "criticalFailures": 0,
-    "legacyWarnings": 2
+    "legacyWarnings": 1
   },
   "probes": [
     {
@@ -16,7 +16,7 @@
       "transport": "http",
       "status": "LIVE_PASS",
       "fallback_used": false,
-      "duration_ms": 72,
+      "duration_ms": 95,
       "details": {
         "http_status": 200,
         "body": {
@@ -56,7 +56,7 @@
               "aliases": [],
               "tags": [],
               "object": "model",
-              "created": 1782942953,
+              "created": 1782964439,
               "owned_by": "llamacpp",
               "meta": {
                 "vocab_type": 2,
@@ -73,22 +73,22 @@
     },
     {
       "service_name": "langextract",
-      "url": "http://127.0.0.1:8096",
-      "port": 8096,
+      "url": "http://127.0.0.1:8095",
+      "port": 8095,
       "transport": "http",
       "status": "LIVE_PASS",
       "fallback_used": false,
-      "duration_ms": 601,
+      "duration_ms": 711,
       "details": {
         "http_status": 200,
         "body": {
           "status": "healthy",
           "services": {
             "spacy_loaded": false,
-            "spacy_enabled": true,
+            "spacy_enabled": false,
             "llama_server_available": true
           },
-          "memory_mb": 21
+          "memory_mb": 6.9
         }
       }
     },
@@ -108,7 +108,7 @@
       "transport": "http",
       "status": "LIVE_PASS",
       "fallback_used": false,
-      "duration_ms": 38,
+      "duration_ms": 19,
       "details": {
         "http_status": 200,
         "body": {
@@ -117,7 +117,7 @@
           "qdrantConnected": true,
           "redisConnected": true,
           "status": "healthy",
-          "timestamp": 1782942954515
+          "timestamp": 1782964439754
         }
       }
     },
@@ -128,7 +128,7 @@
       "transport": "http",
       "status": "LIVE_PASS",
       "fallback_used": false,
-      "duration_ms": 13,
+      "duration_ms": 9,
       "details": {
         "http_status": 200,
         "body": {
@@ -137,7 +137,19 @@
             {
               "id": "embeddinggemma:latest",
               "object": "model",
-              "created": 1782936588,
+              "created": 1778308570,
+              "owned_by": "library"
+            },
+            {
+              "id": "ibm/granite-docling:258m",
+              "object": "model",
+              "created": 1775418523,
+              "owned_by": "ibm"
+            },
+            {
+              "id": "nomic-embed-text:latest",
+              "object": "model",
+              "created": 1760835136,
               "owned_by": "library"
             }
           ]
@@ -151,7 +163,7 @@
       "transport": "http",
       "status": "LIVE_PASS",
       "fallback_used": false,
-      "duration_ms": 16,
+      "duration_ms": 43,
       "details": {
         "http_status": 200,
         "body": {
@@ -262,7 +274,7 @@
             ]
           },
           "status": "ok",
-          "time": 0.000025001
+          "time": 0.001957686
         }
       }
     },
@@ -273,7 +285,7 @@
       "transport": "postgres",
       "status": "LIVE_PASS",
       "fallback_used": false,
-      "duration_ms": 42
+      "duration_ms": 30
     },
     {
       "service_name": "seaweedfs",
@@ -282,27 +294,27 @@
       "transport": "http",
       "status": "LIVE_PASS",
       "fallback_used": false,
-      "duration_ms": 6,
+      "duration_ms": 8,
       "details": {
         "http_status": 403,
-        "body": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<Error><Code>AccessDenied</Code><Message>Access Denied.</Message><Resource>/</Resource><RequestId>18BE492BB91465DD48CD3E58</RequestId></Error>"
+        "body": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<Error><Code>AccessDenied</Code><Message>Access Denied.</Message><Resource>/</Resource><RequestId>18BE5CB624D69405D6FEF3B0</RequestId></Error>"
       }
     },
     {
       "service_name": "neo4j",
-      "url": "http://localhost:7474",
+      "url": "http://127.0.0.1:7474",
       "port": 7474,
       "transport": "http",
       "status": "LIVE_PASS",
       "fallback_used": false,
-      "duration_ms": 27,
+      "duration_ms": 682,
       "details": {
         "http_status": 200,
         "body": {
-          "bolt_routing": "neo4j://localhost:7687",
-          "query": "http://localhost:7474/db/{databaseName}/query/v2",
-          "transaction": "http://localhost:7474/db/{databaseName}/tx",
-          "bolt_direct": "bolt://localhost:7687",
+          "bolt_routing": "neo4j://127.0.0.1:7687",
+          "query": "http://127.0.0.1:7474/db/{databaseName}/query/v2",
+          "transaction": "http://127.0.0.1:7474/db/{databaseName}/tx",
+          "bolt_direct": "bolt://127.0.0.1:7687",
           "neo4j_version": "5.26.27",
           "neo4j_edition": "community"
         }
@@ -315,37 +327,10 @@
       "transport": "redis",
       "status": "LIVE_PASS",
       "fallback_used": false,
-      "duration_ms": 170
+      "duration_ms": 340
     }
   ],
   "legacy_warnings": [
-    {
-      "lane": "langextract-stale-8095",
-      "severity": "WARN",
-      "reason": "Legacy LangExtract listener still advertises ollama_available; canonical Gemma4-backed LangExtract is 127.0.0.1:8096.",
-      "probe": {
-        "service_name": "langextract-stale-8095",
-        "url": "http://127.0.0.1:8095",
-        "port": 8095,
-        "transport": "http",
-        "status": "FAIL",
-        "fallback_used": false,
-        "duration_ms": 427,
-        "error": "HTTP 200",
-        "details": {
-          "http_status": 200,
-          "body": {
-            "status": "healthy",
-            "services": {
-              "spacy_loaded": false,
-              "spacy_enabled": true,
-              "ollama_available": true
-            },
-            "memory_mb": 20
-          }
-        }
-      }
-    },
     {
       "lane": "turbovec-jsonrpc-8792",
       "severity": "WARN",
@@ -357,7 +342,7 @@
         "transport": "http",
         "status": "FAIL",
         "fallback_used": false,
-        "duration_ms": 4,
+        "duration_ms": 5,
         "error": "fetch failed"
       }
     }
