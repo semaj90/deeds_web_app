@@ -1,0 +1,38 @@
+{
+  "status": "scaffolded",
+  "production_summary_backend": {
+    "name": "llama-server RotorQuant GGUF",
+    "url": "http://127.0.0.1:8090",
+    "model": "gemma4-legal-iq4xs-direct.gguf"
+  },
+  "onnx_triton_scaffold": {
+    "model_repository": "triton-trt-llm/model-repositories/gemma4-onnx-q4f16",
+    "models": [
+      "gemma4_e2b_q4f16_embed_tokens",
+      "gemma4_e2b_q4f16_decoder"
+    ],
+    "source": "sveltekit-frontend/static/gemma4_e2b_onnx/onnx",
+    "serving_status": "tensor_backend_only",
+    "needs_adapter_for_summaries": true
+  },
+  "copied_control_files": [
+    "scripts/download-gemma4-e2b-onnx.sh",
+    "scripts/materialize-gemma4-onnx-triton-repo.mjs",
+    "scripts/start-gemma4-onnx-triton.ps1",
+    "scripts/start-triton-trtllm-engine.sh",
+    "scripts/gemma4_onnx_triton_adapter.py",
+    "scripts/phase7-triton-batch-summaries.mjs",
+    "reports/gemma4-onnx-triton-repo-proof.json"
+  ],
+  "future_trt_llm_lane": {
+    "status": "not_built",
+    "rule": "Build from supported Hugging Face/PyTorch checkpoint weights, not from GGUF."
+  },
+  "protocols": {
+    "json_rpc": "ACP/MCP control and validation",
+    "rabbitmq": "batch orchestration",
+    "triton_http_grpc": "tensor inference",
+    "grpc_protobuf": "Go Retrieval, TurboVec, embedding sidecars",
+    "msgpack": "compact packet serialization"
+  }
+}

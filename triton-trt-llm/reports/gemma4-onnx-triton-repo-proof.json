@@ -1,0 +1,65 @@
+{
+  "status": "PASS",
+  "sourceDir": "C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\static\\gemma4_e2b_onnx\\onnx",
+  "outDir": "C:\\Users\\james\\Videos\\deeds-web-app\\triton-model-repository",
+  "apply": true,
+  "copyMode": false,
+  "models": [
+    {
+      "model": "gemma4_e2b_q4f16_embed_tokens",
+      "versionDir": "C:\\Users\\james\\Videos\\deeds-web-app\\triton-model-repository\\gemma4_e2b_q4f16_embed_tokens\\1",
+      "files": [
+        {
+          "source": "C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\static\\gemma4_e2b_onnx\\onnx\\embed_tokens_q4f16.onnx",
+          "dest": "C:\\Users\\james\\Videos\\deeds-web-app\\triton-model-repository\\gemma4_e2b_q4f16_embed_tokens\\1\\embed_tokens_q4f16.onnx",
+          "exists": true,
+          "bytes": 5621,
+          "mode": "hardlink"
+        },
+        {
+          "source": "C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\static\\gemma4_e2b_onnx\\onnx\\embed_tokens_q4f16.onnx_data",
+          "dest": "C:\\Users\\james\\Videos\\deeds-web-app\\triton-model-repository\\gemma4_e2b_q4f16_embed_tokens\\1\\embed_tokens_q4f16.onnx_data",
+          "exists": true,
+          "bytes": 1590689792,
+          "mode": "hardlink"
+        }
+      ],
+      "ready": true,
+      "modelAlias": {
+        "dest": "C:\\Users\\james\\Videos\\deeds-web-app\\triton-model-repository\\gemma4_e2b_q4f16_embed_tokens\\1\\model.onnx",
+        "mode": "hardlink",
+        "note": "Triton default ONNX filename alias; original ONNX filename is also retained for external-data compatibility."
+      }
+    },
+    {
+      "model": "gemma4_e2b_q4f16_decoder",
+      "versionDir": "C:\\Users\\james\\Videos\\deeds-web-app\\triton-model-repository\\gemma4_e2b_q4f16_decoder\\1",
+      "files": [
+        {
+          "source": "C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\static\\gemma4_e2b_onnx\\onnx\\decoder_model_merged_q4f16.onnx",
+          "dest": "C:\\Users\\james\\Videos\\deeds-web-app\\triton-model-repository\\gemma4_e2b_q4f16_decoder\\1\\decoder_model_merged_q4f16.onnx",
+          "exists": true,
+          "bytes": 673231,
+          "mode": "hardlink"
+        },
+        {
+          "source": "C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\static\\gemma4_e2b_onnx\\onnx\\decoder_model_merged_q4f16.onnx_data",
+          "dest": "C:\\Users\\james\\Videos\\deeds-web-app\\triton-model-repository\\gemma4_e2b_q4f16_decoder\\1\\decoder_model_merged_q4f16.onnx_data",
+          "exists": true,
+          "bytes": 1519700992,
+          "mode": "hardlink"
+        }
+      ],
+      "ready": true,
+      "modelAlias": {
+        "dest": "C:\\Users\\james\\Videos\\deeds-web-app\\triton-model-repository\\gemma4_e2b_q4f16_decoder\\1\\model.onnx",
+        "mode": "hardlink",
+        "note": "Triton default ONNX filename alias; original ONNX filename is also retained for external-data compatibility."
+      }
+    }
+  ],
+  "warnings": [
+    "ONNX Triton materialization is an inference-graph scaffold only; generation requires an adapter.",
+    "Do not replace llama-server Phase7 summary backend until the adapter has a live PASS proof."
+  ]
+}

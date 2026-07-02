@@ -24,8 +24,8 @@ const REPORTS_DIR = path.join(__dirname, '../../docs/reports');
 const CANONICAL_DIM = 384;
 const SOM_GRID_SIZE = 20; // 20×20 = 400 neurons
 const K_CLUSTERS = SOM_GRID_SIZE * SOM_GRID_SIZE;
-const MAX_ITERATIONS = 100;
-const TOLERANCE = 0.001;
+const MAX_ITERATIONS = 30;  // Reduced from 100 for faster convergence
+const TOLERANCE = 0.05;     // Relaxed from 0.001 (5% changes acceptable)
 
 // Simple k-means implementation (CPU fallback)
 function computeEuclideanDistance(vec1, vec2) {
@@ -38,60 +38,52 @@ function computeEuclideanDistance(vec1, vec2) {
 }
 
 function initializeCentroids(embeddings, k) {
-  // K-means++ initialization
+  // Fast random initialization (k-means++ is too slow for 40K embeddings)
+  // Instead: random k points from embeddings
   const centroids = [];
+  const indices = new Set();
 
-  // Add first random centroid
-  const firstIdx = Math.floor(Math.random() * embeddings.length);
-  centroids.push(new Float32Array(embeddings[firstIdx]));
+  while (indices.size < k) {
+    indices.add(Math.floor(Math.random() * embeddings.length));
+  }
 
-  // Add remaining centroids
-  for (let i = 1; i < k; i++) {
-    let maxMinDist = -1;
-    let bestIdx = 0;
-
-    for (let j = 0; j < embeddings.length; j++) {
-      let minDist = Infinity;
-      for (const centroid of centroids) {
-        const dist = computeEuclideanDistance(embeddings[j], centroid);
-        minDist = Math.min(minDist, dist);
-      }
-
-      if (minDist > maxMinDist) {
-        maxMinDist = minDist;
-        bestIdx = j;
-      }
-    }
-
-    centroids.push(new Float32Array(embeddings[bestIdx]));
+  for (const idx of indices) {
+    centroids.push(new Float32Array(embeddings[idx]));
   }
 
   return centroids;
 }
 
-function kmeansIteration(embeddings, centroids) {
+function kmeansIteration(embeddings, centroids, logProgress = false) {
   const k = centroids.length;
   const n = embeddings.length;
   const assignments = new Uint32Array(n);
   let changed = 0;
 
-  // Assign each point to nearest centroid
-  for (let i = 0; i < n; i++) {
-    let minDist = Infinity;
-    let bestCluster = 0;
+  // Assign each point to nearest centroid (batch processing for speed)
+  const batchSize = 1000;
+  for (let batch = 0; batch < n; batch += batchSize) {
+    const end = Math.min(batch + batchSize, n);
+    for (let i = batch; i < end; i++) {
+      let minDist = Infinity;
+      let bestCluster = 0;
 
-    for (let c = 0; c < k; c++) {
-      const dist = computeEuclideanDistance(embeddings[i], centroids[c]);
-      if (dist < minDist) {
-        minDist = dist;
-        bestCluster = c;
+      for (let c = 0; c < k; c++) {
+        const dist = computeEuclideanDistance(embeddings[i], centroids[c]);
+        if (dist < minDist) {
+          minDist = dist;
+          bestCluster = c;
+        }
       }
-    }
 
-    if (assignments[i] !== bestCluster) {
-      changed++;
+      if (assignments[i] !== bestCluster) {
+        changed++;
+      }
+      assignments[i] = bestCluster;
     }
-    assignments[i] = bestCluster;
+    if (logProgress && batch % 5000 === 0) {
+      console.error(`  Progress: ${Math.round((batch / n) * 100)}%`);
+    }
   }
 
   // Compute new centroids

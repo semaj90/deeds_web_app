@@ -587,6 +587,12 @@ pico-main/
 # These contain large binaries (291-418MB ONNX, 32MB tokenizer.json)
 # After clone: copy from node_modules or download from HuggingFace
 sveltekit-frontend/static/embeddinggemma_300m_onnx/
+sveltekit-frontend/static/gemma4_e2b_onnx/onnx/
+triton-model-repository/
+triton-trt-llm/model-repositories/
+triton-trt-llm/models/**/tokenizer.json
+triton-trt-llm/models/**/*.onnx
+triton-trt-llm/models/**/*.onnx_data*
 sveltekit-frontend/static/models/
 
 ########################################

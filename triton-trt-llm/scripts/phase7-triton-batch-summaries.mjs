@@ -53,7 +53,6 @@ const { Pool } = pg;
 const env = loadRepoEnv();
 const RABBITMQ_URL = env.RABBITMQ_URL || 'amqp://guest:guest@127.0.0.1:5672';
 const TRITON_URL = env.TRITON_URL || 'http://127.0.0.1:8000';
-const GEMMA4_ONNX_ADAPTER_URL = env.GEMMA4_ONNX_ADAPTER_URL || 'http://127.0.0.1:8098';
 const LLAMA_SERVER_URL = env.LLAMA_SERVER_URL || env.GEMMA4_URL || 'http://127.0.0.1:8090';
 const LLAMA_MODEL = env.LLAMA_MODEL || env.GEMMA4_MODEL || 'gemma4-legal-iq4xs-direct.gguf';
 const QDRANT_URL = env.QDRANT_URL || 'http://127.0.0.1:6333';
@@ -86,7 +85,8 @@ const allowGemma4Fallback = process.argv.includes('--allow-gemma4-fallback');
 const MAX_GEMMA4_FALLBACK_BATCH = parseInt(env.PHASE7_MAX_GEMMA4_FALLBACK_BATCH || '32');
 const allowLargeLlamaBatch = process.argv.includes('--allow-large-llama-batch');
 
-const QUEUE_NAME = 'summaries.batch.work';
+const EXCHANGE = 'summaries.batch.fanout';
+const QUEUE_PREFIX = 'summaries.batch.worker';
 const PREFETCH = 1; // Process one batch at a time
 
 function stripGemmaChannelBlocks(text) {
@@ -107,11 +107,6 @@ async function probeTriton() {
   if (!res.ok) throw new Error(`Triton ${res.status}: ${await res.text()}`);
 }
 
-async function probeGemma4OnnxAdapter() {
-  const res = await fetch(`${GEMMA4_ONNX_ADAPTER_URL.replace(/\/+$/, '')}/health`, { timeout: 5000 });
-  if (!res.ok) throw new Error(`Gemma4 ONNX adapter ${res.status}: ${await res.text()}`);
-}
-
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 // STEP 1: Produce Batches
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -125,8 +120,7 @@ async function produceQueue() {
     connection = await amqp.connect(RABBITMQ_URL);
     channel = await connection.createChannel();
 
-    // Assert durable work queue (no exchange needed for direct queue)
-    await channel.assertQueue(QUEUE_NAME, { durable: true });
+    await channel.assertExchange(EXCHANGE, 'fanout', { durable: true });
 
     // Fetch all unsummarized chunks
     const result = await pool.query(`
@@ -159,8 +153,9 @@ async function produceQueue() {
         timestamp: Date.now()
       };
 
-      channel.sendToQueue(
-        QUEUE_NAME,
+      channel.publish(
+        EXCHANGE,
+        '',
         Buffer.from(JSON.stringify(message)),
         { persistent: true, contentType: 'application/json' }
       );
@@ -173,7 +168,7 @@ async function produceQueue() {
       }
     }
 
-    console.log(`\n  ✅ Enqueued ${enqueued} batches of ${batchSize} packets to ${QUEUE_NAME}`);
+    console.log(`\n  ✅ Enqueued ${enqueued} batches of ${batchSize} packets to ${EXCHANGE}`);
     console.log(`  📋 Start worker: node phase7-triton-batch-summaries.mjs --worker --batch-size=${batchSize}\n`);
 
   } catch (err) {
@@ -199,10 +194,6 @@ async function generateBatchSummaries(contents) {
       );
     }
     return await fallbackGemma4Batch(contents);
-  }
-
-  if (backend === 'gemma4-onnx' || backend === 'onnx-adapter') {
-    return await gemma4OnnxAdapterBatch(contents);
   }
 
   if (backend !== 'triton') {
@@ -260,29 +251,6 @@ async function generateBatchSummaries(contents) {
     // Fallback to sequential Gemma4 (slower but works without Triton)
     return await fallbackGemma4Batch(contents);
   }
-}
-
-async function gemma4OnnxAdapterBatch(contents) {
-  const res = await fetch(`${GEMMA4_ONNX_ADAPTER_URL.replace(/\/+$/, '')}/v1/summaries`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      model: 'gemma4-e2b-q4f16-onnx-triton',
-      input: contents,
-      max_tokens: 150,
-      temperature: 0.2,
-      stream: false
-    }),
-    timeout: 180000
-  });
-
-  if (!res.ok) {
-    throw new Error(`Gemma4 ONNX adapter ${res.status}: ${await res.text()}`);
-  }
-
-  const data = await res.json();
-  const rows = Array.isArray(data.data) ? data.data : [];
-  return rows.map(row => stripGemmaChannelBlocks(row.summary ?? row.text ?? ''));
 }
 
 async function fallbackGemma4Batch(contents) {
@@ -370,7 +338,7 @@ async function updateBatchResults(chunks, summaries) {
 
 async function startWorker() {
   console.log(`\n🤖 Batch Worker ${workerId}: Starting (batch size=${batchSize})\n`);
-  console.log(`  Backend: ${backend}${backend === 'llama-server' || backend === 'gemma4' ? ` (${LLAMA_SERVER_URL}, ${LLAMA_MODEL})` : backend === 'gemma4-onnx' || backend === 'onnx-adapter' ? ` (${GEMMA4_ONNX_ADAPTER_URL})` : ` (${TRITON_URL})`}`);
+  console.log(`  Backend: ${backend}${backend === 'llama-server' || backend === 'gemma4' ? ` (${LLAMA_SERVER_URL}, ${LLAMA_MODEL})` : ` (${TRITON_URL})`}`);
   if (once) console.log(`  Smoke mode: --once enabled; worker exits after one batch.\n`);
 
   let connection, channel;
@@ -380,8 +348,6 @@ async function startWorker() {
   try {
     if (backend === 'llama-server' || backend === 'gemma4') {
       await probeLlamaServer();
-    } else if (backend === 'gemma4-onnx' || backend === 'onnx-adapter') {
-      await probeGemma4OnnxAdapter();
     } else if (backend === 'triton') {
       await probeTriton();
     }
@@ -389,15 +355,18 @@ async function startWorker() {
     connection = await amqp.connect(RABBITMQ_URL);
     channel = await connection.createChannel();
 
-    // Assert durable work queue (direct, no exchange)
-    await channel.assertQueue(QUEUE_NAME, { durable: true });
+    await channel.assertExchange(EXCHANGE, 'fanout', { durable: true });
+
+    const queueName = `${QUEUE_PREFIX}.${workerId}`;
+    const queue = await channel.assertQueue(queueName, { durable: true });
+    await channel.bindQueue(queue.queue, EXCHANGE, '');
 
     await channel.prefetch(PREFETCH);
 
-    console.log(`  ✓ Listening on ${QUEUE_NAME}`);
+    console.log(`  ✓ Listening on ${queueName}`);
     console.log(`  Type Ctrl+C to stop\n`);
 
-    await channel.consume(QUEUE_NAME, async (msg) => {
+    await channel.consume(queue.queue, async (msg) => {
       if (!msg) return;
 
       try {
