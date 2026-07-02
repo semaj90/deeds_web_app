@@ -50,6 +50,8 @@
     "atlas:code-features:populate-summaries": "node scripts/atlas/populate-feature-summaries.mjs --dry-run",
     "atlas:code-features:populate-summaries:apply": "node scripts/atlas/populate-feature-summaries.mjs --apply --verbose",
     "atlas:code-features:summaries:verify": "node scripts/atlas/verify-feature-summaries.mjs",
+    "atlas:phase1b:index:dry": "node scripts/atlas/phase-1b-postgres-bm25-index.mjs --dry-run",
+    "atlas:phase1b:index:apply": "node scripts/atlas/phase-1b-postgres-bm25-index.mjs --apply --verbose",
     "batch:summaries:test10": "node ../scripts/atlas/batch-summaries-test10.mjs",
     "batch:summaries:apply": "node ../scripts/atlas/batch-summaries-apply.mjs",
     "batch:summaries:wrapped:test10": "node scripts/atlas/batch-summaries-wrapped.mjs --batch=10 --dry-run",

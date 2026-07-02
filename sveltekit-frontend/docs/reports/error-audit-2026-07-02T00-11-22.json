@@ -1,0 +1,14 @@
+{
+  "timestamp": "2026-07-02T00:11:22.669Z",
+  "table_exists": false,
+  "total_errors": 0,
+  "by_category": {},
+  "by_severity": {},
+  "by_route": {},
+  "unresolved_count": 0,
+  "critical_count": 0,
+  "recommendations": [
+    "Create error_logs table via migration",
+    "Wire error collection into API routes"
+  ]
+}

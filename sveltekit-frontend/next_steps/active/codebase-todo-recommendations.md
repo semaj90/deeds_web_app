@@ -51,7 +51,7 @@ After the canonical loop is current, run a codebase mapping pass against the act
 
 ## Engram Sidecar Gap Map
 - Durable address registry is still missing as a single contract. Track the explicit ownership fields (`memory_id`, `source_id`, `chunk_id`, `summary_id`, `cluster_id`, `packet_id`, `embedding_id`) in one registry before widening the sidecar.
-- Semantic cache policy is still fragmented across Redis exact-match, semantic cache, Bifrost, Qdrant, and ACE packet caches. Keep the exact-cache key contract, semantic-cache compatibility contract, packet-version contract, and invalidation rule visible in the backlog.
+- Semantic cache policy is still fragmented across Redis exact-match, slight variance redis cache, semantic cache, Bifrost, Qdrant, and ACE packet caches. Keep the exact-cache key contract, semantic-cache compatibility contract, packet-version contract, and invalidation rule visible in the backlog.
 - Deque semantics should stay bounded to recent-session memory only; queue semantics should remain for ingestion/backfill/embedding/rebuild jobs. Do not blur those roles in the next registry pass.
 - The existing `engram-memory.ts` and `local-engram-memory-adapter.ts` are the current seed, not the durable registry boundary.
 
