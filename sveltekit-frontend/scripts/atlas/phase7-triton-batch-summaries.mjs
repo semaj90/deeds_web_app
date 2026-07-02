@@ -328,20 +328,35 @@ async function updateBatchResults(chunks, summaries) {
    *   3. Redis (cache)
    */
 
+  console.log(`  📝 Writing ${summaries.length} summaries to Postgres/Redis/Qdrant...`);
+
   await redis.connect();
 
   try {
+    let written = 0;
     for (let i = 0; i < chunks.length; i++) {
       const chunk = chunks[i];
       const summary = summaries[i] || '';
 
-      if (!summary) continue;
+      if (!summary) {
+        console.log(`    ⊘ Chunk ${i}: empty summary, skipping`);
+        continue;
+      }
+      written++;
 
       // 1. Postgres update
-      await pool.query(
-        `UPDATE codebase_chunk_index SET summary = $1, updated_at = NOW() WHERE id = $2`,
-        [summary, chunk.chunk_id]
-      );
+      try {
+        const result = await pool.query(
+          `UPDATE codebase_chunk_index SET summary = $1, updated_at = NOW() WHERE id = $2`,
+          [summary, chunk.chunk_id]
+        );
+        if (result.rowCount === 0) {
+          console.log(`    ⚠ Chunk ${chunk.chunk_id} not found in Postgres`);
+        }
+      } catch (pgErr) {
+        console.error(`    ❌ Postgres error for chunk ${chunk.chunk_id}: ${pgErr.message}`);
+        throw pgErr;
+      }
 
       // 2. Redis cache (TTL 24h)
       const cacheKey = `bitfrost:summary:${chunk.chunk_id}`;
@@ -362,7 +377,11 @@ async function updateBatchResults(chunks, summaries) {
         }
       }
     }
+    console.log(`  ✓ Written ${written} summaries to Postgres/Redis/Qdrant`);
 
+  } catch (err) {
+    console.error(`  ❌ Write-back error: ${err.message}`);
+    throw err;
   } finally {
     await redis.quit();
   }
