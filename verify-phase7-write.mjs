@@ -34,22 +34,22 @@ async function verify() {
   console.log('=== Phase 7 Write-Back Verification ===\n');
 
   try {
-    // 1. Summary counts with detailed breakdown
+    // 1. Summary counts with detailed breakdown (correct metrics)
     console.log('📊 Summary Counts:');
     const counts = await pool.query(`
       SELECT
-        COUNT(*) FILTER (WHERE summary IS NOT NULL) AS summary_not_null,
-        COUNT(*) FILTER (WHERE summary IS NOT NULL AND summary != '') AS summary_non_empty,
-        COUNT(*) FILTER (WHERE summary IS NULL OR summary = '') AS summary_missing,
+        COUNT(*) FILTER (WHERE summary IS NULL) AS null_summary,
+        COUNT(*) FILTER (WHERE summary = '') AS empty_summary,
+        COUNT(*) FILTER (WHERE summary IS NOT NULL AND summary != '') AS non_empty_summary,
         MAX(updated_at) AS latest_update,
         EXTRACT(EPOCH FROM (NOW() - MAX(updated_at)))::int AS seconds_since_update
       FROM codebase_chunk_index
     `);
 
     const row = counts.rows[0];
-    console.log(`  ✓ Not NULL:       ${row.summary_not_null}`);
-    console.log(`  ✓ Non-empty:      ${row.summary_non_empty}`);
-    console.log(`  ○ Missing/Empty:  ${row.summary_missing}`);
+    console.log(`  ○ NULL:           ${row.null_summary}`);
+    console.log(`  ○ Empty string:   ${row.empty_summary}`);
+    console.log(`  ✓ Non-empty:      ${row.non_empty_summary}`);
     console.log(`  ✓ Latest update:  ${row.latest_update}`);
     console.log(`  ✓ Since update:   ${row.seconds_since_update}s ago`);
 

@@ -343,7 +343,6 @@ async function updateBatchResults(chunks, summaries) {
         continue;
       }
       written++;
-      console.log(`    Summary ${i}: length=${summary.length} bytes`);
 
       // 1. Postgres update (with type safety for UUID/text mismatch)
       try {
@@ -351,7 +350,7 @@ async function updateBatchResults(chunks, summaries) {
           `UPDATE codebase_chunk_index SET summary = $1, updated_at = NOW() WHERE id::text = $2::text`,
           [summary, String(chunk.chunk_id)]
         );
-        console.log(`    Postgres: chunk_id=${chunk.chunk_id} rows=${result.rowCount}`);
+        console.log(`    chunk=${chunk.chunk_id.substring(0, 8)}... len=${summary.length} rows=${result.rowCount}`);
         if (result.rowCount === 0) {
           console.log(`    ⚠ Chunk ${chunk.chunk_id} not found in Postgres`);
         }
