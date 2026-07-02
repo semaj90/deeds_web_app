@@ -343,13 +343,15 @@ async function updateBatchResults(chunks, summaries) {
         continue;
       }
       written++;
+      console.log(`    Summary ${i}: length=${summary.length} bytes`);
 
-      // 1. Postgres update
+      // 1. Postgres update (with type safety for UUID/text mismatch)
       try {
         const result = await pool.query(
-          `UPDATE codebase_chunk_index SET summary = $1, updated_at = NOW() WHERE id = $2`,
-          [summary, chunk.chunk_id]
+          `UPDATE codebase_chunk_index SET summary = $1, updated_at = NOW() WHERE id::text = $2::text`,
+          [summary, String(chunk.chunk_id)]
         );
+        console.log(`    Postgres: chunk_id=${chunk.chunk_id} rows=${result.rowCount}`);
         if (result.rowCount === 0) {
           console.log(`    ⚠ Chunk ${chunk.chunk_id} not found in Postgres`);
         }
