@@ -946,3 +946,9 @@ docs/reports/ignored-directory-audit.min.json
 docs/reports/ignored-directory-audit*.gz
 docs/reports/ignored-directory-audit*.zst
 models/autoencoder/autoencoder_latent_index.json
+
+# Large Phase 7 exports (>10MB, pre-commit hook rejects; generated locally, not tracked)
+exports/
+exports/phase7-summaries-*.json
+exports/phase7-summaries-*.csv
+exports/phase7-export-manifest-*.json
