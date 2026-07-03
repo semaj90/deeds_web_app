@@ -41,17 +41,17 @@
                          stock           K=q8_0  V=q8_0   (works on stock llama.cpp)
                          turboquant      K=q8_0  V=turbo3 (TurboQuant-enabled binary required)
                          turboquant-safe K=q8_0  V=q8_0   (parity-safe, keep large TURBO_CTX)
-                         atomicbot       K=turbo3 V=turbo3 (AtomicBot binary + --mtp-head required;
+                         atomicbot       K=turbo3 V=turbo3 (AtomicBot binary + Gemma4 assistant drafter;
                                           download AtomicBot-ai/atomic-llama-cpp-turboquant-binaries,
-                                          set LLAMA_SERVER_PATH; +30-50% throughput on short prompts;
-                                          requires MTP_HEAD_PATH sidecar .mtp file)
+                                          set LLAMA_SERVER_PATH; speculative decode lane uses
+                                          --spec-draft-model / --spec-type draft-mtp on current builds)
   TURBO_KV_K           overrides profile K (must be in the known KV allowlist)
   TURBO_KV_V           overrides profile V (must be in the known KV allowlist)
   TURBO_CTX            default: 65536
   TURBO_NGL            default: 99
-  MTP_HEAD_PATH        optional: path to .mtp sidecar file for AtomicBot --mtp-head speculative decoding
+  MTP_HEAD_PATH        legacy/optional: path to a .mtp sidecar file for older AtomicBot builds
   ENABLE_MTP_DRAFTER   optional: "true" enables speculative decoding benchmark lane when MTP_DRAFT_MODEL exists
-  MTP_DRAFT_MODEL      optional: path to a small compatible GGUF used only as a draft-model draft guesser
+  MTP_DRAFT_MODEL      optional: path to the Gemma4 assistant drafter GGUF used for speculative decoding
   LEGAL_LORA_PATH      optional: path to legal LoRA adapter GGUF (--lora injection for base-model GGUFs
                          like majentik/gemma-4-E4B-RotorQuant-GGUF-IQ4_XS that ship without the fine-tune)
   LEGAL_LORA_SCALE     optional: LoRA strength 0.0-1.0 (default 0.8; lower = more base, higher = more adapter)
@@ -243,7 +243,7 @@ switch ($kvProfile) {
   'stock'           { $kvProfileK = 'q8_0';   $kvProfileV = 'q8_0' }
   'turboquant'      { $kvProfileK = 'q8_0';   $kvProfileV = 'turbo3' }
   'turboquant-safe' { $kvProfileK = 'q8_0';   $kvProfileV = 'q8_0' }
-  'atomicbot'       { $kvProfileK = 'q8_0';   $kvProfileV = 'q8_0' }
+  'atomicbot'       { $kvProfileK = 'turbo3';  $kvProfileV = 'turbo3' }
   'turbo3'          { $kvProfileK = 'q8_0';   $kvProfileV = 'turbo3' }
   'turbo4'          { $kvProfileK = 'q8_0';   $kvProfileV = 'turbo4' }
 }
@@ -497,26 +497,44 @@ if (Test-LlamaFlag $llama '--parallel') {
 }
 
 if ($kvProfile -eq 'atomicbot') {
-    # Enable TriAttention v2 (2026) for Gemma 4
-    $baseArgs = $baseArgs + @(
-      '--triattention-budget', '4096',
-      '--triattention-window', '128',
-      '--triattention-mode', 'per-kv-head',
-      '--triattention-normalize'
-    )
+    # Enable triattention only if the binary actually advertises it.
+    # Some Atomic builds ship speculative decode but not this extra kernel path.
+    if (Test-LlamaFlag $llama '--triattention-budget') {
+      $baseArgs = $baseArgs + @(
+        '--triattention-budget', '4096',
+        '--triattention-window', '128',
+        '--triattention-mode', 'per-kv-head',
+        '--triattention-normalize'
+      )
+    } else {
+      Write-Host "AtomicBot: triattention flags not advertised by this binary - skipping" -ForegroundColor Yellow
+    }
 }
-# -- Speculative Decoding: inject --model-draft for accelerated throughput --
+# -- Speculative Decoding: inject Atomic/spec-draft flags for accelerated throughput --
 if ($TurboDraftModel) {
-  Write-Host ("Speculative Decoding: --model-draft enabled ($TurboDraftModel)") -ForegroundColor Cyan
+  $specDraftFlagsSupported = Test-LlamaFlag $llama '--spec-draft-n-max'
+  Write-Host ("Speculative Decoding: draft model enabled ($TurboDraftModel)") -ForegroundColor Cyan
   Write-Host ("Speculative Decoding automatically disables vision/multimodal (--mmproj)") -ForegroundColor Yellow
   $TextOnly = $true
-  $baseArgs = $baseArgs + @(
-    '--model-draft', $TurboDraftModel,
-    '--draft-max', '8',
-    '--draft-min', '1',
-    '--draft-p-min', '0.6',
-    '--n-gpu-layers-draft', '99'
-  )
+  if ($specDraftFlagsSupported) {
+    $baseArgs = $baseArgs + @(
+      '--spec-draft-model', $TurboDraftModel,
+      '--spec-type', 'draft-mtp',
+      '--spec-draft-n-max', '3',
+      '--spec-draft-n-min', '0',
+      '--spec-draft-ngl', '99',
+      '-ctkd', 'turbo3',
+      '-ctvd', 'turbo3'
+    )
+  } else {
+    $baseArgs = $baseArgs + @(
+      '--model-draft', $TurboDraftModel,
+      '--draft-max', '8',
+      '--draft-min', '1',
+      '--draft-p-min', '0.6',
+      '--n-gpu-layers-draft', '99'
+    )
+  }
 }
 
 if (-not $TextOnly -and (Test-Path $mmproj)) {
@@ -564,18 +582,14 @@ if ($env:LEGAL_LORA_PATH) {
   }
 }
 
-# -- AtomicBot: inject --mtp-head for Multi-Token Prediction speculative decode --
-# AtomicBot-ai/atomic-llama-cpp-turboquant-binaries ships Gemma 4 D=256/512 support
-# + MTP (multi-token prediction) for +30-50% throughput on short-prompt workloads.
-# Requires a .mtp sidecar file alongside the main GGUF (usually same basename + .mtp).
-# Set MTP_HEAD_PATH to override; defaults to model path with .mtp extension.
+# -- AtomicBot: inject draft-model + MTP speculative decode for Gemma4 assistant --
+# Current Atomic binary exposes --spec-draft-model / --spec-type draft-mtp.
+# This lane is benchmark-only; keep the canonical 8090 summary server separate.
 if ($kvProfile -eq 'atomicbot') {
-  $mtpPath = if ($env:MTP_HEAD_PATH) { $env:MTP_HEAD_PATH } else { [System.IO.Path]::ChangeExtension($model, '.mtp') }
-  if (Test-Path $mtpPath) {
-    Write-Host ("AtomicBot: --mtp-head enabled ($mtpPath)") -ForegroundColor Cyan
-    $baseArgs = $baseArgs + @('--mtp-head', $mtpPath)
+  if ($TurboDraftModel -and (Test-Path $TurboDraftModel)) {
+    Write-Host ("AtomicBot: draft assistant active ($TurboDraftModel)") -ForegroundColor Cyan
   } else {
-    Write-Host ("AtomicBot: MTP sidecar not found at $mtpPath - running without --mtp-head (set MTP_HEAD_PATH to fix)") -ForegroundColor Yellow
+    Write-Host ("AtomicBot: no draft assistant path found - running as target-only benchmark") -ForegroundColor Yellow
   }
 }
 

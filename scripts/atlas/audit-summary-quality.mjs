@@ -16,6 +16,7 @@
 import { createPool } from 'pg';
 import { readFileSync } from 'fs';
 import path from 'path';
+import crypto from 'crypto';
 import { fileURLToPath } from 'url';
 
 const __dir = path.dirname(fileURLToPath(import.meta.url));
@@ -28,7 +29,6 @@ const summaryEnrichmentPath = path.resolve(
 
 // Inline implementations (since we can't directly import TS from Node)
 function contentHash(text) {
-  const crypto = await import('crypto');
   return crypto.createHash('sha256').update(text || '').digest('hex').slice(0, 16);
 }
 
@@ -185,8 +185,8 @@ async function main() {
     if (isReport || isDryRun) {
       // Write full audit to temp file
       const reportPath = '.tmp/summary-quality-audit.json';
-      const fs = await import('fs');
-      fs.writeFileSync(
+      const { writeFileSync } = await import('fs');
+      writeFileSync(
         reportPath,
         JSON.stringify({
           timestamp: new Date().toISOString(),

@@ -5,6 +5,8 @@ const LEAK_PATTERNS = [
   /<\|start\|>\s*(analysis|thought|reasoning)\b/i,
   /<start_of_turn>/i,
   /<end_of_turn>/i,
+  /<\s*start\s+of\s+turn\s*>/i,
+  /<\s*end\s+of\s+turn\s*>/i,
   /<\|message\|>/i,
   /<\|end\|>/i,
   /<\|endthinking\|?>/i,
@@ -12,6 +14,8 @@ const LEAK_PATTERNS = [
   /<thinking\b[^>]*>/i,
   /<\/think>/i,
   /<\/thinking>/i,
+  /<\s*bos\s*>/i,
+  /<\s*eos\s*>/i,
   /\bwe need answer\b/i,
   /\bwe need to\b/i,
   /\blet me\b/i,
@@ -39,6 +43,10 @@ const META_LINE_RE = [
   /^\s*final\s+(answer|summary|plan)\s*:/i,
 ];
 
+const META_PHRASE_RE = [
+  /\b(i\s+see\s+you['’]?re|i\s+see\s+that|let\s+me(?:\s+(?:tie|clarify|know|summarize|address|check))?|we\s+need\s+to|the\s+user\s+(?:wants|asked|asks|is\s+asking|is\s+looking)|here['’]s\s+(?:a\s+)?(?:summary|thinking|analysis|breakdown)|to\s+clarify)\b[^.?!]*(?:[.?!]\s*)?/gi,
+];
+
 function normalizeGemmaMarkers(value) {
   return String(value ?? '')
     .replace(/<\|channel\>\s*(analysis|thought|reasoning)\s*<channel\|>/gi, '')
@@ -51,6 +59,10 @@ function removeTransportTags(value) {
   return String(value ?? '')
     .split(/<end_of_turn>\s*<start_of_turn>\s*user/i)[0]
     .replace(/<start_of_turn>\s*(user|model|assistant|system)?/gi, '')
+    .replace(/<\s*start\s+of\s+turn\s*>/gi, '')
+    .replace(/<\s*end\s+of\s+turn\s*>/gi, '')
+    .replace(/<\s*bos\s*>/gi, '')
+    .replace(/<\s*eos\s*>/gi, '')
     .replace(/<end_of_turn>/gi, '')
     .replace(/<\|channel\|>\s*(final|commentary|analysis|thought|reasoning)?/gi, '')
     .replace(/<\|start\|>\s*(final|commentary|analysis|thought|reasoning)?/gi, '')
@@ -62,11 +74,15 @@ function removeTransportTags(value) {
 }
 
 function filterMetaLines(value) {
-  return String(value ?? '')
+  let text = String(value ?? '')
     .replace(/\r/g, '')
     .replace(/^\s*(the\s+)?user\s+(wants|asked|asks|is asking|is looking)[^.?!]*(?:[.?!]\s*)+/gim, '')
     .replace(/^\s*(the\s+)?provided\s+code\s+snippet[^.?!]*(?:[.?!]\s*)+/gim, '')
     .replace(/^\s*(i\s+need|we\s+need|let me|let'?s)[^.?!]*(?:[.?!]\s*)+/gim, '')
+  for (const pattern of META_PHRASE_RE) {
+    text = text.replace(pattern, '');
+  }
+  return text
     .split('\n')
     .map((line) => line.trim())
     .filter((line) => {

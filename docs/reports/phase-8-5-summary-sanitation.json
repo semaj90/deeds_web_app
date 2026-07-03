@@ -1,26 +1,27 @@
 {
   "phase": "8.5",
-  "mode": "dry-run",
-  "timestamp": "2026-07-03T05:31:17.008Z",
-  "total_scanned": 500,
-  "total_contaminated": 8,
-  "total_cleaned": 3,
-  "total_skipped": 5,
+  "mode": "apply",
+  "timestamp": "2026-07-03T17:15:06.816Z",
+  "total_scanned": 5000,
+  "total_contaminated": 117,
+  "total_cleaned": 41,
+  "total_skipped": 76,
   "total_failed": 0,
-  "pass_count": 2,
-  "warn_count": 1,
-  "fail_count": 5,
+  "pass_count": 32,
+  "warn_count": 9,
+  "fail_count": 76,
   "contamination_patterns": {
-    "shared-gemma4-sanitizer": 3
+    "shared-gemma4-sanitizer": 42,
+    "The code is:": 1
   },
   "results": [
     {
-      "chunk_id": "455af5d1-4ff0-4f97-b741-31125b6f9bb2",
-      "relative_path": "src/routes/(app)/demos/celestial-icons/+page.svelte",
-      "original_length": 93,
-      "original_hash": "ecd5cf131ad96789fcddade019ff9184ca6faf468345582b9319c90d98dda378",
-      "cleaned_summary": "**Final Output",
-      "cleaned_length": 14,
+      "chunk_id": "8f0b53a2-48c7-4ac7-b106-0cdca35726c5",
+      "relative_path": "src/lib/server/indexer/ast-chunker.ts",
+      "original_length": 70,
+      "original_hash": "3550caf2206f4e8073f8cffe7a0444db1fe9cb72d232220f4813b95eaa0dc538",
+      "cleaned_summary": "",
+      "cleaned_length": 0,
       "quality_score": 0,
       "quality_status": "FAIL",
       "contaminations_detected": {
@@ -36,20 +37,20 @@
         {
           "step": "remove_meta_lines",
           "pattern_matched": "various preamble/planning lines",
-          "length_before": 93,
-          "length_after": 14
+          "length_before": 70,
+          "length_after": 0
         }
       ]
     },
     {
-      "chunk_id": "55fb6907-d5c9-447a-a7af-29e69aaeaca2",
-      "relative_path": "src/lib/data/report-templates.ts",
-      "original_length": 163,
-      "original_hash": "1b7f52f0688d351e9fdc63eda392f17969ff5631784d2ca6387af110a409b21f",
-      "cleaned_summary": "The object defines a template for a \"Charging Memorandum,\" which is a comprehensive legal document.",
-      "cleaned_length": 99,
-      "quality_score": 0.85,
-      "quality_status": "PASS",
+      "chunk_id": "a4edcbfa-fa14-4b32-bd4a-9d3ea91b5d22",
+      "relative_path": "src/routes/api/codebase-index/+server.ts",
+      "original_length": 185,
+      "original_hash": "95aeab6995732176e5c42e71f6f0764252a48d0f850c51f343cb41c092724a84",
+      "cleaned_summary": "",
+      "cleaned_length": 0,
+      "quality_score": 0,
+      "quality_status": "FAIL",
       "contaminations_detected": {
         "has_thinking_markers": false,
         "has_meta_preamble": false,
@@ -63,20 +64,47 @@
         {
           "step": "remove_meta_lines",
           "pattern_matched": "various preamble/planning lines",
-          "length_before": 163,
-          "length_after": 99
+          "length_before": 185,
+          "length_after": 0
         }
       ]
     },
     {
-      "chunk_id": "515afb62-2b31-4ec7-b6d4-3c3663d7d433",
-      "relative_path": "src/lib/server/agent/tools/web-search-searxng.ts",
-      "original_length": 387,
-      "original_hash": "3859f50997ad0d7f3920b89fd3f18438025fe1bd302bfd583718dfc88d6d3b50",
-      "cleaned_summary": "The snippet shows how the code handles two main categories of queries:",
-      "cleaned_length": 70,
-      "quality_score": 0.6,
-      "quality_status": "WARN",
+      "chunk_id": "7562ecec-b1f9-4c29-aecd-49d48ca0f976",
+      "relative_path": "src/routes/api/synthesis/typing-context/+server.ts",
+      "original_length": 123,
+      "original_hash": "a3a96bcc0c71b913758fecebae651533579a9a4797bde1eab29ab899bfa72098",
+      "cleaned_summary": "Final check against constraints: 1-2",
+      "cleaned_length": 36,
+      "quality_score": 0,
+      "quality_status": "FAIL",
+      "contaminations_detected": {
+        "has_thinking_markers": false,
+        "has_meta_preamble": false,
+        "has_self_correction": true,
+        "has_planning_steps": false,
+        "markers_found": [],
+        "preamble_patterns": []
+      },
+      "contamination_count": 1,
+      "removal_steps": [
+        {
+          "step": "remove_meta_lines",
+          "pattern_matched": "various preamble/planning lines",
+          "length_before": 123,
+          "length_after": 36
+        }
+      ]
+    },
+    {
+      "chunk_id": "48a7c1f8-ffff-4edb-b37c-a9543e102140",
+      "relative_path": "src/lib/components/yorha/_simulations/YoRHaDataViz.svelte",
+      "original_length": 423,
+      "original_hash": "ae8643c499e6e6fd55ab270d4b5db8775cc8e6e59180c094877261745f6b183b",
+      "cleaned_summary": "The CSS defines styles for:",
+      "cleaned_length": 27,
+      "quality_score": 0,
+      "quality_status": "FAIL",
       "contaminations_detected": {
         "has_thinking_markers": true,
         "has_meta_preamble": false,
@@ -92,22 +120,22 @@
         {
           "step": "shared_gemma4_sanitizer",
           "pattern_matched": "transport/thought/meta markers",
-          "length_before": 387,
-          "length_after": 336
+          "length_before": 423,
+          "length_after": 365
         },
         {
           "step": "remove_meta_lines",
           "pattern_matched": "various preamble/planning lines",
-          "length_before": 336,
-          "length_after": 70
+          "length_before": 365,
+          "length_after": 27
         }
       ]
     },
     {
-      "chunk_id": "2438b1c0-0885-4cb1-b8cb-b697c3460fe6",
-      "relative_path": "src/lib/services/error-analysis/ExperienceRecorder.ts",
-      "original_length": 70,
-      "original_hash": "7158068f34ffa64e96cdf937c1e905d3b242db7d23fb2154b5d3e76f04d62e9f",
+      "chunk_id": "27a2f9d2-a16b-40e0-bf20-173da101eeef",
+      "relative_path": "src/routes/api/v1/agentic/+server.ts",
+      "original_length": 41,
+      "original_hash": "21845eeba7152c7753eb2301df1c1c05e8b2bfc29153657651bf80dd70baebbe",
       "cleaned_summary": "",
       "cleaned_length": 0,
       "quality_score": 0,
@@ -127,13 +155,112 @@
         {
           "step": "shared_gemma4_sanitizer",
           "pattern_matched": "transport/thought/meta markers",
-          "length_before": 70,
+          "length_before": 41,
           "length_after": 0
         }
       ]
     },
     {
-      "chunk_id": "5a074997-9bb9-44b3-8d7d-9234ccd726a9",
+      "chunk_id": "369b2fca-4bd6-4c84-8917-c948806e4ef3",
+      "relative_path": "src/lib/server/db/migrate.ts",
+      "original_length": 404,
+      "original_hash": "fa1ef697370ac6df1f3f518199ccbd85f3e0c1cfcdedf1f8d007f4b4a6345edf",
+      "cleaned_summary": "The code appears to be setup/utility code for database migrations using `drizzle-orm` with `postgres-js`.",
+      "cleaned_length": 105,
+      "quality_score": 0.85,
+      "quality_status": "PASS",
+      "contaminations_detected": {
+        "has_thinking_markers": false,
+        "has_meta_preamble": false,
+        "has_self_correction": false,
+        "has_planning_steps": true,
+        "markers_found": [],
+        "preamble_patterns": []
+      },
+      "contamination_count": 1,
+      "removal_steps": [
+        {
+          "step": "shared_gemma4_sanitizer",
+          "pattern_matched": "transport/thought/meta markers",
+          "length_before": 404,
+          "length_after": 401
+        },
+        {
+          "step": "remove_meta_lines",
+          "pattern_matched": "various preamble/planning lines",
+          "length_before": 401,
+          "length_after": 105
+        }
+      ]
+    },
+    {
+      "chunk_id": "44a8ad68-0572-417d-a0ed-a8871fe3430b",
+      "relative_path": "src/routes/api/precedents/search/+server.ts",
+      "original_length": 316,
+      "original_hash": "eb5724f425079c0e77ee1acfe4bad09bb0aeb5610927fb426ca7411e030b4453",
+      "cleaned_summary": "The code is building a SQL query to search for legal precedents.",
+      "cleaned_length": 64,
+      "quality_score": 0.85,
+      "quality_status": "PASS",
+      "contaminations_detected": {
+        "has_thinking_markers": false,
+        "has_meta_preamble": false,
+        "has_self_correction": false,
+        "has_planning_steps": true,
+        "markers_found": [],
+        "preamble_patterns": []
+      },
+      "contamination_count": 1,
+      "removal_steps": [
+        {
+          "step": "shared_gemma4_sanitizer",
+          "pattern_matched": "transport/thought/meta markers",
+          "length_before": 316,
+          "length_after": 312
+        },
+        {
+          "step": "remove_meta_lines",
+          "pattern_matched": "various preamble/planning lines",
+          "length_before": 312,
+          "length_after": 64
+        }
+      ]
+    },
+    {
+      "chunk_id": "66095dea-b7ec-4d41-a334-d1879b7f71b2",
+      "relative_path": "src/routes/api/codebase-index/tags/+server.ts",
+      "original_length": 336,
+      "original_hash": "0fb7434298ce81975152dfb2ca1614819651a8461f8852ba7f8e6879cfb867ea",
+      "cleaned_summary": "The code performs several data transformations and aggregations before returning a JSON object.\n* `totalChunks`: Total",
+      "cleaned_length": 118,
+      "quality_score": 0.85,
+      "quality_status": "PASS",
+      "contaminations_detected": {
+        "has_thinking_markers": false,
+        "has_meta_preamble": false,
+        "has_self_correction": false,
+        "has_planning_steps": true,
+        "markers_found": [],
+        "preamble_patterns": []
+      },
+      "contamination_count": 1,
+      "removal_steps": [
+        {
+          "step": "shared_gemma4_sanitizer",
+          "pattern_matched": "transport/thought/meta markers",
+          "length_before": 336,
+          "length_after": 326
+        },
+        {
+          "step": "remove_meta_lines",
+          "pattern_matched": "various preamble/planning lines",
+          "length_before": 326,
+          "length_after": 118
+        }
+      ]
+    },
+    {
+      "chunk_id": "6e0c79f8-ee84-4ee2-997f-391ef83628b4",
       "relative_path": "src/lib/server/db/schema-gpu-cache.ts",
       "original_length": 501,
       "original_hash": "5cf49d4018884d0860b170323978d98f93882248c1beee3b531ca006b46d6175",
@@ -168,12 +295,128 @@
       ]
     },
     {
-      "chunk_id": "3301d520-210b-4ead-9a2f-a2d7e123899e",
-      "relative_path": "src/lib/components/EvidenceConnections.svelte",
-      "original_length": 105,
-      "original_hash": "a1ba370bf2f901f441062cb6dcafbab32f5172a6bc3b0b161672167e136227f0",
-      "cleaned_summary": "The code does the following:\n4",
-      "cleaned_length": 30,
+      "chunk_id": "3ef501ff-765c-4f59-b32e-ae5bec57c8ce",
+      "relative_path": "src/routes/(app)/admin/unified-indexing-studio/+page.server.ts",
+      "original_length": 400,
+      "original_hash": "0320b6bd3da05d7c7f73ecff20df6fc9daefab7942c0fd1d2ad51ef761638bc9",
+      "cleaned_summary": "The snippet calculates various coverage percentages and boolean flags related to \"hydration\" status using counts from `bmuCoveredCount` and `manifold4CoveredCount` against a total `summaryCount`. It then initiates multiple asynchronous calls (`Promise.all`) to various services (e.g., `probeService`) to check their health.",
+      "cleaned_length": 323,
+      "quality_score": 0.85,
+      "quality_status": "PASS",
+      "contaminations_detected": {
+        "has_thinking_markers": false,
+        "has_meta_preamble": false,
+        "has_self_correction": false,
+        "has_planning_steps": true,
+        "markers_found": [],
+        "preamble_patterns": []
+      },
+      "contamination_count": 1,
+      "removal_steps": [
+        {
+          "step": "shared_gemma4_sanitizer",
+          "pattern_matched": "transport/thought/meta markers",
+          "length_before": 400,
+          "length_after": 323
+        }
+      ]
+    },
+    {
+      "chunk_id": "4043bcf1-bce4-42d8-875e-c178b051aa14",
+      "relative_path": "src/lib/data/report-templates.ts",
+      "original_length": 163,
+      "original_hash": "1b7f52f0688d351e9fdc63eda392f17969ff5631784d2ca6387af110a409b21f",
+      "cleaned_summary": "The object defines a template for a \"Charging Memorandum,\" which is a comprehensive legal document.",
+      "cleaned_length": 99,
+      "quality_score": 0.85,
+      "quality_status": "PASS",
+      "contaminations_detected": {
+        "has_thinking_markers": false,
+        "has_meta_preamble": false,
+        "has_self_correction": true,
+        "has_planning_steps": false,
+        "markers_found": [],
+        "preamble_patterns": []
+      },
+      "contamination_count": 1,
+      "removal_steps": [
+        {
+          "step": "remove_meta_lines",
+          "pattern_matched": "various preamble/planning lines",
+          "length_before": 163,
+          "length_after": 99
+        }
+      ]
+    },
+    {
+      "chunk_id": "67e48497-f0b2-4e39-8ff8-8f398b583f60",
+      "relative_path": "src/lib/server/retrieval/gpu-reranker.ts",
+      "original_length": 413,
+      "original_hash": "2a9f9152e805cabfb2711a34df53276a94ae0927b89ac5fb428e8a9ec66dbb84",
+      "cleaned_summary": "The code defines an asynchronous function `queryVector` that handles document reranking based on a query vector.",
+      "cleaned_length": 112,
+      "quality_score": 0.85,
+      "quality_status": "PASS",
+      "contaminations_detected": {
+        "has_thinking_markers": false,
+        "has_meta_preamble": false,
+        "has_self_correction": false,
+        "has_planning_steps": true,
+        "markers_found": [],
+        "preamble_patterns": []
+      },
+      "contamination_count": 1,
+      "removal_steps": [
+        {
+          "step": "shared_gemma4_sanitizer",
+          "pattern_matched": "transport/thought/meta markers",
+          "length_before": 413,
+          "length_after": 409
+        },
+        {
+          "step": "remove_meta_lines",
+          "pattern_matched": "various preamble/planning lines",
+          "length_before": 409,
+          "length_after": 112
+        }
+      ]
+    },
+    {
+      "chunk_id": "5b2cca6f-22a1-4f26-9ad3-38dba40ea1f3",
+      "relative_path": "src/routes/(app)/demos/yorha/components/CrossExaminationAssistant.svelte",
+      "original_length": 104,
+      "original_hash": "44ae986c94b02c517d166484283ff9aabca130f7923f4d16e54ce031ef2afa1c",
+      "cleaned_summary": "The code represents a clickable component (a button) designed to display a question.",
+      "cleaned_length": 84,
+      "quality_score": 0.85,
+      "quality_status": "PASS",
+      "contaminations_detected": {
+        "has_thinking_markers": true,
+        "has_meta_preamble": false,
+        "has_self_correction": false,
+        "has_planning_steps": false,
+        "markers_found": [
+          "shared-gemma4-sanitizer"
+        ],
+        "preamble_patterns": []
+      },
+      "contamination_count": 1,
+      "removal_steps": [
+        {
+          "step": "shared_gemma4_sanitizer",
+          "pattern_matched": "transport/thought/meta markers",
+          "length_before": 104,
+          "length_after": 84
+        }
+      ]
+    },
+    {
+      "chunk_id": "3d058767-0cfc-424f-9af7-aac825ffbfc6",
+      "relative_path": "src/lib/server/obsidian/AGENTS.md",
+      "original_length": 148,
+      "original_hash": "e0b85aa948dbc3ca5f3a5bc8a3d9bfed479f90538e68a02a1cf3b7eaea5a07df",
+      "cleaned_summary": "**Drafting the summary:**\n* *Commits:*",
+      "cleaned_length": 38,
       "quality_score": 0,
       "quality_status": "FAIL",
       "contaminations_detected": {
@@ -189,13 +432,354 @@
         {
           "step": "shared_gemma4_sanitizer",
           "pattern_matched": "transport/thought/meta markers",
-          "length_before": 105,
-          "length_after": 30
+          "length_before": 148,
+          "length_after": 38
         }
       ]
     },
     {
-      "chunk_id": "3a2b1ac1-fd3f-4316-b599-6eec218e760b",
+      "chunk_id": "4c5bfb7c-9cd3-46b1-a38b-9f7789bfac68",
+      "relative_path": "src/lib/components/yorha/_simulations/YoRHaDataViz.svelte",
+      "original_length": 423,
+      "original_hash": "ae8643c499e6e6fd55ab270d4b5db8775cc8e6e59180c094877261745f6b183b",
+      "cleaned_summary": "The CSS defines styles for:",
+      "cleaned_length": 27,
+      "quality_score": 0,
+      "quality_status": "FAIL",
+      "contaminations_detected": {
+        "has_thinking_markers": true,
+        "has_meta_preamble": false,
+        "has_self_correction": false,
+        "has_planning_steps": true,
+        "markers_found": [
+          "shared-gemma4-sanitizer"
+        ],
+        "preamble_patterns": []
+      },
+      "contamination_count": 2,
+      "removal_steps": [
+        {
+          "step": "shared_gemma4_sanitizer",
+          "pattern_matched": "transport/thought/meta markers",
+          "length_before": 423,
+          "length_after": 365
+        },
+        {
+          "step": "remove_meta_lines",
+          "pattern_matched": "various preamble/planning lines",
+          "length_before": 365,
+          "length_after": 27
+        }
+      ]
+    },
+    {
+      "chunk_id": "4c1bbfeb-2626-4a54-96dc-64435b70dd36",
+      "relative_path": "src/lib/server/pipeline/error-embedding-pipeline.ts",
+      "original_length": 274,
+      "original_hash": "7f6b1c883d73e967459db4f4dd06b10690aeaa815e12c945af30f7a4bcda659a",
+      "cleaned_summary": "The code contains two distinct parts:\n1. A function snippet that processes and combines error messages, stack traces, and other parts into a single string.",
+      "cleaned_length": 155,
+      "quality_score": 0.7,
+      "quality_status": "WARN",
+      "contaminations_detected": {
+        "has_thinking_markers": true,
+        "has_meta_preamble": false,
+        "has_self_correction": false,
+        "has_planning_steps": true,
+        "markers_found": [
+          "shared-gemma4-sanitizer"
+        ],
+        "preamble_patterns": []
+      },
+      "contamination_count": 2,
+      "removal_steps": [
+        {
+          "step": "shared_gemma4_sanitizer",
+          "pattern_matched": "transport/thought/meta markers",
+          "length_before": 274,
+          "length_after": 155
+        }
+      ]
+    },
+    {
+      "chunk_id": "208c482c-d840-4dc8-a658-85b8eea1b0f9",
+      "relative_path": "src/lib/server/tools/handlers/crawlDocs.ts",
+      "original_length": 353,
+      "original_hash": "cc20f1535186acf4d32e8b81931ecedd572a11938e740c846ebde931db8b6af5",
+      "cleaned_summary": "The code defines an asynchronous function, likely responsible for fetching and parsing content from a given URL.\n4. **`return",
+      "cleaned_length": 125,
+      "quality_score": 0.85,
+      "quality_status": "PASS",
+      "contaminations_detected": {
+        "has_thinking_markers": false,
+        "has_meta_preamble": false,
+        "has_self_correction": false,
+        "has_planning_steps": true,
+        "markers_found": [],
+        "preamble_patterns": []
+      },
+      "contamination_count": 1,
+      "removal_steps": [
+        {
+          "step": "shared_gemma4_sanitizer",
+          "pattern_matched": "transport/thought/meta markers",
+          "length_before": 353,
+          "length_after": 348
+        },
+        {
+          "step": "remove_meta_lines",
+          "pattern_matched": "various preamble/planning lines",
+          "length_before": 348,
+          "length_after": 125
+        }
+      ]
+    },
+    {
+      "chunk_id": "32435e8e-6cb4-4207-ab42-39e26309c1a6",
+      "relative_path": "src/routes/(app)/demos/celestial-icons/+page.svelte",
+      "original_length": 93,
+      "original_hash": "ecd5cf131ad96789fcddade019ff9184ca6faf468345582b9319c90d98dda378",
+      "cleaned_summary": "**Final Output",
+      "cleaned_length": 14,
+      "quality_score": 0,
+      "quality_status": "FAIL",
+      "contaminations_detected": {
+        "has_thinking_markers": false,
+        "has_meta_preamble": false,
+        "has_self_correction": true,
+        "has_planning_steps": false,
+        "markers_found": [],
+        "preamble_patterns": []
+      },
+      "contamination_count": 1,
+      "removal_steps": [
+        {
+          "step": "remove_meta_lines",
+          "pattern_matched": "various preamble/planning lines",
+          "length_before": 93,
+          "length_after": 14
+        }
+      ]
+    },
+    {
+      "chunk_id": "67e92598-305e-4172-914c-7a6fb89c28cb",
+      "relative_path": "src/lib/server/db/migrate.ts",
+      "original_length": 404,
+      "original_hash": "fa1ef697370ac6df1f3f518199ccbd85f3e0c1cfcdedf1f8d007f4b4a6345edf",
+      "cleaned_summary": "The code appears to be setup/utility code for database migrations using `drizzle-orm` with `postgres-js`.",
+      "cleaned_length": 105,
+      "quality_score": 0.85,
+      "quality_status": "PASS",
+      "contaminations_detected": {
+        "has_thinking_markers": false,
+        "has_meta_preamble": false,
+        "has_self_correction": false,
+        "has_planning_steps": true,
+        "markers_found": [],
+        "preamble_patterns": []
+      },
+      "contamination_count": 1,
+      "removal_steps": [
+        {
+          "step": "shared_gemma4_sanitizer",
+          "pattern_matched": "transport/thought/meta markers",
+          "length_before": 404,
+          "length_after": 401
+        },
+        {
+          "step": "remove_meta_lines",
+          "pattern_matched": "various preamble/planning lines",
+          "length_before": 401,
+          "length_after": 105
+        }
+      ]
+    },
+    {
+      "chunk_id": "1d193da9-49ce-4a85-8e7b-65aebc4ad5cb",
+      "relative_path": "src/lib/services/error-analysis/ExperienceRecorder.ts",
+      "original_length": 70,
+      "original_hash": "7158068f34ffa64e96cdf937c1e905d3b242db7d23fb2154b5d3e76f04d62e9f",
+      "cleaned_summary": "",
+      "cleaned_length": 0,
+      "quality_score": 0,
+      "quality_status": "FAIL",
+      "contaminations_detected": {
+        "has_thinking_markers": true,
+        "has_meta_preamble": false,
+        "has_self_correction": false,
+        "has_planning_steps": false,
+        "markers_found": [
+          "shared-gemma4-sanitizer"
+        ],
+        "preamble_patterns": []
+      },
+      "contamination_count": 1,
+      "removal_steps": [
+        {
+          "step": "shared_gemma4_sanitizer",
+          "pattern_matched": "transport/thought/meta markers",
+          "length_before": 70,
+          "length_after": 0
+        }
+      ]
+    },
+    {
+      "chunk_id": "58005483-b951-43ea-8b5a-c7085ebf501e",
+      "relative_path": "src/lib/server/agent/tools/web-search-searxng.ts",
+      "original_length": 387,
+      "original_hash": "3859f50997ad0d7f3920b89fd3f18438025fe1bd302bfd583718dfc88d6d3b50",
+      "cleaned_summary": "The snippet shows how the code handles two main categories of queries:",
+      "cleaned_length": 70,
+      "quality_score": 0.6,
+      "quality_status": "WARN",
+      "contaminations_detected": {
+        "has_thinking_markers": true,
+        "has_meta_preamble": false,
+        "has_self_correction": false,
+        "has_planning_steps": true,
+        "markers_found": [
+          "shared-gemma4-sanitizer"
+        ],
+        "preamble_patterns": []
+      },
+      "contamination_count": 2,
+      "removal_steps": [
+        {
+          "step": "shared_gemma4_sanitizer",
+          "pattern_matched": "transport/thought/meta markers",
+          "length_before": 387,
+          "length_after": 336
+        },
+        {
+          "step": "remove_meta_lines",
+          "pattern_matched": "various preamble/planning lines",
+          "length_before": 336,
+          "length_after": 70
+        }
+      ]
+    },
+    {
+      "chunk_id": "45f4f898-950f-4030-9125-564cf2139262",
+      "relative_path": "src/lib/data/report-templates.ts",
+      "original_length": 163,
+      "original_hash": "1b7f52f0688d351e9fdc63eda392f17969ff5631784d2ca6387af110a409b21f",
+      "cleaned_summary": "The object defines a template for a \"Charging Memorandum,\" which is a comprehensive legal document.",
+      "cleaned_length": 99,
+      "quality_score": 0.85,
+      "quality_status": "PASS",
+      "contaminations_detected": {
+        "has_thinking_markers": false,
+        "has_meta_preamble": false,
+        "has_self_correction": true,
+        "has_planning_steps": false,
+        "markers_found": [],
+        "preamble_patterns": []
+      },
+      "contamination_count": 1,
+      "removal_steps": [
+        {
+          "step": "remove_meta_lines",
+          "pattern_matched": "various preamble/planning lines",
+          "length_before": 163,
+          "length_after": 99
+        }
+      ]
+    },
+    {
+      "chunk_id": "3c81ffe8-54b5-43e6-8b46-d08a3c76c5c7",
+      "relative_path": "src/routes/(app)/demos/celestial-icons/+page.svelte",
+      "original_length": 93,
+      "original_hash": "ecd5cf131ad96789fcddade019ff9184ca6faf468345582b9319c90d98dda378",
+      "cleaned_summary": "**Final Output",
+      "cleaned_length": 14,
+      "quality_score": 0,
+      "quality_status": "FAIL",
+      "contaminations_detected": {
+        "has_thinking_markers": false,
+        "has_meta_preamble": false,
+        "has_self_correction": true,
+        "has_planning_steps": false,
+        "markers_found": [],
+        "preamble_patterns": []
+      },
+      "contamination_count": 1,
+      "removal_steps": [
+        {
+          "step": "remove_meta_lines",
+          "pattern_matched": "various preamble/planning lines",
+          "length_before": 93,
+          "length_after": 14
+        }
+      ]
+    },
+    {
+      "chunk_id": "1fa959ab-8221-446b-b911-02c7d7b7b9a2",
+      "relative_path": "src/routes/(app)/library/[documentId]/node/[nodeId]/+page.svelte",
+      "original_length": 364,
+      "original_hash": "bffee8ad303ef0b2b06aec885f745fb1253e0bb183fe2dea88696631ef87893f",
+      "cleaned_summary": "The code handles displaying different sections of content based on the current active tab (`activeTab`).\n3.",
+      "cleaned_length": 107,
+      "quality_score": 0.85,
+      "quality_status": "PASS",
+      "contaminations_detected": {
+        "has_thinking_markers": false,
+        "has_meta_preamble": false,
+        "has_self_correction": false,
+        "has_planning_steps": true,
+        "markers_found": [],
+        "preamble_patterns": []
+      },
+      "contamination_count": 1,
+      "removal_steps": [
+        {
+          "step": "shared_gemma4_sanitizer",
+          "pattern_matched": "transport/thought/meta markers",
+          "length_before": 364,
+          "length_after": 361
+        },
+        {
+          "step": "remove_meta_lines",
+          "pattern_matched": "various preamble/planning lines",
+          "length_before": 361,
+          "length_after": 107
+        }
+      ]
+    },
+    {
+      "chunk_id": "2975db4d-35b7-4238-88e1-42447eba8a13",
+      "relative_path": "src/lib/server/research/lane4-feedback.ts",
+      "original_length": 343,
+      "original_hash": "86457a35ee8a3e2544fe3903a60c0ab497859e42fad21c5fdbadd913193a3905",
+      "cleaned_summary": "The code defines constants and a mapping for managing source bias and trust weights in a research/knowledge system.",
+      "cleaned_length": 115,
+      "quality_score": 0.85,
+      "quality_status": "PASS",
+      "contaminations_detected": {
+        "has_thinking_markers": false,
+        "has_meta_preamble": false,
+        "has_self_correction": false,
+        "has_planning_steps": true,
+        "markers_found": [],
+        "preamble_patterns": []
+      },
+      "contamination_count": 1,
+      "removal_steps": [
+        {
+          "step": "shared_gemma4_sanitizer",
+          "pattern_matched": "transport/thought/meta markers",
+          "length_before": 343,
+          "length_after": 340
+        },
+        {
+          "step": "remove_meta_lines",
+          "pattern_matched": "various preamble/planning lines",
+          "length_before": 340,
+          "length_after": 115
+        }
+      ]
+    },
+    {
+      "chunk_id": "5c2893ee-9c7e-4005-ba54-29ff69b53c08",
       "relative_path": "src/lib/webgpu/compute-shader-engine.ts",
       "original_length": 417,
       "original_hash": "4f753ee7b88a0ef9d177f9dcb451492f6fba9f81125e7428f4e26dfe2d81c46c",
@@ -228,10 +812,849 @@
       ]
     },
     {
-      "chunk_id": "f5add746-1e57-4855-8920-b430b872710f",
-      "relative_path": "src/lib/server/adapters/service-integrations.ts",
-      "original_length": 198,
-      "original_hash": "01d4769362c64aa43caa0c4605cd176de4a67a7ceb27417ff8a7a2e73641ad12",
+      "chunk_id": "3196a9a1-09a1-4241-b06b-7c22f712b817",
+      "relative_path": "src/lib/components/ChatMessages.svelte",
+      "original_length": 391,
+      "original_hash": "0a058e19a7fd20b1655603d0c53b78986da0dcd946eea6a92644ffdf624951aa",
+      "cleaned_summary": "The code snippet is a section of a component that iterates through a list of messages and renders them.",
+      "cleaned_length": 103,
+      "quality_score": 0.85,
+      "quality_status": "PASS",
+      "contaminations_detected": {
+        "has_thinking_markers": false,
+        "has_meta_preamble": false,
+        "has_self_correction": false,
+        "has_planning_steps": true,
+        "markers_found": [],
+        "preamble_patterns": []
+      },
+      "contamination_count": 1,
+      "removal_steps": [
+        {
+          "step": "shared_gemma4_sanitizer",
+          "pattern_matched": "transport/thought/meta markers",
+          "length_before": 391,
+          "length_after": 387
+        },
+        {
+          "step": "remove_meta_lines",
+          "pattern_matched": "various preamble/planning lines",
+          "length_before": 387,
+          "length_after": 103
+        }
+      ]
+    },
+    {
+      "chunk_id": "64bb0775-9245-4800-893d-e4b7a70aa70a",
+      "relative_path": "src/lib/data/report-templates.ts",
+      "original_length": 163,
+      "original_hash": "1b7f52f0688d351e9fdc63eda392f17969ff5631784d2ca6387af110a409b21f",
+      "cleaned_summary": "The object defines a template for a \"Charging Memorandum,\" which is a comprehensive legal document.",
+      "cleaned_length": 99,
+      "quality_score": 0.85,
+      "quality_status": "PASS",
+      "contaminations_detected": {
+        "has_thinking_markers": false,
+        "has_meta_preamble": false,
+        "has_self_correction": true,
+        "has_planning_steps": false,
+        "markers_found": [],
+        "preamble_patterns": []
+      },
+      "contamination_count": 1,
+      "removal_steps": [
+        {
+          "step": "remove_meta_lines",
+          "pattern_matched": "various preamble/planning lines",
+          "length_before": 163,
+          "length_after": 99
+        }
+      ]
+    },
+    {
+      "chunk_id": "21906c4c-70ad-4ab0-87dd-77b3f0940481",
+      "relative_path": "src/routes/(app)/demos/yorha/components/CrossExaminationAssistant.svelte",
+      "original_length": 104,
+      "original_hash": "44ae986c94b02c517d166484283ff9aabca130f7923f4d16e54ce031ef2afa1c",
+      "cleaned_summary": "The code represents a clickable component (a button) designed to display a question.",
+      "cleaned_length": 84,
+      "quality_score": 0.85,
+      "quality_status": "PASS",
+      "contaminations_detected": {
+        "has_thinking_markers": true,
+        "has_meta_preamble": false,
+        "has_self_correction": false,
+        "has_planning_steps": false,
+        "markers_found": [
+          "shared-gemma4-sanitizer"
+        ],
+        "preamble_patterns": []
+      },
+      "contamination_count": 1,
+      "removal_steps": [
+        {
+          "step": "shared_gemma4_sanitizer",
+          "pattern_matched": "transport/thought/meta markers",
+          "length_before": 104,
+          "length_after": 84
+        }
+      ]
+    },
+    {
+      "chunk_id": "32646062-ef09-4c81-8b71-e7b20fd38753",
+      "relative_path": "src/routes/api/graph/colab-export/+server.ts",
+      "original_length": 402,
+      "original_hash": "108fc062b08a27bfbf20154a339ec56ed392129e2b74cbd367c30d821665823a",
+      "cleaned_summary": "The snippet describes the final steps of a data processing workflow:",
+      "cleaned_length": 68,
+      "quality_score": 0.75,
+      "quality_status": "WARN",
+      "contaminations_detected": {
+        "has_thinking_markers": false,
+        "has_meta_preamble": false,
+        "has_self_correction": false,
+        "has_planning_steps": true,
+        "markers_found": [],
+        "preamble_patterns": []
+      },
+      "contamination_count": 1,
+      "removal_steps": [
+        {
+          "step": "shared_gemma4_sanitizer",
+          "pattern_matched": "transport/thought/meta markers",
+          "length_before": 402,
+          "length_after": 399
+        },
+        {
+          "step": "remove_meta_lines",
+          "pattern_matched": "various preamble/planning lines",
+          "length_before": 399,
+          "length_after": 68
+        }
+      ]
+    },
+    {
+      "chunk_id": "6b1b9bb8-553a-437e-9f98-efb0421f3b3f",
+      "relative_path": "src/lib/webgpu/compute-shader-engine.ts",
+      "original_length": 417,
+      "original_hash": "4f753ee7b88a0ef9d177f9dcb451492f6fba9f81125e7428f4e26dfe2d81c46c",
+      "cleaned_summary": "The snippet is setting up various GPU resources (buffers and bind group layouts) for a compute shader operation.",
+      "cleaned_length": 112,
+      "quality_score": 0.85,
+      "quality_status": "PASS",
+      "contaminations_detected": {
+        "has_thinking_markers": false,
+        "has_meta_preamble": false,
+        "has_self_correction": false,
+        "has_planning_steps": true,
+        "markers_found": [],
+        "preamble_patterns": []
+      },
+      "contamination_count": 1,
+      "removal_steps": [
+        {
+          "step": "shared_gemma4_sanitizer",
+          "pattern_matched": "transport/thought/meta markers",
+          "length_before": 417,
+          "length_after": 413
+        },
+        {
+          "step": "remove_meta_lines",
+          "pattern_matched": "various preamble/planning lines",
+          "length_before": 413,
+          "length_after": 112
+        }
+      ]
+    },
+    {
+      "chunk_id": "4ae07ba1-6a84-4ab9-84b0-c5a3fdd4063b",
+      "relative_path": "src/routes/api/codebase-index/tags/+server.ts",
+      "original_length": 336,
+      "original_hash": "0fb7434298ce81975152dfb2ca1614819651a8461f8852ba7f8e6879cfb867ea",
+      "cleaned_summary": "The code performs several data transformations and aggregations before returning a JSON object.\n* `totalChunks`: Total",
+      "cleaned_length": 118,
+      "quality_score": 0.85,
+      "quality_status": "PASS",
+      "contaminations_detected": {
+        "has_thinking_markers": false,
+        "has_meta_preamble": false,
+        "has_self_correction": false,
+        "has_planning_steps": true,
+        "markers_found": [],
+        "preamble_patterns": []
+      },
+      "contamination_count": 1,
+      "removal_steps": [
+        {
+          "step": "shared_gemma4_sanitizer",
+          "pattern_matched": "transport/thought/meta markers",
+          "length_before": 336,
+          "length_after": 326
+        },
+        {
+          "step": "remove_meta_lines",
+          "pattern_matched": "various preamble/planning lines",
+          "length_before": 326,
+          "length_after": 118
+        }
+      ]
+    },
+    {
+      "chunk_id": "6be2ffbc-3dae-4912-b3f4-62c4be7b5b59",
+      "relative_path": "src/lib/components/yorha/_simulations/YoRHaDataViz.svelte",
+      "original_length": 423,
+      "original_hash": "ae8643c499e6e6fd55ab270d4b5db8775cc8e6e59180c094877261745f6b183b",
+      "cleaned_summary": "The CSS defines styles for:",
+      "cleaned_length": 27,
+      "quality_score": 0,
+      "quality_status": "FAIL",
+      "contaminations_detected": {
+        "has_thinking_markers": true,
+        "has_meta_preamble": false,
+        "has_self_correction": false,
+        "has_planning_steps": true,
+        "markers_found": [
+          "shared-gemma4-sanitizer"
+        ],
+        "preamble_patterns": []
+      },
+      "contamination_count": 2,
+      "removal_steps": [
+        {
+          "step": "shared_gemma4_sanitizer",
+          "pattern_matched": "transport/thought/meta markers",
+          "length_before": 423,
+          "length_after": 365
+        },
+        {
+          "step": "remove_meta_lines",
+          "pattern_matched": "various preamble/planning lines",
+          "length_before": 365,
+          "length_after": 27
+        }
+      ]
+    },
+    {
+      "chunk_id": "21bd7463-9b16-44cc-bb60-146ac11036bc",
+      "relative_path": "src/lib/server/endpoints.ts",
+      "original_length": 476,
+      "original_hash": "1323f8a197e2a0ff2e90f0550fda85c6fb1a2741a241f70a58f7a102bf4a9df2",
+      "cleaned_summary": "The code primarily deals with creating helper functions to retrieve environment-specific URLs for various services (Ollama, RAG). It prioritizes environment variables, falls back to a specified Docker host, and includes an optional local development fallback.\n3.",
+      "cleaned_length": 262,
+      "quality_score": 0.85,
+      "quality_status": "PASS",
+      "contaminations_detected": {
+        "has_thinking_markers": false,
+        "has_meta_preamble": false,
+        "has_self_correction": false,
+        "has_planning_steps": true,
+        "markers_found": [],
+        "preamble_patterns": []
+      },
+      "contamination_count": 1,
+      "removal_steps": [
+        {
+          "step": "shared_gemma4_sanitizer",
+          "pattern_matched": "transport/thought/meta markers",
+          "length_before": 476,
+          "length_after": 262
+        }
+      ]
+    },
+    {
+      "chunk_id": "2f1e9b89-a832-4150-9b10-e16e77cca327",
+      "relative_path": "src/routes/api/precedents/search/+server.ts",
+      "original_length": 316,
+      "original_hash": "eb5724f425079c0e77ee1acfe4bad09bb0aeb5610927fb426ca7411e030b4453",
+      "cleaned_summary": "The code is building a SQL query to search for legal precedents.",
+      "cleaned_length": 64,
+      "quality_score": 0.85,
+      "quality_status": "PASS",
+      "contaminations_detected": {
+        "has_thinking_markers": false,
+        "has_meta_preamble": false,
+        "has_self_correction": false,
+        "has_planning_steps": true,
+        "markers_found": [],
+        "preamble_patterns": []
+      },
+      "contamination_count": 1,
+      "removal_steps": [
+        {
+          "step": "shared_gemma4_sanitizer",
+          "pattern_matched": "transport/thought/meta markers",
+          "length_before": 316,
+          "length_after": 312
+        },
+        {
+          "step": "remove_meta_lines",
+          "pattern_matched": "various preamble/planning lines",
+          "length_before": 312,
+          "length_after": 64
+        }
+      ]
+    },
+    {
+      "chunk_id": "19c2d1a7-d494-4e5d-ae0d-c4e0f5b8ea37",
+      "relative_path": "src/routes/api/reports/batch-export/+server.ts",
+      "original_length": 393,
+      "original_hash": "4ac444c3a8ebf30c756562d13510945040c31e79cf1969d8ac609b84df845c77",
+      "cleaned_summary": "**Function Analysis:**\n4. **Output",
+      "cleaned_length": 34,
+      "quality_score": 0,
+      "quality_status": "FAIL",
+      "contaminations_detected": {
+        "has_thinking_markers": false,
+        "has_meta_preamble": false,
+        "has_self_correction": false,
+        "has_planning_steps": true,
+        "markers_found": [],
+        "preamble_patterns": []
+      },
+      "contamination_count": 1,
+      "removal_steps": [
+        {
+          "step": "shared_gemma4_sanitizer",
+          "pattern_matched": "transport/thought/meta markers",
+          "length_before": 393,
+          "length_after": 389
+        },
+        {
+          "step": "remove_meta_lines",
+          "pattern_matched": "various preamble/planning lines",
+          "length_before": 389,
+          "length_after": 34
+        }
+      ]
+    },
+    {
+      "chunk_id": "20d5c257-5905-4790-8c1f-5d3428ec6088",
+      "relative_path": "src/lib/server/agent/tools/web-search-searxng.ts",
+      "original_length": 387,
+      "original_hash": "3859f50997ad0d7f3920b89fd3f18438025fe1bd302bfd583718dfc88d6d3b50",
+      "cleaned_summary": "The snippet shows how the code handles two main categories of queries:",
+      "cleaned_length": 70,
+      "quality_score": 0.6,
+      "quality_status": "WARN",
+      "contaminations_detected": {
+        "has_thinking_markers": true,
+        "has_meta_preamble": false,
+        "has_self_correction": false,
+        "has_planning_steps": true,
+        "markers_found": [
+          "shared-gemma4-sanitizer"
+        ],
+        "preamble_patterns": []
+      },
+      "contamination_count": 2,
+      "removal_steps": [
+        {
+          "step": "shared_gemma4_sanitizer",
+          "pattern_matched": "transport/thought/meta markers",
+          "length_before": 387,
+          "length_after": 336
+        },
+        {
+          "step": "remove_meta_lines",
+          "pattern_matched": "various preamble/planning lines",
+          "length_before": 336,
+          "length_after": 70
+        }
+      ]
+    },
+    {
+      "chunk_id": "6563f439-44b0-47d8-973e-bbf00cd85130",
+      "relative_path": "src/lib/server/cache/rpc-cache.ts",
+      "original_length": 37,
+      "original_hash": "0137f37405886388554a39f72c33b5cbf1b94933b06f5c5f82d6b527b879edf1",
+      "cleaned_summary": "",
+      "cleaned_length": 0,
+      "quality_score": 0,
+      "quality_status": "FAIL",
+      "contaminations_detected": {
+        "has_thinking_markers": true,
+        "has_meta_preamble": false,
+        "has_self_correction": false,
+        "has_planning_steps": false,
+        "markers_found": [
+          "shared-gemma4-sanitizer"
+        ],
+        "preamble_patterns": []
+      },
+      "contamination_count": 1,
+      "removal_steps": [
+        {
+          "step": "shared_gemma4_sanitizer",
+          "pattern_matched": "transport/thought/meta markers",
+          "length_before": 37,
+          "length_after": 0
+        }
+      ]
+    },
+    {
+      "chunk_id": "60f54474-527b-4c78-865b-9ebfdfd40f4a",
+      "relative_path": "src/routes/(app)/demos/celestial-icons/+page.svelte",
+      "original_length": 93,
+      "original_hash": "ecd5cf131ad96789fcddade019ff9184ca6faf468345582b9319c90d98dda378",
+      "cleaned_summary": "**Final Output",
+      "cleaned_length": 14,
+      "quality_score": 0,
+      "quality_status": "FAIL",
+      "contaminations_detected": {
+        "has_thinking_markers": false,
+        "has_meta_preamble": false,
+        "has_self_correction": true,
+        "has_planning_steps": false,
+        "markers_found": [],
+        "preamble_patterns": []
+      },
+      "contamination_count": 1,
+      "removal_steps": [
+        {
+          "step": "remove_meta_lines",
+          "pattern_matched": "various preamble/planning lines",
+          "length_before": 93,
+          "length_after": 14
+        }
+      ]
+    },
+    {
+      "chunk_id": "325b5648-1d6e-4fc3-aa63-1eeb6a081320",
+      "relative_path": "src/routes/(app)/demos/celestial-icons/+page.svelte",
+      "original_length": 93,
+      "original_hash": "ecd5cf131ad96789fcddade019ff9184ca6faf468345582b9319c90d98dda378",
+      "cleaned_summary": "**Final Output",
+      "cleaned_length": 14,
+      "quality_score": 0,
+      "quality_status": "FAIL",
+      "contaminations_detected": {
+        "has_thinking_markers": false,
+        "has_meta_preamble": false,
+        "has_self_correction": true,
+        "has_planning_steps": false,
+        "markers_found": [],
+        "preamble_patterns": []
+      },
+      "contamination_count": 1,
+      "removal_steps": [
+        {
+          "step": "remove_meta_lines",
+          "pattern_matched": "various preamble/planning lines",
+          "length_before": 93,
+          "length_after": 14
+        }
+      ]
+    },
+    {
+      "chunk_id": "258f1ed4-6f11-43f2-9090-2b98c0f4e152",
+      "relative_path": "src/lib/server/db/schema-gpu-cache.ts",
+      "original_length": 501,
+      "original_hash": "5cf49d4018884d0860b170323978d98f93882248c1beee3b531ca006b46d6175",
+      "cleaned_summary": "This is a database schema definition for a `shader_dependencies` table. I need to summarize its purpose and key fields concisely.\n**Drafting the summary:**\nThis table tracks dependencies between shaders, linking a parent shader",
+      "cleaned_length": 227,
+      "quality_score": 0,
+      "quality_status": "FAIL",
+      "contaminations_detected": {
+        "has_thinking_markers": true,
+        "has_meta_preamble": false,
+        "has_self_correction": false,
+        "has_planning_steps": true,
+        "markers_found": [
+          "shared-gemma4-sanitizer"
+        ],
+        "preamble_patterns": []
+      },
+      "contamination_count": 2,
+      "removal_steps": [
+        {
+          "step": "shared_gemma4_sanitizer",
+          "pattern_matched": "transport/thought/meta markers",
+          "length_before": 501,
+          "length_after": 496
+        },
+        {
+          "step": "remove_meta_lines",
+          "pattern_matched": "various preamble/planning lines",
+          "length_before": 496,
+          "length_after": 227
+        }
+      ]
+    },
+    {
+      "chunk_id": "74d6fbf2-8970-4e04-86a4-777879c45a48",
+      "relative_path": "src/routes/api/graph/colab-export/+server.ts",
+      "original_length": 402,
+      "original_hash": "108fc062b08a27bfbf20154a339ec56ed392129e2b74cbd367c30d821665823a",
+      "cleaned_summary": "The snippet describes the final steps of a data processing workflow:",
+      "cleaned_length": 68,
+      "quality_score": 0.75,
+      "quality_status": "WARN",
+      "contaminations_detected": {
+        "has_thinking_markers": false,
+        "has_meta_preamble": false,
+        "has_self_correction": false,
+        "has_planning_steps": true,
+        "markers_found": [],
+        "preamble_patterns": []
+      },
+      "contamination_count": 1,
+      "removal_steps": [
+        {
+          "step": "shared_gemma4_sanitizer",
+          "pattern_matched": "transport/thought/meta markers",
+          "length_before": 402,
+          "length_after": 399
+        },
+        {
+          "step": "remove_meta_lines",
+          "pattern_matched": "various preamble/planning lines",
+          "length_before": 399,
+          "length_after": 68
+        }
+      ]
+    },
+    {
+      "chunk_id": "3fc176c9-85ce-4598-8dff-ca8f29c5e9a8",
+      "relative_path": "src/lib/services/error-analysis/ExperienceRecorder.ts",
+      "original_length": 70,
+      "original_hash": "7158068f34ffa64e96cdf937c1e905d3b242db7d23fb2154b5d3e76f04d62e9f",
+      "cleaned_summary": "",
+      "cleaned_length": 0,
+      "quality_score": 0,
+      "quality_status": "FAIL",
+      "contaminations_detected": {
+        "has_thinking_markers": true,
+        "has_meta_preamble": false,
+        "has_self_correction": false,
+        "has_planning_steps": false,
+        "markers_found": [
+          "shared-gemma4-sanitizer"
+        ],
+        "preamble_patterns": []
+      },
+      "contamination_count": 1,
+      "removal_steps": [
+        {
+          "step": "shared_gemma4_sanitizer",
+          "pattern_matched": "transport/thought/meta markers",
+          "length_before": 70,
+          "length_after": 0
+        }
+      ]
+    },
+    {
+      "chunk_id": "5e11f01e-6415-46a0-934a-827ebacd188f",
+      "relative_path": "src/routes/api/error-brain/diagnosis-history/backfill/+server.ts",
+      "original_length": 400,
+      "original_hash": "4fd972a8201c53f15ba6b6308070a301309e9559acb285e765def5f9190c18ea",
+      "cleaned_summary": "The code attempts to extract a meaningful string (`cleanText`) from a JSON object (`obj`) based on the structure and content of the `diagnosis` field.",
+      "cleaned_length": 150,
+      "quality_score": 0.85,
+      "quality_status": "PASS",
+      "contaminations_detected": {
+        "has_thinking_markers": false,
+        "has_meta_preamble": false,
+        "has_self_correction": false,
+        "has_planning_steps": true,
+        "markers_found": [],
+        "preamble_patterns": []
+      },
+      "contamination_count": 1,
+      "removal_steps": [
+        {
+          "step": "shared_gemma4_sanitizer",
+          "pattern_matched": "transport/thought/meta markers",
+          "length_before": 400,
+          "length_after": 396
+        },
+        {
+          "step": "remove_meta_lines",
+          "pattern_matched": "various preamble/planning lines",
+          "length_before": 396,
+          "length_after": 150
+        }
+      ]
+    },
+    {
+      "chunk_id": "2bdc9d5f-e294-4d75-b861-0b07cb1b0b18",
+      "relative_path": "src/routes/api/v1/agentic/+server.ts",
+      "original_length": 41,
+      "original_hash": "21845eeba7152c7753eb2301df1c1c05e8b2bfc29153657651bf80dd70baebbe",
+      "cleaned_summary": "",
+      "cleaned_length": 0,
+      "quality_score": 0,
+      "quality_status": "FAIL",
+      "contaminations_detected": {
+        "has_thinking_markers": true,
+        "has_meta_preamble": false,
+        "has_self_correction": false,
+        "has_planning_steps": false,
+        "markers_found": [
+          "shared-gemma4-sanitizer"
+        ],
+        "preamble_patterns": []
+      },
+      "contamination_count": 1,
+      "removal_steps": [
+        {
+          "step": "shared_gemma4_sanitizer",
+          "pattern_matched": "transport/thought/meta markers",
+          "length_before": 41,
+          "length_after": 0
+        }
+      ]
+    },
+    {
+      "chunk_id": "62c277ce-1fea-4f25-bb3d-d85b112dd1c3",
+      "relative_path": "src/routes/api/synthesis/typing-context/+server.ts",
+      "original_length": 123,
+      "original_hash": "a3a96bcc0c71b913758fecebae651533579a9a4797bde1eab29ab899bfa72098",
+      "cleaned_summary": "Final check against constraints: 1-2",
+      "cleaned_length": 36,
+      "quality_score": 0,
+      "quality_status": "FAIL",
+      "contaminations_detected": {
+        "has_thinking_markers": false,
+        "has_meta_preamble": false,
+        "has_self_correction": true,
+        "has_planning_steps": false,
+        "markers_found": [],
+        "preamble_patterns": []
+      },
+      "contamination_count": 1,
+      "removal_steps": [
+        {
+          "step": "remove_meta_lines",
+          "pattern_matched": "various preamble/planning lines",
+          "length_before": 123,
+          "length_after": 36
+        }
+      ]
+    },
+    {
+      "chunk_id": "56ba5d82-a85e-44f0-93f1-544b2bb2228b",
+      "relative_path": "src/lib/data/report-templates.ts",
+      "original_length": 163,
+      "original_hash": "1b7f52f0688d351e9fdc63eda392f17969ff5631784d2ca6387af110a409b21f",
+      "cleaned_summary": "The object defines a template for a \"Charging Memorandum,\" which is a comprehensive legal document.",
+      "cleaned_length": 99,
+      "quality_score": 0.85,
+      "quality_status": "PASS",
+      "contaminations_detected": {
+        "has_thinking_markers": false,
+        "has_meta_preamble": false,
+        "has_self_correction": true,
+        "has_planning_steps": false,
+        "markers_found": [],
+        "preamble_patterns": []
+      },
+      "contamination_count": 1,
+      "removal_steps": [
+        {
+          "step": "remove_meta_lines",
+          "pattern_matched": "various preamble/planning lines",
+          "length_before": 163,
+          "length_after": 99
+        }
+      ]
+    },
+    {
+      "chunk_id": "68c881f9-234b-40c2-b1c1-50c18eacd7a9",
+      "relative_path": "src/lib/server/db/schema-gpu-cache.ts",
+      "original_length": 501,
+      "original_hash": "5cf49d4018884d0860b170323978d98f93882248c1beee3b531ca006b46d6175",
+      "cleaned_summary": "This is a database schema definition for a `shader_dependencies` table. I need to summarize its purpose and key fields concisely.\n**Drafting the summary:**\nThis table tracks dependencies between shaders, linking a parent shader",
+      "cleaned_length": 227,
+      "quality_score": 0,
+      "quality_status": "FAIL",
+      "contaminations_detected": {
+        "has_thinking_markers": true,
+        "has_meta_preamble": false,
+        "has_self_correction": false,
+        "has_planning_steps": true,
+        "markers_found": [
+          "shared-gemma4-sanitizer"
+        ],
+        "preamble_patterns": []
+      },
+      "contamination_count": 2,
+      "removal_steps": [
+        {
+          "step": "shared_gemma4_sanitizer",
+          "pattern_matched": "transport/thought/meta markers",
+          "length_before": 501,
+          "length_after": 496
+        },
+        {
+          "step": "remove_meta_lines",
+          "pattern_matched": "various preamble/planning lines",
+          "length_before": 496,
+          "length_after": 227
+        }
+      ]
+    },
+    {
+      "chunk_id": "50046fba-fab2-4f7c-8872-0e718db7d936",
+      "relative_path": "src/lib/services/error-analysis/ExperienceRecorder.ts",
+      "original_length": 70,
+      "original_hash": "7158068f34ffa64e96cdf937c1e905d3b242db7d23fb2154b5d3e76f04d62e9f",
+      "cleaned_summary": "",
+      "cleaned_length": 0,
+      "quality_score": 0,
+      "quality_status": "FAIL",
+      "contaminations_detected": {
+        "has_thinking_markers": true,
+        "has_meta_preamble": false,
+        "has_self_correction": false,
+        "has_planning_steps": false,
+        "markers_found": [
+          "shared-gemma4-sanitizer"
+        ],
+        "preamble_patterns": []
+      },
+      "contamination_count": 1,
+      "removal_steps": [
+        {
+          "step": "shared_gemma4_sanitizer",
+          "pattern_matched": "transport/thought/meta markers",
+          "length_before": 70,
+          "length_after": 0
+        }
+      ]
+    },
+    {
+      "chunk_id": "4f344df2-ba4d-4955-a401-decf7a7cb10d",
+      "relative_path": "src/routes/(app)/library/[documentId]/node/[nodeId]/+page.svelte",
+      "original_length": 364,
+      "original_hash": "bffee8ad303ef0b2b06aec885f745fb1253e0bb183fe2dea88696631ef87893f",
+      "cleaned_summary": "The code handles displaying different sections of content based on the current active tab (`activeTab`).\n3.",
+      "cleaned_length": 107,
+      "quality_score": 0.85,
+      "quality_status": "PASS",
+      "contaminations_detected": {
+        "has_thinking_markers": false,
+        "has_meta_preamble": false,
+        "has_self_correction": false,
+        "has_planning_steps": true,
+        "markers_found": [],
+        "preamble_patterns": []
+      },
+      "contamination_count": 1,
+      "removal_steps": [
+        {
+          "step": "shared_gemma4_sanitizer",
+          "pattern_matched": "transport/thought/meta markers",
+          "length_before": 364,
+          "length_after": 361
+        },
+        {
+          "step": "remove_meta_lines",
+          "pattern_matched": "various preamble/planning lines",
+          "length_before": 361,
+          "length_after": 107
+        }
+      ]
+    },
+    {
+      "chunk_id": "712abbc2-6174-4586-9b59-15ed6dfba907",
+      "relative_path": "src/lib/components/ui/label/index.ts",
+      "original_length": 160,
+      "original_hash": "724ce59e870275a95ba413b8e9fb7f6c88f97dc948d984505b0ae8e55ac2b020",
+      "cleaned_summary": "4. **Output",
+      "cleaned_length": 11,
+      "quality_score": 0,
+      "quality_status": "FAIL",
+      "contaminations_detected": {
+        "has_thinking_markers": false,
+        "has_meta_preamble": true,
+        "has_self_correction": false,
+        "has_planning_steps": false,
+        "markers_found": [],
+        "preamble_patterns": [
+          "The code is:"
+        ]
+      },
+      "contamination_count": 1,
+      "removal_steps": [
+        {
+          "step": "shared_gemma4_sanitizer",
+          "pattern_matched": "transport/thought/meta markers",
+          "length_before": 160,
+          "length_after": 11
+        }
+      ]
+    },
+    {
+      "chunk_id": "96cce9c8-176e-43a7-8a0f-c6bba3aeba76",
+      "relative_path": "src/lib/server/connections/connection-pool.ts",
+      "original_length": 93,
+      "original_hash": "57b47cbf6236b396574747d965c26a97a807d77682e99b85480b4ee8fcc72d42",
+      "cleaned_summary": "** I need to explain *what* it does and *how* it does it, keeping it concise (1-2 sentences).",
+      "cleaned_length": 93,
+      "quality_score": 0,
+      "quality_status": "FAIL",
+      "contaminations_detected": {
+        "has_thinking_markers": true,
+        "has_meta_preamble": false,
+        "has_self_correction": false,
+        "has_planning_steps": false,
+        "markers_found": [
+          "shared-gemma4-sanitizer"
+        ],
+        "preamble_patterns": []
+      },
+      "contamination_count": 1,
+      "removal_steps": []
+    },
+    {
+      "chunk_id": "3570ee1b-3821-4be8-b6b9-7e9eba8d5132",
+      "relative_path": "src/mcp/server.ts",
+      "original_length": 126,
+      "original_hash": "fccf384e6fc2c2dc6bf05ce7a8bb9fb4aa9651759ce0633b9c54f494804a1723",
+      "cleaned_summary": "** I need to explain what these tools collectively do. They relate to Retrieval-Augmented Generation (RAG) and web automation.",
+      "cleaned_length": 126,
+      "quality_score": 0,
+      "quality_status": "FAIL",
+      "contaminations_detected": {
+        "has_thinking_markers": true,
+        "has_meta_preamble": false,
+        "has_self_correction": false,
+        "has_planning_steps": false,
+        "markers_found": [
+          "shared-gemma4-sanitizer"
+        ],
+        "preamble_patterns": []
+      },
+      "contamination_count": 1,
+      "removal_steps": []
+    },
+    {
+      "chunk_id": "5c21942f-d635-476a-a996-5f9981efe060",
+      "relative_path": "src/lib/server/analytics/mapreduce-matrix-analysis.ts",
+      "original_length": 115,
+      "original_hash": "435f8cc8cf038e1029591a178a48d3572d0c6a5d2d8ae88d4e3693b0d872f7b9",
+      "cleaned_summary": "** I need to combine the functional description (the goal of the function) and the technical details (the process).",
+      "cleaned_length": 115,
+      "quality_score": 0,
+      "quality_status": "FAIL",
+      "contaminations_detected": {
+        "has_thinking_markers": true,
+        "has_meta_preamble": false,
+        "has_self_correction": false,
+        "has_planning_steps": false,
+        "markers_found": [
+          "shared-gemma4-sanitizer"
+        ],
+        "preamble_patterns": []
+      },
+      "contamination_count": 1,
+      "removal_steps": []
+    },
+    {
+      "chunk_id": "ab67dca4-4b92-45dd-b821-8eff73bc9a11",
+      "relative_path": "src/lib/server/agent/tools/find-files.ts",
+      "original_length": 99,
+      "original_hash": "934291ef07e412756a54f2c314ff26d5722bc075150eef5f991b85f5c70d80fe",
       "cleaned_summary": "",
       "cleaned_length": 0,
       "quality_score": 0,
@@ -249,40 +1672,1759 @@
         {
           "step": "remove_meta_lines",
           "pattern_matched": "various preamble/planning lines",
-          "length_before": 198,
+          "length_before": 99,
           "length_after": 0
+        }
+      ]
+    },
+    {
+      "chunk_id": "ee4b5f4b-1064-4552-affe-bb4ca766991d",
+      "relative_path": "src/routes/api/cases/+server.ts",
+      "original_length": 68,
+      "original_hash": "9d441feb08971aeb07fd6abde3602c0161628b8fb38732e289c103575818d189",
+      "cleaned_summary": "",
+      "cleaned_length": 0,
+      "quality_score": 0,
+      "quality_status": "FAIL",
+      "contaminations_detected": {
+        "has_thinking_markers": false,
+        "has_meta_preamble": false,
+        "has_self_correction": true,
+        "has_planning_steps": false,
+        "markers_found": [],
+        "preamble_patterns": []
+      },
+      "contamination_count": 1,
+      "removal_steps": [
+        {
+          "step": "remove_meta_lines",
+          "pattern_matched": "various preamble/planning lines",
+          "length_before": 68,
+          "length_after": 0
+        }
+      ]
+    },
+    {
+      "chunk_id": "a1e5628d-96e0-42d3-8c7b-6a5221d365be",
+      "relative_path": "src/lib/server/yolo.ts",
+      "original_length": 170,
+      "original_hash": "1887e0dbd986de8a291063237aea907d0b2dc1d102c667723ac551372a5a4e4f",
+      "cleaned_summary": "",
+      "cleaned_length": 0,
+      "quality_score": 0,
+      "quality_status": "FAIL",
+      "contaminations_detected": {
+        "has_thinking_markers": false,
+        "has_meta_preamble": false,
+        "has_self_correction": true,
+        "has_planning_steps": false,
+        "markers_found": [],
+        "preamble_patterns": []
+      },
+      "contamination_count": 1,
+      "removal_steps": [
+        {
+          "step": "remove_meta_lines",
+          "pattern_matched": "various preamble/planning lines",
+          "length_before": 170,
+          "length_after": 0
+        }
+      ]
+    },
+    {
+      "chunk_id": "d7dc0215-b1bf-4d16-af5d-288fb9c55cef",
+      "relative_path": "src/lib/server/db/migrations/003_deploy_enhanced_legal_schema.sql",
+      "original_length": 82,
+      "original_hash": "16a9aac4327413543bc1f742a578507114fb3cb1289d1f7ce1e706434deff052",
+      "cleaned_summary": "** I need to state that the code is creating indexes and for which tables/columns.",
+      "cleaned_length": 82,
+      "quality_score": 0,
+      "quality_status": "FAIL",
+      "contaminations_detected": {
+        "has_thinking_markers": true,
+        "has_meta_preamble": false,
+        "has_self_correction": false,
+        "has_planning_steps": false,
+        "markers_found": [
+          "shared-gemma4-sanitizer"
+        ],
+        "preamble_patterns": []
+      },
+      "contamination_count": 1,
+      "removal_steps": []
+    },
+    {
+      "chunk_id": "3e699f53-83e0-4233-b1cb-5ff760c2597a",
+      "relative_path": "src/lib/server/gpu/background-analyzer.ts",
+      "original_length": 118,
+      "original_hash": "3c9c82c0a5211acd312b61a253379b70438ffea81e2a997f322ad8b0d17831ba",
+      "cleaned_summary": "** I need to combine these elements into a concise summary (1-2 sentences) suitable for a legal code analyzer context.",
+      "cleaned_length": 118,
+      "quality_score": 0,
+      "quality_status": "FAIL",
+      "contaminations_detected": {
+        "has_thinking_markers": true,
+        "has_meta_preamble": false,
+        "has_self_correction": false,
+        "has_planning_steps": false,
+        "markers_found": [
+          "shared-gemma4-sanitizer"
+        ],
+        "preamble_patterns": []
+      },
+      "contamination_count": 1,
+      "removal_steps": []
+    },
+    {
+      "chunk_id": "40eb00a1-851d-446d-82c1-51ab110bcc4d",
+      "relative_path": "src/lib/server/evidence-progress.ts",
+      "original_length": 133,
+      "original_hash": "40df6c524e15179e36da7511a2f3bee15469d89629ed21e360262f97d1f99023",
+      "cleaned_summary": "",
+      "cleaned_length": 0,
+      "quality_score": 0,
+      "quality_status": "FAIL",
+      "contaminations_detected": {
+        "has_thinking_markers": false,
+        "has_meta_preamble": false,
+        "has_self_correction": true,
+        "has_planning_steps": false,
+        "markers_found": [],
+        "preamble_patterns": []
+      },
+      "contamination_count": 1,
+      "removal_steps": [
+        {
+          "step": "remove_meta_lines",
+          "pattern_matched": "various preamble/planning lines",
+          "length_before": 133,
+          "length_after": 0
+        }
+      ]
+    },
+    {
+      "chunk_id": "a06bc156-c247-4dec-bdee-3b3b3eb6ce14",
+      "relative_path": "src/lib/server/indexer/cluster-summary.ts",
+      "original_length": 221,
+      "original_hash": "1d5dc711027df861b8fec7d79c4e11b03a19e785a0965753d872337362d9f9c9",
+      "cleaned_summary": "** I need to summarize the *functionality* of the provided code block. Since the code block contains two distinct functions, I should focus on the primary, complete function (`embedSummary`) and mention the purpose of the",
+      "cleaned_length": 221,
+      "quality_score": 0,
+      "quality_status": "FAIL",
+      "contaminations_detected": {
+        "has_thinking_markers": true,
+        "has_meta_preamble": false,
+        "has_self_correction": false,
+        "has_planning_steps": false,
+        "markers_found": [
+          "shared-gemma4-sanitizer"
+        ],
+        "preamble_patterns": []
+      },
+      "contamination_count": 1,
+      "removal_steps": []
+    },
+    {
+      "chunk_id": "b914af13-1dfb-46b9-a39e-efc0c6307018",
+      "relative_path": "src/lib/server/gpu/gpu-pipeline.ts",
+      "original_length": 123,
+      "original_hash": "ea72e64b87609786ba6f31dfcfa8a42555a734b957cd2b564796463ee6e31182",
+      "cleaned_summary": "** I need to summarize the *function* of the code block and the *purpose* of the interface in the context of code analysis.",
+      "cleaned_length": 123,
+      "quality_score": 0,
+      "quality_status": "FAIL",
+      "contaminations_detected": {
+        "has_thinking_markers": true,
+        "has_meta_preamble": false,
+        "has_self_correction": false,
+        "has_planning_steps": false,
+        "markers_found": [
+          "shared-gemma4-sanitizer"
+        ],
+        "preamble_patterns": []
+      },
+      "contamination_count": 1,
+      "removal_steps": []
+    },
+    {
+      "chunk_id": "b6267e5b-690b-4496-a358-8a51ca262376",
+      "relative_path": "src/lib/components/ai/EnhancedDocumentUploader.svelte",
+      "original_length": 178,
+      "original_hash": "cf43b5def8c4fe7eda4c489c716f3ed0213033d13cc8d43bf6d01a766122c3bb",
+      "cleaned_summary": "",
+      "cleaned_length": 0,
+      "quality_score": 0,
+      "quality_status": "FAIL",
+      "contaminations_detected": {
+        "has_thinking_markers": false,
+        "has_meta_preamble": false,
+        "has_self_correction": true,
+        "has_planning_steps": false,
+        "markers_found": [],
+        "preamble_patterns": []
+      },
+      "contamination_count": 1,
+      "removal_steps": [
+        {
+          "step": "remove_meta_lines",
+          "pattern_matched": "various preamble/planning lines",
+          "length_before": 178,
+          "length_after": 0
+        }
+      ]
+    },
+    {
+      "chunk_id": "8738968b-a1bc-49e0-902c-0bb6ad04d9fb",
+      "relative_path": "src/lib/components/codebase/TagRenameDialog.svelte",
+      "original_length": 79,
+      "original_hash": "f3d036d6715b1de2e800729750a5065c0e035735d2ec64da46a9b9e4d63c7c61",
+      "cleaned_summary": "",
+      "cleaned_length": 0,
+      "quality_score": 0,
+      "quality_status": "FAIL",
+      "contaminations_detected": {
+        "has_thinking_markers": false,
+        "has_meta_preamble": false,
+        "has_self_correction": true,
+        "has_planning_steps": false,
+        "markers_found": [],
+        "preamble_patterns": []
+      },
+      "contamination_count": 1,
+      "removal_steps": [
+        {
+          "step": "remove_meta_lines",
+          "pattern_matched": "various preamble/planning lines",
+          "length_before": 79,
+          "length_after": 0
+        }
+      ]
+    },
+    {
+      "chunk_id": "c65449f2-4d56-4237-8361-2d82ebd85006",
+      "relative_path": "src/lib/server/ai/contextual-tools.ts",
+      "original_length": 79,
+      "original_hash": "7ada737fe91552f28d08a5194031edc6bf771178d2f7528ecc3be8141b8f46c4",
+      "cleaned_summary": "",
+      "cleaned_length": 0,
+      "quality_score": 0,
+      "quality_status": "FAIL",
+      "contaminations_detected": {
+        "has_thinking_markers": false,
+        "has_meta_preamble": false,
+        "has_self_correction": true,
+        "has_planning_steps": false,
+        "markers_found": [],
+        "preamble_patterns": []
+      },
+      "contamination_count": 1,
+      "removal_steps": [
+        {
+          "step": "remove_meta_lines",
+          "pattern_matched": "various preamble/planning lines",
+          "length_before": 79,
+          "length_after": 0
+        }
+      ]
+    },
+    {
+      "chunk_id": "e4369127-d27d-4eee-9633-7f8d79ebf172",
+      "relative_path": "src/routes/api/health/ocr/+server.ts",
+      "original_length": 36,
+      "original_hash": "d03e6ce4031ef878dd6098b60c592d17925b131221ed2ca398356b12bd58393a",
+      "cleaned_summary": "",
+      "cleaned_length": 0,
+      "quality_score": 0,
+      "quality_status": "FAIL",
+      "contaminations_detected": {
+        "has_thinking_markers": false,
+        "has_meta_preamble": false,
+        "has_self_correction": true,
+        "has_planning_steps": false,
+        "markers_found": [],
+        "preamble_patterns": []
+      },
+      "contamination_count": 1,
+      "removal_steps": [
+        {
+          "step": "remove_meta_lines",
+          "pattern_matched": "various preamble/planning lines",
+          "length_before": 36,
+          "length_after": 0
+        }
+      ]
+    },
+    {
+      "chunk_id": "a1c52016-5526-4971-928a-7bd070cfdaad",
+      "relative_path": "src/lib/server/ace/policy.ts",
+      "original_length": 33,
+      "original_hash": "646afd5b3e32fc5c1623243f8b6580a341006de7f75a22ec1fd96c404c00c76b",
+      "cleaned_summary": "** I need to combine these into a",
+      "cleaned_length": 33,
+      "quality_score": 0,
+      "quality_status": "FAIL",
+      "contaminations_detected": {
+        "has_thinking_markers": true,
+        "has_meta_preamble": false,
+        "has_self_correction": false,
+        "has_planning_steps": false,
+        "markers_found": [
+          "shared-gemma4-sanitizer"
+        ],
+        "preamble_patterns": []
+      },
+      "contamination_count": 1,
+      "removal_steps": []
+    },
+    {
+      "chunk_id": "e4ea1451-4f18-45dc-99d9-c932989b7197",
+      "relative_path": "src/lib/components/legal-corpus/LegalCorpusClassicView.svelte",
+      "original_length": 88,
+      "original_hash": "fe978166af05d79a89c2c8eee765e641b52cfe9e542ed25edd8cd3e71e09eac2",
+      "cleaned_summary": "** I need to combine these distinct functionalities into a concise 1-2 sentence summary.",
+      "cleaned_length": 88,
+      "quality_score": 0,
+      "quality_status": "FAIL",
+      "contaminations_detected": {
+        "has_thinking_markers": true,
+        "has_meta_preamble": false,
+        "has_self_correction": false,
+        "has_planning_steps": false,
+        "markers_found": [
+          "shared-gemma4-sanitizer"
+        ],
+        "preamble_patterns": []
+      },
+      "contamination_count": 1,
+      "removal_steps": []
+    },
+    {
+      "chunk_id": "717356e0-1f01-4f13-84cb-5bc28f2a0905",
+      "relative_path": "src/routes/(app)/admin/cache/+page.ts",
+      "original_length": 55,
+      "original_hash": "c0f7ec6443b9d3af858d39bbaaecef5c3e275f191cce522cd60dfcc753bf03c5",
+      "cleaned_summary": "",
+      "cleaned_length": 0,
+      "quality_score": 0,
+      "quality_status": "FAIL",
+      "contaminations_detected": {
+        "has_thinking_markers": false,
+        "has_meta_preamble": false,
+        "has_self_correction": true,
+        "has_planning_steps": false,
+        "markers_found": [],
+        "preamble_patterns": []
+      },
+      "contamination_count": 1,
+      "removal_steps": [
+        {
+          "step": "remove_meta_lines",
+          "pattern_matched": "various preamble/planning lines",
+          "length_before": 55,
+          "length_after": 0
+        }
+      ]
+    },
+    {
+      "chunk_id": "6587414d-cdea-4fb1-97e6-d3cda6f42fd1",
+      "relative_path": "src/lib/server/inference/inference-router.ts",
+      "original_length": 117,
+      "original_hash": "c0af992e8d210ea9368b776efd4263f1eb00fc389082661788d583e81a41744a",
+      "cleaned_summary": "",
+      "cleaned_length": 0,
+      "quality_score": 0,
+      "quality_status": "FAIL",
+      "contaminations_detected": {
+        "has_thinking_markers": false,
+        "has_meta_preamble": false,
+        "has_self_correction": false,
+        "has_planning_steps": true,
+        "markers_found": [],
+        "preamble_patterns": []
+      },
+      "contamination_count": 1,
+      "removal_steps": [
+        {
+          "step": "shared_gemma4_sanitizer",
+          "pattern_matched": "transport/thought/meta markers",
+          "length_before": 117,
+          "length_after": 0
+        }
+      ]
+    },
+    {
+      "chunk_id": "19fb6ca7-14f1-45db-adca-b74e27ee6c0e",
+      "relative_path": "src/lib/server/evidence/type-detector.ts",
+      "original_length": 107,
+      "original_hash": "7f41f3f71395196691d1c81e817565d05ae7493b36695303b2003e7741a09836",
+      "cleaned_summary": "",
+      "cleaned_length": 0,
+      "quality_score": 0,
+      "quality_status": "FAIL",
+      "contaminations_detected": {
+        "has_thinking_markers": false,
+        "has_meta_preamble": false,
+        "has_self_correction": false,
+        "has_planning_steps": true,
+        "markers_found": [],
+        "preamble_patterns": []
+      },
+      "contamination_count": 1,
+      "removal_steps": [
+        {
+          "step": "shared_gemma4_sanitizer",
+          "pattern_matched": "transport/thought/meta markers",
+          "length_before": 107,
+          "length_after": 0
+        }
+      ]
+    },
+    {
+      "chunk_id": "78c5de55-6692-4c5d-a3aa-4a61eee92268",
+      "relative_path": "src/lib/server/ai/gemma4-agent.ts",
+      "original_length": 49,
+      "original_hash": "94b7f36a901e32e011ee01974c6465447ff000d0fa675312c9fa63b2d472b32e",
+      "cleaned_summary": "",
+      "cleaned_length": 0,
+      "quality_score": 0,
+      "quality_status": "FAIL",
+      "contaminations_detected": {
+        "has_thinking_markers": false,
+        "has_meta_preamble": false,
+        "has_self_correction": true,
+        "has_planning_steps": false,
+        "markers_found": [],
+        "preamble_patterns": []
+      },
+      "contamination_count": 1,
+      "removal_steps": [
+        {
+          "step": "remove_meta_lines",
+          "pattern_matched": "various preamble/planning lines",
+          "length_before": 49,
+          "length_after": 0
+        }
+      ]
+    },
+    {
+      "chunk_id": "5b55fffd-e493-451e-a504-b05e590939fe",
+      "relative_path": "src/lib/utils/accessibility.ts",
+      "original_length": 74,
+      "original_hash": "575dc228c54fcf17daefc2b0e4274639726d69e44457763e8158552a0c08cf44",
+      "cleaned_summary": "** I need to combine these functions into a concise, 1-2 sentence summary.",
+      "cleaned_length": 74,
+      "quality_score": 0,
+      "quality_status": "FAIL",
+      "contaminations_detected": {
+        "has_thinking_markers": true,
+        "has_meta_preamble": false,
+        "has_self_correction": false,
+        "has_planning_steps": false,
+        "markers_found": [
+          "shared-gemma4-sanitizer"
+        ],
+        "preamble_patterns": []
+      },
+      "contamination_count": 1,
+      "removal_steps": []
+    },
+    {
+      "chunk_id": "f7ea078b-82d0-4ede-9eb3-79fc255ca53c",
+      "relative_path": "src/lib/components/legal/OfficialTextPane.svelte",
+      "original_length": 199,
+      "original_hash": "b8a37c15767415077b3bc8b12ef43f4f07887c97f2c9150d0348788d448826e0",
+      "cleaned_summary": "",
+      "cleaned_length": 0,
+      "quality_score": 0,
+      "quality_status": "FAIL",
+      "contaminations_detected": {
+        "has_thinking_markers": false,
+        "has_meta_preamble": false,
+        "has_self_correction": true,
+        "has_planning_steps": false,
+        "markers_found": [],
+        "preamble_patterns": []
+      },
+      "contamination_count": 1,
+      "removal_steps": [
+        {
+          "step": "remove_meta_lines",
+          "pattern_matched": "various preamble/planning lines",
+          "length_before": 199,
+          "length_after": 0
+        }
+      ]
+    },
+    {
+      "chunk_id": "2dabf8fe-5ff8-4ce2-8f22-00a33c2e7f9a",
+      "relative_path": "src/lib/server/agent/tools/web-search-searxng.ts",
+      "original_length": 387,
+      "original_hash": "3859f50997ad0d7f3920b89fd3f18438025fe1bd302bfd583718dfc88d6d3b50",
+      "cleaned_summary": "The snippet shows how the code handles two main categories of queries:",
+      "cleaned_length": 70,
+      "quality_score": 0.6,
+      "quality_status": "WARN",
+      "contaminations_detected": {
+        "has_thinking_markers": true,
+        "has_meta_preamble": false,
+        "has_self_correction": false,
+        "has_planning_steps": true,
+        "markers_found": [
+          "shared-gemma4-sanitizer"
+        ],
+        "preamble_patterns": []
+      },
+      "contamination_count": 2,
+      "removal_steps": [
+        {
+          "step": "shared_gemma4_sanitizer",
+          "pattern_matched": "transport/thought/meta markers",
+          "length_before": 387,
+          "length_after": 336
+        },
+        {
+          "step": "remove_meta_lines",
+          "pattern_matched": "various preamble/planning lines",
+          "length_before": 336,
+          "length_after": 70
+        }
+      ]
+    },
+    {
+      "chunk_id": "b0eebc25-70fa-44f2-930b-06f82c554ebd",
+      "relative_path": "src/routes/(app)/evidence/analyze/+page.svelte",
+      "original_length": 152,
+      "original_hash": "d90318914bd07403bdc65716de1b6a40ed5fd67c90f7bd39274ad6b17c493a01",
+      "cleaned_summary": "",
+      "cleaned_length": 0,
+      "quality_score": 0,
+      "quality_status": "FAIL",
+      "contaminations_detected": {
+        "has_thinking_markers": false,
+        "has_meta_preamble": false,
+        "has_self_correction": true,
+        "has_planning_steps": false,
+        "markers_found": [],
+        "preamble_patterns": []
+      },
+      "contamination_count": 1,
+      "removal_steps": [
+        {
+          "step": "remove_meta_lines",
+          "pattern_matched": "various preamble/planning lines",
+          "length_before": 152,
+          "length_after": 0
+        }
+      ]
+    },
+    {
+      "chunk_id": "65de1656-3471-4a5a-ba82-8b53a50af73e",
+      "relative_path": "src/lib/services/knowledge-search/types.ts",
+      "original_length": 66,
+      "original_hash": "dd42800ace6800135aee6a066dc290f6f5c57044224895ee39cf989c3522e1a7",
+      "cleaned_summary": "** I need to explain what these structures collectively represent.",
+      "cleaned_length": 66,
+      "quality_score": 0,
+      "quality_status": "FAIL",
+      "contaminations_detected": {
+        "has_thinking_markers": true,
+        "has_meta_preamble": false,
+        "has_self_correction": false,
+        "has_planning_steps": false,
+        "markers_found": [
+          "shared-gemma4-sanitizer"
+        ],
+        "preamble_patterns": []
+      },
+      "contamination_count": 1,
+      "removal_steps": []
+    },
+    {
+      "chunk_id": "63c9d5fe-d9b7-4794-8fc3-bd1e75c1eea1",
+      "relative_path": "src/lib/server/tensor/topology-byte-mapper.ts",
+      "original_length": 111,
+      "original_hash": "c05303a1f5b7af051a20dd927a18b1eadcd653fcd2dea737ad7022f4ce8b4425",
+      "cleaned_summary": "** I need to combine these two functions' purposes into a concise, legal code analysis summary (1-2 sentences).",
+      "cleaned_length": 111,
+      "quality_score": 0,
+      "quality_status": "FAIL",
+      "contaminations_detected": {
+        "has_thinking_markers": true,
+        "has_meta_preamble": false,
+        "has_self_correction": false,
+        "has_planning_steps": false,
+        "markers_found": [
+          "shared-gemma4-sanitizer"
+        ],
+        "preamble_patterns": []
+      },
+      "contamination_count": 1,
+      "removal_steps": []
+    },
+    {
+      "chunk_id": "b84a8a63-2cda-4b38-978d-55c3b7c21f78",
+      "relative_path": "src/lib/components/ai/SimpleWorkingChat.svelte",
+      "original_length": 145,
+      "original_hash": "8c1a9be7a068b0d118cddc3cc765943c3876c0bf73d1555694657355912e0b43",
+      "cleaned_summary": "",
+      "cleaned_length": 0,
+      "quality_score": 0,
+      "quality_status": "FAIL",
+      "contaminations_detected": {
+        "has_thinking_markers": false,
+        "has_meta_preamble": false,
+        "has_self_correction": true,
+        "has_planning_steps": false,
+        "markers_found": [],
+        "preamble_patterns": []
+      },
+      "contamination_count": 1,
+      "removal_steps": [
+        {
+          "step": "remove_meta_lines",
+          "pattern_matched": "various preamble/planning lines",
+          "length_before": 145,
+          "length_after": 0
+        }
+      ]
+    },
+    {
+      "chunk_id": "61f6bfec-1314-4079-a413-36373da79ded",
+      "relative_path": "src/routes/(app)/admin/cache/+page.svelte",
+      "original_length": 128,
+      "original_hash": "8a0c8d3ade0b2d3a937c8c8bf2dea20e0bbd6936b664f5b0b3b997fd3c160cfc",
+      "cleaned_summary": "",
+      "cleaned_length": 0,
+      "quality_score": 0,
+      "quality_status": "FAIL",
+      "contaminations_detected": {
+        "has_thinking_markers": false,
+        "has_meta_preamble": false,
+        "has_self_correction": true,
+        "has_planning_steps": false,
+        "markers_found": [],
+        "preamble_patterns": []
+      },
+      "contamination_count": 1,
+      "removal_steps": [
+        {
+          "step": "remove_meta_lines",
+          "pattern_matched": "various preamble/planning lines",
+          "length_before": 128,
+          "length_after": 0
+        }
+      ]
+    },
+    {
+      "chunk_id": "7b5988a0-4bb2-467c-9839-eec94b7c7abe",
+      "relative_path": "src/lib/server/services/langextract-service.ts",
+      "original_length": 69,
+      "original_hash": "4673d0744823058e6b7d2202423887b50bc14a2ad20017c09588b0e08ab6ecb2",
+      "cleaned_summary": "",
+      "cleaned_length": 0,
+      "quality_score": 0,
+      "quality_status": "FAIL",
+      "contaminations_detected": {
+        "has_thinking_markers": false,
+        "has_meta_preamble": false,
+        "has_self_correction": true,
+        "has_planning_steps": false,
+        "markers_found": [],
+        "preamble_patterns": []
+      },
+      "contamination_count": 1,
+      "removal_steps": [
+        {
+          "step": "remove_meta_lines",
+          "pattern_matched": "various preamble/planning lines",
+          "length_before": 69,
+          "length_after": 0
+        }
+      ]
+    },
+    {
+      "chunk_id": "94ece260-82ac-482e-b1f3-42926394f6ff",
+      "relative_path": "src/lib/server/helpers/docker-discovery.ts",
+      "original_length": 87,
+      "original_hash": "215354d9fdae5335cb36406a6a5a23e7686d597fc1b6777ed41c21eda563049a",
+      "cleaned_summary": "",
+      "cleaned_length": 0,
+      "quality_score": 0,
+      "quality_status": "FAIL",
+      "contaminations_detected": {
+        "has_thinking_markers": false,
+        "has_meta_preamble": false,
+        "has_self_correction": true,
+        "has_planning_steps": false,
+        "markers_found": [],
+        "preamble_patterns": []
+      },
+      "contamination_count": 1,
+      "removal_steps": [
+        {
+          "step": "remove_meta_lines",
+          "pattern_matched": "various preamble/planning lines",
+          "length_before": 87,
+          "length_after": 0
+        }
+      ]
+    },
+    {
+      "chunk_id": "64872d65-be28-469d-931e-febeb5a1eaf8",
+      "relative_path": "src/lib/server/ai/onnx-server.ts",
+      "original_length": 142,
+      "original_hash": "593e78294d7f0311949e0db4e0e86f9243e9ff12182e7f70434235b9e5f45522",
+      "cleaned_summary": "",
+      "cleaned_length": 0,
+      "quality_score": 0,
+      "quality_status": "FAIL",
+      "contaminations_detected": {
+        "has_thinking_markers": false,
+        "has_meta_preamble": false,
+        "has_self_correction": true,
+        "has_planning_steps": false,
+        "markers_found": [],
+        "preamble_patterns": []
+      },
+      "contamination_count": 1,
+      "removal_steps": [
+        {
+          "step": "remove_meta_lines",
+          "pattern_matched": "various preamble/planning lines",
+          "length_before": 142,
+          "length_after": 0
+        }
+      ]
+    },
+    {
+      "chunk_id": "b03eb11f-aa7a-4e7d-acc3-e5580d8a2279",
+      "relative_path": "src/routes/(app)/analytics/+page.svelte",
+      "original_length": 55,
+      "original_hash": "dd083f9161707578a02ce374e24b0d3f07ada6230db11434c5dff9b5215e9dd1",
+      "cleaned_summary": "",
+      "cleaned_length": 0,
+      "quality_score": 0,
+      "quality_status": "FAIL",
+      "contaminations_detected": {
+        "has_thinking_markers": false,
+        "has_meta_preamble": false,
+        "has_self_correction": true,
+        "has_planning_steps": false,
+        "markers_found": [],
+        "preamble_patterns": []
+      },
+      "contamination_count": 1,
+      "removal_steps": [
+        {
+          "step": "remove_meta_lines",
+          "pattern_matched": "various preamble/planning lines",
+          "length_before": 55,
+          "length_after": 0
+        }
+      ]
+    },
+    {
+      "chunk_id": "6376e90f-3c8b-477d-8f33-ff1895d6f30e",
+      "relative_path": "src/lib/components/glyph/GlyphAtlasPanel.svelte",
+      "original_length": 150,
+      "original_hash": "9d9a3ab73defc1156593456f60083e7ecdcc62cd2a58ce42dff9397bb4d7ca74",
+      "cleaned_summary": "",
+      "cleaned_length": 0,
+      "quality_score": 0,
+      "quality_status": "FAIL",
+      "contaminations_detected": {
+        "has_thinking_markers": false,
+        "has_meta_preamble": false,
+        "has_self_correction": true,
+        "has_planning_steps": false,
+        "markers_found": [],
+        "preamble_patterns": []
+      },
+      "contamination_count": 1,
+      "removal_steps": [
+        {
+          "step": "remove_meta_lines",
+          "pattern_matched": "various preamble/planning lines",
+          "length_before": 150,
+          "length_after": 0
+        }
+      ]
+    },
+    {
+      "chunk_id": "605f8d02-f793-4728-8376-bea0f3169721",
+      "relative_path": "src/routes/api/error-brain/search/+server.ts",
+      "original_length": 57,
+      "original_hash": "58ebb5dbd58a0637e3c40661251d28337636f30b48cf96297e8413d8263c3169",
+      "cleaned_summary": "",
+      "cleaned_length": 0,
+      "quality_score": 0,
+      "quality_status": "FAIL",
+      "contaminations_detected": {
+        "has_thinking_markers": false,
+        "has_meta_preamble": false,
+        "has_self_correction": true,
+        "has_planning_steps": false,
+        "markers_found": [],
+        "preamble_patterns": []
+      },
+      "contamination_count": 1,
+      "removal_steps": [
+        {
+          "step": "remove_meta_lines",
+          "pattern_matched": "various preamble/planning lines",
+          "length_before": 57,
+          "length_after": 0
+        }
+      ]
+    },
+    {
+      "chunk_id": "686fe5f4-8705-4dc3-872a-1681962fd65f",
+      "relative_path": "src/lib/server/agent/tools/analyze-file.ts",
+      "original_length": 31,
+      "original_hash": "f3c6bc6d0ff1fbd9fc9f206f681eada272c1e819e3085c1f6eef671c35ccea6e",
+      "cleaned_summary": "",
+      "cleaned_length": 0,
+      "quality_score": 0,
+      "quality_status": "FAIL",
+      "contaminations_detected": {
+        "has_thinking_markers": false,
+        "has_meta_preamble": false,
+        "has_self_correction": true,
+        "has_planning_steps": false,
+        "markers_found": [],
+        "preamble_patterns": []
+      },
+      "contamination_count": 1,
+      "removal_steps": [
+        {
+          "step": "remove_meta_lines",
+          "pattern_matched": "various preamble/planning lines",
+          "length_before": 31,
+          "length_after": 0
+        }
+      ]
+    },
+    {
+      "chunk_id": "7d91835a-2b65-4605-a2da-2bc171c667a2",
+      "relative_path": "src/lib/server/legal/constitution-tagger.ts",
+      "original_length": 79,
+      "original_hash": "e413495d9d1570a904d07a81bb65275ed915e71ff38768706f7e1022f222179e",
+      "cleaned_summary": "** I need to explain that this code is a classification system for legal texts.",
+      "cleaned_length": 79,
+      "quality_score": 0,
+      "quality_status": "FAIL",
+      "contaminations_detected": {
+        "has_thinking_markers": true,
+        "has_meta_preamble": false,
+        "has_self_correction": false,
+        "has_planning_steps": false,
+        "markers_found": [
+          "shared-gemma4-sanitizer"
+        ],
+        "preamble_patterns": []
+      },
+      "contamination_count": 1,
+      "removal_steps": []
+    },
+    {
+      "chunk_id": "576b97ae-3ee7-40b3-888a-9c9ecf16fac9",
+      "relative_path": "src/routes/login/+page.server.ts",
+      "original_length": 106,
+      "original_hash": "b1f4f72e5c95adbae8018e178968510fc5f0453bf22e70b315e26fb97b9ef764",
+      "cleaned_summary": "",
+      "cleaned_length": 0,
+      "quality_score": 0,
+      "quality_status": "FAIL",
+      "contaminations_detected": {
+        "has_thinking_markers": false,
+        "has_meta_preamble": false,
+        "has_self_correction": true,
+        "has_planning_steps": false,
+        "markers_found": [],
+        "preamble_patterns": []
+      },
+      "contamination_count": 1,
+      "removal_steps": [
+        {
+          "step": "remove_meta_lines",
+          "pattern_matched": "various preamble/planning lines",
+          "length_before": 106,
+          "length_after": 0
+        }
+      ]
+    },
+    {
+      "chunk_id": "37e27fbb-6798-41a1-982a-2631ade66c9d",
+      "relative_path": "src/lib/components/forms/EnhancedCaseForm.svelte",
+      "original_length": 196,
+      "original_hash": "221d4d876033941b7644c039aee257a3e2bd672d1fb41bf627e05cad8d8fc799",
+      "cleaned_summary": "",
+      "cleaned_length": 0,
+      "quality_score": 0,
+      "quality_status": "FAIL",
+      "contaminations_detected": {
+        "has_thinking_markers": false,
+        "has_meta_preamble": false,
+        "has_self_correction": true,
+        "has_planning_steps": false,
+        "markers_found": [],
+        "preamble_patterns": []
+      },
+      "contamination_count": 1,
+      "removal_steps": [
+        {
+          "step": "remove_meta_lines",
+          "pattern_matched": "various preamble/planning lines",
+          "length_before": 196,
+          "length_after": 0
+        }
+      ]
+    },
+    {
+      "chunk_id": "3ef3f863-05f6-448a-b223-27cb9e545a1f",
+      "relative_path": "src/lib/server/ai/information-gain-validator.ts",
+      "original_length": 52,
+      "original_hash": "e146deff999e012cf9b1565f5d297da1908bd780f8cb672780ad697af734f43d",
+      "cleaned_summary": "",
+      "cleaned_length": 0,
+      "quality_score": 0,
+      "quality_status": "FAIL",
+      "contaminations_detected": {
+        "has_thinking_markers": false,
+        "has_meta_preamble": false,
+        "has_self_correction": true,
+        "has_planning_steps": false,
+        "markers_found": [],
+        "preamble_patterns": []
+      },
+      "contamination_count": 1,
+      "removal_steps": [
+        {
+          "step": "remove_meta_lines",
+          "pattern_matched": "various preamble/planning lines",
+          "length_before": 52,
+          "length_after": 0
+        }
+      ]
+    },
+    {
+      "chunk_id": "fab86d29-f01b-4f35-9b99-8e0fd063ee3c",
+      "relative_path": "src/lib/server/llm/gemma4-tool-loop.ts",
+      "original_length": 79,
+      "original_hash": "e857585ae9de4077ff4b78f92f1f0df18973e31d501698356d61f5b79a9013d9",
+      "cleaned_summary": "",
+      "cleaned_length": 0,
+      "quality_score": 0,
+      "quality_status": "FAIL",
+      "contaminations_detected": {
+        "has_thinking_markers": false,
+        "has_meta_preamble": false,
+        "has_self_correction": true,
+        "has_planning_steps": false,
+        "markers_found": [],
+        "preamble_patterns": []
+      },
+      "contamination_count": 1,
+      "removal_steps": [
+        {
+          "step": "remove_meta_lines",
+          "pattern_matched": "various preamble/planning lines",
+          "length_before": 79,
+          "length_after": 0
+        }
+      ]
+    },
+    {
+      "chunk_id": "8338f324-ec54-4db6-862f-9127db8b9d36",
+      "relative_path": "src/lib/server/ace/practice-templates.ts",
+      "original_length": 98,
+      "original_hash": "61f299cb532187da0d9fd05c87a254b506308ff15dbe997cd7522349b8d86f83",
+      "cleaned_summary": "** I need to synthesize the common theme: the structure outlines various specialized areas of law.",
+      "cleaned_length": 98,
+      "quality_score": 0,
+      "quality_status": "FAIL",
+      "contaminations_detected": {
+        "has_thinking_markers": true,
+        "has_meta_preamble": false,
+        "has_self_correction": false,
+        "has_planning_steps": false,
+        "markers_found": [
+          "shared-gemma4-sanitizer"
+        ],
+        "preamble_patterns": []
+      },
+      "contamination_count": 1,
+      "removal_steps": []
+    },
+    {
+      "chunk_id": "d60cdcaa-72bd-4f41-ae10-ceec30a1b7fa",
+      "relative_path": "src/lib/server/research/research-to-wiki-encoder.ts",
+      "original_length": 230,
+      "original_hash": "85936ed1b2e63e0096973ee94104b32a7ebd18f362e0ddeb89f88b1dd83a7071",
+      "cleaned_summary": "",
+      "cleaned_length": 0,
+      "quality_score": 0,
+      "quality_status": "FAIL",
+      "contaminations_detected": {
+        "has_thinking_markers": false,
+        "has_meta_preamble": false,
+        "has_self_correction": true,
+        "has_planning_steps": false,
+        "markers_found": [],
+        "preamble_patterns": []
+      },
+      "contamination_count": 1,
+      "removal_steps": [
+        {
+          "step": "remove_meta_lines",
+          "pattern_matched": "various preamble/planning lines",
+          "length_before": 230,
+          "length_after": 0
+        }
+      ]
+    },
+    {
+      "chunk_id": "83a0bedb-ec10-4593-9148-dc51b13437f0",
+      "relative_path": "src/lib/components/ai/Gemma270MWebAssembly.svelte",
+      "original_length": 50,
+      "original_hash": "c9681585e11d36afa3f782bdd44b0b201fd70f8fb87bd3a4f4709405077271fd",
+      "cleaned_summary": "",
+      "cleaned_length": 0,
+      "quality_score": 0,
+      "quality_status": "FAIL",
+      "contaminations_detected": {
+        "has_thinking_markers": false,
+        "has_meta_preamble": false,
+        "has_self_correction": true,
+        "has_planning_steps": false,
+        "markers_found": [],
+        "preamble_patterns": []
+      },
+      "contamination_count": 1,
+      "removal_steps": [
+        {
+          "step": "remove_meta_lines",
+          "pattern_matched": "various preamble/planning lines",
+          "length_before": 50,
+          "length_after": 0
+        }
+      ]
+    },
+    {
+      "chunk_id": "a6c12893-f9ce-4ad0-aa6d-ec00af011b18",
+      "relative_path": "src/lib/cache/loki-cache.svelte.ts",
+      "original_length": 89,
+      "original_hash": "f30b16c8194150936ac81fecf1f2ed746b79f35f014c190ae42c84a397be7c60",
+      "cleaned_summary": "",
+      "cleaned_length": 0,
+      "quality_score": 0,
+      "quality_status": "FAIL",
+      "contaminations_detected": {
+        "has_thinking_markers": false,
+        "has_meta_preamble": false,
+        "has_self_correction": true,
+        "has_planning_steps": false,
+        "markers_found": [],
+        "preamble_patterns": []
+      },
+      "contamination_count": 1,
+      "removal_steps": [
+        {
+          "step": "remove_meta_lines",
+          "pattern_matched": "various preamble/planning lines",
+          "length_before": 89,
+          "length_after": 0
+        }
+      ]
+    },
+    {
+      "chunk_id": "59477dfd-2775-49f5-86f6-ee4dd47561df",
+      "relative_path": "src/lib/server/agent/tools/web-search-searxng.ts",
+      "original_length": 387,
+      "original_hash": "3859f50997ad0d7f3920b89fd3f18438025fe1bd302bfd583718dfc88d6d3b50",
+      "cleaned_summary": "The snippet shows how the code handles two main categories of queries:",
+      "cleaned_length": 70,
+      "quality_score": 0.6,
+      "quality_status": "WARN",
+      "contaminations_detected": {
+        "has_thinking_markers": true,
+        "has_meta_preamble": false,
+        "has_self_correction": false,
+        "has_planning_steps": true,
+        "markers_found": [
+          "shared-gemma4-sanitizer"
+        ],
+        "preamble_patterns": []
+      },
+      "contamination_count": 2,
+      "removal_steps": [
+        {
+          "step": "shared_gemma4_sanitizer",
+          "pattern_matched": "transport/thought/meta markers",
+          "length_before": 387,
+          "length_after": 336
+        },
+        {
+          "step": "remove_meta_lines",
+          "pattern_matched": "various preamble/planning lines",
+          "length_before": 336,
+          "length_after": 70
+        }
+      ]
+    },
+    {
+      "chunk_id": "4c6e8662-ddeb-4662-acd9-59ffd7d3d8a2",
+      "relative_path": "src/routes/(app)/admin/gpu-evidence-graph/+page.server.ts",
+      "original_length": 131,
+      "original_hash": "3578a3357b8aa6a54ceaf4c90f765346a07bd231aa08552b4f0dc545e7ba7d79",
+      "cleaned_summary": "The code performs the following actions:",
+      "cleaned_length": 40,
+      "quality_score": 0,
+      "quality_status": "FAIL",
+      "contaminations_detected": {
+        "has_thinking_markers": false,
+        "has_meta_preamble": false,
+        "has_self_correction": false,
+        "has_planning_steps": true,
+        "markers_found": [],
+        "preamble_patterns": []
+      },
+      "contamination_count": 1,
+      "removal_steps": [
+        {
+          "step": "shared_gemma4_sanitizer",
+          "pattern_matched": "transport/thought/meta markers",
+          "length_before": 131,
+          "length_after": 40
+        }
+      ]
+    },
+    {
+      "chunk_id": "2836433f-2e39-4fbc-ad20-2b72b19ea306",
+      "relative_path": "src/lib/server/cartridge/glyph-record.ts",
+      "original_length": 417,
+      "original_hash": "3fc966f822538033168c481886f61c9312d5ba35781cc9c1330500fd944f462c",
+      "cleaned_summary": "The code snippet is a method within a class (implied, as it's part of a larger function/method structure) that formats and returns a string containing various details about a `GlyphRecord`.\n3.",
+      "cleaned_length": 192,
+      "quality_score": 0.85,
+      "quality_status": "PASS",
+      "contaminations_detected": {
+        "has_thinking_markers": false,
+        "has_meta_preamble": false,
+        "has_self_correction": false,
+        "has_planning_steps": true,
+        "markers_found": [],
+        "preamble_patterns": []
+      },
+      "contamination_count": 1,
+      "removal_steps": [
+        {
+          "step": "shared_gemma4_sanitizer",
+          "pattern_matched": "transport/thought/meta markers",
+          "length_before": 417,
+          "length_after": 414
+        },
+        {
+          "step": "remove_meta_lines",
+          "pattern_matched": "various preamble/planning lines",
+          "length_before": 414,
+          "length_after": 192
+        }
+      ]
+    },
+    {
+      "chunk_id": "66a52a0a-c57a-4263-b35d-38b2f32ffce2",
+      "relative_path": "src/routes/.well-known/agent.json/+server.ts",
+      "original_length": 55,
+      "original_hash": "ba9c3137ab6d36ea8c3660d4cce09486814033c67d3896c8b3816969375da665",
+      "cleaned_summary": "",
+      "cleaned_length": 0,
+      "quality_score": 0,
+      "quality_status": "FAIL",
+      "contaminations_detected": {
+        "has_thinking_markers": false,
+        "has_meta_preamble": false,
+        "has_self_correction": true,
+        "has_planning_steps": false,
+        "markers_found": [],
+        "preamble_patterns": []
+      },
+      "contamination_count": 1,
+      "removal_steps": [
+        {
+          "step": "remove_meta_lines",
+          "pattern_matched": "various preamble/planning lines",
+          "length_before": 55,
+          "length_after": 0
+        }
+      ]
+    },
+    {
+      "chunk_id": "5dc1ccd8-42a6-414c-ba15-814e5e51fcdc",
+      "relative_path": "src/routes/(app)/demos/yorha/components/CrossExaminationAssistant.svelte",
+      "original_length": 104,
+      "original_hash": "44ae986c94b02c517d166484283ff9aabca130f7923f4d16e54ce031ef2afa1c",
+      "cleaned_summary": "The code represents a clickable component (a button) designed to display a question.",
+      "cleaned_length": 84,
+      "quality_score": 0.85,
+      "quality_status": "PASS",
+      "contaminations_detected": {
+        "has_thinking_markers": true,
+        "has_meta_preamble": false,
+        "has_self_correction": false,
+        "has_planning_steps": false,
+        "markers_found": [
+          "shared-gemma4-sanitizer"
+        ],
+        "preamble_patterns": []
+      },
+      "contamination_count": 1,
+      "removal_steps": [
+        {
+          "step": "shared_gemma4_sanitizer",
+          "pattern_matched": "transport/thought/meta markers",
+          "length_before": 104,
+          "length_after": 84
+        }
+      ]
+    },
+    {
+      "chunk_id": "73ac411d-301f-404e-ac3a-1d2992cbad11",
+      "relative_path": "src/routes/(app)/demos/yorha/components/CrossExaminationAssistant.svelte",
+      "original_length": 104,
+      "original_hash": "44ae986c94b02c517d166484283ff9aabca130f7923f4d16e54ce031ef2afa1c",
+      "cleaned_summary": "The code represents a clickable component (a button) designed to display a question.",
+      "cleaned_length": 84,
+      "quality_score": 0.85,
+      "quality_status": "PASS",
+      "contaminations_detected": {
+        "has_thinking_markers": true,
+        "has_meta_preamble": false,
+        "has_self_correction": false,
+        "has_planning_steps": false,
+        "markers_found": [
+          "shared-gemma4-sanitizer"
+        ],
+        "preamble_patterns": []
+      },
+      "contamination_count": 1,
+      "removal_steps": [
+        {
+          "step": "shared_gemma4_sanitizer",
+          "pattern_matched": "transport/thought/meta markers",
+          "length_before": 104,
+          "length_after": 84
+        }
+      ]
+    },
+    {
+      "chunk_id": "529acf8e-e519-4551-ba79-bc506143f035",
+      "relative_path": "src/lib/server/agent/tools/web-search-searxng.ts",
+      "original_length": 387,
+      "original_hash": "3859f50997ad0d7f3920b89fd3f18438025fe1bd302bfd583718dfc88d6d3b50",
+      "cleaned_summary": "The snippet shows how the code handles two main categories of queries:",
+      "cleaned_length": 70,
+      "quality_score": 0.6,
+      "quality_status": "WARN",
+      "contaminations_detected": {
+        "has_thinking_markers": true,
+        "has_meta_preamble": false,
+        "has_self_correction": false,
+        "has_planning_steps": true,
+        "markers_found": [
+          "shared-gemma4-sanitizer"
+        ],
+        "preamble_patterns": []
+      },
+      "contamination_count": 2,
+      "removal_steps": [
+        {
+          "step": "shared_gemma4_sanitizer",
+          "pattern_matched": "transport/thought/meta markers",
+          "length_before": 387,
+          "length_after": 336
+        },
+        {
+          "step": "remove_meta_lines",
+          "pattern_matched": "various preamble/planning lines",
+          "length_before": 336,
+          "length_after": 70
+        }
+      ]
+    },
+    {
+      "chunk_id": "6aedd916-af81-4fd4-b549-d5aef9dd8a33",
+      "relative_path": "src/lib/server/pipeline/error-embedding-pipeline.ts",
+      "original_length": 274,
+      "original_hash": "7f6b1c883d73e967459db4f4dd06b10690aeaa815e12c945af30f7a4bcda659a",
+      "cleaned_summary": "The code contains two distinct parts:\n1. A function snippet that processes and combines error messages, stack traces, and other parts into a single string.",
+      "cleaned_length": 155,
+      "quality_score": 0.7,
+      "quality_status": "WARN",
+      "contaminations_detected": {
+        "has_thinking_markers": true,
+        "has_meta_preamble": false,
+        "has_self_correction": false,
+        "has_planning_steps": true,
+        "markers_found": [
+          "shared-gemma4-sanitizer"
+        ],
+        "preamble_patterns": []
+      },
+      "contamination_count": 2,
+      "removal_steps": [
+        {
+          "step": "shared_gemma4_sanitizer",
+          "pattern_matched": "transport/thought/meta markers",
+          "length_before": 274,
+          "length_after": 155
+        }
+      ]
+    },
+    {
+      "chunk_id": "6f57d206-a132-4dce-ada6-a7995b408f40",
+      "relative_path": "src/lib/components/yorha/_simulations/YoRHaDataViz.svelte",
+      "original_length": 423,
+      "original_hash": "ae8643c499e6e6fd55ab270d4b5db8775cc8e6e59180c094877261745f6b183b",
+      "cleaned_summary": "The CSS defines styles for:",
+      "cleaned_length": 27,
+      "quality_score": 0,
+      "quality_status": "FAIL",
+      "contaminations_detected": {
+        "has_thinking_markers": true,
+        "has_meta_preamble": false,
+        "has_self_correction": false,
+        "has_planning_steps": true,
+        "markers_found": [
+          "shared-gemma4-sanitizer"
+        ],
+        "preamble_patterns": []
+      },
+      "contamination_count": 2,
+      "removal_steps": [
+        {
+          "step": "shared_gemma4_sanitizer",
+          "pattern_matched": "transport/thought/meta markers",
+          "length_before": 423,
+          "length_after": 365
+        },
+        {
+          "step": "remove_meta_lines",
+          "pattern_matched": "various preamble/planning lines",
+          "length_before": 365,
+          "length_after": 27
+        }
+      ]
+    },
+    {
+      "chunk_id": "7396ec56-2b04-41a8-a2e7-c359e31ddea4",
+      "relative_path": "src/lib/services/error-analysis/ExperienceRecorder.ts",
+      "original_length": 70,
+      "original_hash": "7158068f34ffa64e96cdf937c1e905d3b242db7d23fb2154b5d3e76f04d62e9f",
+      "cleaned_summary": "",
+      "cleaned_length": 0,
+      "quality_score": 0,
+      "quality_status": "FAIL",
+      "contaminations_detected": {
+        "has_thinking_markers": true,
+        "has_meta_preamble": false,
+        "has_self_correction": false,
+        "has_planning_steps": false,
+        "markers_found": [
+          "shared-gemma4-sanitizer"
+        ],
+        "preamble_patterns": []
+      },
+      "contamination_count": 1,
+      "removal_steps": [
+        {
+          "step": "shared_gemma4_sanitizer",
+          "pattern_matched": "transport/thought/meta markers",
+          "length_before": 70,
+          "length_after": 0
+        }
+      ]
+    },
+    {
+      "chunk_id": "727caaa1-60fd-451c-ba81-51b808432852",
+      "relative_path": "src/lib/server/db/schema-gpu-cache.ts",
+      "original_length": 501,
+      "original_hash": "5cf49d4018884d0860b170323978d98f93882248c1beee3b531ca006b46d6175",
+      "cleaned_summary": "This is a database schema definition for a `shader_dependencies` table. I need to summarize its purpose and key fields concisely.\n**Drafting the summary:**\nThis table tracks dependencies between shaders, linking a parent shader",
+      "cleaned_length": 227,
+      "quality_score": 0,
+      "quality_status": "FAIL",
+      "contaminations_detected": {
+        "has_thinking_markers": true,
+        "has_meta_preamble": false,
+        "has_self_correction": false,
+        "has_planning_steps": true,
+        "markers_found": [
+          "shared-gemma4-sanitizer"
+        ],
+        "preamble_patterns": []
+      },
+      "contamination_count": 2,
+      "removal_steps": [
+        {
+          "step": "shared_gemma4_sanitizer",
+          "pattern_matched": "transport/thought/meta markers",
+          "length_before": 501,
+          "length_after": 496
+        },
+        {
+          "step": "remove_meta_lines",
+          "pattern_matched": "various preamble/planning lines",
+          "length_before": 496,
+          "length_after": 227
+        }
+      ]
+    },
+    {
+      "chunk_id": "64b88c6b-fa7d-46c5-815a-efdf5829557f",
+      "relative_path": "src/routes/(app)/admin/error-brain/runs/+page.svelte",
+      "original_length": 415,
+      "original_hash": "5a62483e065b1719f6977f92fdc34bfb4807d24ad981dc699fee6dd6d726d399",
+      "cleaned_summary": "The code implements a component that fetches and manages a list of \"runs\" (likely tracking experimental or system runs).\nKey functionalities:",
+      "cleaned_length": 141,
+      "quality_score": 0.85,
+      "quality_status": "PASS",
+      "contaminations_detected": {
+        "has_thinking_markers": false,
+        "has_meta_preamble": false,
+        "has_self_correction": false,
+        "has_planning_steps": true,
+        "markers_found": [],
+        "preamble_patterns": []
+      },
+      "contamination_count": 1,
+      "removal_steps": [
+        {
+          "step": "shared_gemma4_sanitizer",
+          "pattern_matched": "transport/thought/meta markers",
+          "length_before": 415,
+          "length_after": 412
+        },
+        {
+          "step": "remove_meta_lines",
+          "pattern_matched": "various preamble/planning lines",
+          "length_before": 412,
+          "length_after": 141
+        }
+      ]
+    },
+    {
+      "chunk_id": "4de35213-2f67-460f-a2b4-c796ae1846b7",
+      "relative_path": "src/lib/components/yorha/_simulations/YoRHaDataViz.svelte",
+      "original_length": 423,
+      "original_hash": "ae8643c499e6e6fd55ab270d4b5db8775cc8e6e59180c094877261745f6b183b",
+      "cleaned_summary": "The CSS defines styles for:",
+      "cleaned_length": 27,
+      "quality_score": 0,
+      "quality_status": "FAIL",
+      "contaminations_detected": {
+        "has_thinking_markers": true,
+        "has_meta_preamble": false,
+        "has_self_correction": false,
+        "has_planning_steps": true,
+        "markers_found": [
+          "shared-gemma4-sanitizer"
+        ],
+        "preamble_patterns": []
+      },
+      "contamination_count": 2,
+      "removal_steps": [
+        {
+          "step": "shared_gemma4_sanitizer",
+          "pattern_matched": "transport/thought/meta markers",
+          "length_before": 423,
+          "length_after": 365
+        },
+        {
+          "step": "remove_meta_lines",
+          "pattern_matched": "various preamble/planning lines",
+          "length_before": 365,
+          "length_after": 27
+        }
+      ]
+    },
+    {
+      "chunk_id": "315a5a2a-c11b-440c-a799-9f9ba33735e2",
+      "relative_path": "src/lib/webgpu/compute-shader-engine.ts",
+      "original_length": 417,
+      "original_hash": "4f753ee7b88a0ef9d177f9dcb451492f6fba9f81125e7428f4e26dfe2d81c46c",
+      "cleaned_summary": "The snippet is setting up various GPU resources (buffers and bind group layouts) for a compute shader operation.",
+      "cleaned_length": 112,
+      "quality_score": 0.85,
+      "quality_status": "PASS",
+      "contaminations_detected": {
+        "has_thinking_markers": false,
+        "has_meta_preamble": false,
+        "has_self_correction": false,
+        "has_planning_steps": true,
+        "markers_found": [],
+        "preamble_patterns": []
+      },
+      "contamination_count": 1,
+      "removal_steps": [
+        {
+          "step": "shared_gemma4_sanitizer",
+          "pattern_matched": "transport/thought/meta markers",
+          "length_before": 417,
+          "length_after": 413
+        },
+        {
+          "step": "remove_meta_lines",
+          "pattern_matched": "various preamble/planning lines",
+          "length_before": 413,
+          "length_after": 112
+        }
+      ]
+    },
+    {
+      "chunk_id": "6bec3cd4-c3da-45c7-975a-cb2e3f31bcb7",
+      "relative_path": "src/lib/server/db/schema-gpu-cache.ts",
+      "original_length": 501,
+      "original_hash": "5cf49d4018884d0860b170323978d98f93882248c1beee3b531ca006b46d6175",
+      "cleaned_summary": "This is a database schema definition for a `shader_dependencies` table. I need to summarize its purpose and key fields concisely.\n**Drafting the summary:**\nThis table tracks dependencies between shaders, linking a parent shader",
+      "cleaned_length": 227,
+      "quality_score": 0,
+      "quality_status": "FAIL",
+      "contaminations_detected": {
+        "has_thinking_markers": true,
+        "has_meta_preamble": false,
+        "has_self_correction": false,
+        "has_planning_steps": true,
+        "markers_found": [
+          "shared-gemma4-sanitizer"
+        ],
+        "preamble_patterns": []
+      },
+      "contamination_count": 2,
+      "removal_steps": [
+        {
+          "step": "shared_gemma4_sanitizer",
+          "pattern_matched": "transport/thought/meta markers",
+          "length_before": 501,
+          "length_after": 496
+        },
+        {
+          "step": "remove_meta_lines",
+          "pattern_matched": "various preamble/planning lines",
+          "length_before": 496,
+          "length_after": 227
+        }
+      ]
+    },
+    {
+      "chunk_id": "1f000052-2102-4d11-bead-fbbda56dca49",
+      "relative_path": "src/lib/components/citations/CitationList.svelte",
+      "original_length": 375,
+      "original_hash": "7b2604e153be6220bb3240ca27e6b8ac3df82106bc830203482aad1ce3c2713f",
+      "cleaned_summary": "The code handles loading, pagination, and deleting citations.\n4. **`handleDelete`:** Conf",
+      "cleaned_length": 89,
+      "quality_score": 0.85,
+      "quality_status": "PASS",
+      "contaminations_detected": {
+        "has_thinking_markers": false,
+        "has_meta_preamble": false,
+        "has_self_correction": false,
+        "has_planning_steps": true,
+        "markers_found": [],
+        "preamble_patterns": []
+      },
+      "contamination_count": 1,
+      "removal_steps": [
+        {
+          "step": "shared_gemma4_sanitizer",
+          "pattern_matched": "transport/thought/meta markers",
+          "length_before": 375,
+          "length_after": 370
+        },
+        {
+          "step": "remove_meta_lines",
+          "pattern_matched": "various preamble/planning lines",
+          "length_before": 370,
+          "length_after": 89
+        }
+      ]
+    },
+    {
+      "chunk_id": "4a897536-c7ca-438a-8627-46f798d2fe3b",
+      "relative_path": "src/lib/components/ai/IntelligentModelOrchestrator.svelte",
+      "original_length": 403,
+      "original_hash": "0c128b491833059566576934e0e49b1eb44e8d616fcf2b9f19f9444122035dfb",
+      "cleaned_summary": "The code snippet is a function (`runSearch`) designed to execute a search process, likely within a Retrieval-Augmented Generation (RAG) or Knowledge-Augmented Generation (KAG) system.",
+      "cleaned_length": 183,
+      "quality_score": 0.85,
+      "quality_status": "PASS",
+      "contaminations_detected": {
+        "has_thinking_markers": false,
+        "has_meta_preamble": false,
+        "has_self_correction": false,
+        "has_planning_steps": true,
+        "markers_found": [],
+        "preamble_patterns": []
+      },
+      "contamination_count": 1,
+      "removal_steps": [
+        {
+          "step": "shared_gemma4_sanitizer",
+          "pattern_matched": "transport/thought/meta markers",
+          "length_before": 403,
+          "length_after": 399
+        },
+        {
+          "step": "remove_meta_lines",
+          "pattern_matched": "various preamble/planning lines",
+          "length_before": 399,
+          "length_after": 183
+        }
+      ]
+    },
+    {
+      "chunk_id": "59d43033-158b-4965-aa49-223c3eedb4eb",
+      "relative_path": "src/routes/api/codebase-index/tags/+server.ts",
+      "original_length": 336,
+      "original_hash": "0fb7434298ce81975152dfb2ca1614819651a8461f8852ba7f8e6879cfb867ea",
+      "cleaned_summary": "The code performs several data transformations and aggregations before returning a JSON object.\n* `totalChunks`: Total",
+      "cleaned_length": 118,
+      "quality_score": 0.85,
+      "quality_status": "PASS",
+      "contaminations_detected": {
+        "has_thinking_markers": false,
+        "has_meta_preamble": false,
+        "has_self_correction": false,
+        "has_planning_steps": true,
+        "markers_found": [],
+        "preamble_patterns": []
+      },
+      "contamination_count": 1,
+      "removal_steps": [
+        {
+          "step": "shared_gemma4_sanitizer",
+          "pattern_matched": "transport/thought/meta markers",
+          "length_before": 336,
+          "length_after": 326
+        },
+        {
+          "step": "remove_meta_lines",
+          "pattern_matched": "various preamble/planning lines",
+          "length_before": 326,
+          "length_after": 118
+        }
+      ]
+    },
+    {
+      "chunk_id": "7224ea01-e0f6-4164-becb-864d7f3fa509",
+      "relative_path": "src/lib/server/agent/subagents.ts",
+      "original_length": 66,
+      "original_hash": "c80e61a1180958cbfcbac315a17d3e7b1c51c4a33301f65027e282f5724d0fa2",
+      "cleaned_summary": "",
+      "cleaned_length": 0,
+      "quality_score": 0,
+      "quality_status": "FAIL",
+      "contaminations_detected": {
+        "has_thinking_markers": false,
+        "has_meta_preamble": false,
+        "has_self_correction": true,
+        "has_planning_steps": false,
+        "markers_found": [],
+        "preamble_patterns": []
+      },
+      "contamination_count": 1,
+      "removal_steps": [
+        {
+          "step": "remove_meta_lines",
+          "pattern_matched": "various preamble/planning lines",
+          "length_before": 66,
+          "length_after": 0
+        }
+      ]
+    },
+    {
+      "chunk_id": "3ee19442-57aa-45cd-bf56-62716600075f",
+      "relative_path": "src/lib/server/agent/subagents.ts",
+      "original_length": 66,
+      "original_hash": "c80e61a1180958cbfcbac315a17d3e7b1c51c4a33301f65027e282f5724d0fa2",
+      "cleaned_summary": "",
+      "cleaned_length": 0,
+      "quality_score": 0,
+      "quality_status": "FAIL",
+      "contaminations_detected": {
+        "has_thinking_markers": false,
+        "has_meta_preamble": false,
+        "has_self_correction": true,
+        "has_planning_steps": false,
+        "markers_found": [],
+        "preamble_patterns": []
+      },
+      "contamination_count": 1,
+      "removal_steps": [
+        {
+          "step": "remove_meta_lines",
+          "pattern_matched": "various preamble/planning lines",
+          "length_before": 66,
+          "length_after": 0
+        }
+      ]
+    },
+    {
+      "chunk_id": "23db549b-b423-48e8-ae6b-660812088848",
+      "relative_path": "src/lib/data/report-templates.ts",
+      "original_length": 163,
+      "original_hash": "1b7f52f0688d351e9fdc63eda392f17969ff5631784d2ca6387af110a409b21f",
+      "cleaned_summary": "The object defines a template for a \"Charging Memorandum,\" which is a comprehensive legal document.",
+      "cleaned_length": 99,
+      "quality_score": 0.85,
+      "quality_status": "PASS",
+      "contaminations_detected": {
+        "has_thinking_markers": false,
+        "has_meta_preamble": false,
+        "has_self_correction": true,
+        "has_planning_steps": false,
+        "markers_found": [],
+        "preamble_patterns": []
+      },
+      "contamination_count": 1,
+      "removal_steps": [
+        {
+          "step": "remove_meta_lines",
+          "pattern_matched": "various preamble/planning lines",
+          "length_before": 163,
+          "length_after": 99
         }
       ]
     }
   ],
-  "contamination_rate_before": "1.6",
-  "contamination_rate_after": "1.0",
-  "avg_length_before": "242",
-  "avg_length_after": "69",
+  "contamination_rate_before": "2.3",
+  "contamination_rate_after": "1.5",
+  "avg_length_before": "212",
+  "avg_length_after": "65",
   "gates": {
     "contamination_rate_acceptable": true,
-    "avg_quality_score_acceptable": false,
+    "avg_quality_score_acceptable": true,
     "all_pass_or_warn": false,
     "ready_for_phase_9": false
   },
   "examples": [
     {
-      "relative_path": "src/routes/(app)/demos/celestial-icons/+page.svelte",
-      "before_len": 93,
-      "after_len": 14,
+      "relative_path": "src/lib/server/indexer/ast-chunker.ts",
+      "before_len": 70,
+      "after_len": 0,
       "quality_status": "FAIL"
     },
     {
-      "relative_path": "src/lib/data/report-templates.ts",
-      "before_len": 163,
-      "after_len": 99,
-      "quality_status": "PASS"
+      "relative_path": "src/routes/api/codebase-index/+server.ts",
+      "before_len": 185,
+      "after_len": 0,
+      "quality_status": "FAIL"
     },
     {
-      "relative_path": "src/lib/server/agent/tools/web-search-searxng.ts",
-      "before_len": 387,
-      "after_len": 70,
-      "quality_status": "WARN"
+      "relative_path": "src/routes/api/synthesis/typing-context/+server.ts",
+      "before_len": 123,
+      "after_len": 36,
+      "quality_status": "FAIL"
     }
   ]
 }

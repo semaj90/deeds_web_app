@@ -32,6 +32,7 @@ import Redis from 'ioredis';
 import { QdrantClient } from '@qdrant/js-client-rest';
 import fetch from 'node-fetch';
 import { loadRepoEnv } from '../../scripts/atlas/connection-config.mjs';
+import { buildCanonicalPacketKey } from './lib/packet-identity.mjs';
 
 // LangExtract: Intent-based prompt routing for Gemma4
 const INTENT_SYSTEM_PROMPTS = {
@@ -60,7 +61,7 @@ function inferSummaryIntent(chunk) {
 }
 
 // Bifrost L1/L2 semantic cache integration
-async function checkBifrostCache(chunkId, contentHash) {
+async function checkBifrostCache(packetKey, contentHash) {
   if (!BIFROST_URL) return null;
   bifrostStats.checks++;
 
@@ -69,7 +70,7 @@ async function checkBifrostCache(chunkId, contentHash) {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        key: `summary:${chunkId}:${contentHash}`,
+        key: `summary:${packetKey}:${contentHash}`,
         threshold: 0.8  // L2 semantic similarity threshold
       }),
       signal: AbortSignal.timeout(2000)
@@ -91,7 +92,7 @@ async function checkBifrostCache(chunkId, contentHash) {
   return null;
 }
 
-async function writeBifrostCache(chunkId, contentHash, summary) {
+async function writeBifrostCache(packetKey, contentHash, summary) {
   if (!BIFROST_URL || !summary) return;
 
   try {
@@ -99,7 +100,7 @@ async function writeBifrostCache(chunkId, contentHash, summary) {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        key: `summary:${chunkId}:${contentHash}`,
+        key: `summary:${packetKey}:${contentHash}`,
         value: summary,
         ttl: 3600  // 1 hour
       }),
@@ -320,7 +321,7 @@ async function stage1BackfillSummaries() {
     while (true) {
       // Claim next batch of chunks with FOR UPDATE SKIP LOCKED (atomic)
       const claimSql = source.name === 'atlas_packets'
-        ? `
+      ? `
         WITH picked AS (
           SELECT packet_id
           FROM atlas_packets
@@ -338,6 +339,7 @@ async function stage1BackfillSummaries() {
         )
         SELECT
           p.packet_id AS id,
+          coalesce(nullif(p.packet_key, ''), p.packet_id::text) AS packet_key,
           coalesce(nullif(p.file_path, ''), nullif(p.source_ref, ''), nullif(p.directory_path, '')) AS relative_path,
           coalesce(
             nullif(p.payload->>'content', ''),
@@ -360,7 +362,7 @@ async function stage1BackfillSummaries() {
           LIMIT $1
           FOR UPDATE SKIP LOCKED
         )
-        SELECT c.id, c.relative_path, c.content, c.line_start, c.symbol
+        SELECT c.id, NULL::text AS packet_key, c.relative_path, c.content, c.line_start, c.line_end, c.content_hash, c.symbol
         FROM codebase_chunk_index c
         JOIN picked p ON p.id = c.id
       `;
@@ -399,13 +401,23 @@ async function stage1BackfillSummaries() {
           const chunksNeedingGeneration = [];
 
           for (const chunk of subBatch) {
-            const contentHash = crypto.createHash('sha256').update(chunk.content).digest('hex').slice(0, 12);
-            const cached = await checkBifrostCache(chunk.id, contentHash);
+            const contentHash = String(
+              chunk.content_hash ??
+              crypto.createHash('sha256').update(chunk.content || '').digest('hex').slice(0, 12)
+            );
+            const packetKey = buildCanonicalPacketKey({
+              packetKey: chunk.packet_key,
+              sourceRef: chunk.relative_path,
+              lineStart: chunk.line_start,
+              lineEnd: chunk.line_end,
+              contentHash,
+            }) || String(chunk.id ?? '');
+            const cached = await checkBifrostCache(packetKey, contentHash);
 
             if (cached) {
-              summariesFromCache.push({ id: chunk.id, summary: cached, source: 'bifrost' });
+              summariesFromCache.push({ id: chunk.id, packet_key: packetKey, summary: cached, source: 'bifrost' });
             } else {
-              chunksNeedingGeneration.push({ ...chunk, contentHash });
+              chunksNeedingGeneration.push({ ...chunk, packet_key: packetKey, contentHash });
             }
           }
 
@@ -472,7 +484,7 @@ ${c.content?.slice(0, 1200) || ''}
               if (item.id && item.summary) {
                 const chunkInfo = chunksNeedingGeneration.find(c => c.id === item.id);
                 if (chunkInfo) {
-                  await writeBifrostCache(item.id, chunkInfo.contentHash, item.summary);
+                  await writeBifrostCache(chunkInfo.packet_key || chunkInfo.id, chunkInfo.contentHash, item.summary);
                 }
               }
             }
@@ -544,7 +556,22 @@ async function stage2EmbedAndTag() {
     const toEmbed = await pool.query(
       source.name === 'atlas_packets'
         ? `
-      SELECT packet_id AS id, coalesce(nullif(file_path, ''), nullif(source_ref, ''), nullif(directory_path, '')) AS relative_path, summary, qdrant_point_id AS qdrant_id
+      SELECT
+        packet_id AS id,
+        packet_key,
+        packet_ulid,
+        title_id,
+        coalesce(nullif(file_path, ''), nullif(source_ref, ''), nullif(directory_path, '')) AS relative_path,
+        coalesce(nullif(source_ref, ''), nullif(file_path, ''), nullif(directory_path, '')) AS source_ref,
+        coalesce(nullif(source_ref_key, ''), nullif(source_ref, ''), nullif(file_path, ''), nullif(directory_path, '')) AS canonical_source_ref,
+        feature_id,
+        feature_label,
+        domain_class,
+        som_cluster,
+        community_id,
+        page_rank_score AS pagerank,
+        summary,
+        qdrant_point_id AS qdrant_id
       FROM atlas_packets
       WHERE summary IS NOT NULL AND summary != ''
         AND embedding IS NULL
@@ -552,7 +579,25 @@ async function stage2EmbedAndTag() {
       LIMIT $1
     `
         : `
-      SELECT id, relative_path, summary, qdrant_id
+      SELECT
+        id,
+        NULL::text AS packet_key,
+        NULL::text AS packet_ulid,
+        NULL::text AS title_id,
+        relative_path,
+        relative_path AS source_ref,
+        relative_path AS canonical_source_ref,
+        line_start,
+        line_end,
+        content_hash,
+        feature_id,
+        kind AS feature_label,
+        domain,
+        som_cluster,
+        community_id,
+        page_rank_score AS pagerank,
+        summary,
+        qdrant_id
       FROM codebase_chunk_index
       WHERE summary IS NOT NULL AND summary != ''
         AND summary_embedding IS NULL
@@ -601,6 +646,14 @@ async function stage2EmbedAndTag() {
           await pool.query(source.embeddingUpdateSql, [vectorLiteral, chunk.id]);
           pgvectorWritten++;
 
+          const packetKey = buildCanonicalPacketKey({
+            packetKey: chunk.packet_key,
+            sourceRef: chunk.relative_path,
+            lineStart: chunk.line_start,
+            lineEnd: chunk.line_end,
+            contentHash: chunk.content_hash,
+          }) || String(chunk.id);
+
           // Store in Qdrant as named vector (not in payload)
           if (chunk.qdrant_id) {
             try {
@@ -616,6 +669,18 @@ async function stage2EmbedAndTag() {
                   },
                   payload: {
                     // Only store metadata in payload, not the vector itself
+                    packet_id: chunk.id,
+                    packet_key: packetKey,
+                    packet_ulid: chunk.packet_ulid || null,
+                    title_id: chunk.title_id || null,
+                    source_ref: chunk.source_ref || chunk.relative_path || null,
+                    canonical_source_ref: chunk.canonical_source_ref || chunk.source_ref || chunk.relative_path || null,
+                    feature_id: chunk.feature_id || null,
+                    feature_label: chunk.feature_label || null,
+                    domain_class: chunk.domain_class || chunk.domain || null,
+                    som_cluster: chunk.som_cluster || null,
+                    community_id: chunk.community_id || null,
+                    page_rank_score: chunk.pagerank ?? null,
                     summary: chunk.summary,
                     summary_embedding_model: 'embeddinggemma:latest',
                   }

@@ -1,0 +1,184 @@
+{
+  "timestamp": "2026-07-03T19:08:55.160Z",
+  "gate": "WARN",
+  "synthetic": {
+    "total": 4,
+    "pass": false,
+    "cases": [
+      {
+        "name": "transport markers",
+        "raw": "<start_of_turn>user\n<end_of_turn><start_of_turn>model\nThis module creates a shallow copy of the input object.<end_of_turn>",
+        "raw_normalized": "<start_of_turn>user <end_of_turn><start_of_turn>model This module creates a shallow copy of the input object.<end_of_turn>",
+        "summary": "This module creates a shallow copy of the input object.",
+        "cleaned_normalized": "This module creates a shallow copy of the input object.",
+        "changed": true,
+        "safe": true,
+        "raw_leaky": true,
+        "usable": true,
+        "hasLeak": false
+      },
+      {
+        "name": "channel thought block",
+        "raw": "<|channel|>thought<|channel|>We need to think first. <|channel|>final<|channel|>This module validates packets.",
+        "raw_normalized": "<|channel|>thought<|channel|>We need to think first. <|channel|>final<|channel|>This module validates packets.",
+        "summary": "This module validates packets.",
+        "cleaned_normalized": "This module validates packets.",
+        "changed": true,
+        "safe": true,
+        "raw_leaky": true,
+        "usable": false,
+        "hasLeak": false
+      },
+      {
+        "name": "space-delimited turn markers",
+        "raw": "< end of turn > < bos >  Packet summary should remain after stripping markers.",
+        "raw_normalized": "< end of turn > < bos > Packet summary should remain after stripping markers.",
+        "summary": "Packet summary should remain after stripping markers.",
+        "cleaned_normalized": "Packet summary should remain after stripping markers.",
+        "changed": true,
+        "safe": true,
+        "raw_leaky": true,
+        "usable": true,
+        "hasLeak": false
+      },
+      {
+        "name": "meta preamble and whitespace",
+        "raw": "  Here is a summary of the code.\n\n  This module builds an ACE packet envelope.  ",
+        "raw_normalized": "Here is a summary of the code. This module builds an ACE packet envelope.",
+        "summary": "This module builds an ACE packet envelope.",
+        "cleaned_normalized": "This module builds an ACE packet envelope.",
+        "changed": true,
+        "safe": true,
+        "raw_leaky": false,
+        "usable": true,
+        "hasLeak": false
+      }
+    ]
+  },
+  "live_sample": {
+    "total": 200,
+    "changed": 38,
+    "safe_after": 200,
+    "usable_after": 183,
+    "leaky_after": 0,
+    "before_counts": {
+      "channel": 0,
+      "turns": 0,
+      "bos": 0,
+      "eos": 0,
+      "thought": 0
+    },
+    "after_counts": {
+      "channel": 0,
+      "turns": 0,
+      "bos": 0,
+      "eos": 0,
+      "thought": 0
+    },
+    "samples": [
+      {
+        "packet_key": "packet:0c246ec4713d",
+        "raw": "This module, `Summaries.ts`, serves as the entry point for managing summary-related operations within the SQLite storage layer for `claude-mem`. It exports functionality from submodules like `store.js` and `get.js`, indicating its role in coordinating data access and schema interactions. The file's primary responsibility is to expose the necessary interfaces for interacting with stored summaries, maintaining the integrity of the database schema.",
+        "summary": "This module, `Summaries.ts`, serves as the entry point for managing summary-related operations within the SQLite storage layer for `claude-mem`. It exports functionality from submodules like `store.js` and `get.js`, indicating its role in coordinating data access and schema interactions. The file's primary responsibility is to expose the necessary interfaces for interacting with stored summaries, maintaining the integrity of the database schema.",
+        "changed": false,
+        "safe": true,
+        "leaky": false,
+        "usable": true,
+        "hasLeak": false
+      },
+      {
+        "packet_key": "packet:1b7341b14995",
+        "raw": "This module, `store.ts`, implements the `storeSummary` function responsible for summarizing data within a SQLite database context. It requires a `Database` connection from `bun:sqlite` and utilizes types defined in `./types.js` to process summary inputs. The function's core logic resides within the `claude-mem.store` feature, managing data persistence and retrieval within the storage layer.",
+        "summary": "This module, `store.ts`, implements the `storeSummary` function responsible for summarizing data within a SQLite database context. It requires a `Database` connection from `bun:sqlite` and utilizes types defined in `./types.js` to process summary inputs. The function's core logic resides within the `claude-mem.store` feature, managing data persistence and retrieval within the storage layer.",
+        "changed": false,
+        "safe": true,
+        "leaky": false,
+        "usable": true,
+        "hasLeak": false
+      },
+      {
+        "packet_key": "packet:c4c5cd574214",
+        "raw": "This module, `claude-mem.recent` at `claude-mem/src/services/sqlite/summaries/recent.ts`, provides functions to retrieve recent summary data from an SQLite database connection. It exposes `getRecentSummaries`, `getRecentSummariesWithSessionInfo`, and `getAllRecentSummaries` to query summary records based on project and limit. These functions interact with the database schema to return typed results like `RecentSummary` or `FullSummary`.",
+        "summary": "This module, `claude-mem.recent` at `claude-mem/src/services/sqlite/summaries/recent.ts`, provides functions to retrieve recent summary data from an SQLite database connection. It exposes `getRecentSummaries`, `getRecentSummariesWithSessionInfo`, and `getAllRecentSummaries` to query summary records based on project and limit. These functions interact with the database schema to return typed results like `RecentSummary` or `FullSummary`.",
+        "changed": false,
+        "safe": true,
+        "leaky": false,
+        "usable": true,
+        "hasLeak": false
+      },
+      {
+        "packet_key": "packet:576d983fc9c6",
+        "raw": "This module, `claude-mem.get`, provides functions for retrieving session summaries from a SQLite database connection. Key functions include `getSummaryForSession` to fetch a summary by session ID, `getSummaryById` by a specific ID, and `getSummariesByIds` for batch retrieval. These functions interact with the database schema, utilizing `bun:sqlite` and defined types to safely query and return summary data.",
+        "summary": "This module, `claude-mem.get`, provides functions for retrieving session summaries from a SQLite database connection. Key functions include `getSummaryForSession` to fetch a summary by session ID, `getSummaryById` by a specific ID, and `getSummariesByIds` for batch retrieval. These functions interact with the database schema, utilizing `bun:sqlite` and defined types to safely query and return summary data.",
+        "changed": false,
+        "safe": true,
+        "leaky": false,
+        "usable": true,
+        "hasLeak": false
+      },
+      {
+        "packet_key": "packet:155370406f63",
+        "raw": "This file, `claude-mem/src/services/sqlite/sessions/types.ts`, defines the TypeScript schema for session data within the database storage layer. It exports several interfaces, including `SessionBasic`, `SessionFull`, `SessionWithStatus`, and `SessionSummaryDetail`, which model different states and details of a session. These types are crucial for maintaining data integrity and structure when interacting with session records associated with the `claude-mem` feature.",
+        "summary": "This file, `claude-mem/src/services/sqlite/sessions/types.ts`, defines the TypeScript schema for session data within the database storage layer. It exports several interfaces, including `SessionBasic`, `SessionFull`, `SessionWithStatus`, and `SessionSummaryDetail`, which model different states and details of a session. These types are crucial for maintaining data integrity and structure when interacting with session records associated with the `claude-mem` feature.",
+        "changed": false,
+        "safe": true,
+        "leaky": false,
+        "usable": true,
+        "hasLeak": false
+      },
+      {
+        "packet_key": "packet:15cba216e69a",
+        "raw": "This module, located at claude-mem/src/services/sqlite/Sessions.ts, manages session-related database operations within the storage layer. It exports functionalities for creating and retrieving sessions, relying on an imported logger utility. The file serves as the primary schema interface for the `claude-mem.Sessions` feature, encapsulating session management logic.",
+        "summary": "This module, located at claude-mem/src/services/sqlite/Sessions.ts, manages session-related database operations within the storage layer. It exports functionalities for creating and retrieving sessions, relying on an imported logger utility. The file serves as the primary schema interface for the `claude-mem.Sessions` feature, encapsulating session management logic.",
+        "changed": false,
+        "safe": true,
+        "leaky": false,
+        "usable": true,
+        "hasLeak": false
+      },
+      {
+        "packet_key": "packet:974c4034e87d",
+        "raw": "This `SessionStore` class manages session data persistence using an SQLite database connection, evidenced by numerous calls to `db.query()`. Key functionality involves resolving arguments for session creation via `resolveCreateSessionArgs` and interacting with the database schema, as seen in the constructor's initial queries. The class relies on several local and shared modules for operations related to observation data and platform source normalization.",
+        "summary": "This `SessionStore` class manages session data persistence using an SQLite database connection, evidenced by numerous calls to `db.query()`. Key functionality involves resolving arguments for session creation via `resolveCreateSessionArgs` and interacting with the database schema, as seen in the constructor's initial queries. The class relies on several local and shared modules for operations related to observation data and platform source normalization.",
+        "changed": false,
+        "safe": true,
+        "leaky": false,
+        "usable": true,
+        "hasLeak": false
+      },
+      {
+        "packet_key": "packet:dbf36782b738",
+        "raw": "This module, located at claude-mem/src/services/sqlite/sessions/get.ts, provides several functions for querying session data from an SQLite database, fitting the database schema and storage layer context for feature_id claude-mem.get. Key functions include `getSessionById` for retrieving a single session, `getSdkSessionsBySessionIds` for batch retrieval, and `getRecentSessionsWithStatus` to fetch recent sessions. These functions utilize the `bun:sqlite` database connection to execute prepared st",
+        "summary": "This module, located at claude-mem/src/services/sqlite/sessions/get.ts, provides several functions for querying session data from an SQLite database, fitting the database schema and storage layer context for feature_id claude-mem.get. Key functions include `getSessionById` for retrieving a single session, `getSdkSessionsBySessionIds` for batch retrieval, and `getRecentSessionsWithStatus` to fetch recent sessions. These functions utilize the `bun:sqlite` database connection to execute prepared st",
+        "changed": false,
+        "safe": true,
+        "leaky": false,
+        "usable": true,
+        "hasLeak": false
+      },
+      {
+        "packet_key": "packet:7c23a5adc893",
+        "raw": "This class, `SessionSearch`, implements retrieval logic for searching session data within an SQLite database, validating contracts for parsing and schema operations. It handles potential failures during FTS5 table creation, observation searching, and session summary searching by wrapping database calls in `try...catch` blocks. The implementation details are sourced from `claude-mem/src/services/sqlite/SessionSearch.ts` and relate to the `claude-mem.SessionSearch` feature.",
+        "summary": "This class, `SessionSearch`, implements retrieval logic for searching session data within an SQLite database, validating contracts for parsing and schema operations. It handles potential failures during FTS5 table creation, observation searching, and session summary searching by wrapping database calls in `try...catch` blocks. The implementation details are sourced from `claude-mem/src/services/sqlite/SessionSearch.ts` and relate to the `claude-mem.SessionSearch` feature.",
+        "changed": false,
+        "safe": true,
+        "leaky": false,
+        "usable": true,
+        "hasLeak": false
+      },
+      {
+        "packet_key": "packet:dc3acfb4e9b6",
+        "raw": "This module, located at claude-mem/src/services/sqlite/sessions/create.ts, manages the creation and updating of session records within a database schema. Key functions include `createSDKSession` and `updateMemorySessionId`, which interact with a `bun:sqlite` database instance. A critical failure mode is signaled when a platform source conflict is detected during session creation, resulting in a thrown Error.",
+        "summary": "This module, located at claude-mem/src/services/sqlite/sessions/create.ts, manages the creation and updating of session records within a database schema. Key functions include `createSDKSession` and `updateMemorySessionId`, which interact with a `bun:sqlite` database instance. A critical failure mode is signaled when a platform source conflict is detected during session creation, resulting in a thrown Error.",
+        "changed": false,
+        "safe": true,
+        "leaky": false,
+        "usable": true,
+        "hasLeak": false
+      }
+    ]
+  },
+  "gaps": [
+    "At least one synthetic marker case still fails sanitized-output expectations."
+  ]
+}

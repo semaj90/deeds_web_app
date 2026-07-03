@@ -1,9 +1,9 @@
 # Gemma4 E2B ONNX Setup Guide
 
-**Status**: Ready to download and integrate  
-**Model**: onnx-community/gemma-4-E2B-it-ONNX  
-**Speed**: 120–255 tokens/second (browser-optimized)  
-**Size**: ~1.5 GB (one-time download, cached)  
+**Status**: Ready to download and integrate
+**Model**: onnx-community/gemma-4-E2B-it-ONNX
+**Speed**: 120–255 tokens/second (browser-optimized)
+**Size**: ~1.5 GB (one-time download, cached)
 **Purpose**: Fast client-side fallback text generation
 
 ---

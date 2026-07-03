@@ -37,9 +37,14 @@ const PG_USER = process.env.POSTGRES_USER || 'legal_admin';
 const PG_PASSWORD = process.env.POSTGRES_PASSWORD || '123456';
 
 const RABBITMQ_URL = process.env.RABBITMQ_URL || 'amqp://guest:guest@127.0.0.1:5672';
+const SUMMARY_QUEUE = process.env.PHASE7_SUMMARY_QUEUE || 'phase7.summarization';
+const SUMMARY_DLQ = `${SUMMARY_QUEUE}.dlq`;
+const MAX_RETRIES = Number(process.env.PHASE7_MAX_RETRIES || 3);
 const LLAMA_SERVER_URL = process.env.LLAMA_SERVER_URL || 'http://127.0.0.1:8090';
 const MODEL = 'gemma4-legal-iq4xs-direct.gguf';
 const TEMPERATURE = 0.3;
+const GEMMA4_MAX_TOKENS = Number(process.env.GEMMA4_MAX_TOKENS || 100);
+const GEMMA4_INPUT_CHARS = Number(process.env.GEMMA4_INPUT_CHARS || 1200);
 const GEMMA4_TIMEOUT_MS = Number(process.env.GEMMA4_TIMEOUT_MS || 120000);
 
 const REDIS_HOST = process.env.REDIS_HOST || 'localhost';
@@ -180,6 +185,7 @@ interface ChunkMessage {
   id: string;
   content: string;
   source_ref?: string;
+  packet_key?: string | null;
   packet_id?: string | null;
   feature_id?: string;
   reuse_feature_id?: string;
@@ -219,7 +225,7 @@ async function callGemma4(input: string | ChunkMessage, retryCount = 0, contentO
             '',
             'Summarize this code:',
             '',
-            content.slice(0, 2000),
+            content.slice(0, GEMMA4_INPUT_CHARS),
           ].join('\n'),
         },
       ]
@@ -237,7 +243,7 @@ async function callGemma4(input: string | ChunkMessage, retryCount = 0, contentO
           model: MODEL,
           messages,
           temperature: TEMPERATURE,
-          max_tokens: 256,
+          max_tokens: GEMMA4_MAX_TOKENS,
           stream: false,
           cache_prompt: true, // Enable KV cache prefilling
         }),
@@ -325,7 +331,12 @@ function buildSummaryPrompt(
 // Postgres Writing
 // ============================================================================
 
-async function writeSummaryToPostgres(chunkId: string, summary: string, packetId?: string | null): Promise<boolean> {
+async function writeSummaryToPostgres(
+  chunkId: string,
+  summary: string,
+  packetId?: string | null,
+  packetKey?: string | null,
+): Promise<boolean> {
   if (DRY_RUN) {
     return true;
   }
@@ -336,6 +347,7 @@ async function writeSummaryToPostgres(chunkId: string, summary: string, packetId
     const result = await pgPool.query(
       `UPDATE codebase_chunk_index
        SET summary = $1,
+           packet_key = COALESCE($4::text, packet_key),
            metadata = CASE
              WHEN $3::text IS NULL OR btrim($3::text) = '' THEN metadata
              ELSE jsonb_set(
@@ -348,7 +360,7 @@ async function writeSummaryToPostgres(chunkId: string, summary: string, packetId
            updated_at = NOW()
        WHERE id = $2
          AND (summary IS NULL OR btrim(summary) = '')`,
-      [summary, chunkId, packetIdText || null]
+      [summary, chunkId, packetIdText || null, String(packetKey ?? '').trim() || null]
     );
 
     if (result.rowCount !== 1) {
@@ -362,6 +374,28 @@ async function writeSummaryToPostgres(chunkId: string, summary: string, packetId
   } catch (err) {
     console.error(`    ✗ Postgres write failed: ${err}`);
     tracker.recordError();
+    return false;
+  }
+}
+
+async function isChunkAlreadySummarized(chunkId: string): Promise<boolean> {
+  if (DRY_RUN) {
+    return false;
+  }
+
+  try {
+    const result = await pgPool.query(
+      `SELECT 1
+       FROM codebase_chunk_index
+       WHERE id = $1
+         AND summary IS NOT NULL
+         AND btrim(summary) <> ''
+       LIMIT 1`,
+      [chunkId]
+    );
+    return result.rowCount > 0;
+  } catch (err) {
+    console.warn(`  ⚠️  Summary existence check failed for ${chunkId}: ${err}`);
     return false;
   }
 }
@@ -387,7 +421,12 @@ function extractTermsFromSummary(summary: string): string[] {
   return Array.from(terms);
 }
 
-async function warmBitFrostCache(chunkId: string, summary: string, packetId?: string | null): Promise<void> {
+async function warmBitFrostCache(
+  chunkId: string,
+  summary: string,
+  packetId?: string | null,
+  packetKey?: string | null,
+): Promise<void> {
   if (DRY_RUN) {
     return;
   }
@@ -397,7 +436,9 @@ async function warmBitFrostCache(chunkId: string, summary: string, packetId?: st
   }
 
   try {
-    const cacheId = String(packetId ?? '').trim() || chunkId;
+    const canonicalPacketKey = String(packetKey ?? '').trim();
+    const canonicalPacketId = String(packetId ?? '').trim();
+    const cacheId = canonicalPacketKey || canonicalPacketId || chunkId;
 
     // **L1**: Exact summary cache (5ms lookup)
     await redis.setex(`bitfrost:summary:${cacheId}`, 86400, summary);
@@ -406,7 +447,8 @@ async function warmBitFrostCache(chunkId: string, summary: string, packetId?: st
     const terms = extractTermsFromSummary(summary);
     const packetEnvelope = {
       chunk_id: chunkId,
-      packet_id: String(packetId ?? '').trim() || null,
+      packet_id: canonicalPacketId || null,
+      packet_key: canonicalPacketKey || null,
       summary,
       terms,
       cached_at: new Date().toISOString(),
@@ -435,6 +477,33 @@ async function warmBitFrostCache(chunkId: string, summary: string, packetId?: st
 // Message Processing
 // ============================================================================
 
+function retryCountFor(msg: any): number {
+  return Number(msg?.properties?.headers?.['x-retry-count'] ?? 0);
+}
+
+async function sendToQueueAwaitDrain(channel: any, queueName: string, content: Buffer, options: any): Promise<void> {
+  const accepted = channel.sendToQueue(queueName, content, options);
+  if (!accepted) {
+    await new Promise(resolve => channel.once('drain', resolve));
+  }
+}
+
+async function republishOrDlq(channel: any, msg: any, err: unknown): Promise<void> {
+  const nextRetry = retryCountFor(msg) + 1;
+  const targetQueue = nextRetry > MAX_RETRIES ? SUMMARY_DLQ : SUMMARY_QUEUE;
+
+  await sendToQueueAwaitDrain(channel, targetQueue, msg.content, {
+    persistent: true,
+    contentType: msg.properties?.contentType || 'application/json',
+    headers: {
+      ...(msg.properties?.headers || {}),
+      'x-retry-count': nextRetry,
+      'x-last-error': String((err as Error)?.message || err).slice(0, 300),
+    },
+  });
+  channel.ack(msg);
+}
+
 async function processMessage(channel: any, msg: any): Promise<void> {
   if (!msg) return;
 
@@ -443,8 +512,15 @@ async function processMessage(channel: any, msg: any): Promise<void> {
     const t0 = performance.now();
 
     const packetId = String((chunk as { packet_id?: unknown; packetId?: unknown }).packet_id ?? (chunk as { packetId?: unknown }).packetId ?? '').trim() || null;
+    const packetKey = String((chunk as { packet_key?: unknown; packetKey?: unknown }).packet_key ?? (chunk as { packetKey?: unknown }).packetKey ?? '').trim() || null;
 
     console.log(`\n[${new Date().toISOString()}] Processing chunk ${chunk.id}...`);
+
+    if (await isChunkAlreadySummarized(chunk.id)) {
+      console.log(`  ✓ Already summarized; ACK skip`);
+      channel.ack(msg);
+      return;
+    }
 
     // Step 1: Call Gemma4
     console.log(`  ℹ️  Calling Gemma4...`);
@@ -452,18 +528,17 @@ async function processMessage(channel: any, msg: any): Promise<void> {
 
     // Step 2: Write to Postgres (canonical truth)
     console.log(`  ℹ️  Writing to Postgres...`);
-    const pgSuccess = await writeSummaryToPostgres(chunk.id, summary, packetId);
+    const pgSuccess = await writeSummaryToPostgres(chunk.id, summary, packetId, packetKey);
 
     if (!pgSuccess) {
-      // Retry failed message
-      console.log(`  ⚠️  Requeuing failed message`);
-      channel.nack(msg, false, true);
+      console.log(`  ⚠️  Requeuing failed message through bounded retry`);
+      await republishOrDlq(channel, msg, new Error('Postgres write failed'));
       return;
     }
 
     // Step 3: Warm Redis cache
     console.log(`  ℹ️  Warming Redis cache...`);
-    await warmBitFrostCache(chunk.id, summary, packetId);
+    await warmBitFrostCache(chunk.id, summary, packetId, packetKey);
 
     // Step 4: Acknowledge message
     channel.ack(msg);
@@ -474,8 +549,7 @@ async function processMessage(channel: any, msg: any): Promise<void> {
   } catch (err) {
     console.error(`  ✗ Error: ${err}`);
     tracker.recordError();
-    // Discard message on error (don't requeue after retries exhausted)
-    channel.nack(msg, false, false);
+    await republishOrDlq(channel, msg, err);
   }
 }
 
@@ -491,6 +565,7 @@ async function main() {
 
   console.log(`Mode: ${DRY_RUN ? 'DRY-RUN' : 'APPLY'}`);
   console.log(`LLM Concurrency: ${LLM_CONCURRENCY} max active requests`);
+  console.log(`Gemma4 max tokens: ${GEMMA4_MAX_TOKENS}`);
   console.log(`Gemma4 timeout: ${GEMMA4_TIMEOUT_MS}ms`);
   console.log(`RabbitMQ: ${RABBITMQ_URL}`);
   console.log(`Gemma4: ${LLAMA_SERVER_URL}`);
@@ -512,14 +587,15 @@ async function main() {
     channel = await connection.createChannel();
 
     // Declare queue
-    await channel.assertQueue('phase7.summarization', { durable: true });
+    await channel.assertQueue(SUMMARY_QUEUE, { durable: true });
+    await channel.assertQueue(SUMMARY_DLQ, { durable: true });
 
     // **CRITICAL**: Prefetch = 1 (process one message at a time per worker)
     // Multiple workers can run (4), but each processes sequentially
     // LLM calls are queued by the semaphore
     await channel.prefetch(1);
 
-    console.log('✅ Connected to phase7.summarization\n');
+    console.log(`✅ Connected to ${SUMMARY_QUEUE}\n`);
     console.log('🚀 Listening for messages...\n');
 
     // Start metrics reporting every 30 seconds
@@ -530,7 +606,7 @@ async function main() {
     }
 
     // Consume messages
-    channel.consume('phase7.summarization', (msg) => {
+    channel.consume(SUMMARY_QUEUE, (msg) => {
       if (msg) {
         processMessage(channel!, msg);
       }

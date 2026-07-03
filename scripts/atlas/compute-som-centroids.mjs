@@ -62,9 +62,9 @@ function computeMean(embeddings) {
 
 async function getCellEmbeddings() {
   const result = await db.query(`
-    SELECT som_row, som_col, embedding
+    SELECT som_row, som_col, latent_64 as embedding
     FROM atlas_packets
-    WHERE embedding IS NOT NULL
+    WHERE latent_64 IS NOT NULL
       AND som_row IS NOT NULL
       AND som_col IS NOT NULL
     ORDER BY som_row, som_col

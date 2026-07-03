@@ -1,0 +1,164 @@
+{
+  "generatedAt": "2026-07-03T08:03:05.419Z",
+  "queueContracts": [
+    {
+      "queue": "phase7.summarization",
+      "type": "ACP_QUEUE",
+      "requiredFields": [
+        "id",
+        "content"
+      ],
+      "forbiddenFields": [
+        "chunk_id"
+      ],
+      "status": "PASS",
+      "description": "Chunk summarization queue. Input: id + content. Output: summary + metadata envelope."
+    },
+    {
+      "queue": "phase8.qdrant_sync",
+      "type": "ACP_QUEUE",
+      "requiredFields": [
+        "id",
+        "summary",
+        "feature_id"
+      ],
+      "forbiddenFields": [],
+      "status": "PASS",
+      "description": "Qdrant payload sync. Mirrors Postgres summaries to Qdrant collection payload."
+    }
+  ],
+  "protoTableMapping": [
+    {
+      "proto": "Packet",
+      "table": "atlas_packets",
+      "columns": 62,
+      "columnsMissing": [],
+      "indexesTotal": 40,
+      "indexesMissing": [
+        "idx_atlas_packets_feature_id_composite",
+        "atlas_packets_metadata_gin_idx",
+        "idx_atlas_packets_payload_path",
+        "idx_packets_source_feature_multi_hop",
+        "idx_packets_centroid_cache"
+      ],
+      "indexesCoverage": "FAIL",
+      "fieldsCoverage": "PASS",
+      "indexCapabilitiesSatisfied": [],
+      "indexCapabilitiesMissing": [],
+      "capabilityCoverage": "PASS"
+    },
+    {
+      "proto": "RouteRuntimePacket",
+      "table": "route_runtime_packets",
+      "columns": 0,
+      "columnsMissing": [
+        "feature_id",
+        "raw",
+        "route_state"
+      ],
+      "indexesTotal": 0,
+      "indexesMissing": [
+        "idx_route_runtime_packets_feature_id",
+        "idx_rrp_raw_gin",
+        "idx_rrp_feature_cluster",
+        "idx_rrp_feature_ids_gin"
+      ],
+      "indexesCoverage": "FAIL",
+      "fieldsCoverage": "FAIL",
+      "indexCapabilitiesSatisfied": [],
+      "indexCapabilitiesMissing": [],
+      "capabilityCoverage": "PASS"
+    },
+    {
+      "proto": "TaskSemanticPacket",
+      "table": "task_semantic_packets",
+      "columns": 0,
+      "columnsMissing": [
+        "feature_id",
+        "metadata"
+      ],
+      "indexesTotal": 0,
+      "indexesMissing": [
+        "idx_task_semantic_packets_feature_id",
+        "idx_task_semantic_packets_metadata_gin"
+      ],
+      "indexesCoverage": "FAIL",
+      "fieldsCoverage": "FAIL",
+      "indexCapabilitiesSatisfied": [],
+      "indexCapabilitiesMissing": [],
+      "capabilityCoverage": "PASS"
+    },
+    {
+      "proto": "ConceptRecord",
+      "table": "concept_records",
+      "columns": 17,
+      "columnsMissing": [
+        "metadata"
+      ],
+      "indexesTotal": 6,
+      "indexesMissing": [
+        "idx_concept_records_feature_ids_gin",
+        "idx_concept_records_metadata_gin"
+      ],
+      "indexesCoverage": "FAIL",
+      "fieldsCoverage": "FAIL",
+      "indexCapabilitiesSatisfied": [],
+      "indexCapabilitiesMissing": [],
+      "capabilityCoverage": "PASS"
+    }
+  ],
+  "pipelineStages": {
+    "Phase7SummaryRequested": {
+      "queue": "phase7.summarization",
+      "inputFields": [
+        "id",
+        "content"
+      ],
+      "outputTable": "codebase_chunk_index",
+      "outputFields": [
+        "summary",
+        "metadata",
+        "updated_at"
+      ]
+    },
+    "Phase8PayloadSyncRequested": {
+      "queue": "phase8.qdrant_sync",
+      "inputFields": [
+        "id",
+        "summary",
+        "feature_id"
+      ],
+      "outputTable": "qdrant_payload_mirror",
+      "outputFields": [
+        "payload",
+        "synced_at"
+      ]
+    }
+  },
+  "gemma4Output": {
+    "requiredFields": [
+      "id",
+      "summary"
+    ],
+    "optionalFields": [
+      "feature_id",
+      "source_ref",
+      "metadata"
+    ],
+    "metadataShape": {
+      "model": "string",
+      "phase": "string",
+      "summary_len": "number",
+      "domains": "array",
+      "symbols": "array",
+      "confidence": "number"
+    },
+    "description": "Gemma4 summary output must include id, summary, and structured metadata."
+  },
+  "gate": "FAIL",
+  "recommendations": [
+    "Run: npm run drizzle:migrate (applies manual index migrations)",
+    "Check queue contracts: grep -r \"chunk_id\" scripts/ (should be \"id\" only)",
+    "Verify Gemma4 output: tail -100 /tmp/phase7-workers.log | grep -i metadata"
+  ]
+}

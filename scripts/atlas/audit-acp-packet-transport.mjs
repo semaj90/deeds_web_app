@@ -340,10 +340,14 @@ insert into agent_os_events (
   '${JSON.stringify(metadata).replaceAll("'", "''")}'::jsonb
 );
 `;
-  const result = run('docker', ['exec', '-i', 'legal-ai-postgres', 'psql', '-U', 'legal_admin', '-d', 'legal_ai_db', '-v', 'ON_ERROR_STOP=1'], {
-    input: sql,
-    timeoutMs: 10_000,
-  });
+  const result = run(
+    'docker',
+    ['exec', '-i', 'legal-ai-postgres', 'psql', '-U', 'legal_admin', '-d', 'legal_ai_db', '-v'],
+    {
+      input: sql,
+      timeoutMs: 10_000,
+    }
+  );
   return { command: 'docker exec -i legal-ai-postgres psql ...', ok: result.ok, output: result.stdout || result.stderr || result.error };
 }
 

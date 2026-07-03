@@ -83,7 +83,7 @@ async function computePageRank() {
     const topRes = await session.run(`
       MATCH (n:Packet)
       WHERE n.pageRankScore IS NOT NULL
-      RETURN n.stableKey as key, n.pageRankScore as score
+      RETURN toString(id(n)) as key, n.pageRankScore as score
       ORDER BY score DESC
       LIMIT 100
     `);

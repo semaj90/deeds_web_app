@@ -1,7 +1,7 @@
 # GPU Acceleration Analysis: Session 96 Batch Optimization
 
-**Date**: June 29, 2026 (post-power-restore)  
-**System**: Windows 10 Home + WSL2 + Docker, RTX 3060 Ti 8GB, CUDA 13.0  
+**Date**: June 29, 2026 (post-power-restore)
+**System**: Windows 10 Home + WSL2 + Docker, RTX 3060 Ti 8GB, CUDA 13.0
 **Question**: Can we optimize the 57,976-packet batch with local GPU acceleration?
 
 ---
@@ -47,7 +47,6 @@
 # Install onnxruntime-gpu
 pip install onnxruntime-gpu==1.17.1
 
-# Download embeddinggemma ONNX model (~500MB)
 # Model path: static/embeddinggemma_300m_onnx/
 ```
 

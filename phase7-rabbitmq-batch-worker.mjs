@@ -27,6 +27,7 @@ import pg from 'pg';
 import Redis from 'ioredis';
 import fetch from 'node-fetch';
 import { isUsableGemma4Summary, sanitizeGemma4Summary } from './scripts/atlas/lib/gemma4-summary-sanitizer.mjs';
+import { buildCanonicalPacketKey } from './scripts/atlas/lib/packet-identity.mjs';
 
 const { Pool } = pg;
 
@@ -65,7 +66,7 @@ const redis = new Redis({
 });
 
 async function summarizeOne(chunkId, content, cacheKey) {
-  // L1: Check BitFrost cache first (5ms) — use relative_path as stable cache key for source_ref linkage
+  // L1: Check BitFrost cache first (5ms) using canonical packet identity.
   const redisKey = `bitfrost:summary:${cacheKey}`;
   try {
     const cached = await redis.get(redisKey);
@@ -112,7 +113,7 @@ async function summarizeOne(chunkId, content, cacheKey) {
       return null;
     }
 
-    // Cache summary using the same key that was checked in L1 (lines 68-71)
+    // Cache summary using the same canonical key that was checked in L1.
     if (summary && cacheKey) {
       try {
         await redis.setex(`bitfrost:summary:${cacheKey}`, 86400, summary);
@@ -139,9 +140,9 @@ async function produceQueue() {
     await channel.assertQueue(QUEUE_NAME, { durable: true });
     await channel.assertQueue(DLQ_NAME, { durable: true });
 
-    // Fetch unsummarized chunks with relative_path as stable cache key
+    // Fetch unsummarized chunks and derive canonical packet keys from stable source fields.
     const result = await pool.query(`
-      SELECT id, relative_path, content
+      SELECT id, relative_path, line_start, line_end, content, content_hash
       FROM codebase_chunk_index
       WHERE summary IS NULL OR summary = ''
       ORDER BY id
@@ -158,7 +159,25 @@ async function produceQueue() {
       const batch = chunks.slice(i, i + queueBatchSize);
       const message = {
         batch_id: Math.floor(i / queueBatchSize),
-        chunks: batch.map(c => ({ id: c.id, path: c.relative_path, content: c.content, cacheKey: c.relative_path }))
+        chunks: batch.map(c => {
+          const packetKey = buildCanonicalPacketKey({
+            sourceRef: c.relative_path,
+            lineStart: c.line_start,
+            lineEnd: c.line_end,
+            contentHash: c.content_hash,
+          });
+
+          return {
+            id: c.id,
+            path: c.relative_path,
+            content: c.content,
+            lineStart: c.line_start,
+            lineEnd: c.line_end,
+            contentHash: c.content_hash,
+            packetKey,
+            cacheKey: packetKey || c.relative_path,
+          };
+        })
       };
 
       channel.sendToQueue(
@@ -218,7 +237,7 @@ async function startWorker() {
 
         // Process each chunk in the batch
         for (const chunk of chunks) {
-          const summary = await summarizeOne(chunk.id, chunk.content, chunk.cacheKey);
+          const summary = await summarizeOne(chunk.id, chunk.content, chunk.packetKey || chunk.cacheKey);
 
           if (summary) {
             // Write to Postgres (canonical)
@@ -230,7 +249,7 @@ async function startWorker() {
               [summary, chunk.id]
             );
 
-            // Redis caching done in summarizeOne() using relative_path-based key
+            // Redis caching done in summarizeOne() using canonical packet key
             summarized++;
           }
         }

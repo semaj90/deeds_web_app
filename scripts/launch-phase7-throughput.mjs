@@ -74,7 +74,7 @@ try {
 
 // Start producer (enqueue remaining unsummarized chunks)
 console.log('[phase7-throughput] 📤 Starting producer...');
-const producerProc = spawn('node', ['phase7-rabbitmq-batch-worker.mjs', '--produce', '--chunk-batch-size=5000'], {
+const producerProc = spawn('node', ['phase7-rabbitmq-batch-worker.mjs', '--produce', '--chunk-batch-size=3000'], {
   cwd: ROOT,
   stdio: 'inherit',
 });
